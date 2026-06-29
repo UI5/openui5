@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, Theme, Icons) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, Theme, Icons) { 'use strict';
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -18,7 +18,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Theme', 'sap/
      * @abstract
      * @public
      */
-    let ShellBarSpacer = class ShellBarSpacer extends webcomponentsBase.b {
+    let ShellBarSpacer = class ShellBarSpacer extends webcomponentsBase.S {
         constructor() {
             super(...arguments);
             this.visible = false;
@@ -33,8 +33,8 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Theme', 'sap/
         })
     ], ShellBarSpacer);
     ShellBarSpacer.define();
-    var ShellBarSpacer_default = ShellBarSpacer;
+    var ShellBarSpacer$1 = ShellBarSpacer;
 
-    return ShellBarSpacer_default;
+    return ShellBarSpacer$1;
 
 }));

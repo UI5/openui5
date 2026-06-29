@@ -48,7 +48,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.NotificationList",
       {
         metadata: {
-          tag: "ui5-notification-list-0df29cf2",
+          tag: "ui5-notification-list-3bacdbf4",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -66,17 +66,14 @@ sap.ui.define(
              * Defines the text that is displayed when the component contains no items.
              */
             noDataText: { type: "string", mapping: "property" },
-
             /**
              * The text-content of the Web Component.
              */
             text: { type: "string", mapping: "textContent" },
-
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
             width: { type: "sap.ui.core.CSSSize", mapping: "style" },
-
             /**
              * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */

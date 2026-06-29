@@ -1,11 +1,11 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/SearchItem.css', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/parameters-bundle.css3', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/event-strict'], (function (webcomponentsBase, ListItemBase, parametersBundle_css, parametersBundle_css$2, SearchItem_css, Theme, parametersBundle_css$1, i18nDefaults, Icons, eventStrict) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/SearchItem.css', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, eventStrict, ListItemBase, jsxRuntime, parametersBundle_css$1, SearchItem_css, Theme, parametersBundle_css, i18nDefaults, Icons) { 'use strict';
 
     function SearchItemShowMoreTemplate() {
-        return (parametersBundle_css.jsx("li", { class: "ui5-li-root ui5-li--focusable ui5-search-item-show-more", role: "option", tabindex: this._effectiveTabIndex, "aria-selected": this.selected, onFocusIn: this._onfocusin, onFocusOut: this._onfocusout, children: parametersBundle_css.jsx("span", { class: "ui5-search-item-show-more-text", children: this.showMoreTextCount }) }));
+        return (jsxRuntime.jsx("li", { class: "ui5-li-root ui5-li--focusable ui5-search-item-show-more", role: "option", tabindex: this._effectiveTabIndex, "aria-selected": this.selected, onFocusIn: this._onfocusin, onFocusOut: this._onfocusout, onClick: this._onclick, onKeyDown: this._onkeydown, onKeyUp: this._onkeyup, children: jsxRuntime.jsx("span", { class: "ui5-search-item-show-more-text", children: this.showMoreTextCount }) }));
     }
 
-    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var SearchItemShowMoreCss = `.ui5-search-item-show-more-text{color:var(--sapLinkColor)}.ui5-search-item-show-more-text:active{color:var(--sapList_Active_TextColor)}
 `;
 
@@ -55,6 +55,22 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/ListItemBase'
         _onfocusout() {
             this.selected = false;
         }
+        _onclick(e, fromKeyboard = false) {
+            e.stopImmediatePropagation();
+            this.fireDecoratorEvent("click", { item: this, originalEvent: e, fromKeyboard });
+        }
+        _onkeydown(e) {
+            if (webcomponentsBase.b(e)) {
+                this._onclick(e, true);
+                e.preventDefault();
+            }
+        }
+        _onkeyup(e) {
+            if (webcomponentsBase.A(e)) {
+                this._onclick(e, true);
+                e.preventDefault();
+            }
+        }
     };
     __decorate([
         webcomponentsBase.s()
@@ -63,19 +79,32 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/ListItemBase'
         webcomponentsBase.s({ type: Boolean })
     ], SearchItemShowMore.prototype, "selected", void 0);
     __decorate([
-        parametersBundle_css$2.i("@ui5/webcomponents-fiori")
+        parametersBundle_css$1.i("@ui5/webcomponents-fiori")
     ], SearchItemShowMore, "i18nBundle", void 0);
     SearchItemShowMore = SearchItemShowMore_1 = __decorate([
         webcomponentsBase.m({
             tag: "ui5-search-item-show-more",
             languageAware: true,
-            renderer: parametersBundle_css.y,
+            renderer: jsxRuntime.y,
             template: SearchItemShowMoreTemplate,
             styles: [
                 ListItemBase.ListItemBase.styles,
                 SearchItem_css.SearchItemCss,
                 SearchItemShowMoreCss,
             ],
+        })
+        /**
+         * Fired when the component is activated, either with a mouse/tap
+         * or by pressing the Enter or Space keys.
+         *
+         * @public
+         * @param {boolean} fromKeyboard Indicates whether the event was fired
+         * due to keyboard interaction (Enter or Space) rather than mouse/tap.
+         */
+        ,
+        eventStrict.l("click", {
+            bubbles: true,
+            cancelable: true,
         })
     ], SearchItemShowMore);
     SearchItemShowMore.define();

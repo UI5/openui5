@@ -25,7 +25,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarSearch",
       {
         metadata: {
-          tag: "ui5-shellbar-search-0df29cf2",
+          tag: "ui5-shellbar-search-3bacdbf4",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -34,7 +34,7 @@ sap.ui.define(
           designtime:
             "sap/f/gen/ui5/webcomponents_fiori/designtime/ShellBarSearch.designtime",
 
-          interfaces: ["sap.m.IBar", "sap.tnt.IToolHeader"],
+          interfaces: ["sap.m.IBar"],
 
           defaultAggregation: "items",
 
@@ -47,7 +47,22 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
-
+            /**
+             * Defines the accessible ARIA description of the field.
+             */
+            accessibleDescription: { type: "string", mapping: "property" },
+            /**
+             * Defines the accessible ARIA name of the component.
+             */
+            accessibleName: { type: "string", mapping: "property" },
+            /**
+             * Indicates whether a loading indicator should be shown in the input field.
+             */
+            fieldLoading: {
+              type: "boolean",
+              mapping: "property",
+              defaultValue: false
+            },
             /**
              * Indicates whether a loading indicator should be shown in the popup.
              */
@@ -56,7 +71,6 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
-
             /**
              * Defines whether the value will be autcompleted to match an item.
              */
@@ -65,12 +79,28 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
-
             /**
              * Indicates whether the items picker is open.
              */
             open: { type: "boolean", mapping: "property", defaultValue: false },
-
+            /**
+             * Defines a short hint intended to aid the user with data entry when the
+             * component has no value.
+             */
+            placeholder: { type: "string", mapping: "property" },
+            /**
+             * Defines the value of the component:
+             *
+             * Applications are responsible for setting the correct scope value.
+             *
+             * **Note:** If the given value does not match any existing scopes,
+             * no scope will be selected and the SearchField scope component will be displayed as empty.
+             */
+            scopeValue: {
+              type: "string",
+              mapping: "property",
+              defaultValue: ""
+            },
             /**
              * Defines whether the clear icon of the search will be shown.
              */
@@ -79,37 +109,15 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
-
             /**
              * Defines the value of the component.
              *
              * **Note:** The property is updated upon typing.
              */
-            value: { type: "string", mapping: "property", defaultValue: "" },
-
-            /**
-             * Defines a short hint intended to aid the user with data entry when the
-             * component has no value.
-             */
-            placeholder: { type: "string", mapping: "property" },
-
-            /**
-             * Defines the accessible ARIA name of the component.
-             */
-            accessibleName: { type: "string", mapping: "property" },
-
-            /**
-             * Defines the accessible ARIA description of the field.
-             */
-            accessibleDescription: { type: "string", mapping: "property" }
+            value: { type: "string", mapping: "property", defaultValue: "" }
           },
 
           aggregations: {
-            /**
-             * Defines the Search suggestion items.
-             * @type module:sap/ui/core/webc/WebComponent
-             */
-            items: { type: "sap.ui.core.webc.WebComponent", multiple: true },
             /**
              * Defines the popup footer action button.
              * @type module:sap/f/gen/ui5/webcomponents/dist/Button
@@ -118,6 +126,23 @@ sap.ui.define(
               type: "sap.f.gen.ui5.webcomponents.dist.Button",
               multiple: true,
               slot: "action"
+            },
+            /**
+             * Defines the Search suggestion items.
+             * @type module:sap/ui/core/webc/WebComponent
+             */
+            items: { type: "sap.ui.core.webc.WebComponent", multiple: true },
+            /**
+             * Defines the filter button slot, used to display an additional filtering button.
+             * This slot is intended for passing a `ui5-button` with a filter icon to provide extended filtering options.
+             *
+             * **Note:** Scope button and Filter button are mutually exclusive.
+             * @type module:sap/f/gen/ui5/webcomponents/dist/Button
+             */
+            filterButton: {
+              type: "sap.f.gen.ui5.webcomponents.dist.Button",
+              multiple: true,
+              slot: "filterButton"
             },
             /**
              * Defines the illustrated message to be shown in the popup.
@@ -139,38 +164,18 @@ sap.ui.define(
             },
             /**
              * Defines the component scope options.
-             * @type module:sap/f/gen/ui5/webcomponents_fiori.ISearchScope
+             * @type sap/f/gen/ui5/webcomponents_fiori/dist/SearchField
              */
             scopes: {
-              type: "sap.f.gen.ui5.webcomponents_fiori.ISearchScope",
+              type: "sap.f.gen.ui5.webcomponents_fiori.dist.SearchField.ISearchScope",
               multiple: true,
               slot: "scopes"
-            },
-            /**
-             * Defines the filter button slot, used to display an additional filtering button.
-             * This slot is intended for passing a `ui5-button` with a filter icon to provide extended filtering options.
-             *
-             * **Note:** Scope button and Filter button are mutually exclusive.
-             * @type module:sap/f/gen/ui5/webcomponents/dist/Button
-             */
-            filterButton: {
-              type: "sap.f.gen.ui5.webcomponents.dist.Button",
-              multiple: true,
-              slot: "filterButton"
             }
           },
 
           associations: {},
 
           events: {
-            /**
-             * Fired when the popup is opened.
-             */
-            onOpen: {
-              mapping: "open",
-              parameters: {}
-            },
-
             /**
              * Fired when the popup is closed.
              */
@@ -183,6 +188,14 @@ sap.ui.define(
              */
             input: {
               enableEventBubbling: true,
+              parameters: {}
+            },
+
+            /**
+             * Fired when the popup is opened.
+             */
+            onOpen: {
+              mapping: "open",
               parameters: {}
             },
 

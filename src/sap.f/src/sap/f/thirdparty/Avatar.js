@@ -1,16 +1,16 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, eventStrict, parametersBundle_css$1, parametersBundle_css, Theme, Icon, i18nDefaults, Icons) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, eventStrict, parametersBundle_css, jsxRuntime, Theme, Icon, i18nDefaults, Icons) { 'use strict';
 
     function AvatarTemplate() {
-        return (parametersBundle_css.jsxs("div", { class: "ui5-avatar-root", tabindex: this.tabindex, "data-sap-focus-ref": true, role: this._role, "aria-haspopup": this._ariaHasPopup, "aria-label": this.accessibleNameText, onKeyUp: this._onkeyup, onKeyDown: this._onkeydown, onClick: this._onclick, children: [this._hasImage ?
-                    parametersBundle_css.jsx("slot", {})
-                    : parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [this.icon && parametersBundle_css.jsx(Icon.Icon, { class: "ui5-avatar-icon", name: this.icon, accessibleName: this.accessibleName }), this.initials ? (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [parametersBundle_css.jsx("span", { class: "ui5-avatar-initials ui5-avatar-initials-hidden", children: this.validInitials }), parametersBundle_css.jsx(Icon.Icon, { name: this.fallbackIcon, class: "ui5-avatar-icon ui5-avatar-icon-fallback ui5-avatar-fallback-icon-hidden" })] })) : (
+        return (jsxRuntime.jsxs("div", { class: "ui5-avatar-root", tabindex: this.tabindex, "data-sap-focus-ref": true, role: this._role, "aria-hidden": this.effectiveAriaHidden, "aria-haspopup": this._ariaHasPopup, "aria-label": this.accessibleNameText, onKeyUp: this._onkeyup, onKeyDown: this._onkeydown, onClick: this._onclick, children: [this._hasImage ?
+                    jsxRuntime.jsx("slot", {})
+                    : jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [this.icon && jsxRuntime.jsx(Icon.Icon, { class: "ui5-avatar-icon", name: this.icon, accessibleName: this.accessibleName }), this.initials ? (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsx("span", { class: "ui5-avatar-initials ui5-avatar-initials-hidden", children: this.validInitials }), jsxRuntime.jsx(Icon.Icon, { name: this.fallbackIcon, class: "ui5-avatar-icon ui5-avatar-icon-fallback ui5-avatar-fallback-icon-hidden" })] })) : (
                             // Show fallback icon only
-                            parametersBundle_css.jsx(Icon.Icon, { name: this.fallbackIcon, class: "ui5-avatar-icon ui5-avatar-icon-fallback" }))] }), parametersBundle_css.jsx("slot", { name: "badge" })] }));
+                            jsxRuntime.jsx(Icon.Icon, { name: this.fallbackIcon, class: "ui5-avatar-icon ui5-avatar-icon-fallback" }))] }), jsxRuntime.jsx("slot", { name: "badge" })] }));
     }
 
-    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
-    var AvatarCss = `:host(:not([hidden])){display:inline-block;box-sizing:border-box;position:relative;font-family:var(--sapFontFamily)}:host(:not([hidden]).ui5_hovered){opacity:.7}:host([interactive]:not([disabled])){cursor:pointer}:host([interactive]:not([hidden]):active){background-color:var(--sapButton_Active_Background);border-color:var(--sapButton_Active_BorderColor);color:var(--sapButton_Active_TextColor)}:host([interactive]:not([hidden]):not([disabled]):not(:active):not([focused]):hover){box-shadow:var(--ui5-v2-15-0-avatar-hover-box-shadow-offset)}:host([interactive][desktop]:not([hidden])) .ui5-avatar-root:focus,:host([interactive]:not([hidden])) .ui5-avatar-root:focus-visible{outline:var(--_ui5-v2-15-0_avatar_outline);outline-offset:var(--_ui5-v2-15-0_avatar_focus_offset)}:host([disabled]){opacity:var(--sapContent_DisabledOpacity);pointer-events:none}:host{height:3rem;width:3rem;border-radius:50%;border:var(--ui5-v2-15-0-avatar-initials-border);outline:none;color:var(--ui5-v2-15-0-avatar-initials-color)}.ui5-avatar-root{display:flex;align-items:center;justify-content:center;outline:none;height:100%;width:100%;border-radius:inherit}:host([_size="XS"]),:host([size="XS"]){height:2rem;width:2rem;min-height:2rem;min-width:2rem;font-size:var(--_ui5-v2-15-0_avatar_fontsize_XS)}:host(:not([size])),:host([_size="S"]),:host([size="S"]){min-height:3rem;min-width:3rem;font-size:var(--_ui5-v2-15-0_avatar_fontsize_S)}:host([_size="M"]),:host([size="M"]){min-height:4rem;min-width:4rem;font-size:var(--_ui5-v2-15-0_avatar_fontsize_M)}:host([_size="L"]),:host([size="L"]){min-height:5rem;min-width:5rem;font-size:var(--_ui5-v2-15-0_avatar_fontsize_L)}:host([_size="XL"]),:host([size="XL"]){min-height:7rem;min-width:7rem;font-size:var(--_ui5-v2-15-0_avatar_fontsize_XL)}:host .ui5-avatar-icon{height:var(--_ui5-v2-15-0_avatar_fontsize_S);width:var(--_ui5-v2-15-0_avatar_fontsize_S);color:inherit}:host([_size="XS"]) .ui5-avatar-icon,:host([size="XS"]) .ui5-avatar-icon{height:var(--_ui5-v2-15-0_avatar_icon_XS);width:var(--_ui5-v2-15-0_avatar_icon_XS)}:host([_size="S"]) .ui5-avatar-icon,:host([size="S"]) .ui5-avatar-icon{height:var(--_ui5-v2-15-0_avatar_icon_S);width:var(--_ui5-v2-15-0_avatar_icon_S)}:host([_size="M"]) .ui5-avatar-icon,:host([size="M"]) .ui5-avatar-icon{height:var(--_ui5-v2-15-0_avatar_icon_M);width:var(--_ui5-v2-15-0_avatar_icon_M)}:host([_size="L"]) .ui5-avatar-icon,:host([size="L"]) .ui5-avatar-icon{height:var(--_ui5-v2-15-0_avatar_icon_L);width:var(--_ui5-v2-15-0_avatar_icon_L)}:host([_size="XL"]) .ui5-avatar-icon,:host([size="XL"]) .ui5-avatar-icon{height:var(--_ui5-v2-15-0_avatar_icon_XL);width:var(--_ui5-v2-15-0_avatar_icon_XL)}::slotted(*){border-radius:50%;width:100%;height:100%;pointer-events:none}:host([shape="Square"]){border-radius:var(--ui5-v2-15-0-avatar-border-radius)}:host([shape="Square"]) ::slotted(*){border-radius:calc(var(--ui5-v2-15-0-avatar-border-radius) - var(--ui5-v2-15-0-avatar-border-radius-img-deduction))}:host(:not([color-scheme])),:host(:not([_has-image])),:host([color-scheme="Auto"]),:host([_color-scheme="Accent6"]),:host([ui5-avatar][color-scheme="Accent6"]){background-color:var(--ui5-v2-15-0-avatar-accent6);color:var(--ui5-v2-15-0-avatar-accent6-color);border-color:var(--ui5-v2-15-0-avatar-accent6-border-color)}:host([_color-scheme="Accent6"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent6"][interactive]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_6_Hover_Background)}:host([_color-scheme="Accent1"]),:host([ui5-avatar][color-scheme="Accent1"]){background-color:var(--ui5-v2-15-0-avatar-accent1);color:var(--ui5-v2-15-0-avatar-accent1-color);border-color:var(--ui5-v2-15-0-avatar-accent1-border-color)}:host([_color-scheme="Accent1"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent1"][interactive]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_1_Hover_Background)}:host([_color-scheme="Accent2"]),:host([ui5-avatar][color-scheme="Accent2"]){background-color:var(--ui5-v2-15-0-avatar-accent2);color:var(--ui5-v2-15-0-avatar-accent2-color);border-color:var(--ui5-v2-15-0-avatar-accent2-border-color)}:host([_color-scheme="Accent2"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent2"][interactive]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_2_Hover_Background)}:host([_color-scheme="Accent3"]),:host([ui5-avatar][color-scheme="Accent3"]){background-color:var(--ui5-v2-15-0-avatar-accent3);color:var(--ui5-v2-15-0-avatar-accent3-color);border-color:var(--ui5-v2-15-0-avatar-accent3-border-color)}:host([_color-scheme="Accent3"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent3"][interactive]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_3_Hover_Background)}:host([_color-scheme="Accent4"]),:host([ui5-avatar][color-scheme="Accent4"]){background-color:var(--ui5-v2-15-0-avatar-accent4);color:var(--ui5-v2-15-0-avatar-accent4-color);border-color:var(--ui5-v2-15-0-avatar-accent4-border-color)}:host([_color-scheme="Accent4"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent4"][interactive]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_4_Hover_Background)}:host([_color-scheme="Accent5"]),:host([ui5-avatar][color-scheme="Accent5"]){background-color:var(--ui5-v2-15-0-avatar-accent5);color:var(--ui5-v2-15-0-avatar-accent5-color);border-color:var(--ui5-v2-15-0-avatar-accent5-border-color)}:host([_color-scheme="Accent5"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent5"][interactive]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_5_Hover_Background)}:host([_color-scheme="Accent7"]),:host([ui5-avatar][color-scheme="Accent7"]){background-color:var(--ui5-v2-15-0-avatar-accent7);color:var(--ui5-v2-15-0-avatar-accent7-color);border-color:var(--ui5-v2-15-0-avatar-accent7-border-color)}:host([_color-scheme="Accent7"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent7"][interactive]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_7_Hover_Background)}:host([_color-scheme="Accent8"]),:host([ui5-avatar][color-scheme="Accent8"]){background-color:var(--ui5-v2-15-0-avatar-accent8);color:var(--ui5-v2-15-0-avatar-accent8-color);border-color:var(--ui5-v2-15-0-avatar-accent8-border-color)}:host([_color-scheme="Accent8"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent8"][interactive]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_8_Hover_Background)}:host([_color-scheme="Accent9"]),:host([ui5-avatar][color-scheme="Accent9"]){background-color:var(--ui5-v2-15-0-avatar-accent9);color:var(--ui5-v2-15-0-avatar-accent9-color);border-color:var(--ui5-v2-15-0-avatar-accent9-border-color)}:host([_color-scheme="Accent9"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent9"][interactive]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_9_Hover_Background)}:host([_color-scheme="Accent10"]),:host([ui5-avatar][color-scheme="Accent10"]){background-color:var(--ui5-v2-15-0-avatar-accent10);color:var(--ui5-v2-15-0-avatar-accent10-color);border-color:var(--ui5-v2-15-0-avatar-accent10-border-color)}:host([_color-scheme="Accent10"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent10"][interactive]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_10_Hover_Background)}:host([_color-scheme="Placeholder"]),:host([ui5-avatar][color-scheme="Placeholder"]){background-color:var(--ui5-v2-15-0-avatar-placeholder);color:var(--ui5-v2-15-0-avatar-placeholder-color);border-color:var(--sapAvatar_Lite_BorderColor)}:host([_color-scheme="Transparent"]),:host([ui5-avatar][color-scheme="Transparent"]){background-color:transparent;border-color:transparent}:host([_has-image]){color:var(--ui5-v2-15-0-avatar-accent10-color);border:var(--ui5-v2-15-0-avatar-optional-border);background-color:transparent}.ui5-avatar-initials{color:inherit}.ui5-avatar-icon~.ui5-avatar-initials,.ui5-avatar-icon~.ui5-avatar-icon-fallback{display:none}.ui5-avatar-fallback-icon-hidden{display:none}.ui5-avatar-initials-hidden{position:absolute;visibility:hidden;z-index:0;pointer-events:none}::slotted([slot="badge"]){position:absolute;bottom:0;right:0;width:1.125rem;height:1.125rem;font-family:var(--sapFontFamily);font-size:var(--sapFontSmallSize);color:var(--sapBackgroundColor);--_ui5-v2-15-0-tag-height: 1.125rem}:host(:not([disabled])) ::slotted([slot="badge"]){pointer-events:initial}:host([_size="L"]) ::slotted([slot="badge"]),:host([size="L"]) ::slotted([slot="badge"]){width:1.25rem;height:1.25rem;--_ui5-v2-15-0-tag-height: 1.25rem;--_ui5-v2-15-0-tag-icon-width: .875rem}:host([_size="XL"]) ::slotted([slot="badge"]),:host([size="XL"]) ::slotted([slot="badge"]){width:1.75rem;height:1.75rem;--_ui5-v2-15-0-tag-height: 1.75rem;--_ui5-v2-15-0-tag-icon-width: 1rem}:host([shape="Square"]) ::slotted([slot="badge"]){bottom:-.125rem;right:-.125rem}:host([_size="L"][shape="Square"]) ::slotted([slot="badge"]),:host([size="L"][shape="Square"]) ::slotted([slot="badge"]){bottom:-.1875rem;right:-.1875rem}:host([_size="XL"][shape="Square"]) ::slotted([slot="badge"]),:host([size="XL"][shape="Square"]) ::slotted([slot="badge"]){bottom:-.25rem;right:-.25rem}
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var AvatarCss = `:host(:not([hidden])){display:inline-block;box-sizing:border-box;position:relative;font-family:var(--sapFontFamily)}:host(:not([hidden]).ui5_hovered){opacity:.7}:host([interactive]:not([disabled])),:host([mode="Interactive"]:not([disabled])){cursor:pointer}:host([interactive]:not([hidden]):active),:host([mode="Interactive"]:not([hidden]):active){background-color:var(--sapButton_Active_Background);border-color:var(--sapButton_Active_BorderColor);color:var(--sapButton_Active_TextColor)}:host([interactive]:not([hidden]):not([disabled]):not(:active):not([focused]):hover),:host([mode="Interactive"]:not([hidden]):not([disabled]):not(:active):not([focused]):hover){box-shadow:var(--ui5-avatar-hover-box-shadow-offset)}:host([interactive][desktop]:not([hidden])) .ui5-avatar-root:focus,:host([interactive]:not([hidden])) .ui5-avatar-root:focus-visible,:host([mode="Interactive"][desktop]:not([hidden])) .ui5-avatar-root:focus,:host([mode="Interactive"]:not([hidden])) .ui5-avatar-root:focus-visible{outline:var(--_ui5_avatar_outline);outline-offset:var(--_ui5_avatar_focus_offset)}:host([disabled]){opacity:var(--sapContent_DisabledOpacity);pointer-events:none}:host{height:3rem;width:3rem;border-radius:50%;border:var(--ui5-avatar-initials-border);outline:none;color:var(--ui5-avatar-initials-color)}.ui5-avatar-root{display:flex;align-items:center;justify-content:center;outline:none;height:100%;width:100%;border-radius:inherit}:host([size="XS"]){height:2rem;width:2rem;min-height:2rem;min-width:2rem;font-size:var(--_ui5_avatar_fontsize_XS)}:host(:not([size])),:host([size="S"]){min-height:3rem;min-width:3rem;font-size:var(--_ui5_avatar_fontsize_S)}:host([size="M"]){min-height:4rem;min-width:4rem;font-size:var(--_ui5_avatar_fontsize_M)}:host([size="L"]){min-height:5rem;min-width:5rem;font-size:var(--_ui5_avatar_fontsize_L)}:host([size="XL"]){min-height:7rem;min-width:7rem;font-size:var(--_ui5_avatar_fontsize_XL)}:host .ui5-avatar-icon{height:var(--_ui5_avatar_fontsize_S);width:var(--_ui5_avatar_fontsize_S);color:inherit}:host([size="XS"]) .ui5-avatar-icon{height:var(--_ui5_avatar_icon_XS);width:var(--_ui5_avatar_icon_XS)}:host([size="S"]) .ui5-avatar-icon{height:var(--_ui5_avatar_icon_S);width:var(--_ui5_avatar_icon_S)}:host([size="M"]) .ui5-avatar-icon{height:var(--_ui5_avatar_icon_M);width:var(--_ui5_avatar_icon_M)}:host([size="L"]) .ui5-avatar-icon{height:var(--_ui5_avatar_icon_L);width:var(--_ui5_avatar_icon_L)}:host([size="XL"]) .ui5-avatar-icon{height:var(--_ui5_avatar_icon_XL);width:var(--_ui5_avatar_icon_XL)}::slotted(*){border-radius:50%;width:100%;height:100%;pointer-events:none}:host([shape="Square"]){border-radius:var(--ui5-avatar-border-radius)}:host([shape="Square"]) ::slotted(*){border-radius:calc(var(--ui5-avatar-border-radius) - var(--ui5-avatar-border-radius-img-deduction))}:host(:not([color-scheme])),:host(:not([_has-image])),:host([color-scheme="Auto"]),:host([_color-scheme="Accent6"]),:host([ui5-avatar][color-scheme="Accent6"]){background-color:var(--ui5-avatar-accent6);color:var(--ui5-avatar-accent6-color);border-color:var(--ui5-avatar-accent6-border-color)}:host([_color-scheme="Accent6"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent6"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([_color-scheme="Accent6"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent6"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_6_Hover_Background)}:host([_color-scheme="Accent1"]),:host([ui5-avatar][color-scheme="Accent1"]){background-color:var(--ui5-avatar-accent1);color:var(--ui5-avatar-accent1-color);border-color:var(--ui5-avatar-accent1-border-color)}:host([_color-scheme="Accent1"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent1"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([_color-scheme="Accent1"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent1"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_1_Hover_Background)}:host([_color-scheme="Accent2"]),:host([ui5-avatar][color-scheme="Accent2"]){background-color:var(--ui5-avatar-accent2);color:var(--ui5-avatar-accent2-color);border-color:var(--ui5-avatar-accent2-border-color)}:host([_color-scheme="Accent2"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent2"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([_color-scheme="Accent2"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent2"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_2_Hover_Background)}:host([_color-scheme="Accent3"]),:host([ui5-avatar][color-scheme="Accent3"]){background-color:var(--ui5-avatar-accent3);color:var(--ui5-avatar-accent3-color);border-color:var(--ui5-avatar-accent3-border-color)}:host([_color-scheme="Accent3"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent3"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([_color-scheme="Accent3"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent3"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_3_Hover_Background)}:host([_color-scheme="Accent4"]),:host([ui5-avatar][color-scheme="Accent4"]){background-color:var(--ui5-avatar-accent4);color:var(--ui5-avatar-accent4-color);border-color:var(--ui5-avatar-accent4-border-color)}:host([_color-scheme="Accent4"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent4"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([_color-scheme="Accent4"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent4"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_4_Hover_Background)}:host([_color-scheme="Accent5"]),:host([ui5-avatar][color-scheme="Accent5"]){background-color:var(--ui5-avatar-accent5);color:var(--ui5-avatar-accent5-color);border-color:var(--ui5-avatar-accent5-border-color)}:host([_color-scheme="Accent5"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent5"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([_color-scheme="Accent5"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent5"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_5_Hover_Background)}:host([_color-scheme="Accent7"]),:host([ui5-avatar][color-scheme="Accent7"]){background-color:var(--ui5-avatar-accent7);color:var(--ui5-avatar-accent7-color);border-color:var(--ui5-avatar-accent7-border-color)}:host([_color-scheme="Accent7"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent7"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([_color-scheme="Accent7"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent7"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_7_Hover_Background)}:host([_color-scheme="Accent8"]),:host([ui5-avatar][color-scheme="Accent8"]){background-color:var(--ui5-avatar-accent8);color:var(--ui5-avatar-accent8-color);border-color:var(--ui5-avatar-accent8-border-color)}:host([_color-scheme="Accent8"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent8"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([_color-scheme="Accent8"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent8"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_8_Hover_Background)}:host([_color-scheme="Accent9"]),:host([ui5-avatar][color-scheme="Accent9"]){background-color:var(--ui5-avatar-accent9);color:var(--ui5-avatar-accent9-color);border-color:var(--ui5-avatar-accent9-border-color)}:host([_color-scheme="Accent9"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent9"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([_color-scheme="Accent9"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent9"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_9_Hover_Background)}:host([_color-scheme="Accent10"]),:host([ui5-avatar][color-scheme="Accent10"]){background-color:var(--ui5-avatar-accent10);color:var(--ui5-avatar-accent10-color);border-color:var(--ui5-avatar-accent10-border-color)}:host([_color-scheme="Accent10"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent10"][interactive]:not([hidden]):not([disabled]):not(:active):hover),:host([_color-scheme="Accent10"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover),:host([ui5-avatar][color-scheme="Accent10"][mode="Interactive"]:not([hidden]):not([disabled]):not(:active):hover){background-color:var(--sapAvatar_10_Hover_Background)}:host([_color-scheme="Placeholder"]),:host([ui5-avatar][color-scheme="Placeholder"]){background-color:var(--ui5-avatar-placeholder);color:var(--ui5-avatar-placeholder-color);border-color:var(--sapAvatar_Lite_BorderColor)}:host([_color-scheme="Transparent"]),:host([ui5-avatar][color-scheme="Transparent"]){background-color:transparent;border-color:transparent}:host([_has-image]){color:var(--ui5-avatar-accent10-color);border:var(--ui5-avatar-optional-border);background-color:transparent}.ui5-avatar-initials{color:inherit}.ui5-avatar-icon~.ui5-avatar-initials,.ui5-avatar-icon~.ui5-avatar-icon-fallback{display:none}.ui5-avatar-fallback-icon-hidden{display:none}.ui5-avatar-initials-hidden{position:absolute;visibility:hidden;z-index:0;pointer-events:none}::slotted([slot="badge"]){position:absolute;inset-block-end:0;inset-inline-end:0;width:1.125rem;height:1.125rem;font-family:var(--sapFontFamily);font-size:var(--sapFontSmallSize);--_ui5-avatar-badge-icon-size: .75rem}:host(:not([disabled])) ::slotted([slot="badge"]){pointer-events:initial}:host([size="L"]) ::slotted([slot="badge"]){width:1.25rem;height:1.25rem;--_ui5-avatar-badge-icon-size: .875rem}:host([size="XL"]) ::slotted([slot="badge"]){width:1.75rem;height:1.75rem;--_ui5-avatar-badge-icon-size: 1rem}:host([shape="Square"]) ::slotted([slot="badge"]){border-radius:50%}:host([shape="Square"]) ::slotted([slot="badge"]){inset-block-end:-.125rem;inset-inline-end:-.125rem}:host([size="L"][shape="Square"]) ::slotted([slot="badge"]){inset-block-end:-.1875rem;inset-inline-end:-.1875rem}:host([size="XL"][shape="Square"]) ::slotted([slot="badge"]){inset-block-end:-.25rem;inset-inline-end:-.25rem}
 `;
 
     /**
@@ -52,21 +52,53 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
     })(AvatarSize || (AvatarSize = {}));
     var AvatarSize$1 = AvatarSize;
 
+    /**
+     * Different Avatar modes.
+     * @public
+     * @since 2.20.0
+     */
+    var AvatarMode;
+    (function (AvatarMode) {
+        /**
+         * Image mode (by default).
+         * Configures the component to internally render role="img".
+         * @public
+         */
+        AvatarMode["Image"] = "Image";
+        /**
+         * Decorative mode.
+         * Configures the component to internally render role="presentation" and aria-hidden="true",
+         * making it purely decorative without semantic content or interactivity.
+         * @public
+         */
+        AvatarMode["Decorative"] = "Decorative";
+        /**
+         * Interactive mode.
+         * Configures the component to internally render role="button".
+         * This mode also supports focus and enables keyboard interaction.
+         * @public
+         */
+        AvatarMode["Interactive"] = "Interactive";
+    })(AvatarMode || (AvatarMode = {}));
+    var AvatarMode$1 = AvatarMode;
+
     const name$1 = "employee";
-    const pathData$1 = "M448 512H64V384q0-26 10-49.5t27.5-41T142 266t50-10h64q-27 0-50-10t-40.5-27.5T138 178t-10-50q0-26 10-49.5t27.5-41T206 10t50-10q26 0 49.5 10t41 27.5 27.5 41 10 49.5q0 27-10 50t-27.5 40.5-41 27.5-49.5 10h64q26 0 49.5 10t41 27.5 27.5 41 10 49.5v128zM96 384v96h320v-96q0-40-28-68t-68-28H192q-40 0-68 28t-28 68zm160-160q40 0 68-28t28-68-28-68-68-28-68 28-28 68 28 68 68 28zm32 192v-32h96v32h-96z";
+    const pathData$1 = "M14 16.016H2v-4a4.016 4.016 0 0 1 2.438-3.688A3.88 3.88 0 0 1 6 8.016h2a3.876 3.876 0 0 1-1.563-.313 4.065 4.065 0 0 1-2.125-2.125C4.104 5.1 4 4.578 4 4.016A4.016 4.016 0 0 1 6.438.329C6.917.12 7.438.015 8 .015a4.016 4.016 0 0 1 2.828 1.172A4.015 4.015 0 0 1 12 4.016c0 .562-.104 1.083-.313 1.562A4.016 4.016 0 0 1 8 8.016h2.001a4.016 4.016 0 0 1 2.828 1.172A4.016 4.016 0 0 1 14 12.016v4Zm-11-4v3h10v-3c0-.833-.292-1.542-.875-2.125A2.893 2.893 0 0 0 10 9.016H6c-.833 0-1.542.292-2.125.875A2.893 2.893 0 0 0 3 12.016Zm5-5c.833 0 1.542-.292 2.125-.875A2.893 2.893 0 0 0 11 4.016c0-.833-.292-1.542-.875-2.125A2.893 2.893 0 0 0 8 1.016c-.833 0-1.542.292-2.125.875A2.893 2.893 0 0 0 5 4.016c0 .833.292 1.542.875 2.125A2.893 2.893 0 0 0 8 7.016Zm1 6v-1h3v1H9Z";
     const ltr$1 = false;
+    const viewBox$1 = "0 0 16 17";
     const collection$1 = "SAP-icons-v4";
     const packageName$1 = "@ui5/webcomponents-icons";
 
-    Icons.y(name$1, { pathData: pathData$1, ltr: ltr$1, collection: collection$1, packageName: packageName$1 });
+    Icons.y(name$1, { pathData: pathData$1, ltr: ltr$1, viewBox: viewBox$1, collection: collection$1, packageName: packageName$1 });
 
     const name = "employee";
-    const pathData = "M342 255q48 23 77 67.5t29 99.5v32q0 11-7.5 18.5T422 480H90q-11 0-18.5-7.5T64 454v-32q0-55 29-99.5t77-67.5l-4-5q-19-17-28.5-40.5T128 160q0-27 10-50t27.5-40.5 41-27.5T256 32t49.5 10.5 41 28T374 111t10 49q0 27-11 52t-31 43zm-163-95q0 32 22.5 54.5T256 237t54.5-22.5T333 160t-22.5-54.5T256 83t-54.5 22.5T179 160zm51 181l-25-15q-13-7-13-19v-6q-34 17-55.5 49T115 422v7h115v-88zm167 81q0-40-21-72t-56-49v6q0 12-13 19l-26 15v88h116v-7zm-71-70q11 0 18.5 7.5T352 378t-7.5 18-18.5 7h-12q-11 0-18.5-7t-7.5-18 7.5-18.5T314 352h12z";
+    const pathData = "M8 1a4 4 0 0 1 2.616 7.023C12.61 8.931 14 10.927 14 13.25v1a.75.75 0 0 1-.75.75H2.75a.75.75 0 0 1-.75-.75v-1c0-2.323 1.39-4.319 3.383-5.227A4 4 0 0 1 8 1ZM6.034 9.375C4.54 10.042 3.5 11.53 3.5 13.25v.25h3.75v-2.797l-.848-.444a.75.75 0 0 1-.368-.884Zm3.93 0c.031.099.044.203.031.309a.75.75 0 0 1-.397.575l-.848.444V13.5h3.75v-.25c0-1.72-1.04-3.208-2.535-3.875ZM10.25 11a.75.75 0 0 1 0 1.5h-.5a.75.75 0 0 1 0-1.5h.5ZM8 2.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z";
     const ltr = false;
+    const viewBox = "0 0 16 16";
     const collection = "SAP-icons-v5";
     const packageName = "@ui5/webcomponents-icons";
 
-    Icons.y(name, { pathData, ltr, collection, packageName });
+    Icons.y(name, { pathData, ltr, viewBox, collection, packageName });
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -87,7 +119,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
      *
      * ### Keyboard Handling
      *
-     * - [Space] / [Enter] or [Return] - Fires the `click` event if the `interactive` property is set to true.
+     * - [Space] / [Enter] or [Return] - Fires the `click` event if the `mode` is set to `Interactive` or the deprecated `interactive` property is set to true.
      * - [Shift] - If [Space] is pressed, pressing [Shift] releases the component without triggering the click event.
      *
      * ### ES6 Module Import
@@ -98,7 +130,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
      * @implements {IAvatarGroupItem}
      * @public
      */
-    let Avatar = Avatar_1 = class Avatar extends webcomponentsBase.b {
+    let Avatar = Avatar_1 = class Avatar extends webcomponentsBase.S {
         constructor() {
             super();
             /**
@@ -112,12 +144,31 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
             /**
              * Defines if the avatar is interactive (focusable and pressable).
              *
+             * **Note:** When set to `true`, this property takes precedence over the `mode` property,
+             * and the avatar will be rendered as interactive (role="button", focusable) regardless of the `mode` value.
+             *
              * **Note:** This property won't have effect if the `disabled`
              * property is set to `true`.
              * @default false
              * @public
+             * @deprecated Set `mode="Interactive"` instead for the same functionality with proper accessibility.
              */
             this.interactive = false;
+            /**
+             * Defines the mode of the component.
+             *
+             * **Note:**
+             * - `Image` (default) - renders with role="img"
+             * - `Decorative` - renders with role="presentation" and aria-hidden="true", making it purely decorative
+             * - `Interactive` - renders with role="button", focusable (tabindex="0"), and supports keyboard interaction
+             *
+             * **Note:** This property is ignored when the `interactive` property is set to `true`.
+             * In that case, the avatar will always be rendered as interactive.
+             * @default "Image"
+             * @public
+             * @since 2.20
+             */
+            this.mode = "Image";
             /**
              * Defines the name of the fallback icon, which should be displayed in the following cases:
              *
@@ -215,13 +266,26 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
             return this.getAttribute("color-scheme") || this._colorScheme;
         }
         get _role() {
-            return this._interactive ? "button" : "img";
+            if (this._interactive) {
+                return "button";
+            }
+            if (this.mode === AvatarMode$1.Decorative) {
+                return "presentation";
+            }
+            return "img";
+        }
+        get effectiveAriaHidden() {
+            // interactive property takes precedence - never hidden when interactive
+            if (this.interactive) {
+                return undefined;
+            }
+            return this.mode === AvatarMode$1.Decorative ? "true" : undefined;
         }
         get _ariaHasPopup() {
             return this._getAriaHasPopup();
         }
         get _interactive() {
-            return this.interactive && !this.disabled;
+            return (this.interactive || this.mode === AvatarMode$1.Interactive) && !this.disabled;
         }
         get validInitials() {
             // initials should consist of only 1,2 or 3 latin letters
@@ -251,13 +315,13 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
             return this.getDomRef().querySelector(".ui5-avatar-icon-fallback");
         }
         async onAfterRendering() {
-            await Theme.f$1();
+            await Theme.w();
             if (this.initials && !this.icon) {
                 this._checkInitials();
             }
         }
         onEnterDOM() {
-            if (Theme.f()) {
+            if (Theme.f$1()) {
                 this.setAttribute("desktop", "");
             }
             this.initialsContainer && webcomponentsBase.f.register(this.initialsContainer, this._handleResizeBound);
@@ -297,7 +361,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
             if (!this._interactive) {
                 return;
             }
-            if (webcomponentsBase.b$1(e)) {
+            if (webcomponentsBase.b(e)) {
                 this._fireClick();
             }
             if (webcomponentsBase.A(e)) {
@@ -314,6 +378,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
         }
         _getAriaHasPopup() {
             const ariaHaspopup = this.accessibilityAttributes.hasPopup;
+            // aria-haspopup only applies when avatar is interactive
             if (!this._interactive || !ariaHaspopup) {
                 return;
             }
@@ -372,6 +437,17 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
             }
             this._imageLoadError = true;
         }
+        get accessibilityInfo() {
+            if (this.mode === AvatarMode$1.Decorative) {
+                return {};
+            }
+            return {
+                role: this._role,
+                type: this._interactive ? Avatar_1.i18nBundle.getText(i18nDefaults.AVATAR_TYPE_BUTTON) : Avatar_1.i18nBundle.getText(i18nDefaults.AVATAR_TYPE_IMAGE),
+                description: this.accessibleNameText,
+                disabled: this.disabled,
+            };
+        }
     };
     __decorate([
         webcomponentsBase.s({ type: Boolean })
@@ -379,6 +455,9 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
     __decorate([
         webcomponentsBase.s({ type: Boolean })
     ], Avatar.prototype, "interactive", void 0);
+    __decorate([
+        webcomponentsBase.s()
+    ], Avatar.prototype, "mode", void 0);
     __decorate([
         webcomponentsBase.s()
     ], Avatar.prototype, "icon", void 0);
@@ -422,13 +501,13 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
         webcomponentsBase.d()
     ], Avatar.prototype, "badge", void 0);
     __decorate([
-        parametersBundle_css$1.i("@ui5/webcomponents")
+        parametersBundle_css.i("@ui5/webcomponents")
     ], Avatar, "i18nBundle", void 0);
     Avatar = Avatar_1 = __decorate([
         webcomponentsBase.m({
             tag: "ui5-avatar",
             languageAware: true,
-            renderer: parametersBundle_css.y,
+            renderer: jsxRuntime.y,
             styles: AvatarCss,
             template: AvatarTemplate,
         })

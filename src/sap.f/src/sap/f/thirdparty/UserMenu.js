@@ -1,33 +1,33 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/query', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Avatar', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/Text', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/List', 'sap/f/thirdparty/ListItemCustom', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/information', 'sap/f/thirdparty/sys-enter-2', 'sap/f/thirdparty/parameters-bundle.css3', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/ListItemAdditionalText.css'], (function (webcomponentsBase, eventStrict, parametersBundle_css$1, parametersBundle_css, query, ResponsivePopover, Theme, Avatar, Button, Icon, Tag, Title, Text, Label, List, ListItemCustom, i18nDefaults, Icons, information, sysEnter2, parametersBundle_css$2, i18nDefaults$1, ValueState, toLowercaseEnumValue, FocusableElements, ListItemBase, AccessibilityTextsHelper, willShowContent, BusyIndicator, ListItemGroup, WrappingType, ListItemAdditionalText_css) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/query', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/MenuItem2', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Avatar', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/Text', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/List', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/sys-enter-2', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/ListSelectionMode', 'sap/f/thirdparty/ListItemAdditionalText.css'], (function (webcomponentsBase, eventStrict, parametersBundle_css, jsxRuntime, query, ResponsivePopover, MenuItem, Theme, Avatar, Button, Icon, Tag, Title, Text, Label, List, ListItemTemplate, i18nDefaults, AccessibilityTextsHelper, Icons, decline, sysEnter2, parametersBundle_css$1, i18nDefaults$1, ValueState, toLowercaseEnumValue, FocusableElements, ListItemBase, InvisibleMessage, BusyIndicator, willShowContent, ListItemGroup, WrappingType, ListSelectionMode, ListItemAdditionalText_css) { 'use strict';
 
     function PanelTemplate() {
-        return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: parametersBundle_css.jsxs("div", { class: "ui5-panel-root", role: this.accRole, "aria-label": this.effectiveAccessibleName, "aria-labelledby": this.fixedPanelAriaLabelledbyReference, children: [this.hasHeaderOrHeaderText &&
+        return (jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsxs("div", { class: "ui5-panel-root", role: this.accRole, "aria-label": this.effectiveAccessibleName, "aria-labelledby": this.fixedPanelAriaLabelledbyReference, children: [this.hasHeaderOrHeaderText &&
                         // header: either header or h1 with header text
-                        parametersBundle_css.jsx("div", { class: {
+                        jsxRuntime.jsx("div", { class: {
                                 "ui5-panel-heading-wrapper": true,
                                 "ui5-panel-heading-wrapper-sticky": this.stickyHeader,
-                            }, role: this.headingWrapperRole, "aria-level": this.headingWrapperAriaLevel, children: parametersBundle_css.jsxs("div", { onClick: this._headerClick, onKeyDown: this._headerKeyDown, onKeyUp: this._headerKeyUp, class: "ui5-panel-header", tabindex: this.headerTabIndex, role: this.accInfo.role, "aria-expanded": this.accInfo.ariaExpanded, "aria-controls": this.accInfo.ariaControls, "aria-labelledby": this.accInfo.ariaLabelledby, part: "header", children: [!this.fixed &&
-                                        parametersBundle_css.jsx("div", { class: "ui5-panel-header-button-root", children: this._hasHeader ?
-                                                parametersBundle_css.jsx(Button.Button, { design: "Transparent", class: "ui5-panel-header-button ui5-panel-header-button-with-icon", onClick: this._toggleButtonClick, accessibilityAttributes: this.accInfo.button.accessibilityAttributes, tooltip: this.accInfo.button.title, accessibleName: this.accInfo.button.ariaLabelButton, children: parametersBundle_css.jsx("div", { class: "ui5-panel-header-icon-wrapper", children: parametersBundle_css.jsx(Icon.Icon, { class: {
+                            }, role: this.headingWrapperRole, "aria-level": this.headingWrapperAriaLevel, part: "header-wrapper", children: jsxRuntime.jsxs("div", { onClick: this._headerClick, onKeyDown: this._headerKeyDown, onKeyUp: this._headerKeyUp, onTouchStart: this._isMobile, onFocusOut: this._headerFocusOut, class: "ui5-panel-header", tabindex: this.headerTabIndex, role: this.accInfo.role, "aria-expanded": this.accInfo.ariaExpanded, "aria-controls": this.accInfo.ariaControls, "aria-labelledby": this.accInfo.ariaLabelledby, part: "header", children: [!this.fixed &&
+                                        jsxRuntime.jsx("div", { class: "ui5-panel-header-button-root", children: this._hasHeader ?
+                                                jsxRuntime.jsx(Button.Button, { design: "Transparent", class: "ui5-panel-header-button ui5-panel-header-button-with-icon", onClick: this._toggleButtonClick, accessibilityAttributes: this.accInfo.button.accessibilityAttributes, tooltip: this.accInfo.button.title, accessibleName: this.accInfo.button.ariaLabelButton, children: jsxRuntime.jsx("div", { class: "ui5-panel-header-icon-wrapper", children: jsxRuntime.jsx(Icon.Icon, { class: {
                                                                 "ui5-panel-header-icon": true,
                                                                 "ui5-panel-header-button-animated": !this.shouldNotAnimate,
-                                                            }, name: ListItemCustom.slimArrowRight }) }) })
+                                                            }, name: ListItemTemplate.slimArrowRight }) }) })
                                                 : // else
-                                                    parametersBundle_css.jsx(Icon.Icon, { class: {
+                                                    jsxRuntime.jsx(Icon.Icon, { class: {
                                                             "ui5-panel-header-button": true,
                                                             "ui5-panel-header-icon": true,
                                                             "ui5-panel-header-button-animated": !this.shouldNotAnimate,
-                                                        }, name: ListItemCustom.slimArrowRight, showTooltip: true, accessibleName: this.toggleButtonTitle }) }), this._hasHeader ?
-                                        parametersBundle_css.jsx("slot", { name: "header" })
+                                                        }, name: ListItemTemplate.slimArrowRight, showTooltip: true, accessibleName: this.toggleButtonTitle }) }), this._hasHeader ?
+                                        jsxRuntime.jsx("slot", { name: "header" })
                                         : // else
-                                            parametersBundle_css.jsx("div", { id: `${this._id}-header-title`, class: "ui5-panel-header-title", children: this.headerText })] }) }), parametersBundle_css.jsx("div", { class: "ui5-panel-content", id: `${this._id}-content`, tabindex: -1, style: {
+                                            jsxRuntime.jsx("div", { id: `${this._id}-header-title`, class: "ui5-panel-header-title", children: this.headerText })] }) }), jsxRuntime.jsx("div", { class: "ui5-panel-content", id: `${this._id}-content`, tabindex: -1, style: {
                             display: this._contentExpanded ? "block" : "none",
-                        }, part: "content", children: parametersBundle_css.jsx("slot", {}) })] }) }));
+                        }, part: "content", children: jsxRuntime.jsx("slot", {}) })] }) }));
     }
 
-    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
-    var panelCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host(:not([hidden])){display:block}:host{font-family:var(--sapFontFamily);background-color:var(--sapGroup_TitleBackground);border-radius:var(--_ui5-v2-15-0_panel_border_radius)}:host(:not([collapsed])){border-bottom:var(--_ui5-v2-15-0_panel_border_bottom)}:host([fixed]) .ui5-panel-header{padding-left:1rem}.ui5-panel-header{min-height:var(--_ui5-v2-15-0_panel_header_height);width:100%;position:relative;display:flex;justify-content:flex-start;align-items:center;outline:none;box-sizing:border-box;padding-right:var(--_ui5-v2-15-0_panel_header_padding_right);font-family:var(--sapFontHeaderFamily);font-size:var(--sapGroup_Title_FontSize);font-weight:400;color:var(--sapGroup_TitleTextColor)}.ui5-panel-header-icon{color:var(--_ui5-v2-15-0_panel_icon_color)}.ui5-panel-header-button-animated{transition:transform .4s ease-out}:host(:not([_has-header]):not([fixed])) .ui5-panel-header{cursor:pointer}:host(:not([_has-header]):not([fixed])) .ui5-panel-header:focus:after{content:"";position:absolute;pointer-events:none;z-index:2;border:var(--_ui5-v2-15-0_panel_focus_border);border-radius:var(--_ui5-v2-15-0_panel_border_radius);top:var(--_ui5-v2-15-0_panel_focus_offset);bottom:var(--_ui5-v2-15-0_panel_focus_bottom_offset);left:var(--_ui5-v2-15-0_panel_focus_offset);right:var(--_ui5-v2-15-0_panel_focus_offset)}:host(:not([collapsed]):not([_has-header]):not([fixed])) .ui5-panel-header:focus:after{border-radius:var(--_ui5-v2-15-0_panel_border_radius_expanded)}:host(:not([collapsed])) .ui5-panel-header-button:not(.ui5-panel-header-button-with-icon),:host(:not([collapsed])) .ui5-panel-header-icon-wrapper [ui5-icon]{transform:var(--_ui5-v2-15-0_panel_toggle_btn_rotation)}:host([fixed]) .ui5-panel-header-title{width:100%}.ui5-panel-heading-wrapper.ui5-panel-heading-wrapper-sticky{position:sticky;top:0;background-color:var(--_ui5-v2-15-0_panel_header_background_color);z-index:100;border-radius:var(--_ui5-v2-15-0_panel_border_radius)}.ui5-panel-header-title{width:calc(100% - var(--_ui5-v2-15-0_panel_button_root_width));overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ui5-panel-content{padding:var(--_ui5-v2-15-0_panel_content_padding);background-color:var(--sapGroup_ContentBackground);outline:none;border-bottom-left-radius:var(--_ui5-v2-15-0_panel_border_radius);border-bottom-right-radius:var(--_ui5-v2-15-0_panel_border_radius);overflow:auto}.ui5-panel-header-button-root{display:flex;justify-content:center;align-items:center;flex-shrink:0;width:var(--_ui5-v2-15-0_panel_button_root_width);height:var(--_ui5-v2-15-0_panel_button_root_height);padding:var(--_ui5-v2-15-0_panel_header_button_wrapper_padding);box-sizing:border-box}:host([fixed]:not([collapsed]):not([_has-header])) .ui5-panel-header,:host([collapsed]) .ui5-panel-header{border-bottom:.0625rem solid var(--sapGroup_TitleBorderColor)}:host([collapsed]) .ui5-panel-header{border-bottom-left-radius:var(--_ui5-v2-15-0_panel_border_radius);border-bottom-right-radius:var(--_ui5-v2-15-0_panel_border_radius)}:host(:not([fixed]):not([collapsed])) .ui5-panel-header{border-bottom:var(--_ui5-v2-15-0_panel_default_header_border)}[ui5-button].ui5-panel-header-button{display:flex;justify-content:center;align-items:center;min-width:initial;height:100%;width:100%}.ui5-panel-header-icon-wrapper{display:flex;justify-content:center;align-items:center}.ui5-panel-header-icon-wrapper,.ui5-panel-header-icon-wrapper .ui5-panel-header-icon{color:inherit}.ui5-panel-header-icon-wrapper,[ui5-button].ui5-panel-header-button-with-icon [ui5-icon]{pointer-events:none}.ui5-panel-root{height:100%;display:flex;flex-direction:column}
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var panelCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host(:not([hidden])){display:block}:host{font-family:var(--sapFontFamily);background-color:var(--sapGroup_TitleBackground);border-radius:var(--_ui5_panel_border_radius)}:host(:not([collapsed])){border-bottom:var(--_ui5_panel_border_bottom)}:host([fixed]) .ui5-panel-header{padding-left:1rem}.ui5-panel-header{min-height:var(--_ui5_panel_header_height);width:100%;position:relative;display:flex;justify-content:flex-start;align-items:center;outline:none;box-sizing:border-box;padding-right:var(--_ui5_panel_header_padding_right);font-family:var(--sapFontHeaderFamily);font-size:var(--sapGroup_Title_FontSize);font-weight:400;color:var(--sapGroup_TitleTextColor)}.ui5-panel-header-icon{color:var(--_ui5_panel_icon_color)}.ui5-panel-header-button-animated{transition:transform .4s ease-out}:host(:not([_has-header]):not([fixed])) .ui5-panel-header{cursor:pointer}:host(:not([_has-header]):not([fixed])) .ui5-panel-header:focus:after{content:"";position:absolute;pointer-events:none;z-index:2;border:var(--_ui5_panel_focus_border);border-radius:var(--_ui5_panel_border_radius);top:var(--_ui5_panel_focus_offset);bottom:var(--_ui5_panel_focus_bottom_offset);left:var(--_ui5_panel_focus_offset);right:var(--_ui5_panel_focus_offset)}:host(:not([collapsed]):not([_has-header]):not([fixed])) .ui5-panel-header:focus:after{border-radius:var(--_ui5_panel_border_radius_expanded)}:host([_touched]:not([_has-header]):not([fixed])) .ui5-panel-header:focus:after{display:none}:host(:not([collapsed])) .ui5-panel-header-button:not(.ui5-panel-header-button-with-icon),:host(:not([collapsed])) .ui5-panel-header-icon-wrapper [ui5-icon]{transform:var(--_ui5_panel_toggle_btn_rotation)}:host([fixed]) .ui5-panel-header-title{width:100%}.ui5-panel-heading-wrapper.ui5-panel-heading-wrapper-sticky{position:sticky;top:0;background-color:var(--_ui5_panel_header_background_color);z-index:100;border-radius:var(--_ui5_panel_border_radius)}.ui5-panel-header-title{width:calc(100% - var(--_ui5_panel_button_root_width));overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ui5-panel-content{padding:var(--_ui5_panel_content_padding);background-color:var(--sapGroup_ContentBackground);outline:none;border-bottom-left-radius:var(--_ui5_panel_border_radius);border-bottom-right-radius:var(--_ui5_panel_border_radius);overflow:auto}.ui5-panel-header-button-root{display:flex;justify-content:center;align-items:center;flex-shrink:0;width:var(--_ui5_panel_button_root_width);height:var(--_ui5_panel_button_root_height);padding:var(--_ui5_panel_header_button_wrapper_padding);box-sizing:border-box}:host([fixed]:not([collapsed]):not([_has-header])) .ui5-panel-header,:host([collapsed]) .ui5-panel-header{border-bottom:.0625rem solid var(--sapGroup_TitleBorderColor)}:host([collapsed]) .ui5-panel-header{border-bottom-left-radius:var(--_ui5_panel_border_radius);border-bottom-right-radius:var(--_ui5_panel_border_radius)}:host(:not([fixed]):not([collapsed])) .ui5-panel-header{border-bottom:var(--_ui5_panel_default_header_border)}[ui5-button].ui5-panel-header-button{display:flex;justify-content:center;align-items:center;min-width:initial;height:100%;width:100%}.ui5-panel-header-icon-wrapper{display:flex;justify-content:center;align-items:center}.ui5-panel-header-icon-wrapper,.ui5-panel-header-icon-wrapper .ui5-panel-header-icon{color:inherit}.ui5-panel-header-icon-wrapper,[ui5-button].ui5-panel-header-button-with-icon [ui5-icon]{pointer-events:none}.ui5-panel-root{height:100%;display:flex;flex-direction:column}
 `;
 
     var __decorate$2 = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -90,10 +90,11 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
      * @extends UI5Element
      * @public
      * @slot {Array<Node>} default - Defines the content of the component. The content is visible only when the component is expanded.
-     * @csspart header - Used to style the wrapper of the header.
+     * @csspart header-wrapper - Used to style the outermost header wrapper, useful for adjusting sticky header position.
+     * @csspart header - Used to style the header.
      * @csspart content - Used to style the wrapper of the content.
      */
-    let Panel = Panel_1 = class Panel extends webcomponentsBase.b {
+    let Panel = Panel_1 = class Panel extends webcomponentsBase.S {
         constructor() {
             super(...arguments);
             /**
@@ -155,6 +156,8 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
             this._hasHeader = false;
             this._contentExpanded = false;
             this._animationRunning = false;
+            this._pendingToggle = false;
+            this._touched = false;
         }
         onBeforeRendering() {
             // If the animation is running, it will set the content expanded state at the end
@@ -173,6 +176,14 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
         get shouldNotAnimate() {
             return this.noAnimation || webcomponentsBase.d$1() === Theme.u.None;
         }
+        _isMobile() {
+            if (Theme.l()) {
+                this._touched = true;
+            }
+        }
+        _headerFocusOut() {
+            this._touched = false;
+        }
         _headerClick(e) {
             if (!this.shouldToggle(e.target)) {
                 return;
@@ -188,22 +199,32 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
             if (!this.shouldToggle(e.target)) {
                 return;
             }
-            if (webcomponentsBase.b$1(e)) {
-                e.preventDefault();
+            if (webcomponentsBase.b(e)) {
+                this._toggleOpen();
             }
             if (webcomponentsBase.A(e)) {
                 e.preventDefault();
+                this._pendingToggle = true;
+            }
+            // Cancel toggle if Escape is pressed
+            if (webcomponentsBase.m$1(e) && this._pendingToggle) {
+                e.preventDefault();
+                this._pendingToggle = false;
             }
         }
         _headerKeyUp(e) {
             if (!this.shouldToggle(e.target)) {
                 return;
             }
-            if (webcomponentsBase.b$1(e)) {
-                this._toggleOpen();
+            if (webcomponentsBase.b(e)) {
+                e.preventDefault();
             }
             if (webcomponentsBase.A(e)) {
-                this._toggleOpen();
+                // Only toggle if space was pressed and escape wasn't pressed to cancel
+                if (this._pendingToggle) {
+                    this._toggleOpen();
+                }
+                this._pendingToggle = false;
             }
         }
         _toggleOpen() {
@@ -220,10 +241,10 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
             const animations = [];
             [].forEach.call(elements, oElement => {
                 if (this.collapsed) {
-                    animations.push(webcomponentsBase.u(oElement).promise());
+                    animations.push(webcomponentsBase.u$1(oElement).promise());
                 }
                 else {
-                    animations.push(webcomponentsBase.b$2(oElement).promise());
+                    animations.push(webcomponentsBase.b$1(oElement).promise());
                 }
             });
             Promise.all(animations).then(() => {
@@ -327,17 +348,23 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
         webcomponentsBase.s({ type: Boolean, noAttribute: true })
     ], Panel.prototype, "_animationRunning", void 0);
     __decorate$2([
+        webcomponentsBase.s({ type: Boolean, noAttribute: true })
+    ], Panel.prototype, "_pendingToggle", void 0);
+    __decorate$2([
+        webcomponentsBase.s({ type: Boolean })
+    ], Panel.prototype, "_touched", void 0);
+    __decorate$2([
         webcomponentsBase.d()
     ], Panel.prototype, "header", void 0);
     __decorate$2([
-        parametersBundle_css$1.i("@ui5/webcomponents")
+        parametersBundle_css.i("@ui5/webcomponents")
     ], Panel, "i18nBundle", void 0);
     Panel = Panel_1 = __decorate$2([
         webcomponentsBase.m({
             tag: "ui5-panel",
             fastNavigation: true,
             languageAware: true,
-            renderer: parametersBundle_css.y,
+            renderer: jsxRuntime.y,
             template: PanelTemplate,
             styles: panelCss,
         })
@@ -354,12 +381,12 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
     var Panel$1 = Panel;
 
     function BarTemplate() {
-        return (parametersBundle_css.jsxs("div", { class: "ui5-bar-root", "aria-label": this.accInfo.role && this.accInfo.label, role: this.accInfo.role, part: "bar", children: [parametersBundle_css.jsx("div", { class: "ui5-bar-content-container ui5-bar-startcontent-container", part: "startContent", children: parametersBundle_css.jsx("slot", { name: "startContent" }) }), parametersBundle_css.jsx("div", { class: "ui5-bar-content-container ui5-bar-midcontent-container", part: "midContent", children: parametersBundle_css.jsx("slot", {}) }), parametersBundle_css.jsx("div", { class: "ui5-bar-content-container ui5-bar-endcontent-container", part: "endContent", children: parametersBundle_css.jsx("slot", { name: "endContent" }) })] }));
+        return (jsxRuntime.jsxs("div", { class: "ui5-bar-root", "aria-label": this.accInfo.label, role: this.accInfo.role, part: "bar", children: [jsxRuntime.jsx("div", { class: "ui5-bar-content-container ui5-bar-startcontent-container", part: "startContent", children: jsxRuntime.jsx("slot", { name: "startContent" }) }), jsxRuntime.jsx("div", { class: "ui5-bar-content-container ui5-bar-midcontent-container", part: "midContent", children: jsxRuntime.jsx("slot", {}) }), jsxRuntime.jsx("div", { class: "ui5-bar-content-container ui5-bar-endcontent-container", part: "endContent", children: jsxRuntime.jsx("slot", { name: "endContent" }) })] }));
     }
 
-    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
-    var BarCss = `:host{background-color:var(--sapPageHeader_Background);height:var(--_ui5-v2-15-0_bar_base_height);width:100%;box-shadow:var(--sapContent_HeaderShadow);display:block}.ui5-bar-root{display:flex;align-items:center;justify-content:space-between;height:100%;width:100%;background-color:inherit;box-shadow:inherit;border-radius:inherit;min-width:0;overflow:hidden}.ui5-bar-root .ui5-bar-startcontent-container,.ui5-bar-root .ui5-bar-endcontent-container,.ui5-bar-root .ui5-bar-midcontent-container{display:flex;align-items:center}.ui5-bar-root .ui5-bar-startcontent-container,.ui5-bar-root .ui5-bar-endcontent-container{flex:0 0 auto}.ui5-bar-root .ui5-bar-midcontent-container{justify-content:center;flex:1 1 auto;padding:0 var(--_ui5-v2-15-0_bar-mid-container-padding-start-end);min-width:0;overflow:hidden}.ui5-bar-root .ui5-bar-startcontent-container{padding-inline-start:var(--_ui5-v2-15-0_bar-start-container-padding-start)}.ui5-bar-root .ui5-bar-content-container{min-width:calc(30% - calc(var(--_ui5-v2-15-0_bar-start-container-padding-start) + var(--_ui5-v2-15-0_bar-end-container-padding-end) + (2*var(--_ui5-v2-15-0_bar-mid-container-padding-start-end))))}.ui5-bar-root.ui5-bar-root-shrinked .ui5-bar-content-container{min-width:0px;overflow:hidden;height:100%}.ui5-bar-root .ui5-bar-endcontent-container{padding-inline-end:var(--_ui5-v2-15-0_bar-end-container-padding-end)}:host([design="Footer"]){background-color:var(--sapPageFooter_Background);border-top:.0625rem solid var(--sapPageFooter_BorderColor);box-shadow:none}:host([design="Subheader"]){height:var(--_ui5-v2-15-0_bar_subheader_height);margin-top:var(--_ui5-v2-15-0_bar_subheader_margin-top)}:host([design="FloatingFooter"]){border-radius:var(--sapElement_BorderCornerRadius);background-color:var(--sapPageFooter_Background);box-shadow:var(--sapContent_Shadow1);border:none}::slotted(*){margin:0 .25rem}
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var BarCss = `:host{background-color:var(--sapPageHeader_Background);height:var(--_ui5_bar_base_height);width:100%;box-shadow:var(--sapContent_HeaderShadow);display:block}.ui5-bar-root{display:flex;align-items:center;justify-content:space-between;height:100%;width:100%;background-color:inherit;box-shadow:inherit;border-radius:inherit;min-width:0;overflow:hidden}.ui5-bar-root .ui5-bar-startcontent-container,.ui5-bar-root .ui5-bar-endcontent-container,.ui5-bar-root .ui5-bar-midcontent-container{display:flex;align-items:center}.ui5-bar-root .ui5-bar-startcontent-container{flex:0 1 auto}.ui5-bar-root .ui5-bar-endcontent-container{flex:0 0 auto}.ui5-bar-root .ui5-bar-midcontent-container{justify-content:center;flex:1 1 auto;padding:0 var(--_ui5_bar-mid-container-padding-start-end);min-width:0;overflow:hidden}.ui5-bar-root .ui5-bar-startcontent-container{padding-inline-start:var(--_ui5_bar-start-container-padding-start)}.ui5-bar-root .ui5-bar-content-container{min-width:calc(30% - calc(var(--_ui5_bar-start-container-padding-start) + var(--_ui5_bar-end-container-padding-end) + (2*var(--_ui5_bar-mid-container-padding-start-end))))}.ui5-bar-root.ui5-bar-root-shrinked .ui5-bar-content-container{min-width:0px;overflow:hidden;height:100%}.ui5-bar-root .ui5-bar-endcontent-container{padding-inline-end:var(--_ui5_bar-end-container-padding-end)}:host([design="Footer"]){background-color:var(--sapPageFooter_Background);border-top:.0625rem solid var(--sapPageFooter_BorderColor);box-shadow:none}:host([design="Subheader"]){height:var(--_ui5_bar_subheader_height);margin-top:var(--_ui5_bar_subheader_margin-top)}:host([design="FloatingFooter"]){border-radius:var(--sapElement_BorderCornerRadius);background-color:var(--sapPageFooter_Background);box-shadow:var(--sapContent_Shadow1);border:none}::slotted(*:not([hidden])){margin:0 .25rem;display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box}
 `;
 
     var __decorate$1 = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -405,12 +432,18 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
      * @public
      * @since 1.0.0-rc.11
      */
-    let Bar = class Bar extends webcomponentsBase.b {
+    let Bar = class Bar extends webcomponentsBase.S {
         get accInfo() {
             return {
-                "label": this.design,
+                "label": this.ariaLabelText,
                 "role": this.effectiveRole,
             };
+        }
+        get ariaLabelText() {
+            if (this.accessibleName || this.accessibleNameRef) {
+                return AccessibilityTextsHelper.A(this);
+            }
+            return this.design;
         }
         constructor() {
             super();
@@ -468,19 +501,25 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
         webcomponentsBase.s()
     ], Bar.prototype, "accessibleRole", void 0);
     __decorate$1([
-        webcomponentsBase.d({ type: HTMLElement })
+        webcomponentsBase.s()
+    ], Bar.prototype, "accessibleName", void 0);
+    __decorate$1([
+        webcomponentsBase.s()
+    ], Bar.prototype, "accessibleNameRef", void 0);
+    __decorate$1([
+        webcomponentsBase.d()
     ], Bar.prototype, "startContent", void 0);
     __decorate$1([
         webcomponentsBase.d({ type: HTMLElement, "default": true })
     ], Bar.prototype, "middleContent", void 0);
     __decorate$1([
-        webcomponentsBase.d({ type: HTMLElement })
+        webcomponentsBase.d()
     ], Bar.prototype, "endContent", void 0);
     Bar = __decorate$1([
         webcomponentsBase.m({
             tag: "ui5-bar",
             fastNavigation: true,
-            renderer: parametersBundle_css.y,
+            renderer: jsxRuntime.y,
             styles: BarCss,
             template: BarTemplate,
         })
@@ -489,113 +528,127 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
     var Bar$1 = Bar;
 
     const name$7 = "person-placeholder";
-    const pathData$7 = "M64 512V384q0-26 10-49.5t27.5-41T142 266t50-10h64q-27 0-50-10t-40.5-27.5T138 178t-10-50q0-26 10-49.5t27.5-41T206 10t50-10q26 0 49.5 10t41 27.5 27.5 41 10 49.5q0 27-10 50t-27.5 40.5-41 27.5-49.5 10h64q26 0 49.5 10t41 27.5 27.5 41 10 49.5v128H64zm32-128v96h320v-96q0-40-28-68t-68-28H192q-40 0-68 28t-28 68zm64-256q0 40 28 68t68 28 68-28 28-68-28-68-68-28-68 28-28 68z";
+    const pathData$7 = "M2 16v-4a4.016 4.016 0 0 1 2.438-3.688A3.88 3.88 0 0 1 6 8h2a3.876 3.876 0 0 1-1.563-.313 4.065 4.065 0 0 1-2.125-2.125A3.877 3.877 0 0 1 4 4 4.016 4.016 0 0 1 6.438.313C6.917.104 7.438 0 8 0a4.016 4.016 0 0 1 2.828 1.172A4.015 4.015 0 0 1 12 4c0 .563-.104 1.083-.313 1.563A4.016 4.016 0 0 1 8 8h2.001a4.016 4.016 0 0 1 2.828 1.172A4.016 4.016 0 0 1 14 11.999v4H2Zm1-4v3h10v-3c0-.833-.292-1.542-.875-2.125A2.893 2.893 0 0 0 10 9H6c-.833 0-1.542.292-2.125.875A2.893 2.893 0 0 0 3 12Zm2-8c0 .833.292 1.542.875 2.125A2.893 2.893 0 0 0 8 7c.833 0 1.542-.292 2.125-.875A2.893 2.893 0 0 0 11 4c0-.833-.292-1.542-.875-2.125A2.893 2.893 0 0 0 8 1c-.833 0-1.542.292-2.125.875A2.893 2.893 0 0 0 5 4Z";
     const ltr$7 = false;
+    const viewBox$7 = "0 0 16 16";
     const collection$7 = "SAP-icons-v4";
     const packageName$7 = "@ui5/webcomponents-icons";
 
-    Icons.y(name$7, { pathData: pathData$7, ltr: ltr$7, collection: collection$7, packageName: packageName$7 });
+    Icons.y(name$7, { pathData: pathData$7, ltr: ltr$7, viewBox: viewBox$7, collection: collection$7, packageName: packageName$7 });
 
     const name$6 = "person-placeholder";
-    const pathData$6 = "M342 255q48 23 77 67.5t29 99.5v32q0 11-7.5 18.5T422 480H90q-11 0-18.5-7.5T64 454v-32q0-56 29-100t77-67q-20-18-31-42.5T128 160q0-27 10-50t27.5-40.5 41-27.5T256 32t49.5 10.5 41 28T374 111t10 49q0 27-11 52t-31 43zM256 83q-32 0-54.5 22.5T179 160t22.5 54.5T256 237t54.5-22.5T333 160t-22.5-54.5T256 83zm141 339q0-28-10.5-52.5t-29-42.5-43-28.5T262 288h-12q-28 0-52.5 10.5t-43 28.5-29 42.5T115 422v7h282v-7z";
+    const pathData$6 = "M8 1a4 4 0 0 1 2.616 7.023C12.61 8.931 14 10.927 14 13.25v1a.75.75 0 0 1-.75.75H2.75a.75.75 0 0 1-.75-.75v-1c0-2.323 1.39-4.319 3.383-5.227A4 4 0 0 1 8 1Zm-.001 8C5.372 9 3.5 10.911 3.5 13.25v.25h9v-.25C12.5 10.911 10.686 9 7.999 9ZM8 2.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z";
     const ltr$6 = false;
+    const viewBox$6 = "0 0 16 16";
     const collection$6 = "SAP-icons-v5";
     const packageName$6 = "@ui5/webcomponents-icons";
 
-    Icons.y(name$6, { pathData: pathData$6, ltr: ltr$6, collection: collection$6, packageName: packageName$6 });
+    Icons.y(name$6, { pathData: pathData$6, ltr: ltr$6, viewBox: viewBox$6, collection: collection$6, packageName: packageName$6 });
 
     var personPlaceholder = "person-placeholder";
 
     const name$5 = "user-settings";
-    const pathData$5 = "M512 512H192v-64q0-27 10-50t27.5-40.5T270 330t50-10h32q-43 0-69.5-27T256 224q0-13 1-14 5-32 27-54t54-27q1-1 14-1 42 0 69 26.5t27 69.5q0 40-28 68t-68 28h32q26 0 49.5 10t41 27.5T502 398t10 50v64zM0 224q0-14 9-23t23-9h28q2-8 5.5-15t6.5-14l-20-20q-9-10-9-23t9-22l46-46q9-9 22-9 14 0 23 9l20 20q7-3 14-6.5t15-5.5V32q0-14 9-23t23-9h64q14 0 23 9t9 23v28q8 2 15 5.5t14 6.5l20-20q9-9 23-9 13 0 22 9l46 46q9 9 9 22t-9 23l-6 5-10-12-12-11 5-5-45-45-23 23q-5-1-8.5-1.5T352 96q-6 0-12 .5T328 98q-1-1-4-1-4-2-6.5-3l-7.5-3-22-8V32h-64v51l-22 8q-2 1-5 1.5t-5 2.5l-15 6-20 10-37-36-45 45 36 37-10 20q-3 6-5.5 12.5T91 202l-8 22H32v64h51l8 22q1 2 2 5t2 5q0 2 2 4 1 3 2 5.5t2 4.5l10 21-36 37 45 45 37-37 9 5q-5 18-6 37l-17 18q-9 9-23 9-13 0-22-9l-46-46q-9-9-9-22.5t9-22.5l20-20q-3-7-6.5-14T60 320H32q-14 0-23-9.5T0 288v-64zm480 256v-32q0-40-28-68t-68-28h-64q-40 0-68 28t-28 68v32h256zM288 224q0 27 18.5 45.5T352 288q26 0 45-19t19-45q0-27-18.5-45.5T352 160q-26 0-45 19t-19 45zm-128 37q0-35 16-59.5t48-36.5l8-2 9-2q-5 8-8.5 16.5T227 194q0 1-.5 2t-.5 3q-1 0-1 .5t-1 .5l-12 9q-11 11-15.5 21.5T192 256q0 4 .5 8t1.5 9q8 25 30 38l4 2 4 2q-4 1-8 5-5 4-9.5 8t-9.5 9q-4-2-7-5t-6-5q-4-3-7-7-13-15-18-27t-7-32z";
+    const pathData$5 = "M16 16H6v-2c0-.563.104-1.083.313-1.563a4.065 4.065 0 0 1 2.125-2.124c.479-.209 1-.313 1.562-.313h1c-.896 0-1.62-.281-2.172-.844C8.276 8.594 8 7.875 8 7c0-.27.01-.417.031-.438a2.97 2.97 0 0 1 .844-1.687 2.97 2.97 0 0 1 1.688-.844c.02-.02.166-.031.437-.031.875 0 1.594.276 2.156.828C13.72 5.38 14 6.104 14 7c0 .833-.292 1.542-.875 2.125A2.893 2.893 0 0 1 11 10h1a4.015 4.015 0 0 1 3.688 2.438c.208.479.312 1 .312 1.562v2ZM0 7c0-.292.094-.531.281-.719A.973.973 0 0 1 1 6h.875c.042-.167.099-.323.172-.469.073-.146.14-.291.203-.437l-.625-.625a1.043 1.043 0 0 1-.281-.719c0-.27.093-.5.281-.688l1.438-1.437a.935.935 0 0 1 .687-.281c.292 0 .531.093.719.281l.625.625c.146-.063.291-.13.437-.203.146-.073.302-.13.469-.172V1c0-.292.094-.531.281-.719A.973.973 0 0 1 7 0h2c.292 0 .531.094.719.281A.973.973 0 0 1 10 1v.875c.167.042.323.099.469.172.146.073.291.14.437.203l.625-.625a.974.974 0 0 1 .719-.281c.27 0 .5.093.688.281l1.437 1.438a.935.935 0 0 1 .281.687c0 .27-.094.51-.281.719l-.188.156-.312-.375a1.992 1.992 0 0 0-.375-.344l.156-.156-1.406-1.406-.719.719a4.97 4.97 0 0 0-.265-.047A1.917 1.917 0 0 0 11 3a4.517 4.517 0 0 0-.75.063c-.02-.021-.063-.032-.125-.032a2.819 2.819 0 0 0-.203-.094l-.235-.093L9 2.594V1H7v1.594l-.688.25a.555.555 0 0 1-.156.047.28.28 0 0 0-.156.078l-.469.187-.625.313L3.75 2.344 2.344 3.75l1.125 1.156-.313.625c-.062.125-.12.255-.172.39a9.185 9.185 0 0 0-.14.391L2.594 7H1v2h1.594l.25.688c.02.041.041.093.062.156.021.062.042.114.063.156 0 .042.02.083.062.125a3.134 3.134 0 0 0 .125.313l.313.656-1.125 1.156 1.406 1.406L4.906 12.5l.282.156c-.105.375-.167.76-.188 1.156l-.531.563a.973.973 0 0 1-.719.281.94.94 0 0 1-.688-.281l-1.437-1.438a.954.954 0 0 1-.281-.703c0-.28.093-.515.281-.703l.625-.625a8.179 8.179 0 0 0-.203-.437A2.282 2.282 0 0 1 1.875 10H1a.947.947 0 0 1-.719-.297A.988.988 0 0 1 0 9V7Zm15 8v-1c0-.833-.292-1.542-.875-2.125A2.893 2.893 0 0 0 12 11h-2c-.833 0-1.542.292-2.125.875A2.893 2.893 0 0 0 7 14v1h8ZM9 7c0 .563.193 1.036.578 1.422.386.385.86.578 1.422.578a1.92 1.92 0 0 0 1.406-.594A1.92 1.92 0 0 0 13 7c0-.563-.193-1.036-.578-1.422A1.933 1.933 0 0 0 11 5a1.92 1.92 0 0 0-1.406.594A1.922 1.922 0 0 0 9 7ZM5 8.156c0-.729.167-1.349.5-1.86.333-.51.833-.89 1.5-1.14l.25-.062a6 6 0 0 1 .281-.063 3.739 3.739 0 0 0-.438 1.031.133.133 0 0 1-.015.063.218.218 0 0 0-.016.094c-.02 0-.03.005-.03.015 0 .01-.011.016-.032.016l-.375.281c-.23.23-.39.453-.484.672A2.02 2.02 0 0 0 6 8c0 .083.005.167.016.25.01.083.026.177.046.281.167.521.48.917.938 1.188l.125.062.125.063A.553.553 0 0 0 7 10a7.495 7.495 0 0 0-.594.531.832.832 0 0 1-.218-.156A1.237 1.237 0 0 0 6 10.219 1.09 1.09 0 0 1 5.781 10c-.27-.313-.458-.594-.562-.844-.104-.25-.177-.583-.219-1Z";
     const ltr$5 = false;
+    const viewBox$5 = "0 0 16 16";
     const collection$5 = "SAP-icons-v4";
     const packageName$5 = "@ui5/webcomponents-icons";
 
-    Icons.y(name$5, { pathData: pathData$5, ltr: ltr$5, collection: collection$5, packageName: packageName$5 });
+    Icons.y(name$5, { pathData: pathData$5, ltr: ltr$5, viewBox: viewBox$5, collection: collection$5, packageName: packageName$5 });
 
     const name$4 = "user-settings";
-    const pathData$4 = "M166.907 396.779q10.994 0 18.49 6.996t7.495 17.99-7.495 18.49-18.49 7.495H25.985q-10.993 0-18.49-7.496T0 421.764v-31.982q0-55.968 28.984-99.944t76.957-66.962q-41.977-38.979-41.977-94.947 0-26.985 10.494-50.472t27.985-40.977T142.92 9.495 191.893 0q26.985 0 49.972 10.494t40.477 27.985 27.485 40.477 9.995 48.973-9.495 48.972-26.985 40.478-40.977 27.984-50.472 10.494h-5.997q-27.984 0-52.47 10.494T90.45 294.835t-28.984 42.477-10.494 52.47v6.997h115.935zm24.986-345.807q-31.982 0-54.47 22.487t-22.487 54.47 22.487 54.47 54.47 22.487q32.982 0 54.97-22.988t21.987-53.97q0-31.982-22.487-54.469t-54.47-22.487zm310.826 340.81q4.998 1.998 7.496 5.996t1.5 8.995l-3.998 16.99q-2 9.995-11.994 9.995l-27.984-3.998q-5.997 11.993-15.991 21.988l-6.996 6.996 9.994 26.985q0 1 .5 1.999t.5 1.999q0 8.995-7.996 11.993l-14.991 7.996q-2 0-2.5.5t-2.498.499q-7.995 0-10.994-6.996l-14.991-25.986q-4.997 1-8.995 1.5t-8.995.5q-3.998 0-7.496-.5t-8.495-.5l-14.992 26.985q-2.998 5.996-10.994 5.996-3.998 0-5.996-.999l-14.992-7.996q-6.996-2.998-6.996-10.993 0-3.998 1-4.998l9.994-26.985q-7.996-4.997-13.493-11.993t-10.494-14.991l-27.984 3.997q-10.994 0-12.993-9.994l-3.998-19.989q0-9.994 8.995-11.993l22.987-7.996q0-21.988 6.996-39.978l-16.99-15.99q-3.998-3.998-3.998-9.995 0-3.998 2.999-7.996l9.994-12.992q4.997-4.998 9.994-4.998 2.999 0 6.996 2l18.99 12.992q7.995-6.996 16.99-11.493t18.99-7.496l1.999-22.987q1.999-11.994 12.992-11.994h16.99q4.998 0 8.496 3.498t3.498 8.496l2 21.987q21.987 4.997 37.978 17.99l18.99-12.993q3.997-1.998 6.995-1.998 4.998 0 9.995 4.997l9.994 12.993q2.999 3.997 2.999 7.995 0 5.997-3.998 9.995l-15.991 14.991q7.995 20.988 7.995 40.977zm-163.908-7.996q0 18.99 12.993 31.982t31.982 12.993 31.982-12.993 12.993-31.982-12.993-31.982-31.982-12.993-31.982 12.993-12.993 31.982z";
+    const pathData$4 = "M12 8a.75.75 0 0 1 .75.75v.348c.426.11.816.308 1.146.578l.43-.294a.75.75 0 0 1 .849 1.236l-.39.268c.156.392.234.834.21 1.277l.437.11a.75.75 0 1 1-.364 1.454l-.53-.132a3.032 3.032 0 0 1-.717.785l.303.454a.75.75 0 1 1-1.248.832l-.464-.695a3.08 3.08 0 0 1-.825 0l-.463.695a.75.75 0 1 1-1.248-.832l.302-.454a3.011 3.011 0 0 1-.716-.785l-.53.132a.75.75 0 0 1-.364-1.454l.436-.11c-.024-.445.055-.89.214-1.283l-.384-.256a.75.75 0 0 1 .832-1.248l.442.295c.33-.268.718-.464 1.142-.573V8.75A.75.75 0 0 1 12 8ZM6 0a4 4 0 0 1 .355 7.983C6.137 8 5.981 8 5.798 8 3.418 8 1.5 9.911 1.5 12.25v.25h3.75a.75.75 0 0 1 0 1.5H.75a.75.75 0 0 1-.75-.75v-1c0-2.323 1.39-4.319 3.383-5.227A4 4 0 0 1 6 0Zm6 10.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm-6-9a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z";
     const ltr$4 = false;
+    const viewBox$4 = "0 0 16 16";
     const collection$4 = "SAP-icons-v5";
     const packageName$4 = "@ui5/webcomponents-icons";
 
-    Icons.y(name$4, { pathData: pathData$4, ltr: ltr$4, collection: collection$4, packageName: packageName$4 });
+    Icons.y(name$4, { pathData: pathData$4, ltr: ltr$4, viewBox: viewBox$4, collection: collection$4, packageName: packageName$4 });
 
     var userSettings = "user-settings";
 
     const name$3 = "log";
-    const pathData$3 = "M352 86q57 27 92.5 81T480 288q0 47-17.5 87.5t-48 71-71.5 48-87 17.5q-47 0-87.5-17.5t-71-48-48-71T32 288q0-67 35.5-121T160 86v36q-43 25-69.5 68.5T64 288q0 40 15 75t41 61 61 41 75 15 75-15 61-41 41-61 15-75q0-54-26.5-97.5T352 122V86zm-96 202q-14 0-23-9t-9-23V32q0-13 9-22.5T256 0q13 0 22.5 9.5T288 32v224q0 14-9.5 23t-22.5 9z";
+    const pathData$3 = "M11 2.688a6.986 6.986 0 0 1 2.89 2.53C14.63 6.345 15 7.605 15 9c0 .98-.182 1.89-.547 2.734a7.075 7.075 0 0 1-1.5 2.22 7.027 7.027 0 0 1-2.234 1.5A6.853 6.853 0 0 1 8 16c-.98 0-1.89-.182-2.734-.547a7.075 7.075 0 0 1-2.22-1.5 7.074 7.074 0 0 1-1.5-2.219A6.82 6.82 0 0 1 1 9c0-1.396.37-2.656 1.11-3.781A6.986 6.986 0 0 1 5 2.687v1.126a6.106 6.106 0 0 0-2.172 2.14C2.276 6.86 2 7.875 2 9c0 .833.156 1.615.469 2.344A6.02 6.02 0 0 0 3.75 13.25a6.017 6.017 0 0 0 1.906 1.281A5.88 5.88 0 0 0 8 15a5.88 5.88 0 0 0 2.344-.469 6.018 6.018 0 0 0 1.906-1.281 6.018 6.018 0 0 0 1.281-1.906A5.88 5.88 0 0 0 14 9c0-1.125-.276-2.14-.828-3.047A6.107 6.107 0 0 0 11 3.813V2.687ZM8 9a.973.973 0 0 1-.719-.281A.973.973 0 0 1 7 8V1c0-.27.094-.505.281-.703A.947.947 0 0 1 8 0c.27 0 .505.099.703.297A.961.961 0 0 1 9 1v7a.947.947 0 0 1-.297.719A.988.988 0 0 1 8 9Z";
     const ltr$3 = false;
+    const viewBox$3 = "0 0 16 16";
     const collection$3 = "SAP-icons-v4";
     const packageName$3 = "@ui5/webcomponents-icons";
 
-    Icons.y(name$3, { pathData: pathData$3, ltr: ltr$3, collection: collection$3, packageName: packageName$3 });
+    Icons.y(name$3, { pathData: pathData$3, ltr: ltr$3, viewBox: viewBox$3, collection: collection$3, packageName: packageName$3 });
 
     const name$2 = "log";
-    const pathData$2 = "M256 256q-11 0-18.5-7.5T230 230V26q0-11 7.5-18.5T256 0t18.5 7.5T282 26v204q0 11-7.5 18.5T256 256zm0 256q-53 0-100-20t-81.5-54.5T20 356 0 256q0-67 31-125t82-90q9-6 13.5-7.5T134 32q11 0 18.5 7.5T160 58q0 13-12 21-46 29-71.5 76T51 256q0 43 16 80t44 65 65 44 80 16 80.5-16 65-44 43.5-65 16-80q0-54-26-101t-71-76q-12-8-12-21 0-11 7.5-18.5T378 32q3 0 7.5 1.5T399 41q51 32 82 90t31 126q0 53-20 99.5t-54.5 81T356 492t-100 20z";
+    const pathData$2 = "M3.86 1.153a.75.75 0 0 1 .778 1.284 6.5 6.5 0 1 0 6.728.002.75.75 0 0 1 .778-1.283 8 8 0 1 1-8.283-.003ZM8 0a.75.75 0 0 1 .75.75v6.5a.75.75 0 0 1-1.5 0V.75A.75.75 0 0 1 8 0Z";
     const ltr$2 = false;
+    const viewBox$2 = "0 0 16 16";
     const collection$2 = "SAP-icons-v5";
     const packageName$2 = "@ui5/webcomponents-icons";
 
-    Icons.y(name$2, { pathData: pathData$2, ltr: ltr$2, collection: collection$2, packageName: packageName$2 });
+    Icons.y(name$2, { pathData: pathData$2, ltr: ltr$2, viewBox: viewBox$2, collection: collection$2, packageName: packageName$2 });
 
     var log = "log";
 
     const name$1 = "user-edit";
-    const pathData$1 = "M151.25 384H.25v-64q0-26 10-49.5t27.5-41 40.5-27.5 50-10h32q-40 0-68-28t-28-68 28-68 68-28 68 28 28 68-28 68-68 28h32q31 0 57 14t44 37l-23 22q-13-19-33.5-30t-44.5-11h-64q-40 0-68 28t-28 68v32h151zm-9 128q2-4 8-20t12-34q4-10 7.5-21t8.5-24l261-260q5-5 11-5t11 5l45 45q11 11 0 22l-260 261q-1 1-17 6t-36 10q-22 8-51 15zm18-352q26 0 45-19t19-45-19-45-45-19q-27 0-45.5 19t-18.5 45 18.5 45 45.5 19zm45 271l23 22 181-181-22-22zm204-204l23 23 40-41-22-22z";
+    const pathData$1 = "M4.723 12H0v-2a4.016 4.016 0 0 1 2.44-3.688A3.883 3.883 0 0 1 4.004 6h1a2.897 2.897 0 0 1-2.126-.875A2.892 2.892 0 0 1 2.002 3c0-.833.292-1.542.876-2.125A2.897 2.897 0 0 1 5.005 0c.834 0 1.543.292 2.127.875.584.583.876 1.292.876 2.125s-.292 1.542-.876 2.125A2.897 2.897 0 0 1 5.005 6h1c.647 0 1.242.146 1.784.438a4.34 4.34 0 0 1 1.376 1.156l-.72.687a2.927 2.927 0 0 0-1.047-.937A2.9 2.9 0 0 0 6.006 7H4.004c-.834 0-1.543.292-2.127.875A2.892 2.892 0 0 0 1 10v1h4.723l-1 1Zm-.281 4a8.93 8.93 0 0 0 .25-.625c.125-.333.25-.688.375-1.063.084-.208.162-.427.235-.656.073-.229.162-.479.266-.75l8.164-8.125a.479.479 0 0 1 .344-.156c.125 0 .24.052.344.156l1.408 1.407c.23.229.23.458 0 .687l-8.133 8.156c-.02.021-.198.084-.532.188-.333.104-.709.208-1.126.312-.459.167-.99.323-1.595.469Zm.563-11c.542 0 1.011-.198 1.408-.594A1.92 1.92 0 0 0 7.007 3a1.92 1.92 0 0 0-.594-1.406A1.925 1.925 0 0 0 5.005 1a1.91 1.91 0 0 0-1.423.594A1.947 1.947 0 0 0 3.002 3c0 .542.194 1.01.58 1.406.385.396.86.594 1.423.594Zm1.408 8.469.719.687L12.794 8.5l-.688-.688-5.693 5.657Zm6.38-6.375.72.718 1.252-1.28-.689-.688-1.282 1.25Z";
     const ltr$1 = false;
+    const viewBox$1 = "0 0 16 16";
     const collection$1 = "SAP-icons-v4";
     const packageName$1 = "@ui5/webcomponents-icons";
 
-    Icons.y(name$1, { pathData: pathData$1, ltr: ltr$1, collection: collection$1, packageName: packageName$1 });
+    Icons.y(name$1, { pathData: pathData$1, ltr: ltr$1, viewBox: viewBox$1, collection: collection$1, packageName: packageName$1 });
 
     const name = "user-edit";
-    const pathData = "M70 397q11 0 18.5 7t7.5 18-7.5 18.5T70 448H26q-11 0-18.5-7.5T0 422v-32q0-55 29-99.5t77-67.5l-4-5q-19-18-28.5-41T64 128q0-27 10.5-50.5t28-41 40.5-27T192 0q27 0 50 10.5t40.5 28T310 79t10 49-9.5 49-27 40.5-41 28T192 256h-6q-28 0-52.5 10.5t-43 28.5-29 42.5T51 390v7h19zM192 51q-32 0-54.5 22.5T115 128t22.5 54.5T192 205q33 0 55-23t22-54q0-32-22.5-54.5T192 51zm313 161q7 7 7 18t-7 18l-25 26q-8 8-19 8-10 0-18-8l-50-51q-7-7-7-18t7-18l25-26q7-7 18-7 12 0 19 7zm-75 77q7 9 7 18t-7 18L254 504q-8 8-18 8h-50q-11 0-18.5-7.5T160 486v-51q0-9 7-18l176-179q8-8 18-8 12 0 18 8zm-55 18l-14-14-150 153v15h14z";
+    const pathData = "M10.798 7.543a.749.749 0 0 1 1.002.05l1.583 1.585a.75.75 0 0 1 .002 1.06l-5.53 5.542a.75.75 0 0 1-.53.22H5.742a.75.75 0 0 1-.749-.75v-1.583c0-.199.08-.39.22-.53l5.586-5.594ZM6.49 13.977v.523h.525l4.78-4.792-.524-.523-4.781 4.792ZM5.99 0a3.997 3.997 0 0 1 3.994 4 3.996 3.996 0 0 1-3.638 3.983C6.108 8 5.97 8 5.789 8c-2.375 0-4.291 1.911-4.291 4.25v.25h.749a.75.75 0 0 1 0 1.5H.749A.75.75 0 0 1 0 13.25v-1c0-2.323 1.387-4.319 3.378-5.227A3.992 3.992 0 0 1 1.997 4c0-2.21 1.788-4 3.994-4Zm7.526 5c.199 0 .39.078.53.219l1.584 1.584a.75.75 0 0 1 .002 1.06l-.787.791a.749.749 0 0 1-1.06.002l-1.583-1.584a.75.75 0 0 1-.002-1.06l.787-.791a.746.746 0 0 1 .53-.221ZM5.991 1.5A2.498 2.498 0 0 0 3.495 4c0 1.38 1.117 2.5 2.496 2.5A2.498 2.498 0 0 0 8.487 4c0-1.38-1.118-2.5-2.496-2.5Z";
     const ltr = false;
+    const viewBox = "0 0 16 16";
     const collection = "SAP-icons-v5";
     const packageName = "@ui5/webcomponents-icons";
 
-    Icons.y(name, { pathData, ltr, collection, packageName });
+    Icons.y(name, { pathData, ltr, viewBox, collection, packageName });
 
     var userEdit = "user-edit";
 
     function UserMenuTemplate() {
-        return (parametersBundle_css.jsxs(ResponsivePopover.ResponsivePopover, { id: "user-menu-rp", class: "ui5-user-menu-rp", placement: "Bottom", verticalAlign: "Bottom", horizontalAlign: "End", tabindex: -1, accessibleName: this.accessibleNameText, "aria-labelledby": this.accessibleNameText, open: this.open, opener: this.opener, onClose: this._handlePopoverAfterClose, onOpen: this._handlePopoverAfterOpen, onScroll: this._handleScroll, children: [parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [parametersBundle_css.jsxs(Bar$1, { class: {
+        return (jsxRuntime.jsxs(ResponsivePopover.ResponsivePopover, { id: "user-menu-rp", class: "ui5-user-menu-rp", placement: "Bottom", verticalAlign: "Bottom", horizontalAlign: "End", tabindex: -1, accessibleName: this.accessibleNameText, "aria-label": this.accessibleNameText, open: this.open, opener: this.opener, onClose: this._handlePopoverAfterClose, onOpen: this._handlePopoverAfterOpen, onScroll: this._handleScroll, children: [jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsxs(Bar$1, { class: {
                                 "ui5-user-menu-fixed-header": true,
                                 "ui5-user-menu-rp-scrolled": this._isScrolled || this._titleMovedToHeader
                             }, slot: "header", children: [this._titleMovedToHeader &&
-                                    parametersBundle_css.jsx(Title.Title, { level: "H1", wrappingType: "None", children: this._selectedAccount.titleText }), this._isPhone && parametersBundle_css.jsx(Button.Button, { icon: information.decline, design: "Transparent", accessibleName: this._closeDialogAriaLabel, onClick: this._closeUserMenu, slot: "endContent" })] }), parametersBundle_css.jsx("div", { class: "ui5-user-menu-header", children: headerContent.call(this) })] }), this.showOtherAccounts &&
-                    parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: otherAccountsContent.call(this) }), this.menuItems.length > 0 &&
-                    parametersBundle_css.jsx(List.List, { id: "ui5-user-menu-list", class: "ui5-user-menu-list", selectionMode: "None", separators: "None", accessibleRole: "Menu", onItemClick: this._handleMenuItemClick, "onui5-close-menu": this._handleMenuItemClose, children: parametersBundle_css.jsx("slot", {}) }), parametersBundle_css.jsx("div", { slot: "footer", class: "ui5-user-menu-footer", children: parametersBundle_css.jsx(Button.Button, { class: "ui5-user-menu-sign-out-btn", design: "Transparent", icon: log, onClick: this._handleSignOutClick, children: this._signOutButtonText }) })] }));
+                                    jsxRuntime.jsx(Title.Title, { level: "H1", wrappingType: "None", children: this._selectedAccount.titleText }), this._isPhone && jsxRuntime.jsx(Button.Button, { icon: decline.decline, design: "Transparent", accessibleName: this._closeDialogAriaLabel, onClick: this._closeUserMenu, slot: "endContent" })] }), jsxRuntime.jsx("div", { class: "ui5-user-menu-header", children: headerContent.call(this) })] }), this.showOtherAccounts &&
+                    jsxRuntime.jsx(jsxRuntime.Fragment, { children: otherAccountsContent.call(this) }), this.menuItems.length > 0 &&
+                    jsxRuntime.jsx(List.List, { id: "ui5-user-menu-list", class: "ui5-user-menu-list", selectionMode: "None", separators: "None", accessibleRole: "Menu", accessibleName: this._ariaLabelledByActions, onItemClick: this._handleMenuItemClick, onMouseOver: this._itemMouseOver, "onui5-close-menu": this._handleMenuItemClose, children: jsxRuntime.jsx("slot", {}) }), this._hasCustomFooter &&
+                    jsxRuntime.jsx("div", { slot: "footer", class: "ui5-user-menu-footer", children: jsxRuntime.jsx("slot", { name: "footer" }) }), this._showDefaultFooter &&
+                    jsxRuntime.jsx("div", { slot: "footer", class: "ui5-user-menu-footer", children: jsxRuntime.jsx(Button.Button, { class: "ui5-user-menu-sign-out-btn", design: "Transparent", icon: log, onClick: this._handleSignOutClick, children: this._signOutButtonText }) })] }));
     }
     function headerContent() {
-        return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: this._selectedAccount &&
-                parametersBundle_css.jsxs("div", { class: "ui5-user-menu-selected-account", "aria-labelledby": this._ariaLabelledByAccountInformationText, children: [parametersBundle_css.jsxs(Avatar, { size: "L", onClick: this._handleAvatarClick, initials: this._selectedAccount._initials, fallbackIcon: personPlaceholder, class: "ui5-user-menu--selected-account-avatar", interactive: true, children: [this._selectedAccount.avatarSrc &&
-                                    parametersBundle_css.jsx("img", { src: this._selectedAccount.avatarSrc }), this.showEditButton &&
-                                    parametersBundle_css.jsx(Tag.Tag, { slot: "badge", wrappingType: "None", design: "Set1", colorScheme: "5", title: this._editAvatarTooltip, children: parametersBundle_css.jsx(Icon.Icon, { slot: "icon", name: ListItemCustom.edit }) })] }), this._selectedAccount.titleText &&
-                            parametersBundle_css.jsx(Text.Text, { maxLines: 2, id: "selected-account-title", class: "ui5-user-menu-selected-account-title", children: this._selectedAccount.titleText }), this._selectedAccount.subtitleText &&
-                            parametersBundle_css.jsx(Text.Text, { maxLines: 1, class: "ui5-user-menu-selected-account-subtitleText", children: this._selectedAccount.subtitleText }), this._selectedAccount.description &&
-                            parametersBundle_css.jsx(Text.Text, { maxLines: 1, class: "ui5-user-menu-selected-account-description", children: this._selectedAccount.description }), this.showManageAccount &&
-                            parametersBundle_css.jsx(Button.Button, { id: "selected-account-manage-btn", icon: userSettings, class: "ui5-user-menu-manage-account-btn", onClick: this._handleManageAccountClick, children: this._manageAccountButtonText })] }) }));
+        return (jsxRuntime.jsx(jsxRuntime.Fragment, { children: this._selectedAccount &&
+                jsxRuntime.jsxs("div", { class: "ui5-user-menu-selected-account", "aria-label": this._ariaLabelledByAccountInformationText, children: [jsxRuntime.jsx("span", { title: this.showEditButton ? this._editAvatarTooltip : undefined, children: jsxRuntime.jsxs(Avatar, { size: "L", onClick: this._handleAvatarClick, initials: this._selectedAccount._initials, colorScheme: this._selectedAccount.avatarColorScheme, fallbackIcon: personPlaceholder, class: "ui5-user-menu-selected-account-avatar", interactive: true, children: [this._selectedAccount.avatarSrc &&
+                                        jsxRuntime.jsx("img", { src: this._selectedAccount.avatarSrc }), this.showEditButton &&
+                                        jsxRuntime.jsx(Tag.Tag, { slot: "badge", wrappingType: "None", design: "Set1", colorScheme: "5", children: jsxRuntime.jsx(Icon.Icon, { slot: "icon", name: ListItemTemplate.edit }) })] }) }), this._selectedAccount.titleText &&
+                            jsxRuntime.jsx(Text.Text, { id: "selected-account-title", class: "ui5-user-menu-selected-account-title", children: this._selectedAccount.titleText }), this._selectedAccount.subtitleText &&
+                            jsxRuntime.jsx(Text.Text, { class: "ui5-user-menu-selected-account-subtitleText", children: this._selectedAccount.subtitleText }), this._selectedAccount.description &&
+                            jsxRuntime.jsx(Text.Text, { class: "ui5-user-menu-selected-account-description", children: this._selectedAccount.description }), this._selectedAccount.additionalInfo &&
+                            jsxRuntime.jsx(Text.Text, { class: "ui5-user-menu-selected-account-additional-info", children: this._selectedAccount.additionalInfo }), this.showManageAccount &&
+                            jsxRuntime.jsx(Button.Button, { id: "selected-account-manage-btn", icon: userSettings, class: "ui5-user-menu-manage-account-btn", onClick: this._handleManageAccountClick, children: this._manageAccountButtonText })] }) }));
     }
     function otherAccountsContent() {
-        return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: parametersBundle_css.jsxs(Panel$1, { collapsed: true, class: "ui5-user-menu-other-accounts", "aria-labelledby": this._otherAccountsButtonText, children: [parametersBundle_css.jsxs("div", { slot: "header", class: "ui5-user-menu-account-header", children: [parametersBundle_css.jsxs(Title.Title, { slot: "header", level: "H4", "wrapping-type": "None", children: [this._otherAccountsButtonText, " (", this._otherAccounts.length, ")"] }), this.showEditAccounts &&
-                                parametersBundle_css.jsx(Button.Button, { slot: "header", class: "ui5-user-menu-add-account-btn", design: "Transparent", icon: userEdit, onClick: this._handleEditAccountsClick, tooltip: this._editAccountsTooltip })] }), this._otherAccounts.length > 0 &&
-                        parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: otherAccountsList.call(this) })] }) }));
+        return (jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsxs(Panel$1, { collapsed: true, class: "ui5-user-menu-other-accounts", children: [jsxRuntime.jsxs("div", { slot: "header", class: "ui5-user-menu-account-header", children: [jsxRuntime.jsxs(Title.Title, { slot: "header", level: "H4", "wrapping-type": "None", children: [this._otherAccountsButtonText, " (", this._otherAccounts.length, ")"] }), this.showEditAccounts &&
+                                jsxRuntime.jsx(Button.Button, { slot: "header", class: "ui5-user-menu-add-account-btn", design: "Transparent", icon: userEdit, onClick: this._handleEditAccountsClick, tooltip: this._editAccountsTooltip })] }), this._otherAccounts.length > 0 &&
+                        jsxRuntime.jsx(jsxRuntime.Fragment, { children: otherAccountsList.call(this) })] }) }));
     }
     function otherAccountsList() {
-        return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: parametersBundle_css.jsx(List.List, { onItemClick: this._handleAccountSwitch, "aria-labelledby": this._ariaLabelledByActions, loadingDelay: 0, loading: this._otherAccounts.some(account => account.loading === true), children: this._otherAccounts.map((account, index) => parametersBundle_css.jsx(ListItemCustom.ListItemCustom, { ref: this.captureRef.bind(account), "aria-labelledby": account.titleText, "aria-possition": index + 1, "aria-setsize": this._otherAccounts.length, "aria-dectiption": this.getAccountDescriptionText(account), children: parametersBundle_css.jsxs("div", { class: "ui5-user-menu-other-accounts-content", children: [parametersBundle_css.jsx(Avatar, { slot: "image", size: "S", initials: account._initials, fallbackIcon: personPlaceholder, children: account.avatarSrc &&
-                                    parametersBundle_css.jsx("img", { src: account.avatarSrc }) }), parametersBundle_css.jsxs("div", { class: "ui5-user-menu-other-accounts-info", children: [account.titleText &&
-                                        parametersBundle_css.jsx(Title.Title, { class: "ui5-user-menu-other-accounts-title", "wrapping-type": "None", children: account.titleText }), account.subtitleText &&
-                                        parametersBundle_css.jsx(Label, { class: "ui5-user-menu-other-accounts-additional-info", "wrapping-type": "None", children: account.subtitleText }), account.description &&
-                                        parametersBundle_css.jsx(Label, { class: "ui5-user-menu-other-accounts-additional-info", "wrapping-type": "None", children: account.description })] }), parametersBundle_css.jsx("div", { children: account.selected &&
-                                    parametersBundle_css.jsx(Icon.Icon, { part: "icon", name: sysEnter2.selectedAccount, class: "ui5-user-menu-selected-account-icon", mode: "Decorative" }) })] }) })) }) }));
+        return (jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsx(List.List, { onItemClick: this._handleAccountSwitch, loadingDelay: 0, accessibleName: `${this._otherAccountsButtonText} (${this._otherAccounts.length})`, loading: this._otherAccounts.some(account => account.loading === true), children: this._otherAccounts.map((account, index) => jsxRuntime.jsx(MenuItem.ListItemCustom, { ref: this.captureRef.bind(account), accessibilityAttributes: {
+                        "ariaPosinset": index + 1,
+                        "ariaSetsize": this._otherAccounts.length
+                    }, accessibleName: this.getAccountDescriptionText(account), children: jsxRuntime.jsxs("div", { class: "ui5-user-menu-other-accounts-content", children: [jsxRuntime.jsx(Avatar, { slot: "image", size: "S", initials: account._initials, fallbackIcon: personPlaceholder, colorScheme: account.avatarColorScheme, children: account.avatarSrc &&
+                                    jsxRuntime.jsx("img", { src: account.avatarSrc }) }), jsxRuntime.jsxs("div", { class: "ui5-user-menu-other-accounts-info", children: [account.titleText &&
+                                        jsxRuntime.jsx(Title.Title, { class: "ui5-user-menu-other-accounts-title", children: account.titleText }), account.subtitleText &&
+                                        jsxRuntime.jsx(Label, { class: "ui5-user-menu-other-accounts-additional-info", children: account.subtitleText }), account.description &&
+                                        jsxRuntime.jsx(Label, { class: "ui5-user-menu-other-accounts-additional-info", children: account.description })] }), jsxRuntime.jsx("div", { children: account.selected &&
+                                    jsxRuntime.jsx(Icon.Icon, { part: "icon", name: sysEnter2.selectedAccount, class: "ui5-user-menu-selected-account-icon", mode: "Decorative" }) })] }) })) }) }));
     }
 
-    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$2.defaultTheme);
-    var UserMenuCss = `.ui5-user-menu-rp{width:20rem}.ui5-user-menu-rp::part(content),.ui5-user-menu-rp::part(footer){padding-inline:.5rem}.ui5-user-menu-rp::part(header){box-shadow:none;padding:0}.ui5-user-menu-header{display:flex;flex-direction:column}[on-phone] .ui5-user-menu-header{padding-inline:0}.ui5-user-menu-fixed-header:not(.ui5-user-menu-rp-scrolled){box-shadow:none}.ui5-user-menu-fixed-header::part(startContent),.ui5-user-menu-fixed-header::part(endContent){padding:0}.ui5-user-menu-fixed-header [ui5-button]{margin-inline:.5rem;font-family:var(--sapFontSemiboldDuplexFamily)}.ui5-user-menu-rp::part(content){padding-top:0;padding-bottom:.5rem}.ui5-user-menu-rp::part(footer){padding-block:.5rem}.ui5-user-menu-selected-account{display:flex;align-items:center;flex-direction:column;margin-block-end:.5rem;overflow:hidden}.ui5-user-menu--selected-account-avatar{margin-block-start:.25rem;margin-block-end:.5rem}.ui5-user-menu-selected-account-title{margin-block:.25rem;font-family:var(--sapFontBoldFamily);font-size:var(--sapFontLargeSize);color:var(--sapTextColor)}.ui5-user-menu-selected-account-subtitleText{margin-bottom:.25rem;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapContent_LabelColor)}.ui5-user-menu-selected-account-description{font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapContent_LabelColor)}.ui5-user-menu-manage-account-btn{font-family:var(--sapFontSemiboldDuplexFamily);margin-block-start:1rem}.ui5-user-menu-sign-out-btn{font-family:var(--sapFontSemiboldDuplexFamily)}.ui5-user-menu-other-accounts{margin-block-end:.5rem}.ui5-user-menu-other-accounts::part(header){border-bottom-left-radius:0;border-bottom-right-radius:0}.ui5-user-menu-other-accounts::part(content){padding:0}.ui5-user-menu-other-accounts-content{display:flex;align-items:center;width:100%;height:4.5rem;gap:12px}.ui5-user-menu-other-accounts-info{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:4px;align-self:stretch;width:100%;overflow:hidden}.ui5-user-menu-other-accounts-title{overflow:hidden;color:var(--sapList_TextColor);text-overflow:ellipsis;font-family:var(--sapFontBoldFamily);font-size:var(--sapFontSize);font-style:normal;line-height:normal}.ui5-user-menu-other-accounts-additional-info{overflow:hidden;color:var(--sapContent_LabelColor);text-overflow:ellipsis;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);font-style:normal;line-height:normal}.ui5-user-menu-selected-account-icon{display:flex;width:18px;align-items:center;align-self:stretch;color:var(--sapContent_NonInteractiveIconColor);font-family:var(--_ui5-v2-15-0_slider_handle_font_family);font-size:1.125rem}.ui5-user-menu-account-header{display:flex;flex:1;justify-content:space-between;align-items:center}.ui5-user-menu-footer{display:flex;flex:1;justify-content:flex-end;align-items:center}
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
+    var UserMenuCss = `.ui5-user-menu-rp{width:20rem}.ui5-user-menu-rp::part(content),.ui5-user-menu-rp::part(footer){padding-inline:.5rem}.ui5-user-menu-rp::part(header){box-shadow:none;padding:0}.ui5-user-menu-header{display:flex;flex-direction:column}[on-phone] .ui5-user-menu-header{padding-inline:0}.ui5-user-menu-fixed-header:not(.ui5-user-menu-rp-scrolled){box-shadow:none}.ui5-user-menu-fixed-header::part(startContent),.ui5-user-menu-fixed-header::part(endContent){padding:0}.ui5-user-menu-fixed-header [ui5-button]{margin-inline:.5rem;font-family:var(--sapFontSemiboldDuplexFamily)}.ui5-user-menu-rp::part(content){padding-top:0;padding-bottom:.5rem}.ui5-user-menu-selected-account{display:flex;align-items:center;flex-direction:column;margin-block-end:.5rem;overflow:hidden}.ui5-user-menu-selected-account-avatar{margin-block-start:.25rem;margin-block-end:.5rem}.ui5-user-menu-avatar-img{object-fit:cover}.ui5-user-menu-selected-account-title{text-align:center;margin-block:.25rem;font-family:var(--sapFontSemiboldDuplexFamily);font-size:var(--sapFontLargeSize);color:var(--sapTextColor)}.ui5-user-menu-selected-account-subtitleText{text-align:center;margin-bottom:.25rem;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapContent_LabelColor)}.ui5-user-menu-selected-account-description{text-align:center;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapContent_LabelColor)}.ui5-user-menu-selected-account-additional-info{margin-top:.25rem;text-align:center;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapContent_LabelColor)}.ui5-user-menu-manage-account-btn{font-family:var(--sapFontSemiboldDuplexFamily);margin-block-start:1rem}.ui5-user-menu-sign-out-btn{font-family:var(--sapFontSemiboldDuplexFamily)}.ui5-user-menu-other-accounts{margin-block-end:.5rem}.ui5-user-menu-other-accounts::part(header){border-bottom-left-radius:0;border-bottom-right-radius:0}.ui5-user-menu-other-accounts::part(content){padding:0}.ui5-user-menu-other-accounts-content{display:flex;align-items:center;width:100%;min-height:4.5rem;gap:12px}.ui5-user-menu-other-accounts-info{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:4px;align-self:stretch;width:100%;overflow:hidden}.ui5-user-menu-other-accounts-title{overflow:hidden;color:var(--sapList_TextColor);text-overflow:ellipsis;font-family:var(--sapFontSemiboldDuplexFamily);font-size:var(--sapFontSize);font-style:normal;line-height:normal}.ui5-user-menu-other-accounts-additional-info{overflow:hidden;color:var(--sapContent_LabelColor);text-overflow:ellipsis;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);font-style:normal;line-height:normal}.ui5-user-menu-selected-account-icon{display:flex;width:18px;align-items:center;align-self:stretch;color:var(--sapContent_NonInteractiveIconColor);font-family:var(--_ui5_slider_handle_font_family);font-size:1.125rem}.ui5-user-menu-account-header{display:flex;flex:1;justify-content:space-between;align-items:center}.ui5-user-menu-footer{display:flex;flex:1;justify-content:flex-end;align-items:center}
 `;
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -605,6 +658,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
         return c > 3 && r && Object.defineProperty(target, key, r), r;
     };
     var UserMenu_1;
+    const MENU_OPEN_DELAY = 300;
     /**
      * @class
      * ### Overview
@@ -619,11 +673,10 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
      *
      * @constructor
      * @extends UI5Element
-     * @experimental
      * @public
      * @since 2.5.0
      */
-    let UserMenu = UserMenu_1 = class UserMenu extends webcomponentsBase.b {
+    let UserMenu = UserMenu_1 = class UserMenu extends webcomponentsBase.S {
         constructor() {
             super(...arguments);
             /**
@@ -675,20 +728,27 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
         }
         onBeforeRendering() {
             this._selectedAccount = this.accounts.find(account => account.selected) || this.accounts[0];
+            const siblingsWithIcon = this._menuItems.some(menuItem => !!menuItem.icon);
+            this._menuItems.forEach(item => {
+                item._siblingsWithIcon = siblingsWithIcon;
+            });
         }
         onAfterRendering() {
-            if (this._responsivePopover) {
-                const observerOptions = {
-                    threshold: [0.15],
-                };
-                this._observer?.disconnect();
-                this._observer = new IntersectionObserver(entries => this._handleIntersection(entries), observerOptions);
-                if (this._selectedAccountTitleEl) {
-                    this._observer.observe(this._selectedAccountTitleEl);
-                }
-                if (this._selectedAccountManageBtn) {
-                    this._observer.observe(this._selectedAccountManageBtn);
-                }
+            if (this._responsivePopover && this.open && !this._observer) {
+                this._setupObserver();
+            }
+        }
+        _setupObserver() {
+            const observerOptions = {
+                threshold: [0.15],
+            };
+            this._observer?.disconnect();
+            this._observer = new IntersectionObserver(entries => this._handleIntersection(entries), observerOptions);
+            if (this._selectedAccountTitleEl) {
+                this._observer.observe(this._selectedAccountTitleEl);
+            }
+            if (this._selectedAccountManageBtn) {
+                this._observer.observe(this._selectedAccountManageBtn);
             }
         }
         get _isPhone() {
@@ -742,7 +802,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
             this._closeUserMenu();
         }
         _handleMenuItemClick(e) {
-            const item = e.detail.item; // imrove: improve this ideally without "as" cating
+            const item = e.detail.item;
             item._updateCheckedState();
             if (!item._popover) {
                 const eventPrevented = !this.fireDecoratorEvent("item-click", {
@@ -753,6 +813,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
                 }
             }
             else {
+                this._closeOtherSubMenus(item);
                 this._openItemSubMenu(item);
             }
         }
@@ -760,19 +821,56 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
             this._closeUserMenu();
         }
         _handlePopoverAfterOpen() {
+            this._titleMovedToHeader = false;
+            this._isScrolled = false;
+            this._setupObserver();
             this.fireDecoratorEvent("open");
         }
         _handlePopoverAfterClose() {
+            this._observer?.disconnect();
+            this._observer = undefined;
+            this._titleMovedToHeader = false;
+            this._isScrolled = false;
             this.open = false;
             this.fireDecoratorEvent("close");
         }
-        _openItemSubMenu(item) {
+        _itemMouseOver(e) {
+            if (!Theme.f$1()) {
+                return;
+            }
+            const item = e.target;
+            if (!MenuItem.isInstanceOfMenuItem(item)) {
+                return;
+            }
+            item.getFocusDomRef()?.focus();
+            this._startOpenTimeout(item);
+        }
+        _startOpenTimeout(item) {
+            clearTimeout(this._timeout);
+            this._timeout = setTimeout(() => {
+                this._closeOtherSubMenus(item);
+                this._openItemSubMenu(item, true);
+            }, MENU_OPEN_DELAY);
+        }
+        _closeOtherSubMenus(item) {
+            if (!this._menuItems.includes(item)) {
+                return;
+            }
+            this._menuItems.forEach(menuItem => {
+                if (menuItem !== item) {
+                    menuItem._close();
+                }
+            });
+        }
+        _openItemSubMenu(item, openedByMouse = false) {
+            clearTimeout(this._timeout);
             if (!item._popover || item._popover.open) {
                 return;
             }
             item._popover.opener = item;
             item._popover.open = true;
             item.selected = true;
+            item._openedByMouse = openedByMouse;
         }
         _closeUserMenu() {
             this.open = false;
@@ -810,8 +908,14 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
         get _ariaLabelledByActions() {
             return UserMenu_1.i18nBundle.getText(i18nDefaults$1.USER_MENU_ACTIONS_TXT);
         }
+        get _hasCustomFooter() {
+            return this.footer.length > 0 && this.footer[0]?.innerHTML.trim() !== "";
+        }
+        get _showDefaultFooter() {
+            return this.footer.length === 0;
+        }
         getAccountDescriptionText(account) {
-            return `${account.subtitleText} ${account.description} ${account.selected ? UserMenu_1.i18nBundle.getText(i18nDefaults$1.USER_MENU_POPOVER_ACCESSIBLE_ACCOUNT_SELECTED_TXT) : ""}`;
+            return `${account.titleText} ${account.subtitleText} ${account.description} ${account.selected ? UserMenu_1.i18nBundle.getText(i18nDefaults$1.USER_MENU_POPOVER_ACCESSIBLE_ACCOUNT_SELECTED_TXT) : ""}`;
         }
         getAccountByRefId(refId) {
             return this.accounts.find(account => account._id === refId);
@@ -820,6 +924,9 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
             if (ref) {
                 ref.associatedAccount = this;
             }
+        }
+        get _menuItems() {
+            return this.menuItems.filter(MenuItem.isInstanceOfMenuItem);
         }
     };
     __decorate([
@@ -856,6 +963,9 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
         })
     ], UserMenu.prototype, "accounts", void 0);
     __decorate([
+        webcomponentsBase.d()
+    ], UserMenu.prototype, "footer", void 0);
+    __decorate([
         webcomponentsBase.s({ type: Boolean })
     ], UserMenu.prototype, "_titleMovedToHeader", void 0);
     __decorate([
@@ -871,13 +981,13 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
         query.o("#selected-account-manage-btn")
     ], UserMenu.prototype, "_selectedAccountManageBtn", void 0);
     __decorate([
-        parametersBundle_css$1.i("@ui5/webcomponents-fiori")
+        parametersBundle_css.i("@ui5/webcomponents-fiori")
     ], UserMenu, "i18nBundle", void 0);
     UserMenu = UserMenu_1 = __decorate([
         webcomponentsBase.m({
             tag: "ui5-user-menu",
             languageAware: true,
-            renderer: parametersBundle_css.y,
+            renderer: jsxRuntime.y,
             template: UserMenuTemplate,
             styles: [UserMenuCss],
         })

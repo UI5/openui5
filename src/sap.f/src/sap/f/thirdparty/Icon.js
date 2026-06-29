@@ -1,17 +1,20 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/parameters-bundle.css'], (function (exports, webcomponentsBase, parametersBundle_css, eventStrict, Icons, Theme, parametersBundle_css$1) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/i18n-defaults2'], (function (exports, webcomponentsBase, jsxRuntime, eventStrict, Icons, parametersBundle_css, Theme, i18nDefaults) { 'use strict';
 
     function IconTemplate() {
-        return (parametersBundle_css.jsxs("svg", { class: "ui5-icon-root", part: "root", tabindex: this._tabIndex, dir: this._dir, viewBox: this.viewBox, role: this.effectiveAccessibleRole, focusable: "false", preserveAspectRatio: "xMidYMid meet", "aria-label": this.effectiveAccessibleName, "aria-hidden": this.effectiveAriaHidden, xmlns: "http://www.w3.org/2000/svg", onKeyDown: this._onkeydown, onKeyUp: this._onkeyup, children: [this.hasIconTooltip &&
-                    parametersBundle_css.jsxs("title", { id: `${this._id}-tooltip`, children: [" ", this.effectiveAccessibleName, " "] }), parametersBundle_css.jsx("g", { role: "presentation", children: content.call(this) })] }));
+        if (this.hasFontIcon) {
+            return (jsxRuntime.jsx("span", { class: "ui5-icon-root", part: "root", tabindex: this._tabIndex, role: this.effectiveAccessibleRole, "aria-label": this.effectiveAccessibleName, "aria-hidden": this.effectiveAriaHidden, onKeyDown: this._onkeydown, onKeyUp: this._onkeyup, onClick: this._onclick, children: jsxRuntime.jsx("slot", { name: "fontIcon" }) }));
+        }
+        return (jsxRuntime.jsxs("svg", { class: "ui5-icon-root", part: "root", tabindex: this._tabIndex, dir: this._dir, viewBox: this.viewBox, role: this.effectiveAccessibleRole, focusable: "false", preserveAspectRatio: "xMidYMid meet", "aria-label": this.effectiveAccessibleName, "aria-hidden": this.effectiveAriaHidden, xmlns: "http://www.w3.org/2000/svg", onKeyDown: this._onkeydown, onKeyUp: this._onkeyup, onClick: this._onclick, children: [this.hasIconTooltip &&
+                    jsxRuntime.jsxs("title", { id: `${this._id}-tooltip`, children: [" ", this.effectiveAccessibleName, " "] }), jsxRuntime.jsx("g", { role: "presentation", children: content.call(this) })] }));
     }
     function content() {
         if (this.customTemplate) {
             return this.customTemplate;
         }
         if (this.customTemplateAsString) {
-            return parametersBundle_css.jsx("g", { dangerouslySetInnerHTML: { __html: this.customTemplateAsString } });
+            return jsxRuntime.jsx("g", { dangerouslySetInnerHTML: { __html: this.customTemplateAsString } });
         }
-        return this.pathData.map(path => (parametersBundle_css.jsx("path", { d: path })));
+        return this.pathData.map(path => (jsxRuntime.jsx("path", { d: path })));
     }
 
     /**
@@ -44,9 +47,9 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
     })(IconMode || (IconMode = {}));
     var IconMode$1 = IconMode;
 
-    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
-    var iconCss = `:host{-webkit-tap-highlight-color:rgba(0,0,0,0)}:host([hidden]){display:none}:host([invalid]){display:none}:host(:not([hidden]).ui5_hovered){opacity:.7}:host{display:inline-block;width:1rem;height:1rem;color:var(--sapContent_IconColor);fill:currentColor;outline:none}:host([design="Contrast"]){color:var(--sapContent_ContrastIconColor)}:host([design="Critical"]){color:var(--sapCriticalElementColor)}:host([design="Information"]){color:var(--sapInformativeElementColor)}:host([design="Negative"]){color:var(--sapNegativeElementColor)}:host([design="Neutral"]){color:var(--sapNeutralElementColor)}:host([design="NonInteractive"]){color:var(--sapContent_NonInteractiveIconColor)}:host([design="Positive"]){color:var(--sapPositiveElementColor)}:host([mode="Interactive"][desktop]) .ui5-icon-root:focus,:host([mode="Interactive"]) .ui5-icon-root:focus-visible{outline:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);border-radius:var(--ui5-v2-15-0-icon-focus-border-radius)}.ui5-icon-root{display:flex;height:100%;width:100%;outline:none;vertical-align:top}:host([mode="Interactive"]){cursor:pointer}.ui5-icon-root:not([dir=ltr])>g{transform:var(--_ui5-v2-15-0_icon_transform_scale);transform-origin:center}
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var iconCss = `:host{-webkit-tap-highlight-color:rgba(0,0,0,0)}:host([hidden]){display:none}:host([invalid]){display:none}:host(:not([hidden]).ui5_hovered){opacity:.7}:host{display:inline-block;width:1rem;height:1rem;color:var(--sapContent_IconColor);fill:currentColor;outline:none;container-type:size}:host([design="Contrast"]){color:var(--sapContent_ContrastIconColor)}:host([design="Critical"]){color:var(--sapCriticalElementColor)}:host([design="Information"]){color:var(--sapInformativeElementColor)}:host([design="Negative"]){color:var(--sapNegativeElementColor)}:host([design="Neutral"]){color:var(--sapNeutralElementColor)}:host([design="NonInteractive"]){color:var(--sapContent_NonInteractiveIconColor)}:host([design="Positive"]){color:var(--sapPositiveElementColor)}:host([mode="Interactive"][desktop]) .ui5-icon-root:focus,:host([mode="Interactive"]) .ui5-icon-root:focus-visible{outline:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);border-radius:var(--ui5-icon-focus-border-radius)}.ui5-icon-root{display:flex;height:100%;width:100%;outline:none;vertical-align:top;box-sizing:border-box;align-items:center;justify-content:center;font-size:min(100cqw,100cqh);line-height:1}:host([mode="Interactive"]){cursor:pointer}.ui5-icon-root:not([dir=ltr])>g{transform:var(--_ui5_icon_transform_scale);transform-origin:center}
 `;
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -55,6 +58,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
         else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
         return c > 3 && r && Object.defineProperty(target, key, r), r;
     };
+    var Icon_1;
     const ICON_NOT_FOUND = "ICON_NOT_FOUND";
     /**
      * @class
@@ -115,7 +119,6 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
      * ### Keyboard Handling
      *
      * - [Space] / [Enter] or [Return] - Fires the `click` event if the `mode` property is set to `Interactive`.
-     * - [Shift] - If [Space] / [Enter] or [Return] is pressed, pressing [Shift] releases the ui5-icon without triggering the click event.
      *
      * ### ES6 Module Import
      *
@@ -126,7 +129,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
      * @implements {IIcon}
      * @public
      */
-    let Icon = class Icon extends webcomponentsBase.b {
+    let Icon = Icon_1 = class Icon extends webcomponentsBase.S {
         constructor() {
             super(...arguments);
             /**
@@ -160,11 +163,19 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
             */
             this.invalid = false;
         }
+        _onclick(e) {
+            if (this.mode !== IconMode$1.Interactive) {
+                return;
+            }
+            // prevents the native browser "click" event from firing
+            e.stopImmediatePropagation();
+            this.fireDecoratorEvent("click");
+        }
         _onkeydown(e) {
             if (this.mode !== IconMode$1.Interactive) {
                 return;
             }
-            if (webcomponentsBase.b$1(e)) {
+            if (webcomponentsBase.b(e)) {
                 this.fireDecoratorEvent("click");
             }
             if (webcomponentsBase.A(e)) {
@@ -199,11 +210,21 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
             }
         }
         onEnterDOM() {
-            if (Theme.f()) {
+            if (Theme.f$1()) {
                 this.setAttribute("desktop", "");
             }
         }
         async onBeforeRendering() {
+            if (this.fontIcon.length) {
+                // Font-based icon via slot — skip registry, accessibility is app's responsibility
+                if (!this.accessibleName) {
+                    this.effectiveAccessibleName = undefined;
+                }
+                else {
+                    this.effectiveAccessibleName = this.accessibleName;
+                }
+                return;
+            }
             const name = this.name;
             if (!name) {
                 return;
@@ -253,8 +274,31 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
                 this.effectiveAccessibleName = undefined;
             }
         }
+        get hasFontIcon() {
+            return this.fontIcon.length > 0;
+        }
         get hasIconTooltip() {
             return this.showTooltip && this.effectiveAccessibleName;
+        }
+        _getAriaTypeDescription() {
+            switch (this.mode) {
+                case IconMode$1.Interactive:
+                    return Icon_1.i18nBundle.getText(i18nDefaults.ICON_ARIA_TYPE_INTERACTIVE);
+                case IconMode$1.Image:
+                    return Icon_1.i18nBundle.getText(i18nDefaults.ICON_ARIA_TYPE_IMAGE);
+                default:
+                    return "";
+            }
+        }
+        get accessibilityInfo() {
+            if (this.mode === IconMode$1.Decorative) {
+                return {};
+            }
+            return {
+                role: this.effectiveAccessibleRole,
+                type: this._getAriaTypeDescription(),
+                description: this.effectiveAccessibleName,
+            };
         }
     };
     __decorate([
@@ -273,7 +317,10 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
         webcomponentsBase.s()
     ], Icon.prototype, "mode", void 0);
     __decorate([
-        webcomponentsBase.s({ type: Array })
+        webcomponentsBase.d({ type: HTMLElement })
+    ], Icon.prototype, "fontIcon", void 0);
+    __decorate([
+        webcomponentsBase.s({ type: Array, noAttribute: true })
     ], Icon.prototype, "pathData", void 0);
     __decorate([
         webcomponentsBase.s({ type: Object, noAttribute: true })
@@ -284,19 +331,23 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
     __decorate([
         webcomponentsBase.s({ noAttribute: true })
     ], Icon.prototype, "effectiveAccessibleName", void 0);
-    Icon = __decorate([
+    __decorate([
+        parametersBundle_css.i("@ui5/webcomponents")
+    ], Icon, "i18nBundle", void 0);
+    Icon = Icon_1 = __decorate([
         webcomponentsBase.m({
             tag: "ui5-icon",
             languageAware: true,
             themeAware: true,
-            renderer: parametersBundle_css.y,
+            renderer: jsxRuntime.y,
             template: IconTemplate,
             styles: iconCss,
         })
         /**
-         * Fired on mouseup, `SPACE` and `ENTER`.
-         * - on mouse click, the icon fires native `click` event
-         * - on `SPACE` and `ENTER`, the icon fires custom `click` event
+         * Fired when the component is activated by mouse/touch, keyboard (Enter or Space),
+         * or screen reader virtual cursor activation.
+         *
+         * **Note:** The event will not be fired if the `mode` property is set to `Decorative` or `Image`.
          * @public
          * @since 2.11.0
          */

@@ -36,7 +36,7 @@ sap.ui.define(
      *
      * `import "@ui5/webcomponents/dist/Button.js";`
      *
-     * @implements module:sap/f/gen/ui5/webcomponents.IButton
+     * @implements module:sap/f/gen/ui5/webcomponents/dist/Button.IButton
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
      * @private
@@ -48,7 +48,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.Button",
       {
         metadata: {
-          tag: "ui5-button-0df29cf2",
+          tag: "ui5-button-3bacdbf4",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 
@@ -56,75 +56,11 @@ sap.ui.define(
 
           designtime: "sap/f/gen/ui5/webcomponents/designtime/Button.designtime",
 
-          interfaces: ["sap.f.gen.ui5.webcomponents.IButton"],
+          interfaces: ["sap.f.gen.ui5.webcomponents.dist.Button.IButton"],
 
           defaultAggregation: "",
 
           properties: {
-            /**
-             * Defines the component design.
-             * @type module:sap/f/gen/ui5/webcomponents.ButtonDesign
-             */
-            design: {
-              type: "sap.f.gen.ui5.webcomponents.ButtonDesign",
-              mapping: "property",
-              defaultValue: "Default"
-            },
-
-            /**
-             * Defines whether the component is disabled.
-             * A disabled component can't be pressed or
-             * focused, and it is not in the tab chain.
-             */
-            enabled: {
-              type: "boolean",
-              defaultValue: "true",
-              mapping: {
-                type: "property",
-                to: "disabled",
-                formatter: "_mapEnabled"
-              }
-            },
-
-            /**
-             * Defines the icon, displayed as graphical element within the component.
-             * The SAP-icons font provides numerous options.
-             *
-             * Example:
-             * See all the available icons within the [Icon Explorer](https://sdk.openui5.org/test-resources/sap/m/demokit/iconExplorer/webapp/index.html).
-             */
-            icon: { type: "string", mapping: "property" },
-
-            /**
-             * Defines the icon, displayed as graphical element within the component after the button text.
-             *
-             * **Note:** It is highly recommended to use `endIcon` property only together with `icon` and/or `text` properties.
-             * Usage of `endIcon` only should be avoided.
-             *
-             * The SAP-icons font provides numerous options.
-             *
-             * Example:
-             * See all the available icons within the [Icon Explorer](https://sdk.openui5.org/test-resources/sap/m/demokit/iconExplorer/webapp/index.html).
-             */
-            endIcon: { type: "string", mapping: "property" },
-
-            /**
-             * When set to `true`, the component will
-             * automatically submit the nearest HTML form element on `press`.
-             *
-             * **Note:** This property is only applicable within the context of an HTML Form element.`
-             */
-            submits: {
-              type: "boolean",
-              mapping: "property",
-              defaultValue: false
-            },
-
-            /**
-             * Defines the accessible ARIA name of the component.
-             */
-            accessibleName: { type: "string", mapping: "property" },
-
             /**
              * Defines the additional accessibility attributes that will be applied to the component.
              * The following fields are supported:
@@ -146,38 +82,78 @@ sap.ui.define(
             accessibilityAttributes: {
               type: "any",
               mapping: "property",
-              defaultValue: "{}"
+              defaultValue: {}
             },
-
             /**
              * Defines the accessible description of the component.
              */
             accessibleDescription: { type: "string", mapping: "property" },
-
             /**
-             * Defines whether the button has special form-related functionality.
-             *
-             * **Note:** This property is only applicable within the context of an HTML Form element.
-             * @type module:sap/f/gen/ui5/webcomponents.ButtonType
+             * Defines the accessible ARIA name of the component.
              */
-            type: {
-              type: "sap.f.gen.ui5.webcomponents.ButtonType",
-              mapping: "property",
-              defaultValue: "Button"
-            },
-
+            accessibleName: { type: "string", mapping: "property" },
             /**
              * Describes the accessibility role of the button.
              *
              * **Note:** Use <code>ButtonAccessibleRole.Link</code> role only with a press handler, which performs a navigation. In all other scenarios the default button semantics are recommended.
-             * @type module:sap/f/gen/ui5/webcomponents.ButtonAccessibleRole
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/ButtonAccessibleRole
              */
             accessibleRole: {
-              type: "sap.f.gen.ui5.webcomponents.ButtonAccessibleRole",
+              type: "sap.f.gen.ui5.webcomponents.dist.types.ButtonAccessibleRole",
               mapping: "property",
               defaultValue: "Button"
             },
-
+            /**
+             * Defines the component design.
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/ButtonDesign
+             */
+            design: {
+              type: "sap.f.gen.ui5.webcomponents.dist.types.ButtonDesign",
+              mapping: "property",
+              defaultValue: "Default"
+            },
+            /**
+             * Defines whether the component is disabled.
+             * A disabled component can't be pressed or
+             * focused, and it is not in the tab chain.
+             */
+            enabled: {
+              type: "boolean",
+              defaultValue: true,
+              mapping: {
+                type: "property",
+                to: "disabled",
+                formatter: "_mapEnabled"
+              }
+            },
+            /**
+             * Defines the icon, displayed as graphical element within the component after the button text.
+             *
+             * **Note:** It is highly recommended to use `endIcon` property only together with `icon` and/or `text` properties.
+             * Usage of `endIcon` only should be avoided.
+             *
+             * The SAP-icons font provides numerous options.
+             *
+             * Example:
+             * See all the available icons within the [Icon Explorer](https://sdk.openui5.org/test-resources/sap/m/demokit/iconExplorer/webapp/index.html).
+             */
+            endIcon: { type: "string", mapping: "property" },
+            /**
+             * Associates the button with a form element by the form's `id` attribute.
+             * When set, the button can submit or reset the specified form even if the button
+             * is not a descendant of that form.
+             *
+             * **Note:** This property takes effect only when the button's "type" property is set to "Submit" or "Reset".
+             */
+            form: { type: "string", mapping: "property" },
+            /**
+             * Defines the icon, displayed as graphical element within the component.
+             * The SAP-icons font provides numerous options.
+             *
+             * Example:
+             * See all the available icons within the [Icon Explorer](https://sdk.openui5.org/test-resources/sap/m/demokit/iconExplorer/webapp/index.html).
+             */
+            icon: { type: "string", mapping: "property" },
             /**
              * Defines whether the button shows a loading indicator.
              *
@@ -188,7 +164,6 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
-
             /**
              * Specifies the delay in milliseconds before the loading indicator appears within the associated button.
              */
@@ -197,17 +172,36 @@ sap.ui.define(
               mapping: "property",
               defaultValue: 1000
             },
-
+            /**
+             * When set to `true`, the component will
+             * automatically submit the nearest HTML form element on `press`.
+             *
+             * **Note:** This property is only applicable within the context of an HTML Form element.`
+             */
+            submits: {
+              type: "boolean",
+              mapping: "property",
+              defaultValue: false
+            },
+            /**
+             * Defines whether the button has special form-related functionality.
+             *
+             * **Note:** This property is only applicable within the context of an HTML Form element.
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/ButtonType
+             */
+            type: {
+              type: "sap.f.gen.ui5.webcomponents.dist.types.ButtonType",
+              mapping: "property",
+              defaultValue: "Button"
+            },
             /**
              * The text-content of the Web Component.
              */
             text: { type: "string", mapping: "textContent" },
-
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
             width: { type: "sap.ui.core.CSSSize", mapping: "style" },
-
             /**
              * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
@@ -251,21 +245,6 @@ sap.ui.define(
               allowPreventDefault: true,
               enableEventBubbling: true,
               parameters: {
-                /**
-                 * Returns original event that comes from user's **click** interaction
-                 */
-                originalEvent: {
-                  type: "object",
-                  types: [
-                    {
-                      origType: "Event",
-                      multiple: false,
-                      dedicatedTypes: [{ dtsType: "Event", ui5Type: "object" }]
-                    }
-                  ],
-                  dtsParamDescription:
-                    "Returns original event that comes from user's **click** interaction"
-                },
                 /**
                  * Returns whether the "ALT" key was pressed when the event was triggered.
                  */
@@ -316,6 +295,21 @@ sap.ui.define(
                   ],
                   dtsParamDescription:
                     'Returns whether the "META" key was pressed when the event was triggered.'
+                },
+                /**
+                 * Returns original event that comes from user's **click** interaction
+                 */
+                originalEvent: {
+                  type: "object",
+                  types: [
+                    {
+                      origType: "Event",
+                      multiple: false,
+                      dedicatedTypes: [{ dtsType: "Event", ui5Type: "object" }]
+                    }
+                  ],
+                  dtsParamDescription:
+                    "Returns original event that comes from user's **click** interaction"
                 },
                 /**
                  * Returns whether the "SHIFT" key was pressed when the event was triggered.
