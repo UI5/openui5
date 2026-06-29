@@ -32,7 +32,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenu",
       {
         metadata: {
-          tag: "ui5-user-menu-cc48984a",
+          tag: "ui5-user-menu-530c2e1b",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -50,22 +50,6 @@ sap.ui.define(
              */
             open: { type: "boolean", mapping: "property", defaultValue: false },
             /**
-             * Defines if the User Menu shows the Manage Account option.
-             */
-            showManageAccount: {
-              type: "boolean",
-              mapping: "property",
-              defaultValue: false
-            },
-            /**
-             * Defines if the User Menu shows the Other Accounts option.
-             */
-            showOtherAccounts: {
-              type: "boolean",
-              mapping: "property",
-              defaultValue: false
-            },
-            /**
              * Defines if the User Menu shows the Edit Accounts option.
              */
             showEditAccounts: {
@@ -77,6 +61,22 @@ sap.ui.define(
              * Defines if the User menu shows edit button.
              */
             showEditButton: {
+              type: "boolean",
+              mapping: "property",
+              defaultValue: false
+            },
+            /**
+             * Defines if the User Menu shows the Manage Account option.
+             */
+            showManageAccount: {
+              type: "boolean",
+              mapping: "property",
+              defaultValue: false
+            },
+            /**
+             * Defines if the User Menu shows the Other Accounts option.
+             */
+            showOtherAccounts: {
               type: "boolean",
               mapping: "property",
               defaultValue: false
@@ -97,14 +97,6 @@ sap.ui.define(
 
           aggregations: {
             /**
-             * Defines the menu items.
-             * @type module:sap/f/gen/ui5/webcomponents_fiori/dist/UserMenuItem
-             */
-            menuItems: {
-              type: "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenuItem",
-              multiple: true
-            },
-            /**
              * Defines the user accounts.
              *
              * **Note:** If one item is used, it will be shown as the selected one. If more than one item is used, the first one will be shown as selected unless
@@ -115,6 +107,25 @@ sap.ui.define(
               type: "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenuAccount",
               multiple: true,
               slot: "accounts"
+            },
+            /**
+             * Defines the menu items.
+             * @type module:sap/f/gen/ui5/webcomponents_fiori/dist/UserMenuItem
+             */
+            menuItems: {
+              type: "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenuItem",
+              multiple: true
+            },
+            /**
+             * Defines custom footer content.
+             *
+             * **Note:** When provided, replaces the default "Sign Out" button. Use an empty element to hide the footer completely.
+             * @type module:sap/ui/core/Control
+             */
+            footer: {
+              type: "sap.ui.core.Control",
+              multiple: true,
+              slot: "footer"
             }
           },
 
@@ -132,20 +143,6 @@ sap.ui.define(
              * Fired when the account avatar is selected.
              */
             avatarClick: {
-              parameters: {}
-            },
-
-            /**
-             * Fired when the "Manage Account" button is selected.
-             */
-            manageAccountClick: {
-              parameters: {}
-            },
-
-            /**
-             * Fired when the "Edit Accounts" button is selected.
-             */
-            editAccountsClick: {
               parameters: {}
             },
 
@@ -209,6 +206,20 @@ sap.ui.define(
             },
 
             /**
+             * Fired when a user menu is close.
+             */
+            close: {
+              parameters: {}
+            },
+
+            /**
+             * Fired when the "Edit Accounts" button is selected.
+             */
+            editAccountsClick: {
+              parameters: {}
+            },
+
+            /**
              * Fired when a menu item is selected.
              */
             itemClick: {
@@ -242,17 +253,17 @@ sap.ui.define(
             },
 
             /**
-             * Fired when a user menu is open.
+             * Fired when the "Manage Account" button is selected.
              */
-            onOpen: {
-              mapping: "open",
+            manageAccountClick: {
               parameters: {}
             },
 
             /**
-             * Fired when a user menu is close.
+             * Fired when a user menu is open.
              */
-            close: {
+            onOpen: {
+              mapping: "open",
               parameters: {}
             },
 

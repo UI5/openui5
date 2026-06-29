@@ -28,7 +28,7 @@ sap.ui.define(
      *
      * `import "@ui5/webcomponents/dist/MenuItem.js";`
      *
-     * @implements module:sap/f/gen/ui5/webcomponents.IMenuItem
+     * @implements module:sap/f/gen/ui5/webcomponents/dist/Menu.IMenuItem
      * @extends module:sap/f/gen/ui5/webcomponents/dist/ListItem
      * @constructor
      * @private
@@ -39,7 +39,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.MenuItem",
       {
         metadata: {
-          tag: "ui5-menu-item-cc48984a",
+          tag: "ui5-menu-item-530c2e1b",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 
@@ -47,15 +47,40 @@ sap.ui.define(
 
           designtime: "sap/f/gen/ui5/webcomponents/designtime/MenuItem.designtime",
 
-          interfaces: ["sap.f.gen.ui5.webcomponents.IMenuItem"],
+          interfaces: ["sap.f.gen.ui5.webcomponents.dist.Menu.IMenuItem"],
 
           defaultAggregation: "items",
 
           properties: {
             /**
-             * Defines the text of the tree item.
+             * Defines the additional accessibility attributes that will be applied to the component.
+             * The following fields are supported:
+             *
+             * - **ariaKeyShortcuts**: Indicated the availability of a keyboard shortcuts defined for the menu item.
+             *
+             * - **role**: Defines the role of the menu item. If not set, menu item will have default role="menuitem".
              */
-            text: { type: "string", mapping: "property" },
+            accessibilityAttributes: {
+              type: "any",
+              mapping: "property",
+              defaultValue: {}
+            },
+            /**
+             * Defines the accessible ARIA name of the component.
+             */
+            accessibleName: { type: "string", mapping: "property" },
+            /**
+             * Used to define the role of the list item.
+             *
+             * **Note:** If not set, the role is automatically inherited from the parent `ui5-list` based on its `accessible-role` property
+             * (e.g. `Menu` -> `MenuItem`, `Tree` -> `TreeItem`, `ListBox` -> `Option`).
+             * An explicitly set `accessible-role` on the list item takes precedence over the inherited role.
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/ListItemAccessibleRole
+             */
+            accessibleRole: {
+              type: "sap.f.gen.ui5.webcomponents.dist.types.ListItemAccessibleRole",
+              mapping: "property"
+            },
             /**
              * Defines the `additionalText`, displayed in the end of the menu item.
              *
@@ -67,6 +92,43 @@ sap.ui.define(
              */
             additionalText: { type: "string", mapping: "property" },
             /**
+             * Defines whether menu item is in checked state.
+             *
+             * **Note:** checked state is only taken into account when menu item is added to menu item group
+             * with `checkMode` other than `None`.
+             *
+             * **Note:** A checked menu item has a checkmark displayed at its end.
+             */
+            checked: {
+              type: "boolean",
+              mapping: "property",
+              defaultValue: false
+            },
+            /**
+             * Defines whether menu item is in disabled state.
+             *
+             * **Note:** A disabled menu item is noninteractive.
+             */
+            enabled: {
+              type: "boolean",
+              defaultValue: true,
+              mapping: {
+                type: "property",
+                to: "disabled",
+                formatter: "_mapEnabled"
+              }
+            },
+            /**
+             * Defines the highlight state of the list items.
+             * Available options are: `"None"` (by default), `"Positive"`, `"Critical"`, `"Information"` and `"Negative"`.
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/Highlight
+             */
+            highlight: {
+              type: "sap.f.gen.ui5.webcomponents.dist.types.Highlight",
+              mapping: "property",
+              defaultValue: "None"
+            },
+            /**
              * Defines the icon to be displayed as graphical element within the component.
              * The SAP-icons font provides numerous options.
              *
@@ -75,20 +137,6 @@ sap.ui.define(
              * See all the available icons in the [Icon Explorer](https://sdk.openui5.org/test-resources/sap/m/demokit/iconExplorer/webapp/index.html).
              */
             icon: { type: "string", mapping: "property" },
-            /**
-             * Defines whether menu item is in disabled state.
-             *
-             * **Note:** A disabled menu item is noninteractive.
-             */
-            enabled: {
-              type: "boolean",
-              defaultValue: "true",
-              mapping: {
-                type: "property",
-                to: "disabled",
-                formatter: "_mapEnabled"
-              }
-            },
             /**
              * Defines the delay in milliseconds, after which the loading indicator will be displayed inside the corresponding menu popover.
              *
@@ -108,49 +156,6 @@ sap.ui.define(
               defaultValue: 1000
             },
             /**
-             * Defines the accessible ARIA name of the component.
-             */
-            accessibleName: { type: "string", mapping: "property" },
-            /**
-             * Defines whether menu item is in checked state.
-             *
-             * **Note:** checked state is only taken into account when menu item is added to menu item group
-             * with `checkMode` other than `None`.
-             *
-             * **Note:** A checked menu item has a checkmark displayed at its end.
-             */
-            checked: {
-              type: "boolean",
-              mapping: "property",
-              defaultValue: false
-            },
-            /**
-             * Defines the additional accessibility attributes that will be applied to the component.
-             * The following fields are supported:
-             *
-             * - **ariaKeyShortcuts**: Indicated the availability of a keyboard shortcuts defined for the menu item.
-             *
-             * - **role**: Defines the role of the menu item. If not set, menu item will have default role="menuitem".
-             */
-            accessibilityAttributes: {
-              type: "any",
-              mapping: "property",
-              defaultValue: "{}"
-            },
-            /**
-             * Defines the visual indication and behavior of the list items.
-             * Available options are `Active` (by default), `Inactive`, `Detail` and `Navigation`.
-             *
-             * **Note:** When set to `Active` or `Navigation`, the item will provide visual response upon press and hover,
-             * while with type `Inactive` and `Detail` - will not.
-             * @type module:sap/f/gen/ui5/webcomponents.ListItemType
-             */
-            type: {
-              type: "sap.f.gen.ui5.webcomponents.ListItemType",
-              mapping: "property",
-              defaultValue: "Active"
-            },
-            /**
              * The navigated state of the list item.
              * If set to `true`, a navigation indicator is displayed at the end of the list item.
              */
@@ -160,22 +165,29 @@ sap.ui.define(
               defaultValue: false
             },
             /**
-             * Defines the highlight state of the list items.
-             * Available options are: `"None"` (by default), `"Positive"`, `"Critical"`, `"Information"` and `"Negative"`.
-             * @type module:sap/f/gen/ui5/webcomponents.Highlight
-             */
-            highlight: {
-              type: "sap.f.gen.ui5.webcomponents.Highlight",
-              mapping: "property",
-              defaultValue: "None"
-            },
-            /**
              * Defines the selected state of the component.
              */
             selected: {
               type: "boolean",
               mapping: "property",
               defaultValue: false
+            },
+            /**
+             * Defines the text of the tree item.
+             */
+            text: { type: "string", mapping: "property" },
+            /**
+             * Defines the visual indication and behavior of the list items.
+             * Available options are `Active` (by default), `Inactive`, `Detail` and `Navigation`.
+             *
+             * **Note:** When set to `Active` or `Navigation`, the item will provide visual response upon press and hover,
+             * while with type `Inactive` and `Detail` - will not.
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/ListItemType
+             */
+            type: {
+              type: "sap.f.gen.ui5.webcomponents.dist.types.ListItemType",
+              mapping: "property",
+              defaultValue: "Active"
             },
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
@@ -199,9 +211,24 @@ sap.ui.define(
              *
              * The priority of what will be displayed at the end of the menu item is as follows:
              * sub-menu arrow (if there are items added in `items` slot) -> components added in `endContent` -> text set to `additionalText`.
-             * @type module:sap/f/gen/ui5/webcomponents.IMenuItem
+             * @type sap/f/gen/ui5/webcomponents/dist/Menu
              */
-            items: { type: "sap.f.gen.ui5.webcomponents.IMenuItem", multiple: true },
+            items: {
+              type: "sap.f.gen.ui5.webcomponents.dist.Menu.IMenuItem",
+              multiple: true
+            },
+            /**
+             * Defines the delete button, displayed in "Delete" mode.
+             * **Note:** While the slot allows custom buttons, to match
+             * design guidelines, please use the `ui5-button` component.
+             * **Note:** When the slot is not present, a built-in delete button will be displayed.
+             * @type sap/f/gen/ui5/webcomponents/dist/Button
+             */
+            deleteButton: {
+              type: "sap.f.gen.ui5.webcomponents.dist.Button.IButton",
+              multiple: true,
+              slot: "deleteButton"
+            },
             /**
              * Defines the components that should be displayed at the end of the menu item.
              *
@@ -222,24 +249,38 @@ sap.ui.define(
               type: "sap.ui.core.Control",
               multiple: true,
               slot: "endContent"
-            },
-            /**
-             * Defines the delete button, displayed in "Delete" mode.
-             * **Note:** While the slot allows custom buttons, to match
-             * design guidelines, please use the `ui5-button` component.
-             * **Note:** When the slot is not present, a built-in delete button will be displayed.
-             * @type module:sap/f/gen/ui5/webcomponents.IButton
-             */
-            deleteButton: {
-              type: "sap.f.gen.ui5.webcomponents.IButton",
-              multiple: true,
-              slot: "deleteButton"
             }
           },
 
           associations: {},
 
           events: {
+            /**
+             * Fired before the menu is closed. This event can be cancelled, which will prevent the menu from closing.
+             */
+            beforeClose: {
+              allowPreventDefault: true,
+              parameters: {
+                /**
+                 * Indicates that `ESC` key has triggered the event.
+                 */
+                escPressed: {
+                  type: "boolean",
+                  types: [
+                    {
+                      origType: "boolean",
+                      multiple: false,
+                      dedicatedTypes: [
+                        { dtsType: "boolean", ui5Type: "boolean" }
+                      ]
+                    }
+                  ],
+                  dtsParamDescription:
+                    "Indicates that `ESC` key has triggered the event."
+                }
+              }
+            },
+
             /**
              * Fired before the menu is opened. This event can be cancelled, which will prevent the menu from opening.
              *
@@ -275,34 +316,35 @@ sap.ui.define(
             },
 
             /**
-             * Fired after the menu is opened.
+             * Fired when an item is checked or unchecked.
              */
-            open: {
+            check: {
+              enableEventBubbling: true,
               parameters: {}
             },
 
             /**
-             * Fired before the menu is closed. This event can be cancelled, which will prevent the menu from closing.
+             * Fired when the component is activated either with a mouse/tap or by using the Enter or Space key.
+             *
+             * **Note:** The event will not be fired if the `disabled` property is set to `true`.
              */
-            beforeClose: {
-              allowPreventDefault: true,
+            click: {
+              enableEventBubbling: true,
               parameters: {
                 /**
-                 * Indicates that `ESC` key has triggered the event.
+                 * The original event from the user interaction.
                  */
-                escPressed: {
-                  type: "boolean",
+                originalEvent: {
+                  type: "object",
                   types: [
                     {
-                      origType: "boolean",
+                      origType: "Event",
                       multiple: false,
-                      dedicatedTypes: [
-                        { dtsType: "boolean", ui5Type: "boolean" }
-                      ]
+                      dedicatedTypes: [{ dtsType: "Event", ui5Type: "object" }]
                     }
                   ],
                   dtsParamDescription:
-                    "Indicates that `ESC` key has triggered the event."
+                    "The original event from the user interaction."
                 }
               }
             },
@@ -315,18 +357,17 @@ sap.ui.define(
             },
 
             /**
-             * Fired when an item is checked or unchecked.
+             * Fired when the user clicks on the detail button when type is `Detail`.
              */
-            check: {
+            detailClick: {
               enableEventBubbling: true,
               parameters: {}
             },
 
             /**
-             * Fired when the user clicks on the detail button when type is `Detail`.
+             * Fired after the menu is opened.
              */
-            detailClick: {
-              enableEventBubbling: true,
+            open: {
               parameters: {}
             }
           },

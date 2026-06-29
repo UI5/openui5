@@ -1,6 +1,6 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/parameters-bundle.css3', 'sap/f/thirdparty/Title'], (function (webcomponentsBase, parametersBundle_css$2, Icons, AccessibilityTextsHelper, parametersBundle_css, i18nDefaults, parametersBundle_css$1, Title) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/Title'], (function (webcomponentsBase, parametersBundle_css$1, Icons, AccessibilityTextsHelper, jsxRuntime, i18nDefaults, parametersBundle_css, Title) { 'use strict';
 
-    const u=new Map([["sap_horizon","V5"],["sap_horizon_dark","V5"],["sap_horizon_hcb","V5/HC"],["sap_horizon_hcw","V5/HC"]]),e="V4",i=new Map,l=Icons.m("SVGIllustration.registry",new Map),a=Icons.m("SVGIllustration.promises",new Map),I=()=>{const s=Icons.r();return u.has(s)?u.get(s):e},g=s=>{let t=I();const[o,r]=s.split("/");let n=`${o}/${t}/${r}`;return !i.has(n)&&t!==e&&(t=e,n=`${o}/${t}/${r}`),{registryKey:n,collection:t}},h=(s,t)=>{const o=t.collection||e;l.set(`${t.set}/${o}/${s}`,{dialogSvg:t.dialogSvg,sceneSvg:t.sceneSvg,spotSvg:t.spotSvg,dotSvg:t.dotSvg,title:t.title,subtitle:t.subtitle});},m=s=>{const{registryKey:t}=g(s);if(!a.has(t)){if(!i.has(t)){const r=s.startsWith("fiori/")?s.replace("fiori/",""):s;throw new Error(`No loader registered for the ${s} illustration. Probably you forgot to import the "@ui5/webcomponents-fiori/dist/illustrations/${r}.js" module. Or you can import the "@ui5/webcomponents-fiori/dist/illustrations/AllIllustrations.js" module that will make all illustrations available, but fetch only the ones used.`)}const o=i.get(t);a.set(t,o(t));}return a.get(t)},d=s=>{const{registryKey:t}=g(s);return l.get(t)},S=async s=>{const{registryKey:t}=g(s);return await m(s),l.get(t)};
+    const c=new Map([["sap_horizon","V5"],["sap_horizon_dark","V5"],["sap_horizon_hcb","V5/HC"],["sap_horizon_hcw","V5/HC"]]),o="V4",l=new Map,n=Icons.m("SVGIllustration.registry",new Map),a=Icons.m("SVGIllustration.promises",new Map),m=()=>{const e=Icons.r();return c.has(e)?c.get(e):o},p=e=>{let t=m();const[s,r]=e.split("/");let i=`${s}/${t}/${r}`;return !l.has(i)&&t!==o&&(t=o,i=`${s}/${t}/${r}`),{registryKey:i,collection:t}},f=(e,t)=>{const s=t.collection||o;n.set(`${t.set}/${s}/${e}`,{dialogSvg:t.dialogSvg,sceneSvg:t.sceneSvg,spotSvg:t.spotSvg,dotSvg:t.dotSvg,title:t.title,subtitle:t.subtitle});},T=e=>{const{registryKey:t}=p(e);if(!a.has(t)){if(!l.has(t)){const r=e.startsWith("fiori/")?e.replace("fiori/",""):e;throw new Error(`No loader registered for the ${e} illustration. Probably you forgot to import the "@ui5/webcomponents-fiori/dist/illustrations/${r}.js" module. Or you can import the "@ui5/webcomponents-fiori/dist/illustrations/AllIllustrations.js" module that will make all illustrations available, but fetch only the ones used.`)}const s=l.get(t);a.set(t,s(t));}return a.get(t)},h=e=>{const{registryKey:t}=p(e);return n.get(t)},d=async e=>{const{registryKey:t}=p(e);return await T(e),n.get(t)};
 
     /**
      * Different types of IllustrationMessageDesign.
@@ -888,7 +888,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bu
     const title = i18nDefaults.IM_TITLE_BEFORESEARCH;
     const subtitle = i18nDefaults.IM_SUBTITLE_BEFORESEARCH;
 
-    h(name, {
+    f(name, {
     	dialogSvg,
     	sceneSvg,
     	spotSvg,
@@ -899,22 +899,34 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bu
     	collection,
     });
 
-    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
+    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var IllustratedMessageCss = `:host(:not([hidden])){display:block}:host{box-sizing:border-box;width:100%;height:100%;padding:1rem}.ui5-illustrated-message-root,.ui5-illustrated-message-inner,.ui5-illustrated-message-text-and-actions-container{display:flex;flex-direction:column;align-items:center;justify-content:center;height:inherit;min-height:0;flex-basis:content}.ui5-illustrated-message-illustration{margin:2rem 0}.ui5-illustrated-message-illustration svg{max-height:100%;max-width:100%}.ui5-illustrated-message-illustration.ui5-illustrated-message-illustration-fit-content{position:relative;width:0;padding:0 0 0 100%;height:100%;display:flex;align-items:center}.ui5-illustrated-message-illustration.ui5-illustrated-message-illustration-fit-content svg{position:absolute;height:100%;width:100%;left:0;top:0}.ui5-illustrated-message-title [ui5-title],.ui5-illustrated-message-title ::slotted([slot="title"]){text-align:center;margin-bottom:1rem;font-size:var(--sapFontHeader2Size);font-family:var(--sapFontHeaderFamily);font-weight:700;max-width:61.9375rem}.ui5-illustrated-message-subtitle{text-align:center;font-size:var(--sapFontLargeSize);font-family:var(--sapFontFamily);color:var(--sapTextColor);margin-bottom:.5rem;max-width:61.9375rem}.ui5-illustrated-message-actions{margin:1rem 0}:host([media="dialog"]) .ui5-illustrated-message-illustration{margin:1rem 0}:host([media="dialog"]) .ui5-illustrated-message-title [ui5-title],:host([media="dialog"]) ::slotted([slot="title"]){margin-bottom:.5rem;font-size:var(--sapFontHeader3Size);max-width:40.5625rem}:host([media="dialog"]) .ui5-illustrated-message-subtitle{margin-bottom:.5rem;font-size:var(--sapFontSize);max-width:40.5625rem}:host([media="dialog"]) .ui5-illustrated-message-actions{margin-top:.5rem;margin-bottom:1rem}:host([media="spot"]){padding:.5rem}:host([media="spot"]) .ui5-illustrated-message-illustration{margin-bottom:.5rem;margin-top:0}:host([media="spot"]) .ui5-illustrated-message-title [ui5-title],:host([media="spot"]) ::slotted([slot="title"]){margin-bottom:.5rem;font-size:var(--sapFontHeader4Size);max-width:21.5rem}:host([media="spot"]) .ui5-illustrated-message-subtitle{font-size:var(--sapFontSize);max-width:21.5rem;margin-bottom:.5rem}:host([media="spot"]) .ui5-illustrated-message-actions{margin:.5rem 0}:host([media="dot"]){padding:.25rem;min-height:4rem}:host([media="dot"]) .ui5-illustrated-message-inner{flex-direction:row}:host([media="dot"]) .ui5-illustrated-message-illustration{margin:0 .25rem 0 0;height:2.8125rem;width:2.8125rem;align-self:baseline}:host([media="dot"]) .ui5-illustrated-message-title [ui5-title],:host([media="dot"]) ::slotted([slot="title"]){margin-bottom:.25rem;font-size:var(--sapFontHeader5Size);max-width:12.6875rem}:host([media="dot"]) .ui5-illustrated-message-subtitle{font-size:var(--sapFontSize);max-width:12.6875rem;margin-bottom:.25rem}:host([media="dot"]) .ui5-illustrated-message-actions{margin:.25rem 0}:host([media="base"]) .ui5-illustrated-message-illustration{display:none}:host([media="base"]) .ui5-illustrated-message-title [ui5-title],:host([media="base"]) ::slotted([slot="title"]){margin-bottom:.25rem;font-size:var(--sapFontHeader5Size);max-width:10rem}:host([media="base"]) .ui5-illustrated-message-subtitle{font-size:var(--sapFontSize);max-width:10rem;margin-bottom:0rem}.ui5-illustrated-message-util{position:fixed;top:-9999px;left:-9999px}.sapIllus_BlendModeMultiply{mix-blend-mode:multiply}.sapIllus_MaskTypeAlpha{mask-type:alpha}.sapIllus_BackgroundColor{fill:var(--sapIllus_BackgroundColor)}.sapIllus_BrandColorPrimary{fill:var(--sapIllus_BrandColorPrimary)}.sapIllus_BrandColorSecondary{fill:var(--sapIllus_BrandColorSecondary)}.sapIllus_StrokeDetailColor{fill:var(--sapIllus_StrokeDetailColor)}.sapIllus_Layering1{fill:var(--sapIllus_Layering1)}.sapIllus_Layering2{fill:var(--sapIllus_Layering2)}.sapIllus_ObjectFillColor{fill:var(--sapIllus_ObjectFillColor)}.sapIllus_AccentColor{fill:var(--sapIllus_AccentColor)}.sapIllus_NoColor{fill:var(--sapIllus_NoColor)}.sapIllus_PatternShadow{fill:var(--sapIllus_PatternShadow)}.sapIllus_PatternHighlight{fill:var(--sapIllus_PatternHighlight)}.sapIllus_NoColor_Fill{fill:var(--sapIllus_NoColor)}.sapIllus_BrandColorPrimary_Fill{fill:var(--sapIllus_BrandColorPrimary)}.sapIllus_ObjectFillColor_Fill{fill:var(--sapIllus_ObjectFillColor)}
 `;
 
     function IllustratedMessageTemplate() {
-        return (parametersBundle_css.jsxs("div", { class: "ui5-illustrated-message-root", children: [parametersBundle_css.jsxs("div", { class: "ui5-illustrated-message-inner", children: [parametersBundle_css.jsx("div", { class: "ui5-illustrated-message-illustration", dangerouslySetInnerHTML: { __html: this.effectiveIllustration || "" } }), parametersBundle_css.jsxs("div", { class: "ui5-illustrated-message-text-and-actions-container", children: [this.hasTitle &&
-                                    parametersBundle_css.jsx("div", { part: "title", class: "ui5-illustrated-message-title", children: this.hasFormattedTitle ?
-                                            parametersBundle_css.jsx("slot", { name: "title" })
+        return (jsxRuntime.jsxs("div", { class: "ui5-illustrated-message-root", children: [jsxRuntime.jsxs("div", { class: "ui5-illustrated-message-inner", children: [jsxRuntime.jsx("div", { class: "ui5-illustrated-message-illustration", role: this.decorative ? "presentation" : "img", "aria-hidden": this.decorative ? true : undefined, "aria-label": !this.decorative ? this.name : undefined, children: renderIllustration.call(this) }), jsxRuntime.jsxs("div", { class: "ui5-illustrated-message-text-and-actions-container", children: [this.hasTitle &&
+                                    jsxRuntime.jsx("div", { part: "title", class: "ui5-illustrated-message-title", children: this.hasFormattedTitle ?
+                                            jsxRuntime.jsx("slot", { name: "title" })
                                             :
-                                                parametersBundle_css.jsx(Title.Title, { children: this.effectiveTitleText }) }), this.hasSubtitle &&
-                                    parametersBundle_css.jsx("div", { part: "subtitle", class: "ui5-illustrated-message-subtitle", children: this.hasFormattedSubtitle ?
-                                            parametersBundle_css.jsx("slot", { name: "subtitle" })
+                                                jsxRuntime.jsx(Title.Title, { children: this.effectiveTitleText }) }), this.hasSubtitle &&
+                                    jsxRuntime.jsx("div", { part: "subtitle", class: "ui5-illustrated-message-subtitle", children: this.hasFormattedSubtitle ?
+                                            jsxRuntime.jsx("slot", { name: "subtitle" })
                                             :
                                                 this.effectiveSubitleText }), this.hasActions &&
-                                    parametersBundle_css.jsx("div", { class: "ui5-illustrated-message-actions", children: parametersBundle_css.jsx("slot", {}) })] })] }), parametersBundle_css.jsx("svg", { xmlns: "http://www.w3.org/2000/svg", class: "ui5-illustrated-message-util", children: parametersBundle_css.jsxs("defs", { children: [parametersBundle_css.jsxs("pattern", { id: "sapIllus_PatternShadow", "data-name": "sapIllus_PatternShadow", width: "3", height: "5.5", patternUnits: "userSpaceOnUse", viewBox: "0 0 3 5.5", children: [parametersBundle_css.jsx("rect", { class: "sapIllus_NoColor sapIllus_NoColor_Fill", width: "3", height: "5.5" }), parametersBundle_css.jsx("circle", { class: "sapIllus_BrandColorPrimary sapIllus_BrandColorPrimary_Fill", cx: "3", cy: "5.5001", r: "0.5" }), parametersBundle_css.jsx("circle", { class: "sapIllus_BrandColorPrimary sapIllus_BrandColorPrimary_Fill", cy: "5.5001", r: "0.5" }), parametersBundle_css.jsx("circle", { class: "sapIllus_BrandColorPrimary sapIllus_BrandColorPrimary_Fill", cx: "1.5", cy: "2.7501", r: "0.5" }), parametersBundle_css.jsx("circle", { class: "sapIllus_BrandColorPrimary sapIllus_BrandColorPrimary_Fill", cx: "3", cy: "0.0001", r: "0.5" }), parametersBundle_css.jsx("circle", { class: "sapIllus_BrandColorPrimary sapIllus_BrandColorPrimary_Fill", cy: "0.0001", r: "0.5" })] }), parametersBundle_css.jsxs("pattern", { id: "sapIllus_PatternHighlight", "data-name": "sapIllus_PatternHighlight", width: "3", height: "5.5", patternTransform: "translate(35.9059 309.6208)", patternUnits: "userSpaceOnUse", viewBox: "0 0 3 5.5", children: [parametersBundle_css.jsx("rect", { class: "sapIllus_NoColor sapIllus_NoColor_Fill", width: "3", height: "5.5" }), parametersBundle_css.jsx("circle", { class: "sapIllus_ObjectFillColor sapIllus_ObjectFillColor_Fill", cx: "3.0001", cy: "5.5001", r: "0.5" }), parametersBundle_css.jsx("circle", { class: "sapIllus_ObjectFillColor sapIllus_ObjectFillColor_Fill", cx: "0.0001", cy: "5.5001", r: "0.5" }), parametersBundle_css.jsx("circle", { class: "sapIllus_ObjectFillColor sapIllus_ObjectFillColor_Fill", cx: "1.5001", cy: "2.7501", r: "0.5" }), parametersBundle_css.jsx("circle", { class: "sapIllus_ObjectFillColor sapIllus_ObjectFillColor_Fill", cx: "3.0001", cy: "0.0001", r: "0.5" }), parametersBundle_css.jsx("circle", { class: "sapIllus_ObjectFillColor sapIllus_ObjectFillColor_Fill", cx: "0.0001", cy: "0.0001", r: "0.5" })] })] }) })] }));
+                                    jsxRuntime.jsx("div", { class: "ui5-illustrated-message-actions", children: jsxRuntime.jsx("slot", {}) })] })] }), jsxRuntime.jsx("svg", { xmlns: "http://www.w3.org/2000/svg", class: "ui5-illustrated-message-util", children: jsxRuntime.jsxs("defs", { children: [jsxRuntime.jsxs("pattern", { id: "sapIllus_PatternShadow", "data-name": "sapIllus_PatternShadow", width: "3", height: "5.5", patternUnits: "userSpaceOnUse", viewBox: "0 0 3 5.5", children: [jsxRuntime.jsx("rect", { class: "sapIllus_NoColor sapIllus_NoColor_Fill", width: "3", height: "5.5" }), jsxRuntime.jsx("circle", { class: "sapIllus_BrandColorPrimary sapIllus_BrandColorPrimary_Fill", cx: "3", cy: "5.5001", r: "0.5" }), jsxRuntime.jsx("circle", { class: "sapIllus_BrandColorPrimary sapIllus_BrandColorPrimary_Fill", cy: "5.5001", r: "0.5" }), jsxRuntime.jsx("circle", { class: "sapIllus_BrandColorPrimary sapIllus_BrandColorPrimary_Fill", cx: "1.5", cy: "2.7501", r: "0.5" }), jsxRuntime.jsx("circle", { class: "sapIllus_BrandColorPrimary sapIllus_BrandColorPrimary_Fill", cx: "3", cy: "0.0001", r: "0.5" }), jsxRuntime.jsx("circle", { class: "sapIllus_BrandColorPrimary sapIllus_BrandColorPrimary_Fill", cy: "0.0001", r: "0.5" })] }), jsxRuntime.jsxs("pattern", { id: "sapIllus_PatternHighlight", "data-name": "sapIllus_PatternHighlight", width: "3", height: "5.5", patternTransform: "translate(35.9059 309.6208)", patternUnits: "userSpaceOnUse", viewBox: "0 0 3 5.5", children: [jsxRuntime.jsx("rect", { class: "sapIllus_NoColor sapIllus_NoColor_Fill", width: "3", height: "5.5" }), jsxRuntime.jsx("circle", { class: "sapIllus_ObjectFillColor sapIllus_ObjectFillColor_Fill", cx: "3.0001", cy: "5.5001", r: "0.5" }), jsxRuntime.jsx("circle", { class: "sapIllus_ObjectFillColor sapIllus_ObjectFillColor_Fill", cx: "0.0001", cy: "5.5001", r: "0.5" }), jsxRuntime.jsx("circle", { class: "sapIllus_ObjectFillColor sapIllus_ObjectFillColor_Fill", cx: "1.5001", cy: "2.7501", r: "0.5" }), jsxRuntime.jsx("circle", { class: "sapIllus_ObjectFillColor sapIllus_ObjectFillColor_Fill", cx: "3.0001", cy: "0.0001", r: "0.5" }), jsxRuntime.jsx("circle", { class: "sapIllus_ObjectFillColor sapIllus_ObjectFillColor_Fill", cx: "0.0001", cy: "0.0001", r: "0.5" })] })] }) })] }));
+    }
+    function renderIllustration() {
+        const illustration = this.effectiveIllustration;
+        // Safe variant: render template
+        if (illustration && typeof illustration === "object") {
+            return illustration;
+        }
+        // Unsafe variant: render SVG string
+        if (illustration && typeof illustration === "string") {
+            return jsxRuntime.jsx("div", { dangerouslySetInnerHTML: { __html: illustration } });
+        }
+        return null;
     }
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -975,7 +987,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bu
      * @public
      * @since 1.0.0-rc.15
      */
-    let IllustratedMessage = IllustratedMessage_1 = class IllustratedMessage extends webcomponentsBase.b {
+    let IllustratedMessage = IllustratedMessage_1 = class IllustratedMessage extends webcomponentsBase.S {
         constructor() {
             super();
             /**
@@ -1058,19 +1070,41 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bu
         async onBeforeRendering() {
             // Gets the current illustration name given in the "name" attribute
             let effectiveName = getEffectiveIllustrationName(this.name);
-            let illustrationData = d(effectiveName);
+            let illustrationData = h(effectiveName);
             if (this.hasAttribute("name") && !this.isValidIllustration(effectiveName)) {
                 effectiveName = getEffectiveIllustrationName(IllustrationMessageType$1.BeforeSearch);
                 // eslint-disable-next-line
                 console.warn(`The illustration "${effectiveName}" does not exist. The default illustration "${IllustrationMessageType$1.BeforeSearch}" is loaded instead.`);
             }
             if (illustrationData === undefined) {
-                illustrationData = await S(effectiveName);
+                illustrationData = await d(effectiveName);
             }
-            this.dotSvg = illustrationData.dotSvg;
-            this.spotSvg = illustrationData.spotSvg;
-            this.dialogSvg = illustrationData.dialogSvg;
-            this.sceneSvg = illustrationData.sceneSvg;
+            // Check if illustration uses templates (safe variant)
+            if (illustrationData && "dotTemplate" in illustrationData && illustrationData.dotTemplate) {
+                this.dotTemplate = webcomponentsBase.n$1(illustrationData.dotTemplate, this);
+            }
+            if (illustrationData && "spotTemplate" in illustrationData && illustrationData.spotTemplate) {
+                this.spotTemplate = webcomponentsBase.n$1(illustrationData.spotTemplate, this);
+            }
+            if (illustrationData && "dialogTemplate" in illustrationData && illustrationData.dialogTemplate) {
+                this.dialogTemplate = webcomponentsBase.n$1(illustrationData.dialogTemplate, this);
+            }
+            if (illustrationData && "sceneTemplate" in illustrationData && illustrationData.sceneTemplate) {
+                this.sceneTemplate = webcomponentsBase.n$1(illustrationData.sceneTemplate, this);
+            }
+            // Check if illustration uses SVG strings (unsafe variant)
+            if (illustrationData && "dotSvg" in illustrationData) {
+                this.dotSvg = illustrationData.dotSvg;
+            }
+            if (illustrationData && "spotSvg" in illustrationData) {
+                this.spotSvg = illustrationData.spotSvg;
+            }
+            if (illustrationData && "dialogSvg" in illustrationData) {
+                this.dialogSvg = illustrationData.dialogSvg;
+            }
+            if (illustrationData && "sceneSvg" in illustrationData) {
+                this.sceneSvg = illustrationData.sceneSvg;
+            }
             this.illustrationTitle = IllustratedMessage_1.i18nBundle.getText(illustrationData.title);
             this.illustrationSubtitle = IllustratedMessage_1.i18nBundle.getText(illustrationData.subtitle);
             if (this.design !== IllustrationMessageDesign$1.Auto) {
@@ -1197,13 +1231,13 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bu
         get effectiveIllustration() {
             switch (this.media) {
                 case IllustratedMessage_1.MEDIA.DOT:
-                    return this.dotSvg;
+                    return this.dotTemplate || this.dotSvg;
                 case IllustratedMessage_1.MEDIA.SPOT:
-                    return this.spotSvg;
+                    return this.spotTemplate || this.spotSvg;
                 case IllustratedMessage_1.MEDIA.DIALOG:
-                    return this.dialogSvg;
+                    return this.dialogTemplate || this.dialogSvg;
                 case IllustratedMessage_1.MEDIA.SCENE:
-                    return this.sceneSvg;
+                    return this.sceneTemplate || this.sceneSvg;
                 default:
                     return "";
             }
@@ -1262,6 +1296,18 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bu
         webcomponentsBase.s({ noAttribute: true })
     ], IllustratedMessage.prototype, "dialogSvg", void 0);
     __decorate([
+        webcomponentsBase.s({ noAttribute: true })
+    ], IllustratedMessage.prototype, "dotTemplate", void 0);
+    __decorate([
+        webcomponentsBase.s({ noAttribute: true })
+    ], IllustratedMessage.prototype, "spotTemplate", void 0);
+    __decorate([
+        webcomponentsBase.s({ noAttribute: true })
+    ], IllustratedMessage.prototype, "sceneTemplate", void 0);
+    __decorate([
+        webcomponentsBase.s({ noAttribute: true })
+    ], IllustratedMessage.prototype, "dialogTemplate", void 0);
+    __decorate([
         webcomponentsBase.s()
     ], IllustratedMessage.prototype, "media", void 0);
     __decorate([
@@ -1277,21 +1323,21 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bu
         webcomponentsBase.d({ type: HTMLElement, "default": true })
     ], IllustratedMessage.prototype, "actions", void 0);
     __decorate([
-        parametersBundle_css$2.i("@ui5/webcomponents-fiori")
+        parametersBundle_css$1.i("@ui5/webcomponents-fiori")
     ], IllustratedMessage, "i18nBundle", void 0);
     IllustratedMessage = IllustratedMessage_1 = __decorate([
         webcomponentsBase.m({
             tag: "ui5-illustrated-message",
             languageAware: true,
             themeAware: true,
-            renderer: parametersBundle_css.y,
+            renderer: jsxRuntime.y,
             styles: IllustratedMessageCss,
             template: IllustratedMessageTemplate,
         })
     ], IllustratedMessage);
     IllustratedMessage.define();
-    var IllustratedMessage$1 = IllustratedMessage;
+    var IllustratedMessage_default = IllustratedMessage;
 
-    return IllustratedMessage$1;
+    return IllustratedMessage_default;
 
 }));

@@ -18,58 +18,68 @@ sap.ui.define(
     // export the UI5 metadata along with the package
     pkg["_ui5metadata"] = {
       name: "sap/f/gen/ui5/webcomponents_fiori",
-      version: "2.15.0",
+      version: "2.23.2",
       dependencies: ["sap.ui.core"],
       types: [
-        "sap.f.gen.ui5.webcomponents_fiori.FCLLayout",
-        "sap.f.gen.ui5.webcomponents_fiori.IllustrationMessageDesign",
-        "sap.f.gen.ui5.webcomponents_fiori.IllustrationMessageType",
-        "sap.f.gen.ui5.webcomponents_fiori.MediaGalleryItemLayout",
-        "sap.f.gen.ui5.webcomponents_fiori.MediaGalleryLayout",
-        "sap.f.gen.ui5.webcomponents_fiori.MediaGalleryMenuHorizontalAlign",
-        "sap.f.gen.ui5.webcomponents_fiori.MediaGalleryMenuVerticalAlign",
-        "sap.f.gen.ui5.webcomponents_fiori.NavigationLayoutMode",
-        "sap.f.gen.ui5.webcomponents_fiori.NotificationListItemImportance",
-        "sap.f.gen.ui5.webcomponents_fiori.PageBackgroundDesign",
-        "sap.f.gen.ui5.webcomponents_fiori.SearchMode",
-        "sap.f.gen.ui5.webcomponents_fiori.SideContentFallDown",
-        "sap.f.gen.ui5.webcomponents_fiori.SideContentPosition",
-        "sap.f.gen.ui5.webcomponents_fiori.SideContentVisibility",
-        "sap.f.gen.ui5.webcomponents_fiori.SideNavigationItemDesign",
-        "sap.f.gen.ui5.webcomponents_fiori.TimelineGrowingMode",
-        "sap.f.gen.ui5.webcomponents_fiori.TimelineLayout",
-        "sap.f.gen.ui5.webcomponents_fiori.UploadCollectionSelectionMode",
-        "sap.f.gen.ui5.webcomponents_fiori.UploadState",
-        "sap.f.gen.ui5.webcomponents_fiori.ViewSettingsDialogMode",
-        "sap.f.gen.ui5.webcomponents_fiori.WizardContentLayout"
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.FCLLayout",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.HeroBannerActionsPlacement",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.HeroBannerColumnsRatio",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.HeroBannerHeaderBlockPlacement",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.IllustrationMessageDesign",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.IllustrationMessageType",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.MediaGalleryItemLayout",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.MediaGalleryLayout",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.MediaGalleryMenuHorizontalAlign",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.MediaGalleryMenuVerticalAlign",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.NavigationLayoutMode",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.NotificationListItemImportance",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.PageBackgroundDesign",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.SearchMode",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.SideContentFallDown",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.SideContentPosition",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.SideContentVisibility",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.SideNavigationItemDesign",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.TimelineGrowingMode",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.TimelineLayout",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.UploadCollectionSelectionMode",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.UploadState",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.ViewSettingsDialogMode",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.types.WizardContentLayout"
       ],
       interfaces: [
-        "sap.f.gen.ui5.webcomponents_fiori.IMediaGalleryItem",
-        "sap.f.gen.ui5.webcomponents_fiori.IProductSwitchItem",
-        "sap.f.gen.ui5.webcomponents_fiori.ISearchScope",
-        "sap.f.gen.ui5.webcomponents_fiori.ITimelineItem"
+        "sap.f.gen.ui5.webcomponents_fiori.dist.MediaGallery.IMediaGalleryItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.ProductSwitch.IProductSwitchItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.SearchField.ISearchScope",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.Timeline.ITimelineItem"
       ],
       controls: [
         "sap.f.gen.ui5.webcomponents_fiori.dist.BarcodeScannerDialog",
         "sap.f.gen.ui5.webcomponents_fiori.dist.DynamicPage",
         "sap.f.gen.ui5.webcomponents_fiori.dist.DynamicPageHeader",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.DynamicPageHeaderActions",
         "sap.f.gen.ui5.webcomponents_fiori.dist.DynamicPageTitle",
         "sap.f.gen.ui5.webcomponents_fiori.dist.DynamicSideContent",
         "sap.f.gen.ui5.webcomponents_fiori.dist.FilterItem",
         "sap.f.gen.ui5.webcomponents_fiori.dist.FilterItemOption",
         "sap.f.gen.ui5.webcomponents_fiori.dist.FlexibleColumnLayout",
         "sap.f.gen.ui5.webcomponents_fiori.dist.GroupItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.HeroBanner",
         "sap.f.gen.ui5.webcomponents_fiori.dist.IllustratedMessage",
         "sap.f.gen.ui5.webcomponents_fiori.dist.MediaGallery",
         "sap.f.gen.ui5.webcomponents_fiori.dist.MediaGalleryItem",
         "sap.f.gen.ui5.webcomponents_fiori.dist.NavigationLayout",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.NavigationMenu",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.NavigationMenuItem",
         "sap.f.gen.ui5.webcomponents_fiori.dist.NotificationList",
         "sap.f.gen.ui5.webcomponents_fiori.dist.NotificationListGroupItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.NotificationListGroupList",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.NotificationListInternal",
         "sap.f.gen.ui5.webcomponents_fiori.dist.NotificationListItem",
         "sap.f.gen.ui5.webcomponents_fiori.dist.Page",
         "sap.f.gen.ui5.webcomponents_fiori.dist.ProductSwitch",
         "sap.f.gen.ui5.webcomponents_fiori.dist.ProductSwitchItem",
         "sap.f.gen.ui5.webcomponents_fiori.dist.Search",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.SearchField",
         "sap.f.gen.ui5.webcomponents_fiori.dist.SearchItem",
         "sap.f.gen.ui5.webcomponents_fiori.dist.SearchItemGroup",
         "sap.f.gen.ui5.webcomponents_fiori.dist.SearchItemShowMore",
@@ -94,12 +104,18 @@ sap.ui.define(
         "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenuAccount",
         "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenuItem",
         "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenuItemGroup",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsAccountView",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsAppearanceView",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsAppearanceViewGroup",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsAppearanceViewItem",
         "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsDialog",
         "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsItem",
         "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsView",
         "sap.f.gen.ui5.webcomponents_fiori.dist.ViewSettingsDialog",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.ViewSettingsDialogCustomTab",
         "sap.f.gen.ui5.webcomponents_fiori.dist.Wizard",
-        "sap.f.gen.ui5.webcomponents_fiori.dist.WizardStep"
+        "sap.f.gen.ui5.webcomponents_fiori.dist.WizardStep",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.WizardTab"
       ],
       elements: [],
       rootPath: "../"
@@ -110,48 +126,37 @@ sap.ui.define(
      * Different types of FCLLayout.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.FCLLayout
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori FCLLayout
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/FCLLayout
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.FCLLayout
      * @private
      */
     pkg["FCLLayout"] = {
+      /**
+       * Desktop: Fixed -- -- 100 percent widths of columns, only the End column is displayed
+       * Tablet:  Fixed -- -- 100 percent widths of columns, only the End column is displayed
+       * Phone:   Fixed -- -- 100 percent widths of columns, only the End column is displayed
+       *
+       * Use to display a detail-detail page only, when the user should focus entirely on it.
+       *
+       * @private
+       */
+      EndColumnFullScreen: "EndColumnFullScreen",
+      /**
+       * Desktop: Fixed -- 100 -- percent widths of columns, only the Mid column is displayed
+       * Tablet:  Fixed -- 100 -- percent widths of columns, only the Mid column is displayed
+       * Phone:   Fixed -- 100 -- percent widths of columns, only the Mid column is displayed
+       *
+       * Use to display a detail page only, when the user should focus entirely on it.
+       *
+       * @private
+       */
+      MidColumnFullScreen: "MidColumnFullScreen",
       /**
        * The layout will display 1 column.
        *
        * @private
        */
       OneColumn: "OneColumn",
-      /**
-       *
-       * Desktop: Defaults to 67 - 33 - -- percent widths of columns. Start (expanded) and Mid columns are displayed.
-       * Tablet:  Defaults to 67 - 33 - -- percent widths of columns. Start (expanded) and Mid columns are displayed.
-       * Phone:   Fixed -- 100 -- percent widths of columns, only the Mid column is displayed
-       *
-       * Use to display both a list and a detail page when the user should focus on the list page.
-       *
-       * @private
-       */
-      TwoColumnsStartExpanded: "TwoColumnsStartExpanded",
-      /**
-       * Desktop: Defaults to 33 - 67 - -- percent widths of columns. Start and Mid (expanded) columns are displayed
-       * Tablet:  Defaults to 33 - 67 - -- percent widths of columns. Start and Mid (expanded) columns are displayed
-       * Phone:   Fixed -- 100 -- percent widths of columns, only the Mid column is displayed
-       *
-       * Use to display both a list and a detail page when the user should focus on the detail page.
-       *
-       * @private
-       */
-      TwoColumnsMidExpanded: "TwoColumnsMidExpanded",
-      /**
-       * Desktop: Defaults to 25 - 50 - 25 percent widths of columns. Start, Mid (expanded) and End columns are displayed
-       * Tablet:  Defaults to 0 - 67 - 33 percent widths of columns. Mid (expanded) and End columns are displayed, Start is accessible by dragging the columns-separator
-       * Phone:   Fixed -- -- 100 percent widths of columns, only the End column is displayed
-       *
-       * Use to display all three pages (list, detail, detail-detail) when the user should focus on the detail.
-       *
-       * @private
-       */
-      ThreeColumnsMidExpanded: "ThreeColumnsMidExpanded",
       /**
        * Desktop: Defaults to 25 - 25 - 50 percent widths of columns. Start, Mid and End (expanded) columns are displayed
        * Tablet:  Defaults to 0 - 33 - 67 percent widths of columns. Mid and End (expanded) columns are displayed, Start is accessible by dragging the columns-separator
@@ -163,16 +168,15 @@ sap.ui.define(
        */
       ThreeColumnsEndExpanded: "ThreeColumnsEndExpanded",
       /**
-       * Desktop: Defaults to 67 - 33 - 0 percent widths of columns. Start (expanded) and Mid columns are displayed, End is accessible by dragging the columns-separator
-       * Tablet:  Defaults to 67 - 33 - 0 percent widths of columns. Start (expanded) and Mid columns are displayed, End is accessible by dragging the columns-separator
+       * Desktop: Defaults to 25 - 50 - 25 percent widths of columns. Start, Mid (expanded) and End columns are displayed
+       * Tablet:  Defaults to 0 - 67 - 33 percent widths of columns. Mid (expanded) and End columns are displayed, Start is accessible by dragging the columns-separator
        * Phone:   Fixed -- -- 100 percent widths of columns, only the End column is displayed
        *
-       * Use to display the list and detail pages when the user should focus on the list.
-       * The detail-detail is still loaded and easily accessible by dragging the columns-separator
+       * Use to display all three pages (list, detail, detail-detail) when the user should focus on the detail.
        *
        * @private
        */
-      ThreeColumnsStartExpandedEndHidden: "ThreeColumnsStartExpandedEndHidden",
+      ThreeColumnsMidExpanded: "ThreeColumnsMidExpanded",
       /**
        * Desktop: Defaults to 33 - 67 - 0 percent widths of columns. Start and Mid (expanded) columns are displayed, End is accessible by dragging the columns-separator
        * Tablet:  Defaults to 33 - 67 - 0 percent widths of columns. Start and Mid (expanded) columns are displayed, End is accessible by dragging the columns-separator
@@ -185,15 +189,16 @@ sap.ui.define(
        */
       ThreeColumnsMidExpandedEndHidden: "ThreeColumnsMidExpandedEndHidden",
       /**
-       * Desktop: Defaults to 0 - 67 - 33 percent widths of columns. Start is hidden, Mid (expanded) and End columns are displayed.
-       * Tablet:  Defaults to 0 - 67 - 33 percent widths of columns. Start is hidden, Mid (expanded) and End columns are displayed.
-       * Phone:   Fixed -- 100 percent width of the Mid column, only the Mid column is displayed.
+       * Desktop: Defaults to 67 - 33 - 0 percent widths of columns. Start (expanded) and Mid columns are displayed, End is accessible by dragging the columns-separator
+       * Tablet:  Defaults to 67 - 33 - 0 percent widths of columns. Start (expanded) and Mid columns are displayed, End is accessible by dragging the columns-separator
+       * Phone:   Fixed -- -- 100 percent widths of columns, only the End column is displayed
        *
-       * Use to display the Mid and End columns while the Start column is hidden.
+       * Use to display the list and detail pages when the user should focus on the list.
+       * The detail-detail is still loaded and easily accessible by dragging the columns-separator
        *
        * @private
        */
-      ThreeColumnsStartHiddenMidExpanded: "ThreeColumnsStartHiddenMidExpanded",
+      ThreeColumnsStartExpandedEndHidden: "ThreeColumnsStartExpandedEndHidden",
       /**
        * Desktop: Defaults to 0 - 33 - 67 percent widths of columns. Start is hidden, Mid and End (expanded) columns are displayed.
        * Tablet:  Defaults to 0 - 33 - 67 percent widths of columns. Start is hidden, Mid and End (expanded) columns are displayed.
@@ -205,33 +210,132 @@ sap.ui.define(
        */
       ThreeColumnsStartHiddenEndExpanded: "ThreeColumnsStartHiddenEndExpanded",
       /**
-       * Desktop: Fixed -- 100 -- percent widths of columns, only the Mid column is displayed
-       * Tablet:  Fixed -- 100 -- percent widths of columns, only the Mid column is displayed
+       * Desktop: Defaults to 0 - 67 - 33 percent widths of columns. Start is hidden, Mid (expanded) and End columns are displayed.
+       * Tablet:  Defaults to 0 - 67 - 33 percent widths of columns. Start is hidden, Mid (expanded) and End columns are displayed.
+       * Phone:   Fixed -- 100 percent width of the Mid column, only the Mid column is displayed.
+       *
+       * Use to display the Mid and End columns while the Start column is hidden.
+       *
+       * @private
+       */
+      ThreeColumnsStartHiddenMidExpanded: "ThreeColumnsStartHiddenMidExpanded",
+      /**
+       * Desktop: Defaults to 33 - 67 - -- percent widths of columns. Start and Mid (expanded) columns are displayed
+       * Tablet:  Defaults to 33 - 67 - -- percent widths of columns. Start and Mid (expanded) columns are displayed
        * Phone:   Fixed -- 100 -- percent widths of columns, only the Mid column is displayed
        *
-       * Use to display a detail page only, when the user should focus entirely on it.
+       * Use to display both a list and a detail page when the user should focus on the detail page.
        *
        * @private
        */
-      MidColumnFullScreen: "MidColumnFullScreen",
+      TwoColumnsMidExpanded: "TwoColumnsMidExpanded",
       /**
-       * Desktop: Fixed -- -- 100 percent widths of columns, only the End column is displayed
-       * Tablet:  Fixed -- -- 100 percent widths of columns, only the End column is displayed
-       * Phone:   Fixed -- -- 100 percent widths of columns, only the End column is displayed
        *
-       * Use to display a detail-detail page only, when the user should focus entirely on it.
+       * Desktop: Defaults to 67 - 33 - -- percent widths of columns. Start (expanded) and Mid columns are displayed.
+       * Tablet:  Defaults to 67 - 33 - -- percent widths of columns. Start (expanded) and Mid columns are displayed.
+       * Phone:   Fixed -- 100 -- percent widths of columns, only the Mid column is displayed
+       *
+       * Use to display both a list and a detail page when the user should focus on the list page.
        *
        * @private
        */
-      EndColumnFullScreen: "EndColumnFullScreen"
+      TwoColumnsStartExpanded: "TwoColumnsStartExpanded"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents_fiori.FCLLayout", pkg["FCLLayout"]);
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.FCLLayout",
+      pkg["FCLLayout"]
+    );
+    /**
+     * Available HeroBanner actions placement options.
+     *
+     * Defines where the actions slot is rendered within the hero banner header area.
+     *
+     * @enum {string}
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/HeroBannerActionsPlacement
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.HeroBannerActionsPlacement
+     * @private
+     */
+    pkg["HeroBannerActionsPlacement"] = {
+      /**
+       * Places the actions below the header text, aligned to the start.
+       *
+       * @private
+       */
+      BottomStart: "BottomStart",
+      /**
+       * Places the actions to the right of the header text, aligned to the top of the header row.
+       *
+       * @private
+       */
+      TopEnd: "TopEnd"
+    };
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.HeroBannerActionsPlacement",
+      pkg["HeroBannerActionsPlacement"]
+    );
+    /**
+     * Available HeroBanner columns ratio options.
+     *
+     * Defines how the two content blocks are sized relative to each other within the hero banner.
+     * When no value is set, the content renders in a single column.
+     *
+     * @enum {string}
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/HeroBannerColumnsRatio
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.HeroBannerColumnsRatio
+     * @private
+     */
+    pkg["HeroBannerColumnsRatio"] = {
+      /**
+       * Two equal columns. Both content blocks share the available width equally.
+       *
+       * @private
+       */
+      Equal: "Equal",
+      /**
+       * Two unequal columns. The first content block takes two-thirds of the width, the second takes one-third.
+       *
+       * @private
+       */
+      FirstWider: "FirstWider"
+    };
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.HeroBannerColumnsRatio",
+      pkg["HeroBannerColumnsRatio"]
+    );
+    /**
+     * Available HeroBanner header text block placement options.
+     *
+     * Defines the vertical placement of the header text block within the banner header area.
+     *
+     * @enum {string}
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/HeroBannerHeaderBlockPlacement
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.HeroBannerHeaderBlockPlacement
+     * @private
+     */
+    pkg["HeroBannerHeaderBlockPlacement"] = {
+      /**
+       * Places the header text block at the bottom of the header area.
+       *
+       * @private
+       */
+      Bottom: "Bottom",
+      /**
+       * Places the header text block at the top of the header area.
+       *
+       * @private
+       */
+      Top: "Top"
+    };
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.HeroBannerHeaderBlockPlacement",
+      pkg["HeroBannerHeaderBlockPlacement"]
+    );
     /**
      * Different types of IllustrationMessageDesign.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.IllustrationMessageDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori IllustrationMessageDesign
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/IllustrationMessageDesign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.IllustrationMessageDesign
      * @private
      */
     pkg["IllustrationMessageDesign"] = {
@@ -255,29 +359,17 @@ sap.ui.define(
        */
       Base: "Base",
       /**
-       * Dot &lt;code&gt;Illustration&lt;/code&gt; size (XS breakpoint). Suitable for table rows.
-       *
-       * @private
-       */
-      Dot: "Dot",
-      /**
-       * Spot &lt;code&gt;Illustration&lt;/code&gt; size (S breakpoint). Suitable for cards (four columns).
-       *
-       * @private
-       */
-      Spot: "Spot",
-      /**
        * Dialog &#x60;Illustration&#x60; size (M breakpoint). Suitable for dialogs.
        *
        * @private
        */
       Dialog: "Dialog",
       /**
-       * Scene &#x60;Illustration&#x60; size (L breakpoint). Suitable for a &#x60;Page&#x60; or a table.
+       * Dot &lt;code&gt;Illustration&lt;/code&gt; size (XS breakpoint). Suitable for table rows.
        *
        * @private
        */
-      Scene: "Scene",
+      Dot: "Dot",
       /**
        * ExtraSmall &lt;code&gt;Illustration&lt;/code&gt; size (XS breakpoint). Suitable for table rows.
        *
@@ -285,11 +377,11 @@ sap.ui.define(
        */
       ExtraSmall: "ExtraSmall",
       /**
-       * Small &lt;code&gt;Illustration&lt;/code&gt; size (S breakpoint). Suitable for cards (four columns).
+       * Large &#x60;Illustration&#x60; size (L breakpoint). Suitable for a &#x60;Page&#x60; or a table.
        *
        * @private
        */
-      Small: "Small",
+      Large: "Large",
       /**
        * Medium &#x60;Illustration&#x60; size (M breakpoint). Suitable for dialogs.
        *
@@ -297,22 +389,34 @@ sap.ui.define(
        */
       Medium: "Medium",
       /**
-       * Large &#x60;Illustration&#x60; size (L breakpoint). Suitable for a &#x60;Page&#x60; or a table.
+       * Scene &#x60;Illustration&#x60; size (L breakpoint). Suitable for a &#x60;Page&#x60; or a table.
        *
        * @private
        */
-      Large: "Large"
+      Scene: "Scene",
+      /**
+       * Small &lt;code&gt;Illustration&lt;/code&gt; size (S breakpoint). Suitable for cards (four columns).
+       *
+       * @private
+       */
+      Small: "Small",
+      /**
+       * Spot &lt;code&gt;Illustration&lt;/code&gt; size (S breakpoint). Suitable for cards (four columns).
+       *
+       * @private
+       */
+      Spot: "Spot"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents_fiori.IllustrationMessageDesign",
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.IllustrationMessageDesign",
       pkg["IllustrationMessageDesign"]
     );
     /**
      * Different illustration types of Illustrated Message.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.IllustrationMessageType
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori IllustrationMessageType
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/IllustrationMessageType
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.IllustrationMessageType
      * @private
      */
     pkg["IllustrationMessageType"] = {
@@ -323,11 +427,29 @@ sap.ui.define(
        */
       Achievement: "Achievement",
       /**
+       * &quot;Add Column&quot; illustration type.
+       *
+       * @private
+       */
+      AddColumn: "AddColumn",
+      /**
+       * &quot;Add Dimensions&quot; illustration type.
+       *
+       * @private
+       */
+      AddDimensions: "AddDimensions",
+      /**
        * &quot;Adding Columns&quot; illustration type.
        *
        * @private
        */
       AddingColumns: "AddingColumns",
+      /**
+       * &quot;Add People&quot; illustration type.
+       *
+       * @private
+       */
+      AddPeople: "AddPeople",
       /**
        * &quot;Add People To Calendar&quot; illustration type.
        *
@@ -335,11 +457,23 @@ sap.ui.define(
        */
       AddPeopleToCalendar: "AddPeopleToCalendar",
       /**
+       * &quot;Balloon Sky&quot; illustration type.
+       *
+       * @private
+       */
+      BalloonSky: "BalloonSky",
+      /**
        * &quot;Before Search&quot; illustration type.
        *
        * @private
        */
       BeforeSearch: "BeforeSearch",
+      /**
+       * &quot;Connection&quot; illustration type.
+       *
+       * @private
+       */
+      Connection: "Connection",
       /**
        * &quot;Drag Files To Upload&quot; illustration type.
        *
@@ -347,17 +481,59 @@ sap.ui.define(
        */
       DragFilesToUpload: "DragFilesToUpload",
       /**
+       * &quot;Empty Calendar&quot; illustration type.
+       *
+       * @private
+       */
+      EmptyCalendar: "EmptyCalendar",
+      /**
+       * &quot;Empty List&quot; illustration type.
+       *
+       * @private
+       */
+      EmptyList: "EmptyList",
+      /**
+       * &quot;Empty Planning Calendar&quot; illustration type.
+       *
+       * @private
+       */
+      EmptyPlanningCalendar: "EmptyPlanningCalendar",
+      /**
+       * &quot;Error Screen&quot; illustration type.
+       *
+       * @private
+       */
+      ErrorScreen: "ErrorScreen",
+      /**
        * &quot;Filtering Columns&quot; illustration type.
        *
        * @private
        */
       FilteringColumns: "FilteringColumns",
       /**
+       * &quot;Filter Table&quot; illustration type.
+       *
+       * @private
+       */
+      FilterTable: "FilterTable",
+      /**
        * &quot;Grouping Columns&quot; illustration type.
        *
        * @private
        */
       GroupingColumns: "GroupingColumns",
+      /**
+       * &quot;Group Table&quot; illustration type.
+       *
+       * @private
+       */
+      GroupTable: "GroupTable",
+      /**
+       * &quot;Key Task&quot; illustration type.
+       *
+       * @private
+       */
+      KeyTask: "KeyTask",
       /**
        * &quot;New Mail&quot; illustration type.
        *
@@ -371,6 +547,12 @@ sap.ui.define(
        */
       NoActivities: "NoActivities",
       /**
+       * &quot;No Chart Data&quot; illustration type.
+       *
+       * @private
+       */
+      NoChartData: "NoChartData",
+      /**
        * &quot;No Columns Set&quot; illustration type.
        *
        * @private
@@ -383,6 +565,24 @@ sap.ui.define(
        */
       NoData: "NoData",
       /**
+       * &quot;No Dimensions Set&quot; illustration type.
+       *
+       * @private
+       */
+      NoDimensionsSet: "NoDimensionsSet",
+      /**
+       * &quot;No Entries&quot; illustration type.
+       *
+       * @private
+       */
+      NoEntries: "NoEntries",
+      /**
+       * &quot;No Filter Results&quot; illustration type.
+       *
+       * @private
+       */
+      NoFilterResults: "NoFilterResults",
+      /**
        * &quot;No Email&quot; illustration type.
        *
        * @private
@@ -394,12 +594,6 @@ sap.ui.define(
        * @private
        */
       NoMail_v1: "NoMail_v1",
-      /**
-       * &quot;No Entries&quot; illustration type.
-       *
-       * @private
-       */
-      NoEntries: "NoEntries",
       /**
        * &quot;No Notifications&quot; illustration type.
        *
@@ -437,125 +631,17 @@ sap.ui.define(
        */
       NoTasks_v1: "NoTasks_v1",
       /**
-       * &quot;No Dimensions Set&quot; illustration type.
-       *
-       * @private
-       */
-      NoDimensionsSet: "NoDimensionsSet",
-      /**
-       * &quot;Unable To Load&quot; illustration type.
-       *
-       * @private
-       */
-      UnableToLoad: "UnableToLoad",
-      /**
-       * &quot;Unable To Load Image&quot; illustration type.
-       *
-       * @private
-       */
-      UnableToLoadImage: "UnableToLoadImage",
-      /**
-       * &quot;Unable To Upload&quot; illustration type.
-       *
-       * @private
-       */
-      UnableToUpload: "UnableToUpload",
-      /**
-       * &quot;Upload To Cloud&quot; illustration type.
-       *
-       * @private
-       */
-      UploadToCloud: "UploadToCloud",
-      /**
-       * &quot;Add Column&quot; illustration type.
-       *
-       * @private
-       */
-      AddColumn: "AddColumn",
-      /**
-       * &quot;Add People&quot; illustration type.
-       *
-       * @private
-       */
-      AddPeople: "AddPeople",
-      /**
-       * &quot;Add Dimensions&quot; illustration type.
-       *
-       * @private
-       */
-      AddDimensions: "AddDimensions",
-      /**
-       * &quot;Balloon Sky&quot; illustration type.
-       *
-       * @private
-       */
-      BalloonSky: "BalloonSky",
-      /**
-       * &quot;Connection&quot; illustration type.
-       *
-       * @private
-       */
-      Connection: "Connection",
-      /**
-       * &quot;Empty Calendar&quot; illustration type.
-       *
-       * @private
-       */
-      EmptyCalendar: "EmptyCalendar",
-      /**
-       * &quot;Empty List&quot; illustration type.
-       *
-       * @private
-       */
-      EmptyList: "EmptyList",
-      /**
-       * &quot;Empty Planning Calendar&quot; illustration type.
-       *
-       * @private
-       */
-      EmptyPlanningCalendar: "EmptyPlanningCalendar",
-      /**
-       * &quot;Error Screen&quot; illustration type.
-       *
-       * @private
-       */
-      ErrorScreen: "ErrorScreen",
-      /**
-       * &quot;Filter Table&quot; illustration type.
-       *
-       * @private
-       */
-      FilterTable: "FilterTable",
-      /**
-       * &quot;Group Table&quot; illustration type.
-       *
-       * @private
-       */
-      GroupTable: "GroupTable",
-      /**
-       * &quot;Key Task&quot; illustration type.
-       *
-       * @private
-       */
-      KeyTask: "KeyTask",
-      /**
-       * &quot;No Chart Data&quot; illustration type.
-       *
-       * @private
-       */
-      NoChartData: "NoChartData",
-      /**
-       * &quot;No Filter Results&quot; illustration type.
-       *
-       * @private
-       */
-      NoFilterResults: "NoFilterResults",
-      /**
        * &quot;Page Not Found&quot; illustration type.
        *
        * @private
        */
       PageNotFound: "PageNotFound",
+      /**
+       * &quot;Receive Appreciation&quot; illustration type.
+       *
+       * @private
+       */
+      ReceiveAppreciation: "ReceiveAppreciation",
       /**
        * &quot;Reload Screen&quot; illustration type.
        *
@@ -574,12 +660,6 @@ sap.ui.define(
        * @private
        */
       ResizingColumns: "ResizingColumns",
-      /**
-       * &quot;Receive Appreciation&quot; illustration type.
-       *
-       * @private
-       */
-      ReceiveAppreciation: "ReceiveAppreciation",
       /**
        * &quot;Search Earth&quot; illustration type.
        *
@@ -736,18 +816,6 @@ sap.ui.define(
        * @private
        */
       Tent: "Tent",
-      /**
-       * &quot;Upload Collection&quot; illustration type.
-       *
-       * @private
-       */
-      UploadCollection: "UploadCollection",
-      /**
-       * &quot;User Has Signed Up&quot; illustration type.
-       *
-       * @private
-       */
-      UserHasSignedUp: "UserHasSignedUp",
       /**
        * &quot;TntAvatar&quot; illustration type.
        *
@@ -1023,18 +1091,54 @@ sap.ui.define(
        *
        * @private
        */
-      TntUser2: "TntUser2"
+      TntUser2: "TntUser2",
+      /**
+       * &quot;Unable To Load&quot; illustration type.
+       *
+       * @private
+       */
+      UnableToLoad: "UnableToLoad",
+      /**
+       * &quot;Unable To Load Image&quot; illustration type.
+       *
+       * @private
+       */
+      UnableToLoadImage: "UnableToLoadImage",
+      /**
+       * &quot;Unable To Upload&quot; illustration type.
+       *
+       * @private
+       */
+      UnableToUpload: "UnableToUpload",
+      /**
+       * &quot;Upload Collection&quot; illustration type.
+       *
+       * @private
+       */
+      UploadCollection: "UploadCollection",
+      /**
+       * &quot;Upload To Cloud&quot; illustration type.
+       *
+       * @private
+       */
+      UploadToCloud: "UploadToCloud",
+      /**
+       * &quot;User Has Signed Up&quot; illustration type.
+       *
+       * @private
+       */
+      UserHasSignedUp: "UserHasSignedUp"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents_fiori.IllustrationMessageType",
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.IllustrationMessageType",
       pkg["IllustrationMessageType"]
     );
     /**
      * Defines the layout of the content displayed in the `ui5-media-gallery-item`.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.MediaGalleryItemLayout
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori MediaGalleryItemLayout
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/MediaGalleryItemLayout
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.MediaGalleryItemLayout
      * @private
      */
     pkg["MediaGalleryItemLayout"] = {
@@ -1057,15 +1161,15 @@ sap.ui.define(
       Wide: "Wide"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents_fiori.MediaGalleryItemLayout",
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.MediaGalleryItemLayout",
       pkg["MediaGalleryItemLayout"]
     );
     /**
      * Defines the layout type of the thumbnails list of the `ui5-media-gallery` component.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.MediaGalleryLayout
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori MediaGalleryLayout
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/MediaGalleryLayout
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.MediaGalleryLayout
      * @private
      */
     pkg["MediaGalleryLayout"] = {
@@ -1076,28 +1180,28 @@ sap.ui.define(
        */
       Auto: "Auto",
       /**
-       * Displays the layout as a vertical split between the thumbnails list and the selected image.
-       *
-       * @private
-       */
-      Vertical: "Vertical",
-      /**
        * Displays the layout as a horizontal split between the thumbnails list and the selected image.
        *
        * @private
        */
-      Horizontal: "Horizontal"
+      Horizontal: "Horizontal",
+      /**
+       * Displays the layout as a vertical split between the thumbnails list and the selected image.
+       *
+       * @private
+       */
+      Vertical: "Vertical"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents_fiori.MediaGalleryLayout",
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.MediaGalleryLayout",
       pkg["MediaGalleryLayout"]
     );
     /**
      * Defines the horizontal alignment of the thumbnails menu of the `ui5-media-gallery` component.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.MediaGalleryMenuHorizontalAlign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori MediaGalleryMenuHorizontalAlign
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/MediaGalleryMenuHorizontalAlign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.MediaGalleryMenuHorizontalAlign
      * @private
      */
     pkg["MediaGalleryMenuHorizontalAlign"] = {
@@ -1115,47 +1219,47 @@ sap.ui.define(
       Right: "Right"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents_fiori.MediaGalleryMenuHorizontalAlign",
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.MediaGalleryMenuHorizontalAlign",
       pkg["MediaGalleryMenuHorizontalAlign"]
     );
     /**
      * Types for the vertical alignment of the thumbnails menu of the `ui5-media-gallery` component.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.MediaGalleryMenuVerticalAlign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori MediaGalleryMenuVerticalAlign
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/MediaGalleryMenuVerticalAlign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.MediaGalleryMenuVerticalAlign
      * @private
      */
     pkg["MediaGalleryMenuVerticalAlign"] = {
-      /**
-       * Displays the menu at the top of the reference control.
-       *
-       * @private
-       */
-      Top: "Top",
       /**
        * Displays the menu at the bottom of the reference control.
        *
        * @private
        */
-      Bottom: "Bottom"
+      Bottom: "Bottom",
+      /**
+       * Displays the menu at the top of the reference control.
+       *
+       * @private
+       */
+      Top: "Top"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents_fiori.MediaGalleryMenuVerticalAlign",
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.MediaGalleryMenuVerticalAlign",
       pkg["MediaGalleryMenuVerticalAlign"]
     );
     /**
      * Specifies the navigation layout mode.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.NavigationLayoutMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori NavigationLayoutMode
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/NavigationLayoutMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.NavigationLayoutMode
      * @private
      */
     pkg["NavigationLayoutMode"] = {
       /**
-       * Automatically calculates the navigation layout mode based on the screen device type.
-       * &#x60;Expanded&#x60; on desktop and &#x60;Collapsed&#x60; on tablet and phone.
+       * Automatically calculates the navigation layout mode based on the screen width.
+       * &#x60;Collapsed&#x60; on small screens (screen width of 599px or less) and &#x60;Expanded&#x60; on larger screens (screen width of 600px or more).
        *
        * @private
        */
@@ -1174,41 +1278,41 @@ sap.ui.define(
       Expanded: "Expanded"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents_fiori.NavigationLayoutMode",
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.NavigationLayoutMode",
       pkg["NavigationLayoutMode"]
     );
     /**
      * Different types of NotificationListItemImportance.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.NotificationListItemImportance
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori NotificationListItemImportance
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/NotificationListItemImportance
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.NotificationListItemImportance
      * @private
      */
     pkg["NotificationListItemImportance"] = {
-      /**
-       * Standard
-       *
-       * @private
-       */
-      Standard: "Standard",
       /**
        * Important
        *
        * @private
        */
-      Important: "Important"
+      Important: "Important",
+      /**
+       * Standard
+       *
+       * @private
+       */
+      Standard: "Standard"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents_fiori.NotificationListItemImportance",
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.NotificationListItemImportance",
       pkg["NotificationListItemImportance"]
     );
     /**
      * Available Page Background Design.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.PageBackgroundDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori PageBackgroundDesign
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/PageBackgroundDesign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.PageBackgroundDesign
      * @private
      */
     pkg["PageBackgroundDesign"] = {
@@ -1232,15 +1336,15 @@ sap.ui.define(
       Transparent: "Transparent"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents_fiori.PageBackgroundDesign",
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.PageBackgroundDesign",
       pkg["PageBackgroundDesign"]
     );
     /**
      * Search mode options.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.SearchMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SearchMode
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SearchMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SearchMode
      * @private
      */
     pkg["SearchMode"] = {
@@ -1257,22 +1361,19 @@ sap.ui.define(
        */
       Scoped: "Scoped"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents_fiori.SearchMode", pkg["SearchMode"]);
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.SearchMode",
+      pkg["SearchMode"]
+    );
     /**
      * SideContent FallDown options.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.SideContentFallDown
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SideContentFallDown
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SideContentFallDown
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SideContentFallDown
      * @private
      */
     pkg["SideContentFallDown"] = {
-      /**
-       * Side content falls down on breakpoints below XL
-       *
-       * @private
-       */
-      BelowXL: "BelowXL",
       /**
        * Side content falls down on breakpoints below L
        *
@@ -1286,6 +1387,12 @@ sap.ui.define(
        */
       BelowM: "BelowM",
       /**
+       * Side content falls down on breakpoints below XL
+       *
+       * @private
+       */
+      BelowXL: "BelowXL",
+      /**
        * Side content falls down on breakpoint M and the minimum width for the side content
        *
        * @private
@@ -1293,15 +1400,15 @@ sap.ui.define(
       OnMinimumWidth: "OnMinimumWidth"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents_fiori.SideContentFallDown",
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.SideContentFallDown",
       pkg["SideContentFallDown"]
     );
     /**
      * Side Content position options.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.SideContentPosition
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SideContentPosition
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SideContentPosition
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SideContentPosition
      * @private
      */
     pkg["SideContentPosition"] = {
@@ -1321,15 +1428,15 @@ sap.ui.define(
       Start: "Start"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents_fiori.SideContentPosition",
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.SideContentPosition",
       pkg["SideContentPosition"]
     );
     /**
      * Side Content visibility options.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.SideContentVisibility
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SideContentVisibility
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SideContentVisibility
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SideContentVisibility
      * @private
      */
     pkg["SideContentVisibility"] = {
@@ -1339,6 +1446,12 @@ sap.ui.define(
        * @private
        */
       AlwaysShow: "AlwaysShow",
+      /**
+       * Don&#x27;t show the side content on any breakpoints
+       *
+       * @private
+       */
+      NeverShow: "NeverShow",
       /**
        * Show the side content on XL breakpoint
        *
@@ -1356,33 +1469,21 @@ sap.ui.define(
        *
        * @private
        */
-      ShowAboveS: "ShowAboveS",
-      /**
-       * Don&#x27;t show the side content on any breakpoints
-       *
-       * @private
-       */
-      NeverShow: "NeverShow"
+      ShowAboveS: "ShowAboveS"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents_fiori.SideContentVisibility",
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.SideContentVisibility",
       pkg["SideContentVisibility"]
     );
     /**
      * SideNavigationItem designs.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.SideNavigationItemDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SideNavigationItemDesign
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SideNavigationItemDesign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SideNavigationItemDesign
      * @private
      */
     pkg["SideNavigationItemDesign"] = {
-      /**
-       * Design for items that perform navigation, contain navigation child items, or both.
-       *
-       * @private
-       */
-      Default: "Default",
       /**
        * Design for items that trigger an action, such as opening a dialog.
        *
@@ -1392,18 +1493,24 @@ sap.ui.define(
        *
        * @private
        */
-      Action: "Action"
+      Action: "Action",
+      /**
+       * Design for items that perform navigation, contain navigation child items, or both.
+       *
+       * @private
+       */
+      Default: "Default"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents_fiori.SideNavigationItemDesign",
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.SideNavigationItemDesign",
       pkg["SideNavigationItemDesign"]
     );
     /**
      * Timeline growing modes.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.TimelineGrowingMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori TimelineGrowingMode
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/TimelineGrowingMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.TimelineGrowingMode
      * @private
      */
     pkg["TimelineGrowingMode"] = {
@@ -1415,58 +1522,64 @@ sap.ui.define(
        */
       Button: "Button",
       /**
-       * Event &#x60;load-more&#x60; is fired upon scroll.
-       *
-       * @private
-       */
-      Scroll: "Scroll",
-      /**
        * The growing feature is not enabled.
        *
        * @private
        */
-      None: "None"
+      None: "None",
+      /**
+       * Event &#x60;load-more&#x60; is fired upon scroll.
+       *
+       * @private
+       */
+      Scroll: "Scroll"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents_fiori.TimelineGrowingMode",
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.TimelineGrowingMode",
       pkg["TimelineGrowingMode"]
     );
     /**
      * Available Timeline layout orientation
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.TimelineLayout
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori TimelineLayout
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/TimelineLayout
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.TimelineLayout
      * @private
      */
     pkg["TimelineLayout"] = {
+      /**
+       * Horizontal layout
+       *
+       * @private
+       */
+      Horizontal: "Horizontal",
       /**
        * Vertical layout
        * Default type
        *
        * @private
        */
-      Vertical: "Vertical",
-      /**
-       * Horizontal layout
-       *
-       * @private
-       */
-      Horizontal: "Horizontal"
+      Vertical: "Vertical"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents_fiori.TimelineLayout",
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.TimelineLayout",
       pkg["TimelineLayout"]
     );
     /**
      * Different UploadCollection selection modes.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.UploadCollectionSelectionMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori UploadCollectionSelectionMode
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/UploadCollectionSelectionMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.UploadCollectionSelectionMode
      * @private
      */
     pkg["UploadCollectionSelectionMode"] = {
+      /**
+       * Multi selection mode (more than one list item can be selected).
+       *
+       * @private
+       */
+      Multiple: "Multiple",
       /**
        * Default mode (no selection).
        *
@@ -1480,11 +1593,12 @@ sap.ui.define(
        */
       Single: "Single",
       /**
-       * Left-positioned single selection mode (only one list item can be selected).
+       * Selected item is highlighted and selection is changed upon arrow navigation
+       * (only one list item can be selected - this is always the focused item).
        *
        * @private
        */
-      SingleStart: "SingleStart",
+      SingleAuto: "SingleAuto",
       /**
        * Selected item is highlighted but no selection element is visible
        * (only one list item can be selected).
@@ -1493,29 +1607,22 @@ sap.ui.define(
        */
       SingleEnd: "SingleEnd",
       /**
-       * Selected item is highlighted and selection is changed upon arrow navigation
-       * (only one list item can be selected - this is always the focused item).
+       * Left-positioned single selection mode (only one list item can be selected).
        *
        * @private
        */
-      SingleAuto: "SingleAuto",
-      /**
-       * Multi selection mode (more than one list item can be selected).
-       *
-       * @private
-       */
-      Multiple: "Multiple"
+      SingleStart: "SingleStart"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents_fiori.UploadCollectionSelectionMode",
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.UploadCollectionSelectionMode",
       pkg["UploadCollectionSelectionMode"]
     );
     /**
      * Different types of UploadState.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.UploadState
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori UploadState
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/UploadState
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.UploadState
      * @private
      */
     pkg["UploadState"] = {
@@ -1544,22 +1651,19 @@ sap.ui.define(
        */
       Uploading: "Uploading"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents_fiori.UploadState", pkg["UploadState"]);
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.UploadState",
+      pkg["UploadState"]
+    );
     /**
      * Different types of ViewSettings.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.ViewSettingsDialogMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori ViewSettingsDialogMode
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/ViewSettingsDialogMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.ViewSettingsDialogMode
      * @private
      */
     pkg["ViewSettingsDialogMode"] = {
-      /**
-       * Default type
-       *
-       * @private
-       */
-      Sort: "Sort",
       /**
        * Filter type
        *
@@ -1571,18 +1675,24 @@ sap.ui.define(
        *
        * @private
        */
-      Group: "Group"
+      Group: "Group",
+      /**
+       * Default type
+       *
+       * @private
+       */
+      Sort: "Sort"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents_fiori.ViewSettingsDialogMode",
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.ViewSettingsDialogMode",
       pkg["ViewSettingsDialogMode"]
     );
     /**
      * Enumeration for different content layouts of the `ui5-wizard`.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori.WizardContentLayout
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori WizardContentLayout
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/WizardContentLayout
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.WizardContentLayout
      * @private
      */
     pkg["WizardContentLayout"] = {
@@ -1600,7 +1710,7 @@ sap.ui.define(
       SingleStep: "SingleStep"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents_fiori.WizardContentLayout",
+      "sap.f.gen.ui5.webcomponents_fiori.dist.types.WizardContentLayout",
       pkg["WizardContentLayout"]
     );
 
@@ -1609,7 +1719,7 @@ sap.ui.define(
      * Interface for components that can be slotted inside `ui5-media-gallery` as items.
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents_fiori.IMediaGalleryItem
+     * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/MediaGallery.IMediaGalleryItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori IMediaGalleryItem
      * @private
      */
@@ -1617,7 +1727,7 @@ sap.ui.define(
      * Interface for components that may be slotted inside `ui5-product-switch` as items
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents_fiori.IProductSwitchItem
+     * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ProductSwitch.IProductSwitchItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori IProductSwitchItem
      * @private
      */
@@ -1625,7 +1735,7 @@ sap.ui.define(
      * Interface for components that may be slotted inside a `ui5-search`
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents_fiori.ISearchScope
+     * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/SearchField.ISearchScope
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori ISearchScope
      * @private
      */
@@ -1633,7 +1743,7 @@ sap.ui.define(
      * Interface for components that may be slotted inside `ui5-timeline` as items
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents_fiori.ITimelineItem
+     * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/Timeline.ITimelineItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori ITimelineItem
      * @private
      */

@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/List', 'sap/f/thirdparty/NotificationListGroupItem', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/parameters-bundle.css3', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/NotificationListItemBase', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/Icon'], (function (webcomponentsBase, parametersBundle_css, eventStrict, parametersBundle_css$2, List, NotificationListGroupItem, Icons, parametersBundle_css$1, i18nDefaults, toLowercaseEnumValue, ListItemGroup, ListItemBase, i18nDefaults$1, WrappingType, AccessibilityTextsHelper, BusyIndicator, willShowContent, Label, NotificationListItemBase, FocusableElements, Icon) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/List', 'sap/f/thirdparty/NotificationListGroupItem', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/ListSelectionMode', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/NotificationListItemBase', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/Icon'], (function (webcomponentsBase, jsxRuntime, eventStrict, parametersBundle_css$1, List, NotificationListGroupItem, Icons, parametersBundle_css, i18nDefaults, toLowercaseEnumValue, ListItemGroup, ListItemBase, i18nDefaults$1, WrappingType, AccessibilityTextsHelper, ListSelectionMode, BusyIndicator, willShowContent, Label, NotificationListItemBase, FocusableElements, Icon) { 'use strict';
 
     var __decorate$1 = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -13,6 +13,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bu
      * that is used to support keyboard navigation of the notification list internal list.
      *
      * @private
+     * @extends List
      */
     let NotificationListInternal = class NotificationListInternal extends List.List {
         constructor() {
@@ -156,11 +157,11 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bu
     var NotificationListInternal$1 = NotificationListInternal;
 
     function NotificationListTemplate() {
-        return (parametersBundle_css.jsx(NotificationListInternal$1, { accessibleName: this._accessibleName, noDataText: this.noDataText, onItemClick: this._onItemClick, onItemClose: this._onItemClose, onItemToggle: this._onItemToggle, onLoadMore: this._onLoadMore, children: parametersBundle_css.jsx("slot", {}) }));
+        return (jsxRuntime.jsx(NotificationListInternal$1, { accessibleName: this._accessibleName, noDataText: this.noDataText, onItemClick: this._onItemClick, onItemClose: this._onItemClose, onItemToggle: this._onItemToggle, onLoadMore: this._onLoadMore, children: jsxRuntime.jsx("slot", {}) }));
     }
 
-    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
+    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var NotificationListCss = `:host(:not([hidden])){display:block}[ui5-notification-list-internal]{height:100%}
 `;
 
@@ -202,7 +203,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bu
      * @since 2.0.0
      * @public
      */
-    let NotificationList = NotificationList_1 = class NotificationList extends webcomponentsBase.b {
+    let NotificationList = NotificationList_1 = class NotificationList extends webcomponentsBase.S {
         get _accessibleName() {
             return NotificationList_1.i18nFioriBundle.getText(i18nDefaults.NOTIFICATION_LIST_ACCESSIBLE_NAME);
         }
@@ -241,12 +242,12 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bu
         webcomponentsBase.s()
     ], NotificationList.prototype, "noDataText", void 0);
     __decorate([
-        parametersBundle_css$2.i("@ui5/webcomponents-fiori")
+        parametersBundle_css$1.i("@ui5/webcomponents-fiori")
     ], NotificationList, "i18nFioriBundle", void 0);
     NotificationList = NotificationList_1 = __decorate([
         webcomponentsBase.m({
             tag: "ui5-notification-list",
-            renderer: parametersBundle_css.y,
+            renderer: jsxRuntime.y,
             languageAware: true,
             styles: [NotificationListCss],
             template: NotificationListTemplate,
@@ -284,8 +285,8 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bu
         })
     ], NotificationList);
     NotificationList.define();
-    var NotificationList$1 = NotificationList;
+    var NotificationList_default = NotificationList;
 
-    return NotificationList$1;
+    return NotificationList_default;
 
 }));

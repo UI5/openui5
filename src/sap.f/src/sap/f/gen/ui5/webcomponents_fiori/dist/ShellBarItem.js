@@ -12,8 +12,7 @@ sap.ui.define(
 
     /**
      * @class
-     * The `ui5-shellbar-item` represents a custom item, that
-     * might be added to the `ui5-shellbar`.
+     * The `ui5-shellbar-item` represents a custom item for `ui5-shellbar`.
      *
      * ### ES6 Module Import
      * `import "@ui5/webcomponents-fiori/dist/ShellBarItem.js";`
@@ -28,7 +27,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarItem",
       {
         metadata: {
-          tag: "ui5-shellbar-item-cc48984a",
+          tag: "ui5-shellbar-item-530c2e1b",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -37,25 +36,11 @@ sap.ui.define(
           designtime:
             "sap/f/gen/ui5/webcomponents_fiori/designtime/ShellBarItem.designtime",
 
-          interfaces: ["sap.m.IBar", "sap.tnt.IToolHeader"],
+          interfaces: ["sap.m.IBar"],
 
           defaultAggregation: "",
 
           properties: {
-            /**
-             * Defines the name of the item's icon.
-             */
-            icon: { type: "string", mapping: "property" },
-            /**
-             * Defines the item text.
-             *
-             * **Note:** The text is only displayed inside the overflow popover list view.
-             */
-            text: { type: "string", mapping: "property" },
-            /**
-             * Defines the count displayed in the top-right corner.
-             */
-            count: { type: "string", mapping: "property" },
             /**
              * Defines additional accessibility attributes on Shellbar Items.
              *
@@ -75,8 +60,22 @@ sap.ui.define(
             accessibilityAttributes: {
               type: "any",
               mapping: "property",
-              defaultValue: "{}"
+              defaultValue: {}
             },
+            /**
+             * Defines the count displayed in badge.
+             */
+            count: { type: "string", mapping: "property" },
+            /**
+             * Defines the item's icon.
+             */
+            icon: { type: "string", mapping: "property" },
+            /**
+             * Defines the item text.
+             *
+             * **Note:** The text is only displayed inside the overflow popover list view.
+             */
+            text: { type: "string", mapping: "property" },
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
@@ -93,7 +92,7 @@ sap.ui.define(
 
           events: {
             /**
-             * Fired, when the item is pressed.
+             * Fired when the item is clicked.
              */
             click: {
               allowPreventDefault: true,

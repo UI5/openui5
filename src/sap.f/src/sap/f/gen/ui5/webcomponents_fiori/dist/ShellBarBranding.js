@@ -27,7 +27,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarBranding",
       {
         metadata: {
-          tag: "ui5-shellbar-branding-cc48984a",
+          tag: "ui5-shellbar-branding-530c2e1b",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -36,11 +36,16 @@ sap.ui.define(
           designtime:
             "sap/f/gen/ui5/webcomponents_fiori/designtime/ShellBarBranding.designtime",
 
-          interfaces: ["sap.m.IBar", "sap.tnt.IToolHeader"],
+          interfaces: ["sap.m.IBar"],
 
           defaultAggregation: "content",
 
           properties: {
+            /**
+             * Defines the text alternative of the component.
+             * If not provided a default text alternative will be set, if present.
+             */
+            accessibleName: { type: "string", mapping: "property" },
             /**
              * Defines the component href.
              *
@@ -61,11 +66,6 @@ sap.ui.define(
              * **This property must only be used when the `href` property is set.**
              */
             target: { type: "string", mapping: "property" },
-            /**
-             * Defines the text alternative of the component.
-             * If not provided a default text alternative will be set, if present.
-             */
-            accessibleName: { type: "string", mapping: "property" },
             /**
              * The text-content of the Web Component.
              */

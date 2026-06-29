@@ -56,7 +56,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.IllustratedMessage",
       {
         metadata: {
-          tag: "ui5-illustrated-message-cc48984a",
+          tag: "ui5-illustrated-message-530c2e1b",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -70,6 +70,28 @@ sap.ui.define(
           defaultAggregation: "actions",
 
           properties: {
+            /**
+             * Defines whether the illustration is decorative.
+             *
+             * When set to `true`, the attributes `role="presentation"` and `aria-hidden="true"` are applied to the SVG element.
+             */
+            decorative: {
+              type: "boolean",
+              mapping: "property",
+              defaultValue: false
+            },
+            /**
+             * Determines which illustration breakpoint variant is used.
+             *
+             * As `IllustratedMessage` adapts itself around the `Illustration`, the other
+             * elements of the component are displayed differently on the different breakpoints/illustration designs.
+             * @type module:sap/f/gen/ui5/webcomponents_fiori/dist/types/IllustrationMessageDesign
+             */
+            design: {
+              type: "sap.f.gen.ui5.webcomponents_fiori.dist.types.IllustrationMessageDesign",
+              mapping: "property",
+              defaultValue: "Auto"
+            },
             /**
              * Defines the illustration name that will be displayed in the component.
              *
@@ -99,18 +121,6 @@ sap.ui.define(
               defaultValue: "BeforeSearch"
             },
             /**
-             * Determines which illustration breakpoint variant is used.
-             *
-             * As `IllustratedMessage` adapts itself around the `Illustration`, the other
-             * elements of the component are displayed differently on the different breakpoints/illustration designs.
-             * @type module:sap/f/gen/ui5/webcomponents_fiori.IllustrationMessageDesign
-             */
-            design: {
-              type: "sap.f.gen.ui5.webcomponents_fiori.IllustrationMessageDesign",
-              mapping: "property",
-              defaultValue: "Auto"
-            },
-            /**
              * Defines the subtitle of the component.
              *
              * **Note:** Using this property, the default subtitle text of illustration will be overwritten.
@@ -124,16 +134,6 @@ sap.ui.define(
              * **Note:** Using this property, the default title text of illustration will be overwritten.
              */
             titleText: { type: "string", mapping: "property" },
-            /**
-             * Defines whether the illustration is decorative.
-             *
-             * When set to `true`, the attributes `role="presentation"` and `aria-hidden="true"` are applied to the SVG element.
-             */
-            decorative: {
-              type: "boolean",
-              mapping: "property",
-              defaultValue: false
-            },
             /**
              * The text-content of the Web Component.
              */
@@ -150,15 +150,14 @@ sap.ui.define(
 
           aggregations: {
             /**
-             * Defines the title of the component.
+             * Defines the component actions.
              *
-             * **Note:** Using this slot, the default title text of illustration and the value of `title` property will be overwritten.
-             * @type module:sap/ui/core/Control
+             * **Note:** Not displayed when the `design` property is set to `Base`.
+             * @type sap/f/gen/ui5/webcomponents/dist/Button
              */
-            title: {
-              type: "sap.ui.core.Control",
-              multiple: true,
-              slot: "title"
+            actions: {
+              type: "sap.f.gen.ui5.webcomponents.dist.Button.IButton",
+              multiple: true
             },
             /**
              * Defines the subtitle of the component.
@@ -172,12 +171,16 @@ sap.ui.define(
               slot: "subtitle"
             },
             /**
-             * Defines the component actions.
+             * Defines the title of the component.
              *
-             * **Note:** Not displayed when the `design` property is set to `Base`.
-             * @type module:sap/f/gen/ui5/webcomponents.IButton
+             * **Note:** Using this slot, the default title text of illustration and the value of `title` property will be overwritten.
+             * @type module:sap/ui/core/Control
              */
-            actions: { type: "sap.f.gen.ui5.webcomponents.IButton", multiple: true }
+            title: {
+              type: "sap.ui.core.Control",
+              multiple: true,
+              slot: "title"
+            }
           },
 
           associations: {

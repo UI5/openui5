@@ -47,7 +47,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBar",
       {
         metadata: {
-          tag: "ui5-shellbar-cc48984a",
+          tag: "ui5-shellbar-530c2e1b",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -55,74 +55,11 @@ sap.ui.define(
 
           designtime: "sap/f/gen/ui5/webcomponents_fiori/designtime/ShellBar.designtime",
 
-          interfaces: ["sap.m.IBar", "sap.tnt.IToolHeader"],
+          interfaces: ["sap.m.IBar"],
 
           defaultAggregation: "items",
 
           properties: {
-            /**
-             * Defines the visibility state of the search button.
-             *
-             * **Note:** The `hideSearchButton` property is in an experimental state and is a subject to change.
-             */
-            hideSearchButton: {
-              type: "boolean",
-              mapping: "property",
-              defaultValue: false
-            },
-            /**
-             * Disables the automatic search field expansion/collapse when the available space is not enough.
-             *
-             * **Note:** The `disableSearchCollapse` property is in an experimental state and is a subject to change.
-             */
-            disableSearchCollapse: {
-              type: "boolean",
-              mapping: "property",
-              defaultValue: false
-            },
-            /**
-             * Defines the `primaryTitle`.
-             *
-             * **Note:** The `primaryTitle` would be hidden on S screen size (less than approx. 700px).
-             */
-            primaryTitle: { type: "string", mapping: "property" },
-            /**
-             * Defines the `secondaryTitle`.
-             *
-             * **Note:** The `secondaryTitle` would be hidden on S and M screen sizes (less than approx. 1300px).
-             */
-            secondaryTitle: { type: "string", mapping: "property" },
-            /**
-             * Defines the `notificationsCount`,
-             * displayed in the notification icon top-right corner.
-             */
-            notificationsCount: { type: "string", mapping: "property" },
-            /**
-             * Defines, if the notification icon would be displayed.
-             */
-            showNotifications: {
-              type: "boolean",
-              mapping: "property",
-              defaultValue: false
-            },
-            /**
-             * Defines, if the product switch icon would be displayed.
-             */
-            showProductSwitch: {
-              type: "boolean",
-              mapping: "property",
-              defaultValue: false
-            },
-            /**
-             * Defines, if the Search Field would be displayed when there is a valid `searchField` slot.
-             *
-             * **Note:** By default the Search Field is not displayed.
-             */
-            showSearchField: {
-              type: "boolean",
-              mapping: "property",
-              defaultValue: false
-            },
             /**
              * Defines additional accessibility attributes on different areas of the component.
              *
@@ -156,7 +93,70 @@ sap.ui.define(
             accessibilityAttributes: {
               type: "any",
               mapping: "property",
-              defaultValue: "{}"
+              defaultValue: {}
+            },
+            /**
+             * Disables the automatic search field expansion/collapse when the available space is not enough.
+             *
+             * **Note:** The `disableSearchCollapse` property is in an experimental state and is a subject to change.
+             */
+            disableSearchCollapse: {
+              type: "boolean",
+              mapping: "property",
+              defaultValue: false
+            },
+            /**
+             * Defines the visibility state of the search button.
+             *
+             * **Note:** The `hideSearchButton` property is in an experimental state and is a subject to change.
+             */
+            hideSearchButton: {
+              type: "boolean",
+              mapping: "property",
+              defaultValue: false
+            },
+            /**
+             * Defines the `notificationsCount`,
+             * displayed in the notification icon top-right corner.
+             */
+            notificationsCount: { type: "string", mapping: "property" },
+            /**
+             * Defines the `primaryTitle`.
+             *
+             * **Note:** The `primaryTitle` would be hidden on S screen size (less than approx. 700px).
+             */
+            primaryTitle: { type: "string", mapping: "property" },
+            /**
+             * Defines the `secondaryTitle`.
+             *
+             * **Note:** The `secondaryTitle` would be hidden on S and M screen sizes (less than approx. 1300px).
+             */
+            secondaryTitle: { type: "string", mapping: "property" },
+            /**
+             * Defines, if the notification icon would be displayed.
+             */
+            showNotifications: {
+              type: "boolean",
+              mapping: "property",
+              defaultValue: false
+            },
+            /**
+             * Defines, if the product switch icon would be displayed.
+             */
+            showProductSwitch: {
+              type: "boolean",
+              mapping: "property",
+              defaultValue: false
+            },
+            /**
+             * Defines, if the Search Field would be displayed when there is a valid `searchField` slot.
+             *
+             * **Note:** By default the Search Field is not displayed.
+             */
+            showSearchField: {
+              type: "boolean",
+              mapping: "property",
+              defaultValue: false
             },
             /**
              * The text-content of the Web Component.
@@ -175,10 +175,10 @@ sap.ui.define(
           aggregations: {
             /**
              * Defines the assistant slot.
-             * @type module:sap/f/gen/ui5/webcomponents.IButton
+             * @type sap/f/gen/ui5/webcomponents/dist/Button
              */
             assistant: {
-              type: "sap.f.gen.ui5.webcomponents.IButton",
+              type: "sap.f.gen.ui5.webcomponents.dist.Button.IButton",
               multiple: true,
               slot: "assistant"
             },
@@ -196,6 +196,20 @@ sap.ui.define(
               slot: "branding"
             },
             /**
+             * Define the items displayed in the content area.
+             *
+             * Use the `data-hide-order` attribute with numeric value to specify the order of the items to be hidden when the space is not enough.
+             * Lower values will be hidden first.
+             *
+             * **Note:** The `content` slot is in an experimental state and is a subject to change.
+             * @type module:sap/ui/core/Control
+             */
+            content: {
+              type: "sap.ui.core.Control",
+              multiple: true,
+              slot: "content"
+            },
+            /**
              * Defines the `ui5-shellbar` additional items.
              *
              * **Note:**
@@ -205,19 +219,6 @@ sap.ui.define(
             items: {
               type: "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarItem",
               multiple: true
-            },
-            /**
-             * You can pass `ui5-avatar` to set the profile image/icon.
-             * If no profile slot is set - profile will be excluded from actions.
-             *
-             * **Note:** We recommend not using the `size` attribute of `ui5-avatar` because
-             * it should have specific size by design in the context of `ui5-shellbar` profile.
-             * @type module:sap/ui/core/Control
-             */
-            profile: {
-              type: "sap.ui.core.Control",
-              multiple: true,
-              slot: "profile"
             },
             /**
              * Defines the logo of the `ui5-shellbar`.
@@ -237,6 +238,19 @@ sap.ui.define(
               slot: "menuItems"
             },
             /**
+             * You can pass `ui5-avatar` to set the profile image/icon.
+             * If no profile slot is set - profile will be excluded from actions.
+             *
+             * **Note:** We recommend not using the `size` attribute of `ui5-avatar` because
+             * it should have specific size by design in the context of `ui5-shellbar` profile.
+             * @type module:sap/ui/core/Control
+             */
+            profile: {
+              type: "sap.ui.core.Control",
+              multiple: true,
+              slot: "profile"
+            },
+            /**
              * Defines the `ui5-input`, that will be used as a search field.
              */
             searchField: { multiple: true, slot: "searchField" },
@@ -244,26 +258,12 @@ sap.ui.define(
              * Defines a `ui5-button` in the bar that will be placed in the beginning.
              * We encourage this slot to be used for a menu button.
              * It gets overstyled to match ShellBar's styling.
-             * @type module:sap/f/gen/ui5/webcomponents.IButton
+             * @type sap/f/gen/ui5/webcomponents/dist/Button
              */
             startButton: {
-              type: "sap.f.gen.ui5.webcomponents.IButton",
+              type: "sap.f.gen.ui5.webcomponents.dist.Button.IButton",
               multiple: true,
               slot: "startButton"
-            },
-            /**
-             * Define the items displayed in the content area.
-             *
-             * Use the `data-hide-order` attribute with numeric value to specify the order of the items to be hidden when the space is not enough.
-             * Lower values will be hidden first.
-             *
-             * **Note:** The `content` slot is in an experimental state and is a subject to change.
-             * @type module:sap/ui/core/Control
-             */
-            content: {
-              type: "sap.ui.core.Control",
-              multiple: true,
-              slot: "content"
             }
           },
 
@@ -271,21 +271,21 @@ sap.ui.define(
 
           events: {
             /**
-             * Fired, when the notification icon is activated.
+             * Fired, when an item from the content slot is hidden or shown.
+             * **Note:** The `content-item-visibility-change` event is in an experimental state and is a subject to change.
              */
-            notificationsClick: {
-              allowPreventDefault: true,
+            contentItemVisibilityChange: {
               enableEventBubbling: true,
               parameters: {
                 /**
-                 * dom ref of the activated element
+                 * of all the items that are hidden
                  */
-                targetRef: {
+                array: {
                   type: "sap.ui.core.Control",
                   types: [
                     {
                       origType: "HTMLElement",
-                      multiple: false,
+                      multiple: true,
                       dedicatedTypes: [
                         {
                           dtsType: "Control",
@@ -297,72 +297,7 @@ sap.ui.define(
                       ]
                     }
                   ],
-                  dtsParamDescription: "dom ref of the activated element"
-                }
-              }
-            },
-
-            /**
-             * Fired, when the profile slot is present.
-             */
-            profileClick: {
-              enableEventBubbling: true,
-              parameters: {
-                /**
-                 * dom ref of the activated element
-                 */
-                targetRef: {
-                  type: "sap.ui.core.Control",
-                  types: [
-                    {
-                      origType: "HTMLElement",
-                      multiple: false,
-                      dedicatedTypes: [
-                        {
-                          dtsType: "Control",
-                          packageName: "sap/ui/core/Control",
-                          moduleType: "module:sap/ui/core/Control",
-                          ui5Type: "sap.ui.core.Control",
-                          isClass: true
-                        }
-                      ]
-                    }
-                  ],
-                  dtsParamDescription: "dom ref of the activated element"
-                }
-              }
-            },
-
-            /**
-             * Fired, when the product switch icon is activated.
-             *
-             * **Note:** You can prevent closing of overflow popover by calling `event.preventDefault()`.
-             */
-            productSwitchClick: {
-              allowPreventDefault: true,
-              enableEventBubbling: true,
-              parameters: {
-                /**
-                 * dom ref of the activated element
-                 */
-                targetRef: {
-                  type: "sap.ui.core.Control",
-                  types: [
-                    {
-                      origType: "HTMLElement",
-                      multiple: false,
-                      dedicatedTypes: [
-                        {
-                          dtsType: "Control",
-                          packageName: "sap/ui/core/Control",
-                          moduleType: "module:sap/ui/core/Control",
-                          ui5Type: "sap.ui.core.Control",
-                          isClass: true
-                        }
-                      ]
-                    }
-                  ],
-                  dtsParamDescription: "dom ref of the activated element"
+                  dtsParamDescription: "of all the items that are hidden"
                 }
               }
             },
@@ -433,11 +368,9 @@ sap.ui.define(
             },
 
             /**
-             * Fired, when the search button is activated.
-             *
-             * **Note:** You can prevent expanding/collapsing of the search field by calling `event.preventDefault()`.
+             * Fired, when the notification icon is activated.
              */
-            searchButtonClick: {
+            notificationsClick: {
               allowPreventDefault: true,
               enableEventBubbling: true,
               parameters: {
@@ -462,7 +395,84 @@ sap.ui.define(
                     }
                   ],
                   dtsParamDescription: "dom ref of the activated element"
-                },
+                }
+              }
+            },
+
+            /**
+             * Fired, when the product switch icon is activated.
+             *
+             * **Note:** You can prevent closing of overflow popover by calling `event.preventDefault()`.
+             */
+            productSwitchClick: {
+              allowPreventDefault: true,
+              enableEventBubbling: true,
+              parameters: {
+                /**
+                 * dom ref of the activated element
+                 */
+                targetRef: {
+                  type: "sap.ui.core.Control",
+                  types: [
+                    {
+                      origType: "HTMLElement",
+                      multiple: false,
+                      dedicatedTypes: [
+                        {
+                          dtsType: "Control",
+                          packageName: "sap/ui/core/Control",
+                          moduleType: "module:sap/ui/core/Control",
+                          ui5Type: "sap.ui.core.Control",
+                          isClass: true
+                        }
+                      ]
+                    }
+                  ],
+                  dtsParamDescription: "dom ref of the activated element"
+                }
+              }
+            },
+
+            /**
+             * Fired, when the profile slot is present.
+             */
+            profileClick: {
+              enableEventBubbling: true,
+              parameters: {
+                /**
+                 * dom ref of the activated element
+                 */
+                targetRef: {
+                  type: "sap.ui.core.Control",
+                  types: [
+                    {
+                      origType: "HTMLElement",
+                      multiple: false,
+                      dedicatedTypes: [
+                        {
+                          dtsType: "Control",
+                          packageName: "sap/ui/core/Control",
+                          moduleType: "module:sap/ui/core/Control",
+                          ui5Type: "sap.ui.core.Control",
+                          isClass: true
+                        }
+                      ]
+                    }
+                  ],
+                  dtsParamDescription: "dom ref of the activated element"
+                }
+              }
+            },
+
+            /**
+             * Fired, when the search button is activated.
+             *
+             * **Note:** You can prevent expanding/collapsing of the search field by calling `event.preventDefault()`.
+             */
+            searchButtonClick: {
+              allowPreventDefault: true,
+              enableEventBubbling: true,
+              parameters: {
                 /**
                  * whether the search field is visible
                  */
@@ -478,31 +488,28 @@ sap.ui.define(
                     }
                   ],
                   dtsParamDescription: "whether the search field is visible"
-                }
-              }
-            },
-
-            /**
-             * Fired, when the search field is expanded or collapsed.
-             */
-            searchFieldToggle: {
-              enableEventBubbling: true,
-              parameters: {
+                },
                 /**
-                 * whether the search field is expanded
+                 * dom ref of the activated element
                  */
-                expanded: {
-                  type: "boolean",
+                targetRef: {
+                  type: "sap.ui.core.Control",
                   types: [
                     {
-                      origType: "Boolean",
+                      origType: "HTMLElement",
                       multiple: false,
                       dedicatedTypes: [
-                        { dtsType: "boolean", ui5Type: "boolean" }
+                        {
+                          dtsType: "Control",
+                          packageName: "sap/ui/core/Control",
+                          moduleType: "module:sap/ui/core/Control",
+                          ui5Type: "sap.ui.core.Control",
+                          isClass: true
+                        }
                       ]
                     }
                   ],
-                  dtsParamDescription: "whether the search field is expanded"
+                  dtsParamDescription: "dom ref of the activated element"
                 }
               }
             },
@@ -543,33 +550,26 @@ sap.ui.define(
             },
 
             /**
-             * Fired, when an item from the content slot is hidden or shown.
-             * **Note:** The `content-item-visibility-change` event is in an experimental state and is a subject to change.
+             * Fired, when the search field is expanded or collapsed.
              */
-            contentItemVisibilityChange: {
+            searchFieldToggle: {
               enableEventBubbling: true,
               parameters: {
                 /**
-                 * of all the items that are hidden
+                 * whether the search field is expanded
                  */
-                array: {
-                  type: "sap.ui.core.Control",
+                expanded: {
+                  type: "boolean",
                   types: [
                     {
-                      origType: "HTMLElement",
-                      multiple: true,
+                      origType: "Boolean",
+                      multiple: false,
                       dedicatedTypes: [
-                        {
-                          dtsType: "Control",
-                          packageName: "sap/ui/core/Control",
-                          moduleType: "module:sap/ui/core/Control",
-                          ui5Type: "sap.ui.core.Control",
-                          isClass: true
-                        }
+                        { dtsType: "boolean", ui5Type: "boolean" }
                       ]
                     }
                   ],
-                  dtsParamDescription: "of all the items that are hidden"
+                  dtsParamDescription: "whether the search field is expanded"
                 }
               }
             }
@@ -604,15 +604,6 @@ sap.ui.define(
 
             "overflowDomRef",
             /**
-             * Returns the `profile` icon DOM ref.
-             *
-             * @private
-             * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getProfileDomRef
-             * @function
-             */
-
-            "profileDomRef",
-            /**
              * Returns the `product-switch` icon DOM ref.
              *
              * @private
@@ -620,13 +611,21 @@ sap.ui.define(
              * @function
              */
 
-            "productSwitchDomRef"
+            "productSwitchDomRef",
+            /**
+             * Returns the `profile` icon DOM ref.
+             *
+             * @private
+             * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getProfileDomRef
+             * @function
+             */
+
+            "profileDomRef"
           ],
 
           methods: [
             /**
-             * Closes the overflow area.
-             * Useful to manually close the overflow after having suppressed automatic closing with preventDefault() of ShellbarItem's press event
+             * Closes the overflow popover.
              *
              * @private
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#closeOverflow
@@ -635,7 +634,7 @@ sap.ui.define(
 
             "closeOverflow",
             /**
-             * Returns the `search` icon DOM ref.
+             * Returns the search button DOM reference.
              *
              * @private
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getSearchButtonDomRef

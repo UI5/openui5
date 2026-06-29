@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, Icons) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, Icons) { 'use strict';
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -17,7 +17,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons'], (fun
      * @since 2.9.0
      * @experimental
      */
-    let SearchScope = class SearchScope extends webcomponentsBase.b {
+    let SearchScope = class SearchScope extends webcomponentsBase.S {
         get stableDomRef() {
             return this.getAttribute("stable-dom-ref") || `${this._id}-stable-dom-ref`;
         }
@@ -26,14 +26,14 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons'], (fun
         webcomponentsBase.s()
     ], SearchScope.prototype, "text", void 0);
     __decorate([
-        webcomponentsBase.s({ type: Boolean })
-    ], SearchScope.prototype, "selected", void 0);
+        webcomponentsBase.s()
+    ], SearchScope.prototype, "value", void 0);
     SearchScope = __decorate([
         webcomponentsBase.m("ui5-search-scope")
     ], SearchScope);
     SearchScope.define();
-    var SearchScope$1 = SearchScope;
+    var SearchScope_default = SearchScope;
 
-    return SearchScope$1;
+    return SearchScope_default;
 
 }));

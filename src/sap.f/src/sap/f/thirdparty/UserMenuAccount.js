@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, Icons) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, Icons) { 'use strict';
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -18,13 +18,20 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons'], (fun
      *
      * @constructor
      * @extends UI5Element
-     * @experimental
      * @public
      * @since 2.5.0
      */
-    class UserMenuAccount extends webcomponentsBase.b {
+    class UserMenuAccount extends webcomponentsBase.S {
         constructor() {
             super(...arguments);
+            /**
+             * Defines the background color of the desired image.
+             * If `avatarColorScheme` is set to `Auto`, the avatar will be displayed with the `Accent6` color.
+             *
+             * @default "Auto"
+             * @public
+             */
+            this.avatarColorScheme = "Auto";
             /**
              * Defines the title text of the user.
              *
@@ -47,6 +54,13 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons'], (fun
              */
             this.description = "";
             /**
+             * Defines additional information for the user.
+             *
+             * @default ""
+             * @public
+             */
+            this.additionalInfo = "";
+            /**
              * Defines if the user is selected.
              *
              * @default false
@@ -62,7 +76,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons'], (fun
             this.loading = false;
         }
         get _initials() {
-            return this.avatarInitials || "undefined";
+            return this.avatarInitials || undefined;
         }
     };
     __decorate([
@@ -72,6 +86,9 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons'], (fun
         webcomponentsBase.s({ type: String })
     ], UserMenuAccount.prototype, "avatarInitials", void 0);
     __decorate([
+        webcomponentsBase.s()
+    ], UserMenuAccount.prototype, "avatarColorScheme", void 0);
+    __decorate([
         webcomponentsBase.s({ type: String })
     ], UserMenuAccount.prototype, "titleText", void 0);
     __decorate([
@@ -80,6 +97,9 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons'], (fun
     __decorate([
         webcomponentsBase.s({ type: String })
     ], UserMenuAccount.prototype, "description", void 0);
+    __decorate([
+        webcomponentsBase.s({ type: String })
+    ], UserMenuAccount.prototype, "additionalInfo", void 0);
     __decorate([
         webcomponentsBase.s({ type: Boolean })
     ], UserMenuAccount.prototype, "selected", void 0);
@@ -101,14 +121,13 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons'], (fun
          *
          * @constructor
          * @extends UI5Element
-         * @experimental
          * @public
          * @since 2.5.0
          */
     ], UserMenuAccount);
     UserMenuAccount.define();
-    var UserMenuAccount$1 = UserMenuAccount;
+    var UserMenuAccount_default = UserMenuAccount;
 
-    return UserMenuAccount$1;
+    return UserMenuAccount_default;
 
 }));

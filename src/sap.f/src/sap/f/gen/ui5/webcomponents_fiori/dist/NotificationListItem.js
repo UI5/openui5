@@ -58,7 +58,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.NotificationListItem",
       {
         metadata: {
-          tag: "ui5-li-notification-cc48984a",
+          tag: "ui5-li-notification-530c2e1b",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -73,58 +73,14 @@ sap.ui.define(
 
           properties: {
             /**
-             * Defines if the `titleText` and `description` should wrap,
-             * they truncate by default.
-             *
-             * **Note:** by default the `titleText` and `description`,
-             * and a `ShowMore/Less` button would be displayed.
-             * @type module:sap/f/gen/ui5/webcomponents.WrappingType
-             */
-            wrappingType: {
-              type: "sap.f.gen.ui5.webcomponents.WrappingType",
-              mapping: "property",
-              defaultValue: "None"
-            },
-            /**
-             * Defines the status indicator of the item.
-             * @type module:sap/ui/core/ValueState
-             */
-            state: {
-              type: "sap.ui.core.ValueState",
-              mapping: {
-                formatter: "_mapValueState",
-                parser: "_parseValueState"
-              },
-              defaultValue: "None"
-            },
-            /**
-             * Defines if the `Close` button would be displayed.
-             */
-            showClose: {
-              type: "boolean",
-              mapping: "property",
-              defaultValue: false
-            },
-            /**
              * Defines the `Important` label of the item.
-             * @type module:sap/f/gen/ui5/webcomponents_fiori.NotificationListItemImportance
+             * @type module:sap/f/gen/ui5/webcomponents_fiori/dist/types/NotificationListItemImportance
              */
             importance: {
-              type: "sap.f.gen.ui5.webcomponents_fiori.NotificationListItemImportance",
+              type: "sap.f.gen.ui5.webcomponents_fiori.dist.types.NotificationListItemImportance",
               mapping: "property",
               defaultValue: "Standard"
             },
-            /**
-             * Defines the `titleText` of the item.
-             */
-            titleText: { type: "string", mapping: "property" },
-            /**
-             * Defines if the `notification` is new or has been already read.
-             *
-             * **Note:** if set to `false` the `titleText` has bold font,
-             * if set to true - it has a normal font.
-             */
-            read: { type: "boolean", mapping: "property", defaultValue: false },
             /**
              * Defines if a busy indicator would be displayed over the item.
              */
@@ -140,6 +96,50 @@ sap.ui.define(
               type: "float",
               mapping: "property",
               defaultValue: 1000
+            },
+            /**
+             * Defines if the `notification` is new or has been already read.
+             *
+             * **Note:** if set to `false` the `titleText` has bold font,
+             * if set to true - it has a normal font.
+             */
+            read: { type: "boolean", mapping: "property", defaultValue: false },
+            /**
+             * Defines if the `Close` button would be displayed.
+             */
+            showClose: {
+              type: "boolean",
+              mapping: "property",
+              defaultValue: false
+            },
+            /**
+             * Defines the status indicator of the item.
+             * @type module:sap/ui/core/ValueState
+             */
+            state: {
+              type: "sap.ui.core.ValueState",
+              mapping: {
+                formatter: "_mapValueState",
+                parser: "_parseValueState"
+              },
+              defaultValue: "None"
+            },
+            /**
+             * Defines the `titleText` of the item.
+             */
+            titleText: { type: "string", mapping: "property" },
+            /**
+             * Defines if the `titleText` and `description` should wrap,
+             * they truncate by default.
+             *
+             * **Note:** by default the `titleText` and `description`,
+             * and a `ShowMore/Less` button would be displayed.
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/WrappingType
+             */
+            wrappingType: {
+              type: "sap.f.gen.ui5.webcomponents.dist.types.WrappingType",
+              mapping: "property",
+              defaultValue: "None"
             },
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
@@ -168,14 +168,13 @@ sap.ui.define(
               slot: "avatar"
             },
             /**
-             * Defines the menu, displayed in the `ui5-li-notification`.
+             * Defines the content of the `ui5-li-notification`,
+             * usually a description of the notification.
              *
-             * **Note:** Use this for implementing actions.
-             *
-             * **Note:** Should be used instead `u5-notification-action`, which is deprecated as of version 2.0.
+             * **Note:** Although this slot accepts HTML Elements, it is strongly recommended that you only use text in order to preserve the intended design.
              * @type module:sap/ui/core/Control
              */
-            menu: { type: "sap.ui.core.Control", multiple: true, slot: "menu" },
+            description: { type: "sap.ui.core.Control", multiple: true },
             /**
              * Defines the elements, displayed in the footer of the of the component.
              * @type module:sap/ui/core/Control
@@ -186,18 +185,43 @@ sap.ui.define(
               slot: "footnotes"
             },
             /**
-             * Defines the content of the `ui5-li-notification`,
-             * usually a description of the notification.
+             * Defines the menu, displayed in the `ui5-li-notification`.
              *
-             * **Note:** Although this slot accepts HTML Elements, it is strongly recommended that you only use text in order to preserve the intended design.
+             * **Note:** Use this for implementing actions.
+             *
+             * **Note:** Should be used instead `u5-notification-action`, which is deprecated as of version 2.0.
              * @type module:sap/ui/core/Control
              */
-            description: { type: "sap.ui.core.Control", multiple: true }
+            menu: { type: "sap.ui.core.Control", multiple: true, slot: "menu" }
           },
 
           associations: {},
 
           events: {
+            /**
+             * Fired when the component is activated either with a mouse/tap or by using the Enter or Space key.
+             */
+            click: {
+              enableEventBubbling: true,
+              parameters: {
+                /**
+                 * The original event from the user interaction.
+                 */
+                originalEvent: {
+                  type: "object",
+                  types: [
+                    {
+                      origType: "Event",
+                      multiple: false,
+                      dedicatedTypes: [{ dtsType: "Event", ui5Type: "object" }]
+                    }
+                  ],
+                  dtsParamDescription:
+                    "The original event from the user interaction."
+                }
+              }
+            },
+
             /**
              * Fired when the `Close` button is pressed.
              */

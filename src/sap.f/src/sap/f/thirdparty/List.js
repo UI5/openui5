@@ -1,50 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/i18n-defaults2'], (function (exports, webcomponentsBase, parametersBundle_css, toLowercaseEnumValue, eventStrict, parametersBundle_css$1, Icons, ListItemGroup, AccessibilityTextsHelper, BusyIndicator, i18nDefaults) { 'use strict';
-
-    /**
-     * Different list selection modes.
-     * @public
-     */
-    var ListSelectionMode;
-    (function (ListSelectionMode) {
-        /**
-         * Default mode (no selection).
-         * @public
-         */
-        ListSelectionMode["None"] = "None";
-        /**
-         * Right-positioned single selection mode (only one list item can be selected).
-         * @public
-         */
-        ListSelectionMode["Single"] = "Single";
-        /**
-         * Left-positioned single selection mode (only one list item can be selected).
-         * @public
-         */
-        ListSelectionMode["SingleStart"] = "SingleStart";
-        /**
-         * Selected item is highlighted but no selection element is visible
-         * (only one list item can be selected).
-         * @public
-         */
-        ListSelectionMode["SingleEnd"] = "SingleEnd";
-        /**
-         * Selected item is highlighted and selection is changed upon arrow navigation
-         * (only one list item can be selected - this is always the focused item).
-         * @public
-         */
-        ListSelectionMode["SingleAuto"] = "SingleAuto";
-        /**
-         * Multi selection mode (more than one list item can be selected).
-         * @public
-         */
-        ListSelectionMode["Multiple"] = "Multiple";
-        /**
-         * Delete mode (only one list item can be deleted via provided delete button)
-         * @public
-         */
-        ListSelectionMode["Delete"] = "Delete";
-    })(ListSelectionMode || (ListSelectionMode = {}));
-    var ListSelectionMode$1 = ListSelectionMode;
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/ListSelectionMode', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/i18n-defaults2'], (function (exports, webcomponentsBase, jsxRuntime, toLowercaseEnumValue, eventStrict, parametersBundle_css, Icons, ListItemGroup, AccessibilityTextsHelper, ListSelectionMode, BusyIndicator, i18nDefaults) { 'use strict';
 
     const t=e=>{let o=e;return e.shadowRoot&&e.shadowRoot.activeElement&&(o=e.shadowRoot.activeElement),o};
 
@@ -134,24 +88,25 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
     var ListSeparator$1 = ListSeparator;
 
     function ListTemplate() {
-        return (parametersBundle_css.jsx("div", { class: "ui5-list-root", onFocusIn: this._onfocusin, onKeyDown: this._onkeydown, onDragEnter: this._ondragenter, onDragOver: this._ondragover, onDrop: this._ondrop, onDragLeave: this._ondragleave, "onui5-_close": this.onItemClose, "onui5-toggle": this.onItemToggle, "onui5-request-tabindex-change": this.onItemTabIndexChange, "onui5-_focused": this.onItemFocused, "onui5-forward-after": this.onForwardAfter, "onui5-forward-before": this.onForwardBefore, "onui5-selection-requested": this.onSelectionRequested, "onui5-focus-requested": this.onFocusRequested, "onui5-_press": this.onItemPress, children: parametersBundle_css.jsxs(BusyIndicator.BusyIndicator, { id: `${this._id}-busyIndicator`, delay: this.loadingDelay, active: this.showBusyIndicatorOverlay, class: "ui5-list-busy-indicator", children: [parametersBundle_css.jsxs("div", { class: "ui5-list-scroll-container", children: [parametersBundle_css.jsx("span", { tabindex: -1, "aria-hidden": "true", class: "ui5-list-start-marker" }), this.header.length > 0 && parametersBundle_css.jsx("slot", { name: "header" }), this.shouldRenderH1 &&
-                                parametersBundle_css.jsx("header", { id: this.headerID, class: "ui5-list-header", children: this.headerText }), this.hasData &&
-                                parametersBundle_css.jsx("div", { id: `${this._id}-before`, tabindex: 0, role: "none", class: "ui5-list-focusarea" }), parametersBundle_css.jsx("span", { id: `${this._id}-modeLabel`, class: "ui5-hidden-text", children: this.ariaLabelModeText }), parametersBundle_css.jsxs("ul", { id: `${this._id}-listUl`, class: "ui5-list-ul", role: this.listAccessibleRole, "aria-label": this.ariaLabelTxt, "aria-labelledby": this.ariaLabelledBy, "aria-description": this.ariaDescriptionText, children: [parametersBundle_css.jsx("slot", {}), this.showNoDataText &&
-                                        parametersBundle_css.jsx("li", { tabindex: 0, id: `${this._id}-nodata`, class: "ui5-list-nodata", role: "listitem", children: parametersBundle_css.jsx("div", { id: `${this._id}-nodata-text`, class: "ui5-list-nodata-text", children: this.noDataText }) })] }), this.growsWithButton && moreRow.call(this), this.footerText &&
-                                parametersBundle_css.jsx("footer", { id: `${this._id}-footer`, class: "ui5-list-footer", children: this.footerText }), this.hasData &&
-                                parametersBundle_css.jsx("div", { id: `${this._id}-after`, tabindex: 0, role: "none", class: "ui5-list-focusarea" }), parametersBundle_css.jsx("span", { tabindex: -1, "aria-hidden": "true", class: "ui5-list-end-marker" })] }), parametersBundle_css.jsx(ListItemGroup.DropIndicator, { orientation: "Horizontal", ownerReference: this })] }) }));
+        return (jsxRuntime.jsx("div", { class: "ui5-list-root", onFocusIn: this._onfocusin, onKeyDown: this._onkeydown, onDragEnter: this._ondragenter, onDragOver: this._ondragover, onDrop: this._ondrop, onDragLeave: this._ondragleave, "onui5-_close": this.onItemClose, "onui5-toggle": this.onItemToggle, "onui5-request-tabindex-change": this.onItemTabIndexChange, "onui5-_focused": this.onItemFocused, "onui5-forward-after": this.onForwardAfter, "onui5-forward-before": this.onForwardBefore, "onui5-selection-requested": this.onSelectionRequested, "onui5-focus-requested": this.onFocusRequested, "onui5-_press": this.onItemPress, children: jsxRuntime.jsxs(BusyIndicator.BusyIndicator, { id: `${this._id}-busyIndicator`, delay: this.loadingDelay, active: this.showBusyIndicatorOverlay, class: "ui5-list-busy-indicator", children: [jsxRuntime.jsxs("div", { class: "ui5-list-container", children: [this.header.length > 0 && jsxRuntime.jsx("slot", { name: "header" }), this.shouldRenderH1 &&
+                                jsxRuntime.jsx("header", { id: this.headerID, class: "ui5-list-header", children: this.headerText }), jsxRuntime.jsxs("div", { class: "ui5-list-scroll-container", children: [jsxRuntime.jsx("span", { tabindex: -1, "aria-hidden": "true", class: "ui5-list-start-marker" }), this.hasData &&
+                                        jsxRuntime.jsx("div", { id: `${this._id}-before`, tabindex: 0, role: "none", class: "ui5-list-focusarea" }), jsxRuntime.jsx("span", { id: `${this._id}-modeLabel`, class: "ui5-hidden-text", children: this.ariaLabelModeText }), jsxRuntime.jsxs("ul", { id: `${this._id}-listUl`, class: "ui5-list-ul", role: this.listAccessibleRole, "aria-label": this.ariaLabelTxt, "aria-labelledby": this.ariaLabelledBy, "aria-description": this.ariaDescriptionText || undefined, children: [jsxRuntime.jsx("slot", {}), this.showNoDataText &&
+                                                jsxRuntime.jsx("li", { tabindex: 0, id: `${this._id}-nodata`, class: "ui5-list-nodata", role: "listitem", children: jsxRuntime.jsx("div", { id: `${this._id}-nodata-text`, class: "ui5-list-nodata-text", children: this.noDataText }) })] }), this.growsWithButton && moreRow.call(this), this.footerText &&
+                                        jsxRuntime.jsx("footer", { id: `${this._id}-footer`, class: "ui5-list-footer", children: this.footerText }), this.hasData &&
+                                        jsxRuntime.jsx("div", { id: `${this._id}-after`, tabindex: 0, role: "none", class: "ui5-list-focusarea" }), jsxRuntime.jsx("span", { tabindex: -1, "aria-hidden": "true", class: "ui5-list-end-marker" })] })] }), jsxRuntime.jsx(ListItemGroup.DropIndicator, { orientation: "Horizontal", ownerReference: this })] }) }));
     }
     function moreRow() {
-        return (parametersBundle_css.jsx("div", { class: "ui5-growing-button", part: "growing-button", children: parametersBundle_css.jsxs("div", { id: `${this._id}-growing-btn`, role: "button", tabindex: 0, part: "growing-button-inner", class: {
-                    "ui5-growing-button-inner": true,
-                    "ui5-growing-button-inner-active": this._loadMoreActive,
-                }, "aria-label": this.growingButtonAriaLabel, "aria-labelledby": this.growingButtonAriaLabelledBy, onClick: this._onLoadMoreClick, onKeyDown: this._onLoadMoreKeydown, onKeyUp: this._onLoadMoreKeyup, onMouseDown: this._onLoadMoreMousedown, onMouseUp: this._onLoadMoreMouseup, children: [this.loading &&
-                        parametersBundle_css.jsx(BusyIndicator.BusyIndicator, { delay: this.loadingDelay, part: "growing-button-busy-indicator", class: "ui5-list-growing-button-busy-indicator", active: true }), parametersBundle_css.jsx("span", { id: `${this._id}-growingButton-text`, class: "ui5-growing-button-text", "growing-button-text": true, children: this._growingButtonText })] }) }));
+        return (jsxRuntime.jsxs("div", { class: "ui5-growing-button", part: "growing-button", children: [jsxRuntime.jsxs("div", { id: `${this._id}-growing-btn`, role: "button", tabindex: 0, part: "growing-button-inner", class: {
+                        "ui5-growing-button-inner": true,
+                        "ui5-growing-button-inner-active": this._loadMoreActive,
+                    }, "aria-label": this.growingButtonAriaLabel, "aria-labelledby": this.growingButtonAriaLabelledBy, "aria-describedby": this.growingButtonAriaDescribedBy, onClick: this._onLoadMoreClick, onKeyDown: this._onLoadMoreKeydown, onKeyUp: this._onLoadMoreKeyup, onMouseDown: this._onLoadMoreMousedown, onMouseUp: this._onLoadMoreMouseup, children: [this.loading &&
+                            jsxRuntime.jsx(BusyIndicator.BusyIndicator, { delay: this.loadingDelay, part: "growing-button-busy-indicator", class: "ui5-list-growing-button-busy-indicator", active: true }), jsxRuntime.jsx("span", { id: `${this._id}-growingButton-text`, class: "ui5-growing-button-text", "growing-button-text": true, children: this._growingButtonText })] }), this.accessibilityAttributes.growingButton?.description &&
+                    jsxRuntime.jsx("span", { id: `${this._id}-growingButton-description`, class: "ui5-hidden-text", children: this.accessibilityAttributes.growingButton.description })] }));
     }
 
-    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
-    var listCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}.ui5-growing-button{display:flex;align-items:center;padding:var(--_ui5-v2-15-0_load_more_padding);border-top:1px solid var(--sapList_BorderColor);border-bottom:var(--_ui5-v2-15-0_load_more_border-bottom);box-sizing:border-box;cursor:pointer;outline:none}.ui5-growing-button-inner{display:flex;align-items:center;justify-content:center;flex-direction:row;min-height:var(--_ui5-v2-15-0_load_more_text_height);width:100%;color:var(--sapButton_TextColor);background-color:var(--sapList_Background);border:var(--_ui5-v2-15-0_load_more_border);border-radius:var(--_ui5-v2-15-0_load_more_border_radius);box-sizing:border-box}.ui5-growing-button-inner:focus-visible{outline:var(--_ui5-v2-15-0_load_more_outline_width) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);outline-offset:-.125rem;border-color:transparent}.ui5-growing-button-inner:hover{background-color:var(--sapList_Hover_Background)}.ui5-growing-button-inner:active,.ui5-growing-button-inner.ui5-growing-button-inner--active{background-color:var(--sapList_Active_Background);border-color:var(--sapList_Active_Background)}.ui5-growing-button-inner:active>*,.ui5-growing-button-inner.ui5-growing-button-inner--active>*{color:var(--sapList_Active_TextColor)}.ui5-growing-button-text{text-align:center;font-family:var(--sapFontFamily);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box}.ui5-growing-button-text{height:var(--_ui5-v2-15-0_load_more_text_height);padding:.875rem 1rem 1rem;font-size:var(--_ui5-v2-15-0_load_more_text_font_size);font-weight:700}:host([loading]) .ui5-list-growing-button-busy-indicator:not([_is-busy]){display:none}:host([loading]) .ui5-list-growing-button-busy-indicator[_is-busy]+.ui5-growing-button-text{padding-left:.5rem}:host(:not([hidden])){display:block;max-width:100%;width:100%;-webkit-tap-highlight-color:transparent}:host([indent]) .ui5-list-root{padding:2rem}:host([separators="None"]) .ui5-list-nodata{border-bottom:0}.ui5-list-root,.ui5-list-busy-indicator{width:100%;height:100%;position:relative;box-sizing:border-box}.ui5-list-scroll-container{overflow:auto;height:100%;width:100%}.ui5-list-ul{list-style-type:none;padding:0;margin:0}.ui5-list-ul:focus{outline:none}.ui5-list-focusarea{position:fixed}.ui5-list-header{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;box-sizing:border-box;font-size:var(--sapFontHeader4Size);font-family:var(--sapFontFamily);color:var(--sapGroup_TitleTextColor);height:3rem;line-height:3rem;padding:0 1rem;background-color:var(--sapGroup_TitleBackground);border-bottom:1px solid var(--sapGroup_TitleBorderColor)}.ui5-list-footer{height:2rem;box-sizing:border-box;-webkit-text-size-adjust:none;font-size:var(--sapFontSize);font-family:var(--sapFontFamily);line-height:2rem;background-color:var(--sapList_FooterBackground);color:var(--ui5-v2-15-0_list_footer_text_color);padding:0 1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ui5-list-nodata{list-style-type:none;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:center;justify-content:center;color:var(--sapTextColor);background-color:var(--sapList_Background);border-bottom:1px solid var(--sapList_BorderColor);padding:0 1rem!important;outline:none;min-height:var(--_ui5-v2-15-0_list_no_data_height);font-size:var(--_ui5-v2-15-0_list_no_data_font_size);font-family:var(--sapFontFamily);position:relative}.ui5-list-nodata:focus:after{content:"";border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);position:absolute;inset:.125rem;pointer-events:none}.ui5-list-nodata-text{overflow:hidden;text-overflow:ellipsis;white-space:normal;margin:var(--_ui5-v2-15-0_list_item_content_vertical_offset) 0}:host([growing="Scroll"]) .ui5-list-end-marker{display:inline-block}
+    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var listCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}.ui5-growing-button{display:flex;align-items:center;padding:var(--_ui5_load_more_padding);border-top:1px solid var(--sapList_BorderColor);border-bottom:var(--_ui5_load_more_border-bottom);box-sizing:border-box;cursor:pointer;outline:none}.ui5-growing-button-inner{display:flex;align-items:center;justify-content:center;flex-direction:row;min-height:var(--_ui5_load_more_text_height);width:100%;color:var(--sapButton_TextColor);background-color:var(--sapList_Background);border:var(--_ui5_load_more_border);border-radius:var(--_ui5_load_more_border_radius);box-sizing:border-box}.ui5-growing-button-inner:focus-visible{outline:var(--_ui5_load_more_outline_width) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);outline-offset:-.125rem;border-color:transparent}.ui5-growing-button-inner:hover{background-color:var(--sapList_Hover_Background)}.ui5-growing-button-inner:active,.ui5-growing-button-inner.ui5-growing-button-inner--active{background-color:var(--sapList_Active_Background);border-color:var(--sapList_Active_Background)}.ui5-growing-button-inner:active>*,.ui5-growing-button-inner.ui5-growing-button-inner--active>*{color:var(--sapList_Active_TextColor)}.ui5-growing-button-text{text-align:center;font-family:var(--sapFontFamily);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box}.ui5-growing-button-text{height:var(--_ui5_load_more_text_height);padding:.875rem 1rem 1rem;font-size:var(--_ui5_load_more_text_font_size);font-weight:700}:host([loading]) .ui5-list-growing-button-busy-indicator:not([_is-busy]){display:none}:host([loading]) .ui5-list-growing-button-busy-indicator[_is-busy]+.ui5-growing-button-text{padding-left:.5rem}:host(:not([hidden])){display:block;max-width:100%;width:100%;-webkit-tap-highlight-color:transparent}:host([indent]) .ui5-list-root{padding:2rem}:host([separators="None"]) .ui5-list-nodata{border-bottom:0}.ui5-list-root,.ui5-list-busy-indicator,.ui5-list-container{width:100%;height:100%;position:relative;box-sizing:border-box}.ui5-list-scroll-container{overflow:auto;height:100%;width:100%}.ui5-list-ul{list-style-type:none;padding:0;margin:0}.ui5-list-ul:focus{outline:none}.ui5-list-focusarea{position:fixed}.ui5-list-header{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;box-sizing:border-box;font-size:var(--sapFontHeader4Size);font-family:var(--sapFontFamily);color:var(--sapGroup_TitleTextColor);height:3rem;line-height:3rem;padding:0 1rem;background-color:var(--sapGroup_TitleBackground);border-bottom:1px solid var(--sapGroup_TitleBorderColor)}.ui5-list-footer{height:2rem;box-sizing:border-box;-webkit-text-size-adjust:none;font-size:var(--sapFontSize);font-family:var(--sapFontFamily);line-height:2rem;background-color:var(--sapList_FooterBackground);color:var(--ui5_list_footer_text_color);padding:0 1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ui5-list-nodata{list-style-type:none;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:center;justify-content:center;color:var(--sapTextColor);background-color:var(--sapList_Background);border-bottom:1px solid var(--sapList_BorderColor);padding:0 1rem!important;outline:none;min-height:var(--_ui5_list_no_data_height);font-size:var(--_ui5_list_no_data_font_size);font-family:var(--sapFontFamily);position:relative}.ui5-list-nodata:focus:after{content:"";border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);position:absolute;inset:.125rem;pointer-events:none}.ui5-list-nodata-text{overflow:hidden;text-overflow:ellipsis;white-space:normal;margin:var(--_ui5_list_item_content_vertical_offset) 0}:host([growing="Scroll"]) .ui5-list-end-marker{display:inline-block}:host([sticky-header]) ::slotted([slot="header"]),:host([sticky-header]) .ui5-list-header{position:sticky;top:0;z-index:100}
 `;
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -163,6 +118,12 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
     var List_1;
     const INFINITE_SCROLL_DEBOUNCE_RATE = 250; // ms
     const PAGE_UP_DOWN_SIZE = 10;
+    // Maps the List's accessible-role to the expected child item ARIA role (lowercase)
+    const LIST_ACCESSIBLE_ROLE_TO_ITEM_ROLE = {
+        Menu: "menuitem",
+        Tree: "treeitem",
+        ListBox: "option",
+    };
     /**
      * @class
      *
@@ -220,7 +181,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
      * @csspart growing-button - Used to style the button, that is used for growing of the component
      * @csspart growing-button-inner - Used to style the button inner element
      */
-    let List = List_1 = class List extends webcomponentsBase.b {
+    let List = List_1 = class List extends webcomponentsBase.S {
         constructor() {
             super();
             /**
@@ -266,15 +227,27 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
              */
             this.loadingDelay = 1000;
             /**
+             * Indicates whether the List header is sticky or not.
+             * If stickyHeader is set to true, then whenever you scroll the content or
+             * the application, the header of the list will be always visible.
+             * @default false
+             * @public
+             * @since 2.19.0
+             */
+            this.stickyHeader = false;
+            /**
             * Defines additional accessibility attributes on different areas of the component.
             *
             * The accessibilityAttributes object has the following field:
             *
-            *  - **growingButton**: `growingButton.name`.
+            *  - **growingButton**: `growingButton.name`, `growingButton.description`.
             *
             * The accessibility attributes support the following values:
             *
             * - **name**: Defines the accessible ARIA name of the growing button.
+            * Accepts any string.
+            *
+            * - **description**: Defines the accessible ARIA description of the growing button.
             * Accepts any string.
             *
             * **Note:** The `accessibilityAttributes` property is in an experimental state and is a subject to change.
@@ -422,18 +395,18 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
             return !this.hasData && this.noDataText;
         }
         get isDelete() {
-            return this.selectionMode === ListSelectionMode$1.Delete;
+            return this.selectionMode === ListSelectionMode.ListSelectionMode.Delete;
         }
         get isSingleSelect() {
             return [
-                ListSelectionMode$1.Single,
-                ListSelectionMode$1.SingleStart,
-                ListSelectionMode$1.SingleEnd,
-                ListSelectionMode$1.SingleAuto,
+                ListSelectionMode.ListSelectionMode.Single,
+                ListSelectionMode.ListSelectionMode.SingleStart,
+                ListSelectionMode.ListSelectionMode.SingleEnd,
+                ListSelectionMode.ListSelectionMode.SingleAuto,
             ].includes(this.selectionMode);
         }
         get isMultiple() {
-            return this.selectionMode === ListSelectionMode$1.Multiple;
+            return this.selectionMode === ListSelectionMode.ListSelectionMode.Multiple;
         }
         get ariaLabelledBy() {
             if (this.accessibleNameRef || this.accessibleName) {
@@ -452,13 +425,31 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
             return this._associatedLabelsRefTexts || AccessibilityTextsHelper.A(this);
         }
         get ariaDescriptionText() {
-            return this._associatedDescriptionRefTexts || AccessibilityTextsHelper.L(this) || this._getDescriptionForGroups();
+            const parts = [];
+            if (this.accessibleRole === ListAccessibleRole$1.List) {
+                parts.push(this.defaultAriaDescriptionText);
+            }
+            const externalDescription = this._associatedDescriptionRefTexts || AccessibilityTextsHelper.L(this);
+            if (externalDescription) {
+                parts.push(externalDescription);
+            }
+            const groupDescription = this._getDescriptionForGroups();
+            if (groupDescription) {
+                parts.push(groupDescription);
+            }
+            return parts.join(" ");
+        }
+        get defaultAriaDescriptionText() {
+            return List_1.i18nBundle.getText(i18nDefaults.LIST_ROLE_DESCRIPTION);
         }
         get growingButtonAriaLabel() {
             return this.accessibilityAttributes.growingButton?.name;
         }
         get growingButtonAriaLabelledBy() {
             return this.accessibilityAttributes.growingButton?.name ? undefined : `${this._id}-growingButton-text`;
+        }
+        get growingButtonAriaDescribedBy() {
+            return this.accessibilityAttributes.growingButton?.description ? `${this._id}-growingButton-description` : undefined;
         }
         hasGrowingComponent() {
             if (this.growsOnScroll) {
@@ -516,19 +507,21 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
         }
         prepareListItems() {
             const slottedItems = this.getItemsForProcessing();
+            const inheritedItemRole = LIST_ACCESSIBLE_ROLE_TO_ITEM_ROLE[this.accessibleRole];
             slottedItems.forEach((item, key) => {
                 const isLastChild = key === slottedItems.length - 1;
                 const showBottomBorder = this.separators === ListSeparator$1.All
                     || (this.separators === ListSeparator$1.Inner && !isLastChild);
                 if (item.hasConfigurableMode) {
                     item._selectionMode = this.selectionMode;
+                    item._inheritedAccessibleRole = inheritedItemRole;
                 }
                 item.hasBorder = showBottomBorder;
                 item.mediaRange = this.mediaRange;
             });
         }
         async observeListEnd() {
-            await Icons.f$1();
+            await Icons.w();
             this.getEndIntersectionObserver().observe(this.listEndDOM);
         }
         unobserveListEnd() {
@@ -538,7 +531,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
             }
         }
         async observeListStart() {
-            await Icons.f$1();
+            await Icons.w();
             this.getStartIntersectionObserver().observe(this.listStartDOM);
         }
         unobserveListStart() {
@@ -565,7 +558,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
         onSelectionRequested(e) {
             const previouslySelectedItems = this.getSelectedItems();
             let selectionChange = false;
-            if (this.selectionMode !== ListSelectionMode$1.None && this[`handle${this.selectionMode}`]) {
+            if (this.selectionMode !== ListSelectionMode.ListSelectionMode.None && this[`handle${this.selectionMode}`]) {
                 selectionChange = this[`handle${this.selectionMode}`](e.detail.item, !!e.detail.selected);
             }
             if (selectionChange) {
@@ -629,6 +622,9 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
                     // subtract group itself for proper group header item count
                     groupItemCount += groupItems.length - 1;
                 }
+                else if (hasListItems(item)) {
+                    item.assignedSlot && items.push(...item.listItems);
+                }
                 else {
                     item.assignedSlot && items.push(item);
                 }
@@ -664,9 +660,18 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
                 this._handleHome();
                 return;
             }
+            // Handle Arrow Up/Down navigation between internal elements
+            const isArrowKey = webcomponentsBase.P(e) || webcomponentsBase._(e);
+            const listItem = this._getClosestListItem(e.target);
+            if (listItem?._isFocusOnInternalElement() && isArrowKey) {
+                const offset = webcomponentsBase.P(e) ? -1 : 1;
+                if (this._navigateToAdjacentItem(listItem, offset)) {
+                    e.preventDefault();
+                    return;
+                }
+            }
             if (webcomponentsBase._(e)) {
-                this._handleDown();
-                e.preventDefault();
+                this._handleDown(e);
                 return;
             }
             if (webcomponentsBase.C(e)) {
@@ -676,6 +681,33 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
             if (webcomponentsBase.x(e)) {
                 this._handleTabNext(e);
             }
+            if (webcomponentsBase.io(e)) {
+                this._handleF7(e);
+            }
+        }
+        _handleF7(e) {
+            const listItem = this._getClosestListItem(e.target);
+            if (!listItem || !listItem._hasFocusableElements()) {
+                return;
+            }
+            const listItemDomRef = listItem.getFocusDomRef();
+            const activeElement = webcomponentsBase.t();
+            e.preventDefault();
+            e.stopPropagation(); // Prevent Tokenizer's F7 handler from undoing the focus change set by this handler.
+            if (activeElement === listItemDomRef) {
+                listItem._editMode = true;
+                listItem._focusInternalElement(this._lastFocusedElementIndex ?? 0);
+                this._lastFocusedElementIndex = listItem._getFocusedElementIndex();
+            }
+            else {
+                this._lastFocusedElementIndex = listItem._getFocusedElementIndex();
+                listItem._editMode = false;
+                listItemDomRef.focus();
+            }
+        }
+        _getClosestListItem(element) {
+            const listItem = element.closest("[ui5-li], [ui5-li-custom]");
+            return listItem;
         }
         _moveItem(item, e) {
             if (!item || !item.movable) {
@@ -717,7 +749,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
                 e.preventDefault();
                 this._loadMoreActive = true;
             }
-            if (webcomponentsBase.b$1(e)) {
+            if (webcomponentsBase.b(e)) {
                 this._onLoadMoreClick();
                 this._loadMoreActive = true;
             }
@@ -774,7 +806,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
         _handleResize() {
             this.checkListInViewport();
             const width = this.getBoundingClientRect().width;
-            this.mediaRange = webcomponentsBase.i$2.getCurrentRange(webcomponentsBase.i$2.RANGESETS.RANGE_4STEPS, width);
+            this.mediaRange = webcomponentsBase.i$1.getCurrentRange(webcomponentsBase.i$1.RANGESETS.RANGE_4STEPS, width);
         }
         /*
         * KEYBOARD SUPPORT
@@ -795,13 +827,36 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
             if (!this.growsWithButton) {
                 return;
             }
-            this._shouldFocusGrowingButton();
-        }
-        _handleDown() {
-            if (!this.growsWithButton) {
-                return;
+            if (this._shouldFocusGrowingButton()) {
+                this.focusGrowingButton();
             }
-            this._shouldFocusGrowingButton();
+        }
+        _handleDown(e) {
+            if (this._shouldFocusGrowingButton()) {
+                this.focusGrowingButton();
+                e.preventDefault();
+            }
+        }
+        _navigateToAdjacentItem(listItem, offset) {
+            const targetInternalElementIndex = listItem?._getFocusedElementIndex();
+            if (targetInternalElementIndex === undefined || targetInternalElementIndex === -1) {
+                return false;
+            }
+            const allItems = this.getItems().filter(node => {
+                return "hasConfigurableMode" in node && node.hasConfigurableMode
+                    && node._hasFocusableElements();
+            });
+            const itemIndex = allItems.indexOf(listItem) + offset;
+            const nextNode = allItems[itemIndex];
+            if (!nextNode) {
+                return false;
+            }
+            nextNode._editMode = listItem._editMode;
+            const focusedIndex = nextNode._focusInternalElement(targetInternalElementIndex);
+            if (focusedIndex !== undefined) {
+                this._lastFocusedElementIndex = focusedIndex;
+            }
+            return true;
         }
         _onfocusin(e) {
             const target = t(e.target);
@@ -869,7 +924,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
             e.stopPropagation();
             this._itemNavigation.setCurrentItem(target);
             this.fireDecoratorEvent("item-focused", { item: target });
-            if (this.selectionMode === ListSelectionMode$1.SingleAuto) {
+            if (this.selectionMode === ListSelectionMode.ListSelectionMode.SingleAuto) {
                 const detail = {
                     item: target,
                     selectionComponentPressed: false,
@@ -884,7 +939,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
             if (!this.fireDecoratorEvent("item-click", { item: pressedItem })) {
                 return;
             }
-            if (this.selectionMode !== ListSelectionMode$1.Delete) {
+            if (this.selectionMode !== ListSelectionMode.ListSelectionMode.Delete) {
                 const detail = {
                     item: pressedItem,
                     selectionComponentPressed: false,
@@ -909,12 +964,52 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
             this.fireDecoratorEvent("item-toggle", { item: e.detail.item });
         }
         onForwardBefore(e) {
-            this.setPreviouslyFocusedItem(e.target);
+            const listItem = e.target;
+            if (listItem.hasConfigurableMode && listItem._editMode) {
+                const allItems = this.getItems().filter(node => {
+                    return "hasConfigurableMode" in node && node.hasConfigurableMode
+                        && node._hasFocusableElements();
+                });
+                const currentIndex = allItems.indexOf(listItem);
+                const prevItem = currentIndex > 0 ? allItems[currentIndex - 1] : undefined;
+                if (prevItem) {
+                    prevItem._editMode = true;
+                    const focusables = prevItem._getFocusableElements();
+                    prevItem._focusInternalElement(focusables.length - 1);
+                    this._lastFocusedElementIndex = focusables.length - 1;
+                    this.setPreviouslyFocusedItem(prevItem);
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+                listItem._editMode = false;
+            }
+            this.setPreviouslyFocusedItem(listItem);
             this.focusBeforeElement();
             e.stopPropagation();
         }
         onForwardAfter(e) {
-            this.setPreviouslyFocusedItem(e.target);
+            const listItem = e.target;
+            if (listItem.hasConfigurableMode && listItem._editMode) {
+                const allItems = this.getItems().filter(node => {
+                    return "hasConfigurableMode" in node && node.hasConfigurableMode
+                        && node._hasFocusableElements();
+                });
+                const currentIndex = allItems.indexOf(listItem);
+                const nextItem = currentIndex >= 0 && currentIndex < allItems.length - 1
+                    ? allItems[currentIndex + 1] : undefined;
+                if (nextItem) {
+                    nextItem._editMode = true;
+                    nextItem._focusInternalElement(0);
+                    this._lastFocusedElementIndex = 0;
+                    this.setPreviouslyFocusedItem(nextItem);
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+                listItem._editMode = false;
+            }
+            this.setPreviouslyFocusedItem(listItem);
             if (!this.growsWithButton) {
                 this.focusAfterElement();
             }
@@ -939,12 +1034,13 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
             }
         }
         _shouldFocusGrowingButton() {
+            if (!this.growsWithButton) {
+                return false;
+            }
             const items = this.getItems();
             const lastIndex = items.length - 1;
             const currentIndex = this._itemNavigation._currentIndex;
-            if (currentIndex !== -1 && currentIndex === lastIndex) {
-                this.focusGrowingButton();
-            }
+            return currentIndex !== -1 && currentIndex === lastIndex;
         }
         getGrowingButton() {
             return this.shadowRoot.querySelector(`[id="${this._id}-growing-btn"]`);
@@ -1078,6 +1174,9 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
         webcomponentsBase.s({ type: Number })
     ], List.prototype, "loadingDelay", void 0);
     __decorate([
+        webcomponentsBase.s({ type: Boolean })
+    ], List.prototype, "stickyHeader", void 0);
+    __decorate([
         webcomponentsBase.s()
     ], List.prototype, "accessibleName", void 0);
     __decorate([
@@ -1121,13 +1220,13 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
         webcomponentsBase.d()
     ], List.prototype, "header", void 0);
     __decorate([
-        parametersBundle_css$1.i("@ui5/webcomponents")
+        parametersBundle_css.i("@ui5/webcomponents")
     ], List, "i18nBundle", void 0);
     List = List_1 = __decorate([
         webcomponentsBase.m({
             tag: "ui5-list",
             fastNavigation: true,
-            renderer: parametersBundle_css.y,
+            renderer: jsxRuntime.y,
             template: ListTemplate,
             styles: [
                 listCss,
@@ -1243,11 +1342,13 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
         })
     ], List);
     List.define();
+    const hasListItems = (item) => {
+        return "hasListItems" in item && item.hasListItems;
+    };
     var List$1 = List;
 
     exports.List = List$1;
     exports.ListAccessibleRole = ListAccessibleRole$1;
-    exports.ListSelectionMode = ListSelectionMode$1;
     exports.ListSeparator = ListSeparator$1;
 
 }));

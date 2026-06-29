@@ -39,17 +39,6 @@ sap.ui.define(
 
           properties: {
             /**
-             * Defines the `titleText` of the item.
-             */
-            titleText: { type: "string", mapping: "property" },
-            /**
-             * Defines if the `notification` is new or has been already read.
-             *
-             * **Note:** if set to `false` the `titleText` has bold font,
-             * if set to true - it has a normal font.
-             */
-            read: { type: "boolean", mapping: "property", defaultValue: false },
-            /**
              * Defines if a busy indicator would be displayed over the item.
              */
             loading: {
@@ -64,14 +53,51 @@ sap.ui.define(
               type: "float",
               mapping: "property",
               defaultValue: 1000
-            }
+            },
+            /**
+             * Defines if the `notification` is new or has been already read.
+             *
+             * **Note:** if set to `false` the `titleText` has bold font,
+             * if set to true - it has a normal font.
+             */
+            read: { type: "boolean", mapping: "property", defaultValue: false },
+            /**
+             * Defines the `titleText` of the item.
+             */
+            titleText: { type: "string", mapping: "property" }
           },
 
           aggregations: {},
 
           associations: {},
 
-          events: {},
+          events: {
+            /**
+             * Fired when the component is activated either with a mouse/tap or by using the Enter or Space key.
+             *
+             * **Note:** The event will not be fired if the `disabled` property is set to `true`.
+             */
+            click: {
+              enableEventBubbling: true,
+              parameters: {
+                /**
+                 * The original event from the user interaction.
+                 */
+                originalEvent: {
+                  type: "object",
+                  types: [
+                    {
+                      origType: "Event",
+                      multiple: false,
+                      dedicatedTypes: [{ dtsType: "Event", ui5Type: "object" }]
+                    }
+                  ],
+                  dtsParamDescription:
+                    "The original event from the user interaction."
+                }
+              }
+            }
+          },
 
           getters: [],
 

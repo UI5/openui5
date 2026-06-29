@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/generateHighlightedMarkup', 'sap/f/thirdparty/ShellBarSearch2', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/ListBoxItemGroupTemplate', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/List', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/encodeXML', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ListItemAdditionalText.css', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/information', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/information2', 'sap/f/thirdparty/sys-enter-2', 'sap/f/thirdparty/parameters-bundle.css3', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/FocusableElements'], (function (exports, generateHighlightedMarkup, ShellBarSearch, webcomponentsBase, ListItemGroup, ListBoxItemGroupTemplate, parametersBundle_css, Icon, List, ResponsivePopover, Button, i18nDefaults, encodeXML, eventStrict, Icons, ListItemBase, parametersBundle_css$1, ListItemAdditionalText_css, AccessibilityTextsHelper, ValueState, information, Label, slimArrowDown, Title, BusyIndicator, willShowContent, information$1, sysEnter2, parametersBundle_css$2, i18nDefaults$1, toLowercaseEnumValue, WrappingType, FocusableElements) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/generateHighlightedMarkup', 'sap/f/thirdparty/ShellBarSearch2', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/ListBoxItemGroupTemplate', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/List', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/encodeXML', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ListItemAdditionalText.css', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/search', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/information', 'sap/f/thirdparty/sys-enter-2', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/ListSelectionMode', 'sap/f/thirdparty/FocusableElements'], (function (exports, generateHighlightedMarkup, ShellBarSearch, webcomponentsBase, ListItemGroup, ListBoxItemGroupTemplate, jsxRuntime, Icon, List, ResponsivePopover, Button, Title, i18nDefaults, encodeXML, eventStrict, Icons, ListItemBase, parametersBundle_css, ListItemAdditionalText_css, InvisibleMessage, AccessibilityTextsHelper, ValueState, decline, Label, slimArrowDown, search, BusyIndicator, willShowContent, information, sysEnter2, parametersBundle_css$1, i18nDefaults$1, toLowercaseEnumValue, WrappingType, ListSelectionMode, FocusableElements) { 'use strict';
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -34,19 +34,21 @@ sap.ui.define(['exports', 'sap/f/thirdparty/generateHighlightedMarkup', 'sap/f/t
 
     function InputSuggestionsTemplate(hooks) {
         const suggestionsList = hooks?.suggestionsList || defaultSuggestionsList;
+        // Mobile header hook - intended only for MultiInput design scenario
+        const mobileHeader = hooks?.mobileHeader;
         const valueStateMessage = hooks?.valueStateMessage;
         const valueStateMessageInputIcon = hooks?.valueStateMessageInputIcon;
-        return (parametersBundle_css.jsxs(ResponsivePopover.ResponsivePopover, { class: this.classes.popover, hideArrow: true, preventFocusRestore: true, preventInitialFocus: true, placement: "Bottom", horizontalAlign: "Start", tabindex: -1, style: this.styles.suggestionsPopover, onOpen: this._afterOpenPicker, onClose: this._afterClosePicker, onScroll: this._scroll, open: this.open, opener: this, accessibleName: this._popupLabel, children: [this._isPhone &&
-                    parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [parametersBundle_css.jsxs("div", { slot: "header", class: "ui5-responsive-popover-header", children: [parametersBundle_css.jsx("div", { class: "row", children: parametersBundle_css.jsx("span", { children: this._headerTitleText }) }), parametersBundle_css.jsx("div", { class: "row", children: parametersBundle_css.jsx("div", { class: "input-root-phone native-input-wrapper", children: parametersBundle_css.jsx(ShellBarSearch.Input, { class: "ui5-input-inner-phone", type: this.inputType, value: this.value, showClearIcon: this.showClearIcon, placeholder: this.placeholder, onInput: this._handleInput, onChange: this._handleChange }) }) })] }), this.hasValueStateMessage &&
-                                parametersBundle_css.jsxs("div", { class: this.classes.popoverValueState, style: this.styles.suggestionPopoverHeader, children: [parametersBundle_css.jsx(Icon.Icon, { class: "ui5-input-value-state-message-icon", name: valueStateMessageInputIcon?.call(this) }), this.open && valueStateMessage?.call(this)] })] }), !this._isPhone && this.hasValueStateMessage &&
-                    parametersBundle_css.jsxs("div", { slot: "header", class: {
+        return (jsxRuntime.jsxs(ResponsivePopover.ResponsivePopover, { class: this.classes.popover, hideArrow: true, preventFocusRestore: true, preventInitialFocus: true, placement: "Bottom", horizontalAlign: "Start", tabindex: -1, style: this.styles.suggestionsPopover, onOpen: this._afterOpenPicker, onClose: this._afterClosePicker, onScroll: this._scroll, open: this.open, opener: this, accessibleName: this._popupLabel, children: [this._isPhone &&
+                    jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsxs("div", { slot: "header", class: "ui5-responsive-popover-header", children: [jsxRuntime.jsx("div", { class: "row", children: jsxRuntime.jsx(Title.Title, { level: "H1", wrappingType: "None", class: "ui5-responsive-popover-header-text", children: this._headerTitleText }) }), jsxRuntime.jsx("div", { class: "row", children: jsxRuntime.jsxs("div", { class: "input-root-phone native-input-wrapper", children: [jsxRuntime.jsx(ShellBarSearch.Input, { class: "ui5-input-inner-phone", type: this.inputType, value: this.value, showClearIcon: this.showClearIcon, placeholder: this.placeholder, onInput: this._handleInput }), mobileHeader?.call(this)] }) }), this.hasValueStateMessage &&
+                                    jsxRuntime.jsxs("div", { class: this.classes.popoverValueState, style: this.styles.suggestionPopoverHeader, children: [jsxRuntime.jsx(Icon.Icon, { class: "ui5-input-value-state-message-icon", name: valueStateMessageInputIcon?.call(this) }), this.open && valueStateMessage?.call(this)] })] }) }), !this._isPhone && this.hasValueStateMessage &&
+                    jsxRuntime.jsxs("div", { slot: "header", class: {
                             "ui5-responsive-popover-header": true,
                             ...this.classes.popoverValueState,
-                        }, style: this.styles.suggestionPopoverHeader, children: [parametersBundle_css.jsx(Icon.Icon, { class: "ui5-input-value-state-message-icon", name: valueStateMessageInputIcon?.call(this) }), this.open && valueStateMessage?.call(this)] }), suggestionsList.call(this), this._isPhone &&
-                    parametersBundle_css.jsxs("div", { slot: "footer", class: "ui5-responsive-popover-footer", children: [parametersBundle_css.jsx(Button.Button, { design: "Emphasized", onClick: this._closePicker, children: this._suggestionsOkButtonText }), parametersBundle_css.jsx(Button.Button, { class: "ui5-responsive-popover-close-btn", design: "Transparent", onClick: this._closePicker, children: this._suggestionsCancelButtonText })] })] }));
+                        }, style: this.styles.suggestionPopoverHeader, children: [jsxRuntime.jsx(Icon.Icon, { class: "ui5-input-value-state-message-icon", name: valueStateMessageInputIcon?.call(this) }), this.open && valueStateMessage?.call(this)] }), this.showSuggestions && suggestionsList.call(this), this._isPhone &&
+                    jsxRuntime.jsxs("div", { slot: "footer", class: "ui5-responsive-popover-footer", children: [jsxRuntime.jsx(Button.Button, { design: "Emphasized", onClick: this._confirmMobileValue, children: this._suggestionsOkButtonText }), jsxRuntime.jsx(Button.Button, { class: "ui5-responsive-popover-close-btn", design: "Transparent", onClick: this._cancelMobileValue, children: this._suggestionsCancelButtonText })] })] }));
     }
     function defaultSuggestionsList() {
-        return (parametersBundle_css.jsx(List.List, { accessibleRole: List.ListAccessibleRole.ListBox, separators: this.suggestionSeparators, selectionMode: "Single", onMouseDown: this.onItemMouseDown, onItemClick: this._handleSuggestionItemPress, onSelectionChange: this._handleSelectionChange, children: parametersBundle_css.jsx("slot", {}) }));
+        return (jsxRuntime.jsx(List.List, { accessibleRole: List.ListAccessibleRole.ListBox, separators: this.suggestionSeparators, selectionMode: "Single", onMouseDown: this.onItemMouseDown, onItemClick: this._handleSuggestionItemPress, onSelectionChange: this._handleSelectionChange, children: jsxRuntime.jsx("slot", {}) }));
     }
 
     /**
@@ -110,7 +112,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/generateHighlightedMarkup', 'sap/f/t
         }
         onPageDown(e) {
             e.preventDefault();
-            const items = this._getItems();
+            const items = this.visibleItems;
             if (!items) {
                 return true;
             }
@@ -244,7 +246,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/generateHighlightedMarkup', 'sap/f/t
             this._moveItemSelection(previousSelectedIdx, ++this.selectedItemIndex);
         }
         _selectPreviousItem() {
-            const items = this._getItems();
+            const items = this.visibleItems;
             const previousSelectedIdx = this.selectedItemIndex;
             if (previousSelectedIdx === -1 || previousSelectedIdx === null) {
                 return;
@@ -256,22 +258,26 @@ sap.ui.define(['exports', 'sap/f/thirdparty/generateHighlightedMarkup', 'sap/f/t
                 items[previousSelectedIdx].focused = false;
                 this.component.focused = true;
                 this.component.hasSuggestionItemSelected = false;
+                this.component.value = this.component.typedInValue;
                 this.selectedItemIndex -= 1;
                 return;
             }
             this._moveItemSelection(previousSelectedIdx, --this.selectedItemIndex);
         }
+        get visibleItems() {
+            return this._getItems().filter(item => !item.hidden);
+        }
         _moveItemSelection(previousIdx, nextIdx) {
-            const items = this._getItems();
+            const items = this.visibleItems;
             const currentItem = items[nextIdx];
             const previousItem = items[previousIdx];
             const nonGroupItems = this._getNonGroupItems();
-            const isGroupItem = currentItem.hasAttribute("ui5-suggestion-item-group");
+            const isGroupItem = currentItem?.hasAttribute("ui5-suggestion-item-group");
             if (!currentItem) {
                 return;
             }
             this.component.focused = false;
-            const selectedItem = this._getItems()[this.selectedItemIndex];
+            const selectedItem = this.visibleItems[this.selectedItemIndex];
             this.accInfo = {
                 isGroup: isGroupItem,
                 currentPos: items.indexOf(currentItem) + 1,
@@ -307,7 +313,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/generateHighlightedMarkup', 'sap/f/t
         _deselectItems() {
             const items = this._getItems();
             items.forEach(item => {
-                if (item.hasAttribute("ui5-suggestion-item")) {
+                if (item.hasAttribute("ui5-suggestion-item") || item.hasAttribute("ui5-suggestion-item-custom")) {
                     item.selected = false;
                 }
                 item.focused = false;
@@ -376,7 +382,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/generateHighlightedMarkup', 'sap/f/t
                 return `${Suggestions.i18nBundle.getText(i18nDefaults.LIST_ITEM_GROUP_HEADER)} ${this.accInfo.itemText}`;
             }
             const itemPositionText = Suggestions.i18nBundle.getText(i18nDefaults.LIST_ITEM_POSITION, this.accInfo.currentPos || 0, this.accInfo.listSize || 0);
-            return `${this.accInfo.additionalText} ${itemPositionText}`;
+            return `${this.accInfo.additionalText} ${itemPositionText}`.trim();
         }
         hightlightInput(text, input) {
             return generateHighlightedMarkup.f(text, input);
