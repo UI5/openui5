@@ -67,40 +67,31 @@ sap.ui.define([
 						actions: new Press()
 					});
 				},
-				iSwitchToVisualizationMode() {
-					const oRtaResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
-					const sButtonText = oRtaResourceBundle.getText("BTN_VISUALIZATION");
-					return this.waitFor({
-						controlType: "sap.m.Button",
-						matchers(oButton) {
-							return oButton.getText() === sButtonText;
-						},
-						actions: new Press(),
-						errorMessage: "Did not find Visualization-Button"
-					});
-				},
 				iSwitchToAdaptationMode() {
-					const oRtaResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
-					const sButtonText = oRtaResourceBundle.getText("BTN_ADAPTATION");
 					return this.waitFor({
-						autoWait: false,
-						controlType: "sap.m.Button",
-						matchers(oButton) {
-							return oButton.getText() === sButtonText;
+						controlType: "sap.m.Switch",
+						matchers: (oModeSwitcher) => {
+							return oModeSwitcher.getId().includes("sapUiRta_modeSwitcher");
 						},
-						actions: new Press(),
+						success(oModeSwitcher) {
+							if (!oModeSwitcher[0].getState()) {
+								new Press().executeOn(oModeSwitcher[0]);
+							}
+						},
 						errorMessage: "Did not find UI-Adaptation-Button"
 					});
 				},
 				iSwitchToNavigationMode() {
-					const oRtaResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
-					const sButtonText = oRtaResourceBundle.getText("BTN_NAVIGATION");
 					return this.waitFor({
-						controlType: "sap.m.Button",
-						matchers(oButton) {
-							return oButton.getText() === sButtonText;
+						controlType: "sap.m.Switch",
+						matchers: (oModeSwitcher) => {
+							return oModeSwitcher.getId().includes("sapUiRta_modeSwitcher") && oModeSwitcher.getState() === true;
 						},
-						actions: new Press(),
+						success(oModeSwitcher) {
+							if (oModeSwitcher[0].getState()) {
+								new Press().executeOn(oModeSwitcher[0]);
+							}
+						},
 						errorMessage: "Did not find Navigation-Button"
 					});
 				},

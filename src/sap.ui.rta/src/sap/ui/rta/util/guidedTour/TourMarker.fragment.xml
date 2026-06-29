@@ -7,6 +7,7 @@
 		class="sapUiResponsivePadding--header sapUiResponsivePadding--footer sapUiContentPadding"
 		placement="PreferredBottomOrFlip"
 		modal="true"
+		horizontalScrolling="false"
 		contentWidth="32rem"
 		initialFocus="continueButton">
 		<endButton>
@@ -23,7 +24,7 @@
 					visible="{= ${/listContent}.length > 0}"
 					items="{/listContent}"
 					id="navigationList">
-						<StandardListItem  wrapping="true" title="{title}" description="{description}" icon="{icon}" />
+					<FeedListItem senderActive="false" sender="{title}" text="{description}" icon="{icon}" />
 				</List>
 				<ProgressIndicator
 					id="progressIndicator"

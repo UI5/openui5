@@ -769,12 +769,6 @@ sap.ui.define([
 					only: ["sap/ui/rta/toolbar/FioriLike"]
 				}
 			},
-			"toolbar/OverflowToolbarButton": {
-				group: "Toolbar",
-				coverage: {
-					only: ["sap/ui/rta/toolbar/OverflowToolbarButton"]
-				}
-			},
 
 			// utilities
 			"util/adaptationStarter": {

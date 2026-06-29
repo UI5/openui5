@@ -22,7 +22,10 @@ sap.ui.define([
 			translation: oControlsModelData.translation.visible,
 			generalTour: true,
 			appVariantMenu: oControlsModelData.appVariantMenu.visible,
-			restore: oControlsModelData.restore.visible
+			restore: oControlsModelData.restore.visible,
+			highlightAllChanges: true,
+			feedback: oControlsModelData.feedbackButton.visible,
+			contextBasedAdaptations: oControlsModelData.contextBasedAdaptation.visible
 		};
 
 		// Find the index of the burger menu step
@@ -62,29 +65,29 @@ sap.ui.define([
 	 */
 
 	const oGeneralTourContent = {
-		initialStateSelectors: ["sapUIRta_toolbar_fragment--sapUiRta_adaptationSwitcherButton-button"],
+		initialStateSelectors: ["sapUIRta_toolbar_fragment--sapUiRta_modeSwitcher"],
 		steps: [
-			{
-				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_UI_ADAPTATION_BUTTON_TITLE"),
-				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_UI_ADAPTATION_BUTTON_DESCRIPTION"),
-				listContent: [],
-				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_adaptationSwitcherButton-button",
-				actionSelectors: ["sapUIRta_toolbar_fragment--sapUiRta_adaptationSwitcherButton-button"]
-			},
 			{
 				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_NAVIGATION_BUTTON_TITLE"),
 				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_NAVIGATION_BUTTON_DESCRIPTION"),
 				listContent: [],
-				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_navigationSwitcherButton-button",
-				actionSelectors: ["sapUIRta_toolbar_fragment--sapUiRta_navigationSwitcherButton-button"]
+				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_modeSwitcher",
+				actionSelectors: ["sapUIRta_toolbar_fragment--sapUiRta_modeSwitcher"],
+				action: { name: "fireChange", parameterName: "state", parameterValue: false }
 			},
 			{
-				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_SAVE_BUTTON_TITLE"),
-				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_SAVE_BUTTON_DESCRIPTION"),
+				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_UI_ADAPTATION_BUTTON_TITLE"),
+				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_UI_ADAPTATION_BUTTON_DESCRIPTION"),
 				listContent: [],
-				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_save",
-				waitForElement: true,
-				actionSelectors: ["sapUIRta_toolbar_fragment--sapUiRta_adaptationSwitcherButton-button"]
+				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_modeSwitcher",
+				actionSelectors: ["sapUIRta_toolbar_fragment--sapUiRta_modeSwitcher"],
+				action: { name: "fireChange", parameterName: "state", parameterValue: true }
+			},
+			{
+				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_EXIT_BUTTON_TITLE"),
+				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_EXIT_BUTTON_DESCRIPTION"),
+				listContent: [],
+				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_exit"
 			},
 			{
 				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_UNDO_BUTTON_TITLE"),
@@ -99,24 +102,6 @@ sap.ui.define([
 				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_redo"
 			},
 			{
-				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_BACK_BUTTON_TITLE"),
-				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_BACK_BUTTON_DESCRIPTION"),
-				listContent: [],
-				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_backButton"
-			},
-			{
-				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_ACTIVATE_VERSION_BUTTON_TITLE"),
-				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_ACTIVATE_VERSION_BUTTON_DESCRIPTION"),
-				listContent: [],
-				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_activate"
-			},
-			{
-				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_HIGHLIGHT_ALL_CHANGES_BUTTON_TITLE"),
-				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_HIGHLIGHT_ALL_CHANGES_BUTTON_DESCRIPTION"),
-				listContent: [],
-				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_highlightAllChanges"
-			},
-			{
 				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_VERSIONS_DROPDOWN_TITLE"),
 				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_VERSIONS_DROPDOWN_DESCRIPTION"),
 				listContent: [],
@@ -125,10 +110,29 @@ sap.ui.define([
 				actionSelectors: ["sapUIRta_toolbar_fragment--sapUiRta_versionButton"]
 			},
 			{
+				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_ACTIVATE_VERSION_BUTTON_TITLE"),
+				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_ACTIVATE_VERSION_BUTTON_DESCRIPTION"),
+				listContent: [],
+				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_activate"
+			},
+			{
 				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_PUBLISH_BUTTON_TITLE"),
 				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_PUBLISH_BUTTON_DESCRIPTION"),
 				listContent: [],
 				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_publishVersion"
+			},
+			{
+				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_SAVE_BUTTON_TITLE"),
+				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_SAVE_BUTTON_DESCRIPTION"),
+				listContent: [],
+				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_save",
+				actionSelectors: []
+			},
+			{
+				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_BACK_BUTTON_TITLE"),
+				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_BACK_BUTTON_DESCRIPTION"),
+				listContent: [],
+				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_backButton"
 			},
 			{
 				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_BURGER_MENU_TITLE"),
@@ -141,16 +145,34 @@ sap.ui.define([
 						icon: "sap-icon://translate"
 					},
 					{
+						id: "contextBasedAdaptations",
+						title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_CONTEXT_BASED_ADAPTATIONS_TITLE"),
+						description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_CONTEXT_BASED_ADAPTATIONS_DESCRIPTION"),
+						icon: "sap-icon://switch-views"
+					},
+					{
+						id: "feedback",
+						title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_FEEDBACK_BUTTON_TITLE"),
+						description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_FEEDBACK_BUTTON_DESCRIPTION"),
+						icon: "sap-icon://feedback"
+					},
+					{
 						id: "appVariantMenu",
 						title: oTextResources.getText("BTN_MANAGE_APPS_TXT"),
 						description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_BURGER_MENU_APP_VARIANTS"),
-						icon: "sap-icon://BusinessSuiteInAppSymbols/icon-variant-configuration"
+						icon: "sap-icon://switch-views"
 					},
 					{
 						id: "restore",
 						title: oTextResources.getText("BTN_RESTORE"),
 						description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_BURGER_MENU_RESTORE"),
 						icon: "sap-icon://reset"
+					},
+					{
+						id: "highlightAllChanges",
+						title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_HIGHLIGHT_ALL_CHANGES_BUTTON_TITLE"),
+						description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_HIGHLIGHT_ALL_CHANGES_BUTTON_DESCRIPTION"),
+						icon: "sap-icon://past"
 					},
 					{
 						id: "newFeaturesOverview",
@@ -166,24 +188,6 @@ sap.ui.define([
 					}
 				],
 				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_actionsMenu"
-			},
-			{
-				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_CONTEXT_BASED_ADAPTATIONS_TITLE"),
-				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_CONTEXT_BASED_ADAPTATIONS_DESCRIPTION"),
-				listContent: [],
-				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_contextBasedAdaptationMenu"
-			},
-			{
-				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_FEEDBACK_BUTTON_TITLE"),
-				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_FEEDBACK_BUTTON_DESCRIPTION"),
-				listContent: [],
-				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_feedback"
-			},
-			{
-				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_EXIT_BUTTON_TITLE"),
-				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_EXIT_BUTTON_DESCRIPTION"),
-				listContent: [],
-				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_exit"
 			}
 		]
 	};

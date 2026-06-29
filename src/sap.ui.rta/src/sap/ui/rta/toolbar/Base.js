@@ -40,6 +40,7 @@ sap.ui.define([
 	 */
 
 	var Base = HBox.extend("sap.ui.rta.toolbar.Base", {
+		// TODO: Change HBox to OverflowToolbar
 		metadata: {
 			library: "sap.ui.rta",
 			properties: {
@@ -64,6 +65,8 @@ sap.ui.define([
 						flexSettings: {}
 					}
 				},
+
+				appName: "string",
 
 				/** i18n bundle */
 				textResources: "object"
@@ -198,7 +201,7 @@ sap.ui.define([
 	 * @returns {Promise} A Promise which resolves after animation has been completed
 	 * @public
 	 */
-	Base.prototype.show = function(fnAdjustToolbarCallback) {
+	Base.prototype.show = function() {
 		// 1) create Promise and wait until DomRef is available
 		return new Promise(function(fnResolve) {
 			var oDelegate = {
@@ -213,9 +216,6 @@ sap.ui.define([
 		}.bind(this))
 		// 2) animate DomRef
 		.then(function() {
-			if (fnAdjustToolbarCallback && typeof fnAdjustToolbarCallback === "function") {
-				fnAdjustToolbarCallback();
-			}
 			return this.animation
 				? Animation.waitTransition(this.getDomRef(), this.addStyleClass.bind(this, "is_visible"))
 				: Promise.resolve();

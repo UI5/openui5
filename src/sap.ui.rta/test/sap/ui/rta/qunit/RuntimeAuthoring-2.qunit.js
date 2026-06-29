@@ -399,7 +399,7 @@ sap.ui.define([
 			assert.strictEqual(oStopCutPasteStub.callCount, 1, "the cut paste was stopped");
 
 			// simulate mode change from toolbar
-			this.oRta.getToolbar().fireModeChange({ item: { getKey() {return "adaptation";} } });
+			this.oRta.getToolbar().fireModeChange({ state: true });
 			assert.ok(this.oRta._oDesignTime.getEnabled(), "in adaption mode the designTime property enabled is true again");
 			assert.strictEqual(oSetBlockedStub.callCount, 2, "setBlocked was called again");
 			assert.strictEqual(oSetBlockedStub.lastCall.args[0], true, "blocked is set to true");
@@ -502,7 +502,7 @@ sap.ui.define([
 			assert.strictEqual(this.oRta._oToolbarControlsModel.getProperty("/appVariantMenu/manageApps/visible"), false, "then the 'AppVariant Overview' Icon Button is not visible");
 			assert.strictEqual(this.oRta._oToolbarControlsModel.getProperty("/appVariantMenu/saveAs/enabled"), false, "then the saveAs Button is not enabled");
 			assert.strictEqual(this.oRta._oToolbarControlsModel.getProperty("/appVariantMenu/saveAs/visible"), false, "then the saveAs Button is not visible");
-			assert.strictEqual(this.oRta._oToolbarControlsModel.getProperty("/modeSwitcher"), "adaptation", "then the mode is initially set to 'Adaptation'");
+			assert.strictEqual(this.oRta._oToolbarControlsModel.getProperty("/adaptationMode"), true, "then the mode is initially set to 'Adaptation'");
 			assert.strictEqual(this.oRta._oToolbarControlsModel.getProperty("/redo/enabled"), false, "then the redo is disabled");
 			assert.strictEqual(this.oRta._oToolbarControlsModel.getProperty("/undo/enabled"), false, "then the undo is disabled");
 			assert.strictEqual(this.oRta._oToolbarControlsModel.getProperty("/restore/enabled"), false, "then the reset button is disabled");

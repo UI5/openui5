@@ -705,6 +705,7 @@ sap.ui.define([
 			.catch(function(vError) {
 				assert.ok(vError, "then the promise is rejected");
 				assert.strictEqual(vError.message, "Root control not found", "with the correct Error");
+				oRuntimeAuthoring.destroy();
 			});
 		});
 
@@ -730,6 +731,7 @@ sap.ui.define([
 				assert.strictEqual(oSetAdaptationLayerSpy.callCount, 1, "the adaptation layer is not set again");
 				assert.strictEqual(oDesignTimeAddRootElementSpy.callCount, 1, "the the DesignTime is not started again");
 				assert.strictEqual(oError.message, "RuntimeAuthoring is already started", "the start function rejects");
+				oRuntimeAuthoring.destroy();
 			});
 		});
 
@@ -777,6 +779,7 @@ sap.ui.define([
 			return oRuntimeAuthoring.start().then(function() {
 				assert.ok(oRuntimeAuthoring, "then RuntimeAuthoring is created");
 				assert.strictEqual(document.querySelectorAll(".sapUiRtaToolbar").length, 0, "then Toolbar is not visible.");
+				oRuntimeAuthoring.destroy();
 			});
 		});
 
@@ -819,6 +822,7 @@ sap.ui.define([
 					scenario: "scenario"
 				}
 			);
+			oRuntimeAuthoring.destroy();
 		});
 
 		QUnit.test("when starting RTA with additional properties in the sessionStorage", function(assert) {
@@ -840,6 +844,7 @@ sap.ui.define([
 			// the getter will create the commandStack if it does not exist, so we have to use getProperty instead
 			assert.strictEqual(oRuntimeAuthoring.getProperty("commandStack"), undefined, "then the commandStack property is not set");
 			assert.strictEqual(oAssertSpy.callCount, 0, "then no assertion error is logged");
+			oRuntimeAuthoring.destroy();
 		});
 	});
 

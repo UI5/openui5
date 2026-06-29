@@ -283,7 +283,8 @@ sap.ui.define([
 		assert.strictEqual(oDiscardButton.getVisible(), mProperties.bDraft, "the discard button is visible");
 
 		var oPublishButton = this.oToolbar.getControl("publishVersion");
-		assert.strictEqual(oPublishButton.getVisible(), !mProperties.bDraft && mProperties.bPublish, "the publish button is visible");
+		assert.strictEqual(oPublishButton.getVisible(), mProperties.bPublish, "the publish button is visible");
+		assert.strictEqual(oPublishButton.getEnabled(), !mProperties.bDraft && mProperties.bPublish, "the publish button is enabled");
 	}
 
 	QUnit.module("Formatting of direct Toolbar content", {

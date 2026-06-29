@@ -188,12 +188,12 @@ sap.ui.define([
 		return sText;
 	};
 
-	Versioning.prototype.formatPublishVersionVisibility = function(bPublishVisible, bVersioningEnabled, sDisplayedVersion, sModeSwitcher) {
-		return bPublishVisible && bVersioningEnabled && sDisplayedVersion !== Version.Number.Draft && sModeSwitcher === "adaptation";
+	Versioning.prototype.formatPublishVersionEnabled = function(bPublishVisible, sDisplayedVersion) {
+		return bPublishVisible && sDisplayedVersion !== Version.Number.Draft;
 	};
 
-	Versioning.prototype.formatDiscardDraftVisible = function(sDisplayedVersion, bVersioningEnabled, sModeSwitcher) {
-		return sDisplayedVersion === Version.Number.Draft && bVersioningEnabled && sModeSwitcher === "adaptation";
+	Versioning.prototype.formatDiscardDraftVisible = function(sDisplayedVersion, bVersioningEnabled, bAdaptationMode) {
+		return sDisplayedVersion === Version.Number.Draft && bVersioningEnabled && bAdaptationMode;
 	};
 
 	// ------ Dialog handling ------

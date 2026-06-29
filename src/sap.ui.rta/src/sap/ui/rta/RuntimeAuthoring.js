@@ -167,7 +167,7 @@ sap.ui.define([
 					group: "restoreAfterReload"
 				},
 
-				/** Defines view state of key user adaptation. Possible values: adaptation, navigation, visualization */
+				/** Defines view state of key user adaptation. Possible values: adaptation, navigation */
 				mode: {
 					type: "string",
 					defaultValue: "adaptation"
@@ -772,7 +772,7 @@ sap.ui.define([
 				this.getPluginManager().handleStopCutPaste();
 			}
 
-			this._oToolbarControlsModel.setProperty("/modeSwitcher", sNewMode);
+			this._oToolbarControlsModel.setProperty("/adaptationMode", sNewMode === "adaptation");
 			if (sNewMode !== "adaptation") {
 				this._oToolbarControlsModel.setProperty("/highlightAllChanges/enabled", false);
 			} else {
@@ -830,6 +830,7 @@ sap.ui.define([
 		if (this.getRootControlInstance()) {
 			addOrRemoveStyleClass(this.getRootControlInstance(), false);
 		}
+		toggleAdaptationBorder(this, false);
 
 		this.setCommandStack(null);
 
@@ -1723,9 +1724,11 @@ sap.ui.define([
 		this.bPersistedDataTranslatable = false;
 
 		const bChangesNeedHardReload = this._bSavedChangesNeedReload || await this._oSerializer.needsReload();
+		const oAppComponent = FlexUtils.getAppComponentForControl(this.getRootControlInstance());
 		this._oToolbarControlsModel = new JSONModel({
+			appName: oAppComponent.getManifestObject().getEntry("/sap.app/title"),
 			changesNeedHardReload: bChangesNeedHardReload,
-			modeSwitcher: this.getMode(),
+			adaptationMode: this.getMode() === "adaptation",
 			undo: {
 				enabled: false
 			},
@@ -1762,9 +1765,6 @@ sap.ui.define([
 			contextBasedAdaptation: {
 				visible: mButtonsAvailability.contextBasedAdaptationAvailable,
 				enabled: mButtonsAvailability.contextBasedAdaptationAvailable
-			},
-			actionsMenuButton: {
-				enabled: true
 			},
 			feedbackButton: {
 				visible: bFeedbackButtonVisible
@@ -1895,12 +1895,12 @@ sap.ui.define([
 	}
 
 	function onModeChange(oEvent) {
-		this.setMode(oEvent.getParameter("item").getKey());
+		this.setMode(oEvent.getParameter("state") === true ? "adaptation" : "navigation");
 	}
 
 	function onHighlightAllChanges(oEvent) {
 		if (this.getChangeVisualization && this.getChangeVisualization().getInitialized()) {
-			this.getChangeVisualization().setShowAllChanges(oEvent.getParameter("pressed"));
+			this.getChangeVisualization().setShowAllChanges(oEvent.getParameter("item").getSelected());
 		}
 	}
 
