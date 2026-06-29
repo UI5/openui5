@@ -248,5 +248,15 @@
         "text": " We've now fixed an issue of incorrect heading level added on the UploadSetwithTable FilePreviewDialog"
       }
     ]
+  },
+  "1.149.1": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "03e3a9a134dbb3ad1dfb7728999594d3d1871468",
+        "type": "FIX",
+        "text": " sap.m.ComboBox: adjust failing tests in FF"
+      }
+    ]
   }
 }

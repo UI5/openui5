@@ -13,5 +13,15 @@
         "text": " sap.ui.layout.HorizontalLayout: adjust acc test page"
       }
     ]
+  },
+  "1.149.1": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "1fe0ecd137f585004f1227267217d71690b11bcc",
+        "type": "FIX",
+        "text": " sap.ui.layout.ResponsiveFlowLayout: fixed z-index issue"
+      }
+    ]
   }
 }
