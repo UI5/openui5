@@ -1,2 +1,14 @@
-sap.ui.define(["exports","sap/f/thirdparty/parameters-bundle.css2","sap/f/thirdparty/ListItemGroup"],function(e,r,t){"use strict";function s(e){const s=e?.items||o;return r.jsxs("ul",{role:"group",class:"ui5-group-li-root",onDragEnter:this._ondragenter,onDragOver:this._ondragover,onDrop:this._ondrop,onDragLeave:this._ondragleave,children:[this.hasHeader&&r.jsx(t.ListItemGroupHeader,{focused:this.focused,part:"header",accessibleRole:t.ListItemAccessibleRole.Group,wrappingType:this.getGroupHeaderWrapping(),children:this.hasFormattedHeader?r.jsx("slot",{name:"header"}):this.headerText}),s.call(this),r.jsx(t.DropIndicator,{orientation:"Horizontal",ownerReference:this})]})}function o(){return r.jsx("slot",{})}e.ListItemGroupTemplate=s});
-//# sourceMappingURL=ListBoxItemGroupTemplate.js.map
+sap.ui.define(['exports', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/ListItemGroup'], (function (exports, jsxRuntime, ListItemGroup) { 'use strict';
+
+    function ListItemGroupTemplate(hooks) {
+        const items = hooks?.items || defaultItems;
+        return (jsxRuntime.jsxs("ul", { role: "group", class: "ui5-group-li-root", onDragEnter: this._ondragenter, onDragOver: this._ondragover, onDrop: this._ondrop, onDragLeave: this._ondragleave, children: [this.hasHeader &&
+                    jsxRuntime.jsx(ListItemGroup.ListItemGroupHeader, { focused: this.focused, part: "header", accessibleRole: "Group", wrappingType: this.getGroupHeaderWrapping(), children: this.hasFormattedHeader ? jsxRuntime.jsx("slot", { name: "header" }) : this.headerText }), items.call(this), jsxRuntime.jsx(ListItemGroup.DropIndicator, { orientation: "Horizontal", ownerReference: this })] }));
+    }
+    function defaultItems() {
+        return jsxRuntime.jsx("slot", {});
+    }
+
+    exports.ListItemGroupTemplate = ListItemGroupTemplate;
+
+}));

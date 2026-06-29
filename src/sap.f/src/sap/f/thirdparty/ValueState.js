@@ -1,2 +1,7 @@
-sap.ui.define(["exports"],function(i){"use strict";var e=(i=>(i.None="None",i.Positive="Positive",i.Critical="Critical",i.Negative="Negative",i.Information="Information",i))(e||{});i.o=e});
-//# sourceMappingURL=ValueState.js.map
+sap.ui.define(['exports'], (function (exports) { 'use strict';
+
+	var o=(i=>(i.None="None",i.Positive="Positive",i.Critical="Critical",i.Negative="Negative",i.Information="Information",i))(o||{});
+
+	exports.o = o;
+
+}));
