@@ -287,6 +287,7 @@ sap.ui.define([
 		this.stub(oLabel, "clone").returns("myClone");
 		this.stub(oLabel, "getRequired").returns("myRequired");
 		this.stub(oLabel, "getAccessibilityInfo").returns("myAccInfo");
+		this.stub(oLabel, "getTooltip_AsString").returns("myTooltip");
 		this.spy(oLabel, "setIsInColumnHeaderContext");
 
 		assert.strictEqual(oHeaderLabel.getText(), "myHeaderText", "#getText calls Label#getText");
@@ -295,6 +296,11 @@ sap.ui.define([
 		assert.deepEqual(oHeaderLabel.getAccessibilityInfo(), "myAccInfo", "#getAccessibilityInfo calls Label#getAccessibilityInfo");
 		oHeaderLabel.setIsInColumnHeaderContext(true);
 		assert.ok(oLabel.setIsInColumnHeaderContext.calledWithExactly(true), "Label#setIsInColumnHeaderContext called with true");
+		assert.strictEqual(oHeaderLabel.getTooltip_AsString(), "myTooltip",
+			"#getTooltip_AsString returns the tooltip when it differs from the label text");
+		oLabel.getTooltip_AsString.returns("myHeaderText");
+		assert.strictEqual(oHeaderLabel.getTooltip_AsString(), "",
+			"#getTooltip_AsString returns empty string when the tooltip equals the label text");
 
 		oHeaderLabel.destroy();
 		assert.strictEqual(oHeaderLabel.getText(), undefined, "Destroyed: #getText call");

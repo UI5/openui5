@@ -55,20 +55,6 @@ sap.ui.define([
 	// shortcut for sap.m.PageBackgroundDesign
 	var PageBackgroundDesign = mobileLibrary.PageBackgroundDesign;
 
-	/**
-	 * In some tests that are using fake timers, it might happen that a rendering task is queued by
-	 * creating a fake timer. Without an appropriate clock.tick call, this timer might not execute
-	 * and a later nextUIUpdate with real timers would wait endlessly.
-	 * To prevent this, after each such test a sync rendering is executed which will clear any pending
-	 * fake timer. The rendering itself should not be needed by the tests, if they are properly
-	 * isolated.
-	 *
-	 * This function is used as an indicator for such cases. It's just a wrapper around nextUIUpdate.
-	 */
-	function clearPendingUIUpdates(clock) {
-		return nextUIUpdate(clock);
-	}
-
 	// create and add app
 	var oApp = new App("myApp", {initialPage: "toolPage"});
 	oApp.placeAt("qunit-fixture");
@@ -532,7 +518,7 @@ sap.ui.define([
 			this.toolPage = getToolPage();
 			oPage.addContent(this.toolPage);
 
-			await nextUIUpdate(); // no fake timer active in beforeEach
+			await nextUIUpdate();
 		},
 		afterEach: function () {
 			this.toolPage.destroy();
@@ -553,7 +539,7 @@ sap.ui.define([
 		assert.ok(this.toolPage.$().hasClass('sapTntToolPageWithSideContent'), "sapTntToolPageWithSideContent class is set");
 
 		this.toolPage.destroySideContent();
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		assert.notOk(this.toolPage.$().hasClass('sapTntToolPageWithSideContent'), "sapTntToolPageWithSideContent class is not set");
 	});
@@ -564,7 +550,7 @@ sap.ui.define([
 
 	QUnit.test("header and subheader", async function (assert) {
 		this.toolPage.setSubHeader(new ToolHeader());
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		assert.strictEqual(this.toolPage.$().find(".sapTntToolPageHeader").length, 2, "header and subheader are rendered");
 	});
@@ -573,19 +559,19 @@ sap.ui.define([
 		var oToolHeader = new ToolHeader();
 
 		this.toolPage.setSubHeader(oToolHeader);
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		assert.strictEqual(this.toolPage.$().find(".sapTntToolPageHeader").length, 2, "header and subheader are rendered");
 		assert.strictEqual(this.toolPage.$().find(".sapTntToolPageHeaderWrapper.sapTntToolPageHeaderWithSubHeaderWrapper").length, 1, "wrapper has an extra css class");
 
 		oToolHeader.setVisible(false);
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		assert.strictEqual(this.toolPage.$().find(".sapTntToolPageHeader").length, 1, "subheader is not rendered");
 		assert.strictEqual(this.toolPage.$().find(".sapTntToolPageHeaderWrapper.sapTntToolPageHeaderWithSubHeaderWrapper").length, 0, "wrapper does not have an extra css class");
 
 		oToolHeader.setVisible(true);
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 		assert.strictEqual(this.toolPage.$().find(".sapTntToolPageHeader").length, 2, "header and subheader are rendered");
 		assert.strictEqual(this.toolPage.$().find(".sapTntToolPageHeaderWrapper.sapTntToolPageHeaderWithSubHeaderWrapper").length, 1, "wrapper has an extra css class");
 	});
@@ -596,23 +582,21 @@ sap.ui.define([
 		assert.strictEqual(this.toolPage.$().find(".sapTntToolPageAsideContent").length, 1, "sapTntToolPageAsideContent is rendered");
 
 		oSideNavigation.setVisible(false);
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		assert.strictEqual(this.toolPage.$().find(".sapTntToolPageAsideContent").length, 0, "sapTntToolPageAsideContent is not rendered");
 
 		oSideNavigation.setVisible(true);
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 		assert.strictEqual(this.toolPage.$().find(".sapTntToolPageAsideContent").length, 1, "sapTntToolPageAsideContent is rendered");
 	});
 
-	QUnit.test("toggleSideContentMode", async function (assert) {
+	QUnit.test("toggleSideContentMode", function (assert) {
 		assert.strictEqual(this.toolPage.getSideExpanded(), true, "ToolPage should be expanded");
 
 		this.toolPage.toggleSideContentMode();
 
 		assert.strictEqual(this.toolPage.getSideExpanded(), false, "ToolPage should be collapsed");
-
-		await clearPendingUIUpdates(this.clock);
 	});
 
 	QUnit.test("setSideExpanded", async function (assert) {
@@ -623,7 +607,7 @@ sap.ui.define([
 
 		this.toolPage.setSideExpanded(false);
 
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		assert.equal(this.toolPage.$('aside').parent().hasClass('sapTntToolPageAsideCollapsed'), true, "ToolPage should be collapsed");
 		assert.strictEqual(this.toolPage.getSideExpanded(), false, "ToolPage should be collapsed");
@@ -632,7 +616,7 @@ sap.ui.define([
 	QUnit.test("#setContentBackgroundDesign() to 'Solid'", async function (assert) {
 		// Act
 		this.toolPage.setContentBackgroundDesign(PageBackgroundDesign.Solid);
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		// Assert
 		assert.ok(this.toolPage.$("main").hasClass("sapTntToolPageMainBackground-Solid"), "Correct class for Solid Background should be set");
@@ -641,7 +625,7 @@ sap.ui.define([
 	QUnit.test("#setContentBackgroundDesign() to 'Transparent'", async function (assert) {
 		// Act
 		this.toolPage.setContentBackgroundDesign(PageBackgroundDesign.Transparent);
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		// Assert
 		assert.ok(this.toolPage.$("main").hasClass("sapTntToolPageMainBackground-Transparent"), "Correct class for Transparent Background should be set");
@@ -650,7 +634,7 @@ sap.ui.define([
 	QUnit.test("#setContentBackgroundDesign() to 'List'", async function (assert) {
 		// Act
 		this.toolPage.setContentBackgroundDesign(PageBackgroundDesign.List);
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		// Assert
 		assert.ok(this.toolPage.$("main").hasClass("sapTntToolPageMainBackground-List"), "Correct class for List Background should be set");
@@ -658,69 +642,58 @@ sap.ui.define([
 
 	QUnit.module("Screen size", {
 		beforeEach: async function () {
+			this._sFakeRangeName = "M";
+			this.setMediaRange = (sName) => {
+				this._sFakeRangeName = sName;
+			};
+			this.stub(Device.media, "getCurrentRange").callsFake(() => {
+				return { name: this._sFakeRangeName };
+			});
+
 			this.toolPage = getToolPage();
 			oPage.addContent(this.toolPage);
-			this._originalInnerWidth = window.innerWidth;
 
-			await nextUIUpdate(); // no fake timer active in beforeEach
+			await nextUIUpdate();
 		},
 		afterEach: function () {
 			this.toolPage.destroy();
 			this.toolPage = null;
-			// Restore original innerWidth
-			Object.defineProperty(window, 'innerWidth', {
-				writable: true,
-				configurable: true,
-				value: this._originalInnerWidth
-			});
 		}
 	});
 
 	QUnit.test("Layout S - default sideExpanded property", async function (assert) {
-		// Arrange - Override window.innerWidth for Layout S (up to 599px)
-		Object.defineProperty(window, 'innerWidth', {
-			writable: true,
-			configurable: true,
-			value: 400
-		});
+		// Arrange - Simulate Layout S (up to 599px)
+		this.setMediaRange("S");
 
 		// Recreate ToolPage to trigger the layout update on init
 		this.toolPage.destroy();
 		this.toolPage = null;
 		this.toolPage = getToolPage();
 		oPage.addContent(this.toolPage);
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		// Assert
 		assert.strictEqual(this.toolPage.getSideExpanded(), false, "ToolPage should be collapsed in layout S");
 	});
 
 	QUnit.test("Layout M - default sideExpanded property", async function (assert) {
-		// Arrange - Override window.innerWidth for Layout M (600px - 1023px)
-		Object.defineProperty(window, 'innerWidth', {
-			writable: true,
-			configurable: true,
-			value: 800
-		});
+		// Arrange - Simulate Layout M (600px - 1023px)
+		this.setMediaRange("M");
 
 		// Recreate ToolPage to trigger the layout update on init
 		this.toolPage.destroy();
 		this.toolPage = null;
 		this.toolPage = getToolPage();
 		oPage.addContent(this.toolPage);
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		// Assert
 		assert.strictEqual(this.toolPage.getSideExpanded(), true, "ToolPage should be expanded in Layout M");
 	});
 
 	QUnit.test("Layout S - changed sideExpanded property + resize", async function (assert) {
-		// Arrange - Override window.innerWidth for Layout S (up to 599px)
-		Object.defineProperty(window, 'innerWidth', {
-			writable: true,
-			configurable: true,
-			value: 400
-		});
+		// Arrange - Simulate Layout S (up to 599px)
+		this.setMediaRange("S");
 
 		// Recreate ToolPage to trigger the layout update on init
 		this.toolPage.destroy();
@@ -728,48 +701,32 @@ sap.ui.define([
 		this.toolPage = getToolPage();
 		this.toolPage.setSideExpanded(true);
 		oPage.addContent(this.toolPage);
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		// Assert
 		assert.strictEqual(this.toolPage.getSideExpanded(), true, "ToolPage should be expanded in Layout M");
 
-		// Arrange - Override window.innerWidth for Layout M (600px - 1023px)
-		Object.defineProperty(window, 'innerWidth', {
-			writable: true,
-			configurable: true,
-			value: 400
-		});
-
-		// Trigger the update layout settings
+		// Arrange - Stay in Layout S and trigger the update layout settings
+		this.setMediaRange("S");
 		this.toolPage._updateLayoutSettings();
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		// Assert
 		assert.strictEqual(this.toolPage.getSideExpanded(), true, "ToolPage should be expanded if layout is changed to S");
 
 
-		// Arrange - Override window.innerWidth for Layout M (600px - 1023px)
-		Object.defineProperty(window, 'innerWidth', {
-			writable: true,
-			configurable: true,
-			value: 800
-		});
-
-		// Trigger the update layout settings
+		// Arrange - Switch to Layout M (600px - 1023px)
+		this.setMediaRange("M");
 		this.toolPage._updateLayoutSettings();
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		// Assert
 		assert.strictEqual(this.toolPage.getSideExpanded(), true, "ToolPage should be expanded in Layout M, when coming back from Layout S");
 	});
 
 	QUnit.test("Layout M - changed sideExpanded property + resize", async function (assert) {
-		// Arrange - Override window.innerWidth for Layout M (600px - 1023px)
-		Object.defineProperty(window, 'innerWidth', {
-			writable: true,
-			configurable: true,
-			value: 800
-		});
+		// Arrange - Simulate Layout M (600px - 1023px)
+		this.setMediaRange("M");
 
 		// Recreate ToolPage to trigger the layout update on init
 		this.toolPage.destroy();
@@ -777,52 +734,34 @@ sap.ui.define([
 		this.toolPage = getToolPage();
 		this.toolPage.setSideExpanded(false);
 		oPage.addContent(this.toolPage);
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		// Assert
 		assert.strictEqual(this.toolPage.getSideExpanded(), false, "ToolPage should be collapsed in Layout M");
 
-		// Arrange - Override window.innerWidth for Layout M (600px - 1023px)
-		Object.defineProperty(window, 'innerWidth', {
-			writable: true,
-			configurable: true,
-			value: 400
-		});
-
-		// Trigger the update layout settings
+		// Arrange - Switch to Layout S (up to 599px)
+		this.setMediaRange("S");
 		this.toolPage._updateLayoutSettings();
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		// Assert
 		assert.strictEqual(this.toolPage.getSideExpanded(), false, "ToolPage should be collapsed if layout is changed to S");
 
 
-		// Arrange - Override window.innerWidth for Layout M (600px - 1023px)
-		Object.defineProperty(window, 'innerWidth', {
-			writable: true,
-			configurable: true,
-			value: 800
-		});
-
-		// Trigger the update layout settings
+		// Arrange - Switch back to Layout M (600px - 1023px)
+		this.setMediaRange("M");
 		this.toolPage._updateLayoutSettings();
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		// Assert
 		assert.strictEqual(this.toolPage.getSideExpanded(), false, "ToolPage should be collapsed in Layout M, when coming back from Layout S");
 	});
 
 		QUnit.test("Layout S to M and back to S - remember expanded state", async function (assert) {
-		// Arrange - Override window.innerWidth for Layout M (600px - 1023px)
-		Object.defineProperty(window, 'innerWidth', {
-			writable: true,
-			configurable: true,
-			value: 800
-		});
-
-		// Trigger the update layout settings
+		// Arrange - Simulate Layout M (600px - 1023px)
+		this.setMediaRange("M");
 		this.toolPage._updateLayoutSettings();
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		// Assert
 		assert.strictEqual(this.toolPage.getSideExpanded(), true, "ToolPage should be expanded in Layout M");
@@ -832,16 +771,10 @@ sap.ui.define([
 		// Expand side content
 		this.toolPage.setSideExpanded(true);
 
-		// Arrange - Override window.innerWidth for Layout M (600px - 1023px)
-		Object.defineProperty(window, 'innerWidth', {
-			writable: true,
-			configurable: true,
-			value: 400
-		});
-
-		// Trigger the update layout settings
+		// Arrange - Switch to Layout S (up to 599px)
+		this.setMediaRange("S");
 		this.toolPage._updateLayoutSettings();
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		// Assert
 		assert.strictEqual(this.toolPage.getSideExpanded(), true, "ToolPage should be expanded as it was before resizing to Layout S");
@@ -849,16 +782,10 @@ sap.ui.define([
 		// Collapse side content
 		this.toolPage.setSideExpanded(false);
 
-		// Arrange - Override window.innerWidth for Layout M (600px - 1023px)
-		Object.defineProperty(window, 'innerWidth', {
-			writable: true,
-			configurable: true,
-			value: 800
-		});
-
-		// Trigger the update layout settings
+		// Arrange - Switch back to Layout M (600px - 1023px)
+		this.setMediaRange("M");
 		this.toolPage._updateLayoutSettings();
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		// Assert
 		assert.strictEqual(this.toolPage.getSideExpanded(), false, "ToolPage should be collapsed as it was before resizing to Layout  M");
@@ -878,11 +805,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Side navigation auto-closes when item is selected on small screen", async function (assert) {
-		Object.defineProperty(window, 'innerWidth', {
-			writable: true,
-			configurable: true,
-			value: 400
-		});
+		this.setMediaRange("S");
 
 		// Recreate ToolPage to trigger the layout update on init
 		this.toolPage.destroy();
@@ -890,7 +813,7 @@ sap.ui.define([
 		this.toolPage = getToolPage();
 		this.toolPage.setSideExpanded(true); // Explicitly expand for testing
 		oPage.addContent(this.toolPage);
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		const oSideNavigation = this.toolPage.getSideContent();
 		const oNavigationList = oSideNavigation.getItem();
@@ -902,18 +825,14 @@ sap.ui.define([
 
 		// Act
 		oSideNavigation.fireItemSelect({ item: oFirstChildItem });
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		// Assert
 		assert.strictEqual(this.toolPage.getSideExpanded(), false, "ToolPage should be collapsed after item selection on small screen");
 	});
 
 	QUnit.test("Side navigation does NOT auto-close on large screen", async function (assert) {
-		Object.defineProperty(window, 'innerWidth', {
-			writable: true,
-			configurable: true,
-			value: 800
-		});
+		this.setMediaRange("M");
 
 		// Recreate ToolPage to trigger the layout update on init
 		this.toolPage.destroy();
@@ -921,7 +840,7 @@ sap.ui.define([
 		this.toolPage = getToolPage();
 		this.toolPage.setSideExpanded(true);
 		oPage.addContent(this.toolPage);
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		const oSideNavigation = this.toolPage.getSideContent();
 		const oNavigationList = oSideNavigation.getItem();
@@ -933,7 +852,7 @@ sap.ui.define([
 
 		// Act
 		oSideNavigation.fireItemSelect({ item: oFirstChildItem });
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		// Assert
 		assert.strictEqual(this.toolPage.getSideExpanded(), true, "ToolPage should remain expanded after item selection on large screen");
@@ -952,7 +871,7 @@ sap.ui.define([
 
 		oPage.addContent(oToolPage);
 
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		// Assert
 		assert.ok(document.getElementById("test-header"), "The header is rendered.");

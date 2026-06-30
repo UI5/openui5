@@ -311,6 +311,44 @@ sap.ui.define([
 		runAllTimersAndRestore(this.clock);
 	});
 
+	QUnit.test("Re-render syncs the progress navigator's current step with the step container's scroll position", async function (assert) {
+		// Arrange: build a wizard, navigate to the last step so the progress navigator
+		// is at step 4 with the step container scrolled to step 4 position. This mirrors
+		// the dialog re-open scenario from the Wizard.html "Dialog Integration Test" sample,
+		// where the step-container is recreated with scrollTop = 0 but the navigator's
+		// current step is preserved on the control instance.
+
+		//Arrange
+		var oWizard = new Wizard({
+			steps: [new WizardStep({ validated: true }), new WizardStep({ validated: true }),
+				new WizardStep({ validated: true }), new WizardStep({ validated: true })]
+		});
+
+		oWizard.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		//Act - go to the last step
+		oWizard.nextStep().nextStep().nextStep();
+
+		// Wait for goToStep animations to complete so _bScrollLocked is released and the navigator settles on the last step.
+		await new Promise(function (resolve) {
+			setTimeout(resolve, Wizard.CONSTANTS.ANIMATION_TIME + 50);
+		});
+
+		var oProgressNavigator = oWizard._getProgressNavigator();
+		assert.strictEqual(oProgressNavigator.getCurrentStep(), 4, "The current step is the last one");
+
+		// Act - simulate the dialog-reopen flow where the step container is recreated with scrollTop = 0 while _iCurrentStep is preserved.
+		oWizard.getDomRef("step-container").scrollTop = 0;
+		oWizard._syncProgressNavigatorToScroll();
+
+		// Assert
+		assert.strictEqual(oProgressNavigator.getCurrentStep(), 1, "navigator current step follows the reset scroll position");
+
+		// Cleanup
+		oWizard.destroy();
+	});
+
 	QUnit.test("goToStep should be applied on id, containing with special symbols (::)", async function (assert) {
 		var oWizard = new Wizard({
 			id: "wizard::complex::id",

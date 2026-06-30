@@ -295,6 +295,41 @@ sap.ui.define([
 
 			this._attachScrollHandler();
 			this._renderPageMode();
+			this._syncProgressNavigatorToScroll();
+		};
+
+		/**
+		 * Synchronizes the progress navigator's currently displayed step with the actual
+		 * scroll position of the step container. After a re-render (for example when the
+		 * Wizard is shown again inside a re-opened Dialog) the step-container has a fresh
+		 * DOM with <code>scrollTop = 0</code>, while the progress navigator's current step
+		 * is preserved on the control instance. Without this sync the navigator would
+		 * highlight a step that is not visible until the user scrolls.
+		 * @private
+		 */
+		Wizard.prototype._syncProgressNavigatorToScroll = function () {
+			if (this.getRenderMode() === WizardRenderMode.Page || this._bScrollLocked) {
+				return;
+			}
+
+			var oContainer = this.getDomRef("step-container");
+			if (!oContainer) {
+				return;
+			}
+
+			var oProgressNavigator = this._getProgressNavigator(),
+				iScrollTop = oContainer.scrollTop,
+				iThreshold = 100;
+
+			while (oProgressNavigator.getCurrentStep() > 1) {
+				var oCurrentStep = this._aStepPath[oProgressNavigator.getCurrentStep() - 1],
+					oCurrentStepDOM = oCurrentStep && oCurrentStep.getDomRef();
+
+				if (!oCurrentStepDOM || iScrollTop + iThreshold > oCurrentStepDOM.offsetTop) {
+					break;
+				}
+				oProgressNavigator.previousStep();
+			}
 		};
 
 		/**
