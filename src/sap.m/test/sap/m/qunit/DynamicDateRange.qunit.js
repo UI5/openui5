@@ -2027,7 +2027,7 @@ sap.ui.define([
 		// simulate entering of 0
 		oInnerInput = Element.getElementById(document.querySelector(".sapMStepInput").id);
 		oInnerInput.setValue(0);
-		oInnerInput._verifyValue();
+		oInnerInput._getNumericInput()._verifyValue();
 		await nextUIUpdate();
 
 		// close the DDR option

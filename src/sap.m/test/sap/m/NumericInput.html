@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+
+		<title>NumericInput - sap.m</title>
+
+		<script src="shared-config.js"></script>
+		<script id="sap-ui-bootstrap"
+				src="../../../resources/sap-ui-core.js"
+				data-sap-ui-async="true"
+				data-sap-ui-compatVersion="edge"
+				data-sap-ui-libs="sap.m, sap.ui.layout"
+				data-sap-ui-onInit="module:local/NumericInput"
+				data-sap-ui-resourceRoots='{
+					"local": "./",
+					"qunit.internal.acc": "../../../test-resources/sap/ui/core/qunit/internal/acc"
+				}'>
+		</script>
+
+		<script id="stepModeSamples" type="xml/view">
+		<mvc:View
+			controllerName="stepModeSamplesController"
+			xmlns:core="sap.ui.core"
+			xmlns:mvc="sap.ui.core.mvc"
+			xmlns="sap.m"
+			xmlns:f="sap.ui.layout.form">
+			<f:SimpleForm id="stepModeForm" editable="true" layout="ResponsiveGridLayout"
+			 	labelSpanXL="6"
+				labelSpanL="6"
+				labelSpanM="6"
+				labelSpanS="8">
+				<f:content>
+					<Title text="Predefined NumericInput" level="H2"></Title>
+					<Label text="Step Mode: default, NumericInput: default props"/>
+					<NumericInput id="default" change="onChange"/>
+
+					<Label text="Step Mode: 'Multiple', step: 5, larger step: 1, max: 35, min: -15"/>
+					<NumericInput id="stepOnly" stepMode="Multiple" step="5" largerStep="1" max="35" min="-15" change="onChange"/>
+
+					<Label text="Step Mode: 'Multiple', step: 5, larger step: 3, max: 35, min: -15"/>
+					<NumericInput id="stepModeMultipleOf" stepMode="Multiple" change="onChange"
+						step="5" largerStep="3"	max="35" min="-15"/>
+				</f:content>
+			</f:SimpleForm>
+			<f:SimpleForm id="stepModeCustomization" editable="true" layout="ResponsiveGridLayout"
+				labelSpanXL="6"
+				labelSpanL="6"
+				labelSpanM="6"
+				labelSpanS="8">
+				<f:content>
+					<Title text="Custom NumericInput" level="H2"></Title>
+					<Label text="Numeric Input"/>
+					<NumericInput id="customNumericInput" stepMode="Multiple"
+						step="12" largerStep="2" max="240" min="-120" change="onChange"/>
+					<Label text="Step Mode:"/>
+					<Select items="{/stepInputModes}" selectedKey="Multiple" change="onStepModelChange">
+						<core:Item key="{key}" text="{key}"/>
+					</Select>
+
+					<Label text="Minimum"/>
+					<Input id="min" value="-120" change="onMinChanged"/>
+
+					<Label text="Maximum"/>
+					<Input id="max" value="240" change="onMaxChanged"/>
+
+					<Label text="Step"/>
+					<Input id="step" value="12" change="onStepChanged"/>
+
+					<Label text="Larger step"/>
+					<Input id="largerStep" value="2" change="onLargerStepChanged"/>
+				</f:content>
+			</f:SimpleForm>
+		</mvc:View>
+		</script>
+	</head>
+	<body id="body" class="sapUiBody">
+	</body>
+</html>

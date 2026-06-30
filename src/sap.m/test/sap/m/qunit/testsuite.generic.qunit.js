@@ -93,6 +93,9 @@ sap.ui.define([
 			},
 			"sap.m.internal.CustomNumericInput": {
 				moduleName: "sap/m/TimePickerInputs"
+			},
+			"sap.m.NumericInputBase": {
+				rendererHasDependencies: true // render issues because expecting NumericInput as parent control
 			}
 		}
 	});

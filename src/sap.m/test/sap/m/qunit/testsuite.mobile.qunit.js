@@ -878,6 +878,12 @@ sap.ui.define([
 					language: "en"
 				}
 			},
+			NumericInput: {
+				title: "QUnit Page for sap.m.NumericInput",
+				ui5: {
+					language: "en-US"
+				}
+			},
 			ObjectAttribute: {
 				title: "ObjectAttribute - sap.m"
 			},

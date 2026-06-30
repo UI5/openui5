@@ -1,20 +1,20 @@
-/* ================================ */
-/* CSS for control sap.m/StepInput  */
-/* Base theme                       */
-/* ================================ */
+/* =================================== */
+/* CSS for control sap.m/NumericInput  */
+/* Base theme                          */
+/* =================================== */
 
-.sapMStepInput {
+.sapMNumericInput {
 	display: inline-block;
 	width: 100%;
 	outline: none;
 }
 
-.sapMStepInput .sapUiIcon:focus {
+.sapMNumericInput .sapUiIcon:focus {
 	outline: none;
 }
 
-.sapMStepInput {
-	.sapMStepInputIconDisabled {
+.sapMNumericInput {
+	.sapMNumericInputIconDisabled {
 		opacity: 0.5;
 		pointer-events: none;
 	}
@@ -24,7 +24,7 @@
 	}
 
 	&:focus {
-		.sapMInputBaseContentWrapper:not(.sapMInputBaseReadonlyWrapper):not(.sapMStepInputReadOnly) {
+		.sapMInputBaseContentWrapper:not(.sapMInputBaseReadonlyWrapper):not(.sapMNumericInputReadOnly) {
 			&::before {
 				content: "";
 				position: absolute;

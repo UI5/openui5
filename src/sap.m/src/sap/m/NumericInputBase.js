@@ -1,0 +1,154 @@
+/*!
+ * ${copyright}
+ */
+
+sap.ui.define([
+	"./InputBase",
+	"./Input",
+	"./NumericInputBaseRenderer",
+	"./library",
+	"sap/ui/core/format/NumberFormat",
+	"sap/ui/Device",
+	"sap/ui/events/KeyCodes",
+	"sap/ui/dom/jquery/cursorPos"],
+function(
+	InputBase,
+	Input,
+	NumericInputBaseRenderer,
+	library,
+	NumberFormat,
+	Device,
+	KeyCodes) {
+	"use strict";
+
+	var InputType = library.InputType;
+
+	/**
+	 * Constructor for a new <code>sap.m.NumericInputBase</code>.
+	 * Only used inside a NumericInput control.
+	 *
+	 * @param {string} [sId] ID for the new control, generated automatically if no ID is given
+	 * @param {object} [mSettings] Initial settings for the new control
+	 *
+	 * @class
+	 * The <code>sap.m.NumericInputBase</code> control provides functionality for a editing numbers.
+	 *
+	 * @extends sap.m.Input
+	 *
+	 * @author SAP SE
+	 * @version ${version}
+	 *
+	 * @constructor
+	 * @private
+	 * @since 1.97.0
+	 * @alias sap.m.NumericInputBase
+	 */
+	var NumericInputBase = Input.extend("sap.m.NumericInputBase", {
+		metadata: {
+			library: "sap.m"
+		},
+		renderer: NumericInputBaseRenderer
+	});
+
+	NumericInputBase.prototype.onBeforeRendering = function() {
+		InputBase.prototype.onBeforeRendering.call(this);
+
+		// The Input is handling its width in its onBeforeRendering method - if noting is set, the width is 100%.
+		// As the NumericInput is using the InputBase's onBeforeRendering method, the width must be handled here too.
+		// The real width of the NumericInput is handled from its width property, so the NumericInputBase's width should be 100%.
+		this.setWidth("100%");
+
+		this._deregisterEvents();
+	};
+
+	NumericInputBase.prototype.setValue = function(sValue) {
+		Input.prototype.setValue.apply(this, arguments);
+
+		if (this.getDomRef()) {
+			this.getDomRef("inner").setAttribute("aria-valuenow", sValue);
+		}
+
+		return this;
+	};
+
+	NumericInputBase.prototype.setType = function(sType) {
+		return Input.prototype.setType.call(this, InputType.Number);
+	};
+
+	NumericInputBase.prototype.onkeydown = function(oEvent) {
+		let sTypedValue,
+			fParsedValue;
+
+		Input.prototype.onkeydown.apply(this, arguments);
+
+		if (!Device.system.desktop
+			|| oEvent.ctrlKey
+			|| oEvent.metaKey
+			|| (oEvent.originalEvent.key && oEvent.originalEvent.key.length !== 1)) {
+			return;
+		}
+
+		const iCursorPos = this._$input.cursorPos();
+		const sDecimalSeparator = Device.system.desktop ? this._getNumberFormat().oFormatOptions.decimalSeparator : ".";
+
+		// a special key that is meant to be a decimal separator, always
+		// so replace in the input if needed
+		if (oEvent.which === KeyCodes.NUMPAD_COMMA) {
+			oEvent.preventDefault();
+
+			sTypedValue = this.getValue().substring(0, iCursorPos) + sDecimalSeparator + this.getValue().substring(iCursorPos);
+			fParsedValue = this._getNumberFormat().parse(sTypedValue);
+			if (fParsedValue || fParsedValue === 0) {
+				this.setDOMValue(sTypedValue);
+			}
+
+			return;
+		}
+
+		if (oEvent.originalEvent.key === sDecimalSeparator && iCursorPos === 0) {
+			oEvent.preventDefault();
+			this.setDOMValue(sDecimalSeparator);
+			return;
+		}
+
+		const sGroupSeparator = this._getNumberFormat().oFormatOptions.groupingSeparator;
+		const oIsMinusSignAtZeroPosition =  iCursorPos === 0 && (oEvent.which === KeyCodes.SLASH || oEvent.which === KeyCodes.NUMPAD_MINUS);
+		sTypedValue = this.getValue().substring(0, iCursorPos) + oEvent.originalEvent.key + this.getValue().substring(iCursorPos);
+		sTypedValue =  Device.system.desktop ? sTypedValue.replaceAll(sGroupSeparator, "") : sTypedValue;
+		fParsedValue = this._getNumberFormat().parse(sTypedValue);
+		if (!isKeyAllowed(oEvent.which) || (!fParsedValue && fParsedValue !== 0 && !oIsMinusSignAtZeroPosition)) {
+			oEvent.preventDefault();
+		}
+	};
+
+	var aNotAllowedKeyCodeRanges = [
+		[KeyCodes.A, KeyCodes.Z],
+		[KeyCodes.OPEN_BRACKET, KeyCodes.OPEN_BRACKET],
+		[KeyCodes.PIPE, KeyCodes.SEMICOLON],
+		[KeyCodes.GREAT_ACCENT, KeyCodes.BACKSLASH]
+	];
+
+	function isKeyAllowed(iKeyCode) {
+		return Object.values(KeyCodes).includes(iKeyCode) && !aNotAllowedKeyCodeRanges.some(function(aRange) {
+			return iKeyCode >= aRange[0] && iKeyCode <= aRange[1];
+		});
+	}
+
+	NumericInputBase.prototype._setParent = function(oParent) {
+		this._oParent = oParent;
+	};
+
+	NumericInputBase.prototype._getParent = function() {
+		return this._oParent;
+	};
+
+	NumericInputBase.prototype._getNumberFormat = function() {
+		if (!this._oNumberFormat) {
+			this._oNumberFormat = NumberFormat.getFloatInstance();
+		}
+
+		return this._oNumberFormat;
+	};
+
+	return NumericInputBase;
+});
