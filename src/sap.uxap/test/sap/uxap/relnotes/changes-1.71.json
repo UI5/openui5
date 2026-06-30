@@ -361,5 +361,15 @@
         "text": " sap.uxap.ObjectPageHeader: Improve responsive paddings"
       }
     ]
+  },
+  "1.71.79": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "0d06ceacfef360c1e67cd351139f7cedb3c5539f",
+        "type": "FIX",
+        "text": " sap.uxap.BlockBase: Fix QUnit test timing out in Chrome 147"
+      }
+    ]
   }
 }

@@ -4038,5 +4038,20 @@
         "text": " We now ensure that the uploadCompleted event passes the backend response when upload fails in the upload set"
       }
     ]
+  },
+  "1.71.79": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "6ac50f870d793d75778ffa7d80e04ab94976787b",
+        "type": "FIX",
+        "text": " sap.m.ComboBox: adjust failing tests in FF"
+      },
+      {
+        "id": "61dfeb572274b4191237dae6f5882730a2c2aba1",
+        "type": "FIX",
+        "text": " sap.m.Text: Skip unstable test in Chrome"
+      }
+    ]
   }
 }

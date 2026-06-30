@@ -1632,5 +1632,15 @@
         "text": " sap.ui.core: Harden script loading in internal bootstrap scripts"
       }
     ]
+  },
+  "1.71.79": {
+    "date": "June 2026",
+    "notes": [
+      {
+        "id": "96f6313a4df5966553059792442ac87f6f850587",
+        "type": "FIX",
+        "text": " Revert \"sap/base/util/now: Migrate performance.timing\""
+      }
+    ]
   }
 }
