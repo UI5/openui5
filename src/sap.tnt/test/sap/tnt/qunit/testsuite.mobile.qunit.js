@@ -61,7 +61,7 @@ sap.ui.define(function () {
 					only : ["sap/tnt/ToolPage"]
 				},
 				sinon: {
-					useFakeTimers: true
+					version: 4
 				}
 			},
 			"ExploredSamples": {

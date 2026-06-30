@@ -109,8 +109,12 @@ sap.ui.define([
 		await oTable.finalizePropertyHelper();
 
 		const oEngine = oTable.getEngine();
-		const oP13nControl = await oEngine.show(oTable, vChangeKeys, {
+		await oEngine.show(oTable, vChangeKeys, {
 			reset: mSettings.reset,
+			open: () => {
+				// Engine#show resolves with a control instance only if the dialog is opened.
+				oTable._bUserPersonalizationActive = true;
+			},
 			close: () => {
 				mSettings.close?.();
 				oEngine.waitForChanges(oTable).then(() => {
@@ -118,11 +122,6 @@ sap.ui.define([
 				});
 			}
 		});
-
-		if (oP13nControl) {
-			// Engine#show resolves with a control instance only if the dialog is opened.
-			oTable._bUserPersonalizationActive = true;
-		}
 	}
 
 	/**

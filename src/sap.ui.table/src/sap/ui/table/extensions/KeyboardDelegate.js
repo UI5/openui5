@@ -910,12 +910,12 @@ sap.ui.define([
 			return;
 		}
 
-		if (this._getKeyboardExtension().isInActionMode() || !oCellInfo.isOfType(CellType.ANY)) {
-			return;
-		}
-
 		if (KeyboardDelegate._isKeyCombination(oEvent, KeyCodes.SPACE)) {
 			oEvent.preventDefault(); // Prevent scrolling the page.
+		}
+
+		if (this._getKeyboardExtension().isInActionMode() || !oCellInfo.isOfType(CellType.ANY)) {
+			return;
 		}
 
 		// Shift: Start the range selection mode.
