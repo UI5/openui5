@@ -21,10 +21,15 @@
 	cursor: pointer;
 }
 
+.sapUiIcon[tabindex] {
+	padding: @sapUiContentFocusWidth;
+}
+
 .sapUiIcon:focus {
 	outline-width: @sapUiContentFocusWidth;
 	outline-style: @sapUiContentFocusStyle;
 	outline-color: @sapUiContentFocusColor;
+	outline-offset: -@sapUiContentFocusWidth;
 }
 
 .sapUiIcon::before {
