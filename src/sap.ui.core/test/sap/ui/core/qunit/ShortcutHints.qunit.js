@@ -239,6 +239,36 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.test("mouseout hides hint even when element is focused", function(assert) {
+		return waitForViewReady().then(async function(oView) {
+			var oCtrl2 = oView.byId("myControl2");
+			var oSpy = sinon.spy(ShortcutHintsMixin.prototype, "hideShortcutHint");
+
+			//render
+			oView.placeAt('qunit-fixture');
+			await nextUIUpdate();
+
+			ShortcutHintsMixin.addConfig(oCtrl2, { event: "myEvent" }, oCtrl2);
+
+			// Focus the element
+			oCtrl2.focus();
+
+			// Trigger mouseout event with relatedTarget outside the control
+			oCtrl2._handleEvent({
+				type: "mouseout",
+				target: oCtrl2.getDomRef(),
+				relatedTarget: document.body,
+				isImmediateHandlerPropagationStopped: function() {
+					return false;
+				}
+			});
+
+			assert.ok(oSpy.called, "hideShortcutHint was called on mouseout even when element is focused");
+
+			oSpy.restore();
+		});
+	});
+
 	QUnit.module("config options");
 
 	QUnit.test("use id suffix", function(assert) {
