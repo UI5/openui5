@@ -550,6 +550,11 @@ sap.ui.define([
 					type: "Unstyled"
 				}).addStyleClass("sapMPointer").addStyleClass(sTileClass + "MoreIcon");
 				this._oMoreIcon._bExcludeFromTabChain = true;
+				// JAWS synthesizes keydown/keyup on the tile root instead of the button DOM; flag
+				// the button activation so onkeyup can suppress the resulting unintended firePress.
+				this._oMoreIcon.attachPress(function() {
+					this._bScopeButtonActivated = true;
+				}, this);
 			}
 			this._oRemoveButton = this._oRemoveButton || new Button({
 				id: this.getId() + "-action-remove",
@@ -1431,9 +1436,13 @@ sap.ui.define([
 		var sAriaText = this._getAriaText(),
 			$Tile = this.$(),
 			bIsAriaUpd = false;
-		if ($Tile.attr("aria-label") !== sAriaText) {
-			$Tile.attr("aria-label", sAriaText);
-			bIsAriaUpd = true;                  // Aria Label Updated
+		if (this.hasListeners("press") || this._shouldRenderLink() || this.getGridItemRole() || this.getAriaRole()) {
+			if ($Tile.attr("aria-label") !== sAriaText) {
+				$Tile.attr("aria-label", sAriaText);
+				bIsAriaUpd = true;                  // Aria Label Updated
+			}
+		} else {
+			$Tile.removeAttr("aria-label");
 		}
 		return bIsAriaUpd;
 	};
@@ -1474,11 +1483,15 @@ sap.ui.define([
 
 			}
 
-			// The ActionMore button in IconMode tile would be fired irrespective of the pressEnabled property
-			if ((!preventPress && bFirePress && (this._bTilePress || this._isActionMoreButtonVisibleIconMode(event)))) {
-				this.firePress(oParams);
-				event.preventDefault();
+			// Suppress tile press if the more button was activated in this key cycle (JAWS scenario).
+			if (!this._bScopeButtonActivated) {
+				// The ActionMore button in IconMode tile would be fired irrespective of the pressEnabled property
+				if ((!preventPress && bFirePress && (this._bTilePress || this._isActionMoreButtonVisibleIconMode(event)))) {
+					this.firePress(oParams);
+					event.preventDefault();
+				}
 			}
+			this._bScopeButtonActivated = false;
 
 			this._updateAriaLabel(); // To update the Aria Label for Generic Tile on change.
 		}
@@ -1973,7 +1986,11 @@ sap.ui.define([
 		var $Tile = this.$();
 
 		if ($Tile.attr("title") !== sAriaAndTitleText) {
-			$Tile.attr("aria-label", sAriaText);
+			if (this.hasListeners("press") || this._shouldRenderLink() || this.getGridItemRole() || this.getAriaRole()) {
+				$Tile.attr("aria-label", sAriaText);
+			} else {
+				$Tile.removeAttr("aria-label");
+			}
 		}
 		if (this._isInActionScope()) {
 			$Tile.find('*:not(.sapMGTRemoveButton,.sapMGTActionMoreButton)').removeAttr("aria-label").removeAttr("title").off("mouseenter");

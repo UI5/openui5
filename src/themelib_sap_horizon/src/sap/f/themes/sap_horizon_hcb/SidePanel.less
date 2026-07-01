@@ -40,7 +40,7 @@
 						}
 					}
 
-					&:focus {
+					&:focus-visible {
 
 						&::after {
 							border: 0.125rem dotted var(--sapContent_FocusColor);
@@ -50,4 +50,8 @@
 			}
 		}
 	}
+}
+
+html.sap-desktop .sapFSP .sapFSPSide .sapFSPSideInner .sapFSPActionBar .sapFSPItem:focus::after {
+	border: 0.125rem dotted var(--sapContent_FocusColor);
 }

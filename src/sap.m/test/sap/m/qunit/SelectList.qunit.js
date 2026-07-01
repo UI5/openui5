@@ -35,32 +35,39 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.m.SelectListKeyboardNavigationMode
-	var SelectListKeyboardNavigationMode = mobileLibrary.SelectListKeyboardNavigationMode;
+	const SelectListKeyboardNavigationMode = mobileLibrary.SelectListKeyboardNavigationMode;
 
 	// shortcut for sap.ui.core.TextDirection
-	var TextDirection = coreLibrary.TextDirection;
+	const TextDirection = coreLibrary.TextDirection;
 
 	createAndAppendDiv("content");
 
 
-	var fnTestControlHiddenProperty = function(mOptions) {
-		var sProperty = mOptions.property,
-			oControl = mOptions.control,
-			vValue = mOptions.value;
+	const fnTestControlHiddenProperty = function(mOptions) {
+		const sProperty = mOptions.property;
+		const oControl = mOptions.control;
+		let vValue = mOptions.value;
 
 		QUnit.test("getProperty(" + sProperty + ")", function(assert) {
-			oControl.setProperty(sProperty, vValue);
-			vValue = oControl.getProperty(sProperty);
-
-			assert.strictEqual(vValue, mOptions.output, mOptions.description);
+			try {
+				oControl.setProperty(sProperty, vValue);
+				vValue = oControl.getProperty(sProperty);
+				assert.strictEqual(vValue, mOptions.output, mOptions.description);
+			} finally {
+				oControl.destroy();
+			}
 		});
 	};
 
-	var fnTestControlProperty = function(mOptions) {
-		var sProperty = mOptions.property.charAt(0).toUpperCase() + mOptions.property.slice(1);
+	const fnTestControlProperty = function(mOptions) {
+		const sProperty = mOptions.property.charAt(0).toUpperCase() + mOptions.property.slice(1);
 
 		QUnit.test("get" + sProperty + "()", function(assert) {
-			assert.strictEqual(mOptions.control["get" + sProperty](), mOptions.output, mOptions.description);
+			try {
+				assert.strictEqual(mOptions.control["get" + sProperty](), mOptions.output, mOptions.description);
+			} finally {
+				mOptions.control.destroy();
+			}
 		});
 	};
 
@@ -71,7 +78,7 @@ sap.ui.define([
 	QUnit.test("default property values", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					id: "item-id",
@@ -123,7 +130,7 @@ sap.ui.define([
 
 	QUnit.test("icon property", function(assert) {
 
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new ListItem({
 					key: "1",
@@ -146,7 +153,7 @@ sap.ui.define([
 	QUnit.test("rendering", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					key: "DZ",
@@ -395,17 +402,17 @@ sap.ui.define([
 
 	QUnit.test("textDirection value is set to the item elements' dir attribute", function(assert) {
 		// system under test
-		var oItem,
-			oSelectList = new SelectList({
-				items: [
-					oItem = new Item({
-						id: "item-id1",
-						key: "0",
-						text: "item 0",
-						textDirection: TextDirection.RTL
-					})
-				]
-			});
+		let oItem;
+		const oSelectList = new SelectList({
+			items: [
+				oItem = new Item({
+					id: "item-id1",
+					key: "0",
+					text: "item 0",
+					textDirection: TextDirection.RTL
+				})
+			]
+		});
 
 		// arrange
 		oSelectList.placeAt("content");
@@ -420,27 +427,26 @@ sap.ui.define([
 
 	QUnit.test("textDirection value is set to the item elements' dir attribute - 2 column layout", function(assert) {
 		// system under test
-		var sFirstCellSelector = ".sapMSelectListFirstCell",
-			oItemFirstCellDomRef,
-			oItem,
-			oSelectList = new SelectList({
-				showSecondaryValues: true,
-				items: [
-					oItem = new ListItem({
-						id: "item-id2",
-						key: "1",
-						text: "item 1",
-						additionalText: "add text",
-						textDirection: TextDirection.RTL
-					})
-				]
-			});
+		const sFirstCellSelector = ".sapMSelectListFirstCell";
+		let oItem;
+		const oSelectList = new SelectList({
+			showSecondaryValues: true,
+			items: [
+				oItem = new ListItem({
+					id: "item-id2",
+					key: "1",
+					text: "item 1",
+					additionalText: "add text",
+					textDirection: TextDirection.RTL
+				})
+			]
+		});
 
 		// arrange
 		oSelectList.placeAt("content");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-		oItemFirstCellDomRef = oItem.getDomRef().querySelector(sFirstCellSelector);
+		const oItemFirstCellDomRef = oItem.getDomRef().querySelector(sFirstCellSelector);
 		// assert
 		assert.ok(oItemFirstCellDomRef.getAttribute("dir") === TextDirection.RTL.toLowerCase());
 
@@ -450,11 +456,11 @@ sap.ui.define([
 
 	QUnit.module("getSelectedItem()");
 
-	QUnit.test("getSelectedItem()", function(assert) {
+	QUnit.test("getSelectedItem() — selectedItem set to item reference", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			items: [
 				oExpectedItem = new Item({
 					id: "item-id1",
@@ -475,11 +481,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedItem()", function(assert) {
+	QUnit.test("getSelectedItem() — selectedItem set to item id string, item at index 2", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					key: "0",
@@ -515,11 +521,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedItem()", function(assert) {
+	QUnit.test("getSelectedItem() — selectedItem id set before items, item at index 2", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			selectedItem: "item-id",
 			items: [
 				new Item({
@@ -558,11 +564,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedItem()", function(assert) {
+	QUnit.test("getSelectedItem() — selectedKey property selects item at index 1", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			selectedKey: "1",
 			items: [
 				new Item({
@@ -596,10 +602,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedItem()", function(assert) {
+	QUnit.test("getSelectedItem() — empty items returns null", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: []
 		});
 
@@ -612,10 +618,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedItem()", function(assert) {
+	QUnit.test("getSelectedItem() — selectedItem null returns null", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					id: "item-id",
@@ -650,10 +656,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedItem()", function(assert) {
+	QUnit.test("getSelectedItem() — selectedKey empty string returns null", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					id: "item-id",
@@ -690,10 +696,10 @@ sap.ui.define([
 
 	QUnit.module("getSelectedKey()");
 
-	QUnit.test("getSelectedKey()", function(assert) {
+	QUnit.test("getSelectedKey() — selectedKey undefined returns empty string", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					id: "item-id",
@@ -728,10 +734,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedKey()", function(assert) {
+	QUnit.test("getSelectedKey() — single item, no selectedKey returns empty string", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					id: "item-id",
@@ -754,11 +760,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedKey()", function(assert) {
+	QUnit.test("getSelectedKey() — selectedItem set to id at index 2", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					key: "0",
@@ -798,11 +804,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedKey()", function(assert) {
+	QUnit.test("getSelectedKey() — selectedItem set before items, item at last index", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			selectedItem: "item-id",
 
 			items: [
@@ -842,11 +848,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedKey()", function(assert) {
+	QUnit.test("getSelectedKey() — selectedKey property selects item at index 1", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			selectedKey: "1",
 
 			items: [
@@ -881,10 +887,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedKey()", function(assert) {
+	QUnit.test("getSelectedKey() — empty items returns empty string", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: []
 		});
 
@@ -901,10 +907,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedKey()", function(assert) {
+	QUnit.test("getSelectedKey() — selectedItem null returns empty string", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					id: "item-id",
@@ -939,10 +945,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedKey()", function(assert) {
+	QUnit.test("getSelectedKey() — selectedItemId undefined returns empty string", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					id: "item-id",
@@ -977,10 +983,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedKey()", function(assert) {
+	QUnit.test("getSelectedKey() — selectedItemId empty string returns empty string", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					id: "item-id",
@@ -1015,11 +1021,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedKey()", function(assert) {
+	QUnit.test("getSelectedKey() — selectedKey set to first item key", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			items: [
 				oExpectedItem = new Item({
 					id: "item-id",
@@ -1056,10 +1062,10 @@ sap.ui.define([
 
 	QUnit.module("getSelectedItemId()");
 
-	QUnit.test("getSelectedItemId()", function(assert) {
+	QUnit.test("getSelectedItemId() — single item, no selection set", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					id: "item-id",
@@ -1082,11 +1088,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedItemId()", function(assert) {
+	QUnit.test("getSelectedItemId() — selectedItem set to id at index 2", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					key: "0",
@@ -1126,11 +1132,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedItemId()", function(assert) {
+	QUnit.test("getSelectedItemId() — selectedItem set before items, item at last index", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			selectedItem: "item-id",
 
 			items: [
@@ -1170,11 +1176,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedItemId()", function(assert) {
+	QUnit.test("getSelectedItemId() — selectedKey property selects item at index 1", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			selectedKey: "1",
 
 			items: [
@@ -1209,10 +1215,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedItemId()", function(assert) {
+	QUnit.test("getSelectedItemId() — empty items returns empty string", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: []
 		});
 
@@ -1225,10 +1231,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedItemId()", function(assert) {
+	QUnit.test("getSelectedItemId() — selectedItem null returns empty string", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					id: "item-id",
@@ -1263,10 +1269,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedItemId()", function(assert) {
+	QUnit.test("getSelectedItemId() — selectedItemId undefined returns empty string", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					id: "item-id",
@@ -1301,10 +1307,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedItemId()", function(assert) {
+	QUnit.test("getSelectedItemId() — selectedItemId empty string returns empty string", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					id: "item-id",
@@ -1339,10 +1345,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedItemId()", function(assert) {
+	QUnit.test("getSelectedItemId() — selectedKey undefined returns empty string", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					id: "item-id",
@@ -1377,10 +1383,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getSelectedItemId()", function(assert) {
+	QUnit.test("getSelectedItemId() — selectedKey empty string returns empty string", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					id: "item-id",
@@ -1416,7 +1422,7 @@ sap.ui.define([
 	QUnit.test("setWidth()", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					key: "0",
@@ -1445,7 +1451,7 @@ sap.ui.define([
 	QUnit.test("setEnabled()", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					key: "0",
@@ -1474,11 +1480,11 @@ sap.ui.define([
 	QUnit.test("addItem()", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList();
+		const oSelectList = new SelectList();
 
 		// arrange
-		var fnAddItemSpy = this.spy(oSelectList, "addItem");
-		var oItem = new Item({
+		const fnAddItemSpy = this.spy(oSelectList, "addItem");
+		const oItem = new Item({
 			key: "0",
 			text: "item 0"
 		});
@@ -1494,10 +1500,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("it should not throw an error when showSecondaryValues property is set to true", function(assert) {
+	QUnit.test("showSecondaryValues=true does not throw an error", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			showSecondaryValues: true,
 			items: [
 				new SeparatorItem(),
@@ -1523,12 +1529,12 @@ sap.ui.define([
 	QUnit.test("insertItem()", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList();
+		const oSelectList = new SelectList();
 
 		// arrange
-		var fnInsertAggregation = this.spy(oSelectList, "insertAggregation");
-		var fnInsertItem = this.spy(oSelectList, "insertItem");
-		var oItem = new Item({
+		const fnInsertAggregation = this.spy(oSelectList, "insertAggregation");
+		const fnInsertItem = this.spy(oSelectList, "insertItem");
+		const oItem = new Item({
 			key: "0",
 			text: "item 0"
 		});
@@ -1547,16 +1553,16 @@ sap.ui.define([
 
 	QUnit.module("setSelectedItem()");
 
-	QUnit.test("setSelectedItem()", function(assert) {
+	QUnit.test("setSelectedItem() — non-Item argument is ignored", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList();
+		const oSelectList = new SelectList();
 
 		// arrange
-		var fnSetPropertySpy = this.spy(oSelectList, "setProperty"),
-			fnSetAssociationSpy = this.spy(oSelectList, "setAssociation"),
-			fnFireSelectionChangeSpy = this.spy(oSelectList, "fireSelectionChange"),
-			fnSetSelectedItemSpy = this.spy(oSelectList, "setSelectedItem");
+		const fnSetPropertySpy = this.spy(oSelectList, "setProperty");
+		const fnSetAssociationSpy = this.spy(oSelectList, "setAssociation");
+		const fnFireSelectionChangeSpy = this.spy(oSelectList, "fireSelectionChange");
+		const fnSetSelectedItemSpy = this.spy(oSelectList, "setSelectedItem");
 
 		// act
 		oSelectList.setSelectedItem({});
@@ -1574,11 +1580,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("setSelectedItem()", function(assert) {
+	QUnit.test("setSelectedItem() — by item reference", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					key: "0",
@@ -1600,10 +1606,10 @@ sap.ui.define([
 		});
 
 		// arrange
-		var fnSetPropertySpy = this.spy(oSelectList, "setProperty"),
-			fnSetAssociationSpy = this.spy(oSelectList, "setAssociation"),
-			fnSetSelectedItemSpy = this.spy(oSelectList, "setSelectedItem"),
-			fnFireSelectionChangeSpy = this.spy(oSelectList, "fireSelectionChange");
+		const fnSetPropertySpy = this.spy(oSelectList, "setProperty");
+		const fnSetAssociationSpy = this.spy(oSelectList, "setAssociation");
+		const fnSetSelectedItemSpy = this.spy(oSelectList, "setSelectedItem");
+		const fnFireSelectionChangeSpy = this.spy(oSelectList, "fireSelectionChange");
 
 		// act
 		oSelectList.setSelectedItem(oExpectedItem);
@@ -1624,11 +1630,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("setSelectedItem()", function(assert) {
+	QUnit.test("setSelectedItem() — by item id string", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					key: "0",
@@ -1650,10 +1656,10 @@ sap.ui.define([
 		});
 
 		// arrange
-		var fnSetPropertySpy = this.spy(oSelectList, "setProperty"),
-			fnSetAssociationSpy = this.spy(oSelectList, "setAssociation"),
-			fnSetSelectedItemSpy = this.spy(oSelectList, "setSelectedItem"),
-			fnFireSelectionChangeSpy = this.spy(oSelectList, "fireSelectionChange");
+		const fnSetPropertySpy = this.spy(oSelectList, "setProperty");
+		const fnSetAssociationSpy = this.spy(oSelectList, "setAssociation");
+		const fnSetSelectedItemSpy = this.spy(oSelectList, "setSelectedItem");
+		const fnFireSelectionChangeSpy = this.spy(oSelectList, "fireSelectionChange");
 
 		// act
 		oSelectList.setSelectedItem("item-id");
@@ -1673,11 +1679,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("setSelectedItem()", function(assert) {
+	QUnit.test("setSelectedItem() — by item reference updates aria-selected", function(assert) {
 
 		//system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					key: "0",
@@ -1714,11 +1720,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("setSelectedItem()", function(assert) {
+	QUnit.test("setSelectedItem() — null clears selection", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			items: [
 				oExpectedItem = new Item({
 					id: "item-id",
@@ -1759,11 +1765,11 @@ sap.ui.define([
 
 	QUnit.module("setSelectedItemId()");
 
-	QUnit.test("setSelectedItemId()", function(assert) {
+	QUnit.test("setSelectedItemId() — by item id", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					key: "0",
@@ -1785,8 +1791,8 @@ sap.ui.define([
 		});
 
 		// arrange
-		var fnFireSelectionChangeSpy = this.spy(oSelectList, "fireSelectionChange"),
-			fnSetSelectedItemIdSpy = this.spy(oSelectList, "setSelectedItemId");
+		const fnFireSelectionChangeSpy = this.spy(oSelectList, "fireSelectionChange");
+		const fnSetSelectedItemIdSpy = this.spy(oSelectList, "setSelectedItemId");
 
 		// act
 		oSelectList.setSelectedItemId("item-id");
@@ -1802,11 +1808,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("setSelectedItemId()", function(assert) {
+	QUnit.test("setSelectedItemId() — by item id updates aria-selected", function(assert) {
 
 		//system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					key: "0",
@@ -1843,11 +1849,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("setSelectedItemId()", function(assert) {
+	QUnit.test("setSelectedItemId() — empty string clears selection", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					id: "item-id",
@@ -1889,7 +1895,7 @@ sap.ui.define([
 	QUnit.test("setSelectedItemId() should set the value even if the corresponding item doesn't exist on the list", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			selectedItemId: "item-id"
 		});
 
@@ -1911,8 +1917,8 @@ sap.ui.define([
 	QUnit.test("setSelectedKey() first rendering", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			selectedKey: "2",
 			items: [
 				new Item({
@@ -1950,8 +1956,8 @@ sap.ui.define([
 	QUnit.test("setSelectedKey() no rendering", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					key: "0",
@@ -1985,8 +1991,8 @@ sap.ui.define([
 	QUnit.test("setSelectedKey() after the initial rendering", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					key: "0",
@@ -2009,10 +2015,10 @@ sap.ui.define([
 		// arrange
 		oSelectList.placeAt("content");
 
-		var fnSetPropertySpy = this.spy(oSelectList, "setProperty"),
-			fnSetAssociationSpy = this.spy(oSelectList, "setAssociation"),
-			fnFireSelectionChangeSpy = this.spy(oSelectList, "fireSelectionChange"),
-			fnSetSelectedKeySpy = this.spy(oSelectList, "setSelectedKey");
+		const fnSetPropertySpy = this.spy(oSelectList, "setProperty");
+		const fnSetAssociationSpy = this.spy(oSelectList, "setAssociation");
+		const fnFireSelectionChangeSpy = this.spy(oSelectList, "fireSelectionChange");
+		const fnSetSelectedKeySpy = this.spy(oSelectList, "setSelectedKey");
 
 		// act
 		oSelectList.setSelectedKey("1");
@@ -2038,8 +2044,8 @@ sap.ui.define([
 	QUnit.test("setSelectedKey()", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			items: [
 				oExpectedItem = new Item({
 					id: "item-id",
@@ -2080,10 +2086,10 @@ sap.ui.define([
 
 	QUnit.module("keyboard navigation mode");
 
-	QUnit.test("it should not enable the item navigation (initial rendering)", function(assert) {
+	QUnit.test("item navigation is not enabled on initial rendering", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			keyboardNavigationMode: SelectListKeyboardNavigationMode.None,
 			items: [
 				new Item({
@@ -2103,10 +2109,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("it should not enable the item navigation", function(assert) {
+	QUnit.test("item navigation is not enabled after rendering", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			keyboardNavigationMode: SelectListKeyboardNavigationMode.Delimited,
 			items: [
 				new Item({
@@ -2133,7 +2139,7 @@ sap.ui.define([
 	QUnit.test("When keyboardNavigationMode is set to Delimited, it shouldn't prevent browser from navigating to previous or next page.", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					text: "lorem ipsum"
@@ -2145,7 +2151,7 @@ sap.ui.define([
 		oSelectList.placeAt("content");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-		var oModifiers = oSelectList._oItemNavigation.getDisabledModifiers();
+		const oModifiers = oSelectList._oItemNavigation.getDisabledModifiers();
 
 		// assert
 		assert.ok(oModifiers["sapnext"], "sapnext has disabled modifiers");
@@ -2161,15 +2167,15 @@ sap.ui.define([
 
 	QUnit.module("removeItem()");
 
-	QUnit.test("it should give a warning when called with faulty parameter", function(assert) {
+	QUnit.test("removeItem logs a warning for invalid parameter", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList();
+		const oSelectList = new SelectList();
 
 		// arrange
-		var fnRemoveAggregationSpy = this.spy(oSelectList, "removeAggregation");
-		var fnRemoveItemSpy = this.spy(oSelectList, "removeItem");
-		var fnFireSelectionChangeSpy = this.spy(oSelectList, "fireSelectionChange");
+		const fnRemoveAggregationSpy = this.spy(oSelectList, "removeAggregation");
+		const fnRemoveItemSpy = this.spy(oSelectList, "removeItem");
+		const fnFireSelectionChangeSpy = this.spy(oSelectList, "fireSelectionChange");
 
 		// act
 		oSelectList.removeItem(undefined);
@@ -2184,10 +2190,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("removeItem() remove the selected item", function(assert) {
+	QUnit.test("removeItem() removes last item — selection cleared (model with 9 items)", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: {
 				path: "/items",
 				template: new Item({
@@ -2203,9 +2209,9 @@ sap.ui.define([
 		});
 
 		// arrange
-		var oModel = new JSONModel();
-		var fnRemoveAggregationSpy = this.spy(oSelectList, "removeAggregation");
-		var mData = {
+		const oModel = new JSONModel();
+		const fnRemoveAggregationSpy = this.spy(oSelectList, "removeAggregation");
+		const mData = {
 			"items": [
 				{
 					"value": "0",
@@ -2275,10 +2281,10 @@ sap.ui.define([
 		oModel.destroy();
 	});
 
-	QUnit.test("removeItem() remove the selected item", function(assert) {
+	QUnit.test("removeItem() removes first item — selection cleared (model with 4 items)", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 
 			items: {
 				path: "/items",
@@ -2295,9 +2301,9 @@ sap.ui.define([
 		});
 
 		// arrange
-		var oModel = new JSONModel();
+		const oModel = new JSONModel();
 
-		var mData = {
+		const mData = {
 			"items": [
 				{
 					"value": "0",
@@ -2346,8 +2352,8 @@ sap.ui.define([
 	QUnit.test("removeItem()", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var oSelectList = new SelectList({
+		let oExpectedItem;
+		const oSelectList = new SelectList({
 			items: [
 				oExpectedItem = new Item({
 					key: "0",
@@ -2379,7 +2385,7 @@ sap.ui.define([
 	QUnit.test("removeAllItems()", function(assert) {
 
 		// system under test
-		var aItems = [
+		const aItems = [
 			new Item({
 				key: "0",
 				text: "item 0"
@@ -2396,15 +2402,15 @@ sap.ui.define([
 			})
 		];
 
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: aItems
 		});
 
 		// arrange
 		oSelectList.placeAt("content");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		var fnRemoveAllItemsSpy = this.spy(oSelectList, "removeAllItems");
-		var fnRemoveAllAggregationSpy = this.spy(oSelectList, "removeAllAggregation");
+		const fnRemoveAllItemsSpy = this.spy(oSelectList, "removeAllItems");
+		const fnRemoveAllAggregationSpy = this.spy(oSelectList, "removeAllAggregation");
 
 		// act
 		oSelectList.removeAllItems();
@@ -2426,7 +2432,7 @@ sap.ui.define([
 	QUnit.test("destroyItems()", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					key: "0",
@@ -2448,7 +2454,7 @@ sap.ui.define([
 		// arrange
 		oSelectList.placeAt("content");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		var fnDestroyItemsSpy = this.spy(oSelectList, "destroyItems");
+		const fnDestroyItemsSpy = this.spy(oSelectList, "destroyItems");
 
 		// act
 		oSelectList.destroyItems();
@@ -2462,10 +2468,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("it should only remove the items, but not the busy indicator", function(assert) {
+	QUnit.test("destroyItems removes items but preserves the busy indicator", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item()
 			]
@@ -2489,11 +2495,11 @@ sap.ui.define([
 
 	QUnit.module("findFirstEnabledItem()");
 
-	QUnit.test("findFirstEnabledItem()", function(assert) {
+	QUnit.test("findFirstEnabledItem() — first enabled item at index 0", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var aItems = [
+		let oExpectedItem;
+		const aItems = [
 			oExpectedItem = new Item({
 				key: "0",
 				text: "item 0"
@@ -2511,7 +2517,7 @@ sap.ui.define([
 			})
 		];
 
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: aItems
 		});
 
@@ -2520,7 +2526,7 @@ sap.ui.define([
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// act
-		var oFirstEnabledItem = oSelectList.findFirstEnabledItem(aItems);
+		const oFirstEnabledItem = oSelectList.findFirstEnabledItem(aItems);
 
 		// assert
 		assert.ok(oFirstEnabledItem === oExpectedItem);
@@ -2529,10 +2535,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("findFirstEnabledItem()", function(assert) {
+	QUnit.test("findFirstEnabledItem() — all items disabled returns null", function(assert) {
 
 		// system under test
-		var aItems = [
+		const aItems = [
 			new Item({
 				key: "0",
 				text: "item 0",
@@ -2552,7 +2558,7 @@ sap.ui.define([
 			})
 		];
 
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: aItems
 		});
 
@@ -2561,7 +2567,7 @@ sap.ui.define([
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// act
-		var oFirstEnabledItem = oSelectList.findFirstEnabledItem(aItems);
+		const oFirstEnabledItem = oSelectList.findFirstEnabledItem(aItems);
 
 		// assert
 		assert.ok(oFirstEnabledItem === null, 'The first enabled item is "null"');
@@ -2570,17 +2576,17 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("findFirstEnabledItem()", function(assert) {
+	QUnit.test("findFirstEnabledItem() — empty list returns null", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList();
+		const oSelectList = new SelectList();
 
 		// arrange
 		oSelectList.placeAt("content");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// act
-		var oFirstEnabledItem = oSelectList.findFirstEnabledItem([]);
+		const oFirstEnabledItem = oSelectList.findFirstEnabledItem([]);
 
 		// assert
 		assert.ok(oFirstEnabledItem === null, 'The first enabled item is "null"');
@@ -2591,11 +2597,11 @@ sap.ui.define([
 
 	QUnit.module("findLastEnabledItem()");
 
-	QUnit.test("findLastEnabledItem()", function(assert) {
+	QUnit.test("findLastEnabledItem() — last enabled item at index 2", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var aItems = [
+		let oExpectedItem;
+		const aItems = [
 			new Item({
 				key: "0",
 				text: "item 0",
@@ -2614,7 +2620,7 @@ sap.ui.define([
 			})
 		];
 
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: aItems
 		});
 
@@ -2623,7 +2629,7 @@ sap.ui.define([
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// act
-		var oLastEnabledItem = oSelectList.findLastEnabledItem(aItems);
+		const oLastEnabledItem = oSelectList.findLastEnabledItem(aItems);
 
 		// assert
 		assert.ok(oLastEnabledItem === oExpectedItem);
@@ -2632,10 +2638,10 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("findLastEnabledItem()", function(assert) {
+	QUnit.test("findLastEnabledItem() — all items disabled returns null", function(assert) {
 
 		// system under test
-		var aItems = [
+		const aItems = [
 			new Item({
 				key: "0",
 				text: "item 0",
@@ -2655,7 +2661,7 @@ sap.ui.define([
 			})
 		];
 
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: aItems
 		});
 
@@ -2664,7 +2670,7 @@ sap.ui.define([
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// act
-		var oLastEnabledItem = oSelectList.findLastEnabledItem(aItems);
+		const oLastEnabledItem = oSelectList.findLastEnabledItem(aItems);
 
 		// assert
 		assert.ok(oLastEnabledItem === null, 'The last enabled item is "null"');
@@ -2673,17 +2679,17 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("findLastEnabledItem()", function(assert) {
+	QUnit.test("findLastEnabledItem() — empty list returns null", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList();
+		const oSelectList = new SelectList();
 
 		// arrange
 		oSelectList.placeAt("content");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// act
-		var oLastEnabledItem = oSelectList.findLastEnabledItem([]);
+		const oLastEnabledItem = oSelectList.findLastEnabledItem([]);
 
 		// assert
 		assert.ok(oLastEnabledItem === null, 'The last enabled item is "null"');
@@ -2694,11 +2700,11 @@ sap.ui.define([
 
 	QUnit.module("setSelectedIndex()");
 
-	var setSelectedIndexTestCase = function(sTestName, mOptions) {
+	const setSelectedIndexTestCase = function(sTestName, mOptions) {
 		QUnit.test("setSelectedIndex()", function(assert) {
 
 			// system under test
-			var oSelectList = mOptions.control;
+			const oSelectList = mOptions.control;
 
 			// act
 			oSelectList._setSelectedIndex(mOptions.input);
@@ -2712,8 +2718,8 @@ sap.ui.define([
 	};
 
 	(function() {
-		var oExpectedItem;
-		var aItems = [
+		let oExpectedItem;
+		const aItems = [
 			new Item({
 				key: "0",
 				text: "item 0",
@@ -2752,8 +2758,8 @@ sap.ui.define([
 	});
 
 	(function() {
-		var oExpectedItem;
-		var aItems = [
+		let oExpectedItem;
+		const aItems = [
 			new Item({
 				key: "0",
 				text: "item 0",
@@ -2790,8 +2796,8 @@ sap.ui.define([
 	QUnit.test("getItemAt()", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var aItems = [
+		let oExpectedItem;
+		const aItems = [
 			new Item({
 				key: "0",
 				text: "item 0",
@@ -2810,7 +2816,7 @@ sap.ui.define([
 			})
 		];
 
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: aItems
 		});
 
@@ -2819,8 +2825,8 @@ sap.ui.define([
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// act
-		var oItem = oSelectList.getItemAt(2),
-			oItem1 = oSelectList.getItemAt(6);
+		const oItem = oSelectList.getItemAt(2);
+		const oItem1 = oSelectList.getItemAt(6);
 
 		// assert
 		assert.ok(oItem === oExpectedItem);
@@ -2832,11 +2838,11 @@ sap.ui.define([
 
 	QUnit.module("getFirstItem()");
 
-	QUnit.test("getFirstItem()", function(assert) {
+	QUnit.test("getFirstItem() — returns first item", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var aItems = [
+		let oExpectedItem;
+		const aItems = [
 			oExpectedItem = new Item({
 				key: "0",
 				text: "item 0"
@@ -2853,7 +2859,7 @@ sap.ui.define([
 			})
 		];
 
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: aItems
 		});
 
@@ -2862,7 +2868,7 @@ sap.ui.define([
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// act
-		var oItem = oSelectList.getFirstItem();
+		const oItem = oSelectList.getFirstItem();
 
 		// assert
 		assert.ok(oItem === oExpectedItem);
@@ -2871,17 +2877,17 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getFirstItem()", function(assert) {
+	QUnit.test("getFirstItem() — empty items returns null", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList();
+		const oSelectList = new SelectList();
 
 		// arrange
 		oSelectList.placeAt("content");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// act
-		var oExpectedItem = oSelectList.getFirstItem();
+		const oExpectedItem = oSelectList.getFirstItem();
 
 		// assert
 		assert.ok(oExpectedItem === null, "There are no items");
@@ -2892,11 +2898,11 @@ sap.ui.define([
 
 	QUnit.module("getLastItem()");
 
-	QUnit.test("getLastItem()", function(assert) {
+	QUnit.test("getLastItem() — returns last item", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var aItems = [
+		let oExpectedItem;
+		const aItems = [
 			new Item({
 				key: "0",
 				text: "item 0"
@@ -2913,7 +2919,7 @@ sap.ui.define([
 			})
 		];
 
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: aItems
 		});
 
@@ -2922,7 +2928,7 @@ sap.ui.define([
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// act
-		var oItem = oSelectList.getLastItem();
+		const oItem = oSelectList.getLastItem();
 
 		// assert
 		assert.ok(oItem === oExpectedItem);
@@ -2931,17 +2937,17 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("getLastItem()", function(assert) {
+	QUnit.test("getLastItem() — empty items returns null", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList();
+		const oSelectList = new SelectList();
 
 		// arrange
 		oSelectList.placeAt("content");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// act
-		var oItem = oSelectList.getLastItem();
+		const oItem = oSelectList.getLastItem();
 
 		// assert
 		assert.ok(oItem === null, "There are no items");
@@ -2955,10 +2961,10 @@ sap.ui.define([
 	QUnit.test("getItemByKey()", function(assert) {
 
 		// system under test
-		var oExpectedItem0;
-		var oExpectedItem1;
-		var oExpectedItem2;
-		var aItems = [
+		let oExpectedItem0;
+		let oExpectedItem1;
+		let oExpectedItem2;
+		const aItems = [
 			oExpectedItem0 = new Item({
 				key: "0",
 				text: "item 0"
@@ -2975,7 +2981,7 @@ sap.ui.define([
 			})
 		];
 
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: aItems
 		});
 
@@ -2984,10 +2990,10 @@ sap.ui.define([
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// act
-		var oItem0 = oSelectList.getItemByKey("0"),
-			oItem1 = oSelectList.getItemByKey("1"),
-			oItem2 = oSelectList.getItemByKey("2"),
-			oItem3 = oSelectList.getItemByKey("3");
+		const oItem0 = oSelectList.getItemByKey("0");
+		const oItem1 = oSelectList.getItemByKey("1");
+		const oItem2 = oSelectList.getItemByKey("2");
+		const oItem3 = oSelectList.getItemByKey("3");
 
 		// assert
 		assert.ok(oItem0 === oExpectedItem0);
@@ -3004,8 +3010,8 @@ sap.ui.define([
 	QUnit.test("getEnabledItems()", function(assert) {
 
 		// system under test
-		var oExpectedItem;
-		var aItems = [
+		let oExpectedItem;
+		const aItems = [
 			oExpectedItem = new Item({
 				key: "0",
 				text: "item 0"
@@ -3018,7 +3024,7 @@ sap.ui.define([
 			})
 		];
 
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: aItems
 		});
 
@@ -3033,7 +3039,7 @@ sap.ui.define([
 	QUnit.module("Items count");
 
 	QUnit.test("Items count", function(assert) {
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					text: "Test item 1"
@@ -3079,7 +3085,7 @@ sap.ui.define([
 	QUnit.test("updateAggregation() do not clear the selection when items are destroyed", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: {
 				path: "/contries",
 				template: new Item({
@@ -3093,8 +3099,8 @@ sap.ui.define([
 		});
 
 		// arrange
-		var oModel = new JSONModel();
-		var mData = {
+		const oModel = new JSONModel();
+		const mData = {
 			"contries": [
 				{
 					"code": "GER",
@@ -3127,10 +3133,10 @@ sap.ui.define([
 	});
 
 	// BCP 1570825099
-	QUnit.test("it should synchronize the selection (synchronous) after the items are filtered", function(assert) {
+	QUnit.test("selection is synchronized synchronously after items are filtered", function(assert) {
 
 		// system under test
-		var oSelectList = new Select({
+		const oSelectList = new Select({
 			items: {
 				path: "/items",
 				template: new Item({
@@ -3142,8 +3148,8 @@ sap.ui.define([
 		});
 
 		// arrange
-		var oModel = new JSONModel();
-		var mData = {
+		const oModel = new JSONModel();
+		const mData = {
 			"items": [
 				{
 					"key": "DZ",
@@ -3210,7 +3216,7 @@ sap.ui.define([
 
 	QUnit.test("synchronizeSelection is not called with Virtual Context", function(assert) {
 		// Arrange
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: {
 				path: "/contries",
 				template: new Item({
@@ -3221,9 +3227,9 @@ sap.ui.define([
 			selectedKey: {
 				path: "/selected"
 			}
-		}),
-		oModel = new JSONModel(),
-		mData = {
+		});
+		const oModel = new JSONModel();
+		const mData = {
 			"contries": [
 				{
 					"code": "GER",
@@ -3236,13 +3242,12 @@ sap.ui.define([
 
 			// path : selectedKey
 			"selected": "CU"
-		},
-		oSpy = this.spy(oSelectList, "synchronizeSelection"),
-		oBinding;
+		};
+		const oSpy = this.spy(oSelectList, "synchronizeSelection");
 
 		oModel.setData(mData);
 		oSelectList.setModel(oModel);
-		oBinding = oSelectList.getBinding("items");
+		const oBinding = oSelectList.getBinding("items");
 		oSelectList.placeAt("content");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
@@ -3285,7 +3290,7 @@ sap.ui.define([
 	QUnit.test("destroy()", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					key: "0",
@@ -3326,8 +3331,8 @@ sap.ui.define([
 	QUnit.test("_queryEnabledItemsDomRefs()", function(assert) {
 
 		// system under test
-		var oEnabledItem;
-		var oSelectList = new SelectList({
+		let oEnabledItem;
+		const oSelectList = new SelectList({
 			items: [
 				oEnabledItem = new Item({
 					key: "GER",
@@ -3349,7 +3354,7 @@ sap.ui.define([
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// act
-		var aDomRefs = oSelectList._queryEnabledItemsDomRefs();
+		const aDomRefs = oSelectList._queryEnabledItemsDomRefs();
 
 		// assert
 		assert.strictEqual(aDomRefs.length, 1);
@@ -3364,7 +3369,7 @@ sap.ui.define([
 	QUnit.test("list", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList();
+		const oSelectList = new SelectList();
 
 		// arrange
 		oSelectList.placeAt("content");
@@ -3382,7 +3387,7 @@ sap.ui.define([
 	QUnit.test("list disabled", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			enabled: false
 		});
 
@@ -3400,8 +3405,8 @@ sap.ui.define([
 	QUnit.test("list item", function(assert) {
 
 		// system under test
-		var oItem;
-		var oSelectList = new SelectList({
+		let oItem;
+		const oSelectList = new SelectList({
 			items: [
 				oItem = new Item({
 					key: "GER",
@@ -3424,8 +3429,8 @@ sap.ui.define([
 	QUnit.test("list item disabled", function(assert) {
 
 		// system under test
-		var oItem;
-		var oSelectList = new SelectList({
+		let oItem;
+		const oSelectList = new SelectList({
 			items: [
 				oItem = new Item({
 					key: "GER",
@@ -3449,8 +3454,8 @@ sap.ui.define([
 	QUnit.test("list item separator", function(assert) {
 
 		// system under test
-		var oItem;
-		var oSelectList = new SelectList({
+		let oItem;
+		const oSelectList = new SelectList({
 			items: [
 				oItem = new SeparatorItem({
 					key: "GER",
@@ -3472,11 +3477,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("it should display the item", function(assert) {
+	QUnit.test("default bVisible — item is visible", function(assert) {
 
 		// system under test
-		var oItem;
-		var oSelectList = new SelectList({
+		let oItem;
+		const oSelectList = new SelectList({
 			items: [
 				oItem = new Item({
 					text: "lorem ipsum"
@@ -3496,11 +3501,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("it should display the item", function(assert) {
+	QUnit.test("bVisible=true — item is visible", function(assert) {
 
 		// system under test
-		var oItem;
-		var oSelectList = new SelectList({
+		let oItem;
+		const oSelectList = new SelectList({
 			items: [
 				oItem = new Item({
 					text: "lorem ipsum"
@@ -3523,11 +3528,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("it should not display the item", function(assert) {
+	QUnit.test("item with bVisible=false is not displayed", function(assert) {
 
 		// system under test
-		var oItem;
-		var oSelectList = new SelectList({
+		let oItem;
+		const oSelectList = new SelectList({
 			items: [
 				oItem = new Item({
 					text: "lorem ipsum"
@@ -3553,11 +3558,11 @@ sap.ui.define([
 
 	QUnit.module("touchstart");
 
-	QUnit.test("it should set the active state", function(assert) {
+	QUnit.test("ontouchstart sets the active state on an item", function(assert) {
 
 		// system under test
-		var oItem;
-		var oSelectList = new SelectList({
+		let oItem;
+		const oSelectList = new SelectList({
 			items: [
 				oItem = new Item({
 					text: ""
@@ -3566,7 +3571,7 @@ sap.ui.define([
 		});
 
 		// arrange
-		var CSS_CLASS = SelectListRenderer.CSS_CLASS + "ItemBasePressed";
+		const CSS_CLASS = SelectListRenderer.CSS_CLASS + "ItemBasePressed";
 		oSelectList.placeAt("content");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
@@ -3605,11 +3610,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("it should not set the active state", function(assert) {
+	QUnit.test("ontouchstart does not set active state on disabled item", function(assert) {
 
 		// system under test
-		var oItem;
-		var oSelectList = new SelectList({
+		let oItem;
+		const oSelectList = new SelectList({
 			items: [
 				oItem = new Item({
 					text: ""
@@ -3618,7 +3623,7 @@ sap.ui.define([
 		});
 
 		// arrange
-		var CSS_CLASS = SelectListRenderer.CSS_CLASS + "ItemPressed";
+		const CSS_CLASS = SelectListRenderer.CSS_CLASS + "ItemPressed";
 		oSelectList.placeAt("content");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
@@ -3655,11 +3660,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("it should set and remove the active state (there is a movement)", function(assert) {
+	QUnit.test("active state is set then removed when touch moves", function(assert) {
 
 		// system under test
-		var oItem;
-		var oSelectList = new SelectList({
+		let oItem;
+		const oSelectList = new SelectList({
 			items: [
 				oItem = new Item({
 					text: ""
@@ -3668,7 +3673,7 @@ sap.ui.define([
 		});
 
 		// arrange
-		var CSS_CLASS = SelectListRenderer.CSS_CLASS + "ItemPressed";
+		const CSS_CLASS = SelectListRenderer.CSS_CLASS + "ItemPressed";
 		oSelectList.placeAt("content");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
@@ -3734,11 +3739,11 @@ sap.ui.define([
 
 	QUnit.module("touchend");
 
-	QUnit.test("it should set and remove the active state (no movement)", function(assert) {
+	QUnit.test("active state is set then removed when touch ends without movement", function(assert) {
 
 		// system under test
-		var oItem;
-		var oSelectList = new SelectList({
+		let oItem;
+		const oSelectList = new SelectList({
 			items: [
 				oItem = new Item({
 					key: "0",
@@ -3748,7 +3753,7 @@ sap.ui.define([
 		});
 
 		// arrange
-		var CSS_CLASS = SelectListRenderer.CSS_CLASS + "ItemPressed";
+		const CSS_CLASS = SelectListRenderer.CSS_CLASS + "ItemPressed";
 		oSelectList.placeAt("content");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 		oSelectList.focus();
@@ -3808,11 +3813,11 @@ sap.ui.define([
 
 	QUnit.module("tap");
 
-	QUnit.test("it should fire the press and selectionChange events", function(assert) {
+	QUnit.test("press and selectionChange events fire on item tap", function(assert) {
 
 		// system under test
-		var oItem;
-		var oSelectList = new SelectList({
+		let oItem;
+		const oSelectList = new SelectList({
 			items: [
 				oItem = new Item({
 					text: "lorem ipsum"
@@ -3823,8 +3828,8 @@ sap.ui.define([
 		// arrange
 		oSelectList.placeAt("content");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		var fnFireSelectionChangeSpy = this.spy(oSelectList, "fireSelectionChange");
-		var fnFireItemPressSpy = this.spy(oSelectList, "fireItemPress");
+		const fnFireSelectionChangeSpy = this.spy(oSelectList, "fireSelectionChange");
+		const fnFireItemPressSpy = this.spy(oSelectList, "fireItemPress");
 
 		// act
 		qutils.triggerTouchEvent("tap", oSelectList.getDomRef(), {
@@ -3854,11 +3859,11 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
-	QUnit.test("it should not fire the press and selectionChange events", function(assert) {
+	QUnit.test("press and selectionChange events do not fire on disabled item tap", function(assert) {
 
 		// system under test
-		var oItem;
-		var oSelectList = new SelectList({
+		let oItem;
+		const oSelectList = new SelectList({
 			items: [
 				oItem = new Item({
 					enabled: false,
@@ -3870,8 +3875,8 @@ sap.ui.define([
 		// arrange
 		oSelectList.placeAt("content");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		var fnFireSelectionChangeSpy = this.spy(oSelectList, "fireSelectionChange");
-		var fnFireItemPressSpy = this.spy(oSelectList, "fireItemPress");
+		const fnFireSelectionChangeSpy = this.spy(oSelectList, "fireSelectionChange");
+		const fnFireItemPressSpy = this.spy(oSelectList, "fireItemPress");
 
 		// act
 		qutils.triggerTouchEvent("tap", oSelectList.getDomRef(), {
@@ -3906,7 +3911,7 @@ sap.ui.define([
 	QUnit.test("onsapselect activates a item", function(assert) {
 
 		// system under test
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item({
 					key: "GER",
@@ -3922,7 +3927,7 @@ sap.ui.define([
 		// arrange
 		oSelectList.placeAt("content");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		var fnFireSelectionChangeSpy = this.spy(oSelectList, "fireSelectionChange");
+		const fnFireSelectionChangeSpy = this.spy(oSelectList, "fireSelectionChange");
 
 		// act
 		oSelectList.onsapselect(jQuery.Event("sapselect", {
@@ -3941,7 +3946,7 @@ sap.ui.define([
 	QUnit.module("aria-setsize and aria-posinset");
 
 	QUnit.test("Behavior with SeparatorItem in the items", function (assert) {
-		var oSelectList = new SelectList({
+		const oSelectList = new SelectList({
 			items: [
 				new Item("firstItem", {
 					key: "item0",
@@ -3974,7 +3979,7 @@ sap.ui.define([
 
 	QUnit.test("columnRatio is correctly tranformed to percentages", function (assert) {
 		//Arrange
-		var oSelect = new Select({
+		const oSelect = new Select({
 				items : [
 					new ListItem({
 						text: "First item text",
@@ -3985,8 +3990,8 @@ sap.ui.define([
 						additionalText: "Second item additional text"
 					})
 				]
-			}),
-			oList = oSelect.getList();
+			});
+		const oList = oSelect.getList();
 
 		//Act
 		oSelect.setShowSecondaryValues(true);
@@ -4023,3 +4028,4 @@ sap.ui.define([
 		oSelect.destroy();
 	});
 });
+

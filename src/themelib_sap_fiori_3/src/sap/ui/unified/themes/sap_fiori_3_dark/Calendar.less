@@ -22,12 +22,16 @@
 
 html.sap-desktop .sapUiCalHead .sapUiCalHeadB:focus,
 html.sap-desktop .sapUiCalHead .sapUiCalHeadNext:focus,
-html.sap-desktop .sapUiCalHead .sapUiCalHeadPrev:focus {
+html.sap-desktop .sapUiCalHead .sapUiCalHeadPrev:focus,
+.sapUiCalHead .sapUiCalHeadB:focus-visible,
+.sapUiCalHead .sapUiCalHeadNext:focus-visible,
+.sapUiCalHead .sapUiCalHeadPrev:focus-visible {
 	outline: 0.0625rem dotted var(--sapContent_FocusColor);
 	outline-offset: -0.1875rem;
 }
 
-html.sap-desktop .sapUiCalHead .sapUiCalHeadB:focus:active {
+html.sap-desktop .sapUiCalHead .sapUiCalHeadB:focus:active,
+.sapUiCalHead .sapUiCalHeadB:focus-visible:active {
 	outline-color: var(--sapContent_ContrastFocusColor);
 }
 
@@ -37,14 +41,18 @@ html[data-sap-ui-browser^='ff'].sap-desktop .sapUiCalHead .sapUiCalHeadB:focus {
 
 html.sap-desktop .sapUiCalHead .sapUiCalHeadB:focus:not(:hover):not(:active),
 html.sap-desktop .sapUiCalHead .sapUiCalHeadNext:focus:not(:hover):not(:active),
-html.sap-desktop .sapUiCalHead .sapUiCalHeadPrev:focus:not(:hover):not(:active) {
+html.sap-desktop .sapUiCalHead .sapUiCalHeadPrev:focus:not(:hover):not(:active),
+.sapUiCalHead .sapUiCalHeadB:focus-visible:not(:hover):not(:active),
+.sapUiCalHead .sapUiCalHeadNext:focus-visible:not(:hover):not(:active),
+.sapUiCalHead .sapUiCalHeadPrev:focus-visible:not(:hover):not(:active) {
 	background-color: transparent;
 }
 
 .sapUiCalHead .sapUiCalHeadB,
 .sapUiCalCancel,
 html.sap-desktop .sapUiCalHead .sapUiCalHeadB:hover,
-html.sap-desktop .sapUiCalHead .sapUiCalHeadB:focus {
+html.sap-desktop .sapUiCalHead .sapUiCalHeadB:focus,
+.sapUiCalHead .sapUiCalHeadB:focus-visible {
 	color: var(--sapButton_Lite_TextColor);
 }
 
@@ -75,7 +83,7 @@ html.sap-desktop .sapUiCalHead .sapUiCalHeadB:active {
 
 /* make outline for days on number to prevent it around week number */
 /* hide outline for all devices, but enable later for desktop */
-.sapUiCalItem:focus {
+html.sap-desktop .sapUiCalItem:focus {
 	outline: none;
 	overflow: visible;
 }
@@ -99,7 +107,9 @@ html.sap-desktop .sapUiCalYearPicker .sapUiCalItem:focus {
 }
 
 html.sap-desktop .sapUiCalMonthPicker .sapUiCalItem:focus,
-html.sap-desktop .sapUiCalYearPicker .sapUiCalItem:focus {
+html.sap-desktop .sapUiCalYearPicker .sapUiCalItem:focus,
+.sapUiCalMonthPicker .sapUiCalItem:focus-visible,
+.sapUiCalYearPicker .sapUiCalItem:focus-visible {
 	outline: 0.0625rem dotted var(--sapContent_FocusColor);
 	outline-offset: -0.25rem;
 }
@@ -109,7 +119,9 @@ html.sap-desktop .sapUiCalItemSel:not(.sapUiCalItemNow):not(.sapUiCalItemSelBetw
 }
 
 html.sap-desktop .sapUiCalMonthPicker .sapUiCalItemSel:focus,
-html.sap-desktop .sapUiCalYearPicker .sapUiCalItemSel:focus {
+html.sap-desktop .sapUiCalYearPicker .sapUiCalItemSel:focus,
+.sapUiCalMonthPicker .sapUiCalItemSel:focus-visible,
+.sapUiCalYearPicker .sapUiCalItemSel:focus-visible {
 	outline-color: var(--sapContent_ContrastFocusColor);
 	background-color: var(--sapContent_Selected_Background);
 }
@@ -166,20 +178,14 @@ html.sap-desktop .sapUiCalItemSel:not(.sapUiCalItemNow):not(.sapUiCalItemSelBetw
 .sapUiCalItem {
 	position: relative;
 
-	&:focus > .sapUiCalItemText {
-		position: static;
-		outline: none;
-
-		&::after {
-			position: absolute;
-			top: 0.125rem;
-			left: 0.125rem;
-			right: 0.125rem;
-			bottom: 0.125rem;
-			border: 0.0625rem dotted var(--sapContent_FocusColor);
-			content: '';
-
-		}
+	&:not(.sapUiCalItemFocusFromTouch):focus-visible > .sapUiCalItemText::after {
+		position: absolute;
+		top: 0.125rem;
+		left: 0.125rem;
+		right: 0.125rem;
+		bottom: 0.125rem;
+		border: 0.0625rem dotted var(--sapContent_FocusColor);
+		content: '';
 	}
 
 	&.sapUiCalItemSelBetween .sapUiCalItemText {
@@ -211,7 +217,7 @@ html.sap-desktop .sapUiCalItemSel:not(.sapUiCalItemNow):not(.sapUiCalItemSelBetw
 			border-radius: 0.25rem;
 		}
 
-		&:not(.sapUiCalItemSelBetween):focus > .sapUiCalItemText::after {
+		&:not(.sapUiCalItemSelBetween):not(.sapUiCalItemFocusFromTouch):focus-visible > .sapUiCalItemText::after {
 			border-color: var(--sapContent_ContrastFocusColor);
 		}
 	}
@@ -229,6 +235,25 @@ html.sap-desktop .sapUiCalItemSel:not(.sapUiCalItemNow):not(.sapUiCalItemSelBetw
 	.sapUiCalItemText {
 		border-radius: var(--sapElement_BorderCornerRadius);
 	}
+}
+
+html.sap-desktop .sapUiCalItem:focus > .sapUiCalItemText {
+	position: static;
+	outline: none;
+
+	&::after {
+		position: absolute;
+		top: 0.125rem;
+		left: 0.125rem;
+		right: 0.125rem;
+		bottom: 0.125rem;
+		border: 0.0625rem dotted var(--sapContent_FocusColor);
+		content: '';
+	}
+}
+
+html.sap-desktop .sapUiCalItem.sapUiCalItemSel:not(.sapUiCalItemSelBetween):focus > .sapUiCalItemText::after {
+	border-color: var(--sapContent_ContrastFocusColor);
 }
 
 .sapUiCalItemOtherMonth {

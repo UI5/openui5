@@ -76,7 +76,7 @@ sap.ui.define([
 		assert.ok(this.oSelect.getDomRef(), "Select has DOM");
 	});
 
-	QUnit.test("it should set the selection correctly when the item aggregation is bound to a OData model and the selectedKey property is not bound", async function (assert) {
+	QUnit.test("selectedKey bound to OData model without selectedKey binding selects correct item", async function (assert) {
 		setODataModelAndBindItems(this.oSelect);
 
 		await ui5Delegate("onAfterRendering", this.oSelect);
@@ -86,7 +86,7 @@ sap.ui.define([
 		assert.strictEqual(this.oSelect.$("label").text(), "Gladiator MX");
 	});
 
-	QUnit.test("it should set the selection correctly when the item aggregation is bound to a OData model and the selectedKey property is not bound", async function (assert) {
+	QUnit.test("selectedKey pre-set before OData binding is preserved after rendering", async function (assert) {
 		this.oSelect.setSelectedKey("id_14");
 		setODataModelAndBindItems(this.oSelect);
 
@@ -100,7 +100,7 @@ sap.ui.define([
 	});
 
 	// BCP 1580006106
-	QUnit.test("it should not override the selection if the items aggregation is bound to a OData model and filters are used", async function (assert) {
+	QUnit.test("OData model binding with filters does not override existing selection", async function (assert) {
 
 		setODataModelAndBindItems(this.oSelect);
 

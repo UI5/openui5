@@ -367,3 +367,60 @@ html.sap-desktop .sapMDialog.CPDialog {
 		}
 	}
 }
+
+html.sap-phone .sapMColorPalette .sapMBtn:focus-visible {
+
+	> .sapMFocusable {
+		outline: none;
+		outline-offset: 0;
+
+		.sapMBtnFocusDiv {
+			box-sizing: inherit;
+			position: inherit;
+			left: 0;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			border-radius: 0;
+			border: none;
+			pointer-events: none;
+		}
+	}
+
+	&::after {
+		content: ' ';
+		position: absolute;
+		box-sizing: border-box;
+		left: 2px;
+		top: 2px;
+		right: 2px;
+		bottom: 2px;
+		border-radius: 0;
+		border: 0.0625rem dotted var(--sapContent_FocusColor);
+		pointer-events: none;
+	}
+}
+
+html.sap-phone .sapMColorPalette .sapMColorPaletteSquare:focus-visible:not(.sapMColorPaletteSquareSelected)::before {
+	content: '';
+	box-sizing: border-box;
+	position: absolute;
+	left: 0.1875rem;
+	top: 0.1875rem;
+	right: 0.1875rem;
+	bottom: 0.1875rem;
+	border: 1px solid var(--sapContent_FocusColor);
+	pointer-events: none;
+}
+
+html.sap-phone .sapMColorPalette .sapMColorPaletteSquare:focus-visible:not(.sapMColorPaletteSquareSelected)::after {
+	content: '';
+	position: absolute;
+	box-sizing: border-box;
+	left: 0.1875rem;
+	top: 0.1875rem;
+	right: 0.1875rem;
+	bottom: 0.1875rem;
+	border: 1px dotted var(--sapContent_ContrastFocusColor);
+	pointer-events: none;
+}

@@ -9,7 +9,19 @@
 	position: relative;
 }
 
-.sapMObjectAttributeActive .sapMObjectAttributeText:focus::after {
+html.sap-desktop .sapMObjectAttributeActive .sapMObjectAttributeText:focus::after {
+	pointer-events: none;
+	display: block;
+	content: '';
+	position: absolute;
+	top: 1px;
+	left: 1px;
+	bottom: 1px;
+	right: 1px;
+	outline: 1px dotted var(--sapContent_FocusColor);
+}
+
+.sapMObjectAttributeActive .sapMObjectAttributeText:focus-visible::after {
 	pointer-events: none;
 	display: block;
 	content: '';
@@ -33,7 +45,7 @@
 
 .sapMOHR .sapMObjectAttributeActive .sapMObjectAttributeText:active,
 .sapMOHR .sapMObjectAttributeActive .sapMObjectAttributeText:hover,
-.sapMOHR .sapMObjectAttributeActive .sapMObjectAttributeText:focus {
+.sapMOHR .sapMObjectAttributeActive .sapMObjectAttributeText:focus-visible {
 	text-decoration: underline;
 	color: var(--sapLink_Hover_Color);
 }

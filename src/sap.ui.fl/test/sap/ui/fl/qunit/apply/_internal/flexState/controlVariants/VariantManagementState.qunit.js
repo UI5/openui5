@@ -452,18 +452,21 @@ sap.ui.define([
 				layer: Layer.USER,
 				variantReference: sStandardVariantReference
 			});
-			// Variants
+			// Variants - distinct titles so the alphabetical sort is deterministic
 			const oVendorVariant = createVariant({
+				title: "A vendor",
 				variantReference: sVariantManagementReference,
 				fileName: "vendorVariant",
 				layer: Layer.VENDOR
 			});
 			const oCustomerVariant = createVariant({
+				title: "B customer",
 				variantReference: "vendorVariant",
 				fileName: "customerVariant",
 				layer: Layer.CUSTOMER
 			});
 			const oUserVariant = createVariant({
+				title: "C user",
 				variantReference: "customerVariant",
 				fileName: "userVariant",
 				layer: Layer.USER

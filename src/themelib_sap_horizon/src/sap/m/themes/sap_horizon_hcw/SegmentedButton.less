@@ -63,6 +63,18 @@ html.sap-desktop {
 	}
 }
 
+.sapMSegBBtnFocusable:not(.sapMBtnFocusFromTouch):focus-visible .sapMSegBBtnInner {
+	outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle);
+	outline-offset: -0.25rem;
+	outline-color: var(--sapContent_FocusColor);
+}
+
+.sapMSegBBtnFocusable.sapMSegBBtnSel:not(.sapMBtnFocusFromTouch):focus-visible .sapMSegBBtnInner {
+	outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle);
+	outline-offset: -0.25rem;
+	outline-color: var(--sapContent_ContrastFocusColor);
+}
+
 .sapMSegB.sapMSegBIcons {
 
 	.sapMSegBBtn:not(.sapMSegBBtnMixed) .sapMSegBBtnInner {

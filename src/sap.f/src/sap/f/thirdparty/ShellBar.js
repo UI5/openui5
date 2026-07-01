@@ -184,7 +184,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	                                    }, children: jsxRuntime.jsx("slot", { name: "assistant" }) })), notificationsAction && (jsxRuntime.jsx(Button.Button, { "data-ui5-stable": notificationsAction.stableDomRef, class: {
 	                                        "ui5-shellbar-bell-button ui5-shellbar-action-button ui5-shellbar-gap-start": true,
 	                                        "ui5-shellbar-hidden": this.isHidden("notifications")
-	                                    }, icon: notificationsAction.icon, design: "Transparent", onClick: this.handleNotificationsClick, tooltip: actionsAccInfo.notifications.title, accessibilityAttributes: actionsAccInfo.notifications.accessibilityAttributes, children: notificationsAction?.count && (jsxRuntime.jsx(ShellBarItem.ButtonBadge, { slot: "badge", design: "OverlayText", text: notificationsAction?.count })) })), this.items.map(item => (jsxRuntime.jsx("div", { class: {
+	                                    }, icon: notificationsAction.icon, design: "Transparent", onClick: this.handleNotificationsClick, tooltip: actionsAccInfo.notifications.title, accessibilityAttributes: actionsAccInfo.notifications.accessibilityAttributes, children: notificationsAction?.count && (jsxRuntime.jsx(ShellBarItem.ButtonBadge, { slot: "badge", design: "OverlayText", text: notificationsAction?.count })) })), this._validItems.map(item => (jsxRuntime.jsx("div", { class: {
 	                                        "ui5-shellbar-custom-item ui5-shellbar-gap-start": true,
 	                                        "ui5-shellbar-hidden": this.isHidden(item._id),
 	                                    }, "data-ui5-stable": item.stableDomRef, children: !item.inOverflow ? jsxRuntime.jsx("slot", { name: item._individualSlot }) : null }, item._id))), overflowAction && (jsxRuntime.jsx(Button.Button, { "data-ui5-stable": overflowAction.stableDomRef, id: "ui5-shellbar-overflow-button", class: {
@@ -1200,7 +1200,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        const result = this.overflow.updateOverflow({
 	            actions: this.actions,
 	            content: this.sortContent(this.content),
-	            customItems: this.items,
+	            customItems: this._validItems,
 	            hiddenItemsIds: this.hiddenItemsIds,
 	            showSearchField: this.enabledFeatures.search && this.showSearchField,
 	            overflowOuter: this.overflowOuter,
@@ -1218,7 +1218,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    handleUpdateOverflowResult(result) {
 	        const { hiddenItemsIds, showOverflowButton } = result;
 	        // Update items overflow state
-	        this.items.forEach(item => {
+	        this._validItems.forEach(item => {
 	            item.inOverflow = hiddenItemsIds.includes(item._id);
 	            if (item.inOverflow) {
 	                // clear the hidden class to ensure the item is visible in the overflow popover
@@ -1282,9 +1282,20 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    get overflowItems() {
 	        return this.overflow.getOverflowItems({
 	            actions: this.actions,
-	            customItems: this.items,
+	            customItems: this._validItems,
 	            hiddenItemsIds: this.hiddenItemsIds,
 	        });
+	    }
+	    /**
+	     * Only entries that are actually `ui5-shellbar-item` instances participate in the
+	     * overflow calculation and template rendering. The default slot's type is
+	     * `HTMLElement`, so any stray child (e.g. a bare `<span>`) ends up in `this.items`;
+	     * if such an element reaches the overflow algorithm it has no `_id` / `stableDomRef`,
+	     * which writes `undefined` back into reactive properties on every pass and re-enters
+	     * the render queue until `RenderQueue` throws "processed too many times".
+	     */
+	    get _validItems() {
+	        return this.items.filter(ShellBarItem.isInstanceOfShellBarItem);
 	    }
 	    /**
 	     * Returns badge text for overflow button.
@@ -1502,6 +1513,9 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	     * @since 1.0.0-rc.16
 	     */
 	    get notificationsDomRef() {
+	        if (this.isHidden(ShellBarActions.Notifications)) {
+	            return this.overflowDomRef;
+	        }
 	        return this.shadowRoot.querySelector(`*[data-ui5-stable="notifications"]`);
 	    }
 	    /**

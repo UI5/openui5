@@ -151,14 +151,18 @@
 }
 
 /* no default (browser) outline, if device needs focus visualization its defined later */
-.sapUiCalHead button:focus,
-.sapUiCalCancel:focus {
+html.sap-desktop .sapUiCalHead button:focus,
+html.sap-desktop .sapUiCalCancel:focus,
+.sapUiCalHead button:focus-visible,
+.sapUiCalCancel:focus-visible {
 	outline: none;
 }
 
 /* hover and focus makes only sense on desktops. On mobile devices it's not needed */
 html.sap-desktop .sapUiCalHead button:focus,
-html.sap-desktop .sapUiCalCancel:focus {
+html.sap-desktop .sapUiCalCancel:focus,
+.sapUiCalHead button:focus-visible,
+.sapUiCalCancel:focus-visible {
 	background-color: var(--sapButton_Hover_Background);
 	color: var(--sapButton_Hover_TextColor);
 }
@@ -498,7 +502,7 @@ html.sap-desktop .sapUiCalHead button.sapUiCalDsbl:focus,
 	.sapUiCalItem {
 		line-height: 1.875rem;
 
-		&:focus {
+		&:focus-visible {
 			line-height: 1.75rem;
 		}
 
@@ -508,6 +512,13 @@ html.sap-desktop .sapUiCalHead button.sapUiCalDsbl:focus,
 			justify-content: center;
 		}
 	}
+}
+
+html.sap-desktop .sapUiCalMonthPicker.sapUiCalMonthSecType .sapUiCalItem:focus,
+html.sap-desktop .sapUiCalYearPicker.sapUiCalMonthSecType .sapUiCalItem:focus,
+.sapUiCalMonthPicker.sapUiCalMonthSecType .sapUiCalItem:focus-visible,
+.sapUiCalYearPicker.sapUiCalMonthSecType .sapUiCalItem:focus-visible {
+	line-height: 1.75rem;
 }
 
 .sapUiSizeCozy {
@@ -547,13 +558,24 @@ html.sap-desktop .sapUiCalHead button.sapUiCalDsbl:focus,
 	.sapUiCalItem {
 		line-height: 1rem;
 
-		&:focus {
+		&:focus-visible {
 			line-height: 0.875rem;
 
 			.sapUiCalItemSecText {
 				line-height: 0.875rem;
 			}
 		}
+	}
+}
+
+html.sap-desktop .sapUiSizeCompact .sapUiCalMonthPicker.sapUiCalMonthSecType .sapUiCalItem:focus,
+html.sap-desktop .sapUiSizeCompact .sapUiCalYearPicker.sapUiCalMonthSecType .sapUiCalItem:focus,
+.sapUiSizeCompact .sapUiCalMonthPicker.sapUiCalMonthSecType .sapUiCalItem:focus-visible,
+.sapUiSizeCompact .sapUiCalYearPicker.sapUiCalMonthSecType .sapUiCalItem:focus-visible {
+	line-height: 0.875rem;
+
+	.sapUiCalItemSecText {
+		line-height: 0.875rem;
 	}
 }
 
@@ -766,7 +788,14 @@ html.sapUiMedia-Std-Phone .sapUiCalHeadB0 {
 	box-sizing: border-box;
 }
 
-.sapUiCalMonthSecType .sapUiCalItem:focus > .sapUiCalItemSecText {
+.sapUiCalItem:focus-visible {
+    outline-width: none;
+    outline-style: none;
+    outline-color: none;
+}
+
+html.sap-desktop .sapUiCalMonthSecType .sapUiCalItem:focus > .sapUiCalItemSecText,
+.sapUiCalMonthSecType .sapUiCalItem:focus-visible > .sapUiCalItemSecText {
 	line-height: 0.75rem;
 }
 

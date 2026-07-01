@@ -57,23 +57,30 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/jsx-run
         _fireClick() {
             this.fireDecoratorEvent("click");
         }
-        _onclick(e) {
+        _activate(e) {
             e.stopPropagation();
             this._fireClick();
         }
-        _onkeyup(e) {
-            if (webcomponentsBase.A(e)) {
-                this._fireClick();
-            }
+        _getAnchor() {
+            return this.shadowRoot?.querySelector("a");
+        }
+        _onclick(e) {
+            this._activate(e);
         }
         _onkeydown(e) {
-            if (webcomponentsBase.A(e)) {
+            if (webcomponentsBase.b(e) && !this.href) {
                 e.preventDefault();
+                this._getAnchor()?.click();
+            }
+            else if (webcomponentsBase.A(e)) {
+                e.preventDefault();
+            }
+        }
+        _onkeyup(e) {
+            if (!webcomponentsBase.A(e)) {
                 return;
             }
-            if (webcomponentsBase.b(e)) {
-                this._fireClick();
-            }
+            this._getAnchor()?.click();
         }
     };
     __decorate([

@@ -174,9 +174,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	};
 	var Popup_1;
 	const createBlockingStyle = () => {
-	    if (!Theme.S$1("data-ui5-popup-scroll-blocker")) {
-	        Theme.c$1(globalStyles, "data-ui5-popup-scroll-blocker");
-	    }
+	    Theme.R(globalStyles, "data-ui5-popup-scroll-blocker");
 	};
 	createBlockingStyle();
 	const pageScrollingBlockers = new Set();

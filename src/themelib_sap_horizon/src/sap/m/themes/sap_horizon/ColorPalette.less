@@ -159,6 +159,80 @@ html.sap-desktop .sapMColorPalette .sapMBtn:focus > .sapMFocusable::before {
 	display: none;
 }
 
+.sapMColorPalette .sapMColorPaletteSquare:focus-visible:not(.sapMColorPaletteSquareSelected) {
+
+	&::after {
+		display: none;
+	}
+
+	&::before {
+		border: 0.125rem solid var(--sapContent_FocusColor);
+		border-radius: 0.4375rem;
+		top: -0.1875rem;
+		left: -0.1875rem;
+		bottom: -0.1875rem;
+		right: -0.1875rem;
+	}
+
+	&:hover {
+
+		&::after {
+			display: block;
+			border: 0.0625rem solid var(--sapContent_ContrastFocusColor);
+			border-radius: 0.3125rem;
+			top: 0.0625rem;
+			left: 0.0625rem;
+			bottom: 0.0625rem;
+			right: 0.0625rem;
+		}
+
+		&::before {
+			border: 0.125rem solid var(--sapContent_FocusColor);
+			border-radius: 0.4375rem;
+			top: 0.0625rem;
+			left: 0.0625rem;
+			bottom: 0.0625rem;
+			right: 0.0625rem;
+		}
+	}
+}
+
+.sapMColorPalette .sapMBtn:focus-visible {
+
+	> .sapMFocusable {
+		outline: none;
+		outline-offset: 0;
+
+		.sapMBtnFocusDiv {
+			box-sizing: inherit;
+			position: inherit;
+			left: 0;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			border-radius: 0;
+			border: none;
+			pointer-events: none;
+		}
+	}
+
+	&::after {
+		border-radius: 0.5rem;
+		border: 0.125rem solid var(--sapContent_FocusColor);
+	}
+}
+
+.sapUiSizeCompact .sapMColorPalette .sapMColorPaletteSquare:focus-visible:not(:hover):not(.sapMColorPaletteSquareSelected)::before {
+	top: -0.25rem;
+	left: -0.25rem;
+	bottom: -0.25rem;
+	right: -0.25rem;
+}
+
+.sapMColorPalette .sapMBtn:focus-visible > .sapMFocusable::before {
+	display: none;
+}
+
 .sap-phone .sapMColorPalette .sapMColorPaletteSquare {
 
 	& > div {

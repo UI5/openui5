@@ -1,4 +1,4 @@
-/*global QUnit, sinon*/
+/*global QUnit */
 sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/test/utils/nextUIUpdate",
@@ -63,25 +63,25 @@ sap.ui.define([
 		"use strict";
 
 		// shortcut for sap.ui.core.OpenState
-		var OpenState = coreLibrary.OpenState;
+		const OpenState = coreLibrary.OpenState;
 
 		// shortcut for sap.m.SelectType
-		var SelectType = mobileLibrary.SelectType;
+		const SelectType = mobileLibrary.SelectType;
 
-		var TwoColumnSeparator = mobileLibrary.SelectTwoColumnSeparator;
+		const TwoColumnSeparator = mobileLibrary.SelectTwoColumnSeparator;
 
 		// shortcut for sap.ui.core.ValueState
-		var ValueState = coreLibrary.ValueState;
+		const ValueState = coreLibrary.ValueState;
 
 		// shortcut for sap.ui.core.TextDirection
-		var TextDirection = coreLibrary.TextDirection;
+		const TextDirection = coreLibrary.TextDirection;
 
 		// shortcut for sap.ui.core.TextAlign
-		var TextAlign = coreLibrary.TextAlign;
+		const TextAlign = coreLibrary.TextAlign;
 
 		createAndAppendDiv("content").className = "content";
 
-		var mTestModelData = {
+		const mTestModelData = {
 			"items": [
 				{
 					"key": "DZ",
@@ -441,15 +441,19 @@ sap.ui.define([
 		};
 
 		// helper functions
-		var fnTestControlProperty = function (mOptions) {
-			var sProperty = Capitalize(mOptions.property);
+		const fnTestControlProperty = function (mOptions) {
+			const sProperty = Capitalize(mOptions.property);
 
 			QUnit.test("get" + sProperty + "()", function (assert) {
-				assert.strictEqual(mOptions.control["get" + sProperty](), mOptions.output, mOptions.description);
+				try {
+					assert.strictEqual(mOptions.control["get" + sProperty](), mOptions.output, mOptions.description);
+				} finally {
+					mOptions.control.destroy();
+				}
 			});
 		};
 
-		var fnToMobileMode = function () {
+		const fnToMobileMode = function () {
 			jQuery("html").removeClass("sapUiMedia-Std-Desktop")
 				.removeClass("sapUiMedia-Std-Tablet")
 				.addClass("sapUiMedia-Std-Phone");
@@ -457,7 +461,7 @@ sap.ui.define([
 			Device.system.tablet = false;
 			Device.system.phone = true;
 		};
-		var fnToDesktopMode = function () {
+		const fnToDesktopMode = function () {
 			jQuery("html").removeClass("sapUiMedia-Std-Phone")
 				.removeClass("sapUiMedia-Std-Tablet")
 				.addClass("sapUiMedia-Std-Desktop");
@@ -465,7 +469,7 @@ sap.ui.define([
 			Device.system.tablet = false;
 			Device.system.phone = false;
 		};
-		var fnToTabletMode = function () {
+		const fnToTabletMode = function () {
 			jQuery("html").removeClass("sapUiMedia-Std-Desktop")
 				.removeClass("sapUiMedia-Std-Phone")
 				.addClass("sapUiMedia-Std-Tablet");
@@ -479,7 +483,7 @@ sap.ui.define([
 		QUnit.test("default values", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						id: "item-id",
@@ -794,11 +798,11 @@ sap.ui.define([
 
 		QUnit.module("getSelectedItem");
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedItem set to item reference", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id1",
@@ -823,11 +827,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedItem set to item id string — item at index 2", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -867,11 +871,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedItem id set before items, selectedItem property matches item at index 2", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 
 				selectedItem: "item-id",
 
@@ -916,11 +920,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedKey property selects matching item at index 1", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				selectedKey: "1",
 
 				items: [
@@ -959,10 +963,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("empty items — returns null", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: []
 			});
 
@@ -979,11 +983,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedItem set to null — falls back to first item", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -1022,11 +1026,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedKey set to empty string — falls back to first item", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -1065,10 +1069,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly (forceSelection = false)", function (assert) {
+		QUnit.test("forceSelection=false: no item selected when no key matches", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				forceSelection: false,
 				items: [
 					new Item({
@@ -1097,11 +1101,11 @@ sap.ui.define([
 
 		QUnit.module("getSelectedItemId");
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedItemId set to undefined — falls back to first item", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -1140,11 +1144,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedItemId set to empty string — falls back to first item", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -1183,11 +1187,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("single item, no selectedItemId set — first item selected", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -1214,11 +1218,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedItem set to item id — item at index 2", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -1262,11 +1266,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedItem set before items — item at last index", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				selectedItem: "item-id",
 
 				items: [
@@ -1310,11 +1314,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedKey set to key of item at index 1", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				selectedKey: "1",
 
 				items: [
@@ -1353,10 +1357,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("empty items — returns empty string", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: []
 			});
 
@@ -1373,11 +1377,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedItem set to null — falls back to first item", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -1416,11 +1420,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedItemId empty string with null selectedItem — falls back to first item", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -1461,11 +1465,11 @@ sap.ui.define([
 
 		QUnit.module("getSelectedKey");
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedKey set to undefined — falls back to first item", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -1504,11 +1508,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("single item, no selectedKey set — first item selected", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -1535,11 +1539,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedItem set to item id — item at index 2", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -1583,11 +1587,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedItem set before items — item at last index", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				selectedItem: "item-id",
 
 				items: [
@@ -1631,11 +1635,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedKey property selects matching item at index 1", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				selectedKey: "1",
 
 				items: [
@@ -1674,10 +1678,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("empty items — returns empty string", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: []
 			});
 
@@ -1698,11 +1702,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedItem set to null — falls back to first item", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -1741,11 +1745,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedItemId set to undefined — falls back to first item", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -1784,11 +1788,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedItemId set to empty string — falls back to first item", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -1827,11 +1831,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly", function (assert) {
+		QUnit.test("selectedKey set to key of first item", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -1870,10 +1874,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly when the item aggregation is bound to a JSON model and the selectedKey property is not bound", function (assert) {
+		QUnit.test("selectedKey bound to JSONModel without selectedKey binding selects correct item", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: {
 					path: "/items",
 					template: new Item({
@@ -1884,8 +1888,8 @@ sap.ui.define([
 			});
 
 			// arrange
-			var oModel = new JSONModel();
-			var mData = {
+			const oModel = new JSONModel();
+			const mData = {
 				"items": [
 					{
 						"key": "GER",
@@ -1914,10 +1918,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly when the item aggregation and the selectedKey property are bound to a JSON model", function (assert) {
+		QUnit.test("selectedKey and items both bound to JSONModel selects correct item", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				selectedKey: {
 					path: "/selected"
 				},
@@ -1931,8 +1935,8 @@ sap.ui.define([
 			});
 
 			// arrange
-			var oModel = new JSONModel();
-			var mData = {
+			const oModel = new JSONModel();
+			const mData = {
 				"items": [
 					{
 						"key": "GER",
@@ -1966,7 +1970,7 @@ sap.ui.define([
 		QUnit.test("update the selection when the model has changed", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: {
 					path: "/contries",
 					template: new Item({
@@ -1977,8 +1981,8 @@ sap.ui.define([
 			});
 
 			// arrange + act
-			var oModel = new JSONModel();
-			var mData = {
+			const oModel = new JSONModel();
+			const mData = {
 				"contries": [
 					{
 						"code": "GER",
@@ -2012,11 +2016,11 @@ sap.ui.define([
 		});
 
 		// BCP 1570296493
-		QUnit.test("it should synchronize property changes of items to the select control", function (assert) {
+		QUnit.test("item property changes are synchronized to the Select control", function (assert) {
 
 			// system under test
-			var oItem;
-			var oSelect = new Select({
+			let oItem;
+			const oSelect = new Select({
 				items: [
 					oItem = new Item({
 						key: "CU",
@@ -2039,19 +2043,19 @@ sap.ui.define([
 		});
 
 		// BCP 1670351685
-		QUnit.test("it should select the selected item after the dropdown is open", function (assert) {
+		QUnit.test("selected item is highlighted after dropdown opens", function (assert) {
 
 			// system under test
-			var oModel = new JSONModel();
+			const oModel = new JSONModel();
 
 			oModel.setData(mTestModelData);
 
-			var oItemTemplate = new Item({
+			const oItemTemplate = new Item({
 				key: "{key}",
 				text: "{text}"
 			});
 
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: {
 					path: "/items",
 					template: oItemTemplate
@@ -2060,7 +2064,7 @@ sap.ui.define([
 
 			// arrange
 			oSelect.placeAt("content");
-			var oScrollToItemSpy = this.spy(oSelect, "scrollToItem");
+			const oScrollToItemSpy = this.spy(oSelect, "scrollToItem");
 			oSelect.setSelectedKey("YE");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
@@ -2077,19 +2081,19 @@ sap.ui.define([
 		});
 
 		// BCP 1570472488
-		QUnit.test("it should not fire the change event after the selection has changed (via keyboard) and the scrollbar is pressed", function (assert) {
+		QUnit.test("change event is not fired when scrollbar is pressed after keyboard selection", function (assert) {
 
 			// system under test
-			var oModel = new JSONModel();
+			const oModel = new JSONModel();
 
 			oModel.setData(mTestModelData);
 
-			var oItemTemplate = new Item({
+			const oItemTemplate = new Item({
 				key: "{key}",
 				text: "{text}"
 			});
 
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: {
 					path: "/items",
 					template: oItemTemplate
@@ -2103,11 +2107,11 @@ sap.ui.define([
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 			oSelect.focus();
 			oSelect.open();
 			this.clock.tick(1000);	// wait 1s after the open animation is completed
-			var oPickerDomRef = oSelect.getPicker().getDomRef("cont");
+			const oPickerDomRef = oSelect.getPicker().getDomRef("cont");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
@@ -2135,7 +2139,7 @@ sap.ui.define([
 
 		QUnit.module("Update selection on item changes BCP: 1870551736", {
 			assertCurrentItemIsSelected: function (oSelect, oItem, assert) {
-				var sItemId = oItem.getId();
+				const sItemId = oItem.getId();
 
 				assert.strictEqual(oSelect.getAssociation("selectedItem"), sItemId,
 					"Expected item is assigned to the 'selectedItem' association");
@@ -2149,10 +2153,10 @@ sap.ui.define([
 		QUnit.test("We update the select properly when it`s item change", function (assert) {
 
 			// Arrange
-			var oItem1,
-				oItem2,
-				oItem3,
-				oSelect = new Select({
+			let oItem1;
+			let oItem2;
+			let oItem3;
+			const oSelect = new Select({
 					items: [
 						oItem1 = new Item({
 							key: "one"
@@ -2238,10 +2242,10 @@ sap.ui.define([
 			"the same 'key'", function (assert) {
 
 			// Arrange
-			var oItem3 = new Item({
+			const oItem3 = new Item({
 					key: "two"
-				}),
-				oSelect = new Select({
+				});
+			const oSelect = new Select({
 					items: [
 						new Item({
 							key: "one"
@@ -2272,10 +2276,10 @@ sap.ui.define([
 			"with the same 'key'", function (assert) {
 
 			// Arrange
-			var oItem3 = new Item({
+			const oItem3 = new Item({
 					key: "three"
-				}),
-				oSelect = new Select({
+				});
+			const oSelect = new Select({
 					items: [
 						new Item({
 							key: "one"
@@ -2304,8 +2308,8 @@ sap.ui.define([
 
 		QUnit.test("insertItem at last index and current list contains item with the same 'key'", function (assert) {
 			// Arrange
-			var oItem2,
-				oSelect = new Select({
+			let oItem2;
+			const oSelect = new Select({
 					items: [
 						new Item({
 							key: "one"
@@ -2337,10 +2341,10 @@ sap.ui.define([
 		QUnit.test("addItem at with the same 'key' as current 'selectedKey' and current list does not contain item with the " +
 			"same 'key'", function (assert) {
 			// Arrange
-			var oItem3 = new Item({
+			const oItem3 = new Item({
 					key: "three"
-				}),
-				oSelect = new Select({
+				});
+			const oSelect = new Select({
 					items: [
 						new Item({
 							key: "one"
@@ -2369,8 +2373,8 @@ sap.ui.define([
 
 		QUnit.test("addItem at last index and current list contains item with the same 'key'", function (assert) {
 			// Arrange
-			var oItem2,
-				oSelect = new Select({
+			let oItem2;
+			const oSelect = new Select({
 					items: [
 						new Item({
 							key: "one"
@@ -2403,9 +2407,9 @@ sap.ui.define([
 			function (assert) {
 
 			// Arrange
-			var oItem1,
-				oItem2,
-				oSelect = new Select({
+			let oItem1;
+			let oItem2;
+			const oSelect = new Select({
 					items: [
 						oItem1 = new Item({
 							key: "two"
@@ -2441,9 +2445,9 @@ sap.ui.define([
 			"with the same 'key'", function (assert) {
 
 			// Arrange
-			var oItem1,
-				oItem2,
-				oSelect = new Select({
+			let oItem1;
+			let oItem2;
+			const oSelect = new Select({
 					items: [
 						oItem1 = new Item({
 							key: "one"
@@ -2477,11 +2481,10 @@ sap.ui.define([
 
 		QUnit.module("setName()");
 
-		QUnit.test("it should render an input field with the value of the selected key", function (assert) {
+		QUnit.test("renders input field with value of selected key", function (assert) {
 
 			// system under test
-			var oSelectDomRef,
-				oSelect = new Select({
+			const oSelect = new Select({
 				name: "lorem ipsum",
 				items: [
 					new Item({
@@ -2499,7 +2502,7 @@ sap.ui.define([
 			oSelect.setName("select-name0");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-			oSelectDomRef = oSelect._getHiddenInput();
+			const oSelectDomRef = oSelect._getHiddenInput();
 
 			// assert
 			assert.strictEqual(oSelectDomRef.attr("name"), "select-name0", 'The attribute name is "select-name0"');
@@ -2514,7 +2517,7 @@ sap.ui.define([
 		QUnit.test("setWidth()", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -2543,7 +2546,7 @@ sap.ui.define([
 		QUnit.test("setEnabled()", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -2611,10 +2614,10 @@ sap.ui.define([
 
 		QUnit.module("two column layout");
 
-		QUnit.test("it should forward the value of the showSecondaryValues to the list", function (assert) {
+		QUnit.test("showSecondaryValues is forwarded to the SelectList", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				showSecondaryValues: true,
 				items: [
 					new ListItem({
@@ -2632,10 +2635,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should returns the this reference to allow method chaining", function (assert) {
+		QUnit.test("setShowSecondaryValues returns this for method chaining", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new ListItem({
 						key: "lorem",
@@ -2646,7 +2649,7 @@ sap.ui.define([
 			});
 
 			// arrange
-			var fnSetShowSecondaryValuesSpy = this.spy(oSelect, "setShowSecondaryValues");
+			const fnSetShowSecondaryValuesSpy = this.spy(oSelect, "setShowSecondaryValues");
 
 			// act
 			oSelect.setShowSecondaryValues(true);
@@ -2659,10 +2662,10 @@ sap.ui.define([
 		});
 
 		// github #1177
-		QUnit.test("it should adjust the width of the field to the size of its content", function (assert) {
+		QUnit.test("autoAdjustWidth adjusts field width to content size", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				width: "auto",
 				items: [
 					new ListItem({
@@ -2676,7 +2679,7 @@ sap.ui.define([
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
-			var sWidth = oSelect.getDomRef().offsetWidth;
+			const sWidth = oSelect.getDomRef().offsetWidth;
 
 			// act
 			oSelect.open();
@@ -2695,11 +2698,11 @@ sap.ui.define([
 		/* getLabels()					*/
 		/* ------------------------------ */
 
-		QUnit.test("it should return an array with one object which is the current target of the ariaLabelledBy association", function (assert) {
+		QUnit.test("getAriaLabelledBy returns the current ariaLabelledBy association targets", function (assert) {
 
 			// system under test
-			var oLabel = new Label();
-			var oSelect = new ComboBoxTextField({
+			const oLabel = new Label();
+			const oSelect = new ComboBoxTextField({
 				ariaLabelledBy: [
 					oLabel
 				]
@@ -2714,11 +2717,11 @@ sap.ui.define([
 			oLabel.destroy();
 		});
 
-		QUnit.test("it should return an array with one object which is the label referencing the text field", function (assert) {
+		QUnit.test("labels referencing the text field are included in ariaLabelledBy", function (assert) {
 
 			// system under test
-			var oSelect = new ComboBoxTextField();
-			var oLabel = new Label({
+			const oSelect = new ComboBoxTextField();
+			const oLabel = new Label({
 				labelFor: oSelect
 			});
 
@@ -2731,20 +2734,19 @@ sap.ui.define([
 			oLabel.destroy();
 		});
 
-		QUnit.test("it should return an array of objects which are the current targets of the ariaLabelledBy association and the labels referencing the text field", function (assert) {
+		QUnit.test("getAriaLabelledBy combines association targets and referencing labels", function (assert) {
 
 			// system under test
-			var oSelect;
-			var oLabel1 = new Label({
-				id: "lorem-ipsum-label",
-				labelFor: oSelect
-			});
-			oSelect = new ComboBoxTextField({
+			const oSelect = new ComboBoxTextField({
 				ariaLabelledBy: [
 					"lorem-ipsum-label"
 				]
 			});
-			var oLabel2 = new Label({
+			const oLabel1 = new Label({
+				id: "lorem-ipsum-label",
+				labelFor: oSelect
+			});
+			const oLabel2 = new Label({
 				labelFor: oSelect
 			});
 
@@ -2759,12 +2761,12 @@ sap.ui.define([
 			oLabel2.destroy();
 		});
 
-		QUnit.test("it should show the text and additionalText, separated by '-' when select is read-only", function (assert) {
+		QUnit.test("read-only Select shows text and additionalText separated by hyphen", function (assert) {
 
 			// system under test
-			var sText = "lorem ipsum",
-				sAdditionalText = "lorem",
-				oSelect = new Select({
+			const sText = "lorem ipsum";
+			const sAdditionalText = "lorem";
+			const oSelect = new Select({
 				showSecondaryValues: true,
 				items: [
 					new ListItem({
@@ -2801,9 +2803,9 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should show the selected separator when select is read-only", function (assert) {
+		QUnit.test("read-only Select shows selected SeparatorItem text", function (assert) {
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				editable: false,
 				showSecondaryValues: true,
 				items: [
@@ -2847,11 +2849,11 @@ sap.ui.define([
 		QUnit.test("addItem()", function (assert) {
 
 			// system under test
-			var oSelect = new Select();
+			const oSelect = new Select();
 
 			// arrange
-			var fnAddItemSpy = this.spy(oSelect, "addItem");
-			var oItem = new Item({
+			const fnAddItemSpy = this.spy(oSelect, "addItem");
+			const oItem = new Item({
 				key: "0",
 				text: "item 0"
 			});
@@ -2870,13 +2872,13 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should not throw an exeption", function (assert) {
+		QUnit.test("setSelectedItem with null does not throw", function (assert) {
 
 			// system under test
-			var oSelect = new Select();
+			const oSelect = new Select();
 
 			// arrange
-			var fnAddItemSpy = this.spy(oSelect, "addItem");
+			const fnAddItemSpy = this.spy(oSelect, "addItem");
 
 			// act
 			oSelect.addItem(null);
@@ -2893,12 +2895,12 @@ sap.ui.define([
 		QUnit.test("insertItem()", function (assert) {
 
 			// system under test
-			var oSelect = new Select();
+			const oSelect = new Select();
 
 			// arrange
-			var fnInsertAggregation = this.spy(oSelect, "insertAggregation");
-			var fnInsertItem = this.spy(oSelect, "insertItem");
-			var oItem = new Item({
+			const fnInsertAggregation = this.spy(oSelect, "insertAggregation");
+			const fnInsertItem = this.spy(oSelect, "insertItem");
+			const oItem = new Item({
 				key: "0",
 				text: "item 0"
 			});
@@ -2921,10 +2923,10 @@ sap.ui.define([
 		QUnit.test("insertItem() it should not throw an exeption", function (assert) {
 
 			// system under test
-			var oSelect = new Select();
+			const oSelect = new Select();
 
 			// arrange
-			var fnInsertItemSpy = this.spy(oSelect, "insertItem");
+			const fnInsertItemSpy = this.spy(oSelect, "insertItem");
 
 			// act
 			oSelect.insertItem(null);
@@ -2940,8 +2942,8 @@ sap.ui.define([
 
 		QUnit.test("SelectList should have tabidnex='-1'", function (assert) {
 			// system under test
-			var oSelect = new Select(),
-				oList = oSelect.getList();
+			const oSelect = new Select();
+			const oList = oSelect.getList();
 
 			assert.strictEqual(oList.getProperty("_tabIndex"), "-1", "SelectList _tabIndex property is set to -1");
 		});
@@ -2951,12 +2953,12 @@ sap.ui.define([
 		QUnit.test("setSelectedItem() should give a warning when called with faulty parameter", function (assert) {
 
 			// system under test
-			var oSelect = new Select();
+			const oSelect = new Select();
 
 			// arrange
-			var fnSetPropertySpy = this.spy(oSelect, "setProperty"),
-				fnFireChangeSpy = this.spy(oSelect, "fireChange"),
-				fnSetSelectedItemSpy = this.spy(oSelect, "setSelectedItem");
+			const fnSetPropertySpy = this.spy(oSelect, "setProperty");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnSetSelectedItemSpy = this.spy(oSelect, "setSelectedItem");
 
 			// act
 			oSelect.setSelectedItem({});
@@ -2978,11 +2980,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("setSelectedItem()", function (assert) {
+		QUnit.test("setSelectedItem() — by item reference (no DOM)", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -3004,10 +3006,10 @@ sap.ui.define([
 			});
 
 			// arrange
-			var fnSetPropertySpy = this.spy(SelectList.prototype, "setProperty"),
-				fnSetAssociationSpy = this.spy(SelectList.prototype, "setAssociation"),
-				fnFireChangeSpy = this.spy(oSelect, "fireChange"),
-				fnSetSelectedItemSpy = this.spy(oSelect, "setSelectedItem");
+			const fnSetPropertySpy = this.spy(SelectList.prototype, "setProperty");
+			const fnSetAssociationSpy = this.spy(SelectList.prototype, "setAssociation");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnSetSelectedItemSpy = this.spy(oSelect, "setSelectedItem");
 
 			// act
 			oSelect.setSelectedItem(oExpectedItem);
@@ -3031,11 +3033,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("setSelectedItem()", function (assert) {
+		QUnit.test("setSelectedItem() — by item id string (no DOM)", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -3057,10 +3059,10 @@ sap.ui.define([
 			});
 
 			// arrange
-			var fnSetPropertySpy = this.spy(SelectList.prototype, "setProperty"),
-				fnSetAssociationSpy = this.spy(SelectList.prototype, "setAssociation"),
-				fnFireChangeSpy = this.spy(oSelect, "fireChange"),
-				fnSetSelectedItemSpy = this.spy(oSelect, "setSelectedItem");
+			const fnSetPropertySpy = this.spy(SelectList.prototype, "setProperty");
+			const fnSetAssociationSpy = this.spy(SelectList.prototype, "setAssociation");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnSetSelectedItemSpy = this.spy(oSelect, "setSelectedItem");
 
 			// act
 			oSelect.setSelectedItem("item-id");
@@ -3086,11 +3088,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("setSelectedItem()", function (assert) {
+		QUnit.test("setSelectedItem() — by item reference (with DOM)", function (assert) {
 
 			//system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -3132,11 +3134,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("setSelectedItem()", function (assert) {
+		QUnit.test("setSelectedItem() — null clears selection to first item", function (assert) {
 
 			//system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -3180,11 +3182,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly when the dropdown list is open", function (assert) {
+		QUnit.test("setSelectedItem(null) falls back to first item when dropdown is open", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						key: "0",
@@ -3231,11 +3233,11 @@ sap.ui.define([
 
 		QUnit.module("setSelectedItemId()");
 
-		QUnit.test("setSelectedItemId()", function (assert) {
+		QUnit.test("setSelectedItemId() — by item id (no DOM)", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -3257,8 +3259,8 @@ sap.ui.define([
 			});
 
 			// arrange
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange"),
-				fnSetSelectedItemIdSpy = this.spy(oSelect, "setSelectedItemId");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnSetSelectedItemIdSpy = this.spy(oSelect, "setSelectedItemId");
 
 			// act
 			oSelect.setSelectedItemId("item-id");
@@ -3281,11 +3283,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("setSelectedItemId()", function (assert) {
+		QUnit.test("setSelectedItemId() — by item id (with DOM)", function (assert) {
 
 			//system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -3327,11 +3329,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("setSelectedItemId()", function (assert) {
+		QUnit.test("setSelectedItemId() — empty string falls back to first item", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -3375,11 +3377,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly when the dropdown list is open", function (assert) {
+		QUnit.test("setSelectedItemId('') falls back to first item when dropdown is open", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						key: "0",
@@ -3425,10 +3427,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the value even if the corresponding item doesn't exist", function (assert) {
+		QUnit.test("setSelectedKey sets value even when item does not exist", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				selectedItemId: "item-id"
 			});
 
@@ -3451,11 +3453,11 @@ sap.ui.define([
 
 		QUnit.module("setSelectedKey");
 
-		QUnit.test("it should set the selection correctly (initial rendering)", function (assert) {
+		QUnit.test("setSelectedKey selects correct item on initial rendering", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 
 				selectedKey: "2",
 
@@ -3497,11 +3499,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly (before rendering)", function (assert) {
+		QUnit.test("setSelectedKey selects correct item before rendering", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -3540,11 +3542,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly after the initial rendering", function (assert) {
+		QUnit.test("setSelectedKey selects correct item after initial rendering", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -3568,10 +3570,10 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-			var fnSetPropertySpy = this.spy(SelectList.prototype, "setProperty"),
-				fnSetAssociationSpy = this.spy(SelectList.prototype, "setAssociation"),
-				fnFireChangeSpy = this.spy(oSelect, "fireChange"),
-				fnSetSelectedKeySpy = this.spy(oSelect, "setSelectedKey");
+			const fnSetPropertySpy = this.spy(SelectList.prototype, "setProperty");
+			const fnSetAssociationSpy = this.spy(SelectList.prototype, "setAssociation");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnSetSelectedKeySpy = this.spy(oSelect, "setSelectedKey");
 
 			// act
 			oSelect.setSelectedKey("1");
@@ -3599,8 +3601,8 @@ sap.ui.define([
 		QUnit.test("setSelectedKey()", function (assert) {
 
 			//system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -3644,11 +3646,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly when the dropdown list is open", function (assert) {
+		QUnit.test("setSelectedKey('') falls back to first item when dropdown is open", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						key: "0",
@@ -3694,10 +3696,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set the selection correctly when forceSelection=false and the item's keys are not provided", function (assert) {
+		QUnit.test("forceSelection=false with no item keys leaves selection empty", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				forceSelection: false,
 				items: [
 					new Item()
@@ -3721,25 +3723,25 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should reset selection if key is missing", function (assert) {
+		QUnit.test("setSelectedKey resets selection when key does not match any item", function (assert) {
 
-			var itemA = new Item({
+			const itemA = new Item({
 				key: "A",
 				text: "Item A"
 			});
 
-			var itemB = new Item({
+			const itemB = new Item({
 				key: "B",
 				text: "Item B"
 			});
 
-			var itemX = new Item({
+			const itemX = new Item({
 				key: "X",
 				text: "Item X"
 			});
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				forceSelection: false,
 				resetOnMissingKey: true,
 				items: [
@@ -3748,9 +3750,9 @@ sap.ui.define([
 				]
 			});
 
-			var missingKey = "X";
-			var existingKey = "B";
-			var defaultSelectedItemId = "";
+			const missingKey = "X";
+			const existingKey = "B";
+			const defaultSelectedItemId = "";
 
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
@@ -3818,10 +3820,10 @@ sap.ui.define([
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 		});
 
-		QUnit.test("it should render placeholders right when forceSelection=false and item is not provided initialy", function (assert) {
+		QUnit.test("forceSelection=false renders placeholder correctly when no initial item", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				forceSelection: false,
 				items: [
 					new Item({
@@ -3874,7 +3876,7 @@ sap.ui.define([
 		QUnit.test("icon should be destroyed", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				forceSelection: false,
 				items: [
 					new Item({
@@ -3900,15 +3902,15 @@ sap.ui.define([
 		});
 
 		// BCP 1580101530
-		QUnit.test("it should correctly synchronize the selection after the properties (models and bindingContext) are propagated", function (assert) {
+		QUnit.test("selection is synchronized after model and bindingContext are propagated", function (assert) {
 
 			// system under test
-			var oItemTemplate = new Item({
+			const oItemTemplate = new Item({
 				key: "{key}",
 				text: "{text}"
 			});
 
-			var oSelect = new Select({
+			const oSelect = new Select({
 				selectedKey: {
 					path: "/selected"
 				},
@@ -3919,8 +3921,8 @@ sap.ui.define([
 			});
 
 			// arrange
-			var oModel = new JSONModel();
-			var mData = {
+			const oModel = new JSONModel();
+			const mData = {
 				"items": [
 					{
 						"key": "DZ",
@@ -3949,15 +3951,15 @@ sap.ui.define([
 		});
 
 		// BCP 1780153332
-		QUnit.test("it should not fire the select event after losing focus, when the selection was changed while the select was focused", function (assert) {
+		QUnit.test("change event is not fired on focus loss when selection changed while focused", function (assert) {
 
 			// system under test
-			var oItemTemplate = new Item({
+			const oItemTemplate = new Item({
 				key: "{key}",
 				text: "{text}"
 			});
 
-			var oSelect = new Select({
+			const oSelect = new Select({
 				selectedKey: {
 					path: "/selected"
 				},
@@ -3967,11 +3969,11 @@ sap.ui.define([
 				}
 			});
 
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// arrange
-			var oModel = new JSONModel();
-			var mData = {
+			const oModel = new JSONModel();
+			const mData = {
 				"items": [
 					{
 						"key": "DZ",
@@ -4009,8 +4011,7 @@ sap.ui.define([
 		QUnit.test("Changing selected item's data model of sap.m.Select should fire _itemTextChange event", function (assert) {
 
 			// system under test
-			var oModel, spy;
-			var oSelect = new Select({
+			const oSelect = new Select({
 				autoAdjustWidth: true,
 				items: [
 					new Item({id: "idItem1", text: "{/}"})
@@ -4021,10 +4022,10 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-			oModel = new JSONModel();
+			const oModel = new JSONModel();
 			oModel.setData("text");
 			oSelect.setModel(oModel);
-			spy = this.spy(Element.prototype, "fireEvent");
+			const spy = this.spy(Element.prototype, "fireEvent");
 
 			// act
 			oModel.setData("extremely long text");
@@ -4040,20 +4041,19 @@ sap.ui.define([
 
 		QUnit.module("value state");
 
-		QUnit.test("it should add the value state CSS classes (initial rendering)", function (assert) {
+		QUnit.test("value state CSS classes are applied on initial rendering", function (assert) {
 
 			// system under test
-			var oSelectDomRef,
-				oSelect = new Select({
+			const oSelect = new Select({
 				valueState: ValueState.Error
 			});
 
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
-			var CSS_CLASS = oSelect.getRenderer().CSS_CLASS;
+			const CSS_CLASS = oSelect.getRenderer().CSS_CLASS;
 
-			oSelectDomRef = oSelect._getHiddenSelect();
+			const oSelectDomRef = oSelect._getHiddenSelect();
 
 			// assert
 			assert.strictEqual(oSelectDomRef.attr("aria-invalid"), "true");
@@ -4067,18 +4067,17 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should add the value state CSS classes", function (assert) {
+		QUnit.test("value state CSS classes are applied after setValueState", function (assert) {
 
 			// system under test
-			var oSelectDomRef,
-				oSelect = new Select();
+			const oSelect = new Select();
 
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
-			var CSS_CLASS = oSelect.getRenderer().CSS_CLASS;
+			const CSS_CLASS = oSelect.getRenderer().CSS_CLASS;
 
-			oSelectDomRef = oSelect._getHiddenSelect();
+			const oSelectDomRef = oSelect._getHiddenSelect();
 
 			// act
 			oSelect.setValueState(ValueState.Error);
@@ -4096,17 +4095,17 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should remove the value state CSS classes", function (assert) {
+		QUnit.test("value state CSS classes are removed when state is set to None", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				valueState: ValueState.Error
 			});
 
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
-			var CSS_CLASS = oSelect.getRenderer().CSS_CLASS;
+			const CSS_CLASS = oSelect.getRenderer().CSS_CLASS;
 
 			// act
 			oSelect.setValueState(ValueState.None);
@@ -4124,14 +4123,14 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should contain the value state text id in the aria-labelledby attribute", function (assert) {
-			var oSuccessSelect = new Select({ valueState: ValueState.Success }),
-				oWarningSelect = new Select({ valueState: ValueState.Warning }),
-				oErrorSelect = new Select({ valueState: ValueState.Error }),
-				oInformationSelect = new Select({ valueState: ValueState.Information }),
-				fnCheckValueStateText = function (oSelect) {
-					var oValueStateTextDomRef = document.getElementById(oSelect.getValueStateMessageId() + "-sr"),
-						sExpectedValueStateText = ValueStateSupport.getAdditionalText(oSelect);
+		QUnit.test("aria-labelledby contains value state text element id", function (assert) {
+			const oSuccessSelect = new Select({ valueState: ValueState.Success });
+			const oWarningSelect = new Select({ valueState: ValueState.Warning });
+			const oErrorSelect = new Select({ valueState: ValueState.Error });
+			const oInformationSelect = new Select({ valueState: ValueState.Information });
+			const fnCheckValueStateText = function (oSelect) {
+					const oValueStateTextDomRef = document.getElementById(oSelect.getValueStateMessageId() + "-sr");
+					const sExpectedValueStateText = ValueStateSupport.getAdditionalText(oSelect);
 
 					return oValueStateTextDomRef && (oValueStateTextDomRef.textContent.indexOf(sExpectedValueStateText) > -1);
 				};
@@ -4179,12 +4178,12 @@ sap.ui.define([
 
 		QUnit.test("valueState with enabled and editable set to false", function(assert) {
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				enabled: false,
 				valueState: ValueState.Error
 
-			}),
-			CSS_CLASS = oSelect.getRenderer().CSS_CLASS;
+			});
+			const CSS_CLASS = oSelect.getRenderer().CSS_CLASS;
 
 			// act
 			oSelect.placeAt("content");
@@ -4226,22 +4225,21 @@ sap.ui.define([
 
 		QUnit.module("setTooltip()");
 
-		QUnit.test("it should display the default tooltip of the icon if control toolitp is not set", function (assert) {
+		QUnit.test("icon default tooltip is shown when control tooltip is not set", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				type: SelectType.IconOnly,
 				icon: IconPool.getIconURI("filter")
-			}),
-			oSelectDomRef,
-			oIconInfo = IconPool.getIconInfo(oSelect.getIcon()),
-			sIconText = oIconInfo && oIconInfo.text;
+			});
+			const oIconInfo = IconPool.getIconInfo(oSelect.getIcon());
+			const sIconText = oIconInfo && oIconInfo.text;
 
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-			oSelectDomRef = oSelect.getFocusDomRef();
+			const oSelectDomRef = oSelect.getFocusDomRef();
 			// assert
 			assert.strictEqual(oSelectDomRef.getAttribute("title"), sIconText);
 			assert.strictEqual(oSelect.$("icon").attr("title"), sIconText);
@@ -4251,21 +4249,20 @@ sap.ui.define([
 		});
 
 		// BCP 1580232802
-		QUnit.test("it should display the control tooltip instead of the default tooltip of the icon", function (assert) {
+		QUnit.test("control tooltip takes precedence over icon default tooltip", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				tooltip: "lorem ipsum",
 				type: SelectType.IconOnly,
 				icon: IconPool.getIconURI("filter")
-			}),
-			oSelectDomRef;
+			});
 
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-			oSelectDomRef = oSelect.getFocusDomRef();
+			const oSelectDomRef = oSelect.getFocusDomRef();
 			// assert
 			assert.strictEqual(oSelectDomRef.getAttribute("title"), "lorem ipsum");
 			assert.strictEqual(oSelect.$("icon").attr("title"), oSelect.getTooltip_AsString());
@@ -4274,25 +4271,25 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should display the control tooltip when the select has value state", function (assert) {
+		QUnit.test("control tooltip is shown when Select has value state", function (assert) {
 			// system under test
-			var sSampleText = "lorem ipsum",
-				oSelect = new Select({
+			const sSampleText = "lorem ipsum";
+			const oSelect = new Select({
 					tooltip: sSampleText
-				}),
-				oSuccessSelect = new Select({
+				});
+			const oSuccessSelect = new Select({
 					tooltip: sSampleText,
 					valueState: ValueState.Success
-				}),
-				oWarningSelect = new Select({
+				});
+			const oWarningSelect = new Select({
 					tooltip: sSampleText,
 					valueState: ValueState.Warning
-				}),
-				oErrorSelect = new Select({
+				});
+			const oErrorSelect = new Select({
 					tooltip: sSampleText,
 					valueState: ValueState.Error
-				}),
-				oInformationSelect = new Select({
+				});
+			const oInformationSelect = new Select({
 					tooltip: sSampleText,
 					valueState: ValueState.Information
 				});
@@ -4320,11 +4317,11 @@ sap.ui.define([
 			oInformationSelect.destroy();
 		});
 
-		QUnit.test("it should display default tooltip (text) if it is read-only and text is truncated, even if tooltip is not set", function (assert) {
+		QUnit.test("read-only truncated text shows default tooltip when no tooltip set", function (assert) {
 
 			// system under test
-			var sText = "item 0",
-				oSelect = new Select({
+			const sText = "item 0";
+			const oSelect = new Select({
 					width: "10px",
 					editable: false,
 					items: [
@@ -4335,14 +4332,13 @@ sap.ui.define([
 							key: "1",
 							text: "item 1"})
 						]
-					}),
-				oSelectDomRef;
+					});
 
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-			oSelectDomRef = oSelect.getFocusDomRef();
+			const oSelectDomRef = oSelect.getFocusDomRef();
 
 			// assert
 			assert.strictEqual(oSelectDomRef.getAttribute("title"), sText, "tooltip is set to the text of the item, when text is truncated");
@@ -4362,12 +4358,12 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should display default tooltip (text + additionalText) if it is read-only and text is truncated, even if tooltip is not set", function (assert) {
+		QUnit.test("read-only truncated text with additionalText shows default tooltip when no tooltip set", function (assert) {
 
 			// system under test
-			var sText = "item 0",
-				sAdditionalText = "additional text",
-				oSelect = new Select({
+			const sText = "item 0";
+			const sAdditionalText = "additional text";
+			const oSelect = new Select({
 					editable: false,
 					width: "10px",
 					showSecondaryValues: true,
@@ -4377,14 +4373,13 @@ sap.ui.define([
 							text: sText,
 							additionalText: sAdditionalText
 						})]
-					}),
-				oSelectDomRef;
+					});
 
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-			oSelectDomRef = oSelect.getFocusDomRef();
+			const oSelectDomRef = oSelect.getFocusDomRef();
 
 			// assert
 			assert.strictEqual(oSelectDomRef.getAttribute("title"), oSelect._getSelectedItemText(),
@@ -4404,13 +4399,13 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should display user tooltip with precedence over the default tooltip", function (assert) {
+		QUnit.test("user-set tooltip takes precedence over default tooltip", function (assert) {
 
 			// system under test
-			var sText = "item 0",
-				sUserTooltip = "user tooltip",
-				sAdditionalText = "additional text",
-				oSelect = new Select({
+			const sText = "item 0";
+			const sUserTooltip = "user tooltip";
+			const sAdditionalText = "additional text";
+			const oSelect = new Select({
 					tooltip: sUserTooltip,
 					editable: false,
 					width: "10px",
@@ -4421,14 +4416,13 @@ sap.ui.define([
 							text: sText,
 							additionalText: sAdditionalText
 						})]
-					}),
-				oSelectDomRef;
+					});
 
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-			oSelectDomRef = oSelect.getFocusDomRef();
+			const oSelectDomRef = oSelect.getFocusDomRef();
 
 			// assert
 			assert.strictEqual(oSelectDomRef.getAttribute("title"), sUserTooltip, "tooltip is set to the user tooltip");
@@ -4438,10 +4432,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should not display tooltip when Select is not enabled", function (assert) {
+		QUnit.test("no tooltip is shown when Select is disabled", function (assert) {
 			// system under test
-			var sText = "item 0",
-				oSelect = new Select({
+			const sText = "item 0";
+			const oSelect = new Select({
 					tooltip: "user tooltip",
 					enabled: false,
 					items: [
@@ -4449,13 +4443,12 @@ sap.ui.define([
 							key: "0",
 							text: sText
 						})]
-				}),
-				oSelectDomRef;
+				});
 
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
-			oSelectDomRef = oSelect.getFocusDomRef();
+			const oSelectDomRef = oSelect.getFocusDomRef();
 
 			// assert
 			assert.strictEqual(oSelectDomRef, undefined, "focus DOM ref is not rendered when the select is not enabled");
@@ -4468,15 +4461,15 @@ sap.ui.define([
 
 		QUnit.module("removeItem()");
 
-		QUnit.test("it should return null when called with an invalid input argument value", function (assert) {
+		QUnit.test("getItemByKey returns null for invalid input", function (assert) {
 
 			// system under test
-			var oSelect = new Select();
+			const oSelect = new Select();
 
 			// arrange
-			var fnRemoveAggregationSpy = this.spy(oSelect.getList(), "removeAggregation");
-			var fnRemoveItemSpy = this.spy(oSelect, "removeItem");
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnRemoveAggregationSpy = this.spy(oSelect.getList(), "removeAggregation");
+			const fnRemoveItemSpy = this.spy(oSelect, "removeItem");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			oSelect.removeItem(undefined);
@@ -4491,10 +4484,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should remove the selected item and change the selection to the first enabled item will be selected if any (test case 1)", function (assert) {
+		QUnit.test("removeItem removes selected item and selects first enabled item (with more items available)", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: {
 					path: "/items",
 					template: new Item({
@@ -4510,9 +4503,9 @@ sap.ui.define([
 			});
 
 			// arrange
-			var oModel = new JSONModel();
-			var fnRemoveAggregationSpy = this.spy(oSelect.getList(), "removeAggregation");
-			var mData = {
+			const oModel = new JSONModel();
+			const fnRemoveAggregationSpy = this.spy(oSelect.getList(), "removeAggregation");
+			const mData = {
 				"items": [
 					{
 						"value": "0",
@@ -4566,7 +4559,7 @@ sap.ui.define([
 			oModel.setData(mData);
 			oSelect.setModel(oModel);
 			oSelect.placeAt("content");
-			var oSelectedItem = oSelect.getItemByKey("8");
+			const oSelectedItem = oSelect.getItemByKey("8");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 			// act
@@ -4587,10 +4580,10 @@ sap.ui.define([
 			oModel.destroy();
 		});
 
-		QUnit.test("it should remove the selected item and change the selection to the first enabled item will be selected if any (test case 2)", function (assert) {
+		QUnit.test("removeItem removes selected item and selects first enabled item (last item removed)", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 
 				items: {
 					path: "/items",
@@ -4607,9 +4600,9 @@ sap.ui.define([
 			});
 
 			// arrange
-			var oModel = new JSONModel();
+			const oModel = new JSONModel();
 
-			var mData = {
+			const mData = {
 				"items": [
 					{
 						"value": "0",
@@ -4659,11 +4652,11 @@ sap.ui.define([
 			oModel.destroy();
 		});
 
-		QUnit.test("it should remove the selected item and change the selection to null (test case 3)", function (assert) {
+		QUnit.test("removeItem removes selected item and clears selection when no enabled items remain", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						key: "0",
@@ -4700,7 +4693,7 @@ sap.ui.define([
 		QUnit.test("removeAllItems()", function (assert) {
 
 			// system under test
-			var aItems = [
+			const aItems = [
 				new Item({
 					key: "0",
 					text: "item 0"
@@ -4717,19 +4710,19 @@ sap.ui.define([
 				})
 			];
 
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: aItems
 			});
 
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
-			var fnRemoveAllItemsSpy = this.spy(oSelect, "removeAllItems");
-			var fnRemoveAllAggregationSpy = this.spy(oSelect.getList(), "removeAllAggregation");
-			var fnListRemoveAllItemsSpy = this.spy(oSelect.getList(), "removeAllItems");
+			const fnRemoveAllItemsSpy = this.spy(oSelect, "removeAllItems");
+			const fnRemoveAllAggregationSpy = this.spy(oSelect.getList(), "removeAllAggregation");
+			const fnListRemoveAllItemsSpy = this.spy(oSelect.getList(), "removeAllItems");
 
 			// act
-			var oRemovedItems = oSelect.removeAllItems();
+			const oRemovedItems = oSelect.removeAllItems();
 
 			// assert
 			assert.ok(fnRemoveAllAggregationSpy.calledWith("items"), "sap.m.Select.prototype.removeAllAggregation() method was called with the expected argument");
@@ -4738,7 +4731,7 @@ sap.ui.define([
 			assert.strictEqual(oSelect.$("label").text(), "");
 			assert.strictEqual(oSelect.$("select").children().length, 0);
 
-			for (var i = 0; i < oRemovedItems.length; i++) {
+			for (let i = 0; i < oRemovedItems.length; i++) {
 				assert.strictEqual(oRemovedItems[i].hasListeners("_change"), false);
 			}
 
@@ -4747,10 +4740,10 @@ sap.ui.define([
 		});
 
 		// BCP 1680168526
-		QUnit.test("it should clear the label value when the items are removed and the control is invalidated", function (assert) {
+		QUnit.test("label value is cleared when items are removed and control is invalidated", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "li",
@@ -4782,7 +4775,7 @@ sap.ui.define([
 		QUnit.test("destroyItems()", function (assert) {
 
 			// system under test
-			var aItems = [
+			const aItems = [
 				new Item({
 					key: "0",
 					text: "item 0"
@@ -4799,14 +4792,14 @@ sap.ui.define([
 				})
 			];
 
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: aItems
 			});
 
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
-			var fnDestroyItemsSpy = this.spy(oSelect, "destroyItems");
+			const fnDestroyItemsSpy = this.spy(oSelect, "destroyItems");
 
 			// act
 			oSelect.destroyItems();
@@ -4819,7 +4812,7 @@ sap.ui.define([
 			assert.strictEqual(oSelect.$().children("." + oSelect.getList().getRenderer().CSS_CLASS).length, 1);
 			assert.strictEqual(oSelect.$().children("." + oSelect.getList().getRenderer().CSS_CLASS).children().length, 0);
 
-			for (var i = 0; i < aItems.length; i++) {
+			for (let i = 0; i < aItems.length; i++) {
 				assert.strictEqual(aItems[i].hasListeners("_change"), false);
 			}
 
@@ -4838,7 +4831,7 @@ sap.ui.define([
 			});
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -4883,7 +4876,7 @@ sap.ui.define([
 			});
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -4929,7 +4922,7 @@ sap.ui.define([
 			});
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -4968,7 +4961,7 @@ sap.ui.define([
 		QUnit.test("open() check whether the active state persist after re-rendering", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -5014,7 +5007,7 @@ sap.ui.define([
 			});
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				width: "100px",
 				items: [
 					new Item({
@@ -5040,9 +5033,9 @@ sap.ui.define([
 
 		QUnit.test("open() function should focus the select, before opening the picker", function (assert) {
 			//Arrange
-			var oSelect = new Select(),
-				fnOpenPicker = oSelect.getPicker().open,
-				oSpy = this.spy(oSelect, "focus");
+			const oSelect = new Select();
+			const fnOpenPicker = oSelect.getPicker().open;
+			const oSpy = this.spy(oSelect, "focus");
 
 			oSelect.getPicker().open = function() {
 				//Assert
@@ -5070,7 +5063,7 @@ sap.ui.define([
 			});
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -5118,11 +5111,11 @@ sap.ui.define([
 
 		QUnit.module("findFirstEnabledItem()");
 
-		QUnit.test("findFirstEnabledItem()", function (assert) {
+		QUnit.test("findFirstEnabledItem() — first enabled item at index 0", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var aItems = [
+			let oExpectedItem;
+			const aItems = [
 				oExpectedItem = new Item({
 					key: "0",
 					text: "item 0"
@@ -5140,7 +5133,7 @@ sap.ui.define([
 				})
 			];
 
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: aItems
 			});
 
@@ -5149,7 +5142,7 @@ sap.ui.define([
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 			// act
-			var oFirstEnabledItem = oSelect.findFirstEnabledItem(aItems);
+			const oFirstEnabledItem = oSelect.findFirstEnabledItem(aItems);
 
 			// assert
 			assert.ok(oFirstEnabledItem === oExpectedItem);
@@ -5158,10 +5151,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("findFirstEnabledItem()", function (assert) {
+		QUnit.test("findFirstEnabledItem() — all items disabled returns null", function (assert) {
 
 			// system under test
-			var aItems = [
+			const aItems = [
 				new Item({
 					key: "0",
 					text: "item 0",
@@ -5181,7 +5174,7 @@ sap.ui.define([
 				})
 			];
 
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: aItems
 			});
 
@@ -5190,7 +5183,7 @@ sap.ui.define([
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 			// act
-			var oFirstEnabledItem = oSelect.findFirstEnabledItem(aItems);
+			const oFirstEnabledItem = oSelect.findFirstEnabledItem(aItems);
 
 			// assert
 			assert.ok(oFirstEnabledItem === null, 'The first enabled item is "null"');
@@ -5199,17 +5192,17 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("findFirstEnabledItem()", function (assert) {
+		QUnit.test("findFirstEnabledItem() — empty list returns null", function (assert) {
 
 			// system under test
-			var oSelect = new Select();
+			const oSelect = new Select();
 
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 			// act
-			var oFirstEnabledItem = oSelect.findFirstEnabledItem([]);
+			const oFirstEnabledItem = oSelect.findFirstEnabledItem([]);
 
 			// assert
 			assert.ok(oFirstEnabledItem === null, 'The first enabled item is "null"');
@@ -5220,11 +5213,11 @@ sap.ui.define([
 
 		QUnit.module("findLastEnabledItem()");
 
-		QUnit.test("findLastEnabledItem()", function (assert) {
+		QUnit.test("findLastEnabledItem() — last enabled item at index 2", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var aItems = [
+			let oExpectedItem;
+			const aItems = [
 				new Item({
 					key: "0",
 					text: "item 0",
@@ -5243,7 +5236,7 @@ sap.ui.define([
 				})
 			];
 
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: aItems
 			});
 
@@ -5252,7 +5245,7 @@ sap.ui.define([
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 			// act
-			var oLastEnabledItem = oSelect.findLastEnabledItem(aItems);
+			const oLastEnabledItem = oSelect.findLastEnabledItem(aItems);
 
 			// assert
 			assert.ok(oLastEnabledItem === oExpectedItem);
@@ -5261,10 +5254,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("findLastEnabledItem()", function (assert) {
+		QUnit.test("findLastEnabledItem() — all items disabled returns null", function (assert) {
 
 			// system under test
-			var aItems = [
+			const aItems = [
 				new Item({
 					key: "0",
 					text: "item 0",
@@ -5284,7 +5277,7 @@ sap.ui.define([
 				})
 			];
 
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: aItems
 			});
 
@@ -5293,7 +5286,7 @@ sap.ui.define([
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 			// act
-			var oLastEnabledItem = oSelect.findLastEnabledItem(aItems);
+			const oLastEnabledItem = oSelect.findLastEnabledItem(aItems);
 
 			// assert
 			assert.ok(oLastEnabledItem === null, 'The last enabled item is "null"');
@@ -5302,17 +5295,17 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("findLastEnabledItem()", function (assert) {
+		QUnit.test("findLastEnabledItem() — empty list returns null", function (assert) {
 
 			// system under test
-			var oSelect = new Select();
+			const oSelect = new Select();
 
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 			// act
-			var oLastEnabledItem = oSelect.findLastEnabledItem([]);
+			const oLastEnabledItem = oSelect.findLastEnabledItem([]);
 
 			// assert
 			assert.ok(oLastEnabledItem === null, 'The last enabled item is "null"');
@@ -5326,8 +5319,8 @@ sap.ui.define([
 		QUnit.test("searchNextItemByText() returns the correct item", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						text: "Albania"
@@ -5343,7 +5336,7 @@ sap.ui.define([
 			oSelect.setSelectedItem(oSelect.getFirstItem());
 
 			// act
-			var oCurrItem = oSelect.searchNextItemByText("al");
+			const oCurrItem = oSelect.searchNextItemByText("al");
 
 			// assert
 			assert.ok(oCurrItem === oExpectedItem,
@@ -5356,8 +5349,8 @@ sap.ui.define([
 		QUnit.test("findNextItemByFirstCharacter() test case 1", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						text: "Algeria"
@@ -5377,7 +5370,7 @@ sap.ui.define([
 			oSelect.setSelectedItem(oSelect.getFirstItem());
 
 			// act
-			var oNextItem = oSelect.searchNextItemByText("a");
+			const oNextItem = oSelect.searchNextItemByText("a");
 
 			// assert
 			assert.ok(oNextItem === oExpectedItem);
@@ -5389,8 +5382,8 @@ sap.ui.define([
 		QUnit.test("findNextItemByFirstCharacter() test case 2", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "DZ",
@@ -5413,7 +5406,7 @@ sap.ui.define([
 			oSelect.setSelectedKey("AR");
 
 			// act
-			var oNextItem = oSelect.searchNextItemByText("a");
+			const oNextItem = oSelect.searchNextItemByText("a");
 
 			// assert
 			assert.ok(oNextItem === oExpectedItem);
@@ -5425,8 +5418,8 @@ sap.ui.define([
 		QUnit.test("findNextItemByFirstCharacter() test case 3", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						key: "DZ",
@@ -5449,7 +5442,7 @@ sap.ui.define([
 			oSelect.setSelectedKey("AU");
 
 			// act
-			var oNextItem = oSelect.searchNextItemByText("a");
+			const oNextItem = oSelect.searchNextItemByText("a");
 
 			// assert
 			assert.ok(oNextItem === oExpectedItem);
@@ -5461,8 +5454,8 @@ sap.ui.define([
 		QUnit.test("findNextItemByFirstCharacter() test case 4", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "DZ",
@@ -5491,7 +5484,7 @@ sap.ui.define([
 			oSelect.setSelectedKey("DZ");
 
 			// act
-			var oNextItem = oSelect.searchNextItemByText("a");
+			const oNextItem = oSelect.searchNextItemByText("a");
 
 			// assert
 			assert.ok(oNextItem === oExpectedItem);
@@ -5503,8 +5496,8 @@ sap.ui.define([
 		QUnit.test("findNextItemByFirstCharacter() test case 5", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "DZ",
@@ -5529,7 +5522,7 @@ sap.ui.define([
 			oSelect.setSelectedItem(oSelect.getFirstItem());
 
 			// act
-			var oNextItem = oSelect.searchNextItemByText("a");
+			const oNextItem = oSelect.searchNextItemByText("a");
 
 			// assert
 			assert.ok(oNextItem === oExpectedItem);
@@ -5541,7 +5534,7 @@ sap.ui.define([
 		QUnit.test("findNextItemByFirstCharacter() test case 6", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "DZ",
@@ -5564,7 +5557,7 @@ sap.ui.define([
 			oSelect.setSelectedKey("DZ");
 
 			// act
-			var oNextItem = oSelect.searchNextItemByText("b");
+			const oNextItem = oSelect.searchNextItemByText("b");
 
 			// assert
 			assert.ok(oNextItem === null);
@@ -5575,11 +5568,11 @@ sap.ui.define([
 
 		QUnit.module("setSelectedIndex()");
 
-		var setSelectedIndexTestCase = function (sTestName, mOptions) {
+		const setSelectedIndexTestCase = function (sTestName, mOptions) {
 			QUnit.test("setSelectedIndex()", function (assert) {
 
 				// system under test
-				var oSelect = mOptions.control;
+				const oSelect = mOptions.control;
 
 				// act
 				oSelect.setSelectedIndex(mOptions.input);
@@ -5593,8 +5586,8 @@ sap.ui.define([
 		};
 
 		(function () {
-			var oExpectedItem;
-			var aItems = [
+			let oExpectedItem;
+			const aItems = [
 				new Item({
 					key: "0",
 					text: "item 0",
@@ -5633,8 +5626,8 @@ sap.ui.define([
 		});
 
 		(function () {
-			var oExpectedItem;
-			var aItems = [
+			let oExpectedItem;
+			const aItems = [
 				new Item({
 					key: "0",
 					text: "item 0",
@@ -5671,8 +5664,8 @@ sap.ui.define([
 		QUnit.test("getItemAt()", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var aItems = [
+			let oExpectedItem;
+			const aItems = [
 				new Item({
 					key: "0",
 					text: "item 0",
@@ -5691,7 +5684,7 @@ sap.ui.define([
 				})
 			];
 
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: aItems
 			});
 
@@ -5700,8 +5693,8 @@ sap.ui.define([
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 			// act
-			var oItem = oSelect.getItemAt(2),
-				oItem1 = oSelect.getItemAt(6);
+			const oItem = oSelect.getItemAt(2);
+			const oItem1 = oSelect.getItemAt(6);
 
 			// assert
 			assert.ok(oItem === oExpectedItem);
@@ -5713,11 +5706,11 @@ sap.ui.define([
 
 		QUnit.module("getFirstItem()");
 
-		QUnit.test("getFirstItem()", function (assert) {
+		QUnit.test("getFirstItem() — returns first item", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var aItems = [
+			let oExpectedItem;
+			const aItems = [
 				oExpectedItem = new Item({
 					key: "0",
 					text: "item 0"
@@ -5734,7 +5727,7 @@ sap.ui.define([
 				})
 			];
 
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: aItems
 			});
 
@@ -5743,7 +5736,7 @@ sap.ui.define([
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 			// act
-			var oItem = oSelect.getFirstItem();
+			const oItem = oSelect.getFirstItem();
 
 			// assert
 			assert.ok(oItem === oExpectedItem);
@@ -5752,17 +5745,17 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("getFirstItem()", function (assert) {
+		QUnit.test("getFirstItem() — empty items returns null", function (assert) {
 
 			// system under test
-			var oSelect = new Select();
+			const oSelect = new Select();
 
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 			// act
-			var oExpectedItem = oSelect.getFirstItem();
+			const oExpectedItem = oSelect.getFirstItem();
 
 			// assert
 			assert.ok(oExpectedItem === null, "There are no items");
@@ -5773,11 +5766,11 @@ sap.ui.define([
 
 		QUnit.module("getLastItem()");
 
-		QUnit.test("getLastItem()", function (assert) {
+		QUnit.test("getLastItem() — returns last item", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var aItems = [
+			let oExpectedItem;
+			const aItems = [
 				new Item({
 					key: "0",
 					text: "item 0"
@@ -5794,7 +5787,7 @@ sap.ui.define([
 				})
 			];
 
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: aItems
 			});
 
@@ -5803,7 +5796,7 @@ sap.ui.define([
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 			// act
-			var oItem = oSelect.getLastItem();
+			const oItem = oSelect.getLastItem();
 
 			// assert
 			assert.ok(oItem === oExpectedItem);
@@ -5812,17 +5805,17 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("getLastItem()", function (assert) {
+		QUnit.test("getLastItem() — empty items returns null", function (assert) {
 
 			// system under test
-			var oSelect = new Select();
+			const oSelect = new Select();
 
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 			// act
-			var oItem = oSelect.getLastItem();
+			const oItem = oSelect.getLastItem();
 
 			// assert
 			assert.ok(oItem === null, "There are no items");
@@ -5836,10 +5829,10 @@ sap.ui.define([
 		QUnit.test("getItemByKey()", function (assert) {
 
 			// system under test
-			var oExpectedItem0;
-			var oExpectedItem1;
-			var oExpectedItem2;
-			var aItems = [
+			let oExpectedItem0;
+			let oExpectedItem1;
+			let oExpectedItem2;
+			const aItems = [
 				oExpectedItem0 = new Item({
 					key: "0",
 					text: "item 0"
@@ -5856,7 +5849,7 @@ sap.ui.define([
 				})
 			];
 
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: aItems
 			});
 
@@ -5865,10 +5858,10 @@ sap.ui.define([
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 			// act
-			var oItem0 = oSelect.getItemByKey("0"),
-				oItem1 = oSelect.getItemByKey("1"),
-				oItem2 = oSelect.getItemByKey("2"),
-				oItem3 = oSelect.getItemByKey("3");
+			const oItem0 = oSelect.getItemByKey("0");
+			const oItem1 = oSelect.getItemByKey("1");
+			const oItem2 = oSelect.getItemByKey("2");
+			const oItem3 = oSelect.getItemByKey("3");
 
 			// assert
 			assert.ok(oItem0 === oExpectedItem0);
@@ -5885,8 +5878,8 @@ sap.ui.define([
 		QUnit.test("getEnabledItems()", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var aItems = [
+			let oExpectedItem;
+			const aItems = [
 				oExpectedItem = new Item({
 					key: "0",
 					text: "item 0"
@@ -5899,7 +5892,7 @@ sap.ui.define([
 				})
 			];
 
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: aItems
 			});
 
@@ -5915,7 +5908,7 @@ sap.ui.define([
 		QUnit.test("destroy()", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -5937,7 +5930,7 @@ sap.ui.define([
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
-			var fnDestroySpy = this.spy(oSelect.getValueStateMessage(), "destroy");
+			const fnDestroySpy = this.spy(oSelect.getValueStateMessage(), "destroy");
 
 			// act
 			oSelect.destroy();
@@ -5958,7 +5951,7 @@ sap.ui.define([
 		QUnit.test("calling destroy() when the Select's picker popup is open", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -5996,14 +5989,14 @@ sap.ui.define([
 		});
 
 		QUnit.test("update valueState during destroy", function (assert) {
-			var oSelect = new Select({
+			const oSelect = new Select({
 				valueState: "Error"
 			});
 			// Setup: trigger destroy
 			oSelect.destroy();
 
 			// Act: reset valueState
-			var oResult = oSelect.setValueState("None");
+			const oResult = oSelect.setValueState("None");
 
 			// Check
 			assert.ok(oResult, "valueState can be reset during destroy");
@@ -6020,8 +6013,8 @@ sap.ui.define([
 		QUnit.test("addAggregation() + getAggregation()", function (assert) {
 
 			// system under test
-			var oSelect = new Select();
-			var oItem = new Item({
+			const oSelect = new Select();
+			const oItem = new Item({
 				key: "GER",
 				text: "Germany"
 			});
@@ -6029,8 +6022,8 @@ sap.ui.define([
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
-			var fnAddAggregationSpy = this.spy(oSelect, "addAggregation");
-			var fnInvalidateSpy = this.spy(oSelect, "invalidate");
+			const fnAddAggregationSpy = this.spy(oSelect, "addAggregation");
+			const fnInvalidateSpy = this.spy(oSelect, "invalidate");
 
 			// act
 			oSelect.addAggregation("items", oItem);
@@ -6047,8 +6040,8 @@ sap.ui.define([
 		QUnit.test("addAggregation()", function (assert) {
 
 			// system under test
-			var oSelect = new Select();
-			var oItem = new Item({
+			const oSelect = new Select();
+			const oItem = new Item({
 				key: "GER",
 				text: "Germany"
 			});
@@ -6056,8 +6049,8 @@ sap.ui.define([
 			// arrange
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
-			var fnAddAggregationSpy = this.spy(oSelect, "addAggregation");
-			var fnInvalidateSpy = this.spy(oSelect, "invalidate");
+			const fnAddAggregationSpy = this.spy(oSelect, "addAggregation");
+			const fnInvalidateSpy = this.spy(oSelect, "invalidate");
 
 			// act
 			oSelect.addAggregation("items", oItem, true);
@@ -6073,10 +6066,10 @@ sap.ui.define([
 
 		QUnit.module("setAssociation() + getAssociation()");
 
-		QUnit.test("setAssociation() + getAssociation()", function (assert) {
+		QUnit.test("setAssociation() + getAssociation() — selectedItem by id string", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "CU",
@@ -6091,7 +6084,7 @@ sap.ui.define([
 			});
 
 			// arrange
-			var fnSetAssociationSpy = this.spy(oSelect, "setAssociation");
+			const fnSetAssociationSpy = this.spy(oSelect, "setAssociation");
 
 			// act
 			oSelect.setAssociation("selectedItem", "item-id");
@@ -6105,11 +6098,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("setAssociation() + getAssociation()", function (assert) {
+		QUnit.test("setAssociation() + getAssociation() — selectedItem by item reference", function (assert) {
 
 			// system under test
-			var oItem;
-			var oSelect = new Select({
+			let oItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "CU",
@@ -6124,7 +6117,7 @@ sap.ui.define([
 			});
 
 			// arrange
-			var fnSetAssociationSpy = this.spy(oSelect, "setAssociation");
+			const fnSetAssociationSpy = this.spy(oSelect, "setAssociation");
 
 			// act
 			oSelect.setAssociation("selectedItem", oItem);
@@ -6144,7 +6137,7 @@ sap.ui.define([
 		QUnit.test('it should not dispatch the change event when the binding of the item aggregation is updated', function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: {
 					path: "/contries",
 					template: new Item({
@@ -6157,8 +6150,8 @@ sap.ui.define([
 			});
 
 			// arrange
-			var oModel = new JSONModel();
-			var mData = {
+			const oModel = new JSONModel();
+			const mData = {
 				"contries": [
 					{
 						"name": "Germany"
@@ -6168,7 +6161,7 @@ sap.ui.define([
 					}
 				]
 			};
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 			oModel.setData(mData);
 			oSelect.setModel(oModel);
 			oSelect.placeAt("content");
@@ -6191,15 +6184,13 @@ sap.ui.define([
 		QUnit.test("aria-labelledby content", function (assert) {
 
 			// system under test
-			var oHiddenSelect,
-				aActualAriaLabelledByIDs,
-				oLabel = new Label({
+			const oLabel = new Label({
 					id: "label"
-				}),
-				oSelect = new Select({
+				});
+			const oSelect = new Select({
 					ariaLabelledBy: oLabel
-				}),
-				aExpectedAriaLabelledByIDs = [
+				});
+			const aExpectedAriaLabelledByIDs = [
 					"label"
 				];
 
@@ -6208,10 +6199,10 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-			oHiddenSelect = oSelect._getHiddenSelect();
+			const oHiddenSelect = oSelect._getHiddenSelect();
 
 			// assert
-			aActualAriaLabelledByIDs = oHiddenSelect.attr("aria-labelledby").split(" ");
+			const aActualAriaLabelledByIDs = oHiddenSelect.attr("aria-labelledby").split(" ");
 
 			// aria-labelledby should consist of (separated by space)
 			// - external label ID
@@ -6228,10 +6219,10 @@ sap.ui.define([
 
 		QUnit.module("destroyAggregation()");
 
-		QUnit.test("destroyAggregation()", function (assert) {
+		QUnit.test("destroyAggregation() — triggers invalidation", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "GER",
@@ -6241,8 +6232,8 @@ sap.ui.define([
 			});
 
 			// arrange
-			var fnDestroyAggregationSpy = this.spy(oSelect, "destroyAggregation");
-			var fnInvalidateSpy = this.spy(oSelect, "invalidate");
+			const fnDestroyAggregationSpy = this.spy(oSelect, "destroyAggregation");
+			const fnInvalidateSpy = this.spy(oSelect, "invalidate");
 
 			// act
 			oSelect.destroyAggregation("items");
@@ -6256,10 +6247,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("destroyAggregation()", function (assert) {
+		QUnit.test("destroyAggregation() — bSuppressInvalidate=true skips invalidation", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "GER",
@@ -6269,8 +6260,8 @@ sap.ui.define([
 			});
 
 			// arrange
-			var fnDestroyAggregationSpy = this.spy(oSelect, "destroyAggregation");
-			var fnInvalidateSpy = this.spy(oSelect, "invalidate");
+			const fnDestroyAggregationSpy = this.spy(oSelect, "destroyAggregation");
+			const fnInvalidateSpy = this.spy(oSelect, "invalidate");
 
 			// act
 			oSelect.destroyAggregation("items", true);
@@ -6289,7 +6280,7 @@ sap.ui.define([
 		QUnit.test("findAggregatedObjects()", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "GER",
@@ -6299,7 +6290,7 @@ sap.ui.define([
 			});
 
 			// arrange
-			var fnFindAggregatedObjectsSpy = this.spy(oSelect, "findAggregatedObjects");
+			const fnFindAggregatedObjectsSpy = this.spy(oSelect, "findAggregatedObjects");
 
 			// act
 			oSelect.findAggregatedObjects();
@@ -6316,11 +6307,11 @@ sap.ui.define([
 		QUnit.test("getBinding() + getBindingInfo() + getBindingPath()", function (assert) {
 
 			// system under test
-			var oSelect = new Select();
+			const oSelect = new Select();
 
 			// arrange
-			var oModel = new JSONModel();
-			var mData = {
+			const oModel = new JSONModel();
+			const mData = {
 				"countries": [
 					{
 						"value": "GER",
@@ -6329,7 +6320,7 @@ sap.ui.define([
 				],
 				"selected": "GER"
 			};
-			var oItemTemplate = new Item({
+			const oItemTemplate = new Item({
 				key: "{select-model>value}",
 				text: "{select-model>text}"
 			});
@@ -6367,7 +6358,7 @@ sap.ui.define([
 		QUnit.test('setProperty() + getProperty() test for "selectedKey" property', function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "CU",
@@ -6381,7 +6372,7 @@ sap.ui.define([
 			});
 
 			// arrange
-			var fnInvalidateSpy = this.spy(oSelect, "invalidate");
+			const fnInvalidateSpy = this.spy(oSelect, "invalidate");
 
 			// act
 			oSelect.setProperty("selectedKey", "GER");
@@ -6400,7 +6391,7 @@ sap.ui.define([
 		QUnit.test('setProperty() + getProperty() test for "selectedItemId" property', function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						id: "item-cu",
@@ -6433,8 +6424,8 @@ sap.ui.define([
 		QUnit.test("indexOfAggregation()", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						text: "Cuba"
@@ -6457,8 +6448,8 @@ sap.ui.define([
 		QUnit.test("insertAggregation()", function (assert) {
 
 			// system under test
-			var oSelect = new Select();
-			var oItem = new Item({
+			const oSelect = new Select();
+			const oItem = new Item({
 				text: "Germany"
 			});
 
@@ -6477,7 +6468,7 @@ sap.ui.define([
 		QUnit.test("removeAggregation()", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "GER",
@@ -6501,7 +6492,7 @@ sap.ui.define([
 		QUnit.test("removeAllAggregation()", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "GER",
@@ -6529,8 +6520,8 @@ sap.ui.define([
 		QUnit.test("removeAllAssociation()", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						id: "ger-id",
@@ -6548,7 +6539,7 @@ sap.ui.define([
 			});
 
 			// arrange
-			var fnRemoveAllAssociationSpy = this.spy(oSelect, "removeAllAssociation");
+			const fnRemoveAllAssociationSpy = this.spy(oSelect, "removeAllAssociation");
 
 			// act
 			oSelect.removeAllAssociation("selectedItem");
@@ -6567,11 +6558,11 @@ sap.ui.define([
 		QUnit.test("unbindProperty()", function (assert) {
 
 			// system under test
-			var oSelect = new Select();
+			const oSelect = new Select();
 
 			// arrange
-			var oModel = new JSONModel();
-			var mData = {
+			const oModel = new JSONModel();
+			const mData = {
 				"countries": [
 					{
 						"code": "GER",
@@ -6585,7 +6576,7 @@ sap.ui.define([
 				"selected": "CU"
 			};
 
-			var oItemTemplate = new Item({
+			const oItemTemplate = new Item({
 				key: "{code}",
 				text: "{name}"
 			});
@@ -6619,11 +6610,11 @@ sap.ui.define([
 		QUnit.test("unbindAggregation()", function (assert) {
 
 			// system under test
-			var oSelect = new Select();
+			const oSelect = new Select();
 
 			// arrange
-			var oModel = new JSONModel();
-			var mData = {
+			const oModel = new JSONModel();
+			const mData = {
 				"countries": [
 					{
 						"code": "GER",
@@ -6637,7 +6628,7 @@ sap.ui.define([
 				"selected": "CU"
 			};
 
-			var oItemTemplate = new Item({
+			const oItemTemplate = new Item({
 				key: "{code}",
 				text: "{name}"
 			});
@@ -6672,7 +6663,7 @@ sap.ui.define([
 		QUnit.test("updateAggregation() do not clear the selection when items are destroyed", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: {
 					path: "/contries",
 					template: new Item({
@@ -6686,8 +6677,8 @@ sap.ui.define([
 			});
 
 			// arrange
-			var oModel = new JSONModel();
-			var mData = {
+			const oModel = new JSONModel();
+			const mData = {
 				"contries": [
 					{
 						"code": "GER",
@@ -6739,11 +6730,11 @@ sap.ui.define([
 		QUnit.test('it should modify the cloned "selectedItem" association to point to the new item', function (assert) {
 
 			// system under test
-			var oExpectedItem = new Item({
+			const oExpectedItem = new Item({
 				text: "lorem ipsum 2"
 			});
 
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						text: "lorem ipsum 1"
@@ -6755,7 +6746,7 @@ sap.ui.define([
 			});
 
 			// act
-			var oSelectClone = oSelect.clone();
+			const oSelectClone = oSelect.clone();
 
 			// assert
 			assert.ok(oSelectClone.getSelectedItem().getText() === oExpectedItem.getText());
@@ -6766,10 +6757,10 @@ sap.ui.define([
 		});
 
 		// BCP 1580183712
-		QUnit.test("it should set the selection correctly after the control is cloned", function (assert) {
+		QUnit.test("cloned Select preserves the original selection", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				forceSelection: false,
 				items: [
 					new Item({
@@ -6783,7 +6774,7 @@ sap.ui.define([
 			});
 
 			// act
-			var oSelectClone = oSelect.clone();
+			const oSelectClone = oSelect.clone();
 
 			// assert
 			assert.ok(oSelectClone.getSelectedItem() === null);
@@ -6798,7 +6789,7 @@ sap.ui.define([
 		QUnit.test("_isShadowListRequired() it should return true when the width property is set to auto", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				width: "auto"
 			});
 
@@ -6812,7 +6803,7 @@ sap.ui.define([
 		QUnit.test("_isShadowListRequired() it should return false when the autoAdjustWidth property is set to true", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				autoAdjustWidth: true
 			});
 
@@ -6826,7 +6817,7 @@ sap.ui.define([
 		QUnit.test("_isShadowListRequired() it should return false", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				width: "15rem"
 			});
 
@@ -6840,7 +6831,7 @@ sap.ui.define([
 		QUnit.module("HTML");
 
 		QUnit.test("rendering", function (assert) {
-			var oSelect1 = new Select({
+			const oSelect1 = new Select({
 				width: "50%",
 				items: [
 					new Item({
@@ -6851,7 +6842,7 @@ sap.ui.define([
 				visible: false
 			});
 
-			var oSelect2 = new Select({
+			const oSelect2 = new Select({
 				items: [
 					new Item({
 						key: "4",
@@ -6880,7 +6871,7 @@ sap.ui.define([
 				]
 			});
 
-			var oSelect3 = new Select({
+			const oSelect3 = new Select({
 				items: [
 					new Item({
 						key: "9",
@@ -6889,7 +6880,7 @@ sap.ui.define([
 				]
 			});
 
-			var oSelect4 = new Select({
+			const oSelect4 = new Select({
 				items: [
 					new Item({
 						key: "10",
@@ -6915,7 +6906,7 @@ sap.ui.define([
 				selectedKey: "13"
 			});
 
-			var oSelect5 = new Select({
+			const oSelect5 = new Select({
 				width: "13rem",
 				items: [
 					new Item({
@@ -6940,7 +6931,7 @@ sap.ui.define([
 				]
 			});
 
-			var oSelect6 = new Select({
+			const oSelect6 = new Select({
 				width: "200px",
 
 				items: [
@@ -6966,7 +6957,7 @@ sap.ui.define([
 				]
 			});
 
-			var oSelect7 = new Select({
+			const oSelect7 = new Select({
 
 				items: [
 					new Item({
@@ -6986,7 +6977,7 @@ sap.ui.define([
 				]
 			});
 
-			var oSelect8 = new Select({
+			const oSelect8 = new Select({
 				type: SelectType.IconOnly,
 				icon: IconPool.getIconURI("add"),
 				items: [
@@ -7007,7 +6998,7 @@ sap.ui.define([
 				]
 			});
 
-			var aSelects = [oSelect1, oSelect2, oSelect3, oSelect4, oSelect5, oSelect6, oSelect7, oSelect8];
+			const aSelects = [oSelect1, oSelect2, oSelect3, oSelect4, oSelect5, oSelect6, oSelect7, oSelect8];
 
 			// arrange
 			oSelect1.placeAt("content");
@@ -7022,7 +7013,7 @@ sap.ui.define([
 
 			// assert
 			aSelects.forEach(function (oSelect) {
-				var CSS_CLASS = SelectRenderer.CSS_CLASS;
+				const CSS_CLASS = SelectRenderer.CSS_CLASS;
 
 				if (!oSelect.getVisible()) {
 					return;
@@ -7048,7 +7039,7 @@ sap.ui.define([
 
 				if (oSelect._isShadowListRequired() && oSelect.getItems().length) {
 					assert.ok(oSelect.$().children("." + oSelect.getList().getRenderer().CSS_CLASS).length, "The shadow list element exists");
-					var oShadowListDomRef = oSelect.getDomRef().querySelector("." + oSelect.getList().getRenderer().CSS_CLASS);
+					const oShadowListDomRef = oSelect.getDomRef().querySelector("." + oSelect.getList().getRenderer().CSS_CLASS);
 
 					// BCP: 1770084557 avoid duplicated IDs in the DOM when the select control is rendered inside a dialog
 					assert.strictEqual(oShadowListDomRef.firstElementChild.id, "", "it should not render the IDs of the items in the shadow list");
@@ -7081,22 +7072,22 @@ sap.ui.define([
 		QUnit.module("Rendering - min width");
 
 		QUnit.test("min-width added/removed", function (assert) {
-			var oSel1 = new Select({
+			const oSel1 = new Select({
 				width: "10%"
-			}),
-			oSel2 = new Select({
+			});
+			const oSel2 = new Select({
 				width: "auto"
-			}),
-			oSel3 = new Select({
+			});
+			const oSel3 = new Select({
 				autoAdjustWidth: true
-			}),
-			oSel4 = new Select({
+			});
+			const oSel4 = new Select({
 					width: "10rem"
-			}),
-			oSel5 = new Select({
+			});
+			const oSel5 = new Select({
 				width: "2px"
-			}),
-			oSel6 = new Select({
+			});
+			const oSel6 = new Select({
 				width: "4rem",
 				autoAdjustWidth: true
 			});
@@ -7132,7 +7123,7 @@ sap.ui.define([
 		QUnit.module("Rendering - wrapping items text");
 
 		QUnit.test("Wrapped/truncated", function (assert) {
-			var oSelect = new Select({wrapItemsText: true});
+			const oSelect = new Select({wrapItemsText: true});
 
 			// Arrange
 			oSelect.placeAt("content");
@@ -7164,7 +7155,7 @@ sap.ui.define([
 		QUnit.test("touchstart", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -7220,7 +7211,7 @@ sap.ui.define([
 		QUnit.test("touchend", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -7287,7 +7278,7 @@ sap.ui.define([
 		QUnit.test("tap", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -7307,9 +7298,7 @@ sap.ui.define([
 			});
 
 			// arrange
-			var fnTapSpy = this.spy(oSelect, "ontap"),
-				fnPickerCloseSpy,
-				fnOpenSpy;
+			const fnTapSpy = this.spy(oSelect, "ontap");
 
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
@@ -7334,8 +7323,8 @@ sap.ui.define([
 				}
 			});
 
-			fnOpenSpy = this.spy(oSelect.getPicker(), "open");
-			fnPickerCloseSpy = this.spy(oSelect.getPicker(), "close");
+			const fnOpenSpy = this.spy(oSelect.getPicker(), "open");
+			const fnPickerCloseSpy = this.spy(oSelect.getPicker(), "close");
 
 			qutils.triggerTouchEvent("touchend", oSelect.getDomRef(), {
 				targetTouches: {
@@ -7370,11 +7359,11 @@ sap.ui.define([
 		});
 
 		QUnit.test("tap on pre-selected item with keyboard keys should fire change event", function (assert) {
-			var oItem2 = new Item({text : "2"}),
-				oSelect = new Select({
+			const oItem2 = new Item({text : "2"});
+			const oSelect = new Select({
 					items: [new Item({text : "1"}), oItem2]
-				}),
-				fnFireChangeSpy = this.spy(oSelect, "fireChange");
+				});
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// arrange
 			oSelect.placeAt("content");
@@ -7397,11 +7386,11 @@ sap.ui.define([
 
 		QUnit.module("onkeypress");
 
-		var fnKeypressTestCase = function (mOptions) {
+		const fnKeypressTestCase = function (mOptions) {
 			QUnit.test("onkeypress", function (assert) {
 
 				// system under test
-				var oSelect = mOptions.control;
+				const oSelect = mOptions.control;
 
 				// arrange
 				oSelect.placeAt("content");
@@ -7421,7 +7410,7 @@ sap.ui.define([
 		};
 
 		(function () {
-			var oExpectedItem;
+			let oExpectedItem;
 
 			fnKeypressTestCase({
 				control: new Select({
@@ -7484,8 +7473,8 @@ sap.ui.define([
 		QUnit.test("onkeypress if the selected item changes when a key is pressed", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "DZ",
@@ -7504,7 +7493,7 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			qutils.triggerKeypress(oSelect.getDomRef(), "B");
@@ -7525,8 +7514,8 @@ sap.ui.define([
 
 		QUnit.test("selection change with tab", function (assert) {
 			// system under test
-			var oExpectedItem,
-				oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 						new Item({
 							text: "First item"
@@ -7558,11 +7547,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should select Germany", function (assert) {
+		QUnit.test("onsapdown selects Germany", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						text: "Argentina"
@@ -7592,11 +7581,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should select Gglorem", function (assert) {
+		QUnit.test("type 'GGL' selects Gglorem directly", function (assert) {
 
 			// system under test
-			var oExpectedItem,
-				oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						text: "Argentina"
@@ -7629,13 +7618,13 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should select Gglorem", function (assert) {
+		QUnit.test("pressing G cycles Argentina→Germany→Ghana→Gglorem, typing L selects Gglorem", function (assert) {
 
 			// system under test
-			var oExpectedItem,
-				oExpectedItem2,
-				oExpectedItem3,
-				oSelect = new Select({
+			let oExpectedItem;
+			let oExpectedItem2;
+			let oExpectedItem3;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						key: "AR",
@@ -7681,13 +7670,13 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should select Greece", function (assert) {
+		QUnit.test("pressing G cycles Germany→Ghana→Greece", function (assert) {
 
 			// system under test
-			var oExpectedItem,
-				oExpectedItem2,
-				oExpectedItem3,
-				oSelect = new Select({
+			let oExpectedItem;
+			let oExpectedItem2;
+			let oExpectedItem3;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						key: "AR",
@@ -7733,11 +7722,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should select Ghana", function (assert) {
+		QUnit.test("onsapup selects Ghana", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						text: "Argentina"
@@ -7768,11 +7757,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should select Greece", function (assert) {
+		QUnit.test("pressing G three times selects Greece after Gglorem/Ghana", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						text: "Argentina"
@@ -7806,11 +7795,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should select Gglorem", function (assert) {
+		QUnit.test("pressing G twice selects Gglorem before Ghana", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						text: "Argentina"
@@ -7846,11 +7835,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should select Greece", function (assert) {
+		QUnit.test("onsaphome selects Greece", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						text: "Argentina"
@@ -7893,7 +7882,7 @@ sap.ui.define([
 		QUnit.test("onsapshow F4 - the picker popup", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -7911,8 +7900,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnShowSpy = this.spy(oSelect, "onsapshow");
-			var sOpenState = OpenState.OPENING;
+			const fnShowSpy = this.spy(oSelect, "onsapshow");
+			const sOpenState = OpenState.OPENING;
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.F4);
@@ -7929,7 +7918,7 @@ sap.ui.define([
 		QUnit.test("onsapshow Alt + DOWN - open control's picker the popup", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -7947,8 +7936,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnShowSpy = this.spy(oSelect, "onsapshow");
-			var sOpenState = OpenState.OPENING;
+			const fnShowSpy = this.spy(oSelect, "onsapshow");
+			const sOpenState = OpenState.OPENING;
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN, false, true);
@@ -7965,7 +7954,7 @@ sap.ui.define([
 		QUnit.test("onsapshow F4 - close control's picker popup", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -7983,8 +7972,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnShowSpy = this.spy(oSelect, "onsapshow");
-			var sOpenState = OpenState.CLOSING;
+			const fnShowSpy = this.spy(oSelect, "onsapshow");
+			const sOpenState = OpenState.CLOSING;
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.F4);
@@ -8001,7 +7990,7 @@ sap.ui.define([
 		QUnit.test("onsapshow Alt + DOWN - close control's picker popup", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -8019,8 +8008,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnShowSpy = this.spy(oSelect, "onsapshow");
-			var sOpenState = OpenState.CLOSING;
+			const fnShowSpy = this.spy(oSelect, "onsapshow");
+			const sOpenState = OpenState.CLOSING;
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN, false, true);
@@ -8037,7 +8026,7 @@ sap.ui.define([
 		QUnit.test("onsapshow Alt + DOWN - selects first selectable item, when null is selected", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -8057,8 +8046,8 @@ sap.ui.define([
 			oSelect.setSelectedItem(null);
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var aSelectableItems = oSelect.getSelectableItems(),
-				oFirstSelectableItem = aSelectableItems[aSelectableItems.indexOf(oSelect.getSelectedItem()) + 1];
+			const aSelectableItems = oSelect.getSelectableItems();
+			const oFirstSelectableItem = aSelectableItems[aSelectableItems.indexOf(oSelect.getSelectedItem()) + 1];
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN, false, true);
@@ -8075,7 +8064,7 @@ sap.ui.define([
 		QUnit.test("onsaphide Alt + UP - open control's picker popup", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -8093,8 +8082,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnHideSpy = this.spy(oSelect, "onsaphide");
-			var sOpenState = OpenState.OPENING;
+			const fnHideSpy = this.spy(oSelect, "onsaphide");
+			const sOpenState = OpenState.OPENING;
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP, false, true, false);
@@ -8111,7 +8100,7 @@ sap.ui.define([
 		QUnit.test("onsaphide Alt + UP - close control's picker popup", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -8129,8 +8118,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnHideSpy = this.spy(oSelect, "onsaphide");
-			var sOpenState = OpenState.CLOSING;
+			const fnHideSpy = this.spy(oSelect, "onsaphide");
+			const sOpenState = OpenState.CLOSING;
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP, false, true, false);
@@ -8149,7 +8138,7 @@ sap.ui.define([
 		QUnit.test("onsapspace the spacebar key is pressed and the picker popup is close", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "GER",
@@ -8167,7 +8156,7 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			qutils.triggerKeyup(oSelect.getDomRef(), KeyCodes.SPACE);
@@ -8184,7 +8173,7 @@ sap.ui.define([
 		QUnit.test("onsapspace the spacebar key is pressed and the picker popup is open", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "GER",
@@ -8219,7 +8208,7 @@ sap.ui.define([
 		QUnit.test("onsapspace when spacebar key is pressed and the selection has changed", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "GER",
@@ -8240,7 +8229,7 @@ sap.ui.define([
 			oSelect.open();
 			this.clock.tick(1000);	// wait 1s after the open animation is completed
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);	// change the selection
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			qutils.triggerKeyup(oSelect.getDomRef(), KeyCodes.SPACE);
@@ -8255,7 +8244,7 @@ sap.ui.define([
 		QUnit.test("onsapspace the spacebar key is released while holding the shift key", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "GER",
@@ -8290,7 +8279,7 @@ sap.ui.define([
 		QUnit.test("onsapescape - close the picker popup if it is open", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -8308,8 +8297,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnEscapeSpy = this.spy(oSelect, "onsapescape");
-			var fnCloseSpy = this.spy(oSelect, "close");
+			const fnEscapeSpy = this.spy(oSelect, "onsapescape");
+			const fnCloseSpy = this.spy(oSelect, "close");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ESCAPE);
@@ -8325,7 +8314,7 @@ sap.ui.define([
 		QUnit.test("onsapescape - don't close the picker popup if SPACE is hold", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -8344,8 +8333,8 @@ sap.ui.define([
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
 			oSelect.open();
-			var fnEscapeSpy = this.spy(oSelect, "onsapescape");
-			var fnCloseSpy = this.spy(oSelect, "close");
+			const fnEscapeSpy = this.spy(oSelect, "onsapescape");
+			const fnCloseSpy = this.spy(oSelect, "close");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.SPACE);
@@ -8363,7 +8352,7 @@ sap.ui.define([
 		QUnit.test("onsapescape - close the control's picker popup if it is open", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -8384,8 +8373,8 @@ sap.ui.define([
 			oSelect.open();
 			this.clock.tick(1000);
 
-			var fnEscapeSpy = this.spy(oSelect, "onsapescape");
-			var fnCloseSpy = this.spy(oSelect, "close");
+			const fnEscapeSpy = this.spy(oSelect, "onsapescape");
+			const fnCloseSpy = this.spy(oSelect, "close");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ESCAPE);
@@ -8401,7 +8390,7 @@ sap.ui.define([
 		QUnit.test("onsapescape when escape key is pressed and the selection has changed with select list opened", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "GER",
@@ -8421,7 +8410,7 @@ sap.ui.define([
 			oSelect.focus();
 			oSelect.open();
 			this.clock.tick(1000);	// wait 1s after the open animation is completed
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);	// change the selection
 
 			// act
@@ -8437,7 +8426,7 @@ sap.ui.define([
 		QUnit.test("onsapescape when escape key is pressed and the selection has changed with select list closed", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "GER",
@@ -8456,7 +8445,7 @@ sap.ui.define([
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
 			this.clock.tick(1000);	// wait 1s after the open animation is completed
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);	// change the selection
 
 			// act
@@ -8473,7 +8462,7 @@ sap.ui.define([
 
 		QUnit.test("onsapenter - open list box", function (assert) {
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -8490,7 +8479,7 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnEnterSpy = this.spy(oSelect, "onsapenter");
+			const fnEnterSpy = this.spy(oSelect, "onsapenter");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ENTER);
@@ -8508,7 +8497,7 @@ sap.ui.define([
 		QUnit.test("onsapenter - close list box", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -8526,8 +8515,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnEnterSpy = this.spy(oSelect, "onsapenter");
-			var fnCloseSpy = this.spy(oSelect, "close");
+			const fnEnterSpy = this.spy(oSelect, "onsapenter");
+			const fnCloseSpy = this.spy(oSelect, "close");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ENTER);
@@ -8543,7 +8532,7 @@ sap.ui.define([
 		QUnit.test("onsapenter - marking of event", function (assert) {
 
 			// System under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -8555,8 +8544,8 @@ sap.ui.define([
 						text: "item 1"
 					})
 				]
-			}),
-			fnEnterSpy = this.spy(oSelect, "onsapenter");
+			});
+			const fnEnterSpy = this.spy(oSelect, "onsapenter");
 
 			// Arrange
 			oSelect.placeAt("content");
@@ -8587,7 +8576,7 @@ sap.ui.define([
 		QUnit.test("onsapenter when enter key is pressed and the selection has changed", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "GER",
@@ -8606,7 +8595,7 @@ sap.ui.define([
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);	// change the selection
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ENTER);
@@ -8621,7 +8610,7 @@ sap.ui.define([
 		QUnit.test("onsapenter when enter key is pressed the default Browser behavior is prevented", function (assert) {
 
 			// System under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "GER",
@@ -8633,12 +8622,12 @@ sap.ui.define([
 						text: "Cuba"
 					})
 				]
-			}),
-			oEvent = {
+			});
+			const oEvent = {
 				preventDefault: function() {},
 				setMarked: function() {}
-			},
-			oSpy = this.spy(oEvent, "preventDefault");
+			};
+			const oSpy = this.spy(oEvent, "preventDefault");
 
 			// Arrange
 			oSelect.placeAt("content");
@@ -8656,11 +8645,11 @@ sap.ui.define([
 
 		QUnit.module("onsapdown");
 
-		QUnit.test("onsapdown", function (assert) {
+		QUnit.test("onsapdown — skips disabled items and selects next enabled item", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -8685,8 +8674,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnKeyDownSpy = this.spy(oSelect, "onsapdown");
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnKeyDownSpy = this.spy(oSelect, "onsapdown");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
@@ -8707,10 +8696,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("onsapdown", function (assert) {
+		QUnit.test("onsapdown — all items disabled, no change", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -8736,8 +8725,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnKeyDownSpy = this.stub(oSelect, "onsapdown");
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnKeyDownSpy = this.stub(oSelect, "onsapdown");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
@@ -8758,11 +8747,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("onsapdown", function (assert) {
+		QUnit.test("onsapdown — already at last enabled item, wraps to keep current", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -8788,8 +8777,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnKeyDownSpy = this.spy(oSelect, "onsapdown");
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnKeyDownSpy = this.spy(oSelect, "onsapdown");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
@@ -8813,8 +8802,8 @@ sap.ui.define([
 		QUnit.test('it should set the attribute "aria-activedescendant" after the picker popup is opened', function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item(),
 					oExpectedItem = new Item({
@@ -8840,11 +8829,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should be scrolled the the newly selected item using arrow navigation", function (assert) {
+		QUnit.test("list scrolls to newly selected item on arrow key navigation", function (assert) {
 
 			// Arrange
-			var oSelect = new Select({autoAdjustWidth: true}),
-				oEvent = new Event("", oSelect, {which: "ARROW_DOWN"});
+			const oSelect = new Select({autoAdjustWidth: true});
+			const oEvent = new Event("", oSelect, {which: "ARROW_DOWN"});
 
 			oEvent.setMarked = function(){return true;};
 
@@ -8901,9 +8890,9 @@ sap.ui.define([
 			}
 		});
 
-		QUnit.test("it should take action on SPACE key up", function (assert) {
+		QUnit.test("SPACE keyup opens the picker", function (assert) {
 			//arrange
-			var oSpy = this.spy(this.oSelect, "toggleOpenState");
+			const oSpy = this.spy(this.oSelect, "toggleOpenState");
 
 			//act
 			qutils.triggerKeydown(this.oSelect.getDomRef(), KeyCodes.SPACE);
@@ -8918,9 +8907,9 @@ sap.ui.define([
 			assert.ok(oSpy.called, "Action called on keyup");
 		});
 
-		QUnit.test("it should not take action if SHIFT is pressed during space action", function (assert) {
+		QUnit.test("SHIFT+SPACE does not open the picker", function (assert) {
 			//arrange
-			var oSpy = this.spy(this.oSelect, "toggleOpenState");
+			const oSpy = this.spy(this.oSelect, "toggleOpenState");
 
 			// act
 			qutils.triggerKeydown(this.oSelect.getDomRef(), KeyCodes.SPACE);
@@ -8932,9 +8921,9 @@ sap.ui.define([
 			assert.ok(oSpy.notCalled);
 		});
 
-		QUnit.test("it should not take action if ESCAPE is pressed during space action", function (assert) {
+		QUnit.test("ESCAPE during SPACE action cancels the open", function (assert) {
 			//arrange
-			var oSpy = this.spy(this.oSelect, "toggleOpenState");
+			const oSpy = this.spy(this.oSelect, "toggleOpenState");
 
 			// act
 			qutils.triggerKeydown(this.oSelect.getDomRef(), KeyCodes.SPACE);
@@ -8946,9 +8935,9 @@ sap.ui.define([
 			assert.ok(oSpy.notCalled);
 		});
 
-		QUnit.test("it should not take action if ESCAPE is hold during space action", function (assert) {
+		QUnit.test("holding ESCAPE during SPACE action cancels the open", function (assert) {
 			//arrange
-			var oSpy = this.spy(this.oSelect, "toggleOpenState");
+			const oSpy = this.spy(this.oSelect, "toggleOpenState");
 
 			// act
 			qutils.triggerKeydown(this.oSelect.getDomRef(), KeyCodes.SPACE);
@@ -8959,9 +8948,9 @@ sap.ui.define([
 			assert.ok(oSpy.notCalled);
 		});
 
-		QUnit.test("it should fire liveChange event on ARROW Key navigation if a new item is selected", function (assert) {
+		QUnit.test("liveChange event fires on arrow key navigation when selection changes", function (assert) {
 			//arrange
-			var fnFireSelectionChangeSpy = this.spy(this.oSelect, "fireEvent");
+			const fnFireSelectionChangeSpy = this.spy(this.oSelect, "fireEvent");
 
 			// act
 			qutils.triggerKeydown(this.oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
@@ -8972,9 +8961,9 @@ sap.ui.define([
 				{selectedItem: this.oSelect.getItems()[1], id: this.oSelect.getId()}), "the correct item is passed with the event");
 		});
 
-		QUnit.test("it shouldn't fire liveChange event on ARROW Key navigation if no new item is selected", function (assert) {
+		QUnit.test("liveChange event does not fire on arrow key navigation when selection unchanged", function (assert) {
 			//arrange
-			var fnFireSelectionChangeSpy = this.spy();
+			const fnFireSelectionChangeSpy = this.spy();
 			this.oSelect.attachLiveChange(fnFireSelectionChangeSpy);
 
 			// act
@@ -8984,9 +8973,9 @@ sap.ui.define([
 			assert.strictEqual(fnFireSelectionChangeSpy.callCount, 0, "liveChange isn't fired on unsuccessful item navigation");
 		});
 
-		QUnit.test("it should fire liveChange event on Character Key press if a new item is selected", function (assert) {
+		QUnit.test("liveChange event fires on character key press when selection changes", function (assert) {
 			//arrange
-			var fnFireSelectionChangeSpy = this.spy(this.oSelect, "fireEvent");
+			const fnFireSelectionChangeSpy = this.spy(this.oSelect, "fireEvent");
 
 			// act
 			qutils.triggerKeypress(this.oSelect.getDomRef(), "G");
@@ -8997,13 +8986,12 @@ sap.ui.define([
 				{selectedItem: this.oSelect.getItems()[1], id: this.oSelect.getId()}), "the correct item is passed with the event");
 		});
 
-		QUnit.test("it should fire liveChange event on revert selection", function (assert) {
+		QUnit.test("liveChange event fires when selection is reverted", function (assert) {
 			//arrange
-			var fnFireSelectionChangeSpy;
 
 			// act
 			qutils.triggerKeypress(this.oSelect.getDomRef(), "G");
-			fnFireSelectionChangeSpy = this.spy(this.oSelect, "fireEvent");
+			const fnFireSelectionChangeSpy = this.spy(this.oSelect, "fireEvent");
 			this.oSelect._revertSelection();
 
 			// assert
@@ -9014,17 +9002,17 @@ sap.ui.define([
 
 		QUnit.module("onsapfocusleave");
 
-		QUnit.test("it should restore the focus to select if select list item gets the focus", function (assert) {
+		QUnit.test("focus returns to Select when SelectList item receives focus", function (assert) {
 			// system under test
-			var oItem1 = new Item({
+			const oItem1 = new Item({
 					text: "Bulgaria",
 					key: "BG"
-				}),
-				oItem2 = new Item({
+				});
+			const oItem2 = new Item({
 					text: "Germany",
 					key: "GER"
-				}),
-				oSelect = new Select({
+				});
+			const oSelect = new Select({
 				items: [ oItem1, oItem2 ]
 			});
 
@@ -9045,10 +9033,10 @@ sap.ui.define([
 
 		QUnit.module("onfocusout");
 
-		QUnit.test("it should not fire the change event if re-rendering occurs (test case 1)", function (assert) {
+		QUnit.test("change event is not fired when re-rendering occurs while picker is open", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item(),
 					new Item({
@@ -9061,7 +9049,7 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			oSelect.invalidate();
@@ -9074,10 +9062,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should not fire the change event if re-rendering occurs (test case 2)", function (assert) {
+		QUnit.test("change event is not fired when item is re-rendered after selection", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item(),
 					new Item({
@@ -9090,7 +9078,7 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
@@ -9105,10 +9093,10 @@ sap.ui.define([
 		});
 
 		// BCP 1570819144
-		QUnit.test("it should not fire the change event after the selected item is removed and re-added again", function (assert) {
+		QUnit.test("change event is not fired when selected item is removed and re-added", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item()
 				]
@@ -9123,7 +9111,7 @@ sap.ui.define([
 			oSelect.addItem(new Item());
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			oSelect.getFocusDomRef().blur();
@@ -9138,14 +9126,14 @@ sap.ui.define([
 		QUnit.test("it checks if _handleFocusout works as expected", function (assert) {
 
 			// arrange
-			var oSelect = new Select(),
-					oPicker = oSelect.getPicker(),
-					oCheckSelectionChangeSpy = this.spy(oSelect, "_checkSelectionChange"),
-					oRevertSelectionSpy = this.spy(oSelect, "_revertSelection"),
-					oMockEventPickerTarget = {
+			const oSelect = new Select();
+			const oPicker = oSelect.getPicker();
+			const oCheckSelectionChangeSpy = this.spy(oSelect, "_checkSelectionChange");
+			const oRevertSelectionSpy = this.spy(oSelect, "_revertSelection");
+			const oMockEventPickerTarget = {
 						target: oPicker
-					},
-					oMockEventRandomTarget = {
+					};
+			const oMockEventRandomTarget = {
 						target: false
 					};
 
@@ -9176,10 +9164,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should fire the change event", function (assert) {
+		QUnit.test("change event fires when selection changes", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item(),
 					new Item({
@@ -9192,7 +9180,7 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
 			oSelect.invalidate();
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
@@ -9207,10 +9195,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should not fire the change event", function (assert) {
+		QUnit.test("change event does not fire when same item is selected again", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item()
 				]
@@ -9220,7 +9208,7 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			oSelect.getFocusDomRef().blur();
@@ -9233,7 +9221,7 @@ sap.ui.define([
 		});
 
 		// BCP 0020079747 0000194079 2016
-		QUnit.test("it should not fire the change event twice", function (assert) {
+		QUnit.test("change event fires only once per selection change", function (assert) {
 
 			this.stub(Device, "system").value({
 				desktop: true,
@@ -9242,8 +9230,8 @@ sap.ui.define([
 			});
 
 			// system under test
-			var oItem;
-			var oSelect = new Select({
+			let oItem;
+			const oSelect = new Select({
 				items: [
 					oItem = new Item({
 						text: "lorem ipsum foo"
@@ -9260,8 +9248,8 @@ sap.ui.define([
 			oSelect.focus();
 			oSelect.open();
 			this.clock.tick(1000); // wait after the open animation is completed and the list is rendered
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
-			var oItemDomRef = oItem.getDomRef();
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const oItemDomRef = oItem.getDomRef();
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN); // navigate to next selectable item
@@ -9287,12 +9275,12 @@ sap.ui.define([
 
 		QUnit.module("onsapup");
 
-		QUnit.test("onsapup", function (assert) {
+		QUnit.test("onsapup — skips disabled items and selects previous enabled item", function (assert) {
 
 			// system under test
-			var oItem;
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oItem;
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -9319,8 +9307,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnKeyUpSpy = this.spy(oSelect, "onsapup");
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnKeyUpSpy = this.spy(oSelect, "onsapup");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
@@ -9341,10 +9329,10 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("onsapup", function (assert) {
+		QUnit.test("onsapup — all items disabled, no change", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -9370,8 +9358,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnKeyUpSpy = this.spy(oSelect, "onsapup");
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnKeyUpSpy = this.spy(oSelect, "onsapup");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
@@ -9392,11 +9380,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("onsapup", function (assert) {
+		QUnit.test("onsapup — already at first enabled item, wraps to keep current", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -9424,8 +9412,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnKeyUpSpy = this.stub(oSelect, "onsapup");
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnKeyUpSpy = this.stub(oSelect, "onsapup");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
@@ -9449,8 +9437,8 @@ sap.ui.define([
 		QUnit.test('it should set the attribute "aria-activedescendant" after the picker popup is opened', function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						text: "Germany"
@@ -9482,12 +9470,12 @@ sap.ui.define([
 
 		QUnit.module("onsaphome");
 
-		QUnit.test("onsaphome", function (assert) {
+		QUnit.test("onsaphome — selects first enabled item", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			let oItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						id: "item-id",
@@ -9525,8 +9513,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnKeyHomeSpy = this.spy(oSelect, "onsaphome");
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnKeyHomeSpy = this.spy(oSelect, "onsaphome");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.HOME);
@@ -9547,12 +9535,12 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("onsaphome", function (assert) {
+		QUnit.test("onsaphome — first item disabled, selects second enabled item", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			let oItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -9589,8 +9577,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnKeyHomeSpy = this.spy(oSelect, "onsaphome");
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnKeyHomeSpy = this.spy(oSelect, "onsaphome");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.HOME);
@@ -9614,9 +9602,9 @@ sap.ui.define([
 		QUnit.test("onsaphome when the Home key is pressed", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			let oItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -9653,8 +9641,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnKeyHomeSpy = this.spy(oSelect, "onsaphome");
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnKeyHomeSpy = this.spy(oSelect, "onsaphome");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.HOME);
@@ -9679,8 +9667,8 @@ sap.ui.define([
 		QUnit.test('it should set the attribute "aria-activedescendant" after the picker popup is opened', function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						enabled: false
@@ -9722,8 +9710,8 @@ sap.ui.define([
 		QUnit.test("onsapend", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -9758,8 +9746,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnKeyEndSpy = this.spy(oSelect, "onsapend");
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnKeyEndSpy = this.spy(oSelect, "onsapend");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.END);
@@ -9783,8 +9771,8 @@ sap.ui.define([
 		QUnit.test("onsapend when the End key is pressed", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item({
 						key: "0",
@@ -9819,8 +9807,8 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oSelect.focus();
-			var fnKeyEndSpy = this.spy(oSelect, "onsapend");
-			var fnFireChangeSpy = this.spy(oSelect, "fireChange");
+			const fnKeyEndSpy = this.spy(oSelect, "onsapend");
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.END);
@@ -9845,8 +9833,8 @@ sap.ui.define([
 		QUnit.test('it should set the attribute "aria-activedescendant" after the picker popup is opened', function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					new Item(),
 					new Item(),
@@ -9878,8 +9866,8 @@ sap.ui.define([
 		QUnit.test("onAfterOpen test case 1", function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						text: "expected"
@@ -9908,8 +9896,8 @@ sap.ui.define([
 		QUnit.test('it should set the attribute "aria-activedescendant" after the picker popup is opened', function (assert) {
 
 			// system under test
-			var oExpectedItem;
-			var oSelect = new Select({
+			let oExpectedItem;
+			const oSelect = new Select({
 				items: [
 					oExpectedItem = new Item({
 						text: "expected"
@@ -9937,8 +9925,8 @@ sap.ui.define([
 			fnToMobileMode();
 
 			// setup
-			var oSelect = new Select(),
-				oHeader = oSelect.getPicker()._getAnyHeader();
+			const oSelect = new Select();
+			const oHeader = oSelect.getPicker()._getAnyHeader();
 
 			// assert
 			assert.equal(oHeader.getTitleAlignment(), mobileLibrary.TitleAlignment.Auto, 'Title alignment is set correctly to "Auto"');
@@ -9953,8 +9941,8 @@ sap.ui.define([
 		QUnit.test("onAfterClose", function (assert) {
 
 			// system under test
-			var item2 = new Item({text : "2"});
-			var oSelect = new Select({
+			const item2 = new Item({text : "2"});
+			const oSelect = new Select({
 				items: [
 					new Item({text : "1"}),
 					item2
@@ -9985,15 +9973,15 @@ sap.ui.define([
 		QUnit.module("Events");
 
 		QUnit.test("change of selected item onChange should not re-trigger change event", function (assert) {
-			var oItem1 =  new Item({key: "1", text : "1"}),
-				oItem2 = new Item({key: "2", text : "2"}),
-				oSelect = new Select({
+			const oItem1 =  new Item({key: "1", text : "1"});
+			const oItem2 = new Item({key: "2", text : "2"});
+			const oSelect = new Select({
 					items: [oItem1, oItem2],
 					change: function () {
 						oSelect.setSelectedKey("1");
 					}
-				}),
-				fnFireChangeSpy = this.spy(oSelect, "fireChange");
+				});
+			const fnFireChangeSpy = this.spy(oSelect, "fireChange");
 
 			// arrange
 			oSelect.placeAt("content");
@@ -10015,9 +10003,9 @@ sap.ui.define([
 
 
 		QUnit.test("Tab handling shouldn't mark the event", function(assert) {
-			var oSelect = new Select(),
-				$oTabNextEvent = jQuery.Event("tabNextTestEvent"),
-				$oTabPreviousEvent = jQuery.Event("tabPreviousTestEvent");
+			const oSelect = new Select();
+			const $oTabNextEvent = jQuery.Event("tabNextTestEvent");
+			const $oTabPreviousEvent = jQuery.Event("tabPreviousTestEvent");
 
 			oSelect.onsaptabnext($oTabNextEvent);
 			assert.notOk($oTabNextEvent.isMarked(), "The event isn't marked by the onsaptabnext method");
@@ -10029,12 +10017,12 @@ sap.ui.define([
 		});
 
 		QUnit.test("'change' event is triggered with two params - selectedItem and previousSelectedItem", function (assert) {
-			var oItem1 =  new Item({key: "1", text : "1"}),
-				oItem2 = new Item({key: "2", text : "2"}),
-				oSelect = new Select({
+			const oItem1 =  new Item({key: "1", text : "1"});
+			const oItem2 = new Item({key: "2", text : "2"});
+			const oSelect = new Select({
 					items: [oItem1, oItem2]
-				}),
-				fnFireChangeSpy = this.spy(oSelect, "fireEvent");
+				});
+			const fnFireChangeSpy = this.spy(oSelect, "fireEvent");
 
 			// arrange
 			oSelect.placeAt("content");
@@ -10059,7 +10047,7 @@ sap.ui.define([
 		QUnit.test("textDirection set to RTL", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						text: "(+359) 111 222 333"
@@ -10086,7 +10074,7 @@ sap.ui.define([
 		QUnit.test("textDirection set to LTR", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						text: "(+359) 111 222 333"
@@ -10113,7 +10101,7 @@ sap.ui.define([
 		QUnit.test("textDirection set to RTL and textAlign set to BEGIN", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						text: "(+359) 111 222 333"
@@ -10131,7 +10119,7 @@ sap.ui.define([
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 			// assert
-			var $SelectLabel = oSelect.$("label");
+			const $SelectLabel = oSelect.$("label");
 
 			assert.strictEqual($SelectLabel.attr("dir"), "rtl", "Dir attribute is rendered and is set to 'rtl'");
 			assert.strictEqual($SelectLabel.css("text-align"), "right", "Text align style is shifted to right");
@@ -10144,7 +10132,7 @@ sap.ui.define([
 		QUnit.test("textDirection set to LTR and textAlign set to END", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						text: "(+359) 111 222 333"
@@ -10162,7 +10150,7 @@ sap.ui.define([
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 			// assert
-			var $SelectLabel = oSelect.$("label");
+			const $SelectLabel = oSelect.$("label");
 
 			assert.strictEqual($SelectLabel.attr("dir"), "ltr", "Dir attribute is rendered and is set to 'ltr'");
 			assert.strictEqual($SelectLabel.css("text-align"), "right", "Text align style is shifted to right");
@@ -10175,15 +10163,15 @@ sap.ui.define([
 
 		QUnit.test("Referencing labels enhancing", function(assert) {
 			// system under test
-			var oSpy = this.spy(Select.prototype, "_handleReferencingLabels"),
-				oSpyHandler = this.spy(Select.prototype, "focus"),
-				oLabel = new Label({
+			const oSpy = this.spy(Select.prototype, "_handleReferencingLabels");
+			const oSpyHandler = this.spy(Select.prototype, "focus");
+			const oLabel = new Label({
 					text: "referencing label",
 					labelFor: 'selectTest1'
-				}),
-				oItemA = new Item({key: "Item1", text: "Item1"}),
-				oItemB = new Item({key: "Item2", text: "Item2"}),
-				oSelect = new Select('selectTest1', {
+				});
+			const oItemA = new Item({key: "Item1", text: "Item1"});
+			const oItemB = new Item({key: "Item2", text: "Item2"});
+			const oSelect = new Select('selectTest1', {
 					items: [oItemA, oItemB],
 					forceSelection: false
 				});
@@ -10207,10 +10195,10 @@ sap.ui.define([
 		});
 
 		QUnit.test("Referencing labels focusing on tap when selection type is not a range", function (assert) {
-			var oLabel = new Label({ text: "referencing label", labelFor: 'selectTest1' }),
-				oItemA = new Item({ key: "Item1", text: "Item1" }),
-				oItemB = new Item({ key: "Item2", text: "Item2" }),
-				oSelect = new Select('selectTest1', {
+			const oLabel = new Label({ text: "referencing label", labelFor: 'selectTest1' });
+			const oItemA = new Item({ key: "Item1", text: "Item1" });
+			const oItemB = new Item({ key: "Item2", text: "Item2" });
+			const oSelect = new Select('selectTest1', {
 					items: [oItemA, oItemB]
 				});
 
@@ -10220,7 +10208,7 @@ sap.ui.define([
 
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-			var oOriginalGetSelection = window.getSelection;
+			const oOriginalGetSelection = window.getSelection;
 			window.getSelection = function() {
 				return { type: "DummyType" };
 			};
@@ -10239,10 +10227,10 @@ sap.ui.define([
 		});
 
 		QUnit.test("Referencing labels not focusing on tap when selection type is a range", function (assert) {
-			var oLabel = new Label({ text: "referencing label", labelFor: 'selectTest1' }),
-				oItemA = new Item({ key: "Item1", text: "Item1" }),
-				oItemB = new Item({ key: "Item2", text: "Item2" }),
-				oSelect = new Select('selectTest1', {
+			const oLabel = new Label({ text: "referencing label", labelFor: 'selectTest1' });
+			const oItemA = new Item({ key: "Item1", text: "Item1" });
+			const oItemB = new Item({ key: "Item2", text: "Item2" });
+			const oSelect = new Select('selectTest1', {
 					items: [oItemA, oItemB]
 				});
 
@@ -10252,7 +10240,7 @@ sap.ui.define([
 
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-			var oOriginalGetSelection = window.getSelection;
+			const oOriginalGetSelection = window.getSelection;
 			window.getSelection = function () {
 				return { type: "Range" };
 			};
@@ -10271,9 +10259,9 @@ sap.ui.define([
 		});
 
 		QUnit.test("Should have correct value for aria-activedescendant after invalidation", function (assert) {
-			var oItemA = new Item({key: "Item1", text: "Item1"}),
-				oItemB = new Item({key: "Item2", text: "Item2"}),
-				oIconOnlySelect = new Select("iconOnlySelect", {
+			const oItemA = new Item({key: "Item1", text: "Item1"});
+			const oItemB = new Item({key: "Item2", text: "Item2"});
+			const oIconOnlySelect = new Select("iconOnlySelect", {
 					icon: "sap-icon://search",
 					type: "IconOnly",
 					items: [oItemA, oItemB]
@@ -10299,9 +10287,9 @@ sap.ui.define([
 		});
 
 		QUnit.test("Visual focus should be set on first item if there is no selectedItem when popover opens", function (assert) {
-			var oItemA = new Item({key: "Item1", text: "Item1"}),
-				oItemB = new Item({key: "Item2", text: "Item2"}),
-				oSelect = new Select({
+			const oItemA = new Item({key: "Item1", text: "Item1"});
+			const oItemB = new Item({key: "Item2", text: "Item2"});
+			const oSelect = new Select({
 					items: [oItemA, oItemB],
 					forceSelection: false
 				});
@@ -10319,22 +10307,22 @@ sap.ui.define([
 		});
 
 		QUnit.test("Label for IconOnly Select", function (assert) {
-			var aItems = [
+			const aItems = [
 				new Item({key: "Item1", text: "Item1"}),
 				new Item({key: "Item2", text: "Item2"})
 			];
-			var aItems2 = [
+			const aItems2 = [
 				new Item({key: "Item1", text: "Item1"}),
 				new Item({key: "Item2", text: "Item2"})
 			];
 
-			var oIconOnlySelect = new Select("iconOnlySelect", {
+			const oIconOnlySelect = new Select("iconOnlySelect", {
 				icon: "sap-icon://search",
 				type: "IconOnly",
 				items: aItems
 			});
 
-			var oStandardSelect = new Select("standardSelect", {
+			const oStandardSelect = new Select("standardSelect", {
 				items: aItems2
 			});
 
@@ -10355,7 +10343,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("getAccessibilityInfo", function (assert) {
-			var oSelect = new Select({
+			const oSelect = new Select({
 				icon: "sap-icon://search",
 				type: "IconOnly",
 				tooltip: "Tooltip",
@@ -10366,7 +10354,7 @@ sap.ui.define([
 				]
 			});
 			assert.ok(!!oSelect.getAccessibilityInfo, "Select has a getAccessibilityInfo function");
-			var oInfo = oSelect.getAccessibilityInfo();
+			let oInfo = oSelect.getAccessibilityInfo();
 			assert.ok(!!oInfo, "getAccessibilityInfo returns a info object");
 
 			assert.strictEqual(oInfo.role, "button", "AriaRole");
@@ -10377,7 +10365,7 @@ sap.ui.define([
 			assert.strictEqual(oInfo.readonly, undefined, "IconOnly");
 
 			oSelect.setTooltip("");
-			var oIconInfo = IconPool.getIconInfo(oSelect.getIcon());
+			const oIconInfo = IconPool.getIconInfo(oSelect.getIcon());
 			oInfo = oSelect.getAccessibilityInfo();
 			assert.strictEqual(oInfo.role, "button", "AriaRole");
 			assert.strictEqual(oInfo.type, Library.getResourceBundleFor("sap.m").getText("ACC_CTR_TYPE_BUTTON"), "Type");
@@ -10408,8 +10396,8 @@ sap.ui.define([
 		});
 
 		QUnit.test("Enabled/Disabled state", function (assert) {
-			var oEnabledSelect = new Select({ enabled: true }),
-				oDisabledSelect = new Select({ enabled: false });
+			const oEnabledSelect = new Select({ enabled: true });
+			const oDisabledSelect = new Select({ enabled: false });
 
 			oEnabledSelect.placeAt("content");
 			oDisabledSelect.placeAt("content");
@@ -10425,8 +10413,8 @@ sap.ui.define([
 		});
 
 		QUnit.test("Required state", function (assert) {
-			var oSelect = new Select({ required: true }),
-				oHiddenSelect;
+			const oSelect = new Select({ required: true });
+			let oHiddenSelect;
 
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
@@ -10451,12 +10439,11 @@ sap.ui.define([
 
 		QUnit.test("Aria attributes", function (assert) {
 			// arrange
-			var oSelect = new Select(),
-				oHiddenSelect;
+			const oSelect = new Select();
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-			oHiddenSelect = oSelect._getHiddenSelect();
+			const oHiddenSelect = oSelect._getHiddenSelect();
 
 			// assert
 			assert.strictEqual(oHiddenSelect.attr("aria-haspopup"), "listbox", "aria-haspopup is correct");
@@ -10481,9 +10468,9 @@ sap.ui.define([
 
 		QUnit.test("Picker aria-labelledby attribute", function (assert) {
 			// arrange
-			var oSelect = new Select(),
-				sPickerValueStateId = oSelect.getValueStateTextInvisibleText().getId(),
-				oPicker = oSelect.getPicker();
+			const oSelect = new Select();
+			const sPickerValueStateId = oSelect.getValueStateTextInvisibleText().getId();
+			const oPicker = oSelect.getPicker();
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
@@ -10504,9 +10491,9 @@ sap.ui.define([
 
 		QUnit.test("Picker aria-labelledby attribute initial", function (assert) {
 			// arrange
-			var oSelect = new Select({valueState: ValueState.Success}),
-				sPickerValueStateId = oSelect.getValueStateTextInvisibleText().getId(),
-				oPicker = oSelect.getPicker();
+			const oSelect = new Select({valueState: ValueState.Success});
+			const sPickerValueStateId = oSelect.getValueStateTextInvisibleText().getId();
+			const oPicker = oSelect.getPicker();
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
@@ -10519,7 +10506,7 @@ sap.ui.define([
 
 		QUnit.module("value state");
 
-		QUnit.test("it should open the value state message popup on focusin", function (assert) {
+		QUnit.test("value state message popup opens on focusin", function (assert) {
 
 			this.stub(Device, "system").value({
 				desktop: true,
@@ -10528,7 +10515,7 @@ sap.ui.define([
 			});
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				valueState: ValueState.Warning
 			});
 
@@ -10541,7 +10528,7 @@ sap.ui.define([
 			this.clock.tick(101);
 
 			// assert
-			var oValueStateMessageDomRef = document.getElementById(oSelect.getValueStateMessageId());
+			const oValueStateMessageDomRef = document.getElementById(oSelect.getValueStateMessageId());
 			assert.ok(oValueStateMessageDomRef);
 			assert.strictEqual(getComputedStyle(oValueStateMessageDomRef).getPropertyValue("display"), "block");
 
@@ -10549,7 +10536,7 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should open the value state message popup when the dropdown list is closed", function (assert) {
+		QUnit.test("value state message popup opens when dropdown closes", function (assert) {
 
 			this.stub(Device, "system").value({
 				desktop: true,
@@ -10558,7 +10545,7 @@ sap.ui.define([
 			});
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						text: "lorem ipsum"
@@ -10579,7 +10566,7 @@ sap.ui.define([
 			oSelect.close();
 
 			// assert
-			var oValueStateMessageDomRef = document.getElementById(oSelect.getValueStateMessageId());
+			const oValueStateMessageDomRef = document.getElementById(oSelect.getValueStateMessageId());
 			assert.ok(oValueStateMessageDomRef);
 			assert.strictEqual(getComputedStyle(oValueStateMessageDomRef).getPropertyValue("display"), "block");
 
@@ -10587,14 +10574,12 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should not open the value state message when it is already opened", function (assert) {
+		QUnit.test("value state message popup does not open when already open", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 					valueState: ValueState.Warning
-				}),
-				oValueState,
-				oSpy;
+				});
 
 			// arrange
 			oSelect.placeAt("content");
@@ -10604,8 +10589,8 @@ sap.ui.define([
 			oSelect.openValueStateMessage();
 			this.clock.tick(101);
 
-			oValueState = oSelect.getValueStateMessage();
-			oSpy = this.spy(oValueState, "open");
+			const oValueState = oSelect.getValueStateMessage();
+			const oSpy = this.spy(oValueState, "open");
 			oSelect.openValueStateMessage();
 
 			// assert
@@ -10616,7 +10601,7 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should close the value state message popup on focusout", function (assert) {
+		QUnit.test("value state message popup closes on focusout", function (assert) {
 
 			this.stub(Device, "system").value({
 				desktop: true,
@@ -10625,7 +10610,7 @@ sap.ui.define([
 			});
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				valueState: ValueState.Warning
 			});
 
@@ -10639,14 +10624,14 @@ sap.ui.define([
 			qutils.triggerEvent("focusout", oSelect.getFocusDomRef());
 
 			// assert
-			var vValueStateMessageDomRef = document.getElementById(oSelect.getValueStateMessageId());
+			const vValueStateMessageDomRef = document.getElementById(oSelect.getValueStateMessageId());
 			assert.ok(vValueStateMessageDomRef === null);
 
 			// cleanup
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should close the value state message popup when the dropdown list is opened", function (assert) {
+		QUnit.test("value state message popup closes when dropdown opens", function (assert) {
 
 			this.stub(Device, "system").value({
 				desktop: true,
@@ -10655,7 +10640,7 @@ sap.ui.define([
 			});
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({
 						text: "lorem ipsum"
@@ -10674,21 +10659,19 @@ sap.ui.define([
 			oSelect.open();
 
 			// assert
-			var vValueStateMessageDomRef = document.getElementById(oSelect.getValueStateMessageId());
+			const vValueStateMessageDomRef = document.getElementById(oSelect.getValueStateMessageId());
 			assert.strictEqual(vValueStateMessageDomRef, null);
 
 			// cleanup
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should not close the value state message when it is already closed", function (assert) {
+		QUnit.test("value state message popup does not close when already closed", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 					valueState: ValueState.Warning
-				}),
-				oValueState,
-				oSpy;
+				});
 
 			// arrange
 			oSelect.placeAt("content");
@@ -10701,8 +10684,8 @@ sap.ui.define([
 			oSelect.closeValueStateMessage();
 			this.clock.tick(101);
 
-			oValueState = oSelect.getValueStateMessage();
-			oSpy = this.spy(oValueState, "close");
+			const oValueState = oSelect.getValueStateMessage();
+			const oSpy = this.spy(oValueState, "close");
 			oSelect.closeValueStateMessage();
 
 			// assert
@@ -10713,7 +10696,7 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should open the value state message popup on setValueState to Error", function (assert) {
+		QUnit.test("value state message popup opens on setValueState(Error)", function (assert) {
 
 			this.stub(Device, "system").value({
 				desktop: true,
@@ -10722,7 +10705,7 @@ sap.ui.define([
 			});
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				valueState: ValueState.None
 			});
 
@@ -10736,7 +10719,7 @@ sap.ui.define([
 			this.clock.tick(101);
 
 			// assert
-			var oValueStateMessageDomRef = document.getElementById(oSelect.getValueStateMessageId());
+			const oValueStateMessageDomRef = document.getElementById(oSelect.getValueStateMessageId());
 			assert.ok(oValueStateMessageDomRef);
 			assert.strictEqual(getComputedStyle(oValueStateMessageDomRef).getPropertyValue("display"), "block");
 
@@ -10744,7 +10727,7 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should close the value state message popup on setValueState to None", function (assert) {
+		QUnit.test("value state message popup closes on setValueState(None)", function (assert) {
 
 			this.stub(Device, "system").value({
 				desktop: true,
@@ -10753,7 +10736,7 @@ sap.ui.define([
 			});
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				valueState: ValueState.Error
 			});
 
@@ -10767,7 +10750,7 @@ sap.ui.define([
 			this.clock.tick(101);
 
 			// assert
-			var oValueStateMessageDomRef = document.getElementById(oSelect.getValueStateMessageId());
+			const oValueStateMessageDomRef = document.getElementById(oSelect.getValueStateMessageId());
 			assert.strictEqual(oValueStateMessageDomRef, null);
 
 			// cleanup
@@ -10777,12 +10760,12 @@ sap.ui.define([
 		QUnit.test("shouldValueStateMessageBeOpened returns correct value, based on _bValueStateMessageOpened property", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 					valueState: ValueState.Error,
 					enabled: true,
 					editable: true
-				}),
-				bShouldOpenValueStateMessage;
+				});
+			let bShouldOpenValueStateMessage;
 
 			// arrange
 			oSelect._bValueStateMessageOpened = true;
@@ -10811,8 +10794,8 @@ sap.ui.define([
 		QUnit.test("_updatePickerAriaLabelledBy call is postponed when the picker is closing", function (assert) {
 
 			// system under test,
-			var oItem,
-				oSelect = new Select({
+			let oItem;
+			const oSelect = new Select({
 					items: [
 						new Item({
 							text: "lorem ipsum foo"
@@ -10821,11 +10804,11 @@ sap.ui.define([
 							text: "lorem ipsum bar"
 						})
 					]
-				}),
-				oPicker = oSelect.getPicker(),
-				oPickerCloseSpy = this.spy(oSelect.getPicker(), "fireAfterClose"),
-				fnDone = assert.async(),
-				oUpdatePickerAriaLabelledByStub = this.stub(oSelect, "_updatePickerAriaLabelledBy").callsFake(function() {
+				});
+			const oPicker = oSelect.getPicker();
+			const oPickerCloseSpy = this.spy(oSelect.getPicker(), "fireAfterClose");
+			const fnDone = assert.async();
+			const oUpdatePickerAriaLabelledByStub = this.stub(oSelect, "_updatePickerAriaLabelledBy").callsFake(function() {
 					oUpdatePickerAriaLabelledByStub.restore(); // avoid endless recursion
 					// assert
 					assert.ok(oPickerCloseSpy.calledOnce, "after close event is fired once");
@@ -10872,14 +10855,13 @@ sap.ui.define([
 
 		QUnit.test("Aria-describedby reference element should have a separate persistent DOM node other than the visible value state popup", function(assert) {
 			//Arrange
-			var oSelect = new Select({
+			const oSelect = new Select({
 					valueState: ValueState.Warning
 				});
-			var oAccDomRef;
 
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
-			oAccDomRef = document.getElementById(oSelect.getValueStateMessageId() + "-sr");
+			const oAccDomRef = document.getElementById(oSelect.getValueStateMessageId() + "-sr");
 
 			//Assert
 			assert.strictEqual(oSelect.getDomRef().contains(oAccDomRef), true, "Accessibility DOM is created");
@@ -10890,7 +10872,7 @@ sap.ui.define([
 
 		QUnit.test("Aria-describedby attribute should persists even if the message popup is not opened", function(assert) {
 			//Arrange
-			var oSelect = new Select({
+			const oSelect = new Select({
 				valueState: "Warning",
 				valueStateText: "This is a value state with warning message"
 			});
@@ -10941,64 +10923,60 @@ sap.ui.define([
 			}
 		});
 
-		QUnit.test("Text of the picker's title", function(assert) {
+		QUnit.test("Text of the picker's title", async function(assert) {
 			assert.expect(2);
-
-			var fnDone = assert.async(),
-				oDialog = this.oSelect.getAggregation("picker");
-
-			oDialog.attachBeforeOpen(function () {
-				// Checks the picker title after opening the dialog, since the title is updated in beforeOpen
-				assert.strictEqual(this.oSelect._getPickerTitle().getText(), this.oLabel.getText(), "The title of the picker is the same as the label referencing the Select");
-
-				fnDone();
-			}.bind(this));
-
+			const oDialog = this.oSelect.getAggregation("picker");
 			// Checks the picker title before opening (the default one)
 			assert.strictEqual(this.oSelect._getPickerTitle().getText(), 'Select', "The default value of the picker's title");
-
+			const openPromise = new Promise((resolve) => {
+				oDialog.attachBeforeOpen(() => {
+					// Checks the picker title after opening the dialog, since the title is updated in beforeOpen
+					assert.strictEqual(this.oSelect._getPickerTitle().getText(), this.oLabel.getText(), "The title of the picker is the same as the label referencing the Select");
+					resolve();
+				});
+			});
 			// Open the Select, in order for the title to be updated.
 			this.oSelect.open();
+			await openPromise;
 		});
 
-		QUnit.test("beforeOpen event is fired", function(assert) {
+		QUnit.test("beforeOpen event is fired", async function(assert) {
 			assert.expect(1);
-
-			var fnDone = assert.async();
-
-			this.oSelect.attachBeforeOpen(function() {
-				assert.ok(true, "The beforeOpen event was fired."); // Assertion for event firing
-				fnDone();
+			const openPromise = new Promise((resolve) => {
+				this.oSelect.attachBeforeOpen(() => {
+					assert.ok(true, "The beforeOpen event was fired."); // Assertion for event firing
+					resolve();
+				});
 			});
-
 			// Open the Select to trigger the beforeOpen event
 			this.oSelect.open();
+			await openPromise;
 		});
 
 		QUnit.test("Picker header has no contentRight button", function(assert) {
-			var oHeader = this.oSelect._getPickerHeader();
+			const oHeader = this.oSelect._getPickerHeader();
 			assert.strictEqual(oHeader.getContentRight().length, 0, "The picker header bar has no contentRight children");
 		});
 
 		QUnit.test("Dialog has an endButton set", function(assert) {
-			var oDialog = this.oSelect.getAggregation("picker"),
-				oEndButton = oDialog.getEndButton();
+			const oDialog = this.oSelect.getAggregation("picker");
+			const oEndButton = oDialog.getEndButton();
 			assert.ok(oEndButton, "The dialog has an endButton");
 			assert.ok(oEndButton.isA("sap.m.Button"), "The endButton is a sap.m.Button");
 		});
 
 		QUnit.test("Dialog endButton text equals SELECT_CANCEL_BUTTON", function(assert) {
-			var oDialog = this.oSelect.getAggregation("picker"),
-				oEndButton = oDialog.getEndButton(),
-				sExpected = Library.getResourceBundleFor("sap.m").getText("SELECT_CANCEL_BUTTON");
+			const oDialog = this.oSelect.getAggregation("picker");
+			const oEndButton = oDialog.getEndButton();
+			const sExpected = Library.getResourceBundleFor("sap.m").getText("SELECT_CANCEL_BUTTON");
 			assert.strictEqual(oEndButton.getText(), sExpected, "The endButton text is the localised Cancel string");
 		});
 
 		QUnit.test("Pressing the endButton closes the dialog", function(assert) {
 			assert.expect(1);
 
-			var fnDone = assert.async(),
-				oDialog = this.oSelect.getAggregation("picker");
+			const fnDone = assert.async();
+			const oDialog = this.oSelect.getAggregation("picker");
 
 			oDialog.attachEventOnce("afterClose", function() {
 				assert.ok(true, "The dialog was closed after pressing Cancel");
@@ -11038,12 +11016,12 @@ sap.ui.define([
 
 		QUnit.test("Hidden select native dropdown is not showing", function (assert) {
 			// arrange
-			var fnMouseDownOrigin = Select.prototype.onmousedown,
-				fnKeydownDownOrigin = Select.prototype.onkeydown,
-				oSpy,
-				oSelect = this.oSelect,
-				thatSpy = this.spy,
-				fnOverride = function (fnOrigin) {
+			const fnMouseDownOrigin = Select.prototype.onmousedown;
+			const fnKeydownDownOrigin = Select.prototype.onkeydown;
+			let oSpy;
+			const oSelect = this.oSelect;
+			const thatSpy = this.spy;
+			const fnOverride = function (fnOrigin) {
 					return function (oEvent) {
 						oSpy = thatSpy(oEvent, "preventDefault");
 						fnOrigin.call(oSelect, oEvent);
@@ -11075,7 +11053,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("Hidden select value is changed", function (assert) {
-			var oHiddenInput = this.oSelect._getHiddenInput();
+			const oHiddenInput = this.oSelect._getHiddenInput();
 			// assert
 			assert.strictEqual(oHiddenInput.attr("value"), "1", "Value is set to first item key when forceSelection is set to true");
 
@@ -11098,8 +11076,8 @@ sap.ui.define([
 		QUnit.module("OverflowToolbar configuration");
 
 		QUnit.test("OverflowToolbar configuration is set correctly", function (assert) {
-			var oSelect = new Select(),
-				oConfig = oSelect.getOverflowToolbarConfig();
+			const oSelect = new Select();
+			const oConfig = oSelect.getOverflowToolbarConfig();
 
 			assert.equal(typeof oConfig.onBeforeEnterOverflow, "function", "onBeforeEnterOverflow function is set");
 			assert.equal(typeof oConfig.onAfterExitOverflow, "function", "onAfterExitOverflow function is set");
@@ -11109,9 +11087,9 @@ sap.ui.define([
 		QUnit.module("Select with icons");
 
 		QUnit.test("Item's icon changing ", function(assert) {
-			var COMPETITOR = "sap-icon://competitor",
-				PAPER_PLANE = "sap-icon://paper-plane",
-				oSelect = new Select({
+			const COMPETITOR = "sap-icon://competitor";
+			const PAPER_PLANE = "sap-icon://paper-plane";
+			const oSelect = new Select({
 				items: [
 					new ListItem({
 						key: "1",
@@ -11129,7 +11107,7 @@ sap.ui.define([
 			oSelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-			var oValueIcon = oSelect._getValueIcon();
+			const oValueIcon = oSelect._getValueIcon();
 
 			assert.strictEqual(oSelect.getItems()[0].getIcon(), COMPETITOR, "Select item icon was set.");
 			assert.strictEqual(oValueIcon.getSrc(), COMPETITOR, "Icon was set in internal aggregation.");
@@ -11144,7 +11122,7 @@ sap.ui.define([
 
 		QUnit.module("Value state text", {
 			beforeEach: function () {
-				var sWarningText = "lorem ipsum";
+				const sWarningText = "lorem ipsum";
 				this.oSelect = new Select("theSelect", {
 					valueStateText: sWarningText,
 					valueState: ValueState.Warning,
@@ -11180,7 +11158,7 @@ sap.ui.define([
 			"setValueStateText should allow method chaining",
 			function (assert) {
 				//Arrange
-				var oTestSelect = new Select("testSelect", {
+				const oTestSelect = new Select("testSelect", {
 					valueStateText: "lorem ipsum",
 					valueState: ValueState.Warning,
 					items: [
@@ -11199,11 +11177,10 @@ sap.ui.define([
 							text: "item 2"
 						})
 					]
-				}),
-
-				//Act
-				oTestValueStateStatic = oTestSelect.setValueStateText("new Text"),
-				oTestValueStateInsideDom = this.oSelect.setValueStateText("new Text");
+				});
+				const //Act
+				oTestValueStateStatic = oTestSelect.setValueStateText("new Text");
+				const oTestValueStateInsideDom = this.oSelect.setValueStateText("new Text");
 
 			//Assert
 			assert.equal(oTestValueStateStatic, oTestSelect, "setValueStateText returns instance of sap.m.Select," +
@@ -11217,7 +11194,7 @@ sap.ui.define([
 
 		});
 		QUnit.test(
-			"it should show the value state text in the value state content when the dropdown list is opened",
+			"value state text is shown in dropdown content when picker opens",
 			function (assert) {
 
 			// arrange
@@ -11226,22 +11203,21 @@ sap.ui.define([
 				phone: false,
 				tablet: false
 			});
-			var oWarningSelect = this.oSelect,
-				sWarningText = oWarningSelect.getValueStateText(),
-				oPicker;
+			const oWarningSelect = this.oSelect;
+			const sWarningText = oWarningSelect.getValueStateText();
 
 			// act
 			oWarningSelect.open();
 			this.clock.tick(1000);
 
 			// assert
-			oPicker = oWarningSelect.getPicker();
+			const oPicker = oWarningSelect.getPicker();
 			assert.strictEqual(this.getPickerValueStateContent(oPicker).getText(), sWarningText,
 					"The value state text should be present.");
 		});
 
 		QUnit.test(
-			"it should change the CSS class of the value state text in the value state content when the value state is changed",
+			"value state CSS class updates in dropdown content when value state changes",
 			function (assert) {
 			// arrange
 			this.stub(Device, "system").value({
@@ -11249,11 +11225,11 @@ sap.ui.define([
 				phone: false,
 				tablet: false
 			});
-			var oWarningSelect = this.oSelect,
-				mValueState = ValueState,
-				sNoneState = mValueState.None,
-				oPicker,
-				oValueStateContent;
+			const oWarningSelect = this.oSelect;
+			const mValueState = ValueState;
+			const sNoneState = mValueState.None;
+			let oPicker;
+			let oValueStateContent;
 
 			Object.keys(mValueState).forEach(function(key) {
 				//arrange
@@ -11282,7 +11258,7 @@ sap.ui.define([
 		});
 
 		QUnit.test(
-			"it should change the value state text in the value state content when the value state text is changed", function (assert) {
+			"value state text updates in dropdown content when value state text changes", function (assert) {
 			// arrange
 			this.stub(Device, "system").value({
 				desktop: true,
@@ -11290,17 +11266,16 @@ sap.ui.define([
 				tablet: false
 			});
 
-			var oWarningSelect = this.oSelect,
-				sWarningText = oWarningSelect.getValueStateText(),
-				sChangedWarningText = "ipsum lorem",
-				oPicker;
+			const oWarningSelect = this.oSelect;
+			const sWarningText = oWarningSelect.getValueStateText();
+			const sChangedWarningText = "ipsum lorem";
 
 			// act
 			oWarningSelect.open();
 			this.clock.tick(1000);
 
 			// assert
-			oPicker = oWarningSelect.getPicker();
+			const oPicker = oWarningSelect.getPicker();
 			assert.ok(oPicker, "The picker should be present.");
 			assert.strictEqual(this.getPickerValueStateContent(oPicker).getText(), sWarningText,
 					"The correct value state text should be shown.");
@@ -11321,11 +11296,11 @@ sap.ui.define([
 
 		QUnit.module("Select list width");
 
-		QUnit.test("it should set select list max width of 100% on desktop when wrapItemsText property is true", function (assert) {
+		QUnit.test("wrapItemsText=true sets SelectList max-width to 100% on desktop", function (assert) {
 			fnToDesktopMode(); // Enter desktop mode
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [ new Item({ key: "1", text: "item 1" }) ],
 				wrapItemsText: true
 			});
@@ -11337,11 +11312,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set select list max width of 100% on tablet when wrapItemsText property is true", function (assert) {
+		QUnit.test("wrapItemsText=true sets SelectList max-width to 100% on tablet", function (assert) {
 			fnToTabletMode(); // Enter tabled mode
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [ new Item({ key: "1", text: "item 1" }) ],
 				wrapItemsText: true
 			});
@@ -11353,11 +11328,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set select list max width of 100% on phone", function (assert) {
+		QUnit.test("wrapItemsText sets SelectList max-width to 100% on phone", function (assert) {
 			fnToMobileMode(); // Enter phone mode
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [ new Item({ key: "1", text: "item 1" }) ]
 			});
 
@@ -11368,17 +11343,17 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should set to select list`s picker class 'sapMPickerWrappedItems' on desktop when wrapItemsText property is true", function (assert) {
+		QUnit.test("wrapItemsText=true adds sapMPickerWrappedItems class on desktop", function (assert) {
 			fnToDesktopMode(); // Enter desktop mode
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [ new Item({ key: "1", text: "item 1" }) ],
 				wrapItemsText: true
 			});
 
 			//act
-			var oPicker = oSelect.getPicker();
+			const oPicker = oSelect.getPicker();
 
 			// assert
 			assert.ok(oPicker.hasStyleClass("sapMPickerWrappedItems"), 'sapMPickerWrappedItems is set ');
@@ -11389,17 +11364,17 @@ sap.ui.define([
 		});
 
 
-		QUnit.test("it should not set to select list`s picker class 'sapMPickerWrappedItems' on phone when wrapItemsText property is true", function (assert) {
+		QUnit.test("wrapItemsText=true does not add sapMPickerWrappedItems class on phone", function (assert) {
 			fnToMobileMode(); // Enter mobile mode
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [ new Item({ key: "1", text: "item 1" }) ],
 				wrapItemsText: true
 			});
 
 			//act
-			var oPicker = oSelect.getPicker();
+			const oPicker = oSelect.getPicker();
 
 			// assert
 			assert.notOk(oPicker.hasStyleClass("sapMPickerWrappedItems"), 'sapMPickerWrappedItems is not set');
@@ -11409,11 +11384,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should apply 'sapMPickerWrappedItems' class when picker is created with wrapItemsText already set to true", function (assert) {
+		QUnit.test("sapMPickerWrappedItems class is applied when picker is created with wrapItemsText=true", function (assert) {
 			fnToDesktopMode(); // Enter desktop mode
 
 			// system under test - create Select with wrapItemsText: true
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({ key: "1", text: "item 1" }),
 					new Item({ key: "2", text: "item 2" })
@@ -11422,7 +11397,7 @@ sap.ui.define([
 			});
 
 			// act - get the picker (this triggers createPicker)
-			var oPicker = oSelect.getPicker();
+			const oPicker = oSelect.getPicker();
 
 			// assert - verify the class is applied even though picker was created after property was set
 			assert.ok(oPicker.hasStyleClass("sapMPickerWrappedItems"),
@@ -11432,11 +11407,11 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("it should toggle 'sapMPickerWrappedItems' class when wrapItemsText property is changed", function (assert) {
+		QUnit.test("sapMPickerWrappedItems class is toggled when wrapItemsText changes", function (assert) {
 			fnToDesktopMode(); // Enter desktop mode
 
 			// system under test - create Select without wrapItemsText
-			var oSelect = new Select({
+			const oSelect = new Select({
 				items: [
 					new Item({ key: "1", text: "item 1" }),
 					new Item({ key: "2", text: "item 2" })
@@ -11445,7 +11420,7 @@ sap.ui.define([
 			});
 
 			// act - get the picker first
-			var oPicker = oSelect.getPicker();
+			const oPicker = oSelect.getPicker();
 
 			// assert - initially should not have the class
 			assert.notOk(oPicker.hasStyleClass("sapMPickerWrappedItems"),
@@ -11497,7 +11472,7 @@ sap.ui.define([
 
 		QUnit.test("Hidden select focus class attached on 'focus()' called on the control", function (assert) {
 			//Arrange
-			var oSelect = this.oSelect;
+			const oSelect = this.oSelect;
 			//Act
 			oSelect.focus();
 			//Assert
@@ -11508,13 +11483,12 @@ sap.ui.define([
 		QUnit.test("Hidden select focus class attached on 'focus()' called on the control, after rerendering from OTB",
 			function (assert) {
 				//Arrange
-				var oSelect = this.oSelect,
-					oItemToSelect;
+				const oSelect = this.oSelect;
 				//Act
 				oSelect.open();
 				this.clock.tick(1000);
 
-				oItemToSelect = oSelect.getItems()[1];
+				const oItemToSelect = oSelect.getItems()[1];
 				oSelect.setSelectedItem(oItemToSelect);
 
 				oSelect.close();
@@ -11530,7 +11504,7 @@ sap.ui.define([
 		QUnit.test("When Select is of iconOnly type, it should have its autoAdjustWidth property set to true.", function (assert) {
 
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				type: "IconOnly",
 				icon: "sap-icon://search"
 			});
@@ -11571,8 +11545,8 @@ sap.ui.define([
 
 		QUnit.test("columnRatio value is propagated correctly", function (assert) {
 			//Arrange
-			var oList = this.oSelect.getList(),
-				oSelect = this.oSelect;
+			const oList = this.oSelect.getList();
+			const oSelect = this.oSelect;
 
 			//Assert
 			assert.equal(oList.getProperty("_columnRatio"), undefined, "List's columnRatio property is not set by default");
@@ -11594,8 +11568,8 @@ sap.ui.define([
 
 		QUnit.test("columnRatio value is synced correctly", function (assert) {
 			//Arrange
-			var oList = this.oSelect.getList(),
-				oSelect = this.oSelect;
+			const oList = this.oSelect.getList();
+			const oSelect = this.oSelect;
 
 			//Act
 			oSelect.setShowSecondaryValues(true);
@@ -11635,8 +11609,8 @@ sap.ui.define([
 		QUnit.module("ISemanticFormContent methods");
 
 		QUnit.test("Select with selected item", function (assert) {
-			var oSelectedItem,
-				oSelect = new Select({
+			let oSelectedItem;
+			const oSelect = new Select({
 					forceSelection: false,
 					items: [
 						oSelectedItem = new Item({text: "First item text"})
@@ -11707,7 +11681,7 @@ sap.ui.define([
 		QUnit.test("onsapenter - open the control`s popup", function (assert) {
 
 			// system under test
-			var oHierarchicalSelect = new HierarchicalSelect({
+			const oHierarchicalSelect = new HierarchicalSelect({
 				items: [
 					new Item({
 						key: "0",
@@ -11726,8 +11700,8 @@ sap.ui.define([
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 			oHierarchicalSelect.focus();
 
-			var fnEnterSpy = this.spy(oHierarchicalSelect, "onsapenter");
-			var fnOpenSpy = this.spy(oHierarchicalSelect, "open");
+			const fnEnterSpy = this.spy(oHierarchicalSelect, "onsapenter");
+			const fnOpenSpy = this.spy(oHierarchicalSelect, "open");
 
 			// act
 			qutils.triggerKeydown(oHierarchicalSelect.getDomRef(), KeyCodes.ENTER);
@@ -11743,7 +11717,7 @@ sap.ui.define([
 		QUnit.test("onsapenter - close the control`s popup if it is open", function (assert) {
 
 			// system under test
-			var oHierarchicalSelect = new HierarchicalSelect({
+			const oHierarchicalSelect = new HierarchicalSelect({
 				items: [
 					new Item({
 						key: "0",
@@ -11764,8 +11738,8 @@ sap.ui.define([
 			oHierarchicalSelect.open();
 			this.clock.tick(1000);	// wait 1s after the open animation is completed
 
-			var fnEnterSpy = this.spy(oHierarchicalSelect, "onsapenter");
-			var fnCloseSpy = this.spy(oHierarchicalSelect, "close");
+			const fnEnterSpy = this.spy(oHierarchicalSelect, "onsapenter");
+			const fnCloseSpy = this.spy(oHierarchicalSelect, "close");
 
 			// act
 			qutils.triggerKeydown(oHierarchicalSelect.getDomRef(), KeyCodes.ENTER);
@@ -11778,18 +11752,12 @@ sap.ui.define([
 		oHierarchicalSelect.destroy();
 	});
 
-		QUnit.module("Accessibility - Initial Highlighted Item Selection", {
-			beforeEach: function () {
-				this.clock = sinon.useFakeTimers();
-			},
-			afterEach: function () {
-				this.clock.restore();
-			}
-		});
+		QUnit.module("Accessibility - Initial Highlighted Item Selection");
+
 
 		QUnit.test("forceSelection=false: Enter key should select initially highlighted item", function (assert) {
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				forceSelection: false,
 				items: [
 					new Item({ key: "1", text: "Item 1" }),
@@ -11812,7 +11780,7 @@ sap.ui.define([
 			assert.strictEqual(oSelect._oInitialHighlightedItem.getText(), "Item 1", "First item is the initial highlighted item");
 			assert.strictEqual(oSelect.getSelectedItem(), null, "No item is selected yet");
 
-			var fnChangeSpy = this.spy(oSelect, "fireChange");
+			const fnChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act - press Enter key
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ENTER);
@@ -11829,7 +11797,7 @@ sap.ui.define([
 
 		QUnit.test("forceSelection=false: Space key should select initially highlighted item", function (assert) {
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				forceSelection: false,
 				items: [
 					new Item({ key: "1", text: "Item 1" }),
@@ -11851,7 +11819,7 @@ sap.ui.define([
 			assert.ok(oSelect._oInitialHighlightedItem, "Initial highlighted item is tracked");
 			assert.strictEqual(oSelect.getSelectedItem(), null, "No item is selected yet");
 
-			var fnChangeSpy = this.spy(oSelect, "fireChange");
+			const fnChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act - press Space key
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.SPACE);
@@ -11869,7 +11837,7 @@ sap.ui.define([
 
 		QUnit.test("forceSelection=false: Arrow navigation should clear initial highlight state", function (assert) {
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				forceSelection: false,
 				items: [
 					new Item({ key: "1", text: "Item 1" }),
@@ -11903,7 +11871,7 @@ sap.ui.define([
 
 		QUnit.test("forceSelection=false: Arrow up navigation should clear initial highlight state", function (assert) {
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				forceSelection: false,
 				items: [
 					new Item({ key: "1", text: "Item 1" }),
@@ -11937,7 +11905,7 @@ sap.ui.define([
 
 		QUnit.test("forceSelection=false: Closing dropdown should clear initial highlight state", function (assert) {
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				forceSelection: false,
 				items: [
 					new Item({ key: "1", text: "Item 1" }),
@@ -11971,7 +11939,7 @@ sap.ui.define([
 
 		QUnit.test("forceSelection=true: Should NOT track initial highlighted item", function (assert) {
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				forceSelection: true, // explicitly set to true
 				items: [
 					new Item({ key: "1", text: "Item 1" }),
@@ -11998,7 +11966,7 @@ sap.ui.define([
 
 		QUnit.test("forceSelection=false: Enter after navigation should use normal behavior", function (assert) {
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				forceSelection: false,
 				items: [
 					new Item({ key: "1", text: "Item 1" }),
@@ -12023,7 +11991,7 @@ sap.ui.define([
 			// assert - initial highlight cleared
 			assert.strictEqual(oSelect._oInitialHighlightedItem, null, "Initial highlighted item cleared after navigation");
 
-			var fnChangeSpy = this.spy(oSelect, "fireChange");
+			const fnChangeSpy = this.spy(oSelect, "fireChange");
 
 			// act - press Enter
 			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ENTER);
@@ -12039,7 +12007,7 @@ sap.ui.define([
 
 		QUnit.test("forceSelection=false: ARIA activedescendant should be set on first item", function (assert) {
 			// system under test
-			var oSelect = new Select({
+			const oSelect = new Select({
 				forceSelection: false,
 				items: [
 					new Item({ key: "1", text: "Item 1" }),
@@ -12057,11 +12025,12 @@ sap.ui.define([
 			this.clock.tick(1000);
 
 			// assert - aria-activedescendant should be set
-			var sAriaActiveDescendant = oSelect.getFocusDomRef().getAttribute("aria-activedescendant");
-			var oFirstItem = oSelect.getItems()[0];
+			const sAriaActiveDescendant = oSelect.getFocusDomRef().getAttribute("aria-activedescendant");
+			const oFirstItem = oSelect.getItems()[0];
 			assert.strictEqual(sAriaActiveDescendant, oFirstItem.getId(), "aria-activedescendant is set to first item");
 
 			// cleanup
 			oSelect.destroy();
 		});
 });
+

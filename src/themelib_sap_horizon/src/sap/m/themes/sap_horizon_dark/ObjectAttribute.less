@@ -24,7 +24,14 @@
 	color: var(--sapLink_Hover_Color);
 }
 
-.sapMObjectAttributeActive .sapMObjectAttributeText:focus {
+html.sap-desktop .sapMObjectAttributeActive .sapMObjectAttributeText:focus {
+	border-radius: 0.125rem;
+	background-color: var(--sapContent_FocusColor);
+	color: var(--sapContent_ContrastTextColor);
+	text-shadow: none;
+}
+
+.sapMObjectAttributeActive .sapMObjectAttributeText:focus-visible {
 	border-radius: 0.125rem;
 	background-color: var(--sapContent_FocusColor);
 	color: var(--sapContent_ContrastTextColor);
@@ -37,7 +44,7 @@
 
 .sapMOHR .sapMObjectAttributeActive .sapMObjectAttributeText:active,
 .sapMOHR .sapMObjectAttributeActive .sapMObjectAttributeText:hover,
-.sapMOHR .sapMObjectAttributeActive .sapMObjectAttributeText:focus {
+.sapMOHR .sapMObjectAttributeActive .sapMObjectAttributeText:focus-visible {
 	text-decoration: underline;
 }
 
@@ -47,11 +54,11 @@
 
 .sapMOH .sapMObjectAttributeActive .sapMObjectAttributeText:active,
 .sapMOH .sapMObjectAttributeActive .sapMObjectAttributeText:hover,
-.sapMOH .sapMObjectAttributeActive .sapMObjectAttributeText:focus {
+.sapMOH .sapMObjectAttributeActive .sapMObjectAttributeText:focus-visible {
 	text-decoration: underline;
 }
 
-.sapMOH .sapMObjectAttributeActive .sapMObjectAttributeText:focus:hover {
+.sapMOH .sapMObjectAttributeActive .sapMObjectAttributeText:focus-visible:hover {
 	text-decoration: none;
 }
 

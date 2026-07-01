@@ -2931,7 +2931,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
         return (jsxRuntime.jsxs(ResponsivePopover.ResponsivePopover, { id: "ui5-search-list", hideArrow: true, preventFocusRestore: true, preventInitialFocus: !Theme.d(), accessibleNameRef: "suggestions-speech-output message-area-text message-area-description", placement: ResponsivePopover.PopoverPlacement.Bottom, horizontalAlign: ResponsivePopover.PopoverHorizontalAlign.Start, open: this.open, opener: this, onOpen: this._handleOpen, onClose: this._handleClose, onBeforeClose: this._handleBeforeClose, onBeforeOpen: this._handleBeforeOpen, class: {
                 "ui5-search-popover": true,
                 "ui5-search-popover-phone": Theme.d(),
-            }, children: [Theme.d() ? (headerTemplate ? headerTemplate.call(this) : (jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsxs("header", { slot: "header", class: "ui5-search-popup-searching-header", children: [jsxRuntime.jsx(Input$1, { class: "ui5-search-popover-search-field", onInput: this._handleMobileInput, showClearIcon: this.showClearIcon, noTypeahead: this.noTypeahead, hint: InputKeyHint$1.Search, onKeyDown: this._onMobileInputKeydown, children: this._flattenItems.map(item => {
+            }, children: [Theme.d() ? (headerTemplate ? headerTemplate.call(this) : (jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsxs("header", { slot: "header", class: "ui5-search-popup-searching-header", children: [jsxRuntime.jsx(Input$1, { value: this.value, class: "ui5-search-popover-search-field", onInput: this._handleMobileInput, showClearIcon: this.showClearIcon, noTypeahead: this.noTypeahead, hint: InputKeyHint$1.Search, onKeyDown: this._onMobileInputKeydown, children: this._flattenItems.map(item => {
                                     return (jsxRuntime.jsx(SuggestionItem$1, { text: item.text }));
                                 }) }), jsxRuntime.jsx(Button.Button, { design: Button.ButtonDesign.Transparent, onClick: this._handleCancel, children: this.cancelButtonText })] }) }))) : null, jsxRuntime.jsxs("main", { class: "ui5-search-popover-content", children: [jsxRuntime.jsx("slot", { name: "messageArea" }), jsxRuntime.jsx("div", { class: "search-popover-busy-wrapper", children: jsxRuntime.jsx(BusyIndicator.BusyIndicator, { active: true }) }), this.items.length ?
                             jsxRuntime.jsx(List.List, { class: "ui5-search-list", separators: List.ListSeparator.None, onKeyDown: this._onItemKeydown, onFocusIn: this._onListItemFocusIn, accessibleRole: List.ListAccessibleRole.ListBox, onItemClick: this._onItemClick, children: jsxRuntime.jsx("slot", {}) })
@@ -3372,9 +3372,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             }
             const innerInput = this.nativeInput;
             innerInput.setSelectionRange(this.value.length, this.value.length);
-            this.open = false;
-            this._isTyping = false;
-            this._valueBeforeArrowNav = undefined;
+            this._closePopupAndResetState();
         }
         _onMobileInputKeydown(e) {
             if (webcomponentsBase.b(e)) {
@@ -3385,6 +3383,11 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
         }
         _handleSearchEvent() {
             this.fireDecoratorEvent("search", { item: this._proposedItem });
+        }
+        _closePopupAndResetState() {
+            this.open = false;
+            this._isTyping = false;
+            this._valueBeforeArrowNav = undefined;
         }
         _handleEscape() {
             // If arrow navigation was active, restore the original typed value
@@ -3478,9 +3481,6 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             const item = e.detail.item;
             const prevented = !this.fireDecoratorEvent("search", { item });
             if (prevented) {
-                if (Theme.d()) {
-                    this.open = false;
-                }
                 return;
             }
             this.value = item.text;

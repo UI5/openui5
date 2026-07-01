@@ -343,3 +343,108 @@ li.check {
 	height: calc(100vh - 150px);
 	min-height: 600px;
 }
+
+#statusBar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem 1rem;
+	margin-block: 0.25rem;
+	padding: 0.4em 0.6em;
+	font-size: small;
+	color: #333;
+	background-color: #F5F5F5;
+	border: 1px solid #D3D3D3;
+	border-radius: 3px;
+}
+
+#statusBarFilter {
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+#statusBarFilter > label {
+	margin: 0;
+}
+
+#statusBarFilter > input[type="text"] {
+	height: 1.6em;
+}
+
+#statusBarInfo {
+	flex: 1 1 auto;
+	min-width: 0;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.25rem 1rem;
+	font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+#discoveryStats {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.25rem 1rem;
+}
+
+#selectionStatus {
+	display: inline;
+	white-space: normal;
+}
+
+#discoveryStats .stat-label {
+	font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif;
+	color: #0D3349;
+	font-weight: 600;
+}
+
+#discoveryStats .stat {
+	white-space: nowrap;
+}
+
+#discoveryStats .stat .running {
+	color: #007dc0;
+	font-weight: 600;
+}
+
+#discoveryStats .stat .pending {
+	color: #999;
+}
+
+#discoveryStats .stat .completed {
+	color: #3C510C;
+}
+
+#discoveryStats #discoveryPages .found {
+	color: #366097;
+	font-weight: 600;
+}
+
+#selectionStatusCount,
+#selectionStatusTotal,
+#selectionStatusVisible {
+	font-weight: 600;
+	color: #0D3349;
+}
+
+#selectionStatusCount {
+	color: #366097;
+}
+
+#statusBarDuration {
+	flex: 0 0 auto;
+	margin-left: auto;
+	font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+#discoveryDurationLabel {
+	color: #555;
+}
+
+#discoveryDuration {
+	font-weight: 600;
+	color: #3C510C;
+}

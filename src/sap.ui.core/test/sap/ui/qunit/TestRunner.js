@@ -86,52 +86,175 @@
 
 		return bOpen;
 	}
-	class FetchQueue {
-		constructor(iMaxParallelRequests, iWaitTime) {
-			this.iLimit = iMaxParallelRequests === undefined ? Infinity : iMaxParallelRequests;
+	/**
+	 * Simple task scheduler that bounds both the number of concurrently
+	 * running tasks and the minimum delay between starting two tasks.
+	 *
+	 * Used in two flavours:
+	 *  - As a queue for HTML probe requests in {@link Discovery#checkTestPage}.
+	 *  - As a queue for hidden discovery iframes in
+	 *    {@link Discovery##loadSuitePages}. Safari aborts/stalls when too many
+	 *    XHRs/page loads are in flight simultaneously, so testsuite discovery
+	 *    is throttled there by default; see the URL parameters
+	 *    `iframe-parallel` and `iframe-wait` (and the Safari defaults applied
+	 *    in {@link Discovery}).
+	 */
+	class TaskQueue {
+		constructor(iMaxParallel, iWaitTime) {
+			this.iLimit = iMaxParallel === undefined ? Infinity : iMaxParallel;
 			this.iWaitTime = iWaitTime === undefined ? 0 : iWaitTime;
 			this.aPendingTasks = [];
 			this.oRunningTasks = new Set();
 			this.iLastTaskExecution = -Infinity;
+			this.iCompleted = 0;
+			this.fnStateChange = null;
 		}
-		fetch(sUrl, options) {
-			var oTask = Object.assign(new Deferred(), {
-				url: sUrl,
-				options: options
-			});
+		/**
+		 * Register a listener that is called whenever the queue's state changes
+		 * (task enqueued, started, or finished). The listener receives a
+		 * snapshot object with <code>running</code>, <code>pending</code>,
+		 * <code>completed</code>, and <code>limit</code>.
+		 */
+		setStateChangeListener(fnStateChange) {
+			this.fnStateChange = fnStateChange;
+		}
+		_emitState() {
+			if (this.fnStateChange) {
+				this.fnStateChange({
+					running: this.oRunningTasks.size,
+					pending: this.aPendingTasks.length,
+					completed: this.iCompleted,
+					limit: this.iLimit
+				});
+			}
+		}
+		/**
+		 * Schedule <code>fnTask</code> to be executed once a slot is free and
+		 * the inter-task gap has elapsed.
+		 * @param {function():Promise<T>} fnTask zero-arg function returning a Promise
+		 * @returns {Promise<T>} a promise that resolves/rejects with the result of fnTask
+		 */
+		run(fnTask) {
+			const oTask = Object.assign(new Deferred(), { fn: fnTask });
 			this.aPendingTasks.push(oTask);
+			this._emitState();
 			this._processNext();
 			return oTask.promise;
 		}
 		_processNext() {
 			var iNow = Date.now();
-			var iDelay = iNow - this.iLastTaskExecution;
-			if ( iDelay < this.iWaitTime ) {
-				setTimeout(() => this._processNext(), iDelay);
+			var iElapsed = iNow - this.iLastTaskExecution;
+			if ( iElapsed < this.iWaitTime ) {
+				// Wait the REMAINING time, not the time already elapsed
+				setTimeout(() => this._processNext(), this.iWaitTime - iElapsed);
 				return;
 			}
 			if ( this.aPendingTasks.length > 0 && this.oRunningTasks.size < this.iLimit ) {
 				var oTask = this.aPendingTasks.shift();
 				this.oRunningTasks.add(oTask);
 				this.iLastTaskExecution = iNow;
-				fetch(oTask.url, oTask.options)
-					.then((response) => {
-						const sResponseText = response.text();
-						return response.ok ? oTask.resolve(sResponseText) : oTask.reject(sResponseText);
-					})
+				this._emitState();
+				Promise.resolve()
+					.then(() => oTask.fn())
+					.then(oTask.resolve, oTask.reject)
 					.finally(() => {
 						this.oRunningTasks.delete(oTask);
+						this.iCompleted++;
+						this._emitState();
 						this._processNext();
 					});
 			}
 		}
 	}
+
+	/**
+	 * Read a single URL parameter from <code>globalThis.location.search</code>.
+	 * Lifted out of {@link TestRunner} so {@link Discovery} can read its tuning
+	 * parameters at construction time.
+	 */
+	const getUrlParameter = (sName) => {
+		const params = new URLSearchParams(globalThis.location.search);
+		return params.get(sName);
+	};
+
+	// Safari (WebKit, non-Chromium) has trouble keeping up when too many
+	// XHRs / page loads run concurrently during testsuite discovery. Only
+	// Safari gets a throttling default; all other browsers default to no
+	// throttling. The URL parameters below override the default per run.
+	const bIsSafari = /Safari/.test(navigator.userAgent)
+		&& !/Chrome|Chromium|Edg/.test(navigator.userAgent);
+	const parsePositiveIntOrInfinity = (sValue, iDefault) => {
+		if (sValue == null) {
+			return iDefault;
+		}
+		if (sValue === "Infinity") {
+			return Infinity;
+		}
+		const iParsed = parseInt(sValue);
+		return Number.isFinite(iParsed) && iParsed > 0 ? iParsed : iDefault;
+	};
+	const parseNonNegativeIntOr = (sValue, iDefault) => {
+		if (sValue == null) {
+			return iDefault;
+		}
+		const iParsed = parseInt(sValue);
+		return Number.isFinite(iParsed) && iParsed >= 0 ? iParsed : iDefault;
+	};
 	/**
 	 * Utility class to find test pages and check them for being
 	 * a testsuite or a QUnit testpage.
 	 */
 	class Discovery {
-		#fetchQueue = new FetchQueue(50, 2);
+		#fetchQueue = new TaskQueue(50, 2);
+		#iframeQueue = new TaskQueue(
+			parsePositiveIntOrInfinity(getUrlParameter("iframe-parallel"), bIsSafari ? 3 : Infinity),
+			parseNonNegativeIntOr(getUrlParameter("iframe-wait"), bIsSafari ? 50 : 0)
+		);
+		#pagesFound = 0;
+		#fnProgressListener = null;
+		/**
+		 * Register a listener invoked whenever discovery progress changes.
+		 * Receives an aggregated snapshot:
+		 *   {
+		 *     iframes:    {running, pending, completed, limit},  // <iframe> testsuite loads
+		 *     fetches:    {running, pending, completed, limit},  // HTML probe fetches
+		 *     pagesFound: <number of leaf test pages discovered so far>
+		 *   }
+		 */
+		setProgressListener(fnListener) {
+			this.#fnProgressListener = fnListener;
+			const fnRelay = () => this.#emitProgress();
+			this.#iframeQueue.setStateChangeListener(fnRelay);
+			this.#fetchQueue.setStateChangeListener(fnRelay);
+		}
+		/**
+		 * Reset discovery counters so a new `find()` invocation starts at zero.
+		 * The queues themselves keep their lifetime totals — but at the start
+		 * of a discovery run no jobs are in flight, so the counters are reset
+		 * on the queues too for a clean display.
+		 */
+		resetProgress() {
+			this.#pagesFound = 0;
+			this.#iframeQueue.iCompleted = 0;
+			this.#fetchQueue.iCompleted = 0;
+			this.#emitProgress();
+		}
+		#emitProgress() {
+			if (!this.#fnProgressListener) {
+				return;
+			}
+			const snap = (q) => ({
+				running: q.oRunningTasks.size,
+				pending: q.aPendingTasks.length,
+				completed: q.iCompleted,
+				limit: q.iLimit
+			});
+			this.#fnProgressListener({
+				iframes: snap(this.#iframeQueue),
+				fetches: snap(this.#fetchQueue),
+				pagesFound: this.#pagesFound
+			});
+		}
 		checkTestPage(sTestPage, bSequential) {
 			return this.#checkTestPage(sTestPage, bSequential);
 		}
@@ -142,7 +265,10 @@
 			}
 			// console.log("QUnit: checking test page: " + sTestPage);
 			// check for an existing test page and check for test suite or page
-			const sData = await this.#fetchQueue.fetch(sTestPage).catch((err) => {
+			const sData = await this.#fetchQueue.run(() => fetch(sTestPage).then((response) => {
+				const pText = response.text();
+				return response.ok ? pText : pText.then((sText) => Promise.reject(sText));
+			})).catch((err) => {
 				console.error(`QUnit: failed to load page '${sTestPage}':`, err); // eslint-disable-line no-console
 				return null;
 			});
@@ -156,76 +282,152 @@
 				console.info(`got test pages for ${sTestPage}: ${aTestPages.length}`); // eslint-disable-line no-console
 				return aTestPages;
 			} else {
+				this.#pagesFound++;
+				this.#emitProgress();
 				return [sTestPage];
 			}
 		}
-		#collectPagesFromSuite(sTestPage, bSequential) {
-			const oDeferred = new Deferred();
-			const onSuiteReady = async (oIFrame) => {
-				const aTestPages = await this.#findTestPages(oIFrame, bSequential).catch((oError) => {
-					console.error(`QUnit: failed to load page '${sTestPage}', Error:`, oError); // eslint-disable-line no-console
-					return [];
-				});
-				frame.remove();
-				// avoid duplicates in test pages
-				const aUniqueTestPages = aTestPages.filter((e, i, a) => a.indexOf(e) === i);
-				console.info(`test pages for ${sTestPage}: ${aUniqueTestPages.length}`); // eslint-disable-line no-console
-				oDeferred.resolve(aUniqueTestPages);
-			};
-			const frame = h("frame", {
-				style: {
-					display: "none"
-				},
-				onload: function() {
-					if (typeof this.contentWindow.suite === "function") {
-						onSuiteReady(this);
-					} else {
-						// Wait for a CustomEvent in case window.suite isn't defined, yet
-						this.contentWindow.addEventListener("sap-ui-testsuite-ready", function() {
-							onSuiteReady(this);
-						}.bind(this));
-					}
-				},
-				src: sTestPage
-			});
-			document.body.appendChild(frame);
-			return oDeferred.promise;
+		async #collectPagesFromSuite(sTestPage, bSequential) {
+			// Load the suite page in a throttled iframe slot. The slot is
+			// released as soon as we have extracted the page list — recursive
+			// resolution of nested pages happens AFTER the iframe is removed,
+			// so deep testsuite trees cannot deadlock the queue.
+			const aPages = await this.#loadSuitePages(sTestPage);
+			const aTestPages = await this.#resolveNestedPages(sTestPage, aPages, bSequential);
+			// avoid duplicates in test pages
+			const aUniqueTestPages = aTestPages.filter((e, i, a) => a.indexOf(e) === i);
+			console.info(`test pages for ${sTestPage}: ${aUniqueTestPages.length}`); // eslint-disable-line no-console
+			return aUniqueTestPages;
 		}
-		async #findTestPages(oIFrame, bSequential) {
-			const oSuite = await oIFrame.contentWindow.suite();
-			const aPages = oSuite?.getTestPages() ?? [];
+		/**
+		 * Load <code>sTestPage</code> in a hidden iframe, wait for its
+		 * <code>window.suite</code> to be available, call it and return the
+		 * list of test pages it exposes. The iframe is always removed when
+		 * this method resolves, regardless of outcome.
+		 *
+		 * Throttled via {@link Discovery##iframeQueue} — Safari aborts/stalls
+		 * when too many discovery iframes load in parallel, see the constructor.
+		 */
+		#loadSuitePages(sTestPage) {
+			return this.#iframeQueue.run(() => {
+				const oDeferred = new Deferred();
+				let bSettled = false;
+
+				// Forward-declared via the closure; assigned exactly once at
+				// the end of the setup below. All listeners only read it after
+				// the iframe enters the DOM, so they never observe undefined.
+				/* eslint-disable prefer-const */
+				let frame;
+
+				const cleanup = () => {
+					if (frame && frame.parentNode) {
+						frame.remove();
+					}
+				};
+
+				const onSuiteReady = async (oFrame) => {
+					if (bSettled) {
+						return;
+					}
+					bSettled = true;
+					let aPages = [];
+					try {
+						const oSuite = await oFrame.contentWindow.suite();
+						aPages = oSuite?.getTestPages() ?? [];
+					} catch (oError) {
+						console.error(`QUnit: failed to read suite '${sTestPage}', Error:`, oError); // eslint-disable-line no-console
+					}
+					cleanup();
+					oDeferred.resolve(aPages);
+				};
+
+				// Bounded poll for window.suite — covers suites that assign it
+				// asynchronously after load (ES module testsuites, createSuite, …)
+				// without relying solely on the optional sap-ui-testsuite-ready event.
+				const waitForSuite = (oWin, iDeadline) => {
+					if (bSettled) {
+						return;
+					}
+					if (typeof oWin.suite === "function") {
+						onSuiteReady(frame);
+						return;
+					}
+					if (Date.now() > iDeadline) {
+						console.error(`QUnit: testsuite '${sTestPage}' did not expose window.suite within the timeout`); // eslint-disable-line no-console
+						bSettled = true;
+						cleanup();
+						oDeferred.resolve([]);
+						return;
+					}
+					setTimeout(() => waitForSuite(oWin, iDeadline), 50);
+				};
+
+				// Note: use <iframe> (not <frame>) — <frame> outside a <frameset>
+				// is ignored by WebKit/Safari, the src is never fetched, and load
+				// never fires. h() attaches the onload listener via addEventListener
+				// BEFORE setting src, and the element only starts loading when it
+				// enters the DOM via appendChild, so there is no load/listener race.
+				frame = h("iframe", {
+					style: {
+						display: "none"
+					},
+					onload: function() {
+						const oWin = this.contentWindow;
+						// Fast path: suite already defined (legacy synchronous suites)
+						if (typeof oWin.suite === "function") {
+							onSuiteReady(this);
+							return;
+						}
+						// Subscribe first so we never miss the event
+						const onReady = () => {
+							oWin.removeEventListener("sap-ui-testsuite-ready", onReady);
+							onSuiteReady(frame);
+						};
+						oWin.addEventListener("sap-ui-testsuite-ready", onReady);
+						// Fallback: poll for up to 30s in case the suite neither fires
+						// the event nor is defined synchronously at load time.
+						waitForSuite(oWin, Date.now() + 30000);
+					},
+					src: sTestPage
+				});
+				document.body.appendChild(frame);
+				return oDeferred.promise;
+			});
+		}
+		/**
+		 * Recursively resolve each entry in <code>aPages</code> via
+		 * {@link Discovery##checkTestPage}. NOT throttled itself — the
+		 * underlying fetches and (for nested testsuites) iframe loads pass
+		 * through {@link Discovery##fetchQueue} / {@link Discovery##iframeQueue}
+		 * on their own.
+		 */
+		async #resolveNestedPages(sParentPage, aPages, bSequential) {
 			try {
-				if (aPages.length > 0) {
-					const aTestPagePromises = [];
-					let aTestPages;
-					if (bSequential) {
-						aTestPages = [];
-						aTestPagePromises.push(aPages.reduce(function(oPromise, sTestPage) {
-							return oPromise.then(this.#checkTestPage.bind(this, sTestPage, bSequential)).then(function(aFoundTestPages) {
-								aTestPages = aTestPages.concat(aFoundTestPages);
-							});
-						}.bind(this), Promise.resolve([])).then(function() {
-							return aTestPages;
-						}));
-					} else {
-						for (var i = 0, l = aPages.length; i < l; i++) {
-							var sTestPage = aPages[i];
-							aTestPagePromises.push(this.#checkTestPage(sTestPage, bSequential));
-						}
-					}
-					if (aTestPagePromises.length > 0) {
-						const aFoundTestPages = await Promise.all(aTestPagePromises);
-						aTestPages = [];
-						for (let i = 0, l = aFoundTestPages.length; i < l; i++) {
-							aTestPages = aTestPages.concat(aFoundTestPages[i]);
-						}
-						return aTestPages;
-					}
+				if (aPages.length === 0) {
+					return [];
 				}
+				let aTestPages = [];
+				if (bSequential) {
+					await aPages.reduce((oPromise, sTestPage) => {
+						return oPromise.then(this.#checkTestPage.bind(this, sTestPage, bSequential)).then((aFoundTestPages) => {
+							aTestPages = aTestPages.concat(aFoundTestPages);
+						});
+					}, Promise.resolve([]));
+					return aTestPages;
+				}
+				const aTestPagePromises = [];
+				for (let i = 0, l = aPages.length; i < l; i++) {
+					aTestPagePromises.push(this.#checkTestPage(aPages[i], bSequential));
+				}
+				const aFoundTestPages = await Promise.all(aTestPagePromises);
+				for (let i = 0, l = aFoundTestPages.length; i < l; i++) {
+					aTestPages = aTestPages.concat(aFoundTestPages[i]);
+				}
+				return aTestPages;
 			} catch (ex) {
-				console.error("QUnit: error while analyzing test page '" + oIFrame.src + "':\n", ex); // eslint-disable-line no-console
+				console.error("QUnit: error while analyzing test page '" + sParentPage + "':\n", ex); // eslint-disable-line no-console
+				return [];
 			}
-			return [];
 		}
 	}
 	class ProgressBar {
@@ -270,6 +472,8 @@
 						item.remove();
 					}
 				});
+				// notify the status bar in the DOM-ready scope
+				document.dispatchEvent(new CustomEvent("ui5-testrunner-selection-changed"));
 				return this.runTests(aTestPages, nBarStep);
 			}
 		}
@@ -432,8 +636,7 @@
 			return sAutoStart == "true";
 		}
 		getUrlParameter(sName) {
-			const params = new URLSearchParams(globalThis.location.search);
-			return params.get(sName);
+			return getUrlParameter(sName);
 		}
 		updateResultHeader(sNumAll, sNumPassed, sNumFailed) {
 			const total = querySelector("div#reportingHeader span.total");
@@ -594,21 +797,66 @@
 					byId("testPageSelect").appendChild(optionElement);
 				}
 			});
+			updateSelectionStatus();
+		}
+
+		/**
+		 * Refresh the "N of M tests selected" status bar from the current
+		 * DOM state. Call from any path that adds/removes options in the
+		 * left (discovered) or right (selected) lists, or that re-filters
+		 * the left list.
+		 */
+		function updateSelectionStatus() {
+			const iTotal = (globalThis.aTestPages || []).length;
+			const iVisible = querySelectorAll("#testPageSelect > option").length;
+			const iSelected = querySelectorAll("#selectedTests > option").length;
+			byId("selectionStatusTotal").textContent = iTotal;
+			byId("selectionStatusVisible").textContent = iVisible;
+			byId("selectionStatusCount").textContent = iSelected;
+		}
+
+		// Discovery duration ticker — runs at ~10 Hz while find() is in
+		// flight, freezes at the final value when discovery completes.
+		let iDiscoveryStart = 0;
+		let iDiscoveryTicker = 0;
+		function formatDuration(iMs) {
+			return (iMs / 1000).toFixed(1) + " s";
+		}
+		function startDiscoveryTimer() {
+			iDiscoveryStart = Date.now();
+			byId("discoveryDuration").textContent = "0.0 s";
+			iDiscoveryTicker = setInterval(() => {
+				byId("discoveryDuration").textContent =
+					formatDuration(Date.now() - iDiscoveryStart);
+			}, 100);
+		}
+		function stopDiscoveryTimer() {
+			if (iDiscoveryTicker) {
+				clearInterval(iDiscoveryTicker);
+				iDiscoveryTicker = 0;
+			}
+			if (iDiscoveryStart) {
+				byId("discoveryDuration").textContent =
+					formatDuration(Date.now() - iDiscoveryStart);
+			}
 		}
 
 		async function find() {
 			prepareNewTestDiscovery();
+			startDiscoveryTimer();
 			const sTestPage = byId("testPage").value;
 			const bSequential = byId("sequential").checked;
 			const aTestPages = await discovery.checkTestPage(sTestPage, bSequential);
+			stopDiscoveryTimer();
 			toggleDisplay("busy", false);
+			toggleDisplay("discoveryStats", false);
 			globalThis.aTestPages = aTestPages;
 
 			if (aTestPages.length) {
 				createTestPageSelectionOptions();
 
 				setVisibile(["run"], true);
-				toggleDisplay(["filterElements", "select"], true);
+				toggleDisplay(["statusBarFilter", "select", "selectionStatus"], true);
 			} else {
 				alert(`Testpage ${sTestPage} could not be loaded`); // eslint-disable-line no-alert
 			}
@@ -623,6 +871,7 @@
 					h("option", {value: aSelectedTests[i].textContent}, aSelectedTests[i].textContent)
 				);
 			}
+			updateSelectionStatus();
 		}
 
 		function copy(aElements) {
@@ -638,12 +887,14 @@
 					);
 				}
 			}
+			updateSelectionStatus();
 		}
 
 		function removeSelectedTest(aSelectedTests) {
 			aSelectedTests.forEach((selectedTest) => {
 				selectedTest.remove();
 			});
+			updateSelectionStatus();
 		}
 
 		function run() {
@@ -657,10 +908,12 @@
 
 		function prepareNewTestDiscovery() {
 			setVisibile(["run", "stop"], false);
-			toggleDisplay(["filterElements", "select", "test-reporting"], false);
+			toggleDisplay(["statusBarFilter", "select", "selectionStatus", "test-reporting"], false);
 			byId("filter").value = "";
 			removeSelectedTest([...querySelectorAll("#select select > option")]);
 			toggleDisplay("busy", true);
+			discovery.resetProgress();
+			toggleDisplay(["statusBar", "discoveryStats", "statusBarDuration"], true);
 		}
 
 		function displayTestResults() {
@@ -681,6 +934,42 @@
 		byId("testPage").value = testRunner.getTestPageUrl();
 
 		progressBar = new ProgressBar(byId("bar"));
+
+		// Cross-scope notification: runTests removes options from the
+		// #selectedTests list as each test completes, but it lives on the
+		// TestRunner class above this IIFE and has no closure access to
+		// updateSelectionStatus(). Bridge via a DOM event.
+		document.addEventListener("ui5-testrunner-selection-changed", updateSelectionStatus);
+
+		// Live discovery indicator: re-render the three counters in
+		// #discoveryStats whenever the iframe or fetch queue ticks.
+		(() => {
+			const statsRoot = byId("discoveryStats");
+			const ifr = byId("discoveryIframes");
+			const fet = byId("discoveryFetches");
+			const pgs = byId("discoveryPages");
+			let iPending = false;
+			const setStat = (root, snap) => {
+				root.querySelector(".running").textContent = snap.running;
+				root.querySelector(".pending").textContent = snap.pending;
+				root.querySelector(".completed").textContent = snap.completed;
+				root.querySelector(".limit").textContent =
+					snap.limit === Infinity ? "∞" : snap.limit;
+			};
+			discovery.setProgressListener((oSnapshot) => {
+				if (iPending || statsRoot.style.display === "none") {
+					return;
+				}
+				// Coalesce bursts of updates into one paint per frame.
+				iPending = true;
+				requestAnimationFrame(() => {
+					iPending = false;
+					setStat(ifr, oSnapshot.iframes);
+					setStat(fet, oSnapshot.fetches);
+					pgs.querySelector(".found").textContent = oSnapshot.pagesFound;
+				});
+			});
+		})();
 
 		byId("filter").addEventListener("keyup", (event) => {
 			createTestPageSelectionOptions(event.target.value.trim());

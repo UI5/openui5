@@ -41,7 +41,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.Avatar",
       {
         metadata: {
-          tag: "ui5-avatar-e93a470b",
+          tag: "ui5-avatar-6bfd01e3",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 
@@ -64,7 +64,7 @@ sap.ui.define(
             accessibilityAttributes: {
               type: "any",
               mapping: "property",
-              defaultValue: "{}"
+              defaultValue: {}
             },
             /**
              * Defines the text alternative of the component.
@@ -74,7 +74,7 @@ sap.ui.define(
             /**
              * Defines the background color of the desired image.
              * If `colorScheme` is set to `Auto`, the avatar will be displayed with the `Accent6` color.
-             * @type sap/f/gen/ui5/webcomponents/dist/types/AvatarColorScheme
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/AvatarColorScheme
              */
             colorScheme: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.AvatarColorScheme",
@@ -88,7 +88,7 @@ sap.ui.define(
              */
             enabled: {
               type: "boolean",
-              defaultValue: "true",
+              defaultValue: true,
               mapping: {
                 type: "property",
                 to: "disabled",
@@ -163,7 +163,7 @@ sap.ui.define(
              *
              * **Note:** This property is ignored when the `interactive` property is set to `true`.
              * In that case, the avatar will always be rendered as interactive.
-             * @type sap/f/gen/ui5/webcomponents/dist/types/AvatarMode
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/AvatarMode
              */
             mode: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.AvatarMode",
@@ -172,7 +172,7 @@ sap.ui.define(
             },
             /**
              * Defines the shape of the component.
-             * @type sap/f/gen/ui5/webcomponents/dist/types/AvatarShape
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/AvatarShape
              */
             shape: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.AvatarShape",
@@ -181,7 +181,7 @@ sap.ui.define(
             },
             /**
              * Defines predefined size of the component.
-             * @type sap/f/gen/ui5/webcomponents/dist/types/AvatarSize
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/AvatarSize
              */
             size: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.AvatarSize",
