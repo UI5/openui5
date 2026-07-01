@@ -26,7 +26,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.SearchItemGroup",
       {
         metadata: {
-          tag: "ui5-search-item-group-e93a470b",
+          tag: "ui5-search-item-group-6bfd01e3",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -60,7 +60,7 @@ sap.ui.define(
              * Available options are:
              * - `None` (default) - The text will truncate with an ellipsis.
              * - `Normal` - The text will wrap (without truncation).
-             * @type sap/f/gen/ui5/webcomponents/dist/types/WrappingType
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/WrappingType
              */
             wrappingType: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.WrappingType",

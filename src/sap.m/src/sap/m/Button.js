@@ -265,6 +265,7 @@ sap.ui.define([
 		this._buttonPressed = false;
 		this._iTouchStartTimestamp = 0;
 		this._bPreventPress = false;
+		this._bFocusFromTouch = false;
 
 		ShortcutHintsMixin.addConfig(this, {
 				event: "press",
@@ -537,6 +538,8 @@ sap.ui.define([
 		}
 
 		if (this.getEnabled() && this.getVisible()) {
+			this._markFocusFromTouch();
+
 			// Safari and Firefox doesn't set the focus to the clicked button tag but to the nearest parent DOM which is focusable
 			// That is why we re-set the focus manually after the browser sets the focus.
 			const bIsRightClick = oEvent.which === 3 || (oEvent.ctrlKey && oEvent.which === 1);
@@ -637,7 +640,7 @@ sap.ui.define([
 		if (this.getEnabled() && this.getVisible()) {
 			// note: on mobile, the press event should be fired after the focus is on the button
 			if ((oEvent.originalEvent && oEvent.originalEvent.type === "touchend")) {
-					this.focus();
+				this.focus();
 			}
 
 			// prevent press event if long press is detected
@@ -664,6 +667,8 @@ sap.ui.define([
 	 * @private
 	 */
 	Button.prototype.onkeydown = function(oEvent) {
+
+		this._clearFocusFromTouch?.();
 
 		if ((oEvent.which === KeyCodes.SPACE || oEvent.which === KeyCodes.ENTER || oEvent.which === KeyCodes.ESCAPE || oEvent.which === KeyCodes.SHIFT)
 			&& !oEvent.ctrlKey && !oEvent.metaKey) {
@@ -764,9 +769,30 @@ sap.ui.define([
 		this._sTouchStartTargetId = '';
 		this._iTouchStartTimestamp = 0;
 		this._bPreventPress = false;
+		this._clearFocusFromTouch();
 		// set inactive button state
 		this._inactiveButton();
 		this._toggleLiveChangeAnnouncement("off");
+	};
+
+	/**
+	 * Marks the current focus as touch-originated.
+	 * @private
+	 */
+	Button.prototype._markFocusFromTouch = function() {
+		this._bFocusFromTouch = true;
+		this.addStyleClass("sapMBtnFocusFromTouch");
+	};
+
+	/**
+	 * Clears touch-origin focus marker.
+	 * @private
+	 */
+	Button.prototype._clearFocusFromTouch = function() {
+		if (this._bFocusFromTouch) {
+			this._bFocusFromTouch = false;
+			this.removeStyleClass("sapMBtnFocusFromTouch");
+		}
 	};
 
 	/**

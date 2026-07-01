@@ -17,7 +17,7 @@ sap.ui.define(
     // export the UI5 metadata along with the package
     pkg["_ui5metadata"] = {
       name: "sap/f/gen/ui5/webcomponents_base",
-      version: "2.23.1",
+      version: "2.23.2",
       dependencies: ["sap.ui.core"],
       types: [
         "sap.f.gen.ui5.webcomponents_base.dist.types.AnimationMode",
@@ -40,7 +40,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/AnimationMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_base AnimationMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_base dist.types.AnimationMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -83,7 +83,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/CalendarType
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_base CalendarType
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_base dist.types.CalendarType
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -133,7 +133,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/ItemNavigationBehavior
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_base ItemNavigationBehavior
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_base dist.types.ItemNavigationBehavior
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -162,7 +162,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/MovePlacement
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_base MovePlacement
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_base dist.types.MovePlacement
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -198,7 +198,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/NavigationMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_base NavigationMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_base dist.types.NavigationMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -241,7 +241,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/SortOrder
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_base SortOrder
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_base dist.types.SortOrder
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -277,7 +277,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/ValueState
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_base ValueState
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_base dist.types.ValueState
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */

@@ -49,10 +49,10 @@ sap.ui.define([
 		});
 	};
 
-	AnnotationChangeDialogController.prototype.filterProperties = function(sQuery, bEquals) {
+	AnnotationChangeDialogController.prototype.filterProperties = function(sQuery) {
 		const aFilters = [];
 		if (sQuery && sQuery.length > 0) {
-			const sOperator = bEquals ? FilterOperator.EQ : FilterOperator.Contains;
+			const sOperator = FilterOperator.Contains;
 			const oLabelFilter = new Filter("label", sOperator, sQuery);
 			const oValueFilter = new Filter("currentValue", sOperator, sQuery);
 			const oCombinedFilter = new Filter({
@@ -65,6 +65,12 @@ sap.ui.define([
 		const oList = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList");
 		const oBinding = oList.getBinding("formElements");
 		oBinding.filter(aFilters);
+	};
+
+	AnnotationChangeDialogController.prototype.filterByAnnotationPath = function(sAnnotationPath) {
+		const oList = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList");
+		const oBinding = oList.getBinding("formElements");
+		oBinding.filter([new Filter("annotationPath", FilterOperator.EQ, sAnnotationPath)]);
 	};
 
 	AnnotationChangeDialogController.prototype.onFilterProperties = function(oEvent) {

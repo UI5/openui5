@@ -356,6 +356,7 @@ sap.ui.define([
 		//render action tile
 		var oActionTile = new ActionTile("action-tile", {
 			header: "My Action Tile",
+			ariaRole: "button",
 			tileContent: oActionTileContent
 		});
 		oActionTile.placeAt("qunit-fixture");
@@ -408,6 +409,7 @@ sap.ui.define([
 		//render action tile
 		var oActionTile = new ActionTile("action-tile", {
 			header: "My Action Tile",
+			ariaRole: "button",
 			tileContent: oActionTileContent
 		});
 		oActionTile.placeAt("qunit-fixture");

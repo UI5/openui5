@@ -529,6 +529,11 @@ html.sap-desktop .sapMObjStatusActive:focus {
 	outline: none;
 }
 
+html.sap-phone .sapMObjStatusActive:focus-visible,
+html.sap-tablet .sapMObjStatusActive:focus-visible {
+	outline: none;
+}
+
 .sapMObjStatusActive .sapMObjStatusText {
 	pointer-events: auto;
 }
@@ -1005,7 +1010,8 @@ html.sap-desktop .sapMObjStatusActive:focus {
 	color: var(--sapIndicationColor_10_Active_TextColor);
 }
 
-html.sap-desktop .sapMObjStatusActive:focus .sapMObjStatusLink {
+html.sap-desktop .sapMObjStatusActive:focus .sapMObjStatusLink,
+.sapMObjStatusActive:focus-visible .sapMObjStatusLink {
 	position: relative;
 	display: inline-block;
 }
@@ -1021,7 +1027,8 @@ html.sap-desktop .sapMObjStatusActive:focus .sapMObjStatusLink {
 	}
 }
 
-html.sap-desktop .sapMObjStatusActive:focus {
+html.sap-desktop .sapMObjStatusActive:focus,
+.sapMObjStatusActive:focus-visible {
 
 	.sapMObjStatusLink::after {
 		pointer-events: none;
@@ -1058,12 +1065,14 @@ html.sap-desktop .sapMObjStatusActive:focus {
 	}
 }
 
-html.sap-desktop .sapMOHStatus .sapMObjStatusActive:focus .sapMObjStatusLink::after {
+html.sap-desktop .sapMOHStatus .sapMObjStatusActive:focus .sapMObjStatusLink::after,
+.sapMOHStatus .sapMObjStatusActive:focus-visible .sapMObjStatusLink::after {
 	left: 1px;
 	right: 1px;
 }
 
-html.sap-desktop .sapUiTableCell .sapMObjStatusActive:focus .sapMObjStatusLink::after {
+html.sap-desktop .sapUiTableCell .sapMObjStatusActive:focus .sapMObjStatusLink::after,
+.sapUiTableCell .sapMObjStatusActive:focus-visible .sapMObjStatusLink::after {
 	left: 1px;
 	right: 1px;
 	top: 1px;
@@ -1082,7 +1091,8 @@ html.sap-desktop .sapUiTableCell .sapMObjStatusActive:focus .sapMObjStatusLink::
 	display: inline-block;
 }
 
-html.sap-desktop .sapMListTblHasPopin .sapMObjStatusActive:focus {
+html.sap-desktop .sapMListTblHasPopin .sapMObjStatusActive:focus,
+.sapMListTblHasPopin .sapMObjStatusActive:focus-visible {
 
 	.sapMObjStatusLink::after {
 		pointer-events: none;

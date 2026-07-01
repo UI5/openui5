@@ -40,11 +40,53 @@
 				</div>
 
 				<progress id="busy" style="display: none;"></progress>
-				<!-- <br> -->
-				<div id="filterElements" style="display: none;">
-					<label id="filterLabel" for="filter">Filter: </label>
-					<input id="filter" type="text" size="50">
+
+				<div id="statusBar" style="display: none;">
+					<div id="statusBarFilter" style="display: none;">
+						<label id="filterLabel" for="filter">Filter: </label>
+						<input id="filter" type="text" size="50">
+					</div>
+
+					<div id="statusBarInfo">
+						<!-- Discovery mode: live queue counters -->
+						<div id="discoveryStats" style="display: none;">
+							<span class="stat-label">Discovering tests…</span>
+							<span class="stat" id="discoveryIframes" title="Open / queued / loaded testsuite iframes (limit)">
+								iframes
+								<span class="running">0</span> /
+								<span class="pending">0</span> /
+								<span class="completed">0</span>
+								(limit <span class="limit">∞</span>)
+							</span>
+							<span class="stat" id="discoveryFetches" title="In-flight / queued / completed HTML probe fetches (limit)">
+								fetches
+								<span class="running">0</span> /
+								<span class="pending">0</span> /
+								<span class="completed">0</span>
+								(limit <span class="limit">∞</span>)
+							</span>
+							<span class="stat" id="discoveryPages" title="Number of QUnit test pages discovered">
+								test pages
+								<span class="found">0</span>
+							</span>
+						</div>
+
+						<!-- Post-discovery mode: selection summary -->
+						<div id="selectionStatus" style="display: none;">
+							<span id="selectionStatusCount">0</span>
+							of
+							<span id="selectionStatusTotal">0</span>
+							tests selected
+							(<span id="selectionStatusVisible">0</span> shown after filter)
+						</div>
+					</div>
+
+					<div id="statusBarDuration" style="display: none;">
+						<span id="discoveryDurationLabel">discovery:</span>
+						<span id="discoveryDuration">0.0 s</span>
+					</div>
 				</div>
+
 				<div id="select" style="display: none;">
 					<div id="testPageSelectDiv">
 						<select id="testPageSelect" name="testPages" size="10" multiple></select>

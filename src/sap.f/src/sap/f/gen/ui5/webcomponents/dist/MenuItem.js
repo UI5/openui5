@@ -40,7 +40,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.MenuItem",
       {
         metadata: {
-          tag: "ui5-menu-item-e93a470b",
+          tag: "ui5-menu-item-6bfd01e3",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 
@@ -64,7 +64,7 @@ sap.ui.define(
             accessibilityAttributes: {
               type: "any",
               mapping: "property",
-              defaultValue: "{}"
+              defaultValue: {}
             },
             /**
              * Defines the accessible ARIA name of the component.
@@ -76,7 +76,7 @@ sap.ui.define(
              * **Note:** If not set, the role is automatically inherited from the parent `ui5-list` based on its `accessible-role` property
              * (e.g. `Menu` -> `MenuItem`, `Tree` -> `TreeItem`, `ListBox` -> `Option`).
              * An explicitly set `accessible-role` on the list item takes precedence over the inherited role.
-             * @type sap/f/gen/ui5/webcomponents/dist/types/ListItemAccessibleRole
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/ListItemAccessibleRole
              */
             accessibleRole: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.ListItemAccessibleRole",
@@ -112,7 +112,7 @@ sap.ui.define(
              */
             enabled: {
               type: "boolean",
-              defaultValue: "true",
+              defaultValue: true,
               mapping: {
                 type: "property",
                 to: "disabled",
@@ -122,7 +122,7 @@ sap.ui.define(
             /**
              * Defines the highlight state of the list items.
              * Available options are: `"None"` (by default), `"Positive"`, `"Critical"`, `"Information"` and `"Negative"`.
-             * @type sap/f/gen/ui5/webcomponents/dist/types/Highlight
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/Highlight
              */
             highlight: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.Highlight",
@@ -183,7 +183,7 @@ sap.ui.define(
              *
              * **Note:** When set to `Active` or `Navigation`, the item will provide visual response upon press and hover,
              * while with type `Inactive` and `Detail` - will not.
-             * @type sap/f/gen/ui5/webcomponents/dist/types/ListItemType
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/ListItemType
              */
             type: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.ListItemType",

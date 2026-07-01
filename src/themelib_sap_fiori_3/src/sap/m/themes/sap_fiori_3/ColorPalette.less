@@ -45,3 +45,14 @@ html:not(.sap-phone) .sapMColorPalette .sapMColorPaletteSquare div,
 		}
 	}
 }
+
+html.sap-phone .sapMColorPalette .sapMBtn:focus-visible {
+
+	&::after {
+		border-color: var(--sapContent_FocusColor);
+	}
+
+	&:active::after {
+		border-color: var(--sapContent_ContrastFocusColor);
+	}
+}

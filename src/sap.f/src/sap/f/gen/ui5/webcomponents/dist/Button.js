@@ -48,7 +48,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.Button",
       {
         metadata: {
-          tag: "ui5-button-e93a470b",
+          tag: "ui5-button-6bfd01e3",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 
@@ -82,7 +82,7 @@ sap.ui.define(
             accessibilityAttributes: {
               type: "any",
               mapping: "property",
-              defaultValue: "{}"
+              defaultValue: {}
             },
             /**
              * Defines the accessible description of the component.
@@ -96,7 +96,7 @@ sap.ui.define(
              * Describes the accessibility role of the button.
              *
              * **Note:** Use <code>ButtonAccessibleRole.Link</code> role only with a press handler, which performs a navigation. In all other scenarios the default button semantics are recommended.
-             * @type sap/f/gen/ui5/webcomponents/dist/types/ButtonAccessibleRole
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/ButtonAccessibleRole
              */
             accessibleRole: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.ButtonAccessibleRole",
@@ -105,7 +105,7 @@ sap.ui.define(
             },
             /**
              * Defines the component design.
-             * @type sap/f/gen/ui5/webcomponents/dist/types/ButtonDesign
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/ButtonDesign
              */
             design: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.ButtonDesign",
@@ -119,7 +119,7 @@ sap.ui.define(
              */
             enabled: {
               type: "boolean",
-              defaultValue: "true",
+              defaultValue: true,
               mapping: {
                 type: "property",
                 to: "disabled",
@@ -187,7 +187,7 @@ sap.ui.define(
              * Defines whether the button has special form-related functionality.
              *
              * **Note:** This property is only applicable within the context of an HTML Form element.
-             * @type sap/f/gen/ui5/webcomponents/dist/types/ButtonType
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/ButtonType
              */
             type: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.ButtonType",

@@ -63,6 +63,18 @@ html.sap-desktop {
 	}
 }
 
+.sapMSegBBtnFocusable:not(.sapMBtnFocusFromTouch):focus-visible .sapMSegBBtnInner {
+	outline: 1px dotted;
+	outline-offset: -3px;
+	outline-color: var(--sapContent_FocusColor);
+}
+
+.sapMSegBBtnFocusable.sapMSegBBtnSel:not(.sapMBtnFocusFromTouch):focus-visible .sapMSegBBtnInner {
+	outline: 1px dotted;
+	outline-offset: -3px;
+	outline-color: var(--sapContent_ContrastFocusColor);
+}
+
 .sapMSegB.sapMSegBIcons {
 
 	.sapMSegBBtn:not(.sapMSegBBtnMixed) .sapMSegBBtnInner {

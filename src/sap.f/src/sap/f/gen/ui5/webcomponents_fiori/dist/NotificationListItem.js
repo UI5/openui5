@@ -59,7 +59,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.NotificationListItem",
       {
         metadata: {
-          tag: "ui5-li-notification-e93a470b",
+          tag: "ui5-li-notification-6bfd01e3",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -75,7 +75,7 @@ sap.ui.define(
           properties: {
             /**
              * Defines the `Important` label of the item.
-             * @type sap/f/gen/ui5/webcomponents_fiori/dist/types/NotificationListItemImportance
+             * @type module:sap/f/gen/ui5/webcomponents_fiori/dist/types/NotificationListItemImportance
              */
             importance: {
               type: "sap.f.gen.ui5.webcomponents_fiori.dist.types.NotificationListItemImportance",
@@ -135,7 +135,7 @@ sap.ui.define(
              *
              * **Note:** by default the `titleText` and `description`,
              * and a `ShowMore/Less` button would be displayed.
-             * @type sap/f/gen/ui5/webcomponents/dist/types/WrappingType
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/WrappingType
              */
             wrappingType: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.WrappingType",

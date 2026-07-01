@@ -48,7 +48,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBar",
       {
         metadata: {
-          tag: "ui5-shellbar-e93a470b",
+          tag: "ui5-shellbar-6bfd01e3",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -94,7 +94,7 @@ sap.ui.define(
             accessibilityAttributes: {
               type: "any",
               mapping: "property",
-              defaultValue: "{}"
+              defaultValue: {}
             },
             /**
              * Disables the automatic search field expansion/collapse when the available space is not enough.

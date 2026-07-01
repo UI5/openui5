@@ -39,11 +39,11 @@
 		position: absolute;
 		left: -1rem;
 
-		&:focus {
+		&:focus-visible {
 			outline: none;
 		}
 
-		&:focus:not(:active)::after {
+		&:focus-visible:not(:active)::after {
 			content: '';
 			display: block;
 			position: absolute;
@@ -290,7 +290,7 @@
 					}
 				}
 
-				&:focus {
+				&:focus-visible {
 					outline: none;
 
 					&::after {
@@ -332,7 +332,7 @@
 						color: var(--sapContent_ContrastIconColor);
 					}
 
-					&:focus::after {
+					&:focus-visible::after {
 						border-left-color: transparent;
 					}
 				}
@@ -415,6 +415,41 @@
 	padding: 0;
 	margin: 0;
 	overflow: hidden;
+}
+
+html.sap-desktop .sapFSP .sapFSPSplitterBar:focus {
+	outline: none;
+}
+
+html.sap-desktop .sapFSP .sapFSPSplitterBar:focus:not(:active)::after {
+	content: '';
+	display: block;
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
+}
+
+html.sap-desktop .sapFSP .sapFSPSide .sapFSPActionBarList .sapFSPItem:focus {
+	outline: none;
+}
+
+html.sap-desktop .sapFSP .sapFSPSide .sapFSPActionBarList .sapFSPItem:focus::after {
+	content: '';
+	position: absolute;
+	box-sizing: border-box;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	border: 0.0625rem dotted var(--sapContent_FocusColor);
+	pointer-events: none;
+}
+
+html.sap-desktop .sapFSP .sapFSPSide .sapFSPActionBarList .sapFSPItem.sapFSPSelected:focus::after {
+	border-left-color: transparent;
 }
 
 .sapFSPOverflowMenu .sapMMenuItem {

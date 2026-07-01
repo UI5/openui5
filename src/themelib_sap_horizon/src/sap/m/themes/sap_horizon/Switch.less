@@ -36,6 +36,28 @@ html.sap-desktop {
 	}
 }
 
+.sapMSwtCont:focus-visible::after {
+	content: ' ';
+	position: absolute;
+	display: block;
+	top: 0.375rem;
+	left: 0.0625rem;
+	bottom: 0.375rem;
+	right: 0.0625rem;
+	border: 0.125rem solid var(--sapContent_FocusColor);
+	border-radius: 1rem;
+	pointer-events: none;
+}
+
+.sapUiSizeCompact {
+
+	.sapMSwtCont:focus-visible::after {
+		border-radius: 0.875rem;
+		top: 0.125rem;
+		bottom: 0.125rem;
+	}
+}
+
 /* Switch */
 .sapMSwt {
 	width: 2.875rem;

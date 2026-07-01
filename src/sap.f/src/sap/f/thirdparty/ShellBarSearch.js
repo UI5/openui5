@@ -45,6 +45,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Search3
         _handleSearchIconPress() {
             if (Theme.d() && this.open) {
                 this._handleSearchEvent();
+                this._closePopupAndResetState();
                 return;
             }
             super._handleSearchIconPress();

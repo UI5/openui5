@@ -28,7 +28,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarItem",
       {
         metadata: {
-          tag: "ui5-shellbar-item-e93a470b",
+          tag: "ui5-shellbar-item-6bfd01e3",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -61,7 +61,7 @@ sap.ui.define(
             accessibilityAttributes: {
               type: "any",
               mapping: "property",
-              defaultValue: "{}"
+              defaultValue: {}
             },
             /**
              * Defines the count displayed in badge.

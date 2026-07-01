@@ -33,7 +33,7 @@
 						}
 					}
 
-					&:focus {
+					&:focus-visible {
 
 						&::after {
 							border: 0.125rem solid var(--sapContent_Selected_ForegroundColor);
@@ -43,4 +43,8 @@
 			}
 		}
 	}
+}
+
+html.sap-desktop .sapFSP .sapFSPSide .sapFSPSideInner .sapFSPActionBar .sapFSPItem:focus::after {
+	border: 0.125rem solid var(--sapContent_Selected_ForegroundColor);
 }

@@ -362,6 +362,14 @@ sap.ui.define([
 
 		// check if day names are too big -> use smaller ones
 		_checkNamesLength.call(this);
+
+		if (this._bFocusFromTouch) {
+			const iFocusedIndex = this._oItemNavigation.getFocusedIndex();
+			const oDomRef = this._oItemNavigation.getItemDomRefs()[iFocusedIndex];
+			if (oDomRef) {
+				oDomRef.classList.add("sapUiCalItemFocusFromTouch");
+			}
+		}
 	};
 
 	Month.prototype.onmouseover = function(oEvent) {
@@ -1082,6 +1090,10 @@ sap.ui.define([
 			clientY: oEvent.clientY
 		};
 
+		if (oEvent.target.closest(".sapUiCalItem")) {
+			this._bFocusFromTouch = true;
+		}
+
 		// handle only mouse down on a week number
 		if (oEvent.button
 			|| Device.support.touch
@@ -1098,6 +1110,12 @@ sap.ui.define([
 			oFirstDayOfWeekCalendarDate = CalendarDate.fromLocalJSDate(oParsedDate, this._getPrimaryCalendarType());
 
 		this._handleWeekSelection(oFirstDayOfWeekCalendarDate, bFocusStartDate);
+	};
+
+	Month.prototype.ontouchstart = function(oEvent) {
+		if (oEvent.target.closest(".sapUiCalItem")) {
+			this._bFocusFromTouch = true;
+		}
 	};
 
 	Month.prototype.onmouseup = function(oEvent){
@@ -1186,6 +1204,7 @@ sap.ui.define([
 		if (oEvent.which === KeyCodes.SPACE){
 			this.bSpaceButtonPressed = true;
 		}
+		this._bFocusFromTouch = false;
 	};
 	Month.prototype.onkeyup = function(oEvent){
 		if (oEvent.which === KeyCodes.SPACE){
@@ -2160,6 +2179,12 @@ sap.ui.define([
 			// as in the focus event the month can be changed, store the last target here
 			this._sLastTargetId = oDomRef.id;
 			this._selectedWithMouse = true;
+		}
+
+		if (this._bFocusFromTouch) {
+			oDomRef.classList.add("sapUiCalItemFocusFromTouch");
+		} else {
+			oDomRef.classList.remove("sapUiCalItemFocusFromTouch");
 		}
 
 		if (bFireFocus) {

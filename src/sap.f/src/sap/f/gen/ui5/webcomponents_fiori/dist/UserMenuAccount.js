@@ -30,7 +30,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenuAccount",
       {
         metadata: {
-          tag: "ui5-user-menu-account-e93a470b",
+          tag: "ui5-user-menu-account-6bfd01e3",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -55,7 +55,7 @@ sap.ui.define(
             /**
              * Defines the background color of the desired image.
              * If `avatarColorScheme` is set to `Auto`, the avatar will be displayed with the `Accent6` color.
-             * @type sap/f/gen/ui5/webcomponents/dist/types/AvatarColorScheme
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/AvatarColorScheme
              */
             avatarColorScheme: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.AvatarColorScheme",

@@ -1,6 +1,7 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/base/Log",
 	"sap/ui/core/Control",
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
@@ -17,6 +18,7 @@ sap.ui.define([
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
+	Log,
 	Control,
 	Element,
 	Lib,
@@ -680,6 +682,76 @@ sap.ui.define([
 			await openDialog(sandbox, oActionConfig, fnAfterOpen);
 		});
 
+		QUnit.test(
+			"when the dialog is opened with singleRename and another property has a pending change with the same value as the preselected label",
+			async function(assert) {
+				// Reproduces the duplicate-input bug: when a previous rename changed property A's value
+				// to match the displayed label of property B (the now-preselected one), filtering by label
+				// would return both A (matched by currentValue) and B (matched by label), rendering two inputs.
+				const oAnnotationChange = FlexObjectFactory.createFromFileContent({
+					changeType: "changeAnnotation",
+					content: {
+						annotationPath: "path/to/test/label"
+					},
+					fileType: "annotation_change",
+					texts: {
+						annotationText: {
+							value: "My Other Test Label"
+						}
+					}
+				});
+				sandbox.stub(PersistenceWriteAPI, "_getAnnotationChanges").returns([oAnnotationChange]);
+				const oTestDelegate = createStringTestDelegate("path/to/second/test/label");
+				const oActionConfig = {
+					title: "Change Some String Prop",
+					type: AnnotationTypes.StringType,
+					delegate: oTestDelegate,
+					control: this.oTestControl,
+					singleRename: true,
+					controlBasedRenameChangeType: "myRename"
+				};
+				sandbox.stub(ElementUtil, "getLabelForElement").returns("My Other Test Label");
+				const fnAfterOpen = () => {
+					const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+					assert.strictEqual(aFormElements.length, 1, "then exactly one form element is displayed");
+					assert.strictEqual(
+						aFormElements[0].getBindingContext().getProperty("annotationPath"),
+						"path/to/second/test/label",
+						"then the displayed form element belongs to the preselected property"
+					);
+
+					const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+					oCancelButton.firePress();
+				};
+				await openDialog(sandbox, oActionConfig, fnAfterOpen);
+			}
+		);
+
+		QUnit.test("when the dialog is opened with singleRename but without a preSelectedProperty", async function(assert) {
+			// Single rename requires a preSelectedProperty to filter unambiguously by annotation path.
+			// Without it, the dialog must refuse to open instead of falling back to label-based filtering.
+			const oLogStub = sandbox.stub(Log, "error");
+			const oTestDelegate = createStringTestDelegate();
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				control: this.oTestControl,
+				singleRename: true,
+				controlBasedRenameChangeType: "myRename"
+			};
+			const oDialog = new AnnotationChangeDialog();
+			const oCreateDialogSpy = sandbox.spy(oDialog, "_createDialog");
+			const aChanges = await oDialog.openDialogAndHandleChanges(oActionConfig);
+			assert.deepEqual(aChanges, [], "then no changes are returned");
+			assert.strictEqual(oCreateDialogSpy.callCount, 0, "then the dialog is not created");
+			assert.ok(
+				oLogStub.calledWithMatch(sinon.match(/singleRename requires a preSelectedProperty/)),
+				"then an error is logged about the missing preSelectedProperty"
+			);
+			oDialog.destroy();
+		});
+
 		QUnit.test("when the dialog is opened with a preselected property, that does not exist", async function(assert) {
 			const oTestDelegate = createStringTestDelegate("path/to/does/not/exist");
 			const oActionConfig = {
@@ -1097,7 +1169,8 @@ sap.ui.define([
 						annotationPath: "path/to/test/label",
 						currentValue: "valid",
 						label: "My Test Label"
-					}]
+					}],
+					preSelectedProperty: "path/to/test/label"
 				})
 			};
 			const oActionConfig = {

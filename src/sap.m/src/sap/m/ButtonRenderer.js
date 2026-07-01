@@ -8,8 +8,9 @@ sap.ui.define([
 	'sap/ui/core/ShortcutHintsMixin',
 	'sap/m/library',
 	'sap/ui/core/InvisibleText',
-	'sap/ui/core/AccessKeysEnablement'
-], function(coreLibrary, IconPool, ShortcutHintsMixin, library, InvisibleText, AccessKeysEnablement) {
+	'sap/ui/core/AccessKeysEnablement',
+	'sap/ui/Device'
+], function(coreLibrary, IconPool, ShortcutHintsMixin, library, InvisibleText, AccessKeysEnablement, Device) {
 "use strict";
 
 // shortcut for sap.m.ButtonType
@@ -121,6 +122,11 @@ ButtonRenderer.render = function(oRm, oButton) {
 		oRm.style("min-width", sMinWidth);
 	}
 	renderTabIndex(oButton, oRm);
+
+	// For Safari on mobile devices, a button without tabindex is not treated as an interactive element
+	if (bEnabled && !oButton._bExcludeFromTabChain && !Device.system.desktop) {
+		oRm.attr("tabindex", 0);
+	}
 
 	// close button tag
 	oRm.openEnd();
@@ -285,7 +291,7 @@ ButtonRenderer.writeButtonText = function(oRm, oButton, sTextDir, bRenderBDI){
 };
 
 /**
- * Renders tabindex with value of "-1" if required by  <code>_bExcludeFromTabChain</code> property.
+ * Renders tabindex with value of "-1" if required by <code>_bExcludeFromTabChain</code> property.
  * @param {sap.m.Button} oButton The sap.m.Button to be rendered
  * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the Render-Output-Buffer
  */

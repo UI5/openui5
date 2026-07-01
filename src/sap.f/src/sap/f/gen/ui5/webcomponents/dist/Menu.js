@@ -60,7 +60,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.Menu",
       {
         metadata: {
-          tag: "ui5-menu-e93a470b",
+          tag: "ui5-menu-6bfd01e3",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 
@@ -79,7 +79,7 @@ sap.ui.define(
             headerText: { type: "string", mapping: "property" },
             /**
              * Determines the horizontal alignment of the menu relative to its opener control.
-             * @type sap/f/gen/ui5/webcomponents/dist/types/PopoverHorizontalAlign
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/PopoverHorizontalAlign
              */
             horizontalAlign: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.PopoverHorizontalAlign",
@@ -108,7 +108,7 @@ sap.ui.define(
             open: { type: "boolean", mapping: "property", defaultValue: false },
             /**
              * Determines on which side the component is placed at.
-             * @type sap/f/gen/ui5/webcomponents/dist/types/PopoverPlacement
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/PopoverPlacement
              */
             placement: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.PopoverPlacement",

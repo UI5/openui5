@@ -214,6 +214,100 @@ html.sap-desktop .sapMObjStatusActive.sapMObjStatusInverted {
 	}
 }
 
+html.sap-phone .sapMObjStatusActive:not(.sapMObjStatusInverted),
+html.sap-tablet .sapMObjStatusActive:not(.sapMObjStatusInverted) {
+
+	.sapMObjStatusText {
+		text-decoration: underline;
+	}
+
+	&:focus-visible {
+
+		.sapMObjStatusLink::after {
+			outline: none;
+			border-radius: 0.125rem;
+			content: '';
+			position: absolute;
+			box-sizing: border-box;
+			left: 0;
+			right: 0;
+			pointer-events: none;
+			border: 0.125rem solid var(--sapContent_FocusColor);
+			z-index: -1;
+		}
+
+		.sapMObjStatusLink {
+			background: var(--sapContent_FocusColor);
+			border-radius: 0.125rem;
+
+			.sapMObjStatusIcon > .sapUiIcon,
+			.sapMObjStatusText {
+				color: var(--sapContent_ContrastTextColor);
+				text-shadow: none;
+			}
+
+			.sapMObjStatusText {
+				text-decoration: underline;
+			}
+
+			.sapMObjStatusIcon > .sapUiIcon {
+				text-decoration: none;
+			}
+		}
+	}
+
+	&:hover,
+	&:active,
+	&:focus:hover,
+	&:focus:active {
+
+		.sapMObjStatusIcon > .sapUiIcon,
+		.sapMObjStatusText {
+			text-decoration: none;
+		}
+	}
+
+	&.sapMObjectStatusLarge:focus-visible {
+
+		.sapMObjStatusLink::after {
+			top: 0;
+			bottom: 0;
+		}
+	}
+}
+
+html.sap-phone .sapMObjStatusActive.sapMObjStatusInverted,
+html.sap-tablet .sapMObjStatusActive.sapMObjStatusInverted {
+
+	.sapMObjStatusLink {
+		height: auto;
+	}
+
+	&:focus-visible,
+	&.sapMObjectStatusLarge:focus-visible {
+
+		.sapMObjStatusLink::after {
+			outline: none;
+			content: '';
+			position: absolute;
+			box-sizing: border-box;
+			left: 0;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			pointer-events: none;
+			z-index: 1;
+			box-shadow: inset 0 0 0 0.125em var(--sapContent_FocusColor), inset 0 0 0 0.1875em var(--sapContent_ContrastFocusColor);
+			border-radius: var(--sapButton_BorderCornerRadius);
+			height: 100%;
+		}
+	}
+
+	&.sapMObjectStatusLarge:focus-visible {
+		min-height: 1.75rem;
+	}
+}
+
 .sapMObjStatusInverted.sapMObjStatusError .sapMObjStatusWrapper {
 	background-color: var(--sapButton_Negative_Background);
 	border-color: var(--sapButton_Negative_BorderColor);

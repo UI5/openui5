@@ -440,7 +440,8 @@ sap.ui.define([
 			this.oGenericTile = new GenericTile({
 				frameType: FrameType.Auto,
 				header: "This is a header",
-				subheader: "This is a subheader"
+				subheader: "This is a subheader",
+				ariaRole: "button"
 			}).placeAt("qunit-fixture");
 			await nextUIUpdate();
 		},
@@ -2121,12 +2122,29 @@ sap.ui.define([
 		assert.equal(sAriaAndTooltipText, sExpectedAriaAndTooltipText, "Expected text for ARIA-label and tooltip has been generated after content was updated and tooltip was destroyed");
 	});
 
+	QUnit.test("aria-label is not rendered on presentation tile on initial render, hover, and keyup", function(assert) {
+		// Initial render — role="presentation" (no press, url, or ariaRole)
+		assert.strictEqual(this.oGenericTile.getDomRef().getAttribute("aria-label"), null,
+			"aria-label must not be present on a presentation tile after initial render");
+
+		// Hover — _updateAriaAndTitle must not add aria-label back
+		this.oGenericTile.getDomRef().dispatchEvent(new MouseEvent("mouseenter"));
+		assert.strictEqual(this.oGenericTile.getDomRef().getAttribute("aria-label"), null,
+			"aria-label must not be added on hover for a presentation tile");
+
+		// Keyup — _updateAriaLabel must not add aria-label back
+		this.oGenericTile.getDomRef().dispatchEvent(new KeyboardEvent("keyup", { keyCode: KeyCodes.TAB, bubbles: true }));
+		assert.strictEqual(this.oGenericTile.getDomRef().getAttribute("aria-label"), null,
+			"aria-label must not be added on keyup for a presentation tile");
+	});
+
 	QUnit.module("Tooltip handling", {
 		beforeEach: async function() {
 			this.oGenericTile = new GenericTile("generic-tile", {
 				header: "Header text",
 				subheader: "subheader text",
-				tileContent: [new TileContent("tile-cont-1"), new TileContent("tile-cont-2")]
+				tileContent: [new TileContent("tile-cont-1"), new TileContent("tile-cont-2")],
+				ariaRole: "button"
 			}).placeAt("qunit-fixture");
 			// stub function _getAriaAndTooltipText of the content
 			this.oGenericTile.getTileContent()[0]._getAriaAndTooltipText = function() {
@@ -2293,7 +2311,8 @@ sap.ui.define([
 				header: "header",
 				subheader: "subheader",
 				mode: GenericTileMode.LineMode,
-				tileContent: [new TileContent("tile-cont-1"), new TileContent("tile-cont-2")]
+				tileContent: [new TileContent("tile-cont-1"), new TileContent("tile-cont-2")],
+				ariaRole: "button"
 			});
 
 			jQuery("html").addClass("sapUiMedia-GenericTileDeviceSet-large").removeClass("sapUiMedia-GenericTileDeviceSet-small");
@@ -3089,6 +3108,50 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("JAWS: activating the more button via keyboard must not trigger tile press (Actions scope)", async function(assert) {
+		// JAWS fires synthetic keydown/keyup on the tile root when activating _bExcludeFromTabChain
+		// buttons — the tile's onkeydown records keyPressed, which would normally cause firePress
+		// on the matching keyup. The fix: _oMoreIcon.attachPress sets _bScopeButtonActivated so
+		// onkeyup suppresses the tile firePress.
+		this.oGenericTile.setScope(GenericTileScope.Actions);
+		await nextUIUpdate();
+		this.oGenericTile.attachEvent("press", this.ftnPressHandler);
+
+		// Simulate JAWS: keydown on tile root (JAWS virtual focus on ⋮ button)
+		var down = jQuery.Event("keydown");
+		down.keyCode = KeyCodes.ENTER;
+		this.oGenericTile.$().trigger(down);
+
+		// Simulate JAWS activating the ⋮ button (fires button press before keyup reaches tile)
+		this.oGenericTile._oMoreIcon.firePress();
+
+		// Simulate JAWS: keyup on tile root
+		var up = jQuery.Event("keyup");
+		up.keyCode = KeyCodes.ENTER;
+		this.oGenericTile.$().trigger(up);
+
+		assert.ok(!this.ftnPressHandler.called, "Tile press must not fire when JAWS activates the ⋮ button");
+	});
+
+	QUnit.test("Normal Enter key on tile in Actions scope still fires tile press when no scope button activated", async function(assert) {
+		// Main Case: pressing Enter directly on the tile (not via a scope button) must still
+		// fire tile press in Actions scope as before.
+		this.oGenericTile.setScope(GenericTileScope.Actions);
+		await nextUIUpdate();
+		this.oGenericTile.attachEvent("press", this.ftnPressHandler);
+
+		var down = jQuery.Event("keydown");
+		down.keyCode = KeyCodes.ENTER;
+		this.oGenericTile.$().trigger(down);
+
+		// No _oMoreIcon.firePress() — user pressed Enter on tile itself, not the ⋮ button
+		var up = jQuery.Event("keyup");
+		up.keyCode = KeyCodes.ENTER;
+		this.oGenericTile.$().trigger(up);
+
+		assert.ok(this.ftnPressHandler.called, "Tile press must still fire when Enter is pressed directly on the tile");
+	});
+
 	QUnit.test("Check the max line of header if footer exists", async function(assert) {
 		this.oGenericTile.setFrameType("TwoByHalf");
 		this.oGenericTile.setSubheader("");
@@ -3772,6 +3835,7 @@ sap.ui.define([
 				subheader: "Expenses By Region",
 				frameType: FrameType.TwoByOne,
 				header: "Comparative Annual Totals",
+				ariaRole: "button",
 				tileContent: new TileContent("tileCont", {
 					unit: "EUR",
 					priority: Priority.High,
@@ -3788,6 +3852,7 @@ sap.ui.define([
 				frameType: FrameType.TwoByOne,
 				header: "Comparative Annual Totals",
 				headerImage: "sap-icon://alert",
+				ariaRole: "button",
 				tileContent: new TileContent("tile-cont", {
 					unit: "EUR",
 					footer: "Current Quarter",
@@ -5770,7 +5835,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("Announcement of text tile should only be done once", function (assert) {
-		assert.ok(this.isRepeatedTwice(this.oGenericTile.getDomRef().getAttribute("aria-label"),"tile"),"The word tile has been announced only once");
+		assert.strictEqual(this.oGenericTile.getDomRef().getAttribute("aria-label"), null,
+			"aria-label is not rendered on a presentation tile with linkTileContents");
 	});
 
 	QUnit.test("Line-height set to 1.5rem inside the LinkTileContent", function (assert) {

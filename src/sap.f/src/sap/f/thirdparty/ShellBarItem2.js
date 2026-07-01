@@ -320,7 +320,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
 
     function ShellBarItemTemplate() {
         if (this.inOverflow) {
-            return (jsxRuntime.jsx(ListItemStandard$1, { icon: this.icon ? `sap-icon://${this.icon}` : "", type: "Active", "data-count": this.count, "data-ui5-stable": this.stableDomRef, accessibilityAttributes: this.accessibilityAttributes, children: this.text }));
+            return (jsxRuntime.jsx(ListItemStandard$1, { icon: this.icon ? `sap-icon://${this.icon}` : "", type: "Active", "data-count": this.count, "data-ui5-stable": this.stableDomRef, accessibilityAttributes: this.accessibilityAttributes, onClick: this.fireClickEvent, children: this.text }));
         }
         return (jsxRuntime.jsx(Button.Button, { class: "ui5-shellbar-action-button", icon: this.icon, design: "Transparent", accessibleName: this.text, "data-ui5-stable": this.stableDomRef, accessibilityAttributes: this.accessibilityAttributes, onClick: this.fireClickEvent, children: this.count && (jsxRuntime.jsx(ButtonBadge$1, { slot: "badge", design: "OverlayText", text: this.count })) }));
     }
@@ -380,6 +380,9 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
         get stableDomRef() {
             return this.getAttribute("stable-dom-ref") || `${this._id}-stable-dom-ref`;
         }
+        get isShellBarItem() {
+            return true;
+        }
         hasListItems() {
             return this.inOverflow;
         }
@@ -432,9 +435,11 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     ], ShellBarItem);
     ShellBarItem.define();
     var ShellBarItem$1 = ShellBarItem;
+    const isInstanceOfShellBarItem = webcomponentsBase.r$1("isShellBarItem");
 
     exports.ButtonBadge = ButtonBadge$1;
     exports.ListItemStandard = ListItemStandard$1;
     exports.ShellBarItem = ShellBarItem$1;
+    exports.isInstanceOfShellBarItem = isInstanceOfShellBarItem;
 
 }));

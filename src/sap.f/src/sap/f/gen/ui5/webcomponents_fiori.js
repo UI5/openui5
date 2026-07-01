@@ -18,7 +18,7 @@ sap.ui.define(
     // export the UI5 metadata along with the package
     pkg["_ui5metadata"] = {
       name: "sap/f/gen/ui5/webcomponents_fiori",
-      version: "2.23.1",
+      version: "2.23.2",
       dependencies: ["sap.ui.core"],
       types: [
         "sap.f.gen.ui5.webcomponents_fiori.dist.types.FCLLayout",
@@ -127,7 +127,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/FCLLayout
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori FCLLayout
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.FCLLayout
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -264,7 +264,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/HeroBannerActionsPlacement
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori HeroBannerActionsPlacement
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.HeroBannerActionsPlacement
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -296,7 +296,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/HeroBannerColumnsRatio
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori HeroBannerColumnsRatio
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.HeroBannerColumnsRatio
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -327,7 +327,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/HeroBannerHeaderBlockPlacement
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori HeroBannerHeaderBlockPlacement
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.HeroBannerHeaderBlockPlacement
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -356,7 +356,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/IllustrationMessageDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori IllustrationMessageDesign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.IllustrationMessageDesign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -448,7 +448,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/IllustrationMessageType
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori IllustrationMessageType
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.IllustrationMessageType
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1289,7 +1289,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/MediaGalleryItemLayout
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori MediaGalleryItemLayout
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.MediaGalleryItemLayout
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1323,7 +1323,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/MediaGalleryLayout
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori MediaGalleryLayout
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.MediaGalleryLayout
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1359,7 +1359,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/MediaGalleryMenuHorizontalAlign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori MediaGalleryMenuHorizontalAlign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.MediaGalleryMenuHorizontalAlign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1388,7 +1388,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/MediaGalleryMenuVerticalAlign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori MediaGalleryMenuVerticalAlign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.MediaGalleryMenuVerticalAlign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1417,7 +1417,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/NavigationLayoutMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori NavigationLayoutMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.NavigationLayoutMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1454,7 +1454,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/NotificationListItemImportance
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori NotificationListItemImportance
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.NotificationListItemImportance
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1483,7 +1483,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/PageBackgroundDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori PageBackgroundDesign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.PageBackgroundDesign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1519,7 +1519,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SearchMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SearchMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SearchMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1548,7 +1548,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SideContentFallDown
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SideContentFallDown
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SideContentFallDown
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1591,7 +1591,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SideContentPosition
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SideContentPosition
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SideContentPosition
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1622,7 +1622,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SideContentVisibility
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SideContentVisibility
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SideContentVisibility
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1672,7 +1672,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SideNavigationItemDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SideNavigationItemDesign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SideNavigationItemDesign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1705,7 +1705,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/TimelineGrowingMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori TimelineGrowingMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.TimelineGrowingMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1742,7 +1742,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/TimelineLayout
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori TimelineLayout
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.TimelineLayout
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1772,7 +1772,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/UploadCollectionSelectionMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori UploadCollectionSelectionMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.UploadCollectionSelectionMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1831,7 +1831,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/UploadState
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori UploadState
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.UploadState
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1874,7 +1874,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/ViewSettingsDialogMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori ViewSettingsDialogMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.ViewSettingsDialogMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1910,7 +1910,7 @@ sap.ui.define(
      *
      * @enum {string}
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/WizardContentLayout
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori WizardContentLayout
+     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.WizardContentLayout
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */

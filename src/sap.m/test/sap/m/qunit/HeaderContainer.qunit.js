@@ -182,13 +182,13 @@ sap.ui.define([
 		assert.equal(sRole, "list", "HeaderContainer role is of type list");
 	});
 
-	QUnit.test("Acc - role assigned is of type list to scroll container(immediate parent of listitems)", async function (assert) {
+	QUnit.test("Acc - role assigned is of type listbox to scroll container(immediate parent of options)", async function (assert) {
 		//Arrange
 		var sRole = this.oHeaderContainer.aDelegates[0].oDelegate.oDomRef.getAttribute("role");
 		//Act
 		await nextUIUpdate();
 		//Assert
-		assert.equal(sRole, "list", "scrollContainer role is of type list");
+		assert.equal(sRole, "listbox", "scrollContainer role is of type listbox");
 	});
 
 	QUnit.module("Background design", {

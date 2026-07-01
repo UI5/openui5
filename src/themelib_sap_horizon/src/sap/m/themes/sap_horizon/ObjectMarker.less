@@ -5,12 +5,16 @@
 
 @_sap_m_ObjectMarker_LinkShadowColor: none;
 
+html.sap-desktop .sapMObjectMarker .sapMLnk:focus .sapUiIcon {
+	color: var(--sapContent_ContrastTextColor);
+}
+
 .sapMObjectMarker {
 
 	.sapMLnk {
 		text-shadow: @_sap_m_ObjectMarker_LinkShadowColor;
 
-		&:focus {
+		&:focus-visible {
 
 			.sapUiIcon {
 				color: var(--sapContent_ContrastTextColor);
@@ -23,7 +27,16 @@
 	line-height: 1.5rem;
 }
 
-.sapMObjectMarkerActiveIconOnly:focus {
+html.sap-desktop .sapMObjectMarkerActiveIconOnly:focus {
+	outline: none;
+	border-radius: 0.125rem;
+	background-color: var(--sapContent_FocusColor);
+	color: var(--sapContent_ContrastTextColor);
+	text-shadow: none;
+}
+
+.sapMObjectMarkerActiveIconOnly:focus-visible {
+	outline: none;
 	border-radius: 0.125rem;
 	background-color: var(--sapContent_FocusColor);
 	color: var(--sapContent_ContrastTextColor);

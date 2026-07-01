@@ -277,6 +277,7 @@ sap.ui.define([
 			if (this.getTooltipButton(oHead, i)) {
 				oRm.attr("title", this.getTooltipButton(oHead, i));
 			}
+			oRm.attr("tabindex", "0");
 			oRm.accessibilityState(null, mAccProps);
 			mAccProps = {};
 			oRm.openEnd(); // button element
