@@ -793,7 +793,8 @@ sap.ui.define([
 			assert.notOk(oTableTitle.getVisible(), "TableTitle is hidden due to headerVisible=false");
 
 			assert.equal(this.oTable._oTable.getAriaLabelledBy().length, 1, "ARIA labelling available for inner table");
-			assert.equal(this.oTable._oTable.getAriaLabelledBy()[0], oTitle.getId(), "ARIA labelling for inner table points to title");
+			assert.equal(this.oTable._oTable.getAriaLabelledBy()[0], oTableTitle.getId(),
+				"ARIA labelling for inner table points to the composite table title (label + item count)");
 
 			done();
 		}.bind(this));
@@ -1623,7 +1624,8 @@ sap.ui.define([
 		assert.equal(this.oTable._oTitle.getTitleStyle(), "H3", "Title style is set to 'H3'");
 		assert.equal(this.oTable._oTitle.getLevel(), "H6", "Title level is set to 'H6'");
 		assert.ok(oVariantManagement.getShowAsText(), "VariantManagement is shown as text");
-		assert.equal(this.oTable._oTable.getAriaLabelledBy()[0], this.oTable._oTitle.getId(), "Table is labelled by title");
+		assert.equal(this.oTable._oTable.getAriaLabelledBy()[0], this.oTable._oTableTitle.getId(),
+			"Table is labelled by the composite table title (label + item count)");
 
 		this.oTable.setHeaderVisible(false);
 		assert.equal(oVariantManagement.getTitleStyle(), "H3", "VariantManagement title is set to 'H3'");

@@ -65,7 +65,8 @@ sap.ui.define([
 		assert.equal(oInnerTable.getSelectionMode(), "None", "selectionMode");
 		assert.equal(oInnerTable.getSelectionBehavior(), "RowSelector", "selectionBehavior");
 		assert.equal(oInnerTable.getThreshold(), 100, "threshold");
-		assert.deepEqual(oInnerTable.getAriaLabelledBy(), [this.oTable._oTitle.getId()], "ariaLabelledBy");
+		assert.deepEqual(oInnerTable.getAriaLabelledBy(), [this.oTable._oTableTitle.getId()],
+			"ariaLabelledBy references the composite table title (including item count)");
 		assert.deepEqual(oInnerTable.getExtension(), [this.oTable._oToolbar], "extension");
 		assert.equal(oInnerTable.getEnableBusyIndicator(), true, "enableBusyIndicator");
 		assert.equal(oInnerTable.getRowMode().isA("sap.ui.table.rowmodes.Auto"), true, "rowMode");
@@ -91,7 +92,8 @@ sap.ui.define([
 		assert.equal(oInnerTable.getEnableColumnReordering(), false, "enableColumnReordering");
 		assert.equal(oInnerTable.getSelectionBehavior(), "RowOnly", "selectionBehavior");
 		assert.equal(oInnerTable.getThreshold(), 30, "threshold");
-		assert.deepEqual(oInnerTable.getAriaLabelledBy(), [this.oTable._oTitle.getId()], "ariaLabelledBy");
+		assert.deepEqual(oInnerTable.getAriaLabelledBy(), [this.oTable._oTableTitle.getId()],
+			"ariaLabelledBy references the composite table title (including item count)");
 		assert.deepEqual(oInnerTable.getExtension(), [this.oTable._oToolbar], "extension");
 		assert.equal(oInnerTable.getEnableBusyIndicator(), true, "enableBusyIndicator");
 		assert.equal(oInnerTable.getRowMode().isA("sap.ui.table.rowmodes.Fixed"), true, "rowMode");
