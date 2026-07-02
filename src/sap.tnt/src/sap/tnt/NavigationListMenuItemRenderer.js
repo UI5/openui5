@@ -7,13 +7,15 @@ sap.ui.define([
 	"sap/ui/util/defaultLinkTypes",
 	'sap/m/MenuItemRenderer',
 	'sap/tnt/NavigationListItem',
-	"sap/ui/core/Lib"
+	"sap/ui/core/Lib",
+	"sap/base/strings/highlightText"
 ], function(
 	Renderer,
 	defaultLinkTypes,
 	MenuItemRenderer,
 	NavigationListItem,
-	Lib
+	Lib,
+	highlightText
 ) {
 	"use strict";
 
@@ -159,6 +161,30 @@ sap.ui.define([
 
 			oRm.close("span");
 		}
+	};
+
+	/**
+	 * Renders the text column with highlighted text support.
+	 *
+	 * @param {sap.ui.core.RenderManager} oRm Renderer instance
+	 * @param {sap.tnt.NavigationListMenuItem} oItem Menu item instance
+	 * @private
+	 */
+	NavigationListMenuItemRenderer.renderText = function(oRm, oItem) {
+		const sText = oItem.getText();
+		const sHighlightedText = oItem.getHighlightedText();
+
+		oRm.openStart("div", `${oItem.getId()}-txt`);
+		oRm.class("sapMMenuItemText");
+		oRm.openEnd();
+
+		if (sHighlightedText) {
+			oRm.unsafeHtml(highlightText(sText, sHighlightedText, "sapTntNLIHighlight"));
+		} else {
+			oRm.text(sText);
+		}
+
+		oRm.close("div");
 	};
 
 	return NavigationListMenuItemRenderer;

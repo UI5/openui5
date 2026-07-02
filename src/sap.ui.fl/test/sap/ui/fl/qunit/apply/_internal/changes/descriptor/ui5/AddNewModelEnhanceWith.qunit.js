@@ -157,7 +157,7 @@ sap.ui.define([
 
 				"sap.ui5": {
 					models: {
-						i18n: {
+						random: {
 							type: "sap.ui.model.odata.ODataModel",
 							uri: "some/random/url"
 						}
@@ -165,7 +165,7 @@ sap.ui.define([
 				}
 			};
 			const oNewManifest = AddNewModelEnhanceWith.applyChange(oManifest, this.oChangeRelPath);
-			assert.notOk(oNewManifest["sap.ui5"].models.i18n.settings, "settings.enhanceWith is not updated.");
+			assert.notOk(oNewManifest["sap.ui5"].models.random.settings, "settings.enhanceWith is not updated.");
 		});
 
 		QUnit.test("when calling '_applyChange' with a wrong model name", function(assert) {
@@ -185,8 +185,95 @@ sap.ui.define([
 					}
 				}
 			};
-			const oNewManifest = AddNewModelEnhanceWith.applyChange(oManifest, this.oChangeRelPath);
-			assert.notOk(oNewManifest["sap.ui5"].models.test.settings, "settings/enhanceWith is not updated.");
+			assert.throws(function() {
+				AddNewModelEnhanceWith.applyChange(oManifest, this.oChangeRelPath);
+			}.bind(this), Error("Model with ID 'random' does not exist. Set createIfMissing to true to create it."),
+			"throws the correct error message");
+		});
+
+		QUnit.test("when calling '_applyChange' with createIfMissing for a missing model", function(assert) {
+			const oManifest = {
+				"_version": "2.0.0",
+
+				"sap.app": {
+					id: "consumer.base.app"
+				},
+
+				"sap.ui5": {
+					models: {}
+				}
+			};
+
+			const oNewManifest = AddNewModelEnhanceWith.applyChange(oManifest, new AppDescriptorChange({
+				content: {
+					modelId: "newModel",
+					createIfMissing: true,
+					bundleUrl: "reuse/appvar1/i18n/i18n.terminologies.soccer.properties",
+					bundleUrlRelativeTo: "manifest"
+				}
+			}));
+
+			assert.equal(
+				oNewManifest["sap.ui5"].models.newModel.type,
+				"sap.ui.model.resource.ResourceModel",
+				"model is created with ResourceModel type"
+			);
+			assert.deepEqual(oNewManifest["sap.ui5"].models.newModel.settings, {
+				bundleName: "consumer.base.app.reuse.appvar1.i18n.i18n.terminologies.soccer",
+				bundleUrlRelativeTo: "manifest"
+			}, "enhancement settings are directly stored in settings");
+		});
+
+		QUnit.test("when calling '_applyChange' with createIfMissing and i18n text for a missing model", function(assert) {
+			const oManifest = {
+				"_version": "2.0.0",
+
+				"sap.app": {
+					id: "consumer.base.app"
+				},
+
+				"sap.ui5": {
+					models: {}
+				}
+			};
+
+			const oNewManifest = AddNewModelEnhanceWith.applyChange(oManifest, new AppDescriptorChange({
+				content: {
+					modelId: "newModel",
+					createIfMissing: true
+				},
+				texts: {
+					i18n: "resources/i18n/i18n.properties"
+				}
+			}));
+
+			assert.deepEqual(oNewManifest["sap.ui5"].models.newModel.settings, {
+				bundleName: "consumer.base.app.resources.i18n.i18n"
+			}, "i18n enhancement settings are directly stored in settings");
+		});
+
+		QUnit.test("when calling '_applyChange' with missing model and without createIfMissing", function(assert) {
+			const oManifest = {
+				"_version": "2.0.0",
+
+				"sap.app": {
+					id: "consumer.base.app"
+				},
+
+				"sap.ui5": {
+					models: {}
+				}
+			};
+
+			assert.throws(function() {
+				AddNewModelEnhanceWith.applyChange(oManifest, new AppDescriptorChange({
+					content: {
+						modelId: "newModel",
+						bundleName: "consumer.base.app.i18n.i18n"
+					}
+				}));
+			}, Error("Model with ID 'newModel' does not exist. Set createIfMissing to true to create it."),
+			"throws the correct error message");
 		});
 
 		QUnit.test("when calling '_applyChange' with invalid absolute path", function(assert) {

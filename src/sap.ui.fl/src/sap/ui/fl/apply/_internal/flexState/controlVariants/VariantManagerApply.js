@@ -323,5 +323,38 @@ sap.ui.define([
 		oVariant.instance.setVariantDependentControlChangesRemoved(false);
 	};
 
+	/**
+	 * For every control targeted by a VM's initial UI changes that already exists in the
+	 * control tree, run {@link sap.ui.fl.apply._internal.changes.Applier#applyAllChangesForControl}.
+	 * This closes the timing window in which the VariantModel constructor seeds the
+	 * initial changes into the live dependency map after the flex propagation listener has
+	 * already fired for those controls — in that case the propagation-driven apply ran against
+	 * an empty change list and the changes would otherwise remain unapplied, hanging any
+	 * subsequent waitForFlexObjectsToBeApplied. The call might be redundant if changes are already
+	 * available, but applyAllChangesForControl is idempotent and will skip already-applied changes.
+	 *
+	 * @param {object} mPropertyBag - Property bag
+	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - Application component
+	 * @param {string} mPropertyBag.reference - Flex reference
+	 * @param {string} mPropertyBag.vmReference - Variant management reference
+	 * @returns {Promise<void>} Resolves once the apply was executed for every relevant control
+	 */
+	VariantManagerApply.applyInitialChangesForExistingControls = async function(mPropertyBag) {
+		const aInitialChanges = VariantManagementState.getInitialUIChanges({
+			reference: mPropertyBag.reference,
+			vmReference: mPropertyBag.vmReference
+		});
+		const mControls = new Map();
+		for (const oChange of aInitialChanges) {
+			const oControl = JsControlTreeModifier.bySelector(oChange.getSelector(), mPropertyBag.appComponent);
+			if (oControl && !mControls.has(oControl.getId())) {
+				mControls.set(oControl.getId(), oControl);
+			}
+		}
+		await Promise.all(Array.from(mControls.values()).map((oControl) => {
+			return Applier.applyAllChangesForControl(mPropertyBag.appComponent, mPropertyBag.reference, oControl);
+		}));
+	};
+
 	return VariantManagerApply;
 });

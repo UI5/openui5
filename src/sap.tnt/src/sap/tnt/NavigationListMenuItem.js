@@ -71,7 +71,13 @@ sap.ui.define([
 				 * <code>_self</code>, <code>_top</code>, <code>_blank</code>, <code>_parent</code>, <code>_search</code>.
 				 * Alternatively, a frame name can be entered. This property is only used when the <code>href</code> property is set.
 				 */
-				target: { type: "string", group: "Behavior", defaultValue: null }
+				target: { type: "string", group: "Behavior", defaultValue: null },
+
+				/**
+				 * Specifies a term to be highlighted in the navigation items' text.
+				 * When set, matching portions of item and group texts are visually emphasized during rendering.
+				 */
+				highlightedText: { type: "string", group: "Appearance", defaultValue: "" }
 			},
 			aggregations: {
 

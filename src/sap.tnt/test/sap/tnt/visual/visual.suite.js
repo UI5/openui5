@@ -5,6 +5,7 @@ module.exports = [
 	"NavigationList.spec.js",
 	"SideNavigation.spec.js",
 	"SideNavigationGroups.spec.js",
+	"SideNavigationSearch.spec.js",
 	"ToolHeader.spec.js",
 	"ToolHeaderFLP.spec.js",
 	"ToolPage.spec.js",

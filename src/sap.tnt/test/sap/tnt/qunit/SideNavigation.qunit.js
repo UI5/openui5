@@ -1,6 +1,7 @@
 /*global QUnit sinon */
 sap.ui.define([
 	'sap/tnt/SideNavigation',
+	'sap/tnt/SideNavigationSearchField',
 	'sap/tnt/NavigationList',
 	'sap/tnt/NavigationListItem',
 	"sap/ui/core/Element",
@@ -9,6 +10,7 @@ sap.ui.define([
 	"sap/ui/qunit/QUnitUtils"
 ], function(
 	SideNavigation,
+	SideNavigationSearchField,
 	NavigationList,
 	NavigationListItem,
 	Element,
@@ -647,5 +649,163 @@ sap.ui.define([
 		assert.strictEqual(this.sideNavigation.$().attr('aria-label'), label, 'aria-label is as expected');
 		assert.strictEqual(this.sideNavigation.getAggregation("item").$().attr('aria-label'), oRB.getText("SIDE_NAVIGATION_FLEXIBLE_LIST_LABEL"), 'ul for flexible list should have aria-label "Primary Navigation Menu"');
 		assert.strictEqual(this.sideNavigation.getAggregation("fixedItem").$().attr('aria-label'), oRB.getText("SIDE_NAVIGATION_FIXED_LIST_LABEL"), 'ul for fixed list should have aria-label "Footer Navigation Menu"');
+	});
+
+	QUnit.module("Rendering", {
+		beforeEach: async function () {
+			this.sideNavigation = new SideNavigation({
+				item: new NavigationList(),
+				fixedItem: new NavigationList()
+			});
+			this.sideNavigation.placeAt(DOM_RENDER_LOCATION);
+			await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.sideNavigation.destroy();
+		}
+	});
+
+	QUnit.test("Separator and fixed list are hidden when fixedItem has no items", function (assert) {
+		const oDomRef = this.sideNavigation.getDomRef();
+		const oSeparator = oDomRef.querySelector(".sapTntSideNavigationSeparator");
+		const oFixedListNL = oDomRef.querySelector(".sapTntSideNavigationFixed .sapTntNL");
+
+		assert.ok(oSeparator, "Separator element exists in the DOM");
+		assert.ok(oFixedListNL, "Fixed list NavigationList element exists in the DOM");
+		assert.strictEqual(window.getComputedStyle(oSeparator).display, "none", "Separator has display:none when fixedItem has no items");
+		assert.strictEqual(window.getComputedStyle(oFixedListNL).display, "none", "Fixed list has display:none when fixedItem has no items");
+	});
+
+	QUnit.module("filterSection", {
+		beforeEach: async function () {
+			this.oSearchField = new SideNavigationSearchField();
+			this.sideNavigation = new SideNavigation({
+				filterSection: this.oSearchField,
+				item: new NavigationList({
+					items: [
+						new NavigationListItem({ text: "Item 1", key: "item1" }),
+						new NavigationListItem({ text: "Item 2", key: "item2" })
+					]
+				}),
+				fixedItem: new NavigationList({
+					items: [
+						new NavigationListItem({ text: "Fixed Item", key: "fixed1" })
+					]
+				})
+			});
+			this.sideNavigation.placeAt(DOM_RENDER_LOCATION);
+			await nextUIUpdate(); // no fake timer active in beforeEach
+		},
+		afterEach: function () {
+			this.sideNavigation.destroy();
+		}
+	});
+
+	QUnit.test("filterSection is rendered when expanded", function (assert) {
+		const oFilterSection = this.sideNavigation.getDomRef().querySelector(".sapTntSideNavigationFilterSection");
+
+		assert.ok(oFilterSection, "filterSection container is rendered");
+		assert.ok(oFilterSection.contains(this.oSearchField.getDomRef()), "Search field is rendered inside filterSection");
+	});
+
+	QUnit.test("filterSection is not rendered when collapsed", function (assert) {
+		this.clock.restore();
+		const done = assert.async();
+
+		this.sideNavigation.setExpanded(false);
+
+		setTimeout(function () {
+			const oFilterSection = this.sideNavigation.getDomRef().querySelector(".sapTntSideNavigationFilterSection");
+			assert.notOk(oFilterSection, "filterSection is not rendered when SideNavigation is collapsed");
+			done();
+		}.bind(this), 1000);
+	});
+
+	QUnit.test("filterSection is rendered before the flexible list", function (assert) {
+		const oDomRef = this.sideNavigation.getDomRef();
+		const oFilterSection = oDomRef.querySelector(".sapTntSideNavigationFilterSection");
+		const oFlexibleList = oDomRef.querySelector(".sapTntSideNavigationFlexible");
+
+		const iFilterIndex = Array.prototype.indexOf.call(oDomRef.children, oFilterSection);
+		const iFlexibleIndex = Array.prototype.indexOf.call(oDomRef.children, oFlexibleList);
+		assert.ok(iFilterIndex < iFlexibleIndex, "filterSection is rendered before the flexible list");
+	});
+
+	QUnit.test("getFilterSection returns the aggregated control", function (assert) {
+		assert.strictEqual(this.sideNavigation.getFilterSection(), this.oSearchField, "getFilterSection returns the search field");
+	});
+
+	QUnit.test("setFilterSection replaces the control", async function (assert) {
+		const oNewSearchField = new SideNavigationSearchField();
+		this.sideNavigation.setFilterSection(oNewSearchField);
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(this.sideNavigation.getFilterSection(), oNewSearchField, "Aggregation is updated");
+		assert.ok(
+			this.sideNavigation.getDomRef().querySelector(".sapTntSideNavigationFilterSection").contains(oNewSearchField.getDomRef()),
+			"New search field is rendered"
+		);
+	});
+
+	QUnit.test("setFilterSection to null removes the section", async function (assert) {
+		this.sideNavigation.setFilterSection(null);
+		await nextUIUpdate(this.clock);
+
+		const oFilterSection = this.sideNavigation.getDomRef().querySelector(".sapTntSideNavigationFilterSection");
+		assert.notOk(oFilterSection, "filterSection is not rendered when set to null");
+	});
+
+	QUnit.test("destroyFilterSection removes the section", async function (assert) {
+		this.sideNavigation.destroyFilterSection();
+		await nextUIUpdate(this.clock);
+
+		assert.notOk(this.sideNavigation.getFilterSection(), "getFilterSection returns null after destroy");
+		assert.notOk(
+			this.sideNavigation.getDomRef().querySelector(".sapTntSideNavigationFilterSection"),
+			"filterSection is not rendered after destroy"
+		);
+	});
+
+	QUnit.test("filterSection does not affect item selection", function (assert) {
+		this.sideNavigation.setSelectedKey("item1");
+		assert.strictEqual(this.sideNavigation.getSelectedKey(), "item1", "Selection works with filterSection present");
+
+		this.sideNavigation.setSelectedKey("fixed1");
+		assert.strictEqual(this.sideNavigation.getSelectedKey(), "fixed1", "Fixed item selection works with filterSection present");
+	});
+
+	QUnit.test("filterSection does not affect itemSelect event", function (assert) {
+		const oSpy = sinon.spy();
+		this.sideNavigation.attachItemSelect(oSpy);
+
+		const oItem = this.sideNavigation.getItem().getItems()[1];
+		oItem._selectItem();
+
+		assert.strictEqual(oSpy.callCount, 1, "itemSelect event fires correctly with filterSection present");
+		assert.strictEqual(oSpy.firstCall.args[0].getParameter("item"), oItem, "Correct item is passed in the event");
+	});
+
+	QUnit.test("filterSection reappears after collapse and expand", function (assert) {
+		this.clock.restore();
+		const done = assert.async();
+
+		this.sideNavigation.setExpanded(false);
+
+		setTimeout(function () {
+			assert.notOk(
+				this.sideNavigation.getDomRef().querySelector(".sapTntSideNavigationFilterSection"),
+				"filterSection is hidden when collapsed"
+			);
+
+			this.sideNavigation.setExpanded(true);
+
+			setTimeout(function () {
+				assert.ok(
+					this.sideNavigation.getDomRef().querySelector(".sapTntSideNavigationFilterSection"),
+					"filterSection reappears after re-expanding"
+				);
+				done();
+			}.bind(this), 500);
+		}.bind(this), 500);
 	});
 });

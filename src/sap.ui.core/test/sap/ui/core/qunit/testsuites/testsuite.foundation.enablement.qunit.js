@@ -39,6 +39,10 @@ sap.ui.define(function() {
 				title: "QUnit Page for hash"
 			},
 
+			"base/strings/highlightText": {
+				title: "QUnit Page for highlightText"
+			},
+
 			"base/strings/hyphenate": {
 				title: "QUnit Page for hyphenate"
 			},

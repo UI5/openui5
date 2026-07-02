@@ -144,7 +144,13 @@ sap.ui.define([
 				/**
 				 * Association to controls / ids which label this control (see WAI-ARIA attribute aria-labelledby).
 				 */
-				ariaLabelledBy : {type : "sap.ui.core.Control", multiple : true, singularName : "ariaLabelledBy"}
+				ariaLabelledBy : {type : "sap.ui.core.Control", multiple : true, singularName : "ariaLabelledBy"},
+				/**
+				 * Associates controls or IDs that are controlled by this control,
+				 * as described by the WAI-ARIA attribute <code>aria-controls</code>.
+				 * @since 1.150
+				 */
+				ariaControls: {type : "sap.ui.core.Control", multiple : true}
 			},
 			defaultAggregation : "suggestionItems",
 			designtime: "sap/m/designtime/SearchField.designtime",
@@ -982,6 +988,14 @@ sap.ui.define([
 			}
 		}
 		return this;
+	};
+
+	SearchField.prototype._hasAriaLabelledBy = function() {
+		return this.getAriaLabelledBy().length;
+	};
+
+	SearchField.prototype._getPlaceholder = function() {
+		return this.getPlaceholder() || Library.getResourceBundleFor("sap.m").getText("FACETFILTER_SEARCH", undefined, true);
 	};
 
 	function updateSuggestions(oSF) {

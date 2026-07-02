@@ -5,10 +5,12 @@
 
 sap.ui.define([
 	"sap/ui/fl/apply/_internal/changes/descriptor/ApplyUtil",
-	"sap/base/util/ObjectPath"
+	"sap/base/util/ObjectPath",
+	"sap/base/util/isEmptyObject"
 ], function(
 	ApplyUtil,
-	ObjectPath
+	ObjectPath,
+	isEmptyObject
 ) {
 	"use strict";
 
@@ -47,9 +49,40 @@ sap.ui.define([
 			});
 		}
 	}
+
+	/**
+	 * Returns enhancement settings extracted from the change content.
+	 * @param {object} oChange - Change with type <code>appdescr_ui5_addNewModelEnhanceWith</code>
+	 * @param {object} oChangeContent - Details of the change
+	 * @param {string} sAppId - ID of the application
+	 * @returns {object} Enhancement settings
+	 */
+	function getEnhancementSettings(oChange, oChangeContent, sAppId) {
+		const sI18n = oChange.getTexts()?.i18n;
+		if (sI18n) {
+			return { bundleName: ApplyUtil.formatBundleName(sAppId, sI18n) };
+		}
+
+		const oEnhancementSettings = Object.assign({}, oChangeContent);
+		oEnhancementSettings.terminologies &&= Object.keys(oEnhancementSettings.terminologies).reduce((oResult, sTerminology) => {
+			oResult[sTerminology] = Object.assign({}, oEnhancementSettings.terminologies[sTerminology]);
+			return oResult;
+		}, {});
+
+		if (hasBundleUrlAndNotBundleName(oEnhancementSettings)) {
+			oEnhancementSettings.bundleName = ApplyUtil.formatBundleName(sAppId, oEnhancementSettings.bundleUrl);
+			delete oEnhancementSettings.bundleUrl;
+		}
+		processTerminologies(oEnhancementSettings, sAppId);
+		delete oEnhancementSettings.modelId;
+		delete oEnhancementSettings.createIfMissing;
+		return oEnhancementSettings;
+	}
+
 	/**
 	 * Descriptor change merger for change type <code>appdescr_ui5_addNewModelEnhanceWith</code>.
-	 * Adds a <code>settings/enhanceWith</code> node of an existing model with a path to an i18n properties file relative to the location of the manifest.
+	 * Adds a <code>settings/enhanceWith</code> node of an existing model with a path to an
+	 * i18n properties file relative to the location of the manifest.
 	 * Only works for referenced models of type <code>sap.ui.model.resource.ResourceModel</code>.
 	 *
 	 * Only available during build time {@link sap.ui.fl.apply._internal.changes.descriptor.RegistrationBuild}.
@@ -68,6 +101,7 @@ sap.ui.define([
 		 * @param {sap.ui.fl.apply._internal.flexObjects.AppDescriptorChange} oChange - Change with type <code>appdescr_ui5_addNewModelEnhanceWith</code>
 		 * @param {object} oChange.content - Details of the change
 		 * @param {string} oChange.content.modelId - ID of existing model, referenced model must have type <code>sap.ui.model.resource.ResourceModel</code>
+		 * @param {boolean} [oChange.content.createIfMissing] - If set to true, the model will be created if it does not exist yet
 		 * @param {string} oChange.texts.i18n - Path to an i18n properties path relative to the location of the change
 		 * @returns {object} Updated manifest with <code>sap.ui5/models</code> entity
 		 *
@@ -77,28 +111,29 @@ sap.ui.define([
 		applyChange(oManifest, oChange) {
 			const oChangeContent = oChange.getContent();
 			const sModelId = oChangeContent.modelId;
-			const oModel = oManifest["sap.ui5"].models[sModelId];
-			if (oModel) {
-				if (oModel.type && oModel.type === "sap.ui.model.resource.ResourceModel") {
-					if (!(oModel.settings && oModel.settings.enhanceWith)) {
-						ObjectPath.set("settings.enhanceWith", [], oModel);
-					}
-					const sAppId = oManifest["sap.app"].id;
-					const sI18n = oChange.getTexts()?.i18n;
-					const oEnhanceWith = oModel.settings.enhanceWith;
-					if (sI18n) {
-						oEnhanceWith.push({ bundleName: ApplyUtil.formatBundleName(sAppId, sI18n) });
-						return oManifest;
-					}
-					if (hasBundleUrlAndNotBundleName(oChangeContent)) {
-						oChangeContent.bundleName = ApplyUtil.formatBundleName(sAppId, oChangeContent.bundleUrl);
-						delete oChangeContent.bundleUrl;
-					}
-					processTerminologies(oChangeContent, sAppId);
-					delete oChangeContent.modelId;
-					if (Object.keys(oChangeContent).length > 0) {
-						oEnhanceWith.push(oChangeContent);
-					}
+			const oModels = oManifest["sap.ui5"].models;
+			const sAppId = oManifest["sap.app"].id;
+			const oEnhancementSettings = getEnhancementSettings(oChange, oChangeContent, sAppId);
+			const oModel = oModels[sModelId];
+
+			if (!oModel) {
+				if (!oChangeContent.createIfMissing) {
+					throw Error(`Model with ID '${sModelId}' does not exist. Set createIfMissing to true to create it.`);
+				}
+				oModels[sModelId] = {
+					type: "sap.ui.model.resource.ResourceModel",
+					settings: oEnhancementSettings
+				};
+				return oManifest;
+			}
+
+			if (oModel.type && oModel.type === "sap.ui.model.resource.ResourceModel") {
+				if (!(oModel.settings && oModel.settings.enhanceWith)) {
+					ObjectPath.set("settings.enhanceWith", [], oModel);
+				}
+				const oEnhanceWith = oModel.settings.enhanceWith;
+				if (!isEmptyObject(oEnhancementSettings)) {
+					oEnhanceWith.push(oEnhancementSettings);
 				}
 			}
 			return oManifest;

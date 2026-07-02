@@ -48,6 +48,11 @@ sap.ui.define(function () {
 					useFakeTimers: true
 				}
 			},
+			"SideNavigationSearchField": {
+				coverage: {
+					only : ["sap/tnt/SideNavigationSearchField"]
+				}
+			},
 			"ToolHeader": {
 				coverage: {
 					only : ["sap/tnt/ToolHeader"]

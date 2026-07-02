@@ -200,6 +200,15 @@ sap.ui.define([
 			showWeekNumbers : {type : "boolean", group : "Appearance", defaultValue : true},
 
 			/**
+			 * Determines whether the header of the week numbers column is displayed.
+			 * The column header text is translated according to the active language.
+			 *
+			 * <b>Note:</b> Takes effect only when <code>showWeekNumbers</code> is set to <code>true</code>.
+			 * @since 1.151
+			 */
+			showWeekNumbersHeader : {type : "boolean", group : "Appearance", defaultValue : false},
+
+			/**
 			 * Determines whether there is a shortcut navigation to Today. When used in Month, Year or
 			 * Year-range picker view, the calendar navigates to Day picker view.
 			 *
@@ -616,6 +625,7 @@ sap.ui.define([
 			}
 			aMonths[i].displayDate(oDisplayDate.toLocalJSDate());
 			aMonths[i].setShowWeekNumbers(this.getShowWeekNumbers());
+			aMonths[i].setShowWeekNumbersHeader(this.getShowWeekNumbersHeader());
 		}
 
 		if (this._getMonthPicker()) {

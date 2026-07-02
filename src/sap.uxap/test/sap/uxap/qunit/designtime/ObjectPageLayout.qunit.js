@@ -498,8 +498,9 @@ sap.ui.define([
 	});
 
 	QUnit.test("Width calculation after rendering inside hidden parent element", async function(assert) {
-		var iWidth,
-			oParentNode = document.getElementById("content");
+		assert.expect(1);
+		var iWidth;
+		var oParentNode = document.getElementById("content");
 
 		//hiding parent element
 		oParentNode.style.display = "none";
@@ -548,8 +549,8 @@ sap.ui.define([
 
 	QUnit.test("getFirstEditableInput method should return readOnly inputs when includeReadOnlyInputs is set to true", function (assert) {
 		//Arrange
-		var oContainer = document.getElementById("content"),
-			oEvent = getFirstEditableInput(oContainer, {includeReadOnly: true}).focus();
+		var oContainer = document.getElementById("content");
+		var oEvent = getFirstEditableInput(oContainer, {includeReadOnly: true}).focus();
 		//Act
 		this.btn.firePress(oEvent);
 
@@ -559,8 +560,8 @@ sap.ui.define([
 
 	QUnit.test("getFirstEditableInput method should not return readOnly inputs without the additional includeReadOnlyInputs parameter", function (assert) {
 		//Arrange
-			var oContainer = document.getElementById("content"),
-				oEvent = getFirstEditableInput(oContainer).focus();
+			var oContainer = document.getElementById("content");
+			var oEvent = getFirstEditableInput(oContainer).focus();
 
 		//Act
 		this.btn.firePress(oEvent);

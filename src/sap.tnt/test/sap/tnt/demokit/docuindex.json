@@ -57,7 +57,8 @@
 					"sap.tnt.sample.SideNavigationActions",
 					"sap.tnt.sample.SideNavigationOverlayMode",
 					"sap.tnt.sample.SideNavigationPressEvent",
-					"sap.tnt.sample.SideNavigationWrapping"
+					"sap.tnt.sample.SideNavigationWrapping",
+					"sap.tnt.sample.SideNavigationSearch"
 				]
 			},
 			{
@@ -137,6 +138,11 @@
 				"id": "sap.tnt.sample.SideNavigationWrapping",
 				"name": "Side Navigation - Wrapping of long texts",
 				"description": "SideNavigation with long texts that wrap."
+			},
+			{
+				"id": "sap.tnt.sample.SideNavigationSearch",
+				"name": "Side Navigation with Search",
+				"description": "SideNavigation with a search field in the filter section and filterable navigation items."
 			},
 			{
 				"id": "sap.tnt.sample.ToolHeader",

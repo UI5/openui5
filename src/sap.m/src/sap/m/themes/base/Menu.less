@@ -215,10 +215,13 @@
 		}
 	}
 
-	.sapMMenuItem.sapMMenuItemSubMenuOpen,
+	.sapMMenuItem.sapMMenuItemSubMenuOpen {
+		background-color: @sapUiListSelectionBackgroundColor;
+	}
+
 	.sapMMenuItem.sapMMenuItemSubMenuOpen:hover,
 	.sapMMenuItem.sapMMenuItemSubMenuOpen:focus {
-		background-color: @sapUiListSelectionBackgroundColor;
+		background-color: @sapUiListHoverSelectionBackground;
 	}
 
 	.sapMMenuItem.sapMMenuItemSubMenuOpen,
@@ -256,11 +259,13 @@
 		padding-inline-start: 0;
 	}
 
-	.sapMMenuItem:focus .sapMMenuItemSubMenu > div:after {
+	.sapMMenuItem:focus .sapMMenuItemSubMenu > div:after,
+	.sapMMenuItem:hover .sapMMenuItemSubMenu > div:after {
 		color: @sapUiContentNonInteractiveIconColor;
 	}
 
-	.sapMMenuItem:focus:active .sapMMenuItemSubMenu > div:after {
+	.sapMMenuItem:focus:active .sapMMenuItemSubMenu > div:after,
+	.sapMMenuItem:hover:active .sapMMenuItemSubMenu > div:after {
 		color: @sapUiListActiveTextColor;
 	}
 

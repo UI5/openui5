@@ -1,0 +1,123 @@
+<mvc:View
+	controllerName="sap.tnt.sample.SideNavigationSearch.C"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:tnt="sap.tnt"
+	height="100%">
+	<tnt:ToolPage id="toolPage">
+		<tnt:header>
+			<tnt:ToolHeader>
+				<Button id="menuToggleButton"
+					icon="sap-icon://menu2"
+					tooltip="Menu"
+					type="Transparent"
+					press=".onMenuTogglePress" />
+				<Image
+					src="./images/SAP_Logo.png"
+					tooltip="SAP logo"
+					decorative="false" />
+				<Title text="Product name" wrapping="false" />
+				<Text text="Second title" wrapping="false" />
+				<ToolbarSpacer />
+				<SearchField width="16rem">
+					<layoutData>
+						<OverflowToolbarLayoutData priority="Low" group="1" />
+					</layoutData>
+				</SearchField>
+				<ToolbarSpacer>
+					<layoutData>
+						<OverflowToolbarLayoutData priority="Low" group="1" />
+					</layoutData>
+				</ToolbarSpacer>
+				<ToolbarSeparator>
+					<layoutData>
+						<OverflowToolbarLayoutData group="2" />
+					</layoutData>
+				</ToolbarSeparator>
+				<OverflowToolbarButton
+					text="Settings"
+					type="Transparent"
+					icon="sap-icon://action-settings" />
+				<Button
+					tooltip="Notifications"
+					type="Transparent"
+					icon="sap-icon://bell">
+					<layoutData>
+						<OverflowToolbarLayoutData priority="NeverOverflow" />
+					</layoutData>
+				</Button>
+			</tnt:ToolHeader>
+		</tnt:header>
+		<tnt:sideContent>
+			<tnt:SideNavigation id="sideNavigation" itemSelect=".onItemSelect">
+				<tnt:filterSection>
+					<tnt:SideNavigationSearchField
+                            id="sideNavigationSearchField"
+							ariaControls="sideNavigation"
+							liveChange=".onLiveChange"
+							search=".onSearch" />
+				</tnt:filterSection>
+				<tnt:item>
+					<tnt:NavigationList id="navigationList"
+						items="{
+							path: '/navigation',
+							factory: '.navigationItemFactory'
+						}" />
+				</tnt:item>
+				<tnt:fixedItem>
+					<tnt:NavigationList
+						items="{/fixedNavigation}">
+						<tnt:NavigationListItem
+							text="{title}"
+							selectable="{selectable}"
+							icon="{icon}"
+							key="{key}"
+							href="{href}"
+							target="{target}"
+							ariaHasPopup="{ariaHasPopup}"
+							design="{design}"
+							press=".onItemPress" />
+					</tnt:NavigationList>
+				</tnt:fixedItem>
+			</tnt:SideNavigation>
+		</tnt:sideContent>
+		<tnt:mainContents>
+			<NavContainer id="navContainer">
+				<pages>
+					<ScrollContainer
+							id="home"
+							horizontal="false"
+							vertical="true"
+							height="100%"
+							class="sapUiContentPadding">
+						<Text text="This is the home page" />
+					</ScrollContainer>
+					<ScrollContainer
+							id="myAccounts"
+							horizontal="false"
+							vertical="true"
+							height="100%"
+							class="sapUiContentPadding">
+						<Text text="This is my accounts page" />
+					</ScrollContainer>
+					<ScrollContainer
+							id="myOrders"
+							horizontal="false"
+							vertical="true"
+							height="100%"
+							class="sapUiContentPadding">
+						<Text text="This is my orders page" />
+					</ScrollContainer>
+					<ScrollContainer
+							id="CustomerManagement"
+							horizontal="false"
+							vertical="true"
+							height="100%"
+							class="sapUiContentPadding">
+                        <Text text="This is customer management page" />
+					</ScrollContainer>
+				</pages>
+			</NavContainer>
+		</tnt:mainContents>
+	</tnt:ToolPage>
+</mvc:View>

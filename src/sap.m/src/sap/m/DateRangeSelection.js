@@ -1112,8 +1112,8 @@ sap.ui.define([
 		function _fireChange(bValid) {
 
 			this.fireChangeEvent(this.getValue(), {
-				from: this.getDateValue(),
-				to: this.getSecondDateValue(),
+				from: bValid ? this.getDateValue() : undefined,
+				to: bValid ? this.getSecondDateValue() : undefined,
 				valid: bValid
 			});
 

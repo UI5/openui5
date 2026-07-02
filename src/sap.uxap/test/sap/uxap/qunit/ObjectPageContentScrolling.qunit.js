@@ -23,7 +23,7 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	//eslint-disable-next-line no-void
 	const makeVoid = (fn) => (...args) => void fn(...args);
 
-	var oFactory = {
+	const oFactory = {
 		getSection: function (iNumber, sTitleLevel, aSubSections) {
 			return new ObjectPageSection({
 				title: "Section" + iNumber,
@@ -56,15 +56,14 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 				text: "Anna Maria Luisa"
 			});
 		}
-	},
+	};
 
-	helpers = {
+	const helpers = {
 		generateObjectPageWithContent: function (oFactory, iNumberOfSection) {
-			var oObjectPage = oFactory.getObjectPage(),
-				oSection,
-				oSubSection;
+			const oObjectPage = oFactory.getObjectPage();
+			let oSection, oSubSection;
 
-			for (var i = 0; i < iNumberOfSection; i++) {
+			for (let i = 0; i < iNumberOfSection; i++) {
 				oSection = oFactory.getSection(i);
 				oSubSection = oFactory.getSubSection(i, oFactory.getBlocks());
 				oSection.addSubSection(oSubSection);
@@ -74,16 +73,16 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 			return oObjectPage;
 		},
 		generateObjectPageWithDynamicBigHeaderContent: function() {
-			var oBigHeaderContent = new Panel({ height: "900px"}),
-				oObjectPage = this.generateObjectPageWithContent(oFactory, 2);
+			const oBigHeaderContent = new Panel({ height: "900px"});
+			const oObjectPage = this.generateObjectPageWithContent(oFactory, 2);
 
 			oObjectPage.setHeaderTitle(oFactory.getDynamicPageTitle());
 			oObjectPage.addHeaderContent(oBigHeaderContent);
 			return oObjectPage;
 		},
 		generateObjectPageWithDynamicHeaderTitle: function() {
-			var oHeaderContent = new Panel({ height: "99.3px"}),
-				oObjectPage = this.generateObjectPageWithContent(oFactory, 5);
+			const oHeaderContent = new Panel({ height: "99.3px"});
+			const oObjectPage = this.generateObjectPageWithContent(oFactory, 5);
 
 			oObjectPage.setHeaderTitle(oFactory.getDynamicPageTitle());
 			oObjectPage.addHeaderContent(oHeaderContent);
@@ -95,13 +94,24 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 			return oSapUiObject;
 		},
 		getSectionAnchor: function(oSection) {
-			var oObjectPage = oSection.getParent(),
-				aResult = oObjectPage._oABHelper._getAnchorBar().getItems().filter(function(oItem) {
+			const oObjectPage = oSection.getParent();
+			const aResult = oObjectPage._oABHelper._getAnchorBar().getItems().filter((oItem) => {
 				return oItem.getKey() === oSection.getId();
 			});
 			return aResult.length && aResult[0];
 		}
 	};
+
+	/**
+	 * Returns a Promise that resolves after the ObjectPageLayout fires onAfterRenderingDOMReady.
+	 * @param {sap.uxap.ObjectPageLayout} oOPL
+	 * @returns {Promise<void>}
+	 */
+	function waitForDOMReady(oOPL) {
+		return new Promise((resolve) => {
+			oOPL.attachEventOnce("onAfterRenderingDOMReady", resolve);
+		});
+	}
 
 	/**
 	 * In some tests that are using fake timers, it might happen that a rendering task is queued by
@@ -128,35 +138,38 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("sectionChange event is fired upon scrolling", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oSection = oObjectPage.getSections()[9],
-			fnDone = assert.async();
+		assert.expect(1);
+		const oObjectPage = this.oObjectPage;
+		const oSection = oObjectPage.getSections()[9];
+		const fnDone = assert.async();
 
-		oObjectPage.attachEventOnce("sectionChange", function(oEvent) {
+		oObjectPage.attachEventOnce("sectionChange", (oEvent) => {
 			assert.equal(oEvent.getParameter("section").getId(), oSection.getId(), "sectionChange event is fired upon scrolling to a specified section");
 			fnDone();
 		});
 
-		// act
+		// Act
 		await helpers.renderObject(oObjectPage);
 		oObjectPage.setSelectedSection(oSection);
 	});
 
 	QUnit.test("sectionChange event is fired with correct parameters", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oSection = oObjectPage.getSections()[9],
-			fnDone = assert.async();
+		assert.expect(1);
+		const oObjectPage = this.oObjectPage;
+		const oSection = oObjectPage.getSections()[9];
+		const fnDone = assert.async();
 
-		this.stub(this.oObjectPage, "_getClosestScrolledSectionBaseId").callsFake(function(oSection) {
+		this.stub(this.oObjectPage, "_getClosestScrolledSectionBaseId").callsFake(() => {
 			return oObjectPage.getSections()[9].getSubSections()[0].getId(); // return a subSection of the scrolled section
 		});
 
-		oObjectPage.attachSectionChange(function(oEvent) {
+		oObjectPage.attachSectionChange((oEvent) => {
+			// Assert
 			assert.equal(oEvent.getParameter("section").getId(), oSection.getId(), "correct section parameter");
 			fnDone();
 		});
 
-		// act
+		// Act
 		await helpers.renderObject(oObjectPage);
 		oObjectPage.setSelectedSection(oSection);
 	});
@@ -172,9 +185,9 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("correct scroll position of section with hidden title", async function(assert) {
-		var oObjectPage = this.oObjectPage,
-			oFirstSection = oObjectPage.getSections()[0],
-			done = assert.async();
+		assert.expect(1);
+		const oObjectPage = this.oObjectPage;
+		const oFirstSection = oObjectPage.getSections()[0];
 
 		oObjectPage.addEventDelegate({
 			onBeforeRendering:function(){
@@ -183,25 +196,24 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 			}
 		});
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function(){
-			//act
-			var iPosTop = oObjectPage._computeScrollPosition(oFirstSection),
-			iOffsetTop = oFirstSection.getDomRef().offsetTop;
-
-			assert.strictEqual(iPosTop ,iOffsetTop ,"corrected scroll position");
-			done();
-		});
-
 		await helpers.renderObject(oObjectPage);
+		await waitForDOMReady(oObjectPage);
+
+		// Act
+		const iPosTop = oObjectPage._computeScrollPosition(oFirstSection);
+		const iOffsetTop = oFirstSection.getDomRef().offsetTop;
+
+		// Assert
+		assert.strictEqual(iPosTop ,iOffsetTop ,"corrected scroll position");
 	});
 
 	QUnit.test("_restoreScrollPosition restores position within subSection", function (assert) {
-		// Mock data values
-		var oSelectedSection = this.oObjectPage.getSections()[1],
-			oStoredSubSection = oSelectedSection.getSubSections()[0],
-			storedSubSectionPositionTop = 200,
-			iOffsetWithinStoredSubSection = 20,
-			oScrollSpy = this.spy(this.oObjectPage, "_scrollTo");
+		// Arrange
+		const oSelectedSection = this.oObjectPage.getSections()[1];
+		const oStoredSubSection = oSelectedSection.getSubSections()[0];
+		const storedSubSectionPositionTop = 200;
+		const iOffsetWithinStoredSubSection = 20;
+		const oScrollSpy = this.spy(this.oObjectPage, "_scrollTo");
 
 
 		// Setup: Select section
@@ -210,43 +222,44 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 		this.oObjectPage._oStoredScrolledSubSectionInfo.sSubSectionId = oStoredSubSection.getId();
 		this.oObjectPage._oStoredScrolledSubSectionInfo.iOffset = iOffsetWithinStoredSubSection;
 		// Setup: Mock the position of the stored subSection
-		this.stub(this.oObjectPage, "_computeScrollPosition").callsFake(function(oSection) {
+		this.stub(this.oObjectPage, "_computeScrollPosition").callsFake(() => {
 			return storedSubSectionPositionTop; // mock a specific scroll position of a section
 		});
 		// Setup: Mock the validity of the stored subSection
 		this.stub(this.oObjectPage, "_sectionCanBeRenderedByUXRules").returns(true);
 
-		// act
+		// Act
 		this.oObjectPage._restoreScrollPosition();
 
-		// check
+		// Assert
 		assert.ok(oScrollSpy.calledWithMatch(storedSubSectionPositionTop + iOffsetWithinStoredSubSection),
 			"correct scroll position is restored");
 	});
 
-	QUnit.test("_isClosestScrolledSection indentifies subSections ",function(assert) {
-		var oObjectPage = this.oObjectPage,
-			oFirstSection = oObjectPage.getSections()[0],
-			oFirstSubSection = oFirstSection.getSubSections()[0];
+	QUnit.test("_isClosestScrolledSection identifies subSections", function(assert) {
+		// Arrange
+		const oObjectPage = this.oObjectPage;
+		const oFirstSection = oObjectPage.getSections()[0];
+		const oFirstSubSection = oFirstSection.getSubSections()[0];
 
 		this.stub(oObjectPage, "_getClosestScrolledSectionBaseId").returns(oFirstSubSection.getId());
 
-		assert.ok(oObjectPage._isClosestScrolledSection(oFirstSection.getId()), "itentified current section");
+		// Assert
+		assert.ok(oObjectPage._isClosestScrolledSection(oFirstSection.getId()), "identified current section");
 	});
 
 	QUnit.test("selectedSection value correct after resize content in scroll overflow", async function(assert) {
-		var oObjectPage = this.oObjectPage,
-			oFirstSection = oObjectPage.getSections()[0],
-			oFirstSubSection = oFirstSection.getSubSections()[0],
-			sSelectedSectionId = oObjectPage.getSections()[3].getId(),
-			item1 = new Button({text: "content", visible: false}),
-			item2 = new Button({text: "content", visible: false}),
-			item3 = new Button({text: "content", visible: false}),
-			item4 = new Button({text: "content", visible: false}),
-			item5 = new Button({text: "content", visible: false}),
-			iScrollTopBeforeChange,
-			iExpectedScrollTopAfterChange,
-			done = assert.async();
+		assert.expect(Device.browser.safari ? 1 : 2);
+		const oObjectPage = this.oObjectPage;
+		const oFirstSection = oObjectPage.getSections()[0];
+		const oFirstSubSection = oFirstSection.getSubSections()[0];
+		const sSelectedSectionId = oObjectPage.getSections()[3].getId();
+		const item1 = new Button({text: "content", visible: false});
+		const item2 = new Button({text: "content", visible: false});
+		const item3 = new Button({text: "content", visible: false});
+		const item4 = new Button({text: "content", visible: false});
+		const item5 = new Button({text: "content", visible: false});
+		let iExpectedScrollTopAfterChange;
 
 			oFirstSubSection.addBlock(new VBox({
 				items: [item1, item2, item3 , item4, item5]
@@ -255,66 +268,61 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 		// Setup: select a section lower than the first
 		oObjectPage.setSelectedSection(sSelectedSectionId);
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", makeVoid(async function(){
-			iScrollTopBeforeChange = oObjectPage._$opWrapper.scrollTop();
-
-			//Act: change the height of the content inside the scroll overflow
-			//(i.e. the content above above the current scroll position)
-			item1.setVisible(true);
-			item2.setVisible(true);
-			item3.setVisible(true);
-			await nextUIUpdate();
-
-			// Simulate the expected scroll event from the browser, due to overflow anchoring
-			// (expected from all supported browsers except Safari which does not support overflow anchoring => does not fire scroll event)
-			if (!Device.browser.safari) {
-				iExpectedScrollTopAfterChange = iScrollTopBeforeChange + (5 * item1.getDomRef().offsetHeight);
-				// synchronously call the result of the expected scroll event
-				// the browser fires that scroll event because the position of the selected section changed
-				oObjectPage._updateSelectionOnScroll(iExpectedScrollTopAfterChange);
-				// the page internally sets a wrong selected section
-				// because we do not yet update the cached positions of the sections
-				assert.notEqual(oObjectPage.getSelectedSection() , sSelectedSectionId, "selected section has changed");
-
-				// act: request the page to update the positions of the sections and check its current selected section
-				oObjectPage.triggerPendingLayoutUpdates();
-			}
-
-			assert.strictEqual(oObjectPage.getSelectedSection() , sSelectedSectionId, "selected section is correct");
-			done();
-		}));
-
 		await helpers.renderObject(oObjectPage);
+		await waitForDOMReady(oObjectPage);
+
+		const iScrollTopBeforeChange = oObjectPage._$opWrapper.scrollTop();
+
+		//Act: change the height of the content inside the scroll overflow
+		//(i.e. the content above above the current scroll position)
+		item1.setVisible(true);
+		item2.setVisible(true);
+		item3.setVisible(true);
+		await nextUIUpdate();
+
+		// Simulate the expected scroll event from the browser, due to overflow anchoring
+		// (expected from all supported browsers except Safari which does not support overflow anchoring => does not fire scroll event)
+		if (!Device.browser.safari) {
+			iExpectedScrollTopAfterChange = iScrollTopBeforeChange + (5 * item1.getDomRef().offsetHeight);
+			// synchronously call the result of the expected scroll event
+			// the browser fires that scroll event because the position of the selected section changed
+			oObjectPage._updateSelectionOnScroll(iExpectedScrollTopAfterChange);
+			// the page internally sets a wrong selected section
+			// because we do not yet update the cached positions of the sections
+			assert.notEqual(oObjectPage.getSelectedSection() , sSelectedSectionId, "selected section has changed");
+
+			// act: request the page to update the positions of the sections and check its current selected section
+			oObjectPage.triggerPendingLayoutUpdates();
+		}
+
+		assert.strictEqual(oObjectPage.getSelectedSection() , sSelectedSectionId, "selected section is correct");
 	});
 
 	QUnit.test("triggerPendingLayoutUpdates is called on before rendering", async function(assert) {
-		var oObjectPage = this.oObjectPage,
-			sSelectedSectionId = oObjectPage.getSections()[1].getId(),
-			iScrollTop,
-			oSpy = this.spy(oObjectPage, "triggerPendingLayoutUpdates"),
-			done = assert.async();
+		assert.expect(2);
+		const oObjectPage = this.oObjectPage;
+		const sSelectedSectionId = oObjectPage.getSections()[1].getId();
+		const oSpy = this.spy(oObjectPage, "triggerPendingLayoutUpdates");
 
 		// Setup: select a section lower than the first
 		oObjectPage.setSelectedSection(sSelectedSectionId);
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function(){
-			iScrollTop = oObjectPage._$opWrapper.scrollTop();
-			oSpy.reset();
-
-			// synchronously call the result of a scroll event that
-			// the browser fires when the position of the selected section changed
-			oObjectPage._updateSelectionOnScroll(iScrollTop + oObjectPage.getSections().length * 100);
-			// the page internally sets a wrong selected section
-			// because on scroll we do not yet update the cached positions of the sections
-			assert.notEqual(oObjectPage.getSelectedSection() , sSelectedSectionId, "selected section has changed");
-
-			// act: trigger rerendering while an incorrect selected section is set
-			oObjectPage.onBeforeRendering();
-			assert.strictEqual(oSpy.callCount, 1, "selected section is updated");
-			done();
-		});
-
 		await helpers.renderObject(oObjectPage);
+		await waitForDOMReady(oObjectPage);
+
+		const iScrollTop = oObjectPage._$opWrapper.scrollTop();
+		oSpy.reset();
+
+		// synchronously call the result of a scroll event that
+		// the browser fires when the position of the selected section changed
+		oObjectPage._updateSelectionOnScroll(iScrollTop + oObjectPage.getSections().length * 100);
+		// the page internally sets a wrong selected section
+		// because on scroll we do not yet update the cached positions of the sections
+		assert.notEqual(oObjectPage.getSelectedSection() , sSelectedSectionId, "selected section has changed");
+
+		// act: trigger rerendering while an incorrect selected section is set
+		oObjectPage.onBeforeRendering();
+		assert.strictEqual(oSpy.callCount, 1, "selected section is updated");
 	});
 
 	QUnit.module("Scroll to snap", {
@@ -328,81 +336,70 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("spacer sufficient to snap with scroll", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oWrapperDom,
-			iMaxScrollHeight,
-			done = assert.async();
+		assert.expect(1);
+		const oObjectPage = this.oObjectPage;
 
 		oObjectPage.setHeight("999.1px");
 		oObjectPage.setUseIconTabBar(true);
 		oObjectPage.addHeaderContent(new Panel({height: "50.2px"}));
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			// act
-			oObjectPage._snapHeader(true /*keep header in content area */);
-				oWrapperDom = oObjectPage._$opWrapper.get(0);
-				iMaxScrollHeight = oWrapperDom.scrollHeight - oWrapperDom.clientHeight;
-
-			assert.ok(iMaxScrollHeight >= oObjectPage._getSnapPosition(), "enough space to allow scroll");
-			done();
-		});
-
 		await helpers.renderObject(oObjectPage);
+		await waitForDOMReady(oObjectPage);
+
+		// Act
+		oObjectPage._snapHeader(true /*keep header in content area */);
+		const oWrapperDom = oObjectPage._$opWrapper.get(0);
+		const iMaxScrollHeight = oWrapperDom.scrollHeight - oWrapperDom.clientHeight;
+
+		// Assert
+		assert.ok(iMaxScrollHeight >= oObjectPage._getSnapPosition(), "enough space to allow scroll");
 	});
 
 	QUnit.test("no cut-off snap/pin buttons", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			iSnapPosition,
-			iScrollTop,
-			iButtonOffsetTop,
-			oHeader,
-			done = assert.async();
+		assert.expect(3);
+		const oObjectPage = this.oObjectPage;
 
 		oObjectPage.setHeaderTitle(oFactory.getDynamicPageTitle());
 
 		oObjectPage.addHeaderContent(new Panel({height: "50.2px"}));
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			iSnapPosition = oObjectPage._getSnapPosition().toString();
-			oHeader = oObjectPage._getHeaderContent();
-
-			// assert initial setup (in the context of which the final check is valid)
-			assert.notEqual(getComputedStyle( oHeader.getDomRef()).position, "static", "the header is css-positioned");
-			assert.notEqual(getComputedStyle( oObjectPage._$opWrapper.get(0)).position, "static", "the scroll-container is css-positioned");
-
-			// Act:
-			// scroll just before snap
-			// so that only the bottom-most area of the headerContent is visible
-			oObjectPage._scrollTo(iSnapPosition - 5);
-
-			// Check:
-			// obtain the amount of top pixels that are in the overflow (i.e. pixels that are scrolled out of view)
-			iScrollTop = oObjectPage._$opWrapper.scrollTop();
-			// obtain the distance of the expand button from the top of the scrollable content
-			iButtonOffsetTop = oHeader._getCollapseButton().getDomRef().offsetTop + oHeader.getDomRef().offsetTop;
-			assert.ok(iButtonOffsetTop >= iScrollTop, "snap button is not in the overflow");
-			done();
-		});
-
 		await helpers.renderObject(oObjectPage);
+		await waitForDOMReady(oObjectPage);
+
+		const iSnapPosition = oObjectPage._getSnapPosition().toString();
+		const oHeader = oObjectPage._getHeaderContent();
+
+		// Assert initial setup (in the context of which the final check is valid)
+		assert.notEqual(getComputedStyle( oHeader.getDomRef()).position, "static", "the header is css-positioned");
+		assert.notEqual(getComputedStyle( oObjectPage._$opWrapper.get(0)).position, "static", "the scroll-container is css-positioned");
+
+		// Act:
+		// scroll just before snap
+		// so that only the bottom-most area of the headerContent is visible
+		oObjectPage._scrollTo(iSnapPosition - 5);
+
+		// Check:
+		// obtain the amount of top pixels that are in the overflow (i.e. pixels that are scrolled out of view)
+		const iScrollTop = oObjectPage._$opWrapper.scrollTop();
+		// obtain the distance of the expand button from the top of the scrollable content
+		const iButtonOffsetTop = oHeader._getCollapseButton().getDomRef().offsetTop + oHeader.getDomRef().offsetTop;
+		assert.ok(iButtonOffsetTop >= iScrollTop, "snap button is not in the overflow");
 	});
 
 	QUnit.module("Expand header");
 
 	QUnit.test("Header expand works, when scrolled header has height with fraction value", async function(assert) {
 		// Arrange
-		var oObjectPage = helpers.generateObjectPageWithDynamicHeaderTitle(),
-			aSections = oObjectPage.getSections(),
-			oLastSection = aSections[aSections.length - 1],
-			oExpandButton,
-			iLastSectionScrollTop;
+		const oObjectPage = helpers.generateObjectPageWithDynamicHeaderTitle();
+		const aSections = oObjectPage.getSections();
+		const oLastSection = aSections[aSections.length - 1];
 
 		assert.expect(2);
 
 		await helpers.renderObject(oObjectPage);
 
 		oObjectPage.scrollToSection(oLastSection.getId(), 0);
-		iLastSectionScrollTop = oObjectPage._computeScrollPosition(oLastSection);
+		const iLastSectionScrollTop = oObjectPage._computeScrollPosition(oLastSection);
 		oObjectPage._onScroll({target: {scrollTop: iLastSectionScrollTop}});
 		await nextUIUpdate();
 
@@ -416,7 +413,7 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 		assert.strictEqual(oObjectPage._bHeaderExpanded, false, "Header is snapped after scroll");
 
 		// Act
-		oExpandButton = oObjectPage.getHeaderTitle()._getExpandButton();
+		const oExpandButton = oObjectPage.getHeaderTitle()._getExpandButton();
 		oExpandButton.firePress();
 		await nextUIUpdate();
 
@@ -426,12 +423,10 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 
 	QUnit.test("Header expanded in title-area remains expanded upon switching tabs", async function(assert) {
 		// Arrange
-		var oObjectPage = helpers.generateObjectPageWithDynamicHeaderTitle(),
-			aSections = oObjectPage.getSections(),
-			oFirstSection = aSections[0],
-			oSecondSection = aSections[1],
-			oExpandButton,
-			done = assert.async();
+		const oObjectPage = helpers.generateObjectPageWithDynamicHeaderTitle();
+		const aSections = oObjectPage.getSections();
+		const oFirstSection = aSections[0];
+		const oSecondSection = aSections[1];
 
 		oSecondSection.addSubSection(oFactory.getSubSection(1, oFactory.getBlocks()));
 		oObjectPage.setUseIconTabBar(true);
@@ -440,41 +435,37 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 
 		oObjectPage.placeAt('qunit-fixture');
 		await nextUIUpdate();
+		await waitForDOMReady(oObjectPage);
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
+		// step 1 of setup: Scroll to a non-first section to snap the header
+		oObjectPage.scrollToSection(oSecondSection.getSubSections()[1].getId(), 0);
+		// call the scroll handler synchronously to save a timeout
+		oObjectPage._onScroll({target: {scrollTop: oObjectPage._computeScrollPosition(oSecondSection.getSubSections()[1])}});
+		// Assert precondition
+		assert.strictEqual(oObjectPage._bHeaderExpanded, false, "Header is snapped after scroll");
 
-			// step 1 of setup: Scroll to a non-first section to snap the header
-			oObjectPage.scrollToSection(oSecondSection.getSubSections()[1].getId(), 0);
-			// call the scroll handler synchronously to save a timeout
-			oObjectPage._onScroll({target: {scrollTop: oObjectPage._computeScrollPosition(oSecondSection.getSubSections()[1])}});
-			// Assert precondition
-			assert.strictEqual(oObjectPage._bHeaderExpanded, false, "Header is snapped after scroll");
+		// step 2 of setup: Expand the header by pressing the expand button
+		const oExpandButton = oObjectPage.getHeaderTitle()._getExpandButton();
+		oExpandButton.firePress();
+		// Assert precondition
+		assert.strictEqual(oObjectPage._bHeaderExpanded, true, "Header is expanded after pressing expand button");
 
-			// step 2 of setup: Expand the header by pressing the expand button
-			oExpandButton = oObjectPage.getHeaderTitle()._getExpandButton();
-			oExpandButton.firePress();
-			// Assert precondition
-			assert.strictEqual(oObjectPage._bHeaderExpanded, true, "Header is expanded after pressing expand button");
+		// step 3 of setup: Select a new tab
+		oObjectPage.scrollToSection(oFirstSection.getId(), 0);
+		// call the scroll handler synchronously to save a timeout
+		oObjectPage._onScroll({target: {scrollTop: oObjectPage._computeScrollPosition(oFirstSection)}});
 
-			// step 3 of setup: Select a new tab
-			oObjectPage.scrollToSection(oFirstSection.getId(), 0);
-			// call the scroll handler synchronously to save a timeout
-			oObjectPage._onScroll({target: {scrollTop: oObjectPage._computeScrollPosition(oFirstSection)}});
-
-			// Check
-			assert.strictEqual(oObjectPage._bHeaderExpanded, true, "Header remains expanded");
-			done();
-		});
+		// Check
+		assert.strictEqual(oObjectPage._bHeaderExpanded, true, "Header remains expanded");
 	});
 
 	QUnit.test("Scroll position is preserved upon switching tabs when header is expanded", async function(assert) {
 		// Arrange
-		var oObjectPage = helpers.generateObjectPageWithDynamicHeaderTitle(),
-			aSections = oObjectPage.getSections(),
-			iScrollPosition = 30,
-			oFirstSection = aSections[0],
-			oSecondSection = aSections[1],
-			done = assert.async();
+		const oObjectPage = helpers.generateObjectPageWithDynamicHeaderTitle();
+		const aSections = oObjectPage.getSections();
+		const iScrollPosition = 30;
+		const oFirstSection = aSections[0];
+		const oSecondSection = aSections[1];
 
 		oFirstSection.addSubSection(oFactory.getSubSection(1, new Panel({height: "1000px"})));
 		oSecondSection.addSubSection(oFactory.getSubSection(1, new Panel({height: "1000px"})));
@@ -484,28 +475,22 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 
 		oObjectPage.placeAt('qunit-fixture');
 		await nextUIUpdate();
+		await waitForDOMReady(oObjectPage);
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-
-			// scroll down without snapping the header
-			oObjectPage._scrollTo(iScrollPosition, 0);
-			// click on another tab
-			oObjectPage._oABHelper._getAnchorBar().setSelectedItem(oObjectPage._oABHelper._getAnchorBar().getItems()[1]);
-			// Check
-			assert.strictEqual(oObjectPage._bHeaderExpanded, true, "Header remains expanded");
-			assert.strictEqual(iScrollPosition, oObjectPage._$opWrapper.scrollTop(), "Scroll position is preserved");
-			done();
-		});
+		// scroll down without snapping the header
+		oObjectPage._scrollTo(iScrollPosition, 0);
+		// click on another tab
+		oObjectPage._oABHelper._getAnchorBar().setSelectedItem(oObjectPage._oABHelper._getAnchorBar().getItems()[1]);
+		// Check
+		assert.strictEqual(oObjectPage._bHeaderExpanded, true, "Header remains expanded");
+		assert.strictEqual(iScrollPosition, oObjectPage._$opWrapper.scrollTop(), "Scroll position is preserved");
 	});
 
 	QUnit.test("Scrolls to correct position when header is expanded", async function(assert) {
 		// Arrange
-		var oObjectPage = helpers.generateObjectPageWithDynamicHeaderTitle(),
-			aSections = oObjectPage.getSections(),
-			oSection = aSections[1],
-			oExpandButton,
-			iExpectedScrollTop,
-			iActualScrollTop;
+		const oObjectPage = helpers.generateObjectPageWithDynamicHeaderTitle();
+		const aSections = oObjectPage.getSections();
+		const oSection = aSections[1];
 
 		assert.expect(1);
 
@@ -513,7 +498,7 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 		await helpers.renderObject(oObjectPage);
 
 		// Act - expand header and scroll to target section
-		oExpandButton = oObjectPage.getHeaderTitle()._getExpandButton();
+		const oExpandButton = oObjectPage.getHeaderTitle()._getExpandButton();
 		oExpandButton.firePress();
 		await nextUIUpdate();
 
@@ -523,10 +508,10 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 		}
 
 		oObjectPage.scrollToSection(oSection.getId(), 0);
-		iExpectedScrollTop = oObjectPage._computeScrollPosition(oSection);
+		const iExpectedScrollTop = oObjectPage._computeScrollPosition(oSection);
 		oObjectPage._onScroll({target: {scrollTop: iExpectedScrollTop}});
 		await nextUIUpdate();
-		iActualScrollTop = oObjectPage._$opWrapper.scrollTop();
+		const iActualScrollTop = oObjectPage._$opWrapper.scrollTop();
 
 		// Assert
 		assert.strictEqual(Math.round(iActualScrollTop), Math.round(iExpectedScrollTop), "Scroll position is correct for the target section");
@@ -534,64 +519,58 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 
 	QUnit.module("ObjectPage Content scrolling with snap", {
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "UxAP-ObjectPageContentScrollingWithSnap",
 				viewName: "view.UxAP-ObjectPageContentScrollingWithSnap"
-			}).then(async function(oView) {
+			}).then(async (oView) => {
 				this.oObjectPageContentScrollingView = oView;
 				this.oObjectPageContentScrollingView.placeAt('qunit-fixture');
 				await nextUIUpdate();
 				done();
-			}.bind(this));
+			});
 		},
 		afterEach: function () {
 			this.oObjectPageContentScrollingView.destroy();
 		}
 	});
 
-	QUnit.test("Scroll position preserved when header is snapped (integration test)", function (assert) {
-		var fnDone = assert.async(),
-			iScrollPosition,
-			iScrollPositionAfterSnap,
-			iSnapThreshold;
-
+	QUnit.test("Scroll position preserved when header is snapped (integration test)", async function (assert) {
+		assert.expect(2);
 		this.oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
-		this.oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
+		await waitForDOMReady(this.oObjectPage);
 
-			iSnapThreshold = this.oObjectPage._getSnapPosition();
-			// Scroll to a position that will trigger header snap
-			// and is close to the threshold where scroll preservation issue occurs
-			iScrollPosition = iSnapThreshold + 10;
+		const iSnapThreshold = this.oObjectPage._getSnapPosition();
+		// Scroll to a position that will trigger header snap
+		// and is close to the threshold where scroll preservation issue occurs
+		const iScrollPosition = iSnapThreshold + 10;
 
-			// Act - scroll to trigger header snap
-			this.oObjectPage._scrollTo(iScrollPosition, 0);
+		// Act - scroll to trigger header snap
+		this.oObjectPage._scrollTo(iScrollPosition, 0);
 
-			// simulate scroll event fired immediately after the scrollTo call
-			// this synchronously triggers _moveAnchorBarToTitleArea and the snap logic
-			this.oObjectPage._onScroll({target: {scrollTop: iScrollPosition}});
+		// simulate scroll event fired immediately after the scrollTo call
+		// this synchronously triggers _moveAnchorBarToTitleArea and the snap logic
+		this.oObjectPage._onScroll({target: {scrollTop: iScrollPosition}});
 
-			// Assert immediately - the snap operation is synchronous
-			iScrollPositionAfterSnap = this.oObjectPage._$opWrapper.scrollTop();
-			assert.ok(this.oObjectPage._bStickyAnchorBar, "header is snapped");
-			assert.strictEqual(Math.round(iScrollPositionAfterSnap), Math.round(iScrollPosition),
-				"scroll position is preserved (not adjusted due to anchorBar removal)");
-			fnDone();
-		}.bind(this));
+		// Assert immediately - the snap operation is synchronous
+		const iScrollPositionAfterSnap = this.oObjectPage._$opWrapper.scrollTop();
+		assert.ok(this.oObjectPage._bStickyAnchorBar, "header is snapped");
+		assert.strictEqual(Math.round(iScrollPositionAfterSnap), Math.round(iScrollPosition),
+			"scroll position is preserved (not adjusted due to anchorBar removal)");
 	});
 
 	QUnit.module("ObjectPage Content scrolling", {
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "UxAP-objectPageContentScrolling",
 				viewName: "view.UxAP-ObjectPageContentScrolling"
-			}).then(async function(oView) {
+			}).then(async (oView) => {
 				this.oObjectPageContentScrollingView = oView;
 				this.oObjectPageContentScrollingView.placeAt('qunit-fixture');
 				await nextUIUpdate();
 				done();
-			}.bind(this));
+			});
 		},
 		afterEach: function () {
 			this.oObjectPageContentScrollingView.destroy();
@@ -599,13 +578,13 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("Should validate each section's position after scrolling to it, considering UI rules", function (assert) {
-		var clock = sinon.useFakeTimers();
+		const clock = sinon.useFakeTimers();
 
 		clock.tick(500);
 
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
 
-		for (var section in oObjectPage._oSectionInfo) {
+		for (const section in oObjectPage._oSectionInfo) {
 			if (!oObjectPage._oSectionInfo.hasOwnProperty(section)) {
 				continue;
 			}
@@ -615,7 +594,7 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 			clock.tick(500);
 
 			//Handle UI Rules special cases
-			var iExpectedPosition;
+			let iExpectedPosition;
 			switch (section) {
 				case "UxAP-objectPageContentScrolling--firstSection":
 					iExpectedPosition =  0;
@@ -642,44 +621,40 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 		clock.restore();
 	});
 
-	QUnit.test("Slow CPU case", function (assert) {
+	QUnit.test("Slow CPU case", async function (assert) {
 
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			sTargetSectionId = "UxAP-objectPageContentScrolling--secondSection",
-			iTargetPosition,
-			done = assert.async();
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const sTargetSectionId = "UxAP-objectPageContentScrolling--secondSection";
 
 		assert.expect(2);
 
-		// intercept
+		await waitForDOMReady(oObjectPage);
+
+		oObjectPage._requestAdjustLayout(true);
+		const iTargetPosition = oObjectPage._oSectionInfo["UxAP-objectPageContentScrolling--subsection2-1"].positionTop;
+
+		// intercept — must be set up after iTargetPosition is known
 		oObjectPage._moveAnchorBarToTitleArea = function () {
 			ObjectPageLayout.prototype._moveAnchorBarToTitleArea.apply(oObjectPage, arguments);
 			assert.ok(oObjectPage._$opWrapper.scrollTop() < iTargetPosition, "header is snapped before reaching the target position");
 		};
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			oObjectPage._requestAdjustLayout(true);
-			iTargetPosition =  oObjectPage._oSectionInfo["UxAP-objectPageContentScrolling--subsection2-1"].positionTop;
+		oObjectPage.scrollToSection(sTargetSectionId);
 
-			oObjectPage.scrollToSection(sTargetSectionId);
+		oObjectPage._$opWrapper.scrollTop(iTargetPosition);
+		oObjectPage._onScroll({target: {scrollTop: iTargetPosition}});
 
-			oObjectPage._$opWrapper.scrollTop(iTargetPosition);
-			oObjectPage._onScroll({target: {scrollTop: iTargetPosition}});
-
-			assert.ok(oObjectPage._bStickyAnchorBar, "header is snapped");
-
-			done();
-		});
+		assert.ok(oObjectPage._bStickyAnchorBar, "header is snapped");
 
 	});
 
 	QUnit.test("Failure to scroll resumes lazy loading", function (assert) {
 
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			oTargetSection = oObjectPage.getSections()[2],
-			sTargetSectionId = oTargetSection.getId(),
-			oSuppressSpy,
-			done = assert.async();
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const oTargetSection = oObjectPage.getSections()[2];
+		const sTargetSectionId = oTargetSection.getId();
+		const done = assert.async();
+		let oSuppressSpy;
 
 		//Setup
 		oObjectPage.setEnableLazyLoading(true);
@@ -705,14 +680,14 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("Rerendering the page preserves the scroll position", function (assert) {
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			oSecondSection = this.oObjectPageContentScrollingView.byId("secondSection"),
-			oStoreSpy = this.spy(oObjectPage, "_storeScrollLocation"),
-			oRestoreSpy = this.spy(oObjectPage, "_restoreScrollPosition"),
-			oScrollSpy = this.spy(oObjectPage, "_scrollTo"),
-			iScrollPositionBeforeRerender,
-			iExpectedScrollPositionAfterRerender,
-			done = assert.async();
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const oSecondSection = this.oObjectPageContentScrollingView.byId("secondSection");
+		const oStoreSpy = this.spy(oObjectPage, "_storeScrollLocation");
+		const oRestoreSpy = this.spy(oObjectPage, "_restoreScrollPosition");
+		const oScrollSpy = this.spy(oObjectPage, "_scrollTo");
+		const done = assert.async();
+		let iScrollPositionBeforeRerender;
+		let iExpectedScrollPositionAfterRerender;
 
 		oObjectPage.setSelectedSection(oSecondSection.getId());
 
@@ -738,12 +713,12 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 
 	QUnit.test("Scroll position is preserved upon insertion of another section", function (assert) {
 
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			oFirstSection = oObjectPage.getSections()[0],
-			oSecondSection = oObjectPage.getSections()[1],
-			oScrollSpy = this.spy(oObjectPage, "_scrollTo"),
-			iExpectedScrollTopAfterRendering,
-			done = assert.async();
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const oFirstSection = oObjectPage.getSections()[0];
+		const oSecondSection = oObjectPage.getSections()[1];
+		const oScrollSpy = this.spy(oObjectPage, "_scrollTo");
+		const done = assert.async();
+		let iExpectedScrollTopAfterRendering;
 
 		// setup: hide the first visible section so that the next visible is selected
 		oFirstSection.setVisible(false);
@@ -762,11 +737,11 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("ScrollToSection in 0 time scrolls to correct the scroll position", function (assert) {
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			iScrollPosition,
-			iExpectedPosition,
-			sTargetSectionId = "UxAP-objectPageContentScrolling--secondSection",
-			done = assert.async();
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const sTargetSectionId = "UxAP-objectPageContentScrolling--secondSection";
+		const done = assert.async();
+		let iScrollPosition;
+		let iExpectedPosition;
 
 		setTimeout(function() {
 			oObjectPage.scrollToSection(sTargetSectionId, 0);
@@ -780,12 +755,12 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("Deleting the above section preserves the selected section position", function (assert) {
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			oFirstSection = this.oObjectPageContentScrollingView.byId("firstSection"),
-			oThirdSection = this.oObjectPageContentScrollingView.byId("thirdSection"),
-			iScrollPositionAfterRemove,
-			iExpectedPositionAfterRemove,
-			done = assert.async();
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const oFirstSection = this.oObjectPageContentScrollingView.byId("firstSection");
+		const oThirdSection = this.oObjectPageContentScrollingView.byId("thirdSection");
+		const done = assert.async();
+		let iScrollPositionAfterRemove;
+		let iExpectedPositionAfterRemove;
 
 		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
 			oObjectPage.setSelectedSection(oThirdSection.getId());
@@ -803,12 +778,12 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("Deleting the below section preserves the scroll position", function (assert) {
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			oSecondSection = this.oObjectPageContentScrollingView.byId("secondSection"),
-			oThirdSection = this.oObjectPageContentScrollingView.byId("thirdSection"),
-			iScrollPositionBeforeRemove,
-			iScrollPositionAfterRemove,
-			done = assert.async();
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const oSecondSection = this.oObjectPageContentScrollingView.byId("secondSection");
+		const oThirdSection = this.oObjectPageContentScrollingView.byId("thirdSection");
+		const done = assert.async();
+		let iScrollPositionBeforeRemove;
+		let iScrollPositionAfterRemove;
 
 		oObjectPage.setSelectedSection(oSecondSection.getId());
 
@@ -825,8 +800,8 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("Should keep ObjectPageHeader in \"Expanded\" mode on initial load", function (assert) {
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			done = assert.async();
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const done = assert.async();
 
 		setTimeout(function() {
 			assert.ok(!isObjectPageHeaderStickied(oObjectPage), "ObjectHeader is in \"Expanded\" mode");
@@ -836,8 +811,8 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("Should change ObjectPageHeader in \"Stickied\" mode after scrolling to a lower section", function (assert) {
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			done = assert.async();
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const done = assert.async();
 
 		setTimeout(function(){
 			//Act
@@ -851,8 +826,8 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("Should keep ObjectPageHeader in \"Stickied\" mode when scrolling", function (assert) {
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			done = assert.async();
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const done = assert.async();
 
 		setTimeout(function(){
 			//Act
@@ -871,20 +846,20 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 
 	QUnit.test("Should keep the AnchorBar scrolled to the selected Section when title is snapped", async function(assert) {
 		// Arrange
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			oObjectPageSection = new ObjectPageSection({
-				subSections: [
-				new ObjectPageSubSection({
-					blocks: [new GenericDiv({height: "1500px"})]
-				}),
-				new ObjectPageSubSection({
-					blocks: [new GenericDiv({height: "200px"})]
-				})
-			]
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const oObjectPageSection = new ObjectPageSection({
+			subSections: [
+			new ObjectPageSubSection({
+				blocks: [new GenericDiv({height: "1500px"})]
 			}),
-			sSectionId = oObjectPageSection.getId(),
-			oAnchorBar = oObjectPage._oABHelper._getAnchorBar(),
-			done = assert.async();
+			new ObjectPageSubSection({
+				blocks: [new GenericDiv({height: "200px"})]
+			})
+		]
+		});
+		const sSectionId = oObjectPageSection.getId();
+		const oAnchorBar = oObjectPage._oABHelper._getAnchorBar();
+		const done = assert.async();
 
 		assert.expect(2);
 
@@ -913,14 +888,15 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("_isClosestScrolledSection should return the first section if all sections are hidden", async function (assert) {
-		var clock = sinon.useFakeTimers(),
-			oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			aSections = oObjectPage.getSections(),
-			sFirstSectionId = "UxAP-objectPageContentScrolling--firstSection";
+		assert.expect(1);
+		const clock = sinon.useFakeTimers();
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const aSections = oObjectPage.getSections();
+		const sFirstSectionId = "UxAP-objectPageContentScrolling--firstSection";
 
 		clock.tick(500);
 
-		for (var section in aSections) {
+		for (const section in aSections) {
 			aSections[section].setVisible(false);
 		}
 
@@ -930,81 +906,70 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 		clock.restore();
 	});
 
-	QUnit.test("_getClosestScrolledSectionBaseId identifies target subSection", function (assert) {
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			oTargetSection = this.oObjectPageContentScrollingView.byId("secondSection"),
-			oTargetSubSection = oTargetSection.getSubSections()[1],
-			iTargetSubSectionScrollPosition,
-			iPageHeight,
-			sClosestSectionId,
-			done = assert.async();
+	QUnit.test("_getClosestScrolledSectionBaseId identifies target subSection", async function (assert) {
+		assert.expect(1);
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const oTargetSection = this.oObjectPageContentScrollingView.byId("secondSection");
+		const oTargetSubSection = oTargetSection.getSubSections()[1];
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			iPageHeight = oObjectPage.getDomRef().offsetHeight;
-			iTargetSubSectionScrollPosition = oObjectPage._computeScrollPosition(oTargetSubSection);
-			sClosestSectionId = oObjectPage._getClosestScrolledSectionBaseId(iTargetSubSectionScrollPosition, iPageHeight, true);
-			assert.equal(sClosestSectionId, oTargetSubSection.getId(), "target subSection is recognized");
-			done();
-		});
+		await waitForDOMReady(oObjectPage);
+
+		const iPageHeight = oObjectPage.getDomRef().offsetHeight;
+		const iTargetSubSectionScrollPosition = oObjectPage._computeScrollPosition(oTargetSubSection);
+		const sClosestSectionId = oObjectPage._getClosestScrolledSectionBaseId(iTargetSubSectionScrollPosition, iPageHeight, true);
+		assert.equal(sClosestSectionId, oTargetSubSection.getId(), "target subSection is recognized");
 	});
 
 
-	QUnit.test("_getClosestScrolledSectionBaseId identifies target subSection with rounding pixels tolerance", function (assert) {
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			oTargetSection = this.oObjectPageContentScrollingView.byId("secondSection"),
-			oTargetSubSection = oTargetSection.getSubSections()[1],
-			iTargetSubSectionScrollPosition,
-			iPageHeight,
-			sClosestSectionId,
-			done = assert.async();
+	QUnit.test("_getClosestScrolledSectionBaseId identifies target subSection with rounding pixels tolerance", async function (assert) {
+		assert.expect(1);
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const oTargetSection = this.oObjectPageContentScrollingView.byId("secondSection");
+		const oTargetSubSection = oTargetSection.getSubSections()[1];
 
 		oObjectPage.scrollToSection(oTargetSubSection.getId());
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			iPageHeight = oObjectPage.getDomRef().offsetHeight;
-			// Simulating rounding down issue of the current scroll position
-			iTargetSubSectionScrollPosition = oObjectPage._computeScrollPosition(oTargetSubSection) - 1;
-			sClosestSectionId = oObjectPage._getClosestScrolledSectionBaseId(iTargetSubSectionScrollPosition, iPageHeight, true);
-			assert.equal(sClosestSectionId, oTargetSubSection.getId(), "target subSection is recognized");
-			done();
-		});
+		await waitForDOMReady(oObjectPage);
+
+		const iPageHeight = oObjectPage.getDomRef().offsetHeight;
+		// Simulating rounding down issue of the current scroll position
+		const iTargetSubSectionScrollPosition = oObjectPage._computeScrollPosition(oTargetSubSection) - 1;
+		const sClosestSectionId = oObjectPage._getClosestScrolledSectionBaseId(iTargetSubSectionScrollPosition, iPageHeight, true);
+		assert.equal(sClosestSectionId, oTargetSubSection.getId(), "target subSection is recognized");
 	});
 
-	QUnit.test("_getClosestScrolledSectionBaseId returns null if current section is destroyed", function (assert) {
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			oTargetSection = this.oObjectPageContentScrollingView.byId("secondSection"),
-			oTargetSubSection = oTargetSection.getSubSections()[1],
-			iTargetSubSectionScrollPosition,
-			iPageHeight,
-			sClosestSectionId,
-			done = assert.async();
+	QUnit.test("_getClosestScrolledSectionBaseId returns null if current section is destroyed", async function (assert) {
+		assert.expect(1);
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const oTargetSection = this.oObjectPageContentScrollingView.byId("secondSection");
+		const oTargetSubSection = oTargetSection.getSubSections()[1];
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			oObjectPage.scrollToSection(oTargetSubSection.getId(), 0);
-			iPageHeight = oObjectPage.getDomRef().offsetHeight;
-			iTargetSubSectionScrollPosition = oObjectPage._computeScrollPosition(oTargetSubSection);
+		await waitForDOMReady(oObjectPage);
 
-			//Act
-			oTargetSection.destroy();
+		oObjectPage.scrollToSection(oTargetSubSection.getId(), 0);
+		const iPageHeight = oObjectPage.getDomRef().offsetHeight;
+		const iTargetSubSectionScrollPosition = oObjectPage._computeScrollPosition(oTargetSubSection);
 
-			sClosestSectionId = oObjectPage._getClosestScrolledSectionBaseId(iTargetSubSectionScrollPosition, iPageHeight, true);
-			assert.equal(sClosestSectionId, null, "target subSection is recognized");
-			done();
-		});
+		//Act
+		oTargetSection.destroy();
+
+		const sClosestSectionId = oObjectPage._getClosestScrolledSectionBaseId(iTargetSubSectionScrollPosition, iPageHeight, true);
+		assert.equal(sClosestSectionId, null, "target subSection is recognized");
 	});
 
 	QUnit.test("Upon scrolling 'subSectionEnteredViewPortEvent' is fired after '_connectModelsForSections' is called", async function(assert) {
+		assert.expect(2);
 		// Arrange
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			done = assert.async(),
-			oStub = this.stub(oObjectPage, "_connectModelsForSections").callsFake(function () {
-				// Assert
-				assert.ok(oSpy.notCalled, "subSectionEnteredViewPortEvent is not fired before _connectModelsForSections");
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const done = assert.async();
+		let oSpy;
+		const oStub = this.stub(oObjectPage, "_connectModelsForSections").callsFake(function () {
+			// Assert
+			assert.ok(oSpy.notCalled, "subSectionEnteredViewPortEvent is not fired before _connectModelsForSections");
 
-				oStub.restore();
-				return Promise.all([]);
-			}),
-			oSpy;
+			oStub.restore();
+			return Promise.all([]);
+		});
 
 		oObjectPage.setEnableLazyLoading(true);
 		await nextUIUpdate();
@@ -1026,7 +991,7 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("ScrollEnablement private API", function (assert) {
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
 
 		oObjectPage._initializeScroller();
 
@@ -1034,12 +999,13 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("Section position top", function (assert) {
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			oSection = oObjectPage.getSections()[1],
-			$mobileAnchor,
-			iPositionTopBefore,
-			iPositionTopAfter,
-			fnCheckPosition = function() {
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const oSection = oObjectPage.getSections()[1];
+		const done = assert.async();
+		let $mobileAnchor;
+		let iPositionTopBefore;
+		let iPositionTopAfter;
+		const fnCheckPosition = function() {
 				$mobileAnchor = oSection.$("header");
 				iPositionTopBefore = lib.Utilities.getChildPosition($mobileAnchor, oObjectPage._$contentContainer).top;
 
@@ -1050,8 +1016,7 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 				// Check
 				assert.strictEqual(iPositionTopBefore, iPositionTopAfter, "position within contentContainer is still correct");
 				done();
-			},
-			done = assert.async();
+			};
 		if (oObjectPage.isActive()) {
 			fnCheckPosition();
 		} else {
@@ -1062,20 +1027,19 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("ScrollToElement", async function (assert) {
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			oSection2 = oObjectPage.getSections()[1],
-			$Section2TTitle,
-			fnIsElementVisible,
-			fnResolveOnVisible;
+		assert.expect(2);
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const oSection2 = oObjectPage.getSections()[1];
+		let fnResolveOnVisible;
 
 		await new Promise(function (resolve) {
 			oObjectPage.attachEventOnce("onAfterRenderingDOMReady", resolve);
 		});
 
-		$Section2TTitle = oSection2.$().find('.sapUxAPObjectPageSectionTitle');
-		fnIsElementVisible = function () {
-			var oWrapperRect = oObjectPage._$opWrapper.get(0).getBoundingClientRect(),
-				oTitleRect = $Section2TTitle.get(0).getBoundingClientRect();
+		const $Section2TTitle = oSection2.$().find('.sapUxAPObjectPageSectionTitle');
+		const fnIsElementVisible = function () {
+			const oWrapperRect = oObjectPage._$opWrapper.get(0).getBoundingClientRect();
+			const oTitleRect = $Section2TTitle.get(0).getBoundingClientRect();
 
 			return oTitleRect.bottom > oWrapperRect.top && oTitleRect.top < oWrapperRect.bottom;
 		};
@@ -1104,12 +1068,12 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("Modify structure during scroll", function (assert) {
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			oSection2 = oObjectPage.getSections()[1],
-			oSection3 = oObjectPage.getSections()[2],
-			oScrollToSectionSpy = this.spy(oObjectPage, "scrollToSection"),
-			oSection2Anchor,
-			done = assert.async();
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const oSection2 = oObjectPage.getSections()[1];
+		const oSection3 = oObjectPage.getSections()[2];
+		const oScrollToSectionSpy = this.spy(oObjectPage, "scrollToSection");
+		const done = assert.async();
+		let oSection2Anchor;
 
 		assert.expect(2);
 
@@ -1145,47 +1109,41 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 
 	});
 
-	QUnit.test("subSection without title", function (assert) {
+	QUnit.test("subSection without title", async function (assert) {
+		assert.expect(3);
 
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			oSection = oObjectPage.getSections()[1],
-			oSectionSubSection = oSection.getSubSections()[1],
-			done = assert.async(),
-			oSpy = this.spy(oObjectPage, "_requestAdjustLayout");
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const oSection = oObjectPage.getSections()[1];
+		const oSectionSubSection = oSection.getSubSections()[1];
+		const oSpy = this.spy(oObjectPage, "_requestAdjustLayout");
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", makeVoid(async function() {
+		await waitForDOMReady(oObjectPage);
 
-			const iSectionPositionTopBefore = oObjectPage._computeScrollPosition(oSection);
-			const iSubSectionPositionTopBefore = oObjectPage._computeScrollPosition(oSectionSubSection);
-			// verify init state
-			assert.ok(iSubSectionPositionTopBefore > iSectionPositionTopBefore, "subSection position is below its parent section");
+		const iSectionPositionTopBefore = oObjectPage._computeScrollPosition(oSection);
+		const iSubSectionPositionTopBefore = oObjectPage._computeScrollPosition(oSectionSubSection);
+		// verify init state
+		assert.ok(iSubSectionPositionTopBefore > iSectionPositionTopBefore, "subSection position is below its parent section");
 
-			// Act
-			oSpy.resetHistory();
-			oSectionSubSection.setShowTitle(false);
-			await nextUIUpdate();
+		// Act
+		oSpy.resetHistory();
+		oSectionSubSection.setShowTitle(false);
+		await nextUIUpdate();
 
-			// Check
-			assert.ok(oSpy.called, "layout adjustment is requested");
-			oObjectPage._requestAdjustLayout(true); // call synchronously to save a timeout
-			const iSectionPositionTopAfter = oObjectPage._computeScrollPosition(oSection);
-			const iSubSectionPositionTopAfter = oObjectPage._computeScrollPosition(oSectionSubSection);
-			assert.ok(iSubSectionPositionTopAfter > iSectionPositionTopAfter, "subSection position is below its parent section");
-
-			done();
-		}));
+		// Check
+		assert.ok(oSpy.called, "layout adjustment is requested");
+		oObjectPage._requestAdjustLayout(true); // call synchronously to save a timeout
+		const iSectionPositionTopAfter = oObjectPage._computeScrollPosition(oSection);
+		const iSubSectionPositionTopAfter = oObjectPage._computeScrollPosition(oSectionSubSection);
+		assert.ok(iSubSectionPositionTopAfter > iSectionPositionTopAfter, "subSection position is below its parent section");
 
 	});
 
-	QUnit.test("Scrolling to Section, when selectedSection is not visible", function (assert) {
+	QUnit.test("Scrolling to Section, when selectedSection is not visible", async function (assert) {
 		// Arrange
-		var oObjectPageLayout = helpers.generateObjectPageWithContent(oFactory, 10),
-			oFirstSection = oObjectPageLayout.getSections()[0],
-			oFirstSectionSubSection = oFirstSection.getSubSections()[0],
-			oScrollToSection = oObjectPageLayout.getSections()[6],
-			oScrollToSectionInfo,
-			iTargetPosition,
-			done = assert.async();
+		const oObjectPageLayout = helpers.generateObjectPageWithContent(oFactory, 10);
+		const oFirstSection = oObjectPageLayout.getSections()[0];
+		const oFirstSectionSubSection = oFirstSection.getSubSections()[0];
+		const oScrollToSection = oObjectPageLayout.getSections()[6];
 
 		assert.expect(1);
 
@@ -1193,26 +1151,22 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 		oObjectPageLayout.setSelectedSection(oFirstSection);
 		oObjectPageLayout.placeAt('qunit-fixture');
 
-		oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady", function() {
-			// Act
-			oScrollToSectionInfo = oObjectPageLayout._oSectionInfo[oScrollToSection.getId()];
-			iTargetPosition = oScrollToSectionInfo.positionTop;
-			oObjectPageLayout._$opWrapper.scrollTop(iTargetPosition);
-			oObjectPageLayout._onScroll({target: {scrollTop: iTargetPosition}});
+		await waitForDOMReady(oObjectPageLayout);
 
-			// Assert
-			assert.strictEqual(oObjectPageLayout._oABHelper._getAnchorBar().getSelectedKey(), oScrollToSection.getId(),
-				"Scrolled to Section is selected correctly in the AnchorBar");
+		// Act
+		const oScrollToSectionInfo = oObjectPageLayout._oSectionInfo[oScrollToSection.getId()];
+		const iTargetPosition = oScrollToSectionInfo.positionTop;
+		oObjectPageLayout._$opWrapper.scrollTop(iTargetPosition);
+		oObjectPageLayout._onScroll({target: {scrollTop: iTargetPosition}});
 
-			// Clean up
-			done();
-		});
+		// Assert
+		assert.strictEqual(oObjectPageLayout._oABHelper._getAnchorBar().getSelectedKey(), oScrollToSection.getId(),
+			"Scrolled to Section is selected correctly in the AnchorBar");
 	});
 
-	QUnit.test("Does not throw an error when selectedSection does not exists", function (assert) {
+	QUnit.test("Does not throw an error when selectedSection does not exist", async function (assert) {
 		// Arrange
-		var oObjectPageLayout = helpers.generateObjectPageWithContent(oFactory, 3),
-			done = assert.async();
+		const oObjectPageLayout = helpers.generateObjectPageWithContent(oFactory, 3);
 
 		assert.expect(1);
 
@@ -1220,50 +1174,44 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 		oObjectPageLayout.setSelectedSection("not-existing-section");
 		oObjectPageLayout.placeAt('qunit-fixture');
 
-		oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady", function() {
+		await waitForDOMReady(oObjectPageLayout);
 
-			// Assert
-			assert.ok(true, "Error is not thrown");
-
-			// Clean up
-			done();
-		});
+		// Assert
+		assert.ok(true, "Error is not thrown");
 	});
 
-	QUnit.test("requestAdjustLayoutAndUxRules during animated scroll to subSection", function (assert) {
+	QUnit.test("requestAdjustLayoutAndUxRules during animated scroll to subSection", async function (assert) {
+		assert.expect(1);
 
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			oTargetSection = oObjectPage.getSections()[2],
-			sTargetSectionId = oTargetSection.getId(),
-			sTargetSubSectionId = oTargetSection.getSubSections()[0].getId(),
-			oScrollSpy = this.spy(oObjectPage, "scrollToSection"),
-			done = assert.async();
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const oTargetSection = oObjectPage.getSections()[2];
+		const sTargetSectionId = oTargetSection.getId();
+		const sTargetSubSectionId = oTargetSection.getSubSections()[0].getId();
+		const oScrollSpy = this.spy(oObjectPage, "scrollToSection");
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
+		await waitForDOMReady(oObjectPage);
 
-			oObjectPage.setSelectedSection(sTargetSectionId);
+		oObjectPage.setSelectedSection(sTargetSectionId);
 
-			// scroll to a subSection of the selectedSection
-			oObjectPage.scrollToSection(sTargetSubSectionId);
+		// scroll to a subSection of the selectedSection
+		oObjectPage.scrollToSection(sTargetSubSectionId);
 
-			this.stub(oObjectPage, "_isClosestScrolledSection").callsFake(function (sSectionId) {
-				return sSectionId === sTargetSectionId;
-			});
-			this.stub(oObjectPage._oScroller._$Container, "is").callsFake(function (sCondition) {
-				return sCondition === ":animated";
-			});
-			oScrollSpy.reset();
-			oObjectPage._adjustLayoutAndUxRules();
-			assert.ok(oScrollSpy.calledOnceWith(sTargetSubSectionId), "correct scrolled section");
-			done();
-		}.bind(this));
+		this.stub(oObjectPage, "_isClosestScrolledSection").callsFake(function (sSectionId) {
+			return sSectionId === sTargetSectionId;
+		});
+		this.stub(oObjectPage._oScroller._$Container, "is").callsFake(function (sCondition) {
+			return sCondition === ":animated";
+		});
+		oScrollSpy.reset();
+		oObjectPage._adjustLayoutAndUxRules();
+		assert.ok(oScrollSpy.calledOnceWith(sTargetSubSectionId), "correct scrolled section");
 	});
 
 	QUnit.test("Scroll-padding-top of scrolling container", function (assert) {
-		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-			oSelectedSection = oObjectPage.getSections()[1],
-			iPaddingTop,
-			done = assert.async();
+		const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		const oSelectedSection = oObjectPage.getSections()[1];
+		const done = assert.async();
+		let iPaddingTop;
 
 		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
 			iPaddingTop = parseInt(oObjectPage._$opWrapper.css("scroll-padding-top"));
@@ -1299,87 +1247,77 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	QUnit.module("ObjectPage scrolling without view");
 
 	QUnit.test("auto-scroll on resize of last section", async function(assert) {
-		var oObjectPageLayout = helpers.generateObjectPageWithContent(oFactory, 10) /* enough sections to allow scrolling even on big screens */,
-			oLastSection = oObjectPageLayout.getSections()[1],
-			oLastSubSection = oLastSection.getSubSections()[0],
-			oResizableControl = new GenericDiv({height: "100px"}),
-			iScrollTopBeforeResize,
-			iScrollTopAfterResize,
-			done = assert.async();
+		assert.expect(2);
+		const oObjectPageLayout = helpers.generateObjectPageWithContent(oFactory, 10); /* enough sections to allow scrolling even on big screens */
+		const oLastSection = oObjectPageLayout.getSections()[1];
+		const oLastSubSection = oLastSection.getSubSections()[0];
+		const oResizableControl = new GenericDiv({height: "100px"});
 
 		oLastSubSection.addBlock(oResizableControl);
 		oObjectPageLayout.setSelectedSection(oLastSection);
 
-
-		oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady", function() {
-				iScrollTopBeforeResize = oObjectPageLayout._$opWrapper.scrollTop();
-				// make the height of the last section smaller
-				oResizableControl.getDomRef().style.height = "10px";
-				iScrollTopAfterResize = oObjectPageLayout._$opWrapper.scrollTop();
-				// call the listener for the scroll event synchronously to speed up the test
-				oObjectPageLayout._onScroll({target: {scrollTop: iScrollTopAfterResize}});
-
-				assert.strictEqual(oObjectPageLayout.getSelectedSection(), oLastSection.getId(), "Selection is preserved");
-				assert.strictEqual(oObjectPageLayout._$opWrapper.scrollTop(), iScrollTopBeforeResize, "scrollTop is restored");
-				oObjectPageLayout.destroy();
-				done();
-		});
-
 		// arrange
 		oObjectPageLayout.placeAt('qunit-fixture');
 		await nextUIUpdate();
+		await waitForDOMReady(oObjectPageLayout);
+
+		const iScrollTopBeforeResize = oObjectPageLayout._$opWrapper.scrollTop();
+		// make the height of the last section smaller
+		oResizableControl.getDomRef().style.height = "10px";
+		const iScrollTopAfterResize = oObjectPageLayout._$opWrapper.scrollTop();
+		// call the listener for the scroll event synchronously to speed up the test
+		oObjectPageLayout._onScroll({target: {scrollTop: iScrollTopAfterResize}});
+
+		assert.strictEqual(oObjectPageLayout.getSelectedSection(), oLastSection.getId(), "Selection is preserved");
+		assert.strictEqual(oObjectPageLayout._$opWrapper.scrollTop(), iScrollTopBeforeResize, "scrollTop is restored");
+		oObjectPageLayout.destroy();
 	});
 
 	QUnit.test("auto-scroll on resize of last section rounding", async function(assert) {
-		var oObjectPageLayout = helpers.generateObjectPageWithContent(oFactory, 2 /* two sections */),
-			oLastSection = oObjectPageLayout.getSections()[1],
-			oLastSubSection = oLastSection.getSubSections()[0],
-			iResizableControlHeight = 100,
-			iHeightChange = 90,
-			oResizableControl = new GenericDiv({height: +iResizableControlHeight + "px"}),
-			iScrollTopBeforeResize,
-			iScrollLengthBeforeResize,
-			iRoundingOffset = 0.005,
-			done = assert.async();
+		assert.expect(1);
+		const oObjectPageLayout = helpers.generateObjectPageWithContent(oFactory, 2 /* two sections */);
+		const oLastSection = oObjectPageLayout.getSections()[1];
+		const oLastSubSection = oLastSection.getSubSections()[0];
+		const iResizableControlHeight = 100;
+		const iHeightChange = 90;
+		const oResizableControl = new GenericDiv({height: +iResizableControlHeight + "px"});
+		const iRoundingOffset = 0.005;
 
 		oLastSubSection.addBlock(oResizableControl);
 		oObjectPageLayout.setSelectedSection(oLastSection);
 
-
-		oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady", function() {
-			iScrollTopBeforeResize = oObjectPageLayout._$opWrapper.scrollTop();
-			iScrollLengthBeforeResize = oObjectPageLayout._$opWrapper.get(0).scrollHeight;
-
-
-			// Act: make the height of the last section 90px smaller
-			oResizableControl.getDomRef().style.height = (iResizableControlHeight - iHeightChange) + "px";
-			this.stub(oObjectPageLayout, "_getScrollableContentLength").callsFake(function() {
-				// the <code>iRoundingOffset</code> adds a tiny extra ammount of 0.005 that should not affect the outcome
-				return iScrollLengthBeforeResize - iHeightChange + iRoundingOffset;
-			});
-
-			oObjectPageLayout._onScroll({target: {scrollTop: iScrollTopBeforeResize - iHeightChange}});
-
-			// Check: test that the extra <code>iRoundingOffset</code> of 0.005px do not affect the outcome:
-			assert.strictEqual(oObjectPageLayout._isContentScrolledToBottom(), true, "content is scrolled to bottom");
-			oObjectPageLayout.destroy();
-			done();
-		}.bind(this));
-
 		// arrange
 		oObjectPageLayout.placeAt('qunit-fixture');
 		await nextUIUpdate();
+		await waitForDOMReady(oObjectPageLayout);
+
+		const iScrollTopBeforeResize = oObjectPageLayout._$opWrapper.scrollTop();
+		const iScrollLengthBeforeResize = oObjectPageLayout._$opWrapper.get(0).scrollHeight;
+
+		// Act: make the height of the last section 90px smaller
+		oResizableControl.getDomRef().style.height = (iResizableControlHeight - iHeightChange) + "px";
+		this.stub(oObjectPageLayout, "_getScrollableContentLength").callsFake(function() {
+			// the <code>iRoundingOffset</code> adds a tiny extra ammount of 0.005 that should not affect the outcome
+			return iScrollLengthBeforeResize - iHeightChange + iRoundingOffset;
+		});
+
+		oObjectPageLayout._onScroll({target: {scrollTop: iScrollTopBeforeResize - iHeightChange}});
+
+		// Check: test that the extra <code>iRoundingOffset</code> of 0.005px do not affect the outcome:
+		assert.strictEqual(oObjectPageLayout._isContentScrolledToBottom(), true, "content is scrolled to bottom");
+		oObjectPageLayout.destroy();
 	});
 
 	QUnit.test("auto-scroll on resize after layout calculation", async function(assert) {
-		var oObjectPageLayout = helpers.generateObjectPageWithContent(oFactory, 2 /* two sections */),
-			oLastSection = oObjectPageLayout.getSections()[1],
-			oLastSubSection = oLastSection.getSubSections()[0],
-			oResizableControl = new GenericDiv({height: "100px"}),
-			iScrollTopBeforeResize,
-			iExpectedScrollTopAfterResize,
-			oSpy = this.spy(oObjectPageLayout, "_scrollTo"),
-			done = assert.async();
+		assert.expect(2);
+		const oObjectPageLayout = helpers.generateObjectPageWithContent(oFactory, 2 /* two sections */);
+		const oLastSection = oObjectPageLayout.getSections()[1];
+		const oLastSubSection = oLastSection.getSubSections()[0];
+		const oResizableControl = new GenericDiv({height: "100px"});
+		const oSpy = this.spy(oObjectPageLayout, "_scrollTo");
+		const done = assert.async();
+		let iScrollTopBeforeResize;
+		let iExpectedScrollTopAfterResize;
 
 		oLastSubSection.addBlock(oResizableControl);
 		oObjectPageLayout.setSelectedSection(oLastSection);
@@ -1412,14 +1350,15 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("content size correctly calculated", async function(assert) {
-		var oObjectPageLayout = helpers.generateObjectPageWithContent(oFactory, 2 /* two sections */),
-			oFirstSection = oObjectPageLayout.getSections()[0],
-			oLastSection = oObjectPageLayout.getSections()[1],
-			iFirstSectionSpacerHeight,
-			iLastSectionSpacerHeight,
-			oBigHeightControl = new GenericDiv({height: "500px"}),
-			oSmallHeightControl = new GenericDiv({height: "100px"}),
-			done = assert.async();
+		assert.expect(3);
+		const oObjectPageLayout = helpers.generateObjectPageWithContent(oFactory, 2 /* two sections */);
+		const oFirstSection = oObjectPageLayout.getSections()[0];
+		const oLastSection = oObjectPageLayout.getSections()[1];
+		const oBigHeightControl = new GenericDiv({height: "500px"});
+		const oSmallHeightControl = new GenericDiv({height: "100px"});
+		const done = assert.async();
+		let iFirstSectionSpacerHeight;
+		let iLastSectionSpacerHeight;
 
 		oObjectPageLayout.setUseIconTabBar(true);
 		oFirstSection.getSubSections()[0].addBlock(oBigHeightControl);
@@ -1463,66 +1402,60 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	// ensure that appending the anchorBar does not change the scrollTop,
 	// as it may happen in certain cases (if another part of content freshly rerendered (BCP: 1870365138)
 	QUnit.test("_moveAnchorBarToContentArea preserves the page scrollTop", async function(assert) {
-		var oObjectPageLayout = helpers.generateObjectPageWithContent(oFactory, 2 /* two sections */),
-			oFirstSection = oObjectPageLayout.getSections()[0],
-			oLastSection = oObjectPageLayout.getSections()[1],
-			done = assert.async();
+		assert.expect(1);
+		const oObjectPageLayout = helpers.generateObjectPageWithContent(oFactory, 2 /* two sections */);
+		const oFirstSection = oObjectPageLayout.getSections()[0];
+		const oLastSection = oObjectPageLayout.getSections()[1];
 
 		oObjectPageLayout.setSelectedSection(oLastSection);
-
-		oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady", makeVoid(async function() {
-
-			var iScrollTopBefore = oObjectPageLayout.getDomRef().scrollTop;
-
-			// act
-			oFirstSection.invalidate();
-			await nextUIUpdate();
-			oObjectPageLayout._moveAnchorBarToContentArea();
-
-			assert.strictEqual(oObjectPageLayout.getDomRef().scrollTop, iScrollTopBefore, "scrollTop is preserved");
-			oObjectPageLayout.destroy();
-			done();
-		}));
 
 		// arrange
 		oObjectPageLayout.placeAt('qunit-fixture');
 		await nextUIUpdate();
+		await waitForDOMReady(oObjectPageLayout);
+
+		const iScrollTopBefore = oObjectPageLayout.getDomRef().scrollTop;
+
+		// Act
+		oFirstSection.invalidate();
+		await nextUIUpdate();
+		oObjectPageLayout._moveAnchorBarToContentArea();
+
+		assert.strictEqual(oObjectPageLayout.getDomRef().scrollTop, iScrollTopBefore, "scrollTop is preserved");
+		oObjectPageLayout.destroy();
 	});
 
 	QUnit.test("no scrollbar on unsnap if not needed", async function(assert) {
-		var oObjectPageLayout = helpers.generateObjectPageWithContent(oFactory, 1 /* single section */),
-			oRequestAdjustLayoutSpy = this.spy(oObjectPageLayout, "_requestAdjustLayout"),
-			done = assert.async();
+		assert.expect(2);
+		const oObjectPageLayout = helpers.generateObjectPageWithContent(oFactory, 1 /* single section */);
+		const oRequestAdjustLayoutSpy = this.spy(oObjectPageLayout, "_requestAdjustLayout");
 
 		oObjectPageLayout.setHeaderTitle(oFactory.getDynamicPageTitle());
 		oObjectPageLayout.addHeaderContent(new Panel({height: "100px"}));
 
 		function hasScrollbar() {
-			var oScrollContainer = oObjectPageLayout._$opWrapper.get(0);
+			const oScrollContainer = oObjectPageLayout._$opWrapper.get(0);
 			return oScrollContainer.scrollHeight > oScrollContainer.offsetHeight;
 		}
-
-		oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady", function() {
-
-			oObjectPageLayout._snapHeader(true);
-			oRequestAdjustLayoutSpy.resetHistory();
-
-			// Act: unsnap the snapped header
-			oObjectPageLayout._expandHeader(false);
-
-			// Check
-			assert.strictEqual(oRequestAdjustLayoutSpy.called, true, "layout recalculation called");
-			// call explicitly *with no delay* to save timeout in this test
-			oObjectPageLayout._requestAdjustLayout(true);
-			assert.strictEqual(hasScrollbar(), false, "no more scrollbar");
-
-			oObjectPageLayout.destroy();
-			done();
-		});
 
 		// arrange
 		oObjectPageLayout.placeAt('qunit-fixture');
 		await nextUIUpdate();
+		await waitForDOMReady(oObjectPageLayout);
+
+		oObjectPageLayout._snapHeader(true);
+		oRequestAdjustLayoutSpy.resetHistory();
+
+		// Act: unsnap the snapped header
+		oObjectPageLayout._expandHeader(false);
+
+		// Check
+		assert.strictEqual(oRequestAdjustLayoutSpy.called, true, "layout recalculation called");
+		// call explicitly *with no delay* to save timeout in this test
+		oObjectPageLayout._requestAdjustLayout(true);
+		assert.strictEqual(hasScrollbar(), false, "no more scrollbar");
+
+		oObjectPageLayout.destroy();
 	});
 
 	QUnit.module("ObjectPage On Title Press when Header height bigger than page height", {
@@ -1536,10 +1469,11 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("ObjectPage On Title Press", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oTitle = oObjectPage.getHeaderTitle(),
-			oScrollSpy = this.spy(oObjectPage, "_scrollTo"),
-			done = assert.async();
+		assert.expect(3);
+		const oObjectPage = this.oObjectPage;
+		const oTitle = oObjectPage.getHeaderTitle();
+		const oScrollSpy = this.spy(oObjectPage, "_scrollTo");
+		const done = assert.async();
 
 
 		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
@@ -1565,10 +1499,11 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("expand shows the visual indicator", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oExpandButton = oObjectPage.getHeaderTitle()._getExpandButton(),
-			oScrollSpy = this.spy(oObjectPage, "_scrollBelowCollapseVisualIndicator"),
-			done = assert.async();
+		assert.expect(2);
+		const oObjectPage = this.oObjectPage;
+		const oExpandButton = oObjectPage.getHeaderTitle()._getExpandButton();
+		const oScrollSpy = this.spy(oObjectPage, "_scrollBelowCollapseVisualIndicator");
+		const done = assert.async();
 
 		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
 
@@ -1594,21 +1529,21 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("_getClosestScrolledSectionBaseId anchorBar mode", function (assert) {
-		var done = assert.async();
+		const done = assert.async();
 		XMLView.create({
 			id: "UxAP-objectPageContentScrolling",
 			viewName: "view.UxAP-ObjectPageContentScrolling"
-		}).then(async function(oView) {
+		}).then(async (oView) => {
 			this.oObjectPageContentScrollingView = oView;
 			this.oObjectPageContentScrollingView.placeAt('qunit-fixture');
 			await nextUIUpdate();
 
-			var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-				oFirstSubSection = oObjectPage.getSections()[0].getSubSections()[0],
-				oSecondSubSection = oObjectPage.getSections()[0].getSubSections()[0],
-				iFirstSubSectionScrollTop,
-				iSecondSubSectionScrollTop,
-				iPageHeight;
+			const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+			const oFirstSubSection = oObjectPage.getSections()[0].getSubSections()[0];
+			const oSecondSubSection = oObjectPage.getSections()[0].getSubSections()[0];
+			let iFirstSubSectionScrollTop;
+			let iSecondSubSectionScrollTop;
+			let iPageHeight;
 
 			oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
 				iPageHeight = oObjectPage.getDomRef().offsetHeight;
@@ -1620,26 +1555,26 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 				this.oObjectPageContentScrollingView.destroy();
 				done();
 			}.bind(this));
-		}.bind(this));
+		});
 	});
 
 	QUnit.test("_getClosestScrolledSectionBaseId tabs mode", function (assert) {
-		var done = assert.async();
+		const done = assert.async();
 		XMLView.create({
 			id: "UxAP-objectPageContentScrolling",
 			viewName: "view.UxAP-ObjectPageContentScrolling"
-		}).then(async function(oView) {
+		}).then(async (oView) => {
 			this.oObjectPageContentScrollingView = oView;
 			this.oObjectPageContentScrollingView.placeAt('qunit-fixture');
 			await nextUIUpdate();
 
-			var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
-				oSecondSection = oObjectPage.getSections()[1],
-				oSecondSectionFirstSubSection = oSecondSection.getSubSections()[0],
-				oSecondSectionSecondSubSection = oSecondSection.getSubSections()[0],
-				iFirstSubSectionScrollTop,
-				iSecondSubSectionScrollTop,
-				iPageHeight;
+			const oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+			const oSecondSection = oObjectPage.getSections()[1];
+			const oSecondSectionFirstSubSection = oSecondSection.getSubSections()[0];
+			const oSecondSectionSecondSubSection = oSecondSection.getSubSections()[0];
+			let iFirstSubSectionScrollTop;
+			let iSecondSubSectionScrollTop;
+			let iPageHeight;
 
 			// select the second visible tab
 			oObjectPage.setSelectedSection();
@@ -1655,7 +1590,7 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 				this.oObjectPageContentScrollingView.destroy();
 				done();
 			}.bind(this));
-		}.bind(this));
+		});
 	});
 
 	QUnit.module("No visible section", {
@@ -1668,40 +1603,39 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("_shouldAllowScrolling checks if visible sections exist", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oSpy = this.spy(oObjectPage, "_shouldAllowScrolling"),
-			done = assert.async();
-		this.oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			// Setup
-			oSpy.resetHistory();
-			oObjectPage._bAllContentFitsContainer = true;
+		assert.expect(2);
+		const oObjectPage = this.oObjectPage;
+		const oSpy = this.spy(oObjectPage, "_shouldAllowScrolling");
 
-			// Act:
-			oObjectPage.getSections()[0].destroy();
-			// call synchronously to speed up the test
-			oObjectPage._requestAdjustLayout(true);
-			assert.ok(oSpy.calledOnce, "check for scrolling is requested");
-			assert.ok(oSpy.returned(true), "result is correct");
-			done();
-		});
 		await helpers.renderObject(this.oObjectPage);
+		await waitForDOMReady(oObjectPage);
+
+		// Setup
+		oSpy.resetHistory();
+		oObjectPage._bAllContentFitsContainer = true;
+
+		// Act:
+		oObjectPage.getSections()[0].destroy();
+		// call synchronously to speed up the test
+		oObjectPage._requestAdjustLayout(true);
+		assert.ok(oSpy.calledOnce, "check for scrolling is requested");
+		assert.ok(oSpy.returned(true), "result is correct");
 	});
 
 	QUnit.test("Resetting visibility of subsection does not lead to exception", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oSubSection = oObjectPage.getSections()[0].getSubSections()[0],
-			oComputeScrollPositionSpy,
-			oSelectedSection;
+		assert.expect(1);
+		const oObjectPage = this.oObjectPage;
+		const oSubSection = oObjectPage.getSections()[0].getSubSections()[0];
 
 		await helpers.renderObject(oObjectPage);
 
 		oSubSection.setVisible(false);
 		oObjectPage._applyUxRules();
 
-		oSelectedSection = Element.getElementById(oObjectPage.getSelectedSection());
+		const oSelectedSection = Element.getElementById(oObjectPage.getSelectedSection());
 		oSelectedSection.setSelectedSubSection(oSubSection);
 
-		oComputeScrollPositionSpy = this.spy(oObjectPage, "_computeScrollPosition");
+		const oComputeScrollPositionSpy = this.spy(oObjectPage, "_computeScrollPosition");
 
 		oObjectPage._initAnchorBarScroll();
 
@@ -1710,8 +1644,8 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	function isObjectPageHeaderStickied(oObjectPage) {
-		var oHeaderTitle = oObjectPage.getDomRef("headerTitle");
-		var oHeaderContent = oObjectPage.getDomRef("headerContent");
+		const oHeaderTitle = oObjectPage.getDomRef("headerTitle");
+		const oHeaderContent = oObjectPage.getDomRef("headerContent");
 		return oHeaderTitle.classList.contains("sapUxAPObjectPageHeaderStickied") &&
 				oHeaderContent.classList.contains("sapUxAPObjectPageHeaderDetailsHidden") &&
 				oHeaderContent.style["overflow"] == "hidden";
@@ -1785,7 +1719,7 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	QUnit.module("AnchorBar scroll preservation during header snap");
 
 	QUnit.test("_needsAnchorBarPlaceholderForScrollPreservation returns false when sufficient scroll space remains", function(assert) {
-		var oObjectPage = oFactory.getObjectPage();
+		const oObjectPage = oFactory.getObjectPage();
 
 		// Mock: scrollHeight=1000, offsetHeight=500 -> maxScroll=500
 		// scrollTop=100, anchorBarHeight=48 -> maxScrollAfterRemoval=452
@@ -1807,7 +1741,7 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("_needsAnchorBarPlaceholderForScrollPreservation returns true when insufficient scroll space", function(assert) {
-		var oObjectPage = oFactory.getObjectPage();
+		const oObjectPage = oFactory.getObjectPage();
 
 		// Mock: scrollHeight=1000, offsetHeight=500 -> maxScroll=500
 		// scrollTop=480, anchorBarHeight=48 -> maxScrollAfterRemoval=452
@@ -1829,7 +1763,7 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 	});
 
 	QUnit.test("_moveAnchorBarToTitleArea preserves scroll by using placeholder when needed", function(assert) {
-		var oObjectPage = oFactory.getObjectPage();
+		const oObjectPage = oFactory.getObjectPage();
 
 		// Setup
 		oObjectPage._$opWrapper = {

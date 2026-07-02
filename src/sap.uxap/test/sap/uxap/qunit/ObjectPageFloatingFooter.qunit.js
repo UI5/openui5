@@ -3,22 +3,30 @@ sap.ui.define(["sap/ui/core/AnimationMode", "sap/ui/core/ControlBehavior", "sap/
 function(AnimationMode, ControlBehavior, XMLView, OverflowToolbar, HBox, nextUIUpdate, ObjectPageLayout, ObjectPageSection, ObjectPageSubSection) {
 	"use strict";
 
-	//eslint-disable-next-line no-void
-	const makeVoid = (fn) => (...args) => void fn(...args);
+	/**
+	 * Returns a Promise that resolves after the ObjectPageLayout fires onAfterRenderingDOMReady.
+	 * @param {sap.uxap.ObjectPageLayout} oOPL
+	 * @returns {Promise<void>}
+	 */
+	function waitForDOMReady(oOPL) {
+		return new Promise((resolve) => {
+			oOPL.attachEventOnce("onAfterRenderingDOMReady", resolve);
+		});
+	}
 
 	QUnit.module("ObjectPage - Rendering - Footer Visibility", {
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "UxAP-162_ObjectPageSample",
 				viewName: "view.UxAP-162_ObjectPageSample"
-			}).then(async function(oView) {
+			}).then(async (oView) => {
 				this.objectPageSampleView = oView;
 				this.objectPageSampleView.placeAt("qunit-fixture");
 				await nextUIUpdate();
 				this.oObjectPage = this.objectPageSampleView.byId("objectPage162");
 				done();
-			}.bind(this));
+			});
 		},
 		afterEach: function () {
 			this.objectPageSampleView.destroy();
@@ -27,7 +35,7 @@ function(AnimationMode, ControlBehavior, XMLView, OverflowToolbar, HBox, nextUIU
 
 	QUnit.test("ObjectPage Footer rendered correctly", function (assert) {
 		// Arrange
-		var $footerWrapper = this.oObjectPage._$footerWrapper,
+		const $footerWrapper = this.oObjectPage._$footerWrapper,
 			oFooter = this.oObjectPage.getFooter(),
 			$footer = oFooter.$();
 
@@ -38,7 +46,7 @@ function(AnimationMode, ControlBehavior, XMLView, OverflowToolbar, HBox, nextUIU
 
 	QUnit.test("ObjectPage Footer visibility", function (assert) {
 		// Arrange
-		var $footerWrapper = this.oObjectPage._$footerWrapper,
+		const $footerWrapper = this.oObjectPage._$footerWrapper,
 			oFooter = this.oObjectPage.getFooter(),
 			$footer = oFooter.$();
 
@@ -76,7 +84,7 @@ function(AnimationMode, ControlBehavior, XMLView, OverflowToolbar, HBox, nextUIU
 
 	QUnit.test("ObjectPage Footer is visible after setting to false and then to true consecutively", function (assert) {
 		// Arrange
-		var $footerWrapper = this.oObjectPage._$footerWrapper;
+		const $footerWrapper = this.oObjectPage._$footerWrapper;
 
 		// Act
 		this.oObjectPage.setShowFooter(false);
@@ -88,7 +96,7 @@ function(AnimationMode, ControlBehavior, XMLView, OverflowToolbar, HBox, nextUIU
 
 	QUnit.test("Animation CSS class is removed after the animation is over", function (assert) {
 		// Arrange
-		var oFooter = this.oObjectPage.getFooter(),
+		const oFooter = this.oObjectPage.getFooter(),
 			$footer = oFooter.$();
 
 		// Act
@@ -110,7 +118,7 @@ function(AnimationMode, ControlBehavior, XMLView, OverflowToolbar, HBox, nextUIU
 
 	QUnit.test("Footer is toggled when animations disabled", function (assert) {
 		// Arrange
-		var $footerWrapper = this.oObjectPage._$footerWrapper,
+		const $footerWrapper = this.oObjectPage._$footerWrapper,
 			sOriginalMode = ControlBehavior.getAnimationMode();
 
 		//setup
@@ -132,7 +140,7 @@ function(AnimationMode, ControlBehavior, XMLView, OverflowToolbar, HBox, nextUIU
 
 	QUnit.test("Footer is toggled when animations are set to 'minimal'", function (assert) {
 		// Arrange
-		var $footerWrapper = this.oObjectPage._$footerWrapper,
+		const $footerWrapper = this.oObjectPage._$footerWrapper,
 			sOriginalMode = ControlBehavior.getAnimationMode();
 
 		//setup
@@ -180,7 +188,7 @@ function(AnimationMode, ControlBehavior, XMLView, OverflowToolbar, HBox, nextUIU
 
 	QUnit.test("Setting 'footer' aggregation and 'showFooter' property", async function(assert) {
 		// Arrange
-		var oObjectPage = new ObjectPageLayout({
+		const oObjectPage = new ObjectPageLayout({
 			sections: [new ObjectPageSection({
 				subSections: [new ObjectPageSubSection({
 					blocks: [new HBox({
@@ -188,30 +196,32 @@ function(AnimationMode, ControlBehavior, XMLView, OverflowToolbar, HBox, nextUIU
 					})]
 				})]
 			})]
-		}),
-		fnDone = assert.async();
+		});
 
 		oObjectPage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		assert.expect(1);
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", makeVoid(async function () {
+		await waitForDOMReady(oObjectPage);
+
+		await new Promise((resolve) => {
 			oObjectPage.addEventDelegate({
 				onAfterRendering: function () {
 					// Assert
 					assert.ok(true, "No error is thrown");
 
 					oObjectPage.destroy();
-					fnDone();
+					resolve();
 				}
 			});
 
 			// Act
 			oObjectPage.setShowFooter(true);
 			oObjectPage.setFooter(new OverflowToolbar());
-			await nextUIUpdate();
-		}));
+		});
+
+		await nextUIUpdate();
 	});
 
 });

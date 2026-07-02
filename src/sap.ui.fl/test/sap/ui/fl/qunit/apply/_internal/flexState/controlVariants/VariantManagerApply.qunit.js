@@ -779,6 +779,84 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("applyInitialChangesForExistingControls", {
+		beforeEach() {
+			this.oAppComponent = oComponent;
+			this.sVMReference = sVMReference;
+			this.oExistingControl = { getId: () => "existingControl" };
+			this.oOtherExistingControl = { getId: () => "otherExistingControl" };
+			this.oGetInitialUIChangesStub = sandbox.stub(VariantManagementState, "getInitialUIChanges");
+			this.oBySelectorStub = sandbox.stub(JsControlTreeModifier, "bySelector");
+			this.oApplyAllChangesStub = sandbox.stub(Applier, "applyAllChangesForControl").resolves();
+		},
+		afterEach() {
+			sandbox.restore();
+		}
+	}, function() {
+		function createChange(sSelectorId) {
+			return {
+				getSelector: () => ({ id: sSelectorId })
+			};
+		}
+
+		QUnit.test("kicks the Applier once per unique existing target control", async function(assert) {
+			const oChange1 = createChange("existingControl");
+			const oChange2 = createChange("existingControl"); // same control — must be deduped
+			const oChange3 = createChange("otherExistingControl");
+			this.oGetInitialUIChangesStub.returns([oChange1, oChange2, oChange3]);
+			this.oBySelectorStub.withArgs({ id: "existingControl" }, this.oAppComponent).returns(this.oExistingControl);
+			this.oBySelectorStub.withArgs({ id: "otherExistingControl" }, this.oAppComponent).returns(this.oOtherExistingControl);
+
+			await VariantManagerApply.applyInitialChangesForExistingControls({
+				appComponent: this.oAppComponent,
+				reference: sReference,
+				vmReference: this.sVMReference
+			});
+
+			assert.strictEqual(
+				this.oApplyAllChangesStub.callCount, 2,
+				"then applyAllChangesForControl is executed exactly once per unique control"
+			);
+			const aTargetControls = this.oApplyAllChangesStub.getCalls().map((oCall) => oCall.args[2]);
+			assert.ok(aTargetControls.includes(this.oExistingControl), "then the first control is executed");
+			assert.ok(aTargetControls.includes(this.oOtherExistingControl), "then the second control is executed");
+			this.oApplyAllChangesStub.getCalls().forEach((oCall) => {
+				assert.strictEqual(oCall.args[0], this.oAppComponent, "then applyAllChangesForControl receives the app component");
+				assert.strictEqual(oCall.args[1], sReference, "then applyAllChangesForControl receives the flex reference");
+			});
+		});
+
+		QUnit.test("skips changes whose target control does not yet exist", async function(assert) {
+			const oChange = createChange("notYetExistingControl");
+			this.oGetInitialUIChangesStub.returns([oChange]);
+			this.oBySelectorStub.returns(undefined);
+
+			await VariantManagerApply.applyInitialChangesForExistingControls({
+				appComponent: this.oAppComponent,
+				reference: sReference,
+				vmReference: this.sVMReference
+			});
+
+			assert.strictEqual(
+				this.oApplyAllChangesStub.callCount, 0,
+				"then applyAllChangesForControl is not called when the control cannot be resolved"
+			);
+		});
+
+		QUnit.test("resolves without rejection when there are no initial changes at all", async function(assert) {
+			this.oGetInitialUIChangesStub.returns([]);
+
+			await VariantManagerApply.applyInitialChangesForExistingControls({
+				appComponent: this.oAppComponent,
+				reference: sReference,
+				vmReference: this.sVMReference
+			});
+
+			assert.strictEqual(this.oApplyAllChangesStub.callCount, 0, "then applyAllChangesForControl is not called");
+			assert.strictEqual(this.oBySelectorStub.callCount, 0, "then no selector resolution is attempted");
+		});
+	});
+
 	QUnit.done(function() {
 		oComponent._restoreGetAppComponentStub();
 		document.getElementById("qunit-fixture").style.display = "none";

@@ -547,7 +547,7 @@ sap.ui.define([
 	[{
 		aggregatedQueryOptions : {},
 		childQueryOptions : {},
-		expectedQueryOptions : {}
+		expectedQueryOptions : "unchanged"
 	}, {
 		aggregatedQueryOptions : {$select : ["Name"]},
 		childQueryOptions : {$select : ["ID"]},
@@ -559,11 +559,11 @@ sap.ui.define([
 	}, {
 		aggregatedQueryOptions : {$select : ["Name"]},
 		childQueryOptions : {},
-		expectedQueryOptions : {$select : ["Name"]}
+		expectedQueryOptions : "unchanged"
 	}, {
 		aggregatedQueryOptions : {$select : ["ID", "Name"]},
 		childQueryOptions : {$select : ["ID"]},
-		expectedQueryOptions : {$select : ["ID", "Name"]}
+		expectedQueryOptions : "unchanged"
 	}, {
 		aggregatedQueryOptions : {
 			$expand : {
@@ -632,7 +632,7 @@ sap.ui.define([
 	}, {
 		aggregatedQueryOptions : {$count : true},
 		childQueryOptions : {},
-		expectedQueryOptions : {$count : true}
+		expectedQueryOptions : "unchanged"
 	}, {
 		aggregatedQueryOptions : {$count : false},
 		childQueryOptions : {$count : true},
@@ -640,31 +640,31 @@ sap.ui.define([
 	}, {
 		aggregatedQueryOptions : {$count : true},
 		childQueryOptions : {$count : false},
-		expectedQueryOptions : {$count : true}
+		expectedQueryOptions : "unchanged"
 	}, {
 		aggregatedQueryOptions : {},
 		childQueryOptions : {$count : false},
-		expectedQueryOptions : {}
+		expectedQueryOptions : "unchanged"
 	}, {
 		aggregatedQueryOptions : {$orderby : "Category"},
 		childQueryOptions : {$orderby : "Category"},
-		expectedQueryOptions : {$orderby : "Category"}
+		expectedQueryOptions : "unchanged"
 	}, {
 		aggregatedQueryOptions : {$apply : "filter(Amount gt 3)"},
 		childQueryOptions : {},
-		expectedQueryOptions : {$apply : "filter(Amount gt 3)"}
+		expectedQueryOptions : "unchanged"
 	}, {
 		aggregatedQueryOptions : {$filter : "Amount gt 3"},
 		childQueryOptions : {},
-		expectedQueryOptions : {$filter : "Amount gt 3"}
+		expectedQueryOptions : "unchanged"
 	}, {
 		aggregatedQueryOptions : {$orderby : "Category"},
 		childQueryOptions : {},
-		expectedQueryOptions : {$orderby : "Category"}
+		expectedQueryOptions : "unchanged"
 	}, {
 		aggregatedQueryOptions : {$search : "Foo NOT Bar"},
 		childQueryOptions : {},
-		expectedQueryOptions : {$search : "Foo NOT Bar"}
+		expectedQueryOptions : "unchanged"
 	}, {
 		aggregatedQueryOptions : {},
 		childQueryOptions : {
@@ -686,7 +686,7 @@ sap.ui.define([
 	}, {
 		aggregatedQueryOptions : {$expand : {foo : {$select : ["bar"]}}},
 		childQueryOptions : {},
-		expectedQueryOptions : {$expand : {foo : {$select : ["bar"]}}}
+		expectedQueryOptions : "unchanged"
 	}, {
 		aggregatedQueryOptions : {
 			$expand : {
@@ -749,13 +749,7 @@ sap.ui.define([
 				}
 			}
 		},
-		expectedQueryOptions : {
-			$expand : {
-				foo : {
-					$select : ["bar"]
-				}
-			}
-		}
+		expectedQueryOptions : "unchanged"
 	}, {
 		bIsProperty : true,
 		aggregatedQueryOptions : {
@@ -780,6 +774,26 @@ sap.ui.define([
 				}
 			}
 		}
+	}, {
+		aggregatedQueryOptions : {
+			$expand : {
+				EMPLOYEE_2_TEAM : {
+					$expand : {TEAM_2_MANAGER : {}},
+					$orderby : "~orderby~",
+					$select : ["Team_Id"]
+				}
+			}
+		},
+		childQueryOptions : {
+			$expand : {
+				EMPLOYEE_2_TEAM : {
+					// missing $expand is not an issue
+					$orderby : "~orderby~",
+					$select : ["Team_Id"]
+				}
+			}
+		},
+		expectedQueryOptions : "unchanged"
 	}].forEach(function (oFixture, i) {
 		QUnit.test("aggregateQueryOptions returns true: " + i, function (assert) {
 			var oBinding = new ODataParentBinding({
@@ -793,7 +807,10 @@ sap.ui.define([
 			bMergeSuccess = oBinding.aggregateQueryOptions(oFixture.childQueryOptions,
 				"/base/metapath", false, oFixture.bIsProperty);
 
-			assert.deepEqual(oBinding.mAggregatedQueryOptions, oFixture.expectedQueryOptions);
+			assert.deepEqual(oBinding.mAggregatedQueryOptions,
+				oFixture.expectedQueryOptions === "unchanged"
+					? oFixture.aggregatedQueryOptions
+					: oFixture.expectedQueryOptions);
 			assert.strictEqual(bMergeSuccess, true);
 		});
 	});
@@ -2334,13 +2351,13 @@ sap.ui.define([
 [{
 	aggregatedQueryOptions : {$select : ["Name", "AGE"]},
 	childQueryOptions : {$select : ["Name"]},
-	lateQueryOptions : {$select : ["Name"]},
+	lateQueryOptions : true,
 	success : true,
 	title : "same $select as before"
 }, {
 	aggregatedQueryOptions : {$select : ["Name", "AGE"]},
 	childQueryOptions : {$select : ["ROOM_ID"]},
-	lateQueryOptions : {$select : ["Name", "AGE", "ROOM_ID"]},
+	lateQueryOptions : true,
 	success : true,
 	title : "new property accepted and added to late properties"
 }, {
@@ -2351,19 +2368,19 @@ sap.ui.define([
 }, {
 	aggregatedQueryOptions : {$expand : {EMPLOYEE_2_TEAM : {$select : ["Team_Id"]}}},
 	childQueryOptions : {$expand : {EMPLOYEE_2_TEAM : {$select : ["Name"]}}},
-	lateQueryOptions : {$expand : {EMPLOYEE_2_TEAM : {$select : ["Team_Id", "Name"]}}},
+	lateQueryOptions : true,
 	success : true,
 	title : "new $select in existing $expand"
 }, {
 	aggregatedQueryOptions : {$expand : {EMPLOYEE_2_TEAM : {$select : ["Team_Id"]}}},
 	childQueryOptions : {$expand : {EMPLOYEE_2_TEAM : {$select : ["Team_Id"]}}},
-	lateQueryOptions : {$expand : {EMPLOYEE_2_TEAM : {$select : ["Team_Id"]}}},
+	lateQueryOptions : true,
 	success : true,
 	title : "same $expand"
 }, {
 	aggregatedQueryOptions : {$expand : {EMPLOYEE_2_TEAM : {}}},
 	childQueryOptions : {$expand : {EMPLOYEE_2_TEAM : {$expand : {TEAM_2_MANAGER : {}}}}},
-	lateQueryOptions : {$expand : {EMPLOYEE_2_TEAM : {$expand : {TEAM_2_MANAGER : {}}}}},
+	lateQueryOptions : true,
 	metadata : {
 		"/base/metaPath/EMPLOYEE_2_TEAM/TEAM_2_MANAGER" : {}
 	},
@@ -2378,14 +2395,7 @@ sap.ui.define([
 			}
 		}
 	},
-	lateQueryOptions : {
-		$select : ["AGE"],
-		$expand : {
-			EMPLOYEE_OF_THE_WEEK : {
-				$expand : {EMPLOYEE_2_MANAGER : {$select : ["Name"]}}
-			}
-		}
-	},
+	lateQueryOptions : true,
 	metadata : {
 		"/base/metaPath/EMPLOYEE_OF_THE_WEEK" : {},
 		"/base/metaPath/EMPLOYEE_OF_THE_WEEK/EMPLOYEE_2_MANAGER" : {}

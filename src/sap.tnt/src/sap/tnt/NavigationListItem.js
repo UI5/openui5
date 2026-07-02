@@ -14,6 +14,7 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/ui/util/openWindow",
 	"sap/ui/util/defaultLinkTypes",
+	"sap/base/strings/highlightText",
 	"./NavigationListItemBase"
 ], function (
 	library,
@@ -26,6 +27,7 @@ sap.ui.define([
 	KeyCodes,
 	openWindow,
 	defaultLinkTypes,
+	highlightText,
 	NavigationListItemBase
 ) {
 	"use strict";
@@ -277,6 +279,7 @@ sap.ui.define([
 
 		const NavigationListClass = oList.getMetadata().getClass().prototype.constructor;
 		const oListForPopup = new NavigationListClass({
+			highlightedText: oList.getHighlightedText(),
 			itemSelect: this.onPopupItemSelect.bind(this),
 			itemPress: this.onPopupItemPress.bind(this),
 			items: oItemForList
@@ -828,9 +831,19 @@ sap.ui.define([
 			oRM.style("text-align", sTextAlign);
 		}
 
-		oRM.openEnd()
-			.text(this.getText())
-			.close("span");
+		oRM.openEnd();
+
+		const sText = this.getText();
+		const oNavList = this.getNavigationList();
+		const sHighlightedText = !this._isOverflow && oNavList && oNavList.getHighlightedText();
+
+		if (sHighlightedText) {
+			oRM.unsafeHtml(highlightText(sText, sHighlightedText, "sapTntNLIHighlight"));
+		} else {
+			oRM.text(sText);
+		}
+
+		oRM.close("span");
 	};
 
 	/**

@@ -20,14 +20,14 @@ sap.ui.define([
 ], function(Library, nextUIUpdate, jQuery, QUnitUtils, KeyCodes, utils, Device, InvisibleText, XMLView, JSONModel, AnchorBar, Button, Text, Localization) {
 	"use strict";
 
-	var iRenderingDelay = 2000,
-		ANCHORBAR_CLASS_SELECTOR = ".sapUxAPAnchorBar",
-		HIERARCHICAL_CLASS_SELECTOR = ".sapUxAPHierarchicalSelect",
-		BREAK_POINTS = {
-			Phone: 600,
-			Tablet: 1024,
-			Desktop: 2000
-		};
+	const iRenderingDelay = 2000;
+	const ANCHORBAR_CLASS_SELECTOR = ".sapUxAPAnchorBar";
+	const HIERARCHICAL_CLASS_SELECTOR = ".sapUxAPHierarchicalSelect";
+	const BREAK_POINTS = {
+		Phone: 600,
+		Tablet: 1024,
+		Desktop: 2000
+	};
 
 	/**
 	 * In some tests that are using fake timers, it might happen that a rendering task is queued by
@@ -41,6 +41,17 @@ sap.ui.define([
 	 */
 	function clearPendingUIUpdates(clock) {
 		return nextUIUpdate(clock);
+	}
+
+	/**
+	 * Returns a Promise that resolves after the ObjectPageLayout fires onAfterRenderingDOMReady.
+	 * @param {sap.uxap.ObjectPageLayout} oOPL
+	 * @returns {Promise<void>}
+	 */
+	function waitForDOMReady(oOPL) {
+		return new Promise((resolve) => {
+			oOPL.attachEventOnce("onAfterRenderingDOMReady", resolve);
+		});
 	}
 
 	function checkButtonAriaAttribute(assert, oButton, sAttribute, sExpected, sMessage) {
@@ -98,7 +109,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("Show/Hide popover", async function(assert) {
-		var oAnchorBarButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[1];
+		assert.expect(2);
+		let oAnchorBarButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[1];
 
 		// initial assert
 		assert.ok(oAnchorBarButton.isA("sap.m.MenuButton"), "MenuButton is correctly used when showAnchorBarPopover=true");
@@ -116,11 +128,11 @@ sap.ui.define([
 
 	QUnit.test("Selected button", function (assert) {
 		//select button programmatically
-		var oAnchorBar = this.oObjectPage.getAggregation("_anchorBar"),
-			aAnchorBarContent = oAnchorBar.getContent(),
-			oFirstSectionButton = aAnchorBarContent[0],
-			oLastSectionButton = aAnchorBarContent[aAnchorBarContent.length - 1],
-			oMenuButton = aAnchorBarContent[1];
+		const oAnchorBar = this.oObjectPage.getAggregation("_anchorBar");
+		const aAnchorBarContent = oAnchorBar.getContent();
+		const oFirstSectionButton = aAnchorBarContent[0];
+		const oLastSectionButton = aAnchorBarContent[aAnchorBarContent.length - 1];
+		const oMenuButton = aAnchorBarContent[1];
 
 		oAnchorBar.setSelectedButton(oLastSectionButton);
 
@@ -142,10 +154,10 @@ sap.ui.define([
 
 	QUnit.test("aria-selected is set correctly in _computeNextSectionInfo", function (assert) {
 		//select button programmatically
-		var oAnchorBar = this.oObjectPage.getAggregation("_anchorBar"),
-			aAnchorBarContent = oAnchorBar.getContent(),
-			oFirstSectionButton = aAnchorBarContent[0],
-			oLastSectionButton = aAnchorBarContent[aAnchorBarContent.length - 1];
+		const oAnchorBar = this.oObjectPage.getAggregation("_anchorBar");
+		const aAnchorBarContent = oAnchorBar.getContent();
+		const oFirstSectionButton = aAnchorBarContent[0];
+		const oLastSectionButton = aAnchorBarContent[aAnchorBarContent.length - 1];
 
 		// act
 		oAnchorBar.setSelectedButton(oLastSectionButton);
@@ -156,10 +168,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("Selected button always set correctly", function (assert) {
-		var oAnchorBar = this.oObjectPage.getAggregation("_anchorBar"),
-			aAnchorBarContent = oAnchorBar.getContent(),
-			oFirstSectionButtonId = aAnchorBarContent[0].getId(),
-			sInvalidButtonId = "InvalidId";
+		const oAnchorBar = this.oObjectPage.getAggregation("_anchorBar");
+		const aAnchorBarContent = oAnchorBar.getContent();
+		const oFirstSectionButtonId = aAnchorBarContent[0].getId();
+		const sInvalidButtonId = "InvalidId";
 
 		oAnchorBar.setSelectedButton(oFirstSectionButtonId);
 
@@ -172,11 +184,11 @@ sap.ui.define([
 
 	QUnit.test("Custom button", function (assert) {
 		//select button programmatically
-		var oAnchorBar = this.oObjectPage.getAggregation("_anchorBar"),
-			oCustomButton = this.oObjectPage.getSections()[0].getCustomAnchorBarButton(),
-			aAnchorBarContent = oAnchorBar.getContent(),
-			oFirstSectionButton = aAnchorBarContent[0],
-			pressSpy = this.spy(oAnchorBar, "fireEvent");
+		const oAnchorBar = this.oObjectPage.getAggregation("_anchorBar");
+		const oCustomButton = this.oObjectPage.getSections()[0].getCustomAnchorBarButton();
+		const aAnchorBarContent = oAnchorBar.getContent();
+		const oFirstSectionButton = aAnchorBarContent[0];
+		const pressSpy = this.spy(oAnchorBar, "fireEvent");
 
 		oFirstSectionButton.firePress();
 
@@ -194,10 +206,10 @@ sap.ui.define([
 
 	QUnit.test("Custom button for sub-section", function (assert) {
 		//select button programmatically
-		var oAnchorBar = this.oObjectPage.getAggregation("_anchorBar"),
-			oCustomButton = this.oObjectPage.getSections()[1].getSubSections()[0].getCustomAnchorBarButton(),
-			oSecondSectionButton = oAnchorBar.getContent()[1],
-			oSubSectionButton = oSecondSectionButton.getMenu().getItems()[0];
+		const oAnchorBar = this.oObjectPage.getAggregation("_anchorBar");
+		const oCustomButton = this.oObjectPage.getSections()[1].getSubSections()[0].getCustomAnchorBarButton();
+		const oSecondSectionButton = oAnchorBar.getContent()[1];
+		const oSubSectionButton = oSecondSectionButton.getMenu().getItems()[0];
 
 		//assert
 		assert.strictEqual(oSubSectionButton.getText(), oCustomButton.getText(), "custom button text is propagated to the menu item");
@@ -205,7 +217,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Menu Button with long text should be able to have width, bigger than 12rem", function (assert) {
-		var $menuButton = jQuery("#UxAP-69_anchorBar--ObjectPageLayout-anchBar-UxAP-69_anchorBar--section16-anchor");
+		const $menuButton = jQuery("#UxAP-69_anchorBar--ObjectPageLayout-anchBar-UxAP-69_anchorBar--section16-anchor");
 
 		assert.ok(parseInt($menuButton.css("width")) > (12 * parseInt(jQuery("body").css("font-size"))),
 			"Max width style of MenuButton is overridden so that it is bigger than 12rem");
@@ -224,9 +236,9 @@ sap.ui.define([
 
 	QUnit.test("AnchorBar is correctly resized after resize of its parent ObjectPageLayout", function (assert) {
 		// Arrange
-		var oAnchorBar = this.oObjectPage.getAggregation("_anchorBar"),
-			oMediaRange,
-			sRangeSet = Device.media.RANGESETS.SAP_STANDARD;
+		const oAnchorBar = this.oObjectPage.getAggregation("_anchorBar");
+		const sRangeSet = Device.media.RANGESETS.SAP_STANDARD;
+		let oMediaRange;
 
 		// Act
 		// Resizing ObjectPage to Phone breakpoint
@@ -266,18 +278,17 @@ sap.ui.define([
 	});
 
 	QUnit.test("Anchors for sections with multiple subsection must have arrow-down icon", function (assert) {
-		var $arrowDownIcons;
-
-		$arrowDownIcons = this.oObjectPage.$().find(".sapUxAPAnchorBar .sapUxAPAnchorBarButton .sapMBtnIcon");
+		const $arrowDownIcons = this.oObjectPage.$().find(".sapUxAPAnchorBar .sapUxAPAnchorBarButton .sapMBtnIcon");
 		assert.ok($arrowDownIcons.length === 2, "Anchorbar has 2 buttons with arrow-down icon");
 	});
 
 	QUnit.test("Arrow left nad arrow right buttons should have correct tooltips", async function(assert) {
-		var oArrowLeft = this.anchorBarView.byId("ObjectPageLayout-anchBar-arrowScrollLeft"),
-			oArrowRight = this.anchorBarView.byId("ObjectPageLayout-anchBar-arrowScrollRight"),
-			oRB = Library.getResourceBundleFor("sap.uxap"),
-			sArrowLeftTooltip = oRB.getText("TOOLTIP_OP_SCROLL_LEFT_ARROW"),
-			sArrowRightTooltip = oRB.getText("TOOLTIP_OP_SCROLL_RIGHT_ARROW");
+		assert.expect(4);
+		const oArrowLeft = this.anchorBarView.byId("ObjectPageLayout-anchBar-arrowScrollLeft");
+		const oArrowRight = this.anchorBarView.byId("ObjectPageLayout-anchBar-arrowScrollRight");
+		const oRB = Library.getResourceBundleFor("sap.uxap");
+		const sArrowLeftTooltip = oRB.getText("TOOLTIP_OP_SCROLL_LEFT_ARROW");
+		const sArrowRightTooltip = oRB.getText("TOOLTIP_OP_SCROLL_RIGHT_ARROW");
 
 		//assert
 		assert.ok(oArrowLeft.getTooltip() === sArrowLeftTooltip, "Arrow left button should have tooltip '" + sArrowLeftTooltip + "'");
@@ -296,16 +307,14 @@ sap.ui.define([
 	});
 
 	QUnit.test("When using the objectPageNavigation the 'navigate' event is fired with the appropriate arguments", async function(assert) {
-		var oAnchorBar = this.oObjectPage.getAggregation("_anchorBar"),
-			oExpectedSection,
-			oExpectedSubSection,
-			navigateSpy = this.spy(this.oObjectPage, "fireNavigate");
-
+		assert.expect(2);
+		const oAnchorBar = this.oObjectPage.getAggregation("_anchorBar");
+		const navigateSpy = this.spy(this.oObjectPage, "fireNavigate");
 		this.oObjectPage.setShowAnchorBarPopover(false);
 		await nextUIUpdate(this.clock);
 
-		oExpectedSection = this.oObjectPage.getSections()[1];
-		oExpectedSubSection = oExpectedSection.getSubSections()[0];
+		const oExpectedSection = this.oObjectPage.getSections()[1];
+		const oExpectedSubSection = oExpectedSection.getSubSections()[0];
 		oAnchorBar.getContent()[1].firePress();
 
 		assert.ok(navigateSpy.calledWithMatch(sinon.match.has("section", oExpectedSection)), "Event fired has the correct section parameter attached");
@@ -313,8 +322,9 @@ sap.ui.define([
 	});
 
 	QUnit.test("The 'navigate' event is fired after the navigation is done, so a new Section can be selected in the handler", async function(assert) {
-		var oAnchorBar = this.oObjectPage.getAggregation("_anchorBar"),
-			fnDone = assert.async();
+		assert.expect(1);
+		const oAnchorBar = this.oObjectPage.getAggregation("_anchorBar");
+		const fnDone = assert.async();
 
 		this.oObjectPage.setUseIconTabBar(true);
 		this.oObjectPage.setShowAnchorBarPopover(false);
@@ -332,7 +342,7 @@ sap.ui.define([
 	});
 
 
-	var oModel = new JSONModel({
+	const oModel = new JSONModel({
 		sections: [
 			{title: "my first section"},
 			{title: "my second section"},
@@ -350,12 +360,14 @@ sap.ui.define([
 			await nextUIUpdate();
 		},
 		afterEach: function () {
+			this.oAnchorBar.destroy();
 			this.oAnchorBar = null;
 		}
 	});
 
 	QUnit.test("AnchorBar - backgroundDesign", async function(assert) {
-		var $oDomRef = this.oAnchorBar.$();
+		assert.expect(9);
+		const $oDomRef = this.oAnchorBar.$();
 
 		// assert
 		assert.equal(this.oAnchorBar.getBackgroundDesign(), null, "Default value of backgroundDesign property = null");
@@ -413,7 +425,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Simple binding initialized from view", function (assert) {
-		var oSectionButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[0];
+		const oSectionButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[0];
 
 		assert.strictEqual(oSectionButton.getText(), "my first section", "binding in view correctly initialized");
 	});
@@ -425,36 +437,35 @@ sap.ui.define([
 
 		// allow for re-render
 		this.clock.tick(iRenderingDelay);
-		var oSectionButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[0];
+		const oSectionButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[0];
 
 		assert.strictEqual(oSectionButton.getText(), "my updated title", "section title binding updates anchor bar button");
 	});
 
 	QUnit.test("Update by setTitle", function (assert) {
-
-		var oSection = this.oObjectPage.getSections()[0];
+		const oSection = this.oObjectPage.getSections()[0];
 
 		oSection.setTitle("my updated title again");
 		this.clock.tick(iRenderingDelay);
 
-		var oSectionButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[0];
+		const oSectionButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[0];
 
 		assert.strictEqual(oSectionButton.getText(), "my updated title again", "section title set updates anchor bar button");
 	});
 
 	QUnit.test("Dynamic bind property", function(assert) {
-		var oSection = this.oObjectPage.getSections()[3];
+		const oSection = this.oObjectPage.getSections()[3];
 
 		oSection.bindProperty("title", "/sections/3/title");
 
 		this.clock.tick(iRenderingDelay);
-		var oSectionButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[3];
+		const oSectionButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[3];
 
 		assert.equal(oSectionButton.getProperty("text"), "my fourth section", "Property must return model value");
 	});
 
 	QUnit.test("Dynamic bind property OneTime", function(assert) {
-		var oSection = this.oObjectPage.getSections()[3];
+		const oSection = this.oObjectPage.getSections()[3];
 
 		oSection.bindProperty("title", {
 			path: "/sections/3/title",
@@ -462,7 +473,7 @@ sap.ui.define([
 		});
 
 		this.clock.tick(iRenderingDelay);
-		var oSectionButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[3];
+		let oSectionButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[3];
 
 		assert.equal(oSectionButton.getProperty("text"), "my fourth section", "Property must return model value");
 
@@ -476,14 +487,14 @@ sap.ui.define([
 	});
 
 	QUnit.test("Dynamic bind property", function(assert) {
-		var oSection = this.oObjectPage.getSections()[3];
+		const oSection = this.oObjectPage.getSections()[3];
 
 		oSection.bindProperty("title", {
 			path: "/sections/3/title"
 		});
 
 		this.clock.tick(iRenderingDelay);
-		var oSectionButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[3];
+		let oSectionButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[3];
 
 		assert.equal(oSectionButton.getProperty("text"), "my fourth section", "Property must return model value");
 
@@ -496,41 +507,49 @@ sap.ui.define([
 	});
 
 	QUnit.test("selectItems with bound text", function (assert) {
+		// Arrange
+		const sButtonText = "my text";
+		const oAnchorBar = new AnchorBar();
+		const oModel = new JSONModel({
+			buttonText: sButtonText
+		});
+		const oButton = new Button({text: "{/buttonText}"});
 
-		var sButtonText = "my text",
-			oAnchorBar = new AnchorBar(),
-			oModel = new JSONModel({
-				buttonText: sButtonText
-			}),
-			oButton = new Button({text: "{/buttonText}"});
-
+		// Act
 		// Check select-item is created before the data-binding of the text is resolved
 		oAnchorBar.addContent(oButton);
+		// Assert
 		assert.equal(oAnchorBar._oSelect.getItems().length, 1, "select item for the button is created");
 
+		// Act
 		// Check the data-binding of the text is successfully resolved
 		oAnchorBar.setModel(oModel);
+		// Assert
 		assert.equal(oAnchorBar._oSelect.getItems()[0].getText(), sButtonText, "select item for the button has correct text");
 	});
 
 	QUnit.test("selectItems with bound text and contextBinding", function (assert) {
+		// Arrange
+		const sButtonText = "my text";
+		const oAnchorBar = new AnchorBar();
+		const oModel = new JSONModel({
+			buttons: {
+				buttonText: sButtonText
+			}
+		});
+		const oButton = new Button({text: "{buttonText}"});
 
-		var sButtonText = "my text",
-			oAnchorBar = new AnchorBar(),
-			oModel = new JSONModel({
-				buttons: {
-					buttonText: sButtonText
-				}
-			}),
-			oButton = new Button({text: "{buttonText}"});
-
+		// Act
 		// Check select-item is created before the data-binding of the text is resolved
 		oAnchorBar.addContent(oButton);
+		// Assert
 		assert.equal(oAnchorBar._oSelect.getItems().length, 1, "select item for the button is created");
 
+		// Act
 		// Check the data-binding of the text is successfully resolved
 		oAnchorBar.setBindingContext(oModel.createBindingContext("/buttons"));
 		oAnchorBar.setModel(oModel);
+		// Assert
 		assert.equal(oAnchorBar._oSelect.getItems()[0].getText(), sButtonText, "select item for the button has correct text");
 	});
 
@@ -559,12 +578,13 @@ sap.ui.define([
 	});
 
 	QUnit.test("Complex binding initialized from view", function (assert) {
-		var oSectionButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[1];
+		const oSectionButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[1];
 
 		assert.strictEqual(oSectionButton.getText(), "Title(1)", "complex title binding correct");
 	});
 
 	QUnit.test("Update by model change", async function(assert) {
+		assert.expect(1);
 		//section title binding updates anchor bar button
 		oModel.setProperty("/objectCount", 2);
 		oModel.refresh(true);
@@ -572,7 +592,7 @@ sap.ui.define([
 
 		// allow for re-render
 		this.clock.tick(iRenderingDelay);
-		var oSectionButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[1];
+		const oSectionButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[1];
 
 		assert.strictEqual(oSectionButton.getText(), "Title(2)", "section title binding updates anchor bar button");
 	});
@@ -587,7 +607,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Assignment of _iREMSize, _iTolerance and _iOffset in onBeforeRendering method", function (assert) {
-		var iFontSize = 16;
+		const iFontSize = 16;
 
 		this.stub(jQuery, "css").returns(iFontSize);
 
@@ -625,28 +645,28 @@ sap.ui.define([
 	});
 
 	QUnit.test("AnchorBar container has the correct role", function (assert) {
-		var $oMenu = jQuery("#UxAP-69_anchorBarBinding--ObjectPageLayout-anchBar-scroll");
+		const $oMenu = jQuery("#UxAP-69_anchorBarBinding--ObjectPageLayout-anchBar-scroll");
 
 		assert.strictEqual($oMenu.attr("role"), "listbox", "AnchorBar container has the listbox role.");
 	});
 
 	QUnit.test("Tooltip set on HierarchicalSelect", function (assert) {
-		var oAnchorBar = this.oObjectPage.getAggregation("_anchorBar"),
-			oSelect = oAnchorBar._getHierarchicalSelect(),
-			oRB = Library.getResourceBundleFor("sap.uxap"),
-			sExpectedTooltip = oRB.getText("ANCHOR_BAR_OVERFLOW");
+		const oAnchorBar = this.oObjectPage.getAggregation("_anchorBar");
+		const oSelect = oAnchorBar._getHierarchicalSelect();
+		const oRB = Library.getResourceBundleFor("sap.uxap");
+		const sExpectedTooltip = oRB.getText("ANCHOR_BAR_OVERFLOW");
 
 		assert.strictEqual(oSelect.getTooltip(), sExpectedTooltip, "Tooltip correctly set.");
 	});
 
 	QUnit.test("Hierarchy in HierarchicalSelect is preserved on arrow navigation", function (assert) {
 		// Arrange
-		var oAnchorBar = this.oObjectPage.getAggregation("_anchorBar"),
-			oSelect = oAnchorBar._getHierarchicalSelect(),
-			oDialog = oSelect.getAggregation("picker"),
-			clock = sinon.useFakeTimers(),
-			oSelectList = oSelect.getList(),
-			oOnAfterRenderingDelegate = {
+		const oAnchorBar = this.oObjectPage.getAggregation("_anchorBar");
+		const oSelect = oAnchorBar._getHierarchicalSelect();
+		const oDialog = oSelect.getAggregation("picker");
+		const clock = sinon.useFakeTimers();
+		const oSelectList = oSelect.getList();
+		const oOnAfterRenderingDelegate = {
 				onAfterRendering: function () {
 					// Assert
 					oSelectList.removeEventDelegate(oOnAfterRenderingDelegate);
@@ -658,9 +678,9 @@ sap.ui.define([
 					clock.restore();
 					done();
 				}
-			},
-			done = assert.async(),
-			oApplyClassesSpy;
+			};
+		const done = assert.async();
+		let oApplyClassesSpy;
 
 			oDialog.attachAfterOpen(function () {
 				clock.tick(100); // allow finish rendering
@@ -680,10 +700,10 @@ sap.ui.define([
 
 	QUnit.test("Selecting Section from HierarchicalSelect focuses the selected Section", function (assert) {
 		// Arrange
-		var oAnchorBar = this.oObjectPage.getAggregation("_anchorBar"),
-			oSelect = oAnchorBar._getHierarchicalSelect(),
-			oSelectedSubSection = this.oObjectPage.getSections()[0].getSubSections()[0],
-			oStub = this.stub(oSelectedSubSection, "getDomRef").callsFake(function () {
+		const oAnchorBar = this.oObjectPage.getAggregation("_anchorBar");
+		const oSelect = oAnchorBar._getHierarchicalSelect();
+		const oSelectedSubSection = this.oObjectPage.getSections()[0].getSubSections()[0];
+		const oStub = this.stub(oSelectedSubSection, "getDomRef").callsFake(function () {
 				return {
 					focus: function () {
 						assert.ok(true, "Selected Section is focused");
@@ -694,9 +714,9 @@ sap.ui.define([
 							done();
 					}
 				};
-			}),
-			clock = sinon.useFakeTimers(),
-			done = assert.async();
+			});
+		const clock = sinon.useFakeTimers();
+		const done = assert.async();
 
 			assert.expect(1);
 			oAnchorBar._onSelectChange({
@@ -709,10 +729,9 @@ sap.ui.define([
 	});
 
 	QUnit.test("Count information", function (assert) {
-		var aAnchorBarContent = this.oObjectPage.getAggregation("_anchorBar").getContent(),
-			iAnchorBarContentLength = aAnchorBarContent.length,
-			oCurrentButton,
-			iIndex;
+		const aAnchorBarContent = this.oObjectPage.getAggregation("_anchorBar").getContent();
+		const iAnchorBarContentLength = aAnchorBarContent.length;
+		let oCurrentButton, iIndex;
 
 		for (iIndex = 0; iIndex < iAnchorBarContentLength; iIndex++) {
 			oCurrentButton = aAnchorBarContent[iIndex];
@@ -726,11 +745,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("ARIA role and role description of buttons", function (assert) {
-		var aAnchorBarContent = this.oObjectPage.getAggregation("_anchorBar").getContent(),
-			iAnchorBarContentLength = aAnchorBarContent.length,
-			sInvTextId = InvisibleText.getStaticId("sap.m", "SPLIT_BUTTON_DESCRIPTION"),
-			oCurrentButton,
-			iIndex;
+		const aAnchorBarContent = this.oObjectPage.getAggregation("_anchorBar").getContent();
+		const iAnchorBarContentLength = aAnchorBarContent.length;
+		const sInvTextId = InvisibleText.getStaticId("sap.m", "SPLIT_BUTTON_DESCRIPTION");
+		let oCurrentButton, iIndex;
 
 		for (iIndex = 0; iIndex < iAnchorBarContentLength; iIndex++) {
 			oCurrentButton = aAnchorBarContent[iIndex];
@@ -750,10 +768,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("Enhance accessibility for submenu buttons is called", function (assert) {
-		var	oAnchorBarButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[0],
-			oSplitButton = oAnchorBarButton._getButtonControl(),
-			oMenu = oAnchorBarButton.getMenu(),
-			accEnhanceSpy = this.spy(oMenu, "_fnEnhanceUnifiedMenuAccState");
+		const oAnchorBarButton = this.oObjectPage.getAggregation("_anchorBar").getContent()[0];
+		const oSplitButton = oAnchorBarButton._getButtonControl();
+		const oMenu = oAnchorBarButton.getMenu();
+		const accEnhanceSpy = this.spy(oMenu, "_fnEnhanceUnifiedMenuAccState");
 
 		// act
 		oSplitButton.fireArrowPress();
@@ -800,7 +818,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("focus change before rerendering", async function(assert) {
-		var oSelect = this.oAnchorBar._getHierarchicalSelect();
+		assert.expect(1);
+		const oSelect = this.oAnchorBar._getHierarchicalSelect();
 
 		this.oAnchorBar.placeAt('qunit-fixture');
 		await nextUIUpdate();
@@ -830,146 +849,120 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("AnchorBar scrolled to section on width change", function (assert) {
-		var oPage = this.oObjectPage,
-			done = assert.async(),
-			oSection = oPage.getSections()[14],
-			oAnchorBar,
-			sectionId = oSection.getId(),
-			anchorBarStub,
-			fnScrollToStub = function(sectionId) {
-				// Assert
-				assert.equal(anchorBarStub.callCount, 1, "AnchorBar is scrolled");
-				assert.equal(anchorBarStub.args[0][0], sectionId, "AnchorBar scrolled to correct section");
+	QUnit.test("AnchorBar scrolled to section on width change", async function (assert) {
+		const oPage = this.oObjectPage;
+		const oSection = oPage.getSections()[14];
+		const sectionId = oSection.getId();
+
+		const fnScrollToStub = (sectionId) => {
+			// Assert
+			assert.equal(anchorBarStub.callCount, 1, "AnchorBar is scrolled");
+			assert.equal(anchorBarStub.args[0][0], sectionId, "AnchorBar scrolled to correct section");
+		};
+
+		assert.expect(2);
+		this.oObjectPage.placeAt("qunit-fixture");
+		await waitForDOMReady(oPage);
+
+		const oAnchorBar = oPage.getAggregation("_anchorBar");
+		const anchorBarStub = this.stub(oAnchorBar, "scrollToSection").callsFake(fnScrollToStub);
+
+		//act
+		oPage.scrollToSection(sectionId, 0, null, true);
+		oPage.getDomRef().style.width = 772	 + "px";
+		anchorBarStub.reset();
+		// synchronously call the resize listener to spped up the test
+		oAnchorBar._adjustSize({size: {width: 772}, oldSize: {width: 1000}});
+	});
+
+	QUnit.test("AnchorBar scrolled to tab on sapright, when tab is not visible", async function (assert) {
+		// arrange
+		const oPage = this.oObjectPage;
+
+		assert.expect(2);
+		this.oObjectPage.placeAt("qunit-fixture");
+		await waitForDOMReady(oPage);
+
+		const oAnchorBar = oPage.getAggregation("_anchorBar");
+		const aAnchors = oAnchorBar.getContent();
+		const oSpyForceScroll = this.spy(oAnchorBar, "_forceScrollIfNeeded");
+		const oSpyScrollerScroll = this.spy(oAnchorBar._oScroller, "scrollTo");
+		const oEvent = {
+			target: {
+				id: aAnchors[10].getId()
 			},
-			fnOnDomReady = function() {
-				oAnchorBar = oPage.getAggregation("_anchorBar");
-				anchorBarStub = this.stub(oAnchorBar, "scrollToSection").callsFake(fnScrollToStub);
+			preventDefault: function () {}
+		};
 
-				//act
-				oPage.scrollToSection(sectionId, 0, null, true);
-				oPage.getDomRef().style.width = 772	 + "px";
-				anchorBarStub.reset();
-				// synchronously call the resize listener to spped up the test
-				oAnchorBar._adjustSize({size: {width: 772}, oldSize: {width: 1000}});
+		//act
+		oAnchorBar.onsapright(oEvent);
 
-				// Clean up
-				done();
-			};
-
-		assert.expect(2);
-		oPage.attachEventOnce("onAfterRenderingDOMReady", fnOnDomReady.bind(this));
-		this.oObjectPage.placeAt("qunit-fixture");
+		// assert
+		assert.ok(oSpyForceScroll.calledWith(aAnchors[11]), "_forceScrollIfNeeded is called with next AnchorBar tab");
+		assert.ok(oSpyScrollerScroll.calledOnce, "Scroller scrollTo is called");
 	});
 
-	QUnit.test("AnchorBar scrolled to tab on sapright, when tab is not visible", function (assert) {
+	QUnit.test("AnchorBar not scrolled to tab on sapright, when tab is fully visible", async function (assert) {
 		// arrange
-		var oPage = this.oObjectPage,
-			done = assert.async(),
-			oAnchorBar,
-			aAnchors,
-			oSpyForceScroll,
-			oSpyScrollerScroll,
-			oEvent,
-			fnOnDomReady = function() {
-				oAnchorBar = oPage.getAggregation("_anchorBar");
-				aAnchors = oAnchorBar.getContent();
-				oSpyForceScroll = this.spy(oAnchorBar, "_forceScrollIfNeeded");
-				oSpyScrollerScroll = this.spy(oAnchorBar._oScroller, "scrollTo");
-				oEvent = {
-					target: {
-						id: aAnchors[10].getId()
-					},
-					preventDefault: function () {}
-				};
-
-				//act
-				oAnchorBar.onsapright(oEvent);
-
-				// assert
-				assert.ok(oSpyForceScroll.calledWith(aAnchors[11]), "_forceScrollIfNeeded is called with next AnchorBar tab");
-				assert.ok(oSpyScrollerScroll.calledOnce, "Scroller scrollTo is called");
-
-				// clean up
-				done();
-			};
-
-		assert.expect(2);
-		oPage.attachEventOnce("onAfterRenderingDOMReady", fnOnDomReady.bind(this));
-		this.oObjectPage.placeAt("qunit-fixture");
-	});
-
-	QUnit.test("AnchorBar not scrolled to tab on sapright, when tab is fully visible", function (assert) {
-		// arrange
-		var oPage = this.oObjectPage,
-			done = assert.async(),
-			oAnchorBar,
-			aAnchors,
-			oSpyScrollerScroll,
-			oEvent,
-			fnOnDomReady = function() {
-				oAnchorBar = oPage.getAggregation("_anchorBar");
-				aAnchors = oAnchorBar.getContent();
-				oSpyScrollerScroll = this.spy(oAnchorBar._oScroller, "scrollTo");
-				oEvent = {
-					target: {
-						id: aAnchors[2].getId()
-					},
-					preventDefault: function () {}
-				};
-
-				//act
-				oAnchorBar.onsapright(oEvent);
-
-				// assert
-				assert.notOk(oSpyScrollerScroll.calledOnce, "Scroller scrollTo is not called");
-
-				// clean up
-				done();
-			};
+		const oPage = this.oObjectPage;
 
 		assert.expect(1);
-		oPage.attachEventOnce("onAfterRenderingDOMReady", fnOnDomReady.bind(this));
 		this.oObjectPage.placeAt("qunit-fixture");
+		await waitForDOMReady(oPage);
+
+		const oAnchorBar = oPage.getAggregation("_anchorBar");
+		const aAnchors = oAnchorBar.getContent();
+		const oSpyScrollerScroll = this.spy(oAnchorBar._oScroller, "scrollTo");
+		const oEvent = {
+			target: {
+				id: aAnchors[2].getId()
+			},
+			preventDefault: function () {}
+		};
+
+		//act
+		oAnchorBar.onsapright(oEvent);
+
+		// assert
+		assert.notOk(oSpyScrollerScroll.calledOnce, "Scroller scrollTo is not called");
 	});
 
 	QUnit.test("AnchorBar scrolled to tab on sapleft, when tab is not visible", function (assert) {
 		// arrange
-		var oPage = this.oObjectPage,
-			oSection = oPage.getSections()[10],
-			done = assert.async(),
-			oAnchorBar,
-			aAnchors,
-			oSpyForceScroll,
-			oSpyScrollerScroll,
-			oEvent,
-			fnOnDomReady = function() {
-				oAnchorBar = oPage.getAggregation("_anchorBar");
-				aAnchors = oAnchorBar.getContent();
-				oSpyForceScroll = this.spy(oAnchorBar, "_forceScrollIfNeeded");
-				oEvent = {
-					target: {
-						id: aAnchors[1].getId()
-					},
-					preventDefault: function () {}
-				};
+		const oPage = this.oObjectPage;
+		const oSection = oPage.getSections()[10];
+		const done = assert.async();
+		let oAnchorBar, aAnchors, oSpyForceScroll, oSpyScrollerScroll, oEvent;
 
-				//act
-				oPage.scrollToSection(oSection.getId(), 0, null, true);
-				oSpyScrollerScroll = this.spy(oAnchorBar._oScroller, "scrollTo");
-
-				setTimeout(function () {
-					// act
-
-					oAnchorBar.onsapleft(oEvent);
-					// assert
-					assert.ok(oSpyForceScroll.calledWith(aAnchors[0]), "_forceScrollIfNeeded is called with previous AnchorBar tab");
-					assert.ok(oSpyScrollerScroll.calledOnce, "Scroller scrollTo is called");
-
-					// clean up
-					done();
-				}, 300);
+		const fnOnDomReady = function() {
+			oAnchorBar = oPage.getAggregation("_anchorBar");
+			aAnchors = oAnchorBar.getContent();
+			oSpyForceScroll = this.spy(oAnchorBar, "_forceScrollIfNeeded");
+			oEvent = {
+				target: {
+					id: aAnchors[1].getId()
+				},
+				preventDefault: function () {}
 			};
+
+			//act
+			oPage.scrollToSection(oSection.getId(), 0, null, true);
+			oSpyScrollerScroll = this.spy(oAnchorBar._oScroller, "scrollTo");
+
+// eslint-disable-next-line no-warning-comments
+			// Cannot replace with nextUIUpdate — waits for AnchorBar DOM calculations triggered by scroll/keyboard events
+			setTimeout(function () {
+				// act
+
+				oAnchorBar.onsapleft(oEvent);
+				// assert
+				assert.ok(oSpyForceScroll.calledWith(aAnchors[0]), "_forceScrollIfNeeded is called with previous AnchorBar tab");
+				assert.ok(oSpyScrollerScroll.calledOnce, "Scroller scrollTo is called");
+
+				// clean up
+				done();
+			}, 300);
+		};
 
 		assert.expect(2);
 		oPage.attachEventOnce("onAfterRenderingDOMReady", fnOnDomReady.bind(this));
@@ -987,56 +980,46 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("AnchorBar has correct number of items", function (assert) {
-		var oPage = this.oObjectPage,
-			iExpectedTotalSections = this.NUMBER_OF_SECTIONS,
-			iExpectedTotalSubSections = this.NUMBER_OF_SECTIONS * this.NUMBER_OF_SUB_SECTIONS,
-			done = assert.async(),
-			oAnchorBar,
-			fnOnDomReady = function() {
-				oAnchorBar = oPage.getAggregation("_anchorBar");
-				assert.equal(oAnchorBar.getContent().length, iExpectedTotalSections);
-				assert.equal(oAnchorBar._oSelect.getItems().length, iExpectedTotalSections + iExpectedTotalSubSections);
-				done();
-			};
+	QUnit.test("AnchorBar has correct number of items", async function (assert) {
+		const oPage = this.oObjectPage;
+		const iExpectedTotalSections = this.NUMBER_OF_SECTIONS;
+		const iExpectedTotalSubSections = this.NUMBER_OF_SECTIONS * this.NUMBER_OF_SUB_SECTIONS;
 
 		assert.expect(2);
-		oPage.attachEventOnce("onAfterRenderingDOMReady", fnOnDomReady);
 		this.oObjectPage.placeAt("qunit-fixture");
+		await waitForDOMReady(oPage);
+
+		const oAnchorBar = oPage.getAggregation("_anchorBar");
+		assert.equal(oAnchorBar.getContent().length, iExpectedTotalSections);
+		assert.equal(oAnchorBar._oSelect.getItems().length, iExpectedTotalSections + iExpectedTotalSubSections);
 	});
 
-	QUnit.test("AnchorBar content is correctly updated", function (assert) {
-		var oPage = this.oObjectPage,
-			oSubSection1,
-			oSubSection2,
-			iTotalSections = this.NUMBER_OF_SECTIONS,
-			iTotalSubSections = this.NUMBER_OF_SECTIONS * this.NUMBER_OF_SUB_SECTIONS,
-			done = assert.async(),
-			oAnchorBar,
-			fnOnInitRendering = function() {
-				oSubSection1 = utils.oFactory.getSubSection(1, [new Text()]);
-				oSubSection2 = utils.oFactory.getSubSection(2, [new Text()]);
-				oPage.addSection(utils.oFactory.getSection(2, "H2", [oSubSection1, oSubSection2]));
-				iTotalSections += 1;
-				iTotalSubSections += 2;
-				oPage._requestAdjustLayoutAndUxRules(true);
-				oAnchorBar = oPage.getAggregation("_anchorBar");
-				assert.equal(oAnchorBar.getContent().length, iTotalSections);
-				assert.equal(oAnchorBar._oSelect.getItems().length, iTotalSections + iTotalSubSections);
-				done();
-			};
+	QUnit.test("AnchorBar content is correctly updated", async function (assert) {
+		const oPage = this.oObjectPage;
+		let iTotalSections = this.NUMBER_OF_SECTIONS;
+		let iTotalSubSections = this.NUMBER_OF_SECTIONS * this.NUMBER_OF_SUB_SECTIONS;
 
 		assert.expect(2);
-		oPage.attachEventOnce("onAfterRenderingDOMReady", fnOnInitRendering);
 		this.oObjectPage.placeAt("qunit-fixture");
+		await waitForDOMReady(oPage);
+
+		const oSubSection1 = utils.oFactory.getSubSection(1, [new Text()]);
+		const oSubSection2 = utils.oFactory.getSubSection(2, [new Text()]);
+		oPage.addSection(utils.oFactory.getSection(2, "H2", [oSubSection1, oSubSection2]));
+		iTotalSections += 1;
+		iTotalSubSections += 2;
+		oPage._requestAdjustLayoutAndUxRules(true);
+		const oAnchorBar = oPage.getAggregation("_anchorBar");
+		assert.equal(oAnchorBar.getContent().length, iTotalSections);
+		assert.equal(oAnchorBar._oSelect.getItems().length, iTotalSections + iTotalSubSections);
 	});
 
 
 	QUnit.module("RTL", {
 		beforeEach: async function(assert) {
 			Localization.setRTL(true);
-			var done = assert.async(),
-			oAnchorBar = new AnchorBar();
+			const done = assert.async();
+			const oAnchorBar = new AnchorBar();
 			this.anchorBar = oAnchorBar;
 			this.anchorBar.addEventDelegate({
 				onAfterRendering: function() {
@@ -1044,7 +1027,7 @@ sap.ui.define([
 					oAnchorBar.removeEventDelegate(this);
 				}
 			});
-			for (var i = 0; i < 100; i++) {
+			for (let i = 0; i < 100; i++) {
 				this.anchorBar.addContent(new Button({text: "button " + i}));
 			}
 			this.anchorBar.placeAt('qunit-fixture');
@@ -1058,7 +1041,9 @@ sap.ui.define([
 	});
 
 	QUnit.test("Scroll direction is correct", function (assert) {
-		var done = assert.async();
+// eslint-disable-next-line no-warning-comments
+		const done = assert.async();
+		// Cannot replace with nextUIUpdate — waits for AnchorBar DOM calculations triggered by scroll/keyboard events
 		setTimeout(function() {
 
 			// Setup: Ensure there is content in the left overflow
@@ -1089,7 +1074,7 @@ sap.ui.define([
 		beforeEach: async function(assert) {
 			this.oAnchorBar = new AnchorBar();
 			this.clock = sinon.useFakeTimers();
-			for (var i = 0; i < 20; i++) {
+			for (let i = 0; i < 20; i++) {
 				this.oAnchorBar.addContent(new Button({text: "Section " + i}));
 			}
 
@@ -1103,11 +1088,11 @@ sap.ui.define([
 		}
 	});
 	QUnit.test("Select opening popover", async function (assert) {
+		assert.expect(1);
 		//Arrange
-		var	oSelect;
 		await nextUIUpdate(this.clock);
 		this.clock.tick(iRenderingDelay);
-		oSelect = this.oAnchorBar.getAggregation("_select");
+		const oSelect = this.oAnchorBar.getAggregation("_select");
 
 		// Act
 		oSelect.focus();

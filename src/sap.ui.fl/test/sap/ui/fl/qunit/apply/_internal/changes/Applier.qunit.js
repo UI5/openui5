@@ -260,6 +260,41 @@ sap.ui.define([
 			}.bind(this));
 		});
 
+		QUnit.test("does not re-apply the change when applyAllChangesForControl is called twice on the same control", function(assert) {
+			const oChange = FlexObjectFactory.createFromFileContent(getLabelChangeContent("a"));
+			sandbox.stub(FlexObjectState, "getLiveDependencyMap").returns(getInitialDependencyMap({
+				mChanges: {
+					someId: [oChange]
+				}
+			}));
+			// Reflect what the real applyChangeOnControl does on success: transition the change
+			// into APPLY_SUCCESSFUL and let checkAndAdjustChangeStatus see the custom-data marker
+			// on the control so it does not reset the state back to INITIAL.
+			let bApplied = false;
+			this.oApplyChangeOnControlStub.callsFake((oChangeArg) => {
+				oChangeArg.startApplying();
+				oChangeArg.markSuccessful();
+				bApplied = true;
+				return { success: true };
+			});
+			sandbox.stub(FlexCustomData, "getAppliedCustomDataValue").callsFake(() => bApplied);
+			sandbox.stub(FlexCustomData, "hasChangeApplyFinishedCustomData").callsFake(() => bApplied);
+
+			return Applier.applyAllChangesForControl(this.oAppComponent, "DummyFlexReference", this.oControl)
+			.then(() => {
+				assert.strictEqual(this.oApplyChangeOnControlStub.callCount, 1, "the change was applied once");
+				assert.ok(oChange.isSuccessfullyApplied(), "the change status is APPLY_SUCCESSFUL after the first call");
+				return Applier.applyAllChangesForControl(this.oAppComponent, "DummyFlexReference", this.oControl);
+			})
+			.then(() => {
+				assert.strictEqual(
+					this.oApplyChangeOnControlStub.callCount, 1,
+					"the change was not re-applied on the second call — the outer guard in processControl skipped it"
+				);
+				assert.ok(oChange.isSuccessfullyApplied(), "the change status is still APPLY_SUCCESSFUL");
+			});
+		});
+
 		QUnit.test("does not crash if control is in template and not available", function(assert) {
 			const oGetControlStub = sandbox.stub(ChangeUtils, "getControlIfTemplateAffected").returns({
 				bTemplateAffected: true,

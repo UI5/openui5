@@ -318,6 +318,46 @@ sap.ui.define([
 		oDRS.destroy();
 	});
 
+	QUnit.test("change event fires with undefined 'from'/'to' when value is invalid, and with date objects when valid", async function(assert) {
+		// Prepare
+		var oDRS = new DateRangeSelection({
+				delimiter: "-",
+				displayFormat: "dd.MM.yyyy",
+				minDate: UI5Date.getInstance(2020, 0, 1),
+				maxDate: UI5Date.getInstance(2020, 11, 31)
+			}),
+			oFireChangeEventSpy = sinon.spy(oDRS, "fireChangeEvent");
+
+		oDRS.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act - enter an invalid date (outside min/max range)
+		oDRS.focus();
+		oDRS._$input.val("01.01.2019 - 10.01.2019");
+		oDRS.onChange();
+
+		// Assert - invalid: from and to should be undefined
+		assert.ok(oFireChangeEventSpy.calledOnce, "change event was fired for invalid input");
+		assert.strictEqual(oFireChangeEventSpy.getCall(0).args[1].valid, false, "valid is false for invalid input");
+		assert.strictEqual(oFireChangeEventSpy.getCall(0).args[1].from, undefined, "from is undefined when value is invalid");
+		assert.strictEqual(oFireChangeEventSpy.getCall(0).args[1].to, undefined, "to is undefined when value is invalid");
+
+		oFireChangeEventSpy.resetHistory();
+
+		// Act - enter a valid date
+		oDRS._$input.val("05.06.2020 - 15.06.2020");
+		oDRS.onChange();
+
+		// Assert - valid: from and to should be date objects
+		assert.ok(oFireChangeEventSpy.calledOnce, "change event was fired for valid input");
+		assert.strictEqual(oFireChangeEventSpy.getCall(0).args[1].valid, true, "valid is true for valid input");
+		assert.ok(oFireChangeEventSpy.getCall(0).args[1].from instanceof Date, "from is a Date object when value is valid");
+		assert.ok(oFireChangeEventSpy.getCall(0).args[1].to instanceof Date, "to is a Date object when value is valid");
+
+		// Clean
+		oDRS.destroy();
+	});
+
 	QUnit.test("interval selection is correctly set to the MonthPicker", async function(assert) {
 		// Prepare
 		var oDRS = new DateRangeSelection({
