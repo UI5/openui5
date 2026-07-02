@@ -16,7 +16,7 @@ sap.ui.define([
 function(Library, $, KeyCodes, nextUIUpdate, QUtils, Link, Text, BreadCrumbs, Icon, Item, Select, Device) {
 	"use strict";
 
-	var	oFactory = {
+	const oFactory = {
 			getLink: function (sText, sHref) {
 				return new Link({
 					text: sText || "Page 1 long link",
@@ -29,9 +29,9 @@ function(Library, $, KeyCodes, nextUIUpdate, QUtils, Link, Text, BreadCrumbs, Ic
 				});
 			},
 			getLinks: function (iCount) {
-				var aLinks = [];
+				const aLinks = [];
 
-				for (var i = 0; i < iCount; i++) {
+				for (let i = 0; i < iCount; i++) {
 					aLinks.push(this.getLink());
 				}
 
@@ -62,7 +62,7 @@ function(Library, $, KeyCodes, nextUIUpdate, QUtils, Link, Text, BreadCrumbs, Ic
 				assert.strictEqual(oObjectToCheck instanceof fnConstructor, true, sMessage);
 			},
 			objectIsInTheDom: function (sSelector) {
-				var $object = $(sSelector);
+				const $object = $(sSelector);
 				return $object.length > 0;
 			},
 			_stubBreadcrumbsAsJQueryObject: function (iReturnHeight, oBreadcrumbsControl) {
@@ -93,17 +93,21 @@ function(Library, $, KeyCodes, nextUIUpdate, QUtils, Link, Text, BreadCrumbs, Ic
 	});
 
 	QUnit.test("Instantiation", function (assert) {
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl,
-			iLinksCount = oStandardBreadCrumbsControl.getLinks().length;
+		// Arrange
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+		const iLinksCount = oStandardBreadCrumbsControl.getLinks().length;
 
+		// Assert
 		assert.ok(oStandardBreadCrumbsControl, "is instantiated correctly");
 		assert.strictEqual(oStandardBreadCrumbsControl.getLinks().length, iLinksCount, "has " + iLinksCount + " links");
 	});
 
 	QUnit.test("Changing the control dynamically", function (assert) {
-		var oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl,
-			iLinksCount = oStandardBreadCrumbsControl.getLinks().length;
+		// Arrange
+		const oStandardBreadCrumbsControl = this.oStandardBreadCrumbsControl;
+		const iLinksCount = oStandardBreadCrumbsControl.getLinks().length;
 
+		// Act & Assert
 		oStandardBreadCrumbsControl.addLink(oFactory.getLink());
 		assert.strictEqual(oStandardBreadCrumbsControl.getLinks().length, iLinksCount + 1,
 			"the link is correctly added to the control");
@@ -132,9 +136,13 @@ function(Library, $, KeyCodes, nextUIUpdate, QUtils, Link, Text, BreadCrumbs, Ic
 	});
 
 	QUnit.test("Creating the internal icon for link separation", function (assert) {
-		var oBreadCrumbControl = this.oStandardBreadCrumbsControl,
-			oTubeIcon = oBreadCrumbControl._getTubeIcon();
+		// Arrange
+		const oBreadCrumbControl = this.oStandardBreadCrumbsControl;
 
+		// Act
+		const oTubeIcon = oBreadCrumbControl._getTubeIcon();
+
+		// Assert
 		assert.ok(oTubeIcon, "an object is returned from the function");
 		helpers.checkType(assert, Icon, oTubeIcon, "the tube separator is an Icon");
 		assert.strictEqual(oTubeIcon.getSrc(), "sap-icon://slim-arrow-right", "a correct icon is used");
@@ -143,18 +151,22 @@ function(Library, $, KeyCodes, nextUIUpdate, QUtils, Link, Text, BreadCrumbs, Ic
 	});
 
 	QUnit.test("Creating the internal select for the overflown version of the control", function (assert) {
-		var oBreadCrumbControl = this.oStandardBreadCrumbsControl,
-			oOverflowSelect = oBreadCrumbControl._getOverflowSelect();
+		// Arrange
+		const oBreadCrumbControl = this.oStandardBreadCrumbsControl;
 
+		// Act
+		const oOverflowSelect = oBreadCrumbControl._getOverflowSelect();
+
+		// Assert
 		assert.ok(oOverflowSelect, this.sResultMessage);
 		helpers.checkType(assert, Select, oOverflowSelect, "the OverflownSelect is an sap.m.Select");
 		assert.strictEqual(oOverflowSelect.getItems().length, oBreadCrumbControl.getLinks().length + 1,
 			"the select has all of the items from the normal version of the control");
 
-		var oLink = oFactory.getLink(),
-			oText = oFactory.getText(),
-			oSelectItem = oBreadCrumbControl._createSelectItem(oLink),
-			oCurrentlySelectedItem = oBreadCrumbControl._createSelectItem(oText);
+		const oLink = oFactory.getLink();
+		const oText = oFactory.getText();
+		const oSelectItem = oBreadCrumbControl._createSelectItem(oLink);
+		const oCurrentlySelectedItem = oBreadCrumbControl._createSelectItem(oText);
 
 		assert.ok(oSelectItem, this.sResultMessage);
 		helpers.checkType(assert, Item, oSelectItem, "the selectItem is an sap.ui.core.Item");
@@ -165,8 +177,10 @@ function(Library, $, KeyCodes, nextUIUpdate, QUtils, Link, Text, BreadCrumbs, Ic
 	});
 
 	QUnit.test("Mode state selection", function (assert) {
-		var oBreadCrumbControl = this.oStandardBreadCrumbsControl;
+		// Arrange
+		const oBreadCrumbControl = this.oStandardBreadCrumbsControl;
 
+		// Act & Assert
 		helpers._stubBreadcrumbsAsJQueryObject(60, oBreadCrumbControl);
 
 		assert.strictEqual(oBreadCrumbControl._shouldOverflow(), true,
@@ -182,10 +196,15 @@ function(Library, $, KeyCodes, nextUIUpdate, QUtils, Link, Text, BreadCrumbs, Ic
 	});
 
 	QUnit.test("On phone always show overflowSelect", function (assert) {
-		var oBreadCrumbControl = this.oStandardBreadCrumbsControl;
+		// Arrange
+		const oBreadCrumbControl = this.oStandardBreadCrumbsControl;
+
+		// Act
 		Device.system.phone = true;
 		oBreadCrumbControl.onBeforeRendering();
 		oBreadCrumbControl._handleInitialModeSelection();
+
+		// Assert
 		assert.ok(oBreadCrumbControl._getUsingOverflowSelect());
 	});
 
@@ -212,24 +231,31 @@ function(Library, $, KeyCodes, nextUIUpdate, QUtils, Link, Text, BreadCrumbs, Ic
 	});
 
 	QUnit.test("The control is rendered in overflow mode", async function (assert) {
+		assert.expect(4);
+		// Arrange
 		this.baseCaseTests(assert);
+
+		// Act
 		this.oBreadCrumbs._bUseOverflowSelect = true;
 		this.oBreadCrumbs.invalidate();
 		await nextUIUpdate();
 
-		var $breadCrumbs = this.oBreadCrumbs.$(),
-			$overflowDots = $breadCrumbs.find("span.sapUxAPBreadCrumbsDots"),
-			$overflowSelect = $breadCrumbs.find(".sapMSlt");
+		// Assert
+		const $breadCrumbs = this.oBreadCrumbs.$();
+		const $overflowDots = $breadCrumbs.find("span.sapUxAPBreadCrumbsDots");
+		const $overflowSelect = $breadCrumbs.find(".sapMSlt");
 
 		assert.ok($overflowDots.length, "the overflow dots are rendered");
 		assert.ok($overflowSelect.length, "the overflowSelect is rendered ");
 	});
 
 	QUnit.test("Changing the state of visibility of the breadcrumb", function (assert) {
-		var oBreadCrumbControl = this.oBreadCrumbs,
-			$BreadCrumbControl = oBreadCrumbControl.$(),
-			$breadcrumbs = oBreadCrumbControl._getBreadcrumbsAsJQueryObject();
+		// Arrange
+		const oBreadCrumbControl = this.oBreadCrumbs;
+		const $BreadCrumbControl = oBreadCrumbControl.$();
+		const $breadcrumbs = oBreadCrumbControl._getBreadcrumbsAsJQueryObject();
 
+		// Act & Assert
 		oBreadCrumbControl._setBreadcrumbsVisible(true);
 
 		assert.ok(!$breadcrumbs.hasClass("sapUiHidden"));
@@ -242,9 +268,11 @@ function(Library, $, KeyCodes, nextUIUpdate, QUtils, Link, Text, BreadCrumbs, Ic
 	});
 
 	QUnit.test("Changing the state of visibility of the select", function (assert) {
-		var oBreadCrumbControl = this.oBreadCrumbs,
-			$select = oBreadCrumbControl._getOverflowSelectAsJQueryObject();
+		// Arrange
+		const oBreadCrumbControl = this.oBreadCrumbs;
+		const $select = oBreadCrumbControl._getOverflowSelectAsJQueryObject();
 
+		// Act & Assert
 		oBreadCrumbControl._setSelectVisible(false);
 
 		assert.ok($select.hasClass("sapUiHidden"));
@@ -277,10 +305,12 @@ function(Library, $, KeyCodes, nextUIUpdate, QUtils, Link, Text, BreadCrumbs, Ic
 	});
 
 	QUnit.test("BreadCrumbs receives correct AriaLabelledBy", function (assert) {
-		var oBreadCrumbControl = this.oBreadCrumbs,
-			oHiddenLabel = oBreadCrumbControl._getAriaLabelledBy(),
-			sLabelText = oFactory.getResourceBundle().getText("BREADCRUMB_TRAIL_LABEL");
+		// Arrange
+		const oBreadCrumbControl = this.oBreadCrumbs;
+		const oHiddenLabel = oBreadCrumbControl._getAriaLabelledBy();
+		const sLabelText = oFactory.getResourceBundle().getText("BREADCRUMB_TRAIL_LABEL");
 
+		// Assert
 		assert.strictEqual(oHiddenLabel.getText(), sLabelText,
 			"The AriaLabelledBy element is set a hidden label is created with the correct text");
 
@@ -289,13 +319,15 @@ function(Library, $, KeyCodes, nextUIUpdate, QUtils, Link, Text, BreadCrumbs, Ic
 	});
 
 	QUnit.test("PAGE DOWN/PAGE UP keyboard handling", function (assert) {
-		var oBreadCrumbControl = this.oBreadCrumbs,
-			oItemsToNavigate = oBreadCrumbControl._getItemsToNavigate(),
-			iTotalItemCount = oItemsToNavigate.length,
-			oFirstItemSpy = this.spy(oItemsToNavigate[0], "focus"),
-			oFifthItemSpy = this.spy(oItemsToNavigate[5], "focus"),
-			oLastItemSpy = this.spy(oItemsToNavigate[10], "focus");
+		// Arrange
+		const oBreadCrumbControl = this.oBreadCrumbs;
+		const oItemsToNavigate = oBreadCrumbControl._getItemsToNavigate();
+		const iTotalItemCount = oItemsToNavigate.length;
+		const oFirstItemSpy = this.spy(oItemsToNavigate[0], "focus");
+		const oFifthItemSpy = this.spy(oItemsToNavigate[5], "focus");
+		const oLastItemSpy = this.spy(oItemsToNavigate[10], "focus");
 
+		// Act & Assert
 		oBreadCrumbControl._toggleOverflowMode(false);
 
 		helpers.verifyFocusOnKeyDown(assert, KeyCodes.PAGE_DOWN, oItemsToNavigate[0],

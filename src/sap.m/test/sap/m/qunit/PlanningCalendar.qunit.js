@@ -3449,6 +3449,8 @@ sap.ui.define([
 			aDays = oPC1Interval.getDomRef().querySelectorAll(".sapUiCalItem"),
 			$02Mar = aDays[30];
 
+		// Ensure focus is not already on the target (previous test may leave it there)
+		document.activeElement?.blur();
 		$02Mar.focus();
 		await nextUIUpdate();
 		nextUIUpdate.runSync()/*fake timer is used in module*/;

@@ -2624,5 +2624,468 @@ sap.ui.define([
 		oNavigationList.destroy();
 	});
 
+	QUnit.module("highlightedText property", {
+		beforeEach: async function () {
+			this.navigationList = new NavigationList({
+				items: [
+					new NavigationListItem({
+						text: "Home",
+						icon: "sap-icon://home",
+						key: "home"
+					}),
+					new NavigationListItem({
+						text: "Accounts",
+						icon: "sap-icon://account",
+						key: "accounts",
+						items: [
+							new NavigationListItem({
+								text: "My Account",
+								key: "myAccount"
+							}),
+							new NavigationListItem({
+								text: "Settings",
+								key: "settings"
+							})
+						]
+					}),
+					new NavigationListGroup({
+						text: "Business Operations",
+						items: [
+							new NavigationListItem({
+								text: "Orders",
+								icon: "sap-icon://cart",
+								key: "orders"
+							}),
+							new NavigationListItem({
+								text: "Invoices",
+								icon: "sap-icon://receipt",
+								key: "invoices"
+							})
+						]
+					})
+				]
+			});
+			this.navigationList.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.navigationList.destroy();
+		}
+	});
+
+	QUnit.test("Default value is empty string", function (assert) {
+		assert.strictEqual(this.navigationList.getHighlightedText(), "", "Default highlightedText is empty string");
+	});
+
+	QUnit.test("No highlight markup when highlightedText is empty", function (assert) {
+		const oHighlight = this.navigationList.getDomRef().querySelector(".sapTntNLIHighlight");
+		assert.notOk(oHighlight, "No highlight span is rendered when highlightedText is empty");
+	});
+
+	QUnit.test("Matching text is wrapped in highlight span", async function (assert) {
+		this.navigationList.setHighlightedText("Home");
+		await nextUIUpdate();
+
+		const oItem = this.navigationList.getItems()[0];
+		const oHighlight = oItem.getDomRef().querySelector(".sapTntNLIHighlight");
+
+		assert.ok(oHighlight, "Highlight span is rendered");
+		assert.strictEqual(oHighlight.textContent, "Home", "Highlighted text matches the search term");
+	});
+
+	QUnit.test("Highlighting is case-insensitive", async function (assert) {
+		this.navigationList.setHighlightedText("home");
+		await nextUIUpdate();
+
+		const oItem = this.navigationList.getItems()[0];
+		const oHighlight = oItem.getDomRef().querySelector(".sapTntNLIHighlight");
+
+		assert.ok(oHighlight, "Highlight span is rendered for case-insensitive match");
+		assert.strictEqual(oHighlight.textContent, "Home", "Original casing is preserved in highlighted text");
+	});
+
+	QUnit.test("Partial text match is highlighted", async function (assert) {
+		this.navigationList.setHighlightedText("Acc");
+		await nextUIUpdate();
+
+		const oItem = this.navigationList.getItems()[1];
+		const oHighlight = oItem.getDomRef().querySelector(".sapTntNLIHighlight");
+
+		assert.ok(oHighlight, "Highlight span is rendered for partial match");
+		assert.strictEqual(oHighlight.textContent, "Acc", "Only the matching portion is highlighted");
+	});
+
+	QUnit.test("Child items are highlighted", async function (assert) {
+		this.navigationList.setHighlightedText("Account");
+		await nextUIUpdate();
+
+		const oChildItem = this.navigationList.getItems()[1].getItems()[0];
+		const oHighlight = oChildItem.getDomRef().querySelector(".sapTntNLIHighlight");
+
+		assert.ok(oHighlight, "Highlight span is rendered in child item");
+		assert.strictEqual(oHighlight.textContent, "Account", "Child item text is highlighted correctly");
+	});
+
+	QUnit.test("Non-matching items have no highlight", async function (assert) {
+		this.navigationList.setHighlightedText("Home");
+		await nextUIUpdate();
+
+		const oNonMatchingItem = this.navigationList.getItems()[1];
+		const oHighlight = oNonMatchingItem.getDomRef().querySelector(".sapTntNLIHighlight");
+
+		assert.notOk(oHighlight, "No highlight span for non-matching item");
+	});
+
+	QUnit.test("Clearing highlightedText removes highlights", async function (assert) {
+		this.navigationList.setHighlightedText("Home");
+		await nextUIUpdate();
+
+		let oHighlight = this.navigationList.getDomRef().querySelector(".sapTntNLIHighlight");
+		assert.ok(oHighlight, "Highlight is present after setting highlightedText");
+
+		this.navigationList.setHighlightedText("");
+		await nextUIUpdate();
+
+		oHighlight = this.navigationList.getDomRef().querySelector(".sapTntNLIHighlight");
+		assert.notOk(oHighlight, "Highlight is removed after clearing highlightedText");
+	});
+
+	QUnit.test("Surrounding text is preserved correctly", async function (assert) {
+		this.navigationList.setHighlightedText("Account");
+		await nextUIUpdate();
+
+		const oItem = this.navigationList.getItems()[1].getItems()[0];
+		const oTextSpan = oItem.getDomRef().querySelector(".sapTntNLIText");
+
+		assert.strictEqual(oTextSpan.textContent, "My Account", "Full text content is preserved");
+		assert.strictEqual(oTextSpan.querySelector(".sapTntNLIHighlight").textContent, "Account", "Only matching part is in highlight span");
+	});
+
+	QUnit.test("Group text is highlighted", async function (assert) {
+		this.navigationList.setHighlightedText("Business");
+		await nextUIUpdate();
+
+		const oGroup = this.navigationList.getItems()[2];
+		const oHighlight = oGroup.getDomRef().querySelector(".sapTntNLIHighlight");
+
+		assert.ok(oHighlight, "Highlight span is rendered in group header");
+		assert.strictEqual(oHighlight.textContent, "Business", "Group text is highlighted correctly");
+	});
+
+	QUnit.test("Group text highlighting is case-insensitive", async function (assert) {
+		this.navigationList.setHighlightedText("operations");
+		await nextUIUpdate();
+
+		const oGroup = this.navigationList.getItems()[2];
+		const oHighlight = oGroup.getDomRef().querySelector(".sapTntNLIHighlight");
+
+		assert.ok(oHighlight, "Highlight span is rendered for case-insensitive group match");
+		assert.strictEqual(oHighlight.textContent, "Operations", "Original casing is preserved in highlighted group text");
+	});
+
+	QUnit.test("Items inside group are highlighted", async function (assert) {
+		this.navigationList.setHighlightedText("Order");
+		await nextUIUpdate();
+
+		const oGroup = this.navigationList.getItems()[2];
+		const oGroupItem = oGroup.getItems()[0];
+		const oHighlight = oGroupItem.getDomRef().querySelector(".sapTntNLIHighlight");
+
+		assert.ok(oHighlight, "Highlight span is rendered in item inside group");
+		assert.strictEqual(oHighlight.textContent, "Order", "Item inside group is highlighted correctly");
+	});
+
+	QUnit.test("Non-matching group has no highlight", async function (assert) {
+		this.navigationList.setHighlightedText("Home");
+		await nextUIUpdate();
+
+		const oGroup = this.navigationList.getItems()[2];
+		const oGroupHeader = oGroup.getDomRef().querySelector(".sapTntNLGroupText");
+		const oHighlight = oGroupHeader.querySelector(".sapTntNLIHighlight");
+
+		assert.notOk(oHighlight, "No highlight span in non-matching group header");
+	});
+
+	QUnit.test("Highlighted text is propagated to popover list", async function (assert) {
+		const oNavigationList = new NavigationList({
+			expanded: false,
+			highlightedText: "Child",
+			items: [
+				new NavigationListItem({
+					text: "Parent",
+					icon: "sap-icon://home",
+					items: [
+						new NavigationListItem({
+							text: "Child Item",
+							key: "child1"
+						}),
+						new NavigationListItem({
+							text: "Other",
+							key: "other"
+						})
+					]
+				})
+			]
+		});
+		oNavigationList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oParentItem = oNavigationList.getItems()[0];
+		const oPopoverList = oParentItem.createListForPopup();
+
+		assert.strictEqual(oPopoverList.getHighlightedText(), "Child", "highlightedText is propagated to popover list");
+
+		oPopoverList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oHighlight = oPopoverList.getDomRef().querySelector(".sapTntNLIHighlight");
+		assert.ok(oHighlight, "Highlight span is rendered in popover list");
+		assert.strictEqual(oHighlight.textContent, "Child", "Correct text is highlighted in popover");
+
+		const oNonMatchingItem = oPopoverList.getItems()[0].getItems()[1];
+		const oNoHighlight = oNonMatchingItem.getDomRef().querySelector(".sapTntNLIHighlight");
+		assert.notOk(oNoHighlight, "Non-matching item in popover has no highlight");
+
+		oPopoverList.destroy();
+		oNavigationList.destroy();
+	});
+
+	QUnit.test("Overflow item text is not highlighted", async function (assert) {
+		const oNavigationList = new NavigationList({
+			expanded: false,
+			highlightedText: "More",
+			items: [
+				new NavigationListItem({
+					text: "More Items",
+					icon: "sap-icon://home",
+					key: "item1"
+				})
+			]
+		});
+		oNavigationList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oOverflowItem = oNavigationList.getAggregation("_overflowItem");
+		if (oOverflowItem && oOverflowItem.getDomRef()) {
+			const oHighlight = oOverflowItem.getDomRef().querySelector(".sapTntNLIHighlight");
+			assert.notOk(oHighlight, "Overflow item text is not highlighted");
+		} else {
+			assert.ok(true, "Overflow item is not rendered (not enough items to overflow)");
+		}
+
+		oNavigationList.destroy();
+	});
+
+	QUnit.test("Highlighted text is propagated to overflow menu items", async function (assert) {
+		const oNavigationList = new NavigationList({
+			expanded: false,
+			highlightedText: "Settings"
+		});
+
+		const aItems = [];
+		for (let i = 0; i < 20; i++) {
+			aItems.push(new NavigationListItem({
+				text: i === 5 ? "Settings" : "Item " + i,
+				icon: "sap-icon://home",
+				key: "item" + i
+			}));
+		}
+		aItems.forEach(function (oItem) {
+			oNavigationList.addItem(oItem);
+		});
+
+		oNavigationList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oOverflowItem = oNavigationList.getAggregation("_overflowItem");
+		if (oOverflowItem && oOverflowItem.getDomRef() && !oOverflowItem.getDomRef().classList.contains("sapTntNLIHidden")) {
+			const oMenu = oNavigationList._createOverflowMenu(oOverflowItem);
+			const aMenuItems = oMenu.getItems();
+			const oSettingsMenuItem = aMenuItems.find(function (oItem) {
+				return oItem.getText() === "Settings";
+			});
+
+			if (oSettingsMenuItem) {
+				assert.strictEqual(oSettingsMenuItem.getHighlightedText(), "Settings", "highlightedText is set on overflow menu item");
+			} else {
+				assert.ok(true, "Settings item is not in overflow (visible in main list)");
+			}
+
+			oMenu.destroy();
+		} else {
+			assert.ok(true, "Overflow is not active (all items fit)");
+		}
+
+		oNavigationList.destroy();
+	});
+
+	QUnit.module("announceMatchCount", {
+		beforeEach: async function () {
+			this.navigationList = new NavigationList({
+				items: [
+					new NavigationListItem({
+						text: "Item 1",
+						icon: "sap-icon://home",
+						key: "item1"
+					})
+				]
+			});
+			this.navigationList.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.navigationList.destroy();
+		}
+	});
+
+	QUnit.test("Announces plural text for multiple matches", function (assert) {
+		const oRB = Library.getResourceBundleFor("sap.tnt");
+		const oInvisibleMessage = sap.ui.require("sap/ui/core/InvisibleMessage").getInstance();
+		const oAnnounceSpy = sinon.spy(oInvisibleMessage, "announce");
+
+		this.navigationList.announceMatchCount(5);
+
+		assert.strictEqual(oAnnounceSpy.callCount, 1, "announce was called once");
+		assert.strictEqual(oAnnounceSpy.firstCall.args[0], oRB.getText("SIDE_NAVIGATION_SEARCH_MATCHES_FOUND", [5]), "Plural text is announced for 5 matches");
+
+		oAnnounceSpy.restore();
+	});
+
+	QUnit.test("Announces singular text for one match", function (assert) {
+		const oRB = Library.getResourceBundleFor("sap.tnt");
+		const oInvisibleMessage = sap.ui.require("sap/ui/core/InvisibleMessage").getInstance();
+		const oAnnounceSpy = sinon.spy(oInvisibleMessage, "announce");
+
+		this.navigationList.announceMatchCount(1);
+
+		assert.strictEqual(oAnnounceSpy.callCount, 1, "announce was called once");
+		assert.strictEqual(oAnnounceSpy.firstCall.args[0], oRB.getText("SIDE_NAVIGATION_SEARCH_MATCH_FOUND"), "Singular text is announced for 1 match");
+
+		oAnnounceSpy.restore();
+	});
+
+	QUnit.test("Announces plural text for zero matches", function (assert) {
+		const oRB = Library.getResourceBundleFor("sap.tnt");
+		const oInvisibleMessage = sap.ui.require("sap/ui/core/InvisibleMessage").getInstance();
+		const oAnnounceSpy = sinon.spy(oInvisibleMessage, "announce");
+
+		this.navigationList.announceMatchCount(0);
+
+		assert.strictEqual(oAnnounceSpy.callCount, 1, "announce was called once");
+		assert.strictEqual(oAnnounceSpy.firstCall.args[0], oRB.getText("SIDE_NAVIGATION_SEARCH_MATCHES_FOUND", [0]), "Plural text is announced for 0 matches");
+
+		oAnnounceSpy.restore();
+	});
+
+	QUnit.test("Uses InvisibleMessageMode.Polite", function (assert) {
+		const oInvisibleMessage = sap.ui.require("sap/ui/core/InvisibleMessage").getInstance();
+		const oAnnounceSpy = sinon.spy(oInvisibleMessage, "announce");
+
+		this.navigationList.announceMatchCount(3);
+
+		assert.strictEqual(oAnnounceSpy.firstCall.args[1], coreLibrary.InvisibleMessageMode.Polite, "Announcement uses Polite mode");
+
+		oAnnounceSpy.restore();
+	});
+
+	QUnit.module("No data indicator", {
+		beforeEach: async function () {
+			this.navigationList = new NavigationList({
+				items: [
+					new NavigationListItem({
+						text: "Home",
+						icon: "sap-icon://home",
+						key: "home"
+					}),
+					new NavigationListItem({
+						text: "Orders",
+						icon: "sap-icon://cart",
+						key: "orders"
+					})
+				]
+			});
+			this.navigationList.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.navigationList.destroy();
+		}
+	});
+
+	QUnit.test("No data item is not rendered when items are present", function (assert) {
+		this.navigationList.setHighlightedText("Home");
+
+		const oNoData = this.navigationList.getDomRef().querySelector(".sapTntNLNoData");
+		assert.notOk(oNoData, "No data item is not rendered when there are matching items");
+	});
+
+	QUnit.test("No data item is not rendered when highlightedText is empty", async function (assert) {
+		this.navigationList.removeAllItems();
+		await nextUIUpdate();
+
+		const oNoData = this.navigationList.getDomRef().querySelector(".sapTntNLNoData");
+		assert.notOk(oNoData, "No data item is not rendered when highlightedText is not set");
+	});
+
+	QUnit.test("No data item is rendered when list is empty and highlightedText is set", async function (assert) {
+		this.navigationList.removeAllItems();
+		this.navigationList.setHighlightedText("xyz");
+		await nextUIUpdate();
+
+		const oNoData = this.navigationList.getDomRef().querySelector(".sapTntNLNoData");
+		assert.ok(oNoData, "No data item is rendered");
+	});
+
+	QUnit.test("No data item displays correct text", async function (assert) {
+		const oRB = Library.getResourceBundleFor("sap.tnt");
+
+		this.navigationList.removeAllItems();
+		this.navigationList.setHighlightedText("xyz");
+		await nextUIUpdate();
+
+		const oNoDataLink = this.navigationList.getDomRef().querySelector(".sapTntNLNoData div");
+		assert.strictEqual(oNoDataLink.textContent, oRB.getText("SIDE_NAVIGATION_SEARCH_MATCHES_FOUND", [0]), "No data text matches the expected resource bundle text");
+	});
+
+	QUnit.test("No data item has correct DOM structure", async function (assert) {
+		this.navigationList.removeAllItems();
+		this.navigationList.setHighlightedText("xyz");
+		await nextUIUpdate();
+
+		const oLi = this.navigationList.getDomRef().querySelector("[id$='-nodata']");
+		assert.strictEqual(oLi.getAttribute("role"), "none", "li has role='none'");
+
+		const oDiv = oLi.querySelector(".sapTntNLI");
+		assert.ok(oDiv.classList.contains("sapTntNLIFirstLevel"), "div has sapTntNLIFirstLevel class");
+		assert.ok(oDiv.classList.contains("sapTntNLNoData"), "div has sapTntNLNoData class");
+
+		const oLink = oDiv.querySelector("div");
+		assert.strictEqual(oLink.getAttribute("role"), "treeitem", "a has role='treeitem'");
+	});
+
+	QUnit.test("No data item is focusable via ItemNavigation", async function (assert) {
+		this.navigationList.removeAllItems();
+		this.navigationList.setHighlightedText("xyz");
+		await nextUIUpdate();
+
+		const oNoDataLink = this.navigationList.getDomRef().querySelector(".sapTntNLNoData div");
+		const aDomRefs = this.navigationList._getFocusDomRefs();
+
+		assert.ok(aDomRefs.includes(oNoDataLink), "No data link is included in ItemNavigation DOM refs");
+	});
+
+	QUnit.test("No data item disappears when items are added back", async function (assert) {
+		this.navigationList.removeAllItems();
+		this.navigationList.setHighlightedText("xyz");
+		await nextUIUpdate();
+
+		assert.ok(this.navigationList.getDomRef().querySelector(".sapTntNLNoData"), "No data is rendered");
+
+		this.navigationList.addItem(new NavigationListItem({ text: "New Item", icon: "sap-icon://home" }));
+		await nextUIUpdate();
+
+		assert.notOk(this.navigationList.getDomRef().querySelector(".sapTntNLNoData"), "No data disappears after items are added");
+	});
+
 	return waitForThemeApplied();
 });

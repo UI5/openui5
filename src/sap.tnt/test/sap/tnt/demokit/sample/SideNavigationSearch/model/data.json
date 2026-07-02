@@ -1,0 +1,218 @@
+{
+	"navigation": [{
+		"title": "Home",
+		"icon": "sap-icon://home",
+		"key": "home"
+	}, {
+		"type": "group",
+		"title": "Business Operations",
+		"expanded": true,
+		"items": [{
+			"title": "Favorites",
+			"icon": "sap-icon://unfavorite",
+			"expanded": true,
+			"selectable": false,
+			"items": [{
+				"title": "My Accounts",
+				"key": "myAccounts"
+			}, {
+				"title": "My Orders",
+				"key": "myOrders"
+			}]
+		}, {
+			"title": "Customer Management",
+			"icon": "sap-icon://account",
+			"expanded": true,
+			"selectable": false,
+			"key": "CustomerManagement",
+			"items": [{
+				"title": "Contacts",
+				"key": "contacts"
+			}, {
+				"title": "Companies",
+				"key": "companies"
+			}, {
+				"title": "Partners",
+				"key": "partners"
+			}]
+		}, {
+			"title": "SAP Best Practices",
+			"icon": "sap-icon://learning-assistant",
+			"key": "sapBestPractices",
+			"href": "https://sap.com",
+			"target": "_blank",
+			"selectable": false
+		}, {
+			"title": "Sales",
+			"icon": "sap-icon://crm-sales",
+			"expanded": true,
+			"selectable": false,
+			"key": "Sales",
+			"items": [{
+				"title": "Leads",
+				"key": "leads"
+			}, {
+				"title": "Opportunities",
+				"key": "opportunities"
+			}, {
+				"title": "Quotes",
+				"key": "quotes"
+			}, {
+				"title": "Orders",
+				"key": "orders"
+			}, {
+				"title": "Invoices",
+				"key": "invoices"
+			}]
+		}, {
+			"title": "Products",
+			"icon": "sap-icon://customer-view",
+			"expanded": true,
+			"key": "products",
+			"items": [{
+				"title": "Product Catalog",
+				"key": "productCatalog"
+			}, {
+				"title": "Pricing",
+				"key": "pricing"
+			}, {
+				"title": "Inventory Management",
+				"key": "inventoryManagement"
+			}]
+		}, {
+			"title": "Marketing",
+			"icon": "sap-icon://customer-view",
+			"expanded": true,
+			"selectable": false,
+			"key": "marketing",
+			"items": [{
+				"title": "Campaigns",
+				"key": "campaigns"
+			}, {
+				"title": "E-mail Marketing",
+				"key": "emailMarketing"
+			}, {
+				"title": "MArketing Automation",
+				"key": "marketingAutomation"
+			}]
+		}, {
+			"title": "Finance",
+			"icon": "sap-icon://money-bills",
+			"expanded": true,
+			"selectable": false,
+			"items": [{
+				"title": "Accounts Receivable",
+				"key": "accountsReceivable"
+			}, {
+				"title": "Accounts Payable",
+				"key": "accountsPayable"
+			}, {
+				"title": "Budget Planning",
+				"key": "budgetPlanning"
+			}, {
+				"title": "Tax Management",
+				"key": "taxManagement"
+			}]
+		}, {
+			"title": "Year-End Financial Reports",
+			"icon": "sap-icon://manager-insight",
+			"expanded": true,
+			"key": "reports",
+			"items": [{
+				"title": "Sales Reports",
+				"key": "salesReports"
+			}, {
+				"title": "Customer reports",
+				"key": "customerReports"
+			}]
+		}]
+	}, {
+		"type": "group",
+		"title": "System & Administration",
+		"expanded": true,
+		"items": [{
+			"title": "Analytics",
+			"icon": "sap-icon://bar-chart",
+			"key": "analytics"
+		}, {
+			"title": "SAP Community",
+			"icon": "sap-icon://discussion-2",
+			"key": "sapCommunity",
+			"href": "https://sap.com",
+			"target": "_blank",
+			"selectable": false
+		}, {
+			"title": "Administration",
+			"icon": "sap-icon://settings",
+			"expanded": false,
+			"selectable": false,
+			"items": [{
+				"title": "User Management",
+				"key": "userManagement"
+			}, {
+				"title": "System Configuration",
+				"key": "systemConfig"
+			}, {
+				"title": "Audit Log",
+				"key": "auditLog"
+			}]
+		}, {
+			"title": "Service Management",
+			"icon": "sap-icon://customer-and-supplier",
+			"expanded": false,
+			"selectable": false,
+			"items": [{
+				"title": "Service Tickets",
+				"key": "serviceTickets"
+			}, {
+				"title": "Knowledge Base",
+				"key": "knowledgeBase"
+			}, {
+				"title": "Service Contracts",
+				"key": "serviceContracts"
+			}]
+		}, {
+			"title": "Notifications",
+			"icon": "sap-icon://message-information",
+			"key": "notifications"
+		}, {
+			"title": "SAP Training",
+			"icon": "sap-icon://course-book",
+			"key": "sapTraining",
+			"href": "https://sap.com",
+			"target": "_blank",
+			"selectable": false
+		}, {
+			"title": "Integration Hub",
+			"icon": "sap-icon://connected",
+			"expanded": false,
+			"key": "integrationHub",
+			"items": [{
+				"title": "API Management",
+				"key": "apiManagement"
+			}, {
+				"title": "Data Sync",
+				"key": "dataSync"
+			}]
+		}]
+	}],
+	"fixedNavigation": [{
+		"title": "Quick Create",
+		"icon": "sap-icon://add",
+		"ariaHasPopup": "Dialog",
+		"design": "Action",
+		"selectable": false,
+		"key": "quickCreate"
+	}, {
+		"title": "Product Settings",
+		"icon": "sap-icon://settings",
+		"key": "productSettings"
+	}, {
+		"title": "SAP Support Portal",
+		"icon": "sap-icon://sys-help",
+		"key": "sapSupport",
+		"href": "https://sap.com",
+		"target": "_blank",
+		"selectable": false
+	}]
+}

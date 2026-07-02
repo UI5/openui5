@@ -1195,7 +1195,7 @@ sap.ui.define([
 		DynamicDateRange.prototype._handleInputChange = function(oEvent) {
 			var sInputValue = oEvent.getParameter("value");
 
-			var oVal = this._parseValue(this._stripValue(sInputValue));
+			var oVal = this._parseValue(sInputValue);
 			var oPrevValue = this.getValue();
 			var bValid = sInputValue.trim() === "" || !!oVal;
 
@@ -1969,19 +1969,27 @@ sap.ui.define([
 		 * @static
 		 * @public
 		 */
-		 DynamicDateRange.prototype.parse = function(sValue, oFormatter) {
+		DynamicDateRange.prototype.parse = function(sValue, oFormatter) {
 			if (typeof sValue !== 'string') {
 				Log.error("DynamicDateFormat can only parse a String.");
 				return [];
 			}
 
 			var aResults = [],
-				oResult;
+				oResult,
+				sParseValue;
 
 			var aOptions = this._getOptions();
 
 			for (var i = 0; i < aOptions.length; i++) {
-				oResult = aOptions[i] && aOptions[i].parse(sValue.trim(), oFormatter);
+				// Only strip parenthetical text for options that add enhanced formatted values
+				if (aOptions[i].enhanceFormattedValue && aOptions[i].enhanceFormattedValue()) {
+					sParseValue = this._stripValue(sValue.trim());
+				} else {
+					sParseValue = sValue.trim();
+				}
+
+				oResult = aOptions[i] && aOptions[i].parse(sParseValue, oFormatter);
 
 				if (oResult) {
 					oResult.operator = aOptions[i].getKey();

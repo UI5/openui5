@@ -31,6 +31,8 @@ sap.ui.define([
 	SideNavigationRenderer.render = function (oRM, oControl) {
 		this.startSideNavigation(oRM, oControl);
 
+		this.renderFilterSection(oRM, oControl);
+
 		this.renderFlexibleList(oRM, oControl);
 		this.renderFixedList(oRM, oControl);
 
@@ -134,6 +136,23 @@ sap.ui.define([
 			.openEnd()
 			.renderControl(oFooter)
 			.close("footer");
+	};
+
+	SideNavigationRenderer.renderFilterSection = function (oRM, oControl) {
+		if (!oControl.getExpanded()) {
+			return;
+		}
+
+		const oFilterSection = oControl.getAggregation("filterSection");
+		if (!oFilterSection) {
+			return;
+		}
+
+		oRM.openStart("div")
+			.class("sapTntSideNavigationFilterSection")
+			.openEnd()
+			.renderControl(oFilterSection)
+			.close("div");
 	};
 
 	return SideNavigationRenderer;

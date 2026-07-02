@@ -4,11 +4,11 @@ function(Element, nextUIUpdate, jQuery, XMLView) {
 	"use strict";
 
 
-	var waitForForm = function (oView, sBlockId) {
-		return new Promise(function(resolve) {
+	const waitForForm = (oView, sBlockId) => {
+		return new Promise((resolve) => {
 			oView.byId(sBlockId)
-				.attachEvent("viewInit", function(oEvent) {
-					var oForm = oEvent.getParameter("view").getContent()[0];
+				.attachEvent("viewInit", (oEvent) => {
+					const oForm = oEvent.getParameter("view").getContent()[0];
 					oForm.addEventDelegate({
 						onAfterRendering: function() {
 							oForm.removeEventDelegate(this);
@@ -22,7 +22,7 @@ function(Element, nextUIUpdate, jQuery, XMLView) {
 
 	QUnit.module("Form Layout", {
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "UxAP-FormLayout",
 				viewName: "view.UxAP-FormLayout"
@@ -41,15 +41,12 @@ function(Element, nextUIUpdate, jQuery, XMLView) {
 	});
 
 	QUnit.test("ObjectPage Form layout", function (assert) {
-		var sExpectedClasses = ".sapUiFormCLColumnsL3.sapUiFormCLColumnsM2.sapUiFormCLColumnsXL4.sapUiFormCLContent",
-			oFormBlock,
-			aGridCells,
-			$GridCellsOuter;
+		const sExpectedClasses = ".sapUiFormCLColumnsL3.sapUiFormCLColumnsM2.sapUiFormCLColumnsXL4.sapUiFormCLContent";
 
 		// Arrange
-		oFormBlock = this.oObjectPageFormView.byId("personalFormBlock");
-		aGridCells = oFormBlock.$().find(".sapUiForm .sapUiFormCLContent>*");
-		$GridCellsOuter = oFormBlock.$().find(".sapUiForm .sapUiFormCL>div").first();
+		const oFormBlock = this.oObjectPageFormView.byId("personalFormBlock");
+		const aGridCells = oFormBlock.$().find(".sapUiForm .sapUiFormCLContent>*");
+		const $GridCellsOuter = oFormBlock.$().find(".sapUiForm .sapUiFormCL>div").first();
 
 		// Assert
 		assert.strictEqual(aGridCells.length, 4, "Form grid has 4 cells");
@@ -58,23 +55,20 @@ function(Element, nextUIUpdate, jQuery, XMLView) {
 	});
 
 	QUnit.test("ObjectPage with TitleOnLeft Form layout", function (assert) {
-		var done = assert.async(),
-			sExpectedClasses = ".sapUiFormCLColumnsL2.sapUiFormCLColumnsM2.sapUiFormCLColumnsXL3.sapUiFormCLContent",
-			oObjectPage,
-			oFormBlock,
-			$GridCellsOuter;
+		const done = assert.async();
+		const sExpectedClasses = ".sapUiFormCLColumnsL2.sapUiFormCLColumnsM2.sapUiFormCLColumnsXL3.sapUiFormCLContent";
 
 		assert.expect(1);
 
 		// Arrange
-		oObjectPage = this.oObjectPageFormView.byId("ObjectPageLayout");
-		oFormBlock = this.oObjectPageFormView.byId("personalFormBlock");
+		const oObjectPage = this.oObjectPageFormView.byId("ObjectPageLayout");
+		const oFormBlock = this.oObjectPageFormView.byId("personalFormBlock");
 
 		// Act
 		oObjectPage.setSubSectionLayout("TitleOnLeft");
 		oObjectPage.addEventDelegate({
 			onAfterRendering: function() {
-				$GridCellsOuter = oFormBlock.$().find(".sapUiForm .sapUiFormCL>div").first();
+				const $GridCellsOuter = oFormBlock.$().find(".sapUiForm .sapUiFormCL>div").first();
 
 				// Assert
 				assert.ok($GridCellsOuter.is(sExpectedClasses),
@@ -87,7 +81,7 @@ function(Element, nextUIUpdate, jQuery, XMLView) {
 
 	QUnit.module("Simple Form Layout", {
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "UxAP-SimpleFormLayout",
 				viewName: "view.UxAP-SimpleFormLayout"
@@ -97,8 +91,8 @@ function(Element, nextUIUpdate, jQuery, XMLView) {
 				this.oObjectPageFormView.placeAt("qunit-fixture");
 				await nextUIUpdate();
 
-				var oPromise1 = waitForForm(oView, "personalSimpleFormBlock"),
-				oPromise2 = waitForForm(oView, "employmentSimpleFormBlock");
+				const oPromise1 = waitForForm(oView, "personalSimpleFormBlock");
+				const oPromise2 = waitForForm(oView, "employmentSimpleFormBlock");
 
 				Promise.all([oPromise1, oPromise2]).then(done);
 
@@ -112,13 +106,13 @@ function(Element, nextUIUpdate, jQuery, XMLView) {
 	});
 
 	QUnit.test("ObjectPage SimpleForm layout", function (assert) {
-		var sExpectedClasses = ".sapUiFormCLColumnsL3.sapUiFormCLColumnsM2.sapUiFormCLColumnsXL4.sapUiFormCLContent",
-			oFormBlock = this.oObjectPageFormView.byId("personalSimpleFormBlock"),
-			aGridCells = oFormBlock.$().find(".sapUiForm .sapUiFormCLContent>*"),
-			oTestInput = Element.getElementById("__input0"),
-			iTestInputTop = parseInt(oTestInput.$().offset().top),
-			$GridCellsOuter = oFormBlock.$().find(".sapUiForm .sapUiFormCL>div").first(),
-			done = assert.async();
+		const sExpectedClasses = ".sapUiFormCLColumnsL3.sapUiFormCLColumnsM2.sapUiFormCLColumnsXL4.sapUiFormCLContent";
+		const oFormBlock = this.oObjectPageFormView.byId("personalSimpleFormBlock");
+		const aGridCells = oFormBlock.$().find(".sapUiForm .sapUiFormCLContent>*");
+		const oTestInput = Element.getElementById("__input0");
+		const iTestInputTop = parseInt(oTestInput.$().offset().top);
+		const $GridCellsOuter = oFormBlock.$().find(".sapUiForm .sapUiFormCL>div").first();
+		const done = assert.async();
 
 		// Assert
 		assert.expect(3);
@@ -152,23 +146,20 @@ function(Element, nextUIUpdate, jQuery, XMLView) {
 	});
 
 	QUnit.test("ObjectPage with TitleOnLeft SimpleForm layout", function (assert) {
-		var done = assert.async(),
-			sExpectedClasses = ".sapUiFormCLColumnsL2.sapUiFormCLColumnsM2.sapUiFormCLColumnsXL3.sapUiFormCLContent",
-			oObjectPage,
-			oFormBlock,
-			$GridCellsOuter;
+		const done = assert.async();
+		const sExpectedClasses = ".sapUiFormCLColumnsL2.sapUiFormCLColumnsM2.sapUiFormCLColumnsXL3.sapUiFormCLContent";
 
 		assert.expect(1);
 
 		// Arrange
-		oObjectPage = this.oObjectPageFormView.byId("ObjectPageLayout");
-		oFormBlock = this.oObjectPageFormView.byId("personalSimpleFormBlock");
+		const oObjectPage = this.oObjectPageFormView.byId("ObjectPageLayout");
+		const oFormBlock = this.oObjectPageFormView.byId("personalSimpleFormBlock");
 
 		// Act
 		oObjectPage.setSubSectionLayout("TitleOnLeft");
 		oObjectPage.addEventDelegate({
 			onAfterRendering: function() {
-				$GridCellsOuter = oFormBlock.$().find(".sapUiForm .sapUiFormCL>div").first();
+				const $GridCellsOuter = oFormBlock.$().find(".sapUiForm .sapUiFormCL>div").first();
 
 				// Assert
 				assert.ok($GridCellsOuter.is(sExpectedClasses),
@@ -180,11 +171,14 @@ function(Element, nextUIUpdate, jQuery, XMLView) {
 	});
 
 	QUnit.test("ObjectPage Fist Editable field focus", function (assert) {
-		var oObjectPageLayout = this.oObjectPageFormView.byId("ObjectPageLayout"),
-			oInput;
+		// Arrange
+		const oObjectPageLayout = this.oObjectPageFormView.byId("ObjectPageLayout");
+		const oInput = jQuery("#UxAP-SimpleFormLayout--employmentSimpleFormBlock-defaultXML--firstEditableInput-inner")[0];
 
-		oInput = jQuery("#UxAP-SimpleFormLayout--employmentSimpleFormBlock-defaultXML--firstEditableInput-inner")[0];
+		// Act
 		oObjectPageLayout._focusFirstEditableInput("sectionsContainer");
+
+		// Assert
 		assert.equal(document.activeElement, oInput, "The first editable input is focused");
 	});
 });

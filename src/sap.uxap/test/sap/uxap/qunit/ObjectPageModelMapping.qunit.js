@@ -6,16 +6,16 @@ function(Element, JSONModel, XMLView, nextUIUpdate) {
 
 	QUnit.module("modelMapping", {
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "UxAP-ModelMapping",
 				viewName: "view.UxAP-ModelMapping"
-			}).then(async function(oView) {
+			}).then(async (oView) => {
 				this.oView = oView;
 				this.oView.placeAt("qunit-fixture");
 				await nextUIUpdate();
 				done();
-			}.bind(this));
+			});
 		},
 		afterEach: function () {
 			this.oView.destroy();
@@ -24,57 +24,46 @@ function(Element, JSONModel, XMLView, nextUIUpdate) {
 
 	QUnit.test("initial model mapping is applied", async function(assert) {
 		// Arrange
-		var oExpectedFirstName = "John",
-			oExpectedLastName = "Miller",
-			oModel = new JSONModel({
-				Employee: {
-					firstName: oExpectedFirstName,
-					lastName: oExpectedLastName
-				}
-			}),
-			done = assert.async(),
-			oSelectedView,
-			oActualFirstName,
-			oActualLastName;
+		const oExpectedFirstName = "John";
+		const oExpectedLastName = "Miller";
+		const oModel = new JSONModel({
+			Employee: {
+				firstName: oExpectedFirstName,
+				lastName: oExpectedLastName
+			}
+		});
 
 		assert.expect(2);
 
 		// Act
 		this.oView.setModel(oModel, "jsonModel");
 		await nextUIUpdate(); // allow model info to propagare
+		// setModel propagation is asynchronous; wait for it to settle
+		await new Promise((resolve) => { setTimeout(resolve, 400); });
 
-		setTimeout(function () {
-			oSelectedView = Element.getElementById(this.oView.byId('block').getSelectedView());
-			oActualFirstName = oSelectedView.byId("txtFirstName").getText();
-			oActualLastName = oSelectedView.byId("txtLastName").getText();
+		const oSelectedView = Element.getElementById(this.oView.byId('block').getSelectedView());
+		const oActualFirstName = oSelectedView.byId("txtFirstName").getText();
+		const oActualLastName = oSelectedView.byId("txtLastName").getText();
 
-			// Assert
-			assert.strictEqual(oActualFirstName, oExpectedFirstName);
-			assert.strictEqual(oActualLastName, oExpectedLastName);
-
-			done();
-		}.bind(this), 400);
+		// Assert
+		assert.strictEqual(oActualFirstName, oExpectedFirstName);
+		assert.strictEqual(oActualLastName, oExpectedLastName);
 	});
 
 	QUnit.test("updated externalPath is applied", async function(assert) {
 		// Arrange
-		var oNewFirstName = "John1",
-			oNewLastName = "Miller1",
-			oModel = new JSONModel({
-				Employee: {
-					firstName: "John",
-					lastName: "Miller"
-				},
-				newEmployee: {
-					firstName: oNewFirstName,
-					lastName: oNewLastName
-				}
-			}),
-			done = assert.async(),
-			oBlock,
-			oSelectedView,
-			oActualFirstName,
-			oActualLastName;
+		const oNewFirstName = "John1";
+		const oNewLastName = "Miller1";
+		const oModel = new JSONModel({
+			Employee: {
+				firstName: "John",
+				lastName: "Miller"
+			},
+			newEmployee: {
+				firstName: oNewFirstName,
+				lastName: oNewLastName
+			}
+		});
 
 		assert.expect(2);
 
@@ -82,45 +71,40 @@ function(Element, JSONModel, XMLView, nextUIUpdate) {
 		this.oView.setModel(oModel, "jsonModel");
 		await nextUIUpdate(); // allow model info to propagare
 
-		setTimeout(async function() {
-			oBlock = Element.getElementById("UxAP-ModelMapping--block");
-			oSelectedView = Element.getElementById(this.oView.byId('block').getSelectedView());
+		// setModel propagation is asynchronous; wait for it to settle
+		await new Promise((resolve) => { setTimeout(resolve, 400); });
 
-			// Act
-			oBlock.getMappings()[0].setExternalPath("/newEmployee"); // update external path
-			await nextUIUpdate(); // allow model info to propagare
+		const oBlock = Element.getElementById("UxAP-ModelMapping--block");
+		const oSelectedView = Element.getElementById(this.oView.byId('block').getSelectedView());
 
-			oActualFirstName = oSelectedView.byId("txtFirstName").getText();
-			oActualLastName = oSelectedView.byId("txtLastName").getText();
+		// Act
+		oBlock.getMappings()[0].setExternalPath("/newEmployee"); // update external path
+		await nextUIUpdate(); // allow model info to propagare
 
-			// Assert
-			assert.strictEqual(oActualFirstName, oNewFirstName);
-			assert.strictEqual(oActualLastName, oNewLastName);
+		const oActualFirstName = oSelectedView.byId("txtFirstName").getText();
+		const oActualLastName = oSelectedView.byId("txtLastName").getText();
 
-			done();
-		}.bind(this), 400);
+		// Assert
+		assert.strictEqual(oActualFirstName, oNewFirstName);
+		assert.strictEqual(oActualLastName, oNewLastName);
 	});
 
 	QUnit.test("mapping is updated when the model is changed", async function(assert) {
 		// Arrange
-		var oExpectedFirstName = "JohnChanged",
-			oExpectedLastName = "MillerChanged",
-			oModel = new JSONModel({
-				Employee: {
-					firstName: "John",
-					lastName: "Miller"
-				}
-			}),
-			oChangedModel = new JSONModel({
-				Employee: {
-					firstName: oExpectedFirstName,
-					lastName: oExpectedLastName
-				}
-			}),
-			done = assert.async(),
-			oSelectedView,
-			oActualFirstName,
-			oActualLastName;
+		const oExpectedFirstName = "JohnChanged";
+		const oExpectedLastName = "MillerChanged";
+		const oModel = new JSONModel({
+			Employee: {
+				firstName: "John",
+				lastName: "Miller"
+			}
+		});
+		const oChangedModel = new JSONModel({
+			Employee: {
+				firstName: oExpectedFirstName,
+				lastName: oExpectedLastName
+			}
+		});
 
 		assert.expect(2);
 
@@ -131,17 +115,16 @@ function(Element, JSONModel, XMLView, nextUIUpdate) {
 		this.oView.setModel(oChangedModel, "jsonModel");
 		await nextUIUpdate(); // allow model info to propagare
 
-		setTimeout(function () {
-			oSelectedView = Element.getElementById(this.oView.byId('block').getSelectedView());
-			oActualFirstName = oSelectedView.byId("txtFirstName").getText();
-			oActualLastName = oSelectedView.byId("txtLastName").getText();
+		// setModel propagation is asynchronous; wait for it to settle
+		await new Promise((resolve) => { setTimeout(resolve, 400); });
 
-			// Assert
-			assert.strictEqual(oActualFirstName, oExpectedFirstName);
-			assert.strictEqual(oActualLastName, oExpectedLastName);
+		const oSelectedView = Element.getElementById(this.oView.byId('block').getSelectedView());
+		const oActualFirstName = oSelectedView.byId("txtFirstName").getText();
+		const oActualLastName = oSelectedView.byId("txtLastName").getText();
 
-			done();
-		}.bind(this), 400);
+		// Assert
+		assert.strictEqual(oActualFirstName, oExpectedFirstName);
+		assert.strictEqual(oActualLastName, oExpectedLastName);
 	});
 
 });

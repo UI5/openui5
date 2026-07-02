@@ -86,7 +86,13 @@ sap.ui.define([
 				/**
 				 * Defines the content inside the fixed part.
 				 */
-				fixedItem: { type: "sap.tnt.NavigationList", multiple: false }
+				fixedItem: { type: "sap.tnt.NavigationList", multiple: false },
+
+				/**
+				 * Defines the filter section.
+				 * @since 1.151
+				 */
+				filterSection: { type: "sap.ui.core.Control", multiple: false }
 			},
 			associations: {
 				/**

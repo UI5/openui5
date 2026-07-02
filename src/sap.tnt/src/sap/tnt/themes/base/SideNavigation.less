@@ -93,8 +93,17 @@ html[data-sap-ui-animation='off'] .sapTntSideNavigation {
 	border-radius: @_sap_tnt_SideNavigation_NavigationSeparatorRadius;
 }
 
+.sapTntSideNavigationSeparator:has(+ .sapTntSideNavigationFixed .sapTntNL:empty),
+.sapTntSideNavigationFixed .sapTntNL:empty {
+	display: none;
+}
+
 .sapTntSideNavigationFixed {
 	position: relative;
+}
+
+.sapTntSideNavigationFilterSection {
+	padding: 0.5rem 0.5rem 0.25rem 0.5rem;
 }
 
 /* Compact size */

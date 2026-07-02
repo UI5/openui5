@@ -428,6 +428,7 @@ sap.ui.define([
 				// getInitialCurrentVariant falls back to the default variant.
 				Log.error("URL-targeted variant lazy-load failed", oError);
 			})
+			.then(() => VariantManagerApply.applyInitialChangesForExistingControls(mParameters))
 			.then(() => waitForInitialVariantChanges(mParameters))
 		);
 	};

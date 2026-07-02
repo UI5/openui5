@@ -18,7 +18,18 @@ sap.ui.define([
 function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes, QUtils, Device, F6Navigation, XMLView, ObjectPageLayout, ObjectPageSubSection, OverflowToolbar) {
 	"use strict";
 
-	var sAnchorSelector = ".sapUxAPObjectPageNavigation .sapMITBHead .sapMITBFilter";
+	const sAnchorSelector = ".sapUxAPObjectPageNavigation .sapMITBHead .sapMITBFilter";
+
+	/**
+	 * Returns a Promise that resolves after the ObjectPageLayout fires onAfterRenderingDOMReady.
+	 * @param {sap.uxap.ObjectPageLayout} oOPL
+	 * @returns {Promise<void>}
+	 */
+	function waitForDOMReady(oOPL) {
+		return new Promise((resolve) => {
+			oOPL.attachEventOnce("onAfterRenderingDOMReady", resolve);
+		});
+	}
 
 	function getAnchorBar() {
 		return Element.getElementById("UxAP-70_KeyboardHandling--ObjectPageLayout-anchBar");
@@ -40,16 +51,16 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 
 	QUnit.module("F6/Group skipping", {
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "UxAP-12-ObjectPageDynamicHeader",
 				viewName: "view.UxAP-12-ObjectPageDynamicHeader"
-			}).then(function (oView) {
+			}).then((oView) => {
 				this.oView = oView;
 				this.oObjectPage = oView.byId("ObjectPageLayout");
 				this.oObjectPage.setShowFooter(true);
 				done();
-			}.bind(this));
+			});
 		},
 		afterEach: function () {
 			this.oView.destroy();
@@ -60,17 +71,15 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 	QUnit.test("F6/SHIFT+F6 - order should be correct", async function(assert) {
 		assert.expect(10); //number of assertions
 		// Arrange
-		var $oEl,
-			fnDone = assert.async(),
-			oControl,
-			aTabChain,
-			aOrderList = ['headerTitle', '_headerContent', '_anchorBar', '_$sectionsContainer', 'footer'],
-			oObjectPage = this.oObjectPage,
-			fnCheckOrder = function (bForward) {
+		let $oEl;
+		let oControl;
+		const aOrderList = ['headerTitle', '_headerContent', '_anchorBar', '_$sectionsContainer', 'footer'];
+		const oObjectPage = this.oObjectPage;
+		const fnCheckOrder = (bForward) => {
 				// Arrange
-				aTabChain = bForward ? aOrderList : aOrderList.reverse();
+				const aTabChain = bForward ? aOrderList : aOrderList.reverse();
 
-				aTabChain.forEach(function (item) {
+				aTabChain.forEach((item) => {
 					oControl = oObjectPage.getAggregation(item);
 					if (oControl) {
 						$oEl = oControl.$();
@@ -83,50 +92,46 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 					// Assert
 					assert.strictEqual(document.activeElement, $oEl.firstFocusableDomRef(), item + " focused correctly");
 				});
-			},
-			fnOnDomReady = function () {
-				fnCheckOrder(true);
-
-				// Act
-				// go one after footer so when pressing SHIFT+F6 focus comes back to footer first
-				QUtils.triggerKeydown(oObjectPage.getDomRef(), KeyCodes.F6);
-
-				fnCheckOrder(false);
-
-				// Clean up
-				fnDone();
 			};
 
 		// Arrange
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", fnOnDomReady);
 		this.oView.placeAt("qunit-fixture");
 		await nextUIUpdate();
+		await waitForDOMReady(oObjectPage);
+
+		fnCheckOrder(true);
+
+		// Act
+		// go one after footer so when pressing SHIFT+F6 focus comes back to footer first
+		QUtils.triggerKeydown(oObjectPage.getDomRef(), KeyCodes.F6);
+
+		fnCheckOrder(false);
 	});
 
 	QUnit.module("AnchorBar", {
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			this.clock = sinon.useFakeTimers();
 			Device.system.phone = false;
 			XMLView.create({
 				id: "UxAP-70_KeyboardHandling",
 				viewName: "view.UxAP-70_KeyboardHandling"
-			}).then(async function(oView) {
+			}).then(async (oView) => {
 				this.anchorBarView = oView;
 				jQuery("html")
 					.removeClass("sapUiMedia-Std-Phone sapUiMedia-Std-Desktop sapUiMedia-Std-Tablet")
 					.addClass("sapUiMedia-Std-Desktop");
-				var sFocusable = "0",
-					sTabIndex = "tabindex";
+				const sFocusable = "0";
+				const sTabIndex = "tabindex";
 				this.oObjectPage = this.anchorBarView.byId("ObjectPageLayout");
 				this.oObjectPage._setAsCurrentSection(this.oObjectPage.getSections()[0].sId);
-				this.assertCorrectTabIndex = function ($elment, sMessage, assert) {
+				this.assertCorrectTabIndex = ($elment, sMessage, assert) => {
 					assert.strictEqual($elment.attr(sTabIndex), sFocusable, sMessage);
 				};
 				this.anchorBarView.placeAt("qunit-fixture");
 				await nextUIUpdate(this.clock);
 				done();
-			}.bind(this));
+			});
 		},
 		afterEach: async function () {
 			this.anchorBarView.destroy();
@@ -136,13 +141,13 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 		}
 	});
 
-	QUnit.test("TAB/SHIFT+TAB", function (assert) {
-		var aAnchors = jQuery(sAnchorSelector),
-			oAnchorBar = Element.getElementById(this.oObjectPage.$().find(".sapMITH")[0].id),
-			oFirstAnchorButton = Element.getElementById(aAnchors[0].id),
-			oAnchor4Button = Element.getElementById(aAnchors[4].id),
-			aSections = this.oObjectPage.getSections(),
-			oAnchor4Section = aSections[4];
+	QUnit.test("TAB/SHIFT+TAB - correct tab index on anchor buttons", function (assert) {
+		const aAnchors = jQuery(sAnchorSelector);
+		const oAnchorBar = Element.getElementById(this.oObjectPage.$().find(".sapMITH")[0].id);
+		const oFirstAnchorButton = Element.getElementById(aAnchors[0].id);
+		const oAnchor4Button = Element.getElementById(aAnchors[4].id);
+		const aSections = this.oObjectPage.getSections();
+		const oAnchor4Section = aSections[4];
 
 		oAnchorBar.focus();
 		this.assertCorrectTabIndex(oFirstAnchorButton.$(), "If no previously selected anchor button, " +
@@ -156,10 +161,10 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 	});
 
 
-	QUnit.test("RIGHT", function (assert) {
-		var aAnchors = jQuery(sAnchorSelector),
-			iFirstAnchorId = aAnchors[0].id,
-			iSecondAnchorId = aAnchors[1].id;
+	QUnit.test("RIGHT - next anchor button should be focused after arrow right", function (assert) {
+		const aAnchors = jQuery(sAnchorSelector);
+		const iFirstAnchorId = aAnchors[0].id;
+		const iSecondAnchorId = aAnchors[1].id;
 
 		document.getElementById(iFirstAnchorId).focus();
 		this.clock.tick(500);
@@ -168,10 +173,10 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 		assert.equal(document.getElementById(iSecondAnchorId), document.activeElement, "Next button should be focused after arrow right");
 	});
 
-	QUnit.test("LEFT", function (assert) {
-		var aAnchors = jQuery(sAnchorSelector),
-			iSecondAnchorId = aAnchors[1].id,
-			iThirdAnchorId = aAnchors[2].id;
+	QUnit.test("LEFT - previous anchor button should be focused after arrow left", function (assert) {
+		const aAnchors = jQuery(sAnchorSelector);
+		const iSecondAnchorId = aAnchors[1].id;
+		const iThirdAnchorId = aAnchors[2].id;
 
 		document.getElementById(iThirdAnchorId).focus();
 		this.clock.tick(500);
@@ -180,10 +185,10 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 		assert.equal(document.getElementById(iSecondAnchorId), document.activeElement, "Previous button should be focused after arrow left");
 	});
 
-	QUnit.test("DOWN", function (assert) {
-		var aAnchors = jQuery(sAnchorSelector),
-			iFirstAnchorId = aAnchors[0].id,
-			iSecondAnchorId = aAnchors[1].id;
+	QUnit.test("DOWN - next anchor button should be focused after arrow down", function (assert) {
+		const aAnchors = jQuery(sAnchorSelector);
+		const iFirstAnchorId = aAnchors[0].id;
+		const iSecondAnchorId = aAnchors[1].id;
 
 		document.getElementById(iFirstAnchorId).focus();
 		this.clock.tick(500);
@@ -192,10 +197,10 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 		assert.equal(document.getElementById(iSecondAnchorId), document.activeElement, "Next button should be focused after arrow right");
 	});
 
-	QUnit.test("UP", function (assert) {
-		var aAnchors = jQuery(sAnchorSelector),
-			iSecondAnchorId = aAnchors[1].id,
-			iThirdAnchorId = aAnchors[2].id;
+	QUnit.test("UP - previous anchor button should be focused after arrow up", function (assert) {
+		const aAnchors = jQuery(sAnchorSelector);
+		const iSecondAnchorId = aAnchors[1].id;
+		const iThirdAnchorId = aAnchors[2].id;
 
 		document.getElementById(iThirdAnchorId).focus();
 		this.clock.tick(500);
@@ -204,11 +209,11 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 		assert.equal(document.getElementById(iSecondAnchorId), document.activeElement, "Previous button should be focused after arrow left");
 	});
 
-	QUnit.test("HOME/END", function (assert) {
-		var aAnchors = jQuery(sAnchorSelector),
-			oEndOverflow = jQuery(".sapMITH .sapMITHEndOverflow .sapMITBFilter"),
-			iFirstAnchorId = aAnchors[0].id,
-			iLastAnchorId = oEndOverflow[0].id;
+	QUnit.test("HOME/END - first and last anchor buttons should be focused with HOME and END keys", function (assert) {
+		const aAnchors = jQuery(sAnchorSelector);
+		const oEndOverflow = jQuery(".sapMITH .sapMITHEndOverflow .sapMITBFilter");
+		const iFirstAnchorId = aAnchors[0].id;
+		const iLastAnchorId = oEndOverflow[0].id;
 
 		document.getElementById(iFirstAnchorId).focus();
 		this.clock.tick(500);
@@ -221,11 +226,11 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 	});
 
 	QUnit.test("PAGE UP: Anchor level", function (assert) {
-		var oAncorBar = getAnchorBar(),
-			aAnchors = oAncorBar.getItems(),
-			oFirstAnchor = aAnchors[0].getDomRef(),
-			oSecondAnchor = aAnchors[1].getDomRef(),
-			oSeventhAnchor = aAnchors[6].getDomRef();
+		const oAncorBar = getAnchorBar();
+		const aAnchors = oAncorBar.getItems();
+		const oFirstAnchor = aAnchors[0].getDomRef();
+		const oSecondAnchor = aAnchors[1].getDomRef();
+		const oSeventhAnchor = aAnchors[6].getDomRef();
 			oFirstAnchor.focus = function () {
 				// Check if focus function is called on firstAnchor
 				assert.ok(true, "The first anchor should be focused");
@@ -245,11 +250,11 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 	});
 
 	QUnit.test("PAGE DOWN: Anchor level", function (assert) {
-		var oAncorBar = getAnchorBar(),
-			aAnchors = oAncorBar.getItems(),
-			oLastAnchor = aAnchors[aAnchors.length - 1].getDomRef(),
-			oSecondLastAnchor = aAnchors[aAnchors.length - 2].getDomRef(),
-			oSeventhLastAnchor = aAnchors[aAnchors.length - 7].getDomRef();
+		const oAncorBar = getAnchorBar();
+		const aAnchors = oAncorBar.getItems();
+		const oLastAnchor = aAnchors[aAnchors.length - 1].getDomRef();
+		const oSecondLastAnchor = aAnchors[aAnchors.length - 2].getDomRef();
+		const oSeventhLastAnchor = aAnchors[aAnchors.length - 7].getDomRef();
 			oLastAnchor.focus = function () {
 				// Check if focus function is called on firstAnchor
 				assert.ok(true, "The last anchor should be focused");
@@ -269,11 +274,11 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 	});
 
 	QUnit.test("Focus of stickyAnchorBar filter buttons", function (assert) {
-		var iSectionIndex = 7,
-			oAncorBar = getAnchorBar(),
-			oSectionAnchor = oAncorBar.getItems()[iSectionIndex];
+		const iSectionIndex = 7;
+		const oAncorBar = getAnchorBar();
+		const oSectionAnchor = oAncorBar.getItems()[iSectionIndex];
 
-		oSectionAnchor.focus =  function fakeFn() {
+		oSectionAnchor.focus = function fakeFn() {
 			// Check
 			assert.strictEqual(this.oObjectPage._bStickyAnchorBar, true, "anchorBar is snapped");
 		}.bind(this);
@@ -290,22 +295,22 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 
 	QUnit.module("Section/Subsection", {
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "UxAP-70_KeyboardHandling",
 				viewName: "view.UxAP-70_KeyboardHandling"
-			}).then(async function(oView) {
+			}).then(async (oView) => {
 				this.anchorBarView = oView;
-				var sFocusable = "0",
-					sTabIndex = "tabindex";
+				const sFocusable = "0";
+				const sTabIndex = "tabindex";
 				this.oObjectPage = this.anchorBarView.byId("ObjectPageLayout");
-				this.assertCorrectTabIndex = function ($elment, sMessage, assert) {
+				this.assertCorrectTabIndex = ($elment, sMessage, assert) => {
 					assert.strictEqual($elment.attr(sTabIndex), sFocusable, sMessage);
 				};
 				this.anchorBarView.placeAt("qunit-fixture");
 				await nextUIUpdate();
 				done();
-			}.bind(this));
+			});
 		},
 		afterEach: function () {
 			this.anchorBarView.destroy();
@@ -313,12 +318,12 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 		}
 	});
 
-	QUnit.test("TAB/SHIFT+TAB", function (assert) {
-		var aSections = this.oObjectPage.getSections(),
-			$firstSection = aSections[0].$(),
-			oCurrentSection = aSections[4],
-			oPersonalSection = aSections[7],
-			oContactSubSection = aSections[7].getSubSections()[0];
+	QUnit.test("TAB/SHIFT+TAB - correct tab index on section and subsection", function (assert) {
+		const aSections = this.oObjectPage.getSections();
+		const $firstSection = aSections[0].$();
+		const oCurrentSection = aSections[4];
+		const oPersonalSection = aSections[7];
+		const oContactSubSection = aSections[7].getSubSections()[0];
 
 		this.assertCorrectTabIndex($firstSection, "If no previously selected section, " +
 			"the first focusable section should be the first one in the container", assert);
@@ -339,12 +344,13 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 			"the first focusable sub section should be the first one in the container section", assert);
 	});
 
-	QUnit.test("RIGHT/DOWN", async function(assert) {
-		var aSections = this.oObjectPage.getSections(),
-			aSubSections = aSections[8].getSubSections();
+	QUnit.test("RIGHT/DOWN - next section and subsection should be focused with arrow right/down", async function(assert) {
+		assert.expect(5);
+		const aSections = this.oObjectPage.getSections();
+		const aSubSections = aSections[8].getSubSections();
 
-		aSections.forEach(function(oSection) {
-			oSection.getSubSections().forEach(function(oSubSection) {
+		aSections.forEach((oSection) => {
+			oSection.getSubSections().forEach((oSubSection) => {
 				oSubSection._setColumnSpan(ObjectPageSubSection.COLUMN_SPAN.auto);
 			});
 		});
@@ -370,9 +376,9 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 		assert.equal(jQuery(document.activeElement).attr("id"), aSubSections[2].sId, "Next subsection should be focused after arrow right");
 	});
 
-	QUnit.test("LEFT/UP", function (assert) {
-		var aSections = this.oObjectPage.getSections(),
-			aSubSections = aSections[8].getSubSections();
+	QUnit.test("LEFT/UP - previous section and subsection should be focused with arrow left/up", function (assert) {
+		const aSections = this.oObjectPage.getSections();
+		const aSubSections = aSections[8].getSubSections();
 
 		// Section
 		aSections[2].$().trigger("focus");
@@ -389,11 +395,11 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 		assert.equal(jQuery(document.activeElement).attr("id"), aSubSections[0].sId, "Previous subsection should be focused after arrow up");
 	});
 
-	QUnit.test("HOME/END", function (assert) {
-		var aSections = this.oObjectPage.getSections(),
-			aSubSections = aSections[8].getSubSections(),
-			oSingleSubsection = aSections[0].getSubSections()[0],
-		    oSpy = this.spy(oSingleSubsection, "_scrollParent");
+	QUnit.test("HOME/END - first and last section and subsection should be focused with HOME and END keys", function (assert) {
+		const aSections = this.oObjectPage.getSections();
+		const aSubSections = aSections[8].getSubSections();
+		const oSingleSubsection = aSections[0].getSubSections()[0];
+		const oSpy = this.spy(oSingleSubsection, "_scrollParent");
 
 		// Section
 		aSections[0].$().trigger("focus");
@@ -417,11 +423,11 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 		assert.ok(oSpy.notCalled, "_scrollParent should not be called");
 	});
 
-	QUnit.test("PAGE_DOWN/PAGE_UP", function (assert) {
-		var aSections = this.oObjectPage.getSections(),
-			aSubSections = aSections[8].getSubSections(),
-			oSingleSubsection = aSections[0].getSubSections()[0],
-		    oSpy = this.spy(oSingleSubsection, "_scrollParent");
+	QUnit.test("PAGE_DOWN/PAGE_UP - correct section and subsection navigation with page keys", function (assert) {
+		const aSections = this.oObjectPage.getSections();
+		const aSubSections = aSections[8].getSubSections();
+		const oSingleSubsection = aSections[0].getSubSections()[0];
+		const oSpy = this.spy(oSingleSubsection, "_scrollParent");
 
 		// Section
 		aSections[0].$().trigger("focus");
@@ -463,10 +469,10 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 	 ******************************************************************************/
 
 	QUnit.test("ObjectPageSection F7 - interactive control inside Section with only one SubSection", function (assert) {
-		var oBtn = Element.getElementById("UxAP-70_KeyboardHandling--interactive-el-single-sub-section"),
-			$btn = oBtn.$(),
-			oSection = Element.getElementById("UxAP-70_KeyboardHandling--section-with-single-sub-section"),
-			$section = oSection.$();
+		const oBtn = Element.getElementById("UxAP-70_KeyboardHandling--interactive-el-single-sub-section");
+		const $btn = oBtn.$();
+		const oSection = Element.getElementById("UxAP-70_KeyboardHandling--section-with-single-sub-section");
+		const $section = oSection.$();
 
 		oSection.$ = function () {
 			return {
@@ -495,10 +501,10 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 	});
 
 	QUnit.test("ObjectPageSection F7 - interactive control inside Section with only one SubSection", function (assert) {
-		var oBtn = Element.getElementById("UxAP-70_KeyboardHandling--interactive-el-multiple-sub-section"),
-			$btn = oBtn.$(),
-			oSubSection = Element.getElementById("UxAP-70_KeyboardHandling--multiple-sub-section-2"),
-			$subSection = oSubSection.$();
+		const oBtn = Element.getElementById("UxAP-70_KeyboardHandling--interactive-el-multiple-sub-section");
+		const $btn = oBtn.$();
+		const oSubSection = Element.getElementById("UxAP-70_KeyboardHandling--multiple-sub-section-2");
+		const $subSection = oSubSection.$();
 
 		oSubSection.$ = function () {
 			return {
@@ -527,9 +533,9 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 	});
 
 	QUnit.test("ObjectPageSection F7 - from toolbar move focus to coresponding section", function (assert) {
-		var $btnToolbar = Element.getElementById("UxAP-70_KeyboardHandling--button-toolbar").$(),
-			oSubSection = Element.getElementById("UxAP-70_KeyboardHandling--multiple-sub-section-1"),
-			$subSection = oSubSection.$();
+		const $btnToolbar = Element.getElementById("UxAP-70_KeyboardHandling--button-toolbar").$();
+		const oSubSection = Element.getElementById("UxAP-70_KeyboardHandling--multiple-sub-section-1");
+		const $subSection = oSubSection.$();
 
 		oSubSection.$ = function () {
 			return {
@@ -546,8 +552,8 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 	});
 
 	QUnit.test("ObjectPageSection F7 - from section move focus to toolbar", function (assert) {
-		var oSubSection = Element.getElementById("UxAP-70_KeyboardHandling--multiple-sub-section-1"),
-			$subSection = oSubSection.$();
+		const oSubSection = Element.getElementById("UxAP-70_KeyboardHandling--multiple-sub-section-1");
+		const $subSection = oSubSection.$();
 
 		oSubSection.$ = function () {
 			return {
@@ -566,20 +572,25 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 
 	QUnit.test("ObjectPageSection F7 - from toolbar move focus to coresponding section upon Space press", function (assert) {
 		assert.expect(1);
-		var fDone = assert.async(),
-			sSectionId = this.oObjectPage.getSections()[1].sId,
-			sButtonId = getAnchorBar().getItems()[1].getId(),
-			sKeyPressed = "SPACE",
-			oStub;
+		// Arrange
+		const fDone = assert.async();
+		const sSectionId = this.oObjectPage.getSections()[1].sId;
+		const sButtonId = getAnchorBar().getItems()[1].getId();
+		const sKeyPressed = "SPACE";
+		let oStub;
 
-		setTimeout(function () {
-			var oAnchorBarButtonControl = Element.getElementById(sButtonId),
-			$anchorBarButton = oAnchorBarButtonControl.$(),
-			oSubSection = Element.getElementById(sSectionId);
+		// Act
+// eslint-disable-next-line no-warning-comments
+		// Cannot replace with nextUIUpdate — waits for AnchorBar DOM calculations after keyboard events
+		setTimeout(() => {
+			const oAnchorBarButtonControl = Element.getElementById(sButtonId);
+			const $anchorBarButton = oAnchorBarButtonControl.$();
+			const oSubSection = Element.getElementById(sSectionId);
 
 			oStub = this.stub(oSubSection, "getDomRef").callsFake(function () {
 				return {
 					focus: function () {
+						// Assert
 						assert.ok(true, "SubSection must be focused");
 						oStub.restore();
 						fDone();
@@ -589,25 +600,30 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 			$anchorBarButton.trigger("focus");
 
 			QUtils.triggerKeyup($anchorBarButton, sKeyPressed);
-		}.bind(this), 0);
+		}, 0);
 	});
 
 	QUnit.test("ObjectPageSection F7 - from toolbar move focus to coresponding section upon Enter press", function (assert) {
 		assert.expect(1);
-		var fDone = assert.async(),
-			sSectionId = this.oObjectPage.getSections()[2].sId,
-			sButtonId = getAnchorBar().getItems()[2].getId(),
-			sKeyPressed = "ENTER",
-			oStub;
+		// Arrange
+		const fDone = assert.async();
+		const sSectionId = this.oObjectPage.getSections()[2].sId;
+		const sButtonId = getAnchorBar().getItems()[2].getId();
+		const sKeyPressed = "ENTER";
+		let oStub;
 
-		setTimeout(function () {
-			var oAnchorBarButtonControl = Element.getElementById(sButtonId),
-			$anchorBarButton = oAnchorBarButtonControl.$(),
-			oSubSection = Element.getElementById(sSectionId);
+// eslint-disable-next-line no-warning-comments
+		// Act
+		// Cannot replace with nextUIUpdate — waits for AnchorBar DOM calculations after keyboard events
+		setTimeout(() => {
+			const oAnchorBarButtonControl = Element.getElementById(sButtonId);
+			const $anchorBarButton = oAnchorBarButtonControl.$();
+			const oSubSection = Element.getElementById(sSectionId);
 
 			oStub = this.stub(oSubSection, "getDomRef").callsFake(function () {
 				return {
 					focus: function () {
+						// Assert
 						assert.ok(true, "SubSection must be focused");
 						oStub.restore();
 						fDone();
@@ -617,24 +633,29 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 			$anchorBarButton.trigger("focus");
 
 			QUtils.triggerKeydown($anchorBarButton, sKeyPressed);
-		}.bind(this), 0);
+		}, 0);
 	});
 
 	QUnit.test("ObjectPageSection F7 - from toolbar move focus to coresponding section upon mouse click", function (assert) {
 		assert.expect(1);
-		var fDone = assert.async(),
-			sSectionId = this.oObjectPage.getSections()[5].sId,
-			sButtonId = getAnchorBar().getItems()[5].getId(),
-			oStub;
+		// Arrange
+		const fDone = assert.async();
+		const sSectionId = this.oObjectPage.getSections()[5].sId;
+		const sButtonId = getAnchorBar().getItems()[5].getId();
+		let oStub;
+// eslint-disable-next-line no-warning-comments
 
-		setTimeout(function () {
-			var oAnchorBarButtonControl = Element.getElementById(sButtonId),
-			$anchorBarButton = oAnchorBarButtonControl.$(),
-			oSubSection = Element.getElementById(sSectionId);
+		// Act
+		// Cannot replace with nextUIUpdate — waits for AnchorBar DOM calculations after keyboard events
+		setTimeout(() => {
+			const oAnchorBarButtonControl = Element.getElementById(sButtonId);
+			const $anchorBarButton = oAnchorBarButtonControl.$();
+			const oSubSection = Element.getElementById(sSectionId);
 
 			oStub = this.stub(oSubSection, "getDomRef").callsFake(function () {
 				return {
 					focus: function () {
+						// Assert
 						assert.ok(true, "SubSection must be focused");
 						oStub.restore();
 						fDone();
@@ -647,24 +668,24 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 			getAnchorBar().fireSelect({
 				key: oAnchorBarButtonControl.getKey()
 			});
-		}.bind(this), 0);
+		}, 0);
 	});
 
 	QUnit.test("ObjectPageSection SPACE - browser scrolling is prevented", function (assert) {
-		var oSection = Element.getElementById("UxAP-70_KeyboardHandling--section-with-single-sub-section"),
-			oInput = Element.getElementById("UxAP-70_KeyboardHandling--input-single-sub-section"),
-			oEventSection = {
-				keyCode: KeyCodes.SPACE,
-				preventDefault: function () {},
-				srcControl: oSection
-			},
-			oSpySection = this.spy(oEventSection, "preventDefault"),
-			oEventInput = {
-				keyCode: KeyCodes.SPACE,
-				preventDefault: function () {},
-				srcControl: oInput
-			},
-			oSpyInput = this.spy(oEventInput, "preventDefault");
+		const oSection = Element.getElementById("UxAP-70_KeyboardHandling--section-with-single-sub-section");
+		const oInput = Element.getElementById("UxAP-70_KeyboardHandling--input-single-sub-section");
+		const oEventSection = {
+			keyCode: KeyCodes.SPACE,
+			preventDefault: function () {},
+			srcControl: oSection
+		};
+		const oSpySection = this.spy(oEventSection, "preventDefault");
+		const oEventInput = {
+			keyCode: KeyCodes.SPACE,
+			preventDefault: function () {},
+			srcControl: oInput
+		};
+		const oSpyInput = this.spy(oEventInput, "preventDefault");
 
 		oSection.onkeydown(oEventSection);
 		assert.ok(oSpySection.calledOnce, "preventDefault is called on SPACE key for the section");
@@ -674,20 +695,20 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 	});
 
 	QUnit.test("ObjectPageSubSection SPACE - browser scrolling is prevented", function (assert) {
-		var oSection = Element.getElementById("UxAP-70_KeyboardHandling--multiple-sub-section-1"),
-			oInput = Element.getElementById("UxAP-70_KeyboardHandling--input-multiple-sub-section"),
-			oEventSection = {
-				keyCode: KeyCodes.SPACE,
-				preventDefault: function () {},
-				srcControl: oSection
-			},
-			oSpySection = this.spy(oEventSection, "preventDefault"),
-			oEventInput = {
-				keyCode: KeyCodes.SPACE,
-				preventDefault: function () {},
-				srcControl: oInput
-			},
-			oSpyInput = this.spy(oEventInput, "preventDefault");
+		const oSection = Element.getElementById("UxAP-70_KeyboardHandling--multiple-sub-section-1");
+		const oInput = Element.getElementById("UxAP-70_KeyboardHandling--input-multiple-sub-section");
+		const oEventSection = {
+			keyCode: KeyCodes.SPACE,
+			preventDefault: function () {},
+			srcControl: oSection
+		};
+		const oSpySection = this.spy(oEventSection, "preventDefault");
+		const oEventInput = {
+			keyCode: KeyCodes.SPACE,
+			preventDefault: function () {},
+			srcControl: oInput
+		};
+		const oSpyInput = this.spy(oEventInput, "preventDefault");
 
 		oSection.onkeydown(oEventSection);
 		assert.ok(oSpySection.calledOnce, "preventDefault is called on SPACE key for the subsection");
@@ -698,11 +719,11 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 
 	QUnit.module("Focus/scroll order", {
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "UxAP-70_KeyboardHandling",
 				viewName: "view.UxAP-70_KeyboardHandling"
-			}).then(async function(oView) {
+			}).then(async (oView) => {
 				this.anchorBarView = oView;
 				this.oObjectPage = this.anchorBarView.byId("ObjectPageLayout");
 				this.oScrollSpy = this.spy(this.oObjectPage, "scrollToSection");
@@ -710,7 +731,7 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 				this.anchorBarView.placeAt("qunit-fixture");
 				await nextUIUpdate();
 				done();
-			}.bind(this));
+			});
 		},
 		afterEach: function () {
 			this.anchorBarView.destroy();
@@ -719,9 +740,9 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 	});
 
 	QUnit.test("Focus from toolbar to section", function (assert) {
-		var oAnchorBar = this.oObjectPage.getAggregation("_anchorBar"),
-			oSectionButton = oAnchorBar.getItems()[1],
-			oOrigAnimationMode = ControlBehavior.getAnimationMode();
+		const oAnchorBar = this.oObjectPage.getAggregation("_anchorBar");
+		const oSectionButton = oAnchorBar.getItems()[1];
+		const oOrigAnimationMode = ControlBehavior.getAnimationMode();
 
 		assert.expect(3);
 
@@ -746,17 +767,17 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 
 	QUnit.module("Focus on selection, selected state", {
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "UxAP-70_KeyboardHandling",
 				viewName: "view.UxAP-70_KeyboardHandling"
-			}).then(async function(oView) {
+			}).then(async (oView) => {
 				this.anchorBarView = oView;
 				this.oObjectPage = this.anchorBarView.byId("ObjectPageLayout");
 				this.anchorBarView.placeAt("qunit-fixture");
 				await nextUIUpdate();
 				done();
-			}.bind(this));
+			});
 		},
 		afterEach: function () {
 			this.anchorBarView.destroy();
@@ -766,48 +787,60 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 
 	//This test is written to cover a timing problem in IE, when focus outruns scrolling to section
 	QUnit.test("Focus a section on selection with animation mode 'none'", function (assert) {
-		var oAnchorBar = getAnchorBar(),
-			oSectionButton = oAnchorBar.getItems()[2],
-			oOrigAnimationMode = ControlBehavior.getAnimationMode(),
-			done = assert.async();
+		const oAnchorBar = getAnchorBar();
+		const oSectionButton = oAnchorBar.getItems()[2];
+		const oOrigAnimationMode = ControlBehavior.getAnimationMode();
+		const done = assert.async();
 
 		assert.expect(1);
 
+// eslint-disable-next-line no-warning-comments
 		// Setup
 		ControlBehavior.setAnimationMode(AnimationMode.none);
 
-
+		// Cannot replace with nextUIUpdate — waits for AnchorBar DOM calculations after keyboard events
 		// Check
-		setTimeout(function() {
+// eslint-disable-next-line no-warning-comments
+		setTimeout(() => {
 
 			// Act
 			oAnchorBar.fireSelect({ key: oSectionButton.getKey() });
-			setTimeout(function() {
+			// Cannot replace with nextUIUpdate — waits for AnchorBar DOM calculations after keyboard events
+			setTimeout(() => {
 
 				assert.strictEqual(this.oObjectPage.getSelectedSection(), oSectionButton.getKey(), "Section is properly selected");
 
 				// restore state
 				ControlBehavior.setAnimationMode(oOrigAnimationMode);
 				done();
-			}.bind(this), 500);
-		}.bind(this), 500);
+			}, 500);
+		}, 500);
 
 	});
 
-	QUnit.module("onfocusFail");
+	QUnit.module("onfocusFail", {
+		beforeEach: function () {
+			this.oFooterToolbar = new OverflowToolbar({
+				visible: false
+			});
+			this.oObjectPage = new ObjectPageLayout({
+				footer: this.oFooterToolbar
+			});
+		},
+		afterEach: function () {
+			this.oObjectPage.destroy();
+			this.oObjectPage = null;
+			this.oFooterToolbar = null;
+		}
+	});
 
 	QUnit.test("skip restoring focus from footer toolbar if toolbar hidden", function (assert) {
-		var oFooterToolbar = new OverflowToolbar({
-				visible: false
-			}),
-			oObjectPage = new ObjectPageLayout({
-				footer: oFooterToolbar
-			}),
-			oSpy = this.spy(Element.prototype, "onfocusfail");
+		// Arrange
+		const oSpy = this.spy(Element.prototype, "onfocusfail");
 
 		// Act
-		oObjectPage.onfocusfail({
-			srcControl: oFooterToolbar
+		this.oObjectPage.onfocusfail({
+			srcControl: this.oFooterToolbar
 		});
 
 		// Assert
@@ -816,15 +849,15 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 
 	QUnit.module("Sections outside viewport", {
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "UxAP-12-ObjectPageDynamicHeader",
 				viewName: "view.UxAP-12-ObjectPageDynamicHeader"
-			}).then(function (oView) {
+			}).then((oView) => {
 				this.oView = oView;
 				this.oObjectPage = oView.byId("ObjectPageLayout");
 				done();
-			}.bind(this));
+			});
 		},
 		afterEach: function () {
 			this.oView.destroy();
@@ -835,45 +868,39 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 	QUnit.test("scrolls to focused section", async function(assert) {
 		assert.expect(4); //number of assertions
 		// Arrange
-		var fnDone = assert.async(),
-			oObjectPage = this.oObjectPage,
-			oFirstVisibleSection = oObjectPage.getSections()[0],
-			iFirstVisibleSectionOffsetTop,
-			fnOnDomReady = function () {
-				resizePageToSmallHeight();
-
-				// Assert initial state
-				iFirstVisibleSectionOffsetTop = oFirstVisibleSection.getDomRef().offsetTop;
-				assert.ok(iFirstVisibleSectionOffsetTop > oObjectPage.$().height(), "first visible section is below the viewport");
-				assert.strictEqual(oObjectPage._$opWrapper.scrollTop(), 0, "initially scrolled to top");
-
-				// Act
-				oFirstVisibleSection.getDomRef().focus();
-
-				waitForScroll().then(function (iNewScrollTop) {
-					// Assert
-					assert.ok(iNewScrollTop >= iFirstVisibleSectionOffsetTop, "scrolled down to focused section");
-					assert.ok(oObjectPage._isClosestScrolledSection(oFirstVisibleSection.getId()), "scrolled down to focused section");
-
-					fnDone();
-				});
-			},
-			resizePageToSmallHeight = function () {
+		const oObjectPage = this.oObjectPage;
+		const oFirstVisibleSection = oObjectPage.getSections()[0];
+		const resizePageToSmallHeight = () => {
 				//make the page smaller so that only the title+header area is visible in the viewport
-				var iHeaderHeight = oObjectPage._$titleArea.get(0).offsetHeight;
+				const iHeaderHeight = oObjectPage._$titleArea.get(0).offsetHeight;
 				oObjectPage.$().height(iHeaderHeight);
-			},
-			waitForScroll = function () {
-				return new Promise(function (resolve) {
-					oObjectPage._$opWrapper.get(0).addEventListener("scroll", function(oEvent) {
+			};
+		const waitForScroll = () => {
+				return new Promise((resolve) => {
+					oObjectPage._$opWrapper.get(0).addEventListener("scroll", (oEvent) => {
 						resolve(oEvent.target.scrollTop);
 					});
 				});
 			};
 
 		// Arrange
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", fnOnDomReady);
 		this.oView.placeAt("qunit-fixture");
 		await nextUIUpdate();
+		await waitForDOMReady(oObjectPage);
+
+		resizePageToSmallHeight();
+
+		// Assert initial state
+		const iFirstVisibleSectionOffsetTop = oFirstVisibleSection.getDomRef().offsetTop;
+		assert.ok(iFirstVisibleSectionOffsetTop > oObjectPage.$().height(), "first visible section is below the viewport");
+		assert.strictEqual(oObjectPage._$opWrapper.scrollTop(), 0, "initially scrolled to top");
+
+		// Act
+		oFirstVisibleSection.getDomRef().focus();
+
+		const iNewScrollTop = await waitForScroll();
+		// Assert
+		assert.ok(iNewScrollTop >= iFirstVisibleSectionOffsetTop, "scrolled down to focused section");
+		assert.ok(oObjectPage._isClosestScrolledSection(oFirstVisibleSection.getId()), "scrolled down to focused section");
 	});
 });

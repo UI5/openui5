@@ -15876,6 +15876,45 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	});
 
 	//*********************************************************************************************
+	// Scenario: A child binding has a $expand, but no nested $expand. Still, it can use its
+	// parent's cache when there is already a nested $expand.
+	// JIRA: CPOUI5ODATAV4-3577
+	QUnit.test("JIRA: CPOUI5ODATAV4-3577", async function (assert) {
+		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
+		const sView = `
+<FlexBox binding="{path : '/EMPLOYEES(\\'2\\')', parameters : {
+	$expand : {
+		EMPLOYEE_2_MANAGER : {
+			$expand : {
+				Manager_to_Team : {$select : 'Team_Id'}
+			},
+			$select : 'ID'
+		}
+	},
+	$select : 'ID'
+}}">
+	<FlexBox binding="{EMPLOYEE_2_MANAGER}">
+		<Text id="id" text="{ID}"/>
+	</FlexBox>
+</FlexBox>`;
+
+		this.expectRequest("EMPLOYEES('2')"
+				+ "?$expand=EMPLOYEE_2_MANAGER($expand=Manager_to_Team($select=Team_Id);$select=ID)"
+				+ "&$select=ID", {
+				EMPLOYEE_2_MANAGER : {
+					Manager_to_Team : {
+						Team_Id : "1"
+					},
+					ID : "0"
+				},
+				ID : "2"
+			})
+			.expectChange("id", "0");
+
+		await this.createView(assert, sView, oModel);
+	});
+
+	//*********************************************************************************************
 	// Scenario: create an entity on a relative binding without an own cache and check that
 	// hasPendingChanges is working
 	// None of our applications has such a scenario.

@@ -895,3 +895,25 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 		}
 	}
 }
+
+.sapTntNLIHighlight {
+	background-color: var(--sapContent_SearchHighlightColor);
+	font-family: var(--sapFontBoldFamily);
+	font-size: var(--sapFontSize);
+}
+
+.sapTntNLNoData {
+	display: flex;
+	align-items: center;
+
+	& > div {
+		cursor: auto;
+		outline: none;
+		display: flex;
+		flex: 1;
+		justify-content: center;
+		color: var(--sapList_TextColor);
+		font-size: var(--sapFontSize);
+		font-family: var(--sapFontFamily);
+	}
+}

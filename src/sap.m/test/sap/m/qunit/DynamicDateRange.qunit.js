@@ -105,6 +105,35 @@ sap.ui.define([
 		assert.strictEqual(oOptionListItem.getId(), this.ddr.getId() + "-option-XToLastWorkWeek", "correct id of options");
 	});
 
+	QUnit.test("parse: _stripValue is not called when enhanceFormattedValue returns false", function(assert) {
+		// Arrange
+		var oOption = new DynamicDateOption({
+			key: "NOT_SPECIFIED",
+			valueTypes: ["string"]});
+
+		oOption.parse = function() {
+			return {};
+		};
+		oOption.enhanceFormattedValue = function () { return false; };
+
+		var oDDR = new DynamicDateRange({
+			standardOptions: [],
+			customOptions: [oOption]
+		});
+
+		var oStripValueSpy = this.spy(oDDR, "_stripValue");
+		var oFormatter = oDDR._getFormatter();
+
+		// Act
+		oDDR.parse("some value", oFormatter);
+
+		// Assert
+		assert.strictEqual(oStripValueSpy.callCount, 0, "_stripValue should not be called when enhanceFormattedValue returns false");
+
+		// Cleanup
+		oDDR.destroy();
+	});
+
 	QUnit.test("getFocusDomRef", function(assert) {
 		assert.strictEqual(
 			this.ddr.getFocusDomRef().id,

@@ -4,6 +4,8 @@ sap.ui.define([
 	"sap/base/i18n/Localization",
 	"sap/base/i18n/Formatting",
 	"sap/ui/core/Lib",
+	"sap/ui/core/LocaleData",
+	"sap/ui/core/Locale",
 	"sap/ui/unified/calendar/Month",
 	"sap/ui/unified/calendar/DatesRow",
 	"sap/ui/test/utils/nextUIUpdate",
@@ -26,6 +28,8 @@ sap.ui.define([
 	Localization,
 	Formatting,
 	Library,
+	LocaleData,
+	Locale,
 	Month,
 	DatesRow,
 	nextUIUpdate,
@@ -394,6 +398,132 @@ sap.ui.define([
 			// Clean
 			oDeviceStub.restore();
 			oItemNavSpy.restore();
+		});
+
+		QUnit.module("showWeekNumbersHeader", {
+			beforeEach: function () {
+				this.sOriginalLanguage = Localization.getLanguage();
+			},
+			afterEach: async function () {
+				Localization.setLanguage(this.sOriginalLanguage);
+				await nextUIUpdate();
+			}
+		});
+
+		QUnit.test("No header text rendered when showWeekNumbersHeader is false", async function (oAssert) {
+			// Arrange
+			var oM = new Month({ showWeekNumbers: true, showWeekNumbersHeader: false }).placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			// Assert
+			var oCWHeader = oM.getDomRef().querySelector(".sapUiCalWH.sapUiCalDummy span[aria-hidden]");
+			oAssert.notOk(oCWHeader, "No visible text span rendered in week number column header");
+			oAssert.notOk(oM.getDomRef().querySelector(".sapUiCalWH.sapUiCalDummy[title]"), "No title attribute on dummy cell when header is off");
+
+			oM.destroy();
+		});
+
+		QUnit.test("Tooltip shows full 'Calendar Week' text when showWeekNumbersHeader is true", async function (oAssert) {
+			// Arrange
+			var oM = new Month({ showWeekNumbers: true, showWeekNumbersHeader: true }).placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			// Assert
+			var sExpected = Library.getResourceBundleFor("sap.ui.unified").getText("CALENDAR_WEEK");
+			var oDummyCell = oM.getDomRef().querySelector(".sapUiCalWH.sapUiCalDummy");
+			oAssert.strictEqual(oDummyCell.getAttribute("title"), sExpected, "title attribute contains full 'Calendar Week' text");
+
+			oM.destroy();
+		});
+
+		QUnit.test("Header text uses sap-calendarWeek narrow for English locale", async function (oAssert) {
+			// Arrange
+			Localization.setLanguage("en");
+			var oM = new Month({ showWeekNumbers: true, showWeekNumbersHeader: true }).placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			// Assert
+			var sExpected = LocaleData.getInstance(new Locale("en")).getCalendarWeek("narrow").replace("{0}", "").trim();
+			var oCWHeader = oM.getDomRef().querySelector(".sapUiCalWH.sapUiCalDummy span[aria-hidden]");
+			oAssert.ok(oCWHeader, "Visible text span exists in week number column header");
+			oAssert.strictEqual(oCWHeader.textContent, sExpected, "Header text matches sap-calendarWeek narrow for en");
+
+			oM.destroy();
+		});
+
+		QUnit.test("Header text uses sap-calendarWeek narrow for German locale", async function (oAssert) {
+			// Arrange
+			Localization.setLanguage("de");
+			var oM = new Month({ showWeekNumbers: true, showWeekNumbersHeader: true }).placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			// Assert
+			var sExpected = LocaleData.getInstance(new Locale("de")).getCalendarWeek("narrow").replace("{0}", "").trim();
+			var oCWHeader = oM.getDomRef().querySelector(".sapUiCalWH.sapUiCalDummy span[aria-hidden]");
+			oAssert.ok(oCWHeader, "Visible text span exists in week number column header");
+			oAssert.strictEqual(oCWHeader.textContent, sExpected, "Header text matches sap-calendarWeek narrow for de");
+
+			oM.destroy();
+		});
+
+		QUnit.test("Header text falls back to week-narrow displayName for Arabic locale", async function (oAssert) {
+			// Arrange
+			Localization.setLanguage("ar");
+			var oM = new Month({ showWeekNumbers: true, showWeekNumbersHeader: true }).placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			// Assert
+			var sExpected = LocaleData.getInstance(new Locale("ar")).getDisplayName("week", "narrow");
+			var oCWHeader = oM.getDomRef().querySelector(".sapUiCalWH.sapUiCalDummy span[aria-hidden]");
+			oAssert.ok(oCWHeader, "Visible text span exists in week number column header");
+			oAssert.strictEqual(oCWHeader.textContent, sExpected, "Header text falls back to week narrow displayName for ar");
+
+			oM.destroy();
+		});
+
+		QUnit.test("Header text falls back to week-narrow displayName for Hebrew locale", async function (oAssert) {
+			// Arrange
+			Localization.setLanguage("he");
+			var oM = new Month({ showWeekNumbers: true, showWeekNumbersHeader: true }).placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			// Assert
+			var sExpected = LocaleData.getInstance(new Locale("he")).getDisplayName("week", "narrow");
+			var oCWHeader = oM.getDomRef().querySelector(".sapUiCalWH.sapUiCalDummy span[aria-hidden]");
+			oAssert.ok(oCWHeader, "Visible text span exists in week number column header");
+			oAssert.strictEqual(oCWHeader.textContent, sExpected, "Header text falls back to week narrow displayName for he");
+
+			oM.destroy();
+		});
+
+		QUnit.test("Header text falls back to week-narrow displayName for Vietnamese locale", async function (oAssert) {
+			// Arrange
+			Localization.setLanguage("vi");
+			var oM = new Month({ showWeekNumbers: true, showWeekNumbersHeader: true }).placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			// Assert
+			var sExpected = LocaleData.getInstance(new Locale("vi")).getDisplayName("week", "narrow");
+			var oCWHeader = oM.getDomRef().querySelector(".sapUiCalWH.sapUiCalDummy span[aria-hidden]");
+			oAssert.ok(oCWHeader, "Visible text span exists in week number column header");
+			oAssert.strictEqual(oCWHeader.textContent, sExpected, "Header text falls back to week narrow displayName for vi");
+
+			oM.destroy();
+		});
+
+		QUnit.test("Header text falls back to week-narrow displayName for Chinese Simplified locale", async function (oAssert) {
+			// Arrange
+			Localization.setLanguage("zh_CN");
+			var oM = new Month({ showWeekNumbers: true, showWeekNumbersHeader: true }).placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			// Assert
+			var sExpected = LocaleData.getInstance(new Locale("zh_CN")).getDisplayName("week", "narrow");
+			var oCWHeader = oM.getDomRef().querySelector(".sapUiCalWH.sapUiCalDummy span[aria-hidden]");
+			oAssert.ok(oCWHeader, "Visible text span exists in week number column header");
+			oAssert.strictEqual(oCWHeader.textContent, sExpected, "Header text falls back to week narrow displayName for zh_CN");
+
+			oM.destroy();
 		});
 
 		QUnit.module("Internals", {

@@ -43,14 +43,22 @@ function(
 
 	"use strict";
 
-	var ButtonType = mLib.ButtonType;
+	const ButtonType = mLib.ButtonType;
 
-	//eslint-disable-next-line no-void
-	const makeVoid = (fn) => (...args) => void fn(...args);
+	/**
+	 * Returns a Promise that resolves after the ObjectPageLayout fires onAfterRenderingDOMReady.
+	 * @param {sap.uxap.ObjectPageLayout} oOPL
+	 * @returns {Promise<void>}
+	 */
+	function waitForDOMReady(oOPL) {
+		return new Promise((resolve) => {
+			oOPL.attachEventOnce("onAfterRenderingDOMReady", resolve);
+		});
+	}
 
 	function createPage(key, useDynamicTitle) {
-		var oHeaderTitleType = useDynamicTitle ? ObjectPageDynamicHeaderTitle : ObjectPageHeader;
-		var oOPL = new ObjectPageLayout(key,{
+		const oHeaderTitleType = useDynamicTitle ? ObjectPageDynamicHeaderTitle : ObjectPageHeader;
+		const oOPL = new ObjectPageLayout(key,{
 			headerTitle:new oHeaderTitleType(key + "-title",{
 				actions:[
 					new ObjectPageHeaderActionButton({
@@ -91,17 +99,20 @@ function(
 	}
 
 	QUnit.test("Show/Hide Page preserves expanded state", async function(assert) {
+		assert.expect(3);
 
-		var oPage1 = createPage("page1"),
-			oPage2 = createPage("page2"),
-			oApp = new App({pages: [oPage1, oPage2],
+		// Arrange
+		const oPage1 = createPage("page1");
+		const oPage2 = createPage("page2");
+		const oApp = new App({pages: [oPage1, oPage2],
 									initialPage: oPage1});
 		oApp.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		assert.ok(oPage1._bStickyAnchorBar === false, "page is expanded");
 
-		var done = assert.async();
+		// Act/Assert - navigation events are async (attachAfterNavigate)
+		const done = assert.async();
 		oApp.attachAfterNavigate(function(oEvent) {
 			assert.ok(oPage1._bStickyAnchorBar === false, "page is still expanded");
 			if (oApp.getCurrentPage().getId() === "page1") {
@@ -115,16 +126,19 @@ function(
 	});
 
 	QUnit.test("Show/Hide Page preserves header actions state", async function(assert) {
+		assert.expect(4);
 
-		var oPage1 = createPage("page1"),
-			oPage2 = createPage("page2"),
-			oApp = new App({pages: [oPage1, oPage2],
-				initialPage: oPage1}),
-			done = assert.async();
+		// Arrange
+		const oPage1 = createPage("page1");
+		const oPage2 = createPage("page2");
+		const oApp = new App({pages: [oPage1, oPage2],
+			initialPage: oPage1});
+		const done = assert.async();
 
 		oApp.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
+		// OPL internal event + navigation events are async — keep assert.async() pattern
 		oPage1.attachEventOnce("onAfterRenderingDOMReady", function() {
 
 			assert.equal(oPage1.getHeaderTitle()._oOverflowButton.$().is(":visible"), false, "overflow is hidden");
@@ -149,9 +163,10 @@ function(
 
 	QUnit.test("Resize is detected if rerendered while hidden", async function(assert) {
 
-		var oPage1 = createPage("page1"),
-			done = assert.async(),
-			oStub = sinon.stub(oPage1.getHeaderTitle(), "_onHeaderResize").callsFake(function(oEvent) {
+		// Arrange
+		const oPage1 = createPage("page1");
+		const done = assert.async();
+		const oStub = sinon.stub(oPage1.getHeaderTitle(), "_onHeaderResize").callsFake(function(oEvent) {
 				assert.strictEqual(oEvent.size.width, 0, "width resize is detected");
 				assert.strictEqual(oEvent.size.height, 0, "height resize is detected");
 				done();
@@ -169,6 +184,7 @@ function(
 			oPage1.toggleStyleClass("sapMNavItem", bEnable).toggleStyleClass("sapMNavItemHidden", bEnable);
 		}
 
+		// OPL internal events are async — keep assert.async() pattern
 		oPage1.attachEventOnce("onAfterRenderingDOMReady", function() {
 			toggleHidden(false); // hide page
 			oPage1.attachEventOnce("onAfterRenderingDOMReady", function() {
@@ -179,9 +195,9 @@ function(
 	});
 
 	QUnit.test("CSS white-space rule reset. BCP: 1780382804", async function(assert) {
+		assert.expect(1);
 		// Arrange
-		var oOPL = new ObjectPageLayout().placeAt("qunit-fixture"),
-			oComputedStyle;
+		const oOPL = new ObjectPageLayout().placeAt("qunit-fixture");
 
 		// Act
 		await nextUIUpdate();
@@ -189,7 +205,8 @@ function(
 		// Wrap the control in an element which apply's white-space
 		oOPL.$().wrap(jQuery("<div></div>").css("white-space", "nowrap"));
 
-		oComputedStyle = window.getComputedStyle(oOPL.getDomRef());
+		// Assert
+		const oComputedStyle = window.getComputedStyle(oOPL.getDomRef());
 		assert.strictEqual(oComputedStyle.whiteSpace, "normal",
 			"CSS white-space should be reset to 'normal' to prevent breaking of responsive behavior");
 		//cleanup
@@ -199,8 +216,9 @@ function(
 	QUnit.module("_hasVisibleDynamicTitleAndHeader (private method)");
 
 	QUnit.test("Object page with ObjectPageHeader", async function(assert) {
+		assert.expect(1);
 		// Arrange
-		var oOPL = createPage("testPage", false).placeAt("qunit-fixture");
+		const oOPL = createPage("testPage", false).placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		// Assert
@@ -211,8 +229,9 @@ function(
 	});
 
 	QUnit.test("Object page with ObjectPageDynamicHeaderTitle", async function(assert) {
+		assert.expect(1);
 		// Arrange
-		var oOPL = createPage("testPage", true).placeAt("qunit-fixture");
+		const oOPL = createPage("testPage", true).placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		// Assert
@@ -223,8 +242,9 @@ function(
 	});
 
 	QUnit.test("Object page with not visible ObjectPageDynamicHeaderTitle", async function(assert) {
+		assert.expect(1);
 		// Arrange
-		var oOPL = createPage("testPage", true).placeAt("qunit-fixture");
+		const oOPL = createPage("testPage", true).placeAt("qunit-fixture");
 		oOPL.getHeaderTitle().setVisible(false);
 
 		await nextUIUpdate();
@@ -237,9 +257,10 @@ function(
 	});
 
 	QUnit.test("Object page with empty header content", async function(assert) {
+		assert.expect(1);
 		// Arrange
-		var oOPL = createPage("testPage", true).placeAt("qunit-fixture");
-		oOPL.getHeaderContent().forEach(function(oControl) {
+		const oOPL = createPage("testPage", true).placeAt("qunit-fixture");
+		oOPL.getHeaderContent().forEach((oControl) => {
 			oControl.destroy();
 		});
 		await nextUIUpdate();
@@ -252,8 +273,9 @@ function(
 	});
 
 	QUnit.test("Object page with not visible header content", async function(assert) {
+		assert.expect(1);
 		// Arrange
-		var oOPL = createPage("testPage", true).placeAt("qunit-fixture");
+		const oOPL = createPage("testPage", true).placeAt("qunit-fixture");
 		oOPL.setShowHeaderContent(false);
 		await nextUIUpdate();
 
@@ -275,10 +297,12 @@ function(
 	});
 
 	QUnit.test("do not invalidate parent upon first rendering", async function(assert) {
+		assert.expect(2);
 
-		var oTextArea = new TextArea({rows: 5, width: "100%", value: "12345678901234567890", growing: true}),
-			oPage = new Page("page01", {content: [oTextArea]}),
-			oObjectPageLayout = new ObjectPageLayout("page02", {
+		// Arrange
+		const oTextArea = new TextArea({rows: 5, width: "100%", value: "12345678901234567890", growing: true});
+		const oPage = new Page("page01", {content: [oTextArea]});
+		const oObjectPageLayout = new ObjectPageLayout("page02", {
 				sections: new ObjectPageSection({
 					subSections: [
 						new ObjectPageSubSection({
@@ -286,13 +310,13 @@ function(
 						})
 					]
 				})
-			}),
-			oApp = new App({
+			});
+		const oApp = new App({
 				pages: [
 					oPage, oObjectPageLayout
 				]
-			}),
-			done = assert.async();
+			});
+		const done = assert.async();
 
 		sinon.spy(oApp, "invalidate");
 
@@ -303,14 +327,16 @@ function(
 			}
 		});
 
+		// Act
 		oApp.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-
-		var afterBackToPage1 = function() {
+		// Navigation event callbacks are async — keep assert.async() pattern
+		const afterBackToPage1 = function() {
 				oApp.destroy();
 				done();
-			},afterNavigatePage2 = function() {
+			};
+		const afterNavigatePage2 = function() {
 				oApp.detachAfterNavigate(afterNavigatePage2);
 				oApp.attachAfterNavigate(afterBackToPage1);
 				oApp.to("page01");
@@ -322,44 +348,43 @@ function(
 	});
 
 	QUnit.test("toggleTitle upon rerendering", async function(assert) {
+		assert.expect(1);
 
-		var oObjectPage = this.oObjectPage,
-			oSection = oObjectPage.getSections()[0],
-			done = assert.async();
-
-		// Setup step1: wait for page to render
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", makeVoid(async function() {
-
-			// Setup step3: wait to onBeforeRendering
-			oObjectPage.addEventDelegate({
-
-				onBeforeRendering: function() {
-					// Setup step4: mock state after user scrolled to snap the header
-					oObjectPage._bHeaderInTitleArea = true;
-
-					// Act: app requests to scroll to a section that requires snapped header
-					oObjectPage.scrollToSection(oSection.getId());
-				},
-				onAfterRendering: function() {
-					// Check
-					assert.ok(oObjectPage._$titleArea.hasClass("sapUxAPObjectPageHeaderStickied"));
-					done();
-				}
-			});
-
-			// Setup step2: cause rerendering
-			oObjectPage.invalidate();
-			await nextUIUpdate();
-		}));
+		// Arrange
+		const oObjectPage = this.oObjectPage;
+		const oSection = oObjectPage.getSections()[0];
 
 		oObjectPage.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Setup step1: wait for page to render
+		await waitForDOMReady(oObjectPage);
+
+		// Setup step3: wait to onBeforeRendering
+		oObjectPage.addEventDelegate({
+
+			onBeforeRendering: function() {
+				// Setup step4: mock state after user scrolled to snap the header
+				oObjectPage._bHeaderInTitleArea = true;
+
+				// Act: app requests to scroll to a section that requires snapped header
+				oObjectPage.scrollToSection(oSection.getId());
+			},
+			onAfterRendering: function() {
+				// Check
+				assert.ok(oObjectPage._$titleArea.hasClass("sapUxAPObjectPageHeaderStickied"));
+			}
+		});
+
+		// Setup step2: cause rerendering
+		oObjectPage.invalidate();
 		await nextUIUpdate();
 	});
 
 
 	QUnit.module("Sections invalidation", {
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "UxAP-ObjectPageState",
 				viewName: "view.UxAP-ObjectPageState"
@@ -379,10 +404,11 @@ function(
 
 	QUnit.test("changes to hidden sections update the anchor bar", function (assert) {
 		//setup
-		var oPage = this.oObjectPage;
+		const oPage = this.oObjectPage;
 		oPage.setUseIconTabBar(true);
-		var done = assert.async();
+		const done = assert.async();
 
+		// 1000ms delay for OPL internal timing — cannot replace with nextUIUpdate
 		setTimeout(function() {
 
 			//act
@@ -390,7 +416,7 @@ function(
 
 			setTimeout(function() {
 
-				var oTabButton = oPage.getAggregation("_anchorBar").getItems()[1];
+				const oTabButton = oPage.getAggregation("_anchorBar").getItems()[1];
 				assert.ok(oTabButton.getText() === "Changed", "section title is updated in the anchorBar");
 				done();
 			}, 1000); //calc delay
@@ -409,110 +435,102 @@ function(
 	});
 
 	QUnit.test("updates the title positioning", async function(assert) {
+		assert.expect(1);
 		//setup
-		var oPage = this.oObjectPage,
-			oSpy = this.spy(oPage, "_adjustTitlePositioning"),
-			done = assert.async();
-
-		oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			oSpy.reset();
-
-			// act
-			oPage._adjustHeaderHeights();
-
-			// check
-			assert.equal(oSpy.callCount, 1, "update is called");
-			done();
-		});
+		const oPage = this.oObjectPage;
+		const oSpy = this.spy(oPage, "_adjustTitlePositioning");
 
 		oPage.placeAt("qunit-fixture");
 		await nextUIUpdate();
+		await waitForDOMReady(oPage);
+
+		oSpy.reset();
+
+		// act
+		oPage._adjustHeaderHeights();
+
+		// check
+		assert.equal(oSpy.callCount, 1, "update is called");
 	});
 
 	QUnit.test("_adjustTitlePositioning does not update padding-top when ResizeHandler is suspended", async function(assert) {
+		assert.expect(3);
 		//setup
-		var oPage = this.oObjectPage,
-			oResizeHandlerStub,
-			oSpy,
-			done = assert.async();
-
-		oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			oSpy = sinon.spy(oPage, "_adjustTitlePositioning");
-
-			// Create a stub for ResizeHandler.isSuspended to return true
-			oResizeHandlerStub = sinon.stub(ResizeHandler, "isSuspended").returns(true);
-
-			// Act: call _adjustTitlePositioning
-			oPage._adjustTitlePositioning();
-
-			// Assert: check that the function returned early and title positioning is not adjusted
-			assert.equal(oSpy.callCount, 1, "_adjustTitlePositioning was called");
-			assert.ok(oResizeHandlerStub.calledOnce, "ResizeHandler.isSuspended was called once");
-			assert.strictEqual(oSpy.returnValue, undefined, "Function returned early - padding-top of scroll container not adjusted");
-
-			// Cleanup
-			oSpy.restore();
-			oResizeHandlerStub.restore();
-			done();
-		});
+		const oPage = this.oObjectPage;
 
 		oPage.placeAt("qunit-fixture");
 		await nextUIUpdate();
+		await waitForDOMReady(oPage);
+
+		const oSpy = sinon.spy(oPage, "_adjustTitlePositioning");
+
+		// Create a stub for ResizeHandler.isSuspended to return true
+		const oResizeHandlerStub = sinon.stub(ResizeHandler, "isSuspended").returns(true);
+
+		// Act: call _adjustTitlePositioning
+		oPage._adjustTitlePositioning();
+
+		// Assert: check that the function returned early and title positioning is not adjusted
+		assert.equal(oSpy.callCount, 1, "_adjustTitlePositioning was called");
+		assert.ok(oResizeHandlerStub.calledOnce, "ResizeHandler.isSuspended was called once");
+		assert.strictEqual(oSpy.returnValue, undefined, "Function returned early - padding-top of scroll container not adjusted");
+
+		// Cleanup
+		oSpy.restore();
+		oResizeHandlerStub.restore();
 	});
 
 	QUnit.test("_adjustTitlePositioning uses stable bound function to prevent endless loop in ResizeHandler", async function(assert) {
+		assert.expect(4);
 		//setup
-		var oPage = this.oObjectPage,
-			done = assert.async();
-
-		oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			var oDomRef = oPage.getDomRef(),
-				aRegisteredCallbacks = [],
-				oIsSuspendedStub;
-
-			// Stub isSuspended to capture callbacks being registered
-			oIsSuspendedStub = sinon.stub(ResizeHandler, "isSuspended").callsFake(function(oDomRef, fnCallback) {
-				if (fnCallback) {
-					aRegisteredCallbacks.push(fnCallback);
-				}
-				// Return true to simulate suspended state
-				return true;
-			});
-
-			// Suspend and call _adjustTitlePositioning multiple times
-			// (simulating multiple resize events while suspended)
-			ResizeHandler.suspend(oDomRef);
-
-			oPage._adjustTitlePositioning();
-			oPage._adjustTitlePositioning();
-			oPage._adjustTitlePositioning();
-
-			// All callbacks should be the SAME function reference
-			assert.equal(aRegisteredCallbacks.length, 3, "isSuspended called 3 times with callbacks");
-			assert.strictEqual(aRegisteredCallbacks[0], aRegisteredCallbacks[1],
-				"First and second callbacks are identical (same function reference)");
-			assert.strictEqual(aRegisteredCallbacks[1], aRegisteredCallbacks[2],
-				"Second and third callbacks are identical (same function reference)");
-
-			// Verify it's the bound function from init
-			assert.strictEqual(aRegisteredCallbacks[0], oPage._adjustTitlePositioningBound,
-				"Registered callback is the stable bound function from init");
-
-			// Cleanup
-			oIsSuspendedStub.restore();
-			ResizeHandler.resume(oDomRef);
-			done();
-		});
+		const oPage = this.oObjectPage;
 
 		oPage.placeAt("qunit-fixture");
 		await nextUIUpdate();
+		await waitForDOMReady(oPage);
+
+		const oDomRef = oPage.getDomRef();
+		const aRegisteredCallbacks = [];
+
+		// Stub isSuspended to capture callbacks being registered
+		const oIsSuspendedStub = sinon.stub(ResizeHandler, "isSuspended").callsFake(function(oDomRef, fnCallback) {
+			if (fnCallback) {
+				aRegisteredCallbacks.push(fnCallback);
+			}
+			// Return true to simulate suspended state
+			return true;
+		});
+
+		// Suspend and call _adjustTitlePositioning multiple times
+		// (simulating multiple resize events while suspended)
+		ResizeHandler.suspend(oDomRef);
+
+		oPage._adjustTitlePositioning();
+		oPage._adjustTitlePositioning();
+		oPage._adjustTitlePositioning();
+
+		// All callbacks should be the SAME function reference
+		assert.equal(aRegisteredCallbacks.length, 3, "isSuspended called 3 times with callbacks");
+		assert.strictEqual(aRegisteredCallbacks[0], aRegisteredCallbacks[1],
+			"First and second callbacks are identical (same function reference)");
+		assert.strictEqual(aRegisteredCallbacks[1], aRegisteredCallbacks[2],
+			"Second and third callbacks are identical (same function reference)");
+
+		// Verify it's the bound function from init
+		assert.strictEqual(aRegisteredCallbacks[0], oPage._adjustTitlePositioningBound,
+			"Registered callback is the stable bound function from init");
+
+		// Cleanup
+		oIsSuspendedStub.restore();
+		ResizeHandler.resume(oDomRef);
 	});
 
 	QUnit.test("updates the title positioning in first onAfterRendering", async function(assert) {
+		assert.expect(1);
 		//setup
-		var oPage = this.oObjectPage,
-			oSpy = this.spy(oPage, "_adjustTitlePositioning"),
-			done = assert.async();
+		const oPage = this.oObjectPage;
+		const oSpy = this.spy(oPage, "_adjustTitlePositioning");
+		const done = assert.async();
 
 		oPage.addEventDelegate({
 			onAfterRendering: function() {
@@ -527,37 +545,38 @@ function(
 	});
 
 	QUnit.test("sets scrollPaddingTop", async function(assert) {
+		assert.expect(3);
 		//setup
-		var oPage = this.oObjectPage,
-			oSpy = this.spy(oPage, "_adjustTitlePositioning"),
-			done = assert.async();
-
-		oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			oSpy.reset();
-
-			// act: scroll to snap
-			oPage._scrollTo(oPage._getSnapPosition() + 1, 0);
-
-			// check
-			assert.equal(oSpy.callCount, 1, "update is called");
-			assert.ok(parseInt(oPage._$opWrapper.css("padding-top")) > 0, "scroll-padding-top is set");
-			assert.strictEqual(oPage._$opWrapper.css("padding-top"), oPage._$opWrapper.css("scroll-padding-top"), "scroll-padding-top matches padding-top");
-			done();
-		});
+		const oPage = this.oObjectPage;
+		const oSpy = this.spy(oPage, "_adjustTitlePositioning");
 
 		oPage.placeAt("qunit-fixture");
 		await nextUIUpdate();
+		await waitForDOMReady(oPage);
+
+		oSpy.reset();
+
+		// act: scroll to snap
+		oPage._scrollTo(oPage._getSnapPosition() + 1, 0);
+
+		// check
+		assert.equal(oSpy.callCount, 1, "update is called");
+		assert.ok(parseInt(oPage._$opWrapper.css("padding-top")) > 0, "scroll-padding-top is set");
+		assert.strictEqual(oPage._$opWrapper.css("padding-top"), oPage._$opWrapper.css("scroll-padding-top"), "scroll-padding-top matches padding-top");
 	});
 
 	QUnit.test("updates the sectionInfoIsDirty flag", async function(assert) {
-		var oPage = this.oObjectPage,
-			oSection1 = oPage.getSections()[0],
-			oSpy = this.spy(oPage, "_setSectionInfoIsDirty"),
-			done = assert.async();
+		assert.expect(1);
+		// Arrange
+		const oPage = this.oObjectPage;
+		const oSection1 = oPage.getSections()[0];
+		const oSpy = this.spy(oPage, "_setSectionInfoIsDirty");
+		const done = assert.async();
 
 		oPage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
+		// Act/Assert
 		oSection1.addEventDelegate({
 			onBeforeRendering: function() {
 				assert.ok(oSpy.calledOnceWith(true), "sectionInfoIsDirty is set");
@@ -571,7 +590,7 @@ function(
 
 	QUnit.module("update content size", {
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "UxAP-ObjectPageState",
 				viewName: "view.UxAP-ObjectPageState"
@@ -592,17 +611,18 @@ function(
 
 	QUnit.test("expand content below selected section updates layout", function (assert) {
 		//setup
-		var oPage = this.oObjectPage,
-			oBlock = oPage.getSections()[2].getSubSections()[0].getBlocks()[0],
-			done = assert.async();
+		const oPage = this.oObjectPage;
+		const oBlock = oPage.getSections()[2].getSubSections()[0].getBlocks()[0];
+		const done = assert.async();
 
+		// 1000ms delay for OPL internal timing — cannot replace with nextUIUpdate
 		setTimeout(function() {
 			//act
 			oBlock.setHeight("600px"); //add 300px more
 			setTimeout(function() {
 
-				var sSelectedKey = oPage.getAggregation("_anchorBar").getSelectedKey(),
-					sSelectedSectionId = oPage.getSelectedSection();
+				const sSelectedKey = oPage.getAggregation("_anchorBar").getSelectedKey();
+				const sSelectedSectionId = oPage.getSelectedSection();
 
 				assert.strictEqual(sSelectedKey, sSelectedSectionId, "section selection is preserved in the anchorBar");
 				done();
@@ -611,12 +631,12 @@ function(
 	});
 
 	function sectionIsSelected(oPage, assert, oExpected) {
-		var bSnapped = oExpected.bSnapped,
-			iAnchorBarSelectionIndex = oExpected.iAnchorBarSelectionIndex,
-			oAnchorBar = oPage.getAggregation("_anchorBar"),
-			sSelectedKey = oAnchorBar.getSelectedKey(),
-			oSelectedButton = oAnchorBar.getItems().find((i) => i.getKey() === sSelectedKey),
-			iSelectedBtnIndex = oAnchorBar.indexOfItem(oSelectedButton);
+		const bSnapped = oExpected.bSnapped;
+		const iAnchorBarSelectionIndex = oExpected.iAnchorBarSelectionIndex;
+		const oAnchorBar = oPage.getAggregation("_anchorBar");
+		const sSelectedKey = oAnchorBar.getSelectedKey();
+		const oSelectedButton = oAnchorBar.getItems().find((i) => i.getKey() === sSelectedKey);
+		const iSelectedBtnIndex = oAnchorBar.indexOfItem(oSelectedButton);
 
 		assert.strictEqual(oPage._bStickyAnchorBar, bSnapped, "header snapped state is correct");
 		assert.strictEqual(iSelectedBtnIndex, iAnchorBarSelectionIndex, "index of anchorBar selected button is correct");
@@ -624,11 +644,11 @@ function(
 
 	function runParameterizedTests (bUseIconTabBar) {
 
-		var sModulePrefix = bUseIconTabBar ? "IconTabBar" : "AnchorBar";
+		const sModulePrefix = bUseIconTabBar ? "IconTabBar" : "AnchorBar";
 
 		QUnit.module(sModulePrefix + "Mode", {
 			beforeEach: function (assert) {
-				var done = assert.async();
+				const done = assert.async();
 				XMLView.create({
 					id: "UxAP-ObjectPageState",
 					viewName: "view.UxAP-ObjectPageState"
@@ -650,13 +670,14 @@ function(
 
 		QUnit.test("Delete first section", function (assert) {
 			//setup
-			var oPage = this.oObjectPage,
-				oFirstSection = oPage.getSections()[0],
-				done = assert.async(),
-				fnOnDomReady = function() {
+			const oPage = this.oObjectPage;
+			const oFirstSection = oPage.getSections()[0];
+			const done = assert.async();
+			const fnOnDomReady = function() {
 					// act
 					oPage.removeSection(oFirstSection); /* remove first section */
 
+					// Category A: setTimeout 0 inside attachEventOnce — pure render wait after removeSection
 					setTimeout(function() {
 						sectionIsSelected(oPage, assert, {
 							bSnapped: false,
@@ -674,12 +695,12 @@ function(
 
 		QUnit.test("Hide lower section", function (assert) {
 			//setup
-			var oPage = this.oObjectPage,
-				oSecondSection = oPage.getSections()[1],
-				oSecondSection_secondSubsection = oSecondSection.getSubSections()[1],
-				done = assert.async(),
-				iScrollPosition,
-				fnOnDomReady = function() {
+			const oPage = this.oObjectPage;
+			const oSecondSection = oPage.getSections()[1];
+			const oSecondSection_secondSubsection = oSecondSection.getSubSections()[1];
+			const done = assert.async();
+			let iScrollPosition;
+			const fnOnDomReady = function() {
 					oPage.detachEvent("onAfterRenderingDOMReady", fnOnDomReady);
 					oPage.scrollToSection(oSecondSection_secondSubsection.getId(), 0);
 					iScrollPosition = oPage._computeScrollPosition(oSecondSection_secondSubsection);
@@ -695,6 +716,7 @@ function(
 
 					sectionIsSelected(oPage, assert, { //selection moved to the first visible section
 						bSnapped: true,
+// eslint-disable-next-line no-warning-comments
 						iAnchorBarSelectionIndex: 1 // TODO Verify this is correct since these tests were disabled (changed from 0)
 					});
 
@@ -704,55 +726,55 @@ function(
 		});
 
 
-		QUnit.test("Hide lower subSection", function (assert) {
+		QUnit.test("Hide lower subSection", async function (assert) {
+			assert.expect(4);
 			//setup
-			var oPage = this.oObjectPage,
-				oSecondSection_secondSubsection = oPage.getSections()[1].getSubSections()[1],
-				bExpectedSnapped = true,
-				done = assert.async(),
-				iScrollPosition,
-				fnOnDomReady = async function() {
-					oPage.scrollToSection(oSecondSection_secondSubsection.getId(), 0);
-					iScrollPosition = oPage._computeScrollPosition(oSecondSection_secondSubsection);
-					// call the scroll listener synchronously to save a timeout
-					oPage._onScroll({target: {scrollTop: iScrollPosition}});
+			const oPage = this.oObjectPage;
+			const oSecondSection_secondSubsection = oPage.getSections()[1].getSubSections()[1];
+			let bExpectedSnapped = true;
 
-					sectionIsSelected(oPage, assert, {
-						bSnapped: bExpectedSnapped,
-						iAnchorBarSelectionIndex: 1
-					});
+			await waitForDOMReady(oPage);
 
-					// act
-					oSecondSection_secondSubsection.setVisible(false); // hide the current subsection
+			oPage.scrollToSection(oSecondSection_secondSubsection.getId(), 0);
+			const iScrollPosition = oPage._computeScrollPosition(oSecondSection_secondSubsection);
+			// call the scroll listener synchronously to save a timeout
+			oPage._onScroll({target: {scrollTop: iScrollPosition}});
 
-					if (oPage.getUseIconTabBar()) {
-						/* only one subsection remained => we are on top of the section => in iconTabBar no need to snap */
-						bExpectedSnapped = true; // TODO Verify this is correct since these tests were disabled (changed from false)
-					}
+			sectionIsSelected(oPage, assert, {
+				bSnapped: bExpectedSnapped,
+				iAnchorBarSelectionIndex: 1
+			});
 
-					await nextUIUpdate();
+			// act
+			oSecondSection_secondSubsection.setVisible(false); // hide the current subsection
 
-					sectionIsSelected(oPage, assert, {
-						bSnapped: bExpectedSnapped,
-						iAnchorBarSelectionIndex: 1
-					});
-					done();
+			if (oPage.getUseIconTabBar()) {
+// eslint-disable-next-line no-warning-comments
+				/* only one subsection remained => we are on top of the section => in iconTabBar no need to snap */
+				bExpectedSnapped = true; // TODO Verify this is correct since these tests were disabled (changed from false)
+			}
 
-			};
-			oPage.attachEventOnce("onAfterRenderingDOMReady", makeVoid(fnOnDomReady));
+			await nextUIUpdate();
+
+			sectionIsSelected(oPage, assert, {
+				bSnapped: bExpectedSnapped,
+				iAnchorBarSelectionIndex: 1
+			});
 		});
 	}
 
 	QUnit.test("skips layout calculations if rendering not completed", function (assert) {
 
-		var oObjectPage = this.oObjectPage,
-			oCacheDomElementsSpy = sinon.spy(oObjectPage, "_cacheDomElements"),
-			oObtainLayoutSpy = sinon.spy(oObjectPage, "_obtainExpandedTitleHeight"),
-			oHeaderTitle = oObjectPage.getHeaderTitle(),
-			iCacheCallsBefore,
-			iObtainCallsBefore,
-			done = assert.async();
+		// Arrange
+		const oObjectPage = this.oObjectPage;
+		const oCacheDomElementsSpy = sinon.spy(oObjectPage, "_cacheDomElements");
+		const oObtainLayoutSpy = sinon.spy(oObjectPage, "_obtainExpandedTitleHeight");
+		const oHeaderTitle = oObjectPage.getHeaderTitle();
+		let iCacheCallsBefore;
+		let iObtainCallsBefore;
+		const done = assert.async();
 
+		// OPL internal event is async — keep assert.async() pattern
 		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
 			// assert initial state
 			assert.ok(oObjectPage._$titleArea.length > 0, "DOM reference is cached");
@@ -793,8 +815,9 @@ function(
 	});
 
 	QUnit.test("Expand button listener lifecycle", async function(assert) {
+		assert.expect(3);
 		// Arrange
-		var oSpy = sinon.spy(this.oObjectPage, "_handleExpandButtonPressEventLifeCycle");
+		const oSpy = sinon.spy(this.oObjectPage, "_handleExpandButtonPressEventLifeCycle");
 
 		// Act
 		this.oObjectPage.placeAt("qunit-fixture");
@@ -810,9 +833,9 @@ function(
 
 	QUnit.test("Expand button handler method '_handleExpandButtonPressEventLifeCycle'", function (assert) {
 		// Arrange
-		var oExpandButton = this.oObjectPage.getHeaderTitle().getAggregation("_expandButton"),
-			oAttachSpy = sinon.spy(oExpandButton, "attachPress"),
-			oDetachSpy = sinon.spy(oExpandButton, "detachPress");
+		const oExpandButton = this.oObjectPage.getHeaderTitle().getAggregation("_expandButton");
+		const oAttachSpy = sinon.spy(oExpandButton, "attachPress");
+		const oDetachSpy = sinon.spy(oExpandButton, "detachPress");
 
 		// Act - call handler with bAttach = true
 		this.oObjectPage._handleExpandButtonPressEventLifeCycle(true);
@@ -833,6 +856,7 @@ function(
 	});
 
 	QUnit.test("this.iHeaderContentHeight is acquired in the correct way", async function(assert) {
+		assert.expect(2);
 		// Arrange - add a button to the header content so we will have height
 		this.oObjectPage.addHeaderContent(new Button());
 
@@ -841,7 +865,7 @@ function(
 		await nextUIUpdate();
 
 		// Arrange spy method on the headerContent DOM instance
-		var oSpy = sinon.spy(this.oObjectPage._$headerContent[0], "getBoundingClientRect");
+		const oSpy = sinon.spy(this.oObjectPage._$headerContent[0], "getBoundingClientRect");
 
 		// Act - call internal method _adjustHeaderHeights
 		this.oObjectPage._adjustHeaderHeights();
@@ -861,12 +885,17 @@ function(
 	});
 
 	QUnit.test("event is fired upon moving the header in/out scroll container", async function(assert) {
-		var oSpy = this.spy();
+		assert.expect(2);
+		// Arrange
+		const oSpy = this.spy();
 		this.oObjectPage.attachEvent("_snapChange", oSpy);
+
+		// Act
 		this.oObjectPage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 		oSpy.resetHistory();
 
+		// Assert
 		this.oObjectPage._moveHeaderToTitleArea();
 		assert.strictEqual(oSpy.callCount, 1, "the event is fired");
 
@@ -885,9 +914,10 @@ function(
 	});
 
 	QUnit.test("Async code execution after destroy method called", async function(assert) {
+		assert.expect(2);
 
 		//Arrange
-		var oFakeEvent = {
+		const oFakeEvent = {
 			size: {
 				width: 300,
 				height: 1000
@@ -896,13 +926,12 @@ function(
 				width: 1000,
 				height: 1000
 			}
-		},
-		oStub,
-		done = assert.async();
+		};
+		const done = assert.async();
 		this.oObjectPage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		oStub = sinon.stub(ObjectPageDynamicHeaderTitle.prototype, "_onResize");
+		const oStub = sinon.stub(ObjectPageDynamicHeaderTitle.prototype, "_onResize");
 
 		//Act
 		this.oObjectPage._bDomReady = true;
@@ -918,6 +947,7 @@ function(
 		this.oObjectPage._bDomReady = true;
 		this.oObjectPage._onUpdateScreenSize(oFakeEvent);
 
+		// 1000ms delay for OPL _onUpdateScreenSize async processing
 		setTimeout(function() {
 
 			//Assert
@@ -928,7 +958,7 @@ function(
 		}, 1000);
 
 	});
-	var bUseIconTabBar = true;
+	const bUseIconTabBar = true;
 
 	runParameterizedTests(bUseIconTabBar);
 	runParameterizedTests(!bUseIconTabBar);

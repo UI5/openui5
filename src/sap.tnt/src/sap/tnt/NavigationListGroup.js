@@ -4,8 +4,9 @@
 
 sap.ui.define([
 	"./library",
+	"sap/base/strings/highlightText",
 	"./NavigationListItemBase"
-], function (library, NavigationListItemBase) {
+], function (library, highlightText, NavigationListItemBase) {
 	"use strict";
 
 	const EXPAND_ICON_SRC = "sap-icon://navigation-right-arrow";
@@ -106,9 +107,18 @@ sap.ui.define([
 
 		oRM.openStart("span")
 			.class("sapTntNLGroupText")
-			.openEnd()
-			.text(this.getText())
-			.close("span");
+			.openEnd();
+
+		const sText = this.getText();
+		const sHighlightedText = oNavigationList && oNavigationList.getHighlightedText();
+
+		if (sHighlightedText) {
+			oRM.unsafeHtml(highlightText(sText, sHighlightedText, "sapTntNLIHighlight"));
+		} else {
+			oRM.text(sText);
+		}
+
+		oRM.close("span");
 
 		const oIcon = this._getExpandIconControl();
 		oIcon.setSrc(this.getExpanded() ? COLLAPSE_ICON_SRC : EXPAND_ICON_SRC);

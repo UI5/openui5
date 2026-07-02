@@ -154,6 +154,15 @@ sap.ui.define([
 			showWeekNumbers : {type : "boolean", group : "Appearance", defaultValue : true},
 
 			/**
+			 * Determines whether the header of the week numbers column is displayed.
+			 * The column header text is translated according to the active language.
+			 *
+			 * <b>Note:</b> Takes effect only when <code>showWeekNumbers</code> is set to <code>true</code>.
+			 * @since 1.151
+			 */
+			showWeekNumbersHeader : {type : "boolean", group : "Appearance", defaultValue : false},
+
+			/**
 			 * The value of this property is set trough the sap.ui.unified.Calendar control,
 			 * in order for the current sap.ui.unified.calendar.Month control to know which
 			 * is the focused date even if this date is out of the visible date range
@@ -322,6 +331,30 @@ sap.ui.define([
 
 	Month.prototype._getDayDescription = function() {
 		return "";
+	};
+
+	/**
+	 * Returns the text to display in the week numbers column header.
+	 * Returns an empty string when the header should not be shown.
+	 * @returns {string} The week numbers column header text, or empty string
+	 * @private
+	 */
+	Month.prototype._getWeekNumbersHeaderText = function() {
+		if (!this.getShowWeekNumbersHeader()) {
+			return "";
+		}
+
+		// Locales where the calendar week abbreviation (sap-calendarWeek narrow) is too long
+		// to fit in the week number column header cell — verified manually.
+		// These fall back to the "week" narrow display name from CLDR (week-narrow.displayName).
+		const _oLongCWLocales = new Set(["ar", "ar-EG", "ar-SA", "he", "vi", "zh-CN", "zh-HK", "zh-TW"]),
+			oLocaleData = this._getLocaleData();
+
+		if (_oLongCWLocales.has(this._getLocale())) {
+			return oLocaleData.getDisplayName("week", "narrow");
+		}
+
+		return oLocaleData.getCalendarWeek("narrow").replace("{0}", "").trim();
 	};
 
 	Month.prototype.exit = function(){

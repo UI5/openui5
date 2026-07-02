@@ -15,6 +15,8 @@ sap.ui.define([
 	"sap/m/Popover",
 	"sap/ui/core/delegate/ItemNavigation",
 	"sap/ui/core/InvisibleText",
+	"sap/ui/core/InvisibleMessage",
+	"sap/ui/core/library",
 	"./NavigationListItem",
 	"./NavigationListMenuItem",
 	"./NavigationListRenderer",
@@ -32,6 +34,8 @@ sap.ui.define([
 	Popover,
 	ItemNavigation,
 	InvisibleText,
+	InvisibleMessage,
+	coreLibrary,
 	NavigationListItem,
 	NavigationListMenuItem,
 	NavigationListRenderer,
@@ -42,6 +46,8 @@ sap.ui.define([
 
 	// shortcut for sap.m.PlacementType
 	var PlacementType = mLibrary.PlacementType;
+	// shortcut for sap.ui.core.InvisibleMessageMode
+	const InvisibleMessageMode = coreLibrary.InvisibleMessageMode;
 
 	/**
 	 * Constructor for a new <code>NavigationList</code>.
@@ -79,7 +85,13 @@ sap.ui.define([
 				 *
 				 * @since 1.62.0
 				 */
-				selectedKey: { type: "string", group: "Data" }
+				selectedKey: { type: "string", group: "Data" },
+				/**
+				 * Specifies a term to be highlighted in the navigation items' text.
+				 * When set, matching portions of item and group texts are visually emphasized during rendering.
+				 * @since 1.151
+				 */
+				highlightedText: { type: "string", group: "Appearance", defaultValue: "" }
 			},
 			defaultAggregation: "items",
 			aggregations: {
@@ -226,6 +238,10 @@ sap.ui.define([
 
 		this._updateNavItems();
 
+		// force initializing the invisible message,
+		// as the live region should be rendered, when we announce the text
+		InvisibleMessage.getInstance();
+
 		if (this.getExpanded()) {
 			return;
 		}
@@ -283,6 +299,10 @@ sap.ui.define([
 		this._updateOverflowItems();
 	};
 
+	NavigationList.prototype._getVisibleItems = function () {
+		return this.getItems().filter((oItem) => oItem.getVisible());
+	};
+
 	NavigationList.prototype._updateOverflowItems = function () {
 		var oDomRef = this.getDomRef();
 		if (this.getExpanded() || !oDomRef) {
@@ -335,6 +355,10 @@ sap.ui.define([
 	};
 
 	NavigationList.prototype._getOverflowItem = function () {
+		if (!this._getVisibleItems().length) {
+			return null;
+		}
+
 		let oOverflowItem = this.getAggregation("_overflowItem");
 		if (!oOverflowItem) {
 			oOverflowItem = new NavigationListItem({
@@ -388,7 +412,8 @@ sap.ui.define([
 
 	NavigationList.prototype._createNavigationMenuItems = function (oMenu) {
 		var items = [],
-			menuItems = [];
+			menuItems = [],
+			that = this;
 
 		this.getItems().forEach((item) => {
 			if (item.isA("sap.tnt.NavigationListGroup")) {
@@ -411,7 +436,8 @@ sap.ui.define([
 				enabled: item.getEnabled(),
 				href: item.getHref(),
 				target: item.getTarget(),
-				tag: item.getTag()?.clone()
+				tag: item.getTag()?.clone(),
+				highlightedText: that.getHighlightedText()
 			});
 			menuItem._navItem = item;
 			menuItem._oMenu = oMenu;
@@ -423,7 +449,8 @@ sap.ui.define([
 					enabled: item.getEnabled(),
 					href: item.getHref(),
 					target: item.getTarget(),
-					tag: item.getTag()?.clone()
+					tag: item.getTag()?.clone(),
+					highlightedText: that.getHighlightedText()
 				});
 
 				subMenuParentItem._navItem = item;
@@ -440,7 +467,8 @@ sap.ui.define([
 					enabled: subItem.getEnabled(),
 					href: subItem.getHref(),
 					target: subItem.getTarget(),
-					tag: subItem.getTag()?.clone()
+					tag: subItem.getTag()?.clone(),
+					highlightedText: that.getHighlightedText()
 				});
 				subMenuItem._navItem = subItem;
 				subMenuItem._oMenu = oMenu;
@@ -465,10 +493,15 @@ sap.ui.define([
 	 */
 	NavigationList.prototype._getFocusDomRefs = function () {
 		const aDomRefs = this.getItems().flatMap((oItem) => oItem._getFocusDomRefs()),
-			oOverflowDomRef = this._getOverflowItem().getDomRef("a");
+			oOverflowDomRef = this._getOverflowItem()?.getDomRef("a");
 
 		if (!this.getExpanded() && oOverflowDomRef) {
 			aDomRefs.push(oOverflowDomRef);
+		}
+
+		const oNoDataRef = this.getDomRef()?.querySelector(".sapTntNLNoData > div");
+		if (oNoDataRef) {
+			aDomRefs.push(oNoDataRef);
 		}
 
 		return aDomRefs;
@@ -640,6 +673,23 @@ sap.ui.define([
 		);
 
 		return !!aFound.length;
+	};
+
+	/**
+	 * Announces the number of search matches found in the navigation list.
+	 *
+	 * @param {int} iCount The number of matching items.
+	 * @since 1.151
+	 * @public
+	 */
+	NavigationList.prototype.announceMatchCount = function (iCount) {
+		const oRB = Lib.getResourceBundleFor("sap.tnt");
+
+		const sText = iCount === 1
+			? oRB.getText("SIDE_NAVIGATION_SEARCH_MATCH_FOUND")
+			: oRB.getText("SIDE_NAVIGATION_SEARCH_MATCHES_FOUND", [iCount]);
+
+		InvisibleMessage.getInstance().announce(sText, InvisibleMessageMode.Polite);
 	};
 
 	return NavigationList;

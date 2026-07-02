@@ -20,13 +20,24 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	var oConfigModel = new JSONModel();
+	const oConfigModel = new JSONModel();
 	await oConfigModel.loadData("test-resources/sap/uxap/qunit/model/ObjectPageConfig.json");
+
+	/**
+	 * Returns a Promise that resolves after the ObjectPageLayout fires onAfterRenderingDOMReady.
+	 * @param {sap.uxap.ObjectPageLayout} oOPL
+	 * @returns {Promise<void>}
+	 */
+	function waitForDOMReady(oOPL) {
+		return new Promise((resolve) => {
+			oOPL.attachEventOnce("onAfterRenderingDOMReady", resolve);
+		});
+	}
 
 	QUnit.module("ObjectPageAfterRendering");
 
 	QUnit.test("triggering visible subsections calculations should not fail before rendering", function (assert) {
-		var oObjectPageLayout = new ObjectPageLayout({
+		const oObjectPageLayout = new ObjectPageLayout({
 			enableLazyLoading: true,
 			sections: new ObjectPageSection("mySection1", {
 				subSections: [
@@ -44,9 +55,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("BCP: 1870326083 - _triggerVisibleSubSectionsEvents should force OP to recalculate", async function(assert) {
+		assert.expect(2);
 		// Arrange
-		var oObjectPageLayout = new ObjectPageLayout({enableLazyLoading: true}),
-			oRequestAdjustLayoutSpy = this.spy(oObjectPageLayout, "_requestAdjustLayout");
+		const oObjectPageLayout = new ObjectPageLayout({enableLazyLoading: true});
+		const oRequestAdjustLayoutSpy = this.spy(oObjectPageLayout, "_requestAdjustLayout");
 
 		// We have to render the OP as LazyLoading is initiated on onBeforeRendering
 		oObjectPageLayout.placeAt("qunit-fixture");
@@ -67,18 +79,17 @@ sap.ui.define([
 	});
 
 	QUnit.test("Early lazyLoading onAfterRendering", async function(assert) {
-
-		var oObjectPage = new ObjectPageLayout({enableLazyLoading: true}),
-			iExpectedLazyLoadingDelay,
-			spy,
-			that = this,
-			done = assert.async();
+		// Arrange
+		const oObjectPage = new ObjectPageLayout({enableLazyLoading: true});
+		const that = this;
+		const done = assert.async();
+		let spy;
 
 		assert.expect(1);
 
 		// Arrange: enable early lazy loading
 		oObjectPage._triggerVisibleSubSectionsEvents();
-		iExpectedLazyLoadingDelay = 0; // expect very small delay
+		const iExpectedLazyLoadingDelay = 0; // expect very small delay
 
 		oObjectPage.addEventDelegate({
 			"onBeforeRendering": function() {
@@ -99,11 +110,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("Early lazyLoading onAfterRendering if already scheduled", async function(assert) {
-
-		var oObjectPage = new ObjectPageLayout({enableLazyLoading: true}),
-			that = this,
-			spy,
-			done = assert.async();
+		// Arrange
+		const oObjectPage = new ObjectPageLayout({enableLazyLoading: true});
+		const that = this;
+		let spy;
 
 		assert.expect(1);
 
@@ -118,25 +128,23 @@ sap.ui.define([
 			}
 		}, this);
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-				// Check:
-				assert.strictEqual(spy.callCount, 1, "lazy loading is called early");
-				oObjectPage.destroy();
-				done();
-		});
-
 		oObjectPage.placeAt("qunit-fixture");
 		await nextUIUpdate();
+
+		await waitForDOMReady(oObjectPage);
+
+		// Check:
+		assert.strictEqual(spy.callCount, 1, "lazy loading is called early");
+		oObjectPage.destroy();
 	});
 
 	QUnit.test("Early lazyLoading onAfterRendering when hidden", async function(assert) {
-
-		var oObjectPage = new ObjectPageLayout({enableLazyLoading: true}),
-			iExpectedLazyLoadingDelay,
-			recalcSpy = this.spy(oObjectPage, "_requestAdjustLayout"),
-			lazyLoadingSpy,
-			that = this,
-			done = assert.async();
+		// Arrange
+		const oObjectPage = new ObjectPageLayout({enableLazyLoading: true});
+		const recalcSpy = this.spy(oObjectPage, "_requestAdjustLayout");
+		const that = this;
+		const done = assert.async();
+		let iExpectedLazyLoadingDelay, lazyLoadingSpy;
 
 		assert.expect(2);
 
@@ -194,17 +202,16 @@ sap.ui.define([
 
 	QUnit.test("Sections are lazy loaded when header content is pinned initially", async function(assert) {
 		// Arrange
-		var oObjectPageLayout = new ObjectPageLayout({
+		const oObjectPageLayout = new ObjectPageLayout({
 				enableLazyLoading: true,
 				headerContentPinned: true,
 				headerTitle: [new ObjectPageDynamicHeaderTitle()]
-			}),
-			fnDone = assert.async(),
-			fnOnBeforeRendering = function () {
-				oObjectPageLayout.removeEventDelegate(fnOnBeforeRendering);
-				oLazyLoadingSpy = this.spy(oObjectPageLayout._oLazyLoading, "doLazyLoading");
-			}.bind(this),
-			oLazyLoadingSpy;
+			});
+		let oLazyLoadingSpy;
+		const fnOnBeforeRendering = function () {
+			oObjectPageLayout.removeEventDelegate(fnOnBeforeRendering);
+			oLazyLoadingSpy = this.spy(oObjectPageLayout._oLazyLoading, "doLazyLoading");
+		}.bind(this);
 
 		assert.expect(1);
 
@@ -213,19 +220,16 @@ sap.ui.define([
 			"onBeforeRendering": fnOnBeforeRendering
 		});
 
-		oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady",
-			function () {
-				// Assert
-				assert.ok(oLazyLoadingSpy.calledOnce, "LazyLoading is called");
-
-				// Clean up
-				oObjectPageLayout.destroy();
-				fnDone();
-			}
-		);
-
 		oObjectPageLayout.placeAt("qunit-fixture");
 		await nextUIUpdate();
+
+		await waitForDOMReady(oObjectPageLayout);
+
+		// Assert
+		assert.ok(oLazyLoadingSpy.calledOnce, "LazyLoading is called");
+
+		// Clean up
+		oObjectPageLayout.destroy();
 	});
 
 
@@ -233,7 +237,7 @@ sap.ui.define([
 
 	QUnit.test("lazyLoading created on beforeRendering", function (assert) {
 		// Setup
-		var oObjectPageLayout = new ObjectPageLayout({enableLazyLoading: true});
+		const oObjectPageLayout = new ObjectPageLayout({enableLazyLoading: true});
 
 		// Act: mock framework call on before rendering
 		oObjectPageLayout.onBeforeRendering();
@@ -243,10 +247,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("lazyLoading interval task", function (assert) {
-		var oObjectPageLayout = new ObjectPageLayout({enableLazyLoading: true}),
-			oLazyLoading,
-			oLazyLoadingSpy,
-			done = assert.async();
+		const oObjectPageLayout = new ObjectPageLayout({enableLazyLoading: true});
+		const done = assert.async();
 
 		assert.expect(1);
 
@@ -260,8 +262,8 @@ sap.ui.define([
 		oObjectPageLayout.onBeforeRendering();
 
 		// Setup: spy for repeated calls of <code>doLazyLoading</code>
-		oLazyLoading = oObjectPageLayout._oLazyLoading;
-		oLazyLoadingSpy = this.spy(oLazyLoading, "doLazyLoading");
+		const oLazyLoading = oObjectPageLayout._oLazyLoading;
+		const oLazyLoadingSpy = this.spy(oLazyLoading, "doLazyLoading");
 
 		// Act: trigger lazyLoading
 		oLazyLoading.doLazyLoading(); // mock initial trigger from objectPage
@@ -276,10 +278,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("lazyLoading interval task cancelled when not needed", function (assert) {
-		var oObjectPageLayout = new ObjectPageLayout({enableLazyLoading: true}),
-			oLazyLoading,
-			oLazyLoadingSpy,
-			done = assert.async();
+		const oObjectPageLayout = new ObjectPageLayout({enableLazyLoading: true});
+		const done = assert.async();
 
 		assert.expect(1);
 
@@ -293,8 +293,8 @@ sap.ui.define([
 		oObjectPageLayout.onBeforeRendering();
 
 		// Setup: spy for repeated calls of <code>doLazyLoading</code>
-		oLazyLoading = oObjectPageLayout._oLazyLoading;
-		oLazyLoadingSpy = this.spy(oLazyLoading, "doLazyLoading");
+		const oLazyLoading = oObjectPageLayout._oLazyLoading;
+		const oLazyLoadingSpy = this.spy(oLazyLoading, "doLazyLoading");
 		oLazyLoading.doLazyLoading(); // mock initial call from objectPage
 		oLazyLoadingSpy.resetHistory(); // ensure we monitor only calls from this point on
 
@@ -310,14 +310,14 @@ sap.ui.define([
 	});
 
 	QUnit.test("lazyLoading called when content size is updated", async function (assert) {
+		assert.expect(1);
 		// Setup
-		var oObjectPageLayout = new ObjectPageLayout({enableLazyLoading: true}),
-			fnDone = assert.async(),
-			oSpy;
+		const oObjectPageLayout = new ObjectPageLayout({enableLazyLoading: true});
+		const fnDone = assert.async();
 		oObjectPageLayout.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		oSpy = this.spy(oObjectPageLayout._oLazyLoading, "doLazyLoading");
+		const oSpy = this.spy(oObjectPageLayout._oLazyLoading, "doLazyLoading");
 
 		// Act: call _onUpdateContentSize (when content is updated)
 		oObjectPageLayout._onUpdateContentSize({
@@ -333,10 +333,11 @@ sap.ui.define([
 	});
 
 	QUnit.test("doLazyLoading called with scroll top parameter from lazyLoadingDuringScroll", async function (assert) {
+		assert.expect(1);
 		// Setup
-		var oObjectPageLayout = new ObjectPageLayout({enableLazyLoading: true}),
-			fnDone = assert.async(),
-			oSpy;
+		const oObjectPageLayout = new ObjectPageLayout({enableLazyLoading: true});
+		const fnDone = assert.async();
+		let oSpy;
 
 		oObjectPageLayout.placeAt("qunit-fixture");
 		await nextUIUpdate();
@@ -360,20 +361,19 @@ sap.ui.define([
 
 	QUnit.test("_unStashControlsAsync preserves control order with different resolution times", function (assert) {
 		// Setup
-		var fnDone = assert.async(),
-			oSubSection = new ObjectPageSubSection(),
-			aUnstashedControls = [], // Array to track controls in the order they were unstashed
-			aFinalBlockIds = [], // Array to track the final order of blocks in the aggregation
-			oAddAggregationSpy;
+		const fnDone = assert.async();
+		const oSubSection = new ObjectPageSubSection();
+		const aUnstashedControls = []; // Array to track controls in the order they were unstashed
+		const aFinalBlockIds = []; // Array to track the final order of blocks in the aggregation
 
 		// Create mock stashed controls
-		var oMockStashedControl1 = {
+		const oMockStashedControl1 = {
 			getId: function() { return "control1"; },
 			unstash: function() {
 				// Mock the first control to unstash LAST (slowest)
 				return new Promise(function(resolve) {
 					setTimeout(function() {
-						var oUnstashedControl = new Title({text: "Control 1", id: "control1"});
+						const oUnstashedControl = new Title({text: "Control 1", id: "control1"});
 						aUnstashedControls.push("control1");
 						resolve(oUnstashedControl);
 					}, 30);
@@ -382,13 +382,13 @@ sap.ui.define([
 			isStashed: function() { return true; }
 		};
 
-		var oMockStashedControl2 = {
+		const oMockStashedControl2 = {
 			getId: function() { return "control2"; },
 			unstash: function() {
 				// Mock the second control to unstash SECOND
 				return new Promise(function(resolve) {
 					setTimeout(function() {
-						var oUnstashedControl = new Title({text: "Control 2", id: "control2"});
+						const oUnstashedControl = new Title({text: "Control 2", id: "control2"});
 						aUnstashedControls.push("control2");
 						resolve(oUnstashedControl);
 					}, 20);
@@ -397,13 +397,13 @@ sap.ui.define([
 			isStashed: function() { return true; }
 		};
 
-		var oMockStashedControl3 = {
+		const oMockStashedControl3 = {
 			getId: function() { return "control3"; },
 			unstash: function() {
 				// Mock the third control to unstash FIRST (fastest)
 				return new Promise(function(resolve) {
 					setTimeout(function() {
-						var oUnstashedControl = new Title({text: "Control 3", id: "control3"});
+						const oUnstashedControl = new Title({text: "Control 3", id: "control3"});
 						aUnstashedControls.push("control3");
 						resolve(oUnstashedControl);
 					}, 10);
@@ -420,10 +420,10 @@ sap.ui.define([
 		];
 
 		// Spy on addAggregation to verify the implementation
-		oAddAggregationSpy = this.spy(oSubSection, "addAggregation");
+		const oAddAggregationSpy = this.spy(oSubSection, "addAggregation");
 
 		// Keep a reference to the original getElementById function
-		var fnOriginalGetElementById = Element.getElementById;
+		const fnOriginalGetElementById = Element.getElementById;
 
 		// Override getElementById to return our unstashed controls
 		this.stub(Element, "getElementById").callsFake(function(sId) {

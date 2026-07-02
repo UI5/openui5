@@ -58,9 +58,20 @@ function(
 	//eslint-disable-next-line no-void
 	const makeVoid = (fn) => (...args) => void fn(...args);
 
-	var TitleLevel = coreLib.TitleLevel;
-	var ObjectPageLayoutMediaRange = lib.ObjectPageLayoutMediaRange;
-	var oFactory = {
+	/**
+	 * Returns a Promise that resolves after the ObjectPageLayout fires onAfterRenderingDOMReady.
+	 * @param {sap.uxap.ObjectPageLayout} oOPL The ObjectPageLayout instance to wait for
+	 * @returns {Promise<void>} A promise that resolves when the DOM is ready
+	 */
+	function waitForDOMReady(oOPL) {
+		return new Promise((resolve) => {
+			oOPL.attachEventOnce("onAfterRenderingDOMReady", resolve);
+		});
+	}
+
+	const TitleLevel = coreLib.TitleLevel;
+	const ObjectPageLayoutMediaRange = lib.ObjectPageLayoutMediaRange;
+	const oFactory = {
 			getSection: function (iNumber, sTitleLevel, aSubSections, visibility) {
 				return new ObjectPageSection({
 					title: "Section" + iNumber,
@@ -129,15 +140,14 @@ function(
 					]
 				});
 			}
-	},
-
-		helpers = {
+	};
+	const helpers = {
 			generateObjectPageWithContent: function (oFactory, iNumberOfSection, bUseIconTabBar, bFooter) {
-				var oObjectPage = bUseIconTabBar ? oFactory.getObjectPageLayoutWithIconTabBar() : oFactory.getObjectPage(),
-					oSection,
-					oSubSection;
+				const oObjectPage = bUseIconTabBar ? oFactory.getObjectPageLayoutWithIconTabBar() : oFactory.getObjectPage();
+				let oSection;
+				let oSubSection;
 
-				for (var i = 0; i < iNumberOfSection; i++) {
+				for (let i = 0; i < iNumberOfSection; i++) {
 					oSection = oFactory.getSection(i);
 					oSubSection = oFactory.getSubSection(i, oFactory.getBlocks());
 					oSection.addSubSection(oSubSection);
@@ -151,17 +161,17 @@ function(
 				return oObjectPage;
 			},
 			generateObjectPageWithSubSectionContent: function (oFactory, iNumberOfSection, iNumberOfSubSection, bUseIconTabBar) {
-				var oObjectPage = bUseIconTabBar ? oFactory.getObjectPageLayoutWithIconTabBar() : oFactory.getObjectPage(),
-					oSection,
-					oSubSection,
-					sSectionId,
-					sSubSectionId;
+				const oObjectPage = bUseIconTabBar ? oFactory.getObjectPageLayoutWithIconTabBar() : oFactory.getObjectPage();
+				let oSection;
+				let oSubSection;
+				let sSectionId;
+				let sSubSectionId;
 
-				for (var i = 0; i < iNumberOfSection; i++) {
+				for (let i = 0; i < iNumberOfSection; i++) {
 					sSectionId = "s" + i;
 					oSection = oFactory.getSection(sSectionId);
 
-					for (var j = 0; j < iNumberOfSubSection; j++) {
+					for (let j = 0; j < iNumberOfSubSection; j++) {
 						sSubSectionId = sSectionId + "ss" + j;
 						oSubSection = oFactory.getSubSection(sSubSectionId, oFactory.getBlocks());
 						oSection.addSubSection(oSubSection);
@@ -229,7 +239,7 @@ function(
 	QUnit.test("Section without sub-section simulation", async function(assert) {
 
 		// Arrange
-		var oMainSection = new ObjectPageSection({
+		const oMainSection = new ObjectPageSection({
 					subSections: [
 						new ObjectPageSubSection({
 							blocks: [new Text({text: "test"})]
@@ -238,29 +248,25 @@ function(
 							blocks: [new Text({text: "text"})]
 						})
 					]
-			}),
-			oObjectPageLayout = new ObjectPageLayout({
+			});
+		const oObjectPageLayout = new ObjectPageLayout({
 				sections: oMainSection
-			}),
-			sClosestID, done = assert.async();
-
+			});
 		// Assert
 		assert.expect(1); // The test is expected to have one assert
-		oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady", function() {
-
-			oMainSection.removeAllSubSections();
-			sClosestID = oObjectPageLayout._getClosestScrolledSectionBaseId(0, "iPageHeight is not defined", true);
-
-			// Assert
-			assert.strictEqual(sClosestID, oMainSection.sId, "check if _getClosestScrolledSectionBaseId returns the correct value");
-
-			// Cleanup
-			oObjectPageLayout.destroy();
-			done();
-		});
 
 		oObjectPageLayout.placeAt('qunit-fixture');
 		await nextUIUpdate();
+		await waitForDOMReady(oObjectPageLayout);
+
+		oMainSection.removeAllSubSections();
+		const sClosestID = oObjectPageLayout._getClosestScrolledSectionBaseId(0, "iPageHeight is not defined", true);
+
+		// Assert
+		assert.strictEqual(sClosestID, oMainSection.sId, "check if _getClosestScrolledSectionBaseId returns the correct value");
+
+		// Cleanup
+		oObjectPageLayout.destroy();
 	});
 
 	QUnit.module("IconTabBar is initially enabled", {
@@ -295,6 +301,7 @@ function(
 	});
 
 	QUnit.test("test UseIconTabBar APIs", async function(assert) {
+		assert.expect(4);
 		// Act
 		this.oObjectPage.setUseIconTabBar(false);
 		await nextUIUpdate();
@@ -327,8 +334,8 @@ function(
 
 	QUnit.test("Object Page shows first section title when only one section is visible", function (assert) {
 		//Arrange
-		var oFirstSection = this.oObjectPage.getSections()[0],
-			oSubSection = oFirstSection.getSubSections()[0];
+		const oFirstSection = this.oObjectPage.getSections()[0];
+		const oSubSection = oFirstSection.getSubSections()[0];
 
 		oFirstSection.setShowTitle(true);
 
@@ -352,10 +359,10 @@ function(
 	QUnit.test("Calling scrollToSection when OPL is not rendered should do nothing", function (assert) {
 		assert.ok(Log, "Log module should be available");
 
-		var oObjectPage = this.oObjectPage,
-			oFirstSection = oObjectPage.getSections()[0],
-			oLoggerSpy = this.spy(Log, "warning"),
-			oComputeScrollPositionSpy = this.spy(oObjectPage, "_computeScrollPosition");
+		const oObjectPage = this.oObjectPage;
+		const oFirstSection = oObjectPage.getSections()[0];
+		const oLoggerSpy = this.spy(Log, "warning");
+		const oComputeScrollPositionSpy = this.spy(oObjectPage, "_computeScrollPosition");
 
 		assert.ok(!oObjectPage.getDomRef(), "ObjectPage is not rendered");
 
@@ -367,9 +374,10 @@ function(
 	});
 
 	QUnit.test("Calling scrollToSection before its onAfterRendring hook should not throw error", async function (assert) {
-		var oObjectPage = helpers.generateObjectPageWithContent(oFactory, 5),
-			oAnchorBar,
-			oFirstSection = oObjectPage.getSections()[0];
+		assert.expect(2);
+		const oObjectPage = helpers.generateObjectPageWithContent(oFactory, 5);
+		let oAnchorBar;
+		const oFirstSection = oObjectPage.getSections()[0];
 
 		oObjectPage.addEventDelegate({
 			onBeforeRendering: function() {
@@ -408,7 +416,7 @@ function(
 	});
 
 	QUnit.test("test IconTabBar shoud not be created when 0 section is provided", function (assert) {
-		var expectedNumberOfSections = 0;
+		const expectedNumberOfSections = 0;
 
 		assert.strictEqual(this.oObjectPage.getSections().length, expectedNumberOfSections, 'The ObjectPage has ' +
 		expectedNumberOfSections + ' sections');
@@ -428,7 +436,7 @@ function(
 	});
 
 	QUnit.test("test empty anchorBar when one section is provided", function (assert) {
-		var expectedNumberOfSections = this.NUMBER_OF_SECTIONS;
+		const expectedNumberOfSections = this.NUMBER_OF_SECTIONS;
 
 		// one section only
 		assert.strictEqual(this.oObjectPage.getSections().length, expectedNumberOfSections, 'The ObjectPage has ' +
@@ -442,7 +450,7 @@ function(
 
 	QUnit.test("test the section is rendered", function (assert) {
 		//section is rendered
-		var sSectionId = this.oObjectPage.getSections()[0].getId();
+		const sSectionId = this.oObjectPage.getSections()[0].getId();
 		assert.ok(this.oObjectPage.$().find("#" + sSectionId + " *").length, "section is rendered");
 	});
 
@@ -465,10 +473,11 @@ function(
 	});
 
 	QUnit.test("test user defined selected section", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			done = assert.async(); //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
+		assert.expect(4);
+		const oObjectPage = this.oObjectPage;
+		const done = assert.async(); //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
 
-		var oExpected = {
+		const oExpected = {
 			oSelectedSection: this.oSecondSection,
 			sSelectedTitle: this.oSecondSection.getSubSections()[0].getTitle() //subsection is promoted
 		};
@@ -482,13 +491,14 @@ function(
 	});
 
 	QUnit.test("test selected section when hiding another one", async function (assert) {
+		assert.expect(4);
 		/* Arrange */
-		var oObjectPage = this.oObjectPage,
-			oExpected = {
+		const oObjectPage = this.oObjectPage;
+		const oExpected = {
 				oSelectedSection: this.oSecondSection,
 				sSelectedTitle: this.oSecondSection.getSubSections()[0].getTitle()
-			},
-			done = assert.async();
+			};
+		const done = assert.async();
 
 		/* Act: Hide the third section.
 		 /* which used to cause a failure, see BCP: 1770148914 */
@@ -506,20 +516,21 @@ function(
 	});
 
 	QUnit.test("test selected section when removing another one", async function (assert) {
+		assert.expect(11);
 		/* Arrange */
-		var oObjectPage = this.oObjectPage,
-			iNonIntegerHeaderContentHeight = 99.7, // header content height should not be an integer
-			oHeaderContent = new GenericDiv({
+		const oObjectPage = this.oObjectPage;
+		const iNonIntegerHeaderContentHeight = 99.7; // header content height should not be an integer
+		const oHeaderContent = new GenericDiv({
 				height: iNonIntegerHeaderContentHeight + "px",
 				margin: "0", // to suppress any margin imposed by the OP laoyut
 				padding: "0", // to suppress any padding imposed by the OP layout
-				text: "some content"}),
-			oExpected = {
+				text: "some content"});
+		const oExpected = {
 				oSelectedSection: this.oSecondSection,
 				sSelectedTitle: this.oSecondSection.getSubSections()[0].getTitle()
-			},
-			done = assert.async(),
-			_pxToNumber = function (sSizeToConvert) {
+			};
+		const done = assert.async();
+		const _pxToNumber = function (sSizeToConvert) {
 				return (sSizeToConvert.substring(0, (sSizeToConvert.length - 2)) ) * 1;
 			};
 
@@ -527,9 +538,9 @@ function(
 		oObjectPage.addHeaderContent(oHeaderContent);
 		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
 			setTimeout(function() {
-				var oHeaderContentDOM = oObjectPage._getHeaderContent().getDomRef(),
-				sPaddingTop = _pxToNumber(window.getComputedStyle(oHeaderContentDOM, null).getPropertyValue('padding-top')),
-				sPaddingBottom = _pxToNumber(window.getComputedStyle(oHeaderContentDOM, null).getPropertyValue('padding-bottom'));
+				const oHeaderContentDOM = oObjectPage._getHeaderContent().getDomRef();
+				const sPaddingTop = _pxToNumber(window.getComputedStyle(oHeaderContentDOM, null).getPropertyValue('padding-top'));
+				const sPaddingBottom = _pxToNumber(window.getComputedStyle(oHeaderContentDOM, null).getPropertyValue('padding-bottom'));
 
 				// assert that the page internally rounds (ceils) the header content heights
 				assert.notEqual(oObjectPage.iHeaderContentHeight, iNonIntegerHeaderContentHeight, "cached headerContent height is rounded");
@@ -558,15 +569,16 @@ function(
 	});
 
 	QUnit.test("unset selected section", async function (assert) {
+		assert.expect(11);
 		// Arrange
-		var oObjectPage = this.oObjectPage,
-			oFirstSection = this.oObjectPage.getSections()[0],
-			oSecondSection = this.oSecondSection,
-			oExpected,
-			oAnchorBarRebuildSpy,
-			oSubSectionVisibilityEventSpy,
-			oSectionPreloadSpy,
-			done = assert.async(); //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
+		const oObjectPage = this.oObjectPage;
+		const oFirstSection = this.oObjectPage.getSections()[0];
+		const oSecondSection = this.oSecondSection;
+		const done = assert.async(); //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
+		let oExpected;
+		let oAnchorBarRebuildSpy;
+		let oSubSectionVisibilityEventSpy;
+		let oSectionPreloadSpy;
 
 		setTimeout(function () {
 
@@ -606,13 +618,14 @@ function(
 	});
 
 	QUnit.test("unset selected section resets expanded state", async function (assert) {
+		assert.expect(11);
 		// Arrange
-		var oObjectPage = this.oObjectPage,
-			oFirstSection = this.oObjectPage.getSections()[0],
-			oSecondSection = this.oSecondSection,
-			oExpected,
-			oAnchorBarRebuildSpy,
-			done = assert.async(); //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
+		const oObjectPage = this.oObjectPage;
+		const oFirstSection = this.oObjectPage.getSections()[0];
+		const oSecondSection = this.oSecondSection;
+		const done = assert.async(); //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
+		let oExpected;
+		let oAnchorBarRebuildSpy;
 
 		// add header content
 		oObjectPage.setUseIconTabBar(false);
@@ -658,8 +671,7 @@ function(
 	});
 
 	QUnit.test("unset selected section when header always in title area", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			done = assert.async(); //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
+		const oObjectPage = this.oObjectPage;
 
 		assert.expect(2);
 
@@ -674,32 +686,29 @@ function(
 		this.stub(lib.Utilities, "isPhoneScenario").returns(false);
 		this.stub(lib.Utilities, "isTabletScenario").returns(false);
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function () {
-			// Act: unset the currently selected section
-			oObjectPage.setSelectedSection(null);
-
-			// Check: the header is still expanded in the title
-			setTimeout(function() {
-				// Assert
-				assert.equal(oObjectPage._bHeaderExpanded, true, "Header is expanded");
-				assert.equal(oObjectPage._bHeaderInTitleArea, true, "Header is still in the title area");
-
-				// Clean up
-				done();
-			}, 0);
-		});
-
 		await helpers.renderObject(this.oObjectPage);
+		await waitForDOMReady(oObjectPage);
+
+		// Act: unset the currently selected section
+		oObjectPage.setSelectedSection(null);
+
+		// Check: the header is still expanded in the title
+		await new Promise((resolve) => { setTimeout(resolve, 0); });
+
+		// Assert
+		assert.equal(oObjectPage._bHeaderExpanded, true, "Header is expanded");
+		assert.equal(oObjectPage._bHeaderInTitleArea, true, "Header is still in the title area");
 	});
 
 	QUnit.test("unset selected section of hidden page", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oFirstSection = this.oObjectPage.getSections()[0],
-			oSecondSection = this.oSecondSection,
-			oSpy = this.spy(oObjectPage, "_scrollTo"),
-			sOrigDisplay,
-			oExpected,
-			done = assert.async(); //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
+		assert.expect(11);
+		const oObjectPage = this.oObjectPage;
+		const oFirstSection = this.oObjectPage.getSections()[0];
+		const oSecondSection = this.oSecondSection;
+		const oSpy = this.spy(oObjectPage, "_scrollTo");
+		const done = assert.async(); //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
+		let sOrigDisplay;
+		let oExpected;
 
 		oObjectPage.setUseIconTabBar(false);
 		oObjectPage.setHeaderTitle(oFactory.getObjectPageDynamicHeaderTitle());
@@ -750,10 +759,11 @@ function(
 	});
 
 	QUnit.test("unset selected section before layout adjusted", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oFirstSection = this.oObjectPage.getSections()[0],
-			oExpected,
-			done = assert.async(); //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
+		assert.expect(6);
+		const oObjectPage = this.oObjectPage;
+		const oFirstSection = this.oObjectPage.getSections()[0];
+		const done = assert.async(); //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
+		let oExpected;
 
 		// add header content
 		oObjectPage.setUseIconTabBar(false);
@@ -762,7 +772,7 @@ function(
 
 		oFirstSection.setVisible(false);
 
-		var oDelegate = {
+		const oDelegate = {
 			onAfterRendering: function () {
 				oObjectPage.removeEventDelegate(oDelegate);
 
@@ -791,11 +801,12 @@ function(
 
 
 	QUnit.test("call setSelectedSection(null) when the first visible section is already selected", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oFirstSection = this.oObjectPage.getSections()[0],
-			oSecondSection = this.oObjectPage.getSections()[1],
-			oExpected,
-			done = assert.async(); //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
+		assert.expect(6);
+		const oObjectPage = this.oObjectPage;
+		const oFirstSection = this.oObjectPage.getSections()[0];
+		const oSecondSection = this.oObjectPage.getSections()[1];
+		const done = assert.async(); //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
+		let oExpected;
 
 		// add header content
 		oObjectPage.setUseIconTabBar(false);
@@ -804,7 +815,7 @@ function(
 
 		oFirstSection.setVisible(false);
 
-		var oDelegate = {
+		const oDelegate = {
 			onAfterRendering: function () {
 				oObjectPage.removeEventDelegate(oDelegate);
 
@@ -833,9 +844,10 @@ function(
 	});
 
 	QUnit.test("reset setSelectedSection when single visible section", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oSubSection = oFactory.getSubSection(1, oFactory.getBlocks()),
-			oSection = oFactory.getSection(1, null, oSubSection);
+		assert.expect(1);
+		const oObjectPage = this.oObjectPage;
+		const oSubSection = oFactory.getSubSection(1, oFactory.getBlocks());
+		const oSection = oFactory.getSection(1, null, oSubSection);
 
 		oObjectPage.setUseIconTabBar(false);
 
@@ -851,9 +863,9 @@ function(
 
 
 	QUnit.test("scroll to selected section on rerender", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oSecondSection = this.oObjectPage.getSections()[1],
-			done = assert.async(); //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
+		const oObjectPage = this.oObjectPage;
+		const oSecondSection = this.oObjectPage.getSections()[1];
+		const done = assert.async(); //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
 
 		assert.expect(2);
 
@@ -879,9 +891,9 @@ function(
 	});
 
 	QUnit.test("scrollEnablement obtains container ref onAfterRendering", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			done = assert.async(),  //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
-			vOriginalHeight = jQuery("#qunit-fixture").height();
+		const oObjectPage = this.oObjectPage;
+		const done = assert.async(); //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
+		const vOriginalHeight = jQuery("#qunit-fixture").height();
 
 		// ensure page can be scrolled
 		jQuery("#qunit-fixture").height("200"); // container small enough
@@ -889,7 +901,7 @@ function(
 
 		assert.expect(3);
 
-		var oDelegate = {
+		const oDelegate = {
 			onAfterRendering: function () {
 				assert.ok(oObjectPage._oScroller._$Container, "scroller has container referefnce");
 				assert.strictEqual(oObjectPage._oScroller._$Container.get(0), oObjectPage._$opWrapper.get(0), "scroller has correct container reference");
@@ -908,10 +920,9 @@ function(
 	});
 
 	QUnit.test("not scrolled to selected section when navigation is canceled", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oSecondSection = this.oObjectPage.getSections()[1],
-			fnDone = assert.async(),
-			oSpy = this.spy(oObjectPage, "scrollToSection");
+		const oObjectPage = this.oObjectPage;
+		const oSecondSection = this.oObjectPage.getSections()[1];
+		const oSpy = this.spy(oObjectPage, "scrollToSection");
 
 		assert.expect(1);
 
@@ -920,19 +931,16 @@ function(
 			oEvent.preventDefault();
 		});
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			oSpy.reset();
-
-			// Act
-			oObjectPage.onAnchorBarTabPress(oSecondSection.getId());
-
-			// Assert
-			assert.ok(oSpy.notCalled, "scroll to selected section is prevented");
-
-			fnDone();
-		});
-
 		await helpers.renderObject(oObjectPage);
+		await waitForDOMReady(oObjectPage);
+
+		oSpy.reset();
+
+		// Act
+		oObjectPage.onAnchorBarTabPress(oSecondSection.getId());
+
+		// Assert
+		assert.ok(oSpy.notCalled, "scroll to selected section is prevented");
 	});
 
 	QUnit.module("Resizing", {
@@ -948,66 +956,55 @@ function(
 	});
 
 	QUnit.test("adjust selected section", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oHhtmBlock,
-			oFirstSection = oObjectPage.getSections()[0],
-			oSecondSection = oObjectPage.getSections()[1],
-			oBlockDomElement,
-			iScrollTopBefore,
-			iScrollTopAfter,
-			iBlockHeightBefore,
-			iBlockHeightAfter,
-			iHeightDiff = 40,
-			oAdjustLayoutSpy = this.spy(oObjectPage, "_requestAdjustLayout"),
-			oUpdateSelectionSpy = this.spy(oObjectPage, "_updateSelectionOnScroll"),
-			done = assert.async();
+		assert.expect(3);
+		const oObjectPage = this.oObjectPage;
+		const oFirstSection = oObjectPage.getSections()[0];
+		const oSecondSection = oObjectPage.getSections()[1];
+		const iHeightDiff = 40;
+		const oAdjustLayoutSpy = this.spy(oObjectPage, "_requestAdjustLayout");
+		const oUpdateSelectionSpy = this.spy(oObjectPage, "_updateSelectionOnScroll");
 
 		// setup step1: add content with defined height
-		oHhtmBlock = new GenericDiv("b1", {height: "300px"}).addStyleClass("innerDiv");
+		const oHhtmBlock = new GenericDiv("b1", {height: "300px"}).addStyleClass("innerDiv");
 		oFirstSection.getSubSections()[0].addBlock(oHhtmBlock);
 
 		// setup step2
 		oObjectPage.setSelectedSection(oSecondSection.getId());
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function () {
-
-			oBlockDomElement = oHhtmBlock.getDomRef();
-
-			iBlockHeightBefore = oBlockDomElement.offsetHeight;
-			iScrollTopBefore = oObjectPage._$opWrapper.scrollTop();
-
-			iBlockHeightAfter = iBlockHeightBefore - iHeightDiff;
-			iScrollTopAfter = iScrollTopBefore - iHeightDiff;
-
-			oAdjustLayoutSpy.resetHistory();
-			oUpdateSelectionSpy.resetHistory();
-
-
-			// Act: change height without invalidating any control => on the the resize handler will be responsible for re-adjusting the selection
-			oBlockDomElement.style.height = iBlockHeightAfter + "px";
-
-			// mock the (1) scroll and (2) resize listeners that will be fired
-			// as a result of the resize of the content:
-			// (1) call the scroll listener synchronously to speed-up the test
-			oObjectPage._onScroll({target: { scrollTop:  iScrollTopAfter }});
-			// (2) call the resize listener synchronously to speed up the test
-			oObjectPage._onUpdateContentSize({ size: {}, oldSize: { height: 600, width: 400} });
-
-			// Check
-			assert.equal(oAdjustLayoutSpy.callCount, 1, "layout adjustment is called");
-			assert.ok(oUpdateSelectionSpy.called, "update selection is called");
-			assert.equal(oObjectPage.getSelectedSection(), oSecondSection.getId(), "selected section is correct");
-			done();
-		});
-
 		await helpers.renderObject(oObjectPage);
+		await waitForDOMReady(oObjectPage);
+
+		const oBlockDomElement = oHhtmBlock.getDomRef();
+		const iBlockHeightBefore = oBlockDomElement.offsetHeight;
+		const iScrollTopBefore = oObjectPage._$opWrapper.scrollTop();
+		const iBlockHeightAfter = iBlockHeightBefore - iHeightDiff;
+		const iScrollTopAfter = iScrollTopBefore - iHeightDiff;
+
+		oAdjustLayoutSpy.resetHistory();
+		oUpdateSelectionSpy.resetHistory();
+
+
+		// Act: change height without invalidating any control => on the the resize handler will be responsible for re-adjusting the selection
+		oBlockDomElement.style.height = iBlockHeightAfter + "px";
+
+		// mock the (1) scroll and (2) resize listeners that will be fired
+		// as a result of the resize of the content:
+		// (1) call the scroll listener synchronously to speed-up the test
+		oObjectPage._onScroll({target: { scrollTop:  iScrollTopAfter }});
+		// (2) call the resize listener synchronously to speed up the test
+		oObjectPage._onUpdateContentSize({ size: {}, oldSize: { height: 600, width: 400} });
+
+		// Check
+		assert.equal(oAdjustLayoutSpy.callCount, 1, "layout adjustment is called");
+		assert.ok(oUpdateSelectionSpy.called, "update selection is called");
+		assert.equal(oObjectPage.getSelectedSection(), oSecondSection.getId(), "selected section is correct");
 	});
 
 	QUnit.test("ObjectPage resize handler is regestered in onAfterRendering", async function (assert) {
 		// arrange
-		var oObjectPage = this.oObjectPage,
-			done = assert.async(),
-			oDelegate = { onAfterRendering: function() {
+		const oObjectPage = this.oObjectPage;
+		const done = assert.async();
+		const oDelegate = { onAfterRendering: function() {
 					oObjectPage.removeEventDelegate(oDelegate);
 					// assert
 					assert.ok(oObjectPage._iResizeId !== null, "Resize handler is registered in onAfterRendering function");
@@ -1025,10 +1022,11 @@ function(
 	});
 
 	QUnit.test("ObjectPage DOM element resize listeners deregistered on exit", async function (assert) {
+		assert.expect(2);
 		// arrange
-		var oObjectPage = this.oObjectPage,
-			oSpy1 = this.spy(oObjectPage, "_deregisterScreenSizeListener"),
-			oSpy2 = this.spy(oObjectPage, "_deregisterTitleSizeListener");
+		const oObjectPage = this.oObjectPage;
+		const oSpy1 = this.spy(oObjectPage, "_deregisterScreenSizeListener");
+		const oSpy2 = this.spy(oObjectPage, "_deregisterTitleSizeListener");
 
 		await helpers.renderObject(oObjectPage);
 
@@ -1043,36 +1041,30 @@ function(
 	});
 
 	QUnit.test("height metrics are updated on content-resize", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oHtmlBlock,
-			oFirstSection = oObjectPage.getSections()[0],
-			oSpy = this.spy(oObjectPage, "_adjustHeaderHeights"),
-			done = assert.async();
-
+		const oObjectPage = this.oObjectPage;
+		const oFirstSection = oObjectPage.getSections()[0];
+		const oSpy = this.spy(oObjectPage, "_adjustHeaderHeights");
 		assert.expect(1);
 
 		// setup step1: add content with defined height
-		oHtmlBlock = new GenericDiv("b1", {height: "300px"}).addStyleClass("innerDiv");
+		const oHtmlBlock = new GenericDiv("b1", {height: "300px"}).addStyleClass("innerDiv");
 		oFirstSection.getSubSections()[0].addBlock(oHtmlBlock);
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function () {
-
-			// Act: change height without invalidating any control
-			Element.getElementById("b1").getDomRef().style.height = "250px";
-			oSpy.resetHistory();
-			oObjectPage._onUpdateContentSize({ size: {}, oldSize: {} });
-
-			assert.equal(oSpy.callCount, 1, "recalculation of heights is called");
-			done();
-		});
-
 		await helpers.renderObject(oObjectPage);
+		await waitForDOMReady(oObjectPage);
+
+		// Act: change height without invalidating any control
+		Element.getElementById("b1").getDomRef().style.height = "250px";
+		oSpy.resetHistory();
+		oObjectPage._onUpdateContentSize({ size: {}, oldSize: {} });
+
+		assert.equal(oSpy.callCount, 1, "recalculation of heights is called");
 	});
 
 	QUnit.test("media range is updated on-resize", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			done = assert.async(),
-			iWidth = 0;
+		const oObjectPage = this.oObjectPage;
+		const done = assert.async();
+		let iWidth = 0;
 
 		this.stub(oObjectPage, "_getMediaContainerWidth").callsFake(function() {
 			return iWidth;
@@ -1097,8 +1089,8 @@ function(
 	QUnit.module("test setSelectedSection functionality");
 
 	QUnit.test("test setSelectedSection with initially empty ObjectPage", function (assert) {
-		var oObjectPage = oFactory.getObjectPage(),
-			sSectionId = "section1";
+		const oObjectPage = oFactory.getObjectPage();
+		const sSectionId = "section1";
 
 		// act
 		oObjectPage.setSelectedSection(sSectionId);
@@ -1129,11 +1121,11 @@ function(
 
 	function sectionIsSelected(oObjectPage, assert, oExpected) {
 
-		var oAnchorBar = oObjectPage.getAggregation('_anchorBar'),
-			sSelectedSectionId = oAnchorBar.getSelectedKey(),
-			oSelectedFilter = oAnchorBar.getItems().find((i) => i.getKey() === sSelectedSectionId),
-			bExpectedSnapped = oExpected.bSnapped,
-			iExpectedScrollTop = oExpected.iScrollTop;
+		const oAnchorBar = oObjectPage.getAggregation('_anchorBar');
+		const sSelectedSectionId = oAnchorBar.getSelectedKey();
+		const oSelectedFilter = oAnchorBar.getItems().find((i) => i.getKey() === sSelectedSectionId);
+		const bExpectedSnapped = oExpected.bSnapped;
+		const iExpectedScrollTop = oExpected.iScrollTop;
 
 		assert.ok(oSelectedFilter, "anchorBar has selected filter");
 		assert.strictEqual(oSelectedFilter.getText(), oExpected.sSelectedTitle, "section is selected in anchorBar");
@@ -1150,11 +1142,11 @@ function(
 
 	QUnit.test("test first visible section is initially selected", function (assert) {
 
-		var oPage = this.oObjectPage,
-			oFirstSection = oPage.getSections()[0],
-			done = assert.async(),
-			fnOnDomReady = function() {
-				var oExpected = {
+		const oPage = this.oObjectPage;
+		const oFirstSection = oPage.getSections()[0];
+		const done = assert.async();
+		const fnOnDomReady = function() {
+				const oExpected = {
 					oSelectedSection: oFirstSection,
 					sSelectedTitle: oFirstSection.getTitle(),
 					bSnapped: false
@@ -1168,15 +1160,15 @@ function(
 
 	QUnit.test("scrollTo another section", function (assert) {
 
-		var oPage = this.oObjectPage,
-			oSecondSection = oPage.getSections()[1],
-			bTabsMode = oPage.getUseIconTabBar(),
-			done = assert.async(),
-			fnOnDomReady = function() {
+		const oPage = this.oObjectPage;
+		const oSecondSection = oPage.getSections()[1];
+		const bTabsMode = oPage.getUseIconTabBar();
+		const done = assert.async();
+		const fnOnDomReady = function() {
 				//act
 				oPage.scrollToSection(oSecondSection.getId(), 0, null, true);
 
-				var oExpected = {
+				const oExpected = {
 					oSelectedSection: oSecondSection,
 					sSelectedTitle: oSecondSection.getTitle(),
 					bSnapped: !bTabsMode
@@ -1193,15 +1185,15 @@ function(
 
 	QUnit.test("scrollTo another subSection (first subsection)", function (assert) {
 
-		var oPage = this.oObjectPage,
-			oSecondSection = oPage.getSections()[1],
-			bTabsMode = oPage.getUseIconTabBar(),
-			done = assert.async(),
-			fnOnDomReady = function() {
+		const oPage = this.oObjectPage;
+		const oSecondSection = oPage.getSections()[1];
+		const bTabsMode = oPage.getUseIconTabBar();
+		const done = assert.async();
+		const fnOnDomReady = function() {
 				//act
 				oPage.scrollToSection(oSecondSection.getSubSections()[0].getId(), 0, null, true);
 
-				var oExpected = {
+				const oExpected = {
 					oSelectedSection: oSecondSection,
 					sSelectedTitle: oSecondSection.getTitle(),
 					bSnapped: !bTabsMode
@@ -1218,20 +1210,20 @@ function(
 
 	QUnit.test("scrollTo another subSection (second subsection)", function (assert) {
 
-		var oPage = this.oObjectPage,
-			oSecondSection = oPage.getSections()[1],
-			oSubSectionToScrollTo = oSecondSection.getSubSections()[1],
-			done = assert.async(),
-			fnOnDomReady = function() {
+		const oPage = this.oObjectPage;
+		const oSecondSection = oPage.getSections()[1];
+		const oSubSectionToScrollTo = oSecondSection.getSubSections()[1];
+		const done = assert.async();
+		const fnOnDomReady = function() {
 				//act
 				oPage.scrollToSection(oSubSectionToScrollTo.getId(), 0, null, true);
 
 				//check
 				setTimeout(function() {
 
-					var iExpectedScrollTop = oPage._oSectionInfo[oSubSectionToScrollTo.getId()].positionTop;
+					const iExpectedScrollTop = oPage._oSectionInfo[oSubSectionToScrollTo.getId()].positionTop;
 
-					var oExpected = {
+					const oExpected = {
 						oSelectedSection: oSecondSection,
 						sSelectedTitle: oSecondSection.getTitle(),
 						bSnapped: true,
@@ -1246,11 +1238,11 @@ function(
 	});
 
 	QUnit.test("select another section before rendering completed", function (assert) {
-		var oPage = this.oObjectPage,
-			oSecondSection = this.oSecondSection,
-			done = assert.async(),
-			fnOnDomReady = function() {
-				var oExpected = {
+		const oPage = this.oObjectPage;
+		const oSecondSection = this.oSecondSection;
+		const done = assert.async();
+		const fnOnDomReady = function() {
+				const oExpected = {
 					oSelectedSection: oSecondSection,
 					sSelectedTitle: oSecondSection.getTitle() //subsection is promoted
 				};
@@ -1269,11 +1261,11 @@ function(
 
 	QUnit.test("select another section on before page rendering", function (assert) {
 
-		var oPage = helpers.generateObjectPageWithSubSectionContent(oFactory, 3, 2, true),
-			oSecondSection = oPage.getSections()[1],
-			done = assert.async(),
-			fnOnDomReady = function() {
-				var oExpected = {
+		const oPage = helpers.generateObjectPageWithSubSectionContent(oFactory, 3, 2, true);
+		const oSecondSection = oPage.getSections()[1];
+		const done = assert.async();
+		const fnOnDomReady = function() {
+				const oExpected = {
 					oSelectedSection: oSecondSection,
 					sSelectedTitle: oSecondSection.getTitle()
 				};
@@ -1295,11 +1287,11 @@ function(
 	});
 
 	QUnit.test("select another section on after page rendering", function (assert) {
-		var oPage = this.oObjectPage,
-			oSecondSection = oPage.getSections()[1],
-			done = assert.async(),
-			fnOnDomReady = function() {
-				var oExpected = {
+		const oPage = this.oObjectPage;
+		const oSecondSection = oPage.getSections()[1];
+		const done = assert.async();
+		const fnOnDomReady = function() {
+				const oExpected = {
 					oSelectedSection: oSecondSection,
 					sSelectedTitle: oSecondSection.getTitle()
 				};
@@ -1318,14 +1310,14 @@ function(
 	});
 
 	QUnit.test("select another section after dom rendering completed", function (assert) {
-		var oPage = this.oObjectPage,
-			oSecondSection = oPage.getSections()[1],
-			done = assert.async(),
-			fnOnDomReady = function() {
+		const oPage = this.oObjectPage;
+		const oSecondSection = oPage.getSections()[1];
+		const done = assert.async();
+		const fnOnDomReady = function() {
 				//act
 				oPage.setSelectedSection(oSecondSection.getId());
 
-				var oExpected = {
+				const oExpected = {
 					oSelectedSection: oSecondSection,
 					sSelectedTitle: oSecondSection.getTitle()
 				};
@@ -1340,15 +1332,15 @@ function(
 	});
 
 	QUnit.test("test hide selectedSection when selectedSection is first", function (assert) {
-		var oPage = this.oObjectPage,
-			oFirstSection = oPage.getSections()[0],
-			oSecondSection = oPage.getSections()[1],
-			done = assert.async(),
-			fnOnDomReady = function() {
+		const oPage = this.oObjectPage;
+		const oFirstSection = oPage.getSections()[0];
+		const oSecondSection = oPage.getSections()[1];
+		const done = assert.async();
+		const fnOnDomReady = function() {
 				oPage.detachEvent("onAfterRenderingDOMReady", fnOnDomReady);
 
 				//initial state
-				var oExpected = {
+				let oExpected = {
 					oSelectedSection: oFirstSection,
 					sSelectedTitle: oFirstSection.getTitle(),
 					bSnapped: false
@@ -1374,14 +1366,14 @@ function(
 	});
 
 	QUnit.test("test hide a subsection of selectedSection when selectedSection is first", function (assert) {
-		var oPage = this.oObjectPage,
-			oFirstSection = oPage.getSections()[0],
-			done = assert.async(),
-			fnOnDomReady = function() {
+		const oPage = this.oObjectPage;
+		const oFirstSection = oPage.getSections()[0];
+		const done = assert.async();
+		const fnOnDomReady = function() {
 				oPage.detachEvent("onAfterRenderingDOMReady", fnOnDomReady);
 
 				//initial state
-				var oExpected = {
+				let oExpected = {
 					oSelectedSection: oFirstSection,
 					sSelectedTitle: oFirstSection.getTitle(),
 					bSnapped: false
@@ -1407,15 +1399,15 @@ function(
 	});
 
 	QUnit.test("test hide all subsections of selectedSection when selectedSection is first", function (assert) {
-		var oPage = this.oObjectPage,
-			oFirstSection = oPage.getSections()[0],
-			oSecondSection = oPage.getSections()[1],
-			done = assert.async(),
-			fnOnDomReady = function() {
+		const oPage = this.oObjectPage;
+		const oFirstSection = oPage.getSections()[0];
+		const oSecondSection = oPage.getSections()[1];
+		const done = assert.async();
+		const fnOnDomReady = function() {
 				oPage.detachEvent("onAfterRenderingDOMReady", fnOnDomReady);
 
 				//initial state
-				var oExpected = {
+				let oExpected = {
 					oSelectedSection: oFirstSection,
 					sSelectedTitle: oFirstSection.getTitle(),
 					bSnapped: false
@@ -1444,15 +1436,16 @@ function(
 
 	QUnit.test("test remove selected section", async function(assert) {
 
-		var oObjectPage = this.oObjectPage,
-			iLoadingDelay = 500,
-			done = assert.async();
+		assert.expect(4);
+		const oObjectPage = this.oObjectPage;
+		const iLoadingDelay = 500;
+		const done = assert.async();
 
 		//act
 		oObjectPage.removeSection(this.oFirstSection);
 		await nextUIUpdate();
 
-		var oExpected = {
+		const oExpected = {
 			oSelectedSection: this.oSecondSection,
 			sSelectedTitle: this.oSecondSection.getTitle() //subsection is promoted
 		};
@@ -1465,11 +1458,12 @@ function(
 	});
 
 	QUnit.test("test rename selected section", async function(assert) {
-		var oObjectPage = this.oObjectPage,
-			oFirstSection = this.oFirstSection,
-			done = assert.async(),
-			fnOnDomReady = function() {
-				var oExpected = {
+		assert.expect(4);
+		const oObjectPage = this.oObjectPage;
+		const oFirstSection = this.oFirstSection;
+		const done = assert.async();
+		const fnOnDomReady = function() {
+				const oExpected = {
 					oSelectedSection: oFirstSection,
 					sSelectedTitle: "Updated Title"
 				};
@@ -1488,17 +1482,17 @@ function(
 
 	QUnit.test("section modified during layout calculation", function (assert) {
 
-		var oPage = this.oObjectPage,
-			oFirstSection = oPage.getSections()[0],
-			oThirdSection = oPage.getSections()[2],
-			bTabsMode = oPage.getUseIconTabBar(),
-			done = assert.async(),
-			fnOnDomReady = function() {
+		const oPage = this.oObjectPage;
+		const oFirstSection = oPage.getSections()[0];
+		const oThirdSection = oPage.getSections()[2];
+		const bTabsMode = oPage.getUseIconTabBar();
+		const done = assert.async();
+		const fnOnDomReady = function() {
 				//act
 				oFirstSection.setVisible(false); // will trigger async request to adjust layout
 				oPage.setSelectedSection(oThirdSection.getId());
 
-				var oExpected = {
+				const oExpected = {
 					oSelectedSection: oThirdSection,
 					sSelectedTitle: oThirdSection.getTitle(),
 					bSnapped: !bTabsMode
@@ -1515,11 +1509,11 @@ function(
 
 	QUnit.test("_isClosestScrolledSection", function (assert) {
 
-		var oPage = this.oObjectPage,
-			oFirstSection = oPage.getSections()[0],
-			oThirdSection = oPage.getSections()[2],
-			done = assert.async(),
-			fnOnDomReady = function() {
+		const oPage = this.oObjectPage;
+		const oFirstSection = oPage.getSections()[0];
+		const oThirdSection = oPage.getSections()[2];
+		const done = assert.async();
+		const fnOnDomReady = function() {
 
 				//check
 				assert.strictEqual(oPage._isClosestScrolledSection(oFirstSection.getId()), true, "first section is currently scrolled");
@@ -1537,12 +1531,12 @@ function(
 
 	QUnit.test("setSelectedSection to subsection", function (assert) {
 
-		var oPage = this.oObjectPage,
-			oSecondSection = oPage.getSections()[1],
-			oSecondSectionSecondSubSection = oSecondSection.getSubSections()[1],
-			done = assert.async(),
-			fnOnDomReady = async function() {
-				var oExpected = {
+		const oPage = this.oObjectPage;
+		const oSecondSection = oPage.getSections()[1];
+		const oSecondSectionSecondSubSection = oSecondSection.getSubSections()[1];
+		const done = assert.async();
+		const fnOnDomReady = async function() {
+				const oExpected = {
 					oSelectedSection: oSecondSection,
 					sSelectedTitle: oSecondSection.getTitle(),
 					bSnapped: false
@@ -1561,27 +1555,22 @@ function(
 	QUnit.module("ObjectPage API: sectionTitleLevel");
 
 	QUnit.test("test sections/subsections aria-level when sectionTitleLevel is TitleLevel.Auto", async function (assert) {
-		var oObjectPage = helpers.generateObjectPageWithSubSectionContent(oFactory, 2, 2),
-			oSection,
-			$sectionHeaderTitle,
-			oSubSection,
-			$subSectionTitle,
-			oFirstSection,
-			$firstSectionSubSectionTitle,
-			sTitleLevel3 = "h3",
-			sTitleLevel4 = "h4";
+		assert.expect(3);
+		const oObjectPage = helpers.generateObjectPageWithSubSectionContent(oFactory, 2, 2);
+		const sTitleLevel3 = "h3";
+		const sTitleLevel4 = "h4";
 
 		await helpers.renderObject(oObjectPage);
 
 		// subsection titles inside the first section should have aria-level 4 because the section title is no longer hidden
-		oFirstSection = oObjectPage.getSections()[0];
-		$firstSectionSubSectionTitle = oFirstSection.getSubSections()[0].$("headerTitle");
+		const oFirstSection = oObjectPage.getSections()[0];
+		const $firstSectionSubSectionTitle = oFirstSection.getSubSections()[0].$("headerTitle");
 
 		// get the second section to test the aria-level of the section title and the subsection title
-		oSection = oObjectPage.getSections()[1];
-		$sectionHeaderTitle = oSection.$("title");
-		oSubSection = oSection.getSubSections()[0];
-		$subSectionTitle = oSubSection.$("headerTitle");
+		const oSection = oObjectPage.getSections()[1];
+		const $sectionHeaderTitle = oSection.$("title");
+		const oSubSection = oSection.getSubSections()[0];
+		const $subSectionTitle = oSubSection.$("headerTitle");
 
 		assert.equal($sectionHeaderTitle[0].tagName.toLowerCase(), sTitleLevel3, "The section has the correct aria-level");
 		assert.equal($firstSectionSubSectionTitle[0].tagName.toLowerCase(), sTitleLevel4, "The subSection in the first section has the correct aria-level");
@@ -1589,22 +1578,21 @@ function(
 	});
 
 	QUnit.test("test sections/subsections aria-level when sectionTitleLevel is not TitleLevel.Auto", async function(assert) {
-		var oObjectPageSectionTitleLevel = TitleLevel.H1,
-			oObjectPageMinimumSectionTitleLevel = TitleLevel.H6,
-			oObjectPage = oFactory.getObjectPageLayoutWithSectionTitleLevel(oObjectPageSectionTitleLevel),
-			oSection,
-			$sectionHeaderTitle,
-			oSubSection,
-			$subSectionTitle,
-			sSectionExpectedAriaLevel = "h1", // equal to the  sectionTitleLevel(H1)
-			sSubSectionExpectedAriaLevel = "h2", // lower than sectionTitleLevel(H1) by 1
-			sMinimumAriaLevel = "h6";
+		assert.expect(4);
+		const oObjectPageSectionTitleLevel = TitleLevel.H1;
+		const oObjectPageMinimumSectionTitleLevel = TitleLevel.H6;
+		const oObjectPage = oFactory.getObjectPageLayoutWithSectionTitleLevel(oObjectPageSectionTitleLevel);
+		let $sectionHeaderTitle;
+		let $subSectionTitle;
+		const sSectionExpectedAriaLevel = "h1"; // equal to the  sectionTitleLevel(H1)
+		const sSubSectionExpectedAriaLevel = "h2"; // lower than sectionTitleLevel(H1) by 1
+		const sMinimumAriaLevel = "h6";
 
 		await helpers.renderObject(oObjectPage);
 
-		oSection = oObjectPage.getSections()[0];
+		const oSection = oObjectPage.getSections()[0];
 		$sectionHeaderTitle = oSection.$("title");
-		oSubSection = oSection.getSubSections()[0];
+		const oSubSection = oSection.getSubSections()[0];
 		$subSectionTitle = oSubSection.$("headerTitle");
 
 		assert.equal($sectionHeaderTitle[0].tagName.toLowerCase(), sSectionExpectedAriaLevel, "The section has the correct aria-level");
@@ -1621,28 +1609,26 @@ function(
 	});
 
 	QUnit.test("test sections/subsections aria-level when sectionTitleLevel and titleLevel are defined", async function (assert) {
-		var oObjectPageSectionTitleLevel = TitleLevel.H4,
-			oObjectPage = oFactory.getObjectPageLayoutWithSectionTitleLevel(oObjectPageSectionTitleLevel),
-			aSections = oObjectPage.getSections(),
-			oSection = aSections[0],
-			aSubSections = oSection.getSubSections(),
-			oFirstSubSection = aSubSections[0],
-			oSecondSubSection  = aSubSections[1],
-			oThirdSubSection = aSubSections[2],
-			$firstSubSectionTitle,
-			$secondSubSectionTitle,
-			$thirdSubSectionTitle,
-			sSubSectionDefaultAriaLevel = "h5", // lower than sectionTitleLevel(H4) by 1
-			sFirstSubSectionExpectedAriaLevel = "h1", // titleLevel(H1) is set explicitly
-			sSecondSubSectionExpectedAriaLevel = "h2"; // titleLevel(H2) is set explicitly
+		assert.expect(3);
+		const oObjectPageSectionTitleLevel = TitleLevel.H4;
+		const oObjectPage = oFactory.getObjectPageLayoutWithSectionTitleLevel(oObjectPageSectionTitleLevel);
+		const aSections = oObjectPage.getSections();
+		const oSection = aSections[0];
+		const aSubSections = oSection.getSubSections();
+		const oFirstSubSection = aSubSections[0];
+		const oSecondSubSection  = aSubSections[1];
+		const oThirdSubSection = aSubSections[2];
+		const sSubSectionDefaultAriaLevel = "h5"; // lower than sectionTitleLevel(H4) by 1
+		const sFirstSubSectionExpectedAriaLevel = "h1"; // titleLevel(H1) is set explicitly
+		const sSecondSubSectionExpectedAriaLevel = "h2"; // titleLevel(H2) is set explicitly
 
 		oFirstSubSection.setTitleLevel(TitleLevel.H1);
 		oSecondSubSection.setTitleLevel(TitleLevel.H2);
 
 		await helpers.renderObject(oObjectPage);
-		$firstSubSectionTitle = oFirstSubSection.$("headerTitle");
-		$secondSubSectionTitle = oSecondSubSection.$("headerTitle");
-		$thirdSubSectionTitle = oThirdSubSection.$("headerTitle");
+		const $firstSubSectionTitle = oFirstSubSection.$("headerTitle");
+		const $secondSubSectionTitle = oSecondSubSection.$("headerTitle");
+		const $thirdSubSectionTitle = oThirdSubSection.$("headerTitle");
 
 		assert.equal($firstSubSectionTitle[0].tagName.toLowerCase(), sFirstSubSectionExpectedAriaLevel,
 			"SubSection aria-level " + sFirstSubSectionExpectedAriaLevel + ", although op sectionTitleLevel is " + oObjectPageSectionTitleLevel);
@@ -1657,11 +1643,12 @@ function(
 	QUnit.module("ObjectPage API: sectionTitleLevel - private methods");
 
 	QUnit.test("test _determineSectionBaseInternalTitleLevel and _shouldApplySectionTitleLevel", async function (assert) {
-		var oObjectPage = oFactory.getObjectPageLayoutWithSectionTitleLevel(TitleLevel.H2),
-			oSection = oObjectPage.getSections()[0],
-			aSubSections = oSection.getSubSections(),
-			oFirstSubSection = aSubSections[0],
-			oThirdSubSection = aSubSections[2];
+		assert.expect(3);
+		const oObjectPage = oFactory.getObjectPageLayoutWithSectionTitleLevel(TitleLevel.H2);
+		const oSection = oObjectPage.getSections()[0];
+		const aSubSections = oSection.getSubSections();
+		const oFirstSubSection = aSubSections[0];
+		const oThirdSubSection = aSubSections[2];
 
 		oFirstSubSection.setTitleLevel(TitleLevel.H1);
 		await helpers.renderObject(oObjectPage);
@@ -1676,7 +1663,7 @@ function(
 	});
 
 	QUnit.test("test _getNextTitleLevelEntry", function (assert) {
-		var sCurrentTitleLevel = TitleLevel.H1;
+		let sCurrentTitleLevel = TitleLevel.H1;
 
 		assert.equal(ObjectPageLayout._getNextTitleLevelEntry(sCurrentTitleLevel), TitleLevel.H2,
 			"Correct, next TitleLevel is: " + TitleLevel.H2 + " one level lower than: " + sCurrentTitleLevel);
@@ -1696,7 +1683,7 @@ function(
 
 	QUnit.module("ObjectPage API: AnchorBar", {
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "objectPageViewSample",
 				viewName: "view.UxAP-77_ObjectPageSample"
@@ -1716,7 +1703,8 @@ function(
 	});
 
 	QUnit.test("test AnchorBar not rendering using ShowAnchorBar within XMLView", async function(assert) {
-		var oObjectPage = this.oSampleView.byId("objectPage13");
+		assert.expect(2);
+		const oObjectPage = this.oSampleView.byId("objectPage13");
 
 		oObjectPage.setShowAnchorBar(false);
 		await nextUIUpdate();
@@ -1726,7 +1714,8 @@ function(
 	});
 
 	QUnit.test("test AnchorBar rendering using ShowAnchorBar within XMLView", async function(assert) {
-		var oObjectPage = this.oSampleView.byId("objectPage13");
+		assert.expect(2);
+		const oObjectPage = this.oSampleView.byId("objectPage13");
 
 		oObjectPage.setShowAnchorBar(true);
 		await nextUIUpdate();
@@ -1736,9 +1725,10 @@ function(
 	});
 
 	QUnit.test("test AnchorBar showPopover setting through ObjectPageLayout", async function(assert) {
-		var oObjectPage = this.oSampleView.byId("objectPage13"),
-			oAnchorBar =  oObjectPage.getAggregation("_anchorBar"),
-			oSectionButton = oAnchorBar.getItems()[0];
+		assert.expect(2);
+		const oObjectPage = this.oSampleView.byId("objectPage13");
+		const oAnchorBar =  oObjectPage.getAggregation("_anchorBar");
+		let oSectionButton = oAnchorBar.getItems()[0];
 
 		assert.ok(oSectionButton.getDomRef().querySelector(".sapMITBFilterExpandIcon"), "Drop-down icon in AnchorBar button is shown initially");
 
@@ -1751,87 +1741,78 @@ function(
 
 	QUnit.test("test AnchorBar menu items IDs build correctly", async function(assert) {
 		assert.expect(1);
-		var done = assert.async(),
-			sIds = [],
-			oPage = helpers.generateObjectPageWithSubSectionContent(oFactory, 5, 2),
-			aSections,
-			oAnchorBar,
-			oMenuItems,
-			aSubSections,
-			bAllIdsMatched = true,
-			fnOnDomReady = function () {
-				aSections = oPage.getSections() || [];
-				oAnchorBar = oPage._oABHelper._getAnchorBar();
+		const sIds = [];
+		const oPage = helpers.generateObjectPageWithSubSectionContent(oFactory, 5, 2);
+		let oMenuItems;
+		let aSubSections;
+		let bAllIdsMatched = true;
 
-				// we store the expected subsection MenuItems IDs
-				aSections.forEach(function (oSection, index) {
-					aSubSections = oSection.getSubSections() || [];
-
-					// second Level (subsections)
-					aSubSections.forEach(function (oSubSection) {
-						sIds.push(oAnchorBar.getId() + "-" + oSubSection.getId() + "-anchor");
-					});
-				});
-
-				// Check MenuItems IDs if match stored IDs
-				oAnchorBar.getItems().forEach(function (oAggregation) {
-					if (oAggregation.getMenu) {
-						oMenuItems = oAggregation.getMenu().getItems();
-						oMenuItems.forEach(function (item) {
-							if (sIds.indexOf(item.getId()) < 0) {
-								bAllIdsMatched = false;
-								return;
-							}
-						});
-					}
-				});
-
-				// Assert
-				assert.equal(bAllIdsMatched, true, "All AnchorBar MenuItems are with correct IDs");
-				oPage.destroy();
-				done();
-			};
-
-		oPage.attachEventOnce("onAfterRenderingDOMReady", fnOnDomReady);
 		oPage.placeAt('qunit-fixture');
 		await nextUIUpdate();
+		await waitForDOMReady(oPage);
+
+		const aSections = oPage.getSections() || [];
+		const oAnchorBar = oPage._oABHelper._getAnchorBar();
+
+		// we store the expected subsection MenuItems IDs
+		aSections.forEach(function (oSection, index) {
+			aSubSections = oSection.getSubSections() || [];
+
+			// second Level (subsections)
+			aSubSections.forEach(function (oSubSection) {
+				sIds.push(oAnchorBar.getId() + "-" + oSubSection.getId() + "-anchor");
+			});
+		});
+
+		// Check MenuItems IDs if match stored IDs
+		oAnchorBar.getItems().forEach(function (oAggregation) {
+			if (oAggregation.getMenu) {
+				oMenuItems = oAggregation.getMenu().getItems();
+				oMenuItems.forEach(function (item) {
+					if (sIds.indexOf(item.getId()) < 0) {
+						bAllIdsMatched = false;
+						return;
+					}
+				});
+			}
+		});
+
+		// Assert
+		assert.equal(bAllIdsMatched, true, "All AnchorBar MenuItems are with correct IDs");
+		oPage.destroy();
 	});
 
 	QUnit.test("test AnchorBar focus section synchronously and immediate after anchor press to prevent loss of focus when header is snapping", async function(assert) {
 		assert.expect(1);
 		// Arrange
-		var done = assert.async(),
-			iSectionCount = 3,
-			iSubSectionCount = 1,
-			oPage = helpers.generateObjectPageWithSubSectionContent(oFactory, iSectionCount, iSubSectionCount),
-			oABHelper = oPage._oABHelper,
-			oAnchorBar = oABHelper._getAnchorBar(),
-			oLastSectionButton,
-			oLastSection = oPage.getSections()[iSectionCount - 1],
-			fnOnDomReady = function () {
-				// Arrange
-				oLastSectionButton = oAnchorBar.getItems()[iSectionCount - 1];
-				// Act
-				oAnchorBar.fireSelect({
-					key: oLastSectionButton.getKey()
-				});
+		const iSectionCount = 3;
+		const iSubSectionCount = 1;
+		const oPage = helpers.generateObjectPageWithSubSectionContent(oFactory, iSectionCount, iSubSectionCount);
+		const oABHelper = oPage._oABHelper;
+		const oAnchorBar = oABHelper._getAnchorBar();
+		const oLastSection = oPage.getSections()[iSectionCount - 1];
 
-				// Assert
-				assert.strictEqual(document.activeElement, oLastSection.getDomRef(), "Section is focused synchronously");
-
-				// Clean
-				oPage.destroy();
-				done();
-			};
-
-		oPage.attachEventOnce("onAfterRenderingDOMReady", fnOnDomReady);
 		oPage.placeAt('qunit-fixture');
 		await nextUIUpdate();
+		await waitForDOMReady(oPage);
+
+		// Arrange
+		const oLastSectionButton = oAnchorBar.getItems()[iSectionCount - 1];
+		// Act
+		oAnchorBar.fireSelect({
+			key: oLastSectionButton.getKey()
+		});
+
+		// Assert
+		assert.strictEqual(document.activeElement, oLastSection.getDomRef(), "Section is focused synchronously");
+
+		// Clean
+		oPage.destroy();
 	});
 
 	QUnit.module("ObjectPage API: ObjectPageHeader", {
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "objectPageViewSample",
 				viewName: "view.UxAP-77_ObjectPageSample"
@@ -1857,9 +1838,8 @@ function(
 	});
 
 	QUnit.test("test ObjectPageHeader for ObjectPageLayout defined into XMLView", async function(assert) {
-		var oHeader = this.oObjectPage.getHeaderTitle(),
-			oNewHeader;
-
+		assert.expect(6);
+		const oHeader = this.oObjectPage.getHeaderTitle();
 		assert.ok(oHeader);
 		assert.equal(this.oObjectPage.getHeaderContent()[0].getText(), "Personal description");
 
@@ -1867,7 +1847,7 @@ function(
 		this.oObjectPage.destroyHeaderContent();
 		assert.ok(!this.oObjectPage.getHeaderTitle());
 
-		oNewHeader = new ObjectPageHeader(this.oSampleView.createId("newHeader"));
+		const oNewHeader = new ObjectPageHeader(this.oSampleView.createId("newHeader"));
 		this.oObjectPage.addHeaderContent(new Text(this.oSampleView.createId("newHeaderText"), {text: "test"}));
 		this.oObjectPage.setHeaderTitle(oNewHeader);
 		assert.ok(this.oObjectPage.getHeaderTitle());
@@ -1880,8 +1860,8 @@ function(
 
 	QUnit.test("Should not call ObjectPageHeader _toggleFocusableState in non DynamicPageTitle case", function (assert) {
 
-		var oHeader = this.oObjectPage.getHeaderTitle(),
-		oHeaderSpy = this.spy(oHeader, "_toggleFocusableState");
+		const oHeader = this.oObjectPage.getHeaderTitle();
+		const oHeaderSpy = this.spy(oHeader, "_toggleFocusableState");
 
 		// act
 		this.oObjectPage.setToggleHeaderOnTitleClick(false);
@@ -1892,29 +1872,28 @@ function(
 
 	QUnit.test("Should copy _headerContent hidden aggregation to the ObjectPage clone", function (assert) {
 
-		var oHeaderContent = this.oObjectPage.getHeaderContent(),
-			oHeaderContentClone = this.oObjectPageClone.getHeaderContent();
+		const oHeaderContent = this.oObjectPage.getHeaderContent();
+		const oHeaderContentClone = this.oObjectPageClone.getHeaderContent();
 
 		assert.strictEqual(oHeaderContentClone !== null, true, "HeaderContent aggregation should exist in the clone");
 		assert.strictEqual(oHeaderContent.length, oHeaderContentClone.length, "HeaderContent and it's clone should have the same nubmer of elements");
 	});
 
 	QUnit.test("Should destroy cloned _headerContent hidden aggregation", function (assert) {
-		var oDestroySpy = this.spy(ManagedObject.prototype, "destroy"),
-			aDestroyedObjectIds,
-			sHeaderContentId = this.oObjectPageClone.getHeaderContent()[0].getId();
+		const oDestroySpy = this.spy(ManagedObject.prototype, "destroy");
+		const sHeaderContentId = this.oObjectPageClone.getHeaderContent()[0].getId();
 
 		// act
 		this.oObjectPageClone.destroy();
 
 		// check
-		aDestroyedObjectIds = oDestroySpy.thisValues.map(function(x) {return x.getId();});
+		const aDestroyedObjectIds = oDestroySpy.thisValues.map(function(x) {return x.getId();});
 		assert.ok(aDestroyedObjectIds.indexOf(sHeaderContentId) > -1, "default headerContent clone is destroyed");
 	});
 
 	QUnit.module("ObjectPage API", {
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "objectPageViewSample",
 				viewName: "view.UxAP-77_ObjectPageSample"
@@ -1941,28 +1920,28 @@ function(
 	});
 
 	QUnit.test("create instance ObjectPageLayout via javascript", function (assert) {
-		var oObjectPage = new ObjectPageLayout("myObjectPage1");
+		const oObjectPage = new ObjectPageLayout("myObjectPage1");
 		assert.equal(oObjectPage.getId(), "myObjectPage1");
 	});
 	QUnit.test("add ObjectPageLayout in XMLView via API", function (assert) {
-		var oObjectPage = new ObjectPageLayout(this.oView.createId("myObjectPage2"));
+		const oObjectPage = new ObjectPageLayout(this.oView.createId("myObjectPage2"));
 		this.oView.addContent(oObjectPage);
-		var referenceObjectPage = this.oView.byId("myObjectPage2");
+		const referenceObjectPage = this.oView.byId("myObjectPage2");
 		assert.ok(referenceObjectPage != undefined, "ObjectPageLayout created in View");
 
 	});
 	QUnit.test("test default value of ShowAnchorBar", function (assert) {
 		this.oView.removeAllContent();
-		var oObjectPage = new ObjectPageLayout(this.oView.createId("myObjectPage3"));
+		const oObjectPage = new ObjectPageLayout(this.oView.createId("myObjectPage3"));
 		assert.equal(oObjectPage.getShowAnchorBar(), true);
 	});
 	QUnit.test("test ShowAnchorBar via Control settings", function (assert) {
-		var oObjectPage = new ObjectPageLayout(this.oView.createId("myObjectPage4"), {showAnchorBar: false});
+		const oObjectPage = new ObjectPageLayout(this.oView.createId("myObjectPage4"), {showAnchorBar: false});
 		assert.equal(oObjectPage.getShowAnchorBar(), false);
 	});
 
 	QUnit.test("test ShowAnchorBar APIs", function (assert) {
-		var oObjectPage = new ObjectPageLayout(this.oView.createId("myObjectPage5"));
+		const oObjectPage = new ObjectPageLayout(this.oView.createId("myObjectPage5"));
 		oObjectPage.setShowAnchorBar(false);
 		assert.equal(oObjectPage.getShowAnchorBar(), false);
 		oObjectPage.setShowAnchorBar(true);
@@ -1970,7 +1949,7 @@ function(
 	});
 
 	QUnit.test("test showEditHeaderButton API", function (assert) {
-		var oObjectPage = new ObjectPageLayout(this.oView.createId("myObjectPage6"));
+		const oObjectPage = new ObjectPageLayout(this.oView.createId("myObjectPage6"));
 		assert.strictEqual(oObjectPage.getShowEditHeaderButton(), false, "showEditHeaderButton is false by default");
 		oObjectPage.setShowEditHeaderButton(true);
 		assert.strictEqual(oObjectPage.getShowEditHeaderButton(), true, "showEditHeaderButton is set to true correctly");
@@ -1979,12 +1958,12 @@ function(
 	});
 
 	QUnit.test("test Section APIs", function (assert) {
-		var oObjectPage = new ObjectPageLayout(this.oView.createId("myObjectPage7"));
-		var oSection1 = new ObjectPageSection({title: "Recognition"});
-		var oSection2 = new ObjectPageSection({title: "Employee"});
+		const oObjectPage = new ObjectPageLayout(this.oView.createId("myObjectPage7"));
+		const oSection1 = new ObjectPageSection({title: "Recognition"});
+		const oSection2 = new ObjectPageSection({title: "Employee"});
 		oObjectPage.addSection(oSection1);
 		oObjectPage.addSection(oSection2);
-		var aSections = oObjectPage.getSections();
+		const aSections = oObjectPage.getSections();
 		assert.equal(aSections.length, 2);
 
 		assert.equal(oObjectPage.indexOfSection(oSection1), 0);
@@ -1992,7 +1971,7 @@ function(
 
 		assert.equal(aSections[0].getTitle(), "Recognition");
 		assert.equal(aSections[1].getTitle(), "Employee");
-		var oSection3 = new ObjectPageSection({title: "Goal"});
+		const oSection3 = new ObjectPageSection({title: "Goal"});
 		oObjectPage.insertSection(oSection3, 1);
 		assert.equal(oObjectPage.getSections().length, 3);
 		assert.equal(oObjectPage.indexOfSection(oSection1), 0);
@@ -2015,24 +1994,24 @@ function(
 	});
 
 	QUnit.test("test Height APIs", function (assert) {
-		var oObjectPage = new ObjectPageLayout(this.oView.createId("myObjectPage10"));
+		const oObjectPage = new ObjectPageLayout(this.oView.createId("myObjectPage10"));
 		assert.equal(oObjectPage.getHeight(), '100%');
 		oObjectPage.setHeight('50%');
 		assert.equal(oObjectPage.getHeight(), '50%');
 	});
 	QUnit.test("test Header APIs", function (assert) {
-		var oObjectPage = new ObjectPageLayout(this.oView.createId("myObjectPage11"));
-		var oHeader = new ObjectPageHeader("header");
+		const oObjectPage = new ObjectPageLayout(this.oView.createId("myObjectPage11"));
+		const oHeader = new ObjectPageHeader("header");
 		oObjectPage.addHeaderContent(new Text({text: "test"}));
 		oObjectPage.setHeaderTitle(oHeader);
-		var aContent = oObjectPage.getHeaderContent();
+		const aContent = oObjectPage.getHeaderContent();
 		assert.equal(aContent[0].getText(), "test");
 	});
 
 	QUnit.test("test ShowAnchorBar for ObjectPageLayout defined into XMLView", function (assert) {
 		this.appControl.removeAllPages();
 		this.appControl.addPage(this.oSampleView);
-		var oObjectPage = this.oSampleView.byId("objectPage13");
+		const oObjectPage = this.oSampleView.byId("objectPage13");
 		assert.equal(oObjectPage.getShowAnchorBar(), true);
 		oObjectPage.setShowAnchorBar(false);
 		assert.equal(oObjectPage.getShowAnchorBar(), false);
@@ -2044,13 +2023,13 @@ function(
 		this.appControl.removeAllPages();
 		this.appControl.addPage(this.oSampleView);
 
-		var oObjectPage = this.oSampleView.byId("objectPage13");
+		const oObjectPage = this.oSampleView.byId("objectPage13");
 		assert.equal(oObjectPage.getSections().length, 3);
 		assert.equal(oObjectPage.getSections()[0].getTitle(), "Payroll");
 		assert.equal(oObjectPage.getSections()[1].getTitle(), "Status");
 		assert.equal(oObjectPage.getSections()[2].getTitle(), "Wage Type");
 
-		var oSection1 = new ObjectPageSection(this.oSampleView.createId("sectionGoal"), {title: "Goal"});
+		const oSection1 = new ObjectPageSection(this.oSampleView.createId("sectionGoal"), {title: "Goal"});
 		oObjectPage.insertSection(oSection1, 1);
 		assert.equal(oObjectPage.getSections().length, 4);
 		assert.equal(oObjectPage.indexOfSection(oSection1), 1);
@@ -2064,7 +2043,7 @@ function(
 		assert.equal(oObjectPage.getSections()[0].getTitle(), "Goal");
 		assert.equal(oObjectPage.getSections()[1].getTitle(), "Status");
 		assert.equal(oObjectPage.getSections()[2].getTitle(), "Wage Type");
-		var oSection2 = new ObjectPageSection(this.oSampleView.createId("sectionRecognition"), {title: "Recognition"});
+		const oSection2 = new ObjectPageSection(this.oSampleView.createId("sectionRecognition"), {title: "Recognition"});
 		oObjectPage.addSection(oSection2);
 		assert.equal(oObjectPage.getSections().length, 4);
 		assert.equal(oObjectPage.indexOfSection(oSection2), 3);
@@ -2086,8 +2065,8 @@ function(
 
 	QUnit.test("test getHeaderContent returns array if empty", function (assert) {
 		// setup: object page without header content
-		var oPage = new ObjectPageLayout(),
-			aHeaderContent = oPage.getHeaderContent();
+		const oPage = new ObjectPageLayout();
+		const aHeaderContent = oPage.getHeaderContent();
 
 		// check
 		assert.ok(Array.isArray(aHeaderContent), "array is returned");
@@ -2121,8 +2100,9 @@ function(
 	});
 
 	QUnit.test("test removeAllSections should reset selectedSection", async function(assert) {
-		var oObjectPage = this.oOP,
-			done = assert.async();
+		assert.expect(2);
+		const oObjectPage = this.oOP;
+		const done = assert.async();
 
 		// Act
 		oObjectPage.removeAllSections();
@@ -2136,11 +2116,12 @@ function(
 	});
 
 	QUnit.test("applyLayout is not called on invalidated SubSection without parent ObjectPage", async function(assert) {
-		var oObjectPage = this.oOP,
-			sNewTitle = "New SubSection Title",
-			oSectionToRemove = this.oSelectedSection,
-			oSubSectionToSpy = this.oSelectedSection.getSubSections()[0],
-			oSubSectionMethodSpy = this.spy(oSubSectionToSpy, "_applyLayout");
+		assert.expect(1);
+		const oObjectPage = this.oOP;
+		const sNewTitle = "New SubSection Title";
+		const oSectionToRemove = this.oSelectedSection;
+		const oSubSectionToSpy = this.oSelectedSection.getSubSections()[0];
+		const oSubSectionMethodSpy = this.spy(oSubSectionToSpy, "_applyLayout");
 
 		// Act: invalidate the SubSection and remove its parent Section
 		oSubSectionToSpy.setTitle(sNewTitle); // invalidate the SubSection
@@ -2155,8 +2136,9 @@ function(
 
 
 	QUnit.test("test destroySections should reset selectedSection", async function(assert) {
-		var oObjectPage = this.oOP,
-			done = assert.async();
+		assert.expect(2);
+		const oObjectPage = this.oOP;
+		const done = assert.async();
 
 		// Act
 		oObjectPage.destroySections();
@@ -2170,8 +2152,8 @@ function(
 	});
 
 	QUnit.test("test removing and destroying Section on mobile (with binding)", function (assert) {
-		var oObjectPage = this.oOP,
-			done = assert.async();
+		const oObjectPage = this.oOP;
+		const done = assert.async();
 
 			this.stub(lib.Utilities, "isPhoneScenario").returns(true);
 
@@ -2191,7 +2173,8 @@ function(
 
 	QUnit.test("inactive section does not invalidate the objectPage", async function (assert) {
 
-		var oObjectPage = new ObjectPageLayout({
+		assert.expect(1);
+		const oObjectPage = new ObjectPageLayout({
 			useIconTabBar: true,
 			selectedSection: "section1",
 			sections: [
@@ -2215,9 +2198,9 @@ function(
 				})
 
 			]
-		}),
-		oObjectPageRenderSpy = this.spy(),
-		done = assert.async();
+		});
+		const oObjectPageRenderSpy = this.spy();
+		const done = assert.async();
 
 		await helpers.renderObject(oObjectPage);
 
@@ -2239,7 +2222,8 @@ function(
 
 	QUnit.test("adding section does invalidate the objectPage", async function (assert) {
 
-		var oObjectPage = new ObjectPageLayout({
+		assert.expect(1);
+		const oObjectPage = new ObjectPageLayout({
 				useIconTabBar: true,
 				selectedSection: "section1",
 				sections: [
@@ -2253,8 +2237,8 @@ function(
 						]
 					})
 				]
-			}),
-			section2 = new ObjectPageSection("section2", {
+			});
+		const section2 = new ObjectPageSection("section2", {
 				subSections: [
 					new ObjectPageSubSection({
 						blocks: [
@@ -2262,9 +2246,9 @@ function(
 						]
 					})
 				]
-			}),
-			oObjectPageRenderSpy = this.spy(),
-			done = assert.async();
+			});
+		const oObjectPageRenderSpy = this.spy();
+		const done = assert.async();
 
 		await helpers.renderObject(oObjectPage);
 
@@ -2286,8 +2270,8 @@ function(
 
 	QUnit.test("browser events not attached twice on rerender", async function (assert) {
 
-		var oButton = new Button("btn1", {text: "test"}),
-			oObjectPage = new ObjectPageLayout({
+		const oButton = new Button("btn1", {text: "test"});
+		const oObjectPage = new ObjectPageLayout({
 				useIconTabBar: true,
 				selectedSection: "section1",
 				sections: [
@@ -2301,13 +2285,13 @@ function(
 						]
 					})
 				]
-			}),
-			fnBrowserEventHandler = this.spy(),
-			fnOnDomReady = async function() {
+			});
+		const fnBrowserEventHandler = this.spy();
+		const fnOnDomReady = async function() {
 				oObjectPage.invalidate();
 				await nextUIUpdate();
-				var event,
-					$buttonDomRef = Element.getElementById("btn1").getDomRef();
+				let event;
+				const $buttonDomRef = Element.getElementById("btn1").getDomRef();
 				if (typeof Event === 'function') {
 					event = new Event("click");
 				} else {
@@ -2318,8 +2302,8 @@ function(
 				assert.equal(fnBrowserEventHandler.callCount, 1, "browser event listener called only once");
 				oObjectPage.destroy();
 				done();
-			},
-			done = assert.async();
+			};
+		const done = assert.async();
 
 		assert.expect(1); //number of assertions
 
@@ -2332,7 +2316,7 @@ function(
 
 	QUnit.test("onAfterRenderingDomReady cancelled on invalidate", function (assert) {
 
-		var oObjectPage = new ObjectPageLayout({
+		const oObjectPage = new ObjectPageLayout({
 			useIconTabBar: true,
 			selectedSection: "section1",
 			sections: [
@@ -2346,14 +2330,14 @@ function(
 					]
 				})
 			]
-		}),
-		done = assert.async(),
-		oSpy = this.spy(window, "clearTimeout");
+		});
+		const done = assert.async();
+		const oSpy = this.spy(window, "clearTimeout");
 
 		assert.expect(3);
 
 		// hook to onAfterRendering to *make a change that caused invalidation* before _onAfterRenderingDomReady is called
-		var oDelegate = {"onAfterRendering": function() {
+		const oDelegate = {"onAfterRendering": function() {
 
 			// clean up to avoid calling the same hook again
 			oObjectPage.removeDelegate(oDelegate);
@@ -2378,7 +2362,7 @@ function(
 
 	QUnit.test("setShowHeaderContent does not invalidate the objectPage", async function (assert) {
 		// Arrange
-		var oObjectPage = new ObjectPageLayout({
+		const oObjectPage = new ObjectPageLayout({
 			headerTitle: new ObjectPageDynamicHeaderTitle({
 				backgroundDesign: "Solid"
 			}),
@@ -2392,13 +2376,13 @@ function(
 							oFactory.getSubSection(3, [oFactory.getBlocks(), oFactory.getBlocks()], null),
 							oFactory.getSubSection(4, [oFactory.getBlocks(), oFactory.getBlocks()], null)
 						])
-			}),
-			oObjectPageRenderSpy = this.spy(),
-			oAdjustHeaderHeightsSpy,
-			oRequestAdjustLayoutSpy,
-			oHeaderContentRenderSpy,
-			oUpdateTitleVisualStateSpy,
-			done = assert.async();
+			});
+		const oObjectPageRenderSpy = this.spy();
+		const done = assert.async();
+		let oAdjustHeaderHeightsSpy;
+		let oRequestAdjustLayoutSpy;
+		let oHeaderContentRenderSpy;
+		let oUpdateTitleVisualStateSpy;
 
 		assert.expect(6);
 		await helpers.renderObject(oObjectPage);
@@ -2443,14 +2427,14 @@ function(
 
 	QUnit.test("setShowHeaderContent updates the toggle header buttons", function (assert) {
 		// Arrange
-		var oObjectPage = new ObjectPageLayout({
+		const oObjectPage = new ObjectPageLayout({
 				headerTitle: new ObjectPageDynamicHeaderTitle(),
 				headerContent: new Button({
 					text: "Button"
 				}),
 				showHeaderContent: false
-			}),
-			updateToggleHeaderVisualIndicatorsSpy = this.spy(oObjectPage, "_updateToggleHeaderVisualIndicators");
+			});
+		const updateToggleHeaderVisualIndicatorsSpy = this.spy(oObjectPage, "_updateToggleHeaderVisualIndicators");
 
 		oObjectPage.setShowHeaderContent(true);
 		assert.ok(updateToggleHeaderVisualIndicatorsSpy.calledOnce, "buttons visibility is updated");
@@ -2469,7 +2453,7 @@ function(
 	});
 
 	QUnit.test("ObjectPageLayout - setHeaderTitle", function (assert) {
-		var oHeaderTitle = new ObjectPageDynamicHeaderTitle({
+		const oHeaderTitle = new ObjectPageDynamicHeaderTitle({
 				backgroundDesign: "Solid"
 			});
 
@@ -2482,12 +2466,12 @@ function(
 
 	QUnit.test("ObjectPageLayout - update Header Title", function (assert) {
 		// Arrange
-		var oObjectPageLayout = this.oObjectPageLayout,
-			oHeaderTitle = new ObjectPageHeader({
+		const oObjectPageLayout = this.oObjectPageLayout;
+		const oHeaderTitle = new ObjectPageHeader({
 				objectTitle: "First Title"
-			}),
-			oSpy = this.spy(this.oObjectPageLayout, "_adjustHeaderHeights"),
-			fnDone = assert.async();
+			});
+		const oSpy = this.spy(this.oObjectPageLayout, "_adjustHeaderHeights");
+		const fnDone = assert.async();
 
 		assert.expect(2);
 
@@ -2517,7 +2501,8 @@ function(
 	});
 
 	QUnit.test("ObjectPageLayout - backgroundDesignAnchorBar", async function(assert) {
-		var $oAnchorBarDomRef = this.oObjectPageLayout.$("anchorBar");
+		assert.expect(9);
+		const $oAnchorBarDomRef = this.oObjectPageLayout.$("anchorBar");
 
 		// assert
 		assert.equal(this.oObjectPageLayout.getBackgroundDesignAnchorBar(), null, "Default value of backgroundDesign property = null");
@@ -2568,19 +2553,18 @@ function(
 
 	QUnit.test("safe-check _adjustLayoutAndUxRules", function (assert) {
 		// arrange
-		var oObjectPage = this.oObjectPageLayout,
-			oSection,
-			oSubSection,
-			oSelectedSection;
+		const oObjectPage = this.oObjectPageLayout;
+		let oSection;
+		let oSubSection;
 
-		for (var i = 0; i < 2; i++) {
+		for (let i = 0; i < 2; i++) {
 			oSection = oFactory.getSection(i);
 			oSubSection = oFactory.getSubSection(i, oFactory.getBlocks());
 			oSection.addSubSection(oSubSection);
 			oObjectPage.addSection(oSection);
 		}
 
-		oSelectedSection = oObjectPage.getSections()[1];
+		const oSelectedSection = oObjectPage.getSections()[1];
 		oObjectPage.setSelectedSection(oSelectedSection);
 
 		try {
@@ -2597,64 +2581,58 @@ function(
 
 
 	QUnit.test("_getStickyAreaHeight calculation while header expanded in the title-area", async function (assert) {
-		var iStickyAreaHeight,
-			done = assert.async();
+		assert.expect(1);
 		this.oObjectPageLayout.setHeaderTitle(oFactory.getHeaderTitle());
 		this.oObjectPageLayout.addHeaderContent(oFactory.getHeaderContent());
 
-		this.oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady", function() {
-			// pre-calculate the height of the sticky area in snapped mode
-			iStickyAreaHeight = this.oObjectPageLayout._getStickyAreaHeight(true /*snapped header*/);
-			this.oObjectPageLayout._expandHeader(true);
-			assert.strictEqual(this.oObjectPageLayout._getStickyAreaHeight(true /*snapped header*/), iStickyAreaHeight, "sticky area correctly calculated while header expanded");
-			done();
-		}.bind(this));
 		await helpers.renderObject(this.oObjectPageLayout);
+		await waitForDOMReady(this.oObjectPageLayout);
+
+		// pre-calculate the height of the sticky area in snapped mode
+		const iStickyAreaHeight = this.oObjectPageLayout._getStickyAreaHeight(true /*snapped header*/);
+		this.oObjectPageLayout._expandHeader(true);
+		assert.strictEqual(this.oObjectPageLayout._getStickyAreaHeight(true /*snapped header*/), iStickyAreaHeight, "sticky area correctly calculated while header expanded");
 	});
 
 	QUnit.test("_obtainExpandedTitleHeight using clone", async function (assert) {
-		var iExpandedTitleHeight,
-			iClonedExpandedTitleHeight,
-			done = assert.async();
+		assert.expect(1);
 		this.oObjectPageLayout.setHeaderTitle(oFactory.getHeaderTitle());
 		this.oObjectPageLayout.addHeaderContent(oFactory.getHeaderContent());
 		// add two sections
-		for (var i = 0; i < 2; i++) {
+		for (let i = 0; i < 2; i++) {
 			this.oObjectPageLayout.addSection(oFactory.getSection(i, null, [
 				oFactory.getSubSection(1, [oFactory.getBlocks(), oFactory.getBlocks()], null)
 			]));
 		}
 
-		this.oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady", function() {
-			// save the actual title height in expanded mode
-			iExpandedTitleHeight = this.oObjectPageLayout.getHeaderTitle().$().height();
-			// scroll to switch to snapped mode
-			this.oObjectPageLayout._scrollTo(this.oObjectPageLayout._getSnapPosition() + 1, 0);
-
-			// Act
-			iClonedExpandedTitleHeight = this.oObjectPageLayout._obtainExpandedTitleHeight(true /* use clone */);
-			// Check
-			assert.strictEqual(iClonedExpandedTitleHeight, iExpandedTitleHeight, "height is correct");
-			done();
-		}.bind(this));
 		await helpers.renderObject(this.oObjectPageLayout);
+		await waitForDOMReady(this.oObjectPageLayout);
+
+		// save the actual title height in expanded mode
+		const iExpandedTitleHeight = this.oObjectPageLayout.getHeaderTitle().$().height();
+		// scroll to switch to snapped mode
+		this.oObjectPageLayout._scrollTo(this.oObjectPageLayout._getSnapPosition() + 1, 0);
+
+		// Act
+		const iClonedExpandedTitleHeight = this.oObjectPageLayout._obtainExpandedTitleHeight(true /* use clone */);
+		// Check
+		assert.strictEqual(iClonedExpandedTitleHeight, iExpandedTitleHeight, "height is correct");
 	});
 
 	QUnit.test("_calculateShiftOffset on FireFox", async function (assert) {
-		var done = assert.async(),
-			oStubBrowser = this.stub(Device, "browser").value({
+		assert.expect(1);
+		const oStubBrowser = this.stub(Device, "browser").value({
 				firefox: true
-			}),
-			oStubScrollbar = this.stub(this.oObjectPageLayout, "_hasVerticalScrollBar").returns(true);
+			});
+		const oStubScrollbar = this.stub(this.oObjectPageLayout, "_hasVerticalScrollBar").returns(true);
 
-		this.oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady", function() {
-			// Assert
-			assert.strictEqual(this.oObjectPageLayout._calculateShiftOffset().iMarginalsOffset, ObjectPageLayout.SCROLLBAR_SIZE_FF, "Header and footer offset on FireFox is set correctly");
-			oStubBrowser.restore();
-			oStubScrollbar.restore();
-			done();
-		}.bind(this));
 		await helpers.renderObject(this.oObjectPageLayout);
+		await waitForDOMReady(this.oObjectPageLayout);
+
+		// Assert
+		assert.strictEqual(this.oObjectPageLayout._calculateShiftOffset().iMarginalsOffset, ObjectPageLayout.SCROLLBAR_SIZE_FF, "Header and footer offset on FireFox is set correctly");
+		oStubBrowser.restore();
+		oStubScrollbar.restore();
 	});
 
 
@@ -2671,9 +2649,9 @@ function(
 	});
 
 	QUnit.test("ObjectPage headerContent not rendered", function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oTitle = oObjectPage.getHeaderTitle(),
-			done = assert.async();
+		const oObjectPage = this.oObjectPage;
+		const oTitle = oObjectPage.getHeaderTitle();
+		const done = assert.async();
 
 		this.oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
 			setTimeout(function () {
@@ -2712,9 +2690,9 @@ function(
 
 	QUnit.test("ObjectPageDynamicHeaderTitle with snappedTitleOnMobile on desktop", function (assert) {
 		// Arrange
-		var oObjectPage = this.oObjectPage,
-			oDomObjectPageHeaderTitle = oObjectPage.getDomRef("headerTitle"),
-			oDynamicPageTitle = oObjectPage.getHeaderTitle();
+		const oObjectPage = this.oObjectPage;
+		const oDomObjectPageHeaderTitle = oObjectPage.getDomRef("headerTitle");
+		const oDynamicPageTitle = oObjectPage.getHeaderTitle();
 
 		// Act
 		helpers.toDesktopMode(oObjectPage);
@@ -2733,9 +2711,9 @@ function(
 
 	QUnit.test("ObjectPageDynamicHeaderTitle with snappedTitleOnMobile on tablet", function (assert) {
 		// Arrange
-		var oObjectPage = this.oObjectPage,
-			oDomObjectPageHeaderTitle = oObjectPage.getDomRef("headerTitle"),
-			oDynamicPageTitle = oObjectPage.getHeaderTitle();
+		const oObjectPage = this.oObjectPage;
+		const oDomObjectPageHeaderTitle = oObjectPage.getDomRef("headerTitle");
+		const oDynamicPageTitle = oObjectPage.getHeaderTitle();
 
 		// Act
 		helpers.toTabletMode(oObjectPage);
@@ -2757,9 +2735,9 @@ function(
 
 	QUnit.test("ObjectPageDynamicHeaderTitle with snappedTitleOnMobile on phone", function (assert) {
 		// Arrange
-		var oObjectPage = this.oObjectPage,
-			oDomObjectPageHeaderTitle = oObjectPage.getDomRef("headerTitle"),
-			oDynamicPageTitle = oObjectPage.getHeaderTitle();
+		const oObjectPage = this.oObjectPage;
+		const oDomObjectPageHeaderTitle = oObjectPage.getDomRef("headerTitle");
+		const oDynamicPageTitle = oObjectPage.getHeaderTitle();
 
 		// Act
 		helpers.toPhoneMode(oObjectPage);
@@ -2781,8 +2759,9 @@ function(
 
 	QUnit.test("ObjectPage Header pinnable and not pinnable", async function(assert) {
 
-		var oHeader = this.oObjectPage._getHeaderContent(),
-			oPinButton = oHeader.getAggregation("_pinButton");
+		assert.expect(3);
+		const oHeader = this.oObjectPage._getHeaderContent();
+		const oPinButton = oHeader.getAggregation("_pinButton");
 
 		this.oObjectPage.setHeaderContentPinnable(false);
 		await nextUIUpdate();
@@ -2801,10 +2780,11 @@ function(
 	});
 
 	QUnit.test("ObjectPage Header Pin Button focus preservation", async function(assert) {
+		assert.expect(1);
 		// Arrange
-		var oHeader = this.oObjectPage._getHeaderContent(),
-			oPinButton = oHeader.getAggregation("_pinButton"),
-			oPinButtonDomRef = oPinButton.$();
+		const oHeader = this.oObjectPage._getHeaderContent();
+		const oPinButton = oHeader.getAggregation("_pinButton");
+		const oPinButtonDomRef = oPinButton.$();
 			oPinButton.$ = function () {
 				return {
 					attr: function () {},
@@ -2829,11 +2809,11 @@ function(
 
 	QUnit.test("ObjectPage Header - expanding/collapsing by clicking the title", function (assert) {
 
-		var oObjectPage = this.oObjectPage,
-			oObjectPageTitle = oObjectPage.getHeaderTitle(),
-			oHeaderContent = oObjectPage._getHeaderContent(),
-			oPinButton = oHeaderContent._getPinButton(),
-			oFakeEvent = {
+		const oObjectPage = this.oObjectPage;
+		const oObjectPageTitle = oObjectPage.getHeaderTitle();
+		const oHeaderContent = oObjectPage._getHeaderContent();
+		const oPinButton = oHeaderContent._getPinButton();
+		const oFakeEvent = {
 				srcControl: oObjectPageTitle
 			};
 
@@ -2866,10 +2846,10 @@ function(
 
 	QUnit.test("ObjectPage Header - expanding/collapsing by clicking the title", function (assert) {
 		// arrange
-		var oObjectPage = this.oObjectPage,
-			oObjectPageTitle = oObjectPage.getHeaderTitle(),
-			oStateChangeListener = this.spy(),
-			oFakeEvent = {
+		const oObjectPage = this.oObjectPage;
+		const oObjectPageTitle = oObjectPage.getHeaderTitle();
+		const oStateChangeListener = this.spy();
+		const oFakeEvent = {
 				srcControl: oObjectPageTitle
 			};
 
@@ -2890,9 +2870,9 @@ function(
 
 	QUnit.test("ObjectPage Header - expanding/collapsing by clicking the expand/collapse arrow", function (assert) {
 		// arrange
-		var oObjectPage = this.oObjectPage,
-			oObjectPageTitle = oObjectPage.getHeaderTitle(),
-			oStateChangeListener = this.spy();
+		const oObjectPage = this.oObjectPage;
+		const oObjectPageTitle = oObjectPage.getHeaderTitle();
+		const oStateChangeListener = this.spy();
 
 		oObjectPageTitle.attachEvent("stateChange", oStateChangeListener);
 
@@ -2911,8 +2891,8 @@ function(
 
 	QUnit.test("ObjectPage header is preserved in title on screen resize", function (assert) {
 		// arrange
-		var oObjectPage = this.oObjectPage,
-			oFakeEvent = {
+		const oObjectPage = this.oObjectPage;
+		const oFakeEvent = {
 				size: {
 					width: 100,
 					height: 300
@@ -2921,11 +2901,11 @@ function(
 					width: 100,
 					height: 400
 				}
-			},
-			// this delay is already introduced in the ObjectPage resize listener
-			iDelay = ObjectPageLayout.HEADER_CALC_DELAY + 100,
-			oSpy,
-			done = assert.async();
+			};
+		// this delay is already introduced in the ObjectPage resize listener
+		const iDelay = ObjectPageLayout.HEADER_CALC_DELAY + 100;
+		const done = assert.async();
+		let oSpy;
 
 		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
 
@@ -2949,9 +2929,9 @@ function(
 
 	QUnit.test("ObjectPage header is preserved in title on content resize", function (assert) {
 		// arrange
-		var oObjectPage = this.oObjectPage,
-			// this delay is already introduced in the ObjectPage resize listener
-			done = assert.async();
+		const oObjectPage = this.oObjectPage;
+		// this delay is already introduced in the ObjectPage resize listener
+		const done = assert.async();
 
 		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
 
@@ -2969,11 +2949,12 @@ function(
 	});
 
 	QUnit.test("ObjectPage is not attached to MouseOut/MouseOver events of title on tablet/phone device", async function (assert) {
+		assert.expect(2);
 		// Setup
 		helpers.toPhoneMode(this.oObjectPage);
 
-		var oVisualIndicatorMouseoOverSpy = this.spy(this.oObjectPage, "_attachVisualIndicatorMouseOverHandlers"),
-			oTitleMouseOverSpy = this.spy(this.oObjectPage, "_attachTitleMouseOverHandlers");
+		const oVisualIndicatorMouseoOverSpy = this.spy(this.oObjectPage, "_attachVisualIndicatorMouseOverHandlers");
+		const oTitleMouseOverSpy = this.spy(this.oObjectPage, "_attachTitleMouseOverHandlers");
 
 		// Act
 		this.oObjectPage.invalidate();
@@ -2988,8 +2969,8 @@ function(
 
 	QUnit.test("ObjectPage obtains correct anchorBar height", function (assert) {
 		// arrange
-		var oObjectPage = this.oObjectPage,
-			done = assert.async();
+		const oObjectPage = this.oObjectPage;
+		const done = assert.async();
 
 		assert.expect(2);
 
@@ -3004,16 +2985,16 @@ function(
 
 	QUnit.test("AnchorBar height includes paddings", function (assert) {
 		// arrange
-		var oObjectPage = this.oObjectPage,
-			done = assert.async();
+		const oObjectPage = this.oObjectPage;
+		const done = assert.async();
 
 		assert.expect(1);
 
 		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			var oAnchorBarDOM = this.getDomRef("anchorBar"),
-				iPadding = parseInt(getComputedStyle(oAnchorBarDOM).paddingTop) || 0,
-				iABHeight = oObjectPage.iAnchorBarHeight,
-				iDiff = 10;
+			const oAnchorBarDOM = this.getDomRef("anchorBar");
+			const iPadding = parseInt(getComputedStyle(oAnchorBarDOM).paddingTop) || 0;
+			const iABHeight = oObjectPage.iAnchorBarHeight;
+			const iDiff = 10;
 
 			// Act: increase padding
 			oAnchorBarDOM.style.paddingTop = (iPadding + iDiff) + "px";
@@ -3026,9 +3007,9 @@ function(
 	});
 
 	QUnit.test("unset selected section when preserveHeaderStateOnScroll enabled", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oSecondSection = this.oObjectPage.getSections()[1],
-			done = assert.async(); //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
+		const oObjectPage = this.oObjectPage;
+		const oSecondSection = this.oObjectPage.getSections()[1];
+		const done = assert.async(); //async test needed because tab initialization is done onAfterRenderingDomReady (after HEADER_CALC_DELAY)
 
 		assert.expect(1);
 
@@ -3064,18 +3045,18 @@ function(
 	});
 
 	QUnit.test("Should not call toggleHeader", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oHeaderContent,
-			oSecondSection = oObjectPage.getSections()[1],
-			oToggleHeaderSpy = this.spy(oObjectPage, "_toggleHeader"),
-			done = assert.async(),
-			fnOnDomReady = function() {
+		const oObjectPage = this.oObjectPage;
+		const oSecondSection = oObjectPage.getSections()[1];
+		const oToggleHeaderSpy = this.spy(oObjectPage, "_toggleHeader");
+		const done = assert.async();
+		let oHeaderContent;
+		const fnOnDomReady = function() {
 				oObjectPage.scrollToSection(oSecondSection.getId(), 0);
 				assert.strictEqual(oToggleHeaderSpy.callCount, 0, "Toggle header is not called");
 				oObjectPage.attachEventOnce("onAfterRenderingDOMReady", fnOnRerenderedDomReady2);
 				oObjectPage.invalidate();
-			},
-			fnOnRerenderedDomReady2 = function() {
+			};
+		const fnOnRerenderedDomReady2 = function() {
 				// Assert
 				assert.equal(oObjectPage._bHeaderExpanded, true, "Flag for expandedHeader has correct value");
 				oHeaderContent = oObjectPage._getHeaderContent();
@@ -3097,8 +3078,8 @@ function(
 
 	QUnit.test("'alwaysShowContentHeader' is applied correctly on screen resize", async function (assert) {
 		// arrange
-		var oObjectPage = this.oObjectPage,
-			oFakeEvent = {
+		const oObjectPage = this.oObjectPage;
+		const oFakeEvent = {
 				size: {
 					width: 100,
 					height: 300
@@ -3107,8 +3088,8 @@ function(
 					width: 100,
 					height: 400
 				}
-			},
-			done = assert.async();
+			};
+		const done = assert.async();
 
 		// mock tablet mode
 		this.stub(lib.Utilities, "isPhoneScenario").returns(false);
@@ -3154,29 +3135,14 @@ function(
 	});
 
 	QUnit.test("Should change selectedSection", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oSecondPage = new Page(),
-			oNavContainer = new App(),
-			oSecondSection = oObjectPage.getSections()[1],
-			iCompleteResizeCalculationTimeout = ObjectPageLayout.HEADER_CALC_DELAY + 100,
-			oExpected,
-			done = assert.async(),
-			fnOnDomReady = function() {
-				oNavContainer.attachEventOnce("afterNavigate", fnOnHideObjectPage);
-				oNavContainer.to(oSecondPage.getId()); // nav to the second page to hide the object page
-			},
-			fnOnHideObjectPage = function() {
-				// act: change selectedSection while page is HIDDEN
-				oObjectPage.setSelectedSection(oSecondSection);
-				// call the listener to the <code>scroll</code> event synchonously to avoid waiting a timeout
-				oObjectPage._onScroll({ target: {scrollTop: oObjectPage._computeScrollPosition(oSecondSection)}});
-				oNavContainer.attachEventOnce("afterNavigate", fnOnShowBackObjectPage);
-				oNavContainer.to(oObjectPage.getId()); // nav back to the object page
-			},
-			fnOnShowBackObjectPage = function() {
-				setTimeout(onResizeCheckCompleted, iCompleteResizeCalculationTimeout);
-			},
-			onResizeCheckCompleted = function() {
+		const oObjectPage = this.oObjectPage;
+		const oSecondPage = new Page();
+		const oNavContainer = new App();
+		const oSecondSection = oObjectPage.getSections()[1];
+		const iCompleteResizeCalculationTimeout = ObjectPageLayout.HEADER_CALC_DELAY + 100;
+		const done = assert.async();
+		let oExpected;
+		const onResizeCheckCompleted = function() {
 				oExpected = {
 					oSelectedSection: oSecondSection,
 					sSelectedTitle: oSecondSection.getSubSections()[0].getTitle(), // the only subsection is promoted
@@ -3185,6 +3151,21 @@ function(
 				//check
 				sectionIsSelected(oObjectPage, assert, oExpected);
 				done();
+			};
+		const fnOnShowBackObjectPage = function() {
+				setTimeout(onResizeCheckCompleted, iCompleteResizeCalculationTimeout);
+			};
+		const fnOnHideObjectPage = function() {
+				// act: change selectedSection while page is HIDDEN
+				oObjectPage.setSelectedSection(oSecondSection);
+				// call the listener to the <code>scroll</code> event synchonously to avoid waiting a timeout
+				oObjectPage._onScroll({ target: {scrollTop: oObjectPage._computeScrollPosition(oSecondSection)}});
+				oNavContainer.attachEventOnce("afterNavigate", fnOnShowBackObjectPage);
+				oNavContainer.to(oObjectPage.getId()); // nav back to the object page
+			};
+		const fnOnDomReady = function() {
+				oNavContainer.attachEventOnce("afterNavigate", fnOnHideObjectPage);
+				oNavContainer.to(oSecondPage.getId()); // nav to the second page to hide the object page
 			};
 
 		assert.expect(5);
@@ -3205,9 +3186,10 @@ function(
 	});
 
 	QUnit.test("iconTabBar mode selected section", async function (assert) {
+		assert.expect(1);
 		this.oObjectPage.setUseIconTabBar(true);
 
-		var oSectionToSelect = this.oObjectPage.getSections()[1];
+		const oSectionToSelect = this.oObjectPage.getSections()[1];
 		this.oObjectPage.setSelectedSection(oSectionToSelect);
 
 		await helpers.renderObject(this.oObjectPage);
@@ -3216,10 +3198,11 @@ function(
 	});
 
 	QUnit.test("iconTabBar mode selected section first subSection", async function (assert) {
+		assert.expect(1);
 		this.oObjectPage.setUseIconTabBar(true);
 
-		var oSectionToSelect = this.oObjectPage.getSections()[1],
-			oSectionToSelectFirstSubSection = oSectionToSelect.getSubSections()[0];
+		const oSectionToSelect = this.oObjectPage.getSections()[1];
+		const oSectionToSelectFirstSubSection = oSectionToSelect.getSubSections()[0];
 		this.oObjectPage.setSelectedSection(oSectionToSelect);
 
 		await helpers.renderObject(this.oObjectPage);
@@ -3228,10 +3211,11 @@ function(
 	});
 
 	QUnit.test("iconTabBar mode selected section non-first subSection", async function (assert) {
+		assert.expect(1);
 		this.oObjectPage.setUseIconTabBar(true);
 
-		var oSectionToSelect = this.oObjectPage.getSections()[1],
-			oSectionToSelectSecondSubSection = oSectionToSelect.getSubSections()[1];
+		const oSectionToSelect = this.oObjectPage.getSections()[1];
+		const oSectionToSelectSecondSubSection = oSectionToSelect.getSubSections()[1];
 		this.oObjectPage.setSelectedSection(oSectionToSelect);
 
 		await helpers.renderObject(this.oObjectPage);
@@ -3240,9 +3224,10 @@ function(
 	});
 
 	QUnit.test("resize of empty page", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oSelectSpy = this.spy(oObjectPage, "_selectFirstVisibleSection"),
-			done = assert.async();
+		assert.expect(2);
+		const oObjectPage = this.oObjectPage;
+		const oSelectSpy = this.spy(oObjectPage, "_selectFirstVisibleSection");
+		const done = assert.async();
 
 		// Setup
 		this.oObjectPage.setUseIconTabBar(true);
@@ -3279,29 +3264,25 @@ function(
 	});
 
 	QUnit.test("getScrollDelegate", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			iInitScrollTop,
-			iNewScrollTop,
-			done = assert.async();
+		const oObjectPage = this.oObjectPage;
 
 		assert.expect(1);
 
-		// wait for the event when the page is rendered and ready
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			// Setup: save init scroll position
-			iInitScrollTop = Math.round(oObjectPage._$opWrapper.scrollTop());
-
-			// Act: call scrolling while scrolling is suppressed
-			iNewScrollTop = iInitScrollTop + 10;
-			oObjectPage.getScrollDelegate().scrollTo(0 /* x */, iNewScrollTop /* y */);
-
-			// Check if scroll was effective
-			assert.strictEqual(Math.round(oObjectPage._$opWrapper.scrollTop()), iNewScrollTop, "scroll top is changed");
-			done();
-		});
-
 		// Act: render page to test scrolling behavior
 		await helpers.renderObject(oObjectPage);
+
+		// wait for the event when the page is rendered and ready
+		await waitForDOMReady(oObjectPage);
+
+		// Setup: save init scroll position
+		const iInitScrollTop = Math.round(oObjectPage._$opWrapper.scrollTop());
+
+		// Act: call scrolling while scrolling is suppressed
+		const iNewScrollTop = iInitScrollTop + 10;
+		oObjectPage.getScrollDelegate().scrollTo(0 /* x */, iNewScrollTop /* y */);
+
+		// Check if scroll was effective
+		assert.strictEqual(Math.round(oObjectPage._$opWrapper.scrollTop()), iNewScrollTop, "scroll top is changed");
 	});
 
 	QUnit.module("RTA util functions", {
@@ -3315,38 +3296,34 @@ function(
 	});
 
 	QUnit.test("_suppressScroll", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			iScrollTopBefore,
-			iScrollTopAfter,
-			done = assert.async();
+		const oObjectPage = this.oObjectPage;
 
 		assert.expect(1);
 
-		// wait for the event when the page is rendered and ready
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			// Setup: save current scroll position and suppress scroll
-			iScrollTopBefore = oObjectPage._$opWrapper.scrollTop();
-			oObjectPage._suppressScroll();
-
-			// Act: call scrolling while scrolling is suppressed
-			oObjectPage._scrollTo(iScrollTopBefore + 10);
-
-			// Check if scroll suppression was effective
-			iScrollTopAfter = oObjectPage._$opWrapper.scrollTop();
-			assert.strictEqual(iScrollTopBefore, iScrollTopAfter, "scroll top is unchanged");
-			done();
-		});
-
 		// Act: render page to test scrolling behavior
 		await helpers.renderObject(oObjectPage);
+
+		// wait for the event when the page is rendered and ready
+		await waitForDOMReady(oObjectPage);
+
+		// Setup: save current scroll position and suppress scroll
+		const iScrollTopBefore = oObjectPage._$opWrapper.scrollTop();
+		oObjectPage._suppressScroll();
+
+		// Act: call scrolling while scrolling is suppressed
+		oObjectPage._scrollTo(iScrollTopBefore + 10);
+
+		// Check if scroll suppression was effective
+		const iScrollTopAfter = oObjectPage._$opWrapper.scrollTop();
+		assert.strictEqual(iScrollTopBefore, iScrollTopAfter, "scroll top is unchanged");
 	});
 
 	QUnit.test("_resumeScroll", async function (assert) {
-		var oObjectPage = this.oObjectPage,
-			iUpdatedScrollTop = 0,
-			oFirstSection = oObjectPage.getSections()[0],
-			oFourthSection = oObjectPage.getSections()[3],
-			done = assert.async();
+		const oObjectPage = this.oObjectPage;
+		const iUpdatedScrollTop = 0;
+		const oFirstSection = oObjectPage.getSections()[0];
+		const oFourthSection = oObjectPage.getSections()[3];
+		const done = assert.async();
 
 		// Arrange: set selection to a (non-first) section that requires page scrolling
 		oObjectPage.setSelectedSection(oFourthSection.getId());
@@ -3387,51 +3364,46 @@ function(
 
 	QUnit.test("BCP:1870298358 - cloned header should not introduce scrollbar - _appendTitleCloneToDOM", async function(assert) {
 
+		assert.expect(2);
 		// Arrange
-		var oObjectPage = helpers.generateObjectPageWithContent(oFactory, 2, true),
-			oClone,
-			oWrapperElement,
-			done = assert.async();
+		const oObjectPage = helpers.generateObjectPageWithContent(oFactory, 2, true);
 
 		oObjectPage.setHeaderTitle(oFactory.getHeaderTitle());
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-
-			oWrapperElement = oObjectPage._$opWrapper.get(0);
-
-			// Act: obtain snapped title height
-			oClone = oObjectPage._appendTitleCloneToDOM(true /* snap title */);
-
-			// Assert
-			assert.strictEqual(oWrapperElement.offsetHeight, oWrapperElement.scrollHeight, "no scrolling");
-
-			oClone.remove();
-
-			// ACT: obtain expanded title height
-			oObjectPage._appendTitleCloneToDOM(false /* do not snap title */);
-
-			// Assert
-			assert.strictEqual(oWrapperElement.offsetHeight, oWrapperElement.scrollHeight, "no scrolling");
-
-			// Cleanup
-			oObjectPage.destroy();
-			done();
-		});
-
 		oObjectPage.placeAt("qunit-fixture");
 		await nextUIUpdate();
+		await waitForDOMReady(oObjectPage);
+
+		const oWrapperElement = oObjectPage._$opWrapper.get(0);
+
+		// Act: obtain snapped title height
+		const oClone = oObjectPage._appendTitleCloneToDOM(true /* snap title */);
+
+		// Assert
+		assert.strictEqual(oWrapperElement.offsetHeight, oWrapperElement.scrollHeight, "no scrolling");
+
+		oClone.remove();
+
+		// ACT: obtain expanded title height
+		oObjectPage._appendTitleCloneToDOM(false /* do not snap title */);
+
+		// Assert
+		assert.strictEqual(oWrapperElement.offsetHeight, oWrapperElement.scrollHeight, "no scrolling");
+
+		// Cleanup
+		oObjectPage.destroy();
 	});
 
 	QUnit.test("_obtainExpandedTitleHeight does not change element overflow", async function(assert) {
 
+		assert.expect(1);
 		// Arrange
-		var oObjectPage = oFactory.getObjectPageLayoutWithIconTabBar(),
-			oCSSSpy;
+		const oObjectPage = oFactory.getObjectPageLayoutWithIconTabBar();
 
 		oObjectPage.setHeaderTitle(oFactory.getHeaderTitle());
 		oObjectPage.placeAt("qunit-fixture");
 		await nextUIUpdate();
-		oCSSSpy = this.spy(oObjectPage._$opWrapper, "css");
+		const oCSSSpy = this.spy(oObjectPage._$opWrapper, "css");
 
 		// Act - render OP and call method
 		oObjectPage._obtainExpandedTitleHeight(false/* snap directly */);
@@ -3445,8 +3417,9 @@ function(
 
 	QUnit.test("_getHeaderContentDomRef works as expected", async function(assert) {
 
+		assert.expect(3);
 		// Arrange
-		var oObjectPage = oFactory.getObjectPageLayoutWithIconTabBar();
+		const oObjectPage = oFactory.getObjectPageLayoutWithIconTabBar();
 
 		oObjectPage.placeAt("qunit-fixture");
 		await nextUIUpdate();
@@ -3478,14 +3451,14 @@ function(
 
 	QUnit.test("_obtainSnappedTitleHeight does not change element overflow", async function(assert) {
 
+		assert.expect(1);
 		// Arrange
-		var oObjectPage = oFactory.getObjectPageLayoutWithIconTabBar(),
-			oCSSSpy;
+		const oObjectPage = oFactory.getObjectPageLayoutWithIconTabBar();
 
 		oObjectPage.setHeaderTitle(oFactory.getObjectPageDynamicHeaderTitle());
 		oObjectPage.placeAt("qunit-fixture");
 		await nextUIUpdate();
-		oCSSSpy = this.spy(oObjectPage._$opWrapper, "css");
+		const oCSSSpy = this.spy(oObjectPage._$opWrapper, "css");
 
 		// Act - render OP and call method
 		oObjectPage._obtainSnappedTitleHeight(false/* expand directly */);
@@ -3501,46 +3474,39 @@ function(
 	async function (assert) {
 
 		// Arrange
-		var oObjectPage = oFactory.getObjectPageLayoutWithIconTabBar(),
-			oSection,
-			oSubSection,
-			iSpacerInitialHeight,
-			iSpacerNewHeight,
-			done = assert.async();
+		const oObjectPage = oFactory.getObjectPageLayoutWithIconTabBar();
 
 			assert.expect(1);
 
 		oObjectPage.setUseIconTabBar(false);
 		oObjectPage.setHeaderTitle(oFactory.getObjectPageDynamicHeaderTitle());
-		oSection = oFactory.getSection(0);
-		oSubSection = oFactory.getSubSection(0, oFactory.getBlocks());
+		const oSection = oFactory.getSection(0);
+		const oSubSection = oFactory.getSubSection(0, oFactory.getBlocks());
 		oSection.addSubSection(oSubSection);
 		oObjectPage.addSection(oSection);
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			iSpacerInitialHeight = oObjectPage._$spacer.height();
-			oObjectPage._adjustSpacerHeightUponUnsnapping(150, 200);
-			iSpacerNewHeight = oObjectPage._$spacer.height();
-
-			// Assert
-			assert.equal(iSpacerInitialHeight, iSpacerNewHeight,
-				"Spacer height remains 0 when unsnapping leads to change of content height and there is only one SubSection");
-			done();
-
-			// Cleanup
-			oObjectPage.destroy();
-		});
-
 		await helpers.renderObject(oObjectPage);
+		await waitForDOMReady(oObjectPage);
+
+		const iSpacerInitialHeight = oObjectPage._$spacer.height();
+		oObjectPage._adjustSpacerHeightUponUnsnapping(150, 200);
+		const iSpacerNewHeight = oObjectPage._$spacer.height();
+
+		// Assert
+		assert.equal(iSpacerInitialHeight, iSpacerNewHeight,
+			"Spacer height remains 0 when unsnapping leads to change of content height and there is only one SubSection");
+
+		// Cleanup
+		oObjectPage.destroy();
 	});
 
 	QUnit.test("Snapping Header with ObjectPageDynamicHeaderTitle when expandedHeading has bigger height than snappedHeading",
 	async function (assert) {
 
 		// Arrange
-		var oObjectPage = oFactory.getObjectPageLayoutWithOneVisibleSection(),
-			oHeader = oFactory.getObjectPageDynamicHeaderTitle(),
-			fnDone = assert.async();
+		const oObjectPage = oFactory.getObjectPageLayoutWithOneVisibleSection();
+		const oHeader = oFactory.getObjectPageDynamicHeaderTitle();
+		const fnDone = assert.async();
 
 		assert.expect(1);
 
@@ -3571,10 +3537,10 @@ function(
 	async function (assert) {
 
 		// Arrange
-		var oObjectPage = oFactory.getObjectPageLayoutWithOneVisibleSection(),
-			oHeader = oFactory.getObjectPageDynamicHeaderTitle(),
-			fnDone = assert.async(),
-			oSpy;
+		const oObjectPage = oFactory.getObjectPageLayoutWithOneVisibleSection();
+		const oHeader = oFactory.getObjectPageDynamicHeaderTitle();
+		const fnDone = assert.async();
+		let oSpy;
 
 		assert.expect(2);
 
@@ -3615,41 +3581,35 @@ function(
 	async function (assert) {
 
 		// Arrange
-		var oObjectPage = oFactory.getObjectPageLayoutWithOneVisibleSection(),
-			oUpdateMediaSpy,
-			that = this,
-			fnDone = assert.async();
+		const oObjectPage = oFactory.getObjectPageLayoutWithOneVisibleSection();
 
 		assert.expect(1);
 		oObjectPage.setHeaderTitle(oFactory.getObjectPageDynamicHeaderTitle());
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-
-			oUpdateMediaSpy = that.spy(oObjectPage, "_updateMedia");
-
-			oObjectPage.onAfterRendering();
-
-			assert.strictEqual(oUpdateMediaSpy.getCalls()[0].args[1],
-				ObjectPageLayout.DYNAMIC_HEADERS_MEDIA,
-				"_updateMedia is correctly called with dynamic headers args when needed");
-
-			oObjectPage.destroy();
-			oUpdateMediaSpy.reset();
-			fnDone();
-		});
-
 		await helpers.renderObject(oObjectPage);
+		await waitForDOMReady(oObjectPage);
+
+		const oUpdateMediaSpy = this.spy(oObjectPage, "_updateMedia");
+
+		oObjectPage.onAfterRendering();
+
+		assert.strictEqual(oUpdateMediaSpy.getCalls()[0].args[1],
+			ObjectPageLayout.DYNAMIC_HEADERS_MEDIA,
+			"_updateMedia is correctly called with dynamic headers args when needed");
+
+		oObjectPage.destroy();
+		oUpdateMediaSpy.reset();
 	});
 
 	QUnit.test("BCP:1870298358 - _getScrollableViewportHeight method should acquire the exact height", async function(assert) {
 
+		assert.expect(1);
 		// Arrange
-		var oObjectPage = oFactory.getObjectPageLayoutWithIconTabBar(),
-			oGetBoundingClientRectSpy;
+		const oObjectPage = oFactory.getObjectPageLayoutWithIconTabBar();
 
 		oObjectPage.placeAt("qunit-fixture");
 		await nextUIUpdate();
-		oGetBoundingClientRectSpy = this.spy(oObjectPage.getDomRef(), "getBoundingClientRect");
+		const oGetBoundingClientRectSpy = this.spy(oObjectPage.getDomRef(), "getBoundingClientRect");
 
 		// Act - call method
 		oObjectPage._getScrollableViewportHeight();
@@ -3662,27 +3622,24 @@ function(
 	});
 
 	QUnit.test("BCP:1870470695/1970034947 - check _updateMedia is called initially when ObjectPage has correct size", async function (assert) {
-		var oObjectPage = new ObjectPageLayout({}),
-			oUpdateMediaSpy = this.spy(oObjectPage, "_updateMedia"),
-			oGetWidthSpy = this.spy(oObjectPage, "_getWidth"),
-			done = assert.async();
+		const oObjectPage = new ObjectPageLayout({});
+		const oUpdateMediaSpy = this.spy(oObjectPage, "_updateMedia");
+		const oGetWidthSpy = this.spy(oObjectPage, "_getWidth");
 
 		assert.expect(2);
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-				assert.strictEqual(oUpdateMediaSpy.callCount, 2, "_updateMedia is called on after rendering and after DOM ready to ensure coorect size classes are set");
-				assert.strictEqual(oGetWidthSpy.callCount, 2, "_getWidth is called once on after rendering and once after DOM ready");
-				oObjectPage.destroy();
-				done();
-		});
-
 		await helpers.renderObject(oObjectPage);
+		await waitForDOMReady(oObjectPage);
+
+		assert.strictEqual(oUpdateMediaSpy.callCount, 2, "_updateMedia is called on after rendering and after DOM ready to ensure coorect size classes are set");
+		assert.strictEqual(oGetWidthSpy.callCount, 2, "_getWidth is called once on after rendering and once after DOM ready");
+		oObjectPage.destroy();
 	});
 
 	QUnit.test("ObjectPage _updateMedia: Call with falsy value should not take action", function (assert) {
         // setup
-        var oObjectPage = new ObjectPageLayout({}),
-            oToggleStyleClassSpy = this.spy(oObjectPage, "toggleStyleClass");
+        const oObjectPage = new ObjectPageLayout({});
+        const oToggleStyleClassSpy = this.spy(oObjectPage, "toggleStyleClass");
 
         // act
         oObjectPage._updateMedia(0);
@@ -3695,16 +3652,15 @@ function(
 	});
 
 	QUnit.test("ObjectPage _applyContextualSettings: changes media classes", async function(assert) {
+        assert.expect(13);
         // Arrange
-		var oObjectPage = new ObjectPageLayout({}),
-			oContextualSettings = {contextualWidth: 800},
-			oSpy;
-
+		const oObjectPage = new ObjectPageLayout({});
+		const oContextualSettings = {contextualWidth: 800};
 		oObjectPage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		// Act
-		oSpy = this.spy(ManagedObject.prototype, "_applyContextualSettings");
+		const oSpy = this.spy(ManagedObject.prototype, "_applyContextualSettings");
 		oObjectPage._applyContextualSettings(oContextualSettings);
 
 		// Assert
@@ -3733,16 +3689,16 @@ function(
 		assert.ok(oObjectPage.$().hasClass("sapUxAPObjectPageLayout-Std-Desktop-XL"), "Desktop XL class is applied");
     });
 
-	QUnit.test("ObjectPage _computeLastVisibleHeight floors the top position of the spacer", async function(assert) {
+	QUnit.test("ObjectPage _computeLastVisibleHeight floors the top position of the spacer", async function (assert) {
+		assert.expect(1);
 		// setup
-		var oObjectPage = helpers.generateObjectPageWithContent(oFactory, 5),
-			oSpy;
+		const oObjectPage = helpers.generateObjectPageWithContent(oFactory, 5);
 
 		oObjectPage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		// act
-		oSpy = this.spy(Math, "floor");
+		const oSpy = this.spy(Math, "floor");
 		oObjectPage._computeLastVisibleHeight(oObjectPage.getSections()[4].getSubSections()[0]);
 
 		// assert
@@ -3765,51 +3721,48 @@ function(
 
 	QUnit.test("Change in title size retrigger layout calculations", async function (assert) {
 
-		var oObjectPage = this.oObjectPage,
-			sShortText = "sample object subtitle text",
-			sLongText = (function(s) {
-				for (var i = 0; i < 100; i++) {
+		const oObjectPage = this.oObjectPage;
+		const sShortText = "sample object subtitle text";
+		const sLongText = (function(s) {
+				for (let i = 0; i < 100; i++) {
 					s += sShortText;
 				}
 				return s;
-			}("")),
-			oHeaderTitle = new ObjectPageHeader({
+			}(""));
+		const oHeaderTitle = new ObjectPageHeader({
 				objectTitle: "Title",
 				objectSubtitle: sLongText
-			}),
-			layoutCalcSpy = this.spy(oObjectPage, "_requestAdjustLayout"),
-			headerCalcSpy = this.spy(oObjectPage, "_adjustHeaderHeights"),
-			done = assert.async();
+			});
+		const layoutCalcSpy = this.spy(oObjectPage, "_requestAdjustLayout");
+		const headerCalcSpy = this.spy(oObjectPage, "_adjustHeaderHeights");
 
 		assert.expect(2);
 
 		oObjectPage.setHeaderTitle(oHeaderTitle);
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			layoutCalcSpy.resetHistory();
-			headerCalcSpy.resetHistory();
-
-			// Act: change size of title dom element [without control invalidation]
-			var $titleDescription = oObjectPage.getHeaderTitle().$().find('.sapUxAPObjectPageHeaderIdentifierDescription').get(0);
-			$titleDescription.innerText = sShortText;
-
-			oObjectPage.getHeaderTitle()._onHeaderResize({ size: { width: "800px", height: "800px"}});
-			assert.strictEqual(layoutCalcSpy.callCount, 1, "layout recalculations called once");
-			assert.strictEqual(headerCalcSpy.callCount, 1, "header height recalculation called");
-			done();
-		});
-
 		await helpers.renderObject(this.oObjectPage);
+		await waitForDOMReady(oObjectPage);
+
+		layoutCalcSpy.resetHistory();
+		headerCalcSpy.resetHistory();
+
+		// Act: change size of title dom element [without control invalidation]
+		const $titleDescription = oObjectPage.getHeaderTitle().$().find('.sapUxAPObjectPageHeaderIdentifierDescription').get(0);
+		$titleDescription.innerText = sShortText;
+
+		oObjectPage.getHeaderTitle()._onHeaderResize({ size: { width: "800px", height: "800px"}});
+		assert.strictEqual(layoutCalcSpy.callCount, 1, "layout recalculations called once");
+		assert.strictEqual(headerCalcSpy.callCount, 1, "header height recalculation called");
 	});
 
 	QUnit.test("Title is toggled only upon snap/unsnap", async function (assert) {
 
-		var oObjectPage = this.oObjectPage,
-			oHeaderTitle = new ObjectPageHeader({
+		const oObjectPage = this.oObjectPage;
+		const oHeaderTitle = new ObjectPageHeader({
 				objectTitle: "Title"
-			}),
-			toggleTitleSpy = this.spy(oObjectPage, "_toggleHeaderTitle"),
-			done = assert.async();
+			});
+		const toggleTitleSpy = this.spy(oObjectPage, "_toggleHeaderTitle");
+		const done = assert.async();
 
 		assert.expect(2);
 
@@ -3855,12 +3808,13 @@ function(
 	});
 
 	QUnit.test("sectionChange event is fired for single/not promoted SubSection", async function (assert) {
+		assert.expect(2);
 		// Arrange
-		var fnDone = assert.async(),
-			oSubSection = new ObjectPageSubSection({
+		const fnDone = assert.async();
+		const oSubSection = new ObjectPageSubSection({
 				blocks: new Button()
-			}),
-			oSection = oFactory.getSection(1, null, [ oSubSection ]);
+			});
+		const oSection = oFactory.getSection(1, null, [ oSubSection ]);
 
 		this.oObjectPage.addSection(oSection);
 		await nextUIUpdate();
@@ -3883,10 +3837,10 @@ function(
 
 	QUnit.test("subSectionVisibilityChange without IconTabBar and changing visibility", function (assert) {
 		// Arrange
-		var fnDone = assert.async();
+		const fnDone = assert.async();
 		this.oObjectPage.attachEventOnce("subSectionVisibilityChange", function(oEvent) {
 			// Assert
-			var oVisibleSubSections = oEvent.getParameter("visibleSubSections");
+			const oVisibleSubSections = oEvent.getParameter("visibleSubSections");
 			assert.strictEqual(Object.keys(oVisibleSubSections).length, 2,
 				"Two visible subSections are reported when visibility of one of the three subSections is changed to false");
 
@@ -3901,12 +3855,12 @@ function(
 
 	QUnit.test("subSectionVisibilityChange with IconTabBar and changing visibility", function (assert) {
 		// Arrange
-		var fnDone = assert.async();
+		const fnDone = assert.async();
 
 		this.oObjectPage.setUseIconTabBar(true);
 		this.oObjectPage.attachEventOnce("subSectionVisibilityChange", function(oEvent) {
 			// Assert
-			var oVisibleSubSections = oEvent.getParameter("visibleSubSections");
+			const oVisibleSubSections = oEvent.getParameter("visibleSubSections");
 			assert.strictEqual(Object.keys(oVisibleSubSections).length, 1,
 				"One visible subSection is reported when visibility of one of the two subSections in the first section is changed to false");
 
@@ -3922,10 +3876,10 @@ function(
 
 	QUnit.test("subSectionVisibilityChange adding new SubSection and Section without IconTabBar", function (assert) {
 		// Arrange
-		var fnDone = assert.async();
+		const fnDone = assert.async();
 		this.oObjectPage.attachEventOnce("subSectionVisibilityChange", function(oEvent) {
 			// Assert
-			var oVisibleSubSections = oEvent.getParameter("visibleSubSections");
+			const oVisibleSubSections = oEvent.getParameter("visibleSubSections");
 			assert.strictEqual(Object.keys(oVisibleSubSections).length, 4,
 				"Four visible subSections are reported when new subSection is added");
 
@@ -3936,7 +3890,7 @@ function(
 
 			this.oObjectPage.attachEventOnce("subSectionVisibilityChange", function(oEvent) {
 				// Assert
-				var oVisibleSubSections = oEvent.getParameter("visibleSubSections");
+				const oVisibleSubSections = oEvent.getParameter("visibleSubSections");
 				assert.strictEqual(Object.keys(oVisibleSubSections).length, 5,
 					"Five visible subSections are reported when new Section with one subSection is added");
 
@@ -3953,13 +3907,13 @@ function(
 
 	QUnit.test("subSectionVisibilityChange adding new SubSection and Section with IconTabBar", function (assert) {
 		// Arrange
-		var fnDone = assert.async(),
-			oSpy;
+		const fnDone = assert.async();
+		let oSpy;
 
 		this.oObjectPage.setUseIconTabBar(true);
 		this.oObjectPage.attachEventOnce("subSectionVisibilityChange", function(oEvent) {
 			// Assert
-			var oVisibleSubSections = oEvent.getParameter("visibleSubSections");
+			const oVisibleSubSections = oEvent.getParameter("visibleSubSections");
 			assert.strictEqual(Object.keys(oVisibleSubSections).length, 3,
 				"Three visible subSections are reported when new visible subSection is added to the selected section");
 
@@ -3985,8 +3939,9 @@ function(
 	QUnit.module("ObjectPage landmarkInfo API");
 
 	QUnit.test("ObjectPage landmark info is set correctly", async function(assert) {
-		var oObjectPage = helpers.generateObjectPageWithContent(oFactory, 3, false, true),
-			oLandmarkInfo = new ObjectPageAccessibleLandmarkInfo({
+		assert.expect(27);
+		const oObjectPage = helpers.generateObjectPageWithContent(oFactory, 3, false, true);
+		let oLandmarkInfo = new ObjectPageAccessibleLandmarkInfo({
 				rootRole: "Region",
 				rootLabel: "Root",
 				contentRole: "Main",
@@ -4062,20 +4017,21 @@ function(
 	});
 
 	QUnit.test("ObjectPage landmark info aria-label is applied to dynamically shown anchor bar", async function(assert) {
-	var oObjectPage = helpers.generateObjectPageWithContent(oFactory, 1, true),
-		oLandmarkInfo = new ObjectPageAccessibleLandmarkInfo({
+	assert.expect(5);
+	const oObjectPage = helpers.generateObjectPageWithContent(oFactory, 1, true);
+	const oLandmarkInfo = new ObjectPageAccessibleLandmarkInfo({
 			navigationRole: "Navigation",
 			navigationLabel: "Custom Navigation Label"
-		}),
-		oSubSection = oFactory.getSubSection(1, oFactory.getBlocks()),
-		oNewSection = oFactory.getSection(2, null, oSubSection);
+		});
+	const oSubSection = oFactory.getSubSection(1, oFactory.getBlocks());
+	const oNewSection = oFactory.getSection(2, null, oSubSection);
 
 	oObjectPage.setLandmarkInfo(oLandmarkInfo);
 	oObjectPage.placeAt('qunit-fixture');
 	await nextUIUpdate();
 
 	// Initially with 1 section, anchor bar exists but is empty
-	var oAnchorBar = oObjectPage.getAggregation("_anchorBar");
+	const oAnchorBar = oObjectPage.getAggregation("_anchorBar");
 	assert.ok(oAnchorBar, "Anchor bar aggregation exists.");
 	assert.strictEqual(oAnchorBar.getItems().length, 0, "Anchor bar is empty with only one section.");
 
@@ -4086,7 +4042,7 @@ function(
 	// Now anchor bar should be populated and have the correct aria-label
 	assert.strictEqual(oAnchorBar.getItems().length, 2, "Anchor bar now has items after adding second section.");
 
-	var $anchorBar = oAnchorBar.$();
+	const $anchorBar = oAnchorBar.$();
 	assert.strictEqual($anchorBar.attr("role"), "navigation", "Navigation role is set correctly on dynamically shown anchor bar.");
 	assert.strictEqual($anchorBar.attr("aria-label"), "Custom Navigation Label", "Navigation label is set correctly on dynamically shown anchor bar.");
 
@@ -4136,8 +4092,8 @@ function(
 		assert.expect(3);
 
 		// Arrange
-		var oObjectPage = this.oObjectPage,
-			done = assert.async();
+		const oObjectPage = this.oObjectPage;
+		const done = assert.async();
 		this.oObjectPage.attachEventOnce("headerContentPinnedStateChange", function (oEvent) {
 
 			// Assert
@@ -4158,8 +4114,8 @@ function(
 		assert.expect(3);
 
 		// Arrange
-		var oObjectPage = this.oObjectPage,
-			done = assert.async();
+		const oObjectPage = this.oObjectPage;
+		const done = assert.async();
 		this.oObjectPage.attachEventOnce("headerContentPinnedStateChange", function (oEvent) {
 
 			// Assert
@@ -4177,9 +4133,9 @@ function(
 	QUnit.test("The headerContentPinned property is preserved when screen is resized", function (assert) {
 
 		// Arrange
-		var oObjectPage = this.oObjectPage,
-			done = assert.async(),
-			vOriginalHeight = jQuery("#qunit-fixture").height();
+		const oObjectPage = this.oObjectPage;
+		const done = assert.async();
+		const vOriginalHeight = jQuery("#qunit-fixture").height();
 
 		assert.expect(3);
 
@@ -4215,7 +4171,8 @@ function(
 	});
 
 	QUnit.test("Store scroll location, when Object page DOM is not visible on the document on onBeforeRendering", async function(assert) {
-		var oParentNode = document.getElementById("content");
+		assert.expect(1);
+		const oParentNode = document.getElementById("content");
 
 		//Hiding parent element
 		this.oObjectPage.placeAt("content");
@@ -4239,7 +4196,7 @@ function(
 	});
 
 	QUnit.test("breakpointChange event is fired on resize", function(assert) {
-		var oEventSpy = this.spy();
+		const oEventSpy = this.spy();
 
 		// Attach event handler
 		this.oObjectPage.attachBreakpointChange(oEventSpy);
@@ -4255,13 +4212,13 @@ function(
 		assert.strictEqual(oEventSpy.callCount, 1, "Event was fired exactly once");
 
 		// Verify event parameters
-		var oParams = oEventSpy.getCall(0).args[0].getParameters();
+		const oParams = oEventSpy.getCall(0).args[0].getParameters();
 		assert.strictEqual(oParams.currentRange, ObjectPageLayoutMediaRange.Phone, "currentRange is 'Phone'");
 		assert.strictEqual(oParams.currentWidth, 400, "currentWidth is 400px");
 	});
 
 	QUnit.test("breakpointChange event provides correct range values", function(assert) {
-		var oEventSpy = this.spy();
+		const oEventSpy = this.spy();
 
 		this.oObjectPage.attachBreakpointChange(oEventSpy);
 
@@ -4291,7 +4248,7 @@ function(
 	});
 
 	function checkObjectExists(sSelector) {
-		var oObject = jQuery(sSelector);
+		const oObject = jQuery(sSelector);
 		return oObject.length !== 0;
 	}
 

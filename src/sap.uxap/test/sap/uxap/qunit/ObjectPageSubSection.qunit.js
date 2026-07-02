@@ -28,9 +28,9 @@ sap.ui.define([
 function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler, KeyCodes, Log, ObjectPageDynamicHeaderTitle, ObjectPageSection, ObjectPageSectionBase, ObjectPageSubSectionClass, BlockBase, ObjectPageLayout, library, App, Button, Label, Panel, Text, Title, HTML, JSONModel) {
 	"use strict";
 
-	var TitleLevel = coreLibrary.TitleLevel;
+	const TitleLevel = coreLibrary.TitleLevel;
 
-	var aStandardModeConfig = [{
+	const aStandardModeConfig = [{
 		"configString": "a-1",
 		"expectedBlockConfig": [[12, 6, 8, 9, false, false, false, false], [12, 6, 4, 3, false, false, false, false]]
 	}, {
@@ -198,8 +198,8 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	}, {
 		"configString": "a-3-a-2-a-1",
 		"expectedBlockConfig": [[12, 12, 12, 3, false, false, false, false], [12, 12, 12, 9, false, true, true, false], [12, 12, 4, 3, false, true, true, true], [12, 12, 8, 6, false, true, false, false], [12, 6, 8, 3, false, true, true, false], [12, 6, 4, 3, false, false, false, true]]
-	}],
-	aTwoColumnInLConfig = [{
+	}];
+	const aTwoColumnInLConfig = [{
 		"configString": "a-1",
 		"expectedBlockConfig": [[12, 6, 6, 9, false, false, false, false], [12, 6, 6, 3, false, false, false, false]]
 	}, {
@@ -367,8 +367,8 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	}, {
 		"configString": "a-3-a-2-a-1",
 		"expectedBlockConfig": [[12, 12, 12, 3, false, false, false, false], [12, 12, 12, 9, false, true, true, false], [12, 12, 12, 3, false, true, true, true], [12, 12, 12, 6, false, true, true, false], [12, 6, 6, 3, false, true, true, false], [12, 6, 6, 3, false, false, false, true]]
-	}],
-	aTitleOnTheLeftConfig = [{
+	}];
+	const aTitleOnTheLeftConfig = [{
 		"configString": "a-1",
 		"expectedBlockConfig": [[12, 6, 6, 8, false, false, false, false], [12, 6, 6, 4, false, false, false, false]]
 	}, {
@@ -536,8 +536,8 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	}, {
 		"configString": "a-3-a-2-a-1",
 		"expectedBlockConfig": [[12, 12, 12, 12, false, false, false, false], [12, 12, 12, 12, false, true, true, true], [12, 12, 12, 4, false, true, true, true], [12, 12, 12, 8, false, true, true, false], [12, 6, 6, 8, false, true, true, true], [12, 6, 6, 4, false, false, false, false]]
-	}],
-	aTitleOnTheLeftConfigAndTwoColumnInL = [{
+	}];
+	const aTitleOnTheLeftConfigAndTwoColumnInL = [{
 		"configString": "a-1",
 		"expectedBlockConfig": [[12, 6, 12, 8, false, false, false, false], [12, 6, 12, 4, false, false, true, false]]
 	}, {
@@ -707,11 +707,22 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		"expectedBlockConfig": [[12, 12, 12, 12, false, false, false, false], [12, 12, 12, 12, false, true, true, true], [12, 12, 12, 4, false, true, true, true], [12, 12, 12, 8, false, true, true, false], [12, 6, 12, 8, false, true, true, true], [12, 6, 12, 4, false, false, true, false]]
 	}];
 
-	var ObjectPageSubSection = ObjectPageSubSectionClass.prototype,
-		sConfiguration = "BlockLayout Configuration - ",
-		aPropertyTypes = ["span", "linebreak"],
-		aScreenTypes = ["S", "M", "L", "XL"],
-		oHelpers = {
+	/**
+	 * Returns a Promise that resolves after the ObjectPageLayout fires onAfterRenderingDOMReady.
+	 * @param {sap.uxap.ObjectPageLayout} oOPL
+	 * @returns {Promise<void>}
+	 */
+	function waitForDOMReady(oOPL) {
+		return new Promise((resolve) => {
+			oOPL.attachEventOnce("onAfterRenderingDOMReady", resolve);
+		});
+	}
+
+	const ObjectPageSubSection = ObjectPageSubSectionClass.prototype;
+	const sConfiguration = "BlockLayout Configuration - ";
+	const aPropertyTypes = ["span", "linebreak"];
+	const aScreenTypes = ["S", "M", "L", "XL"];
+	const oHelpers = {
 			getBlock: function (sColumnLayout) {
 				return new BlockBase({
 					columnLayout: sColumnLayout
@@ -725,8 +736,8 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 			},
 			generateLayoutConfigTests: function (sTitleConfig, bUseTwoColumnLayoutL, aModeConfig) {
 				QUnit.test("Generates correct layout Configuration", function (assert) {
-					var oLayoutProviderStub = oHelpers.getLayoutProviderStub(bUseTwoColumnLayoutL),
-						oActualLayout = ObjectPageSubSection._calculateLayoutConfiguration(sTitleConfig, oLayoutProviderStub);
+					const oLayoutProviderStub = oHelpers.getLayoutProviderStub(bUseTwoColumnLayoutL);
+					const oActualLayout = ObjectPageSubSection._calculateLayoutConfiguration(sTitleConfig, oLayoutProviderStub);
 
 					assert.propEqual(oActualLayout, this.oLayoutConfig);
 				});
@@ -743,7 +754,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 				return object["get" + propertyName[0].toUpperCase() + propertyName.slice(1)]();
 			},
 			convertToLayoutObject: function (oLayoutData, aProperties) {
-				var resultObject = {};
+				const resultObject = {};
 				aProperties.forEach(function (sProperty) {
 					resultObject[sProperty] = this.callGetter(oLayoutData, sProperty);
 				}, this);
@@ -751,7 +762,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 				return resultObject;
 			},
 			generateProperties: function (aPropTypes, aScreenTypes) {
-				var aResult = [];
+				const aResult = [];
 
 				aPropTypes.forEach(function (sPropType) {
 					aScreenTypes.forEach(function (sScreenSize) {
@@ -762,7 +773,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 				return aResult;
 			},
 			generateLayoutObject: function (aExpectedResult) {
-				var resultObject = {};
+				const resultObject = {};
 				aExpectedResult.forEach(function (value, iIndex) {
 					resultObject[aProperties[iIndex]] = value;
 				});
@@ -771,19 +782,19 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 			},
 			generateBlockTest: function (oConfigToTest) {
 				QUnit.test(sConfiguration + oConfigToTest.configString, function (assert) {
-					var aBlocks = oHelpers.getBlocksByConfigString(oConfigToTest.configString);
+					const aBlocks = oHelpers.getBlocksByConfigString(oConfigToTest.configString);
 					ObjectPageSubSection._assignLayoutData(aBlocks, this.oLayoutConfig);
 
 					aBlocks.forEach(function (oBlock, iIndex) {
-						var expected = oHelpers.generateLayoutObject(oConfigToTest.expectedBlockConfig[iIndex]),
-							actual = oHelpers.convertToLayoutObject(oBlock.getLayoutData(), aProperties);
+						const expected = oHelpers.generateLayoutObject(oConfigToTest.expectedBlockConfig[iIndex]);
+						const actual = oHelpers.convertToLayoutObject(oBlock.getLayoutData(), aProperties);
 
 						assert.propEqual(actual, expected, "Block " + (iIndex + 1) + " configuration is correct");
 					});
 				});
 			}
-		},
-		aProperties = oHelpers.generateProperties(aPropertyTypes, aScreenTypes);
+	};
+	const aProperties = oHelpers.generateProperties(aPropertyTypes, aScreenTypes);
 
 	QUnit.module("ObjectPageSubSection - FitContainer Height Adaptation", {
 		beforeEach: async function() {
@@ -804,12 +815,12 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("height of single subSection with sapUxAPObjectPageSubSectionFitContainer adjusts with headerTitle adjusments", async function(assert) {
-		var oPage = this.oObjectPage,
-			oSection = this.oObjectPage.getSections()[0],
-			oSubSection = oSection.getSubSections()[0],
-			oBlock = oSubSection.getBlocks()[0],
-			oSpy = this.spy(oSubSection, "_executeAfterNextResizeHandlerChecks"),
-			done = assert.async();
+		const oPage = this.oObjectPage;
+		const oSection = this.oObjectPage.getSections()[0];
+		const oSubSection = oSection.getSubSections()[0];
+		const oBlock = oSubSection.getBlocks()[0];
+		const oSpy = this.spy(oSubSection, "_executeAfterNextResizeHandlerChecks");
+		const done = assert.async();
 
 		assert.expect(3);
 
@@ -827,14 +838,14 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 			assert.ok(oSpy.called, 1, "_executeAfterNextResizeHandlerChecks is called");
 			window.requestAnimationFrame(function () {
 				//check
-				var sHeight = oSubSection._height;
+				const sHeight = oSubSection._height;
 				assert.strictEqual(sHeight, "", "Height is auto when content is bigger than SubSection's height");
 
 				//act
 				oPage.destroyHeaderTitle();
 
 				oPage.attachEventOnce("onAfterRenderingDOMReady", function () {
-					var sNewHeight = oSubSection._height;
+					const sNewHeight = oSubSection._height;
 					assert.ok(sHeight !== sNewHeight, "Fixed height is changed when headerTitle is added/removed");
 
 					done();
@@ -845,104 +856,98 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 
 	QUnit.module("Object Page SubSection - actions aggregation");
 
-	QUnit.test("SubSection action buttons in OverflowToolbar in promoted SubSection", function(assert) {
-		var oActionButton1 = new Button({text: "Button1"}),
-			oActionButton2 = new Button({text: "Button2"}),
-			oSubSection = new ObjectPageSubSectionClass({
+	QUnit.test("SubSection action buttons in OverflowToolbar in promoted SubSection", async function(assert) {
+		const oActionButton1 = new Button({text: "Button1"});
+		const oActionButton2 = new Button({text: "Button2"});
+		const oSubSection = new ObjectPageSubSectionClass({
 				title: "SubSection Title",
 				actions: [oActionButton1],
 				blocks: new Label({text: "Block1" })
-			}),
-			oSection = new ObjectPageSection({
+			});
+		const oSection = new ObjectPageSection({
 				title:"Personal",
 				subSections: [ oSubSection ]
-			}),
-			oObjectPageLayout = new ObjectPageLayout({
+			});
+		const oObjectPageLayout = new ObjectPageLayout({
 					sections: [ oSection ]
-				}),
-			fnDone = assert.async();
+				});
 
 		assert.expect(7);
 		oObjectPageLayout.placeAt('qunit-fixture');
-		oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady", function() {
-			//assert
-			assert.ok(oSubSection._getHeaderToolbar().isA("sap.m.OverflowToolbar"), "OverflowToolbar is created");
-			assert.ok(oSubSection._getHeaderToolbar().getDomRef() !== null, "OverflowToolbar is rendered");
-			// Action button is placed on 2nd position, as the first three items are Title of the Section, title of the SubSection (hidden) and spacer.
-			assert.strictEqual(oSubSection._getHeaderToolbar().getContent()[2], oActionButton1, "Action button is placed at correct position");
-			assert.ok(oActionButton1.getParent() === oSubSection, "Action button is a child of the SubSection");
-			assert.strictEqual(oSubSection._getHeaderToolbar().getContent()[0].getVisible(), true, "Section title is visible");
+		await waitForDOMReady(oObjectPageLayout);
+		//assert
+		assert.ok(oSubSection._getHeaderToolbar().isA("sap.m.OverflowToolbar"), "OverflowToolbar is created");
+		assert.ok(oSubSection._getHeaderToolbar().getDomRef() !== null, "OverflowToolbar is rendered");
+		// Action button is placed on 2nd position, as the first three items are Title of the Section, title of the SubSection (hidden) and spacer.
+		assert.strictEqual(oSubSection._getHeaderToolbar().getContent()[2], oActionButton1, "Action button is placed at correct position");
+		assert.ok(oActionButton1.getParent() === oSubSection, "Action button is a child of the SubSection");
+		assert.strictEqual(oSubSection._getHeaderToolbar().getContent()[0].getVisible(), true, "Section title is visible");
 
-			//act
-			oSubSection.insertAction(oActionButton2, 0);
+		//act
+		oSubSection.insertAction(oActionButton2, 0);
 
-			//assert
-			assert.strictEqual(oSubSection._getHeaderToolbar().getContent()[2], oActionButton2, "Action button is inserted in correct index in the OverflowToolbar");
-			assert.ok(oActionButton2.getParent() === oSubSection, "Action button is a child of the SubSection");
+		//assert
+		assert.strictEqual(oSubSection._getHeaderToolbar().getContent()[2], oActionButton2, "Action button is inserted in correct index in the OverflowToolbar");
+		assert.ok(oActionButton2.getParent() === oSubSection, "Action button is a child of the SubSection");
 
-			oObjectPageLayout.destroy();
-			fnDone();
-		});
+		oObjectPageLayout.destroy();
 	});
 
-	QUnit.test("SubSection action buttons in OverflowToolbar in non-promoted SubSection", function(assert) {
-		var oActionButton1 = new Button({text: "Button1"}),
-			oActionButton2 = new Button({text: "Button2"}),
-			oSubSection = new ObjectPageSubSectionClass({
+	QUnit.test("SubSection action buttons in OverflowToolbar in non-promoted SubSection", async function(assert) {
+		const oActionButton1 = new Button({text: "Button1"});
+		const oActionButton2 = new Button({text: "Button2"});
+		const oSubSection = new ObjectPageSubSectionClass({
 				title: "SubSection Title",
 				actions: [oActionButton1],
 				blocks: new Label({text: "Block1" })
-			}),
-			oSubSection2 = new ObjectPageSubSectionClass({
+			});
+		const oSubSection2 = new ObjectPageSubSectionClass({
 				blocks: new Label({text: "Block1" })
-			}),
-			oSection = new ObjectPageSection({
+			});
+		const oSection = new ObjectPageSection({
 				title:"Personal",
 				subSections: [ oSubSection, oSubSection2 ]
-			}),
-			oObjectPageLayout = new ObjectPageLayout({
+			});
+		const oObjectPageLayout = new ObjectPageLayout({
 					sections: [ oSection ]
-				}),
-			fnDone = assert.async();
+				});
 
 		assert.expect(6);
 		oObjectPageLayout.placeAt('qunit-fixture');
-		oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady", function() {
-			//assert
-			assert.ok(oSubSection._getHeaderToolbar().isA("sap.m.OverflowToolbar"), "OverflowToolbar is created");
-			assert.ok(oSubSection._getHeaderToolbar().getDomRef() !== null, "OverflowToolbar is rendered");
-			assert.ok(oSubSection.$().find(oSubSection._getHeaderToolbar().getDomRef()), "Toolbar is rendered in the SubSection header");
-			// Action button is placed on 3rd position, as the first three items are Title of the Section, title of the SubSection (hidden) and spacer.
-			assert.strictEqual(oSubSection._getHeaderToolbar().getContent()[2], oActionButton1, "Action button is placed at correct position");
-			assert.strictEqual(oSubSection._getHeaderToolbar().getContent()[0].getVisible(), true, "SubSection title is visible");
+		await waitForDOMReady(oObjectPageLayout);
+		//assert
+		assert.ok(oSubSection._getHeaderToolbar().isA("sap.m.OverflowToolbar"), "OverflowToolbar is created");
+		assert.ok(oSubSection._getHeaderToolbar().getDomRef() !== null, "OverflowToolbar is rendered");
+		assert.ok(oSubSection.$().find(oSubSection._getHeaderToolbar().getDomRef()), "Toolbar is rendered in the SubSection header");
+		// Action button is placed on 3rd position, as the first three items are Title of the Section, title of the SubSection (hidden) and spacer.
+		assert.strictEqual(oSubSection._getHeaderToolbar().getContent()[2], oActionButton1, "Action button is placed at correct position");
+		assert.strictEqual(oSubSection._getHeaderToolbar().getContent()[0].getVisible(), true, "SubSection title is visible");
 
-			//act
-			oSubSection.insertAction(oActionButton2, 0);
+		//act
+		oSubSection.insertAction(oActionButton2, 0);
 
-			//assert
-			assert.strictEqual(oSubSection._getHeaderToolbar().getContent()[2], oActionButton2, "Action button is inserted in correct index in the OverflowToolbar");
+		//assert
+		assert.strictEqual(oSubSection._getHeaderToolbar().getContent()[2], oActionButton2, "Action button is inserted in correct index in the OverflowToolbar");
 
-			oObjectPageLayout.destroy();
-			fnDone();
-		});
+		oObjectPageLayout.destroy();
 	});
 
 	QUnit.test("Remove (all) action/Index of action", function(assert) {
-		var oActionButton1 = new Button({text: "Button1"}),
-			oActionButton2 = new Button({text: "Button2"}),
-			oSubSection = new ObjectPageSubSectionClass({
+		const oActionButton1 = new Button({text: "Button1"});
+		const oActionButton2 = new Button({text: "Button2"});
+		const oSubSection = new ObjectPageSubSectionClass({
 				title: "SubSection Title",
 				actions: [oActionButton1, oActionButton2],
 				blocks: new Label({text: "Block1" })
-			}),
-			oSubSection2 = new ObjectPageSubSectionClass({
+			});
+		const oSubSection2 = new ObjectPageSubSectionClass({
 				blocks: new Label({text: "Block1" })
-			}),
-			oSection = new ObjectPageSection({
+			});
+		const oSection = new ObjectPageSection({
 				title:"Personal",
 				subSections: [ oSubSection, oSubSection2 ]
-			}),
-			oObjectPageLayout = new ObjectPageLayout({
+			});
+		const oObjectPageLayout = new ObjectPageLayout({
 					sections: [ oSection ]
 				});
 
@@ -968,18 +973,18 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("destroyActions destroys only actions, not Title and ToolbarSpacer", function(assert) {
-		var oActionButton1 = new Button({text: "Button1"}),
-			oActionButton2 = new Button({text: "Button2"}),
-			oSubSection = new ObjectPageSubSectionClass({
+		const oActionButton1 = new Button({text: "Button1"});
+		const oActionButton2 = new Button({text: "Button2"});
+		const oSubSection = new ObjectPageSubSectionClass({
 				title: "SubSection Title",
 				actions: [oActionButton1, oActionButton2],
 				blocks: new Label({text: "Block1" })
-			}),
-			oSection = new ObjectPageSection({
+			});
+		const oSection = new ObjectPageSection({
 				title:"Personal",
 				subSections: [ oSubSection ]
-			}),
-			oObjectPageLayout = new ObjectPageLayout({
+			});
+		const oObjectPageLayout = new ObjectPageLayout({
 				sections: [ oSection ]
 			});
 
@@ -1001,21 +1006,21 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("destroyActions calls _postProcessAction for each action", function(assert) {
-		var oActionButton1 = new Button({text: "Button1"}),
-			oActionButton2 = new Button({text: "Button2"}),
-			oSubSection = new ObjectPageSubSectionClass({
+		const oActionButton1 = new Button({text: "Button1"});
+		const oActionButton2 = new Button({text: "Button2"});
+		const oSubSection = new ObjectPageSubSectionClass({
 				title: "SubSection Title",
 				actions: [oActionButton1, oActionButton2],
 				blocks: new Label({text: "Block1" })
-			}),
-			oSection = new ObjectPageSection({
+			});
+		const oSection = new ObjectPageSection({
 				title:"Personal",
 				subSections: [ oSubSection ]
-			}),
-			oObjectPageLayout = new ObjectPageLayout({
+			});
+		const oObjectPageLayout = new ObjectPageLayout({
 				sections: [ oSection ]
-			}),
-			oPostProcessSpy = this.spy(oSubSection, "_postProcessAction");
+			});
+		const oPostProcessSpy = this.spy(oSubSection, "_postProcessAction");
 
 		//act
 		oSubSection.destroyActions();
@@ -1029,24 +1034,24 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("Show action after subSection rendering", async function(assert) {
-		var oActionButton = new Button({text: "Button1", visible: false}),
-			oSubSection = new ObjectPageSubSectionClass({
+		assert.expect(2);
+		const oActionButton = new Button({text: "Button1", visible: false});
+		const oSubSection = new ObjectPageSubSectionClass({
 				title: "SubSection Title",
 				showTitle: false,
 				actions: [oActionButton],
 				blocks: new Label({text: "Block1" })
-			}),
-			oSection = new ObjectPageSection({
+			});
+		const oSection = new ObjectPageSection({
 				title:"Personal",
 				subSections: [ oSubSection ]
-			}),
-			oObjectPageLayout = new ObjectPageLayout({
+			});
+		const oObjectPageLayout = new ObjectPageLayout({
 				sections: [ oSection ]
-			}),
-			fnIsSubSectionHeaderVisible = function() {
+			});
+		const fnIsSubSectionHeaderVisible = function() {
 				return !!oSubSection.$().find(".sapUxAPObjectPageSubSectionHeader").length;
-			},
-			fnDone = assert.async();
+			};
 
 		oObjectPageLayout.placeAt('qunit-fixture');
 		await nextUIUpdate();
@@ -1058,7 +1063,6 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		await nextUIUpdate();
 
 		assert.ok(fnIsSubSectionHeaderVisible(), "SubSection header is visible");
-		fnDone();
 
 		oObjectPageLayout.destroy();
 	});
@@ -1066,11 +1070,11 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	QUnit.module("Object Page SubSection - blocks aggregation");
 
 	QUnit.test("Generates correct layout Configuration", function (assert) {
-		var oSubSection = oHelpers.getSubSection(),
-			oBlock1 = oHelpers.getBlock(),
-			oBlock2 = oHelpers.getBlock(),
-			iBlockCount = 0,
-			iBlock2ExpectedIndex = 1;
+		const oSubSection = oHelpers.getSubSection();
+		const oBlock1 = oHelpers.getBlock();
+		const oBlock2 = oHelpers.getBlock();
+		const iBlock2ExpectedIndex = 1;
+		let iBlockCount = 0;
 
 		// Assert default.
 		assert.equal(oSubSection.getBlocks().length, iBlockCount, "There are: " + iBlockCount + " blocks.");
@@ -1100,29 +1104,27 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("Layout is updated when visibility of a Block is changed", async function(assert) {
-		var oSubSection = oHelpers.getSubSection(),
-			oObjectPageLayout = new ObjectPageLayout({
+		assert.expect(4);
+		const oSubSection = oHelpers.getSubSection();
+		const oObjectPageLayout = new ObjectPageLayout({
 				sections: new ObjectPageSection({
 					subSections: [
 						oSubSection
 					]
 				})
-			}),
-			oBlock1 = oHelpers.getBlock(),
-			oBlock2 = oHelpers.getBlock(),
-			oApplyLayoutSpy = this.spy(oSubSection, "_applyLayout"),
-			oSpyObserverCallback = this.spy(oSubSection._oBlocksObserver, "_fnCallback"),
-			oInnerGrid,
-			oGridAddAggregationSpy;
-
+			});
+		const oBlock1 = oHelpers.getBlock();
+		const oBlock2 = oHelpers.getBlock();
+		const oApplyLayoutSpy = this.spy(oSubSection, "_applyLayout");
+		const oSpyObserverCallback = this.spy(oSubSection._oBlocksObserver, "_fnCallback");
 		oSubSection.addBlock(oBlock1);
 		oSubSection.addBlock(oBlock2);
 
 		oObjectPageLayout.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		oInnerGrid = oSubSection._getGrid();
-		oGridAddAggregationSpy = this.spy(oInnerGrid, "addAggregation");
+		const oInnerGrid = oSubSection._getGrid();
+		const oGridAddAggregationSpy = this.spy(oInnerGrid, "addAggregation");
 
 		// Act: change visibility of one of the blocks
 		oBlock2.setVisible(false);
@@ -1145,13 +1147,13 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("Layout is updated when visibility of unstashed block is changed", function (assert) {
-		var oSubSection,
-			oInnerGrid,
-			oBlock,
-			oGridAddAggregationSpy,
-			oApplyLayoutSpy,
-			oObserverCallbackSpy,
-			done = assert.async();
+		let oSubSection;
+		let oInnerGrid;
+		let oBlock;
+		let oGridAddAggregationSpy;
+		let oApplyLayoutSpy;
+		let oObserverCallbackSpy;
+		const done = assert.async();
 
 		XMLView.create({
 			id: "UxAP-12-ObjectPageSubSectionStashing",
@@ -1193,7 +1195,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 
 
 	QUnit.test("removeAggregation", function (assert) {
-		var sXmlView = '<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:uxap="sap.uxap" xmlns:m="sap.m">' +
+		const sXmlView = '<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:uxap="sap.uxap" xmlns:m="sap.m">' +
 							'<uxap:ObjectPageLayout id="page">' +
 								'<uxap:headerTitle>' +
 									'<uxap:ObjectPageHeader objectTitle="Title" objectSubtitle="Subtitle">' +
@@ -1231,8 +1233,8 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 			definition: sXmlView
 		}).then(async function(oView) {
 
-			var oSubSection = oView.byId("subSection"),
-				oButton = oView.byId("buttonToRemove");
+			const oSubSection = oView.byId("subSection");
+			const oButton = oView.byId("buttonToRemove");
 
 			oView.placeAt("qunit-fixture");
 			await nextUIUpdate();
@@ -1241,7 +1243,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 			assert.strictEqual(oSubSection._getGrid().getContent().length, 2, "subSection grid has two blocks");
 
 			// act
-			var oResult = oSubSection.removeAggregation("blocks", oButton);
+			const oResult = oSubSection.removeAggregation("blocks", oButton);
 
 			// assert
 			assert.strictEqual(oResult, oButton, "removeAggregation returns the removed control");
@@ -1253,10 +1255,11 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("addAggregation", async function(assert) {
-		var oSubSection = new ObjectPageSubSectionClass({
+		assert.expect(4);
+		const oSubSection = new ObjectPageSubSectionClass({
 				blocks: [new Text({text: "sample"})]
-			}),
-			opl = new ObjectPageLayout({
+			});
+		const opl = new ObjectPageLayout({
 				sections: [
 					new ObjectPageSection({
 						subSections: [
@@ -1264,10 +1267,10 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 						]
 					})
 				]
-			}),
-		oSpy = this.spy(Log, "error"),
-		oSetParentSpy,
-		done = assert.async();
+			});
+		const oSpy = this.spy(Log, "error");
+		let oSetParentSpy;
+		const done = assert.async();
 
 		opl.addEventDelegate({
 			onBeforeRendering: function () {
@@ -1295,12 +1298,13 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("No duplicate ID error when bound blocks aggregation shrinks then grows", async function(assert) {
+		assert.expect(5);
 		// Setup: Create ObjectPageSubSection with template and model binding
-		var oModel = new JSONModel({
+		const oModel = new JSONModel({
 			blocks: Array(8).fill({})  // Start with 8 items
 		});
 
-		var oSubSection = new ObjectPageSubSectionClass({
+		const oSubSection = new ObjectPageSubSectionClass({
 			id: "testSubSection",
 			blocks: {
 				path: 'testModel>/blocks',
@@ -1309,7 +1313,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		});
 		oSubSection.setModel(oModel, "testModel");
 
-		var oObjectPageLayout = new ObjectPageLayout({
+		const oObjectPageLayout = new ObjectPageLayout({
 			sections: new ObjectPageSection({
 				subSections: [oSubSection]
 			})
@@ -1349,11 +1353,11 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	QUnit.module("Object Page SubSection - moreBlocks aggregation");
 
 	QUnit.test("Generates correct layout Configuration", function (assert) {
-		var oSubSection = oHelpers.getSubSection(),
-			oBlock1 = oHelpers.getBlock(),
-			oBlock2 = oHelpers.getBlock(),
-			iBlockCount = 0,
-			iBlock2ExpectedIndex = 1;
+		const oSubSection = oHelpers.getSubSection();
+		const oBlock1 = oHelpers.getBlock();
+		const oBlock2 = oHelpers.getBlock();
+		const iBlock2ExpectedIndex = 1;
+		let iBlockCount = 0;
 
 		// Assert default.
 		assert.equal(oSubSection.getMoreBlocks().length, iBlockCount, "There are: " + iBlockCount + " blocks.");
@@ -1379,44 +1383,41 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		oSubSection.destroy();
 	});
 
-	QUnit.test("Show More button not shown when there are no visible moreBlocks", function (assert) {
-		var oLabel1 = new Label({text: "Block1" }),
-			oSubSection = new ObjectPageSubSectionClass({
+	QUnit.test("Show More button not shown when there are no visible moreBlocks", async function (assert) {
+		const oLabel1 = new Label({text: "Block1" });
+		const oSubSection = new ObjectPageSubSectionClass({
 				title: "SubSection Title",
 				blocks: new Label({text: "Block1" }),
 				moreBlocks: [oLabel1]
-			}),
-			oSection = new ObjectPageSection({
+			});
+		const oSection = new ObjectPageSection({
 				title:"Personal",
 				subSections: [ oSubSection ]
-			}),
-			oObjectPageLayout = new ObjectPageLayout({
+			});
+		const oObjectPageLayout = new ObjectPageLayout({
 				sections: [ oSection ]
-			}),
-			fnDone = assert.async();
+			});
 
 		assert.expect(4);
 		oObjectPageLayout.placeAt('qunit-fixture');
-		oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady", async function() {
-			//assert
-			assert.ok(oSubSection.$().hasClass("sapUxAPObjectPageSubSectionWithSeeMore"),
-				"SubSection has class sapUxAPObjectPageSubSectionWithSeeMore when there are visible moreBlocks");
-			assert.ok(oSubSection._getSeeMoreButton().$().hasClass("sapUxAPSubSectionSeeMoreButtonVisible"),
-				"Show More button is visible when there are visible moreBlocks");
+		await waitForDOMReady(oObjectPageLayout);
+		//assert
+		assert.ok(oSubSection.$().hasClass("sapUxAPObjectPageSubSectionWithSeeMore"),
+			"SubSection has class sapUxAPObjectPageSubSectionWithSeeMore when there are visible moreBlocks");
+		assert.ok(oSubSection._getSeeMoreButton().$().hasClass("sapUxAPSubSectionSeeMoreButtonVisible"),
+			"Show More button is visible when there are visible moreBlocks");
 
-			// act
-			oLabel1.setVisible(false);
-			await nextUIUpdate();
+		// act
+		oLabel1.setVisible(false);
+		await nextUIUpdate();
 
-			// assert
-			assert.notOk(oSubSection.$().hasClass("sapUxAPObjectPageSubSectionWithSeeMore"),
-				"SubSection does not have class sapUxAPObjectPageSubSectionWithSeeMore when there are no visible moreBlocks");
-			assert.notOk(oSubSection._getSeeMoreButton().$().hasClass("sapUxAPSubSectionSeeMoreButtonVisible"),
-				"Show More button is not visible when there are no visible moreBlocks");
+		// assert
+		assert.notOk(oSubSection.$().hasClass("sapUxAPObjectPageSubSectionWithSeeMore"),
+			"SubSection does not have class sapUxAPObjectPageSubSectionWithSeeMore when there are no visible moreBlocks");
+		assert.notOk(oSubSection._getSeeMoreButton().$().hasClass("sapUxAPSubSectionSeeMoreButtonVisible"),
+			"Show More button is not visible when there are no visible moreBlocks");
 
-			oObjectPageLayout.destroy();
-			fnDone();
-		});
+		oObjectPageLayout.destroy();
 	});
 
 	QUnit.module("Object Page SubSection - Managing Block Layouts in Standard Mode", {
@@ -1454,7 +1455,8 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	QUnit.module("Object Page SubSection - subSectionLayout prop");
 
 	QUnit.test("SubSection Header is with title on the LEFT", async function(assert) {
-		var oObjectPageLayout = new ObjectPageLayout({
+		assert.expect(1);
+		const oObjectPageLayout = new ObjectPageLayout({
 				subSectionLayout: library.ObjectPageSubSectionLayout.TitleOnLeft,
 				sections: [
 					new ObjectPageSection({
@@ -1471,8 +1473,8 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 						]
 					})
 				]
-			}),
-			oSubSection = oObjectPageLayout.getSections()[0].getSubSections()[0];
+			});
+		const oSubSection = oObjectPageLayout.getSections()[0].getSubSections()[0];
 
 
 		oObjectPageLayout.placeAt('qunit-fixture');
@@ -1485,7 +1487,8 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("SubSection Header is with title on TOP", async function(assert) {
-		var oObjectPageLayout = new ObjectPageLayout({
+		assert.expect(1);
+		const oObjectPageLayout = new ObjectPageLayout({
 					sections: [
 						new ObjectPageSection({
 							title:"Personal",
@@ -1501,8 +1504,8 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 							]
 						})
 					]
-				}),
-				oSubSection = oObjectPageLayout.getSections()[0].getSubSections()[0];
+				});
+		const oSubSection = oObjectPageLayout.getSections()[0].getSubSections()[0];
 
 
 		oObjectPageLayout.placeAt('qunit-fixture');
@@ -1515,9 +1518,9 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("SubSection action buttons visibility", async function(assert) {
-		var oActionButton1 = new Button({text: "Invisible", visible: false}),
-			oActionButton2 = new Button({text: "Invisible", visible: false}),
-			oObjectPageLayout = new ObjectPageLayout({
+		const oActionButton1 = new Button({text: "Invisible", visible: false});
+		const oActionButton2 = new Button({text: "Invisible", visible: false});
+		const oObjectPageLayout = new ObjectPageLayout({
 					sections: [
 						new ObjectPageSection({
 							title:"Personal",
@@ -1534,32 +1537,29 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 							]
 						})
 					]
-				}),
-				oSubSection1 = oObjectPageLayout.getSections()[0].getSubSections()[0],
-				oSubSection2 = oObjectPageLayout.getSections()[0].getSubSections()[1],
-				fnDone = assert.async();
+				});
+		const oSubSection1 = oObjectPageLayout.getSections()[0].getSubSections()[0];
+		const oSubSection2 = oObjectPageLayout.getSections()[0].getSubSections()[1];
 
 		assert.expect(4);
 		oObjectPageLayout.placeAt('qunit-fixture');
 		await nextUIUpdate();
 
 		//assert
-		oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady", async function() {
-			assert.notOk(oSubSection1.$("header").length, "SubSection header with no visisble title and actions should be invisible");
-			assert.ok(oSubSection2.$("header").length, "SubSection header with title and no visible actions should be visible");
+		await waitForDOMReady(oObjectPageLayout);
+		assert.notOk(oSubSection1.$("header").length, "SubSection header with no visisble title and actions should be invisible");
+		assert.ok(oSubSection2.$("header").length, "SubSection header with title and no visible actions should be visible");
 
-			//act
-			oActionButton1.setVisible(true);
-			oSubSection2.setTitle("");
-			await nextUIUpdate();
+		//act
+		oActionButton1.setVisible(true);
+		oSubSection2.setTitle("");
+		await nextUIUpdate();
 
-			//assert
-			assert.ok(oSubSection1.$("header").length, "SubSection header with visible actions should become visible");
-			assert.notOk(oSubSection2.$("header").length, "SubSection header with no visisble title and actions should become invisible");
+		//assert
+		assert.ok(oSubSection1.$("header").length, "SubSection header with visible actions should become visible");
+		assert.notOk(oSubSection2.$("header").length, "SubSection header with no visisble title and actions should become invisible");
 
-			oObjectPageLayout.destroy();
-			fnDone();
-		});
+		oObjectPageLayout.destroy();
 	});
 
 	QUnit.module("Object Page SubSection media classes", {
@@ -1603,9 +1603,9 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 
 	QUnit.test(".sapUxAPSubSectionSeeMoreContainer class is toggled correctly", function(assert) {
 		// Arrange
-		var oSubSection = this.oObjectPageLayout.getSections()[1].getSubSections()[0],
-			oChildrenSpy = this.spy($.fn, "children"),
-			oSectionBaseSpy = this.spy(ObjectPageSectionBase.prototype, "_updateShowHideState");
+		const oSubSection = this.oObjectPageLayout.getSections()[1].getSubSections()[0];
+		const oChildrenSpy = this.spy($.fn, "children");
+		const oSectionBaseSpy = this.spy(ObjectPageSectionBase.prototype, "_updateShowHideState");
 
 		// Act
 		oSubSection._updateShowHideState(true);
@@ -1624,8 +1624,9 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test(".sapUxAPObjectPageSubSectionWithSeeMore is applied to SubSections correctly", async function(assert) {
+		assert.expect(1);
 		// Arrange
-		var oSubSection = this.oObjectPageLayout.getSections()[1].getSubSections()[0];
+		const oSubSection = this.oObjectPageLayout.getSections()[1].getSubSections()[0];
 
 		// Act
 		oSubSection.addMoreBlock(oHelpers.getBlock());
@@ -1638,11 +1639,11 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 
 	QUnit.test("Content scrollTop is preserved on section rerendering", function(assert) {
 		// note that selected section is the last visible one
-		var oLastSubSection = this.oObjectPageLayout.getSections()[1].getSubSections()[0],
-		oObjectPageLayout = this.oObjectPageLayout,
-		done = assert.async(),
-		oScrollToSectionSpy = this.spy(oObjectPageLayout, "scrollToSection"),
-		oSelectedSection;
+		const oLastSubSection = this.oObjectPageLayout.getSections()[1].getSubSections()[0];
+		const oObjectPageLayout = this.oObjectPageLayout;
+		const done = assert.async();
+		const oScrollToSectionSpy = this.spy(oObjectPageLayout, "scrollToSection");
+		let oSelectedSection;
 
 		assert.expect(1);
 
@@ -1686,18 +1687,17 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 
 	QUnit.test("No error when accessing a property of parent ObjectPage", function(assert) {
 		// note that selected section is the last visible one
-		var oSection = this.oObjectPageLayout.getSections()[0],
-			oSubSection;
+		const oSection = this.oObjectPageLayout.getSections()[0];
 
 		//act
-		oSubSection = oSection.removeSubSection(0);
+		const oSubSection = oSection.removeSubSection(0);
 
 		assert.ok(!oSubSection._getUseTitleOnTheLeft(), "falsy value is returned");
 	});
 
 	QUnit.test("sParentAggregationName matches parent", function(assert) {
-		var oSection = this.oObjectPageLayout.getSections()[0],
-			oSubSection = oSection.getSubSections()[0];
+		const oSection = this.oObjectPageLayout.getSections()[0];
+		const oSubSection = oSection.getSubSections()[0];
 
 		assert.equal(oSubSection.sParentAggregationName, "subSections", "the parent aggregation name matches the public parent");
 	});
@@ -1719,11 +1719,12 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
     QUnit.test("Test aria-labelledby attribute", async function(assert) {
+		assert.expect(3);
 		// Arrange
-		var oSubSectionWithoutTitle = this.ObjectPageSectionView.byId("subsection6"),
-		sSubSectionWithoutTitleAriaLabelledBy = oSubSectionWithoutTitle.$().attr("aria-labelledby"),
-		oSubSectionWithTitle = this.ObjectPageSectionView.byId("subsection1"),
-		sSubSectionWithTitleAriaLabelledBy = oSubSectionWithTitle.$().attr("aria-labelledby");
+		const oSubSectionWithoutTitle = this.ObjectPageSectionView.byId("subsection6");
+		const sSubSectionWithoutTitleAriaLabelledBy = oSubSectionWithoutTitle.$().attr("aria-labelledby");
+		const oSubSectionWithTitle = this.ObjectPageSectionView.byId("subsection1");
+		let sSubSectionWithTitleAriaLabelledBy = oSubSectionWithTitle.$().attr("aria-labelledby");
 
 		// Assert
 		assert.strictEqual(sSubSectionWithoutTitleAriaLabelledBy,
@@ -1752,9 +1753,10 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("Test tabindex attribute", async function(assert) {
+		assert.expect(4);
 		// Arrange
-		var oSubSectionWithoutTitle = this.ObjectPageSectionView.byId("subsection6"),
-		oSubSectionWithTitle = this.ObjectPageSectionView.byId("subsection1");
+		const oSubSectionWithoutTitle = this.ObjectPageSectionView.byId("subsection6");
+		const oSubSectionWithTitle = this.ObjectPageSectionView.byId("subsection1");
 
 		// Assert
 		assert.strictEqual(oSubSectionWithoutTitle.$().attr("tabindex"), undefined, "Subsections without titles should not have tabindex attribute");
@@ -1776,9 +1778,10 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("Test role attribute", async function(assert) {
+		assert.expect(4);
 		// Arrange
-		var oSubSectionWithoutTitle = this.ObjectPageSectionView.byId("subsection6"),
-		oSubSectionWithTitle = this.ObjectPageSectionView.byId("subsection1");
+		const oSubSectionWithoutTitle = this.ObjectPageSectionView.byId("subsection6");
+		const oSubSectionWithTitle = this.ObjectPageSectionView.byId("subsection1");
 
 		// Assert
 		assert.strictEqual(oSubSectionWithoutTitle.$().attr("role"), undefined, "Subsections without titles should not have role attribute");
@@ -1801,7 +1804,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 
 	QUnit.test("Test role attribute of promoted subsection", function(assert) {
 		// Arrange
-		var oSingleSubsection = this.ObjectPageSectionView.byId("subsection3");
+		const oSingleSubsection = this.ObjectPageSectionView.byId("subsection3");
 
 		assert.expect(1);
 
@@ -1811,9 +1814,10 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("sapUxAPObjectPageSubSectionFocusable class is added only to focusable subsections", async function(assert) {
+		assert.expect(4);
 		// Arrange
-		var oSubSectionWithoutTitle = this.ObjectPageSectionView.byId("subsection6"),
-		oSubSectionWithTitle = this.ObjectPageSectionView.byId("subsection1");
+		const oSubSectionWithoutTitle = this.ObjectPageSectionView.byId("subsection6");
+		const oSubSectionWithTitle = this.ObjectPageSectionView.byId("subsection1");
 
 		// Assert
 		assert.notOk(oSubSectionWithoutTitle.$().hasClass("sapUxAPObjectPageSubSectionFocusable"), "Subsections without titles should not be fosucable");
@@ -1835,9 +1839,9 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 
 	QUnit.test("_handleInteractiveElF7 not called on marked events", function(assert) {
 		// Arrange
-		var oSubSectionWithoutTitle = this.ObjectPageSectionView.byId("subsection6"),
-			oTitlePressSpy = this.spy(ObjectPageSubSectionClass.prototype, "_handleInteractiveElF7"),
-			oDummyEvent = {
+		const oSubSectionWithoutTitle = this.ObjectPageSectionView.byId("subsection6");
+		const oTitlePressSpy = this.spy(ObjectPageSubSectionClass.prototype, "_handleInteractiveElF7");
+		const oDummyEvent = {
 				keyCode: KeyCodes.F7,
 				isMarked: function() { return true; },
 				stopPropagation: function() {},
@@ -1860,11 +1864,10 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 
 	QUnit.test("_initTitlePropagationSupport is called on init", function (assert) {
 		// Arrange
-		var oSpy = this.spy(ObjectPageSubSectionClass.prototype, "_initTitlePropagationSupport"),
-			oControl;
+		const oSpy = this.spy(ObjectPageSubSectionClass.prototype, "_initTitlePropagationSupport");
 
 		// Act
-		oControl = new ObjectPageSubSectionClass();
+		const oControl = new ObjectPageSubSectionClass();
 
 		// Assert
 		assert.strictEqual(oSpy.callCount, 1, "Method _initTitlePropagationSupport called on init of control");
@@ -1876,7 +1879,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 
 	QUnit.test("_getTitleDomId", function (assert) {
 		// Arrange
-		var oSubSection = new ObjectPageSubSectionClass("TestSubSection");
+		const oSubSection = new ObjectPageSubSectionClass("TestSubSection");
 
 		// Assert
 		assert.strictEqual(oSubSection._getTitleDomId(), false, "By default the method should return false");
@@ -1897,7 +1900,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.module("Content fit container", {
-		beforeEach: async function() {
+		beforeEach: function() {
 			this.oObjectPage = new ObjectPageLayout({
 				sections: [ new ObjectPageSection({
 					subSections: [new ObjectPageSubSectionClass({
@@ -1907,40 +1910,37 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 			});
 
 			this.oObjectPage.placeAt('qunit-fixture');
-			await nextUIUpdate();
 		},
 		afterEach: function() {
 			this.oObjectPage.destroy();
 		}
 	});
 
-	QUnit.test("sapUxAPObjectPageSubSectionFitContainer expands the subSection to fit the container", function (assert) {
-		var oPage = this.oObjectPage,
-			oSection = this.oObjectPage.getSections()[0],
-			oSubSection = oSection.getSubSections()[0],
-			done = assert.async();
+	QUnit.test("sapUxAPObjectPageSubSectionFitContainer expands the subSection to fit the container", async function (assert) {
+		assert.expect(1);
+		const oPage = this.oObjectPage;
+		const oSection = this.oObjectPage.getSections()[0];
+		const oSubSection = oSection.getSubSections()[0];
 
 		//act
 		oSubSection.addStyleClass(ObjectPageSubSectionClass.FIT_CONTAINER_CLASS);
 
 		//setup
-		oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			//check
-			var iViewportHeight = oPage._getScrollableViewportHeight(false),
-				iOffsetTop = library.Utilities.getChildPosition(oSubSection.$(), oPage._$contentContainer).top,
-				iOffsetBottom = oPage.getDomRef().getBoundingClientRect().bottom - oSubSection.getDomRef().getBoundingClientRect().bottom,
-				iExpectedSubSectionHeight = Math.round(iViewportHeight - iOffsetTop - iOffsetBottom),
-				iSubSectionHeight = Math.round(oSubSection.$().outerHeight() + parseInt(oSection.$().css("marginTop")));
-			assert.strictEqual(iSubSectionHeight, iExpectedSubSectionHeight, "the height is correct");
-			done();
-		}, this);
+		await waitForDOMReady(oPage);
+		//check
+		const iViewportHeight = oPage._getScrollableViewportHeight(false);
+		const iOffsetTop = library.Utilities.getChildPosition(oSubSection.$(), oPage._$contentContainer).top;
+		const iOffsetBottom = oPage.getDomRef().getBoundingClientRect().bottom - oSubSection.getDomRef().getBoundingClientRect().bottom;
+		const iExpectedSubSectionHeight = Math.round(iViewportHeight - iOffsetTop - iOffsetBottom);
+		const iSubSectionHeight = Math.round(oSubSection.$().outerHeight() + parseInt(oSection.$().css("marginTop")));
+		assert.strictEqual(iSubSectionHeight, iExpectedSubSectionHeight, "the height is correct");
 	});
 
 	QUnit.test("sapUxAPObjectPageSubSectionFitContainer expands the subSection tab to fit the container", async function(assert) {
-		var oPage = this.oObjectPage,
-			oSection = this.oObjectPage.getSections()[0],
-			oSubSection = oSection.getSubSections()[0],
-			done = assert.async();
+		assert.expect(1);
+		const oPage = this.oObjectPage;
+		const oSection = this.oObjectPage.getSections()[0];
+		const oSubSection = oSection.getSubSections()[0];
 
 		oPage.addSection(new ObjectPageSection({
 			subSections: new ObjectPageSubSectionClass({
@@ -1952,23 +1952,21 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		await nextUIUpdate();
 
 		//setup
-		oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			//check
-			var iViewportHeight = oPage._getScrollableViewportHeight(false),
-				iOffsetTop = library.Utilities.getChildPosition(oSubSection.$(), oPage._$contentContainer).top,
-				iOffsetBottom = oPage.getDomRef().getBoundingClientRect().bottom - oSubSection.getDomRef().getBoundingClientRect().bottom,
-				iExpectedSubSectionHeight = Math.round(iViewportHeight - iOffsetTop - iOffsetBottom),
-				iSubSectionHeight = Math.round(oSubSection.$().outerHeight() + parseInt(oSection.$().css("marginTop")));
-			assert.strictEqual(iSubSectionHeight, iExpectedSubSectionHeight, "the height is correct");
-			done();
-		}, this);
+		await waitForDOMReady(oPage);
+		//check
+		const iViewportHeight = oPage._getScrollableViewportHeight(false);
+		const iOffsetTop = library.Utilities.getChildPosition(oSubSection.$(), oPage._$contentContainer).top;
+		const iOffsetBottom = oPage.getDomRef().getBoundingClientRect().bottom - oSubSection.getDomRef().getBoundingClientRect().bottom;
+		const iExpectedSubSectionHeight = Math.round(iViewportHeight - iOffsetTop - iOffsetBottom);
+		const iSubSectionHeight = Math.round(oSubSection.$().outerHeight() + parseInt(oSection.$().css("marginTop")));
+		assert.strictEqual(iSubSectionHeight, iExpectedSubSectionHeight, "the height is correct");
 	});
 
 	QUnit.test("sapUxAPObjectPageSubSectionFitContainer expands the subSection when header in title area", async function(assert) {
-		var oPage = this.oObjectPage,
-			oSection = oPage.getSections()[0],
-			oSubSection = oSection.getSubSections()[0],
-			done = assert.async();
+		assert.expect(1);
+		const oPage = this.oObjectPage;
+		const oSection = oPage.getSections()[0];
+		const oSubSection = oSection.getSubSections()[0];
 
 		// ensure the achorBar is in the title area
 		this.stub(oPage, "_shouldPreserveHeaderInTitleArea").returns(true);
@@ -1984,49 +1982,42 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		oPage.setUseIconTabBar(true);
 		await nextUIUpdate();
 
-		oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			//check
-			var iViewportHeight = oPage._getScrollableViewportHeight(false),
-				iOffsetTop = library.Utilities.getChildPosition(oSubSection.$(), oPage._$contentContainer).top,
-				iOffsetBottom = oPage.getDomRef().getBoundingClientRect().bottom - oSubSection.getDomRef().getBoundingClientRect().bottom,
-				iExpectedSubSectionHeight = Math.round(iViewportHeight - iOffsetTop - iOffsetBottom),
-				iSubSectionHeight = Math.round(oSubSection.$().outerHeight() + parseInt(oSection.$().css("marginTop")));
-			assert.strictEqual(iSubSectionHeight, iExpectedSubSectionHeight, "the height is correct");
-			done();
-		}, this);
-
+		await waitForDOMReady(oPage);
+		//check
+		const iViewportHeight = oPage._getScrollableViewportHeight(false);
+		const iOffsetTop = library.Utilities.getChildPosition(oSubSection.$(), oPage._$contentContainer).top;
+		const iOffsetBottom = oPage.getDomRef().getBoundingClientRect().bottom - oSubSection.getDomRef().getBoundingClientRect().bottom;
+		const iExpectedSubSectionHeight = Math.round(iViewportHeight - iOffsetTop - iOffsetBottom);
+		const iSubSectionHeight = Math.round(oSubSection.$().outerHeight() + parseInt(oSection.$().css("marginTop")));
+		assert.strictEqual(iSubSectionHeight, iExpectedSubSectionHeight, "the height is correct");
 	});
 
-	QUnit.test("sapUxAPObjectPageSubSectionFitContainer expands the subSection with padding to fit the container any theme", function (assert) {
-		var oPage = this.oObjectPage,
-			oSection = this.oObjectPage.getSections()[0],
-			oSubSection = oSection.getSubSections()[0],
-			done = assert.async();
+	QUnit.test("sapUxAPObjectPageSubSectionFitContainer expands the subSection with padding to fit the container any theme", async function (assert) {
+		assert.expect(1);
+		const oPage = this.oObjectPage;
+		const oSection = this.oObjectPage.getSections()[0];
+		const oSubSection = oSection.getSubSections()[0];
 
 		//act
 		oSubSection.addStyleClass(ObjectPageSubSectionClass.FIT_CONTAINER_CLASS);
 
+		await waitForDOMReady(oPage);
+		//check
+		const iViewportHeight = oPage._getScrollableViewportHeight(false);
+		const iOffsetTop = library.Utilities.getChildPosition(oSubSection.$(), oPage._$contentContainer).top;
+		const iOffsetBottom = oPage.getDomRef().getBoundingClientRect().bottom - oSubSection.getDomRef().getBoundingClientRect().bottom;
+		const iExpectedSubSectionHeight = Math.round(iViewportHeight - iOffsetTop - iOffsetBottom);
 
-		oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			//check
-			var iViewportHeight = oPage._getScrollableViewportHeight(false),
-				iOffsetTop = library.Utilities.getChildPosition(oSubSection.$(), oPage._$contentContainer).top,
-				iOffsetBottom = oPage.getDomRef().getBoundingClientRect().bottom - oSubSection.getDomRef().getBoundingClientRect().bottom,
-				iExpectedSubSectionHeight = Math.round(iViewportHeight - iOffsetTop - iOffsetBottom);
-
-			oSubSection.getDomRef().style.paddingTop = "20px";
-			oPage._requestAdjustLayout(true);
-			// check height
-			assert.strictEqual(oSubSection.getDomRef().offsetHeight + parseInt(oSection.$().css("marginTop")), iExpectedSubSectionHeight, "correct height");
-			done();
-
-		}, this);
+		oSubSection.getDomRef().style.paddingTop = "20px";
+		oPage._requestAdjustLayout(true);
+		// check height
+		assert.strictEqual(oSubSection.getDomRef().offsetHeight + parseInt(oSection.$().css("marginTop")), iExpectedSubSectionHeight, "correct height");
 	});
 
 	QUnit.test("sapUxAPObjectPageSubSectionFitContainer expands the subSection with title to fit the container", function (assert) {
-		var oSection = this.oObjectPage.getSections()[0],
-			oSubSection = oSection.getSubSections()[0],
-			done = assert.async();
+		const oSection = this.oObjectPage.getSections()[0];
+		const oSubSection = oSection.getSubSections()[0];
+		const done = assert.async();
 
 		//setup: make the subSection fit its container and ensure it has a title
 		oSubSection.addStyleClass(ObjectPageSubSectionClass.FIT_CONTAINER_CLASS);
@@ -2036,7 +2027,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 			blocks: [new Text({text: "block content"})]
 		}));
 
-		var oStub = this.stub(oSubSection, "_setHeight").callsFake(function() {
+		const oStub = this.stub(oSubSection, "_setHeight").callsFake(function() {
 			ObjectPageSubSectionClass.prototype._setHeight.apply(this, arguments);
 			assert.strictEqual(oSubSection.getDomRef().scrollHeight, oSubSection.getDomRef().offsetHeight,
 				"no scrollable content");
@@ -2045,55 +2036,49 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		});
 	});
 
-	QUnit.test("single subSection with sapUxAPObjectPageSubSectionFitContainer no scrolling", function (assert) {
-		var oPage = this.oObjectPage,
-			oSection = this.oObjectPage.getSections()[0],
-			oSubSection = oSection.getSubSections()[0],
-			done = assert.async();
+	QUnit.test("single subSection with sapUxAPObjectPageSubSectionFitContainer no scrolling", async function (assert) {
+		assert.expect(1);
+		const oPage = this.oObjectPage;
+		const oSubSection = this.oObjectPage.getSections()[0].getSubSections()[0];
 
 		//act
 		oSubSection.addStyleClass(ObjectPageSubSectionClass.FIT_CONTAINER_CLASS);
 
 		//setup
-		oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			//check
-			function isPageScrollable() {
-				return oPage._$opWrapper.get(0).scrollHeight > oPage._$opWrapper.get(0).offsetHeight;
-			}
-			assert.strictEqual(isPageScrollable(), false, "no scrolling when single subsection fits container");
-			done();
-		}, this);
+		await waitForDOMReady(oPage);
+		//check
+		function isPageScrollable() {
+			return oPage._$opWrapper.get(0).scrollHeight > oPage._$opWrapper.get(0).offsetHeight;
+		}
+		assert.strictEqual(isPageScrollable(), false, "no scrolling when single subsection fits container");
 	});
 
-	QUnit.test("sapUxAPObjectPageSubSectionFitContainer class can be added late", function (assert) {
-		var oPage = this.oObjectPage,
-			oSection = this.oObjectPage.getSections()[0],
-			oSubSection = oSection.getSubSections()[0],
-			oSpy = this.spy(oPage, "_requestAdjustLayoutAndUxRules"),
-			done = assert.async();
+	QUnit.test("sapUxAPObjectPageSubSectionFitContainer class can be added late", async function (assert) {
+		assert.expect(1);
+		const oPage = this.oObjectPage;
+		const oSection = this.oObjectPage.getSections()[0];
+		const oSubSection = oSection.getSubSections()[0];
+		const oSpy = this.spy(oPage, "_requestAdjustLayoutAndUxRules");
 
 		//setup
-		oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			oSpy.resetHistory();
+		await waitForDOMReady(oPage);
+		oSpy.resetHistory();
 
-			//act
-			oSubSection.addStyleClass(ObjectPageSubSectionClass.FIT_CONTAINER_CLASS);
+		//act
+		oSubSection.addStyleClass(ObjectPageSubSectionClass.FIT_CONTAINER_CLASS);
 
-			//check
-			assert.strictEqual(oSpy.called, true, "_requestAdjustLayoutAndUxRules is called");
-			done();
-		}, this);
+		//check
+		assert.strictEqual(oSpy.called, true, "_requestAdjustLayoutAndUxRules is called");
 	});
 
 	QUnit.test("sapUxAPObjectPageSubSectionFitContainer with dynamic header title - no scroll when only one SubSection",
-		function (assert) {
+		async function (assert) {
 			// Set-up
-			var oPage = this.oObjectPage,
-				oSection = this.oObjectPage.getSections()[0],
-				oSubSection = oSection.getSubSections()[0],
-				oToggleScrollingSpy = this.spy(oPage, "_toggleScrolling"),
-				oComputerSpacerHeightSpy = this.spy(oPage, "_computeSpacerHeight"),
-				done = assert.async();
+			const oPage = this.oObjectPage;
+			const oSection = this.oObjectPage.getSections()[0];
+			const oSubSection = oSection.getSubSections()[0];
+			const oToggleScrollingSpy = this.spy(oPage, "_toggleScrolling");
+			const oComputerSpacerHeightSpy = this.spy(oPage, "_computeSpacerHeight");
 
 			assert.expect(5);
 
@@ -2101,27 +2086,24 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 			oPage.setHeaderTitle(new ObjectPageDynamicHeaderTitle());
 			oSubSection.addStyleClass(ObjectPageSubSectionClass.FIT_CONTAINER_CLASS);
 
-			oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-				// Assert
-				assert.strictEqual(oPage._bAllContentFitsContainer, true, "_bAllContentFitsContainer is 'true'");
-				assert.ok(oToggleScrollingSpy.calledWith(false), "oToggleScrollingSpy called with 'false' - scrolling is supressed");
-				assert.strictEqual(oPage._$opWrapper.css("overflow-x"), "hidden", "Wrapper's overflow property is 'hidden'");
-				assert.strictEqual(oComputerSpacerHeightSpy.args[0][2], false,
-					"oComputerSpacerHeightSpy called with bAllowScrollSectionToTop = false");
-				assert.ok(parseInt(oSubSection.$().css("height")) < oPage._getSectionsContainerHeight(false),
-					"With content fit container no scrollbar is needed");
-				done();
-		}, this);
+			await waitForDOMReady(oPage);
+			// Assert
+			assert.strictEqual(oPage._bAllContentFitsContainer, true, "_bAllContentFitsContainer is 'true'");
+			assert.ok(oToggleScrollingSpy.calledWith(false), "oToggleScrollingSpy called with 'false' - scrolling is supressed");
+			assert.strictEqual(oPage._$opWrapper.css("overflow-x"), "hidden", "Wrapper's overflow property is 'hidden'");
+			assert.strictEqual(oComputerSpacerHeightSpy.args[0][2], false,
+				"oComputerSpacerHeightSpy called with bAllowScrollSectionToTop = false");
+			assert.ok(parseInt(oSubSection.$().css("height")) < oPage._getSectionsContainerHeight(false),
+				"With content fit container no scrollbar is needed");
 	});
 
 	QUnit.test("sapUxAPObjectPageSubSectionFitContainer with dynamic header title - has scroll when content exceeds container",
-		function (assert) {
+		async function (assert) {
 			// Set-up
-			var oPage = this.oObjectPage,
-				oSection = this.oObjectPage.getSections()[0],
-				oSubSection = oSection.getSubSections()[0],
-				oToggleScrollingSpy = this.spy(oPage, "_toggleScrolling"),
-				done = assert.async();
+			const oPage = this.oObjectPage;
+			const oSection = this.oObjectPage.getSections()[0];
+			const oSubSection = oSection.getSubSections()[0];
+			const oToggleScrollingSpy = this.spy(oPage, "_toggleScrolling");
 
 			assert.expect(2);
 
@@ -2131,63 +2113,55 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 			oPage.setHeaderTitle(new ObjectPageDynamicHeaderTitle());
 			oSubSection.addStyleClass(ObjectPageSubSectionClass.FIT_CONTAINER_CLASS);
 
-			oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-				// Assert
-				assert.strictEqual(oPage._bAllContentFitsContainer, true, "_bAllContentFitsContainer is 'true'");
-				assert.ok(oToggleScrollingSpy.calledWith(true), "oToggleScrollingSpy called with 'true' - scrolling is allowed");
-				done();
-		}, this);
+			await waitForDOMReady(oPage);
+			// Assert
+			assert.strictEqual(oPage._bAllContentFitsContainer, true, "_bAllContentFitsContainer is 'true'");
+			assert.ok(oToggleScrollingSpy.calledWith(true), "oToggleScrollingSpy called with 'true' - scrolling is allowed");
 	});
 
 	QUnit.test("sapUxAPObjectPageSubSectionFitContainer with tabs - snap without scroll when only one SubSection",
-		function (assert) {
+		async function (assert) {
 			// Set-up
-			var oPage = this.oObjectPage,
-				oSection1 = this.oObjectPage.getSections()[0],
-				oSection1SubSection1 = oSection1.getSubSections()[0],
-				oSection2SubSection1 = new ObjectPageSubSectionClass({ blocks: [ new Panel({ height: "100px" })]}),
-				oSection2SubSection2 = new ObjectPageSubSectionClass({ blocks: [ new Panel({ height: "100px" })]}),
-				oSection2 = new ObjectPageSection({ subSections: [oSection2SubSection1, oSection2SubSection2]}),
-				oToggleScrollingSpy = this.spy(oPage, "_toggleScrolling"),
-				iSnapPosition,
-				done = assert.async();
+			const oPage = this.oObjectPage;
+			const oSection1 = this.oObjectPage.getSections()[0];
+			const oSection1SubSection1 = oSection1.getSubSections()[0];
+			const oSection2SubSection1 = new ObjectPageSubSectionClass({ blocks: [ new Panel({ height: "100px" })]});
+			const oSection2SubSection2 = new ObjectPageSubSectionClass({ blocks: [ new Panel({ height: "100px" })]});
+			const oSection2 = new ObjectPageSection({ subSections: [oSection2SubSection1, oSection2SubSection2]});
+			const oToggleScrollingSpy = this.spy(oPage, "_toggleScrolling");
+		assert.expect(5);
 
-			assert.expect(5);
+		oPage.setUseIconTabBar(true);
+		oPage.addSection(oSection2);
+		oPage.setSelectedSection(oSection2.getId());
+		oSection1SubSection1.addStyleClass(ObjectPageSubSectionClass.FIT_CONTAINER_CLASS);
 
-			oPage.setUseIconTabBar(true);
-			oPage.addSection(oSection2);
-			oPage.setSelectedSection(oSection2.getId());
-			oSection1SubSection1.addStyleClass(ObjectPageSubSectionClass.FIT_CONTAINER_CLASS);
+		await waitForDOMReady(oPage);
+		const iSnapPosition = oPage._getSnapPosition();
+			oPage._$opWrapper.scrollTop(iSnapPosition + 1); // snap the header with scroll
+			oPage._onScroll({ target : { scrollTop: iSnapPosition + 1}}); // process the scroll synchronously
+			assert.strictEqual(oPage._bHeaderExpanded, false, "header is snapped");
 
-			oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-				iSnapPosition = oPage._getSnapPosition();
-				oPage._$opWrapper.scrollTop(iSnapPosition + 1); // snap the header with scroll
-				oPage._onScroll({ target : { scrollTop: iSnapPosition + 1}}); // process the scroll synchronously
-				assert.strictEqual(oPage._bHeaderExpanded, false, "header is snapped");
+			// Act: select the section with non-scrollable content
+			oPage.setSelectedSection(oSection1.getId());
 
-				// Act: select the section with non-scrollable content
-				oPage.setSelectedSection(oSection1.getId());
-
-				// Assert
-				assert.strictEqual(oPage._bAllContentFitsContainer, true, "_bAllContentFitsContainer is 'true'");
-				assert.strictEqual(oPage._bHeaderExpanded, false, "header is still snapped");
-				assert.ok(oToggleScrollingSpy.calledWith(false), "oToggleScrollingSpy called with 'false' - scrolling is supressed");
-				assert.strictEqual(oPage._$opWrapper.css("overflow-x"), "hidden", "Wrapper's overflow property is 'hidden'");
-				done();
-			}, this);
+			// Assert
+			assert.strictEqual(oPage._bAllContentFitsContainer, true, "_bAllContentFitsContainer is 'true'");
+			assert.strictEqual(oPage._bHeaderExpanded, false, "header is still snapped");
+			assert.ok(oToggleScrollingSpy.calledWith(false), "oToggleScrollingSpy called with 'false' - scrolling is supressed");
+			assert.strictEqual(oPage._$opWrapper.css("overflow-x"), "hidden", "Wrapper's overflow property is 'hidden'");
 	});
 
 	QUnit.test("sapUxAPObjectPageSubSectionFitContainer with tabs - switch to snap with scroll",
-		function (assert) {
+		async function (assert) {
 			// Set-up
-			var oPage = this.oObjectPage,
-				oSection1 = this.oObjectPage.getSections()[0],
-				oSection1SubSection1 = oSection1.getSubSections()[0],
-				oSection2SubSection1 = new ObjectPageSubSectionClass({ blocks: [ new Panel({ height: "100px" })]}),
-				oSection2SubSection2 = new ObjectPageSubSectionClass({ blocks: [ new Panel({ height: "100px" })]}),
-				oSection2 = new ObjectPageSection({ subSections: [oSection2SubSection1, oSection2SubSection2]}),
-				oToggleScrollingSpy = this.spy(oPage, "_toggleScrolling"),
-				done = assert.async();
+			const oPage = this.oObjectPage;
+			const oSection1 = this.oObjectPage.getSections()[0];
+			const oSection1SubSection1 = oSection1.getSubSections()[0];
+			const oSection2SubSection1 = new ObjectPageSubSectionClass({ blocks: [ new Panel({ height: "100px" })]});
+			const oSection2SubSection2 = new ObjectPageSubSectionClass({ blocks: [ new Panel({ height: "100px" })]});
+			const oSection2 = new ObjectPageSection({ subSections: [oSection2SubSection1, oSection2SubSection2]});
+			const oToggleScrollingSpy = this.spy(oPage, "_toggleScrolling");
 
 			assert.expect(5);
 
@@ -2195,30 +2169,27 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 			oPage.addSection(oSection2);
 			oSection1SubSection1.addStyleClass(ObjectPageSubSectionClass.FIT_CONTAINER_CLASS);
 
-			oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
+			await waitForDOMReady(oPage);
 
-				oPage._snapHeader(false);
-				assert.strictEqual(oPage._bHeaderExpanded, false, "header is snapped");
+			oPage._snapHeader(false);
+			assert.strictEqual(oPage._bHeaderExpanded, false, "header is snapped");
 
-				// Act: select the section with scrollable content
-				oPage.setSelectedSection(oSection2.getId());
+			// Act: select the section with scrollable content
+			oPage.setSelectedSection(oSection2.getId());
 
-				// Assert
-				assert.strictEqual(oPage._bAllContentFitsContainer, false, "_bAllContentFitsContainer is 'false'");
-				assert.strictEqual(oPage._bHeaderExpanded, false, "header is still snapped");
-				assert.ok(oToggleScrollingSpy.calledWith(true), "oToggleScrollingSpy called with 'true' - scrolling is enabled");
-				assert.ok(oPage._$opWrapper.scrollTop() >= oPage._getSnapPosition(), "header is snapped with scroll");
-				done();
-			}, this);
+			// Assert
+			assert.strictEqual(oPage._bAllContentFitsContainer, false, "_bAllContentFitsContainer is 'false'");
+			assert.strictEqual(oPage._bHeaderExpanded, false, "header is still snapped");
+			assert.ok(oToggleScrollingSpy.calledWith(true), "oToggleScrollingSpy called with 'true' - scrolling is enabled");
+			assert.ok(oPage._$opWrapper.scrollTop() >= oPage._getSnapPosition(), "header is snapped with scroll");
 	});
 
 	QUnit.test("sapUxAPObjectPageSubSectionFitContainer with tabs - rebuild anchorBar",
-		function (assert) {
-			var oPage = this.oObjectPage,
-				oSection1 = oPage.getSections()[0],
-				oSection2 = new ObjectPageSection({ subSections: [new ObjectPageSubSectionClass({ blocks: [ new Text()]})]}),
-				oSection1SubSection1 = oSection1.getSubSections()[0],
-				done = assert.async();
+		async function (assert) {
+			const oPage = this.oObjectPage;
+			const oSection1 = oPage.getSections()[0];
+			const oSection2 = new ObjectPageSection({ subSections: [new ObjectPageSubSectionClass({ blocks: [ new Text()]})]});
+			const oSection1SubSection1 = oSection1.getSubSections()[0];
 
 			assert.expect(2);
 
@@ -2227,53 +2198,44 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 			oPage.addSection(oSection2); // more than one tab
 			oSection1SubSection1.addStyleClass(ObjectPageSubSectionClass.FIT_CONTAINER_CLASS); // current tab fits the container
 
-			oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-				// Assert init state
-				assert.strictEqual(oPage._bAllContentFitsContainer, true, "_bAllContentFitsContainer is correct");
+			await waitForDOMReady(oPage);
+			// Assert init state
+			assert.strictEqual(oPage._bAllContentFitsContainer, true, "_bAllContentFitsContainer is correct");
 
-				// Act: take an action that requires rebuilding of anchor bar
-				oSection1.setTitle("another"); // setTitle requires rebuilding of anchorBar => internally _adjustLayoutAndUxRules is called
-				oPage._adjustLayoutAndUxRules(true); // call synchronously to speed up the test
+			// Act: take an action that requires rebuilding of anchor bar
+			oSection1.setTitle("another"); // setTitle requires rebuilding of anchorBar => internally _adjustLayoutAndUxRules is called
+			oPage._adjustLayoutAndUxRules(true); // call synchronously to speed up the test
 
-				// Assert
-				assert.strictEqual(oPage._bAllContentFitsContainer, true, "_bAllContentFitsContainer is still correct");
-
-				done();
-			});
+			// Assert
+			assert.strictEqual(oPage._bAllContentFitsContainer, true, "_bAllContentFitsContainer is still correct");
 	});
 
 	QUnit.test("update sapUxAPObjectPageSubSectionFitContainer from _adjustLayoutAndUXRules",
-		function (assert) {
-			var oPage = this.oObjectPage,
-				oLayoutSpy = this.spy(this.oObjectPage, "_requestAdjustLayout"),
-				oDetectFullscreenSubSectionSpy = this.spy(this.oObjectPage, "_hasSingleVisibleFullscreenSubSection"),
-				done = assert.async();
+		async function (assert) {
+			const oPage = this.oObjectPage;
+			const oLayoutSpy = this.spy(this.oObjectPage, "_requestAdjustLayout");
+			const oDetectFullscreenSubSectionSpy = this.spy(this.oObjectPage, "_hasSingleVisibleFullscreenSubSection");
 
 			assert.expect(1);
 
 			oPage.setUseIconTabBar(true); // tabs mode
 
-			oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-				oPage._adjustLayoutAndUxRules(); // call synchronously to speed up the test
+			await waitForDOMReady(oPage);
+			oPage._adjustLayoutAndUxRules(); // call synchronously to speed up the test
 
-				// Assert
-				assert.ok(oDetectFullscreenSubSectionSpy.calledBefore(oLayoutSpy),
-					"fullscreen subSection is detected before applying the layout");
-
-				done();
-			});
+			// Assert
+			assert.ok(oDetectFullscreenSubSectionSpy.calledBefore(oLayoutSpy),
+				"fullscreen subSection is detected before applying the layout");
 	});
 
 	QUnit.test("sapUxAPObjectPageSubSectionFitContainer preserves the minimal content height", function (assert) {
-		var oPage = this.oObjectPage,
-			oSection = this.oObjectPage.getSections()[0],
-			oSubSection = oSection.getSubSections()[0],
-			oQunitFixtureElement = document.getElementById("qunit-fixture"),
-			sPageHeight = "200px",
-			sPageContentHeight = "300px",
-			done = assert.async(),
-			oSpy;
-
+		const oPage = this.oObjectPage;
+		const oSection = this.oObjectPage.getSections()[0];
+		const oSubSection = oSection.getSubSections()[0];
+		const oQunitFixtureElement = document.getElementById("qunit-fixture");
+		const sPageHeight = "200px";
+		const sPageContentHeight = "300px";
+		const done = assert.async();
 		// Setup: content height is bigger than page height
 		oSubSection.removeAllBlocks();
 		oQunitFixtureElement.style.height = sPageHeight;
@@ -2281,7 +2243,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 
 		//act
 		oSubSection.addStyleClass(ObjectPageSubSectionClass.FIT_CONTAINER_CLASS);
-		oSpy = this.spy(oSubSection, "_executeAfterNextResizeHandlerChecks");
+		const oSpy = this.spy(oSubSection, "_executeAfterNextResizeHandlerChecks");
 
 		//setup
 		oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
@@ -2296,10 +2258,11 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("callback to _executeAfterNextResizeHandlerChecks executes after the ResizeHandler listeners", async function (assert) {
-		var oSubSection = this.oObjectPage.getSections()[0].getSubSections()[0],
-			oSubSectionContent = new HTML({content: '<div style="height:300px"></div>'}),
-			done = assert.async(),
-			fnOnSubSectionContentResize = this.spy();
+		assert.expect(1);
+		const oSubSection = this.oObjectPage.getSections()[0].getSubSections()[0];
+		const oSubSectionContent = new HTML({content: '<div style="height:300px"></div>'});
+		const done = assert.async();
+		const fnOnSubSectionContentResize = this.spy();
 
 		oSubSection.addBlock(oSubSectionContent);
 		await nextUIUpdate();
@@ -2335,50 +2298,42 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		}
 	});
 
-	QUnit.test("applyUxRules", function(assert) {
+	QUnit.test("applyUxRules", async function(assert) {
 
 		// Setup
-		var oSubSection = this.oObjectPageLayout.getSections()[0].getSubSections()[0],
-			oInvalidateSpy,
-			done = assert.async();
+		const oSubSection = this.oObjectPageLayout.getSections()[0].getSubSections()[0];
 
 		assert.expect(1);
 
-		this.oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady", function() {
-			oInvalidateSpy	= this.spy(oSubSection, "invalidate");
-
-			// Act
-			this.oObjectPageLayout._applyUxRules(true);
-
-			// Assert
-			assert.equal(oInvalidateSpy.callCount, 0, "subSection is not invalidated");
-			done();
-		}, this);
-
 		this.oObjectPageLayout.placeAt('qunit-fixture');
+		await waitForDOMReady(this.oObjectPageLayout);
+		const oInvalidateSpy = this.spy(oSubSection, "invalidate");
+
+		// Act
+		this.oObjectPageLayout._applyUxRules(true);
+
+		// Assert
+		assert.equal(oInvalidateSpy.callCount, 0, "subSection is not invalidated");
 	});
 
 	QUnit.test("does not reset grid content on rerendering", async function(assert) {
 
 		// Setup
-		var oSubSection = this.oObjectPageLayout.getSections()[0].getSubSections()[0],
-			done = assert.async();
+		const oSubSection = this.oObjectPageLayout.getSections()[0].getSubSections()[0];
 
 		assert.expect(1);
 
 		this.oObjectPageLayout.placeAt('qunit-fixture');
 		await nextUIUpdate();
 
-		var oGrid = oSubSection._getGrid();
-		var oSpy = this.spy(oGrid, "removeAllContent");
+		const oGrid = oSubSection._getGrid();
+		const oSpy = this.spy(oGrid, "removeAllContent");
 
 		// Act
 		oSubSection.invalidate();
 
 		// Assert
 		assert.ok(oSpy.notCalled, "Grid content is not reset");
-
-		done();
 	});
 
 	QUnit.module("SubSection title visibility", {
@@ -2409,7 +2364,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("SubSection without title has no title", function (assert) {
-		var oSubSection = this.oObjectPage.getSections()[0].getSubSections()[0];
+		const oSubSection = this.oObjectPage.getSections()[0].getSubSections()[0];
 
 		assert.strictEqual(oSubSection._oTitle.getDomRef(), null, "subsection has no title");
 		assert.strictEqual(oSubSection.getTitleVisible(), false, "titleVisible is false");
@@ -2419,8 +2374,8 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("SubSection without title is not promoted", function (assert) {
-		var oSection = this.oObjectPage.getSections()[0],
-		$subSection = oSection.getSubSections()[0].$();
+		const oSection = this.oObjectPage.getSections()[0];
+		const $subSection = oSection.getSubSections()[0].$();
 
 		assert.ok(oSection.getSubSections().length > 0, "subsection is not the only child");
 		assert.notOk($subSection.hasClass("sapUxAPObjectPageSubSectionPromoted"), "subsection is not promoted");
@@ -2429,8 +2384,9 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("getTitleVisible with showTitle=true", async function(assert) {
+		assert.expect(4);
 		// Arrange
-		var oSubSection = this.oObjectPage.getSections()[0].getSubSections()[0];
+		const oSubSection = this.oObjectPage.getSections()[0].getSubSections()[0];
 
 		// Assert
 		assert.strictEqual(oSubSection.getTitleVisible(), false, "titleVisible is false");
@@ -2448,8 +2404,9 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("getTitleVisible with empty title", async function(assert) {
+		assert.expect(4);
 		// Arrange
-		var oSubSection = this.oObjectPage.getSections()[0].getSubSections()[0];
+		const oSubSection = this.oObjectPage.getSections()[0].getSubSections()[0];
 
 		// Assert
 		assert.strictEqual(oSubSection.getTitleVisible(), false, "titleVisible is false");
@@ -2467,83 +2424,78 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		this.oObjectPage.destroy();
 	});
 
-	QUnit.test("Subsection _setInternalTitleVisible is called when toggling useIconTabBar (DINC0702145)", function(assert) {
+	QUnit.test("Subsection _setInternalTitleVisible is called when toggling useIconTabBar (DINC0702145)", async function(assert) {
 		// Arrange: Create layout with multiple subsections having titles
-		var oSubSection1 = new ObjectPageSubSectionClass({
+		const oSubSection1 = new ObjectPageSubSectionClass({
 				title: "SubSection 1",
 				blocks: [new Text({text: "content 1"})]
-			}),
-			oSubSection2 = new ObjectPageSubSectionClass({
+			});
+		const oSubSection2 = new ObjectPageSubSectionClass({
 				title: "SubSection 2",
 				blocks: [new Text({text: "content 2"})]
-			}),
-			oObjectPage = new ObjectPageLayout({
+			});
+		const oObjectPage = new ObjectPageLayout({
 				sections: [
 					new ObjectPageSection({
 						title: "Section 1",
 						subSections: [oSubSection1, oSubSection2]
 					})
 				]
-			}),
-			oSpy1,
-			oSpy2,
-			done = assert.async();
+			});
 
 		assert.expect(4);
 
 		oObjectPage.placeAt('qunit-fixture');
 
-		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
-			// Create spies after initial rendering
-			oSpy1 = sinon.spy(oSubSection1, "_setInternalTitleVisible");
-			oSpy2 = sinon.spy(oSubSection2, "_setInternalTitleVisible");
+		await waitForDOMReady(oObjectPage);
+		// Create spies after initial rendering
+		const oSpy1 = sinon.spy(oSubSection1, "_setInternalTitleVisible");
+		const oSpy2 = sinon.spy(oSubSection2, "_setInternalTitleVisible");
 
-			// Act: Toggle useIconTabBar on - this triggers _adjustLayoutAndUxRules internally
-			oObjectPage.setUseIconTabBar(true);
-			oObjectPage._adjustLayoutAndUxRules();
+		// Act: Toggle useIconTabBar on - this triggers _adjustLayoutAndUxRules internally
+		oObjectPage.setUseIconTabBar(true);
+		oObjectPage._adjustLayoutAndUxRules();
 
-			// Assert: Verify _setInternalTitleVisible was called on subsections
-			// This would fail if line 1774 (oTitleVisibilityInfo[oSubSection.getId()] = true;) is deleted
-			// because subsections wouldn't be registered in oTitleVisibilityInfo and wouldn't be processed
-			assert.ok(oSpy1.called,
-				"SubSection 1 _setInternalTitleVisible was called after toggling to IconTabBar mode");
-			assert.ok(oSpy2.called,
-				"SubSection 2 _setInternalTitleVisible was called after toggling to IconTabBar mode");
+		// Assert: Verify _setInternalTitleVisible was called on subsections
+		// This would fail if line 1774 (oTitleVisibilityInfo[oSubSection.getId()] = true;) is deleted
+		// because subsections wouldn't be registered in oTitleVisibilityInfo and wouldn't be processed
+		assert.ok(oSpy1.called,
+			"SubSection 1 _setInternalTitleVisible was called after toggling to IconTabBar mode");
+		assert.ok(oSpy2.called,
+			"SubSection 2 _setInternalTitleVisible was called after toggling to IconTabBar mode");
 
-			// Reset spies
-			oSpy1.resetHistory();
-			oSpy2.resetHistory();
+		// Reset spies
+		oSpy1.resetHistory();
+		oSpy2.resetHistory();
 
-			// Act: Toggle useIconTabBar off and adjust UX rules again
-			oObjectPage.setUseIconTabBar(false);
-			oObjectPage._adjustLayoutAndUxRules();
+		// Act: Toggle useIconTabBar off and adjust UX rules again
+		oObjectPage.setUseIconTabBar(false);
+		oObjectPage._adjustLayoutAndUxRules();
 
-			// Assert: Verify _setInternalTitleVisible was called again after toggling back
-			assert.ok(oSpy1.called,
-				"SubSection 1 _setInternalTitleVisible was called after toggling back from IconTabBar mode");
-			assert.ok(oSpy2.called,
-				"SubSection 2 _setInternalTitleVisible was called after toggling back from IconTabBar mode");
+		// Assert: Verify _setInternalTitleVisible was called again after toggling back
+		assert.ok(oSpy1.called,
+			"SubSection 1 _setInternalTitleVisible was called after toggling back from IconTabBar mode");
+		assert.ok(oSpy2.called,
+			"SubSection 2 _setInternalTitleVisible was called after toggling back from IconTabBar mode");
 
-			// Cleanup
-			oSpy1.restore();
-			oSpy2.restore();
-			oObjectPage.destroy();
-
-			done();
-		});
+		// Cleanup
+		oSpy1.restore();
+		oSpy2.restore();
+		oObjectPage.destroy();
 	});
 
 	QUnit.module("SubSection internalTitle");
 
 	QUnit.test("Subsection _setInternalTitleLevel should invalidate control", async function(assert) {
+		assert.expect(1);
 		// arrange
-		var oSubSection = new ObjectPageSubSectionClass({
+		const oSubSection = new ObjectPageSubSectionClass({
 				title: "Title",
 				titleLevel: TitleLevel.Auto,
 				showTitle: true,
 				blocks: [new Text({ text: "test" })]
-			}),
-			oObjectPage = new ObjectPageLayout({
+			});
+		const oObjectPage = new ObjectPageLayout({
 				sections: new ObjectPageSection({
 					subSections: [
 						oSubSection,
@@ -2572,15 +2524,16 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("Subsection getEffectiveTitleLevel should return correct title level with more than one SubSections", async function(assert) {
+		assert.expect(1);
 		// arrange
-		var sTitleLevel = TitleLevel.H4,
-			oSubSection = new ObjectPageSubSectionClass({
+		const sTitleLevel = TitleLevel.H4;
+		const oSubSection = new ObjectPageSubSectionClass({
 				title: "Title",
 				titleLevel: sTitleLevel,
 				showTitle: true,
 				blocks: [new Text({ text: "test" })]
-			}),
-			oObjectPage = new ObjectPageLayout({
+			});
+		const oObjectPage = new ObjectPageLayout({
 				sections: new ObjectPageSection({
 					subSections: [
 						oSubSection,
@@ -2599,20 +2552,21 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("Subsection getEffectiveTitleLevel should return correct title level with one SubSection", async function(assert) {
+		assert.expect(2);
 		// arrange
-		var sTitleLevel = TitleLevel.H4,
-			oSubSection = new ObjectPageSubSectionClass({
+		const sTitleLevel = TitleLevel.H4;
+		const oSubSection = new ObjectPageSubSectionClass({
 				title: "Title",
 				titleLevel: sTitleLevel,
 				showTitle: true,
 				blocks: [new Text({ text: "test" })]
-			}),
-			oSection = new ObjectPageSection({
+			});
+		const oSection = new ObjectPageSection({
 				subSections: [
 					oSubSection
 				]
-			}),
-			oObjectPage = new ObjectPageLayout({
+			});
+		const oObjectPage = new ObjectPageLayout({
 				sections: oSection
 			});
 		oObjectPage.placeAt('qunit-fixture');
@@ -2652,8 +2606,8 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	QUnit.test("Focus handling when see more / see less button is selected", function (assert) {
 		assert.expect(1);
 		// setup
-		var oSubSection = this.oObjectPage.getSections()[0].getSubSections()[0],
-			done = assert.async();
+		const oSubSection = this.oObjectPage.getSections()[0].getSubSections()[0];
+		const done = assert.async();
 
 		oSubSection.addEventDelegate({ onAfterRendering: function() {
 			// assert
@@ -2668,9 +2622,9 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		assert.expect(1);
 
 		// setup
-		var oSubSection = this.oObjectPage.getSections()[0].getSubSections()[0],
-			oMoreBlock = oSubSection.getMoreBlocks()[0],
-			done = assert.async();
+		const oSubSection = this.oObjectPage.getSections()[0].getSubSections()[0];
+		const oMoreBlock = oSubSection.getMoreBlocks()[0];
+		const done = assert.async();
 
 		oMoreBlock.addEventDelegate({ onAfterRendering: function() {
 			// act - moving the focus the Button
@@ -2713,9 +2667,9 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("_setColumnSpan", function (assert) {
-		var oObjectPage = this.oObjectPage,
-			oSection = oObjectPage.getSections()[0],
-			oSpy = this.spy(oSection, "invalidate");
+		const oObjectPage = this.oObjectPage;
+		const oSection = oObjectPage.getSections()[0];
+		const oSpy = this.spy(oSection, "invalidate");
 
 		oSection.getSubSections().forEach(function(oSubSection) {
 			oSubSection._setColumnSpan(ObjectPageSubSectionClass.COLUMN_SPAN.auto);
@@ -2726,8 +2680,9 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	QUnit.module("ObjectPageSubSection - focus");
 
 	QUnit.test("Focus span is rendered", async function (assert) {
+		assert.expect(1);
 		// Arrange
-		var oSubSection = new ObjectPageSubSectionClass({
+		const oSubSection = new ObjectPageSubSectionClass({
 			title: "Title",
 			blocks: [new Text({text: "Test"})]
 		});
@@ -2747,7 +2702,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 
 	QUnit.test("ObjectPageSubSection destroyed and recreated with same ID does not throw an error", function (assert) {
 		// Arrange
-		var oObjectPageLayout = new ObjectPageLayout("page", {
+		const oObjectPageLayout = new ObjectPageLayout("page", {
 				enableLazyLoading: true,
 				sections: new ObjectPageSection({
 					subSections: [
@@ -2761,11 +2716,11 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 						})
 					]
 				})
-			}),
-			oObjectPageSection = oObjectPageLayout.getSections()[0],
-			oObjectPageSubSection = oObjectPageSection.getSubSections()[1],
-			fnDone = assert.async(),
-			fnOnSubSectionEnteredViewPort = function() {
+			});
+		const oObjectPageSection = oObjectPageLayout.getSections()[0];
+		let oObjectPageSubSection = oObjectPageSection.getSubSections()[1];
+		const fnDone = assert.async();
+		const fnOnSubSectionEnteredViewPort = function() {
 				oObjectPageLayout.detachEvent("subSectionEnteredViewPort", fnOnSubSectionEnteredViewPort);
 				// Act - when the destroyed SubSection entered the viewport, simulate app working with the "actions" aggregation
 				// -> this will create a new toolbar on the already destroyed ObjectPageSubSection
@@ -2800,23 +2755,20 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("ObjectPageSubSection cloned returns correct actions", async function (assert) {
+		assert.expect(5);
 		// Arrange
-		var oSubSection = new ObjectPageSubSectionClass("subsection1", {
+		const oSubSection = new ObjectPageSubSectionClass("subsection1", {
 				title: "Title",
 				blocks: [new Text({text: "Test"})],
 				actions: [new Button({text: "Action1"}), new Button({text: "Action2"})]
-			}),
-			oClone,
-			oCloneAction1,
-			oCloneAction2;
-
+			});
 		// Act
-		oClone = oSubSection.clone();
+		const oClone = oSubSection.clone();
 		oClone.placeAt('qunit-fixture');
 		await nextUIUpdate();
 
-		oCloneAction1 = oClone.getActions()[0];
-		oCloneAction2 = oClone.getActions()[1];
+		const oCloneAction1 = oClone.getActions()[0];
+		const oCloneAction2 = oClone.getActions()[1];
 
 		// Assert
 		assert.strictEqual(oClone.getActions().length, 2, "Cloned ObjectPageSubSection has correct number of actions");
@@ -2832,11 +2784,12 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	QUnit.module("ObjectPageSubSection's aggregations - Parent-Child Relationship");
 
 	QUnit.test("Block controls return ObjectPageSubSection as parent, not internal Grid", async function (assert) {
+		assert.expect(4);
 		// Arrange
-		var oBlock1 = oHelpers.getBlock(),
-			oBlock2 = oHelpers.getBlock(),
-			oSubSection = oHelpers.getSubSection(),
-			oObjectPageLayout = new ObjectPageLayout({
+		const oBlock1 = oHelpers.getBlock();
+		const oBlock2 = oHelpers.getBlock();
+		const oSubSection = oHelpers.getSubSection();
+		const oObjectPageLayout = new ObjectPageLayout({
 				sections: new ObjectPageSection({
 					subSections: [oSubSection]
 				})
@@ -2862,11 +2815,12 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("MoreBlock controls return ObjectPageSubSection as parent, not internal Grid", async function (assert) {
+		assert.expect(4);
 		// Arrange
-		var oMoreBlock1 = oHelpers.getBlock(),
-			oMoreBlock2 = oHelpers.getBlock(),
-			oSubSection = oHelpers.getSubSection(),
-			oObjectPageLayout = new ObjectPageLayout({
+		const oMoreBlock1 = oHelpers.getBlock();
+		const oMoreBlock2 = oHelpers.getBlock();
+		const oSubSection = oHelpers.getSubSection();
+		const oObjectPageLayout = new ObjectPageLayout({
 				sections: new ObjectPageSection({
 					subSections: [oSubSection]
 				})
@@ -2893,10 +2847,11 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("Block parent is correctly restored when removed from blocks aggregation", async function (assert) {
+		assert.expect(3);
 		// Arrange
-		var oBlock = oHelpers.getBlock(),
-			oSubSection = oHelpers.getSubSection(),
-			oObjectPageLayout = new ObjectPageLayout({
+		const oBlock = oHelpers.getBlock();
+		const oSubSection = oHelpers.getSubSection();
+		const oObjectPageLayout = new ObjectPageLayout({
 				sections: new ObjectPageSection({
 					subSections: [oSubSection]
 				})
@@ -2924,10 +2879,11 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("Block parent is correctly restored when removed from moreBlocks aggregation", async function (assert) {
+		assert.expect(3);
 		// Arrange
-		var oMoreBlock = oHelpers.getBlock(),
-			oSubSection = oHelpers.getSubSection(),
-			oObjectPageLayout = new ObjectPageLayout({
+		const oMoreBlock = oHelpers.getBlock();
+		const oSubSection = oHelpers.getSubSection();
+		const oObjectPageLayout = new ObjectPageLayout({
 				sections: new ObjectPageSection({
 					subSections: [oSubSection]
 				})
@@ -2956,17 +2912,16 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("Block is removed from internal Grid when destroyBlocks is called", async function (assert) {
+		assert.expect(6);
 		// Arrange
-		var oBlock1 = oHelpers.getBlock(),
-			oBlock2 = oHelpers.getBlock(),
-			oSubSection = oHelpers.getSubSection(),
-			oObjectPageLayout = new ObjectPageLayout({
+		const oBlock1 = oHelpers.getBlock();
+		const oBlock2 = oHelpers.getBlock();
+		const oSubSection = oHelpers.getSubSection();
+		const oObjectPageLayout = new ObjectPageLayout({
 				sections: new ObjectPageSection({
 					subSections: [oSubSection]
 				})
-			}),
-			oGrid;
-
+			});
 		oSubSection.addBlock(oBlock1);
 		oSubSection.addBlock(oBlock2);
 
@@ -2974,7 +2929,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		oObjectPageLayout.placeAt('qunit-fixture');
 		await nextUIUpdate();
 
-		oGrid = oSubSection._getGrid();
+		const oGrid = oSubSection._getGrid();
 
 		// Assert: blocks are in the internal Grid
 		assert.strictEqual(oGrid.getContent().length, 2, "Internal Grid has 2 controls");
@@ -2994,18 +2949,17 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("MoreBlock is removed from internal Grid when destroyMoreBlocks is called", async function (assert) {
+		assert.expect(8);
 		// Arrange
-		var oBlock = oHelpers.getBlock(),
-			oMoreBlock1 = oHelpers.getBlock(),
-			oMoreBlock2 = oHelpers.getBlock(),
-			oSubSection = oHelpers.getSubSection(),
-			oObjectPageLayout = new ObjectPageLayout({
+		const oBlock = oHelpers.getBlock();
+		const oMoreBlock1 = oHelpers.getBlock();
+		const oMoreBlock2 = oHelpers.getBlock();
+		const oSubSection = oHelpers.getSubSection();
+		const oObjectPageLayout = new ObjectPageLayout({
 				sections: new ObjectPageSection({
 					subSections: [oSubSection]
 				})
-			}),
-			oGrid;
-
+			});
 		oSubSection.setMode(library.ObjectPageSubSectionMode.Expanded);
 		oSubSection.addBlock(oBlock);
 		oSubSection.addMoreBlock(oMoreBlock1);
@@ -3016,7 +2970,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		oObjectPageLayout.placeAt('qunit-fixture');
 		await nextUIUpdate();
 
-		oGrid = oSubSection._getGrid();
+		const oGrid = oSubSection._getGrid();
 
 		// Assert: all blocks are in the internal Grid
 		assert.strictEqual(oGrid.getContent().length, 3, "Internal Grid has 3 controls");
@@ -3038,17 +2992,16 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("Block is removed from internal Grid when removed from blocks aggregation", async function (assert) {
+		assert.expect(4);
 		// Arrange
-		var oBlock1 = oHelpers.getBlock(),
-			oBlock2 = oHelpers.getBlock(),
-			oSubSection = oHelpers.getSubSection(),
-			oObjectPageLayout = new ObjectPageLayout({
+		const oBlock1 = oHelpers.getBlock();
+		const oBlock2 = oHelpers.getBlock();
+		const oSubSection = oHelpers.getSubSection();
+		const oObjectPageLayout = new ObjectPageLayout({
 				sections: new ObjectPageSection({
 					subSections: [oSubSection]
 				})
-			}),
-			oGrid;
-
+			});
 		oSubSection.addBlock(oBlock1);
 		oSubSection.addBlock(oBlock2);
 
@@ -3056,7 +3009,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		oObjectPageLayout.placeAt('qunit-fixture');
 		await nextUIUpdate();
 
-		oGrid = oSubSection._getGrid();
+		const oGrid = oSubSection._getGrid();
 
 		// Assert: blocks are in the internal Grid
 		assert.strictEqual(oGrid.getContent().length, 2, "Internal Grid has 2 controls");
@@ -3075,17 +3028,16 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("MoreBlock is removed from internal Grid when removed from moreBlocks aggregation in Expanded mode", async function (assert) {
+		assert.expect(4);
 		// Arrange
-		var oMoreBlock1 = oHelpers.getBlock(),
-			oMoreBlock2 = oHelpers.getBlock(),
-			oSubSection = oHelpers.getSubSection(),
-			oObjectPageLayout = new ObjectPageLayout({
+		const oMoreBlock1 = oHelpers.getBlock();
+		const oMoreBlock2 = oHelpers.getBlock();
+		const oSubSection = oHelpers.getSubSection();
+		const oObjectPageLayout = new ObjectPageLayout({
 				sections: new ObjectPageSection({
 					subSections: [oSubSection]
 				})
-			}),
-			oGrid;
-
+			});
 		oSubSection.setMode(library.ObjectPageSubSectionMode.Expanded);
 		oSubSection.addMoreBlock(oMoreBlock1);
 		oSubSection.addMoreBlock(oMoreBlock2);
@@ -3094,7 +3046,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		oObjectPageLayout.placeAt('qunit-fixture');
 		await nextUIUpdate();
 
-		oGrid = oSubSection._getGrid();
+		const oGrid = oSubSection._getGrid();
 
 		// Assert: moreBlocks are in the internal Grid (in Expanded mode)
 		assert.strictEqual(oGrid.getContent().length, 2, "Internal Grid has 2 controls");
@@ -3113,10 +3065,11 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("Blocks maintain correct parent relationship after multiple add/remove cycles", async function (assert) {
+		assert.expect(5);
 		// Arrange
-		var oBlock = oHelpers.getBlock(),
-			oSubSection = oHelpers.getSubSection(),
-			oObjectPageLayout = new ObjectPageLayout({
+		const oBlock = oHelpers.getBlock();
+		const oSubSection = oHelpers.getSubSection();
+		const oObjectPageLayout = new ObjectPageLayout({
 				sections: new ObjectPageSection({
 					subSections: [oSubSection]
 				})
@@ -3148,27 +3101,25 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("LayoutDataChange event is delegated from SubSection to internal Grid when block visibility changes", async function (assert) {
+		assert.expect(4);
 		// Arrange
-		var oBlock = oHelpers.getBlock(),
-			oSubSection = oHelpers.getSubSection(),
-			oObjectPageLayout = new ObjectPageLayout({
+		const oBlock = oHelpers.getBlock();
+		const oSubSection = oHelpers.getSubSection();
+		const oObjectPageLayout = new ObjectPageLayout({
 				sections: new ObjectPageSection({
 					subSections: [oSubSection]
 				})
-			}),
-			oGrid,
-			oSpy;
-
+			});
 		// Block is visible by default
 		oBlock.setVisible(true);
 		oSubSection.addBlock(oBlock);
 		oObjectPageLayout.placeAt('qunit-fixture');
 		await nextUIUpdate();
 
-		oGrid = oSubSection._getGrid();
+		const oGrid = oSubSection._getGrid();
 
 		// Spy on Grid's onLayoutDataChange
-		oSpy = this.spy(oGrid, "onLayoutDataChange");
+		const oSpy = this.spy(oGrid, "onLayoutDataChange");
 
 		// Act - Change block visibility from true to false
 		// This triggers _onBlocksChange → _applyLayout → _resetLayoutData → destroyLayoutData()
@@ -3179,7 +3130,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		assert.ok(oSpy.called, "Grid's onLayoutDataChange was called when block visibility changed");
 		assert.strictEqual(oSpy.callCount, 2, "Grid's onLayoutDataChange was called twice - when layout data is destroyed and when it is created again");
 
-		var oEventArg = oSpy.getCall(0).args[0];
+		const oEventArg = oSpy.getCall(0).args[0];
 		assert.ok(oEventArg, "Event object was passed to Grid's onLayoutDataChange");
 		assert.strictEqual(oEventArg.srcControl, oBlock, "Event srcControl is the block that changed visibility");
 
@@ -3188,17 +3139,16 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	});
 
 	QUnit.test("No error when block is externally destroyed and then removeAllBlocks is called", async function (assert) {
+		assert.expect(5);
 		// Arrange
-		var oBlock1 = oHelpers.getBlock(),
-			oBlock2 = oHelpers.getBlock(),
-			oSubSection = oHelpers.getSubSection(),
-			oObjectPageLayout = new ObjectPageLayout({
+		const oBlock1 = oHelpers.getBlock();
+		const oBlock2 = oHelpers.getBlock();
+		const oSubSection = oHelpers.getSubSection();
+		const oObjectPageLayout = new ObjectPageLayout({
 				sections: new ObjectPageSection({
 					subSections: [oSubSection]
 				})
-			}),
-			oGrid;
-
+			});
 		oSubSection.addBlock(oBlock1);
 		oSubSection.addBlock(oBlock2);
 
@@ -3206,7 +3156,7 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		oObjectPageLayout.placeAt('qunit-fixture');
 		await nextUIUpdate();
 
-		oGrid = oSubSection._getGrid();
+		const oGrid = oSubSection._getGrid();
 
 		// Assert: initial state
 		assert.strictEqual(oGrid.getContent().length, 2, "Internal Grid has 2 controls");
@@ -3229,8 +3179,9 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 	QUnit.module("Sticky Header");
 
 	QUnit.test("SubSection sticky header position should be static in RTA mode", async function(assert) {
+		assert.expect(3);
 		// Arrange
-		var oObjectPageLayout = new ObjectPageLayout({
+		const oObjectPageLayout = new ObjectPageLayout({
 			sections: [
 				new ObjectPageSection({
 					title: "Section Title",
@@ -3251,8 +3202,8 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		oObjectPageLayout.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		var oSubSection = oObjectPageLayout.getSections()[0].getSubSections()[0];
-		var oHeaderDom = oSubSection.getDomRef("header");
+		const oSubSection = oObjectPageLayout.getSections()[0].getSubSections()[0];
+		const oHeaderDom = oSubSection.getDomRef("header");
 
 		// Assert - sticky is applied initially
 		assert.strictEqual(getComputedStyle(oHeaderDom).position, "sticky",

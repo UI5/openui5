@@ -20,20 +20,31 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 	"use strict";
 
 	// shortcut for sap.uxap.BlockBaseFormAdjustment
-	var BlockBaseFormAdjustment = library.BlockBaseFormAdjustment;
+	const BlockBaseFormAdjustment = library.BlockBaseFormAdjustment;
+
+	/**
+	 * Returns a Promise that resolves after the ObjectPageLayout fires onAfterRenderingDOMReady.
+	 * @param {sap.uxap.ObjectPageLayout} oOPL
+	 * @returns {Promise<void>}
+	 */
+	function waitForDOMReady(oOPL) {
+		return new Promise((resolve) => {
+			oOPL.attachEventOnce("onAfterRenderingDOMReady", resolve);
+		});
+	}
 
 	QUnit.module("BlockBase");
 
 	QUnit.test("Owner component propagated to views", async function(assert) {
-		var oComponentContainer,
-			oComponent,
-			oMainView,
-			oMainController,
-			oObjectPage,
-			oBlock,
-			oBlockView,
-			oBlockViewController,
-			done = assert.async();
+		let oComponentContainer;
+		let oComponent;
+		let oMainView;
+		let oMainController;
+		let oObjectPage;
+		let oBlock;
+		let oBlockView;
+		let oBlockViewController;
+		const done = assert.async();
 
 		assert.expect(5);
 
@@ -71,6 +82,7 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 				manifest: true,
 				height: "100%",
 				componentCreated: function() {
+					// Component internal initialization runs asynchronously after componentCreated
 					setTimeout(fnOnComponentCreated, 1000);
 				}
 			})
@@ -81,13 +93,12 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 	});
 
 	QUnit.test("blocks are target of lazy loading feature", async function (assert) {
+		assert.expect(6);
 
-		var fnGetBlock = function() {
-			return new BlockBase();
-		},
-		aBlocksOutsideSubSection = [fnGetBlock(), fnGetBlock(), fnGetBlock()],
-		aBlocksInsideSubSection = [fnGetBlock(), fnGetBlock(), fnGetBlock()],
-		oObjectPageLayout = new ObjectPageLayout({
+		const fnGetBlock = () => new BlockBase();
+		const aBlocksOutsideSubSection = [fnGetBlock(), fnGetBlock(), fnGetBlock()];
+		const aBlocksInsideSubSection = [fnGetBlock(), fnGetBlock(), fnGetBlock()];
+		const oObjectPageLayout = new ObjectPageLayout({
 			enableLazyLoading: true,
 			headerContent: aBlocksOutsideSubSection,
 			sections:[
@@ -100,9 +111,9 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 						]
 				})
 			]
-		}),
-		fnAssertShouldBeLoadedLazily = function(assert, oBlock, bExpected) {
-			var bShouldLazyLoad = oBlock._shouldLazyLoad();
+		});
+		const fnAssertShouldBeLoadedLazily = (assert, oBlock, bExpected) => {
+			const bShouldLazyLoad = oBlock._shouldLazyLoad();
 			assert.strictEqual(bShouldLazyLoad, bExpected, " The block " + oBlock.getId() + " is target of lazy loading " + bShouldLazyLoad);
 		};
 
@@ -110,12 +121,12 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 		await nextUIUpdate();
 
 		// Assert: the blocks ObejctPageSubSection are target of lazy laoding
-		aBlocksInsideSubSection.forEach(function(oBlock) {
+		aBlocksInsideSubSection.forEach((oBlock) => {
 			fnAssertShouldBeLoadedLazily(assert, oBlock, true);
 		});
 
 		// Assert: the blocks outside the ObejctPageSubSection are not target of lazy laoding
-		aBlocksOutsideSubSection.forEach(function(oBlock) {
+		aBlocksOutsideSubSection.forEach((oBlock) => {
 			fnAssertShouldBeLoadedLazily(assert, oBlock, false);
 		});
 
@@ -124,18 +135,20 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 	});
 
 	QUnit.test("setVisible prevents redundant layout adjustment", function (assert) {
-
-		 var oBlock = new BlockBase(),
-			 bVisible = oBlock.getVisible(),
-			 oMockObjectPage = {
-				 _requestAdjustLayoutAndUxRules: function() {}
-			 },
-			 oSpy = this.spy(oMockObjectPage, "_requestAdjustLayoutAndUxRules");
+		// Arrange
+		const oBlock = new BlockBase();
+		const bVisible = oBlock.getVisible();
+		const oMockObjectPage = {
+			_requestAdjustLayoutAndUxRules: function() {}
+		};
+		const oSpy = this.spy(oMockObjectPage, "_requestAdjustLayoutAndUxRules");
 
 		this.stub(oBlock, "_getObjectPageLayout").returns(oMockObjectPage);
 
 		// Act: call the setter with the existing value
 		oBlock.setVisible(bVisible);
+
+		// Assert
 		assert.equal(oSpy.callCount, 0, "no layout adjustment requested");
 
 		oBlock.destroy();
@@ -144,62 +157,58 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 	QUnit.module("BlockBase Height", {
 
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "UxAP-InfoBlocks",
 				viewName: "view.UxAP-InfoBlocks"
-			}).then(async function(oView) {
+			}).then(async (oView) => {
 				this.oObjectPageInfoView = oView;
 				this.oObjectPageInfoView.placeAt('qunit-fixture');
 				await nextUIUpdate();
 				done();
-			}.bind(this));
+			});
 		},
 		afterEach: function () {
 			this.oObjectPageInfoView.destroy();
 		}
 	});
 
-	QUnit.test("ObjectPage blocks height", function (assert) {
+	QUnit.test("ObjectPage blocks height", async function (assert) {
 
-		var oOPL = this.oObjectPageInfoView.byId("ObjectPageLayout"),
-			oTargetSubSection = oOPL.getSections()[0].getSubSections()[4],
-			iTargetScrollTop,
-			iActualScrollTop,
-			done = assert.async();
+		const oOPL = this.oObjectPageInfoView.byId("ObjectPageLayout");
+		const oTargetSubSection = oOPL.getSections()[0].getSubSections()[4];
 
 		assert.expect(1);
 
-		oOPL.attachEventOnce("onAfterRenderingDOMReady", function () {
+		await waitForDOMReady(oOPL);
 
-			// Act: scroll to target section, that will result in:
-			// (1) will change the scrollTop [to the one that brings the target section to the top of sections container]
-			// (2) will trigger lazy loading of the target section
-			oOPL.scrollToSection(oTargetSubSection.getId());
+		// Act: scroll to target section, that will result in:
+		// (1) will change the scrollTop [to the one that brings the target section to the top of sections container]
+		// (2) will trigger lazy loading of the target section
+		oOPL.scrollToSection(oTargetSubSection.getId());
 
-			// Act: as the above call is asynchronous (but returns no promise),
-			// make the test synchronous by *explicitly* calling the actions for (1) and (2) above
-			// (1) explicitly change the scrollTop to target position [to the one that brings the target section to the top of sections container]
-			iTargetScrollTop = oOPL._computeScrollPosition(oTargetSubSection);
-			oOPL._$opWrapper.scrollTop(iTargetScrollTop);
-			// (2) explicitly connect the section models (lazy loading)
-			oOPL._connectModelsForSections([oTargetSubSection]);
-			nextUIUpdate.runSync(); // TODO when using async rendering, the below expectations are no longer met?
+		// Act: as the above call is asynchronous (but returns no promise),
+		// make the test synchronous by *explicitly* calling the actions for (1) and (2) above
+		// (1) explicitly change the scrollTop to target position [to the one that brings the target section to the top of sections container]
+		const iTargetScrollTop = oOPL._computeScrollPosition(oTargetSubSection);
+		oOPL._$opWrapper.scrollTop(iTargetScrollTop);
+		// (2) explicitly connect the section models (lazy loading)
+		oOPL._connectModelsForSections([oTargetSubSection]);
+// eslint-disable-next-line no-warning-comments
+		nextUIUpdate.runSync(); // TODO when using async rendering, the below expectations are no longer met?
 
-			// Check if the scrollTop [of the lazy-loaded section] matches the expected one
-			iActualScrollTop = Math.ceil(oOPL._$opWrapper.scrollTop());
-			assert.ok(iTargetScrollTop === iActualScrollTop || iTargetScrollTop === iActualScrollTop + 1, "scrollTop of lazy-loaded section not did not change upon lazy-loading");
-			done();
-		});
+		// Check if the scrollTop [of the lazy-loaded section] matches the expected one
+		const iActualScrollTop = Math.ceil(oOPL._$opWrapper.scrollTop());
+		assert.ok(iTargetScrollTop === iActualScrollTop || iTargetScrollTop === iActualScrollTop + 1, "scrollTop of lazy-loaded section not did not change upon lazy-loading");
 	});
 
 	QUnit.module("'visible' property data binding", {
 		beforeEach: function() {
 			this.fnCreatePageWithSingleBlock = function (oOptions) {
 
-				var oJSONModelData = oOptions.JSONModelData,
-					sPageProperties = objectToString(oOptions.pageProperties),
-					sBlockProperties = objectToString(oOptions.blockProperties);
+				const oJSONModelData = oOptions.JSONModelData;
+				const sPageProperties = objectToString(oOptions.pageProperties);
+				const sBlockProperties = objectToString(oOptions.blockProperties);
 
 				return XMLView.create({
 					definition: `<mvc:View
@@ -217,11 +226,11 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 							</sections>
 						</ObjectPageLayout>
 					</mvc:View>`
-				}).then(function(oView) {
+				}).then((oView) => {
 					this.oView = oView;
 					this.oView.setModel(new JSONModel(oJSONModelData), "viewModel");
 					return oView;
-				}.bind(this));
+				});
 			};
 		},
 		afterEach: function() {
@@ -230,7 +239,7 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 	});
 
 	QUnit.test("resolves databinding when lazyLoading disabled", function (assert) {
-		var done = assert.async();
+		const done = assert.async();
 
 		assert.expect(1);
 
@@ -238,14 +247,15 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 			blockProperties: { id: "block1", visible:"{viewModel>/blockVisible}" },
 			JSONModelData: { blockVisible: false },
 			pageProperties: { enableLazyLoading: false }
-		}).then(function(oView) {
+		}).then((oView) => {
+			// Assert
 			assert.strictEqual(oView.byId("block1").getVisible(), false, "Block visibility is false");
 			done();
 		});
 	});
 
 	QUnit.test("resolves databinding when lazyLoading enabled", function (assert) {
-		var done = assert.async();
+		const done = assert.async();
 
 		assert.expect(2);
 
@@ -253,10 +263,10 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 			blockProperties: { id: "block1", visible:"{viewModel>/blockVisible}" },
 			JSONModelData: { blockVisible: false },
 			pageProperties: { enableLazyLoading: true }
-		}).then(function(oView) {
+		}).then((oView) => {
 
 			// before connecting to models
-			var oBlock = oView.byId("block1");
+			const oBlock = oView.byId("block1");
 			assert.strictEqual(oBlock.getVisible(), true, "Block visibility still has the default value of true");
 
 			// after connecting to models
@@ -269,59 +279,55 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 	QUnit.module("View selection", {
 
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "UxAP-InfoBlocks",
 				viewName: "view.UxAP-InfoBlocks"
-			}).then(async function(oView) {
+			}).then(async (oView) => {
 				this.oObjectPageInfoView = oView;
 				this.oObjectPageInfoView.placeAt('qunit-fixture');
 				await nextUIUpdate();
 				done();
-			}.bind(this));
+			});
 		},
 		afterEach: function () {
 			this.oObjectPageInfoView.destroy();
 		}
 	});
 
-	QUnit.test("bindings are updated when we begin connecting to models with enabled lazyloading, if we are not already connected", function (assert) {
+	QUnit.test("bindings are updated when we begin connecting to models with enabled lazyloading, if we are not already connected", async function (assert) {
 
 		// Arrange
-		var oOPL = this.oObjectPageInfoView.byId("ObjectPageLayout"),
-			oTargetSubSection = oOPL.getSections()[0].getSubSections()[0],
-			oBlock = oTargetSubSection.getBlocks()[0],
-			fnUpdateBindingSpy = this.spy(oBlock, "updateBindings"),
-			fnDone = assert.async();
+		const oOPL = this.oObjectPageInfoView.byId("ObjectPageLayout");
+		const oTargetSubSection = oOPL.getSections()[0].getSubSections()[0];
+		const oBlock = oTargetSubSection.getBlocks()[0];
+		const fnUpdateBindingSpy = this.spy(oBlock, "updateBindings");
 
 		assert.expect(2);
 
 		// Act: explicitly connect the section models (lazy loading)
-		// _bConnect private boolean flag is mocked to "false" in order to target our test scenario
+		// _bConnected = false forces the block to go through the connect path
 		oBlock._bConnected = false;
-		oOPL._connectModelsForSections([oTargetSubSection]);
+		await oOPL._connectModelsForSections([oTargetSubSection]);
 
-		// Assert
-		setTimeout(function () {
-			assert.ok(fnUpdateBindingSpy.calledOnce, "updateBindings is called once only");
-			assert.ok(fnUpdateBindingSpy.calledWithExactly(true, null), "updateBindings is called with the correct arguments");
-			fnDone();
-		}, 0);
+		// Assert: updateBindings is called inside the async connectToModelsAsync chain
+		assert.ok(fnUpdateBindingSpy.calledOnce, "updateBindings is called once only");
+		assert.ok(fnUpdateBindingSpy.calledWithExactly(true, null), "updateBindings is called with the correct arguments");
 	});
 
 	QUnit.test("initView event is fired", function (assert) {
 
-		var oOPL = this.oObjectPageInfoView.byId("ObjectPageLayout"),
-			oTargetSubSection = oOPL.getSections()[0].getSubSections()[0],
-			oBlock = oTargetSubSection.getBlocks()[0],
-			done = assert.async();
+		const oOPL = this.oObjectPageInfoView.byId("ObjectPageLayout");
+		const oTargetSubSection = oOPL.getSections()[0].getSubSections()[0];
+		const oBlock = oTargetSubSection.getBlocks()[0];
+		const done = assert.async();
 
 		assert.expect(2);
 
 		oOPL.attachEventOnce("onAfterRenderingDOMReady", function () {
 			oBlock._selectView("Expanded");
-			oBlock.attachEvent("viewInit", function(oEvent) {
-				var oView = oEvent.getParameter("view");
+			oBlock.attachEvent("viewInit", (oEvent) => {
+				const oView = oEvent.getParameter("view");
 				assert.ok(oView, "event is fired");
 				assert.strictEqual(oView.getViewName(), "sap.uxap.testblocks.objectpageblock.InfoButtonExpanded");
 				done();
@@ -332,12 +338,12 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 
 	QUnit.test("view is created only once", function (assert) {
 
-		var oOPL = this.oObjectPageInfoView.byId("ObjectPageLayout"),
-			oTargetSubSection = oOPL.getSections()[0].getSubSections()[0],
-			oBlock = oTargetSubSection.getBlocks()[0],
-			oExpandViewMetadata = oBlock.getMetadata().getView("Expanded"),
-			createSpy = this.spy(View, "create"),
-			done = assert.async();
+		const oOPL = this.oObjectPageInfoView.byId("ObjectPageLayout");
+		const oTargetSubSection = oOPL.getSections()[0].getSubSections()[0];
+		const oBlock = oTargetSubSection.getBlocks()[0];
+		const oExpandViewMetadata = oBlock.getMetadata().getView("Expanded");
+		const createSpy = this.spy(View, "create");
+		const done = assert.async();
 
 		oExpandViewMetadata.id = oBlock.getId() + "-Expanded"; // setup
 
@@ -365,11 +371,11 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 
 	QUnit.test("notification for view selection only once", function (assert) {
 
-		var oOPL = this.oObjectPageInfoView.byId("ObjectPageLayout"),
-			oTargetSubSection = oOPL.getSections()[0].getSubSections()[0],
-			oBlock = oTargetSubSection.getBlocks()[0],
-			notifySpy = this.spy(oBlock, "_notifyForLoadingInMode"),
-			done = assert.async();
+		const oOPL = this.oObjectPageInfoView.byId("ObjectPageLayout");
+		const oTargetSubSection = oOPL.getSections()[0].getSubSections()[0];
+		const oBlock = oTargetSubSection.getBlocks()[0];
+		const notifySpy = this.spy(oBlock, "_notifyForLoadingInMode");
+		const done = assert.async();
 
 		assert.expect(1);
 
@@ -384,6 +390,7 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 
 			// Check
 			oBlock.attachEventOnce("viewInit", function () {
+				// Inside onAfterRenderingDOMReady + viewInit event chain — cannot replace with nextUIUpdate
 				setTimeout(function() {
 					assert.ok(notifySpy.calledOnce, "notification is called once only");
 					done();
@@ -394,26 +401,26 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 
 	QUnit.test("clean up after destroy view", function (assert) {
 
-		var oOPL = this.oObjectPageInfoView.byId("ObjectPageLayout"),
-			oTargetSubSection = oOPL.getSections()[0].getSubSections()[0],
-			oBlock = oTargetSubSection.getBlocks()[0],
-			done = assert.async();
+		const oOPL = this.oObjectPageInfoView.byId("ObjectPageLayout");
+		const oTargetSubSection = oOPL.getSections()[0].getSubSections()[0];
+		const oBlock = oTargetSubSection.getBlocks()[0];
+		const done = assert.async();
 
 		assert.expect(2);
 
 		oOPL.attachEventOnce("onAfterRenderingDOMReady", function () {
 
 			// verify init state
-			var sCollapsedViewId = oBlock.getSelectedView();
+			const sCollapsedViewId = oBlock.getSelectedView();
 			assert.ok(oBlock._oPromisedViews[sCollapsedViewId], "the view promise is created");
 
 			oBlock._selectView("Expanded");
-			oBlock.attachEvent("viewInit", function(oEvent) {
+			oBlock.attachEvent("viewInit", (oEvent) => {
 
 				// Act
 				Element.getElementById(sCollapsedViewId).destroy();
 
-				// Check
+				// Assert
 				assert.strictEqual(oBlock._oPromisedViews[sCollapsedViewId], undefined, "the view promise is cleaned up");
 				done();
 			});
@@ -424,14 +431,14 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 	QUnit.module("LazyLoading with BlockBase", {
 
 		beforeEach: function (assert) {
-			var done = assert.async();
+			const done = assert.async();
 			XMLView.create({
 				id: "UxAP-ObjectPageLazyLoadingWithBlocks",
 				viewName: "view.UxAP-ObjectPageLazyLoadingWithBlocks"
-			}).then(function(oView) {
+			}).then((oView) => {
 				this.oObjectPageInfoView = oView;
 				done();
-			}.bind(this));
+			});
 		},
 		afterEach: function () {
 			this.oObjectPageInfoView.destroy();
@@ -440,17 +447,17 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 
 	QUnit.test("Check updateBindings for visible and not visible blocks", function (assert) {
 		// Arrange
-		var oOPL = this.oObjectPageInfoView.byId("ObjectPageLayout"),
-			oLastSubSection = this.oObjectPageInfoView.byId("last"),
-			oBlock = oLastSubSection.getBlocks()[0],
-			oSpy = this.spy(Control.prototype, "updateBindings"),
-			done = assert.async();
+		const oOPL = this.oObjectPageInfoView.byId("ObjectPageLayout");
+		const oLastSubSection = this.oObjectPageInfoView.byId("last");
+		const oBlock = oLastSubSection.getBlocks()[0];
+		const oSpy = this.spy(Control.prototype, "updateBindings");
+		const done = assert.async();
 
 		this.oObjectPageInfoView.placeAt('qunit-fixture');
 		nextUIUpdate.runSync();
 
 		function checkSpyCalledWithValue() {
-			return oSpy.getCalls().some(function (oCall) {
+			return oSpy.getCalls().some((oCall) => {
 				return oCall.thisValue === oBlock;
 			});
 		}
@@ -474,76 +481,75 @@ function(ComponentContainer, Control, Shell, Element, nextUIUpdate, BlockBase, O
 		});
 	});
 
-	QUnit.test("Update bindings when 'moreBlocks' are shown", function (assert) {
+	QUnit.test("Update bindings when 'moreBlocks' are shown", async function (assert) {
+		assert.expect(2);
 		// Arrange
-		var oOPL = this.oObjectPageInfoView.byId("ObjectPageLayout"),
-			oFirstSubSection = this.oObjectPageInfoView.byId("firstSubSection"),
-			oBlock = oFirstSubSection.getMoreBlocks()[0],
-			oUpdateBindingsSpy = this.spy(oBlock, "updateBindings"),
-			oSelectViewSpy = this.spy(oBlock, "_selectView"),
-			done = assert.async();
+		const oOPL = this.oObjectPageInfoView.byId("ObjectPageLayout");
+		const oFirstSubSection = this.oObjectPageInfoView.byId("firstSubSection");
+		const oBlock = oFirstSubSection.getMoreBlocks()[0];
+		const oUpdateBindingsSpy = this.spy(oBlock, "updateBindings");
+		const oSelectViewSpy = this.spy(oBlock, "_selectView");
 
 		this.oObjectPageInfoView.placeAt('qunit-fixture');
 		nextUIUpdate.runSync();
 
-		oOPL.attachEventOnce("onAfterRenderingDOMReady", function () {
-			// Act - press ShowMore Button
-			oFirstSubSection._getSeeMoreButton().firePress();
+		await waitForDOMReady(oOPL);
 
-			// Assert
-			assert.ok(oUpdateBindingsSpy.calledOnce, "updateBindings is called for BlockBase in 'moreBlocks' aggregation of first SubSection");
-			assert.ok(oSelectViewSpy.calledOnce, "_selectView is called for BlockBase in 'moreBlocks' aggregation of first SubSection");
+		// Act - press ShowMore Button
+		oFirstSubSection._getSeeMoreButton().firePress();
 
-			done();
-		});
+		// Assert
+		assert.ok(oUpdateBindingsSpy.calledOnce, "updateBindings is called for BlockBase in 'moreBlocks' aggregation of first SubSection");
+		assert.ok(oSelectViewSpy.calledOnce, "_selectView is called for BlockBase in 'moreBlocks' aggregation of first SubSection");
 
 	});
 
 	QUnit.test("Form adjustment destroys the obsolete form layout", function (assert) {
-		var done = assert.async(),
-			viewContent = '<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:form="sap.ui.layout.form">' +
+		const done = assert.async();
+		const viewContent = '<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:form="sap.ui.layout.form">' +
 				'<form:Form>' +
 					'<form:layout>' +
 						'<form:ResponsiveGridLayout id="idResponsiveGridLayout" />' +
 					'</form:layout>' +
 					'</form:Form>' +
-				'</mvc:View>',
-			MyBlock = BlockBase.extend("my.custom.Block", {
-				metadata: {
-					views: {
-						// Define the view for the block
-						Collapsed: {
-							type: "XML",
-							async: true,
-							definition:viewContent
-						},
-						Expanded: {
-							type: "XML",
-							async: true,
-							definition:viewContent
-						}
+				'</mvc:View>';
+		const MyBlock = BlockBase.extend("my.custom.Block", {
+			metadata: {
+				views: {
+					// Define the view for the block
+					Collapsed: {
+						type: "XML",
+						async: true,
+						definition:viewContent
+					},
+					Expanded: {
+						type: "XML",
+						async: true,
+						definition:viewContent
 					}
-				},
-				renderer: {}
-			}),
-			myBlock = new MyBlock({
-				id: "myBlock",
-				formAdjustment: BlockBaseFormAdjustment.BlockColumns
-			}),
-			oSubSection = new ObjectPageSubSection({
-				id: "mySubSection",
-				blocks: [myBlock]
-			});
+				}
+			},
+			renderer: {}
+		});
+		const myBlock = new MyBlock({
+			id: "myBlock",
+			formAdjustment: BlockBaseFormAdjustment.BlockColumns
+		});
+		const oSubSection = new ObjectPageSubSection({
+			id: "mySubSection",
+			blocks: [myBlock]
+		});
 
 		oSubSection._oLayoutConfig = {M: 2, L: 3, XL: 4};
 
-		myBlock.attachEventOnce("viewInit", function (oEvent) {
-			var oView = oEvent.getParameter("view");
-			var oFormLayout = oView.byId("idResponsiveGridLayout");
+		myBlock.attachEventOnce("viewInit", (oEvent) => {
+			const oView = oEvent.getParameter("view");
+			const oFormLayout = oView.byId("idResponsiveGridLayout");
 
 			// Assert: check if the obsolete form layout is destroyed
 			assert.ok(oFormLayout, "The form layout is created");
 
+			// Inside viewInit event — allows form adjustment internals to settle
 			setTimeout(function () {
 				// Act: trigger the adjustment of the form layout
 				myBlock._applyFormAdjustment();

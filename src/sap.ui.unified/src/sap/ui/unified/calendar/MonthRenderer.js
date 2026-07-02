@@ -194,10 +194,10 @@ MonthRenderer.renderHeaderLine = function(oRm, oMonth, oLocaleData, oDate){
 
 MonthRenderer.renderDayNames = function(oRm, oMonth, oLocaleData, iStartDay, iDays, bDayNumberAsId, sWidth){
 
-	var iFirstDayOfWeek = oMonth._getFirstDayOfWeek();
-	var sId = oMonth.getId();
-	var sDayId = "";
-	var sCalendarType = oMonth.getPrimaryCalendarType();
+	var iFirstDayOfWeek = oMonth._getFirstDayOfWeek(),
+		sId = oMonth.getId(),
+		sCalendarType = oMonth.getPrimaryCalendarType(),
+		sDayId = "";
 
 	var aWeekDays = [];
 	if (oMonth._bLongWeekDays || !oMonth._bNamesLengthChecked) {
@@ -208,7 +208,7 @@ MonthRenderer.renderDayNames = function(oRm, oMonth, oLocaleData, iStartDay, iDa
 	var aWeekDaysWide = oLocaleData.getDaysStandAlone("wide", sCalendarType);
 
 	if (oMonth.getShowWeekNumbers() && sCalendarType !== CalendarType.Islamic) { // on Islamic primary calendar week numbers are not shown, do not add dummy cell
-		this.renderDummyCell(oRm, "sapUiCalWH", true, "columnheader");
+		this.renderDummyCell(oRm, "sapUiCalWH", true, oMonth._getWeekNumbersHeaderText(), "columnheader");
 	}
 
 	for ( var i = 0; i < iDays; i++) {
@@ -305,7 +305,7 @@ MonthRenderer.renderDays = function(oRm, oMonth, oDate){
 
 	if (iLength === 28) {
 		// there are only 4 full weeks (28 days), add one hidden 'day' div in order to open space for 5-th week
-		this.renderDummyCell(oRm, "sapUiCalItem", false, "");
+		this.renderDummyCell(oRm, "sapUiCalItem", false, "", "");
 	}
 };
 
@@ -313,22 +313,35 @@ MonthRenderer.renderDays = function(oRm, oMonth, oDate){
  * Generates empty 'day' div that adds space for one more week in the calendar, in case of 4 full weeks only (28 days)
  * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer
  * @param {string} sClassName css class that will be added to the dummy element styles
- * @param {boolean} bVisible if set to true the dummy element will be visible
+ * @param {boolean} bShowColumn if set to true the dummy element will be visible
+ * @param {string} sCellText text to render inside the dummy element; if empty, no text span is rendered
  * @param {string} sRole aria role attribute
  * @private
  */
-MonthRenderer.renderDummyCell = function(oRm, sClassName, bVisible, sRole) {
+MonthRenderer.renderDummyCell = function(oRm, sClassName, bShowColumn, sCellText, sRole) {
+	var sFullText = Library.getResourceBundleFor("sap.ui.unified").getText("CALENDAR_WEEK");
 	oRm.openStart("div");
 	oRm.class(sClassName);
 	oRm.class("sapUiCalDummy");
-	oRm.style("visibility", bVisible ? "visible" : "hidden");
+	oRm.style("visibility", bShowColumn ? "visible" : "hidden");
 	oRm.attr("role", sRole);
+	if (sCellText) {
+		oRm.attr("title", sFullText);
+	}
 	oRm.openEnd();
+
+	if (sCellText) {
+		oRm.openStart("span");
+		oRm.attr("aria-hidden", "true");
+		oRm.openEnd();
+		oRm.text(sCellText);
+		oRm.close("span");
+	}
 
 	oRm.openStart("span");
 	oRm.class("sapUiPseudoInvisibleText");
 	oRm.openEnd();
-	oRm.text(Library.getResourceBundleFor("sap.ui.unified").getText("CALENDAR_WEEK"));
+	oRm.text(sFullText);
 	oRm.close("span");
 
 	oRm.close('div');

@@ -943,6 +943,35 @@ sap.ui.define([
 			assert.strictEqual(oSetCallbackStub.callCount, 0, "then setDynamicVariantsLoadedCallback is not called");
 		});
 
+		QUnit.test("when 'registerToModel' is called, the apply step is wired into the variant switch chain before waitForFlexObjectsToBeApplied", async function(assert) {
+			const oApplyStub = sandbox.stub(VariantManagerApply, "applyInitialChangesForExistingControls").resolves();
+
+			this.createModel();
+			const oRegisterSpy = sandbox.spy(this.oModel, "registerToModel");
+			FlexObjectState.waitForFlexObjectsToBeApplied.resetHistory();
+			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await oRegisterSpy.firstCall.returnValue;
+			await VariantManagementState.waitForVariantSwitch(sReference, this.sVMReference);
+
+			assert.strictEqual(
+				oApplyStub.callCount, 1,
+				"then VariantManagerApply.applyInitialChangesForExistingControls is invoked"
+			);
+			assert.deepEqual(
+				oApplyStub.firstCall.args[0],
+				{
+					appComponent: this.oComponent,
+					reference: sReference,
+					vmReference: this.sVMReference
+				},
+				"then it receives the expected property bag"
+			);
+			assert.ok(
+				oApplyStub.calledBefore(FlexObjectState.waitForFlexObjectsToBeApplied),
+				"then it runs before waitForFlexObjectsToBeApplied — otherwise the wait still hangs"
+			);
+		});
+
 		QUnit.test("when the dynamic variants loaded callback is executed", async function(assert) {
 			this.createModel();
 			sandbox.stub(Loader, "getCachedFlexData").returns({
