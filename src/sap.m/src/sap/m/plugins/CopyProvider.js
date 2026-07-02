@@ -273,6 +273,7 @@ sap.ui.define(["./PluginBase", "sap/base/Log", "sap/base/strings/formatMessage",
 			});
 			sap.ui.require(["sap/ui/core/ShortcutHintsMixin"], (ShortcutHintsMixin) => {
 				if (this._oCopyButton) { // Button might be destroyed in the meantime, esp. in tests
+					this._oCopyButton.attachBrowserEvent("keydown", this._onCopyButtonKeyDown, this);
 					ShortcutHintsMixin.addConfig(this._oCopyButton, {
 						message: oBundle.getText(Device.os.macintosh ? "COPYPROVIDER_SHORTCUT_MAC" : "COPYPROVIDER_SHORTCUT_WIN")
 					}, this.getParent());
@@ -280,6 +281,14 @@ sap.ui.define(["./PluginBase", "sap/base/Log", "sap/base/strings/formatMessage",
 			});
 		}
 		return this._oCopyButton;
+	};
+
+	CopyProvider.prototype._onCopyButtonKeyDown = function(oEvent) {
+		if (oEvent.repeat || oEvent.code !== "KeyC" || !(oEvent.ctrlKey || oEvent.metaKey)) {
+			return;
+		}
+		oEvent.preventDefault();
+		this.copySelectionData(true);
 	};
 
 	CopyProvider.prototype.exit = function() {
