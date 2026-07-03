@@ -21,6 +21,7 @@ sap.ui.define([
 	"sap/m/App",
 	"sap/m/ScrollContainer",
 	"sap/m/Text",
+	"sap/m/FormattedText",
 	"sap/m/OverflowToolbar",
 	"sap/m/Toolbar",
 	"sap/m/Input",
@@ -59,6 +60,7 @@ sap.ui.define([
 	App,
 	ScrollContainer,
 	Text,
+	FormattedText,
 	OverflowToolbar,
 	Toolbar,
 	Input,
@@ -1795,6 +1797,47 @@ sap.ui.define([
 		oClock.restore();
 		oDialog.destroy();
 		oDialogButton.destroy();
+	});
+
+	QUnit.test("FormattedText with a link in the content and a footer button", async function (assert) {
+		// Regression test for: when the dialog content is a FormattedText whose raw
+		// anchor (<a>) has no DOM id, the initial focus wrongly landed on the footer
+		// button (via the -firstfe sentinel redirecting to the last focusable element).
+		// The link must also be focused in a single step so that the screen reader
+		// announces the dialog role, title and content on open.
+		var oClock = sinon.useFakeTimers();
+
+		var oFormattedText = new FormattedText({
+			htmlText: "This is some formatted text with a link: <a href='https://www.sap.com' target='_blank'>Visit SAP</a>."
+		});
+
+		var oDialog = new Dialog({
+			title: "Information",
+			content: [oFormattedText],
+			beginButton: new Button("closeBtnFT", {
+				text: "Close"
+			})
+		});
+
+		await nextUIUpdate(oClock);
+
+		oDialog.open();
+		oClock.tick(400);
+		await nextUIUpdate(oClock);
+
+		var oAnchor = oFormattedText.getDomRef().querySelector("a");
+		var sPopupInitialFocusId = oDialog.oPopup._sInitialFocusId;
+
+		// The id passed to the Popup must resolve directly to the anchor.
+		// If it resolved to the dialog root instead, focus would land on the
+		// dialog's tabindex="-1" wrapper first, breaking the screen reader
+		// announcement of the dialog role and title.
+		assert.notStrictEqual(sPopupInitialFocusId, oDialog.getId(), "Initial focus id passed to Popup is not the dialog root (would cause a two-step focus and break SR announcement).");
+		assert.strictEqual(document.getElementById(sPopupInitialFocusId), oAnchor, "Initial focus id passed to Popup resolves directly to the anchor.");
+		assert.strictEqual(document.activeElement, oAnchor, "Initial focus is on the link inside the FormattedText, not on the footer button.");
+
+		oClock.restore();
+		oDialog.destroy();
 	});
 
 
