@@ -2264,7 +2264,17 @@ sap.ui.define([
 				sinon: false
 			},
 
-			"editor/SectionSapCard1Enhancement": {
+			"editor/SectionSapCard1_RequestValues": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/SectionSapCard1_RequestValuesEnhancement": {
 				group: "Runtime Editor",
 				coverage: {
 					only: [
@@ -2284,7 +2294,17 @@ sap.ui.define([
 				sinon: false
 			},
 
-			"editor/SectionTempEnhancement": {
+			"editor/SectionTemp_RequestValues": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/SectionTemp_RequestValuesEnhancement": {
 				group: "Runtime Editor",
 				coverage: {
 					only: [

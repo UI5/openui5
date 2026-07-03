@@ -1,7 +1,6 @@
 /* global QUnit */
 
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap/m/Button",
 	"sap/m/MessageBox",
 	"sap/m/Popover",
@@ -26,7 +25,6 @@ sap.ui.define([
 	"sap/ui/rta/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
-	Localization,
 	Button,
 	MessageBox,
 	Popover,
@@ -1426,18 +1424,6 @@ sap.ui.define([
 			this.oToolbar.navigateBack();
 
 			assert.strictEqual(oHistoryBackStub.callCount, 1, "then window.history.back was called");
-		});
-
-		QUnit.test("when formatBackButtonIcon is called in LTR mode", function(assert) {
-			sandbox.stub(Localization, "getRTL").returns(false);
-			const sIcon = this.oToolbar.formatBackButtonIcon();
-			assert.ok(sIcon.includes("nav-back"), "then the nav-back icon is returned");
-		});
-
-		QUnit.test("when formatBackButtonIcon is called in RTL mode", function(assert) {
-			sandbox.stub(Localization, "getRTL").returns(true);
-			const sIcon = this.oToolbar.formatBackButtonIcon();
-			assert.ok(sIcon.includes("feeder-arrow"), "then the feeder-arrow icon is returned");
 		});
 	});
 

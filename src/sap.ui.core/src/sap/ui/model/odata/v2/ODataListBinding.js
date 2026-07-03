@@ -2037,13 +2037,7 @@ sap.ui.define([
 			aFilters = [],
 			aPredicateSet = new Set(),
 			sResolvedPath = this.getResolvedPath(),
-			bTransientMatched = false,
-			that = this;
-
-		function isNonTransientTarget(sFullTarget) {
-			return aCreatedContextDeepPaths
-				.every((sCreatedContextDeepPath) => !sFullTarget.startsWith(sCreatedContextDeepPath));
-		}
+			bTransientMatched = false;
 
 		if (!sResolvedPath) {
 			return Promise.resolve(null);
@@ -2052,12 +2046,17 @@ sap.ui.define([
 		const aCreatedContextDeepPaths = this._getCreatedContexts()
 			.filter((oContext) => oContext.isTransient())
 			.map((oCreatedContext) => oCreatedContext.getDeepPath());
-		this.oModel.getMessagesByPath(sDeepPath, true).forEach(function (oMessage) {
+
+		const isNonTransientTarget = (sFullTarget) =>
+			aCreatedContextDeepPaths
+				.every((sCreatedContextDeepPath) => !sFullTarget.startsWith(sCreatedContextDeepPath));
+
+		this.oModel.getMessagesByPath(sDeepPath, true).forEach((oMessage) => {
 			var sPredicate;
 
 			if (!fnFilter || fnFilter(oMessage)) {
 				// this.oModel.getMessagesByPath returns only messages with full target starting with deep path
-				oMessage.aFullTargets.forEach(function (sFullTarget) {
+				oMessage.aFullTargets.forEach((sFullTarget) => {
 					if (sFullTarget.startsWith(sDeepPath)) {
 						if (isNonTransientTarget(sFullTarget)) {
 							sPredicate = sFullTarget.slice(sDeepPath.length).split("/")[0];
@@ -2071,8 +2070,8 @@ sap.ui.define([
 				});
 			}
 		});
-		aPredicateSet.forEach(function (sPredicate) {
-			aFilters.push(that._getFilterForPredicate(sPredicate));
+		aPredicateSet.forEach((sPredicate) => {
+			aFilters.push(this._getFilterForPredicate(sPredicate));
 		});
 
 		if (aFilters.length === 1) {

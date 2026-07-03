@@ -11,7 +11,7 @@
 			<content>
 				<Button
 						id="sapUiRta_backButton"
-						icon="{parts: [{path: 'controls>/backButton/enabled'}], formatter: '.formatBackButtonIcon'}"
+						icon="sap-icon://nav-back"
 						type="Transparent"
 						enabled="{controls>/backButton/enabled}"
 						visible="{controls>/backButton/visible}"

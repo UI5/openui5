@@ -435,15 +435,15 @@ sap.ui.define([
 		headerLevel: TitleLevel.H2,
 		contextMenu: oContextMenu,
 		items: [
-			new StandardListItem({
+			new StandardListItem("list-item1", {
 				title: "Document 1",
 				icon: "sap-icon://document"
 			}),
-			new StandardListItem({
+			new StandardListItem("list-item2", {
 				title: "Document 2",
 				icon: "sap-icon://document"
 			}),
-			new StandardListItem({
+			new StandardListItem("list-item3", {
 				title: "Document 3",
 				icon: "sap-icon://document"
 			})
