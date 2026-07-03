@@ -296,6 +296,7 @@ sap.ui.define([
 
 		assert.ok(oListCustomHeader, true, "The MessagePopover has customHeader");
 		assert.strictEqual(oListCustomHeader.getContent()[0].getText(), Library.getResourceBundleFor("sap.m").getText("MESSAGEPOPOVER_ARIA_HEADING"), "Header has the correct title");
+		assert.strictEqual(oListCustomHeader.getContent()[0].getLevel(), Device.system.phone ? "H1" : "H2", "List page title has correct heading level");
 
 		this.openDetailPageAfterOpen(this.oMessagePopover, 1);
 		this.clock.tick(500);
@@ -304,6 +305,7 @@ sap.ui.define([
 		const oDetailsHeader = this.oMessagePopover._oMessageView._detailsPage.getCustomHeader();
 
 		assert.strictEqual(oDetailsHeader.getContent()[1].getText(), Library.getResourceBundleFor("sap.m").getText("MESSAGEPOPOVER_ARIA_BACK_BUTTON"), "There should not be visible popover header in details page");
+		assert.strictEqual(oDetailsHeader.getContent()[1].getLevel(), Device.system.phone ? "H1" : "H2", "Details page title has correct heading level");
 	});
 
 	QUnit.test("Busy indicator should be shown", function (assert) {

@@ -251,10 +251,6 @@ sap.ui.define([
 		return this.getExtension("versioning", Versioning).formatVersionButtonText(aVersions, sDisplayedVersion);
 	};
 
-	Adaptation.prototype.formatBackButtonIcon = function() {
-		return Localization.getRTL() ? IconPool.getIconURI("feeder-arrow") : IconPool.getIconURI("nav-back");
-	};
-
 	Adaptation.prototype.showVersionHistory = function(oEvent) {
 		return this.getExtension("versioning", Versioning).showVersionHistory(oEvent);
 	};
@@ -349,7 +345,6 @@ sap.ui.define([
 			controller: {
 				activate: this._openVersionTitleDialog.bind(this),
 				discardDraft: this.eventHandler.bind(this, "DiscardDraft"),
-				formatBackButtonIcon: this.formatBackButtonIcon.bind(this),
 				formatDiscardDraftVisible: this.formatDiscardDraftVisible.bind(this),
 				formatPublishVersionVisibility: this.formatPublishVersionVisibility.bind(this),
 				modeChange: this.eventHandler.bind(this, "ModeChange"),

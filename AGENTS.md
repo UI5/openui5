@@ -40,6 +40,10 @@ This repository uses **Gerrit** for code review, not GitHub pull requests. Key r
 - Push changes for review with: `git push origin HEAD:refs/for/master`
 - Do not force-push or rewrite commits that are already under review without explicit user instruction.
 
+## Metadata-Driven Controls (MDC)
+When the context is related to Metadata-Driven Controls (MDC) this relates to sap.ui.mdc library.
+@src/sap.ui.mdc/AGENTS.md
+
 ## Key References
 
 **Start here** (read these first when working on code changes):

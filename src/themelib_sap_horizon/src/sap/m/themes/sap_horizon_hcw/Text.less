@@ -18,3 +18,15 @@ html[data-sap-ui-browser^='cr'] .sapUiFormEdit .sapMText {
 	font-style: italic;
 	padding-right: 5px;
 }
+
+.sapMText {
+	&::selection {
+		background: var(--sapSelectedColor);
+		color: var(--sapContent_ContrastTextColor);
+	}
+
+	&::-moz-selection {
+		background: var(--sapSelectedColor);
+		color: var(--sapContent_ContrastTextColor);
+	}
+}

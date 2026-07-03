@@ -75,6 +75,9 @@ sap.ui.define([
 	// shortcut for sap.ui.core.ValueState
 	var ValueState = coreLibrary.ValueState;
 
+	// shortcut for sap.ui.core.TitleLevel
+	var TitleLevel = coreLibrary.TitleLevel;
+
 	// shortcut for sap.m.ListType
 	var ListType = library.ListType;
 
@@ -719,7 +722,8 @@ sap.ui.define([
 	MessageView.prototype.insertTitle = function (oTitleParent) {
 			const sText = this._oResourceBundle.getText("MESSAGEPOPOVER_ARIA_BACK_BUTTON");
 			const oTitle = new Title({
-				text: sText
+				text: sText,
+				level: Device.system.phone ? TitleLevel.H1 : TitleLevel.H2
 			});
 
 			oTitleParent.insertContent(oTitle, 1);
@@ -736,7 +740,8 @@ sap.ui.define([
 			const oCustomHeader = new Toolbar({
 				content: [
 					new Title({
-						text: sText
+						text: sText,
+						level: Device.system.phone ? TitleLevel.H1 : TitleLevel.H2
 					}),
 					new ToolbarSpacer(),
 					this.getCloseBtn(),
