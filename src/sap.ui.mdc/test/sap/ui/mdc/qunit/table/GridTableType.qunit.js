@@ -16,6 +16,7 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/Control",
 	"sap/ui/model/json/JSONModel",
+	"sap/ui/model/type/Boolean",
 	"sap/ui/fl/variants/VariantManagement",
 	"test-resources/sap/m/qunit/p13n/TestModificationHandler"
 ], function(
@@ -34,6 +35,7 @@ sap.ui.define([
 	Element,
 	Control,
 	JSONModel,
+	BooleanType,
 	VariantManagement,
 	TestModificationHandler
 ) {
@@ -890,6 +892,71 @@ sap.ui.define([
 		assert.strictEqual(oInnerTable.getRowActionCount(), 0, "rowActionCount is 0");
 		assert.notOk(oInnerTable.getDomRef().classList.contains("sapUiTableRAct"),
 			"Row action column is not rendered when rowActionCount is 0");
+	});
+
+	QUnit.test("navigated and highlight - static values", async function(assert) {
+		await this.createTable({
+			rowSettings: new RowSettings({
+				navigated: true,
+				highlight: "Error"
+			})
+		});
+		await new Promise((resolve) => {
+			this.oTable._oTable.attachEventOnce("rowsUpdated", resolve);
+		});
+
+		const oInnerRow = this.oTable._oTable.getRows()[0];
+		const oSettings = oInnerRow.getAggregation("_settings");
+		assert.strictEqual(oSettings.getNavigated(), true, "Static value for navigated is applied");
+		assert.strictEqual(oSettings.getHighlight(), "Error", "Static value for highlight is applied");
+	});
+
+	QUnit.test("navigated and highlight - bound values with formatters", async function(assert) {
+		this.oTable?.destroy();
+		this.oTable = new Table({
+			type: new GridTableType(),
+			delegate: {
+				name: sDelegatePath,
+				payload: {
+					collectionPath: "namedModel>/testPath"
+				}
+			},
+			columns: new Column({
+				id: "foo0",
+				header: "Test0",
+				template: new Text({text: "template0"})
+			}),
+			models: {
+				namedModel: new JSONModel({
+					testPath: [
+						{description: "item 1"},
+						{description: "item 2"}
+					]
+				})
+			},
+			rowSettings: new RowSettings({
+				navigated: {
+					path: "namedModel>description",
+					type: BooleanType,
+					formatter: (sDescription) => sDescription === "item 1"
+				},
+				highlight: {
+					path: "namedModel>description",
+					formatter: (sDescription) => (sDescription === "item 1" ? "Warning" : "Information")
+				}
+			})
+		});
+		this.oTable.placeAt("qunit-fixture");
+		await TableQUnitUtils.waitForBinding(this.oTable);
+		await new Promise((resolve) => {
+			this.oTable._oTable.attachEventOnce("rowsUpdated", resolve);
+		});
+
+		const aRows = this.oTable._oTable.getRows();
+		assert.strictEqual(aRows[0].getAggregation("_settings").getNavigated(), true, "Formatted value for navigated (item 1)");
+		assert.strictEqual(aRows[0].getAggregation("_settings").getHighlight(), "Warning", "Formatted value for highlight (item 1)");
+		assert.strictEqual(aRows[1].getAggregation("_settings").getNavigated(), false, "Formatted value for navigated (item 2)");
+		assert.strictEqual(aRows[1].getAggregation("_settings").getHighlight(), "Information", "Formatted value for highlight (item 2)");
 	});
 
 	QUnit.module("Events", {

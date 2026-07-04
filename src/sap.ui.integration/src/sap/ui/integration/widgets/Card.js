@@ -670,6 +670,7 @@ sap.ui.define([
 			"refresh",
 			"refreshData",
 			"showMessage",
+			"hideMessage",
 			"getBaseUrl",
 			"resolveUrl",
 			"getRuntimeUrl", // @deprecated since 1.147.0
@@ -1739,12 +1740,13 @@ sap.ui.define([
 			};
 			this.scheduleFireStateChanged();
 		} else {
-			Log.error("'showMessage' cannot be used before the card instance is ready. Consider using the event 'manifestApplied' event.", "sap.ui.integration.widgets.Card");
+			Log.error("'showMessage' cannot be used before the card instance is ready. Consider using the 'manifestApplied' event.", "sap.ui.integration.widgets.Card");
 		}
 	};
 
 	/**
-	 * Hides the message previously shown by showMessage.
+	 * Hides the message previously shown by {@link sap.ui.integration.widgets.Card#showMessage showMessage}.
+	 * Can be used only after the <code>manifestApplied</code> event is fired.
 	 *
 	 * @public
 	 * @ui5-experimental-since 1.117
@@ -1757,7 +1759,7 @@ sap.ui.define([
 			this._oMessage = null;
 			this.scheduleFireStateChanged();
 		} else {
-			Log.error("'showMessage' cannot be used before the card instance is ready. Consider using the event 'manifestApplied' event.", "sap.ui.integration.widgets.Card");
+			Log.error("'hideMessage' cannot be used before the card instance is ready. Consider using the 'manifestApplied' event.", "sap.ui.integration.widgets.Card");
 		}
 	};
 

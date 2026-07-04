@@ -3602,20 +3602,13 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("fetchKeyPredicate", function (assert) {
-		var oModel = this.createModel(),
-			mTypeForMetaPathExpected;
+		var oModel = this.createModel();
 
 		this.mock(oModel.oRequestor).expects("fetchType")
-			.withExactArgs(sinon.match(function (mTypeForMetaPath) {
-				mTypeForMetaPathExpected = mTypeForMetaPath;
-				return typeof mTypeForMetaPath === "object";
-			}), "~metaPath~")
-			.returns(SyncPromise.resolve());
+			.withExactArgs("~metaPath~")
+			.returns(SyncPromise.resolve("~mTypeForMetaPath~"));
 		this.mock(_Helper).expects("getKeyPredicate")
-			.withExactArgs("~oEntity~", "~metaPath~",
-				sinon.match(function (mTypeForMetaPath) {
-					return mTypeForMetaPath === mTypeForMetaPathExpected;
-				}))
+			.withExactArgs("~oEntity~", "~metaPath~", "~mTypeForMetaPath~")
 			.returns("~keyPredicate~");
 
 		// code under test

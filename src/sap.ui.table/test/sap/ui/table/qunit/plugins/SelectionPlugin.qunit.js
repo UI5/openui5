@@ -203,4 +203,20 @@ sap.ui.define([
 		assert.strictEqual(oHeaderSelector.getTooltip(), "Custom Tooltip", "HeaderSelector tooltip");
 		oTable.destroy();
 	});
+
+	QUnit.module("Abstract methods");
+
+	QUnit.test("setSelected, isSelected and getSelectedCount throw on the abstract base class", function(assert) {
+		const AbstractPlugin = SelectionPlugin.extend("sap.ui.table.test.SelectionPlugin.AbstractPlugin");
+		const oPlugin = new AbstractPlugin();
+
+		assert.throws(() => oPlugin.setSelected({}, true), new Error(oPlugin + " does not implement #setSelected"),
+			"#setSelected throws with the expected error message");
+		assert.throws(() => oPlugin.isSelected({}), new Error(oPlugin + " does not implement #isSelected"),
+			"#isSelected throws with the expected error message");
+		assert.throws(() => oPlugin.getSelectedCount(), new Error(oPlugin + " does not implement #getSelectedCount"),
+			"#getSelectedCount throws with the expected error message");
+
+		oPlugin.destroy();
+	});
 });

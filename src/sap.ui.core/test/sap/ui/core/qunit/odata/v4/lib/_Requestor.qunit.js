@@ -256,6 +256,9 @@ sap.ui.define([
 		assert.strictEqual(oRequestor.isBatchSent(), false);
 		assert.strictEqual(oRequestor.mHeaders, mHeaders);
 		assert.deepEqual(oRequestor.aLockedGroupLocks, []);
+		assert.deepEqual(oRequestor.mTypeForMetaPath, {});
+		assert.strictEqual(oRequestor.getTypes(), oRequestor.mTypeForMetaPath);
+		assert.deepEqual(oRequestor.mTypePromiseForMetaPath, {});
 		assert.strictEqual(oRequestor.oModelInterface, oModelInterface);
 		assert.strictEqual(oRequestor.sODataVersion, "~sODataVersion~");
 		assert.strictEqual(oRequestor.oOptimisticBatch, null);
@@ -4560,7 +4563,6 @@ sap.ui.define([
 	QUnit.test("fetchType", function (assert) {
 		var oRequestor = _Requestor.create("/", oModelInterface, {}, {}, "4.0"),
 			oRequestorMock = this.mock(oRequestor),
-			mTypeForMetaPath = {},
 			oType = {};
 
 		oRequestorMock.expects("fetchTypeForPath")
@@ -4570,28 +4572,26 @@ sap.ui.define([
 			.returns(SyncPromise.resolve(undefined));
 
 		// code under test
-		return oRequestor.fetchType(mTypeForMetaPath, "/TEAMS").then(function (oResult) {
-			assert.strictEqual(oResult, oType);
+		return oRequestor.fetchType("/TEAMS").then(function (mTypeForMetaPath) {
+			assert.deepEqual(mTypeForMetaPath, {"/TEAMS" : {}});
 			assert.strictEqual(mTypeForMetaPath["/TEAMS"], oType);
 
 			// code under test (already there)
-			assert.strictEqual(oRequestor.fetchType(mTypeForMetaPath, "/TEAMS").getResult(), oType);
+			assert.strictEqual(oRequestor.fetchType("/TEAMS").getResult(), mTypeForMetaPath);
 		});
 	});
 
 	//*********************************************************************************************
 	QUnit.test("fetchType: no type", function (assert) {
-		var oRequestor = _Requestor.create("/", oModelInterface, {}, {}, "4.0"),
-			mTypeForMetaPath = {};
+		var oRequestor = _Requestor.create("/", oModelInterface, {}, {}, "4.0");
 
 		this.mock(oRequestor).expects("fetchTypeForPath")
 			.withExactArgs("/TEAMS/Unknown").returns(SyncPromise.resolve(undefined));
 		this.mock(oRequestor.getModelInterface()).expects("fetchMetadata").never();
 
 		// code under test
-		return oRequestor.fetchType(mTypeForMetaPath, "/TEAMS/Unknown").then(function (oResult) {
-			assert.strictEqual(oResult, undefined);
-			assert.notOk("/TEAMS/Unknown" in mTypeForMetaPath);
+		return oRequestor.fetchType("/TEAMS/Unknown").then(function (mTypeForMetaPath) {
+			assert.deepEqual(mTypeForMetaPath, {});
 		});
 	});
 
@@ -4599,7 +4599,6 @@ sap.ui.define([
 	QUnit.test("fetchType: message annotation", function (assert) {
 		var oRequestor = _Requestor.create("/", oModelInterface, {}, {}, "4.0"),
 			oMessageAnnotation = {},
-			mTypeForMetaPath = {},
 			oType = {};
 
 		this.mock(oRequestor).expects("fetchTypeForPath")
@@ -4609,10 +4608,11 @@ sap.ui.define([
 			.returns(SyncPromise.resolve(oMessageAnnotation));
 
 		// code under test
-		return oRequestor.fetchType(mTypeForMetaPath, "/TEAMS").then(function (oResult) {
-			assert.strictEqual(mTypeForMetaPath["/TEAMS"], oResult);
-			assert.ok(oType.isPrototypeOf(oResult));
-			assert.strictEqual(oResult["@com.sap.vocabularies.Common.v1.Messages"],
+		return oRequestor.fetchType("/TEAMS").then(function (mTypeForMetaPath) {
+			const oTypeWithMessages = mTypeForMetaPath["/TEAMS"];
+			assert.deepEqual(mTypeForMetaPath, {"/TEAMS" : oTypeWithMessages});
+			assert.ok(oType.isPrototypeOf(oTypeWithMessages));
+			assert.strictEqual(oTypeWithMessages["@com.sap.vocabularies.Common.v1.Messages"],
 				oMessageAnnotation);
 		});
 	});
@@ -4623,7 +4623,6 @@ sap.ui.define([
 			oRequestorMock = this.mock(oRequestor),
 			bKey1Done = false,
 			bKey2Done = false,
-			mTypeForMetaPath = {},
 			oType = {$Key : [{key1 : "a/b/id"}, "key2", {key3 : "c/id"}]},
 			oTypeKey1Promise = new SyncPromise(function (resolve) {
 				setTimeout(function () {
@@ -4638,24 +4637,21 @@ sap.ui.define([
 				});
 			});
 
-		oRequestorMock.expects("fetchType")
-			.withExactArgs(sinon.match.same(mTypeForMetaPath), "/TEAMS")
+		oRequestorMock.expects("fetchType").withExactArgs("/TEAMS")
 			.callThrough(); // start the recursion
 		oRequestorMock.expects("fetchTypeForPath")
 			.withExactArgs("/TEAMS").returns(SyncPromise.resolve(Promise.resolve(oType)));
 		this.mock(oRequestor.getModelInterface()).expects("fetchMetadata")
 			.withExactArgs("/TEAMS/@com.sap.vocabularies.Common.v1.Messages")
 			.returns(SyncPromise.resolve(undefined));
-		oRequestorMock.expects("fetchType")
-			.withExactArgs(sinon.match.same(mTypeForMetaPath), "/TEAMS/a/b")
+		oRequestorMock.expects("fetchType").withExactArgs("/TEAMS/a/b")
 			.returns(oTypeKey1Promise);
-		oRequestorMock.expects("fetchType")
-			.withExactArgs(sinon.match.same(mTypeForMetaPath), "/TEAMS/c")
+		oRequestorMock.expects("fetchType").withExactArgs("/TEAMS/c")
 			.returns(oTypeKey2Promise);
 
 		// code under test
-		return oRequestor.fetchType(mTypeForMetaPath, "/TEAMS").then(function (oResult) {
-			assert.strictEqual(oResult, oType);
+		return oRequestor.fetchType("/TEAMS").then(function (mTypeForMetaPath) {
+			assert.deepEqual(mTypeForMetaPath, {"/TEAMS" : oType});
 			assert.strictEqual(mTypeForMetaPath["/TEAMS"], oType);
 			assert.ok(bKey1Done);
 			assert.ok(bKey2Done);
@@ -4672,6 +4668,59 @@ sap.ui.define([
 
 		// code under test
 		assert.strictEqual(oRequestor.fetchTypeForPath("/EMPLOYEES/EMPLOYEE_2_TEAM"), oPromise);
+	});
+
+	//*********************************************************************************************
+	[{
+		options : undefined,
+		types : ["/TEAMS"]
+	}, {
+		options : {$select : ["foo"]},
+		types : ["/TEAMS"]
+	}, {
+		options : {
+			$expand : {
+				MANAGER : null,
+				TEAM_2_EMPLOYEES : {
+					$expand : {
+						"EMPLOYEE_2_EQUIPMENT/EQUIPMENT_2_PRODUCT" : null,
+						"Address/Country" : null
+					}
+				}
+			}
+		},
+		types : [
+			"/TEAMS",
+			"/TEAMS/MANAGER",
+			"/TEAMS/TEAM_2_EMPLOYEES",
+			"/TEAMS/TEAM_2_EMPLOYEES/EMPLOYEE_2_EQUIPMENT",
+			"/TEAMS/TEAM_2_EMPLOYEES/EMPLOYEE_2_EQUIPMENT/EQUIPMENT_2_PRODUCT",
+			"/TEAMS/TEAM_2_EMPLOYEES/Address",
+			"/TEAMS/TEAM_2_EMPLOYEES/Address/Country"
+		]
+	}].forEach(function (oFixture, i) {
+		QUnit.test("fetchTypes #" + i, function (assert) {
+			var oRequestor = _Requestor.create("/", oModelInterface, {}, {}, "4.0"),
+				oRequestorMock = this.mock(oRequestor),
+				iCount = 0;
+
+			oFixture.types.forEach(function (sPath) {
+				oRequestorMock.expects("fetchType").withExactArgs(sPath)
+					.returns(new Promise(function (resolve) {
+						setTimeout(function () {
+							iCount += 1;
+							resolve();
+						});
+					}));
+			});
+
+			// code under test
+			return oRequestor.fetchTypes("/TEAMS", oFixture.options)
+				.then(function (mTypeForMetaPath) {
+					assert.strictEqual(mTypeForMetaPath, oRequestor.mTypeForMetaPath);
+					assert.strictEqual(iCount, oFixture.types.length);
+				});
+		});
 	});
 
 	//*********************************************************************************************
@@ -4907,8 +4956,7 @@ sap.ui.define([
 			}],
 			sMessages = JSON.stringify(aMessages),
 			oRequestor = _Requestor.create("/sServiceUrl/", oModelInterface, {}, {}, "4.0"),
-			sResourcePath = "Product($uid=1-23)",
-			mTypeForMetaPath;
+			sResourcePath = "Product($uid=1-23)";
 
 		this.mock(_Helper).expects("clone").withExactArgs(aMessages[0]).returns("~clonedMessage~");
 		this.mock(_Helper).expects("makeAbsoluteLongtextUrl")
@@ -4917,15 +4965,11 @@ sap.ui.define([
 			.returns(["($uid=1-23)"]);
 		this.mock(_Helper).expects("getMetaPath").withExactArgs(sResourcePath)
 			.returns("~sMetaPath~");
-		this.mock(oRequestor).expects("fetchType")
-			.withExactArgs(sinon.match.object.and(sinon.match((mTypeForMetaPath0) => {
-				mTypeForMetaPath = mTypeForMetaPath0;
-				return true;
-			})), "/~sMetaPath~");
+		this.mock(oRequestor).expects("fetchType").withExactArgs("/~sMetaPath~");
 		this.mock(_Helper).expects("getKeyPredicate")
-			.withExactArgs("~oResponse~", "/~sMetaPath~", sinon.match((mTypeForMetaPath0) => {
-				return mTypeForMetaPath0 === mTypeForMetaPath;
-			})).returns("(foo)");
+			.withExactArgs("~oResponse~", "/~sMetaPath~",
+				sinon.match.same(oRequestor.mTypeForMetaPath))
+			.returns("(foo)");
 		this.mock(oModelInterface).expects("reportTransitionMessages")
 			.withExactArgs(aExpectedMessages, "Product(foo)");
 

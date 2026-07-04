@@ -203,14 +203,12 @@ sap.ui.define([
 						throw new Error(
 							"$$getKeepAliveContext requires $$ownRequest in a relative binding");
 					}
-					["$$aggregation", "$$canonicalPath", "$$sharedRequest"]
-						.forEach(function (sForbidden, i) {
-							if (sForbidden in mParameters
-									&& (i > 0 || _Helper.isDataAggregation(mParameters))) {
-								throw new Error("Cannot combine $$getKeepAliveContext and "
-									+ sForbidden);
-							}
-						});
+					["$$canonicalPath", "$$sharedRequest"].forEach(function (sForbidden) {
+						if (sForbidden in mParameters) {
+							throw new Error("Cannot combine $$getKeepAliveContext and "
+								+ sForbidden);
+						}
+					});
 					// fall through
 				case "$$canonicalPath":
 				case "$$clearSelectionOnFilter":

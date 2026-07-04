@@ -258,11 +258,25 @@ sap.ui.define([
 			},
 			errorMessage: "USA was not selected"
 		});
+
+		Then.iTeardownMyApp();
 	});
 
 	QUnit.module("Scroll");
 
 	opaTest("Should scroll a page", function (Given, When, Then) {
+		Given.iStartMyUIComponent({
+			componentConfig: {
+				name: "appUnderTest"
+			}
+		});
+
+		When.waitFor({
+			id: "navigationButton",
+			actions: new Press(),
+			errorMessage: "The navigation button was not pressable"
+		});
+
 		Then.waitFor({
 			controlType: "sap.m.StandardListItem",
 			matchers: new BindingPath({
@@ -291,10 +305,18 @@ sap.ui.define([
 				Opa5.assert.ok(isInViewport(aControls[0].getDomRef()), "The page is scrolled");
 			}
 		});
+
+		Then.iTeardownMyApp();
 	});
 
 	if (Device.browser.safari) {
 		opaTest("Should not run in Safari", function (Given, When, Then) {
+			Given.iStartMyUIComponent({
+				componentConfig: {
+					name: "appUnderTest"
+				}
+			});
+
 			Then.waitFor({
 				success: function () {
 					Opa5.assert.ok(true, "DataTransfer object can't be instantiated in Safari, but drag event needs a dataTransfer");
@@ -307,6 +329,18 @@ sap.ui.define([
 		QUnit.module("Drag and drop");
 
 		opaTest("Should rearrange items in a list using drag and drop", function (Given, When, Then) {
+			Given.iStartMyUIComponent({
+				componentConfig: {
+					name: "appUnderTest"
+				}
+			});
+
+			When.waitFor({
+				id: "navigationButton",
+				actions: new Press(),
+				errorMessage: "The navigation button was not pressable"
+			});
+
 			When.waitFor({
 				controlType: "sap.m.StandardListItem",
 				matchers: new BindingPath({

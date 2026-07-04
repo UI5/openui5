@@ -4404,6 +4404,7 @@ sap.ui.define([
 
 		const $Overflow = this.oItem1.$("overflow");
 		assert.ok($Overflow[0], "Overflow button is rendered");
+		assert.equal($Overflow[0].getAttribute("aria-haspopup"), "menu", "Overflow button has correct aria-haspopup attribute");
 		assert.notOk($Overflow[0].nextSibling || $Overflow[0].previousSibling, "Overflow button is the only rendered action");
 		$Overflow.trigger("tap");
 		await nextUIUpdate();

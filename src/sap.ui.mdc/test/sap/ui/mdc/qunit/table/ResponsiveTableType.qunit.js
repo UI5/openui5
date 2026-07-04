@@ -16,6 +16,7 @@ sap.ui.define([
 	"sap/m/Menu",
 	"sap/m/plugins/ColumnResizer",
 	"sap/ui/model/json/JSONModel",
+	"sap/ui/model/type/Boolean",
 	"sap/ui/core/Lib",
 	"sap/ui/core/Icon",
 	"sap/ui/model/Filter",
@@ -39,6 +40,7 @@ sap.ui.define([
 	Menu,
 	ColumnResizer,
 	JSONModel,
+	BooleanType,
 	Lib,
 	Icon,
 	Filter,
@@ -1566,6 +1568,64 @@ sap.ui.define([
 		// Verify the cached clone survived the ColumnListItem destruction
 		assert.notOk(oCachedClone.isDestroyed(), "Clone survives ColumnListItem destruction");
 		assert.strictEqual(oCloneMap.size, 1, "Clone is still in cache");
+	});
+
+	QUnit.test("navigated and highlight - static values", async function(assert) {
+		await this.createTable({
+			rowSettings: new RowSettings({
+				navigated: true,
+				highlight: "Error"
+			})
+		});
+
+		const oInnerItem = this.oTable._oTable.getItems()[0];
+		assert.strictEqual(oInnerItem.getNavigated(), true, "Static value for navigated is applied");
+		assert.strictEqual(oInnerItem.getHighlight(), "Error", "Static value for highlight is applied");
+	});
+
+	QUnit.test("navigated and highlight - bound values with formatters", async function(assert) {
+		this.destroyTable();
+		this.oTable = new Table({
+			type: new ResponsiveTableType(),
+			delegate: {
+				name: sDelegatePath,
+				payload: {
+					collectionPath: "namedModel>/testPath"
+				}
+			},
+			columns: new Column({
+				id: "foo0",
+				header: "Test0",
+				template: new Text({text: "template0"})
+			}),
+			models: {
+				namedModel: new JSONModel({
+					testPath: [
+						{description: "item 1"},
+						{description: "item 2"}
+					]
+				})
+			},
+			rowSettings: new RowSettings({
+				navigated: {
+					path: "namedModel>description",
+					type: BooleanType,
+					formatter: (sDescription) => sDescription === "item 1"
+				},
+				highlight: {
+					path: "namedModel>description",
+					formatter: (sDescription) => (sDescription === "item 1" ? "Warning" : "Information")
+				}
+			})
+		});
+		this.oTable.placeAt("qunit-fixture");
+		await TableQUnitUtils.waitForBinding(this.oTable);
+
+		const aItems = this.oTable._oTable.getItems();
+		assert.strictEqual(aItems[0].getNavigated(), true, "Formatted value for navigated (item 1)");
+		assert.strictEqual(aItems[0].getHighlight(), "Warning", "Formatted value for highlight (item 1)");
+		assert.strictEqual(aItems[1].getNavigated(), false, "Formatted value for navigated (item 2)");
+		assert.strictEqual(aItems[1].getHighlight(), "Information", "Formatted value for highlight (item 2)");
 	});
 
 	QUnit.module("Events", {

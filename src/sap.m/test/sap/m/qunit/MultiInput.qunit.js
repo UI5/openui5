@@ -2938,6 +2938,49 @@ sap.ui.define([
 		oMultiInput.destroy();
 	});
 
+	QUnit.test("change event is not fired when focus moves from input to a Token of the same MultiInput", async function (assert) {
+		// Arrange
+		var oToken = new Token("tokenInsideMI", { text: "existing" });
+		this.multiInput1.addToken(oToken);
+		await nextUIUpdate();
+
+		var oChangeSpy = this.spy();
+		this.multiInput1.attachChange(oChangeSpy);
+
+		this.multiInput1.focus();
+		this.multiInput1.updateDomValue("abc");
+
+		// Act - simulate sapfocusleave with the related control being a Token of this MultiInput's Tokenizer
+		this.multiInput1.onsapfocusleave({
+			relatedControlId: oToken.getId()
+		});
+
+		// Assert
+		assert.strictEqual(oChangeSpy.callCount, 0, "change event must not fire while navigating to an own Token");
+	});
+
+	QUnit.test("change event is not fired when focus moves from a Token back to the input of the same MultiInput", async function (assert) {
+		// Arrange
+		var oToken = new Token("tokenBackToInput", { text: "existing" });
+		this.multiInput1.addToken(oToken);
+		await nextUIUpdate();
+
+		var oChangeSpy = this.spy();
+		this.multiInput1.attachChange(oChangeSpy);
+
+		this.multiInput1.focus();
+		this.multiInput1.updateDomValue("abc");
+
+		// Act - simulate sapfocusleave from the Token back to the input
+		this.multiInput1.onsapfocusleave({
+			target: oToken.getFocusDomRef(),
+			relatedControlId: this.multiInput1.getId()
+		});
+
+		// Assert
+		assert.strictEqual(oChangeSpy.callCount, 0, "change event must not fire while navigating from Token back to input");
+	});
+
 	QUnit.module("Accessibility", {
 		beforeEach : async function() {
 			this.multiInput1 = new MultiInput({

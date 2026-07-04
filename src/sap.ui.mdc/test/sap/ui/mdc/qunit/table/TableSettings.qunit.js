@@ -1,246 +1,157 @@
 /* global QUnit */
 
 sap.ui.define([
-	"sap/ui/test/utils/nextUIUpdate",
-	"sap/ui/core/mvc/XMLView",
-	"sap/ui/model/json/JSONModel",
-	"sap/ui/mdc/table/RowSettings",
-	"sap/ui/model/type/Boolean"
+	"sap/ui/mdc/table/TableSettings",
+	"sap/m/OverflowToolbarButton",
+	"sap/ui/mdc/enums/TableActionPosition",
+	"sap/ui/core/theming/Parameters"
 ], function(
-	nextUIUpdate,
-	XMLView,
-	JSONModel,
-	RowSettings,
-	Boolean
+	TableSettings,
+	OverflowToolbarButton,
+	TableActionPosition,
+	ThemeParameters
 ) {
-	'use strict';
+	"use strict";
 
-	function formatNavigated(sDescription) {
-		return sDescription === "item 1";
-	}
+	QUnit.module("Factory methods");
 
-	function formatHighlight(sDescription) {
-		if (sDescription === "item 1") {
-			return "Warning";
-		} else {
-			return "Information";
-		}
-	}
+	QUnit.test("getToolbarButtonType returns configured value or Ghost fallback", function(assert) {
+		const oStub = this.stub(ThemeParameters, "get");
+		oStub.withArgs({name: "_sap_ui_mdc_Table_OverflowButtonType"}).returns("Transparent");
+		assert.strictEqual(TableSettings.getToolbarButtonType(), "Transparent", "Returns theme-configured button type");
 
-	const oModel = new JSONModel({
-		items: [
-			{
-				description: "item 1",
-				type: "Navigation"
-			},
-			{
-				description: "item 2",
-				type: "Navigation"
-			}
-		],
-		description: "item test",
-		type: "Navigation"
+		oStub.withArgs({name: "_sap_ui_mdc_Table_OverflowButtonType"}).returns(undefined);
+		assert.strictEqual(TableSettings.getToolbarButtonType(), "Ghost", "Falls back to Ghost when theme parameter is undefined");
 	});
 
-	function createView(sType, sSettings) {
-		if (sSettings) {
-			sSettings = "<rowSettings><mdcTable:RowSettings " + sSettings + "/></rowSettings>";
-		} else {
-			sSettings = "";
-		}
+	QUnit.test("createSettingsButton creates a configured OverflowToolbarButton", function(assert) {
+		const oFakeTable = {getId: () => "fakeTable", isA: () => false};
+		const oButton = TableSettings.createSettingsButton("myPrefix", [() => {}, oFakeTable]);
 
-		return XMLView.create({
-			definition: '<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:m="sap.m" xmlns="sap.ui.mdc" xmlns:mdcTable="sap.ui.mdc.table"><Table'
-						+ ' id="myTable" delegate="\{\'name\': \'test-resources/sap/ui/mdc/delegates/TableDelegate\', \'payload\': \{'
-						+ ' \'collectionName\': \'items\' \} \}"><type><mdcTable:' + sType + '/></type>' + sSettings + '<columns><mdcTable:Column'
-						+ ' id="myTable--column0" header="column 0" propertyKey="column0"><m:Text text="{description}" id="myTable--text0"'
-						+ ' /></mdcTable:Column></columns></Table></mvc:View>'
-		}).then(async function(oView) {
-			oView.setModel(oModel);
-			oView.placeAt("qunit-fixture");
-			await nextUIUpdate();
-			return oView;
-		});
-	}
+		assert.ok(oButton.isA("sap.m.OverflowToolbarButton"), "Returns an OverflowToolbarButton");
+		assert.strictEqual(oButton.getId(), "myPrefix-settings", "Correct id");
+		assert.strictEqual(oButton.getIcon(), "sap-icon://action-settings", "Correct icon");
+		assert.strictEqual(oButton.getAriaHasPopup(), "Dialog", "Correct aria-haspopup");
+		assert.ok(oButton.getText().length > 0, "Text is resolved from resource bundle");
+		assert.ok(oButton.getTooltip().length > 0, "Tooltip is resolved from resource bundle");
+		const oLayout = oButton.getLayoutData();
+		assert.ok(oLayout.isA("sap.ui.mdc.table.ActionLayoutData"), "ActionLayoutData is set as layoutData");
+		assert.strictEqual(oLayout.getPosition(), TableActionPosition.PersonalizationActionsSettings, "Correct action position");
 
-	QUnit.module("RowSettings unit tests", {
-		afterEach: function() {
-			if (this.oView) {
-				this.oTable = null;
-				this.oView.destroy();
-				this.oView = null;
-			}
-		}
+		oButton.destroy();
 	});
 
-	QUnit.test("GridTable without settings in XML", function(assert) {
-		const that = this;
+	QUnit.test("createCopyButton delegates to CopyProvider with layoutData and id", function(assert) {
+		const oReturnedButton = new OverflowToolbarButton();
+		const oCopyProvider = {
+			getCopyButton: this.stub().returns(oReturnedButton)
+		};
 
-		return createView("GridTableType").then(function(oView) {
-			that.oView = oView;
-			that.oTable = that.oView.byId('myTable');
+		const oButton = TableSettings.createCopyButton("prefixX", oCopyProvider);
 
-			return that.oTable.initialized();
-		}).then(function() {
-			return new Promise(function(resolve) {
-				that.oTable._oTable.attachEventOnce("rowsUpdated", async function() {
-					// Check default values for settings
-					assert.equal(that.oTable._oTable.getBinding("rows").getLength(), 2, "The table contains 2 rows");
-					assert.equal(that.oTable.getRowSettings(), null, "No row settings defined");
+		assert.strictEqual(oButton, oReturnedButton, "Returns the button provided by the CopyProvider");
+		assert.ok(oCopyProvider.getCopyButton.calledOnce, "getCopyButton was invoked exactly once");
+		const mArgs = oCopyProvider.getCopyButton.firstCall.args[0];
+		assert.strictEqual(mArgs.id, "prefixX-copy", "Passes correct id");
+		assert.ok(mArgs.layoutData.isA("sap.ui.mdc.table.ActionLayoutData"), "Passes ActionLayoutData");
+		assert.strictEqual(mArgs.layoutData.getPosition(), TableActionPosition.ModificationActionsCopy, "Correct action position");
+		assert.ok("type" in mArgs, "Passes type binding from _getButtonSettings");
 
-					assert.equal(that.oTable._oTable.getRows()[0].getAggregation("_settings"), null, "No inner row settings defined");
-
-					// Set fixed bound values for settings
-					let oTableRowSettings = new RowSettings();
-					oTableRowSettings.setNavigated(true);
-					oTableRowSettings.setHighlight("Error");
-					that.oTable.setRowSettings(oTableRowSettings);
-					await nextUIUpdate();
-
-					let oSettings = that.oTable._oTable.getRows()[0].getAggregation("_settings");
-					assert.equal(oSettings.getNavigated(), true, "Fixed value for navigated");
-					assert.equal(oSettings.getHighlight(), "Error", "Fixed value for highlight");
-
-					// Set calculated values for settings
-					oTableRowSettings = new RowSettings();
-					oTableRowSettings.bindProperty("navigated", {path: 'description', type: Boolean, formatter: formatNavigated});
-					oTableRowSettings.bindProperty("highlight", {path: 'description', formatter: formatHighlight});
-					that.oTable.setRowSettings(oTableRowSettings);
-					await nextUIUpdate();
-
-					oSettings = that.oTable._oTable.getRows()[0].getAggregation("_settings");
-					assert.equal(oSettings.getNavigated(), true, "Calculated value for navigated 1");
-					assert.equal(oSettings.getHighlight(), "Warning", "Calculated value for highlight 1");
-
-					oSettings = that.oTable._oTable.getRows()[1].getAggregation("_settings");
-					assert.equal(oSettings.getNavigated(), false, "Calculated value for navigated 2");
-					assert.equal(oSettings.getHighlight(), "Information", "Calculated value for highlight 2");
-
-					resolve();
-				});
-			});
-		});
+		oReturnedButton.destroy();
 	});
 
-	QUnit.test("GridTable with settings in XML", function(assert) {
-		const that = this;
+	QUnit.test("createPasteButton creates a button with paste provider dependent", async function(assert) {
+		const oButton = TableSettings.createPasteButton("prefY");
 
-		return createView("GridTableType", "navigated='true' highlight='Warning'").then(function(oView) {
-			that.oView = oView;
-			that.oTable = that.oView.byId('myTable');
+		assert.ok(oButton.isA("sap.m.OverflowToolbarButton"), "Returns an OverflowToolbarButton");
+		assert.strictEqual(oButton.getId(), "prefY-paste", "Correct id");
+		const oLayout = oButton.getLayoutData();
+		assert.strictEqual(oLayout.getPosition(), TableActionPosition.ModificationActionsPaste, "Correct action position");
 
-			return that.oTable.initialized();
-		}).then(function() {
-			return new Promise(function(resolve) {
-				that.oTable._oTable.attachEventOnce("rowsUpdated", async function() {
-					// Check default values for settings
-					assert.equal(that.oTable._oTable.getBinding("rows").getLength(), 2, "The table contains 2 rows");
-					assert.ok(that.oTable.getRowSettings() != null, "Row settings defined");
-
-					let oSettings = that.oTable._oTable.getRows()[0].getAggregation("_settings");
-					assert.equal(oSettings.getNavigated(), true, "Navigated is true from XML view");
-					assert.equal(oSettings.getHighlight(), "Warning", "Highlight is Warning from XML view");
-					assert.equal(oSettings.getHighlightText(), "", "No highlight text by default");
-
-					// Set calculated values for settings
-					const oTableRowSettings = new RowSettings();
-					oTableRowSettings.bindProperty("navigated", {path: 'description', type: Boolean, formatter: formatNavigated});
-					oTableRowSettings.bindProperty("highlight", {path: 'description', formatter: formatHighlight});
-					that.oTable.setRowSettings(oTableRowSettings);
-					await nextUIUpdate();
-
-					oSettings = that.oTable._oTable.getRows()[0].getAggregation("_settings");
-					assert.equal(oSettings.getNavigated(), true, "Calculated value for navigated 1");
-					assert.equal(oSettings.getHighlight(), "Warning", "Calculated value for highlight 1");
-
-					oSettings = that.oTable._oTable.getRows()[1].getAggregation("_settings");
-					assert.equal(oSettings.getNavigated(), false, "Calculated value for navigated 2");
-					assert.equal(oSettings.getHighlight(), "Information", "Calculated value for highlight 2");
-
-					resolve();
-				});
-			});
+		// PasteProvider is loaded asynchronously and attached as a dependent.
+		await new Promise((resolve) => {
+			sap.ui.require(["sap/m/plugins/PasteProvider"], resolve);
 		});
+		const aDependents = oButton.getDependents();
+		assert.strictEqual(aDependents.length, 1, "One dependent added");
+		assert.ok(aDependents[0].isA("sap.m.plugins.PasteProvider"), "Dependent is PasteProvider");
+		assert.strictEqual(aDependents[0].getPasteFor(), "prefY-innerTable", "PasteProvider references the inner table");
+
+		oButton.destroy();
 	});
 
-	QUnit.test("ResponsiveTable without settings", function(assert) {
-		const that = this;
-
-		return createView("ResponsiveTableType").then(function(oView) {
-			that.oView = oView;
-			that.oTable = that.oView.byId('myTable');
-
-			return that.oTable.initialized();
-		}).then(async function() {
-			// Check default values for settings
-			assert.equal(that.oTable._oTable.getItems().length, 2, "The table contains 2 rows");
-			assert.equal(that.oTable.getRowSettings(), null, "No row settings defined");
-
-			let oItem = that.oTable._oTable.getItems()[0];
-			assert.equal(oItem.getNavigated(), false, "Navigated is false by default");
-			assert.equal(oItem.getHighlight(), "None", "No highlight by default");
-			assert.equal(oItem.getHighlightText(), "", "No highlight text by default");
-
-			// Set fixed bound values for settings
-			let oTableRowSettings = new RowSettings();
-			oTableRowSettings.setNavigated(true);
-			oTableRowSettings.setHighlight("Error");
-			that.oTable.setRowSettings(oTableRowSettings);
-			await nextUIUpdate();
-
-			oItem = that.oTable._oTable.getItems()[0];
-			assert.equal(oItem.getNavigated(), true, "Fixed value for navigated");
-			assert.equal(oItem.getHighlight(), "Error", "Fixed value for highlight");
-
-			// Set calculated values for settings
-			oTableRowSettings = new RowSettings();
-			oTableRowSettings.bindProperty("navigated", {path: 'description', type: Boolean, formatter: formatNavigated});
-			oTableRowSettings.bindProperty("highlight", {path: 'description', formatter: formatHighlight});
-			that.oTable.setRowSettings(oTableRowSettings);
-			await nextUIUpdate();
-
-			oItem = that.oTable._oTable.getItems()[0];
-			assert.equal(oItem.getNavigated(), true, "Calculated value for navigated 1");
-			assert.equal(oItem.getHighlight(), "Warning", "Calculated value for highlight 1");
-
-			oItem = that.oTable._oTable.getItems()[1];
-			assert.equal(oItem.getNavigated(), false, "Calculated value for navigated 2");
-			assert.equal(oItem.getHighlight(), "Information", "Calculated value for highlight 2");
+	QUnit.test("createExportButton creates a split menu button with two menu items", function(assert) {
+		const fnDefault = () => {};
+		const fnExportAs = () => {};
+		const oFakeTable = {getId: () => "fakeTable"};
+		const oMenuBtn = TableSettings.createExportButton("expPref", {
+			"default": [fnDefault, oFakeTable],
+			exportAs: [fnExportAs, oFakeTable]
 		});
+
+		assert.ok(oMenuBtn.isA("sap.m.OverflowToolbarMenuButton"), "Returns an OverflowToolbarMenuButton");
+		assert.strictEqual(oMenuBtn.getId(), "expPref-export", "Correct id");
+		assert.strictEqual(oMenuBtn.getIcon(), "sap-icon://excel-attachment", "Correct icon");
+		assert.strictEqual(oMenuBtn.getButtonMode(), "Split", "Split button mode");
+		assert.ok(oMenuBtn.getUseDefaultActionOnly(), "Uses default action only");
+		const oMenu = oMenuBtn.getMenu();
+		assert.ok(oMenu, "Menu is attached");
+		assert.strictEqual(oMenu.getItems().length, 2, "Menu has two items");
+		const oLayout = oMenuBtn.getLayoutData();
+		assert.strictEqual(oLayout.getPosition(), TableActionPosition.ExportActionsExport, "Correct action position");
+
+		oMenuBtn.destroy();
 	});
 
-	QUnit.test("ResponsiveTable with settings in XML", function(assert) {
-		const that = this;
+	QUnit.test("createExpandCollapseButton returns Expand variant when bIsExpand is true", function(assert) {
+		const oButton = TableSettings.createExpandCollapseButton("expPref", true, () => {});
 
-		return createView("ResponsiveTableType", "navigated='true' highlight='Warning'").then(function(oView) {
-			that.oView = oView;
-			that.oTable = that.oView.byId('myTable');
+		assert.ok(oButton.isA("sap.m.OverflowToolbarButton"), "Returns an OverflowToolbarButton");
+		assert.strictEqual(oButton.getId(), "expPref-expandAll", "Correct expand id");
+		assert.strictEqual(oButton.getIcon(), "sap-icon://expand-all", "Correct expand icon");
+		assert.strictEqual(oButton.getLayoutData().getPosition(), TableActionPosition.PersonalizationActionsExpandAll, "Correct expand position");
 
-			return that.oTable.initialized();
-		}).then(async function() {
-			// Check default values for settings
-			assert.equal(that.oTable._oTable.getItems().length, 2, "The table contains 2 rows");
-			assert.ok(that.oTable.getRowSettings() != null, "Row settings defined");
+		oButton.destroy();
+	});
 
-			let oItem = that.oTable._oTable.getItems()[0];
-			assert.equal(oItem.getNavigated(), true, "Navigated is true from XML view");
-			assert.equal(oItem.getHighlight(), "Warning", "Highlight is Warning from XML view");
-			assert.equal(oItem.getHighlightText(), "", "No highlight text by default");
+	QUnit.test("createExpandCollapseButton returns Collapse variant when bIsExpand is false", function(assert) {
+		const oButton = TableSettings.createExpandCollapseButton("colPref", false, () => {});
 
-			 // Set calculated values for settings
-			const oTableRowSettings = new RowSettings();
-			oTableRowSettings.bindProperty("navigated", {path: 'description', type: Boolean, formatter: formatNavigated});
-			oTableRowSettings.bindProperty("highlight", {path: 'description', formatter: formatHighlight});
-			that.oTable.setRowSettings(oTableRowSettings);
-			await nextUIUpdate();
+		assert.strictEqual(oButton.getId(), "colPref-collapseAll", "Correct collapse id");
+		assert.strictEqual(oButton.getIcon(), "sap-icon://collapse-all", "Correct collapse icon");
+		assert.strictEqual(oButton.getLayoutData().getPosition(), TableActionPosition.PersonalizationActionsCollapseAll,
+			"Correct collapse position");
 
-			oItem = that.oTable._oTable.getItems()[0];
-			assert.equal(oItem.getNavigated(), true, "Calculated value for navigated 1");
-			assert.equal(oItem.getHighlight(), "Warning", "Calculated value for highlight 1");
+		oButton.destroy();
+	});
 
-			oItem = that.oTable._oTable.getItems()[1];
-			assert.equal(oItem.getNavigated(), false, "Calculated value for navigated 2");
-			assert.equal(oItem.getHighlight(), "Information", "Calculated value for highlight 2");
+	QUnit.test("createExpandCollapseMenuButton returns Expand variant with tree/node menu items", function(assert) {
+		const oMenuBtn = TableSettings.createExpandCollapseMenuButton("expMenu", true, {
+			tree: () => {},
+			node: () => {}
 		});
+
+		assert.ok(oMenuBtn.isA("sap.m.OverflowToolbarMenuButton"), "Returns an OverflowToolbarMenuButton");
+		assert.strictEqual(oMenuBtn.getId(), "expMenu-expandAll", "Correct expand id");
+		assert.strictEqual(oMenuBtn.getIcon(), "sap-icon://expand-all", "Correct expand icon");
+		assert.strictEqual(oMenuBtn.getMenu().getItems().length, 2, "Menu has two items");
+		assert.strictEqual(oMenuBtn.getLayoutData().getPosition(), TableActionPosition.PersonalizationActionsExpandAll,
+			"Correct expand position");
+
+		oMenuBtn.destroy();
+	});
+
+	QUnit.test("createExpandCollapseMenuButton returns Collapse variant when bIsExpand is false", function(assert) {
+		const oMenuBtn = TableSettings.createExpandCollapseMenuButton("colMenu", false, {
+			tree: () => {},
+			node: () => {}
+		});
+
+		assert.strictEqual(oMenuBtn.getId(), "colMenu-collapseAll", "Correct collapse id");
+		assert.strictEqual(oMenuBtn.getIcon(), "sap-icon://collapse-all", "Correct collapse icon");
+		assert.strictEqual(oMenuBtn.getLayoutData().getPosition(), TableActionPosition.PersonalizationActionsCollapseAll,
+			"Correct collapse position");
+
+		oMenuBtn.destroy();
 	});
 });

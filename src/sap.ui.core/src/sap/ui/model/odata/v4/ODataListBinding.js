@@ -3335,9 +3335,8 @@ sap.ui.define([
 	 *     <li> the given context path does not match this binding,
 	 *     <li> the binding's root binding is suspended,
 	 *     <li> the binding is part of a {@link #create deep create} because it is relative to a
-	 *       {@link sap.ui.model.odata.v4.Context#isTransient transient} context,
-	 *     <li> {@link sap.ui.model.odata.v4.Context#setKeepAlive} fails, or
-	 *     <li> data aggregation but no recursive hierarchy (see {@link #setAggregation}) is used.
+	 *       {@link sap.ui.model.odata.v4.Context#isTransient transient} context, or
+	 *     <li> {@link sap.ui.model.odata.v4.Context#setKeepAlive} fails.
 	 *   </ul>
 	 *
 	 * @public
@@ -3352,9 +3351,6 @@ sap.ui.define([
 			iPredicateIndex = _Helper.getPredicateIndex(sPath),
 			sResolvedPath = this.getResolvedPath();
 
-		if (_Helper.isDataAggregation(this.mParameters)) {
-			throw new Error("Unsupported $$aggregation at " + this);
-		}
 		this.checkKeepAlive();
 		this.checkSuspended();
 		this.checkTransient();

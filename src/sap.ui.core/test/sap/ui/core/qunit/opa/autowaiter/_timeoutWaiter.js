@@ -837,22 +837,27 @@ sap.ui.define([
 		// but chain-based detection still works
 		timeoutWaiter.extendConfig({ frequencyDetection: { disabled: true } });
 
-		// Use Promise-based scheduling so there is no initiator chain.
+		// Use MessageChannel to schedule the next setTimeout from outside any tracked
+		// timeout callback. This guarantees iInitiatorId is undefined when setTimeout
+		// is called, so no initiator chain is built on any browser (unlike
+		// Promise.resolve().then() whose microtask timing differs between FF and Chrome).
 		// Without statistical detection, this should remain blocking.
+		var oChannel = new MessageChannel();
 		function poll() {
 			if (bPoll) {
-				Promise.resolve().then(function () {
+				oChannel.port2.onmessage = function () {
 					aTimeouts.push(fnSetTimeout(poll, 100));
-				});
+				};
+				oChannel.port1.postMessage(null);
 			}
 		}
 
 		poll();
 
 		fnSetTimeout(function () {
-			// With statistical detection disabled, Promise-based polling should still block
+			// With statistical detection disabled, polling without a chain should still block
 			assert.ok(timeoutWaiter.hasPending(),
-				"With frequencyDetection.disabled=true, Promise-based polling should still be treated as blocking");
+				"With frequencyDetection.disabled=true, polling without a chain should still be treated as blocking");
 			bPoll = false;
 			aTimeouts.forEach(function (iID) {
 				fnClearTimeout(iID);
@@ -950,12 +955,16 @@ sap.ui.define([
 			}
 		});
 
-		// Direct self-scheduling with Promise (no chain) — relies on statistical detection
+		// Use MessageChannel so the next setTimeout is scheduled from outside any tracked
+		// timeout callback (iInitiatorId is always undefined). This ensures chain-based
+		// detection does not fire, and only statistical detection is under test.
+		var oChannel = new MessageChannel();
 		function poll() {
 			if (bPoll) {
-				Promise.resolve().then(function () {
+				oChannel.port2.onmessage = function () {
 					aTimeouts.push(fnSetTimeout(poll, 100));
-				});
+				};
+				oChannel.port1.postMessage(null);
 			}
 		}
 

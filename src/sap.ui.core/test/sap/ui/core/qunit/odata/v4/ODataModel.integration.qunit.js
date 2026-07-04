@@ -28885,6 +28885,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-3258
 	//
 	// Test #setKeepAlive w/ messages (JIRA: CPOUI5ODATAV4-3390)
+	// ODM/ODLB#getKeepAlive (w/ messages) (JIRA: CPOUI5ODATAV4-3259)
 	QUnit.test("Data Aggregation: keep alive single entity", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
 		const sView = `
@@ -28900,7 +28901,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						}
 					},
 					groupLevels : ['Country', 'Id']
-				}
+				},
+				$$getKeepAliveContext : true
 			}
 		}" threshold="0" visibleRowCount="3">
 	<Text id="country" text="{Country}"/>
@@ -28969,22 +28971,37 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		await this.waitForChanges(assert, "show details for Id 26");
 
-		this.expectRequest("BusinessPartners(26)?$select=myMessages", {myMessages : []});
+		this.expectRequest("BusinessPartners(25)?$select=myMessages", {myMessages : []});
 
-		// code under test (JIRA: CPOUI5ODATAV4-3390)
-		oContext26.setKeepAlive(true, null, /*bRequestMessages*/true);
 		// code under test
-		oContext25.setKeepAlive(true);
+		oContext26.setKeepAlive(true);
+
+		const fnOnBeforeDestroy25 = sinon.spy();
+		// code under test (JIRA: CPOUI5ODATAV4-3390)
+		oContext25.setKeepAlive(true, fnOnBeforeDestroy25, /*bRequestMessages*/true);
 
 		await this.waitForChanges(assert, "keep alive for Id 26 & 25");
 
 		assert.strictEqual(oContext26.isKeepAlive(), true);
 		assert.strictEqual(oContext25.isKeepAlive(), true);
 
-		assert.throws(() => {
-			// code under test
-			oListBinding.getKeepAliveContext("/BusinessPartners(24)");
-		}, new Error("Unsupported $$aggregation at " + oListBinding));
+		this.expectRequest("BusinessPartners(24)?$select=Id,myMessages", {
+				groupId : "$auto.24"
+			}, {
+				Id : 24,
+				myMessages : []
+			});
+
+		// code under test (JIRA: CPOUI5ODATAV4-3259)
+		// Note: this calls ODLB#getKeepAliveContext behind the scenes
+		const oContext24
+			= oModel.getKeepAliveContext("/BusinessPartners(24)", /*bRequestMessages*/true, {
+				$$groupId : "$auto.24"
+			});
+		const fnOnBeforeDestroy24 = sinon.spy();
+		oContext24.setKeepAlive(true, fnOnBeforeDestroy24, /*bRequestMessages*/true);
+
+		await this.waitForChanges(assert, "ODLB#getKeepAliveContext");
 
 		this.expectChange("country", [, "B", "C"])
 			.expectChange("id", [, null, null])
@@ -28999,6 +29016,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			this.waitForChanges(assert, "collapse Country 'A'")
 		]);
 
+		sinon.assert.notCalled(fnOnBeforeDestroy24);
+		sinon.assert.notCalled(fnOnBeforeDestroy25);
 		assert.strictEqual(oContext26.getBinding(), oListBinding, "context not destroyed");
 		assert.strictEqual(oContext26.getProperty("Name"), "Foo", "data still available");
 
@@ -29012,9 +29031,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		await this.waitForChanges(assert, "modify Region of Id 26");
 
-		this.expectRequest("#6 BusinessPartners?"
+		this.expectRequest("#7 BusinessPartners?"
 				+ "$select=Country,Currency,Id,Name,Region,SalesAmount,myMessages"
-				+ "&$filter=Id eq 25 or Id eq 26&$top=2", {
+				+ "&$filter=Id eq 24 or Id eq 25 or Id eq 26&$top=3", {
 				value : [{ // simulate that Id 25 was deleted in the meantime
 					Country : "A refreshed",
 					Currency : "EUR",
@@ -29023,9 +29042,17 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					Region : "Refreshed",
 					SalesAmount : "61",
 					myMessages : []
+				}, {
+					Country : "A refreshed",
+					Currency : "EUR",
+					Id : 24,
+					Name : "Bar",
+					Region : "Outside",
+					SalesAmount : "0",
+					myMessages : []
 				}]
 			})
-			.expectRequest("#6 BusinessPartners?$apply=groupby((Country))&$count=true"
+			.expectRequest("#7 BusinessPartners?$apply=groupby((Country))&$count=true"
 				+ "&$skip=0&$top=3", {
 				"@odata.count" : "26",
 				value : [
@@ -29043,6 +29070,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			this.waitForChanges(assert, "refresh list")
 		]);
 
+		sinon.assert.notCalled(fnOnBeforeDestroy24);
+		sinon.assert.calledOnceWithExactly(fnOnBeforeDestroy25);
 		assert.strictEqual(oContext25.getBinding(), undefined, "context for Id 25 destroyed");
 		assert.strictEqual(oContext26.getBinding(), oListBinding, "context for Id 26 still alive");
 		assert.strictEqual(oContext26.getProperty("SalesAmount"), "61", "data still available");
@@ -29067,10 +29096,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		assert.strictEqual(oListBinding.getCurrentContexts()[1], oContext26, "still the same");
 
-		this.expectRequest("#8 BusinessPartners?"
+		this.expectRequest("#9 BusinessPartners?"
 				+ "$select=Country,Currency,Id,Name,Region,SalesAmount,myMessages"
-				+ "&$filter=Id eq 26", {
-				value : [{
+				+ "&$filter=Id eq 24 or Id eq 26&$top=2", {
+				value : [{ // simulate that Id 24 was deleted in the meantime
 					Country : "A",
 					Currency : "EUR",
 					Id : 26,
@@ -29080,7 +29109,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					myMessages : []
 				}]
 			})
-			.expectRequest("#8 BusinessPartners?$apply=groupby((Country))&$count=true"
+			.expectRequest("#9 BusinessPartners?$apply=groupby((Country))&$count=true"
 				+ "&$skip=0&$top=3", {
 				"@odata.count" : "26",
 				value : [
@@ -29104,6 +29133,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oListBinding.getHeaderContext().requestSideEffects([""]),
 			this.waitForChanges(assert, "side-effects refresh")
 		]);
+
+		sinon.assert.calledOnceWithExactly(fnOnBeforeDestroy24);
+		assert.strictEqual(oContext24.getBinding(), undefined, "context for Id 24 destroyed");
 
 		this.expectRequest("BusinessPartners?$apply=filter(Country eq 'A')"
 				+ "/groupby((Id,Name),aggregate(SalesAmount,Currency))"

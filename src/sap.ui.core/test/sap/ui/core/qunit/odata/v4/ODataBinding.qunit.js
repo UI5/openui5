@@ -2642,13 +2642,6 @@ sap.ui.define([
 
 		assert.throws(function () {
 			oBinding.checkBindingParameters({
-				$$aggregation : {},
-				$$getKeepAliveContext : true
-			}, aAllowedParams);
-		}, new Error("Cannot combine $$getKeepAliveContext and $$aggregation"));
-
-		assert.throws(function () {
-			oBinding.checkBindingParameters({
 				$$canonicalPath : true,
 				$$getKeepAliveContext : true
 			}, aAllowedParams);

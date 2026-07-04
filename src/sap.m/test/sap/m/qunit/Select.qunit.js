@@ -10564,6 +10564,10 @@ sap.ui.define([
 
 			// act
 			oSelect.close();
+			// Popup must NOT exist yet — open() is deferred via setTimeout(0)
+			assert.strictEqual(document.getElementById(oSelect.getValueStateMessageId()), null,
+				"Popup DOM is not built synchronously on close - open() is deferred.");
+			this.clock.tick(1);	// allow the deferred openValueStateMessage to fire
 
 			// assert
 			const oValueStateMessageDomRef = document.getElementById(oSelect.getValueStateMessageId());
@@ -10752,6 +10756,45 @@ sap.ui.define([
 			// assert
 			const oValueStateMessageDomRef = document.getElementById(oSelect.getValueStateMessageId());
 			assert.strictEqual(oValueStateMessageDomRef, null);
+
+			// cleanup
+			oSelect.destroy();
+		});
+
+		QUnit.test("it should refresh the value state message popup text when valueStateText is set after the popup is already open", function (assert) {
+
+			this.stub(Device, "system").value({
+				desktop: true,
+				phone: false,
+				tablet: false
+			});
+
+			// system under test
+			var oSelect = new Select({
+				valueState: ValueState.None
+			});
+
+			// arrange
+			oSelect.placeAt("content");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+			// act - simulate MessageMixin propagating a Message to a focused Select:
+			// both setters run synchronously in the same tick; the deferred open()
+			// fires after both complete, so the popup is built with the correct text.
+			oSelect.focus();
+			oSelect.setValueState(ValueState.Error);
+			// Popup DOM must NOT exist yet — open() is deferred, so setValueStateText()
+			// will complete before createDom() reads the text.
+			assert.strictEqual(document.getElementById(oSelect.getValueStateMessageId()), null,
+				"Popup DOM is not built synchronously by setValueState - open() is deferred.");
+			oSelect.setValueStateText("Custom error message");
+			this.clock.tick(101);
+
+			// assert
+			var oValueStateMessageDomRef = document.getElementById(oSelect.getValueStateMessageId());
+			assert.ok(oValueStateMessageDomRef, "Value state message popup is rendered.");
+			assert.strictEqual(oValueStateMessageDomRef.textContent, "Custom error message",
+				"The popup shows the custom value state text, not the default 'Invalid entry'.");
 
 			// cleanup
 			oSelect.destroy();

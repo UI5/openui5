@@ -131,6 +131,48 @@ sap.ui.define([
 		}, 0);
 	});
 
+	QUnit.test("activateFor - Re-activation for the same column after the adapter is loaded", async function(assert) {
+		await ColumnHeaderMenuAdapter.activateFor(this.oColumn1);
+		assert.ok(oInjectMenuItemsSpy.calledOnce, "injectMenuItems called once after first activation");
+		oInjectMenuItemsSpy.reset();
+		oRemoveItemsSpy.reset();
+
+		// Second activation for the same column when the adapter is no longer a Promise.
+		// Takes the synchronous path in activateFor.
+		await ColumnHeaderMenuAdapter.activateFor(this.oColumn1);
+		assert.ok(oInjectMenuItemsSpy.calledOnceWith(this.oMenu1, this.oColumn1),
+			"injectMenuItems called once on the already-loaded adapter path");
+		assert.ok(oRemoveItemsSpy.calledOnceWith(this.oMenu1),
+			"Previous injection is removed before re-injecting for the same column");
+	});
+
+	QUnit.test("unlink - While the adapter is still loading", async function(assert) {
+		// Calling unlink for a never-activated column must be a no-op.
+		ColumnHeaderMenuAdapter.unlink(this.oColumn1);
+
+		ColumnHeaderMenuAdapter.activateFor(this.oColumn1);
+		ColumnHeaderMenuAdapter.unlink(this.oColumn1);
+
+		// Yield a microtask so the pending adapter promise resolves.
+		await Promise.resolve();
+
+		await ColumnHeaderMenuAdapter.activateFor(this.oColumn2);
+		assert.ok(oInjectMenuItemsSpy.calledWith(this.oMenu2, this.oColumn2),
+			"A subsequent activation still works after unlinking during the load phase");
+	});
+
+	QUnit.test("destroy - Without a prior _injectMenuItems call skips removeMenuItems", function(assert) {
+		const oAdapter = new ColumnHeaderMenuAdapter();
+		const oRemoveSpy = sinon.spy(oAdapter, "removeMenuItems");
+		const oDisconnectSpy = sinon.spy(oAdapter._oColumnHeaderMenuObserver, "disconnect");
+
+		oAdapter.destroy();
+
+		assert.ok(oRemoveSpy.notCalled, "removeMenuItems is not called when there is no injection target");
+		assert.ok(oDisconnectSpy.calledOnce, "The observer is disconnected");
+		assert.strictEqual(oAdapter._oColumnHeaderMenuObserver, undefined, "The observer reference is deleted");
+	});
+
 	QUnit.test("Adapter lifecycle", function(assert) {
 		const done = assert.async();
 		const oActivateSpy = sinon.spy(ColumnHeaderMenuAdapter, "activateFor");

@@ -91,11 +91,29 @@ sap.ui.define([
 	QUnit.test("#close", function(assert) {
 		const oMenu = new Menu();
 
+		// Calling close without a menu must not throw (optional-chain guard).
+		this.oContextMenu.close();
+
 		this.oContextMenu.setMenu(oMenu);
 		this.stub(oMenu, "close");
 
 		this.oContextMenu.close();
 		assert.ok(oMenu.close.calledOnceWithExactly(), "Menu#close call");
+	});
+
+	QUnit.test("#onLocalizationChanged", function(assert) {
+		const oMenu = new Menu();
+
+		this.oContextMenu.setMenu(oMenu);
+		this.spy(this.oContextMenu, "destroyMenu");
+
+		this.oContextMenu.onLocalizationChanged({changes: {rtl: true}});
+		assert.notOk(this.oContextMenu.destroyMenu.called, "Menu is not destroyed for non-language change");
+		assert.strictEqual(this.oContextMenu.getMenu(), oMenu, "Menu is retained");
+
+		this.oContextMenu.onLocalizationChanged({changes: {language: "de"}});
+		assert.ok(this.oContextMenu.destroyMenu.calledOnce, "Menu is destroyed for language change");
+		assert.notOk(this.oContextMenu.getMenu(), "Menu is destroyed");
 	});
 
 	QUnit.test("#invalidate", function(assert) {

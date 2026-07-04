@@ -1132,4 +1132,348 @@ sap.ui.define([
 		assert.ok(!!oExtension._RowHoverHandler, "_RowHoverHandler: Debug mode");
 		assert.ok(!!oExtension._KNOWNCLICKABLECONTROLS, "_KNOWNCLICKABLECONTROLS: Debug mode");
 	});
+
+	QUnit.test("showColumnResizer", function(assert) {
+		const oExtension = oTable._getPointerExtension();
+		const oColumn = oTable._getVisibleColumns()[1];
+		const oColumnHeaderRect = oTable._aTableHeaders[oColumn.getIndex()].getBoundingClientRect();
+		const oTableRect = oTable.getDomRef("sapUiTableCnt").getBoundingClientRect();
+
+		oExtension.showColumnResizer(oColumn);
+
+		assert.ok(oTable.$().hasClass("sapUiTableResizing"), "Table has resizing class");
+		assert.ok(oTable._$colResize.hasClass("sapUiTableColRszActive"), "Resizer marked active");
+		assert.strictEqual(oTable._$colResize.css("left"), (oColumnHeaderRect.right - oTableRect.left) + "px",
+			"Resizer positioned at the column's right edge in LTR mode");
+	});
+
+	QUnit.test("showColumnResizer in RTL mode", function(assert) {
+		const oExtension = oTable._getPointerExtension();
+		const oColumn = oTable._getVisibleColumns()[1];
+		const oColumnHeaderRect = oTable._aTableHeaders[oColumn.getIndex()].getBoundingClientRect();
+		const oTableRect = oTable.getDomRef("sapUiTableCnt").getBoundingClientRect();
+
+		oTable._bRtlMode = true;
+		oExtension.showColumnResizer(oColumn);
+		oTable._bRtlMode = false;
+
+		assert.strictEqual(oTable._$colResize.css("left"), (oColumnHeaderRect.left - oTableRect.left) + "px",
+			"Resizer positioned at the column's left edge in RTL mode");
+	});
+
+	QUnit.module("Column resize helpers", {
+		beforeEach: async function() {
+			await createTables();
+			this.oPointerExtension = oTable._getPointerExtension();
+			this.oPointerExtension._debug();
+		},
+		afterEach: function() {
+			destroyTables();
+		}
+	});
+
+	QUnit.test("onMouseMoveWhileColumnResizing prevents default for touch events", function(assert) {
+		const ColumnResizeHelper = this.oPointerExtension._ColumnResizeHelper;
+
+		oTable._$colResize = oTable.$("rsz");
+		oTable._iColumnResizeStart = 0;
+
+		const oEvent = jQuery.Event({type: "touchmove"});
+		oEvent.originalEvent = {
+			touches: [{pageX: 100, pageY: 0, clientX: 100, clientY: 0}],
+			stopPropagation: function() {},
+			preventDefault: function() {}
+		};
+
+		ColumnResizeHelper.onMouseMoveWhileColumnResizing.call(oTable, oEvent);
+
+		assert.ok(oEvent.isDefaultPrevented(), "Default is prevented on touch");
+		assert.ok(oEvent.isPropagationStopped(), "Propagation is stopped on touch");
+	});
+
+	QUnit.test("Resizer position is not updated while a resize is already in progress", function(assert) {
+		oTable._bIsColumnResizerMoving = true;
+		const sInitialLeft = oTable.$("rsz").css("left");
+
+		const oEvent = jQuery.Event({type: "mousemove"});
+		oEvent.target = oTable.getColumns()[1].getDomRef();
+		oEvent.clientX = oTable._aTableHeaders[1].getBoundingClientRect().left + 50;
+		jQuery(oEvent.target).trigger(oEvent);
+
+		assert.strictEqual(oTable.$("rsz").css("left"), sInitialLeft, "Resizer position unchanged");
+
+		oTable._bIsColumnResizerMoving = false;
+	});
+
+	QUnit.test("Resizer position tracking in RTL mode", function(assert) {
+		oTable._bRtlMode = true;
+
+		const oColumnHeaderRect = oTable._aTableHeaders[1].getBoundingClientRect();
+		const oEvent = jQuery.Event({type: "mousemove"});
+		oEvent.target = oTable.getColumns()[1].getDomRef();
+		oEvent.clientX = oColumnHeaderRect.left + 5;
+		jQuery(oEvent.target).trigger(oEvent);
+
+		// In RTL, we expect the resizer to snap to the left of the hovered column
+		const oTableRect = oTable.getDomRef("sapUiTableCnt").getBoundingClientRect();
+		const iExpectedLeft = oColumnHeaderRect.left - oTableRect.left;
+		assert.strictEqual(oTable.$("rsz").css("left"), iExpectedLeft + "px",
+			"Resizer at left edge of column in RTL mode");
+
+		oTable._bRtlMode = false;
+	});
+
+	QUnit.module("Tap and context menu handling", {
+		beforeEach: async function() {
+			await createTables();
+			this.oPointerExtension = oTable._getPointerExtension();
+			this.oPointerExtension._debug();
+		},
+		afterEach: function() {
+			destroyTables();
+		}
+	});
+
+	QUnit.test("_skipClick returns true when event is marked on data cell", function(assert) {
+		const ExtensionHelper = this.oPointerExtension._ExtensionHelper;
+		const $Cell = getCell(0, 0);
+		const oCellInfo = TableUtils.getCellInfo($Cell);
+		const oEvent = jQuery.Event({type: "tap"});
+
+		oEvent.setMarked();
+
+		assert.strictEqual(ExtensionHelper._skipClick(oEvent, jQuery($Cell[0]), oCellInfo), true);
+	});
+
+	QUnit.test("oncontextmenu on non-cell content sets default menu flag", function(assert) {
+		const oEvent = jQuery.Event({type: "mousedown"});
+		oEvent.button = 2;
+		oEvent.target = oTable.getDomRef("sapUiTableCnt"); // container, not a cell
+		jQuery(oEvent.target).trigger(oEvent);
+
+		assert.ok(this.oPointerExtension._bShowDefaultMenu, "_bShowDefaultMenu set for non-cell right click");
+
+		delete this.oPointerExtension._bShowDefaultMenu;
+	});
+
+	QUnit.test("ontap returns early for non-cell targets", function(assert) {
+		const oHandleClickSpy = this.spy(this.oPointerExtension._ExtensionHelper, "_handleClickSelection");
+		const oOpenContextMenuSpy = this.spy(TableUtils.Menu, "openContextMenu");
+
+		const oEvent = jQuery.Event({type: "tap"});
+		oEvent.target = oTable.getDomRef("sapUiTableCnt");
+		jQuery(oEvent.target).trigger(oEvent);
+
+		assert.ok(oHandleClickSpy.notCalled, "_handleClickSelection not called");
+		assert.ok(oOpenContextMenuSpy.notCalled, "openContextMenu not called");
+	});
+
+	QUnit.test("ontap on data cell is skipped when browser has an active text selection", function(assert) {
+		const oHandleClickSpy = this.spy(this.oPointerExtension._ExtensionHelper, "_handleClickSelection");
+		const oGetSelectionStub = this.stub(window, "getSelection");
+
+		oGetSelectionStub.returns({toString: () => "selected text"});
+
+		qutils.triggerMouseEvent(getCell(0, 0), "tap");
+
+		assert.ok(oHandleClickSpy.notCalled, "Selection prevents click handling");
+	});
+
+	QUnit.test("oncontextmenu is prevented while a column reorder is in progress", function(assert) {
+		this.oPointerExtension._bReorderInProgress = true;
+
+		const oEvent = jQuery.Event({type: "contextmenu"});
+		oEvent.target = getCell(0, 0)[0];
+		jQuery(oEvent.target).trigger(oEvent);
+
+		assert.ok(oEvent.isDefaultPrevented(), "Default context menu prevented");
+		assert.ok(oEvent.isMarked("sapUiTableHandledByPointerExtension"), "Event marked as handled");
+
+		this.oPointerExtension._bReorderInProgress = false;
+	});
+
+	QUnit.module("Reorder helpers", {
+		beforeEach: async function() {
+			await createTables();
+			this.oPointerExtension = oTable._getPointerExtension();
+			this.oPointerExtension._debug();
+		},
+		afterEach: function() {
+			destroyTables();
+		}
+	});
+
+	QUnit.test("findColumnForPosition returns null when position is outside every column", function(assert) {
+		const ReorderHelper = this.oPointerExtension._ReorderHelper;
+
+		assert.strictEqual(ReorderHelper.findColumnForPosition(oTable, -10000), null, "Far-left position");
+		assert.strictEqual(ReorderHelper.findColumnForPosition(oTable, 100000), null, "Far-right position");
+	});
+
+	QUnit.test("adaptReorderMarkerPosition returns without effect when position is falsy", function(assert) {
+		assert.expect(0);
+		const ReorderHelper = this.oPointerExtension._ReorderHelper;
+
+		// Both branches (bShow = true and bShow = false) must be safe to invoke without a position.
+		ReorderHelper.adaptReorderMarkerPosition(oTable, null, true);
+		ReorderHelper.adaptReorderMarkerPosition(oTable, undefined, false);
+	});
+
+	QUnit.test("onMouseMoveWhileReordering restores previous position when target column is missing", function(assert) {
+		const ReorderHelper = this.oPointerExtension._ReorderHelper;
+
+		oTable._iDnDColIndex = 2;
+		oTable._iNewColPos = 5;
+		oTable._$ReorderGhost = document.createElement("div");
+		document.body.appendChild(oTable._$ReorderGhost);
+		this.stub(ReorderHelper, "findColumnForPosition").returns(null);
+
+		const oEvent = jQuery.Event({type: "mousemove"});
+		oEvent.clientX = -99999;
+		oEvent.clientY = 0;
+
+		ReorderHelper.onMouseMoveWhileReordering.call(oTable, oEvent);
+
+		assert.strictEqual(oTable._iNewColPos, 5, "New position restored to previous value");
+
+		oTable._$ReorderGhost.remove();
+		delete oTable._$ReorderGhost;
+		delete oTable._iDnDColIndex;
+		delete oTable._iNewColPos;
+	});
+
+	QUnit.test("onMouseMoveWhileReordering triggers scroll near the trailing edge", function(assert) {
+		const ReorderHelper = this.oPointerExtension._ReorderHelper;
+		const oDoScrollStub = this.stub(ReorderHelper, "doScroll");
+		const oAdaptStub = this.stub(ReorderHelper, "adaptReorderMarkerPosition");
+		const oPos = {left: 0, center: 0, right: 0, width: 100, index: 1, id: "col", before: false, after: true};
+		this.stub(ReorderHelper, "findColumnForPosition").returns(oPos);
+
+		const oScrollArea = document.createElement("div");
+		oScrollArea.style.width = "200px";
+		oScrollArea.style.height = "20px";
+		oScrollArea.style.overflow = "auto";
+		document.body.appendChild(oScrollArea);
+		const oInner = document.createElement("div");
+		oInner.style.width = "99999px";
+		oInner.style.height = "20px";
+		oScrollArea.appendChild(oInner);
+
+		const oGhost = document.createElement("div");
+		document.body.appendChild(oGhost);
+		const oScrollAreaRect = oScrollArea.getBoundingClientRect();
+		const oFakeTable = {
+			_iDnDColIndex: 0,
+			_iNewColPos: 0,
+			_bRtlMode: false,
+			_bReorderScroll: false,
+			_$ReorderGhost: oGhost,
+			_isTouchEvent: () => false,
+			getDomRef: () => oScrollArea,
+			getColumns: () => []
+		};
+
+		const oEvent = jQuery.Event({type: "mousemove"});
+		oEvent.pageX = oScrollAreaRect.right - 5;
+		oEvent.pageY = 0;
+
+		ReorderHelper.onMouseMoveWhileReordering.call(oFakeTable, oEvent);
+
+		assert.ok(oFakeTable._bReorderScroll, "Reorder scroll active");
+		assert.ok(oDoScrollStub.calledWith(oFakeTable, true), "doScroll called with forward=true");
+		assert.ok(oAdaptStub.calledWith(oFakeTable, oPos, false), "adaptReorderMarkerPosition called");
+
+		oScrollArea.remove();
+		oGhost.remove();
+	});
+
+	QUnit.test("onMouseMoveWhileReordering triggers scroll near the leading edge", function(assert) {
+		const ReorderHelper = this.oPointerExtension._ReorderHelper;
+		const oDoScrollStub = this.stub(ReorderHelper, "doScroll");
+		const oAdaptStub = this.stub(ReorderHelper, "adaptReorderMarkerPosition");
+		const oPos = {left: 0, center: 0, right: 0, width: 100, index: 1, id: "col", before: false, after: true};
+		this.stub(ReorderHelper, "findColumnForPosition").returns(oPos);
+
+		const oScrollArea = document.createElement("div");
+		oScrollArea.style.width = "200px";
+		oScrollArea.style.height = "20px";
+		oScrollArea.style.overflow = "auto";
+		document.body.appendChild(oScrollArea);
+		const oInner = document.createElement("div");
+		oInner.style.width = "99999px";
+		oInner.style.height = "20px";
+		oScrollArea.appendChild(oInner);
+		oScrollArea.scrollLeft = 100;
+
+		const oGhost = document.createElement("div");
+		document.body.appendChild(oGhost);
+		const oScrollAreaRect = oScrollArea.getBoundingClientRect();
+		const oFakeTable = {
+			_iDnDColIndex: 0,
+			_iNewColPos: 0,
+			_bRtlMode: false,
+			_bReorderScroll: false,
+			_$ReorderGhost: oGhost,
+			_isTouchEvent: () => false,
+			getDomRef: () => oScrollArea,
+			getColumns: () => []
+		};
+
+		const oEvent = jQuery.Event({type: "mousemove"});
+		oEvent.pageX = oScrollAreaRect.left + 5;
+		oEvent.pageY = 0;
+
+		ReorderHelper.onMouseMoveWhileReordering.call(oFakeTable, oEvent);
+
+		assert.ok(oFakeTable._bReorderScroll, "Reorder scroll active");
+		assert.ok(oDoScrollStub.calledWith(oFakeTable, false), "doScroll called with forward=false (LTR + leading edge)");
+		assert.ok(oAdaptStub.calledWith(oFakeTable, oPos, false), "adaptReorderMarkerPosition called");
+
+		oScrollArea.remove();
+		oGhost.remove();
+	});
+
+	QUnit.test("doScroll clears a pending timer and schedules a follow-up", function(assert) {
+		const ReorderHelper = this.oPointerExtension._ReorderHelper;
+		const oClearTimeoutSpy = this.spy(window, "clearTimeout");
+		const oSetTimeoutSpy = this.spy(window, "setTimeout");
+
+		oTable._mTimeouts.horizontalReorderScrollTimerId = 12345;
+		oTable._bReorderScroll = true;
+
+		ReorderHelper.doScroll(oTable, true);
+
+		assert.ok(oClearTimeoutSpy.calledWith(12345), "Previous timer cleared");
+		assert.ok(oSetTimeoutSpy.calledWith(sinon.match.func, 60), "Follow-up scroll scheduled after 60ms");
+
+		clearTimeout(oTable._mTimeouts.horizontalReorderScrollTimerId);
+		oTable._mTimeouts.horizontalReorderScrollTimerId = null;
+		oTable._bReorderScroll = false;
+	});
+
+	QUnit.test("doScroll uses scrollLeftRTL in RTL mode", function(assert) {
+		const ReorderHelper = this.oPointerExtension._ReorderHelper;
+		const oOriginal$ = oTable.$;
+		const $Scr = oTable.$("sapUiTableColHdrScr");
+		const oScrollLeftRTLStub = this.stub().returns(0);
+		$Scr.scrollLeftRTL = oScrollLeftRTLStub;
+		this.stub(oTable, "$").callsFake(function(sId) {
+			if (sId === "sapUiTableColHdrScr") {
+				return $Scr;
+			}
+			return oOriginal$.apply(this, arguments);
+		});
+
+		oTable._bRtlMode = true;
+		oTable._bReorderScroll = true;
+
+		ReorderHelper.doScroll(oTable, true);
+
+		assert.ok(oScrollLeftRTLStub.called, "scrollLeftRTL used in RTL mode");
+
+		clearTimeout(oTable._mTimeouts.horizontalReorderScrollTimerId);
+		oTable._mTimeouts.horizontalReorderScrollTimerId = null;
+		oTable._bReorderScroll = false;
+		oTable._bRtlMode = false;
+	});
 });

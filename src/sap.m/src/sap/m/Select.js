@@ -2851,7 +2851,11 @@ function(
 
 			if (oValueStateMessage && !this._bValueStateMessageOpened) {
 				this._bValueStateMessageOpened = true;
-				oValueStateMessage.open();
+				setTimeout(function() {
+					if (!this.bIsDestroyed && this._bValueStateMessageOpened) {
+						oValueStateMessage.open();
+					}
+				}.bind(this), 0);
 			}
 		};
 

@@ -19,8 +19,9 @@ sap.ui.define([
 	"sap/m/Title",
 	"sap/ui/core/Control",
 	"sap/ui/core/InvisibleMessage",
-	"sap/ui/core/library"
-], function(Element, HTML, Button, Image, PDFViewer, Dialog, IllustratedMessage, IllustratedMessageType, Carousel, Log, Library, VBox, Bar, Title, Control, InvisibleMessage, coreLibrary) {
+	"sap/ui/core/library",
+	"sap/base/security/encodeXML"
+], function(Element, HTML, Button, Image, PDFViewer, Dialog, IllustratedMessage, IllustratedMessageType, Carousel, Log, Library, VBox, Bar, Title, Control, InvisibleMessage, coreLibrary, encodeXML) {
 	"use strict";
 
 	// get resource translation bundle;
@@ -489,7 +490,7 @@ sap.ui.define([
 						break;
 					}
 					const oPage = new HTML({
-						content: `<video controls width='100%' height='100%' src=${oItem.getUrl()}>`
+						content: `<video controls width='100%' height='100%' src="${encodeXML(oItem.getUrl())}">`
 					});
 					return oPage;
 				}

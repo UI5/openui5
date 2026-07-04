@@ -1722,7 +1722,7 @@ sap.ui.define([
 			this.oCard.showMessage();
 
 			// Assert
-			assert.ok(oLogSpy.calledWith("'showMessage' cannot be used before the card instance is ready. Consider using the event 'manifestApplied' event."), "Error should be logged in the console");
+			assert.ok(oLogSpy.calledWith("'showMessage' cannot be used before the card instance is ready. Consider using the 'manifestApplied' event."), "Error should be logged in the console");
 		});
 
 		QUnit.test("showMessage delegates the call to BaseContent once created", async function (assert) {

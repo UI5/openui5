@@ -834,12 +834,16 @@ sap.ui.define([
 	* @returns {sap.m.Dialog} oDialog, created dialog instance
 	*/
 	UploadSetwithTable.prototype._getFileRenameDialog = function(oItem) {
+		const bIsUrl = !!oItem.getUrl() && !oItem.getMediaType();
 		const oSplit = UploadItem._splitFileName(oItem.getFileName());
 		let iMaxLength = this.getMaxFileNameLength();
 		const iFileExtensionLength = oSplit.extension ? oSplit.extension.length + 1 : 0;
 			iMaxLength = iMaxLength ? iMaxLength : 0;
 		let iNameMaxLength = iMaxLength - iFileExtensionLength;
 			iNameMaxLength = iNameMaxLength < 0 ? 0 : iNameMaxLength;
+		if (bIsUrl) {
+			iNameMaxLength = iMaxLength ? Math.min(iMaxLength, 40) - iFileExtensionLength : Math.max(0, 40 - iFileExtensionLength);
+		}
 
 		// Input field
 		const oInput = new Input({
@@ -851,6 +855,7 @@ sap.ui.define([
 		});
 		oInput.addStyleClass("sapUiTinyMarginTop");
 		oInput.addStyleClass("sapUiMediumMarginBegin");
+		oInput.data("isUrl", bIsUrl);
 
 		// Test field for extension
 		const sExtension = oSplit.extension ? `.${oSplit.extension}` : "";
@@ -950,16 +955,23 @@ sap.ui.define([
 	UploadSetwithTable.prototype._handleItemRenameConfirmation = function(oEvent) {
 		const oDialog = oEvent.getSource().getParent();
 		const oInput = oDialog.getContent()[1];
+		const oItem = oDialog && oDialog.data ? oDialog.data().item : null;
+		const bIsUrlItem = !!(oItem?.getUrl() && !oItem?.getMediaType());
 		if (oInput && oInput.getValueState() === "Error") {
 			oInput.focus(oInput);
 			oInput.setShowValueStateMessage(true);
 			return;
 		}
-		const oItem = oDialog && oDialog.data ? oDialog.data().item : null;
 		const oSplit = UploadItem._splitFileName(oItem.getFileName());
 		// update only if there is change
 		if (oItem && oSplit.name !== oInput.getValue()) {
-			// const oContext = oItem.data("context");
+			if (bIsUrlItem && oInput.getValue().includes(".")) {
+				oInput.setProperty("valueState", "Error", true);
+				oInput.setValueStateText(this._oRb.getText("UPLOADSET_WITH_TABLE_DOCUMENT_RENAME_SPLC_VALIDATION_ERROR_MESSAGE", ["."]));
+				oInput.setShowValueStateMessage(true);
+				oInput.focus();
+				return;
+			}
 			if (oSplit && oSplit.extension) {
 				oItem.setFileName(oInput.getValue() + "." + oSplit.extension);
 			} else {
@@ -988,6 +1000,13 @@ sap.ui.define([
 			oInput.setProperty("valueState", "Error", true);
 			oInput.setValueStateText(this._oRb.getText("UPLOADSET_WITH_TABLE_DOCUMENT_RENAME_EMPTY_NAME_VALIDATION_ERROR_MESSAGE"));
 			oInput.setShowValueStateMessage(true);
+			return;
+		}
+
+		if (oInput.data("isUrl") && sValue.includes(".")) {
+			oInput.setShowValueStateMessage(true);
+			oInput.setProperty("valueState", "Error", true);
+			oInput.setValueStateText(this._oRb.getText("UPLOADSET_WITH_TABLE_DOCUMENT_RENAME_SPLC_VALIDATION_ERROR_MESSAGE", ["."]));
 			return;
 		}
 
