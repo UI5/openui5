@@ -36,4 +36,32 @@ sap.ui.define([
 		assert.deepEqual(this.oTable._oTable.getModel("$typeSettings").oData, {p13nFixedColumnCount: null},
 			"TreeTable has a model with the typeSettings");
 	});
+
+	QUnit.module("API", {
+		beforeEach: function() {
+			this.oType = new TreeTableType();
+		},
+		afterEach: function() {
+			this.oType.destroy();
+		}
+	});
+
+	QUnit.test("createTable returns null when there is no parent", function(assert) {
+		assert.strictEqual(this.oType.createTable("myId"), null);
+	});
+
+	QUnit.test("loadModules resolves immediately once the inner TreeTable module is already loaded", async function(assert) {
+		// First call ensures the inner TreeTable module is loaded.
+		await this.oType.loadModules();
+
+		// Spy on sap.ui.require to ensure it is not called again for the inner TreeTable module.
+		const oRequireSpy = this.spy(sap.ui, "require");
+
+		await this.oType.loadModules();
+
+		const bRequiredTreeTable = oRequireSpy.getCalls().some((oCall) => {
+			return Array.isArray(oCall.args[0]) && oCall.args[0].includes("sap/ui/table/TreeTable");
+		});
+		assert.notOk(bRequiredTreeTable, "sap.ui.require was not called again for sap/ui/table/TreeTable");
+	});
 });

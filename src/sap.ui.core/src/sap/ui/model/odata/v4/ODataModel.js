@@ -1723,9 +1723,7 @@ sap.ui.define([
 	 * @see #requestKeyPredicate
 	 */
 	ODataModel.prototype.fetchKeyPredicate = function (sMetaPath, oEntity) {
-		var mTypeForMetaPath = {};
-
-		return this.oRequestor.fetchType(mTypeForMetaPath, sMetaPath).then(function () {
+		return this.oRequestor.fetchType(sMetaPath).then((mTypeForMetaPath) => {
 			return _Helper.getKeyPredicate(oEntity, sMetaPath, mTypeForMetaPath);
 		});
 	};

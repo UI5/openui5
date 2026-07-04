@@ -360,4 +360,40 @@ sap.ui.define([
 			testUpdateQuickActions("None", true);
 		});
 	});
+
+	QUnit.test("QuickSort item reflects the current sort order when the menu opens", async function(assert) {
+		const oTable = this.oTable;
+
+		oTable.setP13nMode(["Sort"]);
+		oTable._getSortedProperties = () => [{key: "test", descending: true}];
+
+		await TableQUnitUtils.openColumnMenu(oTable, 0);
+
+		const oQuickSort = oTable._oQuickActionContainer.getQuickActions()[0];
+		assert.ok(oQuickSort.isA("sap.m.table.columnmenu.QuickSort"), "The QuickActionContainer contains a QuickSort");
+		assert.strictEqual(oQuickSort.getItems()[0].getSortOrder(), "Descending", "QuickSort item reflects the current descending sort");
+	});
+
+	QUnit.test("QuickGroup item reflects the current group state when the menu opens", async function(assert) {
+		const oTable = this.oTable;
+
+		oTable.setP13nMode(["Group"]);
+		oTable._getGroupedProperties = () => [{key: "test"}];
+
+		await TableQUnitUtils.openColumnMenu(oTable, 0);
+
+		const oQuickGroup = oTable._oQuickActionContainer.getQuickActions()[0];
+		assert.ok(oQuickGroup.isA("sap.m.table.columnmenu.QuickGroup"), "The QuickActionContainer contains a QuickGroup");
+		assert.ok(oQuickGroup.getItems()[0].getGrouped(), "QuickGroup item reflects the current grouped state");
+	});
+
+	QUnit.test("No p13n modes active", async function(assert) {
+		const oTable = this.oTable;
+
+		oTable.setP13nMode([]);
+
+		await TableQUnitUtils.openColumnMenu(oTable, 0);
+
+		assert.notOk(oTable._oQuickActionContainer.hasQuickActions(), "hasQuickActions returns false");
+	});
 });

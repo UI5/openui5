@@ -169,6 +169,20 @@ sap.ui.define([
 		assert.equal(oTableContainer.clientHeight, oTableContainer.scrollHeight, "The table container has no vertical overflow");
 	});
 
+	QUnit.test("Table is not rendered", function(assert) {
+		const oRowMode = new AutoRowMode();
+		const oTable = new Table({rowMode: oRowMode});
+		const oInvalidateSpy = this.spy(oRowMode, "invalidate");
+
+		oRowMode.adjustRowCountToAvailableSpace();
+
+		assert.ok(oInvalidateSpy.notCalled, "No invalidation triggered");
+		assert.strictEqual(oRowMode.getComputedRowCounts().count, 0,
+			"Computed row count stays at the initial 0 without a rendered DOM to measure against");
+
+		oTable.destroy();
+	});
+
 	QUnit.module("Hide empty rows", {
 		beforeEach: function() {
 			this.oTable = TableQUnitUtils.createTable({
@@ -641,5 +655,98 @@ sap.ui.define([
 			assert.ok(bCallback2Called, "Second callback executed");
 			done();
 		});
+	});
+
+	QUnit.module("Chrome zoom row-height workaround", {
+		beforeEach: async function() {
+			this.oTable = TableQUnitUtils.createTable({
+				models: TableQUnitUtils.createJSONModelWithEmptyRows(10)
+			});
+			await this.oTable.qunit.whenRenderingFinished();
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		}
+	});
+
+	QUnit.test("Chrome with fractional devicePixelRatio measures row height from a temporary DOM table", function(assert) {
+		this.stub(Device.browser, "chrome").value(true);
+		this.stub(window, "devicePixelRatio").value(1.25);
+
+		const oRowMode = this.oTable.getRowMode();
+		const oRowContainer = this.oTable.getDomRef("tableCCnt");
+		const oAppendChildSpy = this.spy(oRowContainer, "appendChild");
+		const oRemoveChildSpy = this.spy(oRowContainer, "removeChild");
+
+		const mStyles = oRowMode.getRowContainerStyles();
+
+		assert.ok(oAppendChildSpy.calledOnce, "Temporary table inserted into row container");
+		assert.ok(oRemoveChildSpy.calledOnce, "Temporary table removed from row container");
+		assert.strictEqual(oAppendChildSpy.firstCall.args[0], oRemoveChildSpy.firstCall.args[0], "The same element that was appended is removed");
+		assert.strictEqual(oAppendChildSpy.firstCall.args[0].tagName, "TABLE", "The inserted element is a table");
+		assert.notOk(oRowContainer.querySelector(":scope > table.sapUiTableCtrl:last-child")?.isSameNode(oAppendChildSpy.firstCall.args[0]),
+			"Temporary table no longer in DOM after measurement");
+		assert.ok(/^\d+px$/.test(mStyles.height), "Row container height is a pixel value");
+	});
+
+	QUnit.test("Chrome zoom workaround honours a configured row content height", function(assert) {
+		this.stub(Device.browser, "chrome").value(true);
+		this.stub(window, "devicePixelRatio").value(1.5);
+
+		const oRowMode = this.oTable.getRowMode();
+		oRowMode.setRowContentHeight(30);
+
+		const oRowContainer = this.oTable.getDomRef("tableCCnt");
+		const oAppendChildSpy = this.spy(oRowContainer, "appendChild");
+
+		oRowMode.getRowContainerStyles();
+
+		const oInsertedTable = oAppendChildSpy.firstCall.args[0];
+		const oInsertedRow = oInsertedTable.rows[0];
+		assert.strictEqual(oInsertedRow.style.height, oRowMode.getBaseRowHeightOfTable() + "px",
+			"Inserted row uses the base row height derived from the configured content height");
+	});
+
+	QUnit.module("Table refresh row-count adjustment", {
+		beforeEach: async function() {
+			this.oTable = TableQUnitUtils.createTable({
+				models: TableQUnitUtils.createJSONModelWithEmptyRows(100)
+			});
+			await this.oTable.qunit.whenRenderingFinished();
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		}
+	});
+
+	QUnit.test("Table#refreshRows requests contexts and initializes rows for the configured count", function(assert) {
+		const oRowMode = this.oTable.getRowMode();
+		const iConfiguredRowCount = oRowMode.getConfiguredRowCount();
+		const oInitRowsSpy = this.spy(oRowMode, "initTableRowsAfterDataRequested");
+		const oGetContextsSpy = this.spy(oRowMode, "getRowContexts");
+
+		assert.ok(iConfiguredRowCount > 0, "Precondition: configured row count is positive");
+
+		this.oTable.refreshRows();
+
+		assert.ok(oInitRowsSpy.calledOnceWithExactly(iConfiguredRowCount),
+			"initTableRowsAfterDataRequested called with the configured row count");
+		assert.ok(oGetContextsSpy.calledWithExactly(iConfiguredRowCount), "getRowContexts called with the configured row count");
+	});
+
+	QUnit.test("Table#refreshRows on a freshly attached row mode skips row initialization", function(assert) {
+		const oRowMode = new AutoRowMode();
+		const oInitRowsSpy = this.spy(oRowMode, "initTableRowsAfterDataRequested");
+		const oGetContextsSpy = this.spy(oRowMode, "getRowContexts");
+
+		this.oTable.setRowMode(oRowMode);
+		oInitRowsSpy.resetHistory();
+		oGetContextsSpy.resetHistory();
+
+		this.oTable.refreshRows();
+
+		assert.ok(oInitRowsSpy.notCalled, "initTableRowsAfterDataRequested not called while row count is still initial");
+		assert.ok(oGetContextsSpy.calledOnceWithExactly(oRowMode.getConfiguredRowCount()),
+			"getRowContexts called with the configured row count");
 	});
 });

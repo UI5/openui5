@@ -711,6 +711,57 @@ sap.ui.define([
 			);
 		});
 
+		QUnit.test("loadVariantDependentControlChanges adds newly-loaded UI changes to the live dependency map", async function(assert) {
+			const oBackendResponse = {
+				variants: [{
+					fileName: "variantWithRemovedContent",
+					fileType: "ctrl_variant",
+					variantManagementReference: sVMReference
+				}],
+				variantDependentControlChanges: [
+					{
+						fileName: "uiChange1",
+						fileType: "change",
+						changeType: "labelChange",
+						variantReference: "variantWithRemovedContent",
+						selector: { id: "targetControl", idIsLocal: false }
+					}
+				]
+			};
+			sandbox.stub(Storage, "loadFlVariantDependentControlChanges").resolves(oBackendResponse);
+			sandbox.stub(VariantManagementState, "getVariant").returns({ instance: this.oVariantWithRemovedContent });
+			const oAddChangeSpy = sandbox.spy(DependencyHandler, "addChangeAndUpdateDependencies");
+
+			await VariantManagerApply.loadVariantDependentControlChanges({
+				reference: sReference,
+				componentId: oComponent.getId(),
+				vmReference: sVMReference,
+				variantId: "variantWithRemovedContent"
+			});
+
+			assert.strictEqual(
+				oAddChangeSpy.callCount, 1,
+				"then addChangeAndUpdateDependencies is called exactly once — only for the UI change, not for the variant"
+			);
+			assert.strictEqual(
+				oAddChangeSpy.firstCall.args[0].getId(), "uiChange1",
+				"then the newly-loaded UI change is the one added"
+			);
+			assert.strictEqual(
+				oAddChangeSpy.firstCall.args[1], oComponent.getId(),
+				"then addChangeAndUpdateDependencies receives the app component id"
+			);
+			const oLiveDepMap = FlexObjectState.getLiveDependencyMap(sReference);
+			assert.strictEqual(
+				oLiveDepMap.mChanges.targetControl?.length, 1,
+				"then the change is present in the live dep map under its target control id"
+			);
+			assert.strictEqual(
+				oLiveDepMap.mChanges.targetControl[0].getId(), "uiChange1",
+				"then the change in the live dep map is the one that was just loaded"
+			);
+		});
+
 		QUnit.test("loadVariantDependentControlChanges discards the response when the requested variant belongs to a different VM", async function(assert) {
 			const oBackendResponse = {
 				variants: [

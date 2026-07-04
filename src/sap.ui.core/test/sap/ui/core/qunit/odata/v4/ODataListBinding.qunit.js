@@ -12605,21 +12605,6 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("getKeepAliveContext: data aggregation", function (assert) {
-		const oBinding = this.bindList("/EMPLOYEES");
-		this.mock(_Helper).expects("isDataAggregation")
-			.withExactArgs(sinon.match.same(oBinding.mParameters))
-			.returns(true);
-		this.mock(Context).expects("create").never();
-		this.mock(oContextPrototype).expects("setKeepAlive").never();
-
-		assert.throws(() => {
-			// code under test
-			oBinding.getKeepAliveContext("/EMPLOYEES('1')");
-		}, new Error("Unsupported $$aggregation at " + oBinding));
-	});
-
-	//*********************************************************************************************
 	QUnit.test("getCacheAndMoveKeepAliveContexts", function (assert) {
 		var oBinding = this.bindList("/path", undefined, undefined, undefined,
 				{$$getKeepAliveContext : true}),

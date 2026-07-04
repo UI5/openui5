@@ -1201,6 +1201,60 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("URL item rename dialog splits name at dot and caps input at 40 chars", async function (assert) {
+		const oTable = await createMDCTable();
+		const oUploadSetwithTablePlugin = new UploadSetwithTable({
+			rowConfiguration: new UploadItemConfiguration({ fileNamePath: "fileName", urlPath: "imageUrl", mediaTypePath: "mediaType", fileSizePath: "size" })
+		});
+		oTable.addDependent(oUploadSetwithTablePlugin);
+		await oTable.initialized();
+		await nextUIUpdate();
+
+		// URL document: url set, no mediaType — split same as regular file
+		const oUrlItem = new UploadItem({ fileName: "sap.com", url: "https://sap.com" });
+		const oDialog = oUploadSetwithTablePlugin._getFileRenameDialog(oUrlItem);
+		assert.equal(oDialog.getContent()[1].getValue(), "sap", "URL item: name part in input");
+		assert.equal(oDialog.getContent()[2].getText(), ".com", "URL item: extension shown separately");
+		assert.equal(oDialog.getContent()[1].getMaxLength(), 36, "URL item: input capped at 40 minus extension length");
+
+		oDialog.destroy();
+		oTable.destroy();
+	});
+
+	QUnit.test("URL item rename blocks dot in name on liveChange and on Apply", async function (assert) {
+		const oTable = await createMDCTable();
+		const oUploadSetwithTablePlugin = new UploadSetwithTable({
+			rowConfiguration: new UploadItemConfiguration({ fileNamePath: "fileName", urlPath: "imageUrl", mediaTypePath: "mediaType", fileSizePath: "size" })
+		});
+		oTable.addDependent(oUploadSetwithTablePlugin);
+		await oTable.initialized();
+		await nextUIUpdate();
+
+		const oItem = new UploadItem({ fileName: "sapcom", url: "https://sap.com" });
+		const oItemRenamedSpy = this.spy(oUploadSetwithTablePlugin, "fireItemRenamed");
+		const oDialog = oUploadSetwithTablePlugin._getFileRenameDialog(oItem);
+		const oInput = oDialog.getContent()[1];
+
+		// liveChange with dot → error
+		oInput.setValue("google.com");
+		oInput.fireLiveChange({ value: "google.com" });
+		assert.equal(oInput.getValueState(), "Error", "Error state on liveChange with dot");
+
+		// Apply with dot → blocked
+		oDialog.getBeginButton().firePress();
+		assert.equal(oItem.getFileName(), "sapcom", "Filename unchanged after blocked Apply");
+		assert.ok(oItemRenamedSpy.notCalled, "itemRenamed not fired");
+
+		// Apply with valid name → saved
+		oInput.setValue("googlecom");
+		oInput.fireLiveChange({ value: "googlecom" });
+		oDialog.getBeginButton().firePress();
+		assert.equal(oItem.getFileName(), "googlecom", "Filename updated with valid name");
+		assert.ok(oItemRenamedSpy.calledOnce, "itemRenamed fired");
+
+		oTable.destroy();
+	});
+
 	QUnit.test("Test for download API to download the file with current context passed.", async function (assert) {
 		/**
 		 * MDC Table with ActionsPlaceholder
@@ -3562,6 +3616,79 @@ sap.ui.define([
 		const oPage = await this.oFilePreviewDialog.getPageContent(oItem);
 
 		assert.ok(oPage.isA("sap.m.IllustratedMessage"), "Page content should be IllustratedMessage when browser does not support video/webm");
+
+		oPage.destroy();
+		oItem.destroy();
+	});
+
+	QUnit.module("FilePreviewDialog video URL encoding (XSS prevention)", {
+		beforeEach: function () {
+			this.oFilePreviewDialog = new FilePreviewDialog();
+			this.oCanPlayStub = sinon.stub(this.oFilePreviewDialog, "_canPlayType").returns("probably");
+		},
+		afterEach: function () {
+			this.oFilePreviewDialog.destroy();
+			this.oCanPlayStub.restore();
+		}
+	});
+
+	QUnit.test("video src attribute is quoted and encodeXML-encoded for a clean URL", async function (assert) {
+		const oItem = new UploadItem({
+			fileName: "video.mp4",
+			mediaType: "video/mp4",
+			url: "test-resources/sap/m/UploadSetwithTableSampleFiles/Video.mp4"
+		});
+
+		const oPage = await this.oFilePreviewDialog.getPageContent(oItem);
+
+		assert.ok(oPage.isA("sap.ui.core.HTML"), "Page content should be an HTML control for video/mp4");
+		const sContent = oPage.getContent();
+		// encodeXML encodes '/' (\x2f) to '&#x2f;' — browser decodes it back before the HTTP request
+		assert.ok(sContent.includes('src="test-resources&#x2f;sap&#x2f;m&#x2f;UploadSetwithTableSampleFiles&#x2f;Video.mp4"'),
+			"src attribute must be quoted and slashes encoded to &#x2f; by encodeXML");
+
+		oPage.destroy();
+		oItem.destroy();
+	});
+
+	QUnit.test("embedded double-quote in URL is encoded — onerror attribute cannot be injected", async function (assert) {
+		const oItem = new UploadItem({
+			fileName: "malicious.mp4",
+			mediaType: "video/mp4",
+			url: 'test-resources/sap/m/UploadSetwithTableSampleFiles/Video.mp4" onerror="alert(\'XSS\')'
+		});
+
+		const oPage = await this.oFilePreviewDialog.getPageContent(oItem);
+
+		assert.ok(oPage.isA("sap.ui.core.HTML"), "Page content should be an HTML control");
+		const sContent = oPage.getContent();
+		// encodeXML maps '"' to '&quot;' — the injected attribute boundary is neutralised
+		assert.notOk(sContent.includes("onerror="),
+			"onerror= must not appear in any form in the rendered HTML after encoding");
+		assert.ok(sContent.includes("&quot;"),
+			"double-quote in the URL is HTML-encoded to &quot; by encodeXML");
+
+		oPage.destroy();
+		oItem.destroy();
+	});
+
+	QUnit.test("URL with query string ampersand is HTML-encoded by encodeXML", async function (assert) {
+		const oItem = new UploadItem({
+			fileName: "video.mp4",
+			mediaType: "video/mp4",
+			url: "/api/files/video.mp4?id=123&token=abc"
+		});
+
+		const oPage = await this.oFilePreviewDialog.getPageContent(oItem);
+
+		assert.ok(oPage.isA("sap.ui.core.HTML"), "Page content should be an HTML control");
+		const sContent = oPage.getContent();
+		// encodeXML encodes '&' to '&amp;' — browser decodes back to '&' before the HTTP request
+		assert.ok(sContent.includes("&amp;"),
+			"ampersand in query string is HTML-encoded to &amp; by encodeXML");
+		// encodeXML also encodes '/' and '?' so raw unquoted src cannot appear
+		assert.notOk(sContent.includes("src=/"),
+			"src attribute must be quoted — unquoted src=/... cannot appear");
 
 		oPage.destroy();
 		oItem.destroy();

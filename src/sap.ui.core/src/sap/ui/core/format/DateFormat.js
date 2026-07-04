@@ -3483,8 +3483,14 @@ sap.ui.define([
 				: UI5Date.getInstance(iYear, iMonth, iDay, iHours, iMinutes, iSeconds, iMilliseconds);
 		}
 
+		const periodEnd = (iYear, iMonth, iDay)  => {
+			return this.type === mDateFormatTypes.DATE
+				? getDate(iYear, iMonth, iDay, 0, 0, 0, 0)
+				: getDate(iYear, iMonth, iDay, 23, 59, 58, 123);
+		};
+
 		function yearEnd(iYear) {
-			return getDate(iYear, 11, 31, 23, 59, 58, 123);
+			return periodEnd(iYear, 11, 31);
 		}
 
 		const oDefault = yearEnd(iFullYear);
@@ -3508,8 +3514,8 @@ sap.ui.define([
 			// R3: same year, different months
 			const iYear = oMaximum.getFullYear();
 			const iMaxMonth = oMaximum.getMonth();
-			const oMaxMonthEnd = getDate(iYear, iMaxMonth + 1, 0, 23, 59, 58, 123);
-			oEnd = oMaxMonthEnd <= oMaximum ? oMaxMonthEnd : getDate(iYear, iMaxMonth, 0, 23, 59, 58, 123);
+			const oMaxMonthEnd = periodEnd(iYear, iMaxMonth + 1, 0);
+			oEnd = oMaxMonthEnd <= oMaximum ? oMaxMonthEnd : periodEnd(iYear, iMaxMonth, 0);
 		} else {
 			// R4: same year and month
 			oEnd = oMaximum;

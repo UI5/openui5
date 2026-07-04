@@ -592,6 +592,71 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.test("Place vertical scrollbar at without an HTMLElement", async function(assert) {
+		const oSyncInterface = await this.oTable._enableSynchronization();
+
+		assert.throws(() => oSyncInterface.placeVerticalScrollbarAt(),
+			new Error("The HTMLElement in which the vertical scrollbar should be placed must be specified."));
+		assert.throws(() => oSyncInterface.placeVerticalScrollbarAt(null),
+			new Error("The HTMLElement in which the vertical scrollbar should be placed must be specified."));
+	});
+
+	QUnit.test("Place vertical scrollbar at externalizes the scrollbar and updates it on re-rendering", async function(assert) {
+		const oTable = this.oTable;
+		const oContainer = document.createElement("div");
+		document.getElementById("qunit-fixture").appendChild(oContainer);
+
+		await oTable.qunit.whenRenderingFinished();
+		const oSyncInterface = await oTable._enableSynchronization();
+		const oScrollExtension = oTable._getScrollExtension();
+		const oInvalidateSpy = this.spy(oTable, "invalidate");
+		const oUpdateHeightSpy = this.spy(oScrollExtension, "updateVerticalScrollbarHeight");
+		const oUpdateScrollHeightSpy = this.spy(oScrollExtension, "updateVerticalScrollHeight");
+
+		oSyncInterface.placeVerticalScrollbarAt(oContainer);
+
+		assert.ok(oScrollExtension.isVerticalScrollbarExternal(), "The vertical scrollbar is marked as external");
+		assert.ok(oInvalidateSpy.calledOnce, "The table was invalidated");
+		const sVSbId = oTable.getId() + "-" + library.SharedDomRef.VerticalScrollBar;
+		const oExternalVSb = oContainer.querySelector('[id="' + sVSbId + '"]');
+		assert.ok(oExternalVSb, "The external vertical scrollbar is placed inside the given container");
+
+		await oTable.qunit.whenRenderingFinished();
+		assert.ok(oUpdateHeightSpy.called, "onAfterRendering updated the vertical scrollbar height while external");
+		assert.ok(oUpdateScrollHeightSpy.called, "onAfterRendering updated the vertical scroll height while external");
+
+		oContainer.remove();
+	});
+
+	QUnit.test("Place vertical scrollbar at reinserts the existing external scrollbar", async function(assert) {
+		const oTable = this.oTable;
+		const oContainer = document.createElement("div");
+		const oOtherContainer = document.createElement("div");
+		document.getElementById("qunit-fixture").appendChild(oContainer);
+		document.getElementById("qunit-fixture").appendChild(oOtherContainer);
+
+		await oTable.qunit.whenRenderingFinished();
+		const oSyncInterface = await oTable._enableSynchronization();
+		const oScrollExtension = oTable._getScrollExtension();
+
+		oSyncInterface.placeVerticalScrollbarAt(oContainer);
+		await oTable.qunit.whenRenderingFinished();
+
+		const oExternalVSb = oScrollExtension.getVerticalScrollbar();
+		const oVSbParent = oExternalVSb.parentElement;
+		const oInvalidateSpy = this.spy(oTable, "invalidate");
+		const oRestoreSpy = this.spy(oScrollExtension, "restoreVerticalScrollPosition");
+
+		oSyncInterface.placeVerticalScrollbarAt(oOtherContainer);
+
+		assert.ok(oInvalidateSpy.notCalled, "The table was not invalidated");
+		assert.strictEqual(oOtherContainer.firstElementChild, oVSbParent, "The existing scrollbar parent was moved into the new container");
+		assert.ok(oRestoreSpy.calledOnce, "The vertical scroll position was restored");
+
+		oContainer.remove();
+		oOtherContainer.remove();
+	});
+
 	QUnit.test("Render horizontal scrollbar", function(assert) {
 		const oTable = this.oTable;
 		const Div = document.createElement("div");
@@ -611,5 +676,14 @@ sap.ui.define([
 
 			document.getElementById("qunit-fixture").removeChild(Div);
 		});
+	});
+
+	QUnit.test("Render horizontal scrollbar without an id", async function(assert) {
+		const oSyncInterface = await this.oTable._enableSynchronization();
+		const oRenderManager = new RenderManager().getInterface();
+
+		assert.throws(() => oSyncInterface.renderHorizontalScrollbar(oRenderManager), new Error("The id must be specified."));
+		assert.throws(() => oSyncInterface.renderHorizontalScrollbar(oRenderManager, null, 100),
+			new Error("The id must be specified."));
 	});
 });

@@ -8,6 +8,7 @@ sap.ui.define([
 	"sap/ui/dom/detectTextSelection",
 	"sap/ui/model/BindingMode",
 	"sap/ui/Device",
+	"sap/ui/core/library",
 	"sap/ui/core/Control",
 	"sap/ui/core/IconPool",
 	"sap/ui/core/InvisibleText",
@@ -30,6 +31,7 @@ function(
 	detectTextSelection,
 	BindingMode,
 	Device,
+	coreLibrary,
 	Control,
 	IconPool,
 	InvisibleText,
@@ -1336,7 +1338,8 @@ function(
 			id: this.getId() + "-overflow",
 			icon: IconPool.getIconURI("overflow"),
 			press: [this._onOverflowButtonPress, this],
-			type: ButtonType.Transparent
+			type: ButtonType.Transparent,
+			ariaHasPopup: coreLibrary.aria.HasPopup.Menu
 		});
 
 		this._oOverflowButton.useEnabledPropagator(false);

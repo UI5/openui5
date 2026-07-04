@@ -359,11 +359,8 @@ sap.ui.define([
 			_Helper.setPrivateAnnotation(oElement, "promise", _Helper.addPromise(oElement));
 			aElements.$byPredicate[sTransientPredicate] = oElement;
 		});
-		// add the collection type to mTypeForMetaPath
-		this.fetchTypes().then(function (mTypeForMetaPath) {
-			that.oRequestor.fetchType(mTypeForMetaPath,
-				that.sMetaPath + "/" + _Helper.getMetaPath(sPath));
-		});
+		// add the collection type
+		that.oRequestor.fetchType(that.sMetaPath + "/" + _Helper.getMetaPath(sPath));
 
 		return aElements;
 	};
@@ -985,7 +982,7 @@ sap.ui.define([
 				oEntityType = mTypeForMetaPath[sMetaPath],
 				sExpand;
 
-			oEntityType ??= that.oRequestor.fetchType(mTypeForMetaPath, sMetaPath).getResult();
+			oEntityType ??= that.oRequestor.fetchType(sMetaPath).getResult()[sMetaPath];
 			if (sBasePath) {
 				// The key properties must only be copied from the result for nested entities. The
 				// root entity is already loaded and has them already. We check that they are
@@ -1097,50 +1094,23 @@ sap.ui.define([
 	};
 
 	/**
-	 * Fetches the type from the metadata for the root entity plus all types for $expand and puts
-	 * them into a map from meta path to type. Checks the types' key properties and puts their types
-	 * into the map, too, if they are complex. If a type has a
-	 * "@com.sap.vocabularies.Common.v1.Messages" annotation for messages, the type is enriched by
-	 * the property "@com.sap.vocabularies.Common.v1.Messages" containing the annotation object.
+	 * Fetches the type from the metadata for the root entity plus all types for $expand via this
+	 * cache's requestor. Checks the types' key properties and puts their types into the requestor's
+	 * map, too, if they are complex. If a type has a "@com.sap.vocabularies.Common.v1.Messages"
+	 * annotation for messages, the type is enriched by the property
+	 * "@com.sap.vocabularies.Common.v1.Messages" containing the annotation object.
 	 *
 	 * @returns {sap.ui.base.SyncPromise<object>}
 	 *   A promise that is resolved with a map from resource path + entity path to the type
 	 *
 	 * @private
+	 * @see sap.ui.model.odata.v4.lib._Requestor#fetchTypes
 	 * @see #getTypes
 	 */
 	_Cache.prototype.fetchTypes = function () {
-		var aPromises, mTypeForMetaPath,
-			that = this;
+		this.oTypePromise ??= this.oRequestor.fetchTypes(this.sMetaPath,
+			this.mLateExpandSelect ?? this.mQueryOptions);
 
-		/*
-		 * Recursively calls fetchType for all (sub)paths in $expand.
-		 * @param {string} sBaseMetaPath The resource meta path + entity path
-		 * @param {object} [mQueryOptions] The corresponding query options
-		 */
-		function fetchExpandedTypes(sBaseMetaPath, mQueryOptions) {
-			if (mQueryOptions && mQueryOptions.$expand) {
-				Object.keys(mQueryOptions.$expand).forEach(function (sNavigationPath) {
-					var sMetaPath = sBaseMetaPath;
-
-					sNavigationPath.split("/").forEach(function (sSegment) {
-						sMetaPath += "/" + sSegment;
-						aPromises.push(that.oRequestor.fetchType(mTypeForMetaPath, sMetaPath));
-					});
-					fetchExpandedTypes(sMetaPath, mQueryOptions.$expand[sNavigationPath]);
-				});
-			}
-		}
-
-		if (!this.oTypePromise) {
-			aPromises = [];
-			mTypeForMetaPath = {};
-			aPromises.push(this.oRequestor.fetchType(mTypeForMetaPath, this.sMetaPath));
-			fetchExpandedTypes(this.sMetaPath, this.mLateExpandSelect ?? this.mQueryOptions);
-			this.oTypePromise = SyncPromise.all(aPromises).then(function () {
-				return mTypeForMetaPath;
-			});
-		}
 		return this.oTypePromise;
 	};
 
@@ -1357,10 +1327,11 @@ sap.ui.define([
 	 *   A map from resource path + entity path to the type
 	 *
 	 * @private
+	 * @see sap.ui.model.odata.v4.lib._Requestor#getTypes
 	 * @see #fetchTypes
 	 */
 	_Cache.prototype.getTypes = function () {
-		return this.fetchTypes().getResult();
+		return this.oRequestor.getTypes();
 	};
 
 	/**

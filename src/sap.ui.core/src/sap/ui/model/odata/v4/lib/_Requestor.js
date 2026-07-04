@@ -89,6 +89,8 @@ sap.ui.define([
 		this.bBatchSent = false;
 		this.mHeaders = mHeaders;
 		this.aLockedGroupLocks = [];
+		this.mTypeForMetaPath = {};
+		this.mTypePromiseForMetaPath = {};
 		this.oModelInterface = oModelInterface;
 		this.sODataVersion = sODataVersion;
 		this.oOptimisticBatch = null; // optimistic batch processing off
@@ -904,53 +906,52 @@ sap.ui.define([
 	};
 
 	/**
-	 * Fetches the type for the given path and puts it into mTypeForMetaPath. Recursively fetches
-	 * the key properties' parent types if they are complex.
+	 * Fetches the type for the given path and stores it in this requestor's type map. Recursively
+	 * fetches the key properties' parent types if they are complex.
 	 *
-	 * @param {object} mTypeForMetaPath
-	 *   A map from resource path and entity path to the type
 	 * @param {string} sMetaPath
 	 *   The meta path of the resource + navigation or key path (which may lead to an entity or
 	 *   complex type)
 	 * @returns {sap.ui.base.SyncPromise<object>}
-	 *   A promise resolving with the type
+	 *   A promise resolving with a map from meta path to type
 	 *
 	 * @public
+	 * @see #fetchTypes
+	 * @see #getTypes
 	 */
-	 _Requestor.prototype.fetchType = function (mTypeForMetaPath, sMetaPath) {
-		var that = this;
-
-		if (sMetaPath in mTypeForMetaPath) {
-			return SyncPromise.resolve(mTypeForMetaPath[sMetaPath]);
+	_Requestor.prototype.fetchType = function (sMetaPath) {
+		if (sMetaPath in this.mTypePromiseForMetaPath) {
+			return this.mTypePromiseForMetaPath[sMetaPath];
 		}
 
-		return this.fetchTypeForPath(sMetaPath).then(function (oType) {
+		const oTypePromise = this.fetchTypeForPath(sMetaPath).then((oType) => {
 			var oMessageAnnotation,
 				aPromises = [];
 
 			if (oType) {
-				oMessageAnnotation = that.getModelInterface()
+				oMessageAnnotation = this.getModelInterface()
 					.fetchMetadata(sMetaPath + "/" + sMessagesAnnotation).getResult();
 				if (oMessageAnnotation) {
 					oType = Object.create(oType);
 					oType[sMessagesAnnotation] = oMessageAnnotation;
 				}
 
-				mTypeForMetaPath[sMetaPath] = oType;
+				this.mTypeForMetaPath[sMetaPath] = oType;
 
-				(oType.$Key || []).forEach(function (vKey) {
+				(oType.$Key || []).forEach((vKey) => {
 					if (typeof vKey === "object") {
 						// key has an alias
 						vKey = vKey[Object.keys(vKey)[0]];
-						aPromises.push(that.fetchType(mTypeForMetaPath,
+						aPromises.push(this.fetchType(
 							sMetaPath + "/" + vKey.slice(0, vKey.lastIndexOf("/"))));
 					}
 				});
-				return SyncPromise.all(aPromises).then(function () {
-					return oType;
-				});
+				return SyncPromise.all(aPromises);
 			}
-		});
+		}).then(() => this.mTypeForMetaPath);
+		this.mTypePromiseForMetaPath[sMetaPath] = oTypePromise;
+
+		return oTypePromise;
 	};
 
 	/**
@@ -965,6 +966,52 @@ sap.ui.define([
 	 */
 	_Requestor.prototype.fetchTypeForPath = function (sMetaPath) {
 		return this.oModelInterface.fetchMetadata(sMetaPath + "/");
+	};
+
+	/**
+	 * Fetches the type from the metadata for the root entity plus all types for $expand. Checks the
+	 * types' key properties and puts their types into the requestor's map, too, if they are
+	 * complex. If a type has a "@com.sap.vocabularies.Common.v1.Messages" annotation for messages,
+	 * the type is enriched by the property "@com.sap.vocabularies.Common.v1.Messages" containing
+	 * the annotation object.
+	 *
+	 * @param {string} sRootMetaPath
+	 *   Meta path to root entity
+	 * @param {object} mRootQueryOptions
+	 *   The read-only query options describing the root entity's $expand
+	 * @returns {sap.ui.base.SyncPromise<object>}
+	 *   A promise resolving with the map from meta path to type
+	 *
+	 * @public
+	 * @see #fetchType
+	 * @see #getTypes
+	 */
+	_Requestor.prototype.fetchTypes = function (sRootMetaPath, mRootQueryOptions) {
+		var aPromises = [this.fetchType(sRootMetaPath)],
+			that = this;
+
+		/*
+		 * Recursively calls fetchType for all (sub)paths in $expand.
+		 * @param {string} sBaseMetaPath The resource meta path + entity path
+		 * @param {object} [mQueryOptions] The corresponding query options
+		 */
+		function fetchExpandedTypes(sBaseMetaPath, mQueryOptions) {
+			if (mQueryOptions?.$expand) {
+				Object.keys(mQueryOptions.$expand).forEach(function (sNavigationPath) {
+					var sNavigationMetaPath = sBaseMetaPath;
+
+					sNavigationPath.split("/").forEach(function (sSegment) {
+						sNavigationMetaPath += "/" + sSegment;
+						aPromises.push(that.fetchType(sNavigationMetaPath));
+					});
+					fetchExpandedTypes(sNavigationMetaPath, mQueryOptions.$expand[sNavigationPath]);
+				});
+			}
+		}
+
+		fetchExpandedTypes(sRootMetaPath, mRootQueryOptions);
+
+		return SyncPromise.all(aPromises).then(() => this.mTypeForMetaPath);
 	};
 
 	/**
@@ -1112,6 +1159,18 @@ sap.ui.define([
 	 */
 	_Requestor.prototype.getServiceUrl = function () {
 		return this.sServiceUrl;
+	};
+
+	/**
+	 * Gets the currently available map from meta path to type.
+	 *
+	 * @returns {object}
+	 *   The currently available map from meta path to type
+	 *
+	 * @public
+	 */
+	_Requestor.prototype.getTypes = function () {
+		return this.mTypeForMetaPath;
 	};
 
 	/**
@@ -1860,10 +1919,9 @@ sap.ui.define([
 				const aMatches = _Helper.matchEndsWithTransientPredicate(sResourcePath);
 				if (aMatches) {
 					const sMetaPath = "/" + _Helper.getMetaPath(sResourcePath);
-					const mTypeForMetaPath = {};
-					this.fetchType(mTypeForMetaPath, sMetaPath); // Note: no need to wait here
+					this.fetchType(sMetaPath); // Note: no need to wait here
 					sResourcePath = sResourcePath.slice(0, -aMatches[0].length)
-						+ _Helper.getKeyPredicate(oResponse, sMetaPath, mTypeForMetaPath);
+						+ _Helper.getKeyPredicate(oResponse, sMetaPath, this.mTypeForMetaPath);
 				}
 
 				this.oModelInterface.reportTransitionMessages(aMessages, sResourcePath);

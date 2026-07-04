@@ -5132,7 +5132,9 @@ sap.ui.define([
 ["getDateInstance", "getDateTimeInstance", "getTimeInstance"].forEach(function (sMethod) {
 	[false, true].forEach(function (bUTC) {
 	QUnit.test("getSampleValue single date, " + sMethod + "; UTC=" + bUTC, function (assert) {
-		var sExpectedDate = "2012-12-31T23:59:58.123" + (bUTC ? "Z" : "");
+		const sExpectedDate = (sMethod === "getDateInstance"
+			? "2012-12-31T00:00:00.000"
+			: "2012-12-31T23:59:58.123") + (bUTC ? "Z" : "");
 
 		this.stub(UI5Date, "getInstance").onFirstCall().returns({getFullYear: function () {return 2012;}})
 			.callThrough(); // only stub first call of UI5Date.getInstance to fake current year
@@ -5144,7 +5146,9 @@ sap.ui.define([
 		});
 
 	QUnit.test("getSampleValue date interval, " + sMethod + "; UTC=" + bUTC, function (assert) {
-		var sExpectedEndDate = "2012-12-31T23:59:58.123" + (bUTC ? "Z" : ""),
+		const sExpectedEndDate = (sMethod === "getDateInstance"
+				? "2012-12-31T00:00:00.000"
+				: "2012-12-31T23:59:58.123") + (bUTC ? "Z" : ""),
 				sExpectedStartDate = "2012-12-22T09:12:34.567" + (bUTC ? "Z" : "");
 
 		this.stub(UI5Date, "getInstance").onFirstCall().returns({getFullYear: function () {return 2012;}})
@@ -5177,7 +5181,7 @@ sap.ui.define([
 	QUnit.test("getSampleValue: R1 - default in range", function (assert) {
 		const fnOrig = UI5Date.getInstance.bind(UI5Date);
 		this.stub(UI5Date, "getInstance").callsFake((...a) => (a.length ? fnOrig(...a) : {getFullYear: () => 2026}));
-		const oExpected = getDate(Date.UTC(2026, 11, 31, 23, 59, 58, 123));
+		const oExpected = getDate(Date.UTC(2026, 11, 31, 0, 0, 0, 0));
 
 		// code under test
 		assert.deepEqual(getSample(getDate("2020-01-01T00:00:00Z"), undefined), [oExpected]);
@@ -5185,41 +5189,43 @@ sap.ui.define([
 		assert.deepEqual(getSample(undefined, getDate("2030-06-15T00:00:00Z")), [oExpected]);
 		// code under test
 		assert.deepEqual(getSample(getDate("2020-01-01T00:00:00Z"), getDate("2030-01-01T00:00:00Z")), [oExpected]);
+		// code under test - oMaximum exactly at year-end midnight keeps the default year-end in range
+		assert.deepEqual(getSample(undefined, getDate("2026-12-31T00:00:00Z")), [oExpected]);
 
 		// current-year default falls outside the constraint range -> R1 must NOT apply
 		// code under test- oMaximum is in current year but before Dec 31 -> R2 applies
 		assert.notDeepEqual(getSample(undefined, getDate("2026-01-05T00:00:00Z")), [oExpected]);
-		// code under test - oMinimum is in current year but after Dec 31 23:59:58.123 -> R2 applies
-		assert.notDeepEqual(getSample(getDate("2026-12-31T23:59:59Z"), undefined), [oExpected]);
+		// code under test - oMinimum is in current year but after Dec 31 00:00:00.000 -> R2 applies
+		assert.notDeepEqual(getSample(getDate("2026-12-31T00:00:01Z"), undefined), [oExpected]);
 	});
 
 	//*****************************************************************************************************************
 	QUnit.test("getSampleValue: R2 - different years - closest year-end", function (assert) {
-		const oYearEnd = (iYear) => getDate(Date.UTC(iYear, 11, 31, 23, 59, 58, 123));
+		const oYearEnd = (iYear) => getDate(Date.UTC(iYear, 11, 31, 0, 0, 0, 0));
 
 		// code under test
 		assert.deepEqual(getSample(getDate("2040-01-01T00:00:00Z"), undefined), [oYearEnd(2040)]);
 		// code under test
-		assert.deepEqual(getSample(getDate("2040-12-31T23:59:59Z"), undefined), [oYearEnd(2041)]);
+		assert.deepEqual(getSample(getDate("2040-12-31T00:00:01Z"), undefined), [oYearEnd(2041)]);
 		// code under test
 		assert.deepEqual(getSample(undefined, getDate("2020-06-15T00:00:00Z")), [oYearEnd(2019)]);
 		// code under test
-		assert.deepEqual(getSample(undefined, getDate("2020-12-31T23:59:59.999Z")), [oYearEnd(2020)]);
+		assert.deepEqual(getSample(undefined, getDate("2020-12-31T00:00:00Z")), [oYearEnd(2020)]);
 
 		// code under test - both, different years
 		assert.deepEqual(getSample(getDate("2038-06-01T00:00:00Z"), getDate("2040-03-15T00:00:00Z")), [oYearEnd(2039)]);
 		// code under test - both, different years
-		assert.deepEqual(getSample(getDate("2038-06-01T00:00:00Z"), getDate("2040-12-31T23:59:59Z")), [oYearEnd(2040)]);
+		assert.deepEqual(getSample(getDate("2038-06-01T00:00:00Z"), getDate("2040-12-31T00:00:00Z")), [oYearEnd(2040)]);
 	});
 
 	//*****************************************************************************************************************
 	QUnit.test("getSampleValue: R3 - same year, different months - closest month-end", function (assert) {
-		const oMonthEnd = (iYear, iMonth, iDay) => getDate(Date.UTC(iYear, iMonth, iDay, 23, 59, 58, 123));
+		const oMonthEnd = (iYear, iMonth, iDay) => getDate(Date.UTC(iYear, iMonth, iDay, 0, 0, 0, 0));
 
 		// code under test
 		assert.deepEqual(getSample(getDate("2040-01-01T00:00:00Z"), getDate("2040-06-15T00:00:00Z")), [oMonthEnd(2040, 4, 31)]);
 		// code under test
-		assert.deepEqual(getSample(getDate("2040-01-01T00:00:00Z"), getDate("2040-06-30T23:59:59Z")), [oMonthEnd(2040, 5, 30)]);
+		assert.deepEqual(getSample(getDate("2040-01-01T00:00:00Z"), getDate("2040-06-30T00:00:00Z")), [oMonthEnd(2040, 5, 30)]);
 	});
 
 	//*****************************************************************************************************************
@@ -5237,11 +5243,11 @@ sap.ui.define([
 
 		// code under test: normal: start = end - 9 days, no clamping
 		assert.deepEqual(getIntervall(getDate("2040-01-01T00:00:00Z"), getDate("2040-06-30T23:59:59Z")),
-			[[getDate(Date.UTC(2040, 5, 21, 9, 12, 34, 567)), getDate(Date.UTC(2040, 5, 30, 23, 59, 58, 123))]]);
+			[[getDate(Date.UTC(2040, 5, 21, 9, 12, 34, 567)), getDate(Date.UTC(2040, 5, 30, 0, 0, 0, 0))]]);
 
 		const oMin = getDate("2040-12-25T00:00:00Z");
 		// code under test: start clamped to min
-		assert.deepEqual(getIntervall(oMin, undefined), [[oMin, getDate(Date.UTC(2040, 11, 31, 23, 59, 58, 123))]]);
+		assert.deepEqual(getIntervall(oMin, undefined), [[oMin, getDate(Date.UTC(2040, 11, 31, 0, 0, 0, 0))]]);
 
 		//  code under test: more than 10 days apart
 		assert.deepEqual(getIntervall(getDate("2040-05-09T00:00:00Z"), getDate("2040-05-12T00:00:00Z")),

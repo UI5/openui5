@@ -370,7 +370,7 @@ sap.ui.define([
 			ariaLabelledBy: this.getId() + "-title",
 			customHeader: new OverflowToolbar({
 				content: [
-					new Title({id: this.getId() + "-title", text: this._getResourceText("table.COLUMNMENU_TITLE")}),
+					new Title({id: this.getId() + "-title", text: this._getResourceText("table.COLUMNMENU_TITLE"), level: coreLibrary.TitleLevel.H1}),
 					new ToolbarSpacer(),
 					new Button({
 						icon: "sap-icon://decline",
@@ -569,7 +569,7 @@ sap.ui.define([
 
 		this._oItemsContainer.setListHeader(new OverflowToolbar({
 			content: [
-				new Title({text: sTitle, level: coreLibrary.TitleLevel.H3})
+				new Title({text: sTitle, level: coreLibrary.TitleLevel.H2})
 			]
 		}));
 		this._oItemsContainer.getHeader().addContentRight(new Button({
@@ -701,7 +701,7 @@ sap.ui.define([
 		if (aQuickActions.length) {
 			oList = new List({
 				headerToolbar: new OverflowToolbar({
-					content: [new Title({text: sTitle, level: coreLibrary.TitleLevel.H3})]
+					content: [new Title({text: sTitle, level: coreLibrary.TitleLevel.H2})]
 				}),
 				keyboardMode: "Edit",
 				formsMode: true,

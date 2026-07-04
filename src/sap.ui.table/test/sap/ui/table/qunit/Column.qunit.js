@@ -9,7 +9,9 @@ sap.ui.define([
 	"sap/ui/table/Table",
 	"sap/ui/table/CreationRow",
 	"sap/ui/table/menus/ColumnHeaderMenuAdapter",
+	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/type/Integer",
+	"sap/base/Log",
 	"sap/m/table/columnmenu/Menu",
 	"sap/m/table/columnmenu/QuickAction",
 	"sap/m/table/columnmenu/ActionItem",
@@ -28,7 +30,9 @@ sap.ui.define([
 	Table,
 	CreationRow,
 	ColumnHeaderMenuAdapter,
+	JSONModel,
 	IntegerType,
+	Log,
 	ColumnMenu,
 	QuickAction,
 	Item,
@@ -1393,5 +1397,230 @@ sap.ui.define([
 		oClone = this.oColumn.getTemplateClone(0);
 		assert.equal(oClone.getFieldHelpDisplay(), "X", "Not changed if defined");
 		oClone.destroy();
+	});
+
+	QUnit.module("Filter operator parsing", {
+		beforeEach: function() {
+			this.oColumn = new Column({filterProperty: "myProp"});
+		},
+		afterEach: function() {
+			this.oColumn.destroy();
+		},
+		getParsedFilter: function(sValue, sFilterOperator, oFilterType) {
+			this.oColumn.setFilterValue(sValue);
+			if (sFilterOperator !== undefined) {
+				this.oColumn.setFilterOperator(sFilterOperator);
+			}
+			if (oFilterType !== undefined) {
+				this.oColumn.setFilterType(oFilterType);
+			}
+			return this.oColumn._getFilter();
+		}
+	});
+
+	QUnit.test("Operator inferred from value prefix (string default type)", function(assert) {
+		const aCases = [
+			{value: "=abc", operator: "EQ", parsed: "abc"},
+			{value: "!=abc", operator: "NE", parsed: "abc"},
+			{value: "<=5", operator: "LE", parsed: "5"},
+			{value: "<5", operator: "LT", parsed: "5"},
+			{value: ">=5", operator: "GE", parsed: "5"},
+			{value: ">5", operator: "GT", parsed: "5"},
+			{value: "1..10", operator: "BT", parsed: "1", secondary: "10"},
+			{value: "1..", operator: "GE", parsed: "1"},
+			{value: "..10", operator: "LE", parsed: "10"},
+			{value: "*abc*", operator: "Contains", parsed: "abc"},
+			{value: "*abc", operator: "EndsWith", parsed: "abc"},
+			{value: "abc*", operator: "StartsWith", parsed: "abc"}
+		];
+
+		for (const oCase of aCases) {
+			this.oColumn.setFilterValue(null);
+			this.oColumn.setFilterOperator("");
+			const oFilter = this.getParsedFilter(oCase.value);
+			assert.strictEqual(oFilter.sOperator, oCase.operator, `"${oCase.value}" -> operator ${oCase.operator}`);
+			assert.strictEqual(oFilter.oValue1, oCase.parsed, `"${oCase.value}" -> parsed value`);
+			if (oCase.secondary !== undefined) {
+				assert.strictEqual(oFilter.oValue2, oCase.secondary, `"${oCase.value}" -> secondary parsed value`);
+			}
+		}
+	});
+
+	QUnit.test("Default operator for plain value uses Contains for strings", function(assert) {
+		const oFilter = this.getParsedFilter("abc");
+		assert.strictEqual(oFilter.sOperator, "Contains", "String default operator is Contains");
+		assert.strictEqual(oFilter.oValue1, "abc");
+	});
+
+	QUnit.test("Default operator for plain value uses EQ for non-string types", function(assert) {
+		const oFilter = this.getParsedFilter("42", undefined, new IntegerType());
+		assert.strictEqual(oFilter.sOperator, "EQ", "Non-string default operator is EQ");
+		assert.strictEqual(oFilter.oValue1, 42, "Value is parsed to integer");
+	});
+
+	QUnit.test("Default operator for plain value honors defaultFilterOperator when set", function(assert) {
+		this.oColumn.setDefaultFilterOperator("StartsWith");
+		const oFilter = this.getParsedFilter("abc");
+		assert.strictEqual(oFilter.sOperator, "StartsWith");
+		assert.strictEqual(oFilter.oValue1, "abc");
+	});
+
+	QUnit.test("Wildcard operators are string-type only", function(assert) {
+		let oFilter = this.getParsedFilter("5", undefined, new IntegerType());
+		assert.strictEqual(oFilter.sOperator, "EQ", "For non-string type, no wildcards match -> default EQ");
+
+		this.oColumn.setFilterValue(null);
+		this.oColumn.setFilterType();
+		oFilter = this.getParsedFilter("*abc*");
+		assert.strictEqual(oFilter.sOperator, "Contains", "For string type, *value* becomes Contains");
+	});
+
+	QUnit.test("Explicit filterOperator bypasses value-prefix parsing", function(assert) {
+		const oFilter = this.getParsedFilter(">5", "EQ");
+		assert.strictEqual(oFilter.sOperator, "EQ", "Explicit operator wins over prefix parsing");
+		assert.strictEqual(oFilter.oValue1, ">5", "Whole value is passed to filter");
+	});
+
+	QUnit.module("Filter and sort integration", {
+		beforeEach: async function() {
+			this.oModel = new JSONModel({items: [{a: "x"}, {a: "y"}]});
+			this.oColumn = new Column({
+				filterProperty: "a",
+				sortProperty: "a",
+				template: new TableQUnitUtils.TestControl({text: "{a}"}),
+				label: new TableQUnitUtils.TestControl({text: "a"})
+			});
+			this.oOtherColumn = new Column({
+				sortProperty: "a",
+				template: new TableQUnitUtils.TestControl({text: "{a}"}),
+				label: new TableQUnitUtils.TestControl({text: "other"})
+			});
+			this.oTable = new Table({columns: [this.oColumn, this.oOtherColumn]});
+			this.oTable.setModel(this.oModel);
+			this.oTable.bindRows("/items");
+			this.oTable.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		}
+	});
+
+	QUnit.test("#filter returns early when column has no table", function(assert) {
+		const oOrphan = new Column({filterProperty: "a"});
+		const oSetFilterValueSpy = this.spy(oOrphan, "setFilterValue");
+		oOrphan.filter("value");
+		assert.ok(oSetFilterValueSpy.notCalled, "setFilterValue not called when column has no parent table");
+		oOrphan.destroy();
+	});
+
+	QUnit.test("#filter returns early when column has no filterProperty", function(assert) {
+		const oSetFilterValueSpy = this.spy(this.oOtherColumn, "setFilterValue");
+		this.oOtherColumn.filter("value");
+		assert.ok(oSetFilterValueSpy.notCalled, "setFilterValue not called when filterProperty is empty");
+	});
+
+	QUnit.test("#filter is aborted when filter event is prevented", function(assert) {
+		this.oTable.attachFilter((oEvent) => oEvent.preventDefault());
+		const oSetFilterValueSpy = this.spy(this.oColumn, "setFilterValue");
+		this.oColumn.filter("abc");
+		assert.ok(oSetFilterValueSpy.notCalled, "setFilterValue not called when the event is prevented");
+	});
+
+	QUnit.test("#filter reports Error state for columns with invalid filter type", function(assert) {
+		this.oOtherColumn.setFilterProperty("a");
+		this.oOtherColumn.setFilterValue("notANumber");
+		this.oOtherColumn.setFilterType(new IntegerType());
+
+		const oHookSpy = this.spy();
+		TableUtils.Hook.register(this.oTable, TableUtils.Hook.Keys.Column.SetFilterState, oHookSpy);
+
+		this.oColumn.filter("x");
+
+		const oErrorCall = oHookSpy.getCalls().find((oCall) => oCall.args[0] === this.oOtherColumn);
+		assert.ok(oErrorCall, "SetFilterState hook was called for the other column");
+		assert.strictEqual(oErrorCall.args[1], "Error", "Filter state Error is reported for the invalid filter");
+	});
+
+	QUnit.test("#_sort returns early without table or sortProperty", function(assert) {
+		const oOrphan = new Column({sortProperty: "a"});
+		const oFireSortSpy = this.spy(this.oTable, "fireSort");
+
+		oOrphan._sort("Ascending");
+		assert.strictEqual(oOrphan.getSortOrder(), "None", "SortOrder unchanged for orphan column");
+
+		this.oOtherColumn.setSortProperty("");
+		this.oOtherColumn._sort("Ascending");
+		assert.ok(oFireSortSpy.notCalled, "fireSort not called when sortProperty is empty");
+
+		oOrphan.destroy();
+	});
+
+	QUnit.test("#_sort is aborted when sort event is prevented", function(assert) {
+		this.oTable.attachSort((oEvent) => oEvent.preventDefault());
+		this.oColumn._sort("Ascending");
+		assert.strictEqual(this.oColumn.getSortOrder(), "None", "SortOrder unchanged when event is prevented");
+	});
+
+	QUnit.test("#_sort with SortOrder.None removes the column from sorted columns", function(assert) {
+		this.oColumn._sort("Ascending");
+		assert.strictEqual(this.oTable.getSortedColumns().length, 1, "Column is in sorted columns");
+
+		this.oColumn._sort("None");
+		assert.strictEqual(this.oColumn.getSortOrder(), "None");
+		assert.strictEqual(this.oTable.getSortedColumns().length, 0, "Column removed from sorted columns");
+	});
+
+	QUnit.test("#_applySorters warns when no binding present", function(assert) {
+		const oLogWarnSpy = this.stub(Log, "warning");
+		this.oTable.unbindRows();
+		this.oColumn._applySorters();
+		assert.ok(oLogWarnSpy.calledOnce, "Log.warning is called when binding is missing");
+	});
+
+	QUnit.module("Additional API", {
+		beforeEach: function() {
+			this.oColumn = new Column();
+		},
+		afterEach: function() {
+			this.oColumn.destroy();
+		}
+	});
+
+	QUnit.test("#setFilterOperator and #setDefaultFilterOperator", function(assert) {
+		this.oColumn.setFilterOperator("EQ");
+		assert.strictEqual(this.oColumn.getFilterOperator(), "EQ");
+
+		this.oColumn.setDefaultFilterOperator("StartsWith");
+		assert.strictEqual(this.oColumn.getDefaultFilterOperator(), "StartsWith");
+	});
+
+	QUnit.test("#getIndex returns -1 for a column without a table", function(assert) {
+		assert.strictEqual(this.oColumn.getIndex(), -1);
+	});
+
+	QUnit.test("#setFilterType handles invalid class names and non-Type results", function(assert) {
+		const oLogErrorSpy = this.stub(Log, "error");
+
+		this.oColumn.setFilterType("does.not.exist.Type");
+		assert.notOk(this.oColumn.getFilterType(), "Unknown class name resolves to a falsy filter type");
+		assert.ok(oLogErrorSpy.calledWithMatch(/not an instance of sap\.ui\.model\.Type/),
+			"Log.error is emitted for a non-Type result");
+
+		oLogErrorSpy.resetHistory();
+		this.oColumn.setFilterType("{type: 'does.not.exist.Type'}");
+		assert.notOk(this.oColumn.getFilterType(), "Unknown class name in binding-like expression resolves to falsy");
+		assert.ok(oLogErrorSpy.called, "Log.error is emitted for the binding-like case");
+
+		oLogErrorSpy.resetHistory();
+		this.oColumn.setFilterType("@@ invalid js @@");
+		assert.notOk(this.oColumn.getFilterType(), "Unparseable expression resolves to falsy");
+		assert.ok(oLogErrorSpy.called, "Log.error is emitted when parsing throws");
+	});
+
+	QUnit.test("Column.ofCell returns null when the cell is not registered", function(assert) {
+		const oUnregisteredControl = new TableQUnitUtils.TestControl();
+		assert.strictEqual(Column.ofCell(oUnregisteredControl), null);
+		oUnregisteredControl.destroy();
 	});
 });

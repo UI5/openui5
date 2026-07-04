@@ -397,6 +397,27 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.test("Ctrl/Cmd+C on the Copy button triggers copySelectionData", async function(assert) {
+		const oCopyButton = this.oCopyProvider.getCopyButton();
+		oCopyButton.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const fnCopyStub = sinon.stub(this.oCopyProvider, "copySelectionData");
+
+		QUnitUtils.triggerEvent("keydown", oCopyButton.getDomRef(), { code: "KeyC", ctrlKey: true });
+		assert.ok(fnCopyStub.calledOnceWithExactly(true), "Ctrl+C triggers copySelectionData(true)");
+
+		fnCopyStub.resetHistory();
+		QUnitUtils.triggerEvent("keydown", oCopyButton.getDomRef(), { code: "KeyC", metaKey: true });
+		assert.strictEqual(fnCopyStub.callCount, 1, "Cmd+C triggers copySelectionData");
+
+		fnCopyStub.resetHistory();
+		QUnitUtils.triggerEvent("keydown", oCopyButton.getDomRef(), { code: "KeyC", ctrlKey: true, repeat: true });
+		assert.strictEqual(fnCopyStub.callCount, 0, "Auto-repeat is ignored");
+
+		fnCopyStub.restore();
+	});
+
 	QUnit.test("Copy button visibility", async function(assert) {
 		const oTable = this.oTable;
 		const oCopyButton = this.oCopyProvider.getCopyButton();

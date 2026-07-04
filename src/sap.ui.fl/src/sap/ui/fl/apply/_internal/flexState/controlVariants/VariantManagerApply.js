@@ -7,6 +7,7 @@ sap.ui.define([
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/fl/apply/_internal/changes/Applier",
 	"sap/ui/fl/apply/_internal/changes/Reverter",
+	"sap/ui/fl/apply/_internal/flexObjects/UIChange",
 	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
@@ -20,6 +21,7 @@ sap.ui.define([
 	JsControlTreeModifier,
 	Applier,
 	Reverter,
+	UIChange,
 	DependencyHandler,
 	VariantManagementState,
 	FlexObjectState,
@@ -308,10 +310,21 @@ sap.ui.define([
 			return;
 		}
 
-		FlexState.addNewObjects({
+		const aNewFlexObjects = FlexState.addNewObjects({
 			reference: mPropertyBag.reference,
 			componentId: mPropertyBag.componentId,
 			newData: oBackendResponse
+		});
+
+		// Add the newly-loaded UI changes into the live dependency map so downstream
+		// consumers (the flex propagation listener, Applier.applyAllChangesForControl,
+		// FlexObjectState.waitForFlexObjectsToBeApplied) can see them. Without this,
+		// the changes exist in FlexState but not in the map, and they can be silently skipped.
+		const oLiveDependencyMap = FlexObjectState.getLiveDependencyMap(mPropertyBag.reference);
+		aNewFlexObjects.forEach((oFlexObject) => {
+			if (oFlexObject.isValidForDependencyMap()) {
+				DependencyHandler.addChangeAndUpdateDependencies(oFlexObject, mPropertyBag.componentId, oLiveDependencyMap);
+			}
 		});
 
 		// Reset the flag so the content is not loaded again
