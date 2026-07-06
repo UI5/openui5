@@ -1734,6 +1734,10 @@ sap.ui.define([
 			assert.ok(oItem.getSelected());
 		});
 
+		// SPACE on the inner checkbox must not be handled by the table (the checkbox handles it itself); otherwise it would toggle twice
+		qutils.triggerKeydown(sut._selectAllCheckBox.getFocusDomRef(), KeyCodes.SPACE);
+		assert.ok(sut._selectAllCheckBox.getSelected(), "SelectAll stays selected; table handler ignores events targeting the inner checkbox");
+
 		sut.destroy();
 	});
 
@@ -3741,13 +3745,13 @@ sap.ui.define([
 		assert.notOk($noData.find(".sapMListTblDummyCell")[0], "Dummy cell is NOT rendered for no-data row");
 		assert.notOk($noData.hasClass("sapMTableRowCustomFocus"), "No-data row does NOT have custom focus handling");
 
-		assert.equal($noDataText.attr("colspan"), 7, "| Hightlight | Selection | Name | Color | Number | Navigated | Spacer |");
+		assert.equal($noDataText.attr("colspan"), 5, "| Selection | Name | Color | Number | Spacer | (highlight and navigated rendered as separate empty cells)");
 		sut.setMode("SingleSelectMaster");
 		await nextUIUpdate();
-		assert.equal($noDataText.attr("colspan"), 6, "| Hightlight | Name | Color | Number | Navigated | Spacer |");
+		assert.equal($noDataText.attr("colspan"), 4, "| Name | Color | Number | Spacer | (highlight and navigated rendered as separate empty cells)");
 		sut.getColumns().forEach((oColummn) => oColummn.setWidth(""));
 		await nextUIUpdate();
-		assert.equal($noDataText.attr("colspan"), 5, "| Hightlight | Name | Color | Number | Navigated |");
+		assert.equal($noDataText.attr("colspan"), 3, "| Name | Color | Number | (highlight and navigated rendered as separate empty cells)");
 
 		$noData.trigger("focus");
 		let sLabelledBy = $noData.attr("aria-labelledby");
@@ -3763,6 +3767,30 @@ sap.ui.define([
 		$noData.trigger("focus");
 		sLabelledBy = $noData.attr("aria-labelledby");
 		assert.equal(Element.getElementById(sLabelledBy).getText(), sNoData, "Accessbility text is set correctly");
+
+		sut.destroy();
+	});
+
+	QUnit.test("nodata-text is padded with empty role=none cells for highlight and navigated columns", async function(assert) {
+		const sut = createSUT(true, false, "MultiSelect");
+		sut.removeAllItems();
+		sut.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oNoDataRow = sut.getDomRef("nodata");
+		const oNoDataText = sut.getDomRef("nodata-text");
+		const aCells = Array.from(oNoDataRow.children);
+
+		assert.strictEqual(aCells.length, 3, "nodata row contains 3 cells: highlight pad, nodata-text, navigated pad");
+		assert.strictEqual(aCells[0].getAttribute("role"), "none", "first cell is the empty highlight pad with role=none");
+		assert.notOk(aCells[0].hasAttribute("id"), "highlight pad cell has no id");
+		assert.strictEqual(aCells[1], oNoDataText, "second cell is the nodata-text cell");
+		assert.strictEqual(aCells[2].getAttribute("role"), "none", "last cell is the empty navigated pad with role=none");
+		assert.notOk(aCells[2].hasAttribute("id"), "navigated pad cell has no id");
+
+		assert.strictEqual(parseInt(oNoDataText.getAttribute("colspan")), sut.getColCount() - 2,
+			"nodata-text colspan equals getColCount() - 2 (highlight + navigated columns are rendered as separate pad cells)");
+		assert.notOk(oNoDataText.hasAttribute("aria-colspan"), "nodata-text does not have aria-colspan since SRs do not honor it");
 
 		sut.destroy();
 	});
@@ -3783,7 +3811,7 @@ sap.ui.define([
 		assert.ok($noDataCell.hasClass("sapMListTblCellNoIllustratedMessage"), "sapMListTblCellNoData contains sapMListTblCellNoIllustratedMessage");
 
 		let $noDataText = sut.$().find("#" + sut.getId() + "-nodata-text");
-		assert.strictEqual($noDataText.attr("colspan"), "2", "nodata cell covers 2 header cells(Higlight and Navigated) rendered");
+		assert.strictEqual($noDataText.attr("colspan"), "0", "nodata-text colspan is 0 since highlight and navigated are rendered as separate empty cells");
 		assert.strictEqual($noDataText.text(), oBundle.getText("TABLE_NO_COLUMNS"), "Table's no columns nodata-text contains correct string");
 		assert.strictEqual(oInvisibleMessage.getText(), oBundle.getText("TABLE_NO_COLUMNS"), "Invisible Message text is correct.");
 		await timeout();
