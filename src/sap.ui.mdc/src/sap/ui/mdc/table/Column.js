@@ -260,6 +260,14 @@ sap.ui.define([
 		},
 		setIsInColumnHeaderContext: function(bIsInColumnHeaderContext) {
 			this.getLabel()?.setIsInColumnHeaderContext(bIsInColumnHeaderContext);
+		},
+		getTooltip_AsString: function() {
+			const sLabel = this.getText();
+			const sTooltip = this.getLabel()?.getTooltip_AsString?.();
+			if (sLabel === sTooltip) {
+				return "";
+			}
+			return sTooltip || "";
 		}
 	});
 
