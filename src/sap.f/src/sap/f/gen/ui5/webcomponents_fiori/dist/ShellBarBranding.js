@@ -28,7 +28,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarBranding",
       {
         metadata: {
-          tag: "ui5-shellbar-branding-0df29cf2",
+          tag: "ui5-shellbar-branding-3bacdbf4",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -37,18 +37,22 @@ sap.ui.define(
           designtime:
             "sap/f/gen/ui5/webcomponents_fiori/designtime/ShellBarBranding.designtime",
 
-          interfaces: ["sap.m.IBar", "sap.tnt.IToolHeader"],
+          interfaces: ["sap.m.IBar"],
 
           defaultAggregation: "content",
 
           properties: {
+            /**
+             * Defines the text alternative of the component.
+             * If not provided a default text alternative will be set, if present.
+             */
+            accessibleName: { type: "string", mapping: "property" },
             /**
              * Defines the component href.
              *
              * **Note:** Standard hyperlink behavior is supported.
              */
             href: { type: "string", mapping: "property" },
-
             /**
              * Defines the component target.
              *
@@ -63,23 +67,14 @@ sap.ui.define(
              * **This property must only be used when the `href` property is set.**
              */
             target: { type: "string", mapping: "property" },
-
-            /**
-             * Defines the text alternative of the component.
-             * If not provided a default text alternative will be set, if present.
-             */
-            accessibleName: { type: "string", mapping: "property" },
-
             /**
              * The text-content of the Web Component.
              */
             text: { type: "string", mapping: "textContent" },
-
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
             width: { type: "sap.ui.core.CSSSize", mapping: "style" },
-
             /**
              * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */

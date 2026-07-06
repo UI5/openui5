@@ -17,7 +17,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
    * @returns {string} padded hex representation of the given character code
    */ /*!
        * OpenUI5
-       * (c) Copyright 2009-2024 SAP SE or an SAP affiliate company.
+       * (c) Copyright 2026 SAP SE or an SAP affiliate company.
        * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
        */
   /*
@@ -32,7 +32,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 
   /*!
    * OpenUI5
-   * (c) Copyright 2009-2024 SAP SE or an SAP affiliate company.
+   * (c) Copyright 2026 SAP SE or an SAP affiliate company.
    * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
    */
   /* eslint-disable no-control-regex -- special characters are really needed here! */

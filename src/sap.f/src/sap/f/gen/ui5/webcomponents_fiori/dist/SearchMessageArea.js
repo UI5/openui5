@@ -25,7 +25,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.SearchMessageArea",
       {
         metadata: {
-          tag: "ui5-search-message-area-0df29cf2",
+          tag: "ui5-search-message-area-3bacdbf4",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -40,20 +40,17 @@ sap.ui.define(
 
           properties: {
             /**
-             * Defines the text to be displayed.
-             */
-            text: { type: "string", mapping: "property" },
-
-            /**
              * Defines the description text to be displayed.
              */
             description: { type: "string", mapping: "property" },
-
+            /**
+             * Defines the text to be displayed.
+             */
+            text: { type: "string", mapping: "property" },
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
             width: { type: "sap.ui.core.CSSSize", mapping: "style" },
-
             /**
              * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */

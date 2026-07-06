@@ -49,7 +49,33 @@ sap.ui.define(
 
           associations: {},
 
-          events: {},
+          events: {
+            /**
+             * Fired when the component is activated either with a mouse/tap or by using the Enter or Space key.
+             *
+             * **Note:** The event will not be fired if the `disabled` property is set to `true`.
+             */
+            click: {
+              enableEventBubbling: true,
+              parameters: {
+                /**
+                 * The original event from the user interaction.
+                 */
+                originalEvent: {
+                  type: "object",
+                  types: [
+                    {
+                      origType: "Event",
+                      multiple: false,
+                      dedicatedTypes: [{ dtsType: "Event", ui5Type: "object" }]
+                    }
+                  ],
+                  dtsParamDescription:
+                    "The original event from the user interaction."
+                }
+              }
+            }
+          },
 
           getters: [],
 

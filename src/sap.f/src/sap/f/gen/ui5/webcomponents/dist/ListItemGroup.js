@@ -31,7 +31,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.ListItemGroup",
       {
         metadata: {
-          tag: "ui5-li-group-0df29cf2",
+          tag: "ui5-li-group-3bacdbf4",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 
@@ -45,15 +45,13 @@ sap.ui.define(
 
           properties: {
             /**
-             * Defines the header text of the <code>ui5-li-group</code>.
-             */
-            headerText: { type: "string", mapping: "property" },
-
-            /**
              * Defines the accessible name of the header.
              */
             headerAccessibleName: { type: "string", mapping: "property" },
-
+            /**
+             * Defines the header text of the <code>ui5-li-group</code>.
+             */
+            headerText: { type: "string", mapping: "property" },
             /**
              * Defines if the text of the component should wrap when it's too long.
              * When set to "Normal", the content (title, description) will be wrapped
@@ -66,24 +64,21 @@ sap.ui.define(
              * Available options are:
              * - `None` (default) - The text will truncate with an ellipsis.
              * - `Normal` - The text will wrap (without truncation).
-             * @type module:sap/f/gen/ui5/webcomponents.WrappingType
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/WrappingType
              */
             wrappingType: {
-              type: "sap.f.gen.ui5.webcomponents.WrappingType",
+              type: "sap.f.gen.ui5.webcomponents.dist.types.WrappingType",
               mapping: "property",
               defaultValue: "None"
             },
-
             /**
              * The text-content of the Web Component.
              */
             text: { type: "string", mapping: "textContent" },
-
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
             width: { type: "sap.ui.core.CSSSize", mapping: "style" },
-
             /**
              * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
@@ -116,6 +111,47 @@ sap.ui.define(
 
           events: {
             /**
+             * Fired when a movable list item is dropped onto a drop target.
+             *
+             * **Note:** `move` event is fired only if there was a preceding `move-over` with prevented default action.
+             */
+            move: {
+              enableEventBubbling: true,
+              parameters: {
+                /**
+                 * Contains information about the destination of the moved element. Has `element` and `placement` properties.
+                 */
+                destination: {
+                  type: "object",
+                  types: [
+                    {
+                      origType: "object",
+                      multiple: false,
+                      dedicatedTypes: [{ dtsType: "object", ui5Type: "object" }]
+                    }
+                  ],
+                  dtsParamDescription:
+                    "Contains information about the destination of the moved element. Has `element` and `placement` properties."
+                },
+                /**
+                 * Contains information about the moved element under `element` property.
+                 */
+                source: {
+                  type: "object",
+                  types: [
+                    {
+                      origType: "object",
+                      multiple: false,
+                      dedicatedTypes: [{ dtsType: "object", ui5Type: "object" }]
+                    }
+                  ],
+                  dtsParamDescription:
+                    "Contains information about the moved element under `element` property."
+                }
+              }
+            },
+
+            /**
              * Fired when a movable list item is moved over a potential drop target during a dragging operation.
              *
              * If the new position is valid, prevent the default action of the event using `preventDefault()`.
@@ -125,21 +161,6 @@ sap.ui.define(
               enableEventBubbling: true,
               parameters: {
                 /**
-                 * Contains information about the moved element under `element` property.
-                 */
-                source: {
-                  type: "object",
-                  types: [
-                    {
-                      origType: "object",
-                      multiple: false,
-                      dedicatedTypes: [{ dtsType: "object", ui5Type: "object" }]
-                    }
-                  ],
-                  dtsParamDescription:
-                    "Contains information about the moved element under `element` property."
-                },
-                /**
                  * Contains information about the destination of the moved element. Has `element` and `placement` properties.
                  */
                 destination: {
@@ -153,18 +174,7 @@ sap.ui.define(
                   ],
                   dtsParamDescription:
                     "Contains information about the destination of the moved element. Has `element` and `placement` properties."
-                }
-              }
-            },
-
-            /**
-             * Fired when a movable list item is dropped onto a drop target.
-             *
-             * **Note:** `move` event is fired only if there was a preceding `move-over` with prevented default action.
-             */
-            move: {
-              enableEventBubbling: true,
-              parameters: {
+                },
                 /**
                  * Contains information about the moved element under `element` property.
                  */
@@ -179,21 +189,6 @@ sap.ui.define(
                   ],
                   dtsParamDescription:
                     "Contains information about the moved element under `element` property."
-                },
-                /**
-                 * Contains information about the destination of the moved element. Has `element` and `placement` properties.
-                 */
-                destination: {
-                  type: "object",
-                  types: [
-                    {
-                      origType: "object",
-                      multiple: false,
-                      dedicatedTypes: [{ dtsType: "object", ui5Type: "object" }]
-                    }
-                  ],
-                  dtsParamDescription:
-                    "Contains information about the destination of the moved element. Has `element` and `placement` properties."
                 }
               }
             }

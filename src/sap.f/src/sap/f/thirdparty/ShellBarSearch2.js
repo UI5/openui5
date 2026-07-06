@@ -1,30 +1,30 @@
-sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ListItemAdditionalText.css', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/information', 'sap/f/thirdparty/List', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/encodeXML', 'sap/f/thirdparty/information2', 'sap/f/thirdparty/sys-enter-2', 'sap/f/thirdparty/parameters-bundle.css3', 'sap/f/thirdparty/i18n-defaults'], (function (require, exports, webcomponentsBase, eventStrict, Theme, parametersBundle_css, Button, Icon, ListItemBase, parametersBundle_css$1, ListItemAdditionalText_css, AccessibilityTextsHelper, ValueState, information, List, i18nDefaults, Label, ResponsivePopover, slimArrowDown, Title, BusyIndicator, encodeXML, information$1, sysEnter2, parametersBundle_css$2, i18nDefaults$1) { 'use strict';
+sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ListItemAdditionalText.css', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/List', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/search', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/encodeXML', 'sap/f/thirdparty/information', 'sap/f/thirdparty/sys-enter-2', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/i18n-defaults'], (function (require, exports, webcomponentsBase, eventStrict, Theme, jsxRuntime, Button, Icon, ListItemBase, parametersBundle_css, ListItemAdditionalText_css, InvisibleMessage, AccessibilityTextsHelper, ValueState, decline, List, i18nDefaults, Label, ResponsivePopover, slimArrowDown, Title, search, BusyIndicator, encodeXML, information, sysEnter2, parametersBundle_css$1, i18nDefaults$1) { 'use strict';
 
     function ListItemBaseTemplate(hooks, injectedProps) {
         const listItemContent = hooks?.listItemContent || defaultListItemContent;
-        return (parametersBundle_css.jsx("li", { part: "native-li", "data-sap-focus-ref": true, tabindex: this._effectiveTabIndex, class: this.classes.main, draggable: this.movable, role: injectedProps?.role, title: injectedProps?.title, onFocusIn: this._onfocusin, onKeyUp: this._onkeyup, onKeyDown: this._onkeydown, onClick: this._onclick, children: listItemContent.call(this) }));
+        return (jsxRuntime.jsx("li", { part: "native-li", "data-sap-focus-ref": true, tabindex: this._effectiveTabIndex, class: this.classes.main, draggable: this.movable, role: injectedProps?.role, title: injectedProps?.title, onFocusIn: this._onfocusin, onKeyUp: this._onkeyup, onKeyDown: this._onkeydown, onClick: this._onclick, children: listItemContent.call(this) }));
     }
     function defaultListItemContent() {
-        return parametersBundle_css.jsx("div", { part: "content", id: `${this._id}-content`, class: "ui5-li-content", children: parametersBundle_css.jsx("div", { class: "ui5-li-text-wrapper", children: parametersBundle_css.jsx("span", { part: "title", class: "ui5-li-title", children: parametersBundle_css.jsx("slot", {}) }) }) });
+        return jsxRuntime.jsx("div", { part: "content", id: `${this._id}-content`, class: "ui5-li-content", children: jsxRuntime.jsx("div", { class: "ui5-li-text-wrapper", children: jsxRuntime.jsx("span", { part: "title", class: "ui5-li-title", children: jsxRuntime.jsx("slot", {}) }) }) });
     }
 
     function OptionTemplate() {
         return ListItemBaseTemplate.call(this, { listItemContent: listItemContent$1 }, { role: "option", title: this.tooltip });
     }
     function listItemContent$1() {
-        return (parametersBundle_css.jsxs("div", { part: "content", id: `${this._id}-content`, class: "ui5-li-content", children: [this.displayIconBegin &&
-                    parametersBundle_css.jsx(Icon.Icon, { part: "icon", name: this.icon, class: "ui5-li-icon", mode: "Decorative" }), parametersBundle_css.jsxs("div", { class: "ui5-li-text-wrapper", children: [parametersBundle_css.jsx("span", { part: "title", class: "ui5-li-title", children: parametersBundle_css.jsx("slot", {}) }), this.additionalText &&
-                            parametersBundle_css.jsx("span", { part: "additional-text", class: "ui5-li-additional-text", children: this.additionalText })] })] }));
+        return (jsxRuntime.jsxs("div", { part: "content", id: `${this._id}-content`, class: "ui5-li-content", children: [this.displayIconBegin &&
+                    jsxRuntime.jsx(Icon.Icon, { part: "icon", name: this.icon, class: "ui5-li-icon", mode: "Decorative" }), jsxRuntime.jsxs("div", { class: "ui5-li-text-wrapper", children: [jsxRuntime.jsx("span", { part: "title", class: "ui5-li-title", children: jsxRuntime.jsx("slot", {}) }), this.additionalText &&
+                            jsxRuntime.jsx("span", { part: "additional-text", class: "ui5-li-additional-text", children: this.additionalText })] })] }));
     }
 
-    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
-    var optionBaseCss = `:host{height:var(--_ui5-v2-15-0_list_item_dropdown_base_height);--_ui5-v2-15-0_list_item_title_size: var(--sapFontSize)}
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var optionBaseCss = `:host{height:var(--_ui5_list_item_dropdown_base_height);--_ui5_list_item_title_size: var(--sapFontSize)}:host(:active[actionable]:not([data-moving])),:host(:active[actionable][selected]:not([data-moving])){background-color:var(--sapList_Active_Background);border-bottom-color:var(--sapList_Active_Background)}
 `;
 
-    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
-    var listItemIconCss = `.ui5-li-icon{color:var(--sapList_TextColor);min-width:var(--_ui5-v2-15-0_list_item_icon_size);min-height:var(--_ui5-v2-15-0_list_item_icon_size);padding-inline-end:var(--_ui5-v2-15-0_list_item_icon_padding-inline-end)}
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var listItemIconCss = `.ui5-li-icon{color:var(--sapList_TextColor);min-width:var(--_ui5_list_item_icon_size);min-height:var(--_ui5_list_item_icon_size);padding-inline-end:var(--_ui5_list_item_icon_padding-inline-end)}
 `;
 
     var __decorate$6 = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -89,74 +89,98 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
     Option.define();
     var Option$1 = Option;
 
-    let t,n$1;const l=e=>{e.style.position="absolute",e.style.clip="rect(1px,1px,1px,1px)",e.style.userSelect="none",e.style.left="-1000px",e.style.top="-1000px",e.style.pointerEvents="none";};Theme.P(()=>{t&&n$1||(t=document.createElement("span"),n$1=document.createElement("span"),t.classList.add("ui5-invisiblemessage-polite"),n$1.classList.add("ui5-invisiblemessage-assertive"),t.setAttribute("aria-live","polite"),n$1.setAttribute("aria-live","assertive"),t.setAttribute("role","alert"),n$1.setAttribute("role","alert"),l(t),l(n$1),Theme.o("ui5-announcement-area").appendChild(t),Theme.o("ui5-announcement-area").appendChild(n$1));});const p=(e,s)=>{const i=t;i.textContent="",i.textContent=e,setTimeout(()=>{i.textContent===e&&(i.textContent="");},3e3);};
+    /**
+     * Defines the separator types for Select component two-column layout.
+     * @public
+     * @since 2.16.0
+     */
+    var SelectTextSeparator;
+    (function (SelectTextSeparator) {
+        /**
+         * Will show bullet(·) as separator on two columns layout when Select is in read-only mode.
+         * @public
+         */
+        SelectTextSeparator["Bullet"] = "Bullet";
+        /**
+         *	Will show N-dash(–) as separator on two columns layout when Select is in read-only mode.
+         * @public
+         */
+        SelectTextSeparator["Dash"] = "Dash";
+        /**
+         * 	Will show vertical line(|) as separator on two columns layout when Select is in read-only mode.
+         * @public
+         */
+        SelectTextSeparator["VerticalLine"] = "VerticalLine";
+    })(SelectTextSeparator || (SelectTextSeparator = {}));
+    var SelectTextSeparator$1 = SelectTextSeparator;
 
     function SelectPopoverTemplate() {
-        return (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [this.options.length > 0 &&
-                    parametersBundle_css.jsxs(ResponsivePopover.ResponsivePopover, { id: this.responsivePopoverId, class: {
+        return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [this.options.length > 0 &&
+                    jsxRuntime.jsxs(ResponsivePopover.ResponsivePopover, { id: this.responsivePopoverId, class: {
                             "ui5-select-popover": true,
                             ...this.classes.popover
                         }, part: "popover", style: this.styles.responsivePopover, placement: "Bottom", horizontalAlign: "Start", hideArrow: true, preventInitialFocus: true, onOpen: this._afterOpen, onBeforeOpen: this._beforeOpen, onClose: this._afterClose, onKeyDown: this._onkeydown, accessibleName: this._isPhone ? this._headerTitleText : undefined, children: [this._isPhone &&
-                                parametersBundle_css.jsxs("div", { slot: "header", class: "ui5-responsive-popover-header", children: [parametersBundle_css.jsxs("div", { class: "row", children: [parametersBundle_css.jsx(Title.Title, { children: this._headerTitleText }), parametersBundle_css.jsx(Button.Button, { class: "ui5-responsive-popover-close-btn", icon: information.decline, design: "Transparent", onClick: this._toggleRespPopover })] }), this.hasValueStateText &&
-                                            parametersBundle_css.jsx("div", { class: {
+                                jsxRuntime.jsxs("div", { slot: "header", class: "ui5-responsive-popover-header", children: [jsxRuntime.jsx("div", { class: "row", children: jsxRuntime.jsx(Title.Title, { children: this._headerTitleText }) }), this.hasValueStateText &&
+                                            jsxRuntime.jsx("div", { class: {
                                                     "row": true,
                                                     "ui5-select-value-state-dialog-header": true,
                                                     ...this.classes.popoverValueState
                                                 }, children: this._isPickerOpen && valueStateMessage$1.call(this) })] }), !this._isPhone && this.hasValueStateText &&
-                                parametersBundle_css.jsxs("div", { class: this.classes.popoverValueState, style: this.styles.responsivePopoverHeader, children: [parametersBundle_css.jsx(Icon.Icon, { class: "ui5-input-value-state-message-icon", name: this._valueStateMessageInputIcon }), this._isPickerOpen && valueStateMessage$1.call(this)] }), parametersBundle_css.jsx(List.List, { separators: "None", onMouseDown: this._itemMousedown, onItemClick: this._handleItemPress, accessibleRole: "ListBox", children: parametersBundle_css.jsx("slot", {}) })] }), this.shouldOpenValueStateMessagePopover &&
-                    parametersBundle_css.jsx(ResponsivePopover.Popover, { part: "popover", class: "ui5-valuestatemessage-popover", preventInitialFocus: true, preventFocusRestore: true, hideArrow: true, placement: "Bottom", horizontalAlign: "Start", children: parametersBundle_css.jsxs("div", { class: this.classes.popoverValueState, style: this.styles.popoverHeader, children: [parametersBundle_css.jsx(Icon.Icon, { class: "ui5-input-value-state-message-icon", name: this._valueStateMessageInputIcon }), valueStateMessage$1.call(this)] }) })] }));
+                                jsxRuntime.jsxs("div", { class: this.classes.popoverValueState, style: this.styles.responsivePopoverHeader, children: [jsxRuntime.jsx(Icon.Icon, { class: "ui5-input-value-state-message-icon", name: this._valueStateMessageInputIcon }), this._isPickerOpen && valueStateMessage$1.call(this)] }), jsxRuntime.jsx(List.List, { separators: "None", onMouseDown: this._itemMousedown, onItemClick: this._handleItemPress, accessibleRole: "ListBox", children: jsxRuntime.jsx("slot", {}) }), this._isPhone &&
+                                jsxRuntime.jsx("div", { slot: "footer", class: "ui5-responsive-popover-footer", children: jsxRuntime.jsx(Button.Button, { class: "ui5-responsive-popover-close-btn", design: "Transparent", onClick: this._toggleRespPopover, children: this._cancelButtonText }) })] }), this.shouldOpenValueStateMessagePopover &&
+                    jsxRuntime.jsx(ResponsivePopover.Popover, { part: "popover", class: "ui5-valuestatemessage-popover", preventInitialFocus: true, preventFocusRestore: true, hideArrow: true, placement: "Bottom", horizontalAlign: "Start", children: jsxRuntime.jsxs("div", { class: this.classes.popoverValueState, style: this.styles.popoverHeader, children: [jsxRuntime.jsx(Icon.Icon, { class: "ui5-input-value-state-message-icon", name: this._valueStateMessageInputIcon }), valueStateMessage$1.call(this)] }) })] }));
     }
     function valueStateMessage$1() {
-        return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: this.shouldDisplayDefaultValueStateMessage
+        return (jsxRuntime.jsx(jsxRuntime.Fragment, { children: this.shouldDisplayDefaultValueStateMessage
                 ? this.valueStateText
-                : parametersBundle_css.jsx("slot", { onClick: this._applyFocus, name: "valueStateMessage" }) }));
+                : jsxRuntime.jsx("slot", { onClick: this._applyFocus, name: "valueStateMessage" }) }));
     }
 
     function SelectTemplate() {
-        return (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [parametersBundle_css.jsxs("div", { class: {
+        return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsxs("div", { class: {
                         "ui5-select-root": true,
                         "ui5-input-focusable-element": true,
-                    }, id: `${this._id}-select`, onClick: this._onclick, title: this.tooltip, children: [!this.icon && this.selectedOptionIcon &&
-                            parametersBundle_css.jsx(Icon.Icon, { mode: "Decorative", class: "ui5-select-option-icon", name: this.selectedOptionIcon }), parametersBundle_css.jsx("div", { class: "ui5-select-label-root", "data-sap-focus-ref": true, tabindex: this._effectiveTabIndex, role: "combobox", "aria-haspopup": "listbox", "aria-label": this.ariaLabelText, ...this.ariaDescribedByIds && {
+                    }, id: `${this._id}-select`, onClick: this._onclick, title: this._effectiveTooltip, children: [!this.icon && this.selectedOptionIcon &&
+                            jsxRuntime.jsx(Icon.Icon, { mode: "Decorative", class: "ui5-select-option-icon", name: this.selectedOptionIcon }), jsxRuntime.jsx("div", { class: "ui5-select-label-root", "data-sap-focus-ref": true, tabindex: this._effectiveTabIndex, role: "combobox", "aria-haspopup": "listbox", "aria-label": this.ariaLabelText, ...this.ariaDescribedByIds && {
                                 "aria-describedby": this.ariaDescribedByIds
-                            }, "aria-disabled": this.isDisabled, "aria-required": this.required, "aria-readonly": this.readonly, "aria-expanded": this._isPickerOpen, "aria-roledescription": this._ariaRoleDescription, onKeyDown: this._onkeydown, onKeyPress: this._handleKeyboardNavigation, onKeyUp: this._onkeyup, onFocusIn: this._onfocusin, onFocusOut: this._onfocusout, "aria-controls": this.responsivePopoverId, children: this.hasCustomLabel
-                                ? parametersBundle_css.jsx("slot", { name: "label" })
+                            }, "aria-disabled": this.isDisabled, "aria-required": this.required, "aria-readonly": this.readonly, "aria-expanded": this._isPickerOpen, "aria-roledescription": this._ariaRoleDescription, onKeyDown: this._onkeydown, onKeyUp: this._onkeyup, onFocusIn: this._onfocusin, onFocusOut: this._onfocusout, "aria-controls": this.responsivePopoverId, children: this.hasCustomLabel
+                                ? jsxRuntime.jsx("slot", { name: "label" })
                                 : this.text }), this.icon &&
-                            parametersBundle_css.jsx("div", { class: {
+                            jsxRuntime.jsx("div", { class: {
                                     "ui5-select-icon-root": true,
                                     "inputIcon": true,
                                     "inputIcon--pressed": this._iconPressed,
-                                }, children: parametersBundle_css.jsx(Icon.Icon, { name: this.icon, class: {
+                                }, children: jsxRuntime.jsx(Icon.Icon, { name: this.icon, class: {
                                         "ui5-select-icon": true,
                                     } }) }), !this.icon && !this.readonly &&
-                            parametersBundle_css.jsx("div", { part: "icon-wrapper", class: {
+                            jsxRuntime.jsx("div", { part: "icon-wrapper", class: {
                                     "ui5-select-icon-root": true,
                                     "inputIcon": true,
                                     "inputIcon--pressed": this._iconPressed,
-                                }, children: parametersBundle_css.jsx(Icon.Icon, { part: "icon", name: slimArrowDown.slimArrowDown, class: {
+                                }, children: jsxRuntime.jsx(Icon.Icon, { part: "icon", name: slimArrowDown.slimArrowDown, class: {
                                         "ui5-select-icon": true,
                                     } }) }), this.hasValueState &&
-                            parametersBundle_css.jsx("span", { id: `${this._id}-valueStateDesc`, class: "ui5-hidden-text", children: this.valueStateText }), this.ariaDescriptionText &&
-                            parametersBundle_css.jsx("span", { id: "accessibleDescription", class: "ui5-hidden-text", children: this.ariaDescriptionText })] }), SelectPopoverTemplate.call(this)] }));
+                            jsxRuntime.jsx("span", { id: `${this._id}-valueStateDesc`, class: "ui5-hidden-text", children: this.valueStateText }), this.ariaDescriptionText &&
+                            jsxRuntime.jsx("span", { id: "accessibleDescription", class: "ui5-hidden-text", children: this.ariaDescriptionText })] }), SelectPopoverTemplate.call(this)] }));
     }
 
-    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
-    var selectCss = `:host{vertical-align:middle}.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}.inputIcon{color:var(--_ui5-v2-15-0_input_icon_color);cursor:pointer;outline:none;padding:var(--_ui5-v2-15-0_input_icon_padding);border-inline-start:var(--_ui5-v2-15-0_input_icon_border);min-width:1rem;min-height:1rem;border-radius:var(--_ui5-v2-15-0_input_icon_border_radius)}.inputIcon.inputIcon--pressed{background:var(--_ui5-v2-15-0_input_icon_pressed_bg);box-shadow:var(--_ui5-v2-15-0_input_icon_box_shadow);border-inline-start:var(--_ui5-v2-15-0_select_hover_icon_left_border);color:var(--_ui5-v2-15-0_input_icon_pressed_color)}.inputIcon:active{background-color:var(--sapButton_Active_Background);box-shadow:var(--_ui5-v2-15-0_input_icon_box_shadow);border-inline-start:var(--_ui5-v2-15-0_select_hover_icon_left_border);color:var(--_ui5-v2-15-0_input_icon_pressed_color)}.inputIcon:not(.inputIcon--pressed):not(:active):hover{background:var(--_ui5-v2-15-0_input_icon_hover_bg);box-shadow:var(--_ui5-v2-15-0_input_icon_box_shadow)}.inputIcon:hover{border-inline-start:var(--_ui5-v2-15-0_select_hover_icon_left_border);box-shadow:var(--_ui5-v2-15-0_input_icon_box_shadow)}:host(:not([hidden])){display:inline-block}:host{width:var(--_ui5-v2-15-0_input_width);min-width:calc(var(--_ui5-v2-15-0_input_min_width) + (var(--_ui5-v2-15-0-input-icons-count)*var(--_ui5-v2-15-0_input_icon_width)));margin:var(--_ui5-v2-15-0_input_margin_top_bottom) 0;height:var(--_ui5-v2-15-0_input_height);color:var(--sapField_TextColor);font-size:var(--sapFontSize);font-family:var(--sapFontFamily);font-style:normal;border:var(--_ui5-v2-15-0-input-border);border-radius:var(--_ui5-v2-15-0_input_border_radius);box-sizing:border-box;text-align:start;transition:var(--_ui5-v2-15-0_input_transition);background:var(--sapField_BackgroundStyle);background-color:var(--_ui5-v2-15-0_input_background_color)}:host(:not([readonly])),:host([readonly][disabled]){box-shadow:var(--sapField_Shadow)}:host([focused]:not([opened])){border-color:var(--_ui5-v2-15-0_input_focused_border_color);background-color:var(--sapField_Focus_Background)}.ui5-input-focusable-element{position:relative}:host([focused]:not([opened])) .ui5-input-focusable-element:after{content:var(--ui5-v2-15-0_input_focus_pseudo_element_content);position:absolute;pointer-events:none;z-index:2;border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--_ui5-v2-15-0_input_focus_outline_color);border-radius:var(--_ui5-v2-15-0_input_focus_border_radius);top:var(--_ui5-v2-15-0_input_focus_offset);bottom:var(--_ui5-v2-15-0_input_focus_offset);left:var(--_ui5-v2-15-0_input_focus_offset);right:var(--_ui5-v2-15-0_input_focus_offset)}:host([focused][readonly]:not([opened])) .ui5-input-focusable-element:after{top:var(--_ui5-v2-15-0_input_readonly_focus_offset);bottom:var(--_ui5-v2-15-0_input_readonly_focus_offset);left:var(--_ui5-v2-15-0_input_readonly_focus_offset);right:var(--_ui5-v2-15-0_input_readonly_focus_offset);border-radius:var(--_ui5-v2-15-0_input_readonly_focus_border_radius)}.ui5-input-root:before{content:"";position:absolute;width:calc(100% - 2px);left:1px;bottom:-2px;border-bottom-left-radius:8px;border-bottom-right-radius:8px;height:var(--_ui5-v2-15-0_input_bottom_border_height);transition:var(--_ui5-v2-15-0_input_transition);background-color:var(--_ui5-v2-15-0_input_bottom_border_color)}.ui5-input-root{width:100%;height:100%;position:relative;background:transparent;display:inline-block;outline:none;box-sizing:border-box;color:inherit;transition:border-color .2s ease-in-out;border-radius:var(--_ui5-v2-15-0_input_border_radius);overflow:hidden}:host([disabled]){opacity:var(--_ui5-v2-15-0_input_disabled_opacity);cursor:default;pointer-events:none;background-color:var(--_ui5-v2-15-0-input_disabled_background);border-color:var(--_ui5-v2-15-0_input_disabled_border_color)}:host([disabled]) .ui5-input-root:before,:host([readonly]) .ui5-input-root:before{content:none}[inner-input]{background:transparent;color:inherit;border:none;font-style:inherit;-webkit-appearance:none;-moz-appearance:textfield;padding:var(--_ui5-v2-15-0_input_inner_padding);box-sizing:border-box;width:100%;text-overflow:ellipsis;flex:1;outline:none;font-size:inherit;font-family:inherit;line-height:inherit;letter-spacing:inherit;word-spacing:inherit;text-align:inherit}[inner-input][inner-input-with-icon]{padding:var(--_ui5-v2-15-0_input_inner_padding_with_icon)}[inner-input][type=search]::-webkit-search-decoration,[inner-input][type=search]::-webkit-search-cancel-button,[inner-input][type=search]::-webkit-search-results-button,[inner-input][type=search]::-webkit-search-results-decoration{display:none}[inner-input]::-ms-reveal,[inner-input]::-ms-clear{display:none}.ui5-input-value-state-icon{height:100%;display:var(--_ui5-v2-15-0-input-value-state-icon-display);align-items:center}.ui5-input-value-state-icon>svg{margin-right:8px}[inner-input]::selection{background:var(--sapSelectedColor);color:var(--sapContent_ContrastTextColor)}:host([disabled]) [inner-input]::-webkit-input-placeholder{visibility:hidden}:host([readonly]) [inner-input]::-webkit-input-placeholder{visibility:hidden}:host([disabled]) [inner-input]::-moz-placeholder{visibility:hidden}:host([readonly]) [inner-input]::-moz-placeholder{visibility:hidden}[inner-input]::-webkit-input-placeholder{font-weight:400;font-style:var(--_ui5-v2-15-0_input_placeholder_style);color:var(--_ui5-v2-15-0_input_placeholder_color);padding-right:.125rem}[inner-input]::-moz-placeholder{font-weight:400;font-style:var(--_ui5-v2-15-0_input_placeholder_style);color:var(--_ui5-v2-15-0_input_placeholder_color);padding-right:.125rem}:host([value-state="Negative"]) [inner-input]::-webkit-input-placeholder{color:var(--_ui5-v2-15-0-input_error_placeholder_color);font-weight:var(--_ui5-v2-15-0_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Negative"]) [inner-input]::-moz-placeholder{color:var(--_ui5-v2-15-0-input_error_placeholder_color);font-weight:var(--_ui5-v2-15-0_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Critical"]) [inner-input]::-webkit-input-placeholder{font-weight:var(--_ui5-v2-15-0_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Critical"]) [inner-input]::-moz-placeholder{font-weight:var(--_ui5-v2-15-0_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Positive"]) [inner-input]::-webkit-input-placeholder{color:var(--_ui5-v2-15-0_input_placeholder_color)}:host([value-state="Positive"]) [inner-input]::-moz-placeholder{color:var(--_ui5-v2-15-0_input_placeholder_color)}:host([value-state="Information"]) [inner-input]::-webkit-input-placeholder{color:var(--_ui5-v2-15-0_input_placeholder_color)}:host([value-state="Information"]) [inner-input]::-moz-placeholder{color:var(--_ui5-v2-15-0_input_placeholder_color)}.ui5-input-content{height:100%;box-sizing:border-box;display:flex;flex-direction:row;justify-content:flex-end;overflow:hidden;outline:none;background:transparent;color:inherit;border-radius:var(--_ui5-v2-15-0_input_border_radius)}:host([readonly]:not([disabled])){border:var(--_ui5-v2-15-0_input_readonly_border);background:var(--sapField_ReadOnly_BackgroundStyle);background-color:var(--_ui5-v2-15-0_input_readonly_background)}:host([value-state="None"]:not([readonly]):hover),:host(:not([value-state]):not([readonly]):hover){border:var(--_ui5-v2-15-0_input_hover_border);border-color:var(--_ui5-v2-15-0_input_focused_border_color);box-shadow:var(--sapField_Hover_Shadow);background:var(--sapField_Hover_BackgroundStyle);background-color:var(--sapField_Hover_Background)}:host(:not([value-state]):not([readonly])[focused]:not([opened]):hover),:host([value-state="None"]:not([readonly])[focused]:not([opened]):hover){box-shadow:none}:host([focused]):not([opened]) .ui5-input-root:before{content:none}:host(:not([readonly]):not([disabled])[value-state]:not([value-state="None"])){border-width:var(--_ui5-v2-15-0_input_state_border_width)}:host([value-state="Negative"]) [inner-input],:host([value-state="Critical"]) [inner-input]{font-style:var(--_ui5-v2-15-0_input_error_warning_font_style);text-indent:var(--_ui5-v2-15-0_input_error_warning_text_indent)}:host([value-state="Negative"]) [inner-input]{font-weight:var(--_ui5-v2-15-0_input_error_font_weight)}:host([value-state="Critical"]) [inner-input]{font-weight:var(--_ui5-v2-15-0_input_warning_font_weight)}:host([value-state="Negative"]:not([readonly]):not([disabled])){background:var(--sapField_InvalidBackgroundStyle);background-color:var(--sapField_InvalidBackground);border-color:var(--_ui5-v2-15-0_input_value_state_error_border_color);box-shadow:var(--sapField_InvalidShadow)}:host([value-state="Negative"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5-v2-15-0_input_focused_value_state_error_background);border-color:var(--_ui5-v2-15-0_input_focused_value_state_error_border_color)}:host([value-state="Negative"][focused]:not([opened]):not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5-v2-15-0_input_focused_value_state_error_focus_outline_color)}:host([value-state="Negative"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5-v2-15-0-input-value-state-error-border-botom-color)}:host([value-state="Negative"]:not([readonly]):not([focused]):hover),:host([value-state="Negative"]:not([readonly])[focused][opened]:hover){background-color:var(--_ui5-v2-15-0_input_value_state_error_hover_background);box-shadow:var(--sapField_Hover_InvalidShadow)}:host([value-state="Negative"]:not([readonly]):not([disabled])),:host([value-state="Critical"]:not([readonly]):not([disabled])),:host([value-state="Information"]:not([readonly]):not([disabled])){border-style:var(--_ui5-v2-15-0_input_error_warning_border_style)}:host([value-state="Critical"]:not([readonly]):not([disabled])){background:var(--sapField_WarningBackgroundStyle);background-color:var(--sapField_WarningBackground);border-color:var(--_ui5-v2-15-0_input_value_state_warning_border_color);box-shadow:var(--sapField_WarningShadow)}:host([value-state="Critical"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5-v2-15-0_input_focused_value_state_warning_background);border-color:var(--_ui5-v2-15-0_input_focused_value_state_warning_border_color)}:host([value-state="Critical"][focused]:not([opened]):not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5-v2-15-0_input_focused_value_state_warning_focus_outline_color)}:host([value-state="Critical"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5-v2-15-0_input_value_state_warning_border_botom_color)}:host([value-state="Critical"]:not([readonly]):not([focused]):hover),:host([value-state="Critical"]:not([readonly])[focused][opened]:hover){background-color:var(--sapField_Hover_Background);box-shadow:var(--sapField_Hover_WarningShadow)}:host([value-state="Positive"]:not([readonly]):not([disabled])){background:var(--sapField_SuccessBackgroundStyle);background-color:var(--sapField_SuccessBackground);border-color:var(--_ui5-v2-15-0_input_value_state_success_border_color);border-width:var(--_ui5-v2-15-0_input_value_state_success_border_width);box-shadow:var(--sapField_SuccessShadow)}:host([value-state="Positive"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5-v2-15-0_input_focused_value_state_success_background);border-color:var(--_ui5-v2-15-0_input_focused_value_state_success_border_color)}:host([value-state="Positive"][focused]:not([opened]):not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5-v2-15-0_input_focused_value_state_success_focus_outline_color)}:host([value-state="Positive"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5-v2-15-0_input_value_state_success_border_botom_color)}:host([value-state="Positive"]:not([readonly]):not([focused]):hover),:host([value-state="Positive"]:not([readonly])[focused][opened]:hover){background-color:var(--sapField_Hover_Background);box-shadow:var(--sapField_Hover_SuccessShadow)}:host([value-state="Information"]:not([readonly]):not([disabled])){background:var(--sapField_InformationBackgroundStyle);background-color:var(--sapField_InformationBackground);border-color:var(--_ui5-v2-15-0_input_value_state_information_border_color);border-width:var(--_ui5-v2-15-0_input_information_border_width);box-shadow:var(--sapField_InformationShadow)}:host([value-state="Information"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5-v2-15-0_input_focused_value_state_information_background);border-color:var(--_ui5-v2-15-0_input_focused_value_state_information_border_color)}:host([value-state="Information"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5-v2-15-0_input_value_success_information_border_botom_color)}:host([value-state="Information"]:not([readonly]):not([focused]):hover),:host([value-state="Information"]:not([readonly])[focused][opened]:hover){background-color:var(--sapField_Hover_Background);box-shadow:var(--sapField_Hover_InformationShadow)}.ui5-input-icon-root{min-width:var(--_ui5-v2-15-0_input_icon_min_width);height:100%;display:flex;justify-content:center;align-items:center}::slotted([ui5-icon][slot="icon"]){align-self:start;padding:var(--_ui5-v2-15-0_input_custom_icon_padding);box-sizing:content-box!important}:host([value-state="Negative"]) .inputIcon,:host([value-state="Critical"]) .inputIcon{padding:var(--_ui5-v2-15-0_input_error_warning_icon_padding)}:host([value-state="Negative"][focused]) .inputIcon,:host([value-state="Critical"][focused]) .inputIcon{padding:var(--_ui5-v2-15-0_input_error_warning_focused_icon_padding)}:host([value-state="Information"]) .inputIcon{padding:var(--_ui5-v2-15-0_input_information_icon_padding)}:host([value-state="Information"][focused]) .inputIcon{padding:var(--_ui5-v2-15-0_input_information_focused_icon_padding)}:host([value-state="Negative"]) ::slotted(.inputIcon[ui5-icon]),:host([value-state="Negative"]) ::slotted([ui5-icon][slot="icon"]),:host([value-state="Critical"]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5-v2-15-0_input_error_warning_custom_icon_padding)}:host([value-state="Negative"][focused]) ::slotted(.inputIcon[ui5-icon]),:host([value-state="Negative"][focused]) ::slotted([ui5-icon][slot="icon"]),:host([value-state="Critical"][focused]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5-v2-15-0_input_error_warning_custom_focused_icon_padding)}:host([value-state="Information"]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5-v2-15-0_input_information_custom_icon_padding)}:host([value-state="Information"][focused]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5-v2-15-0_input_information_custom_focused_icon_padding)}:host([value-state="Negative"]) .inputIcon:active,:host([value-state="Negative"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5-v2-15-0_input_error_icon_box_shadow);color:var(--_ui5-v2-15-0_input_icon_error_pressed_color)}:host([value-state="Negative"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5-v2-15-0_input_error_icon_box_shadow)}:host([value-state="Critical"]) .inputIcon:active,:host([value-state="Critical"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5-v2-15-0_input_warning_icon_box_shadow);color:var(--_ui5-v2-15-0_input_icon_warning_pressed_color)}:host([value-state="Critical"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5-v2-15-0_input_warning_icon_box_shadow)}:host([value-state="Information"]) .inputIcon:active,:host([value-state="Information"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5-v2-15-0_input_information_icon_box_shadow);color:var(--_ui5-v2-15-0_input_icon_information_pressed_color)}:host([value-state="Information"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5-v2-15-0_input_information_icon_box_shadow)}:host([value-state="Positive"]) .inputIcon:active,:host([value-state="Positive"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5-v2-15-0_input_success_icon_box_shadow);color:var(--_ui5-v2-15-0_input_icon_success_pressed_color)}:host([value-state="Positive"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5-v2-15-0_input_success_icon_box_shadow)}.ui5-input-clear-icon-wrapper{height:var(--_ui5-v2-15-0_input_icon_wrapper_height);padding:0;width:var(--_ui5-v2-15-0_input_icon_width);min-width:var(--_ui5-v2-15-0_input_icon_width);display:flex;justify-content:center;align-items:center;box-sizing:border-box}:host([value-state]:not([value-state="None"]):not([value-state="Positive"])) .ui5-input-clear-icon-wrapper{height:var(--_ui5-v2-15-0_input_icon_wrapper_state_height);vertical-align:top}:host([value-state="Positive"]) .ui5-input-clear-icon-wrapper{height:var(--_ui5-v2-15-0_input_icon_wrapper_success_state_height)}[ui5-icon].ui5-input-clear-icon{padding:0;color:inherit}[inner-input]::-webkit-outer-spin-button,[inner-input]::-webkit-inner-spin-button{-webkit-appearance:inherit;margin:inherit}:host([icon]){min-width:var(--_ui5-v2-15-0_button_base_min_width);width:var(--_ui5-v2-15-0_button_base_min_width)}:host([icon]) .ui5-select-root{min-width:var(--_ui5-v2-15-0_button_base_min_width)}:host([icon]) .ui5-select-label-root{min-width:0;padding-inline-start:0}.ui5-select-root{min-width:calc(var(--_ui5-v2-15-0_input_min_width) + (var(--_ui5-v2-15-0-input-icons-count)*var(--_ui5-v2-15-0_input_icon_width)));width:100%;height:100%;display:flex;outline:none;cursor:pointer;overflow:hidden;border-radius:var(--_ui5-v2-15-0_input_border_radius)}.ui5-select-label-root{flex-shrink:1;flex-grow:1;align-self:center;min-width:1rem;padding-inline-start:.5rem;cursor:pointer;outline:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--_ui5-v2-15-0_select_label_color);font-family:var(--sapFontFamily);font-size:var(--sapFontSize);font-weight:400}.ui5-select-option-icon{padding-inline-start:.5rem;color:var(--sapField_TextColor);align-self:center}:host(:not([disabled])){cursor:pointer}.ui5-select-icon-root{display:flex;justify-content:center;align-items:center;box-sizing:border-box;width:var(--_ui5-v2-15-0_select_icon_width);min-width:var(--_ui5-v2-15-0_select_icon_width);height:var(--_ui5-v2-15-0_select_icon_wrapper_height);padding:0}.ui5-select-icon{color:inherit}:host([value-state]:not([value-state="None"],[value-state="Positive"])) .ui5-select-icon-root{height:var(--_ui5-v2-15-0_select_icon_wrapper_state_height)}
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var selectCss = `:host{vertical-align:middle}.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}.inputIcon{color:var(--_ui5_input_icon_color);cursor:pointer;outline:none;padding:var(--_ui5_input_icon_padding);border-inline-start:var(--_ui5_input_icon_border);min-width:1rem;min-height:1rem;border-radius:var(--_ui5_input_icon_border_radius)}.inputIcon.inputIcon--pressed{background:var(--_ui5_input_icon_pressed_bg);box-shadow:var(--_ui5_input_icon_box_shadow);border-inline-start:var(--_ui5_select_hover_icon_left_border);color:var(--_ui5_input_icon_pressed_color)}.inputIcon:active{background-color:var(--sapButton_Active_Background);box-shadow:var(--_ui5_input_icon_box_shadow);border-inline-start:var(--_ui5_select_hover_icon_left_border);color:var(--_ui5_input_icon_pressed_color)}.inputIcon:not(.inputIcon--pressed):not(:active):hover{background:var(--_ui5_input_icon_hover_bg);box-shadow:var(--_ui5_input_icon_box_shadow)}.inputIcon:hover{border-inline-start:var(--_ui5_select_hover_icon_left_border);box-shadow:var(--_ui5_input_icon_box_shadow)}:host(:not([hidden])){display:inline-block}:host{width:var(--_ui5_input_width);min-width:calc(var(--_ui5_input_min_width) + (var(--_ui5-input-icons-count)*var(--_ui5_input_icon_width)));margin:var(--_ui5_input_margin_top_bottom) 0;height:var(--_ui5_input_height);color:var(--sapField_TextColor);font-size:var(--sapFontSize);font-family:var(--sapFontFamily);font-style:normal;border:var(--_ui5-input-border);border-radius:var(--_ui5_input_border_radius);box-sizing:border-box;text-align:start;transition:var(--_ui5_input_transition);background:var(--sapField_BackgroundStyle);background-color:var(--_ui5_input_background_color)}:host(:not([readonly])),:host([readonly][disabled]){box-shadow:var(--sapField_Shadow)}:host([focused]:not([opened])){border-color:var(--_ui5_input_focused_border_color);background-color:var(--sapField_Focus_Background)}.ui5-input-focusable-element{position:relative}:host([focused]:not([opened])) .ui5-input-focusable-element:after{content:var(--ui5_input_focus_pseudo_element_content);position:absolute;pointer-events:none;z-index:2;border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--_ui5_input_focus_outline_color);border-radius:var(--_ui5_input_focus_border_radius);top:var(--_ui5_input_focus_offset);bottom:var(--_ui5_input_focus_offset);left:var(--_ui5_input_focus_offset);right:var(--_ui5_input_focus_offset)}:host([focused][readonly]:not([opened])) .ui5-input-focusable-element:after{top:var(--_ui5_input_readonly_focus_offset);bottom:var(--_ui5_input_readonly_focus_offset);left:var(--_ui5_input_readonly_focus_offset);right:var(--_ui5_input_readonly_focus_offset);border-radius:var(--_ui5_input_readonly_focus_border_radius)}.ui5-input-root:before{content:"";position:absolute;width:calc(100% - 2px);left:1px;bottom:-2px;border-bottom-left-radius:8px;border-bottom-right-radius:8px;height:var(--_ui5_input_bottom_border_height);transition:var(--_ui5_input_transition);background-color:var(--_ui5_input_bottom_border_color)}.ui5-input-root{width:100%;height:100%;position:relative;background:transparent;display:inline-block;outline:none;box-sizing:border-box;color:inherit;transition:border-color .2s ease-in-out;border-radius:var(--_ui5_input_border_radius);overflow:hidden}:host([disabled]){opacity:var(--_ui5_input_disabled_opacity);cursor:default;pointer-events:none;background-color:var(--_ui5-input_disabled_background);border-color:var(--_ui5_input_disabled_border_color)}:host([disabled]) .ui5-input-root:before,:host([readonly]) .ui5-input-root:before{content:none}[inner-input]{background:transparent;color:inherit;border:none;font-style:inherit;-webkit-appearance:none;-moz-appearance:textfield;padding:var(--_ui5_input_inner_padding);box-sizing:border-box;width:100%;text-overflow:ellipsis;flex:1;outline:none;font-size:inherit;font-family:inherit;line-height:inherit;letter-spacing:inherit;word-spacing:inherit;text-align:inherit}[inner-input][inner-input-with-icon]{padding:var(--_ui5_input_inner_padding_with_icon)}[inner-input][type=search]::-webkit-search-decoration,[inner-input][type=search]::-webkit-search-cancel-button,[inner-input][type=search]::-webkit-search-results-button,[inner-input][type=search]::-webkit-search-results-decoration{display:none}[inner-input]::-ms-reveal,[inner-input]::-ms-clear{display:none}.ui5-input-value-state-icon{height:100%;display:var(--_ui5-input-value-state-icon-display);align-items:center}.ui5-input-value-state-icon>svg{margin-right:8px}[inner-input]::selection{background:var(--sapSelectedColor);color:var(--sapContent_ContrastTextColor)}:host([disabled]) [inner-input]::-webkit-input-placeholder{visibility:hidden}:host([readonly]) [inner-input]::-webkit-input-placeholder{visibility:hidden}:host([disabled]) [inner-input]::-moz-placeholder{visibility:hidden}:host([readonly]) [inner-input]::-moz-placeholder{visibility:hidden}[inner-input]::-webkit-input-placeholder{font-weight:400;font-style:var(--_ui5_input_placeholder_style);color:var(--_ui5_input_placeholder_color);padding-right:.125rem}[inner-input]::-moz-placeholder{font-weight:400;font-style:var(--_ui5_input_placeholder_style);color:var(--_ui5_input_placeholder_color);padding-right:.125rem}:host([value-state="Negative"]) [inner-input]::-webkit-input-placeholder{color:var(--_ui5-input_error_placeholder_color);font-weight:var(--_ui5_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Negative"]) [inner-input]::-moz-placeholder{color:var(--_ui5-input_error_placeholder_color);font-weight:var(--_ui5_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Critical"]) [inner-input]::-webkit-input-placeholder{font-weight:var(--_ui5_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Critical"]) [inner-input]::-moz-placeholder{font-weight:var(--_ui5_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Positive"]) [inner-input]::-webkit-input-placeholder{color:var(--_ui5_input_placeholder_color)}:host([value-state="Positive"]) [inner-input]::-moz-placeholder{color:var(--_ui5_input_placeholder_color)}:host([value-state="Information"]) [inner-input]::-webkit-input-placeholder{color:var(--_ui5_input_placeholder_color)}:host([value-state="Information"]) [inner-input]::-moz-placeholder{color:var(--_ui5_input_placeholder_color)}.ui5-input-content{height:100%;box-sizing:border-box;display:flex;flex-direction:row;justify-content:flex-end;overflow:hidden;outline:none;background:transparent;color:inherit;border-radius:var(--_ui5_input_border_radius)}:host([readonly]:not([disabled])){border:var(--_ui5_input_readonly_border);background:var(--sapField_ReadOnly_BackgroundStyle);background-color:var(--_ui5_input_readonly_background)}:host([value-state="None"]:not([readonly]):hover),:host(:not([value-state]):not([readonly]):hover){border:var(--_ui5_input_hover_border);border-color:var(--_ui5_input_focused_border_color);box-shadow:var(--sapField_Hover_Shadow);background:var(--sapField_Hover_BackgroundStyle);background-color:var(--sapField_Hover_Background)}:host(:not([value-state]):not([readonly])[focused]:not([opened]):hover),:host([value-state="None"]:not([readonly])[focused]:not([opened]):hover){box-shadow:none}:host([focused]):not([opened]) .ui5-input-root:before{content:none}:host(:not([readonly]):not([disabled])[value-state]:not([value-state="None"])){border-width:var(--_ui5_input_state_border_width)}:host([value-state="Negative"]) [inner-input],:host([value-state="Critical"]) [inner-input]{font-style:var(--_ui5_input_error_warning_font_style);text-indent:var(--_ui5_input_error_warning_text_indent)}:host([value-state="Negative"]) [inner-input]{font-weight:var(--_ui5_input_error_font_weight)}:host([value-state="Critical"]) [inner-input]{font-weight:var(--_ui5_input_warning_font_weight)}:host([value-state="Negative"]:not([readonly]):not([disabled])){background:var(--sapField_InvalidBackgroundStyle);background-color:var(--sapField_InvalidBackground);border-color:var(--_ui5_input_value_state_error_border_color);box-shadow:var(--sapField_InvalidShadow)}:host([value-state="Negative"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5_input_focused_value_state_error_background);border-color:var(--_ui5_input_focused_value_state_error_border_color)}:host([value-state="Negative"][focused]:not([opened]):not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5_input_focused_value_state_error_focus_outline_color)}:host([value-state="Negative"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5-input-value-state-error-border-botom-color)}:host([value-state="Negative"]:not([readonly]):not([focused]):hover),:host([value-state="Negative"]:not([readonly])[focused][opened]:hover){background-color:var(--_ui5_input_value_state_error_hover_background);box-shadow:var(--sapField_Hover_InvalidShadow)}:host([value-state="Negative"]:not([readonly]):not([disabled])),:host([value-state="Critical"]:not([readonly]):not([disabled])),:host([value-state="Information"]:not([readonly]):not([disabled])){border-style:var(--_ui5_input_error_warning_border_style)}:host([value-state="Critical"]:not([readonly]):not([disabled])){background:var(--sapField_WarningBackgroundStyle);background-color:var(--sapField_WarningBackground);border-color:var(--_ui5_input_value_state_warning_border_color);box-shadow:var(--sapField_WarningShadow)}:host([value-state="Critical"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5_input_focused_value_state_warning_background);border-color:var(--_ui5_input_focused_value_state_warning_border_color)}:host([value-state="Critical"][focused]:not([opened]):not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5_input_focused_value_state_warning_focus_outline_color)}:host([value-state="Critical"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5_input_value_state_warning_border_botom_color)}:host([value-state="Critical"]:not([readonly]):not([focused]):hover),:host([value-state="Critical"]:not([readonly])[focused][opened]:hover){background-color:var(--sapField_Hover_Background);box-shadow:var(--sapField_Hover_WarningShadow)}:host([value-state="Positive"]:not([readonly]):not([disabled])){background:var(--sapField_SuccessBackgroundStyle);background-color:var(--sapField_SuccessBackground);border-color:var(--_ui5_input_value_state_success_border_color);border-width:var(--_ui5_input_value_state_success_border_width);box-shadow:var(--sapField_SuccessShadow)}:host([value-state="Positive"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5_input_focused_value_state_success_background);border-color:var(--_ui5_input_focused_value_state_success_border_color)}:host([value-state="Positive"][focused]:not([opened]):not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5_input_focused_value_state_success_focus_outline_color)}:host([value-state="Positive"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5_input_value_state_success_border_botom_color)}:host([value-state="Positive"]:not([readonly]):not([focused]):hover),:host([value-state="Positive"]:not([readonly])[focused][opened]:hover){background-color:var(--sapField_Hover_Background);box-shadow:var(--sapField_Hover_SuccessShadow)}:host([value-state="Information"]:not([readonly]):not([disabled])){background:var(--sapField_InformationBackgroundStyle);background-color:var(--sapField_InformationBackground);border-color:var(--_ui5_input_value_state_information_border_color);border-width:var(--_ui5_input_information_border_width);box-shadow:var(--sapField_InformationShadow)}:host([value-state="Information"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5_input_focused_value_state_information_background);border-color:var(--_ui5_input_focused_value_state_information_border_color)}:host([value-state="Information"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5_input_value_success_information_border_botom_color)}:host([value-state="Information"]:not([readonly]):not([focused]):hover),:host([value-state="Information"]:not([readonly])[focused][opened]:hover){background-color:var(--sapField_Hover_Background);box-shadow:var(--sapField_Hover_InformationShadow)}.ui5-input-icon-root{min-width:var(--_ui5_input_icon_min_width);height:100%;display:flex;justify-content:center;align-items:center}::slotted([ui5-icon][slot="icon"]){align-self:start;padding:var(--_ui5_input_custom_icon_padding);box-sizing:content-box!important}:host([value-state="Negative"]) .inputIcon,:host([value-state="Critical"]) .inputIcon{padding:var(--_ui5_input_error_warning_icon_padding)}:host([value-state="Negative"][focused]) .inputIcon,:host([value-state="Critical"][focused]) .inputIcon{padding:var(--_ui5_input_error_warning_focused_icon_padding)}:host([value-state="Information"]) .inputIcon{padding:var(--_ui5_input_information_icon_padding)}:host([value-state="Information"][focused]) .inputIcon{padding:var(--_ui5_input_information_focused_icon_padding)}:host([value-state="Negative"]) ::slotted(.inputIcon[ui5-icon]),:host([value-state="Negative"]) ::slotted([ui5-icon][slot="icon"]),:host([value-state="Critical"]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5_input_error_warning_custom_icon_padding)}:host([value-state="Negative"][focused]) ::slotted(.inputIcon[ui5-icon]),:host([value-state="Negative"][focused]) ::slotted([ui5-icon][slot="icon"]),:host([value-state="Critical"][focused]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5_input_error_warning_custom_focused_icon_padding)}:host([value-state="Information"]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5_input_information_custom_icon_padding)}:host([value-state="Information"][focused]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5_input_information_custom_focused_icon_padding)}:host([value-state="Negative"]) .inputIcon:active,:host([value-state="Negative"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5_input_error_icon_box_shadow);color:var(--_ui5_input_icon_error_pressed_color)}:host([value-state="Negative"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5_input_error_icon_box_shadow)}:host([value-state="Critical"]) .inputIcon:active,:host([value-state="Critical"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5_input_warning_icon_box_shadow);color:var(--_ui5_input_icon_warning_pressed_color)}:host([value-state="Critical"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5_input_warning_icon_box_shadow)}:host([value-state="Information"]) .inputIcon:active,:host([value-state="Information"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5_input_information_icon_box_shadow);color:var(--_ui5_input_icon_information_pressed_color)}:host([value-state="Information"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5_input_information_icon_box_shadow)}:host([value-state="Positive"]) .inputIcon:active,:host([value-state="Positive"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5_input_success_icon_box_shadow);color:var(--_ui5_input_icon_success_pressed_color)}:host([value-state="Positive"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5_input_success_icon_box_shadow)}.ui5-input-clear-icon-wrapper{height:var(--_ui5_input_icon_wrapper_height);padding:0;width:var(--_ui5_input_icon_width);min-width:var(--_ui5_input_icon_width);display:flex;justify-content:center;align-items:center;box-sizing:border-box}:host([value-state]:not([value-state="None"]):not([value-state="Positive"])) .ui5-input-clear-icon-wrapper{height:var(--_ui5_input_icon_wrapper_state_height);vertical-align:top}:host([value-state="Positive"]) .ui5-input-clear-icon-wrapper{height:var(--_ui5_input_icon_wrapper_success_state_height)}[ui5-icon].ui5-input-clear-icon{padding:0;color:inherit}[inner-input]::-webkit-outer-spin-button,[inner-input]::-webkit-inner-spin-button{-webkit-appearance:inherit;margin:inherit}[ui5-responsive-popover] [ui5-input]{width:100%}:host([icon]){min-width:var(--_ui5_button_base_min_width);width:var(--_ui5_button_base_min_width)}:host([opened]) .ui5-input-focusable-element:after{content:var(--ui5_input_focus_pseudo_element_content);position:absolute;pointer-events:none;z-index:2;border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--_ui5_input_focus_outline_color);border-radius:var(--_ui5_input_focus_border_radius);top:var(--_ui5_input_focus_offset);bottom:var(--_ui5_input_focus_offset);left:var(--_ui5_input_focus_offset);right:var(--_ui5_input_focus_offset)}:host([value-state="Negative"][opened]:not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5_input_focused_value_state_error_focus_outline_color)}:host([value-state="Critical"][opened]:not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5_input_focused_value_state_warning_focus_outline_color)}:host([value-state="Positive"][opened]:not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5_input_focused_value_state_success_focus_outline_color)}:host([icon]) .ui5-select-root{min-width:var(--_ui5_button_base_min_width)}:host([icon]) .ui5-select-label-root{min-width:0;padding-inline-start:0}.ui5-select-root{min-width:calc(var(--_ui5_input_min_width) + (var(--_ui5-input-icons-count)*var(--_ui5_input_icon_width)));width:100%;height:100%;display:flex;outline:none;cursor:pointer;overflow:hidden;border-radius:var(--_ui5_input_border_radius);background:var(--_ui5_select_bottom_border_gradient)}.ui5-select-label-root{flex-shrink:1;flex-grow:1;align-self:center;min-width:1rem;padding-inline-start:.5rem;cursor:pointer;outline:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--_ui5_select_label_color);font-family:var(--sapFontFamily);font-size:var(--sapFontSize);font-weight:400}.ui5-select-option-icon{padding-inline-start:.5rem;color:var(--sapField_TextColor);align-self:center}:host(:not([disabled])){cursor:pointer}.ui5-select-icon-root{display:flex;justify-content:center;align-items:center;box-sizing:border-box;width:var(--_ui5_select_icon_width);min-width:var(--_ui5_select_icon_width);height:var(--_ui5_select_icon_wrapper_height);padding:0}.ui5-select-icon{color:inherit}:host([value-state]:not([value-state="None"])) .ui5-select-root,:host([value-state="None"]:not([readonly]):not([disabled]):hover) .ui5-select-root,:host(:not([value-state]):not([readonly]):not([disabled]):hover) .ui5-select-root{background:none}:host([readonly]) .ui5-select-root{background:none}:host([value-state]:not([value-state="None"],[value-state="Positive"])) .ui5-select-icon-root{height:var(--_ui5_select_icon_wrapper_state_height)}
 `;
 
-    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
-    var ResponsivePopoverCommonCss = `.input-root-phone{flex:1;position:relative;height:var(--_ui5-v2-15-0_input_height);color:var(--sapField_TextColor);font-size:var(--sapFontSize);font-family:var(--sapFontFamily);background:var(--sapField_BackgroundStyle);background-color:var(--_ui5-v2-15-0_input_background_color);border:var(--_ui5-v2-15-0-input-border);border-radius:var(--_ui5-v2-15-0_input_border_radius);box-sizing:border-box}.input-root-phone [inner-input]{padding:0 .5rem;width:100%;height:100%}.input-root-phone [inner-input]:focus{background-color:var(--sapField_Focus_Background)}.input-root-phone:focus-within:before{content:"";position:absolute;pointer-events:none;z-index:2;border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);border-radius:var(--_ui5-v2-15-0_input_focus_border_radius);top:var(--_ui5-v2-15-0_input_focus_offset);bottom:var(--_ui5-v2-15-0_input_focus_offset);left:var(--_ui5-v2-15-0_input_focus_offset);right:var(--_ui5-v2-15-0_input_focus_offset)}.input-root-phone [value-state=Negative] .inputIcon[data-ui5-compact-size],.input-root-phone [value-state=Positive] .inputIcon[data-ui5-compact-size],.input-root-phone [value-state=Critical] .inputIcon[data-ui5-compact-size]{padding:.1875rem .5rem}[inner-input]{background:transparent;color:inherit;border:none;font-style:normal;-webkit-appearance:none;-moz-appearance:textfield;line-height:normal;padding:var(--_ui5-v2-15-0_input_inner_padding);box-sizing:border-box;min-width:3rem;text-overflow:ellipsis;flex:1;outline:none;font-size:inherit;font-family:inherit;border-radius:var(--_ui5-v2-15-0_input_border_radius)}[inner-input]::selection,[inner-input]::-moz-selection{background:var(--sapSelectedColor);color:var(--sapContent_ContrastTextColor)}[inner-input]::-webkit-input-placeholder{font-style:var(--_ui5-v2-15-0_input_placeholder_style);color:var(--sapField_PlaceholderTextColor)}[inner-input]::-moz-placeholder{font-style:var(--_ui5-v2-15-0_input_placeholder_style);color:var(--sapField_PlaceholderTextColor)}.input-root-phone[value-state]:not([value-state=None]){border-width:var(--_ui5-v2-15-0_input_state_border_width)}.input-root-phone[value-state=Negative] [inner-input],.input-root-phone[value-state=Critical] [inner-input]{font-style:var(--_ui5-v2-15-0_input_error_warning_font_style)}.input-root-phone[value-state=Negative] [inner-input]{font-weight:var(--_ui5-v2-15-0_input_error_font_weight)}.input-root-phone[value-state=Negative]:not([readonly]){background:var(--sapField_InvalidBackgroundStyle);background-color:var(--sapField_InvalidBackground);border-color:var(--_ui5-v2-15-0_input_value_state_error_border_color)}.input-root-phone[value-state=Negative]:not([readonly]) [inner-input]:focus{background-color:var(--_ui5-v2-15-0_input_focused_value_state_error_background);border-color:var(--_ui5-v2-15-0_input_focused_value_state_error_border_color)}.input-root-phone[value-state=Negative]:not([readonly]):focus-within:before{border-color:var(--_ui5-v2-15-0_input_focused_value_state_error_focus_outline_color)}.input-root-phone[value-state=Negative]:not([readonly]):not([disabled]),.input-root-phone[value-state=Critical]:not([readonly]):not([disabled]),.input-root-phone[value-state=Information]:not([readonly]):not([disabled]){border-style:var(--_ui5-v2-15-0_input_error_warning_border_style)}.input-root-phone[value-state=Critical]:not([readonly]){background:var(--sapField_WarningBackgroundStyle);background-color:var(--sapField_WarningBackground);border-color:var(--_ui5-v2-15-0_input_value_state_warning_border_color)}.input-root-phone[value-state=Critical]:not([readonly]) [inner-input]:focus{background-color:var(--_ui5-v2-15-0_input_focused_value_state_warning_background);border-color:var(--_ui5-v2-15-0_input_focused_value_state_warning_border_color)}.input-root-phone[value-state=Critical]:not([readonly]):focus-within:before{border-color:var(--_ui5-v2-15-0_input_focused_value_state_warning_focus_outline_color)}.input-root-phone[value-state=Positive]:not([readonly]){background:var(--sapField_SuccessBackgroundStyle);background-color:var(--sapField_SuccessBackground);border-color:var(--_ui5-v2-15-0_input_value_state_success_border_color);border-width:var(--_ui5-v2-15-0_input_value_state_success_border_width)}.input-root-phone[value-state=Positive]:not([readonly]) [inner-input]:focus{background-color:var(--_ui5-v2-15-0_input_focused_value_state_success_background);border-color:var(--_ui5-v2-15-0_input_focused_value_state_success_border_color)}.input-root-phone[value-state=Positive]:not([readonly]):focus-within:before{border-color:var(--_ui5-v2-15-0_input_focused_value_state_success_focus_outline_color)}.input-root-phone[value-state=Information]:not([readonly]){background:var(--sapField_InformationBackgroundStyle);background-color:var(--sapField_InformationBackground);border-color:var(--_ui5-v2-15-0_input_value_state_information_border_color);border-width:var(--_ui5-v2-15-0_input_information_border_width)}.input-root-phone[value-state=Information]:not([readonly]) [inner-input]:focus{background-color:var(--_ui5-v2-15-0_input_focused_value_state_information_background);border-color:var(--_ui5-v2-15-0_input_focused_value_state_information_border_color)}.ui5-multi-combobox-toggle-button{margin-left:.5rem}.ui5-responsive-popover-header{width:100%;min-height:2.5rem;display:flex;flex-direction:column}.ui5-responsive-popover-header-text{width:calc(100% - var(--_ui5-v2-15-0_button_base_min_width))}.ui5-responsive-popover-header .row{box-sizing:border-box;padding:.25rem 1rem;min-height:2.5rem;display:flex;justify-content:center;align-items:center;font-size:var(--sapFontHeader5Size)}.ui5-responsive-popover-footer{display:flex;justify-content:flex-end;padding:.25rem 0;width:100%}.ui5-responsive-popover-footer .ui5-responsive-popover-close-btn{margin-left:.5rem}.ui5-responsive-popover-header .ui5-responsive-popover-close-btn{position:absolute;right:1rem}
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var ResponsivePopoverCommonCss = `.input-root-phone{flex:1;position:relative;height:var(--_ui5_input_height);color:var(--sapField_TextColor);font-size:var(--sapFontSize);font-family:var(--sapFontFamily);background:var(--sapField_BackgroundStyle);background-color:var(--_ui5_input_background_color);border:var(--_ui5-input-border);border-radius:var(--_ui5_input_border_radius);box-sizing:border-box}.input-root-phone [inner-input]{padding:0 .5rem;width:100%;height:100%}.input-root-phone [inner-input]:focus{background-color:var(--sapField_Focus_Background)}.input-root-phone:focus-within:before{content:"";position:absolute;pointer-events:none;z-index:2;border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);border-radius:var(--_ui5_input_focus_border_radius);top:var(--_ui5_input_focus_offset);bottom:var(--_ui5_input_focus_offset);left:var(--_ui5_input_focus_offset);right:var(--_ui5_input_focus_offset)}.input-root-phone [value-state=Negative] .inputIcon[data-ui5-compact-size],.input-root-phone [value-state=Positive] .inputIcon[data-ui5-compact-size],.input-root-phone [value-state=Critical] .inputIcon[data-ui5-compact-size]{padding:.1875rem .5rem}[inner-input]{background:transparent;color:inherit;border:none;font-style:normal;-webkit-appearance:none;-moz-appearance:textfield;line-height:normal;padding:var(--_ui5_input_inner_padding);box-sizing:border-box;min-width:3rem;text-overflow:ellipsis;flex:1;outline:none;font-size:inherit;font-family:inherit;border-radius:var(--_ui5_input_border_radius)}[inner-input]::selection,[inner-input]::-moz-selection{background:var(--sapSelectedColor);color:var(--sapContent_ContrastTextColor)}[inner-input]::-webkit-input-placeholder{font-style:var(--_ui5_input_placeholder_style);color:var(--sapField_PlaceholderTextColor)}[inner-input]::-moz-placeholder{font-style:var(--_ui5_input_placeholder_style);color:var(--sapField_PlaceholderTextColor)}.input-root-phone[value-state]:not([value-state=None]){border-width:var(--_ui5_input_state_border_width)}.input-root-phone[value-state=Negative] [inner-input],.input-root-phone[value-state=Critical] [inner-input]{font-style:var(--_ui5_input_error_warning_font_style)}.input-root-phone[value-state=Negative] [inner-input]{font-weight:var(--_ui5_input_error_font_weight)}.input-root-phone[value-state=Negative]:not([readonly]){background:var(--sapField_InvalidBackgroundStyle);background-color:var(--sapField_InvalidBackground);border-color:var(--_ui5_input_value_state_error_border_color)}.input-root-phone[value-state=Negative]:not([readonly]) [inner-input]:focus{background-color:var(--_ui5_input_focused_value_state_error_background);border-color:var(--_ui5_input_focused_value_state_error_border_color)}.input-root-phone[value-state=Negative]:not([readonly]):focus-within:before{border-color:var(--_ui5_input_focused_value_state_error_focus_outline_color)}.input-root-phone[value-state=Negative]:not([readonly]):not([disabled]),.input-root-phone[value-state=Critical]:not([readonly]):not([disabled]),.input-root-phone[value-state=Information]:not([readonly]):not([disabled]){border-style:var(--_ui5_input_error_warning_border_style)}.input-root-phone[value-state=Critical]:not([readonly]){background:var(--sapField_WarningBackgroundStyle);background-color:var(--sapField_WarningBackground);border-color:var(--_ui5_input_value_state_warning_border_color)}.input-root-phone[value-state=Critical]:not([readonly]) [inner-input]:focus{background-color:var(--_ui5_input_focused_value_state_warning_background);border-color:var(--_ui5_input_focused_value_state_warning_border_color)}.input-root-phone[value-state=Critical]:not([readonly]):focus-within:before{border-color:var(--_ui5_input_focused_value_state_warning_focus_outline_color)}.input-root-phone[value-state=Positive]:not([readonly]){background:var(--sapField_SuccessBackgroundStyle);background-color:var(--sapField_SuccessBackground);border-color:var(--_ui5_input_value_state_success_border_color);border-width:var(--_ui5_input_value_state_success_border_width)}.input-root-phone[value-state=Positive]:not([readonly]) [inner-input]:focus{background-color:var(--_ui5_input_focused_value_state_success_background);border-color:var(--_ui5_input_focused_value_state_success_border_color)}.input-root-phone[value-state=Positive]:not([readonly]):focus-within:before{border-color:var(--_ui5_input_focused_value_state_success_focus_outline_color)}.input-root-phone[value-state=Information]:not([readonly]){background:var(--sapField_InformationBackgroundStyle);background-color:var(--sapField_InformationBackground);border-color:var(--_ui5_input_value_state_information_border_color);border-width:var(--_ui5_input_information_border_width)}.input-root-phone[value-state=Information]:not([readonly]) [inner-input]:focus{background-color:var(--_ui5_input_focused_value_state_information_background);border-color:var(--_ui5_input_focused_value_state_information_border_color)}.ui5-multi-combobox-toggle-button{margin-left:.5rem}.ui5-responsive-popover-header{width:100%;min-height:2.5rem;display:flex;flex-direction:column}.ui5-responsive-popover-header-text{width:100%}.ui5-responsive-popover-header .row{box-sizing:border-box;padding:.25rem 1rem;min-height:2.5rem;display:flex;justify-content:center;align-items:center;font-size:var(--sapFontHeader5Size)}.ui5-responsive-popover-footer{display:flex;justify-content:flex-end;align-items:center;width:100%;box-sizing:border-box}.ui5-responsive-popover-footer .ui5-responsive-popover-close-btn,.ui5-responsive-popover-footer .ui5-responsive-popover-footer-btn{margin-left:.5rem}.ui5-responsive-popover-header .ui5-responsive-popover-close-btn{position:absolute;right:1rem}.ui5-responsive-popover-footer .ui5-responsive-popover-footer-btn{width:4.5rem}
 `;
 
-    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
-    var ValueStateMessageCss = `.ui5-valuestatemessage-popover{border-radius:var(--_ui5-v2-15-0_value_state_message_popover_border_radius);box-shadow:var(--_ui5-v2-15-0_value_state_message_popover_box_shadow)}.ui5-input-value-state-message-icon{width:var(--_ui5-v2-15-0_value_state_message_icon_width);height:var(--_ui5-v2-15-0_value_state_message_icon_height);display:var(--_ui5-v2-15-0_input_value_state_icon_display);position:absolute;padding-right:.375rem}.ui5-valuestatemessage-root .ui5-input-value-state-message-icon{left:var(--_ui5-v2-15-0_input_value_state_icon_offset)}.ui5-input-value-state-message-icon[name=error]{color:var(--sapNegativeElementColor)}.ui5-input-value-state-message-icon[name=alert]{color:var(--sapCriticalElementColor)}.ui5-input-value-state-message-icon[name=success]{color:var(--sapPositiveElementColor)}.ui5-input-value-state-message-icon[name=information]{color:var(--sapInformativeElementColor)}.ui5-valuestatemessage-root{box-sizing:border-box;display:inline-block;color:var(--sapTextColor);font-size:var(--sapFontSmallSize);font-family:var(--sapFontFamily);height:auto;padding:var(--_ui5-v2-15-0_value_state_message_padding);overflow:hidden;text-overflow:ellipsis;min-width:6.25rem;border:var(--_ui5-v2-15-0_value_state_message_border);line-height:var(--_ui5-v2-15-0_value_state_message_line_height)}[ui5-responsive-popover] .ui5-valuestatemessage-header,[ui5-popover] .ui5-valuestatemessage-header{min-height:var(--_ui5-v2-15-0_value_state_message_popover_header_min_height);min-width:var(--_ui5-v2-15-0_value_state_message_popover_header_min_width);max-width:var(--_ui5-v2-15-0_value_state_message_popover_header_max_width);width:var(--_ui5-v2-15-0_value_state_message_popover_header_width)}[ui5-responsive-popover] .ui5-valuestatemessage-header{padding:var(--_ui5-v2-15-0_value_state_header_padding);border:var(--_ui5-v2-15-0_value_state_header_border);border-bottom:var(--_ui5-v2-15-0_value_state_header_border_bottom);flex-grow:1;position:relative}.ui5-valuestatemessage--success{background:var(--sapSuccessBackground)}.ui5-valuestatemessage--warning{background:var(--sapWarningBackground)}.ui5-valuestatemessage--error{background:var(--sapErrorBackground)}.ui5-valuestatemessage--information{background:var(--sapInformationBackground)}.ui5-responsive-popover-header:focus{outline-offset:var(--_ui5-v2-15-0_value_state_header_offset);outline:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor)}.ui5-valuestatemessage-popover::part(header),.ui5-valuestatemessage-popover::part(content){padding:0}.ui5-valuestatemessage-popover::part(header),.ui5-valuestatemessage-popover::part(footer){min-height:0}.ui5-valuestatemessage-popover::part(header),.ui5-popover-with-value-state-header::part(header),.ui5-popover-with-value-state-header-phone::part(header){margin-bottom:0}.ui5-popover-with-value-state-header-phone .ui5-valuestatemessage-root{padding:var(--_ui5-v2-15-0_value_state_message_padding_phone);width:100%}.ui5-popover-with-value-state-header-phone .ui5-input-value-state-message-icon{left:var(--_ui5-v2-15-0_value_state_message_icon_offset_phone)}.ui5-popover-with-value-state-header-phone .ui5-valuestatemessage-header{position:relative;flex:none;top:0;left:0;max-width:100%}.ui5-popover-with-value-state-header-phone::part(content){padding:0;overflow:hidden;display:flex;flex-direction:column}.ui5-popover-with-value-state-header-phone [ui5-list]{overflow:auto}[ui5-responsive-popover] .ui5-valuestatemessage--error{box-shadow:var(--_ui5-v2-15-0_value_state_header_box_shadow_error)}[ui5-responsive-popover] .ui5-valuestatemessage--information{box-shadow:var(--_ui5-v2-15-0_value_state_header_box_shadow_information)}[ui5-responsive-popover] .ui5-valuestatemessage--success{box-shadow:var(--_ui5-v2-15-0_value_state_header_box_shadow_success)}[ui5-responsive-popover] .ui5-valuestatemessage--warning{box-shadow:var(--_ui5-v2-15-0_value_state_header_box_shadow_warning)}[ui5-responsive-popover].ui5-popover-with-value-state-header .ui5-valuestatemessage-root:has(+[ui5-list]:empty){box-shadow:none}
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var ValueStateMessageCss = `.ui5-valuestatemessage-popover{border-radius:var(--_ui5_value_state_message_popover_border_radius);box-shadow:var(--_ui5_value_state_message_popover_box_shadow)}.ui5-input-value-state-message-icon{width:var(--_ui5_value_state_message_icon_width);height:var(--_ui5_value_state_message_icon_height);display:var(--_ui5_input_value_state_icon_display);position:absolute;padding-right:.375rem}.ui5-valuestatemessage-root .ui5-input-value-state-message-icon{left:var(--_ui5_input_value_state_icon_offset)}.ui5-input-value-state-message-icon[name=error]{color:var(--sapNegativeElementColor)}.ui5-input-value-state-message-icon[name=alert]{color:var(--sapCriticalElementColor)}.ui5-input-value-state-message-icon[name=success]{color:var(--sapPositiveElementColor)}.ui5-input-value-state-message-icon[name=information]{color:var(--sapInformativeElementColor)}.ui5-valuestatemessage-root{box-sizing:border-box;display:inline-block;color:var(--sapTextColor);font-size:var(--sapFontSmallSize);font-family:var(--sapFontFamily);height:auto;padding:var(--_ui5_value_state_message_padding);overflow:hidden;text-overflow:ellipsis;min-width:6.25rem;border:var(--_ui5_value_state_message_border);line-height:var(--_ui5_value_state_message_line_height)}[ui5-responsive-popover] .ui5-valuestatemessage-header,[ui5-popover] .ui5-valuestatemessage-header{min-height:var(--_ui5_value_state_message_popover_header_min_height);min-width:var(--_ui5_value_state_message_popover_header_min_width);max-width:var(--_ui5_value_state_message_popover_header_max_width);width:var(--_ui5_value_state_message_popover_header_width)}[ui5-responsive-popover] .ui5-valuestatemessage-header{padding:var(--_ui5_value_state_header_padding);border:var(--_ui5_value_state_header_border);border-bottom:var(--_ui5_value_state_header_border_bottom);flex-grow:1;position:relative}.ui5-valuestatemessage--success{background:var(--sapSuccessBackground)}.ui5-valuestatemessage--warning{background:var(--sapWarningBackground)}.ui5-valuestatemessage--error{background:var(--sapErrorBackground)}.ui5-valuestatemessage--information{background:var(--sapInformationBackground)}.ui5-responsive-popover-header:focus{outline-offset:var(--_ui5_value_state_header_offset);outline:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor)}.ui5-valuestatemessage-popover::part(header),.ui5-valuestatemessage-popover::part(content){padding:0}.ui5-valuestatemessage-popover::part(header),.ui5-valuestatemessage-popover::part(footer){min-height:0}.ui5-valuestatemessage-popover::part(header),.ui5-popover-with-value-state-header::part(header),.ui5-popover-with-value-state-header-phone::part(header){margin-bottom:0}.ui5-popover-with-value-state-header-phone .ui5-valuestatemessage-root{padding:var(--_ui5_value_state_message_padding_phone);width:100%}.ui5-popover-with-value-state-header-phone .ui5-input-value-state-message-icon{left:var(--_ui5_value_state_message_icon_offset_phone)}.ui5-popover-with-value-state-header-phone .ui5-valuestatemessage-header{position:relative;flex:none;top:0;left:0;max-width:100%}.ui5-popover-with-value-state-header-phone::part(content){padding:0;overflow:hidden;display:flex;flex-direction:column}.ui5-popover-with-value-state-header-phone [ui5-list]{overflow:auto}[ui5-responsive-popover] .ui5-valuestatemessage--error{box-shadow:var(--_ui5_value_state_header_box_shadow_error)}[ui5-responsive-popover] .ui5-valuestatemessage--information{box-shadow:var(--_ui5_value_state_header_box_shadow_information)}[ui5-responsive-popover] .ui5-valuestatemessage--success{box-shadow:var(--_ui5_value_state_header_box_shadow_success)}[ui5-responsive-popover] .ui5-valuestatemessage--warning{box-shadow:var(--_ui5_value_state_header_box_shadow_warning)}[ui5-responsive-popover].ui5-popover-with-value-state-header .ui5-valuestatemessage-root:has(+[ui5-list]:empty){box-shadow:none}
 `;
 
-    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var SelectPopoverCss = `.ui5-select-popover::part(content),.ui5-select-popover::part(header){padding:0}.ui5-select-popover .ui5-responsive-popover-header .row{justify-content:flex-start}
 `;
 
@@ -167,6 +191,9 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         return c > 3 && r && Object.defineProperty(target, key, r), r;
     };
     var Select_1;
+    const isPrintableCharacter = (e) => {
+        return e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey;
+    };
     /**
      * @class
      *
@@ -224,7 +251,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
      * @csspart popover - Used to style the popover element
      * @since 0.8.0
      */
-    let Select = Select_1 = class Select extends webcomponentsBase.b {
+    let Select = Select_1 = class Select extends webcomponentsBase.S {
         constructor() {
             super(...arguments);
             /**
@@ -258,6 +285,14 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
              * @public
              */
             this.readonly = false;
+            /**
+             * Defines the separator type for the two columns layout when Select is in read-only mode.
+             *
+             * @default "Dash"
+             * @public
+             * @since 2.16.0
+             */
+            this.textSeparator = "Dash";
             /**
              * @private
              */
@@ -310,7 +345,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         }
         onBeforeRendering() {
             this._applySelection();
-            this.style.setProperty(Theme.d$1("--_ui5-input-icons-count"), `${this.iconsCount}`);
+            this.style.setProperty("--_ui5-input-icons-count", `${this.iconsCount}`);
         }
         onAfterRendering() {
             this.toggleValueStatePopover(this.shouldOpenValueStateMessagePopover);
@@ -416,8 +451,57 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         get selectedOption() {
             return this.options.find(option => option.selected);
         }
+        /**
+         * Helper function to build display text with separator when additional text exists
+         * @param mainText - The main text content
+         * @param additionalText - The additional text (optional)
+         * @returns The combined text with separator if additionalText exists, otherwise just mainText
+         * @private
+         */
+        _buildDisplayText(mainText, additionalText) {
+            if (!additionalText) {
+                return mainText;
+            }
+            return `${mainText} ${this._separatorSymbol} ${additionalText}`;
+        }
         get text() {
-            return this.selectedOption?.effectiveDisplayText;
+            const selectedOption = this.selectedOption;
+            if (!selectedOption) {
+                return "";
+            }
+            // Only show separator when readonly and there's additional text
+            if (this.readonly && selectedOption.additionalText) {
+                return this._buildDisplayText(selectedOption.effectiveDisplayText, selectedOption.additionalText);
+            }
+            return selectedOption.effectiveDisplayText;
+        }
+        get _effectiveTooltip() {
+            // User-defined tooltip takes precedence
+            if (this.tooltip) {
+                return this.tooltip;
+            }
+            // Provide default tooltip for readonly mode to show full content
+            if (this.readonly) {
+                const selectedOption = this.selectedOption;
+                if (!selectedOption) {
+                    return undefined;
+                }
+                // Use textContent for tooltip to show actual text content, not display text
+                const mainText = selectedOption.textContent || "";
+                return this._buildDisplayText(mainText, selectedOption.additionalText);
+            }
+            return undefined;
+        }
+        get _separatorSymbol() {
+            switch (this.textSeparator) {
+                case SelectTextSeparator$1.Bullet:
+                    return "·"; // Middle dot (U+00B7)
+                case SelectTextSeparator$1.VerticalLine:
+                    return "|"; // Vertical line (U+007C)
+                case SelectTextSeparator$1.Dash:
+                default:
+                    return "–"; // En dash (U+2013)
+            }
         }
         _toggleRespPopover() {
             if (this.disabled || this.readonly) {
@@ -445,7 +529,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             else if (webcomponentsBase.A(e)) {
                 e.preventDefault();
             }
-            else if (webcomponentsBase.m$2(e) && this._isPickerOpen) {
+            else if (webcomponentsBase.m$1(e) && this._isPickerOpen) {
                 this._escapePressed = true;
             }
             else if (webcomponentsBase.M(e)) {
@@ -453,16 +537,22 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             }
             else if (webcomponentsBase.n(e)) {
                 this._handleEndKey(e);
+                // When focus is on the list item, Enter triggers _handleItemPress via the List item-click
+                // event, which already calls _handleSelectionChange and prevents default.
+                // Skip here to avoid a double selection change.
             }
-            else if (webcomponentsBase.b$1(e)) {
+            else if (webcomponentsBase.b(e) && !e.defaultPrevented) {
                 this._handleSelectionChange();
             }
             else if (webcomponentsBase.P(e) || webcomponentsBase._(e)) {
                 this._handleArrowNavigation(e);
             }
+            else if (isPrintableCharacter(e)) {
+                this._handleKeyboardNavigation(e);
+            }
         }
         _handleKeyboardNavigation(e) {
-            if (webcomponentsBase.b$1(e) || this.readonly) {
+            if (this.readonly) {
                 return;
             }
             const typedCharacter = e.key.toLowerCase();
@@ -653,9 +743,9 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         _applyFocusToSelectedItem() {
             this.options.forEach(option => {
                 option.focused = option.selected;
-                if (option.focused && Theme.d()) {
-                    // on phone, the popover opens full screen (dialog)
-                    // move focus to option to read out dialog header
+                if (option.focused) {
+                    // move focus to the selected option so screen readers
+                    // can announce it when the popover opens
                     option.focus();
                 }
             });
@@ -734,6 +824,9 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         get _headerTitleText() {
             return Select_1.i18nBundle.getText(i18nDefaults.INPUT_SUGGESTIONS_TITLE);
         }
+        get _cancelButtonText() {
+            return Select_1.i18nBundle.getText(i18nDefaults.SELECT_DIALOG_CANCEL_BUTTON);
+        }
         get _currentlySelectedOption() {
             return this.options[this._selectedIndex];
         }
@@ -773,6 +866,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             };
         }
         get styles() {
+            const remSizeInPx = parseInt(getComputedStyle(document.documentElement).fontSize);
             return {
                 popoverHeader: {
                     "display": "block",
@@ -784,6 +878,8 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
                 },
                 responsivePopover: {
                     "min-width": `${this.offsetWidth}px`,
+                    "max-width": (this.offsetWidth / remSizeInPx) > 40 ? `${this.offsetWidth}px` : "40rem",
+                    "margin-top": "var(--sapField_BorderWidth)",
                 },
             };
         }
@@ -812,7 +908,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             const itemPositionText = Select_1.i18nBundle.getText(i18nDefaults.LIST_ITEM_POSITION, this._selectedIndex + 1, optionsCount);
             if (this.focused && this._currentlySelectedOption) {
                 text = `${this._currentlySelectedOption.textContent} ${this._isPickerOpen ? itemPositionText : ""}`;
-                p(text);
+                InvisibleMessage.p(text);
             }
         }
         openValueStatePopover() {
@@ -845,6 +941,17 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         get ariaDescribedByIds() {
             const ids = [this.valueStateTextId, this.ariaDescriptionTextId].filter(Boolean);
             return ids.length ? ids.join(" ") : undefined;
+        }
+        get accessibilityInfo() {
+            return {
+                role: "combobox",
+                type: this._ariaRoleDescription,
+                description: this.text,
+                label: this.ariaLabelText,
+                readonly: this.readonly,
+                required: this.required,
+                disabled: this.disabled,
+            };
         }
         _updateAssociatedLabelsTexts() {
             this._associatedDescriptionRefTexts = AccessibilityTextsHelper.p(this);
@@ -887,6 +994,9 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         webcomponentsBase.s()
     ], Select.prototype, "tooltip", void 0);
     __decorate$5([
+        webcomponentsBase.s()
+    ], Select.prototype, "textSeparator", void 0);
+    __decorate$5([
         webcomponentsBase.s({ type: String, noAttribute: true })
     ], Select.prototype, "_associatedDescriptionRefTexts", void 0);
     __decorate$5([
@@ -914,14 +1024,14 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         webcomponentsBase.s()
     ], Select.prototype, "value", null);
     __decorate$5([
-        parametersBundle_css$1.i("@ui5/webcomponents")
+        parametersBundle_css.i("@ui5/webcomponents")
     ], Select, "i18nBundle", void 0);
     Select = Select_1 = __decorate$5([
         webcomponentsBase.m({
             tag: "ui5-select",
             languageAware: true,
             formAssociated: true,
-            renderer: parametersBundle_css.y,
+            renderer: jsxRuntime.y,
             template: SelectTemplate,
             styles: [
                 selectCss,
@@ -992,14 +1102,14 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
     var Select$1 = Select;
 
     function SearchFieldTemplate(options) {
-        return (!options?.forceExpanded && this.collapsed ? (parametersBundle_css.jsx(Button.Button, { class: "ui5-shell-search-field-button", icon: slimArrowDown.search, design: Button.ButtonDesign.Transparent, "data-sap-focus-ref": true, onClick: this._handleSearchIconPress, tooltip: this._effectiveIconTooltip, accessibleName: this._effectiveIconTooltip, accessibilityAttributes: this._searchButtonAccessibilityAttributes })) : (parametersBundle_css.jsx("div", { class: "ui5-search-field-root", role: "search", onFocusOut: this._onFocusOutSearch, children: parametersBundle_css.jsxs("div", { class: "ui5-search-field-content", children: [this.scopes?.length ? (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [parametersBundle_css.jsx(Select$1, { onChange: this._handleScopeChange, class: "sapUiSizeCompact ui5-search-field-select", accessibleName: this._translations.scope, tooltip: this._translations.scope, children: this.scopes.map(scopeOption => (parametersBundle_css.jsx(Option$1, { selected: scopeOption.selected, "data-ui5-stable": scopeOption.stableDomRef, ref: this.captureRef.bind(scopeOption), children: scopeOption.text }))) }), parametersBundle_css.jsx("div", { class: "ui5-search-field-separator" })] })) : this.filterButton?.length ? (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [parametersBundle_css.jsx("div", { class: "ui5-filter-wrapper", style: "display: contents", children: parametersBundle_css.jsx("slot", { name: "filterButton" }) }), parametersBundle_css.jsx("div", { class: "ui5-search-field-separator" })] })) : null, parametersBundle_css.jsx("input", { class: "ui5-search-field-inner-input", role: "searchbox", "aria-description": this.accessibleDescription, "aria-label": this.accessibleName || this._translations.searchFieldAriaLabel, value: this.value, placeholder: this.placeholder, "data-sap-focus-ref": true, onInput: this._handleInput, onFocusIn: this._onfocusin, onFocusOut: this._onfocusout, onKeyDown: this._onkeydown, onClick: this._handleInnerClick }), this._effectiveShowClearIcon &&
-                        parametersBundle_css.jsx(Icon.Icon, { class: "ui5-shell-search-field-icon", name: information.decline, showTooltip: true, accessibleName: this._translations.clearIcon, onClick: this._handleClear }), parametersBundle_css.jsx(Icon.Icon, { class: {
-                            "ui5-shell-search-field-icon": true,
-                            "ui5-shell-search-field-search-icon": this._isSearchIcon,
-                        }, name: slimArrowDown.search, showTooltip: true, accessibleName: this._effectiveIconTooltip, onClick: this._handleSearchIconPress })] }) })));
+        return (!options?.forceExpanded && this.collapsed ? (jsxRuntime.jsx(Button.Button, { class: "ui5-shell-search-field-button", icon: search.search, design: Button.ButtonDesign.Transparent, "data-sap-focus-ref": true, loading: this.fieldLoading, onClick: this._handleSearchIconPress, tooltip: this._effectiveIconTooltip, accessibleName: this._effectiveIconTooltip, accessibilityAttributes: this._searchButtonAccessibilityAttributes })) : (jsxRuntime.jsx(BusyIndicator.BusyIndicator, { class: "ui5-search-field-busy-indicator", active: this.fieldLoading, children: jsxRuntime.jsx("div", { class: "ui5-search-field-root", role: "search", onFocusOut: this._onFocusOutSearch, children: jsxRuntime.jsxs("div", { class: "ui5-search-field-content", children: [this.scopes?.length ? (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsx(Select$1, { onChange: this._handleScopeChange, class: "ui5-search-field-select", accessibleName: this._translations.scope, tooltip: this._translations.scope, value: this.scopeValue, children: this.scopes.map(scopeOption => (jsxRuntime.jsx(Option$1, { value: scopeOption.value, "data-ui5-stable": scopeOption.stableDomRef, ref: this.captureRef.bind(scopeOption), children: scopeOption.text }))) }), jsxRuntime.jsx("div", { class: "ui5-search-field-separator" })] })) : this.filterButton?.length ? (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsx("div", { class: "ui5-filter-wrapper", style: "display: contents", children: jsxRuntime.jsx("slot", { name: "filterButton" }) }), jsxRuntime.jsx("div", { class: "ui5-search-field-separator" })] })) : null, jsxRuntime.jsx("input", { class: "ui5-search-field-inner-input", role: "searchbox", "aria-description": this.accessibleDescription, "aria-label": this.accessibleName || this._translations.searchFieldAriaLabel, "aria-autocomplete": "both", "aria-controls": "ui5-search-list", value: this.value, placeholder: this.placeholder, "data-sap-focus-ref": true, onInput: this._handleInput, onFocusIn: this._onfocusin, onFocusOut: this._onfocusout, onKeyDown: this._onkeydown, onClick: this._handleInnerClick }), this._effectiveShowClearIcon &&
+                            jsxRuntime.jsx(Icon.Icon, { class: "ui5-shell-search-field-icon", name: decline.decline, showTooltip: true, accessibleName: this._translations.clearIcon, onClick: this._handleClear }), jsxRuntime.jsx(Icon.Icon, { class: {
+                                "ui5-shell-search-field-icon": true,
+                                "ui5-shell-search-field-search-icon": this._isSearchIcon,
+                            }, name: search.search, showTooltip: true, accessibleName: this._effectiveIconTooltip, onClick: this._handleSearchIconPress })] }) }) })));
     }
 
-    const f=(t,a,e,o)=>{webcomponentsBase.x(t)&&(e!==a.length-1?(t.stopImmediatePropagation(),t.preventDefault(),a[e+1].focus()):(o.closeValueState(),o.focusInput())),webcomponentsBase.V(t)&&(t.preventDefault(),t.stopImmediatePropagation(),e>0?a[e-1].focus():o.focusInput()),webcomponentsBase.P(t)&&(t.preventDefault(),t.stopImmediatePropagation(),o.isPopoverOpen()&&o.focusInput()),webcomponentsBase._(t)&&(t.preventDefault(),t.stopImmediatePropagation(),o.navigateToItem()),webcomponentsBase.m$2(t)&&(t.preventDefault(),t.stopImmediatePropagation());};
+    const f=(t,a,e,o)=>{webcomponentsBase.x(t)&&(e!==a.length-1?(t.stopImmediatePropagation(),t.preventDefault(),a[e+1].focus()):(o.closeValueState(),o.focusInput())),webcomponentsBase.V(t)&&(t.preventDefault(),t.stopImmediatePropagation(),e>0?a[e-1].focus():o.focusInput()),webcomponentsBase.P(t)&&(t.preventDefault(),t.stopImmediatePropagation(),o.isPopoverOpen()&&o.focusInput()),webcomponentsBase._(t)&&(t.preventDefault(),t.stopImmediatePropagation(),o.navigateToItem()),webcomponentsBase.m$1(t)&&(t.preventDefault(),t.stopImmediatePropagation());};
 
     const n=t=>{let e=0;return (t.selectionStart||t.selectionStart===0)&&(e=t.selectionDirection==="backward"?t.selectionStart:t.selectionEnd),e},o=(t,e)=>{t.selectionStart?(t.focus(),t.setSelectionRange(e,e)):t.focus();};
 
@@ -1050,49 +1160,106 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
 
     function InputPopoverTemplate(hooks) {
         const suggestionsList = hooks?.suggestionsList;
-        return (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [this._effectiveShowSuggestions && this.Suggestions?.template.call(this, { suggestionsList, valueStateMessage, valueStateMessageInputIcon }), this.hasValueStateMessage &&
-                    parametersBundle_css.jsx(ResponsivePopover.Popover, { preventInitialFocus: true, preventFocusRestore: true, hideArrow: true, class: "ui5-valuestatemessage-popover", placement: "Bottom", tabindex: -1, horizontalAlign: this._valueStatePopoverHorizontalAlign, opener: this, open: this.valueStateOpen, onClose: this._handleValueStatePopoverAfterClose, children: parametersBundle_css.jsxs("div", { slot: "header", class: this.classes.popoverValueState, children: [parametersBundle_css.jsx(Icon.Icon, { class: "ui5-input-value-state-message-icon", name: valueStateMessageInputIcon.call(this) }), this.valueStateOpen && valueStateMessage.call(this)] }) })] }));
+        const mobileHeader = hooks?.mobileHeader;
+        return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [this._effectiveShowSuggestions && this.Suggestions?.template.call(this, {
+                    suggestionsList,
+                    mobileHeader,
+                    valueStateMessage,
+                    valueStateMessageInputIcon
+                }), this.hasValueStateMessage && (jsxRuntime.jsx(ResponsivePopover.Popover, { preventInitialFocus: true, preventFocusRestore: true, hideArrow: true, class: "ui5-valuestatemessage-popover", placement: "Bottom", tabindex: -1, horizontalAlign: ResponsivePopover.PopoverHorizontalAlign.Start, opener: this, open: this.valueStateOpen, onClose: this._handleValueStatePopoverAfterClose, children: jsxRuntime.jsxs("div", { slot: "header", class: this.classes.popoverValueState, children: [jsxRuntime.jsx(Icon.Icon, { class: "ui5-input-value-state-message-icon", name: valueStateMessageInputIcon.call(this) }), this.valueStateOpen && valueStateMessage.call(this)] }) }))] }));
     }
     function valueStateMessage() {
-        return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: this.shouldDisplayDefaultValueStateMessage ? this.valueStateText : parametersBundle_css.jsx("slot", { name: "valueStateMessage" }) }));
+        return (jsxRuntime.jsx(jsxRuntime.Fragment, { children: this.shouldDisplayDefaultValueStateMessage ? this.valueStateText : jsxRuntime.jsx("slot", { name: "valueStateMessage" }) }));
     }
     function valueStateMessageInputIcon() {
         const iconPerValueState = {
-            Negative: information$1.error,
-            Critical: information$1.alert,
+            Negative: information.error,
+            Critical: information.alert,
             Positive: sysEnter2.selectedAccount,
-            Information: information$1.information,
+            Information: information.information,
         };
         return this.valueState !== ValueState.o.None ? iconPerValueState[this.valueState] : "";
     }
 
     function InputTemplate(hooks) {
         const suggestionsList = hooks?.suggestionsList;
+        const mobileHeader = hooks?.mobileHeader;
         const preContent = hooks?.preContent || defaultPreContent;
         const postContent = hooks?.postContent || defaultPostContent;
-        return (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [parametersBundle_css.jsx("div", { class: "ui5-input-root ui5-input-focusable-element", part: "root", onFocusIn: this._onfocusin, onFocusOut: this._onfocusout, children: parametersBundle_css.jsxs("div", { class: "ui5-input-content", children: [preContent.call(this), parametersBundle_css.jsx("input", { id: "inner", part: "input", class: "ui5-input-inner", style: this.styles.innerInput, type: this.inputNativeType, "inner-input": true, "inner-input-with-icon": !!this.icon.length, disabled: this.disabled, readonly: this._readonly, value: this._innerValue, placeholder: this._placeholder, maxlength: this.maxlength, role: this.accInfo.role, enterkeyhint: this.hint, "aria-controls": this.accInfo.ariaControls, "aria-invalid": this.accInfo.ariaInvalid, "aria-haspopup": this.accInfo.ariaHasPopup, "aria-describedby": this.accInfo.ariaDescribedBy, "aria-roledescription": this.accInfo.ariaRoledescription, "aria-autocomplete": this.accInfo.ariaAutoComplete, "aria-expanded": this.accInfo.ariaExpanded, "aria-label": this.accInfo.ariaLabel, "aria-required": this.required, autocomplete: "off", "data-sap-focus-ref": true, step: this.nativeInputAttributes.step, min: this.nativeInputAttributes.min, max: this.nativeInputAttributes.max, onInput: this._handleNativeInput, onChange: this._handleChange, onSelect: this._handleSelect, onKeyDown: this._onkeydown, onKeyUp: this._onkeyup, onClick: this._click, onFocusIn: this.innerFocusIn }), this._effectiveShowClearIcon &&
-                                parametersBundle_css.jsx("div", { tabindex: -1, class: "ui5-input-clear-icon-wrapper inputIcon", part: "clear-icon-wrapper", onClick: this._clear, onMouseDown: this._iconMouseDown, children: parametersBundle_css.jsx(Icon.Icon, { part: "clear-icon", class: "ui5-input-clear-icon", name: information.decline, tabindex: -1, accessibleName: this.clearIconAccessibleName }) }), this.icon.length > 0 &&
-                                parametersBundle_css.jsx("div", { class: "ui5-input-icon-root", tabindex: -1, children: parametersBundle_css.jsx("slot", { name: "icon" }) }), parametersBundle_css.jsx("div", { class: "ui5-input-value-state-icon", children: this._valueStateInputIcon }), postContent.call(this), this._effectiveShowSuggestions &&
-                                parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [parametersBundle_css.jsx("span", { id: "suggestionsText", class: "ui5-hidden-text", children: this.suggestionsText }), parametersBundle_css.jsx("span", { id: "selectionText", class: "ui5-hidden-text", "aria-live": "polite", role: "status" }), parametersBundle_css.jsx("span", { id: "suggestionsCount", class: "ui5-hidden-text", "aria-live": "polite", children: this.availableSuggestionsCount })] }), this.accInfo.ariaDescription &&
-                                parametersBundle_css.jsx("span", { id: "descr", class: "ui5-hidden-text", children: this.accInfo.ariaDescription }), this.accInfo.accessibleDescription &&
-                                parametersBundle_css.jsx("span", { id: "accessibleDescription", class: "ui5-hidden-text", children: this.accInfo.accessibleDescription }), this.linksInAriaValueStateHiddenText.length > 0 &&
-                                parametersBundle_css.jsx("span", { id: "hiddenText-value-state-link-shortcut", class: "ui5-hidden-text", children: this.valueStateLinksShortcutsTextAcc }), this.hasValueState &&
-                                parametersBundle_css.jsx("span", { id: "valueStateDesc", class: "ui5-hidden-text", children: this.ariaValueStateHiddenText })] }) }), InputPopoverTemplate.call(this, { suggestionsList })] }));
+        return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsx("div", { class: "ui5-input-root ui5-input-focusable-element", part: "root", onFocusIn: this._onfocusin, onFocusOut: this._onfocusout, children: jsxRuntime.jsxs("div", { class: "ui5-input-content", children: [preContent.call(this), jsxRuntime.jsx("input", { id: "inner", part: "input", class: "ui5-input-inner", style: this.styles.innerInput, type: this.inputNativeType, "inner-input": true, "inner-input-with-icon": this.iconsCount > 0, disabled: this.disabled, readonly: this._readonly, value: this.value, required: this.required, placeholder: this._placeholder, maxlength: this.maxlength, role: this.accInfo.role, enterkeyhint: this.hint, "aria-controls": this.accInfo.ariaControls, "aria-invalid": this.accInfo.ariaInvalid, "aria-haspopup": this.accInfo.ariaHasPopup, "aria-describedby": this.accInfo.ariaDescribedBy, "aria-roledescription": this.accInfo.ariaRoledescription, "aria-autocomplete": this.accInfo.ariaAutoComplete, "aria-expanded": this.accInfo.ariaExpanded, "aria-label": this.accInfo.ariaLabel, "aria-required": this.required, autocomplete: "off", "data-sap-focus-ref": true, step: this.nativeInputAttributes.step, min: this.nativeInputAttributes.min, max: this.nativeInputAttributes.max, onInput: this._handleNativeInput, onChange: this._handleChange, onSelect: this._handleSelect, onKeyDown: this._onkeydown, onKeyUp: this._onkeyup, onClick: this._click, onFocusIn: this.innerFocusIn }), this._effectiveShowClearIcon &&
+                                jsxRuntime.jsx("div", { tabindex: -1, class: "ui5-input-clear-icon-wrapper inputIcon", part: "clear-icon-wrapper", onClick: this._clear, onMouseDown: this._iconMouseDown, children: jsxRuntime.jsx(Icon.Icon, { part: "clear-icon", class: "ui5-input-clear-icon", name: decline.decline, tabindex: -1, accessibleName: this.clearIconAccessibleName }) }), this.icon.length > 0 &&
+                                jsxRuntime.jsx("div", { class: "ui5-input-icon-root", tabindex: -1, children: jsxRuntime.jsx("slot", { name: "icon" }) }), jsxRuntime.jsx("div", { class: "ui5-input-value-state-icon", children: this._valueStateInputIcon }), postContent.call(this), this._effectiveShowSuggestions &&
+                                jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsx("span", { id: "suggestionsText", class: "ui5-hidden-text", children: this.suggestionsText }), jsxRuntime.jsx("span", { id: "selectionText", class: "ui5-hidden-text", "aria-live": "polite", role: "status" }), jsxRuntime.jsx("span", { id: "suggestionsCount", class: "ui5-hidden-text", "aria-live": "polite", children: this.availableSuggestionsCount })] }), this.accInfo.ariaDescription &&
+                                jsxRuntime.jsx("span", { id: "descr", class: "ui5-hidden-text", children: this.accInfo.ariaDescription }), this.accInfo.accessibleDescription &&
+                                jsxRuntime.jsx("span", { id: "accessibleDescription", class: "ui5-hidden-text", children: this.accInfo.accessibleDescription }), this.linksInAriaValueStateHiddenText.length > 0 &&
+                                jsxRuntime.jsx("span", { id: "hiddenText-value-state-link-shortcut", class: "ui5-hidden-text", children: this.valueStateLinksShortcutsTextAcc }), this.hasValueState &&
+                                jsxRuntime.jsx("span", { id: "valueStateDesc", class: "ui5-hidden-text", children: this.ariaValueStateHiddenText })] }) }), InputPopoverTemplate.call(this, { suggestionsList, mobileHeader })] }));
     }
     function defaultPreContent() { }
     function defaultPostContent() { }
 
+    const escapeReg = /[[\]{}()*+?.\\^$|]/g;
+    const escapeRegExp = (str) => {
+        return str.replace(escapeReg, "\\$&");
+    };
+    const StartsWithPerTerm = (value, items, propName) => {
+        const reg = new RegExp(`(^|\\s)${escapeRegExp(value.toLowerCase())}.*`, "g");
+        return items.filter(item => {
+            const text = item[propName];
+            reg.lastIndex = 0;
+            return reg.test(text.toLowerCase());
+        });
+    };
     const StartsWith = (value, items, propName) => items.filter(item => (item[propName] || "").toLowerCase().startsWith(value.toLowerCase()));
+    const Contains = (value, items, propName) => items.filter(item => (item[propName] || "").toLowerCase().includes(value.toLowerCase()));
+    const None = (_, items) => items;
 
-    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
-    var inputStyles = `:host{vertical-align:middle}.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}.inputIcon{color:var(--_ui5-v2-15-0_input_icon_color);cursor:pointer;outline:none;padding:var(--_ui5-v2-15-0_input_icon_padding);border-inline-start:var(--_ui5-v2-15-0_input_icon_border);min-width:1rem;min-height:1rem;border-radius:var(--_ui5-v2-15-0_input_icon_border_radius)}.inputIcon.inputIcon--pressed{background:var(--_ui5-v2-15-0_input_icon_pressed_bg);box-shadow:var(--_ui5-v2-15-0_input_icon_box_shadow);border-inline-start:var(--_ui5-v2-15-0_select_hover_icon_left_border);color:var(--_ui5-v2-15-0_input_icon_pressed_color)}.inputIcon:active{background-color:var(--sapButton_Active_Background);box-shadow:var(--_ui5-v2-15-0_input_icon_box_shadow);border-inline-start:var(--_ui5-v2-15-0_select_hover_icon_left_border);color:var(--_ui5-v2-15-0_input_icon_pressed_color)}.inputIcon:not(.inputIcon--pressed):not(:active):hover{background:var(--_ui5-v2-15-0_input_icon_hover_bg);box-shadow:var(--_ui5-v2-15-0_input_icon_box_shadow)}.inputIcon:hover{border-inline-start:var(--_ui5-v2-15-0_select_hover_icon_left_border);box-shadow:var(--_ui5-v2-15-0_input_icon_box_shadow)}:host(:not([hidden])){display:inline-block}:host{width:var(--_ui5-v2-15-0_input_width);min-width:calc(var(--_ui5-v2-15-0_input_min_width) + (var(--_ui5-v2-15-0-input-icons-count)*var(--_ui5-v2-15-0_input_icon_width)));margin:var(--_ui5-v2-15-0_input_margin_top_bottom) 0;height:var(--_ui5-v2-15-0_input_height);color:var(--sapField_TextColor);font-size:var(--sapFontSize);font-family:var(--sapFontFamily);font-style:normal;border:var(--_ui5-v2-15-0-input-border);border-radius:var(--_ui5-v2-15-0_input_border_radius);box-sizing:border-box;text-align:start;transition:var(--_ui5-v2-15-0_input_transition);background:var(--sapField_BackgroundStyle);background-color:var(--_ui5-v2-15-0_input_background_color)}:host(:not([readonly])),:host([readonly][disabled]){box-shadow:var(--sapField_Shadow)}:host([focused]:not([opened])){border-color:var(--_ui5-v2-15-0_input_focused_border_color);background-color:var(--sapField_Focus_Background)}.ui5-input-focusable-element{position:relative}:host([focused]:not([opened])) .ui5-input-focusable-element:after{content:var(--ui5-v2-15-0_input_focus_pseudo_element_content);position:absolute;pointer-events:none;z-index:2;border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--_ui5-v2-15-0_input_focus_outline_color);border-radius:var(--_ui5-v2-15-0_input_focus_border_radius);top:var(--_ui5-v2-15-0_input_focus_offset);bottom:var(--_ui5-v2-15-0_input_focus_offset);left:var(--_ui5-v2-15-0_input_focus_offset);right:var(--_ui5-v2-15-0_input_focus_offset)}:host([focused][readonly]:not([opened])) .ui5-input-focusable-element:after{top:var(--_ui5-v2-15-0_input_readonly_focus_offset);bottom:var(--_ui5-v2-15-0_input_readonly_focus_offset);left:var(--_ui5-v2-15-0_input_readonly_focus_offset);right:var(--_ui5-v2-15-0_input_readonly_focus_offset);border-radius:var(--_ui5-v2-15-0_input_readonly_focus_border_radius)}.ui5-input-root:before{content:"";position:absolute;width:calc(100% - 2px);left:1px;bottom:-2px;border-bottom-left-radius:8px;border-bottom-right-radius:8px;height:var(--_ui5-v2-15-0_input_bottom_border_height);transition:var(--_ui5-v2-15-0_input_transition);background-color:var(--_ui5-v2-15-0_input_bottom_border_color)}.ui5-input-root{width:100%;height:100%;position:relative;background:transparent;display:inline-block;outline:none;box-sizing:border-box;color:inherit;transition:border-color .2s ease-in-out;border-radius:var(--_ui5-v2-15-0_input_border_radius);overflow:hidden}:host([disabled]){opacity:var(--_ui5-v2-15-0_input_disabled_opacity);cursor:default;pointer-events:none;background-color:var(--_ui5-v2-15-0-input_disabled_background);border-color:var(--_ui5-v2-15-0_input_disabled_border_color)}:host([disabled]) .ui5-input-root:before,:host([readonly]) .ui5-input-root:before{content:none}[inner-input]{background:transparent;color:inherit;border:none;font-style:inherit;-webkit-appearance:none;-moz-appearance:textfield;padding:var(--_ui5-v2-15-0_input_inner_padding);box-sizing:border-box;width:100%;text-overflow:ellipsis;flex:1;outline:none;font-size:inherit;font-family:inherit;line-height:inherit;letter-spacing:inherit;word-spacing:inherit;text-align:inherit}[inner-input][inner-input-with-icon]{padding:var(--_ui5-v2-15-0_input_inner_padding_with_icon)}[inner-input][type=search]::-webkit-search-decoration,[inner-input][type=search]::-webkit-search-cancel-button,[inner-input][type=search]::-webkit-search-results-button,[inner-input][type=search]::-webkit-search-results-decoration{display:none}[inner-input]::-ms-reveal,[inner-input]::-ms-clear{display:none}.ui5-input-value-state-icon{height:100%;display:var(--_ui5-v2-15-0-input-value-state-icon-display);align-items:center}.ui5-input-value-state-icon>svg{margin-right:8px}[inner-input]::selection{background:var(--sapSelectedColor);color:var(--sapContent_ContrastTextColor)}:host([disabled]) [inner-input]::-webkit-input-placeholder{visibility:hidden}:host([readonly]) [inner-input]::-webkit-input-placeholder{visibility:hidden}:host([disabled]) [inner-input]::-moz-placeholder{visibility:hidden}:host([readonly]) [inner-input]::-moz-placeholder{visibility:hidden}[inner-input]::-webkit-input-placeholder{font-weight:400;font-style:var(--_ui5-v2-15-0_input_placeholder_style);color:var(--_ui5-v2-15-0_input_placeholder_color);padding-right:.125rem}[inner-input]::-moz-placeholder{font-weight:400;font-style:var(--_ui5-v2-15-0_input_placeholder_style);color:var(--_ui5-v2-15-0_input_placeholder_color);padding-right:.125rem}:host([value-state="Negative"]) [inner-input]::-webkit-input-placeholder{color:var(--_ui5-v2-15-0-input_error_placeholder_color);font-weight:var(--_ui5-v2-15-0_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Negative"]) [inner-input]::-moz-placeholder{color:var(--_ui5-v2-15-0-input_error_placeholder_color);font-weight:var(--_ui5-v2-15-0_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Critical"]) [inner-input]::-webkit-input-placeholder{font-weight:var(--_ui5-v2-15-0_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Critical"]) [inner-input]::-moz-placeholder{font-weight:var(--_ui5-v2-15-0_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Positive"]) [inner-input]::-webkit-input-placeholder{color:var(--_ui5-v2-15-0_input_placeholder_color)}:host([value-state="Positive"]) [inner-input]::-moz-placeholder{color:var(--_ui5-v2-15-0_input_placeholder_color)}:host([value-state="Information"]) [inner-input]::-webkit-input-placeholder{color:var(--_ui5-v2-15-0_input_placeholder_color)}:host([value-state="Information"]) [inner-input]::-moz-placeholder{color:var(--_ui5-v2-15-0_input_placeholder_color)}.ui5-input-content{height:100%;box-sizing:border-box;display:flex;flex-direction:row;justify-content:flex-end;overflow:hidden;outline:none;background:transparent;color:inherit;border-radius:var(--_ui5-v2-15-0_input_border_radius)}:host([readonly]:not([disabled])){border:var(--_ui5-v2-15-0_input_readonly_border);background:var(--sapField_ReadOnly_BackgroundStyle);background-color:var(--_ui5-v2-15-0_input_readonly_background)}:host([value-state="None"]:not([readonly]):hover),:host(:not([value-state]):not([readonly]):hover){border:var(--_ui5-v2-15-0_input_hover_border);border-color:var(--_ui5-v2-15-0_input_focused_border_color);box-shadow:var(--sapField_Hover_Shadow);background:var(--sapField_Hover_BackgroundStyle);background-color:var(--sapField_Hover_Background)}:host(:not([value-state]):not([readonly])[focused]:not([opened]):hover),:host([value-state="None"]:not([readonly])[focused]:not([opened]):hover){box-shadow:none}:host([focused]):not([opened]) .ui5-input-root:before{content:none}:host(:not([readonly]):not([disabled])[value-state]:not([value-state="None"])){border-width:var(--_ui5-v2-15-0_input_state_border_width)}:host([value-state="Negative"]) [inner-input],:host([value-state="Critical"]) [inner-input]{font-style:var(--_ui5-v2-15-0_input_error_warning_font_style);text-indent:var(--_ui5-v2-15-0_input_error_warning_text_indent)}:host([value-state="Negative"]) [inner-input]{font-weight:var(--_ui5-v2-15-0_input_error_font_weight)}:host([value-state="Critical"]) [inner-input]{font-weight:var(--_ui5-v2-15-0_input_warning_font_weight)}:host([value-state="Negative"]:not([readonly]):not([disabled])){background:var(--sapField_InvalidBackgroundStyle);background-color:var(--sapField_InvalidBackground);border-color:var(--_ui5-v2-15-0_input_value_state_error_border_color);box-shadow:var(--sapField_InvalidShadow)}:host([value-state="Negative"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5-v2-15-0_input_focused_value_state_error_background);border-color:var(--_ui5-v2-15-0_input_focused_value_state_error_border_color)}:host([value-state="Negative"][focused]:not([opened]):not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5-v2-15-0_input_focused_value_state_error_focus_outline_color)}:host([value-state="Negative"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5-v2-15-0-input-value-state-error-border-botom-color)}:host([value-state="Negative"]:not([readonly]):not([focused]):hover),:host([value-state="Negative"]:not([readonly])[focused][opened]:hover){background-color:var(--_ui5-v2-15-0_input_value_state_error_hover_background);box-shadow:var(--sapField_Hover_InvalidShadow)}:host([value-state="Negative"]:not([readonly]):not([disabled])),:host([value-state="Critical"]:not([readonly]):not([disabled])),:host([value-state="Information"]:not([readonly]):not([disabled])){border-style:var(--_ui5-v2-15-0_input_error_warning_border_style)}:host([value-state="Critical"]:not([readonly]):not([disabled])){background:var(--sapField_WarningBackgroundStyle);background-color:var(--sapField_WarningBackground);border-color:var(--_ui5-v2-15-0_input_value_state_warning_border_color);box-shadow:var(--sapField_WarningShadow)}:host([value-state="Critical"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5-v2-15-0_input_focused_value_state_warning_background);border-color:var(--_ui5-v2-15-0_input_focused_value_state_warning_border_color)}:host([value-state="Critical"][focused]:not([opened]):not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5-v2-15-0_input_focused_value_state_warning_focus_outline_color)}:host([value-state="Critical"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5-v2-15-0_input_value_state_warning_border_botom_color)}:host([value-state="Critical"]:not([readonly]):not([focused]):hover),:host([value-state="Critical"]:not([readonly])[focused][opened]:hover){background-color:var(--sapField_Hover_Background);box-shadow:var(--sapField_Hover_WarningShadow)}:host([value-state="Positive"]:not([readonly]):not([disabled])){background:var(--sapField_SuccessBackgroundStyle);background-color:var(--sapField_SuccessBackground);border-color:var(--_ui5-v2-15-0_input_value_state_success_border_color);border-width:var(--_ui5-v2-15-0_input_value_state_success_border_width);box-shadow:var(--sapField_SuccessShadow)}:host([value-state="Positive"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5-v2-15-0_input_focused_value_state_success_background);border-color:var(--_ui5-v2-15-0_input_focused_value_state_success_border_color)}:host([value-state="Positive"][focused]:not([opened]):not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5-v2-15-0_input_focused_value_state_success_focus_outline_color)}:host([value-state="Positive"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5-v2-15-0_input_value_state_success_border_botom_color)}:host([value-state="Positive"]:not([readonly]):not([focused]):hover),:host([value-state="Positive"]:not([readonly])[focused][opened]:hover){background-color:var(--sapField_Hover_Background);box-shadow:var(--sapField_Hover_SuccessShadow)}:host([value-state="Information"]:not([readonly]):not([disabled])){background:var(--sapField_InformationBackgroundStyle);background-color:var(--sapField_InformationBackground);border-color:var(--_ui5-v2-15-0_input_value_state_information_border_color);border-width:var(--_ui5-v2-15-0_input_information_border_width);box-shadow:var(--sapField_InformationShadow)}:host([value-state="Information"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5-v2-15-0_input_focused_value_state_information_background);border-color:var(--_ui5-v2-15-0_input_focused_value_state_information_border_color)}:host([value-state="Information"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5-v2-15-0_input_value_success_information_border_botom_color)}:host([value-state="Information"]:not([readonly]):not([focused]):hover),:host([value-state="Information"]:not([readonly])[focused][opened]:hover){background-color:var(--sapField_Hover_Background);box-shadow:var(--sapField_Hover_InformationShadow)}.ui5-input-icon-root{min-width:var(--_ui5-v2-15-0_input_icon_min_width);height:100%;display:flex;justify-content:center;align-items:center}::slotted([ui5-icon][slot="icon"]){align-self:start;padding:var(--_ui5-v2-15-0_input_custom_icon_padding);box-sizing:content-box!important}:host([value-state="Negative"]) .inputIcon,:host([value-state="Critical"]) .inputIcon{padding:var(--_ui5-v2-15-0_input_error_warning_icon_padding)}:host([value-state="Negative"][focused]) .inputIcon,:host([value-state="Critical"][focused]) .inputIcon{padding:var(--_ui5-v2-15-0_input_error_warning_focused_icon_padding)}:host([value-state="Information"]) .inputIcon{padding:var(--_ui5-v2-15-0_input_information_icon_padding)}:host([value-state="Information"][focused]) .inputIcon{padding:var(--_ui5-v2-15-0_input_information_focused_icon_padding)}:host([value-state="Negative"]) ::slotted(.inputIcon[ui5-icon]),:host([value-state="Negative"]) ::slotted([ui5-icon][slot="icon"]),:host([value-state="Critical"]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5-v2-15-0_input_error_warning_custom_icon_padding)}:host([value-state="Negative"][focused]) ::slotted(.inputIcon[ui5-icon]),:host([value-state="Negative"][focused]) ::slotted([ui5-icon][slot="icon"]),:host([value-state="Critical"][focused]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5-v2-15-0_input_error_warning_custom_focused_icon_padding)}:host([value-state="Information"]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5-v2-15-0_input_information_custom_icon_padding)}:host([value-state="Information"][focused]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5-v2-15-0_input_information_custom_focused_icon_padding)}:host([value-state="Negative"]) .inputIcon:active,:host([value-state="Negative"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5-v2-15-0_input_error_icon_box_shadow);color:var(--_ui5-v2-15-0_input_icon_error_pressed_color)}:host([value-state="Negative"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5-v2-15-0_input_error_icon_box_shadow)}:host([value-state="Critical"]) .inputIcon:active,:host([value-state="Critical"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5-v2-15-0_input_warning_icon_box_shadow);color:var(--_ui5-v2-15-0_input_icon_warning_pressed_color)}:host([value-state="Critical"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5-v2-15-0_input_warning_icon_box_shadow)}:host([value-state="Information"]) .inputIcon:active,:host([value-state="Information"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5-v2-15-0_input_information_icon_box_shadow);color:var(--_ui5-v2-15-0_input_icon_information_pressed_color)}:host([value-state="Information"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5-v2-15-0_input_information_icon_box_shadow)}:host([value-state="Positive"]) .inputIcon:active,:host([value-state="Positive"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5-v2-15-0_input_success_icon_box_shadow);color:var(--_ui5-v2-15-0_input_icon_success_pressed_color)}:host([value-state="Positive"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5-v2-15-0_input_success_icon_box_shadow)}.ui5-input-clear-icon-wrapper{height:var(--_ui5-v2-15-0_input_icon_wrapper_height);padding:0;width:var(--_ui5-v2-15-0_input_icon_width);min-width:var(--_ui5-v2-15-0_input_icon_width);display:flex;justify-content:center;align-items:center;box-sizing:border-box}:host([value-state]:not([value-state="None"]):not([value-state="Positive"])) .ui5-input-clear-icon-wrapper{height:var(--_ui5-v2-15-0_input_icon_wrapper_state_height);vertical-align:top}:host([value-state="Positive"]) .ui5-input-clear-icon-wrapper{height:var(--_ui5-v2-15-0_input_icon_wrapper_success_state_height)}[ui5-icon].ui5-input-clear-icon{padding:0;color:inherit}[inner-input]::-webkit-outer-spin-button,[inner-input]::-webkit-inner-spin-button{-webkit-appearance:inherit;margin:inherit}
+    var Filters = /*#__PURE__*/Object.freeze({
+        __proto__: null,
+        Contains: Contains,
+        None: None,
+        StartsWith: StartsWith,
+        StartsWithPerTerm: StartsWithPerTerm
+    });
+
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var inputStyles = `:host{vertical-align:middle}.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}.inputIcon{color:var(--_ui5_input_icon_color);cursor:pointer;outline:none;padding:var(--_ui5_input_icon_padding);border-inline-start:var(--_ui5_input_icon_border);min-width:1rem;min-height:1rem;border-radius:var(--_ui5_input_icon_border_radius)}.inputIcon.inputIcon--pressed{background:var(--_ui5_input_icon_pressed_bg);box-shadow:var(--_ui5_input_icon_box_shadow);border-inline-start:var(--_ui5_select_hover_icon_left_border);color:var(--_ui5_input_icon_pressed_color)}.inputIcon:active{background-color:var(--sapButton_Active_Background);box-shadow:var(--_ui5_input_icon_box_shadow);border-inline-start:var(--_ui5_select_hover_icon_left_border);color:var(--_ui5_input_icon_pressed_color)}.inputIcon:not(.inputIcon--pressed):not(:active):hover{background:var(--_ui5_input_icon_hover_bg);box-shadow:var(--_ui5_input_icon_box_shadow)}.inputIcon:hover{border-inline-start:var(--_ui5_select_hover_icon_left_border);box-shadow:var(--_ui5_input_icon_box_shadow)}:host(:not([hidden])){display:inline-block}:host{width:var(--_ui5_input_width);min-width:calc(var(--_ui5_input_min_width) + (var(--_ui5-input-icons-count)*var(--_ui5_input_icon_width)));margin:var(--_ui5_input_margin_top_bottom) 0;height:var(--_ui5_input_height);color:var(--sapField_TextColor);font-size:var(--sapFontSize);font-family:var(--sapFontFamily);font-style:normal;border:var(--_ui5-input-border);border-radius:var(--_ui5_input_border_radius);box-sizing:border-box;text-align:start;transition:var(--_ui5_input_transition);background:var(--sapField_BackgroundStyle);background-color:var(--_ui5_input_background_color)}:host(:not([readonly])),:host([readonly][disabled]){box-shadow:var(--sapField_Shadow)}:host([focused]:not([opened])){border-color:var(--_ui5_input_focused_border_color);background-color:var(--sapField_Focus_Background)}.ui5-input-focusable-element{position:relative}:host([focused]:not([opened])) .ui5-input-focusable-element:after{content:var(--ui5_input_focus_pseudo_element_content);position:absolute;pointer-events:none;z-index:2;border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--_ui5_input_focus_outline_color);border-radius:var(--_ui5_input_focus_border_radius);top:var(--_ui5_input_focus_offset);bottom:var(--_ui5_input_focus_offset);left:var(--_ui5_input_focus_offset);right:var(--_ui5_input_focus_offset)}:host([focused][readonly]:not([opened])) .ui5-input-focusable-element:after{top:var(--_ui5_input_readonly_focus_offset);bottom:var(--_ui5_input_readonly_focus_offset);left:var(--_ui5_input_readonly_focus_offset);right:var(--_ui5_input_readonly_focus_offset);border-radius:var(--_ui5_input_readonly_focus_border_radius)}.ui5-input-root:before{content:"";position:absolute;width:calc(100% - 2px);left:1px;bottom:-2px;border-bottom-left-radius:8px;border-bottom-right-radius:8px;height:var(--_ui5_input_bottom_border_height);transition:var(--_ui5_input_transition);background-color:var(--_ui5_input_bottom_border_color)}.ui5-input-root{width:100%;height:100%;position:relative;background:transparent;display:inline-block;outline:none;box-sizing:border-box;color:inherit;transition:border-color .2s ease-in-out;border-radius:var(--_ui5_input_border_radius);overflow:hidden}:host([disabled]){opacity:var(--_ui5_input_disabled_opacity);cursor:default;pointer-events:none;background-color:var(--_ui5-input_disabled_background);border-color:var(--_ui5_input_disabled_border_color)}:host([disabled]) .ui5-input-root:before,:host([readonly]) .ui5-input-root:before{content:none}[inner-input]{background:transparent;color:inherit;border:none;font-style:inherit;-webkit-appearance:none;-moz-appearance:textfield;padding:var(--_ui5_input_inner_padding);box-sizing:border-box;width:100%;text-overflow:ellipsis;flex:1;outline:none;font-size:inherit;font-family:inherit;line-height:inherit;letter-spacing:inherit;word-spacing:inherit;text-align:inherit}[inner-input][inner-input-with-icon]{padding:var(--_ui5_input_inner_padding_with_icon)}[inner-input][type=search]::-webkit-search-decoration,[inner-input][type=search]::-webkit-search-cancel-button,[inner-input][type=search]::-webkit-search-results-button,[inner-input][type=search]::-webkit-search-results-decoration{display:none}[inner-input]::-ms-reveal,[inner-input]::-ms-clear{display:none}.ui5-input-value-state-icon{height:100%;display:var(--_ui5-input-value-state-icon-display);align-items:center}.ui5-input-value-state-icon>svg{margin-right:8px}[inner-input]::selection{background:var(--sapSelectedColor);color:var(--sapContent_ContrastTextColor)}:host([disabled]) [inner-input]::-webkit-input-placeholder{visibility:hidden}:host([readonly]) [inner-input]::-webkit-input-placeholder{visibility:hidden}:host([disabled]) [inner-input]::-moz-placeholder{visibility:hidden}:host([readonly]) [inner-input]::-moz-placeholder{visibility:hidden}[inner-input]::-webkit-input-placeholder{font-weight:400;font-style:var(--_ui5_input_placeholder_style);color:var(--_ui5_input_placeholder_color);padding-right:.125rem}[inner-input]::-moz-placeholder{font-weight:400;font-style:var(--_ui5_input_placeholder_style);color:var(--_ui5_input_placeholder_color);padding-right:.125rem}:host([value-state="Negative"]) [inner-input]::-webkit-input-placeholder{color:var(--_ui5-input_error_placeholder_color);font-weight:var(--_ui5_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Negative"]) [inner-input]::-moz-placeholder{color:var(--_ui5-input_error_placeholder_color);font-weight:var(--_ui5_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Critical"]) [inner-input]::-webkit-input-placeholder{font-weight:var(--_ui5_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Critical"]) [inner-input]::-moz-placeholder{font-weight:var(--_ui5_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Positive"]) [inner-input]::-webkit-input-placeholder{color:var(--_ui5_input_placeholder_color)}:host([value-state="Positive"]) [inner-input]::-moz-placeholder{color:var(--_ui5_input_placeholder_color)}:host([value-state="Information"]) [inner-input]::-webkit-input-placeholder{color:var(--_ui5_input_placeholder_color)}:host([value-state="Information"]) [inner-input]::-moz-placeholder{color:var(--_ui5_input_placeholder_color)}.ui5-input-content{height:100%;box-sizing:border-box;display:flex;flex-direction:row;justify-content:flex-end;overflow:hidden;outline:none;background:transparent;color:inherit;border-radius:var(--_ui5_input_border_radius)}:host([readonly]:not([disabled])){border:var(--_ui5_input_readonly_border);background:var(--sapField_ReadOnly_BackgroundStyle);background-color:var(--_ui5_input_readonly_background)}:host([value-state="None"]:not([readonly]):hover),:host(:not([value-state]):not([readonly]):hover){border:var(--_ui5_input_hover_border);border-color:var(--_ui5_input_focused_border_color);box-shadow:var(--sapField_Hover_Shadow);background:var(--sapField_Hover_BackgroundStyle);background-color:var(--sapField_Hover_Background)}:host(:not([value-state]):not([readonly])[focused]:not([opened]):hover),:host([value-state="None"]:not([readonly])[focused]:not([opened]):hover){box-shadow:none}:host([focused]):not([opened]) .ui5-input-root:before{content:none}:host(:not([readonly]):not([disabled])[value-state]:not([value-state="None"])){border-width:var(--_ui5_input_state_border_width)}:host([value-state="Negative"]) [inner-input],:host([value-state="Critical"]) [inner-input]{font-style:var(--_ui5_input_error_warning_font_style);text-indent:var(--_ui5_input_error_warning_text_indent)}:host([value-state="Negative"]) [inner-input]{font-weight:var(--_ui5_input_error_font_weight)}:host([value-state="Critical"]) [inner-input]{font-weight:var(--_ui5_input_warning_font_weight)}:host([value-state="Negative"]:not([readonly]):not([disabled])){background:var(--sapField_InvalidBackgroundStyle);background-color:var(--sapField_InvalidBackground);border-color:var(--_ui5_input_value_state_error_border_color);box-shadow:var(--sapField_InvalidShadow)}:host([value-state="Negative"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5_input_focused_value_state_error_background);border-color:var(--_ui5_input_focused_value_state_error_border_color)}:host([value-state="Negative"][focused]:not([opened]):not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5_input_focused_value_state_error_focus_outline_color)}:host([value-state="Negative"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5-input-value-state-error-border-botom-color)}:host([value-state="Negative"]:not([readonly]):not([focused]):hover),:host([value-state="Negative"]:not([readonly])[focused][opened]:hover){background-color:var(--_ui5_input_value_state_error_hover_background);box-shadow:var(--sapField_Hover_InvalidShadow)}:host([value-state="Negative"]:not([readonly]):not([disabled])),:host([value-state="Critical"]:not([readonly]):not([disabled])),:host([value-state="Information"]:not([readonly]):not([disabled])){border-style:var(--_ui5_input_error_warning_border_style)}:host([value-state="Critical"]:not([readonly]):not([disabled])){background:var(--sapField_WarningBackgroundStyle);background-color:var(--sapField_WarningBackground);border-color:var(--_ui5_input_value_state_warning_border_color);box-shadow:var(--sapField_WarningShadow)}:host([value-state="Critical"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5_input_focused_value_state_warning_background);border-color:var(--_ui5_input_focused_value_state_warning_border_color)}:host([value-state="Critical"][focused]:not([opened]):not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5_input_focused_value_state_warning_focus_outline_color)}:host([value-state="Critical"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5_input_value_state_warning_border_botom_color)}:host([value-state="Critical"]:not([readonly]):not([focused]):hover),:host([value-state="Critical"]:not([readonly])[focused][opened]:hover){background-color:var(--sapField_Hover_Background);box-shadow:var(--sapField_Hover_WarningShadow)}:host([value-state="Positive"]:not([readonly]):not([disabled])){background:var(--sapField_SuccessBackgroundStyle);background-color:var(--sapField_SuccessBackground);border-color:var(--_ui5_input_value_state_success_border_color);border-width:var(--_ui5_input_value_state_success_border_width);box-shadow:var(--sapField_SuccessShadow)}:host([value-state="Positive"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5_input_focused_value_state_success_background);border-color:var(--_ui5_input_focused_value_state_success_border_color)}:host([value-state="Positive"][focused]:not([opened]):not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5_input_focused_value_state_success_focus_outline_color)}:host([value-state="Positive"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5_input_value_state_success_border_botom_color)}:host([value-state="Positive"]:not([readonly]):not([focused]):hover),:host([value-state="Positive"]:not([readonly])[focused][opened]:hover){background-color:var(--sapField_Hover_Background);box-shadow:var(--sapField_Hover_SuccessShadow)}:host([value-state="Information"]:not([readonly]):not([disabled])){background:var(--sapField_InformationBackgroundStyle);background-color:var(--sapField_InformationBackground);border-color:var(--_ui5_input_value_state_information_border_color);border-width:var(--_ui5_input_information_border_width);box-shadow:var(--sapField_InformationShadow)}:host([value-state="Information"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5_input_focused_value_state_information_background);border-color:var(--_ui5_input_focused_value_state_information_border_color)}:host([value-state="Information"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5_input_value_success_information_border_botom_color)}:host([value-state="Information"]:not([readonly]):not([focused]):hover),:host([value-state="Information"]:not([readonly])[focused][opened]:hover){background-color:var(--sapField_Hover_Background);box-shadow:var(--sapField_Hover_InformationShadow)}.ui5-input-icon-root{min-width:var(--_ui5_input_icon_min_width);height:100%;display:flex;justify-content:center;align-items:center}::slotted([ui5-icon][slot="icon"]){align-self:start;padding:var(--_ui5_input_custom_icon_padding);box-sizing:content-box!important}:host([value-state="Negative"]) .inputIcon,:host([value-state="Critical"]) .inputIcon{padding:var(--_ui5_input_error_warning_icon_padding)}:host([value-state="Negative"][focused]) .inputIcon,:host([value-state="Critical"][focused]) .inputIcon{padding:var(--_ui5_input_error_warning_focused_icon_padding)}:host([value-state="Information"]) .inputIcon{padding:var(--_ui5_input_information_icon_padding)}:host([value-state="Information"][focused]) .inputIcon{padding:var(--_ui5_input_information_focused_icon_padding)}:host([value-state="Negative"]) ::slotted(.inputIcon[ui5-icon]),:host([value-state="Negative"]) ::slotted([ui5-icon][slot="icon"]),:host([value-state="Critical"]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5_input_error_warning_custom_icon_padding)}:host([value-state="Negative"][focused]) ::slotted(.inputIcon[ui5-icon]),:host([value-state="Negative"][focused]) ::slotted([ui5-icon][slot="icon"]),:host([value-state="Critical"][focused]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5_input_error_warning_custom_focused_icon_padding)}:host([value-state="Information"]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5_input_information_custom_icon_padding)}:host([value-state="Information"][focused]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5_input_information_custom_focused_icon_padding)}:host([value-state="Negative"]) .inputIcon:active,:host([value-state="Negative"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5_input_error_icon_box_shadow);color:var(--_ui5_input_icon_error_pressed_color)}:host([value-state="Negative"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5_input_error_icon_box_shadow)}:host([value-state="Critical"]) .inputIcon:active,:host([value-state="Critical"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5_input_warning_icon_box_shadow);color:var(--_ui5_input_icon_warning_pressed_color)}:host([value-state="Critical"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5_input_warning_icon_box_shadow)}:host([value-state="Information"]) .inputIcon:active,:host([value-state="Information"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5_input_information_icon_box_shadow);color:var(--_ui5_input_icon_information_pressed_color)}:host([value-state="Information"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5_input_information_icon_box_shadow)}:host([value-state="Positive"]) .inputIcon:active,:host([value-state="Positive"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5_input_success_icon_box_shadow);color:var(--_ui5_input_icon_success_pressed_color)}:host([value-state="Positive"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5_input_success_icon_box_shadow)}.ui5-input-clear-icon-wrapper{height:var(--_ui5_input_icon_wrapper_height);padding:0;width:var(--_ui5_input_icon_width);min-width:var(--_ui5_input_icon_width);display:flex;justify-content:center;align-items:center;box-sizing:border-box}:host([value-state]:not([value-state="None"]):not([value-state="Positive"])) .ui5-input-clear-icon-wrapper{height:var(--_ui5_input_icon_wrapper_state_height);vertical-align:top}:host([value-state="Positive"]) .ui5-input-clear-icon-wrapper{height:var(--_ui5_input_icon_wrapper_success_state_height)}[ui5-icon].ui5-input-clear-icon{padding:0;color:inherit}[inner-input]::-webkit-outer-spin-button,[inner-input]::-webkit-inner-spin-button{-webkit-appearance:inherit;margin:inherit}[ui5-responsive-popover] [ui5-input]{width:100%}
 `;
 
-    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
-    var SuggestionsCss = `.ui5-suggestions-popover{box-shadow:var(--sapContent_Shadow1)}.ui5-suggestions-popover::part(header),.ui5-suggestions-popover::part(content){padding:0}.ui5-suggestions-popover::part(footer){padding:0 1rem}.input-root-phone.native-input-wrapper{display:contents}.input-root-phone.native-input-wrapper:before{display:none}.native-input-wrapper .ui5-input-inner-phone{margin:0}
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var SuggestionsCss = `.ui5-suggestions-popover{box-shadow:var(--sapContent_Shadow1)}.ui5-suggestions-popover::part(header),.ui5-suggestions-popover::part(content){padding:0}.ui5-suggestions-popover::part(footer){padding:0 1rem}.input-root-phone.native-input-wrapper{display:contents}.input-root-phone.native-input-wrapper:before{display:none}.native-input-wrapper .ui5-input-inner-phone{margin:0}.native-input-wrapper .ui5-multi-input-mobile-dialog-button{margin-inline-start:.5rem}
 `;
+
+    /**
+     * Different filtering types of the Input.
+     * @public
+     */
+    var InputSuggestionsFilter;
+    (function (InputSuggestionsFilter) {
+        /**
+         * Defines filtering by first symbol of each word of item's text.
+         * @public
+         */
+        InputSuggestionsFilter["StartsWithPerTerm"] = "StartsWithPerTerm";
+        /**
+         * Defines filtering by starting symbol of item's text.
+         * @public
+         */
+        InputSuggestionsFilter["StartsWith"] = "StartsWith";
+        /**
+         * Defines contains filtering.
+         * @public
+         */
+        InputSuggestionsFilter["Contains"] = "Contains";
+        /**
+         * Removes any filtering applied while typing
+         * @public
+         */
+        InputSuggestionsFilter["None"] = "None";
+    })(InputSuggestionsFilter || (InputSuggestionsFilter = {}));
+    var InputSuggestionsFilter$1 = InputSuggestionsFilter;
 
     var __decorate$4 = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -1120,8 +1287,8 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
      *
      * The `ui5-input` component allows the user to enter and edit text or numeric values in one line.
      *
-     * Additionally, you can provide `suggestionItems`,
-     * that are displayed in a popover right under the input.
+     * Additionally, you can provide `suggestionItems`
+     * that are displayed in a popover right under the input. Keep in mind that `ui5-input` with type `Number` does not support suggestions.
      *
      * The text field can be editable or read-only (`readonly` property),
      * and it can be enabled or disabled (`disabled` property).
@@ -1153,15 +1320,19 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
      * @csspart input - Used to style the native input element
      * @csspart clear-icon - Used to style the clear icon, which can be pressed to clear user input text
      */
-    let Input = Input_1 = class Input extends webcomponentsBase.b {
+    let Input = Input_1 = class Input extends webcomponentsBase.S {
         get formValidityMessage() {
-            return Input_1.i18nBundle.getText(i18nDefaults.FORM_TEXTFIELD_REQUIRED);
+            return this.nativeInput?.validationMessage;
         }
         get _effectiveShowSuggestions() {
             return !!(this.showSuggestions && this.Suggestions);
         }
         get formValidity() {
-            return { valueMissing: this.required && !this.value };
+            return {
+                valueMissing: this.nativeInput?.validity.valueMissing,
+                typeMismatch: this.required && this.nativeInput?.validity.typeMismatch,
+                patternMismatch: this.nativeInput?.validity.patternMismatch,
+            };
         }
         async formElementAnchor() {
             return this.getFocusDomRefAsync();
@@ -1221,6 +1392,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
              * and the current language settings, especially for type `Number`.
              * - The property is mostly intended to be used with touch devices
              * that use different soft keyboard layouts depending on the given input type.
+             * - Type `Number` does not support suggestions.
              * @default "Text"
              * @public
              */
@@ -1235,14 +1407,6 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
              * @public
              */
             this.value = "";
-            /**
-             * Defines the inner stored value of the component.
-             *
-             * **Note:** The property is updated upon typing. In some special cases the old value is kept (e.g. deleting the value after the dot in a float)
-             * @default ""
-             * @private
-             */
-            this._innerValue = "";
             /**
              * Defines the value state of the component.
              * @default "None"
@@ -1272,6 +1436,13 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
              * @since 2.0.0
              */
             this.open = false;
+            /**
+             * Defines the filter type of the component.
+             * @default "None"
+             * @public
+             * @since 2.19.0
+             */
+            this.filter = InputSuggestionsFilter$1.None;
             /**
              * Defines whether the clear icon is visible.
              * @default false
@@ -1330,7 +1501,6 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             this._isChangeTriggeredBySuggestion = false;
             this._indexOfSelectedItem = -1;
             this._handleResizeBound = this._handleResize.bind(this);
-            this._keepInnerValue = false;
             this._focusedAfterClear = false;
             this._valueStateLinks = [];
         }
@@ -1352,9 +1522,6 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             return item.hasAttribute("ui5-suggestion-item-group");
         }
         onBeforeRendering() {
-            if (!this._keepInnerValue) {
-                this._innerValue = this.value === null ? "" : this.value;
-            }
             if (this.showSuggestions) {
                 this.enableSuggestions();
                 this._flattenItems.forEach(item => {
@@ -1369,32 +1536,36 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
                 });
             }
             this._effectiveShowClearIcon = (this.showClearIcon && !!this.value && !this.readonly && !this.disabled);
-            this.style.setProperty(Theme.d$1("--_ui5-input-icons-count"), `${this.iconsCount}`);
+            this.style.setProperty("--_ui5-input-icons-count", `${this.iconsCount}`);
             const hasItems = !!this._flattenItems.length;
             const hasValue = !!this.value;
             const isFocused = this.shadowRoot.querySelector("input") === webcomponentsBase.t();
-            if (this.shouldDisplayOnlyValueStateMessage) {
-                this.openValueStatePopover();
-            }
-            else {
-                this.closeValueStatePopover();
-            }
             const preventOpenPicker = this.disabled || this.readonly;
+            const shouldOpenSuggestions = !preventOpenPicker && !this._isPhone && hasItems && (this.open || (hasValue && isFocused && this.isTyping));
             if (preventOpenPicker) {
                 this.open = false;
             }
             else if (!this._isPhone) {
                 this.open = hasItems && (this.open || (hasValue && isFocused && this.isTyping));
             }
+            if (this.shouldDisplayOnlyValueStateMessage && !shouldOpenSuggestions) {
+                this.openValueStatePopover();
+            }
+            else {
+                this.closeValueStatePopover();
+            }
             const value = this.value;
             const innerInput = this.getInputDOMRefSync();
             if (!innerInput || !value) {
                 return;
             }
+            if (this.filter !== InputSuggestionsFilter$1.None) {
+                this._filterItems(this.typedInValue);
+            }
             const autoCompletedChars = innerInput.selectionEnd - innerInput.selectionStart;
             // Typehead causes issues on Android devices, so we disable it for now
             // If there is already a selection the autocomplete has already been performed
-            if (this._shouldAutocomplete && !Theme.P$1() && !autoCompletedChars && !this._isKeyNavigation) {
+            if (this._shouldAutocomplete && !Theme.P() && !autoCompletedChars && !this._isKeyNavigation) {
                 const item = this._getFirstMatchingItem(value);
                 if (item) {
                     if (!this._isComposing) {
@@ -1402,10 +1573,12 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
                     }
                     this._selectMatchingItem(item);
                 }
+                else {
+                    this._matchedSuggestionItem = undefined;
+                }
             }
         }
         onAfterRendering() {
-            const innerInput = this.getInputDOMRefSync();
             if (this.showSuggestions && this.Suggestions?._getPicker()) {
                 this._listWidth = this.Suggestions._getListWidth();
                 // disabled ItemNavigation from the list since we are not using it
@@ -1414,11 +1587,11 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             if (this._performTextSelection) {
                 // this is required to syncronize lit-html input's value and user's input
                 // lit-html does not sync its stored value for the value property when the user is typing
-                if (innerInput.value !== this._innerValue) {
-                    innerInput.value = this._innerValue;
-                }
+                // if (innerInput.value !== this._innerValue) {
+                // 	innerInput.value = this._innerValue;
+                // }
                 if (this.typedInValue.length && this.value.length) {
-                    innerInput.setSelectionRange(this.typedInValue.length, this.value.length);
+                    this._adjustSelectionRange();
                 }
                 this.fireDecoratorEvent("type-ahead");
             }
@@ -1429,9 +1602,28 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
                 this._valueStateLinks = this.linksInAriaValueStateHiddenText;
             }
         }
+        _adjustSelectionRange() {
+            const innerInput = this.getInputDOMRefSync();
+            const visibleItems = this.Suggestions?._getItems().filter(item => !item.hidden);
+            const currentItem = visibleItems?.find(item => { return item.selected || item.focused; });
+            const groupItems = this._flattenItems.filter(item => this._isGroupItem(item));
+            if (currentItem && !groupItems.includes(currentItem)) {
+                const doesItemStartWithTypedValue = currentItem?.text?.toLowerCase().startsWith(this.typedInValue.toLowerCase());
+                if (doesItemStartWithTypedValue) {
+                    innerInput.setSelectionRange(this.typedInValue.length, this.value.length);
+                }
+                else {
+                    innerInput.setSelectionRange(0, this.value.length);
+                }
+            }
+            else {
+                // No current item selected (e.g., during typing) - use default typeahead selection
+                innerInput.setSelectionRange(this.typedInValue.length, this.value.length);
+            }
+        }
         _onkeydown(e) {
             this._isKeyNavigation = true;
-            this._shouldAutocomplete = !this.noTypeahead && !(webcomponentsBase.Q(e) || webcomponentsBase.X(e) || webcomponentsBase.m$2(e));
+            this._shouldAutocomplete = !this.noTypeahead && !(webcomponentsBase.Q(e) || webcomponentsBase.X(e) || webcomponentsBase.m$1(e));
             if (webcomponentsBase.P(e)) {
                 return this._handleUp(e);
             }
@@ -1444,12 +1636,13 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             if (webcomponentsBase.x(e)) {
                 return this._handleTab();
             }
-            if (webcomponentsBase.b$1(e)) {
+            if (webcomponentsBase.b(e)) {
                 const isValueUnchanged = this.previousValue === this.getInputDOMRefSync().value;
-                const shouldSubmit = this._internals.form && this._internals.form.querySelectorAll("[ui5-input]").length === 1;
                 this._enterKeyDown = true;
-                if (isValueUnchanged && shouldSubmit) {
-                    webcomponentsBase.i$1(this);
+                if (isValueUnchanged) {
+                    this.fireDecoratorEvent("_request-submit");
+                    webcomponentsBase.l(this);
+                    return;
                 }
                 return this._handleEnter(e);
             }
@@ -1465,7 +1658,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             if (webcomponentsBase.n(e)) {
                 return this._handleEnd(e);
             }
-            if (webcomponentsBase.m$2(e)) {
+            if (webcomponentsBase.m$1(e)) {
                 return this._handleEscape();
             }
             if (webcomponentsBase.Co(e)) {
@@ -1486,8 +1679,9 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         }
         get currentItemIndex() {
             const allItems = this.Suggestions?._getItems();
-            const currentItem = allItems.find(item => { return item.selected || item.focused; });
-            const indexOfCurrentItem = currentItem ? allItems.indexOf(currentItem) : -1;
+            const visibleItems = allItems.filter(item => !item.hidden);
+            const currentItem = visibleItems.find(item => { return item.selected || item.focused; });
+            const indexOfCurrentItem = currentItem ? visibleItems.indexOf(currentItem) : -1;
             return indexOfCurrentItem;
         }
         _handleUp(e) {
@@ -1565,9 +1759,12 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             // if a group item is focused, this is false
             const suggestionItemPressed = !!(this.Suggestions?.onEnter(e));
             const innerInput = this.getInputDOMRefSync();
-            const matchingItem = this._selectableItems.find(item => {
-                return item.text === this.value;
-            });
+            let matchingItem = this._matchedSuggestionItem;
+            if (!matchingItem) {
+                matchingItem = this._selectableItems.find(item => {
+                    return item.text?.toLowerCase() === this.value.toLowerCase();
+                });
+            }
             if (matchingItem) {
                 const itemText = matchingItem.text || "";
                 innerInput.setSelectionRange(itemText.length, itemText.length);
@@ -1618,6 +1815,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             const innerInput = this.getInputDOMRefSync();
             const isAutoCompleted = innerInput.selectionEnd - innerInput.selectionStart > 0;
             this.isTyping = false;
+            this._matchedSuggestionItem = undefined;
             if (this.value !== this.previousValue && this.value !== this.lastConfirmedValue && !this.open) {
                 this.value = this.lastConfirmedValue ? this.lastConfirmedValue : this.previousValue;
                 this.fireDecoratorEvent(INPUT_EVENTS.INPUT, { inputType: "" });
@@ -1654,10 +1852,9 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         innerFocusIn() { }
         _onfocusout(e) {
             const toBeFocused = e.relatedTarget;
-            if (this.Suggestions?._getPicker().contains(toBeFocused) || this.contains(toBeFocused) || this.getSlottedNodes("valueStateMessage").some(el => el.contains(toBeFocused))) {
+            if (this.Suggestions?._getPicker()?.contains(toBeFocused) || this.contains(toBeFocused) || this.getSlottedNodes("valueStateMessage").some(el => el.contains(toBeFocused))) {
                 return;
             }
-            this._keepInnerValue = false;
             this.focused = false; // invalidating property
             this._isChangeTriggeredBySuggestion = false;
             if (this.showClearIcon && !this._effectiveShowClearIcon) {
@@ -1690,7 +1887,6 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             }
         }
         _handleChange() {
-            const shouldSubmit = this._internals.form && this._internals.form.querySelectorAll("[ui5-input]").length === 1;
             if (this._clearIconClicked) {
                 this._clearIconClicked = false;
                 return;
@@ -1705,13 +1901,14 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             };
             if (this.previousValue !== this.getInputDOMRefSync().value) {
                 // if picker is open there might be a selected item, wait next tick to get the value applied
-                if (this.Suggestions?._getPicker().open && this._flattenItems.some(item => item.hasAttribute("ui5-suggestion-item") && item.selected)) {
+                if (this.Suggestions?._getPicker()?.open && this._flattenItems.some(item => item.hasAttribute("ui5-suggestion-item") && item.selected)) {
                     this._changeToBeFired = true;
                 }
                 else {
                     fireChange();
-                    if (this._enterKeyDown && shouldSubmit) {
-                        webcomponentsBase.i$1(this);
+                    if (this._enterKeyDown) {
+                        this.fireDecoratorEvent("_request-submit");
+                        webcomponentsBase.l(this);
                     }
                 }
             }
@@ -1753,8 +1950,6 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         }
         _input(e, eventType) {
             const inputDomRef = this.getInputDOMRefSync();
-            const emptyValueFiredOnNumberInput = this.value && this.isTypeNumber && !inputDomRef.value;
-            this._keepInnerValue = false;
             const allowedEventTypes = [
                 "deleteWordBackward",
                 "deleteWordForward",
@@ -1771,35 +1966,6 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
                 "historyUndo",
             ];
             this._shouldAutocomplete = !allowedEventTypes.includes(eventType) && !this.noTypeahead;
-            if (e instanceof InputEvent) {
-                // ---- Special cases of numeric Input ----
-                // ---------------- Start -----------------
-                // When the last character after the delimiter is removed.
-                // In such cases, we want to skip the re-rendering of the
-                // component as this leads to cursor repositioning and causes user experience issues.
-                // There are few scenarios:
-                // Example: type "123.4" and press BACKSPACE - the native input is firing event with the whole part as value (123).
-                // Pressing BACKSPACE again will remove the delimiter and the native input will fire event with the whole part as value again (123).
-                // Example: type "123.456", select/mark "456" and press BACKSPACE - the native input is firing event with the whole part as value (123).
-                // Example: type "123.456", select/mark "123.456" and press BACKSPACE - the native input is firing event with empty value.
-                const delimiterCase = this.isTypeNumber
-                    && (e.inputType === "deleteContentForward" || e.inputType === "deleteContentBackward")
-                    && !e.target.value.includes(".")
-                    && this.value.includes(".");
-                // Handle special numeric notation with "e", example "12.5e12"
-                const eNotationCase = emptyValueFiredOnNumberInput && e.data === "e";
-                // Handle special numeric notation with "-", example "-3"
-                // When pressing BACKSPACE, the native input fires event with empty value
-                const minusRemovalCase = emptyValueFiredOnNumberInput
-                    && this.value.startsWith("-")
-                    && this.value.length === 2
-                    && (e.inputType === "deleteContentForward" || e.inputType === "deleteContentBackward");
-                if (delimiterCase || eNotationCase || minusRemovalCase) {
-                    this.value = e.target.value;
-                    this._keepInnerValue = true;
-                }
-                // ----------------- End ------------------
-            }
             if (e.target === inputDomRef) {
                 this.focused = true;
                 // stop the native event, as the semantic "input" would be fired.
@@ -1809,6 +1975,9 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             this.hasSuggestionItemSelected = false;
             if (this.Suggestions) {
                 this.Suggestions.updateSelectedItemPosition(-1);
+            }
+            if (this.filter && e.target.value === "") {
+                this.open = false;
             }
             this.isTyping = true;
         }
@@ -1829,11 +1998,57 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         }
         _selectMatchingItem(item) {
             item.selected = true;
+            this._matchedSuggestionItem = item;
+        }
+        _filterItems(value) {
+            let matchingItems = [];
+            const groupItems = this._flattenItems.filter(item => this._isGroupItem(item));
+            this._resetItemVisibility();
+            if (groupItems.length) {
+                matchingItems = this._filterGroups(this.filter, groupItems);
+            }
+            else {
+                matchingItems = (Filters[this.filter])(value, this._selectableItems, "text");
+            }
+            this._selectableItems.forEach(item => {
+                item.hidden = !matchingItems.includes(item);
+            });
+            if (matchingItems.length === 0) {
+                this.open = false;
+            }
+        }
+        _filterGroups(filterType, groupItems) {
+            const filteredGroupItems = [];
+            groupItems.forEach(groupItem => {
+                const currentGroupItems = (Filters[filterType])(this.typedInValue, groupItem.items ?? [], "text");
+                filteredGroupItems.push(...currentGroupItems);
+                if (currentGroupItems.length === 0) {
+                    groupItem.hidden = true;
+                }
+                else {
+                    groupItem.hidden = false;
+                }
+            });
+            return filteredGroupItems;
+        }
+        _resetItemVisibility() {
+            this._flattenItems.forEach(item => {
+                if (this._isGroupItem(item)) {
+                    item.items?.forEach(i => {
+                        i.hidden = false;
+                    });
+                    return;
+                }
+                item.hidden = false;
+            });
         }
         _handleTypeAhead(item) {
-            const value = item.text ? item.text : "";
-            this._innerValue = value;
-            this.value = value;
+            const suggestionText = item.text ? item.text : "";
+            const typedValue = this.typedInValue;
+            // Preserve the user's typed input case during typing
+            if (suggestionText.toLowerCase().startsWith(typedValue.toLowerCase())) {
+                this.value = typedValue + suggestionText.substring(typedValue.length);
+            }
             this._performTextSelection = true;
             this._shouldAutocomplete = false;
         }
@@ -1848,16 +2063,24 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         _closePicker() {
             this.open = false;
         }
+        _confirmMobileValue() {
+            this._closePicker();
+            this._handleChange();
+        }
+        _cancelMobileValue() {
+            this.value = this.previousValue;
+            this._closePicker();
+        }
         _afterOpenPicker() {
             // Set initial focus to the native input
             if (Theme.d()) {
+                this.previousValue = this.value;
                 (this.getInputDOMRef()).focus();
                 this._composition?.addEventListeners();
             }
             this._handlePickerAfterOpen();
         }
         _afterClosePicker() {
-            this.announceSelectedItem();
             // close device's keyboard and prevent further typing
             if (Theme.d()) {
                 this.blur();
@@ -1875,6 +2098,10 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             this.isTyping = false;
             if (this.hasSuggestionItemSelected) {
                 this.focus();
+            }
+            const invisibleText = this.shadowRoot.querySelector(`#selectionText`);
+            if (invisibleText) {
+                invisibleText.textContent = "";
             }
             this._handlePickerAfterClose();
         }
@@ -1949,7 +2176,16 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             if (this._isGroupItem(item)) {
                 return;
             }
-            const itemText = item.text || "";
+            let originalItem = item;
+            if (this._matchedSuggestionItem) {
+                const matchedText = this._matchedSuggestionItem.text?.toLowerCase() || "";
+                const itemText = item.text?.toLowerCase() || "";
+                // Only use matched item if keyboard navigation or if it's the same item (case-insensitive)
+                if (keyboardUsed || matchedText === itemText) {
+                    originalItem = this._matchedSuggestionItem;
+                }
+            }
+            const itemText = originalItem.text || "";
             const fireChange = keyboardUsed
                 ? this.valueBeforeItemSelection !== itemText : this.previousValue !== itemText;
             this.hasSuggestionItemSelected = true;
@@ -1965,6 +2201,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
                 this.previousValue = this.value;
             }
             this.valueBeforeSelectionStart = "";
+            this._matchedSuggestionItem = undefined;
             this.isTyping = false;
             this.open = false;
         }
@@ -1976,6 +2213,10 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             const itemValue = this._isGroupItem(item) ? this.valueBeforeSelectionStart : item.text;
             this.value = itemValue || "";
             this._performTextSelection = true;
+            // Update the matched item when navigating with arrows to preserve correct case on Enter
+            if (!this._isGroupItem(item)) {
+                this._matchedSuggestionItem = item;
+            }
         }
         fireEventByAction(action, e) {
             const valueBeforeInput = this.value;
@@ -2011,13 +2252,19 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         }
         getInputDOMRef() {
             if (Theme.d() && this.Suggestions) {
-                return this.Suggestions._getPicker().querySelector(".ui5-input-inner-phone");
+                const picker = this.Suggestions._getPicker();
+                if (picker) {
+                    return picker.querySelector(".ui5-input-inner-phone");
+                }
             }
             return this.nativeInput;
         }
         getInputDOMRefSync() {
-            if (Theme.d() && this.Suggestions?._getPicker()) {
-                return this.Suggestions._getPicker().querySelector(".ui5-input-inner-phone").shadowRoot.querySelector("input");
+            if (Theme.d() && this.Suggestions) {
+                const picker = this.Suggestions._getPicker();
+                if (picker) {
+                    return picker.querySelector(".ui5-input-inner-phone").shadowRoot.querySelector("input");
+                }
             }
             return this.nativeInput;
         }
@@ -2108,7 +2355,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             return this.readonly && !this.disabled;
         }
         get _headerTitleText() {
-            return Input_1.i18nBundle.getText(i18nDefaults.INPUT_SUGGESTIONS_TITLE);
+            return this._associatedLabelsTexts || Input_1.i18nBundle.getText(i18nDefaults.INPUT_SUGGESTIONS_TITLE);
         }
         get _suggestionsOkButtonText() {
             return Input_1.i18nBundle.getText(i18nDefaults.INPUT_SUGGESTIONS_OK_BUTTON);
@@ -2293,16 +2540,18 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         get availableSuggestionsCount() {
             if (this.showSuggestions && (this.value || this.Suggestions?.isOpened())) {
                 const nonGroupItems = this._selectableItems;
+                const isOpened = this.Suggestions?.isOpened();
+                const stateText = isOpened ? Input_1.i18nBundle.getText(i18nDefaults.INPUT_SUGGESTIONS_EXPANDED) : Input_1.i18nBundle.getText(i18nDefaults.INPUT_SUGGESTIONS_COLLAPSED);
                 switch (nonGroupItems.length) {
                     case 0:
-                        return Input_1.i18nBundle.getText(i18nDefaults.INPUT_SUGGESTIONS_NO_HIT);
+                        return `${Input_1.i18nBundle.getText(i18nDefaults.INPUT_SUGGESTIONS_NO_HIT)} ${stateText}`;
                     case 1:
-                        return Input_1.i18nBundle.getText(i18nDefaults.INPUT_SUGGESTIONS_ONE_HIT);
+                        return `${Input_1.i18nBundle.getText(i18nDefaults.INPUT_SUGGESTIONS_ONE_HIT)} ${stateText}`;
                     default:
-                        return Input_1.i18nBundle.getText(i18nDefaults.INPUT_SUGGESTIONS_MORE_HITS, nonGroupItems.length);
+                        return `${Input_1.i18nBundle.getText(i18nDefaults.INPUT_SUGGESTIONS_MORE_HITS, nonGroupItems.length)} ${stateText}`;
                 }
             }
-            return undefined;
+            return this.showSuggestions ? Input_1.i18nBundle.getText(i18nDefaults.INPUT_SUGGESTIONS_COLLAPSED) : undefined;
         }
         get step() {
             return this.isTypeNumber ? "any" : undefined;
@@ -2338,9 +2587,6 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
 			`;
             }
             return "";
-        }
-        get _valueStatePopoverHorizontalAlign() {
-            return this.effectiveDir !== "rtl" ? "Start" : "End";
         }
         /**
          * This method is relevant for sap_horizon theme only
@@ -2407,9 +2653,6 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         webcomponentsBase.s()
     ], Input.prototype, "value", void 0);
     __decorate$4([
-        webcomponentsBase.s({ noAttribute: true })
-    ], Input.prototype, "_innerValue", void 0);
-    __decorate$4([
         webcomponentsBase.s()
     ], Input.prototype, "valueState", void 0);
     __decorate$4([
@@ -2439,6 +2682,9 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
     __decorate$4([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "open", void 0);
+    __decorate$4([
+        webcomponentsBase.s()
+    ], Input.prototype, "filter", void 0);
     __decorate$4([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "_effectiveShowClearIcon", void 0);
@@ -2479,7 +2725,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         webcomponentsBase.s({ type: Object })
     ], Input.prototype, "Suggestions", void 0);
     __decorate$4([
-        webcomponentsBase.s({ type: Array })
+        webcomponentsBase.s({ type: Array, noAttribute: true })
     ], Input.prototype, "_linksListenersArray", void 0);
     __decorate$4([
         webcomponentsBase.s({ type: Boolean, noAttribute: true })
@@ -2497,14 +2743,14 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         })
     ], Input.prototype, "valueStateMessage", void 0);
     __decorate$4([
-        parametersBundle_css$1.i("@ui5/webcomponents")
+        parametersBundle_css.i("@ui5/webcomponents")
     ], Input, "i18nBundle", void 0);
     Input = Input_1 = __decorate$4([
         webcomponentsBase.m({
             tag: "ui5-input",
             languageAware: true,
             formAssociated: true,
-            renderer: parametersBundle_css.y,
+            renderer: jsxRuntime.y,
             template: InputTemplate,
             styles: [
                 inputStyles,
@@ -2519,6 +2765,9 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
          */
         ,
         eventStrict.l("change", {
+            bubbles: true,
+        }),
+        eventStrict.l("_request-submit", {
             bubbles: true,
         })
         /**
@@ -2596,13 +2845,13 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         return [ListItemBaseTemplate.call(this, { listItemContent }, { role: "option" })];
     }
     function listItemContent() {
-        return parametersBundle_css.jsx("div", { part: "content", id: "content", class: "ui5-li-content", children: parametersBundle_css.jsxs("div", { class: "ui5-li-text-wrapper", children: [parametersBundle_css.jsx("span", { part: "title", className: "ui5-li-title", dangerouslySetInnerHTML: { __html: this.markupText } }), this.additionalText &&
-                        parametersBundle_css.jsx("span", { part: "additional-text", class: "ui5-li-additional-text", children: this.additionalText })] }) });
+        return jsxRuntime.jsx("div", { part: "content", id: "content", class: "ui5-li-content", children: jsxRuntime.jsxs("div", { class: "ui5-li-text-wrapper", children: [jsxRuntime.jsx("span", { part: "title", className: "ui5-li-title", dangerouslySetInnerHTML: { __html: this.markupText } }), this.additionalText &&
+                        jsxRuntime.jsx("span", { part: "additional-text", class: "ui5-li-additional-text", children: this.additionalText })] }) });
     }
 
-    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
-    var styles = `:host([ui5-suggestion-item]){height:auto;min-height:var(--_ui5-v2-15-0_list_item_base_height)}:host([ui5-suggestion-item]) .ui5-li-root{min-height:var(--_ui5-v2-15-0_list_item_base_height)}:host([ui5-suggestion-item]) .ui5-li-content{padding-bottom:.5rem;padding-top:.5rem;box-sizing:border-box}
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var styles = `:host([ui5-suggestion-item]){height:auto;min-height:var(--_ui5_list_item_base_height)}:host([ui5-suggestion-item]) .ui5-li-root{min-height:var(--_ui5_list_item_base_height)}:host([ui5-suggestion-item]) .ui5-li-content{padding-bottom:.5rem;padding-top:.5rem;box-sizing:border-box}
 `;
 
     var __decorate$3 = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -2633,7 +2882,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             this.markupText = "";
         }
         onEnterDOM() {
-            if (Theme.f()) {
+            if (Theme.f$1()) {
                 this.setAttribute("desktop", "");
             }
         }
@@ -2679,28 +2928,28 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
     var InputKeyHint$1 = InputKeyHint;
 
     function SearchPopoverTemplate(headerTemplate) {
-        return (parametersBundle_css.jsxs(ResponsivePopover.ResponsivePopover, { hideArrow: true, preventFocusRestore: true, preventInitialFocus: !Theme.d(), accessibleNameRef: "suggestions-speech-output message-area-text message-area-description", placement: ResponsivePopover.PopoverPlacement.Bottom, horizontalAlign: ResponsivePopover.PopoverHorizontalAlign.Start, open: this.open, opener: this, onOpen: this._handleOpen, onClose: this._handleClose, onBeforeClose: this._handleBeforeClose, onBeforeOpen: this._handleBeforeOpen, class: {
+        return (jsxRuntime.jsxs(ResponsivePopover.ResponsivePopover, { id: "ui5-search-list", hideArrow: true, preventFocusRestore: true, preventInitialFocus: !Theme.d(), accessibleNameRef: "suggestions-speech-output message-area-text message-area-description", placement: ResponsivePopover.PopoverPlacement.Bottom, horizontalAlign: ResponsivePopover.PopoverHorizontalAlign.Start, open: this.open, opener: this, onOpen: this._handleOpen, onClose: this._handleClose, onBeforeClose: this._handleBeforeClose, onBeforeOpen: this._handleBeforeOpen, class: {
                 "ui5-search-popover": true,
                 "ui5-search-popover-phone": Theme.d(),
-            }, children: [Theme.d() ? (headerTemplate ? headerTemplate.call(this) : (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: parametersBundle_css.jsxs("header", { slot: "header", class: "ui5-search-popup-searching-header", children: [parametersBundle_css.jsx(Input$1, { class: "ui5-search-popover-search-field", onInput: this._handleMobileInput, showClearIcon: this.showClearIcon, noTypeahead: this.noTypeahead, hint: InputKeyHint$1.Search, onKeyDown: this._onMobileInputKeydown, children: this._flattenItems.map(item => {
-                                    return (parametersBundle_css.jsx(SuggestionItem$1, { text: item.text }));
-                                }) }), parametersBundle_css.jsx(Button.Button, { design: Button.ButtonDesign.Transparent, onClick: this._handleCancel, children: this.cancelButtonText })] }) }))) : null, parametersBundle_css.jsxs("main", { class: "ui5-search-popover-content", children: [parametersBundle_css.jsx("slot", { name: "messageArea" }), parametersBundle_css.jsx("div", { class: "search-popover-busy-wrapper", children: parametersBundle_css.jsx(BusyIndicator.BusyIndicator, { active: true }) }), this.items.length ?
-                            parametersBundle_css.jsx(List.List, { class: "ui5-search-list", separators: List.ListSeparator.None, onKeyDown: this._onItemKeydown, accessibleRole: List.ListAccessibleRole.ListBox, onItemClick: this._onItemClick, children: parametersBundle_css.jsx("slot", {}) })
-                            : (parametersBundle_css.jsx("slot", { name: "illustration" })), parametersBundle_css.jsx("span", { class: "ui5-hidden-text", id: "suggestions-speech-output", children: this.suggestionsText }), this.messageArea[0]?.text ? (parametersBundle_css.jsx("span", { class: "ui5-hidden-text", id: "message-area-text", children: this.messageArea[0].text })) : null, this.messageArea[0]?.description ? (parametersBundle_css.jsx("span", { class: "ui5-hidden-text", id: "message-area-description", children: this.messageArea[0].description })) : null] }), this.action.length ? (parametersBundle_css.jsx("slot", { onKeyDown: this._handleActionKeydown, name: "action", slot: "footer" })) : null] }));
+            }, children: [Theme.d() ? (headerTemplate ? headerTemplate.call(this) : (jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsxs("header", { slot: "header", class: "ui5-search-popup-searching-header", children: [jsxRuntime.jsx(Input$1, { value: this.value, class: "ui5-search-popover-search-field", onInput: this._handleMobileInput, showClearIcon: this.showClearIcon, noTypeahead: this.noTypeahead, hint: InputKeyHint$1.Search, onKeyDown: this._onMobileInputKeydown, children: this._flattenItems.map(item => {
+                                    return (jsxRuntime.jsx(SuggestionItem$1, { text: item.text }));
+                                }) }), jsxRuntime.jsx(Button.Button, { design: Button.ButtonDesign.Transparent, onClick: this._handleCancel, children: this.cancelButtonText })] }) }))) : null, jsxRuntime.jsxs("main", { class: "ui5-search-popover-content", children: [jsxRuntime.jsx("slot", { name: "messageArea" }), jsxRuntime.jsx("div", { class: "search-popover-busy-wrapper", children: jsxRuntime.jsx(BusyIndicator.BusyIndicator, { active: true }) }), this.items.length ?
+                            jsxRuntime.jsx(List.List, { class: "ui5-search-list", separators: List.ListSeparator.None, onKeyDown: this._onItemKeydown, onFocusIn: this._onListItemFocusIn, accessibleRole: List.ListAccessibleRole.ListBox, onItemClick: this._onItemClick, children: jsxRuntime.jsx("slot", {}) })
+                            : (jsxRuntime.jsx("slot", { name: "illustration" })), jsxRuntime.jsx("span", { class: "ui5-hidden-text", id: "suggestions-speech-output", children: this.suggestionsText }), this.messageArea[0]?.text ? (jsxRuntime.jsx("span", { class: "ui5-hidden-text", id: "message-area-text", children: this.messageArea[0].text })) : null, this.messageArea[0]?.description ? (jsxRuntime.jsx("span", { class: "ui5-hidden-text", id: "message-area-description", children: this.messageArea[0].description })) : null] }), this.action.length ? (jsxRuntime.jsx("slot", { onKeyDown: this._handleActionKeydown, name: "action", slot: "footer" })) : null] }));
     }
 
     function SearchTemplate() {
-        return (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [SearchFieldTemplate.call(this), SearchPopoverTemplate.call(this)] }));
+        return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [SearchFieldTemplate.call(this), SearchPopoverTemplate.call(this)] }));
     }
 
-    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$2.defaultTheme);
-    var SearchCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}.ui5-search-popover{width:var(--search_width);margin-top:.25rem;box-sizing:border-box}.ui5-search-popup-searching-header{display:flex;gap:.5rem;width:100%;align-items:center}.ui5-search-popover::part(header){padding:.5rem 1rem;box-shadow:none;box-sizing:border-box}.ui5-search-popover::part(header):before{display:none}.ui5-search-popover::part(content){padding:0;box-shadow:none}:host([loading]) .ui5-search-popover main{min-height:2rem}.ui5-search-popover-search-field{flex:1;height:2.25rem;border-radius:var(--_ui5-v2-15-0_search_input_border_radius)}.ui5-search-popover-search-field::part(root):after{border-radius:var(--_ui5-v2-15-0_search_input_border_radius)}.ui5-search-popover-search-field::part(input){padding-inline-start:.875rem}.ui5-search-popover-search-field::part(clear-icon-wrapper){margin-inline-end:.5rem}.ui5-search-popover-loading-bi{width:100%;height:100%}::slotted([slot="action"]){width:100%;margin-top:.5rem;margin-bottom:.5rem}.search-popover-busy-wrapper{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:42;width:100%;height:100%;display:none;justify-content:center;align-items:center;pointer-events:all}:host([loading]) .search-popover-busy-wrapper{display:flex;width:100%;height:100%}.search-popover-busy-wrapper [ui5-busy-indicator]{z-index:1}.search-popover-busy-wrapper:after{content:"";position:absolute;top:0;left:0;width:100%;height:100%;background:var(--_ui5-v2-15-0-search-loading-overlay-background);opacity:var(--_ui5-v2-15-0-search-loading-overlay-transparency);border-radius:var(--_ui5-v2-15-0_popup_border_radius)}.ui5-search-popover-phone .ui5-search-popover-content{position:relative;width:100%;height:100%;display:flex;flex-direction:column}.ui5-search-popover-phone .search-popover-busy-wrapper:after{border-radius:0}
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
+    var SearchCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}.ui5-search-popover{width:var(--search_width);margin-top:.25rem;box-sizing:border-box}.ui5-search-popup-searching-header{display:flex;gap:.5rem;width:100%;align-items:center}.ui5-search-popover::part(header){padding:.5rem 1rem;box-shadow:none;box-sizing:border-box}.ui5-search-popover::part(header):before{display:none}.ui5-search-popover::part(content){padding:0;box-shadow:none}:host([loading]) .ui5-search-popover main{min-height:2rem}.ui5-search-popover-search-field{flex:1;height:2.25rem;border-radius:var(--_ui5_search_input_border_radius)}.ui5-search-popover-search-field::part(root):after{border-radius:var(--_ui5_search_input_border_radius)}.ui5-search-popover-search-field::part(input){padding-inline-start:.875rem}.ui5-search-popover-search-field::part(clear-icon-wrapper){margin-inline-end:.5rem}.ui5-search-popover-loading-bi{width:100%;height:100%}::slotted([slot="action"]){width:100%;margin-top:.5rem;margin-bottom:.5rem}.search-popover-busy-wrapper{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:42;width:100%;height:100%;display:none;justify-content:center;align-items:center;pointer-events:all}:host([loading]) .search-popover-busy-wrapper{display:flex;width:100%;height:100%}.search-popover-busy-wrapper [ui5-busy-indicator]{z-index:1}.search-popover-busy-wrapper:after{content:"";position:absolute;top:0;left:0;width:100%;height:100%;background:var(--_ui5-search-loading-overlay-background);opacity:var(--_ui5-search-loading-overlay-transparency);border-radius:var(--_ui5_popup_border_radius)}.ui5-search-popover-phone .ui5-search-popover-content{position:relative;width:100%;height:100%;display:flex;flex-direction:column}.ui5-search-popover-phone .search-popover-busy-wrapper:after{border-radius:0}
 `;
 
-    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$2.defaultTheme);
-    var SearchFieldCss = `:host,.ui5-shellbar-search-field-wrapper{height:2.25rem;display:flex;align-items:center}:host(:not([collapsed])),.ui5-shellbar-search-field-wrapper{min-width:18rem;max-width:36rem;margin:0;height:2.25rem;color:var(--sapShell_TextColor);font-size:var(--sapFontSize);font-family:var(--sapFontFamily);font-style:normal;box-shadow:var(--sapField_Shadow);border-radius:var(--_ui5-v2-15-0_search_input_border_radius);box-sizing:border-box;text-align:start;background:var(--sapField_BackgroundStyle);background-color:var(--_ui5-v2-15-0-search-wrapper-background);position:relative}.ui5-shellbar-search-field-wrapper{flex:1;min-width:auto}:host(:not([collapsed]):hover),:host(:not([collapsed]):focus-within),.ui5-shellbar-search-field-wrapper:focus-within{box-shadow:var(--sapField_Hover_Shadow);background:var(--_ui5-v2-15-0-search-wrapper-hover-background);background-color:var(--_ui5-v2-15-0-search-wrapper-hover-background-color)}:host([focused-inner-input]) .ui5-search-field-root{outline:var(--_ui5-v2-15-0_search_wrapper_outline);border-radius:var(--_ui5-v2-15-0_search_input_border_radius);outline-offset:-.125rem}.ui5-search-field-root{width:100%;height:100%;position:relative;background:transparent;display:inline-block;outline:none;box-sizing:border-box;color:inherit;transition:border-color .2s ease-in-out;border-radius:var(--_ui5-v2-15-0_search_input_border_radius);overflow:hidden}.ui5-search-field-content{height:100%;display:flex;flex-direction:row;justify-content:flex-end;align-items:center;overflow:hidden}[ui5-select]{--_ui5-v2-15-0_content_density: compact;outline:none;margin:var(--_ui5-v2-15-0_search_input_scope_margin);max-width:10rem;border-radius:var(--_ui5-v2-15-0_search_input_border_radius);border:var(--_ui5-v2-15-0-search-border);box-shadow:none;background:unset;background-color:var(--_ui5-v2-15-0-search-elements-background);height:var(--_ui5-v2-15-0-search-select-height);--_ui5-v2-15-0_select_label_color: var(--sapShell_TextColor)}[ui5-select]:hover{box-shadow:var(--sapField_Hover_Shadow)}[ui5-select]::part(icon){display:flex;justify-content:center;align-items:stretch;height:100%;padding:0 .5rem;align-self:center;border-radius:var(--_ui5-v2-15-0_search_input_border_radius);color:var(--sapShell_InteractiveTextColor)}[ui5-select]::part(popover){background-color:var(--sapShellColor)}.ui5-filter-wrapper{--_ui5-v2-15-0_button_focused_border_radius: var(--_ui5-v2-15-0_search_filter_button_border_radius)}::slotted([slot="filterButton"]){min-width:var(--_ui5-v2-15-0_search_icon_size);height:var(--_ui5-v2-15-0_search_icon_size);border:var(--_ui5-v2-15-0_search_filter_button_border);border-radius:var(--_ui5-v2-15-0_search_filter_button_border_radius);color:var(--sapShell_InteractiveTextColor);outline:none;background:var(--_ui5-v2-15-0-search-filter_button_background_color);box-sizing:border-box;margin-inline-end:.1875rem;margin-inline-start:.25rem}::slotted([slot="filterButton"]:focus-within){background-color:var(--ui5-v2-15-0_search_filter_button_background_active);border:var(--_ui5-v2-15-0_search_filter_button_border)}::slotted([slot="filterButton"]:hover){background-color:var(--sapShell_Hover_Background);border:var(--_ui5-v2-15-0_seach_filter_button_border_hover)}.ui5-search-field-inner-input{font-size:var(--sapFontSize);font-family:var(--sapFontFamily);font-style:normal;padding:.5rem 0;height:100%;width:100%;box-sizing:border-box;background-color:var(--_ui5-v2-15-0-search-elements-background);border:var(--_ui5-v2-15-0-search-border);outline:none;color:inherit;padding-inline-start:var(--_ui5-v2-15-0-search-input-start-padding);padding-inline-end:var(--_ui5-v2-15-0_search_input_end_padding)}:host([focused-inner-input]) .ui5-search-field-inner-input{outline:var(--_ui5-v2-15-0_search_input_outline);border-radius:var(--_ui5-v2-15-0_search_input_border_radius);outline-offset:-.3125rem}:host(:not([mode="Scoped"])) .ui5-search-field-inner-input{padding-inline-start:.875rem}[ui5-select]:hover,.ui5-search-field-inner-input:hover{background-color:var(--_ui5-v2-15-0-search-elements-hover-background)}[ui5-select]:focus-within,.ui5-search-field-inner-input:focus-within{background-color:var(--_ui5-v2-15-0-search-elements-active-background)}.ui5-search-field-inner-input::placeholder{font-weight:400;font-style:italic;color:var(--sapField_PlaceholderTextColor);padding-inline-start:.125rem}:host([mode="Scoped"]) .ui5-search-field-inner-input{margin-inline-start:var(--_ui5-v2-15-0_search_input_start_margin)}.ui5-search-field-separator{height:1.5rem;width:.0625rem;background:var(--_ui5-v2-15-0_search_separator_background);box-sizing:border-box}.ui5-shell-search-field-button{outline:none;min-width:var(--_ui5-v2-15-0_search_icon_size);height:var(--_ui5-v2-15-0_search_icon_size);border-radius:var(--_ui5-v2-15-0_search_icon_border_radius);box-sizing:border-box;cursor:pointer}.ui5-shell-search-field-button:not([design=Emphasized]){color:var(--sapShell_InteractiveTextColor);background-color:var(--_ui5-v2-15-0-search-elements-background);min-width:var(--_ui5-v2-15-0_search_icon_size_default);height:var(--_ui5-v2-15-0_search_icon_size_default);border-radius:var(--_ui5-v2-15-0_shellbar_button_border_radius)}.ui5-shell-search-field-button:not([design=Emphasized]):hover{background-color:var(--sapShell_Hover_Background);border-color:var(--sapButton_Lite_Hover_BorderColor);border-radius:var(--_ui5-v2-15-0_shellbar_button_border_radius)}.ui5-shell-search-field-button[desktop]:not([active])::part(button):after,.ui5-shell-search-field-button:not([active])::part(button):focus-visible:after,.ui5-shell-search-field-button[desktop][active][design=Emphasized]::part(button):focus-within:after,.ui5-shell-search-field-button[active][design=Emphasized]::part(button):focus-visible:after,.ui5-shell-search-field-button[desktop][active]::part(button):focus-within:before,.ui5-shell-search-field-button[active]::part(button):focus-visible:before,.ui5-shell-search-field-button[design=Emphasized][desktop]::part(button):focus-within:before,.ui5-shell-search-field-button[design=Emphasized]::part(button):focus-visible:before{border-radius:var(--_ui5-v2-15-0_shellbar_button_border_radius)}.ui5-shell-search-field-icon{display:flex;justify-content:center;align-items:stretch;cursor:pointer;outline:none;min-width:var(--_ui5-v2-15-0_search_icon_size);height:var(--_ui5-v2-15-0_search_icon_size);border-radius:var(--_ui5-v2-15-0_search_icon_border_radius);margin-inline-end:.25rem;margin-inline-start:.1875rem;box-sizing:border-box;color:var(--sapShell_InteractiveTextColor);background-color:var(--_ui5-v2-15-0-search-elements-background);border:var(--_ui5-v2-15-0-search-icon-border)}.ui5-shell-search-field-icon::part(root){padding:var(--_ui5-v2-15-0_search_icon_padding);width:1rem;height:1rem;outline-offset:-.125rem}.ui5-shell-search-field-icon:hover::part(root){padding:var(--_ui5-v2-15-0_search_icon_hover_padding);outline-offset:-.1875rem}.ui5-shell-search-field-icon:focus::part(root){border-radius:var(--_ui5-v2-15-0_search_icon_border_radius)}.ui5-shell-search-field-icon:hover,.ui5-shell-search-field-input-button:hover{background:var(--sapShell_Hover_Background);border:1px solid var(--sapButton_Lite_Hover_BorderColor);color:var(--sapShell_InteractiveTextColor)}.ui5-shell-search-field-search-icon{background-color:var(--sapButton_Emphasized_Background);border-color:var(--sapButton_Emphasized_BorderColor);color:var(--sapButton_Emphasized_TextColor)}.ui5-search-field-select{--_ui5-v2-15-0_input_focus_border_radius: var(--_ui5-v2-15-0_search_input_border_radius)}.ui5-search-field-select:hover,.ui5-search-field-select[focused]{background:var(--_ui5-v2-15-0-search-wrapper-hover-background-color)}.ui5-search-field-select::part(icon-wrapper){border-radius:var(--_ui5-v2-15-0_search_input_border_radius);height:100%}.ui5-search-field-select[focused]::part(icon-wrapper){box-shadow:var(--sapField_Hover_Shadow)}:host(:not([collapsed]):hover):has([ui5-select]:hover){background:var(--_ui5-v2-15-0-search-wrapper-background)}:host(:not([collapsed])):has([ui5-select][focused]){background:var(--_ui5-v2-15-0-search-wrapper-background)}.ui5-search-field-inner-input::selection{background:var(--sapSelectedColor);color:var(--sapContent_ContrastTextColor)}
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
+    var SearchFieldCss = `:host,.ui5-shellbar-search-field-wrapper{height:2.25rem;display:flex;align-items:center}:host(:not([collapsed])),.ui5-shellbar-search-field-wrapper{min-width:18rem;max-width:36rem;margin:0;height:2.25rem;color:var(--_ui5-search-field-text-color);font-size:var(--sapFontSize);font-family:var(--sapFontFamily);font-style:normal;box-shadow:var(--sapField_Shadow);border-radius:var(--_ui5_search_input_border_radius);box-sizing:border-box;text-align:start;background:var(--sapField_BackgroundStyle);background-color:var(--_ui5-search-wrapper-background);position:relative}.ui5-search-field-busy-indicator{width:100%;height:100%;border-radius:var(--_ui5_search_input_border_radius)}.ui5-shellbar-search-field-wrapper{flex:1;min-width:auto}:host(:not([collapsed]):hover),:host(:not([collapsed]):focus-within),.ui5-shellbar-search-field-wrapper:focus-within{box-shadow:var(--sapField_Hover_Shadow);background:var(--_ui5-search-wrapper-hover-background);background-color:var(--_ui5-search-wrapper-hover-background-color)}:host([focused-inner-input]) .ui5-search-field-root{outline:var(--_ui5_search_wrapper_outline);border-radius:var(--_ui5_search_input_border_radius);outline-offset:-.125rem}.ui5-search-field-root{width:100%;height:100%;position:relative;background:transparent;display:inline-block;outline:none;box-sizing:border-box;color:inherit;transition:border-color .2s ease-in-out;border-radius:var(--_ui5_search_input_border_radius);overflow:hidden}.ui5-search-field-content{height:100%;display:flex;flex-direction:row;justify-content:flex-end;align-items:center;overflow:hidden}[ui5-select]{outline:none;margin:var(--_ui5_search_input_scope_margin);max-width:10rem;border-radius:var(--_ui5_search_input_border_radius);border:var(--_ui5-search-border);box-shadow:none;background:unset;background-color:var(--_ui5-search-elements-background);height:var(--_ui5-search-select-height);--_ui5_select_label_color: var(--sapShell_TextColor);--_ui5_input_focus_outline_color: transparent;--_ui5_select_bottom_border_gradient: none}[ui5-select]:hover:not(:active):not(:focus-within){box-shadow:var(--_ui5-search_input_scope_hover_shadow)}[ui5-select]:not(:active):not(:focus-within)::part(icon-wrapper):hover{box-shadow:var(--_ui5-search_input_scope_hover_shadow)}[ui5-select]:active,[ui5-select]:focus-within{box-shadow:var(--_ui5-search_input_scope_active_shadow)}[ui5-select]:active::part(icon-wrapper),[ui5-select]:focus-within::part(icon-wrapper){box-shadow:var(--_ui5-search_input_scope_active_shadow);background:var(--sapShell_Active_Background);color:var(--sapShell_Active_TextColor)}[ui5-select]::part(icon){display:flex;justify-content:center;align-items:stretch;height:100%;padding:0 .5rem;align-self:center;border-radius:var(--_ui5_search_input_border_radius);color:var(--sapShell_InteractiveTextColor)}[ui5-select]::part(popover){background-color:var(--sapShellColor)}::slotted([slot="filterButton"]){--_ui5_button_focused_border_radius: var(--_ui5_search_filter_button_border_radius);min-width:var(--_ui5_search_icon_size);height:var(--_ui5_search_icon_size);border:var(--_ui5_search_filter_button_border);border-radius:var(--_ui5_search_filter_button_border_radius);color:var(--sapShell_InteractiveTextColor);outline:none;background:var(--_ui5-search-filter_button_background_color);box-sizing:border-box;margin-inline-end:.1875rem;margin-inline-start:.25rem}::slotted([slot="filterButton"]:focus-within){background-color:var(--ui5_search_filter_button_background_active);border:var(--_ui5_search_filter_button_border)}::slotted([slot="filterButton"]:not([active]):not(:focus-within):hover){background-color:var(--sapShell_Hover_Background);border:var(--_ui5_seach_filter_button_border_hover)}.ui5-search-field-inner-input{font-size:var(--sapFontSize);font-family:var(--sapFontFamily);font-style:normal;padding:.5rem 0;height:100%;width:100%;box-sizing:border-box;background-color:var(--_ui5-search-elements-background);border:var(--_ui5-search-border);outline:none;color:inherit;padding-inline-start:var(--_ui5-search-input-start-padding);padding-inline-end:var(--_ui5_search_input_end_padding)}:host([focused-inner-input]) .ui5-search-field-inner-input{outline:var(--_ui5_search_input_outline);border-radius:var(--_ui5_search_input_border_radius);outline-offset:-.3125rem}:host(:not([mode="Scoped"])) .ui5-search-field-inner-input{padding-inline-start:.875rem}.ui5-search-field-inner-input:hover{background-color:var(--_ui5-search-elements-hover-background)}.ui5-search-field-inner-input:focus-within{background-color:var(--_ui5-search-elements-active-background)}.ui5-search-field-inner-input::placeholder{font-weight:400;font-style:italic;color:var(--sapField_PlaceholderTextColor);padding-inline-start:.125rem}:host([mode="Scoped"]) .ui5-search-field-inner-input{margin-inline-start:var(--_ui5_search_input_start_margin)}.ui5-search-field-separator{height:1.5rem;width:.0625rem;background:var(--_ui5_search_separator_background);box-sizing:border-box}.ui5-shell-search-field-button{outline:none;min-width:var(--_ui5_search_icon_size);height:var(--_ui5_search_icon_size);border-radius:var(--_ui5_search_icon_border_radius);box-sizing:border-box;cursor:pointer}.ui5-shell-search-field-button:not([design=Emphasized]){color:var(--sapShell_InteractiveTextColor);background-color:var(--_ui5-search-elements-background);min-width:var(--_ui5_search_icon_size_default);height:var(--_ui5_search_icon_size_default);border-radius:var(--_ui5_shellbar_button_border_radius)}.ui5-shell-search-field-button:not([design=Emphasized]):hover{background-color:var(--sapShell_Hover_Background);border-color:var(--sapButton_Lite_Hover_BorderColor);border-radius:var(--_ui5_shellbar_button_border_radius)}.ui5-shell-search-field-button[desktop]:not([active])::part(button):after,.ui5-shell-search-field-button:not([active])::part(button):focus-visible:after,.ui5-shell-search-field-button[desktop][active][design=Emphasized]::part(button):focus-within:after,.ui5-shell-search-field-button[active][design=Emphasized]::part(button):focus-visible:after,.ui5-shell-search-field-button[desktop][active]::part(button):focus-within:before,.ui5-shell-search-field-button[active]::part(button):focus-visible:before,.ui5-shell-search-field-button[design=Emphasized][desktop]::part(button):focus-within:before,.ui5-shell-search-field-button[design=Emphasized]::part(button):focus-visible:before{border-radius:var(--_ui5_shellbar_button_border_radius)}.ui5-shell-search-field-icon{display:flex;justify-content:center;align-items:stretch;cursor:pointer;outline:none;min-width:var(--_ui5_search_icon_size);height:var(--_ui5_search_icon_size);border-radius:var(--_ui5_search_icon_border_radius);margin-inline-end:.25rem;margin-inline-start:.1875rem;box-sizing:border-box;color:var(--sapShell_InteractiveTextColor);background-color:var(--_ui5-search-elements-background);border:var(--_ui5-search-icon-border)}.ui5-shell-search-field-icon::part(root){padding:var(--_ui5_search_icon_padding);outline-offset:-.125rem}.ui5-shell-search-field-icon:hover::part(root){padding:var(--_ui5_search_icon_hover_padding);outline-offset:-.1875rem}.ui5-shell-search-field-icon:focus::part(root){border-radius:var(--_ui5_search_icon_border_radius)}.ui5-shell-search-field-icon:hover,.ui5-shell-search-field-input-button:hover{background:var(--sapShell_Hover_Background);border:1px solid var(--sapButton_Lite_Hover_BorderColor);color:var(--sapShell_InteractiveTextColor)}.ui5-shell-search-field-search-icon{background-color:var(--sapButton_Emphasized_Background);border-color:var(--sapButton_Emphasized_BorderColor);color:var(--sapButton_Emphasized_TextColor)}.ui5-search-field-select{--_ui5_input_focus_border_radius: var(--_ui5_search_input_border_radius)}.ui5-search-field-select::part(icon-wrapper){border-radius:var(--_ui5_search_input_border_radius);height:100%}.ui5-search-field-inner-input::selection{background:var(--sapSelectedColor);color:var(--sapContent_ContrastTextColor)}
 `;
 
     var __decorate$2 = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -2731,9 +2980,16 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
      * @extends UI5Element
      * @private
      */
-    let SearchField = SearchField_1 = class SearchField extends webcomponentsBase.b {
+    let SearchField = SearchField_1 = class SearchField extends webcomponentsBase.S {
         constructor() {
             super(...arguments);
+            /**
+             * Indicates whether a loading indicator should be shown in the input field.
+             * @default false
+             * @since 2.19.0
+             * @public
+             */
+            this.fieldLoading = false;
             /**
              * Defines whether the clear icon of the search will be shown.
              * @default false
@@ -2768,7 +3024,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             this._effectiveShowClearIcon = (this.showClearIcon && !!this.value);
         }
         _onkeydown(e) {
-            if (webcomponentsBase.b$1(e)) {
+            if (webcomponentsBase.b(e)) {
                 return this._handleEnter();
             }
         }
@@ -2805,6 +3061,10 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         }
         _handleScopeChange(e) {
             const item = e.detail.selectedOption;
+            // Set the scopeValue property if the selected scope has a value defined
+            if (item.value) {
+                this.scopeValue = item.value;
+            }
             this.fireDecoratorEvent("scope-change", {
                 scope: item.scopeOption,
             });
@@ -2836,6 +3096,9 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
     };
     __decorate$2([
         webcomponentsBase.s({ type: Boolean })
+    ], SearchField.prototype, "fieldLoading", void 0);
+    __decorate$2([
+        webcomponentsBase.s({ type: Boolean })
     ], SearchField.prototype, "showClearIcon", void 0);
     __decorate$2([
         webcomponentsBase.s({ type: Boolean })
@@ -2853,6 +3116,9 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         webcomponentsBase.s()
     ], SearchField.prototype, "accessibleDescription", void 0);
     __decorate$2([
+        webcomponentsBase.s()
+    ], SearchField.prototype, "scopeValue", void 0);
+    __decorate$2([
         webcomponentsBase.d({ type: HTMLElement, individualSlots: true, invalidateOnChildChange: true })
     ], SearchField.prototype, "scopes", void 0);
     __decorate$2([
@@ -2865,13 +3131,13 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         webcomponentsBase.s({ type: Boolean })
     ], SearchField.prototype, "_effectiveShowClearIcon", void 0);
     __decorate$2([
-        parametersBundle_css$1.i("@ui5/webcomponents-fiori")
+        parametersBundle_css.i("@ui5/webcomponents-fiori")
     ], SearchField, "i18nBundle", void 0);
     SearchField = SearchField_1 = __decorate$2([
         webcomponentsBase.m({
             tag: "ui5-search-field",
             languageAware: true,
-            renderer: parametersBundle_css.y,
+            renderer: jsxRuntime.y,
             template: SearchFieldTemplate,
             styles: [
                 SearchFieldCss,
@@ -2963,6 +3229,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             this._typedInValue = "";
             this._valueBeforeOpen = this.getAttribute("value") || "";
             this._isTyping = false;
+            this._deleteHandler = this._onItemDelete.bind(this);
         }
         onBeforeRendering() {
             super.onBeforeRendering();
@@ -2992,8 +3259,13 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
                     this._selectMatchingItem(item);
                 }
             }
+            // Update highlight text and attach delete listeners
             this._flattenItems.forEach(item => {
                 item.highlightText = this._typedInValue;
+                // Listen for delete events on each item
+                // Using capture phase to ensure we catch it before application handlers
+                item.removeEventListener("ui5-delete", this._deleteHandler, true);
+                item.addEventListener("ui5-delete", this._deleteHandler, true);
             });
         }
         onAfterRendering() {
@@ -3066,12 +3338,19 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         _handleArrowDown() {
             const focusableItems = this._getItemsList().listItems;
             const firstListItem = focusableItems.at(0);
-            if (this.open) {
-                this._deselectItems();
-                this.value = this._typedInValue || this.value;
-                this._innerValue = this.value;
-                firstListItem?.focus();
+            // Store the original value before navigation starts
+            if (this._valueBeforeArrowNav === undefined) {
+                this._valueBeforeArrowNav = this._typedInValue || this.value;
             }
+            this._deselectItems();
+            this.value = this._typedInValue || this.value;
+            this._innerValue = this.value;
+            // Clear any text selection to allow autocomplete to work again when navigating back
+            const innerInput = this.nativeInput;
+            if (innerInput) {
+                innerInput.setSelectionRange(this.value.length, this.value.length);
+            }
+            firstListItem?.focus();
         }
         _handleInnerClick() {
             if (Theme.d()) {
@@ -3093,11 +3372,10 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             }
             const innerInput = this.nativeInput;
             innerInput.setSelectionRange(this.value.length, this.value.length);
-            this.open = false;
-            this._isTyping = false;
+            this._closePopupAndResetState();
         }
         _onMobileInputKeydown(e) {
-            if (webcomponentsBase.b$1(e)) {
+            if (webcomponentsBase.b(e)) {
                 this.value = this.mobileInput?.value || this.value;
                 this._handleEnter();
                 this.blur();
@@ -3106,26 +3384,41 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         _handleSearchEvent() {
             this.fireDecoratorEvent("search", { item: this._proposedItem });
         }
+        _closePopupAndResetState() {
+            this.open = false;
+            this._isTyping = false;
+            this._valueBeforeArrowNav = undefined;
+        }
         _handleEscape() {
-            this.value = this._typedInValue || this.value;
-            this._innerValue = this.value;
+            // If arrow navigation was active, restore the original typed value
+            if (this._valueBeforeArrowNav !== undefined) {
+                this.value = this._valueBeforeArrowNav;
+                this._innerValue = this._valueBeforeArrowNav;
+                this._valueBeforeArrowNav = undefined;
+            }
+            else {
+                this.value = this._typedInValue || this.value;
+                this._innerValue = this.value;
+            }
             this._isTyping = false;
         }
         _handleInput(e) {
             super._handleInput(e);
             this._typedInValue = this.value;
             this._proposedItem = undefined;
+            this._valueBeforeArrowNav = undefined;
             if (Theme.d()) {
                 return;
             }
             this._isTyping = true;
-            this.open = this.value.length > 0;
+            this.open = this.value.length > 0 && this._popoupHasAnyContent();
         }
         _handleClear() {
             super._handleClear();
             this._typedInValue = "";
             this._innerValue = "";
             this._shouldAutocomplete = false;
+            this._valueBeforeArrowNav = undefined;
             this.open = false;
         }
         _popoupHasAnyContent() {
@@ -3152,20 +3445,42 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             const isTab = webcomponentsBase.x(e);
             e.preventDefault();
             if (isFirstItem && isArrowUp) {
+                // Restore original value when navigating back to input
+                if (this._valueBeforeArrowNav !== undefined) {
+                    this.value = this._valueBeforeArrowNav;
+                    this._innerValue = this._valueBeforeArrowNav;
+                    this._valueBeforeArrowNav = undefined;
+                }
                 this.nativeInput?.focus();
                 this._shouldAutocomplete = true;
             }
+            if (webcomponentsBase.m$1(e)) {
+                this._handleEscape();
+            }
             if ((isLastItem && isArrowDown) || isTab) {
                 this._getFooterButton()?.focus();
+            }
+        }
+        _onListItemFocusIn(e) {
+            // Update input value when an item gets focus during arrow navigation
+            if (this._valueBeforeArrowNav === undefined) {
+                return;
+            }
+            const target = e.target;
+            const item = target;
+            // Don't update input value when focus is on action buttons or delete button
+            if (target.hasAttribute("ui5-button") || target.hasAttribute("ui5-icon")) {
+                return;
+            }
+            if (item && item.text && !this._isShowMoreItem(item)) {
+                this.value = item.text;
+                this._innerValue = item.text;
             }
         }
         _onItemClick(e) {
             const item = e.detail.item;
             const prevented = !this.fireDecoratorEvent("search", { item });
             if (prevented) {
-                if (Theme.d()) {
-                    this.open = false;
-                }
                 return;
             }
             this.value = item.text;
@@ -3173,9 +3488,34 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             this._typedInValue = this.value;
             this._shouldAutocomplete = false;
             this._performTextSelection = true;
+            this._valueBeforeArrowNav = undefined;
             this.open = false;
             this._isTyping = false;
             this.focus();
+        }
+        _onItemDelete(e) {
+            // If we're in arrow navigation mode and an item was deleted,
+            // update the input to show the next matching item
+            if (this._valueBeforeArrowNav !== undefined) {
+                const deletedItem = e.target;
+                // Wait for the item to be removed from DOM
+                setTimeout(() => {
+                    const nextItem = this._getFirstMatchingItem(this._valueBeforeArrowNav);
+                    if (nextItem && nextItem !== deletedItem) {
+                        this.value = nextItem.text;
+                        this._innerValue = nextItem.text;
+                        this._selectMatchingItem(nextItem);
+                        nextItem.focus();
+                    }
+                    else {
+                        // No more matching items, restore original typed value
+                        this.value = this._valueBeforeArrowNav;
+                        this._innerValue = this._valueBeforeArrowNav;
+                        this._deselectItems();
+                        this.nativeInput?.focus();
+                    }
+                }, 0);
+            }
         }
         _onkeydown(e) {
             super._onkeydown(e);
@@ -3183,11 +3523,11 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
                 return;
             }
             this._shouldAutocomplete = !this.noTypeahead
-                && !(webcomponentsBase.Q(e) || webcomponentsBase.X(e) || webcomponentsBase.m$2(e) || webcomponentsBase.P(e) || webcomponentsBase._(e) || webcomponentsBase.x(e) || webcomponentsBase.b$1(e) || webcomponentsBase.j(e) || webcomponentsBase.q(e) || webcomponentsBase.M(e) || webcomponentsBase.n(e) || webcomponentsBase.m$2(e));
+                && !(webcomponentsBase.Q(e) || webcomponentsBase.X(e) || webcomponentsBase.m$1(e) || webcomponentsBase.P(e) || webcomponentsBase._(e) || webcomponentsBase.x(e) || webcomponentsBase.b(e) || webcomponentsBase.j(e) || webcomponentsBase.q(e) || webcomponentsBase.M(e) || webcomponentsBase.n(e) || webcomponentsBase.m$1(e));
             if (webcomponentsBase._(e)) {
                 this._handleDown(e);
             }
-            if (webcomponentsBase.m$2(e)) {
+            if (webcomponentsBase.m$1(e)) {
                 this._handleEscape();
             }
             // deselect item on backspace or delete
@@ -3216,6 +3556,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         _handleClose() {
             this.open = false;
             this._isTyping = false;
+            this._valueBeforeArrowNav = undefined;
             this.fireDecoratorEvent("close");
         }
         _handleBeforeOpen() {
@@ -3310,13 +3651,13 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         webcomponentsBase.s({ type: Boolean })
     ], Search.prototype, "_performItemSelectionOnMobile", void 0);
     __decorate$1([
-        parametersBundle_css$1.i("@ui5/webcomponents-fiori")
+        parametersBundle_css.i("@ui5/webcomponents-fiori")
     ], Search, "i18nBundle", void 0);
     Search = Search_1 = __decorate$1([
         webcomponentsBase.m({
             tag: "ui5-search",
             languageAware: true,
-            renderer: parametersBundle_css.y,
+            renderer: jsxRuntime.y,
             template: SearchTemplate,
             styles: [
                 SearchField$1.styles,
@@ -3345,15 +3686,15 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
         return (SearchPopoverTemplate.call(this, ShellBarSearchDialogHeader));
     }
     function ShellBarSearchDialogHeader() {
-        return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: parametersBundle_css.jsxs("header", { slot: "header", class: "ui5-search-popup-searching-header", children: [parametersBundle_css.jsx("div", { class: "ui5-shellbar-search-field-wrapper", children: SearchFieldTemplate.call(this, { forceExpanded: true }) }), parametersBundle_css.jsx(Button.Button, { design: Button.ButtonDesign.Transparent, onClick: this._handleCancel, children: this.cancelButtonText })] }) }));
+        return (jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsxs("header", { slot: "header", class: "ui5-search-popup-searching-header", children: [jsxRuntime.jsx("div", { class: "ui5-shellbar-search-field-wrapper", children: SearchFieldTemplate.call(this, { forceExpanded: true }) }), jsxRuntime.jsx(Button.Button, { design: Button.ButtonDesign.Transparent, onClick: this._handleCancel, children: this.cancelButtonText })] }) }));
     }
 
     function ShellBarSearchTemplate() {
-        return (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [SearchFieldTemplate.call(this), ShellBarSearchPopoverTemplate.call(this)] }));
+        return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [SearchFieldTemplate.call(this), ShellBarSearchPopoverTemplate.call(this)] }));
     }
 
-    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$2.defaultTheme);
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
     var ShellBarSearchCss = `:host(:not([collapsed])){min-width:13rem}
 `;
 
@@ -3384,12 +3725,28 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/th
             this.autoOpen = false;
         }
         _handleSearchIconPress() {
+            if (Theme.d() && this.open) {
+                this._handleSearchEvent();
+                this._closePopupAndResetState();
+                return;
+            }
             super._handleSearchIconPress();
             if (this.collapsed) {
                 this.collapsed = false;
             }
             else if (!this.value) {
                 this.collapsed = true;
+            }
+        }
+        _handleEnter() {
+            if (!this.value && !this.collapsed) {
+                this.collapsed = true;
+                setTimeout(() => {
+                    this.focus();
+                }, 0);
+            }
+            else {
+                super._handleEnter();
             }
         }
         _onFocusOutSearch(e) {

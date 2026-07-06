@@ -13,97 +13,103 @@ sap.ui.define(
     // export the UI5 metadata along with the package
     pkg["_ui5metadata"] = {
       name: "sap/f/gen/ui5/webcomponents",
-      version: "2.15.0",
+      version: "2.23.2",
       dependencies: ["sap.ui.core"],
       types: [
-        "sap.f.gen.ui5.webcomponents.AvatarColorScheme",
-        "sap.f.gen.ui5.webcomponents.AvatarGroupType",
-        "sap.f.gen.ui5.webcomponents.AvatarShape",
-        "sap.f.gen.ui5.webcomponents.AvatarSize",
-        "sap.f.gen.ui5.webcomponents.BackgroundDesign",
-        "sap.f.gen.ui5.webcomponents.BarAccessibleRole",
-        "sap.f.gen.ui5.webcomponents.BarDesign",
-        "sap.f.gen.ui5.webcomponents.BorderDesign",
-        "sap.f.gen.ui5.webcomponents.BreadcrumbsDesign",
-        "sap.f.gen.ui5.webcomponents.BreadcrumbsSeparator",
-        "sap.f.gen.ui5.webcomponents.BusyIndicatorSize",
-        "sap.f.gen.ui5.webcomponents.BusyIndicatorTextPlacement",
-        "sap.f.gen.ui5.webcomponents.ButtonAccessibleRole",
-        "sap.f.gen.ui5.webcomponents.ButtonBadgeDesign",
-        "sap.f.gen.ui5.webcomponents.ButtonDesign",
-        "sap.f.gen.ui5.webcomponents.ButtonType",
-        "sap.f.gen.ui5.webcomponents.CalendarLegendItemType",
-        "sap.f.gen.ui5.webcomponents.CalendarSelectionMode",
-        "sap.f.gen.ui5.webcomponents.CalendarWeekNumbering",
-        "sap.f.gen.ui5.webcomponents.CarouselArrowsPlacement",
-        "sap.f.gen.ui5.webcomponents.CarouselPageIndicatorType",
-        "sap.f.gen.ui5.webcomponents.ComboBoxFilter",
-        "sap.f.gen.ui5.webcomponents.ExpandableTextOverflowMode",
-        "sap.f.gen.ui5.webcomponents.FormItemSpacing",
-        "sap.f.gen.ui5.webcomponents.Highlight",
-        "sap.f.gen.ui5.webcomponents.IconDesign",
-        "sap.f.gen.ui5.webcomponents.IconMode",
-        "sap.f.gen.ui5.webcomponents.InputType",
-        "sap.f.gen.ui5.webcomponents.InteractiveAreaSize",
-        "sap.f.gen.ui5.webcomponents.LinkAccessibleRole",
-        "sap.f.gen.ui5.webcomponents.LinkDesign",
-        "sap.f.gen.ui5.webcomponents.ListAccessibleRole",
-        "sap.f.gen.ui5.webcomponents.ListGrowingMode",
-        "sap.f.gen.ui5.webcomponents.ListItemAccessibleRole",
-        "sap.f.gen.ui5.webcomponents.ListItemType",
-        "sap.f.gen.ui5.webcomponents.ListSelectionMode",
-        "sap.f.gen.ui5.webcomponents.ListSeparator",
-        "sap.f.gen.ui5.webcomponents.MenuItemGroupCheckMode",
-        "sap.f.gen.ui5.webcomponents.MessageStripDesign",
-        "sap.f.gen.ui5.webcomponents.NotificationListGrowingMode",
-        "sap.f.gen.ui5.webcomponents.OverflowMode",
-        "sap.f.gen.ui5.webcomponents.PanelAccessibleRole",
-        "sap.f.gen.ui5.webcomponents.PopoverHorizontalAlign",
-        "sap.f.gen.ui5.webcomponents.PopoverPlacement",
-        "sap.f.gen.ui5.webcomponents.PopoverVerticalAlign",
-        "sap.f.gen.ui5.webcomponents.PopupAccessibleRole",
-        "sap.f.gen.ui5.webcomponents.Priority",
-        "sap.f.gen.ui5.webcomponents.RatingIndicatorSize",
-        "sap.f.gen.ui5.webcomponents.SegmentedButtonSelectionMode",
-        "sap.f.gen.ui5.webcomponents.SemanticColor",
-        "sap.f.gen.ui5.webcomponents.SwitchDesign",
-        "sap.f.gen.ui5.webcomponents.TabLayout",
-        "sap.f.gen.ui5.webcomponents.TableCellHorizontalAlign",
-        "sap.f.gen.ui5.webcomponents.TableGrowingMode",
-        "sap.f.gen.ui5.webcomponents.TableOverflowMode",
-        "sap.f.gen.ui5.webcomponents.TableSelectionBehavior",
-        "sap.f.gen.ui5.webcomponents.TableSelectionMode",
-        "sap.f.gen.ui5.webcomponents.TableSelectionMultiHeaderSelector",
-        "sap.f.gen.ui5.webcomponents.TagDesign",
-        "sap.f.gen.ui5.webcomponents.TagSize",
-        "sap.f.gen.ui5.webcomponents.TextEmptyIndicatorMode",
-        "sap.f.gen.ui5.webcomponents.TitleLevel",
-        "sap.f.gen.ui5.webcomponents.ToastPlacement",
-        "sap.f.gen.ui5.webcomponents.ToolbarAlign",
-        "sap.f.gen.ui5.webcomponents.ToolbarDesign",
-        "sap.f.gen.ui5.webcomponents.ToolbarItemOverflowBehavior",
-        "sap.f.gen.ui5.webcomponents.WrappingType"
+        "sap.f.gen.ui5.webcomponents.dist.types.AvatarColorScheme",
+        "sap.f.gen.ui5.webcomponents.dist.types.AvatarGroupType",
+        "sap.f.gen.ui5.webcomponents.dist.types.AvatarMode",
+        "sap.f.gen.ui5.webcomponents.dist.types.AvatarShape",
+        "sap.f.gen.ui5.webcomponents.dist.types.AvatarSize",
+        "sap.f.gen.ui5.webcomponents.dist.types.BackgroundDesign",
+        "sap.f.gen.ui5.webcomponents.dist.types.BarAccessibleRole",
+        "sap.f.gen.ui5.webcomponents.dist.types.BarDesign",
+        "sap.f.gen.ui5.webcomponents.dist.types.BorderDesign",
+        "sap.f.gen.ui5.webcomponents.dist.types.BreadcrumbsDesign",
+        "sap.f.gen.ui5.webcomponents.dist.types.BreadcrumbsSeparator",
+        "sap.f.gen.ui5.webcomponents.dist.types.BusyIndicatorSize",
+        "sap.f.gen.ui5.webcomponents.dist.types.BusyIndicatorTextPlacement",
+        "sap.f.gen.ui5.webcomponents.dist.types.ButtonAccessibleRole",
+        "sap.f.gen.ui5.webcomponents.dist.types.ButtonBadgeDesign",
+        "sap.f.gen.ui5.webcomponents.dist.types.ButtonDesign",
+        "sap.f.gen.ui5.webcomponents.dist.types.ButtonType",
+        "sap.f.gen.ui5.webcomponents.dist.types.CalendarLegendItemType",
+        "sap.f.gen.ui5.webcomponents.dist.types.CalendarSelectionMode",
+        "sap.f.gen.ui5.webcomponents.dist.types.CalendarWeekNumbering",
+        "sap.f.gen.ui5.webcomponents.dist.types.CarouselArrowsPlacement",
+        "sap.f.gen.ui5.webcomponents.dist.types.CarouselPageIndicatorType",
+        "sap.f.gen.ui5.webcomponents.dist.types.ComboBoxFilter",
+        "sap.f.gen.ui5.webcomponents.dist.types.ExpandableTextOverflowMode",
+        "sap.f.gen.ui5.webcomponents.dist.types.FormAccessibleMode",
+        "sap.f.gen.ui5.webcomponents.dist.types.FormItemSpacing",
+        "sap.f.gen.ui5.webcomponents.dist.types.Highlight",
+        "sap.f.gen.ui5.webcomponents.dist.types.IconDesign",
+        "sap.f.gen.ui5.webcomponents.dist.types.IconMode",
+        "sap.f.gen.ui5.webcomponents.dist.types.InputSuggestionsFilter",
+        "sap.f.gen.ui5.webcomponents.dist.types.InputType",
+        "sap.f.gen.ui5.webcomponents.dist.types.InteractiveAreaSize",
+        "sap.f.gen.ui5.webcomponents.dist.types.LinkAccessibleRole",
+        "sap.f.gen.ui5.webcomponents.dist.types.LinkDesign",
+        "sap.f.gen.ui5.webcomponents.dist.types.ListAccessibleRole",
+        "sap.f.gen.ui5.webcomponents.dist.types.ListGrowingMode",
+        "sap.f.gen.ui5.webcomponents.dist.types.ListItemAccessibleRole",
+        "sap.f.gen.ui5.webcomponents.dist.types.ListItemType",
+        "sap.f.gen.ui5.webcomponents.dist.types.ListSelectionMode",
+        "sap.f.gen.ui5.webcomponents.dist.types.ListSeparator",
+        "sap.f.gen.ui5.webcomponents.dist.types.MenuItemGroupCheckMode",
+        "sap.f.gen.ui5.webcomponents.dist.types.MessageStripDesign",
+        "sap.f.gen.ui5.webcomponents.dist.types.NotificationListGrowingMode",
+        "sap.f.gen.ui5.webcomponents.dist.types.OverflowMode",
+        "sap.f.gen.ui5.webcomponents.dist.types.PanelAccessibleRole",
+        "sap.f.gen.ui5.webcomponents.dist.types.PopoverHorizontalAlign",
+        "sap.f.gen.ui5.webcomponents.dist.types.PopoverPlacement",
+        "sap.f.gen.ui5.webcomponents.dist.types.PopoverVerticalAlign",
+        "sap.f.gen.ui5.webcomponents.dist.types.PopupAccessibleRole",
+        "sap.f.gen.ui5.webcomponents.dist.types.Priority",
+        "sap.f.gen.ui5.webcomponents.dist.types.RatingIndicatorSize",
+        "sap.f.gen.ui5.webcomponents.dist.types.SegmentedButtonSelectionMode",
+        "sap.f.gen.ui5.webcomponents.dist.types.SelectTextSeparator",
+        "sap.f.gen.ui5.webcomponents.dist.types.SemanticColor",
+        "sap.f.gen.ui5.webcomponents.dist.types.SwitchDesign",
+        "sap.f.gen.ui5.webcomponents.dist.types.TabLayout",
+        "sap.f.gen.ui5.webcomponents.dist.types.TableCellHorizontalAlign",
+        "sap.f.gen.ui5.webcomponents.dist.types.TableGrowingMode",
+        "sap.f.gen.ui5.webcomponents.dist.types.TableOverflowMode",
+        "sap.f.gen.ui5.webcomponents.dist.types.TableSelectionBehavior",
+        "sap.f.gen.ui5.webcomponents.dist.types.TableSelectionMode",
+        "sap.f.gen.ui5.webcomponents.dist.types.TableSelectionMultiHeaderSelector",
+        "sap.f.gen.ui5.webcomponents.dist.types.TagDesign",
+        "sap.f.gen.ui5.webcomponents.dist.types.TagSize",
+        "sap.f.gen.ui5.webcomponents.dist.types.TextEmptyIndicatorMode",
+        "sap.f.gen.ui5.webcomponents.dist.types.TitleLevel",
+        "sap.f.gen.ui5.webcomponents.dist.types.ToastPlacement",
+        "sap.f.gen.ui5.webcomponents.dist.types.ToolbarAlign",
+        "sap.f.gen.ui5.webcomponents.dist.types.ToolbarDesign",
+        "sap.f.gen.ui5.webcomponents.dist.types.ToolbarItemOverflowBehavior",
+        "sap.f.gen.ui5.webcomponents.dist.types.WrappingType"
       ],
       interfaces: [
-        "sap.f.gen.ui5.webcomponents.IAvatarGroupItem",
-        "sap.f.gen.ui5.webcomponents.IButton",
-        "sap.f.gen.ui5.webcomponents.ICalendarSelectedDates",
-        "sap.f.gen.ui5.webcomponents.IColorPaletteItem",
-        "sap.f.gen.ui5.webcomponents.IComboBoxItem",
-        "sap.f.gen.ui5.webcomponents.IDynamicDateRangeOption",
-        "sap.f.gen.ui5.webcomponents.IFormItem",
-        "sap.f.gen.ui5.webcomponents.IIcon",
-        "sap.f.gen.ui5.webcomponents.IInputSuggestionItem",
-        "sap.f.gen.ui5.webcomponents.IMenuItem",
-        "sap.f.gen.ui5.webcomponents.IMultiComboBoxItem",
-        "sap.f.gen.ui5.webcomponents.ISegmentedButtonItem",
-        "sap.f.gen.ui5.webcomponents.IOption",
-        "sap.f.gen.ui5.webcomponents.ITab",
-        "sap.f.gen.ui5.webcomponents.ITableFeature",
-        "sap.f.gen.ui5.webcomponents.ITableGrowing"
+        "sap.f.gen.ui5.webcomponents.dist.AvatarGroup.IAvatarGroupItem",
+        "sap.f.gen.ui5.webcomponents.dist.Button.IButton",
+        "sap.f.gen.ui5.webcomponents.dist.Calendar.ICalendarSelectedDates",
+        "sap.f.gen.ui5.webcomponents.dist.ColorPalette.IColorPaletteItem",
+        "sap.f.gen.ui5.webcomponents.dist.ComboBox.IComboBoxItem",
+        "sap.f.gen.ui5.webcomponents.dist.DynamicDateRange.IDynamicDateRangeOption",
+        "sap.f.gen.ui5.webcomponents.dist.Form.IFormItem",
+        "sap.f.gen.ui5.webcomponents.dist.Icon.IIcon",
+        "sap.f.gen.ui5.webcomponents.dist.Input.IInputSuggestionItem",
+        "sap.f.gen.ui5.webcomponents.dist.Menu.IMenuItem",
+        "sap.f.gen.ui5.webcomponents.dist.MultiComboBox.IMultiComboBoxItem",
+        "sap.f.gen.ui5.webcomponents.dist.SegmentedButton.ISegmentedButtonItem",
+        "sap.f.gen.ui5.webcomponents.dist.Select.IOption",
+        "sap.f.gen.ui5.webcomponents.dist.TabContainer.ITab",
+        "sap.f.gen.ui5.webcomponents.dist.Table.ITableFeature",
+        "sap.f.gen.ui5.webcomponents.dist.Table.ITableGrowing",
+        "sap.f.gen.ui5.webcomponents.dist.ToolbarItem.IToolbarItemContent"
       ],
       controls: [
         "sap.f.gen.ui5.webcomponents.dist.Avatar",
+        "sap.f.gen.ui5.webcomponents.dist.AvatarBadge",
         "sap.f.gen.ui5.webcomponents.dist.AvatarGroup",
         "sap.f.gen.ui5.webcomponents.dist.Bar",
         "sap.f.gen.ui5.webcomponents.dist.Breadcrumbs",
@@ -129,8 +135,11 @@ sap.ui.define(
         "sap.f.gen.ui5.webcomponents.dist.ComboBoxItemGroup",
         "sap.f.gen.ui5.webcomponents.dist.DatePicker",
         "sap.f.gen.ui5.webcomponents.dist.DateRangePicker",
+        "sap.f.gen.ui5.webcomponents.dist.DateTimeInput",
         "sap.f.gen.ui5.webcomponents.dist.DateTimePicker",
+        "sap.f.gen.ui5.webcomponents.dist.DayPicker",
         "sap.f.gen.ui5.webcomponents.dist.Dialog",
+        "sap.f.gen.ui5.webcomponents.dist.DropIndicator",
         "sap.f.gen.ui5.webcomponents.dist.DynamicDateRange",
         "sap.f.gen.ui5.webcomponents.dist.ExpandableText",
         "sap.f.gen.ui5.webcomponents.dist.FileUploader",
@@ -144,12 +153,14 @@ sap.ui.define(
         "sap.f.gen.ui5.webcomponents.dist.List",
         "sap.f.gen.ui5.webcomponents.dist.ListItemCustom",
         "sap.f.gen.ui5.webcomponents.dist.ListItemGroup",
+        "sap.f.gen.ui5.webcomponents.dist.ListItemGroupHeader",
         "sap.f.gen.ui5.webcomponents.dist.ListItemStandard",
         "sap.f.gen.ui5.webcomponents.dist.Menu",
         "sap.f.gen.ui5.webcomponents.dist.MenuItem",
         "sap.f.gen.ui5.webcomponents.dist.MenuItemGroup",
         "sap.f.gen.ui5.webcomponents.dist.MenuSeparator",
         "sap.f.gen.ui5.webcomponents.dist.MessageStrip",
+        "sap.f.gen.ui5.webcomponents.dist.MonthPicker",
         "sap.f.gen.ui5.webcomponents.dist.MultiComboBox",
         "sap.f.gen.ui5.webcomponents.dist.MultiComboBoxItem",
         "sap.f.gen.ui5.webcomponents.dist.MultiComboBoxItemGroup",
@@ -167,18 +178,22 @@ sap.ui.define(
         "sap.f.gen.ui5.webcomponents.dist.SegmentedButtonItem",
         "sap.f.gen.ui5.webcomponents.dist.Select",
         "sap.f.gen.ui5.webcomponents.dist.Slider",
+        "sap.f.gen.ui5.webcomponents.dist.SliderHandle",
+        "sap.f.gen.ui5.webcomponents.dist.SliderTooltip",
         "sap.f.gen.ui5.webcomponents.dist.SpecialCalendarDate",
         "sap.f.gen.ui5.webcomponents.dist.SplitButton",
         "sap.f.gen.ui5.webcomponents.dist.StepInput",
         "sap.f.gen.ui5.webcomponents.dist.SuggestionItem",
         "sap.f.gen.ui5.webcomponents.dist.SuggestionItemCustom",
         "sap.f.gen.ui5.webcomponents.dist.SuggestionItemGroup",
+        "sap.f.gen.ui5.webcomponents.dist.SuggestionListItem",
         "sap.f.gen.ui5.webcomponents.dist.Switch",
         "sap.f.gen.ui5.webcomponents.dist.Tab",
         "sap.f.gen.ui5.webcomponents.dist.TabContainer",
         "sap.f.gen.ui5.webcomponents.dist.TabSeparator",
         "sap.f.gen.ui5.webcomponents.dist.Table",
         "sap.f.gen.ui5.webcomponents.dist.TableCell",
+        "sap.f.gen.ui5.webcomponents.dist.TableGroupRow",
         "sap.f.gen.ui5.webcomponents.dist.TableGrowing",
         "sap.f.gen.ui5.webcomponents.dist.TableHeaderCell",
         "sap.f.gen.ui5.webcomponents.dist.TableHeaderCellActionAI",
@@ -194,20 +209,27 @@ sap.ui.define(
         "sap.f.gen.ui5.webcomponents.dist.Text",
         "sap.f.gen.ui5.webcomponents.dist.TextArea",
         "sap.f.gen.ui5.webcomponents.dist.TimePicker",
+        "sap.f.gen.ui5.webcomponents.dist.TimePickerClock",
+        "sap.f.gen.ui5.webcomponents.dist.TimeSelectionClocks",
+        "sap.f.gen.ui5.webcomponents.dist.TimeSelectionInputs",
         "sap.f.gen.ui5.webcomponents.dist.Title",
         "sap.f.gen.ui5.webcomponents.dist.Toast",
         "sap.f.gen.ui5.webcomponents.dist.ToggleButton",
+        "sap.f.gen.ui5.webcomponents.dist.ToggleSpinButton",
         "sap.f.gen.ui5.webcomponents.dist.Token",
         "sap.f.gen.ui5.webcomponents.dist.Tokenizer",
         "sap.f.gen.ui5.webcomponents.dist.Toolbar",
         "sap.f.gen.ui5.webcomponents.dist.ToolbarButton",
+        "sap.f.gen.ui5.webcomponents.dist.ToolbarItem",
         "sap.f.gen.ui5.webcomponents.dist.ToolbarSelect",
         "sap.f.gen.ui5.webcomponents.dist.ToolbarSelectOption",
         "sap.f.gen.ui5.webcomponents.dist.ToolbarSeparator",
         "sap.f.gen.ui5.webcomponents.dist.ToolbarSpacer",
         "sap.f.gen.ui5.webcomponents.dist.Tree",
         "sap.f.gen.ui5.webcomponents.dist.TreeItem",
-        "sap.f.gen.ui5.webcomponents.dist.TreeItemCustom"
+        "sap.f.gen.ui5.webcomponents.dist.TreeItemCustom",
+        "sap.f.gen.ui5.webcomponents.dist.YearPicker",
+        "sap.f.gen.ui5.webcomponents.dist.YearRangePicker"
       ],
       elements: [],
       rootPath: "../"
@@ -218,19 +240,12 @@ sap.ui.define(
      * Different types of AvatarColorScheme.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.AvatarColorScheme
-     * @ui5-module-override sap/f/gen/ui5/webcomponents AvatarColorScheme
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/AvatarColorScheme
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.AvatarColorScheme
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["AvatarColorScheme"] = {
-      /**
-       * Auto
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Auto: "Auto",
       /**
        * Accent1
        *
@@ -238,6 +253,13 @@ sap.ui.define(
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Accent1: "Accent1",
+      /**
+       * Accent10
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Accent10: "Accent10",
       /**
        * Accent2
        *
@@ -295,12 +317,12 @@ sap.ui.define(
        */
       Accent9: "Accent9",
       /**
-       * Accent10
+       * Auto
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Accent10: "Accent10",
+      Auto: "Auto",
       /**
        * Placeholder
        *
@@ -317,15 +339,15 @@ sap.ui.define(
       Transparent: "Transparent"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.AvatarColorScheme",
+      "sap.f.gen.ui5.webcomponents.dist.types.AvatarColorScheme",
       pkg["AvatarColorScheme"]
     );
     /**
      * Different types of AvatarGroupType.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.AvatarGroupType
-     * @ui5-module-override sap/f/gen/ui5/webcomponents AvatarGroupType
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/AvatarGroupType
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.AvatarGroupType
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -345,13 +367,54 @@ sap.ui.define(
        */
       Individual: "Individual"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.AvatarGroupType", pkg["AvatarGroupType"]);
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.AvatarGroupType",
+      pkg["AvatarGroupType"]
+    );
+    /**
+     * Different Avatar modes.
+     *
+     * @enum {string}
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/AvatarMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.AvatarMode
+     * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
+     */
+    pkg["AvatarMode"] = {
+      /**
+       * Decorative mode.
+       * Configures the component to internally render role&#x3D;&quot;presentation&quot; and aria-hidden&#x3D;&quot;true&quot;,
+       * making it purely decorative without semantic content or interactivity.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Decorative: "Decorative",
+      /**
+       * Image mode (by default).
+       * Configures the component to internally render role&#x3D;&quot;img&quot;.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Image: "Image",
+      /**
+       * Interactive mode.
+       * Configures the component to internally render role&#x3D;&quot;button&quot;.
+       * This mode also supports focus and enables keyboard interaction.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Interactive: "Interactive"
+    };
+    registerEnum("sap.f.gen.ui5.webcomponents.dist.types.AvatarMode", pkg["AvatarMode"]);
     /**
      * Different types of AvatarShape.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.AvatarShape
-     * @ui5-module-override sap/f/gen/ui5/webcomponents AvatarShape
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/AvatarShape
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.AvatarShape
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -371,41 +434,20 @@ sap.ui.define(
        */
       Square: "Square"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.AvatarShape", pkg["AvatarShape"]);
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.AvatarShape",
+      pkg["AvatarShape"]
+    );
     /**
      * Different types of AvatarSize.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.AvatarSize
-     * @ui5-module-override sap/f/gen/ui5/webcomponents AvatarSize
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/AvatarSize
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.AvatarSize
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["AvatarSize"] = {
-      /**
-       * component size - 2rem
-       * font size - 1rem
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      XS: "XS",
-      /**
-       * component size - 3rem
-       * font size - 1.5rem
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      S: "S",
-      /**
-       * component size - 4rem
-       * font size - 2rem
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      M: "M",
       /**
        * component size - 5rem
        * font size - 2.5rem
@@ -415,21 +457,45 @@ sap.ui.define(
        */
       L: "L",
       /**
+       * component size - 4rem
+       * font size - 2rem
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      M: "M",
+      /**
+       * component size - 3rem
+       * font size - 1.5rem
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      S: "S",
+      /**
        * component size - 7rem
        * font size - 3rem
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      XL: "XL"
+      XL: "XL",
+      /**
+       * component size - 2rem
+       * font size - 1rem
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      XS: "XS"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.AvatarSize", pkg["AvatarSize"]);
+    registerEnum("sap.f.gen.ui5.webcomponents.dist.types.AvatarSize", pkg["AvatarSize"]);
     /**
      * Defines background designs.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.BackgroundDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents BackgroundDesign
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/BackgroundDesign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.BackgroundDesign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -442,63 +508,77 @@ sap.ui.define(
        */
       Solid: "Solid",
       /**
-       * Transparent background.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Transparent: "Transparent",
-      /**
        * A translucent background depending on the opacity value of the theme.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Translucent: "Translucent"
+      Translucent: "Translucent",
+      /**
+       * Transparent background.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Transparent: "Transparent"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.BackgroundDesign",
+      "sap.f.gen.ui5.webcomponents.dist.types.BackgroundDesign",
       pkg["BackgroundDesign"]
     );
     /**
      * ListItem accessible roles.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.BarAccessibleRole
-     * @ui5-module-override sap/f/gen/ui5/webcomponents BarAccessibleRole
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/BarAccessibleRole
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.BarAccessibleRole
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["BarAccessibleRole"] = {
-      /**
-       * Represents the ARIA role &quot;toolbar&quot;.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Toolbar: "Toolbar",
       /**
        * Represents the ARIA role &quot;none&quot;.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      None: "None"
+      None: "None",
+      /**
+       * Represents the ARIA role &quot;toolbar&quot;.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Toolbar: "Toolbar"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.BarAccessibleRole",
+      "sap.f.gen.ui5.webcomponents.dist.types.BarAccessibleRole",
       pkg["BarAccessibleRole"]
     );
     /**
      * Different types of Bar design
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.BarDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents BarDesign
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/BarDesign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.BarDesign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["BarDesign"] = {
+      /**
+       * Floating Footer type - there is visible border on all sides
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      FloatingFooter: "FloatingFooter",
+      /**
+       * Footer type
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Footer: "Footer",
       /**
        * Default type
        *
@@ -512,59 +592,55 @@ sap.ui.define(
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Subheader: "Subheader",
-      /**
-       * Footer type
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Footer: "Footer",
-      /**
-       * Floating Footer type - there is visible border on all sides
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      FloatingFooter: "FloatingFooter"
+      Subheader: "Subheader"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.BarDesign", pkg["BarDesign"]);
+    registerEnum("sap.f.gen.ui5.webcomponents.dist.types.BarDesign", pkg["BarDesign"]);
     /**
      * Defines border designs.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.BorderDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents BorderDesign
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/BorderDesign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.BorderDesign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["BorderDesign"] = {
-      /**
-       * A solid border color dependent on the theme.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Solid: "Solid",
       /**
        * Specifies no border.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      None: "None"
+      None: "None",
+      /**
+       * A solid border color dependent on the theme.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Solid: "Solid"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.BorderDesign", pkg["BorderDesign"]);
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.BorderDesign",
+      pkg["BorderDesign"]
+    );
     /**
      * Different  Breadcrumbs designs.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.BreadcrumbsDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents BreadcrumbsDesign
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/BreadcrumbsDesign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.BreadcrumbsDesign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["BreadcrumbsDesign"] = {
+      /**
+       * All items are displayed as links.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      NoCurrentPage: "NoCurrentPage",
       /**
        * Shows the current page as the last item in the trail.
        * The last item contains only plain text and is not a link.
@@ -572,36 +648,22 @@ sap.ui.define(
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Standard: "Standard",
-      /**
-       * All items are displayed as links.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      NoCurrentPage: "NoCurrentPage"
+      Standard: "Standard"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.BreadcrumbsDesign",
+      "sap.f.gen.ui5.webcomponents.dist.types.BreadcrumbsDesign",
       pkg["BreadcrumbsDesign"]
     );
     /**
      * Different Breadcrumbs separators.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.BreadcrumbsSeparator
-     * @ui5-module-override sap/f/gen/ui5/webcomponents BreadcrumbsSeparator
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/BreadcrumbsSeparator
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.BreadcrumbsSeparator
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["BreadcrumbsSeparator"] = {
-      /**
-       * The separator appears as &quot;/&quot;.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Slash: "Slash",
       /**
        * The separator appears as &quot;\&quot;.
        *
@@ -636,29 +698,36 @@ sap.ui.define(
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      GreaterThan: "GreaterThan"
+      GreaterThan: "GreaterThan",
+      /**
+       * The separator appears as &quot;/&quot;.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Slash: "Slash"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.BreadcrumbsSeparator",
+      "sap.f.gen.ui5.webcomponents.dist.types.BreadcrumbsSeparator",
       pkg["BreadcrumbsSeparator"]
     );
     /**
      * Different BusyIndicator sizes.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.BusyIndicatorSize
-     * @ui5-module-override sap/f/gen/ui5/webcomponents BusyIndicatorSize
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/BusyIndicatorSize
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.BusyIndicatorSize
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["BusyIndicatorSize"] = {
       /**
-       * small size
+       * large size
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      S: "S",
+      L: "L",
       /**
        * medium size
        *
@@ -667,52 +736,52 @@ sap.ui.define(
        */
       M: "M",
       /**
-       * large size
+       * small size
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      L: "L"
+      S: "S"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.BusyIndicatorSize",
+      "sap.f.gen.ui5.webcomponents.dist.types.BusyIndicatorSize",
       pkg["BusyIndicatorSize"]
     );
     /**
      * Different BusyIndicator text placements.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.BusyIndicatorTextPlacement
-     * @ui5-module-override sap/f/gen/ui5/webcomponents BusyIndicatorTextPlacement
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/BusyIndicatorTextPlacement
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.BusyIndicatorTextPlacement
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["BusyIndicatorTextPlacement"] = {
-      /**
-       * The text will be displayed on top of the busy indicator.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Top: "Top",
       /**
        * The text will be displayed at the bottom of the busy indicator.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Bottom: "Bottom"
+      Bottom: "Bottom",
+      /**
+       * The text will be displayed on top of the busy indicator.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Top: "Top"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.BusyIndicatorTextPlacement",
+      "sap.f.gen.ui5.webcomponents.dist.types.BusyIndicatorTextPlacement",
       pkg["BusyIndicatorTextPlacement"]
     );
     /**
      * Button accessible roles.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.ButtonAccessibleRole
-     * @ui5-module-override sap/f/gen/ui5/webcomponents ButtonAccessibleRole
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ButtonAccessibleRole
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ButtonAccessibleRole
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -733,19 +802,26 @@ sap.ui.define(
       Link: "Link"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.ButtonAccessibleRole",
+      "sap.f.gen.ui5.webcomponents.dist.types.ButtonAccessibleRole",
       pkg["ButtonAccessibleRole"]
     );
     /**
      * Determines where the badge will be placed and how it will be styled.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.ButtonBadgeDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents ButtonBadgeDesign
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ButtonBadgeDesign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ButtonBadgeDesign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ButtonBadgeDesign"] = {
+      /**
+       * The badge is displayed as an attention dot.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      AttentionDot: "AttentionDot",
       /**
        * The badge is displayed after the text, inside the button.
        *
@@ -761,29 +837,29 @@ sap.ui.define(
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      OverlayText: "OverlayText",
-      /**
-       * The badge is displayed as an attention dot.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      AttentionDot: "AttentionDot"
+      OverlayText: "OverlayText"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.ButtonBadgeDesign",
+      "sap.f.gen.ui5.webcomponents.dist.types.ButtonBadgeDesign",
       pkg["ButtonBadgeDesign"]
     );
     /**
      * Different Button designs.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.ButtonDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents ButtonDesign
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ButtonDesign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ButtonDesign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ButtonDesign"] = {
+      /**
+       * attention type
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Attention: "Attention",
       /**
        * default type (no special styling)
        *
@@ -792,12 +868,12 @@ sap.ui.define(
        */
       Default: "Default",
       /**
-       * accept type (green button)
+       * emphasized type
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Positive: "Positive",
+      Emphasized: "Emphasized",
       /**
        * reject style (red button)
        *
@@ -806,34 +882,30 @@ sap.ui.define(
        */
       Negative: "Negative",
       /**
+       * accept type (green button)
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Positive: "Positive",
+      /**
        * transparent type
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Transparent: "Transparent",
-      /**
-       * emphasized type
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Emphasized: "Emphasized",
-      /**
-       * attention type
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Attention: "Attention"
+      Transparent: "Transparent"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.ButtonDesign", pkg["ButtonDesign"]);
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.ButtonDesign",
+      pkg["ButtonDesign"]
+    );
     /**
      * Determines if the button has special form-related functionality.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.ButtonType
-     * @ui5-module-override sap/f/gen/ui5/webcomponents ButtonType
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ButtonType
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ButtonType
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -846,27 +918,27 @@ sap.ui.define(
        */
       Button: "Button",
       /**
-       * The button acts as a submit button (submits a form)
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Submit: "Submit",
-      /**
        * The button acts as a reset button (resets a form)
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Reset: "Reset"
+      Reset: "Reset",
+      /**
+       * The button acts as a submit button (submits a form)
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Submit: "Submit"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.ButtonType", pkg["ButtonType"]);
+    registerEnum("sap.f.gen.ui5.webcomponents.dist.types.ButtonType", pkg["ButtonType"]);
     /**
      * Enum for calendar legend items' types.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.CalendarLegendItemType
-     * @ui5-module-override sap/f/gen/ui5/webcomponents CalendarLegendItemType
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/CalendarLegendItemType
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.CalendarLegendItemType
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -878,13 +950,6 @@ sap.ui.define(
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None",
-      /**
-       * Represents the &quot;Working&quot; item in the calendar legend.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Working: "Working",
       /**
        * Represents the &quot;NonWorking&quot; item in the calendar legend.
        *
@@ -1031,29 +1096,29 @@ sap.ui.define(
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Type20: "Type20"
+      Type20: "Type20",
+      /**
+       * Represents the &quot;Working&quot; item in the calendar legend.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Working: "Working"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.CalendarLegendItemType",
+      "sap.f.gen.ui5.webcomponents.dist.types.CalendarLegendItemType",
       pkg["CalendarLegendItemType"]
     );
     /**
      * Different Calendar selection mode.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.CalendarSelectionMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents CalendarSelectionMode
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/CalendarSelectionMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.CalendarSelectionMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["CalendarSelectionMode"] = {
-      /**
-       * Only one date can be selected at a time
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Single: "Single",
       /**
        * Several dates can be selected
        *
@@ -1067,10 +1132,17 @@ sap.ui.define(
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Range: "Range"
+      Range: "Range",
+      /**
+       * Only one date can be selected at a time
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Single: "Single"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.CalendarSelectionMode",
+      "sap.f.gen.ui5.webcomponents.dist.types.CalendarSelectionMode",
       pkg["CalendarSelectionMode"]
     );
     /**
@@ -1080,8 +1152,8 @@ sap.ui.define(
      * - The first week of the year.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.CalendarWeekNumbering
-     * @ui5-module-override sap/f/gen/ui5/webcomponents CalendarWeekNumbering
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/CalendarWeekNumbering
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.CalendarWeekNumbering
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1124,15 +1196,15 @@ sap.ui.define(
       WesternTraditional: "WesternTraditional"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.CalendarWeekNumbering",
+      "sap.f.gen.ui5.webcomponents.dist.types.CalendarWeekNumbering",
       pkg["CalendarWeekNumbering"]
     );
     /**
      * Different Carousel arrows placement.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.CarouselArrowsPlacement
-     * @ui5-module-override sap/f/gen/ui5/webcomponents CarouselArrowsPlacement
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/CarouselArrowsPlacement
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.CarouselArrowsPlacement
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1153,15 +1225,15 @@ sap.ui.define(
       Navigation: "Navigation"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.CarouselArrowsPlacement",
+      "sap.f.gen.ui5.webcomponents.dist.types.CarouselArrowsPlacement",
       pkg["CarouselArrowsPlacement"]
     );
     /**
      * Different Carousel page indicator types.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.CarouselPageIndicatorType
-     * @ui5-module-override sap/f/gen/ui5/webcomponents CarouselPageIndicatorType
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/CarouselPageIndicatorType
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.CarouselPageIndicatorType
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1183,33 +1255,19 @@ sap.ui.define(
       Numeric: "Numeric"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.CarouselPageIndicatorType",
+      "sap.f.gen.ui5.webcomponents.dist.types.CarouselPageIndicatorType",
       pkg["CarouselPageIndicatorType"]
     );
     /**
      * Different filtering types of the ComboBox.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.ComboBoxFilter
-     * @ui5-module-override sap/f/gen/ui5/webcomponents ComboBoxFilter
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ComboBoxFilter
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ComboBoxFilter
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ComboBoxFilter"] = {
-      /**
-       * Defines filtering by first symbol of each word of item&#x27;s text.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      StartsWithPerTerm: "StartsWithPerTerm",
-      /**
-       * Defines filtering by starting symbol of item&#x27;s text.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      StartsWith: "StartsWith",
       /**
        * Defines contains filtering.
        *
@@ -1223,15 +1281,32 @@ sap.ui.define(
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      None: "None"
+      None: "None",
+      /**
+       * Defines filtering by starting symbol of item&#x27;s text.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      StartsWith: "StartsWith",
+      /**
+       * Defines filtering by first symbol of each word of item&#x27;s text.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      StartsWithPerTerm: "StartsWithPerTerm"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.ComboBoxFilter", pkg["ComboBoxFilter"]);
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.ComboBoxFilter",
+      pkg["ComboBoxFilter"]
+    );
     /**
      * Overflow Mode.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.ExpandableTextOverflowMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents ExpandableTextOverflowMode
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ExpandableTextOverflowMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ExpandableTextOverflowMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1252,45 +1327,105 @@ sap.ui.define(
       Popover: "Popover"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.ExpandableTextOverflowMode",
+      "sap.f.gen.ui5.webcomponents.dist.types.ExpandableTextOverflowMode",
       pkg["ExpandableTextOverflowMode"]
     );
     /**
-     * Different Button designs.
+     * Accessibility modes of the Form.
+     *
+     * Based on the mode, the Form and its items will render different HTML elements and ARIA attributes,
+     * which are appropriate for the use-case.
+     *
+     * **Usage:**
+     * - "Display" mode should be used when the form consists of non-editable (e.g. texts) form items.
+     * - "Edit" mode should be used when the form consists of editable (e.g. input fields) form items.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.FormItemSpacing
-     * @ui5-module-override sap/f/gen/ui5/webcomponents FormItemSpacing
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/FormAccessibleMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.FormAccessibleMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["FormItemSpacing"] = {
+    pkg["FormAccessibleMode"] = {
       /**
-       * Normal spacing (smaller vertical space between form items).
+       * Display mode.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Normal: "Normal",
+      Display: "Display",
+      /**
+       * Edit mode.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Edit: "Edit"
+    };
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.FormAccessibleMode",
+      pkg["FormAccessibleMode"]
+    );
+    /**
+     * Different spacing of the form items.
+     *
+     * @enum {string}
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/FormItemSpacing
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.FormItemSpacing
+     * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
+     */
+    pkg["FormItemSpacing"] = {
       /**
        * Large spacing (larger vertical space between form items).
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Large: "Large"
+      Large: "Large",
+      /**
+       * Normal spacing (smaller vertical space between form items).
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Normal: "Normal"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.FormItemSpacing", pkg["FormItemSpacing"]);
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.FormItemSpacing",
+      pkg["FormItemSpacing"]
+    );
     /**
      * Different types of Highlight .
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.Highlight
-     * @ui5-module-override sap/f/gen/ui5/webcomponents Highlight
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/Highlight
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.Highlight
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["Highlight"] = {
+      /**
+       * Critical
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Critical: "Critical",
+      /**
+       * Information
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Information: "Information",
+      /**
+       * Negative
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Negative: "Negative",
       /**
        * None
        *
@@ -1304,36 +1439,15 @@ sap.ui.define(
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Positive: "Positive",
-      /**
-       * Critical
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Critical: "Critical",
-      /**
-       * Negative
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Negative: "Negative",
-      /**
-       * Information
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Information: "Information"
+      Positive: "Positive"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.Highlight", pkg["Highlight"]);
+    registerEnum("sap.f.gen.ui5.webcomponents.dist.types.Highlight", pkg["Highlight"]);
     /**
      * Different Icon semantic designs.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.IconDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents IconDesign
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/IconDesign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.IconDesign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1395,25 +1509,17 @@ sap.ui.define(
        */
       Positive: "Positive"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.IconDesign", pkg["IconDesign"]);
+    registerEnum("sap.f.gen.ui5.webcomponents.dist.types.IconDesign", pkg["IconDesign"]);
     /**
      * Different Icon modes.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.IconMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents IconMode
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/IconMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.IconMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["IconMode"] = {
-      /**
-       * Image mode (by default).
-       * Configures the component to internally render role&#x3D;&quot;img&quot;.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Image: "Image",
       /**
        * Decorative mode.
        * Configures the component to internally render role&#x3D;&quot;presentation&quot; and aria-hidden&#x3D;&quot;true&quot;,
@@ -1424,6 +1530,14 @@ sap.ui.define(
        */
       Decorative: "Decorative",
       /**
+       * Image mode (by default).
+       * Configures the component to internally render role&#x3D;&quot;img&quot;.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Image: "Image",
+      /**
        * Interactive mode.
        * Configures the component to internally render role&#x3D;&quot;button&quot;.
        * This mode also supports focus and press handling to enhance interactivity.
@@ -1433,24 +1547,60 @@ sap.ui.define(
        */
       Interactive: "Interactive"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.IconMode", pkg["IconMode"]);
+    registerEnum("sap.f.gen.ui5.webcomponents.dist.types.IconMode", pkg["IconMode"]);
     /**
-     * Different input types.
+     * Different filtering types of the Input.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.InputType
-     * @ui5-module-override sap/f/gen/ui5/webcomponents InputType
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/InputSuggestionsFilter
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.InputSuggestionsFilter
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["InputType"] = {
+    pkg["InputSuggestionsFilter"] = {
       /**
-       * Defines a one-line text input field:
+       * Defines contains filtering.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Text: "Text",
+      Contains: "Contains",
+      /**
+       * Removes any filtering applied while typing
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      None: "None",
+      /**
+       * Defines filtering by starting symbol of item&#x27;s text.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      StartsWith: "StartsWith",
+      /**
+       * Defines filtering by first symbol of each word of item&#x27;s text.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      StartsWithPerTerm: "StartsWithPerTerm"
+    };
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.InputSuggestionsFilter",
+      pkg["InputSuggestionsFilter"]
+    );
+    /**
+     * Different input types.
+     *
+     * @enum {string}
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/InputType
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.InputType
+     * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
+     */
+    pkg["InputType"] = {
       /**
        * Used for input fields that must contain an e-mail address.
        *
@@ -1473,6 +1623,13 @@ sap.ui.define(
        */
       Password: "Password",
       /**
+       * Used for input fields that should contain a search term.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Search: "Search",
+      /**
        * Used for input fields that should contain a telephone number.
        *
        * @private
@@ -1480,85 +1637,85 @@ sap.ui.define(
        */
       Tel: "Tel",
       /**
+       * Defines a one-line text input field:
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Text: "Text",
+      /**
        * Used for input fields that should contain a URL address.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      URL: "URL",
-      /**
-       * Used for input fields that should contain a search term.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Search: "Search"
+      URL: "URL"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.InputType", pkg["InputType"]);
+    registerEnum("sap.f.gen.ui5.webcomponents.dist.types.InputType", pkg["InputType"]);
     /**
      * Defines the area size around the component that the user can select.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.InteractiveAreaSize
-     * @ui5-module-override sap/f/gen/ui5/webcomponents InteractiveAreaSize
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/InteractiveAreaSize
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.InteractiveAreaSize
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["InteractiveAreaSize"] = {
-      /**
-       * The default target area size (the area taken by the component itself without any extra invisible touch area).
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Normal: "Normal",
       /**
        * Enlarged target area size (up to 24px in height) provides users with an enhanced dedicated space to interact with the component.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Large: "Large"
+      Large: "Large",
+      /**
+       * The default target area size (the area taken by the component itself without any extra invisible touch area).
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Normal: "Normal"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.InteractiveAreaSize",
+      "sap.f.gen.ui5.webcomponents.dist.types.InteractiveAreaSize",
       pkg["InteractiveAreaSize"]
     );
     /**
      * Link accessible roles.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.LinkAccessibleRole
-     * @ui5-module-override sap/f/gen/ui5/webcomponents LinkAccessibleRole
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/LinkAccessibleRole
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.LinkAccessibleRole
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["LinkAccessibleRole"] = {
-      /**
-       * Represents Default (link) ARIA role.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Link: "Link",
       /**
        * Represents the ARIA role &quot;button&quot;.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Button: "Button"
+      Button: "Button",
+      /**
+       * Represents Default (link) ARIA role.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Link: "Link"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.LinkAccessibleRole",
+      "sap.f.gen.ui5.webcomponents.dist.types.LinkAccessibleRole",
       pkg["LinkAccessibleRole"]
     );
     /**
      * Different link designs.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.LinkDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents LinkDesign
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/LinkDesign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.LinkDesign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1571,27 +1728,27 @@ sap.ui.define(
        */
       Default: "Default",
       /**
-       * subtle type (appears as regular text, rather than a link)
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Subtle: "Subtle",
-      /**
        * emphasized type
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Emphasized: "Emphasized"
+      Emphasized: "Emphasized",
+      /**
+       * subtle type (appears as regular text, rather than a link)
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Subtle: "Subtle"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.LinkDesign", pkg["LinkDesign"]);
+    registerEnum("sap.f.gen.ui5.webcomponents.dist.types.LinkDesign", pkg["LinkDesign"]);
     /**
      * List accessible roles.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.ListAccessibleRole
-     * @ui5-module-override sap/f/gen/ui5/webcomponents ListAccessibleRole
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ListAccessibleRole
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ListAccessibleRole
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1603,6 +1760,13 @@ sap.ui.define(
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       List: "List",
+      /**
+       * Represents the ARIA role &quot;listbox&quot;.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      ListBox: "ListBox",
       /**
        * Represents the ARIA role &quot;menu&quot;.
        *
@@ -1616,25 +1780,18 @@ sap.ui.define(
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Tree: "Tree",
-      /**
-       * Represents the ARIA role &quot;listbox&quot;.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      ListBox: "ListBox"
+      Tree: "Tree"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.ListAccessibleRole",
+      "sap.f.gen.ui5.webcomponents.dist.types.ListAccessibleRole",
       pkg["ListAccessibleRole"]
     );
     /**
      * Different list growing modes.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.ListGrowingMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents ListGrowingMode
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ListGrowingMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ListGrowingMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1648,27 +1805,30 @@ sap.ui.define(
        */
       Button: "Button",
       /**
-       * Component&#x27;s &quot;load-more&quot; is fired upon scroll.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Scroll: "Scroll",
-      /**
        * Component&#x27;s growing is not enabled.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      None: "None"
+      None: "None",
+      /**
+       * Component&#x27;s &quot;load-more&quot; is fired upon scroll.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Scroll: "Scroll"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.ListGrowingMode", pkg["ListGrowingMode"]);
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.ListGrowingMode",
+      pkg["ListGrowingMode"]
+    );
     /**
      * ListItem accessible roles.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.ListItemAccessibleRole
-     * @ui5-module-override sap/f/gen/ui5/webcomponents ListItemAccessibleRole
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ListItemAccessibleRole
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ListItemAccessibleRole
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1688,12 +1848,12 @@ sap.ui.define(
        */
       MenuItem: "MenuItem",
       /**
-       * Represents the ARIA role &quot;treeitem&quot;.
+       * Represents the ARIA role &quot;none&quot;.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      TreeItem: "TreeItem",
+      None: "None",
       /**
        * Represents the ARIA role &quot;option&quot;.
        *
@@ -1702,34 +1862,27 @@ sap.ui.define(
        */
       Option: "Option",
       /**
-       * Represents the ARIA role &quot;none&quot;.
+       * Represents the ARIA role &quot;treeitem&quot;.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      None: "None"
+      TreeItem: "TreeItem"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.ListItemAccessibleRole",
+      "sap.f.gen.ui5.webcomponents.dist.types.ListItemAccessibleRole",
       pkg["ListItemAccessibleRole"]
     );
     /**
      * Different list item types.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.ListItemType
-     * @ui5-module-override sap/f/gen/ui5/webcomponents ListItemType
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ListItemType
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ListItemType
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ListItemType"] = {
-      /**
-       * Indicates the list item does not have any active feedback when item is pressed.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Inactive: "Inactive",
       /**
        * Indicates that the item is clickable via active feedback when item is pressed.
        *
@@ -1745,6 +1898,13 @@ sap.ui.define(
        */
       Detail: "Detail",
       /**
+       * Indicates the list item does not have any active feedback when item is pressed.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Inactive: "Inactive",
+      /**
        * Enables the type of navigation, which is specified to add an arrow at the end of the items and fires navigate-click event.
        *
        * @private
@@ -1752,17 +1912,34 @@ sap.ui.define(
        */
       Navigation: "Navigation"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.ListItemType", pkg["ListItemType"]);
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.ListItemType",
+      pkg["ListItemType"]
+    );
     /**
      * Different list selection modes.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.ListSelectionMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents ListSelectionMode
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ListSelectionMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ListSelectionMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ListSelectionMode"] = {
+      /**
+       * Delete mode (only one list item can be deleted via provided delete button)
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Delete: "Delete",
+      /**
+       * Multi selection mode (more than one list item can be selected).
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Multiple: "Multiple",
       /**
        * Default mode (no selection).
        *
@@ -1778,12 +1955,13 @@ sap.ui.define(
        */
       Single: "Single",
       /**
-       * Left-positioned single selection mode (only one list item can be selected).
+       * Selected item is highlighted and selection is changed upon arrow navigation
+       * (only one list item can be selected - this is always the focused item).
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      SingleStart: "SingleStart",
+      SingleAuto: "SingleAuto",
       /**
        * Selected item is highlighted but no selection element is visible
        * (only one list item can be selected).
@@ -1793,38 +1971,23 @@ sap.ui.define(
        */
       SingleEnd: "SingleEnd",
       /**
-       * Selected item is highlighted and selection is changed upon arrow navigation
-       * (only one list item can be selected - this is always the focused item).
+       * Left-positioned single selection mode (only one list item can be selected).
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      SingleAuto: "SingleAuto",
-      /**
-       * Multi selection mode (more than one list item can be selected).
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Multiple: "Multiple",
-      /**
-       * Delete mode (only one list item can be deleted via provided delete button)
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Delete: "Delete"
+      SingleStart: "SingleStart"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.ListSelectionMode",
+      "sap.f.gen.ui5.webcomponents.dist.types.ListSelectionMode",
       pkg["ListSelectionMode"]
     );
     /**
      * Different types of list items separators.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.ListSeparator
-     * @ui5-module-override sap/f/gen/ui5/webcomponents ListSeparator
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ListSeparator
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ListSeparator
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1852,17 +2015,27 @@ sap.ui.define(
        */
       None: "None"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.ListSeparator", pkg["ListSeparator"]);
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.ListSeparator",
+      pkg["ListSeparator"]
+    );
     /**
      * Menu item group check modes.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.MenuItemGroupCheckMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents MenuItemGroupCheckMode
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/MenuItemGroupCheckMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.MenuItemGroupCheckMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["MenuItemGroupCheckMode"] = {
+      /**
+       * Multiple items check mode (multiple items in a group can be checked at a time)
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Multiple: "Multiple",
       /**
        * default type (items in a group cannot be checked)
        *
@@ -1876,57 +2049,22 @@ sap.ui.define(
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Single: "Single",
-      /**
-       * Multiple items check mode (multiple items in a group can be checked at a time)
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Multiple: "Multiple"
+      Single: "Single"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.MenuItemGroupCheckMode",
+      "sap.f.gen.ui5.webcomponents.dist.types.MenuItemGroupCheckMode",
       pkg["MenuItemGroupCheckMode"]
     );
     /**
      * MessageStrip designs.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.MessageStripDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents MessageStripDesign
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/MessageStripDesign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.MessageStripDesign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["MessageStripDesign"] = {
-      /**
-       * Message should be just an information
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Information: "Information",
-      /**
-       * Message is a success message
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Positive: "Positive",
-      /**
-       * Message is an error
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Negative: "Negative",
-      /**
-       * Message is a warning
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Critical: "Critical",
       /**
        * Message uses custom color set 1
        *
@@ -1940,18 +2078,46 @@ sap.ui.define(
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      ColorSet2: "ColorSet2"
+      ColorSet2: "ColorSet2",
+      /**
+       * Message is a warning
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Critical: "Critical",
+      /**
+       * Message should be just an information
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Information: "Information",
+      /**
+       * Message is an error
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Negative: "Negative",
+      /**
+       * Message is a success message
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Positive: "Positive"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.MessageStripDesign",
+      "sap.f.gen.ui5.webcomponents.dist.types.MessageStripDesign",
       pkg["MessageStripDesign"]
     );
     /**
      * Different notification list growing modes.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.NotificationListGrowingMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents NotificationListGrowingMode
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/NotificationListGrowingMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.NotificationListGrowingMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1973,15 +2139,15 @@ sap.ui.define(
       None: "None"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.NotificationListGrowingMode",
+      "sap.f.gen.ui5.webcomponents.dist.types.NotificationListGrowingMode",
       pkg["NotificationListGrowingMode"]
     );
     /**
      * Tabs overflow mode in TabContainer.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.OverflowMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents OverflowMode
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/OverflowMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.OverflowMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -2001,13 +2167,16 @@ sap.ui.define(
        */
       StartAndEnd: "StartAndEnd"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.OverflowMode", pkg["OverflowMode"]);
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.OverflowMode",
+      pkg["OverflowMode"]
+    );
     /**
      * Panel accessible roles.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.PanelAccessibleRole
-     * @ui5-module-override sap/f/gen/ui5/webcomponents PanelAccessibleRole
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/PanelAccessibleRole
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.PanelAccessibleRole
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -2038,15 +2207,15 @@ sap.ui.define(
       Region: "Region"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.PanelAccessibleRole",
+      "sap.f.gen.ui5.webcomponents.dist.types.PanelAccessibleRole",
       pkg["PanelAccessibleRole"]
     );
     /**
      * Popover horizontal align types.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.PopoverHorizontalAlign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents PopoverHorizontalAlign
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/PopoverHorizontalAlign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.PopoverHorizontalAlign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -2059,19 +2228,19 @@ sap.ui.define(
        */
       Center: "Center",
       /**
-       * Popover is aligned with the start of the target.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Start: "Start",
-      /**
        * Popover is aligned with the end of the target.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       End: "End",
+      /**
+       * Popover is aligned with the start of the target.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Start: "Start",
       /**
        * Popover is stretched.
        *
@@ -2081,26 +2250,26 @@ sap.ui.define(
       Stretch: "Stretch"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.PopoverHorizontalAlign",
+      "sap.f.gen.ui5.webcomponents.dist.types.PopoverHorizontalAlign",
       pkg["PopoverHorizontalAlign"]
     );
     /**
      * Popover placements.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.PopoverPlacement
-     * @ui5-module-override sap/f/gen/ui5/webcomponents PopoverPlacement
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/PopoverPlacement
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.PopoverPlacement
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["PopoverPlacement"] = {
       /**
-       * Popover will be placed at the start of the reference element.
+       * Popover will be placed at the bottom of the reference element.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Start: "Start",
+      Bottom: "Bottom",
       /**
        * Popover will be placed at the end of the reference element.
        *
@@ -2109,48 +2278,34 @@ sap.ui.define(
        */
       End: "End",
       /**
+       * Popover will be placed at the start of the reference element.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Start: "Start",
+      /**
        * Popover will be placed at the top of the reference element.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Top: "Top",
-      /**
-       * Popover will be placed at the bottom of the reference element.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Bottom: "Bottom"
+      Top: "Top"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.PopoverPlacement",
+      "sap.f.gen.ui5.webcomponents.dist.types.PopoverPlacement",
       pkg["PopoverPlacement"]
     );
     /**
      * Popover vertical align types.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.PopoverVerticalAlign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents PopoverVerticalAlign
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/PopoverVerticalAlign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.PopoverVerticalAlign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["PopoverVerticalAlign"] = {
-      /**
-       * Center
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Center: "Center",
-      /**
-       * Popover will be placed at the top of the reference control.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Top: "Top",
       /**
        * Popover will be placed at the bottom of the reference control.
        *
@@ -2159,34 +2314,48 @@ sap.ui.define(
        */
       Bottom: "Bottom",
       /**
+       * Center
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Center: "Center",
+      /**
        * Popover will be streched
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Stretch: "Stretch"
+      Stretch: "Stretch",
+      /**
+       * Popover will be placed at the top of the reference control.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Top: "Top"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.PopoverVerticalAlign",
+      "sap.f.gen.ui5.webcomponents.dist.types.PopoverVerticalAlign",
       pkg["PopoverVerticalAlign"]
     );
     /**
      * Popup accessible roles.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.PopupAccessibleRole
-     * @ui5-module-override sap/f/gen/ui5/webcomponents PopupAccessibleRole
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/PopupAccessibleRole
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.PopupAccessibleRole
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["PopupAccessibleRole"] = {
       /**
-       * Represents no ARIA role.
+       * Represents the ARIA role &quot;alertdialog&quot;.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      None: "None",
+      AlertDialog: "AlertDialog",
       /**
        * Represents the ARIA role &quot;dialog&quot;.
        *
@@ -2195,23 +2364,23 @@ sap.ui.define(
        */
       Dialog: "Dialog",
       /**
-       * Represents the ARIA role &quot;alertdialog&quot;.
+       * Represents no ARIA role.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      AlertDialog: "AlertDialog"
+      None: "None"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.PopupAccessibleRole",
+      "sap.f.gen.ui5.webcomponents.dist.types.PopupAccessibleRole",
       pkg["PopupAccessibleRole"]
     );
     /**
      * Different types of Priority.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.Priority
-     * @ui5-module-override sap/f/gen/ui5/webcomponents Priority
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/Priority
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.Priority
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -2224,19 +2393,19 @@ sap.ui.define(
        */
       High: "High",
       /**
-       * Medium priority.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Medium: "Medium",
-      /**
        * Low priority.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Low: "Low",
+      /**
+       * Medium priority.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Medium: "Medium",
       /**
        * Default, none priority.
        *
@@ -2245,25 +2414,25 @@ sap.ui.define(
        */
       None: "None"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.Priority", pkg["Priority"]);
+    registerEnum("sap.f.gen.ui5.webcomponents.dist.types.Priority", pkg["Priority"]);
     /**
      * Types of icon sizes used in the RatingIndicator.
      * Provides predefined size categories to ensure consistent scaling and spacing of icons.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.RatingIndicatorSize
-     * @ui5-module-override sap/f/gen/ui5/webcomponents RatingIndicatorSize
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/RatingIndicatorSize
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.RatingIndicatorSize
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["RatingIndicatorSize"] = {
       /**
-       * Small size for compact layouts.
+       * Large size for prominent or spacious layouts.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      S: "S",
+      L: "L",
       /**
        * Medium size, used as the default option.
        * Offers a balanced appearance for most scenarios.
@@ -2273,77 +2442,92 @@ sap.ui.define(
        */
       M: "M",
       /**
-       * Large size for prominent or spacious layouts.
+       * Small size for compact layouts.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      L: "L"
+      S: "S"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.RatingIndicatorSize",
+      "sap.f.gen.ui5.webcomponents.dist.types.RatingIndicatorSize",
       pkg["RatingIndicatorSize"]
     );
     /**
      * Different SegmentedButton selection modes.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.SegmentedButtonSelectionMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents SegmentedButtonSelectionMode
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/SegmentedButtonSelectionMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.SegmentedButtonSelectionMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["SegmentedButtonSelectionMode"] = {
-      /**
-       * There is always one selected. Selecting one deselects the previous one.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Single: "Single",
       /**
        * Multiple items can be selected at a time. All items can be deselected.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Multiple: "Multiple"
+      Multiple: "Multiple",
+      /**
+       * There is always one selected. Selecting one deselects the previous one.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Single: "Single"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.SegmentedButtonSelectionMode",
+      "sap.f.gen.ui5.webcomponents.dist.types.SegmentedButtonSelectionMode",
       pkg["SegmentedButtonSelectionMode"]
+    );
+    /**
+     * Defines the separator types for Select component two-column layout.
+     *
+     * @enum {string}
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/SelectTextSeparator
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.SelectTextSeparator
+     * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
+     */
+    pkg["SelectTextSeparator"] = {
+      /**
+       * Will show bullet(·) as separator on two columns layout when Select is in read-only mode.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Bullet: "Bullet",
+      /**
+       * Will show N-dash(–) as separator on two columns layout when Select is in read-only mode.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Dash: "Dash",
+      /**
+       * Will show vertical line(|) as separator on two columns layout when Select is in read-only mode.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      VerticalLine: "VerticalLine"
+    };
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.SelectTextSeparator",
+      pkg["SelectTextSeparator"]
     );
     /**
      * Different types of SemanticColor.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.SemanticColor
-     * @ui5-module-override sap/f/gen/ui5/webcomponents SemanticColor
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/SemanticColor
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.SemanticColor
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["SemanticColor"] = {
-      /**
-       * Default color (brand color)
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Default: "Default",
-      /**
-       * Positive color
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Positive: "Positive",
-      /**
-       * Negative color
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Negative: "Negative",
       /**
        * Critical color
        *
@@ -2352,46 +2536,73 @@ sap.ui.define(
        */
       Critical: "Critical",
       /**
+       * Default color (brand color)
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Default: "Default",
+      /**
+       * Negative color
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Negative: "Negative",
+      /**
        * Neutral color.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Neutral: "Neutral"
-    };
-    registerEnum("sap.f.gen.ui5.webcomponents.SemanticColor", pkg["SemanticColor"]);
-    /**
-     * Different types of Switch designs.
-     *
-     * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.SwitchDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents SwitchDesign
-     * @private
-     * @ui5-restricted sap.ushell,sap.esh.search.ui
-     */
-    pkg["SwitchDesign"] = {
+      Neutral: "Neutral",
       /**
-       * Defines the Switch as Textual
+       * Positive color
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Textual: "Textual",
+      Positive: "Positive"
+    };
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.SemanticColor",
+      pkg["SemanticColor"]
+    );
+    /**
+     * Different types of Switch designs.
+     *
+     * @enum {string}
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/SwitchDesign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.SwitchDesign
+     * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
+     */
+    pkg["SwitchDesign"] = {
       /**
        * Defines the Switch as Graphical
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Graphical: "Graphical"
+      Graphical: "Graphical",
+      /**
+       * Defines the Switch as Textual
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Textual: "Textual"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.SwitchDesign", pkg["SwitchDesign"]);
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.SwitchDesign",
+      pkg["SwitchDesign"]
+    );
     /**
      * Tab layout of TabContainer.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.TabLayout
-     * @ui5-module-override sap/f/gen/ui5/webcomponents TabLayout
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TabLayout
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TabLayout
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -2411,38 +2622,24 @@ sap.ui.define(
        */
       Standard: "Standard"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.TabLayout", pkg["TabLayout"]);
+    registerEnum("sap.f.gen.ui5.webcomponents.dist.types.TabLayout", pkg["TabLayout"]);
     /**
      * Alignment of the &lt;ui5-table-cell&gt; component.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.TableCellHorizontalAlign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents TableCellHorizontalAlign
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TableCellHorizontalAlign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TableCellHorizontalAlign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TableCellHorizontalAlign"] = {
       /**
-       * Left
+       * Center
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Left: "Left",
-      /**
-       * Start
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Start: "Start",
-      /**
-       * Right
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Right: "Right",
+      Center: "Center",
       /**
        * End
        *
@@ -2451,23 +2648,37 @@ sap.ui.define(
        */
       End: "End",
       /**
-       * Center
+       * Left
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Center: "Center"
+      Left: "Left",
+      /**
+       * Right
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Right: "Right",
+      /**
+       * Start
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Start: "Start"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.TableCellHorizontalAlign",
+      "sap.f.gen.ui5.webcomponents.dist.types.TableCellHorizontalAlign",
       pkg["TableCellHorizontalAlign"]
     );
     /**
      * Growing mode of the &lt;ui5-table&gt; component.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.TableGrowingMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents TableGrowingMode
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TableGrowingMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TableGrowingMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -2490,55 +2701,48 @@ sap.ui.define(
       Scroll: "Scroll"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.TableGrowingMode",
+      "sap.f.gen.ui5.webcomponents.dist.types.TableGrowingMode",
       pkg["TableGrowingMode"]
     );
     /**
-     * Overflow mode of the &lt;ui5-table&gt; component.
+     * Overflow mode of the `ui5-table` component.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.TableOverflowMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents TableOverflowMode
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TableOverflowMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TableOverflowMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TableOverflowMode"] = {
-      /**
-       * Shows a scrollbar, when the table cannot fit all columns.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Scroll: "Scroll",
       /**
        * Pops in columns, that do not fit into the table anymore.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Popin: "Popin"
+      Popin: "Popin",
+      /**
+       * Shows a scrollbar, when the table cannot fit all columns.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Scroll: "Scroll"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.TableOverflowMode",
+      "sap.f.gen.ui5.webcomponents.dist.types.TableOverflowMode",
       pkg["TableOverflowMode"]
     );
     /**
      * Selection behavior of the `ui5-table` selection components.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.TableSelectionBehavior
-     * @ui5-module-override sap/f/gen/ui5/webcomponents TableSelectionBehavior
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TableSelectionBehavior
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TableSelectionBehavior
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TableSelectionBehavior"] = {
-      /**
-       * Rows can only be selected by using the row selector column.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      RowSelector: "RowSelector",
       /**
        * Rows can only be selected by clicking directly on the row, as the row selector column is hidden.
        *
@@ -2547,22 +2751,36 @@ sap.ui.define(
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      RowOnly: "RowOnly"
+      RowOnly: "RowOnly",
+      /**
+       * Rows can only be selected by using the row selector column.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      RowSelector: "RowSelector"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.TableSelectionBehavior",
+      "sap.f.gen.ui5.webcomponents.dist.types.TableSelectionBehavior",
       pkg["TableSelectionBehavior"]
     );
     /**
      * Selection modes of the &lt;ui5-table&gt; component.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.TableSelectionMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents TableSelectionMode
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TableSelectionMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TableSelectionMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TableSelectionMode"] = {
+      /**
+       * Multi selection mode (more than one table row can be selected).
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Multiple: "Multiple",
       /**
        * Default mode (no selection).
        *
@@ -2576,58 +2794,86 @@ sap.ui.define(
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Single: "Single",
-      /**
-       * Multi selection mode (more than one table row can be selected).
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Multiple: "Multiple"
+      Single: "Single"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.TableSelectionMode",
+      "sap.f.gen.ui5.webcomponents.dist.types.TableSelectionMode",
       pkg["TableSelectionMode"]
     );
     /**
      * Selectors of the table header row in multi-selection scenarios.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.TableSelectionMultiHeaderSelector
-     * @ui5-module-override sap/f/gen/ui5/webcomponents TableSelectionMultiHeaderSelector
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TableSelectionMultiHeaderSelector
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TableSelectionMultiHeaderSelector
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TableSelectionMultiHeaderSelector"] = {
-      /**
-       * Renders a checkbox in the table header row that toggles the selection of all rows.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      SelectAll: "SelectAll",
       /**
        * Renders an icon in the table header row that removes the selection of all rows.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      ClearAll: "ClearAll"
+      ClearAll: "ClearAll",
+      /**
+       * Renders a checkbox in the table header row that toggles the selection of all rows.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      SelectAll: "SelectAll"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.TableSelectionMultiHeaderSelector",
+      "sap.f.gen.ui5.webcomponents.dist.types.TableSelectionMultiHeaderSelector",
       pkg["TableSelectionMultiHeaderSelector"]
     );
     /**
      * Defines tag design types.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.TagDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents TagDesign
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TagDesign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TagDesign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TagDesign"] = {
+      /**
+       * Critical design
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Critical: "Critical",
+      /**
+       * Information design
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Information: "Information",
+      /**
+       * Negative design
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Negative: "Negative",
+      /**
+       * Neutral design
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Neutral: "Neutral",
+      /**
+       * Positive design
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Positive: "Positive",
       /**
        * Set1 of generic indication colors that are intended for industry-specific use cases
        *
@@ -2641,76 +2887,41 @@ sap.ui.define(
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      Set2: "Set2",
-      /**
-       * Neutral design
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Neutral: "Neutral",
-      /**
-       * Information design
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Information: "Information",
-      /**
-       * Positive design
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Positive: "Positive",
-      /**
-       * Negative design
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Negative: "Negative",
-      /**
-       * Critical design
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Critical: "Critical"
+      Set2: "Set2"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.TagDesign", pkg["TagDesign"]);
+    registerEnum("sap.f.gen.ui5.webcomponents.dist.types.TagDesign", pkg["TagDesign"]);
     /**
      * Predefined sizes for the tag.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.TagSize
-     * @ui5-module-override sap/f/gen/ui5/webcomponents TagSize
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TagSize
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TagSize
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TagSize"] = {
-      /**
-       * Small size of the tag
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      S: "S",
       /**
        * Large size of the tag
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      L: "L"
+      L: "L",
+      /**
+       * Small size of the tag
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      S: "S"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.TagSize", pkg["TagSize"]);
+    registerEnum("sap.f.gen.ui5.webcomponents.dist.types.TagSize", pkg["TagSize"]);
     /**
      * Empty Indicator Mode.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.TextEmptyIndicatorMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents TextEmptyIndicatorMode
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TextEmptyIndicatorMode
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TextEmptyIndicatorMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -2731,15 +2942,15 @@ sap.ui.define(
       On: "On"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.TextEmptyIndicatorMode",
+      "sap.f.gen.ui5.webcomponents.dist.types.TextEmptyIndicatorMode",
       pkg["TextEmptyIndicatorMode"]
     );
     /**
      * Different types of Title level.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.TitleLevel
-     * @ui5-module-override sap/f/gen/ui5/webcomponents TitleLevel
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TitleLevel
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TitleLevel
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -2787,45 +2998,39 @@ sap.ui.define(
        */
       H6: "H6"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.TitleLevel", pkg["TitleLevel"]);
+    registerEnum("sap.f.gen.ui5.webcomponents.dist.types.TitleLevel", pkg["TitleLevel"]);
     /**
      * Toast placement.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.ToastPlacement
-     * @ui5-module-override sap/f/gen/ui5/webcomponents ToastPlacement
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ToastPlacement
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ToastPlacement
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ToastPlacement"] = {
       /**
-       * Toast is placed at the &#x60;TopStart&#x60; position of its container.
+       * Toast is placed at the &#x60;BottomCenter&#x60; position of its container.
+       * Default placement (no selection)
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      TopStart: "TopStart",
+      BottomCenter: "BottomCenter",
       /**
-       * Toast is placed at the &#x60;TopCenter&#x60; position of its container.
+       * Toast is placed at the &#x60;BottomEnd&#x60; position of its container.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      TopCenter: "TopCenter",
+      BottomEnd: "BottomEnd",
       /**
-       * Toast is placed at the &#x60;TopEnd&#x60; position of its container.
+       * Toast is placed at the &#x60;BottomStart&#x60; position of its container.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      TopEnd: "TopEnd",
-      /**
-       * Toast is placed at the &#x60;MiddleStart&#x60; position of its container.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      MiddleStart: "MiddleStart",
+      BottomStart: "BottomStart",
       /**
        * Toast is placed at the &#x60;MiddleCenter&#x60; position of its container.
        *
@@ -2841,61 +3046,73 @@ sap.ui.define(
        */
       MiddleEnd: "MiddleEnd",
       /**
-       * Toast is placed at the &#x60;BottomStart&#x60; position of its container.
+       * Toast is placed at the &#x60;MiddleStart&#x60; position of its container.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      BottomStart: "BottomStart",
+      MiddleStart: "MiddleStart",
       /**
-       * Toast is placed at the &#x60;BottomCenter&#x60; position of its container.
-       * Default placement (no selection)
+       * Toast is placed at the &#x60;TopCenter&#x60; position of its container.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      BottomCenter: "BottomCenter",
+      TopCenter: "TopCenter",
       /**
-       * Toast is placed at the &#x60;BottomEnd&#x60; position of its container.
+       * Toast is placed at the &#x60;TopEnd&#x60; position of its container.
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      BottomEnd: "BottomEnd"
+      TopEnd: "TopEnd",
+      /**
+       * Toast is placed at the &#x60;TopStart&#x60; position of its container.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      TopStart: "TopStart"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.ToastPlacement", pkg["ToastPlacement"]);
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.ToastPlacement",
+      pkg["ToastPlacement"]
+    );
     /**
      * Defines which direction the items of ui5-toolbar will be aligned.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.ToolbarAlign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents ToolbarAlign
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ToolbarAlign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ToolbarAlign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ToolbarAlign"] = {
-      /**
-       * Toolbar items are situated at the &#x60;start&#x60; of the Toolbar
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      Start: "Start",
       /**
        * Toolbar items are situated at the &#x60;end&#x60; of the Toolbar
        *
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      End: "End"
+      End: "End",
+      /**
+       * Toolbar items are situated at the &#x60;start&#x60; of the Toolbar
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      Start: "Start"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.ToolbarAlign", pkg["ToolbarAlign"]);
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.ToolbarAlign",
+      pkg["ToolbarAlign"]
+    );
     /**
      * Defines the available toolbar designs.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.ToolbarDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents ToolbarDesign
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ToolbarDesign
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ToolbarDesign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -2915,17 +3132,27 @@ sap.ui.define(
        */
       Transparent: "Transparent"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.ToolbarDesign", pkg["ToolbarDesign"]);
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.ToolbarDesign",
+      pkg["ToolbarDesign"]
+    );
     /**
      * Defines the priority of the toolbar item to go inside overflow popover.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.ToolbarItemOverflowBehavior
-     * @ui5-module-override sap/f/gen/ui5/webcomponents ToolbarItemOverflowBehavior
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ToolbarItemOverflowBehavior
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ToolbarItemOverflowBehavior
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ToolbarItemOverflowBehavior"] = {
+      /**
+       * When set, the item will be always part of the overflow part of ui5-toolbar.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      AlwaysOverflow: "AlwaysOverflow",
       /**
        * The item is presented inside the toolbar and goes in the popover, when there is not enough space.
        *
@@ -2939,25 +3166,18 @@ sap.ui.define(
        * @private
        * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
-      NeverOverflow: "NeverOverflow",
-      /**
-       * When set, the item will be always part of the overflow part of ui5-toolbar.
-       *
-       * @private
-       * @ui5-restricted sap.ushell,sap.esh.search.ui
-       */
-      AlwaysOverflow: "AlwaysOverflow"
+      NeverOverflow: "NeverOverflow"
     };
     registerEnum(
-      "sap.f.gen.ui5.webcomponents.ToolbarItemOverflowBehavior",
+      "sap.f.gen.ui5.webcomponents.dist.types.ToolbarItemOverflowBehavior",
       pkg["ToolbarItemOverflowBehavior"]
     );
     /**
      * Different types of wrapping.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents.WrappingType
-     * @ui5-module-override sap/f/gen/ui5/webcomponents WrappingType
+     * @alias module:sap/f/gen/ui5/webcomponents/dist/types/WrappingType
+     * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.WrappingType
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -2977,14 +3197,17 @@ sap.ui.define(
        */
       Normal: "Normal"
     };
-    registerEnum("sap.f.gen.ui5.webcomponents.WrappingType", pkg["WrappingType"]);
+    registerEnum(
+      "sap.f.gen.ui5.webcomponents.dist.types.WrappingType",
+      pkg["WrappingType"]
+    );
 
     // Interfaces
     /**
      * Interface for components that represent an avatar and may be slotted in numerous higher-order components such as `ui5-avatar-group`
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents.IAvatarGroupItem
+     * @name module:sap/f/gen/ui5/webcomponents/dist/AvatarGroup.IAvatarGroupItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents IAvatarGroupItem
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
@@ -2993,7 +3216,7 @@ sap.ui.define(
      * Interface for components that may be used as a button inside numerous higher-order components
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents.IButton
+     * @name module:sap/f/gen/ui5/webcomponents/dist/Button.IButton
      * @ui5-module-override sap/f/gen/ui5/webcomponents IButton
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
@@ -3004,7 +3227,7 @@ sap.ui.define(
      * **Note:** Use with `ui5-date` or `ui5-date-range` as calendar date selection types.
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents.ICalendarSelectedDates
+     * @name module:sap/f/gen/ui5/webcomponents/dist/Calendar.ICalendarSelectedDates
      * @ui5-module-override sap/f/gen/ui5/webcomponents ICalendarSelectedDates
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
@@ -3013,7 +3236,7 @@ sap.ui.define(
      * Interface for components that may be used inside a `ui5-color-palette` or `ui5-color-palette-popover`
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents.IColorPaletteItem
+     * @name module:sap/f/gen/ui5/webcomponents/dist/ColorPalette.IColorPaletteItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents IColorPaletteItem
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
@@ -3022,7 +3245,7 @@ sap.ui.define(
      * Interface for components that may be slotted inside a `ui5-combobox`
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents.IComboBoxItem
+     * @name module:sap/f/gen/ui5/webcomponents/dist/ComboBox.IComboBoxItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents IComboBoxItem
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
@@ -3049,7 +3272,7 @@ sap.ui.define(
      * - `isValidString(value: string): boolean`: Validates whether a given string is a valid representation of the dynamic date range value.
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents.IDynamicDateRangeOption
+     * @name module:sap/f/gen/ui5/webcomponents/dist/DynamicDateRange.IDynamicDateRangeOption
      * @ui5-module-override sap/f/gen/ui5/webcomponents IDynamicDateRangeOption
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
@@ -3058,7 +3281,7 @@ sap.ui.define(
      * Interface for components that can be slotted inside `ui5-form` as items.
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents.IFormItem
+     * @name module:sap/f/gen/ui5/webcomponents/dist/Form.IFormItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents IFormItem
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
@@ -3067,7 +3290,7 @@ sap.ui.define(
      * Interface for components that represent an icon, usable in numerous higher-order components
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents.IIcon
+     * @name module:sap/f/gen/ui5/webcomponents/dist/Icon.IIcon
      * @ui5-module-override sap/f/gen/ui5/webcomponents IIcon
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
@@ -3076,7 +3299,7 @@ sap.ui.define(
      * Interface for components that represent a suggestion item, usable in `ui5-input`
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents.IInputSuggestionItem
+     * @name module:sap/f/gen/ui5/webcomponents/dist/Input.IInputSuggestionItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents IInputSuggestionItem
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
@@ -3087,7 +3310,7 @@ sap.ui.define(
      * **Note:** Use with `ui5-menu-item` or `ui5-menu-separator`. Implementing the interface does not guarantee that any other classes can work with the `ui5-menu`.
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents.IMenuItem
+     * @name module:sap/f/gen/ui5/webcomponents/dist/Menu.IMenuItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents IMenuItem
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
@@ -3096,7 +3319,7 @@ sap.ui.define(
      * Interface for components that may be slotted inside a `ui5-multi-combobox` as items
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents.IMultiComboBoxItem
+     * @name module:sap/f/gen/ui5/webcomponents/dist/MultiComboBox.IMultiComboBoxItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents IMultiComboBoxItem
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
@@ -3105,7 +3328,7 @@ sap.ui.define(
      * Interface for components that may be slotted inside `ui5-segmented-button` as items
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents.ISegmentedButtonItem
+     * @name module:sap/f/gen/ui5/webcomponents/dist/SegmentedButton.ISegmentedButtonItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents ISegmentedButtonItem
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
@@ -3114,7 +3337,7 @@ sap.ui.define(
      * Interface for components that may be slotted inside `ui5-select` as options
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents.IOption
+     * @name module:sap/f/gen/ui5/webcomponents/dist/Select.IOption
      * @ui5-module-override sap/f/gen/ui5/webcomponents IOption
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
@@ -3125,7 +3348,7 @@ sap.ui.define(
      * **Note:** Use directly `ui5-tab` or `ui5-tab-seprator`. Implementing the interface does not guarantee that the class can work as a tab.
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents.ITab
+     * @name module:sap/f/gen/ui5/webcomponents/dist/TabContainer.ITab
      * @ui5-module-override sap/f/gen/ui5/webcomponents ITab
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
@@ -3134,7 +3357,7 @@ sap.ui.define(
      * Interface for components that can be slotted inside the `features` slot of the `ui5-table`.
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents.ITableFeature
+     * @name module:sap/f/gen/ui5/webcomponents/dist/Table.ITableFeature
      * @ui5-module-override sap/f/gen/ui5/webcomponents ITableFeature
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
@@ -3144,8 +3367,19 @@ sap.ui.define(
      * and provide growing/data loading functionality.
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents.ITableGrowing
+     * @name module:sap/f/gen/ui5/webcomponents/dist/Table.ITableGrowing
      * @ui5-module-override sap/f/gen/ui5/webcomponents ITableGrowing
+     * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
+     */
+    /**
+     * Interface for the slotted item in `ui5-toolbar-item`.
+     *
+     * It could be any HTMLElement or UI5 Web Component with option to specify custom overflow closing events and overflow behavior.
+     *
+     * @interface
+     * @name module:sap/f/gen/ui5/webcomponents/dist/ToolbarItem.IToolbarItemContent
+     * @ui5-module-override sap/f/gen/ui5/webcomponents IToolbarItemContent
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */

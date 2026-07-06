@@ -30,7 +30,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenuAccount",
       {
         metadata: {
-          tag: "ui5-user-menu-account-0df29cf2",
+          tag: "ui5-user-menu-account-3bacdbf4",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -45,6 +45,28 @@ sap.ui.define(
 
           properties: {
             /**
+             * Defines additional information for the user.
+             */
+            additionalInfo: {
+              type: "string",
+              mapping: "property",
+              defaultValue: ""
+            },
+            /**
+             * Defines the background color of the desired image.
+             * If `avatarColorScheme` is set to `Auto`, the avatar will be displayed with the `Accent6` color.
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/AvatarColorScheme
+             */
+            avatarColorScheme: {
+              type: "sap.f.gen.ui5.webcomponents.dist.types.AvatarColorScheme",
+              mapping: "property",
+              defaultValue: "Auto"
+            },
+            /**
+             * Defines the avatar initials of the user.
+             */
+            avatarInitials: { type: "string", mapping: "property" },
+            /**
              * Defines the avatar image url of the user.
              */
             avatarSrc: {
@@ -52,30 +74,6 @@ sap.ui.define(
               mapping: "property",
               defaultValue: ""
             },
-
-            /**
-             * Defines the avatar initials of the user.
-             */
-            avatarInitials: { type: "string", mapping: "property" },
-
-            /**
-             * Defines the title text of the user.
-             */
-            titleText: {
-              type: "string",
-              mapping: "property",
-              defaultValue: ""
-            },
-
-            /**
-             * Defines additional text of the user.
-             */
-            subtitleText: {
-              type: "string",
-              mapping: "property",
-              defaultValue: ""
-            },
-
             /**
              * Defines description of the user.
              */
@@ -84,16 +82,6 @@ sap.ui.define(
               mapping: "property",
               defaultValue: ""
             },
-
-            /**
-             * Defines if the user is selected.
-             */
-            selected: {
-              type: "boolean",
-              mapping: "property",
-              defaultValue: false
-            },
-
             /**
              * Indicates whether a loading indicator should be shown.
              */
@@ -102,17 +90,38 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
-
+            /**
+             * Defines if the user is selected.
+             */
+            selected: {
+              type: "boolean",
+              mapping: "property",
+              defaultValue: false
+            },
+            /**
+             * Defines additional text of the user.
+             */
+            subtitleText: {
+              type: "string",
+              mapping: "property",
+              defaultValue: ""
+            },
+            /**
+             * Defines the title text of the user.
+             */
+            titleText: {
+              type: "string",
+              mapping: "property",
+              defaultValue: ""
+            },
             /**
              * The text-content of the Web Component.
              */
             text: { type: "string", mapping: "textContent" },
-
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
             width: { type: "sap.ui.core.CSSSize", mapping: "style" },
-
             /**
              * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */

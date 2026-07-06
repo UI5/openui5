@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/i18n-defaults'], (function (exports, webcomponentsBase, parametersBundle_css, ListItemBase, FocusableElements, i18nDefaults) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/i18n-defaults'], (function (exports, webcomponentsBase, parametersBundle_css, ListItemBase, FocusableElements, i18nDefaults) { 'use strict';
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -6,6 +6,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
         else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
         return c > 3 && r && Object.defineProperty(target, key, r), r;
     };
+    var NotificationListItemBase_1;
     /**
      * @class
      *
@@ -15,7 +16,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
      * @since 1.0.0-rc.8
      * @public
      */
-    class NotificationListItemBase extends ListItemBase.ListItemBase {
+    let NotificationListItemBase = NotificationListItemBase_1 = class NotificationListItemBase extends ListItemBase.ListItemBase {
         constructor() {
             super(...arguments);
             /**
@@ -45,7 +46,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
             return !!this.titleText?.length;
         }
         get loadingText() {
-            return NotificationListItemBase.i18nFioriBundle.getText(i18nDefaults.NOTIFICATION_LIST_ITEM_LOADING);
+            return NotificationListItemBase_1.i18nFioriBundle.getText(i18nDefaults.NOTIFICATION_LIST_ITEM_LOADING);
         }
         /**
          * Event handlers
@@ -76,7 +77,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
             const aContent = ListItemBase.b(this.getHeaderDomRef());
             return aContent.length === 0 || (aContent[aContent.length - 1] === webcomponentsBase.t());
         }
-    }
+    };
     __decorate([
         webcomponentsBase.s()
     ], NotificationListItemBase.prototype, "titleText", void 0);
@@ -92,7 +93,11 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
     __decorate([
         parametersBundle_css.i("@ui5/webcomponents-fiori")
     ], NotificationListItemBase, "i18nFioriBundle", void 0);
+    NotificationListItemBase = NotificationListItemBase_1 = __decorate([
+        webcomponentsBase.m({})
+    ], NotificationListItemBase);
+    var NotificationListItemBase$1 = NotificationListItemBase;
 
-    exports.NotificationListItemBase = NotificationListItemBase;
+    exports.NotificationListItemBase = NotificationListItemBase$1;
 
 }));
