@@ -225,7 +225,9 @@ sap.ui.define([
 		this.oColumnMenu.openBy(this.oButton);
 
 		const oHeader = this.oColumnMenu._oPopover.getCustomHeader();
-		assert.equal(oHeader.getTitleControl().getText(), this.oColumnMenu._getResourceText("table.COLUMNMENU_TITLE"), "Dialog title is correct");
+		const oTitle = oHeader.getTitleControl();
+		assert.equal(oTitle.getText(), this.oColumnMenu._getResourceText("table.COLUMNMENU_TITLE"), "Dialog title is correct");
+		assert.equal(oTitle.getLevel(), coreLibrary.TitleLevel.H1, "Dialog title has correct heading level");
 		const oCloseButton = oHeader.getContent()[2];
 		assert.equal(oCloseButton.getIcon(), "sap-icon://decline", "Close button icon is correct");
 		assert.equal(oCloseButton.getTooltip(), this.oColumnMenu._getResourceText("table.COLUMNMENU_CLOSE"), "Close button tooltip is correct");
@@ -256,7 +258,7 @@ sap.ui.define([
 		let oGenericListTitle = this.oColumnMenu._oQuickGenericList.getHeaderToolbar().getTitleControl();
 		assert.equal(oGenericListTitle.getText(), this.oColumnMenu._getResourceText("table.COLUMNMENU_QUICK_GENERIC_ONLY_TITLE"),
 					"Quick actions list title is correct");
-		assert.equal(oGenericListTitle.getLevel(), coreLibrary.TitleLevel.H3, "Quick actions list title has correct heading level");
+		assert.equal(oGenericListTitle.getLevel(), coreLibrary.TitleLevel.H2, "Quick actions list title has correct heading level");
 		sActionsListTitle = this.oColumnMenu._oItemsContainer._oNavigationList.getHeaderToolbar().getTitleControl().getText();
 		assert.equal(sActionsListTitle, this.oColumnMenu._getResourceText("table.COLUMNMENU_LIST_ITEMS_TITLE"), "Items list title is correct");
 		this.oColumnMenu.close();
@@ -269,7 +271,7 @@ sap.ui.define([
 		oGenericListTitle = this.oColumnMenu._oQuickGenericList.getHeaderToolbar().getTitleControl();
 		assert.equal(oGenericListTitle.getText(), this.oColumnMenu._getResourceText("table.COLUMNMENU_QUICK_GENERIC_TITLE"),
 					"Quick actions list title is correct");
-		assert.equal(oGenericListTitle.getLevel(), coreLibrary.TitleLevel.H3, "Quick actions list title has correct heading level");
+		assert.equal(oGenericListTitle.getLevel(), coreLibrary.TitleLevel.H2, "Quick actions list title has correct heading level");
 
 	});
 
