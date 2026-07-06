@@ -1627,35 +1627,46 @@ sap.ui.define([
 		}
 	};
 
-	IconTabHeader.prototype._getItemsForOverflow = function (bIsStartOverflow, bTopLevelTabs) {
+	/**
+	 * Collects items for an overflow tab.
+	 *
+	 * @param {boolean} bIsStartOverflow Whether the start-side overflow is being populated.
+	 *   Only meaningful in <code>TabsOverflowMode.StartAndEnd</code>; ignored in End mode, which has a single overflow tab.
+	 * @param {boolean} bExcludeSubItems When true, sub-items of <code>IconTabFilter</code> controls are not included in the result.
+	 *   into the result.
+	 * @param {boolean} bExcludeStripItems When true, items currently visible in the tab strip
+	 *   are always excluded.
+	 * @returns {sap.m.IconTab[]} The items to display in the overflow tab.
+	 * @private
+	 */
+	IconTabHeader.prototype._getItemsForOverflow = function (bIsStartOverflow, bExcludeSubItems, bExcludeStripItems) {
+		const aItemsInStrip = this._getItemsInStrip();
+		const aItemsForOverflow = [];
 
-		var aItemsInStrip = this._getItemsInStrip(),
-			bIsStartAndEndMode = this.getTabsOverflowMode() === TabsOverflowMode.StartAndEnd,
-			iIndex,
-			aItems = this.getItems(),
-			aItemsForList = [];
+		let aItems = this.getItems();
 
-		if (bIsStartAndEndMode) {
-			iIndex = aItems.indexOf(aItemsInStrip[0]);
-			aItems = bIsStartOverflow ? aItems.slice(0, iIndex) : aItems.slice(iIndex, aItems.length);
+		if (this.getTabsOverflowMode() === TabsOverflowMode.StartAndEnd) {
+			const iFirstIndex = aItems.indexOf(aItemsInStrip[0]);
+			const iLastIndex = aItems.indexOf(aItemsInStrip[aItemsInStrip.length - 1]);
+			aItems = bIsStartOverflow ? aItems.slice(0, iLastIndex + 1) : aItems.slice(iFirstIndex, aItems.length);
 		}
 
-		aItems.forEach(function (oItem) {
-			// If tab is an overflow tab and oItem is already in Tab Strip, do not add it to list
-			// on a mobile device, this behavior doesn't occur, and all items are shown
-			if (!Device.system.phone && aItemsInStrip.indexOf(oItem) > -1) {
-				return;
-			}
+		// On phone all items (including those from the strip) are included in the overflow dialog list by default.
+		// Callers that need only the truly-hidden items can pass bExcludeStripItems.
+		const bHideStripItems = bExcludeStripItems || !Device.system.phone;
+		const aRelevantItems = bHideStripItems
+			? aItems.filter((oItem) => !aItemsInStrip.includes(oItem))
+			: aItems;
 
-			aItemsForList.push(oItem);
-			if (oItem.isA("sap.m.IconTabFilter") && !bTopLevelTabs) {
-				oItem._getAllSubItems().forEach(function (oSubItem) {
-					aItemsForList.push(oSubItem);
-				});
+		aRelevantItems.forEach((oItem) => {
+			aItemsForOverflow.push(oItem);
+
+			if (oItem.isA("sap.m.IconTabFilter") && !bExcludeSubItems) {
+				aItemsForOverflow.push(...oItem._getAllSubItems());
 			}
 		});
 
-		return aItemsForList;
+		return aItemsForOverflow;
 	};
 
 	/* =========================================================== */
