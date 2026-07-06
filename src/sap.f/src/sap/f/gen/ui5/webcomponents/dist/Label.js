@@ -38,7 +38,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.Label",
       {
         metadata: {
-          tag: "ui5-label-cc48984a",
+          tag: "ui5-label-530c2e1b",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 
@@ -52,16 +52,6 @@ sap.ui.define(
 
           properties: {
             /**
-             * Defines whether colon is added to the component text.
-             *
-             * **Note:** Usually used in forms.
-             */
-            showColon: {
-              type: "boolean",
-              mapping: "property",
-              defaultValue: false
-            },
-            /**
              * Defines whether an asterisk character is added to the component text.
              *
              * **Note:** Usually indicates that user input (bound with the `for` property) is required.
@@ -74,13 +64,23 @@ sap.ui.define(
               defaultValue: false
             },
             /**
+             * Defines whether colon is added to the component text.
+             *
+             * **Note:** Usually used in forms.
+             */
+            showColon: {
+              type: "boolean",
+              mapping: "property",
+              defaultValue: false
+            },
+            /**
              * Defines how the text of a component will be displayed when there is not enough space.
              *
              * **Note:** for option "Normal" the text will wrap and the words will not be broken based on hyphenation.
-             * @type module:sap/f/gen/ui5/webcomponents.WrappingType
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/WrappingType
              */
             wrappingType: {
-              type: "sap.f.gen.ui5.webcomponents.WrappingType",
+              type: "sap.f.gen.ui5.webcomponents.dist.types.WrappingType",
               mapping: "property",
               defaultValue: "Normal"
             },

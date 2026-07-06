@@ -14,7 +14,7 @@ sap.ui.define(
      * @class
      * The `ui5-search-scope` represents the options for the scope in `ui5-search`.
      *
-     * @implements module:sap/f/gen/ui5/webcomponents_fiori.ISearchScope
+     * @implements module:sap/f/gen/ui5/webcomponents_fiori/dist/SearchField.ISearchScope
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
      * @private
@@ -25,7 +25,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.SearchScope",
       {
         metadata: {
-          tag: "ui5-search-scope-cc48984a",
+          tag: "ui5-search-scope-530c2e1b",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -34,7 +34,9 @@ sap.ui.define(
           designtime:
             "sap/f/gen/ui5/webcomponents_fiori/designtime/SearchScope.designtime",
 
-          interfaces: ["sap.f.gen.ui5.webcomponents_fiori.ISearchScope"],
+          interfaces: [
+            "sap.f.gen.ui5.webcomponents_fiori.dist.SearchField.ISearchScope"
+          ],
 
           defaultAggregation: "",
 
@@ -44,13 +46,10 @@ sap.ui.define(
              */
             text: { type: "string", mapping: "property", defaultValue: "" },
             /**
-             * Indicates whether the item is selected
+             * Defines the value of the `ui5-search-scope`.
+             * Used for selection in Search scopes.
              */
-            selected: {
-              type: "boolean",
-              mapping: "property",
-              defaultValue: false
-            },
+            value: { type: "string", mapping: "property" },
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */

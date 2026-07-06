@@ -1,39 +1,21 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/information', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Button2'], (function (exports, webcomponentsBase, Icons, parametersBundle_css$1, i18nDefaults, parametersBundle_css, information, Title, ValueState, toLowercaseEnumValue, eventStrict, FocusableElements, AccessibilityTextsHelper, Icon, Button) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/Button2'], (function (exports, webcomponentsBase, Icons, parametersBundle_css, i18nDefaults, jsxRuntime, decline, Icon, Title, ValueState, toLowercaseEnumValue, eventStrict, FocusableElements, AccessibilityTextsHelper, Button) { 'use strict';
+
+    const r=()=>{const e=webcomponentsBase.t();return e&&typeof e.focus=="function"?e:null},a$1=e=>{const n=r();return n?l(e,n):false},l=(e,n)=>{let t=e;if(t.shadowRoot&&(t=Array.from(t.shadowRoot.children).find(c=>c.localName!=="style"),!t))return  false;if(t===n)return  true;const o=t.localName==="slot"?t.assignedNodes():t.children;return o?Array.from(o).some(s=>l(s,n)):false},m$1=(e,n,t)=>e>=t.left&&e<=t.right&&n>=t.top&&n<=t.bottom,f=(e,n)=>{let t,o;if(e instanceof MouseEvent)t=e.clientX,o=e.clientY;else {const s=e.touches[0];t=s.clientX,o=s.clientY;}return m$1(t,o,n)};function d(e){return "isUI5Element"in e&&"_show"in e}const i=e=>{const n=e.parentElement||e.getRootNode&&e.getRootNode().host;return n&&(d(n)||n===document.documentElement)?n:i(n)};
+
+    const m=(t,a,e)=>Math.min(Math.max(t,a),Math.max(a,e));
 
     const e$1={toAttribute(t){return t instanceof HTMLElement?null:t},fromAttribute(t){return t}};
 
     function PopubBlockLayerTemplate() {
-        return (parametersBundle_css.jsx("div", { class: "ui5-block-layer", onKeyDown: this._preventBlockLayerFocus, onMouseDown: this._preventBlockLayerFocus }));
+        return (jsxRuntime.jsx("div", { class: "ui5-block-layer", onKeyDown: this._preventBlockLayerFocus, onMouseDown: this._preventBlockLayerFocus }));
     }
 
     function PopupTemplate(hooks) {
-        return (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [PopubBlockLayerTemplate.call(this), parametersBundle_css.jsxs("section", { "root-element": true, style: this.styles.root, class: this.classes.root, role: this._role, "aria-describedby": this.ariaDescribedByIds, "aria-modal": this._ariaModal, "aria-label": this._ariaLabel, "aria-labelledby": this._ariaLabelledBy, onKeyDown: this._onkeydown, onFocusOut: this._onfocusout, onMouseUp: this._onmouseup, onMouseDown: this._onmousedown, children: [parametersBundle_css.jsx("span", { class: "first-fe", "data-ui5-focus-trap": true, role: "none", tabIndex: 0, onFocusIn: this.forwardToLast }), (hooks?.beforeContent || beforeContent$2).call(this), parametersBundle_css.jsx("div", { style: this.styles.content, class: this.classes.content, onScroll: this._scroll, part: "content", children: parametersBundle_css.jsx("slot", {}) }), this.ariaDescriptionText &&
-                            parametersBundle_css.jsx("span", { id: "accessibleDescription", class: "ui5-hidden-text", children: this.ariaDescriptionText }), (hooks?.afterContent || afterContent$2).call(this), parametersBundle_css.jsx("span", { class: "last-fe", "data-ui5-focus-trap": true, role: "none", tabIndex: 0, onFocusIn: this.forwardToFirst })] })] }));
+        return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [PopubBlockLayerTemplate.call(this), jsxRuntime.jsxs("section", { "root-element": true, style: this.styles.root, class: this.classes.root, role: this._role, "aria-describedby": this.ariaDescribedByIds, "aria-modal": this._ariaModal, "aria-label": this._ariaLabel, "aria-labelledby": this._ariaLabelledBy, onKeyDown: this._onkeydown, onFocusOut: this._onfocusout, onMouseUp: this._onmouseup, onMouseDown: this._onmousedown, children: [jsxRuntime.jsx("span", { class: "first-fe", "data-ui5-focus-trap": true, role: "none", tabIndex: 0, onFocusIn: this.forwardToLast }), (hooks?.beforeContent || beforeContent$2).call(this), jsxRuntime.jsx("div", { style: this.styles.content, class: this.classes.content, onScroll: this._scroll, part: "content", children: jsxRuntime.jsx("slot", {}) }), this.ariaDescriptionText &&
+                            jsxRuntime.jsx("span", { id: "accessibleDescription", class: "ui5-hidden-text", children: this.ariaDescriptionText }), (hooks?.afterContent || afterContent$2).call(this), jsxRuntime.jsx("span", { class: "last-fe", "data-ui5-focus-trap": true, role: "none", tabIndex: 0, onFocusIn: this.forwardToFirst })] })] }));
     }
     function beforeContent$2() { }
     function afterContent$2() { }
-
-    function PopoverTemplate() {
-        return PopupTemplate.call(this, {
-            beforeContent: beforeContent$1,
-            afterContent: afterContent$1,
-        });
-    }
-    function beforeContent$1() {
-        return (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [parametersBundle_css.jsx("span", { class: "ui5-popover-arrow", style: this.styles.arrow }), this._displayHeader &&
-                    parametersBundle_css.jsx("header", { class: "ui5-popup-header-root", id: "ui5-popup-header", part: "header", children: this.header.length ?
-                            parametersBundle_css.jsx("slot", { name: "header" })
-                            :
-                                parametersBundle_css.jsx(Title.Title, { level: "H1", class: "ui5-popup-header-text", children: this.headerText }) })] }));
-    }
-    function afterContent$1() {
-        return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: this._displayFooter && !!this.footer.length &&
-                parametersBundle_css.jsx("footer", { class: "ui5-popup-footer-root", part: "footer", children: parametersBundle_css.jsx("slot", { name: "footer" }) }) }));
-    }
-
-    const m$1=(t,a,e)=>Math.min(Math.max(t,a),Math.max(a,e));
-
-    const r=()=>{const e=webcomponentsBase.t();return e&&typeof e.focus=="function"?e:null},a=e=>{const n=r();return n?l(e,n):false},l=(e,n)=>{let t=e;if(t.shadowRoot&&(t=Array.from(t.shadowRoot.children).find(c=>c.localName!=="style"),!t))return  false;if(t===n)return  true;const o=t.localName==="slot"?t.assignedNodes():t.children;return o?Array.from(o).some(s=>l(s,n)):false},m=(e,n,t)=>e>=t.left&&e<=t.right&&n>=t.top&&n<=t.bottom,f=(e,n)=>{let t,o;if(e instanceof MouseEvent)t=e.clientX,o=e.clientY;else {const s=e.touches[0];t=s.clientX,o=s.clientY;}return m(t,o,n)};function d(e){return "isUI5Element"in e&&"_show"in e}const i=e=>{const n=e.parentElement||e.getRootNode&&e.getRootNode().host;return n&&(d(n)||n===document.documentElement)?n:i(n)};
 
     /**
      * Popup accessible roles.
@@ -58,6 +40,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
         PopupAccessibleRole["AlertDialog"] = "AlertDialog";
     })(PopupAccessibleRole || (PopupAccessibleRole = {}));
     var PopupAccessibleRole$1 = PopupAccessibleRole;
+
+    const t="handledByControl",a=(e,n=t)=>!!e[`_sapui_${n}`];
 
     const OpenedPopupsRegistry = Icons.m("OpenedPopupsRegistry", { openedRegistry: [] });
     const openUI5Support = Icons.n$1("OpenUI5Support");
@@ -100,12 +84,12 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
         if (!OpenedPopupsRegistry.openedRegistry.length) {
             return;
         }
-        if (webcomponentsBase.m$2(event)) {
+        if (webcomponentsBase.m$1(event) && !a(event)) {
             const topmostPopup = OpenedPopupsRegistry.openedRegistry[OpenedPopupsRegistry.openedRegistry.length - 1].instance;
             if (openUI5Support && topmostPopup !== openUI5Support.getTopmostPopup()) {
                 return;
             }
-            event.stopPropagation();
+            event.stopImmediatePropagation();
             topmostPopup.closePopup(true);
         }
     };
@@ -130,18 +114,18 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
         }
     };
 
-    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
-    var popupStlyes = `:host{min-width:1px;overflow:visible;border:none;inset:unset;margin:0;padding:0}:host(:focus-visible){outline:none}
+    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var popupStlyes = `:host{min-width:1px;overflow:visible;border:none;inset:unset;margin:0;padding:0}:host(:focus-visible){outline:none}:host(.ui5-popup-opening){opacity:.1}
 `;
 
-    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
+    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var popupBlockLayerStyles = `.ui5-block-layer{position:fixed;z-index:-1;display:none;inset:-500px;outline:none;pointer-events:all}
 `;
 
-    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
+    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var globalStyles = `.ui5-popup-scroll-blocker{overflow:hidden}
 `;
 
@@ -153,9 +137,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
     };
     var Popup_1;
     const createBlockingStyle = () => {
-        if (!Icons.S("data-ui5-popup-scroll-blocker")) {
-            Icons.c$1(globalStyles, "data-ui5-popup-scroll-blocker");
-        }
+        Icons.R(globalStyles, "data-ui5-popup-scroll-blocker");
     };
     createBlockingStyle();
     const pageScrollingBlockers = new Set();
@@ -184,7 +166,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
      * @extends UI5Element
      * @public
      */
-    let Popup = Popup_1 = class Popup extends webcomponentsBase.b {
+    let Popup = Popup_1 = class Popup extends webcomponentsBase.S {
         constructor() {
             super();
             /**
@@ -235,10 +217,10 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
         }
         onBeforeRendering() {
             this.onPhone = Icons.d();
-            this.onDesktop = Icons.f();
+            this.onDesktop = Icons.f$1();
         }
         onAfterRendering() {
-            Icons.f$1().then(() => {
+            Icons.w().then(() => {
                 this._updateMediaRange();
             });
             if (this.open) {
@@ -250,7 +232,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
         }
         onEnterDOM() {
             this.setAttribute("popover", "manual");
-            if (Icons.f()) {
+            if (Icons.f$1()) {
                 this.setAttribute("desktop", "");
             }
             this.tabIndex = -1;
@@ -269,7 +251,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
                 Popup_1.unblockPageScrolling(this);
                 this._removeOpenedPopup();
             }
-            webcomponentsBase.f.deregister(this, this._resizeHandler);
+            this._deregisterResizeHandler();
+            this._detachBrowserEvents();
             AccessibilityTextsHelper.T(this);
         }
         /**
@@ -302,6 +285,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
                 this.open = false;
                 return;
             }
+            this._attachBrowserEvents();
             if (this.isModal) {
                 Popup_1.blockPageScrolling(this);
             }
@@ -312,10 +296,14 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
                 this._updateMediaRange();
             }
             this._addOpenedPopup();
+            this.classList.add("ui5-popup-opening");
+            setTimeout(() => {
+                this.classList.remove("ui5-popup-opening");
+            }, 50);
             this.open = true;
             // initial focus, if focused element is statically created
             await this.applyInitialFocus();
-            await Icons.f$1();
+            await Icons.w();
             if (this.isConnected) {
                 this.fireDecoratorEvent("open");
             }
@@ -328,6 +316,10 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
          */
         _preventBlockLayerFocus(e) {
             e.preventDefault();
+        }
+        _attachBrowserEvents() {
+        }
+        _detachBrowserEvents() {
         }
         /**
          * Temporarily removes scrollbars from the html element
@@ -360,7 +352,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
         _onkeydown(e) {
             const isTabOutAttempt = e.target === this._root && webcomponentsBase.V(e);
             // if the popup is closed, focus is already moved, so Enter keydown may result in click on the newly focused element
-            const isEnterOnClosedPopupChild = webcomponentsBase.b$1(e) && !this.open;
+            const isEnterOnClosedPopupChild = webcomponentsBase.b(e) && !this.open;
             if (isTabOutAttempt || isEnterOnClosedPopupChild) {
                 e.preventDefault();
             }
@@ -431,11 +423,16 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
          * @returns Promise that resolves when the focus is applied
          */
         async applyFocus() {
-            // do nothing if the standard HTML autofocus is used
-            if (this.querySelector("[autofocus]")) {
+            await this._waitForDomRef();
+            const elementWithAutoFocus = this.querySelector("[autofocus]");
+            if (elementWithAutoFocus) {
+                // If the "autofocus" is set on UI5Element, focus it manually.
+                if ("isUI5Element" in elementWithAutoFocus) {
+                    elementWithAutoFocus.focus();
+                }
+                // Otherwise, the browser will focus it automatically.
                 return;
             }
-            await this._waitForDomRef();
             if (this.getRootNode() === this) {
                 return;
             }
@@ -453,10 +450,10 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
             }
         }
         isFocusWithin() {
-            return a(this._root);
+            return a$1(this._root);
         }
         _updateMediaRange() {
-            this.mediaRange = webcomponentsBase.i$2.getCurrentRange(webcomponentsBase.i$2.RANGESETS.RANGE_4STEPS, this.getDomRef().offsetWidth);
+            this.mediaRange = webcomponentsBase.i$1.getCurrentRange(webcomponentsBase.i$1.RANGESETS.RANGE_4STEPS, this.getDomRef().offsetWidth);
         }
         _updateAssociatedLabelsTexts() {
             this._associatedDescriptionRefTexts = AccessibilityTextsHelper.p(this);
@@ -486,6 +483,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
             }
             this.hide();
             this.open = false;
+            this._detachBrowserEvents();
             if (!preventRegistryUpdate) {
                 this._removeOpenedPopup();
             }
@@ -635,7 +633,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
     ], Popup.prototype, "open", null);
     Popup = Popup_1 = __decorate$3([
         webcomponentsBase.m({
-            renderer: parametersBundle_css.y,
+            renderer: jsxRuntime.y,
             styles: [popupStlyes, popupBlockLayerStyles],
             template: PopupTemplate,
         })
@@ -678,551 +676,6 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
         })
     ], Popup);
     var Popup$1 = Popup;
-
-    const name$1 = "resize-corner";
-    const pathData$1 = "M384 160v32q0 12-10 22L182 406q-10 10-22 10h-32zM224 416l160-160v32q0 12-10 22l-96 96q-10 10-22 10h-32zm160-64v32q0 12-10 22t-22 10h-32z";
-    const ltr$1 = false;
-    const collection$1 = "SAP-icons-v4";
-    const packageName$1 = "@ui5/webcomponents-icons";
-
-    Icons.y(name$1, { pathData: pathData$1, ltr: ltr$1, collection: collection$1, packageName: packageName$1 });
-
-    const name = "resize-corner";
-    const pathData = "M282 416q-11 0-18.5-7.5T256 390t7-18l109-109q7-7 18-7t18.5 7.5T416 282t-7 18L300 409q-7 7-18 7zm-160 0q-11 0-18.5-7.5T96 390t7-18l269-269q7-7 18-7t18.5 7.5T416 122t-7 18L140 409q-7 7-18 7z";
-    const ltr = false;
-    const collection = "SAP-icons-v5";
-    const packageName = "@ui5/webcomponents-icons";
-
-    Icons.y(name, { pathData, ltr, collection, packageName });
-
-    var resizeCorner = "resize-corner";
-
-    function DialogTemplate() {
-        return PopupTemplate.call(this, {
-            beforeContent,
-            afterContent,
-        });
-    }
-    function beforeContent() {
-        return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: !!this._displayHeader &&
-                parametersBundle_css.jsx("header", { children: parametersBundle_css.jsxs("div", { class: "ui5-popup-header-root", id: "ui5-popup-header", role: "group", "aria-describedby": this.effectiveAriaDescribedBy, "aria-roledescription": this.ariaRoleDescriptionHeaderText, tabIndex: this._headerTabIndex, onKeyDown: this._onDragOrResizeKeyDown, onMouseDown: this._onDragMouseDown, part: "header", children: [this.hasValueState &&
-                                parametersBundle_css.jsx(Icon.Icon, { class: "ui5-dialog-value-state-icon", name: this._dialogStateIcon }), this.header.length ?
-                                parametersBundle_css.jsx("slot", { name: "header" })
-                                :
-                                    parametersBundle_css.jsx(Title.Title, { level: "H1", id: "ui5-popup-header-text", class: "ui5-popup-header-text", children: this.headerText }), this.resizable ?
-                                this.draggable ?
-                                    parametersBundle_css.jsx("span", { id: `${this._id}-descr`, "aria-hidden": "true", class: "ui5-hidden-text", children: this.ariaDescribedByHeaderTextDraggableAndResizable })
-                                    :
-                                        parametersBundle_css.jsx("span", { id: `${this._id}-descr`, "aria-hidden": "true", class: "ui5-hidden-text", children: this.ariaDescribedByHeaderTextResizable })
-                                :
-                                    this.draggable &&
-                                        parametersBundle_css.jsx("span", { id: `${this._id}-descr`, "aria-hidden": "true", class: "ui5-hidden-text", children: this.ariaDescribedByHeaderTextDraggable })] }) }) }));
-    }
-    function afterContent() {
-        return (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [!!this.footer.length &&
-                    parametersBundle_css.jsx("footer", { class: "ui5-popup-footer-root", part: "footer", children: parametersBundle_css.jsx("slot", { name: "footer" }) }), this._showResizeHandle &&
-                    parametersBundle_css.jsx("div", { class: "ui5-popup-resize-handle", onMouseDown: this._onResizeMouseDown, children: parametersBundle_css.jsx(Icon.Icon, { name: resizeCorner }) })] }));
-    }
-
-    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
-    var PopupsCommonCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host{position:fixed;background:var(--sapGroup_ContentBackground);border-radius:var(--_ui5-v2-15-0_popup_border_radius);min-height:2rem;box-sizing:border-box}:host([open]){display:flex}.ui5-popup-root{background:inherit;border-radius:inherit;width:100%;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;flex:1 1 auto;outline:none}.ui5-popup-root .ui5-popup-header-root{box-shadow:var(--_ui5-v2-15-0_popup_header_shadow);border-bottom:var(--_ui5-v2-15-0_popup_header_border)}.ui5-popup-content{color:var(--sapTextColor);flex:auto}.ui5-popup-content:focus{outline:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);outline-offset:calc(-1 * var(--sapContent_FocusWidth));border-radius:var(--_ui5-v2-15-0_popup_border_radius)}.ui5-popup-footer-root{background:var(--sapPageFooter_Background);border-top:1px solid var(--sapPageFooter_BorderColor);color:var(--sapPageFooter_TextColor)}.ui5-popup-header-root,.ui5-popup-footer-root,:host([header-text]) .ui5-popup-header-text{margin:0;display:flex;justify-content:center;align-items:center}.ui5-popup-header-root .ui5-popup-header-text{font-weight:var(--sapFontHeaderFamily);font-size:var(--sapFontHeader5Size);color:var(--sapPageHeader_TextColor)}.ui5-popup-content{overflow:auto;box-sizing:border-box}:host([header-text]) .ui5-popup-header-text{min-height:var(--_ui5-v2-15-0_popup_default_header_height);max-height:var(--_ui5-v2-15-0_popup_default_header_height);line-height:var(--_ui5-v2-15-0_popup_default_header_height);text-overflow:ellipsis;overflow:hidden;white-space:nowrap;max-width:100%;display:inline-flex;justify-content:var(--_ui5-v2-15-0_popup_header_prop_header_text_alignment)}:host([header-text]) .ui5-popup-header-root{justify-content:var(--_ui5-v2-15-0_popup_header_prop_header_text_alignment)}:host(:not([header-text])) .ui5-popup-header-text{display:none}:host([media-range="S"]) .ui5-popup-content{padding:1rem var(--_ui5-v2-15-0_popup_content_padding_s)}:host([media-range="M"]) .ui5-popup-content,:host([media-range="L"]) .ui5-popup-content{padding:1rem var(--_ui5-v2-15-0_popup_content_padding_m_l)}:host([media-range="XL"]) .ui5-popup-content{padding:1rem var(--_ui5-v2-15-0_popup_content_padding_xl)}.ui5-popup-header-root{background:var(--sapPageHeader_Background)}:host([media-range="S"]) .ui5-popup-header-root,:host([media-range="S"]) .ui5-popup-footer-root{padding-left:var(--_ui5-v2-15-0_popup_header_footer_padding_s);padding-right:var(--_ui5-v2-15-0_popup_header_footer_padding_s)}:host([media-range="M"]) .ui5-popup-header-root,:host([media-range="L"]) .ui5-popup-header-root,:host([media-range="M"]) .ui5-popup-footer-root,:host([media-range="L"]) .ui5-popup-footer-root{padding-left:var(--_ui5-v2-15-0_popup_header_footer_padding_m_l);padding-right:var(--_ui5-v2-15-0_popup_header_footer_padding_m_l)}:host([media-range="XL"]) .ui5-popup-header-root,:host([media-range="XL"]) .ui5-popup-footer-root{padding-left:var(--_ui5-v2-15-0_popup_header_footer_padding_xl);padding-right:var(--_ui5-v2-15-0_popup_header_footer_padding_xl)}
-`;
-
-    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
-    var dialogCSS = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host{min-width:20rem;min-height:6rem;max-height:94%;max-width:90%;flex-direction:column;box-shadow:var(--sapContent_Shadow3);border-radius:var(--sapElement_BorderCornerRadius)}:host([stretch]){width:90%;height:94%}:host([stretch][on-phone]){width:100%;height:100%;max-height:100%;max-width:100%;border-radius:0;min-width:0}:host([draggable]) .ui5-popup-header-root,:host([draggable]) ::slotted([slot="header"]){cursor:move}:host([draggable]) .ui5-popup-header-root *{cursor:auto}:host([draggable]) .ui5-popup-root{user-select:text}::slotted([slot="header"]){max-width:100%}.ui5-popup-root{display:flex;flex-direction:column;max-width:100vw}.ui5-popup-header-root{position:relative}.ui5-popup-header-root:before{content:"";position:absolute;inset-block-start:auto;inset-block-end:0;inset-inline-start:0;inset-inline-end:0;height:var(--_ui5-v2-15-0_dialog_header_state_line_height);background:var(--sapObjectHeader_BorderColor)}:host([state="Negative"]) .ui5-popup-header-root:before{background:var(--sapErrorBorderColor)}:host([state="Information"]) .ui5-popup-header-root:before{background:var(--sapInformationBorderColor)}:host([state="Positive"]) .ui5-popup-header-root:before{background:var(--sapSuccessBorderColor)}:host([state="Critical"]) .ui5-popup-header-root:before{background:var(--sapWarningBorderColor)}.ui5-dialog-value-state-icon{margin-inline-end:.5rem;flex-shrink:0}:host([state="Negative"]) .ui5-dialog-value-state-icon{color:var(--sapNegativeElementColor)}:host([state="Information"]) .ui5-dialog-value-state-icon{color:var(--sapInformativeElementColor)}:host([state="Positive"]) .ui5-dialog-value-state-icon{color:var(--sapPositiveElementColor)}:host([state="Critical"]) .ui5-dialog-value-state-icon{color:var(--sapCriticalElementColor)}.ui5-popup-header-root{outline:none}:host([desktop]) .ui5-popup-header-root:focus:after,.ui5-popup-header-root:focus-visible:after{content:"";position:absolute;left:var(--_ui5-v2-15-0_dialog_header_focus_left_offset);bottom:var(--_ui5-v2-15-0_dialog_header_focus_bottom_offset);right:var(--_ui5-v2-15-0_dialog_header_focus_right_offset);top:var(--_ui5-v2-15-0_dialog_header_focus_top_offset);border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);border-radius:var(--_ui5-v2-15-0_dialog_header_border_radius) var(--_ui5-v2-15-0_dialog_header_border_radius) 0 0;pointer-events:none}:host([stretch]) .ui5-popup-content{width:100%;height:100%}.ui5-popup-content{min-height:var(--_ui5-v2-15-0_dialog_content_min_height);flex:1 1 auto}.ui5-popup-resize-handle{position:absolute;bottom:-.5rem;inset-inline-end:-.5rem;cursor:var(--_ui5-v2-15-0_dialog_resize_cursor);width:1.5rem;height:1.5rem;border-radius:50%}.ui5-popup-resize-handle [ui5-icon]{color:var(--sapButton_Lite_TextColor)}::slotted([slot="footer"]){height:var(--_ui5-v2-15-0_dialog_footer_height)}::slotted([slot="footer"][ui5-bar][design="Footer"]){border-top:none}::slotted([slot="header"][ui5-bar]){box-shadow:none}::slotted([slot="footer"][ui5-toolbar]){border:0}:host::backdrop{background-color:var(--_ui5-v2-15-0_popup_block_layer_background);opacity:var(--_ui5-v2-15-0_popup_block_layer_opacity)}.ui5-block-layer{display:block}
-`;
-
-    var __decorate$2 = (this && this.__decorate) || function (decorators, target, key, desc) {
-        var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-        if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-        else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-        return c > 3 && r && Object.defineProperty(target, key, r), r;
-    };
-    var Dialog_1;
-    /**
-     * Defines the step size at which this component would change by when being dragged or resized with the keyboard.
-     */
-    const STEP_SIZE = 16;
-    /**
-     * Defines the icons corresponding to the dialog's state.
-     */
-    const ICON_PER_STATE = {
-        [ValueState.o.Negative]: "error",
-        [ValueState.o.Critical]: "alert",
-        [ValueState.o.Positive]: "sys-enter-2",
-        [ValueState.o.Information]: "information",
-    };
-    /**
-     * @class
-     * ### Overview
-     * The `ui5-dialog` component is used to temporarily display some information in a
-     * size-limited window in front of the regular app screen.
-     * It is used to prompt the user for an action or a confirmation.
-     * The `ui5-dialog` interrupts the current app processing as it is the only focused UI element and
-     * the main screen is dimmed/blocked.
-     * The dialog combines concepts known from other technologies where the windows have
-     * names such as dialog box, dialog window, pop-up, pop-up window, alert box, or message box.
-     *
-     * The `ui5-dialog` is modal, which means that a user action is required before it is possible to return to the parent window.
-     * To open multiple dialogs, each dialog element should be separate in the markup. This will ensure the correct modal behavior. Avoid nesting dialogs within each other.
-     * The content of the `ui5-dialog` is fully customizable.
-     *
-     * ### Structure
-     * A `ui5-dialog` consists of a header, content, and a footer for action buttons.
-     * The `ui5-dialog` is usually displayed at the center of the screen.
-     * Its position can be changed by the user. To enable this, you need to set the property `draggable` accordingly.
-
-     *
-     * ### Responsive Behavior
-     * The `stretch` property can be used to stretch the `ui5-dialog` to full screen. For better usability, it's recommended to stretch the dialog to full screen on phone devices.
-     *
-     * **Note:** When a `ui5-bar` is used in the header or in the footer, you should remove the default dialog's paddings.
-     *
-     * For more information see the sample "Bar in Header/Footer".
-
-     * ### Keyboard Handling
-     *
-     * #### Basic Navigation
-     * When the `ui5-dialog` has the `draggable` property set to `true` and the header is focused, the user can move the dialog
-     * with the following keyboard shortcuts:
-     *
-     * - [Up] or [Down] arrow keys - Move the dialog up/down.
-     * - [Left] or [Right] arrow keys - Move the dialog left/right.
-     *
-     * #### Resizing
-     * When the `ui5-dialog` has the `resizable` property set to `true` and the header is focused, the user can change the size of the dialog
-     * with the following keyboard shortcuts:
-     *
-     * - [Shift] + [Up] or [Down] - Decrease/Increase the height of the dialog.
-     * - [Shift] + [Left] or [Right] - Decrease/Increase the width of the dialog.
-     *
-     * ### ES6 Module Import
-     *
-     * `import "@ui5/webcomponents/dist/Dialog";`
-     *
-     * @constructor
-     * @extends Popup
-     * @public
-     * @csspart header - Used to style the header of the component
-     * @csspart content - Used to style the content of the component
-     * @csspart footer - Used to style the footer of the component
-     */
-    let Dialog = Dialog_1 = class Dialog extends Popup$1 {
-        constructor() {
-            super();
-            /**
-             * Determines if the dialog will be stretched to full screen on mobile. On desktop,
-             * the dialog will be stretched to approximately 90% of the viewport.
-             *
-             * **Note:** For better usability of the component it is recommended to set this property to "true" when the dialog is opened on phone.
-             * @default false
-             * @public
-             */
-            this.stretch = false;
-            /**
-             * Determines whether the component is draggable.
-             * If this property is set to true, the Dialog will be draggable by its header.
-             *
-             * **Note:** The component can be draggable only in desktop mode.
-             *
-             * **Note:** This property overrides the default HTML "draggable" attribute native behavior.
-             * When "draggable" is set to true, the native browser "draggable"
-             * behavior is prevented and only the Dialog custom logic ("draggable by its header") works.
-             * @default false
-             * @since 1.0.0-rc.9
-             * @public
-             */
-            this.draggable = false;
-            /**
-             * Configures the component to be resizable.
-             * If this property is set to true, the Dialog will have a resize handle in its bottom right corner in LTR languages.
-             * In RTL languages, the resize handle will be placed in the bottom left corner.
-             *
-             * **Note:** The component can be resizable only in desktop mode.
-             *
-             * **Note:** Upon resizing, externally defined height and width styling will be ignored.
-             * @default false
-             * @since 1.0.0-rc.10
-             * @public
-             */
-            this.resizable = false;
-            /**
-             * Defines the state of the `Dialog`.
-             *
-             * **Note:** If `"Negative"` and `"Critical"` states is set, it will change the
-             * accessibility role to "alertdialog", if the accessibleRole property is set to `"Dialog"`.
-             * @default "None"
-             * @public
-             * @since 1.0.0-rc.15
-             */
-            this.state = "None";
-            this._draggedOrResized = false;
-            this._revertSize = () => {
-                Object.assign(this.style, {
-                    top: "",
-                    left: "",
-                    width: "",
-                    height: "",
-                });
-            };
-            this._screenResizeHandler = this._screenResize.bind(this);
-            this._dragMouseMoveHandler = this._onDragMouseMove.bind(this);
-            this._dragMouseUpHandler = this._onDragMouseUp.bind(this);
-            this._resizeMouseMoveHandler = this._onResizeMouseMove.bind(this);
-            this._resizeMouseUpHandler = this._onResizeMouseUp.bind(this);
-            this._dragStartHandler = this._handleDragStart.bind(this);
-        }
-        static _isHeader(element) {
-            return element.classList.contains("ui5-popup-header-root") || element.getAttribute("slot") === "header";
-        }
-        get isModal() {
-            return true;
-        }
-        get _ariaLabelledBy() {
-            let ariaLabelledById;
-            if (this.headerText && !this._ariaLabel) {
-                ariaLabelledById = "ui5-popup-header-text";
-            }
-            return ariaLabelledById;
-        }
-        get ariaRoleDescriptionHeaderText() {
-            return (this.resizable || this.draggable) ? Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_HEADER_ARIA_ROLE_DESCRIPTION) : undefined;
-        }
-        get effectiveAriaDescribedBy() {
-            return (this.resizable || this.draggable) ? `${this._id}-descr` : undefined;
-        }
-        get ariaDescribedByHeaderTextResizable() {
-            return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_HEADER_ARIA_DESCRIBEDBY_RESIZABLE);
-        }
-        get ariaDescribedByHeaderTextDraggable() {
-            return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_HEADER_ARIA_DESCRIBEDBY_DRAGGABLE);
-        }
-        get ariaDescribedByHeaderTextDraggableAndResizable() {
-            return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_HEADER_ARIA_DESCRIBEDBY_DRAGGABLE_RESIZABLE);
-        }
-        /**
-         * Determines if the header should be shown.
-         */
-        get _displayHeader() {
-            return this.header.length || this.headerText || this.draggable || this.resizable;
-        }
-        get _movable() {
-            return !this.stretch && this.onDesktop && (this.draggable || this.resizable);
-        }
-        get _headerTabIndex() {
-            return this._movable ? 0 : undefined;
-        }
-        get _showResizeHandle() {
-            return this.resizable && this.onDesktop;
-        }
-        get _minHeight() {
-            let minHeight = Number.parseInt(window.getComputedStyle(this.contentDOM).minHeight);
-            const header = this._root.querySelector(".ui5-popup-header-root");
-            if (header) {
-                minHeight += header.offsetHeight;
-            }
-            const footer = this._root.querySelector(".ui5-popup-footer-root");
-            if (footer) {
-                minHeight += footer.offsetHeight;
-            }
-            return minHeight;
-        }
-        get hasValueState() {
-            return this.state !== ValueState.o.None;
-        }
-        get _dialogStateIcon() {
-            return ICON_PER_STATE[this.state];
-        }
-        get _role() {
-            if (this.accessibleRole === PopupAccessibleRole$1.None) {
-                return undefined;
-            }
-            if (this.state === ValueState.o.Negative || this.state === ValueState.o.Critical) {
-                return toLowercaseEnumValue.n(PopupAccessibleRole$1.AlertDialog);
-            }
-            return toLowercaseEnumValue.n(this.accessibleRole);
-        }
-        _show() {
-            super._show();
-            this._center();
-        }
-        onBeforeRendering() {
-            super.onBeforeRendering();
-            this._isRTL = this.effectiveDir === "rtl";
-        }
-        onEnterDOM() {
-            super.onEnterDOM();
-            this._attachScreenResizeHandler();
-            this.addEventListener("dragstart", this._dragStartHandler);
-        }
-        onExitDOM() {
-            super.onExitDOM();
-            this._detachScreenResizeHandler();
-            this.removeEventListener("dragstart", this._dragStartHandler);
-        }
-        /**
-         * @override
-         */
-        _resize() {
-            super._resize();
-            if (!this._draggedOrResized) {
-                this._center();
-            }
-        }
-        _screenResize() {
-            this._center();
-        }
-        _attachScreenResizeHandler() {
-            if (!this._screenResizeHandlerAttached) {
-                window.addEventListener("resize", this._screenResizeHandler);
-                this._screenResizeHandlerAttached = true;
-            }
-        }
-        _detachScreenResizeHandler() {
-            if (this._screenResizeHandlerAttached) {
-                window.removeEventListener("resize", this._screenResizeHandler);
-                this._screenResizeHandlerAttached = false; // prevent dialog from repositioning during resizing
-            }
-        }
-        _center() {
-            const height = window.innerHeight - this.offsetHeight, width = window.innerWidth - this.offsetWidth;
-            Object.assign(this.style, {
-                top: `${Math.round(height / 2)}px`,
-                left: `${Math.round(width / 2)}px`,
-            });
-        }
-        /**
-         * Event handlers
-         */
-        _onDragMouseDown(e) {
-            // allow dragging only on the header
-            if (!this._movable || !this.draggable || !Dialog_1._isHeader(e.target)) {
-                return;
-            }
-            const { top, left, } = this.getBoundingClientRect();
-            const { width, height, } = window.getComputedStyle(this);
-            Object.assign(this.style, {
-                top: `${top}px`,
-                left: `${left}px`,
-                width: `${Math.round(Number.parseFloat(width) * 100) / 100}px`,
-                height: `${Math.round(Number.parseFloat(height) * 100) / 100}px`,
-            });
-            this._x = e.clientX;
-            this._y = e.clientY;
-            this._draggedOrResized = true;
-            this._attachMouseDragHandlers();
-        }
-        _onDragMouseMove(e) {
-            e.preventDefault();
-            const { clientX, clientY } = e;
-            const calcX = this._x - clientX;
-            const calcY = this._y - clientY;
-            const { left, top, } = this.getBoundingClientRect();
-            Object.assign(this.style, {
-                left: `${Math.floor(left - calcX)}px`,
-                top: `${Math.floor(top - calcY)}px`,
-            });
-            this._x = clientX;
-            this._y = clientY;
-        }
-        _onDragMouseUp() {
-            delete this._x;
-            delete this._y;
-            this._detachMouseDragHandlers();
-        }
-        _onDragOrResizeKeyDown(e) {
-            if (!this._movable || !Dialog_1._isHeader(e.target)) {
-                return;
-            }
-            if (this.draggable && [webcomponentsBase.P, webcomponentsBase._, webcomponentsBase.D, webcomponentsBase.R].some(key => key(e))) {
-                this._dragWithEvent(e);
-                return;
-            }
-            if (this.resizable && [webcomponentsBase.O, webcomponentsBase.N, webcomponentsBase.h, webcomponentsBase.I].some(key => key(e))) {
-                this._resizeWithEvent(e);
-            }
-        }
-        _dragWithEvent(e) {
-            const { top, left, width, height, } = this.getBoundingClientRect();
-            let newPos = 0;
-            let posDirection = "top";
-            switch (true) {
-                case webcomponentsBase.P(e):
-                    newPos = top - STEP_SIZE;
-                    posDirection = "top";
-                    break;
-                case webcomponentsBase._(e):
-                    newPos = top + STEP_SIZE;
-                    posDirection = "top";
-                    break;
-                case webcomponentsBase.D(e):
-                    newPos = left - STEP_SIZE;
-                    posDirection = "left";
-                    break;
-                case webcomponentsBase.R(e):
-                    newPos = left + STEP_SIZE;
-                    posDirection = "left";
-                    break;
-            }
-            newPos = m$1(newPos, 0, posDirection === "left" ? window.innerWidth - width : window.innerHeight - height);
-            this.style[posDirection] = `${newPos}px`;
-        }
-        _resizeWithEvent(e) {
-            this._draggedOrResized = true;
-            this.addEventListener("ui5-before-close", this._revertSize, { once: true });
-            const { top, left } = this.getBoundingClientRect(), style = window.getComputedStyle(this), minWidth = Number.parseFloat(style.minWidth), maxWidth = window.innerWidth - left, maxHeight = window.innerHeight - top;
-            let width = Number.parseFloat(style.width), height = Number.parseFloat(style.height);
-            switch (true) {
-                case webcomponentsBase.O(e):
-                    height -= STEP_SIZE;
-                    break;
-                case webcomponentsBase.N(e):
-                    height += STEP_SIZE;
-                    break;
-                case webcomponentsBase.h(e):
-                    width -= STEP_SIZE;
-                    break;
-                case webcomponentsBase.I(e):
-                    width += STEP_SIZE;
-                    break;
-            }
-            width = m$1(width, minWidth, maxWidth);
-            height = m$1(height, this._minHeight, maxHeight);
-            Object.assign(this.style, {
-                width: `${width}px`,
-                height: `${height}px`,
-            });
-        }
-        _attachMouseDragHandlers() {
-            window.addEventListener("mousemove", this._dragMouseMoveHandler);
-            window.addEventListener("mouseup", this._dragMouseUpHandler);
-        }
-        _detachMouseDragHandlers() {
-            window.removeEventListener("mousemove", this._dragMouseMoveHandler);
-            window.removeEventListener("mouseup", this._dragMouseUpHandler);
-        }
-        _onResizeMouseDown(e) {
-            if (!this._movable || !this.resizable) {
-                return;
-            }
-            e.preventDefault();
-            const { top, left, } = this.getBoundingClientRect();
-            const { width, height, minWidth, } = window.getComputedStyle(this);
-            this._initialX = e.clientX;
-            this._initialY = e.clientY;
-            this._initialWidth = Number.parseFloat(width);
-            this._initialHeight = Number.parseFloat(height);
-            this._initialTop = top;
-            this._initialLeft = left;
-            this._minWidth = Number.parseFloat(minWidth);
-            this._cachedMinHeight = this._minHeight;
-            Object.assign(this.style, {
-                top: `${top}px`,
-                left: `${left}px`,
-            });
-            this._draggedOrResized = true;
-            this._attachMouseResizeHandlers();
-        }
-        _onResizeMouseMove(e) {
-            const { clientX, clientY } = e;
-            let newWidth, newLeft;
-            if (this._isRTL) {
-                newWidth = m$1(this._initialWidth - (clientX - this._initialX), this._minWidth, this._initialLeft + this._initialWidth);
-                // check if width is changed to avoid "left" jumping when max width is reached
-                Object.assign(this.style, {
-                    width: `${newWidth}px`,
-                });
-                const deltaWidth = newWidth - this.getBoundingClientRect().width;
-                const rightEdge = this._initialLeft + this._initialWidth + deltaWidth;
-                newLeft = m$1(rightEdge - newWidth, 0, rightEdge - this._minWidth);
-            }
-            else {
-                newWidth = m$1(this._initialWidth + (clientX - this._initialX), this._minWidth, window.innerWidth - this._initialLeft);
-            }
-            const newHeight = m$1(this._initialHeight + (clientY - this._initialY), this._cachedMinHeight, window.innerHeight - this._initialTop);
-            Object.assign(this.style, {
-                height: `${newHeight}px`,
-                width: `${newWidth}px`,
-                left: this._isRTL ? `${newLeft}px` : undefined,
-            });
-        }
-        _onResizeMouseUp() {
-            delete this._initialX;
-            delete this._initialY;
-            delete this._initialWidth;
-            delete this._initialHeight;
-            delete this._initialTop;
-            delete this._initialLeft;
-            delete this._minWidth;
-            delete this._cachedMinHeight;
-            this._detachMouseResizeHandlers();
-        }
-        _handleDragStart(e) {
-            if (this.draggable) {
-                e.preventDefault();
-            }
-        }
-        _attachMouseResizeHandlers() {
-            window.addEventListener("mousemove", this._resizeMouseMoveHandler);
-            window.addEventListener("mouseup", this._resizeMouseUpHandler);
-            this.addEventListener("ui5-before-close", this._revertSize, { once: true });
-        }
-        _detachMouseResizeHandlers() {
-            window.removeEventListener("mousemove", this._resizeMouseMoveHandler);
-            window.removeEventListener("mouseup", this._resizeMouseUpHandler);
-        }
-    };
-    __decorate$2([
-        webcomponentsBase.s()
-    ], Dialog.prototype, "headerText", void 0);
-    __decorate$2([
-        webcomponentsBase.s({ type: Boolean })
-    ], Dialog.prototype, "stretch", void 0);
-    __decorate$2([
-        webcomponentsBase.s({ type: Boolean })
-    ], Dialog.prototype, "draggable", void 0);
-    __decorate$2([
-        webcomponentsBase.s({ type: Boolean })
-    ], Dialog.prototype, "resizable", void 0);
-    __decorate$2([
-        webcomponentsBase.s()
-    ], Dialog.prototype, "state", void 0);
-    __decorate$2([
-        webcomponentsBase.d()
-    ], Dialog.prototype, "header", void 0);
-    __decorate$2([
-        webcomponentsBase.d()
-    ], Dialog.prototype, "footer", void 0);
-    __decorate$2([
-        parametersBundle_css$1.i("@ui5/webcomponents")
-    ], Dialog, "i18nBundle", void 0);
-    Dialog = Dialog_1 = __decorate$2([
-        webcomponentsBase.m({
-            tag: "ui5-dialog",
-            template: DialogTemplate,
-            styles: [
-                Popup$1.styles,
-                PopupsCommonCss,
-                dialogCSS,
-            ],
-        })
-    ], Dialog);
-    Dialog.define();
-    var Dialog$1 = Dialog;
-
-    function ResponsivePopoverTemplate() {
-        if (!this._isPhone) {
-            return PopoverTemplate.call(this);
-        }
-        return (parametersBundle_css.jsxs(Dialog$1, { "root-element": true, accessibleName: this.accessibleName, accessibleNameRef: this.accessibleNameRef, accessibleDescription: this.accessibleDescription, accessibleDescriptionRef: this.accessibleDescriptionRef, accessibleRole: this.accessibleRole, stretch: true, preventInitialFocus: this.preventInitialFocus, preventFocusRestore: this.preventFocusRestore, initialFocus: this.initialFocus, onBeforeOpen: this._beforeDialogOpen, onOpen: this._afterDialogOpen, onBeforeClose: this._beforeDialogClose, onClose: this._afterDialogClose, exportparts: "content, header, footer", open: this.open, children: [!this._hideHeader && parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: this.header.length ?
-                        parametersBundle_css.jsx("slot", { slot: "header", name: "header" })
-                        :
-                            parametersBundle_css.jsxs("div", { class: this.classes.header, slot: "header", children: [this.headerText &&
-                                        parametersBundle_css.jsx(Title.Title, { level: "H1", wrappingType: "None", class: "ui5-popup-header-text ui5-responsive-popover-header-text", children: this.headerText }), !this._hideCloseButton &&
-                                        parametersBundle_css.jsx(Button.Button, { icon: information.decline, design: "Transparent", accessibleName: this._closeDialogAriaLabel, onClick: this._dialogCloseButtonClick })] }) }), parametersBundle_css.jsx("slot", {}), parametersBundle_css.jsx("slot", { slot: "footer", name: "footer" })] }));
-    }
 
     /**
      * Popover placements.
@@ -1373,14 +826,17 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
             return;
         }
         // loop all open popovers
-        for (let i = (openedPopups.length - 1); i !== -1; i--) {
+        for (let i = openedPopups.length - 1; i !== -1; i--) {
             const popup = openedPopups[i].instance;
+            if (!instanceOfPopover(popup)) {
+                return;
+            }
             // if popup is modal, opener is clicked, popup is dialog skip closing
             if (popup.isModal || popup.isOpenerClicked(event)) {
                 return;
             }
-            if (f(event, popup.getBoundingClientRect())) {
-                break;
+            if (popup.isClicked(event)) {
+                return;
             }
             popup.closePopup();
         }
@@ -1444,12 +900,327 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
         return parentPopovers;
     };
 
-    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
-    var PopoverCss = `:host{box-shadow:var(--_ui5-v2-15-0_popover_box_shadow);background-color:var(--_ui5-v2-15-0_popover_background);max-width:calc(100vw - (100vw - 100%) - 2 * var(--_ui5-v2-15-0_popup_viewport_margin))}:host([hide-arrow]){box-shadow:var(--_ui5-v2-15-0_popover_no_arrow_box_shadow)}:host([actual-placement="Bottom"]) .ui5-popover-arrow{left:calc(50% - .5625rem);top:-.5rem;height:.5rem}:host([actual-placement="Bottom"]) .ui5-popover-arrow:after{margin:var(--_ui5-v2-15-0_popover_upward_arrow_margin)}:host([actual-placement="Start"]) .ui5-popover-arrow{top:calc(50% - .5625rem);right:-.5625rem;width:.5625rem}:host([actual-placement="Start"]) .ui5-popover-arrow:after{margin:var(--_ui5-v2-15-0_popover_right_arrow_margin)}:host([actual-placement="Top"]) .ui5-popover-arrow{left:calc(50% - .5625rem);height:.5625rem;top:100%}:host([actual-placement="Top"]) .ui5-popover-arrow:after{margin:var(--_ui5-v2-15-0_popover_downward_arrow_margin)}:host(:not([actual-placement])) .ui5-popover-arrow,:host([actual-placement="End"]) .ui5-popover-arrow{left:-.5625rem;top:calc(50% - .5625rem);width:.5625rem;height:1rem}:host(:not([actual-placement])) .ui5-popover-arrow:after,:host([actual-placement="End"]) .ui5-popover-arrow:after{margin:var(--_ui5-v2-15-0_popover_left_arrow_margin)}:host([hide-arrow]) .ui5-popover-arrow{display:none}.ui5-popover-root{min-width:6.25rem}.ui5-popover-arrow{pointer-events:none;display:block;width:1rem;height:1rem;position:absolute;overflow:hidden}.ui5-popover-arrow:after{content:"";display:block;width:.7rem;height:.7rem;background-color:var(--_ui5-v2-15-0_popover_background);box-shadow:var(--_ui5-v2-15-0_popover_box_shadow);transform:rotate(-45deg)}:host([modal])::backdrop{background-color:var(--_ui5-v2-15-0_popup_block_layer_background);opacity:var(--_ui5-v2-15-0_popup_block_layer_opacity)}:host([modal]) .ui5-block-layer{display:block}
+    var ResizeHandlePlacement;
+    (function (ResizeHandlePlacement) {
+        ResizeHandlePlacement["TopLeft"] = "TopLeft";
+        ResizeHandlePlacement["TopRight"] = "TopRight";
+        ResizeHandlePlacement["BottomLeft"] = "BottomLeft";
+        ResizeHandlePlacement["BottomRight"] = "BottomRight";
+    })(ResizeHandlePlacement || (ResizeHandlePlacement = {}));
+    /**
+     * Manages resize functionality for Popover components
+     * @private
+     */
+    class PopoverResize {
+        constructor(popover) {
+            this._resized = false;
+            this._popover = popover;
+            this._resizeMouseMoveHandler = this._onResizeMouseMove.bind(this);
+            this._resizeMouseUpHandler = this._onResizeMouseUp.bind(this);
+        }
+        /**
+         * Resets the resize state
+         */
+        reset() {
+            if (!this._resized) {
+                return;
+            }
+            this._resized = false;
+            delete this._currentDeltaX;
+            delete this._currentDeltaY;
+            delete this._totalDeltaX;
+            delete this._totalDeltaY;
+        }
+        /**
+         * Returns whether the popover has been resized
+         */
+        get isResized() {
+            return this._resized;
+        }
+        /*
+         * Gets the corrected left position considering resize deltas
+         */
+        getCorrectedLeft(left) {
+            if (this.isResized) {
+                left -= this._currentDeltaX || 0;
+            }
+            return left;
+        }
+        /*
+         * Gets the corrected top position considering resize deltas
+         */
+        getCorrectedTop(top) {
+            if (this.isResized) {
+                top -= this._currentDeltaY || 0;
+            }
+            return top;
+        }
+        setCorrectResizeHandleClass(allClasses) {
+            switch (this.getResizeHandlePlacement()) {
+                case ResizeHandlePlacement.BottomLeft:
+                    allClasses.root["ui5-popover-resize-handle-bottom-left"] = true;
+                    break;
+                case ResizeHandlePlacement.BottomRight:
+                    allClasses.root["ui5-popover-resize-handle-bottom-right"] = true;
+                    break;
+                case ResizeHandlePlacement.TopLeft:
+                    allClasses.root["ui5-popover-resize-handle-top-left"] = true;
+                    break;
+                case ResizeHandlePlacement.TopRight:
+                    allClasses.root["ui5-popover-resize-handle-top-right"] = true;
+                    break;
+            }
+        }
+        getResizeHandlePlacement() {
+            const popover = this._popover;
+            if (this._resized && popover.resizeHandlePlacement) {
+                return popover.resizeHandlePlacement;
+            }
+            const opener = popover.getOpenerHTMLElement(popover.opener);
+            if (!opener) {
+                return undefined;
+            }
+            const offset = 2;
+            const isRtl = popover.isRtl;
+            const openerRect = opener.getBoundingClientRect();
+            const popoverWrapperRect = popover.getBoundingClientRect();
+            let openerCX = Math.floor(openerRect.x + openerRect.width / 2);
+            const openerCY = Math.floor(openerRect.y + openerRect.height / 2);
+            let popoverCX = Math.floor(popoverWrapperRect.x + popoverWrapperRect.width / 2);
+            const popoverCY = Math.floor(popoverWrapperRect.y + popoverWrapperRect.height / 2);
+            const verticalAlign = popover.verticalAlign;
+            const actualHorizontalAlign = popover._actualHorizontalAlign;
+            const isPopoverWidthBiggerThanOpener = popoverWrapperRect.width > openerRect.width;
+            const isPopoverHeightBiggerThanOpener = popoverWrapperRect.height > openerRect.height;
+            if (isRtl) {
+                openerCX = -openerCX;
+                popoverCX = -popoverCX;
+            }
+            switch (popover.getActualPlacement(openerRect)) {
+                case PopoverActualPlacement.Left:
+                    if (isPopoverHeightBiggerThanOpener) {
+                        if (popoverCY > openerCY + offset) {
+                            return ResizeHandlePlacement.BottomLeft;
+                        }
+                        return ResizeHandlePlacement.TopLeft;
+                    }
+                    if (verticalAlign === PopoverVerticalAlign$1.Top) {
+                        return ResizeHandlePlacement.BottomLeft;
+                    }
+                    return ResizeHandlePlacement.TopLeft;
+                case PopoverActualPlacement.Right:
+                    if (isPopoverHeightBiggerThanOpener) {
+                        if (popoverCY + offset < openerCY) {
+                            return ResizeHandlePlacement.TopRight;
+                        }
+                        return ResizeHandlePlacement.BottomRight;
+                    }
+                    if (verticalAlign === PopoverVerticalAlign$1.Bottom) {
+                        return ResizeHandlePlacement.TopRight;
+                    }
+                    return ResizeHandlePlacement.BottomRight;
+                case PopoverActualPlacement.Bottom:
+                    if (isPopoverWidthBiggerThanOpener) {
+                        if (popoverCX + offset < openerCX) {
+                            return isRtl ? ResizeHandlePlacement.BottomRight : ResizeHandlePlacement.BottomLeft;
+                        }
+                        return isRtl ? ResizeHandlePlacement.BottomLeft : ResizeHandlePlacement.BottomRight;
+                    }
+                    if (isRtl) {
+                        if (actualHorizontalAlign === PopoverActualHorizontalAlign.Left) {
+                            return ResizeHandlePlacement.BottomRight;
+                        }
+                        return ResizeHandlePlacement.BottomLeft;
+                    }
+                    if (actualHorizontalAlign === PopoverActualHorizontalAlign.Right) {
+                        return ResizeHandlePlacement.BottomLeft;
+                    }
+                    return ResizeHandlePlacement.BottomRight;
+                case PopoverActualPlacement.Top:
+                default:
+                    if (isPopoverWidthBiggerThanOpener) {
+                        if (popoverCX + offset < openerCX) {
+                            return isRtl ? ResizeHandlePlacement.TopRight : ResizeHandlePlacement.TopLeft;
+                        }
+                        return isRtl ? ResizeHandlePlacement.TopLeft : ResizeHandlePlacement.TopRight;
+                    }
+                    if (isRtl) {
+                        if (actualHorizontalAlign === PopoverActualHorizontalAlign.Left) {
+                            return ResizeHandlePlacement.TopRight;
+                        }
+                        return ResizeHandlePlacement.TopLeft;
+                    }
+                    if (actualHorizontalAlign === PopoverActualHorizontalAlign.Right) {
+                        return ResizeHandlePlacement.TopLeft;
+                    }
+                    return ResizeHandlePlacement.TopRight;
+            }
+        }
+        /**
+         * Handles mouse down event on resize handle
+         */
+        onResizeMouseDown(e) {
+            if (!this._popover.resizable) {
+                return;
+            }
+            e.preventDefault();
+            this._resized = true;
+            this._initialBoundingRect = this._popover.getBoundingClientRect();
+            this._totalDeltaX = this._currentDeltaX;
+            this._totalDeltaY = this._currentDeltaY;
+            const { minWidth, minHeight, } = window.getComputedStyle(this._popover);
+            const domRefComputedStyle = window.getComputedStyle(this._popover);
+            this._initialClientX = e.clientX;
+            this._initialClientY = e.clientY;
+            this._minWidth = Math.max(Number.parseFloat(minWidth), Number.parseFloat(domRefComputedStyle.minWidth));
+            this._minHeight = Number.parseFloat(minHeight);
+            this._attachMouseResizeHandlers();
+        }
+        /**
+         * Handles mouse move event during resize
+         */
+        _onResizeMouseMove(e) {
+            const popover = this._popover;
+            const margin = popover._viewportMargin;
+            const { clientX, clientY } = e;
+            const resizeHandlePlacement = this.getResizeHandlePlacement();
+            const initialBoundingRect = this._initialBoundingRect;
+            const deltaX = clientX - this._initialClientX;
+            const deltaY = clientY - this._initialClientY;
+            let newWidth, newHeight;
+            // Determine if we're resizing from left or right edge
+            const isResizingFromLeft = resizeHandlePlacement === ResizeHandlePlacement.TopLeft
+                || resizeHandlePlacement === ResizeHandlePlacement.BottomLeft;
+            const isResizingFromTop = resizeHandlePlacement === ResizeHandlePlacement.TopLeft
+                || resizeHandlePlacement === ResizeHandlePlacement.TopRight;
+            // Calculate width changes
+            if (isResizingFromLeft) {
+                // Resizing from left edge - width increases when moving left (negative delta)
+                const maxWidthFromLeft = initialBoundingRect.x + initialBoundingRect.width - margin;
+                newWidth = m(initialBoundingRect.width - deltaX, this._minWidth, maxWidthFromLeft);
+                // Adjust left position when resizing from left
+                // Ensure the left edge respects the viewport margin and the right edge position
+                const newLeft = m(initialBoundingRect.x + deltaX, margin, initialBoundingRect.x + initialBoundingRect.width - this._minWidth);
+                // Recalculate width based on actual left position to stay within viewport with margin
+                newWidth = Math.min(newWidth, initialBoundingRect.x + initialBoundingRect.width - newLeft);
+                this._currentDeltaX = (initialBoundingRect.x - newLeft) / 2;
+            }
+            else {
+                // Resizing from right edge - width increases when moving right (positive delta)
+                const maxWidthFromRight = window.innerWidth - initialBoundingRect.x - margin;
+                newWidth = m(initialBoundingRect.width + deltaX, this._minWidth, maxWidthFromRight);
+                this._currentDeltaX = (initialBoundingRect.width - newWidth) / 2;
+            }
+            // Calculate height changes
+            if (isResizingFromTop) {
+                // Resizing from top edge - height increases when moving up (negative delta)
+                const maxHeightFromTop = initialBoundingRect.y + initialBoundingRect.height - margin;
+                newHeight = m(initialBoundingRect.height - deltaY, this._minHeight, maxHeightFromTop);
+                // Adjust top position when resizing from top
+                // Ensure the top edge respects the viewport margin and the bottom edge position
+                const newTop = m(initialBoundingRect.y + deltaY, margin, initialBoundingRect.y + initialBoundingRect.height - this._minHeight);
+                // Recalculate height based on actual top position to stay within viewport with margin
+                newHeight = Math.min(newHeight, initialBoundingRect.y + initialBoundingRect.height - newTop);
+                this._currentDeltaY = (initialBoundingRect.y - newTop) / 2;
+            }
+            else {
+                // Resizing from bottom edge - height increases when moving down (positive delta)
+                const maxHeightFromBottom = window.innerHeight - initialBoundingRect.y - margin;
+                newHeight = m(initialBoundingRect.height + deltaY, this._minHeight, maxHeightFromBottom);
+                this._currentDeltaY = (initialBoundingRect.height - newHeight) / 2;
+            }
+            this._currentDeltaX += this._totalDeltaX || 0;
+            this._currentDeltaY += this._totalDeltaY || 0;
+            const placement = this._popover.calcPlacement(this._popover._openerRect, {
+                width: newWidth,
+                height: newHeight,
+            });
+            this._popover.arrowTranslateX = placement.arrow.x;
+            this._popover.arrowTranslateY = placement.arrow.y;
+            Object.assign(this._popover.style, {
+                left: `${placement.left}px`,
+                top: `${placement.top}px`,
+                height: `${newHeight}px`,
+                width: `${newWidth}px`,
+            });
+        }
+        /**
+         * Handles mouse up event after resize
+         */
+        _onResizeMouseUp() {
+            delete this._initialClientX;
+            delete this._initialClientY;
+            delete this._initialBoundingRect;
+            delete this._minWidth;
+            delete this._minHeight;
+            this._detachMouseResizeHandlers();
+        }
+        /**
+         * Attaches mouse event handlers for resize
+         */
+        _attachMouseResizeHandlers() {
+            window.addEventListener("mousemove", this._resizeMouseMoveHandler);
+            window.addEventListener("mouseup", this._resizeMouseUpHandler);
+        }
+        /**
+         * Detaches mouse event handlers for resize
+         */
+        _detachMouseResizeHandlers() {
+            window.removeEventListener("mousemove", this._resizeMouseMoveHandler);
+            window.removeEventListener("mouseup", this._resizeMouseUpHandler);
+        }
+    }
+
+    const name$1 = "resize-corner";
+    const pathData$1 = "M13 5v1c0 .25-.104.48-.313.688l-6 6C6.48 12.896 6.25 13 6 13H5l8-8Zm-5 8 5-5v1c0 .25-.104.48-.313.688l-3 3C9.48 12.896 9.25 13 9 13H8Zm5-2v1c0 .25-.104.48-.313.688-.208.208-.437.312-.687.312h-1l2-2Z";
+    const ltr$1 = false;
+    const viewBox$1 = "0 0 16 16";
+    const collection$1 = "SAP-icons-v4";
+    const packageName$1 = "@ui5/webcomponents-icons";
+
+    Icons.y(name$1, { pathData: pathData$1, ltr: ltr$1, viewBox: viewBox$1, collection: collection$1, packageName: packageName$1 });
+
+    const name = "resize-corner";
+    const pathData = "M11.72 3.22a.75.75 0 1 1 1.06 1.06l-8.5 8.5a.75.75 0 1 1-1.06-1.06l8.5-8.5Zm0 5a.75.75 0 1 1 1.06 1.06l-3.5 3.5a.75.75 0 1 1-1.06-1.06l3.5-3.5Z";
+    const ltr = false;
+    const viewBox = "0 0 16 16";
+    const collection = "SAP-icons-v5";
+    const packageName = "@ui5/webcomponents-icons";
+
+    Icons.y(name, { pathData, ltr, viewBox, collection, packageName });
+
+    var resizeCorner = "resize-corner";
+
+    function PopoverTemplate() {
+        return PopupTemplate.call(this, {
+            beforeContent: beforeContent$1,
+            afterContent: afterContent$1,
+        });
+    }
+    function beforeContent$1() {
+        return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsx("span", { class: "ui5-popover-arrow", style: this.styles.arrow }), this._displayHeader &&
+                    jsxRuntime.jsx("header", { class: "ui5-popup-header-root", id: "ui5-popup-header", part: "header", children: this.header.length ?
+                            jsxRuntime.jsx("slot", { name: "header" })
+                            :
+                                jsxRuntime.jsx(Title.Title, { level: "H1", class: "ui5-popup-header-text", children: this.headerText }) })] }));
+    }
+    function afterContent$1() {
+        return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [this._displayFooter && !!this.footer.length &&
+                    jsxRuntime.jsx("footer", { class: "ui5-popup-footer-root", part: "footer", children: jsxRuntime.jsx("slot", { name: "footer" }) }), this._showResizeHandle &&
+                    jsxRuntime.jsx("div", { class: "ui5-popover-resize-handle", onMouseDown: this._onResizeMouseDown, children: jsxRuntime.jsx(Icon.Icon, { name: resizeCorner }) })] }));
+    }
+
+    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var PopupsCommonCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host{position:fixed;background:var(--sapGroup_ContentBackground);border-radius:var(--_ui5_popup_border_radius);min-height:2rem;box-sizing:border-box}:host([open]){display:flex}.ui5-popup-root{background:inherit;border-radius:inherit;width:100%;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;flex:1 1 auto;outline:none}.ui5-popup-root .ui5-popup-header-root{box-shadow:var(--_ui5_popup_header_shadow);border-bottom:var(--_ui5_popup_header_border)}.ui5-popup-content{color:var(--sapTextColor);flex:auto}.ui5-popup-content:focus{outline:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);outline-offset:calc(-1 * var(--sapContent_FocusWidth));border-radius:var(--_ui5_popup_border_radius)}.ui5-popup-footer-root{background:var(--sapPageFooter_Background);border-top:1px solid var(--sapPageFooter_BorderColor);color:var(--sapPageFooter_TextColor)}.ui5-popup-header-root,.ui5-popup-footer-root,:host([header-text]) .ui5-popup-header-text{margin:0;display:flex;justify-content:center;align-items:center}.ui5-popup-header-root .ui5-popup-header-text{font-weight:var(--sapFontHeaderFamily);font-size:var(--sapFontHeader5Size);color:var(--sapPageHeader_TextColor)}.ui5-popup-content{overflow:auto;box-sizing:border-box}:host([header-text]) .ui5-popup-header-text{min-height:var(--_ui5_popup_default_header_height);max-height:var(--_ui5_popup_default_header_height);line-height:var(--_ui5_popup_default_header_height);text-overflow:ellipsis;overflow:hidden;white-space:nowrap;max-width:100%;display:inline-flex;justify-content:var(--_ui5_popup_header_prop_header_text_alignment)}:host([header-text]) .ui5-popup-header-root{justify-content:var(--_ui5_popup_header_prop_header_text_alignment)}:host(:not([header-text])) .ui5-popup-header-text{display:none}:host([media-range="S"]) .ui5-popup-content{padding:1rem var(--_ui5_popup_content_padding_s)}:host([media-range="M"]) .ui5-popup-content,:host([media-range="L"]) .ui5-popup-content{padding:1rem var(--_ui5_popup_content_padding_m_l)}:host([media-range="XL"]) .ui5-popup-content{padding:1rem var(--_ui5_popup_content_padding_xl)}.ui5-popup-header-root{background:var(--sapPageHeader_Background)}:host([media-range="S"]) .ui5-popup-header-root,:host([media-range="S"]) .ui5-popup-footer-root{padding-left:var(--_ui5_popup_header_footer_padding_s);padding-right:var(--_ui5_popup_header_footer_padding_s)}:host([media-range="M"]) .ui5-popup-header-root,:host([media-range="L"]) .ui5-popup-header-root,:host([media-range="M"]) .ui5-popup-footer-root,:host([media-range="L"]) .ui5-popup-footer-root{padding-left:var(--_ui5_popup_header_footer_padding_m_l);padding-right:var(--_ui5_popup_header_footer_padding_m_l)}:host([media-range="XL"]) .ui5-popup-header-root,:host([media-range="XL"]) .ui5-popup-footer-root{padding-left:var(--_ui5_popup_header_footer_padding_xl);padding-right:var(--_ui5_popup_header_footer_padding_xl)}::slotted([slot="footer"]){height:var(--_ui5_popup_footer_height)}::slotted([slot="footer"][ui5-bar][design="Footer"]){border-top:none}::slotted([slot="header"][ui5-bar]){box-shadow:none}::slotted([slot="footer"][ui5-toolbar]){border:0}::slotted([slot="footer"][ui5-bar][design="Footer"]),::slotted([slot="header"][ui5-bar][design="Header"]){--_ui5_bar-start-container-padding-start: 0;--_ui5_bar-mid-container-padding-start-end: 0;--_ui5_bar-end-container-padding-end: 0}
 `;
 
-    var __decorate$1 = (this && this.__decorate) || function (decorators, target, key, desc) {
+    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var PopoverCss = `:host{min-width:6.25rem;box-shadow:var(--_ui5_popover_box_shadow);background-color:var(--_ui5_popover_background);max-width:calc(100vw - (100vw - 100%) - 2 * var(--_ui5_popup_viewport_margin))}:host([hide-arrow]){box-shadow:var(--_ui5_popover_no_arrow_box_shadow)}:host([actual-placement="Bottom"]) .ui5-popover-arrow{left:calc(50% - .5625rem);top:-.5rem;height:.5rem}:host([actual-placement="Bottom"]) .ui5-popover-arrow:after{margin:var(--_ui5_popover_upward_arrow_margin)}:host([actual-placement="Left"]) .ui5-popover-arrow{top:calc(50% - .5625rem);right:-.5625rem;width:.5625rem}:host([actual-placement="Left"]) .ui5-popover-arrow:after{margin:var(--_ui5_popover_right_arrow_margin)}:host([actual-placement="Top"]) .ui5-popover-arrow{left:calc(50% - .5625rem);height:.5625rem;top:100%}:host([actual-placement="Top"]) .ui5-popover-arrow:after{margin:var(--_ui5_popover_downward_arrow_margin)}:host(:not([actual-placement])) .ui5-popover-arrow,:host([actual-placement="Right"]) .ui5-popover-arrow{left:-.5625rem;top:calc(50% - .5625rem);width:.5625rem;height:1rem}:host(:not([actual-placement])) .ui5-popover-arrow:after,:host([actual-placement="Right"]) .ui5-popover-arrow:after{margin:var(--_ui5_popover_left_arrow_margin)}:host([hide-arrow]) .ui5-popover-arrow{display:none}.ui5-popover-arrow{pointer-events:none;display:block;width:1rem;height:1rem;position:absolute;overflow:hidden}.ui5-popover-arrow:after{content:"";display:block;width:.7rem;height:.7rem;background-color:var(--_ui5_popover_background);box-shadow:var(--_ui5_popover_box_shadow);transform:rotate(-45deg)}:host([modal])::backdrop{background-color:var(--_ui5_popup_block_layer_background);opacity:var(--_ui5_popup_block_layer_opacity)}:host([modal]) .ui5-block-layer{display:block}.ui5-popover-resize-handle{position:absolute;width:1.5rem;height:1.5rem;border-radius:50%;z-index:1}.ui5-popover-resize-handle [ui5-icon]{position:absolute;width:1rem;height:1rem;cursor:inherit;color:var(--sapButton_Lite_TextColor);--rotAngle: 0;--scaleX: 1;transform:rotate(var(--rotAngle)) scaleX(var(--scaleX))}.ui5-popover-rtl .ui5-popover-resize-handle [ui5-icon]{--scaleX: -1}.ui5-popover-resize-handle-top-right .ui5-popover-resize-handle{top:-.5rem;right:-.5rem;cursor:ne-resize}.ui5-popover-resize-handle-top-right .ui5-popover-resize-handle [ui5-icon]{bottom:0;left:0;--rotAngle: 270deg}.ui5-popover-resize-handle-top-left .ui5-popover-resize-handle{top:-.5rem;left:-.5rem;cursor:nw-resize}.ui5-popover-resize-handle-top-left .ui5-popover-resize-handle [ui5-icon]{bottom:0;right:0;--rotAngle: 180deg}.ui5-popover-resize-handle-bottom-left .ui5-popover-resize-handle{bottom:-.5rem;left:-.5rem;cursor:ne-resize}.ui5-popover-resize-handle-bottom-left .ui5-popover-resize-handle [ui5-icon]{top:0;right:0;--rotAngle: 90deg}.ui5-popover-resize-handle-bottom-right .ui5-popover-resize-handle{bottom:-.5rem;right:-.5rem;cursor:nw-resize}.ui5-popover-resize-handle-bottom-right .ui5-popover-resize-handle [ui5-icon]{top:0;left:0}.ui5-popover-resizing,.ui5-popover-resizing *{user-select:none!important}
+`;
+
+    var __decorate$2 = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
         else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
@@ -1457,6 +1228,20 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
     };
     var Popover_1;
     const ARROW_SIZE = 8;
+    var PopoverActualHorizontalAlign;
+    (function (PopoverActualHorizontalAlign) {
+        PopoverActualHorizontalAlign["Center"] = "Center";
+        PopoverActualHorizontalAlign["Left"] = "Left";
+        PopoverActualHorizontalAlign["Right"] = "Right";
+        PopoverActualHorizontalAlign["Stretch"] = "Stretch";
+    })(PopoverActualHorizontalAlign || (PopoverActualHorizontalAlign = {}));
+    var PopoverActualPlacement;
+    (function (PopoverActualPlacement) {
+        PopoverActualPlacement["Left"] = "Left";
+        PopoverActualPlacement["Right"] = "Right";
+        PopoverActualPlacement["Top"] = "Top";
+        PopoverActualPlacement["Bottom"] = "Bottom";
+    })(PopoverActualPlacement || (PopoverActualPlacement = {}));
     /**
      * @class
      *
@@ -1518,7 +1303,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
             this.verticalAlign = "Center";
             /**
              * Defines whether the component should close when
-             * clicking/tapping outside of the popover.
+             * clicking/tapping outside the popover.
              * If enabled, it blocks any interaction with the background.
              * @default false
              * @public
@@ -1539,6 +1324,14 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
              */
             this.allowTargetOverlap = false;
             /**
+             * Determines whether the component is resizable.
+             * **Note:** This property is effective only on desktop devices.
+             * @default false
+             * @public
+             * @since 2.19.0
+             */
+            this.resizable = false;
+            /**
              * Sets the X translation of the arrow
              * @private
              */
@@ -1552,7 +1345,10 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
              * Returns the calculated placement depending on the free space
              * @private
              */
-            this.actualPlacement = "End";
+            this.actualPlacement = "Right";
+            // for instance checks
+            this.isPopover = true;
+            this._popoverResize = new PopoverResize(this);
         }
         /**
          * Defines the ID or DOM Reference of the element at which the popover is shown.
@@ -1583,13 +1379,26 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
                 return;
             }
             if (!opener || this.isOpenerOutsideViewport(opener.getBoundingClientRect())) {
-                await Icons.f$1();
+                await Icons.w();
                 this.open = false;
                 this.fireDecoratorEvent("close");
                 return;
             }
+            this._initialWidth = this.style.width;
+            this._initialHeight = this.style.height;
             this._openerRect = opener.getBoundingClientRect();
+            this._observeOpenerVisibility();
             await super.openPopup();
+        }
+        closePopup(escPressed = false, preventRegistryUpdate = false, preventFocusRestore = false) {
+            this._unobserveOpenerVisibility();
+            Object.assign(this.style, {
+                width: this._initialWidth,
+                height: this._initialHeight,
+            });
+            this._popoverResize.reset();
+            delete this._resizeHandlePlacement;
+            super.closePopup(escPressed, preventRegistryUpdate, preventFocusRestore);
         }
         isOpenerClicked(e) {
             const target = e.target;
@@ -1604,6 +1413,15 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
                 return true;
             }
             return e.composedPath().indexOf(opener) > -1;
+        }
+        isClicked(e) {
+            if (this._showResizeHandle) {
+                const resizeHandle = this.shadowRoot.querySelector(".ui5-popover-resize-handle");
+                if (resizeHandle === e.composedPath()[0]) {
+                    return true;
+                }
+            }
+            return f(e, this.getBoundingClientRect());
         }
         /**
          * Override for the _addOpenedPopup hook, which would otherwise just call addOpenedPopup(this)
@@ -1627,6 +1445,9 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
                 return this._isUI5AbstractElement(opener) ? opener.getFocusDomRef() : opener;
             }
             let rootNode = this.getRootNode();
+            if (!rootNode) {
+                return null;
+            }
             if (rootNode === this) {
                 rootNode = document;
             }
@@ -1642,8 +1463,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
         shouldCloseDueToOverflow(placement, openerRect) {
             const threshold = 32;
             const limits = {
-                "Start": openerRect.right,
-                "End": openerRect.left,
+                "Left": openerRect.right,
+                "Right": openerRect.left,
                 "Top": openerRect.top,
                 "Bottom": openerRect.bottom,
             };
@@ -1679,8 +1500,14 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
                 this.reposition();
             }
         }
+        get _viewportMargin() {
+            return Popover_1.VIEWPORT_MARGIN;
+        }
         reposition() {
             this._show();
+            if (this.resizable) {
+                this._resizeHandlePlacement = this._popoverResize.getResizeHandlePlacement();
+            }
         }
         async _show() {
             super._show();
@@ -1692,7 +1519,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
                 });
                 return;
             }
-            if (opener && webcomponentsBase.v(opener) && !opener.getDomRef()) {
+            if (opener && webcomponentsBase.y(opener) && !opener.getDomRef()) {
                 return;
             }
             if (!this._opened) {
@@ -1721,13 +1548,13 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
                 return this.closePopup();
             }
             this._oldPlacement = placement;
-            this.actualPlacement = placement.placement;
-            let left = m$1(this._left, Popover_1.VIEWPORT_MARGIN, document.documentElement.clientWidth - popoverSize.width - Popover_1.VIEWPORT_MARGIN);
-            if (this.actualPlacement === PopoverPlacement$1.End) {
+            this.actualPlacement = placement.actualPlacement;
+            let left = m(this._left, Popover_1.VIEWPORT_MARGIN, document.documentElement.clientWidth - popoverSize.width - Popover_1.VIEWPORT_MARGIN);
+            if (this.actualPlacement === PopoverActualPlacement.Right) {
                 left = Math.max(left, this._left);
             }
-            let top = m$1(this._top, Popover_1.VIEWPORT_MARGIN, document.documentElement.clientHeight - popoverSize.height - Popover_1.VIEWPORT_MARGIN);
-            if (this.actualPlacement === PopoverPlacement$1.Bottom) {
+            let top = m(this._top, Popover_1.VIEWPORT_MARGIN, document.documentElement.clientHeight - popoverSize.height - Popover_1.VIEWPORT_MARGIN);
+            if (this.actualPlacement === PopoverActualPlacement.Bottom) {
                 top = Math.max(top, this._top);
             }
             this.arrowTranslateX = placement.arrow.x;
@@ -1737,6 +1564,9 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
                 top: `${top}px`,
                 left: `${left}px`,
             });
+            if (this._popoverResize.isResized) {
+                return;
+            }
             if (this.horizontalAlign === PopoverHorizontalAlign$1.Stretch && this._width) {
                 this.style.width = this._width;
             }
@@ -1752,11 +1582,44 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
          * @returns The adjusted top in px.
          */
         _adjustForIOSKeyboard(top) {
-            if (!Icons.w()) {
+            if (!Icons.w$1()) {
                 return top;
             }
             const actualTop = Math.ceil(this.getBoundingClientRect().top);
             return top + (Number.parseInt(this.style.top || "0") - actualTop);
+        }
+        /**
+         * Callback invoked when the opener element's intersection status changes.
+         * Closes the popover when the opener is no longer visible.
+         * @private
+         */
+        _onOpenerIntersection(entries) {
+            if (this.open && !entries[0]?.isIntersecting) {
+                this.closePopup();
+            }
+        }
+        /**
+         * Starts observing the opener element's visibility in the viewport.
+         * @private
+         */
+        _observeOpenerVisibility() {
+            this._unobserveOpenerVisibility();
+            const opener = this.getOpenerHTMLElement(this.opener);
+            if (!opener) {
+                return;
+            }
+            this._openerIntersectionObserver = new IntersectionObserver(this._onOpenerIntersection.bind(this));
+            this._openerIntersectionObserver.observe(opener);
+        }
+        /**
+         * Stops observing the opener element and cleans up the IntersectionObserver instance.
+         * @private
+         */
+        _unobserveOpenerVisibility() {
+            if (this._openerIntersectionObserver) {
+                this._openerIntersectionObserver.disconnect();
+                this._openerIntersectionObserver = null;
+            }
         }
         getPopoverSize(calcScrollHeight = false) {
             const rect = this.getBoundingClientRect();
@@ -1783,7 +1646,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
             });
         }
         _isUI5AbstractElement(el) {
-            return webcomponentsBase.v(el) && el.isUI5AbstractElement;
+            return webcomponentsBase.y(el) && el.isUI5AbstractElement;
         }
         get arrowDOM() {
             return this.shadowRoot.querySelector(".ui5-popover-arrow");
@@ -1805,29 +1668,31 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
             const clientHeight = document.documentElement.clientHeight;
             let maxHeight = clientHeight;
             let maxWidth = clientWidth;
-            const placement = this.getActualPlacement(targetRect);
-            this._preventRepositionAndClose = this.shouldCloseDueToNoOpener(targetRect) || this.shouldCloseDueToOverflow(placement, targetRect);
-            const isVertical = placement === PopoverPlacement$1.Top
-                || placement === PopoverPlacement$1.Bottom;
-            if (this.horizontalAlign === PopoverHorizontalAlign$1.Stretch && isVertical) {
-                popoverSize.width = targetRect.width;
-                this._width = `${targetRect.width}px`;
-            }
-            else if (this.verticalAlign === PopoverVerticalAlign$1.Stretch && !isVertical) {
-                popoverSize.height = targetRect.height;
-                this._height = `${targetRect.height}px`;
+            const actualPlacement = this.getActualPlacement(targetRect);
+            this._preventRepositionAndClose = this.shouldCloseDueToNoOpener(targetRect) || this.shouldCloseDueToOverflow(actualPlacement, targetRect);
+            const isVertical = actualPlacement === PopoverActualPlacement.Top
+                || actualPlacement === PopoverActualPlacement.Bottom;
+            if (!this._popoverResize.isResized) {
+                if (this.horizontalAlign === PopoverHorizontalAlign$1.Stretch && isVertical) {
+                    popoverSize.width = targetRect.width;
+                    this._width = `${targetRect.width}px`;
+                }
+                else if (this.verticalAlign === PopoverVerticalAlign$1.Stretch && !isVertical) {
+                    popoverSize.height = targetRect.height;
+                    this._height = `${targetRect.height}px`;
+                }
             }
             const arrowOffset = this.hideArrow ? 0 : ARROW_SIZE;
             // calc popover positions
-            switch (placement) {
-                case PopoverPlacement$1.Top:
+            switch (actualPlacement) {
+                case PopoverActualPlacement.Top:
                     left = this.getVerticalLeft(targetRect, popoverSize);
                     top = Math.max(targetRect.top - popoverSize.height - arrowOffset, 0);
                     if (!allowTargetOverlap) {
                         maxHeight = targetRect.top - arrowOffset;
                     }
                     break;
-                case PopoverPlacement$1.Bottom:
+                case PopoverActualPlacement.Bottom:
                     left = this.getVerticalLeft(targetRect, popoverSize);
                     top = targetRect.bottom + arrowOffset;
                     if (allowTargetOverlap) {
@@ -1837,14 +1702,14 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
                         maxHeight = clientHeight - targetRect.bottom - arrowOffset;
                     }
                     break;
-                case PopoverPlacement$1.Start:
+                case PopoverActualPlacement.Left:
                     left = Math.max(targetRect.left - popoverSize.width - arrowOffset, 0);
                     top = this.getHorizontalTop(targetRect, popoverSize);
                     if (!allowTargetOverlap) {
                         maxWidth = targetRect.left - arrowOffset;
                     }
                     break;
-                case PopoverPlacement$1.End:
+                case PopoverActualPlacement.Right:
                     left = targetRect.left + targetRect.width + arrowOffset;
                     top = this.getHorizontalTop(targetRect, popoverSize);
                     if (allowTargetOverlap) {
@@ -1887,8 +1752,11 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
                 arrow: arrowPos,
                 top: this._top,
                 left: this._left,
-                placement,
+                actualPlacement,
             };
+        }
+        get isVertical() {
+            return this.placement === PopoverPlacement$1.Top || this.placement === PopoverPlacement$1.Bottom;
         }
         getRTLCorrectionLeft() {
             return parseFloat(window.getComputedStyle(this).left) - this.getBoundingClientRect().left;
@@ -1905,12 +1773,12 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
          * @returns  Arrow's coordinates
          */
         getArrowPosition(targetRect, popoverSize, left, top, isVertical, borderRadius) {
-            const horizontalAlign = this._actualHorizontalAlign;
-            let arrowXCentered = horizontalAlign === PopoverHorizontalAlign$1.Center || horizontalAlign === PopoverHorizontalAlign$1.Stretch;
-            if (horizontalAlign === PopoverHorizontalAlign$1.End && left <= targetRect.left) {
+            const actualHorizontalAlign = this._actualHorizontalAlign;
+            let arrowXCentered = actualHorizontalAlign === PopoverActualHorizontalAlign.Center || actualHorizontalAlign === PopoverActualHorizontalAlign.Stretch;
+            if (actualHorizontalAlign === PopoverActualHorizontalAlign.Right && left <= targetRect.left) {
                 arrowXCentered = true;
             }
-            if (horizontalAlign === PopoverHorizontalAlign$1.Start && left + popoverSize.width >= targetRect.left + targetRect.width) {
+            if (actualHorizontalAlign === PopoverActualHorizontalAlign.Left && left + popoverSize.width >= targetRect.left + targetRect.width) {
                 arrowXCentered = true;
             }
             let arrowTranslateX = 0;
@@ -1924,9 +1792,9 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
             // Restricts the arrow's translate value along each dimension,
             // so that the arrow does not clip over the popover's rounded borders.
             const safeRangeForArrowY = popoverSize.height / 2 - borderRadius - ARROW_SIZE / 2 - 2;
-            arrowTranslateY = m$1(arrowTranslateY, -safeRangeForArrowY, safeRangeForArrowY);
+            arrowTranslateY = m(arrowTranslateY, -safeRangeForArrowY, safeRangeForArrowY);
             const safeRangeForArrowX = popoverSize.width / 2 - borderRadius - ARROW_SIZE / 2 - 2;
-            arrowTranslateX = m$1(arrowTranslateX, -safeRangeForArrowX, safeRangeForArrowX);
+            arrowTranslateX = m(arrowTranslateX, -safeRangeForArrowX, safeRangeForArrowX);
             return {
                 x: Math.round(arrowTranslateX),
                 y: Math.round(arrowTranslateY),
@@ -1938,69 +1806,82 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
          */
         fallbackPlacement(clientWidth, clientHeight, targetRect, popoverSize) {
             if (targetRect.left > popoverSize.width) {
-                return PopoverPlacement$1.Start;
+                return PopoverActualPlacement.Left;
             }
             if (clientWidth - targetRect.right > targetRect.left) {
-                return PopoverPlacement$1.End;
+                return PopoverActualPlacement.Right;
             }
             if (clientHeight - targetRect.bottom > popoverSize.height) {
-                return PopoverPlacement$1.Bottom;
+                return PopoverActualPlacement.Bottom;
             }
             if (clientHeight - targetRect.bottom < targetRect.top) {
-                return PopoverPlacement$1.Top;
+                return PopoverActualPlacement.Top;
             }
         }
         getActualPlacement(targetRect) {
             const placement = this.placement;
-            let actualPlacement = placement;
-            const isVertical = placement === PopoverPlacement$1.Top
-                || placement === PopoverPlacement$1.Bottom;
             const popoverSize = this.getPopoverSize(!this.allowTargetOverlap);
+            let actualPlacement = PopoverActualPlacement.Right;
+            switch (placement) {
+                case PopoverPlacement$1.Start:
+                    actualPlacement = this.isRtl ? PopoverActualPlacement.Right : PopoverActualPlacement.Left;
+                    break;
+                case PopoverPlacement$1.End:
+                    actualPlacement = this.isRtl ? PopoverActualPlacement.Left : PopoverActualPlacement.Right;
+                    break;
+                case PopoverPlacement$1.Top:
+                    actualPlacement = PopoverActualPlacement.Top;
+                    break;
+                case PopoverPlacement$1.Bottom:
+                    actualPlacement = PopoverActualPlacement.Bottom;
+                    break;
+            }
             const clientWidth = document.documentElement.clientWidth;
             let clientHeight = document.documentElement.clientHeight;
             let popoverHeight = popoverSize.height;
-            if (isVertical) {
+            if (this.isVertical) {
                 popoverHeight += this.hideArrow ? 0 : ARROW_SIZE;
                 clientHeight -= Popover_1.VIEWPORT_MARGIN;
             }
-            switch (placement) {
-                case PopoverPlacement$1.Top:
+            switch (actualPlacement) {
+                case PopoverActualPlacement.Top:
                     if (targetRect.top < popoverHeight
                         && targetRect.top < clientHeight - targetRect.bottom) {
-                        actualPlacement = PopoverPlacement$1.Bottom;
+                        actualPlacement = PopoverActualPlacement.Bottom;
                     }
                     break;
-                case PopoverPlacement$1.Bottom:
+                case PopoverActualPlacement.Bottom:
                     if (clientHeight - targetRect.bottom < popoverHeight
                         && clientHeight - targetRect.bottom < targetRect.top) {
-                        actualPlacement = PopoverPlacement$1.Top;
+                        actualPlacement = PopoverActualPlacement.Top;
                     }
                     break;
-                case PopoverPlacement$1.Start:
+                case PopoverActualPlacement.Left:
                     if (targetRect.left < popoverSize.width) {
-                        actualPlacement = this.fallbackPlacement(clientWidth, clientHeight, targetRect, popoverSize) || placement;
+                        actualPlacement = this.fallbackPlacement(clientWidth, clientHeight, targetRect, popoverSize) || actualPlacement;
                     }
                     break;
-                case PopoverPlacement$1.End:
+                case PopoverActualPlacement.Right:
                     if (clientWidth - targetRect.right < popoverSize.width) {
-                        actualPlacement = this.fallbackPlacement(clientWidth, clientHeight, targetRect, popoverSize) || placement;
+                        actualPlacement = this.fallbackPlacement(clientWidth, clientHeight, targetRect, popoverSize) || actualPlacement;
                     }
                     break;
             }
             return actualPlacement;
         }
         getVerticalLeft(targetRect, popoverSize) {
-            const horizontalAlign = this._actualHorizontalAlign;
+            const actualHorizontalAlign = this._actualHorizontalAlign;
             let left = Popover_1.VIEWPORT_MARGIN;
-            switch (horizontalAlign) {
-                case PopoverHorizontalAlign$1.Center:
-                case PopoverHorizontalAlign$1.Stretch:
+            switch (actualHorizontalAlign) {
+                case PopoverActualHorizontalAlign.Center:
+                case PopoverActualHorizontalAlign.Stretch:
                     left = targetRect.left - (popoverSize.width - targetRect.width) / 2;
+                    left = this._popoverResize.getCorrectedLeft(left);
                     break;
-                case PopoverHorizontalAlign$1.Start:
+                case PopoverActualHorizontalAlign.Left:
                     left = targetRect.left;
                     break;
-                case PopoverHorizontalAlign$1.End:
+                case PopoverActualHorizontalAlign.Right:
                     left = targetRect.right - popoverSize.width;
                     break;
             }
@@ -2012,6 +1893,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
                 case PopoverVerticalAlign$1.Center:
                 case PopoverVerticalAlign$1.Stretch:
                     top = targetRect.top - (popoverSize.height - targetRect.height) / 2;
+                    top = this._popoverResize.getCorrectedTop(top);
                     break;
                 case PopoverVerticalAlign$1.Top:
                     top = targetRect.top;
@@ -2046,6 +1928,10 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
         get classes() {
             const allClasses = super.classes;
             allClasses.root["ui5-popover-root"] = true;
+            allClasses.root["ui5-popover-rtl"] = this.isRtl;
+            if (this.resizable) {
+                this._popoverResize.setCorrectResizeHandleClass(allClasses);
+            }
             return allClasses;
         }
         /**
@@ -2060,64 +1946,85 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
         get _displayFooter() {
             return true;
         }
+        get isRtl() {
+            return this.effectiveDir === "rtl";
+        }
         get _actualHorizontalAlign() {
-            if (this.effectiveDir === "rtl") {
-                if (this.horizontalAlign === PopoverHorizontalAlign$1.Start) {
-                    return PopoverHorizontalAlign$1.End;
-                }
-                if (this.horizontalAlign === PopoverHorizontalAlign$1.End) {
-                    return PopoverHorizontalAlign$1.Start;
-                }
+            switch (this.horizontalAlign) {
+                case PopoverHorizontalAlign$1.Start:
+                    return this.isRtl ? PopoverActualHorizontalAlign.Right : PopoverActualHorizontalAlign.Left;
+                case PopoverHorizontalAlign$1.End:
+                    return this.isRtl ? PopoverActualHorizontalAlign.Left : PopoverActualHorizontalAlign.Right;
+                case PopoverHorizontalAlign$1.Stretch:
+                    return PopoverActualHorizontalAlign.Stretch;
+                case PopoverHorizontalAlign$1.Center:
+                default:
+                    return PopoverActualHorizontalAlign.Center;
             }
-            return this.horizontalAlign;
+        }
+        get _showResizeHandle() {
+            return this.resizable && this.onDesktop;
+        }
+        get resizeHandlePlacement() {
+            return this._resizeHandlePlacement;
+        }
+        _onResizeMouseDown(e) {
+            this._popoverResize.onResizeMouseDown(e);
+            this._resizeHandlePlacement = this._popoverResize.getResizeHandlePlacement();
         }
     };
-    __decorate$1([
+    __decorate$2([
         webcomponentsBase.s()
     ], Popover.prototype, "headerText", void 0);
-    __decorate$1([
+    __decorate$2([
         webcomponentsBase.s()
     ], Popover.prototype, "placement", void 0);
-    __decorate$1([
+    __decorate$2([
         webcomponentsBase.s()
     ], Popover.prototype, "horizontalAlign", void 0);
-    __decorate$1([
+    __decorate$2([
         webcomponentsBase.s()
     ], Popover.prototype, "verticalAlign", void 0);
-    __decorate$1([
+    __decorate$2([
         webcomponentsBase.s({ type: Boolean })
     ], Popover.prototype, "modal", void 0);
-    __decorate$1([
+    __decorate$2([
         webcomponentsBase.s({ type: Boolean })
     ], Popover.prototype, "hideArrow", void 0);
-    __decorate$1([
+    __decorate$2([
         webcomponentsBase.s({ type: Boolean })
     ], Popover.prototype, "allowTargetOverlap", void 0);
-    __decorate$1([
+    __decorate$2([
+        webcomponentsBase.s({ type: Boolean })
+    ], Popover.prototype, "resizable", void 0);
+    __decorate$2([
         webcomponentsBase.s({ type: Number, noAttribute: true })
     ], Popover.prototype, "arrowTranslateX", void 0);
-    __decorate$1([
+    __decorate$2([
         webcomponentsBase.s({ type: Number, noAttribute: true })
     ], Popover.prototype, "arrowTranslateY", void 0);
-    __decorate$1([
+    __decorate$2([
         webcomponentsBase.s()
     ], Popover.prototype, "actualPlacement", void 0);
-    __decorate$1([
+    __decorate$2([
         webcomponentsBase.s({ type: Number, noAttribute: true })
     ], Popover.prototype, "_maxHeight", void 0);
-    __decorate$1([
+    __decorate$2([
         webcomponentsBase.s({ type: Number, noAttribute: true })
     ], Popover.prototype, "_maxWidth", void 0);
-    __decorate$1([
-        webcomponentsBase.d({ type: HTMLElement })
+    __decorate$2([
+        webcomponentsBase.s({ noAttribute: true })
+    ], Popover.prototype, "_resizeHandlePlacement", void 0);
+    __decorate$2([
+        webcomponentsBase.d()
     ], Popover.prototype, "header", void 0);
-    __decorate$1([
-        webcomponentsBase.d({ type: HTMLElement })
+    __decorate$2([
+        webcomponentsBase.d()
     ], Popover.prototype, "footer", void 0);
-    __decorate$1([
+    __decorate$2([
         webcomponentsBase.s({ converter: e$1 })
     ], Popover.prototype, "opener", null);
-    Popover = Popover_1 = __decorate$1([
+    Popover = Popover_1 = __decorate$2([
         webcomponentsBase.m({
             tag: "ui5-popover",
             styles: [
@@ -2128,15 +2035,548 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
             template: PopoverTemplate,
         })
     ], Popover);
-    const instanceOfPopover = (object) => {
-        return "opener" in object;
-    };
     Popover.define();
     var Popover$1 = Popover;
+    const instanceOfPopover = webcomponentsBase.r$1("isPopover");
 
-    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
-    var ResponsivePopoverCss = `:host{--_ui5-v2-15-0_input_width: 100%;min-width:6.25rem;min-height:2rem}:host([on-phone]){display:contents}.ui5-responsive-popover-header{height:var(--_ui5-v2-15-0-responsive_popover_header_height);display:flex;justify-content:var(--_ui5-v2-15-0_popup_header_prop_header_text_alignment);align-items:center;width:100%}.ui5-responsive-popover-header-text{width:calc(100% - var(--_ui5-v2-15-0_button_base_min_width))}.ui5-responsive-popover-header-no-title{justify-content:flex-end}
+    function DialogTemplate() {
+        return PopupTemplate.call(this, {
+            beforeContent,
+            afterContent,
+        });
+    }
+    function beforeContent() {
+        return (jsxRuntime.jsx(jsxRuntime.Fragment, { children: !!this._displayHeader &&
+                jsxRuntime.jsx("header", { children: jsxRuntime.jsxs("div", { class: "ui5-popup-header-root", id: "ui5-popup-header", role: "group", "aria-describedby": this.effectiveAriaDescribedBy, "aria-roledescription": this.ariaRoleDescriptionHeaderText, tabIndex: this._headerTabIndex, onKeyDown: this._onDragOrResizeKeyDown, onMouseDown: this._onDragMouseDown, part: "header", children: [this.hasValueState &&
+                                jsxRuntime.jsx(Icon.Icon, { class: "ui5-dialog-value-state-icon", name: this._dialogStateIcon }), this.header.length ?
+                                jsxRuntime.jsx("slot", { name: "header" })
+                                :
+                                    jsxRuntime.jsx(Title.Title, { level: "H1", id: "ui5-popup-header-text", class: "ui5-popup-header-text", children: this.headerText }), this.resizable ?
+                                this.draggable ?
+                                    jsxRuntime.jsx("span", { id: `${this._id}-descr`, "aria-hidden": "true", class: "ui5-hidden-text", children: this.ariaDescribedByHeaderTextDraggableAndResizable })
+                                    :
+                                        jsxRuntime.jsx("span", { id: `${this._id}-descr`, "aria-hidden": "true", class: "ui5-hidden-text", children: this.ariaDescribedByHeaderTextResizable })
+                                :
+                                    this.draggable &&
+                                        jsxRuntime.jsx("span", { id: `${this._id}-descr`, "aria-hidden": "true", class: "ui5-hidden-text", children: this.ariaDescribedByHeaderTextDraggable })] }) }) }));
+    }
+    function afterContent() {
+        return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [!!this.footer.length &&
+                    jsxRuntime.jsx("footer", { class: "ui5-popup-footer-root", part: "footer", children: jsxRuntime.jsx("slot", { name: "footer" }) }), this._showResizeHandle &&
+                    jsxRuntime.jsx("div", { class: "ui5-popup-resize-handle", onMouseDown: this._onResizeMouseDown, children: jsxRuntime.jsx(Icon.Icon, { name: resizeCorner }) })] }));
+    }
+
+    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var dialogCSS = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host{min-width:min(20rem,90vw);min-height:min(6rem,90vh);max-height:94%;max-width:90%;flex-direction:column;box-shadow:var(--sapContent_Shadow3);border-radius:var(--sapElement_BorderCornerRadius)}:host([stretch]){width:90%;height:94%}:host([stretch][on-phone]){width:100%;height:100%;max-height:100%;max-width:100%;border-radius:0;min-width:0}:host([draggable]) .ui5-popup-header-root,:host([draggable]) ::slotted([slot="header"]){cursor:move}:host([draggable]) .ui5-popup-header-root *{cursor:auto}:host([draggable]) .ui5-popup-root{user-select:text}::slotted([slot="header"]){max-width:100%}.ui5-popup-root{display:flex;flex-direction:column;max-width:100vw}.ui5-popup-header-root{position:relative}.ui5-popup-header-root:before{content:"";position:absolute;inset-block-start:auto;inset-block-end:0;inset-inline-start:0;inset-inline-end:0;height:var(--_ui5_dialog_header_state_line_height);background:var(--sapObjectHeader_BorderColor)}:host([state="Negative"]) .ui5-popup-header-root:before{background:var(--sapErrorBorderColor)}:host([state="Information"]) .ui5-popup-header-root:before{background:var(--sapInformationBorderColor)}:host([state="Positive"]) .ui5-popup-header-root:before{background:var(--sapSuccessBorderColor)}:host([state="Critical"]) .ui5-popup-header-root:before{background:var(--sapWarningBorderColor)}.ui5-dialog-value-state-icon{margin-inline-end:.5rem;flex-shrink:0}:host([state="Negative"]) .ui5-dialog-value-state-icon{color:var(--sapNegativeElementColor)}:host([state="Information"]) .ui5-dialog-value-state-icon{color:var(--sapInformativeElementColor)}:host([state="Positive"]) .ui5-dialog-value-state-icon{color:var(--sapPositiveElementColor)}:host([state="Critical"]) .ui5-dialog-value-state-icon{color:var(--sapCriticalElementColor)}.ui5-popup-header-root{outline:none}:host([desktop]) .ui5-popup-header-root:focus:after,.ui5-popup-header-root:focus-visible:after{content:"";position:absolute;left:var(--_ui5_dialog_header_focus_left_offset);bottom:var(--_ui5_dialog_header_focus_bottom_offset);right:var(--_ui5_dialog_header_focus_right_offset);top:var(--_ui5_dialog_header_focus_top_offset);border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);border-radius:var(--_ui5_dialog_header_border_radius) var(--_ui5_dialog_header_border_radius) 0 0;pointer-events:none}:host([stretch]) .ui5-popup-content{width:100%;height:100%}.ui5-popup-content{min-height:var(--_ui5_dialog_content_min_height);flex:1 1 auto}.ui5-popup-resize-handle{position:absolute;bottom:-.5rem;inset-inline-end:-.5rem;cursor:var(--_ui5_dialog_resize_cursor);width:1.5rem;height:1.5rem;border-radius:50%}.ui5-popup-resize-handle [ui5-icon]{color:var(--sapButton_Lite_TextColor)}:host::backdrop{background-color:var(--_ui5_popup_block_layer_background);opacity:var(--_ui5_popup_block_layer_opacity)}.ui5-block-layer{display:block}
+`;
+
+    var __decorate$1 = (this && this.__decorate) || function (decorators, target, key, desc) {
+        var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+        if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+        else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+        return c > 3 && r && Object.defineProperty(target, key, r), r;
+    };
+    var Dialog_1;
+    /**
+     * Defines the step size at which this component would change by when being dragged or resized with the keyboard.
+     */
+    const STEP_SIZE = 16;
+    /**
+     * Defines the icons corresponding to the dialog's state.
+     */
+    const ICON_PER_STATE = {
+        [ValueState.o.Negative]: "error",
+        [ValueState.o.Critical]: "alert",
+        [ValueState.o.Positive]: "sys-enter-2",
+        [ValueState.o.Information]: "information",
+    };
+    /**
+     * @class
+     * ### Overview
+     * The `ui5-dialog` component is used to temporarily display some information in a
+     * size-limited window in front of the regular app screen.
+     * It is used to prompt the user for an action or a confirmation.
+     * The `ui5-dialog` interrupts the current app processing as it is the only focused UI element and
+     * the main screen is dimmed/blocked.
+     * The dialog combines concepts known from other technologies where the windows have
+     * names such as dialog box, dialog window, pop-up, pop-up window, alert box, or message box.
+     *
+     * The `ui5-dialog` is modal, which means that a user action is required before it is possible to return to the parent window.
+     * To open multiple dialogs, each dialog element should be separate in the markup. This will ensure the correct modal behavior. Avoid nesting dialogs within each other.
+     * The content of the `ui5-dialog` is fully customizable.
+     *
+     * ### Structure
+     * A `ui5-dialog` consists of a header, content, and a footer for action buttons.
+     * The `ui5-dialog` is usually displayed at the center of the screen.
+     * Its position can be changed by the user. To enable this, you need to set the property `draggable` accordingly.
+
+     *
+     * ### Responsive Behavior
+     * The `stretch` property can be used to stretch the `ui5-dialog` to full screen. For better usability, it's recommended to stretch the dialog to full screen on phone devices.
+     *
+     * **Note:** When a `ui5-bar` is used in the header or in the footer, you should remove the default dialog's paddings.
+     *
+     * For more information see the sample "Bar in Header/Footer".
+
+     * ### Keyboard Handling
+     *
+     * #### Basic Navigation
+     * When the `ui5-dialog` has the `draggable` property set to `true` and the header is focused, the user can move the dialog
+     * with the following keyboard shortcuts:
+     *
+     * - [Up] or [Down] arrow keys - Move the dialog up/down.
+     * - [Left] or [Right] arrow keys - Move the dialog left/right.
+     *
+     * #### Resizing
+     * When the `ui5-dialog` has the `resizable` property set to `true` and the header is focused, the user can change the size of the dialog
+     * with the following keyboard shortcuts:
+     *
+     * - [Shift] + [Up] or [Down] - Decrease/Increase the height of the dialog.
+     * - [Shift] + [Left] or [Right] - Decrease/Increase the width of the dialog.
+     *
+     * ### ES6 Module Import
+     *
+     * `import "@ui5/webcomponents/dist/Dialog";`
+     *
+     * @constructor
+     * @extends Popup
+     * @public
+     * @csspart header - Used to style the header of the component
+     * @csspart content - Used to style the content of the component
+     * @csspart footer - Used to style the footer of the component
+     */
+    let Dialog = Dialog_1 = class Dialog extends Popup$1 {
+        constructor() {
+            super();
+            /**
+             * Determines if the dialog will be stretched to full screen on mobile. On desktop,
+             * the dialog will be stretched to approximately 90% of the viewport.
+             *
+             * **Note:** For better usability of the component it is recommended to set this property to "true" when the dialog is opened on phone.
+             * @default false
+             * @public
+             */
+            this.stretch = false;
+            /**
+             * Determines whether the component is draggable.
+             * If this property is set to true, the Dialog will be draggable by its header.
+             *
+             * **Note:** The component can be draggable only in desktop mode.
+             *
+             * **Note:** This property overrides the default HTML "draggable" attribute native behavior.
+             * When "draggable" is set to true, the native browser "draggable"
+             * behavior is prevented and only the Dialog custom logic ("draggable by its header") works.
+             * @default false
+             * @since 1.0.0-rc.9
+             * @public
+             */
+            this.draggable = false;
+            /**
+             * Configures the component to be resizable.
+             * If this property is set to true, the Dialog will have a resize handle in its bottom right corner in LTR languages.
+             * In RTL languages, the resize handle will be placed in the bottom left corner.
+             *
+             * **Note:** The component can be resizable only in desktop mode.
+             *
+             * **Note:** Upon resizing, externally defined height and width styling will be ignored.
+             * @default false
+             * @since 1.0.0-rc.10
+             * @public
+             */
+            this.resizable = false;
+            /**
+             * Defines the state of the `Dialog`.
+             *
+             * **Note:** If `"Negative"` and `"Critical"` states is set, it will change the
+             * accessibility role to "alertdialog", if the accessibleRole property is set to `"Dialog"`.
+             * @default "None"
+             * @public
+             * @since 1.0.0-rc.15
+             */
+            this.state = "None";
+            this._draggedOrResized = false;
+            this._dragHandlerRegistered = false;
+            this._revertSize = () => {
+                Object.assign(this.style, {
+                    top: "",
+                    left: "",
+                    width: "",
+                    height: "",
+                });
+            };
+            this._screenResizeHandler = this._screenResize.bind(this);
+            this._dragMouseMoveHandler = this._onDragMouseMove.bind(this);
+            this._dragMouseUpHandler = this._onDragMouseUp.bind(this);
+            this._resizeMouseMoveHandler = this._onResizeMouseMove.bind(this);
+            this._resizeMouseUpHandler = this._onResizeMouseUp.bind(this);
+            this._dragStartHandler = this._handleDragStart.bind(this);
+        }
+        static _isHeader(element) {
+            return element.classList.contains("ui5-popup-header-root") || element.getAttribute("slot") === "header";
+        }
+        get isModal() {
+            return true;
+        }
+        get _ariaLabelledBy() {
+            let ariaLabelledById;
+            if (this.headerText && !this._ariaLabel) {
+                ariaLabelledById = "ui5-popup-header-text";
+            }
+            return ariaLabelledById;
+        }
+        get ariaRoleDescriptionHeaderText() {
+            return (this.resizable || this.draggable) ? Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_HEADER_ARIA_ROLE_DESCRIPTION) : undefined;
+        }
+        get effectiveAriaDescribedBy() {
+            return (this.resizable || this.draggable) ? `${this._id}-descr` : undefined;
+        }
+        get ariaDescribedByHeaderTextResizable() {
+            return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_HEADER_ARIA_DESCRIBEDBY_RESIZABLE);
+        }
+        get ariaDescribedByHeaderTextDraggable() {
+            return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_HEADER_ARIA_DESCRIBEDBY_DRAGGABLE);
+        }
+        get ariaDescribedByHeaderTextDraggableAndResizable() {
+            return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_HEADER_ARIA_DESCRIBEDBY_DRAGGABLE_RESIZABLE);
+        }
+        /**
+         * Determines if the header should be shown.
+         */
+        get _displayHeader() {
+            return this.header.length || this.headerText || this.draggable || this.resizable;
+        }
+        get _movable() {
+            return !this.stretch && this.onDesktop && (this.draggable || this.resizable);
+        }
+        get _headerTabIndex() {
+            return this._movable ? 0 : undefined;
+        }
+        get _showResizeHandle() {
+            return this.resizable && this.onDesktop;
+        }
+        get _minHeight() {
+            let minHeight = Number.parseInt(window.getComputedStyle(this.contentDOM).minHeight);
+            const header = this._root.querySelector(".ui5-popup-header-root");
+            if (header) {
+                minHeight += header.offsetHeight;
+            }
+            const footer = this._root.querySelector(".ui5-popup-footer-root");
+            if (footer) {
+                minHeight += footer.offsetHeight;
+            }
+            return minHeight;
+        }
+        get hasValueState() {
+            return this.state !== ValueState.o.None;
+        }
+        get _dialogStateIcon() {
+            return ICON_PER_STATE[this.state];
+        }
+        get _role() {
+            if (this.accessibleRole === PopupAccessibleRole$1.None) {
+                return undefined;
+            }
+            if (this.state === ValueState.o.Negative || this.state === ValueState.o.Critical) {
+                return toLowercaseEnumValue.n(PopupAccessibleRole$1.AlertDialog);
+            }
+            return toLowercaseEnumValue.n(this.accessibleRole);
+        }
+        _show() {
+            super._show();
+            this._center();
+        }
+        onBeforeRendering() {
+            super.onBeforeRendering();
+            this._isRTL = this.effectiveDir === "rtl";
+        }
+        /**
+         * @override
+         */
+        _resize() {
+            super._resize();
+            if (!this._draggedOrResized) {
+                this._center();
+            }
+        }
+        _screenResize() {
+            this._center();
+        }
+        _attachBrowserEvents() {
+            this._attachScreenResizeHandler();
+            this._registerDragHandler();
+        }
+        _detachBrowserEvents() {
+            this._detachScreenResizeHandler();
+            this._deregisterDragHandler();
+        }
+        _attachScreenResizeHandler() {
+            if (!this._screenResizeHandlerAttached) {
+                window.addEventListener("resize", this._screenResizeHandler);
+                this._screenResizeHandlerAttached = true;
+            }
+        }
+        _detachScreenResizeHandler() {
+            if (this._screenResizeHandlerAttached) {
+                window.removeEventListener("resize", this._screenResizeHandler);
+                this._screenResizeHandlerAttached = false; // prevent dialog from repositioning during resizing
+            }
+        }
+        _registerDragHandler() {
+            if (!this._dragHandlerRegistered) {
+                this.addEventListener("dragstart", this._dragStartHandler);
+                this._dragHandlerRegistered = true;
+            }
+        }
+        _deregisterDragHandler() {
+            if (this._dragHandlerRegistered) {
+                this.removeEventListener("dragstart", this._dragStartHandler);
+                this._dragHandlerRegistered = false;
+            }
+        }
+        _center() {
+            const height = window.innerHeight - this.offsetHeight, width = window.innerWidth - this.offsetWidth;
+            Object.assign(this.style, {
+                top: `${Math.round(height / 2)}px`,
+                left: `${Math.round(width / 2)}px`,
+            });
+        }
+        /**
+         * Event handlers
+         */
+        _onDragMouseDown(e) {
+            // allow dragging only on the header
+            if (!this._movable || !this.draggable || !Dialog_1._isHeader(e.target)) {
+                return;
+            }
+            const { top, left, } = this.getBoundingClientRect();
+            const { width, height, } = window.getComputedStyle(this);
+            Object.assign(this.style, {
+                top: `${top}px`,
+                left: `${left}px`,
+                width: `${Math.round(Number.parseFloat(width) * 100) / 100}px`,
+                height: `${Math.round(Number.parseFloat(height) * 100) / 100}px`,
+            });
+            this._x = e.clientX;
+            this._y = e.clientY;
+            this._draggedOrResized = true;
+            this._attachMouseDragHandlers();
+        }
+        _onDragMouseMove(e) {
+            e.preventDefault();
+            const { clientX, clientY } = e;
+            const calcX = this._x - clientX;
+            const calcY = this._y - clientY;
+            const { left, top, } = this.getBoundingClientRect();
+            Object.assign(this.style, {
+                left: `${Math.floor(left - calcX)}px`,
+                top: `${Math.floor(top - calcY)}px`,
+            });
+            this._x = clientX;
+            this._y = clientY;
+        }
+        _onDragMouseUp() {
+            delete this._x;
+            delete this._y;
+            this._detachMouseDragHandlers();
+        }
+        _onDragOrResizeKeyDown(e) {
+            if (!this._movable || !Dialog_1._isHeader(e.target)) {
+                return;
+            }
+            if (this.draggable && [webcomponentsBase.P, webcomponentsBase._, webcomponentsBase.D, webcomponentsBase.R].some(key => key(e))) {
+                this._dragWithEvent(e);
+                return;
+            }
+            if (this.resizable && [webcomponentsBase.O, webcomponentsBase.N, webcomponentsBase.h, webcomponentsBase.I].some(key => key(e))) {
+                this._resizeWithEvent(e);
+            }
+        }
+        _dragWithEvent(e) {
+            const { top, left, width, height, } = this.getBoundingClientRect();
+            let newPos = 0;
+            let posDirection = "top";
+            switch (true) {
+                case webcomponentsBase.P(e):
+                    newPos = top - STEP_SIZE;
+                    posDirection = "top";
+                    break;
+                case webcomponentsBase._(e):
+                    newPos = top + STEP_SIZE;
+                    posDirection = "top";
+                    break;
+                case webcomponentsBase.D(e):
+                    newPos = left - STEP_SIZE;
+                    posDirection = "left";
+                    break;
+                case webcomponentsBase.R(e):
+                    newPos = left + STEP_SIZE;
+                    posDirection = "left";
+                    break;
+            }
+            newPos = m(newPos, 0, posDirection === "left" ? window.innerWidth - width : window.innerHeight - height);
+            this.style[posDirection] = `${newPos}px`;
+        }
+        _resizeWithEvent(e) {
+            this._draggedOrResized = true;
+            this.addEventListener("ui5-before-close", this._revertSize, { once: true });
+            const { top, left } = this.getBoundingClientRect(), style = window.getComputedStyle(this), minWidth = Number.parseFloat(style.minWidth), maxWidth = window.innerWidth - left, maxHeight = window.innerHeight - top;
+            let width = Number.parseFloat(style.width), height = Number.parseFloat(style.height);
+            switch (true) {
+                case webcomponentsBase.O(e):
+                    height -= STEP_SIZE;
+                    break;
+                case webcomponentsBase.N(e):
+                    height += STEP_SIZE;
+                    break;
+                case webcomponentsBase.h(e):
+                    width -= STEP_SIZE;
+                    break;
+                case webcomponentsBase.I(e):
+                    width += STEP_SIZE;
+                    break;
+            }
+            width = m(width, minWidth, maxWidth);
+            height = m(height, this._minHeight, maxHeight);
+            Object.assign(this.style, {
+                width: `${width}px`,
+                height: `${height}px`,
+            });
+        }
+        _attachMouseDragHandlers() {
+            window.addEventListener("mousemove", this._dragMouseMoveHandler);
+            window.addEventListener("mouseup", this._dragMouseUpHandler);
+        }
+        _detachMouseDragHandlers() {
+            window.removeEventListener("mousemove", this._dragMouseMoveHandler);
+            window.removeEventListener("mouseup", this._dragMouseUpHandler);
+        }
+        _onResizeMouseDown(e) {
+            if (!this._movable || !this.resizable) {
+                return;
+            }
+            e.preventDefault();
+            const { top, left, } = this.getBoundingClientRect();
+            const { width, height, minWidth, } = window.getComputedStyle(this);
+            this._initialX = e.clientX;
+            this._initialY = e.clientY;
+            this._initialWidth = Number.parseFloat(width);
+            this._initialHeight = Number.parseFloat(height);
+            this._initialTop = top;
+            this._initialLeft = left;
+            this._minWidth = Number.parseFloat(minWidth);
+            this._cachedMinHeight = this._minHeight;
+            Object.assign(this.style, {
+                top: `${top}px`,
+                left: `${left}px`,
+            });
+            this._draggedOrResized = true;
+            this._attachMouseResizeHandlers();
+        }
+        _onResizeMouseMove(e) {
+            const { clientX, clientY } = e;
+            let newWidth, newLeft;
+            if (this._isRTL) {
+                newWidth = m(this._initialWidth - (clientX - this._initialX), this._minWidth, this._initialLeft + this._initialWidth);
+                // check if width is changed to avoid "left" jumping when max width is reached
+                Object.assign(this.style, {
+                    width: `${newWidth}px`,
+                });
+                const deltaWidth = newWidth - this.getBoundingClientRect().width;
+                const rightEdge = this._initialLeft + this._initialWidth + deltaWidth;
+                newLeft = m(rightEdge - newWidth, 0, rightEdge - this._minWidth);
+            }
+            else {
+                newWidth = m(this._initialWidth + (clientX - this._initialX), this._minWidth, window.innerWidth - this._initialLeft);
+            }
+            const newHeight = m(this._initialHeight + (clientY - this._initialY), this._cachedMinHeight, window.innerHeight - this._initialTop);
+            Object.assign(this.style, {
+                height: `${newHeight}px`,
+                width: `${newWidth}px`,
+                left: this._isRTL ? `${newLeft}px` : undefined,
+            });
+        }
+        _onResizeMouseUp() {
+            delete this._initialX;
+            delete this._initialY;
+            delete this._initialWidth;
+            delete this._initialHeight;
+            delete this._initialTop;
+            delete this._initialLeft;
+            delete this._minWidth;
+            delete this._cachedMinHeight;
+            this._detachMouseResizeHandlers();
+        }
+        _handleDragStart(e) {
+            // Only prevent native drag behavior when dragging from the header
+            // to allow native drag-and-drop functionality in the dialog content.
+            if (this.draggable && e.target instanceof HTMLElement && Dialog_1._isHeader(e.target)) {
+                e.preventDefault();
+            }
+        }
+        _attachMouseResizeHandlers() {
+            window.addEventListener("mousemove", this._resizeMouseMoveHandler);
+            window.addEventListener("mouseup", this._resizeMouseUpHandler);
+            this.addEventListener("ui5-before-close", this._revertSize, { once: true });
+        }
+        _detachMouseResizeHandlers() {
+            window.removeEventListener("mousemove", this._resizeMouseMoveHandler);
+            window.removeEventListener("mouseup", this._resizeMouseUpHandler);
+        }
+    };
+    __decorate$1([
+        webcomponentsBase.s()
+    ], Dialog.prototype, "headerText", void 0);
+    __decorate$1([
+        webcomponentsBase.s({ type: Boolean })
+    ], Dialog.prototype, "stretch", void 0);
+    __decorate$1([
+        webcomponentsBase.s({ type: Boolean })
+    ], Dialog.prototype, "draggable", void 0);
+    __decorate$1([
+        webcomponentsBase.s({ type: Boolean })
+    ], Dialog.prototype, "resizable", void 0);
+    __decorate$1([
+        webcomponentsBase.s()
+    ], Dialog.prototype, "state", void 0);
+    __decorate$1([
+        webcomponentsBase.d()
+    ], Dialog.prototype, "header", void 0);
+    __decorate$1([
+        webcomponentsBase.d()
+    ], Dialog.prototype, "footer", void 0);
+    __decorate$1([
+        parametersBundle_css.i("@ui5/webcomponents")
+    ], Dialog, "i18nBundle", void 0);
+    Dialog = Dialog_1 = __decorate$1([
+        webcomponentsBase.m({
+            tag: "ui5-dialog",
+            template: DialogTemplate,
+            styles: [
+                Popup$1.styles,
+                PopupsCommonCss,
+                dialogCSS,
+            ],
+        })
+    ], Dialog);
+    Dialog.define();
+    var Dialog$1 = Dialog;
+
+    function ResponsivePopoverTemplate() {
+        if (!this._isPhone) {
+            return PopoverTemplate.call(this);
+        }
+        return (jsxRuntime.jsxs(Dialog$1, { "root-element": true, accessibleName: this.accessibleName, accessibleNameRef: this.accessibleNameRef, accessibleDescription: this.accessibleDescription, accessibleDescriptionRef: this.accessibleDescriptionRef, accessibleRole: this.accessibleRole, stretch: true, preventInitialFocus: this.preventInitialFocus, preventFocusRestore: this.preventFocusRestore, initialFocus: this.initialFocus, onBeforeOpen: this._beforeDialogOpen, onOpen: this._afterDialogOpen, onBeforeClose: this._beforeDialogClose, onClose: this._afterDialogClose, exportparts: "content, header, footer", open: this.open, children: [!this._hideHeader && jsxRuntime.jsx(jsxRuntime.Fragment, { children: this.header.length ?
+                        jsxRuntime.jsx("slot", { slot: "header", name: "header" })
+                        :
+                            jsxRuntime.jsxs("div", { class: this.classes.header, slot: "header", children: [this.headerText &&
+                                        jsxRuntime.jsx(Title.Title, { level: "H1", wrappingType: "None", class: "ui5-popup-header-text ui5-responsive-popover-header-text", children: this.headerText }), !this._hideCloseButton &&
+                                        jsxRuntime.jsx(Button.Button, { icon: decline.decline, design: "Transparent", accessibleName: this._closeDialogAriaLabel, onClick: this._dialogCloseButtonClick })] }) }), jsxRuntime.jsx("slot", {}), jsxRuntime.jsx("slot", { slot: "footer", name: "footer" })] }));
+    }
+
+    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var ResponsivePopoverCss = `:host{min-width:6.25rem;min-height:2rem}:host([on-phone]){display:contents}.ui5-responsive-popover-header{height:var(--_ui5-responsive_popover_header_height);display:flex;justify-content:var(--_ui5_popup_header_prop_header_text_alignment);align-items:center;width:100%}.ui5-responsive-popover-header-text{width:calc(100% - var(--_ui5_button_base_min_width))}.ui5-responsive-popover-header-no-title{justify-content:flex-end}
 `;
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -2291,7 +2731,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
         webcomponentsBase.s({ type: Boolean })
     ], ResponsivePopover.prototype, "_hideCloseButton", void 0);
     __decorate([
-        parametersBundle_css$1.i("@ui5/webcomponents")
+        parametersBundle_css.i("@ui5/webcomponents")
     ], ResponsivePopover, "i18nBundle", void 0);
     ResponsivePopover = ResponsivePopover_1 = __decorate([
         webcomponentsBase.m({

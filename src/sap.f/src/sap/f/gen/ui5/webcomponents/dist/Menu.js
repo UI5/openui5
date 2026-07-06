@@ -59,7 +59,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.Menu",
       {
         metadata: {
-          tag: "ui5-menu-cc48984a",
+          tag: "ui5-menu-530c2e1b",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 
@@ -77,15 +77,11 @@ sap.ui.define(
              */
             headerText: { type: "string", mapping: "property" },
             /**
-             * Indicates if the menu is open.
-             */
-            open: { type: "boolean", mapping: "property", defaultValue: false },
-            /**
              * Determines the horizontal alignment of the menu relative to its opener control.
-             * @type module:sap/f/gen/ui5/webcomponents.PopoverHorizontalAlign
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/PopoverHorizontalAlign
              */
             horizontalAlign: {
-              type: "sap.f.gen.ui5.webcomponents.PopoverHorizontalAlign",
+              type: "sap.f.gen.ui5.webcomponents.dist.types.PopoverHorizontalAlign",
               mapping: "property",
               defaultValue: "Start"
             },
@@ -106,6 +102,19 @@ sap.ui.define(
               defaultValue: 1000
             },
             /**
+             * Indicates if the menu is open.
+             */
+            open: { type: "boolean", mapping: "property", defaultValue: false },
+            /**
+             * Determines on which side the component is placed at.
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/PopoverPlacement
+             */
+            placement: {
+              type: "sap.f.gen.ui5.webcomponents.dist.types.PopoverPlacement",
+              mapping: "property",
+              defaultValue: "Bottom"
+            },
+            /**
              * The text-content of the Web Component.
              */
             text: { type: "string", mapping: "textContent" },
@@ -124,9 +133,12 @@ sap.ui.define(
              * Defines the items of this component.
              *
              * **Note:** Use `ui5-menu-item` and `ui5-menu-separator` for their intended design.
-             * @type module:sap/f/gen/ui5/webcomponents.IMenuItem
+             * @type sap/f/gen/ui5/webcomponents/dist/Menu
              */
-            items: { type: "sap.f.gen.ui5.webcomponents.IMenuItem", multiple: true }
+            items: {
+              type: "sap.f.gen.ui5.webcomponents.dist.Menu.IMenuItem",
+              multiple: true
+            }
           },
 
           associations: {
@@ -139,6 +151,75 @@ sap.ui.define(
           },
 
           events: {
+            /**
+             * Fired before the menu is closed. This event can be cancelled, which will prevent the menu from closing.
+             */
+            beforeClose: {
+              allowPreventDefault: true,
+              enableEventBubbling: true,
+              parameters: {
+                /**
+                 * Indicates that `ESC` key has triggered the event.
+                 */
+                escPressed: {
+                  type: "boolean",
+                  types: [
+                    {
+                      origType: "boolean",
+                      multiple: false,
+                      dedicatedTypes: [
+                        { dtsType: "boolean", ui5Type: "boolean" }
+                      ]
+                    }
+                  ],
+                  dtsParamDescription:
+                    "Indicates that `ESC` key has triggered the event."
+                }
+              }
+            },
+
+            /**
+             * Fired before the menu is opened. This event can be cancelled, which will prevent the menu from opening.
+             *
+             * **Note:** Since 1.14.0 the event is also fired before a sub-menu opens.
+             */
+            beforeOpen: {
+              allowPreventDefault: true,
+              enableEventBubbling: true,
+              parameters: {
+                /**
+                 * The `ui5-menu-item` that triggers opening of the sub-menu or undefined when fired upon root menu opening.
+                 */
+                item: {
+                  type: "sap.ui.core.Control",
+                  types: [
+                    {
+                      origType: "HTMLElement",
+                      multiple: false,
+                      dedicatedTypes: [
+                        {
+                          dtsType: "Control",
+                          packageName: "sap/ui/core/Control",
+                          moduleType: "module:sap/ui/core/Control",
+                          ui5Type: "sap.ui.core.Control",
+                          isClass: true
+                        }
+                      ]
+                    }
+                  ],
+                  dtsParamDescription:
+                    "The `ui5-menu-item` that triggers opening of the sub-menu or undefined when fired upon root menu opening."
+                }
+              }
+            },
+
+            /**
+             * Fired after the menu is closed.
+             */
+            close: {
+              parameters: {}
+            },
+
             /**
              * Fired when an item is being clicked.
              *
@@ -188,80 +269,11 @@ sap.ui.define(
             },
 
             /**
-             * Fired before the menu is opened. This event can be cancelled, which will prevent the menu from opening.
-             *
-             * **Note:** Since 1.14.0 the event is also fired before a sub-menu opens.
-             */
-            beforeOpen: {
-              allowPreventDefault: true,
-              enableEventBubbling: true,
-              parameters: {
-                /**
-                 * The `ui5-menu-item` that triggers opening of the sub-menu or undefined when fired upon root menu opening.
-                 */
-                item: {
-                  type: "sap.ui.core.Control",
-                  types: [
-                    {
-                      origType: "HTMLElement",
-                      multiple: false,
-                      dedicatedTypes: [
-                        {
-                          dtsType: "Control",
-                          packageName: "sap/ui/core/Control",
-                          moduleType: "module:sap/ui/core/Control",
-                          ui5Type: "sap.ui.core.Control",
-                          isClass: true
-                        }
-                      ]
-                    }
-                  ],
-                  dtsParamDescription:
-                    "The `ui5-menu-item` that triggers opening of the sub-menu or undefined when fired upon root menu opening."
-                }
-              }
-            },
-
-            /**
              * Fired after the menu is opened.
              */
             onOpen: {
               enableEventBubbling: true,
               mapping: "open",
-              parameters: {}
-            },
-
-            /**
-             * Fired before the menu is closed. This event can be cancelled, which will prevent the menu from closing.
-             */
-            beforeClose: {
-              allowPreventDefault: true,
-              enableEventBubbling: true,
-              parameters: {
-                /**
-                 * Indicates that `ESC` key has triggered the event.
-                 */
-                escPressed: {
-                  type: "boolean",
-                  types: [
-                    {
-                      origType: "boolean",
-                      multiple: false,
-                      dedicatedTypes: [
-                        { dtsType: "boolean", ui5Type: "boolean" }
-                      ]
-                    }
-                  ],
-                  dtsParamDescription:
-                    "Indicates that `ESC` key has triggered the event."
-                }
-              }
-            },
-
-            /**
-             * Fired after the menu is closed.
-             */
-            close: {
               parameters: {}
             }
           },

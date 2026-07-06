@@ -49,7 +49,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.NotificationListGroupItem",
       {
         metadata: {
-          tag: "ui5-li-notification-group-cc48984a",
+          tag: "ui5-li-notification-group-530c2e1b",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -74,24 +74,13 @@ sap.ui.define(
             /**
              * Defines whether the component will have growing capability by pressing a `More` button.
              * When button is pressed `load-more` event will be fired.
-             * @type module:sap/f/gen/ui5/webcomponents.NotificationListGrowingMode
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/NotificationListGrowingMode
              */
             growing: {
-              type: "sap.f.gen.ui5.webcomponents.NotificationListGrowingMode",
+              type: "sap.f.gen.ui5.webcomponents.dist.types.NotificationListGrowingMode",
               mapping: "property",
               defaultValue: "None"
             },
-            /**
-             * Defines the `titleText` of the item.
-             */
-            titleText: { type: "string", mapping: "property" },
-            /**
-             * Defines if the `notification` is new or has been already read.
-             *
-             * **Note:** if set to `false` the `titleText` has bold font,
-             * if set to true - it has a normal font.
-             */
-            read: { type: "boolean", mapping: "property", defaultValue: false },
             /**
              * Defines if a busy indicator would be displayed over the item.
              */
@@ -108,6 +97,17 @@ sap.ui.define(
               mapping: "property",
               defaultValue: 1000
             },
+            /**
+             * Defines if the `notification` is new or has been already read.
+             *
+             * **Note:** if set to `false` the `titleText` has bold font,
+             * if set to true - it has a normal font.
+             */
+            read: { type: "boolean", mapping: "property", defaultValue: false },
+            /**
+             * Defines the `titleText` of the item.
+             */
+            titleText: { type: "string", mapping: "property" },
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
@@ -134,6 +134,14 @@ sap.ui.define(
 
           events: {
             /**
+             * Fired when additional items are requested.
+             */
+            loadMore: {
+              enableEventBubbling: true,
+              parameters: {}
+            },
+
+            /**
              * Fired when the `ui5-li-notification-group` is expanded/collapsed by user interaction.
              */
             toggle: {
@@ -142,11 +150,29 @@ sap.ui.define(
             },
 
             /**
-             * Fired when additional items are requested.
+             * Fired when the component is activated either with a mouse/tap or by using the Enter or Space key.
+             *
+             * **Note:** The event will not be fired if the `disabled` property is set to `true`.
              */
-            loadMore: {
+            click: {
               enableEventBubbling: true,
-              parameters: {}
+              parameters: {
+                /**
+                 * The original event from the user interaction.
+                 */
+                originalEvent: {
+                  type: "object",
+                  types: [
+                    {
+                      origType: "Event",
+                      multiple: false,
+                      dedicatedTypes: [{ dtsType: "Event", ui5Type: "object" }]
+                    }
+                  ],
+                  dtsParamDescription:
+                    "The original event from the user interaction."
+                }
+              }
             }
           },
 

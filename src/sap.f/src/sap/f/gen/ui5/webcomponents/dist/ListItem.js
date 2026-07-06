@@ -39,19 +39,6 @@ sap.ui.define(
 
           properties: {
             /**
-             * Defines the visual indication and behavior of the list items.
-             * Available options are `Active` (by default), `Inactive`, `Detail` and `Navigation`.
-             *
-             * **Note:** When set to `Active` or `Navigation`, the item will provide visual response upon press and hover,
-             * while with type `Inactive` and `Detail` - will not.
-             * @type module:sap/f/gen/ui5/webcomponents.ListItemType
-             */
-            type: {
-              type: "sap.f.gen.ui5.webcomponents.ListItemType",
-              mapping: "property",
-              defaultValue: "Active"
-            },
-            /**
              * Defines the additional accessibility attributes that will be applied to the component.
              * The following fields are supported:
              *
@@ -64,7 +51,29 @@ sap.ui.define(
             accessibilityAttributes: {
               type: "any",
               mapping: "property",
-              defaultValue: "{}"
+              defaultValue: {}
+            },
+            /**
+             * Used to define the role of the list item.
+             *
+             * **Note:** If not set, the role is automatically inherited from the parent `ui5-list` based on its `accessible-role` property
+             * (e.g. `Menu` -> `MenuItem`, `Tree` -> `TreeItem`, `ListBox` -> `Option`).
+             * An explicitly set `accessible-role` on the list item takes precedence over the inherited role.
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/ListItemAccessibleRole
+             */
+            accessibleRole: {
+              type: "sap.f.gen.ui5.webcomponents.dist.types.ListItemAccessibleRole",
+              mapping: "property"
+            },
+            /**
+             * Defines the highlight state of the list items.
+             * Available options are: `"None"` (by default), `"Positive"`, `"Critical"`, `"Information"` and `"Negative"`.
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/Highlight
+             */
+            highlight: {
+              type: "sap.f.gen.ui5.webcomponents.dist.types.Highlight",
+              mapping: "property",
+              defaultValue: "None"
             },
             /**
              * The navigated state of the list item.
@@ -76,22 +85,25 @@ sap.ui.define(
               defaultValue: false
             },
             /**
-             * Defines the highlight state of the list items.
-             * Available options are: `"None"` (by default), `"Positive"`, `"Critical"`, `"Information"` and `"Negative"`.
-             * @type module:sap/f/gen/ui5/webcomponents.Highlight
-             */
-            highlight: {
-              type: "sap.f.gen.ui5.webcomponents.Highlight",
-              mapping: "property",
-              defaultValue: "None"
-            },
-            /**
              * Defines the selected state of the component.
              */
             selected: {
               type: "boolean",
               mapping: "property",
               defaultValue: false
+            },
+            /**
+             * Defines the visual indication and behavior of the list items.
+             * Available options are `Active` (by default), `Inactive`, `Detail` and `Navigation`.
+             *
+             * **Note:** When set to `Active` or `Navigation`, the item will provide visual response upon press and hover,
+             * while with type `Inactive` and `Detail` - will not.
+             * @type module:sap/f/gen/ui5/webcomponents/dist/types/ListItemType
+             */
+            type: {
+              type: "sap.f.gen.ui5.webcomponents.dist.types.ListItemType",
+              mapping: "property",
+              defaultValue: "Active"
             },
             /**
              * The text-content of the Web Component.
@@ -105,10 +117,10 @@ sap.ui.define(
              * **Note:** While the slot allows custom buttons, to match
              * design guidelines, please use the `ui5-button` component.
              * **Note:** When the slot is not present, a built-in delete button will be displayed.
-             * @type module:sap/f/gen/ui5/webcomponents.IButton
+             * @type sap/f/gen/ui5/webcomponents/dist/Button
              */
             deleteButton: {
-              type: "sap.f.gen.ui5.webcomponents.IButton",
+              type: "sap.f.gen.ui5.webcomponents.dist.Button.IButton",
               multiple: true,
               slot: "deleteButton"
             }
@@ -117,6 +129,32 @@ sap.ui.define(
           associations: {},
 
           events: {
+            /**
+             * Fired when the component is activated either with a mouse/tap or by using the Enter or Space key.
+             *
+             * **Note:** The event will not be fired if the `disabled` property is set to `true`.
+             */
+            click: {
+              enableEventBubbling: true,
+              parameters: {
+                /**
+                 * The original event from the user interaction.
+                 */
+                originalEvent: {
+                  type: "object",
+                  types: [
+                    {
+                      origType: "Event",
+                      multiple: false,
+                      dedicatedTypes: [{ dtsType: "Event", ui5Type: "object" }]
+                    }
+                  ],
+                  dtsParamDescription:
+                    "The original event from the user interaction."
+                }
+              }
+            },
+
             /**
              * Fired when the user clicks on the detail button when type is `Detail`.
              */

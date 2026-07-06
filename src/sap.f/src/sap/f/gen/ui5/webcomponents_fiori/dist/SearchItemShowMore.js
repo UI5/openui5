@@ -30,7 +30,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.SearchItemShowMore",
       {
         metadata: {
-          tag: "ui5-search-item-show-more-cc48984a",
+          tag: "ui5-search-item-show-more-530c2e1b",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -46,8 +46,8 @@ sap.ui.define(
           properties: {
             /**
              * Specifies the number of additional items available to show.
-             * This value replaces the placeholder (N) in the "Show more (N)" text.
-             * If not set, the placeholder will remain as (N).
+             * If no value is defined, the control shows "Show more" (without any counter).
+             * If a number is provided, it displays "Show more (N)", where N is that number.
              */
             itemsToShowCount: { type: "float", mapping: "property" },
             /**
@@ -72,7 +72,36 @@ sap.ui.define(
 
           associations: {},
 
-          events: {},
+          events: {
+            /**
+             * Fired when the component is activated, either with a mouse/tap
+             * or by pressing the Enter or Space keys.
+             */
+            click: {
+              allowPreventDefault: true,
+              enableEventBubbling: true,
+              parameters: {
+                /**
+                 * Indicates whether the event was fired
+                 * due to keyboard interaction (Enter or Space) rather than mouse/tap.
+                 */
+                fromKeyboard: {
+                  type: "boolean",
+                  types: [
+                    {
+                      origType: "boolean",
+                      multiple: false,
+                      dedicatedTypes: [
+                        { dtsType: "boolean", ui5Type: "boolean" }
+                      ]
+                    }
+                  ],
+                  dtsParamDescription:
+                    "Indicates whether the event was fired\ndue to keyboard interaction (Enter or Space) rather than mouse/tap."
+                }
+              }
+            }
+          },
 
           getters: [],
 
