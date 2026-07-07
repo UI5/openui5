@@ -1387,6 +1387,25 @@ sap.ui.define([
 			this.assertWeekDeselected(oWeekNumberSelectSpy, assert);
 		});
 
+		QUnit.test("[Single interval selection] select event fires when week number is clicked", function (assert) {
+			// Prepare
+			var oSelectSpy = this.spy(this.oM, "fireSelect"),
+				oMockEvent = { target: this.oM.getDomRef().querySelectorAll(".sapUiCalWeekNum")[1] };
+
+			this.stub(Device.support, "touch").value(false);
+			this.oM.setIntervalSelection(true);
+
+			// Act - select week
+			this.oM._handleMousedown(oMockEvent);
+			// Assert
+			assert.ok(oSelectSpy.calledOnce, "select event fired after week number click");
+
+			// Act - deselect same week
+			this.oM._handleMousedown(oMockEvent);
+			// Assert
+			assert.strictEqual(oSelectSpy.callCount, 2, "select event fired again when week is deselected");
+		});
+
 		QUnit.test("_handleWeekSelection", function(assert) {
 			// Prepare
 			var oStartDateInBounds = CalendarDate.fromLocalJSDate(UI5Date.getInstance(2016, 0, 3)),

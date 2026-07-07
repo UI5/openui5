@@ -1796,6 +1796,7 @@ sap.ui.define([
 			// when again clicked on a same week number - then remove the selections
 			oAggOwner.removeAllSelectedDates();
 			oAggOwner.addSelectedDate(oDateRange);
+			_fireSelect.call(this);
 		}
 
 		return this;
