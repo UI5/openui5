@@ -38,7 +38,6 @@ sap.ui.define([
 			sandbox.stub(Utils, "getAppComponentForControl")
 			.withArgs("invalidComponent").returns(undefined)
 			.withArgs("validComponent").returns("appComponent");
-			sandbox.stub(Utils, "isVariantByStartupParameter").returns(false);
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl")
 			.withArgs("appComponent").returns("flexReference");
 			sandbox.stub(Utils, "isApplicationComponent")
@@ -48,14 +47,6 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("with a variant by startup parameter", async function(assert) {
-			Utils.isVariantByStartupParameter.restore();
-			sandbox.stub(Utils, "isVariantByStartupParameter").returns(true);
-
-			const vCacheKey = await XmlPreprocessor.getCacheKey({ componentId: "validComponent" });
-			assert.strictEqual(vCacheKey, undefined, "then caching is disabled");
-		});
-
 		QUnit.test("with no appComponent found for the component", async function(assert) {
 			const vCacheKey = await XmlPreprocessor.getCacheKey({ componentId: "invalidComponent" });
 			assert.strictEqual(vCacheKey, XmlPreprocessor.NOTAG, "the correct cache key is returned");
@@ -114,50 +105,6 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("detects the app variant id and requests the changes for it", function(assert) {
-			var oView = {
-				sId: "testView"
-			};
-			var sComponentName = "someComponentName";
-			var sFlexReference = "someVariantName";
-			var mProperties = {
-				sync: false
-			};
-
-			var oComponentData = {
-				startupParameters: {
-					"sap-app-id": [sFlexReference]
-				}
-			};
-
-			var oMockedComponent = {
-				getComponentClassName() {
-					return sComponentName;
-				}
-			};
-			var oMockedAppComponent = {
-				getManifestObject() {
-					return {};
-				},
-				getManifest() {
-					return {};
-				},
-				getManifestEntry() {
-					return undefined;
-				},
-				getComponentData() {
-					return oComponentData;
-				}
-			};
-			sandbox.stub(Component, "getComponentById").returns(oMockedComponent);
-			sandbox.stub(Utils, "getAppComponentForControl").returns(oMockedAppComponent);
-			sandbox.stub(Utils, "isApplication").returns(true);
-
-			return XmlPreprocessor.process(oView, mProperties).then(function(oProcessedView) {
-				assert.deepEqual(oProcessedView, oView, "the original view is returned");
-			});
-		});
-
 		QUnit.test("skips the processing in case of a component whose type is not application", function(assert) {
 			var oView = {
 				sId: "testView"
@@ -167,11 +114,7 @@ sap.ui.define([
 			};
 			var sComponentName = "someComponentName";
 
-			var oComponentData = {
-				startupParameters: {
-					"sap-app-id": ["someId"]
-				}
-			};
+			var oComponentData = {};
 
 			var oMockedAppComponent = {
 				getManifest() {

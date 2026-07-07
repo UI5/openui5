@@ -3,7 +3,6 @@
  * ${copyright}
  */
 sap.ui.define([
-	"sap/base/Log",
 	"sap/ui/base/ManagedObject",
 	"sap/ui/core/Fragment",
 	"sap/ui/dt/ElementUtil",
@@ -14,7 +13,6 @@ sap.ui.define([
 	"sap/ui/rta/plugin/annotations/DocumentedAnnotationChanges",
 	"sap/ui/rta/Utils"
 ], function(
-	Log,
 	ManagedObject,
 	Fragment,
 	ElementUtil,
@@ -188,13 +186,6 @@ sap.ui.define([
 
 		aProperties.sort((oProperty1, oProperty2) => oProperty1.label.localeCompare(oProperty2.label));
 
-		if (bSingleRename && !sPreSelectedPropertyKey) {
-			// Single-rename mode requires a pre-selected property to filter unambiguously by annotation path.
-			// Without it, there is no way to identify which property the user wants to rename.
-			Log.error("AnnotationChangeDialog: singleRename requires a preSelectedProperty");
-			return [];
-		}
-
 		const aExistingChanges = PersistenceWriteAPI._getAnnotationChanges({
 			control: oControl
 		});
@@ -245,15 +236,8 @@ sap.ui.define([
 			changedCount: 0,
 			isSaveEnabled: false
 		});
-		if (bSingleRename) {
-			// In single-rename mode we want to display exactly the pre-selected property.
-			// Filtering by label/currentValue can over-match if another property's value
-			// happens to equal the pre-selected property's label (e.g. after a previous
-			// rename change introduced a duplicate display name). Match by annotationPath
-			// (unique) to guarantee a single result.
-			this._oController.filterByAnnotationPath(sPreSelectedPropertyKey);
-		} else if (sFilterText) {
-			this._oController.filterProperties(sFilterText);
+		if (sFilterText) {
+			this._oController.filterProperties(sFilterText, !!bSingleRename);
 		}
 		// Ensure that the model is fully refreshed before opening the dialog
 		this.oChangeAnnotationModel.refresh(true);

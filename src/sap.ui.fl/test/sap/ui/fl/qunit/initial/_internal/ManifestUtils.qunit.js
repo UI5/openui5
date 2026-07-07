@@ -70,17 +70,6 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("with 'sap-app-id'", function(assert) {
-			var mPropertyBag = {
-				componentData: {
-					startupParameters: {
-						"sap-app-id": ["oldAppId"]
-					}
-				}
-			};
-			assert.equal(ManifestUtils.getFlexReference(mPropertyBag), "oldAppId", "the old app var id is returned");
-		});
-
 		QUnit.test("with an appvar id (raw manifest)", function(assert) {
 			var mPropertyBag = {
 				manifest: {

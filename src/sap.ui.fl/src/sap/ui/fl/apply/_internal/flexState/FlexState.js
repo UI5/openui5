@@ -237,16 +237,55 @@ sap.ui.define([
 		return oRuntimePersistence;
 	}
 
+	/**
+	 * Checks whether a change definition unknown to the runtimePersistence may be accepted from the backend.
+	 * There are two scenarios in which the backend legitimately returns objects the frontend didn't create:
+	 *
+	 * 1. Context filtering of FlVariants: the backend returns a setVisible ctrl_variant_change whose
+	 *    fileName ends with "flVariant_contextFiltering_setVisible".
+	 * 2. Deleted ctrl_variant: the backend does not always remove a deleted variant but instead returns it
+	 *    together with a setVisible=false ctrl_variant_change (distinguished from a reset via
+	 *    createdByReset=false). Both objects must appear together — a lone variant or a lone setVisible change
+	 *    still indicates an unexpected backend response.
+	 *
+	 * @param {object} oChangeDef - The unknown change definition to check
+	 * @param {object} mChangeDefsByFileName - All change definitions from the storage response, keyed by fileName
+	 * @returns {boolean} Whether the change definition is one of the allowed unknown objects
+	 */
+	function isAllowedUnknownChange(oChangeDef, mChangeDefsByFileName) {
+		if (oChangeDef.fileType === "ctrl_variant_change") {
+			if (oChangeDef.fileName.endsWith("flVariant_contextFiltering_setVisible")) {
+				return true;
+			}
+			// setVisible side of a deleted-variant pair
+			if (oChangeDef.content?.visible === false && oChangeDef.content?.createdByReset === false) {
+				return mChangeDefsByFileName[oChangeDef.selector?.id]?.fileType === "ctrl_variant";
+			}
+		}
+		// Variant side of a deleted-variant pair
+		if (oChangeDef.fileType === "ctrl_variant") {
+			return Object.values(mChangeDefsByFileName).some((oOtherDef) => (
+				oOtherDef.fileType === "ctrl_variant_change"
+				&& oOtherDef.content?.visible === false
+				&& oOtherDef.content?.createdByReset === false
+				&& oOtherDef.selector?.id === oChangeDef.fileName
+			));
+		}
+		return false;
+	}
+
 	function updateRuntimePersistence(sReference, oStorageResponse, oRuntimePersistence) {
 		const aFlexObjects = oRuntimePersistence.flexObjects.slice();
 		const aChangeDefinitions = [];
 		const aChangeIds = [];
+		const mChangeDefsByFileName = {};
 		let bUpdate;
 
 		each(oStorageResponse.changes, function(sKey, vValue) {
 			prepareChangeDefinitions(sKey, vValue).forEach(function(oChangeDef) {
 				aChangeDefinitions.push(oChangeDef);
 				aChangeIds.push(oChangeDef.fileName);
+				mChangeDefsByFileName[oChangeDef.fileName] = oChangeDef;
 			});
 		});
 
@@ -269,12 +308,7 @@ sap.ui.define([
 					return oExistingFlexObject;
 				}
 
-				// The backend creates new changes in some scenarios (e.g. context filtering of FlVariants),
-				// which are not known to the runtimePersistence before
-				if (
-					oChangeDef.fileType === "ctrl_variant_change"
-					&& oChangeDef.fileName.endsWith("flVariant_contextFiltering_setVisible")
-				) {
+				if (isAllowedUnknownChange(oChangeDef, mChangeDefsByFileName)) {
 					return FlexObjectFactory.createFromFileContent(oChangeDef, null, true);
 				}
 

@@ -100,7 +100,7 @@ sap.ui.define([
 
 		$expander.trigger("click");
 
-		await waitForItems(oTree, 5);
+		await waitForItems(oTree, 5, 10000); // Apply enhanced timeout for this test, as the build voters are slow and the expand operation takes a while to complete
 
 		assert.equal(oTree.getItems().length, 5, "expanding is done.");
 	});

@@ -85,18 +85,20 @@ sap.ui.define([
 								selectorElement: this.byId("ObjectPageLayout"),
 								changeSpecificData: {
 									changeType: "moveControls",
-									movedElements: [{
-										id: this.createId("ObjectPageSectionWithForm"),
-										sourceIndex: 0,
-										targetIndex: 1
-									}],
-									source: {
-										id: this.createId("ObjectPageLayout"),
-										aggregation: "sections"
-									},
-									target: {
-										id: this.createId("ObjectPageLayout"),
-										aggregation: "sections"
+									content: {
+										movedElements: [{
+											id: this.createId("ObjectPageSectionWithForm"),
+											sourceIndex: 0,
+											targetIndex: 1
+										}],
+										source: {
+											id: this.createId("ObjectPageLayout"),
+											aggregation: "sections"
+										},
+										target: {
+											id: this.createId("ObjectPageLayout"),
+											aggregation: "sections"
+										}
 									}
 								}
 							};
@@ -115,18 +117,20 @@ sap.ui.define([
 								selectorElement: this.byId("ObjectPageLayout"),
 								changeSpecificData: {
 									changeType: "moveControls",
-									movedElements: [{
-										id: this.createId("ObjectPageSectionWithVM"),
-										sourceIndex: 2,
-										targetIndex: 0
-									}],
-									source: {
-										id: this.createId("ObjectPageLayout"),
-										aggregation: "sections"
-									},
-									target: {
-										id: this.createId("ObjectPageLayout"),
-										aggregation: "sections"
+									content: {
+										movedElements: [{
+											id: this.createId("ObjectPageSectionWithVM"),
+											sourceIndex: 2,
+											targetIndex: 0
+										}],
+										source: {
+											id: this.createId("ObjectPageLayout"),
+											aggregation: "sections"
+										},
+										target: {
+											id: this.createId("ObjectPageLayout"),
+											aggregation: "sections"
+										}
 									}
 								}
 							};

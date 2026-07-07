@@ -36,6 +36,7 @@ sap.ui.define([
 		getManifest() {
 			return {};
 		},
+
 		getManifestObject() {
 			return {
 				"_version": "2.0.0",
@@ -45,13 +46,9 @@ sap.ui.define([
 				}
 			};
 		},
+
 		getId() {
 			return "sComponentId";
-		},
-		getComponentData() {
-			return {
-				startupParameters: ["sap-app-id"]
-			};
 		}
 	};
 
