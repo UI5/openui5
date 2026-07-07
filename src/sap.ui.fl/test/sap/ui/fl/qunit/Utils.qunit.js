@@ -50,38 +50,6 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("isVariantByStartupParameter can detect a variant by the startup parameter", function(assert) {
-			sandbox.stub(Utils, "getAppComponentForControl").returns({
-				getComponentData() {
-					return {
-						startupParameters: {
-							"sap-app-id": ["someId"]
-						}
-					};
-				}
-			});
-
-			const bIsStartupParameterBasedVariant = Utils.isVariantByStartupParameter({});
-
-			assert.equal(bIsStartupParameterBasedVariant, true, "the variant was detected");
-		});
-
-		QUnit.test("isVariantByStartupParameter returns false if no variant by the startup parameter is present", function(assert) {
-			sandbox.stub(Utils, "getAppComponentForControl").returns({
-				getComponentData() {
-					return {
-						startupParameters: {
-							"some-other-param": ["test"]
-						}
-					};
-				}
-			});
-
-			const bIsStartupParameterBasedVariant = Utils.isVariantByStartupParameter({});
-
-			assert.equal(bIsStartupParameterBasedVariant, false, "the entity is not a variant");
-		});
-
 		QUnit.test("getClient", function(assert) {
 			sandbox.stub(URLSearchParams.prototype, "get").withArgs("sap-client").returns("123");
 			const sClient = Utils.getClient();

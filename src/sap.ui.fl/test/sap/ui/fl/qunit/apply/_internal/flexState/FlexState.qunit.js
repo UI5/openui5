@@ -1503,6 +1503,124 @@ sap.ui.define([
 				"then both objects are added to the persistence"
 			);
 		});
+
+		QUnit.test("A deleted ctrl_variant is returned from storage with its auto-generated setVisible change", async function(assert) {
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: this.sComponentId
+			});
+			const oNewChange = FlexObjectFactory.createFromFileContent({
+				fileName: "change1",
+				fileType: "change"
+			});
+			FlexState.addDirtyFlexObjects(sReference, [oNewChange], this.sComponentId);
+
+			// A ctrl_variant deletion in the frontend leads to the backend returning
+			// both the variant and an auto-generated setVisible=false ctrl_variant_change
+			// (createdByReset=false marks it as coming from a delete, not a reset).
+			// The setVisible change targets the variant via selector.id.
+			mockLoader({
+				changes: {
+					changes: [{
+						fileName: "change1",
+						fileType: "change"
+					}],
+					variants: [{
+						fileName: "deletedVariant",
+						fileType: "ctrl_variant",
+						variantManagementReference: "vmReference"
+					}],
+					variantChanges: [{
+						fileName: "setVisibleChange",
+						fileType: "ctrl_variant_change",
+						selector: { id: "deletedVariant" },
+						content: {
+							visible: false,
+							createdByReset: false
+						}
+					}]
+				}
+			});
+
+			await FlexState.reinitialize({
+				reference: sReference,
+				componentId: this.sComponentId,
+				manifest: {},
+				componentData: {}
+			});
+
+			const aChanges = FlexState.getFlexObjectsDataSelector().get({ reference: sReference });
+			assert.strictEqual(
+				aChanges.length,
+				3,
+				"then the deleted variant and its setVisible change are added to the persistence"
+			);
+		});
+
+		QUnit.test("An unknown ctrl_variant without a matching setVisible delete change is rejected", async function(assert) {
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: this.sComponentId
+			});
+
+			// A ctrl_variant that is not accompanied by a delete-setVisible change targeting it must still be rejected.
+			mockLoader({
+				changes: {
+					variants: [{
+						fileName: "unknownVariant",
+						fileType: "ctrl_variant",
+						variantManagementReference: "vmReference"
+					}]
+				}
+			});
+
+			try {
+				await FlexState.reinitialize({
+					reference: sReference,
+					componentId: this.sComponentId,
+					manifest: {},
+					componentData: {}
+				});
+				assert.ok(false, "then an error is raised");
+			} catch (oError) {
+				assert.ok(oError, "then an error is raised");
+			}
+		});
+
+		QUnit.test("An unknown setVisible ctrl_variant_change without its target variant is rejected", async function(assert) {
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: this.sComponentId
+			});
+
+			// A setVisible=false / createdByReset=false change without an accompanying unknown ctrl_variant
+			// that matches its selector.id is not a deletion pair and must still be rejected.
+			mockLoader({
+				changes: {
+					variantChanges: [{
+						fileName: "loneSetVisibleChange",
+						fileType: "ctrl_variant_change",
+						selector: { id: "missingVariant" },
+						content: {
+							visible: false,
+							createdByReset: false
+						}
+					}]
+				}
+			});
+
+			try {
+				await FlexState.reinitialize({
+					reference: sReference,
+					componentId: this.sComponentId,
+					manifest: {},
+					componentData: {}
+				});
+				assert.ok(false, "then an error is raised");
+			} catch (oError) {
+				assert.ok(oError, "then an error is raised");
+			}
+		});
 	});
 
 	QUnit.module("FlexState.update", {

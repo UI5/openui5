@@ -20,14 +20,6 @@ function(
 
 	function getFlexReference(mPropertyBag) {
 		var oManifest = mPropertyBag.manifest;
-		var oComponentData = mPropertyBag.componentData || {};
-
-		// support of old app variants
-		if (oComponentData.startupParameters) {
-			if (Array.isArray(oComponentData.startupParameters["sap-app-id"])) {
-				return oComponentData.startupParameters["sap-app-id"][0];
-			}
-		}
 
 		var oSapUi5Entry = oManifest.getEntry ? oManifest.getEntry("sap.ui5") : oManifest["sap.ui5"];
 		if (oSapUi5Entry) {

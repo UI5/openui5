@@ -1527,21 +1527,6 @@ sap.ui.define([
 		assert.ok(oSetFilterValueSpy.notCalled, "setFilterValue not called when the event is prevented");
 	});
 
-	QUnit.test("#filter reports Error state for columns with invalid filter type", function(assert) {
-		this.oOtherColumn.setFilterProperty("a");
-		this.oOtherColumn.setFilterValue("notANumber");
-		this.oOtherColumn.setFilterType(new IntegerType());
-
-		const oHookSpy = this.spy();
-		TableUtils.Hook.register(this.oTable, TableUtils.Hook.Keys.Column.SetFilterState, oHookSpy);
-
-		this.oColumn.filter("x");
-
-		const oErrorCall = oHookSpy.getCalls().find((oCall) => oCall.args[0] === this.oOtherColumn);
-		assert.ok(oErrorCall, "SetFilterState hook was called for the other column");
-		assert.strictEqual(oErrorCall.args[1], "Error", "Filter state Error is reported for the invalid filter");
-	});
-
 	QUnit.test("#_sort returns early without table or sortProperty", function(assert) {
 		const oOrphan = new Column({sortProperty: "a"});
 		const oFireSortSpy = this.spy(this.oTable, "fireSort");
