@@ -1110,6 +1110,22 @@ sap.ui.define([
 		oObjectHeader.destroy();
 	});
 
+	QUnit.test("Decorative property of the image is set to true if alt property is set to empty string", function(assert){
+		// Arrange
+		var oObjectHeader = new ObjectHeader({
+				title: "Test title level",
+				icon : "../images/action.png",
+				iconTooltip: "test tooltip",
+				iconAlt: ""
+			});
+
+		// Assert
+		assert.strictEqual(oObjectHeader._getImageControl().getDecorative(), true, "The image has property decorative set to true");
+
+		// Cleanup
+		oObjectHeader.destroy();
+	});
+
 	QUnit.test("Decorative property of the image is set to false", function(assert){
 		// Arrange
 		var oObjectHeader = new ObjectHeader({
