@@ -1068,7 +1068,7 @@ sap.ui.define([
 				alt: this.isPropertyInitial("iconAlt") ? ObjectHeader._getResourceBundle().getText("OH_ARIA_ICON") : this.getIconAlt(),
 				useIconTooltip : false,
 				densityAware : this.getIconDensityAware(),
-				decorative : false
+				decorative : (!this.isPropertyInitial("iconAlt") && this.getIconAlt().trim() === "") ? true : false
 			},
 			IconPool.isIconURI(this.getIcon()) ? { size : sSize } : {}
 		);
