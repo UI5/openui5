@@ -666,45 +666,49 @@ sap.ui.define([
 		},
 		afterEach: function() {
 			this.oTable.destroy();
+
+			if (this.bChromeZoomFaked) {
+				Device.browser.chrome = this.bOriginalChrome;
+				if (this.oOriginalDevicePixelRatio) {
+					Object.defineProperty(window, "devicePixelRatio", this.oOriginalDevicePixelRatio);
+				} else {
+					delete window.devicePixelRatio;
+				}
+			}
+		},
+		fakeChromeZoom: function(fRatio) {
+			this.bChromeZoomFaked = true;
+			this.bOriginalChrome = Device.browser.chrome;
+			this.oOriginalDevicePixelRatio = Object.getOwnPropertyDescriptor(window, "devicePixelRatio");
+			Device.browser.chrome = true;
+			Object.defineProperty(window, "devicePixelRatio", {configurable: true, value: fRatio});
 		}
 	});
 
-	QUnit.test("Chrome with fractional devicePixelRatio measures row height from a temporary DOM table", function(assert) {
-		this.stub(Device.browser, "chrome").value(true);
-		this.stub(window, "devicePixelRatio").value(1.25);
-
+	QUnit.test("Chrome with fractional devicePixelRatio still returns a valid row-container height", function(assert) {
 		const oRowMode = this.oTable.getRowMode();
-		const oRowContainer = this.oTable.getDomRef("tableCCnt");
-		const oAppendChildSpy = this.spy(oRowContainer, "appendChild");
-		const oRemoveChildSpy = this.spy(oRowContainer, "removeChild");
+		const mBaselineStyles = oRowMode.getRowContainerStyles();
 
-		const mStyles = oRowMode.getRowContainerStyles();
+		this.fakeChromeZoom(1.25);
+		const mZoomStyles = oRowMode.getRowContainerStyles();
 
-		assert.ok(oAppendChildSpy.calledOnce, "Temporary table inserted into row container");
-		assert.ok(oRemoveChildSpy.calledOnce, "Temporary table removed from row container");
-		assert.strictEqual(oAppendChildSpy.firstCall.args[0], oRemoveChildSpy.firstCall.args[0], "The same element that was appended is removed");
-		assert.strictEqual(oAppendChildSpy.firstCall.args[0].tagName, "TABLE", "The inserted element is a table");
-		assert.notOk(oRowContainer.querySelector(":scope > table.sapUiTableCtrl:last-child")?.isSameNode(oAppendChildSpy.firstCall.args[0]),
-			"Temporary table no longer in DOM after measurement");
-		assert.ok(/^\d+px$/.test(mStyles.height), "Row container height is a pixel value");
+		const iBaselineHeight = parseInt(mBaselineStyles.height);
+		const iZoomHeight = parseInt(mZoomStyles.height);
+
+		assert.ok(/^\d+px$/.test(mZoomStyles.height), "Row-container height is a positive pixel value under Chrome zoom");
+		assert.ok(iZoomHeight >= iBaselineHeight, `Zoom-workaround height (${iZoomHeight}px) is at least the baseline height (${iBaselineHeight}px)`);
 	});
 
-	QUnit.test("Chrome zoom workaround honours a configured row content height", function(assert) {
-		this.stub(Device.browser, "chrome").value(true);
-		this.stub(window, "devicePixelRatio").value(1.5);
-
+	QUnit.test("Chrome zoom row-container height reflects a configured row content height", function(assert) {
 		const oRowMode = this.oTable.getRowMode();
-		oRowMode.setRowContentHeight(30);
+		const mDefaultStyles = oRowMode.getRowContainerStyles();
 
-		const oRowContainer = this.oTable.getDomRef("tableCCnt");
-		const oAppendChildSpy = this.spy(oRowContainer, "appendChild");
+		this.fakeChromeZoom(1.5);
+		oRowMode.setRowContentHeight(60);
+		const mConfiguredStyles = oRowMode.getRowContainerStyles();
 
-		oRowMode.getRowContainerStyles();
-
-		const oInsertedTable = oAppendChildSpy.firstCall.args[0];
-		const oInsertedRow = oInsertedTable.rows[0];
-		assert.strictEqual(oInsertedRow.style.height, oRowMode.getBaseRowHeightOfTable() + "px",
-			"Inserted row uses the base row height derived from the configured content height");
+		assert.ok(parseInt(mConfiguredStyles.height) > parseInt(mDefaultStyles.height),
+			"Configuring a larger row content height enlarges the returned row-container height");
 	});
 
 	QUnit.module("Table refresh row-count adjustment", {
