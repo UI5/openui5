@@ -13,5 +13,20 @@
         "text": " sap.ui.unified.FileUploader: Preserve focus on clear"
       }
     ]
+  },
+  "1.148.2": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "e2e4ddc5fe1bdf8ce7c9f1c6ad74cb4e06213e0e",
+        "type": "FIX",
+        "text": " sap.m.DynamicDateRange: week number click does not populate footer dates and enable Apply button"
+      },
+      {
+        "id": "0b050b0f72b7c2d49a76427801510a8c33831361",
+        "type": "FIX",
+        "text": " sap.m.SinglePlanningCalendar/PlanningCalendar: Fix NVDA appointment announcements"
+      }
+    ]
   }
 }

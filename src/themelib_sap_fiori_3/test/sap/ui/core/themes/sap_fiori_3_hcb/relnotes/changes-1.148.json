@@ -8,5 +8,15 @@
         "text": " sap.m.Carousel: ensure image scales below 240px viewport width"
       }
     ]
+  },
+  "1.148.2": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "750560a3d66a2c21ab8c8635aa2d9ade4497ffff",
+        "type": "FIX",
+        "text": " sap.m.MessageBox: box shadow of the header fixed"
+      }
+    ]
   }
 }

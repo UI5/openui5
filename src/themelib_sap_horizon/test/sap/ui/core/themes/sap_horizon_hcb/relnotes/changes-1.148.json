@@ -28,5 +28,15 @@
         "text": " sap.uxap.ObjectPageSection: Focus outline no longer overlaps header buttons"
       }
     ]
+  },
+  "1.148.2": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "750560a3d66a2c21ab8c8635aa2d9ade4497ffff",
+        "type": "FIX",
+        "text": " sap.m.MessageBox: box shadow of the header fixed"
+      }
+    ]
   }
 }

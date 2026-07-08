@@ -268,5 +268,30 @@
         "text": " sap.m.SelectSegmentedButtonItem: fix circular dependency"
       }
     ]
+  },
+  "1.148.2": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "e2e4ddc5fe1bdf8ce7c9f1c6ad74cb4e06213e0e",
+        "type": "FIX",
+        "text": " sap.m.DynamicDateRange: week number click does not populate footer dates and enable Apply button"
+      },
+      {
+        "id": "0b050b0f72b7c2d49a76427801510a8c33831361",
+        "type": "FIX",
+        "text": " sap.m.SinglePlanningCalendar/PlanningCalendar: Fix NVDA appointment announcements"
+      },
+      {
+        "id": "474f903395fe4975b40a445a9d84be790cc960e9",
+        "type": "FIX",
+        "text": " sap.m.IconTabHeader: End overflow tab now displays correct count on mobile devices"
+      },
+      {
+        "id": "750560a3d66a2c21ab8c8635aa2d9ade4497ffff",
+        "type": "FIX",
+        "text": " sap.m.MessageBox: box shadow of the header fixed"
+      }
+    ]
   }
 }
