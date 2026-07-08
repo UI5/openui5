@@ -37,12 +37,22 @@ NewsContentRenderer.render = function(oRm, oControl) {
 	}
 	oRm.openEnd();
 
-		// render tile content priority, if present
+		// render tile content priority badges, if present
 		var oTileContent = oControl.getParent();
 		var oContentPriorityBadge = oTileContent instanceof TileContent && oTileContent._getPriorityBadge();
+		var oContentAdditionalPriorityBadge = oTileContent instanceof TileContent && oTileContent._getAdditionalPriorityBadge();
 
-		if (oContentPriorityBadge) {
-			oRm.renderControl(oContentPriorityBadge);
+		if (oContentPriorityBadge || oContentAdditionalPriorityBadge) {
+			oRm.openStart("div");
+			oRm.class("sapMNwCPriorityContainer");
+			oRm.openEnd();
+			if (oContentPriorityBadge) {
+				oRm.renderControl(oContentPriorityBadge);
+			}
+			if (oContentAdditionalPriorityBadge) {
+				oRm.renderControl(oContentAdditionalPriorityBadge);
+			}
+			oRm.close("div");
 		}
 
 		oRm.openStart("div", oControl.getId() + "-title");

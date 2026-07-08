@@ -35,6 +35,14 @@ html.sap-desktop .sapMOHTitle.sapMOHTitleActive:focus,
 	outline: none;
 }
 
+html.sap-desktop .sapMOHTitle.sapMOHTitleActive:focus > h1 span,
+html.sap-desktop .sapMOHTitle.sapMOHTitleActive:focus > h2 span,
+html.sap-desktop .sapMOHTitle.sapMOHTitleActive:focus > h3 span,
+html.sap-desktop .sapMOHTitle.sapMOHTitleActive:focus > h4 span,
+html.sap-desktop .sapMOHTitle.sapMOHTitleActive:focus > h5 span,
+html.sap-desktop .sapMOHTitle.sapMOHTitleActive:focus > h6 span,
+html.sap-desktop .sapMOHIcon.sapMPointer .sapUiIcon.sapUiIconPointer:focus,
+html.sap-desktop .sapMOHTitleArrow .sapUiIcon:focus,
 .sapMOHTitle.sapMOHTitleActive:focus-visible > h1 span,
 .sapMOHTitle.sapMOHTitleActive:focus-visible > h2 span,
 .sapMOHTitle.sapMOHTitleActive:focus-visible > h3 span,
@@ -65,11 +73,13 @@ html.sap-desktop .sapMOHTitle.sapMOHTitleActive:focus,
 	background: transparent;
 }
 
+html.sap-desktop .sapMOHRTitleArrow .sapUiIcon:focus,
 .sapMOHRTitleArrow .sapUiIcon:focus-visible {
 	outline: 1px dotted var(--sapContent_FocusColor);
 	outline-offset: -1px;
 }
 
+html.sap-desktop .sapMOHRIcon.sapMPointer .sapUiIcon.sapUiIconPointer:focus,
 .sapMOHRIcon.sapMPointer .sapUiIcon.sapUiIconPointer:focus-visible {
 
 	&::before {
@@ -77,6 +87,7 @@ html.sap-desktop .sapMOHTitle.sapMOHTitleActive:focus,
 	}
 }
 
+html.sap-desktop .sapMOHRTitleActive .sapMOHRTitleText:focus,
 .sapMOHRTitleActive .sapMOHRTitleText:focus-visible {
 	outline: 1px dotted var(--sapContent_FocusColor);
 	outline-offset: -1px;

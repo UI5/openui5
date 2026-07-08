@@ -1276,6 +1276,8 @@ var FrameType = library.FrameType;
 		//Assert
 		assert.ok(aItems[0].hasStyleClass("sapMSTGridContainerOneRemGap"),"Width has been applied successfully when the gap is 1rem");
 
+	});
+
 	QUnit.test("S4 home slide tile", async function(assert) {
 		//Arrange
 		this.oSlideTile = this.createSlideTile().placeAt("qunit-fixture");
@@ -1286,7 +1288,6 @@ var FrameType = library.FrameType;
 		assert.ok(this.oSlideTile.getDomRef().classList.contains("sapMTileSmallPhone"),"class has been successfully added");
 	});
 
-	});
 	QUnit.test("Checking if the correct width has not been applied when the gap is not 1rem", async function (assert) {
 		// Arrange
 		this.fnCreateGridContainer("0.5rem");
@@ -1532,6 +1533,78 @@ var FrameType = library.FrameType;
 		// Assert: small screen — image must be back on root, hdrContent cleared
 		assert.ok(oRoot.style.backgroundImage, "Small screen: background-image is restored on root element");
 		assert.notOk(oHdrContent.style.backgroundImage, "Small screen: background-image is absent from hdrContent");
+	});
+
+	QUnit.module("Additional Priority Badge in SlideTile", {
+		beforeEach: async function() {
+			this.oTileContentWithBadge = new TileContent({
+				priority: "VeryHigh",
+				priorityText: "Contains Critical News",
+				additionalPriority: "Low",
+				additionalPriorityText: "Contains new News",
+				content: new NewsContent({
+					contentText: "Sourcing and Procurement (3)",
+					subheader: "SAP S/4HANA Cloud"
+				})
+			});
+			this.oTileContentWithoutBadge = new TileContent({
+				priority: "VeryHigh",
+				priorityText: "Contains Critical News",
+				content: new NewsContent({
+					contentText: "Please keep language as English",
+					subheader: "SAP S/4HANA Cloud"
+				})
+			});
+			this.oSlideTile = new SlideTile({
+				width: "100%",
+				height: "17rem",
+				tiles: [
+					new GenericTile({
+						mode: "ArticleMode",
+						frameType: "Stretch",
+						backgroundImage: "test.png",
+						tileContent: this.oTileContentWithBadge
+					}),
+					new GenericTile({
+						mode: "ArticleMode",
+						frameType: "Stretch",
+						backgroundImage: "test.png",
+						tileContent: this.oTileContentWithoutBadge
+					})
+				]
+			});
+			this.oSlideTile.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			if (this.oSlideTile) {
+				this.oSlideTile.destroy();
+				this.oSlideTile = null;
+			}
+		}
+	});
+
+	QUnit.test("Both priority badges are rendered inside sapMNwCPriorityContainer within the tile", function(assert) {
+		var oOverflowHidden = this.oSlideTile.getDomRef().querySelector(".sapMSTOverflowHidden");
+		var oPriorityBadge = oOverflowHidden && oOverflowHidden.querySelector(".sapMGTPriorityBadge");
+		var oAdditionalBadge = oOverflowHidden && oOverflowHidden.querySelector(".sapMGTAdditionalPriorityBadge");
+		assert.ok(oPriorityBadge, "Priority badge is rendered inside the tile (sapMSTOverflowHidden)");
+		assert.ok(oAdditionalBadge, "Additional priority badge is rendered inside the tile (sapMSTOverflowHidden)");
+	});
+
+	QUnit.test("Both badges are inside sapMNwCPriorityContainer", function(assert) {
+		var oContainer = this.oSlideTile.getDomRef().querySelector(".sapMNwCPriorityContainer");
+		assert.ok(oContainer, "sapMNwCPriorityContainer is rendered");
+		assert.ok(oContainer.querySelector(".sapMGTPriorityBadge"), "Priority badge inside container");
+		assert.ok(oContainer.querySelector(".sapMGTAdditionalPriorityBadge"), "Additional priority badge inside container");
+	});
+
+	QUnit.test("On mobile (sizeBehavior Small) badges still render inside the tile", async function(assert) {
+		this.oSlideTile.setSizeBehavior("Small");
+		await nextUIUpdate();
+		var oOverflowHidden = this.oSlideTile.getDomRef().querySelector(".sapMSTOverflowHidden");
+		assert.ok(oOverflowHidden.querySelector(".sapMGTPriorityBadge"), "Priority badge inside tile on mobile");
+		assert.ok(oOverflowHidden.querySelector(".sapMGTAdditionalPriorityBadge"), "Additional priority badge inside tile on mobile");
 	});
 
 	// Checks whether the given DomRef is contained or equals (in) one of the given container

@@ -105,7 +105,7 @@ sap.ui.define([
 					/**
 					 * Array of indices whose selection has been changed (either selected or deselected)
 					 */
-					indices: {type: "int[]"},
+					rowIndices: {type: "int[]"},
 
 					/**
 					 * Indicates whether the selection limit has been reached

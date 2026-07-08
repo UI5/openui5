@@ -149,9 +149,14 @@
 			margin: 0;
 			.sapMTileCnt.News {
 				margin: 0;
-				.sapMObjStatus {
+				.sapMNwCPriorityContainer {
 					top: 1.5rem;
 					left: 1.5rem;
+					max-width: calc(~'100% - 3rem');
+				}
+				.sapMObjStatus {
+					top: initial;
+					left: initial;
 				}
 				.sapMTileCntContent {
 					margin: 0;
@@ -188,10 +193,18 @@ html[dir=rtl] .sapMST.Stretch.sapMSTLargeScreen .sapMSTBulleted {
 		.sapMGTContent {
 			overflow: initial;
 			.sapMTileCnt.News {
-				.sapMObjStatus {
+				.sapMNwCPriorityContainer {
 					position: absolute;
 					top: -2rem;
 					left: 0.5rem;
+					padding-bottom: 0;
+					max-width: calc(~'100% - 1rem');
+				}
+
+				.sapMObjStatus {
+					position: initial;
+					top: initial;
+					left: initial;
 					padding-bottom: 0;
 				}
 				.sapMTileCntContent {
