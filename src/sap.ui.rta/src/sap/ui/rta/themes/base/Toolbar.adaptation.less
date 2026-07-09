@@ -9,6 +9,31 @@
 @_sap_ui_rta_Toolbar_Adaptation_ActiveVersionColor: var(--sapChart_Good); /* #006362 */
 @_sap_ui_rta_Toolbar_Adaptation_FocusOutlineColor: var(--sapContent_FocusColor); /* #000 */
 
+.sapUiRtaManageVersionsDialog {
+	max-height: 50% !important;
+
+	.sapUiRtaVersionsList .sapUiRtaDraftVersionAccent .sapMText {
+		color: @_sap_ui_rta_Toolbar_Adaptation_DraftVersionColor;
+	}
+
+	.sapMDialogFooter {
+		.sapMIBar {
+			padding: 0;
+		}
+	}
+	.sapUiRtaOriginalVersionList {
+		width: 100%;
+		.sapMLIBFocusable:focus,
+		.sapMTblCellFocusable:focus {
+			outline: none;
+		}
+	}
+
+	.sapUiRtaOriginalVersionList .sapMListTblCell:first-child {
+		padding-left: 0;
+	}
+}
+
 .sapUiRtaMode {
 
 	.sapUiRtaToolbar.sapUiRtaToolbarAdaptation {
@@ -50,18 +75,18 @@
 			background: transparent;
 		}
 
-		.sapUiRtaVersionButton.sapUiRtaDraftVersionAccent > span > span > bdi,
-		.sapUiRtaVersionButton.sapUiRtaDraftVersionAccent > span > span.sapMBtnIcon {
+		.sapUiRtaVersionButton.sapUiRtaDraftVersionAccent >.sapMBtn > span > span > bdi,
+		.sapUiRtaVersionButton.sapUiRtaDraftVersionAccent >.sapMBtn > span::after {
 			color: @_sap_ui_rta_Toolbar_Adaptation_DraftVersionColor;
 		}
 
-		.sapUiRtaVersionButton.sapUiRtaActiveVersionAccent > span > span > bdi,
-		.sapUiRtaVersionButton.sapUiRtaActiveVersionAccent > span > span.sapMBtnIcon {
+		.sapUiRtaVersionButton.sapUiRtaActiveVersionAccent >.sapMBtn > span > span > bdi,
+		.sapUiRtaVersionButton.sapUiRtaActiveVersionAccent >.sapMBtn > span::after {
 			color: @_sap_ui_rta_Toolbar_Adaptation_ActiveVersionColor;
 		}
 
-		.sapUiRtaVersionButton.sapUiRtaVersionColor > span > span > bdi,
-		.sapUiRtaVersionButton.sapUiRtaVersionColor > span > span.sapMBtnIcon {
+		.sapUiRtaVersionButton.sapUiRtaVersionColor >.sapMBtn > span > span > bdi,
+		.sapUiRtaVersionButton.sapUiRtaVersionColor >.sapMBtn > span::after {
 			color: @_sap_ui_rta_Toolbar_Adaptation_TextColor;
 		}
 
@@ -71,88 +96,6 @@
 			> span > span > bdi {
 				color: @_sap_ui_rta_Toolbar_Adaptation_TextColor;
 			}
-		}
-	}
-
-	.sapUiRtaVersionHistory {
-		box-shadow: var(--sapContent_Shadow2);
-
-		.sapMGHLITitle {
-			color: @_sap_ui_rta_Toolbar_Adaptation_TextColor;
-		}
-
-		.sapMLIBHighlightWarning {
-			background: @_sap_ui_rta_Toolbar_Adaptation_DraftVersionColor;
-		}
-
-		.sapMLIBHighlightWarning ~ .sapMLIBContent .sapMFeedListItemTextString {
-			color: @_sap_ui_rta_Toolbar_Adaptation_DraftVersionColor;
-		}
-
-		.sapMLIBHighlightSuccess {
-			background: @_sap_ui_rta_Toolbar_Adaptation_ActiveVersionColor;
-		}
-
-		.sapUiRtaVersionsList {
-			border-bottom: 0.125rem solid @_sap_ui_rta_Toolbar_Adaptation_TextColor;
-
-			.sapMLIBTypeInactive {
-
-				&.sapMLIBFocusable:focus {
-					outline: none;
-				}
-
-				.sapMLIBContent {
-					margin-top: -1rem;
-				}
-
-				.sapMGHLITitle {
-					cursor: default;
-					text-align: center;
-					width: 100%;
-				}
-			}
-
-			.sapMListUl .sapMLIB.sapMGHLI {
-				border-bottom: 0.0625rem solid @_sap_ui_rta_Toolbar_Adaptation_TextColor;
-				box-shadow: none;
-			}
-		}
-
-		.sapMLIBHighlightSuccess ~ .sapMLIBContent .sapMFeedListItemTextString {
-			color: @_sap_ui_rta_Toolbar_Adaptation_ActiveVersionColor;
-		}
-
-		.sapMLIBHighlightSuccess ~ .sapMLIBContent .sapMFeedListItemInfoText,
-		.sapMLIBHighlightSuccess ~ .sapMLIBContent .sapMFeedListItemTimestampText {
-			color: @_sap_ui_rta_Toolbar_Adaptation_ActiveVersionColor;
-		}
-
-		.sapMFeedListItemTextString {
-			color: @_sap_ui_rta_Toolbar_Adaptation_TextColor;
-			cursor: pointer;
-		}
-
-		.sapMFeedListItemFooter,
-		.sapMFeedListItemTimestampText,
-		.sapMFeedListItemInfoText {
-			color: @_sap_ui_rta_Toolbar_Adaptation_TextColor;
-			cursor: pointer;
-		}
-
-		.sapMFeedListShowSeparatorsAll.sapMLIB,
-		.sapMListTblCell,
-		.sapMListTblNavCol {
-			border: 0;
-		}
-
-		.sapMPopoverArr::after {
-			border: 0;
-		}
-
-		.sapMLIBFocusable:focus {
-			outline: 0.0625rem dotted @_sap_ui_rta_Toolbar_Adaptation_TextColor;
-			outline-offset: calc(-0.0625rem - 0.0625rem);
 		}
 	}
 }

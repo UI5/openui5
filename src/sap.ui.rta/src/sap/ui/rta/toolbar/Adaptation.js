@@ -136,12 +136,12 @@ sap.ui.define([
 		return this.getExtension("versioning", Versioning).formatVersionButtonText(aVersions, sDisplayedVersion);
 	};
 
-	Adaptation.prototype.showVersionHistory = function(oEvent) {
-		return this.getExtension("versioning", Versioning).showVersionHistory(oEvent);
+	Adaptation.prototype._openVersionTitleDialog = function() {
+		return this.getExtension("versioning", Versioning).openActivateVersionDialog();
 	};
 
-	Adaptation.prototype._openVersionTitleDialog = function(sDisplayedVersion) {
-		return this.getExtension("versioning", Versioning).openActivateVersionDialog(sDisplayedVersion);
+	Adaptation.prototype.showManageVersions = function() {
+		return this.getExtension("versioning", Versioning).showManageVersions();
 	};
 
 	Adaptation.prototype.showHardReloadInfoPopover = function(oEvent) {
@@ -178,8 +178,14 @@ sap.ui.define([
 					formatSaveAsEnabled,
 					formatManageAppVariants: formatAppVariantsEnabled.bind(this),
 					formatSaveAsAppVariants: formatSaveAsAppVariantsEnabled.bind(this),
+					saveAsAdaptation: this.onSaveAsAdaptation.bind(this),
+					editAdaptation: this.onEditAdaptation.bind(this),
+					deleteAdaptation: this.onDeleteAdaptation.bind(this),
+					manageAdaptations: this.onManageAdaptations.bind(this),
+					switchAdaptation: this.onSwitchAdaptations.bind(this),
 					saveAs: onSaveAsPressed.bind(this),
 					openWhatsNewOverviewDialog: openWhatsNewOverviewDialog.bind(this, this.getRtaInformation().flexSettings.layer),
+					showFeedbackForm: this.showFeedbackForm.bind(this),
 					openGuidedTour,
 					highlightAllChanges: this.eventHandler.bind(this, "HighlightAllChanges")
 				}
@@ -206,24 +212,18 @@ sap.ui.define([
 			controller: {
 				activate: this._openVersionTitleDialog.bind(this),
 				discardDraft: this.eventHandler.bind(this, "DiscardDraft"),
+				showManageVersions: this.showManageVersions.bind(this),
 				formatDiscardDraftVisible: this.formatDiscardDraftVisible.bind(this),
 				formatPublishVersionEnabled: this.formatPublishVersionEnabled.bind(this),
 				modeChange: this.eventHandler.bind(this, "ModeChange"),
 				undo: this.eventHandler.bind(this, "Undo"),
 				redo: this.eventHandler.bind(this, "Redo"),
-				saveAsAdaptation: this.onSaveAsAdaptation.bind(this),
-				editAdaptation: this.onEditAdaptation.bind(this),
-				deleteAdaptation: this.onDeleteAdaptation.bind(this),
-				manageAdaptations: this.onManageAdaptations.bind(this),
-				switchAdaptation: this.onSwitchAdaptations.bind(this),
 				publishVersion: this.eventHandler.bind(this, "PublishVersion"),
 				save: this.eventHandler.bind(this, "Save"),
 				exit: this.eventHandler.bind(this, "Exit"),
 				formatVersionButtonText: this.formatVersionButtonText.bind(this),
 				formatSaveVisibility,
-				showVersionHistory: this.showVersionHistory.bind(this),
 				showActionsMenu: this.showActionsMenu.bind(this),
-				showFeedbackForm: this.showFeedbackForm.bind(this),
 				showHardReloadInfoPopover: this.showHardReloadInfoPopover.bind(this),
 				saveAndReloadApp: this.eventHandler.bind(this, "SaveAndReload"),
 				navigateBack: this.navigateBack.bind(this)
@@ -430,7 +430,9 @@ sap.ui.define([
 
 		return Fragment.load({
 			name: "sap.ui.rta.toolbar.FeedbackDialog",
-			controller: this
+			controller: {
+				closeFeedbackForm: this.closeFeedbackForm.bind(this)
+			}
 		}).then(function(oFeedbackDialog) {
 			this._oFeedbackDialog = oFeedbackDialog;
 			this._oFeedbackDialog.addStyleClass(Utils.getRtaStyleClassName());

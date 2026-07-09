@@ -29,39 +29,6 @@
 			}
 		}
 
-		.sapMSegBBtn.sapMSegBBtnFocusable {
-
-			.sapMSegBBtnInner {
-				background-color: @_sap_ui_rta_Toolbar_Adaptation_SegBBtnBackgroundColor;
-				color: @_sap_ui_rta_Toolbar_Adaptation_TextColor;
-			}
-
-			&.sapMSegBBtnSel {
-
-				&:hover .sapMSegBBtnInner::after {
-					border-bottom: 0.125rem solid @_sap_ui_rta_Toolbar_Adaptation_SegBBtnHoverTextColor;
-				}
-
-				&:hover .sapMSegBBtnInner {
-					color: @_sap_ui_rta_Toolbar_Adaptation_SegBBtnHoverTextColor;
-					background-color: @_sap_ui_rta_Toolbar_Adaptation_SegBBtnHoverBackgroundColor;
-
-					.sapUiIcon {
-						color: @_sap_ui_rta_Toolbar_Adaptation_SegBBtnHoverTextColor;
-					}
-				}
-			}
-
-			&:hover .sapMSegBBtnInner {
-				color: @_sap_ui_rta_Toolbar_Adaptation_SegBBtnHoverTextColor;
-				background-color: @_sap_ui_rta_Toolbar_Adaptation_SegBBtnHoverBackgroundColor;
-
-				.sapUiIcon {
-					color: @_sap_ui_rta_Toolbar_Adaptation_SegBBtnHoverTextColor;
-				}
-			}
-		}
-
 		.sapUiRtaVersionButton.sapUiRtaVersionColor:hover {
 
 			> span.sapMBtnHoverable.sapMBtnTransparent > span.sapMBtnIcon,
@@ -69,31 +36,34 @@
 				color: @_sap_ui_rta_Toolbar_Adaptation_SegBBtnHoverTextColor;
 			}
 		}
-	}
-	.sapUiRtaVersionHistory {
 
-		.sapMListUl > .sapMLIB {
-			background: @_sap_ui_rta_Toolbar_Adaptation_VersionHistoryBackgroundColor;
-		}
-
-		.sapMLIBHoverable:hover {
-			background: darken(@_sap_ui_rta_Toolbar_Adaptation_VersionHistoryBackgroundColor, 5%);
-		}
-	}
-}
-
-.sapUiSizeCozy.sapUiRtaMode {
-
-	.sapUiRtaToolbar {
-
-		.sapMSegB {
-
-			.sapMSegBBtn {
-
-				.sapMSegBBtnInner {
-					line-height: 2rem; /* 32px */
+		.sapUiRtaVersionButton.sapUiRtaActiveVersionAccent,
+		.sapUiRtaVersionButton.sapUiRtaDraftVersionAccent,
+		.sapUiRtaVersionButton.sapUiRtaVersionColor {
+			> .sapMBtn:hover {
+				> span > span > bdi,
+				> span::after {
+					color: var(--sapButton_Lite_Hover_TextColor);
 				}
 			}
+		}
+		.sapUiRtaVersionButton.sapUiRtaDraftVersionAccent {
+			> .sapMBtn:not(:hover) {
+				> span.sapMBtnInner.sapMBtnAttention {
+					background-color: transparent;
+					border-color: transparent;
+					color: @_sap_ui_rta_Toolbar_Adaptation_DraftVersionColor;
+				}
+			}
+			> .sapMBtn:hover {
+				> span.sapMBtnInner.sapMBtnAttention.sapMBtnHoverable {
+					background-color: var(--sapButton_Lite_Hover_Background);
+					border-color: var(--sapButton_Lite_Hover_BorderColor);
+				}
+			}
+		}
+		.sapUiRtaVersionButton .sapMBtnActive {
+			background-color: transparent;
 		}
 	}
 }

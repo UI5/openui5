@@ -3,27 +3,31 @@
  */
 
 sap.ui.define([
-	"sap/base/security/encodeXML",
-	"sap/m/GroupHeaderListItem",
+	"sap/m/library",
 	"sap/ui/base/ManagedObject",
 	"sap/ui/core/format/DateFormat",
-	"sap/ui/core/Fragment",
 	"sap/ui/core/message/MessageType",
+	"sap/ui/core/Fragment",
+	"sap/ui/core/ResizeHandler",
+	"sap/ui/core/library",
 	"sap/ui/fl/initial/api/Version",
-	"sap/ui/model/Sorter",
 	"sap/ui/rta/Utils"
 ], function(
-	encodeXML,
-	GroupHeaderListItem,
+	mLibrary,
 	ManagedObject,
 	DateFormat,
-	Fragment,
 	MessageType,
+	Fragment,
+	ResizeHandler,
+	coreLibrary,
 	Version,
-	Sorter,
 	Utils
 ) {
 	"use strict";
+
+	// shortcut for sap.ui.core.ValueState
+	const { ValueState } = coreLibrary;
+	const { ButtonType } = mLibrary;
 
 	var DRAFT_ACCENT_COLOR = "sapUiRtaDraftVersionAccent";
 	var ACTIVE_ACCENT_COLOR = "sapUiRtaActiveVersionAccent";
@@ -57,7 +61,7 @@ sap.ui.define([
 		}
 	});
 
-	function versionSelected(oEvent) {
+	async function versionSelected(oEvent) {
 		var oVersionsBindingContext = oEvent.getSource().getBindingContext("versions");
 		var sVersion = Version.Number.Original;
 
@@ -66,6 +70,15 @@ sap.ui.define([
 			sVersion = oVersionsBindingContext.getProperty("version");
 		}
 
+		// The dialog must be fully closed before the switch is triggered; otherwise a UShell soft
+		// reload keeps the modal dialog's block layer in the DOM, covering the reloaded application.
+		// Closing is asynchronous (close animation + afterClose), so we wait for it to complete.
+		if (this.oDialog?.isOpen()) {
+			await new Promise((resolve) => {
+				this.oDialog.attachEventOnce("afterClose", resolve);
+				this.oDialog.close();
+			});
+		}
 		this.getToolbar().fireEvent("switchVersion", { version: sVersion });
 	}
 
@@ -106,15 +119,42 @@ sap.ui.define([
 		}
 	}
 
+	function applyDraftVersionClasses(oEvent) {
+		oEvent.getSource().getItems().forEach((oItem) => {
+			const sType = oItem.getBindingContext("versions").getProperty("type");
+			if (sType === Version.Type.Draft) {
+				oItem.addStyleClass(DRAFT_ACCENT_COLOR);
+			} else {
+				oItem.removeStyleClass(DRAFT_ACCENT_COLOR);
+			}
+		});
+		this.adjustOriginalVersionListPadding();
+	}
+
+	/**
+	 * Aligns the footer table with the scrollable version list above it.
+	 *
+	 * When the version list overflows, its scroll container reserves space for a vertical
+	 * scrollbar, which shrinks the list's content width. The footer table lives outside that
+	 * scroll container, so without compensation its columns would be shifted to the right by the
+	 * scrollbar width. The right padding mirrors that reserved space so both tables stay aligned.
+	 */
+	Versioning.prototype.adjustOriginalVersionListPadding = function() {
+		const oOriginalVersionList = this.oDialog?.getFooter()?.getContent()[0];
+		const oScrollSection = this.oDialog?.getDomRef("cont");
+		const oFooterTableDomRef = oOriginalVersionList?.getDomRef();
+		if (!oScrollSection || !oFooterTableDomRef) {
+			return;
+		}
+		const iScrollbarWidth = oScrollSection.offsetWidth - oScrollSection.clientWidth;
+		oFooterTableDomRef.style.paddingRight = iScrollbarWidth ? `${iScrollbarWidth}px` : "";
+	};
+
 	function formatVersionTitle(sTitle, sType) {
 		if (sType === Version.Type.Draft) {
 			return this.oTextResources.getText("TIT_DRAFT");
 		}
-		// Version title is a string and should be displayed exactly the same as what the keyuser entered
-		// The back end do not encoded it but the FeedListItem supports text with html formatted tags
-		// So it need to be encoded before passing to control to make sure it is displayed correctly
-		// In addition, it also helps to avoid XSS security thread
-		return sTitle ? encodeXML(sTitle) : this.oTextResources.getText("TIT_VERSION_1");
+		return sTitle || this.oTextResources.getText("TIT_VERSION_1");
 	}
 
 	function formatVersionTimeStamp(sActivatedAtTimeStamp, sImportedAtTimeStamp) {
@@ -132,28 +172,22 @@ sap.ui.define([
 		}).format(new Date(sTimeStamp));
 	}
 
-	function getGroupHeaderFactory(oGroup) {
-		return new GroupHeaderListItem({
-			title: oGroup.key
-				? this.oTextResources.getText("TIT_VERSION_HISTORY_PUBLISHED")
-				: this.oTextResources.getText("TIT_VERSION_HISTORY_UNPUBLISHED"),
-			visible: this.getToolbar().getModel("versions").getProperty("/publishVersionVisible")
-		}).addStyleClass("sapUiRtaVersionHistoryGrouping").addStyleClass("sapUiRtaVersionHistory");
-	}
-
 	function setVersionButtonAccentColor(oVersionButton, sType) {
 		switch (sType) {
 			case Version.Type.Draft:
+				oVersionButton.setType(ButtonType.Attention);
 				oVersionButton.addStyleClass(DRAFT_ACCENT_COLOR);
 				oVersionButton.removeStyleClass(ACTIVE_ACCENT_COLOR);
 				oVersionButton.removeStyleClass(VERSION_COLOR);
 				break;
 			case Version.Type.Active:
+				oVersionButton.setType(ButtonType.Transparent);
 				oVersionButton.addStyleClass(ACTIVE_ACCENT_COLOR);
 				oVersionButton.removeStyleClass(DRAFT_ACCENT_COLOR);
 				oVersionButton.removeStyleClass(VERSION_COLOR);
 				break;
 			default:
+				oVersionButton.setType(ButtonType.Transparent);
 				oVersionButton.addStyleClass(VERSION_COLOR);
 				oVersionButton.removeStyleClass(ACTIVE_ACCENT_COLOR);
 				oVersionButton.removeStyleClass(DRAFT_ACCENT_COLOR);
@@ -189,7 +223,7 @@ sap.ui.define([
 	};
 
 	Versioning.prototype.formatPublishVersionEnabled = function(bPublishVisible, sDisplayedVersion) {
-		return bPublishVisible && sDisplayedVersion !== Version.Number.Draft;
+		return bPublishVisible && sDisplayedVersion !== Version.Number.Draft && sDisplayedVersion !== Version.Number.Original;
 	};
 
 	Versioning.prototype.formatDiscardDraftVisible = function(sDisplayedVersion, bVersioningEnabled, bAdaptationMode) {
@@ -197,45 +231,87 @@ sap.ui.define([
 	};
 
 	// ------ Dialog handling ------
-	Versioning.prototype.showVersionHistory = function(oEvent) {
-		var oVersionButton = oEvent.getSource();
 
-		this._oVersionHistoryDialogPromise ||= Fragment.load({
-			name: "sap.ui.rta.toolbar.versioning.VersionHistory",
-			id: `${this.getToolbar().getId()}_fragment--sapUiRta_versionHistoryDialog`,
-			controller: {
-				formatVersionTitle: formatVersionTitle.bind(this),
-				formatVersionTimeStamp,
-				formatHighlight,
-				formatHighlightText: formatHighlightText.bind(this),
-				formatOriginalAppHighlight,
-				formatOriginalAppHighlightText: formatOriginalAppHighlightText.bind(this),
-				versionSelected: versionSelected.bind(this),
-				getGroupHeaderFactory: getGroupHeaderFactory.bind(this)
-			}
-		}).then(function(oDialog) {
-			this.getToolbar().addDependent(oDialog);
-			return oDialog;
-		}.bind(this));
+	function closeManageVersionsDialog() {
+		this.oDialog.close();
+	}
 
-		return this._oVersionHistoryDialogPromise.then(function(oVersionsDialog) {
-			if (!oVersionsDialog.isOpen()) {
-				oVersionsDialog.openBy(oVersionButton);
-				if (this.getToolbar().getModel("versions").getProperty("/publishVersionVisible")) {
-					var oList = this.getToolbar().getControl("versionHistoryDialog--versionList");
-					var oSorter = new Sorter({
-						path: "isPublished",
-						group: true
-					});
-					oList.getBinding("items").sort(oSorter);
+	function formatVersionState(sType, bIsPublished) {
+		if (sType === Version.Type.Active && !bIsPublished) {
+			return ValueState.Success;
+		}
+		if (bIsPublished) {
+			return ValueState.Information;
+		}
+		return undefined;
+	}
+
+	function formatVersionIcon(sType, bIsPublished) {
+		if (sType === Version.Type.Active && !bIsPublished) {
+			return "sap-icon://sys-enter-2";
+		}
+		if (bIsPublished) {
+			return "sap-icon://information";
+		}
+		return undefined;
+	}
+
+	function formatVersionStateText(sType, bIsPublished) {
+		if (sType === Version.Type.Active && !bIsPublished) {
+			return this.oTextResources.getText("LBL_ACTIVE");
+		}
+		if (bIsPublished) {
+			return this.oTextResources.getText("TIT_VERSION_HISTORY_PUBLISHED");
+		}
+		return undefined;
+	}
+
+	function formatOriginalVersionButtonEnabled(sDisplayedVersion) {
+		return sDisplayedVersion !== Version.Number.Original;
+	}
+
+	Versioning.prototype.showManageVersions = async function() {
+		if (!this._oManageVersionsDialogPromise) {
+			this._oManageVersionsDialogPromise ||= Fragment.load({
+				name: "sap.ui.rta.toolbar.versioning.ManageVersions",
+				id: `${this.getToolbar().getId()}_fragment--sapUiRta_manageVersionsDialog`,
+				controller: {
+					formatVersionTitle: formatVersionTitle.bind(this),
+					formatVersionTimeStamp,
+					formatHighlight,
+					formatHighlightText: formatHighlightText.bind(this),
+					formatOriginalAppHighlight,
+					formatOriginalAppHighlightText: formatOriginalAppHighlightText.bind(this),
+					versionSelected: versionSelected.bind(this),
+					closeManageVersionsDialog: closeManageVersionsDialog.bind(this),
+					formatVersionState: formatVersionState.bind(this),
+					formatVersionIcon: formatVersionIcon.bind(this),
+					formatVersionStateText: formatVersionStateText.bind(this),
+					applyDraftVersionClasses: applyDraftVersionClasses.bind(this),
+					formatOriginalVersionButtonEnabled
 				}
-			} else {
-				oVersionsDialog.close();
-			}
-		}.bind(this));
+			});
+			this.oDialog = await this._oManageVersionsDialogPromise;
+			this.oDialog.attachAfterOpen(() => {
+				this.adjustOriginalVersionListPadding();
+				this._iManageVersionsResizeHandler = ResizeHandler.register(
+					this.oDialog,
+					this.adjustOriginalVersionListPadding.bind(this)
+				);
+			});
+			this.oDialog.attachAfterClose(() => {
+				if (this._iManageVersionsResizeHandler) {
+					ResizeHandler.deregister(this._iManageVersionsResizeHandler);
+					delete this._iManageVersionsResizeHandler;
+				}
+			});
+			this.getToolbar().addDependent(this.oDialog);
+		}
+		await this._oManageVersionsDialogPromise;
+		this.oDialog.open();
 	};
 
-	Versioning.prototype.openActivateVersionDialog = function(sDisplayedVersion) {
+	Versioning.prototype.openActivateVersionDialog = function() {
 		if (!this._oActivateVersionDialogPromise) {
 			this._oActivateVersionDialogPromise = Fragment.load({
 				name: "sap.ui.rta.toolbar.versioning.VersionTitleDialog",
@@ -268,9 +344,6 @@ sap.ui.define([
 
 		return this._oActivateVersionDialogPromise.then(function() {
 			var sTitle = this.oTextResources.getText("TIT_VERSION_TITLE_DIALOG");
-			if (sDisplayedVersion !== Version.Number.Draft) {
-				sTitle = this.oTextResources.getText("TIT_REACTIVATE_VERSION_TITLE_DIALOG");
-			}
 			this._oActivateVersionDialog.setTitle(sTitle);
 			return this._oActivateVersionDialog.open();
 		}.bind(this));

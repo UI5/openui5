@@ -19,99 +19,8 @@
 
 	.sapUiRtaToolbar.sapUiRtaToolbarAdaptation {
 
-		/* Segmented Buttons */
-		.sapMSegB {
-			background: @_sap_ui_rta_Toolbar_Adaptation_SegBBtnBackgroundColor;
-
-			.sapMSegBBtn {
-
-				.sapMSegBBtnInnerWrapper {
-					background: @_sap_ui_rta_Toolbar_Adaptation_SegBBtnBackgroundColor;
-					border: none;
-				}
-
-				&.sapMSegBBtnFocusable {
-
-					.sapMSegBBtnInner {
-						color: @_sap_ui_rta_Toolbar_Adaptation_TextColor;
-					}
-
-					&.sapMSegBBtnSel:focus .sapMSegBBtnInner {
-						outline: 0.0625rem solid @_sap_ui_rta_Toolbar_Adaptation_SegBBtnFocusColor; //1px
-						outline-offset: -0.125rem; /* 2px */
-					}
-
-					&:focus .sapMSegBBtnInner {
-						outline: none;
-
-						&::after {
-							left: 0.0625rem;
-							top: 0.0625rem;
-							right: 0.0625rem;
-							bottom: 0.0625rem;
-						}
-					}
-
-					&.sapMSegBBtnSel {
-
-						&:hover .sapMSegBBtnInner {
-
-							&::after {
-								content: none;
-							}
-						}
-
-						& .sapMSegBBtnInner {
-							background: @_sap_ui_rta_Toolbar_Adaptation_SegBBtnSelectedBackgroundColor;
-							color: @_sap_ui_rta_Toolbar_Adaptation_SegBBtnTextColor;
-
-							&::after {
-								content: none;
-							}
-
-							.sapUiIcon {
-								color: @_sap_ui_rta_Toolbar_Adaptation_SegBBtnTextColor;
-							}
-						}
-					}
-				}
-			}
-
-			&.sapMSegBIcons {
-
-				.sapMSegBBtn {
-
-					&.sapMSegBBtnFocusable {
-
-						&:not(.sapMSegBBtnSel):focus {
-
-							.sapMSegBBtnInner {
-								outline: 0.125rem solid @_sap_ui_rta_Toolbar_Adaptation_FocusOutlineColor; /* 1px */
-								border-radius: @_sap_ui_rta_Toolbar_Adaptation_BorderRadius;
-								outline-offset: -0.125rem;
-
-								&::after {
-									content: none;
-								}
-							}
-						}
-
-						&.sapMSegBBtnSel:focus {
-
-							.sapMSegBBtnInner {
-
-								&::after {
-									content: none;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
 		/* Buttons */
-		.sapMBtn:not(.sapUiRtaVersionButton) {
+		:not(.sapUiRtaVersionButton) > .sapMBtn {
 
 			&.sapMBtnDisabled .sapMBtnInner {
 				opacity: 1.0;
@@ -149,19 +58,6 @@
 					color: @_sap_ui_rta_Toolbar_Adaptation_ActiveVersionColor !important;
 				}
 			}
-		}
-	}
-
-	.sapUiRtaVersionHistory {
-
-		.sapMLIB:not(:hover) {
-			background: @_sap_ui_rta_Toolbar_Adaptation_VersionListBackgroundColor;
-		}
-
-		.sapMLIBHoverable:hover {
-			outline: 0.125rem solid @_sap_ui_rta_Toolbar_Adaptation_FocusOutlineColor;
-			border-radius: @_sap_ui_rta_Toolbar_Adaptation_BorderRadius;
-			outline-offset: -0.125rem;
 		}
 	}
 }

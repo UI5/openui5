@@ -150,7 +150,6 @@ sap.ui.define([
 		QUnit.test("When navigating through all steps until completion", async function(assert) {
 			const oPopover = Element.getElementById("guidedTourMarker--guidedTourMarkerPopover");
 			const { oSteps } = this;
-			const oStepWithListContent = oSteps.find((oStep) => oStep.listContent && oStep.listContent.length > 0);
 			const oList = Element.getElementById("guidedTourMarker--navigationList");
 			let currentStepIndex = 0;
 
@@ -161,19 +160,19 @@ sap.ui.define([
 				const oData = oModel.getData();
 
 				// Check if the current step was skipped
-				const expectedStepIndex = oSteps.findIndex((oStep) => oStep.title === oData.title);
-				if (expectedStepIndex !== currentStepIndex) {
+				const nExpectedStepIndex = oSteps.findIndex((oStep) => oStep.title === oData.title);
+				if (nExpectedStepIndex !== currentStepIndex) {
 					assert.ok(true, `Step ${currentStepIndex} was skipped because element was not found`);
-					assert.ok(expectedStepIndex >= currentStepIndex, `Step index progresses forward: current=${currentStepIndex}, next=${expectedStepIndex}`);
-					currentStepIndex = expectedStepIndex;
+					assert.ok(nExpectedStepIndex >= currentStepIndex, `Step index progresses forward: current=${currentStepIndex}, next=${nExpectedStepIndex}`);
+					currentStepIndex = nExpectedStepIndex;
 				}
 
 				if (oList.getVisible()) {
 					assert.ok(oList.getVisible(), "then the list is visible in the popover");
 					assert.strictEqual(
 						oList.getItems().length,
-						oStepWithListContent.listContent.length,
-						"then the  list contains the correct number of items"
+						oSteps[currentStepIndex].listContent.length,
+						"then the list contains the correct number of items"
 					);
 				}
 

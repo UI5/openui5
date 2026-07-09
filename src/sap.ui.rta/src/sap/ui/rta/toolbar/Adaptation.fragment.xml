@@ -34,20 +34,45 @@
 					<OverflowToolbarLayoutData priority="Disappear"/>
 				</layoutData>
 			</Label>
-			<Button
+			<MenuButton
 				id="sapUiRta_versionButton"
-				type="Transparent"
 				class="sapUiRtaVersionButton"
-				icon="sap-icon://megamenu"
-				iconFirst="false"
 				visible="{= (${versions>/versioningEnabled} &amp;&amp; ${controls>/adaptationMode} &amp;&amp; ${controls>/changesNeedHardReload} === false)}"
 				text="{parts: [{path: 'versions>/versions'}, {path: 'versions>/displayedVersion'}], formatter: '.formatVersionButtonText'}"
-				tooltip="{i18n>TOL_SHOW_VERSION_HISTORY}"
-				press=".showVersionHistory">
-				<layoutData>
-					<OverflowToolbarLayoutData priority="High"/>
-				</layoutData>
-			</Button>
+				menuPosition="BeginBottom">
+				<Menu class="sapUiRTABorder">
+					<MenuItem
+						id="sapUiRta_discardDraft"
+						text="{i18n>TOL_DISCARD_DRAFT}"
+						icon="sap-icon://delete"
+						visible="{parts: ['versions>/displayedVersion', 'versions>/versioningEnabled', 'controls>/adaptationMode'], formatter: '.formatDiscardDraftVisible'}"
+						tooltip="{i18n>TOL_DISCARD_DRAFT}"
+						press=".discardDraft" />
+					<MenuItem
+						id="sapUiRta_activate"
+						icon="sap-icon://activate"
+						press=".activate"
+						visible="{= (${versions>/versioningEnabled} &amp;&amp; ${controls>/adaptationMode})}"
+						enabled="{versions>/activateEnabled}"
+						text="{i18n>TOL_ACTIVATE}"
+						tooltip="{i18n>TOL_ACTIVATE}" />
+					<MenuItem
+						id="sapUiRta_publishVersion"
+						enabled="{parts: ['versions>/publishVersionVisible', 'versions>/displayedVersion'], formatter: '.formatPublishVersionEnabled'}"
+						visible="{= (${versions>/versioningEnabled} &amp;&amp; ${controls>/adaptationMode} &amp;&amp; ${versions>/publishVersionVisible})}"
+						press=".publishVersion"
+						icon="sap-icon://shipping-status"
+						text="{i18n>TOL_PUBLISH_VERSION}"
+						tooltip="{i18n>TOL_PUBLISH_VERSION}" />
+					<MenuItem
+						id="sapUiRta_showManageVersions"
+						press=".showManageVersions"
+						enabled="{= ${versions>/versions}.length > 0}"
+						icon="sap-icon://dimension"
+						text="{i18n>TIT_MANAGE_VERSIONS}"
+						tooltip="{i18n>TIT_MANAGE_VERSIONS}" />
+				</Menu>
+			</MenuButton>
 			<Button
 				id="sapUiRta_hardReloadButton"
 				type="Attention"
@@ -72,44 +97,6 @@
 					<OverflowToolbarLayoutData priority="Low"/>
 				</layoutData>
 			</Button>
-			<OverflowToolbarButton
-				id="sapUiRta_activate"
-				icon="sap-icon://activate"
-				press=".activate(${versions>/displayedVersion})"
-				visible="{= (${versions>/versioningEnabled} &amp;&amp; ${controls>/adaptationMode})}"
-				enabled="{versions>/activateEnabled}"
-				type="Transparent"
-				text="{i18n>TOL_ACTIVATE}"
-				tooltip="{i18n>TOL_ACTIVATE}">
-				<layoutData>
-					<OverflowToolbarLayoutData priority="Low" group="2" />
-				</layoutData>
-			</OverflowToolbarButton>
-			<OverflowToolbarButton
-				id="sapUiRta_publishVersion"
-				enabled="{parts: ['versions>/publishVersionVisible', 'versions>/displayedVersion'], formatter: '.formatPublishVersionEnabled'}"
-				visible="{= (${versions>/versioningEnabled} &amp;&amp; ${controls>/adaptationMode} &amp;&amp; ${versions>/publishVersionVisible})}"
-				press=".publishVersion"
-				type="Transparent"
-				icon="sap-icon://shipping-status"
-				text="{i18n>TOL_PUBLISH_VERSION}"
-				tooltip="{i18n>TOL_PUBLISH_VERSION}">
-				<layoutData>
-					<OverflowToolbarLayoutData priority="Low" group="2" />
-				</layoutData>
-			</OverflowToolbarButton>
-			<OverflowToolbarButton
-				id="sapUiRta_discardDraft"
-				icon="sap-icon://delete"
-				press=".discardDraft"
-				visible="{parts: ['versions>/displayedVersion', 'versions>/versioningEnabled', 'controls>/adaptationMode'], formatter: '.formatDiscardDraftVisible'}"
-				type="Transparent"
-				text="{i18n>TOL_DISCARD_DRAFT}"
-				tooltip="{i18n>TOL_DISCARD_DRAFT}">
-				<layoutData>
-					<OverflowToolbarLayoutData priority="Low" group="2" />
-				</layoutData>
-			</OverflowToolbarButton>
 			<OverflowToolbarButton
 				id="sapUiRta_save"
 				type="Transparent"

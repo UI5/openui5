@@ -4,7 +4,7 @@
 	<Popover
 		id="guidedTourMarkerPopover"
 		title="{/title}"
-		class="sapUiResponsivePadding--header sapUiResponsivePadding--footer sapUiContentPadding"
+		class="sapUiResponsivePadding--header sapUiResponsivePadding--footer sapUiContentPadding sapUiRTABorder"
 		placement="PreferredBottomOrFlip"
 		modal="true"
 		horizontalScrolling="false"

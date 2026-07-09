@@ -3,11 +3,15 @@
  */
 
 sap.ui.define([
+	"sap/base/util/merge",
 	"sap/ui/core/Element",
-	"sap/ui/core/Lib"
+	"sap/ui/core/Lib",
+	"sap/ui/fl/initial/api/Version"
 ], function(
+	merge,
 	Element,
-	Lib
+	Lib,
+	Version
 ) {
 	"use strict";
 
@@ -16,7 +20,9 @@ sap.ui.define([
 	const oTextResources = Lib.getResourceBundleFor("sap.ui.rta");
 
 	function filterAvailableBurgerMenuActions(oGeneralTour) {
+		const oCurrentGeneralTour = merge({}, oGeneralTour);
 		const oControlsModelData = Element.getElementById("sapUIRta_toolbar").getModel("controls").getData();
+		const oVersionsModelData = Element.getElementById("sapUIRta_toolbar").getModel("versions").getData();
 		const aAvailableBurgerMenuActions = {
 			newFeaturesOverview: true,
 			translation: oControlsModelData.translation.visible,
@@ -25,20 +31,31 @@ sap.ui.define([
 			restore: oControlsModelData.restore.visible,
 			highlightAllChanges: true,
 			feedback: oControlsModelData.feedbackButton.visible,
-			contextBasedAdaptations: oControlsModelData.contextBasedAdaptation.visible
+			contextBasedAdaptations: oControlsModelData.contextBasedAdaptation.visible,
+			discard: oVersionsModelData.displayedVersion === Version.Number.Draft,
+			activate: true,
+			publish: oVersionsModelData.publishVersionVisible,
+			manageVersions: true
 		};
 
 		// Find the index of the burger menu step
-		const nBurgerMenuStepIndex = oGeneralTour.steps.findIndex((oStep) =>
+		const nBurgerMenuStepIndex = oCurrentGeneralTour.steps.findIndex((oStep) =>
 			oStep.title === oTextResources.getText("TIT_TOUR_GENERAL_STEP_BURGER_MENU_TITLE")
 		);
-
 		// Set the available actions
-		oGeneralTour.steps[nBurgerMenuStepIndex].listContent = oGeneralTour.steps[nBurgerMenuStepIndex].listContent.filter((oItem) =>
+		oCurrentGeneralTour.steps[nBurgerMenuStepIndex].listContent = oCurrentGeneralTour.steps[nBurgerMenuStepIndex].listContent.filter((oItem) =>
 			aAvailableBurgerMenuActions[oItem.id]
 		);
 
-		return oGeneralTour;
+		const nVersionsMenuStepIndex = oCurrentGeneralTour.steps.findIndex((oStep) =>
+			oStep.title === oTextResources.getText("TIT_TOUR_GENERAL_STEP_VERSIONS_DROPDOWN_TITLE")
+		);
+		// Set the available actions
+		oCurrentGeneralTour.steps[nVersionsMenuStepIndex].listContent = oCurrentGeneralTour.steps[nVersionsMenuStepIndex].listContent.filter((oItem) =>
+			aAvailableBurgerMenuActions[oItem.id]
+		);
+
+		return oCurrentGeneralTour;
 	}
 
 	/**
@@ -102,31 +119,42 @@ sap.ui.define([
 				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_redo"
 			},
 			{
-				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_VERSIONS_DROPDOWN_TITLE"),
-				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_VERSIONS_DROPDOWN_DESCRIPTION"),
-				listContent: [],
-				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_versionHistoryDialog--popover",
-				waitForElement: true,
-				actionSelectors: ["sapUIRta_toolbar_fragment--sapUiRta_versionButton"]
-			},
-			{
-				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_ACTIVATE_VERSION_BUTTON_TITLE"),
-				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_ACTIVATE_VERSION_BUTTON_DESCRIPTION"),
-				listContent: [],
-				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_activate"
-			},
-			{
-				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_PUBLISH_BUTTON_TITLE"),
-				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_PUBLISH_BUTTON_DESCRIPTION"),
-				listContent: [],
-				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_publishVersion"
-			},
-			{
 				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_SAVE_BUTTON_TITLE"),
 				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_SAVE_BUTTON_DESCRIPTION"),
 				listContent: [],
 				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_save",
 				actionSelectors: []
+			},
+			{
+				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_VERSIONS_DROPDOWN_TITLE"),
+				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_VERSIONS_DROPDOWN_DESCRIPTION"),
+				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_versionButton",
+				listContent: [
+					{
+						id: "discard",
+						title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_DISCARD_BUTTON_TITLE"),
+						description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_DISCARD_BUTTON_DESCRIPTION"),
+						icon: "sap-icon://delete"
+					},
+					{
+						id: "activate",
+						title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_ACTIVATE_VERSION_BUTTON_TITLE"),
+						description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_ACTIVATE_VERSION_BUTTON_DESCRIPTION"),
+						icon: "sap-icon://activate"
+					},
+					{
+						id: "publish",
+						title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_PUBLISH_BUTTON_TITLE"),
+						description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_PUBLISH_BUTTON_DESCRIPTION"),
+						icon: "sap-icon://shipping-status"
+					},
+					{
+						id: "manageVersions",
+						title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_MANAGE_VERSIONS_BUTTON_TITLE"),
+						description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_MANAGE_VERSIONS_BUTTON_DESCRIPTION"),
+						icon: "sap-icon://dimension"
+					}
+				]
 			},
 			{
 				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_BACK_BUTTON_TITLE"),
@@ -137,6 +165,7 @@ sap.ui.define([
 			{
 				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_BURGER_MENU_TITLE"),
 				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_BURGER_MENU_DESCRIPTION"),
+				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_actionsMenu",
 				listContent: [
 					{
 						id: "translation",
@@ -186,8 +215,7 @@ sap.ui.define([
 						description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_BURGER_MENU_GENERAL_TOUR"),
 						icon: "sap-icon://map-3"
 					}
-				],
-				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_actionsMenu"
+				]
 			}
 		]
 	};

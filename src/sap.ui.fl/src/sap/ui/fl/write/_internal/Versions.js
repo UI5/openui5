@@ -20,7 +20,9 @@ sap.ui.define([
 	"use strict";
 
 	var _mInstances = {};
-	var MODEL_SIZE_LIMIT = 9;
+	// TODO: Currently the limit parameter is mandatory, as soon as this is changed we can remove the parameter from the backend request
+	// The model size limit still needs to be adjusted, as it's 100 by default
+	var MODEL_SIZE_LIMIT = 9999;
 	// Limiting the data requested from the back end but one additional version is requested to
 	// ensure sufficient data is present even if a draft was returned and later discarded
 	var BACKEND_REQUEST_LIMIT = MODEL_SIZE_LIMIT + 1;

@@ -1236,7 +1236,7 @@ sap.ui.define([
 				const bChangesNeedHardReload = this._bSavedChangesNeedReload || await this._oSerializer.needsReload();
 				this._oToolbarControlsModel.setProperty("/changesNeedHardReload", bChangesNeedHardReload);
 			}
-			if (this.getChangeVisualization && this.getChangeVisualization().getInitialized()) {
+			if (this.getChangeVisualization && this.getChangeVisualization()?.getInitialized()) {
 				this.getChangeVisualization().refreshBorders()
 				.catch(function(oError) {
 					Log.error("Failed to refresh change visualization borders after stack modification", oError);
