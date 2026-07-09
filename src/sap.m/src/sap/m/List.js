@@ -87,7 +87,7 @@ sap.ui.define(["./library", "./ListBase", "./ListRenderer"],
 	 *
 	 * @param {string} [sTextKey] aria role description text key
 	 * @private
-	 * @ui5-restricted sap.m.UploadSet
+	 * @ui5-restricted sap.m.upload.UploadSet, sap.ui.comp.smartchart.SmartChart
 	 * @since 1.120
 	 */
 	List.prototype.applyAriaRoleDescription = function(sTextKey) {
