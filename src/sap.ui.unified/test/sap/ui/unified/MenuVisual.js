@@ -5,12 +5,12 @@ sap.ui.define([
 	"sap/ui/unified/Menu",
 	"sap/ui/unified/MenuItem",
 	"sap/ui/unified/MenuTextFieldItem",
-	"sap/ui/unified/MenuItemsGroup",
+	"sap/ui/unified/MenuItemGroup",
 	"sap/ui/core/library",
 	"sap/ui/core/Popup",
 	"sap/m/App",
 	"sap/m/Page"
-], function(Button, Menu, MenuItem, MenuTextFieldItem, MenuItemsGroup, coreLibrary, Popup, App, Page) {
+], function(Button, Menu, MenuItem, MenuTextFieldItem, MenuItemGroup, coreLibrary, Popup, App, Page) {
 	"use strict";
 
 	var ItemSelectionMode = coreLibrary.ItemSelectionMode;
@@ -88,7 +88,7 @@ sap.ui.define([
 						]
 					})
 				}),
-				new MenuItemsGroup({
+				new MenuItemGroup({
 					itemSelectionMode: ItemSelectionMode.MultiSelect,
 					items: [
 						new MenuItem({
@@ -120,7 +120,7 @@ sap.ui.define([
 					startsSection: true,
 					icon: "sap-icon://filter"
 				}),
-				new MenuItemsGroup({
+				new MenuItemGroup({
 					itemSelectionMode: ItemSelectionMode.SingleSelect,
 					items: [
 						new MenuItem({
