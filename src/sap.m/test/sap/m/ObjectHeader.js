@@ -348,7 +348,7 @@ sap.ui.define([
 	  }),
 	  new ProgressIndicator("oh10-pi", {
 		  visible : true,
-		  state : ValueState.NEUTRAL,
+		  state : ValueState.None,
 		  displayValue : '80%',
 		  percentValue : 80,
 		  showValue : true,
@@ -361,7 +361,7 @@ sap.ui.define([
 	  }),
 	  new ProgressIndicator("oh10-pi2", {
 		  visible : true,
-		  state : ValueState.NEUTRAL,
+		  state : ValueState.None,
 		  displayValue : '80%',
 		  percentValue : 80,
 		  showValue : true,
@@ -561,7 +561,7 @@ sap.ui.define([
 		  }),
 		  new ProgressIndicator("oh18-pi", {
 			  visible : true,
-			  state : ValueState.NEUTRAL,
+			  state : ValueState.None,
 			  displayValue : '56%',
 			  percentValue : 56,
 			  showValue : true,
@@ -572,7 +572,7 @@ sap.ui.define([
 		  }),
 		  new ProgressIndicator("oh18-pi2", {
 			  visible : true,
-			  state : ValueState.NEUTRAL,
+			  state : ValueState.None,
 			  displayValue : '90%',
 			  percentValue : 90,
 			  showValue : true,

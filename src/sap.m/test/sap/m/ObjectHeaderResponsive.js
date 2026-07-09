@@ -651,7 +651,7 @@ sap.ui.define([
 		  text : "Order Shipping slow"
 	  }), new ProgressIndicator("oh18-pi", {
 		  visible : true,
-		  state : ValueState.NEUTRAL,
+		  state : ValueState.None,
 		  //displayValue : '56%',
 		  percentValue : 56,
 		  showValue : false,
@@ -661,7 +661,7 @@ sap.ui.define([
 		  text : "High"
 	  }), new ProgressIndicator("oh18-pi2", {
 		  visible : true,
-		  state : ValueState.NEUTRAL,
+		  state : ValueState.None,
 		  //displayValue : '90%',
 		  percentValue : 90,
 		  showValue : false,
@@ -730,7 +730,7 @@ sap.ui.define([
 		  text : "Order Shipping slow"
 	  }), new ProgressIndicator("oh18-piSmall", {
 		  visible : true,
-		  state : ValueState.NEUTRAL,
+		  state : ValueState.None,
 		  //displayValue : '56%',
 		  percentValue : 56,
 		  showValue : false,
@@ -740,7 +740,7 @@ sap.ui.define([
 		  text : "High"
 	  }), new ProgressIndicator("oh18-pi2Small", {
 		  visible : true,
-		  state : ValueState.NEUTRAL,
+		  state : ValueState.None,
 		  //displayValue : '90%',
 		  percentValue : 90,
 		  showValue : false,
