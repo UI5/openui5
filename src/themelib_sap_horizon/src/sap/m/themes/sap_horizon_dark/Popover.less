@@ -3,10 +3,7 @@
 /* Evening Horizon theme          */
 /* ============================== */
 
-.sapMPopoverArr::after {
-	background: var(--sapGroup_ContentBackground);
-	box-shadow: var(--sapContent_Shadow2);
-}
+@_sap_m_Popover_BorderCornerRadius: var(--sapPopover_BorderCornerRadius);
 
 .sapMPopoverWithBar > .sapMPopoverArr {
 	&.sapMPopoverArrUp::after,
@@ -27,115 +24,15 @@
 	background-color: var(--sapPageHeader_Background);
 }
 
-.sapUiSizeCompact {
-
-	.sapMPopoverFooter,
-	.sapMPopoverHeader {
-
-		.sapMIBar,
-		.sapMBar {
-			height: 2.5rem;
-
-			& > .sapMBarLeft,
-			& > .sapMBarRight {
-				height: 2.5rem;
-				line-height: 2.5rem;
-
-				.sapMBtn {
-					vertical-align: middle;
-				}
-			}
-
-			& > .sapMBarMiddle .sapMBarPH {
-				height: 2.5rem;
-				line-height: 2.5rem;
-
-				.sapMBtn {
-					vertical-align: middle;
-				}
-			}
-		}
-	}
-}
-
 .sapMPopoverHeader,
 .sapMPopoverSubHeader {
 	position: relative;
 	z-index: 2;
-
-	.sapMBar {
-
-		.sapMBarContainer {
-			padding-left: 0;
-			padding-right: 0;
-		}
-
-		.sapMBarLeft {
-			padding-left: 1rem;
-		}
-
-		.sapMBarMiddle .sapMBarContainer {
-			padding: 0 1rem;
-		}
-
-		.sapMBarRight {
-			padding-right: 1rem;
-		}
-	}
 }
-
-.sapMPopoverHeader,
-.sapMPopoverFooter,
-.sapMPopoverSubHeader {
-
-	.sapUi-Std-PaddingS,
-	.sapUi-Std-PaddingM,
-	.sapUi-Std-PaddingL,
-	.sapUi-Std-PaddingXL {
-
-		&.sapMBar {
-
-			.sapMBarMiddle .sapMBarPH {
-				padding-left: 0;
-				padding-right: 0;
-			}
-
-			.sapMBarLeft {
-				padding-left: inherit;
-
-				.sapMBarChild {
-					padding-right: 0.5rem;
-				}
-			}
-
-			.sapMBarRight {
-				padding-right: inherit;
-
-				.sapMBarChild {
-					padding-left: 0.5rem;
-				}
-			}
-		}
-	}
-}
-
 .sapMPopover {
-	border-radius: var(--sapPopover_BorderCornerRadius);
 
 	.sapMPopoverCont {
 		padding: 0.0625rem;
-	}
-
-	&.sapMPopoverWithoutBar .sapMPopoverCont,
-	.sapMIBar.sapMHeader-CTX {
-		border-top-right-radius: var(--sapPopover_BorderCornerRadius);
-		border-top-left-radius: var(--sapPopover_BorderCornerRadius);
-	}
-
-	&.sapMPopoverWithoutFooter .sapMPopoverCont,
-	.sapMIBar.sapMFooter-CTX {
-		border-bottom-right-radius: var(--sapPopover_BorderCornerRadius);
-		border-bottom-left-radius: var(--sapPopover_BorderCornerRadius);
 	}
 }
 
