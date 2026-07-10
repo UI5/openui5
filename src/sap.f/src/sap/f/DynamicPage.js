@@ -571,6 +571,31 @@ sap.ui.define([
 		return this.setAggregation("header", oHeader);
 	};
 
+	DynamicPage.prototype.setTitle = function (oTitle) {
+		var oOldTitle = this.getTitle();
+
+		if (oOldTitle === oTitle) {
+			return this;
+		}
+
+		if (oOldTitle) {
+			oOldTitle.detachEvent("_titleTextChange", this._onTitleTextChange, this);
+		}
+		if (oTitle && typeof oTitle.attachEvent === "function") {
+			oTitle.attachEvent("_titleTextChange", this._onTitleTextChange, this);
+		}
+
+		return this.setAggregation("title", oTitle);
+	};
+
+	DynamicPage.prototype.destroyTitle = function () {
+		var oTitle = this.getTitle();
+		if (oTitle) {
+			oTitle.detachEvent("_titleTextChange", this._onTitleTextChange, this);
+		}
+		return this.destroyAggregation("title");
+	};
+
 	DynamicPage.prototype.destroyHeader = function () {
 		this._detachHeaderEventListeners();
 
@@ -2672,6 +2697,30 @@ sap.ui.define([
 		}
 
 		return oInfo;
+	};
+
+	/**
+	 * Refreshes the cached accessibility attributes on the title's wrapper element to reflect
+	 * the current title text. Subscribed to the private <code>_titleTextChange</code> event of
+	 * the contained {@link sap.f.DynamicPageTitle} — title-text mutations only invalidate the
+	 * inner controls, not the <code>DynamicPage</code>, so the rendered <code>aria-label</code>
+	 * would otherwise stay stale.
+	 *
+	 * @private
+	 */
+	DynamicPage.prototype._onTitleTextChange = function () {
+		var oLandmarkInfo = this.getLandmarkInfo(),
+			bHeaderLabelSet = oLandmarkInfo && oLandmarkInfo.getHeaderLabel(),
+			$header;
+
+		if (bHeaderLabelSet) {
+			return; // user-defined label takes precedence
+		}
+
+		$header = this.$("header");
+		if ($header.length) {
+			$header.attr("aria-label", this._getAccessibilityStateTitle().label || null);
+		}
 	};
 
 	/**

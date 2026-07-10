@@ -241,4 +241,24 @@ function(Element, nextUIUpdate, ObjectPageLayout, ObjectPageSection, XMLView, $)
 				+ sBundleTextWithTitle + " " + sBundleTextHeaderRoleDescription,
 				"The header element has correct aria-label with nested Title in 'heading' aggregation");
 	});
+
+	QUnit.test("Header element aria-label - updates when nested Title text changes", function (assert) {
+		// Locate the nested sap.m.Title inside the FlexBox heading of the ObjectPageDynamicHeaderTitle
+		var oHeaderTitle = this.oObjectPage.getHeaderTitle(),
+			oFlexBox = oHeaderTitle.getHeading(),
+			oTitle = oFlexBox.getItems().filter(function (oItem) {
+				return oItem.isA("sap.m.Title");
+			})[0],
+			sBundleTextWithTitle = getResourceBundleText("HEADER_ARIA_LABEL_WITH_TITLE");
+
+		// Act - change only the nested Title's text (does NOT invalidate the ObjectPageLayout)
+		oTitle.setText("Updated supplier");
+
+		// Assert - the parent ObjectPageLayout's headerTitle aria-label has been refreshed.
+		// _updateAriaLabels rewrites the attribute without HEADER_ROLE_DESCRIPTION (which the
+		// renderer adds once on initial render), matching the pattern of the test above.
+		assert.strictEqual(this.oObjectPage.$("headerTitle").attr("aria-label"),
+			"Updated supplier " + sBundleTextWithTitle,
+			"The header element aria-label is updated after the nested Title's text changes");
+	});
 });

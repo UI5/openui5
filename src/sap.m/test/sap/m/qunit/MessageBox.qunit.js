@@ -132,6 +132,38 @@ sap.ui.define([
 		oMessageBox.destroy();
 	});
 
+	QUnit.module("Accessibility role");
+
+	[
+		{ label: "MessageBox with icon ERROR", fn: "show", icon: "ERROR", expected: "AlertDialog" },
+		{ label: "MessageBox with icon WARNING", fn: "show", icon: "WARNING", expected: "AlertDialog" },
+		{ label: "MessageBox with icon INFORMATION", fn: "show", icon: "INFORMATION", expected: "Dialog" },
+		{ label: "MessageBox with icon SUCCESS", fn: "show", icon: "SUCCESS", expected: "Dialog" },
+		{ label: "MessageBox with icon QUESTION", fn: "show", icon: "QUESTION", expected: "AlertDialog" },
+		{ label: "MessageBox without explicit icon", fn: "show", expected: "AlertDialog" },
+		{ label: "MessageBox.error", fn: "error", expected: "AlertDialog" },
+		{ label: "MessageBox.warning", fn: "warning", expected: "AlertDialog" },
+		{ label: "MessageBox.information", fn: "information", expected: "Dialog" },
+		{ label: "MessageBox.success", fn: "success", expected: "Dialog" },
+		{ label: "MessageBox.confirm", fn: "confirm", expected: "AlertDialog" }
+	].forEach(function (oCase) {
+		var sExpectedRole = DialogRoleType[oCase.expected].toLowerCase();
+		QUnit.test(oCase.label + " should have role '" + sExpectedRole + "'", function (assert) {
+			var mOptions = {};
+			if (oCase.icon) {
+				mOptions.icon = MessageBox.Icon[oCase.icon];
+			}
+			MessageBox[oCase.fn](sMessageText, mOptions);
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			var oMessageBox = Element.getElementById(jQuery(".sapMMessageDialog").last().attr("id"));
+			assert.strictEqual(oMessageBox.$().attr("role"), sExpectedRole,
+				"role attribute should be '" + sExpectedRole + "'");
+			oMessageBox.destroy();
+		});
+	});
+
+	QUnit.module("");
+
 	QUnit.test("Reference call of MessageBox.show method", function (assert) {
 		var mSettings = {
 			details: "Some details",

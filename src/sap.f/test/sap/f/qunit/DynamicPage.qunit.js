@@ -16,6 +16,7 @@ sap.ui.define([
 	"sap/m/Input",
 	"sap/m/Panel",
 	"sap/m/Text",
+	"sap/m/Title",
 	"sap/m/VBox",
 	"sap/m/library",
 	"sap/f/DynamicPageAccessibleLandmarkInfo",
@@ -44,6 +45,7 @@ function(
 	Input,
 	Panel,
 	Text,
+	Title,
 	Vbox,
 	mLibrary,
 	DynamicPageAccessibleLandmarkInfo,
@@ -3934,6 +3936,62 @@ function(
 		// Assert
 		assert.strictEqual($oDynamicPage.attr('aria-roledescription'),sExpectedRoleDescription, "aria-roledescription is set");
 		assert.strictEqual(this.oDynamicPage.$("header").attr("aria-label"), sExpectedAriaLabel, "Header label is set according to Title in 'heading' aggregation");
+	});
+
+	QUnit.test("Header aria-label updates when nested Title text changes", function(assert) {
+		// Arrange
+		var oTitle = this.oDynamicPage.getTitle().getHeading();
+
+		// Act - mutate only the inner Title's text (this does NOT invalidate the DynamicPage)
+		oTitle.setText("Updated title");
+
+		// Assert - the cached aria-label on the header DOM has been refreshed
+		assert.strictEqual(this.oDynamicPage.$("header").attr("aria-label"), "Updated title",
+			"Header aria-label is refreshed after nested Title's text changes");
+	});
+
+	QUnit.test("Header aria-label resolves Title nested inside arbitrary container subtree", async function(assert) {
+		// Arrange - replace the heading with a deeply nested structure: Panel > VBox > Title.
+		// This simulates the sap.fe.macros.header.HeaderTitleDescription shape (BuildingBlock
+		// content holding a VBox > Title), proving the recursive walk handles non-FlexBox
+		// containers and any depth.
+		var oNestedTitle = new Title({ text: "Deep title" }),
+			oNestedContainer = new Panel({ content: [new Vbox({ items: [oNestedTitle] })] });
+
+		this.oDynamicPage.getTitle().setHeading(oNestedContainer);
+		await nextUIUpdate();
+
+		// Initial assertion - header label resolves through the deep subtree
+		assert.strictEqual(this.oDynamicPage.$("header").attr("aria-label"), "Deep title",
+			"Header aria-label resolves Title nested inside Panel > VBox");
+
+		// Act - mutate just the inner Title's text
+		oNestedTitle.setText("Deep title - updated");
+
+		// Assert - the cached aria-label is refreshed for deeply-nested titles too
+		assert.strictEqual(this.oDynamicPage.$("header").attr("aria-label"), "Deep title - updated",
+			"Header aria-label is refreshed after a deeply-nested Title's text changes");
+	});
+
+	QUnit.test("Header aria-label updates when Title is added asynchronously to heading subtree", async function(assert) {
+		// Arrange - start with a heading container that has NO title yet (mimics a building
+		// block whose content is created later, e.g. once OData metadata is available)
+		var oContainer = new Vbox();
+		this.oDynamicPage.getTitle().setHeading(oContainer);
+		await nextUIUpdate();
+
+		// Act - insert the Title asynchronously into the existing container
+		var oLateTitle = new Title({ text: "Async title" });
+		oContainer.addItem(oLateTitle);
+
+		// Assert - the observer reacted to the structural change and the aria-label is correct
+		assert.strictEqual(this.oDynamicPage.$("header").attr("aria-label"), "Async title",
+			"Header aria-label is set after a Title is added asynchronously to the heading");
+
+		// And subsequent text changes on that late-inserted Title are tracked too
+		oLateTitle.setText("Async title - updated");
+		assert.strictEqual(this.oDynamicPage.$("header").attr("aria-label"), "Async title - updated",
+			"Header aria-label is refreshed after the asynchronously-inserted Title's text changes");
 	});
 
 	QUnit.test("_setAriaRoleDescription/_getAriaRoleDescription", function(assert) {
