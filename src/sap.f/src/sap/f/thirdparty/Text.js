@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Theme'], (function (exports, webcomponentsBase, jsxRuntime, parametersBundle_css, willShowContent, i18nDefaults, Theme) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/ManagedStyles'], (function (exports, webcomponentsBase, parametersBundle_css, parametersBundle_css$1, willShowContent, i18nDefaults, ManagedStyles) { 'use strict';
 
     /**
      * Empty Indicator Mode.
@@ -20,14 +20,14 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
     var TextEmptyIndicatorMode$1 = TextEmptyIndicatorMode;
 
     function TextTemplate() {
-        return jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsx("span", { children: this._renderEmptyIndicator ?
-                    jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsx("span", { className: "empty-indicator", "aria-hidden": "true", children: this._emptyIndicatorSymbol }), jsxRuntime.jsx("span", { className: "empty-indicator-aria-label", children: this._emptyIndicatorAriaLabel })] })
+        return parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: parametersBundle_css.jsx("span", { children: this._renderEmptyIndicator ?
+                    parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [parametersBundle_css.jsx("span", { className: "empty-indicator", "aria-hidden": "true", children: this._emptyIndicatorSymbol }), parametersBundle_css.jsx("span", { className: "empty-indicator-aria-label", children: this._emptyIndicatorAriaLabel })] })
                     :
-                        jsxRuntime.jsx("slot", {}) }) });
+                        parametersBundle_css.jsx("slot", {}) }) });
     }
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
     var styles = `:host{max-width:100%;font-size:var(--sapFontSize);font-family:var(--sapFontFamily);color:var(--sapTextColor);line-height:normal;cursor:text;overflow:hidden;display:-webkit-inline-box;-webkit-line-clamp:var(--_ui5_text_max_lines);line-clamp:var(--_ui5_text_max_lines);-webkit-box-orient:vertical;white-space:normal;word-wrap:break-word}:host([max-lines="1"]){word-break:break-all}.empty-indicator-aria-label{position:absolute!important;clip:rect(1px,1px,1px,1px);user-select:none;left:0;top:0;font-size:0}
 `;
 
@@ -109,12 +109,12 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
         webcomponentsBase.d({ type: Node, "default": true })
     ], Text.prototype, "text", void 0);
     __decorate([
-        parametersBundle_css.i("@ui5/webcomponents")
+        parametersBundle_css$1.i("@ui5/webcomponents")
     ], Text, "i18nBundle", void 0);
     Text = Text_1 = __decorate([
         webcomponentsBase.m({
             tag: "ui5-text",
-            renderer: jsxRuntime.y,
+            renderer: parametersBundle_css.y,
             template: TextTemplate,
             styles,
         })

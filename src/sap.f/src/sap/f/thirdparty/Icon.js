@@ -1,20 +1,20 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/i18n-defaults2'], (function (exports, webcomponentsBase, jsxRuntime, eventStrict, Icons, parametersBundle_css, Theme, i18nDefaults) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/i18n-defaults2'], (function (exports, webcomponentsBase, parametersBundle_css, eventStrict, Icons, parametersBundle_css$1, ManagedStyles, i18nDefaults) { 'use strict';
 
     function IconTemplate() {
         if (this.hasFontIcon) {
-            return (jsxRuntime.jsx("span", { class: "ui5-icon-root", part: "root", tabindex: this._tabIndex, role: this.effectiveAccessibleRole, "aria-label": this.effectiveAccessibleName, "aria-hidden": this.effectiveAriaHidden, onKeyDown: this._onkeydown, onKeyUp: this._onkeyup, onClick: this._onclick, children: jsxRuntime.jsx("slot", { name: "fontIcon" }) }));
+            return (parametersBundle_css.jsx("span", { class: "ui5-icon-root", part: "root", tabindex: this._tabIndex, role: this.effectiveAccessibleRole, "aria-label": this.effectiveAccessibleName, "aria-hidden": this.effectiveAriaHidden, onKeyDown: this._onkeydown, onKeyUp: this._onkeyup, onClick: this._onclick, children: parametersBundle_css.jsx("slot", { name: "fontIcon" }) }));
         }
-        return (jsxRuntime.jsxs("svg", { class: "ui5-icon-root", part: "root", tabindex: this._tabIndex, dir: this._dir, viewBox: this.viewBox, role: this.effectiveAccessibleRole, focusable: "false", preserveAspectRatio: "xMidYMid meet", "aria-label": this.effectiveAccessibleName, "aria-hidden": this.effectiveAriaHidden, xmlns: "http://www.w3.org/2000/svg", onKeyDown: this._onkeydown, onKeyUp: this._onkeyup, onClick: this._onclick, children: [this.hasIconTooltip &&
-                    jsxRuntime.jsxs("title", { id: `${this._id}-tooltip`, children: [" ", this.effectiveAccessibleName, " "] }), jsxRuntime.jsx("g", { role: "presentation", children: content.call(this) })] }));
+        return (parametersBundle_css.jsxs("svg", { class: "ui5-icon-root", part: "root", tabindex: this._tabIndex, dir: this._dir, viewBox: this.viewBox, role: this.effectiveAccessibleRole, focusable: "false", preserveAspectRatio: "xMidYMid meet", "aria-label": this.effectiveAccessibleName, "aria-hidden": this.effectiveAriaHidden, xmlns: "http://www.w3.org/2000/svg", onKeyDown: this._onkeydown, onKeyUp: this._onkeyup, onClick: this._onclick, children: [this.hasIconTooltip &&
+                    parametersBundle_css.jsxs("title", { id: `${this._id}-tooltip`, children: [" ", this.effectiveAccessibleName, " "] }), parametersBundle_css.jsx("g", { role: "presentation", children: content.call(this) })] }));
     }
     function content() {
         if (this.customTemplate) {
             return this.customTemplate;
         }
         if (this.customTemplateAsString) {
-            return jsxRuntime.jsx("g", { dangerouslySetInnerHTML: { __html: this.customTemplateAsString } });
+            return parametersBundle_css.jsx("g", { dangerouslySetInnerHTML: { __html: this.customTemplateAsString } });
         }
-        return this.pathData.map(path => (jsxRuntime.jsx("path", { d: path })));
+        return this.pathData.map(path => (parametersBundle_css.jsx("path", { d: path })));
     }
 
     /**
@@ -47,8 +47,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
     })(IconMode || (IconMode = {}));
     var IconMode$1 = IconMode;
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
     var iconCss = `:host{-webkit-tap-highlight-color:rgba(0,0,0,0)}:host([hidden]){display:none}:host([invalid]){display:none}:host(:not([hidden]).ui5_hovered){opacity:.7}:host{display:inline-block;width:1rem;height:1rem;color:var(--sapContent_IconColor);fill:currentColor;outline:none;container-type:size}:host([design="Contrast"]){color:var(--sapContent_ContrastIconColor)}:host([design="Critical"]){color:var(--sapCriticalElementColor)}:host([design="Information"]){color:var(--sapInformativeElementColor)}:host([design="Negative"]){color:var(--sapNegativeElementColor)}:host([design="Neutral"]){color:var(--sapNeutralElementColor)}:host([design="NonInteractive"]){color:var(--sapContent_NonInteractiveIconColor)}:host([design="Positive"]){color:var(--sapPositiveElementColor)}:host([mode="Interactive"][desktop]) .ui5-icon-root:focus,:host([mode="Interactive"]) .ui5-icon-root:focus-visible{outline:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);border-radius:var(--ui5-icon-focus-border-radius)}.ui5-icon-root{display:flex;height:100%;width:100%;outline:none;vertical-align:top;box-sizing:border-box;align-items:center;justify-content:center;font-size:min(100cqw,100cqh);line-height:1}:host([mode="Interactive"]){cursor:pointer}.ui5-icon-root:not([dir=ltr])>g{transform:var(--_ui5_icon_transform_scale);transform-origin:center}
 `;
 
@@ -210,7 +210,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
             }
         }
         onEnterDOM() {
-            if (Theme.f$1()) {
+            if (ManagedStyles.f$1()) {
                 this.setAttribute("desktop", "");
             }
         }
@@ -332,14 +332,14 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
         webcomponentsBase.s({ noAttribute: true })
     ], Icon.prototype, "effectiveAccessibleName", void 0);
     __decorate([
-        parametersBundle_css.i("@ui5/webcomponents")
+        parametersBundle_css$1.i("@ui5/webcomponents")
     ], Icon, "i18nBundle", void 0);
     Icon = Icon_1 = __decorate([
         webcomponentsBase.m({
             tag: "ui5-icon",
             languageAware: true,
             themeAware: true,
-            renderer: jsxRuntime.y,
+            renderer: parametersBundle_css.y,
             template: IconTemplate,
             styles: iconCss,
         })

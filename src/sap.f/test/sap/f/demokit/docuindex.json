@@ -16,6 +16,19 @@
 	  ],
 	  "entities": [
 		{
+			"id": "sap.f.HeroBanner",
+			"name": "Hero Banner",
+			"category": "Container",
+			"since": "1.151",
+			"samples": [
+				"sap.f.sample.HeroBannerBasic",
+				"sap.f.sample.HeroBannerColumnsRatio",
+				"sap.f.sample.HeroBannerHeaderBlockAndActionsPlacement",
+				"sap.f.sample.HeroBannerUseCases",
+				"sap.f.sample.HeroBannerIntegrationCard"
+			]
+		},
+		{
 			"id": "sap.f.AvatarGroup",
 			"name": "Avatar Group",
 			"category": "Display",
@@ -158,6 +171,31 @@
 		  }
 	  ],
 	  "samples": [
+		{
+		  "id": "sap.f.sample.HeroBannerBasic",
+		  "name": "Hero Banner - Basic",
+		  "description": "A basic Hero Banner with a header text and overline text."
+		},
+		{
+		  "id": "sap.f.sample.HeroBannerColumnsRatio",
+		  "name": "Hero Banner - Columns Ratio",
+		  "description": "Demonstrates the three columnsRatio options: single column (no endContent), Equal, and FirstWider."
+		},
+		{
+		  "id": "sap.f.sample.HeroBannerHeaderBlockAndActionsPlacement",
+		  "name": "Hero Banner - Header Block and Actions Placement",
+		  "description": "Demonstrates actionsPlacement and headerBlockPlacement properties for controlling the position of the header and actions."
+		},
+		{
+		  "id": "sap.f.sample.HeroBannerUseCases",
+		  "name": "Hero Banner - Use Cases",
+		  "description": "A collection of common Hero Banner use cases: header actions only, content with actions, actions below header, and header at bottom."
+		},
+		{
+		  "id": "sap.f.sample.HeroBannerIntegrationCard",
+		  "name": "Hero Banner - Integration Card",
+		  "description": "Demonstrates the use of sap.ui.integration.widgets.Card inside both the startContent (default slot) and endContent aggregations of the Hero Banner."
+		},
 		{
 		  "id": "sap.f.sample.DynamicPageFreeStyle",
 		  "name": "Dynamic Page Freestyle Example",

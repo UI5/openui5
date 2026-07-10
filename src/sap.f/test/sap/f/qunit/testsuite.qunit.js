@@ -185,6 +185,11 @@ sap.ui.define(function () {
 					only: ["sap/f/GridNavigationMatrix"]
 				}
 			},
+			"HeroBanner": {
+				coverage: {
+					only: ["sap/f/HeroBanner"]
+				}
+			},
 			"ProductSwitchItem": {
 				coverage: {
 					only: ["sap/f/ProductSwitchItem"]

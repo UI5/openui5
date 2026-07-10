@@ -1,11 +1,11 @@
-sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/parameters-bundle.css2'], (function (require, exports, webcomponentsBase, eventStrict, jsxRuntime, Button, Tag, Theme, parametersBundle_css, ListItemTemplate, Icon, WrappingType, parametersBundle_css$1) { 'use strict';
+sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/parameters-bundle3.css'], (function (require, exports, webcomponentsBase, eventStrict, parametersBundle_css, Button, Tag, ManagedStyles, parametersBundle_css$1, ListItemTemplate, Icon, WrappingType, parametersBundle_css$2) { 'use strict';
 
     function ButtonTemplate() {
-        return jsxRuntime.jsx(Tag.Tag, { design: "Critical", "hide-state-icon": true, children: this.effectiveText });
+        return parametersBundle_css.jsx(Tag.Tag, { design: "Critical", "hide-state-icon": true, children: this.effectiveText });
     }
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
     var buttonBadgeCss = `[ui5-tag]::part(root){border:.0625rem solid var(--sapContent_BadgeBorderColor);background-color:var(--sapContent_BadgeBackground);color:var(--sapContent_BadgeTextColor);height:1rem;border-radius:.5rem;display:flex;align-items:center}:host([design="AttentionDot"]) [ui5-tag]::part(root){min-width:var(--_ui5-button-badge-diameter);min-height:var(--_ui5-button-badge-diameter);height:var(--_ui5-button-badge-diameter);width:var(--_ui5-button-badge-diameter);border-radius:100%}
 `;
 
@@ -64,7 +64,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     ButtonBadge = __decorate$2([
         webcomponentsBase.m({
             tag: "ui5-button-badge",
-            renderer: jsxRuntime.y,
+            renderer: parametersBundle_css.y,
             template: ButtonTemplate,
             styles: buttonBadgeCss,
         })
@@ -83,7 +83,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
         return ListItemTemplate.ListItemTemplate.call(this, currentHooks);
     }
     function listItemContent() {
-        return jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsxs("div", { class: "ui5-li-text-wrapper", children: [renderTitle.call(this), renderDescription.call(this), !this.typeActive && jsxRuntime.jsx("span", { class: "ui5-hidden-text", children: this.type })] }), !this.description && renderAdditionalText.call(this)] });
+        return parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [parametersBundle_css.jsxs("div", { class: "ui5-li-text-wrapper", children: [renderTitle.call(this), renderDescription.call(this), !this.typeActive && parametersBundle_css.jsx("span", { class: "ui5-hidden-text", children: this.type })] }), !this.description && renderAdditionalText.call(this)] });
     }
     function renderTitle() {
         if (this.wrappingType === WrappingType.WrappingType.Normal) {
@@ -94,41 +94,41 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
                 part: "title",
             });
         }
-        return (jsxRuntime.jsx("span", { part: "title", class: "ui5-li-title", children: this.text ? this.text : jsxRuntime.jsx("slot", {}) }));
+        return (parametersBundle_css.jsx("span", { part: "title", class: "ui5-li-title", children: this.text ? this.text : parametersBundle_css.jsx("slot", {}) }));
     }
     function renderDescription() {
         if (!this.description) {
             return null;
         }
         if (this.wrappingType === WrappingType.WrappingType.Normal) {
-            return (jsxRuntime.jsxs("div", { class: "ui5-li-description-info-wrapper", children: [this.expandableTextTemplate?.call(this, {
+            return (parametersBundle_css.jsxs("div", { class: "ui5-li-description-info-wrapper", children: [this.expandableTextTemplate?.call(this, {
                         className: "ui5-li-desc",
                         text: this.description,
                         maxCharacters: this._maxCharacters,
                         part: "description",
                     }), renderAdditionalText.call(this)] }));
         }
-        return (jsxRuntime.jsxs("div", { class: "ui5-li-description-info-wrapper", children: [jsxRuntime.jsx("span", { part: "description", class: "ui5-li-desc", children: this.description }), renderAdditionalText.call(this)] }));
+        return (parametersBundle_css.jsxs("div", { class: "ui5-li-description-info-wrapper", children: [parametersBundle_css.jsx("span", { part: "description", class: "ui5-li-desc", children: this.description }), renderAdditionalText.call(this)] }));
     }
     function renderAdditionalText() {
         if (!this.additionalText) {
             return null;
         }
-        return jsxRuntime.jsx("span", { part: "additional-text", class: "ui5-li-additional-text", children: this.additionalText });
+        return parametersBundle_css.jsx("span", { part: "additional-text", class: "ui5-li-additional-text", children: this.additionalText });
     }
     function imageBegin() {
         if (this.hasImage) {
-            return jsxRuntime.jsx("div", { class: "ui5-li-image", children: jsxRuntime.jsx("slot", { name: "image" }) });
+            return parametersBundle_css.jsx("div", { class: "ui5-li-image", children: parametersBundle_css.jsx("slot", { name: "image" }) });
         }
     }
     function iconBegin() {
         if (this.displayIconBegin) {
-            return jsxRuntime.jsx(Icon.Icon, { part: "icon", name: this.icon, class: "ui5-li-icon", mode: "Decorative" });
+            return parametersBundle_css.jsx(Icon.Icon, { part: "icon", name: this.icon, class: "ui5-li-icon", mode: "Decorative" });
         }
     }
     function iconEnd() {
         if (this.displayIconEnd) {
-            return jsxRuntime.jsx(Icon.Icon, { part: "icon", name: this.icon, class: "ui5-li-icon", mode: "Decorative" });
+            return parametersBundle_css.jsx(Icon.Icon, { part: "icon", name: this.icon, class: "ui5-li-icon", mode: "Decorative" });
         }
     }
 
@@ -311,7 +311,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     ListItemStandard = ListItemStandard_1 = __decorate$1([
         webcomponentsBase.m({
             tag: "ui5-li",
-            renderer: jsxRuntime.y,
+            renderer: parametersBundle_css.y,
             template: ListItemStandardTemplate,
         })
     ], ListItemStandard);
@@ -320,13 +320,13 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
 
     function ShellBarItemTemplate() {
         if (this.inOverflow) {
-            return (jsxRuntime.jsx(ListItemStandard$1, { icon: this.icon ? `sap-icon://${this.icon}` : "", type: "Active", "data-count": this.count, "data-ui5-stable": this.stableDomRef, accessibilityAttributes: this.accessibilityAttributes, onClick: this.fireClickEvent, children: this.text }));
+            return (parametersBundle_css.jsx(ListItemStandard$1, { icon: this.icon ? `sap-icon://${this.icon}` : "", type: "Active", "data-count": this.count, "data-ui5-stable": this.stableDomRef, accessibilityAttributes: this.accessibilityAttributes, onClick: this.fireClickEvent, children: this.text }));
         }
-        return (jsxRuntime.jsx(Button.Button, { class: "ui5-shellbar-action-button", icon: this.icon, design: "Transparent", accessibleName: this.text, "data-ui5-stable": this.stableDomRef, accessibilityAttributes: this.accessibilityAttributes, onClick: this.fireClickEvent, children: this.count && (jsxRuntime.jsx(ButtonBadge$1, { slot: "badge", design: "OverlayText", text: this.count })) }));
+        return (parametersBundle_css.jsx(Button.Button, { class: "ui5-shellbar-action-button", icon: this.icon, design: "Transparent", accessibleName: this.text, "data-ui5-stable": this.stableDomRef, accessibilityAttributes: this.accessibilityAttributes, onClick: this.fireClickEvent, children: this.count && (parametersBundle_css.jsx(ButtonBadge$1, { slot: "badge", design: "OverlayText", text: this.count })) }));
     }
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$2.defaultTheme, "host");
     var shellBarV2ItemStyles = `.ui5-shellbar-action-button{width:2.25rem;height:2.25rem;color:var(--sapShell_TextColor)}.ui5-shellbar-action-button:hover{background:var(--sapShell_Hover_Background);border-color:var(--sapButton_Lite_Hover_BorderColor);color:var(--sapShell_InteractiveTextColor)}.ui5-shellbar-action-button[active]{color:var(--_ui5_shellbar_button_active_color)}.ui5-shellbar-action-button>[ui5-button-badge][slot=badge][design=OverlayText]{top:var(--_ui5-shellbar-badge-offset, 0);margin:var(--_ui5-shellbar-badge-margin, -.5rem)}[ui5-li]::part(icon){color:var(--sapList_TextColor)}[ui5-li]:after{position:relative;width:fit-content;height:1rem;min-width:1rem;background:var(--sapContent_BadgeBackground);border:var(--_ui5_shellbar_button_badge_border);color:var(--sapContent_BadgeTextColor);bottom:calc(100% + .0625rem);left:1.25rem;padding:0 .3125rem;border-radius:.5rem;display:flex;justify-content:center;align-items:center;font-size:var(--sapFontSmallSize);font-family:var(--sapFontFamily);z-index:2;box-sizing:border-box;pointer-events:none}[ui5-li][data-count]:after{content:attr(data-count)}
 `;
 
@@ -417,7 +417,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     ShellBarItem = __decorate([
         webcomponentsBase.m({
             tag: "ui5-shellbar-item",
-            renderer: jsxRuntime.y,
+            renderer: parametersBundle_css.y,
             template: ShellBarItemTemplate,
             styles: shellBarV2ItemStyles,
             dependencies: [Button.Button, ButtonBadge$1, ListItemStandard$1],

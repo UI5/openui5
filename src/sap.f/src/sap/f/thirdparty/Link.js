@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/i18n-defaults2'], (function (exports, webcomponentsBase, eventStrict, jsxRuntime, AccessibilityTextsHelper, parametersBundle_css, Theme, toLowercaseEnumValue, Icon, i18nDefaults) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/i18n-defaults2'], (function (exports, webcomponentsBase, eventStrict, parametersBundle_css, AccessibilityTextsHelper, parametersBundle_css$1, ManagedStyles, toLowercaseEnumValue, Icon, i18nDefaults) { 'use strict';
 
     /**
      * Different link designs.
@@ -25,14 +25,14 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
     var LinkDesign$1 = LinkDesign;
 
     function LinkTemplate() {
-        return (jsxRuntime.jsxs("a", { part: "root", class: "ui5-link-root", role: this.effectiveAccRole, href: this.parsedRef, target: this.target, rel: this._rel, tabindex: this.effectiveTabIndex, title: this.tooltip, "aria-disabled": this.disabled, "aria-label": this.ariaLabelText, "aria-haspopup": this._hasPopup, "aria-expanded": this.accessibilityAttributes.expanded, "aria-current": this.accessibilityAttributes.current, "aria-description": this.ariaDescriptionText, onClick: this._onclick, onKeyDown: this._onkeydown, onKeyUp: this._onkeyup, children: [this.icon &&
-                    jsxRuntime.jsx(Icon.Icon, { class: "ui5-link-icon", name: this.icon, mode: "Decorative", part: "icon" }), jsxRuntime.jsx("span", { class: "ui5-link-text", children: jsxRuntime.jsx("slot", {}) }), this.hasLinkType &&
-                    jsxRuntime.jsx("span", { class: "ui5-hidden-text", children: this.linkTypeText }), this.endIcon &&
-                    jsxRuntime.jsx(Icon.Icon, { class: "ui5-link-end-icon", name: this.endIcon, mode: "Decorative", part: "endIcon" })] }));
+        return (parametersBundle_css.jsxs("a", { part: "root", class: "ui5-link-root", role: this.effectiveAccRole, href: this.parsedRef, target: this.target, rel: this._rel, tabindex: this.effectiveTabIndex, title: this.tooltip, "aria-disabled": this.disabled, "aria-label": this.ariaLabelText, "aria-haspopup": this._hasPopup, "aria-expanded": this.accessibilityAttributes.expanded, "aria-current": this.accessibilityAttributes.current, "aria-description": this.ariaDescriptionText, onClick: this._onclick, onKeyDown: this._onkeydown, onKeyUp: this._onkeyup, children: [this.icon &&
+                    parametersBundle_css.jsx(Icon.Icon, { class: "ui5-link-icon", name: this.icon, mode: "Decorative", part: "icon" }), parametersBundle_css.jsx("span", { class: "ui5-link-text", children: parametersBundle_css.jsx("slot", {}) }), this.hasLinkType &&
+                    parametersBundle_css.jsx("span", { class: "ui5-hidden-text", children: this.linkTypeText }), this.endIcon &&
+                    parametersBundle_css.jsx(Icon.Icon, { class: "ui5-link-end-icon", name: this.endIcon, mode: "Decorative", part: "endIcon" })] }));
     }
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
     var linkCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host(:not([hidden])){display:inline-flex}:host{max-width:100%;color:var(--sapLinkColor);font-family:var(--sapFontFamily);font-size:var(--sapFontSize);cursor:pointer;outline:none;text-decoration:var(--_ui5_link_text_decoration);text-shadow:var(--sapContent_TextShadow);white-space:normal;overflow-wrap:break-word}:host(:hover){color:var(--sapLink_Hover_Color);text-decoration:var(--_ui5_link_hover_text_decoration)}:host(:active){color:var(--sapLink_Active_Color);text-decoration:var(--_ui5_link_active_text_decoration)}:host([disabled]){pointer-events:none}:host([disabled]) .ui5-link-root{text-shadow:none;outline:none;cursor:default;pointer-events:none;opacity:var(--sapContent_DisabledOpacity)}:host([design="Emphasized"]) .ui5-link-root{font-family:var(--sapFontBoldFamily)}:host([design="Subtle"]){color:var(--sapLink_SubtleColor);text-decoration:var(--_ui5_link_subtle_text_decoration)}:host([design="Subtle"]:hover:not(:active)){color:var(--sapLink_SubtleColor);text-decoration:var(--_ui5_link_subtle_text_decoration_hover)}:host([wrapping-type="None"]){white-space:nowrap;overflow-wrap:normal}.ui5-link-root{max-width:100%;display:inline-block;position:relative;overflow:hidden;text-overflow:ellipsis;outline:none;white-space:inherit;overflow-wrap:inherit;text-decoration:inherit;color:inherit}:host([wrapping-type="None"][end-icon]) .ui5-link-root{display:inline-flex;align-items:end}:host .ui5-link-root{outline-offset:-.0625rem;border-radius:var(--_ui5_link_focus_border-radius)}.ui5-link-icon,.ui5-link-end-icon{color:inherit;flex-shrink:0}.ui5-link-icon{float:inline-start;margin-inline-end:.125rem}.ui5-link-end-icon{margin-inline-start:.125rem;vertical-align:bottom}.ui5-link-text{overflow:hidden;text-overflow:ellipsis}.ui5-link-root:focus-visible,:host([desktop]) .ui5-link-root:focus-within,:host([design="Subtle"]) .ui5-link-root:focus-visible,:host([design="Subtle"][desktop]) .ui5-link-root:focus-within{background-color:var(--_ui5_link_focus_background_color);outline:var(--_ui5_link_outline);border-radius:var(--_ui5_link_focus_border-radius);text-shadow:none;color:var(--_ui5_link_focus_color)}:host(:not([desktop])) .ui5-link-root:focus-visible,:host([desktop]:focus-within),:host([design="Subtle"][desktop]:focus-within){text-decoration:var(--_ui5_link_focus_text_decoration)}:host([desktop]:hover:not(:active):focus-within),:host([design="Subtle"][desktop]:hover:not(:active):focus-within){color:var(--_ui5_link_focused_hover_text_color);text-decoration:var(--_ui5_link_focused_hover_text_decoration)}:host([interactive-area-size="Large"]) .ui5-link-root{line-height:var(--_ui5_link_large_interactive_area_height)}:host([interactive-area-size="Large"])::part(icon),:host([interactive-area-size="Large"])::part(endIcon){height:var(--_ui5_link_large_interactive_area_height)}
 `;
 
@@ -151,7 +151,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
             this._dummyAnchor = document.createElement("a");
         }
         onEnterDOM() {
-            if (Theme.f$1()) {
+            if (ManagedStyles.f$1()) {
                 this.setAttribute("desktop", "");
             }
         }
@@ -163,9 +163,9 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
         }
         _isCrossOrigin(href) {
             this._dummyAnchor.href = href;
-            return !(this._dummyAnchor.hostname === Theme.i()
-                && this._dummyAnchor.port === Theme.c()
-                && this._dummyAnchor.protocol === Theme.a());
+            return !(this._dummyAnchor.hostname === ManagedStyles.i()
+                && this._dummyAnchor.port === ManagedStyles.c()
+                && this._dummyAnchor.protocol === ManagedStyles.a());
         }
         get effectiveTabIndex() {
             if (this.forcedTabIndex) {
@@ -283,13 +283,13 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
         webcomponentsBase.s({ noAttribute: true })
     ], Link.prototype, "forcedTabIndex", void 0);
     __decorate([
-        parametersBundle_css.i("@ui5/webcomponents")
+        parametersBundle_css$1.i("@ui5/webcomponents")
     ], Link, "i18nBundle", void 0);
     Link = Link_1 = __decorate([
         webcomponentsBase.m({
             tag: "ui5-link",
             languageAware: true,
-            renderer: jsxRuntime.y,
+            renderer: parametersBundle_css.y,
             template: LinkTemplate,
             styles: linkCss,
         })

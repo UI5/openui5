@@ -1,11 +1,11 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, jsxRuntime, eventStrict, Theme, parametersBundle_css, Icons) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/parameters-bundle3.css', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, parametersBundle_css, eventStrict, ManagedStyles, parametersBundle_css$1, Icons) { 'use strict';
 
     function ShellBarBrandingTemplate() {
-        return (jsxRuntime.jsxs("a", { class: "ui5-shellbar-branding-root", href: this.parsedRef, target: this.target, role: this._role, tabIndex: 0, "aria-label": this.accessibleNameText, onClick: this._onclick, onKeyDown: this._onkeydown, onKeyUp: this._onkeyup, children: [jsxRuntime.jsx("span", { class: "ui5-shellbar-logo", children: jsxRuntime.jsx("slot", { name: "logo" }) }), !this._isSBreakPoint && (jsxRuntime.jsx("bdi", { class: "ui5-shellbar-title", children: jsxRuntime.jsx("slot", {}) }))] }));
+        return (parametersBundle_css.jsxs("a", { class: "ui5-shellbar-branding-root", href: this.parsedRef, target: this.target, role: this._role, tabIndex: 0, "aria-label": this.accessibleNameText, onClick: this._onclick, onKeyDown: this._onkeydown, onKeyUp: this._onkeyup, children: [parametersBundle_css.jsx("span", { class: "ui5-shellbar-logo", children: parametersBundle_css.jsx("slot", { name: "logo" }) }), !this._isSBreakPoint && (parametersBundle_css.jsx("bdi", { class: "ui5-shellbar-title", children: parametersBundle_css.jsx("slot", {}) }))] }));
     }
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
     var shellBarBrandingCss = `:host(:not([hidden])) .ui5-shellbar-branding-root{text-decoration:none}:host(:not([hidden])){display:inline}.ui5-shellbar-branding-root{overflow:hidden;display:flex;align-items:center;height:2.25rem;padding-block:.125rem;padding-inline:.25rem .5rem;box-sizing:border-box;cursor:pointer;background:var(--sapButton_Lite_Background);border:1px solid var(--sapButton_Lite_BorderColor);color:var(--sapShell_TextColor);margin-inline-start:.125rem;margin-inline-end:.5rem}.ui5-shellbar-branding-root:focus{outline:var(--_ui5_shellbar_logo_outline);outline-offset:calc(-1 * var(--sapContent_FocusWidth));border-radius:var(--_ui5_shellbar_logo_border_radius)}.ui5-shellbar-branding-root:hover{box-shadow:var(--_ui5_shellbar_button_box_shadow);border-radius:var(--_ui5_shellbar_logo_border_radius)}.ui5-shellbar-branding-root:active:focus{background:var(--sapShell_Active_Background);border:1px solid var(--sapButton_Lite_Active_BorderColor);color:var(--sapShell_Active_TextColor)}.ui5-shellbar-title{display:inline-block;font-family:var(--sapFontSemiboldDuplexFamily);margin:0;font-size:var(--_ui5_shellbar_menu_button_title_font_size);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sapShell_SubBrand_TextColor);margin-inline-start:.25rem}.ui5-shellbar-logo-area{overflow:hidden;display:flex;align-items:center;padding:.125rem .25rem;box-sizing:border-box;cursor:pointer;background:var(--sapButton_Lite_Background);border:1px solid var(--sapButton_Lite_BorderColor);color:var(--sapShell_TextColor);margin-inline-start:.125rem}::slotted([slot="logo"]){max-height:1.875rem;width:auto;padding-block:.0625rem;padding-inline:.25rem;vertical-align:middle}::slotted([slot="logo"]):active{pointer-events:none}
 `;
 
@@ -105,7 +105,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/jsx-run
         webcomponentsBase.m({
             tag: "ui5-shellbar-branding",
             languageAware: true,
-            renderer: jsxRuntime.y,
+            renderer: parametersBundle_css.y,
             template: ShellBarBrandingTemplate,
             styles: shellBarBrandingCss,
         })

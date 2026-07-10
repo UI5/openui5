@@ -1,0 +1,34 @@
+{
+	"sap.app": {
+		"id": "sap.f.sample.HeroBannerIntegrationCard",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.ui5": {
+		"rootView": {
+			"viewName": "sap.f.sample.HeroBannerIntegrationCard.V",
+			"type": "XML",
+			"async": true
+		},
+		"dependencies": {
+			"libs": {
+				"sap.f": {},
+				"sap.m": {},
+				"sap.ui.core": {},
+				"sap.ui.integration": {}
+			}
+		},
+		"config": {
+			"sample": {
+				"files": [
+					"V.view.xml",
+					"C.controller.js",
+					"manifest.json",
+					"startContentManifest.json",
+					"endContentManifest.json"
+				]
+			}
+		}
+	}
+}
