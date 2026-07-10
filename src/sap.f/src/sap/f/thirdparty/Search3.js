@@ -1,4 +1,4 @@
-sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ListItemAdditionalText.css', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/List', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/search', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/encodeXML', 'sap/f/thirdparty/information', 'sap/f/thirdparty/sys-enter-2', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/i18n-defaults'], (function (require, exports, webcomponentsBase, eventStrict, Theme, jsxRuntime, Button, Icon, ListItemBase, parametersBundle_css, ListItemAdditionalText_css, InvisibleMessage, AccessibilityTextsHelper, ValueState, decline, List, i18nDefaults, Label, ResponsivePopover, slimArrowDown, Title, search, BusyIndicator, encodeXML, information, sysEnter2, parametersBundle_css$1, i18nDefaults$1) { 'use strict';
+sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ListItemAdditionalText.css', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/List', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/search2', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/encodeXML', 'sap/f/thirdparty/information', 'sap/f/thirdparty/sys-enter-2', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/i18n-defaults'], (function (require, exports, webcomponentsBase, eventStrict, Theme, jsxRuntime, Button, Icon, ListItemBase, parametersBundle_css, ListItemAdditionalText_css, InvisibleMessage, AccessibilityTextsHelper, ValueState, decline, List, i18nDefaults, Label, ResponsivePopover, slimArrowDown, Title, search, BusyIndicator, encodeXML, information, sysEnter2, parametersBundle_css$1, i18nDefaults$1) { 'use strict';
 
     function ListItemBaseTemplate(hooks, injectedProps) {
         const listItemContent = hooks?.listItemContent || defaultListItemContent;
@@ -27,7 +27,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     var listItemIconCss = `.ui5-li-icon{color:var(--sapList_TextColor);min-width:var(--_ui5_list_item_icon_size);min-height:var(--_ui5_list_item_icon_size);padding-inline-end:var(--_ui5_list_item_icon_padding-inline-end)}
 `;
 
-    var __decorate$6 = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var __decorate$5 = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
         else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
@@ -56,25 +56,25 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             return this.textContent || "";
         }
     };
-    __decorate$6([
+    __decorate$5([
         webcomponentsBase.d({ type: Node, "default": true, invalidateOnChildChange: true })
     ], Option.prototype, "text", void 0);
-    __decorate$6([
+    __decorate$5([
         webcomponentsBase.s()
     ], Option.prototype, "value", void 0);
-    __decorate$6([
+    __decorate$5([
         webcomponentsBase.s()
     ], Option.prototype, "icon", void 0);
-    __decorate$6([
+    __decorate$5([
         webcomponentsBase.s()
     ], Option.prototype, "additionalText", void 0);
-    __decorate$6([
+    __decorate$5([
         webcomponentsBase.s()
     ], Option.prototype, "tooltip", void 0);
-    __decorate$6([
+    __decorate$5([
         webcomponentsBase.s({ type: Boolean })
     ], Option.prototype, "selected", void 0);
-    Option = __decorate$6([
+    Option = __decorate$5([
         webcomponentsBase.m({
             tag: "ui5-option",
             template: OptionTemplate,
@@ -184,7 +184,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     var SelectPopoverCss = `.ui5-select-popover::part(content),.ui5-select-popover::part(header){padding:0}.ui5-select-popover .ui5-responsive-popover-header .row{justify-content:flex-start}
 `;
 
-    var __decorate$5 = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var __decorate$4 = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
         else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
@@ -960,73 +960,73 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             return this.shadowRoot.querySelector("[ui5-popover]");
         }
     };
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s({ type: Boolean })
     ], Select.prototype, "disabled", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "icon", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "name", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "valueState", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s({ type: Boolean })
     ], Select.prototype, "required", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s({ type: Boolean })
     ], Select.prototype, "readonly", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "accessibleName", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "accessibleNameRef", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "accessibleDescription", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "accessibleDescriptionRef", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "tooltip", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "textSeparator", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s({ type: String, noAttribute: true })
     ], Select.prototype, "_associatedDescriptionRefTexts", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s({ type: Boolean, noAttribute: true })
     ], Select.prototype, "_iconPressed", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s({ type: Boolean })
     ], Select.prototype, "opened", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s({ type: Number, noAttribute: true })
     ], Select.prototype, "_listWidth", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s({ type: Boolean })
     ], Select.prototype, "focused", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.d({ "default": true, type: HTMLElement, invalidateOnChildChange: true })
     ], Select.prototype, "options", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.d()
     ], Select.prototype, "valueStateMessage", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.d()
     ], Select.prototype, "label", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "value", null);
-    __decorate$5([
+    __decorate$4([
         parametersBundle_css.i("@ui5/webcomponents")
     ], Select, "i18nBundle", void 0);
-    Select = Select_1 = __decorate$5([
+    Select = Select_1 = __decorate$4([
         webcomponentsBase.m({
             tag: "ui5-select",
             languageAware: true,
@@ -1102,11 +1102,11 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     var Select$1 = Select;
 
     function SearchFieldTemplate(options) {
-        return (!options?.forceExpanded && this.collapsed ? (jsxRuntime.jsx(Button.Button, { class: "ui5-shell-search-field-button", icon: search.search, design: Button.ButtonDesign.Transparent, "data-sap-focus-ref": true, loading: this.fieldLoading, onClick: this._handleSearchIconPress, tooltip: this._effectiveIconTooltip, accessibleName: this._effectiveIconTooltip, accessibilityAttributes: this._searchButtonAccessibilityAttributes })) : (jsxRuntime.jsx(BusyIndicator.BusyIndicator, { class: "ui5-search-field-busy-indicator", active: this.fieldLoading, children: jsxRuntime.jsx("div", { class: "ui5-search-field-root", role: "search", onFocusOut: this._onFocusOutSearch, children: jsxRuntime.jsxs("div", { class: "ui5-search-field-content", children: [this.scopes?.length ? (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsx(Select$1, { onChange: this._handleScopeChange, class: "ui5-search-field-select", accessibleName: this._translations.scope, tooltip: this._translations.scope, value: this.scopeValue, children: this.scopes.map(scopeOption => (jsxRuntime.jsx(Option$1, { value: scopeOption.value, "data-ui5-stable": scopeOption.stableDomRef, ref: this.captureRef.bind(scopeOption), children: scopeOption.text }))) }), jsxRuntime.jsx("div", { class: "ui5-search-field-separator" })] })) : this.filterButton?.length ? (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsx("div", { class: "ui5-filter-wrapper", style: "display: contents", children: jsxRuntime.jsx("slot", { name: "filterButton" }) }), jsxRuntime.jsx("div", { class: "ui5-search-field-separator" })] })) : null, jsxRuntime.jsx("input", { class: "ui5-search-field-inner-input", role: "searchbox", "aria-description": this.accessibleDescription, "aria-label": this.accessibleName || this._translations.searchFieldAriaLabel, "aria-autocomplete": "both", "aria-controls": "ui5-search-list", value: this.value, placeholder: this.placeholder, "data-sap-focus-ref": true, onInput: this._handleInput, onFocusIn: this._onfocusin, onFocusOut: this._onfocusout, onKeyDown: this._onkeydown, onClick: this._handleInnerClick }), this._effectiveShowClearIcon &&
+        return (!options?.forceExpanded && this.collapsed ? (jsxRuntime.jsx(Button.Button, { class: "ui5-shell-search-field-button", icon: search.searchIcon, design: Button.ButtonDesign.Transparent, "data-sap-focus-ref": true, loading: this.fieldLoading, onClick: this._handleSearchIconPress, tooltip: this._effectiveIconTooltip, accessibleName: this._effectiveIconTooltip, accessibilityAttributes: this._searchButtonAccessibilityAttributes })) : (jsxRuntime.jsx(BusyIndicator.BusyIndicator, { class: "ui5-search-field-busy-indicator", active: this.fieldLoading, children: jsxRuntime.jsx("div", { class: "ui5-search-field-root", role: "search", onFocusOut: this._onFocusOutSearch, children: jsxRuntime.jsxs("div", { class: "ui5-search-field-content", children: [this.scopes?.length ? (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsx(Select$1, { onChange: this._handleScopeChange, class: "ui5-search-field-select", accessibleName: this._translations.scope, tooltip: this._translations.scope, value: this.scopeValue, children: this.scopes.map(scopeOption => (jsxRuntime.jsx(Option$1, { value: scopeOption.value, "data-ui5-stable": scopeOption.stableDomRef, ref: this.captureRef.bind(scopeOption), children: scopeOption.text }))) }), jsxRuntime.jsx("div", { class: "ui5-search-field-separator" })] })) : this.filterButton?.length ? (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsx("div", { class: "ui5-filter-wrapper", style: "display: contents", children: jsxRuntime.jsx("slot", { name: "filterButton" }) }), jsxRuntime.jsx("div", { class: "ui5-search-field-separator" })] })) : null, jsxRuntime.jsx("input", { class: "ui5-search-field-inner-input", role: "searchbox", "aria-description": this.accessibleDescription, "aria-label": this.accessibleName || this._translations.searchFieldAriaLabel, "aria-autocomplete": "both", "aria-controls": "ui5-search-list", value: this.value, placeholder: this.placeholder, "data-sap-focus-ref": true, onInput: this._handleInput, onFocusIn: this._onfocusin, onFocusOut: this._onfocusout, onKeyDown: this._onkeydown, onClick: this._handleInnerClick }), this._effectiveShowClearIcon &&
                             jsxRuntime.jsx(Icon.Icon, { class: "ui5-shell-search-field-icon", name: decline.decline, showTooltip: true, accessibleName: this._translations.clearIcon, onClick: this._handleClear }), jsxRuntime.jsx(Icon.Icon, { class: {
                                 "ui5-shell-search-field-icon": true,
                                 "ui5-shell-search-field-search-icon": this._isSearchIcon,
-                            }, name: search.search, showTooltip: true, accessibleName: this._effectiveIconTooltip, onClick: this._handleSearchIconPress })] }) }) })));
+                            }, name: search.searchIcon, showTooltip: true, accessibleName: this._effectiveIconTooltip, onClick: this._handleSearchIconPress })] }) }) })));
     }
 
     const f=(t,a,e,o)=>{webcomponentsBase.x(t)&&(e!==a.length-1?(t.stopImmediatePropagation(),t.preventDefault(),a[e+1].focus()):(o.closeValueState(),o.focusInput())),webcomponentsBase.V(t)&&(t.preventDefault(),t.stopImmediatePropagation(),e>0?a[e-1].focus():o.focusInput()),webcomponentsBase.P(t)&&(t.preventDefault(),t.stopImmediatePropagation(),o.isPopoverOpen()&&o.focusInput()),webcomponentsBase._(t)&&(t.preventDefault(),t.stopImmediatePropagation(),o.navigateToItem()),webcomponentsBase.m$1(t)&&(t.preventDefault(),t.stopImmediatePropagation());};
@@ -1261,7 +1261,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     })(InputSuggestionsFilter || (InputSuggestionsFilter = {}));
     var InputSuggestionsFilter$1 = InputSuggestionsFilter;
 
-    var __decorate$4 = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var __decorate$3 = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
         else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
@@ -2628,124 +2628,124 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             return value;
         }
     };
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "disabled", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "highlight", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "placeholder", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "readonly", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "required", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "noTypeahead", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "type", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "value", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "valueState", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "name", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "showSuggestions", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Number })
     ], Input.prototype, "maxlength", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "accessibleName", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "accessibleNameRef", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "accessibleDescription", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "accessibleDescriptionRef", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "showClearIcon", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "open", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "filter", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "_effectiveShowClearIcon", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "focused", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "hint", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "valueStateOpen", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Object })
     ], Input.prototype, "_inputAccInfo", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Object })
     ], Input.prototype, "_nativeInputAttributes", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Number })
     ], Input.prototype, "_inputWidth", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Number })
     ], Input.prototype, "_listWidth", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean, noAttribute: true })
     ], Input.prototype, "_inputIconFocused", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ noAttribute: true })
     ], Input.prototype, "_associatedLabelsTexts", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ noAttribute: true })
     ], Input.prototype, "_accessibleLabelsRefTexts", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ noAttribute: true })
     ], Input.prototype, "_associatedDescriptionRefTexts", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Object })
     ], Input.prototype, "Suggestions", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Array, noAttribute: true })
     ], Input.prototype, "_linksListenersArray", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean, noAttribute: true })
     ], Input.prototype, "_isComposing", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.d({ type: HTMLElement, "default": true })
     ], Input.prototype, "suggestionItems", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.d()
     ], Input.prototype, "icon", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.d({
             type: HTMLElement,
             invalidateOnChildChange: true,
         })
     ], Input.prototype, "valueStateMessage", void 0);
-    __decorate$4([
+    __decorate$3([
         parametersBundle_css.i("@ui5/webcomponents")
     ], Input, "i18nBundle", void 0);
-    Input = Input_1 = __decorate$4([
+    Input = Input_1 = __decorate$3([
         webcomponentsBase.m({
             tag: "ui5-input",
             languageAware: true,
@@ -2854,7 +2854,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     var styles = `:host([ui5-suggestion-item]){height:auto;min-height:var(--_ui5_list_item_base_height)}:host([ui5-suggestion-item]) .ui5-li-root{min-height:var(--_ui5_list_item_base_height)}:host([ui5-suggestion-item]) .ui5-li-content{padding-bottom:.5rem;padding-top:.5rem;box-sizing:border-box}
 `;
 
-    var __decorate$3 = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var __decorate$2 = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
         else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
@@ -2890,16 +2890,16 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             return -1;
         }
     };
-    __decorate$3([
+    __decorate$2([
         webcomponentsBase.s()
     ], SuggestionItem.prototype, "text", void 0);
-    __decorate$3([
+    __decorate$2([
         webcomponentsBase.s()
     ], SuggestionItem.prototype, "additionalText", void 0);
-    __decorate$3([
+    __decorate$2([
         webcomponentsBase.s()
     ], SuggestionItem.prototype, "markupText", void 0);
-    SuggestionItem = __decorate$3([
+    SuggestionItem = __decorate$2([
         webcomponentsBase.m({
             tag: "ui5-suggestion-item",
             template: SuggestionItemTemplate,
@@ -2952,7 +2952,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     var SearchFieldCss = `:host,.ui5-shellbar-search-field-wrapper{height:2.25rem;display:flex;align-items:center}:host(:not([collapsed])),.ui5-shellbar-search-field-wrapper{min-width:18rem;max-width:36rem;margin:0;height:2.25rem;color:var(--_ui5-search-field-text-color);font-size:var(--sapFontSize);font-family:var(--sapFontFamily);font-style:normal;box-shadow:var(--sapField_Shadow);border-radius:var(--_ui5_search_input_border_radius);box-sizing:border-box;text-align:start;background:var(--sapField_BackgroundStyle);background-color:var(--_ui5-search-wrapper-background);position:relative}.ui5-search-field-busy-indicator{width:100%;height:100%;border-radius:var(--_ui5_search_input_border_radius)}.ui5-shellbar-search-field-wrapper{flex:1;min-width:auto}:host(:not([collapsed]):hover),:host(:not([collapsed]):focus-within),.ui5-shellbar-search-field-wrapper:focus-within{box-shadow:var(--sapField_Hover_Shadow);background:var(--_ui5-search-wrapper-hover-background);background-color:var(--_ui5-search-wrapper-hover-background-color)}:host([focused-inner-input]) .ui5-search-field-root{outline:var(--_ui5_search_wrapper_outline);border-radius:var(--_ui5_search_input_border_radius);outline-offset:-.125rem}.ui5-search-field-root{width:100%;height:100%;position:relative;background:transparent;display:inline-block;outline:none;box-sizing:border-box;color:inherit;transition:border-color .2s ease-in-out;border-radius:var(--_ui5_search_input_border_radius);overflow:hidden}.ui5-search-field-content{height:100%;display:flex;flex-direction:row;justify-content:flex-end;align-items:center;overflow:hidden}[ui5-select]{outline:none;margin:var(--_ui5_search_input_scope_margin);max-width:10rem;border-radius:var(--_ui5_search_input_border_radius);border:var(--_ui5-search-border);box-shadow:none;background:unset;background-color:var(--_ui5-search-elements-background);height:var(--_ui5-search-select-height);--_ui5_select_label_color: var(--sapShell_TextColor);--_ui5_input_focus_outline_color: transparent;--_ui5_select_bottom_border_gradient: none}[ui5-select]:hover:not(:active):not(:focus-within){box-shadow:var(--_ui5-search_input_scope_hover_shadow)}[ui5-select]:not(:active):not(:focus-within)::part(icon-wrapper):hover{box-shadow:var(--_ui5-search_input_scope_hover_shadow)}[ui5-select]:active,[ui5-select]:focus-within{box-shadow:var(--_ui5-search_input_scope_active_shadow)}[ui5-select]:active::part(icon-wrapper),[ui5-select]:focus-within::part(icon-wrapper){box-shadow:var(--_ui5-search_input_scope_active_shadow);background:var(--sapShell_Active_Background);color:var(--sapShell_Active_TextColor)}[ui5-select]::part(icon){display:flex;justify-content:center;align-items:stretch;height:100%;padding:0 .5rem;align-self:center;border-radius:var(--_ui5_search_input_border_radius);color:var(--sapShell_InteractiveTextColor)}[ui5-select]::part(popover){background-color:var(--sapShellColor)}::slotted([slot="filterButton"]){--_ui5_button_focused_border_radius: var(--_ui5_search_filter_button_border_radius);min-width:var(--_ui5_search_icon_size);height:var(--_ui5_search_icon_size);border:var(--_ui5_search_filter_button_border);border-radius:var(--_ui5_search_filter_button_border_radius);color:var(--sapShell_InteractiveTextColor);outline:none;background:var(--_ui5-search-filter_button_background_color);box-sizing:border-box;margin-inline-end:.1875rem;margin-inline-start:.25rem}::slotted([slot="filterButton"]:focus-within){background-color:var(--ui5_search_filter_button_background_active);border:var(--_ui5_search_filter_button_border)}::slotted([slot="filterButton"]:not([active]):not(:focus-within):hover){background-color:var(--sapShell_Hover_Background);border:var(--_ui5_seach_filter_button_border_hover)}.ui5-search-field-inner-input{font-size:var(--sapFontSize);font-family:var(--sapFontFamily);font-style:normal;padding:.5rem 0;height:100%;width:100%;box-sizing:border-box;background-color:var(--_ui5-search-elements-background);border:var(--_ui5-search-border);outline:none;color:inherit;padding-inline-start:var(--_ui5-search-input-start-padding);padding-inline-end:var(--_ui5_search_input_end_padding)}:host([focused-inner-input]) .ui5-search-field-inner-input{outline:var(--_ui5_search_input_outline);border-radius:var(--_ui5_search_input_border_radius);outline-offset:-.3125rem}:host(:not([mode="Scoped"])) .ui5-search-field-inner-input{padding-inline-start:.875rem}.ui5-search-field-inner-input:hover{background-color:var(--_ui5-search-elements-hover-background)}.ui5-search-field-inner-input:focus-within{background-color:var(--_ui5-search-elements-active-background)}.ui5-search-field-inner-input::placeholder{font-weight:400;font-style:italic;color:var(--sapField_PlaceholderTextColor);padding-inline-start:.125rem}:host([mode="Scoped"]) .ui5-search-field-inner-input{margin-inline-start:var(--_ui5_search_input_start_margin)}.ui5-search-field-separator{height:1.5rem;width:.0625rem;background:var(--_ui5_search_separator_background);box-sizing:border-box}.ui5-shell-search-field-button{outline:none;min-width:var(--_ui5_search_icon_size);height:var(--_ui5_search_icon_size);border-radius:var(--_ui5_search_icon_border_radius);box-sizing:border-box;cursor:pointer}.ui5-shell-search-field-button:not([design=Emphasized]){color:var(--sapShell_InteractiveTextColor);background-color:var(--_ui5-search-elements-background);min-width:var(--_ui5_search_icon_size_default);height:var(--_ui5_search_icon_size_default);border-radius:var(--_ui5_shellbar_button_border_radius)}.ui5-shell-search-field-button:not([design=Emphasized]):hover{background-color:var(--sapShell_Hover_Background);border-color:var(--sapButton_Lite_Hover_BorderColor);border-radius:var(--_ui5_shellbar_button_border_radius)}.ui5-shell-search-field-button[desktop]:not([active])::part(button):after,.ui5-shell-search-field-button:not([active])::part(button):focus-visible:after,.ui5-shell-search-field-button[desktop][active][design=Emphasized]::part(button):focus-within:after,.ui5-shell-search-field-button[active][design=Emphasized]::part(button):focus-visible:after,.ui5-shell-search-field-button[desktop][active]::part(button):focus-within:before,.ui5-shell-search-field-button[active]::part(button):focus-visible:before,.ui5-shell-search-field-button[design=Emphasized][desktop]::part(button):focus-within:before,.ui5-shell-search-field-button[design=Emphasized]::part(button):focus-visible:before{border-radius:var(--_ui5_shellbar_button_border_radius)}.ui5-shell-search-field-icon{display:flex;justify-content:center;align-items:stretch;cursor:pointer;outline:none;min-width:var(--_ui5_search_icon_size);height:var(--_ui5_search_icon_size);border-radius:var(--_ui5_search_icon_border_radius);margin-inline-end:.25rem;margin-inline-start:.1875rem;box-sizing:border-box;color:var(--sapShell_InteractiveTextColor);background-color:var(--_ui5-search-elements-background);border:var(--_ui5-search-icon-border)}.ui5-shell-search-field-icon::part(root){padding:var(--_ui5_search_icon_padding);outline-offset:-.125rem}.ui5-shell-search-field-icon:hover::part(root){padding:var(--_ui5_search_icon_hover_padding);outline-offset:-.1875rem}.ui5-shell-search-field-icon:focus::part(root){border-radius:var(--_ui5_search_icon_border_radius)}.ui5-shell-search-field-icon:hover,.ui5-shell-search-field-input-button:hover{background:var(--sapShell_Hover_Background);border:1px solid var(--sapButton_Lite_Hover_BorderColor);color:var(--sapShell_InteractiveTextColor)}.ui5-shell-search-field-search-icon{background-color:var(--sapButton_Emphasized_Background);border-color:var(--sapButton_Emphasized_BorderColor);color:var(--sapButton_Emphasized_TextColor)}.ui5-search-field-select{--_ui5_input_focus_border_radius: var(--_ui5_search_input_border_radius)}.ui5-search-field-select::part(icon-wrapper){border-radius:var(--_ui5_search_input_border_radius);height:100%}.ui5-search-field-inner-input::selection{background:var(--sapSelectedColor);color:var(--sapContent_ContrastTextColor)}
 `;
 
-    var __decorate$2 = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var __decorate$1 = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
         else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
@@ -3094,46 +3094,46 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             }
         }
     };
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s({ type: Boolean })
     ], SearchField.prototype, "fieldLoading", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s({ type: Boolean })
     ], SearchField.prototype, "showClearIcon", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s({ type: Boolean })
     ], SearchField.prototype, "collapsed", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s()
     ], SearchField.prototype, "value", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s()
     ], SearchField.prototype, "placeholder", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s()
     ], SearchField.prototype, "accessibleName", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s()
     ], SearchField.prototype, "accessibleDescription", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s()
     ], SearchField.prototype, "scopeValue", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.d({ type: HTMLElement, individualSlots: true, invalidateOnChildChange: true })
     ], SearchField.prototype, "scopes", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.d()
     ], SearchField.prototype, "filterButton", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s({ type: Boolean })
     ], SearchField.prototype, "focusedInnerInput", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s({ type: Boolean })
     ], SearchField.prototype, "_effectiveShowClearIcon", void 0);
-    __decorate$2([
+    __decorate$1([
         parametersBundle_css.i("@ui5/webcomponents-fiori")
     ], SearchField, "i18nBundle", void 0);
-    SearchField = SearchField_1 = __decorate$2([
+    SearchField = SearchField_1 = __decorate$1([
         webcomponentsBase.m({
             tag: "ui5-search-field",
             languageAware: true,
@@ -3174,7 +3174,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     SearchField.define();
     var SearchField$1 = SearchField;
 
-    var __decorate$1 = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
         else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
@@ -3619,41 +3619,41 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             return domRef ? domRef.querySelector(`[ui5-select]`) : null;
         }
     };
-    __decorate$1([
+    __decorate([
         webcomponentsBase.s({ type: Boolean })
     ], Search.prototype, "loading", void 0);
-    __decorate$1([
+    __decorate([
         webcomponentsBase.s({ type: Boolean })
     ], Search.prototype, "noTypeahead", void 0);
-    __decorate$1([
+    __decorate([
         webcomponentsBase.d({
             type: HTMLElement,
             "default": true,
             invalidateOnChildChange: true,
         })
     ], Search.prototype, "items", void 0);
-    __decorate$1([
+    __decorate([
         webcomponentsBase.d()
     ], Search.prototype, "action", void 0);
-    __decorate$1([
+    __decorate([
         webcomponentsBase.d()
     ], Search.prototype, "illustration", void 0);
-    __decorate$1([
+    __decorate([
         webcomponentsBase.d()
     ], Search.prototype, "messageArea", void 0);
-    __decorate$1([
+    __decorate([
         webcomponentsBase.s({ type: Boolean })
     ], Search.prototype, "open", void 0);
-    __decorate$1([
+    __decorate([
         webcomponentsBase.s({ noAttribute: true })
     ], Search.prototype, "_innerValue", void 0);
-    __decorate$1([
+    __decorate([
         webcomponentsBase.s({ type: Boolean })
     ], Search.prototype, "_performItemSelectionOnMobile", void 0);
-    __decorate$1([
+    __decorate([
         parametersBundle_css.i("@ui5/webcomponents-fiori")
     ], Search, "i18nBundle", void 0);
-    Search = Search_1 = __decorate$1([
+    Search = Search_1 = __decorate([
         webcomponentsBase.m({
             tag: "ui5-search",
             languageAware: true,
@@ -3682,129 +3682,9 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     Search.define();
     var Search$1 = Search;
 
-    function ShellBarSearchPopoverTemplate() {
-        return (SearchPopoverTemplate.call(this, ShellBarSearchDialogHeader));
-    }
-    function ShellBarSearchDialogHeader() {
-        return (jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsxs("header", { slot: "header", class: "ui5-search-popup-searching-header", children: [jsxRuntime.jsx("div", { class: "ui5-shellbar-search-field-wrapper", children: SearchFieldTemplate.call(this, { forceExpanded: true }) }), jsxRuntime.jsx(Button.Button, { design: Button.ButtonDesign.Transparent, onClick: this._handleCancel, children: this.cancelButtonText })] }) }));
-    }
-
-    function ShellBarSearchTemplate() {
-        return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [SearchFieldTemplate.call(this), ShellBarSearchPopoverTemplate.call(this)] }));
-    }
-
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
-    var ShellBarSearchCss = `:host(:not([collapsed])){min-width:13rem}
-`;
-
-    var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-        var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-        if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-        else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-        return c > 3 && r && Object.defineProperty(target, key, r), r;
-    };
-    var ShellBarSearch_1;
-    /**
-     * @class
-     * Search field for the ShellBar component.
-     * @constructor
-     * @extends Search
-     * @public
-     * @since 2.10.0
-     * @experimental
-     */
-    let ShellBarSearch = ShellBarSearch_1 = class ShellBarSearch extends Search$1 {
-        constructor() {
-            super(...arguments);
-            /**
-             * Indicates whether the suggestions popover should be opened on focus.
-             * @default false
-             * @public
-             */
-            this.autoOpen = false;
-        }
-        _handleSearchIconPress() {
-            if (Theme.d() && this.open) {
-                this._handleSearchEvent();
-                this._closePopupAndResetState();
-                return;
-            }
-            super._handleSearchIconPress();
-            if (this.collapsed) {
-                this.collapsed = false;
-            }
-            else if (!this.value) {
-                this.collapsed = true;
-            }
-        }
-        _handleEnter() {
-            if (!this.value && !this.collapsed) {
-                this.collapsed = true;
-                setTimeout(() => {
-                    this.focus();
-                }, 0);
-            }
-            else {
-                super._handleEnter();
-            }
-        }
-        _onFocusOutSearch(e) {
-            if (Theme.d()) {
-                return;
-            }
-            super._onFocusOutSearch(e);
-        }
-        _handleInput(e) {
-            super._handleInput(e);
-            if (Theme.d()) {
-                this._performItemSelectionOnMobile = this._shouldPerformSelectionOnMobile(e.inputType);
-            }
-        }
-        get _effectiveIconTooltip() {
-            if (this.collapsed) {
-                return ShellBarSearch_1.i18nBundle.getText(i18nDefaults$1.SHELLBAR_SEARCH_COLLAPSED);
-            }
-            if (this.value) {
-                return ShellBarSearch_1.i18nBundle.getText(i18nDefaults$1.SEARCH_FIELD_SEARCH_ICON);
-            }
-            return ShellBarSearch_1.i18nBundle.getText(i18nDefaults$1.SHELLBAR_SEARCH_EXPANDED);
-        }
-        get nativeInput() {
-            const domRef = this.shadowRoot;
-            return Theme.d() ? domRef?.querySelector(`[ui5-responsive-popover] input`) : super.nativeInput;
-        }
-        _onfocusin() {
-            super._onfocusin();
-            if (this.autoOpen) {
-                this.open = true;
-                this.fireDecoratorEvent("open");
-            }
-        }
-        onBeforeRendering() {
-            super.onBeforeRendering();
-            if (Theme.d()) {
-                this.collapsed = true;
-            }
-        }
-    };
-    __decorate([
-        webcomponentsBase.s({ type: Boolean })
-    ], ShellBarSearch.prototype, "autoOpen", void 0);
-    ShellBarSearch = ShellBarSearch_1 = __decorate([
-        webcomponentsBase.m({
-            tag: "ui5-shellbar-search",
-            template: ShellBarSearchTemplate,
-            styles: [
-                Search$1.styles,
-                ShellBarSearchCss,
-            ],
-        })
-    ], ShellBarSearch);
-    ShellBarSearch.define();
-    var ShellBarSearch_default = ShellBarSearch;
-
     exports.Input = Input$1;
-    exports.ShellBarSearch_default = ShellBarSearch_default;
+    exports.Search = Search$1;
+    exports.SearchFieldTemplate = SearchFieldTemplate;
+    exports.SearchPopoverTemplate = SearchPopoverTemplate;
 
 }));
