@@ -536,6 +536,9 @@ sap.ui.define([
 
 		if (oOldInitPromise) {
 			await oOldInitPromise.promise;
+			// If another initialization ran in parallel, we might have outdated information in the property bag.
+			// Therefore, we need to enhance it again to get the latest information from the session.
+			enhancePropertyBag(mProperties);
 			checkPartialFlexState(mProperties);
 			checkComponentId(mProperties);
 			checkVersionAndAllContexts(mProperties);

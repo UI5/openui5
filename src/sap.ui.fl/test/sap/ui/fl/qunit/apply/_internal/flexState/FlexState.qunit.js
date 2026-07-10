@@ -1,6 +1,7 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/base/util/Deferred",
 	"sap/base/util/merge",
 	"sap/base/util/uid",
 	"sap/base/Log",
@@ -20,6 +21,7 @@ sap.ui.define([
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
+	Deferred,
 	merge,
 	uid,
 	Log,
@@ -813,7 +815,7 @@ sap.ui.define([
 
 			FlexState.getAppDescriptorChanges(sReference);
 			assert.equal(this.oIsLayerFilteringRequiredStub.callCount, 2, "the check was made again");
-			assert.equal(this.oGetFlexInfoSessionStub.callCount, 8, "get flex info session again");
+			assert.equal(this.oGetFlexInfoSessionStub.callCount, 9, "get flex info session again");
 		});
 	});
 
@@ -864,6 +866,38 @@ sap.ui.define([
 				componentId: sComponentId
 			});
 			assert.strictEqual(oDataSelector.get({reference: sReference}).length, 2, "removing max layer, all changes are available again");
+		});
+
+		QUnit.test("when a second initialize is queued behind a running one that repopulates the FlexInfoSession", async function(assert) {
+			// The second initialize enhances its property bag before the first one finishes, so it captures
+			// the still-empty session. The first initialize then writes allContextsProvided into the session
+			// via the response info and builds the instance with that value. Without re-enhancing after the
+			// await, the second initialize would compare the fresh instance (true) against its stale property
+			// bag (undefined) and trigger an unnecessary reinitialization. Re-enhancing keeps them in sync.
+			const oFirstLoadDeferred = new Deferred();
+			this.oLoadFlexDataStub.onCall(0).returns(oFirstLoadDeferred.promise);
+
+			const oFirstInitPromise = FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId
+			});
+			const oSecondInitPromise = FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId
+			});
+
+			oFirstLoadDeferred.resolve(merge({}, mEmptyResponse, {
+				changes: { info: { allContextsProvided: true } }
+			}));
+
+			await oFirstInitPromise;
+			await oSecondInitPromise;
+
+			assert.strictEqual(
+				this.oLoadFlexDataStub.callCount,
+				1,
+				"the second initialize re-reads the repopulated session and does not reinitialize"
+			);
 		});
 
 		QUnit.test("when initialize is called with different versions", async function(assert) {
