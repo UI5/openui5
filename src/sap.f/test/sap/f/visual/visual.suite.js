@@ -4,6 +4,8 @@ module.exports = [
 	"AdaptiveCardVisualTests.spec.js",
 	"AvatarGroup.spec.js",
 	"DynamicPage.spec.js",
+	"DynamicPageWithIconTabBar.spec.js",
+	"DynamicPageWithWizard.spec.js",
 	"GridContainer.spec.js",
 	"GridListItem.spec.js",
 	"GridListVisualTests.spec.js",

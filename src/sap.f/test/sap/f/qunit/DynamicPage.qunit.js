@@ -461,6 +461,132 @@ function (
 		oStub.restore();
 	});
 
+	QUnit.test("_toggleSpaceForScrollbar offsets title for classic scrollbar", function (assert) {
+		// Arrange
+		this.stub(this.oDynamicPage, "_getEffectiveScrollbarWidth").returns(15);
+		this.stub(this.oDynamicPage, "_hasOverlayScrollbar").returns(false);
+
+		// Act
+		this.oDynamicPage._toggleSpaceForScrollbar(true);
+
+		// Assert
+		assert.strictEqual(this.oDynamicPage.$titleArea.css("right"), "15px",
+			"Title area 'right' offset equals the scrollbar width");
+		assert.notOk(this.oDynamicPage.hasStyleClass("sapFDynamicPageWithOverlayScrollbar"),
+			"'sapFDynamicPageWithOverlayScrollbar' class is not added");
+	});
+
+	QUnit.test("_toggleSpaceForScrollbar offsets title for overlay scrollbar", function (assert) {
+		// Arrange
+		this.stub(this.oDynamicPage, "_getEffectiveScrollbarWidth").returns(12);
+		this.stub(this.oDynamicPage, "_hasOverlayScrollbar").returns(true);
+
+		// Act
+		this.oDynamicPage._toggleSpaceForScrollbar(true);
+
+		// Assert
+		assert.strictEqual(this.oDynamicPage.$titleArea.css("right"), "12px",
+			"Title area 'right' offset equals the overlay scrollbar fallback width");
+		assert.ok(this.oDynamicPage.hasStyleClass("sapFDynamicPageWithOverlayScrollbar"),
+			"'sapFDynamicPageWithOverlayScrollbar' class is added");
+	});
+
+	QUnit.test("_toggleSpaceForScrollbar sets zero offset when no scrollbar is needed", function (assert) {
+		// Arrange
+		this.stub(this.oDynamicPage, "_getEffectiveScrollbarWidth").returns(0);
+		this.stub(this.oDynamicPage, "_hasOverlayScrollbar").returns(false);
+
+		// Act
+		this.oDynamicPage._toggleSpaceForScrollbar(false);
+
+		// Assert
+		assert.strictEqual(this.oDynamicPage.$titleArea.css("right"), "0px",
+			"Title area 'right' offset is 0");
+		assert.notOk(this.oDynamicPage.hasStyleClass("sapFDynamicPageWithOverlayScrollbar"),
+			"'sapFDynamicPageWithOverlayScrollbar' class is not added");
+	});
+
+	QUnit.test("_toggleSpaceForScrollbar removes overlay class on transition to no scrollbar", function (assert) {
+		// Arrange — start with overlay scrollbar
+		this.stub(this.oDynamicPage, "_hasOverlayScrollbar")
+			.withArgs(true).returns(true)
+			.withArgs(false).returns(false);
+		this.stub(this.oDynamicPage, "_getEffectiveScrollbarWidth")
+			.withArgs(true).returns(12)
+			.withArgs(false).returns(0);
+		this.oDynamicPage._toggleSpaceForScrollbar(true);
+		assert.ok(this.oDynamicPage.hasStyleClass("sapFDynamicPageWithOverlayScrollbar"),
+			"'sapFDynamicPageWithOverlayScrollbar' class is initially added");
+
+		// Act — transition to no scrollbar
+		this.oDynamicPage._toggleSpaceForScrollbar(false);
+
+		// Assert
+		assert.notOk(this.oDynamicPage.hasStyleClass("sapFDynamicPageWithOverlayScrollbar"),
+			"'sapFDynamicPageWithOverlayScrollbar' class is removed after transition");
+		assert.strictEqual(this.oDynamicPage.$titleArea.css("right"), "0px",
+			"Title area 'right' offset is 0");
+	});
+
+	QUnit.test("_getEffectiveScrollbarWidth uses _iSystemScrollbarWidth", function (assert) {
+		// Arrange
+		this.oDynamicPage._iSystemScrollbarWidth = 17;
+
+		// Act — call twice
+		var iFirst = this.oDynamicPage._getEffectiveScrollbarWidth(true);
+		var iSecond = this.oDynamicPage._getEffectiveScrollbarWidth(true);
+
+		// Assert
+		assert.strictEqual(iFirst, 17, "First call returns the system scrollbar width");
+		assert.strictEqual(iSecond, 17, "Second call returns the same value");
+	});
+
+	QUnit.test("_getEffectiveScrollbarWidth returns overlay fallback when system scrollbar width is 0", function (assert) {
+		// Arrange — simulate overlay scrollbar (width = 0)
+		this.oDynamicPage._iSystemScrollbarWidth = 0;
+
+		// Act
+		var iWidth = this.oDynamicPage._getEffectiveScrollbarWidth(true);
+
+		// Assert
+		assert.strictEqual(iWidth, DynamicPage.OVERLAY_SCROLLBAR_WIDTH,
+			"Returns the overlay scrollbar fallback width when system scrollbar width is 0");
+	});
+
+	QUnit.test("_hasOverlayScrollbar uses _iSystemScrollbarWidth", function (assert) {
+		// Arrange — classic scrollbar
+		this.oDynamicPage._iSystemScrollbarWidth = 17;
+
+		// Assert
+		assert.notOk(this.oDynamicPage._hasOverlayScrollbar(true),
+			"Returns false when system scrollbar width is > 0");
+
+		// Arrange — overlay scrollbar
+		this.oDynamicPage._iSystemScrollbarWidth = 0;
+
+		// Assert
+		assert.ok(this.oDynamicPage._hasOverlayScrollbar(true),
+			"Returns true when system scrollbar width is 0 and scrolling is needed");
+		assert.notOk(this.oDynamicPage._hasOverlayScrollbar(false),
+			"Returns false when no scrolling is needed, even with system scrollbar width 0");
+	});
+
+	QUnit.test("_onResize refreshes _iSystemScrollbarWidth", function (assert) {
+		// Arrange — pre-fill with a stale value
+		this.oDynamicPage._iSystemScrollbarWidth = 99;
+		var oMockEvent = {
+			size: { width: 1000, height: 800 },
+			oldSize: { width: 1000, height: 800 }
+		};
+
+		// Act
+		this.oDynamicPage._onResize(oMockEvent);
+
+		// Assert — the stale value (99) must be replaced with a fresh measurement
+		assert.notStrictEqual(this.oDynamicPage._iSystemScrollbarWidth, 99,
+			"Stale system scrollbar width is replaced after resize");
+	});
+
 	QUnit.test("BCP: 1870261908 Header title cursor CSS reset is applied", function (assert) {
 		// Arrange
 		var $MainHeading = this.oDynamicPage.$().find(".sapFDynamicPageTitleMainHeading"),
