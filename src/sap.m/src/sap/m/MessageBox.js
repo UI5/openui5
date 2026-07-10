@@ -437,6 +437,10 @@ sap.ui.define([
 					"ERROR": IconPool.getIconURI("error"),
 					"SUCCESS": IconPool.getIconURI("sys-enter-2"),
 					"QUESTION": IconPool.getIconURI("sys-help-2")
+				},
+				mRoles = {
+					"INFORMATION": DialogRoleType.Dialog,
+					"SUCCESS": DialogRoleType.Dialog
 				};
 
 		_verifyBundle();
@@ -571,13 +575,14 @@ sap.ui.define([
 			closeOnNavigation: mOptions.closeOnNavigation
 		}).addStyleClass("sapMMessageBox");
 
+		oDialog.setProperty("role", mRoles[mOptions.icon] || DialogRoleType.AlertDialog);
+
 		// If we have additional details, we should wrap the content in a details layout.
 		if (mOptions.hasOwnProperty("details") && mOptions.details !== "") {
 			vMessageContent = _getDetailsLayout(mOptions, vMessageContent, oDialog, aButtons[0]);
 		}
 
 		oDialog.addContent(vMessageContent);
-		oDialog.setProperty("role", DialogRoleType.AlertDialog);
 
 		if (mClasses[mOptions.icon]) {
 			oDialog.addStyleClass(mClasses[mOptions.icon]);

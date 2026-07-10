@@ -375,6 +375,59 @@
 					}
 				]
 			},
+
+			/**
+			 * The signature and documentation embedded in the "name" property of the following matcher overrides
+			 * must be kept in sync with the source code in src/sap.ui.core/src/sap/ui/test/matchers/*.
+			 */
+			{
+				"name": "sap.ui.test.matchers.Ancestor",
+				"kind": "object",
+				"constructor": null,
+				"properties": [
+					{
+						"name": "new (/**\n* The ancestor control to check, if undefined, validates every control to true.\n* Can be a control or a control ID\n*/\nvAncestor: object | string,\n/**\n* Specifies if the ancestor should be a direct ancestor (parent)\n*/\nbDirect?: boolean)",
+						"type": "function(sap.ui.core.Element): boolean",
+						"visibility": "public"
+					}
+				]
+			},
+			{
+				"name": "sap.ui.test.matchers.Descendant",
+				"kind": "object",
+				"constructor": null,
+				"properties": [
+					{
+						"name": "new (/**\n* The descendant control to check. If undefined, it validates every control to true.\n* Can be a control or a control ID\n*/\nvDescendantControl: object | string,\n/**\n* Specifies if the descendant should be a direct child\n*/\nbDirect?: boolean)",
+						"type": "function(sap.ui.core.Element): boolean",
+						"visibility": "public"
+					}
+				]
+			},
+			{
+				"name": "sap.ui.test.matchers.Properties",
+				"kind": "object",
+				"constructor": null,
+				"properties": [
+					{
+						"name": "new (/**\n* The object with the properties to be checked.\n* If a value is a RegExp, it tests the RegExp with the value. RegExp only works with string properties.\n*/\noProperties: object)",
+						"type": "function(sap.ui.core.Element): boolean",
+						"visibility": "public"
+					}
+				]
+			},
+			{
+				"name": "sap.ui.test.matchers.Sibling",
+				"kind": "object",
+				"constructor": null,
+				"properties": [
+					{
+						"name": "new (/**\n* the sibling control to check. Can be a control or a control ID. If undefined, the result will always \n* be true. \n*/\nvSibling: object | string,\n/**\n* Specifies how to match\n*/\noOptions?: {\n/**\n* Whether to match by relationships of the DOM references, false by default\n*/\nuseDom: boolean;\n/**\n* Match only if control's DOM reference is before the sibling's in the DOM tree\n*/\nprev: boolean;\n/**\n* Match only if control's DOM reference is after the sibling's in the DOM tree\n*/\nnext: boolean;\n/**\n* How many levels of ancestors to search\n*/\nlevel: boolean;\n})",
+						"type": "function(sap.ui.core.Element): boolean",
+						"visibility": "public"
+					}
+				]
+			},
 			{
 				"name": "module:sap/ui/test/starter/config.QUnitConfiguration",
 				"properties": [

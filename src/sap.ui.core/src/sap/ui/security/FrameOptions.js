@@ -248,19 +248,53 @@ sap.ui.define(['sap/base/Log'], function(Log) {
 		}
 	};
 
+	// Parse a URL and return its lowercased hostname without a trailing dot.
+	// Returns "" if the input is missing, opaque, or unparseable. Callers must
+	// treat "" as "do not trust".
+	FrameOptions._getHostname = function(sUrl) {
+		try {
+			return new URL(sUrl).hostname.toLowerCase().replace(/\.$/, "");
+		} catch (e) {
+			return "";
+		}
+	};
+
+	// Match a hostname against an allowlist entry.
+	//
+	// A bare entry "example.com" matches the host "example.com" itself and
+	// any subdomain "*.example.com".
+	//
+	// A leading-dot entry ".example.com" restricts the match to its
+	// subdomains: "sub.example.com" matches while "example.com" does not. This
+	// preserves the legacy allowlist semantics
+	FrameOptions._matchHost = function(sHostname, sEntry) {
+		// Strip trailing dots so the root-anchored FQDN form "example.com." matches "example.com".
+		sEntry = String(sEntry).trim().toLowerCase().replace(/\.+$/, "");
+		if (!sHostname || !sEntry) {
+			return false;
+		}
+		if (sEntry.startsWith(".")) {
+			// subdomain-only form: hostname must end with the entry incl. dot
+			return sHostname.endsWith(sEntry);
+		}
+		// bare form: exact host or proper subdomain
+		return sHostname === sEntry || sHostname.endsWith("." + sEntry);
+	};
+
 	FrameOptions.prototype._check = function(bParentResponsePending) {
 		if (this.bRunnable) {
 			return;
 		}
 		var bTrusted = false;
-		if (this.bAllowSameOrigin && this.sParentOrigin && FrameOptions.__window.document.URL.indexOf(this.sParentOrigin) == 0) {
+		var sSelfOrigin = FrameOptions.__window.location.origin;
+		// Exclude the literal "null" origin which indicates an opaque origin (e.g. a sandboxed iframe or
+		// a data: or file: URI). Two opaque origins are not the same origin.
+		if (this.bAllowSameOrigin && sSelfOrigin !== "null" && this.sParentOrigin === sSelfOrigin) {
 			bTrusted = true;
 		} else if (this.mSettings.allowlist && this.mSettings.allowlist.length != 0) {
-			var sHostName = this.sParentOrigin.split('//')[1];
-			sHostName = sHostName.split(':')[0];
+			var sParentHost = FrameOptions._getHostname(this.sParentOrigin);
 			for (var i = 0; i < this.mSettings.allowlist.length; i++) {
-				var match = sHostName.indexOf(this.mSettings.allowlist[i]);
-				if (match != -1 && sHostName.substring(match) == this.mSettings.allowlist[i]) {
+				if (FrameOptions._matchHost(sParentHost, this.mSettings.allowlist[i])) {
 					bTrusted = true;
 					break;
 				}

@@ -3956,10 +3956,19 @@ sap.ui.define([
 	/* Header specific methods */
 
 	ObjectPageLayout.prototype.setHeaderTitle = function (oHeaderTitle, bSuppressInvalidate) {
+		var oOldHeaderTitle = this.getHeaderTitle();
+
+		if (oOldHeaderTitle && oOldHeaderTitle !== oHeaderTitle) {
+			oOldHeaderTitle.detachEvent("_titleTextChange", this._updateAriaLabels, this);
+		}
+
 		if (oHeaderTitle && typeof oHeaderTitle.addEventDelegate === "function"){
 			oHeaderTitle.addEventDelegate({
 				onAfterRendering: this._onAfterHeaderTitleRendering.bind(this)
 			});
+		}
+		if (oHeaderTitle && typeof oHeaderTitle.attachEvent === "function") {
+			oHeaderTitle.attachEvent("_titleTextChange", this._updateAriaLabels, this);
 		}
 		this.setAggregation("headerTitle", oHeaderTitle, bSuppressInvalidate);
 		this._oObserver && this._oObserver.disconnect();

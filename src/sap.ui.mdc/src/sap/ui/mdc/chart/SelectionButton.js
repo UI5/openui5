@@ -250,6 +250,9 @@ sap.ui.define([
 			}.bind(this)
 		});
 
+		 // remove the default aria role description of the list, as it is not needed in this case
+		oList.applyAriaRoleDescription(null);
+
 		// this._updateSort(oList, this.getSorted() === "descending");
 
 		const oSearchField = new SearchField({

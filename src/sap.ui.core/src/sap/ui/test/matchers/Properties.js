@@ -11,6 +11,7 @@ sap.ui.define([
 	"use strict";
 	var oLogger = Log.getLogger("sap.ui.test.matchers.Properties");
 
+	// Note: changes to the parameter documentation must be reflectes in the .dtsgenrc file, too
 	/**
 	 * @class
 	 * Checks if a control's properties have the provided values - all properties have to match their values.

@@ -435,3 +435,8 @@ html[data-sap-ui-browser^='cr'] .sapUiFupInputMask > input {
 	background-color: var(--sapButton_Emphasized_Hover_Background);
 	border-color: var(--sapButton_Emphasized_Hover_BorderColor);
 }
+
+/* Override default width of the FileUploader when it is used inside a Bar/Toolbar/OverflowToolbar */
+.sapMIBar .sapUiFup {
+	width: 12rem;
+}
