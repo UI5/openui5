@@ -30,7 +30,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenuAccount",
       {
         metadata: {
-          tag: "ui5-user-menu-account-1533ea1f",
+          tag: "ui5-user-menu-account-a1d68b0e",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 

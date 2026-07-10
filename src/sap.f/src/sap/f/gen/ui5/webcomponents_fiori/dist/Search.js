@@ -38,7 +38,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.Search",
       {
         metadata: {
-          tag: "ui5-search-1533ea1f",
+          tag: "ui5-search-a1d68b0e",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 

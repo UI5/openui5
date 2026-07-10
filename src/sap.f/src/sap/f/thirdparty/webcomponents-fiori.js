@@ -4705,7 +4705,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty
         supportsTouch: Theme.l
     });
 
-    Theme.p("1533ea1f");
+    Theme.p("a1d68b0e");
 
     exports.A = A;
     exports.C = C$1;
