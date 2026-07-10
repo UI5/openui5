@@ -42,30 +42,35 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/AnimationMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base dist.types.AnimationMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["AnimationMode"] = {
       /**
        * Basic
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Basic: "Basic",
       /**
        * Full
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Full: "Full",
       /**
        * Minimal
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Minimal: "Minimal",
       /**
        * None
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None"
     };
@@ -80,36 +85,42 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/CalendarType
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base dist.types.CalendarType
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["CalendarType"] = {
       /**
        * Buddhist
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Buddhist: "Buddhist",
       /**
        * Gregorian
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Gregorian: "Gregorian",
       /**
        * Islamic
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Islamic: "Islamic",
       /**
        * Japanese
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Japanese: "Japanese",
       /**
        * Persian
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Persian: "Persian"
     };
@@ -124,18 +135,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/ItemNavigationBehavior
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base dist.types.ItemNavigationBehavior
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ItemNavigationBehavior"] = {
       /**
        * Cycling behavior: navigating past the last item continues with the first and vice versa.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Cyclic: "Cyclic",
       /**
        * Static behavior: navigations stops at the first or last item.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Static: "Static"
     };
@@ -150,24 +164,28 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/MovePlacement
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base dist.types.MovePlacement
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["MovePlacement"] = {
       /**
        * After
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       After: "After",
       /**
        * Before
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Before: "Before",
       /**
        * On
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       On: "On"
     };
@@ -182,30 +200,35 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/NavigationMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base dist.types.NavigationMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["NavigationMode"] = {
       /**
        * Auto
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Auto: "Auto",
       /**
        * Horizontal
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Horizontal: "Horizontal",
       /**
        * Paging
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Paging: "Paging",
       /**
        * Vertical
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Vertical: "Vertical"
     };
@@ -220,24 +243,28 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/SortOrder
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base dist.types.SortOrder
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["SortOrder"] = {
       /**
        * Sorting is applied in ascending order.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Ascending: "Ascending",
       /**
        * Sorting is applied in descending order.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Descending: "Descending",
       /**
        * Sorting is not applied.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None"
     };
@@ -252,36 +279,42 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_base/dist/types/ValueState
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base dist.types.ValueState
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ValueState"] = {
       /**
        * Critical
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Critical: "Critical",
       /**
        * Information
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Information: "Information",
       /**
        * Negative
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Negative: "Negative",
       /**
        * None
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None",
       /**
        * Positive
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Positive: "Positive"
     };

@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/decline'], (function (exports, Icons, decline) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/decline'], (function (exports, Theme, decline) { 'use strict';
 
 	var selectedAccount = "sys-enter-2";
 

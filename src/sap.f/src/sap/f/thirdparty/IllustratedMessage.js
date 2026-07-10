@@ -1,6 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/Title'], (function (webcomponentsBase, parametersBundle_css$1, Icons, AccessibilityTextsHelper, jsxRuntime, i18nDefaults, parametersBundle_css, Title) { 'use strict';
-
-    const c=new Map([["sap_horizon","V5"],["sap_horizon_dark","V5"],["sap_horizon_hcb","V5/HC"],["sap_horizon_hcw","V5/HC"]]),o="V4",l=new Map,n=Icons.m("SVGIllustration.registry",new Map),a=Icons.m("SVGIllustration.promises",new Map),m=()=>{const e=Icons.r();return c.has(e)?c.get(e):o},p=e=>{let t=m();const[s,r]=e.split("/");let i=`${s}/${t}/${r}`;return !l.has(i)&&t!==o&&(t=o,i=`${s}/${t}/${r}`),{registryKey:i,collection:t}},f=(e,t)=>{const s=t.collection||o;n.set(`${t.set}/${s}/${e}`,{dialogSvg:t.dialogSvg,sceneSvg:t.sceneSvg,spotSvg:t.spotSvg,dotSvg:t.dotSvg,title:t.title,subtitle:t.subtitle});},T=e=>{const{registryKey:t}=p(e);if(!a.has(t)){if(!l.has(t)){const r=e.startsWith("fiori/")?e.replace("fiori/",""):e;throw new Error(`No loader registered for the ${e} illustration. Probably you forgot to import the "@ui5/webcomponents-fiori/dist/illustrations/${r}.js" module. Or you can import the "@ui5/webcomponents-fiori/dist/illustrations/AllIllustrations.js" module that will make all illustrations available, but fetch only the ones used.`)}const s=l.get(t);a.set(t,s(t));}return a.get(t)},h=e=>{const{registryKey:t}=p(e);return n.get(t)},d=async e=>{const{registryKey:t}=p(e);return await T(e),n.get(t)};
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Illustrations', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, parametersBundle_css$1, Illustrations, AccessibilityTextsHelper, jsxRuntime, i18nDefaults, Theme, parametersBundle_css, Title, Icons) { 'use strict';
 
     /**
      * Different types of IllustrationMessageDesign.
@@ -888,7 +886,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/paramet
     const title = i18nDefaults.IM_TITLE_BEFORESEARCH;
     const subtitle = i18nDefaults.IM_SUBTITLE_BEFORESEARCH;
 
-    f(name, {
+    Illustrations.f(name, {
     	dialogSvg,
     	sceneSvg,
     	spotSvg,
@@ -899,8 +897,8 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/paramet
     	collection,
     });
 
-    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var IllustratedMessageCss = `:host(:not([hidden])){display:block}:host{box-sizing:border-box;width:100%;height:100%;padding:1rem}.ui5-illustrated-message-root,.ui5-illustrated-message-inner,.ui5-illustrated-message-text-and-actions-container{display:flex;flex-direction:column;align-items:center;justify-content:center;height:inherit;min-height:0;flex-basis:content}.ui5-illustrated-message-illustration{margin:2rem 0}.ui5-illustrated-message-illustration svg{max-height:100%;max-width:100%}.ui5-illustrated-message-illustration.ui5-illustrated-message-illustration-fit-content{position:relative;width:0;padding:0 0 0 100%;height:100%;display:flex;align-items:center}.ui5-illustrated-message-illustration.ui5-illustrated-message-illustration-fit-content svg{position:absolute;height:100%;width:100%;left:0;top:0}.ui5-illustrated-message-title [ui5-title],.ui5-illustrated-message-title ::slotted([slot="title"]){text-align:center;margin-bottom:1rem;font-size:var(--sapFontHeader2Size);font-family:var(--sapFontHeaderFamily);font-weight:700;max-width:61.9375rem}.ui5-illustrated-message-subtitle{text-align:center;font-size:var(--sapFontLargeSize);font-family:var(--sapFontFamily);color:var(--sapTextColor);margin-bottom:.5rem;max-width:61.9375rem}.ui5-illustrated-message-actions{margin:1rem 0}:host([media="dialog"]) .ui5-illustrated-message-illustration{margin:1rem 0}:host([media="dialog"]) .ui5-illustrated-message-title [ui5-title],:host([media="dialog"]) ::slotted([slot="title"]){margin-bottom:.5rem;font-size:var(--sapFontHeader3Size);max-width:40.5625rem}:host([media="dialog"]) .ui5-illustrated-message-subtitle{margin-bottom:.5rem;font-size:var(--sapFontSize);max-width:40.5625rem}:host([media="dialog"]) .ui5-illustrated-message-actions{margin-top:.5rem;margin-bottom:1rem}:host([media="spot"]){padding:.5rem}:host([media="spot"]) .ui5-illustrated-message-illustration{margin-bottom:.5rem;margin-top:0}:host([media="spot"]) .ui5-illustrated-message-title [ui5-title],:host([media="spot"]) ::slotted([slot="title"]){margin-bottom:.5rem;font-size:var(--sapFontHeader4Size);max-width:21.5rem}:host([media="spot"]) .ui5-illustrated-message-subtitle{font-size:var(--sapFontSize);max-width:21.5rem;margin-bottom:.5rem}:host([media="spot"]) .ui5-illustrated-message-actions{margin:.5rem 0}:host([media="dot"]){padding:.25rem;min-height:4rem}:host([media="dot"]) .ui5-illustrated-message-inner{flex-direction:row}:host([media="dot"]) .ui5-illustrated-message-illustration{margin:0 .25rem 0 0;height:2.8125rem;width:2.8125rem;align-self:baseline}:host([media="dot"]) .ui5-illustrated-message-title [ui5-title],:host([media="dot"]) ::slotted([slot="title"]){margin-bottom:.25rem;font-size:var(--sapFontHeader5Size);max-width:12.6875rem}:host([media="dot"]) .ui5-illustrated-message-subtitle{font-size:var(--sapFontSize);max-width:12.6875rem;margin-bottom:.25rem}:host([media="dot"]) .ui5-illustrated-message-actions{margin:.25rem 0}:host([media="base"]) .ui5-illustrated-message-illustration{display:none}:host([media="base"]) .ui5-illustrated-message-title [ui5-title],:host([media="base"]) ::slotted([slot="title"]){margin-bottom:.25rem;font-size:var(--sapFontHeader5Size);max-width:10rem}:host([media="base"]) .ui5-illustrated-message-subtitle{font-size:var(--sapFontSize);max-width:10rem;margin-bottom:0rem}.ui5-illustrated-message-util{position:fixed;top:-9999px;left:-9999px}.sapIllus_BlendModeMultiply{mix-blend-mode:multiply}.sapIllus_MaskTypeAlpha{mask-type:alpha}.sapIllus_BackgroundColor{fill:var(--sapIllus_BackgroundColor)}.sapIllus_BrandColorPrimary{fill:var(--sapIllus_BrandColorPrimary)}.sapIllus_BrandColorSecondary{fill:var(--sapIllus_BrandColorSecondary)}.sapIllus_StrokeDetailColor{fill:var(--sapIllus_StrokeDetailColor)}.sapIllus_Layering1{fill:var(--sapIllus_Layering1)}.sapIllus_Layering2{fill:var(--sapIllus_Layering2)}.sapIllus_ObjectFillColor{fill:var(--sapIllus_ObjectFillColor)}.sapIllus_AccentColor{fill:var(--sapIllus_AccentColor)}.sapIllus_NoColor{fill:var(--sapIllus_NoColor)}.sapIllus_PatternShadow{fill:var(--sapIllus_PatternShadow)}.sapIllus_PatternHighlight{fill:var(--sapIllus_PatternHighlight)}.sapIllus_NoColor_Fill{fill:var(--sapIllus_NoColor)}.sapIllus_BrandColorPrimary_Fill{fill:var(--sapIllus_BrandColorPrimary)}.sapIllus_ObjectFillColor_Fill{fill:var(--sapIllus_ObjectFillColor)}
 `;
 
@@ -1070,14 +1068,14 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/paramet
         async onBeforeRendering() {
             // Gets the current illustration name given in the "name" attribute
             let effectiveName = getEffectiveIllustrationName(this.name);
-            let illustrationData = h(effectiveName);
+            let illustrationData = Illustrations.h(effectiveName);
             if (this.hasAttribute("name") && !this.isValidIllustration(effectiveName)) {
                 effectiveName = getEffectiveIllustrationName(IllustrationMessageType$1.BeforeSearch);
                 // eslint-disable-next-line
                 console.warn(`The illustration "${effectiveName}" does not exist. The default illustration "${IllustrationMessageType$1.BeforeSearch}" is loaded instead.`);
             }
             if (illustrationData === undefined) {
-                illustrationData = await d(effectiveName);
+                illustrationData = await Illustrations.d(effectiveName);
             }
             // Check if illustration uses templates (safe variant)
             if (illustrationData && "dotTemplate" in illustrationData && illustrationData.dotTemplate) {

@@ -1,11 +1,11 @@
-sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/parameters-bundle2.css'], (function (require, exports, webcomponentsBase, eventStrict, jsxRuntime, Button, Tag, Icons, parametersBundle_css, ListItemTemplate, Icon, WrappingType, parametersBundle_css$1) { 'use strict';
+sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/parameters-bundle2.css'], (function (require, exports, webcomponentsBase, eventStrict, jsxRuntime, Button, Tag, Theme, parametersBundle_css, ListItemTemplate, Icon, WrappingType, parametersBundle_css$1) { 'use strict';
 
     function ButtonTemplate() {
         return jsxRuntime.jsx(Tag.Tag, { design: "Critical", "hide-state-icon": true, children: this.effectiveText });
     }
 
-    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var buttonBadgeCss = `[ui5-tag]::part(root){border:.0625rem solid var(--sapContent_BadgeBorderColor);background-color:var(--sapContent_BadgeBackground);color:var(--sapContent_BadgeTextColor);height:1rem;border-radius:.5rem;display:flex;align-items:center}:host([design="AttentionDot"]) [ui5-tag]::part(root){min-width:var(--_ui5-button-badge-diameter);min-height:var(--_ui5-button-badge-diameter);height:var(--_ui5-button-badge-diameter);width:var(--_ui5-button-badge-diameter);border-radius:100%}
 `;
 
@@ -325,8 +325,8 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
         return (jsxRuntime.jsx(Button.Button, { class: "ui5-shellbar-action-button", icon: this.icon, design: "Transparent", accessibleName: this.text, "data-ui5-stable": this.stableDomRef, accessibilityAttributes: this.accessibilityAttributes, onClick: this.fireClickEvent, children: this.count && (jsxRuntime.jsx(ButtonBadge$1, { slot: "badge", design: "OverlayText", text: this.count })) }));
     }
 
-    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
     var shellBarV2ItemStyles = `.ui5-shellbar-action-button{width:2.25rem;height:2.25rem;color:var(--sapShell_TextColor)}.ui5-shellbar-action-button:hover{background:var(--sapShell_Hover_Background);border-color:var(--sapButton_Lite_Hover_BorderColor);color:var(--sapShell_InteractiveTextColor)}.ui5-shellbar-action-button[active]{color:var(--_ui5_shellbar_button_active_color)}.ui5-shellbar-action-button>[ui5-button-badge][slot=badge][design=OverlayText]{top:var(--_ui5-shellbar-badge-offset, 0);margin:var(--_ui5-shellbar-badge-margin, -.5rem)}[ui5-li]::part(icon){color:var(--sapList_TextColor)}[ui5-li]:after{position:relative;width:fit-content;height:1rem;min-width:1rem;background:var(--sapContent_BadgeBackground);border:var(--_ui5_shellbar_button_badge_border);color:var(--sapContent_BadgeTextColor);bottom:calc(100% + .0625rem);left:1.25rem;padding:0 .3125rem;border-radius:.5rem;display:flex;justify-content:center;align-items:center;font-size:var(--sapFontSmallSize);font-family:var(--sapFontFamily);z-index:2;box-sizing:border-box;pointer-events:none}[ui5-li][data-count]:after{content:attr(data-count)}
 `;
 

@@ -40,6 +40,7 @@ sap.ui.define(
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar
      */
 
@@ -580,6 +581,7 @@ sap.ui.define(
              * Returns the `logo` DOM ref.
              *
              * @private
+             * @ui5-restricted sap.ushell,sap.esh.search.ui
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getLogoDomRef
              * @function
              */
@@ -589,6 +591,7 @@ sap.ui.define(
              * Returns the `notifications` icon DOM ref.
              *
              * @private
+             * @ui5-restricted sap.ushell,sap.esh.search.ui
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getNotificationsDomRef
              * @function
              */
@@ -598,6 +601,7 @@ sap.ui.define(
              * Returns the `overflow` icon DOM ref.
              *
              * @private
+             * @ui5-restricted sap.ushell,sap.esh.search.ui
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getOverflowDomRef
              * @function
              */
@@ -607,6 +611,7 @@ sap.ui.define(
              * Returns the `product-switch` icon DOM ref.
              *
              * @private
+             * @ui5-restricted sap.ushell,sap.esh.search.ui
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getProductSwitchDomRef
              * @function
              */
@@ -616,6 +621,7 @@ sap.ui.define(
              * Returns the `profile` icon DOM ref.
              *
              * @private
+             * @ui5-restricted sap.ushell,sap.esh.search.ui
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getProfileDomRef
              * @function
              */
@@ -628,6 +634,7 @@ sap.ui.define(
              * Closes the overflow popover.
              *
              * @private
+             * @ui5-restricted sap.ushell,sap.esh.search.ui
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#closeOverflow
              * @function
              */
@@ -637,6 +644,7 @@ sap.ui.define(
              * Returns the search button DOM reference.
              *
              * @private
+             * @ui5-restricted sap.ushell,sap.esh.search.ui
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getSearchButtonDomRef
              * @function
              */

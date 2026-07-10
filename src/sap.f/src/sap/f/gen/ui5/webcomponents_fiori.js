@@ -129,6 +129,7 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/FCLLayout
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.FCLLayout
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["FCLLayout"] = {
       /**
@@ -139,6 +140,7 @@ sap.ui.define(
        * Use to display a detail-detail page only, when the user should focus entirely on it.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       EndColumnFullScreen: "EndColumnFullScreen",
       /**
@@ -149,12 +151,14 @@ sap.ui.define(
        * Use to display a detail page only, when the user should focus entirely on it.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       MidColumnFullScreen: "MidColumnFullScreen",
       /**
        * The layout will display 1 column.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       OneColumn: "OneColumn",
       /**
@@ -165,6 +169,7 @@ sap.ui.define(
        * Use to display all three pages (list, detail, detail-detail) when the user should focus on the detail-detail.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ThreeColumnsEndExpanded: "ThreeColumnsEndExpanded",
       /**
@@ -175,6 +180,7 @@ sap.ui.define(
        * Use to display all three pages (list, detail, detail-detail) when the user should focus on the detail.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ThreeColumnsMidExpanded: "ThreeColumnsMidExpanded",
       /**
@@ -186,6 +192,7 @@ sap.ui.define(
        * The detail-detail is still loaded and easily accessible by dragging the columns-separator
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ThreeColumnsMidExpandedEndHidden: "ThreeColumnsMidExpandedEndHidden",
       /**
@@ -197,6 +204,7 @@ sap.ui.define(
        * The detail-detail is still loaded and easily accessible by dragging the columns-separator
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ThreeColumnsStartExpandedEndHidden: "ThreeColumnsStartExpandedEndHidden",
       /**
@@ -207,6 +215,7 @@ sap.ui.define(
        * Use to display the Mid column and expanded End column while the grip of the separator is not visible.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ThreeColumnsStartHiddenEndExpanded: "ThreeColumnsStartHiddenEndExpanded",
       /**
@@ -217,6 +226,7 @@ sap.ui.define(
        * Use to display the Mid and End columns while the Start column is hidden.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ThreeColumnsStartHiddenMidExpanded: "ThreeColumnsStartHiddenMidExpanded",
       /**
@@ -227,6 +237,7 @@ sap.ui.define(
        * Use to display both a list and a detail page when the user should focus on the detail page.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TwoColumnsMidExpanded: "TwoColumnsMidExpanded",
       /**
@@ -238,6 +249,7 @@ sap.ui.define(
        * Use to display both a list and a detail page when the user should focus on the list page.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TwoColumnsStartExpanded: "TwoColumnsStartExpanded"
     };
@@ -254,18 +266,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/HeroBannerActionsPlacement
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.HeroBannerActionsPlacement
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["HeroBannerActionsPlacement"] = {
       /**
        * Places the actions below the header text, aligned to the start.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       BottomStart: "BottomStart",
       /**
        * Places the actions to the right of the header text, aligned to the top of the header row.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TopEnd: "TopEnd"
     };
@@ -283,18 +298,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/HeroBannerColumnsRatio
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.HeroBannerColumnsRatio
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["HeroBannerColumnsRatio"] = {
       /**
        * Two equal columns. Both content blocks share the available width equally.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Equal: "Equal",
       /**
        * Two unequal columns. The first content block takes two-thirds of the width, the second takes one-third.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       FirstWider: "FirstWider"
     };
@@ -311,18 +329,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/HeroBannerHeaderBlockPlacement
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.HeroBannerHeaderBlockPlacement
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["HeroBannerHeaderBlockPlacement"] = {
       /**
        * Places the header text block at the bottom of the header area.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Bottom: "Bottom",
       /**
        * Places the header text block at the top of the header area.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Top: "Top"
     };
@@ -337,6 +358,7 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/IllustrationMessageDesign
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.IllustrationMessageDesign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["IllustrationMessageDesign"] = {
       /**
@@ -348,6 +370,7 @@ sap.ui.define(
        * until changed by the app developer.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Auto: "Auto",
       /**
@@ -356,54 +379,63 @@ sap.ui.define(
        * **Note:** When &#x60;Base&#x60; is in use, no illustration is displayed.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Base: "Base",
       /**
        * Dialog &#x60;Illustration&#x60; size (M breakpoint). Suitable for dialogs.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Dialog: "Dialog",
       /**
        * Dot &lt;code&gt;Illustration&lt;/code&gt; size (XS breakpoint). Suitable for table rows.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Dot: "Dot",
       /**
        * ExtraSmall &lt;code&gt;Illustration&lt;/code&gt; size (XS breakpoint). Suitable for table rows.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ExtraSmall: "ExtraSmall",
       /**
        * Large &#x60;Illustration&#x60; size (L breakpoint). Suitable for a &#x60;Page&#x60; or a table.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Large: "Large",
       /**
        * Medium &#x60;Illustration&#x60; size (M breakpoint). Suitable for dialogs.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Medium: "Medium",
       /**
        * Scene &#x60;Illustration&#x60; size (L breakpoint). Suitable for a &#x60;Page&#x60; or a table.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Scene: "Scene",
       /**
        * Small &lt;code&gt;Illustration&lt;/code&gt; size (S breakpoint). Suitable for cards (four columns).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Small: "Small",
       /**
        * Spot &lt;code&gt;Illustration&lt;/code&gt; size (S breakpoint). Suitable for cards (four columns).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Spot: "Spot"
     };
@@ -418,714 +450,833 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/IllustrationMessageType
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.IllustrationMessageType
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["IllustrationMessageType"] = {
       /**
        * &quot;Achievement&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Achievement: "Achievement",
       /**
        * &quot;Add Column&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       AddColumn: "AddColumn",
       /**
        * &quot;Add Dimensions&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       AddDimensions: "AddDimensions",
       /**
        * &quot;Adding Columns&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       AddingColumns: "AddingColumns",
       /**
        * &quot;Add People&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       AddPeople: "AddPeople",
       /**
        * &quot;Add People To Calendar&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       AddPeopleToCalendar: "AddPeopleToCalendar",
       /**
        * &quot;Balloon Sky&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       BalloonSky: "BalloonSky",
       /**
        * &quot;Before Search&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       BeforeSearch: "BeforeSearch",
       /**
        * &quot;Connection&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Connection: "Connection",
       /**
        * &quot;Drag Files To Upload&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       DragFilesToUpload: "DragFilesToUpload",
       /**
        * &quot;Empty Calendar&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       EmptyCalendar: "EmptyCalendar",
       /**
        * &quot;Empty List&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       EmptyList: "EmptyList",
       /**
        * &quot;Empty Planning Calendar&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       EmptyPlanningCalendar: "EmptyPlanningCalendar",
       /**
        * &quot;Error Screen&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ErrorScreen: "ErrorScreen",
       /**
        * &quot;Filtering Columns&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       FilteringColumns: "FilteringColumns",
       /**
        * &quot;Filter Table&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       FilterTable: "FilterTable",
       /**
        * &quot;Grouping Columns&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       GroupingColumns: "GroupingColumns",
       /**
        * &quot;Group Table&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       GroupTable: "GroupTable",
       /**
        * &quot;Key Task&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       KeyTask: "KeyTask",
       /**
        * &quot;New Mail&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NewMail: "NewMail",
       /**
        * &quot;No Activities&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NoActivities: "NoActivities",
       /**
        * &quot;No Chart Data&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NoChartData: "NoChartData",
       /**
        * &quot;No Columns Set&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NoColumnsSet: "NoColumnsSet",
       /**
        * &quot;No Data&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NoData: "NoData",
       /**
        * &quot;No Dimensions Set&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NoDimensionsSet: "NoDimensionsSet",
       /**
        * &quot;No Entries&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NoEntries: "NoEntries",
       /**
        * &quot;No Filter Results&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NoFilterResults: "NoFilterResults",
       /**
        * &quot;No Email&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NoMail: "NoMail",
       /**
        * &quot;No Email v1&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NoMail_v1: "NoMail_v1",
       /**
        * &quot;No Notifications&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NoNotifications: "NoNotifications",
       /**
        * &quot;No Saved Items&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NoSavedItems: "NoSavedItems",
       /**
        * &quot;No Saved Items v1&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NoSavedItems_v1: "NoSavedItems_v1",
       /**
        * &quot;No Search Results&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NoSearchResults: "NoSearchResults",
       /**
        * &quot;No Tasks&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NoTasks: "NoTasks",
       /**
        * &quot;No Tasks v1&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NoTasks_v1: "NoTasks_v1",
       /**
        * &quot;Page Not Found&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       PageNotFound: "PageNotFound",
       /**
        * &quot;Receive Appreciation&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ReceiveAppreciation: "ReceiveAppreciation",
       /**
        * &quot;Reload Screen&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ReloadScreen: "ReloadScreen",
       /**
        * &quot;Resize Column&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ResizeColumn: "ResizeColumn",
       /**
        * &quot;Resizing Columns&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ResizingColumns: "ResizingColumns",
       /**
        * &quot;Search Earth&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SearchEarth: "SearchEarth",
       /**
        * &quot;Search Folder&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SearchFolder: "SearchFolder",
       /**
        * &quot;Sign Out&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SignOut: "SignOut",
       /**
        * &quot;Simple Balloon&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SimpleBalloon: "SimpleBalloon",
       /**
        * &quot;Simple Bell&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SimpleBell: "SimpleBell",
       /**
        * &quot;Simple Calendar&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SimpleCalendar: "SimpleCalendar",
       /**
        * &quot;Simple CheckMark&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SimpleCheckMark: "SimpleCheckMark",
       /**
        * &quot;Simple Connection&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SimpleConnection: "SimpleConnection",
       /**
        * &quot;Simple Empty Doc&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SimpleEmptyDoc: "SimpleEmptyDoc",
       /**
        * &quot;Simple Empty List&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SimpleEmptyList: "SimpleEmptyList",
       /**
        * &quot;Simple Error&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SimpleError: "SimpleError",
       /**
        * &quot;Simple Magnifier&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SimpleMagnifier: "SimpleMagnifier",
       /**
        * &quot;Simple Mail&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SimpleMail: "SimpleMail",
       /**
        * &quot;Simple No Saved Items&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SimpleNoSavedItems: "SimpleNoSavedItems",
       /**
        * &quot;Simple Not Found Magnifier&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SimpleNotFoundMagnifier: "SimpleNotFoundMagnifier",
       /**
        * &quot;Simple Reload&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SimpleReload: "SimpleReload",
       /**
        * &quot;Simple Task&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SimpleTask: "SimpleTask",
       /**
        * &quot;Sleeping Bell&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SleepingBell: "SleepingBell",
       /**
        * &quot;Sort Column&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SortColumn: "SortColumn",
       /**
        * &quot;Sorting Columns&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SortingColumns: "SortingColumns",
       /**
        * &quot;Success Balloon&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SuccessBalloon: "SuccessBalloon",
       /**
        * &quot;Success CheckMark&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SuccessCheckMark: "SuccessCheckMark",
       /**
        * &quot;Success HighFive&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SuccessHighFive: "SuccessHighFive",
       /**
        * &quot;Success Screen&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SuccessScreen: "SuccessScreen",
       /**
        * &quot;Survey&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Survey: "Survey",
       /**
        * &quot;Tent&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Tent: "Tent",
       /**
        * &quot;TntAvatar&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntAvatar: "TntAvatar",
       /**
        * &quot;TntCalculator&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntCalculator: "TntCalculator",
       /**
        * &quot;TntChartArea&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntChartArea: "TntChartArea",
       /**
        * &quot;TntChartArea2&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntChartArea2: "TntChartArea2",
       /**
        * &quot;TntChartBar&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntChartBar: "TntChartBar",
       /**
        * &quot;TntChartBPMNFlow&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntChartBPMNFlow: "TntChartBPMNFlow",
       /**
        * &quot;TntChartBullet&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntChartBullet: "TntChartBullet",
       /**
        * &quot;TntChartDoughnut&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntChartDoughnut: "TntChartDoughnut",
       /**
        * &quot;TntChartFlow&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntChartFlow: "TntChartFlow",
       /**
        * &quot;TntChartGantt&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntChartGantt: "TntChartGantt",
       /**
        * &quot;TntChartOrg&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntChartOrg: "TntChartOrg",
       /**
        * &quot;TntChartPie&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntChartPie: "TntChartPie",
       /**
        * &quot;TntCodePlaceholder&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntCodePlaceholder: "TntCodePlaceholder",
       /**
        * &quot;TntCompany&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntCompany: "TntCompany",
       /**
        * &quot;TntCompass&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntCompass: "TntCompass",
       /**
        * &quot;TntComponents&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntComponents: "TntComponents",
       /**
        * &quot;TntDialog&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntDialog: "TntDialog",
       /**
        * &quot;TntEmptyContentPane&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntEmptyContentPane: "TntEmptyContentPane",
       /**
        * &quot;TntExternalLink&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntExternalLink: "TntExternalLink",
       /**
        * &quot;TntFaceID&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntFaceID: "TntFaceID",
       /**
        * &quot;TntFingerprint&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntFingerprint: "TntFingerprint",
       /**
        * &quot;TntHandshake&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntHandshake: "TntHandshake",
       /**
        * &quot;TntHelp&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntHelp: "TntHelp",
       /**
        * &quot;TntLock&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntLock: "TntLock",
       /**
        * &quot;TntMission&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntMission: "TntMission",
       /**
        * &quot;TntMissionFailed&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntMissionFailed: "TntMissionFailed",
       /**
        * &quot;TntNoApplications&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntNoApplications: "TntNoApplications",
       /**
        * &quot;TntNoFlows&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntNoFlows: "TntNoFlows",
       /**
        * &quot;TntNoUsers&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntNoUsers: "TntNoUsers",
       /**
        * &quot;TntRadar&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntRadar: "TntRadar",
       /**
        * &quot;TntRoadMap&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntRoadMap: "TntRoadMap",
       /**
        * &quot;TntSecrets&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntSecrets: "TntSecrets",
       /**
        * &quot;TntServices&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntServices: "TntServices",
       /**
        * &quot;TntSessionExpired&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntSessionExpired: "TntSessionExpired",
       /**
        * &quot;TntSessionExpiring&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntSessionExpiring: "TntSessionExpiring",
       /**
        * &quot;TntSettings&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntSettings: "TntSettings",
       /**
        * &quot;TntSuccess&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntSuccess: "TntSuccess",
       /**
        * &quot;TntSuccessfulAuth&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntSuccessfulAuth: "TntSuccessfulAuth",
       /**
        * &quot;TntSystems&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntSystems: "TntSystems",
       /**
        * &quot;TntTeams&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntTeams: "TntTeams",
       /**
        * &quot;TntTools&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntTools: "TntTools",
       /**
        * &quot;TntTutorials&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntTutorials: "TntTutorials",
       /**
        * &quot;TntUnableToLoad&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntUnableToLoad: "TntUnableToLoad",
       /**
        * &quot;TntUnlock&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntUnlock: "TntUnlock",
       /**
        * &quot;TntUnsuccessfulAuth&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntUnsuccessfulAuth: "TntUnsuccessfulAuth",
       /**
        * &quot;TntUser2&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TntUser2: "TntUser2",
       /**
        * &quot;Unable To Load&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       UnableToLoad: "UnableToLoad",
       /**
        * &quot;Unable To Load Image&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       UnableToLoadImage: "UnableToLoadImage",
       /**
        * &quot;Unable To Upload&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       UnableToUpload: "UnableToUpload",
       /**
        * &quot;Upload Collection&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       UploadCollection: "UploadCollection",
       /**
        * &quot;Upload To Cloud&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       UploadToCloud: "UploadToCloud",
       /**
        * &quot;User Has Signed Up&quot; illustration type.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       UserHasSignedUp: "UserHasSignedUp"
     };
@@ -1140,6 +1291,7 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/MediaGalleryItemLayout
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.MediaGalleryItemLayout
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["MediaGalleryItemLayout"] = {
       /**
@@ -1148,6 +1300,7 @@ sap.ui.define(
        * When a thumbnail is selected, it makes the corresponding enlarged content appear in a square display area.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Square: "Square",
       /**
@@ -1157,6 +1310,7 @@ sap.ui.define(
        * (stretched to fill all of the available width) for optimal user experiance.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Wide: "Wide"
     };
@@ -1171,24 +1325,28 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/MediaGalleryLayout
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.MediaGalleryLayout
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["MediaGalleryLayout"] = {
       /**
        * The layout is determined automatically.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Auto: "Auto",
       /**
        * Displays the layout as a horizontal split between the thumbnails list and the selected image.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Horizontal: "Horizontal",
       /**
        * Displays the layout as a vertical split between the thumbnails list and the selected image.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Vertical: "Vertical"
     };
@@ -1203,18 +1361,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/MediaGalleryMenuHorizontalAlign
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.MediaGalleryMenuHorizontalAlign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["MediaGalleryMenuHorizontalAlign"] = {
       /**
        * Displays the menu on the left side of the target.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Left: "Left",
       /**
        * Displays the menu on the right side of the target.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Right: "Right"
     };
@@ -1229,18 +1390,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/MediaGalleryMenuVerticalAlign
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.MediaGalleryMenuVerticalAlign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["MediaGalleryMenuVerticalAlign"] = {
       /**
        * Displays the menu at the bottom of the reference control.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Bottom: "Bottom",
       /**
        * Displays the menu at the top of the reference control.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Top: "Top"
     };
@@ -1255,6 +1419,7 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/NavigationLayoutMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.NavigationLayoutMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["NavigationLayoutMode"] = {
       /**
@@ -1262,18 +1427,21 @@ sap.ui.define(
        * &#x60;Collapsed&#x60; on small screens (screen width of 599px or less) and &#x60;Expanded&#x60; on larger screens (screen width of 600px or more).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Auto: "Auto",
       /**
        * Collapsed side navigation.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Collapsed: "Collapsed",
       /**
        * Expanded side navigation.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Expanded: "Expanded"
     };
@@ -1288,18 +1456,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/NotificationListItemImportance
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.NotificationListItemImportance
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["NotificationListItemImportance"] = {
       /**
        * Important
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Important: "Important",
       /**
        * Standard
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Standard: "Standard"
     };
@@ -1314,24 +1485,28 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/PageBackgroundDesign
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.PageBackgroundDesign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["PageBackgroundDesign"] = {
       /**
        * Page background color when a List is set as the Page content.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       List: "List",
       /**
        * A solid background color dependent on the theme.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Solid: "Solid",
       /**
        * Transparent background for the page.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Transparent: "Transparent"
     };
@@ -1346,18 +1521,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SearchMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SearchMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["SearchMode"] = {
       /**
        * Search field with default appearance.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Default: "Default",
       /**
        * Search field with additional scope select.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Scoped: "Scoped"
     };
@@ -1372,30 +1550,35 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SideContentFallDown
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SideContentFallDown
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["SideContentFallDown"] = {
       /**
        * Side content falls down on breakpoints below L
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       BelowL: "BelowL",
       /**
        * Side content falls down on breakpoints below M
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       BelowM: "BelowM",
       /**
        * Side content falls down on breakpoints below XL
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       BelowXL: "BelowXL",
       /**
        * Side content falls down on breakpoint M and the minimum width for the side content
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       OnMinimumWidth: "OnMinimumWidth"
     };
@@ -1410,6 +1593,7 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SideContentPosition
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SideContentPosition
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["SideContentPosition"] = {
       /**
@@ -1417,6 +1601,7 @@ sap.ui.define(
        * in left-to-right mode and on the left side in right-to-left mode.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       End: "End",
       /**
@@ -1424,6 +1609,7 @@ sap.ui.define(
        * in left-to-right mode and on the right side in right-to-left mode.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Start: "Start"
     };
@@ -1438,36 +1624,42 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SideContentVisibility
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SideContentVisibility
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["SideContentVisibility"] = {
       /**
        * Show the side content on any breakpoint
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       AlwaysShow: "AlwaysShow",
       /**
        * Don&#x27;t show the side content on any breakpoints
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NeverShow: "NeverShow",
       /**
        * Show the side content on XL breakpoint
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ShowAboveL: "ShowAboveL",
       /**
        * Show the side content on L and XL breakpoints
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ShowAboveM: "ShowAboveM",
       /**
        * Show the side content on M, L and XL breakpoints
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ShowAboveS: "ShowAboveS"
     };
@@ -1482,6 +1674,7 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SideNavigationItemDesign
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SideNavigationItemDesign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["SideNavigationItemDesign"] = {
       /**
@@ -1492,12 +1685,14 @@ sap.ui.define(
        * **Note:** Items that open a dialog must set &#x60;hasPopup&#x3D;&quot;dialog&quot;&#x60; via &#x60;accessibilityAttributes&#x60; property.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Action: "Action",
       /**
        * Design for items that perform navigation, contain navigation child items, or both.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Default: "Default"
     };
@@ -1512,6 +1707,7 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/TimelineGrowingMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.TimelineGrowingMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TimelineGrowingMode"] = {
       /**
@@ -1519,18 +1715,21 @@ sap.ui.define(
        * upon pressing a &quot;More&quot; button at the end.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Button: "Button",
       /**
        * The growing feature is not enabled.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None",
       /**
        * Event &#x60;load-more&#x60; is fired upon scroll.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Scroll: "Scroll"
     };
@@ -1545,12 +1744,14 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/TimelineLayout
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.TimelineLayout
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TimelineLayout"] = {
       /**
        * Horizontal layout
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Horizontal: "Horizontal",
       /**
@@ -1558,6 +1759,7 @@ sap.ui.define(
        * Default type
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Vertical: "Vertical"
     };
@@ -1572,24 +1774,28 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/UploadCollectionSelectionMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.UploadCollectionSelectionMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["UploadCollectionSelectionMode"] = {
       /**
        * Multi selection mode (more than one list item can be selected).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Multiple: "Multiple",
       /**
        * Default mode (no selection).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None",
       /**
        * Right-positioned single selection mode (only one list item can be selected).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Single: "Single",
       /**
@@ -1597,6 +1803,7 @@ sap.ui.define(
        * (only one list item can be selected - this is always the focused item).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SingleAuto: "SingleAuto",
       /**
@@ -1604,12 +1811,14 @@ sap.ui.define(
        * (only one list item can be selected).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SingleEnd: "SingleEnd",
       /**
        * Left-positioned single selection mode (only one list item can be selected).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SingleStart: "SingleStart"
     };
@@ -1624,30 +1833,35 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/UploadState
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.UploadState
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["UploadState"] = {
       /**
        * The file has been uploaded successfully.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Complete: "Complete",
       /**
        * The file cannot be uploaded due to an error.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Error: "Error",
       /**
        * The file is awaiting an explicit command to start being uploaded.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Ready: "Ready",
       /**
        * The file is currently being uploaded.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Uploading: "Uploading"
     };
@@ -1662,24 +1876,28 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/ViewSettingsDialogMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.ViewSettingsDialogMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ViewSettingsDialogMode"] = {
       /**
        * Filter type
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Filter: "Filter",
       /**
        * Group type
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Group: "Group",
       /**
        * Default type
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Sort: "Sort"
     };
@@ -1694,18 +1912,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/WizardContentLayout
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.WizardContentLayout
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["WizardContentLayout"] = {
       /**
        * Display the content of the &#x60;ui5-wizard&#x60; as multiple steps in a scroll section.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       MultipleSteps: "MultipleSteps",
       /**
        * Display the content of the &#x60;ui5-wizard&#x60; as single step.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SingleStep: "SingleStep"
     };
@@ -1722,6 +1943,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/MediaGallery.IMediaGalleryItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori IMediaGalleryItem
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Interface for components that may be slotted inside `ui5-product-switch` as items
@@ -1730,6 +1952,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ProductSwitch.IProductSwitchItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori IProductSwitchItem
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Interface for components that may be slotted inside a `ui5-search`
@@ -1738,6 +1961,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/SearchField.ISearchScope
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori ISearchScope
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Interface for components that may be slotted inside `ui5-timeline` as items
@@ -1746,6 +1970,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/Timeline.ITimelineItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori ITimelineItem
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
 
     // marker to threat this as an ES module to support named exports

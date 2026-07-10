@@ -18,6 +18,7 @@ sap.ui.define(
      * @extends module:sap/f/gen/ui5/webcomponents/dist/ListItemGroup
      * @constructor
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/SearchItemGroup
      */
 

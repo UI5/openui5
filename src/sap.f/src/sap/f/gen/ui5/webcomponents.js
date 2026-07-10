@@ -243,84 +243,98 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/AvatarColorScheme
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.AvatarColorScheme
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["AvatarColorScheme"] = {
       /**
        * Accent1
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Accent1: "Accent1",
       /**
        * Accent10
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Accent10: "Accent10",
       /**
        * Accent2
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Accent2: "Accent2",
       /**
        * Accent3
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Accent3: "Accent3",
       /**
        * Accent4
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Accent4: "Accent4",
       /**
        * Accent5
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Accent5: "Accent5",
       /**
        * Accent6
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Accent6: "Accent6",
       /**
        * Accent7
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Accent7: "Accent7",
       /**
        * Accent8
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Accent8: "Accent8",
       /**
        * Accent9
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Accent9: "Accent9",
       /**
        * Auto
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Auto: "Auto",
       /**
        * Placeholder
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Placeholder: "Placeholder",
       /**
        * Transparent
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Transparent: "Transparent"
     };
@@ -335,18 +349,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/AvatarGroupType
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.AvatarGroupType
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["AvatarGroupType"] = {
       /**
        * The avatars are displayed as partially overlapped on top of each other and the entire group has one click or tap area.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Group: "Group",
       /**
        * The avatars are displayed side-by-side and each avatar has its own click or tap area.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Individual: "Individual"
     };
@@ -361,6 +378,7 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/AvatarMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.AvatarMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["AvatarMode"] = {
       /**
@@ -369,6 +387,7 @@ sap.ui.define(
        * making it purely decorative without semantic content or interactivity.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Decorative: "Decorative",
       /**
@@ -376,6 +395,7 @@ sap.ui.define(
        * Configures the component to internally render role&#x3D;&quot;img&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Image: "Image",
       /**
@@ -384,6 +404,7 @@ sap.ui.define(
        * This mode also supports focus and enables keyboard interaction.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Interactive: "Interactive"
     };
@@ -395,18 +416,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/AvatarShape
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.AvatarShape
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["AvatarShape"] = {
       /**
        * Circular shape.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Circle: "Circle",
       /**
        * Square shape.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Square: "Square"
     };
@@ -421,6 +445,7 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/AvatarSize
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.AvatarSize
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["AvatarSize"] = {
       /**
@@ -428,6 +453,7 @@ sap.ui.define(
        * font size - 2.5rem
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       L: "L",
       /**
@@ -435,6 +461,7 @@ sap.ui.define(
        * font size - 2rem
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       M: "M",
       /**
@@ -442,6 +469,7 @@ sap.ui.define(
        * font size - 1.5rem
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       S: "S",
       /**
@@ -449,6 +477,7 @@ sap.ui.define(
        * font size - 3rem
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       XL: "XL",
       /**
@@ -456,6 +485,7 @@ sap.ui.define(
        * font size - 1rem
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       XS: "XS"
     };
@@ -467,24 +497,28 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/BackgroundDesign
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.BackgroundDesign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["BackgroundDesign"] = {
       /**
        * A solid background color dependent on the theme.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Solid: "Solid",
       /**
        * A translucent background depending on the opacity value of the theme.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Translucent: "Translucent",
       /**
        * Transparent background.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Transparent: "Transparent"
     };
@@ -499,18 +533,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/BarAccessibleRole
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.BarAccessibleRole
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["BarAccessibleRole"] = {
       /**
        * Represents the ARIA role &quot;none&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None",
       /**
        * Represents the ARIA role &quot;toolbar&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Toolbar: "Toolbar"
     };
@@ -525,30 +562,35 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/BarDesign
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.BarDesign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["BarDesign"] = {
       /**
        * Floating Footer type - there is visible border on all sides
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       FloatingFooter: "FloatingFooter",
       /**
        * Footer type
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Footer: "Footer",
       /**
        * Default type
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Header: "Header",
       /**
        * Subheader type
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Subheader: "Subheader"
     };
@@ -560,18 +602,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/BorderDesign
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.BorderDesign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["BorderDesign"] = {
       /**
        * Specifies no border.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None",
       /**
        * A solid border color dependent on the theme.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Solid: "Solid"
     };
@@ -586,12 +631,14 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/BreadcrumbsDesign
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.BreadcrumbsDesign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["BreadcrumbsDesign"] = {
       /**
        * All items are displayed as links.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NoCurrentPage: "NoCurrentPage",
       /**
@@ -599,6 +646,7 @@ sap.ui.define(
        * The last item contains only plain text and is not a link.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Standard: "Standard"
     };
@@ -613,42 +661,49 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/BreadcrumbsSeparator
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.BreadcrumbsSeparator
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["BreadcrumbsSeparator"] = {
       /**
        * The separator appears as &quot;\&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       BackSlash: "BackSlash",
       /**
        * The separator appears as &quot;\\&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       DoubleBackSlash: "DoubleBackSlash",
       /**
        * The separator appears as &quot;&gt;&gt;&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       DoubleGreaterThan: "DoubleGreaterThan",
       /**
        * The separator appears as &quot;//&quot; .
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       DoubleSlash: "DoubleSlash",
       /**
        * The separator appears as &quot;&gt;&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       GreaterThan: "GreaterThan",
       /**
        * The separator appears as &quot;/&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Slash: "Slash"
     };
@@ -663,24 +718,28 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/BusyIndicatorSize
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.BusyIndicatorSize
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["BusyIndicatorSize"] = {
       /**
        * large size
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       L: "L",
       /**
        * medium size
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       M: "M",
       /**
        * small size
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       S: "S"
     };
@@ -695,18 +754,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/BusyIndicatorTextPlacement
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.BusyIndicatorTextPlacement
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["BusyIndicatorTextPlacement"] = {
       /**
        * The text will be displayed at the bottom of the busy indicator.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Bottom: "Bottom",
       /**
        * The text will be displayed on top of the busy indicator.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Top: "Top"
     };
@@ -721,18 +783,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ButtonAccessibleRole
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ButtonAccessibleRole
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ButtonAccessibleRole"] = {
       /**
        * Represents Default (button) ARIA role.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Button: "Button",
       /**
        * Represents the ARIA role &quot;link&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Link: "Link"
     };
@@ -747,18 +812,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ButtonBadgeDesign
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ButtonBadgeDesign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ButtonBadgeDesign"] = {
       /**
        * The badge is displayed as an attention dot.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       AttentionDot: "AttentionDot",
       /**
        * The badge is displayed after the text, inside the button.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       InlineText: "InlineText",
       /**
@@ -767,6 +835,7 @@ sap.ui.define(
        * **Note:** According to design guidance, the OverlayText design mode is best used in cozy density to avoid potential visual issues in compact.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       OverlayText: "OverlayText"
     };
@@ -781,42 +850,49 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ButtonDesign
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ButtonDesign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ButtonDesign"] = {
       /**
        * attention type
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Attention: "Attention",
       /**
        * default type (no special styling)
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Default: "Default",
       /**
        * emphasized type
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Emphasized: "Emphasized",
       /**
        * reject style (red button)
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Negative: "Negative",
       /**
        * accept type (green button)
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Positive: "Positive",
       /**
        * transparent type
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Transparent: "Transparent"
     };
@@ -831,24 +907,28 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ButtonType
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ButtonType
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ButtonType"] = {
       /**
        * The button does not do anything special when inside a form
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Button: "Button",
       /**
        * The button acts as a reset button (resets a form)
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Reset: "Reset",
       /**
        * The button acts as a submit button (submits a form)
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Submit: "Submit"
     };
@@ -860,144 +940,168 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/CalendarLegendItemType
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.CalendarLegendItemType
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["CalendarLegendItemType"] = {
       /**
        * Set when no type is set.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None",
       /**
        * Represents the &quot;NonWorking&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NonWorking: "NonWorking",
       /**
        * Represents the &quot;Type01&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type01: "Type01",
       /**
        * Represents the &quot;Type02&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type02: "Type02",
       /**
        * Represents the &quot;Type03&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type03: "Type03",
       /**
        * Represents the &quot;Type04&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type04: "Type04",
       /**
        * Represents the &quot;Type05&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type05: "Type05",
       /**
        * Represents the &quot;Type06&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type06: "Type06",
       /**
        * Represents the &quot;Type07&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type07: "Type07",
       /**
        * Represents the &quot;Type08&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type08: "Type08",
       /**
        * Represents the &quot;Type09&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type09: "Type09",
       /**
        * Represents the &quot;Type10&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type10: "Type10",
       /**
        * Represents the &quot;Type11&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type11: "Type11",
       /**
        * Represents the &quot;Type12&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type12: "Type12",
       /**
        * Represents the &quot;Type13&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type13: "Type13",
       /**
        * Represents the &quot;Type14&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type14: "Type14",
       /**
        * Represents the &quot;Type15&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type15: "Type15",
       /**
        * Represents the &quot;Type16&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type16: "Type16",
       /**
        * Represents the &quot;Type17&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type17: "Type17",
       /**
        * Represents the &quot;Type18&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type18: "Type18",
       /**
        * Represents the &quot;Type19&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type19: "Type19",
       /**
        * Represents the &quot;Type20&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Type20: "Type20",
       /**
        * Represents the &quot;Working&quot; item in the calendar legend.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Working: "Working"
     };
@@ -1012,24 +1116,28 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/CalendarSelectionMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.CalendarSelectionMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["CalendarSelectionMode"] = {
       /**
        * Several dates can be selected
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Multiple: "Multiple",
       /**
        * A range defined by a start date and an end date can be selected
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Range: "Range",
       /**
        * Only one date can be selected at a time
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Single: "Single"
     };
@@ -1047,6 +1155,7 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/CalendarWeekNumbering
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.CalendarWeekNumbering
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["CalendarWeekNumbering"] = {
       /**
@@ -1057,6 +1166,7 @@ sap.ui.define(
        * scheme.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Default: "Default",
       /**
@@ -1064,6 +1174,7 @@ sap.ui.define(
        * Monday is first day of the week, the week containing January 4th is first week of the year.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ISO_8601: "ISO_8601",
       /**
@@ -1071,6 +1182,7 @@ sap.ui.define(
        * Saturday is first day of the week, the week containing January 1st is first week of the year.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       MiddleEastern: "MiddleEastern",
       /**
@@ -1079,6 +1191,7 @@ sap.ui.define(
        * Sunday is first day of the week, the week containing January 1st is first week of the year.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       WesternTraditional: "WesternTraditional"
     };
@@ -1093,18 +1206,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/CarouselArrowsPlacement
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.CarouselArrowsPlacement
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["CarouselArrowsPlacement"] = {
       /**
        * Carousel arrows are placed on the sides of the current Carousel page.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Content: "Content",
       /**
        * Carousel arrows are placed on the sides of the page indicator of the Carousel.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Navigation: "Navigation"
     };
@@ -1119,6 +1235,7 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/CarouselPageIndicatorType
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.CarouselPageIndicatorType
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["CarouselPageIndicatorType"] = {
       /**
@@ -1126,12 +1243,14 @@ sap.ui.define(
        * If there are more pages, the page indicator will switch to displaying the current page and the total number of pages. (e.g. X of Y)
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Default: "Default",
       /**
        * The page indicator will display the current page and the total number of pages. (e.g. X of Y)
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Numeric: "Numeric"
     };
@@ -1146,30 +1265,35 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ComboBoxFilter
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ComboBoxFilter
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ComboBoxFilter"] = {
       /**
        * Defines contains filtering.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Contains: "Contains",
       /**
        * Removes any filtering applied while typing
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None",
       /**
        * Defines filtering by starting symbol of item&#x27;s text.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       StartsWith: "StartsWith",
       /**
        * Defines filtering by first symbol of each word of item&#x27;s text.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       StartsWithPerTerm: "StartsWithPerTerm"
     };
@@ -1184,18 +1308,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ExpandableTextOverflowMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ExpandableTextOverflowMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ExpandableTextOverflowMode"] = {
       /**
        * Overflowing text is appended in-place.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       InPlace: "InPlace",
       /**
        * Full text is displayed in a popover.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Popover: "Popover"
     };
@@ -1217,18 +1344,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/FormAccessibleMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.FormAccessibleMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["FormAccessibleMode"] = {
       /**
        * Display mode.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Display: "Display",
       /**
        * Edit mode.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Edit: "Edit"
     };
@@ -1243,18 +1373,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/FormItemSpacing
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.FormItemSpacing
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["FormItemSpacing"] = {
       /**
        * Large spacing (larger vertical space between form items).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Large: "Large",
       /**
        * Normal spacing (smaller vertical space between form items).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Normal: "Normal"
     };
@@ -1269,36 +1402,42 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/Highlight
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.Highlight
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["Highlight"] = {
       /**
        * Critical
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Critical: "Critical",
       /**
        * Information
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Information: "Information",
       /**
        * Negative
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Negative: "Negative",
       /**
        * None
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None",
       /**
        * Positive
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Positive: "Positive"
     };
@@ -1310,54 +1449,63 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/IconDesign
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.IconDesign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["IconDesign"] = {
       /**
        * Contrast design
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Contrast: "Contrast",
       /**
        * Critical design
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Critical: "Critical",
       /**
        * Default design (brand design)
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Default: "Default",
       /**
        * info type
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Information: "Information",
       /**
        * Negative design
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Negative: "Negative",
       /**
        * Neutral design
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Neutral: "Neutral",
       /**
        * Design that indicates an icon which isn&#x27;t interactive
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NonInteractive: "NonInteractive",
       /**
        * Positive design
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Positive: "Positive"
     };
@@ -1369,6 +1517,7 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/IconMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.IconMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["IconMode"] = {
       /**
@@ -1377,6 +1526,7 @@ sap.ui.define(
        * making it purely decorative without semantic content or interactivity.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Decorative: "Decorative",
       /**
@@ -1384,6 +1534,7 @@ sap.ui.define(
        * Configures the component to internally render role&#x3D;&quot;img&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Image: "Image",
       /**
@@ -1392,6 +1543,7 @@ sap.ui.define(
        * This mode also supports focus and press handling to enhance interactivity.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Interactive: "Interactive"
     };
@@ -1403,30 +1555,35 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/InputSuggestionsFilter
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.InputSuggestionsFilter
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["InputSuggestionsFilter"] = {
       /**
        * Defines contains filtering.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Contains: "Contains",
       /**
        * Removes any filtering applied while typing
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None",
       /**
        * Defines filtering by starting symbol of item&#x27;s text.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       StartsWith: "StartsWith",
       /**
        * Defines filtering by first symbol of each word of item&#x27;s text.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       StartsWithPerTerm: "StartsWithPerTerm"
     };
@@ -1441,48 +1598,56 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/InputType
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.InputType
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["InputType"] = {
       /**
        * Used for input fields that must contain an e-mail address.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Email: "Email",
       /**
        * Defines a numeric input field.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Number: "Number",
       /**
        * Defines a password field.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Password: "Password",
       /**
        * Used for input fields that should contain a search term.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Search: "Search",
       /**
        * Used for input fields that should contain a telephone number.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Tel: "Tel",
       /**
        * Defines a one-line text input field:
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Text: "Text",
       /**
        * Used for input fields that should contain a URL address.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       URL: "URL"
     };
@@ -1494,18 +1659,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/InteractiveAreaSize
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.InteractiveAreaSize
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["InteractiveAreaSize"] = {
       /**
        * Enlarged target area size (up to 24px in height) provides users with an enhanced dedicated space to interact with the component.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Large: "Large",
       /**
        * The default target area size (the area taken by the component itself without any extra invisible touch area).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Normal: "Normal"
     };
@@ -1520,18 +1688,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/LinkAccessibleRole
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.LinkAccessibleRole
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["LinkAccessibleRole"] = {
       /**
        * Represents the ARIA role &quot;button&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Button: "Button",
       /**
        * Represents Default (link) ARIA role.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Link: "Link"
     };
@@ -1546,24 +1717,28 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/LinkDesign
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.LinkDesign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["LinkDesign"] = {
       /**
        * default type (no special styling)
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Default: "Default",
       /**
        * emphasized type
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Emphasized: "Emphasized",
       /**
        * subtle type (appears as regular text, rather than a link)
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Subtle: "Subtle"
     };
@@ -1575,30 +1750,35 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ListAccessibleRole
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ListAccessibleRole
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ListAccessibleRole"] = {
       /**
        * Represents the ARIA role &quot;list&quot;. (by default)
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       List: "List",
       /**
        * Represents the ARIA role &quot;listbox&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ListBox: "ListBox",
       /**
        * Represents the ARIA role &quot;menu&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Menu: "Menu",
       /**
        * Represents the ARIA role &quot;tree&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Tree: "Tree"
     };
@@ -1613,6 +1793,7 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ListGrowingMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ListGrowingMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ListGrowingMode"] = {
       /**
@@ -1620,18 +1801,21 @@ sap.ui.define(
        * at the bottom.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Button: "Button",
       /**
        * Component&#x27;s growing is not enabled.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None",
       /**
        * Component&#x27;s &quot;load-more&quot; is fired upon scroll.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Scroll: "Scroll"
     };
@@ -1646,36 +1830,42 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ListItemAccessibleRole
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ListItemAccessibleRole
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ListItemAccessibleRole"] = {
       /**
        * Represents the ARIA role &quot;listitem&quot;. (by default)
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ListItem: "ListItem",
       /**
        * Represents the ARIA role &quot;menuitem&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       MenuItem: "MenuItem",
       /**
        * Represents the ARIA role &quot;none&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None",
       /**
        * Represents the ARIA role &quot;option&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Option: "Option",
       /**
        * Represents the ARIA role &quot;treeitem&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TreeItem: "TreeItem"
     };
@@ -1690,30 +1880,35 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ListItemType
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ListItemType
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ListItemType"] = {
       /**
        * Indicates that the item is clickable via active feedback when item is pressed.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Active: "Active",
       /**
        * Enables detail button of the list item that fires detail-click event.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Detail: "Detail",
       /**
        * Indicates the list item does not have any active feedback when item is pressed.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Inactive: "Inactive",
       /**
        * Enables the type of navigation, which is specified to add an arrow at the end of the items and fires navigate-click event.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Navigation: "Navigation"
     };
@@ -1728,30 +1923,35 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ListSelectionMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ListSelectionMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ListSelectionMode"] = {
       /**
        * Delete mode (only one list item can be deleted via provided delete button)
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Delete: "Delete",
       /**
        * Multi selection mode (more than one list item can be selected).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Multiple: "Multiple",
       /**
        * Default mode (no selection).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None",
       /**
        * Right-positioned single selection mode (only one list item can be selected).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Single: "Single",
       /**
@@ -1759,6 +1959,7 @@ sap.ui.define(
        * (only one list item can be selected - this is always the focused item).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SingleAuto: "SingleAuto",
       /**
@@ -1766,12 +1967,14 @@ sap.ui.define(
        * (only one list item can be selected).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SingleEnd: "SingleEnd",
       /**
        * Left-positioned single selection mode (only one list item can be selected).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SingleStart: "SingleStart"
     };
@@ -1786,12 +1989,14 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ListSeparator
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ListSeparator
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ListSeparator"] = {
       /**
        * Separators between the items including the last and the first one.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       All: "All",
       /**
@@ -1799,12 +2004,14 @@ sap.ui.define(
        * Note: This enumeration depends on the theme.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Inner: "Inner",
       /**
        * No item separators.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None"
     };
@@ -1819,24 +2026,28 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/MenuItemGroupCheckMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.MenuItemGroupCheckMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["MenuItemGroupCheckMode"] = {
       /**
        * Multiple items check mode (multiple items in a group can be checked at a time)
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Multiple: "Multiple",
       /**
        * default type (items in a group cannot be checked)
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None",
       /**
        * Single item check mode (only one item in a group can be checked at a time)
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Single: "Single"
     };
@@ -1851,42 +2062,49 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/MessageStripDesign
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.MessageStripDesign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["MessageStripDesign"] = {
       /**
        * Message uses custom color set 1
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ColorSet1: "ColorSet1",
       /**
        * Message uses custom color set 2
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ColorSet2: "ColorSet2",
       /**
        * Message is a warning
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Critical: "Critical",
       /**
        * Message should be just an information
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Information: "Information",
       /**
        * Message is an error
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Negative: "Negative",
       /**
        * Message is a success message
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Positive: "Positive"
     };
@@ -1901,6 +2119,7 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/NotificationListGrowingMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.NotificationListGrowingMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["NotificationListGrowingMode"] = {
       /**
@@ -1908,12 +2127,14 @@ sap.ui.define(
        * at the bottom.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Button: "Button",
       /**
        * Component&#x27;s growing is not enabled.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None"
     };
@@ -1928,18 +2149,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/OverflowMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.OverflowMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["OverflowMode"] = {
       /**
        * End type is used if there should be only one overflow with hidden the tabs at the end of the tab container.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       End: "End",
       /**
        * StartAndEnd type is used if there should be two overflows on both ends of the tab container.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       StartAndEnd: "StartAndEnd"
     };
@@ -1954,6 +2178,7 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/PanelAccessibleRole
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.PanelAccessibleRole
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["PanelAccessibleRole"] = {
       /**
@@ -1961,6 +2186,7 @@ sap.ui.define(
        * A section of the page, designed to be complementary to the main content at a similar level in the DOM hierarchy.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Complementary: "Complementary",
       /**
@@ -1968,6 +2194,7 @@ sap.ui.define(
        * A landmark region that contains a collection of items and objects that, as a whole, create a form.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Form: "Form",
       /**
@@ -1975,6 +2202,7 @@ sap.ui.define(
        * A section of a page, that is important enough to be included in a page summary or table of contents.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Region: "Region"
     };
@@ -1989,30 +2217,35 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/PopoverHorizontalAlign
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.PopoverHorizontalAlign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["PopoverHorizontalAlign"] = {
       /**
        * Popover is centered.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Center: "Center",
       /**
        * Popover is aligned with the end of the target.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       End: "End",
       /**
        * Popover is aligned with the start of the target.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Start: "Start",
       /**
        * Popover is stretched.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Stretch: "Stretch"
     };
@@ -2027,30 +2260,35 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/PopoverPlacement
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.PopoverPlacement
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["PopoverPlacement"] = {
       /**
        * Popover will be placed at the bottom of the reference element.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Bottom: "Bottom",
       /**
        * Popover will be placed at the end of the reference element.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       End: "End",
       /**
        * Popover will be placed at the start of the reference element.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Start: "Start",
       /**
        * Popover will be placed at the top of the reference element.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Top: "Top"
     };
@@ -2065,30 +2303,35 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/PopoverVerticalAlign
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.PopoverVerticalAlign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["PopoverVerticalAlign"] = {
       /**
        * Popover will be placed at the bottom of the reference control.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Bottom: "Bottom",
       /**
        * Center
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Center: "Center",
       /**
        * Popover will be streched
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Stretch: "Stretch",
       /**
        * Popover will be placed at the top of the reference control.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Top: "Top"
     };
@@ -2103,24 +2346,28 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/PopupAccessibleRole
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.PopupAccessibleRole
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["PopupAccessibleRole"] = {
       /**
        * Represents the ARIA role &quot;alertdialog&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       AlertDialog: "AlertDialog",
       /**
        * Represents the ARIA role &quot;dialog&quot;.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Dialog: "Dialog",
       /**
        * Represents no ARIA role.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None"
     };
@@ -2135,30 +2382,35 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/Priority
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.Priority
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["Priority"] = {
       /**
        * High priority.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       High: "High",
       /**
        * Low priority.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Low: "Low",
       /**
        * Medium priority.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Medium: "Medium",
       /**
        * Default, none priority.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None"
     };
@@ -2171,12 +2423,14 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/RatingIndicatorSize
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.RatingIndicatorSize
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["RatingIndicatorSize"] = {
       /**
        * Large size for prominent or spacious layouts.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       L: "L",
       /**
@@ -2184,12 +2438,14 @@ sap.ui.define(
        * Offers a balanced appearance for most scenarios.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       M: "M",
       /**
        * Small size for compact layouts.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       S: "S"
     };
@@ -2204,18 +2460,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/SegmentedButtonSelectionMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.SegmentedButtonSelectionMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["SegmentedButtonSelectionMode"] = {
       /**
        * Multiple items can be selected at a time. All items can be deselected.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Multiple: "Multiple",
       /**
        * There is always one selected. Selecting one deselects the previous one.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Single: "Single"
     };
@@ -2230,24 +2489,28 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/SelectTextSeparator
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.SelectTextSeparator
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["SelectTextSeparator"] = {
       /**
        * Will show bullet(·) as separator on two columns layout when Select is in read-only mode.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Bullet: "Bullet",
       /**
        * Will show N-dash(–) as separator on two columns layout when Select is in read-only mode.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Dash: "Dash",
       /**
        * Will show vertical line(|) as separator on two columns layout when Select is in read-only mode.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       VerticalLine: "VerticalLine"
     };
@@ -2262,36 +2525,42 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/SemanticColor
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.SemanticColor
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["SemanticColor"] = {
       /**
        * Critical color
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Critical: "Critical",
       /**
        * Default color (brand color)
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Default: "Default",
       /**
        * Negative color
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Negative: "Negative",
       /**
        * Neutral color.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Neutral: "Neutral",
       /**
        * Positive color
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Positive: "Positive"
     };
@@ -2306,18 +2575,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/SwitchDesign
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.SwitchDesign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["SwitchDesign"] = {
       /**
        * Defines the Switch as Graphical
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Graphical: "Graphical",
       /**
        * Defines the Switch as Textual
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Textual: "Textual"
     };
@@ -2332,18 +2604,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TabLayout
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TabLayout
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TabLayout"] = {
       /**
        * Inline type, the tab &quot;main text&quot; and &quot;additionalText&quot; are displayed horizotally.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Inline: "Inline",
       /**
        * Standard type, the tab &quot;main text&quot; and &quot;additionalText&quot; are displayed vertically.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Standard: "Standard"
     };
@@ -2355,36 +2630,42 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TableCellHorizontalAlign
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TableCellHorizontalAlign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TableCellHorizontalAlign"] = {
       /**
        * Center
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Center: "Center",
       /**
        * End
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       End: "End",
       /**
        * Left
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Left: "Left",
       /**
        * Right
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Right: "Right",
       /**
        * Start
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Start: "Start"
     };
@@ -2399,12 +2680,14 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TableGrowingMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TableGrowingMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TableGrowingMode"] = {
       /**
        * Renders a growing button, which can be pressed to load more data.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Button: "Button",
       /**
@@ -2413,6 +2696,7 @@ sap.ui.define(
        * **Note:** If the table is not scrollable, a growing button will be rendered instead to ensure growing functionality.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Scroll: "Scroll"
     };
@@ -2427,18 +2711,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TableOverflowMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TableOverflowMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TableOverflowMode"] = {
       /**
        * Pops in columns, that do not fit into the table anymore.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Popin: "Popin",
       /**
        * Shows a scrollbar, when the table cannot fit all columns.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Scroll: "Scroll"
     };
@@ -2453,6 +2740,7 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TableSelectionBehavior
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TableSelectionBehavior
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TableSelectionBehavior"] = {
       /**
@@ -2461,12 +2749,14 @@ sap.ui.define(
        * **Note:** In this mode, the &#x60;row-click&#x60; event of the &#x60;ui5-table&#x60; component is not fired.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       RowOnly: "RowOnly",
       /**
        * Rows can only be selected by using the row selector column.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       RowSelector: "RowSelector"
     };
@@ -2481,24 +2771,28 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TableSelectionMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TableSelectionMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TableSelectionMode"] = {
       /**
        * Multi selection mode (more than one table row can be selected).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Multiple: "Multiple",
       /**
        * Default mode (no selection).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None",
       /**
        * Single selection mode (only one table row can be selected).
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Single: "Single"
     };
@@ -2513,18 +2807,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TableSelectionMultiHeaderSelector
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TableSelectionMultiHeaderSelector
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TableSelectionMultiHeaderSelector"] = {
       /**
        * Renders an icon in the table header row that removes the selection of all rows.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       ClearAll: "ClearAll",
       /**
        * Renders a checkbox in the table header row that toggles the selection of all rows.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       SelectAll: "SelectAll"
     };
@@ -2539,48 +2836,56 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TagDesign
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TagDesign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TagDesign"] = {
       /**
        * Critical design
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Critical: "Critical",
       /**
        * Information design
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Information: "Information",
       /**
        * Negative design
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Negative: "Negative",
       /**
        * Neutral design
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Neutral: "Neutral",
       /**
        * Positive design
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Positive: "Positive",
       /**
        * Set1 of generic indication colors that are intended for industry-specific use cases
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Set1: "Set1",
       /**
        * Set2 of generic indication colors that are intended for industry-specific use cases
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Set2: "Set2"
     };
@@ -2592,18 +2897,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TagSize
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TagSize
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TagSize"] = {
       /**
        * Large size of the tag
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       L: "L",
       /**
        * Small size of the tag
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       S: "S"
     };
@@ -2615,18 +2923,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TextEmptyIndicatorMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TextEmptyIndicatorMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TextEmptyIndicatorMode"] = {
       /**
        * Empty indicator is never rendered.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Off: "Off",
       /**
        * Empty indicator is rendered always when the component&#x27;s content is empty.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       On: "On"
     };
@@ -2641,42 +2952,49 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/TitleLevel
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.TitleLevel
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["TitleLevel"] = {
       /**
        * Renders &#x60;h1&#x60; tag.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       H1: "H1",
       /**
        * Renders &#x60;h2&#x60; tag.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       H2: "H2",
       /**
        * Renders &#x60;h3&#x60; tag.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       H3: "H3",
       /**
        * Renders &#x60;h4&#x60; tag.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       H4: "H4",
       /**
        * Renders &#x60;h5&#x60; tag.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       H5: "H5",
       /**
        * Renders &#x60;h6&#x60; tag.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       H6: "H6"
     };
@@ -2688,6 +3006,7 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ToastPlacement
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ToastPlacement
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ToastPlacement"] = {
       /**
@@ -2695,54 +3014,63 @@ sap.ui.define(
        * Default placement (no selection)
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       BottomCenter: "BottomCenter",
       /**
        * Toast is placed at the &#x60;BottomEnd&#x60; position of its container.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       BottomEnd: "BottomEnd",
       /**
        * Toast is placed at the &#x60;BottomStart&#x60; position of its container.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       BottomStart: "BottomStart",
       /**
        * Toast is placed at the &#x60;MiddleCenter&#x60; position of its container.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       MiddleCenter: "MiddleCenter",
       /**
        * Toast is placed at the &#x60;MiddleEnd&#x60; position of its container.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       MiddleEnd: "MiddleEnd",
       /**
        * Toast is placed at the &#x60;MiddleStart&#x60; position of its container.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       MiddleStart: "MiddleStart",
       /**
        * Toast is placed at the &#x60;TopCenter&#x60; position of its container.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TopCenter: "TopCenter",
       /**
        * Toast is placed at the &#x60;TopEnd&#x60; position of its container.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TopEnd: "TopEnd",
       /**
        * Toast is placed at the &#x60;TopStart&#x60; position of its container.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       TopStart: "TopStart"
     };
@@ -2757,18 +3085,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ToolbarAlign
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ToolbarAlign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ToolbarAlign"] = {
       /**
        * Toolbar items are situated at the &#x60;end&#x60; of the Toolbar
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       End: "End",
       /**
        * Toolbar items are situated at the &#x60;start&#x60; of the Toolbar
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Start: "Start"
     };
@@ -2783,18 +3114,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ToolbarDesign
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ToolbarDesign
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ToolbarDesign"] = {
       /**
        * The toolbar and its content will be displayed with solid background.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Solid: "Solid",
       /**
        * The toolbar and its content will be displayed with transparent background.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Transparent: "Transparent"
     };
@@ -2809,24 +3143,28 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/ToolbarItemOverflowBehavior
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.ToolbarItemOverflowBehavior
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ToolbarItemOverflowBehavior"] = {
       /**
        * When set, the item will be always part of the overflow part of ui5-toolbar.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       AlwaysOverflow: "AlwaysOverflow",
       /**
        * The item is presented inside the toolbar and goes in the popover, when there is not enough space.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Default: "Default",
       /**
        * When set, the item will never go to the overflow popover.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       NeverOverflow: "NeverOverflow"
     };
@@ -2841,18 +3179,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents/dist/types/WrappingType
      * @ui5-module-override sap/f/gen/ui5/webcomponents dist.types.WrappingType
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["WrappingType"] = {
       /**
        * The text will be truncated with an ellipsis.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None",
       /**
        * The text will wrap. The words will not be broken based on hyphenation.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Normal: "Normal"
     };
@@ -2869,6 +3210,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents/dist/AvatarGroup.IAvatarGroupItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents IAvatarGroupItem
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Interface for components that may be used as a button inside numerous higher-order components
@@ -2877,6 +3219,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents/dist/Button.IButton
      * @ui5-module-override sap/f/gen/ui5/webcomponents IButton
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Interface for components that may be slotted inside a `ui5-calendar`.
@@ -2887,6 +3230,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents/dist/Calendar.ICalendarSelectedDates
      * @ui5-module-override sap/f/gen/ui5/webcomponents ICalendarSelectedDates
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Interface for components that may be used inside a `ui5-color-palette` or `ui5-color-palette-popover`
@@ -2895,6 +3239,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents/dist/ColorPalette.IColorPaletteItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents IColorPaletteItem
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Interface for components that may be slotted inside a `ui5-combobox`
@@ -2903,6 +3248,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents/dist/ComboBox.IComboBoxItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents IComboBoxItem
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Represents a dynamic date range option used by the `ui5-dynamic-date-range` component.
@@ -2929,6 +3275,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents/dist/DynamicDateRange.IDynamicDateRangeOption
      * @ui5-module-override sap/f/gen/ui5/webcomponents IDynamicDateRangeOption
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Interface for components that can be slotted inside `ui5-form` as items.
@@ -2937,6 +3284,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents/dist/Form.IFormItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents IFormItem
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Interface for components that represent an icon, usable in numerous higher-order components
@@ -2945,6 +3293,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents/dist/Icon.IIcon
      * @ui5-module-override sap/f/gen/ui5/webcomponents IIcon
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Interface for components that represent a suggestion item, usable in `ui5-input`
@@ -2953,6 +3302,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents/dist/Input.IInputSuggestionItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents IInputSuggestionItem
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Interface for components that may be slotted inside a `ui5-menu`.
@@ -2963,6 +3313,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents/dist/Menu.IMenuItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents IMenuItem
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Interface for components that may be slotted inside a `ui5-multi-combobox` as items
@@ -2971,6 +3322,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents/dist/MultiComboBox.IMultiComboBoxItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents IMultiComboBoxItem
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Interface for components that may be slotted inside `ui5-segmented-button` as items
@@ -2979,6 +3331,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents/dist/SegmentedButton.ISegmentedButtonItem
      * @ui5-module-override sap/f/gen/ui5/webcomponents ISegmentedButtonItem
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Interface for components that may be slotted inside `ui5-select` as options
@@ -2987,6 +3340,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents/dist/Select.IOption
      * @ui5-module-override sap/f/gen/ui5/webcomponents IOption
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Interface for components that may be slotted inside `ui5-tabcontainer` as items
@@ -2997,6 +3351,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents/dist/TabContainer.ITab
      * @ui5-module-override sap/f/gen/ui5/webcomponents ITab
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Interface for components that can be slotted inside the `features` slot of the `ui5-table`.
@@ -3005,6 +3360,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents/dist/Table.ITableFeature
      * @ui5-module-override sap/f/gen/ui5/webcomponents ITableFeature
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Interface for components that can be slotted inside the `features` slot of the `ui5-table`
@@ -3014,6 +3370,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents/dist/Table.ITableGrowing
      * @ui5-module-override sap/f/gen/ui5/webcomponents ITableGrowing
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
      * Interface for the slotted item in `ui5-toolbar-item`.
@@ -3024,6 +3381,7 @@ sap.ui.define(
      * @name module:sap/f/gen/ui5/webcomponents/dist/ToolbarItem.IToolbarItemContent
      * @ui5-module-override sap/f/gen/ui5/webcomponents IToolbarItemContent
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
 
     // marker to threat this as an ES module to support named exports

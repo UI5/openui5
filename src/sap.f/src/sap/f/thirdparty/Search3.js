@@ -1,4 +1,4 @@
-sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ListItemAdditionalText.css', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/List', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/search', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/encodeXML', 'sap/f/thirdparty/information', 'sap/f/thirdparty/sys-enter-2', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/i18n-defaults'], (function (require, exports, webcomponentsBase, eventStrict, Icons, jsxRuntime, Button, Icon, ListItemBase, parametersBundle_css, ListItemAdditionalText_css, InvisibleMessage, AccessibilityTextsHelper, ValueState, decline, List, i18nDefaults, Label, ResponsivePopover, slimArrowDown, Title, search, BusyIndicator, encodeXML, information, sysEnter2, parametersBundle_css$1, i18nDefaults$1) { 'use strict';
+sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ListItemAdditionalText.css', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/List', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/search2', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/encodeXML', 'sap/f/thirdparty/information', 'sap/f/thirdparty/sys-enter-2', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/i18n-defaults'], (function (require, exports, webcomponentsBase, eventStrict, Theme, jsxRuntime, Button, Icon, ListItemBase, parametersBundle_css, ListItemAdditionalText_css, InvisibleMessage, AccessibilityTextsHelper, ValueState, decline, List, i18nDefaults, Label, ResponsivePopover, slimArrowDown, Title, search, BusyIndicator, encodeXML, information, sysEnter2, parametersBundle_css$1, i18nDefaults$1) { 'use strict';
 
     function ListItemBaseTemplate(hooks, injectedProps) {
         const listItemContent = hooks?.listItemContent || defaultListItemContent;
@@ -17,17 +17,17 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
                             jsxRuntime.jsx("span", { part: "additional-text", class: "ui5-li-additional-text", children: this.additionalText })] })] }));
     }
 
-    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var optionBaseCss = `:host{height:var(--_ui5_list_item_dropdown_base_height);--_ui5_list_item_title_size: var(--sapFontSize)}:host(:active[actionable]:not([data-moving])),:host(:active[actionable][selected]:not([data-moving])){background-color:var(--sapList_Active_Background);border-bottom-color:var(--sapList_Active_Background)}
 `;
 
-    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var listItemIconCss = `.ui5-li-icon{color:var(--sapList_TextColor);min-width:var(--_ui5_list_item_icon_size);min-height:var(--_ui5_list_item_icon_size);padding-inline-end:var(--_ui5_list_item_icon_padding-inline-end)}
 `;
 
-    var __decorate$6 = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var __decorate$5 = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
         else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
@@ -56,25 +56,25 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             return this.textContent || "";
         }
     };
-    __decorate$6([
+    __decorate$5([
         webcomponentsBase.d({ type: Node, "default": true, invalidateOnChildChange: true })
     ], Option.prototype, "text", void 0);
-    __decorate$6([
+    __decorate$5([
         webcomponentsBase.s()
     ], Option.prototype, "value", void 0);
-    __decorate$6([
+    __decorate$5([
         webcomponentsBase.s()
     ], Option.prototype, "icon", void 0);
-    __decorate$6([
+    __decorate$5([
         webcomponentsBase.s()
     ], Option.prototype, "additionalText", void 0);
-    __decorate$6([
+    __decorate$5([
         webcomponentsBase.s()
     ], Option.prototype, "tooltip", void 0);
-    __decorate$6([
+    __decorate$5([
         webcomponentsBase.s({ type: Boolean })
     ], Option.prototype, "selected", void 0);
-    Option = __decorate$6([
+    Option = __decorate$5([
         webcomponentsBase.m({
             tag: "ui5-option",
             template: OptionTemplate,
@@ -164,27 +164,27 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
                             jsxRuntime.jsx("span", { id: "accessibleDescription", class: "ui5-hidden-text", children: this.ariaDescriptionText })] }), SelectPopoverTemplate.call(this)] }));
     }
 
-    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var selectCss = `:host{vertical-align:middle}.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}.inputIcon{color:var(--_ui5_input_icon_color);cursor:pointer;outline:none;padding:var(--_ui5_input_icon_padding);border-inline-start:var(--_ui5_input_icon_border);min-width:1rem;min-height:1rem;border-radius:var(--_ui5_input_icon_border_radius)}.inputIcon.inputIcon--pressed{background:var(--_ui5_input_icon_pressed_bg);box-shadow:var(--_ui5_input_icon_box_shadow);border-inline-start:var(--_ui5_select_hover_icon_left_border);color:var(--_ui5_input_icon_pressed_color)}.inputIcon:active{background-color:var(--sapButton_Active_Background);box-shadow:var(--_ui5_input_icon_box_shadow);border-inline-start:var(--_ui5_select_hover_icon_left_border);color:var(--_ui5_input_icon_pressed_color)}.inputIcon:not(.inputIcon--pressed):not(:active):hover{background:var(--_ui5_input_icon_hover_bg);box-shadow:var(--_ui5_input_icon_box_shadow)}.inputIcon:hover{border-inline-start:var(--_ui5_select_hover_icon_left_border);box-shadow:var(--_ui5_input_icon_box_shadow)}:host(:not([hidden])){display:inline-block}:host{width:var(--_ui5_input_width);min-width:calc(var(--_ui5_input_min_width) + (var(--_ui5-input-icons-count)*var(--_ui5_input_icon_width)));margin:var(--_ui5_input_margin_top_bottom) 0;height:var(--_ui5_input_height);color:var(--sapField_TextColor);font-size:var(--sapFontSize);font-family:var(--sapFontFamily);font-style:normal;border:var(--_ui5-input-border);border-radius:var(--_ui5_input_border_radius);box-sizing:border-box;text-align:start;transition:var(--_ui5_input_transition);background:var(--sapField_BackgroundStyle);background-color:var(--_ui5_input_background_color)}:host(:not([readonly])),:host([readonly][disabled]){box-shadow:var(--sapField_Shadow)}:host([focused]:not([opened])){border-color:var(--_ui5_input_focused_border_color);background-color:var(--sapField_Focus_Background)}.ui5-input-focusable-element{position:relative}:host([focused]:not([opened])) .ui5-input-focusable-element:after{content:var(--ui5_input_focus_pseudo_element_content);position:absolute;pointer-events:none;z-index:2;border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--_ui5_input_focus_outline_color);border-radius:var(--_ui5_input_focus_border_radius);top:var(--_ui5_input_focus_offset);bottom:var(--_ui5_input_focus_offset);left:var(--_ui5_input_focus_offset);right:var(--_ui5_input_focus_offset)}:host([focused][readonly]:not([opened])) .ui5-input-focusable-element:after{top:var(--_ui5_input_readonly_focus_offset);bottom:var(--_ui5_input_readonly_focus_offset);left:var(--_ui5_input_readonly_focus_offset);right:var(--_ui5_input_readonly_focus_offset);border-radius:var(--_ui5_input_readonly_focus_border_radius)}.ui5-input-root:before{content:"";position:absolute;width:calc(100% - 2px);left:1px;bottom:-2px;border-bottom-left-radius:8px;border-bottom-right-radius:8px;height:var(--_ui5_input_bottom_border_height);transition:var(--_ui5_input_transition);background-color:var(--_ui5_input_bottom_border_color)}.ui5-input-root{width:100%;height:100%;position:relative;background:transparent;display:inline-block;outline:none;box-sizing:border-box;color:inherit;transition:border-color .2s ease-in-out;border-radius:var(--_ui5_input_border_radius);overflow:hidden}:host([disabled]){opacity:var(--_ui5_input_disabled_opacity);cursor:default;pointer-events:none;background-color:var(--_ui5-input_disabled_background);border-color:var(--_ui5_input_disabled_border_color)}:host([disabled]) .ui5-input-root:before,:host([readonly]) .ui5-input-root:before{content:none}[inner-input]{background:transparent;color:inherit;border:none;font-style:inherit;-webkit-appearance:none;-moz-appearance:textfield;padding:var(--_ui5_input_inner_padding);box-sizing:border-box;width:100%;text-overflow:ellipsis;flex:1;outline:none;font-size:inherit;font-family:inherit;line-height:inherit;letter-spacing:inherit;word-spacing:inherit;text-align:inherit}[inner-input][inner-input-with-icon]{padding:var(--_ui5_input_inner_padding_with_icon)}[inner-input][type=search]::-webkit-search-decoration,[inner-input][type=search]::-webkit-search-cancel-button,[inner-input][type=search]::-webkit-search-results-button,[inner-input][type=search]::-webkit-search-results-decoration{display:none}[inner-input]::-ms-reveal,[inner-input]::-ms-clear{display:none}.ui5-input-value-state-icon{height:100%;display:var(--_ui5-input-value-state-icon-display);align-items:center}.ui5-input-value-state-icon>svg{margin-right:8px}[inner-input]::selection{background:var(--sapSelectedColor);color:var(--sapContent_ContrastTextColor)}:host([disabled]) [inner-input]::-webkit-input-placeholder{visibility:hidden}:host([readonly]) [inner-input]::-webkit-input-placeholder{visibility:hidden}:host([disabled]) [inner-input]::-moz-placeholder{visibility:hidden}:host([readonly]) [inner-input]::-moz-placeholder{visibility:hidden}[inner-input]::-webkit-input-placeholder{font-weight:400;font-style:var(--_ui5_input_placeholder_style);color:var(--_ui5_input_placeholder_color);padding-right:.125rem}[inner-input]::-moz-placeholder{font-weight:400;font-style:var(--_ui5_input_placeholder_style);color:var(--_ui5_input_placeholder_color);padding-right:.125rem}:host([value-state="Negative"]) [inner-input]::-webkit-input-placeholder{color:var(--_ui5-input_error_placeholder_color);font-weight:var(--_ui5_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Negative"]) [inner-input]::-moz-placeholder{color:var(--_ui5-input_error_placeholder_color);font-weight:var(--_ui5_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Critical"]) [inner-input]::-webkit-input-placeholder{font-weight:var(--_ui5_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Critical"]) [inner-input]::-moz-placeholder{font-weight:var(--_ui5_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Positive"]) [inner-input]::-webkit-input-placeholder{color:var(--_ui5_input_placeholder_color)}:host([value-state="Positive"]) [inner-input]::-moz-placeholder{color:var(--_ui5_input_placeholder_color)}:host([value-state="Information"]) [inner-input]::-webkit-input-placeholder{color:var(--_ui5_input_placeholder_color)}:host([value-state="Information"]) [inner-input]::-moz-placeholder{color:var(--_ui5_input_placeholder_color)}.ui5-input-content{height:100%;box-sizing:border-box;display:flex;flex-direction:row;justify-content:flex-end;overflow:hidden;outline:none;background:transparent;color:inherit;border-radius:var(--_ui5_input_border_radius)}:host([readonly]:not([disabled])){border:var(--_ui5_input_readonly_border);background:var(--sapField_ReadOnly_BackgroundStyle);background-color:var(--_ui5_input_readonly_background)}:host([value-state="None"]:not([readonly]):hover),:host(:not([value-state]):not([readonly]):hover){border:var(--_ui5_input_hover_border);border-color:var(--_ui5_input_focused_border_color);box-shadow:var(--sapField_Hover_Shadow);background:var(--sapField_Hover_BackgroundStyle);background-color:var(--sapField_Hover_Background)}:host(:not([value-state]):not([readonly])[focused]:not([opened]):hover),:host([value-state="None"]:not([readonly])[focused]:not([opened]):hover){box-shadow:none}:host([focused]):not([opened]) .ui5-input-root:before{content:none}:host(:not([readonly]):not([disabled])[value-state]:not([value-state="None"])){border-width:var(--_ui5_input_state_border_width)}:host([value-state="Negative"]) [inner-input],:host([value-state="Critical"]) [inner-input]{font-style:var(--_ui5_input_error_warning_font_style);text-indent:var(--_ui5_input_error_warning_text_indent)}:host([value-state="Negative"]) [inner-input]{font-weight:var(--_ui5_input_error_font_weight)}:host([value-state="Critical"]) [inner-input]{font-weight:var(--_ui5_input_warning_font_weight)}:host([value-state="Negative"]:not([readonly]):not([disabled])){background:var(--sapField_InvalidBackgroundStyle);background-color:var(--sapField_InvalidBackground);border-color:var(--_ui5_input_value_state_error_border_color);box-shadow:var(--sapField_InvalidShadow)}:host([value-state="Negative"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5_input_focused_value_state_error_background);border-color:var(--_ui5_input_focused_value_state_error_border_color)}:host([value-state="Negative"][focused]:not([opened]):not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5_input_focused_value_state_error_focus_outline_color)}:host([value-state="Negative"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5-input-value-state-error-border-botom-color)}:host([value-state="Negative"]:not([readonly]):not([focused]):hover),:host([value-state="Negative"]:not([readonly])[focused][opened]:hover){background-color:var(--_ui5_input_value_state_error_hover_background);box-shadow:var(--sapField_Hover_InvalidShadow)}:host([value-state="Negative"]:not([readonly]):not([disabled])),:host([value-state="Critical"]:not([readonly]):not([disabled])),:host([value-state="Information"]:not([readonly]):not([disabled])){border-style:var(--_ui5_input_error_warning_border_style)}:host([value-state="Critical"]:not([readonly]):not([disabled])){background:var(--sapField_WarningBackgroundStyle);background-color:var(--sapField_WarningBackground);border-color:var(--_ui5_input_value_state_warning_border_color);box-shadow:var(--sapField_WarningShadow)}:host([value-state="Critical"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5_input_focused_value_state_warning_background);border-color:var(--_ui5_input_focused_value_state_warning_border_color)}:host([value-state="Critical"][focused]:not([opened]):not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5_input_focused_value_state_warning_focus_outline_color)}:host([value-state="Critical"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5_input_value_state_warning_border_botom_color)}:host([value-state="Critical"]:not([readonly]):not([focused]):hover),:host([value-state="Critical"]:not([readonly])[focused][opened]:hover){background-color:var(--sapField_Hover_Background);box-shadow:var(--sapField_Hover_WarningShadow)}:host([value-state="Positive"]:not([readonly]):not([disabled])){background:var(--sapField_SuccessBackgroundStyle);background-color:var(--sapField_SuccessBackground);border-color:var(--_ui5_input_value_state_success_border_color);border-width:var(--_ui5_input_value_state_success_border_width);box-shadow:var(--sapField_SuccessShadow)}:host([value-state="Positive"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5_input_focused_value_state_success_background);border-color:var(--_ui5_input_focused_value_state_success_border_color)}:host([value-state="Positive"][focused]:not([opened]):not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5_input_focused_value_state_success_focus_outline_color)}:host([value-state="Positive"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5_input_value_state_success_border_botom_color)}:host([value-state="Positive"]:not([readonly]):not([focused]):hover),:host([value-state="Positive"]:not([readonly])[focused][opened]:hover){background-color:var(--sapField_Hover_Background);box-shadow:var(--sapField_Hover_SuccessShadow)}:host([value-state="Information"]:not([readonly]):not([disabled])){background:var(--sapField_InformationBackgroundStyle);background-color:var(--sapField_InformationBackground);border-color:var(--_ui5_input_value_state_information_border_color);border-width:var(--_ui5_input_information_border_width);box-shadow:var(--sapField_InformationShadow)}:host([value-state="Information"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5_input_focused_value_state_information_background);border-color:var(--_ui5_input_focused_value_state_information_border_color)}:host([value-state="Information"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5_input_value_success_information_border_botom_color)}:host([value-state="Information"]:not([readonly]):not([focused]):hover),:host([value-state="Information"]:not([readonly])[focused][opened]:hover){background-color:var(--sapField_Hover_Background);box-shadow:var(--sapField_Hover_InformationShadow)}.ui5-input-icon-root{min-width:var(--_ui5_input_icon_min_width);height:100%;display:flex;justify-content:center;align-items:center}::slotted([ui5-icon][slot="icon"]){align-self:start;padding:var(--_ui5_input_custom_icon_padding);box-sizing:content-box!important}:host([value-state="Negative"]) .inputIcon,:host([value-state="Critical"]) .inputIcon{padding:var(--_ui5_input_error_warning_icon_padding)}:host([value-state="Negative"][focused]) .inputIcon,:host([value-state="Critical"][focused]) .inputIcon{padding:var(--_ui5_input_error_warning_focused_icon_padding)}:host([value-state="Information"]) .inputIcon{padding:var(--_ui5_input_information_icon_padding)}:host([value-state="Information"][focused]) .inputIcon{padding:var(--_ui5_input_information_focused_icon_padding)}:host([value-state="Negative"]) ::slotted(.inputIcon[ui5-icon]),:host([value-state="Negative"]) ::slotted([ui5-icon][slot="icon"]),:host([value-state="Critical"]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5_input_error_warning_custom_icon_padding)}:host([value-state="Negative"][focused]) ::slotted(.inputIcon[ui5-icon]),:host([value-state="Negative"][focused]) ::slotted([ui5-icon][slot="icon"]),:host([value-state="Critical"][focused]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5_input_error_warning_custom_focused_icon_padding)}:host([value-state="Information"]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5_input_information_custom_icon_padding)}:host([value-state="Information"][focused]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5_input_information_custom_focused_icon_padding)}:host([value-state="Negative"]) .inputIcon:active,:host([value-state="Negative"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5_input_error_icon_box_shadow);color:var(--_ui5_input_icon_error_pressed_color)}:host([value-state="Negative"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5_input_error_icon_box_shadow)}:host([value-state="Critical"]) .inputIcon:active,:host([value-state="Critical"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5_input_warning_icon_box_shadow);color:var(--_ui5_input_icon_warning_pressed_color)}:host([value-state="Critical"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5_input_warning_icon_box_shadow)}:host([value-state="Information"]) .inputIcon:active,:host([value-state="Information"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5_input_information_icon_box_shadow);color:var(--_ui5_input_icon_information_pressed_color)}:host([value-state="Information"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5_input_information_icon_box_shadow)}:host([value-state="Positive"]) .inputIcon:active,:host([value-state="Positive"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5_input_success_icon_box_shadow);color:var(--_ui5_input_icon_success_pressed_color)}:host([value-state="Positive"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5_input_success_icon_box_shadow)}.ui5-input-clear-icon-wrapper{height:var(--_ui5_input_icon_wrapper_height);padding:0;width:var(--_ui5_input_icon_width);min-width:var(--_ui5_input_icon_width);display:flex;justify-content:center;align-items:center;box-sizing:border-box}:host([value-state]:not([value-state="None"]):not([value-state="Positive"])) .ui5-input-clear-icon-wrapper{height:var(--_ui5_input_icon_wrapper_state_height);vertical-align:top}:host([value-state="Positive"]) .ui5-input-clear-icon-wrapper{height:var(--_ui5_input_icon_wrapper_success_state_height)}[ui5-icon].ui5-input-clear-icon{padding:0;color:inherit}[inner-input]::-webkit-outer-spin-button,[inner-input]::-webkit-inner-spin-button{-webkit-appearance:inherit;margin:inherit}[ui5-responsive-popover] [ui5-input]{width:100%}:host([icon]){min-width:var(--_ui5_button_base_min_width);width:var(--_ui5_button_base_min_width)}:host([opened]) .ui5-input-focusable-element:after{content:var(--ui5_input_focus_pseudo_element_content);position:absolute;pointer-events:none;z-index:2;border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--_ui5_input_focus_outline_color);border-radius:var(--_ui5_input_focus_border_radius);top:var(--_ui5_input_focus_offset);bottom:var(--_ui5_input_focus_offset);left:var(--_ui5_input_focus_offset);right:var(--_ui5_input_focus_offset)}:host([value-state="Negative"][opened]:not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5_input_focused_value_state_error_focus_outline_color)}:host([value-state="Critical"][opened]:not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5_input_focused_value_state_warning_focus_outline_color)}:host([value-state="Positive"][opened]:not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5_input_focused_value_state_success_focus_outline_color)}:host([icon]) .ui5-select-root{min-width:var(--_ui5_button_base_min_width)}:host([icon]) .ui5-select-label-root{min-width:0;padding-inline-start:0}.ui5-select-root{min-width:calc(var(--_ui5_input_min_width) + (var(--_ui5-input-icons-count)*var(--_ui5_input_icon_width)));width:100%;height:100%;display:flex;outline:none;cursor:pointer;overflow:hidden;border-radius:var(--_ui5_input_border_radius);background:var(--_ui5_select_bottom_border_gradient)}.ui5-select-label-root{flex-shrink:1;flex-grow:1;align-self:center;min-width:1rem;padding-inline-start:.5rem;cursor:pointer;outline:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--_ui5_select_label_color);font-family:var(--sapFontFamily);font-size:var(--sapFontSize);font-weight:400}.ui5-select-option-icon{padding-inline-start:.5rem;color:var(--sapField_TextColor);align-self:center}:host(:not([disabled])){cursor:pointer}.ui5-select-icon-root{display:flex;justify-content:center;align-items:center;box-sizing:border-box;width:var(--_ui5_select_icon_width);min-width:var(--_ui5_select_icon_width);height:var(--_ui5_select_icon_wrapper_height);padding:0}.ui5-select-icon{color:inherit}:host([value-state]:not([value-state="None"])) .ui5-select-root,:host([value-state="None"]:not([readonly]):not([disabled]):hover) .ui5-select-root,:host(:not([value-state]):not([readonly]):not([disabled]):hover) .ui5-select-root{background:none}:host([readonly]) .ui5-select-root{background:none}:host([value-state]:not([value-state="None"],[value-state="Positive"])) .ui5-select-icon-root{height:var(--_ui5_select_icon_wrapper_state_height)}
 `;
 
-    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var ResponsivePopoverCommonCss = `.input-root-phone{flex:1;position:relative;height:var(--_ui5_input_height);color:var(--sapField_TextColor);font-size:var(--sapFontSize);font-family:var(--sapFontFamily);background:var(--sapField_BackgroundStyle);background-color:var(--_ui5_input_background_color);border:var(--_ui5-input-border);border-radius:var(--_ui5_input_border_radius);box-sizing:border-box}.input-root-phone [inner-input]{padding:0 .5rem;width:100%;height:100%}.input-root-phone [inner-input]:focus{background-color:var(--sapField_Focus_Background)}.input-root-phone:focus-within:before{content:"";position:absolute;pointer-events:none;z-index:2;border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);border-radius:var(--_ui5_input_focus_border_radius);top:var(--_ui5_input_focus_offset);bottom:var(--_ui5_input_focus_offset);left:var(--_ui5_input_focus_offset);right:var(--_ui5_input_focus_offset)}.input-root-phone [value-state=Negative] .inputIcon[data-ui5-compact-size],.input-root-phone [value-state=Positive] .inputIcon[data-ui5-compact-size],.input-root-phone [value-state=Critical] .inputIcon[data-ui5-compact-size]{padding:.1875rem .5rem}[inner-input]{background:transparent;color:inherit;border:none;font-style:normal;-webkit-appearance:none;-moz-appearance:textfield;line-height:normal;padding:var(--_ui5_input_inner_padding);box-sizing:border-box;min-width:3rem;text-overflow:ellipsis;flex:1;outline:none;font-size:inherit;font-family:inherit;border-radius:var(--_ui5_input_border_radius)}[inner-input]::selection,[inner-input]::-moz-selection{background:var(--sapSelectedColor);color:var(--sapContent_ContrastTextColor)}[inner-input]::-webkit-input-placeholder{font-style:var(--_ui5_input_placeholder_style);color:var(--sapField_PlaceholderTextColor)}[inner-input]::-moz-placeholder{font-style:var(--_ui5_input_placeholder_style);color:var(--sapField_PlaceholderTextColor)}.input-root-phone[value-state]:not([value-state=None]){border-width:var(--_ui5_input_state_border_width)}.input-root-phone[value-state=Negative] [inner-input],.input-root-phone[value-state=Critical] [inner-input]{font-style:var(--_ui5_input_error_warning_font_style)}.input-root-phone[value-state=Negative] [inner-input]{font-weight:var(--_ui5_input_error_font_weight)}.input-root-phone[value-state=Negative]:not([readonly]){background:var(--sapField_InvalidBackgroundStyle);background-color:var(--sapField_InvalidBackground);border-color:var(--_ui5_input_value_state_error_border_color)}.input-root-phone[value-state=Negative]:not([readonly]) [inner-input]:focus{background-color:var(--_ui5_input_focused_value_state_error_background);border-color:var(--_ui5_input_focused_value_state_error_border_color)}.input-root-phone[value-state=Negative]:not([readonly]):focus-within:before{border-color:var(--_ui5_input_focused_value_state_error_focus_outline_color)}.input-root-phone[value-state=Negative]:not([readonly]):not([disabled]),.input-root-phone[value-state=Critical]:not([readonly]):not([disabled]),.input-root-phone[value-state=Information]:not([readonly]):not([disabled]){border-style:var(--_ui5_input_error_warning_border_style)}.input-root-phone[value-state=Critical]:not([readonly]){background:var(--sapField_WarningBackgroundStyle);background-color:var(--sapField_WarningBackground);border-color:var(--_ui5_input_value_state_warning_border_color)}.input-root-phone[value-state=Critical]:not([readonly]) [inner-input]:focus{background-color:var(--_ui5_input_focused_value_state_warning_background);border-color:var(--_ui5_input_focused_value_state_warning_border_color)}.input-root-phone[value-state=Critical]:not([readonly]):focus-within:before{border-color:var(--_ui5_input_focused_value_state_warning_focus_outline_color)}.input-root-phone[value-state=Positive]:not([readonly]){background:var(--sapField_SuccessBackgroundStyle);background-color:var(--sapField_SuccessBackground);border-color:var(--_ui5_input_value_state_success_border_color);border-width:var(--_ui5_input_value_state_success_border_width)}.input-root-phone[value-state=Positive]:not([readonly]) [inner-input]:focus{background-color:var(--_ui5_input_focused_value_state_success_background);border-color:var(--_ui5_input_focused_value_state_success_border_color)}.input-root-phone[value-state=Positive]:not([readonly]):focus-within:before{border-color:var(--_ui5_input_focused_value_state_success_focus_outline_color)}.input-root-phone[value-state=Information]:not([readonly]){background:var(--sapField_InformationBackgroundStyle);background-color:var(--sapField_InformationBackground);border-color:var(--_ui5_input_value_state_information_border_color);border-width:var(--_ui5_input_information_border_width)}.input-root-phone[value-state=Information]:not([readonly]) [inner-input]:focus{background-color:var(--_ui5_input_focused_value_state_information_background);border-color:var(--_ui5_input_focused_value_state_information_border_color)}.ui5-multi-combobox-toggle-button{margin-left:.5rem}.ui5-responsive-popover-header{width:100%;min-height:2.5rem;display:flex;flex-direction:column}.ui5-responsive-popover-header-text{width:100%}.ui5-responsive-popover-header .row{box-sizing:border-box;padding:.25rem 1rem;min-height:2.5rem;display:flex;justify-content:center;align-items:center;font-size:var(--sapFontHeader5Size)}.ui5-responsive-popover-footer{display:flex;justify-content:flex-end;align-items:center;width:100%;box-sizing:border-box}.ui5-responsive-popover-footer .ui5-responsive-popover-close-btn,.ui5-responsive-popover-footer .ui5-responsive-popover-footer-btn{margin-left:.5rem}.ui5-responsive-popover-header .ui5-responsive-popover-close-btn{position:absolute;right:1rem}.ui5-responsive-popover-footer .ui5-responsive-popover-footer-btn{width:4.5rem}
 `;
 
-    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var ValueStateMessageCss = `.ui5-valuestatemessage-popover{border-radius:var(--_ui5_value_state_message_popover_border_radius);box-shadow:var(--_ui5_value_state_message_popover_box_shadow)}.ui5-input-value-state-message-icon{width:var(--_ui5_value_state_message_icon_width);height:var(--_ui5_value_state_message_icon_height);display:var(--_ui5_input_value_state_icon_display);position:absolute;padding-right:.375rem}.ui5-valuestatemessage-root .ui5-input-value-state-message-icon{left:var(--_ui5_input_value_state_icon_offset)}.ui5-input-value-state-message-icon[name=error]{color:var(--sapNegativeElementColor)}.ui5-input-value-state-message-icon[name=alert]{color:var(--sapCriticalElementColor)}.ui5-input-value-state-message-icon[name=success]{color:var(--sapPositiveElementColor)}.ui5-input-value-state-message-icon[name=information]{color:var(--sapInformativeElementColor)}.ui5-valuestatemessage-root{box-sizing:border-box;display:inline-block;color:var(--sapTextColor);font-size:var(--sapFontSmallSize);font-family:var(--sapFontFamily);height:auto;padding:var(--_ui5_value_state_message_padding);overflow:hidden;text-overflow:ellipsis;min-width:6.25rem;border:var(--_ui5_value_state_message_border);line-height:var(--_ui5_value_state_message_line_height)}[ui5-responsive-popover] .ui5-valuestatemessage-header,[ui5-popover] .ui5-valuestatemessage-header{min-height:var(--_ui5_value_state_message_popover_header_min_height);min-width:var(--_ui5_value_state_message_popover_header_min_width);max-width:var(--_ui5_value_state_message_popover_header_max_width);width:var(--_ui5_value_state_message_popover_header_width)}[ui5-responsive-popover] .ui5-valuestatemessage-header{padding:var(--_ui5_value_state_header_padding);border:var(--_ui5_value_state_header_border);border-bottom:var(--_ui5_value_state_header_border_bottom);flex-grow:1;position:relative}.ui5-valuestatemessage--success{background:var(--sapSuccessBackground)}.ui5-valuestatemessage--warning{background:var(--sapWarningBackground)}.ui5-valuestatemessage--error{background:var(--sapErrorBackground)}.ui5-valuestatemessage--information{background:var(--sapInformationBackground)}.ui5-responsive-popover-header:focus{outline-offset:var(--_ui5_value_state_header_offset);outline:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor)}.ui5-valuestatemessage-popover::part(header),.ui5-valuestatemessage-popover::part(content){padding:0}.ui5-valuestatemessage-popover::part(header),.ui5-valuestatemessage-popover::part(footer){min-height:0}.ui5-valuestatemessage-popover::part(header),.ui5-popover-with-value-state-header::part(header),.ui5-popover-with-value-state-header-phone::part(header){margin-bottom:0}.ui5-popover-with-value-state-header-phone .ui5-valuestatemessage-root{padding:var(--_ui5_value_state_message_padding_phone);width:100%}.ui5-popover-with-value-state-header-phone .ui5-input-value-state-message-icon{left:var(--_ui5_value_state_message_icon_offset_phone)}.ui5-popover-with-value-state-header-phone .ui5-valuestatemessage-header{position:relative;flex:none;top:0;left:0;max-width:100%}.ui5-popover-with-value-state-header-phone::part(content){padding:0;overflow:hidden;display:flex;flex-direction:column}.ui5-popover-with-value-state-header-phone [ui5-list]{overflow:auto}[ui5-responsive-popover] .ui5-valuestatemessage--error{box-shadow:var(--_ui5_value_state_header_box_shadow_error)}[ui5-responsive-popover] .ui5-valuestatemessage--information{box-shadow:var(--_ui5_value_state_header_box_shadow_information)}[ui5-responsive-popover] .ui5-valuestatemessage--success{box-shadow:var(--_ui5_value_state_header_box_shadow_success)}[ui5-responsive-popover] .ui5-valuestatemessage--warning{box-shadow:var(--_ui5_value_state_header_box_shadow_warning)}[ui5-responsive-popover].ui5-popover-with-value-state-header .ui5-valuestatemessage-root:has(+[ui5-list]:empty){box-shadow:none}
 `;
 
-    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var SelectPopoverCss = `.ui5-select-popover::part(content),.ui5-select-popover::part(header){padding:0}.ui5-select-popover .ui5-responsive-popover-header .row{justify-content:flex-start}
 `;
 
-    var __decorate$5 = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var __decorate$4 = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
         else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
@@ -900,7 +900,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             return Select_1.i18nBundle.getText(i18nDefaults.SELECT_ROLE_DESCRIPTION);
         }
         get _isPhone() {
-            return Icons.d();
+            return Theme.d();
         }
         itemSelectionAnnounce() {
             let text;
@@ -960,73 +960,73 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             return this.shadowRoot.querySelector("[ui5-popover]");
         }
     };
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s({ type: Boolean })
     ], Select.prototype, "disabled", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "icon", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "name", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "valueState", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s({ type: Boolean })
     ], Select.prototype, "required", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s({ type: Boolean })
     ], Select.prototype, "readonly", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "accessibleName", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "accessibleNameRef", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "accessibleDescription", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "accessibleDescriptionRef", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "tooltip", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "textSeparator", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s({ type: String, noAttribute: true })
     ], Select.prototype, "_associatedDescriptionRefTexts", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s({ type: Boolean, noAttribute: true })
     ], Select.prototype, "_iconPressed", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s({ type: Boolean })
     ], Select.prototype, "opened", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s({ type: Number, noAttribute: true })
     ], Select.prototype, "_listWidth", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s({ type: Boolean })
     ], Select.prototype, "focused", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.d({ "default": true, type: HTMLElement, invalidateOnChildChange: true })
     ], Select.prototype, "options", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.d()
     ], Select.prototype, "valueStateMessage", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.d()
     ], Select.prototype, "label", void 0);
-    __decorate$5([
+    __decorate$4([
         webcomponentsBase.s()
     ], Select.prototype, "value", null);
-    __decorate$5([
+    __decorate$4([
         parametersBundle_css.i("@ui5/webcomponents")
     ], Select, "i18nBundle", void 0);
-    Select = Select_1 = __decorate$5([
+    Select = Select_1 = __decorate$4([
         webcomponentsBase.m({
             tag: "ui5-select",
             languageAware: true,
@@ -1102,11 +1102,11 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     var Select$1 = Select;
 
     function SearchFieldTemplate(options) {
-        return (!options?.forceExpanded && this.collapsed ? (jsxRuntime.jsx(Button.Button, { class: "ui5-shell-search-field-button", icon: search.search, design: Button.ButtonDesign.Transparent, "data-sap-focus-ref": true, loading: this.fieldLoading, onClick: this._handleSearchIconPress, tooltip: this._effectiveIconTooltip, accessibleName: this._effectiveIconTooltip, accessibilityAttributes: this._searchButtonAccessibilityAttributes })) : (jsxRuntime.jsx(BusyIndicator.BusyIndicator, { class: "ui5-search-field-busy-indicator", active: this.fieldLoading, children: jsxRuntime.jsx("div", { class: "ui5-search-field-root", role: "search", onFocusOut: this._onFocusOutSearch, children: jsxRuntime.jsxs("div", { class: "ui5-search-field-content", children: [this.scopes?.length ? (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsx(Select$1, { onChange: this._handleScopeChange, class: "ui5-search-field-select", accessibleName: this._translations.scope, tooltip: this._translations.scope, value: this.scopeValue, children: this.scopes.map(scopeOption => (jsxRuntime.jsx(Option$1, { value: scopeOption.value, "data-ui5-stable": scopeOption.stableDomRef, ref: this.captureRef.bind(scopeOption), children: scopeOption.text }))) }), jsxRuntime.jsx("div", { class: "ui5-search-field-separator" })] })) : this.filterButton?.length ? (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsx("div", { class: "ui5-filter-wrapper", style: "display: contents", children: jsxRuntime.jsx("slot", { name: "filterButton" }) }), jsxRuntime.jsx("div", { class: "ui5-search-field-separator" })] })) : null, jsxRuntime.jsx("input", { class: "ui5-search-field-inner-input", role: "searchbox", "aria-description": this.accessibleDescription, "aria-label": this.accessibleName || this._translations.searchFieldAriaLabel, "aria-autocomplete": "both", "aria-controls": "ui5-search-list", value: this.value, placeholder: this.placeholder, "data-sap-focus-ref": true, onInput: this._handleInput, onFocusIn: this._onfocusin, onFocusOut: this._onfocusout, onKeyDown: this._onkeydown, onClick: this._handleInnerClick }), this._effectiveShowClearIcon &&
+        return (!options?.forceExpanded && this.collapsed ? (jsxRuntime.jsx(Button.Button, { class: "ui5-shell-search-field-button", icon: search.searchIcon, design: Button.ButtonDesign.Transparent, "data-sap-focus-ref": true, loading: this.fieldLoading, onClick: this._handleSearchIconPress, tooltip: this._effectiveIconTooltip, accessibleName: this._effectiveIconTooltip, accessibilityAttributes: this._searchButtonAccessibilityAttributes })) : (jsxRuntime.jsx(BusyIndicator.BusyIndicator, { class: "ui5-search-field-busy-indicator", active: this.fieldLoading, children: jsxRuntime.jsx("div", { class: "ui5-search-field-root", role: "search", onFocusOut: this._onFocusOutSearch, children: jsxRuntime.jsxs("div", { class: "ui5-search-field-content", children: [this.scopes?.length ? (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsx(Select$1, { onChange: this._handleScopeChange, class: "ui5-search-field-select", accessibleName: this._translations.scope, tooltip: this._translations.scope, value: this.scopeValue, children: this.scopes.map(scopeOption => (jsxRuntime.jsx(Option$1, { value: scopeOption.value, "data-ui5-stable": scopeOption.stableDomRef, ref: this.captureRef.bind(scopeOption), children: scopeOption.text }))) }), jsxRuntime.jsx("div", { class: "ui5-search-field-separator" })] })) : this.filterButton?.length ? (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsx("div", { class: "ui5-filter-wrapper", style: "display: contents", children: jsxRuntime.jsx("slot", { name: "filterButton" }) }), jsxRuntime.jsx("div", { class: "ui5-search-field-separator" })] })) : null, jsxRuntime.jsx("input", { class: "ui5-search-field-inner-input", role: "searchbox", "aria-description": this.accessibleDescription, "aria-label": this.accessibleName || this._translations.searchFieldAriaLabel, "aria-autocomplete": "both", "aria-controls": "ui5-search-list", value: this.value, placeholder: this.placeholder, "data-sap-focus-ref": true, onInput: this._handleInput, onFocusIn: this._onfocusin, onFocusOut: this._onfocusout, onKeyDown: this._onkeydown, onClick: this._handleInnerClick }), this._effectiveShowClearIcon &&
                             jsxRuntime.jsx(Icon.Icon, { class: "ui5-shell-search-field-icon", name: decline.decline, showTooltip: true, accessibleName: this._translations.clearIcon, onClick: this._handleClear }), jsxRuntime.jsx(Icon.Icon, { class: {
                                 "ui5-shell-search-field-icon": true,
                                 "ui5-shell-search-field-search-icon": this._isSearchIcon,
-                            }, name: search.search, showTooltip: true, accessibleName: this._effectiveIconTooltip, onClick: this._handleSearchIconPress })] }) }) })));
+                            }, name: search.searchIcon, showTooltip: true, accessibleName: this._effectiveIconTooltip, onClick: this._handleSearchIconPress })] }) }) })));
     }
 
     const f=(t,a,e,o)=>{webcomponentsBase.x(t)&&(e!==a.length-1?(t.stopImmediatePropagation(),t.preventDefault(),a[e+1].focus()):(o.closeValueState(),o.focusInput())),webcomponentsBase.V(t)&&(t.preventDefault(),t.stopImmediatePropagation(),e>0?a[e-1].focus():o.focusInput()),webcomponentsBase.P(t)&&(t.preventDefault(),t.stopImmediatePropagation(),o.isPopoverOpen()&&o.focusInput()),webcomponentsBase._(t)&&(t.preventDefault(),t.stopImmediatePropagation(),o.navigateToItem()),webcomponentsBase.m$1(t)&&(t.preventDefault(),t.stopImmediatePropagation());};
@@ -1222,13 +1222,13 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
         StartsWithPerTerm: StartsWithPerTerm
     });
 
-    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var inputStyles = `:host{vertical-align:middle}.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}.inputIcon{color:var(--_ui5_input_icon_color);cursor:pointer;outline:none;padding:var(--_ui5_input_icon_padding);border-inline-start:var(--_ui5_input_icon_border);min-width:1rem;min-height:1rem;border-radius:var(--_ui5_input_icon_border_radius)}.inputIcon.inputIcon--pressed{background:var(--_ui5_input_icon_pressed_bg);box-shadow:var(--_ui5_input_icon_box_shadow);border-inline-start:var(--_ui5_select_hover_icon_left_border);color:var(--_ui5_input_icon_pressed_color)}.inputIcon:active{background-color:var(--sapButton_Active_Background);box-shadow:var(--_ui5_input_icon_box_shadow);border-inline-start:var(--_ui5_select_hover_icon_left_border);color:var(--_ui5_input_icon_pressed_color)}.inputIcon:not(.inputIcon--pressed):not(:active):hover{background:var(--_ui5_input_icon_hover_bg);box-shadow:var(--_ui5_input_icon_box_shadow)}.inputIcon:hover{border-inline-start:var(--_ui5_select_hover_icon_left_border);box-shadow:var(--_ui5_input_icon_box_shadow)}:host(:not([hidden])){display:inline-block}:host{width:var(--_ui5_input_width);min-width:calc(var(--_ui5_input_min_width) + (var(--_ui5-input-icons-count)*var(--_ui5_input_icon_width)));margin:var(--_ui5_input_margin_top_bottom) 0;height:var(--_ui5_input_height);color:var(--sapField_TextColor);font-size:var(--sapFontSize);font-family:var(--sapFontFamily);font-style:normal;border:var(--_ui5-input-border);border-radius:var(--_ui5_input_border_radius);box-sizing:border-box;text-align:start;transition:var(--_ui5_input_transition);background:var(--sapField_BackgroundStyle);background-color:var(--_ui5_input_background_color)}:host(:not([readonly])),:host([readonly][disabled]){box-shadow:var(--sapField_Shadow)}:host([focused]:not([opened])){border-color:var(--_ui5_input_focused_border_color);background-color:var(--sapField_Focus_Background)}.ui5-input-focusable-element{position:relative}:host([focused]:not([opened])) .ui5-input-focusable-element:after{content:var(--ui5_input_focus_pseudo_element_content);position:absolute;pointer-events:none;z-index:2;border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--_ui5_input_focus_outline_color);border-radius:var(--_ui5_input_focus_border_radius);top:var(--_ui5_input_focus_offset);bottom:var(--_ui5_input_focus_offset);left:var(--_ui5_input_focus_offset);right:var(--_ui5_input_focus_offset)}:host([focused][readonly]:not([opened])) .ui5-input-focusable-element:after{top:var(--_ui5_input_readonly_focus_offset);bottom:var(--_ui5_input_readonly_focus_offset);left:var(--_ui5_input_readonly_focus_offset);right:var(--_ui5_input_readonly_focus_offset);border-radius:var(--_ui5_input_readonly_focus_border_radius)}.ui5-input-root:before{content:"";position:absolute;width:calc(100% - 2px);left:1px;bottom:-2px;border-bottom-left-radius:8px;border-bottom-right-radius:8px;height:var(--_ui5_input_bottom_border_height);transition:var(--_ui5_input_transition);background-color:var(--_ui5_input_bottom_border_color)}.ui5-input-root{width:100%;height:100%;position:relative;background:transparent;display:inline-block;outline:none;box-sizing:border-box;color:inherit;transition:border-color .2s ease-in-out;border-radius:var(--_ui5_input_border_radius);overflow:hidden}:host([disabled]){opacity:var(--_ui5_input_disabled_opacity);cursor:default;pointer-events:none;background-color:var(--_ui5-input_disabled_background);border-color:var(--_ui5_input_disabled_border_color)}:host([disabled]) .ui5-input-root:before,:host([readonly]) .ui5-input-root:before{content:none}[inner-input]{background:transparent;color:inherit;border:none;font-style:inherit;-webkit-appearance:none;-moz-appearance:textfield;padding:var(--_ui5_input_inner_padding);box-sizing:border-box;width:100%;text-overflow:ellipsis;flex:1;outline:none;font-size:inherit;font-family:inherit;line-height:inherit;letter-spacing:inherit;word-spacing:inherit;text-align:inherit}[inner-input][inner-input-with-icon]{padding:var(--_ui5_input_inner_padding_with_icon)}[inner-input][type=search]::-webkit-search-decoration,[inner-input][type=search]::-webkit-search-cancel-button,[inner-input][type=search]::-webkit-search-results-button,[inner-input][type=search]::-webkit-search-results-decoration{display:none}[inner-input]::-ms-reveal,[inner-input]::-ms-clear{display:none}.ui5-input-value-state-icon{height:100%;display:var(--_ui5-input-value-state-icon-display);align-items:center}.ui5-input-value-state-icon>svg{margin-right:8px}[inner-input]::selection{background:var(--sapSelectedColor);color:var(--sapContent_ContrastTextColor)}:host([disabled]) [inner-input]::-webkit-input-placeholder{visibility:hidden}:host([readonly]) [inner-input]::-webkit-input-placeholder{visibility:hidden}:host([disabled]) [inner-input]::-moz-placeholder{visibility:hidden}:host([readonly]) [inner-input]::-moz-placeholder{visibility:hidden}[inner-input]::-webkit-input-placeholder{font-weight:400;font-style:var(--_ui5_input_placeholder_style);color:var(--_ui5_input_placeholder_color);padding-right:.125rem}[inner-input]::-moz-placeholder{font-weight:400;font-style:var(--_ui5_input_placeholder_style);color:var(--_ui5_input_placeholder_color);padding-right:.125rem}:host([value-state="Negative"]) [inner-input]::-webkit-input-placeholder{color:var(--_ui5-input_error_placeholder_color);font-weight:var(--_ui5_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Negative"]) [inner-input]::-moz-placeholder{color:var(--_ui5-input_error_placeholder_color);font-weight:var(--_ui5_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Critical"]) [inner-input]::-webkit-input-placeholder{font-weight:var(--_ui5_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Critical"]) [inner-input]::-moz-placeholder{font-weight:var(--_ui5_input_value_state_error_warning_placeholder_font_weight)}:host([value-state="Positive"]) [inner-input]::-webkit-input-placeholder{color:var(--_ui5_input_placeholder_color)}:host([value-state="Positive"]) [inner-input]::-moz-placeholder{color:var(--_ui5_input_placeholder_color)}:host([value-state="Information"]) [inner-input]::-webkit-input-placeholder{color:var(--_ui5_input_placeholder_color)}:host([value-state="Information"]) [inner-input]::-moz-placeholder{color:var(--_ui5_input_placeholder_color)}.ui5-input-content{height:100%;box-sizing:border-box;display:flex;flex-direction:row;justify-content:flex-end;overflow:hidden;outline:none;background:transparent;color:inherit;border-radius:var(--_ui5_input_border_radius)}:host([readonly]:not([disabled])){border:var(--_ui5_input_readonly_border);background:var(--sapField_ReadOnly_BackgroundStyle);background-color:var(--_ui5_input_readonly_background)}:host([value-state="None"]:not([readonly]):hover),:host(:not([value-state]):not([readonly]):hover){border:var(--_ui5_input_hover_border);border-color:var(--_ui5_input_focused_border_color);box-shadow:var(--sapField_Hover_Shadow);background:var(--sapField_Hover_BackgroundStyle);background-color:var(--sapField_Hover_Background)}:host(:not([value-state]):not([readonly])[focused]:not([opened]):hover),:host([value-state="None"]:not([readonly])[focused]:not([opened]):hover){box-shadow:none}:host([focused]):not([opened]) .ui5-input-root:before{content:none}:host(:not([readonly]):not([disabled])[value-state]:not([value-state="None"])){border-width:var(--_ui5_input_state_border_width)}:host([value-state="Negative"]) [inner-input],:host([value-state="Critical"]) [inner-input]{font-style:var(--_ui5_input_error_warning_font_style);text-indent:var(--_ui5_input_error_warning_text_indent)}:host([value-state="Negative"]) [inner-input]{font-weight:var(--_ui5_input_error_font_weight)}:host([value-state="Critical"]) [inner-input]{font-weight:var(--_ui5_input_warning_font_weight)}:host([value-state="Negative"]:not([readonly]):not([disabled])){background:var(--sapField_InvalidBackgroundStyle);background-color:var(--sapField_InvalidBackground);border-color:var(--_ui5_input_value_state_error_border_color);box-shadow:var(--sapField_InvalidShadow)}:host([value-state="Negative"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5_input_focused_value_state_error_background);border-color:var(--_ui5_input_focused_value_state_error_border_color)}:host([value-state="Negative"][focused]:not([opened]):not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5_input_focused_value_state_error_focus_outline_color)}:host([value-state="Negative"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5-input-value-state-error-border-botom-color)}:host([value-state="Negative"]:not([readonly]):not([focused]):hover),:host([value-state="Negative"]:not([readonly])[focused][opened]:hover){background-color:var(--_ui5_input_value_state_error_hover_background);box-shadow:var(--sapField_Hover_InvalidShadow)}:host([value-state="Negative"]:not([readonly]):not([disabled])),:host([value-state="Critical"]:not([readonly]):not([disabled])),:host([value-state="Information"]:not([readonly]):not([disabled])){border-style:var(--_ui5_input_error_warning_border_style)}:host([value-state="Critical"]:not([readonly]):not([disabled])){background:var(--sapField_WarningBackgroundStyle);background-color:var(--sapField_WarningBackground);border-color:var(--_ui5_input_value_state_warning_border_color);box-shadow:var(--sapField_WarningShadow)}:host([value-state="Critical"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5_input_focused_value_state_warning_background);border-color:var(--_ui5_input_focused_value_state_warning_border_color)}:host([value-state="Critical"][focused]:not([opened]):not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5_input_focused_value_state_warning_focus_outline_color)}:host([value-state="Critical"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5_input_value_state_warning_border_botom_color)}:host([value-state="Critical"]:not([readonly]):not([focused]):hover),:host([value-state="Critical"]:not([readonly])[focused][opened]:hover){background-color:var(--sapField_Hover_Background);box-shadow:var(--sapField_Hover_WarningShadow)}:host([value-state="Positive"]:not([readonly]):not([disabled])){background:var(--sapField_SuccessBackgroundStyle);background-color:var(--sapField_SuccessBackground);border-color:var(--_ui5_input_value_state_success_border_color);border-width:var(--_ui5_input_value_state_success_border_width);box-shadow:var(--sapField_SuccessShadow)}:host([value-state="Positive"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5_input_focused_value_state_success_background);border-color:var(--_ui5_input_focused_value_state_success_border_color)}:host([value-state="Positive"][focused]:not([opened]):not([readonly])) .ui5-input-focusable-element:after{border-color:var(--_ui5_input_focused_value_state_success_focus_outline_color)}:host([value-state="Positive"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5_input_value_state_success_border_botom_color)}:host([value-state="Positive"]:not([readonly]):not([focused]):hover),:host([value-state="Positive"]:not([readonly])[focused][opened]:hover){background-color:var(--sapField_Hover_Background);box-shadow:var(--sapField_Hover_SuccessShadow)}:host([value-state="Information"]:not([readonly]):not([disabled])){background:var(--sapField_InformationBackgroundStyle);background-color:var(--sapField_InformationBackground);border-color:var(--_ui5_input_value_state_information_border_color);border-width:var(--_ui5_input_information_border_width);box-shadow:var(--sapField_InformationShadow)}:host([value-state="Information"][focused]:not([opened]):not([readonly])){background-color:var(--_ui5_input_focused_value_state_information_background);border-color:var(--_ui5_input_focused_value_state_information_border_color)}:host([value-state="Information"]:not([readonly])) .ui5-input-root:before{background-color:var(--_ui5_input_value_success_information_border_botom_color)}:host([value-state="Information"]:not([readonly]):not([focused]):hover),:host([value-state="Information"]:not([readonly])[focused][opened]:hover){background-color:var(--sapField_Hover_Background);box-shadow:var(--sapField_Hover_InformationShadow)}.ui5-input-icon-root{min-width:var(--_ui5_input_icon_min_width);height:100%;display:flex;justify-content:center;align-items:center}::slotted([ui5-icon][slot="icon"]){align-self:start;padding:var(--_ui5_input_custom_icon_padding);box-sizing:content-box!important}:host([value-state="Negative"]) .inputIcon,:host([value-state="Critical"]) .inputIcon{padding:var(--_ui5_input_error_warning_icon_padding)}:host([value-state="Negative"][focused]) .inputIcon,:host([value-state="Critical"][focused]) .inputIcon{padding:var(--_ui5_input_error_warning_focused_icon_padding)}:host([value-state="Information"]) .inputIcon{padding:var(--_ui5_input_information_icon_padding)}:host([value-state="Information"][focused]) .inputIcon{padding:var(--_ui5_input_information_focused_icon_padding)}:host([value-state="Negative"]) ::slotted(.inputIcon[ui5-icon]),:host([value-state="Negative"]) ::slotted([ui5-icon][slot="icon"]),:host([value-state="Critical"]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5_input_error_warning_custom_icon_padding)}:host([value-state="Negative"][focused]) ::slotted(.inputIcon[ui5-icon]),:host([value-state="Negative"][focused]) ::slotted([ui5-icon][slot="icon"]),:host([value-state="Critical"][focused]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5_input_error_warning_custom_focused_icon_padding)}:host([value-state="Information"]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5_input_information_custom_icon_padding)}:host([value-state="Information"][focused]) ::slotted([ui5-icon][slot="icon"]){padding:var(--_ui5_input_information_custom_focused_icon_padding)}:host([value-state="Negative"]) .inputIcon:active,:host([value-state="Negative"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5_input_error_icon_box_shadow);color:var(--_ui5_input_icon_error_pressed_color)}:host([value-state="Negative"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5_input_error_icon_box_shadow)}:host([value-state="Critical"]) .inputIcon:active,:host([value-state="Critical"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5_input_warning_icon_box_shadow);color:var(--_ui5_input_icon_warning_pressed_color)}:host([value-state="Critical"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5_input_warning_icon_box_shadow)}:host([value-state="Information"]) .inputIcon:active,:host([value-state="Information"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5_input_information_icon_box_shadow);color:var(--_ui5_input_icon_information_pressed_color)}:host([value-state="Information"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5_input_information_icon_box_shadow)}:host([value-state="Positive"]) .inputIcon:active,:host([value-state="Positive"]) .inputIcon.inputIcon--pressed{box-shadow:var(--_ui5_input_success_icon_box_shadow);color:var(--_ui5_input_icon_success_pressed_color)}:host([value-state="Positive"]) .inputIcon:not(.inputIcon--pressed):not(:active):hover{box-shadow:var(--_ui5_input_success_icon_box_shadow)}.ui5-input-clear-icon-wrapper{height:var(--_ui5_input_icon_wrapper_height);padding:0;width:var(--_ui5_input_icon_width);min-width:var(--_ui5_input_icon_width);display:flex;justify-content:center;align-items:center;box-sizing:border-box}:host([value-state]:not([value-state="None"]):not([value-state="Positive"])) .ui5-input-clear-icon-wrapper{height:var(--_ui5_input_icon_wrapper_state_height);vertical-align:top}:host([value-state="Positive"]) .ui5-input-clear-icon-wrapper{height:var(--_ui5_input_icon_wrapper_success_state_height)}[ui5-icon].ui5-input-clear-icon{padding:0;color:inherit}[inner-input]::-webkit-outer-spin-button,[inner-input]::-webkit-inner-spin-button{-webkit-appearance:inherit;margin:inherit}[ui5-responsive-popover] [ui5-input]{width:100%}
 `;
 
-    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var SuggestionsCss = `.ui5-suggestions-popover{box-shadow:var(--sapContent_Shadow1)}.ui5-suggestions-popover::part(header),.ui5-suggestions-popover::part(content){padding:0}.ui5-suggestions-popover::part(footer){padding:0 1rem}.input-root-phone.native-input-wrapper{display:contents}.input-root-phone.native-input-wrapper:before{display:none}.native-input-wrapper .ui5-input-inner-phone{margin:0}.native-input-wrapper .ui5-multi-input-mobile-dialog-button{margin-inline-start:.5rem}
 `;
 
@@ -1261,7 +1261,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     })(InputSuggestionsFilter || (InputSuggestionsFilter = {}));
     var InputSuggestionsFilter$1 = InputSuggestionsFilter;
 
-    var __decorate$4 = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var __decorate$3 = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
         else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
@@ -1565,7 +1565,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             const autoCompletedChars = innerInput.selectionEnd - innerInput.selectionStart;
             // Typehead causes issues on Android devices, so we disable it for now
             // If there is already a selection the autocomplete has already been performed
-            if (this._shouldAutocomplete && !Icons.P() && !autoCompletedChars && !this._isKeyNavigation) {
+            if (this._shouldAutocomplete && !Theme.P() && !autoCompletedChars && !this._isKeyNavigation) {
                 const item = this._getFirstMatchingItem(value);
                 if (item) {
                     if (!this._isComposing) {
@@ -1881,7 +1881,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             this.Suggestions?._clearItemFocus();
         }
         _click() {
-            if (Icons.d() && !this.readonly && this.Suggestions) {
+            if (Theme.d() && !this.readonly && this.Suggestions) {
                 this.blur();
                 this.open = true;
             }
@@ -2073,7 +2073,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
         }
         _afterOpenPicker() {
             // Set initial focus to the native input
-            if (Icons.d()) {
+            if (Theme.d()) {
                 this.previousValue = this.value;
                 (this.getInputDOMRef()).focus();
                 this._composition?.addEventListeners();
@@ -2082,7 +2082,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
         }
         _afterClosePicker() {
             // close device's keyboard and prevent further typing
-            if (Icons.d()) {
+            if (Theme.d()) {
                 this.blur();
                 this.focused = false;
             }
@@ -2251,7 +2251,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             return "";
         }
         getInputDOMRef() {
-            if (Icons.d() && this.Suggestions) {
+            if (Theme.d() && this.Suggestions) {
                 const picker = this.Suggestions._getPicker();
                 if (picker) {
                     return picker.querySelector(".ui5-input-inner-phone");
@@ -2260,7 +2260,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             return this.nativeInput;
         }
         getInputDOMRefSync() {
-            if (Icons.d() && this.Suggestions) {
+            if (Theme.d() && this.Suggestions) {
                 const picker = this.Suggestions._getPicker();
                 if (picker) {
                     return picker.querySelector(".ui5-input-inner-phone").shadowRoot.querySelector("input");
@@ -2462,7 +2462,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             if (!links.length) {
                 return "";
             }
-            if (Icons.A()) {
+            if (Theme.A()) {
                 return links.length === 1
                     ? Input_1.i18nBundle.getText(i18nDefaults.VALUE_STATE_LINK_MAC)
                     : Input_1.i18nBundle.getText(i18nDefaults.VALUE_STATE_LINKS_MAC);
@@ -2557,7 +2557,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             return this.isTypeNumber ? "any" : undefined;
         }
         get _isPhone() {
-            return Icons.d();
+            return Theme.d();
         }
         get _isSuggestionsFocused() {
             return !this.focused && this.Suggestions?.isOpened();
@@ -2628,124 +2628,124 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             return value;
         }
     };
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "disabled", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "highlight", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "placeholder", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "readonly", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "required", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "noTypeahead", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "type", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "value", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "valueState", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "name", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "showSuggestions", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Number })
     ], Input.prototype, "maxlength", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "accessibleName", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "accessibleNameRef", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "accessibleDescription", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "accessibleDescriptionRef", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "showClearIcon", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "open", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "filter", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "_effectiveShowClearIcon", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "focused", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s()
     ], Input.prototype, "hint", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean })
     ], Input.prototype, "valueStateOpen", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Object })
     ], Input.prototype, "_inputAccInfo", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Object })
     ], Input.prototype, "_nativeInputAttributes", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Number })
     ], Input.prototype, "_inputWidth", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Number })
     ], Input.prototype, "_listWidth", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean, noAttribute: true })
     ], Input.prototype, "_inputIconFocused", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ noAttribute: true })
     ], Input.prototype, "_associatedLabelsTexts", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ noAttribute: true })
     ], Input.prototype, "_accessibleLabelsRefTexts", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ noAttribute: true })
     ], Input.prototype, "_associatedDescriptionRefTexts", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Object })
     ], Input.prototype, "Suggestions", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Array, noAttribute: true })
     ], Input.prototype, "_linksListenersArray", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.s({ type: Boolean, noAttribute: true })
     ], Input.prototype, "_isComposing", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.d({ type: HTMLElement, "default": true })
     ], Input.prototype, "suggestionItems", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.d()
     ], Input.prototype, "icon", void 0);
-    __decorate$4([
+    __decorate$3([
         webcomponentsBase.d({
             type: HTMLElement,
             invalidateOnChildChange: true,
         })
     ], Input.prototype, "valueStateMessage", void 0);
-    __decorate$4([
+    __decorate$3([
         parametersBundle_css.i("@ui5/webcomponents")
     ], Input, "i18nBundle", void 0);
-    Input = Input_1 = __decorate$4([
+    Input = Input_1 = __decorate$3([
         webcomponentsBase.m({
             tag: "ui5-input",
             languageAware: true,
@@ -2849,12 +2849,12 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
                         jsxRuntime.jsx("span", { part: "additional-text", class: "ui5-li-additional-text", children: this.additionalText })] }) });
     }
 
-    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var styles = `:host([ui5-suggestion-item]){height:auto;min-height:var(--_ui5_list_item_base_height)}:host([ui5-suggestion-item]) .ui5-li-root{min-height:var(--_ui5_list_item_base_height)}:host([ui5-suggestion-item]) .ui5-li-content{padding-bottom:.5rem;padding-top:.5rem;box-sizing:border-box}
 `;
 
-    var __decorate$3 = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var __decorate$2 = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
         else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
@@ -2882,7 +2882,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             this.markupText = "";
         }
         onEnterDOM() {
-            if (Icons.f$1()) {
+            if (Theme.f$1()) {
                 this.setAttribute("desktop", "");
             }
         }
@@ -2890,16 +2890,16 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             return -1;
         }
     };
-    __decorate$3([
+    __decorate$2([
         webcomponentsBase.s()
     ], SuggestionItem.prototype, "text", void 0);
-    __decorate$3([
+    __decorate$2([
         webcomponentsBase.s()
     ], SuggestionItem.prototype, "additionalText", void 0);
-    __decorate$3([
+    __decorate$2([
         webcomponentsBase.s()
     ], SuggestionItem.prototype, "markupText", void 0);
-    SuggestionItem = __decorate$3([
+    SuggestionItem = __decorate$2([
         webcomponentsBase.m({
             tag: "ui5-suggestion-item",
             template: SuggestionItemTemplate,
@@ -2928,10 +2928,10 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     var InputKeyHint$1 = InputKeyHint;
 
     function SearchPopoverTemplate(headerTemplate) {
-        return (jsxRuntime.jsxs(ResponsivePopover.ResponsivePopover, { id: "ui5-search-list", hideArrow: true, preventFocusRestore: true, preventInitialFocus: !Icons.d(), accessibleNameRef: "suggestions-speech-output message-area-text message-area-description", placement: ResponsivePopover.PopoverPlacement.Bottom, horizontalAlign: ResponsivePopover.PopoverHorizontalAlign.Start, open: this.open, opener: this, onOpen: this._handleOpen, onClose: this._handleClose, onBeforeClose: this._handleBeforeClose, onBeforeOpen: this._handleBeforeOpen, class: {
+        return (jsxRuntime.jsxs(ResponsivePopover.ResponsivePopover, { id: "ui5-search-list", hideArrow: true, preventFocusRestore: true, preventInitialFocus: !Theme.d(), accessibleNameRef: "suggestions-speech-output message-area-text message-area-description", placement: ResponsivePopover.PopoverPlacement.Bottom, horizontalAlign: ResponsivePopover.PopoverHorizontalAlign.Start, open: this.open, opener: this, onOpen: this._handleOpen, onClose: this._handleClose, onBeforeClose: this._handleBeforeClose, onBeforeOpen: this._handleBeforeOpen, class: {
                 "ui5-search-popover": true,
-                "ui5-search-popover-phone": Icons.d(),
-            }, children: [Icons.d() ? (headerTemplate ? headerTemplate.call(this) : (jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsxs("header", { slot: "header", class: "ui5-search-popup-searching-header", children: [jsxRuntime.jsx(Input$1, { value: this.value, class: "ui5-search-popover-search-field", onInput: this._handleMobileInput, showClearIcon: this.showClearIcon, noTypeahead: this.noTypeahead, hint: InputKeyHint$1.Search, onKeyDown: this._onMobileInputKeydown, children: this._flattenItems.map(item => {
+                "ui5-search-popover-phone": Theme.d(),
+            }, children: [Theme.d() ? (headerTemplate ? headerTemplate.call(this) : (jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsxs("header", { slot: "header", class: "ui5-search-popup-searching-header", children: [jsxRuntime.jsx(Input$1, { value: this.value, class: "ui5-search-popover-search-field", onInput: this._handleMobileInput, showClearIcon: this.showClearIcon, noTypeahead: this.noTypeahead, hint: InputKeyHint$1.Search, onKeyDown: this._onMobileInputKeydown, children: this._flattenItems.map(item => {
                                     return (jsxRuntime.jsx(SuggestionItem$1, { text: item.text }));
                                 }) }), jsxRuntime.jsx(Button.Button, { design: Button.ButtonDesign.Transparent, onClick: this._handleCancel, children: this.cancelButtonText })] }) }))) : null, jsxRuntime.jsxs("main", { class: "ui5-search-popover-content", children: [jsxRuntime.jsx("slot", { name: "messageArea" }), jsxRuntime.jsx("div", { class: "search-popover-busy-wrapper", children: jsxRuntime.jsx(BusyIndicator.BusyIndicator, { active: true }) }), this.items.length ?
                             jsxRuntime.jsx(List.List, { class: "ui5-search-list", separators: List.ListSeparator.None, onKeyDown: this._onItemKeydown, onFocusIn: this._onListItemFocusIn, accessibleRole: List.ListAccessibleRole.ListBox, onItemClick: this._onItemClick, children: jsxRuntime.jsx("slot", {}) })
@@ -2942,17 +2942,17 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
         return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [SearchFieldTemplate.call(this), SearchPopoverTemplate.call(this)] }));
     }
 
-    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
     var SearchCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}.ui5-search-popover{width:var(--search_width);margin-top:.25rem;box-sizing:border-box}.ui5-search-popup-searching-header{display:flex;gap:.5rem;width:100%;align-items:center}.ui5-search-popover::part(header){padding:.5rem 1rem;box-shadow:none;box-sizing:border-box}.ui5-search-popover::part(header):before{display:none}.ui5-search-popover::part(content){padding:0;box-shadow:none}:host([loading]) .ui5-search-popover main{min-height:2rem}.ui5-search-popover-search-field{flex:1;height:2.25rem;border-radius:var(--_ui5_search_input_border_radius)}.ui5-search-popover-search-field::part(root):after{border-radius:var(--_ui5_search_input_border_radius)}.ui5-search-popover-search-field::part(input){padding-inline-start:.875rem}.ui5-search-popover-search-field::part(clear-icon-wrapper){margin-inline-end:.5rem}.ui5-search-popover-loading-bi{width:100%;height:100%}::slotted([slot="action"]){width:100%;margin-top:.5rem;margin-bottom:.5rem}.search-popover-busy-wrapper{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:42;width:100%;height:100%;display:none;justify-content:center;align-items:center;pointer-events:all}:host([loading]) .search-popover-busy-wrapper{display:flex;width:100%;height:100%}.search-popover-busy-wrapper [ui5-busy-indicator]{z-index:1}.search-popover-busy-wrapper:after{content:"";position:absolute;top:0;left:0;width:100%;height:100%;background:var(--_ui5-search-loading-overlay-background);opacity:var(--_ui5-search-loading-overlay-transparency);border-radius:var(--_ui5_popup_border_radius)}.ui5-search-popover-phone .ui5-search-popover-content{position:relative;width:100%;height:100%;display:flex;flex-direction:column}.ui5-search-popover-phone .search-popover-busy-wrapper:after{border-radius:0}
 `;
 
-    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
+    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
     var SearchFieldCss = `:host,.ui5-shellbar-search-field-wrapper{height:2.25rem;display:flex;align-items:center}:host(:not([collapsed])),.ui5-shellbar-search-field-wrapper{min-width:18rem;max-width:36rem;margin:0;height:2.25rem;color:var(--_ui5-search-field-text-color);font-size:var(--sapFontSize);font-family:var(--sapFontFamily);font-style:normal;box-shadow:var(--sapField_Shadow);border-radius:var(--_ui5_search_input_border_radius);box-sizing:border-box;text-align:start;background:var(--sapField_BackgroundStyle);background-color:var(--_ui5-search-wrapper-background);position:relative}.ui5-search-field-busy-indicator{width:100%;height:100%;border-radius:var(--_ui5_search_input_border_radius)}.ui5-shellbar-search-field-wrapper{flex:1;min-width:auto}:host(:not([collapsed]):hover),:host(:not([collapsed]):focus-within),.ui5-shellbar-search-field-wrapper:focus-within{box-shadow:var(--sapField_Hover_Shadow);background:var(--_ui5-search-wrapper-hover-background);background-color:var(--_ui5-search-wrapper-hover-background-color)}:host([focused-inner-input]) .ui5-search-field-root{outline:var(--_ui5_search_wrapper_outline);border-radius:var(--_ui5_search_input_border_radius);outline-offset:-.125rem}.ui5-search-field-root{width:100%;height:100%;position:relative;background:transparent;display:inline-block;outline:none;box-sizing:border-box;color:inherit;transition:border-color .2s ease-in-out;border-radius:var(--_ui5_search_input_border_radius);overflow:hidden}.ui5-search-field-content{height:100%;display:flex;flex-direction:row;justify-content:flex-end;align-items:center;overflow:hidden}[ui5-select]{outline:none;margin:var(--_ui5_search_input_scope_margin);max-width:10rem;border-radius:var(--_ui5_search_input_border_radius);border:var(--_ui5-search-border);box-shadow:none;background:unset;background-color:var(--_ui5-search-elements-background);height:var(--_ui5-search-select-height);--_ui5_select_label_color: var(--sapShell_TextColor);--_ui5_input_focus_outline_color: transparent;--_ui5_select_bottom_border_gradient: none}[ui5-select]:hover:not(:active):not(:focus-within){box-shadow:var(--_ui5-search_input_scope_hover_shadow)}[ui5-select]:not(:active):not(:focus-within)::part(icon-wrapper):hover{box-shadow:var(--_ui5-search_input_scope_hover_shadow)}[ui5-select]:active,[ui5-select]:focus-within{box-shadow:var(--_ui5-search_input_scope_active_shadow)}[ui5-select]:active::part(icon-wrapper),[ui5-select]:focus-within::part(icon-wrapper){box-shadow:var(--_ui5-search_input_scope_active_shadow);background:var(--sapShell_Active_Background);color:var(--sapShell_Active_TextColor)}[ui5-select]::part(icon){display:flex;justify-content:center;align-items:stretch;height:100%;padding:0 .5rem;align-self:center;border-radius:var(--_ui5_search_input_border_radius);color:var(--sapShell_InteractiveTextColor)}[ui5-select]::part(popover){background-color:var(--sapShellColor)}::slotted([slot="filterButton"]){--_ui5_button_focused_border_radius: var(--_ui5_search_filter_button_border_radius);min-width:var(--_ui5_search_icon_size);height:var(--_ui5_search_icon_size);border:var(--_ui5_search_filter_button_border);border-radius:var(--_ui5_search_filter_button_border_radius);color:var(--sapShell_InteractiveTextColor);outline:none;background:var(--_ui5-search-filter_button_background_color);box-sizing:border-box;margin-inline-end:.1875rem;margin-inline-start:.25rem}::slotted([slot="filterButton"]:focus-within){background-color:var(--ui5_search_filter_button_background_active);border:var(--_ui5_search_filter_button_border)}::slotted([slot="filterButton"]:not([active]):not(:focus-within):hover){background-color:var(--sapShell_Hover_Background);border:var(--_ui5_seach_filter_button_border_hover)}.ui5-search-field-inner-input{font-size:var(--sapFontSize);font-family:var(--sapFontFamily);font-style:normal;padding:.5rem 0;height:100%;width:100%;box-sizing:border-box;background-color:var(--_ui5-search-elements-background);border:var(--_ui5-search-border);outline:none;color:inherit;padding-inline-start:var(--_ui5-search-input-start-padding);padding-inline-end:var(--_ui5_search_input_end_padding)}:host([focused-inner-input]) .ui5-search-field-inner-input{outline:var(--_ui5_search_input_outline);border-radius:var(--_ui5_search_input_border_radius);outline-offset:-.3125rem}:host(:not([mode="Scoped"])) .ui5-search-field-inner-input{padding-inline-start:.875rem}.ui5-search-field-inner-input:hover{background-color:var(--_ui5-search-elements-hover-background)}.ui5-search-field-inner-input:focus-within{background-color:var(--_ui5-search-elements-active-background)}.ui5-search-field-inner-input::placeholder{font-weight:400;font-style:italic;color:var(--sapField_PlaceholderTextColor);padding-inline-start:.125rem}:host([mode="Scoped"]) .ui5-search-field-inner-input{margin-inline-start:var(--_ui5_search_input_start_margin)}.ui5-search-field-separator{height:1.5rem;width:.0625rem;background:var(--_ui5_search_separator_background);box-sizing:border-box}.ui5-shell-search-field-button{outline:none;min-width:var(--_ui5_search_icon_size);height:var(--_ui5_search_icon_size);border-radius:var(--_ui5_search_icon_border_radius);box-sizing:border-box;cursor:pointer}.ui5-shell-search-field-button:not([design=Emphasized]){color:var(--sapShell_InteractiveTextColor);background-color:var(--_ui5-search-elements-background);min-width:var(--_ui5_search_icon_size_default);height:var(--_ui5_search_icon_size_default);border-radius:var(--_ui5_shellbar_button_border_radius)}.ui5-shell-search-field-button:not([design=Emphasized]):hover{background-color:var(--sapShell_Hover_Background);border-color:var(--sapButton_Lite_Hover_BorderColor);border-radius:var(--_ui5_shellbar_button_border_radius)}.ui5-shell-search-field-button[desktop]:not([active])::part(button):after,.ui5-shell-search-field-button:not([active])::part(button):focus-visible:after,.ui5-shell-search-field-button[desktop][active][design=Emphasized]::part(button):focus-within:after,.ui5-shell-search-field-button[active][design=Emphasized]::part(button):focus-visible:after,.ui5-shell-search-field-button[desktop][active]::part(button):focus-within:before,.ui5-shell-search-field-button[active]::part(button):focus-visible:before,.ui5-shell-search-field-button[design=Emphasized][desktop]::part(button):focus-within:before,.ui5-shell-search-field-button[design=Emphasized]::part(button):focus-visible:before{border-radius:var(--_ui5_shellbar_button_border_radius)}.ui5-shell-search-field-icon{display:flex;justify-content:center;align-items:stretch;cursor:pointer;outline:none;min-width:var(--_ui5_search_icon_size);height:var(--_ui5_search_icon_size);border-radius:var(--_ui5_search_icon_border_radius);margin-inline-end:.25rem;margin-inline-start:.1875rem;box-sizing:border-box;color:var(--sapShell_InteractiveTextColor);background-color:var(--_ui5-search-elements-background);border:var(--_ui5-search-icon-border)}.ui5-shell-search-field-icon::part(root){padding:var(--_ui5_search_icon_padding);outline-offset:-.125rem}.ui5-shell-search-field-icon:hover::part(root){padding:var(--_ui5_search_icon_hover_padding);outline-offset:-.1875rem}.ui5-shell-search-field-icon:focus::part(root){border-radius:var(--_ui5_search_icon_border_radius)}.ui5-shell-search-field-icon:hover,.ui5-shell-search-field-input-button:hover{background:var(--sapShell_Hover_Background);border:1px solid var(--sapButton_Lite_Hover_BorderColor);color:var(--sapShell_InteractiveTextColor)}.ui5-shell-search-field-search-icon{background-color:var(--sapButton_Emphasized_Background);border-color:var(--sapButton_Emphasized_BorderColor);color:var(--sapButton_Emphasized_TextColor)}.ui5-search-field-select{--_ui5_input_focus_border_radius: var(--_ui5_search_input_border_radius)}.ui5-search-field-select::part(icon-wrapper){border-radius:var(--_ui5_search_input_border_radius);height:100%}.ui5-search-field-inner-input::selection{background:var(--sapSelectedColor);color:var(--sapContent_ContrastTextColor)}
 `;
 
-    var __decorate$2 = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var __decorate$1 = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
         else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
@@ -3094,46 +3094,46 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             }
         }
     };
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s({ type: Boolean })
     ], SearchField.prototype, "fieldLoading", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s({ type: Boolean })
     ], SearchField.prototype, "showClearIcon", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s({ type: Boolean })
     ], SearchField.prototype, "collapsed", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s()
     ], SearchField.prototype, "value", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s()
     ], SearchField.prototype, "placeholder", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s()
     ], SearchField.prototype, "accessibleName", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s()
     ], SearchField.prototype, "accessibleDescription", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s()
     ], SearchField.prototype, "scopeValue", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.d({ type: HTMLElement, individualSlots: true, invalidateOnChildChange: true })
     ], SearchField.prototype, "scopes", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.d()
     ], SearchField.prototype, "filterButton", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s({ type: Boolean })
     ], SearchField.prototype, "focusedInnerInput", void 0);
-    __decorate$2([
+    __decorate$1([
         webcomponentsBase.s({ type: Boolean })
     ], SearchField.prototype, "_effectiveShowClearIcon", void 0);
-    __decorate$2([
+    __decorate$1([
         parametersBundle_css.i("@ui5/webcomponents-fiori")
     ], SearchField, "i18nBundle", void 0);
-    SearchField = SearchField_1 = __decorate$2([
+    SearchField = SearchField_1 = __decorate$1([
         webcomponentsBase.m({
             tag: "ui5-search-field",
             languageAware: true,
@@ -3174,7 +3174,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     SearchField.define();
     var SearchField$1 = SearchField;
 
-    var __decorate$1 = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
         else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
@@ -3233,7 +3233,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
         }
         onBeforeRendering() {
             super.onBeforeRendering();
-            if (this.collapsed && !Icons.d()) {
+            if (this.collapsed && !Theme.d()) {
                 this.open = false;
                 return;
             }
@@ -3252,7 +3252,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
                     this._deselectItems();
                 }
             }
-            if (Icons.d() && this.open) {
+            if (Theme.d() && this.open) {
                 const item = this._getFirstMatchingItem(this.value);
                 this._proposedItem = item;
                 if (item && this._performItemSelectionOnMobile) {
@@ -3353,12 +3353,12 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             firstListItem?.focus();
         }
         _handleInnerClick() {
-            if (Icons.d()) {
+            if (Theme.d()) {
                 this.open = true;
             }
         }
         _handleSearchIconPress() {
-            if (Icons.d()) {
+            if (Theme.d()) {
                 this.open = true;
             }
             else {
@@ -3407,7 +3407,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             this._typedInValue = this.value;
             this._proposedItem = undefined;
             this._valueBeforeArrowNav = undefined;
-            if (Icons.d()) {
+            if (Theme.d()) {
                 return;
             }
             this._isTyping = true;
@@ -3561,7 +3561,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
         }
         _handleBeforeOpen() {
             this._valueBeforeOpen = this.value;
-            if (Icons.d() && this.mobileInput) {
+            if (Theme.d() && this.mobileInput) {
                 this.mobileInput.value = this.value;
             }
         }
@@ -3619,41 +3619,41 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             return domRef ? domRef.querySelector(`[ui5-select]`) : null;
         }
     };
-    __decorate$1([
+    __decorate([
         webcomponentsBase.s({ type: Boolean })
     ], Search.prototype, "loading", void 0);
-    __decorate$1([
+    __decorate([
         webcomponentsBase.s({ type: Boolean })
     ], Search.prototype, "noTypeahead", void 0);
-    __decorate$1([
+    __decorate([
         webcomponentsBase.d({
             type: HTMLElement,
             "default": true,
             invalidateOnChildChange: true,
         })
     ], Search.prototype, "items", void 0);
-    __decorate$1([
+    __decorate([
         webcomponentsBase.d()
     ], Search.prototype, "action", void 0);
-    __decorate$1([
+    __decorate([
         webcomponentsBase.d()
     ], Search.prototype, "illustration", void 0);
-    __decorate$1([
+    __decorate([
         webcomponentsBase.d()
     ], Search.prototype, "messageArea", void 0);
-    __decorate$1([
+    __decorate([
         webcomponentsBase.s({ type: Boolean })
     ], Search.prototype, "open", void 0);
-    __decorate$1([
+    __decorate([
         webcomponentsBase.s({ noAttribute: true })
     ], Search.prototype, "_innerValue", void 0);
-    __decorate$1([
+    __decorate([
         webcomponentsBase.s({ type: Boolean })
     ], Search.prototype, "_performItemSelectionOnMobile", void 0);
-    __decorate$1([
+    __decorate([
         parametersBundle_css.i("@ui5/webcomponents-fiori")
     ], Search, "i18nBundle", void 0);
-    Search = Search_1 = __decorate$1([
+    Search = Search_1 = __decorate([
         webcomponentsBase.m({
             tag: "ui5-search",
             languageAware: true,
@@ -3682,129 +3682,9 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     Search.define();
     var Search$1 = Search;
 
-    function ShellBarSearchPopoverTemplate() {
-        return (SearchPopoverTemplate.call(this, ShellBarSearchDialogHeader));
-    }
-    function ShellBarSearchDialogHeader() {
-        return (jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsxs("header", { slot: "header", class: "ui5-search-popup-searching-header", children: [jsxRuntime.jsx("div", { class: "ui5-shellbar-search-field-wrapper", children: SearchFieldTemplate.call(this, { forceExpanded: true }) }), jsxRuntime.jsx(Button.Button, { design: Button.ButtonDesign.Transparent, onClick: this._handleCancel, children: this.cancelButtonText })] }) }));
-    }
-
-    function ShellBarSearchTemplate() {
-        return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [SearchFieldTemplate.call(this), ShellBarSearchPopoverTemplate.call(this)] }));
-    }
-
-    Icons.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Icons.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
-    var ShellBarSearchCss = `:host(:not([collapsed])){min-width:13rem}
-`;
-
-    var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-        var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-        if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-        else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-        return c > 3 && r && Object.defineProperty(target, key, r), r;
-    };
-    var ShellBarSearch_1;
-    /**
-     * @class
-     * Search field for the ShellBar component.
-     * @constructor
-     * @extends Search
-     * @public
-     * @since 2.10.0
-     * @experimental
-     */
-    let ShellBarSearch = ShellBarSearch_1 = class ShellBarSearch extends Search$1 {
-        constructor() {
-            super(...arguments);
-            /**
-             * Indicates whether the suggestions popover should be opened on focus.
-             * @default false
-             * @public
-             */
-            this.autoOpen = false;
-        }
-        _handleSearchIconPress() {
-            if (Icons.d() && this.open) {
-                this._handleSearchEvent();
-                this._closePopupAndResetState();
-                return;
-            }
-            super._handleSearchIconPress();
-            if (this.collapsed) {
-                this.collapsed = false;
-            }
-            else if (!this.value) {
-                this.collapsed = true;
-            }
-        }
-        _handleEnter() {
-            if (!this.value && !this.collapsed) {
-                this.collapsed = true;
-                setTimeout(() => {
-                    this.focus();
-                }, 0);
-            }
-            else {
-                super._handleEnter();
-            }
-        }
-        _onFocusOutSearch(e) {
-            if (Icons.d()) {
-                return;
-            }
-            super._onFocusOutSearch(e);
-        }
-        _handleInput(e) {
-            super._handleInput(e);
-            if (Icons.d()) {
-                this._performItemSelectionOnMobile = this._shouldPerformSelectionOnMobile(e.inputType);
-            }
-        }
-        get _effectiveIconTooltip() {
-            if (this.collapsed) {
-                return ShellBarSearch_1.i18nBundle.getText(i18nDefaults$1.SHELLBAR_SEARCH_COLLAPSED);
-            }
-            if (this.value) {
-                return ShellBarSearch_1.i18nBundle.getText(i18nDefaults$1.SEARCH_FIELD_SEARCH_ICON);
-            }
-            return ShellBarSearch_1.i18nBundle.getText(i18nDefaults$1.SHELLBAR_SEARCH_EXPANDED);
-        }
-        get nativeInput() {
-            const domRef = this.shadowRoot;
-            return Icons.d() ? domRef?.querySelector(`[ui5-responsive-popover] input`) : super.nativeInput;
-        }
-        _onfocusin() {
-            super._onfocusin();
-            if (this.autoOpen) {
-                this.open = true;
-                this.fireDecoratorEvent("open");
-            }
-        }
-        onBeforeRendering() {
-            super.onBeforeRendering();
-            if (Icons.d()) {
-                this.collapsed = true;
-            }
-        }
-    };
-    __decorate([
-        webcomponentsBase.s({ type: Boolean })
-    ], ShellBarSearch.prototype, "autoOpen", void 0);
-    ShellBarSearch = ShellBarSearch_1 = __decorate([
-        webcomponentsBase.m({
-            tag: "ui5-shellbar-search",
-            template: ShellBarSearchTemplate,
-            styles: [
-                Search$1.styles,
-                ShellBarSearchCss,
-            ],
-        })
-    ], ShellBarSearch);
-    ShellBarSearch.define();
-    var ShellBarSearch_default = ShellBarSearch;
-
     exports.Input = Input$1;
-    exports.ShellBarSearch_default = ShellBarSearch_default;
+    exports.Search = Search$1;
+    exports.SearchFieldTemplate = SearchFieldTemplate;
+    exports.SearchPopoverTemplate = SearchPopoverTemplate;
 
 }));
