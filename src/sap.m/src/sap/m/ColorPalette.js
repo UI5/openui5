@@ -438,7 +438,7 @@ sap.ui.define([
 					this._bMainRegionSelection = false;
 					this._fireColorSelect(this._getDefaultColor(), true, oEvent);
 				}.bind(this)
-			});
+			}).addStyleClass("sapMColorPaletteDefaultColorBtn");
 		};
 
 		// Default color

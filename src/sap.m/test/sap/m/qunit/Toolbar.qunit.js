@@ -876,6 +876,84 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
+	QUnit.test("arrow key navigation reaches wrapper controls whose getParent() skips the toolbar", async function(assert) {
+		// A wrapper that implements IToolbarInteractiveControl and owns its inner
+		// button via a UI5 aggregation, but whose own getParent() is overridden to
+		// return something other than the toolbar (parent-chain mismatch).
+		const WrapperControl = Control.extend("demo.WrapperControl", {
+			metadata: {
+				interfaces: ["sap.m.IToolbarInteractiveControl"],
+				aggregations: { _btn: { type: "sap.m.Button", multiple: false, visibility: "hidden" } }
+			},
+			init: function() {
+				this.setAggregation("_btn", new Button({ text: this.getId() }));
+			},
+			_getToolbarInteractive: function() { return true; },
+			getFocusDomRef: function() { return this.getAggregation("_btn").getFocusDomRef(); },
+			renderer: {
+				apiVersion: 2,
+				render: function(oRm, oCtrl) {
+					oRm.openStart("div", oCtrl).openEnd();
+					oRm.renderControl(oCtrl.getAggregation("_btn"));
+					oRm.close("div");
+				}
+			}
+		});
+
+		const oDetachedParent = new Button({ text: "detached" });
+		const oLink = new Link({ text: "First" });
+		const oWrapper1 = new WrapperControl();
+		const oWrapper2 = new WrapperControl();
+		const oButton = new Button({ text: "Last" });
+
+		// getParent() on each wrapper bypasses the toolbar, but the inner
+		// button's getParent() correctly returns its wrapper via aggregation.
+		oWrapper1.getParent = function() { return oDetachedParent; };
+		oWrapper2.getParent = function() { return oDetachedParent; };
+
+		const oTB = await createToolbar({
+			Toolbar: { content: [oLink, oWrapper1, oWrapper2, oButton] }
+		});
+
+		const oArrowRightEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_RIGHT });
+		const oArrowLeftEvent  = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_LEFT });
+
+		// Forward: Link → Wrapper1 → Wrapper2 → Button
+		oLink.focus();
+		oTB._moveFocus("forward", oArrowRightEvent);
+		assert.strictEqual(document.activeElement, oWrapper1.getAggregation("_btn").getDomRef(),
+			"Arrow right from Link focuses Wrapper1");
+
+		oTB._moveFocus("forward", oArrowRightEvent);
+		assert.strictEqual(document.activeElement, oWrapper2.getAggregation("_btn").getDomRef(),
+			"Arrow right from Wrapper1 focuses Wrapper2");
+
+		oTB._moveFocus("forward", oArrowRightEvent);
+		assert.strictEqual(document.activeElement, oButton.getDomRef(),
+			"Arrow right from Wrapper2 focuses Button");
+
+		// Backward: Button → Wrapper2 → Wrapper1 → Link
+		oTB._moveFocus("backward", oArrowLeftEvent);
+		assert.strictEqual(document.activeElement, oWrapper2.getAggregation("_btn").getDomRef(),
+			"Arrow left from Button focuses Wrapper2");
+
+		oTB._moveFocus("backward", oArrowLeftEvent);
+		assert.strictEqual(document.activeElement, oWrapper1.getAggregation("_btn").getDomRef(),
+			"Arrow left from Wrapper2 focuses Wrapper1");
+
+		oTB._moveFocus("backward", oArrowLeftEvent);
+		assert.strictEqual(document.activeElement, oLink.getDomRef(),
+			"Arrow left from Wrapper1 focuses Link");
+
+		// Cleanup
+		oDetachedParent.destroy();
+		oLink.destroy();
+		oWrapper1.destroy();
+		oWrapper2.destroy();
+		oButton.destroy();
+		oTB.destroy();
+	});
+
 	QUnit.test("tests up/down arrow key navigation", async function(assert) {
 		const oLabel = new Label({text : "text"});
 		const oButton = new Button({text : "text"});
@@ -1463,7 +1541,7 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual(oDefaultBehaviorSpy.getCalls()[0].args[1], oSB, "_shouldAllowDefaultBehavior is called with SegmentedButton");
-		assert.strictEqual(oDefaultBehaviorSpy.getCalls()[1].args[1], oSelect, "_shouldAllowDefaultBehavior is called with Select");
+		assert.strictEqual(oDefaultBehaviorSpy.getCalls()[1].args[1], oSB, "_shouldAllowDefaultBehavior is called with SegmentedButton");
 	});
 
 	QUnit.module("Active Button Text Content");

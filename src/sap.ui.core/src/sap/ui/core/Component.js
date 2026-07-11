@@ -2222,7 +2222,7 @@ sap.ui.define([
 	 *     A non-null object value will be interpreted as manifest content.
 	 *     <b>Note:</b> If a manifest is provided as URL or plain object, it must use the same major schema version as the original manifest
 	 *      to avoid incompatible changes in the behavior of the component.
-	 * @param {string} [mOptions.altManifestUrl] @since 1.61.0 Alternative URL for the manifest.json. If <code>mOptions.manifest</code>
+	 * @param {string} [mOptions.altManifestUrl] {@since 1.61.0} Alternative URL for the manifest.json. If <code>mOptions.manifest</code>
 	 *     is set to an object value, this URL specifies the location to which the manifest object should resolve the relative
 	 *     URLs to.
 	 * @param {string} [mOptions.handleValidation=false] If set to <code>true</code> validation of the component is handled by the <code>Messaging</code>
@@ -2529,7 +2529,7 @@ sap.ui.define([
 	 *     A non-empty string value will be interpreted as the URL to load the manifest from.
 	 *     This implies that the manifest is loaded and evaluated <b>before</b> the Component controller.
 	 *     A non-null object value will be interpreted as manifest content.
-	 * @param {string} [mOptions.altManifestUrl] @since 1.61.0 Alternative URL for the manifest.json. If <code>mOptions.manifest</code>
+	 * @param {string} [mOptions.altManifestUrl] {@since 1.61.0} Alternative URL for the manifest.json. If <code>mOptions.manifest</code>
 	 *     is set to an object value, this URL specifies the location to which the manifest object should resolve the relative
 	 *     URLs to.
 	 * @param {object} [mOptions.asyncHints] Hints for asynchronous loading.

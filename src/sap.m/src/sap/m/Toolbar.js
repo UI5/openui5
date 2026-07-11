@@ -402,20 +402,22 @@ function(
 	};
 
 	/**
-	 * Try to find the parent of the active element assuming it is a child of the toolbar.
-	 * If the active element is not a child of the toolbar, return original active element
-	 * (in cases like associative toolbar)
+	 * Walks the UI5 parent chain of oActiveElement and returns the first
+	 * ancestor that is a direct content item of this toolbar. Falls back to
+	 * oActiveElement itself if no content item is found in the chain.
 	 * @param {sap.ui.core.Element} oActiveElement
 	 * @returns {sap.ui.core.Element}
 	 */
 	Toolbar.prototype._getParent = function(oActiveElement) {
-		var originalActiveElement = oActiveElement;
-
-		while (oActiveElement && oActiveElement.getParent() !== this) {
-			oActiveElement = oActiveElement.getParent();
+		var aContent = this.getContent(),
+			oElement = oActiveElement;
+		while (oElement) {
+			if (aContent.indexOf(oElement) !== -1) {
+				return oElement;
+			}
+			oElement = oElement.getParent();
 		}
-
-		return oActiveElement || originalActiveElement;
+		return oActiveElement;
 	};
 
 	Toolbar.prototype._moveFocus = function(sDirection, oEvent) {

@@ -414,6 +414,10 @@ sap.ui.define([
 
 	DynamicPageTitle.prototype.onBeforeRendering = function () {
 		this._getActionsToolbar();
+		if (this.getNavigationActions().length > 0) {
+			this._getNavigationActionsToolbar();
+		}
+		this._updateToolbarAriaLabelledBy();
 		this._observeControl(this.getBreadcrumbs());
 		this._detachFocusSpanHandlers();
 	};
@@ -1557,6 +1561,26 @@ sap.ui.define([
 			this._bActionsAreaHasContent = bAreaHasContent;
 			$node.toggleClass("sapFDynamicPageTitleMainActionsHasContent", bAreaHasContent);
 		}
+	};
+
+	DynamicPageTitle.prototype._updateToolbarAriaLabelledBy = function () {
+		var sHeadingId = this._getARIALabelReferences(this._bExpandedState),
+			oActionsToolbar = this.getAggregation("_actionsToolbar"),
+			oNavActionsToolbar = this.getAggregation("_navActionsToolbar"),
+			aToolbars = [oActionsToolbar, oNavActionsToolbar].filter(Boolean);
+
+		aToolbars.forEach(function (oToolbar) {
+			var sInvisibleTextId = oToolbar.getId() + "-InvisibleText",
+				bHasHeading = sHeadingId && sHeadingId !== DynamicPageTitle.DEFAULT_HEADER_TEXT_ID && sHeadingId !== sInvisibleTextId;
+
+			// Reset to only the static InvisibleText, then prepend the heading ID if available.
+			// This ensures order: "[Heading text] Header actions" for screen readers.
+			oToolbar.removeAllAriaLabelledBy();
+			if (bHasHeading) {
+				oToolbar.addAriaLabelledBy(sHeadingId);
+			}
+			oToolbar.addAriaLabelledBy(sInvisibleTextId);
+		});
 	};
 
 	DynamicPageTitle.prototype._updateARIAState = function (bExpanded) {

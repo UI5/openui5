@@ -157,8 +157,8 @@ sap.ui.define([
 		 * </pre>
 		 *
 		 * Since the xmlTarget does not specify its viewType, XML is taken from the config object. The jsTarget is specifying it, so the viewType will be JS.
-		 * @param {object} [oConfig.bypassed] Since 1.28. Settings which are used when no route of the router is matched after a hash change.
-		 * @param {string|string[]} [oConfig.bypassed.target] Since 1.28. One or multiple names of targets that will be displayed, if no route of the router is matched.<br/>
+		 * @param {object} [oConfig.bypassed] {@since 1.28} Settings which are used when no route of the router is matched after a hash change.
+		 * @param {string|string[]} [oConfig.bypassed.target] {@since 1.28} One or multiple names of targets that will be displayed, if no route of the router is matched.<br/>
 		 * A typical use case is a not found page.<br/>
 		 * The current hash will be passed to the display event of the target.<br/>
 		 * <b>Example:</b>
@@ -190,7 +190,7 @@ sap.ui.define([
 		 * @param {sap.ui.core.UIComponent} [oOwner] the Component of all the views that will be created by this Router,<br/>
 		 * will get forwarded to the {@link sap.ui.core.routing.Views#constructor}.<br/>
 		 * If you are using the componentMetadata to define your routes you should skip this parameter.
-		 * @param {Object<string,sap.ui.core.routing.$TargetSettings>} [oTargetsConfig] Since 1.28 the target configuration, see {@link sap.ui.core.routing.Targets#constructor} documentation (the options object).<br/>
+		 * @param {Object<string,sap.ui.core.routing.$TargetSettings>} [oTargetsConfig] {@since 1.28} the target configuration, see {@link sap.ui.core.routing.Targets#constructor} documentation (the options object).<br/>
 		 * You should use Targets to create and display views. Since 1.28 the route should only contain routing relevant properties.<br/>
 		 * <b>Example:</b>
 		 * <pre>
@@ -384,7 +384,7 @@ sap.ui.define([
 			 *
 			 * See {@link sap.ui.core.routing.HashChanger}.
 			 *
-			 * @param {boolean} [bIgnoreInitialHash=false] Since 1.48.0. Whether the current URL hash shouldn't be parsed after the router is initialized
+			 * @param {boolean} [bIgnoreInitialHash=false] {@since 1.48.0} Whether the current URL hash shouldn't be parsed after the router is initialized
 			 * @public
 			 * @returns {this} this for chaining.
 			 */

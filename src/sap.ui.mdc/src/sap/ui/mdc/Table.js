@@ -1635,7 +1635,7 @@ sap.ui.define([
 
 		if (oFilterInfoBar) {
 			oFilterInfoBar.setInfoText(sFilterInfoText);
-		} else if (sFilterInfoText) {
+		} else if (sFilterInfoText && oTable._oTable) {
 			oFilterInfoBar = new FilterInfoBar({
 				id: oTable.getId() + "-filterInfoBar",
 				infoText: sFilterInfoText,

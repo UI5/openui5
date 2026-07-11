@@ -1,11 +1,12 @@
 sap.ui.define([
 	"sap/base/Log",
 	"sap/m/Input",
+	"sap/m/Label",
 	"sap/ui/core/Messaging",
 	"sap/ui/core/message/Message",
 	"sap/ui/core/message/MessageMixin",
 	"sap/ui/model/json/JSONModel"
-], function (Log, Input, Messaging, Message, MessageMixin, JSONModel) {
+], function (Log, Input, Label, Messaging, Message, MessageMixin, JSONModel) {
 	/*global QUnit*/
 	"use strict";
 
@@ -62,6 +63,50 @@ sap.ui.define([
 		oControl.destroy("~any", "~parameters");
 
 		assert.ok(oExpectDestroy.calledAfter(oExpectRemoveControlId));
+	});
+
+	// SNOW: DINC0947847 - split(', ') with space required to correctly detect already-added labels
+	// The bug: "Label1, Label2".split(',') yields ["Label1", " Label2"] — the leading space
+	// in " Label2" causes the duplicate-check to fail, so Label2 is appended again on every
+	// subsequent refreshDataState call.
+	QUnit.test("refreshDataState: second label must not be added to additionalText twice", function(assert) {
+		assert.expect(2);
+		const done = assert.async(),
+			oInput1 = new Input({value: "{/value}"}),
+			oInput2 = new Input({value: "{/value}"}),
+			oModel = new JSONModel({value: "test"}),
+			oMessage = new Message({
+				message: "test message",
+				processor: oModel,
+				target: "/value"
+			});
+
+		oInput1.setModel(oModel);
+		oInput2.setModel(oModel);
+
+		const oLabel1 = new Label({text: "Label1", labelFor: oInput1});
+		const oLabel2 = new Label({text: "Label2", labelFor: oInput2});
+		oLabel1.placeAt("qunit-fixture");
+		oLabel2.placeAt("qunit-fixture");
+
+		// bindList and addMessages before attachChange: addMessages triggers refreshDataState
+		// synchronously (both labels appended), attachChange only catches the subsequent
+		// async change fired by setModel.
+		const oMessageBinding = Messaging.getMessageModel().bindList("/");
+		Messaging.addMessages([oMessage, oMessage]);
+
+		oMessageBinding.attachChange(function onFirstChange() {
+			oMessageBinding.detachChange(onFirstChange);
+
+			assert.strictEqual(oMessage.getAdditionalText(), "Label1, Label2",
+				"additionalText contains both labels without duplicates");
+			oLabel1.destroy();
+			oLabel2.destroy();
+			oInput1.destroy();
+			oInput2.destroy();
+			oModel.destroy();
+			done();
+		});
 	});
 
 	QUnit.test("MessageModel update must not refresh endless", function(assert) {

@@ -222,7 +222,7 @@ sap.ui.define([
 		 * @param {sap.ui.core.Component.MetadataOptions} [oClassInfo.metadata]
 		 *            The metadata object describing the class. See {@link sap.ui.core.Component.extend} for the values allowed in every extend.
 		 * @param {sap.ui.core.UIComponent.RoutingMetadata} [oClassInfo.metadata.routing]
-		 *            Since 1.16. An object containing the routing-relevant configurations, routes, targets, config.
+		 *            {@since 1.16} An object containing the routing-relevant configurations, routes, targets, config.
 		 *
 		 *            After creating a component instance, you can retrieve the router with {@link #getRouter}
 		 *            to register a callback to be notified when routes have matched etc. You can also retrieve

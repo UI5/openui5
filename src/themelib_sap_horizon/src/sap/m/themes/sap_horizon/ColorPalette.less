@@ -97,6 +97,11 @@ html:not(.sap-phone) .sapMColorPalette,
 .sapMColorPalette {
 
 	.sapMBtn {
+		&:active {
+			background-color: var(--sapButton_Lite_Active_Background);
+			color: var(--sapButton_Active_TextColor);
+			border: 0.125rem solid var(--sapButton_Lite_Active_BorderColor);
+		}
 
 		&:focus {
 
@@ -110,12 +115,6 @@ html:not(.sap-phone) .sapMColorPalette,
 		}
 
 		.sapMBtnInner {
-			height: 2.75rem;
-
-			.sapMBtnContent {
-				line-height: 2.75rem;
-			}
-
 			&.sapMBtnText {
 				padding: 0;
 			}
@@ -124,6 +123,13 @@ html:not(.sap-phone) .sapMColorPalette,
 
 	.sapMBtnInner {
 		border-radius: 0;
+	}
+
+	.sapMColorPaletteDefaultColorBtn:active {
+		border-radius: 0.5rem 0.5rem 0 0;
+		.sapMBtnInner {
+			border-radius: 0.5rem 0.5rem 0 0;
+		}
 	}
 }
 
