@@ -2872,7 +2872,7 @@ sap.ui.define([
 		afterEach: function() {
 			this.oTable.destroy();
 		},
-		createTable: async function(mSettings) {
+		createTable: function(mSettings) {
 			this.oTable = new Table({
 				propertyInfo: [{
 					key: "name",
@@ -2901,7 +2901,6 @@ sap.ui.define([
 				...mSettings
 			});
 			this.oInsertFilterInfoBar = this.spy(this.oTable._getType(), "insertFilterInfoBar");
-			await this.oTable.initialized();
 		},
 		getFilterInfoBar: function() {
 			return this.oTable._oTable.findAggregatedObjects(false, (oElement) => oElement.isA("sap.ui.mdc.table.utils.FilterInfoBar"))[0];
@@ -2936,8 +2935,9 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Filtering disabled initially", async function(assert) {
-		await this.createTable({
+	QUnit.test("ID", async function(assert) {
+		this.createTable({
+			p13nMode: ["Filter"],
 			filterConditions: {
 				name: [{
 					isEmpty: null,
@@ -2947,6 +2947,22 @@ sap.ui.define([
 				}]
 			}
 		});
+		await this.oTable.initialized();
+		assert.equal(this.getFilterInfoBar().getId(), this.oTable.getId() + "-filterInfoBar");
+	});
+
+	QUnit.test("Filtering disabled initially", async function(assert) {
+		this.createTable({
+			filterConditions: {
+				name: [{
+					isEmpty: null,
+					operator: OperatorName.EQ,
+					validated: ConditionValidated.NotValidated,
+					values: ["test"]
+				}]
+			}
+		});
+		await this.oTable.initialized();
 		this.assertFilterInfoBarExists(false, "After initialization");
 		assert.ok(this.oInsertFilterInfoBar.notCalled, "After initialization: #insertFilterInfoBar not called on table type");
 
@@ -2964,7 +2980,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Filtering disabled after initialization", async function(assert) {
-		await this.createTable({
+		this.createTable({
 			p13nMode: ["Filter"],
 			filterConditions: {
 				name: [{
@@ -2975,20 +2991,22 @@ sap.ui.define([
 				}]
 			}
 		});
+		await this.oTable.initialized();
 		this.oTable.setP13nMode();
 		this.assertFilterInfoBarExists(true, "Filtering disabled");
 		this.assertFilterInfoBarText(null, "Filtering disabled");
 	});
 
 	QUnit.test("Filtering enabled initially", async function(assert) {
-		await this.createTable({
+		this.createTable({
 			p13nMode: ["Filter"]
 		});
+		await this.oTable.initialized();
 		this.assertFilterInfoBarExists(false, "After initialization without filter conditions");
 		assert.ok(this.oInsertFilterInfoBar.notCalled, "Filter conditions changed: #insertFilterInfoBar not called on table type");
 
 		this.oTable.destroy();
-		await this.createTable({
+		this.createTable({
 			p13nMode: ["Filter"],
 			filterConditions: {
 				name: [{
@@ -2999,6 +3017,7 @@ sap.ui.define([
 				}]
 			}
 		});
+		await this.oTable.initialized();
 		this.assertFilterInfoBarExists(true, "After initialization with filter conditions");
 		this.assertFilterInfoBarText(["NameLabel"], "After initialization with filter conditions");
 		assert.ok(this.oInsertFilterInfoBar.calledOnceWithExactly(this.getFilterInfoBar()),
@@ -3006,7 +3025,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Filtering enabled after initialization", async function(assert) {
-		await this.createTable({
+		this.createTable({
 			filterConditions: {
 				name: [{
 					isEmpty: null,
@@ -3016,6 +3035,7 @@ sap.ui.define([
 				}]
 			}
 		});
+		await this.oTable.initialized();
 		this.oTable.setP13nMode(["Filter"]);
 		this.assertFilterInfoBarExists(true, "Filtering enabled");
 		this.assertFilterInfoBarText(["NameLabel"], "Filtering enabled");
@@ -3024,9 +3044,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("Add/Remove filter conditions", async function(assert) {
-		await this.createTable({
+		this.createTable({
 			p13nMode: ["Filter"]
 		});
+		await this.oTable.initialized();
 
 		this.oTable.setFilterConditions({
 			name: [{
@@ -3069,8 +3090,48 @@ sap.ui.define([
 		this.assertFilterInfoBarText(null, "Filter condition added and directly removed");
 	});
 
+	QUnit.test("Set filter conditions before inner table is created", async function(assert) {
+		this.createTable({p13nMode: ["Filter"]});
+
+		await this.oTable.awaitPropertyHelper();
+		this.oTable.setFilterConditions({
+			name: [{
+				isEmpty: null,
+				operator: OperatorName.EQ,
+				validated: ConditionValidated.NotValidated,
+				values: ["test"]
+			}]
+		});
+
+		assert.notOk(Element.getElementById(this.oTable.getId() + "-filterInfoBar"), "No filter info bar while the inner table does not exist yet");
+
+		await this.oTable.initialized();
+
+		this.assertFilterInfoBarExists(true, "After inner table creation");
+		this.assertFilterInfoBarText(["NameLabel"], "After inner table creation");
+		assert.strictEqual(this.getFilterInfoBar().getParent(), this.oTable._oTable, "The filter info bar is attached to the inner table");
+	});
+
+	QUnit.test("Set filter conditions and destroy table before inner table is created", async function(assert) {
+		this.createTable({p13nMode: ["Filter"]});
+
+		await this.oTable.awaitPropertyHelper();
+		this.oTable.setFilterConditions({
+			name: [{
+				isEmpty: null,
+				operator: OperatorName.EQ,
+				validated: ConditionValidated.NotValidated,
+				values: ["test"]
+			}]
+		});
+
+		this.oTable.destroy();
+
+		assert.notOk(Element.getElementById(this.oTable.getId() + "-filterInfoBar"), "No filter info bar after destruction");
+	});
+
 	QUnit.test("Changing table type", async function(assert) {
-		await this.createTable({
+		this.createTable({
 			p13nMode: ["Filter"],
 			filterConditions: {
 				name: [{
@@ -3081,6 +3142,7 @@ sap.ui.define([
 				}]
 			}
 		});
+		await this.oTable.initialized();
 
 		const oOldFilterInfoBar = this.getFilterInfoBar();
 		const oNewTableType = new GridTableType();
@@ -3094,7 +3156,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Open filter dialog", async function(assert) {
-		await this.createTable({
+		this.createTable({
 			p13nMode: ["Filter"],
 			filterConditions: {
 				name: [{
@@ -3109,6 +3171,7 @@ sap.ui.define([
 				propertyKey: "name"
 			})
 		});
+		await this.oTable.initialized();
 
 		this.stub(PersonalizationUtils, "openFilterDialog").resolves();
 		this.getFilterInfoBar().firePress();
@@ -3119,7 +3182,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Clear filters button", async function(assert) {
-		await this.createTable({
+		this.createTable({
 			p13nMode: ["Filter"],
 			filterConditions: {
 				name: [{
@@ -3134,6 +3197,7 @@ sap.ui.define([
 				propertyKey: "name"
 			})
 		});
+		await this.oTable.initialized();
 
 		this.spy(PersonalizationUtils, "createClearFiltersChange");
 		this.getFilterInfoBar().getContent()[2].firePress();
@@ -3195,7 +3259,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Filter info bar ignores inactive property filter conditions", async function(assert) {
-		await this.createTable({
+		this.createTable({
 			p13nMode: ["Filter"],
 			propertyKeys: ["name", "inactive_prop"],
 			propertyInfo: [{
@@ -3239,6 +3303,7 @@ sap.ui.define([
 				}]
 			}
 		});
+		await this.oTable.initialized();
 
 		this.assertFilterInfoBarText(["NameLabel"], "Only active property label shown");
 	});

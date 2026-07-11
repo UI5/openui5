@@ -32,11 +32,13 @@ sap.ui.define([
 		"sap/ui/dom/includeScript",
 		"sap/uxap/ObjectPageSection",
 		"sap/ui/documentation/ObjectPageSubSection",
-		"sap/ui/core/HTML"
+		"sap/ui/core/HTML",
+		"sap/m/MessageStrip",
+		"sap/ui/layout/VerticalLayout"
 	], function (Library, jQuery, Log, Fragment, APIInfo, BaseController,
 			ToggleFullScreenHandler, formatter, Row, ParamText, JSDocType, JSDocText, Image, Label, Link, Text, HBox, ObjectAttribute, ObjectStatus,
 			Popover, library, MessageToast, coreLibrary, CustomListItem, List, includeStylesheet,
-			includeScript, ObjectPageSection, ObjectPageSubSection, HTML) {
+			includeScript, ObjectPageSection, ObjectPageSubSection, HTML, MessageStrip, VerticalLayout) {
 		"use strict";
 
 		// shortcut for sap.m.FlexWrap
@@ -1032,9 +1034,29 @@ sap.ui.define([
 								text: this.formatter.escapeSettingsValue(sDefault),
 								wrapping: true
 							}),
-							new JSDocText({
-								sanitizeContent: false,
-								text: this.formatter.escapeSettingsValue(oProperty.description)
+							new VerticalLayout({
+								content: [
+									new JSDocText({
+										sanitizeContent: false,
+										text: this.formatter.escapeSettingsValue(oProperty.description)
+									}),
+									new MessageStrip({
+										visible: oProperty.deprecatedText !== undefined,
+										text: oProperty.deprecatedText || "",
+										type: "Error",
+										showIcon: true,
+										showCloseButton: false,
+										enableFormattedText: true
+									}).addStyleClass("sapUiTinyMarginBottom sapUiTinyMarginTop"),
+									new MessageStrip({
+										visible: oProperty.experimentalText !== undefined,
+										text: oProperty.experimentalText || "",
+										type: "Warning",
+										showIcon: true,
+										showCloseButton: false,
+										enableFormattedText: true
+									}).addStyleClass("sapUiTinyMarginBottom sapUiTinyMarginTop")
+								]
 							})
 						]
 					}).addStyleClass("subrow");

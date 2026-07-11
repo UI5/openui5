@@ -124,47 +124,101 @@ function(
 
 	QUnit.test("DynamicPageTitle - AriaLabelledBy attribute is set correctly on both navigation and action toolbars", function (assert) {
 		// Arrange
-		const oTitle = oFactory.getDynamicPageTitleWithStandardAndNavigationActions(),
+		var oTitle = oFactory.getDynamicPageTitleWithStandardAndNavigationActions(),
+			oHeading = oTitle.getHeading(),
 			oActionsToolbar = oTitle._getActionsToolbar(),
 			oNavigationToolbar = oTitle._getNavigationActionsToolbar();
 
 		oUtil.renderObject(oTitle);
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-		// Assert
-		let $InvisibleTextDomRef = $('#' + oActionsToolbar.getId() + "-InvisibleText");
-		assert.strictEqual($InvisibleTextDomRef.length, 1, "InvisibleText DOM element exists - actionsToolbar");
-
+		// Assert actions toolbar: heading ID comes first, then the "Header actions" InvisibleText
+		var $ActionsInvisibleTextDomRef = $('#' + oActionsToolbar.getId() + "-InvisibleText"),
+			sActionsAriaLabelledBy = oActionsToolbar.getDomRef().getAttribute("aria-labelledby");
+		assert.strictEqual($ActionsInvisibleTextDomRef.length, 1, "InvisibleText DOM element exists - actionsToolbar");
 		assert.ok(oActionsToolbar.getDomRef().hasAttribute("aria-labelledby"), "AriaLabelledBy attribute is set on the actionsToolbar DOM element");
-		assert.equal(oActionsToolbar.getDomRef().getAttribute("aria-labelledby"), $InvisibleTextDomRef.attr("id"), "AriaLabelledBy attribute points to the correct InvisibleText DOM element");
+		assert.ok(sActionsAriaLabelledBy.indexOf(oHeading.getId()) !== -1, "AriaLabelledBy on actionsToolbar contains the heading ID");
+		assert.ok(sActionsAriaLabelledBy.indexOf($ActionsInvisibleTextDomRef.attr("id")) !== -1, "AriaLabelledBy on actionsToolbar contains the InvisibleText ID");
+		assert.ok(sActionsAriaLabelledBy.indexOf(oHeading.getId()) < sActionsAriaLabelledBy.indexOf($ActionsInvisibleTextDomRef.attr("id")),
+			"Heading ID appears before InvisibleText ID in actionsToolbar aria-labelledby");
 
-		// Assert
-		$InvisibleTextDomRef = $('#' + oNavigationToolbar.getId() + "-InvisibleText");
-		assert.strictEqual($InvisibleTextDomRef.length, 1, "InvisibleText DOM element exists - navigationToolbar");
-
+		// Assert navigation toolbar: same heading + InvisibleText pattern
+		var $NavInvisibleTextDomRef = $('#' + oNavigationToolbar.getId() + "-InvisibleText"),
+			sNavAriaLabelledBy = oNavigationToolbar.getDomRef().getAttribute("aria-labelledby");
+		assert.strictEqual($NavInvisibleTextDomRef.length, 1, "InvisibleText DOM element exists - navigationToolbar");
 		assert.ok(oNavigationToolbar.getDomRef().hasAttribute("aria-labelledby"), "AriaLabelledBy attribute is set on the navigationToolbar DOM element");
-		assert.equal(oNavigationToolbar.getDomRef().getAttribute("aria-labelledby"), $InvisibleTextDomRef.attr("id"), "AriaLabelledBy attribute points to the correct InvisibleText DOM element");
+		assert.ok(sNavAriaLabelledBy.indexOf(oHeading.getId()) !== -1, "AriaLabelledBy on navigationToolbar contains the heading ID");
+		assert.ok(sNavAriaLabelledBy.indexOf($NavInvisibleTextDomRef.attr("id")) !== -1, "AriaLabelledBy on navigationToolbar contains the InvisibleText ID");
+		assert.ok(sNavAriaLabelledBy.indexOf(oHeading.getId()) < sNavAriaLabelledBy.indexOf($NavInvisibleTextDomRef.attr("id")),
+			"Heading ID appears before InvisibleText ID in navigationToolbar aria-labelledby");
 
 		// Clean up
 		oTitle.destroy();
-	  });
+	});
+
+	QUnit.test("DynamicPageTitle - AriaLabelledBy on toolbars is updated when heading changes", function (assert) {
+		// Arrange
+		var oTitle = oFactory.getDynamicPageTitleWithStandardAndNavigationActions(),
+			oOldHeading = oTitle.getHeading(),
+			oNewHeading = new Title({text: "New Heading"}),
+			oActionsToolbar;
+
+		oUtil.renderObject(oTitle);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		oActionsToolbar = oTitle._getActionsToolbar();
+		var sOldActionsAriaLabelledBy = oActionsToolbar.getDomRef().getAttribute("aria-labelledby");
+		assert.ok(sOldActionsAriaLabelledBy.indexOf(oOldHeading.getId()) !== -1, "Old heading ID is in aria-labelledby before heading change");
+
+		// Act: change the heading
+		oTitle.setHeading(oNewHeading);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Assert: new heading ID is present, old one is not
+		var sNewActionsAriaLabelledBy = oActionsToolbar.getDomRef().getAttribute("aria-labelledby");
+		assert.ok(sNewActionsAriaLabelledBy.indexOf(oNewHeading.getId()) !== -1, "New heading ID is in aria-labelledby after heading change");
+		assert.ok(sNewActionsAriaLabelledBy.indexOf(oOldHeading.getId()) === -1, "Old heading ID is no longer in aria-labelledby after heading change");
+
+		// Clean up
+		oTitle.destroy();
+	});
+
+	QUnit.test("DynamicPageTitle - AriaLabelledBy on toolbars falls back to InvisibleText only when no heading is provided", function (assert) {
+		// Arrange
+		var oTitle = oFactory.getDynamicPageTitleWithStandardAndNavigationActions(),
+			oActionsToolbar;
+
+		oTitle.destroyAggregation("heading");
+		oUtil.renderObject(oTitle);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		oActionsToolbar = oTitle._getActionsToolbar();
+		var sAriaLabelledBy = oActionsToolbar.getDomRef().getAttribute("aria-labelledby");
+
+		assert.ok(sAriaLabelledBy, "aria-labelledby is still set when no heading is provided");
+		assert.ok(sAriaLabelledBy.indexOf(oActionsToolbar.getId() + "-InvisibleText") !== -1,
+			"InvisibleText ID is present in aria-labelledby even without a heading");
+
+		// Clean up
+		oTitle.destroy();
+	});
 
 	QUnit.test("DynamicPageTitle - AriaLabelledBy is not undefined, when no heading is presented, as default heading text is available", function (assert) {
-	  // Arrange
-	  const oTitle = oFactory.getDynamicPageTitle();
+		// Arrange
+		const oTitle = oFactory.getDynamicPageTitle();
 
-	  //Act
-	  oTitle.destroyAggregation("heading");
+		//Act
+		oTitle.destroyAggregation("heading");
 
-	  oUtil.renderObject(oTitle);
-	  nextUIUpdate.runSync()/*fake timer is used in module*/;
+		oUtil.renderObject(oTitle);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-	  //Assert
-	  assert.ok(oTitle._getFocusSpan()[0].getAttribute("aria-labelledby") != "undefined", "AriaLabelledBy is not undefined, when no heading is presented");
+		//Assert
+		assert.ok(oTitle._getFocusSpan()[0].getAttribute("aria-labelledby") != "undefined", "AriaLabelledBy is not undefined, when no heading is presented");
 
-	  //Cleanup
-	  oTitle.destroy();
-	});
+		//Cleanup
+		oTitle.destroy();
+	  });
 
 	QUnit.module("DynamicPage - Rendering - Title with Breadcrumbs", {
 		beforeEach: function () {

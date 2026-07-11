@@ -191,8 +191,8 @@
 														<custom:JSDocText sanitizeContent="false" text="{path: 'data', formatter: '.formatter.escapeSettingsValue'}"/>
 													</layout:VerticalLayout>
 													<m:MessageStrip
-															visible="{=${deprecated} !== undefined}"
-															text="Deprecated as of version {deprecated/since}"
+															visible="{=${deprecatedText} !== undefined}"
+															text="{path : 'deprecatedText', formatter: '.formatter.formatMessageStripLinks'}"
 															type="Error"
 															showIcon="true"
 															showCloseButton="false"
@@ -200,8 +200,8 @@
 															class="sapUiTinyMarginBottom sapUiTinyMarginTop">
 													</m:MessageStrip>
 													<m:MessageStrip
-															visible="{=${experimental} !== undefined}"
-															text="Experimental API since {experimental/since} {experimental/text}"
+															visible="{=${experimentalText} !== undefined}"
+															text="{path : 'experimentalText'}"
 															type="Warning"
 															showIcon="true"
 															showCloseButton="false"
@@ -258,7 +258,27 @@
 														<custom:ParamText text="{name}" phoneText="{phoneName}" depth="{depth}" optional="{optional}"/>
 														<custom:JSDocType typeInfo="{parts: ['typeInfo', 'types', 'type', 'linkEnabled'], formatter: '.formatter.formatJSDocType'}"/>
 														<m:Text text="{parts: ['defaultValue', 'typeInfo'], formatter: '.formatter.formatParamDefaultValue'}"/>
-														<custom:JSDocText sanitizeContent="false" text="{description}"/>
+														<layout:VerticalLayout>
+															<custom:JSDocText sanitizeContent="false" text="{description}"/>
+															<m:MessageStrip
+																	visible="{=${deprecatedText} !== undefined}"
+																	text="{path : 'deprecatedText', formatter: '.formatter.formatMessageStripLinks'}"
+																	type="Error"
+																	showIcon="true"
+																	showCloseButton="false"
+																	enableFormattedText="true"
+																	class="sapUiTinyMarginBottom sapUiTinyMarginTop">
+															</m:MessageStrip>
+															<m:MessageStrip
+																	visible="{=${experimentalText} !== undefined}"
+																	text="{path : 'experimentalText'}"
+																	type="Warning"
+																	showIcon="true"
+																	showCloseButton="false"
+																	enableFormattedText="true"
+																	class="sapUiTinyMarginBottom sapUiTinyMarginTop">
+															</m:MessageStrip>
+														</layout:VerticalLayout>
 													</custom:Row>
 												</custom:LightTable>
 											</template:if>
@@ -322,8 +342,8 @@
 														class="sapUiTinyMarginBottom sapUiTinyMarginTop">
 													</m:MessageStrip>
 													<m:MessageStrip
-														visible="{=${experimental} !== undefined}"
-														text="Experimental API since {experimental/since} {experimental/text}"
+														visible="{=${experimentalText} !== undefined}"
+														text="{path : 'experimentalText'}"
 														type="Warning"
 														showIcon="true"
 														showCloseButton="false"
@@ -381,8 +401,8 @@
 															class="sapUiTinyMarginBottom sapUiTinyMarginTop">
 													</m:MessageStrip>
 													<m:MessageStrip
-															visible="{=${experimental} !== undefined}"
-															text="Experimental API since {experimental/since} {experimental/text}"
+															visible="{=${experimentalText} !== undefined}"
+															text="{path : 'experimentalText'}"
 															type="Warning"
 															showIcon="true"
 															showCloseButton="false"
@@ -444,8 +464,8 @@
 												<layout:VerticalLayout width="100%">
 													<custom:JSDocText sanitizeContent="false" text="{description}"/>
 													<m:MessageStrip
-															visible="{=${deprecated} !== undefined}"
-															text="Deprecated as of version {deprecated/since}"
+															visible="{=${deprecatedText} !== undefined}"
+															text="{path : 'deprecatedText', formatter: '.formatter.formatMessageStripLinks'}"
 															type="Error"
 															showIcon="true"
 															showCloseButton="false"
@@ -453,8 +473,8 @@
 															class="sapUiTinyMarginBottom sapUiTinyMarginTop">
 													</m:MessageStrip>
 													<m:MessageStrip
-															visible="{=${experimental} !== undefined}"
-															text="Experimental API since {experimental/since} {experimental/text}"
+															visible="{=${experimentalText} !== undefined}"
+															text="{path : 'experimentalText'}"
 															type="Warning"
 															showIcon="true"
 															showCloseButton="false"
@@ -564,6 +584,15 @@
 																			visible="{=${parameter>deprecated} !== undefined}"
 																			text="{path : 'parameter>deprecatedText', formatter: '.formatter.formatMessageStripLinks'}"
 																			type="Error"
+																			showIcon="true"
+																			showCloseButton="false"
+																			enableFormattedText="true"
+																			class="sapUiTinyMarginBottom sapUiTinyMarginTop">
+																	</m:MessageStrip>
+																	<m:MessageStrip
+																			visible="{=${parameter>experimental} !== undefined}"
+																			text="{path : 'parameter>experimentalText'}"
+																			type="Warning"
 																			showIcon="true"
 																			showCloseButton="false"
 																			enableFormattedText="true"
@@ -688,7 +717,27 @@
 																	<custom:ParamText text="{parameter>name}" phoneText="{parameter>phoneName}" depth="{parameter>depth}" optional="{parameter>optional}"/>
 																	<custom:JSDocType typeInfo="{parts: ['parameter>typeInfo','parameter>types'], formatter: '.formatter.stringifyJSDocType'}"/>
 																	<m:Text text="{parts: ['parameter>defaultValue', 'parameter>typeInfo'], formatter: '.formatter.formatParamDefaultValue'}"/>
-																	<custom:JSDocText sanitizeContent="false" text="{path: 'parameter>description', formatter: '.formatter.escapeSettingsValue'}"/>
+																	<layout:VerticalLayout>
+																		<custom:JSDocText sanitizeContent="false" text="{path: 'parameter>description', formatter: '.formatter.escapeSettingsValue'}"/>
+																		<m:MessageStrip
+																				visible="{=${parameter>deprecated} !== undefined}"
+																				text="{path : 'parameter>deprecatedText', formatter: '.formatter.formatMessageStripLinks'}"
+																				type="Error"
+																				showIcon="true"
+																				showCloseButton="false"
+																				enableFormattedText="true"
+																				class="sapUiTinyMarginBottom sapUiTinyMarginTop">
+																		</m:MessageStrip>
+																		<m:MessageStrip
+																				visible="{=${parameter>experimental} !== undefined}"
+																				text="{path : 'parameter>experimentalText'}"
+																				type="Warning"
+																				showIcon="true"
+																				showCloseButton="false"
+																				enableFormattedText="true"
+																				class="sapUiTinyMarginBottom sapUiTinyMarginTop">
+																		</m:MessageStrip>
+																	</layout:VerticalLayout>
 																</custom:Row>
 															</template:repeat>
 														</custom:LightTable>

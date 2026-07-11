@@ -73,8 +73,8 @@ sap.ui.define(['sap/ui/Device', 'sap/base/Log', 'sap/base/util/extend', 'sap/ui/
 	 *     transforming any numbers that look like phone numbers into clickable links
 	 * @param {boolean} [options.useFullScreenHeight=true] whether the height of the html root element should be
 	 *     set to 100%, which is required for other elements to cover the full height
-	 * @param {string}  [options.homeIcon=undefined] deprecated since 1.12, use sap/ui/util/Mobile.setIcons instead.
-	 * @param {boolean} [options.homeIconPrecomposed=false] deprecated since 1.12, use sap/ui/util/Mobile.setIcons instead.
+	 * @param {string}  [options.homeIcon=undefined] {@deprecated since 1.12, use sap/ui/util/Mobile.setIcons instead.}
+	 * @param {boolean} [options.homeIconPrecomposed=false] {@deprecated since 1.12, use sap/ui/util/Mobile.setIcons instead.}
 	 * @param {boolean} [options.mobileWebAppCapable=true] whether the Application will be loaded in full screen
 	 *     mode after added to home screen on mobile devices. The default value for this property only enables the
 	 *     full screen mode when runs on iOS device.
