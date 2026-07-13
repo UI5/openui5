@@ -143,5 +143,15 @@
         "text": " Field, FilterField: boolean value announed twice"
       }
     ]
+  },
+  "1.148.3": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "96fef897044064f9d1ca6368e38aa0cb3dfe27de",
+        "type": "FIX",
+        "text": " Table: Duplicate ID issue in filter info bar handling"
+      }
+    ]
   }
 }

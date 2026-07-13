@@ -38,5 +38,15 @@
         "text": " sap.m.GridListItem: Missing shadow on selected state added"
       }
     ]
+  },
+  "1.148.3": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "52d90fce8458ab032b4216832469e7667bb1d9b3",
+        "type": "FIX",
+        "text": " sap.f: add missing Search component to ui5-build.yaml"
+      }
+    ]
   }
 }

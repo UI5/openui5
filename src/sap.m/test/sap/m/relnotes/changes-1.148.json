@@ -293,5 +293,15 @@
         "text": " sap.m.MessageBox: box shadow of the header fixed"
       }
     ]
+  },
+  "1.148.3": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "d9374755572b656ab44daef3e16c1f547a09f365",
+        "type": "FIX",
+        "text": " sap.m.ObjectHeader: image is decorative if the alt is empty"
+      }
+    ]
   }
 }
