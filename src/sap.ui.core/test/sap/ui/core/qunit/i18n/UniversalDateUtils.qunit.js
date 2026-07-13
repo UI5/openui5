@@ -76,6 +76,30 @@ sap.ui.define([
 	});
 });
 
+	// SNOW: CS20260012798611: week-based ranges must respect a custom first day of week set via
+	// Configuration.getFormatSettings().setFirstDayOfWeek(), independent of the locale default.
+[
+	{iFirstDay: 1, iOffsetDay: 0}, // Monday start: current week
+	{iFirstDay: 1, iOffsetDay: 7}, // Monday start: next week
+	{iFirstDay: 3, iOffsetDay: 0}, // Wednesday start: current week
+	{iFirstDay: 3, iOffsetDay: 7}  // Wednesday start: next week
+].forEach(function (oFixture, i) {
+	QUnit.test("_getDateFromWeekStartByDayOffset respects setFirstDayOfWeek override #" + i, function (assert) {
+		var oDate = new UniversalDate(2025, 2, 16, 0, 0, 0);
+
+		Configuration.getFormatSettings().setFirstDayOfWeek(oFixture.iFirstDay);
+		this.mock(UniversalDateUtils).expects("createNewUniversalDate").withExactArgs().returns(oDate);
+
+		// code under test
+		assert.strictEqual(
+			UniversalDateUtils._getDateFromWeekStartByDayOffset(undefined, oFixture.iOffsetDay).getDay(),
+			oFixture.iFirstDay,
+			"_getDateFromWeekStartByDayOffset: The date that is returned is correctly created.");
+
+		delete Configuration.getFormatSettings().getCustomLocaleData()["weekData-firstDay"];
+	});
+});
+
 	QUnit.test("Static Methods Test getRange", function (assert) {
 
 		var oDate = new UniversalDate();

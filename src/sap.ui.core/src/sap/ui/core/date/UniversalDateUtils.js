@@ -367,7 +367,7 @@ sap.ui.define(['sap/ui/core/date/UniversalDate', 'sap/ui/core/Locale', 'sap/ui/c
 		 */
 		UniversalDateUtils._getDateFromWeekStartByDayOffset = function (sCalendarWeekNumbering, iDaysToAdd) {
 			var sCalendarType = Configuration.getCalendarType(),
-				oLocale = new Locale(Configuration.getFormatLocale()),
+				oLocale = Configuration.getFormatSettings().getFormatLocale(),
 				oUniversalDate = UniversalDateUtils.createNewUniversalDate(),
 				iWeek = oUniversalDate.getWeek().week,
 				iYear = oUniversalDate.getWeek().year,
