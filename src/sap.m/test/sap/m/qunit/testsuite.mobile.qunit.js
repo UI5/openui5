@@ -108,6 +108,15 @@ sap.ui.define([
 					useFakeTimers: true
 				}
 			},
+			ButtonTooltipEnablement: {
+				title: "Test Page for sap.m.Button with enhanced tooltip",
+				ui5: {
+					language: "en"
+				},
+				sinon: {
+					useFakeTimers: true
+				}
+			},
 			CSSClassesFromParameters: {
 				/*
 				 * Page kept because of

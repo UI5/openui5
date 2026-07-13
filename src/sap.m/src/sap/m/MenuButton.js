@@ -327,6 +327,7 @@ sap.ui.define([
 				width: "100%",
 				ariaHasPopup: coreLibrary.aria.HasPopup.Menu
 			});
+			oBtn._disableTooltipEnablement();
 			oBtn.attachPress(this._handleButtonPress, this);
 			oBtn.onkeydown = this.handleKeydown;
 			return oBtn;
