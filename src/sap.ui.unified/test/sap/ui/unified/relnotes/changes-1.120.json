@@ -229,5 +229,15 @@
         "text": " sap.m.DateRangeSelection: selection via keyboard is working"
       }
     ]
+  },
+  "1.120.47": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "0a960429814c937f658d062f078d412130109376",
+        "type": "FIX",
+        "text": " sap.m.DynamicDateRange: week number click does not populate footer dates and enable Apply button"
+      }
+    ]
   }
 }

@@ -1521,5 +1521,45 @@
         "text": " m.Table: avoid scroll jump when focus is forwarded on mouse click"
       }
     ]
+  },
+  "1.120.47": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "72832ec5cf45eb5526f71b1bf38f34f4c6ca30dc",
+        "type": "FIX",
+        "text": " mdc/SmartChart: 'View By' popover now have correct announcement."
+      },
+      {
+        "id": "2e91f7882ba155a91ad287eafe9723629a35343b",
+        "type": "FIX",
+        "text": " sap.m.ObjectHeader: image is decorative if for the alt empty"
+      },
+      {
+        "id": "0a960429814c937f658d062f078d412130109376",
+        "type": "FIX",
+        "text": " sap.m.DynamicDateRange: week number click does not populate footer dates and enable Apply button"
+      },
+      {
+        "id": "b95b4cfc63b1e4ab599b1faa4ac2238925952d81",
+        "type": "FIX",
+        "text": " sap.m.IconTabBar: sapFontHeaderFamily added to allow overstyling in Theme designer"
+      },
+      {
+        "id": "006876c0a0c5c56a4da302241fa372dd4c991b36",
+        "type": "FIX",
+        "text": " sap.m.TimePickerClock: Replace inline drag event attributes with addEventListener"
+      },
+      {
+        "id": "4af0bcdef2349208e018c0148398cd5f24db6e88",
+        "type": "FIX",
+        "text": " Table settings: message strip not announced"
+      },
+      {
+        "id": "6b9ec48386dc95eb84bec4afb02b4ae186143bfc",
+        "type": "FIX",
+        "text": " sap.m.ComboBox: adjust failing tests in FF"
+      }
+    ]
   }
 }

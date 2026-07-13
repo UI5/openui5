@@ -330,5 +330,15 @@
         "text": " sap.f.FlexibleColumnLayout: Store begin column width"
       }
     ]
+  },
+  "1.120.47": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "847313472b3b1ccfc0b5954ad97981511086e9e2",
+        "type": "FIX",
+        "text": " sap.f.DynamicPage: Cache scrollbar width to avoid excessive style recalculations"
+      }
+    ]
   }
 }

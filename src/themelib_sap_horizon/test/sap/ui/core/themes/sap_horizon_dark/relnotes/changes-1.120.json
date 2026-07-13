@@ -361,5 +361,15 @@
         "text": " Hierarchical Select: Fix styles Horizon"
       }
     ]
+  },
+  "1.120.47": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "b95b4cfc63b1e4ab599b1faa4ac2238925952d81",
+        "type": "FIX",
+        "text": " sap.m.IconTabBar: sapFontHeaderFamily added to allow overstyling in Theme designer"
+      }
+    ]
   }
 }

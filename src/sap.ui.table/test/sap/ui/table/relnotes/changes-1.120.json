@@ -105,5 +105,15 @@
         "text": " ui.Table: Removed column header associations and count information on cell level"
       }
     ]
+  },
+  "1.120.47": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "7f7a9c707923883fddf166988e7cf97275ffcf99",
+        "type": "FIX",
+        "text": " ui.Table: Prevent page scrolling on space keydown on cell level"
+      }
+    ]
   }
 }
