@@ -115,6 +115,7 @@ sap.ui.define(function() {
 
 			opa: {},
 			support: {},
+			tooltip: {},
 			types: {},
 			util: {},
 			rule: {},

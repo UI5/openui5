@@ -66,7 +66,7 @@ sap.ui.define([
 			const aCombinedItems = oOriginalData.navigation.concat(oOriginalData.fixedNavigation);
 			const iMatchCount = this._countItems(aCombinedItems, sValue);
 
-			oNavigationList.announceMatchCount(iMatchCount);
+			oNavigationList.announceSearchMatchCount(iMatchCount);
 		},
 
 		onLiveChange: function (oEvent) {

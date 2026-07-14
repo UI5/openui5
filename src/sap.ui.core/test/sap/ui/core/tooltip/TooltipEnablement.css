@@ -1,0 +1,40 @@
+h1 { font-size: 1.5rem; margin-top: 0; }
+h2 { font-size: 1.125rem; margin: 1.5rem 0 0.5rem; }
+.row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	align-items: center;
+}
+.activation-banner {
+	position: fixed;
+	top: 0.5rem;
+	left: 50%;
+	transform: translateX(-50%);
+	padding: 0.4rem 0.9rem;
+	background: #0070f2;
+	color: #fff;
+	border-radius: 0.25rem;
+	font: inherit;
+	z-index: 10000;
+	pointer-events: none;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.long-press-banner {
+	position: fixed;
+	top: 3rem;
+	left: 50%;
+	transform: translateX(-50%);
+	padding: 0.4rem 0.9rem;
+	background: #d32f2f;
+	color: #fff;
+	border-radius: 0.25rem;
+	font: inherit;
+	z-index: 10000;
+	pointer-events: none;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.label {
+	min-width: 12rem;
+	color: #555;
+}

@@ -54,6 +54,10 @@ sap.ui.define([
 			oRm.style("min-height", sHeight);
 		}
 
+		if (oCardContent._iKeptWidth) {
+			oRm.style("min-width", oCardContent._iKeptWidth + "px");
+		}
+
 		this.renderLoadingClass(oRm, oCardContent);
 
 		oRm.openEnd();

@@ -196,7 +196,6 @@ sap.ui.define([
 		this._oAwaitedEvents = new Set();
 		this._bReady = false;
 		this._mObservers = {};
-		this._bChildCardOpenedInDialog = false;
 
 		this.setAggregation("_loadingProvider", new LoadingProvider());
 		this.awaitEvent("_dataReady");
@@ -230,6 +229,8 @@ sap.ui.define([
 			this._oOverflowHandler.attach();
 		}
 	};
+
+	BaseContent.prototype.onAfterRendering = function () { };
 
 	/**
 	 * Handles tap event.
@@ -274,8 +275,6 @@ sap.ui.define([
 			this._oOverflowHandler.destroy();
 			this._oOverflowHandler = null;
 		}
-
-		this._bChildCardOpenedInDialog = false;
 	};
 
 	/**
@@ -308,8 +307,25 @@ sap.ui.define([
 	 * @protected
 	 */
 	BaseContent.prototype.onOpenInDialog = function () {
-		this._bChildCardOpenedInDialog = true;
-		this.adjustLoadingPlaceholderWidth();
+		this._keepWidth();
+	};
+
+	/**
+	 * Called when the user resizes the dialog hosting this card.
+	 * @protected
+	 */
+	BaseContent.prototype.onDialogResize = function () {
+		this._releaseWidth();
+	};
+
+	BaseContent.prototype.isInDialog = function () {
+		const oCard = this.getCardInstance();
+
+		if (!oCard) {
+			return false;
+		}
+
+		return !!oCard.getAssociation("openerReference");
 	};
 
 	BaseContent.prototype.setLoadDependenciesPromise = function (oPromise) {
@@ -323,15 +339,33 @@ sap.ui.define([
 
 
 	/**
-	 * Adjusts the loading placeholder width to match the content width when the card is opened in a dialog.
+	 * Keeps the current content width as min-width when inside a dialog.
 	 * @private
 	 */
-	BaseContent.prototype.adjustLoadingPlaceholderWidth = function () {
-		const oChildCard = this.getCardInstance();
-		const oContentLoadingPlaceHolder = this.getAggregation("_loadingPlaceholder");
+	BaseContent.prototype._keepWidth = function () {
+		if (!this.isInDialog()) {
+			return;
+		}
 
-		if (oChildCard && this?.getDomRef() && oContentLoadingPlaceHolder) {
-			oContentLoadingPlaceHolder.setWidth(this.getDomRef().getBoundingClientRect().width + "px");
+		const oDomRef = this.getDomRef();
+
+		if (!oDomRef) {
+			return;
+		}
+
+		this._iKeptWidth = oDomRef.getBoundingClientRect().width;
+		oDomRef.style.minWidth = this._iKeptWidth + "px";
+	};
+
+	/**
+	 * Releases the kept min-width.
+	 * @private
+	 */
+	BaseContent.prototype._releaseWidth = function () {
+		delete this._iKeptWidth;
+
+		if (this.getDomRef()) {
+			this.getDomRef().style.minWidth = "";
 		}
 	};
 
@@ -700,9 +734,6 @@ sap.ui.define([
 			return;
 		}
 
-		if (this._bChildCardOpenedInDialog) {
-			this.adjustLoadingPlaceholderWidth();
-		}
 		var oLoadingProvider = this.getAggregation("_loadingProvider"),
 			oCard = this.getCardInstance();
 

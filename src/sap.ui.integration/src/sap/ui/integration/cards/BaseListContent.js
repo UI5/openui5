@@ -57,6 +57,8 @@ sap.ui.define([
 	};
 
 	BaseListContent.prototype.onAfterRendering = function () {
+		BaseContent.prototype.onAfterRendering.apply(this, arguments);
+
 		if (this.isReady() && this.getCardInstance()?.isReady()) {
 			if (this._hasWidthChanged()) {
 				this._resetHeightCalculations();

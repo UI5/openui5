@@ -410,7 +410,7 @@ sap.ui.define([
 				const combinedItems = data.navigation.concat(data.fixedNavigation);
 				const matchCount = countItems(combinedItems, value);
 
-				flexibleNavigationList.announceMatchCount(matchCount);
+				flexibleNavigationList.announceSearchMatchCount(matchCount);
 			},
 			liveChange: function (event) {
 				const value = event.getSource().getValue();

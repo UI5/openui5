@@ -43,7 +43,7 @@
 		"@ui5/server": "^4.0.15",
 		"async": "^3.2.6",
 		"cheerio": "1.0.0",
-		"cookie": "^1.0.2",
+		"cookie": "^2.0.0",
 		"decompress": "^4.2.1",
 		"eslint": "^8.57.1",
 		"glob": "^11.1.0",

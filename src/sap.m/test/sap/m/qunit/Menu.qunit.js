@@ -1332,6 +1332,47 @@ sap.ui.define([
 		Localization.setRTL(bOriginalRTL);
 	});
 
+	QUnit.test("'openAsContextMenu' does not remove pointer element of another menu instance", async function (assert) {
+		// Prepare
+		const oMenu2 = new Menu({
+			items: [new MenuItem({ text: "Second menu item" })]
+		}).placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		const oEvent = {
+			type: "contextmenu",
+			button: 2,
+			pageX: 10,
+			pageY: 10,
+			clientX: 10,
+			clientY: 10
+		};
+
+		// Act — open first menu
+		this.oMenu.openAsContextMenu(oEvent);
+		await nextUIUpdate(this.clock);
+
+		const oFirstPointer = this.oMenu._oPointerElement;
+		assert.ok(oFirstPointer && oFirstPointer.isConnected, "First menu's pointer element is in the DOM");
+
+		// Act — open second menu while first is still open
+		oMenu2.openAsContextMenu(oEvent);
+		await nextUIUpdate(this.clock);
+
+		// Assert — first menu's pointer is gone (it closed), second menu has its own pointer
+		assert.ok(oMenu2._oPointerElement && oMenu2._oPointerElement.isConnected, "Second menu's pointer element is in the DOM");
+		assert.notEqual(oMenu2._oPointerElement, oFirstPointer, "Second menu uses its own pointer element, not the first menu's");
+
+		// Act — close the second menu and verify its pointer is cleaned up
+		oMenu2.close();
+		await nextUIUpdate(this.clock);
+
+		assert.notOk(oMenu2._oPointerElement, "Second menu's pointer element is cleared after close");
+
+		// Cleanup
+		oMenu2.destroy();
+	});
+
 	QUnit.test("focus management", async function (assert) {
 		// Arrange
 		const oMenu = this.oMenu;

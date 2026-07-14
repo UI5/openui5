@@ -28,6 +28,21 @@ sap.ui.define([
 	"use strict";
 	const DOM_RENDER_LOCATION = "qunit-fixture";
 
+	function stubNorthwindFetch() {
+		const aValues = [];
+
+		for (let i = 1; i <= 50; i++) {
+			aValues.push({ ProductName: "Product " + i, UnitsInStock: i });
+		}
+
+		return sinon.stub(RequestDataProvider.prototype, "_fetch").callsFake(function () {
+			return Promise.resolve({
+				"@odata.count": aValues.length,
+				value: aValues
+			});
+		});
+	}
+
 	QUnit.module("openCardDialog", {
 		beforeEach: async function () {
 			const sBaseUrl = "ShowHideCardActionsFakeUrl/";
@@ -601,13 +616,16 @@ sap.ui.define([
 					}
 				}
 			});
+
+			this.oFetchStub = stubNorthwindFetch();
 		},
 		afterEach: function () {
 			this.oHost.destroy();
+			this.oFetchStub.restore();
 		}
 	});
 
-	QUnit.test("Loading placeholder should have width when card opens in dialog", async function (assert) {
+	QUnit.test("Content keeps width during a long-running refresh and matches after data arrives", async function (assert) {
 		// Arrange
 		const oCard = new Card({
 			host: this.oHost,
@@ -618,28 +636,206 @@ sap.ui.define([
 		await nextCardReadyEvent(oCard);
 		await nextUIUpdate();
 
-		// Act
-		const oButton = oCard.getCardFooter().getAggregation("_showMore");
-		oButton.firePress();
+		// Open the dialog with the child card
+		oCard.getCardFooter().getAggregation("_showMore").firePress();
 		const oDialog = oCard.getDependents()[0];
 		await nextDialogAfterOpenEvent(oDialog);
 		await nextUIUpdate();
 
-		// Assert - check loading placeholder has width set
 		const oChildCard = oDialog.getContent()[0];
 		const oContent = oChildCard.getCardContent();
-		const oLoadingPlaceholder = oContent.getAggregation("_loadingPlaceholder");
+		const sWidthAtOpen = oContent.getDomRef().style.minWidth;
+		const iContentWidthAtOpen = oContent.getDomRef().offsetWidth;
 
-		oChildCard.refresh();
+		assert.ok(parseFloat(sWidthAtOpen) > 0, "Content has a non-zero min-width after dialog open");
+		assert.strictEqual(sWidthAtOpen, iContentWidthAtOpen + "px", "min-width matches measured width at open");
 
-		await nextCardReadyEvent(oChildCard);
+		// Stall the next data request so the loading placeholder stays visible
+		const oGetData = new Deferred();
+		this.stub(DataProvider.prototype, "getData").returns(oGetData.promise);
+
+		// Act - trigger a long-running data refresh (keeps content alive, unlike Card#refresh)
+		oChildCard.refreshData();
 		await nextUIUpdate();
 
-		// Assert - check loading placeholder still has width after refresh
-		const sWidthAfterRefresh = oLoadingPlaceholder.getWidth();
-		assert.strictEqual(sWidthAfterRefresh, oChildCard.getCardContent().getDomRef().offsetWidth + "px","Loading placeholder has width property set after refresh");
+		// Assert - during loading, the placeholder is rendered and min-width is preserved
+		assert.ok(oContent.isLoading(), "Content is loading during the long-running refresh");
+		assert.strictEqual(oContent.getDomRef().style.minWidth, sWidthAtOpen, "Content retains min-width while placeholder is shown");
+		const oPlaceholder = oContent.getAggregation("_loadingPlaceholder");
+		assert.ok(oPlaceholder.getDomRef(), "Loading placeholder is rendered");
+
+		// Release the data
+		oGetData.resolve([]);
+		await nextUIUpdate();
+
+		// Assert - after data arrives, no width change
+		assert.strictEqual(oContent.getDomRef().style.minWidth, sWidthAtOpen, "Content min-width unchanged after data load");
+		assert.strictEqual(oContent.getDomRef().offsetWidth, iContentWidthAtOpen, "Content rendered width unchanged after data load");
 
 		// Clean up
+		oCard.destroy();
+	});
+
+	QUnit.module("Child card - dialog drag/resize gestures", {
+		beforeEach: function () {
+			this.oHost = new Host({
+				resolveDestination: function (sName) {
+					switch (sName) {
+						case "Northwind_V4":
+							return Promise.resolve("https://services.odata.org/V4/Northwind/Northwind.svc");
+						default:
+							return null;
+					}
+				}
+			});
+
+			this.oFetchStub = stubNorthwindFetch();
+		},
+		afterEach: function () {
+			this.oHost.destroy();
+			this.oFetchStub.restore();
+		}
+	});
+
+	QUnit.test("Mouse-down on resize handle releases the kept min-width", async function (assert) {
+		const oCard = new Card({
+			host: this.oHost,
+			manifest: "test-resources/sap/ui/integration/qunit/manifests/showCardHeader/manifest.json"
+		});
+		oCard.placeAt(DOM_RENDER_LOCATION);
+
+		await nextCardReadyEvent(oCard);
+		await nextUIUpdate();
+
+		oCard.getCardFooter().getAggregation("_showMore").firePress();
+		const oDialog = oCard.getDependents()[0];
+		await nextDialogAfterOpenEvent(oDialog);
+		await nextUIUpdate();
+
+		const oChildCard = oDialog.getContent()[0];
+		const oContent = oChildCard.getCardContent();
+
+		assert.ok(parseFloat(oContent.getDomRef().style.minWidth) > 0, "min-width is set before resize gesture");
+
+		const oResizeHandle = oDialog.getDomRef().querySelector(".sapMDialogResizeHandle");
+		assert.ok(oResizeHandle, "Resize handle exists in DOM");
+
+		oDialog.onmousedown({
+			which: 1,
+			target: oResizeHandle,
+			clientX: 0,
+			clientY: 0,
+			offsetX: 0,
+			offsetY: 0,
+			stopPropagation: function () {}
+		});
+
+		assert.strictEqual(oContent.getDomRef().style.minWidth, "", "min-width is released after mousedown on resize handle");
+		assert.notOk(oContent._iKeptWidth, "Kept width is cleared on the content");
+
+		oCard.destroy();
+	});
+
+	QUnit.test("Mouse-down outside the resize handle does NOT release the kept min-width", async function (assert) {
+		const oCard = new Card({
+			host: this.oHost,
+			manifest: "test-resources/sap/ui/integration/qunit/manifests/showCardHeader/manifest.json"
+		});
+		oCard.placeAt(DOM_RENDER_LOCATION);
+
+		await nextCardReadyEvent(oCard);
+		await nextUIUpdate();
+
+		oCard.getCardFooter().getAggregation("_showMore").firePress();
+		const oDialog = oCard.getDependents()[0];
+		await nextDialogAfterOpenEvent(oDialog);
+		await nextUIUpdate();
+
+		const oChildCard = oDialog.getContent()[0];
+		const oContent = oChildCard.getCardContent();
+		const sKeptWidth = oContent.getDomRef().style.minWidth;
+
+		oDialog.onmousedown({
+			which: 1,
+			target: oContent.getDomRef(),
+			clientX: 0,
+			clientY: 0,
+			offsetX: 0,
+			offsetY: 0,
+			stopPropagation: function () {}
+		});
+
+		assert.strictEqual(oContent.getDomRef().style.minWidth, sKeptWidth, "min-width is preserved on non-resize mousedown");
+
+		oCard.destroy();
+	});
+
+	QUnit.test("Keyboard Shift+Arrow on resize handle releases the kept min-width", async function (assert) {
+		const oCard = new Card({
+			host: this.oHost,
+			manifest: "test-resources/sap/ui/integration/qunit/manifests/showCardHeader/manifest.json"
+		});
+		oCard.placeAt(DOM_RENDER_LOCATION);
+
+		await nextCardReadyEvent(oCard);
+		await nextUIUpdate();
+
+		oCard.getCardFooter().getAggregation("_showMore").firePress();
+		const oDialog = oCard.getDependents()[0];
+		await nextDialogAfterOpenEvent(oDialog);
+		await nextUIUpdate();
+
+		const oChildCard = oDialog.getContent()[0];
+		const oContent = oChildCard.getCardContent();
+
+		assert.ok(parseFloat(oContent.getDomRef().style.minWidth) > 0, "min-width is set before keyboard resize");
+
+		const oHandler = oDialog.getDomRef("dragAndResizeHandler");
+		assert.ok(oHandler, "dragAndResizeHandler element exists");
+
+		oDialog._handleKeyboardDragResize({
+			target: oHandler,
+			keyCode: 39, // ArrowRight
+			shiftKey: true,
+			preventDefault: function () {}
+		});
+
+		assert.strictEqual(oContent.getDomRef().style.minWidth, "", "min-width is released after Shift+Arrow");
+		assert.notOk(oContent._iKeptWidth, "Kept width is cleared on the content");
+
+		oCard.destroy();
+	});
+
+	QUnit.test("Keyboard Arrow without Shift (drag, not resize) does NOT release the kept min-width", async function (assert) {
+		const oCard = new Card({
+			host: this.oHost,
+			manifest: "test-resources/sap/ui/integration/qunit/manifests/showCardHeader/manifest.json"
+		});
+		oCard.placeAt(DOM_RENDER_LOCATION);
+
+		await nextCardReadyEvent(oCard);
+		await nextUIUpdate();
+
+		oCard.getCardFooter().getAggregation("_showMore").firePress();
+		const oDialog = oCard.getDependents()[0];
+		await nextDialogAfterOpenEvent(oDialog);
+		await nextUIUpdate();
+
+		const oChildCard = oDialog.getContent()[0];
+		const oContent = oChildCard.getCardContent();
+		const sKeptWidth = oContent.getDomRef().style.minWidth;
+
+		const oHandler = oDialog.getDomRef("dragAndResizeHandler");
+
+		oDialog._handleKeyboardDragResize({
+			target: oHandler,
+			keyCode: 39,
+			shiftKey: false,
+			preventDefault: function () {}
+		});
+
+		assert.strictEqual(oContent.getDomRef().style.minWidth, sKeptWidth, "min-width is preserved on drag (Arrow without Shift)");
+
 		oCard.destroy();
 	});
 

@@ -676,13 +676,16 @@ sap.ui.define([
 	};
 
 	/**
-	 * Announces the number of search matches found in the navigation list.
+	 * Announces the number of search matches found in the navigation list to assistive technologies.
 	 *
-	 * @param {int} iCount The number of matching items.
+	 * This method uses an invisible live region message so screen readers can inform users
+	 * about the current number of search matches.
+	 *
+	 * @param {int} iCount The number of matching navigation items.
 	 * @since 1.151
 	 * @public
 	 */
-	NavigationList.prototype.announceMatchCount = function (iCount) {
+	NavigationList.prototype.announceSearchMatchCount = function (iCount) {
 		const oRB = Lib.getResourceBundleFor("sap.tnt");
 
 		const sText = iCount === 1
@@ -691,6 +694,7 @@ sap.ui.define([
 
 		InvisibleMessage.getInstance().announce(sText, InvisibleMessageMode.Polite);
 	};
+
 
 	return NavigationList;
 });
