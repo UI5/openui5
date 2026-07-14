@@ -121,11 +121,30 @@ sap.ui.define([
 				},
 				afterOpen: () => {
 					oParentCard.setBusy(false);
+					oChildCard.getCardContent()?.onOpenInDialog();
 				},
 				afterClose: () => {
 					oDialog.destroy();
 				}
 			});
+
+		// Notify the content when the user starts resizing the dialog so it can
+		// release any kept width and let the dialog shrink freely.
+		const fnOriginalOnMouseDown = oDialog.onmousedown;
+		oDialog.onmousedown = function (oEvent) {
+			if (oEvent.target.closest(".sapMDialogResizeHandle")) {
+				oChildCard.getCardContent()?.onDialogResize();
+			}
+			fnOriginalOnMouseDown.apply(this, arguments);
+		};
+
+		const fnOriginalKeyboardDragResize = oDialog._handleKeyboardDragResize;
+		oDialog._handleKeyboardDragResize = function (oEvent) {
+			if (oEvent.shiftKey) {
+				oChildCard.getCardContent()?.onDialogResize();
+			}
+			fnOriginalKeyboardDragResize.apply(this, arguments);
+		};
 
 		oDialog.addStyleClass("sapUiIntCardDialog");
 
@@ -141,8 +160,6 @@ sap.ui.define([
 			if (!oChildCard._isComponentCard()) {
 				oDialog.open();
 			}
-
-			oChildCard.getCardContent()?.onOpenInDialog();
 
 			_setFocus(oChildCard, oDialog);
 		});

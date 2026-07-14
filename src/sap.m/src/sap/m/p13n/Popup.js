@@ -44,7 +44,7 @@ sap.ui.define([
 	const {P13nPopupMode} = mLibrary;
 
 	//Shortcut to sap.ui.core.TitleLevel
-	const {TitleLevel} = coreLibrary;
+	const {TitleLevel, InvisibleMessage, InvisibleMessageMode} = coreLibrary;
 
 	/**
 	 * Constructor for a new <code>Popup</code>.
@@ -158,6 +158,7 @@ sap.ui.define([
 			resetText: this.oResourceBundle.getText("p13n.POPUP_RESET")
 		});
 		this.setModel(oModel, this.LOCALIZATION_MODEL);
+		this.oInvisibleMessage = InvisibleMessage.getInstance();
 	};
 
 	/**
@@ -531,6 +532,7 @@ sap.ui.define([
 				oPanel.onReset();
 			}
 		});
+		this.oInvisibleMessage.announce(this.oResourceBundle.getText("p13n.POPUP_ANNOUNCEMENT_RESET"), InvisibleMessageMode.Assertive);
 	};
 
 	Popup.prototype._getContainer = function(bWithoutSwitch) {

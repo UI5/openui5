@@ -6,25 +6,22 @@
 sap.ui.define([
 	"sap/m/library",
 	"sap/ui/core/Control",
+	"sap/ui/core/tooltip/TooltipManager",
 	"sap/ui/Device",
 	"sap/m/Text",
-	"sap/ui/core/InvisibleText",
 	"sap/m/Popover"
 ],
 	function(
 		library,
 		Control,
+		TooltipManager,
 		Device,
 		Text,
-		InvisibleText,
 		Popover
 	) {
 		"use strict";
 
 		const PlacementType = library.PlacementType;
-
-		// Shortened open/close delay
-		const TOOLTIP_HANDOFF_DELAY = 200;
 
 		/**
 		* Constructor for a new Tooltip.
@@ -40,6 +37,12 @@ sap.ui.define([
 		*
 		* <h3>Usage</h3>
 		* Use the tooltip for brief, supplementary information about a control.
+		*
+		* <b>Note:</b> Do not instantiate <code>sap.m.Tooltip</code> directly from
+		* a control. Use {@link sap.ui.core.tooltip.TooltipEnablement} as the integration
+		* point — it creates and owns a <code>sap.m.Tooltip</code> internally
+		* and handles hover, focus, touch and the ARIA anchor on behalf of the
+		* host control.
 		*
 		* <h4>When to use:</h4>
 		* <ul>
@@ -60,7 +63,7 @@ sap.ui.define([
 		* </ul>
 		*
 		* <h3>Accessibility</h3>
-		* Use aria-describedBy to associate the tooltip with the control it describes.
+		* Use {@link sap.ui.core.tooltip.TooltipEnablement} to create an invisible tooltip and associate it with the control it describes.
 		*
 		* @extends sap.ui.core.Control
 		* @implements sap.ui.core.PopupInterface
@@ -79,16 +82,13 @@ sap.ui.define([
 				properties: {
 					/**
 					 * The text of the tooltip.
+					 * @since 1.151
 					 */
 					text: {type: "string", group: "Appearance", defaultValue: ""},
 
 					/**
-					 * If mobile context menu should open first instead of the tooltip
-					 */
-					disabledForMobile: {type: "boolean", group: "Appearance", defaultValue: false},
-
-					/**
 					 * Defines the placement of the tooltip relative to its target.
+					 * @since 1.151
 					 */
 					placement: {
 						type: "sap.m.PlacementType", group: "Behavior", defaultValue: PlacementType.VerticalPreferredTop
@@ -98,8 +98,22 @@ sap.ui.define([
 					 * Defines the delay in milliseconds after which the tooltip will be shown.
 					 * <b>Note:</b> The delay of show/dismiss Tooltip only applies on mouse and keyboard focus.
 					 * With gesture from touch and keyboard shortcut, the tooltip will be displayed / dismissed immediately.
+					 * @since 1.151
 					 */
 					delay: {type: "int", group: "Behavior", defaultValue: 500}
+				},
+				events: {
+					/**
+					 * Fired after the tooltip has opened (Popover afterOpen has run, placement applied).
+					 * @since 1.151
+					 */
+					afterOpen: {},
+
+					/**
+					 * Fired after the tooltip has closed (Popover afterClose has run, timers cleared).
+					 * @since 1.151
+					 */
+					afterClose: {}
 				}
 			},
 			renderer: {
@@ -108,14 +122,15 @@ sap.ui.define([
 			}
 		});
 
+		Tooltip.prototype.init = function () {
+			this.attachAfterClose(() => {
+				TooltipManager.deregister(this);
+			});
+		};
+
 		Tooltip.prototype.exit = function () {
 
-			this._removeAriaDescribedBy();
-
-			if (this._oInvisibleText) {
-				this._oInvisibleText.destroy();
-				this._oInvisibleText = null;
-			}
+			TooltipManager.deregister(this);
 
 			if (this._oPopover) {
 				this._oPopover.destroy();
@@ -134,7 +149,6 @@ sap.ui.define([
 			}
 
 			this._bOpenRequested = false;
-			Tooltip.registry.delete(this);
 		};
 
 		Tooltip.prototype._onPopoverMouseEnter = function () {
@@ -142,11 +156,9 @@ sap.ui.define([
 				clearTimeout(this._iCloseTimeout);
 				this._iCloseTimeout = null;
 			}
-			this._bIsMouseOver = true;
 		};
 
 		Tooltip.prototype._onPopoverMouseLeave = function () {
-			this._bIsMouseOver = false;
 			if (this._bIsOpen) {
 				this.close(500);
 			}
@@ -254,6 +266,7 @@ sap.ui.define([
 			// Mark the intent to open immediately so a close() that arrives while we
 			// are still awaiting Popover instantiation can cancel the pending open.
 			this._bOpenRequested = true;
+			TooltipManager.registerOpening(this);
 
 			// Cache the in-flight Promise so simultaneous callers (e.g. mouseenter+focusin)
 			// share a single Popover instance instead of racing and leaking duplicates.
@@ -275,24 +288,19 @@ sap.ui.define([
 				return;
 			}
 
-			let iEffectiveDelay = iDelay;
-			if (Tooltip.registry.size > 0) {
-				Tooltip.closeAllButCurrent(this);
-				iEffectiveDelay = TOOLTIP_HANDOFF_DELAY;
-			}
-
 			this._iOpenTimeout = setTimeout(() => {
 				this._iOpenTimeout = null;
 				// A close() that arrived between scheduling and firing has cleared the open intent — abort.
 				if (!this._bOpenRequested) {
-					Tooltip.registry.delete(this);
 					return;
 				}
 				// Final selection guard: if a selection appeared during the open delay
 				// (e.g. user is mid-drag-select or about to right-click a selection), suppress the open so the popover render does not clear the selection.
 				const oSelection = window.getSelection && window.getSelection();
 				if (oSelection && oSelection.toString().length > 0) {
-					Tooltip.registry.delete(this);
+					// Popover never opens → afterClose won't fire, deregister here.
+					this._bOpenRequested = false;
+					TooltipManager.deregister(this);
 					return;
 				}
 				this._oPopover.getContent()[0].setText(this.getText());
@@ -300,10 +308,7 @@ sap.ui.define([
 				this._oPopover.setPlacement(mPromoteToPreferred[sPlacement] || sPlacement);
 				this._oPopover.openBy(oControl);
 				this._bIsOpen = true;
-				this._setAriaDescribedBy(oControl);
-			}, iEffectiveDelay);
-
-			Tooltip.registry.add(this);
+			}, iDelay);
 		};
 
 		// Resolve the host control's DOM element from a UI5 control or a plain HTMLElement.
@@ -317,50 +322,10 @@ sap.ui.define([
 			return (oControl.getDomRef && oControl.getDomRef()) || null;
 		};
 
-		// Wire the tooltip text into the host's aria-describedby so screen readers
-		// announce the tooltip content alongside the host's own accessible name.
-		Tooltip.prototype._setAriaDescribedBy = function (oControl) {
-			const oHost = this._getHostElement(oControl);
-			if (!oHost) {
-				return;
-			}
-
-			// Lazily create a single static InvisibleText carrying the tooltip's text.
-			// Using core/InvisibleText avoids the need for a renderer DOM node.
-			if (!this._oInvisibleText) {
-				this._oInvisibleText = new InvisibleText(this.getInvisibleTooltipId());
-				this._oInvisibleText.toStatic();
-			}
-			this._oInvisibleText.setText(this.getText());
-
-			const sId = this._oInvisibleText.getId();
-			const sExisting = oHost.getAttribute("aria-describedby") || "";
-			const aIds = sExisting.split(/\s+/).filter(Boolean);
-			if (!aIds.includes(sId)) {
-				aIds.push(sId);
-				oHost.setAttribute("aria-describedby", aIds.join(" "));
-			}
-			this._oAriaHost = oHost;
-		};
-
-		Tooltip.prototype._removeAriaDescribedBy = function () {
-			const oHost = this._oAriaHost;
-			if (!oHost || !this._oInvisibleText) {
-				return;
-			}
-			const sId = this._oInvisibleText.getId();
-			const sExisting = oHost.getAttribute("aria-describedby") || "";
-			const aIds = sExisting.split(/\s+/).filter(Boolean).filter((s) => s !== sId);
-			if (aIds.length) {
-				oHost.setAttribute("aria-describedby", aIds.join(" "));
-			} else {
-				oHost.removeAttribute("aria-describedby");
-			}
-			this._oAriaHost = null;
-		};
-
 		Tooltip.prototype._createPopover = function () {
 			return new Promise((fnResolve) => {
+
+				// @todo make the popover dependency lazy and move Tooltip to sap.ui.core
 
 				const oPopover = new Popover({
 					showHeader: false,
@@ -371,13 +336,13 @@ sap.ui.define([
 						// At this point _calcPlacement has run, so _getCalculatedPlacement
 						// returns the resolved Top/Bottom/Left/Right side.
 						this._applyPlacementClass();
+						this.fireAfterOpen();
 					},
 					afterClose: () => {
 						this._bIsOpen = false;
 						this._bOpenRequested = false;
 						this._clearTimeouts();
-						this._removeAriaDescribedBy();
-						Tooltip.registry.delete(this);
+						this.fireAfterClose();
 					}
 				});
 
@@ -427,13 +392,16 @@ sap.ui.define([
 				}
 			}
 
+			// Popover never opened → afterClose won't fire, deregister here.
+			if (!this._bIsOpen) {
+				TooltipManager.deregister(this);
+			}
+
 			const fnClose = () => {
 				if (this._oPopover) {
 					this._oPopover.close();
 					this._bIsOpen = false;
 				}
-				this._removeAriaDescribedBy();
-				Tooltip.registry.delete(this);
 			};
 
 			if (!delay) {
@@ -445,10 +413,6 @@ sap.ui.define([
 			return this;
 		};
 
-		Tooltip.prototype.getInvisibleTooltipId = function () {
-			return this.getId() + "-invisibleTooltip";
-		};
-
 		Tooltip.prototype._clearTimeouts = function () {
 			clearTimeout(this._iOpenTimeout);
 			this._iOpenTimeout = null;
@@ -456,241 +420,25 @@ sap.ui.define([
 			this._iCloseTimeout = null;
 		};
 
-		// Start Registry
-		Tooltip.registry = new Set();
-		Tooltip.closeAllButCurrent = function (oCurrent) {
-			Tooltip.registry.forEach((oTooltip) => {
-				if (oTooltip !== oCurrent) {
-					oTooltip.close(TOOLTIP_HANDOFF_DELAY);
-				}
-			});
+		/**
+		 * Whether the tooltip is currently open.
+		 *
+		 * @returns {boolean}
+		 * @public
+		 */
+		Tooltip.prototype.isOpen = function () {
+			return !!this._bIsOpen;
 		};
-		// End Registry
-
-		// Start Event Handling
 
 		/**
-		 * Wires the host's DOM element to open/close the tooltip on hover, keyboard
-		 * focus, Escape (desktop/combi) and long-press (touch). Detaches any existing
-		 * handlers first to prevent duplicates.
+		 * Whether the tooltip is open or pending an open (delay running).
 		 *
-		 * @param {sap.ui.core.Control|object} oControl Host with <code>getDomRef()</code>;
-		 *   <code>getAggregation("_tooltip")</code> is read for the per-tooltip
-		 *   <code>delay</code> and <code>disabledForMobile</code> values.
-		 * @param {function(int):void} fnCallbackOpen Called with the resolved delay to open.
-		 * @param {function(int):void} fnCallbackClose Called with the resolved delay to close.
-		 * @private
+		 * @returns {boolean}
+		 * @public
 		 */
-		// TODO: once Tooltip only attaches to UI5 Controls (not plain DOM), replace
-		// the native listeners + expando bookkeeping with oControl.addDelegate()
-		// so handlers follow the UI5 re-render lifecycle automatically.
-		Tooltip.attachEvent = function (oControl, fnCallbackOpen, fnCallbackClose) {
-
-			const oDomRef = oControl.getDomRef();
-
-			// Detach any existing handlers first to prevent duplicates
-			Tooltip._detachEvent(oControl);
-
-			let iDelay = 500; // default value if the control does not have the tooltip aggregation, for example the Select arrow
-
-			if (oControl.getAggregation) {
-				iDelay = oControl.getAggregation("_tooltip")?.getDelay() ?? iDelay;
-			}
-
-			// If the control is activated (clicked/pressed), the tooltip should close immediately.
-			// The close logic lives here in Tooltip.attachEvent (not in individual controls) so that
-			// tooltip behavior remains centralized and no control needs to be aware of the tooltip.
-			//
-			// On desktop/combi, left mousedown closes any open tooltip immediately
-			// (normal activation). Right mousedown (button === 2) is *not* handled here
-			// because closing on right-click would race with the browser's contextmenu
-			// gesture and clear an existing text selection. We also bail out when a
-			// selection exists, so right-clicking after selecting text never triggers
-			// any tooltip activity. On mobile, browsers synthesize a mousedown from
-			// touch events — attaching it there would close the tooltip the moment a
-			// long-press begins, before contextmenu fires.
-			if (Device.system.desktop || Device.system.combi) {
-				oDomRef.fnMouseDown = (e) => {
-					if (e.button === 2) {
-						return;
-					}
-					const oSelection = window.getSelection && window.getSelection();
-					if (oSelection && oSelection.toString().length > 0) {
-						return;
-					}
-					fnCallbackClose(0);
-				};
-				oDomRef.addEventListener("mousedown", oDomRef.fnMouseDown);
-			}
-
-			// Desktop and combi devices (e.g. tablets with mouse and keyboard):
-			if (Device.system.desktop || Device.system.combi) {
-				// add the events only on desktop and combi, those triggers brake the experience on mobile
-
-				oDomRef.fnMouseEnter = (e) => {
-					// If a text selection exists in the document, the user is likely about to
-					// right-click for the context menu (or is mid-drag-select). Opening a
-					// tooltip in that state would clear the selection, so skip it.
-					const oSelection = window.getSelection && window.getSelection();
-					if (oSelection && oSelection.toString().length > 0) {
-						return;
-					}
-					fnCallbackOpen(iDelay);
-				};
-				oDomRef.addEventListener("mouseenter", oDomRef.fnMouseEnter);
-
-				oDomRef.fnMouseLeave = (e) => {
-					fnCallbackClose(iDelay);
-				};
-				oDomRef.addEventListener("mouseleave", oDomRef.fnMouseLeave);
-
-				// Open on focus only when the focus is "visible" (i.e. came from keyboard
-				// navigation), not on initial programmatic focus that fires on page load.
-				// :focus-visible is the standard CSS/DOM signal browsers use to distinguish
-				// keyboard focus from mouse/programmatic focus. This replaces the previous
-				// page-wide keydown listener and makes the behavior correct for any tooltip,
-				// independent of the extended tab chain feature.
-				oDomRef.fnFocusIn = () => {
-					if (oDomRef.matches && oDomRef.matches(":focus-visible")) {
-						fnCallbackOpen(iDelay);
-					}
-				};
-				oDomRef.addEventListener("focusin", oDomRef.fnFocusIn);
-
-				oDomRef.fnFocusOut = () => {
-					fnCallbackClose(iDelay);
-				};
-				oDomRef.addEventListener("focusout", oDomRef.fnFocusOut);
-
-				// Escape handling is bound to the host element (not document) so it stays
-				// scoped to the host: it cannot accidentally swallow Escape for an unrelated
-				// ancestor (e.g. a Dialog) just because some other tooltip on the page is open.
-				// We also treat a *pending* open delay (_iOpenTimeout) as "in flight" so a quick
-				// Escape during the delay cancels the schedule instead of letting it pop later.
-				oDomRef.fnKeyDown = (e) => {
-					if (e.key !== "Escape") {
-						return;
-					}
-					const oTooltip = oControl.getAggregation && oControl.getAggregation("_tooltip");
-					if (oTooltip && (oTooltip._bIsOpen || oTooltip._iOpenTimeout)) {
-						fnCallbackClose(0);
-						// Only prevent the default — do NOT stopPropagation, so an ancestor
-						// Dialog still receives Escape and can close as the user expects.
-						e.preventDefault();
-					}
-				};
-				oDomRef.addEventListener("keydown", oDomRef.fnKeyDown);
-			}
-
-			// Mobile
-			// context menu should open for links
-			// tooltip should open for texts, later the tooltip text can be selected to open the context menu again
-			if ((Device.system.phone || Device.system.tablet) && !Device.system.combi) {
-
-				const oTooltipAggregation = oControl.getAggregation && oControl.getAggregation("_tooltip");
-				// Per design, links on mobile must always preserve their native context menu,
-				// so the tooltip is disabled regardless of the user-set value.
-				//  For all other elements, honor the property (default false).
-				const bIsLink = oDomRef.tagName === "A";
-				const bDisabledForMobile = bIsLink ||
-					(oTooltipAggregation ? oTooltipAggregation.getDisabledForMobile() : false);
-
-				// On iOS, suppress the native callout (image save / link preview) when the
-				// tooltip is enabled, so the long-press gesture is fully available for the tooltip.
-				if (Device.os.ios) {
-					oDomRef.style.webkitTouchCallout = bDisabledForMobile ? "default" : "none";
-				}
-
-				// Prevent the native context menu when the tooltip is enabled so the
-				// long-press gesture opens the tooltip instead of the browser menu.
-				oDomRef.fnContextMenu = (e) => {
-					if (!bDisabledForMobile) {
-						e.preventDefault();
-					}
-				};
-				oDomRef.addEventListener("contextmenu", oDomRef.fnContextMenu);
-
-				let iTimeoutHandle;
-				oDomRef.fnTouchStart = () => {
-					if (!bDisabledForMobile) {
-						iTimeoutHandle = setTimeout(() => fnCallbackOpen(0), iDelay);
-					}
-				};
-				oDomRef.addEventListener("touchstart", oDomRef.fnTouchStart);
-
-				oDomRef.fnTouchMove = () => {
-					clearTimeout(iTimeoutHandle);
-				};
-				oDomRef.addEventListener("touchmove", oDomRef.fnTouchMove);
-
-				oDomRef.fnTouchClear = () => {
-					clearTimeout(iTimeoutHandle);
-				};
-				oDomRef.addEventListener("touchend", oDomRef.fnTouchClear);
-				oDomRef.addEventListener("touchcancel", oDomRef.fnTouchClear);
-
-			}
+		Tooltip.prototype.isPendingOrOpen = function () {
+			return !!(this._bIsOpen || this._iOpenTimeout);
 		};
-
-		Tooltip._detachEvent = function (oControl, fnCallbackOpen, fnCallbackClose) {
-			const oDomRef = oControl.getDomRef();
-			if (!oDomRef) {
-				return;
-			}
-
-			if (oDomRef.fnMouseDown) {
-				oDomRef.removeEventListener("mousedown", oDomRef.fnMouseDown);
-				oDomRef.fnMouseDown = null;
-			}
-
-			if (oDomRef.fnMouseEnter) {
-				oDomRef.removeEventListener("mouseenter", oDomRef.fnMouseEnter);
-				oDomRef.fnMouseEnter = null;
-			}
-
-			if (oDomRef.fnMouseLeave) {
-				oDomRef.removeEventListener("mouseleave", oDomRef.fnMouseLeave);
-				oDomRef.fnMouseLeave = null;
-			}
-
-			if (oDomRef.fnFocusIn) {
-				oDomRef.removeEventListener("focusin", oDomRef.fnFocusIn);
-				oDomRef.fnFocusIn = null;
-			}
-
-			if (oDomRef.fnFocusOut) {
-				oDomRef.removeEventListener("focusout", oDomRef.fnFocusOut);
-				oDomRef.fnFocusOut = null;
-			}
-
-			if (oDomRef.fnKeyDown) {
-				oDomRef.removeEventListener("keydown", oDomRef.fnKeyDown);
-				oDomRef.fnKeyDown = null;
-			}
-
-			if (oDomRef.fnContextMenu) {
-				oDomRef.removeEventListener("contextmenu", oDomRef.fnContextMenu);
-				oDomRef.fnContextMenu = null;
-			}
-
-			if (oDomRef.fnTouchStart) {
-				oDomRef.removeEventListener("touchstart", oDomRef.fnTouchStart);
-				oDomRef.fnTouchStart = null;
-			}
-
-			if (oDomRef.fnTouchClear) {
-				oDomRef.removeEventListener("touchend", oDomRef.fnTouchClear);
-				oDomRef.removeEventListener("touchcancel", oDomRef.fnTouchClear);
-				oDomRef.fnTouchClear = null;
-			}
-
-			if (oDomRef.fnTouchMove) {
-				oDomRef.removeEventListener("touchmove", oDomRef.fnTouchMove);
-				oDomRef.fnTouchMove = null;
-			}
-		};
-
-		// End Event Handling
 
 		return Tooltip;
 	});

@@ -2317,6 +2317,9 @@ sap.ui.define([
 			getHeight: function () { },
 			getContentMinItems: function () {
 				return null;
+			},
+			getMainCard: function () {
+				return this;
 			}
 		});
 

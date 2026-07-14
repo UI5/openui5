@@ -2,16 +2,12 @@ sap.ui.require([
 	"sap/m/Button",
 	"sap/m/Link",
 	"sap/m/Text",
-	"sap/m/Tooltip",
-	"sap/m/library",
 	"sap/ui/core/tooltip/TooltipEnablement",
 	"sap/ui/core/Core",
 	"sap/ui/core/Element",
 	"sap/ui/Device"
-], async function (Button, Link, Text, Tooltip, mLibrary, TooltipEnablement, Core, Element, Device) {
+], async function (Button, Link, Text, TooltipEnablement, Core, Element, Device) {
 	"use strict";
-
-	const PlacementType = mLibrary.PlacementType;
 
 	await Core.ready();
 
@@ -26,10 +22,7 @@ sap.ui.require([
 		new Button(sId, { text: sText }).placeAt(sHostId);
 	});
 
-	// Attach a TooltipEnablement helper to the given control. The helper
-	// only takes textProvider/invisibleTextProvider/enableForTouchDevices —
-	// placement and delay scenarios go through attachPlacement() below using
-	// sap.m.Tooltip directly.
+	// Attach a TooltipEnablement helper to the given control.
 	function attach(oControl, mSettings) {
 		if (!oControl) {
 			return null;
@@ -45,46 +38,7 @@ sap.ui.require([
 		return new TooltipEnablement(oControl, oConfig);
 	}
 
-	// Wires a sap.m.Tooltip directly onto a control's DOM for scenarios that
-	// vary placement or delay — those settings are no longer part of the
-	// TooltipEnablement API. Listens to mouseenter/mouseleave and focusin/
-	// focusout on desktop only; this is enough to exercise placement and
-	// open-delay behavior of sap.m.Tooltip itself.
-	function attachPlacement(oControl, mSettings) {
-		if (!oControl) {
-			return null;
-		}
-		const oTooltip = new Tooltip({
-			text: mSettings.text,
-			placement: mSettings.placement,
-			delay: mSettings.delay !== undefined ? mSettings.delay : 500
-		});
-		oControl.addEventDelegate({
-			onAfterRendering: function () {
-				const oDomRef = oControl.getDomRef();
-				if (!oDomRef) {
-					return;
-				}
-				oDomRef.addEventListener("mouseenter", function () {
-					oTooltip.openBy(oControl);
-				});
-				oDomRef.addEventListener("mouseleave", function () {
-					oTooltip.close();
-				});
-				oDomRef.addEventListener("focusin", function () {
-					if (oDomRef.matches && oDomRef.matches(":focus-visible")) {
-						oTooltip.openBy(oControl);
-					}
-				});
-				oDomRef.addEventListener("focusout", function () {
-					oTooltip.close();
-				});
-			}
-		});
-		return oTooltip;
-	}
-
-	// --- Text and default placement ---
+	// --- Buttons with tooltip text ---
 	attach(Element.getElementById("btn-default"),   { text: "Default tooltip" });
 	attach(Element.getElementById("btn-short"),     { text: "Short" });
 	attach(Element.getElementById("btn-long"),      { text: "This is a noticeably longer tooltip text used to verify wrapping behavior." });
@@ -94,39 +48,6 @@ sap.ui.require([
 			"pulvinar eu, malesuada sagittis mauris. Praesent malesuada erat vel tortor dictum, non tempor " +
 			"mauris finibus. Sed eu porttitor velit, quis consequat lectus. Fusce volutpat nisl augue, eget " +
 			"dictum mi dictum sit amet."
-	});
-
-	// --- Placement (every PlacementType value) — exercised via sap.m.Tooltip directly ---
-	attachPlacement(Element.getElementById("btn-top"),    { text: "Top",    placement: PlacementType.Top });
-	attachPlacement(Element.getElementById("btn-bottom"), { text: "Bottom", placement: PlacementType.Bottom });
-	attachPlacement(Element.getElementById("btn-left"),   { text: "Left",   placement: PlacementType.Left });
-	attachPlacement(Element.getElementById("btn-right"),  { text: "Right",  placement: PlacementType.Right });
-
-	attachPlacement(Element.getElementById("btn-vpt"),  { text: "VerticalPreferredTop",      placement: PlacementType.VerticalPreferredTop });
-	attachPlacement(Element.getElementById("btn-vpb"),  { text: "VerticalPreferredBottom",   placement: PlacementType.VerticalPreferredBottom });
-	attachPlacement(Element.getElementById("btn-hpl"),  { text: "HorizontalPreferredLeft",   placement: PlacementType.HorizontalPreferredLeft });
-	attachPlacement(Element.getElementById("btn-hpr"),  { text: "HorizontalPreferredRight",  placement: PlacementType.HorizontalPreferredRight });
-
-	attachPlacement(Element.getElementById("btn-ptof"), { text: "PreferredTopOrFlip",    placement: PlacementType.PreferredTopOrFlip });
-	attachPlacement(Element.getElementById("btn-pbof"), { text: "PreferredBottomOrFlip", placement: PlacementType.PreferredBottomOrFlip });
-	attachPlacement(Element.getElementById("btn-plof"), { text: "PreferredLeftOrFlip",   placement: PlacementType.PreferredLeftOrFlip });
-	attachPlacement(Element.getElementById("btn-prof"), { text: "PreferredRightOrFlip",  placement: PlacementType.PreferredRightOrFlip });
-
-	// --- Delay ---
-	attachPlacement(Element.getElementById("btn-delay-0"),    { text: "Opens immediately (delay 0)",    delay: 0 });
-	attachPlacement(Element.getElementById("btn-delay-500"),  { text: "Default 500ms delay",            delay: 500 });
-	attachPlacement(Element.getElementById("btn-delay-1500"), { text: "Slow 1500ms delay",              delay: 1500 });
-
-	// --- Programmatic API: openBy / close ---
-	// This sample deliberately uses sap.m.Tooltip directly (not through
-	// TooltipEnablement) to exercise the public openBy/close API.
-	const oAnchor = Element.getElementById("btn-api-anchor");
-	const oApiTooltip = new Tooltip({ text: "Opened programmatically via Tooltip#openBy" });
-	Element.getElementById("btn-api-open").attachPress(function () {
-		oApiTooltip.openBy(oAnchor, 0);
-	});
-	Element.getElementById("btn-api-close").attachPress(function () {
-		oApiTooltip.close(0);
 	});
 
 	// --- Text with tooltip (no focus, no extended tab chain) ---
@@ -162,9 +83,8 @@ sap.ui.require([
 	attach(oRClickText, { text: "Tooltip on selectable text — should not open while text is selected" });
 
 	// --- Links: mobile long-press behavior ---
-	// Tooltips on sap.m.Link are automatically disabled on touch-only devices
-	// (per design) so the native browser context menu remains accessible on
-	// long-press.
+	// Tooltips on sap.m.Link are disabled on touch-only devices (per design)
+	// so the native browser context menu remains accessible on long-press.
 	new Link("link-tooltip", {
 		text: "SAP",
 		href: "https://sap.com",
@@ -185,20 +105,6 @@ sap.ui.require([
 			"and placement on desktop.",
 		enableForTouchDevices: false
 	});
-
-	// --- Viewport corners (auto-flip placement) ---
-	attachPlacement(Element.getElementById("btn-corner-tl"), { text: "Tooltip flips to bottom because there is no space above", placement: PlacementType.Top });
-	attachPlacement(Element.getElementById("btn-corner-tr"), { text: "Tooltip flips to left because there is no space on the right", placement: PlacementType.Right });
-	attachPlacement(Element.getElementById("btn-corner-bl"), { text: "Tooltip flips to right because there is no space on the left", placement: PlacementType.Left });
-	attachPlacement(Element.getElementById("btn-corner-br"), { text: "Tooltip flips to top because there is no space below", placement: PlacementType.Bottom });
-
-	const oCornerToggle = document.getElementById("cb-corners");
-	const oCornerHost = document.getElementById("viewport-corners");
-	if (oCornerToggle && oCornerHost) {
-		oCornerToggle.addEventListener("change", function () {
-			oCornerHost.hidden = !oCornerToggle.checked;
-		});
-	}
 
 	// --- Activation banners (auto-detected on touch devices) ---
 	// On touch devices we surface two banners that make the per-gesture behavior

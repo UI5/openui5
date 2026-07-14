@@ -2919,7 +2919,7 @@ sap.ui.define([
 		oNavigationList.destroy();
 	});
 
-	QUnit.module("announceMatchCount", {
+	QUnit.module("announceSearchMatchCount", {
 		beforeEach: async function () {
 			this.navigationList = new NavigationList({
 				items: [
@@ -2943,7 +2943,7 @@ sap.ui.define([
 		const oInvisibleMessage = sap.ui.require("sap/ui/core/InvisibleMessage").getInstance();
 		const oAnnounceSpy = sinon.spy(oInvisibleMessage, "announce");
 
-		this.navigationList.announceMatchCount(5);
+		this.navigationList.announceSearchMatchCount(5);
 
 		assert.strictEqual(oAnnounceSpy.callCount, 1, "announce was called once");
 		assert.strictEqual(oAnnounceSpy.firstCall.args[0], oRB.getText("SIDE_NAVIGATION_SEARCH_MATCHES_FOUND", [5]), "Plural text is announced for 5 matches");
@@ -2956,7 +2956,7 @@ sap.ui.define([
 		const oInvisibleMessage = sap.ui.require("sap/ui/core/InvisibleMessage").getInstance();
 		const oAnnounceSpy = sinon.spy(oInvisibleMessage, "announce");
 
-		this.navigationList.announceMatchCount(1);
+		this.navigationList.announceSearchMatchCount(1);
 
 		assert.strictEqual(oAnnounceSpy.callCount, 1, "announce was called once");
 		assert.strictEqual(oAnnounceSpy.firstCall.args[0], oRB.getText("SIDE_NAVIGATION_SEARCH_MATCH_FOUND"), "Singular text is announced for 1 match");
@@ -2969,7 +2969,7 @@ sap.ui.define([
 		const oInvisibleMessage = sap.ui.require("sap/ui/core/InvisibleMessage").getInstance();
 		const oAnnounceSpy = sinon.spy(oInvisibleMessage, "announce");
 
-		this.navigationList.announceMatchCount(0);
+		this.navigationList.announceSearchMatchCount(0);
 
 		assert.strictEqual(oAnnounceSpy.callCount, 1, "announce was called once");
 		assert.strictEqual(oAnnounceSpy.firstCall.args[0], oRB.getText("SIDE_NAVIGATION_SEARCH_MATCHES_FOUND", [0]), "Plural text is announced for 0 matches");
@@ -2981,7 +2981,7 @@ sap.ui.define([
 		const oInvisibleMessage = sap.ui.require("sap/ui/core/InvisibleMessage").getInstance();
 		const oAnnounceSpy = sinon.spy(oInvisibleMessage, "announce");
 
-		this.navigationList.announceMatchCount(3);
+		this.navigationList.announceSearchMatchCount(3);
 
 		assert.strictEqual(oAnnounceSpy.firstCall.args[1], coreLibrary.InvisibleMessageMode.Polite, "Announcement uses Polite mode");
 

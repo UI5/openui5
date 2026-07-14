@@ -26,7 +26,7 @@
 		<h2>Text with tooltip (no focus, no extended tab chain)</h2>
 		<p class="selectable-text">
 			This is a regular paragraph. The phrase
-			<span class="text-with-tooltip" id="txt-tooltip">this is a longer highlighted phrase used for testing text selection</span>
+			<span id="txt-tooltip-host"></span>
 			has a tooltip attached to a non-focusable element. On desktop, hover it.
 			On mobile, long-press it to open the tooltip; a short tap should not open it.
 			You should also be able to select any text in this paragraph (including the
@@ -42,7 +42,7 @@
 		</p>
 		<div class="row">
 			<span class="label">Focusable text:</span>
-			<span class="demo" tabindex="0" id="txt-tooltip-focus">this is a longer focusable phrase used for testing focus and text selection</span>
+			<span id="txt-tooltip-focus-host"></span>
 		</div>
 
 		<h2>Text and default placement</h2>
@@ -107,14 +107,13 @@
 		<h2>Links - mobile long-press behavior</h2>
 		<p>On desktop, hover/keyboard-focus the links to see the tooltip. On a touch device,
 			the tooltip is automatically disabled for <code>&lt;a&gt;</code> elements so the
-			native browser context menu (Copy / Open in New Tab) is preserved on long-press.
-			This applies regardless of the <code>disabledForMobile</code> property
+			native browser context menu (Copy / Open in New Tab) is preserved on long-press
 			(<i>recommended: do not set tooltips on links</i>).</p>
 		<div class="row">
 			<span class="label">Link with tooltip:</span>
-			<a class="demo" id="link-tooltip" href="https://sap.com" target="_blank" rel="noopener">SAP</a>
+			<span id="link-tooltip-host"></span>
 			<span class="label">Long text on link:</span>
-			<a class="demo" id="link-long" href="https://sap.com" target="_blank" rel="noopener">SAP (long tooltip)</a>
+			<span id="link-long-host"></span>
 		</div>
 
 		<h2>Right-click on selected text (should NOT clear selection)</h2>
@@ -126,7 +125,7 @@
 		</p>
 		<div class="row">
 			<span class="label">Right-click on text (try selecting this too):</span>
-			<span class="demo" tabindex="0" id="span-rclick">Selectable text with a tooltip</span>
+			<span id="span-rclick-host"></span>
 		</div>
 
 		<h2>Viewport edges (auto-flip placement)</h2>

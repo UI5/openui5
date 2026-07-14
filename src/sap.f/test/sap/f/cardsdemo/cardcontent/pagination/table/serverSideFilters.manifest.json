@@ -1,0 +1,118 @@
+{
+	"_version": "2.0.0",
+	"$schema": "https://raw.githubusercontent.com/SAP/ui5-manifest/v1.81.1/schema.json",
+	"sap.app": {
+		"id": "samples.taskCenter.provider.task1.card2.main",
+		"type": "card",
+		"title": "Sample of a Table with Preview of Details for Each Row",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"tags": {
+			"keywords": [
+				"TaskCenter",
+				"Sample",
+				"Table",
+				"ShowCard"
+			]
+		}
+	},
+	"sap.card": {
+		"configuration": {
+			"destinations": {
+				"northwind": {
+					"name": "Northwind_V4",
+					"defaultUrl": "https://services.odata.org/V4/Northwind/Northwind.svc"
+				}
+			},
+			"filters": {
+				"companyName": {
+					"type": "Search",
+					"label": "Company Name",
+					"placeholder": "Company Name"
+				},
+				"sort": {
+					"type": "Select",
+					"label": "Sort",
+					"items": [
+						{
+							"title": "Company Name ASC",
+							"key": "CompanyName asc"
+						},
+						{
+							"title": "Company Name DESC",
+							"key": "CompanyName desc"
+						},
+						{
+							"title": "Contact Name ASC",
+							"key": "ContactName asc"
+						},
+						{
+							"title": "Contact Name DESC",
+							"key": "ContactName desc"
+						},
+						{
+							"title": "Country ASC",
+							"key": "Country asc"
+						},
+						{
+							"title": "Country DESC",
+							"key": "Country desc"
+						}
+					]
+				}
+			}
+		},
+		"type": "Table",
+		"data": {
+			"request": {
+				"url": "{{destinations.northwind}}/Suppliers",
+				"parameters": {
+					"$select": "SupplierID, CompanyName, ContactName, ContactTitle, Country",
+					"$orderby": "{filters>/sort/value}",
+					"$filter": "contains(CompanyName, '{filters>/companyName/value}')",
+					"$count": true,
+					"$skip": "{paginator>/skip}",
+					"$top": "{parameters>/top/value}"
+				}
+			},
+			"path": "/value"
+		},
+		"header": {
+			"title": "Sample of a Table",
+			"subtitle": "Select a row to see details",
+			"status": {
+				"text": "{= format.text('{0} of {1}', [${parameters>/visibleItems}, ${/@odata.count}]) }"
+			}
+		},
+		"content": {
+			"row": {
+				"highlight": "{= ${SupplierID} > 20 ? 'Success' : ${SupplierID} > 10 ? 'Error' : 'Warning' }",
+				"columns": [
+					{
+						"title": "Company Name",
+						"value": "{CompanyName}"
+					},
+					{
+						"title": "Contact Name",
+						"value": "{ContactName}"
+					},
+					{
+						"title": "Contact Title",
+						"value": "{ContactTitle}"
+					},
+					{
+						"title": "Country",
+						"value": "{Country}"
+					}
+				]
+			}
+		},
+		"footer": {
+			"paginator": {
+				"totalCount": "{/@odata.count}",
+				"pageSize": 8
+			}
+		}
+	}
+}

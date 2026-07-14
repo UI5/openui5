@@ -2911,7 +2911,10 @@ sap.ui.define([
 			removeActiveLoadingProvider: function () { },
 			getManifestEntry: function () { },
 			getPreviewMode: function () { },
-			getHeight: function () { }
+			getHeight: function () { },
+			getMainCard: function () {
+				return this;
+			}
 		});
 
 		oObjectContent.setActions(new CardActions());
