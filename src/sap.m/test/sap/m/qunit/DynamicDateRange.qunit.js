@@ -687,6 +687,29 @@ sap.ui.define([
 		oDDR.destroy();
 	});
 
+	QUnit.test("last/next x - Radio Buttons have correct ariaLabelledBy", function(assert) {
+		var oDDR = new DynamicDateRange();
+		oDDR.setStandardOptions(["LASTDAYS", "LASTDAYSINCLUDED"]);
+
+		var oOptionLastDays = new StandardDynamicDateOption({ key: "LASTDAYS" });
+		var aControls = oOptionLastDays.createValueHelpUI(oDDR);
+
+		var oTimePeriodLabel = aControls[4];
+		var oVBox = aControls[5];
+		var oExcludedRadioButton = oVBox.getItems()[0];
+		var oExcludedLabel = oVBox.getItems()[1];
+		var oIncludedRadioButton = oVBox.getItems()[2];
+		var oIncludedLabel = oVBox.getItems()[3];
+
+		assert.ok(oExcludedRadioButton.getAriaLabelledBy().indexOf(oExcludedLabel.getId()) !== -1, "excluded RadioButton references its date range label");
+		assert.ok(oExcludedRadioButton.getAriaLabelledBy().indexOf(oTimePeriodLabel.getId()) !== -1, "excluded RadioButton references the Time Period label");
+		assert.ok(oIncludedRadioButton.getAriaLabelledBy().indexOf(oIncludedLabel.getId()) !== -1, "included RadioButton references its date range label");
+		assert.ok(oIncludedRadioButton.getAriaLabelledBy().indexOf(oTimePeriodLabel.getId()) !== -1, "included RadioButton references the Time Period label");
+
+		oOptionLastDays.destroy();
+		oDDR.destroy();
+	});
+
 	QUnit.test("today -x/+y creating and validating the option UI", function(assert) {
 		this.ddr.open();
 		this.ddr.addStandardOption("TODAYFROMTO");
