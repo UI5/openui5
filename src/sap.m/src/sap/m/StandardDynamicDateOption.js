@@ -541,7 +541,7 @@ sap.ui.define([
 						oInputControl = this._createOptionsControl(oValue, iIndex, fnControlsUpdated, aParams);
 						break;
 					case "included":
-						oInputControl = this._createIncludedControl(oValue, fnControlsUpdated);
+						oInputControl = this._createIncludedControl(oValue, fnControlsUpdated, oCurrentLabel);
 						break;
 					default:
 						break;
@@ -639,23 +639,32 @@ sap.ui.define([
 			return oControl;
 		};
 
-		StandardDynamicDateOption.prototype._createIncludedControl = function(oValue, fnControlsUpdated) {
+		StandardDynamicDateOption.prototype._createIncludedControl = function(oValue, fnControlsUpdated, oCurrentLabel) {
 			const oIncludedRadioButton = new RadioButton({
 				text: _resourceBundle.getText("DDR_LASTNEXTX_INCLUDE_LABEL"),
 				groupName: `includedSelection-${this.getKey()}`
 			});
+
+			const oIncludedLabel = new Label({text: "", wrapping: true});
+			oIncludedRadioButton.addAriaLabelledBy(oIncludedLabel);
+			oCurrentLabel && oIncludedRadioButton.addAriaLabelledBy(oCurrentLabel);
+
 			const oExcludedRadioButton = new RadioButton({
 				text: _resourceBundle.getText("DDR_LASTNEXTX_EXCLUDE_LABEL"),
 				selected: true,
 				groupName: `includedSelection-${this.getKey()}`
 			});
 
+			const oExcludedLabel = new Label({text: "", wrapping: true});
+			oExcludedRadioButton.addAriaLabelledBy(oExcludedLabel);
+			oCurrentLabel && oExcludedRadioButton.addAriaLabelledBy(oCurrentLabel);
+
 			const oControl = new VBox({
 				items: [
 					oExcludedRadioButton,
-					new Label({text:"", wrapping: true}),
+					oExcludedLabel,
 					oIncludedRadioButton,
-					new Label({text: "", wrapping: true})
+					oIncludedLabel
 				]
 			});
 
