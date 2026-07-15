@@ -1838,4 +1838,129 @@ sap.ui.define([
 		// assert
 		assert.strictEqual(this.oMessagePopover.getDomRef().getAttribute('aria-modal'), "false", 'aria-modal attribute is false');
 	});
+
+	//================================================================================
+	// GitHub issue #4334 - MessagePopover with a single item should not jump from
+	// list back to details view when resizing.
+	//================================================================================
+
+	QUnit.module("Single-item auto-navigation (issue #4334)", {
+		beforeEach: async function () {
+			this.oButton = new Button({ text: "Open" }).placeAt("qunit-fixture");
+			this.oMessagePopover = new MessagePopover({
+				items: [
+					new MessageItem({ title: "Only Item", description: "Only description" })
+				]
+			});
+			await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.oMessagePopover.close();
+			this.oMessagePopover.destroy();
+			this.oButton.destroy();
+		}
+	});
+
+	QUnit.test("Resize after navigateBack keeps the list view visible", async function (assert) {
+		// Arrange: open and navigate back to the list page
+		this.clock = sinon.useFakeTimers();
+		this.oMessagePopover.openBy(this.oButton);
+		this.clock.tick(500);
+
+		var oMessageView = this.oMessagePopover._oMessageView;
+
+		assert.strictEqual(
+			oMessageView._navContainer.getCurrentPage().getId(),
+			oMessageView._detailsPage.getId(),
+			"Precondition: details page is initial for a single item"
+		);
+
+		oMessageView.navigateBack();
+		await nextUIUpdate(this.clock);
+		this.clock.tick(500);
+
+		assert.strictEqual(
+			oMessageView._navContainer.getCurrentPage().getId(),
+			oMessageView._listPage.getId(),
+			"Precondition: user is on the list page"
+		);
+
+		// Act: simulate a resize by invalidating the popover (rerender)
+		var oSpy = this.spy(oMessageView, "_fnHandleForwardNavigation");
+		this.oMessagePopover._oPopover.invalidate();
+		await nextUIUpdate(this.clock);
+
+		// Assert: list view is preserved
+		assert.strictEqual(oSpy.callCount, 0, "_fnHandleForwardNavigation is not called on a resize/invalidate");
+		assert.strictEqual(
+			oMessageView._navContainer.getCurrentPage().getId(),
+			oMessageView._listPage.getId(),
+			"List page is preserved after a resize"
+		);
+
+		runAllTimersAndRestore(this.clock, true);
+	});
+
+	QUnit.test("Close and reopen shows details view for single item", async function (assert) {
+		// Arrange
+		this.clock = sinon.useFakeTimers();
+		this.oMessagePopover.openBy(this.oButton);
+		this.clock.tick(500);
+
+		var oMessageView = this.oMessagePopover._oMessageView;
+
+		// User goes back to the list, then popover is closed
+		oMessageView.navigateBack();
+		await nextUIUpdate(this.clock);
+
+		this.oMessagePopover.close();
+		this.clock.tick(500);
+
+		// Act: reopen the popover
+		this.oMessagePopover.openBy(this.oButton);
+		this.clock.tick(500);
+		await nextUIUpdate(this.clock);
+
+		// Assert: default single-item behaviour is restored on reopen
+		assert.strictEqual(
+			oMessageView._navContainer.getCurrentPage().getId(),
+			oMessageView._detailsPage.getId(),
+			"Details page is shown again on reopen for a single item"
+		);
+
+		runAllTimersAndRestore(this.clock, true);
+	});
+
+	QUnit.test("Adding a message so the count transitions to 1 auto-navigates to details", async function (assert) {
+		// Arrange: start with zero items so the list page is shown
+		this.clock = sinon.useFakeTimers();
+		var oMessagePopover = new MessagePopover();
+		oMessagePopover.openBy(this.oButton);
+		this.clock.tick(500);
+
+		var oMessageView = oMessagePopover._oMessageView;
+
+		// Precondition
+		assert.strictEqual(
+			oMessageView._navContainer.getCurrentPage().getId(),
+			oMessageView._listPage.getId(),
+			"Precondition: list page is shown when there are no items"
+		);
+
+		// Act: add a single item
+		oMessagePopover.addItem(new MessageItem({ title: "New Item", description: "desc" }));
+		await nextUIUpdate(this.clock);
+		this.clock.tick(500);
+
+		// Assert
+		assert.strictEqual(
+			oMessageView._navContainer.getCurrentPage().getId(),
+			oMessageView._detailsPage.getId(),
+			"Details page is shown after the count transitions from 0 to 1"
+		);
+
+		oMessagePopover.close();
+		oMessagePopover.destroy();
+		runAllTimersAndRestore(this.clock, true);
+	});
 });

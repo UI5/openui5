@@ -4513,4 +4513,27 @@ sap.ui.define([
 
 		oStub.restore();
 	});
+
+	QUnit.module("Destroy during closing");
+
+	QUnit.test("closeAllDialogs callback is called when dialog is destroyed while closing", function (assert) {
+		const oDialog = new Dialog();
+		let bCallbackCalled = false;
+
+		oDialog.open();
+		this.clock.tick(500);
+
+		assert.ok(oDialog.isOpen(), "Dialog is open");
+
+		InstanceManager.closeAllDialogs(function () {
+			bCallbackCalled = true;
+		});
+
+		// Dialog is now in CLOSING state - destroy it before closing animation completes
+		oDialog.destroy();
+		this.clock.tick(500);
+
+		assert.ok(bCallbackCalled, "closeAllDialogs callback is called even when the dialog is destroyed during closing");
+	});
 });
+
