@@ -64,8 +64,17 @@ sap.ui.define([
 			asContainer: {
 				value: bAsContainer
 			},
+			// The title field is only shown when adding an iFrame as a section or subsection.
+			// In update mode the title is hidden so that renaming is done exclusively via the
+			// standard section/subsection rename, keeping section and subsection titles consistent.
+			showTitle: {
+				value: bAsContainer && !bSetUpdateTitle
+			},
 			title: {
-				value: bAsContainer ? _oTextResources.getText("IFRAME_ADDIFRAME_DIALOG_CONTAINER_TITLE_DEFAULT_VALUE_TEXT") : null,
+				value: bAsContainer && !bSetUpdateTitle
+					? _oTextResources.getText("IFRAME_ADDIFRAME_DIALOG_CONTAINER_TITLE_DEFAULT_VALUE_TEXT") : null,
+				originalValue: bAsContainer && !bSetUpdateTitle
+					? _oTextResources.getText("IFRAME_ADDIFRAME_DIALOG_CONTAINER_TITLE_DEFAULT_VALUE_TEXT") : null,
 				valueState: ValueState.None,
 				id: "sapUiRtaAddIFrameDialog_ContainerTitle_TitleInput"
 			},
