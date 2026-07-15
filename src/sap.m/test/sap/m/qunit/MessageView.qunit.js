@@ -1881,4 +1881,221 @@ sap.ui.define([
 
 		oMessageView.destroy();
 	});
+
+	//================================================================================
+	// GitHub issue #4334 - MessageView with a single item should not jump from list
+	// back to details view when re-rendering is triggered by resize (or any other
+	// non-data-changing invalidation). Details view should still be shown by default
+	// on first presentation and when the item count transitions from N to 1.
+	//================================================================================
+
+	QUnit.module("Single-item auto-navigation (issue #4334)", {
+		beforeEach: async function () {
+			this.oMessageView = new MessageView({
+				items: [
+					new MessageItem({ title: "Only Item", description: "Only description" })
+				]
+			});
+			this.oMessageView.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.oMessageView.destroy();
+		}
+	});
+
+	QUnit.test("Details page is shown initially when only one item is present", function (assert) {
+		assert.strictEqual(
+			this.oMessageView._navContainer.getCurrentPage().getId(),
+			this.oMessageView._detailsPage.getId(),
+			"Details page is the initial page for a single item"
+		);
+	});
+
+	QUnit.test("Resizing (re-rendering) after user navigated back must not re-forward to details", async function (assert) {
+		// Arrange: user navigates back to the list view
+		this.oMessageView.navigateBack();
+		await nextUIUpdate();
+		assert.strictEqual(
+			this.oMessageView._navContainer.getCurrentPage().getId(),
+			this.oMessageView._listPage.getId(),
+			"Precondition: list page is visible after navigateBack"
+		);
+
+		// Act: simulate a resize by invalidating (item count unchanged)
+		var oSpy = this.spy(this.oMessageView, "_fnHandleForwardNavigation");
+		this.oMessageView.invalidate();
+		await nextUIUpdate();
+
+		// Assert: no forward navigation happened; list view is preserved
+		assert.strictEqual(oSpy.callCount, 0, "_fnHandleForwardNavigation is not called on a resize/re-render");
+		assert.strictEqual(
+			this.oMessageView._navContainer.getCurrentPage().getId(),
+			this.oMessageView._listPage.getId(),
+			"List page stays visible after re-rendering with an unchanged single item"
+		);
+	});
+
+	QUnit.test("Repeated re-renders never navigate away from the list once user is on it", async function (assert) {
+		// Arrange
+		this.oMessageView.navigateBack();
+		await nextUIUpdate();
+
+		var oSpy = this.spy(this.oMessageView, "_fnHandleForwardNavigation");
+
+		// Act: several re-renders in a row (e.g. multiple resize events)
+		for (var i = 0; i < 3; i++) {
+			this.oMessageView.invalidate();
+			await nextUIUpdate();
+		}
+
+		// Assert
+		assert.strictEqual(oSpy.callCount, 0, "_fnHandleForwardNavigation is not called across repeated re-renders");
+		assert.strictEqual(
+			this.oMessageView._navContainer.getCurrentPage().getId(),
+			this.oMessageView._listPage.getId(),
+			"List page remains visible across multiple invalidations"
+		);
+	});
+
+	QUnit.test("Transition from many items to one item auto-navigates to details", async function (assert) {
+		// Arrange: start with several items so the list page is shown
+		var oMessageView = new MessageView({
+			items: [
+				new MessageItem({ title: "A", description: "descA" }),
+				new MessageItem({ title: "B", description: "descB" }),
+				new MessageItem({ title: "C", description: "descC" })
+			]
+		});
+		oMessageView.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		assert.strictEqual(
+			oMessageView._navContainer.getCurrentPage().getId(),
+			oMessageView._listPage.getId(),
+			"Precondition: list page is visible with multiple items"
+		);
+
+		// Act: remove items so only one is left
+		var aItems = oMessageView.getItems();
+		oMessageView.removeItem(aItems[2]);
+		oMessageView.removeItem(aItems[1]);
+		aItems[1].destroy();
+		aItems[2].destroy();
+		await nextUIUpdate();
+
+		// Assert: transition N -> 1 should show the details page
+		assert.strictEqual(
+			oMessageView._navContainer.getCurrentPage().getId(),
+			oMessageView._detailsPage.getId(),
+			"Details page is shown after transitioning to a single item"
+		);
+
+		oMessageView.destroy();
+	});
+
+	QUnit.test("navigateBack() after a data refresh does not re-forward when count is unchanged", async function (assert) {
+		// Arrange: user is on details view (default for single item), then goes back
+		this.oMessageView.navigateBack();
+		await nextUIUpdate();
+
+		var oSpy = this.spy(this.oMessageView, "_fnHandleForwardNavigation");
+
+		// Act: simulate an app-side refresh flow: navigateBack + re-render, count unchanged
+		this.oMessageView.navigateBack();
+		this.oMessageView.invalidate();
+		await nextUIUpdate();
+
+		// Assert: no auto-forward navigation on a same-count refresh
+		assert.strictEqual(oSpy.callCount, 0, "_fnHandleForwardNavigation is not called after refresh with unchanged count");
+		assert.strictEqual(
+			this.oMessageView._navContainer.getCurrentPage().getId(),
+			this.oMessageView._listPage.getId(),
+			"List page is preserved when the number of items does not change"
+		);
+	});
+
+	QUnit.test("Standalone MessageView in Dialog - reopen shows details view for single item", async function (assert) {
+		var clock = sinon.useFakeTimers();
+
+		// Arrange: MessageView placed inside a Dialog
+		var oMessageView = new MessageView({
+			items: [ new MessageItem({ title: "Only Item", description: "Only description" }) ]
+		});
+		var oDialog = new Dialog({ content: [ oMessageView ] });
+
+		// Act: first open
+		oDialog.open();
+		clock.tick(500);
+		await nextUIUpdate(clock);
+
+		assert.strictEqual(
+			oMessageView._navContainer.getCurrentPage().getId(),
+			oMessageView._detailsPage.getId(),
+			"Details page is shown on first open"
+		);
+
+		// Navigate back to list, then close and reopen the Dialog
+		oMessageView.navigateBack();
+		await nextUIUpdate(clock);
+		assert.strictEqual(
+			oMessageView._navContainer.getCurrentPage().getId(),
+			oMessageView._listPage.getId(),
+			"Precondition: user is on the list page before closing the Dialog"
+		);
+
+		oDialog.close();
+		clock.tick(500);
+		await nextUIUpdate(clock);
+
+		oDialog.open();
+		clock.tick(500);
+		await nextUIUpdate(clock);
+
+		// Assert: on reopen the default single-item page (details) should be shown again
+		assert.strictEqual(
+			oMessageView._navContainer.getCurrentPage().getId(),
+			oMessageView._detailsPage.getId(),
+			"Details page is shown again on reopen for a single-item MessageView"
+		);
+
+		oDialog.destroy();
+		runAllFakeTimersAndRestore(clock);
+	});
+
+	QUnit.test("Grouped single item is not re-forwarded to details on resize", async function (assert) {
+		// Arrange
+		var oMessageView = new MessageView({
+			items: [ new MessageItem({ title: "Grouped Only", description: "desc", groupName: "G1" }) ],
+			groupItems: true
+		});
+		oMessageView.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Precondition - initial auto-nav happens for a single navigable item
+		assert.strictEqual(
+			oMessageView._navContainer.getCurrentPage().getId(),
+			oMessageView._detailsPage.getId(),
+			"Precondition: details page shown initially for single grouped item"
+		);
+
+		// User goes back to list
+		oMessageView.navigateBack();
+		await nextUIUpdate();
+
+		// Act: resize / invalidate
+		var oSpy = this.spy(oMessageView, "_fnHandleForwardNavigation");
+		oMessageView.invalidate();
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(oSpy.callCount, 0, "_fnHandleForwardNavigation is not called on re-render for grouped single item");
+		assert.strictEqual(
+			oMessageView._navContainer.getCurrentPage().getId(),
+			oMessageView._listPage.getId(),
+			"List page is preserved after re-render for grouped single item"
+		);
+
+		oMessageView.destroy();
+	});
 });

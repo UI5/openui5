@@ -14,9 +14,9 @@ sap.ui.define([
 	"sap/m/p13n/AbstractContainerItem",
 	"sap/m/library",
 	"sap/ui/core/Element",
+	"sap/ui/core/InvisibleMessage",
 	"sap/ui/core/Lib",
 	"sap/ui/core/library",
-	"sap/ui/core/syncStyleClass",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/core/ShortcutHintsMixin"
 ], (
@@ -32,9 +32,9 @@ sap.ui.define([
 	AbstractContainerItem,
 	mLibrary,
 	Element,
+	InvisibleMessage,
 	Library,
 	coreLibrary,
-	syncStyleClass,
 	JSONModel,
 	ShortcutHintsMixin
 ) => {
@@ -44,7 +44,7 @@ sap.ui.define([
 	const {P13nPopupMode} = mLibrary;
 
 	//Shortcut to sap.ui.core.TitleLevel
-	const {TitleLevel, InvisibleMessage, InvisibleMessageMode} = coreLibrary;
+	const {TitleLevel, InvisibleMessageMode} = coreLibrary;
 
 	/**
 	 * Constructor for a new <code>Popup</code>.

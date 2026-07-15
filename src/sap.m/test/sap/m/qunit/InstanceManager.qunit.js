@@ -225,24 +225,27 @@ sap.ui.define([
 		const done = assert.async();
 
 		//Arrange
-		const attachSpy = this.spy();
+		const registerSpy = this.spy();
 		const closeSpy = this.spy();
 
 		function FakeDialog(id) {
 			return {
 				id,
-				listeners: [],
 				close() {
 					closeSpy();
-					this.listeners.forEach((listener) => listener());
+					this._invokeCloseCallback();
 				},
 				getCloseOnNavigation: function () {
 					return true;
 				},
-				attachEvent : function(eventName, fnFireEvent) {
-					if ( eventName === "afterClose" ) {
-						attachSpy();
-						this.listeners.push(fnFireEvent);
+				_registerCloseCallback: function (fnCallback) {
+					registerSpy();
+					this._fnCloseCallback = fnCallback;
+				},
+				_invokeCloseCallback: function () {
+					if (this._fnCloseCallback) {
+						this._fnCloseCallback();
+						this._fnCloseCallback = null;
 					}
 				}
 			};
@@ -259,7 +262,7 @@ sap.ui.define([
 		InstanceManager.closeAllDialogs(() => {
 			//Assert
 			assert.ok("callback called");
-			assert.strictEqual(attachSpy.callCount, dialogs.length, "attach was called");
+			assert.strictEqual(registerSpy.callCount, dialogs.length, "_registerCloseCallback was called");
 			assert.strictEqual(closeSpy.callCount, dialogs.length, "close was called");
 			done();
 		});

@@ -111,12 +111,15 @@ sap.ui.define([
 		assert.strictEqual(oDialog.getCustomHeader().getContentMiddle()[0].getText(), oResourceBundle.getText("CARD_ERROR_DIALOG_TITLE"), "Dialog title is correct");
 		assert.strictEqual(oDialog.getContent()[0].getText(), mErrorInfo.details, "Dialog content is correct");
 
-		InstanceManager.closeAllDialogs(function () {
-			// Clean up
-			oMessage.destroy();
-			oDebugStub.restore();
-			done();
+		await new Promise(function (resolve) {
+			InstanceManager.closeAllDialogs(function () {
+				resolve();
+			});
 		});
+
+		oMessage.destroy();
+		oDebugStub.restore();
+		done();
 	});
 
 	QUnit.test("Create error message", async function (assert) {
@@ -156,12 +159,15 @@ sap.ui.define([
 		assert.ok(oDialog.getContent()[0].getText().includes(oResourceBundle.getText("CARD_STACK_TRACE")), "There should be default details provided for error messages");
 		assert.notOk(oMessage.getHttpResponse(), "There shouldn't be an HTTP response");
 
-		InstanceManager.closeAllDialogs(function () {
-			// Clean up
-			oMessage.destroy();
-			oDebugStub.restore();
-			done();
+		await new Promise(function (resolve) {
+			InstanceManager.closeAllDialogs(function () {
+				resolve();
+			});
 		});
+
+		oMessage.destroy();
+		oDebugStub.restore();
+		done();
 	});
 
 	QUnit.test("Create data request error message", async function (assert) {
@@ -213,12 +219,15 @@ sap.ui.define([
 		assert.strictEqual(oDialog.getCustomHeader().getContentMiddle()[0].getText(), oResourceBundle.getText("CARD_ERROR_DIALOG_TITLE"), "Dialog title is correct");
 		assert.ok(oDialog.getContent()[0], "Dialog content is created");
 
-		InstanceManager.closeAllDialogs(function () {
-			// Clean up
-			oMessage.destroy();
-			oDebugStub.restore();
-			done();
+		await new Promise(function (resolve) {
+			InstanceManager.closeAllDialogs(function () {
+				resolve();
+			});
 		});
+
+		oMessage.destroy();
+		oDebugStub.restore();
+		done();
 	});
 
 	QUnit.test("Create custom message with buttons", async function (assert) {

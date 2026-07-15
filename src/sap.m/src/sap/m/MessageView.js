@@ -347,6 +347,73 @@ sap.ui.define([
 	};
 
 	/**
+	 * Resets the navigation state before the enclosing container is opened.
+	 * Clears the item-count tracker and, if the MessageView currently contains
+	 * exactly one navigable item and the user was left on the list page (e.g.
+	 * via the back button), forwards the NavContainer to the details page so
+	 * that the next open starts on the details view - matching the documented
+	 * default behaviour for a single item.
+	 *
+	 * <code>NavContainer.to()</code> is safe to call here even though the
+	 * enclosing container has not rendered yet: the page-stack push happens
+	 * synchronously and the transition step is a no-op when the NavContainer
+	 * has no DOM, so the correct page is picked up when the container
+	 * subsequently renders. See GitHub issue #4334.
+	 *
+	 * @private
+	 */
+	MessageView.prototype._resetNavigationState = function () {
+		this._iLastRenderedItemCount = undefined;
+
+		if (!this._oLists || !this._oLists.all || !this._navContainer) {
+			return;
+		}
+
+		var aListItems = this._oLists.all.getItems().filter(function (oItem) {
+			return oItem.isA("sap.m.MessageListItem");
+		});
+
+		if (aListItems.length !== 1
+			|| aListItems[0].getType() !== ListType.Navigation
+			|| this._navContainer.getCurrentPage() === this._detailsPage) {
+			return;
+		}
+
+		this._navContainer.to(this._detailsPage, "show");
+
+		// Prevent onBeforeRendering from treating this as a fresh N->1
+		// transition and forwarding again.
+		this._iLastRenderedItemCount = 1;
+	};
+
+	/**
+	 * Registers a <code>beforeOpen</code> hook on the nearest ancestor
+	 * container that supports it (Popover, ResponsivePopover, Dialog). The hook
+	 * resets the navigation state so that the next rendering treats the
+	 * current data as fresh - restoring the default single-item auto-navigate
+	 * to details each time the container is opened.
+	 *
+	 * @private
+	 */
+	MessageView.prototype._ensureContainerHook = function () {
+		if (this._oHookedContainer && !this._oHookedContainer.bIsDestroyed) {
+			return;
+		}
+
+		var oParent = this.getParent();
+		while (oParent
+			&& !(oParent.isA && oParent.isA(["sap.m.Popover", "sap.m.ResponsivePopover", "sap.m.Dialog"]))) {
+			oParent = oParent.getParent && oParent.getParent();
+		}
+		if (!oParent) {
+			return;
+		}
+
+		this._oHookedContainer = oParent;
+		oParent.attachBeforeOpen(this._resetNavigationState, this);
+	};
+
+	/**
 	 * Restores the focus after navigation
 	 *
 	 * @private
@@ -397,6 +464,8 @@ sap.ui.define([
 			aListItems,
 			aItems = this.getItems();
 
+		this._ensureContainerHook();
+
 		if (!this._oInvisibleMessage) {
 			this._oInvisibleMessage = InvisibleMessage.getInstance();
 		}
@@ -427,9 +496,16 @@ sap.ui.define([
 			return oItem.isA("sap.m.MessageListItem");
 		});
 
-		if (aListItems.length === 1 && aListItems[0].getType()  === ListType.Navigation) {
+		// Auto-navigate to the details page only when the number of list items
+		// transitions to 1 (initial render, or a data update reducing to a single
+		// item). On plain re-renders triggered by resize/invalidate where the count
+		// stays the same we must not re-forward - see GitHub issue #4334.
+		var iPreviousItemCount = this._iLastRenderedItemCount;
+		this._iLastRenderedItemCount = aListItems.length;
 
-			if (this._navContainer.getCurrentPage() !== this._detailsPage) {
+		if (aListItems.length === 1 && aListItems[0].getType() === ListType.Navigation) {
+
+			if (iPreviousItemCount !== 1 && this._navContainer.getCurrentPage() !== this._detailsPage) {
 				this._fnHandleForwardNavigation(aListItems[0], "show");
 
 				// TODO: adopt this to NavContainer's public API once a parameter for back navigation transition name is available
@@ -544,6 +620,12 @@ sap.ui.define([
 		this._detailsPage = null;
 		this._sCurrentList = null;
 		this._oHeaderAriaLabelledByElement = null;
+
+		if (this._oHookedContainer && !this._oHookedContainer.bIsDestroyed) {
+			this._oHookedContainer.detachBeforeOpen(this._resetNavigationState, this);
+		}
+		this._oHookedContainer = null;
+		this._iLastRenderedItemCount = undefined;
 	};
 
 	/**

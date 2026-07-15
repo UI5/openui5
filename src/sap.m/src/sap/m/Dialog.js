@@ -663,6 +663,8 @@ function(
 		this._deregisterResizeObserver();
 		this._deregisterWithinAreaResizeObserver();
 
+		this._invokeCloseCallback();
+
 		if (this.oPopup) {
 			this.oPopup.detachOpened(this._handleOpened, this);
 			this.oPopup.detachClosed(this._handleClosed, this);
@@ -865,6 +867,29 @@ function(
 	};
 
 	/**
+	 * Registers a callback to be invoked once the dialog has fully closed.
+	 * The callback is also invoked if the dialog is destroyed while still closing.
+	 *
+	 * @param {function} fnCallback The callback function
+	 * @private
+	 * @ui5-restricted sap.m.InstanceManager
+	 */
+	Dialog.prototype._registerCloseCallback = function (fnCallback) {
+		this._fnCloseCallback = fnCallback;
+	};
+
+	/**
+	 * Invokes and clears the registered close callback.
+	 * @private
+	 */
+	Dialog.prototype._invokeCloseCallback = function () {
+		if (this._fnCloseCallback) {
+			this._fnCloseCallback();
+			this._fnCloseCallback = null;
+		}
+	};
+
+	/**
 	 *
 	 * @private
 	 */
@@ -890,6 +915,7 @@ function(
 		}
 
 		InstanceManager.removeDialogInstance(this);
+		this._invokeCloseCallback();
 		this.fireAfterClose({origin: this._oCloseTrigger});
 
 		this._bDuringOpenCalled = false;
