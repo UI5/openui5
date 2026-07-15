@@ -40,4 +40,26 @@ sap.ui.define([
             done();
         });
     });
+
+    QUnit.test("_createPopover should remove the aria role description of the list", function(assert) {
+        const done = assert.async();
+
+        // Trigger openPopover to load async dependencies first
+        this._oSelectionButton.openPopover();
+
+        // Wait for async loading to complete
+        this._oSelectionButton.oReadyPromise.then(() => {
+            // Act
+            const oPopover = this._oSelectionButton._createPopover();
+            const oList = oPopover.getContent().find((oContent) => oContent.isA("sap.m.List"));
+
+            // Assert
+            assert.ok(oList, "List is part of the popover content");
+            assert.strictEqual(oList._sAriaRoleDescriptionKey, null, "The aria role description of the list is removed");
+
+            // Cleanup
+            oPopover.destroy();
+            done();
+        });
+    });
 });
