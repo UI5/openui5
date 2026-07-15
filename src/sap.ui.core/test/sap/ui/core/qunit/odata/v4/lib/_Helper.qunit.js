@@ -589,6 +589,22 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("buildQuery: $$sortSystemQueryOptions", function (assert) {
+		assert.strictEqual(
+			// code under test
+			_Helper.buildQuery(Object.freeze({ // unsorted!
+				$$sortSystemQueryOptions : true, // overrule falsy bSortSystemQueryOptions parameter
+				$apply : "A.P.P.L.E.",
+				$filter : "foo",
+				$expand : "bar",
+				$search : "covfefe",
+				$select : "Name",
+				$count : true
+			}), /*bSortSystemQueryOptions*/false),
+			"?$apply=A.P.P.L.E.&$count=true&$expand=bar&$filter=foo&$search=covfefe&$select=Name");
+	});
+
+	//*********************************************************************************************
 	QUnit.test("buildQuery and decoding", function (assert) {
 		var sComplexString = "",
 			i,
