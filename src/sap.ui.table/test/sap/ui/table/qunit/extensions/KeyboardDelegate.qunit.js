@@ -4297,11 +4297,13 @@ sap.ui.define([
 			{keyName: "PageDown", trigger: qutils.triggerKeydown, arguments: [null, Key.Page.DOWN]}
 		];
 
-		assert.expect(aEventTargetGetters.length + aEventTargetGetters.length * aKeystrokes.length + 3);
+		assert.expect(aEventTargetGetters.length + aEventTargetGetters.length * aKeystrokes.length + 4);
 
 		oTable.addEventDelegate({
 			onkeydown: function(oEvent) {
-				assert.ok(oEvent.isDefaultPrevented(), oEvent.target._oKeystroke.keyName + ": Default action was prevented (Page scrolling)");
+				if (oEvent.target._oKeystroke) {
+					assert.ok(oEvent.isDefaultPrevented(), oEvent.target._oKeystroke.keyName + ": Default action was prevented (Page scrolling)");
+				}
 			}
 		});
 
@@ -4340,6 +4342,19 @@ sap.ui.define([
 		oCell.trigger("focus");
 		oCell[0]._oKeystroke = {keyName: "Space (keydown, action mode)"};
 		qutils.triggerKeydown(oCell, Key.SPACE);
+
+		let bDefaultPrevented = false;
+		oTable.addEventDelegate({
+			onkeydown: function(oEvent) {
+				if (oEvent.keyCode === Key.SPACE) {
+					bDefaultPrevented = oEvent.isDefaultPrevented();
+				}
+			}
+		});
+		const oInputElement = TableUtils.getInteractiveElements(getCell(0, 0))[0];
+		oInputElement.focus();
+		qutils.triggerKeydown(oInputElement, Key.SPACE);
+		assert.ok(!bDefaultPrevented, "Space (keydown, input inside cell): Default action was not prevented");
 	});
 
 	QUnit.test("After leaving action mode", async function(assert) {
