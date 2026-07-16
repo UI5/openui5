@@ -58,7 +58,7 @@
 			</MessageStrip>
 
 			<MessageStrip
-				text="{/inlineIconsUnicode}"
+				text="{/inlineIconsHelper}"
 				type="Warning"
 				enableFormattedText="true"
 				showIcon="true"

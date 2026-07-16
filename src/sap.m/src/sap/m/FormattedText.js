@@ -214,7 +214,8 @@ function(
 				'a::href' : 1,
 				'a::target' : 1,
 				'span::style' : 1,
-				'span::class' : 1
+				'span::class' : 1,
+				'span::data-sap-ui-icon-content' : 1
 			},
 			ELEMENTS: {
 				'a' : {cssClass: 'sapMLnk'},
