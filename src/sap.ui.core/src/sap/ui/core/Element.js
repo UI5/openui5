@@ -656,7 +656,17 @@ sap.ui.define([
 
 				case FocusMode.RENDERING_PENDING:
 					Rendering.addPrerenderingTask(() => {
-						_focusTarget(oOriginalDomRef, oFocusTarget);
+						// If the source control has been re-inserted into the same
+						// parent (e.g. remove + insert for reordering) and is still
+						// visible and enabled, skip focus redirect. RenderManager's
+						// focus save/restore will correctly restore focus to the
+						// control's new DOM position within the same parent's rendering.
+						var oSrcControl = oEvent.srcControl;
+						if (oSrcControl.getParent() !== this
+							|| oSrcControl.getVisible?.() === false
+							|| oSrcControl.getEnabled?.() === false) {
+							_focusTarget(oOriginalDomRef, oFocusTarget);
+						}
 					});
 					break;
 
