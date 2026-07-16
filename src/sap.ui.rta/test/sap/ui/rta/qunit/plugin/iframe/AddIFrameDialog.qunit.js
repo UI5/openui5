@@ -253,9 +253,50 @@ sap.ui.define([
 					oTextResources.getText("IFRAME_ADDIFRAME_DIALOG_UPDATE_TITLE"),
 					"then the correct title is set"
 				);
+				assert.notOk(
+					Element.getElementById("sapUiRtaAddIFrameDialog_ContainerTitle").getVisible(),
+					"then the title field is not visible in update mode"
+				);
 				clickOnCancel();
 			}, this);
 			return this.oAddIFrameDialog.open({ updateMode: true }, oReferenceControl);
+		});
+
+		QUnit.test("When AddIFrameDialog is opened in Update Mode for a container/subsection with a title,", function(assert) {
+			this.oAddIFrameDialog.attachOpened(function() {
+				assert.notOk(
+					Element.getElementById("sapUiRtaAddIFrameDialog_ContainerTitle").getVisible(),
+					"then the title field is not visible even though the iFrame has a title (rename via standard rename)"
+				);
+				assert.strictEqual(
+					this.oAddIFrameDialog._oJSONModel.getProperty("/showTitle/value"),
+					false,
+					"then the showTitle flag is false in update mode"
+				);
+				clickOnCancel();
+			}, this);
+			return this.oAddIFrameDialog.open({
+				updateMode: true,
+				asContainer: true,
+				title: "My Section",
+				frameUrl: "https://myhappyurl"
+			}, oReferenceControl);
+		});
+
+		QUnit.test("When AddIFrameDialog is opened in add mode for a subsection (asContainer=true),", function(assert) {
+			this.oAddIFrameDialog.attachOpened(function() {
+				const oTitleVBox = Element.getElementById("sapUiRtaAddIFrameDialog_ContainerTitle");
+				const oTitleInput = Element.getElementById("sapUiRtaAddIFrameDialog_ContainerTitle_TitleInput");
+				assert.ok(oTitleVBox.getVisible(), "then the title field is visible");
+				assert.ok(oTitleInput.getEnabled(), "then the title field is enabled/editable");
+				assert.strictEqual(
+					this.oAddIFrameDialog._oJSONModel.getProperty("/showTitle/value"),
+					true,
+					"then the showTitle flag is true when adding as a section/subsection"
+				);
+				clickOnCancel();
+			}, this);
+			return this.oAddIFrameDialog.open({ asContainer: true }, oReferenceControl);
 		});
 
 		QUnit.test("When AddIFrameDialog is opened then there should be no error value state", function(assert) {

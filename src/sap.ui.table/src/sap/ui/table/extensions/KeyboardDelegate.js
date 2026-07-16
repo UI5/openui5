@@ -910,8 +910,8 @@ sap.ui.define([
 			return;
 		}
 
-		if (KeyboardDelegate._isKeyCombination(oEvent, KeyCodes.SPACE)) {
-			oEvent.preventDefault(); // Prevent scrolling the page.
+		if (KeyboardDelegate._isKeyCombination(oEvent, KeyCodes.SPACE) && TableUtils.getCellInfo(oEvent.target).isOfType(CellType.ANY)) {
+			oEvent.preventDefault(); // Prevent scrolling the page if the focus is on a cell, not if the focus is on an nested control.
 		}
 
 		if (this._getKeyboardExtension().isInActionMode() || !oCellInfo.isOfType(CellType.ANY)) {

@@ -100,7 +100,8 @@ sap.ui.define([
 
 		// providing an action will trigger the rename plugin, which we only want in case of addIFrame as container
 		// in that case the function getCreatedContainerId has to be provided
-		const bAsContainer = !!mPropertyBag.menuItem.action.getCreatedContainerId;
+		const oAction = mPropertyBag.menuItem.action;
+		const bAsContainer = !!oAction.getCreatedContainerId;
 
 		const oAddIFrameDialog = new AddIFrameDialog();
 		let sNewContainerTitle;
@@ -110,14 +111,14 @@ sap.ui.define([
 				parameters: mURLParameters,
 				asContainer: bAsContainer
 			};
-			return oAddIFrameDialog.open(mAddIFrameDialogSettings, oParent, mPropertyBag.menuItem.action);
+			return oAddIFrameDialog.open(mAddIFrameDialogSettings, oParent, oAction);
 		})
 		.then(function(mSettings) {
 			if (!mSettings) {
 				throw new CancelError();
 			}
 			mSettings.index = iIndex;
-			mSettings.aggregation = mPropertyBag.menuItem.action.aggregation;
+			mSettings.aggregation = oAction.aggregation;
 			sNewContainerTitle = mSettings.title;
 			return getAddIFrameCommand.call(this, oParent, mSettings, oDesignTimeMetadata, sVariantManagementReference);
 		}.bind(this))
@@ -125,7 +126,7 @@ sap.ui.define([
 			this.fireElementModified({
 				command: oCommand,
 				newControlId: oCommand.getBaseId(),
-				action: bAsContainer ? mPropertyBag.menuItem.action : undefined,
+				action: bAsContainer ? oAction : undefined,
 				title: sNewContainerTitle
 			});
 		}.bind(this))

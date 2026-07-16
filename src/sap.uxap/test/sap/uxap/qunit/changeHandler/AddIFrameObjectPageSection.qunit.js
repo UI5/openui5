@@ -145,6 +145,20 @@ sap.ui.define([
 			var oCreatedIFrame = aBlocks[0];
 			assert.ok(oCreatedIFrame.getId().indexOf(BASE_ID) === 0, "the created IFrame starts with the expected baseId");
 			assert.strictEqual(oCreatedIFrame.getUrl(), EXAMPLE_URL, "the created IFrame has the correct URL");
+			assert.strictEqual(
+				oCreatedIFrame.getAsContainer(),
+				true,
+				"the created IFrame is marked as a container so its title can be edited/renamed"
+			);
+			assert.deepEqual(
+				oCreatedIFrame.getRenameInfo(),
+				{
+					sourceControlId: oCreatedSubSection.getId(),
+					selectorControlId: oCreatedSubSection.getId(),
+					propertyName: "title"
+				},
+				"the created IFrame stores rename info pointing at the created sub section title"
+			);
 		}
 
 		QUnit.test("When applying the change on a js control tree", function(assert) {

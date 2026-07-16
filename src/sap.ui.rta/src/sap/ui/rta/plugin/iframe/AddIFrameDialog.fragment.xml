@@ -25,7 +25,7 @@
 					class="sapUiRtaAddIFrameDialogVlWrapper">
 				<VBox
 					id="sapUiRtaAddIFrameDialog_ContainerTitle"
-					visible="{dialogInfo>/asContainer/value}"
+					visible="{dialogInfo>/showTitle/value}"
 					class="sapUiRtaAddIFrameDialogContainer sapUiSmallMarginTop"
 					renderType="Bare">
 					<items>

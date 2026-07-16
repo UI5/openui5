@@ -687,27 +687,29 @@ sap.ui.define([
 			oHelperMock.expects("createError")
 				.exactly(bSuccess || o.bReadFails ? 0 : 1)
 				.withExactArgs(sinon.match.same(oTokenRequiredResponse), "Communication error",
-					"/Service/foo", "original/path")
+					"/Service/foo?bar=X", "original/path")
 				.returns(oError);
 			oHelperMock.expects("parseRawHeaders").exactly(bSuccess ? 1 : 0)
 				.withExactArgs("~getAllResponseHeaders~").returns("~mHeaders~");
 			this.mock(oModelInterface).expects("onHttpResponse").exactly(bSuccess ? 1 : 0)
 				.withExactArgs("~mHeaders~");
 			this.mock(oRequestor).expects("doCheckVersionHeader").exactly(bSuccess ? 1 : 0)
-				.withExactArgs(sinon.match.func, "foo", false).returns(sODataVersion);
+				.withExactArgs(sinon.match.func, "foo?bar=X", false).returns(sODataVersion);
 			// Note: cannot mock JSON.stringify, it collides with Sinon.JS framework :-(
 			this.mock(JSON).expects("parse")
 				.exactly(bSuccess && sODataVersion === "4.01" ? 1 : 0)
 				.withExactArgs(JSON.stringify(oResponsePayload),
 					sinon.match.same(_Requestor.reviver))
 				.returns({value : "revived response payload"});
+			this.mock(_Helper).expects("dropQuery").exactly(bSuccess ? 1 : 0)
+				.withExactArgs("foo?bar=X").returns("foo/no/query");
 
 			// With <code>bRequestSucceeds === false</code>, "request" always fails,
 			// with <code>bRequestSucceeds === true</code>, "request" always succeeds,
 			// else "request" first fails due to missing CSRF token which can be fetched via
 			// "ODataModel#refreshSecurityToken".
 			this.mock(jQuery).expects("ajax").exactly(o.iRequests)
-				.withExactArgs("/Service/foo", sinon.match({
+				.withExactArgs("/Service/foo?bar=X", sinon.match({
 					data : "payload",
 					headers : mResolvedHeaders,
 					method : "FOO"
@@ -756,7 +758,7 @@ sap.ui.define([
 			}
 
 			// code under test
-			return oRequestor.sendRequest("FOO", "foo", mHeaders, "payload", "original/path")
+			return oRequestor.sendRequest("FOO", "foo?bar=X", mHeaders, "payload", "original/path")
 				.then(function (oPayload) {
 					assert.ok(bSuccess, "success possible");
 					assert.strictEqual(oPayload.contentType, "application/json");
@@ -773,7 +775,7 @@ sap.ui.define([
 						});
 					}
 					assert.strictEqual(oPayload.messages, "[{code : 42}]");
-					assert.strictEqual(oPayload.resourcePath, "foo");
+					assert.strictEqual(oPayload.resourcePath, "foo/no/query");
 				}, function (oError0) {
 					assert.ok(!bSuccess, "certain failure");
 					assert.strictEqual(oError0, o.bReadFails ? oReadFailure : oError);
@@ -1098,8 +1100,8 @@ sap.ui.define([
 
 		// code under test
 		return Promise.all([
-			oRequestor.sendRequest("POST"),
-			oRequestor.sendRequest("POST")
+			oRequestor.sendRequest("POST", "n/a"),
+			oRequestor.sendRequest("POST", "n/a")
 		]).then(function () {
 			assert.strictEqual(iHeadRequestCount, 1, "fetch HEAD only once");
 		});
@@ -1338,7 +1340,7 @@ sap.ui.define([
 					foo : "URL params are ignored for normal requests"
 				}, "4.0"),
 				oResponse = {body : {}, messages : {}, resourcePath : "Employees?custom=value"},
-				sResourcePath = vStatistics
+				sResourcePathWithQuery = vStatistics
 					? "~Employees~?custom=value&sap-statistics=false"
 					: "~Employees~?custom=value",
 				fnSubmit = sinon.spy();
@@ -1350,19 +1352,22 @@ sap.ui.define([
 			this.mock(oRequestor).expects("convertResourcePath")
 				.withExactArgs("Employees?custom=value")
 				.returns("~Employees~?custom=value");
+			this.mock(_Helper).expects("dropQuery")
+				.withExactArgs("~Employees~?custom=value")
+				.returns("~Employees~");
 			this.mock(oRequestor).expects("sendRequest")
-				.withExactArgs("METHOD", sResourcePath,
+				.withExactArgs("METHOD", sResourcePathWithQuery,
 					{
 						header : "value",
 						"Content-Type" : "application/json;charset=UTF-8;IEEE754Compatible=true"
-					}, JSON.stringify(oPayload), "~Employees~?custom=value")
+					}, JSON.stringify(oPayload), "~Employees~")
 				.resolves(oResponse);
 			this.mock(oRequestor).expects("doConvertResponse")
 				.withExactArgs(sinon.match.same(oResponse.body), "meta/path")
 				.returns("~oConvertedResponse~");
 			this.mock(oRequestor).expects("reportHeaderMessages")
-				.withExactArgs("~Employees~?custom=value", sinon.match.same(oResponse.messages),
-					"~oConvertedResponse~", sResourcePath);
+				.withExactArgs("~Employees~", sinon.match.same(oResponse.messages),
+					"~oConvertedResponse~", sResourcePathWithQuery);
 			this.mock(oRequestor).expects("submitBatch").never();
 
 			// code under test
@@ -1628,17 +1633,19 @@ sap.ui.define([
 
 		this.mock(oRequestor).expects("convertResourcePath").withExactArgs("Employees")
 			.returns("~sResourcePath~");
+		this.mock(_Helper).expects("dropQuery").withExactArgs("~sResourcePath~")
+			.returns("resource/path");
 		this.mock(oRequestor).expects("sendRequest")
 			.withExactArgs("GET", "~sResourcePath~", {
 					"Content-Type" : "application/json;charset=UTF-8;IEEE754Compatible=true",
 					"sap-cancel-on-close" : "true"
-				}, undefined, "~sResourcePath~")
+				}, undefined, "resource/path")
 			.resolves(oResponse);
 		this.mock(oRequestor).expects("doConvertResponse").exactly(sCount === "42" ? 1 : 0)
 			.withExactArgs(42, undefined).returns("~result~");
 		// Note: in case of "1a", JSON.parse throws (see below) and this call is not reached
 		this.mock(oRequestor).expects("reportHeaderMessages").exactly(sCount === "42" ? 1 : 0)
-			.withExactArgs("~sResourcePath~", "~messages~", "~result~", "~sResourcePath~");
+			.withExactArgs("resource/path", "~messages~", "~result~", "~sResourcePath~");
 
 		// code under test
 		return oRequestor.request("GET", "Employees").then(function (oResult) {
@@ -1674,10 +1681,12 @@ sap.ui.define([
 		const oGroupLock = this.createGroupLock("$direct");
 		this.mock(oRequestor).expects("convertResourcePath").withExactArgs("EMPLOYEES")
 			.returns("converted/EMPLOYEES");
+		this.mock(_Helper).expects("dropQuery").withExactArgs("converted/EMPLOYEES")
+			.returns("EMPLOYEES/no/query");
 		this.mock(oRequestor).expects("addQueryString").never();
 		this.mock(oRequestor).expects("sendRequest")
 			.withExactArgs("POST", "converted/EMPLOYEES", sinon.match.object, sinon.match.string,
-				"converted/EMPLOYEES")
+				"EMPLOYEES/no/query")
 			.resolves({/*details do not matter here*/});
 		this.mock(oRequestor).expects("doConvertResponse").withExactArgs(undefined, undefined)
 			.returns("~oResult~");
@@ -1784,9 +1793,11 @@ sap.ui.define([
 			// do not check parameters
 			.returns(Promise.resolve([oResponse]));
 		this.mock(oModelInterface).expects("onHttpResponse").withExactArgs("~headers~");
+		this.mock(_Helper).expects("dropQuery").exactly(i === 0 ? 0 : 1)
+			.withExactArgs("EMPLOYEES").returns("EMPLOYEES/no/query");
 		this.mock(_Helper).expects("createError")
 			.withExactArgs(sinon.match.same(oResponse), "Communication error", "/EMPLOYEES",
-				i === 0 ? sOriginalPath : "EMPLOYEES")
+				i === 0 ? sOriginalPath : "EMPLOYEES/no/query")
 			.returns(new Error());
 
 		// code under test

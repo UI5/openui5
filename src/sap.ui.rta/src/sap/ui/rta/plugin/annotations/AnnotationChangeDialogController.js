@@ -49,12 +49,11 @@ sap.ui.define([
 		});
 	};
 
-	AnnotationChangeDialogController.prototype.filterProperties = function(sQuery, bEquals) {
+	AnnotationChangeDialogController.prototype.filterProperties = function(sQuery) {
 		const aFilters = [];
 		if (sQuery && sQuery.length > 0) {
-			const sOperator = bEquals ? FilterOperator.EQ : FilterOperator.Contains;
-			const oLabelFilter = new Filter("label", sOperator, sQuery);
-			const oValueFilter = new Filter("currentValue", sOperator, sQuery);
+			const oLabelFilter = new Filter("label", FilterOperator.Contains, sQuery);
+			const oValueFilter = new Filter("currentValue", FilterOperator.Contains, sQuery);
 			const oCombinedFilter = new Filter({
 				filters: [oLabelFilter, oValueFilter],
 				and: false

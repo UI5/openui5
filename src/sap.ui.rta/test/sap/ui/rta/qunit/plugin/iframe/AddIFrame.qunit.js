@@ -595,6 +595,51 @@ sap.ui.define([
 			const oMenuItems = await this.oAddIFrame.getMenuItems([this.oObjectPageSectionOverlay]);
 			oMenuItems[0].handler([this.oObjectPageSectionOverlay], { menuItem: oMenuItems[0] });
 		});
+		QUnit.test("when the menu item handler is called for a subsection aggregation (with getCreatedContainerId)", async function(assert) {
+			const fnDone = assert.async();
+			const sTitle = "Subsection iFrame";
+
+			this.oOpenStub.callsFake(function() {
+				return Promise.resolve({
+					frameUrl: TEST_URL,
+					title: sTitle
+				});
+			});
+
+			this.oObjectPageSectionOverlay.setDesignTimeMetadata({
+				aggregations: {
+					subSections: {
+						actions: {
+							addIFrame: {
+								changeType: "addIFrame",
+								text: "foo",
+								getCreatedContainerId(sNewControlID) {
+									return sNewControlID;
+								}
+							}
+						}
+					}
+				}
+			});
+			this.oAddIFrame.deregisterElementOverlay(this.oObjectPageSectionOverlay);
+			this.oAddIFrame.registerElementOverlay(this.oObjectPageSectionOverlay);
+
+			this.oAddIFrame.attachEventOnce("elementModified", function(oEvent) {
+				assert.strictEqual(
+					this.oOpenStub.lastCall.args[0].asContainer,
+					true,
+					"then the dialog is opened with asContainer=true so the title field is shown for the subsection"
+				);
+				assert.strictEqual(oEvent.getParameter("title"), sTitle, "then the entered subsection title is in the event");
+				fnDone();
+			}, this);
+
+			await DtUtil.waitForSynced(this.oDesignTime)();
+			const aMenuItems = await this.oAddIFrame.getMenuItems([this.oObjectPageSectionOverlay]);
+			const oChildMenuItem = aMenuItems.find((oItem) => !oItem.bAsSibling);
+			oChildMenuItem.handler([this.oObjectPageSectionOverlay], { menuItem: oChildMenuItem });
+		});
+
 		QUnit.test("when the dialog returns without allowFocusWithoutUserActivation (unsupported policy)", async function(assert) {
 			const fnDone = assert.async();
 			this.oOpenStub.callsFake(() => Promise.resolve({
