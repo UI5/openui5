@@ -1952,20 +1952,20 @@ sap.ui.define([
 		oModelMock.expects("createUI5Message")
 			.withExactArgs(sinon.match(function (oMessage) {
 				return oMessage === aMessages[0] && oMessage.transition === true;
-			}), "resource/path/operation?~queryOptions~")
+			}), "resource/path/operation")
 			.returns("~UI5msg0~");
 		oModelMock.expects("createUI5Message")
 			.withExactArgs(sinon.match(function (oMessage) {
 				return oMessage === aMessages[1] && oMessage.transition === true;
-			}), "resource/path/operation?~queryOptions~")
+			}), "resource/path/operation")
 			.returns("~UI5msg1~");
 		this.mock(Messaging).expects("updateMessages")
 			.withExactArgs(undefined, ["~UI5msg0~", "~UI5msg1~"]);
 
 		assert.deepEqual(
 			// code under test
-			oModel.reportTransitionMessages(aMessages,
-				"resource/path/operation?~queryOptions~", undefined, "~sOriginalResourcePath~"),
+			oModel.reportTransitionMessages(aMessages, "resource/path/operation", undefined,
+				"~sOriginalResourcePath~"),
 			["~UI5msg0~", "~UI5msg1~"]);
 	});
 
@@ -2870,38 +2870,6 @@ sap.ui.define([
 		oUI5Message = oModel.createUI5Message(oRawMessage);
 
 		assert.deepEqual(oUI5Message.getTargets(), ["/~normalizedTarget~"]);
-	});
-
-	//*********************************************************************************************
-	QUnit.test("createUI5Message: resource path w/ query string", function (assert) {
-		var oHelperMock = this.mock(_Helper),
-			oModel = this.createModel(),
-			oModelMock = this.mock(oModel),
-			oRawMessage = {
-				target : "foo",
-				additionalTargets : ["bar", "baz"]
-			},
-			oUI5Message;
-
-		oModelMock.expects("normalizeMessageTarget")
-			.withExactArgs("/~resourcePath~/~cachePath~/" + oRawMessage.target)
-			.returns("/~normalizedFoo~");
-		oModelMock.expects("normalizeMessageTarget")
-			.withExactArgs("/~resourcePath~/~cachePath~/" + oRawMessage.additionalTargets[0])
-			.returns("/~normalizedBar~");
-		oModelMock.expects("normalizeMessageTarget")
-			.withExactArgs("/~resourcePath~/~cachePath~/" + oRawMessage.additionalTargets[1])
-			.returns("/~normalizedBaz~");
-		oHelperMock.expects("createTechnicalDetails"); // ignore details
-
-		// code under test
-		oUI5Message = oModel.createUI5Message(oRawMessage, "~resourcePath~?foo=bar", "~cachePath~");
-
-		assert.deepEqual(oUI5Message.getTargets(), [
-			"/~normalizedFoo~",
-			"/~normalizedBar~",
-			"/~normalizedBaz~"
-		]);
 	});
 
 	//*********************************************************************************************

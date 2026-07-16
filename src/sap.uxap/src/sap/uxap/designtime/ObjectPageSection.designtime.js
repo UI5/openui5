@@ -88,7 +88,10 @@ sap.ui.define(["sap/base/i18n/ResourceBundle", "sap/ui/core/Lib", "sap/uxap/libr
 					},
 					addIFrame: {
 						changeType: "addIFrame",
-						text: Library.getResourceBundleFor("sap.uxap").getText("ADD_IFRAME_AS_SUBSECTION")
+						text: Library.getResourceBundleFor("sap.uxap").getText("ADD_IFRAME_AS_SUBSECTION"),
+						getCreatedContainerId: function(sNewControlID) {
+							return sNewControlID;
+						}
 					}
 				}
 			}

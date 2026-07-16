@@ -514,8 +514,8 @@ sap.ui.define([
 	 * @param {function} fnGetHeader
 	 *   A callback function to get a header attribute for a given header name with case-insensitive
 	 *   search by header name
-	 * @param {string} sResourcePath
-	 *   The resource path of the request
+	 * @param {string} sResourcePathWithQuery
+	 *   The resource path (possibly including query options) of the request, for error messages
 	 * @param {boolean} [_bVersionOptional]
 	 *   Indicates whether the OData service version is optional, which is the case for all OData V2
 	 *   responses. So this parameter is ignored.
@@ -525,14 +525,15 @@ sap.ui.define([
 	 * @public
 	 */
 	// @override sap.ui.model.odata.v4.lib._Requestor#doCheckVersionHeader
-	_V2Requestor.doCheckVersionHeader = function (fnGetHeader, sResourcePath, _bVersionOptional) {
+	_V2Requestor.doCheckVersionHeader = function (fnGetHeader, sResourcePathWithQuery,
+			_bVersionOptional) {
 		var sDataServiceVersion = fnGetHeader("DataServiceVersion"),
 			vODataVersion = !sDataServiceVersion && fnGetHeader("OData-Version");
 
 		if (vODataVersion) {
 			throw new Error("Expected 'DataServiceVersion' header with value '1.0' or '2.0' but "
 				+ "received 'OData-Version' header with value '" + vODataVersion
-				+ "' in response for " + this.sServiceUrl + sResourcePath);
+				+ "' in response for " + this.sServiceUrl + sResourcePathWithQuery);
 		}
 		if (!sDataServiceVersion) {
 			return;
@@ -543,7 +544,7 @@ sap.ui.define([
 		}
 		throw new Error("Expected 'DataServiceVersion' header with value '1.0' or '2.0' but "
 			+ "received value '" + sDataServiceVersion + "' in response for " + this.sServiceUrl
-			+ sResourcePath);
+			+ sResourcePathWithQuery);
 	};
 
 	/**
@@ -848,7 +849,7 @@ sap.ui.define([
 	 *   The existing entity data (or a function which may be called to access it) in case of a
 	 *   bound operation (V2: "sap:action-for")
 	 * @returns {string}
-	 *   The new path without leading slash and ellipsis
+	 *   The new path without leading slash and ellipsis, possibly including query options
 	 * @throws {Error}
 	 *   If a collection-valued operation parameter is encountered
 	 *

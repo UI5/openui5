@@ -520,6 +520,14 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
+	QUnit.test("dropQuery", function (assert) {
+		assert.strictEqual(_Helper.dropQuery(""), "");
+		assert.strictEqual(_Helper.dropQuery("resource/path"), "resource/path");
+		assert.strictEqual(_Helper.dropQuery("resource/path?"), "resource/path");
+		assert.strictEqual(_Helper.dropQuery("resource/path?with&query&options"), "resource/path");
+	});
+
+	//*********************************************************************************************
 	QUnit.test("encode", function (assert) {
 		var sUnchanged = "foo$,/:?@();";
 

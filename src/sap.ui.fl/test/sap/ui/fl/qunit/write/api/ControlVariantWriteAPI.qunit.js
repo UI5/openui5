@@ -210,7 +210,7 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("When removeVariant is called", function(assert) {
+		QUnit.test("When removeVariant is called", async function(assert) {
 			const mPropertyBag = {
 				variantManagementReference: sVMReference,
 				appComponent: oAppComponent,
@@ -218,14 +218,23 @@ sap.ui.define([
 				sourceVariantReference: "variant0",
 				variantManagementControl: this.oVMControl
 			};
-			const oRemoveVariantStub = sandbox.stub(VariantManager, "removeVariant");
+			let bResolved = false;
+			const oRemoveVariantStub = sandbox.stub(VariantManager, "removeVariant").callsFake(async function() {
+				await Promise.resolve();
+				bResolved = true;
+			});
 
-			ControlVariantWriteAPI.removeVariant(mPropertyBag);
+			await ControlVariantWriteAPI.removeVariant(mPropertyBag);
 
 			assert.strictEqual(
 				oRemoveVariantStub.calledOnceWith(mPropertyBag),
 				true,
 				"then VariantManager.removeVariant is called with correct parameters"
+			);
+			assert.strictEqual(
+				bResolved,
+				true,
+				"then the promise of VariantManager.removeVariant is returned and awaited"
 			);
 		});
 

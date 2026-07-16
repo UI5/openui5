@@ -209,21 +209,25 @@ sap.ui.define([
 	/**
 	 * Adds the given query options to the resource path.
 	 *
-	 * @param {string} sResourcePath The resource path with possible query options and placeholders
-	 * @param {string} sMetaPath The absolute meta path matching the resource path
-	 * @param {object} mQueryOptions Query options to add to the resource path
+	 * @param {string} sResourcePathWithQuery
+	 *   The resource path, possibly including query options and placeholders
+	 * @param {string} sMetaPath
+	 *   The absolute meta path matching the resource path
+	 * @param {object} mQueryOptions
+	 *   Query options to add to the resource path
 	 * @param {boolean} [bSortSystemQueryOptions]
 	 *   Whether system query options are sorted alphabetically and moved to the query string's end
-	 * @returns {string} The resource path with the query options
+	 * @returns {string}
+	 *   The resource path with the query options
 	 *
 	 * @private
 	 */
-	_Requestor.prototype.addQueryString = function (sResourcePath, sMetaPath, mQueryOptions,
-			bSortSystemQueryOptions) {
+	_Requestor.prototype.addQueryString = function (sResourcePathWithQuery, sMetaPath,
+			mQueryOptions, bSortSystemQueryOptions) {
 		var sQueryString;
 
 		mQueryOptions = this.convertQueryOptions(sMetaPath, mQueryOptions, false, true);
-		sResourcePath = sResourcePath.replace(rSystemQueryOptionWithPlaceholder,
+		sResourcePathWithQuery = sResourcePathWithQuery.replace(rSystemQueryOptionWithPlaceholder,
 			function (_sString, sOption) {
 				var sValue = mQueryOptions[sOption];
 
@@ -234,11 +238,11 @@ sap.ui.define([
 
 		sQueryString = _Helper.buildQuery(mQueryOptions, bSortSystemQueryOptions);
 		if (!sQueryString) {
-			return sResourcePath;
+			return sResourcePathWithQuery;
 		}
 
-		return sResourcePath
-			+ (sResourcePath.includes("?") ? "&" + sQueryString.slice(1) : sQueryString);
+		return sResourcePathWithQuery
+			+ (sResourcePathWithQuery.includes("?") ? "&" + sQueryString.slice(1) : sQueryString);
 	};
 
 	/**
@@ -801,8 +805,8 @@ sap.ui.define([
 	 * @param {function} fnGetHeader
 	 *   A callback function to get a header attribute for a given header name with case-insensitive
 	 *   search by header name
-	 * @param {string} sResourcePath
-	 *   The resource path of the request
+	 * @param {string} sResourcePathWithQuery
+	 *   The resource path (possibly including query options) of the request, for error messages
 	 * @param {boolean} [bVersionOptional]
 	 *   Indicates whether the OData service version is optional, which is the case for responses
 	 *   contained in a response for a $batch request
@@ -811,7 +815,7 @@ sap.ui.define([
 	 *
 	 * @private
 	 */
-	_Requestor.prototype.doCheckVersionHeader = function (fnGetHeader, sResourcePath,
+	_Requestor.prototype.doCheckVersionHeader = function (fnGetHeader, sResourcePathWithQuery,
 			bVersionOptional) {
 		var sODataVersion = fnGetHeader("OData-Version"),
 			vDataServiceVersion = !sODataVersion && fnGetHeader("DataServiceVersion");
@@ -819,14 +823,14 @@ sap.ui.define([
 		if (vDataServiceVersion) {
 			throw new Error("Expected 'OData-Version' header with value '4.0' but received"
 				+ " 'DataServiceVersion' header with value '" + vDataServiceVersion
-				+ "' in response for " + this.sServiceUrl + sResourcePath);
+				+ "' in response for " + this.sServiceUrl + sResourcePathWithQuery);
 		}
 		if (!sODataVersion && bVersionOptional || sODataVersion === this.sODataVersion
 				|| sODataVersion === "4.0") {
 			return sODataVersion;
 		}
 		throw new Error("Expected 'OData-Version' header with value '4.0' but received value '"
-			+ sODataVersion + "' in response for " + this.sServiceUrl + sResourcePath);
+			+ sODataVersion + "' in response for " + this.sServiceUrl + sResourcePathWithQuery);
 	};
 
 	/**
@@ -1094,7 +1098,8 @@ sap.ui.define([
 	 *   A copy of the map of key-values pairs representing the operation's actual parameters;
 	 *   invalid keys are removed for actions
 	 * @returns {string}
-	 *   The new path without leading slash and ellipsis
+	 *   The new path without leading slash and ellipsis, possibly including query options (see
+	 *   {@link sap.ui.model.odata.v4.lib._V2Requestor.getPathAndAddQueryOptions})
 	 * @throws {Error}
 	 *   If a collection-valued operation parameter is encountered
 	 *
@@ -1498,7 +1503,9 @@ sap.ui.define([
 					// $resourcePath are undefined
 					oCause = _Helper.createError(vResponse, "Communication error",
 						vRequest.url ? that.sServiceUrl + vRequest.url : undefined,
-						vRequest.$resourcePath === "R#V#C" ? vRequest.url : vRequest.$resourcePath);
+						vRequest.$resourcePath === "R#V#C"
+							? _Helper.dropQuery(vRequest.url)
+							: vRequest.$resourcePath);
 					if (Array.isArray(vRequest)) {
 						_Helper.decomposeError(oCause, vRequest, that.sServiceUrl)
 							.forEach(function (oError, i) {
@@ -1938,8 +1945,9 @@ sap.ui.define([
 	 *
 	 * @param {string} sMethod
 	 *   HTTP method, e.g. "GET"
-	 * @param {string} sResourcePath
-	 *   A resource path relative to the service URL for which this requestor has been created
+	 * @param {string} sResourcePathWithQuery
+	 *   A resource path (possibly including query options) relative to the service URL for which
+	 *   this requestor has been created
 	 * @param {sap.ui.model.odata.v4.lib._GroupLock} [oGroupLock]
 	 *   A lock for the group to associate the request with; if no lock is given or its group ID has
 	 *   {@link sap.ui.model.odata.v4.SubmitMode.Direct}, the request is sent immediately; for group
@@ -2009,9 +2017,9 @@ sap.ui.define([
 	 *
 	 * @public
 	 */
-	_Requestor.prototype.request = function (sMethod, sResourcePath, oGroupLock, mHeaders, oPayload,
-			fnSubmit, fnCancel, sMetaPath, sOriginalResourcePath, bAtFront, mQueryOptions, vOwner,
-			fnMergeRequests) {
+	_Requestor.prototype.request = function (sMethod, sResourcePathWithQuery, oGroupLock, mHeaders,
+			oPayload, fnSubmit, fnCancel, sMetaPath, sOriginalResourcePath, bAtFront, mQueryOptions,
+			vOwner, fnMergeRequests) {
 		var iChangeSetNo,
 			oError,
 			sGroupId = oGroupLock && oGroupLock.getGroupId() || "$direct",
@@ -2021,7 +2029,7 @@ sap.ui.define([
 			that = this;
 
 		if (sGroupId === "$cached") {
-			oError = new Error("Unexpected request: " + sMethod + " " + sResourcePath);
+			oError = new Error("Unexpected request: " + sMethod + " " + sResourcePathWithQuery);
 			oError.$cached = true;
 			throw oError; // fail synchronously!
 		}
@@ -2039,8 +2047,8 @@ sap.ui.define([
 			oGroupLock.unlock();
 			iRequestSerialNumber = oGroupLock.getSerialNumber();
 		}
-		sResourcePath = this.convertResourcePath(sResourcePath);
-		sOriginalResourcePath ??= sResourcePath;
+		sResourcePathWithQuery = this.convertResourcePath(sResourcePathWithQuery);
+		sOriginalResourcePath ??= _Helper.dropQuery(sResourcePathWithQuery);
 		if (this.getGroupSubmitMode(sGroupId) !== "Direct") {
 			if (sGroupId === "$single" && this.mBatchQueue[sGroupId]) {
 				throw new Error("Cannot add new request to already existing $single queue");
@@ -2050,7 +2058,7 @@ sap.ui.define([
 
 				oRequest = {
 					method : sMethod,
-					url : sResourcePath,
+					url : sResourcePathWithQuery,
 					headers : Object.assign({},
 						that.mPredefinedPartHeaders,
 						that.mHeaders,
@@ -2099,17 +2107,18 @@ sap.ui.define([
 			mQueryOptions = Object.assign({"sap-statistics" : this.vStatistics}, mQueryOptions);
 		}
 		if (mQueryOptions) {
-			sResourcePath = that.addQueryString(sResourcePath, sMetaPath, mQueryOptions);
+			sResourcePathWithQuery
+				= that.addQueryString(sResourcePathWithQuery, sMetaPath, mQueryOptions);
 		}
 		if (fnSubmit) {
 			fnSubmit();
 		}
-		return this.sendRequest(sMethod, sResourcePath,
+		return this.sendRequest(sMethod, sResourcePathWithQuery,
 			Object.assign({}, mHeaders, this.mFinalHeaders,
 				sMethod === "GET" ? {"sap-cancel-on-close" : "true"} : undefined),
 			JSON.stringify(oPayload),
 			sOriginalResourcePath === "R#V#C"
-				? sResourcePath
+				? _Helper.dropQuery(sResourcePathWithQuery)
 				: sOriginalResourcePath
 		).then(function (oResponse) {
 			const oResult = that.doConvertResponse(
@@ -2117,7 +2126,7 @@ sap.ui.define([
 				typeof oResponse.body === "string" ? JSON.parse(oResponse.body) : oResponse.body,
 				sMetaPath);
 			that.reportHeaderMessages(sOriginalResourcePath, oResponse.messages, oResult,
-				sResourcePath);
+				sResourcePathWithQuery);
 			return oResult;
 		});
 	};
@@ -2188,15 +2197,16 @@ sap.ui.define([
 	 *
 	 * @param {string} sMethod
 	 *   HTTP method, e.g. "GET"
-	 * @param {string} sResourcePath
-	 *   A resource path relative to the service URL for which this requestor has been created
+	 * @param {string} sResourcePathWithQuery
+	 *   A resource path (possibly including query options) relative to the service URL for which
+	 *   this requestor has been created
 	 * @param {object} [mHeaders]
 	 *   Map of request-specific headers, overriding both the mandatory OData V4 headers and the
 	 *   default headers given to the factory.
 	 * @param {string} [sPayload]
 	 *   Data to be sent to the server
 	 * @param {string} [sOriginalResourcePath]
-	 *  The path by which the resource has originally been requested; MUST NOT be "R#V#C"!
+	 *   The path by which the resource has originally been requested; MUST NOT be "R#V#C"!
 	 * @returns {Promise<{body:object,contentType:string,messages:string,resourcePath:string}>}
 	 *   A promise that is resolved with an object having the properties body, contentType, messages
 	 *   and resourcePath. The body is already an object if the contentType is "application/json".
@@ -2205,9 +2215,9 @@ sap.ui.define([
 	 *
 	 * @private
 	 */
-	_Requestor.prototype.sendRequest = function (sMethod, sResourcePath, mHeaders, sPayload,
-			sOriginalResourcePath) {
-		var sRequestUrl = this.sServiceUrl + sResourcePath,
+	_Requestor.prototype.sendRequest = function (sMethod, sResourcePathWithQuery, mHeaders,
+			sPayload, sOriginalResourcePath) {
+		var sRequestUrl = this.sServiceUrl + sResourcePathWithQuery,
 			that = this;
 
 		return new Promise(function (fnResolve, fnReject) {
@@ -2238,7 +2248,7 @@ sap.ui.define([
 
 					try {
 						sODataVersion = that.doCheckVersionHeader(jqXHR.getResponseHeader,
-							sResourcePath, !vResponse);
+							sResourcePathWithQuery, !vResponse);
 					} catch (oError) {
 						fnReject(oError);
 						return;
@@ -2267,7 +2277,7 @@ sap.ui.define([
 						body : vResponse,
 						contentType : jqXHR.getResponseHeader("Content-Type"),
 						messages : jqXHR.getResponseHeader("sap-messages"),
-						resourcePath : sResourcePath
+						resourcePath : _Helper.dropQuery(sResourcePathWithQuery)
 					});
 				}, function (jqXHR) {
 					var sContextId = jqXHR.getResponseHeader("SAP-ContextId"),

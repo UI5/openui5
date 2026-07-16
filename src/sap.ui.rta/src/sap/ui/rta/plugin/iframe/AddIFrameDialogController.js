@@ -544,10 +544,9 @@ sap.ui.define([
 		},
 
 		_areAllTextFieldsValid() {
-			const bAsContainer = this._oJSONModel.getProperty("asContainer/value");
+			const bShowTitle = this._oJSONModel.getProperty("/showTitle/value");
 			return _aTextInputFields.every((sFieldName) => {
-				// The title field is only available on add as Section
-				if (sFieldName === "title" && !bAsContainer) {
+				if (sFieldName === "title" && !bShowTitle) {
 					return true;
 				}
 				const sValuePath = `/${sFieldName}/value`;

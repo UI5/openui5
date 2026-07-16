@@ -14,11 +14,11 @@ sap.ui.define([
 	"sap/m/p13n/AbstractContainerItem",
 	"sap/m/library",
 	"sap/ui/core/Element",
-	"sap/ui/core/InvisibleMessage",
 	"sap/ui/core/Lib",
 	"sap/ui/core/library",
 	"sap/ui/model/json/JSONModel",
-	"sap/ui/core/ShortcutHintsMixin"
+	"sap/ui/core/ShortcutHintsMixin",
+	"sap/ui/core/InvisibleMessage"
 ], (
 	Control,
 	Button,
@@ -32,11 +32,11 @@ sap.ui.define([
 	AbstractContainerItem,
 	mLibrary,
 	Element,
-	InvisibleMessage,
 	Library,
 	coreLibrary,
 	JSONModel,
-	ShortcutHintsMixin
+	ShortcutHintsMixin,
+	InvisibleMessage
 ) => {
 	"use strict";
 

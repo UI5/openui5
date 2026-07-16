@@ -3,6 +3,7 @@
  * ${copyright}
  */
 sap.ui.define([
+	"sap/base/Log",
 	"sap/ui/base/ManagedObject",
 	"sap/ui/core/Fragment",
 	"sap/ui/dt/ElementUtil",
@@ -13,6 +14,7 @@ sap.ui.define([
 	"sap/ui/rta/plugin/annotations/DocumentedAnnotationChanges",
 	"sap/ui/rta/Utils"
 ], function(
+	Log,
 	ManagedObject,
 	Fragment,
 	ElementUtil,
@@ -45,9 +47,8 @@ sap.ui.define([
 		}
 	}
 
-	function replaceCurrentValueWithTextFromControl(aProperties, sPreSelectedProperty, oControl) {
-		const aNewLabel = ElementUtil.getLabelForElement(oControl);
-		replaceValue(aProperties, sPreSelectedProperty, aNewLabel);
+	function replaceCurrentValueWithTextFromControl(aProperties, sPreSelectedProperty, sControlLabel) {
+		replaceValue(aProperties, sPreSelectedProperty, sControlLabel);
 	}
 
 	function replaceValuesWithValuesFromPendingChanges(aAnnotationChanges, aProperties, bObjectAsKey) {
@@ -109,7 +110,7 @@ sap.ui.define([
 	 * @property {object[]} possibleValues - Array of possible values for value list type properties
 	 * @property {string} possibleValues.key - Key of the option
 	 * @property {string} possibleValues.text - Text of the option
-	 * @property {string} [preSelectedProperty] - Name of the property that should be filtered for initially
+	 * @property {string} [preSelectedProperty] - Annotation path of the property to preselect
 	 * @public
 	 */
 
@@ -196,8 +197,13 @@ sap.ui.define([
 
 		this._oDialog ||= await this._createDialog();
 
+		// A non-rename action (e.g. text arrangement) can still return a preSelectedProperty.
+		// In that case the sFilterText is not required and it will be skipped.
+		// Single-rename is skipped here as it already collapses to one property (see below).
 		const sFilterText = (
-			sPreSelectedPropertyKey && aProperties.find((oProperty) => oProperty.annotationPath === sPreSelectedPropertyKey)?.label
+			!bSingleRename
+			&& sPreSelectedPropertyKey
+			&& aProperties.find((oProperty) => oProperty.annotationPath === sPreSelectedPropertyKey)?.label
 		) || "";
 
 		// default size limit is 100, but we need to display all properties.
@@ -207,14 +213,31 @@ sap.ui.define([
 			this.oChangeAnnotationModel.setSizeLimit(aProperties.length);
 		}
 
+		const sControlLabel = bSingleRename ? ElementUtil.getLabelForElement(oControl) : "";
+
 		if (bSingleRename) {
-			replaceCurrentValueWithTextFromControl(aProperties, sPreSelectedPropertyKey, oControl);
+			replaceCurrentValueWithTextFromControl(aProperties, sPreSelectedPropertyKey, sControlLabel);
 		}
 
 		// Once a change gets passed to the model during initialization, the property _appliedOnModel is set to true
 		replaceValuesWithValuesFromPendingChanges(
 			aExistingChanges.filter((oChange) => !oChange._appliedOnModel), aProperties, bObjectAsKey
 		);
+
+		// In single-rename mode, resolve the target property in JS and put exactly that
+		// object into propertiesToDisplay.
+		let aPropertiesToDisplay = aProperties;
+		if (bSingleRename && sPreSelectedPropertyKey) {
+			const oSingleRenameTarget = aProperties.find((oProperty) => oProperty.annotationPath === sPreSelectedPropertyKey);
+			if (oSingleRenameTarget) {
+				aPropertiesToDisplay = [oSingleRenameTarget];
+			} else {
+				// Delegate did not provide (or provided an invalid) preSelectedProperty.
+				// Fall back to matching the control's current label against oProperty.label.
+				Log.warning("AnnotationChangeDialog: singleRename without a matching preSelectedProperty; falling back to label heuristic");
+				aPropertiesToDisplay = aProperties.filter((oProperty) => oProperty.label === sControlLabel);
+			}
+		}
 
 		this.oChangeAnnotationModel.setData({
 			objectAsKey: bObjectAsKey,
@@ -223,7 +246,7 @@ sap.ui.define([
 			description: sAnnotationDescription || "",
 			properties: aProperties, // all properties
 			changedProperties: aProperties.filter(({ annotationPath }) => aChangedAnnotations.includes(annotationPath)),
-			propertiesToDisplay: aProperties, // switches dynamically between all properties and changed properties
+			propertiesToDisplay: aPropertiesToDisplay, // switches dynamically between all/single-rename target
 			showChangedPropertiesOnly: false,
 			filterText: sFilterText,
 			singleRename: bSingleRename || false,
@@ -237,7 +260,7 @@ sap.ui.define([
 			isSaveEnabled: false
 		});
 		if (sFilterText) {
-			this._oController.filterProperties(sFilterText, !!bSingleRename);
+			this._oController.filterProperties(sFilterText);
 		}
 		// Ensure that the model is fully refreshed before opening the dialog
 		this.oChangeAnnotationModel.refresh(true);

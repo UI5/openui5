@@ -158,9 +158,10 @@ sap.ui.define([
 	 * @param {sap.ui.fl.variants.Variant} mPropertyBag.variant - Variant to be removed
 	 * @param {string} mPropertyBag.sourceVariantReference - Source variant reference that should be set as current after removing
 	 * @param {sap.ui.fl.variants.VariantManagement} mPropertyBag.variantManagementControl - Variant management control
+	 * @returns {Promise} Resolves as soon as the variant is removed
 	 */
 	ControlVariantWriteAPI.removeVariant = function(mPropertyBag) {
-		VariantManager.removeVariant(mPropertyBag);
+		return VariantManager.removeVariant(mPropertyBag);
 	};
 
 	/**

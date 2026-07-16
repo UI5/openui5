@@ -619,7 +619,8 @@ sap.ui.define([
 		 *   The message for the <code>Error</code> instance; code and status text of the HTTP error
 		 *   are appended
 		 * @param {string} [sRequestUrl]
-		 *   The request URL, must be an absolute path starting with the service URL
+		 *   The request URL, must be an absolute path (possibly including query options) starting
+		 *   with the service URL
 		 * @param {string} [sResourcePath]
 		 *   The path by which this resource has originally been requested
 		 * @returns {Error}
@@ -1017,6 +1018,19 @@ sap.ui.define([
 			return vSegments.reduce(function (oCurrent, sSegment) {
 				return (oCurrent && sSegment in oCurrent) ? oCurrent[sSegment] : undefined;
 			}, oObject);
+		},
+
+		/**
+		 * Takes a resource path (possibly including query options), removes the query part, and
+		 * returns only the path.
+		 *
+		 * @param {string} sResourcePathWithQuery
+		 *   A resource path (possibly including query options)
+		 * @returns {string}
+		 *   The resource path w/o query options
+		 */
+		dropQuery : function (sResourcePathWithQuery) {
+			return sResourcePathWithQuery.split("?")[0];
 		},
 
 		/**

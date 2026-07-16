@@ -371,8 +371,6 @@ sap.ui.define([
 		/* =========================================================== */
 		/*                   begin: lifecycle methods                  */
 		/* =========================================================== */
-		Popover._bIOS7 = Device.os.ios && Device.os.version >= 7 && Device.os.version < 8 && Device.browser.name === "sf";
-
 		ResponsivePaddingsEnablement.call(Popover.prototype, {
 			header: {suffix: "intHeader"},
 			subHeader: {selector: ".sapMPopoverSubHeader .sapMIBar"},
@@ -2025,7 +2023,7 @@ sap.ui.define([
 			// Window dimensions
 			oPosParams._fWindowTop = $window.scrollTop();
 			oPosParams._fWindowRight = $window.width();
-			oPosParams._fWindowBottom = (Popover._bIOS7 && Device.orientation.landscape && window.innerHeight) ? window.innerHeight : $window.height();
+			oPosParams._fWindowBottom = $window.height();
 			oPosParams._fWindowLeft = $window.scrollLeft();
 			oPosParams._fWindowWidth = window.innerWidth;
 			oPosParams._fWindowHeight = window.innerHeight;

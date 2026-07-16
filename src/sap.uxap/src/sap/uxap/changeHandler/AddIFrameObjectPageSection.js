@@ -65,7 +65,15 @@ sap.ui.define([
 				oOPSubSection = oOPSubSectionLocal;
 				var oIFrameSelector = Object.create(oBaseSelector);
 				oIFrameSelector.id += "-iframe";
-				return createIFrame(oChange, mPropertyBag, oIFrameSelector);
+				// There is no wrapping section here, so the rename info points at the subsection itself.
+				// This makes the iFrame a container (asContainer=true) whose title is the subsection title,
+				// so a later rename of the subsection stays in sync with the embedded content.
+				const mRenameInfo = {
+					sourceControlId: oModifier.getId(oOPSubSection),
+					selectorControlId: oModifier.getId(oOPSubSection),
+					propertyName: "title"
+				};
+				return createIFrame(oChange, mPropertyBag, oIFrameSelector, mRenameInfo);
 			})
 			.then(function(oIFrame) {
 				return oModifier.insertAggregation(oOPSubSection, "blocks", oIFrame, 0, oView);
