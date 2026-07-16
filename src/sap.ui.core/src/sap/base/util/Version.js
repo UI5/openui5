@@ -140,7 +140,11 @@ sap.ui.define([], function() {
 		 * @public
 		 */
 		this.compareTo = function(vOtherMajor, iOtherMinor, iOtherPatch, sOtherSuffix) {
-			var vOther = Version.apply(window, arguments);
+			// Version acts as a cast operator when not called with 'new', so the 'this'
+			// context is irrelevant here. Passing 'null' avoids referencing the global
+			// 'window', which is not available in non-browser environments such as Web
+			// Workers or Node.js and would otherwise make compareTo/inRange throw there.
+			var vOther = Version.apply(null, arguments);
 			/*eslint-disable no-nested-ternary */
 			return vMajor - vOther.getMajor() ||
 					iMinor - vOther.getMinor() ||
