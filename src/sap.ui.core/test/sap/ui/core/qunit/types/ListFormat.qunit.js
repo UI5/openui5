@@ -186,4 +186,19 @@ sap.ui.define(['sap/ui/core/format/ListFormat', 'sap/ui/core/Locale', "sap/base/
 		assert.deepEqual(aExpectedResult, aActualResult, "Values are correctly parsed but differs from the original input.");
 	});
 
+	QUnit.test("items containing '$' replacement patterns are inserted literally", function (assert) {
+		// '$' sequences in the values must not be interpreted as
+		// String.prototype.replace replacement patterns (e.g. "$&", "$$", "$'").
+		var oListFormat = ListFormat.getInstance(this.oLocale);
+
+		assert.equal(oListFormat.format(["Preis $&", "B"]), "Preis $& und B",
+			"'$&' in a value (exact-count pattern) is kept literally");
+		assert.equal(oListFormat.format(["100$$", "B"]), "100$$ und B",
+			"'$$' in a value is kept literally");
+		assert.equal(oListFormat.format(["a$'b", "B", "C"]), "a$'b, B und C",
+			"\"$'\" in the start element is kept literally");
+		assert.equal(oListFormat.format(["A", "B", "c$&d"]), "A, B und c$&d",
+			"'$&' in the end element is kept literally");
+	});
+
 });

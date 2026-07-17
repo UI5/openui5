@@ -36,6 +36,24 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns a replacer function for <code>String.prototype.replace</code> that inserts the given
+	 * value literally.
+	 *
+	 * Passing the value directly as the replacement string would interpret <code>$</code> sequences
+	 * in it (e.g. <code>$&</code>, <code>$$</code>, <code>$`</code>) as special replacement patterns
+	 * and thereby corrupt list values that contain such sequences.
+	 *
+	 * @param {string} sValue The value to insert literally
+	 * @returns {function():string} A replacer function returning the value unchanged
+	 * @private
+	 */
+	function asReplacement(sValue) {
+		return function() {
+			return sValue;
+		};
+	}
+
+	/**
 	 * Get an instance of the ListFormat which can be used for formatting.
 	 *
 	 * @param {object} [oFormatOptions] Object which defines the format options
@@ -106,8 +124,8 @@ sap.ui.define([
 			var sResult =  aValues[0]; // 1
 
 			for (var i = 1; i < aValues.length; i++) {
-				sResult = sPattern.replace("{0}", sResult); // 1, {1}
-				sResult = sResult.replace("{1}", aValues[i]); // 1, 2
+				sResult = sPattern.replace("{0}", asReplacement(sResult)); // 1, {1}
+				sResult = sResult.replace("{1}", asReplacement(aValues[i])); // 1, 2
 			}
 
 			return sResult;
@@ -119,7 +137,7 @@ sap.ui.define([
 			sPattern = mListPatterns[aValues.length];
 
 			for (var i = 0; i < aValues.length; i++) {
-				sPattern = sPattern.replace('{' + i + '}', aValues[i]);
+				sPattern = sPattern.replace('{' + i + '}', asReplacement(aValues[i]));
 			}
 			sValue = sPattern;
 
@@ -132,11 +150,11 @@ sap.ui.define([
 			sEnd = aValues.pop();
 			aMiddle = aValues;
 
-			sStart = mListPatterns.start.replace("{0}", aStart);
-			sEnd = mListPatterns.end.replace("{1}", sEnd);
+			sStart = mListPatterns.start.replace("{0}", asReplacement(aStart));
+			sEnd = mListPatterns.end.replace("{1}", asReplacement(sEnd));
 			sMiddle = replaceMiddlePatterns(aMiddle, mListPatterns.middle);
 
-			sValue = sStart.replace("{1}", sEnd.replace("{0}", sMiddle));
+			sValue = sStart.replace("{1}", asReplacement(sEnd.replace("{0}", asReplacement(sMiddle))));
 		}
 
 		return sValue;
