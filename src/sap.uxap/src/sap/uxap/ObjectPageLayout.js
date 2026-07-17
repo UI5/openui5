@@ -2453,7 +2453,7 @@ sap.ui.define([
 	 * @private
 	 */
 	ObjectPageLayout.prototype._correctScrollPositionIfNeeded = function (sId) {
-		if (sId !== this._sCurrentScrollId) {
+		if (this._sCurrentScrollId && sId !== this._sCurrentScrollId) {
 			return;
 		}
 

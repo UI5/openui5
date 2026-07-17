@@ -2,7 +2,7 @@
 sap.ui.define([
 	"sap/ui/qunit/utils/createAndAppendDiv",
 	"sap/ui/test/utils/nextUIUpdate",
-	"sap/m/Tooltip",
+	"sap/ui/core/tooltip/Tooltip",
 	"sap/m/Button",
 	"sap/m/library",
 	"sap/ui/Device",
@@ -343,10 +343,33 @@ sap.ui.define([
 
 		// Give the microtask queue a chance to deliver the resolution.
 		setTimeout(() => {
-			assert.strictEqual(this.oTooltip._iOpenTimeout, null, "resumed openBy did not schedule a timer");
+			assert.notOk(this.oTooltip._iOpenTimeout, "resumed openBy did not schedule a timer");
 			assert.notOk(this.oTooltip._bIsOpen, "tooltip did not open");
 			done();
 		}, 100);
+	});
+
+	QUnit.test("openBy cancels a pending close so focusin overrides focusout", async function(assert) {
+		const done = assert.async();
+		// Tooltip already open.
+		await this.oTooltip.openBy(this.stub, 0);
+		setTimeout(async () => {
+			assert.ok(this.oTooltip._bIsOpen, "tooltip open");
+
+			// focusout schedules a delayed close.
+			this.oTooltip.close(500);
+			assert.ok(this.oTooltip._iCloseTimeout, "close scheduled");
+
+			// focusin re-opens before the close fires.
+			await this.oTooltip.openBy(this.stub, 0);
+			assert.strictEqual(this.oTooltip._iCloseTimeout, null, "pending close cancelled");
+
+			// After the close delay, the tooltip must remain open.
+			setTimeout(() => {
+				assert.ok(this.oTooltip._bIsOpen, "tooltip stayed open");
+				done();
+			}, 600);
+		}, 50);
 	});
 
 	QUnit.module("_createPopover content", {
@@ -475,44 +498,44 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("adds sapMTooltipBottom class when placement is Bottom", function(assert) {
+	QUnit.test("adds sapUiCoreTooltipBottom class when placement is Bottom", function(assert) {
 		this.oFakePopover._getCalculatedPlacement = function() { return "Bottom"; };
 		this.oTooltip._popoverAfterRendering();
-		assert.ok(this.oPopoverDiv.classList.contains("sapMTooltipBottom"));
-		assert.notOk(this.oPopoverDiv.classList.contains("sapMTooltipTop"));
+		assert.ok(this.oPopoverDiv.classList.contains("sapUiCoreTooltipBottom"));
+		assert.notOk(this.oPopoverDiv.classList.contains("sapUiCoreTooltipTop"));
 	});
 
-	QUnit.test("adds sapMTooltipTop class when placement is Top", function(assert) {
+	QUnit.test("adds sapUiCoreTooltipTop class when placement is Top", function(assert) {
 		this.oFakePopover._getCalculatedPlacement = function() { return "Top"; };
 		this.oTooltip._popoverAfterRendering();
-		assert.ok(this.oPopoverDiv.classList.contains("sapMTooltipTop"));
+		assert.ok(this.oPopoverDiv.classList.contains("sapUiCoreTooltipTop"));
 	});
 
-	QUnit.test("adds sapMTooltipLeft class when placement is Left", function(assert) {
+	QUnit.test("adds sapUiCoreTooltipLeft class when placement is Left", function(assert) {
 		this.oFakePopover._getCalculatedPlacement = function() { return "Left"; };
 		this.oTooltip._popoverAfterRendering();
-		assert.ok(this.oPopoverDiv.classList.contains("sapMTooltipLeft"));
+		assert.ok(this.oPopoverDiv.classList.contains("sapUiCoreTooltipLeft"));
 	});
 
-	QUnit.test("adds sapMTooltipRight class when placement is Right", function(assert) {
+	QUnit.test("adds sapUiCoreTooltipRight class when placement is Right", function(assert) {
 		this.oFakePopover._getCalculatedPlacement = function() { return "Right"; };
 		this.oTooltip._popoverAfterRendering();
-		assert.ok(this.oPopoverDiv.classList.contains("sapMTooltipRight"));
+		assert.ok(this.oPopoverDiv.classList.contains("sapUiCoreTooltipRight"));
 	});
 
 	QUnit.test("removes stale placement class before adding new one", function(assert) {
-		this.oPopoverDiv.classList.add("sapMTooltipTop");
+		this.oPopoverDiv.classList.add("sapUiCoreTooltipTop");
 		this.oFakePopover._getCalculatedPlacement = function() { return "Bottom"; };
 		this.oTooltip._popoverAfterRendering();
-		assert.notOk(this.oPopoverDiv.classList.contains("sapMTooltipTop"), "old class removed");
-		assert.ok(this.oPopoverDiv.classList.contains("sapMTooltipBottom"), "new class added");
+		assert.notOk(this.oPopoverDiv.classList.contains("sapUiCoreTooltipTop"), "old class removed");
+		assert.ok(this.oPopoverDiv.classList.contains("sapUiCoreTooltipBottom"), "new class added");
 	});
 
 	QUnit.test("no class added for unknown placement", function(assert) {
 		this.oFakePopover._getCalculatedPlacement = function() { return "Unknown"; };
 		this.oTooltip._popoverAfterRendering();
-		assert.notOk(this.oPopoverDiv.classList.contains("sapMTooltipTop"));
-		assert.notOk(this.oPopoverDiv.classList.contains("sapMTooltipBottom"));
+		assert.notOk(this.oPopoverDiv.classList.contains("sapUiCoreTooltipTop"));
+		assert.notOk(this.oPopoverDiv.classList.contains("sapUiCoreTooltipBottom"));
 	});
 
 	QUnit.test("mouseenter on popover cancels pending close timeout", function(assert) {
@@ -555,9 +578,9 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("popover has sapMTooltip style class", async function(assert) {
+	QUnit.test("popover has sapUiCoreTooltip style class", async function(assert) {
 		this.oPopover = await this.oTooltip._createPopover();
-		assert.ok(this.oPopover.hasStyleClass("sapMTooltip"), "sapMTooltip class present");
+		assert.ok(this.oPopover.hasStyleClass("sapUiCoreTooltip"), "sapUiCoreTooltip class present");
 	});
 
 	QUnit.test("popover _restoreFocus is a no-op", async function(assert) {
@@ -614,10 +637,10 @@ sap.ui.define([
 	}
 
 	[
-		{placement: PlacementType.Top, expected: "sapMTooltipTop"},
-		{placement: PlacementType.Bottom, expected: "sapMTooltipBottom"},
-		{placement: PlacementType.Left, expected: "sapMTooltipLeft"},
-		{placement: PlacementType.Right, expected: "sapMTooltipRight"}
+		{placement: PlacementType.Top, expected: "sapUiCoreTooltipTop"},
+		{placement: PlacementType.Bottom, expected: "sapUiCoreTooltipBottom"},
+		{placement: PlacementType.Left, expected: "sapUiCoreTooltipLeft"},
+		{placement: PlacementType.Right, expected: "sapUiCoreTooltipRight"}
 	].forEach(function(oCase) {
 		QUnit.test("placement " + oCase.placement + " → " + oCase.expected, async function(assert) {
 			this.oTooltip = new Tooltip({text: "Hi", placement: oCase.placement, delay: 0});
@@ -625,7 +648,7 @@ sap.ui.define([
 
 			const oCl = this.oTooltip._oPopover.getDomRef().classList;
 			["Top", "Bottom", "Left", "Right"].forEach(function(s) {
-				const sCls = "sapMTooltip" + s;
+				const sCls = "sapUiCoreTooltip" + s;
 				assert[sCls === oCase.expected ? "ok" : "notOk"](oCl.contains(sCls), sCls);
 			});
 		});

@@ -1047,4 +1047,117 @@ sap.ui.define([
 			assert.strictEqual(this.oCP.Color.l, 50, 'light is ok');
 		});
 
+		QUnit.module("High-zoom mode", {
+			beforeEach: function () {
+				this.oCP = new ColorPicker();
+			},
+			afterEach: function () {
+				this.oCP.destroy();
+				this.oCP = null;
+			}
+		});
+
+		QUnit.test("_isHighZoom returns true when innerWidth <= 320", function (oAssert) {
+			this.stub(this.oCP, "_getViewportWidth").returns(320);
+			oAssert.strictEqual(this.oCP._isHighZoom(), true,
+				"_isHighZoom should return true at exactly 320px");
+
+			this.oCP._getViewportWidth.returns(300);
+			oAssert.strictEqual(this.oCP._isHighZoom(), true,
+				"_isHighZoom should return true below 320px");
+		});
+
+		QUnit.test("_isHighZoom returns false when innerWidth > 320", function (oAssert) {
+			this.stub(this.oCP, "_getViewportWidth").returns(321);
+			oAssert.strictEqual(this.oCP._isHighZoom(), false,
+				"_isHighZoom should return false above 320px");
+		});
+
+		QUnit.test("_getEffectiveDisplayMode returns Simplified when high-zoom regardless of displayMode", function (oAssert) {
+			this.stub(this.oCP, "_isHighZoom").returns(true);
+
+			this.oCP.setDisplayMode(ColorPickerDisplayMode.Default);
+			oAssert.strictEqual(this.oCP._getEffectiveDisplayMode(), ColorPickerDisplayMode.Simplified,
+				"Default displayMode should be overridden to Simplified in high-zoom");
+
+			this.oCP.setDisplayMode(ColorPickerDisplayMode.Large);
+			oAssert.strictEqual(this.oCP._getEffectiveDisplayMode(), ColorPickerDisplayMode.Simplified,
+				"Large displayMode should be overridden to Simplified in high-zoom");
+		});
+
+		QUnit.test("_getEffectiveDisplayMode respects displayMode when not high-zoom", function (oAssert) {
+			this.stub(this.oCP, "_isHighZoom").returns(false);
+
+			this.oCP.setDisplayMode(ColorPickerDisplayMode.Large);
+			oAssert.strictEqual(this.oCP._getEffectiveDisplayMode(), ColorPickerDisplayMode.Large,
+				"Large displayMode should be kept when not in high-zoom");
+		});
+
+		QUnit.test("sapUiCPHighZoom class is applied when high-zoom", async function (oAssert) {
+			this.stub(this.oCP, "_isHighZoom").returns(true);
+			this.oCP.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			oAssert.ok(this.oCP.$().hasClass("sapUiCPHighZoom"),
+				"sapUiCPHighZoom class must be on the root element in high-zoom mode");
+		});
+
+		QUnit.test("sapUiCPHighZoom class is not applied when not high-zoom", async function (oAssert) {
+			this.stub(this.oCP, "_isHighZoom").returns(false);
+			this.oCP.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			oAssert.notOk(this.oCP.$().hasClass("sapUiCPHighZoom"),
+				"sapUiCPHighZoom class must not be present outside high-zoom mode");
+		});
+
+		QUnit.test("resize listener is registered after rendering and cleaned up on destroy", async function (oAssert) {
+			this.oCP.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			oAssert.ok(typeof this.oCP._fnWindowResizeListener === "function",
+				"Resize listener function should be set after rendering");
+
+			this.oCP.destroy();
+
+			oAssert.strictEqual(this.oCP._fnWindowResizeListener, null,
+				"Resize listener should be null after destroy");
+		});
+
+		QUnit.test("resize listener triggers invalidate when zoom threshold is crossed", async function (oAssert) {
+			var oIsHighZoomStub = this.stub(this.oCP, "_isHighZoom").returns(false);
+			this.oCP.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			var oInvalidateSpy = this.spy(this.oCP, "invalidate");
+
+			// Simulate crossing the threshold to high-zoom
+			oIsHighZoomStub.returns(true);
+			this.oCP._fnWindowResizeListener();
+
+			oAssert.strictEqual(oInvalidateSpy.callCount, 1,
+				"invalidate should be called once when crossing into high-zoom");
+
+			// Simulate another resize without a state change
+			this.oCP._fnWindowResizeListener();
+
+			oAssert.strictEqual(oInvalidateSpy.callCount, 1,
+				"invalidate should not be called again with no state change");
+		});
+
+		QUnit.test("resize listener triggers invalidate when leaving high-zoom", async function (oAssert) {
+			var oIsHighZoomStub = this.stub(this.oCP, "_isHighZoom").returns(true);
+			this.oCP.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			var oInvalidateSpy = this.spy(this.oCP, "invalidate");
+
+			// Simulate crossing the threshold out of high-zoom
+			oIsHighZoomStub.returns(false);
+			this.oCP._fnWindowResizeListener();
+
+			oAssert.strictEqual(oInvalidateSpy.callCount, 1,
+				"invalidate should be called once when leaving high-zoom");
+		});
+
 });

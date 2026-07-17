@@ -187,6 +187,7 @@
 html.sap-phone {
 
 	.sapMTabStrip {
+		width: 100%;
 
 		.sapMSltWithArrow {
 			visibility: visible;
@@ -205,6 +206,36 @@ html.sap-phone {
 		.sapMTSTabs,
 		.sapMTabStripItem {
 			width: 100%;
+		}
+
+		.sapMTSTabsContainer {
+			left: 0;
+		}
+
+		&.sapMTSHighZoom .sapMTabStripItem {
+			display: flex;
+			align-items: center;
+
+			.sapMTSItemCloseBtnCnt {
+				position: static;
+				flex-shrink: 0;
+			}
+		}
+
+		&.sapMTSHighZoom .sapMTSTexts {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			flex: 1;
+			min-width: 0;
+			overflow: hidden;
+		}
+
+		&.sapMTSHighZoom .sapMTabStripItemLabel,
+		&.sapMTSHighZoom .sapMTabStripItemAddText {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 	}
 
@@ -455,5 +486,158 @@ html .sapMTabStripSelectListItemCloseBtn .sapMBtnInner {
 
 	.sapMTSOverflowSelectListItem.sapMSelectListItem {
 		line-height: 2.5rem;
+	}
+}
+
+/* Phone overflow dialog list */
+html.sap-phone {
+	.sapMTSOverflowSelectListItem {
+		min-height: 3rem;
+		padding: 0 0.5rem 0 0.5rem;
+		border-bottom: 1px solid var(--sapList_BorderColor);
+		display: flex;
+		align-items: center;
+		box-sizing: border-box;
+
+		&.sapMSelectListItemBaseSelected {
+			border-left: 0.1875rem solid var(--sapSelectedColor);
+		}
+
+		.sapMSelectListItemText {
+			flex: 1;
+			display: flex;
+			align-items: center;
+			float: none;
+			overflow: hidden;
+		}
+
+		.sapMTSTexts {
+			flex: 1;
+			overflow: hidden;
+			display: inline-flex;
+			flex-direction: column;
+			justify-content: center;
+			vertical-align: unset;
+		}
+
+		.sapMTabStripItemAddText,
+		.sapMTabStripItemLabel {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.sapMTabStripSelectListItemCloseBtn {
+			flex-shrink: 0;
+			height: 3rem;
+			width: 3rem;
+			float: none;
+		}
+
+		.sapMTabContIcon.sapUiIcon,
+		.sapMTabContIcon.sapMImg {
+			flex-shrink: 0;
+		}
+	}
+}
+
+/* ≤320px phone overflow panel */
+.sapMTSPhoneOverflowPanel {
+	display: none;
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 200;
+	background: var(--sapList_Background);
+	box-shadow: var(--sapContent_Shadow2);
+
+	&.sapMTSPhoneOverflowPanelOpen {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.sapMTSPhoneOverflowPanelList {
+		overflow-y: auto;
+		flex: 1;
+	}
+
+	.sapMTSPhoneOverflowPanelItem {
+		display: flex;
+		align-items: center;
+		min-height: 3rem;
+		padding: 0 0.5rem;
+		border-bottom: 1px solid var(--sapList_BorderColor);
+		box-sizing: border-box;
+		cursor: pointer;
+		&:focus {
+			outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
+			outline-offset: -2px;
+		}
+
+		&.sapMTSPhoneOverflowPanelItemSelected {
+			border-left: 0.1875rem solid var(--sapSelectedColor);
+			background: var(--sapList_SelectionBackgroundColor);
+		}
+
+		.sapMTabContIcon.sapUiIcon,
+		.sapMTabContIcon.sapMImg {
+			flex-shrink: 0;
+			margin-right: 0.5rem;
+		}
+
+		.sapMTSTexts {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			overflow: hidden;
+			vertical-align: unset;
+
+			.sapMTabStripItemAddText {
+				color: var(--sapContent_LabelColor);
+				font-size: var(--sapFontSmallSize);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			.sapMTabStripItemLabel {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+		}
+
+		.sapMTabStripSelectListItemCloseBtn,
+		.sapMTSItemCloseBtnCnt {
+			flex-shrink: 0;
+		}
+
+		.sapMTSPhoneOverflowPanelCloseBtn {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 3rem;
+			height: 3rem;
+			cursor: pointer;
+			color: var(--sapContent_IconColor);
+			flex-shrink: 0;
+
+			&:hover {
+				color: var(--sapContent_Hover_IconColor);
+			}
+		}
+	}
+
+	.sapMTSPhoneOverflowPanelFooter {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		min-height: 3rem;
+		padding: 0 1.125rem 0 0.5rem;
+		border-top: 1px solid var(--sapList_BorderColor);
+		flex-shrink: 0;
+		background: var(--sapList_Background);
 	}
 }

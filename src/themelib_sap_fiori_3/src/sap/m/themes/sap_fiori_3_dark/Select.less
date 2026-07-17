@@ -95,5 +95,26 @@ html.sap-desktop .sapMSltIconOnly.sapMSltFocused:not(.sapMSltExpanded):not(.sapM
 }
 
 div.sapMSltPicker .sapMSltPickerValueState {
-	box-shadow: inset 0 -0.0625rem @_sap_m_Dialog_HeaderShadowColor;
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+
+	.sapMSltPickerValueStateIcon {
+		margin-right: 0.5rem;
+	}
+
+	&.sapMSltPickerErrorState {
+		box-shadow: inset 0 -0.0625rem var(--sapField_InvalidColor);
+	}
+
+	&.sapMSltPickerWarningState {
+		box-shadow: inset 0 -0.0625rem var(--sapField_WarningColor);
+	}
+
+	&.sapMSltPickerSuccessState {
+		box-shadow: inset 0 -0.0625rem var(--sapField_SuccessColor);
+	}
+
+	&.sapMSltPickerInformationState {
+		box-shadow: inset 0 -0.0625rem var(--sapField_InformationColor);
+	}
 }

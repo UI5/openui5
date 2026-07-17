@@ -2,7 +2,7 @@ sap.ui.require([
 	"sap/m/Button",
 	"sap/m/Link",
 	"sap/m/Text",
-	"sap/m/Tooltip",
+	"sap/ui/core/tooltip/Tooltip",
 	"sap/m/library",
 	"sap/ui/core/tooltip/TooltipEnablement",
 	"sap/ui/core/Core",
@@ -29,7 +29,7 @@ sap.ui.require([
 	// Attach a TooltipEnablement helper to the given control. The helper
 	// only takes textProvider/invisibleTextProvider/enableForTouchDevices —
 	// placement and delay scenarios go through attachPlacement() below using
-	// sap.m.Tooltip directly.
+	// sap.ui.core.tooltip.Tooltip directly.
 	function attach(oControl, mSettings) {
 		if (!oControl) {
 			return null;
@@ -45,11 +45,11 @@ sap.ui.require([
 		return new TooltipEnablement(oControl, oConfig);
 	}
 
-	// Wires a sap.m.Tooltip directly onto a control's DOM for scenarios that
+	// Wires a sap.ui.core.tooltip.Tooltip directly onto a control's DOM for scenarios that
 	// vary placement or delay — those settings are no longer part of the
 	// TooltipEnablement API. Listens to mouseenter/mouseleave and focusin/
 	// focusout on desktop only; this is enough to exercise placement and
-	// open-delay behavior of sap.m.Tooltip itself.
+	// open-delay behavior of sap.ui.core.tooltip.Tooltip itself.
 	function attachPlacement(oControl, mSettings) {
 		if (!oControl) {
 			return null;
@@ -96,7 +96,7 @@ sap.ui.require([
 			"dictum mi dictum sit amet."
 	});
 
-	// --- Placement (every PlacementType value) — exercised via sap.m.Tooltip directly ---
+	// --- Placement (every PlacementType value) — exercised via sap.ui.core.tooltip.Tooltip directly ---
 	attachPlacement(Element.getElementById("btn-top"),    { text: "Top",    placement: PlacementType.Top });
 	attachPlacement(Element.getElementById("btn-bottom"), { text: "Bottom", placement: PlacementType.Bottom });
 	attachPlacement(Element.getElementById("btn-left"),   { text: "Left",   placement: PlacementType.Left });
@@ -118,7 +118,7 @@ sap.ui.require([
 	attachPlacement(Element.getElementById("btn-delay-1500"), { text: "Slow 1500ms delay",              delay: 1500 });
 
 	// --- Programmatic API: openBy / close ---
-	// This sample deliberately uses sap.m.Tooltip directly (not through
+	// This sample deliberately uses sap.ui.core.tooltip.Tooltip directly (not through
 	// TooltipEnablement) to exercise the public openBy/close API.
 	const oAnchor = Element.getElementById("btn-api-anchor");
 	const oApiTooltip = new Tooltip({ text: "Opened programmatically via Tooltip#openBy" });

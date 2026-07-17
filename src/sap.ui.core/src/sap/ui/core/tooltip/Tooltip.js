@@ -2,26 +2,39 @@
  * ${copyright}
  */
 
-// Provides control sap.m.Tooltip.
+// Provides control sap.ui.core.tooltip.Tooltip.
 sap.ui.define([
-	"sap/m/library",
 	"sap/ui/core/Control",
+	"sap/ui/core/Lib",
 	"sap/ui/core/tooltip/TooltipManager",
-	"sap/ui/Device",
-	"sap/m/Text",
-	"sap/m/Popover"
+	"sap/ui/Device"
 ],
 	function(
-		library,
 		Control,
+		Library,
 		TooltipManager,
-		Device,
-		Text,
-		Popover
+		Device
 	) {
 		"use strict";
 
-		const PlacementType = library.PlacementType;
+		// Placement string tokens. These match the values of sap.m.PlacementType.
+		// They are kept as inline literals so this control has no static AMD
+		// dependency on sap.m.library — sap.m.Popover (which understands these
+		// values) is loaded lazily on first open.
+		const PlacementType = {
+			Top: "Top",
+			Bottom: "Bottom",
+			Left: "Left",
+			Right: "Right",
+			VerticalPreferredTop: "VerticalPreferredTop",
+			VerticalPreferredBottom: "VerticalPreferredBottom",
+			HorizontalPreferredLeft: "HorizontalPreferredLeft",
+			HorizontalPreferredRight: "HorizontalPreferredRight",
+			PreferredLeftOrFlip: "PreferredLeftOrFlip",
+			PreferredRightOrFlip: "PreferredRightOrFlip",
+			PreferredTopOrFlip: "PreferredTopOrFlip",
+			PreferredBottomOrFlip: "PreferredBottomOrFlip"
+		};
 
 		/**
 		* Constructor for a new Tooltip.
@@ -38,9 +51,9 @@ sap.ui.define([
 		* <h3>Usage</h3>
 		* Use the tooltip for brief, supplementary information about a control.
 		*
-		* <b>Note:</b> Do not instantiate <code>sap.m.Tooltip</code> directly from
+		* <b>Note:</b> Do not instantiate <code>sap.ui.core.tooltip.Tooltip</code> directly from
 		* a control. Use {@link sap.ui.core.tooltip.TooltipEnablement} as the integration
-		* point — it creates and owns a <code>sap.m.Tooltip</code> internally
+		* point — it creates and owns a <code>sap.ui.core.tooltip.Tooltip</code> internally
 		* and handles hover, focus, touch and the ARIA anchor on behalf of the
 		* host control.
 		*
@@ -71,14 +84,14 @@ sap.ui.define([
 		* @version ${version}
 		*
 		* @private
-		* @alias sap.m.Tooltip
+		* @alias sap.ui.core.tooltip.Tooltip
 		*/
-		const Tooltip = Control.extend("sap.m.Tooltip", /** @lends sap.m.Tooltip.prototype */ {
+		const Tooltip = Control.extend("sap.ui.core.tooltip.Tooltip", /** @lends sap.ui.core.tooltip.Tooltip.prototype */ {
 			metadata: {
 				interfaces: [
 					"sap.ui.core.PopupInterface"
 				],
-				library: "sap.m",
+				library: "sap.ui.core",
 				properties: {
 					/**
 					 * The text of the tooltip.
@@ -88,10 +101,16 @@ sap.ui.define([
 
 					/**
 					 * Defines the placement of the tooltip relative to its target.
+					 *
+					 * Accepts the placement string tokens understood by
+					 * <code>sap.m.Popover</code> (the same set as
+					 * <code>sap.m.PlacementType</code>). Typed as <code>string</code>
+					 * so that <code>sap.ui.core</code> does not depend on the
+					 * <code>sap.m</code> enum.
 					 * @since 1.151
 					 */
 					placement: {
-						type: "sap.m.PlacementType", group: "Behavior", defaultValue: PlacementType.VerticalPreferredTop
+						type: "string", group: "Behavior", defaultValue: PlacementType.VerticalPreferredTop
 					},
 
 					/**
@@ -138,24 +157,13 @@ sap.ui.define([
 			}
 			this._pPopover = null;
 
-			if (this._iOpenTimeout) {
-				clearTimeout(this._iOpenTimeout);
-				this._iOpenTimeout = null;
-			}
-
-			if (this._iCloseTimeout) {
-				clearTimeout(this._iCloseTimeout);
-				this._iCloseTimeout = null;
-			}
+			this._clearTimeouts();
 
 			this._bOpenRequested = false;
 		};
 
 		Tooltip.prototype._onPopoverMouseEnter = function () {
-			if (this._iCloseTimeout) {
-				clearTimeout(this._iCloseTimeout);
-				this._iCloseTimeout = null;
-			}
+			this._clearCloseTimeout();
 		};
 
 		Tooltip.prototype._onPopoverMouseLeave = function () {
@@ -173,10 +181,10 @@ sap.ui.define([
 			// The base TooltipPlacementType-style classes drive the LESS pseudo-elements that extend
 			// the clickable area beyond the arrow so the tooltip stays open when the mouse moves
 			// over the gap between popover body and target element.
-			oDomRef.classList.remove("sapMTooltipTop", "sapMTooltipBottom", "sapMTooltipLeft", "sapMTooltipRight");
+			oDomRef.classList.remove("sapUiCoreTooltipTop", "sapUiCoreTooltipBottom", "sapUiCoreTooltipLeft", "sapUiCoreTooltipRight");
 			const sCalcedPos = this._oPopover._getCalculatedPlacement && this._oPopover._getCalculatedPlacement();
 			if (sCalcedPos === "Top" || sCalcedPos === "Bottom" || sCalcedPos === "Left" || sCalcedPos === "Right") {
-				oDomRef.classList.add("sapMTooltip" + sCalcedPos);
+				oDomRef.classList.add("sapUiCoreTooltip" + sCalcedPos);
 			}
 		};
 
@@ -189,8 +197,8 @@ sap.ui.define([
 
 			// Bind mouse handlers exactly once per Popover DOM node. Re-renders may produce a new
 			// node (or the same node), so we tag it to detect first time vs. repeat.
-			if (oDomRef._sapMTooltipMouseBound !== this.getId()) {
-				oDomRef._sapMTooltipMouseBound = this.getId();
+			if (oDomRef._sapUiCoreTooltipMouseBound !== this.getId()) {
+				oDomRef._sapUiCoreTooltipMouseBound = this.getId();
 				oDomRef.addEventListener("mouseenter", this._onPopoverMouseEnter.bind(this));
 				oDomRef.addEventListener("mouseleave", this._onPopoverMouseLeave.bind(this));
 			}
@@ -268,6 +276,9 @@ sap.ui.define([
 			this._bOpenRequested = true;
 			TooltipManager.registerOpening(this);
 
+			// A pending close (e.g. focusout) must not win over a fresh open — cancel it.
+			this._clearCloseTimeout();
+
 			// Cache the in-flight Promise so simultaneous callers (e.g. mouseenter+focusin)
 			// share a single Popover instance instead of racing and leaking duplicates.
 			if (!this._oPopover) {
@@ -322,55 +333,66 @@ sap.ui.define([
 			return (oControl.getDomRef && oControl.getDomRef()) || null;
 		};
 
-		Tooltip.prototype._createPopover = function () {
-			return new Promise((fnResolve) => {
+		// @todo get rid of sap/m/Popover and sap/m/Text dependencies
+		Tooltip.prototype._createPopover = async function () {
 
-				// @todo make the popover dependency lazy and move Tooltip to sap.ui.core
+			// sap.m.Popover (and its Text content) is loaded lazily so that
+			// sap.ui.core keeps no static dependency on sap.m. When sap.m is
+			// already loaded the modules are required synchronously; otherwise
+			// the library is loaded first.
+			let Popover = sap.ui.require("sap/m/Popover");
+			let Text = sap.ui.require("sap/m/Text");
 
-				const oPopover = new Popover({
-					showHeader: false,
-					placement: this.getPlacement(),
-					modal: false,
-					content: new Text(),
-					afterOpen: () => {
-						// At this point _calcPlacement has run, so _getCalculatedPlacement
-						// returns the resolved Top/Bottom/Left/Right side.
-						this._applyPlacementClass();
-						this.fireAfterOpen();
-					},
-					afterClose: () => {
-						this._bIsOpen = false;
-						this._bOpenRequested = false;
-						this._clearTimeouts();
-						this.fireAfterClose();
-					}
+			if (!Popover || !Text) {
+				await Library.load({ name: "sap.m" });
+				[Popover, Text] = await new Promise((fnResolve) => {
+					sap.ui.require(["sap/m/Popover", "sap/m/Text"], (P, T) => fnResolve([P, T]));
 				});
+			}
 
-
-				oPopover.addStyleClass("sapMTooltip");
-
-				oPopover.addEventDelegate({
-					onAfterRendering: this._popoverAfterRendering
-				}, this);
-
-				oPopover._getInitialFocusId = () => {
-					return null;
-				};
-
-				oPopover._restoreFocus = function() {
-					// Do nothing - don't restore focus on close
-				};
-
-				// Popover.close() also calls Popup.applyFocusInfo(_oPreviousFocus) when
-				// the focused element at close-time differs from the one at open-time.
-				const fnSuperClose = oPopover.close.bind(oPopover);
-				oPopover.close = function () {
-					this._oPreviousFocus = null;
-					return fnSuperClose.apply(this, arguments);
-				};
-
-				fnResolve(oPopover);
+			const oPopover = new Popover({
+				showHeader: false,
+				placement: this.getPlacement(),
+				modal: false,
+				content: new Text(),
+				afterOpen: () => {
+					// At this point _calcPlacement has run, so _getCalculatedPlacement
+					// returns the resolved Top/Bottom/Left/Right side.
+					this._applyPlacementClass();
+					this.fireAfterOpen();
+				},
+				afterClose: () => {
+					this._bIsOpen = false;
+					this._bOpenRequested = false;
+					this._clearTimeouts();
+					this.fireAfterClose();
+				}
 			});
+
+
+			oPopover.addStyleClass("sapUiCoreTooltip");
+
+			oPopover.addEventDelegate({
+				onAfterRendering: this._popoverAfterRendering
+			}, this);
+
+			oPopover._getInitialFocusId = () => {
+				return null;
+			};
+
+			oPopover._restoreFocus = function() {
+				// Do nothing - don't restore focus on close
+			};
+
+			// Popover.close() also calls Popup.applyFocusInfo(_oPreviousFocus) when
+			// the focused element at close-time differs from the one at open-time.
+			const fnSuperClose = oPopover.close.bind(oPopover);
+			oPopover.close = function () {
+				this._oPreviousFocus = null;
+				return fnSuperClose.apply(this, arguments);
+			};
+
+			return oPopover;
 		};
 
 		/**
@@ -414,10 +436,22 @@ sap.ui.define([
 		};
 
 		Tooltip.prototype._clearTimeouts = function () {
-			clearTimeout(this._iOpenTimeout);
-			this._iOpenTimeout = null;
-			clearTimeout(this._iCloseTimeout);
-			this._iCloseTimeout = null;
+			this._clearOpenTimeout();
+			this._clearCloseTimeout();
+		};
+
+		Tooltip.prototype._clearOpenTimeout = function () {
+			if (this._iOpenTimeout) {
+				clearTimeout(this._iOpenTimeout);
+				this._iOpenTimeout = null;
+			}
+		};
+
+		Tooltip.prototype._clearCloseTimeout = function () {
+			if (this._iCloseTimeout) {
+				clearTimeout(this._iCloseTimeout);
+				this._iCloseTimeout = null;
+			}
 		};
 
 		/**
@@ -431,13 +465,14 @@ sap.ui.define([
 		};
 
 		/**
-		 * Whether the tooltip is open or pending an open (delay running).
+		 * Whether the tooltip is open or pending an open (Popover creation or
+		 * the hover-delay timer still running).
 		 *
 		 * @returns {boolean}
 		 * @public
 		 */
 		Tooltip.prototype.isPendingOrOpen = function () {
-			return !!(this._bIsOpen || this._iOpenTimeout);
+			return !!(this._bIsOpen || this._iOpenTimeout || this._bOpenRequested);
 		};
 
 		return Tooltip;

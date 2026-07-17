@@ -1917,10 +1917,6 @@ sap.ui.define([
 				title: "Test Page for sap.m.ToolbarSpacer"
 			},
 
-			Tooltip: {
-				title: "QUnit Page for sap.m.Tooltip"
-			},
-
 			Tree: {
 				title: "QUnit Page for sap.m.Tree"
 			},

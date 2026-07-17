@@ -111,7 +111,8 @@ sap.ui.define([
 		  "sap.ui.core.InvisibleText",
 		  "sap.ui.core.TooltipBase",
 		  "sap.ui.core.mvc.View",
-		  "sap.ui.core.mvc.XMLView"
+		  "sap.ui.core.mvc.XMLView",
+		  "sap.ui.core.tooltip.Tooltip"
 		 ],
 		 elements: [
 		  "sap.ui.core.CustomData",

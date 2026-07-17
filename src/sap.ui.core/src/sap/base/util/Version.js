@@ -140,7 +140,7 @@ sap.ui.define([], function() {
 		 * @public
 		 */
 		this.compareTo = function(vOtherMajor, iOtherMinor, iOtherPatch, sOtherSuffix) {
-			var vOther = Version.apply(window, arguments);
+			var vOther = Version.apply(null, arguments); // cast to Version
 			/*eslint-disable no-nested-ternary */
 			return vMajor - vOther.getMajor() ||
 					iMinor - vOther.getMinor() ||

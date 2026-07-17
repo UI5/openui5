@@ -16,6 +16,28 @@ sap.ui.define([
 		// Long-press threshold in ms for touch devices.
 		const LONG_PRESS_MS = 500;
 
+		// If the focus is the first page focus after page load. Sticky flag, once set to false it is not reset.
+		let bInitialFocus = true;
+
+		// Live instance count; the shared listener is attached only while > 0.
+		let iInstancesCount = 0;
+
+		function onDocumentKeyDown() {
+			bInitialFocus = false;
+			detachInitialFocusListener();
+		}
+
+		function attachInitialFocusListener() {
+			// Only relevant while still waiting for the first navigation.
+			if (bInitialFocus) {
+				document.addEventListener("keydown", onDocumentKeyDown, true);
+			}
+		}
+
+		function detachInitialFocusListener() {
+			document.removeEventListener("keydown", onDocumentKeyDown, true);
+		}
+
 		/**
 		 * Constructor for a new <code>sap.ui.core.tooltip.TooltipEventTrigger</code>.
 		 *
@@ -60,6 +82,12 @@ sap.ui.define([
 				// Array of [type, handler] pairs recorded by _on for later removal.
 				this._aListeners = [];
 				this._iLongPressTimer = null;
+
+				// First instance arms the shared initial-focus listener.
+				if (iInstancesCount === 0) {
+					attachInitialFocusListener();
+				}
+				iInstancesCount++;
 			}
 		});
 
@@ -140,11 +168,13 @@ sap.ui.define([
 					this._fnOnClose(true);
 				});
 
-				// Open on keyboard focus only (not on initial programmatic focus).
-				// :focus-visible is the standard CSS/DOM signal that distinguishes
-				// keyboard focus from mouse/programmatic focus.
+				// Open on keyboard focus only, via :focus-visible.
 				this._on("focusin", () => {
 					if (!(oDomRef.matches && oDomRef.matches(":focus-visible"))) {
+						return;
+					}
+					// Suppress tooltip if this is the initial focus (page load).
+					if (bInitialFocus) {
 						return;
 					}
 					this._fnOnOpen(true);
@@ -242,6 +272,13 @@ sap.ui.define([
 			this._fnOnOpen = null;
 			this._fnOnClose = null;
 			this._fnIsPendingOrOpen = null;
+
+			iInstancesCount--;
+			// Last instance gone: drop the shared document listener (no-op if already off).
+			if (iInstancesCount === 0) {
+				detachInitialFocusListener();
+			}
+
 			BaseObject.prototype.destroy.apply(this, arguments);
 		};
 
@@ -255,6 +292,17 @@ sap.ui.define([
 		TooltipEventTrigger.prototype._on = function(sType, fnHandler) {
 			this._oDomRef.addEventListener(sType, fnHandler);
 			this._aListeners.push([sType, fnHandler]);
+		};
+
+		/**
+		 * Resets the sticky initial-focus state. Test-only.
+		 * @private
+		 * @ui5-restricted sap.ui.core
+		 */
+		TooltipEventTrigger._resetInitialFocusForTesting = function() {
+			detachInitialFocusListener();
+			bInitialFocus = true;
+			iInstancesCount = 0;
 		};
 
 		return TooltipEventTrigger;

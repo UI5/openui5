@@ -25,8 +25,9 @@ var oRb = Library.getResourceBundleFor("sap.ui.unified");
  * @param {sap.ui.unified.ColorPicker} oControl an object representation of the control that should be rendered
  */
 ColorPickerRenderer.render = function(oRm, oControl){
-	var sDisplayMode = oControl.getDisplayMode(),
-		bResponsive = oControl.bResponsive;
+	var sDisplayMode = oControl._getEffectiveDisplayMode(),
+		bResponsive = oControl.bResponsive,
+		bHighZoom = oControl._isHighZoom();
 
 	oRm.openStart("div", oControl);
 
@@ -45,6 +46,9 @@ ColorPickerRenderer.render = function(oRm, oControl){
 	}
 	if (Device.system.phone) {
 		oRm.class("sapUiCPPhone");
+	}
+	if (bHighZoom) {
+		oRm.class("sapUiCPHighZoom");
 	}
 	oRm.openEnd();
 
@@ -82,8 +86,9 @@ ColorPickerRenderer.renderSliders = function(oRm, oControl) {
 };
 
 ColorPickerRenderer.renderDefaultColorPicker = function(oRm, oControl) {
+	var bHighZoom = oControl._isHighZoom();
 	oRm.renderControl(oControl.getAggregation("_oCPBox"));
-	if (Device.system.phone) { //mobile
+	if (Device.system.phone && !bHighZoom) { //mobile
 		oRm.openStart("div");
 		oRm.class("sapUiCPPhoneContent");
 		oRm.openEnd();
@@ -94,6 +99,9 @@ ColorPickerRenderer.renderDefaultColorPicker = function(oRm, oControl) {
 		oRm.close("div");
 		this.renderMobileSwatches(oRm, oControl);
 		oRm.close("div");
+	} else if (bHighZoom) { //mobile 200% zoom
+		this.renderSliders(oRm, oControl);
+		this.renderDesktopSwatchesAndHexFields(oRm, oControl);
 	} else { //desktop or tablet
 		this.renderSliders(oRm, oControl);
 		this.renderDesktopSwatchesAndHexFields(oRm, oControl);
@@ -102,7 +110,7 @@ ColorPickerRenderer.renderDefaultColorPicker = function(oRm, oControl) {
 	oRm.openStart("div");
 	oRm.class("sapUiCPDefaultWrapper");
 	oRm.openEnd();
-	if (Device.system.phone) {
+	if (Device.system.phone && !bHighZoom) {
 		oRm.renderControl(oControl.getAggregation("_oHexField"));
 		oRm.openStart("div");
 		oRm.class("sapUiCPHexText");
@@ -207,8 +215,9 @@ ColorPickerRenderer.renderLargeColorPicker = function(oRm, oControl) {
 };
 
 ColorPickerRenderer.renderSimplifiedColorPicker = function(oRm, oControl) {
+	var bHighZoom = oControl._isHighZoom();
 	oRm.renderControl(oControl.getAggregation("_oCPBox"));
-	if (Device.system.phone) {
+	if (Device.system.phone && !bHighZoom) {
 		oRm.openStart("div");
 		oRm.class("sapUiCPPhoneContent");
 		oRm.openEnd();
@@ -229,6 +238,9 @@ ColorPickerRenderer.renderSimplifiedColorPicker = function(oRm, oControl) {
 		oRm.close("div");
 		oRm.close("div");
 		oRm.close("div");
+	} else if (bHighZoom) { //mobile 200% zoom
+		oRm.renderControl(oControl.getAggregation("_oSlider"));
+		this.renderDesktopSwatchesAndHexFields(oRm, oControl);
 	} else {
 		oRm.renderControl(oControl.getAggregation("_oSlider"));
 		this.renderDesktopSwatchesAndHexFields(oRm, oControl);
@@ -242,6 +254,14 @@ ColorPickerRenderer.renderSimplifiedColorPicker = function(oRm, oControl) {
  * @param {sap.ui.unified.ColorPicker} oControl an object representation of the control that should be rendered
  */
 ColorPickerRenderer.renderDesktopSwatchesAndHexFields = function(oRm, oControl) {
+	var bHighZoom = oControl._isHighZoom();
+
+	if (bHighZoom) {
+		oRm.openStart("div");
+		oRm.class("sapUiCPHexRow");
+		oRm.openEnd();
+	}
+
 	oRm.openStart("div");
 	oRm.class("sapUiCPComparisonWrapper");
 	oRm.openEnd();
@@ -256,17 +276,31 @@ ColorPickerRenderer.renderDesktopSwatchesAndHexFields = function(oRm, oControl) 
 	oRm.openEnd();
 	oRm.close("div");
 	oRm.close("div");
-	oRm.openStart("div");
-	oRm.class("sapUiCPHexWrapper");
-	oRm.openEnd();
-	oRm.openStart("span");
-	oRm.class("sapUiCPHexText");
-	oRm.openEnd();
-	oRm.text("Hex");
-	oRm.close("span");
-	oRm.close("div");
-	oRm.renderControl(oControl.getAggregation("_oHexField"));
 
+	if (bHighZoom) {
+		oRm.openStart("div");
+		oRm.class("sapUiCPHexWrapper");
+		oRm.openEnd();
+		oRm.renderControl(oControl.getAggregation("_oHexField"));
+		oRm.openStart("span");
+		oRm.class("sapUiCPHexText");
+		oRm.openEnd();
+		oRm.text("Hex");
+		oRm.close("span");
+		oRm.close("div");
+		oRm.close("div"); // close sapUiCPHexRow
+	} else {
+		oRm.openStart("div");
+		oRm.class("sapUiCPHexWrapper");
+		oRm.openEnd();
+		oRm.openStart("span");
+		oRm.class("sapUiCPHexText");
+		oRm.openEnd();
+		oRm.text("Hex");
+		oRm.close("span");
+		oRm.close("div");
+		oRm.renderControl(oControl.getAggregation("_oHexField"));
+	}
 };
 
 /**

@@ -170,4 +170,21 @@ sap.ui.require([
 			showBanner(oBanner, "Activated: " + (oTarget.id || oTarget.tagName.toLowerCase()));
 		});
 	}
+
+	// Auto-focus the first button on load to verify no tooltip opens until
+	// the user starts arrow/Tab navigation.
+	const oFirstButton = Element.getElementById("btn-default");
+	if (oFirstButton) {
+		const oFocusDelegate = {
+			onAfterRendering: function () {
+				oFirstButton.removeEventDelegate(oFocusDelegate);
+				oFirstButton.focus();
+			}
+		};
+		if (oFirstButton.getDomRef()) {
+			oFirstButton.focus();
+		} else {
+			oFirstButton.addEventDelegate(oFocusDelegate);
+		}
+	}
 });
