@@ -69,7 +69,11 @@ sap.ui.define(["sap/base/Log"], function(Log) {
 			if (!contains && Object.keys(a).length !== Object.keys(b).length) {
 				return false;
 			}
-			if (a instanceof Node) {
+			// 'Node' is a browser global and does not exist in non-browser
+			// environments such as Web Workers or Node.js. Guard the reference so
+			// deepEqual (a sap/base module) stays usable there instead of throwing
+			// a ReferenceError, while still comparing DOM nodes in the browser.
+			if (typeof Node !== "undefined" && a instanceof Node) {
 				return a.isEqualNode(b);
 			}
 			if (a instanceof Date) {
