@@ -809,6 +809,9 @@ sap.ui.define([
 			// add KeyboardInteractionEndpoint to list of modules
 			this.aModules.push("sap/ui/core/boot/KeyboardInteractionEndpoint");
 
+			// add ExtendedKeyboardNavigationSupport to list of modules
+			this.aModules.push("sap/ui/core/boot/ExtendedKeyboardNavigationSupport");
+
 			// load all modules now
 			if ( bAsync ) {
 				return this._requireModulesAsync().then(function() {

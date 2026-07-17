@@ -30,7 +30,7 @@ sap.ui.define([
 	}
 
 	QUnit.test("Toolbar is shown with download button", async function (assert) {
-		assert.expect(5);
+		assert.expect(6);
 		var fnDone = assert.async();
 		var sTitle = "My Title";
 
@@ -49,6 +49,9 @@ sap.ui.define([
 
 			var oDownloadButton = oPdfViewer.$('toolbarDownloadButton');
 			assert.ok(oDownloadButton.length === 1, 'Download button should be visible');
+
+			var oIframe = oPdfViewer.getDomRef().querySelector("iframe");
+			assert.equal(oIframe && oIframe.getAttribute("title"), sTitle, "iframe title attribute matches control title property");
 		};
 
 		var oOptions = {
@@ -73,7 +76,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Toolbar is shown even when title is filled and download button hidden", async function (assert) {
-		assert.expect(5);
+		assert.expect(6);
 		var fnDone = assert.async();
 		var sTitle = "My Title";
 
@@ -92,6 +95,9 @@ sap.ui.define([
 
 			var oDownloadButton = oPdfViewer.$('toolbarDownloadButton');
 			assert.ok(oDownloadButton.length === 0, 'Download button should be hidden');
+
+			var oIframe = oPdfViewer.getDomRef().querySelector("iframe");
+			assert.equal(oIframe && oIframe.getAttribute("title"), sTitle, "iframe title attribute matches control title property");
 		};
 
 		var oOptions = {
@@ -117,7 +123,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Toolbar is hidden when title is empty and download button is hidden", async function (assert) {
-		assert.expect(4);
+		assert.expect(5);
 		var fnDone = assert.async();
 
 		var oModel = new JSONModel({
@@ -133,6 +139,9 @@ sap.ui.define([
 
 			var oDownloadButton = oPdfViewer.$('toolbarDownloadButton');
 			assert.ok(oDownloadButton.length === 0, 'Download button should be hidden');
+
+			var oIframe = oPdfViewer.getDomRef().querySelector("iframe");
+			assert.equal(oIframe && oIframe.getAttribute("title"), null, "iframe title attribute is not set when title property is empty");
 		};
 
 		var oOptions = {
