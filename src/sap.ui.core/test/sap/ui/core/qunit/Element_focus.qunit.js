@@ -690,4 +690,119 @@ sap.ui.define([
 		oPanel.destroy();
 		oUIArea.remove();
 	});
+
+	QUnit.test("Focus stays on control after remove + insert at different position", async function(assert) {
+		const oUIArea = createAndAppendDiv("uiarea_move");
+
+		const oButton1 = new Button({ text: "Button 1" });
+		const oButton2 = new Button({ text: "Button 2" });
+		const oButton3 = new Button({ text: "Button 3" });
+
+		const oPanel = new Panel({
+			content: [oButton1, oButton2, oButton3]
+		});
+
+		oPanel.placeAt("uiarea_move");
+		await nextUIUpdate();
+
+		oButton1.focus();
+		assert.ok(oButton1.getDomRef() === document.activeElement, "Initially, oButton1 should be focused");
+
+		oPanel.removeContent(oButton1);
+		oPanel.insertContent(oButton1, 2);
+		await nextUIUpdate();
+
+		assert.ok(oButton1.getDomRef() === document.activeElement, "After remove + insert, focus should stay on oButton1");
+
+		oPanel.destroy();
+		oUIArea.remove();
+	});
+
+	QUnit.test("Focus redirects when control is moved to a different parent", async function(assert) {
+		const oUIArea = createAndAppendDiv("uiarea_crossmove");
+
+		const oButton1 = new Button({ text: "Button 1" });
+		const oButton2 = new Button({ text: "Button 2" });
+		const oButton3 = new Button({ text: "Button 3" });
+
+		const oPanelA = new Panel({
+			content: [oButton1, oButton3]
+		});
+		const oPanelB = new Panel({
+			content: [oButton2]
+		});
+
+		const oPage = new Page({
+			content: [oPanelA, oPanelB]
+		});
+
+		oPage.placeAt("uiarea_crossmove");
+		await nextUIUpdate();
+
+		oButton1.focus();
+		assert.ok(oButton1.getDomRef() === document.activeElement, "Initially, oButton1 should be focused");
+
+		oPanelA.removeContent(oButton1);
+		oPanelB.insertContent(oButton1, 1);
+		await nextUIUpdate();
+
+		assert.ok(oButton3.getDomRef() === document.activeElement, "After cross-parent move, focus should redirect to the next focusable sibling in the original parent");
+
+		oPage.destroy();
+		oUIArea.remove();
+	});
+
+	QUnit.test("Focus redirects when control is removed + re-inserted but disabled", async function(assert) {
+		const oUIArea = createAndAppendDiv("uiarea_move_disabled");
+
+		const oButton1 = new Button({ text: "Button 1" });
+		const oButton2 = new Button({ text: "Button 2" });
+
+		const oPanel = new Panel({
+			content: [oButton1, oButton2]
+		});
+
+		oPanel.placeAt("uiarea_move_disabled");
+		await nextUIUpdate();
+
+		oButton1.focus();
+		assert.ok(oButton1.getDomRef() === document.activeElement, "Initially, oButton1 should be focused");
+
+		oPanel.removeContent(oButton1);
+		oButton1.setEnabled(false);
+		oPanel.insertContent(oButton1, 1);
+		await nextUIUpdate();
+
+		assert.ok(oButton2.getDomRef() === document.activeElement, "After remove + insert with disabled, focus should redirect to oButton2");
+
+		oPanel.destroy();
+		oUIArea.remove();
+	});
+
+	QUnit.test("Focus redirects when control is removed + re-inserted but invisible", async function(assert) {
+		const oUIArea = createAndAppendDiv("uiarea_move_invisible");
+
+		const oButton1 = new Button({ text: "Button 1" });
+		const oButton2 = new Button({ text: "Button 2" });
+
+		const oPanel = new Panel({
+			content: [oButton1, oButton2]
+		});
+
+		oPanel.placeAt("uiarea_move_invisible");
+		await nextUIUpdate();
+
+		oButton1.focus();
+		assert.ok(oButton1.getDomRef() === document.activeElement, "Initially, oButton1 should be focused");
+
+		oPanel.removeContent(oButton1);
+		oButton1.setVisible(false);
+		oPanel.insertContent(oButton1, 1);
+		await nextUIUpdate();
+
+		assert.ok(oButton2.getDomRef() === document.activeElement, "After remove + insert with invisible, focus should redirect to oButton2");
+
+		oPanel.destroy();
+		oUIArea.remove();
+	});
 });
