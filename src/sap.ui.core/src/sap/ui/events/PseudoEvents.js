@@ -566,6 +566,24 @@ sap.ui.define([
 			}
 		},
 
+		/**
+		 * Pseudo event for toggling Extended Keyboard Navigation (Shift + Alt + F6).
+		 *
+		 * Subject to confirmation by the central Accessibility team before
+		 * stable release.
+		 *
+		 * @private
+		 * @ui5-restricted sap.ui.core
+		 */
+		sapextendedkeyboardnavigationtoggle: {
+			sName: "sapextendedkeyboardnavigationtoggle",
+			aTypes: ["keydown"],
+			fnCheck: function(oEvent) {
+				return (oEvent.key ? oEvent.key === "F6" : oEvent.keyCode == KeyCodes.F6)
+					&& checkModifierKeys(oEvent, /*Ctrl*/ false, /*Alt*/ true, /*Shift*/ true);
+			}
+		},
+
 		//// contextmenu Shift-F10 hack
 		//{sName: "sapcontextmenu", aTypes: ["keydown"], fnCheck: function(oEvent) {
 		//	return oEvent.key === "F10" && checkModifierKeys(oEvent, /*Ctrl*/false, /*Alt*/false, /*Shift*/true);
@@ -796,7 +814,7 @@ sap.ui.define([
 	 * The array is processed during event analysis (when classifying browser events as pseudo events).
 	 * @public
 	 */
-	PseudoEvents.order = ["sapdown", "sapdownmodifiers", "sapshow", "sapup", "sapupmodifiers", "saphide", "sapleft", "sapleftmodifiers", "sapright", "saprightmodifiers", "saphome", "saphomemodifiers", "saptop", "sapend", "sapendmodifiers", "sapbottom", "sappageup", "sappageupmodifiers", "sappagedown", "sappagedownmodifiers", "sapselect", "sapselectmodifiers", "sapspace", "sapspacemodifiers", "sapenter", "sapentermodifiers", "sapexpand", "sapbackspace", "sapbackspacemodifiers", "sapdelete", "sapdeletemodifiers", "sapexpandmodifiers", "sapcollapse", "sapcollapsemodifiers", "sapcollapseall", "sapescape", "saptabnext", "saptabprevious", "sapskipforward", "sapskipback", "sapprevious", "sappreviousmodifiers", "sapnext", "sapnextmodifiers", "sapdecrease", "sapminus", "sapdecreasemodifiers", "sapincrease", "sapplus", "sapincreasemodifiers", "sapdelayeddoubleclick"];
+	PseudoEvents.order = ["sapdown", "sapdownmodifiers", "sapshow", "sapup", "sapupmodifiers", "saphide", "sapleft", "sapleftmodifiers", "sapright", "saprightmodifiers", "saphome", "saphomemodifiers", "saptop", "sapend", "sapendmodifiers", "sapbottom", "sappageup", "sappageupmodifiers", "sappagedown", "sappagedownmodifiers", "sapselect", "sapselectmodifiers", "sapspace", "sapspacemodifiers", "sapenter", "sapentermodifiers", "sapexpand", "sapbackspace", "sapbackspacemodifiers", "sapdelete", "sapdeletemodifiers", "sapexpandmodifiers", "sapcollapse", "sapcollapsemodifiers", "sapcollapseall", "sapescape", "saptabnext", "saptabprevious", "sapskipforward", "sapskipback", "sapextendedkeyboardnavigationtoggle", "sapprevious", "sappreviousmodifiers", "sapnext", "sapnextmodifiers", "sapdecrease", "sapminus", "sapdecreasemodifiers", "sapincrease", "sapplus", "sapincreasemodifiers", "sapdelayeddoubleclick"];
 
 
 	/**

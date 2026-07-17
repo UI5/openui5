@@ -61,6 +61,10 @@ sap.ui.define(function() {
 				}
 			},
 
+			Core_ExtendedKeyboardNavigationSupport: {
+				title: "sap.ui.core: Extended Keyboard Navigation Mode keyboard shortcut boot module"
+			},
+
 			Lib: {
 				title: "sap.ui.core: Unit tests for class sap/ui/core/Lib",
 				loader: {

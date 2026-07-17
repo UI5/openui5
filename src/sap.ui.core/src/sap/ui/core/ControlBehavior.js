@@ -48,6 +48,36 @@ sap.ui.define([
 		 */
 
 		/**
+		 * The <code>extendedKeyboardNavigationChanged</code> event is fired whenever
+		 * Extended Keyboard Navigation is toggled via {@link #setExtendedKeyboardNavigationEnabled}.
+		 *
+		 * The event fires for both transitions (enable and disable). It does
+		 * <strong>not</strong> fire for the initial value provided via configuration
+		 * (URL parameter, bootstrap attribute, or <code>window["sap-ui-config"]</code>);
+		 * consumers needing the current value at registration time should call
+		 * {@link #isExtendedKeyboardNavigationEnabled} once after attaching.
+		 *
+		 * API might change before stable release.
+		 *
+		 * @name module:sap/ui/core/ControlBehavior.extendedKeyboardNavigationChanged
+		 * @event
+		 * @type {module:sap/ui/core/ControlBehavior$ExtendedKeyboardNavigationChangedEvent}
+		 * @public
+		 * @ui5-experimental-since 1.151
+		 */
+
+		/**
+		 * The Extended Keyboard Navigation change Event.
+		 *
+		 * API might change before stable release.
+		 *
+		 * @typedef {object} module:sap/ui/core/ControlBehavior$ExtendedKeyboardNavigationChangedEvent
+		 * @property {boolean} extendedKeyboardNavigationEnabled The new value
+		 * @public
+		 * @ui5-experimental-since 1.151
+		 */
+
+		/**
 		 * Attaches the <code>fnFunction</code> event handler to the {@link #event:change change} event
 		 * of <code>sap/ui/core/ControlBehavior</code>.
 		 *
@@ -138,11 +168,104 @@ sap.ui.define([
 			if (sOldAnimationMode != sAnimationMode) {
 				fireChange({animationMode: sAnimationMode});
 			}
+		},
+
+		/**
+		 * Returns whether Extended Keyboard Navigation is currently enabled.
+		 *
+		 * Extended Keyboard Navigation extends the keyboard tab order to include
+		 * non-interactive, text-bearing elements so their tooltips become reachable
+		 * by keyboard. The feature is not recommended for screen-reader users.
+		 *
+		 * API might change before stable release.
+		 *
+		 * @return {boolean} whether Extended Keyboard Navigation is enabled
+		 * @public
+		 * @ui5-experimental-since 1.151
+		 */
+		isExtendedKeyboardNavigationEnabled: () => {
+			return oWritableConfig.get({
+				name: "sapUiExtendedKeyboardNavigation",
+				type: BaseConfig.Type.Boolean,
+				defaultValue: false,
+				external: true
+			});
+		},
+
+		/**
+		 * Enables or disables Extended Keyboard Navigation.
+		 *
+		 * When the value changes, the <code>extendedKeyboardNavigationChanged</code> event
+		 * is fired. A call with the current value (or with the default value when no
+		 * state has been set) is a no-op — no event fires.
+		 *
+		 * API might change before stable release.
+		 *
+		 * @param {boolean} bEnabled <code>true</code> to enable the Extended Keyboard Navigation, <code>false</code> to disable
+		 * @throws {TypeError} If <code>bEnabled</code> is not a boolean
+		 * @private
+		 * @ui5-restricted sap.ui.core sap.ushell
+		 */
+		setExtendedKeyboardNavigationEnabled: (bEnabled) => {
+			if (typeof bEnabled !== "boolean") {
+				throw new TypeError(
+					"ControlBehavior.setExtendedKeyboardNavigationEnabled: argument must be a boolean"
+				);
+			}
+			const bOldValue = ControlBehavior.isExtendedKeyboardNavigationEnabled();
+			if (bOldValue === bEnabled) {
+				return;
+			}
+			oWritableConfig.set("sapUiExtendedKeyboardNavigation", bEnabled);
+			fireExtendedKeyboardNavigationChanged({ extendedKeyboardNavigationEnabled: bEnabled });
+		},
+
+		/**
+		 * Attaches a handler to the {@link #event:extendedKeyboardNavigationChanged} event.
+		 *
+		 * The handler is invoked whenever the Extended Keyboard Navigation state is toggled via
+		 * {@link #setExtendedKeyboardNavigationEnabled} — both for transitions from
+		 * <code>false</code> to <code>true</code> and from <code>true</code> to
+		 * <code>false</code>. No event is fired for the initial value provided
+		 * via configuration; call {@link #isExtendedKeyboardNavigationEnabled} once
+		 * after attaching to learn the current state.
+		 *
+		 * API might change before stable release.
+		 *
+		 * @param {function(module:sap/ui/core/ControlBehavior$ExtendedKeyboardNavigationChangedEvent)} fnFunction
+		 *   The function to be called when the event occurs
+		 * @public
+		 * @ui5-experimental-since 1.151
+		 */
+		attachExtendedKeyboardNavigationChanged: (fnFunction) => {
+			oEventing.attachEvent("extendedKeyboardNavigationChanged", fnFunction);
+		},
+
+		/**
+		 * Detaches a handler from the {@link #event:extendedKeyboardNavigationChanged} event.
+		 *
+		 * The passed function must be the same one used for the corresponding
+		 * <code>attachExtendedKeyboardNavigationChanged</code> call.
+		 *
+		 * API might change before stable release.
+		 *
+		 * @param {function(module:sap/ui/core/ControlBehavior$ExtendedKeyboardNavigationChangedEvent)} fnFunction
+		 *   The function to be detached
+		 * @public
+		 * @ui5-experimental-since 1.151
+		 */
+		detachExtendedKeyboardNavigationChanged: (fnFunction) => {
+			oEventing.detachEvent("extendedKeyboardNavigationChanged", fnFunction);
 		}
 	};
 
 	function fireChange(mChanges) {
 		oEventing.fireEvent("change", mChanges);
+	}
+
+	function fireExtendedKeyboardNavigationChanged(mPayload) {
+		fireChange({ extendedKeyboardNavigation: mPayload.extendedKeyboardNavigationEnabled });
+		oEventing.fireEvent("extendedKeyboardNavigationChanged", mPayload);
 	}
 
 	return ControlBehavior;

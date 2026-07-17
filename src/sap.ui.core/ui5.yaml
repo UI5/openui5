@@ -86,6 +86,7 @@ builder:
               - "sap/ui/core/util/_LocalizationHelper"
               - sap/ui/core/boot/FieldHelpEndpoint.js
               - sap/ui/core/boot/KeyboardInteractionEndpoint.js
+              - sap/ui/core/boot/ExtendedKeyboardNavigationSupport.js
               - sap/ui/core/boot/FrameOptions.js
               - "sap/ui/security/FrameOptions"
               - "sap/ui/security/Security"
