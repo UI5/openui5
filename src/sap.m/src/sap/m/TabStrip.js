@@ -15,6 +15,7 @@ sap.ui.define([
 	'sap/ui/base/ManagedObject',
 	'sap/ui/core/delegate/ScrollEnablement',
 	'./AccButton',
+	'./Button',
 	'sap/ui/core/InvisibleText',
 	'./TabStripItem',
 	'sap/m/Select',
@@ -49,6 +50,7 @@ function(
 	ManagedObject,
 	ScrollEnablement,
 	AccButton,
+	Button,
 	InvisibleText,
 	TabStripItem,
 	Select,
@@ -129,7 +131,17 @@ function(
 					/**
 					 * Holds the right arrow scrolling button.
 					 */
-					_leftArrowButton : {type: 'sap.m.AccButton', multiple : false, visibility : "hidden"}
+					_leftArrowButton : {type: 'sap.m.AccButton', multiple : false, visibility : "hidden"},
+
+					/**
+					 * Toggle button (↓/↑) for the phone overflow panel at ≤320px viewport.
+					 */
+					_overflowButton : {type: 'sap.m.AccButton', multiple : false, visibility : "hidden"},
+
+					/**
+					 * "Add item" button shown in the phone overflow panel footer at ≤320px viewport.
+					 */
+					_overflowAddButton : {type: 'sap.m.Button', multiple : false, visibility : "hidden"}
 				},
 				associations: {
 
@@ -273,6 +285,7 @@ function(
 			this._oTouchStartX = null;
 			this._bThemeApplied = false;
 			this._handleThemeAppliedBound = this._handleThemeApplied.bind(this);
+			this._bHighZoom = this._isHighZoom();
 
 			if (!Device.system.phone) {
 				this._oScroller = new ScrollEnablement(this, this.getId() + "-tabs", {
@@ -304,6 +317,7 @@ function(
 				this._sResizeListenerId = null;
 			}
 			this._removeItemNavigation();
+			this._stopZoomWatch();
 		};
 
 		/**
@@ -349,6 +363,15 @@ function(
 				this._sResizeListenerId = ResizeHandler.register(this.getDomRef(),  jQuery.proxy(this._adjustScrolling, this));
 			} else {
 				this.$().toggleClass("sapUiSelectable", this.getItems().length > 1);
+				this._startZoomWatch();
+				if (this._bHighZoom) {
+					var oPanelDom = document.getElementById(this.getId() + "-phoneOverflowPanel");
+					if (oPanelDom && !oPanelDom._sapMTSListenersAttached) {
+						oPanelDom.addEventListener("click", this._handleOverflowItemTap.bind(this));
+						oPanelDom.addEventListener("keydown", this._handleOverflowPanelKeydown.bind(this));
+						oPanelDom._sapMTSListenersAttached = true;
+					}
+				}
 			}
 		};
 
@@ -1343,6 +1366,195 @@ function(
 			return this.destroyAggregation("items");
 		};
 
+		/****************************************** PHONE HIGH ZOOM (≤320px) **********************************************/
+
+		TabStrip.prototype._isHighZoom = function() {
+			var iWidth = (window.visualViewport && window.visualViewport.width) || window.innerWidth;
+			return iWidth <= 320;
+		};
+
+		TabStrip.prototype._startZoomWatch = function() {
+			if (this._fnZoomResizeHandler) {
+				return;
+			}
+			this._fnZoomResizeHandler = function() {
+				if (!this.getDomRef()) {
+					return;
+				}
+				var bHighZoom = this._isHighZoom();
+				if (bHighZoom !== this._bHighZoom) {
+					this._bHighZoom = bHighZoom;
+					this.invalidate();
+				}
+			}.bind(this);
+			if (window.visualViewport) {
+				window.visualViewport.addEventListener("resize", this._fnZoomResizeHandler);
+			}
+			window.addEventListener("resize", this._fnZoomResizeHandler);
+		};
+
+		TabStrip.prototype._stopZoomWatch = function() {
+			if (this._fnZoomResizeHandler) {
+				window.removeEventListener("resize", this._fnZoomResizeHandler);
+				if (window.visualViewport) {
+					window.visualViewport.removeEventListener("resize", this._fnZoomResizeHandler);
+				}
+				this._fnZoomResizeHandler = null;
+			}
+		};
+
+		TabStrip.prototype._getOverflowButton = function() {
+			var oButton = this.getAggregation("_overflowButton");
+			if (!oButton) {
+				oButton = new AccButton({
+					type: ButtonType.Transparent,
+					icon: IconPool.getIconURI("navigation-down-arrow"),
+					tooltip: oRb.getText("TABSTRIP_OPENED_TABS"),
+					press: this._toggleOverflowPanel.bind(this)
+				}).addStyleClass("sapMTSOverflowButton");
+				this.setAggregation("_overflowButton", oButton);
+			}
+			return oButton;
+		};
+
+		TabStrip.prototype._toggleOverflowPanel = function() {
+			if (this._bPhoneOverflowOpen) {
+				this._closeOverflowPanel();
+				var oButton = this.getAggregation("_overflowButton");
+				if (oButton) {
+					oButton.focus();
+				}
+				return;
+			}
+
+			this._bPhoneOverflowOpen = true;
+			var oButton = this.getAggregation("_overflowButton");
+			oButton.setIcon(IconPool.getIconURI("navigation-up-arrow"));
+			var oPanelDom = document.getElementById(this.getId() + "-phoneOverflowPanel");
+			if (oPanelDom) {
+				var oRect = this.getDomRef().getBoundingClientRect();
+				oPanelDom.style.top = oRect.bottom + "px";
+				oPanelDom.classList.add("sapMTSPhoneOverflowPanelOpen");
+				var sSelectedId = this.getSelectedItem();
+				var oFocusTarget = (sSelectedId && oPanelDom.querySelector("[data-item-id='" + sSelectedId + "']"))
+					|| oPanelDom.querySelector(".sapMTSPhoneOverflowPanelItem");
+				if (oFocusTarget) {
+					oFocusTarget.focus();
+				}
+			}
+		};
+
+		TabStrip.prototype._closeOverflowPanel = function() {
+			this._bPhoneOverflowOpen = false;
+			var oButton = this.getAggregation("_overflowButton");
+			if (oButton) {
+				oButton.setIcon(IconPool.getIconURI("navigation-down-arrow"));
+			}
+			var oPanelDom = document.getElementById(this.getId() + "-phoneOverflowPanel");
+			if (oPanelDom) {
+				oPanelDom.classList.remove("sapMTSPhoneOverflowPanelOpen");
+			}
+		};
+
+		TabStrip.prototype._handleOverflowItemTap = function(oEvent) {
+			// Close-button tap — remove the item instead of activating it
+			var oCloseBtnEl = oEvent.target.closest(".sapMTSPhoneOverflowPanelCloseBtn");
+			if (oCloseBtnEl) {
+				var sCloseItemId = oCloseBtnEl.getAttribute("data-close-item-id");
+				if (sCloseItemId) {
+					var oItemToClose = Element.getElementById(sCloseItemId);
+					if (oItemToClose) {
+						this._removeItem(oItemToClose);
+					}
+					this._closeOverflowPanel();
+					var oToggleBtn = this.getAggregation("_overflowButton");
+					if (oToggleBtn) {
+						oToggleBtn.focus();
+					}
+				}
+				return;
+			}
+
+			var oLi = oEvent.target.closest(".sapMTSPhoneOverflowPanelItem");
+			if (!oLi) {
+				return;
+			}
+
+			var sId = oLi.getAttribute("data-item-id");
+			if (!sId) {
+				return;
+			}
+
+			var oItem = Element.getElementById(sId);
+			if (oItem) {
+				this._activateItem(oItem, oEvent);
+			}
+
+			this._closeOverflowPanel();
+			var oButton = this.getAggregation("_overflowButton");
+			if (oButton) {
+				oButton.focus();
+			}
+		};
+
+		TabStrip.prototype._handleOverflowPanelKeydown = function(oEvent) {
+			var oPanelDom = document.getElementById(this.getId() + "-phoneOverflowPanel");
+			if (!oPanelDom) {
+				return;
+			}
+			var aItems = Array.prototype.slice.call(oPanelDom.querySelectorAll(".sapMTSPhoneOverflowPanelItem"));
+			if (!aItems.length) {
+				return;
+			}
+			var oFocused = document.activeElement;
+			var iIndex = aItems.indexOf(oFocused);
+
+			switch (oEvent.key) {
+				case "ArrowDown":
+				case "Down":
+					oEvent.preventDefault();
+					aItems[Math.min(iIndex + 1, aItems.length - 1)].focus();
+					break;
+				case "ArrowUp":
+				case "Up":
+					oEvent.preventDefault();
+					aItems[Math.max(iIndex - 1, 0)].focus();
+					break;
+				case "Enter":
+				case " ":
+					oEvent.preventDefault();
+					if (oFocused && oFocused.classList.contains("sapMTSPhoneOverflowPanelItem")) {
+						this._handleOverflowItemTap(oEvent);
+					}
+					break;
+				case "Escape":
+					oEvent.preventDefault();
+					this._toggleOverflowPanel();
+					break;
+				default:
+					break;
+			}
+		};
+
+		TabStrip.prototype._getOverflowAddButton = function() {
+			var oButton = this.getAggregation("_overflowAddButton");
+			if (!oButton) {
+				oButton = new Button({
+					text: oRb.getText("TABCONTAINER_ADD_NEW_TAB"),
+					icon: IconPool.getIconURI("add"),
+					press: function() {
+						var oAddButton = this.getAddButton();
+						if (oAddButton) {
+							oAddButton.firePress();
+						}
+						this._closeOverflowPanel();
+					}.bind(this)
+				});
+				this.setAggregation("_overflowAddButton", oButton);
+			}
+			return oButton;
+		};
+
 		/****************************************** CUSTOM SELECT CONTROL **********************************************/
 
 		var CustomSelectRenderer = Renderer.extend(SelectRenderer);
@@ -1394,6 +1606,26 @@ function(
 				}, this);
 
 			return this._oList;
+		};
+
+		CustomSelect.prototype.onAfterRenderingPicker = function() {
+			var oPicker = this.getPicker();
+
+			Select.prototype.onAfterRenderingPicker.call(this);
+
+			// on phone the picker is a dialog — no offset needed
+			if (Device.system.phone) {
+				return;
+			}
+
+			oPicker.setOffsetX(Math.round(
+				Localization.getRTL() ?
+					this.getPicker().$().width() - this.$().width() :
+					this.$().width() - this.getPicker().$().width()
+			)); // LTR or RTL mode considered
+			oPicker.setOffsetY(this.$().parents().hasClass('sapUiSizeCompact') ? 2 : 3);
+			oPicker._calcPlacement(); // needed to apply the new offset after the popup is open
+
 		};
 
 		CustomSelect.prototype.setValue = function(sValue) {

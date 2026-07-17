@@ -100,7 +100,7 @@ sap.ui.define(["sap/base/util/ObjectPath"], function(ObjectPath) {
 	 * <code>sap.ui.require</code> is called when <code>mOptions.useProbingRequire=true</code> to retrieve the
 	 * module export of the loaded module with the given <code>sPath</code> after replacing '.' with '/' in
 	 * the path. If the path can still not be resolved, the last fallback is taken to resolve
-	 * <code>sPath</code> within the global scope <code>window</code>.
+	 * <code>sPath</code> within the global scope <code>globalThis</code>.
 	 *
 	 * When the resolved value is a function, a context may be bound to it with the following
 	 * conditions:

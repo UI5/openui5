@@ -1,16 +1,10 @@
 /*global QUnit, sinon */
 sap.ui.define([
 	"sap/ui/core/tooltip/TooltipManager",
-	"sap/m/Tooltip",
+	"sap/ui/core/tooltip/Tooltip",
 	"./FakeTooltipHost"
 ], function (TooltipManager, Tooltip, FakeTooltipHost) {
 	"use strict";
-
-	async function createTooltip(oClock, mSettings) {
-		const pTooltip = TooltipManager.create(mSettings);
-		await oClock.tickAsync(2000);
-		return pTooltip;
-	}
 
 	QUnit.module("Constants", {});
 
@@ -22,27 +16,11 @@ sap.ui.define([
 		assert.strictEqual(TooltipManager.HANDOFF_DELAY_MS, 200);
 	});
 
-	QUnit.module("create", {
-		afterEach: function () {
-			TooltipManager._getRegistry().clear();
-		}
-	});
-
-	QUnit.test("resolves with a sap.m.Tooltip and forwards settings", async function (assert) {
-		const oTooltip = await createTooltip(this.clock, { text: "hi" });
-		try {
-			assert.ok(oTooltip instanceof Tooltip, "instance of sap.m.Tooltip");
-			assert.strictEqual(oTooltip.getText(), "hi", "settings forwarded");
-		} finally {
-			oTooltip.destroy();
-		}
-	});
-
 	QUnit.module("open / close / registry", {
-		beforeEach: async function () {
+		beforeEach: function () {
 			this.oOpener = new FakeTooltipHost();
-			this.oTooltipA = await createTooltip(this.clock, { text: "a" });
-			this.oTooltipB = await createTooltip(this.clock, { text: "b" });
+			this.oTooltipA = new Tooltip({ text: "a" });
+			this.oTooltipB = new Tooltip({ text: "b" });
 			// Stub the public open/close to observe calls without scheduling real timers.
 			this.oOpenStub = sinon.stub(Tooltip.prototype, "openBy");
 			this.oCloseStub = sinon.stub(Tooltip.prototype, "close");

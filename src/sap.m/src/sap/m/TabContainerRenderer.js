@@ -26,6 +26,9 @@ sap.ui.define([], function() {
 		// start control wrapper
 		oRm.openStart("div", oControl);
 		oRm.class("sapMTabContainer");
+		if (oTabStrip && oTabStrip._bHighZoom) {
+			oRm.class("sapMTabContainerHighZoom");
+		}
 		oRm.openEnd();
 
 		if (oTabStrip) {

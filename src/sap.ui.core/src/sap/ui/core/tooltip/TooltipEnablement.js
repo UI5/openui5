@@ -7,6 +7,7 @@ sap.ui.define([
 	"sap/base/config",
 	"sap/ui/base/EventProvider",
 	"sap/ui/core/Control",
+	"sap/ui/core/tooltip/Tooltip",
 	"sap/ui/core/tooltip/TooltipEventTrigger",
 	"sap/ui/core/tooltip/TooltipManager"
 ],
@@ -14,6 +15,7 @@ sap.ui.define([
 		BaseConfig,
 		EventProvider,
 		Control,
+		Tooltip,
 		TooltipEventTrigger,
 		TooltipManager
 	) {
@@ -30,7 +32,7 @@ sap.ui.define([
 		 * @param {boolean} [oConfig.enableForTouchDevices=true] Whether long-press should open the tooltip on touch devices. Use this to disable it for links.
 		 *
 		 * @class
-		 * Helper that adds a <code>sap.m.Tooltip</code> to a control.
+		 * Helper that adds a <code>sap.ui.core.tooltip.Tooltip</code> to a control.
 		 *
 		 * Create an instance for your host control, keep it on the host, and call its
 		 * hooks from your renderer and lifecycle methods. The helper takes care
@@ -38,9 +40,10 @@ sap.ui.define([
 		 * rendering an invisible ARIA anchor for screen readers, and of cleaning
 		 * up when the host is destroyed.
 		 *
-		 * The inner <code>sap.m.Tooltip</code> and its <code>sap.m</code> library
-		 * are loaded lazily on first use, so a host in another library may use
-		 * this helper without statically depending on <code>sap.m</code>.
+		 * The inner <code>sap.ui.core.tooltip.Tooltip</code> is created on first
+		 * use. Its <code>sap.m.Popover</code> positioning surface is loaded
+		 * lazily, so a host in another library may use this helper without
+		 * statically depending on <code>sap.m</code>.
 		 *
 		 * <h3>Usage</h3>
 		 * Use the tooltip for brief, supplementary information about a control.
@@ -91,7 +94,7 @@ sap.ui.define([
 		 *     if (TooltipEnablement.isEnhancedTooltipEnabled()) {
 		 *         this._oTooltipEnablement = new TooltipEnablement(this, {
 		 *             textProvider: () =&gt; this._buildVisibleTooltip(),
-		 *             invisibleTextProvider: () =&gt; this._buildInvisibleTooltip() || ""
+		 *             invisibleTextProvider: () =&gt; this._buildInvisibleTooltip()
 		 *         });
 		 *     }
 		 * };
@@ -106,7 +109,12 @@ sap.ui.define([
 		 * MyControlRenderer.render = function(oRm, oControl) {
 		 *     oRm.openStart("button", oControl);
 		 *     if (oControl._oTooltipEnablement) {
-		 *         oRm.attr("aria-describedby", oControl._oTooltipEnablement.getInvisibleTooltipId());
+		 *         oRm.accessibilityState(oControl, {
+		 *             describedby: {
+		 *                 value: oControl._oTooltipEnablement.getInvisibleTooltipId() + " ...combine with other describedby ids, if any...",
+		 *                 append: true
+		 *             }
+		 *         });
 		 *     }
 		 *     oRm.openEnd();
 		 *     // ...host content...
@@ -118,7 +126,7 @@ sap.ui.define([
 		 * </pre>
 		 *
 		 * <b>3. Destroy the helper in the host's <code>exit</code></b> so its
-		 * inner <code>sap.m.Tooltip</code> and DOM listeners are released. The
+		 * inner <code>sap.ui.core.tooltip.Tooltip</code> and DOM listeners are released. The
 		 * helper extends <code>sap.ui.base.EventProvider</code>, so it is not
 		 * disposed automatically by the host.
 		 *
@@ -187,8 +195,6 @@ sap.ui.define([
 
 				this._oTooltip = null;
 
-				this._oPendingOpen = null;
-
 				this._oEventTrigger = new TooltipEventTrigger({
 					onOpen: (bWithDelay) => this._open(bWithDelay),
 					onClose: (bWithDelay) => this._close(bWithDelay),
@@ -245,10 +251,10 @@ sap.ui.define([
 		};
 
 		/**
-		 * Opens the tooltip. The open is asynchronous — the returned reference
-		 * is chainable but does not await the actual on-screen open. To act
-		 * when the tooltip has opened, listen for the <code>afterOpen</code>
-		 * event via {@link #attachAfterOpen}.
+		 * Opens the tooltip. The returned reference is chainable but does not
+		 * reflect the actual on-screen open — the tooltip's hover-delay window
+		 * runs first. To act when the tooltip has opened, listen for the
+		 * <code>afterOpen</code> event via {@link #attachAfterOpen}.
 		 * @public
 		 * @returns {this}
 		 */
@@ -331,8 +337,6 @@ sap.ui.define([
 		 * @public
 		 */
 		TooltipEnablement.prototype.destroy = function() {
-			this._cancelPendingOpen();
-
 			if (this._oHost && this._oDelegate) {
 				this._oHost.removeDelegate(this._oDelegate);
 			}
@@ -378,19 +382,7 @@ sap.ui.define([
 		 * @private
 		 */
 		TooltipEnablement.prototype._isPendingOrOpen = function() {
-			return !!this._oPendingOpen || !!(this._oTooltip && this._oTooltip.isPendingOrOpen());
-		};
-
-		/**
-		 * Aborts an in-flight <code>_open</code>, if any. The suspended <code>_open</code>
-		 * detects the flipped flag on its local token when it resumes and bails out.
-		 * @private
-		 */
-		TooltipEnablement.prototype._cancelPendingOpen = function() {
-			if (this._oPendingOpen) {
-				this._oPendingOpen.aborted = true;
-				this._oPendingOpen = null;
-			}
+			return !!(this._oTooltip && this._oTooltip.isPendingOrOpen());
 		};
 
 		/**
@@ -448,70 +440,37 @@ sap.ui.define([
 		};
 
 		/**
-		 * Lazy-creates the inner <code>sap.m.Tooltip</code> on first use via
-		 * {@link sap.ui.core.tooltip.TooltipManager#create}.
+		 * Lazily creates the inner <code>sap.ui.core.tooltip.Tooltip</code> on first use.
 		 *
-		 * @returns {Promise<sap.m.Tooltip|null>}
+		 * @returns {sap.ui.core.tooltip.Tooltip}
 		 * @private
 		 */
-		TooltipEnablement.prototype._ensureTooltip = async function() {
-
-			// @todo make the popover dependency of the Tooltip to be lazy and move Tooltip itself to sap.ui.core
-
+		TooltipEnablement.prototype._ensureTooltip = function() {
 			if (this._oTooltip) {
 				return this._oTooltip;
 			}
 
-			const oTooltip = await TooltipManager.create({
+			this._oTooltip = new Tooltip({
 				text: this._resolveText(),
 				afterOpen: () => this.fireEvent("afterOpen"),
 				afterClose: () => this.fireEvent("afterClose")
 			});
 
-			if (!this._oHost) {
-				oTooltip.destroy();
-				return null;
-			}
-
-			if (this._oTooltip) {
-				// Raced with a parallel ensure; keep the existing one.
-				oTooltip.destroy();
-			} else {
-				this._oTooltip = oTooltip;
-			}
-
 			return this._oTooltip;
 		};
 
 		/**
-		 * Opens the tooltip via {@link sap.ui.core.tooltip.TooltipManager#open},
+		 * Opens the tooltip via {@link sap.ui.core.tooltip.TooltipManager#openSingle},
 		 * which decides the actual delay.
 		 * @param {boolean} [bWithDelay=false]
-		 * @returns {Promise<void>}
 		 * @private
 		 */
-		TooltipEnablement.prototype._open = async function(bWithDelay = false) {
+		TooltipEnablement.prototype._open = function(bWithDelay = false) {
 			if (!this._resolveText()) {
 				return;
 			}
 
-			this._cancelPendingOpen();
-
-			// Handles races when open or close is called during the async tooltip creation.
-			const oPendingOpen = { aborted: false };
-			this._oPendingOpen = oPendingOpen;
-
-			const oTooltip = await this._ensureTooltip();
-
-			if (oPendingOpen.aborted || !oTooltip || !this._oHost || !this._resolveText()) {
-				// Clear our own pending token if it's still current, so a stale token can't keep _isPendingOrOpen() true (would swallow Escape).
-				if (this._oPendingOpen === oPendingOpen) {
-					this._oPendingOpen = null;
-				}
-				return;
-			}
-
-			this._oPendingOpen = null;
+			const oTooltip = this._ensureTooltip();
 
 			this._syncInnerTooltip();
 
@@ -525,8 +484,6 @@ sap.ui.define([
 		 * @private
 		 */
 		TooltipEnablement.prototype._close = function(bWithDelay = false) {
-			this._cancelPendingOpen();
-
 			if (!this._oTooltip) {
 				return;
 			}

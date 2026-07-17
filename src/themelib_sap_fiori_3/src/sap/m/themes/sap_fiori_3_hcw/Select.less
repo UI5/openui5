@@ -82,35 +82,43 @@ div.sapMSltPicker {
 	}
 
 	.sapMSltPickerValueState {
-		padding-left: 1.5rem;
-		box-shadow:inset 0 -0.125rem var(--sapPageHeader_BorderColor);
-		line-height: 1rem;
+		padding-left: 0.5rem;
 		padding-right: 0.5rem;
-		padding-left: 2rem;
 
-		&::before {
-			font-family: var(--sapContent_IconFontFamily);
-			vertical-align: middle;
-			font-size: 1rem;
-			position: absolute;
-			left: 0.5rem;
-			top: 0.625rem;
+		.sapMSltPickerValueStateIcon {
+			margin-right: 0.5rem;
 		}
 
-		&.sapMSltPickerErrorState::before {
-			content: '\e0b1';
+		&.sapMSltPickerErrorState {
+			box-shadow: inset 0 -0.125rem var(--sapField_InvalidColor);
+
+			.sapMSltPickerValueStateIcon {
+				color: var(--sapNegativeElementColor);
+			}
 		}
 
-		&.sapMSltPickerWarningState::before {
-			content: '\e201';
+		&.sapMSltPickerWarningState {
+			box-shadow: inset 0 -0.125rem var(--sapField_WarningColor);
+
+			.sapMSltPickerValueStateIcon {
+				color: var(--sapCriticalElementColor);
+			}
 		}
 
-		&.sapMSltPickerSuccessState::before {
-			content: '\e203';
+		&.sapMSltPickerSuccessState {
+			box-shadow: inset 0 -0.125rem var(--sapField_SuccessColor);
+
+			.sapMSltPickerValueStateIcon {
+				color: var(--sapPositiveElementColor);
+			}
 		}
 
-		&.sapMSltPickerInformationState::before {
-			content: '\e202';
+		&.sapMSltPickerInformationState {
+			box-shadow: inset 0 -0.125rem var(--sapField_InformationColor);
+
+			.sapMSltPickerValueStateIcon {
+				color: var(--sapInformativeElementColor);
+			}
 		}
 	}
 }

@@ -1662,7 +1662,6 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 		const oFakeSectionRef = { getId: function() { return sId; } };
 
 		oObjectPage._oSectionInfo[sId] = { positionTop: iCorrectTarget, sectionReference: oFakeSectionRef };
-		oObjectPage._sCurrentScrollId = sId;
 		oObjectPage._requestAdjustLayout = sinon.stub();
 		oObjectPage._computeScrollPosition = sinon.stub().returns(iCorrectTarget);
 		oObjectPage._$opWrapper = { length: 1, scrollTop: sinon.stub().returns(iCorrectTarget), off: sinon.stub() };
@@ -1686,7 +1685,6 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 		const oFakeSectionRef = { getId: function() { return sId; } };
 
 		oObjectPage._oSectionInfo[sId] = { positionTop: iStaleScrollTop, sectionReference: oFakeSectionRef };
-		oObjectPage._sCurrentScrollId = sId;
 		oObjectPage._requestAdjustLayout = sinon.stub();
 		oObjectPage._computeScrollPosition = sinon.stub().returns(iCorrectedTarget);
 		oObjectPage._$opWrapper = { length: 1, scrollTop: sinon.stub().returns(iStaleScrollTop), off: sinon.stub() };
@@ -1696,6 +1694,27 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 
 		assert.ok(oObjectPage._scrollTo.calledWith(iCorrectedTarget, 0),
 			"_scrollTo called with corrected target and duration 0");
+
+		oObjectPage.destroy();
+	});
+
+	QUnit.test("_correctScrollPositionIfNeeded is a no-op when a newer scroll is in progress", function (assert) {
+		assert.expect(2);
+
+		const oObjectPage = oFactory.getObjectPage();
+		const sStaleId = "section6";
+		const sCurrentId = "section5";
+		const oFakeSectionRef = { getId: function() { return sStaleId; } };
+
+		oObjectPage._oSectionInfo[sStaleId] = { positionTop: 600, sectionReference: oFakeSectionRef };
+		oObjectPage._sCurrentScrollId = sCurrentId; // user already clicked section 5
+		oObjectPage._requestAdjustLayout = sinon.stub();
+		oObjectPage._scrollTo = sinon.stub();
+
+		oObjectPage._correctScrollPositionIfNeeded(sStaleId);
+
+		assert.notOk(oObjectPage._requestAdjustLayout.called, "_requestAdjustLayout not called for stale section");
+		assert.notOk(oObjectPage._scrollTo.called, "_scrollTo not called for stale section");
 
 		oObjectPage.destroy();
 	});

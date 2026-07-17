@@ -250,8 +250,10 @@ sap.ui.define([
 	MenuTextFieldItem.prototype.onkeydown = function(oEvent){
 		//like sapenter but on keyup -> see Menu.prototype.onkeyup
 		if (!PseudoEvents.events.sapenter.fnCheck(oEvent) && oEvent.key !== "Enter") {
-			oEvent.preventDefault();
-			oEvent.stopPropagation();
+			if (oEvent.key === "Home" || oEvent.key === "End") {
+				oEvent.stopPropagation();
+			}
+
 			return;
 		}
 		var sValue = this.$("tf").val();

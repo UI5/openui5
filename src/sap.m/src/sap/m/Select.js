@@ -26,6 +26,8 @@ sap.ui.define([
 	"sap/ui/dom/containsOrEquals",
 	"sap/ui/events/KeyCodes",
 	'./Text',
+	'./HBox',
+	'./FlexItemData',
 	'sap/m/SimpleFixFlex',
 	'sap/base/Log',
 	'sap/ui/core/ValueStateSupport',
@@ -57,6 +59,8 @@ function(
 	containsOrEquals,
 	KeyCodes,
 	Text,
+	HBox,
+	FlexItemData,
 	SimpleFixFlex,
 	Log,
 	ValueStateSupport,
@@ -90,11 +94,25 @@ function(
 		// shortcut for sap.m.SelectType
 		var SelectType = library.SelectType;
 
+		// shortcut for sap.m.FlexAlignItems
+		var FlexAlignItems = library.FlexAlignItems;
+
+		// shortcut for sap.m.FlexAlignSelf
+		var FlexAlignSelf = library.FlexAlignSelf;
+
 		// shortcut for sap.ui.core.InvisibleMessageMode
 		var InvisibleMessageMode = coreLibrary.InvisibleMessageMode;
 
 		// shortcut for sap.ui.core.TitleLevel
 		var TitleLevel = coreLibrary.TitleLevel;
+
+		// map of semantic icons per value state, used in the picker's value state header
+		var VALUE_STATE_ICONS = {
+			Error: "sap-icon://error",
+			Warning: "sap-icon://alert",
+			Success: "sap-icon://sys-enter-2",
+			Information: "sap-icon://information"
+		};
 
 		// constant for two column separator
 		var TWO_COLUMN_SEPARATOR_MAP = {
@@ -444,7 +462,7 @@ function(
 					 * Internal aggregation to hold the picker's subheader.
 					 */
 					_pickerValueStateContent: {
-						type: "sap.m.Text",
+						type: "sap.m.HBox",
 						multiple: false,
 						visibility: "hidden"
 					}
@@ -1191,16 +1209,29 @@ function(
 		};
 
 		/**
-		 * Get's the picker's subheader.
+		 * Gets the picker's value state content row.
 		 *
-		 * @returns {sap.m.Bar} Picker's header
+		 * @returns {sap.m.HBox} Picker's value state content row
 		 * @private
 		 */
 		Select.prototype._getPickerValueStateContent = function() {
 			if (!this.getAggregation("_pickerValueStateContent")) {
-				this.setAggregation("_pickerValueStateContent", new Text({
-					wrapping: true,
-					text: this._getTextForPickerValueStateContent()
+				var sValueState = this.getValueState();
+
+				this.setAggregation("_pickerValueStateContent", new HBox({
+					alignItems: FlexAlignItems.Start,
+					items: [
+						new Icon({
+							src: VALUE_STATE_ICONS[sValueState] || "",
+							visible: sValueState !== ValueState.None,
+							useIconTooltip: false
+						}).addStyleClass(this.getRenderer().CSS_CLASS + "PickerValueStateIcon"),
+						new Text({
+							wrapping: true,
+							text: this._getTextForPickerValueStateContent(),
+							layoutData: new FlexItemData({ alignSelf: FlexAlignSelf.Center })
+						})
+					]
 				}));
 			}
 
@@ -1215,11 +1246,11 @@ function(
 		Select.prototype._updatePickerValueStateContentText = function() {
 			var oPicker = this.getPicker(),
 				oPickerValueStateContent = oPicker && oPicker.getContent()[0].getFixContent(),
-				sText;
+				oText;
 
 			if (oPickerValueStateContent) {
-				sText = this._getTextForPickerValueStateContent();
-				oPickerValueStateContent.setText(sText);
+				oText = oPickerValueStateContent.getItems()[1];
+				oText && oText.setText(this._getTextForPickerValueStateContent());
 			}
 		};
 
@@ -1262,9 +1293,9 @@ function(
 		};
 
 		/**
-		 * Updates CSS classes for the <code>valueStateText</code> in the picker's subheader.
-		 * @private
-		 */
+		* Updates CSS classes and the semantic icon for the picker's subheader.
+		* @private
+		*/
 		Select.prototype._updatePickerValueStateContentStyles = function() {
 			var sValueState = this.getValueState(),
 				mValueState = ValueState,
@@ -1273,7 +1304,8 @@ function(
 				sCssClass = PICKER_CSS_CLASS + sValueState + "State",
 				sPickerWithSubHeader = PICKER_CSS_CLASS + "WithSubHeader",
 				oPicker = this.getPicker(),
-				oCustomHeader = oPicker && oPicker.getContent()[0].getFixContent();
+				oCustomHeader = oPicker && oPicker.getContent()[0].getFixContent(),
+				oIcon = oCustomHeader && oCustomHeader.getItems()[0];
 
 			if (oCustomHeader) {
 				this._removeValueStateClassesForPickerValueStateContent(oPicker);
@@ -1284,6 +1316,11 @@ function(
 				} else {
 					oPicker.removeStyleClass(sPickerWithSubHeader);
 				}
+			}
+
+			if (oIcon) {
+				oIcon.setSrc(VALUE_STATE_ICONS[sValueState] || "");
+				oIcon.setVisible(sValueState !== mValueState.None);
 			}
 		};
 

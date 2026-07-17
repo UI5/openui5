@@ -14,6 +14,7 @@ sap.ui.define([
 		openPopover: function(oEvent) {
 			var oRP = new ResponsivePopover({
 				title: "Color Picker",
+				showCloseButton: false,
 				content:[
 					new ColorPicker({
 						mode: ColorPickerMode.HSL

@@ -555,9 +555,7 @@ sap.ui.define([
 		TabContainer.prototype.setShowAddNewButton = function (bShowButton) {
 			this.setProperty("showAddNewButton", bShowButton, true);
 
-			if (Device.system.phone) {
-				bShowButton ? this.addStyleClass("sapUiShowAddNewButton") : this.removeStyleClass("sapUiShowAddNewButton");
-			}
+			bShowButton ? this.addStyleClass("sapUiShowAddNewButton") : this.removeStyleClass("sapUiShowAddNewButton");
 
 			var oTabStrip = this._getTabStrip();
 			if (oTabStrip) {

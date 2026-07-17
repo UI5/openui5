@@ -59,7 +59,7 @@ sap.ui.define([
 			this.oTrigger.destroy();
 			this.oHost.destroy();
 			this.oDeviceStub.restore();
-			// Drain leftover timers before restoring the clock so no timer leaks across the boundary.
+			// Drain leftover timers before restoring the clock.
 			await this.clock.tickAsync(2000);
 			this.clock.restore();
 		}
@@ -157,7 +157,7 @@ sap.ui.define([
 			this.oTrigger.destroy();
 			this.oHost.destroy();
 			this.oDeviceStub.restore();
-			// Drain leftover timers before restoring the clock so no timer leaks across the boundary.
+			// Drain leftover timers before restoring the clock.
 			await this.clock.tickAsync(2000);
 			this.clock.restore();
 		}
@@ -189,6 +189,9 @@ sap.ui.define([
 
 	QUnit.module("Desktop events", {
 		beforeEach: async function () {
+			// Reset the sticky initial-focus state before the trigger is built,
+			// so each test starts from a clean slate regardless of order.
+			TooltipEventTrigger._resetInitialFocusForTesting();
 			this.oDeviceStub = sinon.stub(Device, "system")
 				.value({ desktop: true, combi: false, phone: false, tablet: false });
 			this.oHost = new FakeTooltipHost();
@@ -202,7 +205,7 @@ sap.ui.define([
 			this.oTrigger.destroy();
 			this.oHost.destroy();
 			this.oDeviceStub.restore();
-			// Drain leftover timers before restoring the clock so no timer leaks across the boundary.
+			// Drain leftover timers before restoring the clock.
 			await this.clock.tickAsync(2000);
 			this.clock.restore();
 		}
@@ -255,12 +258,14 @@ sap.ui.define([
 		assert.ok(this.oConfig.onClose.calledOnceWith(true));
 	});
 
-	QUnit.test("focusin with :focus-visible invokes onOpen(true)", function (assert) {
+	QUnit.test("focusin with :focus-visible after keyboard navigation invokes onOpen(true)", function (assert) {
 		const oOrig = this.oDomRef.matches;
 		this.oDomRef.matches = function (s) {
 			return s === ":focus-visible" || oOrig.call(this, s);
 		};
 		try {
+			// Keyboard navigation must precede the focusin to leave initial focus.
+			dispatch(document, new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
 			dispatch(this.oDomRef, new FocusEvent("focusin", { bubbles: true }));
 			assert.ok(this.oConfig.onOpen.calledOnceWith(true));
 		} finally {
@@ -274,8 +279,60 @@ sap.ui.define([
 			return s === ":focus-visible" ? false : oOrig.call(this, s);
 		};
 		try {
+			dispatch(document, new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
 			dispatch(this.oDomRef, new FocusEvent("focusin", { bubbles: true }));
 			assert.notOk(this.oConfig.onOpen.called);
+		} finally {
+			this.oDomRef.matches = oOrig;
+		}
+	});
+
+	QUnit.test("focusin during initial focus does not invoke onOpen", function (assert) {
+		const oOrig = this.oDomRef.matches;
+		this.oDomRef.matches = function (s) {
+			return s === ":focus-visible" || oOrig.call(this, s);
+		};
+		try {
+			// No navigation key has been pressed, so focus is still initial.
+			dispatch(this.oDomRef, new FocusEvent("focusin", { bubbles: true }));
+			assert.notOk(this.oConfig.onOpen.called,
+				"initial focus is suppressed even with :focus-visible");
+		} finally {
+			this.oDomRef.matches = oOrig;
+		}
+	});
+
+	QUnit.test("any keydown ends initial focus, regardless of key or modifier", function (assert) {
+		const oOrig = this.oDomRef.matches;
+		this.oDomRef.matches = function (s) {
+			return s === ":focus-visible" || oOrig.call(this, s);
+		};
+		try {
+			// A non-navigation, modified key still counts as user activity.
+			dispatch(document, new KeyboardEvent("keydown", { key: "a", ctrlKey: true, bubbles: true }));
+			dispatch(this.oDomRef, new FocusEvent("focusin", { bubbles: true }));
+			assert.ok(this.oConfig.onOpen.calledOnceWith(true),
+				"focus after any keydown opens the tooltip");
+		} finally {
+			this.oDomRef.matches = oOrig;
+		}
+	});
+
+	QUnit.test("initial focus stays ended after the first navigation key", function (assert) {
+		const oOrig = this.oDomRef.matches;
+		this.oDomRef.matches = function (s) {
+			return s === ":focus-visible" || oOrig.call(this, s);
+		};
+		try {
+			dispatch(document, new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+			dispatch(this.oDomRef, new FocusEvent("focusin", { bubbles: true }));
+			assert.ok(this.oConfig.onOpen.calledOnceWith(true), "first focus after navigation opens");
+
+			// The flag is sticky: a later focus still opens without a new keydown.
+			dispatch(this.oDomRef, new FocusEvent("focusout", { bubbles: true }));
+			dispatch(this.oDomRef, new FocusEvent("focusin", { bubbles: true }));
+			assert.strictEqual(this.oConfig.onOpen.callCount, 2,
+				"subsequent focus still opens without another navigation key");
 		} finally {
 			this.oDomRef.matches = oOrig;
 		}
@@ -327,7 +384,7 @@ sap.ui.define([
 			this.oTrigger.destroy();
 			this.oHost.destroy();
 			this.oDeviceStub.restore();
-			// Drain leftover timers before restoring the clock so no timer leaks across the boundary.
+			// Drain leftover timers before restoring the clock.
 			await this.clock.tickAsync(2000);
 			this.clock.restore();
 		}
@@ -399,7 +456,7 @@ sap.ui.define([
 			this.oTrigger.destroy();
 			this.oHost.destroy();
 			this.oDeviceStub.restore();
-			// Drain leftover timers before restoring the clock so no timer leaks across the boundary.
+			// Drain leftover timers before restoring the clock.
 			await this.clock.tickAsync(2000);
 			this.clock.restore();
 		}
@@ -431,7 +488,7 @@ sap.ui.define([
 			this.oTrigger.destroy();
 			this.oHost.destroy();
 			this.oDeviceStub.restore();
-			// Drain leftover timers before restoring the clock so no timer leaks across the boundary.
+			// Drain leftover timers before restoring the clock.
 			await this.clock.tickAsync(2000);
 			this.clock.restore();
 		}
@@ -441,5 +498,92 @@ sap.ui.define([
 		const oEvent = new MouseEvent("contextmenu", { cancelable: true, bubbles: true });
 		dispatch(this.oDomRef, oEvent);
 		assert.ok(oEvent.defaultPrevented);
+	});
+
+	QUnit.module("Initial-focus document listener lifecycle", {
+		beforeEach: function () {
+			TooltipEventTrigger._resetInitialFocusForTesting();
+			this.oAddSpy = sinon.spy(document, "addEventListener");
+			this.oRemoveSpy = sinon.spy(document, "removeEventListener");
+		},
+		afterEach: function () {
+			this.oAddSpy.restore();
+			this.oRemoveSpy.restore();
+			TooltipEventTrigger._resetInitialFocusForTesting();
+		},
+		keydownAdds: function () {
+			return this.oAddSpy.getCalls().filter(
+				(oCall) => oCall.args[0] === "keydown").length;
+		},
+		keydownRemoves: function () {
+			return this.oRemoveSpy.getCalls().filter(
+				(oCall) => oCall.args[0] === "keydown").length;
+		}
+	});
+
+	QUnit.test("first trigger attaches the document keydown listener; second does not", function (assert) {
+		const oFirst = new TooltipEventTrigger(makeConfig());
+		const oSecond = new TooltipEventTrigger(makeConfig());
+		try {
+			assert.strictEqual(this.keydownAdds(), 1,
+				"only the first trigger attaches the shared listener");
+		} finally {
+			oFirst.destroy();
+			oSecond.destroy();
+		}
+	});
+
+	QUnit.test("listener is detached only when the last trigger is destroyed", function (assert) {
+		const oFirst = new TooltipEventTrigger(makeConfig());
+		const oSecond = new TooltipEventTrigger(makeConfig());
+
+		oFirst.destroy();
+		assert.strictEqual(this.keydownRemoves(), 0,
+			"listener stays while another trigger is alive");
+
+		oSecond.destroy();
+		assert.strictEqual(this.keydownRemoves(), 1,
+			"listener is removed once the last trigger is gone");
+	});
+
+	QUnit.test("navigation keydown ends initial focus and detaches the listener", function (assert) {
+		const oTrigger = new TooltipEventTrigger(makeConfig());
+		try {
+			dispatch(document, new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+			assert.strictEqual(this.keydownRemoves(), 1,
+				"listener detaches itself after the first navigation key");
+		} finally {
+			oTrigger.destroy();
+		}
+	});
+
+	QUnit.test("a new trigger re-attaches the listener while focus is still initial", function (assert) {
+		const oFirst = new TooltipEventTrigger(makeConfig());
+		oFirst.destroy();
+		assert.strictEqual(this.keydownRemoves(), 1, "listener removed with the last trigger");
+
+		const oSecond = new TooltipEventTrigger(makeConfig());
+		try {
+			assert.strictEqual(this.keydownAdds(), 2,
+				"new trigger re-attaches the listener because focus is still initial");
+		} finally {
+			oSecond.destroy();
+		}
+	});
+
+	QUnit.test("a new trigger does not re-attach after initial focus has passed", function (assert) {
+		const oFirst = new TooltipEventTrigger(makeConfig());
+		// End initial focus, which also detaches the listener.
+		dispatch(document, new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+		oFirst.destroy();
+		const iAddsSoFar = this.keydownAdds();
+
+		const oSecond = new TooltipEventTrigger(makeConfig());
+		try {
+			assert.strictEqual(this.keydownAdds(), iAddsSoFar,
+				"no re-attach once initial focus is over (flag is sticky)");
+		} finally {
+			oSecond.destroy();
+		}
 	});
 });

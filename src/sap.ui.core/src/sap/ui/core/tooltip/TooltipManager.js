@@ -3,11 +3,8 @@
  */
 
 // Provides static class sap.ui.core.tooltip.TooltipManager.
-sap.ui.define([
-	"sap/ui/core/Lib"
-],
+sap.ui.define([],
 	function(
-		Library
 	) {
 		"use strict";
 
@@ -17,14 +14,15 @@ sap.ui.define([
 		// Shortened delay (ms) used during handoff between adjacent tooltips.
 		const HANDOFF_DELAY_MS = 200;
 
-		// Registry of currently-open or pending sap.m.Tooltip instances.
+		// Registry of currently-open or pending sap.ui.core.tooltip.Tooltip instances.
 		const oOpenTooltips = new Set();
 
 		/**
 		 * @class
-		 * Static helper that owns cross-tooltip concerns: lazy creation of
-		 * <code>sap.m.Tooltip</code>, the shared registry of open tooltips,
-		 * and the timing constants used for handoff between adjacent tooltips.
+		 * Static helper that owns cross-tooltip concerns: creation of
+		 * <code>sap.ui.core.tooltip.Tooltip</code>, the shared registry of open
+		 * tooltips, and the timing constants used for handoff between adjacent
+		 * tooltips.
 		 *
 		 * Per-host gesture wiring lives in
 		 * {@link sap.ui.core.tooltip.TooltipEnablement} and
@@ -53,27 +51,12 @@ sap.ui.define([
 		TooltipManager.HANDOFF_DELAY_MS = HANDOFF_DELAY_MS;
 
 		/**
-		 * Lazy-loads <code>sap.m</code> and creates a new <code>sap.m.Tooltip</code>.
-		 *
-		 * @param {object} [mSettings] Settings forwarded to the constructor.
-		 * @returns {Promise<sap.m.Tooltip>}
-		 */
-		TooltipManager.create = async function(mSettings) {
-			await Library.load({ name: "sap.m" });
-			return new Promise((resolve) => {
-				sap.ui.require(["sap/m/Tooltip"], (Tooltip) => {
-					resolve(new Tooltip(mSettings));
-				});
-			});
-		};
-
-		/**
 		 * Opens the given tooltip by the given opener, closing any other
 		 * registered tooltip first. The delay is <code>0</code> for instant
 		 * gestures, <code>HANDOFF_DELAY_MS</code> when another tooltip is
 		 * open, or <code>HOVER_DELAY_MS</code> otherwise.
 		 *
-		 * @param {sap.m.Tooltip} oTooltip
+		 * @param {sap.ui.core.tooltip.Tooltip} oTooltip
 		 * @param {sap.ui.core.Control} oOpenBy
 		 * @param {boolean} [bWithDelay=false]
 		 */
@@ -100,7 +83,7 @@ sap.ui.define([
 		 * <code>afterClose</code> fires so a handoff during the close-delay
 		 * window is still recognized.
 		 *
-		 * @param {sap.m.Tooltip} oTooltip
+		 * @param {sap.ui.core.tooltip.Tooltip} oTooltip
 		 * @param {boolean} [bWithDelay=false]
 		 */
 		TooltipManager.close = function(oTooltip, bWithDelay = false) {
@@ -114,7 +97,7 @@ sap.ui.define([
 		 * Closes every registered tooltip except <code>oCurrent</code> with
 		 * the handoff delay.
 		 *
-		 * @param {sap.m.Tooltip} oCurrent
+		 * @param {sap.ui.core.tooltip.Tooltip} oCurrent
 		 */
 		TooltipManager.closeOthers = function(oCurrent) {
 			oOpenTooltips.forEach((oTooltip) => {
@@ -129,7 +112,7 @@ sap.ui.define([
 		 * the registry through the open-delay and open-lifetime windows until
 		 * {@link #deregister} is called on <code>afterClose</code>.
 		 *
-		 * @param {sap.m.Tooltip} oTooltip
+		 * @param {sap.ui.core.tooltip.Tooltip} oTooltip
 		 */
 		TooltipManager.registerOpening = function(oTooltip) {
 			oOpenTooltips.add(oTooltip);
@@ -138,14 +121,14 @@ sap.ui.define([
 		/**
 		 * Removes <code>oTooltip</code> from the registry.
 		 *
-		 * @param {sap.m.Tooltip} oTooltip
+		 * @param {sap.ui.core.tooltip.Tooltip} oTooltip
 		 */
 		TooltipManager.deregister = function(oTooltip) {
 			oOpenTooltips.delete(oTooltip);
 		};
 
 		/**
-		 * @returns {Set<sap.m.Tooltip>} The internal registry. Test-only.
+		 * @returns {Set<sap.ui.core.tooltip.Tooltip>} The internal registry. Test-only.
 		 * @private
 		 */
 		TooltipManager._getRegistry = function() {

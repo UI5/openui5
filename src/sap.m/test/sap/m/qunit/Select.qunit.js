@@ -11193,6 +11193,9 @@ sap.ui.define([
 				this.oSelect.destroy();
 			},
 			getPickerValueStateContent: function(oPicker) {
+				return oPicker.getContent()[0].getFixContent().getItems()[1];
+			},
+			getPickerValueStateHeader: function(oPicker) {
 				return oPicker.getContent()[0].getFixContent();
 			}
 		});
@@ -11286,7 +11289,7 @@ sap.ui.define([
 				oPicker = oWarningSelect.getPicker();
 				assert.ok(oPicker, "The picker should be present.");
 
-				oValueStateContent = this.getPickerValueStateContent(oPicker).$();
+				oValueStateContent = this.getPickerValueStateHeader(oPicker).$();
 				if (key === sNoneState) {
 					assert.ok(oValueStateContent.css("display"), "none",
 							"The picker does not have a value state content.");

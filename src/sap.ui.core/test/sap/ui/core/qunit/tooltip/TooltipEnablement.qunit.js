@@ -3,13 +3,17 @@ sap.ui.define([
 	"sap/ui/core/tooltip/TooltipEnablement",
 	"sap/ui/core/tooltip/TooltipEventTrigger",
 	"sap/ui/core/tooltip/TooltipManager",
+	"sap/ui/core/tooltip/Tooltip",
 	"./FakeTooltipHost",
 	"./FakeTooltipHostWithEnablement",
 	"sap/ui/core/RenderManager",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/Device",
-	"sap/m/Tooltip"
-], function(TooltipEnablement, TooltipEventTrigger, TooltipManager, FakeTooltipHost, FakeTooltipHostWithEnablement, RenderManager, nextUIUpdate, Device, Tooltip) {
+	// Preloaded so the lazy sap.ui.require(["sap/m/Popover","sap/m/Text"]) inside
+	// Tooltip#_createPopover resolves synchronously under fake timers.
+	"sap/m/Popover",
+	"sap/m/Text"
+], function(TooltipEnablement, TooltipEventTrigger, TooltipManager, Tooltip, FakeTooltipHost, FakeTooltipHostWithEnablement, RenderManager, nextUIUpdate, Device) {
 	"use strict";
 
 	// TooltipManager's open-tooltip registry is module-global; reset it per test.
@@ -34,16 +38,14 @@ sap.ui.define([
 	}
 
 	async function waitForOpen(oClock, oEnablement) {
-		// NOTE: This wait works only if we have preloaded sap.m.Tooltip (done in the beginning of the file)
-
 		if (oEnablement.isOpen()) {
-			return;
+			return true;
 		}
 
 		const pOpen = new Promise((fnResolve) => {
 			function fnAfterOpen() {
 				oEnablement.detachAfterOpen(fnAfterOpen);
-				fnResolve();
+				fnResolve(true);
 			}
 			oEnablement.attachAfterOpen(fnAfterOpen);
 		});
@@ -66,13 +68,13 @@ sap.ui.define([
 
 	async function waitForClose(oClock, oEnablement) {
 		if (!oEnablement.isOpen()) {
-			return;
+			return true;
 		}
 
 		const pClose = new Promise((fnResolve) => {
 			function fnAfterClose() {
 				oEnablement.detachAfterClose(fnAfterClose);
-				fnResolve();
+				fnResolve(true);
 			}
 			oEnablement.attachAfterClose(fnAfterClose);
 		});
@@ -81,6 +83,20 @@ sap.ui.define([
 		await oClock.tickAsync(1000);
 
 		return pClose;
+	}
+
+	// Drains microtasks and pending fake timers so async paths settle.
+	async function flushMicrotasks(oClock) {
+		await oClock.tickAsync(0);
+	}
+
+	// Closes an open tooltip and waits for the close to settle, without asserting.
+	async function closeAndWaitSilent(oClock, oEnablement) {
+		if (!oEnablement.isOpen()) {
+			return;
+		}
+		oEnablement.close();
+		await waitForClose(oClock, oEnablement);
 	}
 
 	// ---- DOM event helpers -------------------------------------------------
@@ -328,6 +344,8 @@ sap.ui.define([
 			return s === ":focus-visible" || oOrig.call(this, s);
 		};
 		try {
+			// Leave initial focus first; focusin is suppressed until a key is pressed.
+			document.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
 			dispatch(this.oHost, new FocusEvent("focusin", { bubbles: true }));
 			await waitForOpen(this.clock, this.oEnablement);
 			assert.ok(true, "afterOpen fires on keyboard focus");
@@ -343,6 +361,8 @@ sap.ui.define([
 			return s === ":focus-visible" ? false : oOrig.call(this, s);
 		};
 		try {
+			// Leave initial focus so the :focus-visible gate is what suppresses the open.
+			document.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
 			dispatch(this.oHost, new FocusEvent("focusin", { bubbles: true }));
 			const sState = await waitForOpenState(this.clock, this.oEnablement);
 			assert.strictEqual(sState, "NotOpened", "afterOpen does not fire on programmatic focus");
@@ -381,12 +401,13 @@ sap.ui.define([
 		assert.strictEqual(this.oEnablement.isOpen(), false, "closed after Escape");
 	});
 
-	QUnit.test("Escape during the async popover-creation window cancels the pending open and is consumed", function(assert) {
-		// Enter the async gap: _open is suspended on await _ensureTooltip().
-		// _oPendingOpen is set, but the popover is not open yet.
+	QUnit.test("Escape during the open-delay window cancels the pending open and is consumed", async function(assert) {
+		// open() returns synchronously and starts the Tooltip's own hover-delay
+		// timer (Tooltip.prototype.openBy). isPendingOrOpen() returns true while
+		// the timer runs, but the popover is not on screen yet.
 		this.oEnablement.open();
 		assert.strictEqual(this.oEnablement.isOpen(), false,
-			"not yet open — popover creation still in flight");
+			"not yet open — inside the hover-delay window");
 
 		// Escape on the host must be consumed by the tooltip (not fall through to
 		// an enclosing Dialog) and must cancel the pending open.
@@ -397,8 +418,9 @@ sap.ui.define([
 		assert.ok(oEvent.defaultPrevented,
 			"preventDefault called - Escape consumed while an open is pending");
 
-		// assert.notOk(await waitForOpen(this.clock, this.oEnablement, 500),
-		// 	"afterOpen does not fire — the pending open was cancelled");
+		const sState = await waitForOpenState(this.clock, this.oEnablement);
+		assert.strictEqual(sState, "NotOpened",
+			"afterOpen does not fire — the pending open was cancelled");
 		assert.strictEqual(this.oEnablement.isOpen(), false, "not open");
 	});
 
@@ -407,37 +429,6 @@ sap.ui.define([
 		await waitForOpen(this.clock, this.oEnablement);
 		dispatch(this.oHost, new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
 		assert.strictEqual(this.oEnablement.isOpen(), true, "still open on Enter");
-	});
-
-	QUnit.test("pending open that resolves to empty text does not leave Escape swallowed", async function(assert) {
-		// Regression: if the text provider transitions to "" during the async
-		// _ensureTooltip() window, the pending open must be cleared so a
-		// subsequent Escape is not consumed (leaving ancestor handlers to run).
-		let sText = "initial";
-		const oHost = new FakeTooltipHost({ id: "host-empty-race" });
-		const oEnablement = new TooltipEnablement(oHost, {
-			textProvider: () => sText
-		});
-		await renderHost(oHost, this.clock);
-		try {
-			// Enter the async gap and flip the text to empty before it resumes.
-			oEnablement.open();
-			sText = "";
-			await this.clock.tickAsync(0);
-
-			assert.strictEqual(oEnablement.isOpen(), false,
-				"tooltip did not open — text was empty when the pending open resumed");
-
-			const oEvent = new KeyboardEvent("keydown", {
-				key: "Escape", cancelable: true, bubbles: true
-			});
-			oHost.getDomRef().dispatchEvent(oEvent);
-			assert.notOk(oEvent.defaultPrevented,
-				"Escape not consumed — stale pending state was cleared");
-		} finally {
-			oEnablement.destroy();
-			oHost.destroy();
-		}
 	});
 
 	QUnit.module("Imperative open/close", {
@@ -473,7 +464,7 @@ sap.ui.define([
 		});
 		try {
 			oEnablement.open();
-			await this.clock.tickAsync(0);
+			await flushMicrotasks(this.clock);
 			assert.strictEqual(oEnablement.isOpen(), false,
 				"open() does not flip isOpen when text is empty");
 		} finally {
@@ -498,10 +489,7 @@ sap.ui.define([
 		// Prime the lazy inner tooltip by fully opening once, then close silently.
 		this.oEnablement.open();
 		await waitForOpen(this.clock, this.oEnablement);
-
-		this.oEnablement.close();
-		await waitForClose(this.clock, this.oEnablement);
-
+		await closeAndWaitSilent(this.clock, this.oEnablement);
 		assert.ok(this.oEnablement._oTooltip,
 			"inner tooltip exists — next open() awaits nothing but a resolved promise");
 
@@ -527,6 +515,7 @@ sap.ui.define([
 
 		// Wait long enough for both to have resumed past the await.
 		await waitForOpen(this.clock, this.oEnablement);
+		await flushMicrotasks(this.clock);
 
 		assert.strictEqual(iOpenCount, 1,
 			"only the second open() proceeds — the first bails on its aborted flag");
@@ -539,7 +528,7 @@ sap.ui.define([
 		this.oEnablement.destroy();
 
 		// waitForOpen would try to attach on the destroyed enablement — poll isOpen() instead.
-		await this.clock.tickAsync(0);
+		await flushMicrotasks(this.clock);
 		assert.strictEqual(this.oEnablement.isOpen(), false,
 			"destroyed helper is not open");
 		assert.ok(true, "no throw from the resumed _open path after destroy");
@@ -913,7 +902,7 @@ sap.ui.define([
 		this.oHost.getDomRef().dispatchEvent(
 			new MouseEvent("mouseenter", { bubbles: true })
 		);
-		await this.clock.tickAsync(0);
+		await flushMicrotasks(this.clock);
 		assert.strictEqual(this.oEnablement.isOpen(), false,
 			"mouseenter after destroy does not reopen");
 	});

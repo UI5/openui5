@@ -379,7 +379,6 @@ sap.ui.define([
 		  "sap.m.Toolbar",
 		  "sap.m.ToolbarSpacer",
 		  "sap.m.ToolbarSeparator",
-		  "sap.m.Tooltip",
 		  "sap.m.Tree",
 		  "sap.m.TreeItemBase",
 		  "sap.m.VariantManagement",
