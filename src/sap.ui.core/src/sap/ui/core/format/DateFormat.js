@@ -10,6 +10,7 @@ sap.ui.define([
 	"sap/base/i18n/date/CalendarType",
 	"sap/base/i18n/date/CalendarWeekNumbering",
 	"sap/base/i18n/date/TimezoneUtils",
+	"sap/base/strings/escapeRegExp",
 	"sap/base/strings/formatMessage",
 	"sap/base/util/deepEqual",
 	"sap/base/util/extend",
@@ -20,7 +21,7 @@ sap.ui.define([
 	"sap/ui/core/date/UI5Date",
 	"sap/ui/core/date/UniversalDate",
 	"sap/ui/core/format/FormatUtils"
-], function(Log, Formatting, Localization, CalendarType, CalendarWeekNumbering, TimezoneUtils, formatMessage,
+], function(Log, Formatting, Localization, CalendarType, CalendarWeekNumbering, TimezoneUtils, escapeRegExp, formatMessage,
 		deepEqual, extend, Locale, LocaleData, Supportability, CalendarUtils, UI5Date, UniversalDate, FormatUtils) {
 	"use strict";
 
@@ -1432,8 +1433,11 @@ sap.ui.define([
 					bValid = oParseHelper.checkValid(oPart.type, bPartInvalid, oFormat);
 				} else {
 					sPart = oFormat.oLocaleData.getCalendarWeek(oPart.digits === 3 ? "narrow" : "wide");
-					sPart = sPart.replace("{0}", "([0-9]+)");
-					var rWeekNumber = new RegExp(sPart),
+					// Escape the literal parts of the localized pattern so that regex
+					// metacharacters in the calendar-week text (e.g. the "." in the
+					// Hungarian narrow pattern "{0}. NH") are matched literally rather
+					// than interpreted - or throwing on unbalanced brackets.
+					var rWeekNumber = new RegExp(sPart.split("{0}").map(escapeRegExp).join("([0-9]+)")),
 						oResult = rWeekNumber.exec(sValue);
 					if (oResult) {
 						// e.g. for input "CW 01" create pattern "CW ([0-9]+)"

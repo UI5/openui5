@@ -2063,6 +2063,18 @@ sap.ui.define([
 			});
 			assert.strictEqual(oDateFormat.format(UI5Date.getInstance(2015, 0, 1)), "Calendar Week 01", "week number in Japanese calendar");
 			assert.notOk(isNaN(oDateFormat.parse("Calendar Week 01").getTime()), "Date can be correctly parsed in Japanese calendar 'Calendar Week 01'");
+
+			// The Hungarian narrow calendar-week pattern contains a literal ".": "{0}. NH".
+			// When parsing, that "." must be matched literally and not interpreted as a
+			// regex wildcard (see the escaping in the "w" pattern symbol's parse function).
+			oDateFormat = DateFormat.getDateInstance({
+				pattern: "www"
+			}, new Locale("hu"));
+			var sHuNarrowWeek = oDateFormat.format(UI5Date.getInstance(2015, 0, 1));
+			assert.ok(/^\d+\. NH$/.test(sHuNarrowWeek), "hu narrow calendar week is formatted as 'N. NH' (was '" + sHuNarrowWeek + "')");
+			assert.notOk(isNaN(oDateFormat.parse(sHuNarrowWeek).getTime()), "the formatted hu narrow calendar week can be parsed back");
+			assert.strictEqual(oDateFormat.parse(sHuNarrowWeek.replace(". NH", "X NH")), null,
+				"hu narrow calendar week with a non-matching separator is rejected (dot is matched literally, not as a wildcard)");
 		});
 
 		QUnit.test("format and parse weekYear/weekInYear pattern with 2 digits", function (assert) {
