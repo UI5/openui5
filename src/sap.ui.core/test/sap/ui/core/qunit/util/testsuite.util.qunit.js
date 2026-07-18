@@ -67,6 +67,13 @@ sap.ui.define(["sap/ui/Device"], function (Device) {
 			},
 
 			Serializer: {},
+
+			File: {
+				coverage: {
+					only: "[sap/ui/core/util/File]"
+				}
+			},
+
 			PasteHelper: {},
 			ResponsivePaddingsEnablement: {},
 
