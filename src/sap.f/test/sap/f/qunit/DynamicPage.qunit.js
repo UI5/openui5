@@ -150,6 +150,46 @@ function(
 			"Custom header content label is set correctly.");
 	});
 
+	QUnit.test("DynamicPage landmark labels are not applied when roles are None", async function (assert) {
+		// Arrange - all roles set to None explicitly, all labels provided
+		const oLandmarkInfo = new DynamicPageAccessibleLandmarkInfo({
+			rootRole: "None",
+			rootLabel: "Root label",
+			contentRole: "None",
+			contentLabel: "Content label",
+			footerRole: "None",
+			footerLabel: "Footer label"
+		});
+
+		this.oDynamicPage.setLandmarkInfo(oLandmarkInfo);
+		await nextUIUpdate();
+
+		// Assert - no role and no aria-label on any of the three areas
+		assert.strictEqual(this.oDynamicPage.$().attr("role"), undefined, "Root: no role when rootRole is None.");
+		assert.strictEqual(this.oDynamicPage.$().attr("aria-label"), undefined, "Root: no aria-label when rootRole is None.");
+		assert.strictEqual(this.oDynamicPage.$("content").attr("role"), undefined, "Content: no role when contentRole is None.");
+		assert.strictEqual(this.oDynamicPage.$("content").attr("aria-label"), undefined, "Content: no aria-label when contentRole is None.");
+		assert.strictEqual(this.oDynamicPage.$("footerWrapper").attr("role"), undefined, "Footer: no role when footerRole is None.");
+		assert.strictEqual(this.oDynamicPage.$("footerWrapper").attr("aria-label"), undefined, "Footer: no aria-label when footerRole is None.");
+	});
+
+	QUnit.test("DynamicPage landmark labels are not applied when only labels are set (roles default to None)", async function (assert) {
+		// Arrange - only labels provided, roles stay at their default None
+		const oLandmarkInfo = new DynamicPageAccessibleLandmarkInfo({
+			rootLabel: "Root label",
+			contentLabel: "Content label",
+			footerLabel: "Footer label"
+		});
+
+		this.oDynamicPage.setLandmarkInfo(oLandmarkInfo);
+		await nextUIUpdate();
+
+		// Assert - no aria-label without a role
+		assert.strictEqual(this.oDynamicPage.$().attr("aria-label"), undefined, "Root: no aria-label when rootRole is None (default).");
+		assert.strictEqual(this.oDynamicPage.$("content").attr("aria-label"), undefined, "Content: no aria-label when contentRole is None (default).");
+		assert.strictEqual(this.oDynamicPage.$("footerWrapper").attr("aria-label"), undefined, "Footer: no aria-label when footerRole is None (default).");
+	});
+
 	QUnit.test("headerContentLabel of DynamicPageLandMarkInfo is preserved upon snapping/expanding the header", async function (assert) {
 		const sCustomHeaderContentLabel = "Header content label";
 		const oLandmarkInfo = new DynamicPageAccessibleLandmarkInfo({

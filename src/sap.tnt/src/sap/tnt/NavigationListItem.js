@@ -8,7 +8,6 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/InvisibleText",
 	"sap/ui/core/Renderer",
-	"sap/ui/core/IconPool",
 	"sap/ui/core/library",
 	"sap/ui/core/Lib",
 	"sap/ui/events/KeyCodes",
@@ -21,7 +20,6 @@ sap.ui.define([
 	Element,
 	InvisibleText,
 	Renderer,
-	IconPool,
 	coreLibrary,
 	Lib,
 	KeyCodes,
@@ -779,28 +777,9 @@ sap.ui.define([
 	 * @private
 	 */
 	NavigationListItem.prototype._renderIcon = function (oRM) {
-		const sIconSrc = this.getIcon(),
-			oIconInfo = IconPool.getIconInfo(sIconSrc);
-
-		// Manually rendering the icon instead of using RenderManager's writeIcon. In this way title
-		// attribute is not rendered and the tooltip of the icon does not override item's tooltip
-		oRM.openStart("span")
-			.class("sapUiIcon")
-			.class("sapTntNLIIcon")
-			.attr("aria-hidden", "true");
-
-		if (sIconSrc) {
-			if (oIconInfo && !oIconInfo.suppressMirroring) {
-				oRM.class("sapUiIconMirrorInRTL");
-			}
-
-			if (oIconInfo) {
-				oRM.attr("data-sap-ui-icon-content", oIconInfo.content)
-					.style("font-family", `'${oIconInfo.fontFamily}'`);
-			}
-		}
-
-		oRM.openEnd().close("span");
+		oRM.icon(this.getIcon(), ["sapTntNLIIcon"], {
+			title: null
+		});
 	};
 
 	/**

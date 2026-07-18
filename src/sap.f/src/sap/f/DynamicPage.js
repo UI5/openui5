@@ -2677,6 +2677,7 @@ sap.ui.define([
 
 			if (sRole === AccessibleLandmarkRole.None) {
 				sRole = '';
+				sLabel = '';
 			}
 
 			return {
@@ -2689,11 +2690,16 @@ sap.ui.define([
 	};
 
 	DynamicPage.prototype._getAccessibilityStateTitle = function () {
-		var oInfo = this._formatLandmarkInfo(this.getLandmarkInfo(), "Header"),
+		var oLandmarkInfo = this.getLandmarkInfo(),
+			oInfo = this._formatLandmarkInfo(oLandmarkInfo, "Header"),
 			oTitle = this.getTitle();
 
-		if (oTitle) {
-			oInfo.label = oTitle._getTitleText() || oInfo.label;
+		// Apply title text as fallback label only when no landmarkInfo is set,
+		// or when a non-None headerRole is configured. When headerRole is explicitly
+		// None, _formatLandmarkInfo already cleared oInfo.role and oInfo.label, and
+		// no aria-label should be rendered.
+		if (oTitle && (!oLandmarkInfo || oInfo.role)) {
+			oInfo.label = oInfo.label || oTitle._getTitleText();
 		}
 
 		return oInfo;
