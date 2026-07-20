@@ -625,6 +625,29 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns all currently existing contexts of this list binding in no special order.
+	 *
+	 * @param {boolean} [bNoCreated]
+	 *   Whether to exclude created contexts
+	 * @returns {sap.ui.model.odata.v4.Context[]}
+	 *   All currently existing contexts of this list binding, in no special order
+	 *
+	 * @private
+	 * @see #getAllCurrentContexts
+	 */
+	ODataListBinding.prototype._getAllExistingContexts = function (bNoCreated) {
+		let aContexts = this.aContexts ?? [];
+		if (bNoCreated) {
+			aContexts = aContexts.slice(this.iCreatedContexts);
+		}
+		return aContexts.filter(function (oContext) {
+			return oContext;
+		}).concat(Object.values(this.mPreviousContextsByPath).filter(function (oContext) {
+			return oContext.isEffectivelyKeptAlive();
+		}));
+	};
+
+	/**
 	 * Checks that deep create is possible in this binding.
 	 *
 	 * @throws {Error} If deep create is not possible
@@ -1344,7 +1367,7 @@ sap.ui.define([
 	 * @see sap.ui.model.odata.v4.ODataBinding#doCreateCache
 	 */
 	ODataListBinding.prototype.doCreateCache = function (sResourcePath, mQueryOptions, oContext,
-			sDeepResourcePath, sGroupId, oOldCache) {
+			sDeepResourcePath, sGroupId, bSideEffectsRefresh, oOldCache) {
 		var oCache,
 			aKeepAlivePredicates,
 			mKeptElementsByPredicate;
@@ -1355,8 +1378,10 @@ sap.ui.define([
 			if (this.iCreatedContexts || this.iDeletedContexts || aKeepAlivePredicates.length) {
 				// Note: #inheritQueryOptions as called below should not matter in case of own
 				// requests, which are a precondition for kept-alive elements
-				oOldCache.reset(aKeepAlivePredicates, sGroupId, mQueryOptions,
-					this.mParameters.$$aggregation, this.isGrouped());
+				oOldCache.reset(aKeepAlivePredicates, bSideEffectsRefresh ? sGroupId : undefined,
+					mQueryOptions, this.mParameters.$$aggregation, this.isGrouped());
+				// validate selection after the old cache is reset
+				this.validateSelection(oOldCache, sGroupId);
 
 				return oOldCache;
 			}
@@ -3478,7 +3503,7 @@ sap.ui.define([
 					oCache.reset([]);
 				} else {
 					that.fetchCache(that.oContext, false, /*bKeepQueryOptions*/true,
-						bKeepCacheOnError ? sGroupId : undefined);
+						sGroupId, bKeepCacheOnError);
 					oKeptElementsPromise = that.refreshKeptElements(sGroupId);
 					if (that.iCurrentEnd > 0) {
 						oPromise = that.createRefreshPromise(
@@ -4672,6 +4697,46 @@ sap.ui.define([
 					}))
 			};
 		}
+	};
+
+	/**
+	 * Validates the selected contexts against the list binding's filter criteria and removes the
+	 * selection from contexts that no longer match.
+	 *
+	 * @param {sap.ui.model.odata.v4.lib._Cache} oCache
+	 *   The cache to be used
+	 * @param {string} [sGroupId]
+	 *   The group ID to be used for the request
+	 *
+	 * @private
+	 */
+	ODataListBinding.prototype.validateSelection = function (oCache, sGroupId) {
+		if (!this.mParameters.$$clearSelectionOnFilter || "$$aggregation" in this.mParameters
+			|| this.oHeaderContext.isSelected()) {
+			return;
+		}
+
+		const aSelectedContexts = this._getAllExistingContexts(true)
+			.filter((oContext) => oContext.isSelected());
+
+		if (!aSelectedContexts.length) {
+			return;
+		}
+
+		const iStartOfPredicate = this.getResolvedPath().length;
+		const aPredicatesIn = aSelectedContexts
+			.map((oContext) => oContext.getPath().slice(iStartOfPredicate));
+		oCache.requestFilteredOrderedPredicates(aPredicatesIn, this.lockGroup(sGroupId))
+			.then((aPredicatesOut) => {
+				const oPredicates = new Set(aPredicatesOut);
+				aSelectedContexts.forEach((oContext) => {
+					if (!oPredicates.has(oContext.getPath().slice(iStartOfPredicate))) {
+						oContext.setSelected(false);
+					}
+				});
+			}, (oError) => {
+				this.oModel.reportError("Failed to validate selection", sClassName, oError);
+			});
 	};
 
 	//*********************************************************************************************

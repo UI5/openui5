@@ -3484,6 +3484,51 @@ sap.ui.define([
 	};
 
 	/**
+	 * Sends a request for the elements identified by the given key predicates. Returns predicates
+	 * for elements matching the current filter, arranged according to the current sort order.
+	 *
+	 * @param {string[]} aPredicates
+	 *   A list of key predicates for known elements, in no special order
+	 * @param {sap.ui.model.odata.v4.lib._GroupLock} oGroupLock
+	 *   A lock for the group ID
+	 * @returns {Promise<string[]>}
+	 *   A promise that resolves with an array of predicates (see above), or rejects with an
+	 *   instance of <code>Error</code> in case of failure, for example if the cache is shared
+	 *
+	 * @public
+	 */
+	_CollectionCache.prototype.requestFilteredOrderedPredicates = async function (aPredicates,
+			oGroupLock) {
+		this.checkSharedRequest();
+
+		const mTypeForMetaPath = this.getTypes();
+		const aKeyFilters = aPredicates.map((sPredicate) => _Helper.getKeyFilter(
+			this.aElements.$byPredicate[sPredicate], this.sMetaPath, mTypeForMetaPath));
+
+		const mQueryOptions = {...this.mQueryOptions};
+		delete mQueryOptions.$count;
+		mQueryOptions.$filter = mQueryOptions.$filter
+			? `${mQueryOptions.$filter} and (${aKeyFilters.join(" or ")})`
+			: aKeyFilters.join(" or ");
+		mQueryOptions.$top = aKeyFilters.length;
+		delete mQueryOptions.$expand;
+		delete mQueryOptions.$orderby;
+		mQueryOptions.$select = [];
+		_Helper.selectKeyProperties(mQueryOptions, mTypeForMetaPath[this.sMetaPath]);
+
+		const sResourcePathWithQuery = this.sResourcePath
+			+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions, false, true);
+
+		const oResponse = await this.oRequestor.request("GET", sResourcePathWithQuery, oGroupLock);
+
+		this.visitResponse(oResponse, mTypeForMetaPath, undefined, undefined, 0);
+
+		return oResponse.value.map((oNewElement) => {
+			return _Helper.getPrivateAnnotation(oNewElement, "predicate");
+		});
+	};
+
+	/**
 	 * Returns a promise to be resolved when the side effects have been applied to the elements
 	 * with the given key predicates. All other elements from the back end are discarded!
 	 *

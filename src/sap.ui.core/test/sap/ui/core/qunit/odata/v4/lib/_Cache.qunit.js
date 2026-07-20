@@ -7680,6 +7680,109 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+[false, true].forEach((bHasFilter) => {
+	const sTitle = "CollectionCache#requestFilteredOrderedPredicates: w/ filter=" + bHasFilter;
+
+	QUnit.test(sTitle, async function (assert) {
+		const mQueryOptions = {
+			$apply : "A.P.P.L.E.", // must be kept
+			$count : true, // dropped
+			$expand : {expand : null},
+			$orderby : "orderby", // must be kept
+			$search : "search", // must be kept
+			$select : ["Name"],
+			foo : "bar",
+			"sap-client" : "123"
+		};
+		if (bHasFilter) {
+			mQueryOptions.$filter = "age gt 40"; // is enhanced
+		}
+		const sQueryOptions = JSON.stringify(mQueryOptions);
+		const oCache = this.createCache("TEAMS('42')/TEAM_2_EMPLOYEES", mQueryOptions);
+		oCache.aElements = ["~oElement0~", "~oElement1~", "~oElement2~", "~oElement3~"];
+		oCache.aElements.$byPredicate = {
+			"('0')" : "~oElement0~",
+			"('1')" : "~oElement1~",
+			"('2')" : "~oElement2~",
+			"('3')" : "~oElement3~",
+			"('4')" : "~oElement4~" // outside the collection
+		};
+		const mTypeForMetaPath = {
+			"/TEAMS/TEAM_2_EMPLOYEES" : "~oType~"
+		};
+		this.mock(oCache).expects("checkSharedRequest").withExactArgs();
+		this.mock(oCache).expects("getTypes").withExactArgs().returns(mTypeForMetaPath);
+		const oHelperMock = this.mock(_Helper);
+		oHelperMock.expects("getKeyFilter").withExactArgs("~oElement1~", "/TEAMS/TEAM_2_EMPLOYEES",
+				sinon.match.same(mTypeForMetaPath))
+			.returns("~key_filter1~");
+		oHelperMock.expects("getKeyFilter").withExactArgs("~oElement2~", "/TEAMS/TEAM_2_EMPLOYEES",
+				sinon.match.same(mTypeForMetaPath))
+			.returns("~key_filter2~");
+		oHelperMock.expects("getKeyFilter").withExactArgs("~oElement3~", "/TEAMS/TEAM_2_EMPLOYEES",
+				sinon.match.same(mTypeForMetaPath))
+			.returns("~key_filter3~");
+		oHelperMock.expects("selectKeyProperties")
+			.withExactArgs(sinon.match.object, "~oType~")
+			.callsFake(function (mQueryOptions0) {
+				mQueryOptions0.$select.push("A");
+				mQueryOptions0.$select.push("B");
+			});
+		this.oRequestorMock.expects("buildQueryString")
+			.withExactArgs("/TEAMS/TEAM_2_EMPLOYEES", {
+				$apply : "A.P.P.L.E.",
+				$filter : bHasFilter
+					? "age gt 40 and (~key_filter1~ or ~key_filter2~ or ~key_filter3~)"
+					: "~key_filter1~ or ~key_filter2~ or ~key_filter3~",
+				$search : "search",
+				$select : ["A", "B"],
+				$top : 3,
+				foo : "bar",
+				"sap-client" : "123"
+			}, false, true)
+			.returns("?bar");
+		const oResponse = {};
+		this.oRequestorMock.expects("request")
+			.withExactArgs("GET", "TEAMS('42')/TEAM_2_EMPLOYEES?bar", "~oGroupLock~")
+			.resolves(oResponse);
+		const oNewElement1 = {
+			"@$ui5._" : {predicate : "('1')"}
+		};
+		const oNewElement3 = {
+			"@$ui5._" : {predicate : "('3')"}
+		};
+		this.mock(oCache).expects("visitResponse")
+			.withExactArgs(sinon.match.same(oResponse), sinon.match.same(mTypeForMetaPath),
+				undefined, undefined, 0)
+			.callsFake(function () {
+				oResponse.value = [oNewElement3, oNewElement1];
+				// oResponse.value.$byPredicate = {}; // not needed
+			});
+
+		const oPromise
+			// code under test
+			= oCache.requestFilteredOrderedPredicates(["('1')", "('2')", "('3')"], "~oGroupLock~");
+
+		assert.ok(oPromise instanceof Promise);
+		assert.deepEqual(await oPromise, ["('3')", "('1')"]);
+		assert.strictEqual(JSON.stringify(oCache.mQueryOptions), sQueryOptions, "unchanged");
+		assert.deepEqual(oCache.aElements, [
+			"~oElement0~",
+			"~oElement1~",
+			"~oElement2~",
+			"~oElement3~"
+		]);
+		assert.deepEqual(oCache.aElements.$byPredicate, {
+			"('0')" : "~oElement0~",
+			"('1')" : "~oElement1~",
+			"('2')" : "~oElement2~",
+			"('3')" : "~oElement3~",
+			"('4')" : "~oElement4~"
+		});
+	});
+});
+
+	//*********************************************************************************************
 	QUnit.test("CollectionCache#checkRange", function (assert) {
 		var oCache = this.createCache("Employees");
 

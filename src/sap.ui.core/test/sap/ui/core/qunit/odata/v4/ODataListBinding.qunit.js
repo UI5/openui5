@@ -2665,7 +2665,8 @@ sap.ui.define([
 		this.mock(oBinding).expects("removeCachesAndMessages")
 			.withExactArgs(sinon.match.same(sPath));
 		this.mock(oBinding).expects("fetchCache")
-			.withExactArgs(sinon.match.same(oContext), false, /*bKeepQueryOptions*/true, undefined);
+			.withExactArgs(sinon.match.same(oContext), false, /*bKeepQueryOptions*/true, "myGroup",
+				undefined);
 		this.mock(oBinding).expects("refreshKeptElements").withExactArgs("myGroup")
 			.callsFake(function () {
 				if (oFixture.destroyedWhileRefreshing) {
@@ -2800,8 +2801,7 @@ sap.ui.define([
 			});
 		});
 		this.mock(oBinding).expects("fetchCache")
-			.withExactArgs(sinon.match.same(oContext), false, true,
-				bKeepCacheOnError ? "myGroup" : undefined)
+			.withExactArgs(sinon.match.same(oContext), false, true, "myGroup", bKeepCacheOnError)
 			.callsFake(function () {
 				if (!bRestore) { // simulate creation of new cache
 					oBinding.oCache = {
@@ -2885,7 +2885,8 @@ sap.ui.define([
 		this.mock(oBinding).expects("createReadGroupLock").withExactArgs("myGroup", bIsRoot);
 		this.mock(oBinding).expects("removeCachesAndMessages").withExactArgs("path");
 		this.mock(oBinding).expects("fetchCache")
-			.withExactArgs(sinon.match.same(oContext), false, /*bKeepQueryOptions*/true, "myGroup")
+			.withExactArgs(sinon.match.same(oContext), false, /*bKeepQueryOptions*/true, "myGroup",
+				true)
 			.callsFake(function () {
 				oBinding.oCache = oNewCache;
 				oBinding.oCachePromise = SyncPromise.resolve(oNewCache);
@@ -2942,7 +2943,8 @@ sap.ui.define([
 		this.mock(oBinding).expects("createReadGroupLock").withExactArgs("myGroup", "bIsRoot");
 		this.mock(oBinding).expects("removeCachesAndMessages").withExactArgs("path");
 		this.mock(oBinding).expects("fetchCache")
-			.withExactArgs(sinon.match.same(oContext), false, /*bKeepQueryOptions*/true, "myGroup")
+			.withExactArgs(sinon.match.same(oContext), false, /*bKeepQueryOptions*/true, "myGroup",
+				true)
 			.callsFake(function () {
 				oBinding.oCache = oNewCache;
 				oBinding.oCachePromise = SyncPromise.resolve(oNewCache);
@@ -6813,7 +6815,10 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("doCreateCache w/ old cache", function (assert) {
+[true, false].forEach((bSideEffectsRefresh) => {
+	const sTitle = "doCreateCache w/ old cache, bSideEffectsRefresh = " + bSideEffectsRefresh;
+
+	QUnit.test(sTitle, function (assert) {
 		var oBinding = this.bindList("/EMPLOYEES"),
 			oOldCache = {
 				$deepResourcePath : "deep/resource/path",
@@ -6829,16 +6834,20 @@ sap.ui.define([
 			.returns(aPredicates);
 		this.mock(oBinding).expects("isGrouped").withExactArgs().returns("~isGrouped~");
 		this.mock(oOldCache).expects("reset")
-			.withExactArgs(sinon.match.same(aPredicates), "myGroup", "~queryOptions~",
+			.withExactArgs(sinon.match.same(aPredicates),
+				bSideEffectsRefresh ? "myGroup" : undefined, "~queryOptions~",
 				"~$$aggregation~", "~isGrouped~");
+		this.mock(oBinding).expects("validateSelection")
+			.withExactArgs(sinon.match.same(oOldCache), "myGroup");
 		this.mock(_AggregationCache).expects("create").never();
 
 		assert.strictEqual(
 			// code under test
 			oBinding.doCreateCache("resource/path", "~queryOptions~", "~context~",
-				"deep/resource/path", "myGroup", oOldCache),
+				"deep/resource/path", "myGroup", bSideEffectsRefresh, oOldCache),
 			oOldCache);
 	});
+});
 
 	//*********************************************************************************************
 ["iCreatedContexts", "iDeletedContexts"].forEach(function (sProperty) {
@@ -6861,7 +6870,7 @@ sap.ui.define([
 		assert.strictEqual(
 			// code under test
 			oBinding.doCreateCache("resource/path", "~queryOptions~", "~context~",
-				"deep/resource/path", "myGroup", oOldCache),
+				"deep/resource/path", "myGroup", /*bSideEffectsRefresh*/true, oOldCache),
 			oOldCache);
 	});
 });
@@ -6913,6 +6922,7 @@ sap.ui.define([
 				.returns("resource/path");
 			oBindingMock.expects("getKeepAlivePredicates").withExactArgs().returns([]);
 		}
+		oBindingMock.expects("validateSelection").never();
 		oBindingMock.expects("inheritQueryOptions")
 			.withExactArgs("~queryOptions~", "~context~").returns("~mergedQueryOptions~");
 		oMoveExpectation = oBindingMock.expects("getCacheAndMoveKeepAliveContexts")
@@ -6941,7 +6951,8 @@ sap.ui.define([
 		assert.strictEqual(
 			// code under test
 			oBinding.doCreateCache("resource/path", "~queryOptions~", "~context~",
-				"deep/resource/path", undefined, bWithOld ? oOldCache : undefined),
+				"deep/resource/path", undefined, /*bSideEffectsRefresh*/false,
+				bWithOld ? oOldCache : undefined),
 			bAggregation ? oAggregationCache : oCache);
 		if (oGetExpectation) {
 			assert.ok(oMoveExpectation.calledBefore(oGetExpectation));
@@ -6969,7 +6980,7 @@ sap.ui.define([
 
 		this.oModel.bAutoExpandSelect = "~autoExpandSelect~";
 		oBinding.bSharedRequest = "~sharedRequest~";
-		this.mock(oOldCache).expects("getResourcePath").atMost(1).withExactArgs()
+		this.mock(oOldCache).expects("getResourcePath").withExactArgs()
 			.returns(bDeep ? "resource/path" : "W.R.O.N.G.");
 		this.mock(oBinding).expects("getKeepAlivePredicates").never();
 		this.mock(oBinding).expects("inheritQueryOptions")
@@ -6985,7 +6996,7 @@ sap.ui.define([
 		assert.strictEqual(
 			// code under test
 			oBinding.doCreateCache("resource/path", "~queryOptions~", "~context~",
-				"deep/resource/path", undefined, oOldCache),
+				"deep/resource/path", undefined, /*bSideEffectsRefresh*/false, oOldCache),
 			oCache);
 	});
 });
@@ -10301,6 +10312,45 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("_getAllExistingContexts", function (assert) {
+		const oBinding = this.bindList("relativePath");
+
+		delete oBinding.aContexts; // call from constructor
+
+		// code under test
+		assert.deepEqual(oBinding._getAllExistingContexts(), []);
+
+		oBinding.aContexts = ["~oTransientContext~", /*empty*/, undefined, "~oPersistedContext~"];
+		oBinding.iCreatedContexts = 1;
+		const oKeptContext0 = {isEffectivelyKeptAlive : function () {}};
+		const oKeptContext1 = {isEffectivelyKeptAlive : function () {}};
+		const oNotKeptContext = {isEffectivelyKeptAlive : function () {}}; // BCP 2270081950:
+		// there is a point in time when contexts with keepAlive=false are present in
+		// mPreviousContextsByPath which need be filtered out.
+
+		oBinding.mPreviousContextsByPath = {
+			"~sPath1~" : oKeptContext0,
+			"~sPath2~" : oKeptContext1,
+			"~sPath3~" : oNotKeptContext
+		};
+
+		this.mock(oKeptContext0).expects("isEffectivelyKeptAlive").twice().withExactArgs()
+			.returns(true);
+		this.mock(oKeptContext1).expects("isEffectivelyKeptAlive").twice().withExactArgs()
+			.returns(true);
+		this.mock(oNotKeptContext).expects("isEffectivelyKeptAlive").twice().withExactArgs()
+			.returns(false);
+
+		// code under test
+		assert.deepEqual(oBinding._getAllExistingContexts(),
+			["~oTransientContext~", "~oPersistedContext~", oKeptContext0, oKeptContext1]);
+
+		// code under test - no created contexts
+		assert.deepEqual(oBinding._getAllExistingContexts(true),
+			["~oPersistedContext~", oKeptContext0, oKeptContext1]);
+	});
+
+	//*********************************************************************************************
 	QUnit.test("getKeepAliveContext: existing context", function (assert) {
 		var oBinding = this.bindList("/EMPLOYEES"),
 			oContext;
@@ -11653,6 +11703,135 @@ child nodes added=${iCount}, expandTo=${iExpandTo}, make root=${bMakeRoot}`;
 
 		// code under test
 		oBinding.resetSelection();
+	});
+
+	//*********************************************************************************************
+[
+	{}, // no $$clearSelectionOnFilter
+	{$$aggregation : {}, $$clearSelectionOnFilter : true}
+].forEach((mParameters, i) => {
+	QUnit.test("validateSelection: nothing to do #" + i, function () {
+		const oBinding = this.bindList("TEAM_2_EMPLOYEES", undefined, undefined, undefined,
+			mParameters);
+		this.mock(oBinding).expects("_getAllExistingContexts").never();
+
+		// code under test
+		oBinding.validateSelection();
+	});
+});
+
+	//*********************************************************************************************
+	QUnit.test("validateSelection: Select All = true", function () {
+		const oBinding = this.bindList("TEAM_2_EMPLOYEES",
+			this.oModel.createBindingContext("/TEAMS('23')"), undefined, undefined,
+			{$$clearSelectionOnFilter : true});
+		this.mock(oBinding.oHeaderContext).expects("isSelected").withExactArgs().returns(true);
+		this.mock(oBinding).expects("_getAllExistingContexts").never();
+
+		// code under test
+		oBinding.validateSelection();
+	});
+
+	//*********************************************************************************************
+	QUnit.test("validateSelection: no selection", function () {
+		const oBinding = this.bindList("/EMPLOYEES", undefined, undefined, undefined,
+			{$$clearSelectionOnFilter : true});
+		this.mock(oBinding.oHeaderContext).expects("isSelected").withExactArgs().returns(false);
+		this.mock(oBinding).expects("_getAllExistingContexts").withExactArgs(true)
+			.returns([{
+				isSelected : () => false
+			}, {
+				isSelected : () => false
+			}]);
+		this.mock(oBinding).expects("lockGroup").never();
+
+		const oCache = {requestFilteredOrderedPredicates : mustBeMocked};
+
+		// code under test
+		oBinding.validateSelection(oCache, "~sGroupId~");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("validateSelection", function () {
+		const oBinding = this.bindList("TEAM_2_EMPLOYEES",
+			this.oModel.createBindingContext("/TEAMS('23')"), undefined, undefined,
+			{$$clearSelectionOnFilter : true});
+		this.mock(oBinding.oHeaderContext).expects("isSelected").withExactArgs().returns(false);
+		const oContextIn42 = {
+			sPath : "/TEAMS('23')/TEAM_2_EMPLOYEES('42')",
+			getPath : function () { return this.sPath; },
+			isSelected : () => true,
+			setSelected : mustBeMocked
+		};
+		const oContextIn43 = {
+			sPath : "/TEAMS('23')/TEAM_2_EMPLOYEES('43')",
+			getPath : function () { return this.sPath; },
+			isSelected : () => true,
+			setSelected : mustBeMocked
+		};
+		const oContextOut = {
+			sPath : "/TEAMS('23')/TEAM_2_EMPLOYEES('n/a')",
+			getPath : function () { return this.sPath; },
+			isSelected : () => true,
+			setSelected : mustBeMocked
+		};
+		const oContextNoException = {
+			sPath : "/TEAMS('23')/TEAM_2_EMPLOYEES('not/selected')",
+			getPath : function () { return this.sPath; },
+			isSelected : () => false,
+			setSelected : mustBeMocked
+		};
+		this.mock(oBinding).expects("_getAllExistingContexts").withExactArgs(true)
+			.returns([oContextIn42, oContextOut, oContextIn43, oContextNoException]);
+		this.mock(oBinding).expects("lockGroup").withExactArgs("~sGroupId~")
+			.returns("~oGroupLock~");
+		const oRequestFilteredOrderedPredicatesPromise = Promise.resolve(["('43')", "('42')"]);
+		this.mock(oBinding.oCache).expects("requestFilteredOrderedPredicates")
+			.withExactArgs(["('42')", "('n/a')", "('43')"], "~oGroupLock~")
+			.returns(oRequestFilteredOrderedPredicatesPromise);
+
+		const oCache = oBinding.oCache;
+		oBinding.oCache = undefined; // the binding has no cache while resetting
+
+		// code under test
+		oBinding.validateSelection(oCache, "~sGroupId~");
+
+		this.mock(oContextOut).expects("setSelected").withExactArgs(false);
+
+		return oRequestFilteredOrderedPredicatesPromise;
+	});
+
+	//*********************************************************************************************
+	QUnit.test("validateSelection: failed request", function () {
+		const oBinding = this.bindList("TEAM_2_EMPLOYEES",
+			this.oModel.createBindingContext("/TEAMS('23')"), undefined, undefined,
+			{$$clearSelectionOnFilter : true});
+		this.mock(oBinding.oHeaderContext).expects("isSelected").withExactArgs().returns(false);
+		const oContext = {
+			sPath : "/TEAMS('23')/TEAM_2_EMPLOYEES('42')",
+			getPath : function () { return this.sPath; },
+			isSelected : () => true
+		};
+		this.mock(oBinding).expects("_getAllExistingContexts").withExactArgs(true)
+			.returns([oContext]);
+		this.mock(oBinding).expects("lockGroup").withExactArgs("~sGroupId~")
+			.returns("~oGroupLock~");
+		const oError = new Error("Intentionally failed");
+		const oRequestFilteredOrderedPredicatesPromise = Promise.reject(oError);
+		this.mock(oBinding.oCache).expects("requestFilteredOrderedPredicates")
+			.withExactArgs(["('42')"], "~oGroupLock~")
+			.returns(oRequestFilteredOrderedPredicatesPromise);
+
+		const oCache = oBinding.oCache;
+		oBinding.oCache = undefined; // the binding has no cache while resetting
+
+		// code under test
+		oBinding.validateSelection(oCache, "~sGroupId~");
+
+		this.mock(oBinding.oModel).expects("reportError")
+			.withExactArgs("Failed to validate selection", sClassName, sinon.match.same(oError));
+
+		return oRequestFilteredOrderedPredicatesPromise.catch(() => {});
 	});
 });
 
