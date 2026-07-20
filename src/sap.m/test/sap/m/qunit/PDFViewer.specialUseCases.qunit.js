@@ -97,13 +97,19 @@ sap.ui.define( [
 	});
 
 	QUnit.test("Changes of height & width propagates directly to DOM", async function (assert) {
-		assert.expect(4);
 		var done = assert.async(),
 			fnInvalidate,
 			sExpectedHeight = "666px",
 			sExpectedWidth = "999px",
 			fnLoadedListener = function () {
 				assert.ok(true, "'Load' event should be fired");
+				fnSpyPdfViewer();
+				fnChangeHeightHandler();
+				fnCheckHeight();
+				fnChangeWidthHandler();
+				fnCheckWidth();
+				sinon.assert.callCount(fnInvalidate, 0);
+				done();
 			},
 			fnSpyPdfViewer = function () {
 				fnInvalidate = sinon.spy(oPDFViewer, "invalidate");
@@ -136,17 +142,6 @@ sap.ui.define( [
 
 		oPDFViewer = TestUtils.createPdfViewer(oErrorOptions);
 		await TestUtils.renderPdfViewer(oPDFViewer);
-
-		TestUtils.wait(2000)()
-			.then(fnSpyPdfViewer)
-			.then(fnChangeHeightHandler)
-			.then(fnCheckHeight)
-			.then(fnChangeWidthHandler)
-			.then(fnCheckWidth)
-			.then(function () {
-				sinon.assert.callCount(fnInvalidate, 0);
-				done();
-			});
 	});
 
 	QUnit.test("Loads pdf with non ascii name", async function (assert) {
