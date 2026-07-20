@@ -5997,8 +5997,14 @@ sap.ui.define([
 	//*********************************************************************************************
 	// Refresh single row after it has been updated with a value which doesn't match the table's
 	// filter anymore. In this case we expect the single row to disappear.
+	// JIRA: CPOUI5UISERVICESV3-1176
+	//
+	// Also tests the parseKeepsEmptyString model parameter (JIRA: CPOUI5ODATAV4-1554)
 	QUnit.test("Context#refresh(undefined, true)", function (assert) {
-		var oModel = this.createTeaBusiModel({autoExpandSelect : true}),
+		var oModel = this.createTeaBusiModel({
+				autoExpandSelect : true,
+				parseKeepsEmptyString : true
+			}),
 			oTable,
 			sView = '\
 <Table id="table"\
@@ -6008,7 +6014,7 @@ sap.ui.define([
 			sorter : {path : \'AGE\'},\
 			parameters : {foo : \'bar\'}\
 		}">\
-	<Text id="text" text="{Name}"/>\
+	<Input id="text" value="{Name}"/>\
 	<Input id="age" value="{AGE}"/>\
 </Table>',
 			that = this;
@@ -6061,6 +6067,13 @@ sap.ui.define([
 			oTable.getItems()[0].getBindingContext().refresh(undefined, true);
 
 			return that.waitForChanges(assert);
+		}).then(function () {
+			const oType = oTable.getItems()[0].getCells()[0].getBinding("value").getType();
+			assert.strictEqual(
+				// code under test (JIRA: CPOUI5ODATAV4-1554)
+				oType.parseValue("", "string"),
+				"",
+				"parseKeepsEmptyString causes '' to be parsed as '' instead of null");
 		});
 	});
 
@@ -6317,6 +6330,10 @@ sap.ui.define([
 	// JIRA: CPOUI5ODATAV4-2638
 	//
 	// Support client-side updates (JIRA: CPOUI5ODATAV4-2661)
+	//
+	// Without parseKeepsEmptyString, clearing a non-nullable String triggers a validation error
+	// instead of a PATCH.
+	// JIRA: CPOUI5ODATAV4-1554
 	QUnit.test("CPOUI5ODATAV4-2638: OneWay - Collection(ComplexType)", async function (assert) {
 		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
 		const sView = `
@@ -6447,6 +6464,13 @@ sap.ui.define([
 		this.oView.byId("name").getBinding("value").setValue("Frederic Spring");
 
 		await this.waitForChanges(assert, "update name");
+
+		const oType = this.oView.byId("name").getBinding("value").getType();
+		assert.strictEqual(
+			// code under test (JIRA: CPOUI5ODATAV4-1554)
+			oType.parseValue("", "string"),
+			null,
+			"without parseKeepsEmptyString, '' is parsed as null");
 	});
 
 	//*********************************************************************************************

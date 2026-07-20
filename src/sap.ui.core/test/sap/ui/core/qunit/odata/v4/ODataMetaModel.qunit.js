@@ -1232,6 +1232,7 @@ sap.ui.define([
 			this.mock(Localization).expects("getLanguageTag").atLeast(0).returns("ab-CD");
 
 			this.oModel = {
+				getParseKeepsEmptyString : function () { return false; },
 				getReporter : function () {},
 				reportError : function (_sLogMessage, _sReportingClassName, oError) {
 					throw oError;
@@ -3319,6 +3320,73 @@ sap.ui.define([
 		});
 	});
 	//TODO: later: support for facet DefaultValue?
+
+	//*********************************************************************************************
+[{
+	sTitle : "non-String type: model flag ignored",
+	sType : "Int32",
+	iCalls : 0,
+	bCached : true
+}, {
+	sTitle : "Edm.String: model flag injects parseKeepsEmptyString",
+	sType : "String",
+	iCalls : 1,
+	mResultFormatOptions : {parseKeepsEmptyString : true},
+	bCached : true
+}, {
+	sTitle : "Edm.String w/ other format options: flag injected",
+	sType : "String",
+	mFormatOptions : {style : "short"},
+	iCalls : 2,
+	mResultFormatOptions : {parseKeepsEmptyString : true, style : "short"},
+	bCached : false
+}, {
+	sTitle : "Edm.String: explicit false overrides model flag",
+	sType : "String",
+	mFormatOptions : {parseKeepsEmptyString : false},
+	iCalls : 4,
+	mResultFormatOptions : {parseKeepsEmptyString : false},
+	bCached : false
+}, {
+	sTitle : "Edm.String: explicit format options preserved",
+	sType : "String",
+	mFormatOptions : {parseKeepsEmptyString : true, style : "short"},
+	iCalls : 4,
+	mResultFormatOptions : {parseKeepsEmptyString : true, style : "short"},
+	bCached : false
+}, {
+	sTitle : "Edm.String: {parseKeepsEmptyString: true} provided, type instance cached",
+	sType : "String",
+	mFormatOptions : {parseKeepsEmptyString : true},
+	iCalls : 3,
+	mResultFormatOptions : {parseKeepsEmptyString : true},
+	bCached : true
+}].forEach(({bCached, iCalls, mFormatOptions, mResultFormatOptions, sTitle, sType}) => {
+	QUnit.test("fetchUI5Type: model-level parseKeepsEmptyString, " + sTitle, function (assert) {
+		const oProperty = {$Type : "Edm." + sType};
+		const sPath = "/EMPLOYEES('0')/Name";
+
+		this.mock(this.oModel).expects("getParseKeepsEmptyString").exactly(iCalls).withExactArgs()
+			.returns(true);
+		this.expects4FetchUI5Type(sPath, oProperty);
+
+		// code under test
+		return this.oMetaModel.fetchUI5Type(sPath, mFormatOptions).then((oType) => {
+			assert.strictEqual(oType.getName(), "sap.ui.model.odata.type." + sType);
+			assert.deepEqual(oType.oFormatOptions, mResultFormatOptions);
+			assert.strictEqual(oProperty["$ui5.type"], bCached ? oType : undefined,
+				"cached on property");
+
+			this.expects4FetchUI5Type(sPath, oProperty);
+
+			// code under test: 2nd request returns the cached instance iff bCached
+			const oType2 = this.oMetaModel.getUI5Type(sPath, mFormatOptions);
+
+			assert.strictEqual(oType2 === oType, bCached, "cached");
+			assert.deepEqual(oType2.oFormatOptions, mResultFormatOptions);
+		});
+	});
+});
 
 	//*********************************************************************************************
 [{
