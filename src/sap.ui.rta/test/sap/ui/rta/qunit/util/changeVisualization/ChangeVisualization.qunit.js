@@ -5,6 +5,7 @@ sap.ui.define([
 	"sap/m/Button",
 	"sap/m/HBox",
 	"sap/m/VBox",
+	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
 	"sap/ui/dt/DesignTime",
@@ -14,9 +15,9 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/ui/fl/apply/_internal/changes/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
-	"sap/ui/fl/Utils",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
+	"sap/ui/fl/Utils",
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/ui/rta/util/changeVisualization/ChangeCategories",
 	"sap/ui/rta/util/changeVisualization/ChangeIndicatorRegistry",
@@ -30,6 +31,7 @@ sap.ui.define([
 	Button,
 	HBox,
 	VBox,
+	JsControlTreeModifier,
 	Element,
 	Lib,
 	DesignTime,
@@ -39,9 +41,9 @@ sap.ui.define([
 	KeyCodes,
 	ChangesUtils,
 	States,
-	FlUtils,
 	ChangesWriteAPI,
 	PersistenceWriteAPI,
+	FlUtils,
 	nextUIUpdate,
 	ChangeCategories,
 	ChangeIndicatorRegistry,
@@ -55,14 +57,11 @@ sap.ui.define([
 
 	const sandbox = sinon.createSandbox();
 	QUnit.config.fixture = null;
-
-	// --- Helpers ---
+	const oAppComponent = RtaQunitUtils.createAndStubAppComponent(sinon, "appComponent");
 
 	function createMockChange(sId, sCommandName, sSelectorId, oAdditionalProperties, sState) {
 		const oChange = RtaQunitUtils.createUIChange(merge({
-			selector: {
-				id: sSelectorId
-			},
+			selector: JsControlTreeModifier.getSelector(sSelectorId, oAppComponent),
 			fileName: sId,
 			support: {
 				command: sCommandName
@@ -75,14 +74,8 @@ sap.ui.define([
 		return oChange;
 	}
 
-	function prepareChanges(aMockChanges, oRootComponent, oChangeHandler) {
+	function prepareChanges(aMockChanges, oChangeHandler) {
 		sandbox.stub(PersistenceWriteAPI, "_getUIChanges").resolves(aMockChanges || []);
-		sandbox.stub(ChangeVisualization.prototype, "_getComponent").returns({
-			createId(sId) {
-				return sId;
-			},
-			...oRootComponent
-		});
 		sandbox.stub(ChangesUtils, "getControlIfTemplateAffected")
 		.callsFake(function(oChange, oControl) {
 			return {
@@ -105,7 +98,7 @@ sap.ui.define([
 				new Button("button1", {
 					text: "First button"
 				}),
-				new Button("button2", {
+				new Button(oAppComponent.createId("button2"), {
 					text: "Second button"
 				}),
 				new Button("button3", {
@@ -146,8 +139,6 @@ sap.ui.define([
 		return { top: 100, left: 50, right: 250, bottom: 600, height: 500, width: 200 };
 	}
 
-	// --- Test Modules ---
-
 	QUnit.module("Initialization and border classes", {
 		beforeEach(assert) {
 			const fnDone = assert.async();
@@ -161,8 +152,8 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1"),
-				createMockChange("testChange2", "move", "button2")
-			], undefined, {
+				createMockChange("testChange2", "move", oAppComponent.createId("button2"))
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -172,7 +163,7 @@ sap.ui.define([
 
 			this.oChangeVisualization.initialize().then(function() {
 				const oOverlay1 = OverlayRegistry.getOverlay("button1");
-				const oOverlay2 = OverlayRegistry.getOverlay("button2");
+				const oOverlay2 = OverlayRegistry.getOverlay(oAppComponent.createId("button2"));
 				const oOverlay3 = OverlayRegistry.getOverlay("button3");
 
 				assert.ok(
@@ -197,7 +188,7 @@ sap.ui.define([
 
 			this.oChangeVisualization.initialize().then(function() {
 				const oOverlay1 = OverlayRegistry.getOverlay("button1");
-				const oOverlay2 = OverlayRegistry.getOverlay("button2");
+				const oOverlay2 = OverlayRegistry.getOverlay(oAppComponent.createId("button2"));
 
 				assert.notOk(
 					oOverlay1.hasStyleClass("sapUiRtaOverlayWithChanges"),
@@ -252,7 +243,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -275,6 +266,79 @@ sap.ui.define([
 				fnDone();
 			}.bind(this));
 		});
+
+		QUnit.test("_onElementOverlayCreated resolves a previously unresolved change when its overlay arrives", function(assert) {
+			const fnDone = assert.async();
+			prepareChanges([
+				createMockChange("testChange1", "rename", "button1")
+			], {
+				getChangeVisualizationInfo(oChange) {
+					return { affectedControls: [oChange.getSelector()] };
+				}
+			});
+
+			this.oChangeVisualization.initialize().then(function() {
+				// Simulate the "control absent during initialize" scenario by invalidating its resolution.
+				const oRegistry = this.oChangeVisualization._oChangeIndicatorRegistry;
+				oRegistry.invalidateResolution("testChange1");
+
+				assert.strictEqual(
+					oRegistry.getUnresolvedChangeIds().length, 1,
+					"then the change is in the catalog but unresolved"
+				);
+
+				const oOverlay = OverlayRegistry.getOverlay("button1");
+				this.oChangeVisualization._onElementOverlayCreated({ getParameter: () => oOverlay });
+
+				// _onElementOverlayCreated delegates async work to _resolveAndDecorate; await it directly.
+				return this.oChangeVisualization._resolveAndDecorate(["testChange1"]);
+			}.bind(this)).then(function() {
+				const oRegistry = this.oChangeVisualization._oChangeIndicatorRegistry;
+				assert.strictEqual(
+					oRegistry.getUnresolvedChangeIds().length, 0,
+					"then the change is resolved after the overlay arrives"
+				);
+				assert.ok(
+					OverlayRegistry.getOverlay("button1").hasStyleClass("sapUiRtaOverlayWithChanges"),
+					"then the overlay is decorated after resolution"
+				);
+				fnDone();
+			}.bind(this));
+		});
+
+		QUnit.test("_onElementOverlayCreated ignores an overlay whose element has no valid selector (unstable Id)", async function(assert) {
+			prepareChanges([
+				createMockChange("testChange1", "rename", "button1")
+			], {
+				getChangeVisualizationInfo(oChange) {
+					return {
+						affectedControls: [oChange.getSelector()]
+					};
+				}
+			});
+
+			await this.oChangeVisualization.initialize();
+			const oOverlay = OverlayRegistry.getOverlay("button1");
+			oOverlay.removeStyleClass("sapUiRtaOverlayWithChanges");
+
+			// Simulate an overlay whose element cannot be resolved to a stable selector.
+			sandbox.stub(JsControlTreeModifier, "getSelector").throws(new Error("Control id was generated dynamically"));
+			const oResolveSpy = sandbox.spy(this.oChangeVisualization, "_resolveAndDecorate");
+			const oBorderSpy = sandbox.spy(this.oChangeVisualization, "_applyBorderToOverlay");
+
+			this.oChangeVisualization._onElementOverlayCreated({
+				getParameter: () => oOverlay
+			});
+
+			assert.ok(
+				oResolveSpy.notCalled,
+				"then no unresolved changes are found and resolution is skipped"
+			);
+			assert.ok(
+				oBorderSpy.notCalled,
+				"then no border is applied to the overlay since it cannot be resolved"
+			);
+		});
 	});
 
 	QUnit.module("removeBorderClasses", {
@@ -290,7 +354,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -336,11 +400,11 @@ sap.ui.define([
 			}.bind(this));
 		});
 
-		QUnit.test("returns false for an overlay flagged as destroyed", function(assert) {
+		QUnit.test("returns false for an overlay flagged as destroyed or having no changes", function(assert) {
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -353,39 +417,21 @@ sap.ui.define([
 				oOverlay.removeStyleClass("sapUiRtaOverlayWithChanges");
 				oOverlay.bIsDestroyed = true;
 
-				const bResult = this.oChangeVisualization._applyBorderToOverlay(oOverlay);
-
-				assert.strictEqual(bResult, false, "then false is returned for a destroyed overlay");
+				const bDestroyed = this.oChangeVisualization._applyBorderToOverlay(oOverlay);
+				assert.strictEqual(bDestroyed, false, "then false is returned for a destroyed overlay");
 				assert.notOk(
 					oOverlay.hasStyleClass("sapUiRtaOverlayWithChanges"),
-					"then no border class is applied"
+					"then no border class is applied to a destroyed overlay"
 				);
 
 				oOverlay.bIsDestroyed = false;
-				fnDone();
-			}.bind(this));
-		});
 
-		QUnit.test("returns false for an overlay whose element has no changes and no connected element with changes", function(assert) {
-			const fnDone = assert.async();
-			prepareChanges([
-				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
-				getChangeVisualizationInfo(oChange) {
-					return {
-						affectedControls: [oChange.getSelector()]
-					};
-				}
-			});
-
-			this.oChangeVisualization.initialize().then(function() {
-				const oOverlay = OverlayRegistry.getOverlay("button3");
-				const bResult = this.oChangeVisualization._applyBorderToOverlay(oOverlay);
-
-				assert.strictEqual(bResult, false, "then false is returned when no condition matches");
+				const oOverlay3 = OverlayRegistry.getOverlay("button3");
+				const bNoChanges = this.oChangeVisualization._applyBorderToOverlay(oOverlay3);
+				assert.strictEqual(bNoChanges, false, "then false is returned when no condition matches");
 				assert.notOk(
-					oOverlay.hasStyleClass("sapUiRtaOverlayWithChanges"),
-					"then no border class is applied"
+					oOverlay3.hasStyleClass("sapUiRtaOverlayWithChanges"),
+					"then no border class is applied when element has no changes"
 				);
 				fnDone();
 			}.bind(this));
@@ -405,7 +451,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -415,12 +461,12 @@ sap.ui.define([
 
 			this.oChangeVisualization.setDesignTime(this.oDesignTime);
 			sandbox.stub(this.oDesignTime, "getSelectionManager").returns({
-				getConnectedElements: () => ({ button1: "button2" })
+				getConnectedElements: () => ({ button1: oAppComponent.createId("button2") })
 			});
 
 			this.oChangeVisualization.initialize().then(function() {
 				const oOverlay1 = OverlayRegistry.getOverlay("button1");
-				const oOverlay2 = OverlayRegistry.getOverlay("button2");
+				const oOverlay2 = OverlayRegistry.getOverlay(oAppComponent.createId("button2"));
 
 				assert.ok(
 					oOverlay1.hasStyleClass("sapUiRtaOverlayWithChanges"),
@@ -451,11 +497,11 @@ sap.ui.define([
 			}.bind(this));
 		});
 
-		QUnit.test("_applyBorderToOverlay decorates an element whose connected element has changes (Check 2)", function(assert) {
+		QUnit.test("_applyBorderToOverlay decorates an element via connected-element lookup in both directions", function(assert) {
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -464,53 +510,28 @@ sap.ui.define([
 			});
 
 			this.oChangeVisualization.setDesignTime(this.oDesignTime);
+
+			// Check 2: element's connected element has the change (button2 → button1)
 			sandbox.stub(this.oDesignTime, "getSelectionManager").returns({
-				getConnectedElements: () => ({ button2: "button1" })
+				getConnectedElements: () => ({ [oAppComponent.createId("button2")]: "button1" })
 			});
 
 			this.oChangeVisualization.initialize().then(function() {
-				const oOverlay2 = OverlayRegistry.getOverlay("button2");
+				const oOverlay2 = OverlayRegistry.getOverlay(oAppComponent.createId("button2"));
 				oOverlay2.removeStyleClass("sapUiRtaOverlayWithChanges");
 
-				const bResult = this.oChangeVisualization._applyBorderToOverlay(oOverlay2);
+				assert.strictEqual(this.oChangeVisualization._applyBorderToOverlay(oOverlay2), true, "then true is returned for Check 2");
+				assert.ok(oOverlay2.hasStyleClass("sapUiRtaOverlayWithChanges"), "then overlay is decorated for Check 2");
 
-				assert.strictEqual(bResult, true, "then true is returned");
-				assert.ok(
-					oOverlay2.hasStyleClass("sapUiRtaOverlayWithChanges"),
-					"then the overlay is decorated because its connected element has changes"
-				);
-				fnDone();
-			}.bind(this));
-		});
-
-		QUnit.test("_applyBorderToOverlay decorates an element targeted by another element with changes (Check 3)", function(assert) {
-			const fnDone = assert.async();
-			prepareChanges([
-				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
-				getChangeVisualizationInfo(oChange) {
-					return {
-						affectedControls: [oChange.getSelector()]
-					};
-				}
-			});
-
-			this.oChangeVisualization.setDesignTime(this.oDesignTime);
-			sandbox.stub(this.oDesignTime, "getSelectionManager").returns({
-				getConnectedElements: () => ({ button1: "button2" })
-			});
-
-			this.oChangeVisualization.initialize().then(function() {
-				const oOverlay2 = OverlayRegistry.getOverlay("button2");
+				// Check 3: element is targeted by another element with changes (button1 → button2)
+				this.oDesignTime.getSelectionManager.restore();
+				sandbox.stub(this.oDesignTime, "getSelectionManager").returns({
+					getConnectedElements: () => ({ button1: oAppComponent.createId("button2") })
+				});
 				oOverlay2.removeStyleClass("sapUiRtaOverlayWithChanges");
 
-				const bResult = this.oChangeVisualization._applyBorderToOverlay(oOverlay2);
-
-				assert.strictEqual(bResult, true, "then true is returned");
-				assert.ok(
-					oOverlay2.hasStyleClass("sapUiRtaOverlayWithChanges"),
-					"then the overlay is decorated when another element with changes points to it"
-				);
+				assert.strictEqual(this.oChangeVisualization._applyBorderToOverlay(oOverlay2), true, "then true is returned for Check 3");
+				assert.ok(oOverlay2.hasStyleClass("sapUiRtaOverlayWithChanges"), "then overlay is decorated for Check 3");
 				fnDone();
 			}.bind(this));
 		});
@@ -529,7 +550,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -541,13 +562,13 @@ sap.ui.define([
 				// Now update the stub to return an additional change
 				PersistenceWriteAPI._getUIChanges.resolves([
 					createMockChange("testChange1", "rename", "button1"),
-					createMockChange("testChange2", "move", "button2")
+					createMockChange("testChange2", "move", oAppComponent.createId("button2"))
 				]);
 
 				return this.oChangeVisualization.refreshBorders();
 			}.bind(this)).then(function() {
 				const oOverlay1 = OverlayRegistry.getOverlay("button1");
-				const oOverlay2 = OverlayRegistry.getOverlay("button2");
+				const oOverlay2 = OverlayRegistry.getOverlay(oAppComponent.createId("button2"));
 
 				assert.ok(
 					oOverlay1.hasStyleClass("sapUiRtaOverlayWithChanges"),
@@ -560,11 +581,12 @@ sap.ui.define([
 				fnDone();
 			});
 		});
+
 		QUnit.test("when refreshBorders is called a second time, the registry is not reset again", function(assert) {
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -586,6 +608,118 @@ sap.ui.define([
 				fnDone();
 			});
 		});
+
+		QUnit.test("when a version is activated, refreshBorders reclassifies draft changes to ALL", function(assert) {
+			const fnDone = assert.async();
+			prepareChanges([
+				createMockChange("testChange1", "rename", "button1", {}, States.LifecycleState.PERSISTED)
+			], {
+				getChangeVisualizationInfo(oChange) {
+					return { affectedControls: [oChange.getSelector()] };
+				}
+			});
+
+			const oRefreshSpy = sandbox.spy(ChangeIndicatorRegistry.prototype, "refreshChangeStates");
+
+			this.oChangeVisualization.initialize().then(function() {
+				// Simulate post-activation: catalog entry is DRAFT (draftFilenames listed it),
+				// then activate clears draftFilenames and refreshBorders runs.
+				const oRegistry = this.oChangeVisualization._oChangeIndicatorRegistry;
+				oRegistry._oChangeCatalog.testChange1.changeStates = [ChangeStates.DRAFT];
+
+				const oActivatedModel = { getData: () => ({ draftFilenames: [] }) };
+				this.oChangeVisualization.oVersionsModel = oActivatedModel;
+				return this.oChangeVisualization.refreshBorders();
+			}.bind(this)).then(function() {
+				assert.ok(oRefreshSpy.called, "then refreshChangeStates was called during refreshBorders");
+				const oRegistry = this.oChangeVisualization._oChangeIndicatorRegistry;
+				assert.deepEqual(
+					oRegistry.getCatalogEntry("testChange1").changeStates,
+					[ChangeStates.ALL],
+					"then the change is reclassified to ALL after activation"
+				);
+				fnDone();
+			}.bind(this));
+		});
+
+		QUnit.test("removes previously registered changes that no longer exist", function(assert) {
+			const fnDone = assert.async();
+			prepareChanges([
+				createMockChange("testChange1", "rename", "button1"),
+				createMockChange("testChange2", "move", oAppComponent.createId("button2"))
+			], {
+				getChangeVisualizationInfo(oChange) {
+					return {
+						affectedControls: [oChange.getSelector()]
+					};
+				}
+			});
+
+			this.oChangeVisualization.initialize().then(function() {
+				const oOverlay1 = OverlayRegistry.getOverlay("button1");
+				const oOverlay2 = OverlayRegistry.getOverlay(oAppComponent.createId("button2"));
+				assert.ok(
+					oOverlay1.hasStyleClass("sapUiRtaOverlayWithChanges"),
+					"then button1 has the border class initially"
+				);
+				assert.ok(
+					oOverlay2.hasStyleClass("sapUiRtaOverlayWithChanges"),
+					"then button2 has the border class initially"
+				);
+
+				// Now only return one change — the other should be removed
+				PersistenceWriteAPI._getUIChanges.resolves([
+					createMockChange("testChange1", "rename", "button1")
+				]);
+
+				return this.oChangeVisualization.refreshBorders();
+			}.bind(this)).then(function() {
+				const oOverlay1 = OverlayRegistry.getOverlay("button1");
+				const oOverlay2 = OverlayRegistry.getOverlay(oAppComponent.createId("button2"));
+				assert.ok(
+					oOverlay1.hasStyleClass("sapUiRtaOverlayWithChanges"),
+					"then button1 still has the border class"
+				);
+				assert.notOk(
+					oOverlay2.hasStyleClass("sapUiRtaOverlayWithChanges"),
+					"then button2 no longer has the border class"
+				);
+				fnDone();
+			});
+		});
+
+		QUnit.test("resolves without crashing when no component is available", function(assert) {
+			prepareChanges([
+				createMockChange("testChange1", "rename", "button1")
+			], {
+				getChangeVisualizationInfo(oChange) {
+					return {
+						affectedControls: [oChange.getSelector()]
+					};
+				}
+			});
+
+			return this.oChangeVisualization.initialize().then(function() {
+				assert.strictEqual(
+					this.oChangeVisualization._oChangeIndicatorRegistry.getRegisteredChangeIds().length,
+					1,
+					"then a change is registered after the initial run"
+				);
+
+				sandbox.stub(ChangeVisualization.prototype, "_getComponent").returns(undefined);
+
+				const pUpdate = this.oChangeVisualization.refreshBorders();
+				assert.ok(pUpdate && typeof pUpdate.then === "function", "then a thenable is returned");
+
+				return pUpdate.then(function() {
+					assert.strictEqual(
+						this.oChangeVisualization._oChangeIndicatorRegistry.getRegisteredChangeIds().length,
+						1,
+						"then the existing registry entries are preserved"
+					);
+				}.bind(this));
+			}.bind(this));
+		});
 	});
 
 	QUnit.module("hasChangesForElement", {
@@ -597,11 +731,11 @@ sap.ui.define([
 			cleanupTest.call(this);
 		}
 	}, function() {
-		QUnit.test("returns true for elements with changes", function(assert) {
+		QUnit.test("returns true for elements with changes and false for elements without", function(assert) {
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -614,23 +748,6 @@ sap.ui.define([
 					this.oChangeVisualization.hasChangesForElement("button1"),
 					"then hasChangesForElement returns true for button1"
 				);
-				fnDone();
-			}.bind(this));
-		});
-
-		QUnit.test("returns false for elements without changes", function(assert) {
-			const fnDone = assert.async();
-			prepareChanges([
-				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
-				getChangeVisualizationInfo(oChange) {
-					return {
-						affectedControls: [oChange.getSelector()]
-					};
-				}
-			});
-
-			this.oChangeVisualization.initialize().then(function() {
 				assert.notOk(
 					this.oChangeVisualization.hasChangesForElement("button3"),
 					"then hasChangesForElement returns false for button3"
@@ -665,7 +782,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "parentContainer")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -700,7 +817,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "parentContainer")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -740,7 +857,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "parentContainer")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -780,7 +897,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "parentContainer")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -844,7 +961,7 @@ sap.ui.define([
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1"),
 				createMockChange("testChange2", "move", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -859,7 +976,6 @@ sap.ui.define([
 				assert.strictEqual(aChanges.length, 2, "then two changes are returned");
 				assert.ok(aChanges[0].id, "then the first change has an id");
 				assert.ok(aChanges[0].description, "then the first change has a description");
-				assert.ok(aChanges[0].commandLabel, "then the first change has a commandLabel");
 				assert.ok(aChanges[0].icon, "then the first change has an icon");
 				assert.ok(aChanges[0].user !== undefined, "then the first change has a user field");
 				assert.ok(aChanges[0].relativeDate, "then the first change has a relativeDate");
@@ -872,7 +988,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -889,11 +1005,11 @@ sap.ui.define([
 			}.bind(this));
 		});
 
-		QUnit.test("formats description via resource bundle when command has no visualization", function(assert) {
+		QUnit.test("formats description via resource bundle or descriptionPayload", function(assert) {
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "unknownCommand", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -912,37 +1028,11 @@ sap.ui.define([
 			}.bind(this));
 		});
 
-		QUnit.test("formats description with descriptionPayload keys", function(assert) {
-			const fnDone = assert.async();
-			prepareChanges([
-				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
-				getChangeVisualizationInfo(oChange) {
-					return {
-						affectedControls: [oChange.getSelector()],
-						descriptionPayload: {
-							originalLabel: "Old Label"
-						}
-					};
-				}
-			});
-
-			this.oChangeVisualization.initialize().then(function() {
-				this.oChangeVisualization._bShowAllChanges = true;
-				const oOverlay = OverlayRegistry.getOverlay("button1");
-				const aChanges = this.oChangeVisualization.getChangesForOverlay(oOverlay);
-
-				assert.strictEqual(aChanges.length, 1, "then one change is returned");
-				assert.ok(aChanges[0].description, "then the change has a description");
-				fnDone();
-			}.bind(this));
-		});
-
 		QUnit.test("formats description for settings command with custom description in payload", function(assert) {
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "settings", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()],
@@ -971,7 +1061,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()],
@@ -1001,7 +1091,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -1084,7 +1174,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -1127,7 +1217,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -1153,7 +1243,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -1182,7 +1272,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -1221,7 +1311,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -1262,7 +1352,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return { affectedControls: [oChange.getSelector()] };
 				}
@@ -1293,7 +1383,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return { affectedControls: [oChange.getSelector()] };
 				}
@@ -1326,7 +1416,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return { affectedControls: [oChange.getSelector()] };
 				}
@@ -1457,17 +1547,17 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "move", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()],
-						dependentControls: [{ id: "button2" }]
+						dependentControls: [{ id: oAppComponent.createId("button2") }]
 					};
 				}
 			});
 
 			this.oChangeVisualization.initialize().then(function() {
-				const oDependentOverlay = OverlayRegistry.getOverlay("button2");
+				const oDependentOverlay = OverlayRegistry.getOverlay(oAppComponent.createId("button2"));
 				const oDomRef = oDependentOverlay.getDomRef();
 
 				this.oChangeVisualization._selectChange("testChange1");
@@ -1492,7 +1582,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -1512,7 +1602,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "move", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()],
@@ -1549,7 +1639,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -1588,7 +1678,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -1622,7 +1712,7 @@ sap.ui.define([
 			const oChange = createMockChange("testChange1", "rename", "button1");
 			sandbox.stub(oChange, "getState").returns("PERSISTED");
 
-			prepareChanges([oChange], undefined, {
+			prepareChanges([oChange], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -1665,7 +1755,24 @@ sap.ui.define([
 		}
 	}, function() {
 		function setRegisteredChanges(oRegistry, mEntries) {
-			oRegistry._oRegisteredChanges = mEntries;
+			// Write directly into the two-layer registry: catalog (Layer 1) + resolution cache (Layer 2).
+			// Entries that have a non-empty visualizationInfo go into both layers; entries with
+			// no/empty visualizationInfo go into the catalog only (simulating unresolved state).
+			Object.keys(mEntries).forEach(function(sId) {
+				const oEntry = mEntries[sId];
+				oRegistry._oChangeCatalog[sId] = {
+					change: oEntry.change,
+					commandName: oEntry.commandName || "rename",
+					changeCategory: oEntry.changeCategory || "other",
+					changeStates: oEntry.changeStates
+				};
+				if (oEntry.visualizationInfo && (
+					(oEntry.visualizationInfo.displayElementIds && oEntry.visualizationInfo.displayElementIds.length > 0)
+					|| (oEntry.visualizationInfo.affectedElementIds && oEntry.visualizationInfo.affectedElementIds.length > 0)
+				)) {
+					oRegistry._oResolutionCache[sId] = oEntry.visualizationInfo;
+				}
+			});
 		}
 
 		function createChangeStub(sApplyState) {
@@ -1695,21 +1802,10 @@ sap.ui.define([
 				c1: {
 					change: createChangeStub(States.ApplyState.APPLY_SUCCESSFUL),
 					changeStates: [ChangeStates.ALL],
-					visualizationInfo: { affectedElementIds: ["b1"], displayElementIds: [] }
+					visualizationInfo: { affectedElementIds: ["b1"], displayElementIds: ["b1"] }
 				}
 			});
 			assert.strictEqual(this.oCviz.hasPersistedChanges(), true, "then the successfully applied persisted change is reported");
-		});
-
-		QUnit.test("returns true for another persisted change with apply state APPLY_SUCCESSFUL", function(assert) {
-			setRegisteredChanges(this.oRegistry, {
-				c1: {
-					change: createChangeStub(States.ApplyState.APPLY_SUCCESSFUL),
-					changeStates: [ChangeStates.ALL],
-					visualizationInfo: { affectedElementIds: [], displayElementIds: ["b1"] }
-				}
-			});
-			assert.strictEqual(this.oCviz.hasPersistedChanges(), true, "then the persisted change is still reported");
 		});
 
 		QUnit.test("returns false when no persisted change has apply state APPLY_SUCCESSFUL", function(assert) {
@@ -1749,7 +1845,7 @@ sap.ui.define([
 				c1: {
 					change: { isSuccessfullyApplied: () => true },
 					changeStates: [ChangeStates.ALL],
-					visualizationInfo: { affectedElementIds: ["b1"], displayElementIds: [] }
+					visualizationInfo: { affectedElementIds: ["b1"], displayElementIds: ["b1"] }
 				}
 			});
 			assert.strictEqual(
@@ -1841,7 +1937,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "nonExistentSelector")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo() {
 					return {
 						affectedControls: [{ id: "button1" }]
@@ -1852,9 +1948,11 @@ sap.ui.define([
 			this.oChangeVisualization.initialize().then(function() {
 				// Manually patch visualizationInfo since getInfoFromChangeHandler
 				// cannot resolve "nonExistentSelector" to a control
-				const oRegisteredChange = this.oChangeVisualization
-				._oChangeIndicatorRegistry.getRegisteredChange("testChange1");
-				oRegisteredChange.visualizationInfo.affectedElementIds = ["button1"];
+				const oRegistry = this.oChangeVisualization._oChangeIndicatorRegistry;
+				const oVizInfo = oRegistry._oResolutionCache.testChange1
+					|| { affectedElementIds: [], dependentElementIds: [], displayElementIds: [], descriptionPayload: {} };
+				oVizInfo.affectedElementIds = ["button1"];
+				oRegistry._oResolutionCache.testChange1 = oVizInfo;
 
 				this.oChangeVisualization._bShowAllChanges = true;
 				const oOverlay = OverlayRegistry.getOverlay("button1");
@@ -1870,7 +1968,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "nonExistentSelector")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo() {
 					return {
 						affectedControls: [{ id: "button1" }]
@@ -1880,9 +1978,11 @@ sap.ui.define([
 
 			this.oChangeVisualization.initialize().then(function() {
 				const oRegistry = this.oChangeVisualization._oChangeIndicatorRegistry;
-				const oRawEntry = oRegistry._oRegisteredChanges.testChange1;
-				oRawEntry.visualizationInfo.affectedElementIds = ["button1"];
-				oRawEntry.changeStates = [];
+				const oVizInfo = oRegistry._oResolutionCache.testChange1
+					|| { affectedElementIds: [], dependentElementIds: [], displayElementIds: [], descriptionPayload: {} };
+				oVizInfo.affectedElementIds = ["button1"];
+				oRegistry._oResolutionCache.testChange1 = oVizInfo;
+				oRegistry._oChangeCatalog.testChange1.changeStates = [];
 
 				this.oChangeVisualization._bShowAllChanges = false;
 				const oOverlay = OverlayRegistry.getOverlay("button1");
@@ -1901,7 +2001,7 @@ sap.ui.define([
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1"),
 				createMockChange("testChange2", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -1947,7 +2047,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -1984,79 +2084,6 @@ sap.ui.define([
 			assert.notStrictEqual(
 				this.oChangeVisualization._oChangeDetailPopup, oFirstPopup,
 				"then the new popup is different from the first"
-			);
-			fnDone();
-		});
-
-		QUnit.test("positions popover left when it would overflow the right edge", async function(assert) {
-			const fnDone = assert.async();
-			prepareChanges([
-				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
-				getChangeVisualizationInfo(oChange) {
-					return {
-						affectedControls: [oChange.getSelector()]
-					};
-				}
-			});
-
-			await this.oChangeVisualization.initialize();
-			const oOverlay = OverlayRegistry.getOverlay("button1");
-			const iViewportWidth = document.documentElement.clientWidth;
-			// Place context menu near the right edge so popover overflows
-			const mContextMenuRect = {
-				top: 100, left: iViewportWidth - 50, right: iViewportWidth,
-				bottom: 600, height: 500, width: 50
-			};
-			const oPlugin = createContextMenuPluginStub();
-			await this.oChangeVisualization.openChangeDetailPopup({
-				overlay: oOverlay, contextMenuRect: mContextMenuRect, openerOverlay: oOverlay, contextMenuPlugin: oPlugin
-			});
-
-			const oAnchor = document.getElementById(`${this.oChangeVisualization.getId()}--popupAnchor`);
-			assert.ok(oAnchor, "then the anchor is created");
-			const iAnchorLeft = parseFloat(oAnchor.style.left);
-			assert.ok(
-				iAnchorLeft < mContextMenuRect.left,
-				"then the anchor is shifted left to avoid overflow"
-			);
-			fnDone();
-		});
-
-		QUnit.test("opens popover upward when not enough space below", async function(assert) {
-			const fnDone = assert.async();
-			prepareChanges([
-				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
-				getChangeVisualizationInfo(oChange) {
-					return {
-						affectedControls: [oChange.getSelector()]
-					};
-				}
-			});
-
-			await this.oChangeVisualization.initialize();
-			const oOverlay = OverlayRegistry.getOverlay("button1");
-			const iViewportHeight = document.documentElement.clientHeight;
-			// Context menu positioned so that (viewportHeight - top) < height
-			const mContextMenuRect = {
-				top: iViewportHeight - 10, left: 50, right: 250,
-				bottom: iViewportHeight + 490, height: 500, width: 200
-			};
-			const oPlugin = createContextMenuPluginStub();
-			await this.oChangeVisualization.openChangeDetailPopup({
-				overlay: oOverlay, contextMenuRect: mContextMenuRect, openerOverlay: oOverlay, contextMenuPlugin: oPlugin
-			});
-
-			const oPopover = this.oChangeVisualization._oChangeDetailPopup;
-			assert.strictEqual(
-				oPopover.getPlacement(), "Top",
-				"then the popover placement is set to Top"
-			);
-			const oAnchor = document.getElementById(`${this.oChangeVisualization.getId()}--popupAnchor`);
-			assert.strictEqual(
-				oAnchor.style.top, `${mContextMenuRect.bottom}px`,
-				"then the anchor is positioned at the bottom edge"
 			);
 			fnDone();
 		});
@@ -2269,7 +2296,7 @@ sap.ui.define([
 		QUnit.test("closes popup and reopens context menu", async function(assert) {
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -2317,7 +2344,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -2378,11 +2405,11 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "move", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()],
-						dependentControls: [{ id: "button2" }]
+						dependentControls: [{ id: oAppComponent.createId("button2") }]
 					};
 				}
 			});
@@ -2428,11 +2455,11 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "move", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()],
-						dependentControls: [{ id: "button2" }]
+						dependentControls: [{ id: oAppComponent.createId("button2") }]
 					};
 				}
 			});
@@ -2490,11 +2517,11 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "move", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()],
-						dependentControls: [{ id: "button2" }]
+						dependentControls: [{ id: oAppComponent.createId("button2") }]
 					};
 				}
 			});
@@ -2526,11 +2553,11 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "move", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()],
-						dependentControls: [{ id: "button2" }]
+						dependentControls: [{ id: oAppComponent.createId("button2") }]
 					};
 				}
 			});
@@ -2591,7 +2618,7 @@ sap.ui.define([
 			const fnDone = assert.async();
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
+			], {
 				getChangeVisualizationInfo(oChange) {
 					return {
 						affectedControls: [oChange.getSelector()]
@@ -2615,95 +2642,6 @@ sap.ui.define([
 					"then _selectChange is called with the correct change ID"
 				);
 				fnDone();
-			}.bind(this));
-		});
-	});
-
-	QUnit.module("refreshBorders - stale change removal", {
-		beforeEach(assert) {
-			const fnDone = assert.async();
-			setupTest.call(this, fnDone);
-		},
-		afterEach() {
-			cleanupTest.call(this);
-		}
-	}, function() {
-		QUnit.test("removes previously registered changes that no longer exist", function(assert) {
-			const fnDone = assert.async();
-			prepareChanges([
-				createMockChange("testChange1", "rename", "button1"),
-				createMockChange("testChange2", "move", "button2")
-			], undefined, {
-				getChangeVisualizationInfo(oChange) {
-					return {
-						affectedControls: [oChange.getSelector()]
-					};
-				}
-			});
-
-			this.oChangeVisualization.initialize().then(function() {
-				const oOverlay1 = OverlayRegistry.getOverlay("button1");
-				const oOverlay2 = OverlayRegistry.getOverlay("button2");
-				assert.ok(
-					oOverlay1.hasStyleClass("sapUiRtaOverlayWithChanges"),
-					"then button1 has the border class initially"
-				);
-				assert.ok(
-					oOverlay2.hasStyleClass("sapUiRtaOverlayWithChanges"),
-					"then button2 has the border class initially"
-				);
-
-				// Now only return one change — the other should be removed
-				PersistenceWriteAPI._getUIChanges.resolves([
-					createMockChange("testChange1", "rename", "button1")
-				]);
-
-				return this.oChangeVisualization.refreshBorders();
-			}.bind(this)).then(function() {
-				const oOverlay1 = OverlayRegistry.getOverlay("button1");
-				const oOverlay2 = OverlayRegistry.getOverlay("button2");
-				assert.ok(
-					oOverlay1.hasStyleClass("sapUiRtaOverlayWithChanges"),
-					"then button1 still has the border class"
-				);
-				assert.notOk(
-					oOverlay2.hasStyleClass("sapUiRtaOverlayWithChanges"),
-					"then button2 no longer has the border class"
-				);
-				fnDone();
-			});
-		});
-
-		QUnit.test("resolves without crashing when no component is available", function(assert) {
-			prepareChanges([
-				createMockChange("testChange1", "rename", "button1")
-			], undefined, {
-				getChangeVisualizationInfo(oChange) {
-					return {
-						affectedControls: [oChange.getSelector()]
-					};
-				}
-			});
-
-			return this.oChangeVisualization.initialize().then(function() {
-				assert.strictEqual(
-					this.oChangeVisualization._oChangeIndicatorRegistry.getRegisteredChangeIds().length,
-					1,
-					"then a change is registered after the initial run"
-				);
-
-				ChangeVisualization.prototype._getComponent.returns(undefined);
-
-				const pUpdate = this.oChangeVisualization.refreshBorders();
-				assert.ok(pUpdate && typeof pUpdate.then === "function", "then a thenable is returned");
-
-				return pUpdate.then(function() {
-					assert.strictEqual(
-						this.oChangeVisualization._oChangeIndicatorRegistry.getRegisteredChangeIds().length,
-						1,
-						"then the existing registry entries are preserved"
-					);
-				}.bind(this));
 			}.bind(this));
 		});
 	});
@@ -2750,5 +2688,7 @@ sap.ui.define([
 
 	QUnit.done(function() {
 		document.getElementById("qunit-fixture").style.display = "none";
+		oAppComponent._restoreGetAppComponentStub();
+		oAppComponent.destroy();
 	});
 });

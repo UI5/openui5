@@ -7,7 +7,6 @@ sap.ui.define([
 	"sap/ui/core/format/DateFormat",
 	"sap/ui/core/Fragment",
 	"sap/ui/core/Lib",
-	"sap/base/util/restricted/_difference",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/Control",
@@ -31,7 +30,6 @@ sap.ui.define([
 	DateFormat,
 	Fragment,
 	Lib,
-	difference,
 	KeyCodes,
 	JsControlTreeModifier,
 	Control,
@@ -59,7 +57,6 @@ sap.ui.define([
 
 	/**
 	 * Checks whether a change-states-bearing entry (selector entry or registry entry) matches the
-	 * current state filter. Must be called with a ChangeVisualization instance as <code>this</code>.
 	 *
 	 * @param {{changeStates: string[]}} oEntry - Selector entry or registered-change entry
 	 * @returns {boolean} true if the entry should be visible
@@ -76,7 +73,6 @@ sap.ui.define([
 	 * Walks the registry to determine which overlays should currently carry the dashed-border style class,
 	 * then applies the decoration diff: only overlays whose decoration state actually changes vs.
 	 * <code>_oDecoratedOverlayIds</code> are touched. Updates the bookkeeping set in place.
-	 * Must be called with a ChangeVisualization instance as <code>this</code>.
 	 */
 	function applyDecorationDiff() {
 		const oSelectors = this._oChangeIndicatorRegistry.getSelectorsWithRegisteredChanges();
@@ -171,7 +167,7 @@ sap.ui.define([
 		this._fnScrollHandler = (oScrollEvent) => {
 			const oTarget = oScrollEvent.target;
 			const oPopoverRoot = oPopover.getDomRef();
-			if (oPopoverRoot && oTarget.nodeType === Node.ELEMENT_NODE && oPopoverRoot.contains(oTarget)) {
+			if (oTarget.nodeType === Node.ELEMENT_NODE && oPopoverRoot?.contains(oTarget)) {
 				return;
 			}
 			detachGeometryChangeHandlers.call(this);
@@ -200,43 +196,74 @@ sap.ui.define([
 	}
 
 	/**
-	 * Diffs the registry against the current changes returned by the FL persistence,
-	 * registers missing ones, removes stale ones, and re-applies the decoration diff.
-	 * Must be called with a ChangeVisualization instance as <code>this</code>.
+	 * Diffs the catalog against the current changes returned by the FL persistence,
+	 * adds missing ones to the catalog, removes stale ones, invalidates entries that need
+	 * re-resolution (updateRequired), resolves any catalog entries that now have overlays,
+	 * and re-applies the decoration diff.
 	 *
 	 * @returns {Promise<undefined>} Resolves once the registry is up to date and decorations are applied
 	 */
 	async function refreshChangeRegistryAndDecorations() {
 		const aChanges = await collectChanges.call(this);
-		// remove updated changes
-		this._oChangeIndicatorRegistry.removeOutdatedRegisteredChanges();
-		// remove changes with incomplete vizInfo
-		this._oChangeIndicatorRegistry.removeRegisteredChangesWithoutVizInfo();
 
-		const aRegisteredChangeIds = this._oChangeIndicatorRegistry.getRegisteredChangeIds();
+		// Re-classify changeStates for all catalog entries against the current versions model.
+		// This must run before the decoration diff so that a DRAFT→ALL flip (version activation)
+		// or a NEW→DRAFT flip (save) is reflected immediately.
+		this._oChangeIndicatorRegistry.refreshChangeStates(this.oVersionsModel);
+
+		// Invalidate resolution cache for entries whose display target can shift (e.g. HideControl).
+		this._oChangeIndicatorRegistry.invalidateOutdatedResolutions();
+
+		const oCatalogIds = new Set(this._oChangeIndicatorRegistry.getCatalogIds());
 		const oCurrentChanges = aChanges.reduce((oAcc, oChange) => {
 			oAcc[oChange.getId()] = oChange;
 			return oAcc;
 		}, {});
 		const aCurrentChangeIds = Object.keys(oCurrentChanges);
 
-		// Remove registered changes which no longer exist
-		difference(aRegisteredChangeIds, aCurrentChangeIds).forEach((sChangeIdToRemove) => {
-			this._oChangeIndicatorRegistry.removeRegisteredChange(sChangeIdToRemove);
+		// Remove catalog entries for changes that no longer exist in FL persistence
+		[...oCatalogIds].forEach((sId) => {
+			if (!oCurrentChanges[sId]) {
+				this._oChangeIndicatorRegistry.removeRegisteredChange(sId);
+			}
 		});
 
-		// Register missing changes
-		const aPromises = [];
-		difference(aCurrentChangeIds, aRegisteredChangeIds).forEach((sChangeIdToAdd) => {
-			const oChangeToAdd = oCurrentChanges[sChangeIdToAdd];
-			const sCommandName = this._getCommandForChange(oChangeToAdd);
+		// Add new changes to the catalog (synchronous, no DOM access)
+		const aUnseenIds = aCurrentChangeIds.filter((sId) => !oCatalogIds.has(sId));
+		aUnseenIds.forEach((sId) => {
+			const oChange = oCurrentChanges[sId];
+			const sCommandName = this._getCommandForChange(oChange);
 			if (sCommandName === false) {
 				return;
 			}
-			aPromises.push(this._oChangeIndicatorRegistry.registerChange(oChangeToAdd, sCommandName, this.oVersionsModel));
+			this._oChangeIndicatorRegistry.addChangeToCatalog(oChange, sCommandName, this.oVersionsModel);
 		});
-		await Promise.all(aPromises);
+
+		// Resolve all unresolved catalog entries whose controls are now in the tree
+		await resolveAllPending.call(this);
+
 		applyDecorationDiff.call(this);
+	}
+
+	/**
+	 * Attempts to resolve visualization info for all catalog entries that are not yet in the
+	 * resolution cache. Entries whose controls are still absent remain unresolved and will be
+	 * picked up when their overlay fires elementOverlayCreated.
+	 *
+	 * @returns {Promise<undefined>} Resolves when all possible resolutions are complete
+	 */
+	async function resolveAllPending() {
+		const oAppComponent = this._getComponent();
+		const aUnresolvedIds = this._oChangeIndicatorRegistry.getUnresolvedChangeIds();
+		// Attempt resolution for all unresolved entries concurrently; entries whose controls are
+		// still absent will return undefined and remain unresolved (no cache entry written).
+		await Promise.all(aUnresolvedIds.map((sId) => {
+			const oEntry = this._oChangeIndicatorRegistry.getCatalogEntry(sId);
+			if (!oEntry) {
+				return Promise.resolve();
+			}
+			return this._oChangeIndicatorRegistry.resolveVisualizationInfo(oEntry.change, oAppComponent);
+		}));
 	}
 
 	function _determineElementOverlay(oElementId, oAffectedElementId) {
@@ -245,7 +272,7 @@ sap.ui.define([
 			// When the element has no Overlay, check if there is a relevant container Overlay
 			// e.g. change on a SmartForm group (Element: parent Form; Relevant Container: SmartForm)
 			const oElementOverlay = OverlayRegistry.getOverlay(oAffectedElementId);
-			const oRelevantContainer = oElementOverlay && oElementOverlay.getRelevantContainer();
+			const oRelevantContainer = oElementOverlay?.getRelevantContainer();
 			if (oRelevantContainer) {
 				oOverlay = OverlayRegistry.getOverlay(oRelevantContainer);
 			}
@@ -258,7 +285,7 @@ sap.ui.define([
 
 	function getTexts(mChangeInformation, oRtaResourceBundle, sOverlayId) {
 		const oAffectedElement = Element.getElementById(mChangeInformation.affectedElementId);
-		const mDescriptionPayload = Object.keys(mChangeInformation.descriptionPayload || {}).reduce(function(mDescriptionPayload, sKey) {
+		const mDescriptionPayload = Object.keys(mChangeInformation.descriptionPayload || {}).reduce((mDescriptionPayload, sKey) => {
 			const vOriginalValue = mChangeInformation.descriptionPayload[sKey];
 			const bIsBinding = FlUtils.isBinding(vOriginalValue);
 			mDescriptionPayload[sKey] = bIsBinding
@@ -298,7 +325,7 @@ sap.ui.define([
 			sDescriptionTooltip = oRtaResourceBundle.getText(sChangeTextKey, [sElementLabel]);
 		}
 		sDescriptionTooltip = sDescriptionText.length < sDescriptionTooltip.length ? sDescriptionTooltip : null;
-		const sDetailButtonText = oDescription && oDescription.buttonText;
+		const sDetailButtonText = oDescription?.buttonText;
 		const sIconTooltip = oRtaResourceBundle.getText(
 			`TXT_CHANGEVISUALIZATION_OVERVIEW_${
 			 mChangeInformation.changeCategory.toUpperCase()}`
@@ -327,16 +354,12 @@ sap.ui.define([
 		const oRtaResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
 		const oTexts = getTexts(mChangeInformation, oRtaResourceBundle, sOverlayId);
 		const oDates = getDates(mChangeInformation, oRtaResourceBundle);
-		const sCommandLabel = oRtaResourceBundle.getText(
-			`TXT_CHANGEVISUALIZATION_OVERVIEW_${mChangeInformation.changeCategory.toUpperCase()}`
-		);
 		const oSupportInfo = mChangeInformation.change.getSupportInformation();
-		const sUser = (oSupportInfo && oSupportInfo.user) || oRtaResourceBundle.getText("TXT_CHANGEVISUALIZATION_CREATED_IN_SESSION_DATE");
+		const sUser = oSupportInfo?.user || oRtaResourceBundle.getText("TXT_CHANGEVISUALIZATION_CREATED_IN_SESSION_DATE");
 
 		return {
 			id: mChangeInformation.id,
 			change: mChangeInformation,
-			commandLabel: sCommandLabel,
 			description: oTexts.description,
 			descriptionTooltip: oTexts.tooltip,
 			fullDate: oDates.fullDate,
@@ -540,13 +563,55 @@ sap.ui.define([
 
 	/**
 	 * Handler for elementOverlayCreated event from DesignTime.
-	 * Applies border to the newly created overlay if it or its connected elements have changes.
+	 * Resolves any catalog entries that target the new overlay's element, then decorates the overlay.
+	 * This is the primary path for controls that were absent during initialize() — dialogs, lazy
+	 * sections, template hosts — whose changes could not be resolved until now.
 	 *
 	 * @param {sap.ui.base.Event} oEvent - The event object
 	 * @private
 	 */
 	ChangeVisualization.prototype._onElementOverlayCreated = function(oEvent) {
-		this._applyBorderToOverlay(oEvent.getParameter("elementOverlay"));
+		const oOverlay = oEvent.getParameter("elementOverlay");
+		let sLocalId;
+		try {
+			sLocalId = JsControlTreeModifier.getSelector(oOverlay.getElement(), this._getComponent()).id;
+			const oUnresolvedSet = new Set(this._oChangeIndicatorRegistry.getUnresolvedChangeIds());
+			const aPendingIds = this._oChangeIndicatorRegistry.getChangeIdsForSelector(sLocalId).filter((sId) => oUnresolvedSet.has(sId));
+
+			if (aPendingIds.length === 0) {
+				// No unresolved changes for this element — just apply border (fast path).
+				this._applyBorderToOverlay(oOverlay);
+				return;
+			}
+
+			this._resolveAndDecorate(aPendingIds);
+		} catch (oError) {
+			// ignore overlays without valid selector (e.g. due to unstable Id)
+		}
+	};
+
+	/**
+	 * Resolves visualization info for the given change IDs and repaints the decoration diff.
+	 * Errors are swallowed — unresolved changes are retried on the next refreshBorders call.
+	 *
+	 * @param {string[]} aChangeIds - Change IDs to resolve
+	 * @returns {Promise<undefined>} Resolves when decoration has been updated
+	 * @private
+	 */
+	ChangeVisualization.prototype._resolveAndDecorate = async function(aChangeIds) {
+		const oAppComponent = this._getComponent();
+		try {
+			await Promise.all(aChangeIds.map((sId) => {
+				const oEntry = this._oChangeIndicatorRegistry.getCatalogEntry(sId);
+				if (!oEntry) {
+					return undefined;
+				}
+				return this._oChangeIndicatorRegistry.resolveVisualizationInfo(oEntry.change, oAppComponent);
+			}));
+			applyDecorationDiff.call(this);
+		} catch (_oErr) {
+			// Resolution errors are non-fatal — changes stay unresolved until the next refreshBorders.
+		}
 	};
 
 	/**
@@ -919,7 +984,7 @@ sap.ui.define([
 			}
 			return searchForCommand(
 				oParentOverlay,
-				oParentAggregationOverlay && oParentAggregationOverlay.getAggregationName()
+				oParentAggregationOverlay?.getAggregationName()
 			);
 		}
 
@@ -939,7 +1004,7 @@ sap.ui.define([
 			return;
 		}
 		const aDependentElements = oRegisteredChange.visualizationInfo.dependentElementIds;
-		aDependentElements.forEach(function(sElementId) {
+		aDependentElements.forEach((sElementId) => {
 			const oOverlay = OverlayRegistry.getOverlay(sElementId);
 			if (oOverlay) {
 				const oOverlayDomRef = oOverlay.getDomRef();
@@ -947,7 +1012,7 @@ sap.ui.define([
 					block: "nearest"
 				});
 				oOverlayDomRef.classList.add("sapUiRtaChangeIndicatorDependent");
-				oOverlayDomRef.addEventListener("animationend", function() {
+				oOverlayDomRef.addEventListener("animationend", () => {
 					oOverlayDomRef.classList.remove("sapUiRtaChangeIndicatorDependent");
 				}, { once: true });
 			}
