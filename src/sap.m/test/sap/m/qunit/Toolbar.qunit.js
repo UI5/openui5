@@ -909,7 +909,9 @@ sap.ui.define([
 		// getParent() on each wrapper bypasses the toolbar, but the inner
 		// button's getParent() correctly returns its wrapper via aggregation.
 		oWrapper1.getParent = function() { return oDetachedParent; };
+		oWrapper1.sParentAggregationName = "dependents";
 		oWrapper2.getParent = function() { return oDetachedParent; };
+		oWrapper2.sParentAggregationName = "dependents";
 
 		const oTB = await createToolbar({
 			Toolbar: { content: [oLink, oWrapper1, oWrapper2, oButton] }
