@@ -13,8 +13,10 @@ sap.ui.define(["sap/base/Log"], function(Log) {
 
 		// window
 		jQuery.sap.FrameOptions.__window = {};
-		jQuery.sap.FrameOptions.__window.document = {
-			URL: 'http://localhost/fake.html'
+		jQuery.sap.FrameOptions.__window.location = {
+			origin: 'http://localhost',
+			protocol: 'http:',
+			host: 'localhost'
 		};
 		oSpies.window.addEventListener = oTest.spy(function() {
 			oSpies.window.eventListenerFn = arguments[1];

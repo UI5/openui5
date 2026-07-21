@@ -3,7 +3,23 @@ sap.ui.define(['sap/ui/security/FrameOptions'], function(FrameOptions) {
 	'use strict';
 
 	var oClock, oServer;
+
+	// Build a mock location object (origin/protocol/host) from a URL string, without
+	// relying on the URL constructor which is unavailable in some supported browsers.
+	// Opaque documents (e.g. data: URIs) yield the literal "null" origin.
+	function parseOrigin(sUrl) {
+		var aScheme = String(sUrl).split("//");
+		if (aScheme.length < 2 || /^(?:data|blob|file|about):/.test(sUrl)) {
+			return { origin: "null", protocol: "null", host: "" };
+		}
+		var sProtocol = aScheme[0];
+		var sHost = aScheme[1].split("/")[0];
+		return { origin: sProtocol + "//" + sHost, protocol: sProtocol, host: sHost };
+	}
+
 	function mockBrowserAPI(mOptions) {
+
+		var sParentOrigin = mOptions.parentOrigin || 'http://some.other.origin.local';
 
 		// holds mocked functions for assertions
 		var oSpies = {
@@ -13,9 +29,7 @@ sap.ui.define(['sap/ui/security/FrameOptions'], function(FrameOptions) {
 
 		// window
 		FrameOptions.__window = {};
-		FrameOptions.__window.document = {
-			URL: 'http://localhost/fake.html'
-		};
+		FrameOptions.__window.location = parseOrigin(mOptions.selfUrl || 'http://localhost/fake.html');
 		oSpies.window.addEventListener = sinon.spy(function() {
 			oSpies.window.eventListenerFn = arguments[1];
 			oSpies.window.eventListener = sinon.spy(arguments[1]);
@@ -37,7 +51,7 @@ sap.ui.define(['sap/ui/security/FrameOptions'], function(FrameOptions) {
 							oSpies.window.eventListener.call(null, {
 								source: FrameOptions.__parent,
 								data: 'SAPFrameProtection*parent-unlocked',
-								origin: 'http://some.other.origin.local'
+								origin: sParentOrigin
 							});
 						}, 0);
 						break;
@@ -46,7 +60,7 @@ sap.ui.define(['sap/ui/security/FrameOptions'], function(FrameOptions) {
 							oSpies.window.eventListener.call(null, {
 								source: FrameOptions.__parent,
 								data: 'SAPFrameProtection*parent-origin',
-								origin: 'http://some.other.origin.local'
+								origin: sParentOrigin
 							});
 						}, 0);
 						break;
@@ -55,14 +69,14 @@ sap.ui.define(['sap/ui/security/FrameOptions'], function(FrameOptions) {
 							oSpies.window.eventListener.call(null, {
 								source: FrameOptions.__parent,
 								data: 'SAPFrameProtection*parent-origin',
-								origin: 'http://some.other.origin.local'
+								origin: sParentOrigin
 							});
 						}, 0);
 						setTimeout(function() {
 							oSpies.window.eventListener.call(null, {
 								source: FrameOptions.__parent,
 								data: 'SAPFrameProtection*parent-unlocked',
-								origin: 'http://some.other.origin.local'
+								origin: sParentOrigin
 							});
 						}, 100);
 						break;
@@ -229,6 +243,74 @@ sap.ui.define(['sap/ui/security/FrameOptions'], function(FrameOptions) {
 
 			assert.ok(fnCallback.calledOnce);
 			assert.ok(fnCallback.calledWith(true));
+		});
+	}
+	function testWhitelistMatch(sName, sEnvMode, sParentMode, sMode, bAllowSameOrigin, sParentOrigin, aWhitelist, bAllow) {
+		QUnit.test(sName, function(assert) {
+
+			// arrangements
+			var oMock = mockBrowserAPI({
+				mode: sEnvMode,
+				parentMode: sParentMode,
+				parentOrigin: sParentOrigin
+			});
+			var fnCallback = sinon.spy();
+
+			// actions
+			this.oFrameOptions = new FrameOptions({
+				mode: sMode,
+				allowSameOrigin: bAllowSameOrigin,
+				whitelist: aWhitelist,
+				callback: fnCallback
+			});
+
+			// assertions
+			oClock.tick(10);
+
+			assert.ok(oMock.parent.postMessage.calledOnce);
+			assert.ok(oMock.parent.postMessage.calledWith('SAPFrameProtection*require-origin', '*'));
+
+			assert.ok(fnCallback.calledOnce);
+			assert.ok(
+				fnCallback.calledWith(bAllow),
+				"Parent origin '" + sParentOrigin + "' against whitelist " +
+					JSON.stringify(aWhitelist) + " should " + (bAllow ? "" : "NOT ") + "be trusted"
+			);
+		});
+	}
+	function testSameOriginMatch(sName, sParentOrigin, sSelfUrl, bAllow) {
+		QUnit.test(sName, function(assert) {
+
+			// arrangements: cross-origin frame whose parent reports sParentOrigin,
+			// no whitelist configured. The only path that can grant trust is the
+			// same-origin equality check against window.location.origin.
+			var oMock = mockBrowserAPI({
+				mode: 'DIFF_ORIGIN',
+				parentMode: 'SAFE',
+				parentOrigin: sParentOrigin,
+				selfUrl: sSelfUrl
+			});
+			var fnCallback = sinon.spy();
+
+			// actions
+			this.oFrameOptions = new FrameOptions({
+				mode: 'trusted',
+				allowSameOrigin: true,
+				callback: fnCallback
+			});
+
+			// assertions
+			oClock.tick(10);
+
+			assert.ok(oMock.parent.postMessage.calledOnce);
+			assert.ok(oMock.parent.postMessage.calledWith('SAPFrameProtection*require-origin', '*'));
+
+			assert.ok(fnCallback.calledOnce);
+			assert.ok(
+				fnCallback.calledWith(bAllow),
+				"Parent '" + sParentOrigin + "' framing self '" + sSelfUrl +
+					"' should " + (bAllow ? "" : "NOT ") + "be trusted as same-origin"
+			);
 		});
 	}
 	function testWhitelistService(sName, sEnvMode, sParentMode, sMode, bAllowSameOrigin, bActive, bFraming, bAllow) {
@@ -404,5 +486,60 @@ sap.ui.define(['sap/ui/security/FrameOptions'], function(FrameOptions) {
 	testWhitelistService("same origin not allowed, whitelistService", 'SAME_ORIGIN',   'NO_RESPONSE',  'trusted',     false,        true,     true,     false);
 	testWhitelistService("diff origin, whitelistService",             'DIFF_ORIGIN',   'NO_RESPONSE',  'trusted',     true,         true,     true,     false);
 	testWhitelistService("diff origin, whitelistService, inactive",   'DIFF_ORIGIN',   'NO_RESPONSE',  'trusted',     true,         false,    true,     true);
+
+	// Whitelist host matching: an entry must match the full hostname or a
+	// dot-bounded suffix. Substring-only matches like "evilcompany.example"
+	// against ["company.example"] must NOT pass, otherwise an attacker who
+	// registers a lookalike domain can frame the app.
+
+	//                  test name,                              environment,    parent mode,  frame option,  same origin,  parent origin,                                    whitelist,                  allow
+	QUnit.module("sap.ui.security.FrameOptions - whitelist host matching", { afterEach: teardown, beforeEach: setup });
+
+	// positive cases: exact host or proper subdomain
+	testWhitelistMatch("exact host match",                     'DIFF_ORIGIN',  'SAFE',       'trusted',     true,         'http://company.example',                         ['company.example'],        true);
+	testWhitelistMatch("subdomain match",                      'DIFF_ORIGIN',  'SAFE',       'trusted',     true,         'http://www.company.example',                     ['company.example'],        true);
+	testWhitelistMatch("deep subdomain match",                 'DIFF_ORIGIN',  'SAFE',       'trusted',     true,         'http://foo.bar.company.example',                 ['company.example'],        true);
+
+	// negative cases: these must be rejected
+	testWhitelistMatch("prefix attack: evilcompany.example",   'DIFF_ORIGIN',  'SAFE',       'trusted',     true,         'http://evilcompany.example',                     ['company.example'],        false);
+	testWhitelistMatch("prefix attack: notcompany.example",    'DIFF_ORIGIN',  'SAFE',       'trusted',     true,         'http://notcompany.example',                      ['company.example'],        false);
+	testWhitelistMatch("prefix attack: attacker-company...",   'DIFF_ORIGIN',  'SAFE',       'trusted',     true,         'http://attacker-company.example',                ['company.example'],        false);
+	testWhitelistMatch("suffix attack: company.example.atk",   'DIFF_ORIGIN',  'SAFE',       'trusted',     true,         'http://company.example.attacker.example',        ['company.example'],        false);
+	testWhitelistMatch("infix attack: x.company.example.atk",  'DIFF_ORIGIN',  'SAFE',       'trusted',     true,         'http://x.company.example.attacker.example',      ['company.example'],        false);
+
+	// leading-dot entry form (legacy behavior): ".company.example" restricts the
+	// match to proper subdomains. The apex "company.example" must NOT match.
+	testWhitelistMatch("dot-prefixed entry, apex rejected",    'DIFF_ORIGIN',  'SAFE',       'trusted',     true,         'http://company.example',                         ['.company.example'],       false);
+	testWhitelistMatch("dot-prefixed entry, subdomain",        'DIFF_ORIGIN',  'SAFE',       'trusted',     true,         'http://sub.company.example',                     ['.company.example'],       true);
+	testWhitelistMatch("dot-prefixed entry, deep subdomain",   'DIFF_ORIGIN',  'SAFE',       'trusted',     true,         'http://foo.bar.company.example',                 ['.company.example'],       true);
+	testWhitelistMatch("dot-prefixed entry, prefix attack",    'DIFF_ORIGIN',  'SAFE',       'trusted',     true,         'http://evilcompany.example',                     ['.company.example'],       false);
+	testWhitelistMatch("dot-prefixed entry, suffix attack",    'DIFF_ORIGIN',  'SAFE',       'trusted',     true,         'http://company.example.attacker.example',        ['.company.example'],       false);
+
+	// Pin the asymmetry between the two entry forms: bare entry includes the
+	// apex, dot-prefixed entry does not.
+	testWhitelistMatch("bare entry matches apex",              'DIFF_ORIGIN',  'SAFE',       'trusted',     true,         'http://company.example',                         ['company.example'],        true);
+	testWhitelistMatch("dot-prefixed entry skips apex",        'DIFF_ORIGIN',  'SAFE',       'trusted',     true,         'http://company.example',                         ['.company.example'],       false);
+
+	// Same-origin host matching: the allowSameOrigin branch must compare full
+	// origins (scheme + host + port) instead of string-prefixing the parent
+	// origin against document.URL. Lookalike hostnames and port mismatches must
+	// not be trusted.
+	//
+	//                   test name,                                 parent origin,                              self URL,                                                          allow
+	QUnit.module("sap.ui.security.FrameOptions - same-origin host matching", { afterEach: teardown, beforeEach: setup });
+
+	// positive case: true same-origin parent and self
+	testSameOriginMatch("exact same origin",                       'https://intranet.company.example',         'https://intranet.company.example/app/index.html',                true);
+
+	// negative cases: these must be rejected
+	testSameOriginMatch("domain-prefix attack: company.example framing company.example.attacker.example",
+	                                                               'https://company.example',                  'https://company.example.attacker.example/app',                   false);
+	testSameOriginMatch("port mismatch: parent :443 vs self :8443",'https://intranet.company.example',         'https://intranet.company.example:8443/app',                      false);
+
+	// Opaque self-origin (sandboxed iframe, data:/blob: document) must NOT be
+	// considered same-origin even if the parent reports the same "null" string.
+	// Two opaque origins are not the same origin per the HTML spec.
+	testSameOriginMatch("opaque self vs opaque parent rejected",   'null',                                     'data:text/html,<p>x</p>',                                        false);
+	testSameOriginMatch("opaque self vs https parent rejected",    'https://intranet.company.example',         'data:text/html,<p>x</p>',                                        false);
 
 });

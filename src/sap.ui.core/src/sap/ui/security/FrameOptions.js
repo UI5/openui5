@@ -6,7 +6,7 @@
  * Code other than the OpenUI5 libraries must not introduce dependencies to this module.
  */
 /*global XMLHttpRequest */
-sap.ui.define(['sap/base/Log'], function(Log) {
+sap.ui.define(['sap/base/Log', 'sap/ui/thirdparty/URI'], function(Log, URI) {
 
 	"use strict";
 
@@ -245,19 +245,65 @@ sap.ui.define(['sap/base/Log'], function(Log) {
 		}
 	};
 
+	// Extract the lowercased hostname (without a trailing dot) from an origin or URL string.
+	// Returns "" if the input is missing, opaque (the literal "null"), or unparseable. Callers
+	// must treat "" as "do not trust".
+	//
+	// URI.js parses the authority per RFC 3986 (userinfo, IPv6 brackets, backslashes), so it
+	// resolves the same host as the WHATWG URL constructor on the adversarial forms a string
+	// split would get wrong. With the default preventInvalidHostname it does not throw on string
+	// input. hostname() returns the raw-case host and keeps a trailing dot, so the normalization
+	// is applied here.
+	FrameOptions._getHostname = function(sUrl) {
+		if (!sUrl || sUrl === "null") {
+			return "";
+		}
+		try {
+			return new URI(sUrl).hostname().toLowerCase().replace(/\.$/, "");
+		} catch (e) {
+			return "";
+		}
+	};
+
+	// Match a hostname against a whitelist entry.
+	//
+	// A bare entry "example.com" matches the host "example.com" itself and
+	// any subdomain "*.example.com".
+	//
+	// A leading-dot entry ".example.com" restricts the match to its
+	// subdomains: "sub.example.com" matches while "example.com" does not. This
+	// preserves the legacy whitelist semantics.
+	FrameOptions._matchHost = function(sHostname, sEntry) {
+		// Strip trailing dots so the root-anchored FQDN form "example.com." matches "example.com".
+		sEntry = String(sEntry).trim().toLowerCase().replace(/\.+$/, "");
+		if (!sHostname || !sEntry) {
+			return false;
+		}
+		if (sEntry.startsWith(".")) {
+			// subdomain-only form: hostname must end with the entry incl. dot
+			return sHostname.endsWith(sEntry);
+		}
+		// bare form: exact host or proper subdomain
+		return sHostname === sEntry || sHostname.endsWith("." + sEntry);
+	};
+
 	FrameOptions.prototype._check = function(bParentResponsePending) {
 		if (this.bRunnable) {
 			return;
 		}
 		var bTrusted = false;
-		if (this.bAllowSameOrigin && this.sParentOrigin && FrameOptions.__window.document.URL.indexOf(this.sParentOrigin) == 0) {
+		// Reconstruct the framed app's own origin (scheme + host + port). location.origin is not
+		// available in all browsers supported by this release, so fall back to protocol + host.
+		var oLocation = FrameOptions.__window.location;
+		var sSelfOrigin = oLocation && (oLocation.origin || (oLocation.protocol + "//" + oLocation.host));
+		// Exclude the literal "null" origin which indicates an opaque origin (e.g. a sandboxed iframe or
+		// a data: or file: URI). Two opaque origins are not the same origin.
+		if (this.bAllowSameOrigin && sSelfOrigin && sSelfOrigin !== "null" && this.sParentOrigin === sSelfOrigin) {
 			bTrusted = true;
 		} else if (this.mSettings.whitelist && this.mSettings.whitelist.length != 0) {
-			var sHostName = this.sParentOrigin.split('//')[1];
-			sHostName = sHostName.split(':')[0];
+			var sParentHost = FrameOptions._getHostname(this.sParentOrigin);
 			for (var i = 0; i < this.mSettings.whitelist.length; i++) {
-				var match = sHostName.indexOf(this.mSettings.whitelist[i]);
-				if (match != -1 && sHostName.substring(match) == this.mSettings.whitelist[i]) {
+				if (FrameOptions._matchHost(sParentHost, this.mSettings.whitelist[i])) {
 					bTrusted = true;
 					break;
 				}
