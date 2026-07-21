@@ -17,6 +17,28 @@ sap.ui.define([
 	"use strict";
 
 	/**
+	 * @typedef {sap.ui.core.format.DateFormat.DateFormatOptions} sap.ui.model.type.DateTypeFormatOptions
+	 *
+	 * The format options for the <code>sap.ui.model.type.Date</code>.
+	 *
+	 * @property {sap.ui.core.format.DateFormat.DateFormatOptions} [source]
+	 * 	 Additional set of format options for a second <code>DateFormat</code> object.
+	 *   This object handles conversions between string values in the data source (for example, model) and
+	 *   <code>Date</code> objects.
+	 * 	 These source options are used for two-way data binding:
+	 *   <ul>
+	 *     <li><b>Model to View:</b> Converts a string from the model to a <code>Date</code> object.
+	 *       Afterwards the main format options are used to convert that <code>Date</code> object to
+	 *       a string for display.</li>
+	 *     <li><b>View to Model:</b> Converts a parsed external value, for example, user input,
+	 *       into the string format that the data source requires.</li>
+	 *   </ul>
+	 * 	 If an empty object is provided, the default format is the ISO date notation (yyyy-MM-dd).
+	 *
+	 * @public
+	 */
+
+	/**
 	 * Constructor for a Date type.
 	 *
 	 * @class
@@ -28,13 +50,14 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @public
-	 * @param {object} [oFormatOptions] Formatting options. For a list of all available options, see {@link sap.ui.core.format.DateFormat.getDateInstance DateFormat}.
-	 * @param {object} [oFormatOptions.source] Additional set of options used to create a second <code>DateFormat</code> object for conversions between
-	 *           string values in the data source (e.g. model) and <code>Date</code>. This second format object is used to convert from a model <code>string</code> to <code>Date</code> before
-	 *           converting the <code>Date</code> to <code>string</code> with the primary format object. Vice versa, this 'source' format is also used to format an already parsed
-	 *           external value (e.g. user input) into the string format that is expected by the data source.
-	 *           For a list of all available options, see {@link sap.ui.core.format.DateFormat.getDateInstance DateFormat}.
-	 *           In case an empty object is given, the default is the ISO date notation (yyyy-MM-dd).
+	 * @param {sap.ui.model.type.DateTypeFormatOptions} [oFormatOptions={
+	 *     relativeScale: "day",
+	 *     relativeStyle: "wide",
+	 *     interval: false,
+	 *     singleIntervalValue: false,
+	 *     style: "medium"
+	 *   }]
+	 *   The format options
 	 * @param {object} [oConstraints] Value constraints
 	 * @param {Date|string} [oConstraints.minimum] Smallest value allowed for this type. Values for constraints must use the same type as configured via <code>oFormatOptions.source</code>.
 	 * @param {Date|string} [oConstraints.maximum] Largest value allowed for this type. Values for constraints must use the same type as configured via <code>oFormatOptions.source</code>.
