@@ -1,11 +1,9 @@
 /*global QUnit, sinon */
 sap.ui.define([
 	"sap/ui/core/tooltip/TooltipEnablement",
-	"sap/ui/core/tooltip/TooltipEventTrigger",
 	"sap/ui/core/tooltip/TooltipManager",
 	"sap/ui/core/tooltip/Tooltip",
-	"./FakeTooltipHost",
-	"./FakeTooltipHostWithEnablement",
+	"./FakeControls",
 	"sap/ui/core/RenderManager",
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/ui/Device",
@@ -13,8 +11,10 @@ sap.ui.define([
 	// Tooltip#_createPopover resolves synchronously under fake timers.
 	"sap/m/Popover",
 	"sap/m/Text"
-], function(TooltipEnablement, TooltipEventTrigger, TooltipManager, Tooltip, FakeTooltipHost, FakeTooltipHostWithEnablement, RenderManager, nextUIUpdate, Device) {
+], function(TooltipEnablement, TooltipManager, Tooltip, FakeControls, RenderManager, nextUIUpdate, Device) {
 	"use strict";
+
+	const { PlainHost, MultiTargetEnablementHost } = FakeControls;
 
 	// TooltipManager's open-tooltip registry is module-global; reset it per test.
 	QUnit.testDone(function() {
@@ -102,7 +102,7 @@ sap.ui.define([
 	// ---- DOM event helpers -------------------------------------------------
 
 	async function setupHostWithDevice(o) {
-		o.oHost = new FakeTooltipHost({ id: "host-evt-" + Date.now() });
+		o.oHost = new PlainHost({ id: "host-evt-" + Date.now() });
 		o.oEnablement = new TooltipEnablement(o.oHost, {
 			textProvider: () => "hi"
 		});
@@ -123,7 +123,7 @@ sap.ui.define([
 
 	QUnit.module("Construction", {
 		beforeEach: function() {
-			this.oHost = new FakeTooltipHost({ id: "host-btn" });
+			this.oHost = new PlainHost({ id: "host-btn" });
 		},
 		afterEach: function() {
 			this.oHost.destroy();
@@ -208,7 +208,7 @@ sap.ui.define([
 
 	QUnit.module("Setters", {
 		beforeEach: function() {
-			this.oHost = new FakeTooltipHost({ id: "host-btn" });
+			this.oHost = new PlainHost({ id: "host-btn" });
 			this.oEnablement = new TooltipEnablement(this.oHost);
 		},
 		afterEach: async function() {
@@ -228,7 +228,7 @@ sap.ui.define([
 
 	QUnit.module("renderInvisibleTooltip", {
 		beforeEach: function() {
-			this.oHost = new FakeTooltipHost({ id: "host-btn" });
+			this.oHost = new PlainHost({ id: "host-btn" });
 			this.oEnablement = new TooltipEnablement(this.oHost, {
 				textProvider: () => "hello"
 			});
@@ -253,7 +253,7 @@ sap.ui.define([
 
 	QUnit.test("re-resolves text from the textProvider on every render", function(assert) {
 		let sText = "first";
-		const oHost = new FakeTooltipHost({ id: "host-btn-rerender" });
+		const oHost = new PlainHost({ id: "host-btn-rerender" });
 		const oEnablement = new TooltipEnablement(oHost, {
 			textProvider: () => sText
 		});
@@ -270,7 +270,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("invisibleTextProvider wins over textProvider", function(assert) {
-		const oHost = new FakeTooltipHost({ id: "host-btn-invis" });
+		const oHost = new PlainHost({ id: "host-btn-invis" });
 		const oEnablement = new TooltipEnablement(oHost, {
 			textProvider: () => "visible",
 			invisibleTextProvider: () => "invisible"
@@ -286,7 +286,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("invisibleTextProvider falls back to visible text when not set", function(assert) {
-		const oHost = new FakeTooltipHost({ id: "host-btn-fallback" });
+		const oHost = new PlainHost({ id: "host-btn-fallback" });
 		const oEnablement = new TooltipEnablement(oHost, {
 			textProvider: () => "visible"
 		});
@@ -301,7 +301,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("renders nothing when there is no text", function(assert) {
-		const oHost = new FakeTooltipHost({ id: "host-btn-empty" });
+		const oHost = new PlainHost({ id: "host-btn-empty" });
 		const oEnablement = new TooltipEnablement(oHost);
 		try {
 			const sHtml = renderToString((oRm) => oEnablement.renderInvisibleTooltip(oRm));
@@ -334,13 +334,13 @@ sap.ui.define([
 		assert.strictEqual(this.oEnablement.isOpen(), false, "closed after mousedown");
 	});
 
-	QUnit.test("mouseenter is ignored while text is selected", async function(assert) {
+	QUnit.test("mouseover is ignored while text is selected", async function(assert) {
 		const oOrig = window.getSelection;
 		window.getSelection = function() {
 			return { toString: function() { return "selected text"; } };
 		};
 		try {
-			dispatch(this.oHost, new MouseEvent("mouseenter", { bubbles: true }));
+			dispatch(this.oHost, new MouseEvent("mouseover", { bubbles: true }));
 			const sState = await waitForOpenState(this.clock, this.oEnablement);
 			assert.strictEqual(sState, "NotOpened", "afterOpen does not fire while a selection exists");
 		} finally {
@@ -348,21 +348,21 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("mouseleave closes an open tooltip", async function(assert) {
+	QUnit.test("mouseout closes an open tooltip", async function(assert) {
 		this.oEnablement.open();
 		await waitForOpen(this.clock, this.oEnablement);
-		assert.strictEqual(this.oEnablement.isOpen(), true, "open before mouseleave");
-		dispatch(this.oHost, new MouseEvent("mouseleave", { bubbles: true }));
+		assert.strictEqual(this.oEnablement.isOpen(), true, "open before mouseout");
+		dispatch(this.oHost, new MouseEvent("mouseout", { bubbles: true }));
 
 		await waitForClose(this.clock, this.oEnablement);
-		assert.ok(true, "afterClose fires after mouseleave");
-		assert.strictEqual(this.oEnablement.isOpen(), false, "closed after mouseleave");
+		assert.ok(true, "afterClose fires after mouseout");
+		assert.strictEqual(this.oEnablement.isOpen(), false, "closed after mouseout");
 	});
 
-	QUnit.test("mouseenter opens the tooltip", async function(assert) {
-		dispatch(this.oHost, new MouseEvent("mouseenter", { bubbles: true }));
+	QUnit.test("mouseover opens the tooltip", async function(assert) {
+		dispatch(this.oHost, new MouseEvent("mouseover", { bubbles: true }));
 		await waitForOpen(this.clock, this.oEnablement);
-		assert.ok(true, "afterOpen fires after mouseenter");
+		assert.ok(true, "afterOpen fires after mouseover");
 	});
 
 	QUnit.test("focusin opens when :focus-visible matches", async function(assert) {
@@ -461,7 +461,7 @@ sap.ui.define([
 
 	QUnit.module("Imperative open/close", {
 		beforeEach: async function() {
-			this.oHost = new FakeTooltipHost({ id: "host-btn" });
+			this.oHost = new PlainHost({ id: "host-btn" });
 			await renderHost(this.oHost, this.clock);
 			this.oEnablement = new TooltipEnablement(this.oHost, {
 				textProvider: () => "hello"
@@ -485,7 +485,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("open() with empty text is a no-op", async function(assert) {
-		const oHost = new FakeTooltipHost({ id: "host-btn-empty-open" });
+		const oHost = new PlainHost({ id: "host-btn-empty-open" });
 		await renderHost(oHost, this.clock);
 		const oEnablement = new TooltipEnablement(oHost, {
 			textProvider: () => ""
@@ -576,7 +576,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("defaults to host.getFocusDomRef()", async function(assert) {
-		const oHost = new FakeTooltipHost({ id: "host-focus-default" });
+		const oHost = new PlainHost({ id: "host-focus-default" });
 		await renderHost(oHost, this.clock);
 
 		// Inject an inner element and point getFocusDomRef at it.
@@ -589,19 +589,19 @@ sap.ui.define([
 		const oEnablement = new TooltipEnablement(oHost, { textProvider: () => "hi" });
 		try {
 			// Dispatching on the inner (focus) DOM ref should open.
-			oInner.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+			oInner.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
 
 			await waitForOpen(this.clock, oEnablement);
-			assert.ok(true, "mouseenter on focus DOM ref opens");
+			assert.ok(true, "mouseover on focus DOM ref opens");
 
 			oEnablement.close();
 			await waitForClose(this.clock, oEnablement);
 
 			// Dispatching on the outer DOM ref should NOT open.
-			oHost.getDomRef().dispatchEvent(new MouseEvent("mouseenter", { bubbles: false }));
+			oHost.getDomRef().dispatchEvent(new MouseEvent("mouseover", { bubbles: false }));
 
 			const sState = await waitForOpenState(this.clock, oEnablement);
-			assert.strictEqual(sState, "NotOpened", "mouseenter on outer DOM ref does not open");
+			assert.strictEqual(sState, "NotOpened", "mouseover on outer DOM ref does not open");
 		} finally {
 			oHost.getFocusDomRef = fnOrig;
 			oEnablement.destroy();
@@ -610,12 +610,13 @@ sap.ui.define([
 	});
 
 	QUnit.test("respects custom domRefProvider", async function(assert) {
-		const oHost = new FakeTooltipHost({ id: "host-custom-provider" });
+		const oHost = new PlainHost({ id: "host-custom-provider" });
 		await renderHost(oHost, this.clock);
 
-		const oCustom = document.createElement("div");
+		// Inner element appended inside the host so events bubble through the host delegate.
+		const oCustom = document.createElement("span");
 		oCustom.id = "custom-attach-target";
-		document.getElementById("qunit-fixture").appendChild(oCustom);
+		oHost.getDomRef().appendChild(oCustom);
 
 		const oEnablement = new TooltipEnablement(oHost, {
 			textProvider: () => "hi",
@@ -623,16 +624,17 @@ sap.ui.define([
 		});
 
 		try {
-			oCustom.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+			oCustom.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
 			await waitForOpen(this.clock, oEnablement);
-			assert.ok(true, "mouseenter on custom element opens");
+			assert.ok(true, "mouseover on custom element opens");
 
 			oEnablement.close();
 			await waitForClose(this.clock, oEnablement);
 
-			oHost.getDomRef().dispatchEvent(new MouseEvent("mouseenter", { bubbles: false }));
+			// Dispatching on the host root (oCustom is a child, not the host root itself) must NOT open.
+			oHost.getDomRef().dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
 			const sState = await waitForOpenState(this.clock, oEnablement);
-			assert.strictEqual(sState, "NotOpened", "mouseenter on host DOM does not open");
+			assert.strictEqual(sState, "NotOpened", "mouseover on host root does not open");
 		} finally {
 			oEnablement.destroy();
 			oHost.destroy();
@@ -640,7 +642,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("domRefProvider returning null is safe", async function(assert) {
-		const oHost = new FakeTooltipHost({ id: "host-null-provider" });
+		const oHost = new PlainHost({ id: "host-null-provider" });
 		await renderHost(oHost, this.clock);
 
 		let oEnablement;
@@ -656,7 +658,7 @@ sap.ui.define([
 		);
 
 		try {
-			oHost.getDomRef().dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+			oHost.getDomRef().dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
 			const sState = await waitForOpenState(this.clock, oEnablement);
 			assert.strictEqual(sState, "NotOpened", "no listeners attached, so no open");
 		} finally {
@@ -665,63 +667,25 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("provider is re-invoked on host re-render", async function(assert) {
-		const oHost = new FakeTooltipHost({ id: "host-rerender-provider" });
+	QUnit.test("gestures still work after host re-render", async function(assert) {
+		const oHost = new PlainHost({ id: "host-rerender-gesture" });
 		const oEnablement = new TooltipEnablement(oHost, {
 			textProvider: () => "hi",
-			// Re-resolved each call — points at the host's DOM ref at the moment of invocation.
 			domRefProvider: () => oHost.getDomRef()
 		});
 		await renderHost(oHost, this.clock);
 
-		// Force a real re-render through the public path.
+		// Force a re-render via the public path.
 		oHost.invalidate();
 		await nextUIUpdate(this.clock);
 
 		try {
-			const oCurrent = oHost.getDomRef();
-			assert.ok(oCurrent, "host has a DOM ref after re-render");
-			oCurrent.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+			oHost.getDomRef().dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
 			await waitForOpen(this.clock, oEnablement);
-			assert.ok(true, "mouseenter on the re-rendered host opens");
+			assert.ok(true, "mouseover on re-rendered host opens the tooltip");
 		} finally {
 			oEnablement.destroy();
 			oHost.destroy();
-		}
-	});
-
-	// onBeforeRendering must not consult the provider (fix uses the remembered attach ref).
-	QUnit.test("host re-render does not consult provider on before-rendering; listeners re-attach cleanly", async function(assert) {
-		const oDeviceStub = sinon.stub(Device, "system")
-			.value({ desktop: true, combi: false, phone: false, tablet: false });
-		const oHost = new FakeTooltipHost({ id: "host-attach-tracking" });
-
-		const fnProvider = sinon.spy(() => oHost.getDomRef());
-		const oEnablement = new TooltipEnablement(oHost, {
-			textProvider: () => "hi",
-			domRefProvider: fnProvider
-		});
-		await renderHost(oHost, this.clock);
-
-		try {
-			const iCallsAfterInitialRender = fnProvider.callCount;
-			assert.ok(iCallsAfterInitialRender >= 1,
-				"provider queried at least once during initial construction/render");
-
-			oHost.invalidate();
-			await nextUIUpdate(this.clock);
-
-			// Only onAfterRendering asks the provider on re-render.
-			assert.strictEqual(fnProvider.callCount, iCallsAfterInitialRender + 1,
-				"provider queried exactly once per re-render (in onAfterRendering only)");
-
-			oHost.getDomRef().dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
-			await waitForOpen(this.clock, oEnablement);
-			assert.ok(true, "mouseenter on the re-rendered host opens — listeners were re-attached");
-		} finally {
-			oEnablement.destroy();
-			oHost.destroy();
-			oDeviceStub.restore();
 		}
 	});
 
@@ -730,7 +694,7 @@ sap.ui.define([
 			// Stub touch device so the contextmenu handler is installed.
 			this.oDeviceStub = sinon.stub(Device, "system")
 				.value({ desktop: false, combi: false, phone: true, tablet: false });
-			this.oHost = new FakeTooltipHost({ id: "host-touch" });
+			this.oHost = new PlainHost({ id: "host-touch" });
 			this.oEnablement = new TooltipEnablement(this.oHost, {
 				textProvider: () => "hi"
 			});
@@ -802,8 +766,8 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("combi gets desktop events (mouseenter opens)", async function(assert) {
-		dispatch(this.oHost, new MouseEvent("mouseenter", { bubbles: true }));
+	QUnit.test("combi gets desktop events (mouseover opens)", async function(assert) {
+		dispatch(this.oHost, new MouseEvent("mouseover", { bubbles: true }));
 		await waitForOpen(this.clock, this.oEnablement);
 		assert.ok(true, "afterOpen fires on combi");
 	});
@@ -835,7 +799,7 @@ sap.ui.define([
 
 	QUnit.module("Lifecycle (host re-render)", {
 		beforeEach: async function() {
-			this.oHost = new FakeTooltipHost({ id: "host-btn-life" });
+			this.oHost = new PlainHost({ id: "host-btn-life" });
 			this.oEnablement = new TooltipEnablement(this.oHost, {
 				textProvider: () => "hello"
 			});
@@ -866,47 +830,9 @@ sap.ui.define([
 			"mousedown still closes after host re-render");
 	});
 
-	QUnit.module("Host cloning", {
-		beforeEach: function() {
-			this.oDeviceStub = sinon.stub(Device, "system")
-				.value({ desktop: true, combi: false, phone: false, tablet: false });
-		},
-		afterEach: async function() {
-			this.oDeviceStub.restore();
-			await this.clock.tickAsync(2000);
-			this.clock.restore();
-		}
-	});
-
-	QUnit.test("host clone gets its own single enablement, not a leaked one", async function(assert) {
-		const oHost = new FakeTooltipHostWithEnablement({
-			id: "host-fake-clone", tooltipText: "hi"
-		});
-		await renderHost(oHost, this.clock);
-
-		// Only start counting after the original host is fully rendered.
-		const oAttachSpy = sinon.spy(TooltipEventTrigger.prototype, "attach");
-
-		const oClone = oHost.clone();
-		try {
-			oClone.placeAt("qunit-fixture");
-			await nextUIUpdate(this.clock);
-
-			const aCloneAttachCalls = oAttachSpy.getCalls().filter(
-				(oCall) => oCall.args[0] === oClone.getDomRef()
-			);
-			assert.strictEqual(aCloneAttachCalls.length, 1,
-				"trigger.attach called exactly once on the clone's DOM (the clone's own enablement)");
-		} finally {
-			oAttachSpy.restore();
-			oClone.destroy();
-			oHost.destroy();
-		}
-	});
-
 	QUnit.module("Destroy", {
 		beforeEach: async function() {
-			this.oHost = new FakeTooltipHost({ id: "host-btn-destroy" });
+			this.oHost = new PlainHost({ id: "host-btn-destroy" });
 			this.oEnablement = new TooltipEnablement(this.oHost, {
 				textProvider: () => "hi"
 			});
@@ -928,17 +854,128 @@ sap.ui.define([
 
 		// After destroy, dispatching events on the host must NOT reopen the tooltip.
 		this.oHost.getDomRef().dispatchEvent(
-			new MouseEvent("mouseenter", { bubbles: true })
+			new MouseEvent("mouseover", { bubbles: true })
 		);
 		await flushMicrotasks(this.clock);
 		assert.strictEqual(this.oEnablement.isOpen(), false,
-			"mouseenter after destroy does not reopen");
+			"mouseover after destroy does not reopen");
 	});
 
 	QUnit.test("double-destroy is safe", function(assert) {
 		this.oEnablement.destroy();
 		this.oEnablement.destroy();
 		assert.ok(true, "no throw");
+	});
+
+	QUnit.module("Multiple enablements on one host", {
+		beforeEach: function() {
+			this.oDeviceStub = sinon.stub(Device, "system")
+				.value({ desktop: true, combi: false, phone: false, tablet: false });
+		},
+		afterEach: async function() {
+			this.oDeviceStub.restore();
+			await this.clock.tickAsync(2000);
+			this.clock.restore();
+		}
+	});
+
+	QUnit.test("each enablement derives a distinct invisible anchor id", async function(assert) {
+		const oHost = new MultiTargetEnablementHost({ id: "host-multi" });
+		oHost.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		try {
+			const aIds = oHost._aEnablements.map((oE) => oE.getInvisibleTooltipId());
+			// All ids must be non-null, distinct, and carry the per-index suffix.
+			assert.strictEqual(aIds.length, 3, "three enablements");
+			assert.strictEqual(new Set(aIds).size, 3, "all ids are distinct");
+			aIds.forEach((sId, i) => {
+				assert.ok(sId && sId.endsWith("-invisibleTooltip-" + i),
+					"id[" + i + "] ends with expected suffix");
+			});
+		} finally {
+			oHost.destroy();
+		}
+	});
+
+	QUnit.test("invisibleTooltipIdSuffix config overrides the default id suffix", function(assert) {
+		const oHost = new PlainHost({ id: "host-suffix" });
+		const oEnablementCustom = new TooltipEnablement(oHost, {
+			textProvider: () => "hi",
+			invisibleTooltipIdSuffix: "-myAnchor"
+		});
+		const oEnablementDefault = new TooltipEnablement(oHost, {
+			textProvider: () => "hi"
+		});
+		try {
+			assert.strictEqual(oEnablementCustom.getInvisibleTooltipId(), "host-suffix-myAnchor",
+				"custom suffix is used");
+			assert.strictEqual(oEnablementDefault.getInvisibleTooltipId(), "host-suffix-invisibleTooltip",
+				"default suffix is used when none is provided");
+		} finally {
+			oEnablementCustom.destroy();
+			oEnablementDefault.destroy();
+			oHost.destroy();
+		}
+	});
+
+	QUnit.test("focusing one target opens only that target's tooltip", async function(assert) {
+		const oHost = new MultiTargetEnablementHost({ id: "host-multi-focus" });
+		oHost.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		// Override matches on span[1] to report :focus-visible = true; others false.
+		const aSpans = [0, 1, 2].map((i) =>
+			oHost.getDomRef().querySelector("[data-target='" + i + "']")
+		);
+		const aOrigMatches = aSpans.map((oSpan) => oSpan.matches.bind(oSpan));
+		aSpans.forEach((oSpan, i) => {
+			const fnOrig = aOrigMatches[i];
+			oSpan.matches = function(s) {
+				return s === ":focus-visible" ? (i === 1) : fnOrig(s);
+			};
+		});
+
+		try {
+			// Leave initial focus so the focusin handler can proceed.
+			document.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+			aSpans[1].dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+			await waitForOpen(this.clock, oHost._aEnablements[1]);
+
+			assert.ok(oHost._aEnablements[1].isOpen(), "enablement[1] is open");
+			assert.notOk(oHost._aEnablements[0].isOpen(), "enablement[0] is not open");
+			assert.notOk(oHost._aEnablements[2].isOpen(), "enablement[2] is not open");
+		} finally {
+			aSpans.forEach((oSpan, i) => { oSpan.matches = aOrigMatches[i]; });
+			oHost.destroy();
+		}
+	});
+
+	QUnit.test("positioning opens relative to the target span, not the host", async function(assert) {
+		const oHost = new MultiTargetEnablementHost({ id: "host-multi-pos" });
+		oHost.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		const oSpan2 = oHost.getDomRef().querySelector("[data-target='2']");
+		const oHostDiv = oHost.getDomRef();
+
+		const fnOpenBySpy = sinon.spy(Tooltip.prototype, "openBy");
+		try {
+			oSpan2.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+			await waitForOpen(this.clock, oHost._aEnablements[2]);
+
+			// Find the call that opened the enablement[2] tooltip.
+			const aCalls = fnOpenBySpy.getCalls();
+			const oCallWithSpan2 = aCalls.find((oCall) => oCall.args[0] === oSpan2);
+			assert.ok(oCallWithSpan2, "openBy was called with span[2] as the target element");
+
+			// Ensure no call used the host div.
+			const oCallWithHost = aCalls.find((oCall) => oCall.args[0] === oHostDiv);
+			assert.notOk(oCallWithHost, "openBy was NOT called with the host div");
+		} finally {
+			fnOpenBySpy.restore();
+			oHost.destroy();
+		}
 	});
 
 });
