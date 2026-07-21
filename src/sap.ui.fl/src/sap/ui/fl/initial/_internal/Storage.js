@@ -31,30 +31,57 @@ sap.ui.define([
 	 * @ui5-restricted sap.ui.fl
 	 */
 
+	/**
+	 * Creates a connector-specific property bag by enriching the given property bag with the
+	 * connector configuration and applying the layer- and RTA-related adjustments that are
+	 * common to all load requests
+	 *
+	 * @param {object} mPropertyBag - Properties needed by the connectors
+	 * @param {object} oConnectorConfig - Configuration of the connector
+	 * @returns {object} The connector-specific property bag
+	 */
+	function createConnectorSpecificPropertyBag(mPropertyBag, oConnectorConfig) {
+		const oConnectorSpecificPropertyBag = {
+			...mPropertyBag,
+			url: oConnectorConfig.url
+		};
+
+		if (
+			!oConnectorConfig.layers
+			|| (
+				oConnectorConfig.layers[0] !== "ALL"
+				&& oConnectorConfig.layers.indexOf(Layer.CUSTOMER) === -1
+			)
+		) {
+			delete oConnectorSpecificPropertyBag.version;
+		}
+		// a sign that we are either loading RTA mode or are already in the RTA mode
+		// and allContexts query parameter should be set for the request
+		if (isAdaptationMode(mPropertyBag.reference)) {
+			oConnectorSpecificPropertyBag.allContexts = true;
+		}
+
+		return oConnectorSpecificPropertyBag;
+	}
+
+	/**
+	 * Checks whether data is being loaded for (or already in) RTA / adaptation mode.
+	 *
+	 * @param {string} sReference - Reference of the application
+	 * @returns {boolean} <code>true</code> if in adaptation mode
+	 */
+	function isAdaptationMode(sReference) {
+		const oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+		return !!(oFlexInfoSession.adaptationMode || window.sessionStorage.getItem(`sap.ui.rta.restart.${Layer.CUSTOMER}`));
+	}
+
 	function loadFlexDataFromConnectors(mPropertyBag, aConnectors) {
 		const aConnectorPromises = aConnectors.map(function(oConnectorConfig) {
-			const oFlexInfoSession = FlexInfoSession.getByReference(mPropertyBag.reference);
-			const oConnectorSpecificPropertyBag = {
-				...mPropertyBag,
-				url: oConnectorConfig.url,
-				path: oConnectorConfig.path
-			};
-
-			if (
-				!oConnectorConfig.layers
-				|| (
-					oConnectorConfig.layers[0] !== "ALL"
-					&& oConnectorConfig.layers.indexOf(Layer.CUSTOMER) === -1
-				)
-			) {
-				delete oConnectorSpecificPropertyBag.version;
-			}
-			// a sign that we are either loading RTA mode or are already in the RTA mode
-			// and allContexts query parameter should be set for flex/data request
-			// and the cacheKey should be removed to disable browser caching
+			const oConnectorSpecificPropertyBag = createConnectorSpecificPropertyBag(mPropertyBag, oConnectorConfig);
+			oConnectorSpecificPropertyBag.path = oConnectorConfig.path;
+			// in RTA / adaptation mode the cacheKey should be removed to disable browser caching
 			// and lazy loading of views should be disabled to ensure all variants and their contents are loaded for RTA
-			if (oFlexInfoSession.adaptationMode || window.sessionStorage.getItem(`sap.ui.rta.restart.${Layer.CUSTOMER}`)) {
-				oConnectorSpecificPropertyBag.allContexts = true;
+			if (isAdaptationMode(mPropertyBag.reference)) {
 				delete oConnectorSpecificPropertyBag.cacheKey;
 				delete oConnectorSpecificPropertyBag.lazyLoadingViewsEnabled;
 			}
@@ -131,16 +158,13 @@ sap.ui.define([
 		return Promise.all(aConnectorPromises);
 	}
 
-	async function loadVariantsAuthorsFromConnectors(sReference, aConnectors) {
+	async function loadVariantsAuthorsFromConnectors(mPropertyBag, aConnectors) {
 		const aResponses = await Promise.all(aConnectors.map(function(oConnectorConfig) {
 			// Tolerance for connectors that do not have loadFeature implemented
 			if (!oConnectorConfig?.loadConnectorModule?.loadVariantsAuthors) {
 				return Promise.resolve(StorageUtils.logAndResolveDefault({}, oConnectorConfig, "loadVariantsAuthors"));
 			}
-			const oConnectorSpecificPropertyBag = {
-				reference: sReference,
-				url: oConnectorConfig.url
-			};
+			const oConnectorSpecificPropertyBag = createConnectorSpecificPropertyBag(mPropertyBag, oConnectorConfig);
 			return oConnectorConfig.loadConnectorModule.loadVariantsAuthors(oConnectorSpecificPropertyBag)
 			.then((oResponse) => oResponse || {})
 			.catch(StorageUtils.logAndResolveDefault.bind(
@@ -211,15 +235,18 @@ sap.ui.define([
 	/**
 	 * Load the names of variants' authors for a given application.
 	 *
-	 * @param {string} sReference - Flex reference of application
-	 * @returns {Promise<object>} Resolving with a list of maps between variant ID and author name
+	 * @param {object} mPropertyBag - Object with the necessary properties
+	 * @param {string} mPropertyBag.reference - Flex reference of the application
+	 * @param {number} [mPropertyBag.version] - Number of the version for which the variants are belong to
+	 * @param {string} [mPropertyBag.adaptationId] - Context-based adaptation for which the variants are belong to
+	 * @returns {Promise<object>} Resolving with a list of maps between logon and display name of variant author
 	 */
-	Storage.loadVariantsAuthors = function(sReference) {
-		if (!sReference) {
+	Storage.loadVariantsAuthors = function(mPropertyBag) {
+		if (!mPropertyBag?.reference) {
 			return Promise.reject(new Error("No reference was provided"));
 		}
 		return StorageUtils.getLoadConnectors()
-		.then(loadVariantsAuthorsFromConnectors.bind(this, sReference));
+		.then(loadVariantsAuthorsFromConnectors.bind(this, mPropertyBag));
 	};
 
 	/**

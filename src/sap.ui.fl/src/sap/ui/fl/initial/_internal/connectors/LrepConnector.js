@@ -36,8 +36,6 @@ sap.ui.define([
 		VARIANTS_AUTHORS: "/variants/authors/"
 	};
 
-	let _mFlexDataParameters = {};
-
 	/**
 	 * Connector for requesting data from an LRep based back end.
 	 *
@@ -163,9 +161,6 @@ sap.ui.define([
 				mParameters.upToLayerType = mPropertyBag.preview.maxLayer;
 			}
 
-			// Store parameters for possible subsequence GET variants' authors names request
-			_mFlexDataParameters = mParameters;
-
 			const sDataUrl = Utils.getUrl(ROUTES.DATA, mPropertyBag, mParameters);
 			return Utils.sendRequest(sDataUrl, "GET", {
 				initialConnector: this,
@@ -203,11 +198,15 @@ sap.ui.define([
 		 * @param {object} mPropertyBag Property bag
 		 * @param {string} mPropertyBag.url Configured URL for the connector
 		 * @param {string} mPropertyBag.reference Flexibility reference
+		 * @param {boolean} [mPropertyBag.allContexts] Includes also restricted context
+		 * @param {string} [mPropertyBag.version] Version to be loaded
+		 * @param {string} [mPropertyBag.adaptationId] - Context-based adaptation to be loaded
 		 * @returns {Promise<object>} Promise resolves with an object containing maps of variants' IDs and their names
 		 */
 		loadVariantsAuthors(mPropertyBag) {
-			delete _mFlexDataParameters.lazyLoadingViewsEnabled;
-			const sVariantsAuthorsUrl = Utils.getUrl(ROUTES.VARIANTS_AUTHORS, mPropertyBag, _mFlexDataParameters);
+			const mParameters = _pick(mPropertyBag, ["version", "allContexts", "adaptationId"]);
+			this._addClientInfo(mParameters);
+			const sVariantsAuthorsUrl = Utils.getUrl(ROUTES.VARIANTS_AUTHORS, mPropertyBag, mParameters);
 			return Utils.sendRequest(sVariantsAuthorsUrl, "GET", { initialConnector: this }).then(function(oResult) {
 				return oResult.response;
 			});
