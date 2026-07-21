@@ -38107,6 +38107,10 @@ sap.ui.define([
 	// JIRA: CPOUI5ODATAV4-2032
 	//
 	// Ensure that custom URL parameters are added to a single entity refresh (SNOW: DINC0570634)
+	//
+	// After a failed side-effects refresh, the hierarchy annotations of kept-alive nodes are
+	// restored.
+	// SNOW: DINC0930725
 	QUnit.test("Recursive Hierarchy: side-effects refresh (expandTo=1)", async function (assert) {
 		const oModel = this.createSpecialCasesModel({autoExpandSelect : true});
 		const sFriend = "/Artists(ArtistID='99',IsActiveEntity=false)/_Friend";
@@ -38587,6 +38591,50 @@ sap.ui.define([
 		await this.waitForChanges(assert, "(10) scroll down");
 
 		checkTable("after (10)", assert, oTable, [
+			sFriend + "(ArtistID='5',IsActiveEntity=false)",
+			sFriend + "(ArtistID='1',IsActiveEntity=false)",
+			sFriend + "(ArtistID='4',IsActiveEntity=false)",
+			sFriend + "(ArtistID='2',IsActiveEntity=false)",
+			sFriend + "(ArtistID='3',IsActiveEntity=false)"
+		], [
+			[undefined, 2, "4", "Delta"],
+			[true, 2, "2", "Beta"],
+			[undefined, 3, "3", "Gamma"]
+		]);
+
+		oTable.getRows()[1].getBindingContext().setKeepAlive(true);
+
+		this.expectRequest(sFriend.slice(1) + "?custom=foo"
+				+ "&$select=ArtistID,IsActiveEntity,Name,sendsAutographs"
+				+ "&$filter=ArtistID eq '2' and IsActiveEntity eq false", createErrorInsideBatch())
+			.expectRequest(
+				baseUrl('[{"NodeID":"2,false","Levels":1},{"NodeID":"1,false","Levels":1}]')
+				+ sFullSelect + "&$count=true&$skip=2&$top=3") // no response required
+			.expectMessages([{
+				code : "CODE",
+				message : "Request intentionally failed",
+				persistent : true,
+				technical : true,
+				type : "Error"
+			}]);
+		this.oLogMock.expects("error")
+			.withExactArgs("Failed to refresh kept-alive elements",
+				sinon.match("Request intentionally failed"), sODLB);
+		this.oLogMock.expects("error")
+			.withExactArgs("Failed to get contexts for /special/cases/"
+				+ sFriend.slice(1) + " with start index 2 and length 3",
+				sinon.match(sPreviousFailed), sODLB);
+
+		await Promise.all([
+			// code under test (SNOW: DINC0930725)
+			oBinding.getHeaderContext().requestSideEffects([""])
+				.then(mustFail(assert), function (oError0) {
+					assert.strictEqual(oError0.message, "Request intentionally failed");
+				}),
+			this.waitForChanges(assert, "failed side-effects refresh w/ kept-alive node")
+		]);
+
+		checkTable("after failed side-effects refresh w/ kept-alive node", assert, oTable, [
 			sFriend + "(ArtistID='5',IsActiveEntity=false)",
 			sFriend + "(ArtistID='1',IsActiveEntity=false)",
 			sFriend + "(ArtistID='4',IsActiveEntity=false)",

@@ -2445,11 +2445,15 @@ sap.ui.define([
 			throw new Error("Unsupported grouping via sorter");
 		}
 
+		const mKeptElementsBackup = {};
 		aKeptElementPredicates.forEach(function (sPredicate) {
 			var oKeptElement = that.aElements.$byPredicate[sPredicate];
 
 			if (_Helper.hasPrivateAnnotation(oKeptElement, "placeholder")) {
 				throw new Error("Unexpected placeholder");
+			}
+			if (sGroupId) {
+				mKeptElementsBackup[sPredicate] = {...oKeptElement};
 			}
 			delete oKeptElement["@$ui5.node.isExpanded"];
 			delete oKeptElement["@$ui5.node.level"];
@@ -2466,6 +2470,7 @@ sap.ui.define([
 		if (sGroupId) { // sGroupId means we are in a side-effects refresh
 			this.oBackup.oCountPromise = this.oCountPromise;
 			this.oBackup.oFirstLevel = this.oFirstLevel;
+			this.oBackup.mKeptElements = mKeptElementsBackup;
 			this.oBackup.bUnifiedCache = this.bUnifiedCache;
 			this.bUnifiedCache = true;
 		} else {
@@ -2497,6 +2502,13 @@ sap.ui.define([
 			this.oCountPromise = this.oBackup.oCountPromise;
 			this.oFirstLevel = this.oBackup.oFirstLevel;
 			this.bUnifiedCache = this.oBackup.bUnifiedCache;
+			for (const sPredicate in this.oBackup.mKeptElements) {
+				const oKeptElement = this.aElements.$byPredicate[sPredicate];
+				const oBackupElement = this.oBackup.mKeptElements[sPredicate];
+				oKeptElement["@$ui5.node.isExpanded"] = oBackupElement["@$ui5.node.isExpanded"];
+				oKeptElement["@$ui5.node.level"] = oBackupElement["@$ui5.node.level"];
+				oKeptElement["@$ui5._"] = oBackupElement["@$ui5._"];
+			}
 		}
 		// "super" call (like @borrows ...)
 		const fnSuper = this.oFirstLevel.restore;
