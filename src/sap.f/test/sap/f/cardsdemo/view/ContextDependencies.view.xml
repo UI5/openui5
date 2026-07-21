@@ -1,0 +1,47 @@
+<mvc:View
+	controllerName="sap.f.cardsdemo.controller.ContextDependencies"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:f="sap.f"
+	xmlns:w="sap.ui.integration.widgets"
+	displayBlock="true">
+	<Page title="Context Dependencies - Loading Placeholders">
+		<headerContent>
+			<Text text="Cards 1, 3 and 4 depend on host context - loading placeholders shown until context is resolved. Card 2 has no context dependency." />
+		</headerContent>
+
+		<f:GridContainer class="sapUiSmallMargin">
+			<w:Card
+				id="cardWithContext"
+				manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/contextDependencies/cardWithContext.json">
+				<w:layoutData>
+					<f:GridContainerItemLayoutData columns="4" minRows="4" />
+				</w:layoutData>
+			</w:Card>
+
+			<w:Card
+				id="cardWithoutContext"
+				manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/contextDependencies/cardWithoutContext.json">
+				<w:layoutData>
+					<f:GridContainerItemLayoutData columns="4" />
+				</w:layoutData>
+			</w:Card>
+
+			<w:Card
+				id="cardWithContextInHeader"
+				manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/contextDependencies/cardWithContextInHeader.json">
+				<w:layoutData>
+					<f:GridContainerItemLayoutData columns="4" minRows="4" />
+				</w:layoutData>
+			</w:Card>
+
+			<w:Card
+				id="cardWithContextEverywhere"
+				manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/contextDependencies/cardWithContextEverywhere.json">
+				<w:layoutData>
+					<f:GridContainerItemLayoutData columns="4" minRows="4" />
+				</w:layoutData>
+			</w:Card>
+		</f:GridContainer>
+	</Page>
+</mvc:View>

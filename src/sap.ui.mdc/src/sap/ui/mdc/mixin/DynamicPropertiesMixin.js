@@ -60,33 +60,56 @@ sap.ui.define([], () => {
 	};
 
 	/**
-	 * Syncs the item aggregation from <code>propertyKeys</code> and PropertyHelper state.
-	 * Computes the diff between the current aggregation and the desired state, and patches:
-	 * creates and adds missing items, removes and destroys excess items, reorders mismatched items.
-	 * Idempotent — calling with an unchanged state is a no-op.
+	 * Syncs the item aggregation from <code>propertyKeys</code> and state of properties in the <code>PropertyInfo</code>.
+	 * Computes the diff between the current aggregation and the desired state, and patches: creates and adds missing items, removes and destroys
+	 * excess items, reorders mismatched items. Calling with an unchanged state is a no-op.
 	 *
 	 * @returns {Promise} Resolves when the sync is complete
 	 * @public
 	 */
-	DynamicPropertiesMixin.syncItemsFromPropertyKeys = async function() {
+	DynamicPropertiesMixin.syncItemsFromPropertyKeys = function() {
 		if (!this.isInPropertyKeysMode()) {
 			throw new Error(this + ": syncItemsFromPropertyKeys must not be called in aggregation mode.");
 		}
 
-		const oPropertyHelper = this.getPropertyHelper();
-		const aDesiredKeys = this.getPropertyKeys();
+		// A sync is pending but has not started executing yet.
+		if (this._pQueuedSync) {
+			return this._pQueuedSync;
+		}
+
+		const pPrevious = this._pActiveSync || Promise.resolve();
+		const pSync = pPrevious.catch(() => {/* isolate from prior failures */}).then(() => {
+			// The sync is now starting. Later calls can no longer coalesce onto it and chain a new run instead.
+			this._pQueuedSync = null;
+			return doSyncItemsFromPropertyKeys(this);
+		});
+
+		this._pActiveSync = pSync;
+		this._pQueuedSync = pSync;
+		return pSync;
+	};
+
+	/**
+	 * Performs a single sync of the aggregation from <code>propertyKeys</code>.
+	 *
+	 * @param {sap.ui.mdc.Control} oControl The control instance
+	 * @returns {Promise} Resolves when the sync is complete
+	 */
+	async function doSyncItemsFromPropertyKeys(oControl) {
+		const oPropertyHelper = oControl.getPropertyHelper();
+		const aDesiredKeys = oControl.getPropertyKeys();
 
 		// Resolve active keys — finalize PropertyHelper lazily on first unknown property
 		const aActiveKeys = [];
 		for (const sKey of aDesiredKeys) {
 			let oProperty = oPropertyHelper.getProperty(sKey, true);
 			if (!oProperty) {
-				if (!this.isPropertyHelperFinal()) {
-					await this.finalizePropertyHelper();
+				if (!oControl.isPropertyHelperFinal()) {
+					await oControl.finalizePropertyHelper();
 					oProperty = oPropertyHelper.getProperty(sKey, true);
 				}
 				if (!oProperty) {
-					throw new Error(`${this}: Property '${sKey}' is in 'propertyKeys' but not available.`
+					throw new Error(`${oControl}: Property '${sKey}' is in 'propertyKeys' but not available.`
 						+ ` Ensure the property is defined in the 'propertyInfo' control property or provided by Delegate.fetchProperties.`);
 				}
 			}
@@ -96,8 +119,8 @@ sap.ui.define([], () => {
 		}
 
 		oPropertyHelper.validateDynamicProperties();
-		await patchAggregation(this, aActiveKeys);
-	};
+		await patchAggregation(oControl, aActiveKeys);
+	}
 
 	/**
 	 * Patches the aggregation to match the desired active keys: removes excess items, adds missing items, reorders mismatched items.
@@ -222,6 +245,8 @@ sap.ui.define([], () => {
 		return function() {
 			delete this._bUsesPropertyKeysMode;
 			delete this._mDynamicPropertiesMixinSettings;
+			delete this._pActiveSync;
+			delete this._pQueuedSync;
 
 			if (fnExit) {
 				fnExit.apply(this, arguments);

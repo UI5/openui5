@@ -1,0 +1,43 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.f.cardsdemo.cardcontent.contextDependencies.cardWithContextInHeader",
+		"type": "card",
+		"title": "Card 'cardWithContextInHeader'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"header": {
+			"title": "{= ${context>sample/department/title}.length > 0 ? ${context>sample/currentUser/name} : 'N/A' }",
+			"subtitle": "Budget: {= format.currency(${context>sample/currentUser/budget}, 'EUR', {currencyCode:false}) }",
+			"icon": {
+				"src": "sap-icon://group"
+			}
+		},
+		"content": {
+			"data": {
+				"json": [
+					{
+						"title": "Review quarterly report",
+						"description": "Due tomorrow"
+					},
+					{
+						"title": "Prepare team presentation",
+						"description": "Next Monday"
+					},
+					{
+						"title": "Submit expense claims",
+						"description": "End of week"
+					}
+				]
+			},
+			"item": {
+				"title": "{title}",
+				"description": "{description}"
+			}
+		}
+	}
+}

@@ -168,7 +168,7 @@ sap.ui.define([
 				posinset: oInfo.iItemNo,
 				setsize: oInfo.iTotalItems,
 				selected: null,
-				checked: bIsSelected ? true : undefined,
+				checked: oItem._getItemSelectionMode() !== ItemSelectionMode.None ? bIsSelected : undefined,
 				labelledby: { value: this.getId() + "-txt", append: true },
 				keyshortcuts : !oSubMenu && sShortcutText ? sShortcutText : null,
 				haspopup: oSubMenu && coreLibrary.aria.HasPopup.Menu.toLowerCase(),

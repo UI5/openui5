@@ -11,7 +11,8 @@ sap.ui.define(function() {
 						bridge: "sap/ui/qunit/sinon-qunit-bridge"
 					}
 				},
-				version: "14.0"
+				version: "14.0",
+				useFakeTimers: true
 			},
 			loader: {
 				shim: {
@@ -33,27 +34,18 @@ sap.ui.define(function() {
 				title: "QUnit Page for sap.ui.core.tooltip.TooltipEnablement",
 				ui5: {
 					libs: "sap.m"
-				},
-				sinon: {
-					useFakeTimers: true
 				}
 			},
 			TooltipEventTrigger: {
 				title: "QUnit Page for sap.ui.core.tooltip.TooltipEventTrigger",
 				ui5: {
 					libs: "sap.m"
-				},
-				sinon: {
-					useFakeTimers: true
 				}
 			},
 			TooltipManager: {
 				title: "QUnit Page for sap.ui.core.tooltip.TooltipManager",
 				ui5: {
 					libs: "sap.m"
-				},
-				sinon: {
-					useFakeTimers: true
 				}
 			}
 		}

@@ -82,12 +82,16 @@ sap.ui.define([
 
 	/**
 	 * Reloads the current application with the debug parameter enabled.
+	 * Having it for all libraries leads to a very long reload time, so we only enable it for sap.ui.fl
+	 *
+	 * @private
+	 * @ui5-restricted ui5 support tools
 	 */
-	function reloadAppWithDebugSources() {
+	SupportAPI.reloadAppWithDebugSources = function() {
 		const oUrl = new URL(window.location.href);
-		oUrl.searchParams.set("sap-ui-debug", "true");
+		oUrl.searchParams.set("sap-ui-debug", "sap/ui/fl");
 		window.location.href = oUrl.toString();
-	}
+	};
 
 	/**
 	 * Creates human-readable descriptions for local changes.
@@ -536,7 +540,7 @@ sap.ui.define([
 				emphasizedAction: oResourceBundle.getText("BTN_RELOAD_DEBUG_LIMITED"),
 				onClose: (sAction) => {
 					if (sAction !== MessageBox.Action.CLOSE) {
-						reloadAppWithDebugSources();
+						SupportAPI.reloadAppWithDebugSources();
 					}
 				}
 			});

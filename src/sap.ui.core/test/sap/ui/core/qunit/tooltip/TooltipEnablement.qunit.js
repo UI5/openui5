@@ -178,6 +178,34 @@ sap.ui.define([
 		}, /sap\.ui\.core\.Control/);
 	});
 
+	QUnit.test("default textProvider resolves the host's tooltip via getTooltip_AsString", function(assert) {
+		this.oHost.setTooltip("host tip");
+		const oEnablement = new TooltipEnablement(this.oHost);
+		assert.strictEqual(oEnablement.getInvisibleTooltipId(), "host-btn-invisibleTooltip",
+			"non-null id when host tooltip is set and default provider is used");
+		const sHtml = renderToString((oRm) => oEnablement.renderInvisibleTooltip(oRm));
+		assert.ok(sHtml.includes(">host tip<"), "rendered span contains the host tooltip text");
+		oEnablement.destroy();
+	});
+
+	QUnit.test("default textProvider yields empty when host has no tooltip set", function(assert) {
+		const oEnablement = new TooltipEnablement(this.oHost);
+		assert.strictEqual(oEnablement.getInvisibleTooltipId(), null,
+			"null id when host has no tooltip and default provider returns empty string");
+		const sHtml = renderToString((oRm) => oEnablement.renderInvisibleTooltip(oRm));
+		assert.strictEqual(sHtml, "", "no span emitted when default provider yields empty string");
+		oEnablement.destroy();
+	});
+
+	QUnit.test("explicit textProvider still wins over the host tooltip default", function(assert) {
+		this.oHost.setTooltip("host tip");
+		const oEnablement = new TooltipEnablement(this.oHost, { textProvider: () => "explicit" });
+		const sHtml = renderToString((oRm) => oEnablement.renderInvisibleTooltip(oRm));
+		assert.ok(sHtml.includes(">explicit<"), "explicit textProvider used");
+		assert.notOk(sHtml.includes(">host tip<"), "host tooltip ignored when explicit provider given");
+		oEnablement.destroy();
+	});
+
 	QUnit.module("Setters", {
 		beforeEach: function() {
 			this.oHost = new FakeTooltipHost({ id: "host-btn" });

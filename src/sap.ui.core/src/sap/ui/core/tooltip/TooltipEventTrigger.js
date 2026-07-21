@@ -199,15 +199,15 @@ sap.ui.define([
 
 			// Touch-only (phone or tablet, not combi)
 			if ((Device.system.phone || Device.system.tablet) && !Device.system.combi) {
+				// iOS: suppress the native touch callout (context menu) and text
+				// selection via CSS.
+				if (this._bEnableForTouchDevices) {
+					oDomRef.classList.add("sapUiCoreTooltipHostSuppressSelection");
+				}
+
 				this._on("contextmenu", (e) => {
-					const bDisabled = !this._bEnableForTouchDevices;
-
-					// @todo review the need of webkitTouchCallout. We should try all we can to avoid side effects on the element, or at least we need to properly restore this
-					// if (Device.os.ios) {
-					// 	oDomRef.style.webkitTouchCallout = bDisabled ? "default" : "none";
-					// }
-
-					if (!bDisabled) {
+					// Android: block the native context menu so long-press opens the tooltip.
+					if (this._bEnableForTouchDevices) {
 						e.preventDefault();
 					}
 				});
@@ -259,6 +259,8 @@ sap.ui.define([
 				oCurrent.removeEventListener(sType, fnHandler);
 			});
 			this._aListeners = [];
+			// Restore the element: drop the touch-suppression class added in attach().
+			oCurrent.classList.remove("sapUiCoreTooltipHostSuppressSelection");
 			this._oDomRef = null;
 			return this;
 		};

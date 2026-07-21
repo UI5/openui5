@@ -788,7 +788,7 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		// Assert
-		assert.notOk(aItems[0].getDomRef().getAttribute("aria-checked"), "First item has no 'aria-checked' attribute set");
+		assert.equal(aItems[0].getDomRef().getAttribute("aria-checked"), "false", "First item has 'aria-checked=false' attribute set");
 		assert.notOk(aItems[0].getDomRef().querySelector(".sapMMenuItemSelected"), "First item has no selection mark rendered");
 
 		// Act - select more than one item
@@ -798,9 +798,9 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		// Assert
-		assert.notOk(aItems[0].getDomRef().getAttribute("aria-checked"), "First item has no 'aria-checked' attribute set");
+		assert.equal(aItems[0].getDomRef().getAttribute("aria-checked"), "false", "First item has 'aria-checked=false' attribute set");
 		assert.notOk(aItems[0].getDomRef().querySelector(".sapMMenuItemSelected"), "First item has no selection mark rendered");
-		assert.notOk(aItems[1].getDomRef().getAttribute("aria-checked"), "Second item has no 'aria-checked' attribute set");
+		assert.equal(aItems[1].getDomRef().getAttribute("aria-checked"), "false", "Second item has 'aria-checked=false' attribute set");
 		assert.notOk(aItems[1].getDomRef().querySelector(".sapMMenuItemSelected"), "Second item has no selection mark rendered");
 		assert.equal(aItems[2].getDomRef().getAttribute("aria-checked"), "true", "Third item has 'aria-checked' attribute set");
 		assert.ok(aItems[2].getDomRef().querySelector(".sapMMenuItemSelected"), "Third item has selection mark rendered");
@@ -824,7 +824,7 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		// Assert
-		assert.notOk(aItems[0].getDomRef().getAttribute("aria-checked"), "First item has no 'aria-checked' attribute set");
+		assert.equal(aItems[0].getDomRef().getAttribute("aria-checked"), "false", "First item has 'aria-checked=false' attribute set");
 		assert.notOk(aItems[0].getDomRef().querySelector(".sapMMenuItemSelected"), "First item has no selection mark rendered");
 
 		// Act - select more than one item
@@ -1006,6 +1006,13 @@ sap.ui.define([
 
 		assert.strictEqual(oNoneSelectionGroupDomRef.getAttribute("role"), "group", "Group with itemSelectionMode = None has role=group");
 		assert.strictEqual(oNoneSelectionGroupDomRef.getAttribute("aria-label"), oRb.getText("MENU_ITEM_GROUP_NONE_ACCESSIBLE_NAME"), "Group with itemSelectionMode = None has proper aria-label");
+	});
+
+	QUnit.test("Separator hr element has aria-hidden", async function(assert) {
+		this.oMenu.openBy();
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(this.oMenu._getPopover().getDomRef().querySelector(".sapMMenuSeparator hr").getAttribute("aria-hidden"), "true", "Separator hr element has aria-hidden='true'");
 	});
 
 	QUnit.module("Miscellaneous", {

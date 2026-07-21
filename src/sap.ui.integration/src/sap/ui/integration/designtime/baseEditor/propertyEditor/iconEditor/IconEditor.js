@@ -73,12 +73,16 @@ sap.ui.define([
 
 	IconEditor.prototype._getIconModel = function () {
 		if (!oIconModel) {
-			oIconModel = new JSONModel(IconPool.getIconNames().map(function(sName) {
-				return {
-					name: sName,
-					path: "sap-icon://" + sName
-				};
-			}));
+			oIconModel = new JSONModel();
+			var pReady = IconPool.collectionReady ? IconPool.collectionReady() : Promise.resolve();
+			pReady.then(function() {
+				oIconModel.setData(IconPool.getIconNames().map(function(sName) {
+					return {
+						name: sName,
+						path: "sap-icon://" + sName
+					};
+				}));
+			});
 		}
 		return oIconModel;
 	};

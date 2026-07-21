@@ -104,26 +104,31 @@ sap.ui.define([
 
 	IconSelect.prototype._initDefaultIcons = function () {
 		aDefaultIcons = [];
-		var aIconNames = IconPool.getIconNames();
-		aIconNames = aIconNames.sort(function (a, b) {
-			return a.toLowerCase().localeCompare(b.toLowerCase());
-		});
-		aIconNames.filter(function (s) {
-			var text = IconPool.getIconInfo(s).text || ("-" + s).replace(/-(.)/ig, function (sMatch, sChar) {
-				return " " + sChar.toUpperCase();
-			}).substring(1);
-			aDefaultIcons.push({
-				icon: "sap-icon://" + s,
-				key: "sap-icon://" + s,
-				text: text,
-				additionalText: "sap-icon://" + s,
-				tooltip: text,
-				enabled: true,
-				type: "UI5"
+
+		var pCollectionReady = IconPool.collectionReady ? IconPool.collectionReady() : Promise.resolve();
+		var pBuiltIn = pCollectionReady.then(function() {
+			var aIconNames = IconPool.getIconNames();
+			aIconNames = aIconNames.sort(function (a, b) {
+				return a.toLowerCase().localeCompare(b.toLowerCase());
+			});
+			aIconNames.forEach(function (s) {
+				var text = IconPool.getIconInfo(s).text || ("-" + s).replace(/-(.)/ig, function (sMatch, sChar) {
+					return " " + sChar.toUpperCase();
+				}).substring(1);
+				aDefaultIcons.push({
+					icon: "sap-icon://" + s,
+					key: "sap-icon://" + s,
+					text: text,
+					additionalText: "sap-icon://" + s,
+					tooltip: text,
+					enabled: true,
+					type: "UI5"
+				});
 			});
 		});
 
 		if (!bLoadExtraDefaultIcons) {
+			oLoadDefaultIconPromise = pBuiltIn;
 			return;
 		}
 
@@ -144,8 +149,8 @@ sap.ui.define([
 				fontURI: sap.ui.require.toUrl("sap/ushell/themes/base/fonts/")
 			});
 		}
-		oLoadDefaultIconPromise = Promise.all([IconPool.fontLoaded("SAP-icons-TNT"), IconPool.fontLoaded("BusinessSuiteInAppSymbols")]).then(function () {
-			aIconNames = IconPool.getIconNames("SAP-icons-TNT");
+		oLoadDefaultIconPromise = Promise.all([pBuiltIn, IconPool.fontLoaded("SAP-icons-TNT"), IconPool.fontLoaded("BusinessSuiteInAppSymbols")]).then(function () {
+			var aIconNames = IconPool.getIconNames("SAP-icons-TNT");
 			// filter out names which contains blank or UpperCase characters
 			aIconNames = aIconNames.filter(function (s) {
 				var strCode = s.substring(0, 1).charCodeAt();

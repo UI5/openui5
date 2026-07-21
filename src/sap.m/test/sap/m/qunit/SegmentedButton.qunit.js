@@ -1,7 +1,6 @@
 /*global QUnit */
 sap.ui.define([
 	"sap/ui/core/Element",
-	"sap/ui/core/Lib",
 	"sap/m/SegmentedButton",
 	"sap/m/SegmentedButtonItem",
 	"sap/m/Button",
@@ -18,7 +17,6 @@ sap.ui.define([
 	"sap/ui/test/utils/nextUIUpdate"
 ], function(
 	Element,
-	Library,
 	SegmentedButton,
 	SegmentedButtonItem,
 	Button,
@@ -40,8 +38,6 @@ sap.ui.define([
 	var TextDirection = coreLibrary.TextDirection;
 
 	var IMAGE_PATH = "test-resources/sap/m/images/";
-
-	var oResourceBundle = Library.getResourceBundleFor("sap.m");
 
 	/* =========================================================== */
 	/* Initialize module                                           */
@@ -1529,8 +1525,8 @@ sap.ui.define([
 		$segmentedButton = oSegmentedButton.$();
 		assert.strictEqual($segmentedButton.attr("role"), "listbox", "Control has role 'listbox'");
 		assert.strictEqual($segmentedButton.attr("aria-multiselectable"), "false", "aria-multiselectable is set to 'false'");
-		assert.strictEqual($segmentedButton.attr("aria-roledescription"), oResourceBundle.getText("SEGMENTEDBUTTON_NAME"),
-			"Additional description for control's role is added");
+		assert.notOk($segmentedButton.attr("aria-roledescription"),
+			"No aria-roledescription is set so the native 'listbox' role semantics are preserved");
 		assert.notOk($segmentedButton.attr("aria-describedby"),
 			"Tutor message is not placed on the root listbox to avoid JAWS double announcement");
 		assert.strictEqual($segmentedButton.attr("aria-orientation"), "horizontal", "aria-orientation is set to 'horizontal'");
@@ -1558,10 +1554,10 @@ sap.ui.define([
 		assert.strictEqual($innerButton.attr("role"), "option", "Inner button has role 'option'");
 		assert.strictEqual($innerDisabledButton.attr("role"), "option", "Second inner button has role 'option' as well");
 
-		assert.strictEqual($innerButton.attr("aria-roledescription"), oResourceBundle.getText("SEGMENTEDBUTTON_BUTTONS_NAME"),
-			"First button has an additional description of its role");
-		assert.strictEqual($innerDisabledButton.attr("aria-roledescription"), oResourceBundle.getText("SEGMENTEDBUTTON_BUTTONS_NAME"),
-			"Second button has an additional description of its role as well");
+		assert.notOk($innerButton.attr("aria-roledescription"),
+			"First button has no aria-roledescription so the native 'option' role semantics are preserved");
+		assert.notOk($innerDisabledButton.attr("aria-roledescription"),
+			"Second button has no aria-roledescription so the native 'option' role semantics are preserved");
 
 		assert.notOk($innerButton.attr("aria-disabled"), "Non-disabled buttons aren't marked as disabled");
 		assert.strictEqual($innerDisabledButton.attr("aria-disabled"), "true", "Disabled buttons have aria-disabled");

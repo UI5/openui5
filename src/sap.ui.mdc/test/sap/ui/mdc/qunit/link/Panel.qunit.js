@@ -67,7 +67,7 @@ sap.ui.define([
 		const aElements = oPanel.$().find("span:visible");
 		let iCount = 0;
 		aElements.each(function(iIndex) {
-			if (aElements[iIndex].style.cssText.indexOf("SAP-icons") > -1) {
+			if (aElements[iIndex].className.includes("sapUiIcon")) {
 				iCount++;
 			}
 		});

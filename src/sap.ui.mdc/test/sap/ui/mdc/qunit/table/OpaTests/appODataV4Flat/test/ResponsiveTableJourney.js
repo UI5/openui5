@@ -113,6 +113,53 @@ sap.ui.define([
 		Then.onTheAppMDCTable.iCheckColumnWidth(sTableId, `${sTableId}--CreatedAt`, 100);
 	});
 
+	QUnit.module("Group by invisible column");
+
+	opaTest("Group header text renders correctly when grouping by a hidden column", function(Given, When, Then) {
+		// Hide the "Category" column via the personalization dialog.
+		When.onTheAppMDCTable.iOpenP13nDialog();
+		When.P13nActions.iSelectColumns(["Category"], null, undefined);
+		When.P13nActions.iPressDialogOk();
+
+		// Group by the (now hidden) "Category" property via the personalization dialog.
+		When.onTheAppMDCTable.iOpenP13nDialog();
+		When.P13nActions.iSwitchToP13nTab("Group");
+		When.P13nActions.iClickOnP13nSelect("");
+		When.P13nActions.iSelectP13nMenuItem("Category");
+		When.P13nActions.iPressDialogOk();
+
+		Then.onTheAppMDCTable.iCheckGroupHeaderRowTitle(sTableId, {
+			index: 0,
+			title: "Category: Computer System Accessories"
+		});
+	});
+
+	opaTest("Making the grouped column visible again keeps the group header intact", function(Given, When, Then) {
+		// Precondition: previous test leaves the "Category" column hidden and grouped.
+		// Toggle it visible via p13n while the group stays active.
+		When.onTheAppMDCTable.iOpenP13nDialog();
+		When.P13nActions.iSelectColumns(["Category"], null, undefined);
+		When.P13nActions.iPressDialogOk();
+
+		Then.onTheAppMDCTable.iCheckGroupHeaderRowTitle(sTableId, {
+			index: 0,
+			title: "Category: Computer System Accessories"
+		});
+	});
+
+	opaTest("Hiding a visible grouped column keeps the group header intact", function(Given, When, Then) {
+		// Precondition: previous test leaves the "Category" column visible and grouped.
+		// Hide it via p13n while the group stays active - the group header text must still be requested via Sorter#groupPaths.
+		When.onTheAppMDCTable.iOpenP13nDialog();
+		When.P13nActions.iSelectColumns(["Category"], null, undefined);
+		When.P13nActions.iPressDialogOk();
+
+		Then.onTheAppMDCTable.iCheckGroupHeaderRowTitle(sTableId, {
+			index: 0,
+			title: "Category: Computer System Accessories"
+		});
+	});
+
 	QUnit.module("Dynamic property label update");
 
 	opaTest("Group header row title updated after property label change", function(Given, When, Then) {

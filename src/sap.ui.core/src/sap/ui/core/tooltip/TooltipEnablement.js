@@ -26,7 +26,7 @@ sap.ui.define([
 		 *
 		 * @param {sap.ui.core.Control} oHost The host control.
 		 * @param {object} [oConfig] Configuration for the helper.
-		 * @param {function():string} [oConfig.textProvider] Callback that builds the visible tooltip text.
+		 * @param {function():string} [oConfig.textProvider] Callback that builds the visible tooltip text. Defaults to <code>oHost.getTooltip_AsString()</code>.
 		 * @param {function():string} [oConfig.invisibleTextProvider] Callback that builds the text written into the invisible ARIA anchor. Falls back to <code>textProvider</code> when omitted.
 		 * @param {function():HTMLElement} [oConfig.domRefProvider] Callback that returns the DOM element the gesture listeners should attach to. Defaults to <code>oHost.getFocusDomRef()</code>. Override this when neither the host's focus DOM nor the outer DOM ref is the correct attachment point — for example a wrapper element that owns the hover/focus area.
 		 * @param {boolean} [oConfig.enableForTouchDevices=true] Whether long-press should open the tooltip on touch devices. Use this to disable it for links.
@@ -80,9 +80,19 @@ sap.ui.define([
 		 *
 		 * The following three steps are mandatory for every host control.
 		 *
-		 * <b>1. Create the helper in the host's <code>init</code></b> and pass a
-		 * <code>textProvider</code> callback that returns the desired tooltip
-		 * text. This allows the displayed text to depend on
+		 * <b>1. Create the helper in the host's <code>init</code></b>. Without
+		 * any configuration the visible text defaults to
+		 * <code>oHost.getTooltip_AsString()</code>.
+		 *
+		 * <pre>
+		 * MyControl.prototype.init = function() {
+		 *     if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+		 *         this._oTooltipEnablement = new TooltipEnablement(this);
+		 *     }
+		 * };
+		 * </pre>
+		 *
+		 * Pass a <code>textProvider</code> callback to derive the text from
 		 * runtime state (for example a base tooltip combined with a keyboard
 		 * shortcut). Pass <code>invisibleTextProvider</code> when the
 		 * screen-reader text should differ from the visible one (for example to
@@ -405,7 +415,8 @@ sap.ui.define([
 		};
 
 		/**
-		 * Resolves the visible tooltip text from <code>textProvider</code>.
+		 * Resolves the visible tooltip text from <code>textProvider</code>,
+		 * falling back to the host's <code>getTooltip_AsString()</code>.
 		 * @returns {string}
 		 * @private
 		 */
@@ -413,7 +424,7 @@ sap.ui.define([
 			if (this._fnTextProvider) {
 				return this._fnTextProvider() || "";
 			}
-			return "";
+			return this._oHost.getTooltip_AsString() || "";
 		};
 
 		/**

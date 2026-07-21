@@ -1654,6 +1654,76 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns the context paths that the card depends on.
+	 *
+	 * Scans the <code>sap.card</code> section of the manifest for context model references
+	 * and returns a deduplicated array of the context paths found.
+	 *
+	 * Must be called after the manifest is ready (for example, in the <code>manifestReady</code> event handler).
+	 *
+	 * <b>Limitation:</b> Only context references directly in the manifest are detected.
+	 * Context referenced from inside an extension or component will not be returned.
+	 * If context needs to be used from an extension, assign it to a parameter first.
+	 *
+	 * @public
+	 * @ui5-experimental-since 1.151
+	 * @returns {string[]} An array of context paths found in the manifest
+	 * (for example, <code>["/sample/currentUser/id", "/sample/supplier/id/value"]</code>).
+	 * Returns an empty array if no context dependencies are found or if the manifest is not ready.
+	 */
+	Card.prototype.getContextDependencies = function () {
+		if (!this._isManifestReady || this.isDestroyed()) {
+			Log.error("The manifest is not ready. Consider using the 'manifestReady' event.", "sap.ui.integration.widgets.Card");
+			return [];
+		}
+
+		const oSapCard = this._oCardManifest.get("/sap.card");
+		const oParams = oSapCard && oSapCard.configuration && oSapCard.configuration.parameters;
+		const aResult = [];
+
+		function findContextPaths(oManifestSection, oExcludeSection) {
+			for (const sKey in oManifestSection) {
+				const vValue = oManifestSection[sKey];
+				if (vValue === oExcludeSection) {
+					continue;
+				}
+				if (typeof vValue === "string" && vValue.indexOf("{context>") > -1) {
+					const aParts = vValue.split("{context>");
+					for (let i = 1; i < aParts.length; i++) {
+						const iPathEnd = aParts[i].indexOf("}");
+						if (iPathEnd <= 0) {
+							continue;
+						}
+						let sPath = aParts[i].substring(0, iPathEnd);
+						if (!sPath.startsWith("/")) {
+							sPath = "/" + sPath;
+						}
+						if (aResult.indexOf(sPath) === -1) {
+							aResult.push(sPath);
+						}
+					}
+				} else if (vValue && typeof vValue === "object") {
+					findContextPaths(vValue, oExcludeSection);
+				}
+			}
+		}
+
+		// Walk sap.card but skip the parameters section (handled separately)
+		findContextPaths(oSapCard, oParams);
+
+		// Walk parameters with ignoreBinding check
+		for (const sKey in oParams) {
+			const oParam = oParams[sKey];
+			if (!oParam || typeof oParam !== "object" || oParam.ignoreBinding === true) {
+				continue;
+			}
+			findContextPaths(oParam);
+		}
+
+		return aResult;
+	};
+
+	/**
 	 * Returns a clone of the initial manifest without any processing and without any changes applied to it.
 	 * @ui5-restricted
 	 * @returns {Object} A clone of the initial raw manifest json.

@@ -1,59 +1,57 @@
 sap.ui.require([
-	"sap/m/Button",
-	"sap/m/Link",
+	"local/FakeControls",
+	"sap/m/Page",
+	"sap/m/Panel",
 	"sap/m/Text",
+	"sap/m/Label",
+	"sap/m/Button",
+	"sap/m/Dialog",
+	"sap/m/Popover",
+	"sap/m/CheckBox",
+	"sap/m/VBox",
+	"sap/m/HBox",
 	"sap/ui/core/tooltip/Tooltip",
 	"sap/m/library",
-	"sap/ui/core/tooltip/TooltipEnablement",
-	"sap/ui/core/Core",
-	"sap/ui/core/Element",
-	"sap/ui/Device"
-], async function (Button, Link, Text, Tooltip, mLibrary, TooltipEnablement, Core, Element, Device) {
+	"sap/ui/core/Core"
+], async function (FakeControls, Page, Panel, Text, Label, Button, Dialog, Popover, CheckBox, VBox, HBox, Tooltip, mLibrary, Core) {
 	"use strict";
 
+	const { FakeButton, FakeText, FakeLink, PlainButton } = FakeControls;
 	const PlacementType = mLibrary.PlacementType;
+	const LONG_TOOLTIP = "This is a noticeably longer tooltip text used to verify wrapping behavior.";
+	const VERY_LONG_TOOLTIP =
+		"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra hendrerit convallis. " +
+		"Mauris quis est metus. Curabitur convallis vel arcu id cursus. Maecenas augue neque, lacinia sed " +
+		"pulvinar eu, malesuada sagittis mauris. Praesent malesuada erat vel tortor dictum, non tempor mauris finibus.";
 
 	await Core.ready();
 
-	// Materialize a sap.m.Button into every placeholder in the page. The HTML
-	// declares each Button as <div data-sap-m-button data-button-id="..." data-text="...">.
-	// The host div is given an id so placeAt() can resolve it as a UIArea container.
-	document.querySelectorAll("[data-sap-m-button]").forEach(function (oHost) {
-		const sId = oHost.getAttribute("data-button-id");
-		const sText = oHost.getAttribute("data-text") || "";
-		const sHostId = sId + "-host";
-		oHost.id = sHostId;
-		new Button(sId, { text: sText }).placeAt(sHostId);
-	});
-
-	// Attach a TooltipEnablement helper to the given control. The helper
-	// only takes textProvider/invisibleTextProvider/enableForTouchDevices —
-	// placement and delay scenarios go through attachPlacement() below using
-	// sap.ui.core.tooltip.Tooltip directly.
-	function attach(oControl, mSettings) {
-		if (!oControl) {
-			return null;
-		}
-		const oConfig = {};
-		if (mSettings.text !== undefined) {
-			const sText = mSettings.text;
-			oConfig.textProvider = () => sText;
-		}
-		if (mSettings.enableForTouchDevices !== undefined) {
-			oConfig.enableForTouchDevices = mSettings.enableForTouchDevices;
-		}
-		return new TooltipEnablement(oControl, oConfig);
+	function label(sText) {
+		return new Label({ text: sText, width: "12rem" });
 	}
 
-	// Wires a sap.ui.core.tooltip.Tooltip directly onto a control's DOM for scenarios that
-	// vary placement or delay — those settings are no longer part of the
-	// TooltipEnablement API. Listens to mouseenter/mouseleave and focusin/
-	// focusout on desktop only; this is enough to exercise placement and
-	// open-delay behavior of sap.ui.core.tooltip.Tooltip itself.
-	function attachPlacement(oControl, mSettings) {
-		if (!oControl) {
-			return null;
-		}
+	function panel(sTitle, aContent) {
+		return new Panel({ headerText: sTitle, content: aContent }).addStyleClass("sapUiSmallMarginBottom");
+	}
+
+	function row(aContent) {
+		return new HBox({ items: aContent, alignItems: "Center", wrap: "Wrap" }).addStyleClass("sapUiTinyMarginBottom").setWidth("100%");
+	}
+
+	// Groups a label with its control so they stay together, with generous
+	// spacing between pairs when several sit in one wrapping row.
+	function pair(sLabel, oControl) {
+		return new HBox({
+			items: [new Label({ text: sLabel }).addStyleClass("sapUiTinyMarginEnd"), oControl],
+			alignItems: "Center"
+		}).addStyleClass("sapUiMediumMarginEnd sapUiTinyMarginBottom");
+	}
+
+	// Drives a sap.ui.core.tooltip.Tooltip directly onto a PlainButton for
+	// scenarios that vary placement or delay. Listens on mouseenter/mouseleave
+	// and focusin/focusout (desktop) — enough to exercise placement and
+	// open-delay behavior of the Tooltip itself.
+	function withPlacement(oControl, mSettings) {
 		const oTooltip = new Tooltip({
 			text: mSettings.text,
 			placement: mSettings.placement,
@@ -62,206 +60,244 @@ sap.ui.require([
 		oControl.addEventDelegate({
 			onAfterRendering: function () {
 				const oDomRef = oControl.getDomRef();
-				if (!oDomRef) {
-					return;
-				}
-				oDomRef.addEventListener("mouseenter", function () {
-					oTooltip.openBy(oControl);
-				});
-				oDomRef.addEventListener("mouseleave", function () {
-					oTooltip.close();
-				});
-				oDomRef.addEventListener("focusin", function () {
-					if (oDomRef.matches && oDomRef.matches(":focus-visible")) {
+				oDomRef.addEventListener("mouseenter", () => oTooltip.openBy(oControl));
+				oDomRef.addEventListener("mouseleave", () => oTooltip.close());
+				oDomRef.addEventListener("focusin", () => {
+					if (oDomRef.matches(":focus-visible")) {
 						oTooltip.openBy(oControl);
 					}
 				});
-				oDomRef.addEventListener("focusout", function () {
-					oTooltip.close();
-				});
+				oDomRef.addEventListener("focusout", () => oTooltip.close());
 			}
 		});
-		return oTooltip;
+		return oControl;
 	}
 
-	// --- Text and default placement ---
-	attach(Element.getElementById("btn-default"),   { text: "Default tooltip" });
-	attach(Element.getElementById("btn-short"),     { text: "Short" });
-	attach(Element.getElementById("btn-long"),      { text: "This is a noticeably longer tooltip text used to verify wrapping behavior." });
-	attach(Element.getElementById("btn-very-long"), {
-		text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra hendrerit convallis. " +
-			"Mauris quis est metus. Curabitur convallis vel arcu id cursus. Maecenas augue neque, lacinia sed " +
-			"pulvinar eu, malesuada sagittis mauris. Praesent malesuada erat vel tortor dictum, non tempor " +
-			"mauris finibus. Sed eu porttitor velit, quis consequat lectus. Fusce volutpat nisl augue, eget " +
-			"dictum mi dictum sit amet."
-	});
+	// --- Default placement (via TooltipEnablement on fake buttons) ---
+	const oDefaultPanel = panel("Text and default placement", [
+		row([
+			label("Default (VerticalPreferredTop):"),
+			new FakeButton({ text: "Default", tooltipText: "Default tooltip" }),
+			new FakeButton({ text: "Short text", tooltipText: "Short" }),
+			new FakeButton({ text: "Long text", tooltipText: LONG_TOOLTIP }),
+			new FakeButton({ text: "Very long text", tooltipText: VERY_LONG_TOOLTIP })
+		])
+	]);
 
-	// --- Placement (every PlacementType value) — exercised via sap.ui.core.tooltip.Tooltip directly ---
-	attachPlacement(Element.getElementById("btn-top"),    { text: "Top",    placement: PlacementType.Top });
-	attachPlacement(Element.getElementById("btn-bottom"), { text: "Bottom", placement: PlacementType.Bottom });
-	attachPlacement(Element.getElementById("btn-left"),   { text: "Left",   placement: PlacementType.Left });
-	attachPlacement(Element.getElementById("btn-right"),  { text: "Right",  placement: PlacementType.Right });
-
-	attachPlacement(Element.getElementById("btn-vpt"),  { text: "VerticalPreferredTop",      placement: PlacementType.VerticalPreferredTop });
-	attachPlacement(Element.getElementById("btn-vpb"),  { text: "VerticalPreferredBottom",   placement: PlacementType.VerticalPreferredBottom });
-	attachPlacement(Element.getElementById("btn-hpl"),  { text: "HorizontalPreferredLeft",   placement: PlacementType.HorizontalPreferredLeft });
-	attachPlacement(Element.getElementById("btn-hpr"),  { text: "HorizontalPreferredRight",  placement: PlacementType.HorizontalPreferredRight });
-
-	attachPlacement(Element.getElementById("btn-ptof"), { text: "PreferredTopOrFlip",    placement: PlacementType.PreferredTopOrFlip });
-	attachPlacement(Element.getElementById("btn-pbof"), { text: "PreferredBottomOrFlip", placement: PlacementType.PreferredBottomOrFlip });
-	attachPlacement(Element.getElementById("btn-plof"), { text: "PreferredLeftOrFlip",   placement: PlacementType.PreferredLeftOrFlip });
-	attachPlacement(Element.getElementById("btn-prof"), { text: "PreferredRightOrFlip",  placement: PlacementType.PreferredRightOrFlip });
+	// --- Placement (every PlacementType value) — via Tooltip directly ---
+	const oPlacementPanel = panel("Placement", [
+		row([
+			pair("Top:", withPlacement(new PlainButton({ text: "Top" }), { text: "Top", placement: PlacementType.Top })),
+			pair("Bottom:", withPlacement(new PlainButton({ text: "Bottom" }), { text: "Bottom", placement: PlacementType.Bottom })),
+			pair("Left:", withPlacement(new PlainButton({ text: "Left" }), { text: "Left", placement: PlacementType.Left })),
+			pair("Right:", withPlacement(new PlainButton({ text: "Right" }), { text: "Right", placement: PlacementType.Right }))
+		]),
+		row([
+			pair("VerticalPreferredTop:", withPlacement(new PlainButton({ text: "VPreferredTop" }), { text: "VerticalPreferredTop", placement: PlacementType.VerticalPreferredTop })),
+			pair("VerticalPreferredBottom:", withPlacement(new PlainButton({ text: "VPreferredBottom" }), { text: "VerticalPreferredBottom", placement: PlacementType.VerticalPreferredBottom })),
+			pair("HorizontalPreferredLeft:", withPlacement(new PlainButton({ text: "HPreferredLeft" }), { text: "HorizontalPreferredLeft", placement: PlacementType.HorizontalPreferredLeft })),
+			pair("HorizontalPreferredRight:", withPlacement(new PlainButton({ text: "HPreferredRight" }), { text: "HorizontalPreferredRight", placement: PlacementType.HorizontalPreferredRight }))
+		]),
+		row([
+			pair("PreferredTopOrFlip:", withPlacement(new PlainButton({ text: "TopOrFlip" }), { text: "PreferredTopOrFlip", placement: PlacementType.PreferredTopOrFlip })),
+			pair("PreferredBottomOrFlip:", withPlacement(new PlainButton({ text: "BottomOrFlip" }), { text: "PreferredBottomOrFlip", placement: PlacementType.PreferredBottomOrFlip })),
+			pair("PreferredLeftOrFlip:", withPlacement(new PlainButton({ text: "LeftOrFlip" }), { text: "PreferredLeftOrFlip", placement: PlacementType.PreferredLeftOrFlip })),
+			pair("PreferredRightOrFlip:", withPlacement(new PlainButton({ text: "RightOrFlip" }), { text: "PreferredRightOrFlip", placement: PlacementType.PreferredRightOrFlip }))
+		])
+	]);
 
 	// --- Delay ---
-	attachPlacement(Element.getElementById("btn-delay-0"),    { text: "Opens immediately (delay 0)",    delay: 0 });
-	attachPlacement(Element.getElementById("btn-delay-500"),  { text: "Default 500ms delay",            delay: 500 });
-	attachPlacement(Element.getElementById("btn-delay-1500"), { text: "Slow 1500ms delay",              delay: 1500 });
+	const oDelayPanel = panel("Delay (open delay in ms)", [
+		row([
+			pair("delay = 0:", withPlacement(new PlainButton({ text: "Immediate" }), { text: "Opens immediately (delay 0)", delay: 0 })),
+			pair("delay = 500 (default):", withPlacement(new PlainButton({ text: "Default" }), { text: "Default 500ms delay", delay: 500 })),
+			pair("delay = 1500:", withPlacement(new PlainButton({ text: "Slow" }), { text: "Slow 1500ms delay", delay: 1500 }))
+		])
+	]);
 
 	// --- Programmatic API: openBy / close ---
-	// This sample deliberately uses sap.ui.core.tooltip.Tooltip directly (not through
-	// TooltipEnablement) to exercise the public openBy/close API.
-	const oAnchor = Element.getElementById("btn-api-anchor");
+	const oAnchor = new PlainButton({ text: "Anchor" });
 	const oApiTooltip = new Tooltip({ text: "Opened programmatically via Tooltip#openBy" });
-	Element.getElementById("btn-api-open").attachPress(function () {
-		oApiTooltip.openBy(oAnchor, 0);
-	});
-	Element.getElementById("btn-api-close").attachPress(function () {
-		oApiTooltip.close(0);
-	});
+	const oApiPanel = panel("Programmatic API: openBy / close", [
+		row([
+			pair("Anchor:", oAnchor),
+			new Button({ text: "openBy(anchor)", press: () => oApiTooltip.openBy(oAnchor, 0) }).addStyleClass("sapUiTinyMarginEnd"),
+			new Button({ text: "close(0)", press: () => oApiTooltip.close(0) })
+		])
+	]);
 
-	// --- Text with tooltip (no focus, no extended tab chain) ---
-	// Inline sap.m.Text inside the paragraph. The Text renders as a <span>
-	// so it stays inline in the surrounding prose.
-	new Text("txt-tooltip", {
-		text: "this is a longer highlighted phrase used for testing text selection"
-	}).addStyleClass("text-with-tooltip").placeAt("txt-tooltip-host");
-	attach(Element.getElementById("txt-tooltip"), { text: "Tooltip on plain (non-focusable) text" });
+	// --- Text with tooltip (non-focusable) ---
+	const oTextPanel = panel("Text with tooltip (no focus, no extended tab chain)", [
+		new Text({ text: "The phrase below is a non-focusable fake text with a tooltip. On desktop, hover it; on mobile, long-press it." }).addStyleClass("sapUiTinyMarginBottom"),
+		row([
+			label("Non-focusable text:"),
+			new FakeText({ text: "highlighted phrase for testing", tooltipText: "Tooltip on plain (non-focusable) text" })
+		])
+	]);
 
-	// --- Focusable text with tooltip (isolated) ---
-	// sap.m.Text doesn't expose a tabindex property; we set it directly on the
-	// DOM after first render so the keyboard-focus path is exercised here too.
-	const oFocusText = new Text("txt-tooltip-focus", {
-		text: "this is a longer focusable phrase used for testing focus and text selection"
-	}).addStyleClass("demo").placeAt("txt-tooltip-focus-host");
-	oFocusText.addEventDelegate({
-		onAfterRendering: function () {
-			oFocusText.getDomRef().tabIndex = 0;
-		}
-	});
-	attach(oFocusText, { text: "Tooltip on focusable text (Tab to focus, hover, or long-press)" });
+	// --- Focusable text with tooltip ---
+	const oFocusTextPanel = panel("Focusable text with tooltip (isolated)", [
+		new Text({ text: "The phrase below is focusable (tabindex=0). Tab to focus, hover, or long-press to open the tooltip." }).addStyleClass("sapUiTinyMarginBottom"),
+		row([
+			label("Focusable text:"),
+			new FakeText({ text: "focusable phrase for testing", tooltipText: "Tooltip on focusable text (Tab to focus, hover, or long-press)", focusable: true })
+		])
+	]);
 
 	// --- Right-click on selected text ---
-	const oRClickText = new Text("span-rclick", {
-		text: "Selectable text with a tooltip"
-	}).addStyleClass("demo").placeAt("span-rclick-host");
-	oRClickText.addEventDelegate({
-		onAfterRendering: function () {
-			oRClickText.getDomRef().tabIndex = 0;
+	const oRClickPanel = panel("Right-click on selected text (should NOT clear selection)", [
+		new Text({ text: "Select text on the page, then right-click on the text below. The native context menu should appear and the selection should remain intact." }).addStyleClass("sapUiTinyMarginBottom"),
+		row([
+			label("Right-click on text:"),
+			new FakeText({ text: "Selectable text with a tooltip", tooltipText: "Tooltip on selectable text — should not open while text is selected", focusable: true })
+		])
+	]);
+
+	// --- Links ---
+	const oLinksPanel = panel("Links - mobile long-press behavior", [
+		new Text({ text: "On desktop, hover/keyboard-focus the links to see the tooltip. On touch-only devices the tooltip is disabled for links so the native context menu remains available." }).addStyleClass("sapUiTinyMarginBottom"),
+		row([
+			label("Link with tooltip:"),
+			new FakeLink({ text: "SAP", href: "https://sap.com", tooltipText: "Tooltip on a link (desktop only, disabled for touch-only devices)" }),
+			label("Long text on link:"),
+			new FakeLink({ text: "SAP (long tooltip)", href: "https://sap.com", tooltipText: LONG_TOOLTIP })
+		])
+	]);
+
+	// --- Tooltip host inside Dialog / Popover / nested ---
+	function containerContent(sContext) {
+		return [
+			new FakeButton({ text: "Button in " + sContext, tooltipText: "Tooltip on a button in the " + sContext }).addStyleClass("sapUiSmallMarginBottom"),
+			new FakeText({ text: "Focusable text in " + sContext, tooltipText: "Tooltip on focusable text in the " + sContext, focusable: true }).addStyleClass("sapUiSmallMarginBottom"),
+			new FakeLink({ text: "Link in " + sContext, href: "https://sap.com", tooltipText: "Tooltip on a link in the " + sContext })
+		];
+	}
+
+	let oDialog;
+	let oPopover;
+	let oNestedDialog;
+	let oNestedPopover;
+
+	const oOpenDialogBtn = new Button({
+		text: "Open Dialog",
+		press: function () {
+			if (!oDialog) {
+				oDialog = new Dialog({
+					title: "Tooltip hosts inside a Dialog",
+					contentWidth: "24rem",
+					content: new VBox({ items: containerContent("Dialog") }).addStyleClass("sapUiSmallMargin"),
+					endButton: new Button({ text: "Close", press: () => oDialog.close() })
+				});
+			}
+			oDialog.open();
 		}
 	});
-	attach(oRClickText, { text: "Tooltip on selectable text — should not open while text is selected" });
 
-	// --- Links: mobile long-press behavior ---
-	// Tooltips on sap.m.Link are automatically disabled on touch-only devices
-	// (per design) so the native browser context menu remains accessible on
-	// long-press.
-	new Link("link-tooltip", {
-		text: "SAP",
-		href: "https://sap.com",
-		target: "_blank"
-	}).addStyleClass("demo").placeAt("link-tooltip-host");
-	attach(Element.getElementById("link-tooltip"), {
-		text: "Tooltip on a link (desktop only, disabled for touch-only devices)",
-		enableForTouchDevices: false
+	const oOpenPopoverBtn = new Button({
+		text: "Open Popover",
+		press: function () {
+			if (!oPopover) {
+				oPopover = new Popover({
+					title: "Tooltip hosts inside a Popover",
+					placement: "Bottom",
+					content: new VBox({ items: containerContent("Popover") }).addStyleClass("sapUiSmallMargin")
+				});
+			}
+			oPopover.openBy(oOpenPopoverBtn);
+		}
 	});
 
-	new Link("link-long", {
-		text: "SAP (long tooltip)",
-		href: "https://sap.com",
-		target: "_blank"
-	}).addStyleClass("demo").placeAt("link-long-host");
-	attach(Element.getElementById("link-long"), {
-		text: "A noticeably longer tooltip text shown on a link to verify wrapping " +
-			"and placement on desktop.",
-		enableForTouchDevices: false
+	const oOpenNestedBtn = new Button({
+		text: "Open Popover-in-Dialog",
+		press: function () {
+			if (!oNestedDialog) {
+				const oOpenInnerPopoverBtn = new Button({
+					text: "Open Popover inside this Dialog",
+					press: function () {
+						if (!oNestedPopover) {
+							oNestedPopover = new Popover({
+								title: "Popover nested in a Dialog",
+								placement: "Bottom",
+								content: new VBox({ items: containerContent("nested Popover") }).addStyleClass("sapUiSmallMargin")
+							});
+						}
+						oNestedPopover.openBy(oOpenInnerPopoverBtn);
+					}
+				});
+				oNestedDialog = new Dialog({
+					title: "Dialog hosting a nested Popover",
+					contentWidth: "26rem",
+					content: new VBox({
+						items: [
+							new Text({ text: "This dialog contains tooltip hosts, plus a button that opens a Popover nested inside the dialog — also with tooltip hosts." }).addStyleClass("sapUiTinyMarginBottom"),
+							...containerContent("Dialog"),
+							oOpenInnerPopoverBtn
+						]
+					}).addStyleClass("sapUiSmallMargin"),
+					endButton: new Button({ text: "Close", press: () => oNestedDialog.close() })
+				});
+			}
+			oNestedDialog.open();
+		}
 	});
+
+	const oContainersPanel = panel("Tooltip host inside Dialog / Popover / nested Popover-in-Dialog", [
+		row([oOpenDialogBtn.addStyleClass("sapUiTinyMarginEnd"), oOpenPopoverBtn.addStyleClass("sapUiTinyMarginEnd"), oOpenNestedBtn])
+	]);
 
 	// --- Viewport corners (auto-flip placement) ---
-	attachPlacement(Element.getElementById("btn-corner-tl"), { text: "Tooltip flips to bottom because there is no space above", placement: PlacementType.Top });
-	attachPlacement(Element.getElementById("btn-corner-tr"), { text: "Tooltip flips to left because there is no space on the right", placement: PlacementType.Right });
-	attachPlacement(Element.getElementById("btn-corner-bl"), { text: "Tooltip flips to right because there is no space on the left", placement: PlacementType.Left });
-	attachPlacement(Element.getElementById("btn-corner-br"), { text: "Tooltip flips to top because there is no space below", placement: PlacementType.Bottom });
+	const oCornerTL = withPlacement(new PlainButton({ text: "Top-Left (Top)" }), { text: "Tooltip flips to bottom because there is no space above", placement: PlacementType.Top });
+	const oCornerTR = withPlacement(new PlainButton({ text: "Top-Right (Right)" }), { text: "Tooltip flips to left because there is no space on the right", placement: PlacementType.Right });
+	const oCornerBL = withPlacement(new PlainButton({ text: "Bottom-Left (Left)" }), { text: "Tooltip flips to right because there is no space on the left", placement: PlacementType.Left });
+	const oCornerBR = withPlacement(new PlainButton({ text: "Bottom-Right (Bottom)" }), { text: "Tooltip flips to top because there is no space below", placement: PlacementType.Bottom });
 
-	const oCornerToggle = document.getElementById("cb-corners");
-	const oCornerHost = document.getElementById("viewport-corners");
-	if (oCornerToggle && oCornerHost) {
-		oCornerToggle.addEventListener("change", function () {
-			oCornerHost.hidden = !oCornerToggle.checked;
+	function placeCorner(oControl, sPos) {
+		oControl.addEventDelegate({
+			onAfterRendering: function () {
+				const oStyle = oControl.getDomRef().style;
+				oStyle.position = "fixed";
+				oStyle.zIndex = "100";
+				Object.assign(oStyle, sPos);
+			}
 		});
+		return oControl;
 	}
+	placeCorner(oCornerTL, { top: "3rem", left: "0.5rem" });
+	placeCorner(oCornerTR, { top: "3rem", right: "0.5rem" });
+	placeCorner(oCornerBL, { bottom: "0.5rem", left: "0.5rem" });
+	placeCorner(oCornerBR, { bottom: "0.5rem", right: "0.5rem" });
 
-	// --- Activation banners (auto-detected on touch devices) ---
-	// On touch devices we surface two banners that make the per-gesture behavior
-	// visible without a manual toggle:
-	//   • Blue "Activated" — fires on a short tap (the demo's natural click).
-	//   • Red  "Long press" — fires when a touch survives past the tooltip open
-	//     delay; this is the gesture the tooltip rides on.
-	const oBanner = document.getElementById("activation-banner");
-	const oLongPressBanner = document.getElementById("long-press-banner");
-	const bIsTouchOnly = Device.support.touch && !Device.system.desktop && !Device.system.combi;
-	const LONG_PRESS_DELAY = 500;
-
-	let iBannerTimeout;
-	function showBanner(oEl, sText) {
-		if (!oEl) {
-			return;
+	const oCornerContainer = new HBox({ items: [oCornerTL, oCornerTR, oCornerBL, oCornerBR], visible: false });
+	const oCornerToggle = new CheckBox({
+		text: "Show viewport-corner buttons",
+		select: function (oEvent) {
+			oCornerContainer.setVisible(oEvent.getParameter("selected"));
 		}
-		oEl.textContent = sText;
-		oEl.hidden = false;
-		clearTimeout(iBannerTimeout);
-		iBannerTimeout = setTimeout(function () { oEl.hidden = true; }, 1500);
-	}
+	});
+	const oCornerPanel = panel("Viewport edges (auto-flip placement)", [
+		new Text({ text: "The fixed-position buttons in each viewport corner use a placement that prefers off-screen. The tooltip should flip to the opposite side instead of being clipped." }).addStyleClass("sapUiTinyMarginBottom"),
+		oCornerToggle,
+		oCornerContainer
+	]);
 
-	if (bIsTouchOnly) {
-		let iLongPressTimer;
-		let bLongPressFired = false;
-
-		document.body.addEventListener("touchstart", function (oEvent) {
-			const oTarget = oEvent.target.closest(".demo, .demo-host, .text-with-tooltip");
-			if (!oTarget) {
-				return;
-			}
-			bLongPressFired = false;
-			clearTimeout(iLongPressTimer);
-			iLongPressTimer = setTimeout(function () {
-				bLongPressFired = true;
-				showBanner(oLongPressBanner, "Long press: " + (oTarget.id || oTarget.tagName.toLowerCase()));
-			}, LONG_PRESS_DELAY);
-		}, { passive: true });
-
-		["touchmove", "touchcancel"].forEach(function (sType) {
-			document.body.addEventListener(sType, function () {
-				clearTimeout(iLongPressTimer);
-			}, { passive: true });
-		});
-
-		document.body.addEventListener("touchend", function () {
-			clearTimeout(iLongPressTimer);
-		}, { passive: true });
-
-		document.body.addEventListener("click", function (oEvent) {
-			const oTarget = oEvent.target.closest(".demo, .demo-host, .text-with-tooltip");
-			if (!oTarget) {
-				return;
-			}
-			if (bLongPressFired) {
-				bLongPressFired = false;
-				return;
-			}
-			if (oTarget.tagName === "A") {
-				oEvent.preventDefault();
-			}
-			showBanner(oBanner, "Activated: " + (oTarget.id || oTarget.tagName.toLowerCase()));
-		});
-	}
+	new Page({
+		title: "sap.ui.core.tooltip.Tooltip - showcase",
+		content: [
+			new VBox({
+				items: [
+					new Text({ text: "Hover or keyboard-focus the fake controls to see the tooltip. Press Esc to dismiss." }).addStyleClass("sapUiSmallMarginBottom"),
+					oDefaultPanel,
+					oPlacementPanel,
+					oDelayPanel,
+					oApiPanel,
+					oTextPanel,
+					oFocusTextPanel,
+					oRClickPanel,
+					oLinksPanel,
+					oContainersPanel,
+					oCornerPanel
+				]
+			}).addStyleClass("sapUiContentPadding")
+		]
+	}).placeAt("content");
 });

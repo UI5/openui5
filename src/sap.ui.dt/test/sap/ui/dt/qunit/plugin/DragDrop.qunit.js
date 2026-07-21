@@ -553,22 +553,28 @@ sap.ui.define([
 			}
 		}, function() {
 			QUnit.test("when a dragover event happens in a an overlay with a scrollbar near the edge...", function(assert) {
-				var done = assert.async();
-				var oPageContentOverlay = this.oPageOverlay.getAggregationOverlay("content");
-				var oPageContent = oPageContentOverlay.getGeometry().domRef;
-				var oEvent;
+				const done = assert.async();
+				const oPageContentOverlay = this.oPageOverlay.getAggregationOverlay("content");
+				const oPageContentOverlayDomRef = oPageContentOverlay.getDomRef();
+				const oPageContent = oPageContentOverlay.getGeometry().domRef;
 
-				var oOffset = oPageContentOverlay.offset();
+				// The _dragScroll handler compares the event's clientX/clientY against the
+				// overlay's document-relative offset (jQuery .offset()). Build the event
+				// coordinates on the same document-relative scale so the scroll-trap math
+				// matches regardless of how far qunit-fixture is scrolled down the page.
+				const oRect = oPageContentOverlayDomRef.getBoundingClientRect();
+				const iOffsetLeft = oRect.left + window.scrollX;
+				const iOffsetTop = oRect.top + window.scrollY;
 
-				var iX = oOffset.left + 10;
-				var iY = oOffset.top + oPageContentOverlay.height - 10;
+				const iX = iOffsetLeft + 10;
+				const iY = iOffsetTop + oRect.height - 10;
 
 				oPageContent.addEventListener("scroll", function() {
 					assert.notStrictEqual(oPageContent.scrollTop, 0, "page content is scrolled after drag event");
 					done();
 				});
 
-				oEvent = new MouseEvent("dragover", {
+				const oEvent = new MouseEvent("dragover", {
 					view: window,
 					bubbles: true,
 					cancelable: true,
@@ -576,7 +582,7 @@ sap.ui.define([
 					clientY: iY
 				});
 
-				oPageContentOverlay.dispatchEvent(oEvent);
+				oPageContentOverlayDomRef.dispatchEvent(oEvent);
 			});
 		});
 	}

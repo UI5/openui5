@@ -527,6 +527,28 @@ sap.ui.define([
 		});
 	});
 
+	// ---------------------------------------------------------------------------------------------
+	// Contract guard for the UI5 Flexibility Support Chrome extension
+	// (repo: ui5-flexibility/ui5-flexibility-support-chrome-extension).
+	//
+	// The extension sets a conditional debugger breakpoint on the anchor line below (located by
+	// text search) to force the use of the SupportLocalStorageConnector by reassigning the
+	// "aConnectors" and "mConnectorNamespaces" variables that are in scope at that line.
+	// ---------------------------------------------------------------------------------------------
+	QUnit.module("UI5 Flexibility Support extension breakpoint contract");
+
+	QUnit.test("the breakpoint anchor line still exists in the StorageUtils source", async function(assert) {
+		const sModuleUrl = sap.ui.require.toUrl("sap/ui/fl/initial/_internal/StorageUtils.js");
+		const sSource = await (await fetch(sModuleUrl)).text();
+		assert.ok(
+			sSource.includes(
+				"const aConnectorModules = await StorageUtils.requireConnectors(aConnectors, bLoadConnectors, mConnectorNamespaces);"
+			),
+			"the anchor line used by the UI5 Flexibility Support extension is present - "
+			+ "if you must change it, update UploadFileUtils.js in the extension"
+		);
+	});
+
 	QUnit.done(function() {
 		document.getElementById("qunit-fixture").style.display = "none";
 	});

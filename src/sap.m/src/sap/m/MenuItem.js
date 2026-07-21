@@ -326,7 +326,7 @@ sap.ui.define([
 				posinset: oAccInfo['posinset'] || null,
 				setsize: oAccInfo['setsize'] || null,
 				selected: null,
-				checked: bIsSelected || null,
+				checked: this._getItemSelectionMode() !== ItemSelectionMode.None ? bIsSelected : null,
 				keyshortcuts: sShortcutText || null,
 				labelledby: { value: `${this.getId()}-txt`, append: true },
 				describedby: aDescribedBy.length ? { value: aDescribedBy.join(" "), append: true } : null,

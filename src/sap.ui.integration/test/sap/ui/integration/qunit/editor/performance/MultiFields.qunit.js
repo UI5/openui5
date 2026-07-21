@@ -737,19 +737,13 @@ sap.ui.define([
 					assert.ok(oLabel1.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel1.getText(), "iconParameter1", "Label 1: Has static label text");
 					assert.ok(oControl1.isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field 1: Icon Select Field");
-					var oSelect1 = oControl1.getAggregation("_control");
 					assert.ok(oLabel2.isA("sap.m.Label"), "Label 2: Form content contains a Label");
 					assert.equal(oLabel2.getText(), "iconParameter2", "Label 2: Has static label text");
 					assert.ok(oControl2.isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field 2: Icon Select Field");
-					var oSelect2 = oControl2.getAggregation("_control");
 					EditorQunitUtils.isReady(oEditor).then(function () {
 						time = new Date().getTime() - start.getTime();
 						assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 						assert.ok(oEditor.isReady(), "Editor is ready");
-						oSelect1.setSelectedIndex(10);
-						oSelect1.open();
-						oSelect2.setSelectedIndex(10);
-						oSelect2.open();
 						EditorQunitUtils.wait().then(function () {
 							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
@@ -776,19 +770,13 @@ sap.ui.define([
 								assert.ok(oLabel1.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 								assert.equal(oLabel1.getText(), "iconParameter1", "Label 1: Has static label text");
 								assert.ok(oControl1.isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field 1: Icon Select Field");
-								var oSelect1 = oControl1.getAggregation("_control");
 								assert.ok(oLabel2.isA("sap.m.Label"), "Label 2: Form content contains a Label");
 								assert.equal(oLabel2.getText(), "iconParameter2", "Label 2: Has static label text");
 								assert.ok(oControl2.isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field 2: Icon Select Field");
-								var oSelect2 = oControl2.getAggregation("_control");
 								EditorQunitUtils.isReady(oEditor).then(function () {
 									time = new Date().getTime() - start.getTime();
 									assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 									assert.ok(oEditor.isReady(), "Editor is ready");
-									oSelect1.setSelectedIndex(10);
-									oSelect1.open();
-									oSelect2.setSelectedIndex(10);
-									oSelect2.open();
 									EditorQunitUtils.wait().then(function () {
 										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
@@ -815,19 +803,13 @@ sap.ui.define([
 											assert.ok(oLabel1.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 											assert.equal(oLabel1.getText(), "iconParameter1", "Label 1: Has static label text");
 											assert.ok(oControl1.isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field 1: Icon Select Field");
-											var oSelect1 = oControl1.getAggregation("_control");
 											assert.ok(oLabel2.isA("sap.m.Label"), "Label 2: Form content contains a Label");
 											assert.equal(oLabel2.getText(), "iconParameter2", "Label 2: Has static label text");
 											assert.ok(oControl2.isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field 2: Icon Select Field");
-											var oSelect2 = oControl2.getAggregation("_control");
 											EditorQunitUtils.isReady(oEditor).then(function () {
 												time = new Date().getTime() - start.getTime();
 												assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 												assert.ok(oEditor.isReady(), "Editor is ready");
-												oSelect1.setSelectedIndex(10);
-												oSelect1.open();
-												oSelect2.setSelectedIndex(10);
-												oSelect2.open();
 												EditorQunitUtils.wait().then(function () {
 													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
@@ -854,19 +836,13 @@ sap.ui.define([
 														assert.ok(oLabel1.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 														assert.equal(oLabel1.getText(), "iconParameter1", "Label 1: Has static label text");
 														assert.ok(oControl1.isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field 1: Icon Select Field");
-														var oSelect1 = oControl1.getAggregation("_control");
 														assert.ok(oLabel2.isA("sap.m.Label"), "Label 2: Form content contains a Label");
 														assert.equal(oLabel2.getText(), "iconParameter2", "Label 2: Has static label text");
 														assert.ok(oControl2.isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field 2: Icon Select Field");
-														var oSelect2 = oControl2.getAggregation("_control");
 														EditorQunitUtils.isReady(oEditor).then(function () {
 															time = new Date().getTime() - start.getTime();
 															assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 															assert.ok(oEditor.isReady(), "Editor is ready");
-															oSelect1.setSelectedIndex(10);
-															oSelect1.open();
-															oSelect2.setSelectedIndex(10);
-															oSelect2.open();
 															EditorQunitUtils.wait().then(function () {
 																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
@@ -893,19 +869,13 @@ sap.ui.define([
 																	assert.ok(oLabel1.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 																	assert.equal(oLabel1.getText(), "iconParameter1", "Label 1: Has static label text");
 																	assert.ok(oControl1.isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field 1: Icon Select Field");
-																	var oSelect1 = oControl1.getAggregation("_control");
 																	assert.ok(oLabel2.isA("sap.m.Label"), "Label 2: Form content contains a Label");
 																	assert.equal(oLabel2.getText(), "iconParameter2", "Label 2: Has static label text");
 																	assert.ok(oControl2.isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field 2: Icon Select Field");
-																	var oSelect2 = oControl2.getAggregation("_control");
 																	EditorQunitUtils.isReady(oEditor).then(function () {
 																		time = new Date().getTime() - start.getTime();
 																		assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 																		assert.ok(oEditor.isReady(), "Editor is ready");
-																		oSelect1.setSelectedIndex(10);
-																		oSelect1.open();
-																		oSelect2.setSelectedIndex(10);
-																		oSelect2.open();
 																		EditorQunitUtils.wait().then(function () {
 																			EditorQunitUtils.destroyEditor(oEditor);
 																			oHost.destroy();
@@ -1657,11 +1627,9 @@ sap.ui.define([
 					var oLabel7 = oEditor.getAggregation("_formContent")[13];
 					var oField7 = oEditor.getAggregation("_formContent")[14];
 					var oControl7 = oField7.getAggregation("_field");
-					var oSelect7 = oControl7.getAggregation("_control");
 					var oLabel8 = oEditor.getAggregation("_formContent")[15];
 					var oField8 = oEditor.getAggregation("_formContent")[16];
 					var oControl8 = oField8.getAggregation("_field");
-					var oSelect8 = oControl8.getAggregation("_control");
 					var oLabel9 = oEditor.getAggregation("_formContent")[17];
 					var oField9 = oEditor.getAggregation("_formContent")[18];
 					var oControl9 = oField9.getAggregation("_field");
@@ -1796,10 +1764,6 @@ sap.ui.define([
 						assert.equal(aItems4[3].getText(), "text4req", "Field 4: Select item 3 Text is OK");
 						assert.equal(oControl5.getItems().length, 5, "Field 5: MultiComboBox items lenght is OK");
 						assert.equal(oControl6.getItems().length, 6, "Field 6: MultiComboBox items lenght is OK");
-						oSelect7.setSelectedIndex(10);
-						oSelect7.open();
-						oSelect8.setSelectedIndex(10);
-						oSelect8.open();
 						assert.equal(oSelect9.getSelectedIndex(), 2, "Field 9: selected index is 2");
 						assert.equal(oSelect9.getItems().length, 3, "Field 9: select item number is 3");
 						oSelect9.focus();

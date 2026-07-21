@@ -132,7 +132,9 @@ sap.ui.define([
 
 		oRm.openEnd();
 
-		oRm.voidStart("hr").voidEnd();
+		oRm.voidStart("hr");
+		oRm.attr("aria-hidden", "true");
+		oRm.voidEnd();
 
 		oRm.close("li");
 	};

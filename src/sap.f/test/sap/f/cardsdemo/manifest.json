@@ -207,6 +207,11 @@
 					"target": "delayedLoading"
 				},
 				{
+					"pattern": "contextDependencies",
+					"name": "contextDependencies",
+					"target": "contextDependencies"
+				},
+				{
 					"pattern": "noHeaderNoContent",
 					"name": "noHeaderNoContent",
 					"target": "noHeaderNoContent"
@@ -476,6 +481,11 @@
 				"delayedLoading": {
 					"id": "delayedLoading",
 					"name": "DelayedLoading",
+					"level": 1
+				},
+				"contextDependencies": {
+					"id": "contextDependencies",
+					"name": "ContextDependencies",
 					"level": 1
 				},
 				"timelineContent": {

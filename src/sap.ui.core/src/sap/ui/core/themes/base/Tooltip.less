@@ -8,6 +8,17 @@
 // Enlarges the arrow container so the high contrast border on the tip is not clipped by overflow:hidden.
 @_sap_ui_core_Tooltip_ArrowBorderWidth: 0.125rem;
 
+// Applied to the tooltip host element on touch devices to suppress native touch
+// interactions on long-press: the iOS touch callout (context menu, which iOS does
+// not expose as a contextmenu event) and text selection of the underlying text.
+html.sap-phone .sapUiSelectable.sapUiCoreTooltipHostSuppressSelection,
+html.sap-tablet:not(.sap-desktop) .sapUiSelectable.sapUiCoreTooltipHostSuppressSelection,
+.sapUiCoreTooltipHostSuppressSelection  {
+	-webkit-touch-callout: none; // suppresses the iOS context menu on long-press
+	-webkit-user-select: none;
+	user-select: none;
+}
+
 /* The tooltip renders through sap.m.Popover, so the structural inner selectors
    (.sapMPopoverWrapper, .sapMPopoverCont, .sapMPopoverArr*) target the real
    Popover DOM. The box-shadow / background / border are declared on the
