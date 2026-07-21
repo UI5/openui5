@@ -330,8 +330,12 @@ sap.ui.define([
 							affectedControls: [oRevertData.labelSelector]
 						};
 					}
+					// If a layout control was created, revert data holds the outer control's selector,
+					// which is what needs to be highlighted in the change visualization.
+					const oSelector = (oRevertData && oRevertData.newFieldSelector)
+						|| oChange.getContent().newFieldSelector;
 					return {
-						affectedControls: [oChange.getContent().newFieldSelector]
+						affectedControls: [oSelector]
 					};
 				},
 
