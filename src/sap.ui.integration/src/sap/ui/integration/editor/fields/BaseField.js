@@ -330,7 +330,9 @@ sap.ui.define([
 			if (sPath.endsWith("/")) {
 				sPath = sPath.substring(0, sPath.length - 1);
 			}
-			var aPath = sPath.split("/");
+			var aPath = sPath.split("/").filter(function(sSegment) {
+				return sSegment && ["__proto__", "constructor", "prototype"].indexOf(sSegment) === -1;
+			});
 			var oResult = ObjectPath.get(aPath, oData);
 			return oResult;
 		});
