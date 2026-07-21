@@ -826,6 +826,53 @@ sap.ui.define([
 		}, "'press' event handler called with the correct parameters");
 	});
 
+	QUnit.test("Row action clone is not destroyed when inner RowActionItem is destroyed", async function(assert) {
+		const oRowActionItemPress = sinon.spy();
+
+		await this.createTable({
+			rowSettings: new RowSettings({
+				rowActions: [
+					new RowActionItem({
+						type: "Navigation",
+						press: function(oEvent) {
+							oRowActionItemPress(oEvent);
+						}
+					})
+				]
+			})
+		});
+
+		const oInnerTable = this.oTable._oTable;
+
+		await new Promise((resolve) => {
+			oInnerTable.attachEventOnce("rowsUpdated", resolve);
+		});
+
+		const oType = this.oTable.getType();
+		const oRow = oInnerTable.getRows()[0];
+		const oRowAction = oRow.getRowAction();
+		const oIcon = Element.closestTo(oRowAction.getDomRef().children[0]);
+
+		// Trigger press via DOM to create and cache the RowActionItem clone
+		oIcon.firePress();
+
+		assert.ok(oRowActionItemPress.calledOnce, "Press event fired on first navigation");
+
+		// Verify clone is cached and not a dependent of the inner RowActionItem
+		const oCloneMap = oType._mRowActionItemClones;
+		assert.strictEqual(oCloneMap.size, 1, "One clone is cached");
+		const oCachedClone = oCloneMap.values().next().value;
+		assert.notOk(oCachedClone.isDestroyed(), "Clone is not destroyed after first press");
+		assert.notOk(oCachedClone.getParent(), "Clone has no parent after press (was removed as dependent)");
+
+		// Destroy the inner RowActionItem (simulates what happens during rebinding)
+		oRowAction.getItems()[0].destroy();
+
+		// Verify the cached clone survived
+		assert.notOk(oCachedClone.isDestroyed(), "Clone survives inner RowActionItem destruction");
+		assert.strictEqual(oCloneMap.size, 1, "Clone is still in cache");
+	});
+
 	QUnit.test("rowPress with non-Navigation row actions fires cellClick correctly", async function(assert) {
 		const oRowPress = sinon.spy();
 
