@@ -10,23 +10,55 @@
 			<layout:VerticalLayout class="sapUiContentPadding" width="100%">
 				<Toolbar>
 					<content>
-						<Title text="Button"/>
+						<Title text="Buttons"/>
 					</content>
 				</Toolbar>
-				<Button
-					id="BadgedButton"
-					class="sapUiTinyMarginBeginEnd"
-					icon="{= ${/buttonWithIcon} ? ${/buttonIcon} : '' }"
-					type="{/buttonType}"
-					badgeStyle="{/badgeStyle}"
-					text="{= ${/buttonWithText} ? ${/buttonText} : '' }">
-					<customData>
-						<BadgeCustomData
-							key="badge"
-							value=""
-							visible=""/>
-					</customData>
-				</Button>
+				<Label class="sapUiTinyMarginBeginEnd sapUiTinyMarginTop" text="Default (Counter) BadgeStyle"/>
+				<FlexBox class="sapUiTinyMarginBeginEnd sapUiTinyMarginTop" wrap="Wrap">
+					<Button
+						id="DefaultIconButton"
+						class="sapUiTinyMarginEnd"
+						icon="sap-icon://cart"
+						type="{/buttonType}"
+						badgeStyle="Default">
+						<customData>
+							<BadgeCustomData key="badge" value="5" visible="true"/>
+						</customData>
+					</Button>
+					<Button
+						id="DefaultTextButton"
+						class="sapUiTinyMarginEnd"
+						text="Button with Badge"
+						type="{/buttonType}"
+						badgeStyle="Default">
+						<customData>
+							<BadgeCustomData key="badge" value="5" visible="true"/>
+						</customData>
+					</Button>
+				</FlexBox>
+				<Label class="sapUiTinyMarginBeginEnd sapUiTinyMarginTop" text="Attention BadgeStyle"/>
+				<FlexBox class="sapUiTinyMarginBeginEnd sapUiTinyMarginTop" wrap="Wrap">
+					<Button
+						id="AttentionIconButton"
+						class="sapUiTinyMarginEnd"
+						icon="sap-icon://cart"
+						type="{/buttonType}"
+						badgeStyle="Attention">
+						<customData>
+							<BadgeCustomData key="badge" value="5" visible="true"/>
+						</customData>
+					</Button>
+					<Button
+						id="AttentionTextButton"
+						class="sapUiTinyMarginEnd"
+						text="Button with Badge"
+						type="{/buttonType}"
+						badgeStyle="Attention">
+						<customData>
+							<BadgeCustomData key="badge" value="5" visible="true"/>
+						</customData>
+					</Button>
+				</FlexBox>
 				<Toolbar class="sapUiSmallMarginTop">
 					<content>
 						<Title text="Badge min, max and current values"/>
@@ -79,6 +111,11 @@
 						<Title text="Button properties"/>
 					</content>
 				</Toolbar>
+				<MessageStrip
+					class="sapUiSmallMarginTop sapUiTinyMarginBeginEnd"
+					text="While the badge is technically possible on the Accept, Reject and Attention button variants, these combinations should not be used. The badge is intended solely for neutral counter use cases — such as notification or item counts on default and icon-only buttons. Applying a badge to a non-neutral button stacks two competing signals (the button's color type and the badge's value) and creates ambiguity about what the number refers to."
+					type="Warning"
+					showIcon="true"/>
 				<FlexBox
 					class="sapUiTinyMarginBeginEnd"
 					alignItems="Center"
@@ -94,49 +131,11 @@
 								key="Default"
 								text="Default"/>
 						<core:Item
-								key="Ghost"
-								text="Ghost"/>
-						<core:Item
 								key="Transparent"
 								text="Transparent"/>
 						<core:Item
 								key="Emphasized"
 								text="Emphasized"/>
-					</Select>
-				</FlexBox>
-				<FlexBox
-					class="sapUiTinyMarginBeginEnd"
-					alignItems="Center"
-					justifyContent="Start">
-					<Text
-						renderWhitespace="true"
-						text="With "/>
-					<CheckBox
-						id="IconCheckBox"
-						text="Icon"
-						selected="{/buttonWithIcon}"/>
-					<CheckBox
-						id="TextCheckBox"
-						text="Text"
-						selected="{/buttonWithText}"/>
-				</FlexBox>
-				<FlexBox
-					class="sapUiTinyMarginBeginEnd"
-					alignItems="Center"
-					justifyContent="Start">
-					<Text
-						renderWhitespace="true"
-						width="50px"
-						text="Badge Style"/>
-					<Select
-						id="BadgeStyle"
-						selectedKey="{/badgeStyle}">
-						<core:Item
-								key="Default"
-								text="Default"/>
-						<core:Item
-								key="Attention"
-								text="Attention"/>
 					</Select>
 				</FlexBox>
 				<Toolbar class="sapUiSmallMarginTop">
@@ -152,10 +151,6 @@
 					class="sapUiTinyMargin"
 					wrapping="true"
 					text="2. If an application developer wants to control more precisely the value and appearance of the Badge, that can be done as it is presented in this sample, but the constraints mentioned in (1) cannot be exceeded!"/>
-				<Text
-					class="sapUiTinyMargin"
-					wrapping="true"
-					text="3. Badge can be used with all Button types, but it is recommended to use it only with the following Button types: Default, Ghost, Transparent and Emphasized."/>
 			</layout:VerticalLayout>
 		</content>
 	</Page>
