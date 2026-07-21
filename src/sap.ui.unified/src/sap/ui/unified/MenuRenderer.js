@@ -162,7 +162,9 @@ MenuRenderer.renderSeparator = function(oRm, bAccessible) {
 	oRm.openEnd();
 	oRm.close("div");
 
-	oRm.voidStart("hr").voidEnd();
+	oRm.voidStart("hr");
+	oRm.attr("aria-hidden", "true");
+	oRm.voidEnd();
 
 	oRm.openStart("div");
 	oRm.class("sapUiMnuDivR");

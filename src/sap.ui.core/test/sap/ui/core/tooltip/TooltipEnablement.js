@@ -1,190 +1,190 @@
 sap.ui.require([
-	"sap/m/Button",
-	"sap/m/Link",
+	"local/FakeControls",
+	"sap/m/Page",
+	"sap/m/Panel",
 	"sap/m/Text",
-	"sap/ui/core/tooltip/TooltipEnablement",
-	"sap/ui/core/Core",
-	"sap/ui/core/Element",
-	"sap/ui/Device"
-], async function (Button, Link, Text, TooltipEnablement, Core, Element, Device) {
+	"sap/m/Label",
+	"sap/m/Button",
+	"sap/m/Dialog",
+	"sap/m/Popover",
+	"sap/m/VBox",
+	"sap/m/HBox",
+	"sap/ui/core/Core"
+], async function (FakeControls, Page, Panel, Text, Label, Button, Dialog, Popover, VBox, HBox, Core) {
 	"use strict";
+
+	const { FakeButton, FakeText, FakeLink } = FakeControls;
+	const LONG_TOOLTIP = "This is a noticeably longer tooltip text used to verify wrapping behavior.";
+	const VERY_LONG_TOOLTIP =
+		"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra hendrerit convallis. " +
+		"Mauris quis est metus. Curabitur convallis vel arcu id cursus. Maecenas augue neque, lacinia sed " +
+		"pulvinar eu, malesuada sagittis mauris. Praesent malesuada erat vel tortor dictum, non tempor mauris finibus.";
 
 	await Core.ready();
 
-	// Materialize a sap.m.Button into every placeholder in the page. The HTML
-	// declares each Button as <div data-sap-m-button data-button-id="..." data-text="...">.
-	// The host div is given an id so placeAt() can resolve it as a UIArea container.
-	document.querySelectorAll("[data-sap-m-button]").forEach(function (oHost) {
-		const sId = oHost.getAttribute("data-button-id");
-		const sText = oHost.getAttribute("data-text") || "";
-		const sHostId = sId + "-host";
-		oHost.id = sHostId;
-		new Button(sId, { text: sText }).placeAt(sHostId);
-	});
+	function label(sText) {
+		return new Label({ text: sText, width: "12rem" });
+	}
 
-	// Attach a TooltipEnablement helper to the given control.
-	function attach(oControl, mSettings) {
-		if (!oControl) {
-			return null;
-		}
-		const oConfig = {};
-		if (mSettings.text !== undefined) {
-			const sText = mSettings.text;
-			oConfig.textProvider = () => sText;
-		}
-		if (mSettings.enableForTouchDevices !== undefined) {
-			oConfig.enableForTouchDevices = mSettings.enableForTouchDevices;
-		}
-		return new TooltipEnablement(oControl, oConfig);
+	function panel(sTitle, aContent) {
+		return new Panel({
+			headerText: sTitle,
+			content: aContent
+		}).addStyleClass("sapUiSmallMarginBottom");
+	}
+
+	function row(aContent) {
+		return new HBox({
+			items: aContent,
+			alignItems: "Center",
+			wrap: "Wrap"
+		}).addStyleClass("sapUiTinyMarginBottom").setWidth("100%");
 	}
 
 	// --- Buttons with tooltip text ---
-	attach(Element.getElementById("btn-default"),   { text: "Default tooltip" });
-	attach(Element.getElementById("btn-short"),     { text: "Short" });
-	attach(Element.getElementById("btn-long"),      { text: "This is a noticeably longer tooltip text used to verify wrapping behavior." });
-	attach(Element.getElementById("btn-very-long"), {
-		text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra hendrerit convallis. " +
-			"Mauris quis est metus. Curabitur convallis vel arcu id cursus. Maecenas augue neque, lacinia sed " +
-			"pulvinar eu, malesuada sagittis mauris. Praesent malesuada erat vel tortor dictum, non tempor " +
-			"mauris finibus. Sed eu porttitor velit, quis consequat lectus. Fusce volutpat nisl augue, eget " +
-			"dictum mi dictum sit amet."
-	});
+	const oButtonsPanel = panel("Buttons with tooltip text", [
+		row([
+			label("Default:"),
+			new FakeButton({ text: "Default", tooltipText: "Default tooltip" }),
+			new FakeButton({ text: "Short text", tooltipText: "Short" }),
+			new FakeButton({ text: "Long text", tooltipText: LONG_TOOLTIP }),
+			new FakeButton({ text: "Very long text", tooltipText: VERY_LONG_TOOLTIP })
+		])
+	]);
 
-	// --- Text with tooltip (no focus, no extended tab chain) ---
-	// Inline sap.m.Text inside the paragraph. The Text renders as a <span>
-	// so it stays inline in the surrounding prose.
-	new Text("txt-tooltip", {
-		text: "this is a longer highlighted phrase used for testing text selection"
-	}).addStyleClass("text-with-tooltip").placeAt("txt-tooltip-host");
-	attach(Element.getElementById("txt-tooltip"), { text: "Tooltip on plain (non-focusable) text" });
+	// --- Text with tooltip (non-focusable) ---
+	const oTextPanel = panel("Text with tooltip (no focus, no extended tab chain)", [
+		new Text({ text: "The phrase below is a non-focusable fake text with a tooltip. On desktop, hover it. On mobile, long-press it." }).addStyleClass("sapUiTinyMarginBottom"),
+		row([
+			label("Non-focusable text:"),
+			new FakeText({ text: "highlighted phrase for testing", tooltipText: "Tooltip on plain (non-focusable) text" })
+		])
+	]);
 
-	// --- Focusable text with tooltip (isolated) ---
-	// sap.m.Text doesn't expose a tabindex property; we set it directly on the
-	// DOM after first render so the keyboard-focus path is exercised here too.
-	const oFocusText = new Text("txt-tooltip-focus", {
-		text: "this is a longer focusable phrase used for testing focus and text selection"
-	}).addStyleClass("demo").placeAt("txt-tooltip-focus-host");
-	oFocusText.addEventDelegate({
-		onAfterRendering: function () {
-			oFocusText.getDomRef().tabIndex = 0;
-		}
-	});
-	attach(oFocusText, { text: "Tooltip on focusable text (Tab to focus, hover, or long-press)" });
+	// --- Focusable text with tooltip ---
+	const oFocusTextPanel = panel("Focusable text with tooltip (isolated)", [
+		new Text({ text: "The phrase below is focusable (tabindex=0). Tab to focus it, hover, or long-press to open the tooltip." }).addStyleClass("sapUiTinyMarginBottom"),
+		row([
+			label("Focusable text:"),
+			new FakeText({ text: "focusable phrase for testing", tooltipText: "Tooltip on focusable text (Tab to focus, hover, or long-press)", focusable: true })
+		])
+	]);
 
 	// --- Right-click on selected text ---
-	const oRClickText = new Text("span-rclick", {
-		text: "Selectable text with a tooltip"
-	}).addStyleClass("demo").placeAt("span-rclick-host");
-	oRClickText.addEventDelegate({
-		onAfterRendering: function () {
-			oRClickText.getDomRef().tabIndex = 0;
-		}
-	});
-	attach(oRClickText, { text: "Tooltip on selectable text — should not open while text is selected" });
+	const oRClickPanel = panel("Right-click on selected text (should NOT clear selection)", [
+		new Text({ text: "Select text on the page, then right-click on the text below. The native context menu should appear and the selection should remain intact — the tooltip must not open while a selection exists." }).addStyleClass("sapUiTinyMarginBottom"),
+		row([
+			label("Right-click on text:"),
+			new FakeText({ text: "Selectable text with a tooltip", tooltipText: "Tooltip on selectable text — should not open while text is selected", focusable: true })
+		])
+	]);
 
-	// --- Links: mobile long-press behavior ---
-	// Tooltips on sap.m.Link are disabled on touch-only devices (per design)
-	// so the native browser context menu remains accessible on long-press.
-	new Link("link-tooltip", {
-		text: "SAP",
-		href: "https://sap.com",
-		target: "_blank"
-	}).addStyleClass("demo").placeAt("link-tooltip-host");
-	attach(Element.getElementById("link-tooltip"), {
-		text: "Tooltip on a link (desktop only, disabled for touch-only devices)",
-		enableForTouchDevices: false
-	});
+	// --- Links ---
+	const oLinksPanel = panel("Links - mobile long-press behavior", [
+		new Text({ text: "On desktop, hover/keyboard-focus the links to see the tooltip. On touch-only devices the tooltip is disabled for links so the native context menu remains available on long-press." }).addStyleClass("sapUiTinyMarginBottom"),
+		row([
+			label("Link with tooltip:"),
+			new FakeLink({ text: "SAP", href: "https://sap.com", tooltipText: "Tooltip on a link (desktop only, disabled for touch-only devices)" }),
+			label("Long text on link:"),
+			new FakeLink({ text: "SAP (long tooltip)", href: "https://sap.com", tooltipText: LONG_TOOLTIP })
+		])
+	]);
 
-	new Link("link-long", {
-		text: "SAP (long tooltip)",
-		href: "https://sap.com",
-		target: "_blank"
-	}).addStyleClass("demo").placeAt("link-long-host");
-	attach(Element.getElementById("link-long"), {
-		text: "A noticeably longer tooltip text shown on a link to verify wrapping " +
-			"and placement on desktop.",
-		enableForTouchDevices: false
-	});
-
-	// --- Activation banners (auto-detected on touch devices) ---
-	// On touch devices we surface two banners that make the per-gesture behavior
-	// visible without a manual toggle:
-	//   • Blue "Activated" — fires on a short tap (the demo's natural click).
-	//   • Red  "Long press" — fires when a touch survives past the tooltip open
-	//     delay; this is the gesture the tooltip rides on.
-	const oBanner = document.getElementById("activation-banner");
-	const oLongPressBanner = document.getElementById("long-press-banner");
-	const bIsTouchOnly = Device.support.touch && !Device.system.desktop && !Device.system.combi;
-	const LONG_PRESS_DELAY = 500;
-
-	let iBannerTimeout;
-	function showBanner(oEl, sText) {
-		if (!oEl) {
-			return;
-		}
-		oEl.textContent = sText;
-		oEl.hidden = false;
-		clearTimeout(iBannerTimeout);
-		iBannerTimeout = setTimeout(function () { oEl.hidden = true; }, 1500);
+	// --- Tooltip host inside Dialog / Popover / nested ---
+	function containerContent(sContext) {
+		return [
+			new FakeButton({ text: "Button in " + sContext, tooltipText: "Tooltip on a button in the " + sContext }).addStyleClass("sapUiSmallMarginBottom"),
+			new FakeText({ text: "Focusable text in " + sContext, tooltipText: "Tooltip on focusable text in the " + sContext, focusable: true }).addStyleClass("sapUiSmallMarginBottom"),
+			new FakeLink({ text: "Link in " + sContext, href: "https://sap.com", tooltipText: "Tooltip on a link in the " + sContext })
+		];
 	}
 
-	if (bIsTouchOnly) {
-		let iLongPressTimer;
-		let bLongPressFired = false;
+	let oDialog;
+	let oPopover;
+	let oNestedDialog;
+	let oNestedPopover;
 
-		document.body.addEventListener("touchstart", function (oEvent) {
-			const oTarget = oEvent.target.closest(".demo, .demo-host, .text-with-tooltip");
-			if (!oTarget) {
-				return;
+	const oOpenDialogBtn = new Button({
+		text: "Open Dialog",
+		press: function () {
+			if (!oDialog) {
+				oDialog = new Dialog({
+					title: "Tooltip hosts inside a Dialog",
+					contentWidth: "24rem",
+					content: new VBox({ items: containerContent("Dialog") }).addStyleClass("sapUiSmallMargin"),
+					endButton: new Button({ text: "Close", press: () => oDialog.close() })
+				});
 			}
-			bLongPressFired = false;
-			clearTimeout(iLongPressTimer);
-			iLongPressTimer = setTimeout(function () {
-				bLongPressFired = true;
-				showBanner(oLongPressBanner, "Long press: " + (oTarget.id || oTarget.tagName.toLowerCase()));
-			}, LONG_PRESS_DELAY);
-		}, { passive: true });
-
-		["touchmove", "touchcancel"].forEach(function (sType) {
-			document.body.addEventListener(sType, function () {
-				clearTimeout(iLongPressTimer);
-			}, { passive: true });
-		});
-
-		document.body.addEventListener("touchend", function () {
-			clearTimeout(iLongPressTimer);
-		}, { passive: true });
-
-		document.body.addEventListener("click", function (oEvent) {
-			const oTarget = oEvent.target.closest(".demo, .demo-host, .text-with-tooltip");
-			if (!oTarget) {
-				return;
-			}
-			if (bLongPressFired) {
-				bLongPressFired = false;
-				return;
-			}
-			if (oTarget.tagName === "A") {
-				oEvent.preventDefault();
-			}
-			showBanner(oBanner, "Activated: " + (oTarget.id || oTarget.tagName.toLowerCase()));
-		});
-	}
-
-	// Auto-focus the first button on load to verify no tooltip opens until
-	// the user starts arrow/Tab navigation.
-	const oFirstButton = Element.getElementById("btn-default");
-	if (oFirstButton) {
-		const oFocusDelegate = {
-			onAfterRendering: function () {
-				oFirstButton.removeEventDelegate(oFocusDelegate);
-				oFirstButton.focus();
-			}
-		};
-		if (oFirstButton.getDomRef()) {
-			oFirstButton.focus();
-		} else {
-			oFirstButton.addEventDelegate(oFocusDelegate);
+			oDialog.open();
 		}
-	}
+	});
+
+	const oOpenPopoverBtn = new Button({
+		text: "Open Popover",
+		press: function () {
+			if (!oPopover) {
+				oPopover = new Popover({
+					title: "Tooltip hosts inside a Popover",
+					placement: "Bottom",
+					content: new VBox({ items: containerContent("Popover") }).addStyleClass("sapUiSmallMargin")
+				});
+			}
+			oPopover.openBy(oOpenPopoverBtn);
+		}
+	});
+
+	const oOpenNestedBtn = new Button({
+		text: "Open Popover-in-Dialog",
+		press: function () {
+			if (!oNestedDialog) {
+				const oOpenInnerPopoverBtn = new Button({
+					text: "Open Popover inside this Dialog",
+					press: function () {
+						if (!oNestedPopover) {
+							oNestedPopover = new Popover({
+								title: "Popover nested in a Dialog",
+								placement: "Bottom",
+								content: new VBox({ items: containerContent("nested Popover") }).addStyleClass("sapUiSmallMargin")
+							});
+						}
+						oNestedPopover.openBy(oOpenInnerPopoverBtn);
+					}
+				});
+				oNestedDialog = new Dialog({
+					title: "Dialog hosting a nested Popover",
+					contentWidth: "26rem",
+					content: new VBox({
+						items: [
+							new Text({ text: "This dialog contains tooltip hosts, plus a button that opens a Popover nested inside the dialog — also with tooltip hosts." }).addStyleClass("sapUiTinyMarginBottom"),
+							...containerContent("Dialog"),
+							oOpenInnerPopoverBtn
+						]
+					}).addStyleClass("sapUiSmallMargin"),
+					endButton: new Button({ text: "Close", press: () => oNestedDialog.close() })
+				});
+			}
+			oNestedDialog.open();
+		}
+	});
+
+	const oContainersPanel = panel("Tooltip host inside Dialog / Popover / nested Popover-in-Dialog", [
+		row([oOpenDialogBtn.addStyleClass("sapUiTinyMarginEnd"), oOpenPopoverBtn.addStyleClass("sapUiTinyMarginEnd"), oOpenNestedBtn])
+	]);
+
+	new Page({
+		title: "sap.ui.core.tooltip.TooltipEnablement - showcase",
+		content: [
+			new VBox({
+				items: [
+					new Text({ text: "Hover or keyboard-focus the fake controls to see the tooltip wired through TooltipEnablement. Press Esc to dismiss." }).addStyleClass("sapUiSmallMarginBottom"),
+					oButtonsPanel,
+					oTextPanel,
+					oFocusTextPanel,
+					oRClickPanel,
+					oLinksPanel,
+					oContainersPanel
+				]
+			}).addStyleClass("sapUiContentPadding")
+		]
+	}).placeAt("content");
 });

@@ -760,6 +760,55 @@ sap.ui.define([
 
 			assert.ok(this.oDisconnectStub.calledWith("FlexSupportClient"), "Disconnect called");
 		});
+
+		QUnit.test("Shows error dialog with reload action on connection check failure", async function(assert) {
+			this.oGetUShellServiceStub.withArgs("AppLifeCycle").resolves({
+				getCurrentApplication: () => ({})
+			});
+			this.oPublishStub.rejects(new Error("Publish failed"));
+			const oMessageBoxStub = sandbox.stub(MessageBox, "error");
+
+			await SupportAPI.checkAndPrepareMessageBroker();
+
+			assert.ok(oMessageBoxStub.calledOnce, "MessageBox.error was shown");
+			const oOptions = oMessageBoxStub.getCall(0).args[1];
+			assert.ok(oOptions.actions.length === 2, "then two actions are offered");
+			assert.strictEqual(oOptions.actions[1], MessageBox.Action.CLOSE, "then the second action is CLOSE");
+			assert.ok(typeof oOptions.onClose === "function", "then an onClose handler is provided");
+		});
+
+		QUnit.test("Reloads the app with debug sources when the reload action is chosen", async function(assert) {
+			this.oGetUShellServiceStub.withArgs("AppLifeCycle").resolves({
+				getCurrentApplication: () => ({})
+			});
+			this.oPublishStub.rejects(new Error("Publish failed"));
+			const oMessageBoxStub = sandbox.stub(MessageBox, "error");
+			const oReloadStub = sandbox.stub(SupportAPI, "reloadAppWithDebugSources");
+
+			await SupportAPI.checkAndPrepareMessageBroker();
+			const fnOnClose = oMessageBoxStub.getCall(0).args[1].onClose;
+
+			// user chooses the reload (non-CLOSE) action
+			fnOnClose("someReloadAction");
+
+			assert.ok(oReloadStub.calledOnce, "then the app is reloaded with debug sources");
+		});
+
+		QUnit.test("Does not reload the app when the CLOSE action is chosen", async function(assert) {
+			this.oGetUShellServiceStub.withArgs("AppLifeCycle").resolves({
+				getCurrentApplication: () => ({})
+			});
+			this.oPublishStub.rejects(new Error("Publish failed"));
+			const oMessageBoxStub = sandbox.stub(MessageBox, "error");
+			const oReloadStub = sandbox.stub(SupportAPI, "reloadAppWithDebugSources");
+
+			await SupportAPI.checkAndPrepareMessageBroker();
+			const fnOnClose = oMessageBoxStub.getCall(0).args[1].onClose;
+
+			fnOnClose(MessageBox.Action.CLOSE);
+
+			assert.notOk(oReloadStub.called, "then the app is not reloaded");
+		});
 	});
 
 	QUnit.module("Module 7: Edge Cases and Error Handling", {

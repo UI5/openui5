@@ -208,6 +208,12 @@
 		"group": "Initialization and Data"
 	},
 	{
+		"title": "Context Dependencies",
+		"description": "Using getContextDependencies() to show loading placeholders for cards with host context dependency",
+		"route": "contextDependencies",
+		"group": "Initialization and Data"
+	},
+	{
 		"title": "No Header / No Content",
 		"description": "Examples of cards with no header or no content provided",
 		"route": "noHeaderNoContent",

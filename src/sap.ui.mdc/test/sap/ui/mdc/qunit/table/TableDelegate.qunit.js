@@ -885,6 +885,70 @@ sap.ui.define([
 		assert.notOk(oGroupSorter, "No group sorter returned for inactive property");
 	});
 
+	QUnit.test("Group sorter carries groupPaths for the grouped property (no text)", async function(assert) {
+		await this.createTable({
+			type: "ResponsiveTable",
+			p13nMode: ["Group"],
+			groupConditions: {groupLevels: [{key: "Name"}]}
+		});
+
+		const oGroupSorter = TableDelegate.getGroupSorter(this.oTable);
+		assert.ok(oGroupSorter, "Group sorter returned");
+		assert.strictEqual(oGroupSorter.getPath(), "Name_Path", "Sorter path");
+		assert.deepEqual(oGroupSorter.getGroupPaths(), ["Name_Path"],
+			"Group paths contain only the grouped property path when no text property is defined");
+	});
+
+	QUnit.test("Group sorter groupPaths include the text property path", async function(assert) {
+		await this.createTable({
+			delegate: {
+				name: "sap/ui/mdc/TableDelegate",
+				payload: {
+					collectionPath: "/foo",
+					propertyInfo: [{
+						key: "FirstName",
+						path: "FirstName_Path",
+						label: "FirstName_Label",
+						dataType: "String"
+					}, {
+						key: "ID",
+						path: "ID_Path",
+						label: "ID_Label",
+						text: "FirstName",
+						dataType: "String"
+					}]
+				}
+			},
+			propertyKeys: ["ID", "FirstName"],
+			type: "ResponsiveTable",
+			p13nMode: ["Group"],
+			groupConditions: {groupLevels: [{key: "ID"}]}
+		});
+
+		const oGroupSorter = TableDelegate.getGroupSorter(this.oTable);
+		assert.ok(oGroupSorter, "Group sorter returned");
+		assert.strictEqual(oGroupSorter.getPath(), "ID_Path", "Sorter path");
+		assert.deepEqual(oGroupSorter.getGroupPaths(), ["ID_Path", "FirstName_Path"],
+			"Group paths contain the grouped property path and its text property path");
+	});
+
+	QUnit.test("Group sorter reuses the cached formatter across repeated calls for the same property", async function(assert) {
+		await this.createTable({
+			type: "ResponsiveTable",
+			p13nMode: ["Group"],
+			groupConditions: {groupLevels: [{key: "Name"}]}
+		});
+
+		const oFirstSorter = TableDelegate.getGroupSorter(this.oTable);
+		const oSecondSorter = TableDelegate.getGroupSorter(this.oTable);
+
+		assert.ok(oFirstSorter && oSecondSorter, "Two sorter instances returned");
+		assert.strictEqual(oFirstSorter.fnGroup, oSecondSorter.fnGroup,
+			"The same formatter reference is reused so ODataListBinding#sort does not detect a spurious change");
+		assert.strictEqual(oFirstSorter.fnGroup, this.oTable._mFormatGroupHeaderInfo.formatter,
+			"The cached formatter reference is the one attached to the returned sorter");
+	});
+
 	QUnit.test("Filters exclude inactive property", async function(assert) {
 		await this.createTable({p13nMode: ["Sort", "Filter"]});
 		const oFilterConditions = {

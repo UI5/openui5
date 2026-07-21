@@ -187,11 +187,14 @@ sap.ui.define([
 			return undefined;
 		}
 
-		const oSortedProperty = oTable._getSortedProperties().find((oSortCondition) => {
+		const oSortCondition = oTable._getSortedProperties().find((oSortCondition) => {
 			return oSortCondition.key === oGroupLevel.key;
 		});
-		const sPath = oPropertyHelper.getProperty(oGroupLevel.key).path;
-		const bDescending = oSortedProperty ? oSortedProperty.descending : false;
+		const oGroupedProperty = oPropertyHelper.getProperty(oGroupLevel.key);
+		const sPath = oGroupedProperty.path;
+		const bDescending = oSortCondition?.descending ?? false;
+		const oTextProperty = oPropertyHelper.getProperty(oGroupedProperty.text);
+		const aGroupPaths = oTextProperty ? [sPath, oTextProperty.path] : [sPath];
 
 		if (!oTable._mFormatGroupHeaderInfo || oTable._mFormatGroupHeaderInfo.propertyKey !== oGroupLevel.key) {
 			oTable._mFormatGroupHeaderInfo = {
@@ -202,7 +205,12 @@ sap.ui.define([
 			};
 		}
 
-		return new Sorter(sPath, bDescending, oTable._mFormatGroupHeaderInfo.formatter);
+		return new Sorter({
+			path: sPath,
+			descending: bDescending,
+			group: oTable._mFormatGroupHeaderInfo.formatter,
+			groupPaths: aGroupPaths
+		});
 	};
 
 	/**

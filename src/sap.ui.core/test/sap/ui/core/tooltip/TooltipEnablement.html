@@ -12,71 +12,10 @@
 				data-sap-ui-resource-roots='{
 					"local": "./"
 				}'
+				data-sap-ui-xx-tooltip="enhanced"
 		>
 		</script>
 		<link rel="stylesheet" href="./TooltipEnablement.css">
 	</head>
-	<body class="sapUiBody">
-		<h1>sap.ui.core.tooltip.TooltipEnablement - showcase</h1>
-		<p>Hover or keyboard-focus the controls below to see the tooltip wired through
-			<code>TooltipEnablement</code>. Press <kbd>Esc</kbd> to dismiss.</p>
-
-		<div id="activation-banner" class="activation-banner" hidden></div>
-		<div id="long-press-banner" class="long-press-banner" hidden></div>
-
-		<h2>Buttons with tooltip text</h2>
-		<div class="row">
-			<span class="label">Default:</span>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-default" data-text="Default"></div>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-short" data-text="Short text"></div>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-long" data-text="Long text"></div>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-very-long" data-text="Very long text"></div>
-		</div>
-
-		<h2>Text with tooltip (no focus, no extended tab chain)</h2>
-		<p class="selectable-text">
-			This is a regular paragraph. The phrase
-			<span id="txt-tooltip-host"></span>
-			has a tooltip attached to a non-focusable element. On desktop, hover it.
-			On mobile, long-press it to open the tooltip; a short tap should not open it.
-			You should also be able to select any text in this paragraph (including the
-			highlighted phrase itself) on both desktop and mobile.
-		</p>
-
-		<h2>Focusable text with tooltip (isolated)</h2>
-		<p class="selectable-text">
-			The phrase below is focusable (<code>tabindex="0"</code>) and has a tooltip.
-			On desktop: keyboard-focus it with <kbd>Tab</kbd> to see the tooltip;
-			hover also works. On mobile: long-press to open. The surrounding text in
-			this paragraph should remain selectable on both desktop and mobile.
-		</p>
-		<div class="row">
-			<span class="label">Focusable text:</span>
-			<span id="txt-tooltip-focus-host"></span>
-		</div>
-
-		<h2>Right-click on selected text (should NOT clear selection)</h2>
-		<p class="selectable-text">
-			Select some words in this paragraph, then right-click on the button OR on the
-			text element below. The browser's native context menu should appear and the
-			selection should remain intact — the tooltip must not steal focus or open
-			while a selection exists.
-		</p>
-		<div class="row">
-			<span class="label">Right-click on text (try selecting this too):</span>
-			<span id="span-rclick-host"></span>
-		</div>
-
-		<h2>Links - mobile long-press behavior</h2>
-		<p>On desktop, hover/keyboard-focus the links to see the tooltip. On a touch device,
-			the tooltip is disabled for <code>&lt;a&gt;</code> elements so the
-			native browser context menu (Copy / Open in New Tab) is preserved on long-press.
-			<i>(Recommended: do not set tooltips on links.)</i></p>
-		<div class="row">
-			<span class="label">Link with tooltip:</span>
-			<span id="link-tooltip-host"></span>
-			<span class="label">Long text on link:</span>
-			<span id="link-long-host"></span>
-		</div>
-	</body>
+	<body class="sapUiBody" id="content"></body>
 </html>

@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>sap.ui.core.tooltip.Tooltip - sap.m.Button showcase</title>
+		<title>sap.ui.core.tooltip.Tooltip - showcase</title>
 		<script src="../shared-config.js"></script>
 		<script id="sap-ui-bootstrap"
 				src="../../../../../resources/sap-ui-core.js"
@@ -12,134 +12,10 @@
 				data-sap-ui-resource-roots='{
 					"local": "./"
 				}'
+				data-sap-ui-xx-tooltip="enhanced"
 		>
 		</script>
 		<link rel="stylesheet" href="./Tooltip.css">
 	</head>
-	<body class="sapUiBody">
-		<h1>sap.ui.core.tooltip.Tooltip - sap.m.Button showcase</h1>
-		<p>Hover or keyboard-focus the buttons below to see the custom tooltip. Press <kbd>Esc</kbd> to dismiss.</p>
-
-		<div id="activation-banner" class="activation-banner" hidden></div>
-		<div id="long-press-banner" class="long-press-banner" hidden></div>
-
-		<h2>Text with tooltip (no focus, no extended tab chain)</h2>
-		<p class="selectable-text">
-			This is a regular paragraph. The phrase
-			<span id="txt-tooltip-host"></span>
-			has a tooltip attached to a non-focusable element. On desktop, hover it.
-			On mobile, long-press it to open the tooltip; a short tap should not open it.
-			You should also be able to select any text in this paragraph (including the
-			highlighted phrase itself) on both desktop and mobile.
-		</p>
-
-		<h2>Focusable text with tooltip (isolated)</h2>
-		<p class="selectable-text">
-			The phrase below is focusable (<code>tabindex="0"</code>) and has a tooltip.
-			On desktop: keyboard-focus it with <kbd>Tab</kbd> to see the tooltip;
-			hover also works. On mobile: long-press to open. The surrounding text in
-			this paragraph should remain selectable on both desktop and mobile.
-		</p>
-		<div class="row">
-			<span class="label">Focusable text:</span>
-			<span id="txt-tooltip-focus-host"></span>
-		</div>
-
-		<h2>Text and default placement</h2>
-		<div class="row">
-			<span class="label">Default (VerticalPreferredTop):</span>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-default" data-text="Default"></div>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-short" data-text="Short text"></div>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-long" data-text="Long text"></div>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-very-long" data-text="Very long text"></div>
-		</div>
-
-		<h2>Placement</h2>
-		<div class="row">
-			<span class="label">Top:</span>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-top" data-text="Top"></div>
-			<span class="label">Bottom:</span>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-bottom" data-text="Bottom"></div>
-			<span class="label">Left:</span>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-left" data-text="Left"></div>
-			<span class="label">Right:</span>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-right" data-text="Right"></div>
-		</div>
-		<div class="row">
-			<span class="label">VerticalPreferredTop:</span>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-vpt" data-text="VPreferredTop"></div>
-			<span class="label">VerticalPreferredBottom:</span>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-vpb" data-text="VPreferredBottom"></div>
-			<span class="label">HorizontalPreferredLeft:</span>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-hpl" data-text="HPreferredLeft"></div>
-			<span class="label">HorizontalPreferredRight:</span>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-hpr" data-text="HPreferredRight"></div>
-		</div>
-		<div class="row">
-			<span class="label">PreferredTopOrFlip:</span>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-ptof" data-text="TopOrFlip"></div>
-			<span class="label">PreferredBottomOrFlip:</span>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-pbof" data-text="BottomOrFlip"></div>
-			<span class="label">PreferredLeftOrFlip:</span>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-plof" data-text="LeftOrFlip"></div>
-			<span class="label">PreferredRightOrFlip:</span>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-prof" data-text="RightOrFlip"></div>
-		</div>
-
-		<h2>Delay (open delay in ms)</h2>
-		<div class="row">
-			<span class="label">delay = 0:</span>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-delay-0" data-text="Immediate"></div>
-			<span class="label">delay = 500 (default):</span>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-delay-500" data-text="Default"></div>
-			<span class="label">delay = 1500:</span>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-delay-1500" data-text="Slow"></div>
-		</div>
-
-		<h2>Programmatic API: openBy / close</h2>
-		<div class="row">
-			<span class="label">Anchor:</span>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-api-anchor" data-text="Anchor"></div>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-api-open" data-text="openBy(anchor)"></div>
-			<div class="demo-host" data-sap-m-button data-button-id="btn-api-close" data-text="close(0)"></div>
-		</div>
-
-		<h2>Links - mobile long-press behavior</h2>
-		<p>On desktop, hover/keyboard-focus the links to see the tooltip. On a touch device,
-			the tooltip is automatically disabled for <code>&lt;a&gt;</code> elements so the
-			native browser context menu (Copy / Open in New Tab) is preserved on long-press
-			(<i>recommended: do not set tooltips on links</i>).</p>
-		<div class="row">
-			<span class="label">Link with tooltip:</span>
-			<span id="link-tooltip-host"></span>
-			<span class="label">Long text on link:</span>
-			<span id="link-long-host"></span>
-		</div>
-
-		<h2>Right-click on selected text (should NOT clear selection)</h2>
-		<p class="selectable-text">
-			Select some words in this paragraph, then right-click on the button OR on the
-			text element below. The browser's native context menu should appear and the
-			selection should remain intact — the tooltip must not steal focus or open
-			while a selection exists.
-		</p>
-		<div class="row">
-			<span class="label">Right-click on text (try selecting this too):</span>
-			<span id="span-rclick-host"></span>
-		</div>
-
-		<h2>Viewport edges (auto-flip placement)</h2>
-		<p>The fixed-position buttons in each viewport corner use a placement that prefers off-screen.
-			The tooltip should flip to the opposite side instead of being clipped or covering the button.</p>
-		<div class="row">
-			<label><input type="checkbox" id="cb-corners"> Show viewport-corner buttons</label>
-		</div>
-
-		<div class="viewport-corners" id="viewport-corners" hidden>
-			<div class="demo-host tl" data-sap-m-button data-button-id="btn-corner-tl" data-text="Top-Left (placement: Top)"></div>
-			<div class="demo-host tr" data-sap-m-button data-button-id="btn-corner-tr" data-text="Top-Right (placement: Right)"></div>
-			<div class="demo-host bl" data-sap-m-button data-button-id="btn-corner-bl" data-text="Bottom-Left (placement: Left)"></div>
-			<div class="demo-host br" data-sap-m-button data-button-id="btn-corner-br" data-text="Bottom-Right (placement: Bottom)"></div>
-		</div>
-	</body>
+	<body class="sapUiBody" id="content"></body>
 </html>

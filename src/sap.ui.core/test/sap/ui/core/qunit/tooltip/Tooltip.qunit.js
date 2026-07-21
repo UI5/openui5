@@ -6,7 +6,10 @@ sap.ui.define([
 	"sap/m/Button",
 	"sap/m/library",
 	"sap/ui/Device",
-	"sap/ui/core/tooltip/TooltipManager"
+	"sap/ui/core/tooltip/TooltipManager",
+	// Preloaded so the lazy sap.ui.require(["sap/m/Popover","sap/m/Text"]) resolves synchronously under fake timers.
+	"sap/m/Popover",
+	"sap/m/Text"
 ], function(createAndAppendDiv, nextUIUpdate, Tooltip, Button, mLibrary, Device, TooltipManager) {
 	"use strict";
 	const PlacementType = mLibrary.PlacementType;
@@ -234,17 +237,14 @@ sap.ui.define([
 	});
 
 	QUnit.test("delayed close actually executes", function(assert) {
-		const done = assert.async();
 		this.oTooltip._oPopover = makeFakePopover();
 		const spy = sinon.spy(this.oTooltip._oPopover, "close");
 		this.oTooltip._bIsOpen = true;
 		this.oTooltip.close(50);
-		setTimeout(() => {
-			assert.ok(spy.calledOnce, "popover.close called after delay");
-			assert.strictEqual(this.oTooltip._bIsOpen, false, "isOpen false");
-			spy.restore();
-			done();
-		}, 150);
+		this.clock.tick(150);
+		assert.ok(spy.calledOnce, "popover.close called after delay");
+		assert.strictEqual(this.oTooltip._bIsOpen, false, "isOpen false");
+		spy.restore();
 	});
 
 	QUnit.test("close with default delay", function(assert) {
@@ -279,13 +279,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("creates popover and opens", async function(assert) {
-		const done = assert.async();
 		await this.oTooltip.openBy(this.stub, 0);
-		setTimeout(() => {
-			assert.ok(this.oTooltip._oPopover, "popover created");
-			assert.ok(this.oTooltip._bIsOpen, "is open");
-			done();
-		}, 100);
+		this.clock.tick(0);
+		assert.ok(this.oTooltip._oPopover, "popover created");
+		assert.ok(this.oTooltip._bIsOpen, "is open");
 	});
 
 	QUnit.test("early return if scheduled", async function(assert) {
@@ -296,32 +293,24 @@ sap.ui.define([
 	});
 
 	QUnit.test("openBy reuses existing popover", async function(assert) {
-		const done = assert.async();
 		await this.oTooltip.openBy(this.stub, 0);
-		setTimeout(async () => {
-			const p1 = this.oTooltip._oPopover;
-			this.oTooltip._bIsOpen = false;
-			this.oTooltip._iOpenTimeout = null;
-			await this.oTooltip.openBy(this.stub, 0);
-			setTimeout(() => {
-				assert.strictEqual(this.oTooltip._oPopover, p1, "same popover reused");
-				done();
-			}, 100);
-		}, 100);
+		this.clock.tick(0);
+		const p1 = this.oTooltip._oPopover;
+		this.oTooltip._bIsOpen = false;
+		this.oTooltip._iOpenTimeout = null;
+		await this.oTooltip.openBy(this.stub, 0);
+		this.clock.tick(0);
+		assert.strictEqual(this.oTooltip._oPopover, p1, "same popover reused");
 	});
 
 	QUnit.test("openBy default delay", async function(assert) {
-		const done = assert.async();
 		this.oTooltip.setDelay(10);
 		await this.oTooltip.openBy(this.stub);
-		setTimeout(() => {
-			assert.ok(this.oTooltip._bIsOpen, "opened with default delay");
-			done();
-		}, 100);
+		this.clock.tick(10);
+		assert.ok(this.oTooltip._bIsOpen, "opened with default delay");
 	});
 
-	QUnit.test("close while popover instantiation is in flight aborts the open", function(assert) {
-		const done = assert.async();
+	QUnit.test("close while popover instantiation is in flight aborts the open", async function(assert) {
 		// Force _createPopover to a manually-controlled deferred so we can simulate
 		// the Tab-storm race: focusin → openBy starts and awaits → focusout → close()
 		// → _pPopover finally resolves → resumed openBy must NOT schedule the popup.
@@ -341,35 +330,30 @@ sap.ui.define([
 		// Now resolve _pPopover to let the resumed openBy run.
 		fnResolvePopover(makeFakePopover());
 
-		// Give the microtask queue a chance to deliver the resolution.
-		setTimeout(() => {
-			assert.notOk(this.oTooltip._iOpenTimeout, "resumed openBy did not schedule a timer");
-			assert.notOk(this.oTooltip._bIsOpen, "tooltip did not open");
-			done();
-		}, 100);
+		// Drain the microtask queue so the resumed openBy runs, then advance past the delay.
+		await this.clock.tickAsync(100);
+		assert.notOk(this.oTooltip._iOpenTimeout, "resumed openBy did not schedule a timer");
+		assert.notOk(this.oTooltip._bIsOpen, "tooltip did not open");
 	});
 
 	QUnit.test("openBy cancels a pending close so focusin overrides focusout", async function(assert) {
-		const done = assert.async();
 		// Tooltip already open.
 		await this.oTooltip.openBy(this.stub, 0);
-		setTimeout(async () => {
-			assert.ok(this.oTooltip._bIsOpen, "tooltip open");
+		this.clock.tick(0);
+		assert.ok(this.oTooltip._bIsOpen, "tooltip open");
 
-			// focusout schedules a delayed close.
-			this.oTooltip.close(500);
-			assert.ok(this.oTooltip._iCloseTimeout, "close scheduled");
+		// focusout schedules a delayed close.
+		this.oTooltip.close(500);
+		assert.ok(this.oTooltip._iCloseTimeout, "close scheduled");
 
-			// focusin re-opens before the close fires.
-			await this.oTooltip.openBy(this.stub, 0);
-			assert.strictEqual(this.oTooltip._iCloseTimeout, null, "pending close cancelled");
+		// focusin re-opens before the close fires.
+		await this.oTooltip.openBy(this.stub, 0);
+		this.clock.tick(0);
+		assert.strictEqual(this.oTooltip._iCloseTimeout, null, "pending close cancelled");
 
-			// After the close delay, the tooltip must remain open.
-			setTimeout(() => {
-				assert.ok(this.oTooltip._bIsOpen, "tooltip stayed open");
-				done();
-			}, 600);
-		}, 50);
+		// After the close delay, the tooltip must remain open.
+		this.clock.tick(600);
+		assert.ok(this.oTooltip._bIsOpen, "tooltip stayed open");
 	});
 
 	QUnit.module("_createPopover content", {
@@ -451,33 +435,24 @@ sap.ui.define([
 	});
 
 	QUnit.test("openBy sets text on popover content", async function(assert) {
-		const done = assert.async();
 		const spy = sinon.spy(this.oFakePopover.getContent()[0], "setText");
 		await this.oTooltip.openBy(this.stub, 0);
-		setTimeout(function() {
-			assert.ok(spy.calledWith("Hello"), "setText called with tooltip text");
-			done();
-		}, 50);
+		this.clock.tick(0);
+		assert.ok(spy.calledWith("Hello"), "setText called with tooltip text");
 	});
 
 	QUnit.test("openBy calls setPlacement on popover", async function(assert) {
-		const done = assert.async();
 		const spy = sinon.spy(this.oFakePopover, "setPlacement");
 		await this.oTooltip.openBy(this.stub, 0);
-		setTimeout(function() {
-			assert.ok(spy.calledOnce, "setPlacement called");
-			done();
-		}, 50);
+		this.clock.tick(0);
+		assert.ok(spy.calledOnce, "setPlacement called");
 	});
 
 	QUnit.test("openBy calls openBy on popover", async function(assert) {
-		const done = assert.async();
 		const spy = sinon.spy(this.oFakePopover, "openBy");
 		await this.oTooltip.openBy(this.stub, 0);
-		setTimeout(function() {
-			assert.ok(spy.calledOnce, "popover.openBy called");
-			done();
-		}, 50);
+		this.clock.tick(0);
+		assert.ok(spy.calledOnce, "popover.openBy called");
 	});
 
 	QUnit.module("_popoverAfterRendering", {
@@ -621,19 +596,25 @@ sap.ui.define([
 			// room and the auto-flip fallback never kicks in.
 			this.oButton = new Button({text: "Anchor"});
 			this.oButton.placeAt("content");
-			await nextUIUpdate();
+			await nextUIUpdate(this.clock);
 			Object.assign(this.oButton.getDomRef().style, {
 				position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)"
 			});
 		},
-		afterEach: function() {
+		afterEach: async function() {
 			this.oButton.destroy();
+			// Drain leftover Popover timers before the clock is restored.
+			await this.clock.tickAsync(1000);
 		}
 	});
 
-	async function openAndWait(oTooltip, oAnchor) {
+	async function openAndWait(oClock, oTooltip, oAnchor) {
+		const pAfterOpen = new Promise((r) => {
+			oTooltip.attachEventOnce("afterOpen", r);
+		});
 		await oTooltip.openBy(oAnchor);
-		await new Promise((r) => { oTooltip._oPopover.attachEventOnce("afterOpen", r); });
+		await oClock.tickAsync(1000);
+		return pAfterOpen;
 	}
 
 	[
@@ -644,13 +625,14 @@ sap.ui.define([
 	].forEach(function(oCase) {
 		QUnit.test("placement " + oCase.placement + " → " + oCase.expected, async function(assert) {
 			this.oTooltip = new Tooltip({text: "Hi", placement: oCase.placement, delay: 0});
-			await openAndWait(this.oTooltip, this.oButton);
+			await openAndWait(this.clock, this.oTooltip, this.oButton);
 
 			const oCl = this.oTooltip._oPopover.getDomRef().classList;
 			["Top", "Bottom", "Left", "Right"].forEach(function(s) {
 				const sCls = "sapUiCoreTooltip" + s;
 				assert[sCls === oCase.expected ? "ok" : "notOk"](oCl.contains(sCls), sCls);
 			});
+			this.oTooltip.destroy();
 		});
 	});
 
@@ -659,7 +641,7 @@ sap.ui.define([
 		this.oTooltip._oPopover = await this.oTooltip._createPopover();
 		const oSpy = sinon.spy(this.oTooltip._oPopover, "setPlacement");
 
-		await openAndWait(this.oTooltip, this.oButton);
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
 
 		assert.ok(oSpy.calledWith(PlacementType.VerticalPreferredTop),
 			"Popover.setPlacement called with the promoted preferred variant");
@@ -700,30 +682,26 @@ sap.ui.define([
 			"close() before open called TooltipManager.deregister");
 	});
 
-	QUnit.test("selection guard in the open-timer callback deregisters the tooltip", function(assert) {
-		const done = assert.async();
+	QUnit.test("selection guard in the open-timer callback deregisters the tooltip", async function(assert) {
 		const fnOrig = window.getSelection;
 		window.getSelection = function() {
 			return { toString: function() { return "user has a selection"; } };
 		};
 
-		this.oTooltip.openBy(this.stub, 10).then(() => {
+		try {
+			await this.oTooltip.openBy(this.stub, 10);
 			assert.ok(this.fnRegisterSpy.calledWith(this.oTooltip), "registered while pending");
 			assert.notOk(this.fnDeregisterSpy.calledWith(this.oTooltip),
 				"not yet deregistered before the open timer fires");
 
-			setTimeout(() => {
-				assert.notOk(this.oTooltip.isOpen(),
-					"tooltip stayed closed — selection guard suppressed the open");
-				assert.ok(this.fnDeregisterSpy.calledWith(this.oTooltip),
-					"selection-guard path called TooltipManager.deregister");
-				window.getSelection = fnOrig;
-				done();
-			}, 50);
-		}).catch((e) => {
+			await this.clock.tickAsync(50);
+			assert.notOk(this.oTooltip.isOpen(),
+				"tooltip stayed closed — selection guard suppressed the open");
+			assert.ok(this.fnDeregisterSpy.calledWith(this.oTooltip),
+				"selection-guard path called TooltipManager.deregister");
+		} finally {
 			window.getSelection = fnOrig;
-			done(e);
-		});
+		}
 	});
 
 	QUnit.test("afterClose deregisters via the init-time listener", function(assert) {

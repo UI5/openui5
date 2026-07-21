@@ -2083,6 +2083,38 @@ sap.ui.define([
 		assert.equal(oBindingInfo.filters[0].sPath, "Name_Path", "Filter is for the active property");
 	});
 
+	QUnit.test("Group sorter is returned for a grouped property whose column is not visible (ResponsiveTable)", async function(assert) {
+		await this.initTable({
+			type: TableType.ResponsiveTable,
+			p13nMode: ["Group"],
+			columns: [
+				new Column({
+					propertyKey: "Name",
+					header: new Text({text: "Name_Label"}),
+					template: new Text({text: "{Name_Path}"})
+				})
+			],
+			groupConditions: {groupLevels: [{key: "Country"}]}
+		}, [{
+			key: "Name",
+			path: "Name_Path",
+			label: "Name_Label",
+			dataType: "String",
+			groupable: true
+		}, {
+			key: "Country",
+			path: "Country_Path",
+			label: "Country_Label",
+			dataType: "String",
+			groupable: true
+		}]);
+
+		const oGroupSorter = this.oTable.getControlDelegate().getGroupSorter(this.oTable);
+		assert.ok(oGroupSorter, "Group sorter returned for a grouped property whose column is not visible");
+		assert.strictEqual(oGroupSorter.getPath(), "Country_Path", "Sorter path is the grouped property path");
+		assert.deepEqual(oGroupSorter.getGroupPaths(), ["Country_Path"], "Sorter#getGroupPaths contains the grouped property path");
+	});
+
 	QUnit.test("$$aggregation.expandTo binding parameter", async function(assert) {
 		await this.initTable();
 
@@ -2270,7 +2302,11 @@ sap.ui.define([
 		this.oSortSpy = this.spy(this.oTable.getRowBinding(), "sort");
 		this.oTable.setGroupConditions({groupLevels: [{name: "Country"}]});
 		await this.oTable.rebind();
-		assert.ok(this.oSortSpy.calledOnceWithExactly([]), "Column Country is not visible. No sorter applied");
+		assert.strictEqual(this.oSortSpy.callCount, 1, "Binding#sort was called once");
+		const aSorters = this.oSortSpy.firstCall.args[0];
+		assert.strictEqual(aSorters.length, 1, "One group sorter applied even though the column is not visible");
+		assert.strictEqual(aSorters[0].getPath(), "Country_Path", "Group sorter path is the grouped property path");
+		assert.deepEqual(aSorters[0].getGroupPaths(), ["Country_Path"], "Group sorter#getGroupPaths contains the grouped property path");
 		assert.notOk(this.oRebindSpy.called, "Delegate#rebind call");
 	});
 
@@ -2668,23 +2704,6 @@ sap.ui.define([
 			validation: MessageType.Information,
 			message: oResourceBundle.getText("table.PERSONALIZATION_DIALOG_GROUP_RESTRICTION_TOTALS", ["Name"])
 		}, "Grouping and aggregation can't be used simulatneously");
-
-		assert.deepEqual(this.oTable.validateState({
-			items: [{key: "Name"}, {key: "name_country"}],
-			groupLevels: [{key: "Country"}]
-		}, "Group"), {
-			validation: MessageType.None,
-			message: undefined
-		}, "The grouped property is part of a visible complex property");
-
-		this.oTable.setType(TableType.ResponsiveTable);
-		assert.deepEqual(this.oTable.validateState({
-			items: [{key: "Name"}],
-			groupLevels: [{key: "Country"}]
-		}, "Group"), {
-			validation: MessageType.Information,
-			message: oResourceBundle.getText("table.PERSONALIZATION_DIALOG_GROUP_RESTRICTION_VISIBLE")
-		}, "Grouped property invisible with ResponsiveTable type");
 	});
 
 	QUnit.test("Column restrictions", function(assert) {
@@ -2722,15 +2741,6 @@ sap.ui.define([
 			message: oResourceBundle.getText("table.PERSONALIZATION_DIALOG_TOTAL_RESTRICTION")
 				+ "\n" + oResourceBundle.getText("table.PERSONALIZATION_DIALOG_SORT_RESTRICTION")
 		}, "Removing the column that contains a sorted and an aggregated property");
-
-		this.oTable.setType(TableType.ResponsiveTable);
-		assert.deepEqual(this.oTable.validateState({
-			items: [{key: "Name"}],
-			groupLevels: [{key: "Country"}]
-		}, "Column"), {
-			validation: MessageType.Information,
-			message: oResourceBundle.getText("table.PERSONALIZATION_DIALOG_GROUP_RESTRICTION_VISIBLE")
-		}, "Removing the column that contains a grouped property with ResponsiveTable type");
 	});
 
 	QUnit.test("Restrictions for inactive property", async function(assert) {

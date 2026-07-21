@@ -403,6 +403,32 @@ sap.ui.define([
 		assert.notOk(oEvent.defaultPrevented);
 	});
 
+	QUnit.test("host gets sapUiCoreTooltipHostSuppressSelection class on attach when touch enabled", function (assert) {
+		assert.ok(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+			"touch-suppression class present on host");
+	});
+
+	QUnit.test("host does NOT get sapUiCoreTooltipHostSuppressSelection when touch disabled", function (assert) {
+		this.oTrigger.setEnableForTouchDevices(false);
+		assert.notOk(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+			"touch-suppression class absent when disabled");
+	});
+
+	QUnit.test("detach removes sapUiCoreTooltipHostSuppressSelection from host", function (assert) {
+		this.oTrigger.detach();
+		assert.notOk(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+			"touch-suppression class removed on detach");
+	});
+
+	QUnit.test("re-enabling re-adds sapUiCoreTooltipHostSuppressSelection to host", function (assert) {
+		this.oTrigger.setEnableForTouchDevices(false);
+		assert.notOk(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+			"class absent after disabling");
+		this.oTrigger.setEnableForTouchDevices(true);
+		assert.ok(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+			"class re-added after re-enabling");
+	});
+
 	QUnit.test("long-press (500 ms) invokes onOpen(false)", function (assert) {
 		dispatch(this.oDomRef, new Event("touchstart", { bubbles: false }));
 		assert.notOk(this.oConfig.onOpen.called, "not yet, timer pending");

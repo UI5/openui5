@@ -773,15 +773,15 @@ sap.ui.define([
 	 * @private
 	 */
 	DragDrop.prototype._attachDragScrollHandler = function(oEventOrAggregationOverlay) {
-		var oAggregationOverlay;
+		let oAggregationOverlay;
 		if (BaseObject.isObjectA(oEventOrAggregationOverlay, "sap.ui.dt.AggregationOverlay")) {
 			oAggregationOverlay = oEventOrAggregationOverlay;
 		} else {
 			oAggregationOverlay = oEventOrAggregationOverlay.srcControl;
 		}
 
-		var oAggregationOverlayDomRef = oAggregationOverlay.getDomRef();
-		if (oAggregationOverlayDomRef && Object.keys(oAggregationOverlayDomRef).length > 0 && DOMUtil.hasScrollBar(oAggregationOverlayDomRef)) {
+		const oAggregationOverlayDomRef = oAggregationOverlay.getDomRef();
+		if (oAggregationOverlayDomRef && DOMUtil.hasScrollBar(oAggregationOverlayDomRef)) {
 			oAggregationOverlayDomRef.addEventListener("dragover", this._dragScrollHandler, true);
 			oAggregationOverlayDomRef.addEventListener("dragleave", this._dragLeaveHandler, true);
 		}

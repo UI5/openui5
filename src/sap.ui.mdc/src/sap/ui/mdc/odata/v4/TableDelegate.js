@@ -129,6 +129,13 @@ sap.ui.define([
 	 * {@link sap.ui.mdc.table.GridTableType GridTable}. The <code>p13nMode</code> <code>Group</code> is not supported if the table type is
 	 * {@link sap.ui.mdc.table.TreeTableType TreeTable}. This cannot be changed in your delegate implementation.
 	 *
+	 * <b>Note:</b> When grouping in the {@link sap.ui.mdc.table.ResponsiveTableType ResponsiveTable}, the paths required for the group header
+	 * text (the grouped property's path and, if defined, the path of its text property) are conveyed via {@link sap.ui.model.Sorter#getGroupPaths}.
+	 * The {@link sap.ui.model.odata.v4.ODataListBinding} evaluates these paths only if the {@link sap.ui.model.odata.v4.ODataModel} runs with
+	 * <code>autoExpandSelect</code> enabled; without it, paths that traverse a <code>NavigationProperty</code> are not loaded and the group header
+	 * text is incomplete. Applications that must run without <code>autoExpandSelect</code> and require grouping by such properties need to override
+	 * the delegate to add the required <code>$expand</code> to the binding parameters.
+	 *
 	 * All binding-related limitations regarding selection also apply in the context of this delegate. For details, see
 	 * {@link sap.ui.model.odata.v4.Context#setSelected} and {@link sap.ui.model.odata.v4.ODataModel#bindList}.
 	 *
@@ -192,24 +199,6 @@ sap.ui.define([
 				oBindingInfo.parameters.$select = aInResultPropertyKeys.map((sKey) => oPropertyHelper.getProperty(sKey).path);
 			}
 		}
-	};
-
-	/**
-	 * @inheritDoc
-	 */
-	Delegate.getGroupSorter = function(oTable) {
-		const oGroupedProperty = oTable._getGroupedProperties()[0];
-
-		if (!oGroupedProperty || !oTable._isOfType(TableType.ResponsiveTable)) {
-			return undefined;
-		}
-
-		if (!getVisiblePropertyKeys(oTable).includes(oGroupedProperty.key)) {
-			// Suppress grouping by non-visible property.
-			return undefined;
-		}
-
-		return TableDelegate.getGroupSorter.apply(this, arguments);
 	};
 
 	/**
@@ -474,15 +463,6 @@ sap.ui.define([
 					])
 				};
 			}
-		} else if (oTable._isOfType(TableType.ResponsiveTable)) {
-			if (hasStateForInvisibleColumns(oTable, oState.items, oState.groupLevels)) {
-				// Grouping by a property that isn't visible in the table (not requested from the backend) causes issues with the group header text.
-				// Corresponding group conditions are not applied.
-				return {
-					validation: MessageType.Information,
-					message: oResourceBundle.getText("table.PERSONALIZATION_DIALOG_GROUP_RESTRICTION_VISIBLE")
-				};
-			}
 		}
 
 		return null;
@@ -492,17 +472,6 @@ sap.ui.define([
 		const oResourceBundle = Lib.getResourceBundleFor("sap.ui.mdc");
 		const aAggregateProperties = oState.aggregations && Object.keys(oState.aggregations);
 		let sMessage;
-
-		if (oTable._isOfType(TableType.ResponsiveTable)) {
-			if (hasStateForInvisibleColumns(oTable, oState.items, oState.groupLevels)) {
-				// Grouping by a property that isn't visible in the table (not requested from the backend) causes issues with the group header text.
-				// Corresponding group conditions are not applied.
-				return {
-					validation: MessageType.Information,
-					message: oResourceBundle.getText("table.PERSONALIZATION_DIALOG_GROUP_RESTRICTION_VISIBLE")
-				};
-			}
-		}
 
 		if (hasStateForInvisibleColumns(oTable, oState.items, aAggregateProperties)) {
 			// Aggregating by properties that are not visible in the table (not requested from the backend) is not possible with data aggregation.

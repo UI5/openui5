@@ -70922,6 +70922,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// "ValueListWithFixedValues" is present.
 	// JIRA: CPOUI5ODATAV4-1251
 	// BCP: 2280012068 ValueListWithFixedValues takes precedence over SearchSupported
+	//
+	// ODMM#requestValueListInfo w/ multiple fixed value lists (JIRA: CPOUI5ODATAV4-3597)
 	[0, 1].forEach(function (iValue) {
 		var sTitle = "CPOUI5ODATAV4-1251: ValueListRelevantQualifiers and ValueListWithFixedValues"
 				+ ", value=" + iValue;
@@ -70948,6 +70950,20 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					"" : {
 						Label : iValue ? "Second label" : "First label",
 						$qualifier : iValue ? "one" : "zero"
+					}
+				});
+
+				// code under test (no context! JIRA: CPOUI5ODATAV4-3597)
+				return oModel.getMetaModel().requestValueListInfo("/Bs(1)/BID");
+			}).then(function (mQualifier2ValueListType) {
+				delete mQualifier2ValueListType["one"].$model;
+				delete mQualifier2ValueListType["zero"].$model;
+				assert.deepEqual(mQualifier2ValueListType, {
+					one : {
+						Label : "Second label"
+					},
+					zero : {
+						Label : "First label"
 					}
 				});
 			});

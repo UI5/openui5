@@ -210,6 +210,26 @@ sap.ui.define([
 		});
 	});
 
+	// ---------------------------------------------------------------------------------------------
+	// Contract guard for the UI5 Flexibility Support Chrome extension
+	// (repo: ui5-flexibility/ui5-flexibility-support-chrome-extension).
+	//
+	// The extension sets a conditional debugger breakpoint on the anchor line below (located by
+	// text search) to fake key-user authorization by reassigning properties on "oSettingsProperties"
+	// before the Settings instance is created.
+	// ---------------------------------------------------------------------------------------------
+	QUnit.module("UI5 Flexibility Support extension breakpoint contract");
+
+	QUnit.test("the breakpoint anchor line still exists in the Settings source", async function(assert) {
+		const sModuleUrl = sap.ui.require.toUrl("sap/ui/fl/initial/_internal/Settings.js");
+		const sSource = await (await fetch(sModuleUrl)).text();
+		assert.ok(
+			sSource.includes("oSettingsInstance = new Settings(oSettingsProperties)"),
+			"the anchor line used by the UI5 Flexibility Support extension is present - "
+			+ "if you must change it, update ReloadOptionsUtils.js in the extension"
+		);
+	});
+
 	QUnit.done(function() {
 		document.getElementById("qunit-fixture").style.display = "none";
 	});

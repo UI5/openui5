@@ -346,6 +346,141 @@ sap.ui.define([
 		assert.deepEqual(getItemKeys(this.oControl), ["lateProp"], "Item created after finalization");
 	});
 
+	QUnit.test("Concurrent calls with valid state", async function(assert) {
+		const oDelegate = this.oControl.getControlDelegate();
+
+		const p1 = this.oControl.syncItemsFromPropertyKeys();
+		const p2 = this.oControl.syncItemsFromPropertyKeys();
+		await Promise.all([p1, p2]);
+
+		assert.deepEqual(getItemKeys(this.oControl), ["staticProp1", "staticProp2", "dynamicActive"], "Aggregation has each active key exactly once");
+		assert.strictEqual(oDelegate.addItem.callCount, 3, "Delegate.addItem invoked once per active key");
+		sinon.assert.calledWithExactly(oDelegate.addItem.getCall(0), this.oControl, "staticProp1");
+		sinon.assert.calledWithExactly(oDelegate.addItem.getCall(1), this.oControl, "staticProp2");
+		sinon.assert.calledWithExactly(oDelegate.addItem.getCall(2), this.oControl, "dynamicActive");
+		assert.strictEqual(oDelegate.removeItem.callCount, 0,
+			"Delegate.removeItem not called");
+	});
+
+	QUnit.test("Concurrent calls with invalid state", async function(assert) {
+		this.oControl.setPropertyKeys(["staticProp1", "unknownProp"]);
+		const p1 = this.oControl.syncItemsFromPropertyKeys();
+		const p2 = this.oControl.syncItemsFromPropertyKeys();
+
+		const aResults = await Promise.allSettled([p1, p2]);
+
+		assert.strictEqual(aResults[0].status, "rejected", "First caller's promise rejects");
+		assert.strictEqual(aResults[1].status, "rejected", "Coalesced second caller's promise also rejects");
+		assert.ok(aResults[0].reason.message.includes("unknownProp"),
+			"First caller's rejection mentions the unknown property key: " + aResults[0].reason.message);
+		assert.ok(aResults[1].reason.message.includes("unknownProp"),
+			"Second caller's rejection mentions the unknown property key: " + aResults[1].reason.message);
+	});
+
+	QUnit.test("Concurrent calls with state changed from valid to invalid", async function(assert) {
+		const p1 = this.oControl.syncItemsFromPropertyKeys();
+		this.oControl.setPropertyKeys(["staticProp1", "unknownProp"]);
+		const p2 = this.oControl.syncItemsFromPropertyKeys();
+
+		const aResults = await Promise.allSettled([p1, p2]);
+
+		assert.strictEqual(aResults[0].status, "rejected", "First caller's promise rejects");
+		assert.strictEqual(aResults[1].status, "rejected", "Coalesced second caller's promise also rejects");
+		assert.ok(aResults[0].reason.message.includes("unknownProp"),
+			"First caller's rejection mentions the unknown property key: " + aResults[0].reason.message);
+		assert.ok(aResults[1].reason.message.includes("unknownProp"),
+			"Second caller's rejection mentions the unknown property key: " + aResults[1].reason.message);
+	});
+
+	QUnit.test("Concurrent calls with state changed from invalid to valid", async function(assert) {
+		this.oControl.setPropertyKeys(["staticProp1", "unknownProp"]);
+		const p1 = this.oControl.syncItemsFromPropertyKeys();
+		this.oControl.setPropertyKeys(["staticProp1", "dynamicActive"]);
+		const p2 = this.oControl.syncItemsFromPropertyKeys();
+
+		const aResults = await Promise.allSettled([p1, p2]);
+
+		assert.strictEqual(aResults[0].status, "fulfilled", "First caller's promise resolves");
+		assert.strictEqual(aResults[1].status, "fulfilled", "Coalesced second caller's promise also resolves");
+		assert.deepEqual(getItemKeys(this.oControl), ["staticProp1", "dynamicActive"], "Aggregation reflects the corrected state");
+	});
+
+	QUnit.test("Concurrent calls reflect the latest propertyKeys", async function(assert) {
+		const oDelegate = this.oControl.getControlDelegate();
+
+		const p1 = this.oControl.syncItemsFromPropertyKeys();
+		this.oControl.setPropertyKeys(["dynamicActive", "staticProp1"]);
+		const p2 = this.oControl.syncItemsFromPropertyKeys();
+		await Promise.all([p1, p2]);
+
+		assert.deepEqual(getItemKeys(this.oControl), ["dynamicActive", "staticProp1"], "Final aggregation matches the most recent propertyKeys");
+		assert.strictEqual(oDelegate.addItem.callCount, 2, "Delegate.addItem invoked only for the keys of the latest propertyKeys");
+		sinon.assert.calledWithExactly(oDelegate.addItem.getCall(0), this.oControl, "dynamicActive");
+		sinon.assert.calledWithExactly(oDelegate.addItem.getCall(1), this.oControl, "staticProp1");
+		assert.strictEqual(oDelegate.removeItem.callCount, 0, "Delegate.removeItem not called");
+	});
+
+	QUnit.test("Concurrent calls removing a key remove each item exactly once", async function(assert) {
+		await this.oControl.syncItemsFromPropertyKeys();
+		const oDelegate = this.oControl.getControlDelegate();
+		const oStaticProp2Item = this.oControl.getItems().find((oItem) => oItem.getPropertyKey() === "staticProp2");
+
+		oDelegate.addItem.resetHistory();
+		oDelegate.removeItem.resetHistory();
+
+		// Drop staticProp2
+		this.oControl.setPropertyKeys(["dynamicInactive", "staticProp1", "dynamicActive"]);
+		const p1 = this.oControl.syncItemsFromPropertyKeys();
+		const p2 = this.oControl.syncItemsFromPropertyKeys();
+		await Promise.all([p1, p2]);
+
+		assert.deepEqual(getItemKeys(this.oControl), ["staticProp1", "dynamicActive"], "staticProp2 removed from aggregation");
+		assert.strictEqual(oDelegate.addItem.callCount, 0, "Delegate.addItem not called");
+		assert.strictEqual(oDelegate.removeItem.callCount, 1, "Delegate.removeItem called once");
+		sinon.assert.calledWithExactly(oDelegate.removeItem.getCall(0), this.oControl, oStaticProp2Item);
+	});
+
+	QUnit.test("Failing sync does not block subsequent syncs", async function(assert) {
+		const oDelegate = this.oControl.getControlDelegate();
+
+		this.oControl.setPropertyKeys(["staticProp1", "unknownProp"]);
+		const pFail = this.oControl.syncItemsFromPropertyKeys();
+
+		await pFail.then(() => {
+			assert.ok(false, "First sync should have rejected");
+		}, () => {
+			assert.ok(true, "First sync rejected for unknown property");
+		});
+
+		oDelegate.addItem.resetHistory();
+		oDelegate.removeItem.resetHistory();
+
+		this.oControl.setPropertyKeys(["staticProp1", "dynamicActive"]);
+		await this.oControl.syncItemsFromPropertyKeys();
+
+		assert.deepEqual(getItemKeys(this.oControl), ["staticProp1", "dynamicActive"], "Subsequent sync runs successfully after a prior failure");
+		assert.strictEqual(oDelegate.addItem.callCount, 2, "Delegate.addItem invoked for each key of the recovering sync");
+		sinon.assert.calledWithExactly(oDelegate.addItem.getCall(0), this.oControl, "staticProp1");
+		sinon.assert.calledWithExactly(oDelegate.addItem.getCall(1), this.oControl, "dynamicActive");
+		assert.strictEqual(oDelegate.removeItem.callCount, 0, "Delegate.removeItem not called");
+	});
+
+	QUnit.test("Failing sync after a successful sync rejects", async function(assert) {
+		const pSuccess = this.oControl.syncItemsFromPropertyKeys();
+		await pSuccess;
+
+		this.oControl.setPropertyKeys(["staticProp1", "unknownProp"]);
+		const pFail = this.oControl.syncItemsFromPropertyKeys();
+
+		const aResults = await Promise.allSettled([pSuccess, pFail]);
+
+		assert.strictEqual(aResults[0].status, "fulfilled", "First (successful) sync's promise resolves");
+		assert.strictEqual(aResults[1].status, "rejected", "Second (failing) sync's promise rejects");
+		assert.ok(aResults[1].reason.message.includes("unknownProp"),
+			"Second sync's rejection mentions the unknown property key: " + aResults[1].reason.message);
+	});
+
+
 	QUnit.module("_onModifications wrapper", {
 		beforeEach: function() {
 			this.oControl = createTestControl({propertyKeys: ["staticProp1"]});

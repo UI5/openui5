@@ -114,6 +114,14 @@ sap.ui.define([
 				}
 			},
 
+			"CardContextDependencies": {
+				coverage: {
+					only: [
+						"sap/ui/integration/widgets/Card"
+					]
+				}
+			},
+
 			"CardDataHandling": {},
 
 			"CardDataHandlingWithMock": {
