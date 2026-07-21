@@ -425,6 +425,15 @@ sap.ui.define([
 			matchers: new Ancestor(oP13nDialog, false),
 			success: function(aListViews) {
 				var oListView = aListViews[0];
+
+				// Pass 1: toggle every column's checkbox to its desired selection state.
+				// This must complete before any reordering is done in pass 2. Reordering
+				// presses the move buttons, which triggers SelectionPanel.setProperty("/items")
+				// and re-binds (destroys/recreates) the inner table rows. In Firefox the
+				// checkbox select/focus events are dispatched asynchronously, so interleaving
+				// toggle + reorder in a single pass could apply a "deselect" press against a
+				// row that was already re-bound, silently losing it (the column was never
+				// removed). Doing all toggles first lets them settle before the re-bind.
 				this.waitFor({
 					controlType: "sap.m.ColumnListItem",
 					matchers: new Ancestor(oListView, false),
@@ -444,7 +453,28 @@ sap.ui.define([
 											(oCheckBox.getSelected() && !aItems.includes(oLabelControl.getText()))) {
 											new Press().executeOn(oCheckBox);
 										}
-									},
+									}
+								});
+							}
+						});
+					}.bind(this)
+				});
+
+				// Pass 2: reorder the selected columns into the order given by aItems.
+				this.waitFor({
+					controlType: "sap.m.ColumnListItem",
+					matchers: new Ancestor(oListView, false),
+					actions: function(oColumnListItem) {
+						this.waitFor({
+							controlType: "sap.m.Label",
+							matchers: new Ancestor(oColumnListItem, false),
+							success: function(aLabels) {
+								var oLabelControl = aLabels[0];
+								this.waitFor({
+									controlType: "sap.m.CheckBox",
+									matchers: [
+										new Ancestor(oColumnListItem, false)
+									],
 									success: function(aCheckBoxes) {
 										if (aCheckBoxes[0].getSelected()) {
 											// click on columnlist item
