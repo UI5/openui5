@@ -424,6 +424,12 @@ sap.ui.define([
 		var bSelAll = false;
 		var mRenderConfig = oTable._getSelectionPlugin().getRenderConfig();
 
+		rm.openStart("div");
+		oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, "COLUMNROWHEADERROW");
+		rm.openEnd();
+		rm.openStart("div", oTable.getId() + "-rowcolhdr");
+		oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, "COLUMNROWHEADERCELL");
+		rm.openEnd();
 		rm.openStart("div", oTable.getId() + "-selall");
 
 		rm.class("sapUiTableCell");
@@ -486,7 +492,7 @@ sap.ui.define([
 			rm.close("span");
 		}
 
-		rm.close("div");
+		rm.close("div").close("div").close("div");
 	};
 
 	TableRenderer.renderCol = function(rm, oTable, oColumn, iHeader, nSpan, bIsFirstColumn, bIsLastFixedColumn, bIsLastColumn, bRenderIcons) {
