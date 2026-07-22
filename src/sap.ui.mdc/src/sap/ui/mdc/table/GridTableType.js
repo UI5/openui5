@@ -296,7 +296,7 @@ sap.ui.define([
 			scrollThreshold: "{$sap.ui.mdc.Table#type>/scrollThreshold}",
 			noData: oTable._getNoDataText(),
 			extension: [oTable._oToolbar],
-			ariaLabelledBy: [oTable._oTitle],
+			ariaLabelledBy: [oTable._oTableTitle],
 			rowSettingsTemplate: mRowSettingsConfig ? new InnerRowSettings(mRowSettingsConfig) : null,
 			selectionMode: "None",
 			selectionBehavior: {
