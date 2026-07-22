@@ -1,0 +1,42 @@
+{
+	"sap.app": {
+		"id": "card.explorer.badge.manifest.withIcon",
+		"type": "card"
+	},
+	"sap.card": {
+		"type": "List",
+		"badges": [
+			{
+				"text": "Updated",
+				"icon": "sap-icon://status-in-process",
+				"state": "Indication03"
+			}
+		],
+		"header": {
+			"title": "Badge with Icon",
+			"subTitle": "Badge with icon, text, and state"
+		},
+		"content": {
+			"data": {
+				"json": [
+					{
+						"Name": "Comfort Easy",
+						"Category": "PDA & Organizers"
+					},
+					{
+						"Name": "ITelO Vault",
+						"Category": "PDA & Organizers"
+					},
+					{
+						"Name": "Notebook Professional 15",
+						"Category": "Notebooks"
+					}
+				]
+			},
+			"item": {
+				"title": "{Name}",
+				"description": "{Category}"
+			}
+		}
+	}
+}

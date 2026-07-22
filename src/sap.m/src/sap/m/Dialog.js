@@ -610,15 +610,7 @@ function(
 
 		this._createToolbarButtons();
 
-		if (ControlBehavior.isAccessibilityEnabled() && this.getState() != ValueState.None) {
-			if (!this._oValueState) {
-				this._oValueState = new InvisibleText();
-
-				this.setAggregation("_valueState", this._oValueState);
-				this.addAriaLabelledBy(this._oValueState.getId());
-			}
-			this._oValueState.setText(this.getValueStateString(this.getState()));
-		}
+		this._updateValueStateText();
 
 		// title alignment
 		if (oHeader && oHeader.setTitleAlignment) {
@@ -2044,6 +2036,34 @@ function(
 			if (endButton) {
 				toolbar.addContent(endButton);
 			}
+		}
+	};
+
+	/**
+	 * Updates the invisible text used to announce the value state to screen readers.
+	 *
+	 * @private
+	 */
+	Dialog.prototype._updateValueStateText = function () {
+		if (!ControlBehavior.isAccessibilityEnabled()) {
+			return;
+		}
+
+		const sValueStateText = this.getValueStateString(this.getState());
+		const sTitle = this.getTitle() || "";
+
+		// Avoid redundant SR announcement when the title already conveys the value state
+		if (this.getState() !== ValueState.None && !sTitle.trim().toLowerCase().includes(sValueStateText.toLowerCase())) {
+			if (!this._oValueState) {
+				this._oValueState = new InvisibleText();
+
+				this.setAggregation("_valueState", this._oValueState);
+				this.addAriaLabelledBy(this._oValueState.getId());
+			}
+
+			this._oValueState.setText(sValueStateText);
+		} else if (this._oValueState) {
+			this._oValueState.setText("");
 		}
 	};
 

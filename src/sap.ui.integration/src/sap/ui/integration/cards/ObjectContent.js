@@ -379,13 +379,7 @@ sap.ui.define([
 	};
 
 	ObjectContent.prototype._createGroup = function (oGroupConfiguration, sPath) {
-		var vVisible;
-
-		if (typeof oGroupConfiguration.visible == "string") {
-			vVisible = !Utils.hasFalsyValueAsString(oGroupConfiguration.visible);
-		} else {
-			vVisible = oGroupConfiguration.visible;
-		}
+		const vVisible = Utils.parseBoolean(oGroupConfiguration.visible);
 
 		var oGroup = new VBox({
 			visible: vVisible,
@@ -458,22 +452,15 @@ sap.ui.define([
 	};
 
 	ObjectContent.prototype._createGroupItems = function (oItem, sPath) {
-		var vLabel = oItem.label,
+		const vLabel = oItem.label,
 			bShowColon = oItem.showColon,
-			oLabel,
-			vVisible,
-			oControl;
+			vVisible = Utils.parseBoolean(oItem.visible);
+
+		let oLabel;
 
 		oItem.showColon = (bShowColon === undefined) ? true : bShowColon;
 
-		if (typeof oItem.visible == "string") {
-			vVisible = !Utils.hasFalsyValueAsString(oItem.visible);
-		} else {
-			vVisible = oItem.visible;
-		}
-
 		if (vLabel) {
-
 			oLabel = new Label({
 				text: vLabel,
 				visible: vVisible,
@@ -488,14 +475,14 @@ sap.ui.define([
 			});
 		}
 
-		oControl = this._createItem(oItem, vVisible, oLabel, sPath);
+		const oControl = this._createItem(oItem, vVisible, oLabel, sPath);
 
 		if (oControl && !oControl.isA("sap.m.Image")) {
 			oControl.addStyleClass("sapFCardObjectItemValue");
 		}
 
 		if (oItem.icon) {
-			var oVbox = new VBox({
+			const oVbox = new VBox({
 				renderType: FlexRendertype.Bare,
 				justifyContent: FlexJustifyContent.Center,
 				items: [
@@ -504,7 +491,7 @@ sap.ui.define([
 				]
 			}).addStyleClass("sapFCardObjectItemPairContainer");
 
-			var oHBox = new HBox({
+			const oHBox = new HBox({
 				visible: vVisible,
 				renderType: FlexRendertype.Bare,
 				items: [
@@ -512,10 +499,11 @@ sap.ui.define([
 					oVbox
 				]
 			}).addStyleClass("sapFCardObjectItemLabel");
+
 			return [oHBox];
-		} else {
-			return [oLabel, oControl];
 		}
+
+		return [oLabel, oControl];
 	};
 
 	ObjectContent.prototype._createGroupItemAvatar = function (oIconConfiguration) {
@@ -687,15 +675,33 @@ sap.ui.define([
 	};
 
 	ObjectContent.prototype._createTextItem = function (oItem, vVisible, oLabel) {
-		var vValue = oItem.value,
-			vTooltip = oItem.tooltip,
-			oControl;
+		if (Array.isArray(oItem.valueEntries)) {
+			const oControl = new VBox({
+				renderType: FlexRendertype.Bare,
+				visible: BindingHelper.reuse(vVisible)
+			}).addStyleClass("sapFCardObjectItemValueEntries");
+
+			oItem.valueEntries.forEach((oValue) => {
+				const vValueVisible = Utils.parseBoolean(oValue.visible);
+				oControl.addItem(this._createTextValueEntry(oValue, vValueVisible, oLabel));
+			});
+
+			return oControl;
+		}
+
+		return this._createTextValueEntry(oItem, vVisible, oLabel);
+	};
+
+	ObjectContent.prototype._createTextValueEntry = function (oItem, vVisible, oLabel) {
+		const vValue = oItem.value;
+		const vTooltip = oItem.tooltip;
+
+		let oControl;
 
 		if (vValue && oItem.actions) {
 			oControl = new Link({
 				text: vValue,
-				tooltip: vTooltip,
-				visible: BindingHelper.reuse(vVisible)
+				tooltip: vTooltip
 			});
 
 			if (oLabel) {
@@ -714,9 +720,9 @@ sap.ui.define([
 			// wrap in HBox to avoid stretching the link
 			oControl = new HBox({
 				renderType: FlexRendertype.Bare,
-				items: oControl
+				items: oControl,
+				visible: BindingHelper.reuse(vVisible)
 			});
-
 		} else if (vValue) {
 			oControl = new Text({
 				text: vValue,

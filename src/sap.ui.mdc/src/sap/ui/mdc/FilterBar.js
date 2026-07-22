@@ -306,9 +306,17 @@ sap.ui.define([
 				return oPopup;
 			}).then((oPopup) => {
 				oPopup.attachEventOnce("close", (oEvent) => {
-					this.cleanUpAllFilterFieldsInErrorState();
 					const sReason = oEvent.getParameter("reason");
-					if (sReason === "Filter") {
+					if (sReason !== "Cancel") { // if cancelled the state of the FilterBar should not change
+						this.cleanUpAllFilterFieldsInErrorState();
+					}
+					if (sReason === "Ok") { // as it is not known if there are changes trigger FilterUpdate to allow FE to react (set Messages....)
+						this._reportModelChange({
+							triggerSearch: false,
+							triggerFilterUpdate: true,
+							recheckMissingRequired: false
+						});
+					} else if (sReason === "Filter") {
 						this.triggerSearch();
 					}
 				});

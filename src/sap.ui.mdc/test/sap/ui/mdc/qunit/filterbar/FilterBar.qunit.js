@@ -1287,6 +1287,58 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("handle AdaptFiltersDialog close", async function(assert) {
+
+		const oProperty1 = {
+			key: "field1",
+			label: "A",
+			dataType: "Edm.String",
+			constraints: { maxLength: 40 }
+		};
+		const oProperty2 = {
+			key: "field2",
+			label: "B",
+			dataType: "Edm.String"
+		};
+
+		oFilterBar.setP13nMode(["Item"]);
+
+		sinon.stub(oFilterBar, "getPropertyInfoSet").returns([oProperty1, oProperty2]);
+
+		oFilterBar.initControlDelegate();
+
+		const oDelegate = await oFilterBar.awaitControlDelegate();
+		sinon.stub(oDelegate, "fetchProperties").returns(Promise.resolve([oProperty1, oProperty2]));
+
+		await oFilterBar.initialized();
+		let oP13nContainer = await oFilterBar.onAdaptFilters();
+		assert.ok(oP13nContainer, "panel has been created");
+		sinon.spy(oFilterBar, "cleanUpAllFilterFieldsInErrorState");
+		sinon.spy(oFilterBar, "_reportModelChange");
+		sinon.spy(oFilterBar, "triggerSearch");
+		oP13nContainer.fireClose({reason: "Cancel"});
+		assert.ok(oFilterBar.cleanUpAllFilterFieldsInErrorState.notCalled, "cleanUpAllFilterFieldsInErrorState not called on Cancel");
+		assert.ok(oFilterBar._reportModelChange.notCalled, "_reportModelChange not called on Cancel");
+		assert.ok(oFilterBar.triggerSearch.notCalled, "triggerSearch not called on Cancel");
+
+		oP13nContainer = await oFilterBar.onAdaptFilters();
+		oP13nContainer.fireClose({reason: "Ok"});
+		assert.ok(oFilterBar.cleanUpAllFilterFieldsInErrorState.calledOnce, "cleanUpAllFilterFieldsInErrorState called on Ok");
+		assert.ok(oFilterBar._reportModelChange.calledOnce, "_reportModelChange called on Ok");
+		assert.ok(oFilterBar.triggerSearch.notCalled, "triggerSearch not called on Ok");
+		oFilterBar.cleanUpAllFilterFieldsInErrorState.reset();
+		oFilterBar._reportModelChange.reset();
+
+		oP13nContainer = await oFilterBar.onAdaptFilters();
+		oP13nContainer.fireClose({reason: "Filter"});
+		assert.ok(oFilterBar.cleanUpAllFilterFieldsInErrorState.calledOnce, "cleanUpAllFilterFieldsInErrorState called on Filter");
+		assert.ok(oFilterBar._reportModelChange.notCalled, "_reportModelChange not called on Filter");
+		assert.ok(oFilterBar.triggerSearch.calledOnce, "triggerSearch called on Filter");
+
+		oFilterBar.getControlDelegate().fetchProperties.restore();
+
+	});
+
 	QUnit.test("check filter operators", function(assert) {
 
 		const oProperty1 = {
@@ -1730,10 +1782,12 @@ sap.ui.define([
 
 	QUnit.test("Should not log anything, if PropertyInfo is set and FilterFields only set propertyKey", function(assert) {
 		const oFilterField1 = new FilterField("FF1", {
-			propertyKey: "field1"
+			propertyKey: "field1",
+			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}
 		});
 		const oFilterField2 = new FilterField("FF2", {
-			propertyKey: "field2"
+			propertyKey: "field2",
+			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}
 		});
 
 		const oPropertyInfo = [
@@ -1754,10 +1808,12 @@ sap.ui.define([
 
 	QUnit.test("Should not log anything, if PropertyInfo is set for a small selection of properties only and FilterFields only set propertyKey", function(assert) {
 		const oFilterField1 = new FilterField("FF1", {
-			propertyKey: "field1"
+			propertyKey: "field1",
+			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}
 		});
 		const oFilterField2 = new FilterField("FF2", {
-			propertyKey: "field2"
+			propertyKey: "field2",
+			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}
 		});
 
 		const oPropertyInfo = [
@@ -1778,10 +1834,12 @@ sap.ui.define([
 
 	QUnit.test("Should set FilterField label from PropertyInfo, if only propertyKey is set on FilterField", async function(assert) {
 		const oFilterField1 = new FilterField("FF1", {
-			propertyKey: "field1"
+			propertyKey: "field1",
+			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}
 		});
 		const oFilterField2 = new FilterField("FF2", {
-			propertyKey: "field2"
+			propertyKey: "field2",
+			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}
 		});
 
 		const oPropertyInfo = [
@@ -1803,11 +1861,13 @@ sap.ui.define([
 
 	QUnit.test("Should log warning, if FilterField sets metadata property that is not contained in matching PropertyInfo", function(assert) {
 		const oFilterField1 = new FilterField("FF1", {
-			propertyKey: "field1"
+			propertyKey: "field1",
+			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}
 		});
 		const oFilterField2 = new FilterField("FF2", {
 			propertyKey: "field2",
-			maxConditions: 1
+			maxConditions: 1,
+			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}
 		});
 
 		const oPropertyInfo = [
@@ -1829,7 +1889,8 @@ sap.ui.define([
 	QUnit.test("Should log error, if FilterField sets metadata property, and value in PropertyInfo does not match", function(assert) {
 		const oFilterField1 = new FilterField("FF1", {
 			propertyKey: "field1",
-			label: "Field 1"
+			label: "Field 1",
+			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}
 		});
 
 		const oPropertyInfo = [
@@ -1849,10 +1910,12 @@ sap.ui.define([
 
 	QUnit.test("Should log error, if FilterField has no metadata, and PropertyInfo does not contain metadata either", function(assert) {
 		const oFilterField1 = new FilterField("FF1", {
-			propertyKey: "field1"
+			propertyKey: "field1",
+			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}
 		});
 		const oFilterField2 = new FilterField("FF2", {
-			propertyKey: "field2"
+			propertyKey: "field2",
+			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}
 		});
 
 		const oPropertyInfo = [
@@ -1876,7 +1939,8 @@ sap.ui.define([
 			label: "label",
 			dataType: "Edm.String",
 			maxConditions: 1,
-			required: false
+			required: false,
+			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}
 		});
 
 		const oPropertyInfo = [
@@ -1900,10 +1964,12 @@ sap.ui.define([
 			label: "label",
 			dataType: "Edm.String",
 			maxConditions: 1,
-			required: false
+			required: false,
+			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}
 		});
 		const oFilterField2 = new FilterField("FF2", {
-			propertyKey: "field2"
+			propertyKey: "field2",
+			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}
 		});
 
 		const oPropertyInfo = [
@@ -1930,7 +1996,8 @@ sap.ui.define([
 			dataTypeConstraints: {},
 			dataTypeFormatOptions: {},
 			maxConditions: 1,
-			required: false
+			required: false,
+			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}
 		});
 
 		const oPropertyInfo = [
@@ -1949,7 +2016,8 @@ sap.ui.define([
 
 	QUnit.test("Should not log, if PropertyInfo not set, and no FilterField has metadata", function(assert) {
 		const oFilterField1 = new FilterField("FF1", {
-			propertyKey: "field1"
+			propertyKey: "field1",
+			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}
 		});
 
 		this.oFB = new FilterBar("FB1", {

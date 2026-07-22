@@ -4505,14 +4505,16 @@
 							"position": "Senior Developer",
 							"department": "IT Development",
 							"email": "john.doe@company.com",
-							"phone": "+1 234 567 8900"
+							"phone": "+1 234 567 8900",
+							"date1": "2024-01-01",
+							"date2": "2024-02-01"
 						},
 						"settings": {
 							"priority": "medium",
 							"status": "active",
 							"experience": "senior",
 							"workMode": "hybrid"
-						}, 
+						},
 						"statusOptions": [
 							{ "key": "active", "text": "Active" },
 							{ "key": "inactive", "text": "Inactive" },
@@ -4562,6 +4564,46 @@
 								{
 									"label": "Phone",
 									"value": "{employee/phone}"
+								},
+								{
+									"label": "Issue Dates",
+									"valueEntries": [
+										{
+											"value": "{employee/date1}"
+										},
+										{
+											"value": "{employee/date2}"
+										}
+									]
+								},
+								{
+									"label": "Contacts",
+									"valueEntries": [
+										{
+											"value": "{employee/email}",
+											"tooltip": "Send work email",
+											"actions": [
+												{
+													"type": "Navigation",
+													"parameters": {
+														"url": "mailto:{employee/email}"
+													}
+												}
+											]
+										},
+										{
+											"value": "{employee/phone}",
+											"tooltip": "Personal phone",
+											"actions": [
+												{
+													"type": "Navigation",
+													"parameters": {
+														"url": "tel:{employee/phone}"
+													}
+												}
+											]
+										}
+									]
 								}
 							]
 						},
@@ -4621,7 +4663,7 @@
 					]
 				}
 			}
-		}, 
+		},
 		"radioButtonSubmitCard": {
 			"sap.app": {
 				"id": "test.radio.submit",

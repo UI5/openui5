@@ -171,7 +171,8 @@ sap.ui.define([
 				}
 			}
 			assert.equal(aChildren[i].getAttribute("aria-label"), sText, "Aria-label is correct");
-			assert.equal(aChildren[i].firstChild.getAttribute("title"), sText, "Tooltip is correct");
+			const oTitleEl = aChildren[i].querySelector(".sapUiIconTitle");
+			assert.equal(oTitleEl && oTitleEl.getAttribute("title"), sText, "Tooltip is correct");
 			assert.equal(Element.closestTo(aChildren[i]).getSrc(), aRowActionItems[i]._getIconUri(), "Icon src is correct");
 		}
 	}
@@ -279,17 +280,17 @@ sap.ui.define([
 		assert.equal(aChildren.length, 3, "Number of icons is correct");
 		assert.ok(aChildren[0].classList.contains("sapUiTableActionIcon"), "Icon is rendered");
 		assert.equal(aChildren[0].getAttribute("aria-label"), "Search", "Aria-label is correct");
-		assert.equal(aChildren[0].firstChild.getAttribute("title"), "Search", "Tooltip is correct");
+		assert.equal(aChildren[0].querySelector(".sapUiIconTitle").getAttribute("title"), "Search", "Tooltip is correct");
 		assert.equal(Element.closestTo(aChildren[0]).getSrc(), "sap-icon://search", "Icon is correct");
 
 		assert.ok(aChildren[1].classList.contains("sapUiTableActionIcon"), "Icon is rendered");
 		assert.equal(aChildren[1].getAttribute("aria-label"), "Delete", "Aria-label is correct");
-		assert.equal(aChildren[1].firstChild.getAttribute("title"), "Delete", "Tooltip is correct");
+		assert.equal(aChildren[1].querySelector(".sapUiIconTitle").getAttribute("title"), "Delete", "Tooltip is correct");
 		assert.equal(Element.closestTo(aChildren[1]).getSrc(), "sap-icon://delete", "Icon is correct");
 
 		assert.ok(aChildren[2].classList.contains("sapUiTableActionIcon"), "Icon is rendered");
 		assert.equal(aChildren[2].getAttribute("aria-label"), "More", "Aria-label is correct");
-		assert.equal(aChildren[2].firstChild.getAttribute("title"), "More", "Tooltip is correct");
+		assert.equal(aChildren[2].querySelector(".sapUiIconTitle").getAttribute("title"), "More", "Tooltip is correct");
 		assert.equal(Element.closestTo(aChildren[2]).getSrc(), "sap-icon://overflow", "Icon is correct");
 		assert.equal(aChildren[2].getAttribute("aria-haspopup"), "Menu", "aria-haspopup on overflow icon");
 		assert.equal(oTable._oRowActionOverflowMenu, undefined, "Menu not initialized");
@@ -312,12 +313,12 @@ sap.ui.define([
 		assert.equal(aChildren.length, 3, "Number of icons is correct");
 		assert.ok(aChildren[0].classList.contains("sapUiTableActionIcon"), "Icon is rendered");
 		assert.equal(aChildren[0].getAttribute("aria-label"), "Search", "Aria-label is correct");
-		assert.equal(aChildren[0].firstChild.getAttribute("title"), "Search", "Tooltip is correct");
+		assert.equal(aChildren[0].querySelector(".sapUiIconTitle").getAttribute("title"), "Search", "Tooltip is correct");
 		assert.equal(Element.closestTo(aChildren[0]).getSrc(), "sap-icon://search", "Icon is correct");
 
 		assert.ok(aChildren[1].classList.contains("sapUiTableActionIcon"), "Icon is rendered");
 		assert.equal(aChildren[1].getAttribute("aria-label"), "More", "Aria-label is correct");
-		assert.equal(aChildren[1].firstChild.getAttribute("title"), "More", "Tooltip is correct");
+		assert.equal(aChildren[1].querySelector(".sapUiIconTitle").getAttribute("title"), "More", "Tooltip is correct");
 		assert.equal(Element.closestTo(aChildren[1]).getSrc(), "sap-icon://overflow", "Icon is correct");
 		assert.equal(aChildren[1].getAttribute("aria-haspopup"), "Menu", "aria-haspopup on overflow icon");
 
@@ -336,7 +337,7 @@ sap.ui.define([
 
 		assert.ok(aChildren[2].classList.contains("sapUiTableActionIcon"), "Icon is rendered");
 		assert.equal(aChildren[2].getAttribute("aria-label"), "Details", "Aria-label is correct");
-		assert.equal(aChildren[2].firstChild.getAttribute("title"), "Details", "Tooltip is correct");
+		assert.equal(aChildren[2].querySelector(".sapUiIconTitle").getAttribute("title"), "Details", "Tooltip is correct");
 		assert.equal(Element.closestTo(aChildren[2]).getSrc(), "sap-icon://navigation-right-arrow", "Icon is correct");
 
 		const oIconSearch = Element.closestTo(aChildren[0]);

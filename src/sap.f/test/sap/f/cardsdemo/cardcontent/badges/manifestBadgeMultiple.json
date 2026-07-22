@@ -1,0 +1,68 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "card.test.badge.manifest.multiple",
+		"type": "card",
+		"title": "Card 'multiple'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"badge": [
+			{
+				"text": "New",
+				"icon": "sap-icon://status-in-process",
+				"state": "Indication03",
+				"visible": true,
+				"visibilityMode": "Persist"
+			},
+			{
+				"text": "Updated",
+				"state": "Indication05",
+				"visible": true,
+				"visibilityMode": "Disappear"
+			},
+			{
+				"text": "Important",
+				"icon": "sap-icon://warning",
+				"state": "Indication02",
+				"visible": true,
+				"visibilityMode": "Persist"
+			}
+		],
+		"header": {
+			"title": "Multiple Manifest Badges",
+			"subTitle": "Three badges, no customData"
+		},
+		"content": {
+			"data": {
+				"json": [
+					{
+						"Name": "Caroline Clark",
+						"Relation": "Dependent",
+						"Status": "Pending Approval"
+					},
+					{
+						"Name": "John Clark",
+						"Relation": "Husband",
+						"Status": "Approved"
+					},
+					{
+						"Name": "Sarah Clark",
+						"Relation": "Mother",
+						"Status": "Approved"
+					}
+				]
+			},
+			"item": {
+				"title": "{Name}",
+				"description": "{Relation}",
+				"info": {
+					"value": "{Status}"
+				}
+			}
+		}
+	}
+}

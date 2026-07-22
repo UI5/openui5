@@ -175,4 +175,15 @@ sap.ui.define([
 		assert.deepEqual(oMessage.getTargets(), aTargets);
 		assert.notStrictEqual(aTargets, oMessage.aTargets, "message stores a copy");
 	});
+
+	// --- isValidation ---
+
+	QUnit.test("isValidation", function (assert) {
+		assert.strictEqual(new Message().isValidation(), false, "false by default");
+		assert.strictEqual(new Message({validation: true}).isValidation(), true,
+			"true when validation:true passed to constructor");
+		assert.strictEqual(new Message({validation: false}).isValidation(), false,
+			"false when validation:false passed to constructor");
+		assert.notOk(new Message().setValidation, "no setter on prototype");
+	});
 });

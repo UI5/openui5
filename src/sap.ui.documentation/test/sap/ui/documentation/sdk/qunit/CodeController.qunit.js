@@ -9,6 +9,33 @@ function (
 ) {
 	"use strict";
 
+	QUnit.module("_createHTMLControl", {
+		beforeEach: function () {
+			this.controller = new CodeController();
+			this.controller.sIFrameUrl = "https://sdk.example.com/index.html?sap-ui-xx-sample-id=sample.id";
+		},
+		afterEach: function () {
+			this.controller.destroy();
+			this.controller = null;
+		}
+	});
+
+	QUnit.test("HTML content does not contain the iframe src URL", function (assert) {
+		var oControl = this.controller._createHTMLControl();
+		var sContent = oControl.getContent();
+
+		assert.notOk(
+			sContent.indexOf(this.controller.sIFrameUrl) !== -1,
+			"sIFrameUrl must not appear inside the HTML content string"
+		);
+		assert.notOk(
+			/src\s*=/i.test(sContent),
+			"HTML content must not contain a src attribute"
+		);
+
+		oControl.destroy();
+	});
+
 	QUnit.module("onExit", {
 		beforeEach: function () {
 			this.controller = new CodeController();

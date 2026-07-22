@@ -123,4 +123,18 @@ sap.ui.define([
 		]);
 		oModelSpy.restore();
 	});
+
+	//*********************************************************************************************
+	QUnit.test("getMessages", function(assert) {
+		Messaging.removeAllMessages();
+		assert.deepEqual(Messaging.getMessages(), [], "empty when no messages present");
+
+		Messaging.addMessages([oMessage0, oMessage1, oMessageOtherProcessor]);
+		assert.deepEqual(Messaging.getMessages(), [oMessage0, oMessage1, oMessageOtherProcessor],
+			"returns all current messages as flat array");
+
+		Messaging.removeMessages(oMessage0);
+		assert.deepEqual(Messaging.getMessages(), [oMessage1, oMessageOtherProcessor],
+			"reflects state after removeMessages");
+	});
 });

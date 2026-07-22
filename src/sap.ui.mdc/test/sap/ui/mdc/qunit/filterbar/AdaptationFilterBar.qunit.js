@@ -60,6 +60,10 @@ sap.ui.define([
 							label: "Key 2",
 							key: "key2",
 							dataType: "sap.ui.model.type.String"
+						},{
+							label: "Key 3",
+							key: "key3",
+							dataType: "sap.ui.model.type.String"
 						}]
 					}
 				},
@@ -190,10 +194,16 @@ sap.ui.define([
 			conditions: "{$filters>/conditions/key2}",
 			propertyKey: "key2"
 		});
+		const oFF3 = new FilterField("FF3", {
+			conditions: "{$filters>/conditions/key3}",
+			propertyKey: "key3"
+		});
 		this.oAdaptationFilterBar.addFilterItem(oFF1);
 		this.oAdaptationFilterBar.addFilterItem(oFF2);
+		this.oAdaptationFilterBar.addFilterItem(oFF3);
 
 		this.oAdaptationFilterBar.addMessage(oFF1.getPropertyKey(), "Test Error", MessageType.Error);
+		this.oAdaptationFilterBar.addMessage(oFF3.getPropertyKey(), "Test Warning", MessageType.Warning);
 	}
 
 	QUnit.test("onBeforeClose with 'Ok'", function(assert) {
@@ -208,12 +218,18 @@ sap.ui.define([
 			return oPromise.then(() => {
 				const oFF1 = that.oAdaptationFilterBar.getFilterItems()[0];
 				const oFF2 = that.oAdaptationFilterBar.getFilterItems()[1];
+				const oFF3 = that.oAdaptationFilterBar.getFilterItems()[2];
 
 				// After onBeforeClose, error states should be cleared
 				assert.equal(oFF1.getValueState(), ValueState.None, "ValueState cleared for key1");
 				assert.equal(oFF1.getValueStateText(), "", "ValueStateText cleared for key1");
+				assert.equal(that.oAdaptationFilterBar.getMessages(oFF1.getPropertyKey()).length, 0, "No Messages for key1");
 				assert.equal(oFF2.getValueState(), ValueState.None, "ValueState remains None for key2");
 				assert.equal(oFF2.getValueStateText(), "", "ValueStateText remains empty for key2");
+				assert.equal(that.oAdaptationFilterBar.getMessages(oFF2.getPropertyKey()).length, 0, "No Messages for key2");
+				assert.equal(oFF3.getValueState(), ValueState.None, "ValueState cleared for key3");
+				assert.equal(oFF3.getValueStateText(), "", "ValueStateText cleared for key3");
+				assert.equal(that.oAdaptationFilterBar.getMessages(oFF2.getPropertyKey()).length, 0, "No Messages for key3");
 			});
 		});
 	});
@@ -234,8 +250,15 @@ sap.ui.define([
 			conditions: "{$filters>/conditions/key2}",
 			propertyKey: "key2"
 		});
+		const oFF3 = new FilterField("FF3", {
+			conditions: "{$filters>/conditions/key3}",
+			propertyKey: "key3",
+			valueState: ValueState.Warning,
+			valueStateText: "Test Warning"
+		});
 		this.oAdaptationFilterBar.addFilterItem(oFF1);
 		this.oAdaptationFilterBar.addFilterItem(oFF2);
+		this.oAdaptationFilterBar.addFilterItem(oFF3);
 
 		const that = this;
 		return this.oTestTable.awaitControlDelegate().then(function(oDelegate) {
@@ -249,6 +272,8 @@ sap.ui.define([
 				assert.equal(oFF1.getValueStateText(), "", "ValueStateText cleared for key1");
 				assert.equal(oFF2.getValueState(), ValueState.None, "ValueState remains None for key2");
 				assert.equal(oFF2.getValueStateText(), "", "ValueStateText remains empty for key2");
+				assert.equal(oFF3.getValueState(), ValueState.None, "ValueState cleared for key3");
+				assert.equal(oFF3.getValueStateText(), "", "ValueStateText cleared for key3");
 			});
 		});
 	});

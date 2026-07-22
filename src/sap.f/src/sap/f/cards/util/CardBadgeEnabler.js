@@ -10,11 +10,9 @@ sap.ui.define([
 	"sap/ui/core/InvisibleText",
 	"sap/ui/core/Lib",
 	"sap/ui/core/library",
-	"sap/f/library",
-	"sap/ui/base/ManagedObjectObserver",
-	"sap/base/Log"
+	"sap/f/library"
 ],
-function(CardBadgeCustomData, BadgeCustomData, ObjectStatus, InvisibleText, Lib, coreLibrary, library, ManagedObjectObserver, Log) {
+function(CardBadgeCustomData, BadgeCustomData, ObjectStatus, InvisibleText, Lib, coreLibrary, library) {
 	"use strict";
 
 	const CardBadgeVisibilityMode = library.CardBadgeVisibilityMode,
@@ -33,12 +31,8 @@ function(CardBadgeCustomData, BadgeCustomData, ObjectStatus, InvisibleText, Lib,
 
 		/**
 		 * Initializes the card badge enablement.
-		 * Attaching the customData observer.
 		 */
 		this.initCardBadgeEnablement = function () {
-			this._customDataObserver = new ManagedObjectObserver(this._onCustomDataChange.bind(this));
-			this._customDataObserver.observe(this, {aggregations: ["customData"]});
-
 			// Following is a temporary workaround covering problem with the old code in Work Zone. Can be deleted after they upgrade to UI5 1.130.
 			this._aCardBadges = ["temporary"];
 		};
@@ -47,10 +41,6 @@ function(CardBadgeCustomData, BadgeCustomData, ObjectStatus, InvisibleText, Lib,
 		 * Destroys the card badge enablement.
 		 */
 		this.destroyCardBadgeEnablement = function () {
-			if (this._customDataObserver) {
-				this._customDataObserver.disconnect();
-				this._customDataObserver = null;
-			}
 		};
 
 		this._createBadge = function (oData) {
@@ -66,52 +56,61 @@ function(CardBadgeCustomData, BadgeCustomData, ObjectStatus, InvisibleText, Lib,
 				id: "badge" + oData.getId()
 			});
 
-			if (sIcon.length > 0 && oData.getValue()?.length > 0) {
-				oCardBadge.addStyleClass("sapFCardBadgeTextIcon"); //ObjectStatus does not have CSS class to indicate icon and text presence
-			}
-
 			const iIndex = this._getCardBadgeCustomData()?.indexOf(oData);
 			this.insertAggregation("_cardBadges", oCardBadge, iIndex);
 		};
 
-		this._onCustomDataChange = function (oChanges) {
-			const sMutation = oChanges.mutation,
-				oCustomData = oChanges.child;
+		/**
+		 * Synchronizes the rendered badge controls with the current badge custom data.
+		 * Intended to be called from the card's <code>onBeforeRendering</code> hook.
+		 *
+		 * @protected
+		 */
+		this._syncCardBadges = function () {
+			const aCardBadgeCustomData = this._getCardBadgeCustomData();
+			const oInvisibleCardBadgeText = this.getAggregation("_oInvisibleCardBadgeText");
 
-			if (!this._isBadgeCustomData(oCustomData)) {
-				return;
+			this.destroyAggregation("_cardBadges");
+
+			aCardBadgeCustomData.forEach(function (oCustomData) {
+				this._createBadge(oCustomData);
+			}, this);
+
+			if (aCardBadgeCustomData.length > 0 || oInvisibleCardBadgeText) {
+				this._updateInvisibleCardBadgeText();
 			}
-
-			switch (sMutation) {
-				case "insert":
-					this._createBadge(oCustomData);
-					break;
-				case "remove": {
-					const oCardBadge = this._getCardBadgeElement(oCustomData.getId());
-					if (oCardBadge) {
-						this.removeAggregation("_cardBadges", oCardBadge);
-						oCardBadge.destroy();
-					}
-					break;
-				}
-				default:
-					Log.error(`Mutation ${sMutation} is unexpected for card badge custom data.`, this);
-					break;
-			}
-
-			this._updateInvisibleCardBadgeText();
 		};
 
 		/**
-		 * Returns all CardBadgeCustomData elements from customdata, or just an element corresponding to the key
-		 * @returns {Array} aCardBadgeCustomData
+		 * Extension point for subclasses to provide additional badge custom data
+		 * beyond those in the customData aggregation.
+		 *
+		 * For example, sap.ui.integration.widgets.Card uses this to include
+		 * manifest-declared badges alongside programmatic badges.
+		 *
+		 * @returns {sap.f.cards.CardBadgeCustomData[]} Additional badge custom data elements
+		 * @private
+		 * @since 1.151
+		 */
+		this._getAdditionalCardBadges = function () {
+			return [];
+		};
+
+		/**
+		 * Returns all CardBadgeCustomData elements from the customData aggregation.
+		 * Subclasses can override _getAdditionalCardBadges() to provide badges from other sources.
+		 *
+		 * @returns {sap.f.cards.CardBadgeCustomData[]} All badge custom data elements
+		 * @protected
 		 */
 		this._getCardBadgeCustomData  = function () {
-			const aCardBadgeCustomData = this.getCustomData().filter(function(item) {
+			const aCustomDataBadges = this.getCustomData().filter(function(item) {
 				return this._isBadgeCustomData(item);
 			}.bind(this));
 
-			return aCardBadgeCustomData;
+			const aAdditionalBadges = this._getAdditionalCardBadges();
+
+			return aAdditionalBadges.concat(aCustomDataBadges);
 		};
 
 		/**
@@ -128,9 +127,7 @@ function(CardBadgeCustomData, BadgeCustomData, ObjectStatus, InvisibleText, Lib,
 		 * @returns {sap.m.ObjectStatus} oCardBadge
 		 */
 		this._getCardBadgeElement =  function (sId) {
-			const oCardBadge = this._getCardBadges()?.find((oElement) => oElement.getId().endsWith("badge" + sId));
-
-			return oCardBadge;
+			return this._getCardBadges()?.find((oElement) => oElement.getId().endsWith("badge" + sId));
 		};
 
 		/**

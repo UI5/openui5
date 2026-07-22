@@ -361,12 +361,15 @@ function (
 			oBadge2 = new CardBadgeCustomData({value: "Badge 2"});
 
 		this.oCard.addCustomData(oBadge2);
+
+		this.oCard.placeAt(DOM_RENDER_LOCATION);
 		await nextUIUpdate(this.clock);
 
 		const oCustomData2 = new CustomData({value: "Not a badge 2"});
 		this.oCard.addCustomData(oCustomData2);
 
 		this.oCard.insertCustomData(oBadge1, 0);
+		await nextUIUpdate(this.clock);
 
 		// Assert
 		const aCustomData = this.oCard.getCustomData();
@@ -397,7 +400,6 @@ function (
 		oCard.placeAt(DOM_RENDER_LOCATION);
 		await nextUIUpdate(this.clock);
 
-		const oObserver = oCard._customDataObserver;
 		const aCardBadges = oCard.getAggregation("_cardBadges");
 		const oInvisibleText = oCard.getAggregation("_oInvisibleCardBadgeText");
 
@@ -406,9 +408,6 @@ function (
 		await nextUIUpdate(this.clock);
 
 		// Assert
-		assert.notOk(oObserver.isObserved(oCard), "Obeserver is destroyed.");
-		assert.notOk(oCard._customDataObserver, "Obeserver is not there.");
-
 		assert.ok(aCardBadges[0].isDestroyed(), "Card badge is destroyed.");
 		assert.notOk(oCard.getAggregation("_cardBadges"), "Card badges aggregation is cleared.");
 

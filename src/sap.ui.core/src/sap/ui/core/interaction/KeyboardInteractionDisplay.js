@@ -289,31 +289,36 @@ sap.ui.define([
 
 
 	let oCurrentPort;
-	let bThrottled = false;
+	let oLastTarget;
 
 	/**
 	 * Initializes the keyboard interaction information gathering.
 	 * @param  {Event} event The 'focusin' or 'focusout' event triggering the initialization.
 	 */
 	const init = async (event) => {
-		if (bThrottled) {
-			return;
-		}
-		bThrottled = true;
-
-		setTimeout(() => {
-			bThrottled = false;
-		}, 300);
-
-		const aControlTree = [];
-		const docs = {};
-		const oLabelMap = new Map();
-
 		let oTargetElement;
 		if (event) {
 			oTargetElement = event.type === "focusin" ? event.target : event.relatedTarget;
 		}
 		oTargetElement ??= document.activeElement;
+
+		// When the document regains focus (e.g. switching tabs back, closing
+		// devtools), the browser fires a focusin on the previously focused
+		// element before the user's actual click is processed. Suppress that
+		// redundant event so we don't compute stale interaction info for an
+		// element the user is about to leave. Only track focusin targets —
+		// focusout's relatedTarget points to the upcoming focus owner and
+		// would wrongly suppress the matching focusin during Tab navigation.
+		if (event?.type === "focusin") {
+			if (oTargetElement === oLastTarget) {
+				return;
+			}
+			oLastTarget = oTargetElement;
+		}
+
+		const aControlTree = [];
+		const docs = {};
+		const oLabelMap = new Map();
 
 		const oTargetControl = Element.closestTo(oTargetElement);
 

@@ -131,11 +131,10 @@ sap.ui.define([
 	 * <b>Note:</b> Conditions of filters with error will be removed if shown on P13n dialog.
 	 * @public
 	 * @param {sap.ui.mdc.FilterBar} oFilterBar Instance of the {@link sap.ui.mdc.FilterBar FilterBar} control
-	 * @param {map} [mValidation] Object describing the validation result. This object is only provided when called from the {@link sap.ui.mdc.FilterBar FilterBar}
-	 * @param {string} [mValidation.status] Status of the validation {@link sap.ui.mdc.enums.FilterBarValidationStatus}
+	 * @param {string} [sValidationStatus] Status of the validation {@link sap.ui.mdc.enums.FilterBarValidationStatus}
 	 * @returns {sap.ui.mdc.enums.FilterBarValidationStatus} The inner <code>FilterBar</code> state
 	 */
-	FilterBarDelegate.determineValidationState = function(oFilterBar) {
+	FilterBarDelegate.determineValidationState = function(oFilterBar, sValidationStatus) {
 		return oFilterBar.checkFilters();
 	};
 

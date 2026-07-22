@@ -1,0 +1,55 @@
+{
+	"sap.app": {
+		"id": "card.explorer.badge.manifest.bindings",
+		"type": "card"
+	},
+	"sap.card": {
+		"type": "List",
+		"data": {
+			"json": {
+				"badgeInfo": {
+					"count": "5",
+					"status": "New",
+					"icon": "sap-icon://status-in-process",
+					"color": "Indication03"
+				},
+				"items": [
+					{
+						"Name": "Comfort Easy",
+						"Category": "PDA & Organizers"
+					},
+					{
+						"Name": "ITelO Vault",
+						"Category": "PDA & Organizers"
+					},
+					{
+						"Name": "Notebook Professional 15",
+						"Category": "Notebooks"
+					}
+				]
+			},
+			"path": "/"
+		},
+		"badges": [
+			{
+				"text": "{badgeInfo/count} {badgeInfo/status}",
+				"icon": "{badgeInfo/icon}",
+				"state": "{badgeInfo/color}",
+				"visibilityMode": "Persist"
+			}
+		],
+		"header": {
+			"title": "Badge with Data Binding",
+			"subTitle": "Badge values bound to card model"
+		},
+		"content": {
+			"data": {
+				"path": "/items"
+			},
+			"item": {
+				"title": "{Name}",
+				"description": "{Category}"
+			}
+		}
+	}
+}

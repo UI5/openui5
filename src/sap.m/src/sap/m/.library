@@ -131,7 +131,6 @@
         <component>
             <name>CA-UI5-FST</name>
             <modules>
-                <module>sap/m/tutorial/Walkthrough</module>
                 <module>sap/m/tutorial/Testing-BulletinBoard</module>
                 <module>sap/m/tutorial/MasterDetail-DisplayOrders</module>
                 <module>sap/m/tutorial/Worklist-ManageProductStock</module>

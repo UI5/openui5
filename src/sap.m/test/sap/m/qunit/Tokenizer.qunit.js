@@ -4,6 +4,7 @@ sap.ui.define([
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
+	"sap/ui/core/InvisibleMessage",
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/qunit/utils/createAndAppendDiv",
 	"sap/m/Tokenizer",
@@ -19,7 +20,7 @@ sap.ui.define([
 	"sap/ui/thirdparty/jquery",
 	"sap/m/Panel",
 	"sap/m/Button"
-], function(nextUIUpdate, Element, Library1, qutils, createAndAppendDiv, Tokenizer, Token, Dialog, Label, MultiInput, Event, Device, KeyCodes, Library, JSONModel, jQuery, Panel, Button) {
+], function(nextUIUpdate, Element, Library1, InvisibleMessage, qutils, createAndAppendDiv, Tokenizer, Token, Dialog, Label, MultiInput, Event, Device, KeyCodes, Library, JSONModel, jQuery, Panel, Button) {
 	"use strict";
 
 	createAndAppendDiv("content");
@@ -2803,5 +2804,135 @@ sap.ui.define([
 		// Assert
 		assert.ok(oPopover.isOpen(), "Popover should remain open");
 		assert.strictEqual(this.oTokenizer._iPopoverIndexToFocusAfterDelete, iLastIndex - 1, "Focus index should be stored for previous item");
+	});
+
+	QUnit.module("Token Deletion Announcement", {
+		beforeEach: async function () {
+			this.oTokenizer = new Tokenizer({
+				editable: true,
+				tokens: [
+					new Token({ key: "1", text: "Token 1" }),
+					new Token({ key: "2", text: "Token 2" }),
+					new Token({ key: "3", text: "Token 3" }),
+					new Token({ key: "4", text: "Token 4" })
+				]
+			});
+
+			this.oTokenizer.attachTokenDelete(function (oEvent) {
+				oEvent.getParameter("tokens").forEach(function (oToken) {
+					this.oTokenizer.removeToken(oToken);
+				}.bind(this));
+			}.bind(this));
+
+			this.oTokenizer.placeAt("content");
+			await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.oTokenizer.destroy();
+		}
+	});
+
+	QUnit.test("Single token deletion via click should announce '1 token deleted'", async function (assert) {
+		var oAnnounceSpy = this.spy(InvisibleMessage.prototype, "announce");
+		var aTokens = this.oTokenizer.getTokens();
+		var oToken = aTokens[0];
+
+		oToken._fireDeleteToken({ preventDefault: function() {} });
+		await nextUIUpdate();
+
+		assert.ok(oAnnounceSpy.calledOnce, "announce() was called once");
+		assert.ok(
+			oAnnounceSpy.calledWith(oRb.getText("TOKENIZER_TOKEN_DELETED_SINGULAR")),
+			"Correct singular message was announced"
+		);
+
+		oAnnounceSpy.restore();
+	});
+
+	QUnit.test("Single token deletion via keyboard should announce '1 token deleted'", async function (assert) {
+		var oAnnounceSpy = this.spy(InvisibleMessage.prototype, "announce");
+		var aTokens = this.oTokenizer.getTokens();
+		var oToken = aTokens[0];
+
+		oToken.focus();
+		await nextUIUpdate();
+
+		qutils.triggerKeydown(oToken.getDomRef(), KeyCodes.DELETE);
+		await nextUIUpdate();
+
+		assert.ok(oAnnounceSpy.calledOnce, "announce() was called once");
+		assert.ok(
+			oAnnounceSpy.calledWith(oRb.getText("TOKENIZER_TOKEN_DELETED_SINGULAR")),
+			"Correct singular message was announced"
+		);
+
+		oAnnounceSpy.restore();
+	});
+
+	QUnit.test("Multiple tokens deletion via keyboard should announce '{n} tokens deleted'", async function (assert) {
+		var oAnnounceSpy = this.spy(InvisibleMessage.prototype, "announce");
+		var aTokens = this.oTokenizer.getTokens();
+
+		aTokens[0].setSelected(true);
+		aTokens[1].setSelected(true);
+		aTokens[2].setSelected(true);
+
+		aTokens[0].focus();
+		await nextUIUpdate();
+
+		qutils.triggerKeydown(aTokens[0].getDomRef(), KeyCodes.DELETE);
+		await nextUIUpdate();
+
+		assert.ok(oAnnounceSpy.calledOnce, "announce() was called once");
+		assert.ok(
+			oAnnounceSpy.calledWith(oRb.getText("TOKENIZER_TOKEN_DELETED_PLURAL", [3])),
+			"Correct plural message was announced with count 3"
+		);
+
+		oAnnounceSpy.restore();
+	});
+
+	QUnit.test("Clear all should announce total count of deleted tokens", async function (assert) {
+		var oAnnounceSpy = this.spy(InvisibleMessage.prototype, "announce");
+		var iInitialTokenCount = this.oTokenizer.getTokens().length;
+
+		this.oTokenizer._handleClearAll();
+		await nextUIUpdate();
+
+		assert.ok(oAnnounceSpy.calledOnce, "announce() was called once");
+		assert.ok(
+			oAnnounceSpy.calledWith(oRb.getText("TOKENIZER_TOKEN_DELETED_PLURAL", [iInitialTokenCount])),
+			"Correct plural message was announced with count " + iInitialTokenCount
+		);
+
+		oAnnounceSpy.restore();
+	});
+
+	QUnit.test("Token deletion in popover list should announce '1 token deleted'", async function (assert) {
+		this.clock = sinon.useFakeTimers();
+		var oAnnounceSpy = this.spy(InvisibleMessage.prototype, "announce");
+
+		this.oTokenizer.setWidth("100px");
+		this.oTokenizer.setRenderMode(Library.TokenizerRenderMode.Narrow);
+		await nextUIUpdate(this.clock);
+		this.clock.tick(100);
+
+		this.oTokenizer._handleNMoreIndicatorPress();
+		this.clock.tick(500);
+
+		var oList = this.oTokenizer._getTokensList();
+		var aListItems = oList.getItems();
+
+		oList.fireDelete({ listItem: aListItems[0] });
+		this.clock.tick(100);
+
+		assert.ok(oAnnounceSpy.called, "announce() was called");
+		assert.ok(
+			oAnnounceSpy.calledWith(oRb.getText("TOKENIZER_TOKEN_DELETED_SINGULAR")),
+			"Correct singular message was announced for popover deletion"
+		);
+
+		oAnnounceSpy.restore();
+		this.clock.restore();
 	});
 });

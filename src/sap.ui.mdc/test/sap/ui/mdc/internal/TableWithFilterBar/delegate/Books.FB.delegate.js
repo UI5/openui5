@@ -152,33 +152,58 @@ sap.ui.define([
 		}
 	};
 
-	FilterBarBooksSampleDelegate.determineValidationState = function(oFilterBar, mValidation) {
+	FilterBarBooksSampleDelegate.determineValidationState = function(oFilterBar, sFilterBarValidationStatus) {
+		const bWarning = oFilterBar.isA("sap.ui.mdc.filterbar.p13n.AdaptationFilterBar"); // TODO: as private find better way for FE to determine adaptation mode
+		const sValidationStatus = this._validateConditions(oFilterBar, bWarning);
+
+		return sValidationStatus || sFilterBarValidationStatus || FilterBarDelegate.determineValidationState.apply(this, arguments);
+	};
+
+	FilterBarBooksSampleDelegate._validateConditions = function(oFilterBar, bWarning) {
+		const sMessageType = bWarning ? MessageType.Warning : MessageType.Error;
+		const sMessageText = "Please select a Currency!";
 		const oFilterBarConditions = oFilterBar.getConditions();
-		const sPriceConditionName = "price",
-			sCurrencyConditionName = "currency_code";
+		const sPriceConditionName = "price";
+		const sCurrencyConditionName = "currency_code";
+		const bPriceConditionPresent = !!oFilterBarConditions?.[sPriceConditionName]?.length;
+		const bCurrencyConditionPresent = !!oFilterBarConditions[sCurrencyConditionName]?.length;
 
-		const bPriceConditionPresent = !!oFilterBarConditions?.[sPriceConditionName]?.length,
-			bCurrencyConditionPresent = !!oFilterBarConditions[sCurrencyConditionName]?.length;
-
-		const oCurrencyValidationMessage = oFilterBar.getMessages(sPriceConditionName).find((oMsg) => {
-			return oMsg.getType() === MessageType.Error && oMsg.getMessage() === "Please select a Currency!";
+		let oPriceValidationMessage = oFilterBar.getMessages(sPriceConditionName).find((oMsg) => {
+			return oMsg.getMessage() === sMessageText;
+		});
+		let oCurrencyValidationMessage = oFilterBar.getMessages(sCurrencyConditionName).find((oMsg) => {
+			return oMsg.getMessage() === sMessageText;
 		});
 
+		let sValidationStatus;
+
 		if (!bPriceConditionPresent || (bPriceConditionPresent && bCurrencyConditionPresent)) {
+			if (oPriceValidationMessage) {
+				oFilterBar.removeMessage(oPriceValidationMessage);
+			}
 			if (oCurrencyValidationMessage) {
 				oFilterBar.removeMessage(oCurrencyValidationMessage);
 			}
-		}
-
-		if (bPriceConditionPresent && !bCurrencyConditionPresent) {
+		} else if (bPriceConditionPresent && !bCurrencyConditionPresent) {
+			if (oPriceValidationMessage && oPriceValidationMessage.getType() !== sMessageType) {
+				oFilterBar.removeMessage(oPriceValidationMessage);
+				oPriceValidationMessage = null;
+			}
+			if (!oPriceValidationMessage) {
+				oFilterBar.addMessage(sPriceConditionName, sMessageText, sMessageType);
+			}
+			if (oCurrencyValidationMessage && oCurrencyValidationMessage.getType() !== sMessageType) {
+				oFilterBar.removeMessage(oCurrencyValidationMessage);
+				oCurrencyValidationMessage = null;
+			}
 			if (!oCurrencyValidationMessage) {
-				oFilterBar.addMessage(sPriceConditionName, "Please select a Currency!", MessageType.Error);
+				oFilterBar.addMessage(sCurrencyConditionName, sMessageText, sMessageType);
 			}
 
-			return FilterBarValidationStatus.RequiredHasNoValue;
+			sValidationStatus = FilterBarValidationStatus.RequiredHasNoValue;
 		}
 
-		return oFilterBar.checkFilters();
+		return sValidationStatus;
 	};
 
 	FilterBarBooksSampleDelegate.getDefaultValues = function(oFilterBar, sPropertyKey) {

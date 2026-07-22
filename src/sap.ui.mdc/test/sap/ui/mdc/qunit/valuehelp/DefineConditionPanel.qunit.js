@@ -66,7 +66,8 @@ sap.ui.define([
 	// needed for FixedList getContent
 	"sap/ui/model/base/ManagedObjectModel",
 	// needed for FixedList getContent
-	"sap/base/strings/whitespaceReplacer"
+	"sap/base/strings/whitespaceReplacer",
+	"sap/ui/Device"
 ], (
 	Element,
 	Library,
@@ -114,7 +115,8 @@ sap.ui.define([
 	Filter,
 	Sorter,
 	ManagedObjectModel,
-	whitespaceReplacer
+	whitespaceReplacer,
+	Device
 ) => {
 	"use strict";
 
@@ -2057,10 +2059,10 @@ sap.ui.define([
 		const oContent2 = oOperatorField2.getAggregation("_content")[0];
 		const sFixedListId = oDefineConditionPanel._sOperatorHelpId + "-pop-fl";
 		const oFixedList = Element.getElementById(sFixedListId);
-
+		const iOpenCloseTimeout = Device.browser.name === "ff" ? 100 : 10; // as focus handling in FF is async
 		oContent1.focus();
 		qutils.triggerKeydown(oContent1.getFocusDomRef(), KeyCodes.F4, false, false, false);
-		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening
+		await new Promise((resolve) => {setTimeout(resolve, iOpenCloseTimeout);}); // opening
 		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening
 		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening (need 3 Timeouts as some Promises and Models are involved)
 		let aItems = oFixedList.getItems();
@@ -2071,11 +2073,11 @@ sap.ui.define([
 		assert.equal(aItems[3].getKey(), OperatorName.DefaultValues, "Fourth operator is DefaultValues");
 
 		oContent2.focus();
-		await new Promise((resolve) => {setTimeout(resolve, 10);}); // closing
+		await new Promise((resolve) => {setTimeout(resolve, iOpenCloseTimeout);}); // closing
 		await new Promise((resolve) => {setTimeout(resolve, 10);}); // closing
 		await new Promise((resolve) => {setTimeout(resolve, 10);}); // closing (need 3 Timeouts as some Promises and Models are involved)
 		qutils.triggerKeydown(oContent2.getFocusDomRef(), KeyCodes.F4, false, false, false);
-		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening
+		await new Promise((resolve) => {setTimeout(resolve, iOpenCloseTimeout);}); // opening
 		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening
 		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening (need 3 Timeouts as some Promises and Models are involved)
 		aItems = oFixedList.getItems();
@@ -2086,13 +2088,13 @@ sap.ui.define([
 		assert.equal(aItems[3].getKey(), OperatorName.DefaultValues, "Fourth operator is DefaultValues");
 
 		qutils.triggerKeydown(oContent2.getFocusDomRef(), KeyCodes.F4, false, false, false); // to close
-		await new Promise((resolve) => {setTimeout(resolve, 10);}); // closing
+		await new Promise((resolve) => {setTimeout(resolve, iOpenCloseTimeout);}); // closing
 		await new Promise((resolve) => {setTimeout(resolve, 10);}); // closing
 		await new Promise((resolve) => {setTimeout(resolve, 10);}); // closing (need 3 Timeouts as some Promises and Models are involved)
 		oOperatorField2.setValue(OperatorName.DefaultValues);
 		oOperatorField2.fireChange({value: OperatorName.DefaultValues, valid: true, promise: Promise.resolve(OperatorName.DefaultValues)}); // fake item select
 		qutils.triggerKeydown(oContent2.getFocusDomRef(), KeyCodes.F4, false, false, false);
-		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening
+		await new Promise((resolve) => {setTimeout(resolve, iOpenCloseTimeout);}); // opening
 		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening
 		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening (need 3 Timeouts as some Promises and Models are involved)
 		aItems = oFixedList.getItems();
@@ -2103,11 +2105,11 @@ sap.ui.define([
 		assert.equal(aItems[3].getKey(), OperatorName.DefaultValues, "Fourth operator is DefaultValues");
 
 		oContent1.focus();
-		await new Promise((resolve) => {setTimeout(resolve, 10);}); // closing
+		await new Promise((resolve) => {setTimeout(resolve, iOpenCloseTimeout);}); // closing
 		await new Promise((resolve) => {setTimeout(resolve, 10);}); // closing
 		await new Promise((resolve) => {setTimeout(resolve, 10);}); // closing (need 3 Timeouts as some Promises and Models are involved)
 		qutils.triggerKeydown(oContent1.getFocusDomRef(), KeyCodes.F4, false, false, false);
-		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening
+		await new Promise((resolve) => {setTimeout(resolve, iOpenCloseTimeout);}); // opening
 		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening
 		await new Promise((resolve) => {setTimeout(resolve, 10);}); // opening (need 3 Timeouts as some Promises and Models are involved)
 		aItems = oFixedList.getItems();

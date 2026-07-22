@@ -70,6 +70,35 @@
 							]
 						},
 						{
+							"label": "Email",
+							"valueEntries": [
+								{
+									"value": "{email}",
+									"tooltip": "Send work email",
+									"actions": [
+										{
+											"type": "Navigation",
+											"parameters": {
+												"url": "mailto:{email}"
+											}
+										}
+									]
+								},
+								{
+									"value": "{privateEmail}",
+									"tooltip": "Send personal email",
+									"actions": [
+										{
+											"type": "Navigation",
+											"parameters": {
+												"url": "mailto:{privateEmail}"
+											}
+										}
+									]
+								}
+							]
+						},
+						{
 							"label": "Team",
 							"type": "IconGroup",
 							"path": "team",

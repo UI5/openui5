@@ -124,6 +124,82 @@ sap.ui.define([
 			});
 	});
 
+	QUnit.test("Resolve bindings inside Object item 'valueEntries' array", function (assert) {
+		// Arrange
+		var oManifest = {
+			"sap.app": {
+				"id": "manifestResolver.test.card",
+				"type": "card",
+				"i18n": {
+					"bundleUrl": "i18n/i18n.properties",
+					"supportedLocales": [""],
+					"fallbackLocale": ""
+				}
+			},
+			"sap.card": {
+				"type": "Object",
+				"data": {
+					"request": {
+						"url": "./employee.json"
+					}
+				},
+				"content": {
+					"groups": [
+						{
+							"title": "Contact Details",
+							"items": [
+								{
+									"label": "Contacts",
+									"valueEntries": [
+										{
+											"value": "{phone}",
+											"tooltip": "Call {firstName}",
+											"actions": [
+												{
+													"type": "Navigation",
+													"parameters": {
+														"url": "tel:{phone}"
+													}
+												}
+											]
+										},
+										{
+											"value": "{company/website}",
+											"visible": "{= ${firstName} === 'Donna' }"
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		};
+
+		var oCard = new SkeletonCard({
+			manifest: oManifest,
+			baseUrl: "test-resources/sap/ui/integration/qunit/testResources/manifestResolver/"
+		});
+
+		// Act
+		return ManifestResolver.resolveCard(oCard)
+			.then(function (oRes) {
+				var oItem = oRes["sap.card"].content.groups[0].items[0];
+				var aValues = oItem.valueEntries;
+
+				// Assert
+				assert.ok(Array.isArray(aValues), "The 'valueEntries' array is preserved in the resolved manifest.");
+				assert.strictEqual(aValues.length, 2, "Both value entries are present.");
+				assert.strictEqual(aValues[0].value, "+1 202 555 5555", "Binding in the first value entry is resolved.");
+				assert.strictEqual(aValues[0].tooltip, "Call Donna", "Binding in the entry tooltip is resolved.");
+				assert.strictEqual(aValues[0].actions[0].parameters.url, "tel:+1 202 555 5555", "Binding in the entry action is resolved.");
+				assert.strictEqual(aValues[1].value, "https://www.company_a.example.com", "Binding in the second value entry is resolved.");
+				assert.strictEqual(aValues[1].visible, true, "Expression binding for the entry visibility is resolved to a boolean.");
+
+				oCard.destroy();
+			});
+	});
+
 	QUnit.test("Resolve bindings to named data section", function (assert) {
 		// Arrange
 		var oManifest = {

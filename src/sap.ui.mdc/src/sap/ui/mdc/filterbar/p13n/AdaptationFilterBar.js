@@ -598,18 +598,6 @@ sap.ui.define([
 		});
 	};
 
-
-	AdaptationFilterBar.prototype._setMessageForItem = function(oItem, sText, sType) {
-		const oFilterField = this.mFilterFields && this.mFilterFields[oItem.name];
-		if (!oFilterField) { return; }
-		const sPropKey = oFilterField.getPropertyKey();
-		// remove existing messages for this property
-		this.removeMessages(sPropKey);
-		if (sText) {
-			this.addMessage(sPropKey, sText, sType || MessageType.None);
-		}
-	};
-
 	/**
 	 * Validates a filter item and updates its message based on visibility and value state.
 	 *
@@ -623,8 +611,20 @@ sap.ui.define([
 		}
 
 		// Don't overwrite existing error messages (e.g., from required field validation)
-		const aExistingMessages = this.getMessages(oFilterField.getPropertyKey());
-		if (aExistingMessages.some((msg) => msg.type === MessageType.Error)) {
+		const sPropKey = oFilterField.getPropertyKey();
+		const aExistingMessages = this.getMessages(sPropKey);
+		let bErrorMessage = false;
+		aExistingMessages.forEach((oMessage) => {
+			if (oMessage.getMessage() === this._oRb.getText("adaptFiltersPanel.WARNING_INVISIBLE_EMPTY_REMOVE") ||
+				oMessage.getMessage() === this._oRb.getText("adaptFiltersPanel.INFO_INVISIBLE_WITH_VALUE")) {
+				this.removeMessage(oMessage); // remove only messages set by AdaptationFilterBar
+			}
+			if (oMessage.getType === MessageType.Error) {
+				bErrorMessage = true;
+			}
+		});
+
+		if (bErrorMessage) {
 			return;
 		}
 
@@ -643,37 +643,22 @@ sap.ui.define([
 			sMessageType = MessageType.Information;
 		}
 
-		this._setMessageForItem(oItem, sMessage, sMessageType);
+		if (sMessage) {
+			this.addMessage(sPropKey, sMessage, sMessageType);
+		}
 	};
 
 	AdaptationFilterBar.prototype.onBeforeClose = function() {
-		const aMessagesToRemove = [];
+		// const aMessagesToRemove = [];
 
 		this.getFilterItems().forEach((oFilterField) => {
 			const sPropKey = oFilterField.getPropertyKey();
-			const aMessages = this.getMessages(sPropKey);
-			let bHasError = false;
+			this.removeMessages(sPropKey); // remove all messages, otherwise it could appear in some message-bar after dialog is closed
 
-			aMessages.forEach((oMessage) => {
-				if (oMessage.type === MessageType.Error) {
-					aMessagesToRemove.push(oMessage);
-					bHasError = true;
-				}
-			});
-
-			if (oFilterField.getValueState() === ValueState.Error) {
-				bHasError = true;
-			}
-
-			if (bHasError) {
-				oFilterField.setValueState(ValueState.None);
-				oFilterField.setValueStateText("");
-			}
+			oFilterField.setValueState(ValueState.None);
+			oFilterField.setValueStateText("");
 		});
 
-		if (aMessagesToRemove.length > 0) {
-			Messaging.removeMessages(aMessagesToRemove);
-		}
 		this._getConditionModel().checkUpdate(true);
 
 		return Promise.resolve();

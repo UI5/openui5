@@ -3,6 +3,8 @@
 	"lastName": "Petrova",
 	"position": "Sales Executive",
 	"phone": "+1 202 555 5555",
+	"email": "elena.petrova@company.com",
+	"privateEmail": "elena.petrova@personal.example.com",
 	"photo": "./images/Elena_Petrova.png",
 	"manager": {
 		"firstName": "John",

@@ -318,8 +318,9 @@ sap.ui.define([
 
 				// Assigning allowed query parameters from Demo Kit URL
 				ALLOWLIST_SAMPLES_SEARCH_PARAMS.forEach(function (oParam, index) {
-					if (new URL(document.location.href).searchParams.get(oParam)) {
-						sSampleSearchParams += (sSampleSearchParams === "" ? "?" : "&") + oParam + "=" + new URL(document.location.href).searchParams.get(oParam);
+					var sValue = new URL(document.location.href).searchParams.get(oParam);
+					if (sValue) {
+						sSampleSearchParams += (sSampleSearchParams === "" ? "?" : "&") + oParam + "=" + encodeURIComponent(sValue);
 					}
 				});
 
@@ -660,6 +661,11 @@ sap.ui.define([
 			_onAfterIframeRendering: function() {
 				var oModelData = this.oModel.getData();
 
+				var oIframeDomRef = this._oHtmlControl && this._oHtmlControl.getDomRef();
+				if (oIframeDomRef) {
+					oIframeDomRef.src = this.sIFrameUrl;
+				}
+
 				// For external samples, resolve immediately after rendering since they don't use our messaging protocol
 				if (this._isExternalSample(oModelData)) {
 					setTimeout(function() {
@@ -673,7 +679,7 @@ sap.ui.define([
 			_createHTMLControl: function () {
 				return new HTML({
 					id : "sampleFrame",
-					content : '<iframe src="' + this.sIFrameUrl + '" id="sampleFrame" frameBorder="0"></iframe>'
+					content : '<iframe id="sampleFrame" frameBorder="0"></iframe>'
 				});
 			},
 

@@ -3568,4 +3568,33 @@ sap.ui.define([
 
 		oDP.destroy();
 	});
+
+	QUnit.test("minDate and maxDate from bound DateTime constraints are considered", async function(assert) {
+		// Arrange
+		var oMinDate = UI5Date.getInstance("2015", "10", "20"),
+			oMaxDate = UI5Date.getInstance("2015", "10", "30");
+
+		var oDP8 = new DatePicker("DP8", {
+			value: {
+				path: "/dateValue1",
+				type: new TypeDate({style: "medium"}, { minimum: oMinDate, maximum: oMaxDate })
+			}
+		}).placeAt("content");
+
+		await nextUIUpdate();
+
+		var sStyle = oDP8._getFormatter(true).oFormatOptions.style,
+			sExpected = DateFormat.getDateInstance({ style: sStyle }).getPlaceholderText(oMinDate, oMaxDate);
+
+		// Assert
+		assert.strictEqual(oDP8._getPlaceholder(), sExpected,
+			"Placeholder reflects the min/max date range from the bound type constraints");
+
+		assert.deepEqual(oDP8.getMaxDate(), oMaxDate, "Max date is taken from type constraints");
+		assert.deepEqual(oDP8.getMinDate(), oMinDate, "Min date is taken from type constraints");
+
+		// Cleanup
+		oDP8.destroy();
+	});
+
 });

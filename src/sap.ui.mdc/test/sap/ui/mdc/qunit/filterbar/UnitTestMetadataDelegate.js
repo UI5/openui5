@@ -26,7 +26,8 @@ sap.ui.define([
 			dataTypeFormatOptions: merge({}, oProperty.formatOptions),
 			maxConditions: oProperty.maxConditions,
 			required: oProperty.required,
-			visible: true //oProperty.visible
+			visible: true, //oProperty.visible
+			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}
 		});
 
 		oFilterField.bindProperty("conditions", {

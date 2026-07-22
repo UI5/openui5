@@ -1,0 +1,45 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "card.test.badge.manifest.and.programmatic",
+		"type": "card",
+		"title": "Card 'programmatic'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"badges": [
+			{
+				"text": "From Manifest",
+				"icon": "sap-icon://message-information",
+				"state": "Indication04",
+				"visible": true,
+				"visibilityMode": "Persist"
+			}
+		],
+		"header": {
+			"title": "Combined Badges",
+			"subTitle": "Manifest + Programmatic (host adds more via customData)"
+		},
+		"content": {
+			"data": {
+				"json": [
+					{
+						"Name": "John Clark",
+						"Relation": "Husband"
+					},
+					{
+						"Name": "Sarah Clark",
+						"Relation": "Daughter"
+					}
+				]
+			},
+			"item": {
+				"title": "{Name}",
+				"description": "{Relation}"
+			}
+		}
+	}
+}
