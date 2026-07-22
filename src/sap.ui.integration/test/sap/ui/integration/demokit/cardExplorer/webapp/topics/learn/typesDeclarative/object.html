@@ -288,10 +288,27 @@
 					<tr>
 						<td>value</td>
 						<td>string</td>
-						<td>Yes</td>
+						<td>No</td>
 						<td>Represents the text, which is associated with the label.</td>
 						<td>1.15.0</td>
 						<td>1.64</td>
+					</tr>
+					<tr>
+						<td>valueEntries</td>
+						<td><a href="#valueEntryProperties">ValueEntry[]</a></td>
+						<td>No</td>
+						<td>
+							An array of value objects, each with its own value, tooltip, actions and visibility. This allows a single item to display multiple values, one after another.
+							<br>
+							When provided, this property takes precedence over the <code>value</code> property.
+							<br>
+							<b>Note:</b> This property works only with items of type <code>Default</code>.
+							<br>
+							<span class="mobileNoteIcon"></span>
+							<b>Note:</b> Not yet implemented for <a href="../../../index.html#/overview/supportedPlatforms/native" target="_parent">mobile native cards</a>.
+						</td>
+						<td>1.89.0</td>
+						<td>1.151</td>
 					</tr>
 					<tr>
 						<td>actions</td>
@@ -314,6 +331,60 @@
 						</td>
 						<td>1.38</td>
 						<td>1.98</td>
+					</tr>
+				</table>
+			</div>
+
+			<div id="valueEntryProperties" class="boldBlock">ValueEntry Properties</div>
+			<div class="tableWrapper">
+				<table>
+					<tr>
+						<th>Property</th>
+						<th>Type</th>
+						<th>Required</th>
+						<th>Description</th>
+						<th>Schema Version</th>
+						<th>Since</th>
+					</tr>
+					<tr>
+						<td>value</td>
+						<td>string</td>
+						<td>Yes</td>
+						<td>The text value to display.</td>
+						<td>1.89.0</td>
+						<td>1.151</td>
+					</tr>
+					<tr>
+						<td>tooltip</td>
+						<td>string</td>
+						<td>No</td>
+						<td>Tooltip for an item that is a link (has defined action). It provides a hint about this action.</td>
+						<td>1.89.0</td>
+						<td>1.151</td>
+					</tr>
+					<tr>
+						<td>actions</td>
+						<td><a href="../../../index.html#/learn/actions" target="_parent">Actions[]</a></td>
+						<td>No</td>
+						<td>Actions that are triggered when this value entry is pressed.</td>
+						<td>1.89.0</td>
+						<td>1.151</td>
+					</tr>
+					<tr>
+						<td>visible</td>
+						<td>boolean</td>
+						<td>No</td>
+						<td>Determines the visibility of this value entry.</td>
+						<td>1.89.0</td>
+						<td>1.151</td>
+					</tr>
+					<tr>
+						<td>maxLines</td>
+						<td>int</td>
+						<td>No</td>
+						<td>Maximum number of lines for the value.</td>
+						<td>1.89.0</td>
+						<td>1.151</td>
 					</tr>
 				</table>
 			</div>

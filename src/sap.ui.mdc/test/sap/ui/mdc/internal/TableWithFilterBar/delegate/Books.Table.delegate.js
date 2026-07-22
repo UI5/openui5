@@ -130,33 +130,8 @@ sap.ui.define([
 					return oFilterField;
 				});
 			},
-			determineValidationState: function(oFilterBar, mValidation) {
-				const oFilterBarConditions = oFilterBar.getConditions();
-				const sCurrencyConditionName = "currency_code";
-				const sPriceConditionName = "price";
-
-				const bPriceConditionPresent = !!oFilterBarConditions?.[sPriceConditionName]?.length,
-					bCurrencyConditionPresent = !!oFilterBarConditions[sCurrencyConditionName]?.length;
-
-				const oCurrencyValidationMessage = oFilterBar.getMessages(sPriceConditionName).find((oMsg) => {
-					return oMsg.getType() === MessageType.Error && oMsg.getMessage() === "Please select a Currency!";
-				});
-
-				if (!bPriceConditionPresent || (bPriceConditionPresent && bCurrencyConditionPresent)) {
-					if (oCurrencyValidationMessage) {
-						oFilterBar.removeMessage(oCurrencyValidationMessage);
-					}
-				}
-
-				if (bPriceConditionPresent && !bCurrencyConditionPresent) {
-					if (!oCurrencyValidationMessage) {
-						oFilterBar.addMessage(sPriceConditionName, "Please select a Currency!", MessageType.Error);
-					}
-
-					return FilterBarValidationStatus.RequiredHasNoValue;
-				}
-
-				return oFilterBar.checkFilters();
+			determineValidationState: function(oFilterBar, sFilterBarValidationStatus) {
+				return BooksFBDelegate.determineValidationState(oFilterBar, sFilterBarValidationStatus);
 			}
 		};
 	};

@@ -24,6 +24,8 @@ sap.ui.define([
 	"sap/m/SegmentedButton",
 	"sap/m/SegmentedButtonItem",
 	"sap/ui/core/library",
+	"sap/ui/core/LabelEnablement",
+	"sap/ui/core/Element",
 	"sap/m/table/Util",
 	"sap/m/Button",
 	"sap/m/ToggleButton",
@@ -31,7 +33,7 @@ sap.ui.define([
 	"sap/ui/core/InvisibleMessage",
 	"sap/ui/Device",
 	"sap/ui/layout/VerticalLayout"
-], (Library, JSONModel, QueryPanel, Icon, Sorter, OverflowToolbar, ToolbarSpacer, Title, Label, HBox, Filter, Item, mLibrary, ComboBox, List, CustomListItem, GroupHeaderListItem, Grid, GridData, SegmentedButton, SegmentedButtonItem, coreLib, TableUtil, Button, ToggleButton, InvisibleText, InvisibleMessage, Device, VerticalLayout) => {
+], (Library, JSONModel, QueryPanel, Icon, Sorter, OverflowToolbar, ToolbarSpacer, Title, Label, HBox, Filter, Item, mLibrary, ComboBox, List, CustomListItem, GroupHeaderListItem, Grid, GridData, SegmentedButton, SegmentedButtonItem, coreLib, LabelEnablement, Element, TableUtil, Button, ToggleButton, InvisibleText, InvisibleMessage, Device, VerticalLayout) => {
 	"use strict";
 
 	const { InvisibleMessageMode } = coreLib;
@@ -585,10 +587,16 @@ sap.ui.define([
 		oRow.addContent(oReorderingInvisibleText);
 		const oEventDelegate = {
 			onsaptop: function(oEvent) {
-				this._handleReorder(oEvent, true);
+				this._handleReorder(oEvent, "TOP");
 			},
 			onsapbottom: function(oEvent) {
-				this._handleReorder(oEvent, false);
+				this._handleReorder(oEvent, "BOTTOM");
+			},
+			onsapup: function(oEvent) {
+				this._handleReorder(oEvent, "UP");
+			},
+			onsapdown: function(oEvent) {
+				this._handleReorder(oEvent, "DOWN");
 			}
 		};
 
@@ -597,13 +605,13 @@ sap.ui.define([
 	};
 
 	/**
-	 * Handles reordering of a list item to the top or bottom of the list.
+	 * Handles reordering of a list item.
 	 *
 	 * @param {sap.ui.base.Event} oEvent The keyboard event
-	 * @param {boolean} bToTop If true, move to top; if false, move to bottom
+	 * @param {string} sDirection Direction to move: "TOP", "BOTTOM", "UP", or "DOWN"
 	 * @private
 	 */
-	AdaptFiltersPanelContent.prototype._handleReorder = function(oEvent, bToTop) {
+	AdaptFiltersPanelContent.prototype._handleReorder = function(oEvent, sDirection) {
 		const bEditable = this._oViewModel.getProperty("/editable");
 		const bGrouped = this._oViewModel.getProperty("/grouped");
 
@@ -644,8 +652,34 @@ sap.ui.define([
 			return;
 		}
 
-		const iNewIndex = bToTop ? 1 : aVisibleItems.length;
+		const iCurrentIndex = aVisibleItems.indexOf(oListItem);
+		let iNewIndex;
+
+		switch (sDirection) {
+			case "TOP":
+				iNewIndex = 1;
+				break;
+			case "BOTTOM":
+				iNewIndex = aVisibleItems.length;
+				break;
+			case "UP":
+				if (iCurrentIndex <= 0) {
+					return; // Already at top
+				}
+				iNewIndex = iCurrentIndex;
+				break;
+			case "DOWN":
+				if (iCurrentIndex >= aVisibleItems.length - 1) {
+					return; // Already at bottom
+				}
+				iNewIndex = iCurrentIndex + 2;
+				break;
+			default:
+				return;
+		}
+
 		this._moveListItem(oListItem, iNewIndex);
+		this._announceReorder(oModelEntry, sDirection);
 	};
 
 	/**
@@ -758,7 +792,13 @@ sap.ui.define([
 
 		if (oFilterControl) {
 			oFilterControl.addAriaLabelledBy?.(oLabel);
-			oLabel.setLabelFor(oFilterControl);
+			const oFilterField = oFilterControl.getFilterField?.() || oFilterControl;
+			const aLabelIds = LabelEnablement.getReferencingLabels(oFilterField);
+			aLabelIds.forEach((sId) => { // remove old Label assignment to prevent wrong aria-labelledby
+				const oLabel = Element.getElementById(sId);
+				oLabel.setLabelFor();
+			});
+			oLabel.setLabelFor(oFilterField);
 		}
 
 		const oActionContainer = this._createActionContainer(oContext, oLabel);
@@ -974,6 +1014,7 @@ sap.ui.define([
 
 	AdaptFiltersPanelContent.prototype._onRearrange = function(oEvent) {
 		const oDraggedItem = oEvent.getParameter("draggedControl");
+		const oModelEntry = this._getModelEntry(oDraggedItem);
 		const oDroppedItem = oEvent.getParameter("droppedControl");
 		const sDropPosition = oEvent.getParameter("dropPosition");
 		const aVisibleItems = this._oListControl.getItems().filter((oItem) => oItem.getVisible());
@@ -981,7 +1022,22 @@ sap.ui.define([
 		const iDroppedIndex = aVisibleItems.indexOf(oDroppedItem);
 		const iActualDroppedIndex = iDroppedIndex + (sDropPosition == "Before" ? 0 : 1) + (iDraggedIndex < iDroppedIndex ? 0 : 1);
 
+		// Skip if item was dropped on itself (no actual movement)
+		if (oDraggedItem === oDroppedItem) {
+			return;
+		}
+
+		let sDirection;
+		if (iDroppedIndex === iDraggedIndex + 1 && sDropPosition === "After") {
+			// Moving down by one position
+			sDirection = "DOWN";
+		} else if (iDroppedIndex === iDraggedIndex - 1 && sDropPosition === "Before") {
+			// Moving up by one position
+			sDirection = "UP";
+		}
+
 		this._moveListItem(oDraggedItem, iActualDroppedIndex);
+		this._announceReorder(oModelEntry, sDirection);
 	};
 
 	/**
@@ -1104,6 +1160,42 @@ sap.ui.define([
 				aListItems[iNewIndex - 1].focus();
 			}
 		}, RENDERING_DELAY_MS);
+	};
+
+	/**
+	 * Announces reordering of a filter item to screen readers.
+	 *
+	 * @param {object} oModelEntry The model entry of the reordered item
+	 * @param {string} [sDirection] Optional direction indicator: "TOP", "UP", "DOWN", "BOTTOM"
+	 * @private
+	 */
+	AdaptFiltersPanelContent.prototype._announceReorder = function(oModelEntry, sDirection) {
+		let sTextKey = "p13n.REORDER_ANNOUNCEMENT";
+
+		if (sDirection) {
+			switch (sDirection) {
+				case "TOP":
+					sTextKey = "p13n.REORDER_ANNOUNCEMENT_TOP";
+					break;
+				case "UP":
+					sTextKey = "p13n.REORDER_ANNOUNCEMENT_UP";
+					break;
+				case "DOWN":
+					sTextKey = "p13n.REORDER_ANNOUNCEMENT_DOWN";
+					break;
+				case "BOTTOM":
+					sTextKey = "p13n.REORDER_ANNOUNCEMENT_BOTTOM";
+					break;
+				default:
+					sTextKey = "p13n.REORDER_ANNOUNCEMENT";
+			}
+		}
+
+		const oResourceBundle = Library.getResourceBundleFor("sap.m");
+		this.oInvisibleMessage.announce(
+			oResourceBundle.getText(sTextKey, [oModelEntry.label]),
+			InvisibleMessageMode.Assertive
+		);
 	};
 
 	AdaptFiltersPanelContent.prototype._selectKey = function(oComboBox) {

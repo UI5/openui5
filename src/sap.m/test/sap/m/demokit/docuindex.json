@@ -52,19 +52,6 @@
 				"config": "test-resources/sap/m/demokit/tutorial/worklist/demoapp.json"
 			},
 			{
-				"icon": "learning-assistant",
-				"text": "Walkthrough",
-				"desc": "Created with the 'Walkthrough' tutorial, showing all major development paradigms.",
-				"ref": "test-resources/sap/m/demokit/tutorial/walkthrough/38/webapp/test/mockServer.html",
-				"links": {
-					"View Tutorial": "topic/3da5f4be63264db99f2e5b04c5e853db",
-					"Run Unit Tests": "test-resources/sap/m/demokit/tutorial/walkthrough/38/webapp/test/Test.qunit.html?testsuite=test-resources/ui5/walkthrough/testsuite.qunit&test=unit/unitTests",
-					"Run Integration Tests": "test-resources/sap/m/demokit/tutorial/walkthrough/38/webapp/test/Test.qunit.html?testsuite=test-resources/ui5/walkthrough/testsuite.qunit&test=integration/opaTests"
-				},
-				"category": "Tutorial",
-				"config": "test-resources/sap/m/demokit/tutorial/walkthrough/demoapp.json"
-			},
-			{
 				"icon": "retail-store-manager",
 				"text": "Browse Orders",
 				"desc": "Master-detail app for browsing orders.",
@@ -1707,55 +1694,6 @@
 					"Ready",
 					"Steady",
 					"Go!"
-				]
-			},
-			{
-				"id": "sap.m.tutorial.walkthrough",
-				"name": "Walkthrough",
-				"category": "Tutorial",
-				"since": "1.30",
-				"formFactors": "-",
-				"description": "In this tutorial we are introducing you to all major development paradigms of SAPUI5.",
-				"docuLink": "topic/3da5f4be63264db99f2e5b04c5e853db",
-				"samplesAsSteps": [
-					"Hello World!",
-					"Bootstrap",
-					"Controls",
-					"XML Views",
-					"Controllers",
-					"Modules",
-					"JSON Model",
-					"Translatable Texts",
-					"Component Configuration",
-					"Descriptor for Applications",
-					"Pages and Panels",
-					"Shell Control as Container",
-					"Margins and Paddings",
-					"Custom CSS and Theme Colors",
-					"Nested Views",
-					"Dialogs and Fragments",
-					"Fragment Callbacks",
-					"Icons",
-					"Aggregation Binding",
-					"Data Types",
-					"Expression Binding",
-					"Custom Formatters",
-					"Filtering",
-					"Sorting and Grouping",
-					"(Optional) Remote OData Service",
-					"Mock Server Configuration",
-					"Unit Test with QUnit",
-					"Integration Test with OPA",
-					"Debugging Tools",
-					"Routing and Navigation",
-					"Routing with Parameters",
-					"Routing Back and History",
-					"Custom Controls",
-					"Responsiveness",
-					"Device Adaptation",
-					"Content Density",
-					"Accessibility",
-					"Build"
 				]
 			},
 			{

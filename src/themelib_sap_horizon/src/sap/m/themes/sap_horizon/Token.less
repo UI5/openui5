@@ -50,6 +50,7 @@
 	border-bottom: @_sap_m_Token_Selected_InternalBorderWidth solid var(--sapField_ReadOnly_BorderColor);
 }
 
+.sapMToken:not(.sapMTokenFocusFromTouch):focus-visible::after,
 html.sap-desktop .sapMToken:focus::after {
 	content: "";
 	position: absolute;
@@ -63,6 +64,8 @@ html.sap-desktop .sapMToken:focus::after {
 	right: @_sap_m_Token_Focused_CozyOutlineOffset;
 }
 
+.sapUiSizeCompact .sapMToken:focus-visible::after,
+.sapUiSizeCondensed .sapMToken:focus-visible::after,
 html.sap-desktop .sapUiSizeCompact .sapMToken:focus::after,
 html.sap-desktop .sapUiSizeCondensed .sapMToken:focus::after {
 	top: @_sap_m_Token_Focused_CompactOutlineOffset;
@@ -71,6 +74,7 @@ html.sap-desktop .sapUiSizeCondensed .sapMToken:focus::after {
 	right: @_sap_m_Token_Focused_CompactOutlineOffset;
 }
 
+.sapUiSizeCondensed .sapMToken:focus-visible::after,
 html.sap-desktop .sapUiSizeCondensed .sapMToken:focus::after {
 	border-width: 1px;
 }

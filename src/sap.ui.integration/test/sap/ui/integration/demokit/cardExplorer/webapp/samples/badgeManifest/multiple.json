@@ -1,0 +1,47 @@
+{
+	"sap.app": {
+		"id": "card.explorer.badge.manifest.multiple",
+		"type": "card"
+	},
+	"sap.card": {
+		"type": "List",
+		"badges": [
+			{
+				"text": "3 New",
+				"state": "Indication04",
+				"visibilityMode": "Persist"
+			},
+			{
+				"icon": "sap-icon://pushpin-off",
+				"visibilityMode": "Persist",
+				"announcementText": "The card is pinned on top."
+			}
+		],
+		"header": {
+			"title": "Multiple Badges",
+			"subTitle": "Card with multiple manifest-declared badges"
+		},
+		"content": {
+			"data": {
+				"json": [
+					{
+						"Name": "Comfort Easy",
+						"Category": "PDA & Organizers"
+					},
+					{
+						"Name": "ITelO Vault",
+						"Category": "PDA & Organizers"
+					},
+					{
+						"Name": "Notebook Professional 15",
+						"Category": "Notebooks"
+					}
+				]
+			},
+			"item": {
+				"title": "{Name}",
+				"description": "{Category}"
+			}
+		}
+	}
+}

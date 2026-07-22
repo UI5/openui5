@@ -39,11 +39,13 @@ html.sap-desktop .sapMToken {
 	}
 }
 
+.sapMToken:not(.sapMTokenFocusFromTouch):focus-visible,
 html.sap-desktop .sapMToken:focus {
 	outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 	outline-offset: -0.1875rem;
 }
 
+.sapMToken.sapMTokenSelected:not(.sapMTokenFocusFromTouch):focus-visible,
 html.sap-desktop .sapMToken.sapMTokenSelected:focus {
 	outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_ContrastFocusColor);
 }

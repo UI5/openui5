@@ -209,6 +209,11 @@ sap.ui.define([
 						key: 'actionsStrip'
 					},
 					{
+						title: 'Badges',
+						target: 'learnDetail',
+						key: 'badges'
+					},
+					{
 						title: 'Data',
 						target: 'learnDetail',
 						key: 'data'

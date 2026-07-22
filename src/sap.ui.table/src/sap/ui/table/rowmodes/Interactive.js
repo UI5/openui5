@@ -233,7 +233,7 @@ sap.ui.define([
 
 			const aLabels = oTable.getAriaLabelledBy();
 			if (aLabels.length) {
-				oRm.attr("aria-labelledby", aLabels.join(" "));
+				oRm.attr("aria-labelledby", aLabels[0]);
 			}
 
 			oRm.openEnd();

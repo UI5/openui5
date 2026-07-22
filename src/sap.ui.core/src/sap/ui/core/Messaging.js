@@ -201,6 +201,17 @@ sap.ui.define([
 				oMessageModel.setData([]);
 			}
 			return oMessageModel;
+		},
+
+		/**
+		 * Returns all messages currently managed by Messaging.
+		 *
+		 * @return {sap.ui.core.message.Message[]} An array of all current messages
+		 * @public
+		 * @since 1.151
+		 */
+		getMessages: function() {
+			return Messaging.getMessageModel().getData();
 		}
 	};
 
@@ -371,11 +382,11 @@ sap.ui.define([
 			// We need to work on a copy since the messages reference is changed by _removeMessage()
 			var aOriginalMessages = vMessages.slice(0);
 			for (var i = 0; i < aOriginalMessages.length; i++) {
-				if (!bOnlyValidationMessages || aOriginalMessages[i].validation) {
+				if (!bOnlyValidationMessages || aOriginalMessages[i].isValidation()) {
 					_removeMessage(aOriginalMessages[i]);
 				}
 			}
-		} else if (vMessages instanceof Message && (!bOnlyValidationMessages || vMessages.validation)){
+		} else if (vMessages instanceof Message && (!bOnlyValidationMessages || vMessages.isValidation())){
 			_removeMessage(vMessages);
 		} else {
 			//map with target as key

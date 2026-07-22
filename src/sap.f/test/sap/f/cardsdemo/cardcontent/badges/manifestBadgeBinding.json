@@ -1,0 +1,78 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "card.test.badge.manifest.binding",
+		"type": "card",
+		"title": "Card 'binding'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"data": {
+			"json": {
+				"badgeInfo": [
+					{
+						"text": "5 New",
+						"icon": "sap-icon://status-in-process",
+						"state": "Indication03"
+					},
+					{
+						"text": "2 Updated",
+						"state": "Indication05"
+					}
+				],
+				"items": [
+					{
+						"Name": "Caroline Clark",
+						"Relation": "Dependent",
+						"Status": "New - Pending Approval"
+					},
+					{
+						"Name": "John Clark",
+						"Relation": "Husband",
+						"Status": "Approved"
+					},
+					{
+						"Name": "Sarah Clark",
+						"Relation": "Mother",
+						"Status": "Updated"
+					}
+				]
+			},
+			"path": "/"
+		},
+		"badge": [
+			{
+				"text": "{badgeInfo/0/text}",
+				"icon": "{badgeInfo/0/icon}",
+				"state": "{badgeInfo/0/state}",
+				"visible": true,
+				"visibilityMode": "Persist"
+			},
+			{
+				"text": "{badgeInfo/1/text}",
+				"state": "{badgeInfo/1/state}",
+				"visible": true,
+				"visibilityMode": "Disappear"
+			}
+		],
+		"header": {
+			"title": "Badges with Bindings",
+			"subTitle": "Badge data from card model"
+		},
+		"content": {
+			"data": {
+				"path": "/items"
+			},
+			"item": {
+				"title": "{Name}",
+				"description": "{Relation}",
+				"info": {
+					"value": "{Status}"
+				}
+			}
+		}
+	}
+}

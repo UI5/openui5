@@ -14,7 +14,37 @@
 			</Toolbar>
 		</subHeader>
 
+		<!-- Manifest-only badges (no layoutData to keep customData clean for testing) -->
+		<HBox class="sapUiSmallMargin" wrap="Wrap">
+			<!-- Manifest Badge: Single badge, NO customData at all -->
+			<w:Card manifest="cardsdemo/cardcontent/badges/manifestBadge.json"
+				width="18rem" height="20rem"
+				class="sapUiTinyMarginEnd sapUiTinyMarginBottom" />
+
+			<!-- Multiple Manifest Badges: Three badges, NO customData -->
+			<w:Card manifest="cardsdemo/cardcontent/badges/manifestBadgeMultiple.json"
+				width="18rem" height="20rem"
+				class="sapUiTinyMarginEnd sapUiTinyMarginBottom" />
+
+			<!-- Manifest Badges with Bindings: Badge data from model -->
+			<w:Card manifest="cardsdemo/cardcontent/badges/manifestBadgeBinding.json"
+				width="18rem" height="20rem"
+				class="sapUiTinyMarginEnd sapUiTinyMarginBottom" />
+
+			<!-- Combined: Manifest badge + Programmatic badge -->
+			<w:Card manifest="cardsdemo/cardcontent/badges/manifestAndProgrammaticBadges.json"
+				width="18rem" height="20rem"
+				class="sapUiTinyMarginEnd sapUiTinyMarginBottom">
+				<w:customData>
+					<card:CardBadgeCustomData value="From Host" state="Indication02" visibilityMode="Persist"/>
+				</w:customData>
+			</w:Card>
+		</HBox>
+
+		<!-- Programmatic badges with GridContainer (uses layoutData) -->
 		<f:GridContainer id="grid1" class="sapUiSmallMargin">
+
+			<!-- Programmatic Badge: BadgeCustomData only -->
 			<w:Card manifest="{manifests>/listContent/card13}"
 				baseUrl="{cardsPlayground>/playgroundBaseUrl}">
 				<w:customData>
@@ -24,6 +54,8 @@
 					<f:GridContainerItemLayoutData rows="6" columns="3" />
 				</w:layoutData>
 			</w:Card>
+
+			<!-- Programmatic Badge: CardBadgeCustomData with icon -->
 			<w:Card manifest="{manifests>/listContent/card13}"
 				baseUrl="{cardsPlayground>/playgroundBaseUrl}">
 				<w:customData>
@@ -33,6 +65,8 @@
 					<f:GridContainerItemLayoutData rows="6" columns="3" />
 				</w:layoutData>
 			</w:Card>
+
+			<!-- Multiple Programmatic Badges -->
 			<w:Card manifest="{manifests>/listContent/card13}"
 				baseUrl="{cardsPlayground>/playgroundBaseUrl}">
 				<w:customData>
@@ -43,6 +77,8 @@
 					<f:GridContainerItemLayoutData rows="6" columns="3" />
 				</w:layoutData>
 			</w:Card>
+
+			<!-- Long text badge -->
 			<w:Card manifest="{manifests>/listContent/card13}"
 				baseUrl="{cardsPlayground>/playgroundBaseUrl}">
 				<w:customData>
@@ -52,6 +88,8 @@
 					<f:GridContainerItemLayoutData rows="6" columns="3" />
 				</w:layoutData>
 			</w:Card>
+
+			<!-- Multiple badges with long text -->
 			<w:Card manifest="{manifests>/listContent/card13}"
 				baseUrl="{cardsPlayground>/playgroundBaseUrl}">
 				<w:customData>

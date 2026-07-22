@@ -1096,26 +1096,9 @@ sap.ui.define([
        InteractionTree.prototype.renderIcon = function (rm, expanded) {
            var icon = expanded ? InteractionTree.collapseIcon : InteractionTree.expandIcon;
 
-           rm.openStart("span")
-               .attr("aria-hidden", "true")
-               .attr("expanded", expanded)
-               .class("sapUiIcon")
-               .class("sapUiInteractionTreeIcon");
-
-
-           if (iconInfo && !iconInfo.suppressMirroring) {
-               rm.class("sapUiIconMirrorInRTL");
-           }
-
-           var iconInfo = IconPool.getIconInfo(icon);
-
-           if (iconInfo) {
-               rm.attr("data-sap-ui-icon-content", iconInfo.content);
-               rm.style("font-family", "SAP-icons");
-           }
-
-           rm.openEnd()
-               .close("span");
+           rm.icon(icon, ["sapUiInteractionTreeIcon"], {
+               "expanded": expanded
+           });
        };
 
        return InteractionTree;

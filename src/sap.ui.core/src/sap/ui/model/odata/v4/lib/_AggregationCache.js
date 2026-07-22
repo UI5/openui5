@@ -1444,6 +1444,7 @@ sap.ui.define([
 				if (this.aElements.$byPredicate[sPredicate]) {
 					return; // already read with the in-place request
 				}
+
 				const sParentPredicate = this.oTreeState.getOutOfPlace(sPredicate).parentPredicate;
 				const oParent = mPredicate2RankResult[sParentPredicate];
 				if (oParent) { // parent has a rank
@@ -1454,13 +1455,21 @@ sap.ui.define([
 				} else if (sParentPredicate) { // parent has no rank
 					return; // do not insert
 				} // else: no parent (root) -> insert
-				_Helper.merge(oNode, mPredicate2RankResult[sPredicate]);
-				// Note: overridden by _AggregationCache.calculateKeyPredicateRH
-				this.oFirstLevel.calculateKeyPredicate(oNode, this.getTypes(), this.sMetaPath);
-				const iRank = getRank(oNode);
-				_Helper.deleteProperty(oNode, this.oAggregation.$LimitedRank);
-				// insert at rank position to ensure correct placeholder is replaced
-				this.insertNode(oNode, iRank);
+
+				if (sPredicate in mPredicate2RankResult) {
+					_Helper.merge(oNode, mPredicate2RankResult[sPredicate]);
+					// Note: overridden by _AggregationCache.calculateKeyPredicateRH
+					this.oFirstLevel.calculateKeyPredicate(oNode, this.getTypes(), this.sMetaPath);
+					const iRank = getRank(oNode);
+					_Helper.deleteProperty(oNode, this.oAggregation.$LimitedRank);
+					// insert at rank position to ensure correct placeholder is replaced
+					this.insertNode(oNode, iRank);
+				} else { // outside the collection
+					this.aElements.push(oNode);
+					this.aElements.$byPredicate[sPredicate] = oNode;
+					_Helper.setPrivateAnnotation(oNode, "predicate", sPredicate);
+					oNode["@$ui5.node.level"] = 1;
+				}
 			});
 		});
 

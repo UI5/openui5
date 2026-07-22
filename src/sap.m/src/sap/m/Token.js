@@ -163,6 +163,8 @@ sap.ui.define([
 	});
 
 	Token.prototype.init = function() {
+		this._bFocusFromTouch = false;
+
 		var oDeleteIcon = new Icon({
 				id : this.getId() + "-icon",
 				src : "sap-icon://decline",
@@ -183,9 +185,41 @@ sap.ui.define([
 	 * @private
 	 */
 	Token.prototype.ontouchstart = function(oEvent) {
+		this._markFocusFromTouch();
+
 		if (oEvent.target.id === this.getId() + "-icon") {
 			// prevent default or else the icon may get focused
 			oEvent.preventDefault();
+		}
+	};
+
+	/**
+	 * Clears the touch-origin focus marker when focus leaves the token.
+	 *
+	 * @private
+	 */
+	Token.prototype.onfocusout = function() {
+		this._clearFocusFromTouch();
+	};
+
+	/**
+	 * Marks the current focus as touch-originated so the theme can suppress the
+	 * focus ring on touch devices while keeping it for keyboard focus.
+	 * @private
+	 */
+	Token.prototype._markFocusFromTouch = function() {
+		this._bFocusFromTouch = true;
+		this.addStyleClass("sapMTokenFocusFromTouch");
+	};
+
+	/**
+	 * Clears the touch-origin focus marker.
+	 * @private
+	 */
+	Token.prototype._clearFocusFromTouch = function() {
+		if (this._bFocusFromTouch) {
+			this._bFocusFromTouch = false;
+			this.removeStyleClass("sapMTokenFocusFromTouch");
 		}
 	};
 
@@ -284,6 +318,8 @@ sap.ui.define([
 	 * @private
 	 */
 	Token.prototype.onkeydown = function(oEvent) {
+
+		this._clearFocusFromTouch();
 
 		if ((oEvent.ctrlKey || oEvent.metaKey) && oEvent.which === KeyCodes.SPACE) {
 			//metaKey for MAC command

@@ -383,7 +383,7 @@ sap.ui.define([
 			MessageBox.warning(
 				"Temporary rules have been deprecated and are non-functional anymore. Please use library rulesets instead.",
 				{
-					details: "See documentation about <a href='https://ui5.sap.com/#/topic/b5a51358b3574aea9143fa50ae4e0e2a' target='_blank'>library rulesets</a>.",
+					details: "See documentation about <a href='https://ui5.sap.com/#/topic/b5a51358b3574aea9143fa50ae4e0e2a' target='_blank' rel='noopener noreferrer'>library rulesets</a>.",
 					contentWidth: "400px"
 				}
 			);

@@ -17,6 +17,7 @@ sap.ui.define([
 	"sap/ui/core/UIComponent",
 	"sap/ui/model/resource/ResourceModel",
 	"sap/m/BadgeCustomData",
+	"sap/f/cards/CardBadgeCustomData",
 	"sap/m/MessageStrip",
 	"sap/ui/integration/util/DataProviderFactory",
 	"sap/base/util/deepExtend",
@@ -49,6 +50,7 @@ sap.ui.define([
 		UIComponent,
 		ResourceModel,
 		BadgeCustomData,
+		CardBadgeCustomData,
 		MessageStrip,
 		DataProviderFactory,
 		deepExtend,
@@ -3301,6 +3303,434 @@ sap.ui.define([
 			// Assert
 
 			assert.strictEqual($badgeIndicator.text(), "New", "Badge is correctly rendered");
+		});
+
+		QUnit.module("Badge from Manifest", {
+			beforeEach: function () {
+				this.oCard = new Card({
+					width: "400px",
+					height: "600px"
+				});
+			},
+			afterEach: function () {
+				this.oCard.destroy();
+				this.oCard = null;
+			}
+		});
+
+		QUnit.test("Badge defined in manifest is rendered", async function (assert) {
+			// Arrange
+			const oManifest = {
+				"sap.app": {
+					"id": "test.card.badge.manifest"
+				},
+				"sap.card": {
+					"type": "List",
+					"badges": [
+						{
+							"text": "New",
+							"icon": "sap-icon://status-in-process",
+							"state": "Indication03",
+							"visible": true,
+							"visibilityMode": "Persist"
+						}
+					],
+					"header": {
+						"title": "Test Card"
+					},
+					"content": {
+						"data": {
+							"json": [{"name": "Item 1"}]
+						},
+						"item": {
+							"title": "{name}"
+						}
+					}
+				}
+			};
+
+			this.oCard.setManifest(oManifest);
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			// Assert
+			const aManifestBadges = this.oCard.getAggregation("_manifestBadge");
+
+			assert.ok(aManifestBadges, "Manifest badge aggregation was created");
+			assert.strictEqual(aManifestBadges.length, 1, "One badge was created");
+			assert.strictEqual(aManifestBadges[0].getValue(), "New", "Badge text is correct");
+			assert.strictEqual(aManifestBadges[0].getIcon(), "sap-icon://status-in-process", "Badge icon is correct");
+			assert.strictEqual(aManifestBadges[0].getState(), "Indication03", "Badge state is correct");
+			assert.strictEqual(aManifestBadges[0].getVisible(), true, "Badge is visible");
+			assert.strictEqual(aManifestBadges[0].getProperty("visibilityMode"), "Persist", "Badge visibility mode is correct");
+
+			const $badgeIndicator = this.oCard.$().find(".sapFCardBadgePlaceholder .sapMObjStatusText");
+			assert.strictEqual($badgeIndicator.text(), "New", "Badge is correctly rendered in DOM");
+		});
+
+		QUnit.test("Manifest badge without icon", async function (assert) {
+			// Arrange
+			const oManifest = {
+				"sap.app": {
+					"id": "test.card.badge.manifest.noicon"
+				},
+				"sap.card": {
+					"type": "List",
+					"badges": [
+						{
+							"text": "Updated"
+						}
+					],
+					"header": {
+						"title": "Test Card"
+					},
+					"content": {
+						"data": {
+							"json": [{"name": "Item 1"}]
+						},
+						"item": {
+							"title": "{name}"
+						}
+					}
+				}
+			};
+
+			this.oCard.setManifest(oManifest);
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			// Assert
+			const aManifestBadges = this.oCard.getAggregation("_manifestBadge");
+
+			assert.ok(aManifestBadges, "Manifest badge aggregation was created");
+			assert.strictEqual(aManifestBadges.length, 1, "One badge was created");
+			assert.strictEqual(aManifestBadges[0].getValue(), "Updated", "Badge text is correct");
+			assert.strictEqual(aManifestBadges[0].getIcon(), "", "Badge has no icon");
+			assert.strictEqual(aManifestBadges[0].getState(), "Indication05", "Badge has default state");
+		});
+
+		QUnit.test("Manifest badge is cleaned up on manifest change", async function (assert) {
+			// Arrange - First manifest with badge
+			const oManifest1 = {
+				"sap.app": {
+					"id": "test.card.badge.manifest.1"
+				},
+				"sap.card": {
+					"type": "List",
+					"badges": [
+						{
+							"text": "Badge 1"
+						}
+					],
+					"header": {
+						"title": "Card 1"
+					},
+					"content": {
+						"data": {
+							"json": [{"name": "Item 1"}]
+						},
+						"item": {
+							"title": "{name}"
+						}
+					}
+				}
+			};
+
+			this.oCard.setManifest(oManifest1);
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			const aManifestBadges1 = this.oCard.getAggregation("_manifestBadge");
+
+			assert.ok(aManifestBadges1, "First manifest badge aggregation was created");
+			assert.strictEqual(aManifestBadges1.length, 1, "One badge was created");
+			assert.strictEqual(aManifestBadges1[0].getValue(), "Badge 1", "First badge text is correct");
+
+			// Act - Change manifest to one without badge
+			const oManifest2 = {
+				"sap.app": {
+					"id": "test.card.badge.manifest.2"
+				},
+				"sap.card": {
+					"type": "List",
+					"header": {
+						"title": "Card 2"
+					},
+					"content": {
+						"data": {
+							"json": [{"name": "Item 2"}]
+						},
+						"item": {
+							"title": "{name}"
+						}
+					}
+				}
+			};
+
+			this.oCard.setManifest(oManifest2);
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			// Assert
+			const aManifestBadges2 = this.oCard.getAggregation("_manifestBadge");
+			assert.ok(!aManifestBadges2 || aManifestBadges2.length === 0, "Manifest badge aggregation was destroyed");
+			assert.ok(aManifestBadges1[0].bIsDestroyed, "Old manifest badge was destroyed");
+		});
+
+		QUnit.test("Multiple badges defined in manifest are rendered", async function (assert) {
+			// Arrange
+			const oManifest = {
+				"sap.app": {
+					"id": "test.card.badge.manifest.multiple"
+				},
+				"sap.card": {
+					"type": "List",
+					"badges": [
+						{
+							"text": "New",
+							"icon": "sap-icon://status-in-process",
+							"state": "Indication03",
+							"visible": true,
+							"visibilityMode": "Persist"
+						},
+						{
+							"text": "Updated",
+							"state": "Indication05",
+							"visible": true,
+							"visibilityMode": "Disappear"
+						},
+						{
+							"text": "Important",
+							"icon": "sap-icon://warning",
+							"state": "Indication02",
+							"visible": true,
+							"visibilityMode": "Persist"
+						}
+					],
+					"header": {
+						"title": "Test Card"
+					},
+					"content": {
+						"data": {
+							"json": [{"name": "Item 1"}]
+						},
+						"item": {
+							"title": "{name}"
+						}
+					}
+				}
+			};
+
+			this.oCard.setManifest(oManifest);
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			// Assert
+			const aManifestBadges = this.oCard.getAggregation("_manifestBadge");
+
+			assert.ok(aManifestBadges, "Manifest badge aggregation was created");
+			assert.strictEqual(aManifestBadges.length, 3, "Three badges were created");
+
+			// Check first badge
+			assert.strictEqual(aManifestBadges[0].getValue(), "New", "First badge text is correct");
+			assert.strictEqual(aManifestBadges[0].getIcon(), "sap-icon://status-in-process", "First badge icon is correct");
+			assert.strictEqual(aManifestBadges[0].getState(), "Indication03", "First badge state is correct");
+
+			// Check second badge
+			assert.strictEqual(aManifestBadges[1].getValue(), "Updated", "Second badge text is correct");
+			assert.strictEqual(aManifestBadges[1].getIcon(), "", "Second badge has no icon");
+			assert.strictEqual(aManifestBadges[1].getState(), "Indication05", "Second badge state is correct");
+
+			// Check third badge
+			assert.strictEqual(aManifestBadges[2].getValue(), "Important", "Third badge text is correct");
+			assert.strictEqual(aManifestBadges[2].getIcon(), "sap-icon://warning", "Third badge icon is correct");
+			assert.strictEqual(aManifestBadges[2].getState(), "Indication02", "Third badge state is correct");
+
+			// Check that all badges are rendered in DOM
+			const $badgeIndicators = this.oCard.$().find(".sapFCardBadgePlaceholder .sapMObjStatusText");
+			assert.strictEqual($badgeIndicators.length, 3, "All three badges are rendered in DOM");
+		});
+
+		QUnit.test("Manifest badges work without any customData", async function (assert) {
+			// Arrange - Card with manifest badges but NO customData at all
+			const oManifest = {
+				"sap.app": {
+					"id": "test.card.badge.manifest.nocustomdata"
+				},
+				"sap.card": {
+					"type": "List",
+					"badges": [
+						{
+							"text": "New",
+							"state": "Indication03",
+							"visible": true
+						}
+					],
+					"header": {
+						"title": "Test Card"
+					},
+					"content": {
+						"data": {
+							"json": [{"name": "Item 1"}]
+						},
+						"item": {
+							"title": "{name}"
+						}
+					}
+				}
+			};
+
+			this.oCard.setManifest(oManifest);
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			// Assert - Verify that manifest badges work even without customData
+			const aManifestBadges = this.oCard.getAggregation("_manifestBadge");
+			const aCustomData = this.oCard.getCustomData();
+
+			assert.ok(aManifestBadges, "Manifest badge aggregation exists");
+			assert.strictEqual(aManifestBadges.length, 1, "One manifest badge was created");
+			assert.strictEqual(aCustomData.length, 0, "No customData on the card");
+
+			// Verify the badge is actually rendered
+			const aCardBadges = this.oCard.getAggregation("_cardBadges");
+			assert.ok(aCardBadges, "Visual badge elements exist");
+			assert.strictEqual(aCardBadges.length, 1, "One visual badge was created");
+			assert.strictEqual(aCardBadges[0].getText(), "New", "Badge text is correctly rendered");
+
+			// Verify DOM
+			const $badgeIndicator = this.oCard.$().find(".sapFCardBadgePlaceholder .sapMObjStatusText");
+			assert.strictEqual($badgeIndicator.length, 1, "Badge is rendered in DOM");
+			assert.strictEqual($badgeIndicator.text(), "New", "Badge text in DOM is correct");
+		});
+
+		QUnit.test("Manifest badges and programmatic badges work together", async function (assert) {
+			// Arrange - Card with both manifest badges AND programmatic badges
+			const oManifest = {
+				"sap.app": {
+					"id": "test.card.badge.combined"
+				},
+				"sap.card": {
+					"type": "List",
+					"badges": [
+						{
+							"text": "From Manifest",
+							"state": "Indication03",
+							"visible": true
+						}
+					],
+					"header": {
+						"title": "Combined Badges"
+					},
+					"content": {
+						"data": {
+							"json": [{"name": "Item 1"}]
+						},
+						"item": {
+							"title": "{name}"
+						}
+					}
+				}
+			};
+
+			this.oCard.setManifest(oManifest);
+
+			// Add programmatic badge via customData
+			this.oCard.addCustomData(new CardBadgeCustomData({
+				value: "From Host",
+				state: "Indication05"
+			}));
+
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			// Assert
+			const aManifestBadges = this.oCard.getAggregation("_manifestBadge");
+			const aCustomData = this.oCard.getCustomData();
+
+			assert.strictEqual(aManifestBadges.length, 1, "One manifest badge exists");
+			assert.strictEqual(aCustomData.length, 1, "One programmatic badge exists in customData");
+
+			// CRITICAL: getCustomData() should NOT return manifest badges
+			assert.ok(aCustomData[0].getValue() === "From Host", "customData contains only programmatic badge");
+			assert.notOk(aCustomData.some((cd) => cd.getValue() === "From Manifest"), "Manifest badge is NOT in customData");
+
+			// Verify both are rendered
+			const aCardBadges = this.oCard.getAggregation("_cardBadges");
+			assert.strictEqual(aCardBadges.length, 2, "Both badges are rendered");
+
+			// Verify ORDER: Manifest badges come FIRST, then programmatic
+			assert.strictEqual(aCardBadges[0].getText(), "From Manifest", "First rendered badge is from manifest");
+			assert.strictEqual(aCardBadges[1].getText(), "From Host", "Second rendered badge is programmatic");
+
+			// Verify in DOM
+			const $badgeIndicators = this.oCard.$().find(".sapFCardBadgePlaceholder .sapMObjStatusText");
+			assert.strictEqual($badgeIndicators.length, 2, "Both badges in DOM");
+		});
+
+		QUnit.test("Rendering order is consistent: manifest first, programmatic second", async function (assert) {
+			// Arrange - Multiple manifest badges + multiple programmatic badges
+			const oManifest = {
+				"sap.app": {
+					"id": "test.card.badge.order"
+				},
+				"sap.card": {
+					"type": "List",
+					"badges": [
+						{
+							"text": "Manifest 1",
+							"state": "Indication01"
+						},
+						{
+							"text": "Manifest 2",
+							"state": "Indication02"
+						}
+					],
+					"header": {
+						"title": "Order Test"
+					},
+					"content": {
+						"data": {
+							"json": [{"name": "Item 1"}]
+						},
+						"item": {
+							"title": "{name}"
+						}
+					}
+				}
+			};
+
+			this.oCard.setManifest(oManifest);
+			this.oCard.addCustomData(new CardBadgeCustomData({value: "Programmatic 1"}));
+			this.oCard.addCustomData(new CardBadgeCustomData({value: "Programmatic 2"}));
+
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			// Assert
+			const aCardBadges = this.oCard.getAggregation("_cardBadges");
+			assert.strictEqual(aCardBadges.length, 4, "All 4 badges rendered");
+
+			// Verify order: All manifest badges first, then all programmatic
+			assert.strictEqual(aCardBadges[0].getText(), "Manifest 1", "Position 0: Manifest badge 1");
+			assert.strictEqual(aCardBadges[1].getText(), "Manifest 2", "Position 1: Manifest badge 2");
+			assert.strictEqual(aCardBadges[2].getText(), "Programmatic 1", "Position 2: Programmatic badge 1");
+			assert.strictEqual(aCardBadges[3].getText(), "Programmatic 2", "Position 3: Programmatic badge 2");
 		});
 
 		QUnit.module("Translations", {

@@ -1,0 +1,62 @@
+{
+	"sap.app": {
+		"id": "card.explorer.object.multipleValues.card",
+		"type": "card",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5"
+	},
+	"sap.card": {
+		"type": "Object",
+		"data": {
+			"json": {
+				"document": {
+					"title": "Algeria: Birth Certificate",
+					"country": "Australia",
+					"issuePlace": "1234",
+					"issuingAuthority": "wer",
+					"issueDate": "Feb 26, 2025",
+					"previousIssueDate": "Jan 26, 2025"
+				}
+			}
+		},
+		"header": {
+			"title": "Work Permit"
+		},
+		"content": {
+			"groups": [
+				{
+					"title": "{document/title}",
+					"items": [
+						{
+							"label": "Issue Date",
+							"valueEntries": [
+								{
+									"value": "{document/issueDate}"
+								},
+								{
+									"value": "{= format.text('was: {0}', [${document/previousIssueDate}])}"
+								}
+							]
+						},
+						{
+							"label": "Country",
+							"value": "{document/country}"
+						},
+						{
+							"label": "Issue Place",
+							"value": "{document/issuePlace}"
+						},
+						{
+							"label": "Issuing Authority",
+							"value": "{document/issuingAuthority}"
+						}
+					]
+				}
+			]
+		}
+	}
+}

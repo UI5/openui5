@@ -44,6 +44,10 @@ sap.ui.define([
 		 * @param {string} [mParameters.code] The message code
 		 * @param {boolean} [mParameters.technical=false] If the message is set as technical message
 		 * @param {object} [mParameters.technicalDetails] An object containing technical details for a message
+		 * @param {boolean} [mParameters.validation=false] Whether the message originates from a client-side
+		 *   type validation or parse error. Set to <code>true</code> by the framework when creating messages
+		 *   for <code>validationError</code>, <code>parseError</code>, or <code>formatError</code> binding
+		 *   events. Read via {@link #isValidation}; cannot be changed after construction.
 		 * @param {sap.ui.core.message.MessageProcessor} [mParameters.processor]
 		 * @param {string|string[]} [mParameters.target] The single message target or (since 1.79) an
 		 *   array of message targets in case the message has multiple targets. The syntax is
@@ -400,6 +404,29 @@ sap.ui.define([
 		 */
 		Message.prototype.getTechnicalDetails = function() {
 			return this.technicalDetails;
+		};
+
+		/**
+		 * Returns whether the message originated from a client-side type validation or parse error.
+		 *
+		 * A message is considered a validation message when it was created by the binding layer in
+		 * response to a type validator or parser rejecting a user-entered value (i.e. a
+		 * <code>validationError</code>, <code>parseError</code>, or <code>formatError</code> event
+		 * fired by a managed object binding). Such messages are created with
+		 * <code>mParameters.validation: true</code> in the {@link sap.ui.core.message.Message}
+		 * constructor. The flag is set at construction time and cannot be changed afterwards.
+		 *
+		 * Use this method to distinguish client-side validation messages from server-side messages
+		 * (e.g. OData error responses) or application-created messages, which always have
+		 * <code>validation: false</code>.
+		 *
+		 * @returns {boolean} <code>true</code> if the message originated from a client-side type
+		 *   validation or parse error, <code>false</code> otherwise
+		 * @public
+		 * @since 1.151
+		 */
+		Message.prototype.isValidation = function() {
+			return this.validation;
 		};
 
 		Message.prototype.addReference = function(sId, sProperty) {

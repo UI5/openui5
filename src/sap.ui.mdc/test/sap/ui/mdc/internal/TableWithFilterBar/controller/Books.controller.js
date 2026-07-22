@@ -86,6 +86,15 @@ sap.ui.define([
 			if (oText) {
 				oText.setText(oEvent.getParameters().filtersText);
 			}
+
+			if (!this._bValidationTriggered) { // prevent multiple calls
+				const oFilterBar = oEvent.getSource();
+				oFilterBar.awaitControlDelegate().then((oDelegate) => {
+					oDelegate._validateConditions(oFilterBar, true); // validate input without starting search
+					this._bValidationTriggered = false;
+				});
+			}
+			this._bValidationTriggered = true;
 		},
 
 		onAddButtonPress: function (oEvent) {

@@ -1,0 +1,40 @@
+{
+	"sap.app": {
+		"id": "card.explorer.badge.manifest.basic",
+		"type": "card"
+	},
+	"sap.card": {
+		"type": "List",
+		"badges": [
+			{
+				"text": "New"
+			}
+		],
+		"header": {
+			"title": "Basic Badge",
+			"subTitle": "Text-only badge declared in manifest"
+		},
+		"content": {
+			"data": {
+				"json": [
+					{
+						"Name": "Comfort Easy",
+						"Category": "PDA & Organizers"
+					},
+					{
+						"Name": "ITelO Vault",
+						"Category": "PDA & Organizers"
+					},
+					{
+						"Name": "Notebook Professional 15",
+						"Category": "Notebooks"
+					}
+				]
+			},
+			"item": {
+				"title": "{Name}",
+				"description": "{Category}"
+			}
+		}
+	}
+}

@@ -100,7 +100,7 @@ sap.ui.define(
 			},
 
 			onClearButtonPressed: function (oEvent) {
-				var oFrame = document.getElementById("sampleFrameEdit"),
+				var oFrame = this._getIFrameDomRef(),
 					sLocalStorageDKSamples = this._getChangedSamplesLocalStorage(),
 					oModelData = this.oModel.getData(),
 					sRef = sap.ui.require.toUrl((this._sId).replace(/\./g, "/"));
@@ -319,8 +319,12 @@ sap.ui.define(
 			_createHTMLControl: function () {
 				return new HTML({
 					id : "sampleFrameEdit",
-					content : '<iframe src="' + this.sIFrameUrl + '" frameBorder="0" width="100%" height="100%"></iframe>'
+					content : '<iframe frameBorder="0" width="100%" height="100%"></iframe>'
 				});
+			},
+
+			_getIFrameDomRef: function () {
+				return this._oHtmlControl && this._oHtmlControl.getDomRef();
 			},
 
 			_getPage: function () {
@@ -386,9 +390,9 @@ sap.ui.define(
 			 * @param {string} sValue The value of the manifest.json file.
 			 */
 			_updateSample: function () {
-				var oFrame = document.getElementById("sampleFrameEdit");
+				var oFrame = this._getIFrameDomRef();
 
-				if (oFrame.contentWindow && oFrame.contentWindow.sap) {
+				if (oFrame && oFrame.contentWindow && oFrame.contentWindow.sap) {
 					oFrame.contentWindow.location.reload();
 				}
 			},

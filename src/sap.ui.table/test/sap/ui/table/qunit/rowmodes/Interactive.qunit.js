@@ -2,6 +2,7 @@
 
 sap.ui.define([
 	"sap/m/Title",
+	"sap/m/Label",
 	"sap/ui/core/Element",
 	"sap/ui/core/InvisibleMessage",
 	"sap/ui/table/qunit/TableQUnitUtils",
@@ -17,6 +18,7 @@ sap.ui.define([
 	"sap/ui/Device"
 ], function(
 	Title,
+	Label,
 	Element,
 	InvisibleMessage,
 	TableQUnitUtils,
@@ -105,11 +107,13 @@ sap.ui.define([
 	QUnit.module("Resizer", {
 		beforeEach: async function() {
 			const oTitle = new Title({text: "Title", titleStyle: "H3"});
+			const oLabel = new Label({text: "Additional Label"});
+			oLabel.placeAt("qunit-fixture");
 			this.oTable = TableQUnitUtils.createTable({
 				extension: oTitle,
 				models: TableQUnitUtils.createJSONModelWithEmptyRows(100),
 				placeAt: "qunit-fixture",
-				ariaLabelledBy: oTitle.getId()
+				ariaLabelledBy: [oTitle.getId(), oLabel.getId()]
 			});
 			await this.oTable.qunit.whenRenderingFinished();
 		},
@@ -132,7 +136,8 @@ sap.ui.define([
 		assert.equal(oResizerDomRef.getAttribute("aria-valuemax"), oMode._getMaxRowCount(), "The resizer has the correct aria-valuemax");
 		assert.equal(oResizerDomRef.getAttribute("aria-valuenow"), oMode.getRowCount(), "The resizer has the correct aria-valuenow");
 		assert.ok(oResizerDomRef.classList.contains("sapUiTableHeightResizer"), "The resizer has the correct CSS class");
-		assert.equal(oResizerDomRef.getAttribute("aria-labelledby"), this.oTable.getAriaLabelledBy(), "The resizer has the correct aria-labelledby");
+		assert.equal(oResizerDomRef.getAttribute("aria-labelledby"), this.oTable.getAriaLabelledBy()[0],
+			"The resizer has the correct aria-labelledby: the first of the labels is sufficient");
 
 		assert.ok(oResizerDomRef.querySelector(".sapUiTableHeightResizerDecorationBefore"), "The resizer decoration is rendered");
 		const oGripDomRef = oResizerDomRef.querySelector(".sapUiTableHeightResizerGrip");

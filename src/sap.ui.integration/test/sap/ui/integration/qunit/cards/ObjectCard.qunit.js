@@ -1412,7 +1412,7 @@ sap.ui.define([
 
 		// Assert
 		assert.notOk(aGroupItems[1].getVisible(), "Label for link is NOT visible");
-		assert.notOk(aGroupItems[2].getItems()[0].getVisible(), "Link is also NOT visible");
+		assert.notOk(aGroupItems[2].getVisible(), "Link is also NOT visible");
 		assert.notOk(aGroupItems[3].getVisible(), "Label for text is NOT visible");
 		assert.notOk(aGroupItems[4].getVisible(), "Text is also NOT visible");
 	});
@@ -2322,6 +2322,348 @@ sap.ui.define([
 			// Assert
 			assert.notOk(oContent.getDomRef().querySelector(".sapMIllustratedMessage"), "'No data' message should NOT be shown when 'hasData' is " + JSON.stringify(hasDataValue));
 		});
+	});
+
+	QUnit.module("Object Card - multiple value entries", {
+		beforeEach: function() {
+			this.oCard = new Card({
+				width: "400px",
+				height: "600px",
+				baseUrl: "test-resources/sap/ui/integration/qunit/testResources/"
+			});
+
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+		},
+		afterEach: function () {
+			this.oCard.destroy();
+			this.oCard = null;
+		}
+	});
+
+	QUnit.test("Multiple text values are wrapped in a VBox", async function (assert) {
+		// Arrange
+		this.oCard.setManifest({
+			"sap.app": {
+				"type": "card",
+				"id": "test.object.card.values.text"
+			},
+			"sap.card": {
+				"type": "Object",
+				"data": {
+					"json": {
+						"date1": "2024-01-01",
+						"date2": "2024-02-01"
+					}
+				},
+				"content": {
+					"groups": [{
+						"items": [{
+							"label": "Issue Dates",
+							"valueEntries": [
+								{ "value": "{date1}" },
+								{ "value": "{date2}" }
+							]
+						}]
+					}]
+				}
+			}
+		});
+
+		// Act
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		// Assert
+		const oGroup = this.oCard.getCardContent().getAggregation("_content").getItems()[0].getContent()[0],
+			oLabel = oGroup.getItems()[0],
+			oVBox = oGroup.getItems()[1],
+			aValueControls = oVBox.getItems();
+
+		assert.strictEqual(oLabel.getText(), "Issue Dates", "Label is rendered for the values item.");
+		assert.ok(oVBox.isA("sap.m.VBox"), "Values are wrapped in a VBox.");
+		assert.strictEqual(aValueControls.length, 2, "VBox contains one control per value.");
+		assert.ok(aValueControls[0].isA("sap.m.Text"), "First value is rendered as Text.");
+		assert.ok(aValueControls[1].isA("sap.m.Text"), "Second value is rendered as Text.");
+		assert.strictEqual(aValueControls[0].getText(), "2024-01-01", "First value is bound correctly.");
+		assert.strictEqual(aValueControls[1].getText(), "2024-02-01", "Second value is bound correctly.");
+	});
+
+	QUnit.test("Values with actions are rendered as Links", async function (assert) {
+		// Arrange
+		this.oCard.setManifest({
+			"sap.app": {
+				"type": "card",
+				"id": "test.object.card.values.actions"
+			},
+			"sap.card": {
+				"type": "Object",
+				"data": {
+					"json": {
+						"email": "john.doe@company.com",
+						"phone": "+1 234 567 8900"
+					}
+				},
+				"content": {
+					"groups": [{
+						"items": [{
+							"label": "Contacts",
+							"valueEntries": [
+								{
+									"value": "{email}",
+									"tooltip": "Send work email",
+									"actions": [{
+										"type": "Navigation",
+										"parameters": { "url": "mailto:{email}" }
+									}]
+								},
+								{
+									"value": "{phone}",
+									"tooltip": "Personal phone",
+									"actions": [{
+										"type": "Navigation",
+										"parameters": { "url": "tel:{phone}" }
+									}]
+								}
+							]
+						}]
+					}]
+				}
+			}
+		});
+
+		// Act
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		// Assert
+		const oGroup = this.oCard.getCardContent().getAggregation("_content").getItems()[0].getContent()[0],
+			oVBox = oGroup.getItems()[1],
+			oEmailLink = oVBox.getItems()[0].getItems()[0],
+			oPhoneLink = oVBox.getItems()[1].getItems()[0];
+
+		assert.ok(oVBox.getItems()[0].isA("sap.m.HBox"), "Value with actions is wrapped in an HBox.");
+		assert.ok(oEmailLink.isA("sap.m.Link"), "First value with actions is rendered as a Link.");
+		assert.ok(oPhoneLink.isA("sap.m.Link"), "Second value with actions is rendered as a Link.");
+		assert.strictEqual(oEmailLink.getText(), "john.doe@company.com", "First link text is bound correctly.");
+		assert.strictEqual(oPhoneLink.getText(), "+1 234 567 8900", "Second link text is bound correctly.");
+		assert.strictEqual(oEmailLink.getDomRef().getAttribute("title"), "Send work email", "First link tooltip is correct.");
+		assert.strictEqual(oPhoneLink.getDomRef().getAttribute("title"), "Personal phone", "Second link tooltip is correct.");
+	});
+
+	QUnit.test("Links from values are labelled by the item label (accessibility)", async function (assert) {
+		// Arrange
+		this.oCard.setManifest({
+			"sap.app": {
+				"type": "card",
+				"id": "test.object.card.values.aria"
+			},
+			"sap.card": {
+				"type": "Object",
+				"content": {
+					"groups": [{
+						"items": [{
+							"label": "Contacts",
+							"valueEntries": [{
+								"value": "john.doe@company.com",
+								"actions": [{
+									"type": "Navigation",
+									"parameters": { "url": "mailto:john.doe@company.com" }
+								}]
+							}]
+						}]
+					}]
+				}
+			}
+		});
+
+		// Act
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		// Assert
+		const oGroup = this.oCard.getCardContent().getAggregation("_content").getItems()[0].getContent()[0],
+			oLabel = oGroup.getItems()[0],
+			oLink = oGroup.getItems()[1].getItems()[0].getItems()[0];
+
+		assert.deepEqual(oLink.getAriaLabelledBy(), [oLabel.getId()], "Link is labelled by the item label.");
+	});
+
+	QUnit.test("Per-value 'visible' set as static string hides the value entry", async function (assert) {
+		// Arrange
+		this.oCard.setManifest({
+			"sap.app": {
+				"type": "card",
+				"id": "test.object.card.values.visibleStatic"
+			},
+			"sap.card": {
+				"type": "Object",
+				"content": {
+					"groups": [{
+						"items": [{
+							"label": "Issue Dates",
+							"valueEntries": [
+								{ "value": "2024-01-01", "visible": "true" },
+								{ "value": "2024-02-01", "visible": "false" }
+							]
+						}]
+					}]
+				}
+			}
+		});
+
+		// Act
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		// Assert
+		const oGroup = this.oCard.getCardContent().getAggregation("_content").getItems()[0].getContent()[0],
+			aValueControls = oGroup.getItems()[1].getItems();
+
+		assert.ok(aValueControls[0].getVisible(), "Value with visible 'true' is visible.");
+		assert.notOk(aValueControls[1].getVisible(), "Value with visible 'false' is NOT visible.");
+	});
+
+	QUnit.test("Per-value 'visible' set as boolean hides the value entry", async function (assert) {
+		// Arrange
+		this.oCard.setManifest({
+			"sap.app": {
+				"type": "card",
+				"id": "test.object.card.values.visibleBoolean"
+			},
+			"sap.card": {
+				"type": "Object",
+				"content": {
+					"groups": [{
+						"items": [{
+							"label": "Issue Dates",
+							"valueEntries": [
+								{ "value": "2024-01-01", "visible": true },
+								{ "value": "2024-02-01", "visible": false }
+							]
+						}]
+					}]
+				}
+			}
+		});
+
+		// Act
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		// Assert
+		const oGroup = this.oCard.getCardContent().getAggregation("_content").getItems()[0].getContent()[0],
+			aValueControls = oGroup.getItems()[1].getItems();
+
+		assert.ok(aValueControls[0].getVisible(), "Value with visible true is visible.");
+		assert.notOk(aValueControls[1].getVisible(), "Value with visible false is NOT visible.");
+	});
+
+	QUnit.test("'maxLines' is applied to a value entry", async function (assert) {
+		// Arrange
+		this.oCard.setManifest({
+			"sap.app": {
+				"type": "card",
+				"id": "test.object.card.values.maxLines"
+			},
+			"sap.card": {
+				"type": "Object",
+				"content": {
+					"groups": [{
+						"items": [{
+							"label": "Notes",
+							"valueEntries": [
+								{ "value": "first note", "maxLines": 2 },
+								{ "value": "second note" }
+							]
+						}]
+					}]
+				}
+			}
+		});
+
+		// Act
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		// Assert
+		const oGroup = this.oCard.getCardContent().getAggregation("_content").getItems()[0].getContent()[0],
+			aValueControls = oGroup.getItems()[1].getItems();
+
+		assert.strictEqual(aValueControls[0].getMaxLines(), 2, "'maxLines' is set on the inner Text control.");
+	});
+
+	QUnit.test("Item-level 'visible' propagates to the values VBox", async function (assert) {
+		// Arrange
+		this.oCard.setManifest({
+			"sap.app": {
+				"type": "card",
+				"id": "test.object.card.values.itemVisible"
+			},
+			"sap.card": {
+				"type": "Object",
+				"data": {
+					"json": {
+						"visible": false
+					}
+				},
+				"content": {
+					"groups": [{
+						"items": [{
+							"label": "Issue Dates",
+							"visible": "{visible}",
+							"valueEntries": [
+								{ "value": "2024-01-01" },
+								{ "value": "2024-02-01" }
+							]
+						}]
+					}]
+				}
+			}
+		});
+
+		// Act
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		// Assert
+		const oGroup = this.oCard.getCardContent().getAggregation("_content").getItems()[0].getContent()[0],
+			oLabel = oGroup.getItems()[0],
+			oVBox = oGroup.getItems()[1];
+
+		assert.notOk(oLabel.getVisible(), "Label is NOT visible when the item is hidden.");
+		assert.notOk(oVBox.getVisible(), "Values VBox is NOT visible when the item is hidden.");
+	});
+
+	QUnit.test("Empty 'valueEntries' array renders an empty VBox", async function (assert) {
+		// Arrange
+		this.oCard.setManifest({
+			"sap.app": {
+				"type": "card",
+				"id": "test.object.card.values.empty"
+			},
+			"sap.card": {
+				"type": "Object",
+				"content": {
+					"groups": [{
+						"items": [{
+							"label": "Issue Dates",
+							"valueEntries": []
+						}]
+					}]
+				}
+			}
+		});
+
+		// Act
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		// Assert
+		const oGroup = this.oCard.getCardContent().getAggregation("_content").getItems()[0].getContent()[0],
+			oVBox = oGroup.getItems()[1];
+
+		assert.ok(oVBox.isA("sap.m.VBox"), "An (empty) VBox is still created for an empty 'valueEntries' array.");
+		assert.strictEqual(oVBox.getItems().length, 0, "The VBox has no value controls.");
 	});
 
 	QUnit.module("Accessibility", {

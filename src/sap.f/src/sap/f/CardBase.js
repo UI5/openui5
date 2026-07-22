@@ -178,6 +178,15 @@ sap.ui.define([
 		this.destroyCardBadgeEnablement();
 	};
 
+	/**
+	 * Called on before rendering of the control.
+	 *
+	 * @private
+	 */
+	CardBase.prototype.onBeforeRendering = function () {
+		this._syncCardBadges();
+	};
+
 	CardBase.prototype.setAggregation = function (sAggregationName, oObject) {
 		var oPrevObject;
 

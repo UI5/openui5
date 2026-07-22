@@ -1,0 +1,95 @@
+{
+	"sap.app": {
+		"id": "card.explorer.badge.manifestBadge.card",
+		"type": "card",
+		"title": "Sample of Manifest-Declared Badge",
+		"subTitle": "Badge defined in manifest",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "Manifest Badge",
+		"info": "Badge configuration in manifest",
+		"description": "A card with badge configuration directly in the manifest",
+		"tags": {
+			"keywords": [
+				"Badge",
+				"Manifest",
+				"Card",
+				"Sample"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://status-in-process"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"badges": [
+			{
+				"text": "New",
+				"icon": "sap-icon://status-in-process",
+				"state": "Indication03",
+				"visible": true,
+				"visibilityMode": "Persist",
+				"announcementText": "The card has new content"
+			},
+			{
+				"text": "Updated",
+				"state": "Indication05",
+				"visible": true,
+				"visibilityMode": "Disappear"
+			}
+		],
+		"header": {
+			"title": "Task Details - New Record Added",
+			"subTitle": "Approve newly added dependent"
+		},
+		"content": {
+			"data": {
+				"json": [
+					{
+						"Name": "Caroline Clark",
+						"Relation": "Dependent",
+						"Status": "Pending Approval",
+						"EffectiveDate": "Tomorrow"
+					},
+					{
+						"Name": "John Clark",
+						"Relation": "Husband",
+						"Status": "Approved",
+						"EffectiveDate": "2020-01-15"
+					},
+					{
+						"Name": "Sarah Clark",
+						"Relation": "Mother",
+						"Status": "Approved",
+						"EffectiveDate": "2019-05-20"
+					},
+					{
+						"Name": "Michael Clark",
+						"Relation": "Brother",
+						"Status": "Approved",
+						"EffectiveDate": "2019-05-20"
+					},
+					{
+						"Name": "David Clark",
+						"Relation": "Son",
+						"Status": "Approved",
+						"EffectiveDate": "2021-03-10"
+					}
+				]
+			},
+			"item": {
+				"title": "{Name}",
+				"description": "{Relation} - {Status}",
+				"info": {
+					"value": "{EffectiveDate}",
+					"state": "{= ${Status} === 'Pending Approval' ? 'Warning' : 'Success'}"
+				}
+			}
+		}
+	}
+}

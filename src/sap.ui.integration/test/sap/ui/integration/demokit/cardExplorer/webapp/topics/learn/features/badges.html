@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head><meta charset="utf-8">
+	<title>Badges</title>
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="../../../scripts/boot.js"></script>
+</head>
+
+<body class="sapUiBody topicBody">
+
+	<div class="topic">
+		<div class="content">
+
+			<h1 id="overview">
+				Badges
+			</h1>
+
+			<p>
+				Badges can be used to display very short and important information that attracts the user's attention.
+			</p>
+
+			<p>
+				<b>Note:</b> Not yet implemented for <a href="../../../index.html#/overview/supportedPlatforms/native" target="_parent">mobile native cards</a>.
+			</p>
+
+			<p>
+
+				Manifest-defined badges and programmatic badges (added by the card host via <code>customData</code>) can coexist on the same card.
+				Manifest badges are displayed first, followed by programmatic badges.
+				For information on how to add badges programmatically as a card host, see the
+				<a href="../../../index.html#/integrate/badge" target="_parent">Badge Integration</a> documentation.
+			</p>
+
+			<h2 id="usage">When to Use</h2>
+			<p>Use badges when:</p>
+			<ul>
+				<li>The card is new in the user's home page.</li>
+				<li>The card has been updated and the user should be aware of the change.</li>
+				<li>Important status information needs to be communicated at a glance.</li>
+			</ul>
+			<p>Do not use badges if:</p>
+			<ul>
+				<li>You want to display the message text 'temporarily unavailable'. Use the disabled state of the card instead.</li>
+				<li>The card should not be visible or used by the user. Don't display the card in the home page in this case.</li>
+				<li>You want to display a counter. Use the numeric header of the card instead.</li>
+			</ul>
+
+			<h2 id="behavior">Behavior and Interaction</h2>
+			<p>
+				By default, badges automatically disappear when the user activates (e.g. clicks, taps) the card,
+				or when the focus is on the card (or the card's content) for more than 3 seconds.
+				This behavior can be changed using the <code>visibilityMode</code> property.
+			</p>
+
+			<h2 id="properties">Badge Properties</h2>
+			<p>
+				Badges are defined in the card manifest using the <code>sap.card/badges</code> property,
+				which accepts an array of badge objects. Each badge object supports the following properties:
+			</p>
+
+			<div class="tableWrapper">
+				<table>
+					<tr>
+						<th>Property</th>
+						<th>Type</th>
+						<th>Default Value</th>
+						<th>Required</th>
+						<th>Description</th>
+						<th>Schema Version</th>
+						<th>Since</th>
+					</tr>
+					<tr>
+						<td>text</td>
+						<td>string</td>
+						<td>""</td>
+						<td>No</td>
+						<td>The text to display in the badge. Supports data binding.</td>
+						<td>1.89</td>
+						<td>1.151</td>
+					</tr>
+					<tr>
+						<td>icon</td>
+						<td>string</td>
+						<td>""</td>
+						<td>No</td>
+						<td>Icon URI (e.g., "sap-icon://status-in-process"). Supports data binding.</td>
+						<td>1.89</td>
+						<td>1.151</td>
+					</tr>
+					<tr>
+						<td>state</td>
+						<td>string</td>
+						<td>"Indication05"</td>
+						<td>No</td>
+						<td>
+							Color indication. Supports values from
+							<a data-demokit-href="#/api/sap.ui.core.IndicationColor" target="_blank">IndicationColor</a>
+							(Indication01-20) and
+							<a data-demokit-href="#/api/sap.ui.core.ValueState" target="_blank">ValueState</a>
+							(Success, Error, Warning, Information, None). Supports data binding.
+						</td>
+						<td>1.89</td>
+						<td>1.151</td>
+					</tr>
+					<tr>
+						<td>visible</td>
+						<td>boolean</td>
+						<td>true</td>
+						<td>No</td>
+						<td>Whether the badge is initially visible. Supports data binding.</td>
+						<td>1.89</td>
+						<td>1.151</td>
+					</tr>
+					<tr>
+						<td>visibilityMode</td>
+						<td>string</td>
+						<td>"Disappear"</td>
+						<td>No</td>
+						<td>
+							Visibility behavior. "Disappear" hides the badge on card interaction, "Persist" keeps it visible.
+							See <a data-demokit-href="#/api/sap.f.CardBadgeVisibilityMode" target="_blank">CardBadgeVisibilityMode</a>.
+							Supports data binding.
+						</td>
+						<td>1.89</td>
+						<td>1.151</td>
+					</tr>
+					<tr>
+						<td>announcementText</td>
+						<td>string</td>
+						<td>""</td>
+						<td>No</td>
+						<td>Custom accessibility announcement text for screen readers. Supports data binding.</td>
+						<td>1.89</td>
+						<td>1.151</td>
+					</tr>
+				</table>
+			</div>
+
+			<h2 id="examples">Examples</h2>
+
+			<h3>Single Badge</h3>
+			<pre class="lang-json">
+{
+	"sap.card": {
+		"type": "List",
+		"badges": [
+			{
+				"text": "New",
+				"icon": "sap-icon://status-in-process",
+				"state": "Indication03",
+				"visibilityMode": "Persist"
+			}
+		],
+		"header": {
+			"title": "Products"
+		},
+		"content": {
+			"item": {
+				"title": "{Name}"
+			}
+		}
+	}
+}</pre>
+
+			<h3>Multiple Badges</h3>
+			<p>You can define multiple badges that will be displayed side by side:</p>
+			<pre class="lang-json">
+{
+	"sap.card": {
+		"type": "List",
+		"badges": [
+			{
+				"text": "3 New",
+				"state": "Indication04",
+				"visibilityMode": "Persist"
+			},
+			{
+				"icon": "sap-icon://pushpin-off",
+				"visibilityMode": "Persist",
+				"announcementText": "The card is pinned on top."
+			}
+		],
+		"header": {
+			"title": "My Tasks"
+		},
+		"content": {
+			"item": {
+				"title": "{Name}"
+			}
+		}
+	}
+}</pre>
+
+			<h3>Data Binding</h3>
+			<p>Badge properties support data binding, allowing you to bind badge values to the card's data model:</p>
+			<pre class="lang-json">
+{
+	"sap.card": {
+		"type": "List",
+		"data": {
+			"json": {
+				"badgeInfo": {
+					"count": "5",
+					"status": "New",
+					"icon": "sap-icon://status-in-process",
+					"color": "Indication03"
+				}
+			}
+		},
+		"badges": [
+			{
+				"text": "{badgeInfo/count} {badgeInfo/status}",
+				"icon": "{badgeInfo/icon}",
+				"state": "{badgeInfo/color}",
+				"visibilityMode": "Persist"
+			}
+		],
+		"header": {
+			"title": "Orders"
+		},
+		"content": {
+			"item": {
+				"title": "{Name}"
+			}
+		}
+	}
+}</pre>
+			<a class="try-button" href="../../../index.html#/explore/badges" target="_parent">Try it Out</a>
+
+		</div>
+	</div>
+
+</body>
+
+</html>

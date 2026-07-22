@@ -348,7 +348,7 @@ sap.ui.define([
 	  }
   );
 
-  var app = new App("myApp");
+  var app = new App("myApp", {autoFocus: false});
 
   var page1 = new Page("page1", {
 	  title:"sap.m.Tokenizer Test Samples",

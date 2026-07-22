@@ -119,10 +119,6 @@ sap.ui.define(function () {
 			"sap/m/demokit/tutorial/worklist/07/webapp/test/testsuite": {
 				group: "Worklist Tutorial",
 				page: "test-resources/sap/m/demokit/tutorial/worklist/07/webapp/test/testsuite.qunit.html"
-			},
-			"sap/m/demokit/tutorial/walkthrough/38/webapp/test/testsuite": {
-				group: "Walkthrough Tutorial",
-				page: "test-resources/sap/m/demokit/tutorial/walkthrough/38/webapp/test/testsuite.qunit.html"
 			}
 		}
 	};

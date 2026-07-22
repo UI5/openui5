@@ -214,6 +214,14 @@ sap.ui.define([
 		return Promise.race([pOriginalPromise, pTimeoutPromise]);
 	};
 
+	Utils.parseBoolean = function (vVisible) {
+		if (typeof vVisible === "string") {
+			return !Utils.hasFalsyValueAsString(vVisible);
+		}
+
+		return vVisible;
+	};
+
 	Utils.hasFalsyValueAsString = function (sString) {
 		return typeof sString == "string" && ["null", "false", "undefined", ""].indexOf(sString.trim()) > -1;
 	};

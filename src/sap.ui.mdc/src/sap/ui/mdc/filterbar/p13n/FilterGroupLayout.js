@@ -41,6 +41,10 @@ sap.ui.define(['sap/ui/core/Control'], (Control) => {
 		this._oFilterField = oFilterField;
 	};
 
+	FilterGroupLayout.prototype.getFilterField = function() {
+		return this._oFilterField;
+	};
+
 	FilterGroupLayout.prototype.getIdForLabel = function() {
 		return this._oFilterField && this._oFilterField.getIdForLabel();
 	};

@@ -25,6 +25,7 @@ sap.ui.define([
 	"sap/ui/core/library",
 	"sap/m/p13n/MessageStrip",
 	"sap/ui/core/InvisibleText",
+	"sap/ui/core/InvisibleMessage",
 	"sap/m/table/Util"
 
 
@@ -51,11 +52,13 @@ sap.ui.define([
 	coreLibrary,
 	MessageStrip,
 	InvisibleText,
+	InvisibleMessage,
 	TableUtil
 ) => {
 	"use strict";
 
 	const { ListMode, ListKeyboardMode } = mlibrary;
+	const { InvisibleMessageMode } = coreLibrary;
 
 	/**
 	 * P13n <code>Item</code> object type.
@@ -217,6 +220,7 @@ sap.ui.define([
 		if (!mSettings || (mSettings && mSettings.enableReorder === undefined)) {
 			this._updateMovement(true);
 		}
+		this.oInvisibleMessage = InvisibleMessage.getInstance();
 	};
 
 	BasePanel.prototype.init = function() {
@@ -861,19 +865,23 @@ sap.ui.define([
 
 	BasePanel.prototype._onPressButtonMoveToTop = function() {
 		this._moveSelectedItem(0);
+		this._announceReorder(this._getModelEntry(this._oSelectedItem), "TOP");
 	};
 
 	BasePanel.prototype._onPressButtonMoveUp = function() {
 		this._moveSelectedItem("Up");
+		this._announceReorder(this._getModelEntry(this._oSelectedItem), "UP");
 	};
 
 	BasePanel.prototype._onPressButtonMoveDown = function() {
 		this._moveSelectedItem("Down");
+		this._announceReorder(this._getModelEntry(this._oSelectedItem), "DOWN");
 	};
 
 	BasePanel.prototype._onPressButtonMoveToBottom = function() {
 		const iIndex = this._oListControl.getItems().length - 1;
 		this._moveSelectedItem(iIndex);
+		this._announceReorder(this._getModelEntry(this._oSelectedItem), "BOTTOM");
 	};
 
 	BasePanel.prototype._setMoveButtonVisibility = function(bVisible) {
@@ -881,6 +889,34 @@ sap.ui.define([
 		this._getMoveUpButton().setVisible(bVisible);
 		this._getMoveDownButton().setVisible(bVisible);
 		this._getMoveBottomButton().setVisible(bVisible);
+	};
+
+	BasePanel.prototype._announceReorder = function (oModelEntry, sDirection) {
+		let sTextKey = "p13n.REORDER_ANNOUNCEMENT";
+
+		if (sDirection) {
+			switch (sDirection) {
+				case "TOP":
+					sTextKey = "p13n.REORDER_ANNOUNCEMENT_TOP";
+					break;
+				case "UP":
+					sTextKey = "p13n.REORDER_ANNOUNCEMENT_UP";
+					break;
+				case "DOWN":
+					sTextKey = "p13n.REORDER_ANNOUNCEMENT_DOWN";
+					break;
+				case "BOTTOM":
+					sTextKey = "p13n.REORDER_ANNOUNCEMENT_BOTTOM";
+					break;
+				default:
+					sTextKey = "p13n.REORDER_ANNOUNCEMENT";
+			}
+		}
+
+		this.oInvisibleMessage.announce(
+			this._getResourceText(sTextKey, [oModelEntry.label]),
+			InvisibleMessageMode.Assertive
+		);
 	};
 
 	BasePanel.prototype._filterBySelected = function(bShowSelected, oList) {
@@ -965,6 +1001,7 @@ sap.ui.define([
 		const iActualDroppedIndex = iDroppedIndex + (sDropPosition == "Before" ? 0 : 1) + (iDraggedIndex < iDroppedIndex ? -1 : 0);
 
 		this._moveTableItem(oDraggedItem, iActualDroppedIndex);
+		this._announceReorder(oModelEntry);
 	};
 
 	BasePanel.prototype._updateEnableOfMoveButtons = function(oTableItem, bFocus) {

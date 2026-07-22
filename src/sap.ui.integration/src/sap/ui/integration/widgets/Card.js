@@ -10,6 +10,7 @@ sap.ui.define([
 	"sap/ui/base/Interface",
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
+	"sap/ui/core/library",
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/integration/util/Manifest",
 	"sap/base/Log",
@@ -23,6 +24,7 @@ sap.ui.define([
 	"sap/ui/integration/model/ContextModel",
 	"sap/f/CardBase",
 	"sap/f/library",
+	"sap/f/cards/CardBadgeCustomData",
 	"sap/ui/integration/library",
 	"sap/ui/integration/util/Destinations",
 	"sap/ui/integration/util/DelayedLoadingProvider",
@@ -47,6 +49,7 @@ sap.ui.define([
 	Interface,
 	Element,
 	Library,
+	coreLibrary,
 	jQuery,
 	CardManifest,
 	Log,
@@ -60,6 +63,7 @@ sap.ui.define([
 	ContextModel,
 	CardBase,
 	fLibrary,
+	CardBadgeCustomData,
 	library,
 	Destinations,
 	DelayedLoadingProvider,
@@ -87,6 +91,7 @@ sap.ui.define([
 		CONTENT: "/sap.card/content",
 		FOOTER: "/sap.card/footer",
 		PAGINATOR: "/sap.card/footer/paginator",
+		BADGES: "/sap.card/badges",
 		APP_TYPE: "/sap.app/type",
 		PARAMS: "/sap.card/configuration/parameters",
 		DESTINATIONS: "/sap.card/configuration/destinations",
@@ -103,6 +108,10 @@ sap.ui.define([
 	const HeaderPosition = fLibrary.cards.HeaderPosition;
 
 	const SemanticRole = fLibrary.cards.SemanticRole;
+
+	const CardBadgeVisibilityMode = fLibrary.CardBadgeVisibilityMode;
+
+	const IndicationColor = coreLibrary.IndicationColor;
 
 	const CardArea = library.CardArea;
 
@@ -154,7 +163,16 @@ sap.ui.define([
 	 * <li>Content</li>
 	 * <li>Data source</li>
 	 * <li>Possible actions</li>
+	 * <li>Badge (optional) - Since 1.151</li>
 	 * </ul>
+	 *
+	 * <h4>Manifest Badges vs. Programmatic Badges:</h4>
+	 * Badges can be set in two ways:
+	 * <ul>
+	 * <li><b>Manifest Badges:</b> Defined in <code>sap.card/badges</code> array - ideal for backend-driven scenarios where badge state is known at card definition time</li>
+	 * <li><b>Programmatic Badges:</b> Added via <code>customData</code> aggregation using {@link sap.f.cards.CardBadgeCustomData} - ideal for runtime dynamic scenarios controlled by the host application</li>
+	 * </ul>
+	 * Both types can coexist on the same card, allowing combination of backend-defined and host-controlled badges.
 	 *
 	 * The role of the app developer is to integrate the card into the app and define:
 	 * <ul>
@@ -463,6 +481,16 @@ sap.ui.define([
 				_loadingProvider: {
 					type: "sap.ui.core.Element",
 					multiple: false,
+					visibility: "hidden"
+				},
+
+				/**
+				 * Defines the manifest-declared badges.
+				 * @since 1.151
+				 */
+				_manifestBadge: {
+					type: "sap.f.cards.CardBadgeCustomData",
+					multiple: true,
 					visibility: "hidden"
 				}
 			},
@@ -864,6 +892,8 @@ sap.ui.define([
 	 * @private
 	 */
 	Card.prototype.onBeforeRendering = function () {
+		CardBase.prototype.onBeforeRendering.call(this);
+
 		const oCardContent = this.getCardContent();
 		if (oCardContent && oCardContent.isA("sap.ui.integration.cards.BaseContent")) {
 			oCardContent.setDesign(this.getDesign());
@@ -1458,6 +1488,8 @@ sap.ui.define([
 	Card.prototype.exit = function () {
 		CardBase.prototype.exit.call(this);
 
+		this.destroyAggregation("_manifestBadge");
+
 		this._destroyManifest();
 		this._oCardObserver.destroy();
 		this._oCardObserver = null;
@@ -1533,6 +1565,8 @@ sap.ui.define([
 		this._oContextParameters = null;
 
 		this._deregisterCustomModels();
+
+		this.destroyAggregation("_manifestBadge");
 
 		this.destroyAggregation("_extension");
 
@@ -2101,6 +2135,7 @@ sap.ui.define([
 		this._applyModelSizeLimit();
 
 		this._applyLoadingDelay();
+		this._applyBadgeManifestSettings();
 		this._applyFilterBarManifestSettings();
 		this._applyDataManifestSettings();
 		this._applyActionManifestSettings();
@@ -2421,6 +2456,53 @@ sap.ui.define([
 			return;
 		}
 		this.getAggregation("_loadingProvider").applyDelay(iLoadingDelay);
+	};
+
+	/**
+	 * Applies badge settings from the manifest.
+	 *
+	 * Creates or destroys manifest badges based on the manifest configuration.
+	 * The manifest can contain an array of badge configurations.
+	 * The visual badge rendering is handled automatically during the card rendering lifecycle.
+	 *
+	 * @private
+	 * @since 1.151
+	 */
+	Card.prototype._applyBadgeManifestSettings = function () {
+		const aBadgeConfigs = this._oCardManifest.get(MANIFEST_PATHS.BADGES);
+
+		this.destroyAggregation("_manifestBadge");
+
+		if (!aBadgeConfigs || aBadgeConfigs.length === 0) {
+			return;
+		}
+
+		aBadgeConfigs.forEach((oBadgeConfig) => {
+			const oNewBadge = new CardBadgeCustomData({
+				value: oBadgeConfig.text ?? "",
+				icon: oBadgeConfig.icon ?? "",
+				state: oBadgeConfig.state ?? IndicationColor.Indication05,
+				visible: oBadgeConfig.visible ?? true,
+				visibilityMode: oBadgeConfig.visibilityMode ?? CardBadgeVisibilityMode.Disappear,
+				announcementText: oBadgeConfig.announcementText ?? ""
+			});
+
+			this.addAggregation("_manifestBadge", oNewBadge);
+		});
+	};
+
+	/**
+	 * Provides manifest-declared badges as additional badge custom data.
+	 * This hook is called by CardBadgeEnabler to include manifest badges
+	 * alongside programmatic badges from the customData aggregation.
+	 *
+	 * @override
+	 * @returns {sap.f.cards.CardBadgeCustomData[]} Manifest-declared badges
+	 * @private
+	 * @since 1.151
+	 */
+	Card.prototype._getAdditionalCardBadges = function () {
+		return this.getAggregation("_manifestBadge") || [];
 	};
 
 	Card.prototype._validateChildCardsManifestSettings = function () {
