@@ -3625,4 +3625,78 @@ sap.ui.define([
 		assert.notOk(this.oDialog.isOpen(), "Dialog is closed after pressing Ctrl+Enter if footer has emphasized button");
 
 	});
+
+	QUnit.module("Min-width on narrow viewports", {
+		/**
+		 * Finds a CSS rule inside a media query block that matches the given
+		 * condition and selector, searching all loaded stylesheets.
+		 * @param {string} sConditionPart part of the media conditionText to look for (whitespace-insensitive)
+		 * @param {string} sSelectorPart part of the selectorText to look for
+		 * @returns {CSSStyleRule|null} the matching rule or null
+		 */
+		findRuleInMediaQuery: function (sConditionPart, sSelectorPart) {
+			var aStyleSheets = document.styleSheets;
+			var sNormalizedCondition = sConditionPart.replace(/\s/g, "");
+
+			for (var i = 0; i < aStyleSheets.length; i++) {
+				var aRules;
+
+				// Accessing cssRules of a cross-origin stylesheet throws a SecurityError
+				try {
+					aRules = aStyleSheets[i].cssRules;
+				} catch (e) {
+					continue;
+				}
+
+				if (!aRules) {
+					continue;
+				}
+
+				for (var j = 0; j < aRules.length; j++) {
+					var oRule = aRules[j];
+
+					// Only look into media rules that match the requested condition
+					if (oRule.type !== CSSRule.MEDIA_RULE ||
+						oRule.conditionText.replace(/\s/g, "").indexOf(sNormalizedCondition) === -1) {
+						continue;
+					}
+
+					var aInnerRules = oRule.cssRules;
+					for (var k = 0; k < aInnerRules.length; k++) {
+						if (aInnerRules[k].selectorText &&
+							aInnerRules[k].selectorText.indexOf(sSelectorPart) > -1) {
+							return aInnerRules[k];
+						}
+					}
+				}
+			}
+
+			return null;
+		}
+	});
+
+	QUnit.test("Open phone dialog has min-width 100% inside the max-width 18rem media query", function (assert) {
+		// Act
+		var oRule = this.findRuleInMediaQuery("max-width:18rem", ".sap-phone .sapMDialog");
+
+		// Assert
+		assert.ok(oRule, "A rule for a phone dialog exists inside the '@media (max-width: 18rem)' block");
+		assert.strictEqual(oRule.style.minWidth, "100%",
+			"min-width is 100% so the phone dialog (18rem min-width) does not overflow on very narrow viewports");
+	});
+
+	QUnit.test("Open tablet and desktop dialogs have min-width 100% inside the max-width 20rem media query", function (assert) {
+		// Act
+		var oTabletRule = this.findRuleInMediaQuery("max-width:20rem", ".sap-tablet .sapMDialog");
+		var oDesktopRule = this.findRuleInMediaQuery("max-width:20rem", ".sap-desktop .sapMDialog");
+
+		// Assert
+		assert.ok(oTabletRule, "A rule for a tablet dialog exists inside the '@media (max-width: 20rem)' block");
+		assert.strictEqual(oTabletRule.style.minWidth, "100%",
+			"min-width is 100% so the tablet dialog (20rem min-width) does not overflow on very narrow viewports");
+
+		assert.ok(oDesktopRule, "A rule for a desktop dialog exists inside the '@media (max-width: 20rem)' block");
+		assert.strictEqual(oDesktopRule.style.minWidth, "100%",
+			"min-width is 100% so the desktop dialog (20rem min-width) does not overflow on very narrow viewports");
+	});
 });
