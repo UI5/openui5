@@ -1098,13 +1098,10 @@ sap.ui.define([
 			delete mQueryOptions.$filter;
 			delete mQueryOptions.$orderby;
 			mQueryOptions = _AggregationHelper.buildApply(oAggregation, mQueryOptions, 1);
+			mQueryOptions.$select.pop(); // undo select("DrillState") from buildApply()
 			const aNodeFilters = oOutOfPlace.nodeFilters.slice().sort();
 			mQueryOptions.$filter = aNodeFilters.join(" or ");
 			mQueryOptions.$top = aNodeFilters.length;
-			const iDrillStateIndex = mQueryOptions.$select.indexOf(oAggregation.$DrillState);
-			if (iDrillStateIndex >= 0) {
-				mQueryOptions.$select.splice(iDrillStateIndex, 1);
-			}
 
 			return mQueryOptions;
 		},
