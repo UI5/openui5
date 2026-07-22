@@ -1649,7 +1649,7 @@ sap.ui.define([
 		};
 
 		var fnOpened4 = function(){
-			assert.notOk(QUnitUtils.isSelectedTextEqual(), "There should not be any text selected.");
+			assert.ok(QUnitUtils.isSelectedTextEqual(), "The text selection should be preserved when a non-modal popup opens.");
 			assert.notOk(jQuery(oPopup3DomRef).hasClass("sapUiNotUserSelectable"), "The content of popup with ID: " + oPopup3.getId() + " should not be marked explicitly as not user selectable.");
 
 			assert.ok(jQuery(oPopup4DomRef).hasClass("sapUiUserSelectable"), "The content of popup with ID: " + oPopup4.getId() + " should be marked explicitly as user selectable.");
@@ -1663,7 +1663,7 @@ sap.ui.define([
 		};
 
 		var fnClosed4 = function(){
-			assert.notOk(QUnitUtils.isSelectedTextEqual(), "There should not be any text selected.");
+			assert.ok(QUnitUtils.isSelectedTextEqual(), "The text selection should be preserved when a non-modal popup closes.");
 			assert.notOk(jQuery(oPopup4DomRef).hasClass("sapUiUserSelectable"), "The content of popup with ID: " + oPopup4.getId() + " should not be marked explicitly as user selectable.");
 			assert.notOk(jQuery(oPopup4DomRef).hasClass("sapUiNotUserSelectable"), "The content of popup with ID: " + oPopup4.getId() + " should not be marked explicitly as not user selectable.");
 			assert.notOk(jQuery(oPopup3DomRef).hasClass("sapUiNotUserSelectable"), "The content of popup with ID: " + oPopup3.getId() + " should not be marked explicitly as not user selectable.");
@@ -1696,7 +1696,7 @@ sap.ui.define([
 		var done = assert.async();
 
 		var fnOpened3 = function(){
-			assert.notOk(QUnitUtils.isSelectedTextEqual(), "There should not be any text selected.");
+			assert.ok(QUnitUtils.isSelectedTextEqual(), "The text selection should be preserved when a non-modal popup opens.");
 			assert.notOk(jQuery(oPopup3DomRef).hasClass("sapUiUserSelectable"), "The content of popup with ID: " + oPopup3.getId() + " should not be marked explicitly as user selectable.");
 			assert.notOk(jQuery(oPopup3DomRef).hasClass("sapUiNotUserSelectable"), "The content of popup with ID: " + oPopup3.getId() + " should not be marked explicitly as not user selectable.");
 			assert.notOk(jQuery("html").hasClass("sapUiNotUserSelectable"), "The content of the whole html document should not be marked as not user selectable.");
@@ -1706,7 +1706,7 @@ sap.ui.define([
 		};
 
 		var fnClosed3 = function(){
-			assert.notOk(QUnitUtils.isSelectedTextEqual(), "There should not be any text selected.");
+			assert.notOk(QUnitUtils.isSelectedTextEqual(), "There should not be any text selected because the modal popup already cleared it.");
 			assert.notOk(jQuery(oPopup4DomRef).hasClass("sapUiUserSelectable"), "The content of popup with ID: " + oPopup4.getId() + " should not be marked explicitly as user selectable.");
 			assert.notOk(jQuery(oPopup4DomRef).hasClass("sapUiNotUserSelectable"), "The content of popup with ID: " + oPopup4.getId() + " should not be marked explicitly as not user selectable.");
 			assert.notOk(jQuery(oPopup3DomRef).hasClass("sapUiNotUserSelectable"), "The content of popup with ID: " + oPopup3.getId() + " should not be marked explicitly as not user selectable.");
@@ -1772,7 +1772,7 @@ sap.ui.define([
 		var done = assert.async();
 
 		var fnOpened3 = function(){
-			assert.notOk(QUnitUtils.isSelectedTextEqual(), "There should not be any text selected.");
+			assert.ok(QUnitUtils.isSelectedTextEqual(), "The text selection should be preserved when a non-modal popup opens.");
 			assert.notOk(jQuery(oPopup3DomRef).hasClass("sapUiUserSelectable"), "The content of popup with ID: " + oPopup3.getId() + " should not be marked explicitly as user selectable.");
 			assert.notOk(jQuery(oPopup3DomRef).hasClass("sapUiNotUserSelectable"), "The content of popup with ID: " + oPopup3.getId() + " should not be marked explicitly as not user selectable.");
 			assert.notOk(jQuery("html").hasClass("sapUiNotUserSelectable"), "The content of the whole html document should not be marked explicitly as not user selectable.");
@@ -1782,7 +1782,7 @@ sap.ui.define([
 		};
 
 		var fnClosed3 = function(){
-			assert.notOk(QUnitUtils.isSelectedTextEqual(), "There should not be any text selected.");
+			assert.ok(QUnitUtils.isSelectedTextEqual(), "The text selection should be preserved when a non-modal popup closes.");
 			assert.notOk(jQuery(oPopup4DomRef).hasClass("sapUiUserSelectable"), "The content of popup with ID: " + oPopup4.getId() + " should not be marked explicitly as user selectable.");
 			assert.notOk(jQuery(oPopup4DomRef).hasClass("sapUiNotUserSelectable"), "The content of popup with ID: " + oPopup4.getId() + " should not be marked explicitly as not user selectable.");
 			assert.notOk(jQuery(oPopup3DomRef).hasClass("sapUiNotUserSelectable"), "The content of popup with ID: " + oPopup3.getId() + " should not be marked explicitly as not user selectable.");
@@ -1790,7 +1790,7 @@ sap.ui.define([
 			setTimeout(function(){
 				assert.notOk(jQuery("html").hasClass("sapUiUserSelectable"), "The content of the whole html document should not be marked explicitly as user selectable.");
 				assert.notOk(jQuery("html").hasClass("sapUiNotUserSelectable"), "The content of the whole html document should not be marked explicitly as not user selectable.");
-				assert.notOk(QUnitUtils.isSelectedTextEqual(), "There should not be any text selected.");
+				assert.ok(QUnitUtils.isSelectedTextEqual(), "The text selection should be preserved when non-modal popups are used.");
 				oPopup3.destroy();
 				oPopup4.destroy();
 				done();
@@ -1798,18 +1798,18 @@ sap.ui.define([
 		};
 
 		var fnOpened4 = function(){
-			assert.notOk(QUnitUtils.isSelectedTextEqual(), "There should not be any text selected.");
+			assert.ok(QUnitUtils.isSelectedTextEqual(), "The text selection should be preserved when a non-modal popup opens.");
 			assert.notOk(jQuery(oPopup4DomRef).hasClass("sapUiUserSelectable"), "The content of popup with ID: " + oPopup4.getId() + " should not be marked explicitly as user selectable.");
 			assert.notOk(jQuery(oPopup3DomRef).hasClass("sapUiNotUserSelectable"), "The content of popup with ID: " + oPopup3.getId() + " should not be marked explicitly as not user selectable.");
 			assert.notOk(jQuery(oPopup3DomRef).hasClass("sapUiUserSelectable"), "The content of popup with ID: " + oPopup3.getId() + " should not be marked explicitly as user selectable.");
 			assert.notOk(jQuery("html").hasClass("sapUiNotUserSelectable"), "The content of the whole html document should not be marked explicitly as not user selectable.");
 			QUnitUtils.triggerSelectAll();
-			assert.ok(QUnitUtils.isSelectedTextEqual(), "There should not be any text selected.");
+			assert.ok(QUnitUtils.isSelectedTextEqual(), "There should be any text selected.");
 			oPopup4.close();
 		};
 
 		var fnClosed4 = function(){
-			assert.notOk(QUnitUtils.isSelectedTextEqual(), "There should not be any text selected.");
+			assert.ok(QUnitUtils.isSelectedTextEqual(), "The text selection should be preserved when a non-modal popup closes.");
 			assert.notOk(jQuery(oPopup4DomRef).hasClass("sapUiUserSelectable"), "The content of popup with ID: " + oPopup4.getId() + " should not be marked explicitly as user selectable.");
 			assert.notOk(jQuery(oPopup4DomRef).hasClass("sapUiNotUserSelectable"), "The content of popup with ID: " + oPopup4.getId() + " should not be marked explicitly as not user selectable.");
 			assert.notOk(jQuery(oPopup3DomRef).hasClass("sapUiNotUserSelectable"), "The content of popup with ID: " + oPopup3.getId() + " should not be marked explicitly as not user selectable.");
@@ -1841,8 +1841,11 @@ sap.ui.define([
 
 		var done = assert.async();
 
+		// Clear any leftover selection from previous tests
+		document.getSelection().removeAllRanges();
+
 		var fnOpened3 = function(){
-			assert.notOk(QUnitUtils.isSelectedTextEqual(), "There should not be any text selected.");
+			assert.ok(QUnitUtils.isSelectedTextEqual(), "The text selection should be preserved when a non-modal popup opens.");
 			assert.notOk(jQuery(oPopup3DomRef).hasClass("sapUiUserSelectable"), "The content of popup with ID: " + oPopup3.getId() + " should not be marked explicitly as user selectable.");
 			assert.notOk(jQuery(oPopup3DomRef).hasClass("sapUiNotUserSelectable"), "The content of popup with ID: " + oPopup3.getId() + " should not be marked explicitly as not user selectable.");
 			assert.notOk(jQuery("html").hasClass("sapUiNotUserSelectable"), "The content of the whole html document should not be marked explicitly as not user selectable.");
@@ -1874,12 +1877,12 @@ sap.ui.define([
 		};
 
 		var fnClosed3 = function(){
-			assert.notOk(QUnitUtils.isSelectedTextEqual(), "There should not be any text selected.");
+			assert.ok(QUnitUtils.isSelectedTextEqual(), "The text selection should be preserved when a non-modal popup closes.");
 			assert.notOk(jQuery(oPopup3DomRef).hasClass("sapUiNotUserSelectable"), "The content of popup with ID: " + oPopup3.getId() + " should not be marked explicitly as not user selectable.");
 			assert.notOk(jQuery(oPopup3DomRef).hasClass("sapUiUserSelectable"), "The content of popup with ID: " + oPopup3.getId() + " should not be marked explicitly as user selectable.");
 			assert.notOk(jQuery("html").hasClass("sapUiUserSelectable"), "The content of the whole html document should not be marked explicitly as user selectable.");
 			assert.notOk(jQuery("html").hasClass("sapUiNotUserSelectable"), "The content of the whole html document should not be marked explicitly as not user selectable.");
-			assert.notOk(QUnitUtils.isSelectedTextEqual(), "There should not be any text selected.");
+			assert.ok(QUnitUtils.isSelectedTextEqual(), "The text selection should still be preserved.");
 			oPopup4.open();
 		};
 
@@ -1959,6 +1962,62 @@ sap.ui.define([
 
 		// switch to non modal state
 		oPopup3.setModal(false);
+
+		oPopup3.open();
+	});
+
+	QUnit.test("Should not clear text selection when non-modal popup opens or closes", function(assert){
+		var oPopup3DomRef = document.getElementById("popup3");
+		var oPopup3 = new Popup(oPopup3DomRef, /*bModal*/ false);
+		var done = assert.async();
+
+		var fnOpened3 = function(){
+			assert.ok(QUnitUtils.isSelectedTextEqual(), "The text selection should be preserved when a non-modal popup opens.");
+			oPopup3.close();
+		};
+
+		var fnClosed3 = function(){
+			assert.ok(QUnitUtils.isSelectedTextEqual(), "The text selection should be preserved when a non-modal popup closes.");
+			oPopup3.destroy();
+			done();
+		};
+
+		oPopup3.setDurations(0, 0);
+		oPopup3.attachOpened(fnOpened3);
+		oPopup3.attachClosed(fnClosed3);
+
+		// Create a text selection before opening the popup
+		QUnitUtils.triggerSelectAll();
+		assert.ok(QUnitUtils.isSelectedTextEqual(), "There should be text selected before opening the popup.");
+
+		oPopup3.open();
+	});
+
+	QUnit.test("Should clear text selection when modal popup opens or closes", function(assert){
+		var oPopup3DomRef = document.getElementById("popup3");
+		var oPopup3 = new Popup(oPopup3DomRef, /*bModal*/ true);
+		var done = assert.async();
+
+		var fnOpened3 = function(){
+			assert.notOk(QUnitUtils.isSelectedTextEqual(), "The text selection should be cleared when a modal popup opens.");
+			QUnitUtils.triggerSelectAll();
+			assert.ok(QUnitUtils.isSelectedTextEqual("OpenPopup"), "The selected text should be correct 'OpenPopup'.");
+			oPopup3.close();
+		};
+
+		var fnClosed3 = function(){
+			assert.notOk(QUnitUtils.isSelectedTextEqual(), "The text selection should be cleared when a modal popup closes.");
+			oPopup3.destroy();
+			done();
+		};
+
+		oPopup3.setDurations(0, 0);
+		oPopup3.attachOpened(fnOpened3);
+		oPopup3.attachClosed(fnClosed3);
+
+		// Create a text selection before opening the popup
+		QUnitUtils.triggerSelectAll();
+		assert.ok(QUnitUtils.isSelectedTextEqual(), "There should be text selected before opening the popup.");
 
 		oPopup3.open();
 	});
@@ -2235,7 +2294,7 @@ sap.ui.define([
 			oText.setText("NewText");
 			setTimeout(function(){
 				assert.notOk(jQuery(oText.getDomRef()).hasClass("sapUiUserSelectable"), "The content of popup with ID: " + oPopup3.getId() + " should not be marked explicitly as user selectable.");
-				assert.notOk(QUnitUtils.isSelectedTextEqual(), "There should not be any text selected.");
+				assert.ok(QUnitUtils.isSelectedTextEqual(), "The text selection should be preserved when non-modal popup content is invalidated.");
 
 				QUnitUtils.triggerSelectAll();
 
@@ -2245,7 +2304,7 @@ sap.ui.define([
 			}, 0);
 		};
 		var fnClosed3 = function(){
-			assert.notOk(QUnitUtils.isSelectedTextEqual(), "There should not be any text selected.");
+			assert.ok(QUnitUtils.isSelectedTextEqual(), "The text selection should be preserved when a non-modal popup closes.");
 			assert.notOk(jQuery(oText.getDomRef()).hasClass("sapUiUserSelectable"), "The content of popup with ID: " + oPopup3.getId() + " should not be marked explicitly as user selectable.");
 			assert.notOk(jQuery("html").hasClass("sapUiNotUserSelectable"), "The content of the whole html document should not be marked explicitly as not user selectable.");
 			oText.destroy();
