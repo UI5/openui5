@@ -61,53 +61,49 @@ sap.ui.define([
 	};
 
 	QUnit.module("Prevent keyboard scrolling", {
-		beforeEach: function () {
+		beforeEach: async function () {
 			this.oCard = new Card({
 				baseUrl: "test-resources/sap/ui/integration/qunit/testResources/",
 				manifest: oTestManifest1,
 				overflow: CardOverflow.ShowMore
 			});
+
+			this.oCard.setHeight("100%");
+
+			this.vBox = new VBox({
+				height: "150px",
+				renderType: "Bare",
+				items: [this.oCard]
+			});
+
+			this.vBox.placeAt(DOM_RENDER_LOCATION);
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
 		},
 		afterEach: function () {
 			this.oCard.destroy();
+			this.vBox.destroy();
 		}
 	});
 
-	QUnit.test("When space is not enough", async function (assert) {
+	QUnit.test("When space is not enough", function (assert) {
 		// Arrange
-		const oCard = this.oCard;
-		oCard.setHeight("100%");
-
-		const vBox = new VBox({
-			height: "150px",
-			renderType: "Bare",
-			items: [oCard]
-		});
-
-		// Act
-		vBox.placeAt(DOM_RENDER_LOCATION);
-		await nextCardReadyEvent(oCard);
-		await nextUIUpdate();
-
-		const oList = oCard.getCardContent().getInnerList();
+		const oList = this.oCard.getCardContent().getInnerList();
 
 		oList.focus();
 
 		QUnitUtils.triggerKeydown(document.activeElement, "ARROW_DOWN");
-		oCard.getCardContent()._oOverflowHandler._oPreventKeyboardScrolling._scroll(); // @todo the scroll event should be fired, but is not
+		this.oCard.getCardContent()._oOverflowHandler._oPreventKeyboardScrolling._scroll(); // @todo the scroll event should be fired, but is not
 
 		QUnitUtils.triggerKeydown(document.activeElement, "ARROW_DOWN");
-		oCard.getCardContent()._oOverflowHandler._oPreventKeyboardScrolling._scroll();
+		this.oCard.getCardContent()._oOverflowHandler._oPreventKeyboardScrolling._scroll();
 
 		// Assert
-		const oFooter = oCard.getCardFooter();
+		const oFooter = this.oCard.getCardFooter();
 		const oShowMore = oFooter.getAggregation("_showMore");
-		const oContentSection = oCard.getDomRef("contentSection");
+		const oContentSection = this.oCard.getDomRef("contentSection");
 
 		assert.strictEqual(oContentSection.scrollTop, 0, "The content is not scrolled");
 		assert.strictEqual(oShowMore.getDomRef(), document.activeElement, "The focus is on the show more button.");
-
-		// Clean up
-		vBox.destroy();
 	});
 });
