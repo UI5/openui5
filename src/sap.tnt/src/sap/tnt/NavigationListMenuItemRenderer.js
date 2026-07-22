@@ -64,10 +64,17 @@ sap.ui.define([
 
 		// Icon column
 		this.renderIcon(oRm, oItem);
+
+		oRm.openStart("div")
+			.class("sapTntNLMenuItemTextAndTagContainer")
+			.openEnd();
+
 		// Text column
 		this.renderText(oRm, oItem);
 		// Tag column
 		this.renderTag(oRm, oItem);
+
+		oRm.close("div");
 
 		if (bHasSubmenu) {
 			// Submenu arrow column
