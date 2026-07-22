@@ -39527,6 +39527,135 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	});
 
 	//*********************************************************************************************
+	// Scenario: A recursive hierarchy is filtered so that a newly created node ("out of place")
+	// does not match the filter and thus has no limited rank ("outside the collection"). A
+	// side-effects refresh must keep the tree state: the out-of-place node must survive and, more
+	// importantly, no in-place node must get lost. Only root nodes are present, same in DINC.
+	// SNOW: DINC0921191
+[false/*TODO: , true*/].forEach((bSelected) => {
+	const sTitle = "Recursive Hierarchy: DINC0921191, side-effects refresh w/ out-of-place node"
+		+ " outside the collection, selected = " + bSelected;
+
+	QUnit.test(sTitle, async function (assert) {
+		const sBaseUrl = "EMPLOYEES?$apply=ancestors($root/EMPLOYEES,OrgChart,ID"
+			+ ",filter(not startswith(Name, 'Out')),keep start)"
+			+ "/com.sap.vocabularies.Hierarchy.v1.TopLevels(HierarchyNodes=$root/EMPLOYEES"
+			+ ",HierarchyQualifier='OrgChart',NodeProperty='ID',Levels=1)";
+		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
+		const sView = `
+<t:Table id="table" rows="{path : '/EMPLOYEES',
+		parameters : {
+			$$aggregation : {
+				hierarchyQualifier : 'OrgChart'
+			},
+			$filter : 'not startswith(Name, \\'Out\\')'
+		}}" threshold="0" visibleRowCount="4">
+	<Text text="{= %{@$ui5.node.isExpanded} }"/>
+	<Text text="{= %{@$ui5.node.level} }"/>
+	<Text text="{Name}"/>
+</t:Table>`;
+
+		this.expectRequest(sBaseUrl + "&$select=DrillState,ID,Name&$count=true&$skip=0&$top=4", {
+				"@odata.count" : "2",
+				value : [
+					{DrillState : "leaf", ID : "0", Name : "Alpha"},
+					{DrillState : "leaf", ID : "1", Name : "Beta"}
+				]
+			});
+
+		await this.createView(assert, sView, oModel);
+
+		const oTable = this.oView.byId("table");
+		checkTable("initial page", assert, oTable, [
+			"/EMPLOYEES('0')",
+			"/EMPLOYEES('1')"
+		], [
+			[undefined, 1, "Alpha"],
+			[undefined, 1, "Beta"]
+		], 2);
+		const oListBinding = oTable.getBinding("rows");
+
+		// create a new root which does not match the filter (thus w/o rank, "out of place")
+		this.expectRequest("POST EMPLOYEES", {
+				payload : {Name : "Out"}
+			}, {ID : "Out", Name : "Out"});
+
+		const oOut = oListBinding.create({Name : "Out"}, /*bSkipRefresh*/true);
+		oOut.setSelected(bSelected);
+
+		await Promise.all([
+			oOut.created(),
+			this.waitForChanges(assert, "create Out")
+		]);
+
+		checkTable("after create Out", assert, oTable, [
+			oOut,
+			"/EMPLOYEES('0')",
+			"/EMPLOYEES('1')"
+		], [
+			[undefined, 1, "Out"],
+			[undefined, 1, "Alpha"],
+			[undefined, 1, "Beta"]
+		]);
+		assert.deepEqual(oOut.getObject(), {
+			...(bSelected && {"@$ui5.context.isSelected" : true}),
+			"@$ui5.context.isTransient" : false,
+			"@$ui5.node.level" : 1,
+			ID : "Out",
+			Name : "Out"
+		});
+
+		this.expectRequestIf(bSelected, "EMPLOYEES?$filter=ID eq 'Out'&$select=ID,Name", {
+				value : [{ID : "Out", Name : "Out"}] //TODO: influence of this?
+			})
+			.expectRequest(sBaseUrl + "&$select=DrillState,ID,Name&$count=true&$skip=0&$top=4", {
+				"@odata.count" : "2",
+				value : [
+					{DrillState : "leaf", ID : "0", Name : "Alpha"},
+					{DrillState : "leaf", ID : "1", Name : "Beta"}
+				]
+			})
+			// rank of the out-of-place node; it is filtered out and thus has no rank
+			.expectRequest(sBaseUrl + "&$select=DistanceFromRoot,DrillState,ID,LimitedRank"
+				+ "&$filter=ID eq 'Out'&$top=1", {
+				value : [] // filtered out -> no rank
+			})
+			// the out-of-place node's data
+			.expectRequest("EMPLOYEES?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
+				+ "HierarchyNodes=$root/EMPLOYEES,HierarchyQualifier='OrgChart',NodeProperty='ID'"
+				+ ",Levels=1)&$select=ID,Name&$filter=ID eq 'Out'&$top=1", {
+				value : [{ID : "Out", Name : "Out"}]
+			});
+
+		await Promise.all([
+			// code under test
+			oListBinding.getHeaderContext().requestSideEffects([""]),
+			this.waitForChanges(assert, "side-effects refresh, keeping tree state")
+		]);
+
+		// the out-of-place node "Out" must survive and the last in-place node "Beta" must not be
+		// lost (SNOW: DINC0921191)
+		checkTable("after side-effects refresh", assert, oTable, [
+			oOut,
+			"/EMPLOYEES('0')",
+			"/EMPLOYEES('1')"
+		], [
+			[undefined, 1, "Out"],
+			[undefined, 1, "Alpha"],
+			[undefined, 1, "Beta"]
+		]);
+		assert.deepEqual(oOut.getObject(), {
+			...(bSelected && {"@$ui5.context.isSelected" : true}),
+			"@$ui5.context.isTransient" : false,
+			"@$ui5.node.level" : 1,
+			ID : "Out",
+			Name : "Out"
+		});
+		checkSelected(assert, oOut, bSelected ? true : undefined);
+	});
+});
+
+	//*********************************************************************************************
 	// Scenario: Expand all levels of a recursive hierarchy with two roots ("Alpha", "Omega").
 	// Collapse "Beta". Move "Alpha" so that "Omega" becomes its parent, either as an expanded node
 	// with children or by first collapsing and later expanding. Check that its children are moved

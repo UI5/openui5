@@ -7329,7 +7329,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("handleOutOfPlaceNodes", function () {
+	QUnit.test("handleOutOfPlaceNodes", function (assert) {
 		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
 			hierarchyQualifier : "X",
 			$DrillState : "~DrillState~",
@@ -7343,8 +7343,9 @@ sap.ui.define([
 		const oOutOfPlaceNodeResult1 = {
 			value : ["~node1Data~", "~node2Data~"]
 		};
+		const oOutData = {Name : "Out"};
 		const oOutOfPlaceNodeResult2 = {
-			value : ["~node3Data~"]
+			value : [oOutData, "~node3Data~"]
 		};
 		const oOutOfPlaceNodeResult3 = {
 			value : ["~node4Data~"]
@@ -7377,8 +7378,10 @@ sap.ui.define([
 
 		oTreeStateMock.expects("getOutOfPlacePredicates").withExactArgs()
 			.returns(["~predicate1~", "~predicate2~", "~predicate3~", "~predicate4~",
-				"~predicate5~", "~predicate6NowInPlace~", "~predicate7NowInPlace~"]);
+				"~predicate5~", "~predicate6NowInPlace~", "~predicate7NowInPlace~",
+				"~predicateOut~"]);
 
+		// Out
 		// parent1
 		//   node1
 		//   node2
@@ -7406,6 +7409,14 @@ sap.ui.define([
 		// "~node2Data~": already in $byPredicate
 		oHelperMock.expects("getKeyPredicate").withExactArgs("~node2Data~", "/Foo", "~types~")
 			.returns("~predicate2~");
+		// oOutData
+		oHelperMock.expects("getKeyPredicate")
+			.withExactArgs(sinon.match.same(oOutData), "/Foo", "~types~")
+			.returns("~predicateOut~");
+		oTreeStateMock.expects("getOutOfPlace").withExactArgs("~predicateOut~")
+			.returns({/*no parentPredicate*/});
+		oHelperMock.expects("setPrivateAnnotation")
+			.withExactArgs(sinon.match.same(oOutData), "predicate", "~predicateOut~");
 		// "~node3Data~"
 		oHelperMock.expects("getKeyPredicate").withExactArgs("~node3Data~", "/Foo", "~types~")
 			.returns("~predicate3~");
@@ -7456,7 +7467,20 @@ sap.ui.define([
 		oHelperMock.expects("drillDown").withExactArgs("~parent2RankResult~", "~LimitedRank~")
 			.returns("23"); // doesn't really matter, but must be a number
 		oCacheMock.expects("moveOutOfPlaceNodes").withExactArgs(23, "~parent2NodePredicates~");
-		oCacheMock.expects("moveOutOfPlaceNodes").withExactArgs(undefined, "~rootNodePredicates~");
+		oCacheMock.expects("moveOutOfPlaceNodes").withExactArgs(undefined, "~rootNodePredicates~")
+			.callsFake(function () {
+				assert.strictEqual(oCache.aElements.at(-1), oOutData);
+				assert.deepEqual(oCache.aElements.$byPredicate, {
+					"~predicate1~" : "~node1Data~",
+					"~predicate2~" : "~node2~",
+					"~predicate3~" : "~node3Data~",
+					"~predicateOut~" : { // oOutData
+						"@$ui5.node.level" : 1,
+						Name : "Out"
+					}
+				});
+				assert.strictEqual(oCache.aElements.$byPredicate["~predicateOut~"], oOutData);
+			});
 
 		// code under test
 		oCache.handleOutOfPlaceNodes([oRankResult, oOutOfPlaceNodeResult1, oOutOfPlaceNodeResult2,
