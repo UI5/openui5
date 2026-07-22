@@ -11,8 +11,9 @@ sap.ui.define([
 	'sap/ui/core/util/reflection/JsControlTreeModifier',
 	'sap/ui/fl/Utils',
 	'sap/ui/mdc/enums/FieldDisplay',
+	'sap/ui/mdc/p13n/StateUtil',
 	'delegates/util/DelegateCache'
-], function(FilterBarDelegate, JsControlTreeModifier, FlUtils, FieldDisplay, DelegateCache) {
+], function(FilterBarDelegate, JsControlTreeModifier, FlUtils, FieldDisplay, StateUtil, DelegateCache) {
 	"use strict";
 
 	var FilterBarAuthorsSampleDelegate = Object.assign({}, FilterBarDelegate);
@@ -103,5 +104,18 @@ sap.ui.define([
 
 		return FilterBarDelegate._createFilterField.apply(this, arguments);
 	};
+
+	FilterBarAuthorsSampleDelegate.clearFilters = function(oFilterBar) {
+		return new Promise((resolve) => {
+			setTimeout(resolve, 100); // to allow re-rendering in between
+		}).then(() => {
+			return StateUtil.retrieveExternalState(oFilterBar);
+		}).then((oState) => {
+			return StateUtil.diffState(oFilterBar, oState, { filter: {} });
+		}).then((oStateDiff) => {
+			return StateUtil.applyExternalState(oFilterBar, oStateDiff);
+		});
+	};
+
 	return FilterBarAuthorsSampleDelegate;
 });

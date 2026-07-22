@@ -292,14 +292,14 @@ sap.ui.define([
 	});
 
 	QUnit.test("check Clear delegate call", async function(assert) {
-		const done = assert.async();
+		const oButton = oFilterBar._btnClear;
 		sinon.spy(oFilterBar, "onClear");
 
-		oFilterBar.initControlDelegate().then(function(oDelegate) {
+		await oFilterBar.initControlDelegate().then(function(oDelegate) {
 			sinon.stub(oDelegate, "clearFilters").callsFake(function() {
 				assert.ok(oFilterBar.onClear.called, "onClear called");
 				assert.ok(true, "'clearFilters' on delegate called");
-				done();
+				assert.ok(oButton.getBusy(), "Clear Button is Busy");
 				return Promise.resolve();
 			});
 		});
@@ -309,13 +309,23 @@ sap.ui.define([
 		oFilterBar.setShowClearButton(true);
 		await nextUIUpdate();
 
-		const oButton = oFilterBar._btnClear;
 		assert.ok(oButton, "clear button available");
 		const oTarget = oButton.getFocusDomRef();
 		assert.ok(oTarget, "clear button dom-ref available");
 		QUnitUtils.triggerTouchEvent("tap", oTarget, {
 			srcControl: null
 		});
+		QUnitUtils.triggerTouchEvent("tap", oTarget, { // check not executed twice
+			srcControl: null
+		});
+
+		await new Promise((resolve) => {setTimeout(resolve,0);}); // as busty is reset after promise was fullfilled
+		const oDelegate = oFilterBar.getControlDelegate();
+		assert.ok(oFilterBar.onClear.calledTwice, "onClear called twice");
+		assert.ok(oDelegate.clearFilters.calledOnce, "clearFilters only called once.");
+		assert.notOk(oButton.getBusy(), "Clear Button is not Busy");
+
+		oDelegate.clearFilters.restore();
 	});
 
 	QUnit.test("check p13nMode property", function(assert) {
