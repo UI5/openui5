@@ -1640,6 +1640,7 @@ sap.ui.define([
 					var oControl = aControls[iIndex];
 					oControl.attachEvent("parseError", _handleParseError, this);
 					oControl.attachEvent("validationError", _handleValidationError, this);
+					oControl.attachEvent("validationSuccess", _handleValidationSuccess, this);
 					_modifyKeyboardHandler.call(this, oControl, oContentType.getUseDefaultEnterHandler());
 					_modifyFieldGroupHandler.call(this, oControl, false);
 					_setModelOnContent.call(this, oControl);
@@ -1949,6 +1950,12 @@ sap.ui.define([
 
 	}
 
+	function _handleValidationSuccess(oEvent) {
+
+		this._bParseError = false; // if last valid value is entered again no condition is updated
+
+	}
+
 	function _handleContentChange(oEvent) {
 
 		var oChangeEvent = { parameters: merge({}, oEvent.getParameters()), source: oEvent.getSource() };
@@ -2197,8 +2204,6 @@ sap.ui.define([
 			var aConditions = this.getConditions();
 			vPreviousValue = aConditions[0] && aConditions[0].values[0];
 		}
-
-		this._bParseError = false; // last parsing result is obsolete if user starts typing
 
 		var oFieldHelp = _getFieldHelp.call(this);
 
