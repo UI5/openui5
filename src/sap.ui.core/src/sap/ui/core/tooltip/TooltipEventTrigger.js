@@ -52,6 +52,7 @@ sap.ui.define([
 		 * @param {function(boolean)} oConfig.onOpen Opens the tooltip. Called with <code>true</code> for deferred gestures (hover, keyboard focus), no argument for instant ones (long-press).
 		 * @param {function(boolean)} oConfig.onClose Closes the tooltip. Called with <code>true</code> for deferred gestures (mouseleave, focusout), no argument for instant ones (left mousedown, Escape).
 		 * @param {function():boolean} oConfig.isPendingOrOpen Whether a tooltip is pending or open; the Escape handler consumes the key only then.
+		 * @param {function():boolean} [oConfig.hasText] Predicate telling whether the host currently has tooltip text. Used to gate the touch-device suppressions (text-selection class, native context menu), so they only kick in for a control that actually has a tooltip. When omitted, the suppressions are not applied.
 		 * @param {boolean} [oConfig.enableForTouchDevices=true] Whether long-press should open the tooltip on touch devices.
 		 *
 		 * @class
@@ -85,6 +86,7 @@ sap.ui.define([
 				this._fnOnOpen = oConfig.onOpen;
 				this._fnOnClose = oConfig.onClose;
 				this._fnIsPendingOrOpen = oConfig.isPendingOrOpen;
+				this._fnHasText = oConfig.hasText;
 				this._bEnableForTouchDevices = oConfig.enableForTouchDevices !== false;
 
 				this._iLongPressTimer = null;
@@ -126,6 +128,17 @@ sap.ui.define([
 		};
 
 		/**
+		 * Whether the host currently has tooltip text, per the configured
+		 * <code>hasText</code> predicate. Returns <code>false</code> when no
+		 * predicate was configured.
+		 * @private
+		 * @returns {boolean}
+		 */
+		TooltipEventTrigger.prototype._hasText = function() {
+			return !!(this._fnHasText && this._fnHasText());
+		};
+
+		/**
 		 * Disposes the trigger: removes its event delegate from the host.
 		 * @public
 		 */
@@ -148,6 +161,7 @@ sap.ui.define([
 			this._fnOnOpen = null;
 			this._fnOnClose = null;
 			this._fnIsPendingOrOpen = null;
+			this._fnHasText = null;
 
 			iInstancesCount--;
 			// Last instance gone: drop the shared document listener.
@@ -190,18 +204,38 @@ sap.ui.define([
 		};
 
 		/**
-		 * Adds or removes the touch-suppression class on the current target.
+		 * The suppress-selection class is touch-scoped: it is applied on touchstart
+		 * (when a tooltip exists and touch is enabled) and dropped once the touch
+		 * gesture ends. This clears any leftover class after a re-render or setter.
 		 * @private
 		 */
 		TooltipEventTrigger.prototype._syncTouchSuppression = function() {
 			if (!((Device.system.phone || Device.system.tablet) && !Device.system.combi)) {
 				return;
 			}
+			this._stopSuppressSelection();
+		};
+
+		/**
+		 * Adds the touch-suppression class on the current target.
+		 * @private
+		 */
+		TooltipEventTrigger.prototype._startSuppressSelection = function() {
 			const oTarget = this._fnDomRefProvider && this._fnDomRefProvider();
-			if (!oTarget) {
-				return;
+			if (oTarget) {
+				oTarget.classList.add("sapUiCoreTooltipHostSuppressSelection");
 			}
-			oTarget.classList.toggle("sapUiCoreTooltipHostSuppressSelection", this._bEnableForTouchDevices);
+		};
+
+		/**
+		 * Removes the touch-suppression class from the current target.
+		 * @private
+		 */
+		TooltipEventTrigger.prototype._stopSuppressSelection = function() {
+			const oTarget = this._fnDomRefProvider && this._fnDomRefProvider();
+			if (oTarget) {
+				oTarget.classList.remove("sapUiCoreTooltipHostSuppressSelection");
+			}
 		};
 
 		/**
@@ -324,7 +358,7 @@ sap.ui.define([
 			if (!this._isForMyTarget(oEvent)) {
 				return;
 			}
-			if (this._bEnableForTouchDevices) {
+			if (this._bEnableForTouchDevices && this._hasText()) {
 				oEvent.preventDefault();
 			}
 		};
@@ -336,9 +370,12 @@ sap.ui.define([
 			if (!this._isForMyTarget(oEvent)) {
 				return;
 			}
-			if (!this._bEnableForTouchDevices) {
+			// @todo make the option for late desision for a tooltip to be well documented in the official contract. Better move to isEnabled or beforeOpen which is publicly documented, rather than to rely on late hasText check
+			if (!this._bEnableForTouchDevices || !this._hasText()) {
 				return;
 			}
+			// Suppress selection while the tooltip is pending/open; kept until the touch is cancelled or closed.
+			this._startSuppressSelection();
 			this._clearLongPressTimer();
 			this._iLongPressTimer = setTimeout(() => {
 				this._iLongPressTimer = null;
@@ -361,6 +398,7 @@ sap.ui.define([
 		 */
 		TooltipEventTrigger.prototype._onTouchMove = function() {
 			this._clearLongPressTimer();
+			this._stopSuppressSelection();
 		};
 
 		/**
@@ -368,6 +406,7 @@ sap.ui.define([
 		 */
 		TooltipEventTrigger.prototype._onTouchEnd = function() {
 			this._clearLongPressTimer();
+			this._stopSuppressSelection();
 		};
 
 		/**
@@ -375,6 +414,7 @@ sap.ui.define([
 		 */
 		TooltipEventTrigger.prototype._onTouchCancel = function() {
 			this._clearLongPressTimer();
+			this._stopSuppressSelection();
 		};
 
 		/**

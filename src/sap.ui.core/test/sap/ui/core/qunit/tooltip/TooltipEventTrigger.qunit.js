@@ -20,7 +20,8 @@ sap.ui.define([
 			domRefProvider: () => oTargetEl,
 			onOpen: sinon.spy(),
 			onClose: sinon.spy(),
-			isPendingOrOpen: sinon.stub().returns(false)
+			isPendingOrOpen: sinon.stub().returns(false),
+			hasText: () => true
 		}, oOverrides || {});
 	}
 
@@ -344,44 +345,34 @@ sap.ui.define([
 		assert.notOk(oEvent.defaultPrevented);
 	});
 
-	QUnit.test("target gets sapUiCoreTooltipHostSuppressSelection class when touch enabled", function (assert) {
+	QUnit.test("host gets sapUiCoreTooltipHostSuppressSelection class on touchstart when touch enabled", function (assert) {
+		assert.notOk(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+			"class absent before any touch");
+		dispatch(this.oDomRef, new MouseEvent("mousedown", { bubbles: true }));
 		assert.ok(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
-			"touch-suppression class present on the target");
+			"touch-suppression class added once a touch starts");
 	});
 
-	QUnit.test("target does NOT get the class when constructed with touch disabled", function (assert) {
-		this.oTrigger.destroy();
-		this.oConfig = makeConfig(this.oHost, this.oDomRef, { enableForTouchDevices: false });
-		this.oTrigger = new TooltipEventTrigger(this.oConfig);
+	QUnit.test("host does NOT get sapUiCoreTooltipHostSuppressSelection on touchstart when touch disabled", function (assert) {
+		this.oTrigger.setEnableForTouchDevices(false);
+		dispatch(this.oDomRef, new MouseEvent("mousedown", { bubbles: true }));
 		assert.notOk(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
 			"touch-suppression class absent when disabled");
 	});
 
-	QUnit.test("setEnableForTouchDevices(false) removes the class, re-enabling re-adds it", function (assert) {
+	QUnit.test("setEnableForTouchDevices(false) removes an active suppress-selection class", function (assert) {
+		dispatch(this.oDomRef, new MouseEvent("mousedown", { bubbles: true }));
+		assert.ok(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+			"class present during the touch");
 		this.oTrigger.setEnableForTouchDevices(false);
 		assert.notOk(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
 			"class removed after disabling");
-		this.oTrigger.setEnableForTouchDevices(true);
+	});
+
+	QUnit.test("destroy removes an active suppress-selection class from the target", function (assert) {
+		dispatch(this.oDomRef, new MouseEvent("mousedown", { bubbles: true }));
 		assert.ok(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
-			"class re-added after re-enabling");
-	});
-
-	QUnit.test("class is reapplied to the freshly rendered target after a host re-render", async function (assert) {
-		// Live-resolving provider, as production hosts use.
-		this.oTrigger.destroy();
-		this.oConfig = makeConfig(this.oHost, null, { domRefProvider: () => this.oHost.getDomRef() });
-		this.oTrigger = new TooltipEventTrigger(this.oConfig);
-		assert.ok(this.oHost.getDomRef().classList.contains("sapUiCoreTooltipHostSuppressSelection"),
-			"class present before re-render");
-
-		this.oHost.invalidate();
-		await nextUIUpdate(this.clock);
-
-		assert.ok(this.oHost.getDomRef().classList.contains("sapUiCoreTooltipHostSuppressSelection"),
-			"class present on the freshly rendered target after re-render");
-	});
-
-	QUnit.test("destroy removes the class from the target", function (assert) {
+			"class present after touchstart");
 		this.oTrigger.destroy();
 		assert.notOk(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
 			"touch-suppression class removed on destroy");
@@ -417,6 +408,165 @@ sap.ui.define([
 		dispatch(this.oDomRef, new MouseEvent("mousedown", { bubbles: true }));
 		this.clock.tick(1000);
 		assert.notOk(this.oConfig.onOpen.called);
+	});
+
+	QUnit.module("Phone events - hasText gating", {
+		beforeEach: async function () {
+			this.oDeviceStub = sinon.stub(Device, "system")
+				.value({ desktop: false, combi: false, phone: true, tablet: false });
+			this.oHost = new FocusableHost();
+			await renderHost(this.oHost, this.clock);
+			this.oDomRef = this.oHost.getDomRef();
+			this.bHasText = false;
+			this.oConfig = makeConfig(this.oHost, this.oDomRef, { hasText: () => this.bHasText });
+			this.oTrigger = new TooltipEventTrigger(this.oConfig);
+		},
+		afterEach: async function () {
+			this.oTrigger.destroy();
+			this.oHost.destroy();
+			this.oDeviceStub.restore();
+			await this.clock.tickAsync(2000);
+			this.clock.restore();
+		}
+	});
+
+	QUnit.test("touchstart does NOT add the class when there is no text", function (assert) {
+		dispatch(this.oDomRef, new MouseEvent("mousedown", { bubbles: true }));
+		assert.notOk(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+			"class absent while host has no tooltip text");
+	});
+
+	QUnit.test("touchstart does NOT start the long-press timer when there is no text", function (assert) {
+		dispatch(this.oDomRef, new MouseEvent("mousedown", { bubbles: true }));
+		this.clock.tick(1000);
+		assert.notOk(this.oConfig.onOpen.called,
+			"no open scheduled while host has no tooltip text");
+	});
+
+	QUnit.test("touchstart adds the class once text becomes available", function (assert) {
+		dispatch(this.oDomRef, new MouseEvent("mousedown", { bubbles: true }));
+		assert.notOk(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+			"class absent for the touch that happened while text was empty");
+
+		// Text is now known (e.g. resolved late) — a later touch suppresses selection.
+		this.bHasText = true;
+		dispatch(this.oDomRef, new MouseEvent("mousedown", { bubbles: true }));
+		assert.ok(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+			"class added on the touch that happens once text exists");
+	});
+
+	QUnit.test("contextmenu is NOT prevented when there is no text", function (assert) {
+		const oEvent = new MouseEvent("contextmenu", { cancelable: true, bubbles: true });
+		dispatch(this.oDomRef, oEvent);
+		assert.notOk(oEvent.defaultPrevented,
+			"native context menu left available while host has no tooltip text");
+	});
+
+	QUnit.test("contextmenu is prevented once text exists", function (assert) {
+		this.bHasText = true;
+		const oEvent = new MouseEvent("contextmenu", { cancelable: true, bubbles: true });
+		dispatch(this.oDomRef, oEvent);
+		assert.ok(oEvent.defaultPrevented,
+			"native context menu blocked when host has tooltip text");
+	});
+
+	QUnit.test("hasText is consulted when a touch starts", function (assert) {
+		const oHasText = sinon.spy(() => true);
+		const oConfig = makeConfig(this.oHost, this.oDomRef, { hasText: oHasText });
+		const oTrigger = new TooltipEventTrigger(oConfig);
+		try {
+			assert.notOk(oHasText.called, "hasText not consulted before any touch");
+			dispatch(this.oDomRef, new MouseEvent("mousedown", { bubbles: true }));
+			assert.ok(oHasText.called, "hasText consulted once a touch starts");
+		} finally {
+			oTrigger.destroy();
+		}
+	});
+
+	QUnit.test("hasText is re-consulted on each touchstart (late-resolved text)", function (assert) {
+		const oHasText = sinon.stub();
+		oHasText.onFirstCall().returns(false);
+		oHasText.onSecondCall().returns(true);
+		const oConfig = makeConfig(this.oHost, this.oDomRef, { hasText: oHasText });
+		const oTrigger = new TooltipEventTrigger(oConfig);
+		try {
+			dispatch(this.oDomRef, new MouseEvent("mousedown", { bubbles: true }));
+			assert.notOk(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+				"first touch: no text yet, class not added");
+
+			dispatch(this.oDomRef, new MouseEvent("mousedown", { bubbles: true }));
+			assert.strictEqual(oHasText.callCount, 2,
+				"hasText consulted again on the second touch");
+			assert.ok(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+				"second touch: text now available, class added");
+		} finally {
+			oTrigger.destroy();
+		}
+	});
+
+	QUnit.test("no suppressions applied when no hasText predicate is configured", function (assert) {
+		const oConfig = makeConfig(this.oHost, this.oDomRef);
+		delete oConfig.hasText;
+		const oTrigger = new TooltipEventTrigger(oConfig);
+		try {
+			dispatch(this.oDomRef, new MouseEvent("mousedown", { bubbles: true }));
+			assert.notOk(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+				"class not added without a hasText predicate");
+
+			const oEvent = new MouseEvent("contextmenu", { cancelable: true, bubbles: true });
+			dispatch(this.oDomRef, oEvent);
+			assert.notOk(oEvent.defaultPrevented,
+				"context menu left available without a hasText predicate");
+		} finally {
+			oTrigger.destroy();
+		}
+	});
+
+	QUnit.module("Phone events - suppress-selection class lifecycle", {
+		beforeEach: async function () {
+			this.oDeviceStub = sinon.stub(Device, "system")
+				.value({ desktop: false, combi: false, phone: true, tablet: false });
+			this.oHost = new FocusableHost();
+			await renderHost(this.oHost, this.clock);
+			this.oDomRef = this.oHost.getDomRef();
+			this.oConfig = makeConfig(this.oHost, this.oDomRef);
+			this.oTrigger = new TooltipEventTrigger(this.oConfig);
+		},
+		afterEach: async function () {
+			this.oTrigger.destroy();
+			this.oHost.destroy();
+			this.oDeviceStub.restore();
+			await this.clock.tickAsync(2000);
+			this.clock.restore();
+		}
+	});
+
+	QUnit.test("class is kept while the long-press keeps the tooltip open", function (assert) {
+		dispatch(this.oDomRef, new MouseEvent("mousedown", { bubbles: true }));
+		assert.ok(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+			"class present while the long-press timer runs");
+		this.clock.tick(500);
+		assert.ok(this.oConfig.onOpen.calledOnce, "long-press opened the tooltip");
+		assert.ok(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+			"class kept while the tooltip is open so the text stays unselected");
+	});
+
+	QUnit.test("class is removed on touchend (touch finished before long-press)", function (assert) {
+		dispatch(this.oDomRef, new MouseEvent("mousedown", { bubbles: true }));
+		assert.ok(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+			"class present during the touch");
+		dispatch(this.oDomRef, new MouseEvent("mouseup", { bubbles: true }));
+		assert.notOk(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+			"class removed once the touch ends");
+	});
+
+	QUnit.test("class is removed on touchmove", function (assert) {
+		dispatch(this.oDomRef, new MouseEvent("mousedown", { bubbles: true }));
+		assert.ok(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+			"class present during the touch");
+		dispatch(this.oDomRef, new MouseEvent("mousemove", { bubbles: true }));
+		assert.notOk(this.oDomRef.classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+			"class removed once the touch moves");
 	});
 
 	QUnit.module("Combi events (desktop wiring, no mobile)", {

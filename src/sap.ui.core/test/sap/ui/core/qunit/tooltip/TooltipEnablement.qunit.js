@@ -365,6 +365,23 @@ sap.ui.define([
 		assert.ok(true, "afterOpen fires after mouseover");
 	});
 
+	QUnit.test("textProvider is called by the mouseover interaction, not only by rendering", async function(assert) {
+		const oHost = new PlainHost({ id: "host-tp-" + Date.now() });
+		const fnText = sinon.spy(() => "hi");
+		const oEnablement = new TooltipEnablement(oHost, { textProvider: fnText });
+		try {
+			await renderHost(oHost, this.clock);
+			// Exclude the render path (renderInvisibleTooltip) from the assertion.
+			fnText.resetHistory();
+			assert.notOk(fnText.called, "textProvider not consulted before the interaction");
+			dispatch(oHost, new MouseEvent("mouseover", { bubbles: true }));
+			assert.ok(fnText.called, "textProvider consulted by the mouseover interaction");
+		} finally {
+			oEnablement.destroy();
+			oHost.destroy();
+		}
+	});
+
 	QUnit.test("focusin opens when :focus-visible matches", async function(assert) {
 		const oDomRef = this.oHost.getDomRef();
 		const oOrig = oDomRef.matches;
@@ -751,6 +768,49 @@ sap.ui.define([
 		const oEvent = new MouseEvent("contextmenu", { cancelable: true, bubbles: true });
 		dispatch(this.oHost, oEvent);
 		assert.notOk(oEvent.defaultPrevented, "contextmenu not prevented");
+	});
+
+	QUnit.test("touchstart consults the textProvider and suppresses selection when it yields text", async function(assert) {
+		const fnText = sinon.spy(() => "hi");
+		const oHost = new PlainHost({ id: "host-touch-textprovider" });
+		const oEnablement = new TooltipEnablement(oHost, { textProvider: fnText });
+		await renderHost(oHost, this.clock);
+		try {
+			fnText.resetHistory();
+			assert.notOk(fnText.called, "textProvider not consulted before the touch interaction");
+			dispatch(oHost, new MouseEvent("mousedown", { bubbles: true }));
+			assert.ok(fnText.called, "textProvider consulted once a touch starts");
+			assert.ok(oHost.getDomRef().classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+				"selection suppressed because the textProvider yielded text");
+		} finally {
+			oEnablement.destroy();
+			oHost.destroy();
+		}
+	});
+
+	QUnit.test("touchstart does not suppress selection when the textProvider yields empty", async function(assert) {
+		let sText = "";
+		const fnText = sinon.spy(() => sText);
+		const oHost = new PlainHost({ id: "host-touch-emptytext" });
+		const oEnablement = new TooltipEnablement(oHost, { textProvider: fnText });
+		await renderHost(oHost, this.clock);
+		try {
+			fnText.resetHistory();
+			assert.notOk(fnText.called, "textProvider not consulted before the touch interaction");
+			dispatch(oHost, new MouseEvent("mousedown", { bubbles: true }));
+			assert.ok(fnText.called, "textProvider consulted on touchstart");
+			assert.notOk(oHost.getDomRef().classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+				"selection not suppressed while the textProvider yields empty");
+
+			// Text resolves late; the next touch suppresses selection.
+			sText = "now I have a tooltip";
+			dispatch(oHost, new MouseEvent("mousedown", { bubbles: true }));
+			assert.ok(oHost.getDomRef().classList.contains("sapUiCoreTooltipHostSuppressSelection"),
+				"selection suppressed on the touch that happens once text exists");
+		} finally {
+			oEnablement.destroy();
+			oHost.destroy();
+		}
 	});
 
 	QUnit.module("DOM events - combi (desktop wiring, no mobile)", {
