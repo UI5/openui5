@@ -1275,6 +1275,7 @@ sap.ui.define([
 			this.oUpdateModelFromBackendStub = sandbox.stub(Versions, "updateModelFromBackend");
 		},
 		afterEach() {
+			FlexInfoSession.removeByReference("com.sap.app");
 			Versions.clearInstances();
 			sandbox.restore();
 		}
@@ -1299,6 +1300,65 @@ sap.ui.define([
 			assert.strictEqual(this.oUpdateModelFromBackendStub.callCount, 0, "updateModelFromBackend was not called");
 		});
 
+		QUnit.test("with a response from backend and a version, the version is written to the FlexInfoSession", function(assert) {
+			FlexInfoSession.setByReference({ version: "oldVersion" }, "com.sap.app");
+			Versions.updateAfterSave({
+				reference: "com.sap.app",
+				layer: Layer.CUSTOMER,
+				version: "newVersion",
+				backendResponse: {
+					response: [{ fileName: "filename1" }]
+				}
+			});
+			assert.strictEqual(
+				FlexInfoSession.getByReference("com.sap.app").version,
+				"newVersion",
+				"the version in FlexInfoSession is updated to the passed version"
+			);
+		});
+
+		QUnit.test("with a response from backend but no version, the FlexInfoSession version is not changed", function(assert) {
+			FlexInfoSession.setByReference({ version: "oldVersion" }, "com.sap.app");
+			Versions.updateAfterSave({
+				reference: "com.sap.app",
+				layer: Layer.CUSTOMER,
+				backendResponse: {
+					response: [{ fileName: "filename1" }]
+				}
+			});
+			assert.strictEqual(
+				FlexInfoSession.getByReference("com.sap.app").version,
+				undefined,
+				"the version in FlexInfoSession is changes to undefined when no version is passed, as undefined is a valid value."
+			);
+		});
+
+		QUnit.test("with a response from backend, onAllChangesSaved is called with extracted filenames and the version is written to FlexInfoSession", function(assert) {
+			FlexInfoSession.setByReference({ version: "oldVersion" }, "com.sap.app");
+			Versions.updateAfterSave({
+				reference: "com.sap.app",
+				layer: Layer.CUSTOMER,
+				version: "newVersion",
+				backendResponse: {
+					response: [
+						{ fileName: "filename1" },
+						{ fileName: "filename2" }
+					]
+				}
+			});
+			assert.ok(this.oOnAllChangesSavedStub.calledOnceWith({
+				reference: "com.sap.app",
+				layer: Layer.CUSTOMER,
+				draftFilenames: ["filename1", "filename2"]
+			}), "onAllChangesSaved was called with the filenames extracted from the response");
+			assert.strictEqual(this.oUpdateModelFromBackendStub.callCount, 0, "updateModelFromBackend was not called");
+			assert.strictEqual(
+				FlexInfoSession.getByReference("com.sap.app").version,
+				"newVersion",
+				"the version in FlexInfoSession is set to the passed version"
+			);
+		});
+
 		QUnit.test("without response passed from the backend", function(assert) {
 			Versions.updateAfterSave({
 				reference: "com.sap.app",
@@ -1310,6 +1370,42 @@ sap.ui.define([
 				reference: "com.sap.app",
 				layer: Layer.CUSTOMER
 			}), "updateModelFromBackend was called with the correct parameters");
+		});
+
+		QUnit.test("without response from backend, the displayed version is written to the FlexInfoSession", async function(assert) {
+			FlexInfoSession.setByReference({ version: "oldVersion" }, "com.sap.app");
+			const oVersionsModel = new JSONModel({ displayedVersion: "2" });
+			sandbox.stub(Versions, "getVersionsModel").returns(oVersionsModel);
+			this.oUpdateModelFromBackendStub.resolves();
+
+			await Versions.updateAfterSave({
+				reference: "com.sap.app",
+				layer: Layer.CUSTOMER
+			});
+
+			assert.strictEqual(
+				FlexInfoSession.getByReference("com.sap.app").version,
+				"2",
+				"the version in FlexInfoSession is updated to the displayedVersion from the model"
+			);
+		});
+
+		QUnit.test("without response from backend, when displayedVersion is Draft the FlexInfoSession version is set to Draft", async function(assert) {
+			FlexInfoSession.setByReference({ version: "oldVersion" }, "com.sap.app");
+			const oVersionsModel = new JSONModel({ displayedVersion: Version.Number.Draft });
+			sandbox.stub(Versions, "getVersionsModel").returns(oVersionsModel);
+			this.oUpdateModelFromBackendStub.resolves();
+
+			await Versions.updateAfterSave({
+				reference: "com.sap.app",
+				layer: Layer.CUSTOMER
+			});
+
+			assert.strictEqual(
+				FlexInfoSession.getByReference("com.sap.app").version,
+				Version.Number.Draft,
+				"the version in FlexInfoSession is set to Draft when displayedVersion is Draft"
+			);
 		});
 	});
 

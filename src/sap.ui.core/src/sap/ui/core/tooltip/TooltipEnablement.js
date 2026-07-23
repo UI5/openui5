@@ -35,10 +35,10 @@ sap.ui.define([
 		 * Helper that adds a <code>sap.ui.core.tooltip.Tooltip</code> to a control.
 		 *
 		 * Create an instance for your host control, keep it on the host, and call its
-		 * hooks from your renderer and lifecycle methods. The helper takes care
-		 * of showing and hiding the tooltip on hover, focus and touch, of
-		 * rendering an invisible ARIA anchor for screen readers, and of cleaning
-		 * up when the host is destroyed.
+		 * hooks from your renderer and lifecycle methods. The helper handles
+		 * showing and hiding the tooltip on hover, focus, and touch, rendering
+		 * an invisible ARIA anchor for screen readers, and cleaning up when the
+		 * host is destroyed.
 		 *
 		 * The inner <code>sap.ui.core.tooltip.Tooltip</code> is created on first
 		 * use. Its <code>sap.m.Popover</code> positioning surface is loaded
@@ -173,9 +173,9 @@ sap.ui.define([
 		 * example when gestures must fire on a wrapper.
 		 *
 		 * <h3>Links</h3>
-		 * The design guidelines for sap.m.Link and link-like controls is to
-		 * disable the tooltip on mobile, because the long-press gesture
-		 * must remain to be used to open the context menu.
+		 * The design guidelines for <code>sap.m.Link</code> and link-like
+		 * controls are to disable the tooltip on mobile, because the long-press
+		 * gesture must remain available to open the context menu.
 		 *
 		 * @author SAP SE
 		 * @version ${version}
@@ -261,10 +261,10 @@ sap.ui.define([
 		};
 
 		/**
-		 * Opens the tooltip. The returned reference is chainable but does not
-		 * reflect the actual on-screen open — the tooltip's hover-delay window
-		 * runs first. To act when the tooltip has opened, listen for the
-		 * <code>afterOpen</code> event via {@link #attachAfterOpen}.
+		 * Opens the tooltip. The open is asynchronous — the returned reference is
+		 * chainable but does not await the actual on-screen appearance. To act
+		 * when the tooltip has opened, listen for the <code>afterOpen</code>
+		 * event via {@link #attachAfterOpen}.
 		 * @public
 		 * @returns {this}
 		 */

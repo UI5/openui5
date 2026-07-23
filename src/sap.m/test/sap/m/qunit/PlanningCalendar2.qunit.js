@@ -3669,6 +3669,26 @@ sap.ui.define([
 		assert.strictEqual(this.oPC.getStartDate().getTime(), this.oStartDayOfWeek.getTime(), "Start date is set to the beginning of the week (prior to min day)");
 	});
 
+	QUnit.test("changing from big to small to OneMonth view", async function(assert) {
+		// Arrange
+		this.oPC.setViewKey(CalendarIntervalType.OneMonth);
+		this.oPC.placeAt("bigUiArea");
+		await nextUIUpdate();
+
+		var oSetRowsDays = this.spy(this.oPC, "_setRowsStartDate");
+
+		// Act switch to small size
+		this.oPC.setWidth("600px");
+		await nextUIUpdate();
+
+		// Act return to original size
+		this.oPC.setWidth("100%");
+		await nextUIUpdate();
+
+		// Assert
+		assert.equal(oSetRowsDays.callCount, 1, "_setRowsStartDate is called when resizing oneMonth view from small to big size");
+	});
+
 	QUnit.module("Recurring appointments", {
 	beforeEach: async function() {
 		this.oRow = new PlanningCalendarRow({

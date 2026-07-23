@@ -910,6 +910,33 @@ sap.ui.define([
 	};
 
 	/**
+	 * Wrapper for fetch API ("design for testability").
+	 *
+	 * @param {string} sMethod - HTTP method (e.g. GET or POST)
+	 * @param {string} sResourcePath - Resource path relative to service URL
+	 * @param {object} [oPayload] - Request payload
+	 * @returns {Promise<Response>} Promise resolving with the response interface of the fetch API
+	 * @public
+	 */
+	_Requestor.prototype.fetch = function (sMethod, sResourcePath, oPayload) {
+		const sRequestUrl = this.sServiceUrl + sResourcePath;
+		const oFetchOptions = {
+			method : sMethod,
+			headers : {
+				...this.mPredefinedRequestHeaders,
+				...this.mHeaders,
+				...this.mFinalHeaders
+			}
+		};
+
+		if (oPayload) {
+			oFetchOptions.body = JSON.stringify(oPayload);
+		}
+
+		return fetch(sRequestUrl, oFetchOptions);
+	};
+
+	/**
 	 * Fetches the type for the given path and stores it in this requestor's type map. Recursively
 	 * fetches the key properties' parent types if they are complex.
 	 *

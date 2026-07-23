@@ -1,4 +1,4 @@
-/*global QUnit */
+/*global QUnit, sinon */
 
 sap.ui.define([
 	"sap/m/StandardTreeItem",
@@ -94,37 +94,55 @@ sap.ui.define([
 		const oTree = this.oTree;
 
 		await waitForItems(oTree, 3);
+		await nextUIUpdate(); // Ensure rendering is complete before DOM interaction
 
 		const $expander = oTree.getItems()[0].$().find(".sapMTreeItemBaseExpander");
 		assert.ok($expander.length, "expander is rendered");
 
+		assert.ok(oTree._oProxy, "TreeBindingProxy is available");
+		sinon.spy(oTree._oProxy, "expand");
+
 		$expander.trigger("click");
 
-		await waitForItems(oTree, 5, 10000); // Apply enhanced timeout for this test, as the build voters are slow and the expand operation takes a while to complete
+		assert.ok(oTree._oProxy.expand.calledOnce, "expand method is called on TreeBindingProxy");
+
+		await waitForItems(oTree, 5, 10000);
 
 		assert.equal(oTree.getItems().length, 5, "expanding is done.");
+
+		oTree._oProxy.expand.restore();
 	});
 
 	QUnit.test("collapse", async function(assert) {
 		const oTree = this.oTree;
 
 		await waitForItems(oTree, 3);
+		await nextUIUpdate(); // Ensure rendering is complete before DOM interaction
+
+		assert.ok(oTree._oProxy, "TreeBindingProxy is available");
+		sinon.spy(oTree._oProxy, "expand");
 
 		oTree.getItems()[0].$().find(".sapMTreeItemBaseExpander").trigger("click");
 
+		assert.ok(oTree._oProxy.expand.calledOnce, "expand method is called on TreeBindingProxy");
+
 		await waitForItems(oTree, 5);
+		await nextUIUpdate(); // Ensure rendering is complete before DOM interaction
 
 		oTree.getItems()[0].$().find(".sapMTreeItemBaseExpander").trigger("click");
 
 		await waitForItems(oTree, 3);
 
 		assert.equal(oTree.getItems().length, 3, "collapsing is done.");
+
+		oTree._oProxy.expand.restore();
 	});
 
 	QUnit.test("expand/collapse multiple nodes", async function(assert) {
 		const oTree = this.oTree;
 
 		await waitForItems(oTree, 3);
+		await nextUIUpdate(); // Ensure rendering is complete before DOM interaction
 
 		oTree.expand([0,1]);
 

@@ -18,10 +18,12 @@ sap.ui.define([
 	"sap/ui/fl/write/_internal/flexState/compVariants/CompVariantManager",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
 	"sap/ui/fl/write/_internal/Storage",
+	"sap/ui/fl/write/_internal/Versions",
 	"sap/ui/fl/write/api/FeaturesAPI",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
+	"sap/ui/model/json/JSONModel",
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/fl/qunit/FlQUnitUtils"
 ], function(
@@ -42,10 +44,12 @@ sap.ui.define([
 	CompVariantManager,
 	FlexObjectManager,
 	Storage,
+	Versions,
 	FeaturesAPI,
 	PersistenceWriteAPI,
 	Layer,
 	Utils,
+	JSONModel,
 	sinon,
 	FlQUnitUtils
 ) {
@@ -172,8 +176,7 @@ sap.ui.define([
 				allContextsProvided: true,
 				adaptationMode: true,
 				isEndUserAdaptation: true,
-				isResetEnabled: true,
-				version: "version1"
+				isResetEnabled: true
 			};
 			FlexInfoSession.setByReference({
 				isResetEnabled: false,
@@ -244,14 +247,41 @@ sap.ui.define([
 				"the PersistenceWriteAPI was called with the same arguments"
 			);
 			assert.deepEqual(
-				oExpectedFlexInfo,
 				FlexInfoSession.getByReference(sReference),
+				oExpectedFlexInfo,
 				"session flex info is updated with isResetEnabled but adaptationId, isEndUserAdaptation, and adaptationMode are kept"
 			);
 			assert.equal(
 				FlexInfoSession.getByReference(sReference).saveChangeKeepSession,
 				undefined,
 				"saveChangeKeepSession is delete in flex info session"
+			);
+		});
+
+		QUnit.test("when save is called and updateAfterSave receives an empty backend response, etc. last change deleted in a draft", async function(assert) {
+			// saveFlexObjects is stubbed to call updateAfterSave directly with an empty response,
+			// which triggers the else-branch that reads displayedVersion from the model
+			sandbox.stub(FlexObjectManager, "saveFlexObjects").callsFake(async () => {
+				await Versions.updateAfterSave({
+					reference: sReference,
+					layer: Layer.CUSTOMER,
+					backendResponse: { response: [] },
+					version: "draftVersion"
+				});
+				return { response: [] };
+			});
+			sandbox.stub(FlexObjectManager, "getFlexObjects").resolves([]);
+			sandbox.stub(Versions, "getVersionsModel").returns(new JSONModel({ displayedVersion: "2" }));
+			sandbox.stub(Versions, "updateModelFromBackend").resolves();
+
+			FlexInfoSession.setByReference({ version: "oldVersion" }, sReference);
+
+			await PersistenceWriteAPI.save({ selector: this.oAppComponent.getId(), layer: Layer.CUSTOMER, version: "draftVersion" });
+
+			assert.strictEqual(
+				FlexInfoSession.getByReference(sReference).version,
+				"2",
+				"the session version is set to displayedVersion from the model when the backend response is empty"
 			);
 		});
 

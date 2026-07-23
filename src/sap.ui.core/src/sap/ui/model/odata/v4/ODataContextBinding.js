@@ -204,21 +204,23 @@ sap.ui.define([
 	 *   Whether this operation binding's parent context, which must belong to a list binding, is
 	 *   replaced with the operation's return value context (see below) and that new list context is
 	 *   returned instead. Since 1.97.0.
-	 * @returns {Promise<sap.ui.model.odata.v4.Context|undefined>}
-	 *   A promise that is resolved without data or with a return value context when the operation
-	 *   call succeeded, or rejected with an <code>Error</code> instance <code>oError</code> in case
-	 *   of failure.
+	 * @returns {Promise<sap.ui.model.odata.v4.Context|{body: ReadableStream,headers: Headers}|undefined>}
+	 *   A promise that is resolved without data or with a return value context or with the
+	 *   response's body and headers when the operation call succeeded, or rejected with an
+	 *   <code>Error</code> instance <code>oError</code> in case of failure.
 	 *
 	 * @private
 	 * @see #invoke for details
 	 */
 	ODataContextBinding.prototype._invoke = function (oGroupLock, mParameters, bIgnoreETag,
 			fnOnStrictHandlingFailed, bReplaceWithRVC) {
-		var oMetaModel = this.oModel.getMetaModel(),
+		var sGroupId = oGroupLock.getGroupId(),
+			oMetaModel = this.oModel.getMetaModel(),
 			oOperationMetadata,
 			oPromise,
 			sResolvedPath = this.getResolvedPathWithReplacedTransientPredicates(),
 			sResolvedMetaPath = _Helper.getMetaPath(sResolvedPath),
+			bStream,
 			that = this;
 
 		/*
@@ -227,7 +229,7 @@ sap.ui.define([
 		 */
 		function fireChangeAndRefreshDependentBindings() {
 			that._fireChange({reason : ChangeReason.Change});
-			return that.refreshDependentBindings("", oGroupLock.getGroupId(), true);
+			return that.refreshDependentBindings("", sGroupId, true);
 		}
 
 		oPromise = SyncPromise.all([
@@ -253,12 +255,19 @@ sap.ui.define([
 					sPath = iIndex >= 0 ? that.sPath.slice(0, iIndex) : "";
 					fnGetEntity = that.oContext.getValue.bind(that.oContext, sPath);
 				}
+				if (sGroupId === "$stream") {
+					if (oOperationMetadata.$ReturnType?.$Type === "Edm.Stream") {
+						bStream = true;
+					} else {
+						throw new Error("$stream requires Edm.Stream: " + that);
+					}
+				}
 				return that.createCacheAndRequest(oGroupLock, sResolvedPath, oOperationMetadata,
-					mParameters, fnGetEntity, bIgnoreETag, fnOnStrictHandlingFailed);
-			}).then(function (oResponseEntity) {
+					mParameters, fnGetEntity, bIgnoreETag, fnOnStrictHandlingFailed, bStream);
+			}).then(function (oResponse) {
 				return fireChangeAndRefreshDependentBindings().then(function () {
-					return that.handleOperationResult(oOperationMetadata,
-						oResponseEntity, bReplaceWithRVC);
+					return that.handleOperationResult(oOperationMetadata, oResponse,
+						bReplaceWithRVC, bStream);
 				});
 			}, function (oError) {
 				// Note: operation metadata is only needed to handle server messages, it is
@@ -561,6 +570,8 @@ sap.ui.define([
 	 *   actions only
 	 * @param {function} [fnOnStrictHandlingFailed]
 	 *   Callback for strict handling; supported for actions only
+	 * @param {boolean} [bStream]
+	 *   Whether to use the fetch API as a prerequisite for streaming
 	 * @returns {sap.ui.base.SyncPromise<any>}
 	 *   The request promise
 	 * @throws {Error} If
@@ -577,7 +588,8 @@ sap.ui.define([
 	 * @private
 	 */
 	ODataContextBinding.prototype.createCacheAndRequest = function (oGroupLock, sPath,
-		oOperationMetadata, mParameters, fnGetEntity, bIgnoreETag, fnOnStrictHandlingFailed) {
+		oOperationMetadata, mParameters, fnGetEntity, bIgnoreETag, fnOnStrictHandlingFailed,
+		bStream) {
 		var bAction = oOperationMetadata.$kind === "Action",
 			oCache,
 			vEntity = fnGetEntity,
@@ -675,6 +687,11 @@ sap.ui.define([
 		// Note: in case of NavigationProperty, this just removes "(...)"
 		sPath = oRequestor.getPathAndAddQueryOptions(sPath, oOperationMetadata, mParameters,
 			this.mCacheQueryOptions, vEntity);
+		if (bStream) {
+			return oRequestor.fetch(bAction ? "POST" : "GET", sPath,
+				bAction ? mParameters : undefined);
+		}
+
 		oCache = _Cache.createSingle(oRequestor, sPath, this.mCacheQueryOptions,
 			oModel.bAutoExpandSelect, oModel.bSharedRequests, undefined, bAction,
 			sMetaPath);
@@ -1141,36 +1158,46 @@ sap.ui.define([
 	 *
 	 * @param {object} oOperationMetadata
 	 *   The operation's metadata
-	 * @param {object} oResponseEntity
-	 *   The result of the invoked operation
+	 * @param {object|Response} oResponse
+	 *   The result of the invoked operation or the response of the fetch API in case of streaming
 	 * @param {boolean} [bReplaceWithRVC]
 	 *   Whether this operation binding's parent context, which must belong to a list binding, is
 	 *   replaced with the operation's return value context and that new list context is returned
 	 *   instead.
-	 * @returns {sap.ui.model.odata.v4.Context}
-	 *   The return value context or <code>undefined</code> if it is not possible to create one
+	 * @param {boolean} [bStream]
+	 *   Whether to handle a streaming response
+	 * @returns {sap.ui.model.odata.v4.Context|{body: ReadableStream,headers: Headers}|undefined}
+	 *   The return value context or <code>undefined</code> if it is not possible to create one or
+	 *   an object with body and headers extracted from the given streaming response
 	 * @throws {Error}
 	 *   If <code>bReplaceWithRVC</code> is given, but no return value context can be created
 	 *
 	 * @private
 	 */
-	ODataContextBinding.prototype.handleOperationResult = function (oOperationMetadata,
-			oResponseEntity, bReplaceWithRVC) {
+	ODataContextBinding.prototype.handleOperationResult = function (oOperationMetadata, oResponse,
+			bReplaceWithRVC, bStream) {
 		var sContextPredicate, oOldValue, sResponsePredicate, sNewPath, oResult;
+
+		if (bStream) {
+			return {
+				body : oResponse.body,
+				headers : oResponse.headers
+			};
+		}
 
 		if (this.isReturnValueLikeBindingParameter(oOperationMetadata)) {
 			oOldValue = this.oContext.getValue();
 			// Note: sContextPredicate missing e.g. when collection-bound
 			sContextPredicate = oOldValue && _Helper.getPrivateAnnotation(oOldValue, "predicate");
-			sResponsePredicate = _Helper.getPrivateAnnotation(oResponseEntity, "predicate");
+			sResponsePredicate = _Helper.getPrivateAnnotation(oResponse, "predicate");
 
 			if (sResponsePredicate) {
 				if (sContextPredicate === sResponsePredicate) {
 					// this is sync, because the entity to be patched is available in
 					// the context (we already read its predicate)
-					this.oContext.patch(oResponseEntity);
+					this.oContext.patch(oResponse);
 				}
-				sNewPath = this.getReturnValueContextPath(oResponseEntity); // w/o initial "/"!
+				sNewPath = this.getReturnValueContextPath(oResponse); // w/o initial "/"!
 				if (sNewPath) {
 					if (bReplaceWithRVC) {
 						// replace is only possible if the path does not contain any navigation
@@ -1186,7 +1213,7 @@ sap.ui.define([
 						oResult = this.oContext.getPath().indexOf(sNewPath) === 1
 							? this.oContext
 							: this.oContext.getBinding()
-								.doReplaceWith(this.oContext, oResponseEntity, sResponsePredicate);
+								.doReplaceWith(this.oContext, oResponse, sResponsePredicate);
 						oResult.setNewGeneration();
 
 						return oResult;
@@ -1287,10 +1314,12 @@ sap.ui.define([
 	 *   The group ID to be used for the request; if not specified, the group ID for this binding is
 	 *   used, see {@link #constructor} and {@link #getGroupId}. To use the update group ID, see
 	 *   {@link #getUpdateGroupId}, it needs to be specified explicitly.
-	 *   Valid values are <code>undefined</code>, '$auto', '$auto.*', '$direct', '$single', or
-	 *   application group IDs as specified in {@link sap.ui.model.odata.v4.ODataModel}. If
-	 *   '$single' is used, the request will be sent as fast as '$direct', but wrapped in a batch
-	 *   request like '$auto' (since 1.121.0).
+	 *   Valid values are <code>undefined</code>, '$auto', '$auto.*', '$direct', '$single',
+	 *   '$stream', or application group IDs as specified in
+	 *   {@link sap.ui.model.odata.v4.ODataModel}. If '$single' is used, the request will be sent
+	 *   as fast as '$direct', but wrapped in a batch request like '$auto' (since 1.121.0). If
+	 *   '$stream' is used with an operation that returns "Edm.Stream", the stream response's body
+	 *   and headers can be retrieved (since 1.151.0).
 	 * @param {boolean} [bIgnoreETag]
 	 *   Whether the entity's ETag should be actively ignored (If-Match:*); supported for bound
 	 *   actions only, since 1.90.0. This parameter is ignored if there is no ETag (since 1.93.0)
@@ -1319,7 +1348,7 @@ sap.ui.define([
 	 *   currently if it is {@link sap.ui.model.odata.v4.Context#isKeepAlive kept alive}. If the
 	 *   parent context has requested messages when it was kept alive, they will be inherited if the
 	 *   $$inheritExpandSelect binding parameter is set to <code>true</code>. Since 1.97.0.
-	 * @returns {Promise<sap.ui.model.odata.v4.Context|undefined>}
+	 * @returns {Promise<sap.ui.model.odata.v4.Context|{body: ReadableStream,headers: Headers}|undefined>}
 	 *   A promise that is resolved without data or with a return value context when the invocation
 	 *   succeeded, or rejected with an <code>Error</code> instance <code>oError</code> in case of
 	 *   failure, for instance if the operation metadata is not found, if overloading is not
@@ -1363,6 +1392,14 @@ sap.ui.define([
 	 *   navigation property binding has to be available for the entity set of the first segment in
 	 *   the parent context's path. <b>Note:</b> Ensure your service implementation returns all
 	 *   selected key properties; otherwise, no return value context is provided.
+	 *   <br>
+	 *   Since 1.151.0, if the operation returns an "Edm.Stream" and the group ID '$stream' is used,
+	 *   the promise resolves with a partial <code>Response</code> object containing only:
+	 *   <ul>
+	 *     <li> <code>body</code>: The response's <code>ReadableStream</code>
+	 *     <li> <code>headers</code>: The response's <code>Headers</code>
+	 *   </ul>
+	 *   The promise rejects if '$stream' is used with a wrong return type.
 	 * @throws {Error} If
 	 *   <ul>
 	 *     <li> the binding's root binding is suspended,
@@ -1390,7 +1427,9 @@ sap.ui.define([
 		var sResolvedPath = this.getResolvedPath();
 
 		this.checkSuspended();
-		_Helper.checkGroupId(sGroupId, false, true);
+		if (sGroupId !== "$stream") {
+			_Helper.checkGroupId(sGroupId, false, true);
+		}
 		if (!this.oOperation) {
 			throw new Error("The binding must be deferred: " + this.sPath);
 		}

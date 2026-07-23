@@ -751,6 +751,12 @@ sap.ui.define([
 		var oAggregationOverlay = OverlayRegistry.getOverlay(oEvent.currentTarget.id);
 		var $aggregationOverlay = oAggregationOverlay.$();
 
+		// The dragover listener is attached unconditionally (see _attachDragScrollHandler),
+		// so gate the actual scrolling on the current scroll state of the aggregation.
+		if (!DOMUtil.hasScrollBar(oAggregationOverlay.getDomRef())) {
+			return;
+		}
+
 		var iDragX = oEvent.clientX;
 		var iDragY = oEvent.clientY;
 
@@ -781,7 +787,12 @@ sap.ui.define([
 		}
 
 		const oAggregationOverlayDomRef = oAggregationOverlay.getDomRef();
-		if (oAggregationOverlayDomRef && DOMUtil.hasScrollBar(oAggregationOverlayDomRef)) {
+		// The listeners are attached unconditionally: whether the aggregation is
+		// scrollable is re-evaluated live in _dragScroll. Gating the attachment on
+		// DOMUtil.hasScrollBar() here is unreliable, because at overlay-registration
+		// time the DOM is frequently not laid out yet (scrollHeight/clientHeight 0),
+		// so a scrollable aggregation would never get its scroll handler attached.
+		if (oAggregationOverlayDomRef) {
 			oAggregationOverlayDomRef.addEventListener("dragover", this._dragScrollHandler, true);
 			oAggregationOverlayDomRef.addEventListener("dragleave", this._dragLeaveHandler, true);
 		}
@@ -802,6 +813,7 @@ sap.ui.define([
 
 		if (oDomRef) {
 			oDomRef.removeEventListener("dragover", this._dragScrollHandler, true);
+			oDomRef.removeEventListener("dragleave", this._dragLeaveHandler, true);
 		}
 	};
 

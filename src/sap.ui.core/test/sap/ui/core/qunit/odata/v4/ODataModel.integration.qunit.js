@@ -81939,6 +81939,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// @see "Fiori Elements Safeguard: Test 2 (Create)" for a similar scenario "but w/o
 	//   $$inheritExpandSelect because nothing can be inherited" :-(
 	// @see "DINC0333115: bound action w/o entity data" for a similar scenario w/ ODCB
+	//
+	// Invoke promise is rejected because group ID $stream is used without return type Edm.Stream.
+	// JIRA: CPOUI5ODATAV4-3590
 	QUnit.test("CS20250010102074: $$inheritExpandSelect on new ODLB", async function (assert) {
 		const oModel = this.createSpecialCasesModel({autoExpandSelect : true});
 
@@ -81967,6 +81970,17 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		assert.strictEqual(oReturnValueContext.getPath(),
 			"/Artists(ArtistID='23',IsActiveEntity=false)", "some quick check");
+
+		const sMessage = "$stream requires Edm.Stream: " + sODCB
+			+ ": /Artists|special.cases.Create(...)";
+		this.oLogMock.expects("error")
+			.withExactArgs("Failed to invoke /Artists/special.cases.Create(...)",
+				sinon.match(sMessage), sODCB);
+
+		// code under test (JIRA: CPOUI5ODATAV4-3590)
+		await oOperationBinding.invoke("$stream").then(mustFail(assert), (oError) => {
+			assert.strictEqual(oError.message, sMessage);
+		});
 	});
 
 	//*********************************************************************************************
@@ -85648,5 +85662,61 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			this.waitForChanges(assert, "request late property #2")
 		]);
 		assert.strictEqual(sNote, "late #2");
+	});
+
+	//*********************************************************************************************
+	// Scenario: Invoke an Action (POST) or Function (GET) that returns Edm.Stream. The operation
+	// should use fetch API and return a ReadableStream.
+	// JIRA: CPOUI5ODATAV4-3375
+	//
+	// Invoke an additional action in parallel (JIRA: CPOUI5ODATAV4-3591)
+	[false, true].forEach((bAction) => {
+		QUnit.test("Edm.Stream: " + (bAction ? "Action" : "Function"), async function (assert) {
+			const oModel = this.createTeaBusiModel();
+			const sPath = "EMPLOYEES('1')"
+				+ "/com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__"
+				+ (bAction ? "Ac" : "Fu") + "DownloadDocument";
+			const oBinding = oModel.bindContext("/" + sPath + "(...)");
+
+			const oStreamResponse0 = {
+				body : "~body0~",
+				headers : "~headers0~",
+				foo : "bar" // must not be part of the result
+			};
+			const oStreamResponse1 = {
+				body : "~body1~",
+				headers : "~headers1~",
+				foo : "bar" // must not be part of the result
+			};
+
+			const oRequestorMock = this.mock(oModel.oRequestor);
+			if (bAction) {
+				oRequestorMock.expects("fetch")
+					.withExactArgs("POST", sPath, {format : "PDF", locale : "en-US"})
+					.resolves(oStreamResponse0);
+				oRequestorMock.expects("fetch")
+					.withExactArgs("POST", sPath, {format : "JSON", locale : "de"})
+					.resolves(oStreamResponse1);
+			} else {
+				oRequestorMock.expects("fetch")
+					.withExactArgs("GET", sPath + "(format='PDF',locale='en-US')", undefined)
+					.resolves(oStreamResponse0);
+				oRequestorMock.expects("fetch")
+					.withExactArgs("GET", sPath + "(format='JSON',locale='de')", undefined)
+					.resolves(oStreamResponse1);
+			}
+
+			const [oResult0, oResult1] = await Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3375) j
+				oBinding.setParameter("format", "PDF").setParameter("locale", "en-US")
+					.invoke("$stream"),
+				// code under test (JIRA: CPOUI5ODATAV4-3591)
+				oBinding.setParameter("format", "JSON").setParameter("locale", "de")
+					.invoke("$stream")
+			]);
+
+			assert.deepEqual(oResult0, {body : "~body0~", headers : "~headers0~"});
+			assert.deepEqual(oResult1, {body : "~body1~", headers : "~headers1~"});
+		});
 	});
 });

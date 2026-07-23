@@ -7,6 +7,7 @@ sap.ui.define([
 	"sap/ui/Device",
 	"sap/ui/dt/plugin/DragDrop",
 	"sap/ui/dt/DesignTime",
+	"sap/ui/dt/DOMUtil",
 	"sap/ui/dt/ElementOverlay",
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/layout/VerticalLayout",
@@ -21,6 +22,7 @@ sap.ui.define([
 	Device,
 	DragDrop,
 	DesignTime,
+	DOMUtil,
 	ElementOverlay,
 	OverlayRegistry,
 	VerticalLayout,
@@ -550,6 +552,7 @@ sap.ui.define([
 			afterEach() {
 				this.oDesignTime.destroy();
 				this.oPage.destroy();
+				sandbox.restore();
 			}
 		}, function() {
 			QUnit.test("when a dragover event happens in a an overlay with a scrollbar near the edge...", function(assert) {
@@ -583,6 +586,69 @@ sap.ui.define([
 				});
 
 				oPageContentOverlayDomRef.dispatchEvent(oEvent);
+			});
+
+			QUnit.test("when the aggregation overlay is not scrollable at registration time and becomes scrollable later", function(assert) {
+				// Regression test: the drag-scroll listener must be attached regardless of the
+				// overlay's scroll state at registration time. At registration the overlay DOM is
+				// often not laid out yet (scrollHeight/clientHeight 0), so gating the attachment on
+				// DOMUtil.hasScrollBar() used to permanently skip it - the aggregation then never
+				// scrolled on drag even once it had a scrollbar.
+				const oPageContentOverlay = this.oPageOverlay.getAggregationOverlay("content");
+				const oPageContentOverlayDomRef = oPageContentOverlay.getDomRef();
+
+				// Re-attach the handler while the overlay reports "not scrollable", mimicking the
+				// not-yet-laid-out state during registration on a slow environment.
+				this.oDragDrop._removeDragScrollHandler(oPageContentOverlay);
+				const fnHasScrollBarStub = sandbox.stub(DOMUtil, "hasScrollBar").returns(false);
+				this.oDragDrop._attachDragScrollHandler(oPageContentOverlay);
+
+				// _checkScroll is reached only when the dragover listener fired and _dragScroll did
+				// not early-return, i.e. the aggregation is scrollable at drag time. Spy on it
+				// (a live prototype method - _dragScroll itself is pre-bound in init and cannot be
+				// spied after the fact) and let the overlay report scrollable for the drag.
+				const fnCheckScrollSpy = sandbox.spy(this.oDragDrop, "_checkScroll");
+				fnHasScrollBarStub.returns(true);
+
+				const oEvent = new MouseEvent("dragover", {
+					view: window,
+					bubbles: true,
+					cancelable: true,
+					clientX: 0,
+					clientY: 0
+				});
+				oPageContentOverlayDomRef.dispatchEvent(oEvent);
+
+				assert.ok(
+					fnCheckScrollSpy.callCount > 0,
+					"then the dragover listener is attached even though the overlay was not scrollable at registration time"
+				);
+			});
+
+			QUnit.test("when a dragover happens while the aggregation is not scrollable", function(assert) {
+				// The listener is attached unconditionally, so _dragScroll itself must gate on the
+				// current scroll state and do nothing (start no scroll interval) when the aggregation
+				// has no scrollbar at drag time.
+				const oPageContentOverlay = this.oPageOverlay.getAggregationOverlay("content");
+				const oPageContentOverlayDomRef = oPageContentOverlay.getDomRef();
+
+				sandbox.stub(DOMUtil, "hasScrollBar").returns(false);
+				const fnCheckScrollSpy = sandbox.spy(this.oDragDrop, "_checkScroll");
+
+				const oEvent = new MouseEvent("dragover", {
+					view: window,
+					bubbles: true,
+					cancelable: true,
+					clientX: 0,
+					clientY: 0
+				});
+				oPageContentOverlayDomRef.dispatchEvent(oEvent);
+
+				assert.strictEqual(
+					fnCheckScrollSpy.callCount,
+					0,
+					"then _dragScroll returns early and starts no scroll interval when the aggregation is not scrollable"
+				);
 			});
 		});
 	}

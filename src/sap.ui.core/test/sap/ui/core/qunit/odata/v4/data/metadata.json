@@ -514,6 +514,27 @@
 			"$Nullable" : false
 		}
 	}],
+	"com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__AcDownloadDocument": [{
+		"$kind": "Action",
+		"$IsBound": true,
+		"$Parameter": [{
+			"$Name": "_it",
+			"$Nullable": false,
+			"$Type": "com.sap.gateway.default.iwbep.tea_busi.v0001.Worker"
+		}, {
+			"$MaxLength": 10,
+			"$Name": "format",
+			"$Type": "Edm.String"
+		}, {
+			"$MaxLength": 10,
+			"$Name": "locale",
+			"$Type": "Edm.String"
+		}],
+		"$ReturnType": {
+			"$Nullable": false,
+			"$Type": "Edm.Stream"
+		}
+	}],
 	"com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__AcOverload": [{
 		"$kind": "Action",
 		"$IsBound": true,
@@ -590,6 +611,27 @@
 			"$isCollection" : true,
 			"$Type" : "com.sap.gateway.default.iwbep.tea_busi.v0001.Worker",
 			"$Nullable" : false
+		}
+	}],
+	"com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__FuDownloadDocument": [{
+		"$kind": "Function",
+		"$IsBound": true,
+		"$Parameter": [{
+			"$Name": "_it",
+			"$Nullable": false,
+			"$Type": "com.sap.gateway.default.iwbep.tea_busi.v0001.Worker"
+		}, {
+			"$MaxLength": 10,
+			"$Name": "format",
+			"$Type": "Edm.String"
+		}, {
+			"$MaxLength": 10,
+			"$Name": "locale",
+			"$Type": "Edm.String"
+		}],
+		"$ReturnType": {
+			"$Nullable": false,
+			"$Type": "Edm.Stream"
 		}
 	}],
 	"com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__FuGetEmployees": [{
