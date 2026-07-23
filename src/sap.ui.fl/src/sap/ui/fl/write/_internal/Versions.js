@@ -233,10 +233,20 @@ sap.ui.define([
 			const aDraftFilenames = mPropertyBag.backendResponse.response.map((oChange) => oChange.fileName);
 			oVersionsProperties.draftFilenames = aDraftFilenames;
 			Versions.onAllChangesSaved(oVersionsProperties);
+			// When activating a new version or saving a new draft the request has to be made with the new version as parameter
+			const oFlexInfo = FlexInfoSession.getByReference(oVersionsProperties.reference);
+			oFlexInfo.version = mPropertyBag.version;
+			FlexInfoSession.setByReference(oFlexInfo, oVersionsProperties.reference);
 		} else {
 			// need to update version model when condensing send post request with a delete change and
 			// afterwards call flex/data request with right version parameter
 			await Versions.updateModelFromBackend(oVersionsProperties);
+			const oModel = Versions.getVersionsModel(mPropertyBag);
+			const sDisplayedVersion = oModel.getProperty("/displayedVersion");
+			const sActiveVersion = oModel.getProperty("/activeVersion");
+			const oFlexInfo = FlexInfoSession.getByReference(oVersionsProperties.reference);
+			oFlexInfo.version = sDisplayedVersion === sActiveVersion ? undefined : sDisplayedVersion;
+			FlexInfoSession.setByReference(oFlexInfo, oVersionsProperties.reference);
 		}
 	};
 

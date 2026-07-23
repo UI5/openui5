@@ -156,10 +156,6 @@ sap.ui.define([
 		// the cache should always be updated when saving, to make sure that the flex state is up to date for the current session
 		await FlexObjectManager.saveFlexObjects(_omit(mPropertyBag, ["skipUpdateCache"]));
 
-		// When activating a new version or saving a new draft the request has to be made with the new version as parameter
-		oFlexInfoSession.version = mPropertyBag.version;
-		FlexInfoSession.setByReference(oFlexInfoSession, sReference);
-
 		// This is needed as long the save requests does not return the necessary information to update the FlexState without a new request
 		const aFlexObjects = await FlexObjectManager.getFlexObjects({
 			..._omit(mPropertyBag, ["layer", "version"]),

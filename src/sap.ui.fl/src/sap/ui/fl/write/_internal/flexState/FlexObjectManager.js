@@ -572,10 +572,11 @@ sap.ui.define([
 		});
 
 		if (bConsiderDraftHandling && bVersioningEnabled) {
-			Versions.updateAfterSave({
+			await Versions.updateAfterSave({
 				reference: sReference,
 				layer: mPropertyBag.layer,
-				backendResponse: oResult
+				backendResponse: oResult,
+				version: mPropertyBag.version
 			});
 		}
 		return oResult;

@@ -4571,6 +4571,44 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+[false, true].forEach(function (bAction) {
+	QUnit.test("fetch: with payload: " + bAction, function (assert) {
+		const oRequestor = _Requestor.create("/~/", null, {
+				"Content-Type" : "n/a",
+				custom : "value",
+				"X-CSRF-Token" : "~token~"
+			}, {}, "4.0");
+		const oFetchOptions = {
+			method : "~method~",
+			headers : {
+				Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true",
+				"OData-MaxVersion" : "4.0",
+				"OData-Version" : "4.0",
+				"X-CSRF-Token" : "~token~",
+				custom : "value",
+				"Content-Type" : "application/json;charset=UTF-8;IEEE754Compatible=true"
+			}
+		};
+		if (bAction) {
+			oFetchOptions["body"] = "{\"foo\":\"bar\"}";
+		}
+		this.mock(window).expects("fetch").withExactArgs("/~/Product(42)", oFetchOptions)
+			.returns("~result~");
+
+		assert.strictEqual(
+			// code under test
+			oRequestor.fetch("~method~", "Product(42)", bAction ? {foo : "bar"} : undefined),
+			"~result~");
+
+		assert.deepEqual(oRequestor.mHeaders, {
+			"Content-Type" : "n/a",
+			custom : "value",
+			"X-CSRF-Token" : "~token~"
+		});
+	});
+});
+
+	//*********************************************************************************************
 	QUnit.test("fetchType", function (assert) {
 		var oRequestor = _Requestor.create("/", oModelInterface, {}, {}, "4.0"),
 			oRequestorMock = this.mock(oRequestor),

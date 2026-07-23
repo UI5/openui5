@@ -122,6 +122,20 @@ html.sap-desktop .sapMDialog {
 	min-width: 20rem;
 }
 
+/* On very narrow viewports the fixed min-width would overflow */
+@media (max-width: 18rem) {
+	html.sap-phone .sapMDialog {
+		min-width: 100%;
+	}
+}
+
+@media (max-width: 20rem) {
+	html.sap-tablet .sapMDialog,
+	html.sap-desktop .sapMDialog {
+		min-width: 100%;
+	}
+}
+
 .sapMDialog .sapMIBar {
 	position: relative;
 	width: auto;

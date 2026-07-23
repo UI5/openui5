@@ -252,6 +252,20 @@
 					Nullable="false"/>
 				<ReturnType Type="com.sap.gateway.default.iwbep.tea_busi.v0001.Worker" Nullable="false"/>
 			</Function>
+			<Action Name="__FAKE__AcDownloadDocument" IsBound="true">
+				<Parameter Name="_it" Type="com.sap.gateway.default.iwbep.tea_busi.v0001.Worker"
+					Nullable="false"/>
+				<Parameter Name="format" Type="Edm.String" MaxLength="10"/>
+				<Parameter Name="locale" Type="Edm.String" MaxLength="10"/>
+				<ReturnType Type="Edm.Stream" Nullable="false"/>
+			</Action>
+			<Function Name="__FAKE__FuDownloadDocument" IsBound="true">
+				<Parameter Name="_it" Type="com.sap.gateway.default.iwbep.tea_busi.v0001.Worker"
+					Nullable="false"/>
+				<Parameter Name="format" Type="Edm.String" MaxLength="10"/>
+				<Parameter Name="locale" Type="Edm.String" MaxLength="10"/>
+				<ReturnType Type="Edm.Stream" Nullable="false"/>
+			</Function>
 			<EntityContainer Name="Container">
 				<EntitySet Name="Departments" EntityType="com.sap.gateway.default.iwbep.tea_busi.v0001.Department">
 					<NavigationPropertyBinding Path="DEPARTMENT_2_TEAMS" Target="TEAMS"/>
