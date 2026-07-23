@@ -1,7 +1,10 @@
 # Ignore .gitignore, target, dist and tmp folders
+lib/jsdoc/target
 src/*/.gitignore
 src/*/target/
 src/*/dist/
+src/*/coverage/
+src/*/surefire-reports/
 /target
 /tmp
 
