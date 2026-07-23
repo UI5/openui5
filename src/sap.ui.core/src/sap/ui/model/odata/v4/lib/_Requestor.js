@@ -910,12 +910,15 @@ sap.ui.define([
 	};
 
 	/**
-	 * Wrapper for fetch API ("design for testability").
+	 * Builds and sends a fetch request. Constructs the request URL from the service URL
+	 * and resource path, assembles the fetch options including headers and optional payload, and
+	 * delegates to {@link #doFetch}.
 	 *
 	 * @param {string} sMethod - HTTP method (e.g. GET or POST)
 	 * @param {string} sResourcePath - Resource path relative to service URL
 	 * @param {object} [oPayload] - Request payload
 	 * @returns {Promise<Response>} Promise resolving with the response interface of the fetch API
+	 *
 	 * @public
 	 */
 	_Requestor.prototype.fetch = function (sMethod, sResourcePath, oPayload) {
@@ -933,7 +936,7 @@ sap.ui.define([
 			oFetchOptions.body = JSON.stringify(oPayload);
 		}
 
-		return fetch(sRequestUrl, oFetchOptions);
+		return _Requestor.fetch(sRequestUrl, oFetchOptions);
 	};
 
 	/**
@@ -2634,6 +2637,13 @@ sap.ui.define([
 
 		return oRequestor;
 	};
+
+	/**
+	 * Trampoline property for the native fetch API ("design for testability").
+	 *
+	 * @private
+	 */
+	_Requestor.fetch = fetch;
 
 	/**
 	 * A "reviver" function to be used by JSON.parse in order to transform 4.01 control information

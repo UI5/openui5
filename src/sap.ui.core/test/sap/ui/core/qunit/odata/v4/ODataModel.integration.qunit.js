@@ -37,6 +37,7 @@ sap.ui.define([
 	"sap/ui/model/odata/v4/ODataPropertyBinding",
 	"sap/ui/model/odata/v4/ValueListType",
 	"sap/ui/model/odata/v4/lib/_Helper",
+	"sap/ui/model/odata/v4/lib/_Requestor",
 	"sap/ui/security/Security",
 	"sap/ui/test/TestUtils",
 	"sap/ui/util/XMLHelper",
@@ -46,8 +47,8 @@ sap.ui.define([
 		Text, Device, _BoundFilter, EventProvider, SyncPromise, Messaging, Rendering,
 		Supportability, FieldHelp, Message, Controller, View, ChangeReason, Filter, FilterOperator,
 		FilterType, Sorter, JSONModel, OperationMode, Decimal, AnnotationHelper, ODataListBinding,
-		ODataMetaModel, ODataModel, ODataPropertyBinding, ValueListType, _Helper, Security,
-		TestUtils, XMLHelper) {
+		ODataMetaModel, ODataModel, ODataPropertyBinding, ValueListType, _Helper, _Requestor,
+		Security, TestUtils, XMLHelper) {
 	/*eslint no-sparse-arrays: 0,
 		"max-len": ["error", {"code": 100, "ignorePattern": "\\{meta>"}] */
 	"use strict";
@@ -85894,6 +85895,14 @@ make root = ${bMakeRoot}`;
 			+ (bAction ? "Ac" : "Fu") + "DownloadDocument";
 		const oBinding = oModel.bindContext("/" + sPath + "(...)");
 
+		const mHeaders = {
+			Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true",
+			"Accept-Language" : "en-US",
+			"Content-Type" : "application/json;charset=UTF-8;IEEE754Compatible=true",
+			"OData-MaxVersion" : "4.0",
+			"OData-Version" : "4.0",
+			"X-CSRF-Token" : "Fetch"
+		};
 		const oStreamResponse0 = {
 			body : "~body0~",
 			headers : "~headers0~",
@@ -85905,20 +85914,34 @@ make root = ${bMakeRoot}`;
 			foo : "bar" // must not be part of the result
 		};
 
-		const oRequestorMock = this.mock(oModel.oRequestor);
+		const oRequestorMock = this.mock(_Requestor);
 		if (bAction) {
 			oRequestorMock.expects("fetch")
-				.withExactArgs("POST", sPath, {format : "PDF", locale : "en-US"})
+				.withExactArgs(sTeaBusi + sPath, {
+					headers : mHeaders,
+					method : "POST",
+					body : JSON.stringify({format : "PDF", locale : "en-US"})
+				})
 				.resolves(oStreamResponse0);
 			oRequestorMock.expects("fetch")
-				.withExactArgs("POST", sPath, {format : "JSON", locale : "de"})
+				.withExactArgs(sTeaBusi + sPath, {
+					headers : mHeaders,
+					method : "POST",
+					body : JSON.stringify({format : "JSON", locale : "de"})
+				})
 				.resolves(oStreamResponse1);
 		} else {
 			oRequestorMock.expects("fetch")
-				.withExactArgs("GET", sPath + "(format='PDF',locale='en-US')", undefined)
+				.withExactArgs(sTeaBusi + sPath + "(format='PDF',locale='en-US')", {
+					headers : mHeaders,
+					method : "GET"
+				})
 				.resolves(oStreamResponse0);
 			oRequestorMock.expects("fetch")
-				.withExactArgs("GET", sPath + "(format='JSON',locale='de')", undefined)
+				.withExactArgs(sTeaBusi + sPath + "(format='JSON',locale='de')", {
+					headers : mHeaders,
+					method : "GET"
+				})
 				.resolves(oStreamResponse1);
 		}
 
