@@ -167,14 +167,11 @@ function (ManagedObject, QUnitUtils, Opa5, Device, jQuery, _OpaLogger, _FocusLis
 			var bFireArtificialEvents = false;
 			var bSimulateFocusout = false;
 			var isAlreadyFocused = this._isFocused(oDomRef);
-			var bIsNewFF = Device.browser.firefox && Device.browser.version >= 60;
 			var oLastFocusedElement;
 
-			if (isAlreadyFocused || bIsNewFF) {
-				// 1. If the event is already focused, make sure onfocusin event of the control will be properly fired when executing this action,
+			if (isAlreadyFocused) {
+				// If the event is already focused, make sure onfocusin event of the control will be properly fired when executing this action,
 				// otherwise the next blur will not be able to safely remove the focus.
-				// 2. In IE11 (and often in Firefox v61.0/v60.0 ESR), if the focus action fails and focusin is dispatched, onfocusin will be called twice.
-				// To avoid this, directly dispatch the artificial events
 				bFireArtificialEvents = true;
 			} else {
 				$DomRef.trigger("focus");
