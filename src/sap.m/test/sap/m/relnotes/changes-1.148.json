@@ -303,5 +303,35 @@
         "text": " sap.m.ObjectHeader: image is decorative if the alt is empty"
       }
     ]
+  },
+  "1.148.4": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "9f494508c8836c0df8a771cb2a095d049ef87e8e",
+        "type": "FIX",
+        "text": "p13n.FilterPanel: announcement missing on adding filter"
+      },
+      {
+        "id": "17f21f88cb73d3b50bd5d8569861105331e86ea2",
+        "type": "FIX",
+        "text": " sap.m.Dialog: min-width 100% on narrow viewports"
+      },
+      {
+        "id": "6e64885be294ce7638e9d740cf149cd2d2a437d3",
+        "type": "FIX",
+        "text": " core/Element: Skip focus redirect on same-parent move"
+      },
+      {
+        "id": "d6fa7a8135026acd3c52194d8fe9354132c3f114",
+        "type": "FIX",
+        "text": " mdc/SmartChart: 'View By' popover now have correct announcement."
+      },
+      {
+        "id": "874e7ce52dcc45a04e46ea94180de48f09a355d5",
+        "type": "FIX",
+        "text": " sap.m.Toolbar: Fix arrow key navigation for Slider, RangeSlider and MultiInput"
+      }
+    ]
   }
 }

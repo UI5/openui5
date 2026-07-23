@@ -153,5 +153,25 @@
         "text": " Table: Duplicate ID issue in filter info bar handling"
       }
     ]
+  },
+  "1.148.4": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "ee201bff0448e5e6c0a413b67432a20120c40b3d",
+        "type": "FIX",
+        "text": "mdc.ValueHelp: Fix active filters count"
+      },
+      {
+        "id": "2f067355f5781f166ec4d4f1fb8b0916a5f8122f",
+        "type": "FIX",
+        "text": " MDC OPA test utils: fix column personalization in Firefox"
+      },
+      {
+        "id": "d6fa7a8135026acd3c52194d8fe9354132c3f114",
+        "type": "FIX",
+        "text": " mdc/SmartChart: 'View By' popover now have correct announcement."
+      }
+    ]
   }
 }

@@ -38,5 +38,15 @@
         "text": " core.BusyIndicatorUtils: Set aria-busy on correct busy section"
       }
     ]
+  },
+  "1.148.4": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "6e64885be294ce7638e9d740cf149cd2d2a437d3",
+        "type": "FIX",
+        "text": " core/Element: Skip focus redirect on same-parent move"
+      }
+    ]
   }
 }
