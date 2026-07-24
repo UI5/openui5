@@ -629,6 +629,10 @@ sap.ui.define([
 				case AccExtension.ELEMENTTYPES.COLUMNROWHEADER:
 					var mRenderConfig = oTable._getSelectionPlugin().getRenderConfig();
 
+					if (oTable.getSelectionMode() !== SelectionMode.None) {
+						mAttributes["aria-label"] = TableUtils.getResourceText("TBL_TABLE_SELECTION_COLUMNHEADER");
+					}
+
 					if (mRenderConfig.headerSelector.visible) {
 						if (mRenderConfig.headerSelector.type === "toggle") {
 							mAttributes["role"] = ["checkbox"];
@@ -642,6 +646,15 @@ sap.ui.define([
 							}
 						}
 					}
+					break;
+
+				case AccExtension.ELEMENTTYPES.COLUMNROWHEADERROW:
+					mAttributes["role"] = "row";
+					mAttributes["aria-hidden"] = "true";
+					break;
+
+				case AccExtension.ELEMENTTYPES.COLUMNROWHEADERCELL:
+					mAttributes["role"] = "columnheader";
 					break;
 
 				case AccExtension.ELEMENTTYPES.ROWHEADER:
@@ -829,19 +842,15 @@ sap.ui.define([
 						mAttributes["aria-current"] = true;
 					}
 
-					if (!mParams.fixedCol) {
-						mAttributes["aria-owns"] = [];
-						if (TableUtils.hasRowHeader(oTable)) {
-							mAttributes["aria-owns"].push(sTableId + "-rowsel" + mParams.index);
-						}
-						if (TableUtils.hasFixedColumns(oTable)) {
-							for (var j = 0; j < oTable.getComputedFixedColumnCount(); j++) {
-								mAttributes["aria-owns"].push(sTableId + "-rows-row" + mParams.index + "-col" + j);
-							}
-						}
-						if (TableUtils.hasRowActions(oTable)) {
-							mAttributes["aria-owns"].push(sTableId + "-rowact" + mParams.index);
-						}
+					mAttributes["aria-owns"] = [];
+					if (TableUtils.hasRowHeader(oTable)) {
+						mAttributes["aria-owns"].push(sTableId + "-rowsel" + mParams.index);
+					}
+					for (var j = 0; j < TableUtils.getVisibleColumnCount(oTable); j++) {
+						mAttributes["aria-owns"].push(sTableId + "-rows-row" + mParams.index + "-col" + j);
+					}
+					if (TableUtils.hasRowActions(oTable)) {
+						mAttributes["aria-owns"].push(sTableId + "-rowact" + mParams.index);
 					}
 					break;
 
@@ -1047,7 +1056,8 @@ sap.ui.define([
 	/**
 	 * Known element types (DOM areas) in the table.
 	 *
-	 * @type {{DATACELL: string, COLUMNHEADER: string, ROWHEADER: string, ROWACTION: string, COLUMNROWHEADER: string, ROOT: string, CONTENT: string,
+	 * @type {{DATACELL: string, COLUMNHEADER: string, ROWHEADER: string, ROWACTION: string, COLUMNROWHEADER: string, COLUMNROWHEADERROW: string,
+	 *     COLUMNROWHEADERCELL: string, ROOT: string, CONTENT: string,
 	 *     TABLE: string, TABLEHEADER: string, TABLEFOOTER: string, TABLESUBHEADER: string, COLUMNHEADER_TBL: string, COLUMNHEADER_ROW: string,
 	 *     CREATIONROW_TBL: string, ROWHEADER_COL: string, TH: string, TR: string, TREEICON: string, ROWACTIONHEADER: string,
 	 *     NODATA: string, OVERLAY: string}|*}
@@ -1060,6 +1070,8 @@ sap.ui.define([
 		ROWHEADER: "ROWHEADER", 				// Row header (standard, group or sum)
 		ROWACTION: "ROWACTION", 				// Row action (standard, group or sum)
 		COLUMNROWHEADER: "COLUMNROWHEADER",		// Select all row selector (top left cell)
+		COLUMNROWHEADERROW: "COLUMNROWHEADERROW",	// Select all row selector row
+		COLUMNROWHEADERCELL: "COLUMNROWHEADERCELL",	// Select all row selector cell
 		ROOT: "ROOT",							// The tables root dom element
 		CONTAINER: "CONTAINER",					// The table container
 		CONTENT: "CONTENT",						// The content area of the table which contains all the table elements, rowheaders, columnheaders, etc
@@ -1156,6 +1168,10 @@ sap.ui.define([
 			sCellType = AccExtension.ELEMENTTYPES.ROWACTION;
 		} else if (oInfo.isOfType(CellType.COLUMNROWHEADER)) {
 			sCellType = AccExtension.ELEMENTTYPES.COLUMNROWHEADER;
+		} else if (oInfo.isOfType(CellType.COLUMNROWHEADERROW)) {
+			sCellType = AccExtension.ELEMENTTYPES.COLUMNROWHEADERROW;
+		} else if (oInfo.isOfType(CellType.COLUMNROWHEADERCELL)) {
+			sCellType = AccExtension.ELEMENTTYPES.COLUMNROWHEADERCELL;
 		}
 
 		if (!ExtensionHelper["modifyAccOf" + sCellType]) {

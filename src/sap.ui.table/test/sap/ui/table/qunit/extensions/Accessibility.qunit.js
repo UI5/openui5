@@ -1607,19 +1607,29 @@ sap.ui.define([
 		var sTableId = oTable.getId();
 		var $Elem = getCell(0, 0, false, assert).parent();
 		assert.strictEqual($Elem.attr("role"), "row", "role");
-		assert.strictEqual($Elem.attr("aria-owns"), undefined, "aria-owns");
+
+		function getExpectedAriaOwnsForRow(iIndex) {
+			const aAriaOwns = [sTableId + "-rowsel" + iIndex];
+			for (let i = 0; i < 5; i++) {
+				aAriaOwns.push(sTableId + "-rows-row" + iIndex + "-col" + i);
+			}
+			aAriaOwns.push(sTableId + "-rowact" + iIndex);
+			return aAriaOwns.join(" ");
+		}
+
+		assert.strictEqual($Elem.attr("aria-owns"), getExpectedAriaOwnsForRow(0), "aria-owns");
 		checkAriaSelected($Elem.attr("aria-selected"), true, assert);
 		$Elem = getCell(0, 1, false, assert).parent();
 		assert.strictEqual($Elem.attr("role"), "row", "role");
-		assert.strictEqual($Elem.attr("aria-owns"), sTableId + "-rowsel0 " + sTableId + "-rows-row0-col0 " + sTableId + "-rowact0", "aria-owns");
+		assert.strictEqual($Elem.attr("aria-owns"), getExpectedAriaOwnsForRow(0), "aria-owns");
 		checkAriaSelected($Elem.attr("aria-selected"), true, assert);
 		$Elem = getCell(1, 0, false, assert).parent();
 		assert.strictEqual($Elem.attr("role"), "row", "role");
-		assert.strictEqual($Elem.attr("aria-owns"), undefined, "aria-owns");
+		assert.strictEqual($Elem.attr("aria-owns"), getExpectedAriaOwnsForRow(1), "aria-owns");
 		checkAriaSelected($Elem.attr("aria-selected"), false, assert);
 		$Elem = getCell(1, 1, false, assert).parent();
 		assert.strictEqual($Elem.attr("role"), "row", "role");
-		assert.strictEqual($Elem.attr("aria-owns"), sTableId + "-rowsel1 " + sTableId + "-rows-row1-col0 " + sTableId + "-rowact1", "aria-owns");
+		assert.strictEqual($Elem.attr("aria-owns"), getExpectedAriaOwnsForRow(1), "aria-owns");
 		checkAriaSelected($Elem.attr("aria-selected"), false, assert);
 	});
 
