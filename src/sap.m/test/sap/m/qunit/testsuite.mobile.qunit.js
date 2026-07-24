@@ -1851,6 +1851,13 @@ sap.ui.define([
 					language: "en"
 				}
 			},
+			"TitleEnhancedTooltip": {
+				title: "QUnit Page for sap.m.Title - Enhanced Tooltip",
+				ui5: {
+					language: "en",
+					"xx-tooltip": "enhanced"
+				}
+			},
 			TitlePropagationSupport: {
 				title: "QUnit Page for sap.m.TitlePropagationSupport"
 			},

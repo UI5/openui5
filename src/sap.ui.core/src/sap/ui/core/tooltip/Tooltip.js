@@ -320,8 +320,13 @@ sap.ui.define([
 				}
 				// If a selection appeared during the open delay, suppress the
 				// open so the tooltip DOM insertion doesn't clear it.
+				// Only check if the selection is within the tooltip's target element or its ancestors to avoid
+				// false positives from selections in other form fields (e.g., when tabbing through inputs).
 				const oSelection = window.getSelection && window.getSelection();
-				if (oSelection && oSelection.toString().length > 0) {
+				const oHostElement = this._getHostElement(oControl);
+				const bHasRelevantSelection = !!(oSelection && oSelection.toString().length > 0 &&
+					oHostElement && oSelection.anchorNode && oHostElement.contains(oSelection.anchorNode));
+				if (bHasRelevantSelection) {
 					this._bOpenRequested = false;
 					TooltipManager.deregister(this);
 					return;

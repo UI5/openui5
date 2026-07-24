@@ -35,6 +35,7 @@ sap.ui.define(["sap/ui/core/Renderer", "sap/ui/core/library", "sap/m/Hyphenation
 			sText = !oTitleContent ? HyphenationSupport.getTextForRender(oTitle, "main") : "",
 			sTextDir = oTitle.getTextDirection(),
 			sTextAlign = Renderer.getTextAlign(oTitle.getTextAlign(), sTextDir),
+			bHasTooltipEnablement = !!oTitle._oTooltipEnablement,
 			sTooltip;
 
 		oRm.openStart(sTag, oTitle);
@@ -54,8 +55,21 @@ sap.ui.define(["sap/ui/core/Renderer", "sap/ui/core/library", "sap/m/Hyphenation
 		}
 
 		sTooltip = oTitle._getTooltipText();
-		if (sTooltip) {
+		if (sTooltip && !bHasTooltipEnablement) {
 			oRm.attr("title", sTooltip);
+		}
+
+		if (bHasTooltipEnablement && sTooltip) {
+			var sInvisibleTooltipId = oTitle._oTooltipEnablement.getInvisibleTooltipId();
+
+			if (sInvisibleTooltipId) {
+				oRm.accessibilityState(oTitle, {
+					describedby: {
+						value: sInvisibleTooltipId,
+						append: true
+					}
+				});
+			}
 		}
 
 		if (bAutoLevel) {
@@ -79,6 +93,10 @@ sap.ui.define(["sap/ui/core/Renderer", "sap/ui/core/library", "sap/m/Hyphenation
 			oRm.text(sText);
 		}
 		oRm.close("span");
+
+		if (bHasTooltipEnablement && sTooltip) {
+			oTitle._oTooltipEnablement.renderInvisibleTooltip(oRm);
+		}
 
 		oRm.close(sTag);
 	};

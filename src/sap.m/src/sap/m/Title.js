@@ -9,9 +9,11 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	'sap/ui/core/library',
 	'./TitleRenderer',
-	"sap/m/HyphenationSupport"
+	"sap/m/HyphenationSupport",
+	'sap/ui/core/tooltip/TooltipEnablement',
+	'sap/ui/core/ControlBehavior'
 ],
-	function(Control, library, Element, coreLibrary, TitleRenderer, HyphenationSupport) {
+	function(Control, library, Element, coreLibrary, TitleRenderer, HyphenationSupport, TooltipEnablement, ControlBehavior) {
 	"use strict";
 
 	// shortcut for sap.ui.core.TextDirection
@@ -195,6 +197,81 @@ sap.ui.define([
 	});
 
 	/**
+	 * Returns the DOM element to use for tooltip positioning.
+	 *
+	 * This method is called ONLY on user interaction (hover/focus).
+	 * It performs DOM measurements to determine the optimal anchor element:
+	 * - If text is truncated: returns outer element (tooltip spans full width)
+	 * - If text is not truncated: returns inner element (tooltip aligns with text)
+	 *
+	 * This lazy evaluation ensures no layout thrashing during batch rendering of multiple titles.
+	 * The method is invoked via TooltipEnablement's domRefProvider callback when the tooltip opens.
+	 *
+	 * @returns {HTMLElement|null} The DOM element for tooltip positioning
+	 * @private
+	 */
+	Title.prototype._getTooltipAnchorElement = function() {
+		const oOuterDomRef = this.getDomRef();
+		const oInnerDomRef = this.getDomRef("inner");
+
+		if (!oOuterDomRef || !oInnerDomRef) {
+			return oOuterDomRef || oInnerDomRef || null;
+		}
+
+		if (oOuterDomRef.scrollWidth > oOuterDomRef.clientWidth) {
+			return oOuterDomRef;
+		}
+
+		return oInnerDomRef;
+	};
+
+	/**
+	 * Initializes the Title control.
+	 * Sets up TooltipEnablement for Enhanced Tooltip support.
+	 *
+	 * @private
+	 */
+	Title.prototype.init = function() {
+		if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+			this._oTooltipEnablement = new TooltipEnablement(this, {
+				textProvider: this._getEnhancedTooltipText.bind(this),
+				invisibleTextProvider: this._getTooltipText.bind(this),
+				domRefProvider: this._getTooltipAnchorElement.bind(this),
+				focusDomRefProvider: () => this.getDomRef()
+			});
+		}
+
+		this._fnExtendedKeyboardNavigationChanged = this._onExtendedKeyboardNavigationChanged.bind(this);
+		ControlBehavior.attachExtendedKeyboardNavigationChanged(
+			this._fnExtendedKeyboardNavigationChanged
+		);
+	};
+
+	/**
+	 * Cleans up before the Title control is destroyed.
+	 *
+	 * @private
+	 */
+	Title.prototype.exit = function() {
+		if (this._oTooltipEnablement) {
+			this._oTooltipEnablement.destroy();
+			this._oTooltipEnablement = null;
+		}
+
+		if (this._fnExtendedKeyboardNavigationChanged) {
+			ControlBehavior.detachExtendedKeyboardNavigationChanged(
+				this._fnExtendedKeyboardNavigationChanged
+			);
+			this._fnExtendedKeyboardNavigationChanged = null;
+		}
+
+		if (this._iUpdateTabIndexDelayedCallId) {
+			clearTimeout(this._iUpdateTabIndexDelayedCallId);
+			this._iUpdateTabIndexDelayedCallId = null;
+		}
+	};
+
+	/**
 	 * Gets the currently set title.
 	 *
 	 * @private
@@ -336,13 +413,128 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns the visible tooltip text for Enhanced Tooltips.
+	 *
+	 * @returns {string} The tooltip text or empty string
+	 * @private
+	 */
+	Title.prototype._getEnhancedTooltipText = function() {
+		const sExplicitTooltip = this._getTooltipText();
+		if (sExplicitTooltip) {
+			return sExplicitTooltip;
+		}
+
+		if (this._isTextTruncated()) {
+			const oAssociatedTitle = this._getTitle();
+			return oAssociatedTitle && !this.getContent() ? oAssociatedTitle.getText() : this.getText();
+		}
+
+		return "";
+	};
+
+	/**
+	 * Checks if the Title text is truncated in the DOM.
+	 *
+	 * @returns {boolean} True if text is truncated
+	 * @private
+	 */
+	Title.prototype._isTextTruncated = function() {
+		const oDomRef = this.getDomRef();
+		if (!oDomRef) {
+			return false;
+		}
+
+		return oDomRef.scrollWidth > oDomRef.clientWidth;
+	};
+
+	/**
+	 * Handles Extended Keyboard Navigation mode changes.
+	 *
+	 * @private
+	 */
+	Title.prototype._onExtendedKeyboardNavigationChanged = function() {
+		this.invalidate();
+	};
+
+	/**
+	 * Determines if Title should be focusable in current state.
+	 * Returns true if there's an explicit tooltip set or if text is truncated.
+	 *
+	 * @returns {boolean} True if Title should receive tabindex="0"
+	 * @private
+	 */
+	Title.prototype._shouldBeFocusable = function() {
+		if (!ControlBehavior.isExtendedKeyboardNavigationEnabled()) {
+			return false;
+		}
+
+		if (this.getContent()) {
+			return false;
+		}
+
+		if (!this._oTooltipEnablement) {
+			return false;
+		}
+
+		const sExplicitTooltip = this._getTooltipText();
+		if (sExplicitTooltip) {
+			return true;
+		}
+
+		if (this._isTextTruncated()) {
+			return true;
+		}
+
+		return false;
+	};
+
+	/**
+	 * Updates the tabindex attribute based on focusability.
+	 * Uses delayed execution to batch DOM reads and avoid layout thrashing.
+	 * Called after rendering when Extended Keyboard Navigation mode is enabled.
+	 *
+	 * @private
+	 */
+	Title.prototype._updateTabIndex = function() {
+		if (this._iUpdateTabIndexDelayedCallId) {
+			clearTimeout(this._iUpdateTabIndexDelayedCallId);
+			this._iUpdateTabIndexDelayedCallId = null;
+		}
+
+		this._iUpdateTabIndexDelayedCallId = setTimeout(() => {
+			this._iUpdateTabIndexDelayedCallId = null;
+
+			const oDomRef = this.getDomRef();
+			if (!oDomRef) {
+				return;
+			}
+
+			if (this._shouldBeFocusable()) {
+				oDomRef.setAttribute("tabindex", "0");
+			} else {
+				oDomRef.removeAttribute("tabindex");
+			}
+		}, 0);
+	};
+
+	/**
+	 * Called after the Title control is rendered.
+	 *
+	 * @private
+	 */
+	Title.prototype.onAfterRendering = function() {
+		if (ControlBehavior.isExtendedKeyboardNavigationEnabled() && this._oTooltipEnablement) {
+			this._updateTabIndex();
+		}
+	};
+
+	/**
 	* Get tooltip text
 	* @returns {string} Tooltip text
 	* @private
 	*/
 	Title.prototype._getTooltipText = function () {
 		const oAssoTitle = this._getTitle();
-
 		return oAssoTitle && !this.getContent() ? oAssoTitle.getTooltip_AsString() : this.getTooltip_AsString();
 	};
 
@@ -352,6 +544,10 @@ sap.ui.define([
 	* @private
 	*/
 	Title.prototype.onmouseover = function (oEvent) {
+		if (this._oTooltipEnablement) {
+			return;
+		}
+
 		const oTarget = this.getDomRef();
 
 		if (!oTarget || oTarget.offsetWidth >= oTarget.scrollWidth) {
@@ -374,6 +570,10 @@ sap.ui.define([
 	* @private
 	*/
 	Title.prototype.onmouseout = function (oEvent) {
+		if (this._oTooltipEnablement) {
+			return;
+		}
+
 		const oTarget = this.getDomRef();
 		const sTooltip = this._getTooltipText();
 
