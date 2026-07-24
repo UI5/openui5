@@ -4547,7 +4547,8 @@ sap.ui.define([
 
 						if (bConfirm) {
 							delete mHeaders["Prefer"];
-							return post(oGroupLock0.getUnlockedCopy());
+							// decomposed error indicates request inside change set (but not alone)
+							return post(oGroupLock0.getUnlockedCopy(!oError.decomposed));
 						}
 
 						oCanceledError = Error("Action canceled due to strict handling");
