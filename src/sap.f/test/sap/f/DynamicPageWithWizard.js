@@ -251,9 +251,6 @@ sap.ui.define([
 	oWizard.addStyleClass("sapUiResponsivePadding--header");
 
 	var oPage = oDynamicPageUtil.getDynamicPageWithStickyHeader(false, oTitle, oHeader, oWizard, oFooter, oWizard);
-	// Leaves the Wizard to handle the scroll
-	oPage.setFitContent(true);
-	oPage.setHeaderExpanded(false);
 	// Makes the Wizard take 100% of the DynamicPage's width.
 	oPage.addStyleClass("sapUiNoContentPadding");
 

@@ -399,6 +399,8 @@ sap.ui.define([
 	DynamicPage.ARIA_ROLE_DESCRIPTION = "DYNAMIC_PAGE_ROLE_DESCRIPTION";
 	DynamicPage.ARIA_LABEL_TOOLBAR_FOOTER_ACTIONS = "ARIA_LABEL_TOOLBAR_FOOTER_ACTIONS";
 
+	DynamicPage.OVERLAY_SCROLLBAR_WIDTH = 12; // in pixels
+
 	/**
 	 * LIFECYCLE METHODS
 	 */
@@ -424,6 +426,7 @@ sap.ui.define([
 				this._adjustStickyContent();
 			}};
 
+		this._iSystemScrollbarWidth = null;
 		this._setAriaRoleDescription(Library.getResourceBundleFor("sap.f").getText(DynamicPage.ARIA_ROLE_DESCRIPTION));
 		this._initRangeSet();
 		this._attachMediaContainerWidthChange(this._onMediaRangeChange,
@@ -462,6 +465,9 @@ sap.ui.define([
 		}
 
 		this._cacheDomElements();
+		if (this._iSystemScrollbarWidth === null) {
+			this._iSystemScrollbarWidth = getScrollbarSize(true).width;
+		}
 		this._attachResizeHandlers();
 		this._updateMedia(this._getWidth(this));
 		this._attachScrollHandler();
@@ -1372,7 +1378,7 @@ sap.ui.define([
 			oWrapperElement = this.$wrapper.get(0),
 			iTitleHeight = this.$titleArea.get(0).getBoundingClientRect().height,
 			iTitleWidth = this._getTitleAreaWidth(),
-			iScrollbarWidth = getScrollbarSize().width,
+			iSpaceForScrollbar = this._getEffectiveScrollbarWidth(bScrollBarNeeded),
 			sClipPath;
 
 		// the top area of the scroll container is reserved for showing the title element,
@@ -1390,16 +1396,17 @@ sap.ui.define([
 		// (otherwise content from the scroll *overflow* will show underneath the transparent title element)
 		sClipPath = 'polygon(0px ' + Math.floor(iTitleHeight) + 'px, '
 			+ iTitleWidth + 'px ' + Math.floor(iTitleHeight) + 'px, '
-			+ iTitleWidth + 'px 0, 100% 0, 100% 100%, 0 100%)'; //
+			+ iTitleWidth + 'px 0, 100% 0, 100% 100%, 0 100%)';
 
 		if (Localization.getRTL()) {
-			sClipPath = 'polygon(0px 0px, ' + iScrollbarWidth + 'px 0px, '
-			+ iScrollbarWidth + 'px ' + iTitleHeight + 'px, 100% '
+			sClipPath = 'polygon(0px 0px, ' + iSpaceForScrollbar + 'px 0px, '
+			+ iSpaceForScrollbar + 'px ' + iTitleHeight + 'px, 100% '
 			+ iTitleHeight + 'px, 100% 100%, 0 100%)';
 		}
 		oWrapperElement.style.clipPath = sClipPath;
 
 		this.toggleStyleClass("sapFDynamicPageWithScroll", bScrollBarNeeded);
+		this._toggleSpaceForScrollbar(bScrollBarNeeded);
 
 		 // update styles for scrolling after a timeout of 0, in order to obtain the final state
 		 // e.g. after the ResizeHandler looped though *all* resized controls (to notify them) =>
@@ -1412,7 +1419,50 @@ sap.ui.define([
 		var bNoScrollBar = typeof bNeedsVerticalScrollBar !== 'undefined' ? !bNeedsVerticalScrollBar : !this._needsVerticalScrollBar();
 
 		this.toggleStyleClass("sapFDynamicPageWithScroll", !bNoScrollBar);
+		this._toggleSpaceForScrollbar(!bNoScrollBar);
 		this.$contentFitContainer.toggleClass("sapFDynamicPageContentFitContainer", bNoScrollBar);
+	};
+
+	/**
+	 * Returns the effective scrollbar width to reserve alongside the content.
+	 * For classic scrollbars this is the measured width; for overlay scrollbars
+	 * a fixed fallback is used because the measured width is 0.
+	 * @param {boolean} bHasScrolling whether the page currently needs a vertical scrollbar
+	 * @returns {int} the width in pixels (0 when no scrollbar is needed)
+	 * @private
+	 */
+	DynamicPage.prototype._getEffectiveScrollbarWidth = function (bHasScrolling) {
+		if (!bHasScrolling || Device.system.phone) {
+			return 0;
+		}
+		return this._iSystemScrollbarWidth || DynamicPage.OVERLAY_SCROLLBAR_WIDTH;
+	};
+
+	/**
+	 * Reserves or clears space alongside the title and header to prevent them
+	 * from overlapping the vertical scrollbar. For classic scrollbars the offset
+	 * is set inline using the measured scrollbar width. For overlay scrollbars
+	 * (whose width cannot be obtained from JavaScript) a fixed offset and a CSS
+	 * class are applied instead.
+	 * @param {boolean} bHasScrolling whether the page currently needs a vertical scrollbar
+	 * @private
+	 */
+	DynamicPage.prototype._toggleSpaceForScrollbar = function (bHasScrolling) {
+		var iOffset = this._getEffectiveScrollbarWidth(bHasScrolling),
+			bHasOverlayScrollbar = this._hasOverlayScrollbar(bHasScrolling);
+		this.$titleArea.css(Localization.getRTL() ? "left" : "right", iOffset);
+		this.toggleStyleClass("sapFDynamicPageWithOverlayScrollbar", bHasOverlayScrollbar); // toggles offset for remaining elements
+	};
+
+	/**
+	 * Returns whether the browser uses overlay scrollbars whose width
+	 * cannot be measured from JavaScript.
+	 * @param {boolean} bHasScrolling whether the page currently needs a vertical scrollbar
+	 * @returns {boolean}
+	 * @private
+	 */
+	DynamicPage.prototype._hasOverlayScrollbar = function (bHasScrolling) {
+		return bHasScrolling && this._iSystemScrollbarWidth === 0;
 	};
 
 	/**
@@ -1934,6 +1984,8 @@ sap.ui.define([
 			iCurrentHeight = oEvent.size.height,
 			bHeightChange = iCurrentHeight !== oEvent.oldSize.height;
 
+		this._iSystemScrollbarWidth = getScrollbarSize(true).width;
+
 		this._updateHeaderVisualState(bHeightChange, iCurrentHeight);
 
 		if (exists(oDynamicPageTitle)) {
@@ -2413,6 +2465,7 @@ sap.ui.define([
 
 			if (bIsInInterface) {
 				this._oStickySubheader = oStickySubheaderProvider._getStickyContent();
+				this._oStickySubheader.addStyleClass("sapFDynamicPageStickySubheader");
 
 				this._oStickySubheader.addEventDelegate(this._oSubHeaderAfterRenderingDelegate, this);
 
