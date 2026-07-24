@@ -3,7 +3,9 @@
  * ${copyright}
  */
 sap.ui.define([
+	"sap/base/Log",
 	"sap/ui/base/ManagedObject",
+	"sap/ui/core/Element",
 	"sap/ui/core/Fragment",
 	"sap/ui/dt/ElementUtil",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
@@ -12,7 +14,9 @@ sap.ui.define([
 	"sap/ui/rta/plugin/annotations/AnnotationChangeDialogController",
 	"sap/ui/rta/Utils"
 ], function(
+	Log,
 	ManagedObject,
+	Element,
 	Fragment,
 	ElementUtil,
 	PersistenceWriteAPI,
@@ -70,7 +74,19 @@ sap.ui.define([
 	};
 
 	AnnotationChangeDialog.prototype._openDialog = function() {
+		// Set the initial focus before opening so it does not visibly jump after the open animation.
+		if (this.oChangeAnnotationModel.getProperty("/singleFieldRename")) {
+			// A single field rename shows exactly one text input
+			this._oDialog.setInitialFocus("sapUiRtaChangeAnnotationDialog_singleRenameField");
+		} else {
+			this._oDialog.setInitialFocus("sapUiRtaChangeAnnotationDialog_propertiesFilter");
+		}
 		this._oDialog.open();
+		if (this.oChangeAnnotationModel.getProperty("/singleFieldRename")) {
+			// Select the text synchronously right after opening (as the rename dialog does) so the
+			// selection is visible without waiting for the afterOpen event, avoiding a focus flicker.
+			Element.getElementById("sapUiRtaChangeAnnotationDialog_singleRenameField").getFocusDomRef().select();
+		}
 		return this._oController.initialize();
 	};
 
@@ -147,6 +163,10 @@ sap.ui.define([
 			preSelectedProperty: sPreSelectedPropertyKey
 		} = await oDelegate.getAnnotationsChangeInfo(oControl, sAnnotation);
 
+		if (bSingleRename && !sPreSelectedPropertyKey) {
+			Log.error("AnnotationChangeDialog: singleRename should not be used without a preSelectedProperty.");
+		}
+
 		const bObjectAsKey = !!aDelegatePossibleValues?.some((oPossibleValue) => typeof oPossibleValue.key === "object");
 		// the key could be an object which does not work as property for the Select control
 		// therefore the key must be stringified and later parsed
@@ -191,6 +211,21 @@ sap.ui.define([
 		// Once a change gets passed to the model during initialization, the property _appliedOnModel is set to true
 		replaceValuesWithValuesFromPendingChanges(aExistingChanges.filter((oChange) => !oChange._appliedOnModel), aProperties, bObjectAsKey);
 
+		// The single-rename target is the field that Enter saves and that gets the stable ID / auto-focus.
+		// It is the preselected property when it resolves, or the sole property when there is exactly one.
+		let oSingleRenameTarget;
+		if (bSingleRename) {
+			oSingleRenameTarget = (
+				sPreSelectedPropertyKey && aProperties.find((oProperty) => oProperty.annotationPath === sPreSelectedPropertyKey)
+			) || (aProperties.length === 1 ? aProperties[0] : undefined);
+		}
+		const bSingleFieldRename = !!oSingleRenameTarget;
+
+		// In single-field-rename mode only the target property is displayed, so the factory instantiates
+		// exactly one field. This lets the stable single-rename ID be driven by /singleFieldRename alone
+		// (as on master) without risking duplicate IDs across otherwise-hidden fields.
+		const aPropertiesToDisplay = bSingleFieldRename ? [oSingleRenameTarget] : aProperties;
+
 		this.oChangeAnnotationModel.setData({
 			objectAsKey: bObjectAsKey,
 			control: oControl,
@@ -198,10 +233,11 @@ sap.ui.define([
 			description: sAnnotationDescription || "",
 			properties: aProperties, // all properties
 			changedProperties: aProperties.filter(({ annotationPath }) => aChangedAnnotations.includes(annotationPath)),
-			propertiesToDisplay: aProperties, // switches dynamically between all properties and changed properties
+			propertiesToDisplay: aPropertiesToDisplay, // switches dynamically between all properties and changed properties
 			showChangedPropertiesOnly: false,
 			filterText: sFilterText,
 			singleRename: bSingleRename || false,
+			singleFieldRename: bSingleFieldRename,
 			possibleValues: aPossibleValues,
 			valueType: sAnnotationValueType,
 			serviceUrl: sServiceUrl

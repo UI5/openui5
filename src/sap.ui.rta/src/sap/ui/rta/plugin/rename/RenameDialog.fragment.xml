@@ -32,6 +32,7 @@
 					value="{/newText}"
 					placeholder="{i18n>RENAME_DIALOG_PLACEHOLDER}"
 					liveChange="onTextChange"
+					submit="onSave"
 					valueState="{= ${/validationError} === undefined ? 'None' : 'Error'}"
 					valueStateText="{/validationError}"
 					width="100%"
