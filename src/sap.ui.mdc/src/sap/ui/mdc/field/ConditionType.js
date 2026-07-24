@@ -242,6 +242,14 @@ sap.ui.define([
 
 	ConditionType.prototype.parseValue = function(vValue, sInternalType) {
 
+		var bInputValidationEnabled = _isInputValidationEnabled.call(this);
+		return this._parseValue(vValue, sInternalType, bInputValidationEnabled);
+
+	};
+
+	// own function as API for parseValue cannot be extended by inherited class
+	ConditionType.prototype._parseValue = function(vValue, sInternalType, bInputValidationEnabled) {
+
 		if (this._bDestroyed) { // if destroyed do nothing
 			return null;
 		}
@@ -262,7 +270,6 @@ sap.ui.define([
 		}
 
 		var sDisplay = _getDisplay.call(this);
-		var bInputValidationEnabled = _isInputValidationEnabled.call(this);
 		var oType = _getValueType.call(this);
 		var oOriginalType = _getOriginalType.call(this);
 		var aOperators = _getOperators.call(this);

@@ -518,7 +518,8 @@ sap.ui.define([
 		onsapnext: _handleKeybordEvent,
 		onsapup: _handleKeybordEvent,
 		onsapdown: _handleKeybordEvent,
-		onsapbackspace: _handleKeybordEvent
+		onsapbackspace: _handleKeybordEvent,
+		onpaste: _handlePaste
 	};
 
 	var oContentEventDelegateAfter = {
@@ -916,6 +917,121 @@ sap.ui.define([
 
 			this.fireSubmit({ promise: oPromise });
 		}
+
+	}
+
+	function _handlePaste(oEvent) {
+
+		var iMaxConditions = this.getMaxConditions();
+
+		if (iMaxConditions === 1) { // only for multi-value
+			return;
+		}
+
+		// for the purpose to copy from column in excel and paste in FilterField/MultiValueField
+		var sOriginalText = oEvent.originalEvent.clipboardData.getData('text/plain');
+		var aSeparatedText = _splitValue(sOriginalText, true); // check without BT support as if TAB is inside the Paste logic needs to be used anyhow
+
+		if (aSeparatedText.length <= 1) {
+			// only one entry -> use default logic
+			return;
+		}
+
+		var oConditionType = this._oContentFactory.getConditionType(true);
+		var aConditions = this.getConditions();
+		var oSource = oEvent.srcControl;
+		var sValue;
+		var bValid = true;
+		var sWrongValue;
+
+		aSeparatedText = _splitValue(sOriginalText, false); // split without TAB to support BT
+		try {
+			for (var i = 0; i < aSeparatedText.length; i++) {
+				if (aSeparatedText[i]) {
+					sValue = aSeparatedText[i].trim();
+
+					var aValues = sValue.split(/\t/g); // if two values exist, use it as Between and create a "a...z" value
+					if (aValues.length == 2 && aValues[0] && aValues[1]) {
+						var oOperator = FilterOperatorUtil.getOperator("BT");
+
+						sValue = oOperator.tokenFormat;
+						for (var j = 0; j < 2; j++) {
+							sValue = sValue.replace(new RegExp("\\{" + j + "\\}", "g"), aValues[j]);
+						}
+
+					}
+
+					var oCondition = oConditionType._parseValue(sValue, "string", false); // no input validation -> paring is not async
+					oConditionType.validateValue(oCondition);
+					// add new condition
+					if (FilterOperatorUtil.indexOfCondition(oCondition, aConditions) >= 0) {
+						// condition already exist (only error if tokens, in SearchField it is OK)
+						throw new ParseException(this._oResourceBundle.getText("field.CONDITION_ALREADY_EXIST", [sValue]));
+					} else {
+						if (iMaxConditions > 0 && iMaxConditions <= aConditions.length) {
+							// remove first conditions to meet maxConditions
+							aConditions.splice(0, aConditions.length - iMaxConditions + 1);
+						}
+						aConditions.push(oCondition);
+					}
+				}
+			}
+
+			FilterOperatorUtil.checkConditionsEmpty(aConditions);
+			this.setProperty("conditions", aConditions, true); // do not invalidate whole DefineConditionPanel
+
+			if (oSource.setDOMValue) {
+				oSource.setDOMValue("");
+			}
+		} catch (oException) {
+			if (oException && !(oException instanceof ParseException) && !(oException instanceof FormatException) && !(oException instanceof ValidateException)) {// FormatException could also occur
+				// unknown error -> just raise it
+				throw oException;
+			}
+			bValid = false;
+			sWrongValue = sValue;
+			this._bParseError = true;
+			this._sFilterValue = "";
+			_setUIMessage.call(this, oException.message);
+			aConditions = this.getConditions();
+		}
+
+		oEvent.stopImmediatePropagation(true); // to prevent MultiInputs own logic
+		oEvent.preventDefault(); // to prevent pasting string into INPUT
+
+		// as change might be async
+		var iLength = this._aAsyncChanges.length;
+		var oPromise;
+		if (iLength > 0) {
+			oEvent.source = oEvent.srcControl; // to align with other events
+			oEvent.parameters = {}; // to align with other events
+			this._aAsyncChanges[iLength - 1].changeFired = true;
+			this._aAsyncChanges[iLength - 1].changeEvent = oEvent;
+			oPromise = this._aAsyncChanges[iLength - 1].promise;
+		}
+		_triggerChange.call(this, aConditions, bValid, sWrongValue, oPromise);
+
+	}
+
+	function _splitValue(vValue, bSplitOnTab) {
+
+		var aSeparatedText;
+		if (typeof vValue === "string") {
+			// Pasting from Excel on Windows always adds "\r\n" at the end, even if a single cell is selected
+			if (vValue.length && vValue.endsWith("\r\n")) {
+				vValue = vValue.substring(0, vValue.lastIndexOf("\r\n"));
+			}
+
+			if (bSplitOnTab) {
+				aSeparatedText = vValue.split(/\r\n|\r|\n|\t/g);
+			} else {
+				aSeparatedText = vValue.split(/\r\n|\r|\n/g); // use tap as delemiter for between
+			}
+		} else {
+			aSeparatedText = [vValue];
+		}
+
+		return aSeparatedText;
 
 	}
 
