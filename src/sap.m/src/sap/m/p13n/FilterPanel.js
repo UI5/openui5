@@ -11,7 +11,8 @@ sap.ui.define([
 	"sap/ui/core/library",
 	"sap/m/library",
 	"sap/m/Label",
-	"sap/ui/core/Lib"
+	"sap/ui/core/Lib",
+	"sap/ui/core/InvisibleMessage"
 ], (
 	QueryPanel,
 	VBox,
@@ -22,11 +23,12 @@ sap.ui.define([
 	coreLibrary,
 	mLibrary,
 	Label,
-	Library
+	Library,
+	InvisibleMessage
 ) => {
 	"use strict";
 
-	const { ValueState, InvisibleMessage, InvisibleMessageMode } = coreLibrary;
+	const { ValueState, InvisibleMessageMode } = coreLibrary;
 
 	const { ListKeyboardMode, FlexJustifyContent, WrappingType } = mLibrary;
 
