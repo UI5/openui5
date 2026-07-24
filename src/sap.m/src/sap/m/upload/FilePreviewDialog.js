@@ -21,14 +21,16 @@ sap.ui.define([
 	"sap/ui/core/Control",
 	"sap/ui/core/InvisibleMessage",
 	"sap/ui/core/library",
-	"sap/base/security/encodeXML"
-], function(Core, Element, HTML, Button, Image, PDFViewer, Dialog, IllustratedMessage, IllustratedMessageType, Carousel, Log, Library, VBox, Bar, Title, Control, InvisibleMessage, coreLibrary, encodeXML) {
+	"sap/base/security/encodeXML",
+	"sap/m/library"
+], function(Core, Element, HTML, Button, Image, PDFViewer, Dialog, IllustratedMessage, IllustratedMessageType, Carousel, Log, Library, VBox, Bar, Title, Control, InvisibleMessage, coreLibrary, encodeXML, MobileLibrary) {
 	"use strict";
 
 	// get resource translation bundle;
 	const oLibraryResourceBundle = Library.getResourceBundleFor("sap.m");
 	const InvisibleMessageMode = coreLibrary.InvisibleMessageMode;
 	const TitleLevel = coreLibrary.TitleLevel;
+	const ButtonType = MobileLibrary.ButtonType;
 
 	/**
 	 * Media types that can be previewed.
@@ -142,6 +144,8 @@ sap.ui.define([
 				/**
 				 * Custom buttons, to be displayed in the preview dialog footer.
 				 * <br>Control by default adds two buttons (download and close).
+				 * <br><b>Note:</b> Buttons added using this aggregation cannot use <code>sap.m.ButtonType.Emphasized</code> since the Download button is already rendered as emphasized to comply with the SAP Fiori action placement guidelines.
+				 * Adding another emphasized button violates the single-primary-action pattern.
 				 */
 				additionalFooterButtons: {type: "sap.m.Button", multiple: true}
 			}
@@ -562,6 +566,7 @@ sap.ui.define([
 					this.getAdditionalFooterButtons(),
 					new Button({
 						text: oLibraryResourceBundle.getText("UPLOAD_SET_TABLE_FILE_PREVIEW_DIALOG_DOWNLOAD"),
+						type: ButtonType.Emphasized,
 						press: () => {
 							this._getActiveUploadSetwithTableItem().download(true);
 						}
