@@ -9,7 +9,7 @@
 		resizable="false"
 		draggable="true"
 		contentWidth="50rem"
-		contentHeight="{= ${/singleRename} === true ? 'auto' : '25rem'}"
+		contentHeight="{= ${/singleFieldRename} === true ? 'auto' : '25rem'}"
 		title="{/title}"
 		class="sapUiContentPadding"
 		escapeHandler=".onCancel"
@@ -34,7 +34,7 @@
 				<HBox
 					id="sapUiRtaChangeAnnotationDialog_filterHBox"
 					fitContainer="true"
-					visible="{= ${/singleRename} === false}"
+					visible="{= ${/singleFieldRename} === false}"
 				>
 					<SearchField
 						id="sapUiRtaChangeAnnotationDialog_propertiesFilter"
