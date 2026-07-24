@@ -11,7 +11,8 @@ sap.ui.define(
 		"sap/m/Button",
 		"sap/m/p13n/enums/PersistenceMode",
 		"sap/m/OverflowToolbarLayoutData",
-		"sap/ui/core/InvisibleText"
+		"sap/ui/core/InvisibleText",
+		"sap/ui/mdc/util/IdentifierUtil"
 	],
 	(
 		mLibrary,
@@ -22,10 +23,12 @@ sap.ui.define(
 		Button,
 		PersistenceMode,
 		OverflowToolbarLayoutData,
-		InvisibleText
+		InvisibleText,
+		IdentifierUtil
 	) => {
 		"use strict";
 		const {OverflowToolbarPriority} = mLibrary;
+		const SEARCH_CONDITION = "$search";
 
 		/**
 		 * Constructor for a new <code>FilterBar</code> for a value help dialog.
@@ -228,6 +231,38 @@ sap.ui.define(
 				iFilterCount ? "valuehelp.SHOWADVSEARCH_NONZERO" : "valuehelp.SHOWADVSEARCH",
 				[iFilterCount]
 			);
+		};
+
+		/**
+		 * Gets the labels of all filters with a value assignment that are also rendered.
+		 *
+		 * <b>Note:</b> Filters annotated with <code>hiddenFilters</code> will not be considered.
+		 *
+		 * @returns {string[]} Array of labels of rendered filters with value assignment
+		 * @public
+		 * @override
+		 */
+		FilterBar.prototype.getAssignedFilterNames = function() {
+			let sName, aFilterNames = null;
+			const oModel = this._getConditionModel();
+			if (oModel) {
+				aFilterNames = [];
+
+				const aConditions = oModel.getConditions(SEARCH_CONDITION);
+				if (aConditions && aConditions.length > 0 && this.getAggregation("basicSearchField")) {
+					aFilterNames.push(this._oRb.getText("filterbar.ADAPT_SEARCHTERM"));
+				}
+
+				this._getNonHiddenPropertyInfoSet().forEach((oProperty) => {
+					sName = IdentifierUtil.getPropertyKey(oProperty);
+					const aConditions = oModel.getConditions(sName);
+					if (aConditions && aConditions.length > 0 && this._getFilterField(sName)) {
+						aFilterNames.push(oProperty.label || sName);
+					}
+				});
+			}
+
+			return aFilterNames;
 		};
 
 		/**

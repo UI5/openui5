@@ -24,7 +24,7 @@ sap.ui.define([
 					// textDirection: sap.ui.core.TextDirection.RTL,
 					text: 'Root 1',
 					expanded: true,
-					// icon: 'sap-icon://employee',
+					icon: 'sap-icon://employee',
 					items: [
 						new NavigationListItem({
 							text: 'Looooooooooooooooooooong Child'

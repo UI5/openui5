@@ -45,6 +45,7 @@
 				variantBackreference="IDVariantManagementOfTable"
 				filtersChanged=".onFiltersChanged"
 				liveMode="false"
+				showClearButton="true"
 				delegate='\{"name": "sap/ui/v4demo/delegate/Authors.FB.delegate", "payload": \{"collectionName": "Authors"\}\}'
 				propertyInfo='[
 					\{"name": "name", "label": "Name", "dataType": "Edm.String", "constraints": \{"maxLength": 111\}, "group": "CatalogService.Authors", "groupLabel": "Authors"\},

@@ -248,11 +248,14 @@ sap.ui.define([
 	AnnotationChangeDialogController.prototype.editorFactory = function(sId, oContext) {
 		const sValueType = oContext.getProperty("/valueType");
 		const bSingleRename = oContext.getProperty("/singleRename");
+		const bPreselectedProperty = !!oContext.getProperty("/preSelectedProperty");
 
 		return new FormElement({
 			id: sId,
 			label: new Label({
-				text: bSingleRename ? "{i18n>ANNOTATION_CHANGE_DIALOG_SINGLE_RENAME_LABEL}" : "{= ${label} || ${propertyName}}",
+				text: bSingleRename && bPreselectedProperty
+					? "{i18n>ANNOTATION_CHANGE_DIALOG_SINGLE_RENAME_LABEL}"
+					: "{= ${label} || ${propertyName}}",
 				tooltip: "{tooltip}"
 			}),
 			fields: [

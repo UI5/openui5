@@ -721,122 +721,143 @@ sap.ui.define([
 			await openDialog(sandbox, oActionConfig, fnAfterOpen);
 		});
 
-		QUnit.test(
-			"when singleRename has a non-matching preSelectedProperty and the control label matches one property",
-			async function(assert) {
-				const oLogStub = sandbox.stub(Log, "warning");
-				const oTestDelegate = createStringTestDelegate("path/to/does/not/exist");
-				sandbox.stub(ElementUtil, "getLabelForElement").returns("My Test Label");
-				const oActionConfig = {
-					title: "Change Some String Prop",
-					type: AnnotationTypes.StringType,
-					delegate: oTestDelegate,
-					control: this.oTestControl,
-					singleRename: true,
-					controlBasedRenameChangeType: "myRename"
-				};
-				const fnAfterOpen = () => {
-					const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
-					assert.strictEqual(aFormElements.length, 1, "then exactly one form element is displayed");
-					assert.strictEqual(
-						aFormElements[0].getBindingContext().getProperty("annotationPath"),
-						"path/to/test/label",
-						"then the label-matched property is displayed"
-					);
-					assert.ok(
-						oLogStub.calledWithMatch(sinon.match(/singleRename without a matching preSelectedProperty/)),
-						"then a warning is logged about the non-matching preSelectedProperty"
-					);
+		QUnit.test("when singleRename has a non-matching preSelectedProperty and the control label matches one property", async function(assert) {
+			const oLogStub = sandbox.stub(Log, "warning");
+			const oTestDelegate = createStringTestDelegate("path/to/does/not/exist");
+			sandbox.stub(ElementUtil, "getLabelForElement").returns("My Test Label");
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				control: this.oTestControl,
+				singleRename: true,
+				controlBasedRenameChangeType: "myRename"
+			};
+			const fnAfterOpen = () => {
+				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				assert.strictEqual(aFormElements.length, 1, "then exactly one form element is displayed");
+				assert.strictEqual(
+					aFormElements[0].getBindingContext().getProperty("annotationPath"),
+					"path/to/test/label",
+					"then the label-matched property is displayed"
+				);
+				assert.ok(
+					oLogStub.calledWithMatch(sinon.match(/singleRename without a matching preSelectedProperty/)),
+					"then a warning is logged about the non-matching preSelectedProperty"
+				);
 
-					const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
-					oCancelButton.firePress();
-				};
-				await openDialog(sandbox, oActionConfig, fnAfterOpen);
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("when singleRename has a non-matching preSelectedProperty and the control label matches multiple properties", async function(assert) {
+			const oLogStub = sandbox.stub(Log, "warning");
+			const oTestDelegate = {
+				getAnnotationsChangeInfo: () => ({
+					serviceUrl: "testServiceUrl",
+					properties: [
+						{
+							propertyName: "First",
+							annotationPath: "path/to/first",
+							currentValue: "Hello",
+							label: "Ambiguous Label"
+						},
+						{
+							propertyName: "Second",
+							annotationPath: "path/to/second",
+							currentValue: "World",
+							label: "Ambiguous Label"
+						},
+						{
+							propertyName: "Unique",
+							annotationPath: "path/to/unique",
+							currentValue: "Bye",
+							label: "Unique Label"
+						}
+					],
+					preSelectedProperty: "path/to/does/not/exist"
+				})
+			};
+			sandbox.stub(ElementUtil, "getLabelForElement").returns("Ambiguous Label");
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				control: this.oTestControl,
+				singleRename: true,
+				controlBasedRenameChangeType: "myRename"
+			};
+			const fnAfterOpen = () => {
+				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				assert.strictEqual(aFormElements.length, 2, "then both label-matched properties are displayed");
+				assert.ok(
+					oLogStub.calledWithMatch(sinon.match(/singleRename without a matching preSelectedProperty/)),
+					"then a warning is logged"
+				);
+
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("when singleRename has a non-matching preSelectedProperty and the control label matches no property", async function(assert) {
+			const oLogStub = sandbox.stub(Log, "warning");
+			const oTestDelegate = createStringTestDelegate("path/to/does/not/exist");
+			sandbox.stub(ElementUtil, "getLabelForElement").returns("No Such Label");
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				control: this.oTestControl,
+				singleRename: true,
+				controlBasedRenameChangeType: "myRename"
+			};
+			const fnAfterOpen = () => {
+				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				assert.strictEqual(aFormElements.length, 0, "then no form elements are displayed");
+				assert.ok(
+					oLogStub.calledWithMatch(sinon.match(/singleRename without a matching preSelectedProperty/)),
+					"then a warning is logged"
+				);
+
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("when singleRename is true and preSelectedProperty not provided", async function(assert) {
+			const oLogStub = sandbox.stub(Log, "error");
+			const oTestDelegate = createStringTestDelegate();
+			sandbox.stub(ElementUtil, "getLabelForElement").returns("No Such Label");
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				control: this.oTestControl,
+				singleRename: true,
+				controlBasedRenameChangeType: "myRename"
+			};
+			function fnAfterOpen() {
+				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				assert.strictEqual(aFormElements.length, 4, "then all form elements are displayed");
+				assert.strictEqual(aFormElements[0].getLabel().getText(), "My Other Test Label", "the first label is correct");
+				assert.strictEqual(aFormElements[1].getLabel().getText(), "My Test Label", "the second label is correct");
+				assert.strictEqual(aFormElements[2].getLabel().getText(), "Other Property", "the third label is correct");
+				assert.strictEqual(aFormElements[3].getLabel().getText(), "Test", "the fourth label is correct");
+				assert.ok(
+					oLogStub.calledWithMatch(sinon.match(/AnnotationChangeDialog: singleRename should not be used without a preSelectedProperty./)),
+					"then an error is logged about the non-matching preSelectedProperty"
+				);
+
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
 			}
-		);
-
-		QUnit.test(
-			"when singleRename has a non-matching preSelectedProperty and the control label matches multiple properties",
-			async function(assert) {
-				const oLogStub = sandbox.stub(Log, "warning");
-				const oTestDelegate = {
-					getAnnotationsChangeInfo: () => ({
-						serviceUrl: "testServiceUrl",
-						properties: [
-							{
-								propertyName: "First",
-								annotationPath: "path/to/first",
-								currentValue: "Hello",
-								label: "Ambiguous Label"
-							},
-							{
-								propertyName: "Second",
-								annotationPath: "path/to/second",
-								currentValue: "World",
-								label: "Ambiguous Label"
-							},
-							{
-								propertyName: "Unique",
-								annotationPath: "path/to/unique",
-								currentValue: "Bye",
-								label: "Unique Label"
-							}
-						],
-						preSelectedProperty: "path/to/does/not/exist"
-					})
-				};
-				sandbox.stub(ElementUtil, "getLabelForElement").returns("Ambiguous Label");
-				const oActionConfig = {
-					title: "Change Some String Prop",
-					type: AnnotationTypes.StringType,
-					delegate: oTestDelegate,
-					control: this.oTestControl,
-					singleRename: true,
-					controlBasedRenameChangeType: "myRename"
-				};
-				const fnAfterOpen = () => {
-					const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
-					assert.strictEqual(aFormElements.length, 2, "then both label-matched properties are displayed");
-					assert.ok(
-						oLogStub.calledWithMatch(sinon.match(/singleRename without a matching preSelectedProperty/)),
-						"then a warning is logged"
-					);
-
-					const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
-					oCancelButton.firePress();
-				};
-				await openDialog(sandbox, oActionConfig, fnAfterOpen);
-			}
-		);
-
-		QUnit.test(
-			"when singleRename has a non-matching preSelectedProperty and the control label matches no property",
-			async function(assert) {
-				const oLogStub = sandbox.stub(Log, "warning");
-				const oTestDelegate = createStringTestDelegate("path/to/does/not/exist");
-				sandbox.stub(ElementUtil, "getLabelForElement").returns("No Such Label");
-				const oActionConfig = {
-					title: "Change Some String Prop",
-					type: AnnotationTypes.StringType,
-					delegate: oTestDelegate,
-					control: this.oTestControl,
-					singleRename: true,
-					controlBasedRenameChangeType: "myRename"
-				};
-				const fnAfterOpen = () => {
-					const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
-					assert.strictEqual(aFormElements.length, 0, "then no form elements are displayed");
-					assert.ok(
-						oLogStub.calledWithMatch(sinon.match(/singleRename without a matching preSelectedProperty/)),
-						"then a warning is logged"
-					);
-
-					const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
-					oCancelButton.firePress();
-				};
-				await openDialog(sandbox, oActionConfig, fnAfterOpen);
-			}
-		);
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
 
 		QUnit.test("when the dialog is opened with a preselected property, that does not exist", async function(assert) {
 			const oTestDelegate = createStringTestDelegate("path/to/does/not/exist");

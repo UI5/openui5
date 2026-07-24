@@ -13,11 +13,12 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"sap/uxap/AnchorBar",
 	"sap/m/Button",
+	"sap/m/BadgeCustomData",
 	"sap/m/Text",
 	"sap/base/i18n/Localization",
 	// jQuery Plugin "scrollLeftRTL"
 	"sap/ui/dom/jquery/scrollLeftRTL"
-], function(Library, nextUIUpdate, jQuery, QUnitUtils, KeyCodes, utils, Device, InvisibleText, XMLView, JSONModel, AnchorBar, Button, Text, Localization) {
+], function(Library, nextUIUpdate, jQuery, QUnitUtils, KeyCodes, utils, Device, InvisibleText, XMLView, JSONModel, AnchorBar, Button, BadgeCustomData, Text, Localization) {
 	"use strict";
 
 	const iRenderingDelay = 2000;
@@ -214,6 +215,22 @@ sap.ui.define([
 		//assert
 		assert.strictEqual(oSubSectionButton.getText(), oCustomButton.getText(), "custom button text is propagated to the menu item");
 		assert.strictEqual(oSubSectionButton.getIcon(), oCustomButton.getIcon(), "custom button icon is propagated to the menu item");
+	});
+
+	QUnit.test("Custom button customData is forwarded to section anchor", function (assert) {
+		const oAnchorBar = this.oObjectPage.getAggregation("_anchorBar");
+		const oCustomButton = this.oObjectPage.getSections()[0].getCustomAnchorBarButton();
+		const oSectionAnchor = oAnchorBar.getItems()[0];
+
+		oCustomButton.addCustomData(new BadgeCustomData({
+			value: "5"
+		}));
+
+		this.clock.tick(iRenderingDelay);
+
+		assert.strictEqual(oSectionAnchor.getCustomData().length, 1, "CustomData is forwarded to the generated IconTabFilter");
+		assert.ok(oSectionAnchor.getCustomData()[0].isA("sap.m.BadgeCustomData"), "Forwarded customData keeps its type");
+		assert.strictEqual(oSectionAnchor.getCustomData()[0].getValue(), "5", "Forwarded BadgeCustomData keeps the badge value");
 	});
 
 	QUnit.test("Menu Button with long text should be able to have width, bigger than 12rem", function (assert) {

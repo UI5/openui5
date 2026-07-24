@@ -200,16 +200,28 @@ sap.ui.define([
 		// set initial property values
 		oSectionBaseTab.setText(oCustomAnchorBarButton.getText());
 		oSectionBaseTab.setIcon(oCustomAnchorBarButton.getIcon());
+		this._syncCustomData(oCustomAnchorBarButton, oSectionBaseTab);
 
-		// forward updates to property values
+		// forward updates to property values and customData aggregation
 		this._oObserver.observe(oCustomAnchorBarButton, {
-			properties: true
+			properties: true,
+			aggregations: ["customData"]
 		});
 
 		// forward press event
 		this._getAnchorBar().attachSelect(function(oEvent) {
 			this._forwardPressToCustomButton(oEvent.getParameter("item"));
 		}, this);
+	};
+
+	ABHelper.prototype._syncCustomData = function (oSourceControl, oTargetControl) {
+		oTargetControl.removeAllCustomData().forEach(function (oCustomData) {
+			oCustomData.destroy();
+		});
+
+		oSourceControl.getCustomData().forEach(function (oCustomData) {
+			oTargetControl.addCustomData(oCustomData.clone());
+		});
 	};
 
 	ABHelper.prototype._forwardPressToCustomButton = function (oPressedAnchor) {
@@ -317,6 +329,17 @@ sap.ui.define([
 			sPropertyName = oChanges.name,
 			vCurrentValue = oChanges.current,
 			sSetter = "set" + fnCapitalize(sPropertyName);
+
+		if (oChanges.type === "aggregation" && sPropertyName === "customData") {
+			if (oSectionBaseAnchor) {
+				this._syncCustomData(oObject, oSectionBaseAnchor);
+			}
+			return;
+		}
+
+		if (oChanges.type !== "property") {
+			return;
+		}
 
 			if (oSectionBaseAnchor) {
 				oSectionBaseAnchor[sSetter].call(oSectionBaseAnchor, vCurrentValue);

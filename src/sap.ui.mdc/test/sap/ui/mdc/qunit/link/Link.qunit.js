@@ -128,6 +128,7 @@ sap.ui.define([
 
 	QUnit.test("retrieveLinkItems should cache LinkItems", function(assert) {
 		const done = assert.async();
+		const sBindingContextPath = "fakeBindingContextPath";
 		const oLink = new Link({
 			delegate: {
 				name: "test-resources/sap/ui/mdc/qunit/link/TestDelegate_Link",
@@ -136,10 +137,17 @@ sap.ui.define([
 				}
 			}
 		});
+
+		sinon.stub(oLink, "_getControlBindingContext").returns({
+			getPath: function () {
+				return sBindingContextPath;
+			}
+		});
+
 		const fnUseDelegateItems = sinon.spy(oLink, "_useDelegateItems");
 		oLink.retrieveLinkItems().then(function(aRetrievedLinkItems) {
 			assert.deepEqual(aRetrievedLinkItems, this.aLinkItems, "First retrievedLinkItems are correct");
-			assert.ok(oLink._bLinkItemsFetched, "LinkItems are chached");
+			assert.deepEqual(oLink._sItemsContextPath, sBindingContextPath, "LinkItems are chached");
 			oLink.retrieveLinkItems().then(function(aRetrievedLinkItems) {
 				assert.deepEqual(aRetrievedLinkItems, this.aLinkItems, "Second retrievedLinkItems are correct");
 				assert.ok(fnUseDelegateItems.calledOnce, "_useDelegateItems only called once");

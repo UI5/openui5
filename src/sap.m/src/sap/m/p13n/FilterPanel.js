@@ -26,17 +26,9 @@ sap.ui.define([
 ) => {
 	"use strict";
 
-	//shortcut for sap.ui.core.ValueState
-	const ValueState = coreLibrary.ValueState;
+	const { ValueState, InvisibleMessage, InvisibleMessageMode } = coreLibrary;
 
-	// shortcut for sap.m.ListKeyboardMode
-	const ListKeyboardMode = mLibrary.ListKeyboardMode;
-
-	// shortcut for sap.m.FlexJustifyContent
-	const FlexJustifyContent = mLibrary.FlexJustifyContent;
-
-	// shortcut for sap.m.WrappingType
-	const WrappingType = mLibrary.WrappingType;
+	const { ListKeyboardMode, FlexJustifyContent, WrappingType } = mLibrary;
 
 	/**
 	 * Constructor for a new <code>FilterPanel</code>.
@@ -149,6 +141,7 @@ sap.ui.define([
 	};
 
 	FilterPanel.prototype._createKeySelect = function(sKey) {
+		this.oInvisibleMessage = InvisibleMessage.getInstance();
 
 		const oComboBox = new ComboBox({
 			width: "100%",
@@ -161,6 +154,11 @@ sap.ui.define([
 			change: (oEvt) => {
 				const oComboBox = oEvt.getSource();
 				const newValue = oEvt.getParameter("newValue");
+
+				if (newValue) {
+					this.oInvisibleMessage.announce(Library.getResourceBundleFor("sap.m").getText("p13n.FILTERPANEL_ADDINGFILTER_ANNOUNCEMENT", [newValue]), InvisibleMessageMode.Assertive);
+				}
+
 				oComboBox.setValueState(newValue && !oComboBox.getSelectedItem() ? ValueState.Error : ValueState.None);
 				this._selectKey();
 			}

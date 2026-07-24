@@ -1,4 +1,3 @@
-
 /*!
  * ${copyright}
  */
@@ -171,6 +170,10 @@ sap.ui.define([
 			preSelectedProperty: sPreSelectedPropertyKey
 		} = await oDelegate.getAnnotationsChangeInfo(oControl, sAnnotation);
 
+		if (bSingleRename && !sPreSelectedPropertyKey) {
+			Log.error("AnnotationChangeDialog: singleRename should not be used without a preSelectedProperty.");
+		}
+
 		const bObjectAsKey = !!aDelegatePossibleValues?.some((oPossibleValue) => typeof oPossibleValue.key === "object");
 		// the key could be an object which does not work as property for the Select control
 		// therefore the key must be stringified and later parsed
@@ -250,6 +253,7 @@ sap.ui.define([
 			showChangedPropertiesOnly: false,
 			filterText: sFilterText,
 			singleRename: bSingleRename || false,
+			preSelectedProperty: sPreSelectedPropertyKey || "",
 			possibleValues: aPossibleValues,
 			valueType: sAnnotationValueType,
 			serviceUrl: sServiceUrl,
