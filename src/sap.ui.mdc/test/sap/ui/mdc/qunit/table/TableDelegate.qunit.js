@@ -149,6 +149,11 @@ sap.ui.define([
 		assert.equal(oValidationState.message, oResourceBundle.getText("table.PERSONALIZATION_DIALOG_FILTER_MESSAGESTRIP"), "Message text");
 	});
 
+	QUnit.test("validateP13nState default resolves true", async function(assert) {
+		const bResult = await this.oTable.getControlDelegate().validateP13nState(this.oTable, {});
+		assert.strictEqual(bResult, true, "Default resolves true");
+	});
+
 	QUnit.test("updateBindingInfo", function(assert) {
 		const oTable = this.oTable;
 		oTable.setP13nMode(["Sort", "Filter"]);

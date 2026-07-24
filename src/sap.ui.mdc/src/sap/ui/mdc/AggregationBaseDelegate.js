@@ -106,6 +106,26 @@ sap.ui.define(['sap/ui/mdc/BaseDelegate', 'sap/ui/core/message/MessageType', 'sa
 	};
 
 	/**
+	 * Validation hook that is invoked when the user confirms the personalization dialog.
+	 *
+	 * Applications can use this hook to validate the current personalization state, display their
+	 * own messages, and prevent the dialog from closing by resolving to <code>false</code>.
+	 *
+	 * Providing accessible feedback (e.g. screen reader announcements) while the validation is ongoing
+	 * or once it has completed is the responsibility of the implementation.
+	 *
+	 * @param {sap.ui.mdc.Control} oControl Instance of an <code>sap.ui.mdc.Control</code>
+	 * @param {object} oState The theoretical (not yet applied) external state of the control's personalization. The format matches the one processed by {@link sap.ui.mdc.p13n.StateUtil StateUtil}.
+	 * @returns {Promise<boolean>|boolean} A promise that resolves to <code>false</code> (or the literal value <code>false</code>) to prevent the dialog from closing. Any other value allows the dialog to close.
+	 *
+	 * @public
+	 * @since 1.152
+	 */
+	AggregationBaseDelegate.validateP13nState = function(oControl, oState) {
+		return Promise.resolve(true);
+	};
+
+	/**
 	 * Hook that will be executed when changes are done applying to controls during the XML flexibility change appliance process.
 	 *
 	 * @param {Element} oControl XML node of a mdc control

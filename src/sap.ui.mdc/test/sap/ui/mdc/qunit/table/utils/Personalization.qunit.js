@@ -264,6 +264,49 @@ sap.ui.define([
 		oInbuiltFilterVisibleFieldsSpy.restore();
 	});
 
+	QUnit.test("openSettingsDialog: delegate validateP13nState=false keeps the dialog open on OK", async function(assert) {
+		const oTable = this.oTable;
+		const oDelegate = oTable.getControlDelegate();
+		let pValidation;
+		const oStub = sinon.stub(oDelegate, "validateP13nState").callsFake(function() {
+			pValidation = Promise.resolve(false);
+			return pValidation;
+		});
+
+		PersonalizationUtils.openSettingsDialog(oTable);
+		const oPopup = await TableQUnitUtils.waitForP13nPopup(oTable);
+
+		oPopup._oPopup.getButtons()[0].firePress();
+		await oTable.awaitControlDelegate();
+		await pValidation;
+		await Promise.resolve();
+
+		assert.strictEqual(oStub.firstCall.args[0], oTable, "Hook called with the table");
+		assert.ok(oStub.firstCall.args[1], "Hook called with the pending state");
+		assert.ok(oPopup._bIsOpen, "Dialog stays open when validation fails");
+
+		oStub.restore();
+		await TableQUnitUtils.closeP13nPopup(oTable);
+	});
+
+	QUnit.test("openSettingsDialog: delegate validateP13nState rejection closes the dialog on OK", async function(assert) {
+		const oTable = this.oTable;
+		const oStub = sinon.stub(oTable.getControlDelegate(), "validateP13nState").rejects(new Error("failed"));
+
+		PersonalizationUtils.openSettingsDialog(oTable);
+		const oPopup = await TableQUnitUtils.waitForP13nPopup(oTable);
+
+		const pClosed = new Promise((resolve) => {
+			oPopup._oPopup.attachEventOnce("afterClose", resolve);
+		});
+		oPopup._oPopup.getButtons()[0].firePress();
+		await pClosed;
+
+		assert.notOk(oPopup._bIsOpen, "Dialog closes despite rejection");
+
+		oStub.restore();
+	});
+
 	QUnit.module("Reset changes", {
 		before: function() {
 			sinon.stub(TableDelegate, "getSupportedFeatures").callsFake(function() {
