@@ -90,7 +90,7 @@ sap.ui.define([
 		}
 	};
 
-	AnnotationChangeDialogController.prototype.onSave = function(oEvent) {
+	function onSave(oEvent) {
 		const oModelData = oEvent.getSource().getModel().getData();
 		const aChanges = oModelData.properties
 		.map((oProperty) => {
@@ -110,13 +110,17 @@ sap.ui.define([
 		.filter(Boolean);
 
 		this._fnResolveAfterClose(aChanges);
+	}
+
+	AnnotationChangeDialogController.prototype.onSave = function(oEvent) {
+		onSave.call(this, oEvent);
 	};
 
 	AnnotationChangeDialogController.prototype.onCancel = function() {
 		this._fnResolveAfterClose([]);
 	};
 
-	function createEditorField(sValueType) {
+	function createEditorField(sValueType, bSingleFieldRename) {
 		if (sValueType === AnnotationTypes.ValueListType) {
 			const oSelect = new Select({
 				selectedKey: "{currentValue}"
@@ -138,12 +142,17 @@ sap.ui.define([
 
 		if (sValueType === AnnotationTypes.StringType) {
 			return new Input({
+				// In single-field-rename mode exactly one field is displayed, so it carries a stable ID
+				// that _openDialog uses to focus it. Multi-field dialogs keep auto-generated IDs.
+				id: bSingleFieldRename ? "sapUiRtaChangeAnnotationDialog_singleRenameField" : undefined,
 				value: "{currentValue}",
 				liveChange: (oEvent) => {
 					const sValue = oEvent.getParameter("newValue");
 					const oContext = oEvent.getSource().getBindingContext();
 					oEvent.getSource().getModel().setProperty("currentValue", sValue, oContext);
-				}
+				},
+				// The Enter key triggers the save action for a single field rename, mirroring the RenameDialog.
+				submit: bSingleFieldRename ? onSave.bind(this) : () => {}
 			});
 		}
 
@@ -158,16 +167,19 @@ sap.ui.define([
 
 	AnnotationChangeDialogController.prototype.editorFactory = function(sId, oContext) {
 		const sValueType = oContext.getProperty("/valueType");
-		const bSingleRename = oContext.getProperty("/singleRename");
+		const bSingleFieldRename = !!oContext.getProperty("/singleFieldRename");
 
 		return new FormElement({
 			id: sId,
 			label: new Label({
-				text: bSingleRename ? "{i18n>ANNOTATION_CHANGE_DIALOG_SINGLE_RENAME_LABEL}" : "{= ${label} || ${propertyName}}",
+				// The generic single-rename label is only shown when the dialog collapsed to a single
+				// target field. Otherwise (e.g. singleRename without a preSelectedProperty, so all
+				// properties are shown) the real per-property label is used.
+				text: bSingleFieldRename ? "{i18n>ANNOTATION_CHANGE_DIALOG_SINGLE_RENAME_LABEL}" : "{= ${label} || ${propertyName}}",
 				tooltip: "{tooltip}"
 			}),
 			fields: [
-				createEditorField.call(this, sValueType)
+				createEditorField.call(this, sValueType, bSingleFieldRename)
 			]
 		});
 	};
