@@ -139,14 +139,14 @@ sap.ui.define([
 		this.setModel(oModel, "$sapuimdcLink");
 		this.attachEvent("modelContextChange", this.fireDataUpdate, this);
 		this._oLinkType = null;
-		this._bLinkItemsFetched = false;
+		this._sItemsContextPath = null;
 		this._aLinkItems = [];
 
 		FieldInfoBase.prototype.init.apply(this, arguments);
 	};
 
 	Link.prototype.exit = function() {
-		this._bLinkItemsFetched = undefined;
+		this._sItemsContextPath = undefined;
 		this._oLinkType = undefined;
 		this._oUseDelegateItemsPromise = undefined;
 		this._oUseDelegateAdditionalContentPromise = undefined;
@@ -571,7 +571,10 @@ sap.ui.define([
 	 * @returns {Promise<sap.ui.mdc.link.LinkItem[]>} Resolves an array of type {@link sap.ui.mdc.link.LinkItem}
 	 */
 	Link.prototype._retrieveUnmodifiedLinkItems = function() {
-		if (this._bLinkItemsFetched) {
+		const oBindingContext = this._getControlBindingContext(),
+			bContextUnchanged = oBindingContext && oBindingContext?.getPath() === this._sItemsContextPath;
+
+		if (bContextUnchanged) {
 			return Promise.resolve(this._aLinkItems);
 		} else {
 			this._oUseDelegateItemsPromise = this._useDelegateItems();
@@ -595,7 +598,9 @@ sap.ui.define([
 				return new Promise((resolve) => {
 					this.getControlDelegate().fetchLinkItems(this, oBindingContext, oInfoLog).then((aLinkItems) => {
 						this._setLinkItems(aLinkItems === null ? [] : aLinkItems);
-						this._bLinkItemsFetched = aLinkItems !== null;
+						if (aLinkItems !== null) {
+							this._sItemsContextPath = oBindingContext?.getPath();
+						}
 						resolve();
 					});
 				});

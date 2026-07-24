@@ -3597,4 +3597,26 @@ sap.ui.define([
 		oDP8.destroy();
 	});
 
+	QUnit.test("minDate and maxDate setters are not called if there aren't min and max in the binding constraints", async function(assert) {
+		// Arrange
+
+		var oDP9 = new DatePicker("DP9", {
+			value: {
+				path: "/dateValue1",
+				type: new TypeDate({style: "medium"}, { displayFormat: 'Date' })
+			}
+		}).placeAt("content");
+		var oMinSpy = this.spy(oDP9, "setMinDate");
+		var oMaxSpy = this.spy(oDP9, "setMaxDate");
+
+		await nextUIUpdate();
+
+		// Assert
+		assert.deepEqual(oMinSpy.callCount, 0, "setMinDate is not called");
+		assert.deepEqual(oMaxSpy.callCount, 0, "setMaxDate is not called");
+
+		// Cleanup
+		oDP9.destroy();
+	});
+
 });

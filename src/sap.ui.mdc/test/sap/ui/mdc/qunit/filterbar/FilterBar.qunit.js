@@ -292,14 +292,14 @@ sap.ui.define([
 	});
 
 	QUnit.test("check Clear delegate call", async function(assert) {
-		const done = assert.async();
+		const oButton = oFilterBar._btnClear;
 		sinon.spy(oFilterBar, "onClear");
 
-		oFilterBar.initControlDelegate().then(function(oDelegate) {
+		await oFilterBar.initControlDelegate().then(function(oDelegate) {
 			sinon.stub(oDelegate, "clearFilters").callsFake(function() {
 				assert.ok(oFilterBar.onClear.called, "onClear called");
 				assert.ok(true, "'clearFilters' on delegate called");
-				done();
+				assert.ok(oButton.getBusy(), "Clear Button is Busy");
 				return Promise.resolve();
 			});
 		});
@@ -309,13 +309,23 @@ sap.ui.define([
 		oFilterBar.setShowClearButton(true);
 		await nextUIUpdate();
 
-		const oButton = oFilterBar._btnClear;
 		assert.ok(oButton, "clear button available");
 		const oTarget = oButton.getFocusDomRef();
 		assert.ok(oTarget, "clear button dom-ref available");
 		QUnitUtils.triggerTouchEvent("tap", oTarget, {
 			srcControl: null
 		});
+		QUnitUtils.triggerTouchEvent("tap", oTarget, { // check not executed twice
+			srcControl: null
+		});
+
+		await new Promise((resolve) => {setTimeout(resolve,0);}); // as busty is reset after promise was fullfilled
+		const oDelegate = oFilterBar.getControlDelegate();
+		assert.ok(oFilterBar.onClear.calledTwice, "onClear called twice");
+		assert.ok(oDelegate.clearFilters.calledOnce, "clearFilters only called once.");
+		assert.notOk(oButton.getBusy(), "Clear Button is not Busy");
+
+		oDelegate.clearFilters.restore();
 	});
 
 	QUnit.test("check p13nMode property", function(assert) {
@@ -1311,28 +1321,37 @@ sap.ui.define([
 		sinon.stub(oDelegate, "fetchProperties").returns(Promise.resolve([oProperty1, oProperty2]));
 
 		await oFilterBar.initialized();
+
+		let iFiltersChanged = 0;
+		let bConditionBased;
+		oFilterBar.attachFiltersChanged((oEvent) => {
+			iFiltersChanged++;
+			bConditionBased = oEvent.getParameter("conditionBased");
+		});
+
 		let oP13nContainer = await oFilterBar.onAdaptFilters();
 		assert.ok(oP13nContainer, "panel has been created");
 		sinon.spy(oFilterBar, "cleanUpAllFilterFieldsInErrorState");
-		sinon.spy(oFilterBar, "_reportModelChange");
 		sinon.spy(oFilterBar, "triggerSearch");
 		oP13nContainer.fireClose({reason: "Cancel"});
 		assert.ok(oFilterBar.cleanUpAllFilterFieldsInErrorState.notCalled, "cleanUpAllFilterFieldsInErrorState not called on Cancel");
-		assert.ok(oFilterBar._reportModelChange.notCalled, "_reportModelChange not called on Cancel");
+		assert.equal(iFiltersChanged, 0, "FiltersChanged event not fired on Cancel");
 		assert.ok(oFilterBar.triggerSearch.notCalled, "triggerSearch not called on Cancel");
 
 		oP13nContainer = await oFilterBar.onAdaptFilters();
 		oP13nContainer.fireClose({reason: "Ok"});
 		assert.ok(oFilterBar.cleanUpAllFilterFieldsInErrorState.calledOnce, "cleanUpAllFilterFieldsInErrorState called on Ok");
-		assert.ok(oFilterBar._reportModelChange.calledOnce, "_reportModelChange called on Ok");
+		assert.equal(iFiltersChanged, 1, "FiltersChanged event fired on OK");
+		assert.notOk(bConditionBased, "ConditionsBased not set in FiltersChanged event on OK");
 		assert.ok(oFilterBar.triggerSearch.notCalled, "triggerSearch not called on Ok");
 		oFilterBar.cleanUpAllFilterFieldsInErrorState.reset();
-		oFilterBar._reportModelChange.reset();
+		iFiltersChanged = 0;
+		bConditionBased = false;
 
 		oP13nContainer = await oFilterBar.onAdaptFilters();
 		oP13nContainer.fireClose({reason: "Filter"});
 		assert.ok(oFilterBar.cleanUpAllFilterFieldsInErrorState.calledOnce, "cleanUpAllFilterFieldsInErrorState called on Filter");
-		assert.ok(oFilterBar._reportModelChange.notCalled, "_reportModelChange not called on Filter");
+		assert.equal(iFiltersChanged, 0, "FiltersChanged event not fired on Filter");
 		assert.ok(oFilterBar.triggerSearch.calledOnce, "triggerSearch called on Filter");
 
 		oFilterBar.getControlDelegate().fetchProperties.restore();

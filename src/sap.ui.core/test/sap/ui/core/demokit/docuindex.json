@@ -1,20 +1,4 @@
 {
-	"demo": {
-		"text": "sap.ui.core",
-		"links": [
-			{
-				"icon": "map-2",
-				"text": "Employee Directory",
-				"desc": "This app is an employee directory and shows the final result of the 'Navigation Tutorial'.",
-				"ref": "test-resources/sap/ui/core/demokit/tutorial/navigation/17/webapp/index.html",
-				"links": {
-					"View Tutorial": "topic/1b6dcd39a6a74f528b27ddb22f15af0d"
-				},
-				"category": "Tutorial",
-				"config": "test-resources/sap/ui/core/demokit/tutorial/navigation/demoapp.json"
-			}
-		]
-	},
 	"explored": {
 		"entitiesDefaults": {
 			"formFactors": "-"
@@ -389,34 +373,6 @@
 				]
 			},
 			{
-				"id": "sap.ui.core.tutorial.navigation",
-				"name": "Navigation and Routing",
-				"category": "Tutorial",
-				"since": "1.30",
-				"formFactors": "-",
-				"description": "This tutorial illustrates the major features of navigation and routing inside SAPUI5 apps.",
-				"docuLink": "topic/1b6dcd39a6a74f528b27ddb22f15af0d",
-				"samplesAsSteps": [
-					"Set Up the Initial App",
-					"Enable Routing",
-					"Catch Invalid Hashes",
-					"Add a Back Button to the Not Found Page",
-					"Display a Target Without Changing the Hash",
-					"Navigate to Routes with Hard-Coded Patterns",
-					"Navigate to Routes with Mandatory Parameters",
-					"Navigate with Flip Transition",
-					"Allow Bookmarkable Tabs with Optional Query Parameters",
-					"Implement Lazy Loading",
-					"Assign Multiple Targets",
-					"Make a Search Bookmarkable",
-					"Make Table Sorting Bookmarkable",
-					"Make Dialogs Bookmarkable",
-					"Reuse an Existing Route",
-					"Handle Invalid Hashes by Listening to Bypassed Events",
-					"Listen to Matched Events of Any Route"
-				]
-			},
-			{
 				"id": "sap.ui.core.tutorial.troubleshooting",
 				"name": "Troubleshooting",
 				"category": "Tutorial",
@@ -426,32 +382,6 @@
 				"docuLink": "topic/5661952e72df471b932eddc10350c081",
 				"samplesAsSteps": [
 					"Heap of Shards"
-				]
-			},
-			{
-				"id": "sap.ui.core.tutorial.databinding",
-				"name": "Data Binding",
-				"category": "Tutorial",
-				"since": "1.30",
-				"formFactors": "-",
-				"description": "In this tutorial, we will explain the concepts of data binding in SAPUI5.",
-				"docuLink": "topic/e5310932a71f42daa41f3a6143efca9c",
-				"samplesAsSteps": [
-					"No Data Binding",
-					"Creating a Model",
-					"Create Property Binding",
-					"Two-Way Data Binding",
-					"One-way Data Binding",
-					"Resource Models",
-					"(Optional) Resource Bundles and Multiple Languages",
-					"Binding Paths: Accessing Properties in Hierarchically Structured Models",
-					"Formatting Values",
-					"Property Formatting Using Data Types",
-					"Validation Using the Message Manager",
-					"Aggregation Binding Using Templates",
-					"Element Binding",
-					"Expression Binding",
-					"Aggregation Binding Using a Factory Function"
 				]
 			},
 			{

@@ -265,17 +265,18 @@ sap.ui.define([
 	};
 
 	FilterBar.prototype.onClear = function() {
-		this._btnClear.setEnabled(false);
-		this.awaitControlDelegate().then((oDelegate) => {
-			oDelegate.clearFilters(this)
-				.catch((oEx) => {
-					Log.error(oEx);
-				})
-				.finally(() => {
-					this._btnClear.setEnabled(true);
-				});
-
-		});
+		if (!this._btnClear.getBusy()) { // prevent multiple execution (busy is visualized with delay)
+			this._btnClear.setBusy(true);
+			this.awaitControlDelegate().then((oDelegate) => {
+				oDelegate.clearFilters(this)
+					.catch((oEx) => {
+						Log.error(oEx);
+					})
+					.finally(() => {
+						this._btnClear.setBusy(false);
+					});
+			});
+		}
 	};
 
 	FilterBar.prototype.retrieveInbuiltFilter = function() {
@@ -311,11 +312,7 @@ sap.ui.define([
 						this.cleanUpAllFilterFieldsInErrorState();
 					}
 					if (sReason === "Ok") { // as it is not known if there are changes trigger FilterUpdate to allow FE to react (set Messages....)
-						this._reportModelChange({
-							triggerSearch: false,
-							triggerFilterUpdate: true,
-							recheckMissingRequired: false
-						});
+						this._handleAssignedFilterNames(true); // no conditions changed right now
 					} else if (sReason === "Filter") {
 						this.triggerSearch();
 					}

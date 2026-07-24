@@ -972,7 +972,7 @@ sap.ui.define([
 			oType = oBinding && oBinding.getType && oBinding.getType(),
 			oConstraints = oType && oType.oConstraints, oMin, oMax;
 
-		if (!oConstraints) {
+		if (!oConstraints || !(oConstraints.minimum || oConstraints.maximum)) {
 			return;
 		}
 
@@ -982,16 +982,17 @@ sap.ui.define([
 
 		if (oMin && oMin.getTime() > this._oMinDate.getTime()) {
 			this._oMinDate = UI5Date.getInstance(oMin.getTime());
+			this.setProperty("minDate", this._oMinDate, true);
+			if (this._getCalendar()) {
+				this._getCalendar().setMinDate(this._oMinDate);
+			}
 		}
 		if (oMax && oMax.getTime() < this._oMaxDate.getTime()) {
 			this._oMaxDate = UI5Date.getInstance(oMax.getTime());
-		}
-
-		this.setProperty("minDate", this._oMinDate, true);
-		this.setProperty("maxDate", this._oMaxDate, true);
-		if (this._getCalendar()) {
-			this._getCalendar().setMinDate(this._oMinDate);
-			this._getCalendar().setMaxDate(this._oMaxDate);
+			this.setProperty("maxDate", this._oMaxDate, true);
+			if (this._getCalendar()) {
+				this._getCalendar().setMaxDate(this._oMaxDate);
+			}
 		}
 	};
 
