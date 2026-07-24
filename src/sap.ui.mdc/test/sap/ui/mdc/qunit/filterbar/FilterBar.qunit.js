@@ -1311,28 +1311,37 @@ sap.ui.define([
 		sinon.stub(oDelegate, "fetchProperties").returns(Promise.resolve([oProperty1, oProperty2]));
 
 		await oFilterBar.initialized();
+
+		let iFiltersChanged = 0;
+		let bConditionBased;
+		oFilterBar.attachFiltersChanged((oEvent) => {
+			iFiltersChanged++;
+			bConditionBased = oEvent.getParameter("conditionBased");
+		});
+
 		let oP13nContainer = await oFilterBar.onAdaptFilters();
 		assert.ok(oP13nContainer, "panel has been created");
 		sinon.spy(oFilterBar, "cleanUpAllFilterFieldsInErrorState");
-		sinon.spy(oFilterBar, "_reportModelChange");
 		sinon.spy(oFilterBar, "triggerSearch");
 		oP13nContainer.fireClose({reason: "Cancel"});
 		assert.ok(oFilterBar.cleanUpAllFilterFieldsInErrorState.notCalled, "cleanUpAllFilterFieldsInErrorState not called on Cancel");
-		assert.ok(oFilterBar._reportModelChange.notCalled, "_reportModelChange not called on Cancel");
+		assert.equal(iFiltersChanged, 0, "FiltersChanged event not fired on Cancel");
 		assert.ok(oFilterBar.triggerSearch.notCalled, "triggerSearch not called on Cancel");
 
 		oP13nContainer = await oFilterBar.onAdaptFilters();
 		oP13nContainer.fireClose({reason: "Ok"});
 		assert.ok(oFilterBar.cleanUpAllFilterFieldsInErrorState.calledOnce, "cleanUpAllFilterFieldsInErrorState called on Ok");
-		assert.ok(oFilterBar._reportModelChange.calledOnce, "_reportModelChange called on Ok");
+		assert.equal(iFiltersChanged, 1, "FiltersChanged event fired on OK");
+		assert.notOk(bConditionBased, "ConditionsBased not set in FiltersChanged event on OK");
 		assert.ok(oFilterBar.triggerSearch.notCalled, "triggerSearch not called on Ok");
 		oFilterBar.cleanUpAllFilterFieldsInErrorState.reset();
-		oFilterBar._reportModelChange.reset();
+		iFiltersChanged = 0;
+		bConditionBased = false;
 
 		oP13nContainer = await oFilterBar.onAdaptFilters();
 		oP13nContainer.fireClose({reason: "Filter"});
 		assert.ok(oFilterBar.cleanUpAllFilterFieldsInErrorState.calledOnce, "cleanUpAllFilterFieldsInErrorState called on Filter");
-		assert.ok(oFilterBar._reportModelChange.notCalled, "_reportModelChange not called on Filter");
+		assert.equal(iFiltersChanged, 0, "FiltersChanged event not fired on Filter");
 		assert.ok(oFilterBar.triggerSearch.calledOnce, "triggerSearch called on Filter");
 
 		oFilterBar.getControlDelegate().fetchProperties.restore();

@@ -311,11 +311,7 @@ sap.ui.define([
 						this.cleanUpAllFilterFieldsInErrorState();
 					}
 					if (sReason === "Ok") { // as it is not known if there are changes trigger FilterUpdate to allow FE to react (set Messages....)
-						this._reportModelChange({
-							triggerSearch: false,
-							triggerFilterUpdate: true,
-							recheckMissingRequired: false
-						});
+						this._handleAssignedFilterNames(true); // no conditions changed right now
 					} else if (sReason === "Filter") {
 						this.triggerSearch();
 					}
