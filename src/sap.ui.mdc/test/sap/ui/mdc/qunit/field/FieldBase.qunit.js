@@ -3068,6 +3068,7 @@ sap.ui.define([
 		oField.setValueState("Error"); // simulate wrong input before
 		oField.setValueStateText("Error");
 		oField._bParseError = true;
+		oContent.fireLiveChange({value: "I"});
 		oContent.setValue("I"); // to test clearing of content
 		oFieldHelp.fireSelect({ conditions: [oCondition], add: true, close: false });
 		assert.equal(iCount, 1, "Change Event fired once");
