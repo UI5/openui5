@@ -19,6 +19,7 @@ sap.ui.define([
 	'sap/ui/core/format/DateFormat',
 	'sap/ui/core/LocaleData',
 	'./TimePickerClocks',
+	'./TimePickerInputs',
 	'./DateTimePickerRenderer',
 	'./SegmentedButton',
 	'./SegmentedButtonItem',
@@ -46,6 +47,7 @@ sap.ui.define([
 	DateFormat,
 	LocaleData,
 	TimePickerClocks,
+	TimePickerInputs,
 	DateTimePickerRenderer,
 	SegmentedButton,
 	SegmentedButtonItem,
@@ -307,7 +309,7 @@ sap.ui.define([
 			aggregations: {
 				_switcher  : {type: "sap.ui.core.Control", multiple: false, visibility: "hidden"},
 				calendar   : {type: "sap.ui.core.Control", multiple: false},
-				clocks: {type: "sap.ui.core.Control", multiple: false}
+				clocks     : {type: "sap.ui.core.Control", multiple: false}
 			}
 		},
 
@@ -318,6 +320,9 @@ sap.ui.define([
 				oRm.openStart("div", oPopup);
 				oRm.class("sapMDateTimePopupCont")
 					.class("sapMTimePickerDropDown");
+				if (oPopup._bHighZoom) {
+					oRm.class("sapMDTPHighZoom");
+				}
 				oRm.openEnd();
 
 				var oSwitcher = oPopup.getAggregation("_switcher");
@@ -374,15 +379,23 @@ sap.ui.define([
 				this.setAggregation("_switcher", oSwitcher);
 			}
 
-			if (Device.system.phone || jQuery('html').hasClass("sapUiMedia-Std-Phone") || this.getForcePhoneView()) {
+			if (this._bHighZoom || Device.system.phone || jQuery('html').hasClass("sapUiMedia-Std-Phone") || (this._oDateTimePicker && this._oDateTimePicker.getForcePhoneView && this._oDateTimePicker.getForcePhoneView())) {
 				oSwitcher.setVisible(true);
-				oSwitcher.setSelectedKey("Cal");
-				this.getCalendar().attachSelect(function () {
+				oSwitcher.setSelectedKey(oSwitcher.getSelectedKey() || "Cal");
+				if (!this._bHighZoom) {
+					this.getCalendar().attachSelect(function () {
+						this._addCalendarDelegate();
+					}.bind(this));
 					this._addCalendarDelegate();
-				}.bind(this));
-				this._addCalendarDelegate();
+				}
 			} else {
 				oSwitcher.setVisible(false);
+			}
+		},
+
+		onAfterRendering: function() {
+			if (this._bHighZoom) {
+				this._switchVisibility(this.getAggregation("_switcher")?.getSelectedKey() || "Cal");
 			}
 		},
 
@@ -405,15 +418,29 @@ sap.ui.define([
 			if (sKey === "Clk") {
 				this.getClocks()._focusActiveButton();
 			}
-
+			// Update Today button visibility when switching between Cal and Clk tabs
+			if (this._bHighZoom && this._oDateTimePicker) {
+				this._oDateTimePicker._updateHZCalToggleBtn();
+			}
 		},
 
 		_switchVisibility: function(sKey) {
-
 			var oCalendar = this.getCalendar(),
 				oClocks = this.getClocks();
 
 			if (!oCalendar || !oClocks) {
+				return;
+			}
+
+			if (this._bHighZoom) {
+				oCalendar.$().css("display", "none");
+				oClocks.$().css("display", "none");
+				if (this._oDateZoomInputs && this._oDateZoomInputs.getDomRef()) {
+					this._oDateZoomInputs.getDomRef().style.display = sKey === "Cal" ? "" : "none";
+				}
+				if (this._oTimeZoomInputs && this._oTimeZoomInputs.getDomRef()) {
+					this._oTimeZoomInputs.getDomRef().style.display = sKey === "Clk" ? "" : "none";
+				}
 				return;
 			}
 
@@ -425,7 +452,6 @@ sap.ui.define([
 				oCalendar.$().css("display", "none");
 				oClocks.$().css("display", "");
 			}
-
 		},
 
 		switchToTime: function() {
@@ -439,9 +465,7 @@ sap.ui.define([
 		},
 
 		getSpecialDates: function() {
-
-			return this._oDateTimePicker.getSpecialDates();
-
+			return this._oDateTimePicker ? this._oDateTimePicker.getSpecialDates() : [];
 		}
 	});
 
@@ -449,6 +473,7 @@ sap.ui.define([
 		DatePicker.prototype.init.apply(this, arguments);
 
 		this._bOnlyCalendar = false;
+		this._oTimeZoomInputs = null;
 	};
 
 	/**
@@ -575,6 +600,8 @@ sap.ui.define([
 			delete this._oClocks;
 		}
 
+		this._oTimeZoomInputs = null; // destroyed via _oPopup content aggregation - just remove reference
+
 		this._oTimezonePopup = undefined;
 		this._oPopupContent = undefined; // is destroyed via popup aggregation - just remove reference
 		Theming.detachApplied(this._adjustInnerMaxWidth);
@@ -657,6 +684,9 @@ sap.ui.define([
 		var oClocks = this._oClocks;
 
 		oClocks && oClocks.setShowCurrentTimeButton(bShow);
+		if (this._oTimeZoomInputs) {
+			this._oTimeZoomInputs.setShowCurrentTimeButton(bShow);
+		}
 
 		return this.setProperty("showCurrentTimeButton", bShow);
 	};
@@ -1043,6 +1073,16 @@ sap.ui.define([
 				oPopover.setShowArrow(false);
 			}
 
+			// Calendar-type toggle button — used in high-zoom mode when secondaryCalendarType is set.
+			if (!this._oHZCalToggleBtn) {
+				this._oHZCalToggleBtn = new Button(this.getId() + "-hzCalToggle", {
+					type: library.ButtonType.Transparent,
+					icon: "sap-icon://workflow-tasks",
+					visible: false,
+					press: this._onHZCalTogglePress.bind(this)
+				});
+			}
+
 			// define a parent-child relationship between the control's and the _picker pop-up
 			this.setAggregation("_popup", this._oPopup, true);
 
@@ -1079,7 +1119,13 @@ sap.ui.define([
 
 		var bNoCalendar = !this._oCalendar;
 
-		DatePicker.prototype._createPopupContent.apply(this, arguments);
+		// Defer high-zoom switch until after _oClocks is created below
+		this._bDeferHighZoomSwitch = true;
+		try {
+			DatePicker.prototype._createPopupContent.apply(this, arguments);
+		} finally {
+			this._bDeferHighZoomSwitch = false;
+		}
 
 		if (bNoCalendar) {
 			this._oPopupContent.setCalendar(this._oCalendar);
@@ -1098,10 +1144,183 @@ sap.ui.define([
 			this._oPopupContent.setClocks(this._oClocks);
 		}
 
+		// Now that _oClocks exists, apply high-zoom switch if needed
+		const oInputs = this._getOrCreateHighZoomInputs();
+		if (this._bHighZoom) {
+			this._switchPickerContent(true);
+		} else {
+			oInputs.setVisible(false);
+		}
+
 	};
 
 	/* Override of the DatePicker method - this delegate is not needed in DateTimePicker */
 	DateTimePicker.prototype._attachAfterRenderingDelegate = function()	{
+	};
+
+	/**
+	 * Restores the high-zoom time inputs to the picker's current confirmed value.
+	 * Called on Cancel to discard tentative edits. When there is no confirmed value
+	 * (empty picker), nothing needs restoring — _fillDateRange seeds inputs on the
+	 * next open.
+	 * @private
+	 */
+	DateTimePicker.prototype._resetTimeZoomInputs = function() {
+		if (!this._oTimeZoomInputs) {
+			return;
+		}
+		const oConfirmed = this.getDateValue() || (this.getValue() && this._parseValue(this.getValue(), true));
+		if (oConfirmed) {
+			this._oTimeZoomInputs._setTimeValues(oConfirmed, false);
+		}
+	};
+
+	/**
+	 * Returns the best available date to seed sub-controls with. Prefers
+	 * <code>dateValue</code>; falls back to parsing the current <code>value</code>
+	 * string (which happens when the picker was configured only via the value
+	 * property and never had its dateValue property set); finally falls back to
+	 * the current time.
+	 *
+	 * Uses displayFormat for parsing because <code>value</code> without a
+	 * <code>valueFormat</code> is stored in display form (see
+	 * <code>DateTimeField.setValue</code> / <code>_parseAndValidateValue</code>).
+	 * @returns {Date|module:sap/ui/core/date/UI5Date}
+	 * @private
+	 */
+	DateTimePicker.prototype._getEffectiveDateValue = function() {
+		const sValue = this.getValue();
+		return this.getDateValue() || (sValue && this._parseValue(sValue, true)) || UI5Date.getInstance();
+	};
+
+	DateTimePicker.prototype._onZoomChange = function(bHighZoom) {
+		if (bHighZoom === this._bHighZoom) { return; }
+		this._bHighZoom = bHighZoom;
+		if (this.isOpen()) {
+			this._switchPickerContent(bHighZoom);
+		}
+	};
+
+	/**
+	 * Lazily creates and returns the TimePickerInputs for the time tab in high-zoom mode.
+	 * DateTimePicker uses TimePickerInputs directly rather than a full TimePicker because it
+	 * needs the inputs inline inside its own popup — TimePicker always opens its own separate
+	 * popup and cannot be embedded as content.
+	 * @returns {sap.m.TimePickerInputs}
+	 * @private
+	 */
+	DateTimePicker.prototype._getOrCreateTimeZoomInputs = function() {
+		if (!this._oTimeZoomInputs) {
+			const sFormat = _getTimePattern.call(this);
+			this._oTimeZoomInputs = new TimePickerInputs(this.getId() + "-dtpZoomTime", {
+				support2400: false,
+				displayFormat: sFormat,
+				valueFormat: sFormat,
+				localeId: this.getLocaleId(),
+				minutesStep: this.getMinutesStep(),
+				secondsStep: this.getSecondsStep(),
+				showCurrentTimeButton: this.getShowCurrentTimeButton(),
+				change: this._onTimeZoomInputChange.bind(this)
+			});
+			this._oTimeZoomInputs.addStyleClass("sapMDTPTimeZoomInputs");
+			this._oTimeZoomInputs.addEventDelegate({
+				onAfterRendering: () => {
+					const oDom = this._oTimeZoomInputs.getDomRef();
+					if (oDom && this._oPopupContent?._bHighZoom) {
+						const sKey = this._oPopupContent.getAggregation("_switcher")?.getSelectedKey() || "Cal";
+						oDom.style.display = sKey === "Clk" ? "" : "none";
+					}
+				}
+			});
+		}
+		return this._oTimeZoomInputs;
+	};
+
+	/**
+	 * Handles a change on any time input at 200% zoom. Marks the time as selected and
+	 * enables the OK button so the user can confirm a time-only edit.
+	 * @private
+	 */
+	DateTimePicker.prototype._onTimeZoomInputChange = function() {
+		this._bTimeSelected = true;
+		if (this._oOKButton) {
+			this._oOKButton.setEnabled(true);
+		}
+	};
+
+	/**
+	 * Override of DatePicker._switchPickerContent for DateTimePicker.
+	 * At high zoom shows DateHighZoomInputs (date tab) and TimePickerInputs (time tab)
+	 * controlled by the Cal/Clk switcher. At normal zoom restores the standard layout.
+	 * @param {boolean} bHighZoom
+	 * @private
+	 */
+	DateTimePicker.prototype._switchPickerContent = function(bHighZoom) {
+		if (!this._oPopupContent || !this._oHighZoomInputs) {
+			return;
+		}
+
+		const oTimeZoomInputs = this._getOrCreateTimeZoomInputs();
+
+		// Add zoom inputs to _oPopup (sibling of _oPopupContent) so they render outside
+		// the PopupContent box. CSS class sapMDTPHighZoom on PopupContent hides calendar/clocks.
+		if (this._oPopup) {
+			if (this._oPopup.getContent().indexOf(this._oHighZoomInputs) === -1) {
+				this._oPopup.addContent(this._oHighZoomInputs);
+			}
+			if (this._oPopup.getContent().indexOf(oTimeZoomInputs) === -1) {
+				this._oPopup.addContent(oTimeZoomInputs);
+			}
+		}
+
+		// Pass refs to PopupContent so _switchVisibility can toggle them via DOM
+		this._oPopupContent._bHighZoom = bHighZoom;
+		this._oPopupContent._oDateZoomInputs = bHighZoom ? this._oHighZoomInputs : null;
+		this._oPopupContent._oTimeZoomInputs = bHighZoom ? oTimeZoomInputs : null;
+
+		if (bHighZoom) {
+			this._oHighZoomInputs.setMinDate(this._oMinDate);
+			this._oHighZoomInputs.setMaxDate(this._oMaxDate);
+			this._oHighZoomInputs.setDateValue(this._getEffectiveDateValue());
+			this._oHighZoomInputs.setPrimaryCalendarType(this._getEffectiveCalendarType());
+			this._oHighZoomInputs.setSecondaryCalendarType(
+				this._bSecondaryCalendarTypeSet ? this.getSecondaryCalendarType() : null
+			);
+			this._oHighZoomInputs.setProperty("_visibleFields", this._getHighZoomVisibleFields(), true);
+			this._oHighZoomInputs.syncStartDate();
+			this._oHighZoomInputs.validate();
+
+			oTimeZoomInputs._setTimeValues(this._getEffectiveDateValue(), false);
+
+			this._oHighZoomInputs.setVisible(true);
+			oTimeZoomInputs.setVisible(true);
+		} else {
+			if (this._oHighZoomInputs) {
+				this._oHighZoomInputs.switchCalendarType(this._getEffectiveCalendarType() || "Gregorian");
+			}
+			this._oHighZoomInputs.setVisible(false);
+			oTimeZoomInputs.setVisible(false);
+		}
+
+		this._updateHZCalToggleBtn();
+
+		// Invalidate PopupContent so onBeforeRendering shows/hides the switcher
+		this._oPopupContent.invalidate();
+
+		if (this._oPopup) {
+			const bShowFooter = bHighZoom || this.getShowFooter();
+			this._oPopup._getButtonFooter?.().setVisible(bShowFooter);
+		}
+	};
+
+	/**
+	 * Today button is only shown when the date tab (Cal) is active.
+	 * @returns {boolean}
+	 * @private
+	 */
+	DateTimePicker.prototype._isHZTodayBtnVisible = function() {
+		const sKey = this._oPopupContent?.getAggregation("_switcher")?.getSelectedKey() || "Cal";
+		return this.getShowCurrentDateButton() && sKey === "Cal";
 	};
 
 	DateTimePicker.prototype._selectFocusedDateValue = function (oDateRange) {
@@ -1123,13 +1342,23 @@ sap.ui.define([
 			oDate = UI5Date.getInstance(oDate.getTime());
 			this._oOKButton.setEnabled(true);
 		} else {
-			bDateFound = false;
-			oDate = this.getInitialFocusedDateValue();
-			if (!oDate) {
-				oDate = UI5Date.getInstance();
-				this._oCalendar.removeAllSelectedDates();
+			// Fall back to parsing the value string — covers pickers configured via
+			// value= only (dateValue is not set in that case).
+			const sValue = this.getValue();
+			const oParsed = sValue && this._parseValue(sValue, true);
+			if (oParsed) {
+				oDate = UI5Date.getInstance(oParsed.getTime());
+				bDateFound = true;
+				this._oOKButton.setEnabled(true);
+			} else {
+				bDateFound = false;
+				oDate = this.getInitialFocusedDateValue();
+				if (!oDate) {
+					oDate = UI5Date.getInstance();
+					this._oCalendar.removeAllSelectedDates();
+				}
+				this._oOKButton.setEnabled(false);
 			}
-			this._oOKButton.setEnabled(false);
 		}
 
 		if (oDate.getTime() < this._oMinDate.getTime()) {
@@ -1152,9 +1381,31 @@ sap.ui.define([
 		}
 
 		this._oClocks._setTimeValues(oDate);
+		if (this._bHighZoom && this._oTimeZoomInputs) {
+			if (bDateFound) {
+				this._oTimeZoomInputs._setTimeValues(oDate, false);
+			} else {
+				// No confirmed value — seed the time inputs with "now" so the user
+				// sees a sensible default, and enable OK so they can confirm it.
+				this._oTimeZoomInputs._setTimeValues(UI5Date.getInstance(), false);
+				if (this._oOKButton) {
+					this._oOKButton.setEnabled(true);
+				}
+			}
+		}
 	};
 
 	DateTimePicker.prototype._getSelectedDate = function(){
+		// When closing without an explicit OK press (Cancel / ESC / click-outside) and the
+		// picker has no confirmed value, return null so toggleOpen takes the cancel path and
+		// does not write today's date into the input.
+		if (this._bHighZoom && !this._bOKPressed) {
+			const oConfirmed = this.getDateValue() || (this.getValue() && this._parseValue(this.getValue(), true));
+			if (!oConfirmed) {
+				return null;
+			}
+		}
+
 		var oDate = DatePicker.prototype._getSelectedDate.apply(this, arguments),
 			oDateTime,
 			sPattern,
@@ -1162,8 +1413,13 @@ sap.ui.define([
 			oParts;
 
 		if (oDate) {
-			oDateTime = this._oClocks.getTimeValues();
-			sPattern = this._oClocks._getDisplayFormatPattern();
+			if (this._bHighZoom && this._oTimeZoomInputs) {
+				oDateTime = this._oTimeZoomInputs.getTimeValues();
+				sPattern = _getTimePattern.call(this);
+			} else {
+				oDateTime = this._oClocks.getTimeValues();
+				sPattern = this._oClocks._getDisplayFormatPattern();
+			}
 
 			if (sPattern.search("h") >= 0 || sPattern.search("H") >= 0) {
 				oDate.setHours(oDateTime.getHours());
@@ -1218,10 +1474,29 @@ sap.ui.define([
 	};
 
 	function _handleOkPress(oEvent){
-		this._handleCalendarSelect();
+		this._bOKPressed = true;
+		try {
+			this._handleCalendarSelect();
+		} finally {
+			this._bOKPressed = false;
+		}
 	}
 
 	function _handleCancelPress(oEvent){
+		if (this._bHighZoom) {
+			if (this._oHighZoomInputs) {
+				this._oHighZoomInputs.resetValueState();
+				// Restore date fields to the confirmed value so onsaphide → toggleOpen →
+				// _getSelectedDate reads the confirmed date, not a tentative edit.
+				const oConfirmed = this.getDateValue() || (this.getValue() && this._parseValue(this.getValue(), true));
+				if (oConfirmed) {
+					this._oHighZoomInputs.setDateValue(oConfirmed);
+					this._oHighZoomInputs.syncStartDate();
+				}
+			}
+			// Discard tentative time edits so a next open shows the confirmed value.
+			this._resetTimeZoomInputs();
+		}
 		this.onsaphide(oEvent);
 		if (!this.getDateValue()) {
 			this._oCalendar.removeAllSelectedDates();
@@ -1242,14 +1517,23 @@ sap.ui.define([
 			this.getAggregation("_popup").getContent()[1]._switchVisibility(oSwitcher.getSelectedKey());
 		} else {
 			oSwitcher.setVisible(false);
-			oClocks.$().css("display", "");
-			oCalendar.$().css("display", "");
+			// Do not restore Calendar/Clocks visibility while in high-zoom mode —
+			// _switchVisibility already manages their display state there.
+			if (!this._bHighZoom) {
+				oClocks.$().css("display", "");
+				oCalendar.$().css("display", "");
+			}
 		}
 	};
 
 	function _handleBeforeOpen(){
 		if (Device.system.phone) {
 			this._oPopup.setTitle(this._getLabelledText());
+		}
+		// Restore confirmed time value on re-open so tentative edits from a previous
+		// open (that was Cancelled) don't linger. No-op when there is no confirmed value.
+		if (this._bHighZoom) {
+			this._resetTimeZoomInputs();
 		}
 	}
 

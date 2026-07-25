@@ -34,6 +34,9 @@ sap.ui.define([
 	"sap/base/i18n/date/CalendarType",
 	"sap/base/i18n/date/CalendarWeekNumbering",
 	"sap/ui/core/InvisibleText",
+	"./DateHighZoomInputs",
+	"./Bar",
+	"./Title",
 	"sap/ui/dom/jquery/cursorPos"
 ],
 	function(
@@ -66,7 +69,10 @@ sap.ui.define([
 		UI5Date,
 		CalendarType,
 		CalendarWeekNumbering,
-		InvisibleText
+		InvisibleText,
+		DateHighZoomInputs,
+		Bar,
+		Title
 	) {
 	"use strict";
 
@@ -416,6 +422,11 @@ sap.ui.define([
 		// idicates whether the picker is still open
 		this._bShouldClosePicker = false;
 
+		this._bHighZoom = false;
+		this._oHighZoomInputs = null;
+
+		this._startZoomWatch();
+
 		oIcon.addEventDelegate({
 			onmousedown: function (oEvent) {
 				// as the popup closes automatically on blur - we need to remember its state
@@ -506,6 +517,22 @@ sap.ui.define([
 			this._invisibleLabelText.destroy();
 			this._invisibleLabelText = null;
 		}
+
+		this._stopZoomWatch();
+		if (this._oHighZoomInputs) {
+			this._oHighZoomInputs.destroy();
+			this._oHighZoomInputs = null;
+		}
+		// Destroy explicitly — on non-phone the button is not inside any aggregation
+		// so the popup destroy does not reach it. destroy() is safe on already-destroyed objects.
+		if (this._oHZCalToggleBtn) {
+			this._oHZCalToggleBtn.destroy();
+			this._oHZCalToggleBtn = null;
+		}
+		if (this._oHZTodayBtn) {
+			this._oHZTodayBtn.destroy();
+			this._oHZTodayBtn = null;
+		}
 	};
 
 	DatePicker.prototype.invalidate = function(oOrigin) {
@@ -528,10 +555,17 @@ sap.ui.define([
 
 		this._checkMinMaxDate();
 
+		// Sync _bHighZoom before first render only — once the popup is in use,
+		// _bHighZoom is managed by _createPopupContent and _onZoomChange.
+		if (!this._oPopup) {
+			this._bHighZoom = this._isHighZoom();
+		}
+
 		var oValueHelpIcon = this._getValueHelpIcon();
 
 		if (oValueHelpIcon) {
-			oValueHelpIcon.setProperty("visible", this.getEditable());
+			// Always read _isHighZoom() directly — _bHighZoom may lag at initial render
+			oValueHelpIcon.setProperty("visible", this.getEditable() && !this._isHighZoom());
 		}
 
 		// Close picker when scrolling in a table
@@ -612,6 +646,14 @@ sap.ui.define([
 
 		this._bFocusNoPopup = undefined;
 
+	};
+
+	DatePicker.prototype.onclick = function(oEvent) {
+		if (this._isHighZoom()) {
+			if (!oEvent.target.closest(".sapUiIcon")) {
+				this.toggleOpen(this.isOpen());
+			}
+		}
 	};
 
 	DatePicker.prototype.onsapshow = function(oEvent) {
@@ -1411,6 +1453,27 @@ sap.ui.define([
 
 			this._oPopup._getPopup().setAutoClose(true);
 
+			// Calendar-type toggle button — used in high-zoom mode when secondaryCalendarType is set.
+			// Created for all popup types so _updateHZCalToggleBtn works on desktop too.
+			if (!this._oHZCalToggleBtn) {
+				this._oHZCalToggleBtn = new Button(this.getId() + "-hzCalToggle", {
+					type: library.ButtonType.Transparent,
+					icon: "sap-icon://workflow-tasks",
+					visible: false,
+					press: this._onHZCalTogglePress.bind(this)
+				});
+			}
+
+			// Today button — shown in high-zoom header when showCurrentDateButton is true.
+			if (!this._oHZTodayBtn) {
+				this._oHZTodayBtn = new Button(this.getId() + "-hzToday", {
+					type: library.ButtonType.Transparent,
+					icon: "sap-icon://appointment",
+					visible: false,
+					press: this._onHZTodayPress.bind(this)
+				});
+			}
+
 			if (bPhone) {
 				this._oPopup.setTitle(this._getLabelledText());
 			} else {
@@ -1535,6 +1598,10 @@ sap.ui.define([
 	 * @private
 	 */
 	DatePicker.prototype._getVisibleDatesRange = function (oCalendar) {
+		if (this._bHighZoom) {
+			return null;
+		}
+
 		var aVisibleDays = oCalendar._getVisibleDays();
 
 		// Convert to local date instance
@@ -1606,6 +1673,22 @@ sap.ui.define([
 			}
 			this._attachAfterRenderingDelegate();
 		}
+
+		this._bHighZoom = this._isHighZoom();
+
+		const oInputs = this._getOrCreateHighZoomInputs();
+		if (this._oPopup && this._oPopup.getContent().indexOf(oInputs) === -1) {
+			this._oPopup.addContent(oInputs);
+		}
+		// Subclasses that need extra controls (e.g. DateTimePicker creates _oClocks after
+		// calling super) set _bDeferHighZoomSwitch = true and call _switchPickerContent themselves.
+		if (!this._bDeferHighZoomSwitch) {
+			if (this._bHighZoom) {
+				this._switchPickerContent(true);
+			} else {
+				oInputs.setVisible(false);
+			}
+		}
 	};
 
 	DatePicker.prototype._attachAfterRenderingDelegate = function()	{
@@ -1650,7 +1733,52 @@ sap.ui.define([
 		}
 	};
 
+	/**
+	 * Returns the effective primary calendar type — from data binding if available, otherwise from displayFormatType.
+	 * Mirrors the logic used when opening the calendar popup.
+	 * @returns {string|null}
+	 * @private
+	 */
+	DatePicker.prototype._getEffectiveCalendarType = function() {
+		const oBinding = this.getBinding("value");
+		let sCalType;
+		if (oBinding && oBinding.oType && oBinding.oType.oOutputFormat) {
+			sCalType = oBinding.oType.oOutputFormat.oFormatOptions.calendarType;
+		} else if (oBinding && oBinding.oType && oBinding.oType.oFormat) {
+			sCalType = oBinding.oType.oFormat.oFormatOptions.calendarType;
+		}
+		return sCalType || this.getDisplayFormatType() || null;
+	};
+
+	/**
+	 * Derives which input rows DateHighZoomInputs should render from the display format.
+	 * Returns <code>"Year"</code>, <code>"YearMonth"</code>, <code>"YearMonthDay"</code>,
+	 * or <code>"MonthDay"</code>.
+	 * @returns {string}
+	 * @private
+	 */
+	DatePicker.prototype._getHighZoomVisibleFields = function() {
+		const aPatternSymbolTypes = this._getFormatter(true)
+			.aFormatArray
+			.map(function(oPatternSymbolSettings) {
+				return oPatternSymbolSettings.type.toLowerCase();
+			});
+		const bDay   = aPatternSymbolTypes.indexOf("day") >= 0;
+		const bMonth = aPatternSymbolTypes.indexOf("month") >= 0 || aPatternSymbolTypes.indexOf("monthstandalone") >= 0;
+		const bYear  = aPatternSymbolTypes.indexOf("year") >= 0;
+
+		if (bDay && bMonth && bYear) { return "YearMonthDay"; }
+		if (bMonth && bYear)         { return "YearMonth"; }
+		if (bDay && bMonth)          { return "MonthDay"; }
+		return "Year";
+	};
+
 	DatePicker.prototype._fillDateRange = function(){
+		if (this._bHighZoom) {
+			this._syncHighZoomInputs();
+			return;
+		}
+
 		var oDate = this.getDateValue();
 
 		if (oDate &&
@@ -1677,6 +1805,25 @@ sap.ui.define([
 			}
 		}
 
+	};
+
+	/**
+	 * Syncs min/max/value and callbacks to DateHighZoomInputs, then validates.
+	 * Called on every popup open and on switch into high-zoom mode.
+	 * @private
+	 */
+	DatePicker.prototype._syncHighZoomInputs = function() {
+		this._oHighZoomInputs.setMinDate(this._oMinDate);
+		this._oHighZoomInputs.setMaxDate(this._oMaxDate);
+		// Prefer dateValue; fall back to parsing the value string so a picker
+		// configured only via value= still shows the correct date in the selects.
+		const oDate = this.getDateValue() || (this.getValue() && this._parseValue(this.getValue(), true)) || null;
+		this._oHighZoomInputs.setDateValue(oDate);
+		this._oHighZoomInputs.syncStartDate();
+		const bValid = this._oHighZoomInputs.validate();
+		if (this._oPopup && this._oPopup.getBeginButton) {
+			this._oPopup.getBeginButton().setEnabled(bValid);
+		}
 	};
 
 	/**
@@ -1771,6 +1918,9 @@ sap.ui.define([
 	};
 
 	DatePicker.prototype._getSelectedDate = function(){
+		if (this._bHighZoom) {
+			return this._oHighZoomInputs.getDateObject();
+		}
 
 		var aSelectedDates = this._getCalendar().getSelectedDates(),
 			oDate;
@@ -1785,11 +1935,19 @@ sap.ui.define([
 
 	//when OK is pressed, select a date and close the popover
 	DatePicker.prototype._handleOKButton = function() {
+		if (this._bHighZoom && this._oHighZoomInputs) {
+			if (!this._oHighZoomInputs.validate()) {
+				return; // keep popup open, errors shown on fields
+			}
+		}
 		this._selectDate();
 	};
 
 	//when Cancel is pressed, close the popover
 	DatePicker.prototype._handleCancelButton = function (){
+		if (this._bHighZoom && this._oHighZoomInputs) {
+			this._oHighZoomInputs.resetValueState();
+		}
 		if (!this.getDateValue()) {
 			this._oPopup.getBeginButton().setEnabled(false);
 		}
@@ -1973,6 +2131,175 @@ sap.ui.define([
 	 * @name sap.m.DatePicker#fireChange
 	 * @function
 	 */
+
+	// ============================================================
+	// High-zoom (≤320px) Year/Month/Day selects
+	// ============================================================
+
+	/**
+	 * Called by DateTimeFieldZoomMixin when the viewport width crosses the 320px boundary.
+	 * @param {boolean} bHighZoom
+	 * @private
+	 */
+	DatePicker.prototype._onZoomChange = function(bHighZoom) {
+		if (bHighZoom === this._bHighZoom) { return; }
+		this._bHighZoom = bHighZoom;
+		if (this.isOpen()) {
+			this._switchPickerContent(bHighZoom);
+		}
+	};
+
+	/**
+	 * Lazily creates and returns the DateHighZoomInputs control.
+	 * @returns {sap.m.DateHighZoomInputs}
+	 * @private
+	 */
+	DatePicker.prototype._getOrCreateHighZoomInputs = function() {
+		if (this._oHighZoomInputs) { return this._oHighZoomInputs; }
+
+		this._oHighZoomInputs = new DateHighZoomInputs(this.getId() + "-hzInputs", {
+			change: this._onHighZoomChange.bind(this)
+		});
+
+		return this._oHighZoomInputs;
+	};
+
+	/**
+	 * Called when DateHighZoomInputs fires its change event.
+	 * Validates the composed date — never auto-closes; user confirms via OK.
+	 * @private
+	 */
+	DatePicker.prototype._onHighZoomChange = function() {
+		const bValid = this._oHighZoomInputs.validate();
+		if (this._oPopup && this._oPopup.getBeginButton) {
+			this._oPopup.getBeginButton().setEnabled(bValid);
+		}
+	};
+
+	/**
+	 * Switches between Calendar and DateHighZoomInputs in the popup.
+	 * @param {boolean} bHighZoom
+	 * @private
+	 */
+	DatePicker.prototype._switchPickerContent = function(bHighZoom) {
+		if (!this._oCalendar || !this._oHighZoomInputs) {
+			return;
+		}
+
+		this._oCalendar.setVisible(!bHighZoom);
+		this._oHighZoomInputs.setVisible(bHighZoom);
+
+		if (this._oPopup) {
+			const bShowFooter = bHighZoom || this.getShowFooter();
+			this._oPopup._getButtonFooter?.().setVisible(bShowFooter);
+		}
+		if (bHighZoom) {
+			this._oHighZoomInputs.setPrimaryCalendarType(this._getEffectiveCalendarType());
+			this._oHighZoomInputs.setSecondaryCalendarType(
+				this._bSecondaryCalendarTypeSet ? this.getSecondaryCalendarType() : null
+			);
+			this._oHighZoomInputs.setProperty("_visibleFields", this._getHighZoomVisibleFields(), true);
+			this._syncHighZoomInputs();
+			this._updateHZCalToggleBtn();
+		} else {
+			if (this._oHighZoomInputs) {
+				this._oHighZoomInputs.switchCalendarType(this._getEffectiveCalendarType() || "Gregorian");
+			}
+			this._fillDateRange();
+			this._updateHZCalToggleBtn();
+		}
+	};
+
+	/**
+	 * Returns whether the Today button should be visible in high-zoom mode.
+	 * Override in subclasses to add extra conditions (e.g. active tab check).
+	 * @returns {boolean}
+	 * @private
+	 */
+	DatePicker.prototype._isHZTodayBtnVisible = function() {
+		return this.getShowCurrentDateButton();
+	};
+
+	/**
+	 * Updates the calendar-type toggle button visibility in the dialog header.
+	 * Shown only when in high-zoom mode AND a secondary calendar type has been set.
+	 * @private
+	 */
+	DatePicker.prototype._updateHZCalToggleBtn = function() {
+		const bToggleVisible = this._bHighZoom && this._bSecondaryCalendarTypeSet;
+		const bTodayVisible  = this._bHighZoom && this._isHZTodayBtnVisible();
+
+		if (this._oHZTodayBtn) {
+			this._oHZTodayBtn.setVisible(bTodayVisible);
+		}
+
+		if (!this._oHZCalToggleBtn) { return; }
+
+		// Build or tear down the custom header when either button changes visibility
+		const bNeedCustomHeader = (bToggleVisible || bTodayVisible) && this._oPopup && Device.system.phone;
+
+		if (bNeedCustomHeader) {
+			if (!this._oPopup.getCustomHeader()) {
+				const aRight = [];
+				if (bTodayVisible)  { aRight.push(this._oHZTodayBtn); }
+				if (bToggleVisible) { aRight.push(this._oHZCalToggleBtn); }
+				this._oPopup.setCustomHeader(new Bar({
+					contentMiddle: [new Title({ text: this._getLabelledText() })],
+					contentRight:  aRight
+				}).addStyleClass("sapMDialogTitle"));
+			} else {
+				const oBar = this._oPopup.getCustomHeader();
+				oBar.removeAllContentRight();
+				if (bTodayVisible)  { oBar.addContentRight(this._oHZTodayBtn); }
+				if (bToggleVisible) { oBar.addContentRight(this._oHZCalToggleBtn); }
+			}
+		} else if (!bNeedCustomHeader && this._oPopup && this._oPopup.getCustomHeader()) {
+			this._oPopup.destroyCustomHeader();
+			this._oPopup.setTitle(this._getLabelledText());
+		}
+
+		this._oHZCalToggleBtn.setVisible(bToggleVisible);
+
+		if (bToggleVisible) {
+			const sPrimary = this._getEffectiveCalendarType() || "Gregorian";
+			const sActive = this._oHighZoomInputs.getProperty("_activeCalendarType") || sPrimary;
+			const sOther = (sActive === sPrimary)
+				? this.getSecondaryCalendarType()
+				: sPrimary;
+			this._oHZCalToggleBtn.setTooltip(
+				oResourceBundle.getText("DATEPICKER_HZ_SWITCH_CAL_TYPE", [sOther])
+			);
+		}
+	};
+
+	/**
+	 * Handles press on the Today button in high-zoom mode.
+	 * @private
+	 */
+	DatePicker.prototype._onHZTodayPress = function() {
+		if (!this._oHighZoomInputs) { return; }
+		const oToday = UI5Date.getInstance();
+		this._oHighZoomInputs.setDateValue(oToday);
+		this._oHighZoomInputs.syncStartDate();
+		this._onHighZoomChange();
+	};
+
+	/**
+	 * Handles press on the calendar-type toggle button.
+	 * @private
+	 */
+	DatePicker.prototype._onHZCalTogglePress = function() {
+		if (!this._oHighZoomInputs) { return; }
+
+		const sPrimary = this._getEffectiveCalendarType() || "Gregorian";
+		const sActive = this._oHighZoomInputs.getProperty("_activeCalendarType") || sPrimary;
+		const sTarget = (sActive === sPrimary)
+			? this.getSecondaryCalendarType()
+			: sPrimary;
+
+		this._oHighZoomInputs.switchCalendarType(sTarget);
+		this._updateHZCalToggleBtn();
+	};
 
 	return DatePicker;
 

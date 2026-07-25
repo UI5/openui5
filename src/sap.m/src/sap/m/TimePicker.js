@@ -7,8 +7,6 @@ sap.ui.define([
 	'./InputBase',
 	'./DateTimeField',
 	'./MaskInputRule',
-	'./Toolbar',
-	'./ToolbarSpacer',
 	'./Popover',
 	'./ResponsivePopover',
 	"sap/base/i18n/Formatting",
@@ -38,8 +36,6 @@ function(
 	InputBase,
 	DateTimeField,
 	MaskInputRule,
-	Toolbar,
-	ToolbarSpacer,
 	Popover,
 	ResponsivePopover,
 	Formatting,
@@ -480,6 +476,9 @@ function(
 
 			this._sMinutes = "00"; //needed for the support2400 scenario to store the minutes when changing hour to 24 and back
 			this._sSeconds = "00"; //needed for the support2400 scenario to store the seconds when changing hour to 24 and back
+			this._bShowInputs = false;
+
+			this._startZoomWatch();
 		};
 
 		/**
@@ -494,7 +493,7 @@ function(
 				sAccessibleName = this._getPickerAccessibleName();
 
 			if (oValueHelpIcon) {
-				oValueHelpIcon.setProperty("visible", this.getEditable());
+				oValueHelpIcon.setProperty("visible", this.getEditable() && !this._isHighZoom());
 			}
 
 			// update invisible label
@@ -502,8 +501,8 @@ function(
 				this._invisibleLabelText.setText(sAccessibleName);
 			}
 
-			// update title of the dialog on mobile devices
-			if (Device.system.phone) {
+			// update title of the dialog on mobile devices and at high zoom
+			if (Device.system.phone || this._bShowInputs) {
 				const oPicker = this._getPicker();
 				oPicker?.setTitle(sAccessibleName);
 			}
@@ -525,6 +524,15 @@ function(
 			}
 
 			MaskEnabler.exit.apply(this, arguments);
+
+			this._stopZoomWatch();
+
+			if (this._oInputsPart) {
+				this._oInputsPart.destroy();
+				this._oInputsPart = null;
+			}
+
+			this._oClocksPart = null; // ref is owned by _picker aggregation; just clear the cache
 
 			this._removePickerEvents();
 
@@ -626,9 +634,11 @@ function(
 				return;
 			}
 			if (!bIconClicked) {
-				this.toggleNumericOpen(bOpen);
+				if (!this._isHighZoom()) {
+					this.toggleNumericOpen(bOpen);
+					this._openByFocusIn = true;
+				}
 			}
-			this._openByFocusIn = true;
 		};
 
 		var _maskEnablerOnFocusOut = TimePicker.prototype.onfocusout;
@@ -654,19 +664,29 @@ function(
 		 * @private
 		 */
 		 TimePicker.prototype.onclick = function (oEvent) {
-			var bIconClicked = this._isIconClicked(oEvent),
-				oPicker = this._getNumericPicker(),
-				bOpen = oPicker && oPicker.isOpen();
+			const bIconClicked = this._isIconClicked(oEvent);
 
 			if (this._openByFocusIn) {
 				this._openByFocusIn = false;
 				return;
 			}
+
+			if (this._isHighZoom()) {
+				// Icon is hidden at high zoom — clicking anywhere on the input opens the clock picker
+				if (!bIconClicked) {
+					const oPicker = this._getPicker();
+					this.toggleOpen(oPicker && oPicker.isOpen());
+				}
+				this._openByClick = true;
+				return;
+			}
+
 			if (!this._isMobileDevice()) {
 				return;
 			}
 			if (!bIconClicked) {
-				this.toggleNumericOpen(bOpen);
+				const oPicker = this._getNumericPicker();
+				this.toggleNumericOpen(oPicker && oPicker.isOpen());
 			}
 			this._openByClick = true;
 		};
@@ -702,29 +722,73 @@ function(
 		 */
 		TimePicker.prototype.onBeforeOpen = function() {
 			/* Set the timevalues of the picker here to prevent user from seeing it */
-			var oClocks = this._getClocks(),
-				oDateValue = this.getDateValue(),
-				sFormat = this._getFormatter(true).oFormatOptions.pattern,
+			const oDateValue = this.getDateValue();
+			const sFormat = this._getFormatter(true).oFormatOptions.pattern,
 				iIndexOfHH = sFormat.indexOf("HH"),
 				iIndexOfH = sFormat.indexOf("H"),
-				sInputValue = TimePickerInternals._isHoursValue24(this._$input.val(), iIndexOfHH, iIndexOfH) ?
+				bIs24 = TimePickerInternals._isHoursValue24(this._$input.val(), iIndexOfHH, iIndexOfH),
+				sInputValue = bIs24 ?
 					TimePickerInternals._replace24HoursWithZero(this._$input.val(), iIndexOfHH, iIndexOfH) : this._$input.val();
 
-			var oCurrentDateValue = this._getFormatter(true).parse(sInputValue) || oDateValue;
-			if (oCurrentDateValue) {
-				var sDisplayFormattedValue = this._getFormatter(true).format(oCurrentDateValue);
-				oClocks.setValue(sDisplayFormattedValue);
+			const oCurrentDateValue = this._getFormatter(true).parse(sInputValue) || oDateValue;
+			this._preparePickerForOpen(oCurrentDateValue, oDateValue, bIs24);
+
+			/* Mark input as active */
+			this.$().addClass(InputBase.ICON_PRESSED_CSS_CLASS);
+		};
+
+		/**
+		 * Switches content to high-zoom inputs or clocks mode and syncs time values.
+		 * Extracted from onBeforeOpen for readability.
+		 * @param {Date} oCurrentDateValue  Parsed value from the input field
+		 * @param {Date} oDateValue         Raw dateValue property
+		 * @param {boolean} bIs24           Whether the input uses 24-hour notation
+		 * @private
+		 */
+		TimePicker.prototype._preparePickerForOpen = function(oCurrentDateValue, oDateValue, bIs24) {
+			// Decide which content to show: Inputs at high zoom, Clocks otherwise
+			const bShowInputs = this._isHighZoom();
+			if (bShowInputs !== this._bShowInputs) {
+				this._switchPickerContent(bShowInputs);
+			} else if (bShowInputs) {
+				// First open already in high-zoom: picker was created with showHeader:false,
+				// so we set the title here once without a full content switch.
+				const oPicker = this._getPicker();
+				if (oPicker && !oPicker.getShowHeader()) {
+					oPicker.setShowHeader(true);
+					oPicker.setTitle(this._getPickerAccessibleName());
+				}
+			}
+
+			// On a phone at high zoom, replace the Dialog's open animation with a synchronous
+			// version so that onAfterOpen (and the focus() call inside it) fires within the
+			// original user-gesture call stack.  Without this, the setTimeout in _openAnimation
+			// breaks the gesture context and the virtual keyboard never opens.
+			if (bShowInputs && Device.system.phone) {
+				const oDialog = this._getPicker() && this._getPicker().getAggregation("_popup");
+				if (oDialog && oDialog.oPopup && oDialog.oPopup._animations) {
+					if (!this._fnOrigPickerOpenAnim) {
+						this._fnOrigPickerOpenAnim = oDialog.oPopup._animations.open;
+					}
+					oDialog.oPopup._animations.open = function($Ref, _iDuration, fnOpened) {
+						$Ref.addClass("sapMDialogOpen");
+						fnOpened();
+					};
+				}
 			}
 
 			if (this._shouldSetInitialFocusedDateValue()) {
 				oDateValue = this.getInitialFocusedDateValue() || oDateValue;
 			}
 
-			oClocks._setTimeValues(oDateValue, TimePickerInternals._isHoursValue24(this._$input.val(), iIndexOfHH, iIndexOfH));
-			oClocks.prepareForOpen();
-
-			/* Mark input as active */
-			this.$().addClass(InputBase.ICON_PRESSED_CSS_CLASS);
+			const oControl = bShowInputs ? this._getOrCreateInputs() : this._getClocks();
+			if (oCurrentDateValue) {
+				oControl.setValue(this._getFormatter(true).format(oCurrentDateValue));
+			}
+			oControl._setTimeValues(oDateValue, bIs24);
+			if (!bShowInputs) {
+				this._getClocks().prepareForOpen();
+			}
 		};
 
 		/**
@@ -734,7 +798,23 @@ function(
 		 * @public
 		 */
 		TimePicker.prototype.onAfterOpen = function() {
+			// Restore original Dialog open animation (was replaced in onBeforeOpen for gesture context)
+			if (this._fnOrigPickerOpenAnim) {
+				const oDialog = this._getPicker() && this._getPicker().getAggregation("_popup");
+				if (oDialog && oDialog.oPopup && oDialog.oPopup._animations) {
+					oDialog.oPopup._animations.open = this._fnOrigPickerOpenAnim;
+					this._fnOrigPickerOpenAnim = null;
+				}
+			}
 			this.fireAfterValueHelpOpen();
+			if (this._bShowInputs && this._oInputsPart) {
+				var aInputs = this._oInputsPart.getAggregation("_inputs");
+				var oFocusDom = aInputs && aInputs[0] && aInputs[0].getFocusDomRef();
+				if (oFocusDom) {
+					oFocusDom.focus();
+					oFocusDom.select();
+				}
+			}
 		};
 
 		/**
@@ -756,6 +836,76 @@ function(
 		 */
 		 TimePicker.prototype._isMobileDevice = function() {
 			return !Device.system.desktop && (Device.system.phone || Device.system.tablet);
+		};
+
+		/**
+		 * Called by DateTimeFieldZoomMixin._startZoomWatch on every viewport resize.
+		 * @param {boolean} bHighZoom
+		 * @private
+		 */
+		TimePicker.prototype._onZoomChange = function(bHighZoom) {
+			const oPicker = this._getPicker();
+			if (oPicker && oPicker.isOpen() && bHighZoom !== this._bShowInputs) {
+				this._switchPickerContent(bHighZoom);
+			}
+		};
+
+		/**
+		 * Lazily creates and caches the TimePickerInputs control.
+		 * @returns {sap.m.TimePickerInputs}
+		 * @private
+		 */
+		TimePicker.prototype._getOrCreateInputs = function() {
+			if (!this._oInputsPart) {
+				const sFormat = this._getDisplayFormatPattern(),
+					sLocaleId = this._getLocale().getLanguage();
+				this._oInputsPart = new TimePickerInputs(this.getId() + "-switchInputs", {
+					support2400: this._getSupport2400(),
+					displayFormat: sFormat,
+					valueFormat: sFormat,
+					localeId: sLocaleId,
+					minutesStep: this.getMinutesStep(),
+					secondsStep: this.getSecondsStep(),
+					showCurrentTimeButton: this.getShowCurrentTimeButton()
+				});
+			}
+			return this._oInputsPart;
+		};
+
+		/**
+		 * Swaps the active content control in _picker between TimePickerClocks and TimePickerInputs.
+		 * Transfers the current time value to the newly shown control.
+		 * @param {boolean} bShowInputs - true to show TimePickerInputs, false for TimePickerClocks
+		 * @private
+		 */
+		TimePicker.prototype._switchPickerContent = function(bShowInputs) {
+			const oPicker = this._getPicker();
+			if (!oPicker) { return; }
+
+			const oClocks = this._getClocks(),
+				oInputs = this._getOrCreateInputs(),
+				oRemove = bShowInputs ? oClocks : oInputs,
+				oInsert = bShowInputs ? oInputs : oClocks;
+
+			// Sync current time value to the incoming control
+			const oDate = oRemove.getTimeValues ? oRemove.getTimeValues() : null;
+			if (oDate) {
+				oInsert._setTimeValues(oDate, false);
+			}
+
+			// Show the picker title (labelled by the associated form label) at high zoom
+			oPicker.setShowHeader(bShowInputs);
+			if (bShowInputs) {
+				oPicker.setTitle(this._getPickerAccessibleName());
+			}
+
+			oPicker.removeContent(oRemove);
+			oPicker.insertContent(oInsert, 1);
+			if (oPicker._oControl) {
+				oPicker._oControl.invalidate();
+			}
+
+			this._bShowInputs = bShowInputs;
 		};
 
 		/**
@@ -931,6 +1081,9 @@ function(
 			if (oInputs) {
 				oInputs.setMinutesStep(step);
 			}
+			if (this._oInputsPart) {
+				this._oInputsPart.setMinutesStep(step);
+			}
 			return this.setProperty("minutesStep", step, true);
 		};
 
@@ -952,6 +1105,9 @@ function(
 			}
 			if (oInputs) {
 				oInputs.setSecondsStep(step);
+			}
+			if (this._oInputsPart) {
+				this._oInputsPart.setSecondsStep(step);
 			}
 			return this.setProperty("secondsStep", step, true);
 		};
@@ -1016,6 +1172,9 @@ function(
 			if (oInputs) {
 				oInputs.setSupport2400(bSupport2400);
 			}
+			if (this._oInputsPart) {
+				this._oInputsPart.setSupport2400(bSupport2400);
+			}
 
 			this._initMask();
 			return this;
@@ -1052,6 +1211,11 @@ function(
 			if (oInputs) {
 				oInputs.setValueFormat(sDisplayFormat);
 				oInputs.setDisplayFormat(sDisplayFormat);
+			}
+
+			if (this._oInputsPart) {
+				this._oInputsPart.setValueFormat(sDisplayFormat);
+				this._oInputsPart.setDisplayFormat(sDisplayFormat);
 			}
 
 			var oDateValue = this.getDateValue();
@@ -1207,6 +1371,9 @@ function(
 			if (oInputs) {
 				oInputs.setLocaleId(sLocaleId);
 			}
+			if (this._oInputsPart) {
+				this._oInputsPart.setLocaleId(sLocaleId);
+			}
 
 			return this;
 		};
@@ -1216,7 +1383,10 @@ function(
 				oNumericPicker = this._getNumericPicker();
 
 			oClocks && oClocks.setShowCurrentTimeButton(bShow);
-			oNumericPicker && oNumericPicker.getContent()[0].setShowCurrentTimeButton(bShow);
+			oNumericPicker && oNumericPicker.getContent()[1].setShowCurrentTimeButton(bShow);
+			if (this._oInputsPart) {
+				this._oInputsPart.setShowCurrentTimeButton(bShow);
+			}
 
 			return this.setProperty("showCurrentTimeButton", bShow);
 		};
@@ -1419,7 +1589,12 @@ function(
 				}
 			} else {
 				if (iKC === KeyCodes.ENTER || iKC === KeyCodes.SPACE) {
-					this._openNumericPicker();
+					if (this._isHighZoom()) {
+						const oPicker = this._getPicker();
+						this.toggleOpen(oPicker && oPicker.isOpen());
+					} else {
+						this._openNumericPicker();
+					}
 				}
 			}
 		};
@@ -1500,8 +1675,8 @@ function(
 			}
 
 			oPicker.openBy(oDomRef);
-			oPicker.getContent()[0]._sMinutes = this._sMinutes;
-			oPicker.getContent()[0]._sSeconds = this._sSeconds;
+			oPicker.getContent()[1]._sMinutes = this._sMinutes;
+			oPicker.getContent()[1]._sSeconds = this._sSeconds;
 
 			return oPicker;
 		};
@@ -1516,8 +1691,8 @@ function(
 			var oPicker = this._getPicker();
 
 			if (oPicker) {
-				this._sMinutes = oPicker.getContent()[0]._sMinutes;
-				this._sSeconds = oPicker.getContent()[0]._sSeconds;
+				this._sMinutes = oPicker.getContent()[1]._sMinutes;
+				this._sSeconds = oPicker.getContent()[1]._sSeconds;
 				oPicker.close();
 			} else {
 				Log.warning("There is no picker to close.");
@@ -1542,8 +1717,8 @@ function(
 			}
 
 			oPicker.open();
-			oPicker.getContent()[0]._sMinutes = this._sMinutes;
-			oPicker.getContent()[0]._sSeconds = this._sSeconds;
+			oPicker.getContent()[1]._sMinutes = this._sMinutes;
+			oPicker.getContent()[1]._sSeconds = this._sSeconds;
 
 			return oPicker;
 		};
@@ -1558,8 +1733,8 @@ function(
 			var oPicker = this._getNumericPicker();
 
 			if (oPicker) {
-				this._sMinutes = oPicker.getContent()[0]._sMinutes;
-				this._sSeconds = oPicker.getContent()[0]._sSeconds;
+				this._sMinutes = oPicker.getContent()[1]._sMinutes;
+				this._sSeconds = oPicker.getContent()[1]._sSeconds;
 				oPicker.close();
 				this.getDomRef("inner").select();
 			} else {
@@ -1601,6 +1776,7 @@ function(
 				showCurrentTimeButton: this.getShowCurrentTimeButton()
 			});
 			oClocks._setAcceptCallback(this._handleOkPress.bind(this));
+			this._oClocksPart = oClocks; // cache reference — stays valid even after content swap
 
 			var oHeader = this._getValueStateHeader();
 			oPicker = new ResponsivePopover(that.getId() + "-RP", {
@@ -1683,24 +1859,18 @@ function(
 		 TimePicker.prototype._createNumericPicker = function(sFormat) {
 			var that = this,
 				oPicker,
-				sOKButtonText,
-				sCancelButtonText,
 				sLocaleId = this._getLocale().getLanguage(),
 				oHeader = this._getValueStateHeader();
 
-			sOKButtonText = this._oResourceBundle.getText("TIMEPICKER_SET");
-			sCancelButtonText = this._oResourceBundle.getText("TIMEPICKER_CANCEL");
-
 			oPicker = new Popover(that.getId() + "-NP", {
 				showArrow: false,
-				showHeader: false,
+				showHeader: true,
+				title: this._getPickerAccessibleName(),
 				horizontalScrolling: false,
 				verticalScrolling: false,
 				placement: PlacementType.VerticalPreferredBottom,
-				customHeader: [
-					oHeader
-				],
-				content: [
+					content: [
+					oHeader,
 					new TimePickerInputs(this.getId() + "-inputs", {
 						support2400: this._getSupport2400(),
 						displayFormat: sFormat,
@@ -1711,32 +1881,32 @@ function(
 						showCurrentTimeButton: this.getShowCurrentTimeButton()
 					})
 				],
-				footer: [
-					new Toolbar({
-						content: [
-							new ToolbarSpacer(),
-							new Button(this.getId() + "-NumericOK", {
-								text: sOKButtonText,
-								type: ButtonType.Emphasized,
-								press: this._handleNumericOkPress.bind(this)
-							}),
-							new Button(this.getId() + "-NumericCancel", {
-								text: sCancelButtonText,
-								press: this._handleNumericCancelPress.bind(this)
-							})
-						]
-					})
-				],
 
 				ariaLabelledBy: this._getInvisibleLabelText().getId(),
 				beforeOpen: this.onBeforeNumericOpen.bind(this),
 				afterOpen: function() {
 					this.fireAfterValueHelpOpen();
+					// afterOpen fires synchronously (animation disabled below) — still within
+					// the user-gesture context, so focus() also opens the mobile keyboard.
+					var oInputs = this._getInputs();
+					var aInputs = oInputs && oInputs.getAggregation("_inputs");
+					var oFocusDom = aInputs && aInputs[0] && aInputs[0].getFocusDomRef();
+					if (oFocusDom) {
+						oFocusDom.focus();
+						oFocusDom.select();
+					}
 				}.bind(this),
 				afterClose: function() {
 					this.fireAfterValueHelpClose();
 				}.bind(this)
 			});
+
+			// Disable open/close animation so that _opened fires synchronously within
+			// the user-gesture call chain — required for reliable focus and mobile keyboard.
+			oPicker.oPopup.setDurations(0, 0);
+
+			// Mark the inputs control to render inline OK/Cancel (no footer toolbar on mobile)
+			oPicker.getContent()[1]._bInlineActions = true;
 
 			oPicker.open = function() {
 				return this.openBy(that);
@@ -1804,7 +1974,7 @@ function(
 			if (!oPicker) {
 				return null;
 			}
-			return oPicker.getContent()[1];
+			return this._oClocksPart || null;
 		};
 
 		/**
@@ -1818,22 +1988,23 @@ function(
 			if (!oPicker) {
 				return null;
 			}
-			return oPicker.getContent()[0];
+			return oPicker.getContent()[1];
 		};
 
 		/**
-		 * Handles the press event of the OK button.
 		 *
 		 * @param {jQuery.Event} oEvent  Event object
 		 * @private
 		 */
 		TimePicker.prototype._handleOkPress = function(oEvent) {
-			var oDate = this._getClocks().getTimeValues(),
-				sValue;
+			const bShowInputs = this._bShowInputs,
+				oDate = bShowInputs
+					? this._getOrCreateInputs().getTimeValues()
+					: this._getClocks().getTimeValues();
 
-			this._isClockPicker = true;
-			this._isNumericPicker = false;
-			sValue = this._formatValue(oDate, false, true);
+			this._isClockPicker = !bShowInputs;
+			this._isNumericPicker = false; // _oInputsPart is shown in _picker, not _numPicker
+			const sValue = this._formatValue(oDate, false, true);
 
 			this.updateDomValue(sValue);
 			this._handleInputChange();
@@ -1947,10 +2118,16 @@ function(
 				}
 			}
 
-			if ((this._isNumericPicker && this.isNumericOpen() && this._getInputs() && this._getInputs()._getHoursInput() && this._getInputs()._getHoursInput().getValue() === "24") ||
-				(this._isClockPicker && this.isOpen() && this._getClocks() && this._getClocks()._getHoursClock() && this._getClocks()._getHoursClock().getSelectedValue() === 24) ||
-				(this._sLastChangeValue && this._sLastChangeValue.indexOf("24") > -1 && !bNotReplace00with24)) {
-					bFieldValueIs24 = true;
+			var oNumericInputs = this._isNumericPicker && this.isNumericOpen() && this._getInputs(),
+				oZoomInputs = this._bShowInputs && this.isOpen() && this._oInputsPart,
+				oClocksControl = this._isClockPicker && this.isOpen() && this._getClocks(),
+				bNumericIs24 = !!(oNumericInputs && oNumericInputs._getHoursInput() && oNumericInputs._getHoursInput().getValue() === "24"),
+				bZoomIs24 = !!(oZoomInputs && oZoomInputs._getHoursInput() && oZoomInputs._getHoursInput().getValue() === "24"),
+				bClocksIs24 = !!(oClocksControl && oClocksControl._getHoursClock() && oClocksControl._getHoursClock().getSelectedValue() === 24),
+				bLastChangeIs24 = !!(this._sLastChangeValue && this._sLastChangeValue.indexOf("24") > -1 && !bNotReplace00with24);
+
+			if (bNumericIs24 || bZoomIs24 || bClocksIs24 || bLastChangeIs24) {
+				bFieldValueIs24 = true;
 			}
 
 			//2400 scenario - be sure that the correct value will be set in all cases - when binding,

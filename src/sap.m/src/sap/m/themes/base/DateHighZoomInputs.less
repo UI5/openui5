@@ -1,0 +1,61 @@
+/* ===================================== */
+/* CSS for control sap.m/DateHighZoomInputs */
+/* Base theme                            */
+/* ===================================== */
+
+.sapMDPHZInputs {
+	overflow-y: auto;
+	padding-bottom: 4rem; /* room for the popup footer buttons */
+	box-sizing: border-box;
+}
+
+.sapMDPHZContainer {
+	padding: 0.5rem;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.sapMDPHZRow {
+	padding: 0.375rem 0;
+	width: 100%;
+
+	.sapMLabel {
+		display: block;
+		margin-bottom: 0.25rem;
+	}
+
+	.sapMSlt {
+		width: 100%;
+		box-sizing: border-box;
+	}
+}
+
+/* Range mode — two groups (From / To) stacked vertically */
+
+.sapMDPHZRange .sapMDPHZContainer {
+	padding: 0;
+}
+
+.sapMDPHZRange {
+	overflow-y: auto;
+	padding-bottom: 5rem;
+	box-sizing: border-box;
+}
+
+.sapMDPHZRangeGroup {
+	padding: 0.5rem;
+	border-bottom: 1px solid var(--sapList_BorderColor);
+
+	&:last-child {
+		border-bottom: none;
+	}
+}
+
+.sapMDPHZRangeGroupLabel {
+	font-size: @sapMFontSmallSize;
+	font-weight: bold;
+	color: var(--sapContent_LabelColor);
+	margin-bottom: 0.25rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}

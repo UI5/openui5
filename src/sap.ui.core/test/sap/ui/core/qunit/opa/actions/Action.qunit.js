@@ -110,4 +110,22 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("_tryOrSimulateFocusin should update document.activeElement to the target element", async function (assert) {
+		var oAction = new Action();
+		var async = assert.async();
+		var oControl = this.oMyControl;
+		var oDomRef = oAction.$(oControl)[0];
+
+		oDomRef.blur();
+		await nextUIUpdate();
+
+		oAction._tryOrSimulateFocusin(oAction.$(oControl), oControl);
+
+		setTimeout(function () {
+			assert.strictEqual(document.activeElement, oDomRef,
+				"document.activeElement should point to the target element after _tryOrSimulateFocusin");
+			async();
+		}, 0);
+	});
+
 });

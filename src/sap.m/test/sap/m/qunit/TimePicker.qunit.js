@@ -33,6 +33,7 @@ sap.ui.define([
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/m/Link",
 	"sap/m/FormattedText",
+	"sap/m/TimePickerInputs",
 	// provides jQuery.fn.cursorPos
 	"sap/ui/dom/jquery/cursorPos"
 ], function(
@@ -68,7 +69,8 @@ sap.ui.define([
 	Element,
 	nextUIUpdate,
 	Link,
-	FormattedText
+	FormattedText,
+	TimePickerInputs
 ) {
 	"use strict";
 
@@ -3921,4 +3923,272 @@ sap.ui.define([
 			qutils.triggerKeypress($TimePicker, sChar);
 		}
 	}
+
+	// =========================================================
+	// Zoom support
+	// =========================================================
+
+	function stubViewportWidth(oSandbox, iWidth) {
+		// visualViewport may not exist in the test environment — stub window.innerWidth instead
+		if (window.visualViewport) {
+			oSandbox.stub(window.visualViewport, "width").get(function() { return iWidth; });
+		} else {
+			oSandbox.stub(window, "innerWidth").get(function() { return iWidth; });
+		}
+	}
+
+	QUnit.module("Zoom support", {
+		beforeEach: async function() {
+			this.oTP = new TimePicker({
+				value: "14:30:00",
+				valueFormat: "HH:mm:ss",
+				displayFormat: "HH:mm:ss"
+			});
+			this.oTP.placeAt("qunit-fixture");
+			await nextUIUpdate();
+			this.oSandbox = sinon.createSandbox();
+		},
+		afterEach: function() {
+			this.oSandbox.restore();
+			this.oTP.destroy();
+			this.oTP = null;
+		}
+	});
+
+	QUnit.test("_isHighZoom returns false at normal viewport width", function(assert) {
+		stubViewportWidth(this.oSandbox, 1280);
+		assert.strictEqual(this.oTP._isHighZoom(), false, "not high zoom at 1280 px");
+	});
+
+	QUnit.test("_isHighZoom returns true at 320px viewport width", function(assert) {
+		stubViewportWidth(this.oSandbox, 320);
+		assert.strictEqual(this.oTP._isHighZoom(), true, "high zoom at exactly 320 px");
+	});
+
+	QUnit.test("_isHighZoom returns true below 320px", function(assert) {
+		stubViewportWidth(this.oSandbox, 200);
+		assert.strictEqual(this.oTP._isHighZoom(), true, "high zoom below 320 px");
+	});
+
+	QUnit.test("_isHighZoom returns false above 320px", function(assert) {
+		stubViewportWidth(this.oSandbox, 321);
+		assert.strictEqual(this.oTP._isHighZoom(), false, "not high zoom above 320 px");
+	});
+
+	QUnit.test("value-help icon is hidden at high zoom", async function(assert) {
+		stubViewportWidth(this.oSandbox, 320);
+		this.oTP.invalidate();
+		await nextUIUpdate();
+		var oIcon = this.oTP._getValueHelpIcon();
+		assert.strictEqual(oIcon.getVisible(), false, "icon is hidden at high zoom");
+	});
+
+	QUnit.test("value-help icon is visible at normal zoom", async function(assert) {
+		stubViewportWidth(this.oSandbox, 1280);
+		this.oTP.invalidate();
+		await nextUIUpdate();
+		var oIcon = this.oTP._getValueHelpIcon();
+		assert.strictEqual(oIcon.getVisible(), true, "icon is visible at normal zoom");
+	});
+
+	QUnit.test("_getOrCreateInputs returns a TimePickerInputs instance", function(assert) {
+		var oInputs = this.oTP._getOrCreateInputs();
+		assert.ok(oInputs.isA("sap.m.TimePickerInputs"), "returns TimePickerInputs");
+	});
+
+	QUnit.test("_getOrCreateInputs returns the same instance on repeated calls", function(assert) {
+		var oFirst = this.oTP._getOrCreateInputs();
+		var oSecond = this.oTP._getOrCreateInputs();
+		assert.strictEqual(oFirst, oSecond, "singleton — same instance returned");
+	});
+
+	QUnit.test("_getOrCreateInputs inherits format and steps from TimePicker", function(assert) {
+		var oTP = new TimePicker({
+			displayFormat: "HH:mm",
+			minutesStep: 5,
+			secondsStep: 10
+		});
+		var oInputs = oTP._getOrCreateInputs();
+		assert.strictEqual(oInputs.getDisplayFormat(), "HH:mm", "displayFormat propagated");
+		assert.strictEqual(oInputs.getMinutesStep(), 5, "minutesStep propagated");
+		assert.strictEqual(oInputs.getSecondsStep(), 10, "secondsStep propagated");
+		oTP.destroy();
+	});
+
+	QUnit.test("_switchPickerContent inserts TimePickerInputs at content[1] when bShowInputs=true", function(assert) {
+		// Open picker first so it is created
+		this.oTP.toggleOpen(false);
+		this.oTP._switchPickerContent(true);
+		var oPicker = this.oTP._getPicker();
+		assert.ok(oPicker.getContent()[1].isA("sap.m.TimePickerInputs"),
+			"content[1] is TimePickerInputs after switch to inputs");
+		this.oTP._closePicker();
+	});
+
+	QUnit.test("_switchPickerContent restores TimePickerClocks at content[1] when bShowInputs=false", function(assert) {
+		this.oTP.toggleOpen(false);
+		this.oTP._switchPickerContent(true);
+		this.oTP._switchPickerContent(false);
+		var oPicker = this.oTP._getPicker();
+		assert.ok(oPicker.getContent()[1].isA("sap.m.TimePickerClocks"),
+			"content[1] is TimePickerClocks after switch back");
+		this.oTP._closePicker();
+	});
+
+	QUnit.test("_switchPickerContent updates _bShowInputs flag", function(assert) {
+		this.oTP.toggleOpen(false);
+		assert.strictEqual(this.oTP._bShowInputs, false, "initially false");
+		this.oTP._switchPickerContent(true);
+		assert.strictEqual(this.oTP._bShowInputs, true, "true after switch to inputs");
+		this.oTP._switchPickerContent(false);
+		assert.strictEqual(this.oTP._bShowInputs, false, "false after switch back");
+		this.oTP._closePicker();
+	});
+
+	QUnit.test("_switchPickerContent enables showHeader and sets title when switching to inputs", function(assert) {
+		this.oTP.toggleOpen(false);
+		this.oTP._switchPickerContent(true);
+		var oPicker = this.oTP._getPicker();
+		assert.strictEqual(oPicker.getShowHeader(), true, "showHeader enabled");
+		assert.ok(oPicker.getTitle().length > 0, "title is non-empty");
+		this.oTP._closePicker();
+	});
+
+	QUnit.test("_switchPickerContent disables showHeader when switching back to clocks", function(assert) {
+		this.oTP.toggleOpen(false);
+		this.oTP._switchPickerContent(true);
+		this.oTP._switchPickerContent(false);
+		var oPicker = this.oTP._getPicker();
+		assert.strictEqual(oPicker.getShowHeader(), false, "showHeader disabled after switch back");
+		this.oTP._closePicker();
+	});
+
+	QUnit.test("_switchPickerContent transfers time value to incoming control", function(assert) {
+		this.oTP.setValue("10:20:30");
+		this.oTP.toggleOpen(false);
+		// Set a known time on clocks then switch to inputs
+		var oClocks = this.oTP._getClocks();
+		oClocks._setTimeValues(UI5Date.getInstance(2000, 0, 1, 10, 20, 30), false);
+		this.oTP._switchPickerContent(true);
+		var oInputs = this.oTP._getOrCreateInputs();
+		var oDate = oInputs.getTimeValues();
+		assert.strictEqual(oDate.getHours(), 10, "hours transferred");
+		assert.strictEqual(oDate.getMinutes(), 20, "minutes transferred");
+		this.oTP._closePicker();
+	});
+
+	QUnit.test("setMinutesStep propagates to _oInputsPart after creation", function(assert) {
+		// Create _oInputsPart first
+		this.oTP._getOrCreateInputs();
+		this.oTP.setMinutesStep(15);
+		assert.strictEqual(this.oTP._oInputsPart.getMinutesStep(), 15,
+			"minutesStep propagated to zoom inputs");
+	});
+
+	QUnit.test("setSecondsStep propagates to _oInputsPart after creation", function(assert) {
+		this.oTP._getOrCreateInputs();
+		this.oTP.setSecondsStep(10);
+		assert.strictEqual(this.oTP._oInputsPart.getSecondsStep(), 10,
+			"secondsStep propagated to zoom inputs");
+	});
+
+	QUnit.test("setShowCurrentTimeButton propagates to _oInputsPart after creation", function(assert) {
+		this.oTP._getOrCreateInputs();
+		this.oTP.setShowCurrentTimeButton(true);
+		assert.strictEqual(this.oTP._oInputsPart.getShowCurrentTimeButton(), true,
+			"showCurrentTimeButton propagated to zoom inputs");
+	});
+
+	QUnit.test("setDisplayFormat propagates to _oInputsPart after creation", function(assert) {
+		this.oTP._getOrCreateInputs();
+		this.oTP.setDisplayFormat("HH:mm");
+		assert.strictEqual(this.oTP._oInputsPart.getDisplayFormat(), "HH:mm",
+			"displayFormat propagated to zoom inputs");
+	});
+
+	QUnit.test("setLocaleId propagates to _oInputsPart after creation", function(assert) {
+		this.oTP._getOrCreateInputs();
+		this.oTP.setLocaleId("de_DE");
+		assert.strictEqual(this.oTP._oInputsPart.getLocaleId(), "de_DE",
+			"localeId propagated to zoom inputs");
+	});
+
+	QUnit.test("setSupport2400 propagates to _oInputsPart after creation", function(assert) {
+		this.oTP._getOrCreateInputs();
+		this.oTP.setSupport2400(true);
+		assert.strictEqual(this.oTP._oInputsPart.getSupport2400(), true,
+			"support2400 propagated to zoom inputs");
+	});
+
+	QUnit.test("onkeydown ENTER at high zoom opens clock-picker (toggleOpen), not numeric picker", function(assert) {
+		// _isHighZoom check lives in the mobile-only else-branch — stub _isMobileDevice too
+		var fnOrigMobile = this.oTP._isMobileDevice;
+		this.oTP._isMobileDevice = function() { return true; };
+
+		var fnOrig = this.oTP._isHighZoom;
+		this.oTP._isHighZoom = function() { return true; };
+
+		var bToggleOpenCalled = false;
+		var fnOrigToggle = this.oTP.toggleOpen.bind(this.oTP);
+		this.oTP.toggleOpen = function() { bToggleOpenCalled = true; fnOrigToggle.apply(this, arguments); };
+
+		var bNumericOpenCalled = false;
+		this.oTP._openNumericPicker = function() { bNumericOpenCalled = true; };
+
+		qutils.triggerKeydown(this.oTP.getDomRef(), KeyCodes.ENTER);
+
+		assert.ok(bToggleOpenCalled, "toggleOpen called at high zoom on ENTER");
+		assert.notOk(bNumericOpenCalled, "_openNumericPicker NOT called at high zoom on ENTER");
+
+		// Restore
+		this.oTP._isMobileDevice = fnOrigMobile;
+		this.oTP._isHighZoom = fnOrig;
+		this.oTP.toggleOpen = fnOrigToggle;
+	});
+
+	QUnit.test("onkeydown ENTER at normal zoom opens numeric picker, not clock-picker", function(assert) {
+		// Ensure we simulate mobile (onkeydown else-branch requires _isMobileDevice)
+		var fnOrigMobile = this.oTP._isMobileDevice;
+		this.oTP._isMobileDevice = function() { return true; };
+		this.oTP._isHighZoom = function() { return false; };
+
+		var bNumericOpenCalled = false;
+		this.oTP._openNumericPicker = function() { bNumericOpenCalled = true; };
+
+		var bToggleOpenCalled = false;
+		var fnOrigToggle = this.oTP.toggleOpen.bind(this.oTP);
+		this.oTP.toggleOpen = function() { bToggleOpenCalled = true; fnOrigToggle.apply(this, arguments); };
+
+		qutils.triggerKeydown(this.oTP.getDomRef(), KeyCodes.ENTER);
+
+		assert.ok(bNumericOpenCalled, "_openNumericPicker called at normal zoom on ENTER");
+		assert.notOk(bToggleOpenCalled, "toggleOpen NOT called at normal zoom on ENTER");
+
+		// Restore
+		this.oTP._isMobileDevice = fnOrigMobile;
+		delete this.oTP._isHighZoom; // removes instance override, falls back to mixin
+		this.oTP.toggleOpen = fnOrigToggle;
+	});
+
+	QUnit.test("exit destroys _oInputsPart", function(assert) {
+		var oInputs = this.oTP._getOrCreateInputs();
+		var bDestroyedCalled = false;
+		var fnOrig = oInputs.destroy.bind(oInputs);
+		oInputs.destroy = function() { bDestroyedCalled = true; fnOrig(); };
+		this.oTP.destroy();
+		assert.ok(bDestroyedCalled, "_oInputsPart.destroy() called on exit");
+		// afterEach will call destroy() again — UI5 ignores double-destroy on a destroyed control
+	});
+
+	QUnit.test("_closePicker preserves _sMinutes/_sSeconds via content[1]", function(assert) {
+		this.oTP.toggleOpen(false);
+		// Directly set the property on the time control at [1]
+		var oPicker = this.oTP._getPicker();
+		oPicker.getContent()[1]._sMinutes = "45";
+		oPicker.getContent()[1]._sSeconds = "15";
+		this.oTP._closePicker();
+		assert.strictEqual(this.oTP._sMinutes, "45", "_sMinutes read from content[1]");
+		assert.strictEqual(this.oTP._sSeconds, "15", "_sSeconds read from content[1]");
+	});
+
 });

@@ -10,6 +10,7 @@ sap.ui.define([
 	"sap/base/i18n/date/CalendarType",
 	"sap/base/i18n/date/CalendarWeekNumbering",
 	"sap/base/i18n/date/TimezoneUtils",
+	"sap/base/strings/escapeRegExp",
 	"sap/base/strings/formatMessage",
 	"sap/base/util/deepEqual",
 	"sap/base/util/extend",
@@ -20,8 +21,9 @@ sap.ui.define([
 	"sap/ui/core/date/UI5Date",
 	"sap/ui/core/date/UniversalDate",
 	"sap/ui/core/format/FormatUtils"
-], function(Log, Formatting, Localization, CalendarType, CalendarWeekNumbering, TimezoneUtils, formatMessage,
-		deepEqual, extend, Locale, LocaleData, Supportability, CalendarUtils, UI5Date, UniversalDate, FormatUtils) {
+], function(Log, Formatting, Localization, CalendarType, CalendarWeekNumbering, TimezoneUtils, escapeRegExp,
+		formatMessage, deepEqual, extend, Locale, LocaleData, Supportability, CalendarUtils, UI5Date, UniversalDate,
+		FormatUtils) {
 	"use strict";
 
 	/**
@@ -1414,9 +1416,8 @@ sap.ui.define([
 					bValid = oParseHelper.checkValid(oPart.type, bPartInvalid, oFormat);
 				} else {
 					sPart = oFormat.oLocaleData.getCalendarWeek(oPart.digits === 3 ? "narrow" : "wide");
-					sPart = sPart.replace("{0}", "([0-9]+)");
-					var rWeekNumber = new RegExp(sPart),
-						oResult = rWeekNumber.exec(sValue);
+					const rWeekNumber = new RegExp(sPart.split("{0}").map(escapeRegExp).join("([0-9]+)"));
+					const oResult = rWeekNumber.exec(sValue);
 					if (oResult) {
 						// e.g. for input "CW 01" create pattern "CW ([0-9]+)"
 						// and extract number from "01" part of the input
@@ -3097,7 +3098,8 @@ sap.ui.define([
 		aPatterns = this.oLocaleData.getRelativePatterns(this.aRelativeParseScales, this.oFormatOptions.relativeStyle);
 		for (var i = 0; i < aPatterns.length; i++) {
 			oEntry = aPatterns[i];
-			rPattern = new RegExp("^\\s*" + oEntry.pattern.replace(/\{0\}/, "(\\d+)") + "\\s*$", "i");
+			const sPattern = oEntry.pattern.split("{0}").map(escapeRegExp).join("(\\d+)");
+			rPattern = new RegExp("^\\s*" + sPattern + "\\s*$", "i");
 			oResult = rPattern.exec(sValue);
 			if (oResult) {
 				if (oEntry.value !== undefined) {

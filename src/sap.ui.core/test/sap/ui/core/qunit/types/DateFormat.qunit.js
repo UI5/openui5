@@ -963,6 +963,17 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("relative parsing escape special charaters in pattern, e.g. '.'", function (assert) {
+		const oDateFormat = DateFormat.getDateInstance({relative: true, relativeStyle: "short"}, new Locale("de"));
+
+		// set now to 12.03.2021, 4:30 (GMT+1, Europe/Berlin)
+		this.clock = sinon.useFakeTimers(UI5Date.getInstance("2021-03-12T03:30:00Z").getTime());
+
+		assert.deepEqual(oDateFormat.parse("vor 1 Min."), UI5Date.getInstance(Date.UTC(2021, 2, 12, 3, 29)));
+		assert.deepEqual(oDateFormat.parse("vor 1 Min;"), null);
+	});
+
+	//*********************************************************************************************
 	QUnit.module("'now' for different time zones", {
 		beforeEach: function () {
 			this.clock = sinon.useFakeTimers(UI5Date.getInstance("2022-12-15T09:45:00Z").getTime());
@@ -2062,6 +2073,19 @@ sap.ui.define([
 			});
 			assert.strictEqual(oDateFormat.format(UI5Date.getInstance(2015, 0, 1)), "Calendar Week 01", "week number in Japanese calendar");
 			assert.notOk(isNaN(oDateFormat.parse("Calendar Week 01").getTime()), "Date can be correctly parsed in Japanese calendar 'Calendar Week 01'");
+
+			// The Hungarian narrow calendar-week pattern contains a literal ".": "{0}. NH".
+			// When parsing, that "." must be matched literally and not interpreted as a
+			// regex wildcard (see the escaping in the "w" pattern symbol's parse function).
+			oDateFormat = DateFormat.getDateInstance({
+				pattern: "www"
+			}, new Locale("hu"));
+			const sHuNarrowWeek = oDateFormat.format(UI5Date.getInstance(2015, 0, 1));
+			assert.strictEqual(sHuNarrowWeek, "01. NH", "hungarian narrow calendar week is formatted as '01. NH'");
+			assert.strictEqual(oDateFormat.format(oDateFormat.parse(sHuNarrowWeek)), sHuNarrowWeek,
+				"the formatted hungarian narrow calendar week can be parsed back");
+			assert.strictEqual(oDateFormat.parse("01; NH"), null,
+				"hungarian narrow calendar week with a non-matching separator is rejected");
 		});
 
 		QUnit.test("format and parse weekYear/weekInYear pattern with 2 digits", function (assert) {

@@ -299,3 +299,65 @@ html.sap-desktop {
 		}
 	}
 }
+
+/* ==================== High Zoom (≤320px) mode ==================== */
+
+/* Collapse the popup content to just the switcher row */
+.sapMDateTimePopupCont.sapMDTPHighZoom {
+	display: block;
+	height: auto;
+	min-width: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+html.sap-phone .sapMDateTimePopupCont.sapMDTPHighZoom,
+html.sapUiMedia-Std-Phone .sapMDateTimePopupCont.sapMDTPHighZoom {
+	display: block;
+	height: auto;
+	min-width: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+/* Remove switcher top margin */
+.sapMDateTimePopupCont.sapMDTPHighZoom .sapMTimePickerSwitch {
+	margin-top: 0;
+	padding: 0.5rem 0;
+}
+
+/* Hide calendar, separator, clocks — switcher stays visible */
+.sapMDateTimePopupCont.sapMDTPHighZoom > *:not(.sapMTimePickerSwitch) {
+	display: none;
+}
+
+/* TimePickerInputs in DTP zoom mode — labels above inputs, wrap when narrow */
+.sapMDTPTimeZoomInputs .sapMTPInputWrapper .sapMLabel {
+	display: inline-block;
+}
+
+/* Container is the same element that has sapMTPInputsContainer — use compound selector */
+.sapMDTPTimeZoomInputs.sapMTPInputsContainer {
+	min-width: 0;
+	padding: 0.5rem;
+	flex-wrap: wrap;
+	row-gap: 0.5rem;
+	align-items: flex-end;
+}
+
+.sapMDTPTimeZoomInputs .sapMTPInputsSeparator {
+	height: 2.75rem;
+	line-height: 2.75rem;
+}
+
+.sapMDTPTimeZoomInputs .sapMInputBase {
+	width: min(2.875rem, 22vw);
+	min-width: 0;
+}
+
+/* AM/PM row takes full width so it wraps to its own line */
+.sapMDTPTimeZoomInputs .sapMTPSecondRow {
+	width: 100%;
+	justify-content: center;
+	margin-top: 0.75rem;
+}
