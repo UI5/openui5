@@ -177,7 +177,7 @@ ListItemBaseRenderer.closeItemTag = function(rm, oLI) {
 
 ListItemBaseRenderer.renderTabIndex = function(rm, oLI) {
 	const oList = oLI.getList();
-	if (oList?._skipGroupHeaderFocus() && oLI.isGroupHeader()) {
+	if (oList?.getSkipGroupHeaderFocus() && oLI.isGroupHeader()) {
 		return;
 	}
 	rm.attr("tabindex", "-1");

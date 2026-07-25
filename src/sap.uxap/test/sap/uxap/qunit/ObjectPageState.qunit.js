@@ -44,6 +44,7 @@ function(
 	"use strict";
 
 	const ButtonType = mLib.ButtonType;
+	const BackgroundDesign = mLib.BackgroundDesign;
 
 	/**
 	 * Returns a Promise that resolves after the ObjectPageLayout fires onAfterRenderingDOMReady.
@@ -586,6 +587,34 @@ function(
 
 		oSpy.resetHistory();
 		oSection1.invalidate();
+	});
+
+	QUnit.test("clip-path applied only when title backgroundDesign is Transparent", async function(assert) {
+		const oPage = this.oObjectPage,
+			oHeaderTitle = oPage.getHeaderTitle();
+
+		oPage.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oWrapperElement = oPage._$opWrapper.get(0);
+
+		// initially no transparent background => no clipPath
+		assert.strictEqual(oWrapperElement.style.clipPath, "", "clipPath not set when backgroundDesign is not Transparent");
+		assert.notOk(oPage._bClipPathApplied, "tracking flag is false initially");
+
+		// set Transparent => clipPath applied
+		oHeaderTitle.setBackgroundDesign(BackgroundDesign.Transparent);
+		await nextUIUpdate();
+
+		assert.notStrictEqual(oWrapperElement.style.clipPath, "", "clipPath set when backgroundDesign is Transparent");
+		assert.ok(oPage._bClipPathApplied, "tracking flag is true");
+
+		// revert to Solid => clipPath cleared
+		oHeaderTitle.setBackgroundDesign(BackgroundDesign.Solid);
+		await nextUIUpdate();
+
+		assert.strictEqual(oWrapperElement.style.clipPath, "", "clipPath cleared when backgroundDesign is no longer Transparent");
+		assert.notOk(oPage._bClipPathApplied, "tracking flag is false after revert");
 	});
 
 	QUnit.module("update content size", {

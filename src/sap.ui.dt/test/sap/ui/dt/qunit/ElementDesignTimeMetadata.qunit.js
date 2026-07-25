@@ -329,6 +329,64 @@ sap.ui.define([
 			);
 		});
 
+		QUnit.test("when getName, getAggregationDescription and getAggregationDisplayName are called with missing singular/plural keys", function(assert) {
+			var oElementDesignTimeMetadataWithMissingKeys = new ElementDesignTimeMetadata({
+				data: {
+					name: {
+						plural: "ONLY_PLURAL_NAME"
+					},
+					aggregations: {
+						testAggregation: {
+							childNames: {
+								singular: "ONLY_SINGULAR_CHILD_NAME"
+							},
+							displayName: {
+								plural: "ONLY_PLURAL_DISPLAY_NAME"
+							}
+						}
+					}
+				}
+			});
+			var oFakeElement = {
+				getMetadata: sandbox.stub().returns({
+					getLibraryName: sandbox.stub().returns("fakeLibrary"),
+					getParent: sandbox.stub().returns(undefined)
+				})
+			};
+			var oFakeLibBundle = {
+				getText: sandbox.stub().returnsArg(0), // just return i18n keys
+				hasText: sandbox.stub().returns(false)
+			};
+			sandbox.stub(Lib, "getResourceBundleFor").returns(oFakeLibBundle);
+
+			assert.deepEqual(
+				oElementDesignTimeMetadataWithMissingKeys.getName(oFakeElement),
+				{
+					singular: undefined,
+					plural: "ONLY_PLURAL_NAME"
+				},
+				"then getName returns undefined for the missing singular key without resolving it"
+			);
+			assert.deepEqual(
+				oElementDesignTimeMetadataWithMissingKeys.getAggregationDescription("testAggregation", oFakeElement),
+				{
+					singular: "ONLY_SINGULAR_CHILD_NAME",
+					plural: undefined
+				},
+				"then getAggregationDescription returns undefined for the missing plural key without resolving it"
+			);
+			assert.deepEqual(
+				oElementDesignTimeMetadataWithMissingKeys.getAggregationDisplayName("testAggregation", oFakeElement),
+				{
+					singular: undefined,
+					plural: "ONLY_PLURAL_DISPLAY_NAME"
+				},
+				"then getAggregationDisplayName returns undefined for the missing singular key without resolving it"
+			);
+
+			oElementDesignTimeMetadataWithMissingKeys.destroy();
+		});
+
 		QUnit.test("when getLabel is called with label property available in the DesignTimeMetadata as a function", function(assert) {
 			this.oElementDesignTimeMetadata.getData().getLabel = function(oElement) {
 				return oElement.getId();

@@ -9,17 +9,88 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
+}
 
-	& > span {
-		min-width: 0.5rem;
-		padding: 0 0.125rem;
-		text-align: center;
-		font-family: var(--sapFontFamily);
-		font-size: @sapMFontMediumSize;
-		color: var(--sapTextColor);
-	}
+/* Wraps a single numeric input together with its label */
+.sapMTPInputWrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+/* Visible label above each input — hidden by default, shown only in keypad mode */
+.sapMTPInputWrapper .sapMLabel {
+	display: none;
+	text-align: center;
+	padding-bottom: 0.25rem;
+}
+
+/* Separator between inputs (":") */
+.sapMTPInputsSeparator {
+	min-width: 0.5rem;
+	padding: 0 0.125rem;
+	text-align: center;
+	font-family: var(--sapFontFamily);
+	font-size: @sapMFontMediumSize;
+	color: var(--sapTextColor);
+}
+
+/* AM/PM + Now grouped together so they wrap as one unit */
+.sapMTPSecondRow {
+	display: flex;
+	align-items: center;
 }
 
 .sapMTPNow {
 	margin-left: 0.5rem;
+}
+
+/* ==================== Inline actions layout (mobile numeric picker) ==================== */
+
+/* Container wraps children so the action row gets its own line */
+.sapMTPHasInlineActions {
+	flex-wrap: wrap;
+	align-items: flex-end;
+	min-width: 0;
+	padding: 0.5rem;
+	padding-bottom: 0;
+}
+
+/* Keep inputs at their natural width — prevent flex from stretching them */
+.sapMTPHasInlineActions .sapMInputBase {
+	width: min(2.875rem, 22vw);
+	min-width: 0;
+}
+
+/* Show labels above inputs */
+.sapMTPHasInlineActions .sapMTPInputWrapper .sapMLabel {
+	display: inline-block;
+}
+
+/* Give separator the same height as the input */
+.sapMTPHasInlineActions .sapMTPInputsSeparator {
+	height: 2.75rem;
+	line-height: 2.75rem;
+}
+
+/* AM/PM row takes the full width so it wraps to its own line, centred */
+.sapMTPHasInlineActions .sapMTPSecondRow {
+	width: 100%;
+	justify-content: center;
+	margin-top: 0.75rem;
+}
+
+/* ==================== Inline action row (OK / Cancel) ==================== */
+
+/* Buttons are auto-sized and right-aligned — NOT stretched to dialog width */
+.sapMTPNumericActionRow {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.75rem 0 0;
+	width: 100%;
+	box-sizing: border-box;
+	border-top: 1px solid var(--sapGroup_ContentBorderColor);
+	margin-top: 0.75rem;
 }

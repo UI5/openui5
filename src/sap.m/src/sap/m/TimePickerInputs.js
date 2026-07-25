@@ -9,13 +9,15 @@ sap.ui.define([
 	"./Input",
 	"./InputRenderer",
 	"sap/ui/core/Renderer",
+	"./Label",
 	"./SegmentedButton",
 	"./SegmentedButtonItem",
 	"sap/ui/core/InvisibleText",
 	"sap/ui/events/KeyCodes",
 	"./TimePickerInputsRenderer",
 	"sap/ui/thirdparty/jquery",
-	'sap/ui/core/date/UI5Date'
+	'sap/ui/core/date/UI5Date',
+	"./Button"
 ],
 	function(
 		library,
@@ -24,18 +26,21 @@ sap.ui.define([
 		Input,
 		InputRenderer,
 		Renderer,
+		Label,
 		SegmentedButton,
 		SegmentedButtonItem,
 		InvisibleText,
 		KeyCodes,
 		TimePickerInputsRenderer,
 		jQuery,
-        UI5Date
+		UI5Date,
+		Button
 	) {
 		"use strict";
 
 		var InputType = library.InputType,
 			TextAlign = coreLibrary.TextAlign,
+			ButtonType = library.ButtonType,
 			TYPE_COOLDOWN_DELAY = 1000;
 
 		/**
@@ -67,7 +72,25 @@ sap.ui.define([
 					/**
 					 * Holds the invisible texts for labelling the buttons.
 					 */
-					 _texts: { type: "sap.ui.core.InvisibleText", multiple: true, visibility: "hidden" }
+					_texts: { type: "sap.ui.core.InvisibleText", multiple: true, visibility: "hidden" },
+					/**
+					 * OK button shown in the inline action row (keypad/200%-zoom mode).
+					 */
+					_okButton: { type: "sap.m.Button", multiple: false, visibility: "hidden" },
+					/**
+					 * Cancel button shown in the inline action row (keypad/200%-zoom mode).
+					 */
+					_cancelButton: { type: "sap.m.Button", multiple: false, visibility: "hidden" }
+				},
+				events: {
+					/**
+					 * Fired when the user commits a time edit — via digit / arrow / backspace /
+					 * delete keys or by selecting a different AM/PM. Consumers can use this to
+					 * react to user interaction with the time inputs, since the inner Input
+					 * controls do not fire their own change event (onkeydown is intercepted
+					 * and values are written directly through setValue).
+					 */
+					change: {}
 				}
 			},
 
@@ -102,7 +125,7 @@ sap.ui.define([
 		 *
 		 * @private
 		 */
-		TimePickerInputs.prototype._clickHandler = function(oEvent) {
+		TimePickerInputs.prototype._clickHandler = function() {
 			var aInputs = this.getAggregation("_inputs"),
 				iActiveInput = this._getActiveInput();
 
@@ -132,6 +155,7 @@ sap.ui.define([
 				sBuffer = "",
 				iBuffer,
 				bIs24Hours = false,
+				bChanged = false,
 				oInput,
 				oAmPm;
 
@@ -141,19 +165,29 @@ sap.ui.define([
 				this._resetCooldown(true);
 				this._switchNextInput(true);
 			} else if (iKey === KeyCodes.ENTER) {
-				// Enter - close the popover and accept the selected time
-				oPicker = this.getParent().getParent();
-				oPicker && oPicker._handleNumericOkPress();
+				// Enter - close the popover and accept the selected time.
+				// Walk up to TimePicker regardless of how many wrapper levels the picker adds.
+				oPicker = this.getParent();
+				while (oPicker && !oPicker._handleOkPress) { oPicker = oPicker.getParent(); }
+				if (oPicker) {
+					// _bInlineActions marks the numeric-picker inputs — use the numeric ok path.
+					// Otherwise (_oInputsPart in zoom mode) use the clock-picker ok path.
+					this._bInlineActions ? oPicker._handleNumericOkPress() : oPicker._handleOkPress();
+				}
 			} else if (iKey === KeyCodes.P || iKey === KeyCodes.A) {
 				// AM/PM
 				oEvent.preventDefault();
 				oAmPm = this._getFormatButton();
 				oAmPm && oAmPm.setSelectedKey(iKey === KeyCodes.P ? "pm" : "am");
+				bChanged = !!oAmPm;
 			} else if ((iKey === KeyCodes.ARROW_UP || iKey === KeyCodes.ARROW_DOWN) && !oEvent.altKey && !oEvent.metaKey) {
 				// Arrows up/down increase/decrease currently active input
 				oEvent.preventDefault();
 				oInput = this._getActiveInputObject();
-				oInput && oInput.getEnabled() && this._keyboardUpdateInput(oInput, iKey === KeyCodes.ARROW_UP ? 1 : -1);
+				if (oInput && oInput.getEnabled()) {
+					this._keyboardUpdateInput(oInput, iKey === KeyCodes.ARROW_UP ? 1 : -1);
+					bChanged = true;
+				}
 				if (sActiveIndex === "H") {
 					this._handleHoursChange(oInput.getValue());
 				}
@@ -182,12 +216,14 @@ sap.ui.define([
 						this._inputsProperties[sActiveIndex].value = sValue;
 						this._resetCooldown(true);
 					}.bind(this), 0);
+					bChanged = true;
 				} else {
 					// value is less than clock's max value, so add new entry to the buffer
 					this._kbdBuffer = sBuffer;
 					sValue = this._formatNumberToString(parseInt(this._kbdBuffer), this._inputsProperties[sActiveIndex].prependZero, this._inputsProperties[sActiveIndex].max, "");
 					aInputs[iActiveInput].setValue(sValue);
 					this._inputsProperties[sActiveIndex].value = sValue;
+					bChanged = true;
 					if (this._kbdBuffer.length === 2 || parseInt(this._kbdBuffer + "0") > this._inputsProperties[sActiveIndex].max) {
 						// if buffer length is 2, or buffer value + one more (any) number is greater than clock's max value
 						// there is no place for more entry - just set buffer as a value, and switch to the next clock
@@ -207,6 +243,12 @@ sap.ui.define([
 			} else if (iKey !== KeyCodes.ARROW_LEFT && iKey !== KeyCodes.ARROW_RIGHT && iKey !== KeyCodes.BACKSPACE && iKey !== KeyCodes.DELETE && iKey !== KeyCodes.TAB) {
 				// omit unwanted characters
 				oEvent.preventDefault();
+			} else if (iKey === KeyCodes.BACKSPACE || iKey === KeyCodes.DELETE) {
+				bChanged = true;
+			}
+
+			if (bChanged) {
+				this.fireChange({});
 			}
 		};
 
@@ -509,6 +551,9 @@ sap.ui.define([
 		TimePickerInputs.prototype._destroyControls = function() {
 			this.destroyAggregation("_inputs");
 			this.destroyAggregation("_buttonAmPm");
+			if (this._oLabelH) { this._oLabelH.destroy(); this._oLabelH = null; }
+			if (this._oLabelM) { this._oLabelM.destroy(); this._oLabelM = null; }
+			if (this._oLabelS) { this._oLabelS.destroy(); this._oLabelS = null; }
 		};
 
 		/**
@@ -581,6 +626,12 @@ sap.ui.define([
 					value: iSelectedHours,
 					ariaLabelledBy: sId + "-textH"
 				}));
+				this._oLabelH = new Label(sId + "-labelH", {
+					text: this._oResourceBundle.getText("TIMEPICKER_INPUTS_LABEL_HOURS"),
+					labelFor: sId + "-inputH",
+					showColon: true
+				});
+				this.addDependent(this._oLabelH);
 				this._inputsProperties.H = {min: iMin, max: iMax, prependZero: bPrependZero, step: 1, value: iSelectedHours, format24: bFormatSupport24};
 				this._inputIndexes.H = iIndex++;
 			}
@@ -597,6 +648,12 @@ sap.ui.define([
 					value: iSelectedMinutes,
 					ariaLabelledBy: sId + "-textM"
 				}));
+				this._oLabelM = new Label(sId + "-labelM", {
+					text: this._oResourceBundle.getText("TIMEPICKER_INPUTS_LABEL_MINUTES"),
+					labelFor: sId + "-inputM",
+					showColon: true
+				});
+				this.addDependent(this._oLabelM);
 				this._inputsProperties.M = {min: 0, max: iMax, prependZero: bPrependZero, step: this.getMinutesStep(), value: iSelectedMinutes};
 				this._inputIndexes.M = iIndex++;
 			}
@@ -613,6 +670,12 @@ sap.ui.define([
 					value: iSelectedSeconds,
 					ariaLabelledBy: sId + "-textS"
 				}));
+				this._oLabelS = new Label(sId + "-labelS", {
+					text: this._oResourceBundle.getText("TIMEPICKER_INPUTS_LABEL_SECONDS"),
+					labelFor: sId + "-inputS",
+					showColon: true
+				});
+				this.addDependent(this._oLabelS);
 				this._inputsProperties.S = {min: 0, max: iMax, prependZero: bPrependZero, step: this.getSecondsStep(), value: iSelectedSeconds};
 				this._inputIndexes.S = iIndex++;
 			}
@@ -631,7 +694,8 @@ sap.ui.define([
 						})
 					],
 					selectedKey: sSelectedAmPm,
-					tooltip: this._oResourceBundle.getText("TIMEPICKER_AMPM_BUTTON_TOOLTIP")
+					tooltip: this._oResourceBundle.getText("TIMEPICKER_AMPM_BUTTON_TOOLTIP"),
+					selectionChange: function() { this.fireChange({}); }.bind(this)
 				}));
 			}
 
@@ -760,6 +824,51 @@ sap.ui.define([
 				return false;
 			}
 
+		};
+
+		/**
+		 * Lazily creates and returns the OK button for the inline action row.
+		 *
+		 * @returns {sap.m.Button}
+		 * @private
+		 */
+		TimePickerInputs.prototype._getOkButton = function() {
+			var oButton = this.getAggregation("_okButton");
+			if (!oButton) {
+				oButton = new Button({
+					text: this._oResourceBundle.getText("TIMEPICKER_SET"),
+					type: ButtonType.Emphasized,
+					press: function() {
+						var oTP = this.getParent();
+						while (oTP && !oTP._handleNumericOkPress) { oTP = oTP.getParent(); }
+						oTP && oTP._handleNumericOkPress();
+					}.bind(this)
+				});
+				this.setAggregation("_okButton", oButton, true);
+			}
+			return oButton;
+		};
+
+		/**
+		 * Lazily creates and returns the Cancel button for the inline action row.
+		 *
+		 * @returns {sap.m.Button}
+		 * @private
+		 */
+		TimePickerInputs.prototype._getCancelButton = function() {
+			var oButton = this.getAggregation("_cancelButton");
+			if (!oButton) {
+				oButton = new Button({
+					text: this._oResourceBundle.getText("TIMEPICKER_CANCEL"),
+					press: function() {
+						var oTP = this.getParent();
+						while (oTP && !oTP._handleNumericCancelPress) { oTP = oTP.getParent(); }
+						oTP && oTP._handleNumericCancelPress();
+					}.bind(this)
+				});
+				this.setAggregation("_cancelButton", oButton, true);
+			}
+			return oButton;
 		};
 
 		/* Numeric Input override */

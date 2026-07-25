@@ -169,6 +169,9 @@ sap.ui.define([
 	};
 
 	ElementDesignTimeMetadata.prototype._getText = function(oElement, vName) {
+		if (!vName) {
+			return undefined;
+		}
 		if (typeof vName === "function") {
 			return vName();
 		}

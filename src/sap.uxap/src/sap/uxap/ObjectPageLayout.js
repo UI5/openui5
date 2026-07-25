@@ -35,6 +35,7 @@ sap.ui.define([
 	"sap/base/assert",
 	"sap/base/util/isEmptyObject",
 	"sap/base/util/merge",
+	"sap/m/library",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/dom/getFirstEditableInput",
 	'sap/ui/dom/units/Rem',
@@ -71,6 +72,7 @@ sap.ui.define([
 	assert,
 	isEmptyObject,
 	merge,
+	mLibrary,
 	KeyCodes,
 	getFirstEditableInput,
 	DomUnitsRem,
@@ -89,6 +91,9 @@ sap.ui.define([
 
 	// shortcut for sap.uxap.ObjectPageLayoutMediaRange
 	var ObjectPageLayoutMediaRange = library.ObjectPageLayoutMediaRange;
+
+	// shortcut for sap.m.BackgroundDesign
+	var BackgroundDesign = mLibrary.BackgroundDesign;
 
 	var SNAP_EVENTS = ["toggleAnchorBar", "_moveHeader"];
 
@@ -692,6 +697,7 @@ sap.ui.define([
 		this._oVisibleSubSections = 0;
 		this._initialABButtonsColorUpdateDone = false;
 		this._bDomElementsCached = false;
+		this._bClipPathApplied = false;
 
 		this._$footerWrapper = [];                  //dom reference to the floating footer wrapper
 		this._$opWrapper = [];                      //dom reference to the header for Dark mode background image scrolling scenario
@@ -3246,10 +3252,8 @@ sap.ui.define([
 
 		var oWrapperElement = this._$opWrapper.get(0),
 			oTitleElement = this._$titleArea.get(0),
-			iTitleHeight = oTitleElement.getBoundingClientRect().height,
-			iTitleWidth = oTitleElement.getBoundingClientRect().width,
-			iScrollbarWidth = getScrollbarSize().width,
-			sClipPath;
+			oTitleMetrics = oTitleElement.getBoundingClientRect(),
+			iScrollbarWidth = getScrollbarSize().width;
 
 		// the top area of the scroll container is reserved for showing the title element,
 		// (where the title element is positioned absolutely on top of the scroll container),
@@ -3257,24 +3261,52 @@ sap.ui.define([
 
 		// (1) add top padding for the area underneath the title element
 		// so that the title does not overlap the content of the scroll container
-		oWrapperElement.style.paddingTop = iTitleHeight + "px";
+		oWrapperElement.style.paddingTop = oTitleMetrics.height + "px";
 		this._adjustScrollPaddingTop();
 
 		// (2) also make the area underneath the title invisible (using clip-path)
 		// to allow usage of *transparent background* of the title element
 		// (otherwise content from the scroll *overflow* will show underneath the transparent title element)
-		sClipPath = 'polygon(0px ' + iTitleHeight + 'px, '
-			+ Math.floor(iTitleWidth) + 'px ' 	+ iTitleHeight + 'px, '
-			+ Math.floor(iTitleWidth) + 'px 0, 100% 0, 100% 100%, 0 100%)';
-
-		if (Localization.getRTL()) {
-			sClipPath = 'polygon(0px 0px, ' + iScrollbarWidth + 'px 0px, '
-			+ iScrollbarWidth + 'px ' + iTitleHeight + 'px, 100% '
-			+ iTitleHeight + 'px, 100% 100%, 0 100%)';
-		}
-		oWrapperElement.style.clipPath = sClipPath;
+		this._adjustClipPathForTitleTransparency(oWrapperElement, oTitleMetrics, iScrollbarWidth);
 
 		this.getHeaderTitle() && this._shiftHeaderTitle();
+	};
+
+	/**
+	 * Makes the area underneath the title element invisible using clip-path,
+	 * to allow usage of a transparent background on the title element.
+	 * Without this, content from the scroll overflow would show underneath the transparent title.
+	 * @param {object} oWrapperElement
+	 * @param {object} oTitleMetrics
+	 * @param {number} oTitleMetrics.height
+	 * @param {number} oTitleMetrics.width
+	 * @param {number} iScrollbarWidth
+	 * @private
+	 */
+	ObjectPageLayout.prototype._adjustClipPathForTitleTransparency = function (oWrapperElement, oTitleMetrics, iScrollbarWidth) {
+		var oHeaderTitle = this.getHeaderTitle(),
+			bRequiresClipPath = oHeaderTitle && oHeaderTitle.supportsBackgroundDesign()
+				&& oHeaderTitle.getBackgroundDesign() === BackgroundDesign.Transparent,
+			iTitleHeight = oTitleMetrics.height,
+			iTitleWidth = oTitleMetrics.width,
+			sClipPath;
+
+		if (bRequiresClipPath) {
+			sClipPath = 'polygon(0px ' + iTitleHeight + 'px, '
+				+ Math.floor(iTitleWidth) + 'px ' + iTitleHeight + 'px, '
+				+ Math.floor(iTitleWidth) + 'px 0, 100% 0, 100% 100%, 0 100%)';
+
+			if (Localization.getRTL()) {
+				sClipPath = 'polygon(0px 0px, ' + iScrollbarWidth + 'px 0px, '
+				+ iScrollbarWidth + 'px ' + iTitleHeight + 'px, 100% '
+				+ iTitleHeight + 'px, 100% 100%, 0 100%)';
+			}
+			oWrapperElement.style.clipPath = sClipPath;
+			this._bClipPathApplied = true;
+		} else if (this._bClipPathApplied) {
+			oWrapperElement.style.clipPath = '';
+			this._bClipPathApplied = false;
+		}
 	};
 
 	ObjectPageLayout.prototype._adjustScrollPaddingTop = function () {
@@ -4020,9 +4052,19 @@ sap.ui.define([
 	 * @private
 	 */
 	ObjectPageLayout.prototype._onModifyHeaderTitle = function (params) {
-		var oHeaderContent = this.getAggregation("_headerContent");
+		var oHeaderContent = this.getAggregation("_headerContent"),
+			oWrapperElement = this._$opWrapper?.get(0),
+			oTitleElement = this._$titleArea?.get(0);
 
 		oHeaderContent && params.current && oHeaderContent.setBackgroundDesign(params.current);
+
+		if (oWrapperElement && oTitleElement) {
+			this._adjustClipPathForTitleTransparency(
+				oWrapperElement,
+				oTitleElement.getBoundingClientRect(),
+				getScrollbarSize().width
+			);
+		}
 	};
 
 	/**

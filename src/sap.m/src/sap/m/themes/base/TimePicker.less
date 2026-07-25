@@ -42,3 +42,34 @@ html.sap-desktop .sapMValueStateHeaderRoot {
 	margin-right: -12px; /* fixing a right margin set from popover */
 	max-width: 100%;
 }
+
+/* Inputs layout inside the clock-picker dropdown */
+.sapMTimePickerDropDown .sapMTPInputsContainer {
+	min-width: 0;
+	padding: 0.5rem;
+	flex-wrap: wrap;
+	row-gap: 0.5rem;
+	align-items: flex-end;
+}
+
+/* Horizontal space between inputs row and AM/PM+Now group when on same row */
+.sapMTimePickerDropDown .sapMTPSecondRow {
+	margin-left: 0.5rem;
+}
+
+/* High-zoom layout (viewport ≤ 320 px) — show labels and shrink inputs */
+@media (max-width: 320px) {
+	.sapMTimePickerDropDown .sapMTPInputLabel {
+		display: block;
+	}
+
+	.sapMTimePickerDropDown .sapMTPInputsSeparator {
+		height: 2.75rem;
+		line-height: 2.75rem;
+	}
+
+	.sapMTimePickerDropDown .sapMTPInputsContainer .sapMInputBase {
+		width: min(2.875rem, 22vw);
+		min-width: 0;
+	}
+}

@@ -2698,7 +2698,7 @@ sap.ui.define([
 		this.oList.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		const oSkipFocusStub = sinon.stub(this.oList, "_skipGroupHeaderFocus").returns(true);
+		const oSkipFocusStub = sinon.stub(this.oList, "getSkipGroupHeaderFocus").returns(true);
 
 		const aGroupHeaderListItems = this.oList.getVisibleItems().filter(function(oItem) {
 			return oItem.isGroupHeader();

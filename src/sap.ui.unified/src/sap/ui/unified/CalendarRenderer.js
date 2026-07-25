@@ -64,10 +64,16 @@ CalendarRenderer.render = function(oRm, oCal){
 	}
 
 	if (this.addAttributes) {
-		// additional stuff by inherited controls
 		this.addAttributes(oRm, oCal);
 	}
-	oRm.openEnd(); // div element
+	oRm.openEnd();
+
+	// In high-zoom standalone mode render only the DatePicker/DateRangeSelection proxy
+	if (oCal.getProperty("_highZoomActive") && oCal._oHZPicker) {
+		oRm.renderControl(oCal._oHZPicker);
+		oRm.close("div");
+		return;
+	}
 
 	var oHeader = oCal.getAggregation("header");
 	oRm.renderControl(oHeader);

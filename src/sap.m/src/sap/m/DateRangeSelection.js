@@ -20,6 +20,7 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/base/assert",
 	"sap/ui/core/date/UI5Date",
+	"./DateHighZoomInputs",
 	// jQuery Plugin "cursorPos"
 	"sap/ui/dom/jquery/cursorPos"
 ],
@@ -39,7 +40,8 @@ sap.ui.define([
 		deepEqual,
 		Log,
 		assert,
-		UI5Date
+		UI5Date,
+		DateHighZoomInputs
 	) {
 		"use strict";
 
@@ -957,6 +959,17 @@ sap.ui.define([
 
 		//Support of two date range version of Calendar added into original DatePicker's version
 		DateRangeSelection.prototype._fillDateRange = function(){
+			if (this._bHighZoom) {
+				// DatePicker._fillDateRange handles the high-zoom path (syncs _oHighZoomInputs).
+				// We additionally sync the end date.
+				DatePicker.prototype._fillDateRange.apply(this, arguments);
+				if (this._oHighZoomInputs) {
+					this._oHighZoomInputs.setMode(library.DateHighZoomInputsMode.Range);
+					this._oHighZoomInputs.syncEndDate(this.getSecondDateValue());
+					this._oHighZoomInputs.validateEndDate();
+				}
+				return;
+			}
 
 			DatePicker.prototype._fillDateRange.apply(this, arguments);
 
@@ -1411,6 +1424,150 @@ sap.ui.define([
 		* @name sap.m.DateRangeSelection#fireChange
 		* @function
 		*/
+
+		// ============================================================
+		// High-zoom (≤320px) overrides for range mode
+		// ============================================================
+
+		/**
+		 * Override to create DateHighZoomInputs in range mode.
+		 * @returns {sap.m.DateHighZoomInputs}
+		 * @private
+		 */
+		DateRangeSelection.prototype._getOrCreateHighZoomInputs = function() {
+			if (!this._oHighZoomInputs) {
+				this._oHighZoomInputs = new DateHighZoomInputs(this.getId() + "-hzInputs", {
+					mode: "Range",
+					change: this._onHighZoomChange.bind(this)
+				});
+			}
+			return this._oHighZoomInputs;
+		};
+
+		/**
+		 * Live validation on every field change — validate both groups.
+		 * @private
+		 */
+		DateRangeSelection.prototype._onHighZoomChange = function() {
+			const bStartValid = this._oHighZoomInputs.validate();
+			const bEndValid   = this._oHighZoomInputs.validateEndDate();
+			if (this._oPopup && this._oPopup.getBeginButton) {
+				this._oPopup.getBeginButton().setEnabled(bStartValid && bEndValid);
+			}
+		};
+
+		/**
+		 * Override DatePicker._onZoomChange to activate range mode on the high-zoom inputs.
+		 * @param {boolean} bHighZoom
+		 * @private
+		 */
+		DateRangeSelection.prototype._onZoomChange = function(bHighZoom) {
+			if (bHighZoom === this._bHighZoom) { return; }
+			this._bHighZoom = bHighZoom;
+			if (this._oHighZoomInputs) {
+				this._oHighZoomInputs.setMode(library.DateHighZoomInputsMode.Range);
+			}
+			if (this.isOpen()) {
+				this._switchPickerContent(bHighZoom);
+			}
+		};
+
+		/**
+		 * Override DatePicker._switchPickerContent to sync both start and end dates.
+		 * @param {boolean} bHighZoom
+		 * @private
+		 */
+		DateRangeSelection.prototype._switchPickerContent = function(bHighZoom) {
+			// Ensure range mode before calling super (which calls syncToDate)
+			if (!this._oHighZoomInputs) {
+				this._getOrCreateHighZoomInputs().setMode(library.DateHighZoomInputsMode.Range);
+			} else {
+				this._oHighZoomInputs.setMode(library.DateHighZoomInputsMode.Range);
+			}
+
+			DatePicker.prototype._switchPickerContent.call(this, bHighZoom);
+
+			if (bHighZoom && this._oHighZoomInputs) {
+				this._oHighZoomInputs.syncEndDate(this.getSecondDateValue());
+			}
+		};
+
+		/**
+		 * Override DatePicker._onZoomChange to activate range mode on the high-zoom inputs.
+		 * @private
+		 */
+		DateRangeSelection.prototype._handleOKButton = function() {
+			if (this._bHighZoom && this._oHighZoomInputs) {
+				const bStartValid = this._oHighZoomInputs.validate();
+				const bEndValid   = this._oHighZoomInputs.validateEndDate();
+				if (!bStartValid || !bEndValid) {
+					return;
+				}
+
+				const oOldStart = this.getDateValue();
+				const oOldEnd   = this.getSecondDateValue();
+
+				// Write end date before _selectDate so _syncDateObjectsToValue sees both values.
+				const oEndParts = this._oHighZoomInputs.getSelectedSecondDate();
+				if (oEndParts) {
+					const oEnd = UI5Date.getInstance(oEndParts.year, oEndParts.month, oEndParts.day);
+					oEnd.setFullYear(oEndParts.year);
+					oEnd.setHours(23, 59, 59, 999);
+					this.setSecondDateValue(oEnd);
+				}
+
+				DatePicker.prototype._selectDate.call(this);
+
+				const oNewEnd = this.getSecondDateValue();
+				if (deepEqual(this.getDateValue(), oOldStart) && !deepEqual(oNewEnd, oOldEnd)) {
+					this.fireChangeEvent(this.getValue(), { valid: true });
+				}
+				return;
+			}
+			this._selectDate();
+		};
+
+		/**
+		 * Override DatePicker._handleCancelButton to clear error states on both groups.
+		 * @private
+		 */
+		DateRangeSelection.prototype._handleCancelButton = function() {
+			if (this._bHighZoom && this._oHighZoomInputs) {
+				this._oHighZoomInputs.resetValueState();
+			}
+			// Delegate to base class which also disables OK button when dateValue is null
+			DatePicker.prototype._handleCancelButton.apply(this, arguments);
+		};
+
+		/**
+		 * Override DatePicker._getSelectedDate to return start date only (read-only, no side effects).
+		 * @returns {Date|module:sap/ui/core/date/UI5Date|null}
+		 * @private
+		 */
+		DateRangeSelection.prototype._getSelectedDate = function() {
+			if (this._bHighZoom && this._oHighZoomInputs) {
+				const oStartParts = this._oHighZoomInputs.getSelectedDate();
+				const oStart = UI5Date.getInstance(oStartParts.year, oStartParts.month, oStartParts.day);
+				oStart.setFullYear(oStartParts.year);
+				return oStart;
+			}
+
+			return DatePicker.prototype._getSelectedDate.apply(this, arguments);
+		};
+
+		/**
+		 * Override DatePicker._onHZCalTogglePress to also re-sync the end date after the
+		 * calendar type switch. The base implementation calls switchCalendarType which only
+		 * re-syncs the start date; the end date would remain displayed in the previous
+		 * calendar type without this override.
+		 * @private
+		 */
+		DateRangeSelection.prototype._onHZCalTogglePress = function() {
+			DatePicker.prototype._onHZCalTogglePress.call(this);
+			if (this._oHighZoomInputs) {
+				this._oHighZoomInputs.syncEndDate(this.getSecondDateValue());
+			}
+		};
 
 		return DateRangeSelection;
 	});

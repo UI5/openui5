@@ -30,6 +30,7 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/date/UI5Date",
 	"sap/ui/model/type/DateInterval",
+	"sap/m/DateHighZoomInputs",
 	"sap/ui/dom/jquery/cursorPos"
 ], function(
 	Formatting,
@@ -61,7 +62,8 @@ sap.ui.define([
 	jQuery,
 	Element,
 	UI5Date,
-	DateInterval
+	DateInterval,
+	DateHighZoomInputs
 ) {
 	"use strict";
 
@@ -2040,6 +2042,160 @@ sap.ui.define([
 
 		// Clean
 		oDRS.destroy();
+	});
+
+	// =========================================================
+	// Zoom support
+	// =========================================================
+
+	QUnit.module("Zoom support", {
+		beforeEach: async function() {
+			this.oDRS = new DateRangeSelection({
+				displayFormat: "dd.MM.yyyy",
+				dateValue: UI5Date.getInstance(2026, 4, 1),
+				secondDateValue: UI5Date.getInstance(2026, 4, 31),
+				minDate: UI5Date.getInstance(2020, 0, 1),
+				maxDate: UI5Date.getInstance(2030, 11, 31)
+			});
+			this.oDRS.placeAt("qunit-fixture");
+			await nextUIUpdate();
+			this.oSandbox = sinon.createSandbox();
+		},
+		afterEach: function() {
+			this.oSandbox.restore();
+			this.oDRS.destroy();
+			this.oDRS = null;
+		}
+	});
+
+	QUnit.test("_getOrCreateHighZoomInputs creates DateHighZoomInputs in range mode", function(assert) {
+		var oInputs = this.oDRS._getOrCreateHighZoomInputs();
+		assert.ok(oInputs.isA("sap.m.DateHighZoomInputs"), "returns DateHighZoomInputs");
+		assert.strictEqual(oInputs.getMode(), "Range", "mode is 'Range'");
+	});
+
+	QUnit.test("_getOrCreateHighZoomInputs returns the same instance on repeated calls", function(assert) {
+		var oFirst  = this.oDRS._getOrCreateHighZoomInputs();
+		var oSecond = this.oDRS._getOrCreateHighZoomInputs();
+		assert.strictEqual(oFirst, oSecond, "singleton — same instance returned");
+	});
+
+	QUnit.test("_switchPickerContent syncs start and end date to zoom inputs", async function(assert) {
+		this.oDRS.toggleOpen(false);
+		await nextUIUpdate();
+
+		this.oDRS._bHighZoom = true;
+		this.oDRS._switchPickerContent(true);
+		await nextUIUpdate();
+
+		var oInputs = this.oDRS._oHighZoomInputs;
+		assert.ok(oInputs && oInputs.getVisible(), "DateHighZoomInputs visible");
+		assert.ok(oInputs._oYearInputEnd, "End-date controls created (range mode rendered)");
+
+		this.oDRS.toggleOpen(true);
+	});
+
+	QUnit.test("_handleOKButton at high zoom closes popup and commits both dates", async function(assert) {
+		this.oDRS.toggleOpen(false);
+		await nextUIUpdate();
+
+		this.oDRS._bHighZoom = true;
+		this.oDRS._switchPickerContent(true);
+		await nextUIUpdate();
+
+		// Sync to current values
+		this.oDRS._oHighZoomInputs.syncStartDate();
+		this.oDRS._oHighZoomInputs.syncEndDate(this.oDRS.getSecondDateValue());
+
+		var bClosed = false;
+		var fnOrig = this.oDRS._oPopup.close.bind(this.oDRS._oPopup);
+		this.oDRS._oPopup.close = function() { bClosed = true; fnOrig(); };
+
+		this.oDRS._handleOKButton();
+
+		assert.ok(bClosed, "Popup closed after valid OK");
+
+		var oDateValue = this.oDRS.getDateValue();
+		var oSecondDateValue = this.oDRS.getSecondDateValue();
+		assert.ok(oDateValue instanceof Date, "dateValue is a Date");
+		assert.ok(oSecondDateValue instanceof Date, "secondDateValue is a Date");
+		// Verify actual values match what was synced (May 1 and May 31, 2026)
+		assert.strictEqual(oDateValue.getMonth(), 4, "dateValue month is May");
+		assert.strictEqual(oDateValue.getDate(), 1, "dateValue day is 1");
+		assert.strictEqual(oSecondDateValue.getMonth(), 4, "secondDateValue month is May");
+		assert.strictEqual(oSecondDateValue.getDate(), 31, "secondDateValue day is 31");
+
+		this.oDRS._oPopup.close = fnOrig;
+	});
+
+	QUnit.test("_handleOKButton keeps popup open when start validation fails", async function(assert) {
+		this.oDRS.toggleOpen(false);
+		await nextUIUpdate();
+
+		this.oDRS._bHighZoom = true;
+		this.oDRS._switchPickerContent(true);
+		await nextUIUpdate();
+
+		this.oSandbox.stub(this.oDRS._oHighZoomInputs, "validate").returns(false);
+
+		var bClosed = false;
+		this.oDRS._oPopup.close = function() { bClosed = true; };
+
+		this.oDRS._handleOKButton();
+
+		assert.notOk(bClosed, "Popup stays open when start validation fails");
+	});
+
+	QUnit.test("_handleOKButton keeps popup open when end validation fails", async function(assert) {
+		this.oDRS.toggleOpen(false);
+		await nextUIUpdate();
+
+		this.oDRS._bHighZoom = true;
+		this.oDRS._switchPickerContent(true);
+		await nextUIUpdate();
+
+		this.oSandbox.stub(this.oDRS._oHighZoomInputs, "validateEndDate").returns(false);
+
+		var bClosed = false;
+		this.oDRS._oPopup.close = function() { bClosed = true; };
+
+		this.oDRS._handleOKButton();
+
+		assert.notOk(bClosed, "Popup stays open when end validation fails");
+	});
+
+	QUnit.test("_handleCancelButton clears error states on both start and end fields", async function(assert) {
+		this.oDRS.toggleOpen(false);
+		await nextUIUpdate();
+
+		this.oDRS._bHighZoom = true;
+		this.oDRS._switchPickerContent(true);
+		await nextUIUpdate();
+
+		// Set errors
+		this.oDRS._oHighZoomInputs.setFieldValueState("year", "Error", "out of range");
+		this.oDRS._oHighZoomInputs.setFieldValueState("year", "Error", "out of range", /*bEnd=*/true);
+
+		this.oDRS._handleCancelButton();
+
+		assert.strictEqual(
+			this.oDRS._oHighZoomInputs._oYearInput.getValueState(), "None",
+			"start year error cleared"
+		);
+		assert.strictEqual(
+			this.oDRS._oHighZoomInputs._oYearInputEnd.getValueState(), "None",
+			"end year error cleared"
+		);
+	});
+
+	QUnit.test("exit destroys _oHighZoomInputs", function(assert) {
+		var oInputs = this.oDRS._getOrCreateHighZoomInputs();
+		var bDestroyed = false;
+		var fnOrig = oInputs.destroy.bind(oInputs);
+		oInputs.destroy = function() { bDestroyed = true; fnOrig(); };
+		this.oDRS.destroy();
+		assert.ok(bDestroyed, "_oHighZoomInputs.destroy() called on exit");
+		// afterEach will call destroy() again — UI5 ignores double-destroy on a destroyed control
 	});
 
 });
