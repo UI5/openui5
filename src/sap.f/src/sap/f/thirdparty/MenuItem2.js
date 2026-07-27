@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/List', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/Icon'], (function (exports, webcomponentsBase, jsxRuntime, eventStrict, parametersBundle_css, Theme, Icons, decline, InvisibleMessage, ListItemTemplate, ListItemBase, i18nDefaults, ResponsivePopover, Button, List, BusyIndicator, Icon) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/List', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/i18n-defaults2'], (function (exports, webcomponentsBase, parametersBundle_css, eventStrict, parametersBundle_css$1, ManagedStyles, Icons, decline, List, ListItemTemplate, ListItemBase, ResponsivePopover, Button, Icon, i18nDefaults) { 'use strict';
 
 	const name$1 = "nav-back";
 	const pathData$1 = "M11.723 13.285a.957.957 0 0 1 .277.702c0 .28-.092.514-.277.701a.967.967 0 0 1-.708.312.967.967 0 0 1-.707-.312L4.246 8.67a.723.723 0 0 0-.092-.156.362.362 0 0 0-.046-.077.362.362 0 0 1-.046-.078A1.106 1.106 0 0 1 4 8.016a.22.22 0 0 1 .015-.094.14.14 0 0 0 .016-.062.44.44 0 0 1 .092-.297c.02-.03.041-.067.062-.109.02-.02.03-.036.03-.046 0-.01.01-.026.031-.047.02-.021.03-.042.03-.063l6.032-5.986A.967.967 0 0 1 11.015 1c.267 0 .503.104.708.312.185.187.277.42.277.701a.957.957 0 0 1-.277.702l-4.77 4.802a.889.889 0 0 0 0 .997l4.77 4.771Z";
@@ -47,275 +47,12 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	})(MenuItemGroupCheckMode || (MenuItemGroupCheckMode = {}));
 	var MenuItemGroupCheckMode$1 = MenuItemGroupCheckMode;
 
-	const predefinedHooks$1 = {
-	    listItemContent,
-	};
-	function ListItemCustomTemplate(hooks) {
-	    const currentHooks = { ...predefinedHooks$1, ...hooks };
-	    return ListItemTemplate.ListItemTemplate.call(this, currentHooks);
-	}
-	function listItemContent() {
-	    return jsxRuntime.jsx("slot", {});
-	}
-
-	let i18nBundle;
-	let invisibleText;
-	const getBundle = () => {
-	    i18nBundle ??= new Icons.u("@ui5/webcomponents-base");
-	    return i18nBundle;
-	};
-	const checkVisibility = (element) => {
-	    return element.checkVisibility() || getComputedStyle(element).display === "contents";
-	};
-	const applyCustomAnnouncement = (element, text = []) => {
-	    if (!invisibleText || !invisibleText.isConnected) {
-	        invisibleText = document.createElement("span");
-	        invisibleText.id = "ui5-invisible-text";
-	        invisibleText.hidden = true;
-	        document.body.appendChild(invisibleText);
-	    }
-	    const ariaLabelledByElements = [...(element.ariaLabelledByElements || [])];
-	    const invisibleTextIndex = ariaLabelledByElements.indexOf(invisibleText);
-	    text = Array.isArray(text) ? text.filter(Boolean).join(" . ").trim() : text.trim();
-	    invisibleText.textContent = text;
-	    if (text && invisibleTextIndex === -1) {
-	        ariaLabelledByElements.unshift(invisibleText);
-	        element.ariaLabelledByElements = ariaLabelledByElements;
-	    }
-	    else if (!text && invisibleTextIndex > -1) {
-	        ariaLabelledByElements.splice(invisibleTextIndex, 1);
-	        element.ariaLabelledByElements = ariaLabelledByElements.length ? ariaLabelledByElements : null;
-	    }
-	};
-	const getCustomAnnouncement = (element, options = {}, _isRootElement = true) => {
-	    if (!element) {
-	        return "";
-	    }
-	    if (element.nodeType === Node.TEXT_NODE) {
-	        return element.data.trim();
-	    }
-	    if (!(element instanceof HTMLElement)) {
-	        return "";
-	    }
-	    if (element.hasAttribute("data-ui5-acc-text")) {
-	        return element.getAttribute("data-ui5-acc-text") || "";
-	    }
-	    if (element.ariaHidden === "true" || !checkVisibility(element)) {
-	        return _isRootElement ? getBundle().getText(i18nDefaults.ACC_STATE_EMPTY) : "";
-	    }
-	    let childNodes = [];
-	    const descriptions = [];
-	    const accessibilityInfo = element.accessibilityInfo;
-	    const { lessDetails } = options;
-	    if (accessibilityInfo) {
-	        const { type, description, required, disabled, readonly, children, } = accessibilityInfo;
-	        childNodes = children || [];
-	        type && descriptions.push(type);
-	        description && descriptions.push(description);
-	        if (!lessDetails) {
-	            required && descriptions.push(getBundle().getText(i18nDefaults.ACC_STATE_REQUIRED));
-	            disabled && descriptions.push(getBundle().getText(i18nDefaults.ACC_STATE_DISABLED));
-	            readonly && descriptions.push(getBundle().getText(i18nDefaults.ACC_STATE_READONLY));
-	        }
-	    }
-	    else if (element.localName === "slot") {
-	        childNodes = element.assignedNodes({ flatten: true });
-	    }
-	    else {
-	        childNodes = element.shadowRoot ? [...element.shadowRoot.childNodes] : [...element.childNodes];
-	    }
-	    childNodes.forEach(child => {
-	        const childDescription = getCustomAnnouncement(child, options, false);
-	        childDescription && descriptions.push(childDescription);
-	    });
-	    if (_isRootElement) {
-	        const hasDescription = descriptions.length > 0;
-	        if (!hasDescription || !lessDetails) {
-	            const tabbables = ListItemBase.b(element);
-	            const bundleKey = [
-	                hasDescription ? "" : i18nDefaults.ACC_STATE_EMPTY,
-	                i18nDefaults.ACC_STATE_SINGLE_CONTROL,
-	                i18nDefaults.ACC_STATE_MULTIPLE_CONTROLS,
-	            ][Math.min(tabbables.length, 2)];
-	            if (bundleKey) {
-	                hasDescription && descriptions.push(".");
-	                descriptions.push(getBundle().getText(bundleKey));
-	            }
-	        }
-	    }
-	    return descriptions.join(" ").trim();
-	};
-
-	Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-	Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
-	var ListItemCustomCss = `:host(:not([hidden])){display:block}:host{min-height:var(--_ui5_list_item_base_height);height:auto;box-sizing:border-box}.ui5-li-root.ui5-custom-li-root{pointer-events:inherit;min-height:inherit}.ui5-li-root.ui5-custom-li-root .ui5-li-content{pointer-events:inherit}[ui5-checkbox].ui5-li-singlesel-radiobtn,[ui5-radio-button].ui5-li-singlesel-radiobtn{display:flex;align-items:center}.ui5-li-root.ui5-custom-li-root,[ui5-checkbox].ui5-li-singlesel-radiobtn,[ui5-radio-button].ui5-li-singlesel-radiobtn{min-width:var(--_ui5_custom_list_item_rb_min_width)}:host([_selection-mode="SingleStart"]) .ui5-li-root.ui5-custom-li-root{padding-inline:0 1rem}:host([_selection-mode="Multiple"]) .ui5-li-root.ui5-custom-li-root{padding-inline:0 1rem}:host([_selection-mode="SingleEnd"]) .ui5-li-root.ui5-custom-li-root{padding-inline:1rem 0}
-`;
-
-	var __decorate$3 = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var ListItemCustom_1;
-	/**
-	 * @class
-	 *
-	 * A component to be used as custom list item within the `ui5-list`
-	 * the same way as the standard `ui5-li`.
-	 *
-	 * The component accepts arbitrary HTML content to allow full customization.
-	 * @csspart native-li - Used to style the main li tag of the list item
-	 * @csspart content - Used to style the content area of the list item
-	 * @csspart detail-button - Used to style the button rendered when the list item is of type detail
-	 * @csspart delete-button - Used to style the button rendered when the list item is in delete mode
-	 * @csspart radio - Used to style the radio button rendered when the list item is in single selection mode
-	 * @csspart checkbox - Used to style the checkbox rendered when the list item is in multiple selection mode
-	 * @slot {Node[]} default - Defines the content of the component.
-	 * @constructor
-	 * @extends ListItem
-	 * @public
-	 */
-	let ListItemCustom = ListItemCustom_1 = class ListItemCustom extends ListItemTemplate.ListItem {
-	    constructor() {
-	        super(...arguments);
-	        /**
-	         * Defines whether the item is movable.
-	         * @default false
-	         * @public
-	         * @since 2.0.0
-	         */
-	        this.movable = false;
-	    }
-	    _onkeydown(e) {
-	        const isFocused = this.matches(":focus");
-	        const shouldHandle = isFocused
-	            || webcomponentsBase.x(e) || webcomponentsBase.V(e)
-	            || webcomponentsBase.ro(e) || webcomponentsBase.io(e)
-	            || webcomponentsBase.P(e) || webcomponentsBase._(e);
-	        if (shouldHandle) {
-	            super._onkeydown(e);
-	        }
-	    }
-	    _onkeyup(e) {
-	        const isFocused = this.matches(":focus");
-	        const shouldHandle = isFocused
-	            || webcomponentsBase.x(e) || webcomponentsBase.V(e)
-	            || webcomponentsBase.ro(e) || webcomponentsBase.io(e)
-	            || webcomponentsBase.P(e) || webcomponentsBase._(e);
-	        if (shouldHandle) {
-	            super._onkeyup(e);
-	        }
-	    }
-	    get _accessibleNameRef() {
-	        return `${this._id}-invisibleText`;
-	    }
-	    _onfocusin(e) {
-	        super._onfocusin(e);
-	        // Skip updating invisible text during drag operations
-	        if (!this._isDragging() && !this.accessibleName) {
-	            this._updateInvisibleTextContent();
-	        }
-	    }
-	    _onfocusout(e) {
-	        super._onfocusout(e);
-	        // Skip clearing invisible text during drag operations
-	        if (!this._isDragging() && !this.accessibleName) {
-	            this._clearInvisibleTextContent();
-	        }
-	    }
-	    /**
-	     * Checks if this element is currently being dragged
-	     * @returns True if this element is being dragged
-	     * @private
-	     */
-	    _isDragging() {
-	        // Check if this specific element has the data-moving attribute
-	        return this.hasAttribute("data-moving");
-	    }
-	    _updateInvisibleTextContent() {
-	        const listItem = this._listItem;
-	        if (!listItem) {
-	            return;
-	        }
-	        // Get accessibility announcements
-	        const accessibilityText = getCustomAnnouncement(this);
-	        // Apply the announcement using the shared invisible text element from CustomAnnouncement
-	        applyCustomAnnouncement(listItem, accessibilityText);
-	    }
-	    _clearInvisibleTextContent() {
-	        const listItem = this._listItem;
-	        if (!listItem) {
-	            return;
-	        }
-	        // Clear the announcement by passing empty text
-	        applyCustomAnnouncement(listItem, "");
-	    }
-	    /**
-	     * Gets delete button nodes to process for accessibility
-	     * @returns Array of nodes to process
-	     * @private
-	     */
-	    _getDeleteButtonNodes() {
-	        if (!this.modeDelete) {
-	            return [];
-	        }
-	        if (this.hasDeleteButtonSlot) {
-	            // Return custom delete buttons from slot
-	            return this.deleteButton;
-	        }
-	        // Return the built-in delete button from the shadow DOM if it exists
-	        const deleteButton = this.shadowRoot?.querySelector(`#${this._id}-deleteSelectionElement`);
-	        return deleteButton ? [deleteButton] : [];
-	    }
-	    get classes() {
-	        const result = super.classes;
-	        result.main["ui5-custom-li-root"] = true;
-	        return result;
-	    }
-	    get accessibilityInfo() {
-	        const children = [];
-	        // Get slotted content elements (default slot)
-	        const defaultSlot = this.shadowRoot?.querySelector("slot:not([name])");
-	        if (defaultSlot) {
-	            const assignedNodes = defaultSlot.assignedNodes({ flatten: true });
-	            children.push(...assignedNodes);
-	        }
-	        // Get delete button nodes
-	        const deleteButtonNodes = this._getDeleteButtonNodes();
-	        children.push(...deleteButtonNodes);
-	        return {
-	            type: ListItemCustom_1.i18nBundle.getText(i18nDefaults.LISTITEMCUSTOM_TYPE_TEXT),
-	            children,
-	        };
-	    }
-	};
-	__decorate$3([
-	    webcomponentsBase.s({ type: Boolean })
-	], ListItemCustom.prototype, "movable", void 0);
-	__decorate$3([
-	    webcomponentsBase.s()
-	], ListItemCustom.prototype, "accessibleName", void 0);
-	__decorate$3([
-	    parametersBundle_css.i("@ui5/webcomponents")
-	], ListItemCustom, "i18nBundle", void 0);
-	ListItemCustom = ListItemCustom_1 = __decorate$3([
-	    webcomponentsBase.m({
-	        tag: "ui5-li-custom",
-	        template: ListItemCustomTemplate,
-	        renderer: jsxRuntime.y,
-	        styles: [ListItemTemplate.ListItem.styles, ListItemCustomCss],
-	    })
-	], ListItemCustom);
-	ListItemCustom.define();
-	var ListItemCustom$1 = ListItemCustom;
-
 	function MenuSeparatorTemplate() {
-	    return (jsxRuntime.jsx(ListItemCustom$1, { class: "ui5-menu-separator", _forcedAccessibleRole: "separator", disabled: true }));
+	    return (parametersBundle_css.jsx(List.ListItemCustom, { class: "ui5-menu-separator", _forcedAccessibleRole: "separator", disabled: true }));
 	}
 
-	Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-	Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+	ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+	ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
 	var menuSeparatorCss = `:host{border-top:.0625rem solid var(--sapGroup_ContentBorderColor);min-height:.125rem}.ui5-menu-separator{border:inherit;min-height:inherit;background:inherit;opacity:1}
 `;
 
@@ -361,7 +98,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	MenuSeparator = __decorate$2([
 	    webcomponentsBase.m({
 	        tag: "ui5-menu-separator",
-	        renderer: jsxRuntime.y,
+	        renderer: parametersBundle_css.y,
 	        styles: [menuSeparatorCss],
 	        template: MenuSeparatorTemplate,
 	    })
@@ -370,7 +107,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	const isInstanceOfMenuSeparator = webcomponentsBase.r$1("isSeparator");
 
 	function MenuItemGroupTemplate() {
-	    return (jsxRuntime.jsx("div", { role: "group", "aria-label": this.ariaLabelText, "onui5-check": this._handleItemCheck, children: jsxRuntime.jsx("slot", {}) }));
+	    return (parametersBundle_css.jsx("div", { role: "group", "aria-label": this.ariaLabelText, "onui5-check": this._handleItemCheck, children: parametersBundle_css.jsx("slot", {}) }));
 	}
 
 	var __decorate$1 = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -492,12 +229,12 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    webcomponentsBase.d({ "default": true, type: HTMLElement, invalidateOnChildChange: true })
 	], MenuItemGroup.prototype, "items", void 0);
 	__decorate$1([
-	    parametersBundle_css.i("@ui5/webcomponents")
+	    parametersBundle_css$1.i("@ui5/webcomponents")
 	], MenuItemGroup, "i18nBundle", void 0);
 	MenuItemGroup = MenuItemGroup_1 = __decorate$1([
 	    webcomponentsBase.m({
 	        tag: "ui5-menu-item-group",
-	        renderer: jsxRuntime.y,
+	        renderer: parametersBundle_css.y,
 	        template: MenuItemGroupTemplate,
 	    })
 	], MenuItemGroup);
@@ -512,41 +249,41 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    const currentHooks = { ...predefinedHooks, ...hooks };
 	    if (!hooks?.listItemContent) {
 	        currentHooks.listItemContent = function listItemContent() {
-	            return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [currentHooks.menuItemTextContent.call(this), rightContent.call(this), checkmarkContent.call(this)] }));
+	            return (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [currentHooks.menuItemTextContent.call(this), rightContent.call(this), checkmarkContent.call(this)] }));
 	        };
 	    }
-	    return jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [ListItemTemplate.ListItemTemplate.call(this, currentHooks), listItemPostContent.call(this)] });
+	    return parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [ListItemTemplate.ListItemTemplate.call(this, currentHooks), listItemPostContent.call(this)] });
 	}
 	function menuItemTextContent() {
-	    return jsxRuntime.jsx(jsxRuntime.Fragment, { children: this.text && jsxRuntime.jsx("div", { class: "ui5-menu-item-text", children: this.text }) });
+	    return parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: this.text && parametersBundle_css.jsx("div", { class: "ui5-menu-item-text", children: this.text }) });
 	}
 	function checkmarkContent() {
-	    return !this._markChecked ? "" : (jsxRuntime.jsx("div", { class: "ui5-menu-item-checked", children: jsxRuntime.jsx(Icon.Icon, { name: ListItemTemplate.checkIcon, class: "ui5-menu-item-icon-checked" }) }));
+	    return !this._markChecked ? "" : (parametersBundle_css.jsx("div", { class: "ui5-menu-item-checked", children: parametersBundle_css.jsx(Icon.Icon, { name: ListItemTemplate.checkIcon, class: "ui5-menu-item-icon-checked" }) }));
 	}
 	function rightContent() {
 	    switch (true) {
 	        case this.hasSubmenu:
-	            return (jsxRuntime.jsx("div", { class: "ui5-menu-item-submenu-icon", children: jsxRuntime.jsx(Icon.Icon, { part: "subicon", name: ListItemTemplate.slimArrowRight, class: "ui5-menu-item-icon-end" }) }));
+	            return (parametersBundle_css.jsx("div", { class: "ui5-menu-item-submenu-icon", children: parametersBundle_css.jsx(Icon.Icon, { part: "subicon", name: ListItemTemplate.slimArrowRight, class: "ui5-menu-item-icon-end" }) }));
 	        case this.hasEndContent:
-	            return (jsxRuntime.jsx("div", { class: "ui5-menu-item-end-content", role: "group", "aria-label": this.endContentAccessibleName, children: jsxRuntime.jsx("slot", { name: "endContent", onKeyDown: this._endContentKeyDown }) }));
+	            return (parametersBundle_css.jsx("div", { class: "ui5-menu-item-end-content", role: "group", "aria-label": this.endContentAccessibleName, children: parametersBundle_css.jsx("slot", { name: "endContent", onKeyDown: this._endContentKeyDown }) }));
 	        case !!this.additionalText:
-	            return (jsxRuntime.jsx("span", { part: "additional-text", class: "ui5-li-additional-text", "aria-hidden": this._accInfo.ariaHidden, children: this.additionalText }));
+	            return (parametersBundle_css.jsx("span", { part: "additional-text", class: "ui5-li-additional-text", "aria-hidden": this._accInfo.ariaHidden, children: this.additionalText }));
 	    }
 	}
 	function iconBegin() {
 	    if (this.hasIcon) {
-	        return jsxRuntime.jsx(Icon.Icon, { class: "ui5-li-icon", name: this.icon });
+	        return parametersBundle_css.jsx(Icon.Icon, { class: "ui5-li-icon", name: this.icon });
 	    }
 	    if (this._siblingsWithIcon) {
-	        return jsxRuntime.jsx("div", { class: "ui5-menu-item-dummy-icon" });
+	        return parametersBundle_css.jsx("div", { class: "ui5-menu-item-dummy-icon" });
 	    }
 	}
 	function listItemPostContent() {
-	    return this.hasSubmenu && jsxRuntime.jsxs(ResponsivePopover.ResponsivePopover, { id: `${this._id}-menu-rp`, class: "ui5-menu-rp ui5-menu-rp-sub-menu", preventInitialFocus: true, preventFocusRestore: true, hideArrow: true, allowTargetOverlap: true, placement: ResponsivePopover.PopoverPlacement.End, verticalAlign: "Top", accessibleName: this.accessibleNameText, onBeforeOpen: this._beforePopoverOpen, onOpen: this._afterPopoverOpen, onBeforeClose: this._beforePopoverClose, onClose: this._afterPopoverClose, children: [this.isPhone && (jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsxs("div", { slot: "header", class: "ui5-menu-dialog-header", children: [jsxRuntime.jsx(Button.Button, { icon: navBackIcon, class: "ui5-menu-back-button", design: "Transparent", "aria-label": this.labelBack, onClick: this._close }), jsxRuntime.jsx("div", { class: "ui5-menu-dialog-title", children: jsxRuntime.jsx("div", { children: this.text }) })] }) })), jsxRuntime.jsx("div", { id: `${this._id}-menu-main`, class: this.loading ? "menu-busy-indicator-main" : "", "aria-busy": this.loading, children: this.items.length ? (jsxRuntime.jsx(List.List, { id: `${this._id}-menu-list`, selectionMode: "None", separators: "None", accessibleRole: "Menu", loading: this.loading, loadingDelay: this.loadingDelay, onMouseOver: this._itemMouseOver, onKeyDown: this._itemKeyDown, onKeyUp: this._itemKeyUp, "onui5-close-menu": this._close, "onui5-exit-end-content": this._navigateOutOfEndContent, children: jsxRuntime.jsx("slot", {}) })) : this.loading && jsxRuntime.jsx(BusyIndicator.BusyIndicator, { id: `${this._id}-menu-busy-indicator`, delay: this.loadingDelay, class: "ui5-menu-busy-indicator", active: true }) }), this.isPhone && (jsxRuntime.jsx("div", { slot: "footer", class: "ui5-menu-dialog-footer", children: jsxRuntime.jsx(Button.Button, { design: "Transparent", onClick: this._closeAll, children: this.labelCancel }) }))] });
+	    return this.hasSubmenu && parametersBundle_css.jsxs(ResponsivePopover.ResponsivePopover, { id: `${this._id}-menu-rp`, class: "ui5-menu-rp ui5-menu-rp-sub-menu", preventInitialFocus: true, preventFocusRestore: true, hideArrow: true, allowTargetOverlap: true, placement: ResponsivePopover.PopoverPlacement.End, verticalAlign: "Top", accessibleName: this.accessibleNameText, onBeforeOpen: this._beforePopoverOpen, onOpen: this._afterPopoverOpen, onBeforeClose: this._beforePopoverClose, onClose: this._afterPopoverClose, children: [this.isPhone && (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: parametersBundle_css.jsxs("div", { slot: "header", class: "ui5-menu-dialog-header", children: [parametersBundle_css.jsx(Button.Button, { icon: navBackIcon, class: "ui5-menu-back-button", design: "Transparent", "aria-label": this.labelBack, onClick: this._close }), parametersBundle_css.jsx("div", { class: "ui5-menu-dialog-title", children: parametersBundle_css.jsx("div", { children: this.text }) })] }) })), parametersBundle_css.jsx("div", { id: `${this._id}-menu-main`, class: this.loading ? "menu-busy-indicator-main" : "", "aria-busy": this.loading, children: this.items.length ? (parametersBundle_css.jsx(List.List, { id: `${this._id}-menu-list`, selectionMode: "None", separators: "None", accessibleRole: "Menu", loading: this.loading, loadingDelay: this.loadingDelay, onMouseOver: this._itemMouseOver, onKeyDown: this._itemKeyDown, onKeyUp: this._itemKeyUp, "onui5-close-menu": this._close, "onui5-exit-end-content": this._navigateOutOfEndContent, children: parametersBundle_css.jsx("slot", {}) })) : this.loading && parametersBundle_css.jsx(Button.BusyIndicator, { id: `${this._id}-menu-busy-indicator`, delay: this.loadingDelay, class: "ui5-menu-busy-indicator", active: true }) }), this.isPhone && (parametersBundle_css.jsx("div", { slot: "footer", class: "ui5-menu-dialog-footer", children: parametersBundle_css.jsx(Button.Button, { design: "Transparent", onClick: this._closeAll, children: this.labelCancel }) }))] });
 	}
 
-	Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-	Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+	ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+	ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
 	var menuItemCss = `:host{line-height:initial}::slotted([ui5-menu-item]){line-height:inherit}.ui5-menu-rp[ui5-responsive-popover]::part(header),.ui5-menu-rp[ui5-responsive-popover]::part(content),.ui5-menu-rp[ui5-responsive-popover]::part(footer){padding:0}.ui5-menu-rp[ui5-responsive-popover]{box-shadow:var(--sapContent_Shadow1);border-radius:var(--_ui5_menu_popover_border_radius)}.ui5-menu-busy-indicator{width:100%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}.ui5-menu-busy-indicator-main{min-height:var(--_ui5_list_item_base_height)}.ui5-menu-dialog-header{display:flex;height:var(--_ui5-responsive_popover_header_height);align-items:center;justify-content:space-between;padding:0px 1rem;width:100%;overflow:hidden}.ui5-menu-dialog-title{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;width:calc(100% - 6.5rem);padding-right:1rem;font-family:var(--sapFontHeaderFamily)}.ui5-menu-dialog-title>h1{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--sapFontHeader5Size)}.ui5-menu-back-button{margin-right:1rem}.ui5-menu-dialog-footer{display:flex;align-items:center;justify-content:flex-end;padding:0 1rem;width:100%;border-top:.0625rem solid var(--sapPageFooter_BorderColor)}.ui5-menu-rp.ui5-menu-rp-sub-menu{margin-top:.25rem;margin-inline:var(--_ui5_menu_submenu_margin_offset)}:host([disabled]){pointer-events:initial;opacity:initial}:host([disabled])::part(content){opacity:var(--_ui5-listitembase_disabled_opacity)}:host([disabled][actionable]:not([active]):not([selected]):hover),:host([disabled][active][actionable]){background:var(--ui5-listitem-background-color)}:host([active]:not([disabled])),:host([active]:not([disabled])):hover{background-color:var(--sapList_Active_Background)}:host(:not([active]):not([selected]):not([disabled]):hover){background-color:var(--sapList_Hover_Background)}:host([disabled][active][actionable]) .ui5-li-root .ui5-li-icon{color:var(--sapContent_NonInteractiveIconColor)}:host([active]:not([disabled]))::part(content),:host([active]:not([disabled]))::part(additional-text),:host([active]:not([disabled])) .ui5-li-root .ui5-li-icon{color:var(--sapList_Active_TextColor)}:host([focused]:not([active]):not([disabled])){background-color:var(--sapList_Hover_Background)}:host::part(additional-text){margin:unset;margin-inline-start:1rem;color:var(--sapContent_LabelColor);min-width:max-content}.ui5-menu-item-text{width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;pointer-events:none;display:inline-block;font-size:var(--sapFontSize)}.ui5-menu-item-dummy-icon{visibility:hidden}:host::part(title){font-size:var(--sapFontSize);padding-top:.125rem}:host([icon]:not([is-phone]))::part(title),:host([is-phone]:not([icon=""]))::part(title){padding-top:0}:host(:not([is-phone]))::part(native-li){user-select:none;padding:var(--_ui5_menu_item_padding)}:host::part(content){padding-inline-end:.25rem}.ui5-menu-item-submenu-icon{min-width:var(--_ui5_list_item_icon_size);min-height:var(--_ui5_list_item_icon_size);display:inline-block;vertical-align:middle;pointer-events:none}.ui5-menu-item-icon-end{display:inline-block;vertical-align:middle;padding-inline-start:.5rem;pointer-events:none;position:absolute;inset-inline-end:var(--_ui5_menu_item_submenu_icon_right)}.ui5-menu-item-submenu-icon .ui5-menu-item-icon-end{color:var(--sapContent_NonInteractiveIconColor)}.ui5-menu-item-dummy-icon{min-width:var(--_ui5_list_item_icon_size);min-height:var(--_ui5_list_item_icon_size);display:inline-block;vertical-align:middle;padding-inline-end:.75rem;pointer-events:none}.ui5-menu-item-checked{padding-inline-start:.5rem;padding-inline-end:0;font-weight:400;text-align:center}.ui5-menu-item-icon-checked{color:var(--sapContent_BusyColor);padding-top:.25rem}.ui5-menu-item-end-content{display:inline-flex;align-items:center}.ui5-menu-busy-indicator{position:absolute;width:100%;top:50%;left:50%;transform:translate(-50%,-50%)}
 `;
 
@@ -633,7 +370,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        this._openedByMouse = false;
 	        this._itemNavigation = new webcomponentsBase.f$1(this, {
 	            navigationMode: webcomponentsBase.r.Horizontal,
-	            behavior: webcomponentsBase.l$1.Static,
+	            behavior: webcomponentsBase.l.Static,
 	            getItemsCallback: () => this._navigableItems,
 	        });
 	    }
@@ -679,7 +416,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        return this.text;
 	    }
 	    get isPhone() {
-	        return Theme.d();
+	        return ManagedStyles.d();
 	    }
 	    get labelBack() {
 	        return MenuItem_1.i18nBundle.getText(i18nDefaults.MENU_BACK_BUTTON_ARIA_LABEL);
@@ -722,7 +459,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        });
 	    }
 	    async focus(focusOptions) {
-	        await Theme.w();
+	        await ManagedStyles.w();
 	        if (this.hasSubmenu && this.isSubMenuOpen) {
 	            const menuItems = this._allMenuItems;
 	            return menuItems[0] && menuItems[0].focus(focusOptions);
@@ -813,7 +550,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        });
 	    }
 	    _itemMouseOver(e) {
-	        if (!Theme.f$1()) {
+	        if (!ManagedStyles.f$1()) {
 	            return;
 	        }
 	        const item = e.target;
@@ -832,8 +569,15 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        return webcomponentsBase.b(e) || webcomponentsBase.i(e);
 	    }
 	    _onclick(e) {
+	        // Clicks on the endContent slot must not activate the item (which would close the menu).
+	        if (this._isEndContentClicked(e)) {
+	            return;
+	        }
 	        this._shiftPressed = this._isCheckable && e.shiftKey;
 	        super._onclick(e);
+	    }
+	    _isEndContentClicked(e) {
+	        return this.endContent.some(element => e.composedPath().includes(element));
 	    }
 	    _itemKeyDown(e) {
 	        const item = e.target;
@@ -894,7 +638,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	            this._allMenuItems[0]?.focus();
 	        }
 	        if (this.loading) {
-	            InvisibleMessage.p(MenuItem_1.i18nBundle.getText(i18nDefaults.MENU_ITEM_LOADING));
+	            List.p(MenuItem_1.i18nBundle.getText(i18nDefaults.MENU_ITEM_LOADING));
 	        }
 	        this.fireDecoratorEvent("open");
 	    }
@@ -907,7 +651,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        this.selected = false;
 	        if (e.detail.escPressed) {
 	            this.focus();
-	            if (Theme.d()) {
+	            if (ManagedStyles.d()) {
 	                this.fireDecoratorEvent("close-menu");
 	            }
 	        }
@@ -971,12 +715,12 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    webcomponentsBase.d()
 	], MenuItem.prototype, "endContent", void 0);
 	__decorate([
-	    parametersBundle_css.i("@ui5/webcomponents")
+	    parametersBundle_css$1.i("@ui5/webcomponents")
 	], MenuItem, "i18nBundle", void 0);
 	MenuItem = MenuItem_1 = __decorate([
 	    webcomponentsBase.m({
 	        tag: "ui5-menu-item",
-	        renderer: jsxRuntime.y,
+	        renderer: parametersBundle_css.y,
 	        template: MenuItemTemplate,
 	        styles: [ListItemTemplate.ListItem.styles, menuItemCss],
 	    })
@@ -1045,7 +789,6 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	var MenuItem$1 = MenuItem;
 	const isInstanceOfMenuItem = webcomponentsBase.r$1("isMenuItem");
 
-	exports.ListItemCustom = ListItemCustom$1;
 	exports.MenuItem = MenuItem$1;
 	exports.MenuItemGroupCheckMode = MenuItemGroupCheckMode$1;
 	exports.MenuItemTemplate = MenuItemTemplate;

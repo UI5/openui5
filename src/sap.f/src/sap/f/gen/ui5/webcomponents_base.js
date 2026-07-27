@@ -17,7 +17,7 @@ sap.ui.define(
     // export the UI5 metadata along with the package
     pkg["_ui5metadata"] = {
       name: "sap/f/gen/ui5/webcomponents_base",
-      version: "2.23.2",
+      version: "2.24.0",
       dependencies: ["sap.ui.core"],
       types: [
         "sap.f.gen.ui5.webcomponents_base.dist.types.AnimationMode",

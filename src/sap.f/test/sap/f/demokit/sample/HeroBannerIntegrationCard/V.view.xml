@@ -1,0 +1,30 @@
+<mvc:View
+	controllerName="sap.f.sample.HeroBannerIntegrationCard.C"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:f="sap.f"
+	xmlns:w="sap.ui.integration.widgets"
+	height="100%"
+	displayBlock="true">
+	<Page showHeader="false">
+		<content>
+			<VBox class="sapUiMediumMarginBeginEnd sapUiMediumMarginTop">
+				<f:HeroBanner
+					headerText="Good Morning, John"
+					overlineText="Thursday, July 10, 2026"
+					columnsRatio="FirstWider">
+					<f:actions>
+						<Button text="Explore" type="Emphasized" />
+						<Button text="Settings" />
+					</f:actions>
+					<f:startContent>
+						<w:Card manifest="test-resources/sap/f/demokit/sample/HeroBannerIntegrationCard/startContentManifest.json" />
+					</f:startContent>
+					<f:endContent>
+						<w:Card manifest="test-resources/sap/f/demokit/sample/HeroBannerIntegrationCard/endContentManifest.json" />
+					</f:endContent>
+				</f:HeroBanner>
+			</VBox>
+		</content>
+	</Page>
+</mvc:View>

@@ -1,0 +1,15 @@
+/* ================================= */
+/* CSS for control sap.f/HeroBanner  */
+/* Base theme                        */
+/* ================================= */
+
+/* The HeroBanner web component sets --sapButton_IconColor to the banner text color
+   on its internal .ui5-banner-actions container. This CSS variable cascades through
+   the slot boundary into slotted sap.m.Button icons, making them invisible.
+   Reset it to the standard button icon color for all buttons placed in the banner.
+   The attribute selector [ui5-hero-banner] is set by the web component runtime on
+   connectedCallback and is stable — unlike the scoped tag name which carries a
+   build-time hash suffix that changes on each ui5-tooling regeneration. */
+[ui5-hero-banner] .sapMBtnIcon.sapUiIcon {
+	color: @sapButton_IconColor;
+}
