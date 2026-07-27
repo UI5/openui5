@@ -1688,7 +1688,7 @@ sap.ui.define([
 				sWhite = oBundle.getText("COLOR_PALETTE_PREDEFINED_COLOR_WHITE"),
 				$SwatchContainer,
 				$aSwatches,
-				sCPSwatchContainerTitle = oBundle.getText("COLOR_PALETTE_SWATCH_CONTAINER_TITLE");
+				sCPSwatchContainerTitle = oBundle.getText("COLOR_PALETTE_SWATCH_CONTAINER_TITLE", [3]);
 
 			// Act
 			oCP.placeAt("qunit-fixture");
