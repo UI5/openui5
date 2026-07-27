@@ -1,0 +1,17 @@
+{
+  "1.152.0": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "2366334ce272ed271c46025c288fbb143ad2d130",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: Inline CSS limited"
+      },
+      {
+        "id": "528bf0ca7cda30db707c6baf0744a1ce690aa82b",
+        "type": "FIX",
+        "text": " sap.uxap: ObjectPageLayoutABHelper: customData forward"
+      }
+    ]
+  }
+}

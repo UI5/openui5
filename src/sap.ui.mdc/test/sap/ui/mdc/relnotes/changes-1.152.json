@@ -1,0 +1,27 @@
+{
+  "1.152.0": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "d43779e10b83ab3261bebc1ffee9622c851f9d9a",
+        "type": "FIX",
+        "text": "mdc.ValueHelp: Fix active filters count"
+      },
+      {
+        "id": "a9c0a70983e8b8ce5038202c65efdb03db6d4247",
+        "type": "FIX",
+        "text": " FilterBar: no changes on adapt-filters make table inactive"
+      },
+      {
+        "id": "d6e50263e30d0d06e660f38815a5b9d67ff16242",
+        "type": "FIX",
+        "text": " FilterBar: Clear button - focus lost"
+      },
+      {
+        "id": "e6ced8930b7fe4b266fa182032e5bec8789754fb",
+        "type": "FIX",
+        "text": " mdc.Link: items caching fix"
+      }
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "1.152.0": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "c804c6f12a44921a4ea966039b8dc70df9a0cb71",
+        "type": "FEATURE",
+        "text": " Date and Time: added new handling for high zoom levels."
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "1.152.0": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "34fc1f23b48534eb4a9b907102bbf00699a3ac0c",
+        "type": "FIX",
+        "text": " sap/ui/core/format/DateFormat: escape calendar week pattern"
+      },
+      {
+        "id": "d18452e9e42ffc0528da0906dcc6748794e99995",
+        "type": "FIX",
+        "text": " sap.ui.test.actions.Action: fix focus issue on Firefox"
+      }
+    ]
+  }
+}

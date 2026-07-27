@@ -1,0 +1,27 @@
+{
+  "1.152.0": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "03231d54f29b336920f4e09183bbcb265e8a68e7",
+        "type": "FIX",
+        "text": "p13n.FilterPanel: fix import"
+      },
+      {
+        "id": "c804c6f12a44921a4ea966039b8dc70df9a0cb71",
+        "type": "FEATURE",
+        "text": " Date and Time: added new handling for high zoom levels."
+      },
+      {
+        "id": "63294d9721ac10758250fc919675fc404677c2ce",
+        "type": "FIX",
+        "text": " sap.m.DatePicker: not setting min/max date if there are no"
+      },
+      {
+        "id": "1e6a73c86bb14888dcdd399c35209808715bd94d",
+        "type": "FIX",
+        "text": "p13n.FilterPanel: announcement missing on adding filter"
+      }
+    ]
+  }
+}
