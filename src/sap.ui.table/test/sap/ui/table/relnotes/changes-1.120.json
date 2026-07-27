@@ -115,5 +115,15 @@
         "text": " ui.Table: Prevent page scrolling on space keydown on cell level"
       }
     ]
+  },
+  "1.120.48": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "4302d2f26801dcf19ce3e0a338b7e4671f8281c0",
+        "type": "FIX",
+        "text": " ui.Table: Add aria-owns for rows to ensure correct column count announcement"
+      }
+    ]
   }
 }

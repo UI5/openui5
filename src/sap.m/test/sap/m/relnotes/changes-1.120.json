@@ -1561,5 +1561,15 @@
         "text": " sap.m.ComboBox: adjust failing tests in FF"
       }
     ]
+  },
+  "1.120.48": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "3096a7ce749e1766e1063a404216460bd307b54f",
+        "type": "FIX",
+        "text": " sap.m.Dialog: min-width 100% on narrow viewports"
+      }
+    ]
   }
 }
