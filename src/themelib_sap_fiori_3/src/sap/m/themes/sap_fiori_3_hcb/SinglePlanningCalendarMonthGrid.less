@@ -16,6 +16,11 @@ html.sap-desktop .sapMSPCMonthDay.sapMSPCMonthDayToday:focus .sapMSPCMonthNowMar
 	border-width: 0.125rem;
 }
 
+.sapMSPCMonthDay:not(.sapMSPCMonthDayToday):focus-visible::after,
+.sapMSPCMonthDay.sapMSPCMonthDayToday:focus-visible .sapMSPCMonthNowMarker::after {
+	border-width: 0.125rem;
+}
+
 .calendarSpecialDayTypeColorMixIn(sapUiCalendarSpecialDayType01, @sapLegendColor1);
 .calendarSpecialDayTypeColorMixIn(sapUiCalendarSpecialDayType02, @sapLegendColor2);
 .calendarSpecialDayTypeColorMixIn(sapUiCalendarSpecialDayType03, @sapLegendColor3);

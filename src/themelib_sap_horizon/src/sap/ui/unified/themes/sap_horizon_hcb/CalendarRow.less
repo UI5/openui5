@@ -21,7 +21,8 @@
 
 /* Appointments */
 /* as outlines can't have different offsets on one side (no left border) and don't work in IE just use a inner border */
-html.sap-desktop .sapUiCalendarApp:focus > .sapUiCalendarAppCont::after {
+html.sap-desktop .sapUiCalendarApp:focus > .sapUiCalendarAppCont::after,
+.sapUiCalendarApp:not(.sapUiCalItemFocusFromTouch):focus-visible > .sapUiCalendarAppCont::after {
 	position: absolute;
 	top: 1px;
 	left: 1px;
@@ -42,16 +43,19 @@ html.sap-desktop .sapUiCalendarApp:focus > .sapUiCalendarAppCont::after {
 	border-bottom-left-radius: 0;
 }
 
-html.sap-desktop .sapUiCalendarApp:focus:not(:active) > .sapUiCalendarAppCont {
+html.sap-desktop .sapUiCalendarApp:focus:not(:active) > .sapUiCalendarAppCont,
+.sapUiCalendarApp:not(.sapUiCalItemFocusFromTouch):focus-visible:not(:active) > .sapUiCalendarAppCont {
 	background-color: var(--sapList_Background);
 }
 
 html.sap-desktop .sapUiCalendarApp.sapUiCalendarAppSel:focus:hover:not(:active) > .sapUiCalendarAppCont,
-html.sap-desktop .sapUiCalendarApp:hover:not(:active) > .sapUiCalendarAppCont {
+html.sap-desktop .sapUiCalendarApp:hover:not(:active) > .sapUiCalendarAppCont,
+.sapUiCalendarApp.sapUiCalendarAppSel:not(.sapUiCalItemFocusFromTouch):focus-visible:not(:active) > .sapUiCalendarAppCont {
 	background-color: var(--sapList_Hover_Background);
 }
 
-html.sap-desktop .sapUiCalendarAppSel:focus > .sapUiCalendarAppCont::after {
+html.sap-desktop .sapUiCalendarAppSel:focus > .sapUiCalendarAppCont::after,
+.sapUiCalendarAppSel:not(.sapUiCalItemFocusFromTouch):focus-visible > .sapUiCalendarAppCont::after {
 	border-color: var(--sapContent_ContrastFocusColor);
 	left: 2px;
 }
@@ -73,7 +77,9 @@ html.sap-desktop .sapUiCalendarApp:hover:not(:active) > .sapUiCalendarAppCont {
 
 html.sap-desktop .sapUiCalendarApp.sapUiCalendarAppSel:hover:not(:active),
 html.sap-desktop .sapUiCalendarApp.sapUiCalendarAppSel:focus:not(:active) > .sapUiCalendarAppCont,
-html.sap-desktop .sapUiCalendarApp.sapUiCalendarAppSel:focus:not(:active){
+html.sap-desktop .sapUiCalendarApp.sapUiCalendarAppSel:focus:not(:active),
+.sapUiCalendarApp.sapUiCalendarAppSel:not(.sapUiCalItemFocusFromTouch):focus-visible:not(:active) > .sapUiCalendarAppCont,
+.sapUiCalendarApp.sapUiCalendarAppSel:not(.sapUiCalItemFocusFromTouch):focus-visible:not(:active) {
 	background-color: var(--sapContent_Selected_Hover_Background);
 	color: var(--sapContent_Selected_TextColor);
 }
@@ -85,7 +91,8 @@ html.sap-desktop .sapUiCalendarApp.sapUiCalendarAppSel:focus:not(:active){
 }
 
 html.sap-desktop .sapUiCalendarApp.sapUiCalendarAppSel:focus:not(:active) > .sapUiCalendarAppCont,
-html.sap-desktop .sapUiCalendarApp.sapUiCalendarAppSel:hover:not(:active) > .sapUiCalendarAppCont {
+html.sap-desktop .sapUiCalendarApp.sapUiCalendarAppSel:hover:not(:active) > .sapUiCalendarAppCont,
+.sapUiCalendarApp.sapUiCalendarAppSel:not(.sapUiCalItemFocusFromTouch):focus-visible:not(:active) > .sapUiCalendarAppCont {
 	border-color: var(--sapList_SelectionBorderColor);
 	border-left-color: var(--sapList_Background);
 }

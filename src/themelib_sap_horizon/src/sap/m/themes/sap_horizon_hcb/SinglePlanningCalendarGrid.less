@@ -26,6 +26,49 @@ html.sap-desktop {
 	}
 }
 
+.sapMSinglePCBlockersRow > .sapMSinglePCBlockersColumns > .sapMSinglePCBlockersColumn:focus-visible::after,
+.sapMSinglePCGridContent .sapMSinglePCColumns .sapMSinglePCRow:focus-visible::after {
+	border: 0.125rem dotted var(--sapContent_FocusColor);
+}
+
+html.sap-desktop .sapMSinglePC {
+	.sapMSinglePCAppointmentWrap.sapUiCalendarRowApps {
+
+		&:focus {
+
+			.sapUiCalendarAppCont::after {
+				border: 0.125rem dotted var(--sapContent_ContrastFocusColor);
+			}
+
+			.sapUiCalendarAppSel > .sapUiCalendarAppCont::after {
+				border: 0.125rem dotted var(--sapContent_ContrastFocusColor);
+			}
+		}
+	}
+
+	.sapUiCalItem:focus {
+		outline: none;
+	}
+}
+
+.sapMSinglePCAppointmentWrap.sapUiCalendarRowApps {
+
+	&:focus-visible {
+
+		.sapUiCalendarAppCont::after {
+			border: 0.125rem dotted var(--sapContent_ContrastFocusColor);
+		}
+
+		.sapUiCalendarAppSel>.sapUiCalendarAppCont::after {
+			border: 0.125rem dotted var(--sapContent_ContrastFocusColor);
+		}
+	}
+}
+
+.sapUiCalItem:focus-visible {
+	outline: none;
+}
+
 .sapMSinglePC {
 
 	.sapMSinglePCRow,
@@ -66,21 +109,6 @@ html.sap-desktop {
 				border: none;
 			}
 		}
-
-		&:focus {
-
-			.sapUiCalendarAppCont::after {
-				border: 0.125rem dotted var(--sapContent_ContrastFocusColor);
-			}
-
-			.sapUiCalendarAppSel > .sapUiCalendarAppCont::after {
-				border: 0.125rem dotted var(--sapContent_ContrastFocusColor);
-			}
-		}
-	}
-
-	.sapUiCalItem:focus {
-		outline: none;
 	}
 
 	.sapMSinglePCColumnHeader {
@@ -117,6 +145,30 @@ html.sap-desktop {
 	}
 }
 
+html.sap-desktop .sapUiSizeCompact .sapMSinglePC {
+	.sapMSinglePCColumnHeader {
+		.sapUiCalItem.sapUiCalItemSel:not(.sapUiCalItemNow):not(.sapUiCalItemSelBetween):focus > .sapUiCalItemText {
+			border: 1px solid transparent;
+		}
+
+		.sapUiCalItem:focus > .sapUiCalItemText {
+			outline: none;
+		}
+	}
+}
+
+.sapUiSizeCompact .sapMSinglePC {
+	.sapMSinglePCColumnHeader {
+		.sapUiCalItem:not(.sapUiCalItemFocusFromTouch).sapUiCalItemSel:not(.sapUiCalItemNow):not(.sapUiCalItemSelBetween):focus-visible > .sapUiCalItemText {
+			border: 1px solid transparent;
+		}
+
+		.sapUiCalItem:focus-visible > .sapUiCalItemText {
+			outline: none;
+		}
+	}
+}
+
 .sapUiSizeCompact .sapMSinglePC {
 
 	.sapMSinglePCColumnHeader {
@@ -141,8 +193,7 @@ html.sap-desktop {
 			}
 		}
 
-		.sapUiCalItem.sapUiCalItemSel:not(.sapUiCalItemSelBetween) > .sapUiCalItemText,
-		.sapUiCalItem.sapUiCalItemSel:not(.sapUiCalItemNow):not(.sapUiCalItemSelBetween):focus > .sapUiCalItemText {
+		.sapUiCalItem.sapUiCalItemSel:not(.sapUiCalItemSelBetween) > .sapUiCalItemText {
 			border: 1px solid transparent;
 		}
 
@@ -152,10 +203,6 @@ html.sap-desktop {
 			.sapUiCalItemText {
 				line-height: 1.825rem;
 			}
-		}
-
-		.sapUiCalItem:focus > .sapUiCalItemText {
-			outline: none;
 		}
 
 		.sapUiCalItem {
