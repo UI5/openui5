@@ -971,7 +971,7 @@ sap.ui.define([
 
 		function pressHeaderSelector() {
 			return doSelection(function() {
-				oSelectionPlugin.onHeaderSelectorPress();
+				oSelectionPlugin.handleHeaderSelectorPress();
 			});
 		}
 
@@ -1031,7 +1031,7 @@ sap.ui.define([
 
 		function pressKeyboardShortcut(sType) {
 			return doSelection(function() {
-				oSelectionPlugin.onKeyboardShortcut(sType, {setMarked: () => { }});
+				oSelectionPlugin.handleKeyboardShortcut(sType, {setMarked: () => { }});
 			});
 		}
 
@@ -1203,7 +1203,7 @@ sap.ui.define([
 
 		await new Promise(function(resolve) {
 			oSelectionPlugin.attachEventOnce("selectionChange", resolve);
-			oSelectionPlugin.onHeaderSelectorPress();
+			oSelectionPlugin.handleHeaderSelectorPress();
 		});
 
 		assert.ok(oSelectionChangeSpy.calledOnce, "The \"selectionChange\" event was fired once");
@@ -1500,7 +1500,7 @@ sap.ui.define([
 		assert.deepEqual(oSelectionPlugin.getSelectedIndices(), [], "Nothing selected");
 	});
 
-	QUnit.test("#onKeyboardShortcut - Event Marking", async function(assert) {
+	QUnit.test("#handleKeyboardShortcut - Event Marking", async function(assert) {
 		const sEventMarker = "sapUiTableClearAll";
 		const oEvent = {
 			setMarked: function() { }
@@ -1514,29 +1514,29 @@ sap.ui.define([
 		await this.oTable.qunit.whenRenderingFinished();
 
 		let nextSelectionChange = TableQUnitUtils.nextEvent("selectionChange", oSelectionPlugin);
-		oSelectionPlugin.onKeyboardShortcut("toggle", oEvent);
+		oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
 		await nextSelectionChange;
 
 		assert.ok(oSelectAllSpy.calledOnce, "select all called");
 		assert.ok(oSetMarkedSpy.notCalled, `Event has not been marked with ${sEventMarker}`);
 
-		oSelectionPlugin.onKeyboardShortcut("toggle", oEvent);
+		oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
 		assert.ok(oClearSelectionSpy.calledOnce, "clear all called");
 		assert.ok(oSetMarkedSpy.calledOnceWithExactly(sEventMarker), `Event has been marked with ${sEventMarker}`);
 
-		oSelectionPlugin.onKeyboardShortcut("clear", oEvent);
+		oSelectionPlugin.handleKeyboardShortcut("clear", oEvent);
 		assert.ok(oClearSelectionSpy.calledTwice, "Selection is cleared");
 		assert.ok(oSetMarkedSpy.calledTwice, `Event marked twice`);
 		assert.ok(oSetMarkedSpy.calledWithExactly(sEventMarker), `Event has been marked with ${sEventMarker}`);
 
 		oSetMarkedSpy.reset();
-		oSelectionPlugin.onKeyboardShortcut("toggle", oEvent);
+		oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
 		await TableQUnitUtils.nextEvent("selectionChange", oSelectionPlugin);
 
 		assert.ok(oSelectAllSpy.callCount, 2, "select all called");
 		assert.ok(oSetMarkedSpy.notCalled, "Event has not been marked");
 
-		oSelectionPlugin.onKeyboardShortcut("toggle", oEvent);
+		oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
 		assert.ok(oClearSelectionSpy.calledThrice, "clear all called");
 		assert.ok(oSetMarkedSpy.calledOnceWithExactly(sEventMarker), `Event has been marked with ${sEventMarker}`);
 
@@ -1547,7 +1547,7 @@ sap.ui.define([
 		oSelectionPlugin.addSelectionInterval(0, 2);
 		await nextSelectionChange;
 
-		oSelectionPlugin.onKeyboardShortcut("clear", oEvent);
+		oSelectionPlugin.handleKeyboardShortcut("clear", oEvent);
 		assert.ok(oClearSelectionSpy.calledOnce, "Selection is cleared");
 		assert.ok(oSetMarkedSpy.calledOnce, `Event marked once`);
 		assert.ok(oSetMarkedSpy.calledWithExactly(sEventMarker), `Event has been marked with ${sEventMarker}`);

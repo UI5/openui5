@@ -87,22 +87,50 @@ sap.ui.define([
 
 	/**
 	 * This hook is called when the header selector is pressed.
-	 * TODO: Also provide the event object?
 	 *
 	 * @private
 	 */
-	SelectionPlugin.prototype.onHeaderSelectorPress = function() { };
+	SelectionPlugin.prototype.onHeaderSelectorPress = function() {
+		if (this.isActive()) {
+			this.handleHeaderSelectorPress();
+		}
+	};
+
+	/**
+	 * Handles a header selector press. Subclasses override this method to implement the selection behavior.
+	 *
+	 * @returns {Promise} A promise that resolves once the selection change has completed.
+	 * @private
+	 */
+	SelectionPlugin.prototype.handleHeaderSelectorPress = function() {
+		return Promise.resolve();
+	};
 
 	/**
 	 * This hook is called when a keyboard shortcut relevant for selection is pressed.
-	 * TODO: Document type parameter to that possible values are clear
-	 * TODO: Also provide the event object?
 	 *
-	 * @param {string} sType Type of the keyboard shortcut.
+	 * @param {string} sType Type of the keyboard shortcut. Can be <code>toggle</code> or <code>clear</code>.
 	 * @param {sap.ui.base.Event} oEvent The emitted event.
 	 * @private
 	 */
-	SelectionPlugin.prototype.onKeyboardShortcut = function(sType, oEvent) { };
+	SelectionPlugin.prototype.onKeyboardShortcut = function(sType, oEvent) {
+		if (this.isActive()) {
+			this.handleKeyboardShortcut(sType, oEvent);
+		}
+	};
+
+	/**
+	 * Handles a selection-relevant keyboard shortcut. The event object must be marked synchronously if the shortcut is handled.
+	 * TODO: Document type parameter to that possible values are clear
+	 *
+	 * @param {string} sType Type of the keyboard shortcut. Can be <code>toggle</code> or <code>clear</code>.
+	 * @param {sap.ui.base.Event} oEvent The emitted event.
+	 * @returns {Promise} A promise that resolves once the selection change has completed.
+	 * @private
+	 */
+	SelectionPlugin.prototype.handleKeyboardShortcut = function(sType, oEvent) {
+		return Promise.resolve();
+	};
 
 	/**
 	 * Changes the selection state of a row.
