@@ -193,5 +193,30 @@
         "text": "p13n.ChartItemPanel: fix acc issues"
       }
     ]
+  },
+  "1.136.19": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "4409e3cd510f96253e935dc540541a929d8b2602",
+        "type": "FIX",
+        "text": " FilterBar: Clear button - focus lost"
+      },
+      {
+        "id": "84398803b4379f877266fc7437e5fb45c1bbd8b2",
+        "type": "FIX",
+        "text": " MDC OPA test utils: fix column personalization in Firefox"
+      },
+      {
+        "id": "52d513ec5fc902c634aada34d49d2c46ce435833",
+        "type": "FIX",
+        "text": " mdc/SmartChart: 'View By' popover now have correct announcement."
+      },
+      {
+        "id": "99ebc606dfa641ef7ccefe3e1bdd3b5b4980c1c8",
+        "type": "FIX",
+        "text": " ValueHelp: min width of SearchField."
+      }
+    ]
   }
 }

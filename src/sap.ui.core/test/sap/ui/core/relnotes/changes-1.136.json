@@ -413,5 +413,25 @@
         "text": " sap.ui.test.autowaiter._timeoutWaiter: Guard log construction with level check"
       }
     ]
+  },
+  "1.136.19": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "5a72ebff63b28d9b91386e6a6bb7e7c1f80266b7",
+        "type": "FIX",
+        "text": " core/Element: Skip focus redirect on same-parent move"
+      },
+      {
+        "id": "f806a2e09ef9cd50c9b8463546f44d62de892a43",
+        "type": "FIX",
+        "text": " sap.ui.core.format.NumberFormat#getDefaultUnitPattern: Replace normal space with non-breaking space"
+      },
+      {
+        "id": "2f40d56ee8fc1876eb76672e80c3339276aca06a",
+        "type": "FIX",
+        "text": " sap.ui.core.ShortcutHintsMixin: Hide shortcut hint on mouseout"
+      }
+    ]
   }
 }

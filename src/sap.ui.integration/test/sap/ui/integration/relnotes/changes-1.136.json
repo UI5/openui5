@@ -28,5 +28,15 @@
         "text": " DemoKit: Hardened script loading in internal bootstrap processes for Card Explorer and Accessibility Guide applications"
       }
     ]
+  },
+  "1.136.19": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "e2f7ac525eaa4905c4b52778cc443500652d4604",
+        "type": "FIX",
+        "text": " sap.ui.integration.widgets.Card: Stabilize PreventKeyboardScrolling test"
+      }
+    ]
   }
 }

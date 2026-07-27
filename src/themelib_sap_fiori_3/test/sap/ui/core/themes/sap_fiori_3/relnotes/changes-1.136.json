@@ -63,5 +63,15 @@
         "text": " sap.m.PlanningCalendar: fixed focus on Planning Calendar Row"
       }
     ]
+  },
+  "1.136.19": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "01b3dc2bbb61e1a2cb50f666f5e7d4586affa69a",
+        "type": "FIX",
+        "text": " sap.m.MessageBox: box shadow of the header fixed"
+      }
+    ]
   }
 }

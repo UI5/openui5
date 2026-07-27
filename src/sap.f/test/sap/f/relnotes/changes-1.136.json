@@ -53,5 +53,15 @@
         "text": " sap.m.GridListItem: Missing shadow on selected state added"
       }
     ]
+  },
+  "1.136.19": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "706a02d737a66a7aa398e014876107f47ce9bfa3",
+        "type": "FIX",
+        "text": " sap.f.DynamicPage: Cache scrollbar width to avoid excessive style recalculations"
+      }
+    ]
   }
 }

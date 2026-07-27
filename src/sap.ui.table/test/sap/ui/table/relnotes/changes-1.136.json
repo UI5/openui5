@@ -43,5 +43,15 @@
         "text": " Table: Show busy indicator when selection plugins load data"
       }
     ]
+  },
+  "1.136.19": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "bb1cc6f73aa50abe91f123b0a3bcee5e23f5b757",
+        "type": "FIX",
+        "text": " ui.Table: Prevent page scrolling on space keydown on cell level"
+      }
+    ]
   }
 }

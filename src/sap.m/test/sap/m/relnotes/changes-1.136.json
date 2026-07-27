@@ -733,5 +733,75 @@
         "text": " sap.m.DynamicDateRange: align height to content"
       }
     ]
+  },
+  "1.136.19": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "93d36235908bb70ddad64361b633478de289a3cc",
+        "type": "FIX",
+        "text": " sap.m.Dialog: min-width 100% on narrow viewports"
+      },
+      {
+        "id": "52d513ec5fc902c634aada34d49d2c46ce435833",
+        "type": "FIX",
+        "text": " mdc/SmartChart: 'View By' popover now have correct announcement."
+      },
+      {
+        "id": "ec93a2571911ab15ea3a07823688ac0870a4e8c5",
+        "type": "FIX",
+        "text": " sap.m.DynamicDateRange - labels are not announced"
+      },
+      {
+        "id": "896ed0146b46e106f78a8920400c3cc5359cd0d6",
+        "type": "FIX",
+        "text": " sap.m.PlanningCalendar: fixed rowHeaderPress event firing"
+      },
+      {
+        "id": "f448dc22a688146f086174ad8092f54a47bb667d",
+        "type": "FIX",
+        "text": " sap.m.ObjectHeader: image is decorative if the alt is empty"
+      },
+      {
+        "id": "58fb6fd8465ea4ab959cf4c0e22e03cd169b4db8",
+        "type": "FIX",
+        "text": " sap.m.MessageStrip: Aria attributes are now correctly updated when enableFormattedText:true is set"
+      },
+      {
+        "id": "98cc5ca11336f3e2b9fafefb824f5a5882d878cf",
+        "type": "FIX",
+        "text": " sap.m.DynamicDateRange: week number click does not populate footer dates and enable Apply button"
+      },
+      {
+        "id": "658af5dcbdcb06b17a1bc7bacc9e1eb3a8823e2c",
+        "type": "FIX",
+        "text": " sap.m.IconTabHeader: End overflow tab now displays correct count on mobile devices"
+      },
+      {
+        "id": "d8068abc1712d83db29be6311c630b529358059f",
+        "type": "FIX",
+        "text": " sap.m.DateRangeSelection: returns parameters based on validity"
+      },
+      {
+        "id": "f251dac53adb15955ad5a35ecff808d24e0cc145",
+        "type": "FIX",
+        "text": " sap.m.Popover: Removed invalidate on resize"
+      },
+      {
+        "id": "3da0b728d9139774ac77c896fb04b18ea739a3bb",
+        "type": "FIX",
+        "text": " sap.m.Popover: Calculate correct placement on resize"
+      },
+      {
+        "id": "01b3dc2bbb61e1a2cb50f666f5e7d4586affa69a",
+        "type": "FIX",
+        "text": " sap.m.MessageBox: box shadow of the header fixed"
+      },
+      {
+        "id": "c2204fb6d95ee67c0c167017315333c9c234bda0",
+        "type": "FIX",
+        "text": " sap.m.ComboBox: Group header announced only once"
+      }
+    ]
   }
 }
