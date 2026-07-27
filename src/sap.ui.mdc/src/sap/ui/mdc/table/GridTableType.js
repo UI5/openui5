@@ -525,12 +525,15 @@ sap.ui.define([
 			oRowActionItem = this.getRowActionClone(oOriginalActionItem);
 		}
 
-		// Set model for row settings, as it is not propagated
+		// Temporarily add clone as dependent to propagate model context, then remove it to prevent
+		// the clone from being destroyed when the inner RowActionItem is destroyed during rebinding.
 		oInnerRowActionItem.addDependent(oRowActionItem);
 
 		this.callHook("Press", oRowActionItem, {
 			bindingContext: oEvent.getParameter("row").getBindingContext(this.getInnerTable().getBindingInfo("rows").model)
 		});
+
+		oInnerRowActionItem.removeDependent(oRowActionItem);
 	}
 
 	GridTableType.prototype.prepareRowPress = function() {
