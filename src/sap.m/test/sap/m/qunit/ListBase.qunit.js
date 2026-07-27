@@ -489,6 +489,85 @@ sap.ui.define([
 			assert.strictEqual(oSelectionChangeSpy.callCount, 1, "selectAll fired a removeSelections event via true parameter call");
 		});
 
+		QUnit.test("#_fireHeaderSelectorPress", function(assert) {
+			let iHeaderSelectorPressCount = 0;
+			oList.attachEvent("_headerSelectorPress", function() {
+				iHeaderSelectorPressCount++;
+			});
+
+			oList._fireHeaderSelectorPress();
+			assert.equal(iHeaderSelectorPressCount, 1, "The _headerSelectorPress event is fired once per call");
+		});
+
+		QUnit.test("_headerSelectorPress event - default multiSelectMode", async function(assert) {
+			bindListData(oList, data2, "/items", createTemplateListItem());
+			oList.setMode("MultiSelect");
+			oList.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			const oHeaderSelectorPressSpy = this.spy();
+			oList.attachEvent("_headerSelectorPress", oHeaderSelectorPressSpy);
+
+			// Ctrl+A selects all and fires the event.
+			oList.getItems()[0].focus();
+			qutils.triggerEvent("keydown", document.activeElement, {code: "KeyA", ctrlKey: true});
+			assert.equal(oHeaderSelectorPressSpy.callCount, 1, "Fired on Ctrl+A (select all)");
+
+			// Ctrl+A again deselects all (all selectable already selected) and fires the event.
+			oHeaderSelectorPressSpy.resetHistory();
+			oList.getItems()[0].focus();
+			qutils.triggerEvent("keydown", document.activeElement, {code: "KeyA", ctrlKey: true});
+			assert.equal(oHeaderSelectorPressSpy.callCount, 1, "Fired on Ctrl+A again (deselect all)");
+
+			// Ctrl+Shift+A is a no-op in default multiSelectMode, so the event must not be fired.
+			oHeaderSelectorPressSpy.resetHistory();
+			oList.getItems()[0].focus();
+			qutils.triggerEvent("keydown", document.activeElement, {code: "KeyA", ctrlKey: true, shiftKey: true});
+			assert.equal(oHeaderSelectorPressSpy.callCount, 0, "Not fired on Ctrl+Shift+A");
+		});
+
+		QUnit.test("_headerSelectorPress event - ClearAll multiSelectMode", async function(assert) {
+			bindListData(oList, data2, "/items", createTemplateListItem());
+			oList.setMode("MultiSelect");
+			oList.setMultiSelectMode("ClearAll");
+			oList.placeAt("qunit-fixture");
+			await nextUIUpdate();
+			oList.getItems()[0].setSelected(true);
+
+			const oHeaderSelectorPressSpy = this.spy();
+			oList.attachEvent("_headerSelectorPress", oHeaderSelectorPressSpy);
+
+			// Ctrl+A is a no-op in ClearAll multiSelectMode, so the event must not be fired.
+			oList.getItems()[0].focus();
+			qutils.triggerEvent("keydown", document.activeElement, {code: "KeyA", ctrlKey: true});
+			assert.equal(oHeaderSelectorPressSpy.callCount, 0, "Not fired on Ctrl+A");
+
+			// Ctrl+Shift+A clears all and fires the event.
+			oHeaderSelectorPressSpy.resetHistory();
+			oList.getItems()[0].focus();
+			qutils.triggerEvent("keydown", document.activeElement, {code: "KeyA", ctrlKey: true, shiftKey: true});
+			assert.equal(oHeaderSelectorPressSpy.callCount, 1, "Fired on Ctrl+Shift+A (clear all)");
+		});
+
+		QUnit.test("_headerSelectorPress event is fired after the selectionChange event", async function(assert) {
+			bindListData(oList, data2, "/items", createTemplateListItem());
+			oList.setMode("MultiSelect");
+			oList.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			oList.attachSelectionChange(function() {
+				assert.step("selectionChange");
+			});
+			oList.attachEvent("_headerSelectorPress", function() {
+				assert.step("_headerSelectorPress");
+			});
+
+			// Ctrl+A selects all: the _headerSelectorPress event must be fired after the selectionChange event.
+			oList.getItems()[0].focus();
+			qutils.triggerEvent("keydown", document.activeElement, {code: "KeyA", ctrlKey: true});
+			assert.verifySteps(["selectionChange", "_headerSelectorPress"], "_headerSelectorPress is fired after the selectionChange event");
+		});
+
 		/**
 		 * @deprecated Since version 1.16.
 		 */

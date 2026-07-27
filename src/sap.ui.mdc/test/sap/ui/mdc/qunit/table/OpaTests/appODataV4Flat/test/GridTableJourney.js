@@ -16,10 +16,22 @@ sap.ui.define([
 	});
 
 	opaTest("Select / deselect all visible rows via Select All", function(Given, When, Then) {
+		When.onTheAppMDCTable.iStartObservingHeaderSelectorPressEvent(sTableId);
 		When.onTheAppMDCTable.iClickOnSelectAllCheckBox(sTableId);
 		Then.onTheAppMDCTable.iShouldSeeAllVisibleRowsSelected(sTableId, true);
+		Then.onTheAppMDCTable.iCheckHeaderSelectorPressEventFired(sTableId);
 		When.onTheAppMDCTable.iClickOnSelectAllCheckBox(sTableId);
 		Then.onTheAppMDCTable.iShouldSeeAllVisibleRowsSelected(sTableId, false);
+	});
+
+	opaTest("Select all visible rows via keyboard shortcut", function(Given, When, Then) {
+		When.onTheAppMDCTable.iStartObservingHeaderSelectorPressEvent(sTableId);
+		When.onTheAppMDCTable.iPressSelectAllKeyboardShortcut(sTableId);
+		Then.onTheAppMDCTable.iShouldSeeAllVisibleRowsSelected(sTableId, true);
+		Then.onTheAppMDCTable.iCheckHeaderSelectorPressEventFired(sTableId);
+		When.onTheApp.iGetTheTableInstance(sTableId, function(oTable) {
+			oTable.clearSelection();
+		});
 	});
 
 	opaTest("Select / deselect some rows via the check box", function(Given, When, Then) {

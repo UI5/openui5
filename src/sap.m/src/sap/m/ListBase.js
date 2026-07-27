@@ -1699,6 +1699,17 @@ function(
 		}
 	};
 
+	/**
+	 * Fires the private <code>_headerSelectorPress</code> event. It is supposed to be fired when the user presses the header selector (e.g. the
+	 * select-all checkbox), or a corresponding keyboard shortcut (e.g. CTRL + A), after the selection has been changed.
+	 * Restricted event for sap.ui.mdc.odata.v4.TableDelegate.
+	 *
+	 * @private
+	 */
+	ListBase.prototype._fireHeaderSelectorPress = function() {
+		this.fireEvent("_headerSelectorPress");
+	};
+
 	// Fire selectionChange event and support old select event API
 	ListBase.prototype._fireSelectionChangeEvent = function(aListItems, bSelectAll) {
 		var oListItem = aListItems && aListItems[0];
@@ -2626,6 +2637,7 @@ function(
 				if (bClearAll) {
 					this.removeSelections(false, true);
 					oEvent.setMarked("sapMTableClearAll");
+					this._fireHeaderSelectorPress();
 				}
 			} else if (!bClearAll) {
 				if (this.isAllSelectableSelected()) {
@@ -2634,6 +2646,7 @@ function(
 				} else {
 					this.selectAll(true);
 				}
+				this._fireHeaderSelectorPress();
 			}
 			return preventDefault();
 		}
