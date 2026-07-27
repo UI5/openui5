@@ -37,6 +37,8 @@
 				<m:ToolbarSpacer/>
 				<m:CheckBox selected="{ui>/bCopy}" text="Copy"
 					tooltip="Copy (instead of Move)"/>
+				<m:CheckBox selected="{ui>/bRefreshAfterMove}" text="Refresh after Move"
+					tooltip="Refresh the table keeping the tree state after each Move/Copy"/>
 				<m:Button icon="sap-icon://create" press=".onCreateRoot" tooltip="Create New Root"/>
 				<m:Button icon="sap-icon://hide" press=".onCreateRoot($event, true)"
 					tooltip="Create New Root (filtered out)"/>

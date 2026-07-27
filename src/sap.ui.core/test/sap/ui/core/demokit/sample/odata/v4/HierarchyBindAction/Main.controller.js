@@ -25,6 +25,23 @@ sap.ui.define([
 			}
 		},
 
+		/**
+		 * Move the given node and if configured also refresh the table keeping the tree state.
+		 *
+		 * @param {object} oNode - The node to move
+		 * @param {object} mParameters - The parameters for the move operation
+		 * @returns {Promise<number|undefined>}
+		 *   A Promise resolving with the result of the move operation
+		 */
+		move(oNode, mParameters) {
+			const oPromise = oNode.move(mParameters);
+			if (this.getView().getModel("ui").getProperty("/bRefreshAfterMove")) {
+				this.onRefresh(null, true);
+			}
+
+			return oPromise;
+		},
+
 		onCall(_oEvent) {
 			const oContext = this.getView().getModel()
 				.getKeepAliveContext(
@@ -179,7 +196,7 @@ sap.ui.define([
 			try {
 				this.getView().setBusy(true);
 				const oNode = oEvent.getSource().getBindingContext();
-				const iCopyIndex = await oNode.move({
+				const iCopyIndex = await this.move(oNode, {
 					copy : this.getView().getModel("ui").getProperty("/bCopy"),
 					nextSibling : bLastSibling ? null : undefined,
 					parent : null
@@ -233,13 +250,13 @@ sap.ui.define([
 
 				let iCopyIndex;
 				if (this._vNextSibling === "?") {
-					await this._oNode.move({
+					await this.move(this._oNode, {
 						copy : this.getView().getModel("ui").getProperty("/bCopy"),
 						nextSibling : oParent,
 						parent : oParent.getParent()
 					});
 				} else {
-					iCopyIndex = await this._oNode.move({
+					iCopyIndex = await this.move(this._oNode, {
 						copy : this.getView().getModel("ui").getProperty("/bCopy"),
 						nextSibling : this._vNextSibling,
 						parent : oParent
@@ -267,7 +284,7 @@ sap.ui.define([
 				]);
 
 				if (oNode.created()) { // out-of-place, move it to become the 1st child/root
-					await oNode.move({nextSibling : oSibling, parent : oParent});
+					await this.move(oNode, {nextSibling : oSibling, parent : oParent});
 				} else {
 					if (!oSibling) {
 						MessageBox.information("Cannot move down",
@@ -276,7 +293,7 @@ sap.ui.define([
 					}
 
 					oNode.setKeepAlive(true); // opt-in to update nextSibling's index
-					await oSibling.move({nextSibling : oNode, parent : oParent});
+					await this.move(oSibling, {nextSibling : oNode, parent : oParent});
 				}
 
 				this.scrollTo(oNode.getIndex(), true);
@@ -309,7 +326,7 @@ sap.ui.define([
 					return;
 				}
 
-				await oNode.move({nextSibling : oSibling, parent : oParent});
+				await this.move(oNode, {nextSibling : oSibling, parent : oParent});
 
 				// make sure moved node is visible
 				this.scrollTo(oNode.getIndex());
