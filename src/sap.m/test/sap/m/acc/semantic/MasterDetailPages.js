@@ -24,7 +24,8 @@ sap.ui.define([
 	"sap/m/Label",
 	"sap/m/Text",
 	"sap/m/SplitContainer",
-	"sap/m/App"
+	"sap/m/App",
+	"sap/ui/Device"
 ], function(
 	EditAction,
 	AddAction,
@@ -51,7 +52,8 @@ sap.ui.define([
 	Label,
 	MText,
 	SplitContainer,
-	App
+	App,
+	Device
 ) {
 	"use strict";
 
@@ -76,7 +78,6 @@ sap.ui.define([
 		}),
 		title:"Master Test page",
 		titleLevel: "H1",
-		showNavButton: true,
 		addAction: new AddAction({
 			tooltip: "Add Action"
 		}),
@@ -89,7 +90,11 @@ sap.ui.define([
 				ariaLabelledBy: "masterPage-title",
 				items: [new StandardListItem({
 					title : "John Doe",
-					description : "Employee Record"
+					description : "Employee Record",
+					type: "Navigation",
+					press: function() {
+						oSplitContainer.toDetail("detailPage");
+					}
 				})]
 			})
 		]
@@ -110,6 +115,10 @@ sap.ui.define([
 		}),
 		title:"Detail Test page",
 		titleLevel: "H2",
+		showNavButton: Device.system.phone,
+		navButtonPress: function() {
+			oSplitContainer.backDetail();
+		},
 		editAction: new EditAction(),
 		flagAction: new FlagAction(),
 		favoriteAction: new FavoriteAction(),
