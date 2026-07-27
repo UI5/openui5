@@ -142,6 +142,62 @@ sap.ui.define([
 			assert.strictEqual(oFeatures.isLocalResetEnabled, true, "then local reset flag is set to true");
 			assert.strictEqual(oFeatures.isContextBasedAdaptationEnabled, true, "then context based adaptation is set to true");
 		});
+
+		QUnit.test("loadVariantsAuthors trigger the correct request to back end with version and context", function(assert) {
+			const mPropertyBag = {
+				url: "/btp",
+				reference: "reference",
+				version: Version.Number.Draft,
+				allContexts: true,
+				adaptationId: "adaptationId1"
+			};
+			const mExpectedParameter = {
+				version: Version.Number.Draft,
+				allContexts: true,
+				adaptationId: "adaptationId1"
+			};
+			const oServerResponse = {
+				id1: "name1",
+				id2: "name2"
+			};
+			const oStubGetUrlWithQueryParameters = sandbox.spy(Utils, "getUrl");
+			const oStubSendRequest = sandbox.stub(Utils, "sendRequest").resolves({
+				response: oServerResponse
+			});
+
+			return BtpServiceConnector.loadVariantsAuthors(mPropertyBag).then(function(oResponse) {
+				assert.ok(oStubGetUrlWithQueryParameters.calledOnce, "getUrl is called once");
+				assert.equal(oStubGetUrlWithQueryParameters.getCall(0).args[0], "/flex/all/v3/variants/authors/", "with correct route path");
+				assert.deepEqual(oStubGetUrlWithQueryParameters.getCall(0).args[1], mPropertyBag, "with correct property bag");
+				assert.deepEqual(oStubGetUrlWithQueryParameters.getCall(0).args[2], mExpectedParameter, "with correct parameters input");
+				assert.ok(oStubSendRequest.calledOnce, "sendRequest is called once");
+				assert.equal(oStubSendRequest.getCall(0).args[1], "GET", "with correct method");
+				assert.deepEqual(oResponse, oServerResponse, "loadVariantsAuthors response is correct");
+			});
+		});
+
+		QUnit.test("loadVariantsAuthors trigger the correct request to back end without optional parameters", function(assert) {
+			const mPropertyBag = {
+				url: "/btp",
+				reference: "reference"
+			};
+			const mExpectedParameter = {};
+			const oServerResponse = {};
+			const oStubGetUrlWithQueryParameters = sandbox.spy(Utils, "getUrl");
+			const oStubSendRequest = sandbox.stub(Utils, "sendRequest").resolves({
+				response: oServerResponse
+			});
+
+			return BtpServiceConnector.loadVariantsAuthors(mPropertyBag).then(function(oResponse) {
+				assert.ok(oStubGetUrlWithQueryParameters.calledOnce, "getUrl is called once");
+				assert.equal(oStubGetUrlWithQueryParameters.getCall(0).args[0], "/flex/all/v3/variants/authors/", "with correct route path");
+				assert.deepEqual(oStubGetUrlWithQueryParameters.getCall(0).args[1], mPropertyBag, "with correct property bag");
+				assert.deepEqual(oStubGetUrlWithQueryParameters.getCall(0).args[2], mExpectedParameter, "with correct parameters input");
+				assert.ok(oStubSendRequest.calledOnce, "sendRequest is called once");
+				assert.equal(oStubSendRequest.getCall(0).args[1], "GET", "with correct method");
+				assert.deepEqual(oResponse, oServerResponse, "loadVariantsAuthors response is correct");
+			});
+		});
 	});
 
 	QUnit.done(function() {

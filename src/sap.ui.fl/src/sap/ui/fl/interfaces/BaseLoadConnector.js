@@ -49,6 +49,9 @@ sap.ui.define([], function() {
 		 * @param {object} mPropertyBag - Property bag
 		 * @param {string} mPropertyBag.reference - Flexibility reference
 		 * @param {string} [mPropertyBag.url] - Configured URL for the connector
+		 * @param {boolean} [mPropertyBag.allContexts] Includes also restricted context
+		 * @param {string} [mPropertyBag.version] Version to be loaded
+		 * @param {string} [mPropertyBag.adaptationId] - Context-based adaptation to be loaded
 		 * @returns {Promise<object>} Resolves with a map between variant IDs and their authors' names containing the data for the flex features
 		 */
 		loadVariantsAuthors() {

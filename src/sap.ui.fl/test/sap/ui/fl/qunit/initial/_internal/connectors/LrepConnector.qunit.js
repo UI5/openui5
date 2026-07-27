@@ -280,20 +280,8 @@ sap.ui.define([
 			return LrepConnector.loadFlexData({ url: "/sap/bc/lrep", reference: "reference", adaptationId: "id_1234", version: "0" }).then(function() {
 				assert.equal(this.oXHR.url, "/sap/bc/lrep/flex/data/reference?version=0&adaptationId=id_1234&sap-language=EN", "and the URL was correct");
 				assert.equal(oStubLoadModule.callCount, 1, "loadModule triggered");
-				return LrepConnector.loadVariantsAuthors({ url: "/sap/bc/lrep", reference: "reference" }).then(function() {
-					assert.equal(this.oXHR.url, "/sap/bc/lrep/variants/authors/reference?version=0&adaptationId=id_1234&sap-language=EN", "then the subsequence get variants authors inherit correct parameters");
-				}.bind(this));
-			}.bind(this));
-		});
-
-		QUnit.test("when loading flex data sets lazyLoadingViewsEnabled, loadVariantsAuthors does not forward the parameter", function(assert) {
-			FlexInfoSession.getByReference.returns({});
-			mockResponse.call(this, JSON.stringify({ changes: [], loadModules: false }));
-			return LrepConnector.loadFlexData({ url: "/sap/bc/lrep", reference: "reference" }).then(function() {
-				return LrepConnector.loadVariantsAuthors({ url: "/sap/bc/lrep", reference: "reference" }).then(function() {
-					const sExpectedUrl = "/sap/bc/lrep/variants/authors/reference?sap-language=EN";
-					assert.equal(this.oXHR.url, sExpectedUrl,
-						"lazyLoadingViewsEnabled is not forwarded to the loadVariantsAuthors request");
+				return LrepConnector.loadVariantsAuthors({ url: "/sap/bc/lrep", reference: "reference", version: "0", adaptationId: "id_1234" }).then(function() {
+					assert.equal(this.oXHR.url, "/sap/bc/lrep/variants/authors/reference?version=0&adaptationId=id_1234", "then the subsequence get variants authors inherit correct parameters");
 				}.bind(this));
 			}.bind(this));
 		});
