@@ -159,7 +159,7 @@
 														<mdc:FilterField
 															delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate", "payload": \{\}\}'
 															label="Title" conditions="{$filters>/conditions/title}"
-															propertyKey="$title" />
+															propertyKey="title" />
 													</mdcvh:filterItems>
 												</mdcvh:FilterBar>
 											</mdcvc:filterBar>

@@ -510,4 +510,57 @@ sap.ui.define([
 			"Falls back to 'Show Filters' (count 0) when condition model not initialized");
 	});
 
+	QUnit.test("getAssignedFilterNames only returns rendered filters (override behavior)", (assert) => {
+		const done = assert.async();
+
+		sap.ui.require([
+			"sap/ui/mdc/FilterField",
+			"sap/ui/mdc/condition/Condition",
+			"sap/ui/mdc/enums/OperatorName",
+			"sap/ui/mdc/enums/ConditionValidated"
+		], (FilterField, Condition, OperatorName, ConditionValidated) => {
+			// Add two filter fields
+			const oFilterField1 = new FilterField("vhff1", {
+				propertyKey: "key1",
+				dataType: "sap.ui.model.type.String"
+			});
+			const oFilterField2 = new FilterField("vhff2", {
+				propertyKey: "key2",
+				dataType: "sap.ui.model.type.String"
+			});
+
+			oFilterBar.addFilterItem(oFilterField1);
+			oFilterBar.addFilterItem(oFilterField2);
+
+			// Mock _getNonHiddenPropertyInfoSet to return PropertyInfo for the two fields
+			const fnStub = sinon.stub(oFilterBar, "_getNonHiddenPropertyInfoSet").returns([
+				{ key: "key1", label: "Key 1" },
+				{ key: "key2", label: "Key 2" }
+			]);
+
+			// Set conditions on both filters
+			const oConditionModel = oFilterBar._getConditionModel();
+			oConditionModel.addCondition("key1", Condition.createCondition(OperatorName.EQ, ["Value1"], undefined, undefined, ConditionValidated.Validated));
+			oConditionModel.addCondition("key2", Condition.createCondition(OperatorName.EQ, ["Value2"], undefined, undefined, ConditionValidated.Validated));
+
+			// Initially both are rendered
+			let aAssignedNames = oFilterBar.getAssignedFilterNames();
+			assert.equal(aAssignedNames.length, 2, "Both rendered filters with conditions are counted");
+
+			// Now remove one filter field (it's no longer rendered, but condition still exists)
+			oFilterBar.removeFilterItem(oFilterField2);
+
+			// Only the rendered filter should be returned
+			aAssignedNames = oFilterBar.getAssignedFilterNames();
+			assert.equal(aAssignedNames.length, 1, "Only rendered filter with conditions is counted");
+
+			// Cleanup
+			fnStub.restore();
+			oFilterField1.destroy();
+			oFilterField2.destroy();
+
+			done();
+		});
+	});
+
 });
