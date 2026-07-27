@@ -5168,8 +5168,14 @@ sap.ui.define([
 			oSyncPromise;
 
 		oRequestor.mBatchQueue = {
-			myGroup : [[{$promise : Promise.resolve("~result~")}]]
+			myGroup : [
+				[],
+				[],
+				[{$promise : Promise.resolve("~result~")}, {$promise : "n/a"}],
+				[{$promise : "n/a"}]
+			]
 		};
+		oRequestor.mBatchQueue.myGroup.iChangeSet = 3;
 
 		// code under test
 		oSyncPromise = oRequestor.waitForBatchResponseReceived("myGroup");
@@ -5179,6 +5185,25 @@ sap.ui.define([
 		return oSyncPromise.then(function (vResult) {
 			assert.strictEqual(vResult, "~result~");
 		});
+	});
+
+	//*****************************************************************************************
+	QUnit.test("waitForBatchResponseReceived: no change requests yet", function (assert) {
+		const oRequestor = _Requestor.create(sServiceUrl, oModelInterface, {}, {}, "4.0");
+		oRequestor.mBatchQueue = {
+			myGroup : [
+				[],
+				[],
+				[]
+			]
+		};
+		oRequestor.mBatchQueue.myGroup.iChangeSet = 2;
+
+		assert.strictEqual(
+			// code under test
+			oRequestor.waitForBatchResponseReceived("myGroup"),
+			undefined,
+			"break the caller ;-)");
 	});
 
 	//*****************************************************************************************

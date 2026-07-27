@@ -2315,16 +2315,21 @@ sap.ui.define([
 	 *
 	 * @param {string} sGroupId
 	 *   The group ID
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>|undefined}
 	 *   A promise that resolves without a defined result when a batch response has been received
-	 *   for the given group ID, no matter if the batch succeeded or failed
+	 *   for the given group ID, no matter if the batch succeeded or failed; returns
+	 *   <code>undefined</code> when there are no change(!) requests yet
 	 *
 	 * @public
 	 * @see #batchResponseReceived
 	 */
 	_Requestor.prototype.waitForBatchResponseReceived = function (sGroupId) {
-		// Note: this currently works only in case there is at least one change request already
-		return SyncPromise.resolve(this.mBatchQueue[sGroupId][0][0].$promise);
+		for (let i = 0; i <= this.mBatchQueue[sGroupId].iChangeSet; i += 1) {
+			if (this.mBatchQueue[sGroupId][i].length) {
+				// Note: this currently works only if there is at least one change request already
+				return SyncPromise.resolve(this.mBatchQueue[sGroupId][i][0].$promise);
+			}
+		}
 	};
 
 	/**
