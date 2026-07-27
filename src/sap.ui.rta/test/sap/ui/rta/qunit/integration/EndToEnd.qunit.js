@@ -526,10 +526,29 @@ sap.ui.define([
 						}.bind(this));
 					}.bind(this)));
 
-					Promise.all([
-						new Promise(function(resolve) { this.oRta._oDesignTime.attachEventOnce("synced", resolve); }.bind(this)),
-						new Promise(function(resolve) { oFieldOverlay.attachEventOnce("movableChange", resolve); })
-					])
+					// Wait until the field overlay is movable in adaptation mode, then cut & paste.
+					// The overlay's movable state after the mode switch differs between browsers
+					// (it can already be movable), so wait for the design time to be synced and
+					// check the current state rather than relying on a movableChange transition.
+					function whenOverlayMovable(oOverlay) {
+						if (oOverlay.getMovable()) {
+							return Promise.resolve();
+						}
+						return new Promise(function(resolve) {
+							oOverlay.attachEventOnce("movableChange", function(oEvent) {
+								if (oEvent.getParameter("movable")) {
+									resolve();
+								} else {
+									resolve(whenOverlayMovable(oOverlay));
+								}
+							});
+						});
+					}
+
+					new Promise(function(resolve) { this.oRta._oDesignTime.attachEventOnce("synced", resolve); }.bind(this))
+					.then(function() {
+						return whenOverlayMovable(oFieldOverlay);
+					})
 					.then(function() {
 						oCutPastePlugin.getElementMover().attachEventOnce("validTargetZonesActivated", function() {
 							QUnitUtils.triggerKeydown(oFieldOverlay2.getDomRef(), KeyCodes.V, false, false, true);
