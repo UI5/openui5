@@ -76,7 +76,15 @@
 							target="{target}"
 							ariaHasPopup="{ariaHasPopup}"
 							design="{design}"
-							press=".onItemPress" />
+							press=".onItemPress">
+							<tnt:tag>
+								<ObjectStatus
+									text="{tagText}"
+									state="{tagState}"
+									inverted="true"
+									visible="{= !!${tagText} }" />
+							</tnt:tag>
+						</tnt:NavigationListItem>
 					</tnt:NavigationList>
 				</tnt:fixedItem>
 			</tnt:SideNavigation>
