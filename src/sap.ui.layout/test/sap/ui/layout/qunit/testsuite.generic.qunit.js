@@ -91,7 +91,8 @@ sap.ui.define([
 					const oLayout = new FormLayout(mSettings);
 					await _createForm(oLayout.getId() + "Form", oLayout);
 					return oLayout;
-				}
+				},
+				rendererHasDependencies: true // cannot be rendered stand-alone
 			},
 			"sap.ui.layout.form.ColumnLayout": {
 				create: async (ColumnLayout, mSettings) => {
@@ -106,28 +107,32 @@ sap.ui.define([
 					columnsM: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
 					labelCellsLarge: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
 					emptyCellsLarge: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings
-				}
+				},
+				rendererHasDependencies: true // cannot be rendered stand-alone
 			},
 			"sap.ui.layout.form.GridLayout": {
 				create: async (GridLayout, mSettings) => {
 					const oLayout = new GridLayout(mSettings);
 					await _createForm(oLayout.getId() + "Form", oLayout);
 					return oLayout;
-				}
+				},
+				rendererHasDependencies: true // cannot be rendered stand-alone
 			},
 			"sap.ui.layout.form.ResponsiveLayout": {
 				create: async (ResponsiveLayout, mSettings) => {
 					const oLayout = new ResponsiveLayout(mSettings);
 					await _createForm(oLayout.getId() + "Form", oLayout);
 					return oLayout;
-				}
+				},
+				rendererHasDependencies: true // cannot be rendered stand-alone
 			},
 			"sap.ui.layout.form.ResponsiveGridLayout": {
 				create: async (ResponsiveGridLayout, mSettings) => {
 					const oLayout = new ResponsiveGridLayout(mSettings);
 					await _createForm(oLayout.getId() + "Form", oLayout);
 					return oLayout;
-				}
+				},
+				rendererHasDependencies: true // cannot be rendered stand-alone
 			}
 		}
 	});
