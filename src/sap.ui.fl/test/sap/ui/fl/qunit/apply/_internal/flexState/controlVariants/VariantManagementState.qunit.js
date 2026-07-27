@@ -540,11 +540,14 @@ sap.ui.define([
 			});
 			stubFlexObjectsSelector([
 				oVariantManagementChange,
+				// distinct titles so the alphabetical sort is deterministic
 				createVariant({
+					title: "A variant",
 					variantReference: sVariantManagementReference,
 					fileName: "variant1"
 				}),
 				createVariant({
+					title: "B variant",
 					variantReference: sVariantManagementReference,
 					fileName: "variant2"
 				}),
