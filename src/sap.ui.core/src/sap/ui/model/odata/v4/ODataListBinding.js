@@ -1078,15 +1078,12 @@ sap.ui.define([
 				return;
 			}
 
-			const bSelectionChanged = oContext.doSetSelected(false, true);
+			oContext.doSetSelected(false, true);
 			that.removeCreated(oContext);
 			return Promise.resolve().then(function () {
 				// Fire the change asynchronously so that Cache#delete is finished and #getContexts
 				// can read the data synchronously. This is important for extended change detection.
 				that._fireChange({reason : ChangeReason.Remove});
-				if (bSelectionChanged) {
-					that.fireSelectionChanged(oContext);
-				}
 			});
 		});
 		oCreatePromise = this.createInCache(oGroupLock, oCreatePathPromise, sResolvedPath,

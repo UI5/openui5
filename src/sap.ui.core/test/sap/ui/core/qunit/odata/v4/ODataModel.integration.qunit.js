@@ -22729,9 +22729,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			return that.waitForChanges(assert, "select before direct delete");
 		}).then(function () {
-			oBinding.attachEventOnce("selectionChanged", (oEvent) => { // Note: async
+			oBinding.attachSelectionChanged((oEvent) => { // Note: async
+				if (oEvent.getParameter("context") !== oContext3) {
+					return; // not our concern here
+				}
+				assert.notOk(bSelectionChanged, "no duplicate calls!");
 				bSelectionChanged = true;
-				assert.strictEqual(oEvent.getParameter("context"), oContext3);
 				assert.strictEqual(oContext3.toString(),
 					"/SalesOrderList('3')[-9007199254740991;deleted]",
 					"Context#toString: deleted, VIRTUAL iIndex");
@@ -22753,6 +22756,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			return Promise.all([
 				oContext3.delete("$auto"),
+				assert.notOk(bSelectionChanged, "async!"),
 				that.waitForChanges(assert, "direct delete succeeded")
 			]);
 		}).then(function () {
@@ -69511,7 +69515,8 @@ make root = ${bMakeRoot}`;
 			assert.strictEqual(oBinding.getSelectionCount(), 1);
 
 			let bSelectionChanged;
-			oBinding.attachEventOnce("selectionChanged", (oEvent) => {
+			oBinding.attachSelectionChanged((oEvent) => { // Note: sync
+				assert.notOk(bSelectionChanged, "no duplicate calls!");
 				bSelectionChanged = true;
 				assert.strictEqual(oEvent.getParameter("context"), oContext2);
 				assert.strictEqual(oBinding.getSelectionCount(), 0);
@@ -76308,7 +76313,8 @@ make root = ${bMakeRoot}`;
 			assert.strictEqual(aAllContexts[1], oContext_01);
 			assert.strictEqual(aAllContexts[2], oContext_03);
 
-			oBinding.attachEventOnce("selectionChanged", (oEvent) => { // Note: async
+			oBinding.attachSelectionChanged((oEvent) => { // Note: async
+				assert.notOk(bSelectionChanged, "no duplicate calls!");
 				bSelectionChanged = true;
 				assert.strictEqual(oEvent.getParameter("context"), oContext_03);
 				assert.strictEqual(oContext_03.toString(),
@@ -76329,6 +76335,7 @@ make root = ${bMakeRoot}`;
 
 				return Promise.all([
 					oContext_03.requestRefresh("$auto", /*bAllowRemoval*/true), // code under test
+					assert.notOk(bSelectionChanged, "async!"),
 					that.waitForChanges(assert,
 						"refresh w/ removal of selected context outside collection")
 				]);
@@ -76343,6 +76350,7 @@ make root = ${bMakeRoot}`;
 
 			return Promise.all([
 				oModel.delete("/TEAMS('TEAM_03')"), // code under test
+				assert.notOk(bSelectionChanged, "async!"),
 				that.waitForChanges(assert, "delete selected context outside collection")
 			]);
 		}).then(function () {
