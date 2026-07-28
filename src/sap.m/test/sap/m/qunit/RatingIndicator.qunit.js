@@ -296,12 +296,11 @@ sap.ui.define([
 	});
 
 	QUnit.test("readonly half value uses 'unfavorite' icon for the half-rated icon only", async function(assert) {
-		var sFavoriteContent = IconPool.getIconInfo("favorite").content,
-			sUnfavoriteContent = IconPool.getIconInfo("unfavorite").content;
-
-		function getUnselectedIconChars(oRating) {
-			var aIcons = oRating.$().find(".sapMRIUnsel > span").get();
-			return aIcons.map(function (el) { return el.textContent; });
+		function getUnselectedIconNames(oRating) {
+			var aIcons = oRating.$().find(".sapMRIUnsel > span.sapUiIcon");
+			return aIcons.get().map(function (el) {
+				return el.getAttribute("aria-label");
+			});
 		}
 
 		// disabled + half value -> only icon at floor(value) is "unfavorite"
@@ -314,13 +313,13 @@ sap.ui.define([
 		oDisabled.placeAt("content");
 		await nextUIUpdate();
 
-		var aChars = getUnselectedIconChars(oDisabled);
+		var aChars = getUnselectedIconNames(oDisabled);
 		assert.strictEqual(aChars.length, 5, "Five unselected icons rendered");
-		assert.strictEqual(aChars[0], sFavoriteContent, "Unselected icon 0 is 'favorite'");
-		assert.strictEqual(aChars[1], sFavoriteContent, "Unselected icon 1 is 'favorite'");
-		assert.strictEqual(aChars[2], sUnfavoriteContent, "Half-rated icon 2 is 'unfavorite'");
-		assert.strictEqual(aChars[3], sFavoriteContent, "Unselected icon 3 is 'favorite'");
-		assert.strictEqual(aChars[4], sFavoriteContent, "Unselected icon 4 is 'favorite'");
+		assert.strictEqual(aChars[0], "favorite", "Unselected icon 0 is 'favorite'");
+		assert.strictEqual(aChars[1], "favorite", "Unselected icon 1 is 'favorite'");
+		assert.strictEqual(aChars[2], "unfavorite", "Half-rated icon 2 is 'unfavorite'");
+		assert.strictEqual(aChars[3], "favorite", "Unselected icon 3 is 'favorite'");
+		assert.strictEqual(aChars[4], "favorite", "Unselected icon 4 is 'favorite'");
 
 		oDisabled.destroy();
 
@@ -334,10 +333,10 @@ sap.ui.define([
 		oDisplayOnly.placeAt("content");
 		await nextUIUpdate();
 
-		aChars = getUnselectedIconChars(oDisplayOnly);
-		assert.strictEqual(aChars[0], sFavoriteContent, "displayOnly: icon 0 is 'favorite'");
-		assert.strictEqual(aChars[1], sUnfavoriteContent, "displayOnly: half-rated icon 1 is 'unfavorite'");
-		assert.strictEqual(aChars[2], sFavoriteContent, "displayOnly: icon 2 is 'favorite'");
+		aChars = getUnselectedIconNames(oDisplayOnly);
+		assert.strictEqual(aChars[0], "favorite", "displayOnly: icon 0 is 'favorite'");
+		assert.strictEqual(aChars[1], "unfavorite", "displayOnly: half-rated icon 1 is 'unfavorite'");
+		assert.strictEqual(aChars[2], "favorite", "displayOnly: icon 2 is 'favorite'");
 
 		oDisplayOnly.destroy();
 
@@ -351,9 +350,9 @@ sap.ui.define([
 		oInteger.placeAt("content");
 		await nextUIUpdate();
 
-		aChars = getUnselectedIconChars(oInteger);
-		aChars.forEach(function (sChar, i) {
-			assert.strictEqual(sChar, sFavoriteContent, "Integer value: unselected icon " + i + " is 'favorite'");
+		aChars = getUnselectedIconNames(oInteger);
+		aChars.forEach(function (sName, i) {
+			assert.strictEqual(sName, "favorite", "Integer value: unselected icon " + i + " is 'favorite'");
 		});
 
 		oInteger.destroy();
@@ -368,12 +367,12 @@ sap.ui.define([
 		oReadOnly.placeAt("content");
 		await nextUIUpdate();
 
-		aChars = getUnselectedIconChars(oReadOnly);
-		assert.strictEqual(aChars[0], sFavoriteContent, "editable:false: icon 0 is 'favorite'");
-		assert.strictEqual(aChars[1], sFavoriteContent, "editable:false: icon 1 is 'favorite'");
-		assert.strictEqual(aChars[2], sUnfavoriteContent, "editable:false: half-rated icon 2 is 'unfavorite'");
-		assert.strictEqual(aChars[3], sFavoriteContent, "editable:false: icon 3 is 'favorite'");
-		assert.strictEqual(aChars[4], sFavoriteContent, "editable:false: icon 4 is 'favorite'");
+		aChars = getUnselectedIconNames(oReadOnly);
+		assert.strictEqual(aChars[0], "favorite", "editable:false: icon 0 is 'favorite'");
+		assert.strictEqual(aChars[1], "favorite", "editable:false: icon 1 is 'favorite'");
+		assert.strictEqual(aChars[2], "unfavorite", "editable:false: half-rated icon 2 is 'unfavorite'");
+		assert.strictEqual(aChars[3], "favorite", "editable:false: icon 3 is 'favorite'");
+		assert.strictEqual(aChars[4], "favorite", "editable:false: icon 4 is 'favorite'");
 
 		oReadOnly.destroy();
 	});

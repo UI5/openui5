@@ -125,7 +125,7 @@ sap.ui.define([
 
 		// Assert
 		assert.ok(!oMarker.$().text().length, "Control text is not visible by default.");
-		assert.ok((oMarker.$().find(".sapUiIcon").attr("data-sap-ui-icon-content") && oMarker.$().find(".sapUiIcon").attr("data-sap-ui-icon-content").length), "Control icon is visible by default.");
+		assert.equal(oMarker.$().find(".sapUiIcon").control(0).getSrc(), "sap-icon://flag", "Control icon is visible by default.");
 
 		// Cleanup
 		oMarker.destroy();
@@ -143,7 +143,7 @@ sap.ui.define([
 
 		// Assert
 		assert.ok(!oMarker.$().text().length, "Control text is not visible by default.");
-		assert.ok((oMarker.$().find(".sapUiIcon").attr("data-sap-ui-icon-content") && oMarker.$().find(".sapUiIcon").attr("data-sap-ui-icon-content").length), "Control icon is visible by default.");
+		assert.equal(oMarker.$().find(".sapUiIcon").control(0).getSrc(), "sap-icon://favorite", "Control icon is visible by default.");
 
 		// Cleanup
 		oMarker.destroy();
@@ -161,7 +161,7 @@ sap.ui.define([
 
 		// Assert
 		assert.ok(oMarker.$().text().length, "Control text is visible by default.");
-		assert.ok(!(oMarker.$().find(".sapUiIcon").attr("data-sap-ui-icon-content") && oMarker.$().find(".sapUiIcon").attr("data-sap-ui-icon-content").length), "Control icon is not visible by default.");
+		assert.equal(oMarker.$().find(".sapUiIcon").control(0).getSrc(), "", "Control icon is not visible by default.");
 
 		// Cleanup
 		oMarker.destroy();
@@ -179,7 +179,7 @@ sap.ui.define([
 
 		// Assert
 		assert.ok(oMarker.$().text().length, "Control text is visible by default.");
-		assert.ok((oMarker.$().find(".sapUiIcon").attr("data-sap-ui-icon-content") && oMarker.$().find(".sapUiIcon").attr("data-sap-ui-icon-content").length), "Control icon is visible by default.");
+		assert.equal(oMarker.$().find(".sapUiIcon").control(0).getSrc(), "sap-icon://private", "Control icon is visible by default.");
 
 		// Cleanup
 		oMarker.destroy();
@@ -197,7 +197,7 @@ sap.ui.define([
 
 		// Assert
 		assert.ok(oMarker.$().text().length, "Control text is visible by default.");
-		assert.ok((oMarker.$().find(".sapUiIcon").attr("data-sap-ui-icon-content") && oMarker.$().find(".sapUiIcon").attr("data-sap-ui-icon-content").length), "Control icon is visible by default.");
+		assert.equal(oMarker.$().find(".sapUiIcon").control(0).getSrc(), "sap-icon://private", "Control icon is visible by default.");
 
 		// Cleanup
 		oMarker.destroy();
@@ -215,7 +215,7 @@ sap.ui.define([
 
 		// Assert
 		assert.ok(oMarker.$().text().length, "Control text is visible by default.");
-		assert.ok((oMarker.$().find(".sapUiIcon").attr("data-sap-ui-icon-content") && oMarker.$().find(".sapUiIcon").attr("data-sap-ui-icon-content").length), "Control icon is visible by default.");
+		assert.equal(oMarker.$().find(".sapUiIcon").control(0).getSrc(), "sap-icon://user-edit", "Control icon is visible by default.");
 
 		// Cleanup
 		oMarker.destroy();
@@ -233,7 +233,7 @@ sap.ui.define([
 
 		// Assert
 		assert.ok(oMarker.$().text().length, "Control text is visible by default.");
-		assert.ok((oMarker.$().find(".sapUiIcon").attr("data-sap-ui-icon-content") && oMarker.$().find(".sapUiIcon").attr("data-sap-ui-icon-content").length), "Control icon is visible by default.");
+		assert.equal(oMarker.$().find(".sapUiIcon").control(0).getSrc(), "sap-icon://user-edit", "Control icon is visible by default.");
 
 		// Cleanup
 		oMarker.destroy();
