@@ -4603,8 +4603,8 @@ sap.ui.define([
 		// code under test
 		assert.strictEqual(_Requestor.fetch, fetch, "trampoline property");
 
-		this.mock(_Requestor).expects("fetch").withExactArgs("/~/Product(42)", oFetchOptions)
-			.returns("~result~");
+		this.mock(_Requestor).expects("fetch").on(window)
+			.withExactArgs("/~/Product(42)", oFetchOptions).returns("~result~");
 
 		assert.strictEqual(
 			// code under test
