@@ -1275,6 +1275,21 @@ sap.ui.define([
 		assert.ok(oSpy.firstCall.args[0].isA("sap.m.MessageListItem"), "The Navigation happens against the correct element.");
 	});
 
+	QUnit.test("Back navigation from single-item details page stays on the list", function (assert) {
+		assert.strictEqual(this.oMessageView._navContainer.getCurrentPage().getId(), this.oMessageView._detailsPage.getId(), "Details page is shown");
+		assert.strictEqual(this.oMessageView._bAutoForwarded, true, "The initial opening has auto-forwarded once");
+
+		var oForwardSpy = this.spy(this.oMessageView, "_fnHandleForwardNavigation"),
+			oListItem = this.oMessageView._oLists.all.getItems()[0];
+
+		this.stub(oListItem, "getTitleRef").returns({ offsetWidth: 10, scrollWidth: 100 });
+
+		this.oMessageView.navigateBack();
+		this.oMessageView._setItemType(oListItem);
+
+		assert.ok(oForwardSpy.notCalled, "Auto-forward does not re-fire after the user navigated back");
+	});
+
 	QUnit.module("Aggregation Binding", {
 		beforeEach: function () {
 			this.oMessageView = new MessageView();
