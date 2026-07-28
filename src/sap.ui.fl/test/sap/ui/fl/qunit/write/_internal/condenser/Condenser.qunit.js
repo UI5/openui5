@@ -1221,6 +1221,36 @@ sap.ui.define([
 				getMessage(sAffectedControlMgs, undefined, 0) + getControlSelectorId("Dates.SpecificFlexibility")
 			);
 		});
+
+		QUnit.test("add a field, create a group, add a field to it and move the first field into the created group", async function(assert) {
+			const aRemainingChanges = await loadApplyCondenseChanges.call(this, "addFieldMoveIntoCreatedGroup.json", 4, 4, assert);
+
+			// the addGroup change must come before any change adding/moving a field into that new group,
+			// otherwise the control dependency of those changes cannot be resolved on the next reload
+			const iAddGroupIndex = aRemainingChanges.findIndex((oChange) => {
+				return oChange.getChangeType() === "addGroup";
+			});
+			aRemainingChanges.forEach((oChange, iIndex) => {
+				const oContent = oChange.getContent();
+				const sTargetContainerId = oChange.getChangeType() === "moveControls"
+					? oContent.target.selector.id
+					: oChange.getSelector().id;
+				if (sTargetContainerId === "idMain1--id-1775638406855-153") {
+					assert.ok(
+						iIndex > iAddGroupIndex,
+						`change '${oChange.getChangeType()}' targeting the created group is sorted after the addGroup change`
+					);
+				}
+			});
+
+			await revertAndApplyNew.call(this);
+
+			const oSmartForm = oAppComponent.byId(sLocalSmartFormId);
+			const aGroups = oSmartForm.getGroups();
+			const oCreatedGroup = aGroups[aGroups.length - 1];
+			const aCreatedGroupElements = oCreatedGroup.getGroupElements();
+			assert.strictEqual(aCreatedGroupElements.length, 2, sContainerElementsMsg + 2);
+		});
 	});
 
 	QUnit.module("Given an app with controls with templates", {
