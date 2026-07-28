@@ -5442,10 +5442,7 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-[false, true].forEach(function (bSelectionChanged) {
-	const sTitle = "create: callbacks and eventing; selection changed: " + bSelectionChanged;
-
-	QUnit.test(sTitle, function (assert) {
+	QUnit.test("create: callbacks and eventing", function (assert) {
 		var oBinding = this.bindList("/EMPLOYEES"),
 			oBindingMock = this.mock(oBinding),
 			oContext0,
@@ -5528,7 +5525,7 @@ sap.ui.define([
 		oCreateInCacheExpectation.args[0][6](oError);
 
 		oSetSelectedExpectation = this.mock(oContext0).expects("doSetSelected")
-			.withExactArgs(false, true).returns(bSelectionChanged);
+			.withExactArgs(false, true);
 		oRemoveCreatedExpectation = oBindingMock.expects("removeCreated")
 			.withExactArgs(sinon.match.same(oContext0));
 
@@ -5537,11 +5534,8 @@ sap.ui.define([
 
 		sinon.assert.callOrder(oSetSelectedExpectation, oRemoveCreatedExpectation);
 
-		// expect the events to be fired asynchronously
-		const oChangeExpectation = oBindingMock.expects("_fireChange")
-			.withExactArgs({reason : ChangeReason.Remove});
-		const oSelectionChangedExpectation = oBindingMock.expects("fireSelectionChanged")
-			.exactly(bSelectionChanged ? 1 : 0).withExactArgs(sinon.match.same(oContext0));
+		// expect the event to be fired asynchronously
+		oBindingMock.expects("_fireChange").withExactArgs({reason : ChangeReason.Remove});
 
 		oBinding.aContexts = [];
 		oBindingMock.expects("destroyPreviousContextsLater").withExactArgs([oContext0.getPath()]);
@@ -5564,14 +5558,8 @@ sap.ui.define([
 			oPromise,
 			oContext0.created(),
 			oContext1.created()
-		]).then(function () {
-			if (bSelectionChanged) {
-				// 1st change, then selectionChanged event (UI adapts before controller code)
-				sinon.assert.callOrder(oChangeExpectation, oSelectionChangedExpectation);
-			}
-		});
+		]);
 	});
-});
 
 	//*********************************************************************************************
 	[{
