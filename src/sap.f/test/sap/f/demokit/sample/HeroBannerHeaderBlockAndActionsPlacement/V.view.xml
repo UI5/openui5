@@ -1,0 +1,39 @@
+<mvc:View
+	controllerName="sap.f.sample.HeroBannerHeaderBlockAndActionsPlacement.C"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:f="sap.f"
+	xmlns:card="sap.f.cards"
+	height="100%"
+	displayBlock="true">
+	<Page showHeader="false">
+		<content>
+			<VBox class="sapUiMediumMarginBeginEnd sapUiMediumMarginTop">
+				<f:HeroBanner
+				headerText="Good Morning, Anna"
+				overlineText="Monday, May 26, 2026"
+				columnsRatio="Equal"
+				actionsPlacement="BottomStart"
+				headerBlockPlacement="Bottom">
+				<f:actions>
+					<Button icon="sap-icon://create" text="New Request" />
+					<Button icon="sap-icon://document" text="Create Report" />
+					<Button icon="sap-icon://email" text="Send Message" />
+				</f:actions>
+				<f:endContent>
+					<f:Card width="100%">
+						<f:header>
+							<card:Header title="Open Tickets" subtitle="Support" />
+						</f:header>
+						<f:content>
+							<VBox class="sapUiSmallMargin">
+								<Title text="42" level="H3" />
+							</VBox>
+						</f:content>
+					</f:Card>
+				</f:endContent>
+			</f:HeroBanner>
+			</VBox>
+		</content>
+	</Page>
+</mvc:View>

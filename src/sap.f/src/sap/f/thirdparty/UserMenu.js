@@ -1,32 +1,32 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/query', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/MenuItem2', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Avatar', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/Text', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/List', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/sys-enter-2', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/ListSelectionMode', 'sap/f/thirdparty/ListItemAdditionalText.css'], (function (webcomponentsBase, eventStrict, parametersBundle_css, jsxRuntime, query, ResponsivePopover, MenuItem, Theme, Avatar, Button, Icon, Tag, Title, Text, Label, List, ListItemTemplate, i18nDefaults, AccessibilityTextsHelper, Icons, decline, sysEnter2, parametersBundle_css$1, i18nDefaults$1, ValueState, toLowercaseEnumValue, FocusableElements, ListItemBase, InvisibleMessage, BusyIndicator, willShowContent, ListItemGroup, WrappingType, ListSelectionMode, ListItemAdditionalText_css) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/query', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/MenuItem2', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/Avatar', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/Text', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/List', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/sys-enter-2', 'sap/f/thirdparty/parameters-bundle3.css', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/information', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/WrappingType'], (function (webcomponentsBase, eventStrict, parametersBundle_css$1, parametersBundle_css, query, ResponsivePopover, MenuItem, ManagedStyles, Avatar, Button, Icon, Tag, Title, Text, Label, List, ListItemTemplate, i18nDefaults, AccessibilityTextsHelper, Icons, decline, sysEnter2, parametersBundle_css$2, i18nDefaults$1, ValueState, toLowercaseEnumValue, FocusableElements, ListItemBase, information, willShowContent, ListItemGroup, WrappingType) { 'use strict';
 
     function PanelTemplate() {
-        return (jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsxs("div", { class: "ui5-panel-root", role: this.accRole, "aria-label": this.effectiveAccessibleName, "aria-labelledby": this.fixedPanelAriaLabelledbyReference, children: [this.hasHeaderOrHeaderText &&
+        return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: parametersBundle_css.jsxs("div", { class: "ui5-panel-root", role: this.accRole, "aria-label": this.effectiveAccessibleName, "aria-labelledby": this.fixedPanelAriaLabelledbyReference, children: [this.hasHeaderOrHeaderText &&
                         // header: either header or h1 with header text
-                        jsxRuntime.jsx("div", { class: {
+                        parametersBundle_css.jsx("div", { class: {
                                 "ui5-panel-heading-wrapper": true,
                                 "ui5-panel-heading-wrapper-sticky": this.stickyHeader,
-                            }, role: this.headingWrapperRole, "aria-level": this.headingWrapperAriaLevel, part: "header-wrapper", children: jsxRuntime.jsxs("div", { onClick: this._headerClick, onKeyDown: this._headerKeyDown, onKeyUp: this._headerKeyUp, onTouchStart: this._isMobile, onFocusOut: this._headerFocusOut, class: "ui5-panel-header", tabindex: this.headerTabIndex, role: this.accInfo.role, "aria-expanded": this.accInfo.ariaExpanded, "aria-controls": this.accInfo.ariaControls, "aria-labelledby": this.accInfo.ariaLabelledby, part: "header", children: [!this.fixed &&
-                                        jsxRuntime.jsx("div", { class: "ui5-panel-header-button-root", children: this._hasHeader ?
-                                                jsxRuntime.jsx(Button.Button, { design: "Transparent", class: "ui5-panel-header-button ui5-panel-header-button-with-icon", onClick: this._toggleButtonClick, accessibilityAttributes: this.accInfo.button.accessibilityAttributes, tooltip: this.accInfo.button.title, accessibleName: this.accInfo.button.ariaLabelButton, children: jsxRuntime.jsx("div", { class: "ui5-panel-header-icon-wrapper", children: jsxRuntime.jsx(Icon.Icon, { class: {
+                            }, role: this.headingWrapperRole, "aria-level": this.headingWrapperAriaLevel, part: "header-wrapper", children: parametersBundle_css.jsxs("div", { onClick: this._headerClick, onKeyDown: this._headerKeyDown, onKeyUp: this._headerKeyUp, onTouchStart: this._isMobile, onFocusOut: this._headerFocusOut, class: "ui5-panel-header", tabindex: this.headerTabIndex, role: this.accInfo.role, "aria-expanded": this.accInfo.ariaExpanded, "aria-controls": this.accInfo.ariaControls, "aria-labelledby": this.accInfo.ariaLabelledby, part: "header", children: [!this.fixed &&
+                                        parametersBundle_css.jsx("div", { class: "ui5-panel-header-button-root", children: this._hasHeader ?
+                                                parametersBundle_css.jsx(Button.Button, { design: "Transparent", class: "ui5-panel-header-button ui5-panel-header-button-with-icon", onClick: this._toggleButtonClick, accessibilityAttributes: this.accInfo.button.accessibilityAttributes, tooltip: this.accInfo.button.title, accessibleName: this.accInfo.button.ariaLabelButton, children: parametersBundle_css.jsx("div", { class: "ui5-panel-header-icon-wrapper", children: parametersBundle_css.jsx(Icon.Icon, { class: {
                                                                 "ui5-panel-header-icon": true,
                                                                 "ui5-panel-header-button-animated": !this.shouldNotAnimate,
                                                             }, name: ListItemTemplate.slimArrowRight }) }) })
                                                 : // else
-                                                    jsxRuntime.jsx(Icon.Icon, { class: {
+                                                    parametersBundle_css.jsx(Icon.Icon, { class: {
                                                             "ui5-panel-header-button": true,
                                                             "ui5-panel-header-icon": true,
                                                             "ui5-panel-header-button-animated": !this.shouldNotAnimate,
                                                         }, name: ListItemTemplate.slimArrowRight, showTooltip: true, accessibleName: this.toggleButtonTitle }) }), this._hasHeader ?
-                                        jsxRuntime.jsx("slot", { name: "header" })
+                                        parametersBundle_css.jsx("slot", { name: "header" })
                                         : // else
-                                            jsxRuntime.jsx("div", { id: `${this._id}-header-title`, class: "ui5-panel-header-title", children: this.headerText })] }) }), jsxRuntime.jsx("div", { class: "ui5-panel-content", id: `${this._id}-content`, tabindex: -1, style: {
+                                            parametersBundle_css.jsx("div", { id: `${this._id}-header-title`, class: "ui5-panel-header-title", children: this.headerText })] }) }), parametersBundle_css.jsx("div", { class: "ui5-panel-content", id: `${this._id}-content`, tabindex: -1, style: {
                             display: this._contentExpanded ? "block" : "none",
-                        }, part: "content", children: jsxRuntime.jsx("slot", {}) })] }) }));
+                        }, part: "content", children: parametersBundle_css.jsx("slot", {}) })] }) }));
     }
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
     var panelCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host(:not([hidden])){display:block}:host{font-family:var(--sapFontFamily);background-color:var(--sapGroup_TitleBackground);border-radius:var(--_ui5_panel_border_radius)}:host(:not([collapsed])){border-bottom:var(--_ui5_panel_border_bottom)}:host([fixed]) .ui5-panel-header{padding-left:1rem}.ui5-panel-header{min-height:var(--_ui5_panel_header_height);width:100%;position:relative;display:flex;justify-content:flex-start;align-items:center;outline:none;box-sizing:border-box;padding-right:var(--_ui5_panel_header_padding_right);font-family:var(--sapFontHeaderFamily);font-size:var(--sapGroup_Title_FontSize);font-weight:400;color:var(--sapGroup_TitleTextColor)}.ui5-panel-header-icon{color:var(--_ui5_panel_icon_color)}.ui5-panel-header-button-animated{transition:transform .4s ease-out}:host(:not([_has-header]):not([fixed])) .ui5-panel-header{cursor:pointer}:host(:not([_has-header]):not([fixed])) .ui5-panel-header:focus:after{content:"";position:absolute;pointer-events:none;z-index:2;border:var(--_ui5_panel_focus_border);border-radius:var(--_ui5_panel_border_radius);top:var(--_ui5_panel_focus_offset);bottom:var(--_ui5_panel_focus_bottom_offset);left:var(--_ui5_panel_focus_offset);right:var(--_ui5_panel_focus_offset)}:host(:not([collapsed]):not([_has-header]):not([fixed])) .ui5-panel-header:focus:after{border-radius:var(--_ui5_panel_border_radius_expanded)}:host([_touched]:not([_has-header]):not([fixed])) .ui5-panel-header:focus:after{display:none}:host(:not([collapsed])) .ui5-panel-header-button:not(.ui5-panel-header-button-with-icon),:host(:not([collapsed])) .ui5-panel-header-icon-wrapper [ui5-icon]{transform:var(--_ui5_panel_toggle_btn_rotation)}:host([fixed]) .ui5-panel-header-title{width:100%}.ui5-panel-heading-wrapper.ui5-panel-heading-wrapper-sticky{position:sticky;top:0;background-color:var(--_ui5_panel_header_background_color);z-index:100;border-radius:var(--_ui5_panel_border_radius)}.ui5-panel-header-title{width:calc(100% - var(--_ui5_panel_button_root_width));overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ui5-panel-content{padding:var(--_ui5_panel_content_padding);background-color:var(--sapGroup_ContentBackground);outline:none;border-bottom-left-radius:var(--_ui5_panel_border_radius);border-bottom-right-radius:var(--_ui5_panel_border_radius);overflow:auto}.ui5-panel-header-button-root{display:flex;justify-content:center;align-items:center;flex-shrink:0;width:var(--_ui5_panel_button_root_width);height:var(--_ui5_panel_button_root_height);padding:var(--_ui5_panel_header_button_wrapper_padding);box-sizing:border-box}:host([fixed]:not([collapsed]):not([_has-header])) .ui5-panel-header,:host([collapsed]) .ui5-panel-header{border-bottom:.0625rem solid var(--sapGroup_TitleBorderColor)}:host([collapsed]) .ui5-panel-header{border-bottom-left-radius:var(--_ui5_panel_border_radius);border-bottom-right-radius:var(--_ui5_panel_border_radius)}:host(:not([fixed]):not([collapsed])) .ui5-panel-header{border-bottom:var(--_ui5_panel_default_header_border)}[ui5-button].ui5-panel-header-button{display:flex;justify-content:center;align-items:center;min-width:initial;height:100%;width:100%}.ui5-panel-header-icon-wrapper{display:flex;justify-content:center;align-items:center}.ui5-panel-header-icon-wrapper,.ui5-panel-header-icon-wrapper .ui5-panel-header-icon{color:inherit}.ui5-panel-header-icon-wrapper,[ui5-button].ui5-panel-header-button-with-icon [ui5-icon]{pointer-events:none}.ui5-panel-root{height:100%;display:flex;flex-direction:column}
 `;
 
@@ -174,10 +174,10 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
             return true;
         }
         get shouldNotAnimate() {
-            return this.noAnimation || webcomponentsBase.d$1() === Theme.u.None;
+            return this.noAnimation || ManagedStyles.d$1() === ManagedStyles.u.None;
         }
         _isMobile() {
-            if (Theme.l()) {
+            if (ManagedStyles.l$1()) {
                 this._touched = true;
             }
         }
@@ -357,14 +357,14 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
         webcomponentsBase.d()
     ], Panel.prototype, "header", void 0);
     __decorate$2([
-        parametersBundle_css.i("@ui5/webcomponents")
+        parametersBundle_css$1.i("@ui5/webcomponents")
     ], Panel, "i18nBundle", void 0);
     Panel = Panel_1 = __decorate$2([
         webcomponentsBase.m({
             tag: "ui5-panel",
             fastNavigation: true,
             languageAware: true,
-            renderer: jsxRuntime.y,
+            renderer: parametersBundle_css.y,
             template: PanelTemplate,
             styles: panelCss,
         })
@@ -381,12 +381,12 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
     var Panel$1 = Panel;
 
     function BarTemplate() {
-        return (jsxRuntime.jsxs("div", { class: "ui5-bar-root", "aria-label": this.accInfo.label, role: this.accInfo.role, part: "bar", children: [jsxRuntime.jsx("div", { class: "ui5-bar-content-container ui5-bar-startcontent-container", part: "startContent", children: jsxRuntime.jsx("slot", { name: "startContent" }) }), jsxRuntime.jsx("div", { class: "ui5-bar-content-container ui5-bar-midcontent-container", part: "midContent", children: jsxRuntime.jsx("slot", {}) }), jsxRuntime.jsx("div", { class: "ui5-bar-content-container ui5-bar-endcontent-container", part: "endContent", children: jsxRuntime.jsx("slot", { name: "endContent" }) })] }));
+        return (parametersBundle_css.jsxs("div", { class: "ui5-bar-root", "aria-label": this.accInfo.label, role: this.accInfo.role, part: "bar", children: [parametersBundle_css.jsx("div", { class: "ui5-bar-content-container ui5-bar-startcontent-container", part: "startContent", children: parametersBundle_css.jsx("slot", { name: "startContent" }) }), parametersBundle_css.jsx("div", { class: "ui5-bar-content-container ui5-bar-midcontent-container", part: "midContent", children: parametersBundle_css.jsx("slot", {}) }), parametersBundle_css.jsx("div", { class: "ui5-bar-content-container ui5-bar-endcontent-container", part: "endContent", children: parametersBundle_css.jsx("slot", { name: "endContent" }) })] }));
     }
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
-    var BarCss = `:host{background-color:var(--sapPageHeader_Background);height:var(--_ui5_bar_base_height);width:100%;box-shadow:var(--sapContent_HeaderShadow);display:block}.ui5-bar-root{display:flex;align-items:center;justify-content:space-between;height:100%;width:100%;background-color:inherit;box-shadow:inherit;border-radius:inherit;min-width:0;overflow:hidden}.ui5-bar-root .ui5-bar-startcontent-container,.ui5-bar-root .ui5-bar-endcontent-container,.ui5-bar-root .ui5-bar-midcontent-container{display:flex;align-items:center}.ui5-bar-root .ui5-bar-startcontent-container{flex:0 1 auto}.ui5-bar-root .ui5-bar-endcontent-container{flex:0 0 auto}.ui5-bar-root .ui5-bar-midcontent-container{justify-content:center;flex:1 1 auto;padding:0 var(--_ui5_bar-mid-container-padding-start-end);min-width:0;overflow:hidden}.ui5-bar-root .ui5-bar-startcontent-container{padding-inline-start:var(--_ui5_bar-start-container-padding-start)}.ui5-bar-root .ui5-bar-content-container{min-width:calc(30% - calc(var(--_ui5_bar-start-container-padding-start) + var(--_ui5_bar-end-container-padding-end) + (2*var(--_ui5_bar-mid-container-padding-start-end))))}.ui5-bar-root.ui5-bar-root-shrinked .ui5-bar-content-container{min-width:0px;overflow:hidden;height:100%}.ui5-bar-root .ui5-bar-endcontent-container{padding-inline-end:var(--_ui5_bar-end-container-padding-end)}:host([design="Footer"]){background-color:var(--sapPageFooter_Background);border-top:.0625rem solid var(--sapPageFooter_BorderColor);box-shadow:none}:host([design="Subheader"]){height:var(--_ui5_bar_subheader_height);margin-top:var(--_ui5_bar_subheader_margin-top)}:host([design="FloatingFooter"]){border-radius:var(--sapElement_BorderCornerRadius);background-color:var(--sapPageFooter_Background);box-shadow:var(--sapContent_Shadow1);border:none}::slotted(*:not([hidden])){margin:0 .25rem;display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box}
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
+    var BarCss = `:host{background-color:var(--sapPageHeader_Background);height:var(--_ui5_bar_base_height);width:100%;box-shadow:var(--sapContent_HeaderShadow);display:block}.ui5-bar-root{display:flex;align-items:center;justify-content:space-between;height:100%;width:100%;background-color:inherit;box-shadow:inherit;border-radius:inherit;min-width:0;overflow-x:clip;overflow-y:visible}.ui5-bar-root .ui5-bar-startcontent-container,.ui5-bar-root .ui5-bar-endcontent-container,.ui5-bar-root .ui5-bar-midcontent-container{display:flex;align-items:center}.ui5-bar-root .ui5-bar-startcontent-container{flex:0 1 auto}.ui5-bar-root .ui5-bar-endcontent-container{flex:0 0 auto}.ui5-bar-root .ui5-bar-midcontent-container{justify-content:center;flex:1 1 auto;padding:0 var(--_ui5_bar-mid-container-padding-start-end);min-width:0;overflow-x:clip;overflow-y:visible}.ui5-bar-root .ui5-bar-startcontent-container{padding-inline-start:var(--_ui5_bar-start-container-padding-start)}.ui5-bar-root .ui5-bar-content-container{min-width:calc(30% - calc(var(--_ui5_bar-start-container-padding-start) + var(--_ui5_bar-end-container-padding-end) + (2*var(--_ui5_bar-mid-container-padding-start-end))))}.ui5-bar-root.ui5-bar-root-shrinked .ui5-bar-content-container{min-width:0px;overflow-x:clip;overflow-y:visible;height:100%}.ui5-bar-root .ui5-bar-endcontent-container{padding-inline-end:var(--_ui5_bar-end-container-padding-end)}:host([design="Footer"]){background-color:var(--sapPageFooter_Background);border-top:.0625rem solid var(--sapPageFooter_BorderColor);box-shadow:none}:host([design="Subheader"]){height:var(--_ui5_bar_subheader_height);margin-top:var(--_ui5_bar_subheader_margin-top)}:host([design="FloatingFooter"]){border-radius:var(--sapElement_BorderCornerRadius);background-color:var(--sapPageFooter_Background);box-shadow:var(--sapContent_Shadow1);border:none}::slotted(*:not([hidden]):not([ui5-button])){margin:0 .25rem;display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box}::slotted([ui5-button]){margin:0 .25rem;--_ui5_button_overlay_badge_offset: -.25rem}@container style(--ui5_content_density: compact){::slotted([ui5-button]){--_ui5_button_overlay_badge_offset: initial}}
 `;
 
     var __decorate$1 = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -458,9 +458,11 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
              *
              * **Note:**
              *
-             * - Set accessibleRole to "toolbar" only when the component contains two or more active, interactive elements (such as buttons, links, or input fields) within the bar.
+             * - By default, accessibleRole is set to "Toolbar", which renders the ARIA role "toolbar".
              *
-             * - If there is only one or no active element, it is recommended to avoid using the "toolbar" role, as it implies a grouping of multiple interactive controls.
+             * - Use the default accessibleRole value "Toolbar" only when the component contains two or more active, interactive elements (such as buttons, links, or input fields) within the bar.
+             *
+             * - If there is only one or no active element, set accessibleRole to "None" to avoid rendering the ARIA role "toolbar", as that role implies a grouping of multiple interactive controls.
              *
              * @public
              * @default "Toolbar"
@@ -519,7 +521,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
         webcomponentsBase.m({
             tag: "ui5-bar",
             fastNavigation: true,
-            renderer: jsxRuntime.y,
+            renderer: parametersBundle_css.y,
             styles: BarCss,
             template: BarTemplate,
         })
@@ -608,47 +610,48 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
     var userEdit = "user-edit";
 
     function UserMenuTemplate() {
-        return (jsxRuntime.jsxs(ResponsivePopover.ResponsivePopover, { id: "user-menu-rp", class: "ui5-user-menu-rp", placement: "Bottom", verticalAlign: "Bottom", horizontalAlign: "End", tabindex: -1, accessibleName: this.accessibleNameText, "aria-label": this.accessibleNameText, open: this.open, opener: this.opener, onClose: this._handlePopoverAfterClose, onOpen: this._handlePopoverAfterOpen, onScroll: this._handleScroll, children: [jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsxs(Bar$1, { class: {
+        return (parametersBundle_css.jsxs(ResponsivePopover.ResponsivePopover, { id: "user-menu-rp", class: "ui5-user-menu-rp", placement: "Bottom", verticalAlign: "Bottom", horizontalAlign: "End", tabindex: -1, accessibleName: this.accessibleNameText, "aria-label": this.accessibleNameText, open: this.open, opener: this.opener, onClose: this._handlePopoverAfterClose, onOpen: this._handlePopoverAfterOpen, onScroll: this._handleScroll, children: [parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [parametersBundle_css.jsxs(Bar$1, { class: {
                                 "ui5-user-menu-fixed-header": true,
                                 "ui5-user-menu-rp-scrolled": this._isScrolled || this._titleMovedToHeader
                             }, slot: "header", children: [this._titleMovedToHeader &&
-                                    jsxRuntime.jsx(Title.Title, { level: "H1", wrappingType: "None", children: this._selectedAccount.titleText }), this._isPhone && jsxRuntime.jsx(Button.Button, { icon: decline.decline, design: "Transparent", accessibleName: this._closeDialogAriaLabel, onClick: this._closeUserMenu, slot: "endContent" })] }), jsxRuntime.jsx("div", { class: "ui5-user-menu-header", children: headerContent.call(this) })] }), this.showOtherAccounts &&
-                    jsxRuntime.jsx(jsxRuntime.Fragment, { children: otherAccountsContent.call(this) }), this.menuItems.length > 0 &&
-                    jsxRuntime.jsx(List.List, { id: "ui5-user-menu-list", class: "ui5-user-menu-list", selectionMode: "None", separators: "None", accessibleRole: "Menu", accessibleName: this._ariaLabelledByActions, onItemClick: this._handleMenuItemClick, onMouseOver: this._itemMouseOver, "onui5-close-menu": this._handleMenuItemClose, children: jsxRuntime.jsx("slot", {}) }), this._hasCustomFooter &&
-                    jsxRuntime.jsx("div", { slot: "footer", class: "ui5-user-menu-footer", children: jsxRuntime.jsx("slot", { name: "footer" }) }), this._showDefaultFooter &&
-                    jsxRuntime.jsx("div", { slot: "footer", class: "ui5-user-menu-footer", children: jsxRuntime.jsx(Button.Button, { class: "ui5-user-menu-sign-out-btn", design: "Transparent", icon: log, onClick: this._handleSignOutClick, children: this._signOutButtonText }) })] }));
+                                    parametersBundle_css.jsx(Title.Title, { level: "H1", wrappingType: "None", children: this._selectedAccount.titleText }), this._isPhone && parametersBundle_css.jsx(Button.Button, { icon: decline.decline, design: "Transparent", accessibleName: this._closeDialogAriaLabel, onClick: this._closeUserMenu, slot: "endContent" })] }), parametersBundle_css.jsx("div", { class: "ui5-user-menu-header", children: headerContent.call(this) })] }), this.showOtherAccounts &&
+                    parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: otherAccountsContent.call(this) }), this.menuItems.length > 0 &&
+                    parametersBundle_css.jsx(List.List, { id: "ui5-user-menu-list", class: "ui5-user-menu-list", selectionMode: "None", separators: "None", accessibleRole: "Menu", accessibleName: this._ariaLabelledByActions, onItemClick: this._handleMenuItemClick, onMouseOver: this._itemMouseOver, "onui5-close-menu": this._handleMenuItemClose, children: parametersBundle_css.jsx("slot", {}) }), this._hasCustomFooter &&
+                    parametersBundle_css.jsx("div", { slot: "footer", class: "ui5-user-menu-footer", children: parametersBundle_css.jsx("slot", { name: "footer" }) }), this._showDefaultFooter &&
+                    parametersBundle_css.jsx("div", { slot: "footer", class: "ui5-user-menu-footer", children: parametersBundle_css.jsx(Button.Button, { class: "ui5-user-menu-sign-out-btn", design: "Transparent", icon: log, onClick: this._handleSignOutClick, children: this._signOutButtonText }) })] }));
     }
     function headerContent() {
-        return (jsxRuntime.jsx(jsxRuntime.Fragment, { children: this._selectedAccount &&
-                jsxRuntime.jsxs("div", { class: "ui5-user-menu-selected-account", "aria-label": this._ariaLabelledByAccountInformationText, children: [jsxRuntime.jsx("span", { title: this.showEditButton ? this._editAvatarTooltip : undefined, children: jsxRuntime.jsxs(Avatar, { size: "L", onClick: this._handleAvatarClick, initials: this._selectedAccount._initials, colorScheme: this._selectedAccount.avatarColorScheme, fallbackIcon: personPlaceholder, class: "ui5-user-menu-selected-account-avatar", interactive: true, children: [this._selectedAccount.avatarSrc &&
-                                        jsxRuntime.jsx("img", { src: this._selectedAccount.avatarSrc }), this.showEditButton &&
-                                        jsxRuntime.jsx(Tag.Tag, { slot: "badge", wrappingType: "None", design: "Set1", colorScheme: "5", children: jsxRuntime.jsx(Icon.Icon, { slot: "icon", name: ListItemTemplate.edit }) })] }) }), this._selectedAccount.titleText &&
-                            jsxRuntime.jsx(Text.Text, { id: "selected-account-title", class: "ui5-user-menu-selected-account-title", children: this._selectedAccount.titleText }), this._selectedAccount.subtitleText &&
-                            jsxRuntime.jsx(Text.Text, { class: "ui5-user-menu-selected-account-subtitleText", children: this._selectedAccount.subtitleText }), this._selectedAccount.description &&
-                            jsxRuntime.jsx(Text.Text, { class: "ui5-user-menu-selected-account-description", children: this._selectedAccount.description }), this._selectedAccount.additionalInfo &&
-                            jsxRuntime.jsx(Text.Text, { class: "ui5-user-menu-selected-account-additional-info", children: this._selectedAccount.additionalInfo }), this.showManageAccount &&
-                            jsxRuntime.jsx(Button.Button, { id: "selected-account-manage-btn", icon: userSettings, class: "ui5-user-menu-manage-account-btn", onClick: this._handleManageAccountClick, children: this._manageAccountButtonText })] }) }));
+        return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: this._selectedAccount &&
+                parametersBundle_css.jsxs("div", { class: "ui5-user-menu-selected-account", "aria-label": this._ariaLabelledByAccountInformationText, children: [parametersBundle_css.jsx("span", { title: this.showEditButton ? this._editAvatarTooltip : undefined, children: parametersBundle_css.jsxs(Avatar, { size: "L", onClick: this._isAvatarInteractive ? this._handleAvatarClick : undefined, initials: this._selectedAccount._initials, colorScheme: this._selectedAccount.avatarColorScheme, fallbackIcon: personPlaceholder, class: "ui5-user-menu-selected-account-avatar", mode: this._isAvatarInteractive ? "Interactive" : "Image", children: [this._selectedAccount.avatarSrc &&
+                                        parametersBundle_css.jsx("img", { src: this._selectedAccount.avatarSrc }), this.showEditButton &&
+                                        parametersBundle_css.jsx(Tag.Tag, { slot: "badge", wrappingType: "None", design: "Set1", colorScheme: "5", children: parametersBundle_css.jsx(Icon.Icon, { slot: "icon", name: ListItemTemplate.edit }) })] }) }), this._selectedAccount.titleText &&
+                            parametersBundle_css.jsx(Text.Text, { id: "selected-account-title", class: "ui5-user-menu-selected-account-title", children: this._selectedAccount.titleText }), this._selectedAccount.subtitleText &&
+                            parametersBundle_css.jsx(Text.Text, { class: "ui5-user-menu-selected-account-subtitleText", children: this._selectedAccount.subtitleText }), this._selectedAccount.description &&
+                            parametersBundle_css.jsx(Text.Text, { class: "ui5-user-menu-selected-account-description", children: this._selectedAccount.description }), this._selectedAccount.additionalInfo &&
+                            parametersBundle_css.jsx(Text.Text, { class: "ui5-user-menu-selected-account-additional-info", children: this._selectedAccount.additionalInfo }), this._hasInfoArea &&
+                            parametersBundle_css.jsx("div", { class: "ui5-user-menu-info-area", children: parametersBundle_css.jsx("slot", { name: "infoArea" }) }), this.showManageAccount &&
+                            parametersBundle_css.jsx(Button.Button, { id: "selected-account-manage-btn", icon: userSettings, class: "ui5-user-menu-manage-account-btn", onClick: this._handleManageAccountClick, children: this._manageAccountButtonText })] }) }));
     }
     function otherAccountsContent() {
-        return (jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsxs(Panel$1, { collapsed: true, class: "ui5-user-menu-other-accounts", children: [jsxRuntime.jsxs("div", { slot: "header", class: "ui5-user-menu-account-header", children: [jsxRuntime.jsxs(Title.Title, { slot: "header", level: "H4", "wrapping-type": "None", children: [this._otherAccountsButtonText, " (", this._otherAccounts.length, ")"] }), this.showEditAccounts &&
-                                jsxRuntime.jsx(Button.Button, { slot: "header", class: "ui5-user-menu-add-account-btn", design: "Transparent", icon: userEdit, onClick: this._handleEditAccountsClick, tooltip: this._editAccountsTooltip })] }), this._otherAccounts.length > 0 &&
-                        jsxRuntime.jsx(jsxRuntime.Fragment, { children: otherAccountsList.call(this) })] }) }));
+        return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: parametersBundle_css.jsxs(Panel$1, { collapsed: true, class: "ui5-user-menu-other-accounts", children: [parametersBundle_css.jsxs("div", { slot: "header", class: "ui5-user-menu-account-header", children: [parametersBundle_css.jsxs(Title.Title, { slot: "header", level: "H4", "wrapping-type": "None", children: [this._otherAccountsButtonText, " (", this._otherAccounts.length, ")"] }), this.showEditAccounts &&
+                                parametersBundle_css.jsx(Button.Button, { slot: "header", class: "ui5-user-menu-add-account-btn", design: "Transparent", icon: userEdit, onClick: this._handleEditAccountsClick, tooltip: this._editAccountsTooltip })] }), this._otherAccounts.length > 0 &&
+                        parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: otherAccountsList.call(this) })] }) }));
     }
     function otherAccountsList() {
-        return (jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsx(List.List, { onItemClick: this._handleAccountSwitch, loadingDelay: 0, accessibleName: `${this._otherAccountsButtonText} (${this._otherAccounts.length})`, loading: this._otherAccounts.some(account => account.loading === true), children: this._otherAccounts.map((account, index) => jsxRuntime.jsx(MenuItem.ListItemCustom, { ref: this.captureRef.bind(account), accessibilityAttributes: {
+        return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: parametersBundle_css.jsx(List.List, { onItemClick: this._handleAccountSwitch, loadingDelay: 0, accessibleName: `${this._otherAccountsButtonText} (${this._otherAccounts.length})`, loading: this._otherAccounts.some(account => account.loading === true), children: this._otherAccounts.map((account, index) => parametersBundle_css.jsx(List.ListItemCustom, { ref: this.captureRef.bind(account), accessibilityAttributes: {
                         "ariaPosinset": index + 1,
                         "ariaSetsize": this._otherAccounts.length
-                    }, accessibleName: this.getAccountDescriptionText(account), children: jsxRuntime.jsxs("div", { class: "ui5-user-menu-other-accounts-content", children: [jsxRuntime.jsx(Avatar, { slot: "image", size: "S", initials: account._initials, fallbackIcon: personPlaceholder, colorScheme: account.avatarColorScheme, children: account.avatarSrc &&
-                                    jsxRuntime.jsx("img", { src: account.avatarSrc }) }), jsxRuntime.jsxs("div", { class: "ui5-user-menu-other-accounts-info", children: [account.titleText &&
-                                        jsxRuntime.jsx(Title.Title, { class: "ui5-user-menu-other-accounts-title", children: account.titleText }), account.subtitleText &&
-                                        jsxRuntime.jsx(Label, { class: "ui5-user-menu-other-accounts-additional-info", children: account.subtitleText }), account.description &&
-                                        jsxRuntime.jsx(Label, { class: "ui5-user-menu-other-accounts-additional-info", children: account.description })] }), jsxRuntime.jsx("div", { children: account.selected &&
-                                    jsxRuntime.jsx(Icon.Icon, { part: "icon", name: sysEnter2.selectedAccount, class: "ui5-user-menu-selected-account-icon", mode: "Decorative" }) })] }) })) }) }));
+                    }, accessibleName: this.getAccountDescriptionText(account), children: parametersBundle_css.jsxs("div", { class: "ui5-user-menu-other-accounts-content", children: [parametersBundle_css.jsx(Avatar, { slot: "image", size: "S", initials: account._initials, fallbackIcon: personPlaceholder, colorScheme: account.avatarColorScheme, children: account.avatarSrc &&
+                                    parametersBundle_css.jsx("img", { src: account.avatarSrc }) }), parametersBundle_css.jsxs("div", { class: "ui5-user-menu-other-accounts-info", children: [account.titleText &&
+                                        parametersBundle_css.jsx(Title.Title, { class: "ui5-user-menu-other-accounts-title", children: account.titleText }), account.subtitleText &&
+                                        parametersBundle_css.jsx(Label, { class: "ui5-user-menu-other-accounts-additional-info", children: account.subtitleText }), account.description &&
+                                        parametersBundle_css.jsx(Label, { class: "ui5-user-menu-other-accounts-additional-info", children: account.description })] }), parametersBundle_css.jsx("div", { children: account.selected &&
+                                    parametersBundle_css.jsx(Icon.Icon, { part: "icon", name: sysEnter2.selectedAccount, class: "ui5-user-menu-selected-account-icon", mode: "Decorative" }) })] }) })) }) }));
     }
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
-    var UserMenuCss = `.ui5-user-menu-rp{width:20rem}.ui5-user-menu-rp::part(content),.ui5-user-menu-rp::part(footer){padding-inline:.5rem}.ui5-user-menu-rp::part(header){box-shadow:none;padding:0}.ui5-user-menu-header{display:flex;flex-direction:column}[on-phone] .ui5-user-menu-header{padding-inline:0}.ui5-user-menu-fixed-header:not(.ui5-user-menu-rp-scrolled){box-shadow:none}.ui5-user-menu-fixed-header::part(startContent),.ui5-user-menu-fixed-header::part(endContent){padding:0}.ui5-user-menu-fixed-header [ui5-button]{margin-inline:.5rem;font-family:var(--sapFontSemiboldDuplexFamily)}.ui5-user-menu-rp::part(content){padding-top:0;padding-bottom:.5rem}.ui5-user-menu-selected-account{display:flex;align-items:center;flex-direction:column;margin-block-end:.5rem;overflow:hidden}.ui5-user-menu-selected-account-avatar{margin-block-start:.25rem;margin-block-end:.5rem}.ui5-user-menu-avatar-img{object-fit:cover}.ui5-user-menu-selected-account-title{text-align:center;margin-block:.25rem;font-family:var(--sapFontSemiboldDuplexFamily);font-size:var(--sapFontLargeSize);color:var(--sapTextColor)}.ui5-user-menu-selected-account-subtitleText{text-align:center;margin-bottom:.25rem;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapContent_LabelColor)}.ui5-user-menu-selected-account-description{text-align:center;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapContent_LabelColor)}.ui5-user-menu-selected-account-additional-info{margin-top:.25rem;text-align:center;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapContent_LabelColor)}.ui5-user-menu-manage-account-btn{font-family:var(--sapFontSemiboldDuplexFamily);margin-block-start:1rem}.ui5-user-menu-sign-out-btn{font-family:var(--sapFontSemiboldDuplexFamily)}.ui5-user-menu-other-accounts{margin-block-end:.5rem}.ui5-user-menu-other-accounts::part(header){border-bottom-left-radius:0;border-bottom-right-radius:0}.ui5-user-menu-other-accounts::part(content){padding:0}.ui5-user-menu-other-accounts-content{display:flex;align-items:center;width:100%;min-height:4.5rem;gap:12px}.ui5-user-menu-other-accounts-info{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:4px;align-self:stretch;width:100%;overflow:hidden}.ui5-user-menu-other-accounts-title{overflow:hidden;color:var(--sapList_TextColor);text-overflow:ellipsis;font-family:var(--sapFontSemiboldDuplexFamily);font-size:var(--sapFontSize);font-style:normal;line-height:normal}.ui5-user-menu-other-accounts-additional-info{overflow:hidden;color:var(--sapContent_LabelColor);text-overflow:ellipsis;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);font-style:normal;line-height:normal}.ui5-user-menu-selected-account-icon{display:flex;width:18px;align-items:center;align-self:stretch;color:var(--sapContent_NonInteractiveIconColor);font-family:var(--_ui5_slider_handle_font_family);font-size:1.125rem}.ui5-user-menu-account-header{display:flex;flex:1;justify-content:space-between;align-items:center}.ui5-user-menu-footer{display:flex;flex:1;justify-content:flex-end;align-items:center}
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$2.defaultTheme, "host");
+    var UserMenuCss = `.ui5-user-menu-rp{width:20rem}.ui5-user-menu-rp::part(content),.ui5-user-menu-rp::part(footer){padding-inline:.5rem}.ui5-user-menu-rp::part(header){box-shadow:none;padding:0}.ui5-user-menu-header{display:flex;flex-direction:column}[on-phone] .ui5-user-menu-header{padding-inline:0}.ui5-user-menu-fixed-header:not(.ui5-user-menu-rp-scrolled){box-shadow:none}.ui5-user-menu-fixed-header::part(startContent),.ui5-user-menu-fixed-header::part(endContent){padding:0}.ui5-user-menu-fixed-header [ui5-button]{margin-inline:.5rem;font-family:var(--sapFontSemiboldDuplexFamily)}.ui5-user-menu-rp::part(content){padding-top:0;padding-bottom:.5rem}.ui5-user-menu-selected-account{display:flex;align-items:center;flex-direction:column;margin-block-end:.5rem;overflow:hidden}.ui5-user-menu-selected-account-avatar{margin-block-start:.25rem;margin-block-end:.5rem}.ui5-user-menu-avatar-img{object-fit:cover}.ui5-user-menu-selected-account-title{text-align:center;margin-block:.25rem;font-family:var(--sapFontSemiboldDuplexFamily);font-size:var(--sapFontLargeSize);color:var(--sapTextColor)}.ui5-user-menu-selected-account-subtitleText{text-align:center;margin-bottom:.25rem;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapContent_LabelColor)}.ui5-user-menu-selected-account-description{text-align:center;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapContent_LabelColor)}.ui5-user-menu-selected-account-additional-info{margin-top:.25rem;text-align:center;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapContent_LabelColor)}.ui5-user-menu-manage-account-btn{font-family:var(--sapFontSemiboldDuplexFamily);margin-block-start:1rem}.ui5-user-menu-sign-out-btn{font-family:var(--sapFontSemiboldDuplexFamily)}.ui5-user-menu-other-accounts{margin-block-end:.5rem}.ui5-user-menu-other-accounts::part(header){border-bottom-left-radius:0;border-bottom-right-radius:0}.ui5-user-menu-other-accounts::part(content){padding:0}.ui5-user-menu-other-accounts-content{display:flex;align-items:center;width:100%;min-height:4.5rem;gap:12px}.ui5-user-menu-other-accounts-info{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:4px;align-self:stretch;width:100%;overflow:hidden}.ui5-user-menu-other-accounts-title{overflow:hidden;color:var(--sapList_TextColor);text-overflow:ellipsis;font-family:var(--sapFontSemiboldDuplexFamily);font-size:var(--sapFontSize);font-style:normal;line-height:normal}.ui5-user-menu-other-accounts-additional-info{overflow:hidden;color:var(--sapContent_LabelColor);text-overflow:ellipsis;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);font-style:normal;line-height:normal}.ui5-user-menu-selected-account-icon{display:flex;width:18px;align-items:center;align-self:stretch;color:var(--sapContent_NonInteractiveIconColor);font-family:var(--_ui5_slider_handle_font_family);font-size:1.125rem}.ui5-user-menu-account-header{display:flex;flex:1;justify-content:space-between;align-items:center}.ui5-user-menu-footer{display:flex;flex:1;justify-content:flex-end;align-items:center}.ui5-user-menu-info-area{display:flex;flex-direction:column;align-self:stretch;margin-block:.5rem;padding-block:.5rem;padding-inline:.5rem;margin-inline:-.5rem}.ui5-user-menu-selected-account-subtitleText:has(+.ui5-user-menu-info-area){margin-bottom:0}.ui5-user-menu-info-area+.ui5-user-menu-manage-account-btn{margin-block-start:0}
 `;
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -716,6 +719,20 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
              */
             this.showEditButton = false;
             /**
+             * Defines whether the avatar of the selected account is interactive (focusable and pressable).
+             *
+             * When `false` (default), the avatar is rendered as a non-interactive image
+             * and is not announced as a button by screen readers.
+             *
+             * **Note:** When `showEditButton` is set to `true`, the avatar is treated as interactive
+             * regardless of this property's value, to preserve the edit affordance.
+             *
+             * @default false
+             * @public
+             * @since 2.25.0
+             */
+            this.avatarInteractive = false;
+            /**
              * @default false
              * @private
              */
@@ -752,7 +769,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
             }
         }
         get _isPhone() {
-            return Theme.d();
+            return ManagedStyles.d();
         }
         _handleScroll(e) {
             this._isScrolled = e.detail.scrollTop > 0;
@@ -835,7 +852,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
             this.fireDecoratorEvent("close");
         }
         _itemMouseOver(e) {
-            if (!Theme.f$1()) {
+            if (!ManagedStyles.f$1()) {
                 return;
             }
             const item = e.target;
@@ -914,6 +931,12 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
         get _showDefaultFooter() {
             return this.footer.length === 0;
         }
+        get _hasInfoArea() {
+            return this.infoArea.length > 0;
+        }
+        get _isAvatarInteractive() {
+            return this.avatarInteractive || this.showEditButton;
+        }
         getAccountDescriptionText(account) {
             return `${account.titleText} ${account.subtitleText} ${account.description} ${account.selected ? UserMenu_1.i18nBundle.getText(i18nDefaults$1.USER_MENU_POPOVER_ACCESSIBLE_ACCOUNT_SELECTED_TXT) : ""}`;
         }
@@ -948,6 +971,9 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
         webcomponentsBase.s({ type: Boolean })
     ], UserMenu.prototype, "showEditButton", void 0);
     __decorate([
+        webcomponentsBase.s({ type: Boolean })
+    ], UserMenu.prototype, "avatarInteractive", void 0);
+    __decorate([
         webcomponentsBase.d({
             type: HTMLElement,
             "default": true,
@@ -966,6 +992,9 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
         webcomponentsBase.d()
     ], UserMenu.prototype, "footer", void 0);
     __decorate([
+        webcomponentsBase.d()
+    ], UserMenu.prototype, "infoArea", void 0);
+    __decorate([
         webcomponentsBase.s({ type: Boolean })
     ], UserMenu.prototype, "_titleMovedToHeader", void 0);
     __decorate([
@@ -981,13 +1010,13 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
         query.o("#selected-account-manage-btn")
     ], UserMenu.prototype, "_selectedAccountManageBtn", void 0);
     __decorate([
-        parametersBundle_css.i("@ui5/webcomponents-fiori")
+        parametersBundle_css$1.i("@ui5/webcomponents-fiori")
     ], UserMenu, "i18nBundle", void 0);
     UserMenu = UserMenu_1 = __decorate([
         webcomponentsBase.m({
             tag: "ui5-user-menu",
             languageAware: true,
-            renderer: jsxRuntime.y,
+            renderer: parametersBundle_css.y,
             template: UserMenuTemplate,
             styles: [UserMenuCss],
         })

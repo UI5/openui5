@@ -4,11 +4,13 @@
 
 sap.ui.define([
 	"sap/base/util/merge",
+	"sap/base/util/restricted/_pick",
 	"sap/ui/fl/initial/_internal/connectors/KeyUserConnector",
 	"sap/ui/fl/initial/_internal/connectors/Utils",
 	"sap/ui/fl/Layer"
 ], function(
 	merge,
+	_pick,
 	KeyUserConnector,
 	InitialUtils,
 	Layer
@@ -37,7 +39,8 @@ sap.ui.define([
 		ROUTES: {
 			DATA: `${ROOT}/data`,
 			VARIANTDATA: `${ROOT}/variantdata`,
-			SETTINGS: `${ROOT}/settings`
+			SETTINGS: `${ROOT}/settings`,
+			VARIANTS_AUTHORS: `${ROOT}/variants/authors/`
 		},
 
 		/**
@@ -77,6 +80,25 @@ sap.ui.define([
 			}
 			const sVariantDataUrl = InitialUtils.getUrl(this.ROUTES.VARIANTDATA, mPropertyBag, mParameters);
 			return InitialUtils.sendRequest(sVariantDataUrl, "GET", { initialConnector: this }).then(function(oResult) {
+				return oResult.response;
+			});
+		},
+
+		/**
+		 * Get full names of variants' authors.
+		 *
+		 * @param {object} mPropertyBag Property bag
+		 * @param {string} mPropertyBag.url Configured URL for the connector
+		 * @param {string} mPropertyBag.reference Flexibility reference
+		 * @param {boolean} [mPropertyBag.allContexts] Includes also restricted context
+		 * @param {string} [mPropertyBag.version] Version to be loaded
+		 * @param {string} [mPropertyBag.adaptationId] - Context-based adaptation to be loaded
+		 * @returns {Promise<object>} Promise resolves with an object containing maps of variants' IDs and their names
+		 */
+		loadVariantsAuthors(mPropertyBag) {
+			const mParameters = _pick(mPropertyBag, ["version", "allContexts", "adaptationId"]);
+			const sVariantsAuthorsUrl = InitialUtils.getUrl(this.ROUTES.VARIANTS_AUTHORS, mPropertyBag, mParameters);
+			return InitialUtils.sendRequest(sVariantsAuthorsUrl, "GET", { initialConnector: this }).then(function(oResult) {
 				return oResult.response;
 			});
 		}

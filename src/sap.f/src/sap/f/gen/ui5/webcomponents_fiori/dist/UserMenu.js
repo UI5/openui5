@@ -47,6 +47,20 @@ sap.ui.define(
 
           properties: {
             /**
+             * Defines whether the avatar of the selected account is interactive (focusable and pressable).
+             *
+             * When `false` (default), the avatar is rendered as a non-interactive image
+             * and is not announced as a button by screen readers.
+             *
+             * **Note:** When `showEditButton` is set to `true`, the avatar is treated as interactive
+             * regardless of this property's value, to preserve the edit affordance.
+             */
+            avatarInteractive: {
+              type: "boolean",
+              mapping: "property",
+              defaultValue: false
+            },
+            /**
              * Defines if the User Menu is opened.
              */
             open: { type: "boolean", mapping: "property", defaultValue: false },
@@ -127,6 +141,17 @@ sap.ui.define(
               type: "sap.ui.core.Control",
               multiple: true,
               slot: "footer"
+            },
+            /**
+             * Defines the content of the info area inside the User Menu's account block.
+             *
+             * **Note:** When empty, the User Menu renders unchanged.
+             * @type module:sap/ui/core/Control
+             */
+            infoArea: {
+              type: "sap.ui.core.Control",
+              multiple: true,
+              slot: "infoArea"
             }
           },
 

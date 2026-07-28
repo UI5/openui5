@@ -620,10 +620,10 @@ sap.ui.define([
 		assert.notOk(this.oTable.getBinding().getHeaderContext(), "Header context");
 	});
 
-	QUnit.test("#onHeaderSelectorPress", async function(assert) {
+	QUnit.test("#handleHeaderSelectorPress", async function(assert) {
 		const oClearSelection = this.spy(this.oSelectionPlugin, "clearSelection");
 
-		this.oSelectionPlugin.onHeaderSelectorPress();
+		this.oSelectionPlugin.handleHeaderSelectorPress();
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "When no contexts selected and limit enabled: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 200, "When no contexts selected and limit enabled: Selected contexts");
@@ -639,7 +639,7 @@ sap.ui.define([
 		oClearSelection.resetHistory();
 		this.oTable.setFirstVisibleRow(0);
 		await this.oTable.qunit.whenRenderingFinished();
-		this.oSelectionPlugin.onHeaderSelectorPress();
+		this.oSelectionPlugin.handleHeaderSelectorPress();
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "When some contexts selected and limit enabled: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0, "When some contexts selected and limit enabled: Selected contexts");
@@ -653,7 +653,7 @@ sap.ui.define([
 		this.oTable.setFirstVisibleRow(0);
 		this.oSelectionPlugin.setLimit(0);
 		await this.oTable.qunit.whenRenderingFinished();
-		this.oSelectionPlugin.onHeaderSelectorPress();
+		this.oSelectionPlugin.handleHeaderSelectorPress();
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "When no contexts selected and limit disabled: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, this.oTable.getBinding().getLength(),
@@ -666,7 +666,7 @@ sap.ui.define([
 		this.oTable.getRows()[2].getBindingContext().setSelected(false);
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		this.oSelectionChangeHandler.resetHistory();
-		this.oSelectionPlugin.onHeaderSelectorPress();
+		this.oSelectionPlugin.handleHeaderSelectorPress();
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "When some contexts selected and limit disabled: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, this.oTable.getBinding().getLength(),
@@ -674,23 +674,14 @@ sap.ui.define([
 
 		this.oSelectionChangeHandler.resetHistory();
 		oClearSelection.resetHistory();
-		this.oSelectionPlugin.onHeaderSelectorPress();
+		this.oSelectionPlugin.handleHeaderSelectorPress();
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "When all contexts selected and limit disabled: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0, "When all contexts selected and limit disabled: Selected contexts");
 		assert.equal(oClearSelection.callCount, 1, "When all contexts selected and limit disabled: #clearSelection call");
-
-		this.oSelectionChangeHandler.resetHistory();
-		this.oSelectionPlugin.setEnabled(false);
-		this.oSelectionPlugin.onHeaderSelectorPress();
-		await TableQUnitUtils.wait(10);
-		assert.equal(this.oSelectionChangeHandler.callCount, 0, "Plugin disabled: selectionChange event");
-		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0, "Plugin disabled: Selected contexts");
-		assert.ok(this.oTable.getBinding().getAllCurrentContexts().every((oContext) => !oContext.isSelected()),
-			"Plugin disabled: Contexts are not selected");
 	});
 
-	QUnit.test("#onHeaderSelectorPress; Hierarchy", async function(assert) {
+	QUnit.test("#handleHeaderSelectorPress; Hierarchy", async function(assert) {
 		this.oTable.destroy();
 		this.oTable = TableQUnitUtils.createTable(TableQUnitUtils.createSettingsForHierarchy(), (oTable) => {
 			oTable.getBinding().resume();
@@ -703,7 +694,7 @@ sap.ui.define([
 		this.oSelectionPlugin.setLimit(0);
 		await this.oTable.qunit.whenRenderingFinished();
 
-		this.oSelectionPlugin.onHeaderSelectorPress();
+		this.oSelectionPlugin.handleHeaderSelectorPress();
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 10, "Selected contexts");
 
@@ -713,7 +704,7 @@ sap.ui.define([
 		assert.strictEqual(this.oSelectionPlugin.isSelected(this.oTable.getRows()[3]), false, "Selection state of the first child");
 	});
 
-	QUnit.test("#onHeaderSelectorPress; Data Aggregation", async function(assert) {
+	QUnit.test("#handleHeaderSelectorPress; Data Aggregation", async function(assert) {
 		this.oTable.destroy();
 		this.oTable = TableQUnitUtils.createTable(TableQUnitUtils.createSettingsForDataAggregation(), (oTable) => {
 			oTable.getBinding().resume();
@@ -725,13 +716,13 @@ sap.ui.define([
 
 		const aRows = this.oTable.getRows();
 
-		this.oSelectionPlugin.onHeaderSelectorPress();
+		this.oSelectionPlugin.handleHeaderSelectorPress();
 		await TableQUnitUtils.wait(10);
-		assert.equal(this.oSelectionChangeHandler.callCount, 0, "#onHeaderSelectorPress (No selection): selectionChange event");
-		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0, "#onHeaderSelectorPress (No selection): Selected contexts");
+		assert.equal(this.oSelectionChangeHandler.callCount, 0, "#handleHeaderSelectorPress (No selection): selectionChange event");
+		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0, "#handleHeaderSelectorPress (No selection): Selected contexts");
 
 		await TableQUnitUtils.expandAndScrollTableWithDataAggregation(this.oTable);
-		this.oSelectionPlugin.onHeaderSelectorPress();
+		this.oSelectionPlugin.handleHeaderSelectorPress();
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 2, "Selected contexts");
@@ -739,13 +730,13 @@ sap.ui.define([
 		assert.ok(aRows[3].getBindingContext() === this.oSelectionPlugin.getSelectedContexts()[1], "2nd selected context is related to correct row");
 	});
 
-	QUnit.test("#onKeyboardShortcut", async function(assert) {
+	QUnit.test("#handleKeyboardShortcut", async function(assert) {
 		const oClearSelection = this.spy(this.oSelectionPlugin, "clearSelection");
 		const oEvent = new jQuery.Event();
 
 		this.spy(oEvent, "setMarked");
 
-		this.oSelectionPlugin.onKeyboardShortcut("clear", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("clear", oEvent);
 		await TableQUnitUtils.wait(10);
 		assert.equal(this.oSelectionChangeHandler.callCount, 0, "Clear selection, no selection: selectionChange event");
 		assert.equal(oClearSelection.callCount, 1, "Clear selection, no selection: #clearSelection call");
@@ -753,7 +744,7 @@ sap.ui.define([
 
 		this.oSelectionChangeHandler.resetHistory();
 		oEvent.setMarked.resetHistory();
-		this.oSelectionPlugin.onKeyboardShortcut("toggle", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "Toggle selection, limit enabled, no selection: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 200, "Toggle selection, limit enabled, no selection: Selected contexts");
@@ -771,7 +762,7 @@ sap.ui.define([
 		oEvent.setMarked.resetHistory();
 		this.oTable.setFirstVisibleRow(0);
 		await this.oTable.qunit.whenRenderingFinished();
-		this.oSelectionPlugin.onKeyboardShortcut("toggle", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
 		await TableQUnitUtils.wait(10);
 		assert.equal(this.oSelectionChangeHandler.callCount, 0,
 			"Toggle selection, limit enabled, all contexts in limit selected: selectionChange event");
@@ -794,7 +785,7 @@ sap.ui.define([
 		this.oSelectionPlugin.getSelectedContexts()[198].setSelected(false);
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		this.oSelectionChangeHandler.resetHistory();
-		this.oSelectionPlugin.onKeyboardShortcut("toggle", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1,
 			"Toggle selection, limit enabled, some contexts in limit selected: selectionChange event");
@@ -812,7 +803,7 @@ sap.ui.define([
 		this.oSelectionChangeHandler.resetHistory();
 		oClearSelection.resetHistory();
 		oEvent.setMarked.resetHistory();
-		this.oSelectionPlugin.onKeyboardShortcut("clear", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("clear", oEvent);
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "Clear selection: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0, "Clear selection: Selected contexts");
@@ -825,7 +816,7 @@ sap.ui.define([
 		this.oTable.setFirstVisibleRow(0);
 		this.oSelectionPlugin.setLimit(0);
 		await this.oTable.qunit.whenRenderingFinished();
-		this.oSelectionPlugin.onKeyboardShortcut("toggle", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "Toggle selection, limit disabled, no selection: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, this.oTable.getBinding().getLength(),
@@ -841,7 +832,7 @@ sap.ui.define([
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		this.oSelectionChangeHandler.resetHistory();
 		oEvent.setMarked.resetHistory();
-		this.oSelectionPlugin.onKeyboardShortcut("toggle", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "Toggle selection, limit disabled, some contexts selected: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, this.oTable.getBinding().getLength(),
@@ -852,7 +843,7 @@ sap.ui.define([
 		this.oSelectionChangeHandler.resetHistory();
 		oClearSelection.resetHistory();
 		oEvent.setMarked.resetHistory();
-		this.oSelectionPlugin.onKeyboardShortcut("toggle", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "Toggle selection, limit disabled, all contexts selected: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0,
@@ -860,15 +851,6 @@ sap.ui.define([
 		assert.equal(oClearSelection.callCount, 1, "Toggle selection, limit disabled, all contexts selected: #clearSelection call");
 		assert.ok(oEvent.setMarked.calledWithExactly("sapUiTableClearAll"),
 			"Toggle selection, limit disabled, all contexts selected: Event mark 'sapUiTableClearAll'");
-
-		this.oSelectionChangeHandler.resetHistory();
-		this.oSelectionPlugin.setEnabled(false);
-		this.oSelectionPlugin.onKeyboardShortcut("toggle", oEvent);
-		await TableQUnitUtils.wait(10);
-		assert.equal(this.oSelectionChangeHandler.callCount, 0, "Plugin disabled: selectionChange event");
-		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0, "Plugin disabled: Selected contexts");
-		assert.ok(this.oTable.getBinding().getAllCurrentContexts().every((oContext) => !oContext.isSelected()),
-			"Plugin disabled: Contexts are not selected");
 	});
 
 	QUnit.module("Binding selection API", {
@@ -1416,7 +1398,7 @@ sap.ui.define([
 	QUnit.test("Hierarchy; Expand/Collapse", async function(assert) {
 		await this.createTableWithHierarchy();
 
-		this.oSelectionPlugin.onHeaderSelectorPress();
+		this.oSelectionPlugin.handleHeaderSelectorPress();
 		await this.oTable.getRows()[2].getBindingContext().expand();
 		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.clearSelectionIcon,
@@ -1829,7 +1811,7 @@ sap.ui.define([
 	QUnit.test("TableUtils.loadContexts is called with busy=true", async function(assert) {
 		const oLoadContextsSpy = sinon.spy(TableUtils, "loadContexts");
 
-		this.oSelectionPlugin.onHeaderSelectorPress();
+		this.oSelectionPlugin.handleHeaderSelectorPress();
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 
 		assert.strictEqual(oLoadContextsSpy.args[0][3], true, "TableUtils.loadContexts called with busy=true");

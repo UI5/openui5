@@ -1,0 +1,93 @@
+<mvc:View
+	controllerName="sap.f.sample.HeroBannerColumnsRatio.C"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:f="sap.f"
+	xmlns:card="sap.f.cards"
+	height="100%"
+	displayBlock="true">
+	<Page showHeader="false">
+		<content>
+			<Title text="No columnsRatio (single column)" level="H4" class="sapUiSmallMarginBottom sapUiSmallMarginTop sapUiSmallMarginBegin" />
+			<VBox class="sapUiMediumMarginBeginEnd">
+				<f:HeroBanner
+					headerText="Welcome back, Sarah"
+					overlineText="Monday, May 26, 2026">
+					<f:actions>
+						<Button icon="sap-icon://receipt" text="Approve Invoices" />
+						<Button icon="sap-icon://shipping-status" text="Track Deliveries" />
+					</f:actions>
+					<f:startContent>
+						<Text class="heroBannerWhiteText" text="Here you can insert any additional information that may be relevant to the context. This section serves as a placeholder for content that can provide more in-depth explanations, supplementary data, or any other pertinent details that the reader might need." />
+					</f:startContent>
+				</f:HeroBanner>
+			</VBox>
+
+			<Title text="columnsRatio=&quot;Equal&quot; (equal width columns)" level="H4" class="sapUiSmallMarginBottom sapUiMediumMarginTop sapUiSmallMarginBegin" />
+			<VBox class="sapUiMediumMarginBeginEnd">
+				<f:HeroBanner
+					headerText="Hi, David"
+					overlineText="Monday, May 26, 2026"
+					columnsRatio="Equal">
+					<f:startContent>
+						<f:Card>
+							<f:header>
+								<card:Header title="Leave Balance" subtitle="Days remaining" />
+							</f:header>
+							<f:content>
+								<VBox class="sapUiSmallMargin">
+									<Title text="18 of 30" level="H3" />
+								</VBox>
+							</f:content>
+						</f:Card>
+					</f:startContent>
+					<f:endContent>
+						<f:Card>
+							<f:header>
+								<card:Header title="Next Payroll" subtitle="June 2026" />
+							</f:header>
+							<f:content>
+								<VBox class="sapUiSmallMargin">
+									<Title text="Jun 30" level="H3" />
+								</VBox>
+							</f:content>
+						</f:Card>
+					</f:endContent>
+				</f:HeroBanner>
+			</VBox>
+
+			<Title text="columnsRatio=&quot;FirstWider&quot; (start column twice as wide)" level="H4" class="sapUiSmallMarginBottom sapUiMediumMarginTop sapUiSmallMarginBegin" />
+			<VBox class="sapUiMediumMarginBeginEnd">
+				<f:HeroBanner
+					headerText="Good Afternoon, Thomas"
+					overlineText="Monday, May 26, 2026"
+					columnsRatio="FirstWider">
+					<f:startContent>
+						<f:Card>
+							<f:header>
+								<card:Header title="Sales Pipeline" subtitle="Q2 2026" />
+							</f:header>
+							<f:content>
+								<VBox class="sapUiSmallMargin">
+									<Title text="€4.2M" level="H3" />
+								</VBox>
+							</f:content>
+						</f:Card>
+					</f:startContent>
+					<f:endContent>
+						<f:Card>
+							<f:header>
+								<card:Header title="Overdue Tasks" subtitle="Action needed" />
+							</f:header>
+							<f:content>
+								<VBox class="sapUiSmallMargin">
+									<Title text="3" level="H3" />
+								</VBox>
+							</f:content>
+						</f:Card>
+					</f:endContent>
+				</f:HeroBanner>
+			</VBox>
+		</content>
+	</Page>
+</mvc:View>

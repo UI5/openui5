@@ -1,0 +1,45 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.f.sample.HeroBannerIntegrationCard.endContent",
+		"type": "card",
+		"title": "Card 'endContent'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"header": {
+			"title": "Upcoming Events",
+			"subtitle": "Today",
+			"status": {
+				"text": "2 events"
+			}
+		},
+		"content": {
+			"data": {
+				"json": [
+					{
+						"time": "14:00",
+						"title": "Team Meeting",
+						"location": "Conference Room B",
+						"highlight": "Success"
+					}
+				]
+			},
+			"item": {
+				"icon": {
+					"src": "sap-icon://calendar"
+				},
+				"title": {
+					"value": "{title}"
+				},
+				"description": {
+					"value": "{time} · {location}"
+				},
+				"highlight": "{highlight}"
+			}
+		}
+	}
+}

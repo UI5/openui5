@@ -120,15 +120,13 @@ sap.ui.define([
 	/**
 	 * @inheritDoc
 	 */
-	ODataV4Selection.prototype.onKeyboardShortcut = function(sType, oEvent) {
-		if (!this.isActive()) {
-			return;
-		}
-
+	ODataV4Selection.prototype.handleKeyboardShortcut = function(sType, oEvent) {
 		if (sType === "clear") { // ctrl + shift + a
 			this.clearSelection();
 			oEvent.setMarked("sapUiTableClearAll");
 		}
+
+		return Promise.resolve();
 	};
 
 	ODataV4Selection.prototype.isContextSelectable = function(oContext) {

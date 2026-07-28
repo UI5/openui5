@@ -271,7 +271,11 @@ sap.ui.define([
 				legacyBundleHandling: bLegacyBundleHandling
 			});
 			const oSettings = await Settings.getInstance();
-			oAuthors = oSettings.getIsVariantAuthorNameAvailable() ? await Storage.loadVariantsAuthors(sReference) : {};
+			oAuthors = oSettings.getIsVariantAuthorNameAvailable() ? await Storage.loadVariantsAuthors({
+				reference: sReference,
+				version: sVersion,
+				adaptationId: sAdaptationId
+			}) : {};
 		} else if (bRequiresOnlyCompletion) {
 			oFlexData = await Storage.completeFlexData({
 				reference: sReference,

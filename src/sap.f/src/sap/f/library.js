@@ -60,7 +60,10 @@ sap.ui.define([
 		  "sap.f.IllustratedMessageType",
 		  "sap.f.LayoutType",
 		  "sap.f.SidePanelPosition",
-		  "sap.f.NavigationDirection"
+		  "sap.f.NavigationDirection",
+		  "sap.f.HeroBannerActionsPlacement",
+		  "sap.f.HeroBannerColumnsRatio",
+		  "sap.f.HeroBannerHeaderBlockPlacement"
 		 ],
 		 controls: [
 		  "sap.f.AvatarGroup",
@@ -72,6 +75,7 @@ sap.ui.define([
 		  "sap.f.CalendarInCard",
 		  "sap.f.Card",
 		  "sap.f.GridContainer",
+		  "sap.f.HeroBanner",
 		  "sap.f.DynamicPage",
 		  "sap.f.DynamicPageHeader",
 		  "sap.f.DynamicPageTitle",
@@ -689,6 +693,78 @@ sap.ui.define([
 	 DataType.registerEnum("sap.f.cards.HeaderPosition", thisLib.cards.HeaderPosition);
 	 DataType.registerEnum("sap.f.cards.NumericHeaderSideIndicatorsAlignment", thisLib.cards.NumericHeaderSideIndicatorsAlignment);
 	 DataType.registerEnum("sap.f.LayoutType", thisLib.LayoutType);
+
+	 /**
+	  * Defines the placement of the actions slot within the {@link sap.f.HeroBanner} header area.
+	  *
+	  * @enum {string}
+	  * @public
+	  * @since 1.152
+	  */
+	 thisLib.HeroBannerActionsPlacement = {
+		 /**
+		  * Actions are displayed to the right of the header text, at the top of the header row.
+		  *
+		  * @public
+		  */
+		 TopEnd: "TopEnd",
+		 /**
+		  * Actions are displayed below the header text, left-aligned, regardless of <code>columnsRatio</code> or slot usage.
+		  *
+		  * @public
+		  */
+		 BottomStart: "BottomStart"
+	 };
+	 DataType.registerEnum("sap.f.HeroBannerActionsPlacement", thisLib.HeroBannerActionsPlacement);
+
+	 /**
+	  * Defines the ratio between the two content columns inside the {@link sap.f.HeroBanner}.
+	  *
+	  * @enum {string}
+	  * @public
+	  * @since 1.152
+	  */
+	 thisLib.HeroBannerColumnsRatio = {
+		 /**
+		  * Two equal columns. Both content blocks share the available width equally.
+		  * On smaller screens, both slots stack vertically.
+		  *
+		  * @public
+		  */
+		 Equal: "Equal",
+		 /**
+		  * Two unequal columns. The start content takes two-thirds of the width, the end content one-third.
+		  * On smaller screens, both slots stack vertically.
+		  *
+		  * @public
+		  */
+		 FirstWider: "FirstWider"
+	 };
+	 DataType.registerEnum("sap.f.HeroBannerColumnsRatio", thisLib.HeroBannerColumnsRatio);
+
+	 /**
+	  * Defines the vertical placement of the header block within the {@link sap.f.HeroBanner} content area.
+	  *
+	  * @enum {string}
+	  * @public
+	  * @since 1.152
+	  */
+	 thisLib.HeroBannerHeaderBlockPlacement = {
+		 /**
+		  * Header block is placed at the top of the content area.
+		  *
+		  * @public
+		  */
+		 Top: "Top",
+		 /**
+		  * Header block is pushed to the bottom of column 1. Only takes effect when <code>columnsRatio</code>
+		  * is <code>Equal</code> or <code>FirstWider</code> and only <code>endContent</code> is provided.
+		  *
+		  * @public
+		  */
+		 Bottom: "Bottom"
+	 };
+	 DataType.registerEnum("sap.f.HeroBannerHeaderBlockPlacement", thisLib.HeroBannerHeaderBlockPlacement);
 
 	 return thisLib;
 	});

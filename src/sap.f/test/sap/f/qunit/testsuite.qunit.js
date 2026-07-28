@@ -206,6 +206,12 @@ sap.ui.define(function () {
 				}
 			},
 
+			"HeroBanner": {
+				coverage: {
+					only: ["sap/f/HeroBanner"]
+				}
+			},
+
 			"ProductSwitchItem": {
 				coverage: {
 					only: ["sap/f/ProductSwitchItem"]

@@ -402,17 +402,25 @@ sap.ui.define([
 		/**
 		 * @param {string} sControllerName Name of the controller
 		 * @param {string} sComponentId Name of the compoonent
+		 * @param {boolean} bAsync Whether the extensions should be provided synchronously
+		 * @ui5-transform-hint replace-param bAsync true
 		 */
-		ExtensionProvider.prototype.getControllerExtensions = function(sControllerName, sComponentId) {
+		ExtensionProvider.prototype.getControllerExtensions = function(sControllerName, sComponentId, bAsync) {
 			if (sControllerName == "example.BaseController") {
-				return new Promise(function(fnResolve, fnReject) {
-					sap.ui.require(["example/ProviderExt1", "example/ProviderExt2"], function(Ext1, Ext2) {
-						fnResolve([
-							Ext1,
-							Ext2
-						]);
+				if (bAsync) {
+					return new Promise(function(fnResolve, fnReject) {
+						sap.ui.require(["example/ProviderExt1", "example/ProviderExt2"], function(Ext1, Ext2) {
+							fnResolve([
+								Ext1,
+								Ext2
+							]);
+						});
 					});
-				});
+				} else {
+					var Ext1 = sap.ui.requireSync("example/ProviderExt1"); // legacy-relevant: sync path tests
+					var Ext2 = sap.ui.requireSync("example/ProviderExt2"); // legacy-relevant: sync path tests
+					return [Ext1, Ext2];
+				}
 			}
 		};
 		return ExtensionProvider;

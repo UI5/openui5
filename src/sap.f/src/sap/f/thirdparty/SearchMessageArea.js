@@ -1,11 +1,11 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/Text', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/i18n-defaults2'], (function (webcomponentsBase, jsxRuntime, Title, Text, Theme, parametersBundle_css, Icons, parametersBundle_css$1, willShowContent, i18nDefaults) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/Text', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/parameters-bundle3.css', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/i18n-defaults2'], (function (webcomponentsBase, parametersBundle_css, Title, Text, ManagedStyles, parametersBundle_css$1, Icons, parametersBundle_css$2, willShowContent, i18nDefaults) { 'use strict';
 
     function SearchMessageAreaTemplate() {
-        return (jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsxs("div", { class: "ui5-search-message-area-wrapper", children: [jsxRuntime.jsx(Title.Title, { size: Title.TitleLevel.H6, children: this.text }), jsxRuntime.jsx(Text.Text, { class: "ui5-search-message-area-description", children: this.description })] }) }));
+        return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: parametersBundle_css.jsxs("div", { class: "ui5-search-message-area-wrapper", children: [parametersBundle_css.jsx(Title.Title, { size: Title.TitleLevel.H6, children: this.text }), parametersBundle_css.jsx(Text.Text, { class: "ui5-search-message-area-description", children: this.description })] }) }));
     }
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
     var SearchMessageAreaStyles = `:host{width:100%;border-bottom:1px solid var(--sapGroup_TitleBorderColor);box-sizing:border-box;display:inline-block}.ui5-search-message-area-wrapper{padding:.5rem;box-sizing:border-box}.ui5-search-message-area-description{margin-top:.25rem;font-size:.75rem;color:var(--sapContent_LabelColor)}
 `;
 
@@ -37,7 +37,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/jsx-run
             tag: "ui5-search-message-area",
             languageAware: true,
             styles: SearchMessageAreaStyles,
-            renderer: jsxRuntime.y,
+            renderer: parametersBundle_css.y,
             template: SearchMessageAreaTemplate,
         })
     ], SearchMessageArea);

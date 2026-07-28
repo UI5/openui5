@@ -216,7 +216,7 @@ sap.ui.define([
 			};
 			const oLogResolveSpy = sandbox.spy(StorageUtils, "logAndResolveDefault");
 
-			return Storage.loadVariantsAuthors("reference").then(function(oResponse) {
+			return Storage.loadVariantsAuthors({ reference: "reference" }).then(function(oResponse) {
 				assert.strictEqual(oLrepConnectorLoadFeaturesStub.callCount, 1, "the loadVariantsAuthors was triggered once");
 				assert.strictEqual(oJsObjectConnectorLoadFeaturesStub.callCount, 1, "the loadVariantsAuthors was triggered once");
 				assert.strictEqual(oLogResolveSpy.callCount, 2, "the logAndResolveDefault called twice");
@@ -243,7 +243,7 @@ sap.ui.define([
 				id2: "name2",
 				id3: "name3"
 			};
-			return Storage.loadVariantsAuthors("reference").then(function(oResponse) {
+			return Storage.loadVariantsAuthors({ reference: "reference" }).then(function(oResponse) {
 				assert.strictEqual(oLrepConnectorLoadFeaturesStub.callCount, 1, "the loadVariantsAuthors was triggered once");
 				const oLrepConnectorCallArgs = oLrepConnectorLoadFeaturesStub.getCall(0).args[0];
 				assert.deepEqual(oLrepConnectorCallArgs, { url: this.url, reference: "reference" }, "the url was passed");

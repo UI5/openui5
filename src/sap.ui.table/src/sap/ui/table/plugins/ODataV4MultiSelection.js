@@ -294,20 +294,22 @@ sap.ui.define([
 	 * Selects all rows if not all are already selected, otherwise the selection is cleared.
 	 *
 	 * @param {sap.ui.table.plugins.ODataV4MultiSelection} oPlugin The selection plugin.
-	 * @returns {boolean} The state of selection. true - all selected, false - all cleared, undefined - no action
+	 * @returns {{selectAll: (boolean|undefined), promise: Promise}}
+	 *   An object providing the synchronous state of the selection
+	 *   (<code>true</code> - all selected, <code>false</code> - all cleared, <code>undefined</code> - no action) and a promise that
+	 *   resolves once the selection change has completed.
 	 */
 	function toggleSelectAll(oPlugin) {
 		if (areAllRowsSelected(getSelectableCount(oPlugin), oPlugin.getSelectedCount())) {
 			oPlugin.clearSelection();
-			return false;
+			return {selectAll: false, promise: Promise.resolve()};
 		} else if (oPlugin._isLimitDisabled()) {
 			const oBinding = oPlugin.getControl().getBinding();
 			if (oBinding?.getLength()) {
-				select(oPlugin, 0, oBinding.getLength() - 1);
-				return true;
+				return {selectAll: true, promise: select(oPlugin, 0, oBinding.getLength() - 1)};
 			}
 		}
-		return undefined;
+		return {selectAll: undefined, promise: Promise.resolve()};
 	}
 
 	/**
@@ -328,50 +330,52 @@ sap.ui.define([
 	/**
 	 * @inheritDoc
 	 */
-	ODataV4MultiSelection.prototype.onHeaderSelectorPress = function() {
-		ODataV4Selection.prototype.onHeaderSelectorPress.apply(this, arguments);
+	ODataV4MultiSelection.prototype.handleHeaderSelectorPress = function() {
+		ODataV4Selection.prototype.handleHeaderSelectorPress.apply(this, arguments);
 
 		const oHeaderSelector = this._getHeaderSelector();
 
 		if (!oHeaderSelector.getVisible() || !oHeaderSelector.getEnabled()) {
-			return;
+			return Promise.resolve();
 		}
 
 		if (oHeaderSelector.getType() === "CheckBox") {
-			toggleSelectAll(this);
-	} else if (oHeaderSelector.getType() === "Icon") {
-		if (this.getSelectedCount() > 0) {
+			return toggleSelectAll(this).promise;
+		} else if (oHeaderSelector.getType() === "Icon") {
+			if (this.getSelectedCount() > 0) {
 				this.clearSelection();
 			} else {
 				const oBinding = this.getControl().getBinding();
 				if (oBinding?.getLength() > 0) {
-					select(this, 0, oBinding.getLength() - 1);
+					return select(this, 0, oBinding.getLength() - 1);
 				}
 			}
 		}
+
+		return Promise.resolve();
 	};
 
 	/**
 	 * @inheritDoc
 	 */
-	ODataV4MultiSelection.prototype.onKeyboardShortcut = function(sType, oEvent) {
-		ODataV4Selection.prototype.onKeyboardShortcut.apply(this, arguments);
-
-		if (!this.isActive()) {
-			return;
-		}
+	ODataV4MultiSelection.prototype.handleKeyboardShortcut = function(sType, oEvent) {
 
 		if (sType === "toggle") { // ctrl + a
 			if (this._isLimitDisabled()) {
-				if (toggleSelectAll(this) === false) {
+				const mResult = toggleSelectAll(this);
+				if (mResult.selectAll === false) {
 					oEvent.setMarked("sapUiTableClearAll");
 				}
+				return mResult.promise;
 			} else {
 				const oBinding = this.getControl().getBinding();
 				if (oBinding?.getLength() > 0) {
-					select(this, 0, oBinding.getLength() - 1);
+					return select(this, 0, oBinding.getLength() - 1);
 				}
+				return Promise.resolve();
 			}
+		} else {
+			return ODataV4Selection.prototype.handleKeyboardShortcut.apply(this, arguments);
 		}
 	};
 
@@ -488,8 +492,9 @@ sap.ui.define([
 	 * @param {sap.ui.table.plugins.ODataV4MultiSelection} oPlugin The selection plugin.
 	 * @param {int} iIndexFrom The start index of the range selection.
 	 * @param {int} iIndexTo The end index of the range selection.
+	 * @returns {Promise} A promise that resolves once the contexts have been loaded and their selected state has been set.
 	 */
-	function select(oPlugin, iIndexFrom, iIndexTo) {
+	async function select(oPlugin, iIndexFrom, iIndexTo) {
 		const oTable = oPlugin.getControl();
 		const iLimit = oPlugin.getLimit();
 		const bUpwardSelection = iIndexTo < iIndexFrom; // Indicates whether the selection is made from bottom to top.
@@ -513,27 +518,26 @@ sap.ui.define([
 			}
 		}
 
-		TableUtils.loadContexts(oTable, iGetContextsStartIndex, iGetContextsLength, true).then((aContexts) => {
-			aContexts.forEach(function(oContext) {
-				if (!oPlugin.isContextSelectable(oContext) || oContext.isSelected()) {
-					return;
-				}
-				if (bUpwardSelection && oContext.getIndex() >= iIndexTo || oContext.getIndex() <= iIndexTo) {
-					oContext.setSelected(true);
-				}
-				if (oContext.getIndex() === iIndexTo) {
-					_private(oPlugin).oRangeSelectionStartContext = oContext;
-				}
-			});
+		const aContexts = await TableUtils.loadContexts(oTable, iGetContextsStartIndex, iGetContextsLength, true);
 
-			if (_private(oPlugin).bLimitReached) {
-				TableUtils.scrollTableToIndex(oTable, iIndexTo, bUpwardSelection).then(function() {
-					if (oPlugin.getEnableNotification()) {
-						TableUtils.showNotificationPopoverAtIndex(oTable, iIndexTo, oPlugin.getLimit());
-					}
-				});
+		aContexts.forEach(function(oContext) {
+			if (!oPlugin.isContextSelectable(oContext) || oContext.isSelected()) {
+				return;
+			}
+			if (bUpwardSelection && oContext.getIndex() >= iIndexTo || oContext.getIndex() <= iIndexTo) {
+				oContext.setSelected(true);
+			}
+			if (oContext.getIndex() === iIndexTo) {
+				_private(oPlugin).oRangeSelectionStartContext = oContext;
 			}
 		});
+
+		if (_private(oPlugin).bLimitReached) {
+			await TableUtils.scrollTableToIndex(oTable, iIndexTo, bUpwardSelection);
+			if (oPlugin.getEnableNotification()) {
+				TableUtils.showNotificationPopoverAtIndex(oTable, iIndexTo, oPlugin.getLimit());
+			}
+		}
 	}
 
 	/**

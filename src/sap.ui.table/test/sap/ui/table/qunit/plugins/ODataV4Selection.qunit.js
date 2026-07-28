@@ -285,13 +285,13 @@ sap.ui.define([
 		assert.notOk(this.oTable.getBinding().getHeaderContext(), "Header context");
 	});
 
-	QUnit.test("#onKeyboardShortcut", async function(assert) {
+	QUnit.test("#handleKeyboardShortcut", async function(assert) {
 		const aRows = this.oTable.getRows();
 		const oClearSelection = this.spy(this.oSelectionPlugin, "clearSelection");
 		const oEvent = new jQuery.Event();
 
 		this.spy(oEvent, "setMarked");
-		this.oSelectionPlugin.onKeyboardShortcut("toggle", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
 		await TableQUnitUtils.wait(200);
 		assert.equal(this.oSelectionChangeHandler.callCount, 0, "Toggle selection: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0, "Toggle selection: Selected contexts");
@@ -302,7 +302,7 @@ sap.ui.define([
 		this.oSelectionChangeHandler.resetHistory();
 		oClearSelection.resetHistory();
 		oEvent.setMarked.resetHistory();
-		this.oSelectionPlugin.onKeyboardShortcut("clear", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("clear", oEvent);
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "Clear selection: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0, "Clear selection: Selected contexts");

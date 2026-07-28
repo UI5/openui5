@@ -192,56 +192,69 @@ sap.ui.define([
 		return this.isIndexSelected(oRow.getIndex());
 	};
 
-	MultiSelectionPlugin.prototype.onHeaderSelectorPress = function() {
+	/**
+	 * @inheritDoc
+	 */
+	MultiSelectionPlugin.prototype.handleHeaderSelectorPress = function() {
 		const oHeaderSelector = this._getHeaderSelector();
 
 		if (!oHeaderSelector.getVisible() || !oHeaderSelector.getEnabled()) {
-			return;
+			return Promise.resolve();
 		}
 
 		if (oHeaderSelector.getType() === "CheckBox") {
-			toggleSelection(this);
+			return toggleSelection(this).promise;
 		} else if (oHeaderSelector.getType() === "Icon") {
 			if (this.getSelectedCount() > 0) {
 				this.clearSelection();
 			} else {
-				this.addSelectionInterval(0, this._getHighestSelectableIndex());
+				return this.addSelectionInterval(0, this._getHighestSelectableIndex());
 			}
 		}
+
+		return Promise.resolve();
 	};
 
-	MultiSelectionPlugin.prototype.onKeyboardShortcut = function(sType, oEvent) {
+	/**
+	 * @inheritDoc
+	 */
+	MultiSelectionPlugin.prototype.handleKeyboardShortcut = function(sType, oEvent) {
 		if (sType === "toggle") { // ctrl + a
 			if (this.getSelectionMode() !== SelectionMode.MultiToggle) {
-				return;
+				return Promise.resolve();
 			}
 
 			if (this._bLimitDisabled) {
-				if (!toggleSelection(this)) {
+				const mResult = toggleSelection(this);
+				if (!mResult.selectAll) {
 					oEvent.setMarked("sapUiTableClearAll");
 				}
+				return mResult.promise;
 			} else {
-				this.addSelectionInterval(0, this._getHighestSelectableIndex());
+				return this.addSelectionInterval(0, this._getHighestSelectableIndex());
 			}
 		} else if (sType === "clear") { // ctrl + shift + a
 			this.clearSelection();
 			oEvent.setMarked("sapUiTableClearAll");
 		}
+
+		return Promise.resolve();
 	};
 
 	/**
 	 * If not all indices are selected, all indices are selected, otherwise the selection is removed.
 	 *
 	 * @param {sap.ui.table.plugins.MultiSelectionPlugin} oPlugin The plugin to toggle the selection on.
-	 * @returns {boolean} The selection state. true - all selected, false - all cleared
+	 * @returns {{selectAll: boolean, promise: Promise}}
+	 *   An object providing the synchronous selection state
+	 *   (<code>true</code> - all selected, <code>false</code> - all cleared) and a promise that resolves once the selection change has completed.
 	 */
 	function toggleSelection(oPlugin) {
 		if (oPlugin.getSelectableCount() > oPlugin.getSelectedCount()) {
-			oPlugin.selectAll();
-			return true;
+			return {selectAll: true, promise: oPlugin.selectAll()};
 		} else {
 			oPlugin.clearSelection();
-			return false;
+			return {selectAll: false, promise: Promise.resolve()};
 		}
 	}
 
