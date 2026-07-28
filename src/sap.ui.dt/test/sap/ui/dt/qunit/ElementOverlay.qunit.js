@@ -1865,7 +1865,7 @@ sap.ui.define([
 
 	QUnit.module("Given a DynamicPage with scrolling", {
 		async beforeEach(assert) {
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 
 			function getDynamicPageTitle() {
 				return new DynamicPageTitle({
@@ -1912,6 +1912,99 @@ sap.ui.define([
 				window.getComputedStyle(this.oDynamicPageOverlay.getScrollContainerById(0))["clip-path"],
 				"then the scroll container gets the clip-path property from the DynamicPage contentWrapper"
 			);
+		});
+
+		QUnit.test("check that no overlay uses programmatically scrollable 'overflow: hidden'", function(assert) {
+			// "overflow: hidden" is still scrollable via scrollIntoView(). When a stretched descendant
+			// (e.g. RTA Stretch padding) overflows an overlay, that would scroll the overlay and misalign
+			// all overlays. "overflow: clip" clips identically but is not scrollable, so it must be used instead.
+			const aOverlayDomRefs = Array.from(document.getElementById("overlay-container").querySelectorAll(".sapUiDtOverlay"));
+			assert.ok(aOverlayDomRefs.length > 0, "there are rendered overlays to check");
+			aOverlayDomRefs.forEach(function(oOverlayDomRef) {
+				assert.notStrictEqual(oOverlayDomRef.style.overflowX, "hidden", `overlay ${oOverlayDomRef.id} does not use overflow-x: hidden`);
+				assert.notStrictEqual(oOverlayDomRef.style.overflowY, "hidden", `overlay ${oOverlayDomRef.id} does not use overflow-y: hidden`);
+			});
+		});
+	});
+
+	QUnit.module("Given an Overlay whose associated element has overflow: hidden", {
+		async beforeEach(assert) {
+			const fnDone = assert.async();
+			this.oPanel = new Panel("panel");
+			this.oPanel.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			this.oDesignTime = new DesignTime({
+				rootElements: [this.oPanel]
+			});
+			this.oDesignTime.attachEventOnce("synced", function() {
+				this.oPanelOverlay = OverlayRegistry.getOverlay(this.oPanel);
+				fnDone();
+			}.bind(this));
+		},
+		afterEach() {
+			sandbox.restore();
+			this.oDesignTime.destroy();
+			this.oPanel.destroy();
+		}
+	}, function() {
+		QUnit.test("when _handleOverflowScroll copies a 'hidden' overflow and the element does not overflow", function(assert) {
+			// The associated element reports overflow: hidden but does not overflow its box (e.g. it only
+			// overflows in the overlay layer because a stretched descendant grew the child overlays) ...
+			sandbox.stub(DOMUtil, "getOverflows").returns({
+				overflowX: "hidden",
+				overflowY: "hidden"
+			});
+			const oOverlayDomRef = this.oPanelOverlay.getDomRef();
+			const oGeometry = this.oPanelOverlay.getGeometry(true);
+			// "no genuine overflow": geometry size is larger than the element's scroll size
+			oGeometry.size = {
+				width: oGeometry.domRef.scrollWidth + 100,
+				height: oGeometry.domRef.scrollHeight + 100
+			};
+
+			this.oPanelOverlay._handleOverflowScroll(oGeometry, oOverlayDomRef, this.oPanelOverlay.getParent(), false);
+
+			// ... so the overlay must use "clip" (not the programmatically scrollable "hidden")
+			assert.strictEqual(oOverlayDomRef.style.overflowX, "clip", "then the overlay uses overflow-x: clip");
+			assert.strictEqual(oOverlayDomRef.style.overflowY, "clip", "then the overlay uses overflow-y: clip");
+		});
+
+		QUnit.test("when _handleOverflowScroll copies a 'hidden' overflow and the element genuinely overflows", function(assert) {
+			// A genuinely overflowing "hidden" element must keep "hidden" on the overlay: the overlay is used
+			// as a scroll proxy (dummy container + ScrollbarSynchronizer) and "clip" would break the scroll sync.
+			sandbox.stub(DOMUtil, "getOverflows").returns({
+				overflowX: "hidden",
+				overflowY: "hidden"
+			});
+			const oOverlayDomRef = this.oPanelOverlay.getDomRef();
+			const oGeometry = this.oPanelOverlay.getGeometry(true);
+			// "genuine overflow": geometry size is smaller than the element's scroll size
+			oGeometry.size = {
+				width: Math.max(0, oGeometry.domRef.scrollWidth - 100),
+				height: Math.max(0, oGeometry.domRef.scrollHeight - 100)
+			};
+
+			this.oPanelOverlay._handleOverflowScroll(oGeometry, oOverlayDomRef, this.oPanelOverlay.getParent(), false);
+
+			assert.strictEqual(oOverlayDomRef.style.overflowX, "hidden", "then the overlay keeps overflow-x: hidden (scrollable)");
+			assert.strictEqual(oOverlayDomRef.style.overflowY, "hidden", "then the overlay keeps overflow-y: hidden (scrollable)");
+		});
+
+		QUnit.test("when _handleOverflowScroll copies an 'auto' overflow onto the overlay", function(assert) {
+			// A genuinely scrollable element must keep its "auto"/"scroll" overflow on the overlay,
+			// so the ScrollbarSynchronizer path keeps working.
+			sandbox.stub(DOMUtil, "getOverflows").returns({
+				overflowX: "auto",
+				overflowY: "scroll"
+			});
+			const oOverlayDomRef = this.oPanelOverlay.getDomRef();
+			const oGeometry = this.oPanelOverlay.getGeometry(true);
+
+			this.oPanelOverlay._handleOverflowScroll(oGeometry, oOverlayDomRef, this.oPanelOverlay.getParent(), false);
+
+			assert.strictEqual(oOverlayDomRef.style.overflowX, "auto", "then the overlay keeps overflow-x: auto");
+			assert.strictEqual(oOverlayDomRef.style.overflowY, "scroll", "then the overlay keeps overflow-y: scroll");
 		});
 	});
 
