@@ -526,19 +526,19 @@ sap.ui.define([
 		assert.notOk(this.oTable.getBinding().getHeaderContext(), "Header context");
 	});
 
-	QUnit.test("#onHeaderSelectorPress", async function(assert) {
-		this.oSelectionPlugin.onHeaderSelectorPress();
+	QUnit.test("#handleHeaderSelectorPress", async function(assert) {
+		this.oSelectionPlugin.handleHeaderSelectorPress();
 		await TableQUnitUtils.wait(200);
 		assert.equal(this.oSelectionChangeHandler.callCount, 0, "selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0, "Selected contexts");
 	});
 
-	QUnit.test("#onKeyboardShortcut", async function(assert) {
+	QUnit.test("#handleKeyboardShortcut", async function(assert) {
 		const oClearSelection = this.spy(this.oSelectionPlugin, "clearSelection");
 		const oEvent = new jQuery.Event();
 
 		this.spy(oEvent, "setMarked");
-		this.oSelectionPlugin.onKeyboardShortcut("toggle", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
 		await TableQUnitUtils.wait(200);
 		assert.equal(this.oSelectionChangeHandler.callCount, 0, "Toggle selection: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0, "Toggle selection: Selected contexts");
@@ -547,7 +547,7 @@ sap.ui.define([
 		this.oSelectionPlugin.setSelected(this.oTable.getRows()[0], true);
 		oClearSelection.resetHistory();
 		oEvent.setMarked.resetHistory();
-		this.oSelectionPlugin.onKeyboardShortcut("clear", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("clear", oEvent);
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "Clear selection: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0, "Clear selection: Selected contexts");

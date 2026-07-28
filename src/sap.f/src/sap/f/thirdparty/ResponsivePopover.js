@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/Button2'], (function (exports, webcomponentsBase, Theme, parametersBundle_css, i18nDefaults, jsxRuntime, decline, Icon, Icons, Title, ValueState, toLowercaseEnumValue, eventStrict, FocusableElements, AccessibilityTextsHelper, Button) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/information', 'sap/f/thirdparty/Button2'], (function (exports, webcomponentsBase, ManagedStyles, parametersBundle_css$1, i18nDefaults, parametersBundle_css, decline, Icon, Icons, Title, ValueState, toLowercaseEnumValue, eventStrict, FocusableElements, AccessibilityTextsHelper, information, Button) { 'use strict';
 
 	const name$1 = "resize-corner";
 	const pathData$1 = "M13 5v1c0 .25-.104.48-.313.688l-6 6C6.48 12.896 6.25 13 6 13H5l8-8Zm-5 8 5-5v1c0 .25-.104.48-.313.688l-3 3C9.48 12.896 9.25 13 9 13H8Zm5-2v1c0 .25-.104.48-.313.688-.208.208-.437.312-.687.312h-1l2-2Z";
@@ -21,12 +21,12 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	var resizeCorner = "resize-corner";
 
 	function PopubBlockLayerTemplate() {
-	    return (jsxRuntime.jsx("div", { class: "ui5-block-layer", onKeyDown: this._preventBlockLayerFocus, onMouseDown: this._preventBlockLayerFocus }));
+	    return (parametersBundle_css.jsx("div", { class: "ui5-block-layer", onKeyDown: this._preventBlockLayerFocus, onMouseDown: this._preventBlockLayerFocus }));
 	}
 
 	function PopupTemplate(hooks) {
-	    return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [PopubBlockLayerTemplate.call(this), jsxRuntime.jsxs("section", { "root-element": true, style: this.styles.root, class: this.classes.root, role: this._role, "aria-describedby": this.ariaDescribedByIds, "aria-modal": this._ariaModal, "aria-label": this._ariaLabel, "aria-labelledby": this._ariaLabelledBy, onKeyDown: this._onkeydown, onFocusOut: this._onfocusout, onMouseUp: this._onmouseup, onMouseDown: this._onmousedown, children: [jsxRuntime.jsx("span", { class: "first-fe", "data-ui5-focus-trap": true, role: "none", tabIndex: 0, onFocusIn: this.forwardToLast }), (hooks?.beforeContent || beforeContent$2).call(this), jsxRuntime.jsx("div", { style: this.styles.content, class: this.classes.content, onScroll: this._scroll, part: "content", children: jsxRuntime.jsx("slot", {}) }), this.ariaDescriptionText &&
-	                        jsxRuntime.jsx("span", { id: "accessibleDescription", class: "ui5-hidden-text", children: this.ariaDescriptionText }), (hooks?.afterContent || afterContent$2).call(this), jsxRuntime.jsx("span", { class: "last-fe", "data-ui5-focus-trap": true, role: "none", tabIndex: 0, onFocusIn: this.forwardToFirst })] })] }));
+	    return (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [PopubBlockLayerTemplate.call(this), parametersBundle_css.jsxs("section", { "root-element": true, style: this.styles.root, class: this.classes.root, role: this._role, "aria-describedby": this.ariaDescribedByIds, "aria-modal": this._ariaModal, "aria-label": this._ariaLabel, "aria-labelledby": this._ariaLabelledBy, onKeyDown: this._onkeydown, onFocusOut: this._onfocusout, onMouseUp: this._onmouseup, onMouseDown: this._onmousedown, children: [parametersBundle_css.jsx("span", { class: "first-fe", "data-ui5-focus-trap": true, role: "none", tabIndex: 0, onFocusIn: this.forwardToLast }), (hooks?.beforeContent || beforeContent$2).call(this), parametersBundle_css.jsx("div", { style: this.styles.content, class: this.classes.content, role: this._contentRole, "aria-label": this._contentAriaLabel, onScroll: this._scroll, part: "content", children: parametersBundle_css.jsx("slot", {}) }), this.ariaDescriptionText &&
+	                        parametersBundle_css.jsx("span", { id: "accessibleDescription", class: "ui5-hidden-text", children: this.ariaDescriptionText }), (hooks?.afterContent || afterContent$2).call(this), parametersBundle_css.jsx("span", { class: "last-fe", "data-ui5-focus-trap": true, role: "none", tabIndex: 0, onFocusIn: this.forwardToFirst })] })] }));
 	}
 	function beforeContent$2() { }
 	function afterContent$2() { }
@@ -38,16 +38,16 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    });
 	}
 	function beforeContent$1() {
-	    return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [jsxRuntime.jsx("span", { class: "ui5-popover-arrow", style: this.styles.arrow }), this._displayHeader &&
-	                jsxRuntime.jsx("header", { class: "ui5-popup-header-root", id: "ui5-popup-header", part: "header", children: this.header.length ?
-	                        jsxRuntime.jsx("slot", { name: "header" })
+	    return (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [parametersBundle_css.jsx("span", { class: "ui5-popover-arrow", style: this.styles.arrow }), this._displayHeader &&
+	                parametersBundle_css.jsx("header", { class: "ui5-popup-header-root", id: "ui5-popup-header", part: "header", children: this.header.length ?
+	                        parametersBundle_css.jsx("slot", { name: "header" })
 	                        :
-	                            jsxRuntime.jsx(Title.Title, { level: "H1", class: "ui5-popup-header-text", children: this.headerText }) })] }));
+	                            parametersBundle_css.jsx(Title.Title, { level: "H1", class: "ui5-popup-header-text", children: this.headerText }) })] }));
 	}
 	function afterContent$1() {
-	    return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [this._displayFooter && !!this.footer.length &&
-	                jsxRuntime.jsx("footer", { class: "ui5-popup-footer-root", part: "footer", children: jsxRuntime.jsx("slot", { name: "footer" }) }), this._showResizeHandle &&
-	                jsxRuntime.jsx("div", { class: "ui5-popover-resize-handle", onMouseDown: this._onResizeMouseDown, children: jsxRuntime.jsx(Icon.Icon, { name: resizeCorner }) })] }));
+	    return (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [this._displayFooter && !!this.footer.length &&
+	                parametersBundle_css.jsx("footer", { class: "ui5-popup-footer-root", part: "footer", children: parametersBundle_css.jsx("slot", { name: "footer" }) }), this._showResizeHandle &&
+	                parametersBundle_css.jsx("div", { class: "ui5-popover-resize-handle", onMouseDown: this._onResizeMouseDown, children: parametersBundle_css.jsx(Icon.Icon, { name: resizeCorner }) })] }));
 	}
 
 	const m$1=(t,a,e)=>Math.min(Math.max(t,a),Math.max(a,e));
@@ -80,8 +80,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 
 	const t="handledByControl",a=(e,n=t)=>!!e[`_sapui_${n}`];
 
-	const OpenedPopupsRegistry = Theme.m("OpenedPopupsRegistry", { openedRegistry: [] });
-	const openUI5Support = Theme.n("OpenUI5Support");
+	const OpenedPopupsRegistry = ManagedStyles.m("OpenedPopupsRegistry", { openedRegistry: [] });
+	const openUI5Support = ManagedStyles.n("OpenUI5Support");
 	function registerPopupWithOpenUI5Support(popupInfo) {
 	    openUI5Support?.addOpenedPopup(popupInfo);
 	}
@@ -151,18 +151,18 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    }
 	};
 
-	Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-	Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+	ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+	ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
 	var popupStlyes = `:host{min-width:1px;overflow:visible;border:none;inset:unset;margin:0;padding:0}:host(:focus-visible){outline:none}:host(.ui5-popup-opening){opacity:.1}
 `;
 
-	Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-	Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+	ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+	ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
 	var popupBlockLayerStyles = `.ui5-block-layer{position:fixed;z-index:-1;display:none;inset:-500px;outline:none;pointer-events:all}
 `;
 
-	Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-	Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+	ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+	ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
 	var globalStyles = `.ui5-popup-scroll-blocker{overflow:hidden}
 `;
 
@@ -174,7 +174,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	};
 	var Popup_1;
 	const createBlockingStyle = () => {
-	    Theme.R(globalStyles, "data-ui5-popup-scroll-blocker");
+	    ManagedStyles.R(globalStyles, "data-ui5-popup-scroll-blocker");
 	};
 	createBlockingStyle();
 	const pageScrollingBlockers = new Set();
@@ -253,11 +253,11 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        };
 	    }
 	    onBeforeRendering() {
-	        this.onPhone = Theme.d();
-	        this.onDesktop = Theme.f$1();
+	        this.onPhone = ManagedStyles.d();
+	        this.onDesktop = ManagedStyles.f$1();
 	    }
 	    onAfterRendering() {
-	        Theme.w().then(() => {
+	        ManagedStyles.w().then(() => {
 	            this._updateMediaRange();
 	        });
 	        if (this.open) {
@@ -269,7 +269,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    }
 	    onEnterDOM() {
 	        this.setAttribute("popover", "manual");
-	        if (Theme.f$1()) {
+	        if (ManagedStyles.f$1()) {
 	            this.setAttribute("desktop", "");
 	        }
 	        this.tabIndex = -1;
@@ -340,7 +340,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        this.open = true;
 	        // initial focus, if focused element is statically created
 	        await this.applyInitialFocus();
-	        await Theme.w();
+	        await ManagedStyles.w();
 	        if (this.isConnected) {
 	            this.fireDecoratorEvent("open");
 	        }
@@ -411,7 +411,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    }
 	    _onmouseup() {
 	        if (this._shouldFocusRoot) {
-	            if (Theme.g()) {
+	            if (ManagedStyles.g()) {
 	                this._root.focus();
 	            }
 	            this._shouldFocusRoot = false;
@@ -600,6 +600,12 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    get _role() {
 	        return (this.accessibleRole === PopupAccessibleRole$1.None) ? undefined : toLowercaseEnumValue.n(this.accessibleRole);
 	    }
+	    get _contentRole() {
+	        return undefined;
+	    }
+	    get _contentAriaLabel() {
+	        return undefined;
+	    }
 	    get _ariaModal() {
 	        return this.accessibleRole === PopupAccessibleRole$1.None ? undefined : "true";
 	    }
@@ -670,7 +676,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	], Popup.prototype, "open", null);
 	Popup = Popup_1 = __decorate$3([
 	    webcomponentsBase.m({
-	        renderer: jsxRuntime.y,
+	        renderer: parametersBundle_css.y,
 	        styles: [popupStlyes, popupBlockLayerStyles],
 	        template: PopupTemplate,
 	    })
@@ -721,34 +727,30 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    });
 	}
 	function beforeContent() {
-	    return (jsxRuntime.jsx(jsxRuntime.Fragment, { children: !!this._displayHeader &&
-	            jsxRuntime.jsx("header", { children: jsxRuntime.jsxs("div", { class: "ui5-popup-header-root", id: "ui5-popup-header", role: "group", "aria-describedby": this.effectiveAriaDescribedBy, "aria-roledescription": this.ariaRoleDescriptionHeaderText, tabIndex: this._headerTabIndex, onKeyDown: this._onDragOrResizeKeyDown, onMouseDown: this._onDragMouseDown, part: "header", children: [this.hasValueState &&
-	                            jsxRuntime.jsx(Icon.Icon, { class: "ui5-dialog-value-state-icon", name: this._dialogStateIcon }), this.header.length ?
-	                            jsxRuntime.jsx("slot", { name: "header" })
-	                            :
-	                                jsxRuntime.jsx(Title.Title, { level: "H1", id: "ui5-popup-header-text", class: "ui5-popup-header-text", children: this.headerText }), this.resizable ?
-	                            this.draggable ?
-	                                jsxRuntime.jsx("span", { id: `${this._id}-descr`, "aria-hidden": "true", class: "ui5-hidden-text", children: this.ariaDescribedByHeaderTextDraggableAndResizable })
-	                                :
-	                                    jsxRuntime.jsx("span", { id: `${this._id}-descr`, "aria-hidden": "true", class: "ui5-hidden-text", children: this.ariaDescribedByHeaderTextResizable })
-	                            :
-	                                this.draggable &&
-	                                    jsxRuntime.jsx("span", { id: `${this._id}-descr`, "aria-hidden": "true", class: "ui5-hidden-text", children: this.ariaDescribedByHeaderTextDraggable })] }) }) }));
+	    return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: !!this._displayHeader &&
+	            parametersBundle_css.jsxs("div", { class: "ui5-popup-header-root", id: "ui5-popup-header", role: "region", "aria-label": this._headerAriaLabel, onMouseDown: this._onDragMouseDown, part: "header", children: [this.hasValueState &&
+	                        parametersBundle_css.jsx(Icon.Icon, { class: "ui5-dialog-value-state-icon", name: this._dialogStateIcon }), this.header.length ?
+	                        parametersBundle_css.jsx("slot", { name: "header" })
+	                        :
+	                            parametersBundle_css.jsx(Title.Title, { level: "H1", id: "ui5-popup-header-text", class: "ui5-popup-header-text", children: this.headerText })] }) }));
 	}
 	function afterContent() {
-	    return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [!!this.footer.length &&
-	                jsxRuntime.jsx("footer", { class: "ui5-popup-footer-root", part: "footer", children: jsxRuntime.jsx("slot", { name: "footer" }) }), this._showResizeHandle &&
-	                jsxRuntime.jsx("div", { class: "ui5-popup-resize-handle", onMouseDown: this._onResizeMouseDown, children: jsxRuntime.jsx(Icon.Icon, { name: resizeCorner }) })] }));
+	    return (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [!!this.footer.length &&
+	                parametersBundle_css.jsx("div", { class: "ui5-popup-footer-root", role: "region", "aria-label": this._footerAriaLabel, part: "footer", children: parametersBundle_css.jsx("slot", { name: "footer" }) }), this._showResizeHandle &&
+	                parametersBundle_css.jsx("div", { class: "ui5-popup-resize-handle", onMouseDown: this._onResizeMouseDown, title: this._resizeHandleTooltip, children: parametersBundle_css.jsx(Icon.Icon, { name: resizeCorner }) }), this._movable &&
+	                parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [parametersBundle_css.jsx("span", { id: `${this._id}-dragResizeHandler`, class: "ui5-popup-drag-resize-handler ui5-hidden-text", tabIndex: this._dragResizeHandleTabIndex, role: "img", "aria-roledescription": this._dragResizeHandleAriaRoleDescription, "aria-label": this._dragResizeHandleAriaLabel, "aria-describedby": this._dragResizeHandleAriaDescribedBy, onKeyDown: this._onDragOrResizeKeyDown }), this.ariaDescribedByHandlerText &&
+	                            parametersBundle_css.jsx("span", { id: `${this._id}-descr`, "aria-hidden": "true", class: "ui5-hidden-text", children: this.ariaDescribedByHandlerText }), this.dialogAriaDescribedByText &&
+	                            parametersBundle_css.jsx("span", { id: `${this._id}-dialog-descr`, "aria-hidden": "true", class: "ui5-hidden-text", children: this.dialogAriaDescribedByText })] })] }));
 	}
 
-	Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-	Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+	ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+	ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
 	var PopupsCommonCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host{position:fixed;background:var(--sapGroup_ContentBackground);border-radius:var(--_ui5_popup_border_radius);min-height:2rem;box-sizing:border-box}:host([open]){display:flex}.ui5-popup-root{background:inherit;border-radius:inherit;width:100%;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;flex:1 1 auto;outline:none}.ui5-popup-root .ui5-popup-header-root{box-shadow:var(--_ui5_popup_header_shadow);border-bottom:var(--_ui5_popup_header_border)}.ui5-popup-content{color:var(--sapTextColor);flex:auto}.ui5-popup-content:focus{outline:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);outline-offset:calc(-1 * var(--sapContent_FocusWidth));border-radius:var(--_ui5_popup_border_radius)}.ui5-popup-footer-root{background:var(--sapPageFooter_Background);border-top:1px solid var(--sapPageFooter_BorderColor);color:var(--sapPageFooter_TextColor)}.ui5-popup-header-root,.ui5-popup-footer-root,:host([header-text]) .ui5-popup-header-text{margin:0;display:flex;justify-content:center;align-items:center}.ui5-popup-header-root .ui5-popup-header-text{font-weight:var(--sapFontHeaderFamily);font-size:var(--sapFontHeader5Size);color:var(--sapPageHeader_TextColor)}.ui5-popup-content{overflow:auto;box-sizing:border-box}:host([header-text]) .ui5-popup-header-text{min-height:var(--_ui5_popup_default_header_height);max-height:var(--_ui5_popup_default_header_height);line-height:var(--_ui5_popup_default_header_height);text-overflow:ellipsis;overflow:hidden;white-space:nowrap;max-width:100%;display:inline-flex;justify-content:var(--_ui5_popup_header_prop_header_text_alignment)}:host([header-text]) .ui5-popup-header-root{justify-content:var(--_ui5_popup_header_prop_header_text_alignment)}:host(:not([header-text])) .ui5-popup-header-text{display:none}:host([media-range="S"]) .ui5-popup-content{padding:1rem var(--_ui5_popup_content_padding_s)}:host([media-range="M"]) .ui5-popup-content,:host([media-range="L"]) .ui5-popup-content{padding:1rem var(--_ui5_popup_content_padding_m_l)}:host([media-range="XL"]) .ui5-popup-content{padding:1rem var(--_ui5_popup_content_padding_xl)}.ui5-popup-header-root{background:var(--sapPageHeader_Background)}:host([media-range="S"]) .ui5-popup-header-root,:host([media-range="S"]) .ui5-popup-footer-root{padding-left:var(--_ui5_popup_header_footer_padding_s);padding-right:var(--_ui5_popup_header_footer_padding_s)}:host([media-range="M"]) .ui5-popup-header-root,:host([media-range="L"]) .ui5-popup-header-root,:host([media-range="M"]) .ui5-popup-footer-root,:host([media-range="L"]) .ui5-popup-footer-root{padding-left:var(--_ui5_popup_header_footer_padding_m_l);padding-right:var(--_ui5_popup_header_footer_padding_m_l)}:host([media-range="XL"]) .ui5-popup-header-root,:host([media-range="XL"]) .ui5-popup-footer-root{padding-left:var(--_ui5_popup_header_footer_padding_xl);padding-right:var(--_ui5_popup_header_footer_padding_xl)}::slotted([slot="footer"]){height:var(--_ui5_popup_footer_height)}::slotted([slot="footer"][ui5-bar][design="Footer"]){border-top:none}::slotted([slot="header"][ui5-bar]){box-shadow:none}::slotted([slot="footer"][ui5-toolbar]){border:0}::slotted([slot="footer"][ui5-bar][design="Footer"]),::slotted([slot="header"][ui5-bar][design="Header"]){--_ui5_bar-start-container-padding-start: 0;--_ui5_bar-mid-container-padding-start-end: 0;--_ui5_bar-end-container-padding-end: 0}
 `;
 
-	Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-	Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
-	var dialogCSS = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host{min-width:min(20rem,90vw);min-height:min(6rem,90vh);max-height:94%;max-width:90%;flex-direction:column;box-shadow:var(--sapContent_Shadow3);border-radius:var(--sapElement_BorderCornerRadius)}:host([stretch]){width:90%;height:94%}:host([stretch][on-phone]){width:100%;height:100%;max-height:100%;max-width:100%;border-radius:0;min-width:0}:host([draggable]) .ui5-popup-header-root,:host([draggable]) ::slotted([slot="header"]){cursor:move}:host([draggable]) .ui5-popup-header-root *{cursor:auto}:host([draggable]) .ui5-popup-root{user-select:text}::slotted([slot="header"]){max-width:100%}.ui5-popup-root{display:flex;flex-direction:column;max-width:100vw}.ui5-popup-header-root{position:relative}.ui5-popup-header-root:before{content:"";position:absolute;inset-block-start:auto;inset-block-end:0;inset-inline-start:0;inset-inline-end:0;height:var(--_ui5_dialog_header_state_line_height);background:var(--sapObjectHeader_BorderColor)}:host([state="Negative"]) .ui5-popup-header-root:before{background:var(--sapErrorBorderColor)}:host([state="Information"]) .ui5-popup-header-root:before{background:var(--sapInformationBorderColor)}:host([state="Positive"]) .ui5-popup-header-root:before{background:var(--sapSuccessBorderColor)}:host([state="Critical"]) .ui5-popup-header-root:before{background:var(--sapWarningBorderColor)}.ui5-dialog-value-state-icon{margin-inline-end:.5rem;flex-shrink:0}:host([state="Negative"]) .ui5-dialog-value-state-icon{color:var(--sapNegativeElementColor)}:host([state="Information"]) .ui5-dialog-value-state-icon{color:var(--sapInformativeElementColor)}:host([state="Positive"]) .ui5-dialog-value-state-icon{color:var(--sapPositiveElementColor)}:host([state="Critical"]) .ui5-dialog-value-state-icon{color:var(--sapCriticalElementColor)}.ui5-popup-header-root{outline:none}:host([desktop]) .ui5-popup-header-root:focus:after,.ui5-popup-header-root:focus-visible:after{content:"";position:absolute;left:var(--_ui5_dialog_header_focus_left_offset);bottom:var(--_ui5_dialog_header_focus_bottom_offset);right:var(--_ui5_dialog_header_focus_right_offset);top:var(--_ui5_dialog_header_focus_top_offset);border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);border-radius:var(--_ui5_dialog_header_border_radius) var(--_ui5_dialog_header_border_radius) 0 0;pointer-events:none}:host([stretch]) .ui5-popup-content{width:100%;height:100%}.ui5-popup-content{min-height:var(--_ui5_dialog_content_min_height);flex:1 1 auto}.ui5-popup-resize-handle{position:absolute;bottom:-.5rem;inset-inline-end:-.5rem;cursor:var(--_ui5_dialog_resize_cursor);width:1.5rem;height:1.5rem;border-radius:50%}.ui5-popup-resize-handle [ui5-icon]{color:var(--sapButton_Lite_TextColor)}:host::backdrop{background-color:var(--_ui5_popup_block_layer_background);opacity:var(--_ui5_popup_block_layer_opacity)}.ui5-block-layer{display:block}
+	ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+	ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
+	var dialogCSS = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host{min-width:min(20rem,90vw);min-height:min(6rem,90vh);max-height:94%;max-width:90%;flex-direction:column;box-shadow:var(--sapContent_Shadow3);border-radius:var(--sapElement_BorderCornerRadius)}:host([stretch]){width:90%;height:94%}:host([stretch][on-phone]){width:100%;height:100%;max-height:100%;max-width:100%;border-radius:0;min-width:0}:host([draggable]) .ui5-popup-header-root,:host([draggable]) ::slotted([slot="header"]){cursor:move}:host([draggable]) .ui5-popup-header-root *{cursor:auto}:host([draggable]) .ui5-popup-root{user-select:text}::slotted([slot="header"]){max-width:100%}.ui5-popup-root{display:flex;flex-direction:column;max-width:100vw}.ui5-popup-header-root{position:relative}.ui5-popup-header-root:before{content:"";position:absolute;inset-block-start:auto;inset-block-end:0;inset-inline-start:0;inset-inline-end:0;height:var(--_ui5_dialog_header_state_line_height);background:var(--sapObjectHeader_BorderColor)}:host([state="Negative"]) .ui5-popup-header-root:before{background:var(--sapErrorBorderColor)}:host([state="Information"]) .ui5-popup-header-root:before{background:var(--sapInformationBorderColor)}:host([state="Positive"]) .ui5-popup-header-root:before{background:var(--sapSuccessBorderColor)}:host([state="Critical"]) .ui5-popup-header-root:before{background:var(--sapWarningBorderColor)}.ui5-dialog-value-state-icon{margin-inline-end:.5rem;flex-shrink:0}:host([state="Negative"]) .ui5-dialog-value-state-icon{color:var(--sapNegativeElementColor)}:host([state="Information"]) .ui5-dialog-value-state-icon{color:var(--sapInformativeElementColor)}:host([state="Positive"]) .ui5-dialog-value-state-icon{color:var(--sapPositiveElementColor)}:host([state="Critical"]) .ui5-dialog-value-state-icon{color:var(--sapCriticalElementColor)}.ui5-popup-header-root{outline:none}.ui5-popup-drag-resize-handler:focus{outline:none}.ui5-popup-root:has(.ui5-popup-drag-resize-handler:focus):before{content:"";position:absolute;inset:var(--_ui5_dialog_focus_outline_offset);border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);border-radius:var(--sapElement_BorderCornerRadius);pointer-events:none;z-index:5}:host([resizable]) .ui5-popup-root:has(.ui5-popup-drag-resize-handler:focus):before{border-end-end-radius:var(--_ui5_dialog_resizable_bottom_right_radius)}:host([stretch]) .ui5-popup-content{width:100%;height:100%}.ui5-popup-content{min-height:var(--_ui5_dialog_content_min_height);flex:1 1 auto}.ui5-popup-resize-handle{position:absolute;bottom:-.5rem;inset-inline-end:-.5rem;cursor:var(--_ui5_dialog_resize_cursor);width:1.5rem;height:1.5rem;border-radius:50%}.ui5-popup-resize-handle [ui5-icon]{color:var(--sapButton_Lite_TextColor)}:host::backdrop{background-color:var(--_ui5_popup_block_layer_background);opacity:var(--_ui5_popup_block_layer_opacity)}.ui5-block-layer{display:block}
 `;
 
 	var __decorate$2 = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -802,14 +804,14 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	 * ### Keyboard Handling
 	 *
 	 * #### Basic Navigation
-	 * When the `ui5-dialog` has the `draggable` property set to `true` and the header is focused, the user can move the dialog
+	 * When the `ui5-dialog` has the `draggable` property set to `true`, the user can move the dialog
 	 * with the following keyboard shortcuts:
 	 *
 	 * - [Up] or [Down] arrow keys - Move the dialog up/down.
 	 * - [Left] or [Right] arrow keys - Move the dialog left/right.
 	 *
 	 * #### Resizing
-	 * When the `ui5-dialog` has the `resizable` property set to `true` and the header is focused, the user can change the size of the dialog
+	 * When the `ui5-dialog` has the `resizable` property set to `true`, the user can change the size of the dialog
 	 * with the following keyboard shortcuts:
 	 *
 	 * - [Shift] + [Up] or [Down] - Decrease/Increase the height of the dialog.
@@ -905,20 +907,50 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        }
 	        return ariaLabelledById;
 	    }
-	    get ariaRoleDescriptionHeaderText() {
-	        return (this.resizable || this.draggable) ? Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_HEADER_ARIA_ROLE_DESCRIPTION) : undefined;
-	    }
 	    get effectiveAriaDescribedBy() {
-	        return (this.resizable || this.draggable) ? `${this._id}-descr` : undefined;
+	        return this._movable ? `${this._id}-dialog-descr` : undefined;
 	    }
-	    get ariaDescribedByHeaderTextResizable() {
-	        return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_HEADER_ARIA_DESCRIBEDBY_RESIZABLE);
+	    get ariaDescribedByIds() {
+	        return [
+	            this.ariaDescriptionTextId,
+	            this.effectiveAriaDescribedBy,
+	        ].filter(Boolean).join(" ");
 	    }
-	    get ariaDescribedByHeaderTextDraggable() {
-	        return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_HEADER_ARIA_DESCRIBEDBY_DRAGGABLE);
+	    get dialogAriaDescribedByText() {
+	        if (!this._movable) {
+	            return "";
+	        }
+	        if (this.resizable && this.draggable) {
+	            return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_ARIA_DESCRIBEDBY_REACH_DRAGGABLE_RESIZABLE);
+	        }
+	        if (this.draggable) {
+	            return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_ARIA_DESCRIBEDBY_REACH_DRAGGABLE);
+	        }
+	        if (this.resizable) {
+	            return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_ARIA_DESCRIBEDBY_REACH_RESIZABLE);
+	        }
+	        return "";
 	    }
-	    get ariaDescribedByHeaderTextDraggableAndResizable() {
-	        return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_HEADER_ARIA_DESCRIBEDBY_DRAGGABLE_RESIZABLE);
+	    get ariaDescribedByTextResizable() {
+	        return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_ARIA_DESCRIBEDBY_RESIZABLE);
+	    }
+	    get ariaDescribedByTextDraggable() {
+	        return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_ARIA_DESCRIBEDBY_DRAGGABLE);
+	    }
+	    get ariaDescribedByTextDraggableAndResizable() {
+	        return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_ARIA_DESCRIBEDBY_DRAGGABLE_RESIZABLE);
+	    }
+	    get ariaDescribedByHandlerText() {
+	        if (this.resizable && this.draggable) {
+	            return this.ariaDescribedByTextDraggableAndResizable;
+	        }
+	        if (this.resizable) {
+	            return this.ariaDescribedByTextResizable;
+	        }
+	        if (this.draggable) {
+	            return this.ariaDescribedByTextDraggable;
+	        }
+	        return "";
 	    }
 	    /**
 	     * Determines if the header should be shown.
@@ -929,11 +961,35 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    get _movable() {
 	        return !this.stretch && this.onDesktop && (this.draggable || this.resizable);
 	    }
-	    get _headerTabIndex() {
+	    get _dragResizeHandleTabIndex() {
 	        return this._movable ? 0 : undefined;
+	    }
+	    get _dragResizeHandleAriaLabel() {
+	        if (!this._movable) {
+	            return "";
+	        }
+	        if (this.resizable && this.draggable) {
+	            return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_DRAG_AND_RESIZE_HANDLE_ARIA_LABEL);
+	        }
+	        if (this.draggable) {
+	            return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_DRAG_HANDLE_ARIA_LABEL);
+	        }
+	        if (this.resizable) {
+	            return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_RESIZE_HANDLE_ARIA_LABEL);
+	        }
+	        return "";
+	    }
+	    get _dragResizeHandleAriaRoleDescription() {
+	        return this._movable ? Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_HANDLE_ARIA_ROLEDESCRIPTION) : undefined;
+	    }
+	    get _dragResizeHandleAriaDescribedBy() {
+	        return this._movable ? `${this._id}-descr` : undefined;
 	    }
 	    get _showResizeHandle() {
 	        return this.resizable && this.onDesktop;
+	    }
+	    get _resizeHandleTooltip() {
+	        return this._showResizeHandle ? Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_RESIZE_HANDLE_TOOLTIP) : undefined;
 	    }
 	    get _minHeight() {
 	        let minHeight = Number.parseInt(window.getComputedStyle(this.contentDOM).minHeight);
@@ -961,6 +1017,18 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	            return toLowercaseEnumValue.n(PopupAccessibleRole$1.AlertDialog);
 	        }
 	        return toLowercaseEnumValue.n(this.accessibleRole);
+	    }
+	    get _contentRole() {
+	        return "region";
+	    }
+	    get _headerAriaLabel() {
+	        return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_HEADER_ARIA_LABEL);
+	    }
+	    get _contentAriaLabel() {
+	        return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_CONTENT_ARIA_LABEL);
+	    }
+	    get _footerAriaLabel() {
+	        return Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_FOOTER_ARIA_LABEL);
 	    }
 	    _show() {
 	        super._show();
@@ -1061,7 +1129,11 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        this._detachMouseDragHandlers();
 	    }
 	    _onDragOrResizeKeyDown(e) {
-	        if (!this._movable || !Dialog_1._isHeader(e.target)) {
+	        if (!this._movable) {
+	            return;
+	        }
+	        const target = e.target;
+	        if (!target || target.id !== `${this._id}-dragResizeHandler`) {
 	            return;
 	        }
 	        if (this.draggable && [webcomponentsBase.P, webcomponentsBase._, webcomponentsBase.D, webcomponentsBase.R].some(key => key(e))) {
@@ -1203,6 +1275,21 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        window.removeEventListener("mousemove", this._resizeMouseMoveHandler);
 	        window.removeEventListener("mouseup", this._resizeMouseUpHandler);
 	    }
+	    /**
+	     * Overrides Popup's forwardToLast to prioritize the drag/resize handler
+	     * when Shift+Tab is pressed from the first focusable element.
+	     * @private
+	     */
+	    async forwardToLast() {
+	        if (this._movable) {
+	            const dragResizeHandler = this.shadowRoot.querySelector(`#${this._id}-dragResizeHandler`);
+	            if (dragResizeHandler) {
+	                dragResizeHandler.focus();
+	                return;
+	            }
+	        }
+	        await super.forwardToLast();
+	    }
 	};
 	__decorate$2([
 	    webcomponentsBase.s()
@@ -1226,7 +1313,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    webcomponentsBase.d()
 	], Dialog.prototype, "footer", void 0);
 	__decorate$2([
-	    parametersBundle_css.i("@ui5/webcomponents")
+	    parametersBundle_css$1.i("@ui5/webcomponents")
 	], Dialog, "i18nBundle", void 0);
 	Dialog = Dialog_1 = __decorate$2([
 	    webcomponentsBase.m({
@@ -1246,12 +1333,12 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    if (!this._isPhone) {
 	        return PopoverTemplate.call(this);
 	    }
-	    return (jsxRuntime.jsxs(Dialog$1, { "root-element": true, accessibleName: this.accessibleName, accessibleNameRef: this.accessibleNameRef, accessibleDescription: this.accessibleDescription, accessibleDescriptionRef: this.accessibleDescriptionRef, accessibleRole: this.accessibleRole, stretch: true, preventInitialFocus: this.preventInitialFocus, preventFocusRestore: this.preventFocusRestore, initialFocus: this.initialFocus, onBeforeOpen: this._beforeDialogOpen, onOpen: this._afterDialogOpen, onBeforeClose: this._beforeDialogClose, onClose: this._afterDialogClose, exportparts: "content, header, footer", open: this.open, children: [!this._hideHeader && jsxRuntime.jsx(jsxRuntime.Fragment, { children: this.header.length ?
-	                    jsxRuntime.jsx("slot", { slot: "header", name: "header" })
+	    return (parametersBundle_css.jsxs(Dialog$1, { "root-element": true, accessibleName: this.accessibleName, accessibleNameRef: this.accessibleNameRef, accessibleDescription: this.accessibleDescription, accessibleDescriptionRef: this.accessibleDescriptionRef, accessibleRole: this.accessibleRole, stretch: true, preventInitialFocus: this.preventInitialFocus, preventFocusRestore: this.preventFocusRestore, initialFocus: this.initialFocus, onBeforeOpen: this._beforeDialogOpen, onOpen: this._afterDialogOpen, onBeforeClose: this._beforeDialogClose, onClose: this._afterDialogClose, exportparts: "content, header, footer", open: this.open, children: [!this._hideHeader && parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: this.header.length ?
+	                    parametersBundle_css.jsx("slot", { slot: "header", name: "header" })
 	                    :
-	                        jsxRuntime.jsxs("div", { class: this.classes.header, slot: "header", children: [this.headerText &&
-	                                    jsxRuntime.jsx(Title.Title, { level: "H1", wrappingType: "None", class: "ui5-popup-header-text ui5-responsive-popover-header-text", children: this.headerText }), !this._hideCloseButton &&
-	                                    jsxRuntime.jsx(Button.Button, { icon: decline.decline, design: "Transparent", accessibleName: this._closeDialogAriaLabel, onClick: this._dialogCloseButtonClick })] }) }), jsxRuntime.jsx("slot", {}), jsxRuntime.jsx("slot", { slot: "footer", name: "footer" })] }));
+	                        parametersBundle_css.jsxs("div", { class: this.classes.header, slot: "header", children: [this.headerText &&
+	                                    parametersBundle_css.jsx(Title.Title, { level: "H1", wrappingType: "None", class: "ui5-popup-header-text ui5-responsive-popover-header-text", children: this.headerText }), !this._hideCloseButton &&
+	                                    parametersBundle_css.jsx(Button.Button, { icon: decline.decline, design: "Transparent", accessibleName: this._closeDialogAriaLabel, onClick: this._dialogCloseButtonClick })] }) }), parametersBundle_css.jsx("slot", {}), parametersBundle_css.jsx("slot", { slot: "footer", name: "footer" })] }));
 	}
 
 	const e$1={toAttribute(t){return t instanceof HTMLElement?null:t},fromAttribute(t){return t}};
@@ -1647,12 +1734,19 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        this._initialBoundingRect = this._popover.getBoundingClientRect();
 	        this._totalDeltaX = this._currentDeltaX;
 	        this._totalDeltaY = this._currentDeltaY;
-	        const { minWidth, minHeight, } = window.getComputedStyle(this._popover);
+	        const { minWidth, minHeight, maxWidth, maxHeight, } = window.getComputedStyle(this._popover);
 	        const domRefComputedStyle = window.getComputedStyle(this._popover);
 	        this._initialClientX = e.clientX;
 	        this._initialClientY = e.clientY;
 	        this._minWidth = Math.max(Number.parseFloat(minWidth), Number.parseFloat(domRefComputedStyle.minWidth));
 	        this._minHeight = Number.parseFloat(minHeight);
+	        const viewportMargin = this._popover._viewportMargin;
+	        const defaultMaxWidth = window.innerWidth - 2 * viewportMargin;
+	        const defaultMaxHeight = window.innerHeight - 2 * viewportMargin;
+	        const computedMaxWidth = maxWidth !== "none" ? Number.parseFloat(maxWidth) : Infinity;
+	        const computedMaxHeight = maxHeight !== "none" ? Number.parseFloat(maxHeight) : Infinity;
+	        this._maxWidth = computedMaxWidth < defaultMaxWidth ? computedMaxWidth : Infinity;
+	        this._maxHeight = computedMaxHeight < defaultMaxHeight ? computedMaxHeight : Infinity;
 	        this._attachMouseResizeHandlers();
 	    }
 	    /**
@@ -1675,7 +1769,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        // Calculate width changes
 	        if (isResizingFromLeft) {
 	            // Resizing from left edge - width increases when moving left (negative delta)
-	            const maxWidthFromLeft = initialBoundingRect.x + initialBoundingRect.width - margin;
+	            const maxWidthFromLeft = Math.min(initialBoundingRect.x + initialBoundingRect.width - margin, this._maxWidth);
 	            newWidth = m$1(initialBoundingRect.width - deltaX, this._minWidth, maxWidthFromLeft);
 	            // Adjust left position when resizing from left
 	            // Ensure the left edge respects the viewport margin and the right edge position
@@ -1686,14 +1780,14 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        }
 	        else {
 	            // Resizing from right edge - width increases when moving right (positive delta)
-	            const maxWidthFromRight = window.innerWidth - initialBoundingRect.x - margin;
+	            const maxWidthFromRight = Math.min(window.innerWidth - initialBoundingRect.x - margin, this._maxWidth);
 	            newWidth = m$1(initialBoundingRect.width + deltaX, this._minWidth, maxWidthFromRight);
 	            this._currentDeltaX = (initialBoundingRect.width - newWidth) / 2;
 	        }
 	        // Calculate height changes
 	        if (isResizingFromTop) {
 	            // Resizing from top edge - height increases when moving up (negative delta)
-	            const maxHeightFromTop = initialBoundingRect.y + initialBoundingRect.height - margin;
+	            const maxHeightFromTop = Math.min(initialBoundingRect.y + initialBoundingRect.height - margin, this._maxHeight);
 	            newHeight = m$1(initialBoundingRect.height - deltaY, this._minHeight, maxHeightFromTop);
 	            // Adjust top position when resizing from top
 	            // Ensure the top edge respects the viewport margin and the bottom edge position
@@ -1704,7 +1798,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        }
 	        else {
 	            // Resizing from bottom edge - height increases when moving down (positive delta)
-	            const maxHeightFromBottom = window.innerHeight - initialBoundingRect.y - margin;
+	            const maxHeightFromBottom = Math.min(window.innerHeight - initialBoundingRect.y - margin, this._maxHeight);
 	            newHeight = m$1(initialBoundingRect.height + deltaY, this._minHeight, maxHeightFromBottom);
 	            this._currentDeltaY = (initialBoundingRect.height - newHeight) / 2;
 	        }
@@ -1732,6 +1826,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        delete this._initialBoundingRect;
 	        delete this._minWidth;
 	        delete this._minHeight;
+	        delete this._maxWidth;
+	        delete this._maxHeight;
 	        this._detachMouseResizeHandlers();
 	    }
 	    /**
@@ -1750,8 +1846,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    }
 	}
 
-	Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-	Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+	ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+	ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
 	var PopoverCss = `:host{min-width:6.25rem;box-shadow:var(--_ui5_popover_box_shadow);background-color:var(--_ui5_popover_background);max-width:calc(100vw - (100vw - 100%) - 2 * var(--_ui5_popup_viewport_margin))}:host([hide-arrow]){box-shadow:var(--_ui5_popover_no_arrow_box_shadow)}:host([actual-placement="Bottom"]) .ui5-popover-arrow{left:calc(50% - .5625rem);top:-.5rem;height:.5rem}:host([actual-placement="Bottom"]) .ui5-popover-arrow:after{margin:var(--_ui5_popover_upward_arrow_margin)}:host([actual-placement="Left"]) .ui5-popover-arrow{top:calc(50% - .5625rem);right:-.5625rem;width:.5625rem}:host([actual-placement="Left"]) .ui5-popover-arrow:after{margin:var(--_ui5_popover_right_arrow_margin)}:host([actual-placement="Top"]) .ui5-popover-arrow{left:calc(50% - .5625rem);height:.5625rem;top:100%}:host([actual-placement="Top"]) .ui5-popover-arrow:after{margin:var(--_ui5_popover_downward_arrow_margin)}:host(:not([actual-placement])) .ui5-popover-arrow,:host([actual-placement="Right"]) .ui5-popover-arrow{left:-.5625rem;top:calc(50% - .5625rem);width:.5625rem;height:1rem}:host(:not([actual-placement])) .ui5-popover-arrow:after,:host([actual-placement="Right"]) .ui5-popover-arrow:after{margin:var(--_ui5_popover_left_arrow_margin)}:host([hide-arrow]) .ui5-popover-arrow{display:none}.ui5-popover-arrow{pointer-events:none;display:block;width:1rem;height:1rem;position:absolute;overflow:hidden}.ui5-popover-arrow:after{content:"";display:block;width:.7rem;height:.7rem;background-color:var(--_ui5_popover_background);box-shadow:var(--_ui5_popover_box_shadow);transform:rotate(-45deg)}:host([modal])::backdrop{background-color:var(--_ui5_popup_block_layer_background);opacity:var(--_ui5_popup_block_layer_opacity)}:host([modal]) .ui5-block-layer{display:block}.ui5-popover-resize-handle{position:absolute;width:1.5rem;height:1.5rem;border-radius:50%;z-index:1}.ui5-popover-resize-handle [ui5-icon]{position:absolute;width:1rem;height:1rem;cursor:inherit;color:var(--sapButton_Lite_TextColor);--rotAngle: 0;--scaleX: 1;transform:rotate(var(--rotAngle)) scaleX(var(--scaleX))}.ui5-popover-rtl .ui5-popover-resize-handle [ui5-icon]{--scaleX: -1}.ui5-popover-resize-handle-top-right .ui5-popover-resize-handle{top:-.5rem;right:-.5rem;cursor:ne-resize}.ui5-popover-resize-handle-top-right .ui5-popover-resize-handle [ui5-icon]{bottom:0;left:0;--rotAngle: 270deg}.ui5-popover-resize-handle-top-left .ui5-popover-resize-handle{top:-.5rem;left:-.5rem;cursor:nw-resize}.ui5-popover-resize-handle-top-left .ui5-popover-resize-handle [ui5-icon]{bottom:0;right:0;--rotAngle: 180deg}.ui5-popover-resize-handle-bottom-left .ui5-popover-resize-handle{bottom:-.5rem;left:-.5rem;cursor:ne-resize}.ui5-popover-resize-handle-bottom-left .ui5-popover-resize-handle [ui5-icon]{top:0;right:0;--rotAngle: 90deg}.ui5-popover-resize-handle-bottom-right .ui5-popover-resize-handle{bottom:-.5rem;right:-.5rem;cursor:nw-resize}.ui5-popover-resize-handle-bottom-right .ui5-popover-resize-handle [ui5-icon]{top:0;left:0}.ui5-popover-resizing,.ui5-popover-resizing *{user-select:none!important}
 `;
 
@@ -1914,7 +2010,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	            return;
 	        }
 	        if (!opener || this.isOpenerOutsideViewport(opener.getBoundingClientRect())) {
-	            await Theme.w();
+	            await ManagedStyles.w();
 	            this.open = false;
 	            this.fireDecoratorEvent("close");
 	            return;
@@ -2117,7 +2213,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	     * @returns The adjusted top in px.
 	     */
 	    _adjustForIOSKeyboard(top) {
-	        if (!Theme.w$2()) {
+	        if (!ManagedStyles.w$1()) {
 	            return top;
 	        }
 	        const actualTop = Math.ceil(this.getBoundingClientRect().top);
@@ -2574,8 +2670,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	var Popover$1 = Popover;
 	const instanceOfPopover = webcomponentsBase.r$1("isPopover");
 
-	Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-	Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+	ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+	ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
 	var ResponsivePopoverCss = `:host{min-width:6.25rem;min-height:2rem}:host([on-phone]){display:contents}.ui5-responsive-popover-header{height:var(--_ui5-responsive_popover_header_height);display:flex;justify-content:var(--_ui5_popup_header_prop_header_text_alignment);align-items:center;width:100%}.ui5-responsive-popover-header-text{width:calc(100% - var(--_ui5_button_base_min_width))}.ui5-responsive-popover-header-no-title{justify-content:flex-end}
 `;
 
@@ -2631,7 +2727,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        this._hideCloseButton = false;
 	    }
 	    async openPopup() {
-	        if (!Theme.d()) {
+	        if (!ManagedStyles.d()) {
 	            await super.openPopup();
 	        }
 	        else if (this._dialog) {
@@ -2639,12 +2735,12 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        }
 	    }
 	    async _show() {
-	        if (!Theme.d()) {
+	        if (!ManagedStyles.d()) {
 	            return super._show();
 	        }
 	    }
 	    handleOpenOnEnterDOM() {
-	        if (this.open && !Theme.d()) {
+	        if (this.open && !ManagedStyles.d()) {
 	            this.showPopover();
 	            this.openPopup();
 	        }
@@ -2657,7 +2753,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	     * @override
 	     */
 	    closePopup(escPressed = false, preventRegistryUpdate = false, preventFocusRestore = false) {
-	        if (!Theme.d()) {
+	        if (!ManagedStyles.d()) {
 	            super.closePopup(escPressed, preventRegistryUpdate, preventFocusRestore);
 	        }
 	        else {
@@ -2684,16 +2780,16 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        return this.shadowRoot.querySelector("[ui5-dialog]");
 	    }
 	    get contentDOM() {
-	        return Theme.d() ? this._dialog.contentDOM : super.contentDOM;
+	        return ManagedStyles.d() ? this._dialog.contentDOM : super.contentDOM;
 	    }
 	    get _isPhone() {
-	        return Theme.d();
+	        return ManagedStyles.d();
 	    }
 	    get _displayHeader() {
-	        return (Theme.d() || !this.contentOnlyOnDesktop) && super._displayHeader;
+	        return (ManagedStyles.d() || !this.contentOnlyOnDesktop) && super._displayHeader;
 	    }
 	    get _displayFooter() {
-	        return Theme.d() || !this.contentOnlyOnDesktop;
+	        return ManagedStyles.d() || !this.contentOnlyOnDesktop;
 	    }
 	    get _closeDialogAriaLabel() {
 	        return ResponsivePopover_1.i18nBundle.getText(i18nDefaults.RESPONSIVE_POPOVER_CLOSE_DIALOG_BUTTON);
@@ -2715,7 +2811,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        this.fireDecoratorEvent("close");
 	    }
 	    get isModal() {
-	        if (!Theme.d()) {
+	        if (!ManagedStyles.d()) {
 	            return super.isModal;
 	        }
 	        return this._dialog.isModal;
@@ -2731,7 +2827,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    webcomponentsBase.s({ type: Boolean })
 	], ResponsivePopover.prototype, "_hideCloseButton", void 0);
 	__decorate([
-	    parametersBundle_css.i("@ui5/webcomponents")
+	    parametersBundle_css$1.i("@ui5/webcomponents")
 	], ResponsivePopover, "i18nBundle", void 0);
 	ResponsivePopover = ResponsivePopover_1 = __decorate([
 	    webcomponentsBase.m({

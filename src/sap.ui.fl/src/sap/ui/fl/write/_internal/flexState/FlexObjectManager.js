@@ -150,7 +150,16 @@ sap.ui.define([
 		return bCondenseAnyLayer || [Layer.CUSTOMER, Layer.PUBLIC, Layer.USER].includes(aFlexObjects[0].getLayer());
 	}
 
-	function updateCacheAndDeleteUnsavedChanges(aAllChanges, aCondensedChanges, bSkipUpdateCache, bAlreadyDeletedViaCondense, sReference, sComponentId) {
+	function applyCacheUpdates(sReference, aUpdates) {
+		if (aUpdates.length) {
+			// FlexState.update only takes care of updating the storage response and runtime persistence for new or removed FlexObjects
+			// For updated FlexObjects, the cache needs to be updated as well, which is done by calling checkUpdate on the selector
+			FlexState.getFlexObjectsDataSelector().checkUpdate({ reference: sReference });
+			FlexState.update(sReference, aUpdates);
+		}
+	}
+
+	function collectUpdatesAndDeleteUnsavedChanges(aAllChanges, aCondensedChanges, bSkipUpdateCache, bAlreadyDeletedViaCondense, sReference, sComponentId) {
 		const aUpdates = aCondensedChanges.map((oDirtyChange) => createStorageUpdate(oDirtyChange, bSkipUpdateCache))
 		.filter(Boolean);
 		const aRemovedChanges = [];
@@ -175,10 +184,7 @@ sap.ui.define([
 				});
 			}
 		}
-		if (aUpdates.length) {
-			FlexState.getFlexObjectsDataSelector().checkUpdate({ reference: sReference });
-			FlexState.update(sReference, aUpdates);
-		}
+		return aUpdates;
 	}
 
 	function getAllRelevantChangesForCondensing(aDirtyChanges, aDraftFilenames, bCondenseAnyLayer, sLayer, sReference) {
@@ -199,7 +205,7 @@ sap.ui.define([
 		return aRelevantChanges.concat(aDirtyChanges);
 	}
 
-	async function saveSequenceOfDirtyChanges(aDirtyChanges, bSkipUpdateCache, sParentVersion, sReference) {
+	async function saveSequenceOfDirtyChanges(aDirtyChanges, bSkipUpdateCache, sParentVersion) {
 		let oFirstNewChange;
 		if (sParentVersion) {
 			// in case of changes saved for a draft only the first writing operation must have the parentVersion targeting the basis
@@ -207,11 +213,11 @@ sap.ui.define([
 			[oFirstNewChange] = aDirtyChanges.filter((oChange) => oChange.getState() === States.LifecycleState.NEW);
 		}
 
-		const oCollectedResponse = {
-			response: []
+		const oResult = {
+			response: [],
+			updates: []
 		};
 
-		const aUpdates = [];
 		for (const oDirtyChange of aDirtyChanges) {
 			const oPropertyBag = {
 				layer: oDirtyChange.getLayer(),
@@ -235,18 +241,14 @@ sap.ui.define([
 
 			const oUpdate = createStorageUpdate(oDirtyChange, bSkipUpdateCache);
 			if (oUpdate) {
-				aUpdates.push(oUpdate);
+				oResult.updates.push(oUpdate);
 			}
 
 			if (oStorageResponse?.response) {
-				oCollectedResponse.response.push(...oStorageResponse.response);
+				oResult.response.push(...oStorageResponse.response);
 			}
 		}
-		if (aUpdates.length) {
-			FlexState.update(sReference, aUpdates);
-		}
-		FlexState.getFlexObjectsDataSelector().checkUpdate({ reference: sReference });
-		return oCollectedResponse;
+		return oResult;
 	}
 
 	function createStorageUpdate(oDirtyChange, bSkipUpdateCache) {
@@ -335,6 +337,7 @@ sap.ui.define([
 			const oResponse = {
 				response: []
 			};
+			const aUpdates = [];
 			const sRequest = aChangesClone[0].getRequest();
 			const aLayerEntries = Object.entries(mFlexObjectsPerLayer)
 			.sort(([sLayerA], [sLayerB]) => LayerUtils.getLayerIndex(sLayerA) - LayerUtils.getLayerIndex(sLayerB));
@@ -360,10 +363,12 @@ sap.ui.define([
 
 					// "remove" and "update" only support a single change; multiple calls are required
 					if (aDeletedChanges.length || oGroupedChanges[States.LifecycleState.UPDATED]?.length) {
-						await saveSequenceOfDirtyChanges(
-							[...aDeletedChanges, ...oGroupedChanges[States.LifecycleState.UPDATED] || []], mPropertyBag.skipUpdateCache,
-							mPropertyBag.parentVersion, mPropertyBag.reference
+						const oSequenceResult = await saveSequenceOfDirtyChanges(
+							[...aDeletedChanges, ...oGroupedChanges[States.LifecycleState.UPDATED] || []],
+							mPropertyBag.skipUpdateCache,
+							mPropertyBag.parentVersion
 						);
+						aUpdates.push(...oSequenceResult.updates);
 					}
 
 					// "write" supports multiple changes at once
@@ -381,22 +386,24 @@ sap.ui.define([
 					}
 				}
 			}
-			updateCacheAndDeleteUnsavedChanges(
+			aUpdates.push(...collectUpdatesAndDeleteUnsavedChanges(
 				aAllFlexObjects,
 				aCondensedChanges,
 				mPropertyBag.skipUpdateCache,
 				bIsCondensingEnabled,
 				mPropertyBag.reference,
 				mPropertyBag.appComponent.getId()
-			);
+			));
+			applyCacheUpdates(mPropertyBag.reference, aUpdates);
 			return oResponse;
 		}
-		return saveSequenceOfDirtyChanges(
+		const oResult = await saveSequenceOfDirtyChanges(
 			mPropertyBag.dirtyFlexObjects,
 			mPropertyBag.skipUpdateCache,
-			mPropertyBag.parentVersion,
-			mPropertyBag.reference
+			mPropertyBag.parentVersion
 		);
+		applyCacheUpdates(mPropertyBag.reference, oResult.updates);
+		return { response: oResult.response };
 	}
 
 	/**

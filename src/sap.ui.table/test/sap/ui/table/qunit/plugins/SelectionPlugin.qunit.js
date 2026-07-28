@@ -206,7 +206,7 @@ sap.ui.define([
 
 	QUnit.module("Abstract methods");
 
-	QUnit.test("setSelected, isSelected and getSelectedCount throw on the abstract base class", function(assert) {
+	QUnit.test("Should throw", function(assert) {
 		const AbstractPlugin = SelectionPlugin.extend("sap.ui.table.test.SelectionPlugin.AbstractPlugin");
 		const oPlugin = new AbstractPlugin();
 
@@ -218,5 +218,60 @@ sap.ui.define([
 			"#getSelectedCount throws with the expected error message");
 
 		oPlugin.destroy();
+	});
+
+	QUnit.module("Event-based hooks", {
+		beforeEach: function() {
+			this.oPlugin = new TestPlugin();
+			this.oTable = TableQUnitUtils.createTable({
+				dependents: [this.oPlugin]
+			});
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		}
+	});
+
+	QUnit.test("onHeaderSelectorPress dispatches to handleHeaderSelectorPress when active", function(assert) {
+		const oHandleSpy = this.spy(this.oPlugin, "handleHeaderSelectorPress");
+
+		this.oPlugin.onHeaderSelectorPress();
+		assert.ok(oHandleSpy.calledOnceWithExactly(), "handleHeaderSelectorPress is called once with correct arguments");
+	});
+
+	QUnit.test("onHeaderSelectorPress does not dispatch when inactive", function(assert) {
+		const oHandleSpy = this.spy(this.oPlugin, "handleHeaderSelectorPress");
+
+		this.oPlugin.setEnabled(false);
+		this.oPlugin.onHeaderSelectorPress();
+		assert.ok(oHandleSpy.notCalled, "handleHeaderSelectorPress is not called");
+	});
+
+	QUnit.test("onKeyboardShortcut dispatches to handleKeyboardShortcut when active", function(assert) {
+		const oHandleSpy = this.spy(this.oPlugin, "handleKeyboardShortcut");
+		const oEvent = {};
+
+		this.oPlugin.onKeyboardShortcut("toggle", oEvent);
+		assert.ok(oHandleSpy.calledOnceWithExactly("toggle", oEvent), "handleKeyboardShortcut is called once with correct arguments");
+	});
+
+	QUnit.test("onKeyboardShortcut does not dispatch when inactive", function(assert) {
+		const oHandleSpy = this.spy(this.oPlugin, "handleKeyboardShortcut");
+
+		this.oPlugin.setEnabled(false);
+		this.oPlugin.onKeyboardShortcut("toggle", {});
+		assert.ok(oHandleSpy.notCalled, "handleKeyboardShortcut is not called");
+	});
+
+	QUnit.test("Base hooks resolve", async function(assert) {
+		const oHeaderSelectorResult = this.oPlugin.handleHeaderSelectorPress();
+		const oShortcutResult = this.oPlugin.handleKeyboardShortcut("toggle", {});
+
+		assert.ok(oHeaderSelectorResult instanceof Promise, "handleHeaderSelectorPress returns a promise");
+		assert.ok(oShortcutResult instanceof Promise, "handleKeyboardShortcut returns a promise");
+
+		// A rejection fails the test via the awaited rejection.
+		// A hanging promise fails the test via the QUnit test timeout.
+		await Promise.all([oHeaderSelectorResult, oShortcutResult]);
 	});
 });

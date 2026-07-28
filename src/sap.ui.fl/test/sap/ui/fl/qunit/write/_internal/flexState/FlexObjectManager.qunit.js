@@ -521,8 +521,7 @@ sap.ui.define([
 			});
 			assert.strictEqual(this.oFlexStateUpdateSpy.callCount, 1, "FlexState.updateStorageResponse was called once");
 			assert.strictEqual(this.oFlexStateUpdateSpy.firstCall.args[1].length, 4, "there are 4 updates");
-			// checkUpdate is called for the initial addDirtyChanges, for the update of the saved changes
-			// and for the deletion of the additional changes
+			// checkUpdate is called once for the initial addDirtyChanges, once for the saveFlexObjects and once for the cache update
 			assert.strictEqual(this.oFlexObjectDSUpdateSpy.callCount, 3, "FlexObjectDataSelector.checkUpdate was called three times");
 			assert.strictEqual(this.oDHRemoveFromMapSpy.callCount, 2, "removeChangeFromMap was called twice");
 			assert.strictEqual(this.oDHRemoveFromDependenciesSpy.callCount, 2, "removeChangeFromDependencies was called twice");
@@ -640,6 +639,7 @@ sap.ui.define([
 				Version.Number.Original,
 				"the first change has the parent version"
 			);
+			// checkUpdate is called once for the initial addDirtyChanges and once for the saveFlexObjects
 			assert.strictEqual(this.oFlexObjectDSUpdateSpy.callCount, 3, "FlexObjectDataSelector.checkUpdate was called three times");
 		});
 
@@ -948,6 +948,64 @@ sap.ui.define([
 			assert.strictEqual(this.oCondenserStub.callCount, 0, "the Condenser was not called");
 			assert.strictEqual(this.oStorageCondenseStub.callCount, 0, "Storage.condense was not called");
 			assert.strictEqual(this.oStorageWriteStub.callCount, 3, "Storage.write was called once per dirty change");
+		});
+
+		QUnit.test("without backend condensing and new changes in two layers — writes each layer and updates the cache once", async function(assert) {
+			const oDeleteStub = sandbox.stub(FlexObjectManager, "deleteFlexObjects");
+			const oConnectorConfig = { connector: "LrepConnector" };
+			sandbox.stub(StorageUtils, "getWriteConnectorConfigByLayer").resolves(oConnectorConfig);
+			const aChanges = UIChangeManager.addDirtyChanges(sReference, [
+				{ fileName: "customerBaseChange1", layer: Layer.CUSTOMER_BASE, selector: { id: "control1" } }
+			], this.oAppComponent);
+			this.oCondenserStub.restore();
+			this.oCondenserStub = sandbox.stub(Condenser, "condense").resolves([...this.aChanges, ...aChanges]);
+			sandbox.stub(Settings.getInstanceOrUndef(), "getIsCondensingEnabled").returns(false);
+
+			await FlexObjectManager.saveFlexObjects({
+				selector: this.oAppComponent,
+				layer: Layer.CUSTOMER
+			});
+
+			assert.strictEqual(this.oStorageWriteStub.callCount, 2, "Storage.write was called once per layer");
+			assert.strictEqual(this.oFlexStateUpdateSpy.callCount, 1, "the cache was updated once after the loop");
+			assert.strictEqual(oDeleteStub.callCount, 0, "deleteFlexObjects was not called as all changes were saved");
+		});
+
+		QUnit.test("without backend condensing and only deleted changes — no write and no add/delete cache update", async function(assert) {
+			const oDeleteStub = sandbox.stub(FlexObjectManager, "deleteFlexObjects");
+			const aChanges = UIChangeManager.addDirtyChanges(sReference, [
+				{ fileName: "deletedChange1", layer: Layer.CUSTOMER, selector: { id: "control1" } }
+			], this.oAppComponent);
+			this.aChanges.forEach((oChange) => {
+				oChange.setState(States.LifecycleState.PERSISTED);
+				oChange.setState(States.LifecycleState.DELETED);
+			});
+			aChanges[0].setState(States.LifecycleState.PERSISTED);
+			aChanges[0].setState(States.LifecycleState.DELETED);
+			this.oCondenserStub.restore();
+			this.oCondenserStub = sandbox.stub(Condenser, "condense").resolves([...this.aChanges, ...aChanges]);
+			sandbox.stub(Settings.getInstanceOrUndef(), "getIsCondensingEnabled").returns(false);
+
+			await FlexObjectManager.saveFlexObjects({
+				selector: this.oAppComponent,
+				layer: Layer.CUSTOMER
+			});
+
+			assert.strictEqual(this.oStorageWriteStub.callCount, 0, "Storage.write was not called as there are no new changes");
+			// The delete updates are collected during the removes and applied together in a single cache update at the end.
+			assert.strictEqual(this.oFlexStateUpdateSpy.callCount, 1, "the cache was updated exactly once for the removes");
+			assert.strictEqual(oDeleteStub.callCount, 0, "deleteFlexObjects was not called as all changes were condensed");
+		});
+
+		QUnit.test("with backend condensing — updates the cache once after the condense loop", async function(assert) {
+			await FlexObjectManager.saveFlexObjects({
+				selector: this.oAppComponent,
+				layer: Layer.CUSTOMER
+			});
+
+			assert.strictEqual(this.oStorageCondenseStub.callCount, 1, "the Storage.condense was called once");
+			assert.strictEqual(this.oStorageWriteStub.callCount, 0, "the Storage.write was not called");
+			assert.strictEqual(this.oFlexStateUpdateSpy.callCount, 1, "the cache was updated once after the condense loop");
 		});
 	});
 

@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/parameters-bundle.css'], (function (exports, webcomponentsBase, jsxRuntime, Theme, parametersBundle_css) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/parameters-bundle.css'], (function (exports, webcomponentsBase, parametersBundle_css, ManagedStyles, parametersBundle_css$1) { 'use strict';
 
     /**
      * Different types of Title level.
@@ -40,32 +40,32 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
     var TitleLevel$1 = TitleLevel;
 
     function TitleTemplate() {
-        return (jsxRuntime.jsx(jsxRuntime.Fragment, { children: title.call(this, this.level) }));
+        return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: title.call(this, this.level) }));
     }
     function title(titleLevel) {
         switch (titleLevel) {
             case "H1":
-                return (jsxRuntime.jsx("h1", { class: "ui5-title-root", children: titleInner.call(this) }));
+                return (parametersBundle_css.jsx("h1", { class: "ui5-title-root", children: titleInner.call(this) }));
             case "H2":
-                return (jsxRuntime.jsx("h2", { class: "ui5-title-root", children: titleInner.call(this) }));
+                return (parametersBundle_css.jsx("h2", { class: "ui5-title-root", children: titleInner.call(this) }));
             case "H3":
-                return (jsxRuntime.jsx("h3", { class: "ui5-title-root", children: titleInner.call(this) }));
+                return (parametersBundle_css.jsx("h3", { class: "ui5-title-root", children: titleInner.call(this) }));
             case "H4":
-                return (jsxRuntime.jsx("h4", { class: "ui5-title-root", children: titleInner.call(this) }));
+                return (parametersBundle_css.jsx("h4", { class: "ui5-title-root", children: titleInner.call(this) }));
             case "H5":
-                return (jsxRuntime.jsx("h5", { class: "ui5-title-root", children: titleInner.call(this) }));
+                return (parametersBundle_css.jsx("h5", { class: "ui5-title-root", children: titleInner.call(this) }));
             case "H6":
-                return (jsxRuntime.jsx("h6", { id: `${this._id}-inner`, class: "ui5-title-root", children: titleInner.call(this) }));
+                return (parametersBundle_css.jsx("h6", { id: `${this._id}-inner`, class: "ui5-title-root", children: titleInner.call(this) }));
             default:
-                return (jsxRuntime.jsx("h2", { class: "ui5-title-root", children: titleInner.call(this) }));
+                return (parametersBundle_css.jsx("h2", { class: "ui5-title-root", children: titleInner.call(this) }));
         }
     }
     function titleInner() {
-        return (jsxRuntime.jsx("span", { id: `${this._id}-inner`, children: jsxRuntime.jsx("slot", {}) }));
+        return (parametersBundle_css.jsx("span", { id: `${this._id}-inner`, children: parametersBundle_css.jsx("slot", {}) }));
     }
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
     var titleCss = `:host(:not([hidden])){display:block;cursor:text}:host{max-width:100%;color:var(--sapGroup_TitleTextColor);font-size:var(--sapFontHeader5Size);font-family:var(--sapFontHeaderFamily);text-shadow:var(--sapContent_TextShadow)}.ui5-title-root{display:inline-block;position:relative;font-weight:400;font-size:inherit;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;max-width:100%;vertical-align:bottom;-webkit-margin-before:0;-webkit-margin-after:0;-webkit-margin-start:0;-webkit-margin-end:0;margin:0;cursor:inherit}:host{white-space:pre-line}:host([wrapping-type="None"]){white-space:nowrap}.ui5-title-root,:host ::slotted(*){white-space:inherit}::slotted(*){font-size:inherit;font-family:inherit;text-shadow:inherit}:host([size="H1"]){font-size:var(--sapFontHeader1Size)}:host([size="H2"]){font-size:var(--sapFontHeader2Size)}:host([size="H3"]){font-size:var(--sapFontHeader3Size)}:host([size="H4"]){font-size:var(--sapFontHeader4Size)}:host([size="H5"]){font-size:var(--sapFontHeader5Size)}:host([size="H6"]){font-size:var(--sapFontHeader6Size)}
 `;
 
@@ -153,7 +153,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
     Title = __decorate([
         webcomponentsBase.m({
             tag: "ui5-title",
-            renderer: jsxRuntime.y,
+            renderer: parametersBundle_css.y,
             template: TitleTemplate,
             styles: titleCss,
         })

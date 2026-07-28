@@ -168,30 +168,26 @@ sap.ui.define([
 	}
 
 	/**
-	 * This hook is called by the table when the header selector is pressed.
-	 *
-	 * @private
+	 * @inheritDoc
 	 */
-	SelectionModelSelection.prototype.onHeaderSelectorPress = function() {
+	SelectionModelSelection.prototype.handleHeaderSelectorPress = function() {
 		if (this._getHeaderSelector().getVisible()) {
 			toggleSelectAll(this);
 		}
+		return Promise.resolve();
 	};
 
 	/**
-	 * This hook is called by the table when the "select all" keyboard shortcut is pressed.
-	 *
-	 * @param {string} sType Type of the keyboard shortcut.
-	 * @param {sap.ui.base.Event} oEvent The emitted event.
-	 * @private
+	 * @inheritDoc
 	 */
-	SelectionModelSelection.prototype.onKeyboardShortcut = function(sType, oEvent) {
+	SelectionModelSelection.prototype.handleKeyboardShortcut = function(sType, oEvent) {
 		if (sType === "toggle" && toggleSelectAll(this) === false) {
 			oEvent.setMarked("sapUiTableClearAll");
 		} else if (sType === "clear") {
 			this.clearSelection();
 			oEvent.setMarked("sapUiTableClearAll");
 		}
+		return Promise.resolve();
 	};
 
 	/**

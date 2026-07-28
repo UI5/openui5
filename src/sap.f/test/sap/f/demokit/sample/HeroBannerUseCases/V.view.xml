@@ -1,0 +1,93 @@
+<mvc:View
+	controllerName="sap.f.sample.HeroBannerUseCases.C"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:f="sap.f"
+	xmlns:card="sap.f.cards"
+	height="100%"
+	displayBlock="true">
+	<Page showHeader="false">
+		<content>
+			<Title text="Header Actions Only" level="H4" class="sapUiSmallMarginBottom sapUiSmallMarginTop sapUiSmallMarginBegin" />
+			<VBox class="sapUiMediumMarginBeginEnd">
+				<f:HeroBanner
+					headerText="Welcome, Lisa"
+					overlineText="Tuesday, May 27, 2026">
+					<f:actions>
+						<Button icon="sap-icon://action-settings" text="Settings" />
+						<Button icon="sap-icon://activity-individual" text="Activity Log" />
+					</f:actions>
+				</f:HeroBanner>
+			</VBox>
+
+			<Title text="Content with Actions" level="H4" class="sapUiSmallMarginBottom sapUiMediumMarginTop sapUiSmallMarginBegin" />
+			<VBox class="sapUiMediumMarginBeginEnd">
+				<f:HeroBanner
+					headerText="Good Morning, Robert"
+					overlineText="Tuesday, May 27, 2026">
+					<f:actions>
+						<Button icon="sap-icon://task" text="Review Approvals" />
+						<Button icon="sap-icon://add-document" text="Create Report" />
+						<Button icon="sap-icon://collaborate" text="Team Overview" />
+					</f:actions>
+					<f:startContent>
+						<Text class="heroBannerWhiteText" text="You have 3 pending approvals and 12 new notifications since your last visit. Review your tasks below or use the quick actions to get started." />
+					</f:startContent>
+				</f:HeroBanner>
+			</VBox>
+
+			<Title text="Actions Below Header (actionsPlacement=&quot;BottomStart&quot;)" level="H4" class="sapUiSmallMarginBottom sapUiMediumMarginTop sapUiSmallMarginBegin" />
+			<VBox class="sapUiMediumMarginBeginEnd">
+				<f:HeroBanner
+					headerText="Hello, Emma"
+					overlineText="Wednesday, May 28, 2026"
+					actionsPlacement="BottomStart"
+					columnsRatio="Equal">
+					<f:actions>
+						<Button icon="sap-icon://create" text="New Request" />
+						<Button icon="sap-icon://add-document" text="Create Report" />
+						<Button icon="sap-icon://collaborate" text="Team Overview" />
+					</f:actions>
+					<f:endContent>
+						<f:Card width="100%">
+							<f:header>
+								<card:Header title="Open Tickets" subtitle="Support" />
+							</f:header>
+							<f:content>
+								<VBox class="sapUiSmallMargin">
+									<Title text="42" level="H3" />
+								</VBox>
+							</f:content>
+						</f:Card>
+					</f:endContent>
+				</f:HeroBanner>
+			</VBox>
+
+			<Title text="Header at Bottom (headerBlockPlacement=&quot;Bottom&quot;)" level="H4" class="sapUiSmallMarginBottom sapUiMediumMarginTop sapUiSmallMarginBegin" />
+			<VBox class="sapUiMediumMarginBeginEnd sapUiMediumMarginBottom">
+				<f:HeroBanner
+					headerText="Good Afternoon, James"
+					overlineText="Wednesday, May 28, 2026"
+					columnsRatio="FirstWider"
+					headerBlockPlacement="Bottom">
+					<f:actions>
+						<Button icon="sap-icon://cart" text="Orders" />
+						<Button icon="sap-icon://task" text="Tasks" />
+					</f:actions>
+					<f:endContent>
+						<f:Card width="100%">
+							<f:header>
+								<card:Header title="Revenue YTD" subtitle="Q2 2026" />
+							</f:header>
+							<f:content>
+								<VBox class="sapUiSmallMargin">
+									<Title text="€4.2M" level="H3" />
+								</VBox>
+							</f:content>
+						</f:Card>
+					</f:endContent>
+				</f:HeroBanner>
+			</VBox>
+		</content>
+	</Page>
+</mvc:View>

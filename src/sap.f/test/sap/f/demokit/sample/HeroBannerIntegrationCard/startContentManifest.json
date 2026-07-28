@@ -1,0 +1,45 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.f.sample.HeroBannerIntegrationCard.startContent",
+		"type": "card",
+		"title": "Card 'startContent'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"header": {
+			"title": "Pending Approvals",
+			"subtitle": "Action required",
+			"status": {
+				"text": "3 items"
+			}
+		},
+		"content": {
+			"data": {
+				"json": [
+					{
+						"title": "Expense Report Q2",
+						"description": "Submitted 2 days ago",
+						"icon": "sap-icon://expense-report",
+						"highlight": "Warning"
+					}
+				]
+			},
+			"item": {
+				"icon": {
+					"src": "{icon}"
+				},
+				"title": {
+					"value": "{title}"
+				},
+				"description": {
+					"value": "{description}"
+				},
+				"highlight": "{highlight}"
+			}
+		}
+	}
+}

@@ -22,6 +22,7 @@ customConfiguration:
       - "@ui5/webcomponents-fiori/dist/NotificationList"
       - "@ui5/webcomponents-fiori/dist/NotificationListGroupItem"
       - "@ui5/webcomponents-fiori/dist/NotificationListItem"
+      - "@ui5/webcomponents-fiori/dist/HeroBanner"
       - "@ui5/webcomponents-fiori/dist/ShellBar"
       - "@ui5/webcomponents-fiori/dist/ShellBarBranding"
       - "@ui5/webcomponents-fiori/dist/ShellBarItem"

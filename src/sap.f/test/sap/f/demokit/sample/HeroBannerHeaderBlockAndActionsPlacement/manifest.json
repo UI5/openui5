@@ -1,0 +1,39 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.f.sample.HeroBannerHeaderBlockAndActionsPlacement",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"type": "application",
+		"title": "Application 'HeroBannerHeaderBlockAndActionsPlacement'"
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"rootView": "sap.f.sample.HeroBannerHeaderBlockAndActionsPlacement.V",
+		"dependencies": {
+			"minUI5Version": "2.0.0",
+			"libs": {
+				"sap.f": {},
+				"sap.m": {},
+				"sap.ui.core": {}
+			}
+		},
+		"config": {
+			"sample": {
+				"files": [
+					"V.view.xml",
+					"C.controller.js",
+					"manifest.json"
+				]
+			}
+		}
+	}
+}
