@@ -4599,7 +4599,11 @@ sap.ui.define([
 		if (bAction) {
 			oFetchOptions["body"] = "{\"foo\":\"bar\"}";
 		}
-		this.mock(window).expects("fetch").withExactArgs("/~/Product(42)", oFetchOptions)
+
+		// code under test
+		assert.strictEqual(_Requestor.fetch, fetch, "trampoline property");
+
+		this.mock(_Requestor).expects("fetch").withExactArgs("/~/Product(42)", oFetchOptions)
 			.returns("~result~");
 
 		assert.strictEqual(
