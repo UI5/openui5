@@ -859,45 +859,12 @@ sap.ui.define([], function () {
 		},
 
 		/**
-		 * Parses a system query option "$select" or "$expand" into an object representation.
-		 *
-		 * The value for "$select" is an array of strings.
-		 *
-		 * The value for "$expand" is an object with the path as key and the options as object. If
-		 * there are no options, the value for the path is <code>null</code>. Each option again
-		 * becomes a property with the option name as key and the option value as value.
-		 *
-		 * The value for all other options is simply the string passed to them.
-		 *
-		 * <b>Example:</b>
-		 *
-		 * <code>$expand=SO_2_BP,SO_2_SOITEM($expand=SOITEM_2_PRODUCT($expand=PRODUCT_2_BP
-		 * ;$select=ID,Name);$select=*;$count=true;$orderby=Name desc)</code>
-		 * is converted to
-		 * <pre>
-			{
-				"$expand" : {
-					"SO_2_BP" : null,
-					"SO_2_SOITEM" : {
-						"$count" : "true",
-						"$expand" : {
-							"SOITEM_2_PRODUCT" : {
-								"$expand" : {
-									"PRODUCT_2_BP" : null
-								},
-								"$select" : ["ID", "Name"]
-							}
-						},
-						"$orderby" : "Name desc",
-						"$select" : ["*"]
-					}
-				}
-			}
-		 * </pre>
+		 * Parses a system query option "$select" or "$expand" into an object representation, see
+		 * {@link sap.ui.model.odata.v4.ODataUtils.parseSystemQueryOption} for details.
 		 *
 		 * @param {string} sOption The option string
 		 * @returns {object} The option value as object
-		 * @throws {SyntaxError} If the string could not be parsed
+		 * @throws {SyntaxError} If the string cannot be parsed
 		 */
 		parseSystemQueryOption : function (sOption) {
 			return new _SystemQueryOptionParser().parse(sOption);

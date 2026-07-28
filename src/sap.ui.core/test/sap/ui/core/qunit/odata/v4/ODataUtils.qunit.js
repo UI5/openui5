@@ -9,9 +9,10 @@ sap.ui.define([
 	"sap/ui/model/odata/ODataUtils",
 	"sap/ui/model/odata/v4/ODataUtils",
 	"sap/ui/model/odata/v4/lib/_Batch",
-	"sap/ui/model/odata/v4/lib/_Helper"
+	"sap/ui/model/odata/v4/lib/_Helper",
+	"sap/ui/model/odata/v4/lib/_Parser"
 ], function (Log, Formatting, CalendarType, DateFormat, BaseODataUtils, ODataUtils, _Batch,
-		_Helper) {
+		_Helper, _Parser) {
 	"use strict";
 
 	//*********************************************************************************************
@@ -272,6 +273,12 @@ sap.ui.define([
 			// code under test
 			ODataUtils.serializeBatchRequest(aRequests, "foo");
 		}, oError);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("parseSystemQueryOption", function (assert) {
+		// code under test
+		assert.strictEqual(ODataUtils.parseSystemQueryOption, _Parser.parseSystemQueryOption);
 	});
 });
 //TODO: from https://www.w3.org/TR/xmlschema11-2/#vp-dt-timezone:
