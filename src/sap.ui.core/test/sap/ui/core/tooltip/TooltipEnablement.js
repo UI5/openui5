@@ -9,11 +9,13 @@ sap.ui.require([
 	"sap/m/Popover",
 	"sap/m/VBox",
 	"sap/m/HBox",
+	"sap/m/library",
 	"sap/ui/core/Core"
-], async function (FakeControls, Page, Panel, Text, Label, Button, Dialog, Popover, VBox, HBox, Core) {
+], async function (FakeControls, Page, Panel, Text, Label, Button, Dialog, Popover, VBox, HBox, mLibrary, Core) {
 	"use strict";
 
-	const { FakeButton, FakeText, FakeLink } = FakeControls;
+	const { FakeButton, FakeText, FakeLink, FakeMultiTarget } = FakeControls;
+	const PlacementType = mLibrary.PlacementType;
 	const LONG_TOOLTIP = "This is a noticeably longer tooltip text used to verify wrapping behavior.";
 	const VERY_LONG_TOOLTIP =
 		"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra hendrerit convallis. " +
@@ -42,10 +44,11 @@ sap.ui.require([
 	}
 
 	// --- Buttons with tooltip text ---
+	const oFirstButton = new FakeButton({ text: "Default", tooltipText: "Default tooltip" });
 	const oButtonsPanel = panel("Buttons with tooltip text", [
 		row([
 			label("Default:"),
-			new FakeButton({ text: "Default", tooltipText: "Default tooltip" }),
+			oFirstButton,
 			new FakeButton({ text: "Short text", tooltipText: "Short" }),
 			new FakeButton({ text: "Long text", tooltipText: LONG_TOOLTIP }),
 			new FakeButton({ text: "Very long text", tooltipText: VERY_LONG_TOOLTIP })
@@ -67,6 +70,18 @@ sap.ui.require([
 		row([
 			label("Focusable text:"),
 			new FakeText({ text: "focusable phrase for testing", tooltipText: "Tooltip on focusable text (Tab to focus, hover, or long-press)", focusable: true })
+		])
+	]);
+
+	// --- Control with multiple focus targets ---
+	const oMultiTargetPanel = panel("Control with multiple focus targets (one control, nested spans, distinct tooltips)", [
+		new Text({ text: "The control below renders three nested focusable spans. Tab between them or hover each — every span shows its own tooltip, proving focus/hover on nested elements each drive a different tooltip." }).addStyleClass("sapUiTinyMarginBottom"),
+		row([
+			label("Multi-target:"),
+			new FakeMultiTarget({
+				texts: ["First", "Second", "Third"],
+				tooltipTexts: ["Tooltip for the first target", "Tooltip for the second target", "Tooltip for the third target"]
+			})
 		])
 	]);
 
@@ -125,7 +140,7 @@ sap.ui.require([
 			if (!oPopover) {
 				oPopover = new Popover({
 					title: "Tooltip hosts inside a Popover",
-					placement: "Bottom",
+					placement: PlacementType.PreferredTopOrFlip,
 					content: new VBox({ items: containerContent("Popover") }).addStyleClass("sapUiSmallMargin")
 				});
 			}
@@ -143,7 +158,7 @@ sap.ui.require([
 						if (!oNestedPopover) {
 							oNestedPopover = new Popover({
 								title: "Popover nested in a Dialog",
-								placement: "Bottom",
+								placement: PlacementType.PreferredTopOrFlip,
 								content: new VBox({ items: containerContent("nested Popover") }).addStyleClass("sapUiSmallMargin")
 							});
 						}
@@ -180,6 +195,7 @@ sap.ui.require([
 					oButtonsPanel,
 					oTextPanel,
 					oFocusTextPanel,
+					oMultiTargetPanel,
 					oRClickPanel,
 					oLinksPanel,
 					oContainersPanel
@@ -187,4 +203,12 @@ sap.ui.require([
 			}).addStyleClass("sapUiContentPadding")
 		]
 	}).placeAt("content");
+
+	// Focus the first button on load (regular browser behaviour) to verify the
+	// tooltip does NOT open on the initial page-load focus.
+	oFirstButton.addEventDelegate({
+		onAfterRendering: function () {
+			this.focus();
+		}
+	}, oFirstButton);
 });
