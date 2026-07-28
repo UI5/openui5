@@ -1372,18 +1372,20 @@ sap.ui.define([
 
 	//*********************************************************************************************
 [
-	{transient : false, groupId : "myGroup", isAddressViaNavigationPath : false},
-	{transient : false, groupId : "myGroup", isAddressViaNavigationPath : true},
+	{groupId : "myGroup", isAddressViaNavigationPath : false},
+	{groupId : "myGroup", isAddressViaNavigationPath : true},
 	{transient : true, groupId : "myGroup"},
 	{transient : true, groupId : null},
-	{transient : true, groupId : null, hierarchy : true}
+	{transient : true, groupId : null, hierarchy : true},
+	{groupId : "myGroup", isAddressViaNavigationPath : false, noIndexAndNoHierarchy : true}
 ].forEach(function (oFixture) {
 	QUnit.test("delete: success " + JSON.stringify(oFixture), function (assert) {
 		var oMetaModel = {
 				isAddressViaNavigationPath : mustBeMocked
 			},
 			oModel = {
-				getMetaModel : () => oMetaModel
+				getMetaModel : () => oMetaModel,
+				isApiGroup : mustBeMocked
 			},
 			oBinding = {
 				checkSuspended : function () {},
@@ -1406,9 +1408,16 @@ sap.ui.define([
 		if (oFixture.hierarchy) {
 			oBinding.mParameters.$$aggregation = {hierarchyQualifier : "X"};
 		}
+		if (oFixture.noIndexAndNoHierarchy) {
+			oBinding.mParameters.$$aggregation = {};
+			oContext.iIndex = undefined;
+		}
 		oContext.bSelected = bSelected;
 		this.mock(oBinding).expects("checkSuspended").withExactArgs();
 		this.mock(oContext).expects("isAggregated").withExactArgs().returns(false);
+		this.mock(oModel).expects("isApiGroup")
+			.exactly(oFixture.noIndexAndNoHierarchy ? 1 : 0)
+			.withExactArgs("myGroup").returns(false);
 		this.mock(_Helper).expects("checkGroupId").exactly(oFixture.transient ? 0 : 1)
 			.withExactArgs("myGroup", false, true);
 		this.mock(oContext).expects("fetchCanonicalPath").exactly(oFixture.transient ? 0 : 1)
@@ -1430,7 +1439,9 @@ sap.ui.define([
 		assert.ok(oDeletePromise instanceof Promise);
 
 		oContext.oDeletePromise = "~oDeletePromise~";
-		assert.strictEqual(oContext.toString(), "/Foo/Bar('42')[42;deleted]");
+		assert.strictEqual(oContext.toString(), oFixture.noIndexAndNoHierarchy
+			? "/Foo/Bar('42');deleted"
+			: "/Foo/Bar('42')[42;deleted]");
 		assert.strictEqual(oContext.isDeleted(), true);
 
 		// code under test

@@ -1881,18 +1881,21 @@ sap.ui.define([
 	 *
 	 * @param {sap.ui.model.odata.v4.lib._GroupLock} oGroupLock
 	 *   An unlocked lock for the group ID
+	 * @param {object} [mQueryOptions=this.mQueryOptions]
+	 *   The query options to be used for the count request
 	 * @returns {Promise<number>}
 	 *   A promise that resolves with the count regardless whether a request was needed
 	 *
 	 * @public
 	 */
-	_Cache.prototype.requestCount = function (oGroupLock) {
-		var sExclusiveFilter, mQueryOptions, sReadUrl,
+	_Cache.prototype.requestCount = function (oGroupLock, mQueryOptions = this.mQueryOptions) {
+		var sExclusiveFilter, sReadUrl,
 			that = this;
 
-		if (this.mQueryOptions && this.mQueryOptions.$count) {
+		if (mQueryOptions && mQueryOptions.$count) {
 			// now we are definitely in a CollectionCache
-			mQueryOptions = Object.assign({}, this.mQueryOptions);
+			const bSortSystemQueryOptions = mQueryOptions !== this.mQueryOptions;
+			mQueryOptions = Object.assign({}, mQueryOptions);
 			delete mQueryOptions.$expand;
 			delete mQueryOptions.$orderby;
 			delete mQueryOptions.$select;
@@ -1904,7 +1907,8 @@ sap.ui.define([
 			}
 			mQueryOptions.$top = 0;
 			sReadUrl = this.sResourcePath
-				+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions);
+				+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions, false, false,
+					bSortSystemQueryOptions);
 
 			return this.oRequestor.request("GET", sReadUrl, oGroupLock.getUnlockedCopy())
 				.catch(function (oError) {

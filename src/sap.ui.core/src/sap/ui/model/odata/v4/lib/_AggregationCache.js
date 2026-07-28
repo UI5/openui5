@@ -104,7 +104,8 @@ sap.ui.define([
 	 *   A promise which is resolved without a result in case of success, or rejected with an
 	 *   instance of <code>Error</code> in case of failure
 	 * @throws {Error} If the cache is shared, the node is not in the collection (because a
-	 *   predicate was given), or the node at the given index is expanded.
+	 *   predicate was given) in case of a recursive hierarchy, or the node at the given index is
+	 *   expanded.
 	 *
 	 * @public
 	 */
@@ -113,8 +114,14 @@ sap.ui.define([
 			oETagEntity, fnCallback) {
 		let iIndex = parseInt(sIndexOrPredicate);
 		if (isNaN(iIndex)) { // it must be a predicate because the element is not in the collection
-			throw new Error(
-				`Unsupported kept-alive entity: ${this.sResourcePath}${sIndexOrPredicate}`);
+			if (this.oAggregation.hierarchyQualifier) {
+				throw new Error(
+					`Unsupported kept-alive entity: ${this.sResourcePath}${sIndexOrPredicate}`);
+			}
+			return SyncPromise.all([
+				_Cache.prototype._delete.apply(this, arguments),
+				this.readGrandTotal(oGroupLock)
+			]);
 		}
 
 		const oElement = this.aElements[iIndex];
@@ -2372,6 +2379,36 @@ sap.ui.define([
 			undefined, bKeepReportedMessagesPath);
 
 		_Helper.updateAll({/*mChangeListeners*/}, "", aElements.$byPredicate[sPredicate], oElement);
+	};
+
+	/**
+	 * @override
+	 * @see sap.ui.model.odata.v4.lib._Cache#requestCount
+	 */
+	_AggregationCache.prototype.requestCount = function (oGroupLock) {
+		if (this.oAggregation.hierarchyQualifier || this.oAggregation.groupLevels.length) {
+			// recursive hierarchy has a specific implementation in #readCount, and data aggregation
+			// with groupLevels requires a different approach for requesting the count (oFirstLevel
+			// would not be responsible for single entities)
+			throw new Error("Unsupported with recursive hierarchy or groupLevels");
+		}
+
+		const mQueryOptions = {...this.oFirstLevel.mQueryOptions};
+		// drop not needed system query options; $expand, $filter, $search, and $select must not be
+		// used with grand totals; all filters are contained in $$filterBeforeAggregate
+		delete mQueryOptions.$apply;
+		if (mQueryOptions.$$filterBeforeAggregate) {
+			mQueryOptions.$filter = mQueryOptions.$$filterBeforeAggregate;
+			delete mQueryOptions.$$filterBeforeAggregate;
+		}
+		if (this.oAggregation.search) {
+			mQueryOptions.$search = this.oAggregation.search;
+		}
+
+		return this.oFirstLevel.requestCount(oGroupLock, mQueryOptions).then((iCount) => {
+			// an _AggregationCache instance w/o groupLevels has always at least one grand total row
+			return iCount + (this.oAggregation.grandTotalAtBottomOnly === false ? 2 : 1);
+		});
 	};
 
 	/**

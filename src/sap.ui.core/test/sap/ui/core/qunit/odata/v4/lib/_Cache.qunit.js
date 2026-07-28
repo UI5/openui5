@@ -6081,8 +6081,12 @@ sap.ui.define([
 	created : true,
 	queryFilter : "(filter) and ~filter~"
 }].forEach(function (oFixture) {
-	QUnit.test("Cache#requestCount: " + JSON.stringify(oFixture), function (assert) {
-		var oCache = this.createCache("Employees", {
+	[false, true].forEach(function (bInCall) {
+		const sTitle = "Cache#requestCount: " + JSON.stringify(oFixture)
+			+ ", mQueryOptions passed in method call, not c'tor=" + bInCall;
+
+	QUnit.test(sTitle, async function (assert) {
+		var mQueryOptions = Object.freeze({
 				"sap-client" : "123",
 				$apply : "apply",
 				$count : true,
@@ -6092,9 +6096,9 @@ sap.ui.define([
 				$search : "search",
 				$select : "select"
 			}),
+			oCache = this.createCache("Employees", bInCall ? undefined : mQueryOptions),
 			oGroupLock = {getUnlockedCopy : function () {}},
-			oGroupLockCopy = {},
-			sQueryOptions = JSON.stringify(oCache.mQueryOptions);
+			oGroupLockCopy = {};
 
 		oCache.aElements.$created = oFixture.created ? 2 : 0;
 		oCache.iActiveElements = oFixture.created ? 1 : 0;
@@ -6108,7 +6112,7 @@ sap.ui.define([
 				$filter : oFixture.queryFilter,
 				$search : "search",
 				$top : 0
-			})
+			}, false, false, bInCall)
 			.returns("?~");
 		this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs().returns(oGroupLockCopy);
 		this.mock(this.oRequestor).expects("request")
@@ -6119,10 +6123,11 @@ sap.ui.define([
 				sinon.match.same(oCache.aElements), oFixture.count);
 
 		// code under test
-		return oCache.requestCount(oGroupLock).then(function () {
-			assert.strictEqual(JSON.stringify(oCache.mQueryOptions), sQueryOptions, "unchanged");
-			assert.strictEqual(oCache.iLimit, oFixture.count);
-		});
+		const iCount = await oCache.requestCount(oGroupLock, bInCall ? mQueryOptions : undefined);
+
+		assert.strictEqual(iCount, oFixture.count);
+		assert.strictEqual(oCache.iLimit, oFixture.count);
+	});
 	});
 });
 
@@ -6135,7 +6140,7 @@ sap.ui.define([
 		oCache.aElements.$created = 1;
 		this.mock(oCache).expects("getExclusiveFilter").withExactArgs().returns("~filter~");
 		this.mock(this.oRequestor).expects("buildQueryString")
-			.withExactArgs(oCache.sMetaPath, sinon.match.object)
+			.withExactArgs(oCache.sMetaPath, sinon.match.object, false, false, false)
 			.callsFake(function (_sMetaPath, mQueryOptions) {
 				assert.deepEqual(Object.keys(mQueryOptions), ["$count", "$filter", "$top"]);
 				return "?~";
@@ -6168,7 +6173,7 @@ sap.ui.define([
 		this.mock(oCache).expects("getExclusiveFilter").withExactArgs()
 			.returns(undefined);
 		oRequestorMock.expects("buildQueryString")
-			.withExactArgs(oCache.sMetaPath, sinon.match.object)
+			.withExactArgs(oCache.sMetaPath, sinon.match.object, false, false, false)
 			.returns("?~");
 		oGroupLockMock.expects("getUnlockedCopy").withExactArgs().returns(oGroupLockCopy1);
 		oRequestorMock.expects("request")
@@ -6202,7 +6207,7 @@ sap.ui.define([
 		this.mock(oCache).expects("getExclusiveFilter").withExactArgs()
 			.returns(undefined);
 		this.mock(this.oRequestor).expects("buildQueryString")
-			.withExactArgs(oCache.sMetaPath, sinon.match.object)
+			.withExactArgs(oCache.sMetaPath, sinon.match.object, false, false, false)
 			.returns("?~");
 		this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs().returns(oGroupLockCopy);
 		this.mock(this.oRequestor).expects("request")
