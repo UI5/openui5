@@ -20,6 +20,43 @@ sap.ui.define([
 		'</mvc:View>';
 
 
+	// View with an invalid boolean property value (iconFirst is of type "boolean")
+	const sViewInvalidBoolean =
+		'<mvc:View height="100%" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m">' +
+			'<Button id="btn" iconFirst="notBoolean"></Button>' +
+		'</mvc:View>';
+
+	// View with a valid boolean property value
+	const sViewValidBoolean =
+		'<mvc:View height="100%" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m">' +
+			'<Button id="btnTrue" iconFirst="true"></Button>' +
+			'<Button id="btnFalse" iconFirst="false"></Button>' +
+		'</mvc:View>';
+
+	// View with an invalid int property value (maxLength is of type "int")
+	const sViewInvalidInt =
+		'<mvc:View height="100%" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m">' +
+			'<SearchField id="sf" maxLength="notANumber"></SearchField>' +
+		'</mvc:View>';
+
+	// View with a valid int property value
+	const sViewValidInt =
+		'<mvc:View height="100%" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m">' +
+			'<SearchField id="sf" maxLength="42"></SearchField>' +
+		'</mvc:View>';
+
+	// View with an invalid float property value (percentValue is of type "float")
+	const sViewInvalidFloat =
+		'<mvc:View height="100%" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m">' +
+			'<ProgressIndicator id="pi" percentValue="notANumber"></ProgressIndicator>' +
+		'</mvc:View>';
+
+	// View with a valid float property value
+	const sViewValidFloat =
+		'<mvc:View height="100%" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m">' +
+			'<ProgressIndicator id="pi" percentValue="75.5"></ProgressIndicator>' +
+		'</mvc:View>';
+
 	const sView =
 		'<mvc:View height="100%" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m" id="view" ' +
 			'xmlns:dt="sap.ui.dt" displayBlock="true" unknownProperty="true">' +
@@ -152,6 +189,249 @@ sap.ui.define([
 		await oView.catch((err) => {
 			assert.ok(err.message.includes("Value 'somethingInvalid' is not valid for type 'sap.m.ButtonType'.", "View creation rejected with type error"));
 		});
+	});
+
+	/**
+	 * @deprecated
+	 */
+	QUnit.module("parseScalarType - boolean type (future=false)", {
+		beforeEach: function() {
+			future.active = false;
+			this.oLogSpy = sinon.spy(Log, "error");
+		},
+		afterEach: function() {
+			this.oLogSpy.restore();
+			future.active = undefined;
+			if (this.oView) {
+				this.oView.destroy();
+			}
+		}
+	});
+
+	/**
+	 * @deprecated
+	 */
+	QUnit.test("invalid boolean value logs an error (future=false)", async function (assert) {
+		this.oView = await XMLView.create({
+			definition: sViewInvalidBoolean
+		});
+		assert.ok(this.oLogSpy.calledOnce, "Log.error was called exactly once");
+		assert.ok(
+			this.oLogSpy.calledWith(sinon.match(/Value 'notBoolean' is not valid for type 'boolean'\./)),
+			"Log.error reports invalid boolean value"
+		);
+	});
+
+	/**
+	 * @deprecated
+	 */
+	QUnit.test("valid boolean values 'true' and 'false' do not log errors (future=false)", async function (assert) {
+		this.oView = await XMLView.create({
+			definition: sViewValidBoolean
+		});
+		assert.ok(
+			this.oLogSpy.neverCalledWith(sinon.match(/is not valid for type 'boolean'/)),
+			"Log.error was not called for valid boolean strings"
+		);
+	});
+
+	QUnit.module("parseScalarType - boolean type (future=true)", {});
+
+	QUnit.test("invalid boolean value rejects view creation (future=true)", async function (assert) {
+		future.active = true;
+		try {
+			const oView = XMLView.create({
+				definition: sViewInvalidBoolean
+			});
+			assert.rejects(oView);
+			await oView.catch((err) => {
+				assert.ok(
+					err.message.includes("Value 'notBoolean' is not valid for type 'boolean'."),
+					"View creation rejected with boolean type error"
+				);
+			});
+		} finally {
+			future.active = undefined;
+		}
+	});
+
+	QUnit.test("valid boolean values 'true' and 'false' are accepted (future=true)", async function (assert) {
+		future.active = true;
+		let oView;
+		try {
+			oView = await XMLView.create({
+				definition: sViewValidBoolean
+			});
+			assert.ok(oView.byId("btnTrue").getIconFirst() === true, "iconFirst='true' parsed as boolean true");
+			assert.ok(oView.byId("btnFalse").getIconFirst() === false, "iconFirst='false' parsed as boolean false");
+		} finally {
+			future.active = undefined;
+			if (oView) {
+				oView.destroy();
+			}
+		}
+	});
+
+	/**
+	 * @deprecated
+	 */
+	QUnit.module("parseScalarType - int type (future=false)", {
+		beforeEach: function() {
+			future.active = false;
+			this.oLogSpy = sinon.spy(Log, "error");
+		},
+		afterEach: function() {
+			this.oLogSpy.restore();
+			future.active = undefined;
+			if (this.oView) {
+				this.oView.destroy();
+			}
+		}
+	});
+
+	/**
+	 * @deprecated
+	 */
+	QUnit.test("invalid int value logs an error (future=false)", async function (assert) {
+		this.oView = await XMLView.create({
+			definition: sViewInvalidInt
+		});
+		assert.ok(this.oLogSpy.calledOnce, "Log.error was called exactly once");
+		assert.ok(
+			this.oLogSpy.calledWith(sinon.match(/Value 'notANumber' is not valid for type 'int'\./)),
+			"Log.error reports invalid int value"
+		);
+	});
+
+	/**
+	 * @deprecated
+	 */
+	QUnit.test("valid int value does not log errors (future=false)", async function (assert) {
+		this.oView = await XMLView.create({
+			definition: sViewValidInt
+		});
+		assert.ok(
+			this.oLogSpy.neverCalledWith(sinon.match(/is not valid for type 'int'/)),
+			"Log.error was not called for valid int string"
+		);
+		assert.strictEqual(this.oView.byId("sf").getMaxLength(), 42, "maxLength='42' parsed as int 42");
+	});
+
+	QUnit.module("parseScalarType - int type (future=true)", {});
+
+	QUnit.test("invalid int value rejects view creation (future=true)", async function (assert) {
+		future.active = true;
+		try {
+			const oView = XMLView.create({
+				definition: sViewInvalidInt
+			});
+			assert.rejects(oView);
+			await oView.catch((err) => {
+				assert.ok(
+					err.message.includes("Value 'notANumber' is not valid for type 'int'."),
+					"View creation rejected with int type error"
+				);
+			});
+		} finally {
+			future.active = undefined;
+		}
+	});
+
+	QUnit.test("valid int value is accepted (future=true)", async function (assert) {
+		future.active = true;
+		let oView;
+		try {
+			oView = await XMLView.create({
+				definition: sViewValidInt
+			});
+			assert.strictEqual(oView.byId("sf").getMaxLength(), 42, "maxLength='42' parsed as int 42");
+		} finally {
+			future.active = undefined;
+			if (oView) {
+				oView.destroy();
+			}
+		}
+	});
+
+	/**
+	 * @deprecated
+	 */
+	QUnit.module("parseScalarType - float type (future=false)", {
+		beforeEach: function() {
+			future.active = false;
+			this.oLogSpy = sinon.spy(Log, "error");
+		},
+		afterEach: function() {
+			this.oLogSpy.restore();
+			future.active = undefined;
+			if (this.oView) {
+				this.oView.destroy();
+			}
+		}
+	});
+
+	/**
+	 * @deprecated
+	 */
+	QUnit.test("invalid float value logs an error (future=false)", async function (assert) {
+		this.oView = await XMLView.create({
+			definition: sViewInvalidFloat
+		});
+		assert.ok(this.oLogSpy.calledOnce, "Log.error was called exactly once");
+		assert.ok(
+			this.oLogSpy.calledWith(sinon.match(/Value 'notANumber' is not valid for type 'float'\./)),
+			"Log.error reports invalid float value"
+		);
+	});
+
+	/**
+	 * @deprecated
+	 */
+	QUnit.test("valid float value does not log errors (future=false)", async function (assert) {
+		this.oView = await XMLView.create({
+			definition: sViewValidFloat
+		});
+		assert.ok(
+			this.oLogSpy.neverCalledWith(sinon.match(/is not valid for type 'float'/)),
+			"Log.error was not called for valid float string"
+		);
+		assert.strictEqual(this.oView.byId("pi").getPercentValue(), 75.5, "percentValue='75.5' parsed as float 75.5");
+	});
+
+	QUnit.module("parseScalarType - float type (future=true)", {});
+
+	QUnit.test("invalid float value rejects view creation (future=true)", async function (assert) {
+		future.active = true;
+		try {
+			const oView = XMLView.create({
+				definition: sViewInvalidFloat
+			});
+			assert.rejects(oView);
+			await oView.catch((err) => {
+				assert.ok(
+					err.message.includes("Value 'notANumber' is not valid for type 'float'."),
+					"View creation rejected with float type error"
+				);
+			});
+		} finally {
+			future.active = undefined;
+		}
+	});
+
+	QUnit.test("valid float value is accepted (future=true)", async function (assert) {
+		future.active = true;
+		let oView;
+		try {
+			oView = await XMLView.create({
+				definition: sViewValidFloat
+			});
+			assert.strictEqual(oView.byId("pi").getPercentValue(), 75.5, "percentValue='75.5' parsed as float 75.5");
+		} finally {
+			future.active = undefined;
+			if (oView) {
+				oView.destroy();
+			}
+		}
 	});
 
 	/**

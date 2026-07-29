@@ -260,7 +260,14 @@ sap.ui.define([
 					return typeof vValue === "boolean";
 				},
 				parseValue: function(sValue) {
-					return sValue == "true";
+					if (sValue === "true") {
+						return true;
+					} else if (sValue === "false" || sValue === "") {
+						return false;
+					}
+					// return undefined for unrecognized values so that isValid() can
+					// detect and report the invalid input (consistent with enum behavior)
+					return undefined;
 				}
 			}),
 
@@ -271,7 +278,13 @@ sap.ui.define([
 					return typeof vValue === "number" && (isNaN(vValue) || Math.floor(vValue) == vValue);
 				},
 				parseValue: function(sValue) {
-					return parseInt(sValue);
+					if (sValue === "") {
+						return NaN;
+					}
+					var iValue = parseInt(sValue);
+					// return undefined for unparseable strings so that isValid() can
+					// detect and report the invalid input (consistent with boolean behavior)
+					return isNaN(iValue) ? undefined : iValue;
 				}
 			}),
 
@@ -282,7 +295,13 @@ sap.ui.define([
 					return typeof vValue === "number";
 				},
 				parseValue: function(sValue) {
-					return parseFloat(sValue);
+					if (sValue === "") {
+						return NaN;
+					}
+					var fValue = parseFloat(sValue);
+					// return undefined for unparseable strings so that isValid() can
+					// detect and report the invalid input (consistent with boolean behavior)
+					return isNaN(fValue) ? undefined : fValue;
 				}
 			}),
 
