@@ -4687,11 +4687,14 @@ sap.ui.define([
 	[false, true].forEach(function (bCreated) { // the deleted context is created-persisted
 		[undefined, false, true].forEach(function (bExpanded) { // undefined -> no hierarchy
 			[false, true].forEach(function (bExpandFailure) {
-				const sTitle = "delete: success=" + bSuccess + ", created=" + bCreated
-					+ ", expanded=" + bExpanded + ", expandFailure=" + bExpandFailure;
-				if (bCreated && bExpanded || bExpandFailure && (bSuccess || !bExpanded)) {
-					return;
-				}
+				[false, true].forEach(function (bSelected) {
+					const sTitle = "delete: success=" + bSuccess + ", created=" + bCreated
+						+ ", expanded=" + bExpanded + ", expandFailure=" + bExpandFailure
+						+ ", selected=" + bSelected;
+					if (bCreated && bExpanded || bExpandFailure && (bSuccess || !bExpanded)
+						|| bSelected && !bSuccess) {
+						return;
+					}
 
 		QUnit.test(sTitle, function (assert) {
 			var oBinding = this.bindList("/EMPLOYEES"),
@@ -4732,6 +4735,8 @@ sap.ui.define([
 			// also called from sinon.match.same() via toString()
 			oContext1Mock.expects("isDeleted").atLeast(1).withExactArgs().returns(false);
 			oContext1Mock.expects("isExpanded").withExactArgs().returns(bExpanded);
+			// also called from sinon.match.same() via toString()
+			oContext1Mock.expects("isSelected").atLeast(1).withExactArgs().returns(bSelected);
 			oBindingMock.expects("collapse").exactly(bExpanded ? 1 : 0)
 				.withExactArgs(sinon.match.same(oContext1), /*bAll*/false, /*bSilent*/true);
 			oBindingMock.expects("destroyPreviousContexts").never();
@@ -4757,10 +4762,17 @@ sap.ui.define([
 					assert.notOk(fnUndelete.called);
 
 					// expectations for then
-					oContext1Mock.expects("resetKeepAlive").exactly(bSuccess ? 1 : 0)
-						.withExactArgs();
+					const oResetKeepAliveExpectation = oContext1Mock.expects("resetKeepAlive")
+						.exactly(bSuccess ? 1 : 0).withExactArgs();
 					oBindingMock.expects("destroyPreviousContextsLater").exactly(bSuccess ? 1 : 0)
 						.withExactArgs([sContext1Path]);
+					oBindingMock.expects("fireSelectionChanged").exactly(bSelected ? 1 : 0)
+						.withExactArgs(sinon.match.same(oContext1))
+						.callsFake(() => {
+							assert.ok(oResetKeepAliveExpectation.called);
+							assert.strictEqual(oContext1.iIndex, Context.VIRTUAL,
+								"called after bookkeeping");
+						});
 					// expectations for catch
 					oBindingMock.expects("expand").exactly(!bSuccess && bExpanded ? 1 : 0)
 						.withExactArgs(sinon.match.same(oContext1), 1, true)
@@ -4846,6 +4858,7 @@ sap.ui.define([
 				}
 			});
 		});
+				});
 			});
 		});
 	});
@@ -4906,6 +4919,7 @@ sap.ui.define([
 				getPath : function () { return "~contextPath~"; },
 				isDeleted : mustBeMocked,
 				isExpanded : mustBeMocked,
+				isSelected : mustBeMocked,
 				resetKeepAlive : mustBeMocked
 			},
 			iOldMaxLength = oFixture.lengthFinal ? 42 : Infinity,
@@ -4925,6 +4939,7 @@ sap.ui.define([
 
 		this.mock(oKeptAliveContext).expects("isDeleted").withExactArgs().returns(false);
 		this.mock(oKeptAliveContext).expects("isExpanded").withExactArgs().returns(false);
+		this.mock(oKeptAliveContext).expects("isSelected").withExactArgs().returns(false);
 		oBindingMock.expects("destroyPreviousContexts").never();
 		oHelperMock.expects("getRelativePath")
 			.withExactArgs("~contextPath~", "/EMPLOYEES").returns("~predicate~");
@@ -7963,12 +7978,15 @@ sap.ui.define([
 [true, false].forEach(function (bStillAlive) {
 	[true, false].forEach(function (bOnRemoveCalled) {
 		[true, false].forEach(function (bCreated) {
-			var sTitle = "refreshSingle with allow remove: " + bOnRemoveCalled + ", created: "
-				+ bCreated + ", still alive: " + bStillAlive;
+			[true, false].forEach(function (bSelectionChanged) {
+				var sTitle = "refreshSingle with allow remove: " + bOnRemoveCalled + ", created: "
+					+ bCreated + ", still alive: " + bStillAlive
+					+ ", selection changed: " + bSelectionChanged;
 
-			if (bStillAlive && !bOnRemoveCalled) {
-				return;
-			}
+				if (bStillAlive && !bOnRemoveCalled
+					|| bSelectionChanged && (bCreated || bStillAlive)) {
+					return;
+				}
 
 			QUnit.test(sTitle, function (assert) {
 				var oBinding = this.bindList("/EMPLOYEES"),
@@ -8023,7 +8041,15 @@ sap.ui.define([
 							.exactly(bCreated ? 1 : 0).withExactArgs(sinon.match.same(oContext));
 						oContextMock.expects("doSetSelected")
 							.exactly(bCreated || bStillAlive ? 0 : 1)
-							.withExactArgs(false, true);
+							.withExactArgs(false, true).returns(bSelectionChanged);
+						that.mock(oBinding).expects("fireSelectionChanged")
+							.exactly(bSelectionChanged ? 1 : 0)
+							.withExactArgs(sinon.match.same(oContext))
+							.callsFake(() => {
+								assert.strictEqual(oContext.isDeleted(), true);
+								assert.strictEqual(oContext.oDeletePromise, SyncPromise.resolve());
+								assert.strictEqual(oContext.iIndex, Context.VIRTUAL);
+							});
 						oContextMock.expects("destroy").exactly(bCreated || bStillAlive ? 0 : 1)
 							.withExactArgs();
 						that.mock(oBinding).expects("_fireChange")
@@ -8095,6 +8121,7 @@ sap.ui.define([
 						bOnRemoveCalled && bStillAlive ? ["/EMPLOYEES('2')"] : []);
 				});
 			});
+			});
 		});
 	});
 });
@@ -8104,6 +8131,7 @@ sap.ui.define([
 	{index : undefined, stillAlive : false},
 	/*{index : undefined, stillAlive : true*} combination is never called*/
 	{index : 1, stillAlive : false},
+	{index : 1, stillAlive : false, selectionChanged : true},
 	{index : 1, stillAlive : true}
 ].forEach(function (oFixture) {
 	var sTitle = "refreshSingle with allow remove on a kept-alive context, index = "
@@ -8148,7 +8176,14 @@ sap.ui.define([
 		oCacheRequestPromise = SyncPromise.resolve(Promise.resolve()).then(function () {
 			// fnOnRemove Test
 			that.mock(oContext).expects("doSetSelected").exactly(oFixture.stillAlive ? 0 : 1)
-				.withExactArgs(false, true);
+				.withExactArgs(false, true).returns(oFixture.selectionChanged);
+			that.mock(oBinding).expects("fireSelectionChanged")
+				.exactly(oFixture.selectionChanged ? 1 : 0)
+				.withExactArgs(sinon.match.same(oContext))
+				.callsFake(() => {
+					assert.strictEqual(oContext.oDeletePromise, SyncPromise.resolve());
+					assert.strictEqual(oContext.iIndex, Context.VIRTUAL);
+				});
 			that.mock(oContext).expects("destroy").exactly(oFixture.stillAlive ? 0 : 1)
 				.withExactArgs();
 			that.mock(oBinding).expects("_fireChange").exactly(oFixture.index ? 1 : 0)

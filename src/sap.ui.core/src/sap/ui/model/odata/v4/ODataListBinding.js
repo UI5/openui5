@@ -1295,6 +1295,7 @@ sap.ui.define([
 			: String(oContext.getModelIndex());
 
 		this.iDeletedContexts += 1;
+		const bSelected = oContext.isSelected();
 
 		return oContext.doDelete(oGroupLock, sEditUrl, sPath, oETagEntity, this,
 			function (iIndex, iOffset) {
@@ -1356,6 +1357,9 @@ sap.ui.define([
 			oContext.resetKeepAlive();
 			oContext.iIndex = Context.VIRTUAL; // prevent further cache access via this context
 			that.destroyPreviousContextsLater([oContext.getPath()]);
+			if (bSelected) {
+				that.fireSelectionChanged(oContext);
+			}
 		}, function (oError) {
 			that.iDeletedContexts -= 1;
 			// if the cache has become inactive, the callback is not called -> undelete here
@@ -4174,7 +4178,11 @@ sap.ui.define([
 
 					if (!bStillAlive) {
 						bDestroyed = true;
-						oContext.doSetSelected(false, true);
+						if (oContext.doSetSelected(false, true)) {
+							oContext.oDeletePromise = SyncPromise.resolve();
+							oContext.iIndex = Context.VIRTUAL; // prevent further cache access...
+							that.fireSelectionChanged(oContext);
+						}
 						oContext.destroy();
 					}
 				}

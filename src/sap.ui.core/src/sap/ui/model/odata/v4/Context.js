@@ -465,6 +465,7 @@ sap.ui.define([
 			that.checkUpdate();
 			throw oError;
 		});
+		// Note: #deleteFromCache may cancel request and thus deselect synchronously!
 		if (this.bSelected) {
 			this.oBinding.getHeaderContext().onSelectionChanged(this);
 		}
