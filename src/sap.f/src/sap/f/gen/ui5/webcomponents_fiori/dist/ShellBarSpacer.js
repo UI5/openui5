@@ -27,7 +27,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarSpacer",
       {
         metadata: {
-          tag: "ui5-shellbar-spacer-6bfd01e3",
+          tag: "ui5-shellbar-spacer-0b2c601f",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
