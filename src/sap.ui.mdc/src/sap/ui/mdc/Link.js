@@ -574,7 +574,7 @@ sap.ui.define([
 		const oBindingContext = this._getControlBindingContext(),
 			bContextUnchanged = oBindingContext && oBindingContext?.getPath() === this._sItemsContextPath;
 
-		if (bContextUnchanged) {
+		if (bContextUnchanged && this._aLinkItems.length > 0) {
 			return Promise.resolve(this._aLinkItems);
 		} else {
 			this._oUseDelegateItemsPromise = this._useDelegateItems();

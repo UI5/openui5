@@ -38,13 +38,14 @@ sap.ui.define([
 	"sap/ui/model/odata/v4/ODataPropertyBinding",
 	"sap/ui/model/odata/v4/ValueListType",
 	"sap/ui/model/odata/v4/lib/_Helper",
+	"sap/ui/model/odata/v4/lib/_Requestor",
 	"sap/ui/security/Security",
 	"sap/ui/test/TestUtils",
 	"sap/ui/util/XMLHelper",
 	"sap/ui/thirdparty/jquery",
 	// load Table resources upfront to avoid loading times > 1 second for the first test using Table
 	"sap/ui/table/Table"
-], function(Log, Localization, uid, ColumnListItem, CustomListItem, FlexBox, _MessageStrip, Text, Device, _BoundFilter, EventProvider, SyncPromise, Messaging, Rendering, Supportability, FieldHelp, Message, Controller, View, ChangeReason, Filter, FilterOperator, FilterType, Sorter, JSONModel, OperationMode, Decimal, AnnotationHelper, ODataListBinding, ODataMetaModel, ODataModel, ODataPropertyBinding, ValueListType, _Helper, Security, TestUtils, XMLHelper, jQuery) {
+], function(Log, Localization, uid, ColumnListItem, CustomListItem, FlexBox, _MessageStrip, Text, Device, _BoundFilter, EventProvider, SyncPromise, Messaging, Rendering, Supportability, FieldHelp, Message, Controller, View, ChangeReason, Filter, FilterOperator, FilterType, Sorter, JSONModel, OperationMode, Decimal, AnnotationHelper, ODataListBinding, ODataMetaModel, ODataModel, ODataPropertyBinding, ValueListType, _Helper, _Requestor, Security, TestUtils, XMLHelper, jQuery) {
 	/*eslint no-sparse-arrays: 0,
 		"max-len": ["error", {"code": 100, "ignorePattern": "\\{meta>"}] */
 	"use strict";
@@ -22527,6 +22528,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// Selection on contexts which are deleted and restored (JIRA: CPOUI5ODATAV4-1943).
 	// Selection is cleared on successful deletion (JIRA: CPOUI5ODATAV4-2053).
+	// "selectionChanged" event on successful deletion (SNOW: CS20260012637083)
 	// Data binding for selection (JIRA: CPOUI5ODATAV4-1944).
 	// $selectionCount, ODLB#getSelectionCount (JIRA: CPOUI5ODATAV4-1945)
 	[
@@ -22546,6 +22548,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				oPromise2,
 				oPromise4,
 				bReset = oFixture.resetViaModel || oFixture.resetViaBinding,
+				bSelectionChanged,
 				sView = '\
 <Text id="count" text="{$count}"/>\
 <Text id="selectionCount" text="{$selectionCount}"/>\
@@ -22703,7 +22706,27 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}).then(function () {
 				assert.strictEqual(oBinding.getLength(), 18);
 
+				that.expectChange("selectionCount", "1");
+
+				oContext3.setSelected(true);
+
+				return that.waitForChanges(assert, "select before direct delete");
+			}).then(function () {
+				oBinding.attachSelectionChanged((oEvent) => { // Note: async
+					if (oEvent.getParameter("context") !== oContext3) {
+						return; // not our concern here
+					}
+					assert.notOk(bSelectionChanged, "no duplicate calls!");
+					bSelectionChanged = true;
+					assert.strictEqual(oContext3.toString(),
+						"/SalesOrderList('3')[-9007199254740991;deleted]",
+						"Context#toString: deleted, VIRTUAL iIndex");
+					assert.strictEqual(oContext3.isDeleted(), true);
+					assert.strictEqual(oContext3.getIndex(), -9007199254740991);
+					checkSelected(assert, oContext3, undefined, "SNOW: CS20260012637083");
+				});
 				that.expectChange("count", "17")
+					.expectChange("selectionCount", "0")
 					.expectRequest("DELETE SalesOrderList('3')")
 					.expectRequest("SalesOrderList?$count=true&$select=SalesOrderID"
 						+ "&$filter=not (SalesOrderID eq '2' or SalesOrderID eq '3'"
@@ -22716,9 +22739,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 				return Promise.all([
 					oContext3.delete("$auto"),
+					assert.notOk(bSelectionChanged, "async!"),
 					that.waitForChanges(assert, "direct delete succeeded")
 				]);
 			}).then(function () {
+				assert.ok(bSelectionChanged, "SNOW: CS20260012637083");
 				assert.strictEqual(oBinding.getLength(), 17);
 
 				if (oFixture.success) {
@@ -69110,8 +69135,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-1264
 	// JIRA: CPOUI5ODATAV4-1380 (allow SubmitMode.API)
 	//
-	// Selection on inactive context which is then deleted and destroyed (JIRA: CPOUI5ODATAV4-1943).
-	// Selection is cleared on successful deletion (JIRA: CPOUI5ODATAV4-2053).
+	// Selection on inactive context which is then deleted and destroyed (JIRA: CPOUI5ODATAV4-1943)
+	// Selection is cleared on successful deletion (JIRA: CPOUI5ODATAV4-2053)
+	// "selectionChanged" event on successful deletion (SNOW: CS20260012637083)
 	// $selectionCount, ODLB#getSelectionCount (JIRA: CPOUI5ODATAV4-1945)
 	//
 	// Show that a persisted creation row does not loose its special handling with refresh single.
@@ -69272,16 +69298,26 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				oContext2.setSelected(true);
 
 				assert.strictEqual(oBinding.getSelectionCount(), 1);
+
+				let bSelectionChanged;
+				oBinding.attachSelectionChanged((oEvent) => { // Note: sync
+					assert.notOk(bSelectionChanged, "no duplicate calls!");
+					bSelectionChanged = true;
+					assert.strictEqual(oEvent.getParameter("context"), oContext2);
+					assert.strictEqual(oBinding.getSelectionCount(), 0);
+					assert.strictEqual(normalizeUID(oContext2.toString()),
+						"/SalesOrderList('42')/SO_2_SOITEM($uid=...)[-9007199254740991;deleted]",
+						"Context#toString: deleted, VIRTUAL iIndex");
+					assert.strictEqual(oContext2.isDeleted(), true);
+					//TODO: assert.strictEqual(oContext2.getIndex(), -9007199254740991);
+					checkSelected(assert, oContext2, undefined, "JIRA: CPOUI5ODATAV4-2053");
+				});
 				that.expectChange("selectionCount", "0");
 
 				// code under test
 				oContext2.delete();
 
-				assert.strictEqual(oBinding.getSelectionCount(), 0);
-				assert.strictEqual(normalizeUID(oContext2.toString()),
-					"/SalesOrderList('42')/SO_2_SOITEM($uid=...)[-9007199254740991;deleted]",
-					"Context#toString: deleted");
-				checkSelected(assert, oContext2, undefined, "JIRA: CPOUI5ODATAV4-2053");
+				assert.ok(bSelectionChanged, "SNOW: CS20260012637083");
 
 				return Promise.all([
 					checkCanceled(assert, oContext2.created()),
@@ -75763,6 +75799,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-2053
 	//
 	// Data binding for selection (JIRA: CPOUI5ODATAV4-1944).
+	// "selectionChanged" event on successful deletion (SNOW: CS20260012637083)
 	// $selectionCount, ODLB#getSelectionCount (JIRA: CPOUI5ODATAV4-1945)
 	[
 		"changeParameters", "filter", "refresh", "resume", "sideEffectsRefresh", "sort"
@@ -75780,6 +75817,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					Team_Id : "NEW"
 				},
 				oModel = this.createTeaBusiModel({autoExpandSelect : true}),
+				bSelectionChanged,
 				sView = `
 	<Text id="count" text="{$count}"/>\
 	<Text id="selectionCount" text="{$selectionCount}"/>\
@@ -76060,6 +76098,18 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				assert.strictEqual(aAllContexts[1], oContext_01);
 				assert.strictEqual(aAllContexts[2], oContext_03);
 
+				oBinding.attachSelectionChanged((oEvent) => { // Note: async
+					assert.notOk(bSelectionChanged, "no duplicate calls!");
+					bSelectionChanged = true;
+					assert.strictEqual(oEvent.getParameter("context"), oContext_03);
+					assert.strictEqual(oContext_03.toString(),
+						"/TEAMS('TEAM_03')[-9007199254740991;deleted]",
+						"Context#toString: deleted, VIRTUAL iIndex");
+					assert.strictEqual(oContext_03.isDeleted(), true);
+					assert.strictEqual(oContext_03.getIndex(), -9007199254740991);
+					checkSelected(assert, oContext_03, undefined, "SNOW: CS20260012637083");
+				});
+
 				// Note: method should not make a difference anymore at this point
 				if (sMethod === "refresh") {
 					that.expectRequest("TEAMS?$select=MEMBER_COUNT,Name,Team_Id"
@@ -76070,6 +76120,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 					return Promise.all([
 						oContext_03.requestRefresh("$auto", /*bAllowRemoval*/true), // code under test
+						assert.notOk(bSelectionChanged, "async!"),
 						that.waitForChanges(assert,
 							"refresh w/ removal of selected context outside collection")
 					]);
@@ -76084,11 +76135,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 				return Promise.all([
 					oModel.delete("/TEAMS('TEAM_03')"), // code under test
+					assert.notOk(bSelectionChanged, "async!"),
 					that.waitForChanges(assert, "delete selected context outside collection")
 				]);
 			}).then(function () {
 				var aAllContexts = oBinding.getAllCurrentContexts();
 
+				assert.ok(bSelectionChanged, "SNOW: CS20260012637083");
 				assert.strictEqual(oBinding.getSelectionCount(), 2);
 				assert.strictEqual(aAllContexts.length, 2);
 				assert.strictEqual(aAllContexts[0], oCreatedContext);
@@ -85678,6 +85731,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				+ (bAction ? "Ac" : "Fu") + "DownloadDocument";
 			const oBinding = oModel.bindContext("/" + sPath + "(...)");
 
+			const mHeaders = {
+				Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true",
+				"Accept-Language" : "en-US",
+				"Content-Type" : "application/json;charset=UTF-8;IEEE754Compatible=true",
+				"OData-MaxVersion" : "4.0",
+				"OData-Version" : "4.0",
+				"X-CSRF-Token" : "Fetch"
+			};
 			const oStreamResponse0 = {
 				body : "~body0~",
 				headers : "~headers0~",
@@ -85689,20 +85750,34 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				foo : "bar" // must not be part of the result
 			};
 
-			const oRequestorMock = this.mock(oModel.oRequestor);
+			const oRequestorMock = this.mock(_Requestor);
 			if (bAction) {
 				oRequestorMock.expects("fetch")
-					.withExactArgs("POST", sPath, {format : "PDF", locale : "en-US"})
+					.withExactArgs(sTeaBusi + sPath, {
+						headers : mHeaders,
+						method : "POST",
+						body : JSON.stringify({format : "PDF", locale : "en-US"})
+					})
 					.resolves(oStreamResponse0);
 				oRequestorMock.expects("fetch")
-					.withExactArgs("POST", sPath, {format : "JSON", locale : "de"})
+					.withExactArgs(sTeaBusi + sPath, {
+						headers : mHeaders,
+						method : "POST",
+						body : JSON.stringify({format : "JSON", locale : "de"})
+					})
 					.resolves(oStreamResponse1);
 			} else {
 				oRequestorMock.expects("fetch")
-					.withExactArgs("GET", sPath + "(format='PDF',locale='en-US')", undefined)
+					.withExactArgs(sTeaBusi + sPath + "(format='PDF',locale='en-US')", {
+						headers : mHeaders,
+						method : "GET"
+					})
 					.resolves(oStreamResponse0);
 				oRequestorMock.expects("fetch")
-					.withExactArgs("GET", sPath + "(format='JSON',locale='de')", undefined)
+					.withExactArgs(sTeaBusi + sPath + "(format='JSON',locale='de')", {
+						headers : mHeaders,
+						method : "GET"
+					})
 					.resolves(oStreamResponse1);
 			}
 

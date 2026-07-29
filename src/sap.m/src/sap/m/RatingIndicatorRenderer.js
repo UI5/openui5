@@ -195,46 +195,24 @@ sap.ui.define(
 
 		RatingIndicatorRenderer.renderIcon = function(iconType, oRm, oControl, iValue) {
 			var sIconURI = this.getIconURI(iconType, oControl, iValue),
-				sTagName = this.getIconTag(sIconURI),
-				bIsIconURI = IconPool.isIconURI(sIconURI),
 				sSize = this._fIconSize + sIconSizeMeasure;
-
-			if (sTagName === "img") {
-				oRm.voidStart(sTagName);
-			} else {
-				oRm.openStart(sTagName);
-			}
 
 			if (iconType === "UNSELECTED" && !oControl.getEditable()) {
 				iconType = "READONLY";
 			}
 
-			oRm.class("sapUiIcon");
-			oRm.class(this.getIconClass(iconType));
+			const aClasses = [this.getIconClass(iconType)];
+
 
 			if (iValue >= Math.ceil(oControl.getValue())) {
-				oRm.class("sapMRIunratedIcon");
+				aClasses.push("sapMRIunratedIcon");
 			}
 
-			oRm.style("width", sSize);
-			oRm.style("height", sSize);
-			oRm.style("line-height", sSize);
-			oRm.style("font-size", sSize);
+			const sStyle = `width: ${sSize}; height: ${sSize};`;
 
-			if (!bIsIconURI) {
-				oRm.attr("src", sIconURI);
-			}
-
-			if (sTagName === "img") {
-				oRm.voidEnd();
-			} else {
-				oRm.openEnd();
-
-				if (bIsIconURI) {
-					oRm.text(IconPool.getIconInfo(sIconURI).content);
-				}
-				oRm.close(sTagName);
-			}
+			oRm.icon(sIconURI, aClasses, {
+				style: sStyle
+			});
 		};
 
 		RatingIndicatorRenderer.getIconClass = function(iconType) {

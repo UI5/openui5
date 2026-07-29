@@ -98,8 +98,8 @@ sap.ui.define([
 
 	QUnit.test("MarkersOrder", function(assert) {
 		var markers = jQuery("#" + listItemId + " .sapUiIcon");
-		assert.equal(markers.eq(0).attr("data-sap-ui-icon-content").charCodeAt(0), 57445, "Favorite marker should be rendered first");
-		assert.equal(markers.eq(1).attr("data-sap-ui-icon-content").charCodeAt(0), 57514, "Flag marker should be rendered second");
+		assert.equal(Element.closestTo(markers.eq(0)[0]).getSrc(), "sap-icon://favorite", "Favorite marker should be rendered first");
+		assert.equal(Element.closestTo(markers.eq(1)[0]).getSrc(), "sap-icon://flag", "Flag marker should be rendered second");
 	});
 
 	QUnit.test("FirstStatusRendered", function(assert) {

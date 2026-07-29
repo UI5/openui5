@@ -610,13 +610,13 @@ sap.ui.define([
 
 	QUnit.test("data binding update", async function(assert) {
 		const oTree = this.oTree;
-		assert.ok(oTree.getItems()[0].$().find(".sapMTreeItemBaseExpander")[0].hasAttribute("data-sap-ui-icon-content"), "initial binding context.");
+		assert.equal(Element.closestTo(oTree.getItems()[0].$().find(".sapMTreeItemBaseExpander")[0]).getSrc(), "sap-icon://navigation-right-arrow", "initial binding context.");
 
 		oTree.getModel().setProperty("/", oData2);
 		await nextUIUpdate();
 
 		assert.ok(oTree.getItems()[0].$().hasClass("sapMTreeItemBaseLeaf"), "data changed");
-		assert.ok(oTree.getItems()[0].$().find(".sapMTreeItemBaseExpander")[0].hasAttribute("data-sap-ui-icon-content"), "icon has correct source.");
+		assert.equal(Element.closestTo(oTree.getItems()[0].$().find(".sapMTreeItemBaseExpander")[0]).getSrc(), "sap-icon://navigation-right-arrow", "icon has correct source.");
 	});
 
 	QUnit.test("context length", function(assert) {

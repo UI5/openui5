@@ -8,8 +8,9 @@ sap.ui.define([
 	"sap/ui/core/format/DateFormat",
 	"sap/ui/model/odata/ODataUtils",
 	"sap/ui/model/odata/v4/lib/_Batch",
-	"sap/ui/model/odata/v4/lib/_Helper"
-], function (CalendarType, DateFormat, BaseODataUtils, _Batch, _Helper) {
+	"sap/ui/model/odata/v4/lib/_Helper",
+	"sap/ui/model/odata/v4/lib/_Parser"
+], function (CalendarType, DateFormat, BaseODataUtils, _Batch, _Helper, _Parser) {
 	"use strict";
 
 	// see https://docs.oasis-open.org/odata/odata/v4.01/os/abnf/
@@ -249,6 +250,59 @@ sap.ui.define([
 				}
 				return oTimeOfDay;
 			},
+
+			/**
+			 * Parses a system query option "$select" or "$expand" into an object representation.
+			 *
+			 * The value for "$select" is an array of strings.
+			 *
+			 * The value for "$expand" is an object with the path as key and the options object as
+			 * value. Each option again becomes a property with the option name as key and the
+			 * option value as value. If there are no options, the value for the path is
+			 * <code>null</code>.
+			 *
+			 * The value for all other options is the string passed to them.
+			 *
+			 * <b>Example:</b>
+			 *
+			 * <pre>
+			 * sOption = "$expand=SO_2_BP,SO_2_SOITEM($expand=SOITEM_2_PRODUCT($expand=PRODUCT_2_BP"
+			 *     + ";$select=ID,Name);$select=*;$count=true;$orderby=Name desc)"
+			 * </pre>
+			 * is converted to
+			 * <pre>
+			 * {
+			 *     "$expand" : {
+			 *         "SO_2_BP" : null,
+			 *         "SO_2_SOITEM" : {
+			 *             "$count" : "true",
+			 *             "$expand" : {
+			 *                 "SOITEM_2_PRODUCT" : {
+			 *                     "$expand" : {
+			 *                         "PRODUCT_2_BP" : null
+			 *                     },
+			 *                     "$select" : ["ID", "Name"]
+			 *                 }
+			 *             },
+			 *             "$orderby" : "Name desc",
+			 *             "$select" : ["*"]
+			 *         }
+			 *     }
+			 * }
+			 * </pre>
+			 *
+			 * @param {string} sOption
+			 *   The option string
+			 * @returns {object}
+			 *   The option as an object with the option name as key and the parsed value as value
+			 * @throws {SyntaxError}
+			 *   If the string cannot be parsed
+			 *
+			 * @function
+			 * @public
+			 * @since 1.152.0
+			 */
+			parseSystemQueryOption : _Parser.parseSystemQueryOption,
 
 			/**
 			 * Serializes an array of requests to an object containing the batch request body and

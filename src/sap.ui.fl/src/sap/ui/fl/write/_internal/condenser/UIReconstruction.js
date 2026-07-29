@@ -75,7 +75,21 @@ sap.ui.define([
 				const bElementPartOfInitialOrTargetUi = aTargetElementIds.indexOf(oCondenserInfo.affectedControl) > -1
 					|| aSourceElementIds.indexOf(oCondenserInfo.affectedControl) > -1;
 
-				if (sAggregationName === oCondenserInfo.targetAggregation && bElementPartOfInitialOrTargetUi) {
+				// A 'create' change only acts on its own target container during the simulation.
+				// The affected control might also appear in the target UI of a different container (e.g. because a
+				// subsequent move relocates it there). In that case the create must not be grouped into the foreign
+				// container, otherwise it distorts the ordering during swapChanges and dependent changes might be
+				// sorted before the change that creates their container.
+				const bCreateInForeignContainer = (
+					oCondenserInfo.classification === CondenserClassification.Create
+					&& oCondenserInfo.targetContainer !== sContainerKey
+				);
+
+				if (
+					sAggregationName === oCondenserInfo.targetAggregation
+					&& bElementPartOfInitialOrTargetUi
+					&& !bCreateInForeignContainer
+				) {
 					mContainers[sContainerKey] ||= {};
 					const mAggregations = mContainers[sContainerKey];
 					mAggregations[sAggregationName] ||= [];

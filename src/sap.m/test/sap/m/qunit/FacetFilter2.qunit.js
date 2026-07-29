@@ -235,13 +235,14 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		assert.ok(getAddFacetCtrl(oFF).getDomRef(), "Add button should be displayed");
-		assert.equal(getAddFacetCtrl(oFF).$().find(".sapUiIcon").attr("data-sap-ui-icon-content").charCodeAt(0), 57430,
-				"The add icon should be the add-filter icon font.");
+
+		assert.equal(Element.closestTo(getAddFacetCtrl(oFF).$()[0]).getIcon(), "sap-icon://add-filter",
+			"The add icon should be the add-filter icon font.");
 
 		var oPopover = oFF._getPopover();
 		oPopover.attachEventOnce("afterOpen", function(oEvent) {
 			assert.ok(getRemoveIconCtrl(oFF, 0).getDomRef(), "Facet filter remove icon should be rendered");
-			assert.equal(getRemoveIconCtrl(oFF, 0).$().attr("data-sap-ui-icon-content").charCodeAt(0), 57406,
+			assert.equal(Element.closestTo(getRemoveIconCtrl(oFF, 0).$()[0]).getSrc(), "sap-icon://decline",
 					"The remove icon should be the decline icon font.");
 			assert.ok(getRemoveIconCtrl(oFF, 0).$().hasClass("sapMFFLVisibleRemoveIcon"), "The remove icon should be displayed.");
 
@@ -290,16 +291,16 @@ sap.ui.define([
 
 				// Personalization, add facet icon
 				assert.ok(getAddFacetCtrl(oFF).getDomRef(), "The add facet button should be rendered");
-				assert.equal(getAddFacetCtrl(oFF).$().find(".sapUiIcon").attr("data-sap-ui-icon-content").charCodeAt(0), 57430,
+				assert.equal(Element.closestTo(getAddFacetCtrl(oFF).$()[0]).getIcon(), "sap-icon://add-filter",
 						"The add icon should be the add-filter icon font.");
 
 				// Personalization, remove facet icons
 				assert.ok(getRemoveIconCtrl(oFF, 0).getDomRef(), "Facet filter remove icon should be rendered");
 				assert.ok(getRemoveIconCtrl(oFF, 1).getDomRef(), "Facet filter remove icon should be rendered");
-				assert.equal(getRemoveIconCtrl(oFF, 0).$().attr("data-sap-ui-icon-content").charCodeAt(0), 57406,
+				assert.equal(Element.closestTo(getRemoveIconCtrl(oFF, 0).$()[0]).getSrc(), "sap-icon://decline",
 						"The remove icon should be the decline icon font.");
 				assert.ok(getRemoveIconCtrl(oFF, 0).$().hasClass("sapMFFLHiddenRemoveIcon"), "The remove icon should be hidden.");
-				assert.equal(getRemoveIconCtrl(oFF, 1).$().attr("data-sap-ui-icon-content").charCodeAt(0), 57406,
+				assert.equal(Element.closestTo(getRemoveIconCtrl(oFF, 1).$()[0]).getSrc(), "sap-icon://decline",
 						"The remove icon should be the decline icon font.");
 				assert.ok(getRemoveIconCtrl(oFF, 1).$().hasClass("sapMFFLHiddenRemoveIcon"), "The remove icon should be hidden.");
 			}

@@ -12,6 +12,13 @@ html, body { height: 100%; }
 .fakeButton:hover {
 	background: #f5f5f5;
 }
+.fakeButton:focus,
+.fakeText:focus,
+.fakeLink:focus,
+.fakeMultiTargetItem:focus {
+	outline: 2px solid #000;
+	outline-offset: -2px;
+}
 .fakeText {
 	color: inherit;
 	margin-right: 0.75rem;
@@ -19,4 +26,23 @@ html, body { height: 100%; }
 .fakeLink {
 	color: #0a6ed1;
 	margin-right: 0.75rem;
+}
+.fakeMultiTarget {
+	display: inline-flex;
+	border: 1px solid #b3b3b3;
+	border-radius: 0.25rem;
+	padding: 0.25rem;
+}
+.fakeMultiTargetItem {
+	border: 1px solid #b3b3b3;
+	margin: 0.125rem;
+	padding: 0.25rem 0.75rem;
+	cursor: default;
+}
+/* Distinguish the sample's activation/long-press toast from the tooltip. */
+.sapMMessageToast {
+	background: #e5f0fa !important;
+	color: #0a3d6e !important;
+	border: 1px solid #0070f2 !important;
+	box-shadow: none;
 }
