@@ -22506,6 +22506,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// Selection on contexts which are deleted and restored (JIRA: CPOUI5ODATAV4-1943).
 	// Selection is cleared on successful deletion (JIRA: CPOUI5ODATAV4-2053).
+	// "selectionChanged" event on successful deletion (SNOW: CS20260012637083)
 	// Data binding for selection (JIRA: CPOUI5ODATAV4-1944).
 	// $selectionCount, ODLB#getSelectionCount (JIRA: CPOUI5ODATAV4-1945)
 [
@@ -22525,6 +22526,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oPromise2,
 			oPromise4,
 			bReset = oFixture.resetViaModel || oFixture.resetViaBinding,
+			bSelectionChanged,
 			sView = '\
 <Text id="count" text="{$count}"/>\
 <Text id="selectionCount" text="{$selectionCount}"/>\
@@ -22688,7 +22690,27 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		}).then(function () {
 			assert.strictEqual(oBinding.getLength(), 18);
 
+			that.expectChange("selectionCount", "1");
+
+			oContext3.setSelected(true);
+
+			return that.waitForChanges(assert, "select before direct delete");
+		}).then(function () {
+			oBinding.attachSelectionChanged((oEvent) => { // Note: async
+				if (oEvent.getParameter("context") !== oContext3) {
+					return; // not our concern here
+				}
+				assert.notOk(bSelectionChanged, "no duplicate calls!");
+				bSelectionChanged = true;
+				assert.strictEqual(oContext3.toString(),
+					"/SalesOrderList('3')[-9007199254740991;deleted]",
+					"Context#toString: deleted, VIRTUAL iIndex");
+				assert.strictEqual(oContext3.isDeleted(), true);
+				assert.strictEqual(oContext3.getIndex(), -9007199254740991);
+				checkSelected(assert, oContext3, undefined, "SNOW: CS20260012637083");
+			});
 			that.expectChange("count", "17")
+				.expectChange("selectionCount", "0")
 				.expectRequest("DELETE SalesOrderList('3')")
 				.expectRequest("SalesOrderList?$count=true&$select=SalesOrderID"
 					+ "&$filter=not (SalesOrderID eq '2' or SalesOrderID eq '3'"
@@ -22701,9 +22723,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			return Promise.all([
 				oContext3.delete("$auto"),
+				assert.notOk(bSelectionChanged, "async!"),
 				that.waitForChanges(assert, "direct delete succeeded")
 			]);
 		}).then(function () {
+			assert.ok(bSelectionChanged, "SNOW: CS20260012637083");
 			assert.strictEqual(oBinding.getLength(), 17);
 
 			if (oFixture.success) {
@@ -68601,8 +68625,9 @@ make root = ${bMakeRoot}`;
 	// JIRA: CPOUI5ODATAV4-1264
 	// JIRA: CPOUI5ODATAV4-1380 (allow SubmitMode.API)
 	//
-	// Selection on inactive context which is then deleted and destroyed (JIRA: CPOUI5ODATAV4-1943).
-	// Selection is cleared on successful deletion (JIRA: CPOUI5ODATAV4-2053).
+	// Selection on inactive context which is then deleted and destroyed (JIRA: CPOUI5ODATAV4-1943)
+	// Selection is cleared on successful deletion (JIRA: CPOUI5ODATAV4-2053)
+	// "selectionChanged" event on successful deletion (SNOW: CS20260012637083)
 	// $selectionCount, ODLB#getSelectionCount (JIRA: CPOUI5ODATAV4-1945)
 	//
 	// Show that a persisted creation row does not loose its special handling with refresh single.
@@ -68769,16 +68794,26 @@ make root = ${bMakeRoot}`;
 			oContext2.setSelected(true);
 
 			assert.strictEqual(oBinding.getSelectionCount(), 1);
+
+			let bSelectionChanged;
+			oBinding.attachSelectionChanged((oEvent) => { // Note: sync
+				assert.notOk(bSelectionChanged, "no duplicate calls!");
+				bSelectionChanged = true;
+				assert.strictEqual(oEvent.getParameter("context"), oContext2);
+				assert.strictEqual(oBinding.getSelectionCount(), 0);
+				assert.strictEqual(normalizeUID(oContext2.toString()),
+					"/SalesOrderList('42')/SO_2_SOITEM($uid=...)[-9007199254740991;deleted]",
+					"Context#toString: deleted, VIRTUAL iIndex");
+				assert.strictEqual(oContext2.isDeleted(), true);
+				//TODO: assert.strictEqual(oContext2.getIndex(), -9007199254740991);
+				checkSelected(assert, oContext2, undefined, "JIRA: CPOUI5ODATAV4-2053");
+			});
 			that.expectChange("selectionCount", "0");
 
 			// code under test
 			oContext2.delete();
 
-			assert.strictEqual(oBinding.getSelectionCount(), 0);
-			assert.strictEqual(normalizeUID(oContext2.toString()),
-				"/SalesOrderList('42')/SO_2_SOITEM($uid=...)[-9007199254740991;deleted]",
-				"Context#toString: deleted");
-			checkSelected(assert, oContext2, undefined, "JIRA: CPOUI5ODATAV4-2053");
+			assert.ok(bSelectionChanged, "SNOW: CS20260012637083");
 
 			return Promise.all([
 				checkCanceled(assert, oContext2.created()),
@@ -75085,6 +75120,7 @@ make root = ${bMakeRoot}`;
 	// JIRA: CPOUI5ODATAV4-2053
 	//
 	// Data binding for selection (JIRA: CPOUI5ODATAV4-1944).
+	// "selectionChanged" event on successful deletion (SNOW: CS20260012637083)
 	// $selectionCount, ODLB#getSelectionCount (JIRA: CPOUI5ODATAV4-1945)
 [
 	"changeParameters", "filter", "refresh", "resume", "sideEffectsRefresh", "sort"
@@ -75102,6 +75138,7 @@ make root = ${bMakeRoot}`;
 				Team_Id : "NEW"
 			},
 			oModel = this.createTeaBusiModel({autoExpandSelect : true}),
+			bSelectionChanged,
 			sView = `
 <Text id="count" text="{$count}"/>\
 <Text id="selectionCount" text="{$selectionCount}"/>\
@@ -75382,6 +75419,18 @@ make root = ${bMakeRoot}`;
 			assert.strictEqual(aAllContexts[1], oContext_01);
 			assert.strictEqual(aAllContexts[2], oContext_03);
 
+			oBinding.attachSelectionChanged((oEvent) => { // Note: async
+				assert.notOk(bSelectionChanged, "no duplicate calls!");
+				bSelectionChanged = true;
+				assert.strictEqual(oEvent.getParameter("context"), oContext_03);
+				assert.strictEqual(oContext_03.toString(),
+					"/TEAMS('TEAM_03')[-9007199254740991;deleted]",
+					"Context#toString: deleted, VIRTUAL iIndex");
+				assert.strictEqual(oContext_03.isDeleted(), true);
+				assert.strictEqual(oContext_03.getIndex(), -9007199254740991);
+				checkSelected(assert, oContext_03, undefined, "SNOW: CS20260012637083");
+			});
+
 			// Note: method should not make a difference anymore at this point
 			if (sMethod === "refresh") {
 				that.expectRequest("TEAMS?$select=MEMBER_COUNT,Name,Team_Id"
@@ -75392,6 +75441,7 @@ make root = ${bMakeRoot}`;
 
 				return Promise.all([
 					oContext_03.requestRefresh("$auto", /*bAllowRemoval*/true), // code under test
+					assert.notOk(bSelectionChanged, "async!"),
 					that.waitForChanges(assert,
 						"refresh w/ removal of selected context outside collection")
 				]);
@@ -75406,11 +75456,13 @@ make root = ${bMakeRoot}`;
 
 			return Promise.all([
 				oModel.delete("/TEAMS('TEAM_03')"), // code under test
+				assert.notOk(bSelectionChanged, "async!"),
 				that.waitForChanges(assert, "delete selected context outside collection")
 			]);
 		}).then(function () {
 			var aAllContexts = oBinding.getAllCurrentContexts();
 
+			assert.ok(bSelectionChanged, "SNOW: CS20260012637083");
 			assert.strictEqual(oBinding.getSelectionCount(), 2);
 			assert.strictEqual(aAllContexts.length, 2);
 			assert.strictEqual(aAllContexts[0], oCreatedContext);
