@@ -14,7 +14,6 @@ sap.ui.define([
 	"sap/m/Avatar",
 	"sap/m/AvatarShape",
 	"sap/m/AvatarSize",
-	"sap/ui/core/Theming",
 	"sap/ui/util/openWindow",
 	"sap/ui/core/Lib",
 	"sap/ui/core/InvisibleText",
@@ -32,7 +31,6 @@ function(
 	Avatar,
 	AvatarShape,
 	AvatarSize,
-	Theming,
 	openWindow,
 	CoreLib,
 	InvisibleText,
@@ -59,7 +57,7 @@ function(
 	 * The control provides a set of properties for text, sender information, time stamp.
 	 * Beginning with release 1.23 the new feature expand / collapse was introduced, which uses the property maxCharacters.
 	 * Beginning with release 1.44, sap.m.FormattedText was introduced which allows html formatted text to be displayed.
-	 * The <code>actions</code> aggregation must contain instances of {@link sap.m.FeedListItemAction} in order to display them in the action sheet.
+	 * The <code>actions</code> aggregation must contain instances of {@link sap.m.FeedListItemAction} in order to display them in a menu.
 	 * @extends sap.m.ListItemBase
 	 *
 	 * @author SAP SE
@@ -198,7 +196,7 @@ function(
 				/**
 				 * Hidden aggregation that contains the actions.
 				 */
-				_actionSheet: {type: "sap.m.ActionSheet", multiple: false, visibility: "hidden"},
+				_menu: {type: "sap.m.Menu", multiple: false, visibility: "hidden"},
 
 				/**
 				 * Hidden aggregation that displays the action button.
@@ -297,65 +295,41 @@ function(
 	 * @private
 	 */
 	FeedListItem.prototype._onActionButtonPress = function () {
-		sap.ui.require(["sap/m/ActionSheet"], this._openActionSheet.bind(this));
+		sap.ui.require(["sap/m/Menu", "sap/m/MenuItem"], this._openMenu.bind(this));
 	};
 
 	/**
 	 *
-	 * @param {function} ActionSheet The constructor function of sap.m.ActionSheet
+	 * @param {function} Menu The constructor function of sap.m.Menu
+	 * @param {function} MenuItem The constructor function of sap.m.MenuItem
 	 * @private
 	 */
-	FeedListItem.prototype._openActionSheet = function(ActionSheet) {
-		var oActionSheet = this.getAggregation("_actionSheet");
+	FeedListItem.prototype._openMenu = function(Menu, MenuItem) {
+		var oMenu = this.getAggregation("_menu");
 		var aActions = this.getActions();
 		var oAction;
 
-		if (!(oActionSheet && oActionSheet instanceof ActionSheet)) {
-			oActionSheet = new ActionSheet({
-				id: this.getId() + "-actionSheet",
-				beforeOpen: [ this._onBeforeOpenActionSheet, this ]
+		if (!(oMenu && oMenu instanceof Menu)) {
+			oMenu = new Menu({
+				id: this.getId() + "-actionMenu"
 			});
-			this.setAggregation("_actionSheet", oActionSheet, true);
+			this.setAggregation("_menu", oMenu, true);
 		}
 
-		oActionSheet.destroyAggregation("buttons", true);
+		oMenu.destroyItems();
 		for (var i = 0; i < aActions.length; i++) {
 			oAction = aActions[i];
-			oActionSheet.addButton(new Button({
+			oMenu.addItem(new MenuItem({
 				icon: oAction.getIcon(),
 				text: oAction.getText(),
 				visible: oAction.getVisible(),
 				enabled: oAction.getEnabled(),
+				key: oAction.getKey(),
 				press: oAction.firePress.bind(oAction, { "item": this })
 			}));
 		}
 
-		oActionSheet.openBy(this.getAggregation("_actionButton"));
-	};
-
-	/**
-	 * Sets the contrast class on the ActionSheet's Popover based on the current theme.
-	 *
-	 * @param {sap.ui.base.Event} event The 'beforeOpen' event
-	 * @private
-	 */
-	FeedListItem.prototype._onBeforeOpenActionSheet = function(event) {
-		var oActionSheetPopover, sTheme;
-
-		// On phone there is no need to overstyle the ActionSheet's Popover with a contrast class
-		if (Device.system.phone) {
-			return;
-		}
-
-		sTheme = Theming.getTheme();
-		oActionSheetPopover = event.getSource().getParent();
-		oActionSheetPopover.removeStyleClass("sapContrast sapContrastPlus");
-
-		if (sTheme === "sap_belize") {
-			oActionSheetPopover.addStyleClass("sapContrast");
-		} else if (sTheme === "sap_belize_plus") {
-			oActionSheetPopover.addStyleClass("sapContrastPlus");
-		}
+		oMenu.openBy(this.getAggregation("_actionButton"));
 	};
 
 	FeedListItem.prototype.invalidate = function() {

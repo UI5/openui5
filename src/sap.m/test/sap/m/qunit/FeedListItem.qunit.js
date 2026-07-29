@@ -12,7 +12,8 @@ sap.ui.define([
 	"sap/m/Button",
 	"sap/m/Popover",
 	"sap/m/Bar",
-	"sap/m/ActionSheet",
+	"sap/m/Menu",
+	"sap/m/MenuItem",
 	"sap/m/App",
 	"sap/m/Page",
 	"sap/ui/Device",
@@ -24,7 +25,7 @@ sap.ui.define([
 	"sap/ui/core/Core",
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/m/AvatarSize"
-], function(Theming, qutils, jQuery, FeedListItem, FeedListItemAction, ListItemAction, List, StandardListItem, JSONModel, Button, Popover, Bar, ActionSheet, App, Page, Device, FormattedText, IconPool, library, Log, KeyCodes, oCore, nextUIUpdate, AvatarSize) {
+], function(Theming, qutils, jQuery, FeedListItem, FeedListItemAction, ListItemAction, List, StandardListItem, JSONModel, Button, Popover, Bar, Menu, MenuItem, App, Page, Device, FormattedText, IconPool, library, Log, KeyCodes, oCore, nextUIUpdate, AvatarSize) {
 	"use strict";
 
 	// shortcut for sap.m.PlacementType
@@ -952,7 +953,7 @@ sap.ui.define([
 	QUnit.test("Action aggregation and hidden aggregations", function (assert) {
 		assert.equal(this.oFeedListItem.getActions().length, 2, "There are two actions in the aggregation.");
 		assert.ok(this.oFeedListItem.getAggregation("_actionButton") instanceof Button, "Hidden aggregation _actionButton is added");
-		assert.notOk(this.oFeedListItem.getAggregation("_actionSheet") instanceof ActionSheet, "Hidden aggregation _actionSheet not added");
+		assert.notOk(this.oFeedListItem.getAggregation("_menu") instanceof Menu, "Hidden aggregation _menu not added yet (only created on first press)");
 	});
 
 	QUnit.test("Shows action button", function (assert) {
@@ -1058,25 +1059,25 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Lazy load ActionSheet and call method '_openActionSheet'", function (assert) {
+	QUnit.test("Lazy load Menu and MenuItem and call method '_openMenu'", function (assert) {
 		// Arrange
-		this.oFeedListItem._openActionSheet = sinon.stub();
+		this.oFeedListItem._openMenu = sinon.stub();
 		var oRequireStub = sinon.stub(sap.ui, "require").callsFake(function () {
-			this.oFeedListItem._openActionSheet();
+			this.oFeedListItem._openMenu();
 		}.bind(this));
 
 		// Act
 		this.oFeedListItem._onActionButtonPress();
 
 		// Assert
-		assert.ok(oRequireStub.calledWith(["sap/m/ActionSheet"]), "ActionSheet has been required.");
-		assert.ok(this.oFeedListItem._openActionSheet.calledOnce, "The method has been called once.");
+		assert.ok(oRequireStub.calledWith(["sap/m/Menu", "sap/m/MenuItem"]), "Menu and MenuItem have been required.");
+		assert.ok(this.oFeedListItem._openMenu.calledOnce, "The method has been called once.");
 
 		// Cleanup
 		oRequireStub.restore();
 	});
 
-	QUnit.module("Method '_openActionSheet'", {
+	QUnit.module("Method '_openMenu'", {
 		beforeEach: function () {
 			this.oFeedListItem = new FeedListItem();
 		},
@@ -1085,58 +1086,40 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Creates an instance of type sap.m.ActionSheet", function (assert) {
+	QUnit.test("Creates an instance of type sap.m.Menu", function (assert) {
 		// Arrange
-		var oOpenByStub = sinon.stub(ActionSheet.prototype, "openBy");
+		var oOpenByStub = sinon.stub(Menu.prototype, "openBy");
 
 		// Act
-		this.oFeedListItem._openActionSheet(ActionSheet);
-		var oActionSheet = this.oFeedListItem.getAggregation("_actionSheet");
+		this.oFeedListItem._openMenu(Menu, MenuItem);
+		var oMenu = this.oFeedListItem.getAggregation("_menu");
 
 		// Assert
-		assert.ok(oActionSheet instanceof ActionSheet, "ActionSheet was created.");
-		assert.ok(oActionSheet.hasListeners("beforeOpen"), "Event listeners for beforeOpen have been attached.");
+		assert.ok(oMenu instanceof Menu, "Menu was created.");
 
 		// Cleanup
 		oOpenByStub.restore();
 	});
 
-	QUnit.test("The method '_onBeforeOpenActionSheet' is called before the ActionSheet instance is opened.", function (assert) {
+	QUnit.test("The Menu's items get destroyed before new items are added.", function (assert) {
 		// Arrange
-		var oOpenByStub = sinon.stub(ActionSheet.prototype, "openBy");
-		this.oFeedListItem._onBeforeOpenActionSheet = sinon.stub();
+		var oOpenByStub = sinon.stub(Menu.prototype, "openBy");
+		var oDestroyItemsStub = sinon.stub(Menu.prototype, "destroyItems");
 
 		// Act
-		this.oFeedListItem._openActionSheet(ActionSheet);
-		this.oFeedListItem.getAggregation("_actionSheet").fireBeforeOpen();
+		this.oFeedListItem._openMenu(Menu, MenuItem);
 
 		// Assert
-		assert.ok(this.oFeedListItem._onBeforeOpenActionSheet.calledOnce, "Method has been called once.");
+		assert.ok(oDestroyItemsStub.calledOnce, "destroyItems has been called once.");
 
 		// Cleanup
 		oOpenByStub.restore();
+		oDestroyItemsStub.restore();
 	});
 
-	QUnit.test("The ActionSheet's aggregation 'buttons' gets destroyed before new buttons are added to it.", function (assert) {
+	QUnit.test("For each item in aggregation 'actions', a sap.m.MenuItem instance is added to the Menu.", function (assert) {
 		// Arrange
-		var oOpenByStub = sinon.stub(ActionSheet.prototype, "openBy");
-		var oDestroyAggregationsStub = sinon.stub(ActionSheet.prototype, "destroyAggregation");
-
-		// Act
-		this.oFeedListItem._openActionSheet(ActionSheet);
-
-		// Assert
-		assert.ok(oDestroyAggregationsStub.calledOnce, "Method has been called once.");
-		assert.ok(oDestroyAggregationsStub.calledWith("buttons", true), "Method has been called with the correct parameters.");
-
-		// Cleanup
-		oOpenByStub.restore();
-		oDestroyAggregationsStub.restore();
-	});
-
-	QUnit.test("For each item in aggregation 'actions', a sap.m.Button instance is added to the ActionSheet's aggregation 'buttons'.", function (assert) {
-		// Arrange
-		var oOpenByStub = sinon.stub(ActionSheet.prototype, "openBy");
+		var oOpenByStub = sinon.stub(Menu.prototype, "openBy");
 		this.oFeedListItem.addAction(new FeedListItemAction({
 			"text": "Action1",
 			"icon": "Icon1"
@@ -1147,70 +1130,52 @@ sap.ui.define([
 		}));
 
 		// Act
-		this.oFeedListItem._openActionSheet(ActionSheet);
+		this.oFeedListItem._openMenu(Menu, MenuItem);
 
 		// Assert
-		var oActionSheetButtons = this.oFeedListItem.getAggregation("_actionSheet").getButtons();
+		var oMenuItems = this.oFeedListItem.getAggregation("_menu").getItems();
 		var oFeedListItemActions = this.oFeedListItem.getActions();
 
-		assert.equal(oActionSheetButtons.length, oFeedListItemActions.length, "The numbers of items inside the aggregation and the action sheet are the same.");
-		assert.equal(oActionSheetButtons[0].getText(), oFeedListItemActions[0].getText(), "The first item's text is correct.");
-		assert.equal(oActionSheetButtons[0].getIcon(), oFeedListItemActions[0].getIcon(), "The first item's icon is correct.");
-		assert.equal(oActionSheetButtons[1].getText(), oFeedListItemActions[1].getText(), "The second item's text is correct.");
-		assert.equal(oActionSheetButtons[1].getIcon(), oFeedListItemActions[1].getIcon(), "The second item's icon is correct.");
+		assert.equal(oMenuItems.length, oFeedListItemActions.length, "The numbers of items inside the aggregation and the menu are the same.");
+		assert.equal(oMenuItems[0].getText(), oFeedListItemActions[0].getText(), "The first item's text is correct.");
+		assert.equal(oMenuItems[0].getIcon(), oFeedListItemActions[0].getIcon(), "The first item's icon is correct.");
+		assert.equal(oMenuItems[1].getText(), oFeedListItemActions[1].getText(), "The second item's text is correct.");
+		assert.equal(oMenuItems[1].getIcon(), oFeedListItemActions[1].getIcon(), "The second item's icon is correct.");
 
 		// Cleanup
 		oOpenByStub.restore();
 	});
 
-	QUnit.test("The ActionSheet instance is opened by the action button.", function (assert) {
+	QUnit.test("The Menu instance is opened by the action button.", function (assert) {
 		// Arrange
-		var oOpenByStub = sinon.stub(ActionSheet.prototype, "openBy");
+		var oOpenByStub = sinon.stub(Menu.prototype, "openBy");
 
 		// Act
-		this.oFeedListItem._openActionSheet(ActionSheet);
+		this.oFeedListItem._openMenu(Menu, MenuItem);
 
 		// Assert
-		assert.ok(oOpenByStub.calledOnce, "Method has been called once.");
-		assert.ok(oOpenByStub.calledWith(this.oFeedListItem.getAggregation("_actionButton")), "Method has been called with the correct parameter.");
+		assert.ok(oOpenByStub.calledOnce, "openBy has been called once.");
+		assert.ok(oOpenByStub.calledWith(this.oFeedListItem.getAggregation("_actionButton")), "openBy has been called with the correct parameter.");
 
 		// Cleanup
 		oOpenByStub.restore();
 	});
 
-	QUnit.module("Method '_onBeforeOpenActionSheet'", {
-		beforeEach: function () {
-			this.oFeedListItem = new FeedListItem();
-		},
-		afterEach: function () {
-			this.oFeedListItem.destroy();
-		}
-	});
-
-	QUnit.test("When the device is a phone, no CSS contrast class is set on the ActionSheet's popover.", function (assert) {
+	QUnit.test("The Menu instance is reused on repeated opens.", function (assert) {
 		// Arrange
-		var oPopover = new Popover();
-		var oEvent = {
-			getSource: function () {
-				return {
-					getParent: function () {
-						return oPopover;
-					}
-				};
-			}
-		};
-		var bOriginSystemPhone = Device.system.phone;
-		Device.system.phone = true;
+		var oOpenByStub = sinon.stub(Menu.prototype, "openBy");
 
 		// Act
-		this.oFeedListItem._onBeforeOpenActionSheet(oEvent);
+		this.oFeedListItem._openMenu(Menu, MenuItem);
+		var oFirstMenu = this.oFeedListItem.getAggregation("_menu");
+		this.oFeedListItem._openMenu(Menu, MenuItem);
+		var oSecondMenu = this.oFeedListItem.getAggregation("_menu");
 
 		// Assert
-		assert.notOk(oPopover.hasStyleClass("sapContrastPlus"), "Popover does not have the CSS contrast class 'sapContrastPlus'.");
-		assert.notOk(oPopover.hasStyleClass("sapContrast"), "Popover does not have the CSS contrast class 'sapContrast'.");
+		assert.strictEqual(oFirstMenu, oSecondMenu, "The same Menu instance is reused on repeated opens.");
 
 		// Cleanup
-		Device.system.phone = bOriginSystemPhone;
+		oOpenByStub.restore();
 	});
 
 	QUnit.module("Security");
