@@ -344,6 +344,68 @@ sap.ui.define([
 		);
 	});
 
+	QUnit.module("sap.ui.fl.changeHandler.BaseAddViaDelegate - getChangeVisualizationInfo", {
+		before() {
+			return fnBefore.apply(this);
+		},
+		beforeEach() {
+			return fnBeforeEach.apply(this);
+		},
+		afterEach() {
+			return fnAfterEach.apply(this);
+		},
+		after() {
+			return fnAfter.apply(this);
+		}
+	});
+
+	QUnit.test("when revert data has a labelSelector", function(assert) {
+		const oChangeHandler = createChangeHandler(false);
+		this.oDelegate = {};
+		oChangeHandler.completeChangeContent(this.oChange, this.mSpecificChangeInfo, this.mPropertyBag);
+		const oLabelSelector = { id: "someLabel", idIsLocal: false };
+		sandbox.stub(this.oChange, "getRevertData").returns({ labelSelector: oLabelSelector });
+
+		const oInfo = oChangeHandler.getChangeVisualizationInfo(this.oChange);
+
+		assert.deepEqual(
+			oInfo.affectedControls,
+			[oLabelSelector],
+			"then the label selector is returned as affected control"
+		);
+	});
+
+	QUnit.test("when revert data has a newFieldSelector (layout control path)", function(assert) {
+		const oChangeHandler = createChangeHandler(false);
+		this.oDelegate = {};
+		oChangeHandler.completeChangeContent(this.oChange, this.mSpecificChangeInfo, this.mPropertyBag);
+		const oLayoutSelector = { id: "someControlId-field", idIsLocal: false };
+		sandbox.stub(this.oChange, "getRevertData").returns({ newFieldSelector: oLayoutSelector });
+
+		const oInfo = oChangeHandler.getChangeVisualizationInfo(this.oChange);
+
+		assert.deepEqual(
+			oInfo.affectedControls,
+			[oLayoutSelector],
+			"then the revert data selector (outer layout control) is returned instead of the change content selector"
+		);
+	});
+
+	QUnit.test("when no revert data is available", function(assert) {
+		const oChangeHandler = createChangeHandler(false);
+		this.oDelegate = {};
+		oChangeHandler.completeChangeContent(this.oChange, this.mSpecificChangeInfo, this.mPropertyBag);
+		sandbox.stub(this.oChange, "getRevertData").returns(undefined);
+
+		const oInfo = oChangeHandler.getChangeVisualizationInfo(this.oChange);
+
+		assert.strictEqual(
+			oInfo.affectedControls[0].id,
+			"someControlId",
+			"then the change content selector is returned as affected control"
+		);
+	});
+
 	QUnit.done(function() {
 		document.getElementById("qunit-fixture").style.display = "none";
 	});
