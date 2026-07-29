@@ -19,7 +19,7 @@
 			"id": "sap.f.HeroBanner",
 			"name": "Hero Banner",
 			"category": "Container",
-			"since": "1.151",
+			"since": "1.152",
 			"samples": [
 				"sap.f.sample.HeroBannerBasic",
 				"sap.f.sample.HeroBannerColumnsRatio",
