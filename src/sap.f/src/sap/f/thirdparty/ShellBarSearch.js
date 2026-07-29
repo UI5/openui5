@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Search3', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/ListItemAdditionalText.css', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/List', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/ListSelectionMode', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/search2', 'sap/f/thirdparty/encodeXML', 'sap/f/thirdparty/information', 'sap/f/thirdparty/sys-enter-2'], (function (webcomponentsBase, Search, Theme, jsxRuntime, Button, parametersBundle_css, i18nDefaults, Icons, eventStrict, Icon, parametersBundle_css$1, i18nDefaults$1, ListItemBase, ListItemAdditionalText_css, InvisibleMessage, AccessibilityTextsHelper, ValueState, decline, List, toLowercaseEnumValue, ListItemGroup, WrappingType, ListSelectionMode, BusyIndicator, willShowContent, Label, ResponsivePopover, Title, FocusableElements, slimArrowDown, search, encodeXML, information, sysEnter2) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Search3', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/List', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/information', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/search2', 'sap/f/thirdparty/encodeXML', 'sap/f/thirdparty/information2', 'sap/f/thirdparty/sys-enter-2', 'sap/f/thirdparty/willShowContent'], (function (webcomponentsBase, Search, Theme, jsxRuntime, Button, parametersBundle_css, i18nDefaults, Icons, eventStrict, Icon, parametersBundle_css$1, i18nDefaults$1, ListItemBase, ListItemTemplate, decline, ValueState, AccessibilityTextsHelper, Label, List, toLowercaseEnumValue, ListItemGroup, WrappingType, information, ResponsivePopover, Title, FocusableElements, slimArrowDown, search, encodeXML, information$1, sysEnter2, willShowContent) { 'use strict';
 
     function ShellBarSearchPopoverTemplate() {
         return (Search.SearchPopoverTemplate.call(this, ShellBarSearchDialogHeader));
@@ -58,6 +58,9 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Search3
         }
         _handleEnter() {
             if (!this.value && !this.collapsed) {
+                // Fire `ui5-search` so a host ShellBar collapses in sync; also collapse
+                // locally for standalone usage (host converges on the same state).
+                this._handleSearchEvent();
                 this.collapsed = true;
                 setTimeout(() => {
                     this.focus();
@@ -91,6 +94,9 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Search3
         get nativeInput() {
             const domRef = this.shadowRoot;
             return Theme.d() ? domRef?.querySelector(`[ui5-responsive-popover] input`) : super.nativeInput;
+        }
+        getSearchButtonDomRef() {
+            return this.shadowRoot?.querySelector(".ui5-shell-search-field-button") ?? null;
         }
         _onfocusin() {
             super._onfocusin();

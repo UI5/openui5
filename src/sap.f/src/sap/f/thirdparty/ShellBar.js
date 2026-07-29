@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/query', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/ShellBarItem2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Menu', 'sap/f/thirdparty/List', 'sap/f/thirdparty/search2', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/overflow', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/ShellBarSpacer', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/ListSelectionMode', 'sap/f/thirdparty/ListItemAdditionalText.css', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/MenuItem2', 'sap/f/thirdparty/ListItemGroup'], (function (exports, webcomponentsBase, eventStrict, query, parametersBundle_css$1, jsxRuntime, Theme, Button, ShellBarItem, Icon, ResponsivePopover, Menu, List, search, Icons, overflow, slimArrowDown, parametersBundle_css, ListItemBase, ShellBarSpacer, i18nDefaults, AccessibilityTextsHelper, willShowContent, toLowercaseEnumValue, BusyIndicator, Label, i18nDefaults$1, Tag, decline, ListItemTemplate, ListSelectionMode, ListItemAdditionalText_css, ValueState, WrappingType, Title, FocusableElements, InvisibleMessage, MenuItem, ListItemGroup) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/query', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/ShellBarItem2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Menu', 'sap/f/thirdparty/List', 'sap/f/thirdparty/search2', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/overflow', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/ShellBarSpacer', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/information', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/MenuItem2', 'sap/f/thirdparty/ListItemGroup'], (function (exports, webcomponentsBase, eventStrict, query, parametersBundle_css$1, jsxRuntime, Theme, Button, ShellBarItem, Icon, ResponsivePopover, Menu, List, search, Icons, overflow, slimArrowDown, parametersBundle_css, ListItemBase, ShellBarSpacer, i18nDefaults, AccessibilityTextsHelper, willShowContent, toLowercaseEnumValue, Label, i18nDefaults$1, Tag, information, decline, ListItemTemplate, ValueState, WrappingType, Title, FocusableElements, MenuItem, ListItemGroup) { 'use strict';
 
 	function n(e,o){let t=null,l=null;return function(...u){if(l){t=u;return}e(...u),l=setTimeout(()=>{t&&(e(...t),t=null),l=null;},o);}}
 
@@ -360,7 +360,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	 * Handles search fields with collapsed/open properties and ui5-open/close/search events.
 	 */
 	class ShellBarSearch {
-	    constructor({ getOverflowed, setSearchState, getSearchField, getSearchState, getCSSVariable, }) {
+	    constructor({ getOverflowed, setSearchState, getSearchField, getSearchState, getCSSVariable, handleSearchButtonClick, }) {
 	        this.onSearchBound = this.onSearch.bind(this);
 	        this.onSearchOpenBound = this.onSearchOpen.bind(this);
 	        this.onSearchCloseBound = this.onSearchClose.bind(this);
@@ -370,6 +370,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        this.getSearchField = getSearchField;
 	        this.getSearchState = getSearchState;
 	        this.setSearchState = setSearchState;
+	        this.handleSearchButtonClick = handleSearchButtonClick;
 	    }
 	    subscribe(searchField = this.getSearchField()) {
 	        if (!searchField) {
@@ -466,7 +467,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        if (Theme.d() || (this.getSearchField()?.value && this.getSearchState())) {
 	            return;
 	        }
-	        this.setSearchState(!this.getSearchState());
+	        this.handleSearchButtonClick();
 	    }
 	    /**
 	     * Gets the minimum width needed for search field from CSS variable.
@@ -1328,6 +1329,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	            getSearchState: () => this.enabledFeatures.search && this.showSearchField,
 	            getCSSVariable: (cssVar) => this.getCSSVariable(cssVar),
 	            setSearchState: (expanded) => this.setSearchState(expanded),
+	            handleSearchButtonClick: () => this.handleSearchButtonClick(),
 	            getOverflowed: () => this.overflow.isOverflowing(this.overflowOuter, this.overflowInner),
 	        };
 	    }
@@ -1338,7 +1340,9 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        return this._searchAdaptorLegacy;
 	    }
 	    handleSearchButtonClick() {
-	        const searchButton = this.shadowRoot.querySelector(".ui5-shellbar-search-button");
+	        const searchButton = this.isSelfCollapsibleSearch
+	            ? this.search?.shadowRoot?.querySelector(".ui5-shell-search-field-button") ?? null
+	            : this.shadowRoot.querySelector(".ui5-shellbar-search-button");
 	        const defaultPrevented = !this.fireDecoratorEvent("search-button-click", {
 	            targetRef: searchButton,
 	            searchFieldVisible: this.showSearchField,
@@ -1551,6 +1555,9 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	     */
 	    async getSearchButtonDomRef() {
 	        await Theme.w();
+	        if (this.isSelfCollapsibleSearch) {
+	            return this.search.getSearchButtonDomRef();
+	        }
 	        return this.shadowRoot.querySelector(`*[data-ui5-stable="toggle-search"]`);
 	    }
 	    _fireClickEvent(eventName, domRef) {

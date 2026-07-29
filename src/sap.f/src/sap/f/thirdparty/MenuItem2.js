@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/List', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/Icon'], (function (exports, webcomponentsBase, jsxRuntime, eventStrict, parametersBundle_css, Theme, Icons, decline, InvisibleMessage, ListItemTemplate, ListItemBase, i18nDefaults, ResponsivePopover, Button, List, BusyIndicator, Icon) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/List', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/i18n-defaults2'], (function (exports, webcomponentsBase, jsxRuntime, eventStrict, parametersBundle_css, Theme, Icons, decline, List, ListItemTemplate, ListItemBase, ResponsivePopover, Button, Icon, i18nDefaults) { 'use strict';
 
 	const name$1 = "nav-back";
 	const pathData$1 = "M11.723 13.285a.957.957 0 0 1 .277.702c0 .28-.092.514-.277.701a.967.967 0 0 1-.708.312.967.967 0 0 1-.707-.312L4.246 8.67a.723.723 0 0 0-.092-.156.362.362 0 0 0-.046-.077.362.362 0 0 1-.046-.078A1.106 1.106 0 0 1 4 8.016a.22.22 0 0 1 .015-.094.14.14 0 0 0 .016-.062.44.44 0 0 1 .092-.297c.02-.03.041-.067.062-.109.02-.02.03-.036.03-.046 0-.01.01-.026.031-.047.02-.021.03-.042.03-.063l6.032-5.986A.967.967 0 0 1 11.015 1c.267 0 .503.104.708.312.185.187.277.42.277.701a.957.957 0 0 1-.277.702l-4.77 4.802a.889.889 0 0 0 0 .997l4.77 4.771Z";
@@ -47,271 +47,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	})(MenuItemGroupCheckMode || (MenuItemGroupCheckMode = {}));
 	var MenuItemGroupCheckMode$1 = MenuItemGroupCheckMode;
 
-	const predefinedHooks$1 = {
-	    listItemContent,
-	};
-	function ListItemCustomTemplate(hooks) {
-	    const currentHooks = { ...predefinedHooks$1, ...hooks };
-	    return ListItemTemplate.ListItemTemplate.call(this, currentHooks);
-	}
-	function listItemContent() {
-	    return jsxRuntime.jsx("slot", {});
-	}
-
-	let i18nBundle;
-	let invisibleText;
-	const getBundle = () => {
-	    i18nBundle ??= new Icons.u("@ui5/webcomponents-base");
-	    return i18nBundle;
-	};
-	const checkVisibility = (element) => {
-	    return element.checkVisibility() || getComputedStyle(element).display === "contents";
-	};
-	const applyCustomAnnouncement = (element, text = []) => {
-	    if (!invisibleText || !invisibleText.isConnected) {
-	        invisibleText = document.createElement("span");
-	        invisibleText.id = "ui5-invisible-text";
-	        invisibleText.hidden = true;
-	        document.body.appendChild(invisibleText);
-	    }
-	    const ariaLabelledByElements = [...(element.ariaLabelledByElements || [])];
-	    const invisibleTextIndex = ariaLabelledByElements.indexOf(invisibleText);
-	    text = Array.isArray(text) ? text.filter(Boolean).join(" . ").trim() : text.trim();
-	    invisibleText.textContent = text;
-	    if (text && invisibleTextIndex === -1) {
-	        ariaLabelledByElements.unshift(invisibleText);
-	        element.ariaLabelledByElements = ariaLabelledByElements;
-	    }
-	    else if (!text && invisibleTextIndex > -1) {
-	        ariaLabelledByElements.splice(invisibleTextIndex, 1);
-	        element.ariaLabelledByElements = ariaLabelledByElements.length ? ariaLabelledByElements : null;
-	    }
-	};
-	const getCustomAnnouncement = (element, options = {}, _isRootElement = true) => {
-	    if (!element) {
-	        return "";
-	    }
-	    if (element.nodeType === Node.TEXT_NODE) {
-	        return element.data.trim();
-	    }
-	    if (!(element instanceof HTMLElement)) {
-	        return "";
-	    }
-	    if (element.hasAttribute("data-ui5-acc-text")) {
-	        return element.getAttribute("data-ui5-acc-text") || "";
-	    }
-	    if (element.ariaHidden === "true" || !checkVisibility(element)) {
-	        return _isRootElement ? getBundle().getText(i18nDefaults.ACC_STATE_EMPTY) : "";
-	    }
-	    let childNodes = [];
-	    const descriptions = [];
-	    const accessibilityInfo = element.accessibilityInfo;
-	    const { lessDetails } = options;
-	    if (accessibilityInfo) {
-	        const { type, description, required, disabled, readonly, children, } = accessibilityInfo;
-	        childNodes = children || [];
-	        type && descriptions.push(type);
-	        description && descriptions.push(description);
-	        if (!lessDetails) {
-	            required && descriptions.push(getBundle().getText(i18nDefaults.ACC_STATE_REQUIRED));
-	            disabled && descriptions.push(getBundle().getText(i18nDefaults.ACC_STATE_DISABLED));
-	            readonly && descriptions.push(getBundle().getText(i18nDefaults.ACC_STATE_READONLY));
-	        }
-	    }
-	    else if (element.localName === "slot") {
-	        childNodes = element.assignedNodes({ flatten: true });
-	    }
-	    else {
-	        childNodes = element.shadowRoot ? [...element.shadowRoot.childNodes] : [...element.childNodes];
-	    }
-	    childNodes.forEach(child => {
-	        const childDescription = getCustomAnnouncement(child, options, false);
-	        childDescription && descriptions.push(childDescription);
-	    });
-	    if (_isRootElement) {
-	        const hasDescription = descriptions.length > 0;
-	        if (!hasDescription || !lessDetails) {
-	            const tabbables = ListItemBase.b(element);
-	            const bundleKey = [
-	                hasDescription ? "" : i18nDefaults.ACC_STATE_EMPTY,
-	                i18nDefaults.ACC_STATE_SINGLE_CONTROL,
-	                i18nDefaults.ACC_STATE_MULTIPLE_CONTROLS,
-	            ][Math.min(tabbables.length, 2)];
-	            if (bundleKey) {
-	                hasDescription && descriptions.push(".");
-	                descriptions.push(getBundle().getText(bundleKey));
-	            }
-	        }
-	    }
-	    return descriptions.join(" ").trim();
-	};
-
-	Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-	Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
-	var ListItemCustomCss = `:host(:not([hidden])){display:block}:host{min-height:var(--_ui5_list_item_base_height);height:auto;box-sizing:border-box}.ui5-li-root.ui5-custom-li-root{pointer-events:inherit;min-height:inherit}.ui5-li-root.ui5-custom-li-root .ui5-li-content{pointer-events:inherit}[ui5-checkbox].ui5-li-singlesel-radiobtn,[ui5-radio-button].ui5-li-singlesel-radiobtn{display:flex;align-items:center}.ui5-li-root.ui5-custom-li-root,[ui5-checkbox].ui5-li-singlesel-radiobtn,[ui5-radio-button].ui5-li-singlesel-radiobtn{min-width:var(--_ui5_custom_list_item_rb_min_width)}:host([_selection-mode="SingleStart"]) .ui5-li-root.ui5-custom-li-root{padding-inline:0 1rem}:host([_selection-mode="Multiple"]) .ui5-li-root.ui5-custom-li-root{padding-inline:0 1rem}:host([_selection-mode="SingleEnd"]) .ui5-li-root.ui5-custom-li-root{padding-inline:1rem 0}
-`;
-
-	var __decorate$3 = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var ListItemCustom_1;
-	/**
-	 * @class
-	 *
-	 * A component to be used as custom list item within the `ui5-list`
-	 * the same way as the standard `ui5-li`.
-	 *
-	 * The component accepts arbitrary HTML content to allow full customization.
-	 * @csspart native-li - Used to style the main li tag of the list item
-	 * @csspart content - Used to style the content area of the list item
-	 * @csspart detail-button - Used to style the button rendered when the list item is of type detail
-	 * @csspart delete-button - Used to style the button rendered when the list item is in delete mode
-	 * @csspart radio - Used to style the radio button rendered when the list item is in single selection mode
-	 * @csspart checkbox - Used to style the checkbox rendered when the list item is in multiple selection mode
-	 * @slot {Node[]} default - Defines the content of the component.
-	 * @constructor
-	 * @extends ListItem
-	 * @public
-	 */
-	let ListItemCustom = ListItemCustom_1 = class ListItemCustom extends ListItemTemplate.ListItem {
-	    constructor() {
-	        super(...arguments);
-	        /**
-	         * Defines whether the item is movable.
-	         * @default false
-	         * @public
-	         * @since 2.0.0
-	         */
-	        this.movable = false;
-	    }
-	    _onkeydown(e) {
-	        const isFocused = this.matches(":focus");
-	        const shouldHandle = isFocused
-	            || webcomponentsBase.x(e) || webcomponentsBase.V(e)
-	            || webcomponentsBase.ro(e) || webcomponentsBase.io(e)
-	            || webcomponentsBase.P(e) || webcomponentsBase._(e);
-	        if (shouldHandle) {
-	            super._onkeydown(e);
-	        }
-	    }
-	    _onkeyup(e) {
-	        const isFocused = this.matches(":focus");
-	        const shouldHandle = isFocused
-	            || webcomponentsBase.x(e) || webcomponentsBase.V(e)
-	            || webcomponentsBase.ro(e) || webcomponentsBase.io(e)
-	            || webcomponentsBase.P(e) || webcomponentsBase._(e);
-	        if (shouldHandle) {
-	            super._onkeyup(e);
-	        }
-	    }
-	    get _accessibleNameRef() {
-	        return `${this._id}-invisibleText`;
-	    }
-	    _onfocusin(e) {
-	        super._onfocusin(e);
-	        // Skip updating invisible text during drag operations
-	        if (!this._isDragging() && !this.accessibleName) {
-	            this._updateInvisibleTextContent();
-	        }
-	    }
-	    _onfocusout(e) {
-	        super._onfocusout(e);
-	        // Skip clearing invisible text during drag operations
-	        if (!this._isDragging() && !this.accessibleName) {
-	            this._clearInvisibleTextContent();
-	        }
-	    }
-	    /**
-	     * Checks if this element is currently being dragged
-	     * @returns True if this element is being dragged
-	     * @private
-	     */
-	    _isDragging() {
-	        // Check if this specific element has the data-moving attribute
-	        return this.hasAttribute("data-moving");
-	    }
-	    _updateInvisibleTextContent() {
-	        const listItem = this._listItem;
-	        if (!listItem) {
-	            return;
-	        }
-	        // Get accessibility announcements
-	        const accessibilityText = getCustomAnnouncement(this);
-	        // Apply the announcement using the shared invisible text element from CustomAnnouncement
-	        applyCustomAnnouncement(listItem, accessibilityText);
-	    }
-	    _clearInvisibleTextContent() {
-	        const listItem = this._listItem;
-	        if (!listItem) {
-	            return;
-	        }
-	        // Clear the announcement by passing empty text
-	        applyCustomAnnouncement(listItem, "");
-	    }
-	    /**
-	     * Gets delete button nodes to process for accessibility
-	     * @returns Array of nodes to process
-	     * @private
-	     */
-	    _getDeleteButtonNodes() {
-	        if (!this.modeDelete) {
-	            return [];
-	        }
-	        if (this.hasDeleteButtonSlot) {
-	            // Return custom delete buttons from slot
-	            return this.deleteButton;
-	        }
-	        // Return the built-in delete button from the shadow DOM if it exists
-	        const deleteButton = this.shadowRoot?.querySelector(`#${this._id}-deleteSelectionElement`);
-	        return deleteButton ? [deleteButton] : [];
-	    }
-	    get classes() {
-	        const result = super.classes;
-	        result.main["ui5-custom-li-root"] = true;
-	        return result;
-	    }
-	    get accessibilityInfo() {
-	        const children = [];
-	        // Get slotted content elements (default slot)
-	        const defaultSlot = this.shadowRoot?.querySelector("slot:not([name])");
-	        if (defaultSlot) {
-	            const assignedNodes = defaultSlot.assignedNodes({ flatten: true });
-	            children.push(...assignedNodes);
-	        }
-	        // Get delete button nodes
-	        const deleteButtonNodes = this._getDeleteButtonNodes();
-	        children.push(...deleteButtonNodes);
-	        return {
-	            type: ListItemCustom_1.i18nBundle.getText(i18nDefaults.LISTITEMCUSTOM_TYPE_TEXT),
-	            children,
-	        };
-	    }
-	};
-	__decorate$3([
-	    webcomponentsBase.s({ type: Boolean })
-	], ListItemCustom.prototype, "movable", void 0);
-	__decorate$3([
-	    webcomponentsBase.s()
-	], ListItemCustom.prototype, "accessibleName", void 0);
-	__decorate$3([
-	    parametersBundle_css.i("@ui5/webcomponents")
-	], ListItemCustom, "i18nBundle", void 0);
-	ListItemCustom = ListItemCustom_1 = __decorate$3([
-	    webcomponentsBase.m({
-	        tag: "ui5-li-custom",
-	        template: ListItemCustomTemplate,
-	        renderer: jsxRuntime.y,
-	        styles: [ListItemTemplate.ListItem.styles, ListItemCustomCss],
-	    })
-	], ListItemCustom);
-	ListItemCustom.define();
-	var ListItemCustom$1 = ListItemCustom;
-
 	function MenuSeparatorTemplate() {
-	    return (jsxRuntime.jsx(ListItemCustom$1, { class: "ui5-menu-separator", _forcedAccessibleRole: "separator", disabled: true }));
+	    return (jsxRuntime.jsx(List.ListItemCustom, { class: "ui5-menu-separator", _forcedAccessibleRole: "separator", disabled: true }));
 	}
 
 	Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
@@ -542,7 +279,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    }
 	}
 	function listItemPostContent() {
-	    return this.hasSubmenu && jsxRuntime.jsxs(ResponsivePopover.ResponsivePopover, { id: `${this._id}-menu-rp`, class: "ui5-menu-rp ui5-menu-rp-sub-menu", preventInitialFocus: true, preventFocusRestore: true, hideArrow: true, allowTargetOverlap: true, placement: ResponsivePopover.PopoverPlacement.End, verticalAlign: "Top", accessibleName: this.accessibleNameText, onBeforeOpen: this._beforePopoverOpen, onOpen: this._afterPopoverOpen, onBeforeClose: this._beforePopoverClose, onClose: this._afterPopoverClose, children: [this.isPhone && (jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsxs("div", { slot: "header", class: "ui5-menu-dialog-header", children: [jsxRuntime.jsx(Button.Button, { icon: navBackIcon, class: "ui5-menu-back-button", design: "Transparent", "aria-label": this.labelBack, onClick: this._close }), jsxRuntime.jsx("div", { class: "ui5-menu-dialog-title", children: jsxRuntime.jsx("div", { children: this.text }) })] }) })), jsxRuntime.jsx("div", { id: `${this._id}-menu-main`, class: this.loading ? "menu-busy-indicator-main" : "", "aria-busy": this.loading, children: this.items.length ? (jsxRuntime.jsx(List.List, { id: `${this._id}-menu-list`, selectionMode: "None", separators: "None", accessibleRole: "Menu", loading: this.loading, loadingDelay: this.loadingDelay, onMouseOver: this._itemMouseOver, onKeyDown: this._itemKeyDown, onKeyUp: this._itemKeyUp, "onui5-close-menu": this._close, "onui5-exit-end-content": this._navigateOutOfEndContent, children: jsxRuntime.jsx("slot", {}) })) : this.loading && jsxRuntime.jsx(BusyIndicator.BusyIndicator, { id: `${this._id}-menu-busy-indicator`, delay: this.loadingDelay, class: "ui5-menu-busy-indicator", active: true }) }), this.isPhone && (jsxRuntime.jsx("div", { slot: "footer", class: "ui5-menu-dialog-footer", children: jsxRuntime.jsx(Button.Button, { design: "Transparent", onClick: this._closeAll, children: this.labelCancel }) }))] });
+	    return this.hasSubmenu && jsxRuntime.jsxs(ResponsivePopover.ResponsivePopover, { id: `${this._id}-menu-rp`, class: "ui5-menu-rp ui5-menu-rp-sub-menu", preventInitialFocus: true, preventFocusRestore: true, hideArrow: true, allowTargetOverlap: true, placement: ResponsivePopover.PopoverPlacement.End, verticalAlign: "Top", accessibleName: this.accessibleNameText, onBeforeOpen: this._beforePopoverOpen, onOpen: this._afterPopoverOpen, onBeforeClose: this._beforePopoverClose, onClose: this._afterPopoverClose, children: [this.isPhone && (jsxRuntime.jsx(jsxRuntime.Fragment, { children: jsxRuntime.jsxs("div", { slot: "header", class: "ui5-menu-dialog-header", children: [jsxRuntime.jsx(Button.Button, { icon: navBackIcon, class: "ui5-menu-back-button", design: "Transparent", "aria-label": this.labelBack, onClick: this._close }), jsxRuntime.jsx("div", { class: "ui5-menu-dialog-title", children: jsxRuntime.jsx("div", { children: this.text }) })] }) })), jsxRuntime.jsx("div", { id: `${this._id}-menu-main`, class: this.loading ? "menu-busy-indicator-main" : "", "aria-busy": this.loading, children: this.items.length ? (jsxRuntime.jsx(List.List, { id: `${this._id}-menu-list`, selectionMode: "None", separators: "None", accessibleRole: "Menu", loading: this.loading, loadingDelay: this.loadingDelay, onMouseOver: this._itemMouseOver, onKeyDown: this._itemKeyDown, onKeyUp: this._itemKeyUp, "onui5-close-menu": this._close, "onui5-exit-end-content": this._navigateOutOfEndContent, children: jsxRuntime.jsx("slot", {}) })) : this.loading && jsxRuntime.jsx(Button.BusyIndicator, { id: `${this._id}-menu-busy-indicator`, delay: this.loadingDelay, class: "ui5-menu-busy-indicator", active: true }) }), this.isPhone && (jsxRuntime.jsx("div", { slot: "footer", class: "ui5-menu-dialog-footer", children: jsxRuntime.jsx(Button.Button, { design: "Transparent", onClick: this._closeAll, children: this.labelCancel }) }))] });
 	}
 
 	Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
@@ -633,7 +370,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        this._openedByMouse = false;
 	        this._itemNavigation = new webcomponentsBase.f$1(this, {
 	            navigationMode: webcomponentsBase.r.Horizontal,
-	            behavior: webcomponentsBase.l$1.Static,
+	            behavior: webcomponentsBase.l.Static,
 	            getItemsCallback: () => this._navigableItems,
 	        });
 	    }
@@ -832,8 +569,15 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        return webcomponentsBase.b(e) || webcomponentsBase.i(e);
 	    }
 	    _onclick(e) {
+	        // Clicks on the endContent slot must not activate the item (which would close the menu).
+	        if (this._isEndContentClicked(e)) {
+	            return;
+	        }
 	        this._shiftPressed = this._isCheckable && e.shiftKey;
 	        super._onclick(e);
+	    }
+	    _isEndContentClicked(e) {
+	        return this.endContent.some(element => e.composedPath().includes(element));
 	    }
 	    _itemKeyDown(e) {
 	        const item = e.target;
@@ -894,7 +638,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	            this._allMenuItems[0]?.focus();
 	        }
 	        if (this.loading) {
-	            InvisibleMessage.p(MenuItem_1.i18nBundle.getText(i18nDefaults.MENU_ITEM_LOADING));
+	            List.p(MenuItem_1.i18nBundle.getText(i18nDefaults.MENU_ITEM_LOADING));
 	        }
 	        this.fireDecoratorEvent("open");
 	    }
@@ -1045,7 +789,6 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	var MenuItem$1 = MenuItem;
 	const isInstanceOfMenuItem = webcomponentsBase.r$1("isMenuItem");
 
-	exports.ListItemCustom = ListItemCustom$1;
 	exports.MenuItem = MenuItem$1;
 	exports.MenuItemGroupCheckMode = MenuItemGroupCheckMode$1;
 	exports.MenuItemTemplate = MenuItemTemplate;

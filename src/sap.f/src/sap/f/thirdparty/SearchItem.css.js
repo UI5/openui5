@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/parameters-bundle.css2'], (function (exports, Theme, jsxRuntime, parametersBundle_css) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/parameters-bundle2.css'], (function (exports, Theme, jsxRuntime, parametersBundle_css) { 'use strict';
 
 	Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
 	Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
