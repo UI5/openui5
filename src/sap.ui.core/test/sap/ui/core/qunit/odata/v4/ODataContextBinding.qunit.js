@@ -2717,9 +2717,12 @@ sap.ui.define([
 			.withExactArgs("~sPath~", sinon.match.same(oOperationMetadata), "~copiedParameters~",
 				"~mCacheQueryOptions~", undefined)
 			.returns("~sResourcePath~");
+		this.mock(this.oModel.oRequestor).expects("buildQueryString")
+			.withExactArgs("~sPath~/@$ui5.overload/0/$ReturnType", "~mCacheQueryOptions~")
+			.returns("~queryString~");
 		this.mock(this.oModel.oRequestor).expects("fetch")
 			.withExactArgs(sOperation === "Action" ? "POST" : "GET", "~sResourcePath~",
-				sOperation === "Action" ? "~copiedParameters~" : undefined)
+				"~queryString~", sOperation === "Action" ? "~copiedParameters~" : undefined)
 			.returns("~fetchPromise~");
 
 		assert.strictEqual(
