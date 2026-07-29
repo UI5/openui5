@@ -156,8 +156,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("Rendering with toolbar related changes", function (assert) {
-		assert.expect(9);
 		var fnDone = assert.async();
+		var iPhase = 0;
 
 		var oModel = new JSONModel({
 			source: "test-resources/sap/m/qunit/pdfviewer/sample-file.pdf",
@@ -170,9 +170,40 @@ sap.ui.define([
 			source: "{/source}",
 			loaded: function () {
 				assert.ok(true, "'loaded' event fired");
+
+				if (iPhase === 0) {
+					iPhase = 1;
+					oModel.setData({ showDownloadButton: true }, true);
+					TestUtils.triggerRerender();
+				} else if (iPhase === 1) {
+					iPhase = 2;
+					var oOverflowToolbar = oPdfViewer.$('overflowToolbar');
+					assert.ok(oOverflowToolbar.length === 1, "OverflowToolbar should be visible");
+
+					var oOverflowToolbarTitle = oPdfViewer.$('overflowToolbar-title');
+					assert.ok(oOverflowToolbarTitle.length === 1, "OverflowToolbar's title should be visible");
+
+					var oDownloadButton = oPdfViewer.$('toolbarDownloadButton');
+					assert.ok(oDownloadButton.length === 1, 'Download button should be visible');
+
+					oModel.setData({ showDownloadButton: false }, true);
+					TestUtils.triggerRerender();
+				} else if (iPhase === 2) {
+					var oOverflowToolbar = oPdfViewer.$('overflowToolbar');
+					assert.ok(oOverflowToolbar.length === 0, "OverflowToolbar should be hidden");
+
+					var oOverflowToolbarTitle = oPdfViewer.$('overflowToolbar-title');
+					assert.ok(oOverflowToolbarTitle.length === 0, "OverflowToolbar's title should be hidden");
+
+					var oDownloadButton = oPdfViewer.$('toolbarDownloadButton');
+					assert.ok(oDownloadButton.length === 0, 'Download button should be hidden');
+
+					fnDone();
+				}
 			},
 			error: function () {
 				assert.ok(false, "'error' event should not be fired");
+				fnDone();
 			}
 		};
 
@@ -180,39 +211,6 @@ sap.ui.define([
 		oPdfViewer.setModel(oModel);
 
 		TestUtils.renderPdfViewer(oPdfViewer);
-
-		TestUtils.wait(2000)()
-			.then(function () {
-				oModel.setData({ showDownloadButton: true }, true);
-				TestUtils.triggerRerender();
-			})
-			.then(TestUtils.wait(2000))
-			.then(function () {
-				var oOverflowToolbar = oPdfViewer.$('overflowToolbar');
-				assert.ok(oOverflowToolbar.length === 1, "OverflowToolbar should be visible");
-
-				var oOverflowToolbarTitle = oPdfViewer.$('overflowToolbar-title');
-				assert.ok(oOverflowToolbarTitle.length === 1, "OverflowToolbar's title should be visible");
-
-				var oDownloadButton = oPdfViewer.$('toolbarDownloadButton');
-				assert.ok(oDownloadButton.length === 1, 'Download button should be visible');
-			})
-			.then(function () {
-				oModel.setData({ showDownloadButton: false }, true);
-				TestUtils.triggerRerender();
-			})
-			.then(TestUtils.wait(2000))
-			.then(function () {
-				var oOverflowToolbar = oPdfViewer.$('overflowToolbar');
-				assert.ok(oOverflowToolbar.length === 0, "OverflowToolbar should be hidden");
-
-				var oOverflowToolbarTitle = oPdfViewer.$('overflowToolbar-title');
-				assert.ok(oOverflowToolbarTitle.length === 0, "OverflowToolbar's title should be hidden");
-
-				var oDownloadButton = oPdfViewer.$('toolbarDownloadButton');
-				assert.ok(oDownloadButton.length === 0, 'Download button should be hidden');
-				fnDone();
-			});
 	});
 
 	QUnit.test("DisplayTypes tests", function (assert) {
