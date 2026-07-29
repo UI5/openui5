@@ -2,9 +2,11 @@
 sap.ui.define([
 	"sap/ui/core/tooltip/TooltipManager",
 	"sap/ui/core/tooltip/Tooltip",
-	"./FakeTooltipHost"
-], function (TooltipManager, Tooltip, FakeTooltipHost) {
+	"./FakeControls"
+], function (TooltipManager, Tooltip, FakeControls) {
 	"use strict";
+
+	const { PlainHost } = FakeControls;
 
 	QUnit.module("Constants", {});
 
@@ -18,7 +20,7 @@ sap.ui.define([
 
 	QUnit.module("open / close / registry", {
 		beforeEach: function () {
-			this.oOpener = new FakeTooltipHost();
+			this.oOpener = new PlainHost();
 			this.oTooltipA = new Tooltip({ text: "a" });
 			this.oTooltipB = new Tooltip({ text: "b" });
 			// Stub the public open/close to observe calls without scheduling real timers.

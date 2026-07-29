@@ -632,7 +632,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		var oFakeEvent = {
-			target: oOH2.getDomRef().querySelector(".sapUiIconTitle")
+			target: oOH2.getDomRef().querySelector(".sapUiIcon")
 		};
 
 		oOH2.ontap(oFakeEvent);

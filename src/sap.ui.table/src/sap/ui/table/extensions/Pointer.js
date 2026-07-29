@@ -218,7 +218,13 @@ sap.ui.define([
 		initReordering: function(oTable, iColIndex, oEvent) {
 			oTable._getPointerExtension()._bReorderInProgress = true;
 			const oColumn = oTable.getColumns()[iColIndex];
-			const $Col = oColumn.$();
+			let $Col = oColumn.$();
+			const oHeaderCell = TableUtils.Column.getHeaderLabel(oColumn)?.getDomRef()?.closest("td");
+
+			if (oHeaderCell) {
+				$Col = jQuery(oHeaderCell);
+			}
+
 			const $Table = oTable.$();
 
 			oTable._disableTextSelection();

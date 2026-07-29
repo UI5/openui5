@@ -1,0 +1,123 @@
+[
+	{
+		"fileName": "id_1579844823982_01_addFields",
+		"changeType": "addFields",
+		"reference": "sap.ui.rta.test",
+		"content": {
+			"field": {
+				"value": [
+					"AccountingDocumentKeyComplex/ComplexProperty01"
+				],
+				"valueProperty": [
+					"value"
+				],
+				"selector": {
+					"id": "idMain1--GeneralLedgerDocument_Header_AccountingDocumentKeyComplex_ComplexProperty01",
+					"idIsLocal": true
+				},
+				"jsTypes": [
+					"sap.ui.comp.smartfield.SmartField"
+				],
+				"index": 3
+			}
+		},
+		"selector": {
+			"id": "idMain1--GeneralLedgerDocument",
+			"idIsLocal": true
+		},
+		"creation": "2026-04-08T08:53:44.010Z"
+	},
+	{
+		"fileName": "id_1775638408154_02_addGroup",
+		"changeType": "addGroup",
+		"reference": "sap.ui.rta.test",
+		"content": {
+			"group": {
+				"index": 3,
+				"selector": {
+					"id": "idMain1--id-1775638406855-153",
+					"idIsLocal": true
+				}
+			}
+		},
+		"selector": {
+			"id": "idMain1--MainForm",
+			"idIsLocal": true
+		},
+		"creation": "2026-04-08T08:53:44.020Z",
+		"layer": "CUSTOMER",
+		"fileType": "change",
+		"texts": {
+			"groupLabel": {
+				"value": "New: Group1",
+				"type": "XFLD"
+			}
+		}
+	},
+	{
+		"fileName": "id_1579844823982_03_addFields",
+		"changeType": "addFields",
+		"reference": "sap.ui.rta.test",
+		"content": {
+			"field": {
+				"value": [
+					"AccountingDocumentKeyComplex/ComplexProperty02"
+				],
+				"valueProperty": [
+					"value"
+				],
+				"selector": {
+					"id": "idMain1--GeneralLedgerDocument_Header_AccountingDocumentKeyComplex_ComplexProperty02",
+					"idIsLocal": true
+				},
+				"jsTypes": [
+					"sap.ui.comp.smartfield.SmartField"
+				],
+				"index": 0
+			}
+		},
+		"selector": {
+			"id": "idMain1--id-1775638406855-153",
+			"idIsLocal": true
+		},
+		"creation": "2026-04-08T08:53:44.030Z"
+	},
+	{
+		"fileName": "id_1579855106890_04_moveControls",
+		"changeType": "moveControls",
+		"reference": "sap.ui.rta.test",
+		"content": {
+			"movedElements": [
+				{
+					"selector": {
+						"id": "idMain1--GeneralLedgerDocument_Header_AccountingDocumentKeyComplex_ComplexProperty01",
+						"idIsLocal": true
+					},
+					"sourceIndex": 3,
+					"targetIndex": 1
+				}
+			],
+			"source": {
+				"selector": {
+					"aggregation": "formElements",
+					"type": "sap.ui.comp.smartform.Group",
+					"id": "idMain1--GeneralLedgerDocument",
+					"idIsLocal": true
+				}
+			},
+			"target": {
+				"selector": {
+					"aggregation": "formElements",
+					"type": "sap.ui.comp.smartform.Group",
+					"id": "idMain1--id-1775638406855-153",
+					"idIsLocal": true
+				}
+			}
+		},
+		"selector": {
+			"id": "idMain1--MainForm",
+			"idIsLocal": true
+		},
+		"creation": "2026-04-08T08:53:44.040Z"
+	}
+]

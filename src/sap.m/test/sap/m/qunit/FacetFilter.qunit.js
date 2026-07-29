@@ -2995,7 +2995,7 @@ sap.ui.define([
 
 		await nextUIUpdate();
 		var oEvent = {
-			target: document.querySelector("#" + oFF.getId() + "-arrowScrollRight .sapUiIconTitle"),
+			target: document.querySelector("#" + oFF.getId() + "-arrowScrollRight"),
 			preventDefault: function() { }
 		};
 

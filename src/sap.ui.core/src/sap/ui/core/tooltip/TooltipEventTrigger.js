@@ -38,24 +38,31 @@ sap.ui.define([
 			document.removeEventListener("keydown", onDocumentKeyDown, true);
 		}
 
+		function hasTextSelection() {
+			const oSel = window.getSelection && window.getSelection();
+			return !!(oSel && oSel.toString().length > 0);
+		}
+
 		/**
 		 * Constructor for a new <code>sap.ui.core.tooltip.TooltipEventTrigger</code>.
 		 *
 		 * @param {object} oConfig Configuration for the trigger.
-		 * @param {function(boolean)} oConfig.onOpen Callback invoked when a gesture asks to open the tooltip. Receives <code>true</code> for deferred gestures (hover, keyboard focus). Invoked with no argument for instant gestures (long-press).
-		 * @param {function(boolean)} oConfig.onClose Callback invoked when a gesture asks to close the tooltip. Receives <code>true</code> for deferred gestures (mouseleave, focusout). Invoked with no argument for instant gestures (left mousedown, Escape).
-		 * @param {function():boolean} oConfig.isPendingOrOpen Predicate used by the Escape handler to decide whether to consume the key.
+		 * @param {sap.ui.core.Element} oConfig.host The control the gesture delegate is registered on.
+		 * @param {function():HTMLElement} oConfig.domRefProvider Returns the target sub-element this trigger reacts to. May return <code>null</code> before the first render.
+		 * @param {function(boolean)} oConfig.onOpen Opens the tooltip. Called with <code>true</code> for deferred gestures (hover, keyboard focus), no argument for instant ones (long-press).
+		 * @param {function(boolean)} oConfig.onClose Closes the tooltip. Called with <code>true</code> for deferred gestures (mouseleave, focusout), no argument for instant ones (left mousedown, Escape).
+		 * @param {function():boolean} oConfig.isPendingOrOpen Whether a tooltip is pending or open; the Escape handler consumes the key only then.
 		 * @param {boolean} [oConfig.enableForTouchDevices=true] Whether long-press should open the tooltip on touch devices.
 		 *
 		 * @class
 		 * Translates raw DOM gestures (hover, keyboard focus, Escape, long-press)
-		 * on a given DOM element into open/close signals delivered via the
-		 * configured callbacks. The trigger is host-agnostic: callers attach it
-		 * to a DOM element via {@link #attach} and detach it via {@link #detach}.
+		 * into open/close signals delivered via the configured callbacks.
 		 *
-		 * Only one DOM element is attached at a time. Calling <code>attach</code>
-		 * for a different element detaches the current one first — callers do
-		 * not need to track the currently attached ref themselves.
+		 * The trigger registers a single UI5 event delegate on the host control,
+		 * so its handlers survive host re-renders without an attach/detach lifecycle.
+		 * It reacts only to gestures inside the element returned by
+		 * <code>domRefProvider</code>, so several triggers can coexist on one host —
+		 * one per focus target — each showing its own tooltip.
 		 *
 		 * @author SAP SE
 		 * @version ${version}
@@ -73,14 +80,13 @@ sap.ui.define([
 
 				oConfig = oConfig || {};
 
+				this._oHost = oConfig.host;
+				this._fnDomRefProvider = oConfig.domRefProvider;
 				this._fnOnOpen = oConfig.onOpen;
 				this._fnOnClose = oConfig.onClose;
 				this._fnIsPendingOrOpen = oConfig.isPendingOrOpen;
 				this._bEnableForTouchDevices = oConfig.enableForTouchDevices !== false;
 
-				this._oDomRef = null;
-				// Array of [type, handler] pairs recorded by _on for later removal.
-				this._aListeners = [];
 				this._iLongPressTimer = null;
 
 				// First instance arms the shared initial-focus listener.
@@ -88,25 +94,26 @@ sap.ui.define([
 					attachInitialFocusListener();
 				}
 				iInstancesCount++;
+
+				this._oDelegate = this._buildDelegate();
+				if (this._oHost) {
+					this._oHost.addDelegate(this._oDelegate, this);
+				}
+
+				// Host may already be rendered; sync touch-suppression now.
+				this._syncTouchSuppression();
 			}
 		});
 
 		/**
-		 * Toggles the long-press / contextmenu branch. If a DOM element is
-		 * currently attached, it is re-wired so the new state takes effect
-		 * immediately.
+		 * Enables or disables the long-press / contextmenu tooltip on touch devices.
 		 * @public
 		 * @param {boolean} bEnable
 		 * @returns {this}
 		 */
 		TooltipEventTrigger.prototype.setEnableForTouchDevices = function(bEnable) {
 			this._bEnableForTouchDevices = !!bEnable;
-
-			if (this._oDomRef) {
-				const oDomRef = this._oDomRef;
-				this.detach();
-				this.attach(oDomRef);
-			}
+			this._syncTouchSuppression();
 			return this;
 		};
 
@@ -119,164 +126,31 @@ sap.ui.define([
 		};
 
 		/**
-		 * Attaches gesture listeners to the given DOM element. If another
-		 * element is already attached, it is detached first — attaching is
-		 * idempotent from the caller's point of view.
-		 *
+		 * Disposes the trigger: removes its event delegate from the host.
 		 * @public
-		 * @param {HTMLElement} oDomRef
-		 * @returns {this}
 		 */
-		TooltipEventTrigger.prototype.attach = function(oDomRef) {
-			if (!oDomRef) {
-				return this;
-			}
-			if (this._oDomRef === oDomRef) {
-				return this;
-			}
-			if (this._oDomRef) {
-				this.detach();
-			}
-
-			this._oDomRef = oDomRef;
-
-			if (Device.system.desktop || Device.system.combi) {
-				// Left mousedown (normal activation) closes the tooltip immediately.
-				// Right mousedown is left to the browser's contextmenu gesture.
-				this._on("mousedown", (e) => {
-					if (e.button === 2) {
-						return;
-					}
-					const oSel = window.getSelection && window.getSelection();
-					if (oSel && oSel.toString().length > 0) {
-						return;
-					}
-					this._fnOnClose();
-				});
-
-				this._on("mouseenter", () => {
-					// If a text selection exists, the user is likely about to right-click
-					// for the context menu (or is mid-drag-select). Opening would clear it.
-					const oSel = window.getSelection && window.getSelection();
-					if (oSel && oSel.toString().length > 0) {
-						return;
-					}
-					this._fnOnOpen(true);
-				});
-
-				this._on("mouseleave", () => {
-					this._fnOnClose(true);
-				});
-
-				// Open on keyboard focus only, via :focus-visible.
-				this._on("focusin", () => {
-					if (!(oDomRef.matches && oDomRef.matches(":focus-visible"))) {
-						return;
-					}
-					// Suppress tooltip if this is the initial focus (page load).
-					if (bInitialFocus) {
-						return;
-					}
-					this._fnOnOpen(true);
-				});
-
-				this._on("focusout", () => {
-					this._fnOnClose(true);
-				});
-
-				// Escape closes a pending or open tooltip without swallowing the event
-				// from ancestor handlers (e.g. a Dialog's Escape).
-				this._on("keydown", (e) => {
-					if (e.key !== "Escape") {
-						return;
-					}
-					if (this._fnIsPendingOrOpen && this._fnIsPendingOrOpen()) {
-						this._fnOnClose();
-						e.preventDefault();
-					}
-				});
-			}
-
-			// Touch-only (phone or tablet, not combi)
-			if ((Device.system.phone || Device.system.tablet) && !Device.system.combi) {
-				// iOS: suppress the native touch callout (context menu) and text
-				// selection via CSS.
-				if (this._bEnableForTouchDevices) {
-					oDomRef.classList.add("sapUiCoreTooltipHostSuppressSelection");
-				}
-
-				this._on("contextmenu", (e) => {
-					// Android: block the native context menu so long-press opens the tooltip.
-					if (this._bEnableForTouchDevices) {
-						e.preventDefault();
-					}
-				});
-
-				this._on("touchstart", () => {
-					if (!this._bEnableForTouchDevices) {
-						return;
-					}
-					clearTimeout(this._iLongPressTimer);
-					this._iLongPressTimer = setTimeout(() => {
-						this._iLongPressTimer = null;
-						this._fnOnOpen();
-					}, LONG_PRESS_MS);
-				});
-				this._on("touchmove", () => {
-					clearTimeout(this._iLongPressTimer);
-					this._iLongPressTimer = null;
-				});
-				this._on("touchend", () => {
-					clearTimeout(this._iLongPressTimer);
-					this._iLongPressTimer = null;
-				});
-				this._on("touchcancel", () => {
-					clearTimeout(this._iLongPressTimer);
-					this._iLongPressTimer = null;
-				});
-			}
-
-			return this;
-		};
-
-		/**
-		 * Detaches gesture listeners from the currently attached DOM element,
-		 * if any. Safe to call when nothing is attached.
-		 *
-		 * @public
-		 * @returns {this}
-		 */
-		TooltipEventTrigger.prototype.detach = function() {
-			if (!this._oDomRef) {
-				return this;
-			}
-			const oCurrent = this._oDomRef;
+		TooltipEventTrigger.prototype.destroy = function() {
 			if (this._iLongPressTimer) {
 				clearTimeout(this._iLongPressTimer);
 				this._iLongPressTimer = null;
 			}
-			this._aListeners.forEach(([sType, fnHandler]) => {
-				oCurrent.removeEventListener(sType, fnHandler);
-			});
-			this._aListeners = [];
-			// Restore the element: drop the touch-suppression class added in attach().
-			oCurrent.classList.remove("sapUiCoreTooltipHostSuppressSelection");
-			this._oDomRef = null;
-			return this;
-		};
-
-		/**
-		 * Disposes the trigger: detaches the currently attached DOM element, if any.
-		 * @public
-		 */
-		TooltipEventTrigger.prototype.destroy = function() {
-			this.detach();
+			// Drop the touch-suppression class so it does not linger on the host.
+			const oTarget = this._fnDomRefProvider && this._fnDomRefProvider();
+			if (oTarget) {
+				oTarget.classList.remove("sapUiCoreTooltipHostSuppressSelection");
+			}
+			if (this._oHost && this._oDelegate) {
+				this._oHost.removeDelegate(this._oDelegate);
+			}
+			this._oDelegate = null;
+			this._oHost = null;
+			this._fnDomRefProvider = null;
 			this._fnOnOpen = null;
 			this._fnOnClose = null;
 			this._fnIsPendingOrOpen = null;
 
 			iInstancesCount--;
-			// Last instance gone: drop the shared document listener (no-op if already off).
+			// Last instance gone: drop the shared document listener.
 			if (iInstancesCount === 0) {
 				detachInitialFocusListener();
 			}
@@ -285,15 +159,230 @@ sap.ui.define([
 		};
 
 		/**
-		 * Adds a single event listener on the currently attached DOM element
-		 * and records it for later removal by {@link #detach}.
+		 * Builds the UI5 event delegate. Handler names are UI5 pseudo-event names,
+		 * so UI5 rebinds them across host re-renders.
 		 * @private
-		 * @param {string} sType
-		 * @param {function} fnHandler
+		 * @returns {object}
 		 */
-		TooltipEventTrigger.prototype._on = function(sType, fnHandler) {
-			this._oDomRef.addEventListener(sType, fnHandler);
-			this._aListeners.push([sType, fnHandler]);
+		TooltipEventTrigger.prototype._buildDelegate = function() {
+			const oDelegate = {};
+
+			if (Device.system.desktop || Device.system.combi) {
+				oDelegate.onmousedown = this._onMouseDown;
+				oDelegate.onmouseover = this._onMouseOver;
+				oDelegate.onmouseout  = this._onMouseOut;
+				oDelegate.onfocusin   = this._onFocusIn;
+				oDelegate.onfocusout  = this._onFocusOut;
+				oDelegate.onsapescape = this._onSapEscape;
+			}
+
+			// Touch-only (phone or tablet, not combi).
+			if ((Device.system.phone || Device.system.tablet) && !Device.system.combi) {
+				oDelegate.oncontextmenu = this._onContextMenu;
+				oDelegate.ontouchstart  = this._onTouchStart;
+				oDelegate.ontouchmove   = this._onTouchMove;
+				oDelegate.ontouchend    = this._onTouchEnd;
+				oDelegate.ontouchcancel = this._onTouchCancel;
+				oDelegate.onAfterRendering = this._onAfterRendering;
+			}
+
+			return oDelegate;
+		};
+
+		/**
+		 * Adds or removes the touch-suppression class on the current target.
+		 * @private
+		 */
+		TooltipEventTrigger.prototype._syncTouchSuppression = function() {
+			if (!((Device.system.phone || Device.system.tablet) && !Device.system.combi)) {
+				return;
+			}
+			const oTarget = this._fnDomRefProvider && this._fnDomRefProvider();
+			if (!oTarget) {
+				return;
+			}
+			oTarget.classList.toggle("sapUiCoreTooltipHostSuppressSelection", this._bEnableForTouchDevices);
+		};
+
+		/**
+		 * Whether the gesture landed inside this trigger's target.
+		 * @private
+		 * @param {jQuery.Event} oEvent
+		 * @returns {boolean}
+		 */
+		TooltipEventTrigger.prototype._isForMyTarget = function(oEvent) {
+			const oTarget = this._fnDomRefProvider && this._fnDomRefProvider();
+			return !!(oTarget && oEvent.target && oTarget.contains(oEvent.target));
+		};
+
+		/**
+		 * Whether the move stayed inside the target (an inner move, not a real
+		 * enter/leave).
+		 * @private
+		 * @param {jQuery.Event} oEvent
+		 * @returns {boolean}
+		 */
+		TooltipEventTrigger.prototype._isMoveWithinTarget = function(oEvent) {
+			const oTarget = this._fnDomRefProvider && this._fnDomRefProvider();
+			const oRelated = oEvent.relatedTarget;
+			return !!(oTarget && oRelated && oTarget.contains(oRelated));
+		};
+
+		/**
+		 * Left mousedown (normal activation) closes the tooltip immediately.
+		 * Right mousedown is left to the browser's contextmenu gesture.
+		 * @private
+		 */
+		TooltipEventTrigger.prototype._onMouseDown = function(oEvent) {
+			if (!this._isForMyTarget(oEvent)) {
+				return;
+			}
+			if (oEvent.button === 2) {
+				return;
+			}
+			if (hasTextSelection()) {
+				return;
+			}
+			this._fnOnClose();
+		};
+
+		/**
+		 * @private
+		 */
+		TooltipEventTrigger.prototype._onMouseOver = function(oEvent) {
+			if (!this._isForMyTarget(oEvent)) {
+				return;
+			}
+			if (this._isMoveWithinTarget(oEvent)) {
+				return;
+			}
+			// A live selection means a likely right-click / drag-select; opening would clear it.
+			if (hasTextSelection()) {
+				return;
+			}
+			this._fnOnOpen(true);
+		};
+
+		/**
+		 * @private
+		 */
+		TooltipEventTrigger.prototype._onMouseOut = function(oEvent) {
+			if (!this._isForMyTarget(oEvent)) {
+				return;
+			}
+			if (this._isMoveWithinTarget(oEvent)) {
+				return;
+			}
+			this._fnOnClose(true);
+		};
+
+		/**
+		 * Open on keyboard focus only, via :focus-visible.
+		 * @private
+		 */
+		TooltipEventTrigger.prototype._onFocusIn = function(oEvent) {
+			if (!this._isForMyTarget(oEvent)) {
+				return;
+			}
+			const oTarget = this._fnDomRefProvider();
+			if (!(oTarget && oTarget.matches && oTarget.matches(":focus-visible"))) {
+				return;
+			}
+			// Suppress the tooltip on the initial page-load focus.
+			if (bInitialFocus) {
+				return;
+			}
+			this._fnOnOpen(true);
+		};
+
+		/**
+		 * @private
+		 */
+		TooltipEventTrigger.prototype._onFocusOut = function(oEvent) {
+			if (!this._isForMyTarget(oEvent)) {
+				return;
+			}
+			this._fnOnClose(true);
+		};
+
+		/**
+		 * Escape closes a pending or open tooltip without swallowing the event
+		 * from ancestors (e.g. a Dialog's Escape).
+		 * @private
+		 */
+		TooltipEventTrigger.prototype._onSapEscape = function(oEvent) {
+			if (this._fnIsPendingOrOpen && this._fnIsPendingOrOpen()) {
+				this._fnOnClose();
+				oEvent.preventDefault();
+			}
+		};
+
+		/**
+		 * @private
+		 */
+		TooltipEventTrigger.prototype._onContextMenu = function(oEvent) {
+			if (!this._isForMyTarget(oEvent)) {
+				return;
+			}
+			if (this._bEnableForTouchDevices) {
+				oEvent.preventDefault();
+			}
+		};
+
+		/**
+		 * @private
+		 */
+		TooltipEventTrigger.prototype._onTouchStart = function(oEvent) {
+			if (!this._isForMyTarget(oEvent)) {
+				return;
+			}
+			if (!this._bEnableForTouchDevices) {
+				return;
+			}
+			this._clearLongPressTimer();
+			this._iLongPressTimer = setTimeout(() => {
+				this._iLongPressTimer = null;
+				this._fnOnOpen();
+			}, LONG_PRESS_MS);
+		};
+
+		/**
+		 * @private
+		 */
+		TooltipEventTrigger.prototype._clearLongPressTimer = function() {
+			if (this._iLongPressTimer) {
+				clearTimeout(this._iLongPressTimer);
+				this._iLongPressTimer = null;
+			}
+		};
+
+		/**
+		 * @private
+		 */
+		TooltipEventTrigger.prototype._onTouchMove = function() {
+			this._clearLongPressTimer();
+		};
+
+		/**
+		 * @private
+		 */
+		TooltipEventTrigger.prototype._onTouchEnd = function() {
+			this._clearLongPressTimer();
+		};
+
+		/**
+		 * @private
+		 */
+		TooltipEventTrigger.prototype._onTouchCancel = function() {
+			this._clearLongPressTimer();
+		};
+
+		/**
+		 * Reapplies the touch-suppression class, whose target DOM is recreated on re-render.
+		 * @private
+		 */
+		TooltipEventTrigger.prototype._onAfterRendering = function() {
+			this._syncTouchSuppression();
 		};
 
 		/**

@@ -156,6 +156,37 @@ sap.ui.define([
 		}.bind(this));
 	});
 
+	QUnit.test("retrieveLinkItems should re-fetch when cached items are empty but context is unchanged", function (assert) {
+		const done = assert.async();
+		const sBindingContextPath = "fakeBindingContextPath";
+		const oLink = new Link({
+			delegate: {
+				name: "test-resources/sap/ui/mdc/qunit/link/TestDelegate_Link",
+				payload: {
+					items: this.aLinkItems
+				}
+			}
+		});
+
+		sinon.stub(oLink, "_getControlBindingContext").returns({
+			getPath: function () {
+				return sBindingContextPath;
+			}
+		});
+
+		const fnUseDelegateItems = sinon.spy(oLink, "_useDelegateItems");
+
+		// Simulate the scenario: context path is cached but _aLinkItems is empty
+		oLink._sItemsContextPath = sBindingContextPath;
+		oLink._aLinkItems = [];
+
+		oLink.retrieveLinkItems().then(function (aRetrievedLinkItems) {
+			assert.ok(fnUseDelegateItems.calledOnce, "_useDelegateItems is called when cached items are empty");
+			assert.deepEqual(aRetrievedLinkItems, this.aLinkItems, "LinkItems are fetched from delegate");
+			done();
+		}.bind(this));
+	});
+
 	QUnit.test("retrieveAdditionalContent should only be called once when calling open", function(assert) {
 		const done = assert.async();
 		const oLink = new Link({

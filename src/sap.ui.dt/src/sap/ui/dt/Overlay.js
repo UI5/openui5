@@ -820,23 +820,32 @@ sap.ui.define([
 	 * @private
 	 */
 	Overlay.prototype._handleOverflowScroll = function(oGeometry, oTargetDomRef, oTargetOverlay, bForceScrollbarSync) {
-		var oOriginalDomRef = oGeometry.domRef;
-		var mSize = oGeometry.size;
+		const oOriginalDomRef = oGeometry.domRef;
+		const mSize = oGeometry.size;
 
 		// OVERFLOW & SCROLLING
-		var oOverflows = DOMUtil.getOverflows(oOriginalDomRef);
+		const oOverflows = DOMUtil.getOverflows(oOriginalDomRef);
 
-		oTargetDomRef.style.overflowX = oOverflows.overflowX;
-		oTargetDomRef.style.overflowY = oOverflows.overflowY;
+		const iScrollHeight = oOriginalDomRef.scrollHeight;
+		const iScrollWidth = oOriginalDomRef.scrollWidth;
 
-		var iScrollHeight = oOriginalDomRef.scrollHeight;
-		var iScrollWidth = oOriginalDomRef.scrollWidth;
-		var oDummyScrollContainer = oTargetDomRef.querySelector(":scope> .sapUiDtDummyScrollContainer");
-
-		// Math.ceil is needed because iScrollHeight is an integer value, mSize not. To compare we should have an integer value for mSize too.
+		// "hidden" is still programmatically scrollable. When an overlay only overflows because a stretched
+		// descendant (e.g. RTA Stretch padding) grew its children - while the associated element itself does
+		// not overflow on that axis - scrollIntoView() can scroll the overlay, triggering a MutationOnScroll
+		// that misaligns the overlays. On such an axis "hidden" is downgraded to "clip", which clips identically
+		// but is not a scroll container. When the associated element genuinely overflows, the overlay is used as
+		// a scroll proxy (dummy container + ScrollbarSynchronizer below) and must stay scrollable, so "hidden" is kept.
+		// Math.ceil is needed because iScrollHeight is an integer value, mSize not.
 		// example: iScrollHeight = 24px, mSize.height = 23.98375. Both should be the same.
-		if (iScrollHeight > Math.ceil(mSize.height) || iScrollWidth > Math.ceil(mSize.width)) {
-			var oScrollbarSynchronizer;
+		const bOriginalOverflowsX = iScrollWidth > Math.ceil(mSize.width);
+		const bOriginalOverflowsY = iScrollHeight > Math.ceil(mSize.height);
+		oTargetDomRef.style.overflowX = (oOverflows.overflowX === "hidden" && !bOriginalOverflowsX) ? "clip" : oOverflows.overflowX;
+		oTargetDomRef.style.overflowY = (oOverflows.overflowY === "hidden" && !bOriginalOverflowsY) ? "clip" : oOverflows.overflowY;
+
+		let oDummyScrollContainer = oTargetDomRef.querySelector(":scope> .sapUiDtDummyScrollContainer");
+
+		if (bOriginalOverflowsY || bOriginalOverflowsX) {
+			let oScrollbarSynchronizer;
 			if (!oDummyScrollContainer) {
 				oDummyScrollContainer = document.createElement("div");
 				oDummyScrollContainer.classList.add("sapUiDtDummyScrollContainer");

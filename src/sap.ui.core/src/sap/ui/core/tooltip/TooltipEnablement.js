@@ -29,6 +29,7 @@ sap.ui.define([
 		 * @param {function():string} [oConfig.textProvider] Callback that builds the visible tooltip text. Defaults to <code>oHost.getTooltip_AsString()</code>.
 		 * @param {function():string} [oConfig.invisibleTextProvider] Callback that builds the text written into the invisible ARIA anchor. Falls back to <code>textProvider</code> when omitted.
 		 * @param {function():HTMLElement} [oConfig.domRefProvider] Callback that returns the DOM element the gesture listeners should attach to. Defaults to <code>oHost.getFocusDomRef()</code>. Override this when neither the host's focus DOM nor the outer DOM ref is the correct attachment point — for example a wrapper element that owns the hover/focus area.
+		 * @param {string} [oConfig.invisibleTooltipIdSuffix="-invisibleTooltip"] Suffix for the invisible ARIA anchor's id. Set a distinct value when one host owns several <code>TooltipEnablement</code>s so each anchor id stays unique.
 		 * @param {boolean} [oConfig.enableForTouchDevices=true] Whether long-press should open the tooltip on touch devices. Use this to disable it for links.
 		 *
 		 * @class
@@ -202,29 +203,18 @@ sap.ui.define([
 				this._fnTextProvider = oConfig.textProvider;
 				this._fnInvisibleTextProvider = oConfig.invisibleTextProvider;
 				this._fnDomRefProvider = oConfig.domRefProvider || (() => oHost.getFocusDomRef());
+				this._sInvisibleTooltipIdSuffix = oConfig.invisibleTooltipIdSuffix || "-invisibleTooltip";
 
 				this._oTooltip = null;
 
 				this._oEventTrigger = new TooltipEventTrigger({
+					host: oHost,
+					domRefProvider: this._fnDomRefProvider,
 					onOpen: (bWithDelay) => this._open(bWithDelay),
 					onClose: (bWithDelay) => this._close(bWithDelay),
 					isPendingOrOpen: this._isPendingOrOpen.bind(this),
 					enableForTouchDevices: oConfig.enableForTouchDevices
 				});
-
-				// Re-wire DOM listeners across host re-renders. The trigger itself is host-agnostic.
-				this._oDelegate = {
-					onBeforeRendering: this._onHostBeforeRendering,
-					onAfterRendering: this._onHostAfterRendering
-				};
-				oHost.addDelegate(this._oDelegate, this);
-
-				// If the host is already rendered, attach immediately —
-				// onAfterRendering won't fire until the next render.
-				const oDomRef = this._fnDomRefProvider();
-				if (oDomRef) {
-					this._oEventTrigger.attach(oDomRef);
-				}
 			}
 		});
 
@@ -256,7 +246,7 @@ sap.ui.define([
 		 */
 		TooltipEnablement.prototype.getInvisibleTooltipId = function() {
 			return this._resolveInvisibleText() !== ""
-				? this._oHost.getId() + "-invisibleTooltip"
+				? this._oHost.getId() + this._sInvisibleTooltipIdSuffix
 				: null;
 		};
 
@@ -347,12 +337,6 @@ sap.ui.define([
 		 * @public
 		 */
 		TooltipEnablement.prototype.destroy = function() {
-			if (this._oHost && this._oDelegate) {
-				this._oHost.removeDelegate(this._oDelegate);
-			}
-
-			this._oDelegate = null;
-
 			if (this._oEventTrigger) {
 				this._oEventTrigger.destroy();
 				this._oEventTrigger = null;
@@ -396,27 +380,7 @@ sap.ui.define([
 		};
 
 		/**
-		 * Detaches gesture listeners before the host re-renders.
-		 * @private
-		 */
-		TooltipEnablement.prototype._onHostBeforeRendering = function() {
-			this._oEventTrigger.detach();
-		};
-
-		/**
-		 * Re-attaches gesture listeners after the host has been re-rendered.
-		 * @private
-		 */
-		TooltipEnablement.prototype._onHostAfterRendering = function() {
-			const oDomRef = this._oHost && this._fnDomRefProvider();
-			if (oDomRef) {
-				this._oEventTrigger.attach(oDomRef);
-			}
-		};
-
-		/**
-		 * Resolves the visible tooltip text from <code>textProvider</code>,
-		 * falling back to the host's <code>getTooltip_AsString()</code>.
+		 * Resolves the visible tooltip text from <code>textProvider</code>.
 		 * @returns {string}
 		 * @private
 		 */
@@ -485,7 +449,10 @@ sap.ui.define([
 
 			this._syncInnerTooltip();
 
-			TooltipManager.openSingle(oTooltip, this._oHost, bWithDelay);
+			// Open next to the gesture's target so each target anchors correctly; fall back to the host.
+			const oOpenBy = this._fnDomRefProvider() || this._oHost;
+
+			TooltipManager.openSingle(oTooltip, oOpenBy, bWithDelay);
 		};
 
 		/**

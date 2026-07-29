@@ -6,6 +6,7 @@ sap.ui.define([
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/table/extensions/Pointer",
 	"sap/ui/table/Row",
+	"sap/ui/table/Column",
 	"sap/ui/table/utils/TableUtils",
 	"sap/ui/table/library",
 	"sap/ui/table/rowmodes/Fixed",
@@ -17,6 +18,7 @@ sap.ui.define([
 	nextUIUpdate,
 	PointerExtension,
 	Row,
+	Column,
 	TableUtils,
 	library,
 	FixedRowMode,
@@ -1004,6 +1006,103 @@ sap.ui.define([
 				done();
 			}, 100);
 		}, 250);
+	});
+
+	QUnit.module("Reorder helpers - Ghost", {
+		beforeEach: async function() {
+			this.oTable = TableQUnitUtils.createTable({
+				columns: [
+					// Single-header column (plain label aggregation)
+					new Column({
+						label: new TableQUnitUtils.TestControl({text: "Single"}),
+						template: new TableQUnitUtils.TestControl({text: "content"})
+					}),
+					// Multi-header: label in the first header row, second row empty
+					new Column({
+						multiLabels: [
+							new TableQUnitUtils.TestControl({text: "R1only"})
+						],
+						template: new TableQUnitUtils.TestControl({text: "content"})
+					}),
+					// Multi-header: label in the second header row, first row empty
+					new Column({
+						multiLabels: [
+							new TableQUnitUtils.TestControl({text: "Group", visible: false}),
+							new TableQUnitUtils.TestControl({text: "R2only"})
+						],
+						template: new TableQUnitUtils.TestControl({text: "content"})
+					}),
+					// Multi-header: label in both header rows
+					new Column({
+						multiLabels: [
+							new TableQUnitUtils.TestControl({text: "Both1"}),
+							new TableQUnitUtils.TestControl({text: "Both2"})
+						],
+						template: new TableQUnitUtils.TestControl({text: "content"})
+					})
+				]
+			});
+			await this.oTable.qunit.whenRenderingFinished();
+			const oPointerExtension = this.oTable._getPointerExtension();
+			oPointerExtension._debug();
+			this.oReorderHelper = oPointerExtension._ReorderHelper;
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		},
+		getGhostText: function() {
+			const oGhost = this.oTable.getDomRef("roghost");
+			return oGhost ? oGhost.textContent.trim() : null;
+		},
+		cleanupReorder: function() {
+			// Unbind the document handlers attached by initReordering and remove the created DOM
+			jQuery(document).off(".sapUiColumnMove");
+			jQuery(this.oTable._$ReorderGhost).remove();
+			delete this.oTable._$ReorderGhost;
+			jQuery(this.oTable._$ReorderIndicator).remove();
+			delete this.oTable._$ReorderIndicator;
+		}
+	});
+
+	QUnit.test("Single-header column in a single-row header", async function(assert) {
+		// Collapse the multi-header columns to plain labels so the table renders only a single header row
+		this.oTable.getColumns().forEach((oColumn, iIndex) => {
+			if (oColumn.getMultiLabels().length > 0) {
+				oColumn.destroyMultiLabels();
+				oColumn.setLabel(new TableQUnitUtils.TestControl({text: "Plain" + iIndex}));
+			}
+		});
+		await this.oTable.qunit.whenRenderingFinished();
+
+		this.oReorderHelper.initReordering(this.oTable, 1, createPointerEvent("mousedown"));
+
+		assert.strictEqual(this.getGhostText(), "Plain1", "Ghost contains the column header label");
+
+		this.cleanupReorder();
+	});
+
+	QUnit.test("Single-header column in a multi-row header", function(assert) {
+		this.oReorderHelper.initReordering(this.oTable, 0, createPointerEvent("mousedown"));
+
+		assert.strictEqual(this.getGhostText(), "Single", "Ghost contains the column header label");
+
+		this.cleanupReorder();
+	});
+
+	QUnit.test("Multi-header column", function(assert) {
+		const aScenarios = [
+			{index: 1, expected: "R1only", description: "Label in the first header row, second row empty"},
+			{index: 2, expected: "R2only", description: "Label in the second header row, first row empty"},
+			{index: 3, expected: "Both2", description: "Label in both header rows"}
+		];
+
+		assert.strictEqual(TableUtils.getHeaderRowCount(this.oTable), 2, "Table renders two header rows");
+
+		aScenarios.forEach((oScenario) => {
+			this.oReorderHelper.initReordering(this.oTable, oScenario.index, createPointerEvent("mousedown"));
+			assert.strictEqual(this.getGhostText(), oScenario.expected, oScenario.description);
+			this.cleanupReorder();
+		});
 	});
 
 	QUnit.module("Row Hover Effect", {

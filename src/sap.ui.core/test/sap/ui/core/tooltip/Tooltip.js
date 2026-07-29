@@ -74,10 +74,11 @@ sap.ui.require([
 	}
 
 	// --- Default placement (via TooltipEnablement on fake buttons) ---
+	const oFirstButton = new FakeButton({ text: "Default", tooltipText: "Default tooltip" });
 	const oDefaultPanel = panel("Text and default placement", [
 		row([
 			label("Default (VerticalPreferredTop):"),
-			new FakeButton({ text: "Default", tooltipText: "Default tooltip" }),
+			oFirstButton,
 			new FakeButton({ text: "Short text", tooltipText: "Short" }),
 			new FakeButton({ text: "Long text", tooltipText: LONG_TOOLTIP }),
 			new FakeButton({ text: "Very long text", tooltipText: VERY_LONG_TOOLTIP })
@@ -199,7 +200,7 @@ sap.ui.require([
 			if (!oPopover) {
 				oPopover = new Popover({
 					title: "Tooltip hosts inside a Popover",
-					placement: "Bottom",
+					placement: PlacementType.PreferredTopOrFlip,
 					content: new VBox({ items: containerContent("Popover") }).addStyleClass("sapUiSmallMargin")
 				});
 			}
@@ -217,7 +218,7 @@ sap.ui.require([
 						if (!oNestedPopover) {
 							oNestedPopover = new Popover({
 								title: "Popover nested in a Dialog",
-								placement: "Bottom",
+								placement: PlacementType.PreferredTopOrFlip,
 								content: new VBox({ items: containerContent("nested Popover") }).addStyleClass("sapUiSmallMargin")
 							});
 						}
@@ -300,4 +301,12 @@ sap.ui.require([
 			}).addStyleClass("sapUiContentPadding")
 		]
 	}).placeAt("content");
+
+	// Focus the first button on load (regular browser behaviour) to verify the
+	// tooltip does NOT open on the initial page-load focus.
+	oFirstButton.addEventDelegate({
+		onAfterRendering: function () {
+			this.focus();
+		}
+	}, oFirstButton);
 });
