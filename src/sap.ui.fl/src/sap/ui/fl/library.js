@@ -494,6 +494,7 @@ sap.ui.define([
 			flChangeHandlers: {
 				"sap.ui.fl.util.IFrame": "sap/ui/fl/util/IFrame"
 			},
+			"sap.ui.debug": true,
 			"sap.ui.support": {
 				diagnosticPlugins: [
 					"sap/ui/fl/support/diagnostics/FlexibilityPlugin"

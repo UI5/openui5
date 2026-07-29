@@ -160,6 +160,11 @@ sap.ui.define(function() {
 					only: ["sap/ui/dt/Util"]
 				}
 			},
+			"support/debug/debug-tools": {
+				coverage: {
+					only: ["sap/ui/dt/support/debug/debug-tools"]
+				}
+			},
 			"util/ZIndexManager": {
 				coverage: {
 					only: ["sap/ui/dt/util/ZIndexManager"]
