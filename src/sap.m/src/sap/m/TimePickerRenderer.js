@@ -86,7 +86,7 @@ sap.ui.define(['sap/ui/core/Renderer', './DateTimeFieldRenderer', 'sap/ui/core/l
 				oRm.attr("readonly", "readonly"); // readonly for mobile devices
 			}
 			if (oControl.getShowValueStateMessage()) {
-				oRm.attr("autocomplete", "off"); // autocomplete="off" needed so the native browser autocomplete is not shown?
+				oRm.attr("autocomplete", "off");
 			}
 
 			oRm.attr("maxlength", MAX_INPUT_VALUE_LENGTH);
