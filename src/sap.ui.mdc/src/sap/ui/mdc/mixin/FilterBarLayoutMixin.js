@@ -81,20 +81,18 @@ sap.ui.define([
 				return;
 			}
 
-			const oFBDim = oFB.getBoundingClientRect(),
-				oButtonsDim = oButtons.getBoundingClientRect(),
+			const oButtonsDim = oButtons.getBoundingClientRect(),
 				oFirstItemDim = oFirstItem.getBoundingClientRect(),
 				oLastItemDim = oLastItem.getBoundingClientRect();
 			let sButtonStyle = "";
 			if (oButtonsDim.x - iItemsGap >= oLastItemDim.x + oLastItemDim.width) {
 				sButtonStyle = `margin-top: -${oLastItemDim.height}px`;
 			}
-			const iLeftPadding = parseInt(getComputedStyle(oFB).paddingLeft);
-			const iRightPadding = parseInt(getComputedStyle(oFB).paddingRight);
 
-			if (oFBDim.left + iLeftPadding === oFirstItemDim.left && oFBDim.right - iRightPadding === oFirstItemDim.right) {
+			if (oLastItemDim.width < oFirstItemDim.width) {
 				sButtonStyle = "";
 			}
+
 			oButtons.style = sButtonStyle;
 
 			if (oFirstItemDim.y === oLastItemDim.y) {
