@@ -911,8 +911,47 @@ function(
 			this._fTempValue = oValue;
 			this._bValueStatePreset = false;
 
+			// Only clear a stale error state once the control is rendered, so we don't
+			// validate half-initialized bound values during the templating phase (stepinp1.html).
+			if (this.getDomRef()) {
+				this._clearErrorIfValueValid();
+			}
+
 			return oResult;
 		};
+
+
+		/**
+		 * Clears an existing error <code>valueState</code> only if the current value
+		 * is valid. It never sets an error state, so it is safe to call from
+		 * <code>setValue</code> without interfering with the initial binding/templating
+		 * phase (where bound values may not be available yet).
+		 *
+		 * @private
+		 */
+		StepInput.prototype._clearErrorIfValueValid = function () {
+			// Only act if we currently show an error that was not explicitly preset via setValueState
+			if (this.getValueState() !== ValueState.Error || this._bValueStatePreset) {
+				return;
+			}
+
+			var value = this._parseNumber(this._getInput().getValue());
+
+			if (!this._isNumericLike(value)) {
+				return;
+			}
+
+			var bValid = !this._isMoreThanMax(value) &&
+				!this._isLessThanMin(value) &&
+				!(this._areFoldChangeRequirementsFulfilled() && (value % this.getStep() !== 0)) &&
+				this._isValueWithCorrectPrecision(this._getInput().getValue());
+
+			if (bValid) {
+				this.setProperty("valueState", ValueState.None, true);
+				this._getInput().setValueState(ValueState.None);
+			}
+		};
+
 
 		StepInput.prototype._getNumberFormatter = function(bReset) {
 			if (!this._formatter || bReset) {
