@@ -14,7 +14,7 @@ Since the above web components were defined by the same or newer version runtime
 
 To prevent other runtimes from defining tags that you use, consider using scoping or have third-party libraries use scoping: https://github.com/UI5/webcomponents/blob/main/docs/2-advanced/06-scoping.md.`,console.warn(t);};
 
-	const e$c={version:"2.24.0",major:2,minor:24,patch:0,suffix:"",isNext:false,buildTime:1783339253};
+	const e$c={version:"2.24.2",major:2,minor:24,patch:2,suffix:"",isNext:false,buildTime:1784895942};
 
 	let s$c,t$h={include:[/./],exclude:[]};const o$b=new Map,p$2=e=>{if(!e.match(/^[a-zA-Z0-9_-]+$/))throw new Error("Only alphanumeric characters and dashes allowed for the scoping suffix");R$2()&&console.warn("Setting the scoping suffix must be done before importing any components. For proper usage, read the scoping section: https://github.com/UI5/webcomponents/blob/main/docs/2-advanced/06-scoping.md."),s$c=e;},c$a=()=>s$c,g$6=e=>{if(!e||!e.include)throw new Error('"rules" must be an object with at least an "include" property');if(!Array.isArray(e.include)||e.include.some(n=>!(n instanceof RegExp)))throw new Error('"rules.include" must be an array of regular expressions');if(e.exclude&&(!Array.isArray(e.exclude)||e.exclude.some(n=>!(n instanceof RegExp))))throw new Error('"rules.exclude" must be an array of regular expressions');e.exclude=e.exclude||[],t$h=e,o$b.clear();},m$9=()=>t$h,i$d=e=>{if(!o$b.has(e)){const n=t$h.include.some(r=>e.match(r))&&!t$h.exclude.some(r=>e.match(r));o$b.set(e,n);}return o$b.get(e)},d$8=e=>{if(i$d(e))return c$a()},f$8=(e,n=false)=>{if(!n)return e;const r=`v${e$c.version.replaceAll(".","-")}`,a=/(--_?ui5)([^,:)\s]+)/g;return e.replaceAll(a,`$1-${r}$2`)};
 

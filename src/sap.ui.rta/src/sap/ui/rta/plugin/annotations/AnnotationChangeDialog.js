@@ -4,6 +4,7 @@
 sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/base/ManagedObject",
+	"sap/ui/core/Element",
 	"sap/ui/core/Fragment",
 	"sap/ui/dt/ElementUtil",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
@@ -15,6 +16,7 @@ sap.ui.define([
 ], function(
 	Log,
 	ManagedObject,
+	Element,
 	Fragment,
 	ElementUtil,
 	PersistenceWriteAPI,
@@ -91,7 +93,19 @@ sap.ui.define([
 	};
 
 	AnnotationChangeDialog.prototype._openDialog = function() {
+		// Set the initial focus before opening so it does not visibly jump after the open animation.
+		if (this.oChangeAnnotationModel.getProperty("/singleFieldRename")) {
+			// A single-field rename always shows exactly one text input
+			this._oDialog.setInitialFocus("sapUiRtaChangeAnnotationDialog_singleRenameField");
+		} else {
+			this._oDialog.setInitialFocus("sapUiRtaChangeAnnotationDialog_propertiesFilter");
+		}
 		this._oDialog.open();
+		if (this.oChangeAnnotationModel.getProperty("/singleFieldRename")) {
+			// Select the text synchronously right after opening (as the rename dialog does) so the
+			// selection is visible without waiting for the afterOpen event, avoiding a focus flicker.
+			Element.getElementById("sapUiRtaChangeAnnotationDialog_singleRenameField").getFocusDomRef().select();
+		}
 		return this._oController.initialize();
 	};
 
@@ -242,6 +256,11 @@ sap.ui.define([
 			}
 		}
 
+		// A true single-field rename shows exactly one editable field. This drives the auto-focus
+		// and the Enter-to-save behavior (see AnnotationChangeDialogController), which must not apply
+		// when the label heuristic above yields more than one field.
+		const bSingleFieldRename = !!bSingleRename && aPropertiesToDisplay.length === 1;
+
 		this.oChangeAnnotationModel.setData({
 			objectAsKey: bObjectAsKey,
 			control: oControl,
@@ -252,8 +271,7 @@ sap.ui.define([
 			propertiesToDisplay: aPropertiesToDisplay, // switches dynamically between all/single-rename target
 			showChangedPropertiesOnly: false,
 			filterText: sFilterText,
-			singleRename: bSingleRename || false,
-			preSelectedProperty: sPreSelectedPropertyKey || "",
+			singleFieldRename: bSingleFieldRename,
 			possibleValues: aPossibleValues,
 			valueType: sAnnotationValueType,
 			serviceUrl: sServiceUrl,

@@ -4691,7 +4691,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/ManagedStyles', 'sap/f/th
         supportsTouch: ManagedStyles.l$1
     });
 
-    ManagedStyles.p("6bfd01e3");
+    ManagedStyles.p("0b2c601f");
 
     exports.A = A;
     exports.C = C$1;

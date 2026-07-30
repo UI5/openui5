@@ -360,7 +360,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	 * Handles search fields with collapsed/open properties and ui5-open/close/search events.
 	 */
 	class ShellBarSearch {
-	    constructor({ getOverflowed, setSearchState, getSearchField, getSearchState, getCSSVariable, }) {
+	    constructor({ getOverflowed, setSearchState, getSearchField, getSearchState, getCSSVariable, handleSearchButtonClick, }) {
 	        this.onSearchBound = this.onSearch.bind(this);
 	        this.onSearchOpenBound = this.onSearchOpen.bind(this);
 	        this.onSearchCloseBound = this.onSearchClose.bind(this);
@@ -370,6 +370,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        this.getSearchField = getSearchField;
 	        this.getSearchState = getSearchState;
 	        this.setSearchState = setSearchState;
+	        this.handleSearchButtonClick = handleSearchButtonClick;
 	    }
 	    subscribe(searchField = this.getSearchField()) {
 	        if (!searchField) {
@@ -466,7 +467,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        if (ManagedStyles.d() || (this.getSearchField()?.value && this.getSearchState())) {
 	            return;
 	        }
-	        this.setSearchState(!this.getSearchState());
+	        this.handleSearchButtonClick();
 	    }
 	    /**
 	     * Gets the minimum width needed for search field from CSS variable.
@@ -1328,6 +1329,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	            getSearchState: () => this.enabledFeatures.search && this.showSearchField,
 	            getCSSVariable: (cssVar) => this.getCSSVariable(cssVar),
 	            setSearchState: (expanded) => this.setSearchState(expanded),
+	            handleSearchButtonClick: () => this.handleSearchButtonClick(),
 	            getOverflowed: () => this.overflow.isOverflowing(this.overflowOuter, this.overflowInner),
 	        };
 	    }
@@ -1338,7 +1340,9 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        return this._searchAdaptorLegacy;
 	    }
 	    handleSearchButtonClick() {
-	        const searchButton = this.shadowRoot.querySelector(".ui5-shellbar-search-button");
+	        const searchButton = this.isSelfCollapsibleSearch
+	            ? this.search?.shadowRoot?.querySelector(".ui5-shell-search-field-button") ?? null
+	            : this.shadowRoot.querySelector(".ui5-shellbar-search-button");
 	        const defaultPrevented = !this.fireDecoratorEvent("search-button-click", {
 	            targetRef: searchButton,
 	            searchFieldVisible: this.showSearchField,
@@ -1551,6 +1555,9 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	     */
 	    async getSearchButtonDomRef() {
 	        await ManagedStyles.w();
+	        if (this.isSelfCollapsibleSearch) {
+	            return this.search.getSearchButtonDomRef();
+	        }
 	        return this.shadowRoot.querySelector(`*[data-ui5-stable="toggle-search"]`);
 	    }
 	    _fireClickEvent(eventName, domRef) {

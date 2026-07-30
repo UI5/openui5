@@ -58,6 +58,9 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Search3
         }
         _handleEnter() {
             if (!this.value && !this.collapsed) {
+                // Fire `ui5-search` so a host ShellBar collapses in sync; also collapse
+                // locally for standalone usage (host converges on the same state).
+                this._handleSearchEvent();
                 this.collapsed = true;
                 setTimeout(() => {
                     this.focus();
@@ -91,6 +94,9 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Search3
         get nativeInput() {
             const domRef = this.shadowRoot;
             return ManagedStyles.d() ? domRef?.querySelector(`[ui5-responsive-popover] input`) : super.nativeInput;
+        }
+        getSearchButtonDomRef() {
+            return this.shadowRoot?.querySelector(".ui5-shell-search-field-button") ?? null;
         }
         _onfocusin() {
             super._onfocusin();

@@ -1492,6 +1492,13 @@ sap.ui.define([
 				}
 			},
 
+			"support/debug/debug-tools": {
+				group: "Support",
+				coverage: {
+					only: ["sap/ui/fl/support/debug/debug-tools"]
+				}
+			},
+
 			"support/apps/contentbrowser/controller/ContentDetails.controller": {
 				group: "Support",
 				coverage: {

@@ -936,7 +936,8 @@ sap.ui.define([
 			oFetchOptions.body = JSON.stringify(oPayload);
 		}
 
-		return _Requestor.fetch(sRequestUrl, oFetchOptions);
+		// Note: fetch API needs to be invoked on window object
+		return _Requestor.fetch.call(window, sRequestUrl, oFetchOptions);
 	};
 
 	/**

@@ -130,7 +130,10 @@ sap.ui.define([
 		types: [],
 		interfaces: [],
 		controls: [],
-		elements: []
+		elements: [],
+		extensions: {
+			"sap.ui.debug": true
+		}
 	});
 
 	ManagedObjectMetadata.setDesignTimeDefaultMapping({
