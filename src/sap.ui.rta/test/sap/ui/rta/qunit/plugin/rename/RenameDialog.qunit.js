@@ -116,6 +116,14 @@ sap.ui.define([
 			assert.strictEqual(sNewText, "New", "then the new text is returned");
 		});
 
+		QUnit.test("when renaming to a valid text and pressing Enter (submit)", async function(assert) {
+			const sNewText = await openDialog(this.oRenameDialog, this.oButtonOverlay, ({ oInput }) => {
+				oInput.setValue("New");
+				oInput.fireSubmit();
+			});
+			assert.strictEqual(sNewText, "New", "then the new text is returned");
+		});
+
 		QUnit.test("when cancel is pressed", async function(assert) {
 			const sNewText = await openDialog(this.oRenameDialog, this.oButtonOverlay, ({ oCancelButton, oInput }) => {
 				oInput.setValue("New");

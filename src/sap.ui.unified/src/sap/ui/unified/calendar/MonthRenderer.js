@@ -15,7 +15,8 @@ sap.ui.define([
 	'sap/ui/core/InvisibleText',
 	'sap/ui/core/date/UI5Date',
 	"sap/ui/core/date/CalendarUtils",
-	"sap/ui/core/Locale"
+	"sap/ui/core/Locale",
+	"sap/ui/core/library"
 ], function(
 	CalendarType,
 	Element,
@@ -29,13 +30,17 @@ sap.ui.define([
 	InvisibleText,
 	UI5Date,
 	CalendarDateUtils,
-	Locale
+	Locale,
+	coreLibrary
 ) {
 "use strict";
 
 
 // shortcut for sap.ui.unified.CalendarDayType
-var CalendarDayType = library.CalendarDayType;
+const CalendarDayType = library.CalendarDayType;
+
+// shortcut for sap.ui.core.aria.HasPopup
+const AriaHasPopup = coreLibrary.aria.HasPopup;
 
 
 
@@ -453,6 +458,15 @@ MonthRenderer.renderDay = function(oRm, oMonth, oDay, oHelper, bOtherMonth, bWee
 	var bEnabled = oMonth._checkDateEnabled(oDay);
 	var bShouldBeMarkedAsSpecialDate = oMonth._isSpecialDateMarkerEnabled(oDay);
 
+	// Determine effective aria-haspopup from per-date value on matched DateTypeRange entries.
+	let sHasPopup = AriaHasPopup.None;
+	for (let i = 0; i < aDayTypes.length; i++) {
+		if (aDayTypes[i].bAriaHasPopupExplicit) {
+			sHasPopup = aDayTypes[i].ariaHasPopup;
+			break;
+		}
+	}
+
 	const sFirstSpecialDateType = aDayTypes.length > 0 && aDayTypes[0].type;
 	const sSecondaryDateType = aDayTypes.length > 0 && aDayTypes[0].secondaryType;
 	const bIsWeekend = oHelper.aNonWorkingDays && oHelper.aNonWorkingDays instanceof Array
@@ -591,6 +605,10 @@ MonthRenderer.renderDay = function(oRm, oMonth, oDay, oHelper, bOtherMonth, bWee
 		CalendarLegendRenderer.addCalendarTypeAccInfo(mAccProps, sAriaType, oLegend);
 	}
 
+	if (sHasPopup !== AriaHasPopup.None) {
+		mAccProps["haspopup"] = sHasPopup.toLowerCase();
+	}
+
 	if (aDayTypes[0] && aDayTypes[0].customData?.length && bShouldBeMarkedAsSpecialDate) {
 		//render customData
 		aDayTypes[0].customData.forEach((customData) => {
@@ -603,7 +621,8 @@ MonthRenderer.renderDay = function(oRm, oMonth, oDay, oHelper, bOtherMonth, bWee
 	oRm.accessibilityState(null, mAccProps);
 	oRm.openEnd(); // div element
 
-	if (aDayTypes[0] && bShouldBeMarkedAsSpecialDate){ //if there's a special date inside current month, render it
+	if (aDayTypes[0] && bShouldBeMarkedAsSpecialDate
+			&& (aDayTypes[0].type !== CalendarDayType.None || aDayTypes[0].color)) { //if there's a special date inside current month, render it
 		oRm.openStart("div");
 		oRm.class("sapUiCalSpecialDate");
 		const sColor = aDayTypes[0].color?.toLowerCase();

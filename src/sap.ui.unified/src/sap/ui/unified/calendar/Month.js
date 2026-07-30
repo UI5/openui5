@@ -1010,10 +1010,10 @@ sap.ui.define([
 			// collects non working day with the first occurrence of one of the types01..types20
 			if ((oTimeStamp === oStartTimeStamp && !oEndDate) || (oTimeStamp >= oStartTimeStamp && oTimeStamp <= oEndTimeStamp)) {
 				if (!bNonWorkingType && !oType) {
-					oType = {type: oRange.getType(), secondaryType: oRange.getSecondaryType(), tooltip: oRange.getTooltip_AsString(), color: oRange.getColor(), customData: oRange.getCustomData()};
+					oType = Month.prototype._createDateTypeObject.call(this, oRange, true);
 					aTypes.push(oType);
 				} else if (bNonWorkingType && !oTypeNW) {
-						oTypeNW = {type: oRange.getType(), secondaryType: oRange.getSecondaryType(), tooltip: oRange.getTooltip_AsString(), customData: oRange.getCustomData()};
+						oTypeNW = Month.prototype._createDateTypeObject.call(this, oRange, false);
 						aTypes.push(oTypeNW);
 				}
 				if (oType && oTypeNW) {
@@ -1024,6 +1024,28 @@ sap.ui.define([
 
 		return aTypes;
 
+	};
+
+	/*
+	 * Creates a date type object from a given date range.
+	 * @param {sap.ui.unified.DateRange} oRange the date range
+	 * @param {boolean} bSetColor whether to include the color property
+	 * @returns {object} the date type object
+	 * @private
+	 */
+	Month.prototype._createDateTypeObject = function(oRange, bSetColor) {
+		const oTypeObject = {
+			type: oRange.getType(),
+			secondaryType: oRange.getSecondaryType(),
+			tooltip: oRange.getTooltip_AsString(),
+			customData: oRange.getCustomData(),
+			ariaHasPopup: oRange.getAriaHasPopup(),
+			bAriaHasPopupExplicit: !oRange.isPropertyInitial("ariaHasPopup")
+		};
+		if (bSetColor) {
+			oTypeObject.color = oRange.getColor();
+		}
+		return oTypeObject;
 	};
 
 	/*
