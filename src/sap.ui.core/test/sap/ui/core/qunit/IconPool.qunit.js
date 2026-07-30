@@ -666,4 +666,69 @@ sap.ui.define([
 		});
 	});
 
+	// =========================================================================
+	// getIconHTML
+	// =========================================================================
+	QUnit.module("getIconHTML");
+
+	QUnit.test("Returns empty string for non-icon URI", function(assert) {
+		assert.strictEqual(IconPool.getIconHTML("http://example.com/img.png"), "", "Non-icon URI returns empty string");
+		assert.strictEqual(IconPool.getIconHTML("just-a-string"), "", "Plain string returns empty string");
+	});
+
+	QUnit.test("Returns empty string for empty or falsy input", function(assert) {
+		assert.strictEqual(IconPool.getIconHTML(""), "", "Empty string");
+		assert.strictEqual(IconPool.getIconHTML(null), "", "null");
+		assert.strictEqual(IconPool.getIconHTML(undefined), "", "undefined");
+		assert.strictEqual(IconPool.getIconHTML(false), "", "false");
+	});
+
+	QUnit.test("Returns empty string for unregistered icon", function(assert) {
+		assert.strictEqual(IconPool.getIconHTML("sap-icon://thisDoesNotExist99999"), "", "Unknown icon returns empty string");
+	});
+
+	QUnit.test("Returns valid HTML span for a known icon", function(assert) {
+		var sHTML = IconPool.getIconHTML("sap-icon://accept");
+		assert.ok(sHTML.length > 0, "Non-empty result");
+		assert.ok(sHTML.indexOf("<span") === 0, "Starts with <span");
+		assert.ok(sHTML.indexOf("</span>") > 0, "Contains closing </span>");
+		assert.ok(sHTML.indexOf("sapUiIcon") > 0, "Contains sapUiIcon class");
+	});
+
+	QUnit.test("Includes additional CSS classes passed as parameter", function(assert) {
+		var sHTML = IconPool.getIconHTML("sap-icon://accept", ["myClass1", "myClass2"]);
+		assert.ok(sHTML.indexOf("myClass1") > 0, "First custom class present");
+		assert.ok(sHTML.indexOf("myClass2") > 0, "Second custom class present");
+		assert.ok(sHTML.indexOf("sapUiIcon") > 0, "Base sapUiIcon class still present");
+	});
+
+	QUnit.test("Includes custom attributes", function(assert) {
+		var sHTML = IconPool.getIconHTML("sap-icon://accept", [], {title: "Accept", id: "myIcon"});
+		assert.ok(sHTML.indexOf("Accept") > 0, "title attribute value present");
+		assert.ok(sHTML.indexOf("myIcon") > 0, "id attribute value present");
+	});
+
+	QUnit.test("Encodes special characters in attributes", function(assert) {
+		var sHTML = IconPool.getIconHTML("sap-icon://accept", [], {title: "a<b&c"});
+		// Browser encodes < and & in attribute values when serializing to outerHTML
+		assert.ok(sHTML.indexOf("a&lt;b&amp;c") > 0, "Special chars are XML-encoded in attribute value");
+	});
+
+	QUnit.test("Does not return img element for icon URIs", function(assert) {
+		var sHTML = IconPool.getIconHTML("sap-icon://accept");
+		assert.ok(sHTML.indexOf("<img") === -1, "No img element produced");
+	});
+
+	QUnit.test("Produces a DOM-parseable element", function(assert) {
+		var sHTML = IconPool.getIconHTML("sap-icon://accept");
+		var oDiv = document.createElement("div");
+		oDiv.innerHTML = sHTML;
+		var oSpan = oDiv.firstChild;
+
+		assert.strictEqual(oSpan.tagName, "SPAN", "Root element is a span");
+		assert.ok(oSpan.classList.contains("sapUiIcon"), "Has sapUiIcon class");
+		assert.ok(oSpan.getAttribute("role") === "presentation", "Has role=presentation");
+		assert.strictEqual(oSpan.getAttribute("aria-hidden"), "true", "Has aria-hidden=true");
+	});
+
 });
