@@ -321,6 +321,37 @@ sap.ui.define([
 			assert.ok(typeof oSetCallbackStub.firstCall.args[0] === "function", "a callback function was passed");
 		});
 
+		QUnit.test("When loadVariants() is called for a wrapper control that exposes its VM via getVariantManagement()", async function(assert) {
+			const sPersistencyKey = "myPersistencyKey";
+			this.oControl = new Control("controlId3a");
+			// The inner SmartVariantManagement is the one that carries the VM-specific methods and the
+			// persistency key; the outer wrapper control (e.g. SmartTable/SmartChart/SmartFilterBar) does not.
+			const oSetCallbackStub = sandbox.stub();
+			const oVariantManagement = {
+				getPersonalizableControlPersistencyKey: () => sPersistencyKey,
+				setDynamicVariantsLoadedCallback: oSetCallbackStub,
+				addVariants: sandbox.stub()
+			};
+			this.oControl.getVariantManagement = () => oVariantManagement;
+			const oOuterCallbackStub = sandbox.stub();
+			this.oControl.setDynamicVariantsLoadedCallback = oOuterCallbackStub;
+
+			sandbox.stub(LrepConnector, "loadFlexData").resolves({});
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				parameters: { nonFavoriteVariantsRemoved: [sPersistencyKey] }
+			});
+
+			await FlexState.initialize({ reference: "sap.ui.core", componentId: "AppComponent21" });
+			await SmartVariantManagementApplyAPI.loadVariants({
+				control: this.oControl,
+				standardVariant: { name: "Standard" }
+			});
+
+			assert.strictEqual(oSetCallbackStub.callCount, 1, "setDynamicVariantsLoadedCallback was called on the inner VariantManagement");
+			assert.strictEqual(oOuterCallbackStub.callCount, 0, "setDynamicVariantsLoadedCallback was NOT called on the outer wrapper control");
+			assert.ok(typeof oSetCallbackStub.firstCall.args[0] === "function", "a callback function was passed to the inner VariantManagement");
+		});
+
 		QUnit.test("When loadVariants() is called and the persistency key is NOT in nonFavoriteVariantsRemoved", async function(assert) {
 			const sPersistencyKey = "myPersistencyKey";
 			this.oControl = new Control("controlId4");
@@ -415,6 +446,45 @@ sap.ui.define([
 				sPersistencyKey,
 				"with the correct persistency key"
 			);
+		});
+
+		QUnit.test("When the dynamicVariantsLoadedCallback is invoked for a wrapper control, addVariants is called on the inner VM", async function(assert) {
+			const sPersistencyKey = "myPersistencyKey";
+			const sReference = "sap.ui.core";
+			this.oControl = new Control("controlId5a");
+			let fnCallback;
+			const oAddVariantsStub = sandbox.stub();
+			const oVariantManagement = {
+				getPersonalizableControlPersistencyKey: () => sPersistencyKey,
+				setDynamicVariantsLoadedCallback: (fn) => {
+					fnCallback = fn;
+				},
+				addVariants: oAddVariantsStub
+			};
+			this.oControl.getVariantManagement = () => oVariantManagement;
+			this.oControl.addVariants = sandbox.stub();
+
+			sandbox.stub(LrepConnector, "loadFlexData").resolves({});
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				parameters: { nonFavoriteVariantsRemoved: [sPersistencyKey] }
+			});
+			sandbox.stub(Storage, "loadAllCompVariants").resolves({
+				compVariants: [{ fileType: "variant", fileName: "newVariant1" }],
+				changes: [{ fileType: "change", fileName: "newVariantChange1" }]
+			});
+			sandbox.stub(FlexState, "addLazyVariantsLoaded");
+
+			await FlexState.initialize({ reference: sReference, componentId: "AppComponent21" });
+			await SmartVariantManagementApplyAPI.loadVariants({
+				control: this.oControl,
+				standardVariant: { name: "Standard" }
+			});
+
+			await fnCallback();
+
+			assert.strictEqual(oAddVariantsStub.callCount, 1, "addVariants was called on the inner VariantManagement");
+			assert.strictEqual(this.oControl.addVariants.callCount, 0, "addVariants was NOT called on the outer wrapper control");
+			assert.ok(Array.isArray(oAddVariantsStub.firstCall.args[0]), "addVariants was called with an array");
 		});
 
 		QUnit.test("When the dynamicVariantsLoadedCallback is invoked a second time, it resolves immediately", async function(assert) {
