@@ -40249,7 +40249,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// side-effects refresh must keep the tree state: the out-of-place node must survive and, more
 	// importantly, no in-place node must get lost. Only root nodes are present, same in DINC.
 	// SNOW: DINC0921191
-[false/*TODO: , true*/].forEach((bSelected) => {
+	//
+	// Selection must not make a difference (JIRA: CPOUI5ODATAV4-3605)
+[false, true].forEach((bSelected) => {
 	const sTitle = "Recursive Hierarchy: DINC0921191, side-effects refresh w/ out-of-place node"
 		+ " outside the collection, selected = " + bSelected;
 
@@ -40267,6 +40269,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			},
 			$filter : 'not startswith(Name, \\'Out\\')'
 		}}" threshold="0" visibleRowCount="4">
+	<Text text="{= %{@$ui5.context.isSelected} }"/>
 	<Text text="{= %{@$ui5.node.isExpanded} }"/>
 	<Text text="{= %{@$ui5.node.level} }"/>
 	<Text text="{Name}"/>
@@ -40287,8 +40290,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"/EMPLOYEES('0')",
 			"/EMPLOYEES('1')"
 		], [
-			[undefined, 1, "Alpha"],
-			[undefined, 1, "Beta"]
+			[undefined, undefined, 1, "Alpha"],
+			[undefined, undefined, 1, "Beta"]
 		], 2);
 		const oListBinding = oTable.getBinding("rows");
 
@@ -40310,20 +40313,30 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"/EMPLOYEES('0')",
 			"/EMPLOYEES('1')"
 		], [
-			[undefined, 1, "Out"],
-			[undefined, 1, "Alpha"],
-			[undefined, 1, "Beta"]
+			[bSelected ? true : undefined, undefined, 1, "Out"],
+			[undefined, undefined, 1, "Alpha"],
+			[undefined, undefined, 1, "Beta"]
 		]);
+
+		this.expectRequest("EMPLOYEES('Out')?$select=AGE", {AGE : 42});
+
+		const [iAge] = await Promise.all([
+			oOut.requestProperty("AGE"),
+			this.waitForChanges(assert, "request late property")
+		]);
+
+		assert.strictEqual(iAge, 42);
 		assert.deepEqual(oOut.getObject(), {
 			...(bSelected && {"@$ui5.context.isSelected" : true}),
 			"@$ui5.context.isTransient" : false,
 			"@$ui5.node.level" : 1,
+			AGE : 42,
 			ID : "Out",
 			Name : "Out"
 		});
 
-		this.expectRequestIf(bSelected, "EMPLOYEES?$filter=ID eq 'Out'&$select=ID,Name", {
-				value : [{ID : "Out", Name : "Out"}] //TODO: influence of this?
+		this.expectRequestIf(bSelected, "EMPLOYEES?$filter=ID eq 'Out'&$select=AGE,ID,Name", {
+				value : [{AGE : 44, ID : "Out", Name : "Out"}]
 			})
 			.expectRequest(sBaseUrl + "&$select=DrillState,ID,Name&$count=true&$skip=0&$top=4", {
 				"@odata.count" : "2",
@@ -40357,14 +40370,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"/EMPLOYEES('0')",
 			"/EMPLOYEES('1')"
 		], [
-			[undefined, 1, "Out"],
-			[undefined, 1, "Alpha"],
-			[undefined, 1, "Beta"]
+			[bSelected ? true : undefined, undefined, 1, "Out"],
+			[undefined, undefined, 1, "Alpha"],
+			[undefined, undefined, 1, "Beta"]
 		]);
 		assert.deepEqual(oOut.getObject(), {
 			...(bSelected && {"@$ui5.context.isSelected" : true}),
 			"@$ui5.context.isTransient" : false,
 			"@$ui5.node.level" : 1,
+			...(bSelected && {AGE : 44}), // Note: w/o selection, late property is NOT requested!
 			ID : "Out",
 			Name : "Out"
 		});
@@ -44550,7 +44564,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		const oBinding = oTable.getBinding("rows");
 		let oGamma = oTable.getRows()[0].getBindingContext();
 		checkTable("initial page", assert, oTable, [
-			"/EMPLOYEES('3')",
+			oGamma,
 			"/EMPLOYEES('4')"
 		], [
 			[true, 1, "Gamma"],
@@ -44573,7 +44587,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		await this.waitForChanges(assert, "(1) collapse Gamma");
 
 		checkTable("after (1)", assert, oTable, [
-			"/EMPLOYEES('3')",
+			oGamma,
 			"/EMPLOYEES('5')"
 		], [
 			[false, 1, "Gamma"],
@@ -44605,6 +44619,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				{value : [{LimitedRank : "5"}]});
 
 		const oZeta = oBinding.create({Name : "Zeta"}, /*bSkipRefresh*/true);
+		oZeta.setSelected(true);
 
 		await Promise.all([
 			oZeta.created(), // must not interleave two creates
@@ -44614,16 +44629,28 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		this.expectRequest("#5 POST EMPLOYEES?custom=foo", {
 				payload : {Name : "Eta"}
 			}, {ID : "7", Name : "Eta"})
+			.expectRequest("#5 EMPLOYEES('6')?custom=foo&$select=AGE", {AGE : 42})
 			.expectRequest("#5 " + sCountUrl, 7)
 			.expectRequest(sUrl + "&$filter=ID eq '7'&$select=LimitedRank",
 				{value : [{LimitedRank : "6"}]});
 
 		const oEta = oBinding.create({Name : "Eta"}, /*bSkipRefresh*/true);
 
-		await Promise.all([
+		const [, iAge] = await Promise.all([
 			oEta.created(),
-			this.waitForChanges(assert, "(2b) create Eta")
+			oZeta.requestProperty("AGE"),
+			this.waitForChanges(assert, "(2b) create Eta; request late property for Zeta")
 		]);
+
+		assert.strictEqual(iAge, 42);
+		assert.deepEqual(oZeta.getObject(), {
+			"@$ui5.context.isSelected" : true,
+			"@$ui5.context.isTransient" : false,
+			"@$ui5.node.level" : 1,
+			AGE : 42,
+			ID : "6",
+			Name : "Zeta"
+		});
 
 		this.expectRequest("#7 POST EMPLOYEES?custom=foo", {
 				payload : {
@@ -44647,12 +44674,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		]);
 
 		checkTable("after (2)", assert, oTable, [
-			"/EMPLOYEES('7')",
-			"/EMPLOYEES('6')",
-			"/EMPLOYEES('1')",
-			"/EMPLOYEES('8')",
+			oEta,
+			oZeta,
+			oAlpha,
+			oTheta,
 			"/EMPLOYEES('2')",
-			"/EMPLOYEES('3')",
+			oGamma,
 			"/EMPLOYEES('5')"
 		], [
 			[true, 1, "Alpha"],
@@ -44664,7 +44691,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		checkSiblingOrder(assert, /*in place*/[], /*out of place*/[oTheta]);
 		checkSiblingOrder(assert, /*in*/[oAlpha, oBeta, oGamma, oEpsilon], /*out*/[oEta, oZeta]);
 
-		this.expectRequest("#9 " + sCountUrl, 8)
+		this.expectRequest("#9 EMPLOYEES?$filter=ID eq '6'&custom=foo&$select=AGE,ID,Name", {
+				value : [{AGE : 42, ID : "6", Name : "Zeta*"}]
+			})
+			.expectRequest("#9 " + sCountUrl, 8)
 			.expectRequest("#9 " + sUrlWithExpandLevels
 				+ "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,Name"
 				+ "&$count=true&$skip=0&$top=4", {
@@ -44756,8 +44786,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		]);
 
 		checkTable("after (3)", assert, oTable, [
-			"/EMPLOYEES('1')",
-			"/EMPLOYEES('8')"
+			oAlpha,
+			oTheta,
+			oZeta
 		], [
 			[true, 1, "Alpha*"],
 			[undefined, 2, "Theta*"]
@@ -44768,6 +44799,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			ID : "7",
 			Name : "Eta*"
 		}, "no LimitedRank");
+		assert.deepEqual(oZeta.getObject(), {
+			"@$ui5.context.isSelected" : true,
+			"@$ui5.context.isTransient" : false,
+			"@$ui5.node.level" : 1,
+			AGE : 42,
+			ID : "6",
+			Name : "Zeta*"
+		});
+		checkSelected(assert, oZeta, true);
 
 		this.expectRequest(sUrlWithExpandLevels
 				+ "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,Name"
