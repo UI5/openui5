@@ -1667,7 +1667,8 @@ sap.ui.define([
 	 *     requested), and in case of copy a promise which resolves with the index of the copied
 	 *     node. Else it is resolved with an array of:
 	 *     - the number of child nodes added (normally one, but maybe more in case the parent node
-	 *       was collapsed before),
+	 *       was collapsed before), or <code>undefined</code> if a concurrent side-effects refresh
+	 *       is detected,
 	 *     - the new index of the moved node,
 	 *     - the number of descendant nodes that were affected by collapsing the moved node
 	 *       (<code>undefined</code> in case the moved node was not expanded before),
@@ -1790,6 +1791,11 @@ sap.ui.define([
 			});
 		} else {
 			oPromise = oPromise.then(([oPatchResult,, iRank]) => {
+				if (this.aElements.length === 0) {
+					// concurrent side-effects refresh, manual update not needed
+					return [undefined, iRank];
+				}
+
 				const iCount = oChildNode["@$ui5.node.isExpanded"]
 					? this.collapse(sChildPredicate, {}) // no mKeptElementPredicates needed
 					: undefined;
