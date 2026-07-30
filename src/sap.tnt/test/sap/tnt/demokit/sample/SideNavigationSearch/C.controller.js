@@ -7,8 +7,9 @@ sap.ui.define([
 	"sap/m/Dialog",
 	"sap/m/Button",
 	"sap/m/Text",
+	"sap/m/ObjectStatus",
 	"sap/m/library"
-], function (Controller, JSONModel, LoaderExtensions, NavigationListItem, NavigationListGroup, Dialog, Button, Text, mLibrary) {
+], function (Controller, JSONModel, LoaderExtensions, NavigationListItem, NavigationListGroup, Dialog, Button, Text, ObjectStatus, mLibrary) {
 	"use strict";
 
 	const ButtonType = mLibrary.ButtonType;
@@ -109,6 +110,7 @@ sap.ui.define([
 				ariaHasPopup: "{ariaHasPopup}",
 				design: "{design}",
 				press: this.onItemPress.bind(this),
+				tag: this._createTag(),
 				items: {
 					path: "items",
 					templateShareable: true,
@@ -121,9 +123,19 @@ sap.ui.define([
 						target: "{target}",
 						ariaHasPopup: "{ariaHasPopup}",
 						design: "{design}",
-						press: this.onItemPress.bind(this)
+						press: this.onItemPress.bind(this),
+						tag: this._createTag()
 					})
 				}
+			});
+		},
+
+		_createTag: function () {
+			return new ObjectStatus({
+				text: "{tagText}",
+				state: "{tagState}",
+				inverted: true,
+				visible: "{= !!${tagText} }"
 			});
 		},
 
@@ -167,8 +179,9 @@ sap.ui.define([
 
 			return aItems.reduce(function (aResult, oItem) {
 				const bTitleMatches = oItem.title?.toLowerCase().includes(sLowerValue);
+				const bTagTextMatches = oItem.tagText?.toLowerCase().includes(sLowerValue);
 
-				if (bTitleMatches) {
+				if (bTitleMatches || bTagTextMatches) {
 					aResult.push(oItem);
 				} else if (oItem.items) {
 					const aFilteredChildren = this._filterItems(oItem.items, sValue);
