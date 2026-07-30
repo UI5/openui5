@@ -4911,6 +4911,79 @@ sap.ui.define([
 });
 
 	//*****************************************************************************************
+	QUnit.test("copySecurityTokenPromise: no oSecurityTokenPromise", function (assert) {
+		const oRequestor = _Requestor.create(sServiceUrl, oModelInterface);
+		assert.notOk("X-CSRF-Token" in oRequestor.mHeaders);
+		assert.strictEqual(oRequestor.oSecurityTokenPromise, null);
+
+		// code under test
+		oRequestor.copySecurityTokenPromise({/*oOtherRequestor*/});
+
+		assert.notOk("X-CSRF-Token" in oRequestor.mHeaders);
+		assert.strictEqual(oRequestor.oSecurityTokenPromise, undefined, "this is how ?. behaves");
+	});
+
+	//*****************************************************************************************
+	QUnit.test("copySecurityTokenPromise: copies", async function (assert) {
+		const oRequestor = _Requestor.create(sServiceUrl, oModelInterface);
+		const oOtherRequestor = {
+			oSecurityTokenPromise : Promise.resolve().then(() => {
+				oOtherRequestor.mHeaders = {
+					"X-CSRF-Token" : "abc"
+				};
+			})
+		};
+
+		// code under test
+		oRequestor.copySecurityTokenPromise(oOtherRequestor);
+
+		assert.notStrictEqual(oRequestor.oSecurityTokenPromise, null);
+
+		await oRequestor.oSecurityTokenPromise;
+
+		assert.strictEqual(oRequestor.mHeaders["X-CSRF-Token"], "abc");
+		assert.strictEqual(oRequestor.oSecurityTokenPromise, null);
+	});
+
+	//*****************************************************************************************
+	QUnit.test("copySecurityTokenPromise: nothing to copy", async function (assert) {
+		const oRequestor = _Requestor.create(sServiceUrl, oModelInterface);
+		const oOtherRequestor = {
+			mHeaders : {},
+			oSecurityTokenPromise : Promise.resolve()
+		};
+
+		// code under test
+		oRequestor.copySecurityTokenPromise(oOtherRequestor);
+
+		assert.notStrictEqual(oRequestor.oSecurityTokenPromise, null);
+
+		await oRequestor.oSecurityTokenPromise;
+
+		assert.notOk("X-CSRF-Token" in oRequestor.mHeaders);
+		assert.strictEqual(oRequestor.oSecurityTokenPromise, null);
+	});
+
+	//*****************************************************************************************
+	QUnit.test("copySecurityTokenPromise: rejection", async function (assert) {
+		const oRequestor = _Requestor.create(sServiceUrl, oModelInterface);
+		const oSecurityTokenPromise = Promise.reject();
+		const oOtherRequestor = {
+			oSecurityTokenPromise : oSecurityTokenPromise
+		};
+
+		// code under test
+		oRequestor.copySecurityTokenPromise(oOtherRequestor);
+
+		assert.notStrictEqual(oRequestor.oSecurityTokenPromise, null);
+
+		await oRequestor.oSecurityTokenPromise.catch(() => {});
+
+		assert.notOk("X-CSRF-Token" in oRequestor.mHeaders);
+		assert.strictEqual(oRequestor.oSecurityTokenPromise, null);
+	});
+
+	//*****************************************************************************************
 	QUnit.test("setContinueOnError", function (assert) {
 		const oRequestor = _Requestor.create(sServiceUrl, oModelInterface);
 		const aRequests = [];

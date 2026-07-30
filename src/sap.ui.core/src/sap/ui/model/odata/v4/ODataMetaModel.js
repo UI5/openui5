@@ -2573,7 +2573,7 @@ sap.ui.define([
 			oSharedModel = new this.oModel.constructor({
 				autoExpandSelect : bAutoExpandSelect,
 				groupId : bCopyAnnotations ? undefined : "$direct",
-				httpHeaders : this.oModel.getHttpHeaders(),
+				httpHeaders : this.oModel.getHttpHeaders(), // Note: includes X-CSRF-Token
 				metadataUrlParams : this.sLanguage && {"sap-language" : this.sLanguage},
 				operationMode : OperationMode.Server,
 				serviceUrl : sUrl,
@@ -2585,6 +2585,7 @@ sap.ui.define([
 			oSharedModel.setRetryAfterHandler((oError) => {
 				return this.oModel.getOrCreateRetryAfterPromise(oError);
 			});
+			oSharedModel.oRequestor.copySecurityTokenPromise(this.oModel.oRequestor);
 			mSharedModelByUrl[sMapKey] = oSharedModel;
 		}
 		return oSharedModel;
