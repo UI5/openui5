@@ -13,6 +13,7 @@ sap.ui.define([
 	"sap/base/util/LoaderExtensions",
 	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/Storage",
+	"sap/ui/fl/Layer",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	Utils,
@@ -27,6 +28,7 @@ sap.ui.define([
 	LoaderExtensions,
 	Loader,
 	Storage,
+	Layer,
 	sinon
 ) {
 	"use strict";
@@ -443,6 +445,61 @@ sap.ui.define([
 				oAddLazyVariantsLoadedStub.firstCall.args[1],
 				sPersistencyKey,
 				"with the correct persistency key"
+			);
+		});
+
+		QUnit.test("When the dynamicVariantsLoadedCallback is invoked, variant changes are applied to the lazily loaded variants", async function(assert) {
+			const sPersistencyKey = "myPersistencyKey";
+			const sReference = "sap.ui.core";
+			this.oControl = new Control("controlId5b");
+			this.oControl.getPersonalizableControlPersistencyKey = () => sPersistencyKey;
+			let fnCallback;
+			let aAddedVariants;
+			this.oControl.setDynamicVariantsLoadedCallback = (fn) => {
+				fnCallback = fn;
+			};
+			this.oControl.addVariants = (aVariants) => {
+				aAddedVariants = aVariants;
+			};
+
+			sandbox.stub(LrepConnector, "loadFlexData").resolves({});
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				parameters: { nonFavoriteVariantsRemoved: [sPersistencyKey] }
+			});
+			sandbox.stub(Storage, "loadAllCompVariants").resolves({
+				compVariants: [{
+					fileType: "variant",
+					fileName: "newVariant1",
+					variantId: "newVariant1",
+					selector: { persistencyKey: sPersistencyKey },
+					layer: Layer.USER,
+					texts: { variantName: { value: "New Variant 1" } }
+				}],
+				changes: [{
+					fileType: "change",
+					fileName: "newVariantChange1",
+					changeType: "updateVariant",
+					selector: { persistencyKey: sPersistencyKey, variantId: "newVariant1" },
+					layer: Layer.USER,
+					content: { executeOnSelection: true }
+				}]
+			});
+			sandbox.stub(FlexState, "addLazyVariantsLoaded");
+
+			await FlexState.initialize({ reference: sReference, componentId: "AppComponent21" });
+			await SmartVariantManagementApplyAPI.loadVariants({
+				control: this.oControl,
+				standardVariant: { name: "Standard" }
+			});
+
+			await fnCallback();
+
+			assert.strictEqual(aAddedVariants.length, 1, "then the lazily loaded variant is added to the control");
+			assert.strictEqual(aAddedVariants[0].getVariantId(), "newVariant1", "then it is the expected variant");
+			assert.strictEqual(
+				aAddedVariants[0].getExecuteOnSelection(),
+				true,
+				"then the executeOnSelection variant change is applied to the lazily loaded variant"
 			);
 		});
 
