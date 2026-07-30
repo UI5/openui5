@@ -134,8 +134,12 @@ sap.ui.define([
 			this.createCountPromise();
 		}
 
+		const fnDelete = oParentCache
+			? oParentCache._delete.bind(oParentCache)
+			: _Cache.prototype._delete.bind(this); // "super" call
+
 		return SyncPromise.all(oGroupLock ? [
-			oParentCache._delete(oGroupLock, sEditUrl, sPredicate, oETagEntity, /*fnCallback*/null),
+			fnDelete(oGroupLock, sEditUrl, sPredicate, oETagEntity, /*fnCallback*/null),
 			this.readCount(oGroupLock),
 			this.readGrandTotal(oGroupLock)
 		] : [
@@ -149,7 +153,7 @@ sap.ui.define([
 			// the element might have moved due to parallel insert/delete
 			iIndex = _Cache.getElementIndex(this.aElements, sPredicate, iIndex);
 			// remove in parent cache
-			const iIndexInParentCache = oParentCache.removeElement(
+			const iIndexInParentCache = oParentCache?.removeElement(
 				_Helper.getPrivateAnnotation(oElement, "rank", 0), sPredicate);
 			// remove the descendants in the parent cache (if any)
 			const iDescendants = _Helper.getPrivateAnnotation(oElement, "descendants", 0);
@@ -159,7 +163,7 @@ sap.ui.define([
 			const iOffset = iDescendants + 1;
 			if (oParentCache === this.oFirstLevel) {
 				this.adjustDescendantCount(oElement, iIndex, -iOffset);
-			} else if (!oParentCache.getValue("$count")) {
+			} else if (oParentCache && !oParentCache.getValue("$count")) {
 				// make parent a leaf (the direct predecessor)
 				this.makeLeaf(this.aElements[iIndex - 1]);
 			}

@@ -7201,13 +7201,18 @@ sap.ui.define([
 [
 	{firstLevel : true},
 	{firstLevel : false, parentLeaf : false},
-	{firstLevel : false, parentLeaf : true}
+	{firstLevel : false, parentLeaf : true},
+	{firstLevel : false, noParentCache : true, parentLeaf : false}
 ].forEach(function (oFixture) {
 	[false, true].forEach((bCreated) => {
 		[false, true].forEach((bCount) => {
 			[false, true].forEach((bGroupLock) => {
 	const sTitle = `_delete: ${JSON.stringify(oFixture)}, created=${bCreated}`
 		+ `, count=${bCount}, w/ oGroupLock=${bGroupLock}`;
+
+	if (oFixture.noParentCache && (oFixture.firstLevel || oFixture.parentLeaf)) {
+		throw new Error("Unsupported combination!");
+	}
 
 	QUnit.test(sTitle, function (assert) {
 		var oCountExpectation, oRemoveExpectation;
@@ -7236,7 +7241,7 @@ sap.ui.define([
 		const oHelperMock = this.mock(_Helper);
 		oHelperMock.expects("getPrivateAnnotation")
 			.withExactArgs(sinon.match.same(oElement), "parent")
-			.returns(oParentCache);
+			.returns(oFixture.noParentCache ? undefined : oParentCache);
 		oHelperMock.expects("getPrivateAnnotation")
 			.withExactArgs(sinon.match.same(oElement), "predicate")
 			.returns("~predicate~");
@@ -7249,8 +7254,10 @@ sap.ui.define([
 				.withExactArgs(sinon.match.same(oCache.aElements), "~predicate~", 2)
 				.returns(4);
 			oHelperMock.expects("getPrivateAnnotation")
+				.exactly(oFixture.noParentCache ? 0 : 1)
 				.withExactArgs(sinon.match.same(oElement), "rank", 0).returns("~rank~");
 			oRemoveExpectation = oParentCacheMock.expects("removeElement")
+				.exactly(oFixture.noParentCache ? 0 : 1)
 				.withExactArgs("~rank~", "~predicate~").returns("~iIndexInParentCache~");
 			oHelperMock.expects("getPrivateAnnotation")
 				.withExactArgs(sinon.match.same(oElement), "descendants", 0)
@@ -7261,7 +7268,7 @@ sap.ui.define([
 				.exactly(oFixture.firstLevel ? 1 : 0)
 				.withExactArgs(sinon.match.same(oElement), 4, oFixture.firstLevel ? -4 : -1);
 			oCountExpectation = this.mock(oParentCache).expects("getValue")
-				.exactly(oFixture.firstLevel ? 0 : 1)
+				.exactly(oFixture.firstLevel || oFixture.noParentCache ? 0 : 1)
 				.withExactArgs("$count").returns(oFixture.parentLeaf ? 0 : 5);
 			this.mock(oCache).expects("makeLeaf").exactly(oFixture.parentLeaf ? 1 : 0)
 				.withExactArgs("~oParent~");
@@ -7275,7 +7282,9 @@ sap.ui.define([
 		if (!bGroupLock) {
 			mock();
 		}
-		oParentCacheMock.expects("_delete").exactly(bGroupLock ? 1 : 0)
+		(oFixture.noParentCache ? this.mock(_Cache.prototype) : oParentCacheMock)
+			.expects("_delete").exactly(bGroupLock ? 1 : 0)
+			.on(oFixture.noParentCache ? oCache : oParentCache)
 			.withExactArgs("~oGroupLock~", "~editUrl~", "~predicate~", "~oETagEntity~", null)
 			.callsFake(() => {
 				mock();
@@ -7297,7 +7306,7 @@ sap.ui.define([
 		return oDeletePromise.then(function () {
 			assert.strictEqual(fnCallback.callCount, 1);
 			assert.deepEqual(fnCallback.args[0], [4, -1]);
-			if (!oFixture.firstLevel) {
+			if (!oFixture.firstLevel && !oFixture.noParentCache) {
 				sinon.assert.callOrder(oRemoveExpectation, oCountExpectation);
 			}
 		});
