@@ -181,9 +181,9 @@ sap.ui.define([
 				doneUrlValidated = [assert.async(), assert.async()];
 
 		this.oMessageView.attachLongtextLoaded(function () {
-			assert.strictEqual(this.oMessageView._detailsPage.getContent()[2].getContent().indexOf("h2") >= 1, true, "There should be an h2 tag");
-			assert.strictEqual(this.oMessageView._detailsPage.getContent()[2].getContent().indexOf("<script"), -1, "There should be no script tag in the html");
-			assert.strictEqual(this.oMessageView._detailsPage.getContent()[2].getContent().indexOf("embed"), -1, "There should be no embed tag in the html");
+			assert.strictEqual(this.oMessageView._detailsPage.getContent()[3].getContent().indexOf("h2") >= 1, true, "There should be an h2 tag");
+			assert.strictEqual(this.oMessageView._detailsPage.getContent()[3].getContent().indexOf("<script"), -1, "There should be no script tag in the html");
+			assert.strictEqual(this.oMessageView._detailsPage.getContent()[3].getContent().indexOf("embed"), -1, "There should be no embed tag in the html");
 			doneLongtextLoaded();
 			assert.ok(this.oMessageView.getItems()[2].getDescription().indexOf("&") >= 0, "Item's description should not be sanitized");
 		}, this);
@@ -311,7 +311,7 @@ sap.ui.define([
 
 		oMessageView._fnHandleForwardNavigation(oListItem, "show");
 
-		var oSubtitleText = oMessageView._detailsPage.getContent()[1]; // Subtitle is second content after title
+		var oSubtitleText = oMessageView._detailsPage.getContent()[2]; // Subtitle is third content (icon, title, subtitle)
 		assert.strictEqual(oSubtitleText.getText(), "Initial Subtitle", "Details page should show initial subtitle");
 
 		oModel.setProperty("/messages/0/subtitle", "Updated Subtitle");
@@ -319,12 +319,12 @@ sap.ui.define([
 
 		assert.strictEqual(oMessageItem.getSubtitle(), "Updated Subtitle", "Message item should have updated subtitle");
 
-		oSubtitleText = oMessageView._detailsPage.getContent()[1];
+		oSubtitleText = oMessageView._detailsPage.getContent()[2];
 		assert.strictEqual(oSubtitleText.getText(), "Updated Subtitle", "Details page should show updated subtitle after model change");
 
 		oMessageItem.setSubtitle("Programmatic Subtitle");
 
-		oSubtitleText = oMessageView._detailsPage.getContent()[1];
+		oSubtitleText = oMessageView._detailsPage.getContent()[2];
 		assert.strictEqual(oSubtitleText.getText(), "Programmatic Subtitle", "Details page should show programmatically set subtitle");
 
 		oMessageView.destroy();
@@ -545,9 +545,9 @@ sap.ui.define([
 		this.oMessageView._navigateToDetails(oFirstMessageItem, oFirstListItem, "slide", false);
 		this.clock.tick(300);
 
-		oDetailsFirstContent = this.oMessageView._detailsPage.getContent()[0];
+		oDetailsFirstContent = this.oMessageView._detailsPage.getContent()[1];
 
-		assert.strictEqual(oDetailsFirstContent.getMetadata().getName(), "sap.m.Link", "First content should be a link");
+		assert.strictEqual(oDetailsFirstContent.getMetadata().getName(), "sap.m.Link", "First content after the icon should be a link");
 		assert.ok(oDetailsFirstContent.hasStyleClass("sapMMsgViewTitleText"), "Link should have 'sapMMsgViewTitleText' css class");
 	});
 
@@ -564,7 +564,7 @@ sap.ui.define([
 		this.oMessageView._navigateToDetails(oFirstMessageItem, oFirstListItem, "slide", false);
 		this.clock.tick(300);
 
-		oDetailsLink = this.oMessageView._detailsPage.getContent()[0];
+		oDetailsLink = this.oMessageView._detailsPage.getContent()[1];
 
 		oDetailsLink.firePress();
 		this.clock.tick(300);
@@ -933,7 +933,7 @@ sap.ui.define([
 		this.oMessageView._navigateToDetails(oFirstMessageItem, oFirstListItem, "slide", false);
 		this.clock.tick(300);
 
-		oDetailsTitle = this.oMessageView._detailsPage.getContent()[0];
+		oDetailsTitle = this.oMessageView._detailsPage.getContent()[1];
 
 		assert.ok(oDetailsTitle.getAriaDescribedBy().indexOf(oFirstListItem.getId() + "-link") > -1, "Details title should be described by the item's link");
 	});
@@ -1387,7 +1387,7 @@ sap.ui.define([
 		oItem.setDescription("Test");
 		await nextUIUpdate();
 
-		assert.strictEqual(oMessageView._detailsPage.getContent()[2].getText(), oItem.getDescription(), "Description should be changed");
+		assert.strictEqual(oMessageView._detailsPage.getContent()[3].getText(), oItem.getDescription(), "Description should be changed");
 		assert.strictEqual(oMessageView._navContainer.getCurrentPage(), oMessageView._detailsPage, "Details page should be visible");
 		assert.strictEqual(oSpy.callCount, 1, "Navigation should be performed once");
 
