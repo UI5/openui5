@@ -9,15 +9,15 @@
 .sapUiRtaRoot {
 
 	.sapUiRtaMarginBottom {
-		margin-bottom: var(--sapContent_Space_Medium); //32px // To be complient with standard paddings
+		margin-bottom: var(--sapContent_Space_Medium); //32px // To be compliant with standard paddings
 	}
 
 	.sapUiRtaPaddingTop {
-		padding-top: var(--sapContent_Space_Medium); //32px // To be complient with standard paddings
+		padding-top: var(--sapContent_Space_Medium); //32px // To be compliant with standard paddings
 	}
 
 	&.sapUiRtaStretchPaddingTop, .sapUiRtaStretchPaddingTop {
-		padding-top: var(--sapContent_Space_Medium); //32px // To be complient with standard paddings
+		padding-top: var(--sapContent_Space_Medium); //32px // To be compliant with standard paddings
 	}
 }
 
@@ -26,7 +26,7 @@
 	padding-top: var(--sapContent_Space_Medium); //32px
 }
 
-.sapUiRta:not(.sapUiRtaVisualizationMode) {
+.sapUiRta {
 
 	.sapUiRtaResizeHandle {
 		cursor: col-resize;
@@ -102,17 +102,18 @@
 	}
 }
 
-.sapUiRta {
+// Border around the whole screen in RTA Adaptation Mode.
+.sapUiRtaAdaptationBorder {
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	display: none;
+	top: 3.0625rem; /* 49px = 48px toolbar outer height + 1px gap */
 
-	&.sapUiRtaVisualizationMode {
-
-		.sapUiDtOverlayHover {
-			background: inherit;
-
-			&::after {
-				content: none;
-			}
-		}
+	&.sapUiRtaAdaptationBorderVisible {
+		display: block;
+		border: 0.25rem solid var(--sapSelectedColor); /* 4px */
+		box-sizing: border-box;
 	}
 }
 

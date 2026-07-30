@@ -78,6 +78,17 @@
 						type="Transparent"
 						icon="sap-icon://shipping-status"
 						tooltip="{i18n>TOL_PUBLISH_VERSION}" />
+				<ToggleButton
+						id="sapUiRta_highlightAllChanges"
+						icon="sap-icon://past"
+						type="Transparent"
+						class="sapUiRtaHighlightAllChangesButton"
+						text="{i18n>BTN_HIGHLIGHT_ALL_CHANGES}"
+						pressed="{controls>/highlightAllChanges/pressed}"
+						enabled="{controls>/highlightAllChanges/enabled}"
+						visible="{= ${controls>/modeSwitcher} === 'adaptation'}"
+						tooltip="{i18n>BTN_HIGHLIGHT_ALL_CHANGES}"
+						press=".highlightAllChanges" />
 			</content>
 		</OverflowToolbar>
 	</HBox>
@@ -102,12 +113,6 @@
 								text="{i18n>BTN_NAVIGATION}"
 								width="auto"
 								key="navigation" />
-						<SegmentedButtonItem
-								id="sapUiRta_visualizationSwitcherButton"
-								visible="{controls>/visualizationButton/visible}"
-								text="{i18n>BTN_VISUALIZATION}"
-								width="auto"
-								key="visualization" />
 					</items>
 				</SegmentedButton>
 			</content>
@@ -122,15 +127,6 @@
 				class="sapUiRtaActionsToolbar">
 			<content>
 				<ToolbarSpacer />
-				<Button
-						id="sapUiRta_toggleChangeVisualizationMenuButton"
-						visible="{= ${controls>/modeSwitcher} === 'visualization'}"
-						text="{visualizationModel>/changeCategoryText}"
-						type="Transparent"
-						icon="sap-icon://slim-arrow-down"
-						iconFirst="false"
-						press=".openChangeCategorySelectionPopover"
-						tooltip="{i18n>BUT_CHANGEVISUALIZATION_SELECTCHANGES}"/>
 				<Button
 						id="sapUiRta_actionsMenu"
 						icon="sap-icon://menu2"

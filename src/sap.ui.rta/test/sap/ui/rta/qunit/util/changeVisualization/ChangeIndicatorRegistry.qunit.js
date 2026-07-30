@@ -23,10 +23,10 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	var sandbox = sinon.createSandbox();
+	const sandbox = sinon.createSandbox();
 
 	function createMockChange(sId, sState) {
-		var oChange = RtaQunitUtils.createUIChange({
+		const oChange = RtaQunitUtils.createUIChange({
 			selector: {
 				id: "myControl"
 			},
@@ -70,19 +70,43 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when changes with valid command types are registered", function(assert) {
-			var oVersionsModel = createMockVersioning(["draftChange"]);
+			const oVersionsModel = createMockVersioning(["draftChange"]);
 			return Promise.all([
 				this.oRegistry.registerChange(createMockChange("fooChange", FlStates.LifecycleState.NEW), "foo", oVersionsModel),
 				this.oRegistry.registerChange(createMockChange("barChange", FlStates.LifecycleState.PERSISTED), "bar", oVersionsModel),
 				this.oRegistry.registerChange(createMockChange("draftChange", FlStates.LifecycleState.PERSISTED), "bar", oVersionsModel)
 			]).then(function() {
-				assert.strictEqual(this.oRegistry.getSelectorsWithRegisteredChanges().myControl.length, 3, "then the selector has the correct number of changes");
-				assert.deepEqual(this.oRegistry.getRegisteredChangeIds(), ["fooChange", "barChange", "draftChange"], "then the change ids are registered");
+				assert.strictEqual(
+					this.oRegistry.getSelectorsWithRegisteredChanges().myControl.length,
+					3,
+					"then the selector has the correct number of changes"
+				);
+				assert.deepEqual(
+					this.oRegistry.getRegisteredChangeIds(),
+					["fooChange", "barChange", "draftChange"],
+					"then the change ids are registered"
+				);
 				assert.strictEqual(this.oRegistry.getAllRegisteredChanges().length, 3, "then the changes are added to the registry");
-				assert.strictEqual(this.oRegistry.getRegisteredChange("fooChange").changeCategory, "fooCategory", "then the command categories are properly classified");
-				assert.deepEqual(this.oRegistry.getRegisteredChange("fooChange").changeStates, ChangeStates.getDraftAndDirtyStates(), "then the change state is properly classified (Dirty & Draft)");
-				assert.deepEqual(this.oRegistry.getRegisteredChange("barChange").changeStates, [ChangeStates.ALL], "then the change state is properly classified (All)");
-				assert.deepEqual(this.oRegistry.getRegisteredChange("draftChange").changeStates, [ChangeStates.DRAFT], "then the change state is properly classified (Draft)");
+				assert.strictEqual(
+					this.oRegistry.getRegisteredChange("fooChange").changeCategory,
+					"fooCategory",
+					"then the command categories are properly classified"
+				);
+				assert.deepEqual(
+					this.oRegistry.getRegisteredChange("fooChange").changeStates,
+					ChangeStates.getDraftAndDirtyStates(),
+					"then the change state is properly classified (Dirty & Draft)"
+				);
+				assert.deepEqual(
+					this.oRegistry.getRegisteredChange("barChange").changeStates,
+					[ChangeStates.ALL],
+					"then the change state is properly classified (All)"
+				);
+				assert.deepEqual(
+					this.oRegistry.getRegisteredChange("draftChange").changeStates,
+					[ChangeStates.DRAFT],
+					"then the change state is properly classified (Draft)"
+				);
 			}.bind(this));
 		});
 
@@ -104,7 +128,11 @@ sap.ui.define([
 				}
 			});
 			return this.oRegistry.registerChange(createMockChange("id1"), "settings").then(function() {
-				assert.strictEqual(this.oRegistry.getRegisteredChange("id1").changeCategory, "fooCategory", "then the category is considered");
+				assert.strictEqual(
+					this.oRegistry.getRegisteredChange("id1").changeCategory,
+					"fooCategory",
+					"then the category is considered"
+				);
 			}.bind(this));
 		});
 
@@ -120,12 +148,16 @@ sap.ui.define([
 				}
 			});
 			return this.oRegistry.registerChange(createMockChange("id1"), "settings").then(function() {
-				assert.strictEqual(this.oRegistry.getRegisteredChange("id1").changeCategory, "other", "then the category is set to 'other'");
+				assert.strictEqual(
+					this.oRegistry.getRegisteredChange("id1").changeCategory,
+					"other",
+					"then the category is set to 'other'"
+				);
 			}.bind(this));
 		});
 
 		QUnit.test("when a settings command change is registered with getChangeHandler rejecting", function(assert) {
-			var oLogStub = sandbox.stub(Log, "error");
+			const oLogStub = sandbox.stub(Log, "error");
 			ChangesWriteAPI.getChangeHandler.reset();
 			ChangesWriteAPI.getChangeHandler.rejects("foo");
 			return this.oRegistry.registerChange(createMockChange("id1"), "settings").then(function() {
@@ -150,15 +182,6 @@ sap.ui.define([
 			}.bind(this));
 		});
 
-		QUnit.test("when a change indicator is registered", function(assert) {
-			var oIndicator = {
-				destroy() {}
-			};
-			this.oRegistry.registerChangeIndicator("someChangeIndicator", oIndicator);
-			assert.strictEqual(this.oRegistry.getChangeIndicator("someChangeIndicator"), oIndicator, "then the saved reference is returned");
-			assert.deepEqual(this.oRegistry.getChangeIndicators()[0], oIndicator, "then it is included in the list of change indicator references");
-		});
-
 		QUnit.test("when a registered change has the updateRequired flag and should be removed from the registry", function(assert) {
 			ChangesWriteAPI.getChangeHandler.reset();
 			ChangesWriteAPI.getChangeHandler
@@ -171,8 +194,14 @@ sap.ui.define([
 				}
 			})
 			.onSecondCall()
-			.resolves();
-			var oRemoveOutdatedRegisteredChangesSpy = sandbox.spy(this.oRegistry, "removeOutdatedRegisteredChanges");
+			.resolves({
+				getChangeVisualizationInfo() {
+					return {
+						updateRequired: false
+					};
+				}
+			});
+			const oRemoveOutdatedRegisteredChangesSpy = sandbox.spy(this.oRegistry, "removeOutdatedRegisteredChanges");
 			return Promise.all([
 				this.oRegistry.registerChange(createMockChange("fooChange"), "foo"),
 				this.oRegistry.registerChange(createMockChange("barChange"), "bar")
@@ -182,14 +211,17 @@ sap.ui.define([
 			}.bind(this)).then(function() {
 				assert.ok(oRemoveOutdatedRegisteredChangesSpy.calledOnce, "then the function was called only once");
 				assert.strictEqual(this.oRegistry.getAllRegisteredChanges().length, 1, "then only one change is registered");
-				assert.notOk(this.oRegistry.getAllRegisteredChanges()[0].visualizationInfo.updateRequired, "then the remaining change has no updateRequired flag");
+				assert.notOk(
+					this.oRegistry.getAllRegisteredChanges()[0].visualizationInfo.updateRequired,
+					"then the remaining change has no updateRequired flag"
+				);
 			}.bind(this));
 		});
 
 		QUnit.test("when a registered change has no displayElementId and should be removed from the registry", function(assert) {
 			ChangesWriteAPI.getChangeHandler.reset();
 			ChangesWriteAPI.getChangeHandler.resolves();
-			var oRemoveRegisteredChangesWithoutVizInfoSpy = sandbox.spy(this.oRegistry, "removeRegisteredChangesWithoutVizInfo");
+			const oRemoveRegisteredChangesWithoutVizInfoSpy = sandbox.spy(this.oRegistry, "removeRegisteredChangesWithoutVizInfo");
 			return Promise.all([
 				this.oRegistry.registerChange(createMockChange("fooChange"), "foo"),
 				this.oRegistry.registerChange(createMockChange("barChange"), "bar")
@@ -200,7 +232,11 @@ sap.ui.define([
 			}.bind(this)).then(function() {
 				assert.ok(oRemoveRegisteredChangesWithoutVizInfoSpy.calledOnce, "then the function was called only once");
 				assert.strictEqual(this.oRegistry.getAllRegisteredChanges().length, 1, "then only one change is registered");
-				assert.strictEqual(this.oRegistry.getAllRegisteredChanges()[0].visualizationInfo.displayElementIds.length, 1, "then the remaining change has a display element id");
+				assert.strictEqual(
+					this.oRegistry.getAllRegisteredChanges()[0].visualizationInfo.displayElementIds.length,
+					1,
+					"then the remaining change has a display element id"
+				);
 			}.bind(this));
 		});
 	});
@@ -224,16 +260,8 @@ sap.ui.define([
 				this.oRegistry.registerChange(createMockChange("fooChange"), "foo"),
 				this.oRegistry.registerChange(createMockChange("barChange"), "bar")
 			]).then(function() {
-				var oIndicator = {
-					destroy() {}
-				};
-				var oDestructionSpy = sandbox.spy(oIndicator, "destroy");
-				this.oRegistry.registerChangeIndicator("someChangeIndicator", oIndicator);
-
 				this.oRegistry.destroy();
 				assert.strictEqual(this.oRegistry.getAllRegisteredChanges().length, 0, "then all changes are deleted");
-				assert.strictEqual(this.oRegistry.getChangeIndicators().length, 0, "then all indicator references are deleted");
-				assert.ok(oDestructionSpy.calledOnce, "then the registered indicators are destroyed");
 			}.bind(this));
 		});
 	});

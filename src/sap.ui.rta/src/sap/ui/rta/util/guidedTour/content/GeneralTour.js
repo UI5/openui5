@@ -79,25 +79,6 @@ sap.ui.define([
 				actionSelectors: ["sapUIRta_toolbar_fragment--sapUiRta_navigationSwitcherButton-button"]
 			},
 			{
-				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_VISUALIZATION_BUTTON_TITLE"),
-				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_VISUALIZATION_BUTTON_DESCRIPTION"),
-				listContent: [],
-				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_visualizationSwitcherButton-button",
-				actionSelectors: ["sapUIRta_toolbar_fragment--sapUiRta_visualizationSwitcherButton-button"]
-			},
-			{
-				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_CHANGE_LIST_DROPDOWN_TITLE"),
-				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_CHANGE_LIST_DROPDOWN_DESCRIPTION"),
-				listContent: [],
-				markerSelector:
-					"sapUIRta_toolbar_fragment--sapUiRta_toggleChangeVisualizationMenuButton--ChangeIndicatorCategorySelection--popover",
-				waitForElement: true,
-				actionSelectors: [
-					"sapUIRta_toolbar_fragment--sapUiRta_visualizationSwitcherButton-button",
-					"sapUIRta_toolbar_fragment--sapUiRta_toggleChangeVisualizationMenuButton"
-				]
-			},
-			{
 				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_SAVE_BUTTON_TITLE"),
 				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_SAVE_BUTTON_DESCRIPTION"),
 				listContent: [],
@@ -128,6 +109,12 @@ sap.ui.define([
 				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_ACTIVATE_VERSION_BUTTON_DESCRIPTION"),
 				listContent: [],
 				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_activate"
+			},
+			{
+				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_HIGHLIGHT_ALL_CHANGES_BUTTON_TITLE"),
+				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_HIGHLIGHT_ALL_CHANGES_BUTTON_DESCRIPTION"),
+				listContent: [],
+				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_highlightAllChanges"
 			},
 			{
 				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_VERSIONS_DROPDOWN_TITLE"),

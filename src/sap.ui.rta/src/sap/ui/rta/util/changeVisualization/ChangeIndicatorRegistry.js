@@ -61,9 +61,6 @@ sap.ui.define([
 
 			// List of entries with indicator data, grouped by Change ID
 			this._oRegisteredChanges = {};
-
-			// List of actual change indicator objects, grouped by selector
-			this._oChangeIndicators = {};
 		}
 	});
 
@@ -137,35 +134,99 @@ sap.ui.define([
 		return oChangeIndicators;
 	};
 
-	ChangeIndicatorRegistry.prototype.getRelevantChangesWithSelector = function() {
-		const oSelectors = this.getSelectorsWithRegisteredChanges();
-		let aRelevantChanges = [];
-		Object.keys(oSelectors).forEach(function(sSelectorId) {
-			const aRelevantChangesForSelector = oSelectors[sSelectorId].filter(function(oChange) {
-				return !oChange.dependent;
-			});
-			aRelevantChanges = aRelevantChanges.concat(aRelevantChangesForSelector);
+	/**
+	 * Indicates whether the registry currently holds at least one activated change that is actually
+	 * visualizable. A change is visualizable when its visualizationInfo resolves to at least one
+	 * affected or display element.
+	 *
+	 * Changes are ignored here when they are still draft or dirty, when their handler has no
+	 * getChangeVisualizationInfo, or when their selectors do not resolve in the current control tree.
+	 *
+	 * @returns {boolean} true if at least one activated, visualizable change is registered
+	 */
+	ChangeIndicatorRegistry.prototype.hasPersistedChanges = function() {
+		return this.getAllRegisteredChanges().some(function(oEntry) {
+			if (!Array.isArray(oEntry.changeStates) || !oEntry.changeStates.includes(ChangeStates.ALL)) {
+				return false;
+			}
+			const oChange = oEntry.change;
+			if (oChange.isSuccessfullyApplied) {
+				return oChange.isSuccessfullyApplied();
+			}
+			return false;
 		});
-		return aRelevantChanges;
 	};
 
 	/**
-	 * Returns the registered change indicator for the given element ID.
+	 * Checks whether the given element appears as either a display target or an affected element
+	 * for any registered change. An optional <code>fnFilter</code> predicate can be passed to scope
+	 * the considered changes (e.g. by state).
 	 *
-	 * @param {string} sSelectorId - ID of the indicator
-	 * @returns {object} Registered change indicator
+	 * @param {string} sElementId - ID of the UI element
+	 * @param {function(object):boolean} [fnFilter] - Optional predicate; only entries for which it
+	 *   returns <code>true</code> are considered
+	 * @returns {boolean} true if at least one matching change references the element
 	 */
-	ChangeIndicatorRegistry.prototype.getChangeIndicator = function(sSelectorId) {
-		return this._oChangeIndicators[sSelectorId];
+	ChangeIndicatorRegistry.prototype.hasChangesForElement = function(sElementId, fnFilter) {
+		return this.getAllRegisteredChanges().some(function(oEntry) {
+			if (fnFilter && !fnFilter(oEntry)) {
+				return false;
+			}
+			return oEntry.visualizationInfo.displayElementIds.includes(sElementId)
+				|| oEntry.visualizationInfo.affectedElementIds.includes(sElementId);
+		});
 	};
 
 	/**
-	 * Returns all registered change indicators.
+	 * Returns the flat change-info entries for the given element, deduped by change id. Combines
+	 * matches by displayElementIds (the primary path used for the dashed-border decoration) and
+	 * matches by affectedElementIds (so changes that only carry affected info still surface in the
+	 * detail popup). An optional <code>fnFilter</code> predicate scopes the considered changes.
 	 *
-	 * @returns {object[]} Registered change indicators
+	 * @param {string} sElementId - ID of the UI element
+	 * @param {function(object):boolean} [fnFilter] - Optional predicate; only entries for which it
+	 *   returns <code>true</code> are considered
+	 * @returns {object[]} Flat change-info entries (same shape as the values of
+	 *   <code>getSelectorsWithRegisteredChanges</code>)
 	 */
-	ChangeIndicatorRegistry.prototype.getChangeIndicators = function() {
-		return values(this._oChangeIndicators || {});
+	ChangeIndicatorRegistry.prototype.getChangeInfosForElement = function(sElementId, fnFilter) {
+		const oSelectors = this.getSelectorsWithRegisteredChanges();
+		const oChangeInfosById = new Map();
+
+		// Path A: direct lookup by displayElementId
+		(oSelectors[sElementId] || []).forEach(function(oChangeInfo) {
+			if (!oChangeInfo.dependent && (!fnFilter || fnFilter(oChangeInfo))) {
+				oChangeInfosById.set(oChangeInfo.id, oChangeInfo);
+			}
+		});
+
+		// Path B: catch changes that reference this element only as an affected element.
+		// In the common case displayElementIds === affectedElementIds, so we'd produce duplicates of
+		// Path A here — the Map dedupes them by change id.
+		this.getAllRegisteredChanges().forEach(function(oEntry) {
+			const sChangeId = oEntry.change.getId();
+			if (oChangeInfosById.has(sChangeId) || (fnFilter && !fnFilter(oEntry))) {
+				return;
+			}
+			if (
+				oEntry.visualizationInfo.affectedElementIds.includes(sElementId)
+				|| oEntry.visualizationInfo.displayElementIds.includes(sElementId)
+			) {
+				// Build a flat change info similar to what getSelectorsWithRegisteredChanges returns
+				oChangeInfosById.set(sChangeId, {
+					id: sChangeId,
+					dependent: false,
+					affectedElementId: oEntry.visualizationInfo.affectedElementIds[0],
+					descriptionPayload: oEntry.visualizationInfo.descriptionPayload || {},
+					change: oEntry.change,
+					commandName: oEntry.commandName,
+					changeCategory: oEntry.changeCategory,
+					changeStates: oEntry.changeStates
+				});
+			}
+		});
+
+		return [...oChangeInfosById.values()];
 	};
 
 	/**
@@ -239,11 +300,26 @@ sap.ui.define([
 			const oChangeOriginalSelector = oChange.getOriginalSelector && oChange.getOriginalSelector();
 			const aDisplayElementSelectors = oChangeOriginalSelector ? aChangeSelectors : aAffectedElementSelectors;
 
+			// When the change handler did not provide visualization info, mark as updateRequired
+			// so the next refreshBorders flushes and retries - UNLESS the handler explicitly
+			// has no getChangeVisualizationInfo function (sentinel value), in which case retrying won't help.
+			let bUpdateRequired;
+			if (oInfoFromChangeHandler && !oInfoFromChangeHandler.noVisualizationInfo) {
+				// Handler provided info - use its updateRequired flag
+				bUpdateRequired = !!mVisualizationInfo.updateRequired;
+			} else if (oInfoFromChangeHandler && oInfoFromChangeHandler.noVisualizationInfo) {
+				// Handler found but has no getChangeVisualizationInfo - don't retry
+				bUpdateRequired = false;
+			} else {
+				// Control not in tree yet - worth retrying
+				bUpdateRequired = true;
+			}
+
 			return {
 				affectedElementIds: getSelectorIds(aAffectedElementSelectors),
 				dependentElementIds: getSelectorIds(mVisualizationInfo.dependentControls) || [],
 				displayElementIds: getSelectorIds(mVisualizationInfo.displayControls || getSelectorIds(aDisplayElementSelectors)),
-				updateRequired: mVisualizationInfo.updateRequired,
+				updateRequired: bUpdateRequired,
 				descriptionPayload: mVisualizationInfo.descriptionPayload || {}
 			};
 		});
@@ -267,7 +343,8 @@ sap.ui.define([
 				) {
 					return oChangeHandler.getChangeVisualizationInfo(oChange, oAppComponent);
 				}
-				return undefined;
+				// Return a sentinel to indicate handler was found but has no getChangeVisualizationInfo
+				return { noVisualizationInfo: true };
 			})
 			.catch(function(vErr) {
 				Log.error(vErr);
@@ -279,36 +356,12 @@ sap.ui.define([
 	}
 
 	/**
-	 * Adds a change indicator to the registry.
-	 *
-	 * @param {string} sSelectorId - The ID of the selector for which the change indicator is registered
-	 * @param {object} oChangeIndicator - The change indicator to register
-	 */
-	ChangeIndicatorRegistry.prototype.registerChangeIndicator = function(sSelectorId, oChangeIndicator) {
-		this._oChangeIndicators[sSelectorId] = oChangeIndicator;
-	};
-
-	/**
-	 * Waits for the registered indicators to be rendered.
-	 * @returns {Promise} Resolves when all visible indicators are rendered.
-	 */
-	ChangeIndicatorRegistry.prototype.waitForIndicatorRendering = function() {
-		const aVisibleIndicators = this.getChangeIndicators().filter((oIndicator) => oIndicator.getVisible());
-		return Promise.all(aVisibleIndicators.map((oIndicator) => oIndicator.waitForRendering()));
-	};
-
-	/**
-	 * Resets the change and change indicator registries.
+	 * Resets the change registry.
 	 */
 	ChangeIndicatorRegistry.prototype.reset = function() {
 		Object.keys(this._oRegisteredChanges).forEach(function(sKeyToRemove) {
 			this.removeRegisteredChange(sKeyToRemove);
 		}.bind(this));
-
-		values(this._oChangeIndicators).forEach(function(oIndicator) {
-			oIndicator.destroy();
-		});
-		this._oChangeIndicators = {};
 	};
 
 	/**

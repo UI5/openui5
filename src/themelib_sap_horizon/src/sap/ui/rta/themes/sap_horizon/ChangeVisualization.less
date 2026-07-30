@@ -3,18 +3,12 @@
 /* Morning Horizon theme                           */
 /* =============================================== */
 
-@_sap_ui_rta_ChangeVisualization_BorderRadius: var(--sapButton_BorderCornerRadius); /* 0.5rem */
+@_sap_ui_rta_ChangeVisualization_OverlayOutlineColor: var(--sapSelectedColor); /* #0e4186 */
+@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark: @sapUiLegend7; /* #0e4186 */
 
 .sapUiDtOverlay {
 
-	.sapUiRtaChangeIndicatorHovered {
-
-		&::after {
-			border-radius: @_sap_ui_rta_ChangeVisualization_BorderRadius;
-		}
-	}
-
 	&.sapUiRtaChangeIndicatorDependent {
-		border-radius: @_sap_ui_rta_ChangeVisualization_BorderRadius;
+		border-radius: @_sap_ui_rta_ChangeVisualization_OverlayBorderRadius;
 	}
 }

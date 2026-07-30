@@ -408,55 +408,16 @@ sap.ui.define([
 			assert.strictEqual(oStopCutPasteStub.callCount, 1, "the cut paste was not stopped again");
 		});
 
-		QUnit.test("when Mode is changed from adaptation to visualization and back to adaptation", function(assert) {
-			oComp.getRootControl().addStyleClass("sapUiDtOverlayMovable");
+		QUnit.test("when Mode is set to visualization it throws an error (no longer supported)", function(assert) {
 			const oFireModeChangedStub = sandbox.stub(this.oRta, "fireModeChanged");
-			const oStopCutPasteStub = sandbox.stub(this.oRta.getPluginManager(), "handleStopCutPaste");
-			const oSetBlockedStub = sandbox.stub(oComp.getRootControl(), "setBlocked");
 
-			this.oRta.setMode("visualization");
-			assert.ok(this.oRta._oDesignTime.getEnabled(), "in visualization mode the designTime property enabled is true");
-			assert.strictEqual(oSetBlockedStub.callCount, 0, "setBlocked was not called");
-			assert.equal(oFireModeChangedStub.callCount, 1, "the event ModeChanged was fired");
-			assert.deepEqual(oFireModeChangedStub.lastCall.args[0], { mode: "visualization" }, "the argument of the event is correct");
-			assert.equal(getComputedStyle(document.querySelector(".sapUiDtOverlayMovable")).cursor, "default", "the movable overlays switched to the default cursor");
-			assert.strictEqual(oStopCutPasteStub.callCount, 1, "the cut paste was stopped");
-
-			// simulate mode change from toolbar
-			this.oRta.getToolbar().fireModeChange({ item: { getKey() {return "adaptation";} } });
-			assert.ok(this.oRta._oDesignTime.getEnabled(), "in adaption mode the designTime property enabled is true");
-			assert.strictEqual(oSetBlockedStub.callCount, 0, "setBlocked was not called");
-			assert.equal(oFireModeChangedStub.callCount, 2, "the event ModeChanged was fired again");
-			assert.deepEqual(oFireModeChangedStub.lastCall.args[0], { mode: "adaptation" }, "the argument of the event is correct");
-			assert.equal(getComputedStyle(document.querySelector(".sapUiDtOverlayMovable")).cursor, "move", "the movable overlays switched back to the move cursor");
-			oComp.getRootControl().removeStyleClass("sapUiDtOverlayMovable");
-			assert.strictEqual(oStopCutPasteStub.callCount, 1, "the cut paste was not stopped again");
-		});
-
-		QUnit.test("when Mode is changed from visualization to navigation and back to visualization", function(assert) {
-			oComp.getRootControl().addStyleClass("sapUiDtOverlayMovable");
-			this.oRta.setMode("visualization");
-			const oSetBlockedStub = sandbox.stub(oComp.getRootControl(), "setBlocked");
-			const oFireModeChangedStub = sandbox.stub(this.oRta, "fireModeChanged");
-			assert.equal(getComputedStyle(document.querySelector(".sapUiDtOverlayMovable")).cursor, "default", "the movable overlays switched to the default cursor");
-
-			this.oRta.setMode("navigation");
-			assert.notOk(this.oRta._oDesignTime.getEnabled(), " in navigation mode the designTime property enabled is false");
-			assert.strictEqual(oSetBlockedStub.callCount, 1, "setBlocked was called");
-			assert.strictEqual(oSetBlockedStub.lastCall.args[0], false, "blocked is set to false");
-			assert.equal(oFireModeChangedStub.callCount, 1, "the event ModeChanged was fired");
-			assert.deepEqual(oFireModeChangedStub.lastCall.args[0], { mode: "navigation" }, "the argument of the event is correct");
-			assert.equal(getComputedStyle(document.querySelector(".sapUiDtOverlayMovable")).cursor, "move", "the movable overlays back to the move cursor");
-
-			// simulate mode change from toolbar
-			this.oRta.getToolbar().fireModeChange({ item: { getKey() {return "visualization";} } });
-			assert.ok(this.oRta._oDesignTime.getEnabled(), "in visualization mode the designTime property enabled is true again");
-			assert.strictEqual(oSetBlockedStub.callCount, 2, "setBlocked was called");
-			assert.strictEqual(oSetBlockedStub.lastCall.args[0], true, "blocked is set to true");
-			assert.equal(oFireModeChangedStub.callCount, 2, "the event ModeChanged was fired again");
-			assert.deepEqual(oFireModeChangedStub.lastCall.args[0], { mode: "visualization" }, "the argument of the event is correct");
-			assert.equal(getComputedStyle(document.querySelector(".sapUiDtOverlayMovable")).cursor, "default", "the movable overlays switched again to the default cursor");
-			oComp.getRootControl().removeStyleClass("sapUiDtOverlayMovable");
+			assert.throws(
+				() => this.oRta.setMode("visualization"),
+				/Mode 'visualization' is not supported anymore/,
+				"then an error is thrown"
+			);
+			assert.strictEqual(this.oRta.getMode(), "adaptation", "the mode stays adaptation");
+			assert.strictEqual(oFireModeChangedStub.callCount, 0, "ModeChanged was not fired");
 		});
 
 		QUnit.test("when personalization changes are created in navigation mode", async function(assert) {
@@ -493,7 +454,7 @@ sap.ui.define([
 			assert.strictEqual(oRootControlBlockedStub.callCount, 1, "setBlocked is called");
 			assert.strictEqual(oRootControlBlockedStub.lastCall.args[0], false, "and set to false");
 
-			this.oRta.setMode("visualization");
+			this.oRta.setMode("adaptation");
 			assert.strictEqual(oButtonBlockedStub.callCount, 2, "setBlocked is called");
 			assert.strictEqual(oButtonBlockedStub.lastCall.args[0], true, "and set to true");
 			assert.strictEqual(oRootControlBlockedStub.callCount, 2, "setBlocked is called");
@@ -548,7 +509,7 @@ sap.ui.define([
 			assert.strictEqual(this.oRta._oToolbarControlsModel.getProperty("/restore/visible"), false, "then the reset button is hidden");
 			assert.strictEqual(this.oRta._oToolbarControlsModel.getProperty("/translation/enabled"), false, "then the translation button is disabled");
 			assert.strictEqual(this.oRta._oToolbarControlsModel.getProperty("/translation/visible"), false, "then the translation button is not visible");
-			assert.strictEqual(this.oRta._oToolbarControlsModel.getProperty("/visualizationButton/visible"), true, "then the visualization button is visible");
+			assert.strictEqual(this.oRta._oToolbarControlsModel.getProperty("/highlightAllChanges/enabled"), false, "then the 'Highlight All Changes' button is initially disabled");
 			assert.strictEqual(this.oRta._oVersionsModel.getProperty("/publishVersionVisible"), false, "then the publish version button is not visible");
 			assert.strictEqual(this.oRta._oToolbarControlsModel.getProperty("/changesNeedHardReload"), false, "then no changes need a hard reload");
 			assert.strictEqual(this.oRta.getToolbar().isA("sap.ui.rta.toolbar.Standalone"), true, "then the toolbar is of type Standalone");
@@ -612,32 +573,6 @@ sap.ui.define([
 			return oPromise.then(function() {
 				assert.equal(this.oRta._oToolbarControlsModel.getProperty("/translation/enabled"), true, "then the Translate Button is enabled");
 			}.bind(this));
-		});
-
-		QUnit.test("when the URL parameter set by Fiori tools is set to 'true'", async function(assert) {
-			sandbox.stub(URLSearchParams.prototype, "has").callThrough().withArgs("fiori-tools-rta-mode").returns(true);
-			sandbox.stub(URLSearchParams.prototype, "get").callThrough().withArgs("fiori-tools-rta-mode").returns("true");
-
-			await this.oRta.start();
-			const oToolbar = this.oRta.getToolbar();
-			assert.notOk(oToolbar.getControl("visualizationSwitcherButton").getVisible(), "then the 'Visualization' tab is not visible");
-		});
-
-		QUnit.test("when the URL parameter set by Fiori tools is set to 'false'", async function(assert) {
-			sandbox.stub(URLSearchParams.prototype, "has").callThrough().withArgs("fiori-tools-rta-mode").returns(true);
-			sandbox.stub(URLSearchParams.prototype, "get").callThrough().withArgs("fiori-tools-rta-mode").returns("false");
-
-			await this.oRta.start();
-			const oToolbar = this.oRta.getToolbar();
-			assert.ok(oToolbar.getControl("visualizationSwitcherButton").getVisible(), "then the 'Visualization' tab is visible");
-		});
-
-		QUnit.test("when the URL parameter used by Fiori tools is not set", async function(assert) {
-			sandbox.stub(URLSearchParams.prototype, "has").callThrough().withArgs("fiori-tools-rta-mode").returns(false);
-
-			await this.oRta.start();
-			const oToolbar = this.oRta.getToolbar();
-			assert.ok(oToolbar.getControl("visualizationSwitcherButton").getVisible(), "then the 'Visualization' tab is visible");
 		});
 
 		QUnit.test("when RTA is started in the customer layer, app variant feature is available for a (key user) but the manifest of an app is not supported", async function(assert) {
@@ -975,6 +910,52 @@ sap.ui.define([
 					version: "myVersion"
 				}),
 				"the loadVersionForApplication function was called with the displayed version"
+			);
+		});
+
+		QUnit.test("when re-entering adaptation mode and ChangeVisualization reports persisted changes, then the 'Highlight All Changes' button becomes enabled", async function(assert) {
+			await this.oRta.start();
+			const oCViz = this.oRta.getChangeVisualization();
+			sandbox.stub(oCViz, "hasPersistedChanges").returns(true);
+			this.oRta._oToolbarControlsModel.setProperty("/highlightAllChanges/enabled", false);
+
+			// Toggle out of adaptation and back in — the toolbar flag is recomputed when re-entering.
+			this.oRta.setMode("navigation");
+			this.oRta.setMode("adaptation");
+
+			assert.strictEqual(
+				this.oRta._oToolbarControlsModel.getProperty("/highlightAllChanges/enabled"),
+				true,
+				"then the 'Highlight All Changes' button is enabled"
+			);
+		});
+
+		QUnit.test("when re-entering adaptation mode and ChangeVisualization reports no persisted changes, then the 'Highlight All Changes' button stays disabled", async function(assert) {
+			await this.oRta.start();
+			const oCViz = this.oRta.getChangeVisualization();
+			sandbox.stub(oCViz, "hasPersistedChanges").returns(false);
+			this.oRta._oToolbarControlsModel.setProperty("/highlightAllChanges/enabled", true);
+
+			this.oRta.setMode("navigation");
+			this.oRta.setMode("adaptation");
+
+			assert.strictEqual(
+				this.oRta._oToolbarControlsModel.getProperty("/highlightAllChanges/enabled"),
+				false,
+				"then the 'Highlight All Changes' button is disabled again"
+			);
+		});
+
+		QUnit.test("when leaving adaptation mode, then the 'Highlight All Changes' button becomes disabled", async function(assert) {
+			await this.oRta.start();
+			this.oRta._oToolbarControlsModel.setProperty("/highlightAllChanges/enabled", true);
+
+			this.oRta.setMode("navigation");
+
+			assert.strictEqual(
+				this.oRta._oToolbarControlsModel.getProperty("/highlightAllChanges/enabled"),
+				false,
+				"then the 'Highlight All Changes' button is reset to disabled"
 			);
 		});
 	});

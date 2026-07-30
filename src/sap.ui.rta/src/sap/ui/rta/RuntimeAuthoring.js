@@ -499,9 +499,36 @@ sap.ui.define([
 			);
 			await oDesignTimePromise;
 
-			// needed to access the connected elements (e.g. section/anchor bar) in CViz
-			if (this.getChangeVisualization) {
-				this.getChangeVisualization()._oDesignTime = this._oDesignTime;
+			// CViz is only instantiated when toolbars are shown (see addDependent at line 252)
+			if (this.getShowToolbars()) {
+				const oChangeVisualization = this.getChangeVisualization();
+
+				// Initialize CViz: set DesignTime, root control, collect changes, and apply border classes
+				oChangeVisualization.setDesignTime(this._oDesignTime);
+				oChangeVisualization.setRootControlId(this.getRootControl());
+				oChangeVisualization.setVersionsModel(this.getToolbar());
+				await oChangeVisualization.initialize();
+				updateHighlightAllChangesEnabled.call(this);
+
+				// Wire CViz callback to ContextMenu plugin
+				const oContextMenuPlugin = this._oDesignTime.getPlugins()
+				.find((oPlugin) => oPlugin.isA("sap.ui.dt.plugin.ContextMenu"));
+				if (oContextMenuPlugin) {
+					oContextMenuPlugin.setChangeVisualizationCallbackFunctions({
+						findOverlayWithChanges(oOverlay) {
+							return oChangeVisualization.findOverlayWithChanges(oOverlay);
+						},
+						openPopup(oOverlay, mContextMenuRect, oOpenerEvent, oOpenerOverlay) {
+							oChangeVisualization.openChangeDetailPopup({
+								overlay: oOverlay,
+								contextMenuRect: mContextMenuRect,
+								openerEvent: oOpenerEvent,
+								openerOverlay: oOpenerOverlay,
+								contextMenuPlugin: oContextMenuPlugin
+							});
+						}
+					});
+				}
 			}
 			setBlockedOnRootElements.call(this, true);
 
@@ -525,7 +552,7 @@ sap.ui.define([
 				});
 				oGuidedTour.autoStart(GeneralTour.getTourContent());
 			} else if (bShowWhatsNew) {
-				this.getWhatsNew().initializeWhatsNewDialog(aSeenFeatureIds);
+				await this.getWhatsNew().initializeWhatsNewDialog(aSeenFeatureIds);
 				window.sessionStorage.setItem(sWhatsNewReloadFlag, true);
 			}
 
@@ -587,6 +614,7 @@ sap.ui.define([
 			Overlay.getOverlayContainer().classList.add("sapUiRta");
 			// RTA Visual Improvements
 			document.body.classList.add("sapUiRtaMode");
+			createOrRemoveAdaptationBorder(this, true);
 			this._oDesignTime.getSelectionManager().attachChange(function(oEvent) {
 				this.fireSelectionChange({ selection: oEvent.getParameter("selection") });
 			}, this);
@@ -680,6 +708,7 @@ sap.ui.define([
 		if (!bExitFailed) {
 			this._sStatus = STOPPED;
 			document.body.classList.remove("sapUiRtaMode");
+			createOrRemoveAdaptationBorder(this, false);
 		}
 	};
 
@@ -728,50 +757,30 @@ sap.ui.define([
 	 * @override
 	 */
 	RuntimeAuthoring.prototype.setMode = function(sNewMode) {
+		if (sNewMode === "visualization") {
+			throw Error("Mode 'visualization' is not supported anymore");
+		}
 		const sCurrentMode = this.getMode();
 		if (sCurrentMode !== sNewMode) {
-			const oSelectionPlugin = this.getPluginManager().getPlugin("selection");
-
 			// Switch between another mode and navigation -> toggle blocked on root controls
 			if (sCurrentMode === "navigation" || sNewMode === "navigation") {
 				this._oDesignTime.setEnabled(sNewMode !== "navigation");
 				setBlockedOnRootElements.call(this, sCurrentMode === "navigation");
 			}
 
-			const oChangeVisualization = this.getChangeVisualization?.();
-			if (sNewMode === "visualization" || sCurrentMode === "visualization") {
-				DtUtil.waitForSynced(this._oDesignTime)()
-				.then(function() {
-					return oChangeVisualization.triggerModeChange(this.getRootControl(), this.getToolbar());
-				}.bind(this));
-			}
-
 			if (sCurrentMode === "adaptation") {
 				this.getPluginManager().handleStopCutPaste();
 			}
 
-			oSelectionPlugin.setIsActive(!(sNewMode === "visualization"));
-
-			const oOverlayContainer = Overlay.getOverlayContainer();
-			if (sNewMode === "visualization") {
-				oOverlayContainer.classList.add("sapUiRtaVisualizationMode");
-			} else {
-				oOverlayContainer.classList.remove("sapUiRtaVisualizationMode");
-			}
-
-			if (sNewMode === "visualization") {
-				document.querySelectorAll(".sapUiDtOverlayMovable").forEach(function(oNode) {
-					oNode.style.cursor = "default";
-				});
-			} else {
-				document.querySelectorAll(".sapUiDtOverlayMovable").forEach(function(oNode) {
-					oNode.style.cursor = "move";
-				});
-			}
-
 			this._oToolbarControlsModel.setProperty("/modeSwitcher", sNewMode);
+			if (sNewMode !== "adaptation") {
+				this._oToolbarControlsModel.setProperty("/highlightAllChanges/enabled", false);
+			} else {
+				updateHighlightAllChangesEnabled.call(this);
+			}
 			this.setProperty("mode", sNewMode);
 			this.fireModeChanged({ mode: sNewMode });
+			toggleAdaptationBorder(this, sNewMode === "adaptation");
 		}
 	};
 
@@ -1048,6 +1057,32 @@ sap.ui.define([
 		}
 	}
 
+	const ADAPTATION_BORDER_CLASS = "sapUiRtaAdaptationBorder";
+	const ADAPTATION_BORDER_VISIBLE_CLASS = "sapUiRtaAdaptationBorderVisible";
+
+	function createOrRemoveAdaptationBorder(oRta, bCreate) {
+		if (bCreate) {
+			if (!oRta._oAdaptationBorderElement) {
+				const oBorder = document.createElement("div");
+				oBorder.className = ADAPTATION_BORDER_CLASS;
+				if (oRta.getMode() === "adaptation") {
+					oBorder.classList.add(ADAPTATION_BORDER_VISIBLE_CLASS);
+				}
+				document.body.appendChild(oBorder);
+				oRta._oAdaptationBorderElement = oBorder;
+			}
+		} else if (oRta._oAdaptationBorderElement) {
+			oRta._oAdaptationBorderElement.remove();
+			delete oRta._oAdaptationBorderElement;
+		}
+	}
+
+	function toggleAdaptationBorder(oRta, bVisible) {
+		if (oRta._oAdaptationBorderElement) {
+			oRta._oAdaptationBorderElement.classList.toggle(ADAPTATION_BORDER_VISIBLE_CLASS, bVisible);
+		}
+	}
+
 	/**
 	 * Checks the publish button, draft buttons(activate and delete) and app variant support (i.e.
 	 * Save As and Overview of App Variants) availability. The publish button shall not be available
@@ -1150,6 +1185,19 @@ sap.ui.define([
 	}
 
 	/**
+	 * Recomputes the enabled state of the "Highlight All App Changes" toolbar toggle.
+	 * The button should only be enabled when toggling it would actually reveal additional
+	 * indicators, i.e. when the change registry holds at least one already-persisted change.
+	 */
+	function updateHighlightAllChangesEnabled() {
+		if (!this.getShowToolbars()) {
+			return;
+		}
+		const bHasPersisted = this.getChangeVisualization().hasPersistedChanges();
+		this._oToolbarControlsModel.setProperty("/highlightAllChanges/enabled", bHasPersisted);
+	}
+
+	/**
 	 * Adapt the enablement of undo/redo/reset button
 	 */
 	async function onStackModified() {
@@ -1186,6 +1234,12 @@ sap.ui.define([
 				);
 				const bChangesNeedHardReload = this._bSavedChangesNeedReload || await this._oSerializer.needsReload();
 				this._oToolbarControlsModel.setProperty("/changesNeedHardReload", bChangesNeedHardReload);
+			}
+			if (this.getChangeVisualization && this.getChangeVisualization().getInitialized()) {
+				this.getChangeVisualization().refreshBorders()
+				.catch(function(oError) {
+					Log.error("Failed to refresh change visualization borders after stack modification", oError);
+				});
 			}
 			this.fireUndoRedoStackModified();
 		} catch (e) {
@@ -1323,11 +1377,11 @@ sap.ui.define([
 		}
 
 		await this._oSerializer.saveCommands(mPropertyBag);
-		if (!bIsExit && this.getChangeVisualization) {
-			// clean CViz after Save
-			const oToolbar = this.getToolbar();
-			const oChangeVisualization = this.getChangeVisualization();
-			oChangeVisualization.updateAfterSave(oToolbar);
+		if (!bIsExit && this.getChangeVisualization && this.getChangeVisualization().getInitialized()) {
+			// Refresh CViz borders after save. The persisted-changes flag (highlightAllChanges)
+			// cannot flip here: save only moves changes between NEW/DRAFT/DIRTY, never to ALL.
+			// That transition only happens on activate, which updates the flag itself.
+			await this.getChangeVisualization().refreshBorders();
 		}
 	}
 
@@ -1367,6 +1421,12 @@ sap.ui.define([
 			this.bInitialResetEnabled = true;
 			this._oToolbarControlsModel.setProperty("/restore/enabled", true);
 			this.getCommandStack().removeAllCommands();
+			// Refresh CViz: activate flips registered changes from DRAFT to ALL, but doesn't
+			// add/remove changes themselves.
+			if (this.getChangeVisualization().getInitialized()) {
+				await this.getChangeVisualization().refreshBorders();
+				updateHighlightAllChangesEnabled.call(this);
+			}
 		} catch (oError) {
 			Utils.showMessageBox("error", "MSG_DRAFT_ACTIVATION_FAILED", { error: oError });
 		}
@@ -1634,11 +1694,9 @@ sap.ui.define([
 		oProperties.switchVersion = onSwitchVersion.bind(this);
 		oProperties.switchAdaptation = onSwitchAdaptation.bind(this);
 		oProperties.deleteAdaptation = onDeleteAdaptation.bind(this);
-		oProperties.openChangeCategorySelectionPopover = this.getChangeVisualization
-			? this.getChangeVisualization().openChangeCategorySelectionPopover.bind(this.getChangeVisualization())
-			: function() {};
 		oProperties.save = saveOnly.bind(this);
 		oProperties.saveAndReload = saveAndReload.bind(this);
+		oProperties.highlightAllChanges = onHighlightAllChanges.bind(this);
 
 		let oToolbar;
 		const bUshellAvailable = !!FlexUtils.getUshellContainer();
@@ -1659,10 +1717,6 @@ sap.ui.define([
 		const bTranslationAvailable = await FeaturesAPI.isKeyUserTranslationEnabled(this.getLayer());
 		const bAppVariantsAvailable = mButtonsAvailability.saveAsAvailable;
 		const bExtendedOverview = bAppVariantsAvailable && RtaAppVariantFeature.isOverviewExtended();
-		const oUriParameters = new URLSearchParams(window.location.search);
-		// the "Visualization" tab should not be visible if the "fiori-tools-rta-mode" URL-parameter is set to any value but "false"
-		const bVisualizationButtonVisible = !oUriParameters.has("fiori-tools-rta-mode")
-			|| oUriParameters.get("fiori-tools-rta-mode") === "false";
 		const bFeedbackButtonVisible = FlexRuntimeInfoAPI.getConfiguredFlexServices().some(function(oFlexibilityService) {
 			return oFlexibilityService.connector !== "LocalStorageConnector";
 		});
@@ -1712,15 +1766,15 @@ sap.ui.define([
 			actionsMenuButton: {
 				enabled: true
 			},
-			visualizationButton: {
-				visible: bVisualizationButtonVisible,
-				enabled: bVisualizationButtonVisible
-			},
 			feedbackButton: {
 				visible: bFeedbackButtonVisible
 			},
 			backButton: {
 				visible: !!window.navigation,
+				enabled: false
+			},
+			highlightAllChanges: {
+				pressed: false,
 				enabled: false
 			}
 		});
@@ -1842,6 +1896,12 @@ sap.ui.define([
 
 	function onModeChange(oEvent) {
 		this.setMode(oEvent.getParameter("item").getKey());
+	}
+
+	function onHighlightAllChanges(oEvent) {
+		if (this.getChangeVisualization && this.getChangeVisualization().getInitialized()) {
+			this.getChangeVisualization().setShowAllChanges(oEvent.getParameter("pressed"));
+		}
 	}
 
 	/**

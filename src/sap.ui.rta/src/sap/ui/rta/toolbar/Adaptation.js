@@ -78,7 +78,7 @@ sap.ui.define([
 	 * @since 1.48
 	 * @alias sap.ui.rta.toolbar.Adaptation
 	 */
-	var Adaptation = Base.extend("sap.ui.rta.toolbar.Adaptation", {
+	const Adaptation = Base.extend("sap.ui.rta.toolbar.Adaptation", {
 		renderer: AdaptationRenderer,
 		animation: true,
 		metadata: {
@@ -99,8 +99,8 @@ sap.ui.define([
 				switchVersion: {},
 				switchAdaptation: {},
 				deleteAdaptation: {},
-				openChangeCategorySelectionPopover: {},
-				saveAndReload: {}
+				saveAndReload: {},
+				highlightAllChanges: {}
 			}
 		}
 	});
@@ -109,8 +109,8 @@ sap.ui.define([
 	Adaptation.MIDDLE_SECTION = "toolbarSwitcherSection";
 	Adaptation.RIGHT_SECTION = "toolbarActionsSection";
 
-	// Size of three icons + spacing in pixels
-	var SWITCHER_ICON_WIDTH = 124;
+	// Size of two icons + spacing in pixels
+	const SWITCHER_ICON_WIDTH = 84;
 
 	Adaptation.prototype.init = function(...aArgs) {
 		this._mSizeLimits = {
@@ -126,7 +126,7 @@ sap.ui.define([
 	};
 
 	Adaptation.prototype._calculateWindowWidth = function(aEntries) {
-		var iSectionWidth = aEntries[0].intersectionRect.width;
+		const iSectionWidth = aEntries[0].intersectionRect.width;
 		return (iSectionWidth * 2) + this._iSwitcherToolbarWidth + 80/* toolbar padding */;
 	};
 
@@ -156,7 +156,7 @@ sap.ui.define([
 	};
 
 	Adaptation.prototype.initialAdjustToolbarSectionWidths = function() {
-		var nModeSwitcherWidth = this.getControl("modeSwitcher").getDomRef().getBoundingClientRect().width;
+		const nModeSwitcherWidth = this.getControl("modeSwitcher").getDomRef().getBoundingClientRect().width;
 		// Size of switcher with texts depends on language; needs to be calculated on start
 		this._iSwitcherToolbarWidthWithTexts = nModeSwitcherWidth + 16;
 		this._iSwitcherToolbarWidth = this._iSwitcherToolbarWidthWithTexts;
@@ -182,7 +182,7 @@ sap.ui.define([
 			oInstersectionObserver.disconnect();
 		});
 		[Adaptation.LEFT_SECTION, Adaptation.RIGHT_SECTION].forEach(function(sSectionName) {
-			var oIntersectionObserver = this._createIntersectionObserver(sSectionName);
+			const oIntersectionObserver = this._createIntersectionObserver(sSectionName);
 			this._observeToolbarIntersection(sSectionName, oIntersectionObserver);
 			this._aIntersectionObservers.push(oIntersectionObserver);
 		}.bind(this));
@@ -216,9 +216,9 @@ sap.ui.define([
 	};
 
 	Adaptation.prototype._observeToolbarIntersection = function(sSectionName, oInstersectionObserver) {
-		var oHBox = this.getControl(sSectionName);
+		const oHBox = this.getControl(sSectionName);
 		oHBox.getItems().map(function(oItem) {
-			var oItemDomRef = oItem.getDomRef();
+			const oItemDomRef = oItem.getDomRef();
 			oInstersectionObserver.observe(oItemDomRef);
 		});
 	};
@@ -231,16 +231,19 @@ sap.ui.define([
 	};
 
 	function setButtonProperties(sButtonName, sIcon, sTextKey, sToolTipKey) {
-		var oButton = this.getControl(sButtonName);
-		var sText = sTextKey ? this.getTextResources().getText(sTextKey) : "";
-		var sToolTip = sToolTipKey ? this.getTextResources().getText(sToolTipKey) : "";
+		const oButton = this.getControl(sButtonName);
+		const sText = sTextKey ? this.getTextResources().getText(sTextKey) : "";
+		const sToolTip = sToolTipKey ? this.getTextResources().getText(sToolTipKey) : "";
 		oButton.setText(sText || "");
 		oButton.setTooltip(sToolTip || "");
 		oButton.setIcon(sIcon || "");
 	}
 
 	Adaptation.prototype.formatPublishVersionVisibility = function(bPublishVisible, bVersioningEnabled, sDisplayedVersion, sModeSwitcher) {
-		return this.getExtension("versioning", Versioning).formatPublishVersionVisibility(bPublishVisible, bVersioningEnabled, sDisplayedVersion, sModeSwitcher);
+		return this.getExtension(
+			"versioning",
+			Versioning).formatPublishVersionVisibility(bPublishVisible, bVersioningEnabled, sDisplayedVersion, sModeSwitcher
+		);
 	};
 
 	Adaptation.prototype.formatDiscardDraftVisible = function(sDisplayedVersion, bVersioningEnabled, sModeSwitcher) {
@@ -277,7 +280,7 @@ sap.ui.define([
 	};
 
 	Adaptation.prototype.showActionsMenu = function(oEvent) {
-		var oButton = oEvent.getSource();
+		const oButton = oEvent.getSource();
 		if (!this._oActionsMenuFragment) {
 			return Fragment.load({
 				id: `${this.getId()}_actionsMenu_fragment`,
@@ -318,7 +321,6 @@ sap.ui.define([
 	Adaptation.prototype._switchToIcons = function() {
 		this._showButtonIcon("adaptationSwitcherButton", "sap-icon://wrench", "BTN_ADAPTATION");
 		this._showButtonIcon("navigationSwitcherButton", "sap-icon://explorer", "BTN_NAVIGATION");
-		this._showButtonIcon("visualizationSwitcherButton", "sap-icon://show", "BTN_VISUALIZATION");
 
 		this._iSwitcherToolbarWidth = SWITCHER_ICON_WIDTH;
 		this.adjustToolbarSectionWidths();
@@ -327,7 +329,6 @@ sap.ui.define([
 	Adaptation.prototype._switchToTexts = function() {
 		this._showButtonText("adaptationSwitcherButton", "BTN_ADAPTATION");
 		this._showButtonText("navigationSwitcherButton", "BTN_NAVIGATION");
-		this._showButtonText("visualizationSwitcherButton", "BTN_VISUALIZATION");
 
 		this._iSwitcherToolbarWidth = this._iSwitcherToolbarWidthWithTexts;
 		this.adjustToolbarSectionWidths();
@@ -350,7 +351,6 @@ sap.ui.define([
 				modeChange: this.eventHandler.bind(this, "ModeChange"),
 				undo: this.eventHandler.bind(this, "Undo"),
 				redo: this.eventHandler.bind(this, "Redo"),
-				openChangeCategorySelectionPopover: this.eventHandler.bind(this, "OpenChangeCategorySelectionPopover"),
 				saveAsAdaptation: onSaveAsAdaptation.bind(this),
 				editAdaptation: onEditAdaptation.bind(this),
 				deleteAdaptation: onDeleteAdaptation.bind(this),
@@ -366,13 +366,14 @@ sap.ui.define([
 				showFeedbackForm: this.showFeedbackForm.bind(this),
 				showHardReloadInfoPopover: this.showHardReloadInfoPopover.bind(this),
 				saveAndReloadApp: this.eventHandler.bind(this, "SaveAndReload"),
-				navigateBack: this.navigateBack.bind(this)
+				navigateBack: this.navigateBack.bind(this),
+				highlightAllChanges: this.eventHandler.bind(this, "HighlightAllChanges")
 			}
 		});
 	};
 
 	function onOpenDownloadTranslationDialog() {
-		var mPropertyBag = {
+		const mPropertyBag = {
 			layer: this.getRtaInformation().flexSettings.layer,
 			selector: this.getRtaInformation().rootControl
 		};
@@ -401,7 +402,7 @@ sap.ui.define([
 	}
 
 	function confirmMigration(oRtaInformation) {
-		var bDirty = oRtaInformation.commandStack.canSave();
+		const bDirty = oRtaInformation.commandStack.canSave();
 
 		return Utils.showMessageBox("confirm", (bDirty) ? "DAC_DIALOG_MIGRATION_DIRTY_DESCRIPTION" : "DAC_DIALOG_MIGRATION_DESCRIPTION", {
 			titleKey: "DAC_DIALOG_MIGRATION_HEADER",
@@ -445,8 +446,8 @@ sap.ui.define([
 		}.bind(this))
 		.catch(function(oError) {
 			Log.error(oError.stack || oError);
-			var sMessage = "DAC_DIALOG_MIGRATION_ERROR_DESCRIPTION";
-			var oOptions = {
+			const sMessage = "DAC_DIALOG_MIGRATION_ERROR_DESCRIPTION";
+			const oOptions = {
 				titleKey: "DAC_DIALOG_MIGRATION_HEADER",
 				details: oError.userMessage || oError
 			};
@@ -455,10 +456,11 @@ sap.ui.define([
 	}
 
 	function onSaveAsAdaptation() {
-		var oRtaInformation = this.getRtaInformation();
+		const oRtaInformation = this.getRtaInformation();
 		Utils.checkDraftOverwrite(this.getModel("versions")).then(function() {
 			Measurement.start("onCBACanMigrate", "Measurement if its possible to migrate to context-based adaptation");
-			return ContextBasedAdaptationsAPI.canMigrate({ control: oRtaInformation.rootControl, layer: oRtaInformation.flexSettings.layer });
+			return ContextBasedAdaptationsAPI.canMigrate(
+				{ control: oRtaInformation.rootControl, layer: oRtaInformation.flexSettings.layer });
 		}).then(function(bCanMigrate) {
 			Measurement.end("onCBACanMigrate");
 			Measurement.getActive() && Log.info(`onCBACanMigrate: ${Measurement.getMeasurement("onCBACanMigrate").time} ms`);
@@ -474,7 +476,9 @@ sap.ui.define([
 	function onEditAdaptation() {
 		Utils.checkDraftOverwrite(this.getModel("versions"))
 		.then(function() {
-			this.getExtension("contextBasedSaveAs", SaveAsAdaptation).openAddAdaptationDialog(this.getRtaInformation().flexSettings.layer, true /* bIsEditMode */);
+			this.getExtension("contextBasedSaveAs", SaveAsAdaptation).openAddAdaptationDialog(
+				this.getRtaInformation().flexSettings.layer, true /* bIsEditMode */
+			);
 		}.bind(this))
 		.catch(handleError);
 	}
@@ -533,7 +537,7 @@ sap.ui.define([
 	}
 
 	Adaptation.prototype.getControl = function(sName) {
-		var oControl = Element.getElementById(`${this.getId()}_fragment--sapUiRta_${sName}`);
+		let oControl = Element.getElementById(`${this.getId()}_fragment--sapUiRta_${sName}`);
 		// Control is inside the ActionsMenu
 		if (!oControl && this._oActionsMenuFragment) {
 			oControl = Element.getElementById(this._oActionsMenuFragment.getId().replace("sapUiRta_actions", "sapUiRta_") + sName);
@@ -569,7 +573,7 @@ sap.ui.define([
 		// Add product filter for qualtrics colleagues
 		oUrlParams.set("product_filter", "Key%20User%20Adaptation");
 
-		var oFeedbackDialogModel = new JSONModel({
+		const oFeedbackDialogModel = new JSONModel({
 			url: `${sURL}?${oUrlParams.toString()}`
 		});
 

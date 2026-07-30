@@ -73,7 +73,7 @@
 				id="sapUiRta_restore"
 				icon="sap-icon://reset"
 				enabled="{controls>/restore/enabled}"
-				visible="{= (${controls>/restore/visible} &amp;&amp; ((${controls>/modeSwitcher} === 'visualization') || (${controls>/modeSwitcher} === 'adaptation')))}"
+				visible="{= (${controls>/restore/visible} &amp;&amp; ${controls>/modeSwitcher} === 'adaptation')}"
 				press=".restore"
 				text="{i18n>BTN_RESTORE}" />
 		<MenuItem

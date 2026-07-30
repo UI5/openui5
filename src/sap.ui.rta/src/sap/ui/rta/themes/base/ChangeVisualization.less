@@ -3,58 +3,35 @@
 /* Base theme                                      */
 /* =============================================== */
 
-@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorMedium: @sapUiChartPaletteSequentialHue1Dark1; /* #1b57a7 */
+@_sap_ui_rta_ChangeVisualization_OverlayOutlineColor: var(--sapSelectedColor);
 @_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark: @sapUiChartPaletteSequentialHue11Dark2; /* #0e4186 */
-@_sap_ui_rta_ChangeVisualization_OverlayOutlineColor: var(--sapSelectedColor); /* #8fb5ff */
-
-.sapUiRtaChangeIndicator {
-	height: 0.8rem;
-	width: 0.8rem;
-	position: relative;
-	border-radius: 50%;
-	transition: width 0.3s, height 0.3s, box-shadow 0.3s;
-	cursor: pointer;
-	background-color: @_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorMedium;
-	opacity: 0.75;
-	top: 0.25rem;
-	left: 0.25rem;
-
-	&.sapUiRtaChangeIndicatorVerticallyCentered {
-		top: 50%;
-		transform: translateY(-50%);
-	}
-
-	&.sapUiRtaHover {
-		height: 0.9rem;
-		width: 0.9rem;
-		box-shadow: var(--sapContent_Shadow2);
-	}
-}
+@_sap_ui_rta_ChangeVisualization_OverlayBorderRadius: var(--sapButton_BorderCornerRadius); /* 0.5rem */
 
 .sapUiDtOverlay {
 
-	&.sapUiRtaChangeIndicatorHovered {
-		cursor: pointer !important;
-
-		&::after {
-			content: '';
-			transition: box-shadow .25s;
-			box-shadow: var(--sapContent_Shadow2);
-			outline: 0.0625rem solid @_sap_ui_rta_ChangeVisualization_OverlayOutlineColor !important; /* 1px */
-			outline-offset: -0.0625rem; /* 1px */
-		}
-	}
-
+	// source overlay of moved elements with animation
 	&.sapUiRtaChangeIndicatorDependent {
 		position: absolute;
 		box-shadow: inset 0 0 0 0.1875rem @_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark, var(--sapContent_Shadow2);
 		background-color: fade(@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark, 25%);
-		animation: fadeOut linear 1.5s;
+		animation: flashFadeOut cubic-bezier(0.57, 0.13, 1, 0.57) 2s;
 		animation-fill-mode: forwards;
-		@keyframes fadeOut {
-			66% {
+		@keyframes flashFadeOut {
+			5% {
 				box-shadow: inset 0 0 0 0.1875rem @_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark, var(--sapContent_Shadow2);
 				background-color: fade(@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark, 25%);
+			}
+			25% {
+				box-shadow: none;
+				background-color: fade(@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark, 0%);
+			}
+			50% {
+				box-shadow: inset 0 0 0 0.1875rem @_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark, var(--sapContent_Shadow2);
+				background-color: fade(@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark, 25%);
+			}
+			75% {
+				box-shadow: none;
+				background-color: fade(@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark, 0%);
 			}
 			100% {
 				box-shadow: none;
@@ -62,25 +39,102 @@
 			}
 		}
 	}
-}
 
-.sapUiRtaMode {
-
-	.sapMPopover {
-
-		.sapUiRtaChangesList {
-			/* Visualize Changes: gray out items with no changes */
-			li.sapMLIBTypeInactive {
-				opacity: 0.5;
-			}
+	/* Dashed border for overlays with changes */
+	&.sapUiRtaOverlayWithChanges:not(.sapUiDtOverlaySelected):not(.sapUiDtOverlayHover) {
+		&:after {
+			content: '';
+			outline: 0.063rem dashed @_sap_ui_rta_ChangeVisualization_OverlayOutlineColor;
+			outline-offset: -0.125rem;
+			border: none;
+			border-radius: @_sap_ui_rta_ChangeVisualization_OverlayBorderRadius;
+			pointer-events: none;
 		}
 	}
 }
 
-/* do not show focus border in the popover */
-.sapUiRtaChangeVisualizationPopover {
+/* Change detail popup styles */
+.sapMPopover.sapUiRtaChangeDetailPopup {
+	min-height: 12.5rem; // 200px
+	max-height: 31.25rem; // 500px
+	opacity: 1;
+	&.sapUiRtaChangeDetailPopupInvisible {
+		opacity: 0!important;
+	}
 
+	.sapMBtn {
+		height: 2rem;
+		margin-top: 0!important;
+		margin-left: var(--sapContent_Space_Tiny);
+		padding: 0;
+		max-width: 7.5rem;
+		.sapMBtnInner {
+			height: 2rem;
+			font-size: 0.75rem;
+			.sapMBtnIcon {
+				line-height: 2rem;
+			}
+		}
+		.sapMBtnContent {
+			line-height: 2rem;
+		}
+	}
+
+	.sapMBar {
+		height: 2.25rem;
+		line-height: 2.25rem;
+		.sapMBarLeft, .sapMBarRight, .sapMBarPH {
+			height: 2.25rem;
+			line-height: 2.25rem;
+		}
+	}
 	.sapMLIBFocusable:focus {
 		outline: none;
 	}
+
+	.sapMListTblHeader .sapMText {
+		font-weight: bold;
+	}
+
+	.sapUiRtaChangeDetailCommandLabel {
+		font-weight: bold;
+	}
+
+	.sapMList {
+		.sapMTableTHead {
+			.sapMListTblHeader {
+				height: 2rem;
+				.sapMColumnHeader {
+					padding-top: 0.5rem;
+					padding-bottom: 0.5rem;
+				}
+			}
+			.sapUiRtaTypeColumnHeader {
+				padding: 0!important;
+				.sapMColumnHeader {
+					justify-content: center!important;
+					text-align: center!important;
+				}
+			}
+		}
+		.sapMTableTBody {
+			.sapMListTblRow {
+				height: 3.375rem;
+			}
+			.sapMListTblHighlightCell + td.sapMListTblCell {
+				text-align: center!important;
+			}
+		}
+	}
+
+}
+
+/* Anchor Element for Change detail popup */
+.sapUiRtaChangeDetailPopupAnchor {
+	display: block;
+	position: fixed;
+	width: 0;
+	height: 0;
+	overflow: hidden;
+	pointer-events: none;
 }

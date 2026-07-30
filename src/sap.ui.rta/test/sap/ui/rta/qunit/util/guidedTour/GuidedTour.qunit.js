@@ -2,7 +2,6 @@
 
 sap.ui.define([
 	"sap/m/MessageBox",
-	"sap/m/Popover",
 	"sap/ui/core/Element",
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/qunit/utils/nextUIUpdate",
@@ -14,7 +13,6 @@ sap.ui.define([
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	MessageBox,
-	Popover,
 	Element,
 	OverlayRegistry,
 	nextUIUpdate,
@@ -142,18 +140,11 @@ sap.ui.define([
 
 			// Navigate back to the beginning
 			const oPreviousButton = Element.getElementById("guidedTourMarker--previousButton");
-			let oVizPopoverSpy;
 			for (let i = 4; i > 0; i--) {
 				const oModel = oPopover.getModel();
 				const oData = oModel.getData();
 				assert.strictEqual(oData.title, this.oSteps[i].title, `The title is correct for step ${i}`);
 				assert.strictEqual(oData.description, this.oSteps[i].description, `The description is correct for step ${i}`);
-				const oVizPopover = Element.getElementById(
-					"sapUIRta_toolbar_fragment--sapUiRta_toggleChangeVisualizationMenuButton--ChangeIndicatorCategorySelection--popover"
-				);
-				if (oVizPopover && !oVizPopoverSpy) {
-					oVizPopoverSpy = sinon.spy(oVizPopover, "setModal");
-				}
 				const oShowMarkerPromise = RtaQunitUtils.waitForMethodCall(sandbox, this.oGuidedTour, "showMarker");
 				oPreviousButton.firePress();
 				await oShowMarkerPromise;
@@ -165,46 +156,6 @@ sap.ui.define([
 			assert.strictEqual(oDataAtStart.title, this.oSteps[0].title, "The title is set correctly for step 0");
 			assert.strictEqual(oDataAtStart.description, this.oSteps[0].description, "The description is set correctly for step 0");
 			assert.ok(oPreviousButton.getVisible() === false, "The Previous button is hidden on the first step");
-			assert.strictEqual(oVizPopoverSpy?.callCount, 2, "The Modal change of the Change Visualization popover was called twice");
-			assert.strictEqual(
-				oVizPopoverSpy?.getCall(0).args[0],
-				true,
-				"The Change Visualization popover was set to modal to prevent popover to close on focus loss"
-			);
-			assert.strictEqual(
-				oVizPopoverSpy?.getCall(1).args[0],
-				false,
-				"The Change Visualization popover was set to not modal after the nav back"
-			);
-		});
-
-		QUnit.test("When opening the guided tour popover on a modal popover", async function(assert) {
-			const oNextButton = Element.getElementById("guidedTourMarker--continueButton");
-			sandbox.stub(Popover.prototype, "getModal").onFirstCall().returns(true).callThrough();
-			const oPopoverModalSpy = sinon.spy(Popover.prototype, "setModal");
-			await nextUIUpdate();
-
-			// Navigate 4 steps forward
-			for (let i = 0; i < 4; i++) {
-				const oShowMarkerPromise = RtaQunitUtils.waitForMethodCall(sandbox, this.oGuidedTour, "showMarker");
-				oNextButton.firePress();
-				await oShowMarkerPromise;
-			}
-			const oVizPopover = Element.getElementById(
-				"sapUIRta_toolbar_fragment--sapUiRta_toggleChangeVisualizationMenuButton--ChangeIndicatorCategorySelection--popover"
-			);
-			assert.strictEqual(oPopoverModalSpy.callCount, 2, "The Modal change of the Change Visualization popover was called twice");
-			assert.strictEqual(
-				oPopoverModalSpy.getCall(0).args[0],
-				true,
-				"The Change Visualization popover was set to modal to prevent popover to close on focus loss"
-			);
-			assert.strictEqual(
-				oPopoverModalSpy.getCall(1).args[0],
-				true,
-				"The Change Visualization popover was set to modal after the nav back to restore the modal state"
-			);
-			assert.strictEqual(oVizPopover.getModal(), true, "Then the modal popover is modal again after navigating through the steps");
 		});
 
 		QUnit.test("When navigating through all steps until completion", async function(assert) {
