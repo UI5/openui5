@@ -61,7 +61,7 @@ sap.ui.define([
 	 */
 	var HeroBanner = HeroBannerBase.extend("sap.f.HeroBanner", /** @lends sap.f.HeroBanner.prototype */ {
 		metadata: {
-			tag: "ui5-hero-banner-6bfd01e3",
+			tag: HeroBannerBase.getMetadata().getTag(),
 			library: "sap.f",
 			defaultAggregation: "startContent",
 			properties: {
