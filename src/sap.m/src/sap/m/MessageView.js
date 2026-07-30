@@ -383,7 +383,8 @@ sap.ui.define([
 		if (oItemTitleRef.offsetWidth < oItemTitleRef.scrollWidth) {
 			oListItem.setType(ListType.Navigation);
 
-			if (this.getItems().length === 1) {
+			if (this.getItems().length === 1 && !this._bAutoForwarded) {
+				this._bAutoForwarded = true;
 				this._fnHandleForwardNavigation(oListItem, "show");
 			}
 
@@ -399,6 +400,8 @@ sap.ui.define([
 		var oGroupedItems,
 			aListItems,
 			aItems = this.getItems();
+
+		this._bAutoForwarded = false;
 
 		this._clearLists();
 		this._detailsPage.setShowHeader(this.getShowDetailsPageHeader());
@@ -428,10 +431,13 @@ sap.ui.define([
 
 		if (aListItems.length === 1 && aListItems[0].getType()  === ListType.Navigation) {
 
-			this._fnHandleForwardNavigation(aListItems[0], "show");
+			if (!this._bAutoForwarded) {
+				this._bAutoForwarded = true;
+				this._fnHandleForwardNavigation(aListItems[0], "show");
 
-			// TODO: adopt this to NavContainer's public API once a parameter for back navigation transition name is available
-			this._navContainer._pageStack[this._navContainer._pageStack.length - 1].transition = "slide";
+				// TODO: adopt this to NavContainer's public API once a parameter for back navigation transition name is available
+				this._navContainer._pageStack[this._navContainer._pageStack.length - 1].transition = "slide";
+			}
 		} else if (aListItems.length === 0) {
 			this._navContainer.backToTop();
 		}
