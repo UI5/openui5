@@ -1,6 +1,7 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/base/Log",
 	"sap/ui/core/Control",
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
@@ -15,6 +16,7 @@ sap.ui.define([
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
+	Log,
 	Control,
 	Element,
 	Lib,
@@ -605,6 +607,187 @@ sap.ui.define([
 
 				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
 				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("when the dialog is opened with singleRename, a new value is entered and user presses Enter", async function(assert) {
+			const oTestDelegate = createStringTestDelegate("path/to/test/label");
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				control: this.oTestControl,
+				singleRename: true,
+				controlBasedRenameChangeType: "myRename"
+			};
+			sandbox.stub(ElementUtil, "getLabelForElement").returns("My Control Specific Label");
+			const fnAfterOpen = () => {
+				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				const oInput = aFormElements[0].getFields().filter((oField) => oField.getVisible())[0];
+				oInput.fireLiveChange({ newValue: "My New Value" });
+				// The Enter key saves in single rename mode, mirroring the RenameDialog.
+				oInput.fireSubmit();
+			};
+			const aChanges = await openDialog(sandbox, oActionConfig, fnAfterOpen);
+			assert.strictEqual(aChanges.length, 1, "then one change is created");
+			assert.strictEqual(aChanges[0].content.annotationPath, "path/to/test/label", "then the correct path was returned");
+			assert.strictEqual(aChanges[0].content.text, "My New Value", "then the correct text was returned");
+		});
+
+		QUnit.test("when the dialog is opened with singleRename and the user presses Enter without changing the value", async function(assert) {
+			const oTestDelegate = createStringTestDelegate("path/to/test/label");
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				control: this.oTestControl,
+				singleRename: true,
+				controlBasedRenameChangeType: "myRename"
+			};
+			sandbox.stub(ElementUtil, "getLabelForElement").returns("My Control Specific Label");
+			const fnAfterOpen = () => {
+				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				const oInput = aFormElements[0].getFields().filter((oField) => oField.getVisible())[0];
+				// Enter on an unchanged value must still close the dialog
+				oInput.fireSubmit();
+			};
+			const aChanges = await openDialog(sandbox, oActionConfig, fnAfterOpen);
+			assert.strictEqual(aChanges.length, 0, "then the dialog closes with no change");
+		});
+
+		QUnit.test("when singleRename has no preselected property but exactly one field, a value is entered and Enter pressed", async function(assert) {
+			const oTestDelegate = {
+				getAnnotationsChangeInfo: () => ({
+					serviceUrl: "testServiceUrl",
+					properties: [{
+						propertyName: "My Test Label",
+						annotationPath: "path/to/test/label",
+						currentValue: "Hello",
+						label: "My Test Label"
+					}]
+				})
+			};
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				control: this.oTestControl,
+				singleRename: true,
+				controlBasedRenameChangeType: "myRename"
+			};
+			sandbox.stub(ElementUtil, "getLabelForElement").returns("My Control Specific Label");
+			const fnAfterOpen = () => {
+				const oInput = Element.getElementById("sapUiRtaChangeAnnotationDialog_singleRenameField");
+				assert.ok(oInput, "then the sole field carries the single-rename stable ID");
+				oInput.fireLiveChange({ newValue: "My New Value" });
+				// Enter must save even though no property was preselected (there is only one field)
+				oInput.fireSubmit();
+			};
+			const aChanges = await openDialog(sandbox, oActionConfig, fnAfterOpen);
+			assert.strictEqual(aChanges.length, 1, "then one change is created");
+			assert.strictEqual(aChanges[0].content.text, "My New Value", "then the correct text was returned");
+		});
+
+		QUnit.test("when the dialog is opened in list mode, the search field is focused", async function(assert) {
+			const oTestDelegate = createStringTestDelegate();
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				control: this.oTestControl
+			};
+			const fnAfterOpen = () => {
+				const oSearchField = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertiesFilter");
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog").getInitialFocus(),
+					"sapUiRtaChangeAnnotationDialog_propertiesFilter",
+					"then the search field is set as the dialog's initial focus"
+				);
+				assert.strictEqual(oSearchField.getFocusDomRef(), document.activeElement, "then the search field is focused");
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("when the dialog is opened in single rename mode, the property editor is focused", async function(assert) {
+			const oTestDelegate = createStringTestDelegate("path/to/test/label");
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				control: this.oTestControl,
+				singleRename: true,
+				controlBasedRenameChangeType: "myRename"
+			};
+			sandbox.stub(ElementUtil, "getLabelForElement").returns("My Control Specific Label");
+			const fnAfterOpen = () => {
+				const oInput = Element.getElementById("sapUiRtaChangeAnnotationDialog_singleRenameField");
+				assert.ok(oInput, "then the single rename field has the stable ID");
+				assert.strictEqual(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog").getInitialFocus(),
+					"sapUiRtaChangeAnnotationDialog_singleRenameField",
+					"then the field is set as the dialog's initial focus"
+				);
+				assert.strictEqual(oInput.getFocusDomRef(), document.activeElement, "then the property editor field is focused");
+				assert.strictEqual(window.getSelection().toString(), oInput.getValue(), "then the current text is selected");
+				const oCancelButton = Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton");
+				oCancelButton.firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("when the dialog is opened in single rename mode, the text is selected while opening (no focus flicker)", async function(assert) {
+			const oTestDelegate = createStringTestDelegate("path/to/test/label");
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				control: this.oTestControl,
+				singleRename: true,
+				controlBasedRenameChangeType: "myRename"
+			};
+			sandbox.stub(ElementUtil, "getLabelForElement").returns("My Control Specific Label");
+			// The text must be selected synchronously while opening (in _openDialog) so it is already
+			// selected by the time the afterOpen event fires - deferring it caused a visible focus flicker.
+			const oSelectSpy = sandbox.spy(window.HTMLInputElement.prototype, "select");
+			const fnAfterOpen = () => {
+				assert.ok(oSelectSpy.called, "then the text was already selected when the afterOpen event fired");
+				Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton").firePress();
+			};
+			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+
+		QUnit.test("when the dialog is opened with singleRename but without a preSelectedProperty", async function(assert) {
+			const oLogStub = sandbox.stub(Log, "error");
+			const oTestDelegate = createStringTestDelegate();
+			const oActionConfig = {
+				title: "Change Some String Prop",
+				type: AnnotationTypes.StringType,
+				delegate: oTestDelegate,
+				control: this.oTestControl,
+				singleRename: true,
+				controlBasedRenameChangeType: "myRename"
+			};
+			const fnAfterOpen = () => {
+				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
+				assert.strictEqual(aFormElements.length, 4, "then all properties are displayed");
+				assert.notOk(
+					Element.getElementById("sapUiRtaChangeAnnotationDialog_singleRenameField"),
+					"then no field carries the single-rename stable ID"
+				);
+				// The real per-property labels must be shown, not the generic single-rename label.
+				const sGenericLabel = oResourceBundle.getText("ANNOTATION_CHANGE_DIALOG_SINGLE_RENAME_LABEL");
+				aFormElements.forEach((oFormElement) => {
+					const sLabel = oFormElement.getLabel().getText();
+					assert.notStrictEqual(sLabel, sGenericLabel, `then '${sLabel}' is the real property label, not the generic one`);
+				});
+				assert.ok(
+					oLogStub.calledWithMatch(sinon.match(/singleRename should not be used without a preSelectedProperty/)),
+					"then an error is logged about the missing preSelectedProperty"
+				);
+				Element.getElementById("sapUiRtaChangeAnnotationDialog_cancelButton").firePress();
 			};
 			await openDialog(sandbox, oActionConfig, fnAfterOpen);
 		});
