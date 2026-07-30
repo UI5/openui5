@@ -333,5 +333,15 @@
         "text": " sap.m.Toolbar: Fix arrow key navigation for Slider, RangeSlider and MultiInput"
       }
     ]
+  },
+  "1.148.5": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "690410e32acfc78f55fcaf17af659aa4e809ce2b",
+        "type": "FIX",
+        "text": "p13n.FilterPanel: fix import"
+      }
+    ]
   }
 }

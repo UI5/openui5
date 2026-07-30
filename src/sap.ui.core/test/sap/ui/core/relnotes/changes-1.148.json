@@ -48,5 +48,15 @@
         "text": " core/Element: Skip focus redirect on same-parent move"
       }
     ]
+  },
+  "1.148.5": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "127d61eafdbaa484b2060c22b630266a67ed8232",
+        "type": "FIX",
+        "text": " sap.ui.test.autowaiter._timeoutWaiter: Guard log construction with level check"
+      }
+    ]
   }
 }

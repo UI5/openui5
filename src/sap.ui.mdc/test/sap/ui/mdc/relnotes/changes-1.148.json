@@ -173,5 +173,15 @@
         "text": " mdc/SmartChart: 'View By' popover now have correct announcement."
       }
     ]
+  },
+  "1.148.5": {
+    "date": "July 2026",
+    "notes": [
+      {
+        "id": "45d54541629e9880823943ad07057619e3a9ac8f",
+        "type": "FIX",
+        "text": " FilterBar: Clear button - focus lost"
+      }
+    ]
   }
 }
