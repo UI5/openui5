@@ -952,6 +952,39 @@ sap.ui.define(['sap/ui/base/ManagedObjectObserver', 'sap/ui/model/json/JSONModel
 
 		});
 
+		QUnit.test("ManagedObjectObserver listening to aggregation changes for destroying altType aggregation", function(assert) {
+
+			//listen to all changes
+			var oObserver = new ManagedObjectObserver(function(oChanges) {
+				setActual(oChanges);
+			});
+
+			// Set a string value (altType) for the label aggregation
+			this.obj.setAggregation("label", "MyLabel");
+
+			oObserver.observe(this.obj, {
+				aggregations: ["label"]
+			});
+
+			assert.ok(true, "Observation of destroying altType aggregation started");
+
+			// Destroy the altType aggregation (string value)
+			setExpected({
+				object: this.obj,
+				type: "aggregation",
+				name: "label",
+				mutation: "remove",
+				child: "MyLabel",
+				children: null
+			});
+
+			this.obj.destroyAggregation("label");
+			this.checkExpected("AltType aggregation destroyed. Observer called successfully");
+
+			oObserver.disconnect();
+
+		});
+
 
 		// -------------------------------------------------------
 		// Association handling
