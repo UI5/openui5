@@ -9936,6 +9936,55 @@ sap.ui.define([
 			fnToDesktopMode();
 		});
 
+		QUnit.test('it should expose a combobox role and set "aria-activedescendant" while an IconOnly Select is open, reverting to a button when closed', function (assert) {
+
+			// system under test
+			var oSelect = new Select({
+				type: SelectType.IconOnly,
+				icon: "sap-icon://filter",
+				items: [
+					new Item({ key: "1", text: "Option 1" }),
+					new Item({ key: "2", text: "Option 2" })
+				],
+				selectedKey: "2"
+			});
+
+			// arrange
+			oSelect.placeAt("content");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			oSelect.focus();
+			var oFocusDomRef = oSelect.getFocusDomRef();
+
+			// assert - closed state: plain button, no aria-activedescendant
+			assert.strictEqual(oFocusDomRef.getAttribute("role"), "button",
+				'A closed IconOnly Select exposes role="button"');
+			assert.strictEqual(oFocusDomRef.getAttribute("aria-activedescendant"), null,
+				"aria-activedescendant must not be set while the IconOnly Select is closed");
+
+			// act - open the picker
+			oSelect.open();
+			this.clock.tick(1000); // wait for open animation
+
+			// assert - open state: combobox role, aria-activedescendant points to the selected option
+			assert.strictEqual(oFocusDomRef.getAttribute("role"), "combobox",
+				'An open IconOnly Select exposes role="combobox" so aria-activedescendant is valid');
+			assert.strictEqual(oFocusDomRef.getAttribute("aria-activedescendant"), oSelect.getSelectedItem().getId(),
+				"aria-activedescendant points to the active option while the IconOnly Select is open");
+
+			// act - close the picker
+			oSelect.close();
+			this.clock.tick(1000); // wait for close animation
+
+			// assert - reverted back to a button with no aria-activedescendant
+			assert.strictEqual(oFocusDomRef.getAttribute("role"), "button",
+				'A closed IconOnly Select reverts to role="button"');
+			assert.strictEqual(oFocusDomRef.getAttribute("aria-activedescendant"), null,
+				"aria-activedescendant is removed once the IconOnly Select is closed");
+
+			// cleanup
+			oSelect.destroy();
+		});
+
 		QUnit.module("onAfterClose");
 
 		QUnit.test("onAfterClose", function (assert) {
@@ -10258,30 +10307,44 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
-		QUnit.test("Should have correct value for aria-activedescendant after invalidation", function (assert) {
+		QUnit.test("IconOnly Select exposes a combobox role with aria-activedescendant while open — even after invalidation", function (assert) {
 			const oItemA = new Item({key: "Item1", text: "Item1"});
 			const oItemB = new Item({key: "Item2", text: "Item2"});
 			const oIconOnlySelect = new Select("iconOnlySelect", {
 					icon: "sap-icon://search",
 					type: "IconOnly",
-					items: [oItemA, oItemB]
+					items: [oItemA, oItemB],
+					selectedKey: "Item2"
 				});
 
 			oIconOnlySelect.placeAt("content");
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
+			// open and wait for the open animation so onAfterOpen has run and the
+			// list items are rendered (this module uses fake timers)
+			oIconOnlySelect.focus();
 			oIconOnlySelect.open();
-			oIconOnlySelect.setSelectedKey(oItemB.getKey());
-			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			this.clock.tick(1000);
 
-			assert.strictEqual(oIconOnlySelect.getFocusDomRef().getAttribute('aria-activedescendant'), oItemB.getId(),
-				"Correct aria-activedescendant value");
+			// while open the field is a combobox, so aria-activedescendant (pointing to
+			// the selected option) is valid and restores the full announcement
+			assert.strictEqual(oIconOnlySelect.getFocusDomRef().getAttribute("role"), "combobox",
+				'An open IconOnly Select exposes role="combobox"');
+			assert.strictEqual(oIconOnlySelect.getFocusDomRef().getAttribute("aria-activedescendant"), oItemB.getId(),
+				"aria-activedescendant points to the selected option while open");
 
+			// Keep the open state deterministic across the re-render below.
+			this.stub(oIconOnlySelect, "isOpen").returns(true);
+
+			// Invalidate while open — the renderer must keep deriving the combobox role
+			// and aria-activedescendant from the open state.
 			oIconOnlySelect.invalidate();
 			nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-			assert.strictEqual(oIconOnlySelect.getFocusDomRef().getAttribute('aria-activedescendant'), oItemB.getId(),
-				"Correct aria-activedescendant value");
+			assert.strictEqual(oIconOnlySelect.getFocusDomRef().getAttribute("role"), "combobox",
+				'role="combobox" is preserved after invalidation while open');
+			assert.strictEqual(oIconOnlySelect.getFocusDomRef().getAttribute("aria-activedescendant"), oItemB.getId(),
+				"aria-activedescendant is preserved after invalidation while open");
 
 			oIconOnlySelect.destroy();
 		});
@@ -11546,6 +11609,50 @@ sap.ui.define([
 			});
 
 		QUnit.module("IconOnly Select");
+
+		QUnit.test('aria-activedescendant is set on an open IconOnly Select (combobox role) and updates with keyboard navigation', function (assert) {
+
+			// system under test
+			var oSelect = new Select({
+				type: SelectType.IconOnly,
+				icon: "sap-icon://filter",
+				items: [
+					new Item({ key: "1", text: "Option 1" }),
+					new Item({ key: "2", text: "Option 2" })
+				]
+			});
+
+			// arrange
+			oSelect.placeAt("content");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			oSelect.focus();
+
+			// act — open the picker
+			oSelect.open();
+			this.clock.tick(1000); // wait for open animation
+
+			// assert — while open the field is a combobox and aria-activedescendant is valid
+			assert.strictEqual(oSelect.getFocusDomRef().getAttribute("role"), "combobox",
+				'An open IconOnly Select exposes role="combobox"');
+			assert.strictEqual(
+				oSelect.getFocusDomRef().getAttribute("aria-activedescendant"),
+				oSelect.getSelectedItem().getId(),
+				"aria-activedescendant points to the active option while open"
+			);
+
+			// act — navigate with keyboard
+			qutils.triggerKeydown(oSelect.getFocusDomRef(), KeyCodes.ARROW_DOWN);
+
+			// assert — aria-activedescendant follows the newly highlighted option
+			assert.strictEqual(
+				oSelect.getFocusDomRef().getAttribute("aria-activedescendant"),
+				oSelect.getSelectedItem().getId(),
+				"aria-activedescendant updates to the active option after keyboard navigation"
+			);
+
+			// cleanup
+			oSelect.destroy();
+		});
 
 		QUnit.test("When Select is of iconOnly type, it should have its autoAdjustWidth property set to true.", function (assert) {
 

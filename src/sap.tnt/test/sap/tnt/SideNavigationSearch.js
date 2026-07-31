@@ -10,6 +10,7 @@ sap.ui.define([
 		"sap/m/ScrollContainer",
 		"sap/m/Text",
 		"sap/m/Dialog",
+		"sap/m/ObjectStatus",
 		"sap/tnt/ToolHeader",
 		"sap/tnt/ToolPage",
 		"sap/tnt/SideNavigation",
@@ -35,6 +36,7 @@ sap.ui.define([
 		ScrollContainer,
 		Text,
 		Dialog,
+		ObjectStatus,
 		ToolHeader,
 		ToolPage,
 		SideNavigation,
@@ -69,6 +71,8 @@ sap.ui.define([
 					icon: 'sap-icon://unfavorite',
 					expanded: true,
 					selectable: false,
+					tagText: '3 Items',
+					tagState: 'Indication17',
 					items: [{
 						title: 'My Accounts',
 						key: 'myAccounts',
@@ -76,7 +80,9 @@ sap.ui.define([
 					}, {
 						title: 'My Orders',
 						key: 'myOrders',
-						href: '#/myOrders'
+						href: '#/myOrders',
+						tagText: '5 Pending',
+						tagState: 'Indication20'
 					}]
 				}, {
 					title: 'Customer Management',
@@ -139,6 +145,8 @@ sap.ui.define([
 					expanded: true,
 					key: 'products',
 					href: '#/products',
+					tagText: 'Low Stock',
+					tagState: 'Indication18',
 					items: [{
 						title: 'Product Catalog',
 						key: 'productCatalog',
@@ -218,7 +226,9 @@ sap.ui.define([
 					title: 'Analytics',
 					icon: 'sap-icon://bar-chart',
 					key: 'analytics',
-					href: '#/analytics'
+					href: '#/analytics',
+					tagText: 'Beta',
+					tagState: 'Indication15'
 				}, {
 					title: 'SAP Community',
 					icon: 'sap-icon://discussion-2',
@@ -266,7 +276,9 @@ sap.ui.define([
 					title: 'Notifications',
 					icon: 'sap-icon://message-information',
 					key: 'notifications',
-					href: '#/notifications'
+					href: '#/notifications',
+					tagText: '8 New',
+					tagState: 'Indication18'
 				}, {
 					title: 'SAP Training',
 					icon: 'sap-icon://course-book',
@@ -307,6 +319,8 @@ sap.ui.define([
 				title: 'SAP Support Portal',
 				icon: 'sap-icon://sys-help',
 				key: 'sapSupport',
+				tagText: '24/7',
+				tagState: 'Indication16',
 				href: 'https://sap.com',
 				target: '_blank',
 				selectable: false
@@ -380,6 +394,7 @@ sap.ui.define([
 				ariaHasPopup: '{ariaHasPopup}',
 				design: '{design}',
 				press: onFixedItemPress,
+				tag: createTag(),
 				items: {
 					path: 'items',
 					templateShareable: true,
@@ -392,9 +407,19 @@ sap.ui.define([
 						target: '{target}',
 						ariaHasPopup: '{ariaHasPopup}',
 						design: '{design}',
-						press: onFixedItemPress
+						press: onFixedItemPress,
+						tag: createTag()
 					})
 				}
+			});
+		}
+
+		function createTag() {
+			return new ObjectStatus({
+				text: '{tagText}',
+				state: '{tagState}',
+				inverted: true,
+				visible: "{= !!${tagText} }"
 			});
 		}
 
@@ -436,7 +461,8 @@ sap.ui.define([
 						target: '{target}',
 						ariaHasPopup: '{ariaHasPopup}',
 						design: '{design}',
-						press: onFixedItemPress
+						press: onFixedItemPress,
+						tag: createTag()
 					}),
 					path: '/fixedNavigation'
 				}
@@ -452,8 +478,9 @@ sap.ui.define([
 
 			return items.reduce(function (result, item) {
 				const titleMatches = item.title && item.title.toLowerCase().indexOf(lowerCaseValue) > -1;
+				const tagTextMatches = item.tagText && item.tagText.toLowerCase().indexOf(lowerCaseValue) > -1;
 
-				if (titleMatches) {
+				if (titleMatches || tagTextMatches) {
 					result.push(item);
 				} else if (item.items) {
 					const filteredChildren = filterItems(item.items, value);

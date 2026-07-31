@@ -6,6 +6,9 @@ sap.ui.define([
 	'sap/tnt/NavigationListItem',
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
+	"sap/ui/core/ControlBehavior",
+	"sap/ui/core/AnimationMode",
+	"sap/ui/dom/units/Rem",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/qunit/QUnitUtils"
 ], function(
@@ -15,6 +18,9 @@ sap.ui.define([
 	NavigationListItem,
 	Element,
 	Library,
+	ControlBehavior,
+	AnimationMode,
+	Rem,
 	nextUIUpdate,
 	QUnitUtils) {
 	'use strict';
@@ -35,9 +41,6 @@ sap.ui.define([
 		return nextUIUpdate(clock);
 	}
 
-	//================================================================================
-	// Carousel Properties
-	//================================================================================
 	QUnit.module('API', {
 		beforeEach: async function () {
 			this.sideNavigation = new SideNavigation({
@@ -78,6 +81,168 @@ sap.ui.define([
 		this.sideNavigation.$().find('.sapTntNLIFirstLevel.sapTntNLI a').each(function (index, item) {
 			assert.strictEqual(item.getAttribute('role'), 'treeitem', 'li should have role "treeitem"');
 		});
+	});
+
+	QUnit.test('Inner flexible and fixed regions keep the expanded width during the collapse animation', async function (assert) {
+		// arrange - measure the expanded width of the inner regions
+		this.sideNavigation.getItem().addItem(new NavigationListItem({ text: "Text" }));
+		this.sideNavigation.getFixedItem().addItem(new NavigationListItem({ text: "Fixed Text" }));
+		await nextUIUpdate(this.clock);
+
+		let oFlexibleRef = this.sideNavigation.getDomRef().querySelector('.sapTntSideNavigationFlexible');
+		let oFixedRef = this.sideNavigation.getDomRef().querySelector('.sapTntSideNavigationFixed');
+		const iExpandedFlexibleWidth = oFlexibleRef.offsetWidth;
+		const iExpandedFixedWidth = oFixedRef.offsetWidth;
+
+		// act - collapse
+		this.sideNavigation.setExpanded(false);
+		await nextUIUpdate(this.clock);
+
+		// assert - the animating class is added and inner regions keep expanded width
+		const oNavRef = this.sideNavigation.getDomRef();
+		assert.ok(oNavRef.classList.contains('sapTntSideNavigationAnimating'), 'animating class is added');
+
+		oFlexibleRef = oNavRef.querySelector('.sapTntSideNavigationFlexible');
+		oFixedRef = oNavRef.querySelector('.sapTntSideNavigationFixed');
+		assert.strictEqual(oFlexibleRef.offsetWidth, iExpandedFlexibleWidth, 'flexible region keeps expanded width');
+		assert.strictEqual(oFixedRef.offsetWidth, iExpandedFixedWidth, 'fixed region keeps expanded width');
+	});
+
+	QUnit.test('Animating class is removed on width transitionend', async function (assert) {
+		this.sideNavigation.setExpanded(false);
+		await nextUIUpdate(this.clock);
+
+		const oNavRef = this.sideNavigation.getDomRef();
+		assert.ok(oNavRef.classList.contains('sapTntSideNavigationAnimating'), 'animating class is added on collapse');
+
+		// act - simulate the browser's transitionend for the width property
+		oNavRef.dispatchEvent(new TransitionEvent('transitionend', { propertyName: 'width' }));
+
+		assert.notOk(oNavRef.classList.contains('sapTntSideNavigationAnimating'), 'animating class is removed on transitionend');
+	});
+
+	QUnit.test('Inner flexible and fixed regions keep the expanded width during the expand animation', async function (assert) {
+		// arrange - start collapsed, then measure inner regions at expanded state
+		this.sideNavigation.getItem().addItem(new NavigationListItem({ text: "Text" }));
+		this.sideNavigation.getFixedItem().addItem(new NavigationListItem({ text: "Fixed Text" }));
+		await nextUIUpdate(this.clock);
+
+		let oFlexibleRef = this.sideNavigation.getDomRef().querySelector('.sapTntSideNavigationFlexible');
+		let oFixedRef = this.sideNavigation.getDomRef().querySelector('.sapTntSideNavigationFixed');
+		const iExpandedFlexibleWidth = oFlexibleRef.offsetWidth;
+		const iExpandedFixedWidth = oFixedRef.offsetWidth;
+
+		// arrange - collapse and finish that transition before testing the expand
+		this.sideNavigation.setExpanded(false);
+		await nextUIUpdate(this.clock);
+		this.sideNavigation.getDomRef().dispatchEvent(new TransitionEvent('transitionend', { propertyName: 'width' }));
+
+		// act - expand
+		this.sideNavigation.setExpanded(true);
+		await nextUIUpdate(this.clock);
+
+		// assert - the animating class is added and inner regions are at expanded width from the start
+		const oNavRef = this.sideNavigation.getDomRef();
+		assert.ok(oNavRef.classList.contains('sapTntSideNavigationAnimating'), 'animating class is added on expand');
+
+		oFlexibleRef = oNavRef.querySelector('.sapTntSideNavigationFlexible');
+		oFixedRef = oNavRef.querySelector('.sapTntSideNavigationFixed');
+		assert.strictEqual(oFlexibleRef.offsetWidth, iExpandedFlexibleWidth, 'flexible region is at expanded width');
+		assert.strictEqual(oFixedRef.offsetWidth, iExpandedFixedWidth, 'fixed region is at expanded width');
+	});
+
+	QUnit.test('Animating class is removed on width transitionend after expand', async function (assert) {
+		// arrange - collapse first so we can test the expand direction
+		this.sideNavigation.setExpanded(false);
+		await nextUIUpdate(this.clock);
+		this.sideNavigation.getDomRef().dispatchEvent(new TransitionEvent('transitionend', { propertyName: 'width' }));
+
+		// act - expand
+		this.sideNavigation.setExpanded(true);
+		await nextUIUpdate(this.clock);
+
+		const oNavRef = this.sideNavigation.getDomRef();
+		assert.ok(oNavRef.classList.contains('sapTntSideNavigationAnimating'), 'animating class is added on expand');
+
+		oNavRef.dispatchEvent(new TransitionEvent('transitionend', { propertyName: 'width' }));
+
+		assert.notOk(oNavRef.classList.contains('sapTntSideNavigationAnimating'), 'animating class is removed on transitionend');
+	});
+
+	QUnit.test('Custom width property is exposed as CSS variable and applied to inner regions while animating', async function (assert) {
+		// arrange - set custom width
+		this.sideNavigation.setWidth('20rem');
+		this.sideNavigation.getItem().addItem(new NavigationListItem({ text: "Text" }));
+		await nextUIUpdate(this.clock);
+
+		const oNavRef = this.sideNavigation.getDomRef();
+		assert.strictEqual(oNavRef.style.getPropertyValue('--sapTntSideNavigation_ExpandedWidth'), '20rem', 'CSS variable reflects custom width');
+
+		// act - collapse and inspect inner regions during animation
+		this.sideNavigation.setExpanded(false);
+		await nextUIUpdate(this.clock);
+
+		const oFlexibleRef = oNavRef.querySelector('.sapTntSideNavigationFlexible');
+		const oFixedRef = oNavRef.querySelector('.sapTntSideNavigationFixed');
+		const sFlexibleWidth = window.getComputedStyle(oFlexibleRef).width;
+		const sFixedWidth = window.getComputedStyle(oFixedRef).width;
+
+		assert.strictEqual(sFlexibleWidth, sFixedWidth, 'inner regions resolve to the same width');
+		assert.ok(parseFloat(sFlexibleWidth) > Rem.toPx(15), 'inner regions reflect the 20rem custom value');
+	});
+
+	QUnit.test('Without custom width, --sapTntSideNavigation_ExpandedWidth is not set inline', function (assert) {
+		const oNavRef = this.sideNavigation.getDomRef();
+
+		assert.strictEqual(oNavRef.style.getPropertyValue('--sapTntSideNavigation_ExpandedWidth'), '', 'CSS variable not set inline');
+	});
+
+	QUnit.test('Animating class is not added on the initial render of a collapsed SideNavigation', async function (assert) {
+		// arrange
+		this.sideNavigation.destroy();
+		this.sideNavigation = new SideNavigation({
+			expanded: false,
+			item: new NavigationList({ items: [new NavigationListItem({ text: "Text" })] })
+		});
+		this.sideNavigation.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate(this.clock);
+
+		// assert
+		assert.notOk(this.sideNavigation.getDomRef().classList.contains('sapTntSideNavigationAnimating'),
+			'animating class must not be present on the initial render');
+	});
+
+	QUnit.test('Animating class is not added when animation mode is "minimal"', async function (assert) {
+		const oStub = sinon.stub(ControlBehavior, 'getAnimationMode').returns(AnimationMode.minimal);
+
+		// act - collapse
+		this.sideNavigation.setExpanded(false);
+		await nextUIUpdate(this.clock);
+
+		// assert - the class must not be left stuck
+		const oNavRef = this.sideNavigation.getDomRef();
+		assert.notOk(oNavRef.classList.contains('sapTntSideNavigationAnimating'),
+			'animating class must not be added in minimal animation mode');
+		assert.notOk(this.sideNavigation._bAnimating, '_bAnimating flag is reset');
+
+		oStub.restore();
+	});
+
+	QUnit.test('Animating class is not added when animation mode is "none"', async function (assert) {
+		// arrange
+		const oStub = sinon.stub(ControlBehavior, 'getAnimationMode').returns(AnimationMode.none);
+
+		// act - collapse
+		this.sideNavigation.setExpanded(false);
+		await nextUIUpdate(this.clock);
+
+		// assert
+		const oNavRef = this.sideNavigation.getDomRef();
+		assert.notOk(oNavRef.classList.contains('sapTntSideNavigationAnimating'),
+			'animating class must not be added in none animation mode');
+		assert.notOk(this.sideNavigation._bAnimating, '_bAnimating flag is reset');
+
+		oStub.restore();
 	});
 
 	QUnit.test('SetExpanded false', function (assert) {
@@ -395,7 +560,7 @@ sap.ui.define([
 		this.sideNavigation.setWidth("20rem");
 		await nextUIUpdate(this.clock);
 
-		assert.strictEqual(this.sideNavigation.getDomRef().style.width, '20rem', 'width is set');
+		assert.strictEqual(this.sideNavigation.getDomRef().style.getPropertyValue('--sapTntSideNavigation_ExpandedWidth'), '20rem', 'width is set');
 
 		var selectedItem = Element.getElementById(this.sideNavigation.getSelectedItem());
 		assert.strictEqual(selectedItem.getText(), 'Root', 'initial selection is correct');

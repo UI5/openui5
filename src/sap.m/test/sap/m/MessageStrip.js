@@ -88,16 +88,15 @@ sap.ui.define([
 		  "voluptate voluptates. Architecto blanditiis culpa eveniet expedita harum, iure molestias nam qui sint tenetur!"
   });
 
-  // Example using direct Unicode in span content
+  // Example using MessageStripUtilities.getInlineIcon() helper with icon names
+  var MSUtils = sap.ui.require("sap/m/MessageStripUtilities");
   var oMCWithInlineIcons = new MessageStrip({
 	  type: "Warning",
 	  showIcon: true,
 	  enableFormattedText: true,
-	  text: "System status: <span class='sapMMsgStripInlineIcon'>&#xe1b4;</span> critical error detected <span class='sapMMsgStripInlineIcon'>&#xe049;</span> in module <span class='sapMMsgStripInlineIcon'>&#xe126;</span> configuration."
+	  text: "System status: " + MSUtils.getInlineIcon("sap-icon://alert") + " critical error detected " + MSUtils.getInlineIcon("sap-icon://message-warning") + " in module " + MSUtils.getInlineIcon("sap-icon://settings") + " configuration."
   });
 
-  // Example using MessageStripUtilities.getInlineIcon() helper with icon names
-  var MSUtils = sap.ui.require("sap/m/MessageStripUtilities");
   var oMCWithInlineIconsAndHTML = new MessageStrip({
 	  type: "Success",
 	  showIcon: true,

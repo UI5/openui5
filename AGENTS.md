@@ -23,6 +23,16 @@ OpenUI5 is an enterprise-grade JavaScript UI framework implementing SAP Fiori de
 /run-test sap/ui/core/routing/Router
 ```
 
+## Running Visual (uiveri5) Tests
+
+**Use the `/run-visual-tests` skill for visual/image-comparison/screenshot tests.**
+
+```bash
+/run-visual-tests <lib> <SpecName>
+```
+
+e.g. `/run-visual-tests sap.m Text`. `<SpecName>` is the `*.spec.js` basename; omit it to run all of a library's specs.
+
 ## Determining the @since Tag for New API
 
 When adding new properties, aggregations, associations, methods, or API, read the version field from the root package.json (e.g. "1.148.0-SNAPSHOT") and use the version without the -SNAPSHOT suffix as the @since tag (e.g. @since 1.148).

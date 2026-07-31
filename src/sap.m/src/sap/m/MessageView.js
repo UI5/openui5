@@ -8,6 +8,7 @@ sap.ui.define([
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/core/Control",
 	"sap/ui/core/CustomData",
+	"sap/ui/core/Element",
 	"sap/ui/core/IconPool",
 	"sap/ui/core/HTML",
 	"sap/ui/core/Icon",
@@ -42,6 +43,7 @@ sap.ui.define([
 	jQuery,
 	Control,
 	CustomData,
+	Element,
 	IconPool,
 	HTML,
 	Icon,
@@ -1173,7 +1175,11 @@ sap.ui.define([
 			.addStyleClass(CSS_CLASS + "DescIcon")
 			.addStyleClass(this._previousIconTypeClass);
 
-		this._detailsPage.addContent(this._oMessageIcon);
+		// Insert the icon as the first element in the details page so that screen
+		// readers announce it before the title/subtitle/description. Its visual
+		// position (top-left of the section) is controlled via CSS (position: absolute),
+		// so the DOM order does not affect the layout.
+		this._detailsPage.insertContent(this._oMessageIcon, 0);
 	};
 
 	/**
@@ -1496,7 +1502,7 @@ sap.ui.define([
 		this._detailsPage.invalidate();
 		this.fireLongtextLoaded();
 
-		const oContentTitle = this._detailsPage.getContent()[0];
+		const oContentTitle = Element.getElementById(this.getId() + "MessageTitleText");
 
 		if (oContentTitle && !oContentTitle.isA("sap.m.Link")) {
 			const sTypeText = this._oResourceBundle.getText("LIST_ITEM_STATE_" + oMessageItem.getType().toUpperCase());

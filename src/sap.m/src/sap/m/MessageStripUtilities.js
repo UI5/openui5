@@ -102,12 +102,7 @@ sap.ui.define([
 	 * @since 1.148
 	 */
 	MessageStripUtilities.getInlineIcon = function (sIconURI) {
-		var oIconInfo = IconPool.getIconInfo(sIconURI);
-		if (oIconInfo && oIconInfo.content) {
-			return "<span class='sapMMsgStripInlineIcon'>" + oIconInfo.content + "</span>";
-		}
-		// If icon not found, return empty string
-		return "";
+		return IconPool.getIconHTML(sIconURI);
 	};
 
 	return MessageStripUtilities;

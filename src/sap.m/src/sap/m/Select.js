@@ -929,6 +929,10 @@ function(
 
 			if (!this._isIconOnly()) {
 				oSelect.text(sSelectedItemText);
+			} else {
+				// For IconOnly Select, keep the hidden description span in sync so that
+				// aria-describedby announces the currently selected item to screen readers.
+				this.$("selectedText").text(sSelectedItemText);
 			}
 		};
 
@@ -992,7 +996,10 @@ function(
 				return;
 			}
 
-			// the aria-activedescendant attribute is set when the item is rendered
+			// note: the "aria-activedescendant" attribute is only set while the picker is
+			// open. For an IconOnly Select the field exposes a combobox role in that state
+			// (see onAfterOpen), so referencing the active option is valid. While closed the
+			// attribute is removed and the field reverts to a plain button role.
 			if (oItemDomRef && this.isOpen()) {
 				oDomRef.setAttribute(sActivedescendant, vItem.getId());
 			} else {
@@ -1070,6 +1077,16 @@ function(
 			// note: the "aria-controls" attribute is set when the list is visible and in view
 			oDomRef.setAttribute("aria-controls", this.getList().getId());
 
+			// For an IconOnly Select the field exposes role="button" while closed. While the
+			// picker is open we switch it to a combobox role so that the "aria-activedescendant"
+			// attribute - which points to the active option inside the listbox popup - is valid
+			// (it is not allowed on role="button"). This restores the full screen reader
+			// announcement (available options, selected value, position and dialog context)
+			// without an accessibility violation; it is reverted to a button in onAfterClose.
+			if (this._isIconOnly()) {
+				oDomRef.setAttribute("role", "combobox");
+			}
+
 			if (oItem) {
 
 				// note: the "aria-activedescendant" attribute is set
@@ -1131,6 +1148,13 @@ function(
 			if (oDomRef) {
 				oDomRef.setAttribute("aria-expanded", "false");
 				oDomRef.removeAttribute("aria-activedescendant");
+
+				// Revert the IconOnly field back to a plain button role now that the picker
+				// is closed (see onAfterOpen). Keeping a combobox role / aria-activedescendant
+				// on a closed icon button would be an accessibility violation.
+				if (this._isIconOnly()) {
+					oDomRef.setAttribute("role", "button");
+				}
 			}
 
 			// Remove the active state

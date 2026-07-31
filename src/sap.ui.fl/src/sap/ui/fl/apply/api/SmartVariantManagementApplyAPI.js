@@ -117,7 +117,16 @@ sap.ui.define([
 						reference: sReference,
 						componentId: mProperties.componentId,
 						newData: oResponse
-					}).filter((oNewFlexObject) => oNewFlexObject.getFileType() === "variant");
+					})
+					.filter((oNewFlexObject) => oNewFlexObject.getFileType() === "variant")
+					// The variant changes are only applied on the execution of the
+					// data selector, so we retrieve the variant from the state
+					.map((oNewVariant) => CompVariantManagementState.getVariant({
+						reference: sReference,
+						persistencyKey: sPersistencyKey,
+						id: oNewVariant.getVariantId(),
+						componentId: mProperties.componentId
+					}) || oNewVariant);
 					// New variants need to be explicitly added to the control
 					oVMControl.addVariants(aNewVariants);
 					FlexState.addLazyVariantsLoaded(sReference, sPersistencyKey);
