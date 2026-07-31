@@ -3793,7 +3793,7 @@ sap.ui.define([
 	 *   <b>Note:</b> in this case no data is updated from the response
 	 * @returns {Promise<string[]>}
 	 *   A promise that resolves with an array of predicates (see above), or rejects with an
-	 *   instance of <code>Error</code> in case of failure, for exmaple if the cache is shared
+	 *   instance of <code>Error</code> in case of failure, for example if the cache is shared
 	 *
 	 * @public
 	 */

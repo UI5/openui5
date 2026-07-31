@@ -4,8 +4,9 @@
 sap.ui.define([
 	'sap/ui/core/Icon',
 	'sap/ui/core/_IconRegistry',
-	"sap/base/Log"
-], function(Icon, _IconRegistry, Log) {
+	"sap/base/Log",
+	"sap/ui/core/RenderManager"
+], function(Icon, _IconRegistry, Log, RenderManager) {
 		"use strict";
 
 		/**
@@ -347,6 +348,83 @@ sap.ui.define([
 		 */
 		IconPool.getIconForMimeType = function (sMimeType) {
 			return mIconForMimeType[sMimeType?.toLowerCase()] || "sap-icon://document";
+		};
+
+		var oCurrentElement;
+		var oParentStack;
+
+		var oDomWriter = {
+			openStart: function(sTag) {
+				oCurrentElement = document.createElement(sTag);
+				return this;
+			},
+			voidStart: function(sTag) {
+				oCurrentElement = document.createElement(sTag);
+				return this;
+			},
+			"class": function(sClass) {
+				oCurrentElement.classList.add(sClass);
+				return this;
+			},
+			style: function(sName, sValue) {
+				oCurrentElement.style.setProperty(sName, sValue);
+				return this;
+			},
+			attr: function(sName, sValue) {
+				oCurrentElement.setAttribute(sName, sValue);
+				return this;
+			},
+			openEnd: function() {
+				var oParent = oParentStack[oParentStack.length - 1];
+				oParent.appendChild(oCurrentElement);
+				oParentStack.push(oCurrentElement);
+				return this;
+			},
+			voidEnd: function() {
+				var oParent = oParentStack[oParentStack.length - 1];
+				oParent.appendChild(oCurrentElement);
+				return this;
+			},
+			text: function(sText) {
+				var oParent = oParentStack[oParentStack.length - 1];
+				oParent.appendChild(document.createTextNode(sText));
+				return this;
+			},
+			close: function() {
+				oParentStack.pop();
+				return this;
+			}
+		};
+
+		/**
+		 * Returns the HTML string for an icon URI.
+		 *
+		 * This method reuses the rendering logic from {@link sap.ui.core.RenderManager#icon}
+		 * by calling it with a lightweight DOM-building interface that mirrors the
+		 * RenderManager's semantic API.
+		 *
+		 * @param {sap.ui.core.URI} sURI The icon URI (e.g. "sap-icon://accept")
+		 * @param {string[]} [aClasses] Additional CSS classes to add to the icon element
+		 * @param {object} [mAttributes] Additional HTML attributes as key-value pairs
+		 * @returns {string} The HTML string for the icon, or empty string if the URI is not a valid icon URI
+		 * @static
+		 * @public
+		 * @since 1.152
+		 */
+		IconPool.getIconHTML = function(sURI, aClasses, mAttributes) {
+			if (!sURI || !IconPool.isIconURI(sURI)) {
+				return "";
+			}
+
+			var oIconInfo = IconPool.getIconInfo(sURI);
+			if (!oIconInfo) {
+				return "";
+			}
+
+			var oFragment = document.createDocumentFragment();
+			oParentStack = [oFragment];
+			RenderManager.prototype.icon.call(oDomWriter, sURI, aClasses, mAttributes);
+			return oFragment.firstChild.outerHTML;
 		};
 
 		return IconPool;

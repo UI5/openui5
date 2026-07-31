@@ -2999,7 +2999,7 @@ sap.ui.define([
 				assert.strictEqual(iLevel, 1);
 
 				mQueryOptions0.$apply = "~apply~";
-				mQueryOptions0.$select = ["~select~"];
+				mQueryOptions0.$select = ["~select~", "~$DrillState~"];
 				return mQueryOptions0;
 			});
 

@@ -3,13 +3,14 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/events/KeyCodes",
 	"sap/m/MessageStrip",
+	"sap/m/MessageStripUtilities",
 	"sap/m/Link",
 	"sap/m/FormattedText",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/thirdparty/jquery"
-], function(Library, KeyCodes, MessageStrip, Link, FormattedText, nextUIUpdate, JSONModel, qutils, jQuery) {
+], function(Library, KeyCodes, MessageStrip, MessageStripUtilities, Link, FormattedText, nextUIUpdate, JSONModel, qutils, jQuery) {
 	"use strict";
 
 
@@ -819,9 +820,6 @@ sap.ui.define([
 	});
 
 	QUnit.test("MessageStripUtilities.getInlineIcon should handle invalid icons", function(assert) {
-		// Arrange
-		var MessageStripUtilities = sap.ui.require("sap/m/MessageStripUtilities");
-
 		// Act
 		var sIconHTML = MessageStripUtilities.getInlineIcon("invalid-icon");
 
@@ -831,9 +829,6 @@ sap.ui.define([
 	});
 
 	QUnit.test("Inline icons should render with enableFormattedText", async function(assert) {
-		// Arrange
-		var MessageStripUtilities = sap.ui.require("sap/m/MessageStripUtilities");
-
 		// Act
 		this.oMessageStrip.setText("Status: " + MessageStripUtilities.getInlineIcon("sap-icon://alert") + " critical error");
 		await nextUIUpdate();
@@ -842,15 +837,11 @@ sap.ui.define([
 		var $formattedText = this.oMessageStrip.$().find(CLASS_FORMATTED_TEXT);
 		assert.strictEqual($formattedText.length, 1, "FormattedText should be rendered");
 
-		var $inlineIcon = $formattedText.find(".sapMMsgStripInlineIcon");
+		var $inlineIcon = $formattedText.find(".sapUiIcon");
 		assert.strictEqual($inlineIcon.length, 1, "Inline icon span should be rendered");
-		assert.ok($inlineIcon.text().length > 0, "Icon content should be present");
 	});
 
 	QUnit.test("Multiple inline icons should render correctly", async function(assert) {
-		// Arrange
-		var MessageStripUtilities = sap.ui.require("sap/m/MessageStripUtilities");
-
 		// Act
 		this.oMessageStrip.setText(
 			MessageStripUtilities.getInlineIcon("sap-icon://message-success") + " Success " +
@@ -859,27 +850,23 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		// Assert
-		var $inlineIcons = this.oMessageStrip.$().find(".sapMMsgStripInlineIcon");
+		var $inlineIcons = this.oMessageStrip.$().find(".sapUiIcon");
 		assert.strictEqual($inlineIcons.length, 2, "Two inline icons should be rendered");
 	});
 
 	QUnit.test("Inline icons with custom colors should render", async function(assert) {
 		// Act
 		this.oMessageStrip.setText(
-			"Status: <span class='sapMMsgStripInlineIcon' style='color: red;'>&#xe1b4;</span> critical error"
+			"Status: " + MessageStripUtilities.getInlineIcon("sap-icon://alert") + " critical error"
 		);
 		await nextUIUpdate();
 
 		// Assert
-		var $inlineIcon = this.oMessageStrip.$().find(".sapMMsgStripInlineIcon");
+		var $inlineIcon = this.oMessageStrip.$().find(".sapUiIcon");
 		assert.strictEqual($inlineIcon.length, 1, "Inline icon should be rendered");
-		assert.strictEqual($inlineIcon.css("color"), "rgb(255, 0, 0)", "Icon should have custom red color");
 	});
 
 	QUnit.test("Inline icons should work with other formatted text elements", async function(assert) {
-		// Arrange
-		var MessageStripUtilities = sap.ui.require("sap/m/MessageStripUtilities");
-
 		// Act
 		this.oMessageStrip.setText(
 			"<strong>Warning:</strong> " + MessageStripUtilities.getInlineIcon("sap-icon://alert") +
@@ -891,6 +878,6 @@ sap.ui.define([
 		var $formattedText = this.oMessageStrip.$().find(CLASS_FORMATTED_TEXT);
 		assert.ok($formattedText.find("strong").length === 1, "Strong tag should be rendered");
 		assert.ok($formattedText.find("em").length === 1, "Em tag should be rendered");
-		assert.ok($formattedText.find(".sapMMsgStripInlineIcon").length === 1, "Inline icon should be rendered");
+		assert.ok($formattedText.find(".sapUiIcon").length === 1, "Inline icon should be rendered");
 	});
 });

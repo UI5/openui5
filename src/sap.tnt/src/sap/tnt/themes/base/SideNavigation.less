@@ -3,7 +3,6 @@
 /* Base theme                              */
 /* ======================================= */
 
-@_sap_tnt_SideNavigation_Width: 15rem;
 @_sap_tnt_SideNavigation_CollapsedWidth: 3rem;
 @_sap_tnt_SideNavigation_NavigationSeparatorMargin: 0.25rem 0.875rem 0.25rem 0.875rem;
 @_sap_tnt_SideNavigation_NavigationSeparatorMarginCollapsed: 0.25rem 0.5rem 0.25rem 0.5rem;
@@ -16,18 +15,27 @@
 @_sap_tnt_SideNavigation_TriangleDisplay: block;
 
 .sapTntSideNavigation {
+	--sapTntSideNavigation_ExpandedMinWidth: 15rem;
+	--sapTntSideNavigation_ExpandedWidth: 15rem;
+}
+
+.sapTntSideNavigation {
 	display: flex;
 	flex-direction: column;
 	flex: 1;
 	min-height: 0;
 	background: var(--sapList_Background);
 	border-right: @_sap_tnt_SideNavigation_BorderRight;
-	min-width: @_sap_tnt_SideNavigation_Width;
+	min-width: var(--sapTntSideNavigation_ExpandedMinWidth);
 	box-shadow: @_sap_tnt_SideNavigation_BoxShadow;
 	max-width: 100%;
-	width: @_sap_tnt_SideNavigation_Width;
+	width: var(--sapTntSideNavigation_ExpandedWidth);
 	transition: width 0.3s, min-width 0.3s;
 	height: 100%;
+}
+
+.sapTntSideNavigation.sapTntSideNavigationAnimating {
+	overflow: hidden;
 }
 
 .sapTntSideNavigationDesignPlain {
@@ -35,14 +43,14 @@
 	box-shadow: none;
 }
 
-html[data-sap-ui-animation='off'] .sapTntSideNavigation {
+html[data-sap-ui-animation-mode='minimal'] .sapTntSideNavigation,
+html[data-sap-ui-animation-mode='none'] .sapTntSideNavigation {
 	transition: none;
 }
 
 .sapTntToolPage-LayoutS .sapTntSideNavigation {
 	width: ~"100% !important";
 }
-
 
 .sapTntSideNavigation.sapTntSideNavigationNotExpandedWidth {
 	min-width: @_sap_tnt_SideNavigation_CollapsedWidth;
@@ -104,6 +112,14 @@ html[data-sap-ui-animation='off'] .sapTntSideNavigation {
 
 .sapTntSideNavigationFilterSection {
 	padding: 0.5rem 0.5rem 0.25rem 0.5rem;
+}
+
+/* While the panel is animating between collapsed and expanded widths, lock the
+   inner regions to the final expanded width so labels do not reflow at
+   intermediate widths. The parent <nav> clips overflow during the animation. */
+.sapTntSideNavigationAnimating .sapTntSideNavigationFlexible,
+.sapTntSideNavigationAnimating .sapTntSideNavigationFixed {
+	width: var(--sapTntSideNavigation_ExpandedWidth);
 }
 
 /* Compact size */

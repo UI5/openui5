@@ -12,12 +12,16 @@
 			"icon": "sap-icon://unfavorite",
 			"expanded": true,
 			"selectable": false,
+			"tagText": "3 Items",
+			"tagState": "Indication17",
 			"items": [{
 				"title": "My Accounts",
 				"key": "myAccounts"
 			}, {
 				"title": "My Orders",
-				"key": "myOrders"
+				"key": "myOrders",
+				"tagText": "5 Pending",
+				"tagState": "Indication20"
 			}]
 		}, {
 			"title": "Customer Management",
@@ -69,6 +73,8 @@
 			"icon": "sap-icon://customer-view",
 			"expanded": true,
 			"key": "products",
+			"tagText": "Low Stock",
+			"tagState": "Indication18",
 			"items": [{
 				"title": "Product Catalog",
 				"key": "productCatalog"
@@ -133,7 +139,9 @@
 		"items": [{
 			"title": "Analytics",
 			"icon": "sap-icon://bar-chart",
-			"key": "analytics"
+			"key": "analytics",
+			"tagText": "Beta",
+			"tagState": "Indication15"
 		}, {
 			"title": "SAP Community",
 			"icon": "sap-icon://discussion-2",
@@ -174,7 +182,9 @@
 		}, {
 			"title": "Notifications",
 			"icon": "sap-icon://message-information",
-			"key": "notifications"
+			"key": "notifications",
+			"tagText": "8 New",
+			"tagState": "Indication18"
 		}, {
 			"title": "SAP Training",
 			"icon": "sap-icon://course-book",
@@ -211,6 +221,8 @@
 		"title": "SAP Support Portal",
 		"icon": "sap-icon://sys-help",
 		"key": "sapSupport",
+		"tagText": "24/7",
+		"tagState": "Indication16",
 		"href": "https://sap.com",
 		"target": "_blank",
 		"selectable": false
