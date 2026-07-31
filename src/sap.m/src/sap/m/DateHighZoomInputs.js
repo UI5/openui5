@@ -624,8 +624,7 @@ sap.ui.define([
 	DateHighZoomInputs.prototype._populateDaySelect = function(oSelect, iYear, iMonth, sCalType) {
 		const sType = sCalType || this._getActiveCalendarType();
 
-		const oUDate = UniversalDate.getInstance(UI5Date.getInstance(), sType);
-		oUDate.setFullYear(iYear);
+		const oUDate = UniversalDate.getInstance(UI5Date.getInstance(iYear, iMonth, 1), sType);
 		oUDate.setMonth(iMonth + 1);
 		oUDate.setDate(0);
 		const iDaysInMonth = oUDate.getDate();
@@ -806,8 +805,7 @@ sap.ui.define([
 		const sCalType = this._getActiveCalendarType();
 		const oUMin = UniversalDate.getInstance(oMinDate, sCalType);
 		const oUMax = UniversalDate.getInstance(oMaxDate, sCalType);
-		const oULast = UniversalDate.getInstance(UI5Date.getInstance(), sCalType);
-		oULast.setFullYear(iYear);
+		const oULast = UniversalDate.getInstance(UI5Date.getInstance(iYear, iMonth, 1), sCalType);
 		oULast.setMonth(iMonth + 1);
 		oULast.setDate(0);
 		const iDaysInMonth = oULast.getDate();
