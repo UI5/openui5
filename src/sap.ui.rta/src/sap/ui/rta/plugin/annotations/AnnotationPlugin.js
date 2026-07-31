@@ -127,12 +127,6 @@ sap.ui.define([
 	 * @override
 	 */
 	AnnotationPlugin.prototype._isEditable = function(oElementOverlay) {
-		// Currently annotation changes are not supported for developers,
-		// because the changes are not guaranteed to be loaded in time to be properly applied
-		if (DesignTime.isDesignModeEnabled()) {
-			return false;
-		}
-
 		const oActions = this.getAction(oElementOverlay);
 
 		if (oActions) {
