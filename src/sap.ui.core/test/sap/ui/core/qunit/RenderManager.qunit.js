@@ -1897,6 +1897,97 @@ sap.ui.define([
 		document.getElementById("area7").innerHTML = "";
 	});
 
+	QUnit.test("RenderManager.prototype.icon with style attribute triggers future.warningThrows", function(assert) {
+		var rm = new RenderManager().getInterface();
+		var oIconInfo = IconPool.getIconInfo("wrench");
+
+		/** @ui5-transform-hint replace-local true */
+		var bFuture = future.active;
+
+		if (bFuture) {
+			assert.throws(function() {
+				rm.icon(oIconInfo.uri, ["classA"], {
+					id: "icon-style-warning",
+					style: "width: 16px; height: 16px;"
+				});
+			}, function(oError) {
+				return oError.message.includes("mStyles");
+			}, "should throw an error mentioning mStyles parameter");
+			rm.destroy();
+		} else {
+			var oSpy = this.spy(future, "warningThrows");
+
+			rm.icon(oIconInfo.uri, ["classA"], {
+				id: "icon-style-warning",
+				style: "width: 16px; height: 16px;"
+			});
+			rm.flush(document.getElementById("area6"));
+			rm.destroy();
+
+			assert.ok(oSpy.calledOnce, "future.warningThrows should be called once");
+			assert.ok(oSpy.firstCall.args[0].includes("mStyles"), "warning message should mention mStyles parameter");
+
+			document.getElementById("area6").innerHTML = "";
+		}
+	});
+
+	QUnit.test("RenderManager.prototype.icon with class attribute triggers future.warningThrows", function(assert) {
+		var rm = new RenderManager().getInterface();
+		var oIconInfo = IconPool.getIconInfo("wrench");
+
+		/** @ui5-transform-hint replace-local true */
+		var bFuture = future.active;
+
+		if (bFuture) {
+			assert.throws(function() {
+				rm.icon(oIconInfo.uri, ["classA"], {
+					id: "icon-class-warning",
+					"class": "extraClass"
+				});
+			}, function(oError) {
+				return oError.message.includes("aClasses");
+			}, "should throw an error mentioning aClasses parameter");
+			rm.destroy();
+		} else {
+			var oSpy = this.spy(future, "warningThrows");
+
+			rm.icon(oIconInfo.uri, ["classA"], {
+				id: "icon-class-warning",
+				"class": "extraClass"
+			});
+			rm.flush(document.getElementById("area6"));
+			rm.destroy();
+
+			assert.ok(oSpy.calledOnce, "future.warningThrows should be called once");
+			assert.ok(oSpy.firstCall.args[0].includes("aClasses"), "warning message should mention aClasses parameter");
+
+			document.getElementById("area6").innerHTML = "";
+		}
+	});
+
+	QUnit.test("RenderManager.prototype.icon with mStyles parameter (4th param)", function(assert) {
+		var rm = new RenderManager().getInterface();
+		var oIconInfo = IconPool.getIconInfo("wrench");
+		rm.icon(oIconInfo.uri, ["classA"], {
+			id: "icon-mstyles"
+		}, {
+			width: "20px",
+			height: "20px",
+			"line-height": "20px"
+		});
+		rm.flush(document.getElementById("area6"));
+		rm.destroy();
+
+		var icon1 = document.getElementById("icon-mstyles");
+		assert.ok(icon1, "icon should be rendered");
+		assert.equal(icon1.style.width, "20px", "width from mStyles is applied");
+		assert.equal(icon1.style.height, "20px", "height from mStyles is applied");
+		assert.equal(icon1.style.lineHeight, "20px", "line-height from mStyles is applied");
+		assert.ok(icon1.style.fontFamily, "font-family set internally by icon() is preserved");
+
+		document.getElementById("area6").innerHTML = "";
+	});
+
 	QUnit.module("Edge cases");
 
 	QUnit.test("RenderManager should not break for controls with invalid renderer", async function(assert) {
