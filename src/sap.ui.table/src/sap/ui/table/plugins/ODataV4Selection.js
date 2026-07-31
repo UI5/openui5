@@ -120,10 +120,9 @@ sap.ui.define([
 	/**
 	 * @inheritDoc
 	 */
-	ODataV4Selection.prototype.handleKeyboardShortcut = function(sType, oEvent) {
+	ODataV4Selection.prototype.handleKeyboardShortcut = function(sType) {
 		if (sType === "clear") { // ctrl + shift + a
 			this.clearSelection();
-			oEvent.setMarked("sapUiTableClearAll");
 		}
 
 		return Promise.resolve();

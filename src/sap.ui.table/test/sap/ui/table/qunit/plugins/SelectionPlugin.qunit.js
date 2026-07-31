@@ -249,23 +249,22 @@ sap.ui.define([
 
 	QUnit.test("onKeyboardShortcut dispatches to handleKeyboardShortcut when active", function(assert) {
 		const oHandleSpy = this.spy(this.oPlugin, "handleKeyboardShortcut");
-		const oEvent = {};
 
-		this.oPlugin.onKeyboardShortcut("toggle", oEvent);
-		assert.ok(oHandleSpy.calledOnceWithExactly("toggle", oEvent), "handleKeyboardShortcut is called once with correct arguments");
+		this.oPlugin.onKeyboardShortcut("toggle");
+		assert.ok(oHandleSpy.calledOnceWithExactly("toggle"), "handleKeyboardShortcut is called once with correct arguments");
 	});
 
 	QUnit.test("onKeyboardShortcut does not dispatch when inactive", function(assert) {
 		const oHandleSpy = this.spy(this.oPlugin, "handleKeyboardShortcut");
 
 		this.oPlugin.setEnabled(false);
-		this.oPlugin.onKeyboardShortcut("toggle", {});
+		this.oPlugin.onKeyboardShortcut("toggle");
 		assert.ok(oHandleSpy.notCalled, "handleKeyboardShortcut is not called");
 	});
 
 	QUnit.test("Base hooks resolve", async function(assert) {
 		const oHeaderSelectorResult = this.oPlugin.handleHeaderSelectorPress();
-		const oShortcutResult = this.oPlugin.handleKeyboardShortcut("toggle", {});
+		const oShortcutResult = this.oPlugin.handleKeyboardShortcut("toggle");
 
 		assert.ok(oHeaderSelectorResult instanceof Promise, "handleHeaderSelectorPress returns a promise");
 		assert.ok(oShortcutResult instanceof Promise, "handleKeyboardShortcut returns a promise");

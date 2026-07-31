@@ -288,10 +288,8 @@ sap.ui.define([
 	QUnit.test("#handleKeyboardShortcut", async function(assert) {
 		const aRows = this.oTable.getRows();
 		const oClearSelection = this.spy(this.oSelectionPlugin, "clearSelection");
-		const oEvent = new jQuery.Event();
 
-		this.spy(oEvent, "setMarked");
-		this.oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("toggle");
 		await TableQUnitUtils.sleep(200);
 		assert.equal(this.oSelectionChangeHandler.callCount, 0, "Toggle selection: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0, "Toggle selection: Selected contexts");
@@ -301,13 +299,11 @@ sap.ui.define([
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		this.oSelectionChangeHandler.resetHistory();
 		oClearSelection.resetHistory();
-		oEvent.setMarked.resetHistory();
-		this.oSelectionPlugin.handleKeyboardShortcut("clear", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("clear");
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "Clear selection: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0, "Clear selection: Selected contexts");
 		assert.equal(oClearSelection.callCount, 1, "Clear selection: #clearSelection call");
-		assert.ok(oEvent.setMarked.calledWithExactly("sapUiTableClearAll"), "Clear selection: Event mark 'sapUiTableClearAll'");
 	});
 
 	QUnit.module("Binding selection API", {

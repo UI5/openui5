@@ -2636,13 +2636,11 @@ function(
 			if (oEvent.shiftKey) {
 				if (bClearAll) {
 					this.removeSelections(false, true);
-					oEvent.setMarked("sapMTableClearAll");
 					this._fireHeaderSelectorPress();
 				}
 			} else if (!bClearAll) {
 				if (this.isAllSelectableSelected()) {
 					this.removeSelections(false, true);
-					oEvent.setMarked("sapMTableClearAll");
 				} else {
 					this.selectAll(true);
 				}
