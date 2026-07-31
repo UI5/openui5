@@ -2222,11 +2222,15 @@ sap.ui.define([
 	 * @param {sap.ui.core.URI} sURI URI of an image or of an icon registered in {@link sap.ui.core.IconPool}
 	 * @param {array|string} [aClasses] Additional classes that are added to the rendered tag
 	 * @param {object} [mAttributes] Additional attributes that will be added to the rendered tag.
-	 * Currently the attributes <code>class</code> and <code>style</code> are not allowed
+	 * The attributes <code>class</code> and <code>style</code> are not allowed.
+	 * Use the <code>mStyles</code> parameter to set inline styles.
+	 * @param {object} [mStyles] A map of CSS property names and their values to be set as inline styles
+	 * on the rendered tag. Example: <code>{width: "16px", height: "16px"}</code>.
+	 * This parameter is available since version 1.152.
 	 * @returns {this} Reference to <code>this</code> in order to allow method chaining
 	 * @public
 	 */
-	RenderManager.prototype.icon = function(sURI, aClasses, mAttributes){
+	RenderManager.prototype.icon = function(sURI, aClasses, mAttributes, mStyles){
 		var IconPool = sap.ui.require("sap/ui/core/IconPool");
 		if (!IconPool) {
 			future.warningThrows(
@@ -2330,7 +2334,21 @@ sap.ui.define([
 		if (typeof mAttributes === "object") {
 			for (sProp in mAttributes) {
 				if (mAttributes.hasOwnProperty(sProp) && mAttributes[sProp] !== null) {
-					this.attr(sProp, mAttributes[sProp]);
+					if (sProp === "class") {
+						future.warningThrows("Attribute 'class' must not be set via the mAttributes parameter of RenderManager#icon. Use the 2nd parameter 'aClasses' instead.");
+					} else if (sProp === "style") {
+						future.warningThrows("Attribute 'style' must not be set via the mAttributes parameter of RenderManager#icon. Use the 4th parameter 'mStyles' instead.");
+					} else {
+						this.attr(sProp, mAttributes[sProp]);
+					}
+				}
+			}
+		}
+
+		if (typeof mStyles === "object") {
+			for (sProp in mStyles) {
+				if (mStyles.hasOwnProperty(sProp) && mStyles[sProp] != null) {
+					this.style(sProp, mStyles[sProp]);
 				}
 			}
 		}
