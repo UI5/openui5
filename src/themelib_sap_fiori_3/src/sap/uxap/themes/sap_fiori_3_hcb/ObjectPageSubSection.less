@@ -57,3 +57,9 @@
 .sapUxAPBlockContainer .sapUxAPObjectPageSubSectionAlignContent {
 	padding: 0 1rem;
 }
+
+/* Fiori 3 spec: on phone the form content aligns flush with the block container (no side padding) */
+.sapUxAPObjectPageLayout-Std-Phone .sapUxAPBlockContainer .sapUiFormResGrid > div,
+.sapUxAPObjectPageLayout-Std-Phone .sapUxAPBlockContainer .sapUiFormCLContainer {
+	padding: 1rem 0;
+}
