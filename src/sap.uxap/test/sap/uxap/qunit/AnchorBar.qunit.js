@@ -34,6 +34,29 @@ sap.ui.define([
 		assert.strictEqual(oButton.$().attr(sAttribute), sExpected, sMessage);
 	}
 
+	// Resizes the ObjectPage so that the AnchorBar's own width lands exactly 1px below the
+	// given breakpoint, i.e. safely inside the lower SAP_STANDARD media range on every browser.
+	//
+	// The AnchorBar mirrors its parent ObjectPage width minus the space the ObjectPage reserves
+	// for its vertical scrollbar. That reserved space is browser-dependent: engines with classic
+	// scrollbars (e.g. Chrome) reserve ~15px, while engines with overlay scrollbars (e.g. Firefox)
+	// reserve 0px. Setting the ObjectPage width to a raw breakpoint value would therefore classify
+	// the AnchorBar into different media ranges across browsers. We neutralize this by measuring
+	// the reserved width at the current layout (parent offsetWidth - AnchorBar width) and adding it
+	// back, so the AnchorBar ends up at "breakpoint - 1" regardless of scrollbar rendering.
+	function resizeObjectPageToBreakpoint(oClock, oObjectPage, oAnchorBar, iBreakpoint) {
+		var oDomRef = oObjectPage.getDomRef();
+
+		// First render at the nominal breakpoint to measure the reserved scrollbar width.
+		oDomRef.style.width = iBreakpoint + "px";
+		oClock.tick(iRenderingDelay);
+		var iReservedWidth = oDomRef.offsetWidth - oAnchorBar._getWidth(oAnchorBar);
+
+		// Compensate so the AnchorBar itself ends up just below the breakpoint on every browser.
+		oDomRef.style.width = (iBreakpoint - 1 + iReservedWidth) + "px";
+		oClock.tick(iRenderingDelay);
+	}
+
 	QUnit.module("properties", {
 		beforeEach: function () {
 			this.clock = sinon.useFakeTimers();
@@ -212,10 +235,7 @@ sap.ui.define([
 
 		// Act
 		// Resizing ObjectPage to Phone breakpoint
-		this.oObjectPage.getDomRef().style.width = BREAK_POINTS.Phone + "px";
-
-		// allow for re-render
-		this.clock.tick(iRenderingDelay);
+		resizeObjectPageToBreakpoint(this.clock, this.oObjectPage, oAnchorBar, BREAK_POINTS.Phone);
 		oMediaRange = Device.media.getCurrentRange(sRangeSet, oAnchorBar._getWidth(oAnchorBar));
 
 		// Assert
@@ -224,10 +244,7 @@ sap.ui.define([
 
 		// Act
 		// Resizing ObjectPage to Tablet breakpoint
-		this.oObjectPage.getDomRef().style.width = BREAK_POINTS.Tablet + "px";
-
-		// allow for re-render
-		this.clock.tick(iRenderingDelay);
+		resizeObjectPageToBreakpoint(this.clock, this.oObjectPage, oAnchorBar, BREAK_POINTS.Tablet);
 		oMediaRange = Device.media.getCurrentRange(sRangeSet, oAnchorBar._getWidth(oAnchorBar));
 
 		// Assert
@@ -236,10 +253,7 @@ sap.ui.define([
 
 		// Act
 		// Resizing ObjectPage to Desktop breakpoint
-		this.oObjectPage.getDomRef().style.width = BREAK_POINTS.Desktop + "px";
-
-		// allow for re-render
-		this.clock.tick(iRenderingDelay);
+		resizeObjectPageToBreakpoint(this.clock, this.oObjectPage, oAnchorBar, BREAK_POINTS.Desktop);
 		oMediaRange = Device.media.getCurrentRange(sRangeSet, oAnchorBar._getWidth(oAnchorBar));
 
 		// Assert
