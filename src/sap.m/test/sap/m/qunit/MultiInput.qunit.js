@@ -4896,6 +4896,32 @@ sap.ui.define([
 		assert.ok(this.oMultiInput.getAggregation("tokenizer").hasOneTruncatedToken(), "The token should be truncated");
 	});
 
+	QUnit.test("Truncation should be reset when tokens are updated via binding", async function (assert) {
+		// Arrange: initial data with one extra long token results in a truncated token
+		var oTokenizer = this.oMultiInput.getAggregation("tokenizer");
+		assert.ok(oTokenizer.hasOneTruncatedToken(), "Precondition: the tokenizer has one truncated token");
+
+		// Bind tokens so the update goes through Tokenizer#updateTokens
+		var oModel = new JSONModel({
+			names: [
+				{ text: "Short A" },
+				{ text: "Short B" },
+				{ text: "Short C" }
+			]
+		});
+		this.oMultiInput.setModel(oModel);
+		this.oMultiInput.bindAggregation("tokens", "/names", new Token({ text: "{text}" }));
+
+		await nextUIUpdate();
+
+		// Assert: after re-binding to multiple short tokens, the first-token-truncated
+		// state must be reset - otherwise a stale sapMTokenizerOneLongToken class remains
+		// and the first token is still rendered as truncated.
+		assert.strictEqual(this.oMultiInput.getTokens().length, 3, "MultiInput now has 3 tokens");
+		assert.notOk(oTokenizer.getTokens()[0].getTruncated(), "First token is no longer truncated");
+		assert.notOk(oTokenizer.hasStyleClass("sapMTokenizerOneLongToken"), "Tokenizer no longer has the one-long-token style class");
+	});
+
 	QUnit.module("API");
 
 	QUnit.test("showItems should always set all items list visibility to true", async function (assert) {

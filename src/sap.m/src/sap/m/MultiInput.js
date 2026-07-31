@@ -271,6 +271,7 @@ function(
 			}
 
 			this.destroyTokens();
+			this.setFirstTokenTruncated(false);
 			this.updateAggregation("tokens");
 		};
 
