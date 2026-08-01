@@ -1829,4 +1829,82 @@ sap.ui.define([
 		oButton.destroy();
 	});
 
+	QUnit.module("Page navigation", {
+		beforeEach: async function () {
+			// 6 items: items[0..5], all focusable
+			this.oMenu = new Menu({
+				items: [
+					new MenuItem({ text: "Item 1" }),
+					new MenuItem({ text: "Item 2" }),
+					new MenuItem({ text: "Item 3" }),
+					new MenuItem({ text: "Item 4" }),
+					new MenuItem({ text: "Item 5" }),
+					new MenuItem({ text: "Item 6" })
+				]
+			}).placeAt("qunit-fixture");
+			await nextUIUpdate(this.clock);
+
+			this.oMenu.openBy(document.body);
+			await nextUIUpdate(this.clock);
+
+			this.oWrapper = this.oMenu._getMenuWrapper();
+			// 5 visible items → step = 4
+			this._oCountStub = sinon.stub(this.oWrapper, "_getVisibleItemCount").returns(5);
+		},
+		afterEach: async function () {
+			this._oCountStub.restore();
+			this.oMenu.destroy();
+			this.oMenu = null;
+			await nextUIUpdate(this.clock);
+		}
+	});
+
+	QUnit.test("PAGE_DOWN advances by visibleItemCount - 1 steps", function (assert) {
+		const aItems = this.oWrapper._getVisibleItems();
+		// step=4, from index 0 → lands on index 4
+		assert.strictEqual(this.oWrapper._getPageItem(0, true), aItems[4], "PAGE_DOWN from first item lands 4 steps forward");
+	});
+
+	QUnit.test("PAGE_DOWN falls back to last item when fewer items remain than a full step", function (assert) {
+		const aItems = this.oWrapper._getVisibleItems();
+		// step=4, from index 2 → only 3 items remain, lands on last (index 5)
+		assert.strictEqual(this.oWrapper._getPageItem(2, true), aItems[5], "PAGE_DOWN lands on last item when step exceeds remaining items");
+	});
+
+	QUnit.test("PAGE_DOWN from last item returns undefined", function (assert) {
+		// step=4, from index 5 → no items ahead
+		assert.strictEqual(this.oWrapper._getPageItem(5, true), undefined, "PAGE_DOWN from last item returns undefined");
+	});
+
+	QUnit.test("PAGE_UP advances by visibleItemCount - 1 steps backward", function (assert) {
+		const aItems = this.oWrapper._getVisibleItems();
+		// step=4, from index 5 → lands on index 1
+		assert.strictEqual(this.oWrapper._getPageItem(5, false), aItems[1], "PAGE_UP from last item lands 4 steps backward");
+	});
+
+	QUnit.test("PAGE_UP falls back to first item when fewer items remain than a full step", function (assert) {
+		const aItems = this.oWrapper._getVisibleItems();
+		// step=4, from index 3 → only 3 items before, lands on first (index 0)
+		assert.strictEqual(this.oWrapper._getPageItem(3, false), aItems[0], "PAGE_UP lands on first item when step exceeds remaining items");
+	});
+
+	QUnit.test("PAGE_UP from first item returns undefined", function (assert) {
+		// step=4, from index 0 → no items before
+		assert.strictEqual(this.oWrapper._getPageItem(0, false), undefined, "PAGE_UP from first item returns undefined");
+	});
+
+	QUnit.test("_navigateToPageItem focuses the target item", function (assert) {
+		const aItems = this.oWrapper._getVisibleItems();
+		this.oWrapper.oHoveredItem = aItems[0];
+		const oFocusStub = sinon.stub(aItems[4].getDomRef(), "focus");
+
+		// step=4, from index 0 → target is index 4
+		this.oWrapper._navigateToPageItem(0, true);
+
+		assert.ok(oFocusStub.calledOnce, "focus() is called on the target item");
+		assert.strictEqual(this.oWrapper.oHoveredItem, aItems[4], "oHoveredItem is updated to target item");
+
+		oFocusStub.restore();
+	});
+
 });

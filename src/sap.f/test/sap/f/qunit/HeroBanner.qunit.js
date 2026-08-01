@@ -23,7 +23,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("renders the correct custom element tag", function(assert) {
-		assert.strictEqual(this.oHeroBanner.getDomRef().localName, "ui5-hero-banner-6bfd01e3", "correct scoped tag is rendered");
+		assert.strictEqual(this.oHeroBanner.getDomRef().localName, this.oHeroBanner.getMetadata().getTag(), "correct scoped tag is rendered");
 	});
 
 	QUnit.test("is instance of sap.f.HeroBanner and the private wrapper", function(assert) {
