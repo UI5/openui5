@@ -3124,6 +3124,47 @@ sap.ui.define([
 		assert.strictEqual(this.stepInput._getIncrementButton().getEnabled(), false, "increment is disabled");
 	});
 
+	QUnit.test("_clearErrorIfValueValid clears error state when value is valid", function (assert) {
+		// arrange
+		this.stepInput.setMax(50);
+		this.stepInput._getInput().setValue("100");
+		this.stepInput._verifyValue(); // sets error because 100 > 50
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// assert - precondition
+		assert.strictEqual(this.stepInput.getValueState(), ValueState.Error,
+			"Value state is Error for invalid value");
+
+		// act - set a valid value and clear the error
+		this.stepInput._getInput().setValue("30");
+		this.stepInput._clearErrorIfValueValid();
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// assert
+		assert.strictEqual(this.stepInput.getValueState(), ValueState.None,
+			"Value state is cleared to None when value becomes valid");
+		assert.strictEqual(this.stepInput._getInput().getValueState(), ValueState.None,
+			"Inner input value state is also cleared to None");
+	});
+
+	QUnit.test("_clearErrorIfValueValid keeps error state when value is still invalid", function (assert) {
+		// arrange
+		this.stepInput.setMax(50);
+		this.stepInput.setValue("100");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		this.stepInput._verifyValue(); // sets error because 100 > 50
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// act - value is still invalid
+		this.stepInput._clearErrorIfValueValid();
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// assert
+		assert.strictEqual(this.stepInput.getValueState(), ValueState.Error,
+			"Value state remains Error while value is still invalid");
+	});
+
+
 	QUnit.module("Misc");
 
 	QUnit.test("increment/decrement buttons enabled state", function (assert) {

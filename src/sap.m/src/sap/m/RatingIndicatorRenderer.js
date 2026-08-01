@@ -203,15 +203,15 @@ sap.ui.define(
 
 			const aClasses = [this.getIconClass(iconType)];
 
-
 			if (iValue >= Math.ceil(oControl.getValue())) {
 				aClasses.push("sapMRIunratedIcon");
 			}
 
-			const sStyle = `width: ${sSize}; height: ${sSize};`;
-
-			oRm.icon(sIconURI, aClasses, {
-				style: sStyle
+			oRm.icon(sIconURI, aClasses, {}, {
+				width: sSize,
+				height: sSize,
+				"line-height": sSize,
+				"font-size": sSize
 			});
 		};
 
