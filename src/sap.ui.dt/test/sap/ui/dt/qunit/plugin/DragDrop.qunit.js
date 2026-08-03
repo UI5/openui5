@@ -491,27 +491,82 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("when the element is the last visible element and removeLastElement is false", function(assert) {
 			const fnOnDragStartSpy = sandbox.spy(this.oDragDrop, "onDragStart");
+
+			// setMovable(true) is called (e.g. by CutPaste plugin) but the element is already the last one
 			this.oButtonOverlay.setMovable(true);
 
-			assert.strictEqual(
-				this.oButtonOverlay.getDomRef().getAttribute("draggable"),
-				"true",
-				"then the overlay is draggable before it is recognized as the last visible element"
-			);
-
-			this.oButtonOverlay.setLastElementMovable(false);
 			triggerEvent("dragstart", this.oButtonOverlay.getDomRef());
 
 			assert.strictEqual(
 				fnOnDragStartSpy.callCount,
 				0,
-				"then after set as last visible Element onDragStart is not called because drag events are not attached"
+				"then onDragStart is not called because drag events are not attached for the last element"
+			);
+			assert.notOk(
+				this.oButtonOverlay.isMovable(),
+				"then the overlay is flagged as non-movable by the plugin"
+			);
+			assert.notOk(
+				this.oButtonOverlay.hasStyleClass("sapUiDtOverlayMovable"),
+				"then the movable style class is removed"
 			);
 			assert.strictEqual(
 				this.oButtonOverlay.getDomRef().getAttribute("draggable"),
 				null,
-				"then the overlay is not draggable"
+				"then the draggable attribute is removed"
 			);
+		});
+
+		QUnit.test("when the overlay is registered as last element, the movable style class is removed", function(assert) {
+			this.oButtonOverlay.setMovable(true);
+
+			assert.notOk(
+				this.oButtonOverlay.hasStyleClass("sapUiDtOverlayMovable"),
+				"then the movable style class is not present on the last element"
+			);
+		});
+
+		QUnit.test("when a second element is removed and the remaining element becomes the last one, the movable style class is removed", async function(assert) {
+			const oButton2 = new Button();
+			this.oLayout.addContent(oButton2);
+			await nextUIUpdate();
+			const oButton2Overlay = OverlayRegistry.getOverlay(oButton2);
+			oButton2Overlay.setMovable(true);
+			this.oButtonOverlay.setMovable(true);
+
+			assert.ok(
+				this.oButtonOverlay.hasStyleClass("sapUiDtOverlayMovable"),
+				"then both elements are movable when there are two elements"
+			);
+
+			this.oLayout.removeContent(oButton2);
+			oButton2.destroy();
+			await nextUIUpdate();
+
+			assert.notOk(
+				this.oButtonOverlay.hasStyleClass("sapUiDtOverlayMovable"),
+				"then the movable style class is removed once the element becomes the last one"
+			);
+		});
+
+		QUnit.test("when a new element is added after the last element restriction, the movable style class is restored", async function(assert) {
+			this.oButtonOverlay.setMovable(true);
+
+			assert.notOk(
+				this.oButtonOverlay.hasStyleClass("sapUiDtOverlayMovable"),
+				"then the movable style class is initially absent on the last element"
+			);
+
+			const oButton2 = new Button();
+			this.oLayout.addContent(oButton2);
+			await nextUIUpdate();
+
+			assert.ok(
+				this.oButtonOverlay.hasStyleClass("sapUiDtOverlayMovable"),
+				"then the movable style class is restored once a second element is added"
+			);
+
+			oButton2.destroy();
 		});
 	});
 
