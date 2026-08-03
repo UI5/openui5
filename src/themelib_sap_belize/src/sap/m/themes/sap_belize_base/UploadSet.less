@@ -2,6 +2,18 @@
  * @file
  * @deprecated As of version 1.129, together with sap.m.upload.UploadSet
  */
+.sapUiSizeCompact .sapMUCItem .sapMLIBSelectM,
+.sapMUCItem .sapMLIBSelectM {
+	width: 2rem;
+	flex-shrink: 0;
+}
+
+.sapUiSizeCompact .sapMUCItem.sapMLIB > .sapMLIBSelectM + .sapMLIBContent,
+.sapUiSizeCompact .sapMUCItem.sapMLIB > .sapMLIBSelectS + .sapMLIBContent,
+.sapMUCItem.sapMLIB > .sapMLIBContent {
+	margin-left: 0.25rem;
+}
+
 .sapMUSFileName {
 	flex-shrink: 0;
 }

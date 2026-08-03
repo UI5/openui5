@@ -6,6 +6,16 @@
 /* CSS for control sap.m/UploadSet  */
 /* Base theme                       */
 /* ================================ */
+.sapUiSizeCompact .sapMUCItem .sapMLIBSelectM,
+.sapMUCItem .sapMLIBSelectM {
+	width: 2rem;
+}
+
+.sapUiSizeCompact .sapMUCItem.sapMLIB > .sapMLIBSelectM + .sapMLIBContent,
+.sapUiSizeCompact .sapMUCItem.sapMLIB > .sapMLIBSelectS + .sapMLIBContent,
+.sapMUCItem.sapMLIB > .sapMLIBContent {
+	margin-left: 0.25rem;
+}
 
 .sapMUSFileName {
 	flex-shrink: 0;
