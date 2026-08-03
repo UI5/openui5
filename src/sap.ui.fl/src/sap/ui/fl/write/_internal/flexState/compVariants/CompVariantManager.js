@@ -687,6 +687,17 @@ sap.ui.define([
 		const aCompVariantEntities = CompVariantManagementState.getCompEntitiesByPersistencyKey(mPropertyBag);
 
 		const aFlexObjects = aCompVariantEntities.filter((oFlexObject) => oFlexObject.getState() !== States.LifecycleState.PERSISTED);
+		aFlexObjects.forEach((oFlexObject) => {
+			// The SmartVariantManagement control always creates new variants with favorite set to true.
+			// A PUBLIC variant must not be a favorite for other users, so the flag is reset before persisting.
+			if (
+				oFlexObject instanceof CompVariant
+				&& oFlexObject.getState() === States.LifecycleState.NEW
+				&& oFlexObject.getLayer() === Layer.PUBLIC
+			) {
+				oFlexObject.setFavorite(false);
+			}
+		});
 		await FlexObjectManager.saveFlexObjects({
 			flexObjects: aFlexObjects,
 			reference: mPropertyBag.reference,
