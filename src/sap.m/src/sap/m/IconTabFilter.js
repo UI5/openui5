@@ -1274,6 +1274,7 @@ sap.ui.define([
 		if (this._isOverflow() ||
 				((this._getNestedLevel() === 1 && this._getRealTab() === this) && this._getRealTab().getItems().length !== 0)) {
 
+					oEvent.preventDefault();
 					oEvent.stopImmediatePropagation();
 					this._expandButtonPress();
 		}
