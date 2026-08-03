@@ -639,6 +639,97 @@ sap.ui.define([
 		testCase(450, 50, 500, PlacementType.PreferredBottomOrFlip, PlacementType.Top); // You do not have enough space at the preferred position, so the position with more space is used
 	});
 
+	// Opens a Popover on a scrolled page and returns the calculated placement.
+	async function runScrolledFlipCase(oConfig) {
+		const oContainer = createAndAppendDiv();
+		const oSpacerAbove = new HTML({ content: "<div style='height:" + (window.innerHeight + 1000) + "px'></div>" });
+		const oOpener = new Button({ text: "Open Popover" });
+		oSpacerAbove.placeAt(oContainer);
+		oOpener.placeAt(oContainer);
+
+		let oSpacerBelow;
+		if (oConfig.spaceBelowOpener) {
+			oSpacerBelow = new HTML({ content: "<div style='height:1000px'></div>" });
+			oSpacerBelow.placeAt(oContainer);
+		}
+
+		const oPopover = new Popover({
+			placement: oConfig.placement,
+			contentHeight: "300px",
+			content: [new HTML({ content: "<div style='height:300px'></div>" })]
+		});
+
+		if (oConfig.within) {
+			Popup.setWithinArea(oContainer);
+		}
+		await nextUIUpdate();
+
+		const oOpenerDom = oOpener.getDomRef();
+		const iOpenerPageTop = oOpenerDom.getBoundingClientRect().top + window.scrollY;
+		if (oConfig.openerAtViewportBottom) {
+			window.scrollTo(0, iOpenerPageTop - (window.innerHeight - oOpenerDom.offsetHeight - 20));
+		} else {
+			window.scrollTo(0, iOpenerPageTop - 20);
+		}
+
+		const pOpened = new Promise((resolve) => { oPopover.attachAfterOpen(resolve); });
+		oPopover.openBy(oOpener);
+		await pOpened;
+
+		const sPos = oPopover._oCalcedPos;
+
+		Popup.setWithinArea(null);
+		window.scrollTo(0, 0);
+		oPopover.destroy();
+		oOpener.destroy();
+		oSpacerAbove.destroy();
+
+		if (oSpacerBelow) {
+			oSpacerBelow.destroy();
+		}
+
+		await nextUIUpdate();
+		oContainer.remove();
+
+		return sPos;
+	}
+
+	QUnit.test("VerticalPreferredBottom flips up when the opener is at the viewport bottom of a scrolled page", async function (assert) {
+		this.clock.restore();
+		const sPos = await runScrolledFlipCase({ placement: PlacementType.VerticalPreferredBottom, spaceBelowOpener: true, openerAtViewportBottom: true });
+		assert.strictEqual(sPos, PlacementType.Top, "Popover flips up");
+	});
+
+	QUnit.test("VerticalPreferredBottom does not flip when there is room below the opener in the viewport", async function (assert) {
+		this.clock.restore();
+		const sPos = await runScrolledFlipCase({ placement: PlacementType.VerticalPreferredBottom, spaceBelowOpener: true });
+		assert.strictEqual(sPos, PlacementType.Bottom, "Popover stays below");
+	});
+
+	QUnit.test("VerticalPreferredBottom does not flip when a within-area has room below the opener at the viewport bottom", async function (assert) {
+		this.clock.restore();
+		const sPos = await runScrolledFlipCase({ placement: PlacementType.VerticalPreferredBottom, spaceBelowOpener: true, openerAtViewportBottom: true, within: true });
+		assert.strictEqual(sPos, PlacementType.Bottom, "Popover stays below");
+	});
+
+	QUnit.test("PreferredBottomOrFlip flips up when the opener is at the viewport bottom of a scrolled page", async function (assert) {
+		this.clock.restore();
+		const sPos = await runScrolledFlipCase({ placement: PlacementType.PreferredBottomOrFlip, spaceBelowOpener: true, openerAtViewportBottom: true });
+		assert.strictEqual(sPos, PlacementType.Top, "Popover flips up");
+	});
+
+	QUnit.test("PreferredBottomOrFlip does not flip when there is room below the opener in the viewport", async function (assert) {
+		this.clock.restore();
+		const sPos = await runScrolledFlipCase({ placement: PlacementType.PreferredBottomOrFlip, spaceBelowOpener: true });
+		assert.strictEqual(sPos, PlacementType.Bottom, "Popover stays below");
+	});
+
+	QUnit.test("PreferredBottomOrFlip does not flip when a within-area has room below the opener at the viewport bottom", async function (assert) {
+		this.clock.restore();
+		const sPos = await runScrolledFlipCase({ placement: PlacementType.PreferredBottomOrFlip, spaceBelowOpener: true, openerAtViewportBottom: true, within: true });
+		assert.strictEqual(sPos, PlacementType.Bottom, "Popover stays below");
+	});
+
 	QUnit.test("Horizontal (right/left) calculation and flip functionality", function(assert){
 		var testCase = function (offset, outerWidth, width, placement, expectedPlace) {
 			var stubOffset = sinon.stub(Element.prototype, "getBoundingClientRect").returns({left: offset, width: outerWidth});
@@ -1877,38 +1968,6 @@ sap.ui.define([
 			this.oPopover.destroy();
 			this.oButton.destroy();
 		}
-	});
-
-	QUnit.test("_getBottomBound returns the viewport bottom when the within-area is the window", function (assert) {
-		const stubWithin = sinon.stub(this.oPopover, "getWithinAreaDomRef").returns(window);
-
-		assert.strictEqual(
-			this.oPopover._getBottomBound(),
-			window.innerHeight + window.scrollY,
-			"window.innerHeight + window.scrollY (viewport bottom in page coordinates)"
-		);
-
-		stubWithin.restore();
-	});
-
-	QUnit.test("_getBottomBound returns the document-end bound for a custom within-area", function (assert) {
-		const oWithin = document.createElement("div");
-		const stubWithin = sinon.stub(this.oPopover, "getWithinAreaDomRef").returns(oWithin);
-		const stubRect = sinon.stub(oWithin, "getBoundingClientRect").returns({ top: 120 });
-
-		const iExpected = 120 + window.scrollY + Math.max(
-			document.body.scrollHeight, document.body.offsetHeight,
-			document.documentElement.clientHeight, document.documentElement.offsetHeight
-		);
-
-		assert.strictEqual(
-			this.oPopover._getBottomBound(),
-			iExpected,
-			"within-area page-top + document height (document-end bound)"
-		);
-
-		stubRect.restore();
-		stubWithin.restore();
 	});
 
 	QUnit.test("_getAnimationDuration", function (assert) {
