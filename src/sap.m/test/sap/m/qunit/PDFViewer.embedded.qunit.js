@@ -173,7 +173,7 @@ sap.ui.define([
 				if (iPhase === 0) {
 					iPhase = 1;
 					oModel.setData({ showDownloadButton: true }, true);
-					TestUtils.triggerRerender();
+					TestUtils.rerender();
 				} else if (iPhase === 1) {
 					iPhase = 2;
 					var oOverflowToolbar = oPdfViewer.$('overflowToolbar');
@@ -186,7 +186,7 @@ sap.ui.define([
 					assert.ok(oDownloadButton.length === 1, 'Download button should be visible');
 
 					oModel.setData({ showDownloadButton: false }, true);
-					TestUtils.triggerRerender();
+					TestUtils.rerender();
 				} else if (iPhase === 2) {
 					var oOverflowToolbar = oPdfViewer.$('overflowToolbar');
 					assert.ok(oOverflowToolbar.length === 0, "OverflowToolbar should be hidden");
