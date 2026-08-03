@@ -152,6 +152,7 @@ sap.ui.define([
         this.oFilterPanel._setLabelForOnBox(oFilterItem, oFieldBox);
 
         assert.ok(oFieldBox.getItems()[0].getLabelFor(), "Set 'labelFor' reference on label control");
+        oFilterItem.destroy();
     });
 
     QUnit.test("Check labelFor reference on label (WITH getIdForLabel)", function(assert){
@@ -244,4 +245,38 @@ sap.ui.define([
         assert.notOk(oLabel.getTooltip(), "No tooltip is set for field without tooltip property");
         assert.equal(oLabel.getText(), "Field 4", "Label text is correct for field without tooltip");
     });
+
+	QUnit.test("GridData", function(assert){
+        this.oFilterPanel.setP13nData(getTestData());
+        let aRows = this.oFilterPanel._oListControl.getItems();
+		let oGrid = aRows[0].getContent()[0];
+        const oComboBox = oGrid.getContent()[0];
+
+        assert.equal(oGrid.getDefaultSpan(), "XL4 L4 M4 S4", "Grid: Span");
+		let oGridData = oComboBox.getLayoutData();
+		assert.equal(oGridData.getSpan(), "XL4 L4 M4 S10", "ComboBox: Span");
+
+        oComboBox.setSelectedKey("key2");
+        oComboBox.fireSelectionChange({
+            source: oComboBox
+        });
+        oComboBox.fireChange({
+            source: oComboBox,
+            newValue: "key2"
+        });
+
+        aRows = this.oFilterPanel._oListControl.getItems();
+		oGrid = aRows[0].getContent()[0];
+		const oLabel = oGrid.getContent()[0];
+		const oField = oGrid.getContent()[1];
+		const oButtonBox = oGrid.getContent()[2];
+
+		oGridData = oLabel.getLayoutData();
+		assert.equal(oGridData.getSpan(), "XL4 L4 M4 S10", "Label: Span");
+		oGridData = oField.getLayoutData();
+		assert.equal(oGridData.getSpan(), "XL7 L7 M7 S10", "Field: Span");
+		assert.ok(oGridData.getLinebreakS(), "Field: linebreakS");
+		oGridData = oButtonBox.getLayoutData();
+		assert.equal(oGridData.getSpan(), "XL1 L1 M1 S2", "ButtonBox: Span");
+	});
 });
