@@ -89,13 +89,14 @@ function(
 		}
 
 		const iCursorPos = this._$input.cursorPos();
+		const sDecimalSeparator = Device.system.desktop ? this._getNumberFormat().oFormatOptions.decimalSeparator : ".";
 
 		// a special key that is meant to be a decimal separator, always
 		// so replace in the input if needed
 		if (oEvent.which === KeyCodes.NUMPAD_COMMA) {
 			oEvent.preventDefault();
 
-			sTypedValue = this.getValue().substring(0, iCursorPos) + this._getNumberFormat().oFormatOptions.decimalSeparator + this.getValue().substring(iCursorPos);
+			sTypedValue = this.getValue().substring(0, iCursorPos) + sDecimalSeparator + this.getValue().substring(iCursorPos);
 			fParsedValue = this._getNumberFormat().parse(sTypedValue);
 			if (fParsedValue || fParsedValue === 0) {
 				this.setDOMValue(sTypedValue);
@@ -104,7 +105,6 @@ function(
 			return;
 		}
 
-		const sDecimalSeparator = this._getNumberFormat().oFormatOptions.decimalSeparator;
 		if (oEvent.originalEvent.key === sDecimalSeparator && iCursorPos === 0) {
 			oEvent.preventDefault();
 			this.setDOMValue(sDecimalSeparator);
@@ -114,7 +114,7 @@ function(
 		const sGroupSeparator = this._getNumberFormat().oFormatOptions.groupingSeparator;
 		const oIsMinusSignAtZeroPosition =  iCursorPos === 0 && (oEvent.which === KeyCodes.SLASH || oEvent.which === KeyCodes.NUMPAD_MINUS);
 		sTypedValue = this.getValue().substring(0, iCursorPos) + oEvent.originalEvent.key + this.getValue().substring(iCursorPos);
-		sTypedValue = sTypedValue.replaceAll(sGroupSeparator, "");
+		sTypedValue =  Device.system.desktop ? sTypedValue.replaceAll(sGroupSeparator, "") : sTypedValue;
 		fParsedValue = this._getNumberFormat().parse(sTypedValue);
 		if (!isKeyAllowed(oEvent.which) || (!fParsedValue && fParsedValue !== 0 && !oIsMinusSignAtZeroPosition)) {
 			oEvent.preventDefault();

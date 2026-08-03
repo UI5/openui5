@@ -17,7 +17,8 @@ sap.ui.define([
 	"sap/ui/layout/GridData",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/model/type/Float",
-	"sap/ui/core/Core"
+	"sap/ui/core/Core",
+	"sap/base/i18n/Localization"
 ], function(
 	Library,
 	qutils,
@@ -36,7 +37,8 @@ sap.ui.define([
 	GridData,
 	KeyCodes,
 	TypeFloat,
-	oCore
+	oCore,
+	Localization
 ) {
 	"use strict";
 
@@ -1955,6 +1957,205 @@ sap.ui.define([
 
 		// assert that the value is 10 and that the change event is fired
 		assert.ok(this.stepInput._getInput().getValue() === "-4", "Input has reached the min value of -4");
+		assert.equal(this.oChangeSpy.callCount, 1, "Change Event should be called once");
+	});
+
+
+	QUnit.module("Touch events on increment/decrement button - mobile EN locale", {
+		beforeEach: function () {
+			this.sOriginalLanguage = Localization.getLanguage();
+			Localization.setLanguage("en");
+			this.stub(Device, "system").value({
+				desktop : false,
+				phone : true,
+				tablet : false
+			});
+			this.oChangeSpy = this.spy();
+			this.stepInput = new StepInput({
+				value: 1.0,
+				step: 0.5,
+				displayValuePrecision: 1,
+				min: 0.0,
+				max: 3.0,
+				change: this.oChangeSpy
+			});
+
+			this.stepInput.placeAt('qunit-fixture');
+			oCore.applyChanges();
+		},
+		afterEach: function () {
+			Localization.setLanguage(this.sOriginalLanguage);
+			if (!bSkipDestroy) {
+				this.stepInput.destroy();
+			}
+		}
+	});
+
+	QUnit.test("Touch start on incrementButton", function (assert) {
+		// time for which the value will get from 1.0 to 1.5 (1 step of 0.5)
+		var t = calcTime(this.stepInput, 0),
+			incBtn = this.stepInput._getIncrementButton();
+
+		// Act - tap increment button
+		callIconDelegate("onmousedown", incBtn);
+		this.clock.tick(t);
+		callIconDelegate("ontouchend", incBtn);
+
+		assert.equal(this.stepInput.getValue(), 1.5, "Input has value of 1.5");
+		assert.equal(this.stepInput._getInput().getValue(), "1.5", "Displayed value uses '.' as decimal separator");
+	});
+
+	QUnit.test("Touch start on decrementButton", function (assert) {
+		// time for which the value will get from 1.0 to 0.5 (1 step of 0.5)
+		var t = calcTime(this.stepInput, 0),
+			decBtn = this.stepInput._getDecrementButton();
+
+		// Act - tap decrement button
+		callIconDelegate("onmousedown", decBtn);
+		this.clock.tick(t);
+		callIconDelegate("ontouchend", decBtn);
+
+		assert.equal(this.stepInput.getValue(), 0.5, "Input has value of 0.5");
+		assert.equal(this.stepInput._getInput().getValue(), "0.5", "Displayed value uses '.' as decimal separator");
+	});
+
+	QUnit.test("Touch start on incrementButton when having max value set", function (assert) {
+		// time for which the value will get from 1.0 to 2.5 (3 steps of 0.5)
+		var t = calcTime(this.stepInput, 2),
+			incBtn = this.stepInput._getIncrementButton();
+
+		// Act - hold increment button
+		callIconDelegate("onmousedown", incBtn);
+		this.clock.tick(t);
+
+		assert.equal(this.stepInput._getInput().getValue(), "2.5", "Input has value of 2.5");
+
+		// keep holding until max value of 3.0 is reached
+		this.clock.tick(2000);
+
+		callIconDelegate("ontouchend", incBtn);
+
+		assert.ok(this.stepInput._getInput().getValue() === "3.0", "Input has reached the max value of 3.0");
+		assert.equal(this.oChangeSpy.callCount, 1, "Change Event should be called once");
+	});
+
+	QUnit.test("Touch start on decrementButton when having min value set", function (assert) {
+		// time for which the value will get from 1.0 to 0.5 (1 step of 0.5)
+		var t = calcTime(this.stepInput, 0),
+			decBtn = this.stepInput._getDecrementButton();
+
+		// Act - hold decrement button
+		callIconDelegate("onmousedown", decBtn);
+		this.clock.tick(t);
+
+		assert.equal(this.stepInput._getInput().getValue(), "0.5", "Input has value of 0.5");
+
+		// keep holding until min value of 0.0 is reached
+		this.clock.tick(2000);
+
+		callIconDelegate("ontouchend", decBtn);
+
+		assert.ok(this.stepInput._getInput().getValue() === "0.0", "Input has reached the min value of 0.0");
+		assert.equal(this.oChangeSpy.callCount, 1, "Change Event should be called once");
+	});
+
+
+	QUnit.module("Touch events on increment/decrement button - mobile DE locale", {
+		beforeEach: function () {
+			this.sOriginalLanguage = Localization.getLanguage();
+			Localization.setLanguage("de");
+			this.stub(Device, "system").value({
+				desktop : false,
+				phone : true,
+				tablet : false
+			});
+			this.oChangeSpy = this.spy();
+			this.stepInput = new StepInput({
+				value: 1.0,
+				step: 0.5,
+				displayValuePrecision: 1,
+				min: 0.0,
+				max: 3.0,
+				change: this.oChangeSpy
+			});
+
+			this.stepInput.placeAt('qunit-fixture');
+			oCore.applyChanges();
+		},
+		afterEach: function () {
+			Localization.setLanguage(this.sOriginalLanguage);
+			if (!bSkipDestroy) {
+				this.stepInput.destroy();
+			}
+		}
+	});
+
+	QUnit.test("Touch start on incrementButton", function (assert) {
+		// time for which the value will get from 1.0 to 1.5 (1 step of 0.5)
+		var t = calcTime(this.stepInput, 0),
+			incBtn = this.stepInput._getIncrementButton();
+
+		// Act - tap increment button
+		callIconDelegate("onmousedown", incBtn);
+		this.clock.tick(t);
+		callIconDelegate("ontouchend", incBtn);
+
+		assert.equal(this.stepInput.getValue(), 1.5, "Input has value of 1.5");
+		// on mobile _getFormattedValue bypasses NumberFormat so dot is always used regardless of DE locale
+		assert.equal(this.stepInput._getInput().getValue(), "1.5", "Displayed value uses '.' not locale ',' on mobile");
+	});
+
+	QUnit.test("Touch start on decrementButton", function (assert) {
+		// time for which the value will get from 1.0 to 0.5 (1 step of 0.5)
+		var t = calcTime(this.stepInput, 0),
+			decBtn = this.stepInput._getDecrementButton();
+
+		// Act - tap decrement button
+		callIconDelegate("onmousedown", decBtn);
+		this.clock.tick(t);
+		callIconDelegate("ontouchend", decBtn);
+
+		assert.equal(this.stepInput.getValue(), 0.5, "Input has value of 0.5");
+		assert.equal(this.stepInput._getInput().getValue(), "0.5", "Displayed value uses '.' not locale ',' on mobile");
+	});
+
+	QUnit.test("Touch start on incrementButton when having max value set", function (assert) {
+		// time for which the value will get from 1.0 to 2.5 (3 steps of 0.5)
+		var t = calcTime(this.stepInput, 2),
+			incBtn = this.stepInput._getIncrementButton();
+
+		// Act - hold increment button
+		callIconDelegate("onmousedown", incBtn);
+		this.clock.tick(t);
+
+		assert.equal(this.stepInput._getInput().getValue(), "2.5", "Input has value of 2.5");
+
+		// keep holding until max value of 3.0 is reached
+		this.clock.tick(2000);
+
+		callIconDelegate("ontouchend", incBtn);
+
+		assert.ok(this.stepInput._getInput().getValue() === "3.0", "Input has reached the max value of 3.0 with dot separator");
+		assert.equal(this.oChangeSpy.callCount, 1, "Change Event should be called once");
+	});
+
+	QUnit.test("Touch start on decrementButton when having min value set", function (assert) {
+		// time for which the value will get from 1.0 to 0.5 (1 step of 0.5)
+		var t = calcTime(this.stepInput, 0),
+			decBtn = this.stepInput._getDecrementButton();
+
+		// Act - hold decrement button
+		callIconDelegate("onmousedown", decBtn);
+		this.clock.tick(t);
+
+		assert.equal(this.stepInput._getInput().getValue(), "0.5", "Input has value of 0.5");
+
+		// keep holding until min value of 0.0 is reached
+		this.clock.tick(2000);
+
+		callIconDelegate("ontouchend", decBtn);
+
+		assert.ok(this.stepInput._getInput().getValue() === "0.0", "Input has reached the min value of 0.0 with dot separator");
 		assert.equal(this.oChangeSpy.callCount, 1, "Change Event should be called once");
 	});
 
