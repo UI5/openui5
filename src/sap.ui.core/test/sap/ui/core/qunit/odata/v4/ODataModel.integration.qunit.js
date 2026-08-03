@@ -2585,7 +2585,8 @@ sap.ui.define([
 		 *   The content ID of the request within the change set
 		 * @param {number} [vRequest.batchNo]
 		 *   The number of the ($direct or $batch) request within the test (starting with 1); use a
-		 *   negative number to expect a $direct request; see also <code>sURL</code>
+		 *   negative number to expect a $direct request; see also <code>sURL</code>; use 0 as a
+		 *   symbolic value for the current batchNo to group multiple requests together
 		 * @param {number} [vRequest.changeSetNo]
 		 *   The number of the change set within $batch (starting with 1)
 		 * @param {string} [vRequest.groupId]
@@ -2649,7 +2650,7 @@ sap.ui.define([
 				vRequest = {url : sURL};
 			}
 			if (vRequest.url.startsWith("#")) { // "#batchNo ..."
-				if (vRequest.batchNo || vRequest.changeSetNo) {
+				if (vRequest.batchNo !== undefined || vRequest.changeSetNo) {
 					throw new Error("Don't mix property usage and compact URL notation of batchNo"
 						+ " and changeSetNo");
 				}
@@ -2662,6 +2663,9 @@ sap.ui.define([
 					vRequest.changeSetNo = parseInt(aNumbers[1]);
 				}
 				vRequest.url = vRequest.url.slice(iSpace + 1);
+			}
+			if (vRequest.batchNo === 0) {
+				vRequest.batchNo = this.iBatchNo + 1;
 			}
 			const aURLParts = rStartsWithMethod.exec(vRequest.url);
 			if (aURLParts) {
@@ -42279,7 +42283,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-2547
 	//
 	// Moving a node works as expected, even if a side-effects refresh is initiated synchronously
-	// after the move operation.
+	// after the move operation. If a node (Alpha) is moved to a position after a client-side
+	// collapsed node (Gamma), the index of the moved node is correct regardless of whether a
+	// side-effects refresh runs concurrently.
 	// JIRA: CPOUI5ODATAV4-3607
 [false, true].forEach((bWithSideEffectsRefresh) => {
 	const sTitle = "Recursive Hierarchy: move outside of view"
@@ -42287,7 +42293,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 	QUnit.test(sTitle, async function (assert) {
 		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
-		const sUrl = "EMPLOYEES?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
+		let sUrl = "EMPLOYEES?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
 			+ "HierarchyNodes=$root/EMPLOYEES,HierarchyQualifier='OrgChart',NodeProperty='ID')";
 		const sSelect = "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,Name";
 		const sView = `
@@ -42303,12 +42309,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<Text text="{Name}"/>
 </t:Table>`;
 
-		// 1 Alpha
-		//   2 Beta
-		// 3 Gamma
-		// 4 Delta
+		// 1 Alpha   After 1st move: 1 Alpha          After 2nd move: 3 Gamma (collapsed)
+		//   2 Beta                  3 Gamma                          5 Epsilon
+		// 3 Gamma                     4 Delta                          1 Alpha (moved here)
+		//   4 Delta                 5 Epsilon                        2 Beta
+		// 5 Epsilon                 2 Beta (moved here)
 		this.expectRequest(sUrl + sSelect + "&$count=true&$skip=0&$top=3", {
-				"@odata.count" : "4",
+				"@odata.count" : "5",
 				value : [{
 					DescendantCount : "1",
 					DistanceFromRoot : "0",
@@ -42322,9 +42329,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					ID : "2",
 					Name : "Beta"
 				}, {
-					DescendantCount : "0",
+					DescendantCount : "1",
 					DistanceFromRoot : "0",
-					DrillState : "leaf",
+					DrillState : "expanded",
 					ID : "3",
 					Name : "Gamma"
 				}]
@@ -42340,10 +42347,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		], [
 			[true, 1, "Alpha"],
 			[undefined, 2, "Beta"],
-			[undefined, 1, "Gamma"]
-		], 4);
+			[true, 1, "Gamma"]
+		], 5);
 		const oListBinding = oTable.getBinding("rows");
-		const oBeta = oListBinding.getCurrentContexts()[1];
+		const [oAlpha, oBeta, oGamma] = oListBinding.getCurrentContexts();
 
 		this.expectRequest("#2 PATCH EMPLOYEES('2')", {
 				headers : {
@@ -42355,46 +42362,43 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}, oNO_CONTENT)
 			.expectRequest("#2 " + sUrl + "&$filter=ID eq '2'&$select=LimitedRank", {
 				value : [{
-					LimitedRank : "3"
+					LimitedRank : "4"
 				}]
 			});
-		// 1 Alpha
-		// 3 Gamma
-		// 4 Delta
-		// 2 Beta (moved here)
+
 		if (bWithSideEffectsRefresh) {
 			this.expectRequest("#2 " + sUrl + sSelect + "&$count=true&$skip=0&$top=3", {
-				"@odata.count" : "4",
-				value : [{
-					DescendantCount : "0",
-					DistanceFromRoot : "0",
-					DrillState : "leaf",
-					ID : "1",
-					Name : "Alpha"
-				}, {
-					DescendantCount : "0",
-					DistanceFromRoot : "0",
-					DrillState : "leaf",
-					ID : "3",
-					Name : "Gamma"
-				}, {
-					DescendantCount : "0",
-					DistanceFromRoot : "0",
-					DrillState : "leaf",
-					ID : "4",
-					Name : "Delta"
-				}]
-			});
+					"@odata.count" : "5",
+					value : [{
+						DescendantCount : "0",
+						DistanceFromRoot : "0",
+						DrillState : "leaf",
+						ID : "1",
+						Name : "Alpha"
+					}, {
+						DescendantCount : "1",
+						DistanceFromRoot : "0",
+						DrillState : "expanded",
+						ID : "3",
+						Name : "Gamma"
+					}, {
+						DescendantCount : "0",
+						DistanceFromRoot : "1",
+						DrillState : "leaf",
+						ID : "4",
+						Name : "Delta"
+					}]
+				});
 		} else {
 			this.expectRequest("#3 " + sUrl + sSelect + "&$skip=2&$top=1", {
-				value : [{
-					DescendantCount : "0",
-					DistanceFromRoot : "0",
-					DrillState : "leaf",
-					ID : "4",
-					Name : "Delta"
-				}]
-			});
+					value : [{
+						DescendantCount : "0",
+						DistanceFromRoot : "1",
+						DrillState : "leaf",
+						ID : "4",
+						Name : "Delta"
+					}]
+				});
 		}
 
 		await Promise.all([
@@ -42406,22 +42410,120 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		]);
 
 		checkTable("after move 2 (Beta) to root", assert, oTable, [
-			"/EMPLOYEES('1')",
-			"/EMPLOYEES('3')",
+			oAlpha,
+			oGamma,
 			"/EMPLOYEES('4')",
 			!bWithSideEffectsRefresh && oBeta
 		], [
 			[undefined, 1, "Alpha"],
-			[undefined, 1, "Gamma"],
-			[undefined, 1, "Delta"]
-		], 4);
+			[true, 1, "Gamma"],
+			[undefined, 2, "Delta"]
+		], 5);
 		assert.strictEqual(oBeta.getBinding(),
 			bWithSideEffectsRefresh ? undefined : oListBinding,
 			"after side-effects refresh oBeta is destroyed");
-		assert.strictEqual(oBeta.getIndex(), 3, "getIndex() returns the correct index");
+		assert.strictEqual(oBeta.getIndex(), 4, "getIndex() returns the correct index");
 
-		this.expectRequestIf(bWithSideEffectsRefresh, "#3 " + sUrl + sSelect + "&$skip=3&$top=1", {
+		if (bWithSideEffectsRefresh) {
+			this.expectRequest("#3 " + sUrl + sSelect + "&$skip=3&$top=2", {
 				value : [{
+					DescendantCount : "0",
+					DistanceFromRoot : "0",
+					DrillState : "leaf",
+					ID : "5",
+					Name : "Epsilon"
+				}, {
+					DescendantCount : "0",
+					DistanceFromRoot : "0",
+					DrillState : "leaf",
+					ID : "2",
+					Name : "Beta"
+				}]
+			});
+		} else {
+			this.expectRequest("#4 " + sUrl + sSelect + "&$skip=3&$top=1", {
+				value : [{
+					DescendantCount : "0",
+					DistanceFromRoot : "0",
+					DrillState : "leaf",
+					ID : "5",
+					Name : "Epsilon"
+				}]
+			});
+		}
+
+		oTable.setFirstVisibleRow(oBeta.getIndex());
+
+		await Promise.all([
+			resolveLater(), // table update takes a moment
+			this.waitForChanges(assert, "scroll to 2 (Beta)")
+		]);
+
+		checkTable("after scroll to 2 (Beta)", assert, oTable, [
+			oAlpha,
+			oGamma,
+			"/EMPLOYEES('4')",
+			"/EMPLOYEES('5')",
+			// in case of a side-effects refresh, oBeta gets destroyed and recreated
+			bWithSideEffectsRefresh ? oBeta.getPath() : oBeta
+		], [
+			[undefined, 2, "Delta"],
+			[undefined, 1, "Epsilon"],
+			[undefined, 1, "Beta"]
+		], 5);
+
+		if (!bWithSideEffectsRefresh) {
+			// moving a node behind a collapsed node without a side-effects refresh is already
+			// tested by other tests
+			return;
+		}
+
+		oGamma.collapse();
+
+		await this.waitForChanges(assert, "collapse 3 (Gamma)");
+
+		checkTable("after collapse 3 (Gamma)", assert, oTable, [
+			oAlpha,
+			oGamma,
+			"/EMPLOYEES('5')",
+			oBeta.getPath()
+		], [
+			[false, 1, "Gamma"],
+			[undefined, 1, "Epsilon"],
+			[undefined, 1, "Beta"]
+		], 4);
+
+		const oEpsilon = oListBinding.getCurrentContexts()[1];
+		sUrl = sUrl.slice(0, -1)
+			+ ",ExpandLevels=" + JSON.stringify([{NodeID : "3", Levels : 0}]) + ")";
+		this.expectRequest("#0 PATCH EMPLOYEES('1')", {
+				headers : {
+					Prefer : "return=minimal"
+				},
+				payload : {
+					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('5')"
+				}
+			}, oNO_CONTENT)
+			.expectRequest("#0 " + sUrl + "&$filter=ID eq '1'&$select=LimitedRank", {
+				value : [{
+					LimitedRank : "2"
+				}]
+			})
+			.expectRequest("#0 " + sUrl + sSelect + "&$count=true&$skip=1&$top=3", {
+				"@odata.count" : "4",
+				value : [{
+					DescendantCount : "1",
+					DistanceFromRoot : "0",
+					DrillState : "expanded",
+					ID : "5",
+					Name : "Epsilon"
+				}, {
+					DescendantCount : "0",
+					DistanceFromRoot : "1",
+					DrillState : "leaf",
+					ID : "1",
+					Name : "Alpha"
+				}, {
 					DescendantCount : "0",
 					DistanceFromRoot : "0",
 					DrillState : "leaf",
@@ -42430,25 +42532,24 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				}]
 			});
 
-		// "The index of the first visible row is too high. The value has been set to 1."
-		oTable.setFirstVisibleRow(/*3*/ 1);
-
 		await Promise.all([
-			resolveLater(), // table update takes a moment
-			this.waitForChanges(assert, "scroll to 2 (Beta)")
+			// code under test
+			oAlpha.move({parent : oEpsilon}),
+			// code under test (JIRA: CPOUI5ODATAV4-3607)
+			oListBinding.getHeaderContext().requestSideEffects([""]),
+			this.waitForChanges(assert, "move 1 (Alpha) to 5 (Epsilon)")
 		]);
 
-		checkTable("after scroll to 2 (Beta)", assert, oTable, [
-			"/EMPLOYEES('1')",
-			"/EMPLOYEES('3')",
-			"/EMPLOYEES('4')",
-			// in case of a side-effects refresh, oBeta gets destroyed and recreated
-			bWithSideEffectsRefresh ? oBeta.getPath() : oBeta
+		checkTable("after move 1 (Alpha) to 5 (Epsilon)", assert, oTable, [
+			oEpsilon,
+			oAlpha, // "Alpha" is still part of the table, so oAlpha is reused
+			oBeta.getPath()
 		], [
-			[undefined, 1, "Gamma"],
-			[undefined, 1, "Delta"],
+			[true, 1, "Epsilon"],
+			[undefined, 2, "Alpha"],
 			[undefined, 1, "Beta"]
 		], 4);
+		assert.strictEqual(oAlpha.getIndex(), 2, "getIndex() returns the correct index");
 	});
 });
 
@@ -46434,8 +46535,7 @@ make root = ${bMakeRoot}`;
 				}]
 			});
 
-		// "The index of the first visible row is too high. The value has been set to 1."
-		oTable.setFirstVisibleRow(/*4*/ 1);
+		oTable.setFirstVisibleRow(oDelta.getIndex());
 
 		await this.waitForChanges(assert, "scroll to Delta");
 
