@@ -1,0 +1,133 @@
+{
+	"_version": "1.81.1",
+	"sap.app": {
+		"id": "samples.taskCenter.provider.task1.card2.details",
+		"type": "card",
+		"title": "Sample of a Table with Preview of Details for Each Row",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"tags": {
+			"keywords": [
+				"TaskCenter",
+				"Sample",
+				"Table",
+				"ShowCard"
+			]
+		}
+	},
+	"sap.card": {
+		"type": "Object",
+		"configuration": {
+			"useMainDestinations": true,
+			"parameters": {
+				"orderId": {
+					"value": null
+				}
+			}
+		},
+		"data": {
+			"request": {
+				"url": "{{mainDestinations.northwind}}/Orders({parameters>/orderId/value})",
+				"parameters": {
+					"$expand": "Customer,Employee,Shipper"
+				}
+			}
+		},
+		"header": {
+			"title": "Order Details - Order #{OrderID}",
+			"subtitle": "{ShipName}",
+			"icon": {
+				"src": "sap-icon://sales-order"
+			}
+		},
+		"content": {
+			"groups": [
+				{
+					"title": "Order Details",
+					"items": [
+						{
+							"label": "Order Date",
+							"value": "{= format.dateTime(${OrderDate}, { style: 'medium' }) }"
+						},
+						{
+							"label": "Required Date",
+							"value": "{= format.dateTime(${RequiredDate}, { style: 'medium' }) }"
+						},
+						{
+							"label": "Shipped Date",
+							"value": "{= ${ShippedDate} ? format.dateTime(${ShippedDate}, { style: 'medium' }) : 'Not Shipped' }"
+						},
+						{
+							"label": "Freight",
+							"value": "{= format.currency(${Freight}, 'USD') }"
+						}
+					]
+				},
+				{
+					"title": "Customer",
+					"items": [
+						{
+							"label": "Company Name",
+							"value": "{Customer/CompanyName}"
+						},
+						{
+							"label": "Contact Name",
+							"value": "{Customer/ContactName}"
+						},
+						{
+							"label": "Phone",
+							"value": "Call: {Customer/Phone}",
+							"actions": [
+								{
+									"type": "Navigation",
+									"parameters": {
+										"url": "tel:{Customer/Phone}"
+									}
+								}
+							]
+						}
+					]
+				},
+				{
+					"title": "Shipping",
+					"items": [
+						{
+							"label": "Ship Name",
+							"value": "{ShipName}"
+						},
+						{
+							"label": "Address",
+							"value": "{ShipAddress}"
+						},
+						{
+							"label": "Ship City",
+							"value": "{ShipCity}"
+						},
+						{
+							"label": "Ship Country",
+							"value": "{ShipCountry}"
+						},
+						{
+							"label": "Shipper",
+							"value": "{Shipper/CompanyName}"
+						}
+					]
+				},
+				{
+					"title": "Employee",
+					"items": [
+						{
+							"label": "Employee Name",
+							"value": "{Employee/FirstName} {Employee/LastName}"
+						},
+						{
+							"label": "Title",
+							"value": "{Employee/Title}"
+						}
+					]
+				}
+			]
+		}
+	}
+}

@@ -77,6 +77,12 @@
 								<f:GridContainerItemLayoutData columns="6" />
 							</w:layoutData>
 						</w:Card>
+						<w:Card manifest="{cardsPlayground>/playgroundBaseUrl}cardcontent/pagination/table/tableWithFiltersAndShowCard.manifest.json"
+								action=".onAction">
+							<w:layoutData>
+								<f:GridContainerItemLayoutData columns="6" />
+							</w:layoutData>
+						</w:Card>
 					</f:GridContainer>
 				</IconTabFilter>
 				<IconTabFilter text="Timeline">

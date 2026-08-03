@@ -1,0 +1,228 @@
+{
+	"_version": "1.81.1",
+	"sap.app": {
+		"id": "samples.taskCenter.provider.task1.card2.main",
+		"type": "card",
+		"title": "Sample of a Table with Preview of Details for Each Row",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"tags": {
+			"keywords": [
+				"TaskCenter",
+				"Sample",
+				"Table",
+				"ShowCard"
+			]
+		}
+	},
+	"sap.card": {
+		"configuration": {
+			"destinations": {
+				"northwind": {
+					"name": "Northwind_V4",
+					"defaultUrl": "https://services.odata.org/V4/Northwind/Northwind.svc"
+				}
+			},
+			"parameters": {
+				"taskId": {
+					"value": null
+				}
+			},
+			"childCards": {
+				"detailsCard": {
+					"manifest": "./tableWithFiltersAndShowCard.details.json"
+				}
+			},
+			"filters": {
+				"orderId": {
+					"type": "Search",
+					"label": "Order ID",
+					"placeholder": "Search by Order ID"
+				},
+				"customerId": {
+					"type": "ComboBox",
+					"label": "Customer",
+					"placeholder": "Customer",
+					"data": {
+						"request": {
+							"url": "{{destinations.northwind}}/Customers",
+							"parameters": {
+								"$select": "CustomerID,CompanyName",
+								"$orderby": "CompanyName"
+							}
+						}
+					},
+					"item": {
+						"path": "/value",
+						"template": { "key": "{CustomerID}", "title": "{CompanyName}", "additionalText": "{CustomerID}" }
+					}
+				},
+				"shipName": {
+					"type": "Search",
+					"label": "Ship Name",
+					"placeholder": "Ship Name"
+				},
+				"shipCity": {
+					"type": "ComboBox",
+					"label": "Ship City",
+					"placeholder": "Ship City",
+					"data": {
+						"json": [
+							{ "key": "Berlin", "text": "Berlin" },
+							{ "key": "Bern", "text": "Bern" },
+							{ "key": "Buenos Aires", "text": "Buenos Aires" },
+							{ "key": "Graz", "text": "Graz" },
+							{ "key": "Helsinki", "text": "Helsinki" },
+							{ "key": "Köln", "text": "Köln" },
+							{ "key": "Lisboa", "text": "Lisboa" },
+							{ "key": "London", "text": "London" },
+							{ "key": "Madrid", "text": "Madrid" },
+							{ "key": "Marseille", "text": "Marseille" },
+							{ "key": "México D.F.", "text": "México D.F." },
+							{ "key": "München", "text": "München" },
+							{ "key": "Nantes", "text": "Nantes" },
+							{ "key": "Paris", "text": "Paris" },
+							{ "key": "Portland", "text": "Portland" },
+							{ "key": "Rio de Janeiro", "text": "Rio de Janeiro" },
+							{ "key": "Salzburg", "text": "Salzburg" },
+							{ "key": "San Francisco", "text": "San Francisco" },
+							{ "key": "São Paulo", "text": "São Paulo" },
+							{ "key": "Seattle", "text": "Seattle" },
+							{ "key": "Strasbourg", "text": "Strasbourg" },
+							{ "key": "Stuttgart", "text": "Stuttgart" },
+							{ "key": "Toulouse", "text": "Toulouse" },
+							{ "key": "Warszawa", "text": "Warszawa" }
+						]
+					},
+					"item": {
+						"path": "/",
+						"template": { "key": "{key}", "title": "{text}" }
+					}
+				},
+				"shipCountry": {
+					"type": "ComboBox",
+					"label": "Ship Country",
+					"placeholder": "Ship Country",
+					"data": {
+						"json": [
+							{ "key": "Argentina", "text": "Argentina" },
+							{ "key": "Austria", "text": "Austria" },
+							{ "key": "Belgium", "text": "Belgium" },
+							{ "key": "Brazil", "text": "Brazil" },
+							{ "key": "Canada", "text": "Canada" },
+							{ "key": "Denmark", "text": "Denmark" },
+							{ "key": "Finland", "text": "Finland" },
+							{ "key": "France", "text": "France" },
+							{ "key": "Germany", "text": "Germany" },
+							{ "key": "Ireland", "text": "Ireland" },
+							{ "key": "Italy", "text": "Italy" },
+							{ "key": "Mexico", "text": "Mexico" },
+							{ "key": "Norway", "text": "Norway" },
+							{ "key": "Poland", "text": "Poland" },
+							{ "key": "Portugal", "text": "Portugal" },
+							{ "key": "Spain", "text": "Spain" },
+							{ "key": "Sweden", "text": "Sweden" },
+							{ "key": "Switzerland", "text": "Switzerland" },
+							{ "key": "UK", "text": "UK" },
+							{ "key": "USA", "text": "USA" },
+							{ "key": "Venezuela", "text": "Venezuela" }
+						]
+					},
+					"item": {
+						"path": "/",
+						"template": { "key": "{key}", "title": "{text}" }
+					}
+				},
+				"orderDate": {
+					"type": "DateRange",
+					"label": "Order Date",
+					"placeholder": "Select order date range",
+					"options": ["dateRange", "date", "from", "to", "lastDays", "nextDays", "today", "yesterday", "thisWeek", "thisMonth", "thisQuarter", "thisYear"]
+				},
+				"sort": {
+					"type": "Select",
+					"label": "Sort",
+					"items": [
+						{ "title": "Order Date (newest first)", "key": "OrderDate desc" },
+						{ "title": "Order Date (oldest first)", "key": "OrderDate asc" },
+						{ "title": "Ship Name A-Z", "key": "ShipName asc" },
+						{ "title": "Ship Name Z-A", "key": "ShipName desc" },
+						{ "title": "Ship Country A-Z", "key": "ShipCountry asc" },
+						{ "title": "Ship Country Z-A", "key": "ShipCountry desc" }
+					]
+				}
+			}
+		},
+		"type": "Table",
+		"data": {
+			"request": {
+				"url": "{{destinations.northwind}}/Orders",
+				"parameters": {
+					"$select": "OrderID,CustomerID,OrderDate,ShipName,ShipCity,ShipCountry",
+					"$orderby": "{filters>/sort/value}",
+					"$filter": "{= 'contains(CustomerID,' + String.fromCharCode(39) + (${filters>/customerId/selectedItem/key} || '') + String.fromCharCode(39) + ') and contains(ShipName,' + String.fromCharCode(39) + ${filters>/shipName/value} + String.fromCharCode(39) + ') and contains(ShipCity,' + String.fromCharCode(39) + ${filters>/shipCity/value} + String.fromCharCode(39) + ') and contains(ShipCountry,' + String.fromCharCode(39) + ${filters>/shipCountry/value} + String.fromCharCode(39) + ')' + (${filters>/orderId/value} ? ' and OrderID eq ' + ${filters>/orderId/value} : '') + (${filters>/orderDate/rangeOData/start} ? ' and OrderDate ge ' + ${filters>/orderDate/rangeOData/start} + ' and OrderDate le ' + ${filters>/orderDate/rangeOData/end} : '') }",
+					"$count": true,
+					"$skip": "{paginator>/skip}",
+					"$top": "{parameters>/top/value}"
+				}
+			},
+			"path": "/value"
+		},
+		"header": {
+			"title": "Sample of a Table with Preview of Details",
+			"subtitle": "Select a row to see details",
+			"status": {
+				"text": "{= format.text('{0} of {1}', [${parameters>/visibleItems}, ${/@odata.count}]) }"
+			}
+		},
+		"content": {
+			"autoPopinMode": true,
+			"row": {
+				"columns": [
+					{
+						"title": "Order ID",
+						"value": "{OrderID}"
+					},
+					{
+						"title": "Customer",
+						"value": "{CustomerID}"
+					},
+					{
+						"title": "Ship Name",
+						"value": "{ShipName}"
+					},
+					{
+						"title": "Ship City",
+						"value": "{ShipCity}"
+					},
+					{
+						"title": "Ship Country",
+						"value": "{ShipCountry}"
+					},
+					{
+						"title": "Order Date",
+						"value": "{= format.dateTime(${OrderDate}, { style: 'medium' }) }"
+					}
+				],
+				"actions": [
+					{
+						"type": "ShowCard",
+						"parameters": {
+							"childCardKey": "detailsCard",
+							"parameters": {
+								"orderId": "{OrderID}"
+							}
+						}
+					}
+				]
+			}
+		},
+		"footer": {
+			"paginator": {
+				"totalCount": "{/@odata.count}",
+				"pageSize": 8
+			}
+		}
+	}
+}

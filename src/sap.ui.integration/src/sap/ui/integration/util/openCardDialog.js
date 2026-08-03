@@ -21,6 +21,13 @@ sap.ui.define([
 
 	const CardDataMode = library.CardDataMode;
 
+	function _isPopinTable(oChildCard) {
+		const sCardType = oChildCard.getManifestEntry("/sap.card/type");
+		const bAutoPopinMode = oChildCard.getManifestEntry("/sap.card/content/autoPopinMode");
+
+		return sCardType === "Table" && bAutoPopinMode;
+	}
+
 	function _addAnimationDelegate(oDialog, oParentCard) {
 		const oParentRect = oParentCard.getDomRef().getBoundingClientRect();
 		const oParentPos = {
@@ -164,11 +171,12 @@ sap.ui.define([
 			_setFocus(oChildCard, oDialog);
 		});
 
-		if (!Device.system.phone) {
-			_addAnimationDelegate(oDialog, oParentCard);
-		}
-
 		oChildCard.attachManifestReady(() => {
+			// Skip animation for table cards with autoPopinMode due to broken combination of animation and resize during opening
+			if (!Device.system.phone && !oDialog.isOpen() && !_isPopinTable(oChildCard)) {
+				_addAnimationDelegate(oDialog, oParentCard);
+			}
+
 			// component card does not trigger the ready event if it hasn't been rendered yet
 			if (oChildCard._isComponentCard()) {
 				oDialog.open();
