@@ -1,0 +1,17 @@
+{
+  "1.152.0": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "1646f162498d9bdd0a4ac291ba926ef82633c4b8",
+        "type": "FIX",
+        "text": " sap.f.HeroBanner: metadata tag property is taken from the parent, instead of hardcoded."
+      },
+      {
+        "id": "322773639dc35947477eed032c8c048e100ce4d0",
+        "type": "FEATURE",
+        "text": " sap.f: Add HeroBanner control"
+      }
+    ]
+  }
+}

@@ -1,7 +1,12 @@
 {
   "1.152.0": {
-    "date": "July 2026",
+    "date": "August 2026",
     "notes": [
+      {
+        "id": "a60effdf5e151d12a0adfd94b3925bc8ea7bd89e",
+        "type": "FIX",
+        "text": " MDC.Link: link items caching now works correct when binding path is same with empty stale cache items"
+      },
       {
         "id": "d43779e10b83ab3261bebc1ffee9622c851f9d9a",
         "type": "FIX",

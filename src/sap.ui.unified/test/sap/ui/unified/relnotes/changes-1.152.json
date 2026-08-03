@@ -1,7 +1,12 @@
 {
   "1.152.0": {
-    "date": "July 2026",
+    "date": "August 2026",
     "notes": [
+      {
+        "id": "3668cfad878eb5ce0b1daa87109eaf77e3bf3998",
+        "type": "FEATURE",
+        "text": " sap.ui.unified.Calendar: add ariaHasPopup for special day cells"
+      },
       {
         "id": "c804c6f12a44921a4ea966039b8dc70df9a0cb71",
         "type": "FEATURE",

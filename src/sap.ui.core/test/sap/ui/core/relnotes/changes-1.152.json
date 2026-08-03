@@ -1,7 +1,17 @@
 {
   "1.152.0": {
-    "date": "July 2026",
+    "date": "August 2026",
     "notes": [
+      {
+        "id": "aeee39f79a50a4c5f2016e57d432e710df0fcd9a",
+        "type": "FIX",
+        "text": " core/RenderManager: function 'icon' extended with 'mStyles' parameter"
+      },
+      {
+        "id": "218cd8f0ce53359df92d0cb7d0cfc9cc1d7f9028",
+        "type": "FIX",
+        "text": " sap/ui/core/format/ListFormat#format: keep '$' in values literal"
+      },
       {
         "id": "34fc1f23b48534eb4a9b907102bbf00699a3ac0c",
         "type": "FIX",

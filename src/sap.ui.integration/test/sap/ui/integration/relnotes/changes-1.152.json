@@ -1,0 +1,12 @@
+{
+  "1.152.0": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "345843a5e02345188a66276c59b57e31d21a8901",
+        "type": "FIX",
+        "text": " Integration Cards: '{i18n>}' binding in static filter items is now resolved"
+      }
+    ]
+  }
+}

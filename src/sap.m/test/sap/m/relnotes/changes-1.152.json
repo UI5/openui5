@@ -1,7 +1,47 @@
 {
   "1.152.0": {
-    "date": "July 2026",
+    "date": "August 2026",
     "notes": [
+      {
+        "id": "aa9f891cc1dbfcc0cb1d341ef1428b92d4b339b0",
+        "type": "FIX",
+        "text": " Date and Time Pickers: Fix input width in responsive mode"
+      },
+      {
+        "id": "aeee39f79a50a4c5f2016e57d432e710df0fcd9a",
+        "type": "FIX",
+        "text": " core/RenderManager: function 'icon' extended with 'mStyles' parameter"
+      },
+      {
+        "id": "daf0aeaf6dbf583629c37d29fdefa9f2fc466176",
+        "type": "FIX",
+        "text": " sap.m.MultiInput: reset first token truncated state on updateTokens"
+      },
+      {
+        "id": "32abfa68866cdbefd2d2dab3c5db8485d2b755e0",
+        "type": "FEATURE",
+        "text": " sap.m.Menu: viewport-based PAGE_UP/PAGE_DOWN navigation"
+      },
+      {
+        "id": "848a0284fd4221a36ca0af07b5edda8cda165fc1",
+        "type": "FIX",
+        "text": " sap.m.DateHighZoomInputs: fix day-count overflow on day 31"
+      },
+      {
+        "id": "992434a8be1f95f2270435d742db8a3566007247",
+        "type": "FIX",
+        "text": " sap.m.Select: Fix aria-activeDescendant"
+      },
+      {
+        "id": "8a629418ac54d85007ac6642d493b942301653f7",
+        "type": "FIX",
+        "text": " sap.m.MessageView: Details page icon is now moved to the top for screen readers"
+      },
+      {
+        "id": "2ee90f5a6463de5ffe9cc036ea3f00d0ae36c134",
+        "type": "FIX",
+        "text": " sap.m.StepInput: Error state is cleared if correct value is set"
+      },
       {
         "id": "03231d54f29b336920f4e09183bbcb265e8a68e7",
         "type": "FIX",

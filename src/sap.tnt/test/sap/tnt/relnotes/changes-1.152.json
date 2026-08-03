@@ -1,0 +1,12 @@
+{
+  "1.152.0": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "21841c989e847d0c8731a2dea7566d913928ebaa",
+        "type": "FIX",
+        "text": " sap.tnt.SideNavigation: Content no longer reflows during collapse/expand animation"
+      }
+    ]
+  }
+}
