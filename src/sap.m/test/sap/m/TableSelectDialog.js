@@ -1074,7 +1074,14 @@ sap.ui.define([
 		noDataText: "Table Select Dialog with resizable and draggable true no data",
 		contentWidth: "1000px",
 		resizable: true,
-		draggable: true
+		draggable: true,
+		columns: [
+			new Column({
+				header: new Label({
+					text: "Item"
+				})
+			})
+		]
 	});
 
 	// set model & bind Aggregation
