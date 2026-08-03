@@ -1,7 +1,22 @@
 {
   "1.151.0": {
-    "date": "July 2026",
+    "date": "August 2026",
     "notes": [
+      {
+        "id": "024cdb0e17d639e4f20934d99e478d2a84c39218",
+        "type": "FIX",
+        "text": "p13n.FilterPanel: fix import"
+      },
+      {
+        "id": "ee3e93692fd386d20a48672cea62ba8e820e2646",
+        "type": "FIX",
+        "text": " sap.m.DatePicker: not setting min/max date if there are no"
+      },
+      {
+        "id": "8b4acf962669dd98fdf7189b231c8b50a61c093c",
+        "type": "FIX",
+        "text": "p13n.FilterPanel: announcement missing on adding filter"
+      },
       {
         "id": "d2543cc867382f566b55f438af5515ec7231e5cb",
         "type": "FIX",
@@ -16,6 +31,11 @@
         "id": "e0658796a4839b82168e59a89408edf668f76613",
         "type": "FIX",
         "text": "p13n.SelectionPanel: add anouncements for reordering"
+      },
+      {
+        "id": "ca6c999f9f018ac244007f22d295718c9a2dfac9",
+        "type": "FIX",
+        "text": " We've now improved the screen reader announcements for the Edit and Delete buttons on the UploadSet control"
       },
       {
         "id": "940d07b74ef2af62e916c8ec15540cd46e2b1b06",
