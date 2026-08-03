@@ -13,6 +13,7 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/Storage",
 	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/fl/initial/api/Version",
+	"test-resources/sap/ui/fl/qunit/FlQUnitUtils",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	Deferred,
@@ -27,6 +28,7 @@ sap.ui.define([
 	Storage,
 	StorageUtils,
 	Version,
+	FlQUnitUtils,
 	sinon
 ) {
 	"use strict";
@@ -1233,6 +1235,64 @@ sap.ui.define([
 			assert.strictEqual(oCachedData2.appDescriptorChanges.length, 1, "the manifest change is still stored");
 			assert.strictEqual(oCachedData2.annotationChanges.length, 1, "the annotation change is still stored");
 			assert.strictEqual(oCachedData2.ui2personalization, "newData2", "the ui2 data is updated");
+		});
+	});
+
+	// ---------------------------------------------------------------------------------------------
+	// Contract guards for the UI5 Flexibility Support Chrome extension
+	// (repo: ui5-flexibility/ui5-flexibility-support-chrome-extension).
+	//
+	// The extension sets a conditional debugger breakpoint on a specific source line of this
+	// module and injects JavaScript that runs in that stack frame to filter the flex data changes
+	// before they are applied.
+	// ---------------------------------------------------------------------------------------------
+	QUnit.module("UI5 Flexibility Support extension breakpoint contract", () => {
+		// Extracts the dependency module names from the sap.ui.define([...]) array of the given
+		// source, so the contract tests below assert an actual declared dependency rather than a
+		// substring that could also match a comment or a lazy load.
+		function getDefineDependencies(sSource) {
+			const oMatch = sSource.match(/sap\.ui\.define\(\s*\[([^\]]*)\]/);
+			if (!oMatch) {
+				return [];
+			}
+			return oMatch[1]
+			.split(",")
+			.map((sEntry) => sEntry.trim().replace(/^["']|["']$/g, ""))
+			.filter((sEntry) => sEntry.length > 0);
+		}
+
+		QUnit.test("the breakpoint anchor line still exists in the Loader source", async (assert) => {
+			const sSource = await FlQUnitUtils.getModuleSourceCode("sap/ui/fl/initial/_internal/Loader");
+			assert.ok(
+				sSource.includes("const oFlexDataCopy = Object.assign({}, oFlexData);"),
+				"the anchor line used by the UI5 Flexibility Support extension is present - "
+				+ "if you must change it, update ReloadOptionsUtils.js in the extension"
+			);
+		});
+
+		QUnit.test("StorageUtils.getAllFlexObjectNamespaces is available", async (assert) => {
+			// The extension's "remove all changes" logic (buildChangesBreakpointCondition() in
+			// ReloadOptionsUtils.js) needs StorageUtil.getAllFlexObjectNamespaces() to exist and the
+			// module StorageUtil to be loaded in Loader.js.
+			assert.ok(StorageUtils.getAllFlexObjectNamespaces, "the StorageUtils.getAllFlexObjectNamespaces function is present - "
+				+ "if you must change it, update ReloadOptionsUtils.js in the extension");
+			const sSource = await FlQUnitUtils.getModuleSourceCode("sap/ui/fl/initial/_internal/Loader");
+			assert.ok(
+				getDefineDependencies(sSource).includes("sap/ui/fl/initial/_internal/StorageUtils"),
+				"the StorageUtils module is declared as a dependency in Loader.js - "
+				+ "if you must change it, update ReloadOptionsUtils.js in the extension"
+			);
+		});
+
+		QUnit.test("ObjectPath is available", async (assert) => {
+			// The extension's "remove all changes" logic (buildChangesBreakpointCondition() in
+			// ReloadOptionsUtils.js) needs ObjectPath to be loaded in Loader.js.
+			const sSource = await FlQUnitUtils.getModuleSourceCode("sap/ui/fl/initial/_internal/Loader");
+			assert.ok(
+				getDefineDependencies(sSource).includes("sap/base/util/ObjectPath"),
+				"the ObjectPath module is declared as a dependency in Loader.js - "
+				+ "if you must change it, update ReloadOptionsUtils.js in the extension"
+			);
 		});
 	});
 });
