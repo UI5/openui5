@@ -2144,6 +2144,34 @@ sap.ui.define([
 		assert.equal(this.oUploadSet.getSelectedItems().length, 2, "2 items are selected with property selected bound to each UploadSetItem");
 	});
 
+	QUnit.test("Multiselect checkbox is square and content gap is correct to prevent focus ring from bleeding into file icon", async function(assert) {
+		// Arrange
+		this.oUploadSet.placeAt("qunit-fixture");
+		await nextUIUpdate();
+		this.oUploadSet.setMode(ListMode.MultiSelect);
+		await nextUIUpdate();
+
+		var oList = this.oUploadSet._oList;
+		var oListItem = oList.getItems()[0];
+		var oDomRef = oListItem.getDomRef();
+		assert.ok(oDomRef, "List item is rendered");
+
+		var oCheckboxEl = oDomRef.querySelector(".sapMLIBSelectM");
+		var oContentEl = oDomRef.querySelector(".sapMLIBContent");
+		assert.ok(oCheckboxEl, ".sapMLIBSelectM checkbox element exists");
+		assert.ok(oContentEl, ".sapMLIBContent element exists");
+
+		var oCheckboxStyle = window.getComputedStyle(oCheckboxEl);
+		var oContentStyle = window.getComputedStyle(oContentEl);
+
+		// The checkbox must be square so the ::before focus ring matches standalone sap.m.CheckBox
+		assert.equal(oCheckboxStyle.width, oCheckboxStyle.height, "Checkbox width equals height (square)");
+
+		// The content margin-left must not be negative (no overlap between checkbox and file icon)
+		var fMarginLeft = parseFloat(oContentStyle.marginLeft);
+		assert.ok(fMarginLeft >= 0, "Content margin-left is non-negative (no overlap with checkbox)");
+	});
+
 	QUnit.module("Grouping tests", {
 		beforeEach: async function() {
 			this.oUploadSet = new UploadSet({
