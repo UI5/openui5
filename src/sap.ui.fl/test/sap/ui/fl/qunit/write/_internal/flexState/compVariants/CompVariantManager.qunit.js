@@ -557,6 +557,166 @@ sap.ui.define([
 			assert.strictEqual(aDefaultVariants.length, 0, "the default variant was cleared");
 			assert.strictEqual(aCompVariants.standardVariantChange, undefined, "the standard variant was cleared");
 		});
+
+		QUnit.test("Given a new PUBLIC variant with favorite set to true is persisted", async function(assert) {
+			const sPersistencyKey = "persistency.key";
+			sandbox.stub(Settings.getInstanceOrUndef(), "getIsPublicLayerAvailable").returns(true);
+
+			const oVariant = CompVariantManager.addVariant({
+				changeSpecificData: {
+					type: "pageVariant",
+					isUserDependent: false,
+					favorite: true,
+					content: {}
+				},
+				reference: sComponentId,
+				componentId: sComponentId,
+				persistencyKey: sPersistencyKey
+			});
+
+			assert.strictEqual(oVariant.getLayer(), Layer.PUBLIC, "the variant is in the PUBLIC layer");
+
+			const oSaveSpy = sandbox.spy(FlexObjectManager, "saveFlexObjects");
+
+			await CompVariantManager.persist({
+				reference: sComponentId,
+				componentId: sComponentId,
+				persistencyKey: sPersistencyKey,
+				control: oComponent
+			});
+
+			assert.notOk(oVariant.getFavorite(), "the favorite flag is reset to false after persisting");
+			assert.notOk(
+				oSaveSpy.getCall(0).args[0].flexObjects[0].convertToFileContent().favorite,
+				"the favorite:false value is included in the persisted payload"
+			);
+		});
+
+		QUnit.test("Given a PUBLIC variant is renamed while it carries a USER-layer favorite change", async function(assert) {
+			// Reproduces the reported issue: a PUBLIC variant is renamed by the current user (our change) while a
+			// separate USER-layer favorite change (from another user, or the user's own personal favorite) is
+			// applied on the same runtime instance. The rename puts the variant into state UPDATED and the
+			// USER-layer change re-applies favorite:true at runtime. Before the fix the persist-time reset only
+			// ran for state NEW, so getCondensingUpdateDiff persisted the runtime favorite:true into the shared
+			// PUBLIC variant file, wrongly making it a favorite for every other user.
+			const sPersistencyKey = "persistency.key";
+			sandbox.stub(Settings.getInstanceOrUndef(), "getIsPublicLayerAvailable").returns(true);
+
+			const oVariant = CompVariantManager.addVariant({
+				changeSpecificData: {
+					type: "pageVariant",
+					isUserDependent: false,
+					favorite: true,
+					content: {}
+				},
+				reference: sComponentId,
+				componentId: sComponentId,
+				persistencyKey: sPersistencyKey
+			});
+
+			assert.strictEqual(oVariant.getLayer(), Layer.PUBLIC, "the variant is in the PUBLIC layer");
+
+			// A personal favorite of the PUBLIC variant is stored as a separate USER-layer favorite change.
+			CompVariantManager.updateVariant({
+				reference: sComponentId,
+				componentId: sComponentId,
+				persistencyKey: sPersistencyKey,
+				id: oVariant.getVariantId(),
+				isUserDependent: true,
+				favorite: true
+			});
+
+			// Assembling the variant list re-applies the changes (incl. the USER-layer favorite) on the runtime
+			// instance, mirroring how the variant is presented to the user.
+			CompVariantManagementState.assembleVariantList({
+				reference: sComponentId,
+				componentId: sComponentId,
+				persistencyKey: sPersistencyKey
+			});
+
+			await CompVariantManager.persist({
+				reference: sComponentId,
+				componentId: sComponentId,
+				persistencyKey: sPersistencyKey,
+				control: oComponent
+			});
+
+			const [oFavoriteChange] = CompVariantManagementState.getVariantChanges(oVariant);
+			assert.strictEqual(oFavoriteChange.getLayer(), Layer.USER, "the personal favorite is stored as a USER-layer change");
+
+			// The user renames the PUBLIC variant. This dirties it to state UPDATED; re-assembling the variant
+			// list re-applies the USER-layer favorite change, so the runtime favorite is true again.
+			CompVariantManager.updateVariant({
+				reference: sComponentId,
+				componentId: sComponentId,
+				persistencyKey: sPersistencyKey,
+				id: oVariant.getVariantId(),
+				layer: Layer.PUBLIC,
+				name: "renamedName"
+			});
+			CompVariantManagementState.assembleVariantList({
+				reference: sComponentId,
+				componentId: sComponentId,
+				persistencyKey: sPersistencyKey
+			});
+
+			assert.strictEqual(oVariant.getState(), States.LifecycleState.UPDATED, "the renamed variant is in state UPDATED, not NEW");
+			assert.strictEqual(oVariant.getFavorite(), true, "the runtime favorite is true again after the rename via the USER-layer change");
+
+			const oSaveSpy = sandbox.spy(FlexObjectManager, "saveFlexObjects");
+
+			await CompVariantManager.persist({
+				reference: sComponentId,
+				componentId: sComponentId,
+				persistencyKey: sPersistencyKey,
+				control: oComponent
+			});
+
+			const aPersistedFlexObjects = oSaveSpy.getCall(0).args[0].flexObjects;
+
+			assert.ok(aPersistedFlexObjects.includes(oVariant), "the renamed variant is part of the persisted batch");
+			assert.notOk(
+				oVariant.convertToFileContent().favorite,
+				"the shared PUBLIC variant file is persisted with favorite:false despite the runtime favorite"
+			);
+			const aFavoriteChangesAfterPersist = CompVariantManagementState.getVariantChanges(oVariant)
+			.filter((oChange) => oChange.getContent().favorite !== undefined);
+			assert.deepEqual(aFavoriteChangesAfterPersist, [oFavoriteChange],
+				"persisting the rename creates no additional conflicting favorite change");
+		});
+
+		QUnit.test("Given a new CUSTOMER variant with favorite set to true is persisted", async function(assert) {
+			const sPersistencyKey = "persistency.key";
+			sandbox.stub(Settings.getInstanceOrUndef(), "getIsPublicLayerAvailable").returns(false);
+
+			const oVariant = CompVariantManager.addVariant({
+				changeSpecificData: {
+					type: "pageVariant",
+					isUserDependent: false,
+					favorite: true,
+					content: {}
+				},
+				reference: sComponentId,
+				componentId: sComponentId,
+				persistencyKey: sPersistencyKey,
+				control: {
+					getCurrentVariantId() {
+						return "";
+					}
+				}
+			});
+
+			assert.strictEqual(oVariant.getLayer(), Layer.CUSTOMER, "the variant is in the CUSTOMER layer");
+
+			await CompVariantManager.persist({
+				reference: sComponentId,
+				componentId: sComponentId,
+				persistencyKey: sPersistencyKey,
+				control: oComponent
+			});
+
+			assert.strictEqual(oVariant.getFavorite(), true, "the favorite flag is kept for a non-PUBLIC variant");
+		});
 	});
 
 	QUnit.module("setDefault", {
