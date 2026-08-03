@@ -17,22 +17,26 @@
 		<!-- Manifest-only badges (no layoutData to keep customData clean for testing) -->
 		<HBox class="sapUiSmallMargin" wrap="Wrap">
 			<!-- Manifest Badge: Single badge, NO customData at all -->
-			<w:Card manifest="cardsdemo/cardcontent/badges/manifestBadge.json"
+			<w:Card manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/badges/manifestBadge.json"
+				baseUrl="{cardsPlayground>/playgroundBaseUrl}"
 				width="18rem" height="20rem"
 				class="sapUiTinyMarginEnd sapUiTinyMarginBottom" />
 
 			<!-- Multiple Manifest Badges: Three badges, NO customData -->
-			<w:Card manifest="cardsdemo/cardcontent/badges/manifestBadgeMultiple.json"
+			<w:Card manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/badges/manifestBadgeMultiple.json"
+				baseUrl="{cardsPlayground>/playgroundBaseUrl}"
 				width="18rem" height="20rem"
 				class="sapUiTinyMarginEnd sapUiTinyMarginBottom" />
 
 			<!-- Manifest Badges with Bindings: Badge data from model -->
-			<w:Card manifest="cardsdemo/cardcontent/badges/manifestBadgeBinding.json"
+			<w:Card manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/badges/manifestBadgeBinding.json"
+				baseUrl="{cardsPlayground>/playgroundBaseUrl}"
 				width="18rem" height="20rem"
 				class="sapUiTinyMarginEnd sapUiTinyMarginBottom" />
 
 			<!-- Combined: Manifest badge + Programmatic badge -->
-			<w:Card manifest="cardsdemo/cardcontent/badges/manifestAndProgrammaticBadges.json"
+			<w:Card manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/badges/manifestAndProgrammaticBadges.json"
+				baseUrl="{cardsPlayground>/playgroundBaseUrl}"
 				width="18rem" height="20rem"
 				class="sapUiTinyMarginEnd sapUiTinyMarginBottom">
 				<w:customData>

@@ -1,31 +1,26 @@
 {
 	"_version": "1.14.0",
 	"sap.app": {
-		"id": "card.test.badge.manifest.multiple",
+		"id": "card.test.badge.manifestMultiple",
 		"type": "card"
 	},
 	"sap.card": {
 		"type": "List",
-		"badge": [
+		"badges": [
 			{
 				"text": "New",
 				"icon": "sap-icon://status-in-process",
-				"state": "Indication03",
-				"visible": true,
-				"visibilityMode": "Persist"
+				"state": "Indication03"
 			},
 			{
 				"text": "Updated",
-				"state": "Indication05",
-				"visible": true,
-				"visibilityMode": "Disappear"
+				"icon": "sap-icon://warning",
+				"state": "Warning"
 			},
 			{
 				"text": "Important",
-				"icon": "sap-icon://warning",
-				"state": "Indication02",
-				"visible": true,
-				"visibilityMode": "Persist"
+				"icon": "sap-icon://alert",
+				"state": "Error"
 			}
 		],
 		"header": {
@@ -36,7 +31,9 @@
 			"data": {
 				"json": [
 					{
-						"Name": "Caroline Clark",
+						"Name": "Caroline Clark"
+					},
+					{
 						"Relation": "Dependent",
 						"Status": "Pending Approval"
 					},
