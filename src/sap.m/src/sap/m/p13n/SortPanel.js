@@ -90,8 +90,9 @@ sap.ui.define([
 
 	SortPanel.prototype._createRemoveButton = function() {
 		const oRemoveBtn = QueryPanel.prototype._createRemoveButton.apply(this, arguments);
-		oRemoveBtn.setLayoutData(new GridData({
-			span: "XL3 L3 M3 S4" //on "S" the Asc/Desc text is invisible, we need to increase the size the
+		oRemoveBtn.setLayoutData(new GridData(oRemoveBtn.getId() + "-GD", {
+			span: "XL3 L3 M3 S4", //on "S" the Asc/Desc text is invisible, we need to increase the size the
+			indentS: 5
 		}));
 		return oRemoveBtn;
 	};
@@ -100,7 +101,8 @@ sap.ui.define([
 		const oSortOrderSwitch = new SegmentedButton({
 			enabled: sKey ? true : false,
 			layoutData: new GridData({
-				span: "XL2 L2 M2 S3" //on "S" the Asc/Desc text is invisible, we need to increase the size then
+				span: "XL2 L2 M2 S3", //on "S" the Asc/Desc text is invisible, we need to increase the size then
+				linebreakS: true // make ComboBox full line to prevent truncation
 			}),
 			items: [
 				new SegmentedButtonItem({
@@ -128,6 +130,11 @@ sap.ui.define([
 		return oSortOrderSwitch;
 	};
 
+	SortPanel.prototype.init = function() {
+		QueryPanel.prototype.init.apply(this, arguments);
+		this.addStyleClass("sapMP13nSortPanel");
+	};
+
 	SortPanel.prototype._createSortOrderText = function(sKey, bDesc) {
 		return new Text({
 			layoutData: new GridData({
@@ -143,6 +150,11 @@ sap.ui.define([
 		const oSelect = this._createKeySelect(oItem.name);
 		const oSortOrderSwitch = this._createOrderSwitch(oItem.name, oItem.descending);
 		const oSortOrderText = this._createSortOrderText(oItem.name, oItem.descending);
+
+		oSelect.setLayoutData(new GridData(oSelect.getId() + "-GD", {
+			span: "XL4 L4 M4 S12" // use full row on small screens to prevent truncation
+		}));
+		oSelect.setWidth("100%");
 
 		return new Grid({
 			containerQuery: true,

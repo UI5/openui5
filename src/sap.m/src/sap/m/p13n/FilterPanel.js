@@ -108,6 +108,11 @@ sap.ui.define([
 
 	FilterPanel.prototype.PRESENCE_ATTRIBUTE = "active";
 
+	FilterPanel.prototype.init = function() {
+		QueryPanel.prototype.init.apply(this, arguments);
+		this.addStyleClass("sapMP13nFilterPanel");
+	};
+
 	FilterPanel.prototype._createInnerListControl = function() {
 		const oList = QueryPanel.prototype._createInnerListControl.apply(this, arguments);
 		return oList;
@@ -166,8 +171,8 @@ sap.ui.define([
 			}
 		});
 
-		oComboBox.setLayoutData(new GridData({
-			span: "XL4 L4 M4 S11"
+		oComboBox.setLayoutData(new GridData(oComboBox.getId() + "-GD", {
+			span: "XL4 L4 M4 S10"
 		}));
 
 		return oComboBox;
@@ -176,8 +181,8 @@ sap.ui.define([
 	FilterPanel.prototype._createRemoveButton = function(bVisible) {
 		const oRemoveBtn = QueryPanel.prototype._createRemoveButton.apply(this, arguments);
 		oRemoveBtn.setJustifyContent(FlexJustifyContent.Start); //avoid remove button overlapping with input field
-		oRemoveBtn.setLayoutData(new GridData({
-			span: "XL1 L1 M1 S1"
+		oRemoveBtn.setLayoutData(new GridData(oRemoveBtn.getId() + "-GD", {
+			span: "XL1 L1 M1 S2"
 		}));
 		return oRemoveBtn;
 	};
@@ -192,7 +197,10 @@ sap.ui.define([
 			wrappingType: WrappingType.Hyphenated
 		});
 		const oFieldBox = new VBox({
-			items: [oLabel.addStyleClass("sapUiTinyMarginBegin")]
+			items: [oLabel.addStyleClass("sapUiTinyMarginBegin")],
+			layoutData: new GridData({
+				span: "XL4 L4 M4 S10"
+			})
 		});
 		oFieldBox._key = sKey;
 		return oFieldBox;
@@ -263,9 +271,12 @@ sap.ui.define([
 
 	FilterPanel.prototype._createFactoryControl = function(oItem) {
 		const oField = this.getItemFactory().call(this, oItem);
-		oField.setLayoutData(new GridData({
-			span: "XL7 L7 M7 S7"
-		}));
+		if (!oField.getLayoutData()) { // if fiter removed and added again, LayoutData already exist
+			oField.setLayoutData(new GridData(oField.getId() + "-GD", {
+				span: "XL7 L7 M7 S10",
+				linebreakS: true
+			}));
+		}
 
 		let iModelIndex;
 		this._getP13nModel().getProperty("/items").forEach((oP13nItem, index) => {
