@@ -619,6 +619,13 @@ sap.ui.define([
 			return;
 		}
 
+		const bIsMac = Device.os.macintosh;
+		const bModifierPressed = bIsMac ? oEvent.metaKey : oEvent.ctrlKey;
+
+		if (!bModifierPressed) {
+			return;
+		}
+
 		const oFocusedElement = document.activeElement;
 		let oListItem = null;
 
