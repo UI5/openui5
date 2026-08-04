@@ -14,7 +14,7 @@ sap.ui.require([
 ], async function (FakeControls, Page, Panel, Text, Label, Button, Dialog, Popover, VBox, HBox, mLibrary, Core) {
 	"use strict";
 
-	const { FakeButton, FakeText, FakeLink, FakeMultiTarget } = FakeControls;
+	const { FakeButton, FakeText, FakeLink, FakeTitle, FakeMultiTarget } = FakeControls;
 	const PlacementType = mLibrary.PlacementType;
 	const LONG_TOOLTIP = "This is a noticeably longer tooltip text used to verify wrapping behavior.";
 	const VERY_LONG_TOOLTIP =
@@ -103,6 +103,36 @@ sap.ui.require([
 			label("Long text on link:"),
 			new FakeLink({ text: "SAP (long tooltip)", href: "https://sap.com", tooltipText: LONG_TOOLTIP })
 		])
+	]);
+
+	// --- Title with lazily-resolved tooltip (touch text-selection) ---
+	const oLateTitle = new FakeTitle({
+		text: "Selectable title whose tooltip is resolved late",
+		tooltipText: ""
+	});
+	const oResolveTitleTooltipBtn = new Button({
+		text: "Add tooltip text",
+		press: function () {
+			oLateTitle.setTooltipText("Tooltip resolved late — long-press now suppresses selection");
+		}
+	});
+	const oClearTitleTooltipBtn = new Button({
+		text: "Clear tooltip text",
+		press: function () {
+			oLateTitle.setTooltipText("");
+		}
+	});
+	const oTitlePanel = panel("Title with lazily-resolved tooltip (touch text-selection)", [
+		new Text({ text: "On a touch device (or with device emulation), try to select the title text below. " +
+			"Text selection must stay available until you actually start a touch on a title that has tooltip text. " +
+			"With no tooltip text, the title is always selectable. Press \"Add tooltip text\" to give it a tooltip; " +
+			"only then does a long-press suppress text selection. The suppression is applied on touchstart, not on render. " +
+			"This title renders only the visible tooltip, without an invisible ARIA anchor." }).addStyleClass("sapUiTinyMarginBottom"),
+		row([
+			label("Title:"),
+			oLateTitle
+		]),
+		row([oResolveTitleTooltipBtn.addStyleClass("sapUiTinyMarginEnd"), oClearTitleTooltipBtn])
 	]);
 
 	// --- Tooltip host inside Dialog / Popover / nested ---
@@ -198,6 +228,7 @@ sap.ui.require([
 					oMultiTargetPanel,
 					oRClickPanel,
 					oLinksPanel,
+					oTitlePanel,
 					oContainersPanel
 				]
 			}).addStyleClass("sapUiContentPadding")

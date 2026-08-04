@@ -133,6 +133,7 @@ sap.ui.define([
 			render: function (oRm, oControl) {
 				oRm.openStart("span", oControl);
 				oRm.class("fakeText");
+				oRm.class("sapUiSelectable");
 				if (oControl.getFocusable()) {
 					oRm.attr("tabindex", "0");
 				}
@@ -223,6 +224,44 @@ sap.ui.define([
 		}
 	});
 
+	// A fake title rendered as a native <h2> with selectable text. Its tooltip
+	// text is resolved lazily through the textProvider, modelling the real case
+	// where a control does not know whether it has a tooltip until late. Text
+	// selection is therefore only suppressed once a touch actually starts on a
+	// title that has tooltip text — before any touch the text stays selectable.
+	// This host renders only the visible tooltip, no invisible ARIA anchor.
+	const FakeTitle = Control.extend("local.FakeTitle", {
+		metadata: {
+			properties: {
+				text: { type: "string", defaultValue: "" },
+				tooltipText: { type: "string", defaultValue: "" }
+			}
+		},
+		init: function () {
+			this._oTooltipEnablement = new TooltipEnablement(this, {
+				textProvider: () => this.getTooltipText(),
+				domRefProvider: () => this.getDomRef()
+			});
+		},
+		exit: function () {
+			if (this._oTooltipEnablement) {
+				this._oTooltipEnablement.destroy();
+				this._oTooltipEnablement = null;
+			}
+		},
+		renderer: {
+			apiVersion: 2,
+			render: function (oRm, oControl) {
+				oRm.openStart("h2", oControl);
+				oRm.class("fakeTitle");
+				oRm.class("sapUiSelectable");
+				oRm.openEnd();
+				oRm.text(oControl.getText());
+				oRm.close("h2");
+			}
+		}
+	});
+
 	// A plain focusable fake button with NO internal TooltipEnablement. Used by
 	// the Tooltip showcase to drive a sap.ui.core.tooltip.Tooltip directly
 	// (placement, delay, openBy/close) without the helper in the way.
@@ -302,5 +341,5 @@ sap.ui.define([
 		}
 	});
 
-	return { FakeButton, FakeText, FakeLink, PlainButton, FakeMultiTarget };
+	return { FakeButton, FakeText, FakeLink, FakeTitle, PlainButton, FakeMultiTarget };
 });

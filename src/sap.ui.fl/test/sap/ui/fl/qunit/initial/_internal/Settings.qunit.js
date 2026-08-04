@@ -8,6 +8,7 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
+	"test-resources/sap/ui/fl/qunit/FlQUnitUtils",
 	"sap/ui/thirdparty/sinon-4"
 ], (
 	Log,
@@ -17,6 +18,7 @@ sap.ui.define([
 	StorageUtils,
 	Layer,
 	Utils,
+	FlQUnitUtils,
 	sinon
 ) => {
 	"use strict";
@@ -207,6 +209,25 @@ sap.ui.define([
 			assert.strictEqual(oSettings.getIsContextBasedAdaptationEnabled(), false, "then isContextBasedAdaptationEnabled is correct");
 			assert.strictEqual(oSettings.getIsLocalResetEnabled(), false, "with multiple correct connectors the last value is used");
 			assert.strictEqual(oSettings.getIsPublicFlVariantEnabled(), false, "the default value is used");
+		});
+	});
+
+	// ---------------------------------------------------------------------------------------------
+	// Contract guard for the UI5 Flexibility Support Chrome extension
+	// (repo: ui5-flexibility/ui5-flexibility-support-chrome-extension).
+	//
+	// The extension sets a conditional debugger breakpoint on the anchor line below (located by
+	// text search) to fake key-user authorization by reassigning properties on "oSettingsProperties"
+	// before the Settings instance is created.
+	// ---------------------------------------------------------------------------------------------
+	QUnit.module("UI5 Flexibility Support extension breakpoint contract", {}, function() {
+		QUnit.test("the breakpoint anchor line still exists in the Settings source", async function(assert) {
+			const sSource = await FlQUnitUtils.getModuleSourceCode("sap/ui/fl/initial/_internal/Settings");
+			assert.ok(
+				sSource.includes("oSettingsInstance = new Settings(oSettingsProperties)"),
+				"the anchor line used by the UI5 Flexibility Support extension is present - "
+				+ "if you must change it, update ReloadOptionsUtils.js in the extension"
+			);
 		});
 	});
 

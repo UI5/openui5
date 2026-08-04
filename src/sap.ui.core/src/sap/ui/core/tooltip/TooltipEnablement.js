@@ -26,7 +26,7 @@ sap.ui.define([
 		 *
 		 * @param {sap.ui.core.Control} oHost The host control.
 		 * @param {object} [oConfig] Configuration for the helper.
-		 * @param {function():string} [oConfig.textProvider] Callback that builds the visible tooltip text. Defaults to <code>oHost.getTooltip_AsString()</code>.
+		 * @param {function():string} [oConfig.textProvider] Callback that builds the visible tooltip text. Defaults to <code>oHost.getTooltip_AsString()</code>. It is called after a user interaction (hover/focus on desktop, touch on touch devices) to decide whether a tooltip should appear, unless the invisible tooltip is being rendered.
 		 * @param {function():string} [oConfig.invisibleTextProvider] Callback that builds the text written into the invisible ARIA anchor. Falls back to <code>textProvider</code> when omitted.
 		 * @param {function():HTMLElement} [oConfig.domRefProvider] Callback that returns the DOM element the gesture listeners should attach to. Defaults to <code>oHost.getFocusDomRef()</code>. Override this when neither the host's focus DOM nor the outer DOM ref is the correct attachment point — for example a wrapper element that owns the hover/focus area.
 		 * @param {string} [oConfig.invisibleTooltipIdSuffix="-invisibleTooltip"] Suffix for the invisible ARIA anchor's id. Set a distinct value when one host owns several <code>TooltipEnablement</code>s so each anchor id stays unique.
@@ -95,17 +95,28 @@ sap.ui.define([
 		 *
 		 * Pass a <code>textProvider</code> callback to derive the text from
 		 * runtime state (for example a base tooltip combined with a keyboard
-		 * shortcut). Pass <code>invisibleTextProvider</code> when the
-		 * screen-reader text should differ from the visible one (for example to
-		 * leave out a shortcut that is already exposed via
-		 * <code>aria-keyshortcuts</code>).
+		 * shortcut).
 		 *
 		 * <pre>
 		 * MyControl.prototype.init = function() {
 		 *     if (TooltipEnablement.isEnhancedTooltipEnabled()) {
 		 *         this._oTooltipEnablement = new TooltipEnablement(this, {
-		 *             textProvider: () =&gt; this._buildVisibleTooltip(),
-		 *             invisibleTextProvider: () =&gt; this._buildInvisibleTooltip()
+		 *             textProvider: () =&gt; this._buildTooltipText()
+		 *         });
+		 *     }
+		 * };
+		 * </pre>
+		 *
+		 * Pass <code>invisibleTextProvider</code>, together with <code>textProvider</code>, when the
+		 * screen-reader text should differ from the visible one (for example to
+		 * leave out a shortcut that is already exposed via <code>aria-keyshortcuts</code>).
+		 *
+		 * <pre>
+		 * MyControl.prototype.init = function() {
+		 *     if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+		 *         this._oTooltipEnablement = new TooltipEnablement(this, {
+		 *             textProvider: () =&gt; this._buildTooltipText(),
+		 *             invisibleTextProvider: () =&gt; this._buildInvisibleTooltipText()
 		 *         });
 		 *     }
 		 * };
@@ -152,12 +163,6 @@ sap.ui.define([
 		 *
 		 * <h3>Optional integration steps</h3>
 		 *
-		 * The following steps are only needed for hosts with specific requirements.
-		 *
-		 * <b>React to runtime state changes</b> by invalidating the host
-		 * whenever the text returned by your providers can change. The helper
-		 * re-resolves the text on the next render.
-		 *
 		 * <b>Open or close imperatively</b> with
 		 * <code>open()</code> / <code>close()</code> when your control has a
 		 * gesture beyond the built-in hover/focus/touch handling.
@@ -172,6 +177,14 @@ sap.ui.define([
 		 * <code>domRefProvider</code> config when neither the host's focus DOM
 		 * ref nor its outer DOM ref is the right element to listen on — for
 		 * example when gestures must fire on a wrapper.
+		 *
+		 * <h3>Resolving the text</h3>
+		 * The <code>textProvider</code> is called after a user interaction
+		 * (hover or focus on desktop, touch on touch devices) to decide whether
+		 * a tooltip should appear. A control may therefore resolve its tooltip
+		 * text at such late state and still opt out of the tooltip by returning an empty
+		 * string.
+		 * The one exception is if {@link #renderInvisibleTooltip} is called and invisibleTextProvider is not provided.
 		 *
 		 * <h3>Links</h3>
 		 * The design guidelines for <code>sap.m.Link</code> and link-like
@@ -213,6 +226,7 @@ sap.ui.define([
 					onOpen: (bWithDelay) => this._open(bWithDelay),
 					onClose: (bWithDelay) => this._close(bWithDelay),
 					isPendingOrOpen: this._isPendingOrOpen.bind(this),
+					hasText: () => !!this._resolveText(),
 					enableForTouchDevices: oConfig.enableForTouchDevices
 				});
 			}

@@ -4,12 +4,14 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/integration/cards/filters/SelectFilter",
 	"sap/ui/integration/widgets/Card",
+	"sap/ui/model/resource/ResourceModel",
 	"sap/ui/test/utils/nextUIUpdate",
 	"qunit/testResources/nextCardReadyEvent"
 ], function(
 	Element,
 	SelectFilter,
 	Card,
+	ResourceModel,
 	nextUIUpdate,
 	nextCardReadyEvent
 ) {
@@ -109,6 +111,35 @@ sap.ui.define([
 			assert.strictEqual(oItem.getKey(), aOptions[iInd].key, "Option at position " + iInd + " has a valid key.");
 			assert.strictEqual(oItem.getText(), aOptions[iInd].title, "Option at position " + iInd + " has a valid title.");
 		});
+	});
+
+	QUnit.test("Static items with '{i18n>...}' binding syntax are translated", async function (assert) {
+		// Arrange
+		this.oCard.setModel(new ResourceModel({
+			bundleUrl: "test-resources/sap/ui/integration/qunit/testResources/cardWithTranslations/i18n/i18n.properties"
+		}), "i18n");
+
+		const oSF = new SelectFilter({
+			config: {
+				value: "translated",
+				items: [
+					{ key: "static", title: "Static Title" },
+					{ key: "translated", title: "{i18n>translatedText}" }
+				]
+			},
+			card: this.oCard
+		});
+
+		// Act
+		await nextUIUpdate();
+
+		// Assert
+		const aItems = oSF._getSelect().getItems();
+		assert.strictEqual(aItems[0].getText(), "Static Title", "Plain title stays unchanged.");
+		assert.strictEqual(aItems[1].getText(), "Some translated text", "'{i18n>...}' title is resolved against the card's i18n model.");
+
+		// Clean up
+		oSF.destroy();
 	});
 
 	QUnit.test("Initial value for filters model when filter is with dynamic data", function (assert) {
