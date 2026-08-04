@@ -60,7 +60,7 @@ sap.ui.define([
 		const oApiStub = sandbox.stub().returns("");
 		RtaQunitUtils.stubSapUiRequire(sandbox, [{
 			name: "sap/ushell/api/RTA",
-			stub: { getLogo: oApiStub }
+			stub: { getLogo: oApiStub, setShellHeaderVisibility: () => {} }
 		}]);
 	}
 

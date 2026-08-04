@@ -294,23 +294,6 @@ sap.ui.define([
 		return iIndex;
 	};
 
-	Utils.isOriginalFioriToolbarAccessible = function() {
-		var oRenderer = Utils.getFiori2Renderer();
-		return oRenderer
-			&& oRenderer.getRootControl
-			&& oRenderer.getRootControl().getShellHeader();
-	};
-
-	/**
-	 * Function to get the Fiori2 Renderer
-	 *
-	 * @returns {sap.ushell.renderers.fiori2.Renderer|undefined} renderer or null if there is no one
-	 */
-	Utils.getFiori2Renderer = function() {
-		var oContainer = FlexUtils.getUshellContainer() || {};
-		return typeof oContainer.getRenderer === "function" ? oContainer.getRenderer("fiori2") : undefined;
-	};
-
 	/**
 	 * Extending helper which allows custom function
 	 * for extending.

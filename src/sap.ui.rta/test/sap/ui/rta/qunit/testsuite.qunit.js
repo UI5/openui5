@@ -763,12 +763,6 @@ sap.ui.define([
 					only: ["sap/ui/rta/toolbar/Fiori"]
 				}
 			},
-			"toolbar/FioriLike": {
-				group: "Toolbar",
-				coverage: {
-					only: ["sap/ui/rta/toolbar/FioriLike"]
-				}
-			},
 
 			// utilities
 			"util/adaptationStarter": {

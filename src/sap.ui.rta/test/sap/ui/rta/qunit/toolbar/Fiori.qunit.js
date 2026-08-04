@@ -42,7 +42,7 @@ sap.ui.define([
 	const sandbox = sinon.createSandbox();
 	const sLogoSource = "test-resources/sap/ui/rta/testdata/sap_logo.png";
 
-	async function stubFioriRenderer(assert) {
+	async function stubFlpAPI(assert) {
 		const done = assert.async();
 
 		this.oImage = new Image({
@@ -58,7 +58,9 @@ sap.ui.define([
 		const oGetLogoDomRefStub = sandbox.stub().returns(this.oImage.getDomRef());
 		this.oUshellApi = {
 			getLogo: oGetLogoStub,
-			getLogoDomRef: oGetLogoDomRefStub
+			getLogoDomRef: oGetLogoDomRefStub,
+			setShellHeaderVisibility: sandbox.stub(),
+			navigateBack: sandbox.stub()
 		};
 
 		sandbox.stub(Utils, "getUshellContainer").returns({
@@ -68,29 +70,13 @@ sap.ui.define([
 			name: "sap/ushell/api/RTA",
 			stub: this.oUshellApi
 		}]);
-		sandbox.stub(RtaUtils, "getFiori2Renderer").returns({
-			getRootControl: function() {
-				return {
-					getShellHeader: function() {
-						return {
-							addStyleClass: function(sText) {
-								this.sAdd = sText;
-							}.bind(this),
-							removeStyleClass: function(sText) {
-								this.sRemove = sText;
-							}.bind(this)
-						};
-					}.bind(this)
-				};
-			}.bind(this)
-		});
 	}
 
 	QUnit.module("Basic functionality", {
 		async beforeEach(assert) {
 			await nextUIUpdate();
 			this.oToolbarControlsModel = RtaQunitUtils.createToolbarControlsModel();
-			await stubFioriRenderer.call(this, assert);
+			await stubFlpAPI.call(this, assert);
 		},
 		afterEach() {
 			this.oImage.destroy();
@@ -111,7 +97,8 @@ sap.ui.define([
 			assert.equal(oImage.getSrc(), sLogoSource, "then the source of the logo is correctly set");
 
 			await this.oToolbar.show();
-			assert.equal(this.sAdd, "sapUiRtaFioriHeaderInvisible", "then the correct StyleClass got added");
+			assert.strictEqual(this.oUshellApi.setShellHeaderVisibility.callCount, 1, "the ushell API was called to hide the Fiori header");
+			assert.equal(this.oUshellApi.setShellHeaderVisibility.getCall(0).args[0], false, "then the Fiori header is hidden");
 
 			const oErrorStub = sandbox.stub(Log, "error");
 			this.oToolbar._checkLogoSize(oImage.getDomRef(), 20, 20);
@@ -121,7 +108,9 @@ sap.ui.define([
 
 			sandbox.stub(Adaptation.prototype, "hide").returns(Promise.resolve());
 			await this.oToolbar.hide();
-			assert.equal(this.sRemove, "sapUiRtaFioriHeaderInvisible", "then the correct StyleClass got removed");
+			assert.strictEqual(this.oUshellApi.setShellHeaderVisibility.callCount, 2, "the ushell API was called to show the Fiori header");
+			assert.equal(this.oUshellApi.setShellHeaderVisibility.getCall(1).args[0], true, "then the Fiori header is shown again");
+
 			this.oToolbar.destroy();
 		});
 
@@ -137,18 +126,17 @@ sap.ui.define([
 				assert.ok(true, "then the destroy is executed without errors");
 			});
 
-			const oRemoveStyleClassSpy = sandbox.spy(this.oToolbar._oFioriHeader, "removeStyleClass");
-
 			await this.oToolbar.onFragmentLoaded();
 			await this.oToolbar.show();
 			sandbox.stub(Adaptation.prototype, "hide").returns(Promise.resolve());
 			await this.oToolbar.hide();
-			assert.ok(oRemoveStyleClassSpy.called, "then the invisible style class was removed before the destruction");
+			assert.strictEqual(this.oUshellApi.setShellHeaderVisibility.callCount, 2, "the ushell API was called to show the Fiori header");
+			assert.equal(this.oUshellApi.setShellHeaderVisibility.getCall(1).args[0], true, "then the Fiori header is shown again");
 			this.oToolbar.destroy();
 		});
 
 		QUnit.test("when there is a logo source, but no logo domRef", async function(assert) {
-			this.oUshellApi.getLogoDomRef = () => null;
+			this.oUshellApi.getLogoDomRef.returns(null);
 			this.oToolbar = new Fiori({
 				ushellApi: this.oUshellApi,
 				textResources: Lib.getResourceBundleFor("sap.ui.rta")
@@ -162,23 +150,31 @@ sap.ui.define([
 
 			this.oToolbar.destroy();
 		});
+
+		QUnit.test("when there is no logo source", async function(assert) {
+			this.oUshellApi.getLogo.returns(null);
+			this.oToolbar = new Fiori({
+				ushellApi: this.oUshellApi,
+				textResources: Lib.getResourceBundleFor("sap.ui.rta")
+			});
+			this.oToolbar.setModel(this.oToolbarControlsModel, "controls");
+
+			await this.oToolbar.onFragmentLoaded();
+			assert.notOk(this.oToolbar.getControl("icon"), "then no logo control is created");
+		});
 	});
 
 	QUnit.module("Navigate Back", {
-		beforeEach(assert) {
+		async beforeEach(assert) {
 			this.oToolbarControlsModel = RtaQunitUtils.createToolbarControlsModel();
-			stubFioriRenderer.call(this, assert);
+			await stubFlpAPI.call(this, assert);
 		},
 		afterEach() {
-			this.oImage.destroy();
 			this.oToolbar.destroy();
 			sandbox.restore();
 		}
 	}, function() {
 		QUnit.test("when navigateBack is called, it calls ushell API", async function(assert) {
-			const oNavigateBackStub = sandbox.stub();
-			this.oUshellApi.navigateBack = oNavigateBackStub;
-
 			this.oToolbar = new Fiori({
 				ushellApi: this.oUshellApi,
 				textResources: Lib.getResourceBundleFor("sap.ui.rta")
@@ -188,7 +184,7 @@ sap.ui.define([
 			await this.oToolbar.onFragmentLoaded();
 			this.oToolbar.navigateBack();
 
-			assert.strictEqual(oNavigateBackStub.callCount, 1, "then ushellApi.navigateBack was called");
+			assert.strictEqual(this.oUshellApi.navigateBack.callCount, 1, "then ushellApi.navigateBack was called");
 		});
 	});
 

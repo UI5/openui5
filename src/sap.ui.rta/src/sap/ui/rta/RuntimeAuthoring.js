@@ -40,7 +40,6 @@ sap.ui.define([
 	"sap/ui/rta/command/LREPSerializer",
 	"sap/ui/rta/command/Stack",
 	"sap/ui/rta/toolbar/Fiori",
-	"sap/ui/rta/toolbar/FioriLike",
 	"sap/ui/rta/toolbar/Standalone",
 	"sap/ui/rta/util/changeVisualization/ChangeVisualization",
 	"sap/ui/rta/util/guidedTour/content/GeneralTour",
@@ -90,7 +89,6 @@ sap.ui.define([
 	LREPSerializer,
 	CommandStack,
 	FioriToolbar,
-	FioriLikeToolbar,
 	StandaloneToolbar,
 	ChangeVisualization,
 	GeneralTour,
@@ -1702,13 +1700,9 @@ sap.ui.define([
 		let oToolbar;
 		const bUshellAvailable = !!FlexUtils.getUshellContainer();
 		if (bUshellAvailable) {
-			if (Utils.isOriginalFioriToolbarAccessible()) {
-				const oUshellRtaApi = await requireAsync("sap/ushell/api/RTA");
-				oProperties.ushellApi = oUshellRtaApi;
-				oToolbar = new FioriToolbar(oProperties);
-			} else {
-				oToolbar = new FioriLikeToolbar(oProperties);
-			}
+			const oUshellRtaApi = await requireAsync("sap/ushell/api/RTA");
+			oProperties.ushellApi = oUshellRtaApi;
+			oToolbar = new FioriToolbar(oProperties);
 		} else {
 			oToolbar = new StandaloneToolbar(oProperties);
 		}
