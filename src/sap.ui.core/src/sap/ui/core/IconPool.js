@@ -4,9 +4,8 @@
 sap.ui.define([
 	'sap/ui/core/Icon',
 	'sap/ui/core/_IconRegistry',
-	"sap/base/Log",
 	"sap/ui/core/RenderManager"
-], function(Icon, _IconRegistry, Log, RenderManager) {
+], function(Icon, _IconRegistry, RenderManager) {
 		"use strict";
 
 		/**
@@ -27,7 +26,28 @@ sap.ui.define([
 		 * @public
 		 * @alias sap.ui.core.IconPool
 		 */
-		var IconPool = {};
+		const IconPool = {};
+
+		/**
+		 * Enumeration of icon collection types.
+		 *
+		 * @enum {string}
+		 * @public
+		 * @since 1.156
+		 */
+		IconPool.CollectionType = {
+			/**
+			 * Icon collection that uses an icon font.
+			 * @public
+			 */
+			FONT: _IconRegistry.TYPE_FONT,
+
+			/**
+			 * Icon collection that uses SVG assets.
+			 * @public
+			 */
+			SVG: _IconRegistry.TYPE_SVG
+		};
 
 		/**
 		 * @typedef {object} sap.ui.core.IconPool.IconInfo
@@ -36,8 +56,17 @@ sap.ui.define([
 		 *  this property is set with <code>undefined</code>
 		 * @property {sap.ui.core.URI} uri The URI representing the icon following pattern
 		 *  <code>sap-icon://collection-name/icon-name</code>
-		 * @property {string} fontFamily the name of the font when importing the font using @font-face in CSS
-		 * @property {string} content the hexadecimal code in string format without the prefix, for example "e000"
+		 * @property {string} [fontFamily] the name of the font when importing the font using @font-face in CSS.
+		 *  This property is only available when a font format has been registered for the icon's
+		 *  collection (via {@link #.registerFont IconPool.registerFont}). The built-in SAP-icons
+		 *  collection registers both font and SVG formats, so this property is always present
+		 *  for built-in icons.
+		 * @property {string} [content] the character content of the icon in the icon font, e.g.
+		 *  <code>String.fromCharCode(0xe000)</code>. This property is only available when a font
+		 *  format has been registered for the icon's collection (via
+		 *  {@link #.registerFont IconPool.registerFont}). The built-in SAP-icons collection
+		 *  registers both font and SVG formats, so this property is always present for
+		 *  built-in icons.
 		 * @property {string} text the translated text for the icon under the current used locale
 		 * @property {boolean} suppressMirroring indicates whether this icon should NOT be mirrored in RTL (right to left) mode
 		 * @public
@@ -62,8 +91,8 @@ sap.ui.define([
 			}
 
 			if (setting && setting.src) {
-				var sSrc = setting.src,
-					fnConstructor = constructor;
+				const sSrc = setting.src;
+				let fnConstructor = constructor;
 				if (IconPool.isIconURI(sSrc)) {
 					fnConstructor = Icon;
 					//converting to press event in case tap is specified
@@ -155,11 +184,11 @@ sap.ui.define([
 		 * @since 1.56.0
 		 */
 		IconPool.fontLoaded = function (sCollectionName){
-			var mFontRegistry = _IconRegistry.getFontRegistry();
-			if (mFontRegistry[sCollectionName]) {
-				if (mFontRegistry[sCollectionName].metadataLoaded instanceof Promise) {
-					return mFontRegistry[sCollectionName].metadataLoaded;
-				} else if (mFontRegistry[sCollectionName].metadataLoaded === true) {
+			const mCollectionRegistry = _IconRegistry.getCollectionRegistry();
+			if (mCollectionRegistry[sCollectionName]) {
+				if (mCollectionRegistry[sCollectionName].metadataLoaded instanceof Promise) {
+					return mCollectionRegistry[sCollectionName].metadataLoaded;
+				} else if (mCollectionRegistry[sCollectionName].metadataLoaded === true) {
 					return Promise.resolve();
 				}
 			}
@@ -231,43 +260,9 @@ sap.ui.define([
 		 * @public
 		 * @since 1.56.0
 		 */
-		IconPool.registerFont = function (oConfig) {
-			oConfig.collectionName = oConfig.collectionName || oConfig.fontFamily;
+		IconPool.registerFont = _IconRegistry.registerFont;
 
-			// check for mandatory fontURI parameter
-			if (!oConfig.fontURI) {
-				Log.error("The configuration parameter fontURI is missing, cannot register the font '" + oConfig.collectionName + "'!");
-				return;
-			}
-
-			// protect the default font family
-			if (oConfig.fontFamily === _IconRegistry.sapIconFontFamily) {
-				Log.error("The font family" + _IconRegistry.sapIconFontFamily + " is already registered");
-				return;
-			}
-
-			// add trailing slash if necessary for more convenience
-			if (oConfig.fontURI.substr(oConfig.fontURI.length - 1) !== "/") {
-				oConfig.fontURI += "/";
-			}
-
-			var mFontRegistry = _IconRegistry.getFontRegistry();
-			// create an initial configuration for the font
-			if (!mFontRegistry[oConfig.collectionName] || mFontRegistry[oConfig.collectionName].metadataLoaded === false) {
-				mFontRegistry[oConfig.collectionName] = {
-					config: oConfig
-				};
-			} else {
-				Log.warning("The font '" + oConfig.collectionName + "' is already registered");
-			}
-
-			// load font metadata immediately
-			if (!oConfig.lazy) {
-				_IconRegistry._loadFontMetadata(oConfig.collectionName, true);
-			}
-		};
-
-		var mIconForMimeType = {
+		const mIconForMimeType = {
 			"application/msword": "sap-icon://doc-attachment",
 			"application/vnd.google-apps.document": "sap-icon://doc-attachment",
 			"application/vnd.openxmlformats-officedocument.wordprocessingml.document": "sap-icon://doc-attachment",
@@ -350,10 +345,10 @@ sap.ui.define([
 			return mIconForMimeType[sMimeType?.toLowerCase()] || "sap-icon://document";
 		};
 
-		var oCurrentElement;
-		var oParentStack;
+		let oCurrentElement;
+		let oParentStack;
 
-		var oDomWriter = {
+		const oDomWriter = {
 			openStart: function(sTag) {
 				oCurrentElement = document.createElement(sTag);
 				return this;
@@ -375,18 +370,18 @@ sap.ui.define([
 				return this;
 			},
 			openEnd: function() {
-				var oParent = oParentStack[oParentStack.length - 1];
+				const oParent = oParentStack[oParentStack.length - 1];
 				oParent.appendChild(oCurrentElement);
 				oParentStack.push(oCurrentElement);
 				return this;
 			},
 			voidEnd: function() {
-				var oParent = oParentStack[oParentStack.length - 1];
+				const oParent = oParentStack[oParentStack.length - 1];
 				oParent.appendChild(oCurrentElement);
 				return this;
 			},
 			text: function(sText) {
-				var oParent = oParentStack[oParentStack.length - 1];
+				const oParent = oParentStack[oParentStack.length - 1];
 				oParent.appendChild(document.createTextNode(sText));
 				return this;
 			},
@@ -416,16 +411,111 @@ sap.ui.define([
 				return "";
 			}
 
-			var oIconInfo = IconPool.getIconInfo(sURI);
+			const oIconInfo = IconPool.getIconInfo(sURI);
 			if (!oIconInfo) {
 				return "";
 			}
 
-			var oFragment = document.createDocumentFragment();
+			const oFragment = document.createDocumentFragment();
 			oParentStack = [oFragment];
 			RenderManager.prototype.icon.call(oDomWriter, sURI, aClasses, mAttributes);
 			return oFragment.firstChild.outerHTML;
 		};
+
+		/**
+		 * Registers a custom SVG icon collection.
+		 *
+		 * The stylesheet (typically named <code>svg.css</code>) must define CSS custom
+		 * properties following the naming convention <code>--{collectionName}_{icon-name}</code>,
+		 * where each property value is a <code>url()</code> pointing to an individual SVG file.
+		 *
+		 * After registration, icons from the collection can be used with the standard
+		 * icon URI syntax: <code>sap-icon://{name}/icon-name</code>.
+		 *
+		 * RTL support is provided via <code>:dir(rtl)</code> selectors in the stylesheet
+		 * to redefine an existing icon CSS custom property with the path to the RTL version
+		 * of the icon. This is only needed when a different icon shape is required for RTL mode.
+		 *
+		 * @example
+		 * // Basic registration
+		 * IconPool.registerSVG({
+		 *   name: "myIcons",
+		 *   uri: "/assets/my-icons/svg.css"
+		 * });
+		 *
+		 * @example
+		 * // Theme-dependent registration
+		 * IconPool.registerSVG({
+		 *   name: "myIcons",
+		 *   uri: "/assets/my-icons/svg.css",
+		 *   themeConfig: {
+		 *     "^sap_horizon.*": "/assets/my-icons/horizon/svg.css"
+		 *   }
+		 * });
+		 *
+		 * @param {object} oConfig configuration object
+		 * @param {string} oConfig.name the name of the icon collection
+		 * @param {sap.ui.core.URI} oConfig.uri the default URI to the svg.css stylesheet.
+		 *   <ul>
+		 *   <li><b>Absolute paths</b> (starting with <code>/</code> or <code>http(s)://</code>)
+		 *       are used as-is. The stylesheet is loaded from the given location and its
+		 *       relative <code>url()</code> references resolve against the stylesheet's location.
+		 *       Example: <code>"/assets/my-icons/svg.css"</code> — icon URLs inside the stylesheet
+		 *       like <code>url("icon.svg")</code> resolve to <code>/assets/my-icons/icon.svg</code>.</li>
+		 *   <li><b>Relative paths</b> (e.g. <code>"my/icons/svg.css"</code>) are resolved
+		 *       relative to the document base URL (<code>document.baseURI</code>). The stylesheet's
+		 *       internal <code>url()</code> references then resolve relative to the stylesheet's
+		 *       own location. Example: with a document base URL of <code>/app/</code> and
+		 *       <code>uri: "icons/svg.css"</code>, the stylesheet loads from
+		 *       <code>/app/icons/svg.css</code> and its <code>url("accept.svg")</code> resolves
+		 *       to <code>/app/icons/accept.svg</code>.</li>
+		 *   </ul>
+		 *   <b>Note:</b> The relative <code>url()</code> references within the stylesheet
+		 *   resolve against the stylesheet's own location, not against the document base URL.
+		 *   Ensure that the referenced SVG files are reachable from the stylesheet's location.
+		 * @param {object} [oConfig.themeConfig] map of theme regex patterns to svg.css URIs.
+		 *   On theme change, the first matching pattern determines which svg.css to load.
+		 *   If no pattern matches, <code>oConfig.uri</code> is used as fallback.
+		 *   The same absolute/relative resolution rules as for <code>oConfig.uri</code> apply.
+		 * @param {string} [oConfig.cssVarPrefix=oConfig.name] CSS variable prefix used to resolve
+		 *   CSS custom property names. When omitted, defaults to the collection name
+		 *   <code>oConfig.name</code>. The icon is rendered by referring to the CSS custom property
+		 *   whose name is built from this prefix plus the icon name
+		 *   (e.g. <code>--{cssVarPrefix}_{icon-name}</code>). This allows the icon to be rendered
+		 *   immediately without waiting for the stylesheet to be loaded.
+		 *
+		 *   <b>Naming guideline:</b> Use a camelCase identifier that is unique to your
+		 *   application, project, or library (e.g. <code>"myAppIcons"</code>). The prefix must
+		 *   <b>not</b> start with <code>sap</code>, because the <code>sap</code> namespace is
+		 *   reserved for UI5 theming parameters and built-in icon collections.
+		 * @returns {Promise} resolves when the stylesheet is loaded
+		 * @static
+		 * @public
+		 * @since 1.156
+		 */
+		IconPool.registerSVG = _IconRegistry.registerSVG;
+
+		/**
+		 * Returns a Promise that resolves when the given icon collection's metadata
+		 * has been fully loaded.
+		 *
+		 * For SVG collections, metadata is the svg.css stylesheet that declares the
+		 * CSS custom properties for each icon. After the returned Promise resolves,
+		 * {@link #.getIconNames IconPool.getIconNames(collectionName)} returns the
+		 * complete list of available icon names for that collection.
+		 *
+		 * For font-based collections, metadata is the JSON file that declares the
+		 * available icon names and their character codes.
+		 *
+		 * @param {string} [collectionName] Name of the icon collection. Omit (or pass
+		 *   <code>undefined</code>) for the built-in SAP-icons collection.
+		 * @returns {Promise|undefined} A Promise that resolves when the collection is ready,
+		 *   or <code>undefined</code> if the collection has not been registered
+		 * @static
+		 * @public
+		 * @since 1.156
+		 */
+		IconPool.collectionReady = _IconRegistry.collectionReady;
 
 		return IconPool;
 

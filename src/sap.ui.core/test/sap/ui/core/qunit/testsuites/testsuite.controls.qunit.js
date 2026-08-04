@@ -60,6 +60,21 @@ sap.ui.define(function() {
 					qunitBridge: true
 				}
 			},
+			"Icon-SVG": {
+				title: "sap.ui.core.Icon SVG Rendering",
+				ui5: {
+					libs: "sap.ui.core"
+				},
+				sinon: {
+					version: 4,
+					qunitBridge: true
+				},
+				loader: {
+					paths: {
+						"testdata/iconsvg": "test-resources/sap/ui/core/qunit/testdata/iconsvg"
+					}
+				}
+			},
 			InvisibleText: {
 				title: "sap.ui.core.InvisibleText",
 				ui5: {

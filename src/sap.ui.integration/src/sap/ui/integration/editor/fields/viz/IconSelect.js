@@ -132,7 +132,7 @@ sap.ui.define([
 			return;
 		}
 
-		var mFontRegistry = _IconRegistry.getFontRegistry();
+		var mFontRegistry = _IconRegistry.getCollectionRegistry();
 		if (!mFontRegistry["SAP-icons-TNT"]) {
 			// register TNT icons
 			IconPool.registerFont({

@@ -1,50 +1,53 @@
 /*!
  * ${copyright}
  */
-/* global FontFace */
 /*
  * IMPORTANT: This is a private module, its API must not be used and is subject to change.
  * Code other than the UI5 core library must not introduce dependencies to this module.
  */
 sap.ui.define([
-	"sap/base/i18n/ResourceBundle",
 	"sap/base/Log",
-	"sap/base/util/fetch",
-	"sap/base/util/syncFetch",
-	"sap/base/util/isPlainObject",
 	"sap/ui/core/Lib",
 	"sap/ui/core/Theming",
-	"sap/ui/core/theming/ThemeHelper"
+	"sap/ui/core/_IconSVGStrategy",
+	"sap/ui/core/_IconFontStrategy"
 ],
-	function(ResourceBundle, Log, fetch, syncFetch, isPlainObject, Library, Theming, ThemeHelper) {
+	function(Log, Library, Theming, SVGStrategy, FontStrategy) {
 		"use strict";
-
-		/**
-		 * CSS font family used for the icons provided by SAP.
-		 */
-		var SAP_ICON_FONT_FAMILY = 'SAP-icons';
 
 		/**
 		 * Protocol that is used to identify icon URIs.
 		 */
-		var ICON_PROTOCOL = 'sap-icon';
+		const ICON_PROTOCOL = 'sap-icon';
 
 		const ICON_URI_REGEX = new RegExp(`^${ICON_PROTOCOL}:\/\/(?:([^\/]+)\/)?([^\/]+)$`);
 
-		var mFontRegistry = {
-			undefined: {
+		const _IconRegistry = {
+			sapIconFontFamily: FontStrategy.SAP_ICON_FONT_FAMILY,
+			TYPE_SVG: SVGStrategy.TYPE,
+			TYPE_FONT: FontStrategy.TYPE
+		};
+
+		let fnReadyResolve;
+
+		const mCollectionRegistry = {
+			'undefined': {
 				config: {
-					fontFamily: SAP_ICON_FONT_FAMILY
+					cssVarPrefix: "sapIcons",
+					iconNames: [],
+					iconNamesSet: new Set()
 				},
+				type: _IconRegistry.TYPE_SVG,
 				metadataLoaded: true,
-				deprecatedNames: new Set(["soccor", "clinical-tast-tracker"])
+				deprecatedNames: new Set(["soccor", "clinical-tast-tracker"]),
+				ready: new Promise(function(resolve) {
+					fnReadyResolve = resolve;
+				})
 			}
 		};
 
-		var mRegistry = {
-			/*
-			 * Raw data for built-in icons.
-			 *
+		const mRegistry = {
+			/**
 			 * Maps the name of each icon to a numeric value. The lower 16 bit of the value (0xFFFF) represent the char code
 			 * of the icon in the 'SAP-icons' font (multiple char codes are currently not needed).
 			 * If the 17th bit is set (0x10000), then the icon doesn't need mirroring in right-to-left (RTL) mode.
@@ -761,9 +764,8 @@ sap.ui.define([
 			}
 		};
 
-		var oCoreResourceBundle;
+		let oCoreResourceBundle;
 
-		// Lazy load core resource bundle
 		function getCoreResourceBundle() {
 			if (!oCoreResourceBundle) {
 				oCoreResourceBundle = Library.getResourceBundleFor("sap.ui.core");
@@ -771,123 +773,161 @@ sap.ui.define([
 			return oCoreResourceBundle;
 		}
 
-		/*
-		 * The private "sap/ui/core/_IconRegistry" holds the implementation for some functions exposed
-		 * via the the "sap/ui/core/IconPool".
-		 * Please see the corresponding API documentation there.
+		function parseIconURI(sURI) {
+			if (_IconRegistry.isIconURI(sURI)) {
+				const [, collectionName, iconName] = sURI.match(ICON_URI_REGEX);
+				return { collection: collectionName, icon: iconName };
+			}
+			return null;
+		}
+
+		function normalizeCollectionName(collectionName) {
+			if (typeof collectionName !== "string") {
+				collectionName = String(collectionName);
+			}
+			return collectionName === 'undefined' ? undefined : collectionName;
+		}
+
+		/**
+		 * Returns the icon collection registry object.
+		 * Intended for test isolation only.
+		 * @returns {object} The icon collection registry object.
+		 * @private
+		 * @ui5-restricted sap.ui.core, sap.ui.integration
 		 */
-		var _IconRegistry = {
-			sapIconFontFamily: SAP_ICON_FONT_FAMILY
+		_IconRegistry.getCollectionRegistry = function() {
+			return mCollectionRegistry;
 		};
 
-
-		_IconRegistry.get = function() {
-			return mRegistry;
+		/**
+		 * Checks whether the given URI is an icon URI.
+		 * @param {string} sURI The URI to check.
+		 * @returns {boolean} True if the URI is an icon URI, false otherwise.
+		 */
+		_IconRegistry.isIconURI = function(sURI) {
+			return typeof sURI === "string" && ICON_URI_REGEX.test(sURI);
 		};
 
-		_IconRegistry.getFontRegistry = function() {
-			return mFontRegistry;
+		/**
+		 * Returns the type of the icon for the given URI.
+		 * @param {string} sURI The URI of the icon.
+		 * @returns {sap.ui.core.IconPool.CollectionType|null} The icon collection type,
+		 *   or <code>null</code> if the URI is not an icon URI or the collection is not registered.
+		 */
+		_IconRegistry.getIconType = function(sURI) {
+			const oInfo = parseIconURI(sURI);
+			if (!oInfo) {
+				return null;
+			}
+			const sType = mCollectionRegistry[oInfo.collection]?.type;
+			if (sType === _IconRegistry.TYPE_SVG || sType === _IconRegistry.TYPE_FONT) {
+				return sType;
+			}
+			return null;
 		};
 
 		/*
 		 * See IconPool.addIcon
 		 */
-		_IconRegistry.addIcon = function(iconName, collectionName, iconInfo) {
-			// OLD API Compatibility fontFamily, content, overWrite, suppressMirroring
-			if (typeof iconInfo === "string") {
-				iconInfo = {
-					fontFamily: arguments[2],
-					content: arguments[3],
-					overWrite: !!arguments[4],
-					suppressMirroring: !!arguments[5]
-				};
-			}
+		_IconRegistry.addIcon = function(iconName, collectionName, ...rest) {
+			collectionName = normalizeCollectionName(collectionName);
 
-			// if collectionName isn't a string, convert it to string
-			if (typeof collectionName !== "string") {
-				collectionName = String(collectionName);
+			if (!mCollectionRegistry[collectionName]) {
+				Log.warning("Icon collection '" + collectionName + "' is not registered. The collection type is set to 'FONT' by default", "sap.ui.core.IconPool");
 			}
-
-			// normalize "undefined" back to undefined because the default
-			// icon collection should have name undefined
-			collectionName = collectionName === 'undefined' ? undefined : collectionName;
 
 			if (!mRegistry[collectionName]) {
 				mRegistry[collectionName] = {};
 			}
 
-			var collection = mRegistry[collectionName],
-				icon = collection[iconName],
-				sContent, sText, sKey;
-
-			if (icon) {
-				if (collectionName === undefined) {
-					Log.warning("Icon with name '" + iconName + "' in built-in collection already exists and can not be overwritten.", "sap.ui.core.IconPool");
-					return;
-				} else if (!iconInfo.overWrite) {
-					Log.warning("Icon with name '" + iconName + "' in collection '" + collectionName + "' already exists. Specify 'iconInfo.overWrite' in order to overwrite.", "sap.ui.core.IconPool");
-					return;
-				}
-			}
-
-			if (Array.isArray(iconInfo.content)) {
-				sContent = iconInfo.content.map(makeChar).join('');
+			const type = mCollectionRegistry[collectionName]?.type || _IconRegistry.TYPE_FONT;
+			if (type === _IconRegistry.TYPE_SVG) {
+				return SVGStrategy.addIcon(iconName, collectionName, rest[0], mRegistry);
 			} else {
-				sContent = makeChar(iconInfo.content);
-			}
-
-			if (iconInfo.resourceBundle instanceof ResourceBundle) {
-				sKey = "Icon." + iconName;
-				if (iconInfo.resourceBundle.hasText(sKey)) {
-					sText = iconInfo.resourceBundle.getText(sKey);
+				// Legacy API compat: addIcon(name, coll, fontFamily, content, overWrite, suppressMirroring)
+				let iconInfo = rest[0];
+				if (typeof iconInfo === "string") {
+					iconInfo = {
+						fontFamily: rest[0],
+						content: rest[1],
+						overWrite: !!rest[2],
+						suppressMirroring: !!rest[3]
+					};
 				}
+				return FontStrategy.addIcon(iconName, collectionName, iconInfo, mRegistry);
 			}
-
-			icon = collection[iconName] = {
-				name: iconName,
-				collection: collectionName,
-				uri: `${ICON_PROTOCOL}://${collectionName ? `${collectionName}/` : ""}${iconName}`,
-				fontFamily: iconInfo.fontFamily,
-				content: sContent,
-				text: sText || '',
-				suppressMirroring: iconInfo.suppressMirroring,
-				//keep compatibility with old name
-				skipMirroring: iconInfo.suppressMirroring
-			};
-
-			return icon;
 		};
 
 		/*
 		 * See IconPool.getIconURI
 		 */
-		_IconRegistry.getIconURI = function (iconName, collectionName) {
-			var icon = this.getIconInfo(iconName, collectionName);
+		_IconRegistry.getIconURI = function(iconName, collectionName) {
+			const icon = _IconRegistry.getIconInfo(iconName, collectionName);
 			return icon && icon.uri;
 		};
 
 		/*
 		 * See IconPool.getIconInfo
 		 */
-		_IconRegistry.getIconInfo = function (iconName, collectionName, loadingMode) {
+		_IconRegistry.getIconInfo = function(iconName, collectionName, loadingMode) {
 			if (!iconName) {
-				return;
+				return undefined;
 			}
 
-			var info,
-				async,
-				oLoaded;
+			const oIconURI = parseIconURI(iconName);
 
-			// retrieves the icon info from the internal registry
-			function getInfo() {
-				var collection = mRegistry[collectionName];
-				var info = collection && collection[iconName];
+			if (oIconURI) {
+				loadingMode ??= collectionName;
+				collectionName = oIconURI.collection;
+				iconName = oIconURI.icon;
+				if (!iconName) {
+					return undefined;
+				}
+			}
 
-				// convert raw data lazily to the icon info
-				if (typeof info === 'number') {
-					mRegistry[collectionName][iconName] = undefined; // avoid duplicate icon warning
+			function getInfo(type) {
+				const collection = mRegistry[collectionName];
+				let info = collection && collection[iconName];
+
+				if (type === _IconRegistry.TYPE_SVG) {
+					// SVG: lazy creation from iconNames set
+					if (info === undefined || typeof info === 'number') {
+						const oCollConfig = mCollectionRegistry[collectionName]?.config;
+						const oNamesSet = oCollConfig?.iconNamesSet;
+						if (oNamesSet && oNamesSet.size > 0 && !oNamesSet.has(iconName)) {
+							return undefined;
+						}
+
+						// Read font compat char code data if available
+						const rawCharData = typeof info === 'number' ? info : undefined;
+						const addIconConfig = {
+							resourceBundle: getCoreResourceBundle(),
+							suppressMirroring: rawCharData != null ? !!(rawCharData & 0x10000) : true,
+							id: "sapIcon-" + (collectionName ? collectionName + "--" : "") + iconName,
+							cssVarPrefix: oCollConfig?.cssVarPrefix
+						};
+
+						// Built-in collection: inline char code map
+						if (typeof rawCharData === 'number') {
+							addIconConfig.fontFamily = FontStrategy.SAP_ICON_FONT_FAMILY;
+							addIconConfig.content = rawCharData & 0xFFFF;
+						} else if (mCollectionRegistry[collectionName]?.fontConfig) {
+							// External dual-registered collection: char codes in mRegistry from registerFont
+							const fontConfigEntry = mCollectionRegistry[collectionName].fontConfig;
+							const fontCharData = mRegistry[collectionName]?.[iconName];
+							if (typeof fontCharData === 'number') {
+								addIconConfig.fontFamily = fontConfigEntry.fontFamily;
+								addIconConfig.content = fontCharData & 0xFFFF;
+								addIconConfig.suppressMirroring = !!(fontCharData & 0x10000);
+							}
+						}
+
+						info = _IconRegistry.addIcon(iconName, collectionName, addIconConfig);
+					}
+				} else if (typeof info === 'number') { // FONT: lazy conversion from raw charCode
+					mRegistry[collectionName][iconName] = undefined;
 					info = _IconRegistry.addIcon(iconName, collectionName, {
-						fontFamily: mFontRegistry[collectionName].config.fontFamily,
+						fontFamily: mCollectionRegistry[collectionName].config.fontFamily,
 						content: info & 0xFFFF,
 						suppressMirroring: !!(info & 0x10000),
 						resourceBundle: getCoreResourceBundle()
@@ -897,43 +937,23 @@ sap.ui.define([
 				return info;
 			}
 
-			const aIconUriParts = iconName?.match(ICON_URI_REGEX);
-
-			// parse icon URI
-			if (aIconUriParts) {
-				loadingMode ??= collectionName;
-
-				[, collectionName, iconName] = aIconUriParts;
-
-				if (!iconName) {
-					return;
-				}
-			}
-
 			loadingMode = loadingMode || "sync";
-			async = (loadingMode === "async" || loadingMode === "mixed");
+			const async = (loadingMode === "async" || loadingMode === "mixed");
 
-			// if collectionName isn't a string, convert it to string
-			if (typeof collectionName !== "string") {
-				collectionName = String(collectionName);
-			}
+			collectionName = normalizeCollectionName(collectionName);
 
-			// normalize "undefined" back to undefined because the default
-			// icon collection should have name undefined
-			collectionName = collectionName === 'undefined' ? undefined : collectionName;
+			const type = mCollectionRegistry[collectionName]?.type || _IconRegistry.TYPE_FONT;
 
-			// get the info from the registry
-			info = getInfo();
+			let info = getInfo(type), oLoaded;
 
-			// load icon metadata if not available (except for default collection)
 			if (info === undefined && collectionName !== undefined) {
-				oLoaded = _IconRegistry._loadFontMetadata(collectionName, async);
+				oLoaded = FontStrategy.loadMetadata(collectionName, async, mCollectionRegistry, mRegistry, _IconRegistry._convertUrl);
 			}
+
 			if (async) {
 				if (oLoaded) {
-					// wait for the icon metadata to be loaded
-					return oLoaded.then(function () {
-						info = getInfo();
+					return oLoaded.then(function() {
+						info = getInfo(type);
 						if (!info) {
 							Log.warning("Icon info for icon '" + iconName + "' in collection '" + collectionName + "' could not be found");
 						}
@@ -944,45 +964,53 @@ sap.ui.define([
 						Log.warning("Icon info for icon '" + iconName + "' in collection '" + collectionName + "' could not be found");
 					}
 					return Promise.resolve(info);
-				} else {
-					info = getInfo();
 				}
 			} else {
-				// refresh info if needed and return it
-				info = getInfo();
+				info = getInfo(type);
 			}
 
-			// show a warning when the icon could not be found
 			if (!info) {
 				Log.warning("Icon info for icon '" + iconName + "' in collection '" + collectionName + "' could not be found");
 			}
 			return info;
 		};
 
-
 		/*
 		 * See IconPool.isIconURI
 		 */
-		_IconRegistry.isIconURI = function (uri) {
+		_IconRegistry.isIconURI = function(uri) {
 			return ICON_URI_REGEX.test(uri);
 		};
 
 		/*
 		 * See IconPool.getIconCollectionNames
 		 */
-		_IconRegistry.getIconCollectionNames = function () {
+		_IconRegistry.getIconCollectionNames = function() {
 			return Object.keys(mRegistry);
 		};
 
 		/*
 		 * See IconPool.getIconNames
 		 */
-		_IconRegistry.getIconNames = function (collectionName) {
-			var collection = mRegistry[collectionName],
-				deprecatedNames = mFontRegistry[collectionName] && mFontRegistry[collectionName].deprecatedNames,
-				res = [];
+		_IconRegistry.getIconNames = function(collectionName) {
+			const oCollectionConfig = mCollectionRegistry[collectionName],
+				deprecatedNames = oCollectionConfig && oCollectionConfig.deprecatedNames;
 
-			for (var name in collection) {
+			if (oCollectionConfig && oCollectionConfig.type === _IconRegistry.TYPE_SVG) {
+				const aNames = oCollectionConfig.config && oCollectionConfig.config.iconNames;
+				if (aNames && aNames.length > 0) {
+					if (!deprecatedNames) {
+						return aNames.slice();
+					}
+					return aNames.filter(function(name) {
+						return !deprecatedNames.has(name);
+					});
+				}
+			}
+
+			const collection = mRegistry[collectionName],
+				res = [];
+			for (const name in collection) {
 				if (collection.hasOwnProperty(name) && (!deprecatedNames || !deprecatedNames.has(name))) {
 					res.push(name);
 				}
@@ -993,268 +1021,96 @@ sap.ui.define([
 		/*
 		 * See IconPool.insertFontFaceStyle
 		 */
-		_IconRegistry.insertFontFaceStyle = function (sFontFace, sPath, sCollectionName) {
-			var oFontFace,
-				mFontRegistry = _IconRegistry.getFontRegistry();
-
-			function convertUrl(sUrl) {
-				// AppCacheBuster createds the '_covnertUrl' function when it's active. Call the function to include the
-				// CacheBuster token into the url.
-				return _IconRegistry._convertUrl ? _IconRegistry._convertUrl(sUrl) : sUrl;
-			}
-
-			if (arguments.length === 0 || sFontFace === SAP_ICON_FONT_FAMILY) {
-				// The font-face declaration for the predefined icon font is done in SAP-icons.css which is imported to the
-				// library.source.less. Therefore it's not needed to use inline css to declare it.
-				Log.info("It's not needed to call IconPool.insertFontFaceStyle to insert font-face for the predefined icon font SAP-icons because the font-face is included in the library.css of sap.ui.core");
-				return;
-			}
-
-			if (sFontFace && sPath === undefined) {
-				Log.error("IconPool.insertFontFaceStyle must be called with at least two parameters!");
-				return;
-			}
-
-			if (sCollectionName === undefined) {
-				// when the collection name isn't given
-				// set the collection name with sFontFace only when the icon font
-				// isn't the standard icon font. The collectionName of the standard icon font
-				// should always be set with undefined
-				sCollectionName = sFontFace;
-			}
-
-			// check if the font has not been registered yet
-			if (!mFontRegistry[sCollectionName]) {
-				Log.error("Icon font '" + sCollectionName + "' has not been registered yet.");
-				return;
-			}
-
-			if (sPath == mFontRegistry[sCollectionName].currentFontURI) {
-				Log.info("The font face style of icon font '" + sCollectionName + "' was already inserted.");
-				return;
-			}
-
-			mFontRegistry[sCollectionName].currentFontURI = sPath;
-
-			oFontFace = new FontFace(sFontFace,
-				"url(" + convertUrl(sPath + sFontFace + ".woff2") + ") format('woff2')," +
-				"local(" + sFontFace + ")",
-				{
-					weight: "normal",
-					style: "normal"
-				}
-			);
-
-			document.fonts.add(oFontFace);
-			oFontFace.load();
-
-			mFontRegistry[sCollectionName].fontFace = sFontFace;
+		_IconRegistry.insertFontFaceStyle = function(sFontFace, sPath, sCollectionName) {
+			FontStrategy.insertFontFaceStyle(sFontFace, sPath, sCollectionName, mCollectionRegistry, _IconRegistry._convertUrl);
 		};
 
+		/*
+		 * See IconPool.registerFont
+		 */
+		_IconRegistry.registerSVG = function(oConfig) {
+			return SVGStrategy.register(oConfig, mCollectionRegistry, mRegistry);
+		};
 
-		// attach to theme applied event to display the correct theme dependent icon fonts
+		/*
+		 * See IconPool.registerFont
+		 */
+		_IconRegistry.registerFont = function(oConfig) {
+			return FontStrategy.register(oConfig, mCollectionRegistry, mRegistry, _IconRegistry._convertUrl);
+		};
+
+		/**
+		 * Deregisters an icon collection, cleaning up all internal state.
+		 * Intended for test isolation only — not a public API.
+		 *
+		 * @param {string} collectionName the collection name to deregister
+		 */
+		_IconRegistry._deregisterCollection = function(collectionName) {
+			collectionName = normalizeCollectionName(collectionName);
+
+			const oCollection = mCollectionRegistry[collectionName];
+			if (!oCollection) {
+				return;
+			}
+
+			if (oCollection.type === _IconRegistry.TYPE_SVG) {
+				SVGStrategy._deregister(collectionName);
+			}
+			// Clean up FontFace for both pure FONT and dual-registered SVG+font collections
+			FontStrategy._deregister(collectionName, mCollectionRegistry);
+
+			delete mCollectionRegistry[collectionName];
+			delete mRegistry[collectionName];
+		};
+
+		/*
+		 * See IconPool.collectionReady
+		 */
+		_IconRegistry.collectionReady = function(collectionName) {
+			collectionName = normalizeCollectionName(collectionName);
+
+			const oCollection = mCollectionRegistry[collectionName];
+			if (!oCollection) {
+				return undefined;
+			}
+
+			// SVG collections store their ready promise
+			if (oCollection.ready) {
+				return oCollection.ready;
+			}
+
+			// FONT collections: metadataLoaded is a Promise during async load,
+			// true when done, false on error
+			if (oCollection.metadataLoaded instanceof Promise) {
+				return oCollection.metadataLoaded;
+			}
+			if (oCollection.metadataLoaded === true) {
+				return Promise.resolve();
+			}
+
+			return undefined;
+		};
+
+		// Theme change handler
 		Theming.attachApplied(function() {
-			for (const collectionName in mFontRegistry) {
-				const oThemeConfig = mFontRegistry[collectionName].themeConfig;
+			for (const collectionName in mCollectionRegistry) {
+				const oCollection = mCollectionRegistry[collectionName];
 
-				if (!oThemeConfig) {
-					continue;
+				if (collectionName === "undefined") {
+					// Built-in SAP-icons: SVG with fallback stylesheet for old themes
+					SVGStrategy.onThemeAppliedBuiltIn(mCollectionRegistry);
+					if (fnReadyResolve) {
+						fnReadyResolve();
+						fnReadyResolve = null;
+					}
+				} else if (oCollection.type === _IconRegistry.TYPE_SVG && oCollection.themeConfig) {
+					SVGStrategy.onThemeApplied(collectionName, oCollection, mCollectionRegistry);
 				}
 
-				const oFontConfig = mFontRegistry[collectionName].config;
-				const sFontURI = getThemePath(oThemeConfig) || oFontConfig.fontURI;
-
-				_IconRegistry.insertFontFaceStyle(oFontConfig.fontFamily, sFontURI, collectionName);
+				// Font theme handling — works for both pure FONT and dual-registered SVG+font
+				FontStrategy.onThemeApplied(collectionName, oCollection, mCollectionRegistry, _IconRegistry._convertUrl);
 			}
 		});
 
-		function getThemePath(oConfig) {
-			let fontURI;
-
-			if (isPlainObject(oConfig)) {
-				const mPath = oConfig["path"];
-				const aThemes = [Theming.getTheme()];
-
-				const oCustomThemeMetadata = ThemeHelper.getMetadata("sap-ui-core");
-				const sParentTheme = oCustomThemeMetadata?.Extends[0];
-
-				if (sParentTheme) {
-					aThemes.push(sParentTheme);
-				}
-
-				aThemes.some((sTheme) => {
-					return Object.keys(mPath).some((key) => {
-						const rTheme = new RegExp(key);
-
-						if (rTheme.test(sTheme)) {
-							fontURI = mPath[key];
-
-							// add trailing slash if necessary for more convenience
-							if (fontURI.charAt(fontURI.length - 1) !== "/") {
-								fontURI += "/";
-							}
-
-							fontURI = sap.ui.require.toUrl(fontURI);
-							return true;
-						}
-					});
-				});
-
-
-			}
-			return fontURI;
-		}
-
-		/**
-		 * Loads the font metadata for the given collection
-		 *
-		 * @param {string} collectionName the font collection name
-		 * @param {boolean} async whether the metadata is loaded async or sync
-		 * @returns {Promise<undefined>|undefined} if async is set to true a Promise is returned, otherwise undefined
-		 * @private
-		 */
-		_IconRegistry._loadFontMetadata = function (collectionName, async) {
-			var oConfig,
-				mRegistry = _IconRegistry.get(),
-				mFontRegistry = _IconRegistry.getFontRegistry();
-
-			if (mFontRegistry[collectionName]) {
-				// early out for subsequent tries of loading a font that failed or is finished loading
-				if (typeof mFontRegistry[collectionName].metadataLoaded === "boolean") {
-					return;
-				}
-
-				if (async && mFontRegistry[collectionName].metadataLoaded instanceof Promise) {
-					return mFontRegistry[collectionName].metadataLoaded;
-				}
-				// fetch font config
-				oConfig = mFontRegistry[collectionName].config;
-			} else {
-				// only display an error when the collection has not been manually registered by calling addIcon
-				if (!mRegistry[collectionName]) {
-					Log.error("The font configuration for collection '" + collectionName + "' is not registered");
-				}
-				// register an entry indicating the font loading failed
-				mFontRegistry[collectionName] = {
-					metadataLoaded: false
-				};
-			}
-
-			// add icons to registry and insert the font style
-			function loadFont(oFontMetadata) {
-				let mIcons = oFontMetadata;
-				let sFontURI = oConfig.fontURI;
-
-				if (oFontMetadata?.config && isPlainObject(oFontMetadata.config)) {
-					mFontRegistry[collectionName].themeConfig = oFontMetadata.config;
-					sFontURI = getThemePath(oFontMetadata.config) || oConfig.fontURI;
-					mIcons = oFontMetadata.icons;
-
-					if (!isPlainObject(mIcons)) {
-						Log.error(`There is something wrong with the structure of the font metadata loaded from ${sFontURI}.`);
-					}
-				}
-
-				for (const sKey in mIcons) {
-					mIcons[sKey] = parseInt(mIcons[sKey], 16);
-				}
-
-				mRegistry[collectionName] = mIcons;
-				_IconRegistry.insertFontFaceStyle(oConfig.fontFamily, sFontURI, collectionName);
-				mFontRegistry[collectionName].metadataLoaded = true;
-			}
-
-			var fnErrorCallback = function() {
-				Log.error("An error occurred loading the font metadata for collection '" + collectionName + "'");
-				mFontRegistry[collectionName].metadataLoaded = false;
-			};
-
-			if (oConfig) {
-				// search for a metadata file with the font family name in the same folder
-				if (oConfig.metadataURI === undefined) {
-					oConfig.metadataURI = oConfig.fontURI + oConfig.fontFamily + ".json";
-				}
-				if (async && !oConfig.metadata) {
-					// while loading is pending return the promise
-					if (mFontRegistry[collectionName].metadataLoaded instanceof Promise) {
-						return mFontRegistry[collectionName].metadataLoaded;
-					}
-					if (mRegistry[collectionName] === undefined) {
-						// load the metadata asynchronously and save the XHR object
-						var oAbortController = new AbortController();
-						mFontRegistry[collectionName].abortController = oAbortController;
-
-						mFontRegistry[collectionName].metadataLoaded = fetch(oConfig.metadataURI, {
-							headers: {
-								Accept: fetch.ContentTypes.JSON
-							},
-							signal: oAbortController.signal
-						}).then(function(response) {
-							if (response.ok) {
-								return response.json().then(function(oJSON) {
-									loadFont(oJSON);
-									delete mFontRegistry[collectionName].abortController;
-								});
-							}
-							// response not ok
-							throw new Error();
-
-						}).catch(function(error) {
-							if (error.name !== "AbortError") {
-								fnErrorCallback();
-							}
-						});
-					}
-					return mFontRegistry[collectionName].metadataLoaded;
-				}
-
-				/**
-				 * @deprecated As of Version 1.120
-				 */
-				if (!(async && !oConfig.metadata) && oConfig.metadataURI) {
-					if (mFontRegistry[collectionName].abortController) { // there is an async request ongoing
-						// the async request is aborted before the sync request is sent
-						mFontRegistry[collectionName].abortController.abort("Replaced by sync request");
-						mFontRegistry[collectionName].abortController = null;
-					}
-					Log.warning("Synchronous loading of font meta data in IconPool, due to .getIconInfo() call" +
-						" for '" + collectionName + "'. Use loading mode 'async' to avoid this call.", "SyncXHR", null, function() {
-						return {
-							type: "SyncXHR",
-							name: "IconPool"
-						};
-					});
-
-					try {
-						// load the metadata synchronously
-						var response = syncFetch(oConfig.metadataURI, {
-							headers: {
-								Accept: syncFetch.ContentTypes.JSON
-							}
-						});
-
-						if (response.ok) {
-							var oJSON = response.json();
-							loadFont(oJSON);
-						} else {
-							fnErrorCallback();
-						}
-					} catch (error) {
-						fnErrorCallback();
-					}
-					return;
-				}
-
-				// pass on the configuration object
-				loadFont(oConfig.metadata);
-			}
-		};
-
-		// helper functions
-		function makeChar(code) {
-			return String.fromCharCode(typeof code === 'number' ? code : parseInt(code, 16));
-		}
-
 		return _IconRegistry;
-
 	});

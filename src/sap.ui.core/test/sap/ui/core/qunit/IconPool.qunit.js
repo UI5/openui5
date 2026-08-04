@@ -3,13 +3,14 @@
 sap.ui.define([
 	"sap/ui/core/IconPool",
 	"sap/ui/core/_IconRegistry",
+	"sap/ui/core/_IconFontStrategy",
 	"sap/ui/core/Icon",
 	"sap/ui/core/Theming",
 	"sap/m/Image",
 	"sap/base/Log",
 	"sap/ui/test/TestUtils",
 	"sap/ui/thirdparty/jquery"
-], function(IconPool, _IconRegistry, Icon, Theming, Image, Log, TestUtils, jQuery) {
+], function(IconPool, _IconRegistry, FontStrategy, Icon, Theming, Image, Log, TestUtils, jQuery) {
 	"use strict";
 
 	QUnit.config.reorder = false;
@@ -74,7 +75,8 @@ sap.ui.define([
 			skipMirroring: false,
 			suppressMirroring: false,
 			text: "",
-			uri: "sap-icon://collection-1/legacy-syntax"
+			uri: "sap-icon://collection-1/legacy-syntax",
+			type: IconPool.CollectionType.FONT
 		}, "'legacy-syntax' icon info correct.");
 
 		// add icon twice
@@ -138,13 +140,13 @@ sap.ui.define([
 		var oIconInfo = IconPool.getIconInfo("manager");
 
 		IconPool.addIcon("manager", "undefined", {
-			content: oIconInfo.content.charCodeAt(0) + 0x1000,
+			suppressMirroring: !oIconInfo.suppressMirroring,
 			overWrite: true
 		});
 
 		var oNewIconInfo = IconPool.getIconInfo("manager");
 
-		assert.equal(oNewIconInfo.content, oIconInfo.content, "the defualt collection can't be overwritten");
+		assert.equal(oNewIconInfo.suppressMirroring, oIconInfo.suppressMirroring, "the defualt collection can't be overwritten");
 	});
 
 	QUnit.test("isIconURI", function(assert) {
@@ -157,7 +159,8 @@ sap.ui.define([
 		assert.deepEqual(IconPool.getIconCollectionNames(), ["undefined", "collection-1", "test"], "Correct set of collections should be returned.");
 	});
 
-	QUnit.test("getIconNames", function(assert) {
+	QUnit.test("getIconNames", async function(assert) {
+		await IconPool.collectionReady();
 
 		// default collection
 		assert.ok(Object.keys(IconPool.getIconNames()).length > 10, "Default collection should have more than 10 icons.");
@@ -450,7 +453,7 @@ sap.ui.define([
 	QUnit.module("Theme dependent Icons", {});
 
 	QUnit.test("registerFont with SAP-icons-TNT (Horizon Theme)", function(assert) {
-		const oInsertFontFaceStyleSpy = sinon.spy(_IconRegistry, "insertFontFaceStyle");
+		const oInsertFontFaceStyleSpy = sinon.spy(FontStrategy, "insertFontFaceStyle");
 		const oGetThemeStub = sinon.stub(Theming, "getTheme").returns("sap_horizon");
 
 		IconPool.registerFont({
@@ -481,7 +484,7 @@ sap.ui.define([
 
 		return new Promise((res, rej) => {
 			IconPool.fontLoaded("sap-tnt-icons-horizon-2").then(function() {
-				const oInsertFontFaceStyleSpy = sinon.spy(_IconRegistry, "insertFontFaceStyle");
+				const oInsertFontFaceStyleSpy = sinon.spy(FontStrategy, "insertFontFaceStyle");
 				const sExpectedFontURI = sap.ui.require.toUrl("sap/tnt/themes/base/fonts/horizon/");
 
 				Theming.attachApplied((oEvent) => {
@@ -503,13 +506,11 @@ sap.ui.define([
 	QUnit.test("Calling getIconInfo with 'sync' mode on the default icon font returns the result immediately", function(assert) {
 		var oIconInfo = IconPool.getIconInfo("sap-icon://card", undefined, "sync");
 		assert.equal(oIconInfo.collection, undefined, "Icon collection is correct");
-		assert.equal(oIconInfo.fontFamily, "SAP-icons", "Icon font family is correct");
-		assert.equal(oIconInfo.content, String.fromCharCode(0xe044), "Icon content has been resolved properly");
+		assert.equal(oIconInfo.suppressMirroring, false, "Icon mirroring info is correct (SVG: mirroring handled by CSS)");
 
 		oIconInfo = IconPool.getIconInfo("sap-icon://card", "sync");
 		assert.equal(oIconInfo.collection, undefined, "Icon collection is correct when not giving the iconCollection parameter");
-		assert.equal(oIconInfo.fontFamily, "SAP-icons", "Icon font family is correct when not giving the iconCollection parameter");
-		assert.equal(oIconInfo.content, String.fromCharCode(0xe044), "Icon content has been resolved properly when not giving the iconCollection parameter");
+		assert.equal(oIconInfo.suppressMirroring, false, "Icon mirroring info is correct when not giving the iconCollection parameter");
 	});
 
 	QUnit.test("Calling getIconInfo with 'sync' mode on a separate icon font returns the result immediately", function(assert) {		// stub the ajax method
@@ -550,8 +551,8 @@ sap.ui.define([
 		assert.ok(oIconInfo instanceof Promise, "getIconInfo returns a promise");
 		oIconInfo.then(function(oIconInfo) {
 			assert.ok(oIconInfo, "The promise is resolved with the icon info");
-			assert.equal(oIconInfo.fontFamily, "SAP-icons", "Icon font family is correct");
-			assert.equal(oIconInfo.content, String.fromCharCode(0xe105), "Icon content has been resolved properly");
+			assert.equal(oIconInfo.collection, undefined, "Icon collection is correct");
+			assert.equal(oIconInfo.suppressMirroring, false, "Icon mirroring info is correct");
 			done();
 		});
 	});
@@ -562,8 +563,8 @@ sap.ui.define([
 		assert.ok(oIconInfo instanceof Promise, "getIconInfo returns a promise");
 		oIconInfo.then(function(oIconInfo) {
 			assert.ok(oIconInfo, "The promise is resolved with the icon info");
-			assert.equal(oIconInfo.fontFamily, "SAP-icons", "Icon font family is correct");
-			assert.equal(oIconInfo.content, String.fromCharCode(0xe105), "Icon content has been resolved properly");
+			assert.equal(oIconInfo.collection, undefined, "Icon collection is correct");
+			assert.equal(oIconInfo.suppressMirroring, false, "Icon mirroring info is correct");
 			done();
 		});
 	});
@@ -631,13 +632,11 @@ sap.ui.define([
 	QUnit.test("Calling getIconInfo with 'mixed' mode on a default font icon returns the result immediately", function(assert) {
 		var oIconInfo = IconPool.getIconInfo("sap-icon://nutrition-activity", undefined, "mixed");
 		assert.equal(oIconInfo.collection, undefined, "Icon collection is correct");
-		assert.equal(oIconInfo.fontFamily, "SAP-icons", "Icon font family is correct");
-		assert.equal(oIconInfo.content, String.fromCharCode(0xe105), "Icon content has been resolved properly");
+		assert.equal(oIconInfo.suppressMirroring, false, "Icon mirroring info is correct");
 
 		oIconInfo = IconPool.getIconInfo("sap-icon://nutrition-activity", "mixed");
 		assert.equal(oIconInfo.collection, undefined, "Icon collection is correct when not giving the iconCollection parameter");
-		assert.equal(oIconInfo.fontFamily, "SAP-icons", "Icon font family is correct when not giving the iconCollection parameter");
-		assert.equal(oIconInfo.content, String.fromCharCode(0xe105), "Icon content has been resolved properly when not giving the iconCollection parameter");
+		assert.equal(oIconInfo.suppressMirroring, false, "Icon mirroring info is correct");
 	});
 
 	QUnit.test("Calling getIconInfo with 'mixed' is successfully handled in all cases (load, pending, success)", function(assert) {
@@ -667,9 +666,19 @@ sap.ui.define([
 	});
 
 	// =========================================================================
-	// getIconHTML
-	// =========================================================================
-	QUnit.module("getIconHTML");
+	QUnit.module("getIconHTML (font icons)", {
+		before: function() {
+			IconPool.registerFont({
+				fontFamily: "SAP-icons-TNT",
+				collectionName: "tnt",
+				fontURI: sap.ui.require.toUrl("sap/tnt/themes/base/fonts/")
+			});
+			return IconPool.collectionReady("tnt");
+		},
+		after: function() {
+			_IconRegistry._deregisterCollection("tnt");
+		}
+	});
 
 	QUnit.test("Returns empty string for non-icon URI", function(assert) {
 		assert.strictEqual(IconPool.getIconHTML("http://example.com/img.png"), "", "Non-icon URI returns empty string");
@@ -729,6 +738,33 @@ sap.ui.define([
 		assert.ok(oSpan.classList.contains("sapUiIcon"), "Has sapUiIcon class");
 		assert.ok(oSpan.getAttribute("role") === "presentation", "Has role=presentation");
 		assert.strictEqual(oSpan.getAttribute("aria-hidden"), "true", "Has aria-hidden=true");
+	});
+
+	QUnit.test("Works with font-based icon collection (TNT)", function(assert) {
+		var sHTML = IconPool.getIconHTML("sap-icon://tnt/technicalsystem");
+		assert.ok(sHTML.length > 0, "Non-empty result for font icon");
+		assert.ok(sHTML.indexOf("<span") === 0, "Starts with <span");
+		assert.ok(sHTML.indexOf("</span>") > 0, "Contains closing </span>");
+		assert.ok(sHTML.indexOf("sapUiIcon") > 0, "Contains sapUiIcon class");
+		assert.strictEqual(sHTML.indexOf("sapUiIconSVG"), -1, "Does NOT contain sapUiIconSVG class for font icons");
+		assert.ok(sHTML.indexOf("font-family") > 0 || sHTML.indexOf("font&#x2d;family") > 0, "Contains font-family style");
+	});
+
+	QUnit.test("Font icon HTML contains data-sap-ui-icon-content attribute", function(assert) {
+		var sHTML = IconPool.getIconHTML("sap-icon://tnt/technicalsystem");
+		assert.ok(sHTML.indexOf("data-sap-ui-icon-content") > 0, "Font icon has data-sap-ui-icon-content attribute");
+	});
+
+	QUnit.test("Includes additional CSS classes for font icons", function(assert) {
+		var sHTML = IconPool.getIconHTML("sap-icon://tnt/technicalsystem", ["myCustomClass"]);
+		assert.ok(sHTML.indexOf("myCustomClass") > 0, "Custom class present");
+		assert.ok(sHTML.indexOf("sapUiIcon") > 0, "Base sapUiIcon class still present");
+	});
+
+	QUnit.test("Includes custom attributes for font icons", function(assert) {
+		var sHTML = IconPool.getIconHTML("sap-icon://tnt/technicalsystem", [], {title: "TechnicalSystem", id: "myTntIcon"});
+		assert.ok(sHTML.indexOf('title="TechnicalSystem"') > 0, "title attribute present");
+		assert.ok(sHTML.indexOf('id="myTntIcon"') > 0, "id attribute present");
 	});
 
 });

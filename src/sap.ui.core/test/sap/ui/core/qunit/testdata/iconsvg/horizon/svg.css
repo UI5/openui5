@@ -1,0 +1,9 @@
+@property --testSVG_icon-alpha {syntax: "<url>"; initial-value: url("data:,"); inherits: true;}
+@property --testSVG_icon-beta {syntax: "<url>"; initial-value: url("data:,"); inherits: true;}
+@property --testSVG_icon-gamma {syntax: "<url>"; initial-value: url("data:,"); inherits: true;}
+
+:root {
+  --testSVG_icon-alpha: url("icon-alpha.svg");
+  --testSVG_icon-beta: url("icon-beta.svg");
+  --testSVG_icon-gamma: url("icon-gamma.svg");
+}
