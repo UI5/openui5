@@ -1871,6 +1871,7 @@ sap.ui.define([
 		if (oOldElement) {
 			_Helper.copySelected(oOldElement, oElement);
 			// PATCH serialization is using old instance; @see _Helper.resolveIfMatchHeader
+			// Note: also avoids "ETag changed" errors w/ #fetchLateProperty after #refreshSingle
 			_Helper.copyETags(oElement, oOldElement);
 		}
 		_Helper.restoreUpdatingProperties(oOldElement, oElement);
