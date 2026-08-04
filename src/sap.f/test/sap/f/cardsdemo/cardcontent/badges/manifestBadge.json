@@ -10,7 +10,7 @@
 	},
 	"sap.card": {
 		"type": "List",
-		"badge": [
+		"badges": [
 			{
 				"text": "New",
 				"icon": "sap-icon://status-in-process",

@@ -1,9 +1,9 @@
 {
 	"_version": "2.0.0",
 	"sap.app": {
-		"id": "card.test.badge.manifest.and.programmatic",
+		"id": "card.test.badge.manifestAndProgrammatic",
 		"type": "card",
-		"title": "Card 'programmatic'",
+		"title": "Card 'manifestAndProgrammatic'",
 		"applicationVersion": {
 			"version": "1.0.0"
 		}
@@ -13,9 +13,8 @@
 		"badges": [
 			{
 				"text": "From Manifest",
-				"icon": "sap-icon://message-information",
-				"state": "Indication04",
-				"visible": true,
+				"icon": "sap-icon://add-document",
+				"state": "Success",
 				"visibilityMode": "Persist"
 			}
 		],

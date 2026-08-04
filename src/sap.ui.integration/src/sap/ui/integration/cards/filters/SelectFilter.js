@@ -200,7 +200,7 @@ sap.ui.define([
 			sItemTemplateKey = "{key}";
 			sItemTemplateTitle = "{title}";
 
-			oModel = new JSONModel(oConfig.items);
+			oModel = new JSONModel(BindingResolver.resolveValue(oConfig.items, oCard));
 			oModel.setSizeLimit(oCard.getModelSizeLimit());
 
 			this.setModel(oModel);

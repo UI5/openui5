@@ -138,5 +138,22 @@ sap.ui.define([
 		return oGetFlexObjectsStub;
 	};
 
+	/**
+	 * Gets the source code of the specified module.
+	 * Try to get the debug source first, for systems where modules are e.g. minified.
+	 *
+	 * @param {string} sModuleName - Module name to get the source for
+	 * @returns {Promise<string>} The source code of the module
+	 */
+	FlQUnitUtils.getModuleSourceCode = async function(sModuleName) {
+		const sModuleUrl = sap.ui.require.toUrl(`${sModuleName}-dbg.js`);
+		const oResponse = await fetch(sModuleUrl);
+		if (oResponse.ok) {
+			return await oResponse.text();
+		}
+		const sFallbackModuleUrl = sap.ui.require.toUrl(`${sModuleName}.js`);
+		return await (await fetch(sFallbackModuleUrl)).text();
+	};
+
 	return FlQUnitUtils;
 });

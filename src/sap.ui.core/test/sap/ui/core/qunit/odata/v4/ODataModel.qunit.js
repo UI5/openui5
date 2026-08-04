@@ -222,6 +222,23 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("parseKeepsEmptyString", function (assert) {
+		// code under test
+		let oModel = this.createModel("", {parseKeepsEmptyString : true});
+		assert.strictEqual(oModel.getParseKeepsEmptyString(), true);
+
+		// code under test
+		oModel = this.createModel("", {});
+		assert.strictEqual(oModel.getParseKeepsEmptyString(), false);
+
+		[false, 0, "", undefined, 1, "X"].forEach((vValue) => {
+			assert.throws(() => {
+				this.createModel("", {parseKeepsEmptyString : vValue});
+			}, new Error("Value for parseKeepsEmptyString must be true"));
+		});
+	});
+
+	//*********************************************************************************************
 	QUnit.test("unsupported OData version", function (assert) {
 		assert.throws(function () {
 			this.createModel("", {odataVersion : "4.02"});

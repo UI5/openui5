@@ -285,6 +285,12 @@ sap.ui.define(['./util/EnvHelper', "sap/base/util/merge"], function (EnvHelper, 
 				sinon: true
 			},
 
+			"FilterBarLayoutMixin": {
+				group: "Mixin",
+				module: "./mixin/FilterBarLayoutMixin.qunit",
+				sinon: true
+			},
+
 			"PropertyHelperMixin": {
 				group: "Mixin",
 				module: "./mixin/PropertyHelperMixin.qunit",

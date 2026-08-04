@@ -91,7 +91,7 @@ sap.ui.define([
 				return !sUrl.includes(sBaseUrl);
 			});
 
-			this.oServer.respondWith("GET", new RegExp(sBaseUrl + "\.*childManifest\.json.*"), (oXhr) => {
+			this.oServer.respondWith("GET", new RegExp("childManifest\\.json"), (oXhr) => {
 				oXhr.respond(
 					200,
 					{ "Content-Type": "application/json" },
@@ -1008,5 +1008,258 @@ sap.ui.define([
 
 		// Clean up
 		oCard.destroy();
+	});
+
+	QUnit.module("ShowCard animation for Table cards", {
+		beforeEach: async function () {
+			const sBaseUrl = "ShowHideCardActionsFakeUrl/";
+			this.oCardManifest = {
+				"sap.app": {
+					id: "test.card"
+				},
+				"sap.card": {
+					type: "List",
+					configuration: {
+						childCards: {
+							childCard: {
+								manifest: "childManifest.json"
+							}
+						}
+					},
+					data: {
+						json: []
+					},
+					header: {
+						title: "Test Card"
+					},
+					content: {
+						item: {
+							title: "{title}"
+						}
+					}
+				}
+			};
+
+			this.oCard = new Card({
+				baseUrl: sBaseUrl,
+				manifest: this.oCardManifest
+			});
+
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+			await nextCardReadyEvent(this.oCard);
+
+			this.oServer = sinon.createFakeServer({
+				autoRespond: true,
+				respondImmediately: true
+			});
+
+			this.oServer.xhr.useFilters = true;
+			this.oServer.xhr.addFilter(function(sMethod, sUrl) {
+				return !sUrl.includes(sBaseUrl);
+			});
+
+			this.oServer.respondWith("GET", new RegExp("childManifest\\.json"), (oXhr) => {
+				oXhr.respond(
+					200,
+					{ "Content-Type": "application/json" },
+					JSON.stringify(this.oChildManifest)
+				);
+			});
+		},
+		afterEach: function () {
+			this.oCard.destroy();
+		}
+	});
+
+	QUnit.test("Animation is disabled for Table card with autoPopinMode", async function (assert) {
+		// Arrange
+		this.oChildManifest = {
+			"sap.app": {
+				id: "test.card.tableWithPopIn"
+			},
+			"sap.card": {
+				type: "Table",
+				data: {
+					json: [
+						{
+							"product": "Product 1"
+						}
+					]
+				},
+				header: {
+					title: "Table with AutoPopin"
+				},
+				content: {
+					autoPopinMode: true,
+					row: {
+						columns: [
+							{
+								title: "Product",
+								value: "{product}"
+							}
+						]
+					}
+				}
+			}
+		};
+
+		// Act
+		const oDialog = openCardDialog(
+			this.oCard,
+			{
+				childCardKey: "childCard"
+			}
+		);
+
+		await nextDialogAfterOpenEvent(oDialog);
+		await nextUIUpdate();
+
+		// Assert
+		const oChildCard = oDialog.getContent()[0];
+		assert.strictEqual(
+			oChildCard.getManifestEntry("/sap.card/type"),
+			"Table",
+			"Child card type is Table"
+		);
+		assert.strictEqual(
+			oChildCard.getManifestEntry("/sap.card/content/autoPopinMode"),
+			true,
+			"Child card has autoPopinMode enabled"
+		);
+
+		const oDialogRef = oDialog.getDomRef();
+		assert.notOk(
+			oDialogRef.classList.contains("sapUiIntCardDialogAnimate"),
+			"Dialog should not have animation class for Table card with autoPopinMode"
+		);
+
+		oDialog.close();
+		await nextUIUpdate();
+
+		assert.notOk(
+			oDialogRef.classList.contains("sapUiIntCardDialogAnimate"),
+			"Dialog should not have animation class after close for Table card with autoPopinMode"
+		);
+	});
+
+	QUnit.test("Animation is enabled for Table card without autoPopinMode", async function (assert) {
+		// Arrange
+		this.oChildManifest = {
+			"sap.app": {
+				id: "test.card.tableWithoutPopIn"
+			},
+			"sap.card": {
+				type: "Table",
+				data: {
+					json: [
+						{
+							"product": "Product 1"
+						}
+					]
+				},
+				header: {
+					title: "Table without AutoPopin"
+				},
+				content: {
+					autoPopinMode: false,
+					row: {
+						columns: [
+							{
+								title: "Product",
+								value: "{product}"
+							}
+						]
+					}
+				}
+			}
+		};
+
+		// Act
+		const oDialog = openCardDialog(
+			this.oCard,
+			{
+				childCardKey: "childCard"
+			}
+		);
+
+		await nextDialogAfterOpenEvent(oDialog);
+		await nextUIUpdate();
+
+		// Assert
+		const oChildCard = oDialog.getContent()[0];
+		assert.strictEqual(
+			oChildCard.getManifestEntry("/sap.card/type"),
+			"Table",
+			"Child card type is Table"
+		);
+		assert.strictEqual(
+			oChildCard.getManifestEntry("/sap.card/content/autoPopinMode"),
+			false,
+			"Child card has autoPopinMode disabled"
+		);
+
+		const oDialogRef = oDialog.getDomRef();
+		oDialog.close();
+		await nextUIUpdate();
+
+		assert.ok(
+			oDialogRef.classList.contains("sapUiIntCardDialogAnimate"),
+			"Dialog should have animation class after close for Table card without autoPopinMode"
+		);
+	});
+
+	QUnit.test("Animation is enabled for non-Table cards", async function (assert) {
+		// Arrange
+		this.oChildManifest = {
+			"sap.app": {
+				id: "test.card.list"
+			},
+			"sap.card": {
+				type: "List",
+				data: {
+					json: [
+						{
+							"title": "Item 1"
+						}
+					]
+				},
+				header: {
+					title: "List Card"
+				},
+				content: {
+					item: {
+						title: "{title}"
+					}
+				}
+			}
+		};
+
+		// Act
+		const oDialog = openCardDialog(
+			this.oCard,
+			{
+				childCardKey: "childCard"
+			}
+		);
+
+		await nextDialogAfterOpenEvent(oDialog);
+		await nextUIUpdate();
+
+		// Assert
+		const oChildCard = oDialog.getContent()[0];
+		assert.strictEqual(
+			oChildCard.getManifestEntry("/sap.card/type"),
+			"List",
+			"Child card type is List"
+		);
+
+		const oDialogRef = oDialog.getDomRef();
+		oDialog.close();
+		await nextUIUpdate();
+
+		assert.ok(
+			oDialogRef.classList.contains("sapUiIntCardDialogAnimate"),
+			"Dialog should have animation class after close for non-Table cards"
+		);
 	});
 });

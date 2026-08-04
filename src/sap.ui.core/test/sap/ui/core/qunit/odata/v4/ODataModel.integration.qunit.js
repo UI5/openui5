@@ -5994,8 +5994,14 @@ sap.ui.define([
 	//*********************************************************************************************
 	// Refresh single row after it has been updated with a value which doesn't match the table's
 	// filter anymore. In this case we expect the single row to disappear.
+	// JIRA: CPOUI5UISERVICESV3-1176
+	//
+	// Also tests the parseKeepsEmptyString model parameter (JIRA: CPOUI5ODATAV4-1554)
 	QUnit.test("Context#refresh(undefined, true)", function (assert) {
-		var oModel = this.createTeaBusiModel({autoExpandSelect : true}),
+		var oModel = this.createTeaBusiModel({
+				autoExpandSelect : true,
+				parseKeepsEmptyString : true
+			}),
 			oTable,
 			sView = '\
 <Table id="table"\
@@ -6005,7 +6011,7 @@ sap.ui.define([
 			sorter : {path : \'AGE\'},\
 			parameters : {foo : \'bar\'}\
 		}">\
-	<Text id="text" text="{Name}"/>\
+	<Input id="text" value="{Name}"/>\
 	<Input id="age" value="{AGE}"/>\
 </Table>',
 			that = this;
@@ -6058,6 +6064,13 @@ sap.ui.define([
 			oTable.getItems()[0].getBindingContext().refresh(undefined, true);
 
 			return that.waitForChanges(assert);
+		}).then(function () {
+			const oType = oTable.getItems()[0].getCells()[0].getBinding("value").getType();
+			assert.strictEqual(
+				// code under test (JIRA: CPOUI5ODATAV4-1554)
+				oType.parseValue("", "string"),
+				"",
+				"parseKeepsEmptyString causes '' to be parsed as '' instead of null");
 		});
 	});
 
@@ -6314,6 +6327,10 @@ sap.ui.define([
 	// JIRA: CPOUI5ODATAV4-2638
 	//
 	// Support client-side updates (JIRA: CPOUI5ODATAV4-2661)
+	//
+	// Without parseKeepsEmptyString, clearing a non-nullable String triggers a validation error
+	// instead of a PATCH.
+	// JIRA: CPOUI5ODATAV4-1554
 	QUnit.test("CPOUI5ODATAV4-2638: OneWay - Collection(ComplexType)", async function (assert) {
 		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
 		const sView = `
@@ -6444,6 +6461,13 @@ sap.ui.define([
 		this.oView.byId("name").getBinding("value").setValue("Frederic Spring");
 
 		await this.waitForChanges(assert, "update name");
+
+		const oType = this.oView.byId("name").getBinding("value").getType();
+		assert.strictEqual(
+			// code under test (JIRA: CPOUI5ODATAV4-1554)
+			oType.parseValue("", "string"),
+			null,
+			"without parseKeepsEmptyString, '' is parsed as null");
 	});
 
 	//*********************************************************************************************
@@ -40035,6 +40059,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// SNOW: DINC0921191
 	//
 	// Selection must not make a difference (JIRA: CPOUI5ODATAV4-3605)
+	// Afterwards, deletion still works fine (JIRA: CPOUI5ODATAV4-3608)
 	[false, true].forEach((bSelected) => {
 		const sTitle = "Recursive Hierarchy: DINC0921191, side-effects refresh w/ out-of-place node"
 			+ " outside the collection, selected = " + bSelected;
@@ -40046,11 +40071,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				+ ",HierarchyQualifier='OrgChart',NodeProperty='ID',Levels=1)";
 			const oModel = this.createTeaBusiModel({autoExpandSelect : true});
 			const sView = `
+	<Text id="count" text="{$count}"/>\
 	<t:Table id="table" rows="{path : '/EMPLOYEES',
 			parameters : {
 				$$aggregation : {
 					hierarchyQualifier : 'OrgChart'
 				},
+				$count : true,
 				$filter : 'not startswith(Name, \\'Out\\')'
 			}}" threshold="0" visibleRowCount="4">
 		<Text text="{= %{@$ui5.context.isSelected} }"/>
@@ -40059,13 +40086,16 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		<Text text="{Name}"/>
 	</t:Table>`;
 
-			this.expectRequest(sBaseUrl + "&$select=DrillState,ID,Name&$count=true&$skip=0&$top=4", {
+			this.expectRequest("#1 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2)
+				.expectRequest("#1 " + sBaseUrl
+					+ "&$select=DrillState,ID,Name&$count=true&$skip=0&$top=4", {
 					"@odata.count" : "2",
 					value : [
 						{DrillState : "leaf", ID : "0", Name : "Alpha"},
 						{DrillState : "leaf", ID : "1", Name : "Beta"}
 					]
-				});
+				})
+				.expectChange("count");
 
 			await this.createView(assert, sView, oModel);
 
@@ -40079,10 +40109,17 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			], 2);
 			const oListBinding = oTable.getBinding("rows");
 
+			this.expectChange("count", "2");
+
+			this.oView.byId("count").setBindingContext(oListBinding.getHeaderContext());
+
+			await this.waitForChanges(assert, "count");
+
 			// create a new root which does not match the filter (thus w/o rank, "out of place")
-			this.expectRequest("POST EMPLOYEES", {
+			this.expectRequest("#2 POST EMPLOYEES", {
 					payload : {Name : "Out"}
-				}, {ID : "Out", Name : "Out"});
+				}, {ID : "Out", Name : "Out"})
+				.expectRequest("#2 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2);
 
 			const oOut = oListBinding.create({Name : "Out"}, /*bSkipRefresh*/true);
 			oOut.setSelected(bSelected);
@@ -40119,10 +40156,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				Name : "Out"
 			});
 
-			this.expectRequestIf(bSelected, "EMPLOYEES?$filter=ID eq 'Out'&$select=AGE,ID,Name", {
+			this.expectRequestIf(bSelected, "#4 EMPLOYEES?$filter=ID eq 'Out'&$select=AGE,ID,Name", {
 					value : [{AGE : 44, ID : "Out", Name : "Out"}]
 				})
-				.expectRequest(sBaseUrl + "&$select=DrillState,ID,Name&$count=true&$skip=0&$top=4", {
+				.expectRequest("#4 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2)
+				.expectRequest("#4 " + sBaseUrl
+					+ "&$select=DrillState,ID,Name&$count=true&$skip=0&$top=4", {
 					"@odata.count" : "2",
 					value : [
 						{DrillState : "leaf", ID : "0", Name : "Alpha"},
@@ -40130,12 +40169,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					]
 				})
 				// rank of the out-of-place node; it is filtered out and thus has no rank
-				.expectRequest(sBaseUrl + "&$select=DistanceFromRoot,DrillState,ID,LimitedRank"
+				.expectRequest("#4 " + sBaseUrl
+					+ "&$select=DistanceFromRoot,DrillState,ID,LimitedRank"
 					+ "&$filter=ID eq 'Out'&$top=1", {
 					value : [] // filtered out -> no rank
 				})
 				// the out-of-place node's data
-				.expectRequest("EMPLOYEES?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
+				.expectRequest("#4 EMPLOYEES?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
 					+ "HierarchyNodes=$root/EMPLOYEES,HierarchyQualifier='OrgChart',NodeProperty='ID'"
 					+ ",Levels=1)&$select=ID,Name&$filter=ID eq 'Out'&$top=1", {
 					value : [{ID : "Out", Name : "Out"}]
@@ -40167,6 +40207,23 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				Name : "Out"
 			});
 			checkSelected(assert, oOut, bSelected ? true : undefined);
+
+			this.expectRequest("#5 DELETE EMPLOYEES('Out')")
+				.expectRequest("#5 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2);
+
+			await Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3608)
+				oOut.delete(), //TODO: ("$auto", /*bDoNotRequestCount*/true),
+				this.waitForChanges(assert, "delete")
+			]);
+
+			checkTable("after delete", assert, oTable, [
+				"/EMPLOYEES('0')",
+				"/EMPLOYEES('1')"
+			], [
+				[undefined, undefined, 1, "Alpha"],
+				[undefined, undefined, 1, "Beta"]
+			]);
 		});
 	});
 

@@ -76,6 +76,7 @@ sap.ui.define([
 			metadataUrlParams : true,
 			odataVersion : true,
 			operationMode : true,
+			parseKeepsEmptyString : true,
 			serviceUrl : true,
 			sharedRequests : true,
 			supportReferences : true,
@@ -146,6 +147,11 @@ sap.ui.define([
 		 *   including <code>undefined</code> lead to an error if 'vFilters' or 'vSorters' are given
 		 *   or if {@link sap.ui.model.odata.v4.ODataListBinding#filter} or
 		 *   {@link sap.ui.model.odata.v4.ODataListBinding#sort} is called.
+		 * @param {boolean} [mParameters.parseKeepsEmptyString]
+		 *   {@since 1.152.0} Whether the format option <code>parseKeepsEmptyString</code> is set to
+		 *   <code>true</code> for all instances of {@link sap.ui.model.odata.type.String} that are
+		 *   created automatically during type detection; only the value <code>true</code> is
+		 *   allowed; see {@link #getParseKeepsEmptyString}.
 		 * @param {string} mParameters.serviceUrl
 		 *   Root URL of the service to request data from. The path part of the URL must end with a
 		 *   forward slash according to OData V4 specification ABNF, rule "serviceRoot". You may
@@ -323,6 +329,11 @@ sap.ui.define([
 			throw new Error("Value for sharedRequests must be true");
 		}
 		this.bSharedRequests = mParameters.sharedRequests === true;
+		if ("parseKeepsEmptyString" in mParameters
+				&& mParameters.parseKeepsEmptyString !== true) {
+			throw new Error("Value for parseKeepsEmptyString must be true");
+		}
+		this.bParseKeepsEmptyString = mParameters.parseKeepsEmptyString === true;
 		this.bIgnoreETag = false;
 		if ("ignoreAnnotationsFromMetadata" in mParameters
 			&& mParameters.ignoreAnnotationsFromMetadata !== true) {
@@ -2136,6 +2147,25 @@ sap.ui.define([
 	// @override sap.ui.model.Model#getOriginalProperty
 	ODataModel.prototype.getOriginalProperty = function () {
 		throw new Error("Unsupported operation: v4.ODataModel#getOriginalProperty");
+	};
+
+	/**
+	 * Returns whether the <code>parseKeepsEmptyString</code> format option is set to
+	 * <code>true</code> for all instances of {@link sap.ui.model.odata.type.String} that are
+	 * created automatically during {@link sap.ui.model.odata.v4.ODataMetaModel#requestUI5Type
+	 * type detection} (as defined by the <code>parseKeepsEmptyString</code> model parameter, see
+	 * {@link #constructor}). Use this model setting if your OData service cannot handle
+	 * <code>null</code> values for string properties.
+	 *
+	 * @returns {boolean}
+	 *   Whether the <code>parseKeepsEmptyString</code> model parameter is set
+	 *
+	 * @public
+	 * @see #constructor
+	 * @since 1.152.0
+	 */
+	ODataModel.prototype.getParseKeepsEmptyString = function () {
+		return this.bParseKeepsEmptyString;
 	};
 
 	/**

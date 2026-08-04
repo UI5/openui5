@@ -1,9 +1,9 @@
 {
 	"_version": "2.0.0",
 	"sap.app": {
-		"id": "card.test.badge.manifest.binding",
+		"id": "card.test.badge.manifestBinding",
 		"type": "card",
-		"title": "Card 'binding'",
+		"title": "Card 'manifestBinding'",
 		"applicationVersion": {
 			"version": "1.0.0"
 		}
@@ -14,18 +14,42 @@
 			"json": {
 				"badgeInfo": [
 					{
-						"text": "5 New",
+						"text": "New",
 						"icon": "sap-icon://status-in-process",
 						"state": "Indication03"
 					},
 					{
-						"text": "2 Updated",
-						"state": "Indication05"
+						"text": "Pending Approval",
+						"icon": "sap-icon://pending",
+						"state": "Warning"
 					}
-				],
-				"items": [
+				]
+			},
+			"path": "/"
+		},
+		"badges": [
+			{
+				"text": "{badgeInfo/0/text}",
+				"icon": "{badgeInfo/0/icon}",
+				"state": "{badgeInfo/0/state}"
+			},
+			{
+				"text": "{badgeInfo/1/text}",
+				"icon": "{badgeInfo/1/icon}",
+				"state": "{badgeInfo/1/state}"
+			}
+		],
+		"header": {
+			"title": "Badges with Bindings",
+			"subTitle": "Badge data from card model"
+		},
+		"content": {
+			"data": {
+				"json": [
 					{
-						"Name": "Caroline Clark",
+						"Name": "Caroline Clark"
+					},
+					{
 						"Relation": "Dependent",
 						"Status": "New - Pending Approval"
 					},
@@ -40,31 +64,6 @@
 						"Status": "Updated"
 					}
 				]
-			},
-			"path": "/"
-		},
-		"badge": [
-			{
-				"text": "{badgeInfo/0/text}",
-				"icon": "{badgeInfo/0/icon}",
-				"state": "{badgeInfo/0/state}",
-				"visible": true,
-				"visibilityMode": "Persist"
-			},
-			{
-				"text": "{badgeInfo/1/text}",
-				"state": "{badgeInfo/1/state}",
-				"visible": true,
-				"visibilityMode": "Disappear"
-			}
-		],
-		"header": {
-			"title": "Badges with Bindings",
-			"subTitle": "Badge data from card model"
-		},
-		"content": {
-			"data": {
-				"path": "/items"
 			},
 			"item": {
 				"title": "{Name}",
