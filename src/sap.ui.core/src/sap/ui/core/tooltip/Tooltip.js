@@ -5,36 +5,27 @@
 // Provides control sap.ui.core.tooltip.Tooltip.
 sap.ui.define([
 	"sap/ui/core/Control",
-	"sap/ui/core/Lib",
+	"sap/ui/Device",
+	"sap/ui/core/Popup",
+	"sap/ui/core/popover/Positioning",
+	"sap/ui/core/popover/PopoverPhysicalSide",
+	"sap/ui/core/theming/Parameters",
+	"sap/ui/dom/units/Rem",
 	"sap/ui/core/tooltip/TooltipManager",
-	"sap/ui/Device"
+	"./TooltipRenderer"
 ],
 	function(
 		Control,
-		Library,
+		Device,
+		Popup,
+		Positioning,
+		PopoverPhysicalSide,
+		Parameters,
+		Rem,
 		TooltipManager,
-		Device
+		TooltipRenderer
 	) {
 		"use strict";
-
-		// Placement string tokens. These match the values of sap.m.PlacementType.
-		// They are kept as inline literals so this control has no static AMD
-		// dependency on sap.m.library — sap.m.Popover (which understands these
-		// values) is loaded lazily on first open.
-		const PlacementType = {
-			Top: "Top",
-			Bottom: "Bottom",
-			Left: "Left",
-			Right: "Right",
-			VerticalPreferredTop: "VerticalPreferredTop",
-			VerticalPreferredBottom: "VerticalPreferredBottom",
-			HorizontalPreferredLeft: "HorizontalPreferredLeft",
-			HorizontalPreferredRight: "HorizontalPreferredRight",
-			PreferredLeftOrFlip: "PreferredLeftOrFlip",
-			PreferredRightOrFlip: "PreferredRightOrFlip",
-			PreferredTopOrFlip: "PreferredTopOrFlip",
-			PreferredBottomOrFlip: "PreferredBottomOrFlip"
-		};
 
 		/**
 		* Constructor for a new Tooltip.
@@ -56,27 +47,6 @@ sap.ui.define([
 		* point — it creates and owns a <code>sap.ui.core.tooltip.Tooltip</code> internally
 		* and handles hover, focus, touch and the ARIA anchor on behalf of the
 		* host control.
-		*
-		* <h4>When to use:</h4>
-		* <ul>
-		* <li>For interactive controls without a visible label, such as icon buttons or avatars.</li>
-		* <li>To display supplementary, non-critical descriptions for elements such as icon buttons with badges. Users should still be able to complete their task without this information.</li>
-		* <li>To show a keyboard shortcut for an action.</li>
-		* <li>To display the full version of truncated text on a specific control, when no other wrapping or truncation pattern can be applied.</li>
-		* </ul>
-		*
-		* <h4>When not to use:</h4>
-		* <ul>
-		* <li>If you want to label a control, use a label instead.</li>
-		* <li>If you want to provide a large amount of information about the control, use a popover.</li>
-		* <li>If you need to include an interactive element or formatted text within the additional information, use a popover.</li>
-		* <li>If the information is essential for completing the task. Don't hide critical information in a tooltip.</li>
-		* <li>If you need to display long truncated text, use another wrapping or truncation pattern.</li>
-		* <li>If you need to provide in-app help such as context help or guided tour, use SAP Companion.</li>
-		* </ul>
-		*
-		* <h3>Accessibility</h3>
-		* Use {@link sap.ui.core.tooltip.TooltipEnablement} to create an invisible tooltip and associate it with the control it describes.
 		*
 		* @extends sap.ui.core.Control
 		* @implements sap.ui.core.PopupInterface
@@ -102,15 +72,12 @@ sap.ui.define([
 					/**
 					 * Defines the placement of the tooltip relative to its target.
 					 *
-					 * Accepts the placement string tokens understood by
-					 * <code>sap.m.Popover</code> (the same set as
-					 * <code>sap.m.PlacementType</code>). Typed as <code>string</code>
-					 * so that <code>sap.ui.core</code> does not depend on the
-					 * <code>sap.m</code> enum.
+					 * Accepts the same placement string tokens understood as <code>sap.m.PlacementType</code>).
+					 * Typed as <code>string</code> so that <code>sap.ui.core</code> does not depend on the <code>sap.m</code> enum.
 					 * @since 1.151
 					 */
 					placement: {
-						type: "string", group: "Behavior", defaultValue: PlacementType.VerticalPreferredTop
+						type: "string", group: "Behavior", defaultValue: "VerticalPreferredTop"
 					},
 
 					/**
@@ -123,203 +90,154 @@ sap.ui.define([
 				},
 				events: {
 					/**
-					 * Fired after the tooltip has opened (Popover afterOpen has run, placement applied).
+					 * Fired after the tooltip has opened.
 					 * @since 1.151
 					 */
 					afterOpen: {},
 
 					/**
-					 * Fired after the tooltip has closed (Popover afterClose has run, timers cleared).
+					 * Fired after the tooltip has closed.
 					 * @since 1.151
 					 */
 					afterClose: {}
 				}
 			},
-			renderer: {
-				apiVersion: 2,
-				render: function () {}
-			}
+			renderer: TooltipRenderer
 		});
 
+		// Minimum distance the arrow keeps from a tooltip corner, in px —
+		// roughly the corner radius. Small so the arrow can still center on
+		// short tooltips instead of being pushed to a corner.
+		const ARROW_CORNER_INSET_PX = 4;
+		// Base gap the tooltip keeps from the within-area edge.
+		const EDGE_MARGIN_PX = 10;
+
 		Tooltip.prototype.init = function () {
+			this._sCalcedPos = null;
+			this._bIsOpen = false;
+			this._bOpenRequested = false;
+
 			this.attachAfterClose(() => {
 				TooltipManager.deregister(this);
 			});
 		};
 
 		Tooltip.prototype.exit = function () {
-
 			TooltipManager.deregister(this);
 
-			if (this._oPopover) {
-				this._oPopover.destroy();
-				this._oPopover = null;
+			if (this._oPopup) {
+				this._oPopup.destroy();
+				this._oPopup = null;
 			}
-			this._pPopover = null;
 
 			this._clearTimeouts();
-
 			this._bOpenRequested = false;
 		};
 
-		Tooltip.prototype._onPopoverMouseEnter = function () {
-			this._clearCloseTimeout();
+		Tooltip.prototype._loadThemeParameters = function () {
+			this._arrowProtrusion = Rem.toPx(Parameters.get({
+				name: "_sap_ui_core_Tooltip_ArrowProtrusion",
+				callback: (sValue) => { this._arrowProtrusion = Rem.toPx(sValue); }
+			}) || "0.375rem");
+			this._arrowContainerSize = Rem.toPx(Parameters.get({
+				name: "_sap_ui_core_Tooltip_ArrowContainerSize",
+				callback: (sValue) => { this._arrowContainerSize = Rem.toPx(sValue); }
+			}) || "0.75rem");
 		};
 
-		Tooltip.prototype._onPopoverMouseLeave = function () {
-			if (this._bIsOpen) {
-				this.close(500);
+		Tooltip.prototype._ensurePopup = function () {
+			if (this._oPopup) {
+				return this._oPopup;
 			}
+
+			this._oPopup = new Popup(this, /*bModal*/ false, /*bShadow*/ false, /*bAutoClose*/ false);
+
+			// Resolve placement from the *rendered* DOM. The Popup renders the
+			// tooltip content during open() and then calls _applyPosition; at
+			// that point getDomRef() has a real size, so we measure it, pick the
+			// side, re-anchor, and let the base positioning run — a two-pass
+			// reposition. This avoids pre-rendering the
+			// tooltip into a hidden holder just to measure it.
+			const oTooltip = this;
+			const fnBaseApplyPosition = this._oPopup._applyPosition;
+			this._oPopup._applyPosition = function (oPosition) {
+				const sState = this.getOpenState();
+
+				if (sState === "CLOSING" || sState === "CLOSED") {
+					return;
+				}
+
+				// Clear stale position before the Popup re-docks below (clear -> dock -> measure).
+				const oDomRef = oTooltip.getDomRef();
+
+				if (oDomRef) {
+					oDomRef.style.left = "";
+					oDomRef.style.right = "";
+					oDomRef.style.top = "";
+					oDomRef.style.bottom = "";
+				}
+
+				// First pass for this open: resolve the side from the measured
+				// DOM, re-anchor, and return — the setPosition below triggers a
+				// second _applyPosition pass where _bPosResolved is true.
+				if (!oTooltip._bPosResolved && oTooltip._oHostForArrow) {
+					const sSide = oTooltip._resolveSide(oTooltip._oHostForArrow);
+					oTooltip._sCalcedPos = sSide;
+					oTooltip._applyPlacementClass();
+
+					const oAnchor = Positioning.computeAnchor({
+						side: sSide,
+						arrowSize: oTooltip._arrowProtrusion
+					});
+
+					oTooltip._bPosResolved = true;
+					this.setPosition(oAnchor.my, oAnchor.at, oTooltip._oHostForArrow, oAnchor.offset, "none");
+					return;
+				}
+
+				fnBaseApplyPosition.call(this, oPosition);
+			};
+
+			this._oPopup.attachOpened(function () {
+				this._bIsOpen = true;
+				this._fitIntoWithinArea();
+				this._positionArrow();
+				this._bindDomEvents();
+				this.fireAfterOpen();
+			}, this);
+			this._oPopup.attachClosed(function () {
+				this._bIsOpen = false;
+				this._bOpenRequested = false;
+				this._bPosResolved = false;
+				this._clearTimeouts();
+				this.fireAfterClose();
+			}, this);
+			return this._oPopup;
 		};
 
-		Tooltip.prototype._applyPlacementClass = function () {
-			const oDomRef = this._oPopover && this._oPopover.getDomRef();
+		Tooltip.prototype._bindDomEvents = function () {
+			const oDomRef = this.getDomRef();
 			if (!oDomRef) {
 				return;
 			}
-			// Reflect the *resolved* placement (after any auto-flip by Popover) on the popover root.
-			// The base TooltipPlacementType-style classes drive the LESS pseudo-elements that extend
-			// the clickable area beyond the arrow so the tooltip stays open when the mouse moves
-			// over the gap between popover body and target element.
-			oDomRef.classList.remove("sapUiCoreTooltipTop", "sapUiCoreTooltipBottom", "sapUiCoreTooltipLeft", "sapUiCoreTooltipRight");
-			const sCalcedPos = this._oPopover._getCalculatedPlacement && this._oPopover._getCalculatedPlacement();
-			if (sCalcedPos === "Top" || sCalcedPos === "Bottom" || sCalcedPos === "Left" || sCalcedPos === "Right") {
-				oDomRef.classList.add("sapUiCoreTooltip" + sCalcedPos);
+			if (oDomRef._sapUiCoreTooltipMouseBound === this.getId()) {
+				return;
 			}
+			oDomRef._sapUiCoreTooltipMouseBound = this.getId();
+			oDomRef.addEventListener("mouseenter", this._onTooltipMouseEnter.bind(this));
+			oDomRef.addEventListener("mouseleave", this._onTooltipMouseLeave.bind(this));
 		};
 
-		Tooltip.prototype._popoverAfterRendering = function () {
-			const oDomRef = this._oPopover.getDomRef();
-
-			// During the first afterRendering of the Popover, _calcPlacement has not yet run for
-			// non-strict placements, so the class may be applied again from afterOpen below.
-			this._applyPlacementClass();
-
-			// Bind mouse handlers exactly once per Popover DOM node. Re-renders may produce a new
-			// node (or the same node), so we tag it to detect first time vs. repeat.
-			if (oDomRef._sapUiCoreTooltipMouseBound !== this.getId()) {
-				oDomRef._sapUiCoreTooltipMouseBound = this.getId();
-				oDomRef.addEventListener("mouseenter", this._onPopoverMouseEnter.bind(this));
-				oDomRef.addEventListener("mouseleave", this._onPopoverMouseLeave.bind(this));
-			}
-		};
-
-		// Strict edges (Top/Bottom/Left/Right) do not flip in Popover.
-		const mPromoteToPreferred = {
-			[PlacementType.Top]: PlacementType.VerticalPreferredTop,
-			[PlacementType.Bottom]: PlacementType.VerticalPreferredBottom,
-			[PlacementType.Left]: PlacementType.HorizontalPreferredLeft,
-			[PlacementType.Right]: PlacementType.HorizontalPreferredRight
-		};
-
-		// Popover has a known issue with Preferred*OrFlip: when the preferred side
-		// has insufficient space, _calcHorizontal/_calcVertical correctly set
-		// _oCalcedPos to the opposite side, but _getOffsetX/_getOffsetY then add
-		// an extra ±parentWidth/Height shift on top, double-counting the flip and
-		// leaving the popover overlapping the opener. Until that is fixed in
-		// Popover, the Tooltip side-steps the broken path: when the preferred
-		// side does not have enough room for the popover, we return the strict
-		// opposite edge (which mPromoteToPreferred then re-routes through
-		// Popover's correct HorizontalPreferred* / VerticalPreferred* path).
-		// Conservative defaults are used for the very first open, where the
-		// popover has not been rendered yet and its real dimensions are unknown.
-		const FALLBACK_TOOLTIP_WIDTH = 200;
-		const FALLBACK_TOOLTIP_HEIGHT = 40;
-
-		Tooltip.prototype._resolvePlacement = function (oControl) {
-			const sPlacement = this.getPlacement();
-			// Only the Preferred*OrFlip placements need the measurement-based fallback;
-			// every other value is forwarded as-is.
-			if (sPlacement !== PlacementType.PreferredRightOrFlip
-				&& sPlacement !== PlacementType.PreferredLeftOrFlip
-				&& sPlacement !== PlacementType.PreferredTopOrFlip
-				&& sPlacement !== PlacementType.PreferredBottomOrFlip) {
-				return sPlacement;
-			}
-			const oHost = this._getHostElement(oControl);
-			if (!oHost) {
-				return sPlacement;
-			}
-			const oRect = oHost.getBoundingClientRect();
-			// Use the Popover's rendered size after the first open; before that
-			// fall back to conservative estimates that match a typical tooltip.
-			const $popover = this._oPopover && this._oPopover.$ && this._oPopover.$();
-			const iPopoverWidth = ($popover && $popover.length && $popover.outerWidth()) || FALLBACK_TOOLTIP_WIDTH;
-			const iPopoverHeight = ($popover && $popover.length && $popover.outerHeight()) || FALLBACK_TOOLTIP_HEIGHT;
-			const iArrow = (this._oPopover && this._oPopover._arrowOffset) || 18;
-
-			switch (sPlacement) {
-				case PlacementType.PreferredRightOrFlip:
-					return (window.innerWidth - oRect.right) > (iPopoverWidth + iArrow) ? sPlacement : PlacementType.Left;
-				case PlacementType.PreferredLeftOrFlip:
-					return oRect.left > (iPopoverWidth + iArrow) ? sPlacement : PlacementType.Right;
-				case PlacementType.PreferredTopOrFlip:
-					return oRect.top > (iPopoverHeight + iArrow) ? sPlacement : PlacementType.Bottom;
-				case PlacementType.PreferredBottomOrFlip:
-					return (window.innerHeight - oRect.bottom) > (iPopoverHeight + iArrow) ? sPlacement : PlacementType.Top;
-				default:
-					return sPlacement;
-			}
-		};
-
-		/**
-		 * Opens the tooltip next to the given control or DOM element.
-		 *
-		 * @param {sap.ui.core.Control|HTMLElement} oControl The control or DOM element relative to which the tooltip is positioned.
-		 * @param {int} [iDelay] Delay in milliseconds before the tooltip opens. Defaults to the value of the <code>delay</code> property.
-		 * @public
-		 */
-		Tooltip.prototype.openBy = async function (oControl, iDelay = this.getDelay()) {
-
-			// Mark the intent to open immediately so a close() that arrives while we
-			// are still awaiting Popover instantiation can cancel the pending open.
-			this._bOpenRequested = true;
-			TooltipManager.registerOpening(this);
-
-			// A pending close (e.g. focusout) must not win over a fresh open — cancel it.
+		Tooltip.prototype._onTooltipMouseEnter = function () {
 			this._clearCloseTimeout();
+			this._bIsMouseOver = true;
+		};
 
-			// Cache the in-flight Promise so simultaneous callers (e.g. mouseenter+focusin)
-			// share a single Popover instance instead of racing and leaking duplicates.
-			if (!this._oPopover) {
-				if (!this._pPopover) {
-					this._pPopover = this._createPopover().then((oPopover) => {
-						this._oPopover = oPopover;
-						return oPopover;
-					});
-				}
-				await this._pPopover;
+		Tooltip.prototype._onTooltipMouseLeave = function () {
+			this._bIsMouseOver = false;
+			if (this._bIsOpen) {
+				this.close(500);
 			}
-
-			if (!this._bOpenRequested) {
-				return;
-			}
-
-			if (this._iOpenTimeout) {
-				return;
-			}
-
-			this._iOpenTimeout = setTimeout(() => {
-				this._iOpenTimeout = null;
-				// A close() that arrived between scheduling and firing has cleared the open intent — abort.
-				if (!this._bOpenRequested) {
-					return;
-				}
-				// Final selection guard: if a selection appeared during the open delay
-				// (e.g. user is mid-drag-select or about to right-click a selection), suppress the open so the popover render does not clear the selection.
-				const oSelection = window.getSelection && window.getSelection();
-				if (oSelection && oSelection.toString().length > 0) {
-					// Popover never opens → afterClose won't fire, deregister here.
-					this._bOpenRequested = false;
-					TooltipManager.deregister(this);
-					return;
-				}
-				this._oPopover.getContent()[0].setText(this.getText());
-				const sPlacement = this._resolvePlacement(oControl);
-				this._oPopover.setPlacement(mPromoteToPreferred[sPlacement] || sPlacement);
-				this._oPopover.openBy(oControl);
-				this._bIsOpen = true;
-			}, iDelay);
 		};
 
 		// Resolve the host control's DOM element from a UI5 control or a plain HTMLElement.
@@ -333,78 +251,250 @@ sap.ui.define([
 			return (oControl.getDomRef && oControl.getDomRef()) || null;
 		};
 
-		// @todo get rid of sap/m/Popover and sap/m/Text dependencies
-		Tooltip.prototype._createPopover = async function () {
+		Tooltip.prototype._applyPlacementClass = function () {
+			const oDomRef = this.getDomRef();
 
-			// sap.m.Popover (and its Text content) is loaded lazily so that
-			// sap.ui.core keeps no static dependency on sap.m. When sap.m is
-			// already loaded the modules are required synchronously; otherwise
-			// the library is loaded first.
-			let Popover = sap.ui.require("sap/m/Popover");
-			let Text = sap.ui.require("sap/m/Text");
-
-			if (!Popover || !Text) {
-				await Library.load({ name: "sap.m" });
-				[Popover, Text] = await new Promise((fnResolve) => {
-					sap.ui.require(["sap/m/Popover", "sap/m/Text"], (P, T) => fnResolve([P, T]));
-				});
+			if (!oDomRef) {
+				return;
 			}
 
-			const oPopover = new Popover({
-				showHeader: false,
-				placement: this.getPlacement(),
-				modal: false,
-				content: new Text(),
-				afterOpen: () => {
-					// At this point _calcPlacement has run, so _getCalculatedPlacement
-					// returns the resolved Top/Bottom/Left/Right side.
-					this._applyPlacementClass();
-					this.fireAfterOpen();
+			oDomRef.classList.remove(
+				"sapUiCoreTooltip-" + PopoverPhysicalSide.Top, "sapUiCoreTooltip-" + PopoverPhysicalSide.Bottom,
+				"sapUiCoreTooltip-" + PopoverPhysicalSide.Left, "sapUiCoreTooltip-" + PopoverPhysicalSide.Right
+			);
+
+			const sSide = this._sCalcedPos || this.getPlacement();
+
+			if (Object.hasOwn(PopoverPhysicalSide, sSide)) {
+				oDomRef.classList.add("sapUiCoreTooltip-" + sSide);
+			}
+		};
+
+		Tooltip.prototype._resolveSide = function (oHostElement) {
+			return Positioning.resolvePlacement({
+				preferred: this.getPlacement(),
+				openerRef: oHostElement,
+				popoverRef: this.getDomRef(),
+				withinAreaRef: Popup.getWithinAreaDomRef(),
+				margins: {
+					top: EDGE_MARGIN_PX,
+					right: EDGE_MARGIN_PX,
+					bottom: EDGE_MARGIN_PX,
+					left: EDGE_MARGIN_PX
 				},
-				afterClose: () => {
-					this._bIsOpen = false;
-					this._bOpenRequested = false;
-					this._clearTimeouts();
-					this.fireAfterClose();
+				arrowSize: this._arrowProtrusion
+			});
+		};
+
+		/**
+		 * Opens the tooltip next to the given control or DOM element.
+		 *
+		 * @param {sap.ui.core.Control|HTMLElement} oControl The control or DOM element relative to which the tooltip is positioned.
+		 * @param {int} [iDelay] Delay in milliseconds before the tooltip opens. Defaults to the value of the <code>delay</code> property.
+		 * @public
+		 */
+		Tooltip.prototype.openBy = function (oControl, iDelay) {
+			if (iDelay === undefined) {
+				iDelay = this.getDelay();
+			}
+
+			this._bOpenRequested = true;
+			TooltipManager.registerOpening(this);
+
+			// A pending close (e.g. focusout) must not win over a fresh open — cancel it.
+			this._clearCloseTimeout();
+
+			// Load arrow dimensions from the theme before positioning.
+			this._loadThemeParameters();
+
+			this._ensurePopup();
+
+			if (this._iOpenTimeout) {
+				return;
+			}
+
+			this._iOpenTimeout = setTimeout(() => {
+				this._iOpenTimeout = null;
+				if (!this._bOpenRequested) {
+					return;
 				}
+				// If a selection appeared during the open delay, suppress the
+				// open so the tooltip DOM insertion doesn't clear it.
+				const oSelection = window.getSelection && window.getSelection();
+				if (oSelection && oSelection.toString().length > 0) {
+					this._bOpenRequested = false;
+					TooltipManager.deregister(this);
+					return;
+				}
+				this._doOpen(oControl);
+			}, iDelay);
+		};
+
+		Tooltip.prototype._doOpen = function (oControl) {
+			const oHost = this._getHostElement(oControl);
+			if (!oHost) {
+				this._bOpenRequested = false;
+				return;
+			}
+
+			// Remember the opener so the _applyPosition override (during open)
+			// and _positionArrow (on the "opened" event) can resolve the side
+			// and point the arrow at the opener's center.
+			this._oHostForArrow = oHost;
+			this._bPosResolved = false;
+
+			// Open with a provisional anchor derived from the preferred placement
+			// (abstract placements fall back to Bottom in computeAnchor). The
+			// Popup renders the content, then the _applyPosition override measures
+			// the real DOM, resolves the final side, and re-anchors before paint.
+			const oAnchor = Positioning.computeAnchor({
+				side: this.getPlacement(),
+				arrowSize: this._arrowProtrusion
 			});
 
+			this._oPopup.setPosition(oAnchor.my, oAnchor.at, oHost, oAnchor.offset, "none");
+			this._oPopup.open(0);
+		};
 
-			oPopover.addStyleClass("sapUiCoreTooltip");
+		/**
+		 * After the Popup has docked the tooltip, re-clamp its position inside the
+		 * within-area and cap its size so it fits those bounds.
+		 */
+		Tooltip.prototype._fitIntoWithinArea = function () {
+			const oDomRef = this.getDomRef();
 
-			oPopover.addEventDelegate({
-				onAfterRendering: this._popoverAfterRendering
-			}, this);
+			if (!oDomRef) {
+				return;
+			}
 
-			oPopover._getInitialFocusId = () => {
-				return null;
+			// Reset size caps only; position is owned by the Popup dock (cleared and
+			// re-docked in _applyPosition).
+			oDomRef.style.maxWidth = "";
+			oDomRef.style.maxHeight = "";
+
+			const oContRef = oDomRef.querySelector(".sapUiCoreTooltipCont");
+
+			if (oContRef) {
+				oContRef.style.maxHeight = "";
+			}
+
+			const oWithinRef = Popup.getWithinAreaDomRef();
+			const oMargins = {
+				top: EDGE_MARGIN_PX,
+				right: EDGE_MARGIN_PX,
+				bottom: EDGE_MARGIN_PX,
+				left: EDGE_MARGIN_PX
 			};
 
-			oPopover._restoreFocus = function() {
-				// Do nothing - don't restore focus on close
-			};
+			// Cap before clamp: the clamp reads the box rect, so
+			// the box must already be shrunk to fit — else it can't be pulled on-screen.
+			const oBoxMax = Positioning.computeMaxContentSize({
+				margin: oMargins,
+				withinAreaRef: oWithinRef,
+				side: this._sCalcedPos,
+				openerRef: this._oHostForArrow,
+				arrowSize: this._arrowProtrusion
+			});
 
-			// Popover.close() also calls Popup.applyFocusInfo(_oPreviousFocus) when
-			// the focused element at close-time differs from the one at open-time.
-			const fnSuperClose = oPopover.close.bind(oPopover);
-			oPopover.close = function () {
-				this._oPreviousFocus = null;
-				return fnSuperClose.apply(this, arguments);
-			};
+			if (oBoxMax.maxWidth < oDomRef.getBoundingClientRect().width) {
+				oDomRef.style.maxWidth = oBoxMax.maxWidth + "px";
+			}
 
-			return oPopover;
+			// Cap root + scroll container so a too-tall tooltip scrolls. Cap on content
+			// height, not the root rect.
+			if (oContRef) {
+				const oCs = window.getComputedStyle(oDomRef);
+				const iPadY = parseFloat(oCs.paddingTop) + parseFloat(oCs.paddingBottom);
+				const iContMax = Positioning.computeMaxContentSize({
+					margin: oMargins,
+					withinAreaRef: oWithinRef,
+					side: this._sCalcedPos,
+					openerRef: this._oHostForArrow,
+					arrowSize: this._arrowProtrusion,
+					reservedHeight: iPadY
+				}).maxHeight;
+
+				if (oContRef.scrollHeight > iContMax) {
+					oDomRef.style.maxHeight = oBoxMax.maxHeight + "px";
+					oContRef.style.maxHeight = iContMax + "px";
+				}
+			}
+
+			// Clamp: where the (now fit-sized) box may sit. Positioning folds in the
+			// within-area and reserves the opener side from the base margin.
+			const oPosition = Positioning.computePopoverPositionCss({
+				popoverRef: oDomRef,
+				hasVerticalScrollbar: false,
+				margin: oMargins,
+				withinAreaRef: oWithinRef,
+				side: this._sCalcedPos,
+				openerRef: this._oHostForArrow,
+				arrowSize: this._arrowProtrusion
+			});
+
+			["top", "bottom", "left", "right"].forEach((sSide) => {
+				const vValue = oPosition[sSide];
+				if (typeof vValue === "number") {
+					oDomRef.style[sSide] = vValue + "px";
+				} else if (vValue === "") {
+					oDomRef.style[sSide] = "";
+				}
+			});
+		};
+
+		// Sets the arrow's offset along the tooltip edge so it points at the opener.
+		Tooltip.prototype._positionArrow = function () {
+			const oDomRef = this.getDomRef();
+			const oHost = this._oHostForArrow;
+			if (!oDomRef || !oHost) {
+				return;
+			}
+			const oArrow = oDomRef.querySelector(".sapUiCoreTooltipArrow");
+			if (!oArrow) {
+				return;
+			}
+
+			const sSide = this._sCalcedPos;
+
+			const oOffset = Positioning.computeArrowOffset({
+				side: sSide,
+				openerRef: oHost,
+				popoverRef: oDomRef,
+				arrowSize: this._arrowProtrusion,
+				arrowWidth: this._arrowContainerSize,
+				arrowHeight: this._arrowContainerSize,
+				// small inset so the clamp band doesn't collapse on short tooltips
+				cornerInset: ARROW_CORNER_INSET_PX
+			});
+
+			// Reset offsets from a prior open (possibly on another side / direction).
+			oArrow.style.top = "";
+			oArrow.style.left = "";
+			oArrow.style.right = "";
+
+			if (sSide === PopoverPhysicalSide.Left || sSide === PopoverPhysicalSide.Right) {
+				oArrow.style.top = oOffset.along + "px";
+			} else if (oOffset.rtlRight) {
+				// RTL Top/Bottom: offset is measured from the tooltip's right edge.
+				oArrow.style.right = oOffset.along + "px";
+			} else {
+				oArrow.style.left = oOffset.along + "px";
+			}
 		};
 
 		/**
 		 * Closes the tooltip if it is open.
 		 *
-		 * @return {this} Reference to the control instance for chaining
+		 * @param {int} [delay] Delay in ms before actually closing.
+		 * @param {boolean} [bFromPress] Whether the close was triggered by a press/touch gesture.
+		 * @returns {this} Reference to the control instance for chaining
 		 * @public
 		 */
-		Tooltip.prototype.close = function (delay = this.getDelay(), bFromPress = false) {
+		Tooltip.prototype.close = function (delay, bFromPress) {
+			if (delay === undefined) {
+				delay = this.getDelay();
+			}
 			this._clearTimeouts();
-			// Cancel any in-flight openBy that is still awaiting Popover instantiation
-			// (the resumed openBy checks this flag before scheduling its open timer).
 			this._bOpenRequested = false;
 
 			if (bFromPress) {
@@ -414,15 +504,14 @@ sap.ui.define([
 				}
 			}
 
-			// Popover never opened → afterClose won't fire, deregister here.
+			// Popup never opened → closed won't fire, deregister here.
 			if (!this._bIsOpen) {
 				TooltipManager.deregister(this);
 			}
 
 			const fnClose = () => {
-				if (this._oPopover) {
-					this._oPopover.close();
-					this._bIsOpen = false;
+				if (this._oPopup && this._bIsOpen) {
+					this._oPopup.close(0);
 				}
 			};
 
@@ -465,14 +554,13 @@ sap.ui.define([
 		};
 
 		/**
-		 * Whether the tooltip is open or pending an open (Popover creation or
-		 * the hover-delay timer still running).
+		 * Whether the tooltip is open or pending an open (delay running).
 		 *
 		 * @returns {boolean}
 		 * @public
 		 */
 		Tooltip.prototype.isPendingOrOpen = function () {
-			return !!(this._bIsOpen || this._iOpenTimeout || this._bOpenRequested);
+			return !!(this._bIsOpen || this._iOpenTimeout);
 		};
 
 		return Tooltip;
