@@ -257,7 +257,7 @@ sap.ui.define([
 			 * The value for "$select" is an array of strings.
 			 *
 			 * The value for "$expand" is an object with the path as key and the options object as
-			 * value. Each option again becomes a property with the option name as key and the
+			 * value. Each option itself becomes a property with the option name as key and the
 			 * option value as value. If there are no options, the value for the path is
 			 * <code>null</code>.
 			 *
