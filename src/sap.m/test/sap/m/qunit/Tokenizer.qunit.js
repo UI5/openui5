@@ -2877,6 +2877,7 @@ sap.ui.define([
 		beforeEach: async function () {
 			this.oTokenizer = new Tokenizer({
 				editable: true,
+				width: "365px",
 				tokens: [
 					new Token({ key: "1", text: "Token 1" }),
 					new Token({ key: "2", text: "Token 2" }),
