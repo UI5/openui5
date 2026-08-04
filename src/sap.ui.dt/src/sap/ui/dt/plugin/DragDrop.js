@@ -101,8 +101,8 @@ sap.ui.define([
 	DragDrop.prototype.registerElementOverlay = function(oOverlay) {
 		oOverlay.attachEvent("movableChange", this._onMovableChange, this);
 
-		if (oOverlay.isMovable() && OverlayUtil.canBeRemovedFromAggregationOnMove(oOverlay, this.getDesignTime())) {
-			this._attachDragEvents(oOverlay);
+		if (oOverlay.isMovable()) {
+			this._updateDragEventsForElements(oOverlay);
 		}
 
 		oOverlay.attachBrowserEvent("dragover", this._onDragOver, this);
@@ -241,11 +241,36 @@ sap.ui.define([
 
 	/**
 	 * @private
+	 * @returns {boolean} <code>true</code> if a Remove plugin is registered, <code>false</code> otherwise
+	 */
+	DragDrop.prototype._hasRemovePlugin = function() {
+		return !!this.getDesignTime()?.getPlugins()?.find(function(oPlugin) {
+			return oPlugin.isA("sap.ui.rta.plugin.Remove");
+		});
+	};
+
+	/**
+	 * Attaches drag events or removes the movable style class when the overlay is the last
+	 * non-removable element. Only acts on the last-element restriction when a Remove plugin
+	 * is registered — without one there is no configured restriction and dragging is allowed.
+	 * @param {sap.ui.dt.Overlay} oOverlay - Overlay instance
+	 * @private
+	 */
+	DragDrop.prototype._updateDragEventsForElements = function(oOverlay) {
+		if (this._hasRemovePlugin() && !OverlayUtil.canBeRemovedFromAggregationOnMove(oOverlay, this.getDesignTime())) {
+			oOverlay.setLastElementMovable(false);
+		} else {
+			this._attachDragEvents(oOverlay);
+		}
+	};
+
+	/**
+	 * @private
 	 */
 	DragDrop.prototype._onMovableChange = function(oEvent) {
 		var oOverlay = oEvent.getSource();
 		if (oOverlay.isMovable()) {
-			this._attachDragEvents(oOverlay);
+			this._updateDragEventsForElements(oOverlay);
 		} else {
 			this._detachDragEvents(oOverlay);
 		}
