@@ -4120,34 +4120,27 @@ sap.ui.define([
 			"support2400 propagated to zoom inputs");
 	});
 
-	QUnit.test("onkeydown ENTER at high zoom opens clock-picker (toggleOpen), not numeric picker", function(assert) {
-		// _isHighZoom check lives in the mobile-only else-branch — stub _isMobileDevice too
+	QUnit.test("onkeydown ENTER opens clock-picker on mobile (regardless of zoom)", function(assert) {
 		var fnOrigMobile = this.oTP._isMobileDevice;
 		this.oTP._isMobileDevice = function() { return true; };
 
-		var fnOrig = this.oTP._isHighZoom;
-		this.oTP._isHighZoom = function() { return true; };
-
-		var bToggleOpenCalled = false;
-		var fnOrigToggle = this.oTP.toggleOpen.bind(this.oTP);
-		this.oTP.toggleOpen = function() { bToggleOpenCalled = true; fnOrigToggle.apply(this, arguments); };
+		var bOpenPickerCalled = false;
+		var fnOrigOpen = this.oTP._openPicker.bind(this.oTP);
+		this.oTP._openPicker = function() { bOpenPickerCalled = true; fnOrigOpen.apply(this, arguments); };
 
 		var bNumericOpenCalled = false;
 		this.oTP._openNumericPicker = function() { bNumericOpenCalled = true; };
 
 		qutils.triggerKeydown(this.oTP.getDomRef(), KeyCodes.ENTER);
 
-		assert.ok(bToggleOpenCalled, "toggleOpen called at high zoom on ENTER");
-		assert.notOk(bNumericOpenCalled, "_openNumericPicker NOT called at high zoom on ENTER");
+		assert.ok(bOpenPickerCalled, "_openPicker called on ENTER on mobile");
+		assert.notOk(bNumericOpenCalled, "_openNumericPicker NOT called on ENTER");
 
-		// Restore
 		this.oTP._isMobileDevice = fnOrigMobile;
-		this.oTP._isHighZoom = fnOrig;
-		this.oTP.toggleOpen = fnOrigToggle;
+		this.oTP._openPicker = fnOrigOpen;
 	});
 
-	QUnit.test("onkeydown ENTER at normal zoom opens numeric picker, not clock-picker", function(assert) {
-		// Ensure we simulate mobile (onkeydown else-branch requires _isMobileDevice)
+	QUnit.test("onkeydown ENTER at normal zoom opens clock-picker, not numeric picker", function(assert) {
 		var fnOrigMobile = this.oTP._isMobileDevice;
 		this.oTP._isMobileDevice = function() { return true; };
 		this.oTP._isHighZoom = function() { return false; };
@@ -4155,19 +4148,18 @@ sap.ui.define([
 		var bNumericOpenCalled = false;
 		this.oTP._openNumericPicker = function() { bNumericOpenCalled = true; };
 
-		var bToggleOpenCalled = false;
-		var fnOrigToggle = this.oTP.toggleOpen.bind(this.oTP);
-		this.oTP.toggleOpen = function() { bToggleOpenCalled = true; fnOrigToggle.apply(this, arguments); };
+		var bOpenPickerCalled = false;
+		var fnOrigOpen = this.oTP._openPicker.bind(this.oTP);
+		this.oTP._openPicker = function() { bOpenPickerCalled = true; fnOrigOpen.apply(this, arguments); };
 
 		qutils.triggerKeydown(this.oTP.getDomRef(), KeyCodes.ENTER);
 
-		assert.ok(bNumericOpenCalled, "_openNumericPicker called at normal zoom on ENTER");
-		assert.notOk(bToggleOpenCalled, "toggleOpen NOT called at normal zoom on ENTER");
+		assert.ok(bOpenPickerCalled, "_openPicker called at normal zoom on ENTER");
+		assert.notOk(bNumericOpenCalled, "_openNumericPicker NOT called at normal zoom on ENTER");
 
-		// Restore
 		this.oTP._isMobileDevice = fnOrigMobile;
-		delete this.oTP._isHighZoom; // removes instance override, falls back to mixin
-		this.oTP.toggleOpen = fnOrigToggle;
+		delete this.oTP._isHighZoom;
+		this.oTP._openPicker = fnOrigOpen;
 	});
 
 	QUnit.test("exit destroys _oInputsPart", function(assert) {

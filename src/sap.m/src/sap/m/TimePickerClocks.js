@@ -15,7 +15,8 @@ sap.ui.define([
 	'sap/ui/Device',
 	'sap/ui/core/library',
 	"sap/ui/thirdparty/jquery",
-	'sap/ui/core/date/UI5Date'
+	'sap/ui/core/date/UI5Date',
+	"./TimePickerInputs"
 ],
 	function(
 		TimePickerInternals,
@@ -30,7 +31,8 @@ sap.ui.define([
 		Device,
 		coreLibrary,
 		jQuery,
-		UI5Date
+		UI5Date,
+		TimePickerInputs
 	) {
 		"use strict";
 
@@ -66,7 +68,9 @@ sap.ui.define([
 					/**
 					 * When set to <code>true</code>, the clock will be displayed without the animation.
 					 */
-					skipAnimation: {type: "boolean", group: "Misc", defaultValue: false}
+					skipAnimation: {type: "boolean", group: "Misc", defaultValue: false},
+
+					_onManualInput: {type: "boolean", group: "Misc", defaultValue: false, visibility: "hidden"}
 
 				},
 				aggregations: {
@@ -249,6 +253,45 @@ sap.ui.define([
 		TimePickerClocks.prototype.init = function() {
 			TimePickerInternals.prototype.init.apply(this, arguments);
 			this._performInitialFocus = false;
+		};
+
+		TimePickerClocks.prototype.getNumInput = function () {
+			if (!this._oNumInput) {
+				this._oNumInput = new TimePickerInputs(this.getId() + "-inputs", {
+					support2400: true,
+					displayFormat: this._getDisplayFormatPattern(),
+					valueFormat: this._getValueFormatPattern(),
+					showCurrentTimeButton: this.getShowCurrentTimeButton()
+				});
+				this._oNumInput.addStyleClass("sapMTPShowLabels");
+			}
+			return this._oNumInput;
+		};
+
+		/**
+		 * Toggles between clock view and numeric input view, syncing the current time value.
+		 * @returns {boolean} true when switched to numeric input mode
+		 */
+		TimePickerClocks.prototype.toggleInputMode = function () {
+			var bManual = !this.getProperty("_onManualInput"),
+				oDate = this.getTimeValues(); // read BEFORE flipping the flag
+
+			this.setProperty("_onManualInput", bManual);
+
+			if (oDate) {
+				if (bManual) {
+					this.getNumInput()._setTimeValues(oDate, false);
+				} else {
+					this._setTimeValues(oDate, false);
+				}
+			}
+
+			return bManual;
+		};
+
+		TimePickerClocks.prototype.exit = function() {
+			TimePickerInternals.prototype.exit.apply(this, arguments);
+			this._destroyControls();
 		};
 
 		/**
@@ -481,6 +524,9 @@ sap.ui.define([
 		 * @public
 		 */
 		TimePickerClocks.prototype.getTimeValues = function() {
+			if (this.getProperty("_onManualInput") && this._oNumInput) {
+				return this._oNumInput.getTimeValues();
+			}
 			var oHoursClock = this._getHoursClock(),
 				oMinutesClock = this._getMinutesClock(),
 				oSecondsClock = this._getSecondsClock(),
@@ -886,6 +932,10 @@ sap.ui.define([
 			this.destroyAggregation("_buttons");
 			this.destroyAggregation("_clocks");
 			this.destroyAggregation("_buttonAmPm");
+			if (this._oNumInput) {
+				this._oNumInput.destroy();
+				this._oNumInput = null;
+			}
 		};
 
 		/**

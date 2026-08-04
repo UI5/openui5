@@ -29,6 +29,9 @@ sap.ui.define([
 	"sap/ui/core/Theming",
 	'sap/ui/core/date/UI5Date',
 	"sap/ui/core/InvisibleText",
+	"./Bar",
+	"sap/ui/core/InvisibleMessage",
+	"./Title",
 	// provides jQuery.fn.cursorPos
 	'sap/ui/dom/jquery/cursorPos'
 ], function(
@@ -56,13 +59,17 @@ sap.ui.define([
 	IconPool,
 	Theming,
 	UI5Date,
-	InvisibleText
+	InvisibleText,
+	Bar,
+	InvisibleMessage,
+	Title
 ) {
 	"use strict";
 
 	// shortcut for sap.m.PlacementType and sap.m.ButtonType
 	var PlacementType = library.PlacementType,
 		ButtonType = library.ButtonType,
+		InvisibleMessageMode = coreLibrary.InvisibleMessageMode,
 		// From Device.media.RANGESETS.SAP_STANDARD - "Phone": For screens smaller than 600 pixels.
 		STANDART_PHONE_RANGESET = "Phone";
 
@@ -1058,7 +1065,29 @@ sap.ui.define([
 
 
 			if (bPhone) {
-				this._oPopup.setTitle(this._getLabelledText());
+				const oBundle = Library.getResourceBundleFor("sap.m"),
+					sPickerTitle = this._getLabelledText();
+				this._oDTPToggleViewButtonLabel = new InvisibleText({
+					text: oBundle.getText("TIMEPICKER_TOGGLE_INPUT_VIEW_LABEL")
+				});
+				this._oDTPToggleViewButtonDesc = new InvisibleText({
+					text: oBundle.getText("TIMEPICKER_TOGGLE_INPUT_VIEW_DESC")
+				});
+				this._oDTPToggleViewButton = new Button({
+					icon: IconPool.getIconURI("keyboard-and-mouse"),
+					tooltip: oBundle.getText("TIMEPICKER_TOGGLE_TO_KEYBOARD"),
+					press: this._onDTPToggleViewPress.bind(this),
+					ariaLabelledBy: [this._oDTPToggleViewButtonLabel],
+					ariaDescribedBy: [this._oDTPToggleViewButtonDesc]
+				});
+				this._oDTPPickerTitle = new Title({
+					text: sPickerTitle
+				});
+				this._oPopup.setTitle(sPickerTitle);
+				this._oPopup.setCustomHeader(new Bar({
+					contentMiddle: [this._oDTPPickerTitle],
+					contentRight: [this._oDTPToggleViewButtonLabel, this._oDTPToggleViewButtonDesc, this._oDTPToggleViewButton]
+				}));
 			} else {
 				// We add time in miliseconds for opening and closing animations of the popup,
 				// so the opening and closing event handlers are properly ordered in the event queue
@@ -1097,6 +1126,34 @@ sap.ui.define([
 	 */
 	DateTimePicker.prototype._getAccessibleNameBundleKey = function() {
 		return "DATETIMEPICKER_POPOVER_ACCESSIBLE_NAME";
+	};
+
+	/**
+	 * Handles the press event of the toggle view button in the picker header (phone only).
+	 * Switches between the Date (Cal) and Time (Clk) tabs.
+	 * @private
+	 */
+	DateTimePicker.prototype._onDTPToggleViewPress = function() {
+		var oBundle = Library.getResourceBundleFor("sap.m"),
+			bManual = this._oClocks && this._oClocks.toggleInputMode();
+
+		if (this._oDTPToggleViewButton) {
+			if (bManual) {
+				this._oDTPToggleViewButton.setIcon(IconPool.getIconURI("time-entry-request"));
+				this._oDTPToggleViewButton.setTooltip(oBundle.getText("TIMEPICKER_TOGGLE_TO_CLOCK"));
+			} else {
+				this._oDTPToggleViewButton.setIcon(IconPool.getIconURI("keyboard-and-mouse"));
+				this._oDTPToggleViewButton.setTooltip(oBundle.getText("TIMEPICKER_TOGGLE_TO_KEYBOARD"));
+			}
+		}
+		if (this._oDTPPickerTitle) {
+			this._oDTPPickerTitle.setText(this._getLabelledText());
+		}
+
+		InvisibleMessage.getInstance().announce(
+			oBundle.getText(bManual ? "TIMEPICKER_ANNOUNCE_KEYBOARD" : "TIMEPICKER_ANNOUNCE_CLOCK"),
+			InvisibleMessageMode.Assertive
+		);
 	};
 
 	DateTimePicker.prototype._openPopup = function(oDomRef){
@@ -1528,7 +1585,11 @@ sap.ui.define([
 
 	function _handleBeforeOpen(){
 		if (Device.system.phone) {
-			this._oPopup.setTitle(this._getLabelledText());
+			const sTitle = this._getLabelledText();
+			this._oPopup.setTitle(sTitle);
+			if (this._oDTPPickerTitle) {
+				this._oDTPPickerTitle.setText(sTitle);
+			}
 		}
 		// Restore confirmed time value on re-open so tentative edits from a previous
 		// open (that was Cancelled) don't linger. No-op when there is no confirmed value.
