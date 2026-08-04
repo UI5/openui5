@@ -548,7 +548,7 @@ sap.ui.define([
 				placement: placement
 			});
 
-			var stubWindowHeight = sinon.stub(oPopover, "_getDocHeight").returns(height);
+			var stubWindowHeight = sinon.stub(oPopover, "_getBottomBound").returns(height);
 			var stubOpenByRef = sinon.stub(oPopover, "_getOpenByDomRef").returns(document.createElement("div"));
 
 			oPopover._calcPlacement();
@@ -618,7 +618,7 @@ sap.ui.define([
 				placement: placement
 			});
 
-			var stubWindowHeight = sinon.stub(oPopover, "_getDocHeight").returns(height);
+			var stubWindowHeight = sinon.stub(oPopover, "_getBottomBound").returns(height);
 			var stubOpenByRef = sinon.stub(oPopover, "_getOpenByDomRef").returns(document.createElement("div"));
 
 			oPopover._calcPlacement();
@@ -728,7 +728,7 @@ sap.ui.define([
 				placement: PlacementType.Auto
 			});
 
-			var stubWindowHeight = sinon.stub(oPopover, "_getDocHeight").returns(height);
+			var stubWindowHeight = sinon.stub(oPopover, "_getBottomBound").returns(height);
 
 			var stubOpenByRef = sinon.stub(oPopover, "_getOpenByDomRef").returns(document.createElement("div"));
 			oPopover._calcPlacement();
@@ -1877,6 +1877,38 @@ sap.ui.define([
 			this.oPopover.destroy();
 			this.oButton.destroy();
 		}
+	});
+
+	QUnit.test("_getBottomBound returns the viewport bottom when the within-area is the window", function (assert) {
+		const stubWithin = sinon.stub(this.oPopover, "getWithinAreaDomRef").returns(window);
+
+		assert.strictEqual(
+			this.oPopover._getBottomBound(),
+			window.innerHeight + window.scrollY,
+			"window.innerHeight + window.scrollY (viewport bottom in page coordinates)"
+		);
+
+		stubWithin.restore();
+	});
+
+	QUnit.test("_getBottomBound returns the document-end bound for a custom within-area", function (assert) {
+		const oWithin = document.createElement("div");
+		const stubWithin = sinon.stub(this.oPopover, "getWithinAreaDomRef").returns(oWithin);
+		const stubRect = sinon.stub(oWithin, "getBoundingClientRect").returns({ top: 120 });
+
+		const iExpected = 120 + window.scrollY + Math.max(
+			document.body.scrollHeight, document.body.offsetHeight,
+			document.documentElement.clientHeight, document.documentElement.offsetHeight
+		);
+
+		assert.strictEqual(
+			this.oPopover._getBottomBound(),
+			iExpected,
+			"within-area page-top + document height (document-end bound)"
+		);
+
+		stubRect.restore();
+		stubWithin.restore();
 	});
 
 	QUnit.test("_getAnimationDuration", function (assert) {
