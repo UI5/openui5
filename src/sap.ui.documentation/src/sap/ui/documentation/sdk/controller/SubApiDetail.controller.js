@@ -1055,7 +1055,11 @@ sap.ui.define([
 										showIcon: true,
 										showCloseButton: false,
 										enableFormattedText: true
-									}).addStyleClass("sapUiTinyMarginBottom sapUiTinyMarginTop")
+									}).addStyleClass("sapUiTinyMarginBottom sapUiTinyMarginTop"),
+									new ObjectStatus({
+										visible: oProperty.since !== undefined,
+										text: oProperty.since ? "Since: " + oProperty.since : ""
+									})
 								]
 							})
 						]
