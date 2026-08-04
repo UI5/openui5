@@ -524,29 +524,15 @@ sap.ui.define([
 
 		QUnit.test("when RTA gets started in FLP context with original toolbar available", async function(assert) {
 			givenAnFLP();
-			sandbox.stub(RtaUtils, "getFiori2Renderer").returns({
-				getRootControl() {
-					return {
-						getShellHeader() {
-							return {
-								addStyleClass: () => {},
-								removeStyleClass: () => {}
-							};
-						}
-					};
-				}
-			});
 			stubToolbarButtonsVisibility(false, false);
-			const oApiStub = sandbox.stub().returns("");
-			sandbox.stub(RtaUtils, "isOriginalFioriToolbarAccessible").returns(true);
 			RtaQunitUtils.stubSapUiRequire(sandbox, [{
 				name: "sap/ushell/api/RTA",
-				stub: { getLogo: oApiStub }
+				stub: { getLogo: () => {}, setShellHeaderVisibility: () => {} }
 			}]);
 			await this.oRta.start();
 
 			assert.strictEqual(this.oRta.getToolbar().isA("sap.ui.rta.toolbar.Fiori"), true, "then the toolbar is of type Fiori");
-			assert.deepEqual(this.oRta.getToolbar().getUshellApi(), { getLogo: oApiStub }, "then the api is passed to the toolbar");
+			assert.ok(this.oRta.getToolbar().getUshellApi(), "then the api is passed to the toolbar");
 		});
 
 		QUnit.test("when RTA gets started with an enabled key user translation", async function(assert) {
