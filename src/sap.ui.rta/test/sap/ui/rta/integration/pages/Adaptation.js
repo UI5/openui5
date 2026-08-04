@@ -67,40 +67,31 @@ sap.ui.define([
 						actions: new Press()
 					});
 				},
-				iSwitchToVisualizationMode() {
-					const oRtaResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
-					const sButtonText = oRtaResourceBundle.getText("BTN_VISUALIZATION");
-					return this.waitFor({
-						controlType: "sap.m.Button",
-						matchers(oButton) {
-							return oButton.getText() === sButtonText;
-						},
-						actions: new Press(),
-						errorMessage: "Did not find Visualization-Button"
-					});
-				},
 				iSwitchToAdaptationMode() {
-					const oRtaResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
-					const sButtonText = oRtaResourceBundle.getText("BTN_ADAPTATION");
 					return this.waitFor({
-						autoWait: false,
-						controlType: "sap.m.Button",
-						matchers(oButton) {
-							return oButton.getText() === sButtonText;
+						controlType: "sap.m.Switch",
+						matchers: (oModeSwitcher) => {
+							return oModeSwitcher.getId().includes("sapUiRta_modeSwitcher");
 						},
-						actions: new Press(),
+						success(oModeSwitcher) {
+							if (!oModeSwitcher[0].getState()) {
+								new Press().executeOn(oModeSwitcher[0]);
+							}
+						},
 						errorMessage: "Did not find UI-Adaptation-Button"
 					});
 				},
 				iSwitchToNavigationMode() {
-					const oRtaResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
-					const sButtonText = oRtaResourceBundle.getText("BTN_NAVIGATION");
 					return this.waitFor({
-						controlType: "sap.m.Button",
-						matchers(oButton) {
-							return oButton.getText() === sButtonText;
+						controlType: "sap.m.Switch",
+						matchers: (oModeSwitcher) => {
+							return oModeSwitcher.getId().includes("sapUiRta_modeSwitcher") && oModeSwitcher.getState() === true;
 						},
-						actions: new Press(),
+						success(oModeSwitcher) {
+							if (oModeSwitcher[0].getState()) {
+								new Press().executeOn(oModeSwitcher[0]);
+							}
+						},
 						errorMessage: "Did not find Navigation-Button"
 					});
 				},
@@ -314,43 +305,53 @@ sap.ui.define([
 				iActivateAVersion(sVersionName) {
 					sVersionName ||= "Version X";
 					return this.waitFor({
-						controlType: "sap.m.Button",
-						matchers(oButton) {
-							return oButton.getId().includes("sapUiRta_activate");
+						controlType: "sap.m.MenuButton",
+						matchers(oMenuButton) {
+							return oMenuButton.getId().includes("sapUiRta_versionButton");
 						},
 						actions: new Press(),
-						success(aButtons) {
-							Opa5.assert.equal(aButtons.length, 1, "'Activate Version' button found");
+						success(aMenuButtons) {
+							Opa5.assert.equal(aMenuButtons.length, 1, "'Version' button found");
 							return this.waitFor({
-								controlType: "sap.m.Input",
-								matchers(oInput) {
-									return oInput.getId().includes("sapUiRta_activateVersionDialog--versionTitleInput");
+								controlType: "sap.m.MenuItem",
+								matchers(oButton) {
+									return oButton.getId().includes("sapUiRta_activate");
 								},
-								actions: new EnterText({
-									text: sVersionName
-								}),
-								success(aInputs) {
-									Opa5.assert.equal(aInputs.length, 1, "'Version Name' input found in the activate version dialog");
+								actions: new Press(),
+								success(aButtons) {
+									Opa5.assert.equal(aButtons.length, 1, "'Activate Version' button found");
 									return this.waitFor({
-										controlType: "sap.m.Button",
-										matchers(oButton) {
-											return oButton.getId().includes("sapUiRta_activateVersionDialog--confirmVersionTitleButton");
+										controlType: "sap.m.Input",
+										matchers(oInput) {
+											return oInput.getId().includes("sapUiRta_activateVersionDialog--versionTitleInput");
 										},
-										actions: new Press(),
-										success(aButtons) {
-											Opa5.assert.ok(aButtons.length > 0,
-												`Dialog closed with click on 'Confirm' and a version name of ${sVersionName}' `);
-
-											// await the version activation by waiting for the versions model update after the activation
+										actions: new EnterText({
+											text: sVersionName
+										}),
+										success(aInputs) {
+											Opa5.assert.equal(aInputs.length, 1, "'Version Name' input found in the activate version dialog");
 											return this.waitFor({
 												controlType: "sap.m.Button",
 												matchers(oButton) {
-													return oButton.getId().includes("sapUiRta_versionButton")
-														&& oButton.getText() === sVersionName;
+													return oButton.getId().includes("sapUiRta_activateVersionDialog--confirmVersionTitleButton");
 												},
-												success() {
-													Opa5.assert.ok(true,
-														`The version '${sVersionName}' is activated.`);
+												actions: new Press(),
+												success(aButtons) {
+													Opa5.assert.ok(aButtons.length > 0,
+														`Dialog closed with click on 'Confirm' and a version name of ${sVersionName}' `);
+
+													// await the version activation by waiting for the versions model update after the activation
+													return this.waitFor({
+														controlType: "sap.m.Button",
+														matchers(oButton) {
+															return oButton.getId().includes("sapUiRta_versionButton")
+																&& oButton.getText() === sVersionName;
+														},
+														success() {
+															Opa5.assert.ok(true,
+																`The version '${sVersionName}' is activated.`);
+														}
+													});
 												}
 											});
 										}

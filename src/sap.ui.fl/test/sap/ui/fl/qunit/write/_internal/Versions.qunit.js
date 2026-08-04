@@ -105,7 +105,7 @@ sap.ui.define([
 				var aCallArguments = this.oStorageLoadVersionsStub.getCall(0).args[0];
 				assert.equal(aCallArguments.reference, sReference, "the reference was passed");
 				assert.equal(aCallArguments.layer, sLayer, "the layer was passed");
-				assert.equal(aCallArguments.limit, 10, "and the limit was passed");
+				assert.equal(aCallArguments.limit, 10000, "and the limit was passed");
 				assert.ok(oResponse instanceof JSONModel, "a model was returned");
 				assert.strictEqual(
 					oResponse.getProperty("/versions"), this.aReturnedVersions,

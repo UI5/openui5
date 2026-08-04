@@ -4,8 +4,6 @@ sap.ui.define([
 	"sap/m/Bar",
 	"sap/m/Button",
 	"sap/m/HBox",
-	"sap/m/InstanceManager",
-	"sap/m/Popover",
 	"sap/m/Text",
 	"sap/m/VBox",
 	"sap/ui/events/KeyCodes",
@@ -27,8 +25,6 @@ sap.ui.define([
 	Bar,
 	Button,
 	HBox,
-	InstanceManager,
-	Popover,
 	Text,
 	VBox,
 	KeyCodes,
@@ -399,17 +395,6 @@ sap.ui.define([
 			assert.notOk(oOverlay.isSelected(), "then this overlay is not selected");
 		});
 
-		QUnit.test("Pressing any Keyboard-key on an Overlay and isActive is false", function(assert) {
-			// processing of the key-down event can be proofed by checking the calls of "getFocusedOverlay" function
-			this.oSelectionPlugin.setIsActive(false);
-			const oGetFocusedOverlayStub = sandbox.stub(this.oSelectionPlugin, "_getFocusedOverlay");
-			const oOverlay = OverlayRegistry.getOverlay(this.oComponent.createId("innerBtn11"));
-			oOverlay.focus();
-			this.oEvent.keyCode = KeyCodes.TAB;
-			oOverlay.getDomRef().dispatchEvent(this.oEvent);
-			assert.strictEqual(oGetFocusedOverlayStub.callCount, 0, "then KayDown Event is not processed");
-		});
-
 		QUnit.test("Pressing ENTER on an Overlay", function(assert) {
 			const oOverlay1 = OverlayRegistry.getOverlay(this.oComponent.createId("innerBtn12"));
 			this.oSelectionManager.add(oOverlay1);
@@ -511,30 +496,6 @@ sap.ui.define([
 			assert.ok(oOverlay2.isSelected(), "then Overlay2 is selected");
 		});
 
-		QUnit.test("Invoking Mouse-Down on an Overlay which is selectable and isActive is false and two PopOvers are open", function(assert) {
-			const fnDone = assert.async();
-			this.oSelectionPlugin.setIsActive(false);
-			const oOverlay1 = OverlayRegistry.getOverlay(this.oComponent.createId("innerBtn11"));
-			const oOverlay2 = OverlayRegistry.getOverlay(this.oComponent.createId("innerBtn12"));
-			const oPopOver1 = new Popover({}).openBy(oOverlay1);
-			const oPopOver2 = new Popover({}).openBy(oOverlay2);
-			oPopOver1._bOpenedByChangeIndicator = false;
-			oPopOver2._bOpenedByChangeIndicator = true;
-			assert.strictEqual(InstanceManager.getOpenPopovers().length, 2, "then 2 PopOvers are opened initially");
-			oOverlay1.getDomRef().dispatchEvent(new Event("mousedown"));
-			oPopOver2.attachAfterClose(function() {
-				assert.strictEqual(InstanceManager.getOpenPopovers().length, 1, "then one PopOver is closed");
-				fnDone();
-			});
-		});
-
-		QUnit.test("When selecting an Overlay and then setting isActive to false", function(assert) {
-			const oOverlay = OverlayRegistry.getOverlay(this.oComponent.createId("innerBtn11"));
-			oOverlay.setSelected(true);
-			this.oSelectionPlugin.setIsActive(false);
-			assert.notOk(oOverlay.isSelected(), "then the Overlay is no longer selected");
-		});
-
 		QUnit.test("Invoking Mouse-Over and Mouse-Leave on an Overlay which is selectable", function(assert) {
 			const oOverlay = OverlayRegistry.getOverlay(this.oComponent.createId("innerBtn11"));
 			assert.ok(!oOverlay.hasStyleClass("sapUiDtOverlayHover"), "initially the CSS class is not set");
@@ -542,16 +503,6 @@ sap.ui.define([
 			assert.ok(oOverlay.hasStyleClass("sapUiDtOverlayHover"), "then the Overlay has the proper CSS class after mouse-over event");
 			oOverlay.getDomRef().dispatchEvent(new Event("mouseleave"));
 			assert.ok(!oOverlay.hasStyleClass("sapUiDtOverlayHover"), "then the CSS class is removed again after mouse-leave event");
-		});
-
-		QUnit.test("Invoking Mouse-Over and Mouse-Leave on an Overlay which is selectable and isActive is false", function(assert) {
-			this.oSelectionPlugin.setIsActive(false);
-			const oOverlay = OverlayRegistry.getOverlay(this.oComponent.createId("innerBtn11"));
-			assert.ok(!oOverlay.hasStyleClass("sapUiDtOverlayHover"), "initially the CSS class is not set");
-			oOverlay.getDomRef().dispatchEvent(new Event("mouseover"));
-			assert.ok(!oOverlay.hasStyleClass("sapUiDtOverlayHover"), "then the CSS class is still not not set after mouse-over event");
-			oOverlay.getDomRef().dispatchEvent(new Event("mouseleave"));
-			assert.ok(!oOverlay.hasStyleClass("sapUiDtOverlayHover"), "then the CSS class is still not not set after mouse-leave event");
 		});
 
 		QUnit.test("Invoking Mouse-Over and Mouse-Leave on an Overlay which is selectable and has a movable parent", function(assert) {

@@ -159,7 +159,11 @@ sap.ui.define([
 		try {
 			for (const sActionSelector of aActionSelectors) {
 				const oActionControl = await waitForElementVisibility.call(this, sActionSelector);
-				await oActionControl.firePress();
+				if (oStepConfig.action) {
+					oActionControl[oStepConfig.action.name]({ [oStepConfig.action.parameterName]: oStepConfig.action.parameterValue });
+				} else {
+					oActionControl.firePress();
+				}
 			}
 
 			this._oAffectedControl = oStepConfig.waitForElement
@@ -233,7 +237,7 @@ sap.ui.define([
 			}
 			for (const sActionSelector of oInitialStateSelectors) {
 				const oActionControl = await waitForElementVisibility.call(this, sActionSelector);
-				oActionControl.firePress();
+				oActionControl.fireChange({ state: true });
 			}
 		} catch (error) {
 			this.destroy();

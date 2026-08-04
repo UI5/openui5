@@ -3,7 +3,7 @@
 /* Horizon High Contrast White theme   */
 /* =================================== */
 
-@_sap_ui_rta_Overlay_ResizeHandleColor: darken(@sapUiSelected, 25%); /* #004adc */
+@_sap_ui_rta_Overlay_ResizeHandleColor: var(--sapLegendColor7);
 @_sap_ui_rta_Overlay_PlaceholderBackgroundColor: @sapUiContentImagePlaceholderBackground; /* #fff */
 
 .sapUiRta {
@@ -38,4 +38,9 @@
 			}
 		}
 	}
+}
+
+/* HCW: black full-screen border instead of green. */
+.sapUiRtaAdaptationBorder.sapUiRtaAdaptationBorderVisible {
+	border-color: var(--sapShell_BorderColor); /* #000 */
 }

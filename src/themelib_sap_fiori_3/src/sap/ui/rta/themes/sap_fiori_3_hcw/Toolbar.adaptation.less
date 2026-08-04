@@ -39,30 +39,6 @@
 			}
 		}
 
-		.sapMSegB {
-
-			.sapMSegBBtn {
-
-				&:not(:hover) {
-
-					&.sapMSegBBtnFocusable {
-
-						.sapMSegBBtnInner {
-							background-color: @_sap_ui_rta_Toolbar_Adaptation_SegBBtnBackgroundColor;
-						}
-					}
-				}
-
-				&.sapMSegBBtnFocusable {
-
-					&:focus .sapMSegBBtnInner {
-						outline-width: 0.125rem; /* 2px */
-						outline-offset: -0.125rem; /* 2px */
-					}
-				}
-			}
-		}
-
 		/* set text to white on hover for better accessibility */
 		.sapUiRtaVersionButton {
 
@@ -70,38 +46,6 @@
 
 				> span > span > bdi {
 					color: @_sap_ui_rta_Toolbar_Adaptation_BtnHoverTextColor;
-				}
-			}
-		}
-	}
-
-	/* set text to white on hover for better accessibility */
-	.sapUiRtaVersionHistory {
-
-		.sapMLIBHoverable:hover {
-			background: @_sap_ui_rta_Toolbar_Adaptation_VersionHistory_HoverBackgroundColor;
-
-			.sapMLIBContent {
-
-				.sapMFeedListItem {
-
-					.sapMFeedListItemText {
-
-						.sapMFeedListItemTextText {
-
-							.sapMFeedListItemTextString {
-								color: @_sap_ui_rta_Toolbar_Adaptation_BtnHoverTextColor;
-							}
-						}
-
-						.sapMFeedListItemFooter {
-
-							.sapMFeedListItemInfoText,
-							.sapMFeedListItemTimestampText {
-								color: @_sap_ui_rta_Toolbar_Adaptation_BtnHoverTextColor;
-							}
-						}
-					}
 				}
 			}
 		}

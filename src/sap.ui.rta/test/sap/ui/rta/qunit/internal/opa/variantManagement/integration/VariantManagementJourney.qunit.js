@@ -5,7 +5,6 @@ sap.ui.define([
 	"sap/ui/test/Opa5",
 	"test-resources/sap/ui/rta/integration/pages/Common",
 	"test-resources/sap/ui/rta/integration/pages/Adaptation",
-	"test-resources/sap/ui/rta/integration/pages/ChangeVisualization",
 	"test-resources/sap/ui/fl/testutils/opa/TestLibrary"
 ], (
 	Lib,
@@ -24,7 +23,6 @@ sap.ui.define([
 	const sVMControlId = "__component0---app--variantManagementOrdersTable";
 	const sContainedVMControlId = "__component0---app--variantManagementContained";
 	const sNewContainedVariantName = "ContainedVariant";
-	const sCVizDropDownId = "sapUIRta_toolbar_fragment--sapUiRta_toggleChangeVisualizationMenuButton--ChangeIndicatorCategorySelection--popover";
 	const sStandardVariantName = "Standard";
 	const sNewVariantName = "TestVariant1";
 	const sTitleId = "__component0---app--TitleForVM1";
@@ -76,27 +74,6 @@ sap.ui.define([
 		Then.onFlVariantManagement.theModifiedIndicatorShouldBeDisplayed();
 	});
 
-	opaTest("I check the change in the visualization mode", (Given, When, Then) => {
-		const oChangesCount = {
-			all: 2,
-			add: 0,
-			move: 0,
-			rename: 1,
-			combineSplit: 0,
-			remove: 1,
-			other: 0
-		};
-
-		When.onPageWithRTA.iSwitchToVisualizationMode();
-		When.onPageWithCViz.iClickOnTheChangesDropDownMenuButton()
-		.and.iClickOnTheUnsavedButton();
-
-		Then.onPageWithCViz.iShouldSeeTheChangeIndicators(2)
-		.and.iShouldSeeTheCorrectChangesCategoriesCount(sCVizDropDownId, oChangesCount);
-
-		When.onPageWithRTA.iSwitchToAdaptationMode();
-	});
-
 	opaTest("I save the change in a new variant", (Given, When, Then) => {
 		const sLabel = "Rename Label";
 		When.onPageWithRTA.iRightClickOnAnElementOverlay(sVMControlId)
@@ -107,28 +84,6 @@ sap.ui.define([
 		Then.onFlVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sNewVariantName)
 		.and.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName)
 		.and.theModifiedIndicatorShouldBeHidden();
-	});
-
-	opaTest("I check if the variant changes are correctly displayed in the visualization mode", (Given, When, Then) => {
-		const iNotVisualizedChanges = 4;
-		const oChangesCount = {
-			all: 2,
-			add: 0,
-			move: 0,
-			rename: 1,
-			combineSplit: 0,
-			remove: 1,
-			other: 0
-		};
-
-		When.onPageWithRTA.iSwitchToVisualizationMode();
-		When.onPageWithCViz.iClickOnTheChangesDropDownMenuButton()
-		.and.iClickOnTheUnsavedButton();
-
-		Then.onPageWithCViz.iShouldSeeTheChangeIndicators(2)
-		.and.iShouldSeeTheCorrectChangesCategoriesCount(sCVizDropDownId, oChangesCount)
-		.and.iShouldSeeTheHiddenChangesStrip(sCVizDropDownId, iNotVisualizedChanges);
-		When.onPageWithRTA.iSwitchToAdaptationMode();
 	});
 
 	opaTest("I make a change on the new variant", (Given, When, Then) => {
@@ -177,26 +132,6 @@ sap.ui.define([
 		.and.theModifiedIndicatorShouldBeHidden();
 	});
 
-	opaTest("I check if the variant changes are correctly displayed in the visualization mode", (Given, When, Then) => {
-		const iNotVisualizedChanges = 4;
-		const oChangesCount = {
-			all: 1,
-			add: 0,
-			move: 0,
-			rename: 0,
-			combineSplit: 0,
-			remove: 1,
-			other: 0
-		};
-
-		When.onPageWithRTA.iSwitchToVisualizationMode();
-		When.onPageWithCViz.iClickOnTheChangesDropDownMenuButton();
-
-		Then.onPageWithCViz.iShouldSeeTheCorrectChangesCategoriesCount(sCVizDropDownId, oChangesCount)
-		.and.iShouldSeeTheHiddenChangesStrip(sCVizDropDownId, iNotVisualizedChanges);
-		When.onPageWithRTA.iSwitchToAdaptationMode();
-	});
-
 	opaTest("I check if the change was saved correctly", (Given, When, Then) => {
 		const sLabel = "SaveRenameChangeLabel";
 		When.onPageWithRTA.iRightClickOnAnElementOverlay(sVMControlId)
@@ -207,36 +142,6 @@ sap.ui.define([
 		Then.onFlVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sNewVariantName)
 		.and.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName)
 		.and.theModifiedIndicatorShouldBeHidden();
-	});
-
-	opaTest("I check if the variant changes are correctly displayed in the visualization mode", (Given, When, Then) => {
-		const iNotVisualizedChanges = 4;
-		const oChangesCount = {
-			all: 3,
-			add: 0,
-			move: 0,
-			rename: 2,
-			combineSplit: 0,
-			remove: 1,
-			other: 0
-		};
-
-		When.onPageWithRTA.iSwitchToVisualizationMode();
-		When.onPageWithCViz.iClickOnTheChangesDropDownMenuButton();
-
-		Then.onPageWithCViz.iShouldSeeTheChangeIndicators(3)
-		.and.iShouldSeeTheCorrectChangesCategoriesCount(sCVizDropDownId, oChangesCount, iNotVisualizedChanges)
-		.and.iShouldSeeTheHiddenChangesStrip(sCVizDropDownId, iNotVisualizedChanges);
-		When.onPageWithRTA.iSwitchToAdaptationMode();
-	});
-
-	opaTest("I save the changes and check if the unsaved change button is disabled in CViz", (Given, When, Then) => {
-		When.onPageWithRTA.iClickTheSaveButton()
-		.and.iSwitchToVisualizationMode();
-		When.onPageWithCViz.iClickOnTheChangesDropDownMenuButton();
-
-		Then.onPageWithCViz.iShouldSeeTheDisabledSegmentedButton(sCVizDropDownId, 2);
-		When.onPageWithRTA.iSwitchToAdaptationMode();
 	});
 
 	opaTest("I make a change on the variant again", (Given, When, Then) => {
@@ -309,33 +214,6 @@ sap.ui.define([
 		.and.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName);
 	});
 
-	opaTest("I check if the variant changes are correctly displayed in the visualization mode", (Given, When, Then) => {
-		const iNotVisualizedChangesAll = 6;
-		const iNotVisualizedChangesDraft = 2;
-		const oChangesCount = {
-			all: 0,
-			add: 0,
-			move: 0,
-			rename: 0,
-			combineSplit: 0,
-			remove: 0,
-			other: 0
-		};
-
-		When.onPageWithRTA.iSwitchToVisualizationMode();
-		When.onPageWithCViz.iClickOnTheChangesDropDownMenuButton();
-
-		Then.onPageWithCViz.iShouldSeeTheChangeIndicators(3)
-		.and.iShouldSeeTheHiddenChangesStrip(sCVizDropDownId, iNotVisualizedChangesAll);
-
-		When.onPageWithCViz.iClickOnTheUnsavedButton();
-
-		Then.onPageWithCViz.iShouldSeeTheCorrectChangesCategoriesCount(sCVizDropDownId, oChangesCount)
-		.and.iShouldNotSeeAChangeIndicator()
-		.and.iShouldSeeTheHiddenChangesStrip(sCVizDropDownId, iNotVisualizedChangesDraft);
-		When.onPageWithRTA.iSwitchToAdaptationMode();
-	});
-
 	opaTest("I save the changes and close the app", (Given, When, Then) => {
 		When.onPageWithRTA.iExitRtaMode();
 
@@ -354,14 +232,6 @@ sap.ui.define([
 		.and.iShouldSeeTheElementWithText(sLabel);
 		Then.onFlVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sDefaultVariantName)
 		.and.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName);
-	});
-
-	opaTest("I check if the draft change button is disabled in CViz", (Given, When, Then) => {
-		When.onPageWithRTA.iSwitchToVisualizationMode();
-		When.onPageWithCViz.iClickOnTheChangesDropDownMenuButton();
-
-		Then.onPageWithCViz.iShouldSeeTheDisabledSegmentedButton(sCVizDropDownId, 1);
-		When.onPageWithRTA.iSwitchToAdaptationMode();
 	});
 
 	opaTest("Delete the variant", (Given, When, Then) => {

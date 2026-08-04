@@ -254,7 +254,7 @@ sap.ui.define([
 
 		QUnit.test("when saving RTA without exiting,", function(assert) {
 			var fnDone = assert.async();
-			var oCVizUpdateSpy = sandbox.spy(ChangeVisualization.prototype, "updateAfterSave");
+			var oCVizUpdateSpy = sandbox.spy(ChangeVisualization.prototype, "refreshBorders");
 			var oMessageToastShowSpy = sandbox.spy(MessageToast, "show");
 			var sExpectedMessageToastMessage = this.oRta._getTextResources().getText("MSG_SAVE_SUCCESS");
 

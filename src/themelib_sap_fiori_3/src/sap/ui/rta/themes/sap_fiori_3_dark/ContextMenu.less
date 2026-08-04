@@ -3,5 +3,16 @@
 /* Quartz Dark theme                       */
 /* ======================================= */
 
-@_sap_ui_rta_ContextMenu_BorderLightColor: var(--sapContent_ContrastShadowColor); /* #fff */
-@_sap_ui_rta_ContextMenu_BorderDarkColor: var(--sapShell_BorderColor); /* #354a5f */
+@_sap_ui_rta_ContextMenu_BorderLightColor: var(--sapShell_BorderColor); /* #354a5f */
+@_sap_ui_rta_ContextMenu_BorderDarkColor: var(--sapLegendColor7);
+
+.sapUiRtaMode {
+
+	.sapUiDtContextMenu {
+
+		&.sapMMenu {
+			border: 0.125rem dashed @_sap_ui_rta_ContextMenu_BorderDarkColor; /* 2px */
+			border-image: none;
+		}
+	}
+}

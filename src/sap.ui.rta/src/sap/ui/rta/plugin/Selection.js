@@ -3,7 +3,6 @@
  */
 
 sap.ui.define([
-	"sap/m/InstanceManager",
 	"sap/ui/core/Element",
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/dt/OverlayUtil",
@@ -11,7 +10,6 @@ sap.ui.define([
 	"sap/ui/rta/plugin/Plugin",
 	"sap/ui/rta/Utils"
 ], function(
-	InstanceManager,
 	Element,
 	OverlayRegistry,
 	OverlayUtil,
@@ -41,10 +39,6 @@ sap.ui.define([
 			properties: {
 				multiSelectionRequiredPlugins: {
 					type: "string[]"
-				},
-				isActive: {
-					type: "boolean",
-					defaultValue: true
 				}
 			},
 			associations: {},
@@ -122,18 +116,6 @@ sap.ui.define([
 	};
 
 	/**
-	 * Sets the value of the isActive property.
-	 * When set to false, de-select all overlays.
-	 * @param {boolean} bValue - Value to be set
-	 */
-	Selection.prototype.setIsActive = function(bValue) {
-		this.setProperty("isActive", bValue);
-		if (bValue === false) {
-			this._deselectOverlays();
-		}
-	};
-
-	/**
 	 * Register an overlay
 	 *
 	 * @param {sap.ui.dt.Overlay} oOverlay - Overlay object
@@ -152,7 +134,6 @@ sap.ui.define([
 		oOverlay.attachBrowserEvent("click", this._selectOverlay, this);
 		oOverlay.attachBrowserEvent("contextmenu", this._selectOverlay, this);
 		oOverlay.attachBrowserEvent("keydown", this._onKeyDown, this);
-		oOverlay.attachBrowserEvent("mousedown", this._onMouseDown, this);
 		oOverlay.attachBrowserEvent("mouseover", this._onMouseover, this);
 		oOverlay.attachBrowserEvent("mouseleave", this._onMouseleave, this);
 	};
@@ -185,7 +166,6 @@ sap.ui.define([
 		oOverlay.detachBrowserEvent("click", this._selectOverlay, this);
 		oOverlay.detachBrowserEvent("contextmenu", this._selectOverlay, this);
 		oOverlay.detachBrowserEvent("keydown", this._onKeyDown, this);
-		oOverlay.detachBrowserEvent("mousedown", this._onMouseDown, this);
 		oOverlay.detachBrowserEvent("mouseover", this._onMouseover, this);
 		oOverlay.detachBrowserEvent("mouseleave", this._onMouseleave, this);
 		oOverlay.detachEditableChange(this._onEditableChange, this);
@@ -221,9 +201,6 @@ sap.ui.define([
 	 * @private
 	 */
 	Selection.prototype._onKeyDown = function(oEvent) {
-		if (!this.getIsActive()) {
-			return;
-		}
 		const oOverlay = this._getFocusedOverlay();
 		const bOverlayAndNoShiftAlt = oOverlay && oEvent.shiftKey === false && oEvent.altKey === false;
 		switch (oEvent.keyCode) {
@@ -279,13 +256,6 @@ sap.ui.define([
 
 	Selection.prototype._selectOverlay = function(oEvent) {
 		const oOverlay = OverlayRegistry.getOverlay(oEvent.currentTarget.id);
-		if (!this.getIsActive()) {
-			// Propagation should be stopped at the root overlay to prevent the selection of the underlying elements
-			if (oOverlay.isRoot()) {
-				preventEventDefaultAndPropagation(oEvent);
-			}
-			return;
-		}
 		const oSelectionManager = this.getDesignTime().getSelectionManager();
 		const bMultipleOverlaysSelected = oSelectionManager.get().length > 1;
 		const bMultiSelection = oEvent.metaKey || oEvent.ctrlKey || oEvent.shiftKey;
@@ -315,30 +285,6 @@ sap.ui.define([
 	};
 
 	/**
-	 * Handle MouseDown event
-	 *
-	 * @param {sap.ui.base.Event} oEvent - Event object
-	 * @private
-	 */
-	Selection.prototype._onMouseDown = function(oEvent) {
-		if (!this.getIsActive()) {
-			// In Visualization Mode we must prevent MouseDown-Event for Overlays
-			// We have to close open PopOvers from the ChangeVisualization because they
-			// should close on MouseDown
-			const oOverlay = OverlayRegistry.getOverlay(oEvent.currentTarget.id);
-			// Propagation should be stopped at the root overlay to prevent the selection of the underlying elements
-			if (oOverlay.isRoot()) {
-				preventEventDefaultAndPropagation(oEvent);
-			}
-			InstanceManager.getOpenPopovers().forEach(function(oPopOver) {
-				if (oPopOver._bOpenedByChangeIndicator) {
-					oPopOver.close();
-				}
-			});
-		}
-	};
-
-	/**
 	 * Handle mouseover event
 	 * @param  {sap.ui.base.Event} oEvent - Event object
 	 * @private
@@ -346,7 +292,7 @@ sap.ui.define([
 	Selection.prototype._onMouseover = function(oEvent) {
 		const oOverlay = OverlayRegistry.getOverlay(oEvent.currentTarget.id);
 		// due to some timing issues the mouseover event callback can be triggered during drag&drop
-		if (!this.getIsActive() || (this.getDesignTime()?.getBusyPlugins().length)) {
+		if (this.getDesignTime()?.getBusyPlugins().length) {
 			// Propagation should be stopped at the root overlay to prevent the selection of the underlying elements
 			if (oOverlay.isRoot()) {
 				preventEventDefaultAndPropagation(oEvent);
@@ -369,12 +315,7 @@ sap.ui.define([
 	 */
 	Selection.prototype._onMouseleave = function(oEvent) {
 		const oOverlay = OverlayRegistry.getOverlay(oEvent.currentTarget.id);
-		if (!this.getIsActive()) {
-			// Propagation should be stopped at the root overlay to prevent the selection of the underlying elements
-			if (oOverlay.isRoot()) {
-				preventEventDefaultAndPropagation(oEvent);
-			}
-		} else if (oOverlay.isSelectable()) {
+		if (oOverlay.isSelectable()) {
 			OverlayUtil.setFirstParentMovable(oOverlay, true);
 			this._removePreviousHover();
 			preventEventDefaultAndPropagation(oEvent);

@@ -20,7 +20,6 @@ sap.ui.define([
 	"sap/ui/model/Model",
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/ui/rta/command/CommandFactory",
-	"sap/ui/rta/util/changeVisualization/ChangeCategories",
 	"sap/ui/rta/util/changeVisualization/ChangeVisualization",
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/fl/api/FlexTestAPI",
@@ -43,7 +42,6 @@ sap.ui.define([
 	Model,
 	nextUIUpdate,
 	CommandFactory,
-	ChangeCategories,
 	ChangeVisualization,
 	sinon,
 	FlexTestAPI,
@@ -483,16 +481,16 @@ sap.ui.define([
 			}
 
 			const oChangeVisualization = new ChangeVisualization({
-				rootControlId: oView.getId(),
-				isActive: true
+				rootControlId: oView.getId()
 			});
 
-			sandbox.stub(oChangeVisualization, "_updateChangeIndicators");
 			const aChanges = aCommands.map((oCommand) => oCommand.getPreparedChange());
-			sandbox.stub(oChangeVisualization, "_collectChanges").resolves(aChanges);
+			sandbox.stub(PersistenceWriteAPI, "_getUIChanges").resolves(aChanges);
+			// CViz reaches into DesignTime to read the connected-elements map; this enablement helper
+			// runs CViz standalone (no DesignTime), so stub the lookup to return an empty map.
+			sandbox.stub(oChangeVisualization, "_getConnectedElements").returns({});
 
-			await oChangeVisualization._updateChangeRegistry();
-			await oChangeVisualization._selectChangeCategory(ChangeCategories.ALL);
+			await oChangeVisualization.refreshBorders();
 			const oChangeIndicatorRegistry = oChangeVisualization._oChangeIndicatorRegistry;
 			const oData = oChangeIndicatorRegistry.getSelectorsWithRegisteredChanges();
 			const sDisplayElementId = oChangeVisualizationInput.displayElementId;
