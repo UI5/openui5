@@ -7,13 +7,15 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/dt/OverlayRegistry",
-	"sap/ui/fl/write/api/ChangesWriteAPI"
+	"sap/ui/fl/write/api/ChangesWriteAPI",
+	"sap/ui/fl/support/api/SupportAPI"
 ], function(
 	Log,
 	Element,
 	JsControlTreeModifier,
 	OverlayRegistry,
-	ChangesWriteAPI
+	ChangesWriteAPI,
+	SupportAPI
 ) {
 	"use strict";
 
@@ -25,9 +27,9 @@ sap.ui.define([
 	 * there is no easy way to retrieve the RuntimeAuthoring instance otherwise.
 	 *
 	 * @namespace
-	 * @name sap.ui.rta.service.SupportTools
+	 * @name sap.ui.rta.service.OverlayInfo
 	 * @author SAP SE
-	 * @since 1.106
+	 * @since 1.152
 	 * @version ${version}
 	 * @private
 	 * @ui5-restricted
@@ -35,9 +37,42 @@ sap.ui.define([
 
 	const sHighlightClass = "sapUiFlexibilitySupportExtension_Selected";
 	const sGlobalVariableName = "ui5flex$temp";
+	const sMessageId = "ui5FlexibilitySupport.submodules.overlayInfo";
+	// Prefix for the message IDs used on the shared flex support channel, so OverlayInfo
+	// traffic does not collide with the flex messages on the same channel.
+	const sBrokerMessagePrefix = "overlayInfo.";
 	window[sGlobalVariableName] = {}; // Container for all temp. variables
 	const aTempVariables = window[sGlobalVariableName];
 	let nTempVarCount = 0;
+	// Set per service start by the factory. Determines whether postToExtension uses the
+	// direct (same-window) path or the broker path.
+	let bBrokerScenario = false;
+	// In the broker scenario the app client must not publish before the support client (the
+	// extension host bridge) is connected; publishing to a non-connected target makes the
+	// ushell MessageBroker log errors. Presence is detected via the broker's connection
+	// callback ("clientSubscribed" / "clientUnsubscribed", see fnOnClientConnectionChange);
+	// until the support client subscribes, app-initiated pushes are skipped.
+	let bSupportClientConnected = false;
+
+	/*
+	 * Detects the cFLP scenario: the RTA/app runs inside an iFrame while the support
+	 * extension runs in the outer frame. Same-window window.postMessage cannot cross that
+	 * boundary, so in this scenario the communication is routed through the sap.ushell
+	 * MessageBroker (reusing the sap.ui.fl support channel via SupportAPI). The direct
+	 * (same-window) path is kept unchanged for standalone / in-frame scenarios.
+	 *
+	 * The scenario requires BOTH an iFrame (window.parent !== window) AND a reachable
+	 * ushell container (the MessageBroker lives there). The ushell check also keeps the
+	 * QUnit test runner - which loads the test page in an iFrame but has no ushell - on
+	 * the direct path.
+	 *
+	 * Evaluated per service start (not at module load).
+	 *
+	 * @returns {boolean} true if the RTA runs inside a cFLP iFrame
+	 */
+	function isBrokerScenario() {
+		return window.parent !== window && !!window.sap?.ushell?.Container;
+	}
 
 	/**
 	 * Logs a message to the console
@@ -49,6 +84,37 @@ sap.ui.define([
 		if (oVariable) {
 			console.log(oVariable); // eslint-disable-line no-console
 		}
+	}
+
+	/*
+	 * Sends a message to the support extension.
+	 * Direct (standalone / in-frame) scenario: same-window window.postMessage (unchanged behavior).
+	 * cFLP scenario: routed through the flex support MessageBroker via SupportAPI.
+	 *
+	 * @param {string} sType - The message type
+	 * @param {object} oContent - The message content
+	 */
+	function postToExtension(sType, oContent) {
+		if (bBrokerScenario) {
+			// Only publish when the support client (extension host bridge) is connected.
+			// Publishing to a missing target client makes the ushell MessageBroker log errors.
+			if (!bSupportClientConnected) {
+				return;
+			}
+			Promise.resolve(SupportAPI.publishToSupportClient(sBrokerMessagePrefix + sType, oContent))
+			.catch((oError) => {
+				// The support client may have disconnected (extension closed) between the
+				// presence check and the publish. Treat as "no one listening" and mark it so.
+				bSupportClientConnected = false;
+				Log.info(`OverlayInfo: could not publish '${sType}' to the support client`, oError?.message);
+			});
+			return;
+		}
+		window.postMessage({
+			type: sType,
+			id: sMessageId,
+			content: oContent
+		});
 	}
 
 	function getPluginChangeHandler(oPlugin, oElementOverlay, oRta) {
@@ -155,6 +221,22 @@ sap.ui.define([
 		};
 	}
 
+	/*
+	 * Collects the overlay info for the given overlay and pushes it to the support extension
+	 * as an "overlayInfo" message. Used both as the response to a "getOverlayInfo" request and
+	 * for the app-initiated focus push.
+	 *
+	 * @param {sap.ui.rta.RuntimeAuthoring} oRta - Instance of the RuntimeAuthoring class
+	 * @param {string} sOverlayId - ID of the Overlay
+	 * @returns {Promise<void>} Resolves once the info was pushed (or skipped if no overlay)
+	 */
+	async function sendOverlayInfo(oRta, sOverlayId) {
+		const oOverlayInfo = await getOverlayInfo(oRta, { overlayId: sOverlayId });
+		if (oOverlayInfo) {
+			postToExtension("overlayInfo", oOverlayInfo);
+		}
+	}
+
 	/**
 	 * Prints the change handler to the console
 	 * @param {sap.ui.rta.RuntimeAuthoring} oRta - Instance of the RuntimeAuthoring class
@@ -214,13 +296,20 @@ sap.ui.define([
 		// set new focus and enforce collecting overlay info data
 		const oOverlay = Element.getElementById(mPayload.overlayId);
 		oOverlay.focus();
-		window.postMessage({
-			type: "getOverlayInfo",
-			id: "ui5FlexibilitySupport.submodules.overlayInfo",
-			content: {
+		if (bBrokerScenario) {
+			// In the broker scenario re-posting a getOverlayInfo message to the window would
+			// not reach the (broker-registered) command handler, so collect and push the
+			// overlay info directly.
+			sendOverlayInfo(oRta, oOverlay.getId()).catch((oError) => {
+				Log.info("OverlayInfo: could not send overlay info", oError?.message);
+			});
+		} else {
+			// Direct scenario (unchanged behavior): re-post a getOverlayInfo message to the
+			// window, which re-enters onMessageReceived and pushes the overlayInfo result.
+			postToExtension("getOverlayInfo", {
 				overlayId: oOverlay.getId()
-			}
-		});
+			});
+		}
 
 		// remove previous selection highlighting
 		removeSelectionHighlight();
@@ -302,29 +391,25 @@ sap.ui.define([
 		}
 	}
 
-	// List of supported handlers
+	// List of supported handlers, keyed by message type. All OverlayInfo messages use the
+	// submodule id sMessageId (direct scenario) resp. the sBrokerMessagePrefix (broker scenario).
 	const mHandlers = {
 		getOverlayInfo: {
 			handler: getOverlayInfo,
-			returnMessageType: "overlayInfo",
-			id: "ui5FlexibilitySupport.submodules.overlayInfo"
+			returnMessageType: "overlayInfo"
 		},
 		printChangeHandler: {
-			handler: printChangeHandler,
-			id: "ui5FlexibilitySupport.submodules.overlayInfo"
+			handler: printChangeHandler
 		},
 		printDesignTimeMetadata: {
-			handler: printDesignTimeMetadata,
-			id: "ui5FlexibilitySupport.submodules.overlayInfo"
+			handler: printDesignTimeMetadata
 		},
 		changeOverlaySelection: {
-			handler: changeOverlaySelection,
-			id: "ui5FlexibilitySupport.submodules.overlayInfo"
+			handler: changeOverlaySelection
 		},
 		collectOverlayTableData: {
 			handler: collectOverlayTableData,
-			returnMessageType: "overlayInfoTableData",
-			id: "ui5FlexibilitySupport.submodules.overlayInfo"
+			returnMessageType: "overlayInfoTableData"
 		}
 	};
 
@@ -334,11 +419,7 @@ sap.ui.define([
 	 * Flex Support web extension (Overlay section)
 	 */
 	function onRtaStop() {
-		window.postMessage({
-			type: "rtaStopped",
-			id: "ui5FlexibilitySupport.submodules.overlayInfo",
-			content: {}
-		});
+		postToExtension("rtaStopped", {});
 	}
 
 	/*
@@ -347,15 +428,79 @@ sap.ui.define([
 	 * UI Adaption has started
 	 */
 	function onRtaStart() {
-		window.postMessage({
-			type: "rtaStarted",
-			id: "ui5FlexibilitySupport.submodules.overlayInfo",
-			content: {}
+		postToExtension("rtaStarted", {});
+	}
+
+	/*
+	 * Focus listener for the broker (cFLP) scenario. In the direct scenario this listener
+	 * lives in the injected script of the support extension (which runs in the same frame
+	 * as the app). In cFLP the injected script cannot reach the app frame, so the listener
+	 * has to run here (app-side) and push the overlay info through the broker.
+	 */
+	let fnFocusListener;
+	let iFocusDebounce;
+
+	function installFocusListener(oRta) {
+		if (fnFocusListener) {
+			return;
+		}
+		fnFocusListener = (oEvent) => {
+			const oElement = Element.getElementById(oEvent?.target?.id);
+			if (oElement && oElement.isA("sap.ui.dt.Overlay")) {
+				// debounce to avoid flooding the broker while the user clicks around
+				clearTimeout(iFocusDebounce);
+				iFocusDebounce = setTimeout(() => {
+					sendOverlayInfo(oRta, oElement.getId()).catch((oError) => {
+						Log.info("OverlayInfo: could not send overlay info", oError?.message);
+					});
+				}, 100);
+			}
+		};
+		window.addEventListener("focus", fnFocusListener, true);
+	}
+
+	function removeFocusListener() {
+		if (fnFocusListener) {
+			window.removeEventListener("focus", fnFocusListener, true);
+			fnFocusListener = undefined;
+			clearTimeout(iFocusDebounce);
+		}
+	}
+
+	/*
+	 * Executes a command coming from the support extension by looking it up in mHandlers
+	 * and, if the handler defines a returnMessageType, pushes the result back.
+	 *
+	 * @param {sap.ui.rta.RuntimeAuthoring} oRta - Instance of the RuntimeAuthoring class
+	 * @param {string} sType - The command type (key in mHandlers)
+	 * @param {object} oContent - The command content
+	 */
+	function handleCommand(oRta, sType, oContent) {
+		const mHandler = mHandlers[sType];
+		if (!mHandler) {
+			return;
+		}
+		// Receiving a command means a support client is connected and listening, so replies
+		// and subsequent pushes are safe to publish.
+		bSupportClientConnected = true;
+		// Wrap in a Promise executor so a synchronous throw from the handler (e.g. a stale
+		// overlayId leading to a null overlay) is caught by the same .catch as an async rejection.
+		new Promise((resolve) => {
+			resolve(mHandler.handler(oRta, oContent));
+		})
+		.then((oResult) => {
+			if (mHandler.returnMessageType) {
+				postToExtension(mHandler.returnMessageType, oResult);
+			}
+		})
+		.catch((oError) => {
+			Log.error(`OverlayInfo: command '${sType}' failed`, oError?.message);
 		});
 	}
 
 	/*
-	 * Event handler for the messages sent by the support extension.
+	 * Event handler for the messages sent by the support extension in the direct
+	 * (same-window) scenario.
 	 *
 	 * Messages are contained in oEvent.data - the following properties
 	 * are sent:
@@ -372,30 +517,76 @@ sap.ui.define([
 		if (oEvent.source !== window) {
 			return;
 		}
-
-		const aHandler = Object.entries(mHandlers).find(function(aEntry) {
-			return (
-				aEntry[0] === oEvent.data.type
-				&& aEntry[1].id === oEvent.data.id
-			);
-		});
-		const mHandler = aHandler && aHandler[1];
-
-		if (mHandler) {
-			Promise.resolve(mHandler.handler(oRta, oEvent.data.content))
-			.then(function(oResult) {
-				if (mHandler.returnMessageType) {
-					oEvent.source.postMessage({
-						id: mHandler.id,
-						type: mHandler.returnMessageType,
-						content: oResult
-					});
-				}
-			});
+		if (oEvent.data.id !== sMessageId || !mHandlers[oEvent.data.type]) {
+			return;
 		}
+		handleCommand(oRta, oEvent.data.type, oEvent.data.content);
 	}
 
-	return function(oRta) {
+	function OverlayInfoFactory(oRta) {
+		bBrokerScenario = OverlayInfoFactory._isBrokerScenario();
+		if (bBrokerScenario) {
+			// Fresh start: no support client is known to be connected yet.
+			bSupportClientConnected = false;
+			// Presence detection via the broker's connection callback. The broker notifies us with
+			// "clientSubscribed" for every client already subscribed to the channel when we connect
+			// (covers the case where the extension opened first) and with "clientSubscribed" /
+			// "clientUnsubscribed" for any later change (covers the case where the extension opens
+			// after RTA started). No publish-based handshake is needed - publishing into a channel
+			// with no target logs an error in the ushell MessageBroker and leaks an uncaught
+			// rejection that the caller cannot suppress.
+			const fnOnClientConnectionChange = (sMessageName, sClientId) => {
+				const { supportClientId } = SupportAPI.getSupportChannelInfo();
+				if (sClientId !== supportClientId) {
+					return;
+				}
+				if (sMessageName === "clientSubscribed") {
+					bSupportClientConnected = true;
+					// Intentionally re-announce on every subscribe: if the extension is closed and
+					// reopened, it re-subscribes and needs the rtaStarted signal again to rebuild its
+					// state. The extension treats rtaStarted as idempotent.
+					onRtaStart();
+				} else if (sMessageName === "clientUnsubscribed") {
+					bSupportClientConnected = false;
+				}
+			};
+			// cFLP: connect the app client (idempotent - it may already be connected by
+			// the flex ComponentLifecycleHooks in debug mode) and register a handler per
+			// command on the shared support channel. The focus listener is installed here
+			// because the injected script cannot reach the app frame in cFLP.
+			const pConnected = SupportAPI.connectAppClient(fnOnClientConnectionChange).then(() => {
+				Object.keys(mHandlers).forEach((sType) => {
+					SupportAPI.registerMessageHandler(sBrokerMessagePrefix + sType, (oContent) => {
+						handleCommand(oRta, sType, oContent);
+					});
+				});
+				installFocusListener(oRta);
+				oRta.attachEventOnce("stop", onRtaStop);
+			});
+			pConnected.catch((oError) => {
+				Log.error("OverlayInfo: could not connect to the message broker", oError);
+			});
+
+			return {
+				// Resolves once the app client is connected and the command handlers are registered.
+				// Exposed so consumers (and tests) can await the async setup deterministically.
+				pReady: pConnected,
+				destroy() {
+					removeFocusListener();
+					bSupportClientConnected = false;
+					Object.keys(mHandlers).forEach((sType) => {
+						SupportAPI.deregisterMessageHandler(sBrokerMessagePrefix + sType);
+					});
+					// Detach our connection callback so its closure (which captures oRta) is not
+					// retained and does not fire onRtaStart for this torn-down instance on later
+					// broker connection events. The shared app client itself stays connected - it
+					// is reused by the flex support API.
+					SupportAPI.deregisterConnectionCallback(fnOnClientConnectionChange);
+				}
+			};
+		}
+
+		// Direct (standalone / in-frame) scenario: unchanged same-window communication.
 		const fnOnMessageReceivedBound = onMessageReceived.bind(null, oRta);
 		window.addEventListener("message", fnOnMessageReceivedBound);
 		oRta.attachEventOnce("stop", onRtaStop);
@@ -406,5 +597,10 @@ sap.ui.define([
 				window.removeEventListener("message", fnOnMessageReceivedBound);
 			}
 		};
-	};
+	}
+
+	// Exposed as a property so the scenario detection can be stubbed in tests.
+	OverlayInfoFactory._isBrokerScenario = isBrokerScenario;
+
+	return OverlayInfoFactory;
 });

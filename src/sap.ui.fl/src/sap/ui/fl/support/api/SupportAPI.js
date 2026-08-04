@@ -54,6 +54,25 @@ sap.ui.define([
 	const MESSAGE_CONNECTION_ESTABLISHED = "ConnectionEstablished";
 	const oResourceBundle = Lib.getResourceBundleFor("sap.ui.fl");
 	let sMessageBrokerStatus = "initial";
+	// Registry for message handlers of other support tools (e.g. sap.ui.rta OverlayInfo)
+	// that reuse the flex support channel. Keyed by message ID. Dispatched from the
+	// default branch of the client message handlers, so push messages and additional
+	// request/response flows are supported without their own broker subscription and
+	// without interfering with the shared oDeferredResult used by this API.
+	const mExternalHandlers = {};
+	// Connection callback slot for the shared app client. The app client is always connected with a
+	// stable internal dispatcher (dispatchAppClientConnectionChange) so that the caller-provided
+	// callback is honored regardless of who connected the client first: the flex ComponentLifecycleHook
+	// (debug mode) may connect it before the RTA OverlayInfo service does, and the connection to the
+	// broker - including its connection callback - can only be established once. Storing the callback
+	// separately keeps presence detection working across that ordering.
+	let fnAppClientConnectionCallback;
+	function dispatchAppClientConnectionChange() {
+		if (typeof fnAppClientConnectionCallback === "function") {
+			// eslint-disable-next-line prefer-rest-params
+			fnAppClientConnectionCallback.apply(this, arguments);
+		}
+	}
 	/**
 	 * Retrieves the application component from either FLP or standalone scenarios.
 	 *
@@ -237,14 +256,16 @@ sap.ui.define([
 	 * Uses the Flex support channel to communicate between support tools and the application.
 	 *
 	 * @param {string} sMessageId - The ID of the message to send
+	 * @param {object} [oData] - Optional data payload to send with the message
 	 */
-	async function sendMessageToAppClient(sMessageId) {
+	async function sendMessageToAppClient(sMessageId, oData) {
 		const oMessageBroker = await getMessageBroker();
 		await oMessageBroker.publish(
 			CHANNEL_ID,
 			SUPPORT_CLIENT_ID,
 			sMessageId,
-			[APP_CLIENT_ID]
+			[APP_CLIENT_ID],
+			oData
 		);
 	}
 
@@ -271,8 +292,9 @@ sap.ui.define([
 	 * @param {string} sClientId - The client ID of the sender. Should always be "FlexSupportClient"
 	 * @param {string} sChannelId - The channel ID on which the message was received. Should always be "flex.support.channel"
 	 * @param {string} sMessageId - The ID of the received message.
+	 * @param {object} [oData] - Optional data payload, forwarded to externally registered handlers.
 	 */
-	async function onSupportClientMessageReceived(sClientId, sChannelId, sMessageId) {
+	async function onSupportClientMessageReceived(sClientId, sChannelId, sMessageId, oData) {
 		if (sClientId === SUPPORT_CLIENT_ID && sChannelId === CHANNEL_ID) {
 			switch (sMessageId) {
 				case MESSAGE_GET_FLEX_OBJECT_INFOS: {
@@ -305,8 +327,13 @@ sap.ui.define([
 					await sendMessageToFlexClient(MESSAGE_CONNECTION_ESTABLISHED);
 					break;
 				}
-				default:
+				default: {
+					const fnHandler = mExternalHandlers[sMessageId];
+					if (fnHandler) {
+						await fnHandler(oData, { clientId: sClientId, channelId: sChannelId });
+					}
 					break;
+				}
 			}
 		}
 	}
@@ -334,8 +361,13 @@ sap.ui.define([
 					SupportAPI.oDeferredResult.resolve(oData);
 					break;
 				}
-				default:
+				default: {
+					const fnHandler = mExternalHandlers[sMessageId];
+					if (fnHandler) {
+						fnHandler(oData, { clientId: sClientId, channelId: sChannelId });
+					}
 					break;
+				}
 			}
 		}
 	}
@@ -361,7 +393,7 @@ sap.ui.define([
 	 */
 	SupportAPI.getAllUIChanges = async function() {
 		if (await checkForMessageBrokerScenario()) {
-			throw new Error("getFlexObjectInfos cannot be used in MessageBroker scenario");
+			throw new Error("getAllUIChanges cannot be used in MessageBroker scenario");
 		} else {
 			const oComponent = await getComponent();
 			return getAllUIChanges(oComponent);
@@ -557,9 +589,172 @@ sap.ui.define([
 	 * @ui5-restricted ui5 support tools
 	 */
 	SupportAPI.initializeMessageBrokerForComponent = async function() {
-		const oMessageBrokerService = await getMessageBroker();
-		await oMessageBrokerService.connect(APP_CLIENT_ID, () => {});
-		oMessageBrokerService.subscribe(APP_CLIENT_ID, [{ channelId: CHANNEL_ID }], onSupportClientMessageReceived.bind(this));
+		await SupportAPI.connectAppClient();
+	};
+
+	/**
+	 * Returns the identifiers of the flex support message broker channel and clients.
+	 * Allows other support tools (e.g. sap.ui.rta) to reuse the same channel without
+	 * hardcoding the constants.
+	 *
+	 * @returns {{channelId: string, appClientId: string, supportClientId: string}} The channel and client identifiers
+	 * @since 1.152
+	 * @ui5-restricted ui5 support tools
+	 */
+	SupportAPI.getSupportChannelInfo = function() {
+		return {
+			channelId: CHANNEL_ID,
+			appClientId: APP_CLIENT_ID,
+			supportClientId: SUPPORT_CLIENT_ID
+		};
+	};
+
+	/**
+	 * Connects the application client to the MessageBroker and subscribes it to the support channel.
+	 * Idempotent: repeated calls reuse the first connection instead of connecting again. This is
+	 * important because the app client can be connected from two places (the flex component
+	 * lifecycle hook in debug mode and the RTA OverlayInfo service); connecting twice makes the
+	 * ushell MessageBroker log a "Client is already connected" error.
+	 *
+	 * @param {function} [fnConnectionCallback] - Optional connection callback invoked by the broker with
+	 *   ("clientSubscribed"|"clientUnsubscribed", clientId, channels) whenever another client subscribes or
+	 *   unsubscribes. This is the broker-native way to detect the presence of the support client, so no
+	 *   publish-based handshake is needed. Defaults to a no-op.
+	 * @param {function} [fnMessageCallback] - Optional message callback for received messages. Defaults to the internal support-client message handler.
+	 * @returns {Promise<void>} Resolves once the client is connected and subscribed
+	 * @since 1.152
+	 * @ui5-restricted ui5 support tools
+	 */
+	SupportAPI.connectAppClient = function(fnConnectionCallback, fnMessageCallback) {
+		// On a fresh connection, clear any stale callback from a previous (torn-down) session so a
+		// no-callback caller does not inherit it. Repeated calls on an existing connection keep it.
+		if (!SupportAPI.pAppClientConnected) {
+			fnAppClientConnectionCallback = undefined;
+		}
+		// Remember the latest connection callback. The client is connected only once (memoized
+		// below), but the callback may be provided by a later caller than the one that connected;
+		// the internal dispatcher always forwards to whatever is stored here.
+		if (typeof fnConnectionCallback === "function") {
+			fnAppClientConnectionCallback = fnConnectionCallback;
+		}
+		SupportAPI.pAppClientConnected ||= (async () => {
+			try {
+				const oMessageBroker = await getMessageBroker();
+				try {
+					await oMessageBroker.connect(APP_CLIENT_ID, dispatchAppClientConnectionChange);
+				} catch (oError) {
+					// An "already connected" error is expected (the client may have been connected by
+					// another caller) and is tolerated; any other connect error is rethrown below.
+					if (!oError?.message?.includes("Client is already connected")) {
+						throw oError;
+					}
+				}
+				await oMessageBroker.subscribe(
+					APP_CLIENT_ID,
+					[{ channelId: CHANNEL_ID }],
+					fnMessageCallback || onSupportClientMessageReceived.bind(this)
+				);
+			} catch (oError) {
+				// Reset so a later call can retry after a genuine connect or subscribe failure.
+				SupportAPI.pAppClientConnected = undefined;
+				throw oError;
+			}
+		})();
+		return SupportAPI.pAppClientConnected;
+	};
+
+	/**
+	 * Connects the support client to the MessageBroker and subscribes it to the support channel.
+	 * Idempotent: an already connected client is treated as success.
+	 *
+	 * @param {function} [fnMessageCallback] - Optional callback for received messages. Defaults to the internal app-client message handler.
+	 * @returns {Promise<void>} Resolves once the client is connected and subscribed
+	 * @since 1.152
+	 * @ui5-restricted ui5 support tools
+	 */
+	SupportAPI.connectSupportClient = async function(fnMessageCallback) {
+		const oMessageBroker = await getMessageBroker();
+		try {
+			await oMessageBroker.connect(SUPPORT_CLIENT_ID, () => {});
+		} catch (oError) {
+			if (!oError?.message?.includes("Client is already connected")) {
+				throw oError;
+			}
+		}
+		await oMessageBroker.subscribe(
+			SUPPORT_CLIENT_ID,
+			[{ channelId: CHANNEL_ID }],
+			fnMessageCallback || onAppClientMessageReceived.bind(this)
+		);
+	};
+
+	/**
+	 * Publishes a message from the support client to the application client on the support channel.
+	 *
+	 * @param {string} sMessageId - The ID of the message to send
+	 * @param {object} [oData] - Optional data payload
+	 * @returns {Promise<void>} Resolves once the message is published
+	 * @since 1.152
+	 * @ui5-restricted ui5 support tools
+	 */
+	SupportAPI.publishToAppClient = function(sMessageId, oData) {
+		return sendMessageToAppClient(sMessageId, oData);
+	};
+
+	/**
+	 * Publishes a message from the application client to the support client on the support channel.
+	 *
+	 * @param {string} sMessageId - The ID of the message to send
+	 * @param {object} [oData] - Optional data payload
+	 * @returns {Promise<void>} Resolves once the message is published
+	 * @since 1.152
+	 * @ui5-restricted ui5 support tools
+	 */
+	SupportAPI.publishToSupportClient = function(sMessageId, oData) {
+		return sendMessageToFlexClient(sMessageId, oData);
+	};
+
+	/**
+	 * Registers a handler for a message ID that is not handled by this API itself.
+	 * The handler is dispatched from the default branch of both client message handlers,
+	 * so it can be used for push messages and additional request/response flows of other
+	 * support tools reusing the flex support channel.
+	 *
+	 * @param {string} sMessageId - The message ID to handle
+	 * @param {function} fnHandler - Handler invoked with (oData, {clientId, channelId})
+	 * @since 1.152
+	 * @ui5-restricted ui5 support tools
+	 */
+	SupportAPI.registerMessageHandler = function(sMessageId, fnHandler) {
+		mExternalHandlers[sMessageId] = fnHandler;
+	};
+
+	/**
+	 * Removes a previously registered message handler.
+	 *
+	 * @param {string} sMessageId - The message ID whose handler should be removed
+	 * @since 1.152
+	 * @ui5-restricted ui5 support tools
+	 */
+	SupportAPI.deregisterMessageHandler = function(sMessageId) {
+		delete mExternalHandlers[sMessageId];
+	};
+
+	/**
+	 * Removes the connection callback previously passed to {@link sap.ui.fl.support.api.SupportAPI.connectAppClient}.
+	 * The shared app client stays connected; only the caller-provided callback is detached. This lets a
+	 * support tool (e.g. sap.ui.rta OverlayInfo) clean up on teardown so its closure - and anything it
+	 * captures - is not retained and no longer fires on later broker connection events.
+	 *
+	 * @param {function} [fnConnectionCallback] - The callback to remove. If it is not the currently stored
+	 *   callback, nothing is removed. If omitted, the stored callback is cleared unconditionally.
+	 * @since 1.152
+	 * @ui5-restricted ui5 support tools
+	 */
+	SupportAPI.deregisterConnectionCallback = function(fnConnectionCallback) {
+		if (!fnConnectionCallback || fnConnectionCallback === fnAppClientConnectionCallback) {
+			fnAppClientConnectionCallback = undefined;
+		}
 	};
 
 	return SupportAPI;

@@ -431,6 +431,7 @@ sap.ui.define([
 
 	QUnit.module("Module 4: MessageBroker Integration (Application Client Side)", {
 		beforeEach() {
+			delete SupportAPI.pAppClientConnected;
 			sandbox.stub(Utils, "getUshellContainer").returns(true);
 			this.oSubscribeStub = sandbox.stub();
 			this.oConnectStub = sandbox.stub().resolves();
@@ -447,6 +448,7 @@ sap.ui.define([
 			});
 		},
 		afterEach() {
+			delete SupportAPI.pAppClientConnected;
 			sandbox.restore();
 		}
 	}, function() {
@@ -848,6 +850,235 @@ sap.ui.define([
 				assert.ok(oError, "Error was thrown");
 				assert.ok(oError.message.includes("MessageBroker"), "Error message mentions 'MessageBroker'");
 			}
+		});
+	});
+
+	QUnit.module("Module 8: Reusable broker primitives (for other support tools)", {
+		beforeEach() {
+			delete SupportAPI.pAppClientConnected;
+			sandbox.stub(Utils, "getUshellContainer").returns(true);
+			this.oSubscribeStub = sandbox.stub().resolves();
+			this.oConnectStub = sandbox.stub().resolves();
+			this.oPublishStub = sandbox.stub().resolves();
+
+			sandbox.stub(Utils, "getUShellService")
+			.withArgs("AppLifeCycle").resolves({
+				getCurrentApplication: () => ({})
+			})
+			.withArgs("MessageBroker").resolves({
+				subscribe: this.oSubscribeStub,
+				connect: this.oConnectStub,
+				publish: this.oPublishStub
+			});
+		},
+		afterEach() {
+			SupportAPI.deregisterMessageHandler("myTool.custom");
+			delete SupportAPI.pAppClientConnected;
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("getSupportChannelInfo returns the channel and client ids", function(assert) {
+			const oInfo = SupportAPI.getSupportChannelInfo();
+			assert.strictEqual(oInfo.channelId, "flex.support.channel", "then the channel id is returned");
+			assert.strictEqual(oInfo.appClientId, "FlexAppClient", "then the app client id is returned");
+			assert.strictEqual(oInfo.supportClientId, "FlexSupportClient", "then the support client id is returned");
+		});
+
+		QUnit.test("connectAppClient connects and subscribes the app client", async function(assert) {
+			await SupportAPI.connectAppClient();
+			assert.ok(this.oConnectStub.calledWith("FlexAppClient"), "then the app client is connected");
+			assert.ok(this.oSubscribeStub.calledOnce, "then the app client is subscribed");
+			assert.deepEqual(
+				this.oSubscribeStub.getCall(0).args[1],
+				[{ channelId: "flex.support.channel" }],
+				"then the correct channel is used"
+			);
+		});
+
+		QUnit.test("connectAppClient forwards connection events to the provided callback", async function(assert) {
+			const aCalls = [];
+			const fnConnectionCallback = function(...aArgs) {
+				aCalls.push(aArgs);
+			};
+			await SupportAPI.connectAppClient(fnConnectionCallback);
+			// The client is connected with a stable internal dispatcher, not the raw callback,
+			// so that a later caller's callback is still honored despite the one-time connect.
+			const fnDispatcher = this.oConnectStub.getCall(0).args[1];
+			assert.strictEqual(typeof fnDispatcher, "function", "then a connection callback is passed to the broker connect");
+			assert.notStrictEqual(fnDispatcher, fnConnectionCallback, "then it is the internal dispatcher, not the raw callback");
+
+			// The dispatcher forwards broker connection events to the stored callback.
+			fnDispatcher("clientSubscribed", "FlexSupportClient", [{ channelId: "flex.support.channel" }]);
+			assert.strictEqual(aCalls.length, 1, "then the provided callback is invoked when the dispatcher fires");
+			assert.deepEqual(
+				aCalls[0],
+				["clientSubscribed", "FlexSupportClient", [{ channelId: "flex.support.channel" }]],
+				"then the connection event arguments are forwarded unchanged"
+			);
+		});
+
+		QUnit.test("connectAppClient honors a callback provided after the client was already connected", async function(assert) {
+			// First caller connects the client without a connection callback (e.g. the flex
+			// ComponentLifecycleHook in debug mode).
+			await SupportAPI.connectAppClient();
+			const fnDispatcher = this.oConnectStub.getCall(0).args[1];
+
+			// A later caller (e.g. RTA SupportTools) provides the connection callback. Because the
+			// client is already connected, connect is not called again - but the callback must still fire.
+			const aCalls = [];
+			await SupportAPI.connectAppClient(function(...aArgs) {
+				aCalls.push(aArgs);
+			});
+			assert.strictEqual(this.oConnectStub.callCount, 1, "then the client is not connected a second time");
+
+			fnDispatcher("clientSubscribed", "FlexSupportClient", []);
+			assert.strictEqual(aCalls.length, 1, "then the later-provided callback is still invoked via the dispatcher");
+		});
+
+		QUnit.test("connectAppClient only connects once across repeated calls", async function(assert) {
+			await SupportAPI.connectAppClient();
+			await SupportAPI.connectAppClient();
+			assert.strictEqual(this.oConnectStub.callCount, 1, "then connect is only called once");
+			assert.strictEqual(this.oSubscribeStub.callCount, 1, "then subscribe is only called once");
+		});
+
+		QUnit.test("connectSupportClient connects and subscribes the support client", async function(assert) {
+			await SupportAPI.connectSupportClient();
+			assert.ok(this.oConnectStub.calledWith("FlexSupportClient"), "then the support client is connected");
+			assert.ok(this.oSubscribeStub.calledOnce, "then the support client is subscribed");
+		});
+
+		QUnit.test("connectAppClient tolerates an already connected client", async function(assert) {
+			this.oConnectStub.rejects(new Error("Client is already connected"));
+			await SupportAPI.connectAppClient();
+			assert.ok(this.oSubscribeStub.calledOnce, "then it still subscribes after the already-connected error");
+		});
+
+		QUnit.test("connectAppClient rethrows other connect errors", async function(assert) {
+			this.oConnectStub.rejects(new Error("boom"));
+			await SupportAPI.connectAppClient().then(function() {
+				assert.ok(false, "should have thrown");
+			}).catch(function(oError) {
+				assert.strictEqual(oError.message, "boom", "then the error is rethrown");
+			});
+		});
+
+		QUnit.test("connectAppClient allows a retry after a genuine connect failure", async function(assert) {
+			this.oConnectStub.onFirstCall().rejects(new Error("boom"));
+			await SupportAPI.connectAppClient().catch(() => {});
+			assert.notOk(SupportAPI.pAppClientConnected, "then the memoized promise is cleared after the failure");
+
+			await SupportAPI.connectAppClient();
+			assert.strictEqual(this.oConnectStub.callCount, 2, "then a later call retries the connect");
+			assert.ok(this.oSubscribeStub.calledOnce, "then the retry subscribes the app client");
+		});
+
+		QUnit.test("connectAppClient rethrows a subscribe failure and allows a retry", async function(assert) {
+			this.oSubscribeStub.onFirstCall().rejects(new Error("subscribe boom"));
+			await SupportAPI.connectAppClient().then(() => {
+				assert.ok(false, "should have thrown");
+			}).catch((oError) => {
+				assert.strictEqual(oError.message, "subscribe boom", "then the subscribe error is rethrown");
+			});
+			assert.notOk(SupportAPI.pAppClientConnected, "then the memoized promise is cleared after the subscribe failure");
+
+			await SupportAPI.connectAppClient();
+			assert.strictEqual(this.oSubscribeStub.callCount, 2, "then a later call retries the subscribe");
+		});
+
+		QUnit.test("publishToAppClient publishes from the support client to the app client", async function(assert) {
+			await SupportAPI.publishToAppClient("myTool.command", { a: 1 });
+			assert.ok(this.oPublishStub.calledOnce, "then publish was called");
+			const aArgs = this.oPublishStub.getCall(0).args;
+			assert.strictEqual(aArgs[0], "flex.support.channel", "then the correct channel is used");
+			assert.strictEqual(aArgs[1], "FlexSupportClient", "then the sender is the support client");
+			assert.strictEqual(aArgs[2], "myTool.command", "then the correct message id is used");
+			assert.deepEqual(aArgs[3], ["FlexAppClient"], "then the target is the app client");
+			assert.deepEqual(aArgs[4], { a: 1 }, "then the data payload is forwarded");
+		});
+
+		QUnit.test("publishToSupportClient publishes from the app client to the support client", async function(assert) {
+			await SupportAPI.publishToSupportClient("myTool.result", { b: 2 });
+			const aArgs = this.oPublishStub.getCall(0).args;
+			assert.strictEqual(aArgs[1], "FlexAppClient", "then the sender is the app client");
+			assert.strictEqual(aArgs[2], "myTool.result", "then the correct message id is used");
+			assert.deepEqual(aArgs[3], ["FlexSupportClient"], "then the target is the support client");
+			assert.deepEqual(aArgs[4], { b: 2 }, "then the data payload is forwarded");
+		});
+
+		QUnit.test("registerMessageHandler dispatches unknown ids on the app client subscription", async function(assert) {
+			this.oSubscribeStub.callsFake((sClientId, aChannels, fnHandler) => {
+				this.messageHandler = fnHandler;
+			});
+			const oHandler = sandbox.stub();
+			SupportAPI.registerMessageHandler("myTool.custom", oHandler);
+
+			await SupportAPI.connectAppClient();
+			await this.messageHandler("FlexSupportClient", "flex.support.channel", "myTool.custom", { x: 1 });
+
+			assert.ok(oHandler.calledOnce, "then the registered handler is invoked");
+			assert.deepEqual(oHandler.getCall(0).args[0], { x: 1 }, "then the data payload is passed");
+			assert.deepEqual(
+				oHandler.getCall(0).args[1],
+				{ clientId: "FlexSupportClient", channelId: "flex.support.channel" },
+				"then the sender meta is passed"
+			);
+		});
+
+		QUnit.test("registerMessageHandler dispatches unknown ids on the support client subscription", async function(assert) {
+			this.oSubscribeStub.callsFake((sClientId, aChannels, fnHandler) => {
+				this.responseHandler = fnHandler;
+			});
+			const oHandler = sandbox.stub();
+			SupportAPI.registerMessageHandler("myTool.custom", oHandler);
+
+			await SupportAPI.connectSupportClient();
+			this.responseHandler("FlexAppClient", "flex.support.channel", "myTool.custom", { y: 2 });
+
+			assert.ok(oHandler.calledOnce, "then the registered handler is invoked");
+			assert.deepEqual(oHandler.getCall(0).args[0], { y: 2 }, "then the data payload is passed");
+		});
+
+		QUnit.test("deregisterMessageHandler stops the dispatch", async function(assert) {
+			this.oSubscribeStub.callsFake((sClientId, aChannels, fnHandler) => {
+				this.messageHandler = fnHandler;
+			});
+			const oHandler = sandbox.stub();
+			SupportAPI.registerMessageHandler("myTool.custom", oHandler);
+			SupportAPI.deregisterMessageHandler("myTool.custom");
+
+			await SupportAPI.connectAppClient();
+			await this.messageHandler("FlexSupportClient", "flex.support.channel", "myTool.custom", {});
+
+			assert.notOk(oHandler.called, "then the handler is not invoked after deregistration");
+		});
+
+		QUnit.test("deregisterConnectionCallback stops forwarding connection events", async function(assert) {
+			const aCalls = [];
+			const fnConnectionCallback = (...aArgs) => {
+				aCalls.push(aArgs);
+			};
+			await SupportAPI.connectAppClient(fnConnectionCallback);
+			const fnDispatcher = this.oConnectStub.getCall(0).args[1];
+
+			SupportAPI.deregisterConnectionCallback(fnConnectionCallback);
+			fnDispatcher("clientSubscribed", "FlexSupportClient", []);
+
+			assert.strictEqual(aCalls.length, 0, "then the callback is no longer invoked after deregistration");
+		});
+
+		QUnit.test("deregisterConnectionCallback only removes the matching callback", async function(assert) {
+			const aCalls = [];
+			const fnConnectionCallback = (...aArgs) => {
+				aCalls.push(aArgs);
+			};
+			await SupportAPI.connectAppClient(fnConnectionCallback);
+			const fnDispatcher = this.oConnectStub.getCall(0).args[1];
+
+			SupportAPI.deregisterConnectionCallback(() => {});
+			fnDispatcher("clientSubscribed", "FlexSupportClient", []);
+
+			assert.strictEqual(aCalls.length, 1, "then a non-matching callback does not remove the stored one");
 		});
 	});
 
