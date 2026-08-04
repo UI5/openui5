@@ -13226,7 +13226,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 [false, true].forEach((bIsExpanded) => {
-	[1, 4].forEach((iCount) => {
+	[/*side-effects refresh after move*/undefined, 1, 4].forEach((iCount) => {
 		[false, true].forEach((bMakeRoot) => {
 			[23, 42].forEach((iNewIndex) => {
 				const sTitle = `move: expanded=${bIsExpanded}, child nodes added=${iCount},
@@ -13277,26 +13277,31 @@ sap.ui.define([
 					}
 					oBindingMock.expects("insertGap").exactly(iCount > 1 ? 1 : 0)
 						.withExactArgs("~iParentIndex~", iCount - 1);
-					oBindingMock.expects("collapse").exactly(bIsExpanded ? 1 : 0)
+					oBindingMock.expects("collapse").exactly(bIsExpanded && iCount ? 1 : 0)
 						.withExactArgs(sinon.match.same(oChildContext), /*bAll*/false,
 						/*bSilent*/true, "~iCollapseCount~");
-					for (let i = 0; i < 100; i += 1) {
-						if (i % 5) {
-							oBinding.aContexts[i] = {iIndex : i};
-						} // else: leave some gaps ;-)
-					}
 					const iOldIndex = iNewIndex === 42 ? 23 : 42; // "the other one"
-					oBindingMock.expects("getModelIndex")
+					if (iCount) {
+						for (let i = 0; i < 100; i += 1) {
+							if (i % 5) {
+								oBinding.aContexts[i] = {iIndex : i};
+							} // else: leave some gaps ;-)
+						}
+						oBinding.aContexts[iOldIndex] = oChildContext;
+					} else {
+						oBinding.aContexts = null; // must not be used
+						iNewIndex = "~iNewIndex~";
+					}
+					oBindingMock.expects("getModelIndex").exactly(iCount ? 1 : 0)
 						.withExactArgs(sinon.match.same(oChildContext)).returns(iOldIndex);
-					oBinding.aContexts[iOldIndex] = oChildContext;
-					this.mock(_Helper).expects("insert")
+					this.mock(_Helper).expects("insert").exactly(iCount ? 1 : 0)
 						.withExactArgs(sinon.match.same(oBinding.aContexts), iNewIndex,
 							sinon.match.same(oChildContext))
 						.callThrough(); // needed for "setIndices"
-					oBindingMock.expects("expand").exactly(bIsExpanded ? 1 : 0)
+					oBindingMock.expects("expand").exactly(bIsExpanded && iCount ? 1 : 0)
 						.withExactArgs(sinon.match.same(oChildContext), 1)
 						.returns(SyncPromise.resolve());
-					oBindingMock.expects("_fireChange").exactly(bIsExpanded ? 0 : 1)
+					oBindingMock.expects("_fireChange").exactly(bIsExpanded || !iCount ? 0 : 1)
 						.withExactArgs({reason : ChangeReason.Change});
 
 					resolve([iCount, iNewIndex, bIsExpanded ? "~iCollapseCount~" : undefined]);
@@ -13311,12 +13316,17 @@ sap.ui.define([
 
 		return oSyncPromise.then(function (vResult) {
 			assert.strictEqual(vResult, undefined, "without a defined result");
-			assert.strictEqual(oBinding.aContexts[iNewIndex], oChildContext);
-			assert.strictEqual(oChildContext.iIndex, iNewIndex);
-			for (let i = 0; i < 100; i += 1) {
-				if (oBinding.aContexts[i]) {
-					assert.strictEqual(oBinding.aContexts[i].iIndex, i, `iIndex @ ${i}`);
+			if (iCount) {
+				assert.strictEqual(oBinding.aContexts[iNewIndex], oChildContext);
+				assert.strictEqual(oChildContext.iIndex, iNewIndex);
+				for (let i = 0; i < 100; i += 1) {
+					if (oBinding.aContexts[i]) {
+						assert.strictEqual(oBinding.aContexts[i].iIndex, i, `iIndex @ ${i}`);
+					}
 				}
+			} else {
+				assert.strictEqual(oChildContext.iIndex, "~iNewIndex~");
+				assert.strictEqual(oBinding.aContexts, null, "unchanged");
 			}
 		});
 	});
