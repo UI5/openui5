@@ -538,6 +538,34 @@ sap.ui.define([
 		}, 0);
 	});
 
+	QUnit.test("two fields with fieldLabels", async function(assert) {
+		var oLabel1 = new Label("L1", {text: "Label 1"});
+		var oLabel2 = new Label("L2", {text: "Label 2"});
+		oFormElement.addFieldLabel(oLabel1);
+		oFormElement.addFieldLabel(oLabel2);
+		var oField1 = new Text("F1", {text: "Text 1"});
+		var oField2 = new Text("F2", {text: "Text 2"});
+		oFormElement.addField(oField1);
+		oFormElement.addField(oField2);
+		await nextUIUpdate();
+
+		var aFields = oFormElement.getFieldsForRendering();
+		var oLabel = oFormElement.getLabelControl();
+
+		assert.ok(oLabel, "Label created");
+		assert.equal(oLabel && oLabel.getText(), "Label 1 / Label 2", "Label text");
+		assert.equal(aFields.length, 3, "3 controls rendered");
+		assert.notOk(jQuery(oField1.getFocusDomRef()).attr("aria-label"), "First field no aria-label set");
+		assert.notOk(jQuery(oField1.getFocusDomRef()).attr("aria-labelledby"), "First field no aria-labelledby set");
+		assert.notOk(jQuery(oField2.getFocusDomRef()).attr("aria-label"), "Second field no aria-label set");
+		assert.notOk(jQuery(oField2.getFocusDomRef()).attr("aria-labelledby"), "Second field no aria-labelledby set");
+
+		// change Label text
+		oLabel1.setText("Changed Label");
+		assert.equal(oLabel && oLabel.getText(), "Changed Label / Label 2", "Label text");
+
+	});
+
 	QUnit.test("three fields", async function(assert) {
 		var oLabel = new Label("L1", {text: "Test"});
 		oFormElement.setLabel(oLabel);
