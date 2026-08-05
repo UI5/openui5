@@ -9,6 +9,10 @@
 	--_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor: var(--sapList_AlternatingBackground);
 	--_sap_ui_dt_ContextMenu_PrpgtedTitleBorderColor: var(--sapShell_BorderColor);
 	--_sap_ui_dt_ContextMenu_EnabledOpacity: 1;
+	--_sap_ui_dt_ContextMenu_ShowChangesButtonBorderColor: var(--sapShell_BorderColor);
+	--_sap_ui_dt_ContextMenu_ShowChangesButtonHoverBG: var(--sapButton_Hover_Background);
+	--_sap_ui_dt_ContextMenu_ShowChangesButtonFocusColor: var(--sapSelectedColor);
+	--_sap_ui_dt_ContextMenu_ShowChangesButtonRadius: var(--sapField_BorderCornerRadius);
 }
 
 .sapUiDtContextMenu.sapMMenu {
@@ -47,7 +51,12 @@
 			/* style for control names */
 			&.sapUiDtContextMenuControlTitle {
 				opacity: var(--_sap_ui_dt_ContextMenu_EnabledOpacity);
-				height: 2rem;
+				height: 2.25rem;
+				border-bottom: 0.0625rem solid var(--_sap_ui_dt_ContextMenu_PrpgtedTitleBorderColor);
+
+				&:hover {
+					background-color: inherit;
+				}
 
 				.sapMMenuItemIcon {
 					display: none;
@@ -56,6 +65,13 @@
 				.sapMMenuItemText {
 					font-weight: bold;
 					color: var(--_sap_ui_dt_ContextMenu_MnuItemTextColor);
+				}
+				// mark the "Show Changes" button as focused, remove focus outline from Title item
+				&:focus {
+					outline: none;
+					.sapMBtnInner {
+						outline: 0.125rem solid var(--sapSelectedColor);
+					}
 				}
 			}
 
@@ -112,6 +128,31 @@
 
 					&:hover {
 						background-color: var(--_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor);
+					}
+				}
+			}
+
+			/* "View Changes" button in control title header */
+			.sapUiDtContextMenuViewChanges.sapMBtn {
+				padding: 0;
+				width: 2rem;
+				&:hover > .sapMBtnHoverable {
+					background-color: var(--_sap_ui_dt_ContextMenu_ShowChangesButtonHoverBG);
+				}
+				.sapMBtnInner {
+					border: 0.063rem solid var(--_sap_ui_dt_ContextMenu_ShowChangesButtonBorderColor);
+					border-radius: var(--_sap_ui_dt_ContextMenu_ShowChangesButtonRadius);
+					padding: 0 var(--sapContent_Space_Tiny);
+					height: 1.75rem;
+					min-width: auto;
+				}
+
+				.sapMBtnIcon {
+					line-height: 1.75rem;
+				}
+				&:focus {
+					.sapMBtnInner {
+						outline: 0.125rem solid var(--_sap_ui_dt_ContextMenu_ShowChangesButtonFocusColor);
 					}
 				}
 			}

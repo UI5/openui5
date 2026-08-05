@@ -9,11 +9,12 @@ sap.ui.define([
 	'sap/ui/Device',
 	'sap/ui/performance/trace/Passport',
 	'sap/ui/performance/trace/Interaction',
+	'sap/ui/performance/FetchInterceptor',
 	'sap/ui/performance/XHRInterceptor',
 	'sap/ui/performance/BeaconRequest',
 	'sap/ui/util/isCrossOriginURL',
 	'sap/base/util/Version'
-], function (BaseConfig, Device, Passport, Interaction, XHRInterceptor, BeaconRequest, isCrossOriginURL, Version) {
+], function (BaseConfig, Device, Passport, Interaction, FetchInterceptor, XHRInterceptor, BeaconRequest, isCrossOriginURL, Version) {
 	"use strict";
 
 	const sIntegrationEnvironment = BaseConfig.get({
@@ -60,10 +61,10 @@ sap.ui.define([
 		return oDate.toISOString().replace(/[^\d]/g, '');
 	}
 
-	function passportHeaderOverride() {
+	function passportHeaderOverride(sUrl, fnUpdateHeader) {
 
 		// only use Passport for non CORS requests
-		if (!isCrossOriginURL(arguments[1])) {
+		if (!isCrossOriginURL(sUrl)) {
 
 			// use the first request of an interaction as FESR TransactionID
 			if (!sFESRTransactionId) {
@@ -79,7 +80,7 @@ sap.ui.define([
 			);
 
 			// set passport with Root Context ID, Transaction ID, Component Info, Action
-			this.setRequestHeader("SAP-PASSPORT", sPassportHeader);
+			fnUpdateHeader("SAP-PASSPORT", sPassportHeader);
 			wmPassportHeader.set(this, sPassportHeader);
 		}
 	}
@@ -88,18 +89,15 @@ sap.ui.define([
 	 * Sends the FESR header when using the piggyback aproach
 	 * @private
 	 */
-	function fesrHeaderOverride() {
+	function fesrHeaderOverride(sUrl, fnUpdateHeader) {
 
 		// only use FESR for non CORS requests
-		if (!isCrossOriginURL(arguments[1])) {
-
-			if (sFESR && sFESRopt) {
-				this.setRequestHeader("SAP-Perf-FESRec", sFESR);
-				this.setRequestHeader("SAP-Perf-FESRec-opt", sFESRopt);
-				sFESR = null;
-				sFESRopt = null;
-				sFESRTransactionId = Passport.getTransactionId();
-			}
+		if (!isCrossOriginURL(sUrl) && sFESR && sFESRopt) {
+			fnUpdateHeader("SAP-Perf-FESRec", sFESR);
+			fnUpdateHeader("SAP-Perf-FESRec-opt", sFESRopt);
+			sFESR = null;
+			sFESRopt = null;
+			sFESRTransactionId = Passport.getTransactionId();
 		}
 	}
 
@@ -303,9 +301,31 @@ sap.ui.define([
 			await Interaction.setActive(true);
 			// activate passport after Interaction is ready to make the XHRInterceptor work properly. The Interceptor needs a pending interaction to work.
 			Passport.setActive(true);
-			XHRInterceptor.register("PASSPORT_HEADER", "open", passportHeaderOverride);
+			XHRInterceptor.register("PASSPORT_HEADER", "open", function() {
+				passportHeaderOverride.call(this, arguments[1], (sHeaderName, sValue) => {
+					this.setRequestHeader(sHeaderName, sValue);
+				});
+			});
+			FetchInterceptor.register("PASSPORT_HEADER", {
+				onRequest(oRequest) {
+					passportHeaderOverride.call(oRequest, oRequest.url, (sHeaderName, sValue) => {
+						oRequest.headers.append(sHeaderName, sValue);
+					});
+				}
+			});
 			if (!oBeaconRequest) {
-				XHRInterceptor.register("FESR", "open" , fesrHeaderOverride);
+				XHRInterceptor.register("FESR", "open" , function() {
+					fesrHeaderOverride(arguments[1], (sHeaderName, sValue) => {
+						this.setRequestHeader(sHeaderName, sValue);
+					});
+				});
+				FetchInterceptor.register("FESR", {
+					onRequest(oRequest) {
+						fesrHeaderOverride(oRequest.url, (sHeaderName, sValue) => {
+							oRequest.headers.append(sHeaderName, sValue);
+						});
+					}
+				});
 			}
 			Interaction.setFESR(FESR);
 			await Device.os.getPlatformInfo().then((platform) => {
@@ -315,12 +335,22 @@ sap.ui.define([
 			bFesrActive = false;
 			await Interaction.setActive(false);
 			XHRInterceptor.unregister("FESR", "open");
+			FetchInterceptor.unregister("FESR", "onRequest");
 			// passport stays active so far
 			if (XHRInterceptor.isRegistered("PASSPORT_HEADER", "open")) {
 				XHRInterceptor.register("PASSPORT_HEADER", "open", function() {
 					if (!isCrossOriginURL(arguments[1])) {
 						// set passport with Root Context ID, Transaction ID for Trace
 						this.setRequestHeader("SAP-PASSPORT", Passport.header(Passport.traceFlags(), ROOT_ID, Passport.getTransactionId()));
+					}
+				});
+			}
+			if (FetchInterceptor.isRegistered("PASSPORT_HEADER", "onRequest")) {
+				FetchInterceptor.register("PASSPORT_HEADER", {
+					onRequest(oRequest) {
+						if (!isCrossOriginURL(oRequest.url)) {
+							oRequest.headers.append("SAP-PASSPORT", Passport.header(Passport.traceFlags(), ROOT_ID, Passport.getTransactionId()));
+						}
 					}
 				});
 			}

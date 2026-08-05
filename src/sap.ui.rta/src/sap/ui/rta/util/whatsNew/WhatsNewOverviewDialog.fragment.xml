@@ -6,6 +6,7 @@
 	xmlns:util="sap.ui.fl.util">
 	<Dialog
 		id="sapUiRtaWhatsNewOverviewDialog"
+		class="sapUiRTABorder"
 		title="{i18n>TIT_WHATS_NEW_DIALOG_OVERVIEW}"
 		contentWidth="50rem"
 		contentHeight="33rem"

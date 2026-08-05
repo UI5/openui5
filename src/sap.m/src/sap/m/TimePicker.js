@@ -30,7 +30,11 @@ sap.ui.define([
 	"sap/ui/core/InvisibleText",
 	'./Button',
 	"sap/ui/thirdparty/jquery",
-	"sap/ui/core/date/UI5Date"
+	"sap/ui/core/date/UI5Date",
+	"./Bar",
+	"sap/ui/core/InvisibleMessage",
+	"sap/ui/core/library",
+	"./Title"
 ],
 function(
 	InputBase,
@@ -59,7 +63,11 @@ function(
 	InvisibleText,
 	Button,
 	jQuery,
-	UI5Date
+	UI5Date,
+	Bar,
+	InvisibleMessage,
+	coreLibrary,
+	Title
 ) {
 		"use strict";
 
@@ -68,7 +76,10 @@ function(
 		var PlacementType = library.PlacementType,
 			TimePickerMaskMode = library.TimePickerMaskMode,
 			ButtonType = library.ButtonType,
+			InvisibleMessageMode = coreLibrary.InvisibleMessageMode,
 			DEFAULT_STEP = 1;
+
+		const oResourceBundle = Library.getResourceBundleFor("sap.m");
 
 		/**
 		 * Constructor for a new <code>TimePicker</code>.
@@ -427,7 +438,7 @@ function(
 
 			this.setDisplayFormat(getDefaultDisplayFormat());
 
-			this._oResourceBundle = Library.getResourceBundleFor("sap.m");
+			this._oResourceBundle = oResourceBundle;
 
 			// marks if the value is valid or not
 			this._bValid = false;
@@ -453,8 +464,8 @@ function(
 				noTabStop: true,
 				decorative: !Device.support.touch || Device.system.desktop ? true : false,
 				useIconTooltip: false,
-				tooltip: this._oResourceBundle.getText("OPEN_PICKER_TEXT"),
-				alt: this._oResourceBundle.getText("OPEN_PICKER_TEXT")
+				tooltip: oResourceBundle.getText("OPEN_PICKER_TEXT"),
+				alt: oResourceBundle.getText("OPEN_PICKER_TEXT")
 			});
 
 			// indicates whether the clock picker is still open
@@ -505,6 +516,9 @@ function(
 			if (Device.system.phone || this._bShowInputs) {
 				const oPicker = this._getPicker();
 				oPicker?.setTitle(sAccessibleName);
+				if (this._oPickerTitle) {
+					this._oPickerTitle.setText(sAccessibleName);
+				}
 			}
 		};
 
@@ -610,9 +624,7 @@ function(
 		 */
 		TimePicker.prototype.onfocusin = function (oEvent) {
 			var oPicker = this._getPicker(),
-				bIconClicked = this._isIconClicked(oEvent),
-				oNumericPicker = this._getNumericPicker(),
-				bOpen = oNumericPicker && oNumericPicker.isOpen();
+				bIconClicked = this._isIconClicked(oEvent);
 
 			if (!this._isMobileDevice()) {
 				DateTimeField.prototype.onfocusin.apply(this, arguments);
@@ -635,7 +647,9 @@ function(
 			}
 			if (!bIconClicked) {
 				if (!this._isHighZoom()) {
-					this.toggleNumericOpen(bOpen);
+					this._openByFocusIn = false;
+					this._openByClick = false;
+					this.toggleOpen(this._getPicker() && this._getPicker().isOpen());
 					this._openByFocusIn = true;
 				}
 			}
@@ -685,8 +699,10 @@ function(
 				return;
 			}
 			if (!bIconClicked) {
-				const oPicker = this._getNumericPicker();
-				this.toggleNumericOpen(oPicker && oPicker.isOpen());
+				const oPicker = this._getPicker();
+				this._openByFocusIn = false;
+				this._openByClick = false;
+				this.toggleOpen(oPicker && oPicker.isOpen());
 			}
 			this._openByClick = true;
 		};
@@ -826,6 +842,16 @@ function(
 		 TimePicker.prototype.onAfterClose = function() {
 			this.$().removeClass(InputBase.ICON_PRESSED_CSS_CLASS);
 			this.fireAfterValueHelpClose();
+
+			// Reset input mode so next open via icon shows clocks
+			const oClocks = this._getClocks();
+			if (oClocks && oClocks.getProperty("_onManualInput")) {
+				oClocks.setProperty("_onManualInput", false);
+				if (this._oToggleViewButton) {
+					this._oToggleViewButton.setIcon(IconPool.getIconURI("keyboard-and-mouse"));
+					this._oToggleViewButton.setTooltip(oResourceBundle.getText("TIMEPICKER_TOGGLE_TO_KEYBOARD"));
+				}
+			}
 		};
 
 		/**
@@ -1589,11 +1615,8 @@ function(
 				}
 			} else {
 				if (iKC === KeyCodes.ENTER || iKC === KeyCodes.SPACE) {
-					if (this._isHighZoom()) {
-						const oPicker = this._getPicker();
-						this.toggleOpen(oPicker && oPicker.isOpen());
-					} else {
-						this._openNumericPicker();
+					if (!this._getPicker() || !this._getPicker().isOpen()) {
+						this._openPicker();
 					}
 				}
 			}
@@ -1763,8 +1786,8 @@ function(
 				oIcon = this.getAggregation("_endIcon")[0],
 				sLocaleId  = this._getLocale().getLanguage();
 
-			sOKButtonText = this._oResourceBundle.getText("TIMEPICKER_SET");
-			sCancelButtonText = this._oResourceBundle.getText("TIMEPICKER_CANCEL");
+			sOKButtonText = oResourceBundle.getText("TIMEPICKER_SET");
+			sCancelButtonText = oResourceBundle.getText("TIMEPICKER_CANCEL");
 
 			oClocks = new TimePickerClocks(this.getId() + "-clocks", {
 				support2400: this._getSupport2400(),
@@ -1814,7 +1837,28 @@ function(
 			oPopover.oPopup.setExtraContent([oIcon]);
 
 			if (Device.system.phone) {
-				oPicker.setTitle(this._getPickerAccessibleName());
+				const sPickerTitle = this._getPickerAccessibleName();
+				this._oToggleViewButtonLabel = new InvisibleText({
+					text: oResourceBundle.getText("TIMEPICKER_TOGGLE_INPUT_VIEW_LABEL")
+				});
+				this._oToggleViewButtonDesc = new InvisibleText({
+					text: oResourceBundle.getText("TIMEPICKER_TOGGLE_INPUT_VIEW_DESC")
+				});
+				this._oToggleViewButton = new Button({
+					icon: IconPool.getIconURI("keyboard-and-mouse"),
+					tooltip: oResourceBundle.getText("TIMEPICKER_TOGGLE_TO_KEYBOARD"),
+					press: this._onToggleViewPress.bind(this),
+					ariaLabelledBy: [this._oToggleViewButtonLabel],
+					ariaDescribedBy: [this._oToggleViewButtonDesc]
+				});
+				this._oPickerTitle = new Title({
+					text: sPickerTitle
+				});
+				oPicker.setTitle(sPickerTitle);
+				oPicker.setCustomHeader(new Bar({
+					contentMiddle: [this._oPickerTitle],
+					contentRight: [this._oToggleViewButtonLabel, this._oToggleViewButtonDesc, this._oToggleViewButton]
+				}));
 				oPicker.setShowHeader(true);
 			} else {
 				oPicker.addAriaLabelledBy(this._getInvisibleLabelText().getId());
@@ -1847,6 +1891,38 @@ function(
 			this.setAggregation("_picker", oPicker, true);
 
 			return oPicker;
+		};
+
+		/**
+		 * Handles the press event of the toggle view button in the picker header (phone only).
+		 * Switches the picker content between clock and keyboard input views.
+		 * @private
+		 */
+		TimePicker.prototype._onToggleViewPress = function() {
+			const bManual = this._getClocks().toggleInputMode();
+
+			// On phone the custom header (with toggle button) must stay visible
+			if (Device.system.phone) {
+				this._getPicker().setShowHeader(true);
+			}
+
+			if (this._oToggleViewButton) {
+				if (bManual) {
+					this._oToggleViewButton.setIcon(IconPool.getIconURI("time-entry-request"));
+					this._oToggleViewButton.setTooltip(oResourceBundle.getText("TIMEPICKER_TOGGLE_TO_CLOCK"));
+				} else {
+					this._oToggleViewButton.setIcon(IconPool.getIconURI("keyboard-and-mouse"));
+					this._oToggleViewButton.setTooltip(oResourceBundle.getText("TIMEPICKER_TOGGLE_TO_KEYBOARD"));
+				}
+			}
+			if (this._oPickerTitle) {
+				this._oPickerTitle.setText(this._getPickerAccessibleName());
+			}
+
+			InvisibleMessage.getInstance().announce(
+				oResourceBundle.getText(bManual ? "TIMEPICKER_ANNOUNCE_KEYBOARD" : "TIMEPICKER_ANNOUNCE_CLOCK"),
+				InvisibleMessageMode.Assertive
+			);
 		};
 
 		/**
@@ -1941,8 +2017,8 @@ function(
 			const sLabelledText = this._getLabelledText();
 
 			return this.getTitle() ||
-				(sLabelledText && this._oResourceBundle.getText("TIMEPICKER_SET_TIME", [sLabelledText])) ||
-				this._oResourceBundle.getText("TIMEPICKER_DEFAULT_TITLE");
+				(sLabelledText && oResourceBundle.getText("TIMEPICKER_SET_TIME", [sLabelledText])) ||
+				oResourceBundle.getText("TIMEPICKER_DEFAULT_TITLE");
 		};
 
 		/**
@@ -2609,7 +2685,7 @@ function(
 			var oRenderer = this.getRenderer();
 			var oInfo = DateTimeField.prototype.getAccessibilityInfo.apply(this, arguments);
 			var sValue = this.getValue() || "";
-			var sRequired = this.getRequired() ? this._oResourceBundle.getText("ELEMENT_REQUIRED") : '';
+			var sRequired = this.getRequired() ? oResourceBundle.getText("ELEMENT_REQUIRED") : '';
 
 			if (this._bValid) {
 				var oDate = this.getDateValue();
@@ -2619,7 +2695,7 @@ function(
 			}
 
 			oInfo.role = oRenderer.getAriaRole(this);
-			oInfo.type = this._oResourceBundle.getText("ACC_CTR_TYPE_TIMEINPUT");
+			oInfo.type = oResourceBundle.getText("ACC_CTR_TYPE_TIMEINPUT");
 			oInfo.description = [sValue || this._getPlaceholder(), oRenderer.getDescribedByAnnouncement(this), sRequired].join(" ").trim();
 			oInfo.autocomplete = "none";
 			oInfo.haspopup = true;

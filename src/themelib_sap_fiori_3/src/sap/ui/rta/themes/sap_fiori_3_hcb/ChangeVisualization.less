@@ -3,18 +3,16 @@
 /* Quartz High Contrast Black theme                */
 /* =============================================== */
 
-@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorMedium: var(--sapCriticalTextColor); /* #ffab1d */
 @_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark: lighten(@sapUiChart8, 20%); /* #dc8cc9 */
 @_sap_ui_rta_ChangeVisualization_OverlayOutlineColor: @sapUiSuccessBorder; /* #9c9 */
 
-.sapUiDtOverlay {
+.sapMPopover.sapUiRtaChangeDetailPopup {
 
-	.sapUiRtaChangeIndicatorHovered {
+	.sapMBtn {
 
-		&::after {
-			box-shadow: none;
-			outline-width: 0.125rem; /* 2px */
-			outline-offset: -0.125rem; /* 2px */
+		.sapMBtnInner {
+			border-radius: 0;
 		}
+
 	}
 }

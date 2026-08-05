@@ -8,13 +8,11 @@ sap.ui.define([
 	"sap/ui/rta/toolbar/Adaptation",
 	"sap/ui/rta/toolbar/AdaptationRenderer",
 	"sap/ui/rta/Utils"
-],
-function(
+], function(
 	Log,
 	Image,
 	Adaptation,
-	AdaptationRenderer,
-	Utils
+	AdaptationRenderer
 ) {
 	"use strict";
 
@@ -22,7 +20,6 @@ function(
 	 * This class is being assigned to the original Fiori Header Toolbar when RTA Toolbar shows
 	 * @type {string}
 	 */
-	const FIORI_HIDDEN_CLASS = "sapUiRtaFioriHeaderInvisible";
 
 	/**
 	 * Constructor for a new sap.ui.rta.toolbar.Fiori control
@@ -54,54 +51,49 @@ function(
 	});
 
 	Fiori.prototype.init = function(...aArgs) {
-		this._oRenderer = Utils.getFiori2Renderer();
-		this._oFioriHeader = this._oRenderer.getRootControl().getShellHeader();
 		Adaptation.prototype.init.apply(this, aArgs);
 	};
 
 	Fiori.prototype.show = function(...aArgs) {
-		this._oFioriHeader.addStyleClass(FIORI_HIDDEN_CLASS);
+		this.getUshellApi().setShellHeaderVisibility(false);
 		return Adaptation.prototype.show.apply(this, aArgs);
 	};
 
-	Fiori.prototype.buildControls = function(...aArgs) {
-		return Adaptation.prototype.buildControls.apply(this, aArgs).then(function(aControls) {
-			const sLogoPath = this.getUshellApi().getLogo();
+	Fiori.prototype.buildControls = async function(...aArgs) {
+		const aControls = await Adaptation.prototype.buildControls.apply(this, aArgs);
+		const sLogoPath = this.getUshellApi().getLogo();
 
-			if (sLogoPath) {
-				const oLogo = this.getUshellApi().getLogoDomRef();
-				let iWidth;
-				let iHeight;
-				if (oLogo) {
-					iWidth = oLogo.getBoundingClientRect().width;
-					iHeight = oLogo.getBoundingClientRect().height;
-					this._checkLogoSize(oLogo, iWidth, iHeight);
-				}
-
-				this.getControl("iconSpacer").setWidth("8px");
-				this._iLogoWidth = iWidth + 8;
-
-				this.getControl("iconBox").addItem(
-					new Image(`${this.getId()}_fragment--sapUiRta_icon`, {
-						src: sLogoPath,
-						// type check required cause of image could have zero width and height
-						width: typeof iWidth === "number" ? `${iWidth}px` : iWidth,
-						height: typeof iHeight === "number" ? `${iHeight}px` : iHeight
-					})
-				);
+		if (sLogoPath) {
+			const oLogo = this.getUshellApi().getLogoDomRef();
+			let iWidth;
+			let iHeight;
+			if (oLogo) {
+				iWidth = oLogo.getBoundingClientRect().width;
+				iHeight = oLogo.getBoundingClientRect().height;
+				this._checkLogoSize(oLogo, iWidth, iHeight);
+			} else {
+				// without setting a width, the image will span the height of the toolbar, which doesn't look good.
+				iWidth = "80%";
 			}
-			return aControls;
-		}.bind(this));
+
+			this.getControl("iconBox").addItem(
+				new Image(`${this.getId()}_fragment--sapUiRta_icon`, {
+					src: sLogoPath,
+					// type check required because the image could have zero width and height
+					width: typeof iWidth === "number" ? `${iWidth}px` : iWidth,
+					height: typeof iHeight === "number" ? `${iHeight}px` : iHeight
+				})
+			);
+		}
+		return aControls;
 	};
 
 	/**
 	 * @inheritDoc
 	 */
-	Fiori.prototype.hide = function(...aArgs) {
-		return Adaptation.prototype.hide.apply(this, aArgs)
-		.then(function() {
-			this._oFioriHeader.removeStyleClass(FIORI_HIDDEN_CLASS);
-		}.bind(this));
+	Fiori.prototype.hide = async function(...aArgs) {
+		await Adaptation.prototype.hide.apply(this, aArgs);
+		this.getUshellApi().setShellHeaderVisibility(true);
 	};
 
 	Fiori.prototype._checkLogoSize = function(oLogo, iWidth, iHeight) {
@@ -117,51 +109,9 @@ function(
 		}
 	};
 
-	Fiori.prototype._restoreHiddenElements = function() {
-		if (this._iLogoVisibilityLimit && window.innerWidth > this._iLogoVisibilityLimit) {
-			this._setLogoVisibility(true);
-			delete this._iLogoVisibilityLimit;
-		}
-		Adaptation.prototype._restoreHiddenElements.apply(this);
-	};
-
-	Fiori.prototype._hideElementsOnIntersection = function(...aArgs) {
-		const [sSectionName, aEntries] = aArgs;
-		let bWiderThanLogo;
-
-		if (aEntries[0].intersectionRatio === 0) {
-			this.adjustToolbarSectionWidths();
-			this._observeIntersections();
-			return;
-		}
-		if (aEntries[0].intersectionRatio < 1) {
-			if (
-				!this._iLogoVisibilityLimit
-				&& sSectionName === Adaptation.LEFT_SECTION
-			) {
-				const iHiddenWidth = aEntries[0].boundingClientRect.width - aEntries[0].intersectionRect.width;
-				bWiderThanLogo = iHiddenWidth > this._iLogoWidth;
-				this._iLogoVisibilityLimit = this._calculateWindowWidth(aEntries);
-				this._setLogoVisibility(false);
-				if (bWiderThanLogo) {
-					Adaptation.prototype._hideElementsOnIntersection.apply(this, aArgs);
-				}
-				return;
-			}
-		}
-		Adaptation.prototype._hideElementsOnIntersection.apply(this, aArgs);
-	};
-
-	Fiori.prototype._setLogoVisibility = function(bVisible) {
-		const oIconBox = this.getControl("iconBox");
-		const oIconSpacer = this.getControl("iconSpacer");
-		oIconBox.setVisible(bVisible);
-		oIconSpacer.setVisible(bVisible);
-	};
-
 	Fiori.prototype.destroy = function(...aArgs) {
 		// In case of destroy() without normal hide() call
-		this._oFioriHeader.removeStyleClass(FIORI_HIDDEN_CLASS);
+		this.getUshellApi().setShellHeaderVisibility(true);
 
 		Adaptation.prototype.destroy.apply(this, aArgs);
 	};

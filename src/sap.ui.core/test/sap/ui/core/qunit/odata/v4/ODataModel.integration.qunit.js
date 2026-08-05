@@ -42118,129 +42118,179 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Scenario: A node is moved to root level, outside of view, but is still shown in the right
 	// position when scrolling.
 	// JIRA: CPOUI5ODATAV4-2547
-	QUnit.test("Recursive Hierarchy: move outside of view", async function (assert) {
-		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
-		const sUrl = "EMPLOYEES?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
-			+ "HierarchyNodes=$root/EMPLOYEES,HierarchyQualifier='OrgChart',NodeProperty='ID')";
-		const sSelect = "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,Name";
-		const sView = `
-<t:Table id="table" rows="{path : '/EMPLOYEES',
-		parameters : {
-			$$aggregation : {
-				expandTo : 1E16,
-				hierarchyQualifier : 'OrgChart'
-			}
-		}}" threshold="0" visibleRowCount="3">
-	<Text text="{= %{@$ui5.node.isExpanded} }"/>
-	<Text text="{= %{@$ui5.node.level} }"/>
-	<Text text="{Name}"/>
-</t:Table>`;
+	//
+	// Moving a node works as expected, even if a side-effects refresh is initiated synchronously
+	// after the move operation.
+	// JIRA: CPOUI5ODATAV4-3607
+	[false, true].forEach((bWithSideEffectsRefresh) => {
+		const sTitle = "Recursive Hierarchy: move outside of view"
+			+ (bWithSideEffectsRefresh ? " with side-effects refresh" : "");
 
-		// 1 Alpha
-		//   2 Beta
-		// 3 Gamma
-		// 4 Delta
-		this.expectRequest(sUrl + sSelect + "&$count=true&$skip=0&$top=3", {
-				"@odata.count" : "4",
-				value : [{
-					DescendantCount : "1",
-					DistanceFromRoot : "0",
-					DrillState : "expanded",
-					ID : "1",
-					Name : "Alpha"
-				}, {
-					DescendantCount : "0",
-					DistanceFromRoot : "1",
-					DrillState : "leaf",
-					ID : "2",
-					Name : "Beta"
-				}, {
-					DescendantCount : "0",
-					DistanceFromRoot : "0",
-					DrillState : "leaf",
-					ID : "3",
-					Name : "Gamma"
-				}]
-			});
-
-		await this.createView(assert, sView, oModel);
-
-		const oTable = this.oView.byId("table");
-		checkTable("initial page", assert, oTable, [
-			"/EMPLOYEES('1')",
-			"/EMPLOYEES('2')",
-			"/EMPLOYEES('3')"
-		], [
-			[true, 1, "Alpha"],
-			[undefined, 2, "Beta"],
-			[undefined, 1, "Gamma"]
-		], 4);
-		const oListBinding = oTable.getBinding("rows");
-		const oBeta = oListBinding.getCurrentContexts()[1];
-
-		this.expectRequest("#2 PATCH EMPLOYEES('2')", {
-				headers : {
-					Prefer : "return=minimal"
-				},
-				payload : {
-					"EMPLOYEE_2_MANAGER@odata.bind" : null
+		QUnit.test(sTitle, async function (assert) {
+			const oModel = this.createTeaBusiModel({autoExpandSelect : true});
+			const sUrl = "EMPLOYEES?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
+				+ "HierarchyNodes=$root/EMPLOYEES,HierarchyQualifier='OrgChart',NodeProperty='ID')";
+			const sSelect = "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,Name";
+			const sView = `
+	<t:Table id="table" rows="{path : '/EMPLOYEES',
+			parameters : {
+				$$aggregation : {
+					expandTo : 1E16,
+					hierarchyQualifier : 'OrgChart'
 				}
-			}, oNO_CONTENT)
-			.expectRequest("#2 " + sUrl + "&$filter=ID eq '2'&$select=LimitedRank", {
-				value : [{
-					LimitedRank : "3"
-				}]
-			})
+			}}" threshold="0" visibleRowCount="3">
+		<Text text="{= %{@$ui5.node.isExpanded} }"/>
+		<Text text="{= %{@$ui5.node.level} }"/>
+		<Text text="{Name}"/>
+	</t:Table>`;
+
+			// 1 Alpha
+			//   2 Beta
+			// 3 Gamma
+			// 4 Delta
+			this.expectRequest(sUrl + sSelect + "&$count=true&$skip=0&$top=3", {
+					"@odata.count" : "4",
+					value : [{
+						DescendantCount : "1",
+						DistanceFromRoot : "0",
+						DrillState : "expanded",
+						ID : "1",
+						Name : "Alpha"
+					}, {
+						DescendantCount : "0",
+						DistanceFromRoot : "1",
+						DrillState : "leaf",
+						ID : "2",
+						Name : "Beta"
+					}, {
+						DescendantCount : "0",
+						DistanceFromRoot : "0",
+						DrillState : "leaf",
+						ID : "3",
+						Name : "Gamma"
+					}]
+				});
+
+			await this.createView(assert, sView, oModel);
+
+			const oTable = this.oView.byId("table");
+			checkTable("initial page", assert, oTable, [
+				"/EMPLOYEES('1')",
+				"/EMPLOYEES('2')",
+				"/EMPLOYEES('3')"
+			], [
+				[true, 1, "Alpha"],
+				[undefined, 2, "Beta"],
+				[undefined, 1, "Gamma"]
+			], 4);
+			const oListBinding = oTable.getBinding("rows");
+			const oBeta = oListBinding.getCurrentContexts()[1];
+
+			this.expectRequest("#2 PATCH EMPLOYEES('2')", {
+					headers : {
+						Prefer : "return=minimal"
+					},
+					payload : {
+						"EMPLOYEE_2_MANAGER@odata.bind" : null
+					}
+				}, oNO_CONTENT)
+				.expectRequest("#2 " + sUrl + "&$filter=ID eq '2'&$select=LimitedRank", {
+					value : [{
+						LimitedRank : "3"
+					}]
+				});
 			// 1 Alpha
 			// 3 Gamma
 			// 4 Delta
 			// 2 Beta (moved here)
-			.expectRequest("#3 " + sUrl + sSelect + "&$skip=2&$top=1", {
-				value : [{
-					DescendantCount : "0",
-					DistanceFromRoot : "0",
-					DrillState : "leaf",
-					ID : "4",
-					Name : "Delta"
-				}]
-			});
+			if (bWithSideEffectsRefresh) {
+				this.expectRequest("#2 " + sUrl + sSelect + "&$count=true&$skip=0&$top=3", {
+					"@odata.count" : "4",
+					value : [{
+						DescendantCount : "0",
+						DistanceFromRoot : "0",
+						DrillState : "leaf",
+						ID : "1",
+						Name : "Alpha"
+					}, {
+						DescendantCount : "0",
+						DistanceFromRoot : "0",
+						DrillState : "leaf",
+						ID : "3",
+						Name : "Gamma"
+					}, {
+						DescendantCount : "0",
+						DistanceFromRoot : "0",
+						DrillState : "leaf",
+						ID : "4",
+						Name : "Delta"
+					}]
+				});
+			} else {
+				this.expectRequest("#3 " + sUrl + sSelect + "&$skip=2&$top=1", {
+					value : [{
+						DescendantCount : "0",
+						DistanceFromRoot : "0",
+						DrillState : "leaf",
+						ID : "4",
+						Name : "Delta"
+					}]
+				});
+			}
 
-		await Promise.all([
-			// code under test
-			oBeta.move({parent : null}),
-			this.waitForChanges(assert, "move 2 (Beta) to root")
-		]);
+			await Promise.all([
+				// code under test
+				oBeta.move({parent : null}),
+				// code under test (JIRA: CPOUI5ODATAV4-3607)
+				bWithSideEffectsRefresh && oListBinding.getHeaderContext().requestSideEffects([""]),
+				this.waitForChanges(assert, "move 2 (Beta) to root")
+			]);
 
-		checkTable("after move 2 (Beta) to root", assert, oTable, [
-			"/EMPLOYEES('1')",
-			"/EMPLOYEES('3')",
-			"/EMPLOYEES('4')",
-			"/EMPLOYEES('2')"
-		], [
-			[undefined, 1, "Alpha"],
-			[undefined, 1, "Gamma"],
-			[undefined, 1, "Delta"]
-		]);
-		assert.strictEqual(oBeta.getIndex(), 3);
+			checkTable("after move 2 (Beta) to root", assert, oTable, [
+				"/EMPLOYEES('1')",
+				"/EMPLOYEES('3')",
+				"/EMPLOYEES('4')",
+				!bWithSideEffectsRefresh && oBeta
+			], [
+				[undefined, 1, "Alpha"],
+				[undefined, 1, "Gamma"],
+				[undefined, 1, "Delta"]
+			], 4);
+			assert.strictEqual(oBeta.getBinding(),
+				bWithSideEffectsRefresh ? undefined : oListBinding,
+				"after side-effects refresh oBeta is destroyed");
+			assert.strictEqual(oBeta.getIndex(), 3, "getIndex() returns the correct index");
 
-		// "The index of the first visible row is too high. The value has been set to 1."
-		oTable.setFirstVisibleRow(/*3*/ 1);
+			this.expectRequestIf(bWithSideEffectsRefresh, "#3 " + sUrl + sSelect + "&$skip=3&$top=1", {
+					value : [{
+						DescendantCount : "0",
+						DistanceFromRoot : "0",
+						DrillState : "leaf",
+						ID : "2",
+						Name : "Beta"
+					}]
+				});
 
-		await Promise.all([
-			resolveLater(), // table update takes a moment
-			this.waitForChanges(assert, "scroll to 2 (Beta)")
-		]);
+			// "The index of the first visible row is too high. The value has been set to 1."
+			oTable.setFirstVisibleRow(/*3*/ 1);
 
-		checkTable("after scroll to 2 (Beta)", assert, oTable, [
-			"/EMPLOYEES('1')",
-			"/EMPLOYEES('3')",
-			"/EMPLOYEES('4')",
-			"/EMPLOYEES('2')"
-		], [
-			[undefined, 1, "Gamma"],
-			[undefined, 1, "Delta"],
-			[undefined, 1, "Beta"]
-		], 4);
+			await Promise.all([
+				resolveLater(), // table update takes a moment
+				this.waitForChanges(assert, "scroll to 2 (Beta)")
+			]);
+
+			checkTable("after scroll to 2 (Beta)", assert, oTable, [
+				"/EMPLOYEES('1')",
+				"/EMPLOYEES('3')",
+				"/EMPLOYEES('4')",
+				// in case of a side-effects refresh, oBeta gets destroyed and recreated
+				bWithSideEffectsRefresh ? oBeta.getPath() : oBeta
+			], [
+				[undefined, 1, "Gamma"],
+				[undefined, 1, "Delta"],
+				[undefined, 1, "Beta"]
+			], 4);
+		});
 	});
 
 	//*********************************************************************************************
@@ -45983,6 +46033,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// root level explicitly to the last sibling position, where Delta is no longer visible but its
 	// index is properly updated.
 	// JIRA: CPOUI5ODATAV4-2228
+	//
+	// If there is a side-effects refresh automatically added when moving a node (e.g. if moving in
+	// front of a sibling) an additional side-effects refresh initiated synchronously by the
+	// application doesn't harm.
+	// JIRA: CPOUI5ODATAV4-3607
 	QUnit.test("Recursive Hierarchy: move to nextSibling", async function (assert) {
 		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
 		const sSelect = "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,Name";
@@ -46117,7 +46172,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		await Promise.all([
 			// code under test
 			oDelta.move({nextSibling : oGamma, parent : oAlpha}),
-			this.waitForChanges(assert, "move Delta before Gamma (below Alpha)")
+			// code under test (JIRA: CPOUI5ODATAV4-3607)
+			oListBinding.getHeaderContext().requestSideEffects([""]),
+			this.waitForChanges(assert, "move Delta before Gamma (below Alpha),"
+				+ " no extra request for additional side-effects refresh"
+			)
 		]);
 
 		checkTable("after move Delta before Gamma (below Alpha)", assert, oTable, [

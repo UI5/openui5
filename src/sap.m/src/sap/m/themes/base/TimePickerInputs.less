@@ -33,6 +33,8 @@
 	font-family: var(--sapFontFamily);
 	font-size: @sapMFontMediumSize;
 	color: var(--sapTextColor);
+	height: 2.75rem;
+	line-height: 2.75rem;
 }
 
 /* AM/PM + Now grouped together so they wrap as one unit */
@@ -63,15 +65,10 @@
 	min-width: 0;
 }
 
-/* Show labels above inputs */
-.sapMTPHasInlineActions .sapMTPInputWrapper .sapMLabel {
+/* Show labels above inputs when in toggle/keypad modes */
+.sapMTPHasInlineActions .sapMTPInputWrapper .sapMLabel,
+.sapMTPShowLabels .sapMTPInputWrapper .sapMLabel {
 	display: inline-block;
-}
-
-/* Give separator the same height as the input */
-.sapMTPHasInlineActions .sapMTPInputsSeparator {
-	height: 2.75rem;
-	line-height: 2.75rem;
 }
 
 /* AM/PM row takes the full width so it wraps to its own line, centred */

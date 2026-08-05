@@ -3,6 +3,7 @@
  */
 
 sap.ui.define([
+	"sap/ui/performance/FetchInterceptor",
 	"sap/ui/performance/Measurement",
 	"sap/ui/performance/XHRInterceptor",
 	"sap/ui/performance/trace/FESRHelper",
@@ -11,7 +12,7 @@ sap.ui.define([
 	"sap/base/util/now",
 	"sap/base/util/uid",
 	"sap/base/Log"
-], function(Measurement, XHRInterceptor, FESRHelper, isCrossOriginURL, LoaderExtensions, now, uid, Log) {
+], function(FetchInterceptor, Measurement, XHRInterceptor, FESRHelper, isCrossOriginURL, LoaderExtensions, now, uid, Log) {
 
 	"use strict";
 
@@ -33,7 +34,14 @@ sap.ui.define([
 		lastHash;
 
 	const UI5_URL_SYMBOL = Symbol("ui5Url");
-	const UI5_REQUEST_INFO_SYMBOL = Symbol("ui5Url");
+	// Marker on a PerformanceResourceTiming entry: flags that the completed request belongs to a tracked
+	// interaction, so isValidInteractionRequest picks it up in finalizeInteraction. Set on the timing entry.
+	const UI5_REQUEST_INFO_SYMBOL = Symbol("ui5RequestInfo");
+	// Live per-request id, attached to the transport object (XHR or fetch Request) while the request is in
+	// flight. Used as the key into mRequestInfo to carry the request's byte accounting across the separate
+	// transport hooks (open/send/setRequestHeader/response). Own id (via uid) because there is no reliable
+	// intrinsic id on XHR/Request objects.
+	const UI5_REQUEST_ID_SYMBOL = Symbol("ui5RequestId");
 	const mRequestInfo = new Map();
 
 	const mCompressedMimeTypes = {
@@ -94,20 +102,20 @@ sap.ui.define([
 	}
 
 	/**
-	 * Check if request is initiated by XHR, comleted and timeframe of request is within timeframe of current interaction
+	 * Check if request is initiated by XHR/fetch, completed and timeframe of request is within timeframe of current interaction
 	 *
 	 * @param {object} oRequestTiming PerformanceResourceTiming as retrieved by performance.getEntryByType("resource")
-	 * @return {boolean} true if the request is a completed XHR with started and ended within the current interaction
+	 * @return {boolean} true if the request is a completed request with started and ended within the current interaction
 	 * @private
 	 */
-	function isValidInteractionXHR(oRequestTiming) {
+	function isValidInteractionRequest(oRequestTiming) {
 		// if the request has been completed it has complete timing figures)
 		const bPartOfInteraction = oPendingInteraction.start - performance.timeOrigin <= oRequestTiming.startTime
 			&& oPendingInteraction.end - performance.timeOrigin >= oRequestTiming.responseEnd;
 		const bStartsInInteraction = oPendingInteraction.start - performance.timeOrigin <= oRequestTiming.startTime;
 		const oRequestInfo = oRequestTiming[UI5_REQUEST_INFO_SYMBOL];
 		const bCached = oRequestTiming.transferSize === 0 && oRequestTiming.decodedBodySize >= 0;
-		const bIsValid = !bCached && !isCrossOriginURL(oRequestTiming.name) && oRequestInfo && bPartOfInteraction && oRequestTiming.initiatorType === "xmlhttprequest";
+		const bIsValid = !bCached && !isCrossOriginURL(oRequestTiming.name) && oRequestInfo && bPartOfInteraction && (oRequestTiming.initiatorType === "xmlhttprequest" || oRequestTiming.initiatorType === "fetch");
 
 		// calculate navigation and roundtrip time for all requests to calculate client CPU time
 		if (bStartsInInteraction) {
@@ -178,7 +186,7 @@ sap.ui.define([
 			aTimingCache.sort((a, b) => {
 				return a.startTime - b.startTime;
 			});
-			oPendingInteraction.requests = aTimingCache.filter(isValidInteractionXHR);
+			oPendingInteraction.requests = aTimingCache.filter(isValidInteractionRequest);
 
 			// calculate the roundtrip time for all valid requests
 			oPendingInteraction.roundtrip = oValidAggregatedTiming ? oValidAggregatedTiming.roundtrip + (oValidAggregatedTiming.roundtripHigherLimit - oValidAggregatedTiming.roundtripLowerLimit) : 0;
@@ -286,19 +294,19 @@ sap.ui.define([
 		});
 	}
 
-	function registerXHROverrides() {
+	function interceptRequests() {
 		// store the byte size of the body
 		XHRInterceptor.register("INTERACTION", "send" ,function() {
-			if (this.oPendingInteraction && !isCrossOriginURL(this[UI5_URL_SYMBOL])) {
+			if (oPendingInteraction && !isCrossOriginURL(this[UI5_URL_SYMBOL])) {
 				// double string length for byte length as in js characters are stored as 16 bit ints
-				mRequestInfo.get(this._id).bytesSent += arguments[0] ? arguments[0].length : 0;
+				mRequestInfo.get(this[UI5_REQUEST_ID_SYMBOL]).bytesSent += arguments[0] ? arguments[0].length : 0;
 			}
 		});
 
 		// store request header size
 		XHRInterceptor.register("INTERACTION", "setRequestHeader", function(sHeader, sValue) {
 			if (oPendingInteraction && !isCrossOriginURL(this[UI5_URL_SYMBOL])) {
-				mRequestInfo.get(this._id).bytesSent += (sHeader + "").length + (sValue + "").length;
+				mRequestInfo.get(this[UI5_REQUEST_ID_SYMBOL]).bytesSent += (sHeader + "").length + (sValue + "").length;
 			}
 		});
 
@@ -312,14 +320,72 @@ sap.ui.define([
 				// only use Interaction for non CORS requests
 				this.addEventListener("readystatechange", handleResponse.bind(this, oPendingInteraction.id, _InteractionImpl.notifyAsyncStep("request")));
 				const oRequestInfo = Object.create(null);
-				// init bytesSent
+				// init bytesSent / bytesReceived
 				oRequestInfo.bytesSent = 0;
+				oRequestInfo.bytesReceived = 0;
 				// assign the current interaction to the xhr for later response header retrieval.
 				oRequestInfo.pendingInteraction = oPendingInteraction;
-				mRequestInfo.set(this._id, oRequestInfo);
+				// attach an own request id and key the requestInfo by it (send/setRequestHeader/handleResponse
+				// recover it via this[UI5_REQUEST_ID_SYMBOL]) — the XHR has no reliable intrinsic id.
+				const sRequestId = uid();
+				this[UI5_REQUEST_ID_SYMBOL] = sRequestId;
+				mRequestInfo.set(sRequestId, oRequestInfo);
 			}
 		});
 
+		// register the fetch interceptor for data collection — mirrors the XHR "open"/handleResponse
+		// pair above. onRequest sets up the requestInfo and opens an async step; onResponse is called
+		// by the FetchInterceptor once the response body is complete (its readyState===4 equivalent),
+		// so the PerformanceResourceTiming entry is guaranteed to exist and enrichment can run directly.
+		FetchInterceptor.register("INTERACTION", {
+			onRequest(oRequest) {
+				// remember url for later use in handleFetchResponse
+				oRequest[UI5_URL_SYMBOL] = new URL(oRequest.url, document.baseURI).href;
+
+				if (oPendingInteraction && !isCrossOriginURL(oRequest[UI5_URL_SYMBOL])) {
+					// only use Interaction for non CORS requests
+					const oRequestInfo = Object.create(null);
+					oRequestInfo.bytesSent = 0;
+					oRequestInfo.bytesReceived = 0;
+					// account for request header bytes
+					for (const [sKey, sValue] of oRequest.headers.entries()) {
+						oRequestInfo.bytesSent += (sKey + "").length + (sValue + "").length;
+					}
+					// assign the current interaction to the request for later response header retrieval.
+					oRequestInfo.pendingInteraction = oPendingInteraction;
+					// keep the interaction open until the response has been fully received
+					oRequest.fnDone = _InteractionImpl.notifyAsyncStep("request");
+					// attach an own request id and key the requestInfo by it — same mechanism as the XHR
+					// "open" hook above, recovered in onResponse via UI5_REQUEST_ID_SYMBOL.
+					const sRequestId = uid();
+					oRequest[UI5_REQUEST_ID_SYMBOL] = sRequestId;
+					mRequestInfo.set(sRequestId, oRequestInfo);
+				}
+			},
+			onResponse(oResponse, oRequest) {
+				// Always close the async step (fnDone) even if enrichment throws or no requestInfo
+				// was found, so the interaction's async step is never left hanging.
+				try {
+					const sRequestId = oRequest && oRequest[UI5_REQUEST_ID_SYMBOL];
+					const oRequestInfo = sRequestId && mRequestInfo.get(sRequestId);
+					if (oRequestInfo) {
+						// onResponse is fired only after the body is complete, so the timing entry exists.
+						handleFetchResponse(oRequest, oResponse, oRequestInfo);
+					}
+				} finally {
+					if (oRequest && oRequest.fnDone) {
+						oRequest.fnDone();
+					}
+				}
+			},
+			onResponseError(oErr, oRequest) {
+				// The fetch was aborted or failed (network error, CORS rejection, etc.): close the
+				// async step so the interaction counter is not left hanging.
+				if (oRequest && oRequest.fnDone) {
+					oRequest.fnDone();
+				}
+			}
+		});
 	}
 
 	// check if SAP compression rules are fulfilled
@@ -341,43 +407,77 @@ sap.ui.define([
 	// response handler which uses the custom properties we added to the xhr to retrieve information from the response headers
 	function handleResponse(sId, fnDone) {
 		if (this.readyState === 4) {
-			const oRequestInfo = mRequestInfo.get(this._id);
-			let aTimings = performance.getEntriesByType("resource");
-			aTimingCache.push(...aTimings);
-			performance.clearResourceTimings();
-			if (aTimings.length && !oPendingInteraction?.completed && oPendingInteraction?.id === sId) {
-				if (oRequestInfo) {
-					aTimings = aTimings.filter((timing) => {
-						return timing.name === this[UI5_URL_SYMBOL] && timing.decodedBodySize !== 0 && timing.transferSize !== 0;
-					});
-					if (aTimings.length) {
-						// enrich interaction with information
-						const sContentLength = this.getResponseHeader("content-length"),
-							bCompressed = checkCompression(this.responseURL, this.getResponseHeader("content-encoding"), this.getResponseHeader("content-type"), sContentLength),
-							sFesrec = this.getResponseHeader("sap-perf-fesrec");
+			const oRequestInfo = mRequestInfo.get(this[UI5_REQUEST_ID_SYMBOL]);
+			enrichRequestInfoFromTiming(this[UI5_URL_SYMBOL], oRequestInfo, sId, (sHeaderName) => {
+				if (sHeaderName) {
+					return this.getResponseHeader(sHeaderName);
+				}
+				return this.getAllResponseHeaders();
+			});
+			fnDone();
+		}
+	}
 
-						oRequestInfo.bytesReceived = sContentLength ? parseInt(sContentLength) : 0;
-						oRequestInfo.bytesReceived = this.getAllResponseHeaders().length;
-						// this should be true only if all responses are compressed
-						oRequestInfo.requestCompression = bCompressed;
+	/*
+	 * Shared, transport-agnostic response enrichment used by both the XHR and the fetch
+	 * INTERACTION interceptors. It matches the PerformanceResourceTiming entry for the request,
+	 * enriches the given requestInfo (bytesReceived, compression, fesrecTime, sapStatistics) and
+	 * marks the timing entry with UI5_REQUEST_INFO_SYMBOL so isValidInteractionRequest picks it up
+	 * in finalizeInteraction. The header access is abstracted via fnGetHeader so XHR
+	 * (getResponseHeader/getAllResponseHeaders) and fetch (Headers.get / joined headers) can share
+	 * the same body.
+	 */
+	function enrichRequestInfoFromTiming(sUrl, oRequestInfo, sId, fnGetHeader) {
+		let aTimings = performance.getEntriesByType("resource");
+		aTimingCache.push(...aTimings);
+		performance.clearResourceTimings();
+		if (aTimings.length && !oPendingInteraction?.completed && oPendingInteraction?.id === sId) {
+			if (oRequestInfo) {
+				aTimings = aTimings.filter((timing) => {
+					return timing.name === sUrl && timing.decodedBodySize !== 0 && timing.transferSize !== 0;
+				});
+				if (aTimings.length) {
+					// enrich interaction with information
+					const sContentLength = fnGetHeader("content-length"),
+						bCompressed = checkCompression(sUrl, fnGetHeader("content-encoding"), fnGetHeader("content-type"), sContentLength),
+						sFesrec = fnGetHeader("sap-perf-fesrec");
 
-						// sap-perf-fesrec header contains milliseconds
-						oRequestInfo.fesrecTime = sFesrec ? Math.round(parseFloat(sFesrec, 10) / 1000) : 0;
-						const sSapStatistics = this.getResponseHeader("sap-statistics");
-						aTimings[0][UI5_REQUEST_INFO_SYMBOL] = oRequestInfo;
-						if (sSapStatistics) {
-							oRequestInfo.pendingInteraction.sapStatistics.push({
-								// add response url for mapping purposes
-								url: this.responseURL,
-								statistics: sSapStatistics,
-								timing: aTimings ? aTimings[aTimings.length - 1] : undefined
-							});
-						}
+					// total bytes received = response body (content-length) + response header bytes
+					oRequestInfo.bytesReceived += sContentLength ? parseInt(sContentLength) : 0;
+					oRequestInfo.bytesReceived += fnGetHeader().length;
+					// this should be true only if all responses are compressed
+					oRequestInfo.requestCompression = bCompressed;
+
+					// sap-perf-fesrec header contains milliseconds
+					oRequestInfo.fesrecTime = sFesrec ? Math.round(parseFloat(sFesrec, 10) / 1000) : 0;
+					const sSapStatistics = fnGetHeader("sap-statistics");
+					aTimings[0][UI5_REQUEST_INFO_SYMBOL] = oRequestInfo;
+					if (sSapStatistics) {
+						oRequestInfo.pendingInteraction.sapStatistics.push({
+							// add response url for mapping purposes
+							url: sUrl,
+							statistics: sSapStatistics,
+							timing: aTimings ? aTimings[aTimings.length - 1] : undefined
+						});
 					}
 				}
 			}
-			fnDone();
 		}
+	}
+
+	// response handler for fetch — mirrors the XHR handleResponse, reusing the shared enrichment.
+	function handleFetchResponse(oRequest, oResponse, oRequestInfo) {
+		const sId = oRequestInfo.pendingInteraction.id;
+		enrichRequestInfoFromTiming(oRequest[UI5_URL_SYMBOL], oRequestInfo, sId, (sHeaderName) => {
+			if (sHeaderName) {
+				return oResponse.headers.get(sHeaderName);
+			}
+			let sHeaders = "";
+			for (const [sKey, sValue] of oResponse.headers.entries()) {
+				sHeaders += sKey + sValue;
+			}
+			return sHeaders;
+		});
 	}
 
 	var _InteractionImpl = {
@@ -776,7 +876,7 @@ sap.ui.define([
 
 	};
 
-	registerXHROverrides();
+	interceptRequests();
 	interceptScripts();
 
 	LoaderExtensions.notifyResourceLoading = _InteractionImpl.notifyAsyncStep.bind(this, "request");

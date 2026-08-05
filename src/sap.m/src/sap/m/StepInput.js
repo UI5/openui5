@@ -707,7 +707,7 @@ function(
 					this._fTempValue = this._getDefaultValue(sInputValue, this._getMax(), this._getMin());
 				} else {
 					const sGroupSeparator = this._getNumberFormatter().oFormatOptions.groupingSeparator;
-					sInputValue = sInputValue.replaceAll(sGroupSeparator, "");
+					sInputValue = Device.system.desktop ? sInputValue.replaceAll(sGroupSeparator, "") : sInputValue;
 					this._fTempValue = this._parseNumber(sInputValue);
 				}
 			} else {
@@ -1034,8 +1034,10 @@ function(
 				sInputValue = this._getDefaultValue(sInputValue, this._getMax(), this._getMin()).toString();
 			}
 
-			const sGroupSeparator = this._getNumberFormatter().oFormatOptions.groupingSeparator;
-			sInputValue = sInputValue.replaceAll(sGroupSeparator, "");
+			if (Device.system.desktop) {
+				const sGroupSeparator = this._getNumberFormatter().oFormatOptions.groupingSeparator;
+				sInputValue = sInputValue.replaceAll(sGroupSeparator, "");
+			}
 
 			// calculates delta (difference) between input value and real control value
 			if (this._getFormattedValue(this._fTempValue) !== this._getFormattedValue(sInputValue)) {

@@ -71,6 +71,27 @@
 					background-color: var(--_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor) !important;
 				}
 			}
+
+			&.sapUiDtContextMenuControlTitle{
+
+				&:focus {
+					border-radius: 0;
+					outline: none;
+
+					.sapMBtnInner {
+						border: 0.0625rem dotted var(--sapContent_FocusColor);
+						outline: none;
+					}
+				}
+			}
+
+			.sapUiDtContextMenuViewChanges.sapMBtn {
+				height: 1.75rem;
+
+				.sapMBtnIcon {
+					line-height: 1.5rem;
+				}
+			}
 		}
 	}
 }

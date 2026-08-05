@@ -54,6 +54,16 @@ sap.ui.define([
 				openOnClick: {
 					type: "boolean",
 					defaultValue: true
+				},
+				/**
+				 * Callback object for change visualization integration.
+				 * Expects an object with:
+				 * - findOverlayWithChanges(oOverlay): sap.ui.dt.ElementOverlay|null
+				 * - openPopup(oOverlay, mContextMenuRect, oOpenerEvent, oOpenerOverlay): void
+				 */
+				changeVisualizationCallbackFunctions: {
+					type: "object",
+					defaultValue: null
 				}
 			},
 			events: {
@@ -70,10 +80,10 @@ sap.ui.define([
 		this.oContextMenuControl = new Menu(`${this.getId()}-menu`);
 		this.oContextMenuControl.attachItemSelected(this._onItemSelected, this);
 		this.oContextMenuControl.attachClosed(this._contextMenuClosed, this);
+		this.oContextMenuControl.attachOpen(this._contextMenuOpened, this);
 		this.oContextMenuControl.addStyleClass(sMainStyleClass);
 		this._aMenuItems = [];
 		this._aGroupedItems = [];
-		this._bHasPropagatedMenuItems = false;
 		this._aSubMenus = [];
 		this._sMenuIdPrefix = `${this.oContextMenuControl.getId()}-`;
 	};
@@ -264,12 +274,34 @@ sap.ui.define([
 					const oTitleMenuItem = new MenuItem({
 						key: "CTX_CONTROL_NAME",
 						id: `${this._sMenuIdPrefix}CTX_CONTROL_NAME`,
-						text: this.sSelectedControlName,
-						enabled: false
+						text: this.sSelectedControlName
 					});
 					oTitleMenuItem.addStyleClass("sapUiDtContextMenuControlTitle");
-					// prevent focusability of the title item
-					oTitleMenuItem.isFocusable = fnRemoveFocusability;
+					// Add "View Changes" button if change visualization callback is set and element has changes
+					const oCallbackFunctions = this.getChangeVisualizationCallbackFunctions();
+					const oOverlayWithChanges = oCallbackFunctions?.findOverlayWithChanges(this._oCurrentOverlay);
+					if (oOverlayWithChanges) {
+						const oViewChangesButton = new Button({
+							id: `${this.sId}-viewChanges-button`,
+							tooltip: oTextResources.getText("CTX_VIEW_CHANGES"),
+							icon: "sap-icon://display",
+							type: "Transparent",
+							press: function() {
+								oCallbackFunctions.openPopup(
+									oOverlayWithChanges,
+									this._mContextMenuRect,
+									this._oOpenerEvent,
+									this._oOpenerOverlay);
+							}.bind(this)
+						});
+						oViewChangesButton.addStyleClass("sapUiDtContextMenuViewChanges");
+						oTitleMenuItem.addEndContent(oViewChangesButton);
+					} else {
+						// prevent focusability and interactivity of the title item
+						// when no "View Changes" button is shown to avoid confusion that the title item is clickable
+						oTitleMenuItem.isFocusable = fnRemoveFocusability;
+						oTitleMenuItem.isInteractive = fnRemoveFocusability;
+					}
 					oMenu.addItem(oTitleMenuItem);
 				}
 				aMenuItems.forEach(function(oMenuItem, index) {
@@ -344,7 +376,6 @@ sap.ui.define([
 			this._fnCancelMenuPromise = oDtSyncPromise.cancel;
 			oPromise = oDtSyncPromise.promise
 			.then(function() {
-				this._bHasPropagatedMenuItems = false;
 				this._aSubMenus = [];
 				const aPluginItemPromises = [];
 				const aPlugins = this.getDesignTime().getPlugins();
@@ -478,6 +509,13 @@ sap.ui.define([
 		}
 
 		const sSelectedItemId = oEventItem.getParameter("item").getKey();
+		if (sSelectedItemId === "CTX_CONTROL_NAME") {
+			// user selected the Title. This is only possible when we have the button "Show Changes"
+			// Emulate button click
+			const oCallbackFunctions = this.getChangeVisualizationCallbackFunctions();
+			const oOverlayWithChanges = oCallbackFunctions?.findOverlayWithChanges(this._oCurrentOverlay);
+			oCallbackFunctions?.openPopup(oOverlayWithChanges, this._mContextMenuRect, this._oOpenerEvent, this._oOpenerOverlay);
+		}
 
 		this._aMenuItems.some(function(mMenuItemEntry) {
 			const oItem = mMenuItemEntry.menuItem;
@@ -564,6 +602,9 @@ sap.ui.define([
 		const oOverlay = OverlayRegistry.getOverlay(oEvent.currentTarget.id);
 		if (oOverlay && oOverlay.isSelectable() && oOverlay.getSelected()) {
 			this._oCurrentOverlay = oOverlay;
+			// store the opener Event & Overlay for later use (reopen the menu from changes list popover in CViz)
+			this._oOpenerEvent = oEvent;
+			this._oOpenerOverlay = oOverlay;
 			this.open(oOverlay, undefined, oEvent);
 		}
 	};
@@ -574,6 +615,17 @@ sap.ui.define([
 	ContextMenu.prototype._contextMenuClosed = function() {
 		this._aGroupedItems = [];
 		this.fireClosedContextMenu();
+	};
+
+	/**
+	 * Called when ContextMenu gets opened
+	 */
+	ContextMenu.prototype._contextMenuOpened = function() {
+		// store the position of the context menu for later use (open change list popover via "Show Changes" button)
+		const oMenuDomRef = document.querySelector(".sapMPopover.sapUiDtContextMenu");
+		this._mContextMenuRect = oMenuDomRef ? oMenuDomRef.getBoundingClientRect() : null;
+		// set the focus on the first item in list (move focus from title)
+		this.oContextMenuControl.getItems()[1]?.focus();
 	};
 
 	/**
@@ -625,7 +677,6 @@ sap.ui.define([
 					sGroupName: mMenuItem.propagatingControlName,
 					aGroupedItems: [mMenuItem]
 				});
-				this._bHasPropagatedMenuItems = true;
 			} else {
 				// ensure that the group with the same name as the current control is always on top
 				this._aGroupedItems.unshift({

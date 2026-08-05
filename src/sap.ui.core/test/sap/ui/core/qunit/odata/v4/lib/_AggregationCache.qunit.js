@@ -6151,13 +6151,15 @@ sap.ui.define([
 	[undefined, false, true].forEach((bNewParentExpanded) => {
 		[false, true].forEach((bMakeRoot) => {
 			[undefined, false, true].forEach((bChildExpanded) => {
-				const sTitle = "move: unified cache, no refresh needed"
-					+ ", new parent's @$ui5.node.isExpanded = " + bNewParentExpanded
-					+ ", make root = " + bMakeRoot
-					+ ", child's @$ui5.node.isExpanded = " + bChildExpanded;
-				if (bMakeRoot && bNewParentExpanded !== undefined) {
-					return;
-				}
+				[false, true].forEach((bSideEffectsRefreshAfterMove) => {
+		const sTitle = "move: unified cache, no refresh needed"
+			+ ", new parent's @$ui5.node.isExpanded = " + bNewParentExpanded
+			+ ", make root = " + bMakeRoot
+			+ ", child's @$ui5.node.isExpanded = " + bChildExpanded
+			+ ", side-effects refresh after move = " + bSideEffectsRefreshAfterMove;
+		if (bMakeRoot && bNewParentExpanded !== undefined) {
+			return;
+		}
 
 		QUnit.test(sTitle, async function (assert) {
 			var oUpdateExistingExpectation;
@@ -6203,19 +6205,24 @@ sap.ui.define([
 					}, {"myParent@odata.bind" : bMakeRoot ? null : "Foo('42')"},
 					/*fnSubmit*/null, /*fnCancel*/sinon.match.func)
 				.resolves({"@odata.etag" : "etag"});
-			const oCollapseExpectation = oCacheMock.expects("collapse").exactly(bChildExpanded ? 1 : 0)
+			const oCollapseExpectation = oCacheMock.expects("collapse")
+				.exactly(bChildExpanded && !bSideEffectsRefreshAfterMove ? 1 : 0)
 				.withExactArgs("('23')", {}).returns("~collapseCount~");
-			oCacheMock.expects("expand").exactly(bNewParentExpanded === false ? 1 : 0)
+			oCacheMock.expects("expand")
+				.exactly(bNewParentExpanded === false && !bSideEffectsRefreshAfterMove ? 1 : 0)
 				.withExactArgs(sinon.match.same(_GroupLock.$cached), "('42')", 1,
 					"~mKeptElementPredicates~")
 				.returns(SyncPromise.resolve(47));
 			oHelperMock.expects("updateAll")
-				.exactly(oParentNode && bNewParentExpanded === undefined ? 1 : 0)
+				.exactly(oParentNode && bNewParentExpanded === undefined
+					&& !bSideEffectsRefreshAfterMove ? 1 : 0)
 				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "('42')",
 					sinon.match.same(oParentNode), {"@$ui5.node.isExpanded" : true});
 			oHelperMock.expects("getPrivateAnnotation")
+				.exactly(bSideEffectsRefreshAfterMove ? 0 : 1)
 				.withExactArgs(sinon.match.same(oChildNode), "descendants", 0).returns(4);
 			oCacheMock.expects("adjustDescendantCount")
+				.exactly(bSideEffectsRefreshAfterMove ? 0 : 1)
 				.withExactArgs(sinon.match.same(oChildNode), 2, -(4 + 1))
 				.callsFake(function () {
 					assert.notOk(oUpdateExistingExpectation.called, "old level needed!");
@@ -6226,11 +6233,16 @@ sap.ui.define([
 						"collapse before splice");
 				});
 			oHelperMock.expects("getPrivateAnnotation")
+				.exactly(bSideEffectsRefreshAfterMove ? 0 : 1)
 				.withExactArgs(sinon.match.same(oChildNode), "rank").returns("~rank~");
 			const oShiftRankForMoveExpectation = oCacheMock.expects("shiftRankForMove")
+				.exactly(bSideEffectsRefreshAfterMove ? 0 : 1)
 				.withExactArgs("~rank~", 4 + 1, 17);
-			this.mock(oCache.oFirstLevel).expects("move").withExactArgs("~rank~", 17, 4 + 1);
+			this.mock(oCache.oFirstLevel).expects("move")
+				.exactly(bSideEffectsRefreshAfterMove ? 0 : 1)
+				.withExactArgs("~rank~", 17, 4 + 1);
 			oUpdateExistingExpectation = oHelperMock.expects("updateExisting")
+				.exactly(bSideEffectsRefreshAfterMove ? 0 : 1)
 				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "('23')",
 					sinon.match.same(oChildNode), {
 						"@odata.etag" : "etag",
@@ -6238,10 +6250,13 @@ sap.ui.define([
 						"@$ui5.context.isTransient" : undefined
 					});
 			const oDeleteRankExpectation = oHelperMock.expects("deletePrivateAnnotation")
+				.exactly(bSideEffectsRefreshAfterMove ? 0 : 1)
 				.withExactArgs(sinon.match.same(oChildNode), "rank");
 			const oGetInsertIndexExpectation = oCacheMock.expects("getInsertIndex")
+				.exactly(bSideEffectsRefreshAfterMove ? 0 : 1)
 				.withExactArgs(17).returns(7);
 			const oAdjustDescendantCountExpectation = oCacheMock.expects("adjustDescendantCount")
+				.exactly(bSideEffectsRefreshAfterMove ? 0 : 1)
 				.withExactArgs(sinon.match.same(oChildNode), 7, +(4 + 1))
 				.callsFake(function () {
 					assert.deepEqual(oCache.aElements,
@@ -6249,28 +6264,39 @@ sap.ui.define([
 						"already moved");
 				});
 			const oSetRankExpectation = oHelperMock.expects("setPrivateAnnotation")
+				.exactly(bSideEffectsRefreshAfterMove ? 0 : 1)
 				.withExactArgs(sinon.match.same(oChildNode), "rank", 17);
 
 			// code under test
 			const {promise : oSyncPromise, refresh : bRefresh}
 				= oCache.move("~oGroupLock~", "~mKeptElementPredicates~", "Foo('23')", "n/a",
 					bMakeRoot ? null : "Foo('42')");
+			if (bSideEffectsRefreshAfterMove) {
+				oCache.aElements.length = 0; // => side-effects refresh in progress
+			}
 
 			assert.strictEqual(oSyncPromise.isPending(), true);
 			assert.strictEqual(bRefresh, false);
 			assert.notOk(oCollapseExpectation.called, "avoid early collapse");
 
-			assert.deepEqual(await oSyncPromise, [
-				bNewParentExpanded === false ? 47 + 1 : 1, // iResult
-				7, // iNewIndex
-				bChildExpanded === true ? "~collapseCount~" : undefined
-			]);
-			assert.deepEqual(oCache.aElements,
-				["a", "b", "d", "e", "f", "g", "h", oChildNode, "i"]);
-			sinon.assert.callOrder(oShiftRankForMoveExpectation, oGetInsertIndexExpectation);
-			sinon.assert.callOrder(oDeleteRankExpectation, oAdjustDescendantCountExpectation,
-				oSetRankExpectation);
+			const aResult = await oSyncPromise;
+			if (bSideEffectsRefreshAfterMove) {
+				assert.deepEqual(aResult, [undefined, 17]);
+				assert.deepEqual(oCache.aElements, []);
+			} else {
+				assert.deepEqual(aResult, [
+					bNewParentExpanded === false ? 47 + 1 : 1, // iResult
+					7, // iNewIndex
+					bChildExpanded === true ? "~collapseCount~" : undefined
+				]);
+				assert.deepEqual(oCache.aElements,
+					["a", "b", "d", "e", "f", "g", "h", oChildNode, "i"]);
+				sinon.assert.callOrder(oShiftRankForMoveExpectation, oGetInsertIndexExpectation);
+				sinon.assert.callOrder(oDeleteRankExpectation, oAdjustDescendantCountExpectation,
+					oSetRankExpectation);
+			}
 		});
+				});
 			});
 		});
 	});

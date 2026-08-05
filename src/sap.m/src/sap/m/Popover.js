@@ -1734,13 +1734,31 @@ sap.ui.define([
 			this.oPopup.setPosition(this._myPositions[iPlacePos], this._atPositions[iPlacePos], oParentDomRef, this._calcOffset(this._offsets[iPlacePos]), "fit");
 		};
 
-		Popover.prototype._getDocHeight = function () {
-			var body = document.body,
-				html = document.documentElement,
-				oWithinArea = this.getWithinAreaDomRef(),
-				oOffset = (oWithinArea !== window) ? jQuery(oWithinArea).offset() : {top: 0};
+		/**
+		 * Returns the page-relative Y coordinate used as the bottom bound when
+		 * deciding whether a popover fits below its opener.
+		 *
+		 * For the default (window) within-area this is the visible viewport bottom,
+		 * so a popover near the bottom of a scrolled page flips up instead of opening
+		 * off-screen. For a custom within-area the document-end bound is kept (as
+		 * before), so within-area placement is unchanged.
+		 *
+		 * @returns {number} The page-relative Y of the bottom bound, in px.
+		 * @private
+		 */
+		Popover.prototype._getBottomBound = function () {
+			const oWithinArea = this.getWithinAreaDomRef();
 
-			return oOffset.top + Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.offsetHeight);
+			if (oWithinArea === window) {
+				return window.innerHeight + window.scrollY;
+			}
+
+			const oBody = document.body,
+				oHtml = document.documentElement,
+				iWithinTop = oWithinArea.getBoundingClientRect().top + window.scrollY;
+
+			return iWithinTop
+				+ Math.max(oBody.scrollHeight, oBody.offsetHeight, oHtml.clientHeight, oHtml.offsetHeight);
 		};
 
 		Popover.prototype._calcVertical = function () {
@@ -1755,7 +1773,7 @@ sap.ui.define([
 			var iOffsetY = this._getOffsetY();
 			var iTopSpace = iParentTop - this._marginTop + iOffsetY;
 			var iPopoverHeight = this.$().outerHeight();
-			var iBottomSpace = this._getDocHeight() - ($parent.offset().top + iParentHeight + this._marginBottom + iOffsetY);
+			var iBottomSpace = this._getBottomBound() - ($parent.offset().top + iParentHeight + this._marginBottom + iOffsetY);
 
 			if (bPreferredPlacementTop && iTopSpace > iPopoverHeight + this._arrowOffset) {
 					this._bVerticalFlip = false;
@@ -1882,7 +1900,7 @@ sap.ui.define([
 			var iParentHeight = bHasParent ? $parent[0].getBoundingClientRect().height : 0;
 			var iOffsetY = this._getOffsetY();
 			var iTopSpace = iParentTop - this._marginTop + iOffsetY;
-			var iBottomSpace = this._getDocHeight() - $parent.offset().top - iParentHeight - this._marginBottom - iOffsetY;
+			var iBottomSpace = this._getBottomBound() - $parent.offset().top - iParentHeight - this._marginBottom - iOffsetY;
 
 			var $this = this.$();
 			var iHeight = $this.outerHeight() + this._arrowOffset;
@@ -1908,7 +1926,7 @@ sap.ui.define([
 			var iOffsetX = this._getOffsetX();
 			var iOffsetY = this._getOffsetY();
 			var iTopSpace = iParentTop - this._marginTop + iOffsetY;
-			var iBottomSpace = this._getDocHeight() - $parent.offset().top - iParentHeight - this._marginBottom - iOffsetY;
+			var iBottomSpace = this._getBottomBound() - $parent.offset().top - iParentHeight - this._marginBottom - iOffsetY;
 			var iLeftSpace = iParentLeft - this._marginLeft + iOffsetX;
 			var iParentRight = iParentLeft + iParentWidth;
 			var $popoverWithinArea = jQuery(this.getWithinAreaDomRef());

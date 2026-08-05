@@ -9,52 +9,44 @@ sap.ui.define([
 ) => {
 	"use strict";
 
+	const sOverlayWithChangesClass = "sapUiRtaOverlayWithChanges";
+	const oContextMenuEvent = new MouseEvent("contextmenu", {
+		bubbles: true,
+		cancelable: true,
+		view: window,
+		buttons: 2
+	});
+
+	function getChangeDetailTable(oPopover) {
+		return oPopover.getContent().find((oControl) => oControl.isA("sap.m.Table"));
+	}
+
 	Opa5.createPageObjects({
 		onPageWithCViz: {
 
 			actions: {
-				iClickOnTheChangesDropDownMenuButton() {
-					return this.waitFor({
-						controlType: "sap.m.Button",
-						bindingPath: {
-							path: "",
-							propertyPath: "/changeCategoryText",
-							modelName: "visualizationModel"
-						},
-						actions: new Press(),
-						errorMessage: "Did not find the DropDownMenuButton"
-					});
-				},
-				iClickOnTheChangeCategory(sCategoryTitle) {
-					return this.waitFor({
-						controlType: "sap.m.StandardListItem",
-						matchers(oListItem) {
-							return oListItem.getTitle() === sCategoryTitle;
-						},
-						actions: new Press(),
-						errorMessage: "Did not find the StandardListItem"
-					});
-				},
-				iClickOnTheChangeIndicator(sElementId) {
-					return this.waitFor({
+				iOpenTheChangeDetailPopupFor(vElementId) {
+					const fnGetElementId = typeof vElementId === "function" ? vElementId : () => vElementId;
+					this.waitFor({
 						controlType: "sap.ui.dt.ElementOverlay",
 						matchers(oOverlay) {
-							return oOverlay.getElement().getId() === sElementId;
+							return oOverlay.getElement().getId() === fnGetElementId();
 						},
 						success(aOverlays) {
-							return this.waitFor({
-								controlType: "sap.ui.rta.util.changeVisualization.ChangeIndicator",
-								matchers(oIndicator) {
-									return oIndicator.getOverlayId() === aOverlays[0].getId();
-								},
-								actions: new Press(),
-								errorMessage: "Did not find the ChangeIndicator"
-							});
+							aOverlays[0].getDomRef().dispatchEvent(oContextMenuEvent);
 						},
 						errorMessage: "Did not find the Element Overlay"
 					});
+					return this.waitFor({
+						controlType: "sap.m.Button",
+						matchers(oButton) {
+							return oButton.getId().endsWith("-viewChanges-button");
+						},
+						actions: new Press(),
+						errorMessage: "Did not find the View Changes button in the context menu"
+					});
 				},
-				iClickOnTheShowSourceButton() {
+				iPressTheShowSourceButton() {
 					const oRtaResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
 					const sButtonText = oRtaResourceBundle.getText("BTN_CHANGEVISUALIZATION_SHOW_DEPENDENT_CONTAINER_MOVE");
 					return this.waitFor({
@@ -63,116 +55,97 @@ sap.ui.define([
 							return oButton.getText() === sButtonText;
 						},
 						actions: new Press(),
-						errorMessage: "Did not find the ShowSourceButton"
+						errorMessage: "Did not find the Show Source button"
 					});
 				},
-				iClickOnTheUnsavedButton() {
-					const oRtaResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
-					const sButtonText = oRtaResourceBundle.getText("BUT_CHANGEVISUALIZATION_VERSIONING_DIRTY");
+				iCloseTheChangeDetailPopup() {
+					// The popover's begin/back button (press=".onClosePopover") closes the popup
+					// and reopens the context menu. Closing it frees the context menu plugin so the
+					// next element's change list can be opened.
 					return this.waitFor({
-						controlType: "sap.m.Button",
-						matchers(oButton) {
-							return oButton.getText() === sButtonText;
+						controlType: "sap.m.Popover",
+						matchers(oPopover) {
+							return oPopover.getId().endsWith("--changeDetailPopover");
 						},
-						actions: new Press(),
-						errorMessage: "Did not find the Unsaved button"
+						actions(oPopover) {
+							new Press().executeOn(oPopover.getBeginButton());
+						},
+						errorMessage: "Did not find the change detail popover to close"
 					});
 				}
 			},
 
 			assertions: {
-				iShouldSeeTheChangesDropDownMenu(sCVizDropDownId) {
-					return this.waitFor({
-						id: sCVizDropDownId,
-						controlType: "sap.m.Popover",
-						success(oPopover) {
-							Opa5.assert.ok(oPopover.isOpen(), "then the changesDropdown popover is open");
-						},
-						errorMessage: "Did not find the ChangesDropDownMenu"
-					});
-				},
-				iShouldSeeTheDisabledSegmentedButton(sCVizDropDownId, iSegmentedButtonPosition) {
-					return this.waitFor({
-						id: sCVizDropDownId,
-						controlType: "sap.m.Popover",
-						success(oPopover) {
-							Opa5.assert.notOk(oPopover.getContent()[0].getAggregation("buttons")[iSegmentedButtonPosition].getEnabled(), "then the button is disabled");
-						},
-						errorMessage: "The segmented button is enabled"
-					});
-				},
-				iShouldSeeTheCorrectChangesCategoriesCount(sCVizDropDownId, oChangesCount) {
-					const aChangesCount = Object.values(oChangesCount);
-					return this.waitFor({
-						id: sCVizDropDownId,
-						controlType: "sap.m.Popover",
-						success(oPopover) {
-							Opa5.assert.ok(
-								oPopover.getContent()[1].getItems().every((oItem, iIndex) => {
-									return oItem.getCounter() === aChangesCount[iIndex];
-								}),
-								"then the correct categories count is visible"
-							);
-						},
-						errorMessage: "ChangeCategory count does not match the visible count"
-					});
-				},
-				iShouldSeeTheHiddenChangesStrip(sCVizDropDownId, nHiddenChanges) {
-					return this.waitFor({
-						id: sCVizDropDownId,
-						controlType: "sap.m.Popover",
-						success(oPopover) {
-							Opa5.assert.ok(oPopover.getAggregation("content")[1].getVisible(), "then the strip is visible");
-							Opa5.assert.strictEqual(
-								oPopover.getModel("visualizationModel").getData().sortedChanges.relevantHiddenChanges.length,
-								nHiddenChanges,
-								"then the hidden changes are set correctly"
-							);
-						},
-						errorMessage: "Then the changes hidden strip is not visible"
-					});
-				},
-				iShouldNotSeeAChangeIndicator() {
-					return this.waitFor({
-						success() {
-							const bHasNoIndicators = Opa5.getWindow().document.getElementsByClassName(".sapUiRtaChangeIndicator").length === 0;
-							Opa5.assert.ok(bHasNoIndicators, "then no change indicators are visible");
-						},
-						errorMessage: "Then the a change indicator is visible"
-					});
-				},
-				iShouldSeeTheChangeIndicators(iNumberOfVisibleIndicators) {
-					return this.waitFor({
-						controlType: "sap.ui.rta.util.changeVisualization.ChangeIndicator",
-						success(aIndicators) {
-							Opa5.assert.strictEqual(aIndicators.length, iNumberOfVisibleIndicators, "then the correct number of indicators is visible");
-						},
-						errorMessage: "Could not find a Indicator"
-					});
-				},
-				iShouldSeeTheChangeIndicatorPopover() {
+				iShouldSeeTheChangeDetailPopup() {
 					return this.waitFor({
 						controlType: "sap.m.Popover",
 						matchers(oPopover) {
-							return oPopover.getId().includes("Info--popover");
+							return oPopover.getId().endsWith("--changeDetailPopover");
 						},
-						success(oPopover) {
-							Opa5.assert.ok(oPopover[0].getVisible(), "then the popover is visible");
+						success(aPopover) {
+							Opa5.assert.ok(aPopover[0].isOpen(), "then the change detail popover is open");
 						},
-						errorMessage: "Did not find ChangeIndicatorPopover"
+						errorMessage: "Did not find the change detail popover"
 					});
 				},
-				iShouldSeeTheCorrectPopupInformation(sChangeType, iIndex) {
+				iShouldSeeChangeDetailWithType(sChangeType, iRow) {
 					return this.waitFor({
-						controlType: "sap.m.Table",
-						success(aTables) {
+						controlType: "sap.m.Popover",
+						matchers(oPopover) {
+							return oPopover.getId().endsWith("--changeDetailPopover");
+						},
+						success(aPopover) {
+							const oTable = getChangeDetailTable(aPopover[0]);
 							Opa5.assert.strictEqual(
-								aTables[0].getItems()[iIndex].getCells()[0].getTooltip(),
+								oTable.getItems()[iRow].getCells()[0].getTooltip(),
 								sChangeType,
-								"then the information displayed in the popover is correct"
+								"then the change type displayed in the detail popover is correct"
 							);
 						},
-						errorMessage: "Could not find the popover information or it doesn't match the change type"
+						errorMessage: "Could not find the change detail information or it doesn't match the change type"
+					});
+				},
+				iShouldSeeNumberOfChangeDetailRows(iCount) {
+					return this.waitFor({
+						controlType: "sap.m.Popover",
+						matchers(oPopover) {
+							return oPopover.getId().endsWith("--changeDetailPopover");
+						},
+						success(aPopover) {
+							const oTable = getChangeDetailTable(aPopover[0]);
+							Opa5.assert.strictEqual(
+								oTable.getItems().length,
+								iCount,
+								"then the correct number of changes is listed in the detail popover"
+							);
+						},
+						errorMessage: "The number of change detail rows does not match"
+					});
+				},
+				iShouldSeeOverlaysWithChanges(iCount) {
+					return this.waitFor({
+						controlType: "sap.ui.dt.ElementOverlay",
+						matchers(oOverlay) {
+							return oOverlay.hasStyleClass(sOverlayWithChangesClass);
+						},
+						success(aOverlays) {
+							Opa5.assert.strictEqual(
+								aOverlays.length,
+								iCount,
+								"then the correct number of overlays is decorated as changed"
+							);
+						},
+						errorMessage: "The number of decorated overlays does not match the expected count"
+					});
+				},
+				iShouldNotSeeAnyOverlayWithChanges() {
+					return this.waitFor({
+						success() {
+							const bHasNoDecoratedOverlays =
+								Opa5.getWindow().document.getElementsByClassName(sOverlayWithChangesClass).length === 0;
+							Opa5.assert.ok(bHasNoDecoratedOverlays, "then no overlay is decorated as changed");
+						},
+						errorMessage: "There is still an overlay decorated as changed"
 					});
 				},
 				iShouldSeeTheSourceElementOverlay() {
