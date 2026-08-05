@@ -382,4 +382,62 @@ sap.ui.define([
 
 	});
 
+	QUnit.module("Re-rendering guard");
+
+	// When the persoService resolves asynchronously the .done callback fires after the current
+	// render pass, so the unconditional oTable.invalidate() schedules a fresh render endlessly.
+	// This test uses a microtask-deferred service to trigger the real scenario and asserts the
+	// render count stays bounded.
+	QUnit.test("applyPersonalizations with async persoService does not cause infinite re-rendering", function(assert) {
+		var done = assert.async();
+
+		var oAsyncPersoService = {
+			_oBundle: {
+				_persoSchemaVersion: "1.0",
+				aColumns: [
+					{ id: "AsyncTest-asyncLoopTable-colA", order: 0, visible: true },
+					{ id: "AsyncTest-asyncLoopTable-colB", order: 1, visible: true }
+				]
+			},
+			getPersData: function() {
+				var oDeferred = new jQuery.Deferred();
+				var oBundle = this._oBundle;
+				Promise.resolve().then(function() { oDeferred.resolve(oBundle); });
+				return oDeferred.promise();
+			},
+			setPersData: function(oBundle) {
+				var oDeferred = new jQuery.Deferred();
+				this._oBundle = oBundle;
+				Promise.resolve().then(function() { oDeferred.resolve(); });
+				return oDeferred.promise();
+			}
+		};
+
+		var oAsyncTable = new Table("asyncLoopTable", {
+			columns: ["A", "B"].map(function(sCol) {
+				return new Column("col" + sCol, { header: new Label({ text: sCol }) });
+			})
+		});
+		oAsyncTable.placeAt("content");
+		oCore.applyChanges();
+
+		var iRenderCount = 0;
+		oAsyncTable.addDelegate({ onBeforeRendering: function() { iRenderCount++; } });
+
+		var oAsyncTPC = new TablePersoController({
+			table: oAsyncTable,
+			componentName: "AsyncTest",
+			persoService: oAsyncPersoService
+		}).activate();
+
+		oCore.applyChanges();
+
+		setTimeout(function() {
+			assert.strictEqual(iRenderCount, 0, "Table does not re-render after personalization is applied");
+			oAsyncTPC.destroy();
+			oAsyncTable.destroy();
+			done();
+		}, 200);
+	});
+
 });

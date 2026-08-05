@@ -431,6 +431,7 @@ sap.ui.define([
 		// or if any of the column ids is not static
 		if (mPersoMap && this._oPersonalizations) {
 			var bDoSaveMigration = false;
+			var bColumnStateChanged = false;
 			// Set order and visibility
 			for ( var c = 0, cl = this._oPersonalizations.aColumns.length; c < cl; c++) {
 				var oNewSetting = this._oPersonalizations.aColumns[c];
@@ -447,8 +448,14 @@ sap.ui.define([
 				}
 
 				if (oTableColumn) {
-					oTableColumn.setVisible(oNewSetting.visible);
-					oTableColumn.setOrder(oNewSetting.order);
+					// Only flag a change if the column state actually differs.
+					// Re-applying identical values is a no-op, but the invalidate below must not run otherwise
+					if (oTableColumn.getVisible() !== !!oNewSetting.visible || oTableColumn.getOrder() !== +oNewSetting.order) {
+						bColumnStateChanged = true;
+
+						oTableColumn.setVisible(oNewSetting.visible);
+						oTableColumn.setOrder(oNewSetting.order);
+					}
 				} else {
 					Log.warning("Personalization could not be applied to column " + oNewSetting.id + " - not found!");
 				}
@@ -459,10 +466,27 @@ sap.ui.define([
 				this.savePersonalizations();
 			}
 
-			// Force re-rendering of Table for column reorder
-			// SUGGESTED IMPROVEMENT: this is probably obsolete by now: changing one of
-			// the table column's visibility or order should suffice to trigger table's rerendering
-			oTable.invalidate();
+			/*
+			 * Force re-rendering of Table for column reorder
+			 * Do not invalidate unconditionally as this would cause infinite invalidate/rerendering loops:
+			 *
+			 * Table.onBeforeRendering
+			 *  └─ delegate → applyPersonalizations(oTable)
+			 *  └─ persoService.getPersData()              (might be actually async)
+			 *      └─ .done(oPersData) ──────────────┐  ← runs on a later microtask
+			 *                                        │
+			 *  ── render pass finishes here ──       │
+			 *                                        ▼
+			 *                                 _adjustTable(oPersData, oTable)
+			 *                                   └─ _personalizeTable(oTable)
+			 *                                         ├─ col.setVisible / setOrder
+			 *                                         └─ oTable.invalidate()          ← schedules ANOTHER render
+			 *                                              │
+			 *                                              └──────────────► back to Table.onBeforeRendering  (∞)
+			 */
+			if (bColumnStateChanged) {
+				oTable.invalidate();
+			}
 		}
 	};
 
