@@ -90,6 +90,9 @@ sap.ui.define(['../util/EnvHelper', "sap/base/util/merge"], function(EnvHelper, 
 				module: "./ChartV4Delegate.qunit",
 				sinon: {
 					qunitBridge: true
+				},
+				ui5: {
+					libs: ["sap.ui.mdc", "sap.viz"]
 				}
 			},
 			"OPA Test: Basic Tests": {

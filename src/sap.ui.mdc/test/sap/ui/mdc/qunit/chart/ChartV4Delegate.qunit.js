@@ -861,6 +861,7 @@ function(
         const done = assert.async();
         const oInnerChartMock = {getVisibleDimensions: function(){return ["Dimension3", "Dimension1", "Dimension2"];},
                                 getVisibleMeasures: function(){return ["Measure3", "Measure1", "Measure2"];},
+                                setChartType: function(){},
                                 setVisibleDimensions: function(){},
                                 setVisibleMeasures: function(){},
                                 getMeasureByName: function(){},
@@ -898,6 +899,8 @@ function(
         const oSemStub = sandbox.stub(ChartDelegate, "_updateSemanticalPattern");
         const oAddDimStub = sandbox.stub(ChartDelegate, "_addInnerDimension");
         const oAddMeasStub = sandbox.stub(ChartDelegate, "_addInnerMeasure");
+        sandbox.stub(ChartDelegate, "_prepareColoringForItem").returns(Promise.resolve());
+        sandbox.stub(ChartDelegate, "innerDimensionFactory").returns({});
         const oSetVisDimSpy = sinon.spy(oInnerChartMock, "setVisibleDimensions");
         const oSetVisMeasSpy = sinon.spy(oInnerChartMock, "setVisibleMeasures");
         const oAddDimSpy = sinon.spy(oInnerChartMock, "addDimension");
@@ -1472,18 +1475,20 @@ function(
 		}}});
 
 		ChartDelegate._setInnerStructure(oChart, new ChartImplementationContainer(oChart.getId() + "--implementationContainer", {}));
-		ChartDelegate.createInnerChartContent(oChart).then(() => {
+		ChartDelegate._loadChart().then(() => {
+			ChartDelegate.createInnerChartContent(oChart).then(() => {
 
-			const oInnerChart = ChartDelegate._getChart(oChart);
+				const oInnerChart = ChartDelegate._getChart(oChart);
 
-			assert.ok(oInnerChart, "Inner chart is created");
+				assert.ok(oInnerChart, "Inner chart is created");
 
-			const oVizProperties = oInnerChart.getVizProperties();
-			assert.ok(oVizProperties, "vizProperties are set");
-			assert.strictEqual(oVizProperties.tooltip.formatString, null, "Tooltip formatString is null");
-			assert.strictEqual(oVizProperties.valueAxis.label.formatString, null, "Value axis label formatString is null");
+				const oVizProperties = oInnerChart.getVizProperties();
+				assert.ok(oVizProperties, "vizProperties are set");
+				assert.strictEqual(oVizProperties.tooltip.formatString, null, "Tooltip formatString is null");
+				assert.strictEqual(oVizProperties.valueAxis.label.formatString, null, "Value axis label formatString is null");
 
-			done();
+				done();
+			});
 		});
 	});
 
@@ -1803,6 +1808,102 @@ function(
         oStub.restore();
     });
 
+
+    QUnit.test("getPropertyAttribute returns 'Date' for Edm.DateTimeOffset timeUnitType", function(assert) {
+        const oPropertyInfo = { key: "createdAt", dataType: "Edm.DateTimeOffset" };
+        const sResult = ChartDelegate.getPropertyAttribute(this.oMDCChart, oPropertyInfo, "timeUnitType");
+        assert.equal(sResult, "Date", "timeUnitType 'Date' auto-derived from Edm.DateTimeOffset");
+    });
+
+    QUnit.test("getPropertyAttribute returns 'Date' for sap.ui.model.odata.type.DateTimeOffset timeUnitType", function(assert) {
+        const oPropertyInfo = { key: "createdAt", dataType: "sap.ui.model.odata.type.DateTimeOffset" };
+        const sResult = ChartDelegate.getPropertyAttribute(this.oMDCChart, oPropertyInfo, "timeUnitType");
+        assert.equal(sResult, "Date", "timeUnitType 'Date' auto-derived from sap.ui.model.odata.type.DateTimeOffset");
+    });
+
+    QUnit.test("getPropertyAttribute does not override explicit timeUnitType on propertyInfo", function(assert) {
+        const oPropertyInfo = { key: "createdAt", dataType: "Edm.DateTimeOffset", timeUnitType: "yearmonth" };
+        const sResult = ChartDelegate.getPropertyAttribute(this.oMDCChart, oPropertyInfo, "timeUnitType");
+        assert.equal(sResult, "yearmonth", "Explicit timeUnitType on propertyInfo takes precedence");
+    });
+
+    QUnit.test("getPropertyAttribute does not derive timeUnitType for non-DateTimeOffset types", function(assert) {
+        const oPropertyInfo = { key: "title", dataType: "Edm.String" };
+        sandbox.stub(ChartDelegate, "fetchConfigurationForVizchart").returns(null);
+        const sResult = ChartDelegate.getPropertyAttribute(this.oMDCChart, oPropertyInfo, "timeUnitType");
+        assert.equal(sResult, null, "No timeUnitType derived for Edm.String");
+    });
+
+    QUnit.test("_createContentFromItems calls setChartType before setVisibleDimensions", function(assert) {
+        const done = assert.async();
+        const aCallOrder = [];
+        const oInnerChartMock = {
+            getVisibleDimensions: function() { return []; },
+            getVisibleMeasures: function() { return []; },
+            setChartType: function() { aCallOrder.push("setChartType"); },
+            setVisibleDimensions: function() { aCallOrder.push("setVisibleDimensions"); },
+            setVisibleMeasures: function() { aCallOrder.push("setVisibleMeasures"); },
+            getMeasureByName: function() {},
+            removeMeasure: function() {},
+            addDimension: function() {},
+            setInResultDimensions: function() {}
+        };
+
+        const oDim = new Item({ propertyKey: "createdAt", type: "groupable" });
+        const oMeas = new Item({ propertyKey: "averageWords", type: "aggregatable" });
+        this.oMDCChart.addItem(oDim);
+        this.oMDCChart.addItem(oMeas);
+
+        const oStub = sandbox.stub(this.oMDCChart, "_getPropertyByNameAsync");
+        oStub.withArgs("createdAt").returns(Promise.resolve({
+            key: "createdAt", groupable: true, label: "Created On", role: "category", dataType: "Edm.DateTimeOffset"
+        }));
+        oStub.withArgs("averageWords").returns(Promise.resolve({
+            key: "averageWords", aggregatable: true, label: "Words", role: "axis1", dataType: "Edm.Int32"
+        }));
+        oStub.returns(Promise.resolve({ key: "unknown", groupable: true, label: "", role: "category", dataType: "Edm.String" }));
+
+        sandbox.stub(ChartDelegate, "_updateColoring");
+        sandbox.stub(ChartDelegate, "_updateSemanticalPattern");
+        sandbox.stub(ChartDelegate, "_addInnerDimension");
+        sandbox.stub(ChartDelegate, "_addInnerMeasure");
+        sandbox.stub(ChartDelegate, "_prepareColoringForItem").returns(Promise.resolve());
+        sandbox.stub(ChartDelegate, "innerDimensionFactory").returns({});
+
+        ChartDelegate._setState(this.oMDCChart, { innerChart: oInnerChartMock, aColMeasures: [], aInSettings: [], inResultDimensions: [] });
+
+        ChartDelegate._loadChart().then(function() {
+            ChartDelegate._createContentFromItems(this.oMDCChart).then(function() {
+                assert.equal(aCallOrder[0], "setChartType", "setChartType was called first");
+                assert.equal(aCallOrder[1], "setVisibleDimensions", "setVisibleDimensions was called after setChartType");
+                done();
+            });
+        }.bind(this));
+    });
+
+    QUnit.test("_addInnerDimension creates TimeDimension for Edm.DateTimeOffset property", function(assert) {
+        const done = assert.async();
+        const aAddedDimensions = [];
+        const oMockChart = {
+            addDimension: function(oDim) { aAddedDimensions.push(oDim); }
+        };
+        ChartDelegate._setState(this.oMDCChart, { innerChart: oMockChart });
+
+        ChartDelegate._loadChart().then(function() {
+            const oPropertyInfo = {
+                key: "createdAt",
+                groupable: true,
+                label: "Created On",
+                role: "category",
+                dataType: "Edm.DateTimeOffset"
+            };
+            ChartDelegate._addInnerDimension(this.oMDCChart, new Item({ propertyKey: "createdAt", type: "groupable", label: "Created On" }), oPropertyInfo);
+            assert.equal(aAddedDimensions.length, 1, "One dimension was added");
+            assert.equal(aAddedDimensions[0].getMetadata().getName(), "sap.chart.data.TimeDimension", "TimeDimension created for Edm.DateTimeOffset");
+            assert.equal(aAddedDimensions[0].getTimeUnit(), "Date", "TimeDimension has timeUnit 'Date'");
+            done();
+        }.bind(this));
+    });
 
     QUnit.test("fetchProperties", function(assert) {
         assert.ok(true, "Must be implemented by custom delegate");
