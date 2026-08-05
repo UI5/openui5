@@ -457,6 +457,9 @@ sap.ui.define([
 				}
 			});
 
+			// SNOW: DINC0776587 Ensure the cancel button is always enabled even if the list is empty
+			this._oCancelButton.useEnabledPropagator(false);
+
 			ShortcutHintsMixin.addConfig(this._oCancelButton, {
 				addAccessibilityLabel: true,
 				shortcut: "Escape" // Keyboard.Shortcut.Escape, see sap/ui/core/messagebundle.properties
