@@ -504,8 +504,7 @@ sap.ui.define([
 
 	QUnit.module("Undo/Redo functionality", {
 		beforeEach() {
-			this.bMacintoshOriginal = Device.os.macintosh;
-			Device.os.macintosh = false;
+			sandbox.stub(Device, "os").value({ ...Device.os, macintosh: false });
 
 			this.fnUndoStub = sandbox.stub().resolves();
 			this.fnRedoStub = sandbox.stub().resolves();
@@ -547,7 +546,6 @@ sap.ui.define([
 		},
 		afterEach() {
 			sandbox.restore();
-			Device.os.macintosh = this.bMacintoshOriginal;
 			this.oRta.destroy();
 		}
 	}, function() {

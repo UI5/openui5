@@ -41,37 +41,7 @@ sap.ui.define([
 	const oComp = RtaQunitUtils.createAndStubAppComponent(sinon);
 
 	function givenAnFLP(fnFLPReloadStub, mShellParams) {
-		sandbox.stub(FlexUtils, "getUshellContainer").returns({
-			getServiceAsync() {
-				return Promise.resolve({
-					navigate() {},
-					getHash() {
-						return "Action-somestring";
-					},
-					parseShellHash() {
-						const mHash = {
-							semanticObject: "Action",
-							action: "somestring"
-						};
-
-						if (mShellParams) {
-							mHash.params = mShellParams;
-						}
-						return mHash;
-					},
-					unregisterNavigationFilter() {},
-					registerNavigationFilter() {},
-					reloadCurrentApp: fnFLPReloadStub,
-					getUser() {},
-					getCurrentApplication() {}
-				});
-			}
-		});
-		const oApiStub = sandbox.stub().returns("");
-		RtaQunitUtils.stubSapUiRequire(sandbox, [{
-			name: "sap/ushell/api/RTA",
-			stub: { getLogo: oApiStub, setShellHeaderVisibility: () => {} }
-		}]);
+		RtaQunitUtils.stubFLPContainer(sandbox, fnFLPReloadStub, mShellParams);
 	}
 
 	QUnit.module("Given that RuntimeAuthoring gets a switch version event from the toolbar in the FLP", {

@@ -6,7 +6,6 @@ sap.ui.define([
 	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
 	"sap/ui/fl/write/api/VersionsAPI",
 	"sap/ui/fl/write/_internal/Versions",
-	"sap/ui/fl/Utils",
 	"sap/ui/rta/command/Stack",
 	"sap/ui/rta/util/ReloadManager",
 	"sap/ui/rta/RuntimeAuthoring",
@@ -18,7 +17,6 @@ sap.ui.define([
 	ContextBasedAdaptationsAPI,
 	VersionsAPI,
 	Versions,
-	FlexUtils,
 	Stack,
 	ReloadManager,
 	RuntimeAuthoring,
@@ -31,37 +29,7 @@ sap.ui.define([
 	var oComp = RtaQunitUtils.createAndStubAppComponent(sinon);
 
 	function givenAnFLP(fnFLPReloadStub, mShellParams) {
-		sandbox.stub(FlexUtils, "getUshellContainer").returns({
-			getServiceAsync() {
-				return Promise.resolve({
-					navigate() {},
-					getHash() {
-						return "Action-somestring";
-					},
-					parseShellHash() {
-						var mHash = {
-							semanticObject: "Action",
-							action: "somestring"
-						};
-
-						if (mShellParams) {
-							mHash.params = mShellParams;
-						}
-						return mHash;
-					},
-					unregisterNavigationFilter() {},
-					registerNavigationFilter() {},
-					reloadCurrentApp: fnFLPReloadStub,
-					getUser() {},
-					getCurrentApplication() {}
-				});
-			}
-		});
-		const oApiStub = sandbox.stub().returns("");
-		RtaQunitUtils.stubSapUiRequire(sandbox, [{
-			name: "sap/ushell/api/RTA",
-			stub: { getLogo: oApiStub, setShellHeaderVisibility: () => {} }
-		}]);
+		RtaQunitUtils.stubFLPContainer(sandbox, fnFLPReloadStub, mShellParams);
 	}
 
 	QUnit.module("Given that RuntimeAuthoring gets a switch adaptation event from the toolbar in the FLP", {
