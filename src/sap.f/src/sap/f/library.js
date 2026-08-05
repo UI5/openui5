@@ -887,7 +887,7 @@ sap.ui.define([
 	 *
 	 * @enum {string}
 	 * @public
-	 * @since 1.152
+	 * @ui5-experimental-since 1.152
 	 */
 	thisLib.HeroBannerActionsPlacement = {
 		/**
@@ -910,7 +910,7 @@ sap.ui.define([
 	 *
 	 * @enum {string}
 	 * @public
-	 * @since 1.152
+	 * @ui5-experimental-since 1.152
 	 */
 	thisLib.HeroBannerColumnsRatio = {
 		/**
@@ -935,7 +935,7 @@ sap.ui.define([
 	 *
 	 * @enum {string}
 	 * @public
-	 * @since 1.152
+	 * @ui5-experimental-since 1.152
 	 */
 	thisLib.HeroBannerHeaderBlockPlacement = {
 		/**
