@@ -614,10 +614,10 @@ sap.ui.define([
 				iShouldSeeTheVariantURLParameter() {
 					return this.waitFor({
 						autoWait: true,
-						check() {
+						async check() {
 							const oOpa5Window = Opa5.getWindow();
-							const oHashChanger = new oOpa5Window.sap.ui.core.routing.HashChanger();
-							return oHashChanger.getHash().includes("sap-ui-fl-control-variant-id");
+							const oHasher = await oOpa5Window.sap.ui.require(["sap/ui/thirdparty/hasher"]);
+							return oHasher.getHash().includes("sap-ui-fl-control-variant-id");
 						},
 						success() {
 							Opa5.assert.ok(true, "The URL parameter for variant id is present");
@@ -628,10 +628,10 @@ sap.ui.define([
 				iShouldNotSeeTheVariantURLParameter() {
 					return this.waitFor({
 						autoWait: true,
-						check() {
+						async check() {
 							const oOpa5Window = Opa5.getWindow();
-							const oHashChanger = new oOpa5Window.sap.ui.core.routing.HashChanger();
-							return !oHashChanger.getHash().includes("sap-ui-fl-control-variant-id");
+							const oHasher = await oOpa5Window.sap.ui.require(["sap/ui/thirdparty/hasher"]);
+							return !oHasher.getHash().includes("sap-ui-fl-control-variant-id");
 						},
 						success() {
 							Opa5.assert.ok(true, "The URL parameter for variant id is not present");
