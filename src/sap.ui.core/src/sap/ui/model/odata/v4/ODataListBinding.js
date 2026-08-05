@@ -4064,6 +4064,11 @@ sap.ui.define([
 		}
 
 		return oPromise.then(([iCount, iNewIndex, iCollapseCount]) => {
+			if (iCount === undefined) {
+				// concurrent side-effects refresh, only the index needs to be updated
+				oChildContext.iIndex = iNewIndex;
+				return;
+			}
 			if (iCount > 1) { // Note: skip oChildContext which is treated below
 				this.insertGap(this.getModelIndex(oParentContext), iCount - 1);
 			}

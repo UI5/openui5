@@ -1,0 +1,94 @@
+<core:FragmentDefinition
+	xmlns:core="sap.ui.core"
+	xmlns="sap.m"
+>
+	<Popover
+		showHeader="true"
+		showArrow="false"
+		placement="Bottom"
+		contentWidth="43rem"
+		id="changeDetailPopover"
+		title="{i18n>TIT_CHANGEVISUALIZATION_CHANGE_LIST}"
+		class="sapUiRtaChangeDetailPopup sapUiRtaPopover sapUiRtaChangeDetailPopupInvisible"
+	>
+		<beginButton>
+			<Button
+				type="Back"
+				press=".onClosePopover"
+			/>
+		</beginButton>
+		<Table
+			items="{changes>/}"
+			inset="false"
+			fixedLayout="true"
+			sticky="ColumnHeaders"
+			width="auto"
+		>
+			<columns>
+				<Column width="9%" styleClass="sapUiRtaTypeColumnHeader">
+					<Text
+						text="{i18n>TIT_CHANGEVISUALIZATION_CHANGE_TYPE}"
+						tooltip="{i18n>TIT_CHANGEVISUALIZATION_CHANGE_TYPE}"
+						width="42px"
+						maxLines="1"
+						wrappingType="Hyphenated"
+					/>
+				</Column>
+				<Column width="55%">
+					<Text text="{i18n>TIT_CHANGEVISUALIZATION_CHANGE}" tooltip="{i18n>TIT_CHANGEVISUALIZATION_CHANGE}"/>
+				</Column>
+				<Column width="18%">
+					<Text text="{i18n>TIT_CHANGEVISUALIZATION_USER}" tooltip="{i18n>TIT_CHANGEVISUALIZATION_USER}" />
+				</Column>
+				<Column width="18%" hAlign="Right">
+					<Text
+						text="{i18n>TIT_CHANGEVISUALIZATION_CHANGE_TIMELINE}"
+						tooltip="{i18n>TIT_CHANGEVISUALIZATION_CHANGE_TIMELINE}"
+						width="104px"
+						maxLines="1"
+						wrappingType="Hyphenated"
+					/>
+				</Column>
+			</columns>
+			<items>
+				<ColumnListItem>
+					<cells>
+						<core:Icon
+							src="{changes>icon}"
+							tooltip="{changes>iconTooltip}"
+							class="sapUiTinyMarginEnd"
+						/>
+						<HBox alignItems="Center">
+							<Text
+								text="{changes>description}"
+								maxLines="2"
+								wrappingType="Hyphenated"
+								tooltip="{changes>descriptionTooltip}"
+							/>
+							<Button
+								text="{changes>detailButtonText}"
+								tooltip="{changes>detailButtonText}"
+								visible="{= !!${changes>detailButtonText}}"
+								type="Default"
+								press=".showDependentElements"
+								class="sapUiTinyMarginTop"
+							/>
+						</HBox>
+						<Text
+							text="{changes>user}"
+							tooltip="{changes>user}"
+							maxLines="2"
+							wrappingType="Hyphenated"
+						/>
+						<Text
+							text="{changes>relativeDate}"
+							maxLines="2"
+							wrappingType="Hyphenated"
+							tooltip="{changes>fullDate}"
+						/>
+					</cells>
+				</ColumnListItem>
+			</items>
+		</Table>
+	</Popover>
+</core:FragmentDefinition>

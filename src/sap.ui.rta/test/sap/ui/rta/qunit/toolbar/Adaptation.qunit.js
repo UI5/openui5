@@ -51,10 +51,11 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	var sandbox = sinon.createSandbox();
+	const sandbox = sinon.createSandbox();
+
 	function createAndStartRTA(oAdaptationsModel) {
 		this.oComponent = RtaQunitUtils.createAndStubAppComponent(sandbox);
-		var oButton = new Button("testButton");
+		const oButton = new Button("testButton");
 		this.oContainer = new VerticalLayout({
 			id: this.oComponent.createId("myVerticalLayout"),
 			content: [oButton],
@@ -140,9 +141,17 @@ sap.ui.define([
 
 			return this.oToolbar._pFragmentLoaded
 			.then(function() {
-				assert.strictEqual(this.oToolbar.getControl("save").getTooltip(), "Save", "then without versioning enabled tooltip on save button is correct");
+				assert.strictEqual(
+					this.oToolbar.getControl("save").getTooltip(),
+					"Save",
+					"then without versioning enabled tooltip on save button is correct"
+				);
 				this.oVersionsModel.setProperty("/versioningEnabled", true);
-				assert.strictEqual(this.oToolbar.getControl("save").getTooltip(), "Save Draft", "then with versioning enabled tooltip on save button is correct");
+				assert.strictEqual(
+					this.oToolbar.getControl("save").getTooltip(),
+					"Save Draft",
+					"then with versioning enabled tooltip on save button is correct"
+				);
 				this.oToolbar.destroy();
 			}.bind(this));
 		});
@@ -164,7 +173,11 @@ sap.ui.define([
 
 			assert.strictEqual(this.oToolbar.getControl("versionButton").getVisible(), false, "then the version button is not visible");
 			assert.strictEqual(this.oToolbar.getControl("hardReloadButton").getVisible(), true, "then the hard reload buttons are visible");
-			assert.strictEqual(this.oToolbar.getControl("hardReloadInfoButton").getVisible(), true, "then the hard reload buttons are visible");
+			assert.strictEqual(
+				this.oToolbar.getControl("hardReloadInfoButton").getVisible(),
+				true,
+				"then the hard reload buttons are visible"
+			);
 
 			const oOpenPopoverStub = sandbox.stub(Popover.prototype, "openBy");
 			this.oToolbar.getControl("hardReloadInfoButton").firePress();
@@ -190,12 +203,12 @@ sap.ui.define([
 	});
 
 	QUnit.module("Test Adaptation Model binding & formatter and save as", {
-		beforeEach() {
+		async beforeEach() {
 			this.oTextResources = Lib.getResourceBundleFor("sap.ui.rta");
 			sandbox.stub(BaseToolbar.prototype, "placeToContainer").callsFake(function() {
 				this.placeAt("qunit-fixture");
 			});
-			var oAdaptationsModel = new JSONModel({
+			const oAdaptationsModel = new JSONModel({
 				adaptations: [],
 				count: 0,
 				displayedAdaptation: {}
@@ -234,7 +247,8 @@ sap.ui.define([
 				displayedVersion: "0"
 			});
 			this.oToolbar.setModel(this.oVersionsModel, "versions");
-			return this.oToolbar._pFragmentLoaded;
+			await this.oToolbar._pFragmentLoaded;
+			await RtaQunitUtils.showActionsMenu(this.oToolbar);
 		},
 		afterEach() {
 			this.oToolbar.destroy();
@@ -250,9 +264,9 @@ sap.ui.define([
 
 			this.oToolbar.setModel(this.oAdaptationsModel, "contextBasedAdaptations");
 			this.oToolbar.setModel(this.oToolbarControlsModel, "controls");
-			var oContextBasedAdaptationMenu = this.oToolbar.getControl("contextBasedAdaptationMenu");
+			const oContextBasedAdaptationMenu = this.oToolbar.getControl("contextBasedAdaptationMenu");
 			assert.ok(oContextBasedAdaptationMenu.getEnabled(), "then the context-based adaptation menu is enabled");
-			var sExpectedTitle = this.oToolbar.getTextResources().getText("BTN_ADAPTING_FOR_ALL_USERS");
+			const sExpectedTitle = this.oToolbar.getTextResources().getText("BTN_ADAPTING_FOR_ALL_USERS");
 			assert.strictEqual(oContextBasedAdaptationMenu.getText(), sExpectedTitle, "then the menu text is rendered correctly ");
 			assert.ok(this.oToolbar.getControl("saveAsAdaptation").getEnabled(), "then the save as new adaptation button is enabled");
 			assert.ok(this.oToolbar.getControl("manageAdaptations").getEnabled(), "then the manage adaptations button is enabled");
@@ -269,15 +283,15 @@ sap.ui.define([
 
 			this.oToolbar.setModel(this.oAdaptationsModel, "contextBasedAdaptations");
 			this.oToolbar.setModel(this.oToolbarControlsModel, "controls");
-			var oContextBasedAdaptationMenu = this.oToolbar.getControl("contextBasedAdaptationMenu");
+			const oContextBasedAdaptationMenu = this.oToolbar.getControl("contextBasedAdaptationMenu");
 			assert.ok(oContextBasedAdaptationMenu.getEnabled(), "then the context-based adaptation menu is enabled");
-			var sExpectedTitle = this.oToolbar.getTextResources().getText(this.oToolbar.getTextResources().getText("TXT_DEFAULT_APP"));
+			const sExpectedTitle = this.oToolbar.getTextResources().getText(this.oToolbar.getTextResources().getText("TXT_DEFAULT_APP"));
 			assert.strictEqual(oContextBasedAdaptationMenu.getText(), sExpectedTitle, "then the menu text is rendered correctly ");
 			assert.ok(this.oToolbar.getControl("saveAsAdaptation").getEnabled(), "then the save as new adaptation button is enabled");
 			assert.ok(this.oToolbar.getControl("manageAdaptations").getEnabled(), "then the manage adaptations button is enabled");
 			assert.notOk(this.oToolbar.getControl("editAdaptation").getVisible(), "then the edit adaptations button is not visible");
 			assert.notOk(this.oToolbar.getControl("deleteAdaptation").getVisible(), "then the delete adaptations button is not visible");
-			var oSwitchAdaptationsButton = this.oToolbar.getControl("switchAdaptations");
+			const oSwitchAdaptationsButton = this.oToolbar.getControl("switchAdaptations");
 			assert.ok(oSwitchAdaptationsButton.getVisible(), "then the switch adaptations button is visible");
 			assert.strictEqual(oSwitchAdaptationsButton.getItems().length, 3, "number of adaptations to be switched is correct");
 		});
@@ -292,15 +306,15 @@ sap.ui.define([
 
 			this.oToolbar.setModel(this.oAdaptationsModel, "contextBasedAdaptations");
 			this.oToolbar.setModel(this.oToolbarControlsModel, "controls");
-			var oContextBasedAdaptationMenu = this.oToolbar.getControl("contextBasedAdaptationMenu");
+			const oContextBasedAdaptationMenu = this.oToolbar.getControl("contextBasedAdaptationMenu");
 			assert.ok(oContextBasedAdaptationMenu.getEnabled(), "then the context-based adaptation menu is enabled");
-			var sExpectedTitle = this.oToolbar.getTextResources().getText(this.oToolbar.getTextResources().getText("TXT_DEFAULT_APP"));
+			const sExpectedTitle = this.oToolbar.getTextResources().getText(this.oToolbar.getTextResources().getText("TXT_DEFAULT_APP"));
 			assert.strictEqual(oContextBasedAdaptationMenu.getText(), sExpectedTitle, "then the menu text is rendered correctly ");
 			assert.ok(this.oToolbar.getControl("saveAsAdaptation").getEnabled(), "then the save as new adaptation button is enabled");
 			assert.ok(this.oToolbar.getControl("manageAdaptations").getEnabled(), "then the manage adaptations button is enabled");
 			assert.notOk(this.oToolbar.getControl("editAdaptation").getVisible(), "then the edit adaptations button is not visible");
 			assert.notOk(this.oToolbar.getControl("deleteAdaptation").getVisible(), "then the delete adaptations button is not visible");
-			var oSwitchAdaptationsButton = this.oToolbar.getControl("switchAdaptations");
+			const oSwitchAdaptationsButton = this.oToolbar.getControl("switchAdaptations");
 			assert.ok(oSwitchAdaptationsButton.getVisible(), "then the switch adaptations button is visible");
 			assert.strictEqual(oSwitchAdaptationsButton.getItems().length, 3, "number of adaptations to be switched is correct");
 		});
@@ -315,165 +329,131 @@ sap.ui.define([
 
 			this.oToolbar.setModel(this.oAdaptationsModel, "contextBasedAdaptations");
 			this.oToolbar.setModel(this.oToolbarControlsModel, "controls");
-			var oContextBasedAdaptationMenu = this.oToolbar.getControl("contextBasedAdaptationMenu");
+			const oContextBasedAdaptationMenu = this.oToolbar.getControl("contextBasedAdaptationMenu");
 			assert.ok(oContextBasedAdaptationMenu.getEnabled(), "then the context-based adaptation menu is enabled");
-			var sExpectedTitle = this.oToolbar.getTextResources().getText("BTN_ADAPTING_FOR", ["Sales"]);
+			const sExpectedTitle = this.oToolbar.getTextResources().getText("BTN_ADAPTING_FOR", ["Sales"]);
 			assert.strictEqual(oContextBasedAdaptationMenu.getText(), sExpectedTitle, "then the menu text is rendered correctly ");
 			assert.ok(this.oToolbar.getControl("saveAsAdaptation").getEnabled(), "then the save as new adaptation button is enabled");
 			assert.ok(this.oToolbar.getControl("manageAdaptations").getEnabled(), "then the manage adaptations button is enabled");
 			assert.ok(this.oToolbar.getControl("editAdaptation").getVisible(), "then the edit adaptations button is visible");
 			assert.ok(this.oToolbar.getControl("deleteAdaptation").getVisible(), "then the delete adaptations button is visible");
-			var oSwitchAdaptationsButton = this.oToolbar.getControl("switchAdaptations");
+			const oSwitchAdaptationsButton = this.oToolbar.getControl("switchAdaptations");
 			assert.ok(oSwitchAdaptationsButton.getVisible(), "then the switch adaptations button is visible");
 			assert.strictEqual(oSwitchAdaptationsButton.getItems().length, 3, "number of adaptations to be switched is correct");
 		});
 
-		QUnit.test("Given I am on backend draft, when save as is pressed", function(assert) {
+		QUnit.test("Given I am on backend draft, when save as is pressed", async function(assert) {
 			this.oVersionsModel.setData({
 				backendDraft: true,
 				displayedVersion: "0"
 			});
 
-			this.oToolbar.getControl("saveAsAdaptation").firePress();
-
-			return new Promise(function(resolve) {
-				setTimeout(resolve, 0);
-			}).then(function() {
-				assert.strictEqual(this.oShowMessageBoxStub.callCount, 0, "Warning is not shown");
-				assert.strictEqual(this.oOpenAddAdaptationDialogStub.callCount, 1, "Dialog is opened");
-			}.bind(this));
+			await this.oToolbar.onSaveAsAdaptation();
+			assert.strictEqual(this.oShowMessageBoxStub.callCount, 0, "Warning is not shown");
+			assert.strictEqual(this.oOpenAddAdaptationDialogStub.callCount, 1, "Dialog is opened");
 		});
 
-		QUnit.test("Given I am on client draft, when save as is pressed", function(assert) {
+		QUnit.test("Given I am on client draft, when save as is pressed", async function(assert) {
 			this.oVersionsModel.setData({
 				backendDraft: false,
 				displayedVersion: "0"
 			});
 
-			this.oToolbar.getControl("saveAsAdaptation").firePress();
-
-			return new Promise(function(resolve) {
-				setTimeout(resolve, 0);
-			}).then(function() {
-				assert.strictEqual(this.oShowMessageBoxStub.callCount, 0, "Warning is not shown");
-				assert.strictEqual(this.oOpenAddAdaptationDialogStub.callCount, 1, "Dialog is opened");
-			}.bind(this));
+			await this.oToolbar.onSaveAsAdaptation();
+			assert.strictEqual(this.oShowMessageBoxStub.callCount, 0, "Warning is not shown");
+			assert.strictEqual(this.oOpenAddAdaptationDialogStub.callCount, 1, "Dialog is opened");
 		});
 
-		QUnit.test("Given I am on active version without draft, when save as is pressed", function(assert) {
+		QUnit.test("Given I am on active version without draft, when save as is pressed", async function(assert) {
 			this.oVersionsModel.setData({
 				backendDraft: false,
 				displayedVersion: "12345"
 			});
 
-			this.oToolbar.getControl("saveAsAdaptation").firePress();
+			await this.oToolbar.onSaveAsAdaptation();
 
-			return new Promise(function(resolve) {
-				setTimeout(resolve, 0);
-			}).then(function() {
-				assert.strictEqual(this.oShowMessageBoxStub.callCount, 0, "Warning is not shown");
-				assert.strictEqual(this.oOpenAddAdaptationDialogStub.callCount, 1, "Dialog is opened");
-				assert.strictEqual(this.oOpenAddAdaptationDialogStub.getCall(0).args[0], Layer.CUSTOMER, "Dialog has correct layer");
-				assert.notOk(this.oOpenAddAdaptationDialogStub.getCall(0).args[1], "Dialog not in edit mode (but create)");
-			}.bind(this));
+			assert.strictEqual(this.oShowMessageBoxStub.callCount, 0, "Warning is not shown");
+			assert.strictEqual(this.oOpenAddAdaptationDialogStub.callCount, 1, "Dialog is opened");
+			assert.strictEqual(this.oOpenAddAdaptationDialogStub.getCall(0).args[0], Layer.CUSTOMER, "Dialog has correct layer");
+			assert.notOk(this.oOpenAddAdaptationDialogStub.getCall(0).args[1], "Dialog not in edit mode (but create)");
 		});
 
-		QUnit.test("Given I am on active version with draft, when save as is pressed I confirm warning", function(assert) {
+		QUnit.test("Given I am on active version with draft, when save as is pressed I confirm warning", async function(assert) {
 			this.oVersionsModel.setData({
 				backendDraft: true,
 				displayedVersion: "12345"
 			});
 			this.oShowMessageBoxStub.resolves(MessageBox.Action.OK);
 
-			this.oToolbar.getControl("saveAsAdaptation").firePress();
+			await this.oToolbar.onSaveAsAdaptation();
 
-			return new Promise(function(resolve) {
-				setTimeout(resolve, 0);
-			}).then(function() {
-				assert.strictEqual(this.oShowMessageBoxStub.callCount, 1, "Warning is shown");
-				assert.strictEqual(this.oShowMessageBoxStub.getCall(0).args[0], "warning", "Warning is shown");
-				assert.strictEqual(this.oOpenAddAdaptationDialogStub.callCount, 1, "Dialog is opened");
-			}.bind(this));
+			assert.strictEqual(this.oShowMessageBoxStub.callCount, 1, "Warning is shown");
+			assert.strictEqual(this.oShowMessageBoxStub.getCall(0).args[0], "warning", "Warning is shown");
+			assert.strictEqual(this.oOpenAddAdaptationDialogStub.callCount, 1, "Dialog is opened");
 		});
 
-		QUnit.test("Given I am on active version with draft, when save as is pressed I cancel warning", function(assert) {
+		QUnit.test("Given I am on active version with draft, when save as is pressed I cancel warning", async function(assert) {
 			this.oVersionsModel.setData({
 				backendDraft: true,
 				displayedVersion: "12345"
 			});
 			this.oShowMessageBoxStub.resolves(MessageBox.Action.CANCEL);
 
-			this.oToolbar.getControl("saveAsAdaptation").firePress();
+			await this.oToolbar.onSaveAsAdaptation();
 
-			return new Promise(function(resolve) {
-				setTimeout(resolve, 0);
-			}).then(function() {
-				assert.strictEqual(this.oShowMessageBoxStub.callCount, 1, "Warning is shown");
-				assert.strictEqual(this.oShowMessageBoxStub.getCall(0).args[0], "warning", "Warning is shown");
-				assert.strictEqual(this.oOpenAddAdaptationDialogStub.callCount, 0, "Dialog is opened");
-			}.bind(this));
+			assert.strictEqual(this.oShowMessageBoxStub.callCount, 1, "Warning is shown");
+			assert.strictEqual(this.oShowMessageBoxStub.getCall(0).args[0], "warning", "Warning is shown");
+			assert.strictEqual(this.oOpenAddAdaptationDialogStub.callCount, 0, "Dialog is opened");
 		});
 
-		QUnit.test("Given I am on active version with draft, when edit as is pressed I confirm warning", function(assert) {
+		QUnit.test("Given I am on active version with draft, when edit as is pressed I confirm warning", async function(assert) {
 			this.oVersionsModel.setData({
 				backendDraft: true,
 				displayedVersion: "12345"
 			});
 			this.oShowMessageBoxStub.resolves(MessageBox.Action.OK);
 
-			this.oToolbar.getControl("editAdaptation").firePress();
+			await this.oToolbar.onEditAdaptation();
 
-			return new Promise(function(resolve) {
-				setTimeout(resolve, 0);
-			}).then(function() {
-				assert.strictEqual(this.oShowMessageBoxStub.callCount, 1, "Warning is shown");
-				assert.strictEqual(this.oShowMessageBoxStub.getCall(0).args[0], "warning", "Warning is shown");
-				assert.strictEqual(this.oOpenAddAdaptationDialogStub.callCount, 1, "Dialog is opened");
-				assert.strictEqual(this.oOpenAddAdaptationDialogStub.getCall(0).args[0], "CUSTOMER", "Dialog has correct layer");
-				assert.ok(this.oOpenAddAdaptationDialogStub.getCall(0).args[1], "Dialog in edit mode ");
-			}.bind(this));
+			assert.strictEqual(this.oShowMessageBoxStub.callCount, 1, "Warning is shown");
+			assert.strictEqual(this.oShowMessageBoxStub.getCall(0).args[0], "warning", "Warning is shown");
+			assert.strictEqual(this.oOpenAddAdaptationDialogStub.callCount, 1, "Dialog is opened");
+			assert.strictEqual(this.oOpenAddAdaptationDialogStub.getCall(0).args[0], "CUSTOMER", "Dialog has correct layer");
+			assert.ok(this.oOpenAddAdaptationDialogStub.getCall(0).args[1], "Dialog in edit mode ");
 		});
 
-		QUnit.test("Given I am on active version with draft, when delete is pressed I confirm warning", function(assert) {
+		QUnit.test("Given I am on active version with draft, when delete is pressed I confirm warning", async function(assert) {
 			this.oVersionsModel.setData({
 				backendDraft: true,
 				displayedVersion: "12345"
 			});
 			this.oShowMessageBoxStub.resolves(MessageBox.Action.OK);
-			var iEventCalls = 0;
+			let iEventCalls = 0;
 			this.oToolbar.attachDeleteAdaptation(function() {
 				iEventCalls++;
 			});
 
-			this.oToolbar.getControl("deleteAdaptation").firePress();
+			await this.oToolbar.onDeleteAdaptation();
 
-			return new Promise(function(resolve) {
-				setTimeout(resolve, 0);
-			}).then(function() {
-				assert.strictEqual(this.oShowMessageBoxStub.callCount, 1, "Warning is shown");
-				assert.strictEqual(this.oShowMessageBoxStub.getCall(0).args[0], "warning", "Warning is shown");
-				assert.strictEqual(iEventCalls, 1, "Event is raised");
-			}.bind(this));
+			assert.strictEqual(this.oShowMessageBoxStub.callCount, 1, "Warning is shown");
+			assert.strictEqual(this.oShowMessageBoxStub.getCall(0).args[0], "warning", "Warning is shown");
+			assert.strictEqual(iEventCalls, 1, "Event is raised");
 		});
 
-		QUnit.test("Given I am on active version with draft, when manage as is pressed", function(assert) {
+		QUnit.test("Given I am on active version with draft, when manage as is pressed", async function(assert) {
 			this.oVersionsModel.setData({
 				backendDraft: true,
 				displayedVersion: "12345"
 			});
 			this.oShowMessageBoxStub.resolves(MessageBox.Action.OK);
 
-			this.oToolbar.getControl("manageAdaptations").firePress();
+			await this.oToolbar.onManageAdaptations();
 
-			return new Promise(function(resolve) {
-				setTimeout(resolve, 0);
-			}).then(function() {
-				assert.strictEqual(this.oShowMessageBoxStub.callCount, 0, "Warning is not shown (will be shown on save)");
-				assert.strictEqual(this.oOpenManageAdaptationDialog.callCount, 1, "Dialog is opened");
-			}.bind(this));
+			assert.strictEqual(this.oShowMessageBoxStub.callCount, 0, "Warning is not shown (will be shown on save)");
+			assert.strictEqual(this.oOpenManageAdaptationDialog.callCount, 1, "Dialog is opened");
 		});
 
-		QUnit.test("Given a migration is needed and I am on backend draft, when save as is pressed and I cancel migration and there are no dirty changes", function(assert) {
+		QUnit.test("Given a migration is needed and I am on backend draft, when save as is pressed and I cancel migration and there are no dirty changes", async function(assert) {
 			this.oCanMigrateStub.resolves(true);
 			this.oVersionsModel.setData({
 				backendDraft: true,
@@ -482,22 +462,18 @@ sap.ui.define([
 			this.oShowMessageBoxStub.resolves(MessageBox.Action.CANCEL);
 			this.hasDirtyChanges = false;
 
-			this.oToolbar.getControl("saveAsAdaptation").firePress();
+			await this.oToolbar.onSaveAsAdaptation();
 
-			return new Promise(function(resolve) {
-				setTimeout(resolve, 0);
-			}).then(function() {
-				assert.strictEqual(this.oShowMessageBoxStub.callCount, 1, "Migration Information is shown");
-				assert.strictEqual(this.oShowMessageBoxStub.getCall(0).args[0], "confirm", "Migration Information is shown");
-				assert.strictEqual(this.oOpenAddAdaptationDialogStub.callCount, 0, "Dialog is not opened");
-				assert.notOk(this.bRemovedAllCommands, "Did not revert dirty changes");
-				assert.strictEqual(this.oMigrateStub.callCount, 0, "migrate is called");
-				assert.notOk(this.sSwitchedToAdaptation, "Did not switch adaptation");
-				assert.strictEqual(this.oOpenManageAdaptationDialog.callCount, 0, "Manage Dialog is not opened");
-			}.bind(this));
+			assert.strictEqual(this.oShowMessageBoxStub.callCount, 1, "Migration Information is shown");
+			assert.strictEqual(this.oShowMessageBoxStub.getCall(0).args[0], "confirm", "Migration Information is shown");
+			assert.strictEqual(this.oOpenAddAdaptationDialogStub.callCount, 0, "Dialog is not opened");
+			assert.notOk(this.bRemovedAllCommands, "Did not revert dirty changes");
+			assert.strictEqual(this.oMigrateStub.callCount, 0, "migrate is called");
+			assert.notOk(this.sSwitchedToAdaptation, "Did not switch adaptation");
+			assert.strictEqual(this.oOpenManageAdaptationDialog.callCount, 0, "Manage Dialog is not opened");
 		});
 
-		QUnit.test("Given a migration is needed and I am on backend draft, when save as is pressed and I confirm migration and there are no dirty changes", function(assert) {
+		QUnit.test("Given a migration is needed and I am on backend draft, when save as is pressed and I confirm migration and there are no dirty changes", async function(assert) {
 			this.oCanMigrateStub.resolves(true);
 			this.oVersionsModel.setData({
 				backendDraft: true,
@@ -506,7 +482,7 @@ sap.ui.define([
 			this.oShowMessageBoxStub.resolves("something positive");
 			this.hasDirtyChanges = false;
 
-			this.oToolbar.getControl("saveAsAdaptation").firePress();
+			await this.oToolbar.onSaveAsAdaptation();
 
 			return new Promise(function(resolve) {
 				setTimeout(resolve, 0);
@@ -518,11 +494,16 @@ sap.ui.define([
 				assert.notOk(this.bRemovedAllCommands, "Did not revert dirty changes");
 				assert.strictEqual(this.oMigrateStub.callCount, 1, "migrate is called");
 				assert.ok(this.sSwitchedToAdaptation, "switched adaptation");
-				assert.strictEqual(this.oOpenManageAdaptationDialog.callCount, 0, "Manage Dialog is not opened (because it does not work after reload)");
+				assert.strictEqual(
+					this.oOpenManageAdaptationDialog.callCount,
+					0,
+					"Manage Dialog is not opened (because it does not work after reload)"
+				);
 			}.bind(this));
 		});
 
-		QUnit.test("Given a migration is needed and I am on active version with backend draft existing , when save as is pressed and I confirm all and there are dirty changes", function(assert) {
+		QUnit.test("Given a migration is needed and I am on active version with backend draft existing , when save as is pressed and I confirm all and there are dirty changes", async function(assert) {
+			assert.expect(9);
 			this.oCanMigrateStub.resolves(true);
 			this.oVersionsModel.setData({
 				backendDraft: true,
@@ -531,27 +512,28 @@ sap.ui.define([
 			this.oShowMessageBoxStub.resolves(MessageBox.Action.OK);
 			this.hasDirtyChanges = true;
 
-			this.oToolbar.getControl("saveAsAdaptation").firePress();
 			this.oToolbar.attachSave(function(oEvent) {
 				assert.strictEqual(oEvent.sId, "save", "Dirty changes were saved");
 				oEvent.getParameter("callback")();
 			});
+			await this.oToolbar.onSaveAsAdaptation();
 
-			return new Promise(function(resolve) {
-				setTimeout(resolve, 0);
-			}).then(function() {
-				assert.strictEqual(this.oShowMessageBoxStub.callCount, 3, "Some dialogs are show");
-				assert.strictEqual(this.oShowMessageBoxStub.getCall(0).args[0], "warning", "Discard draft warning is shown");
-				assert.strictEqual(this.oShowMessageBoxStub.getCall(1).args[0], "confirm", "Migration Information is shown");
-				assert.strictEqual(this.oShowMessageBoxStub.getCall(2).args[0], "information", "Migration completed is shown");
-				assert.strictEqual(this.oOpenAddAdaptationDialogStub.callCount, 0, "Save as Dialog is not opened");
-				assert.strictEqual(this.oMigrateStub.callCount, 1, "migrate is called");
-				assert.ok(this.sSwitchedToAdaptation, "switched adaptation");
-				assert.strictEqual(this.oOpenManageAdaptationDialog.callCount, 0, "Manage Dialog is opened (because it does not work after reload)");
-			}.bind(this));
+			assert.strictEqual(this.oShowMessageBoxStub.callCount, 3, "Some dialogs are show");
+			assert.strictEqual(this.oShowMessageBoxStub.getCall(0).args[0], "warning", "Discard draft warning is shown");
+			assert.strictEqual(this.oShowMessageBoxStub.getCall(1).args[0], "confirm", "Migration Information is shown");
+			assert.strictEqual(this.oShowMessageBoxStub.getCall(2).args[0], "information", "Migration completed is shown");
+			assert.strictEqual(this.oOpenAddAdaptationDialogStub.callCount, 0, "Save as Dialog is not opened");
+			assert.strictEqual(this.oMigrateStub.callCount, 1, "migrate is called");
+			assert.ok(this.sSwitchedToAdaptation, "switched adaptation");
+			assert.strictEqual(
+				this.oOpenManageAdaptationDialog.callCount,
+				0,
+				"Manage Dialog is opened (because it does not work after reload)"
+			);
 		});
 
-		QUnit.test("Given a migration is needed and there are dirty changes", function(assert) {
+		QUnit.test("Given a migration is needed and there are dirty changes", async function(assert) {
+			assert.expect(8);
 			this.oCanMigrateStub.resolves(true);
 			this.oVersionsModel.setData({
 				backendDraft: false,
@@ -560,22 +542,21 @@ sap.ui.define([
 			this.oShowMessageBoxStub.resolves(MessageBox.Action.OK);
 			this.hasDirtyChanges = true;
 
-			this.oToolbar.getControl("saveAsAdaptation").firePress();
 			this.oToolbar.attachSave(function(oEvent) {
 				assert.strictEqual(oEvent.sId, "save", "Dirty changes were saved");
 				oEvent.getParameter("callback")();
 			});
-			return new Promise(function(resolve) {
-				setTimeout(resolve, 0);
-			}).then(function() {
-				assert.strictEqual(this.oShowMessageBoxStub.callCount, 2, "Some dialogs are show");
-				assert.strictEqual(this.oShowMessageBoxStub.getCall(0).args[0], "confirm", "Migration Information is shown");
-				assert.strictEqual(this.oShowMessageBoxStub.getCall(1).args[0], "information", "Migration completed is shown");
-				assert.strictEqual(this.oOpenAddAdaptationDialogStub.callCount, 0, "Save as Dialog is not opened");
-				assert.strictEqual(this.oMigrateStub.callCount, 1, "migrate is called");
-				assert.ok(this.sSwitchedToAdaptation, "switched adaptation");
-				assert.strictEqual(this.oOpenManageAdaptationDialog.callCount, 0, "Manage Dialog is opened (because it does not work after reload)");
-			}.bind(this));
+			await this.oToolbar.onSaveAsAdaptation();
+			assert.strictEqual(this.oShowMessageBoxStub.callCount, 2, "Some dialogs are show");
+			assert.strictEqual(this.oShowMessageBoxStub.getCall(0).args[0], "confirm", "Migration Information is shown");
+			assert.strictEqual(this.oShowMessageBoxStub.getCall(1).args[0], "information", "Migration completed is shown");
+			assert.strictEqual(this.oOpenAddAdaptationDialogStub.callCount, 0, "Save as Dialog is not opened");
+			assert.strictEqual(this.oMigrateStub.callCount, 1, "migrate is called");
+			assert.ok(this.sSwitchedToAdaptation, "switched adaptation");
+			assert.strictEqual(this.oOpenManageAdaptationDialog.callCount,
+				0,
+				"Manage Dialog is opened (because it does not work after reload)"
+			);
 		});
 	});
 
@@ -596,7 +577,7 @@ sap.ui.define([
 	}, function() {
 		// TODO: This test should be deleted after OPA5 test are available for this functionality
 		QUnit.test("When two context-based adaptation are available and then both adaptations are deleted one after the other", async function(assert) {
-			var oDefaultAdaptation = {
+			const oDefaultAdaptation = {
 				id: "DEFAULT",
 				contexts: {},
 				title: "",
@@ -607,7 +588,7 @@ sap.ui.define([
 				changedAt: "",
 				type: "DEFAULT"
 			};
-			var aAdaptations = [
+			const aAdaptations = [
 				{
 					title: "Sales",
 					rank: 1,
@@ -620,37 +601,45 @@ sap.ui.define([
 				},
 				oDefaultAdaptation
 			];
-			var oAdaptationsModel = ContextBasedAdaptationsAPI.createModel(aAdaptations, aAdaptations[0], true);
+			const oAdaptationsModel = ContextBasedAdaptationsAPI.createModel(aAdaptations, aAdaptations[0], true);
 
 			sandbox.stub(FlexState, "update");
 			sandbox.stub(ContextBasedAdaptationsAPI, "remove").resolves({ status: 204 });
 			sandbox.stub(ContextBasedAdaptationsAPI, "getAdaptationsModel").returns(oAdaptationsModel);
 			sandbox.stub(Utils, "showMessageBox").resolves(MessageBox.Action.OK);
-			sandbox.stub(ReloadManager, "triggerReload");
+			const oReloadStub = sandbox.stub(ReloadManager, "triggerReload");
 
 			await createAndStartRTA.call(this, oAdaptationsModel);
-			var oMenuButton = this.oToolbar.getControl("contextBasedAdaptationMenu");
 			this.oToolbar.setModel(oAdaptationsModel, "contextBasedAdaptations");
 			this.oToolbar.setModel(this.oToolbarControlsModel, "controls");
-			var oDeleteButton = this.oToolbar.getControl("deleteAdaptation");
-			var oEditButton = this.oToolbar.getControl("editAdaptation");
-			assert.ok(oMenuButton.getEnabled(), "then the context-based adaptation menu is enabled");
+			await RtaQunitUtils.showActionsMenu(this.oToolbar);
+			const oMenuButton = this.oToolbar.getControl("contextBasedAdaptationMenu");
+			const oDeleteButton = this.oToolbar.getControl("deleteAdaptation");
+			const oEditButton = this.oToolbar.getControl("editAdaptation");
 			assert.strictEqual(oDeleteButton.getEnabled(), true, "then the context-based adaptation delete menu button is enabled");
 			assert.strictEqual(oDeleteButton.getVisible(), true, "then the context-based adaptation delete menu button is enabled");
 			assert.strictEqual(oEditButton.getEnabled(), true, "then the context-based edit menu button is enabled");
 			assert.strictEqual(oEditButton.getVisible(), true, "then the context-based edit menu button is enabled");
 			assert.strictEqual(oMenuButton.getText(), "Adapting for 'Sales'", "then the menu text is rendered correctly");
-			oDeleteButton.firePress();
+
+			this.oToolbar.onDeleteAdaptation();
 			await new Promise((resolve) => {
-				setTimeout(resolve, 0);
+				oReloadStub.callsFake(function() {
+					resolve();
+				});
 			});
+			oReloadStub.reset();
+
 			assert.strictEqual(oAdaptationsModel.getProperty("/count"), 1, "only one adaptation is left in the model");
 			assert.strictEqual(oDeleteButton.getVisible(), true, "then the context-based adaptation delete menu button is enabled");
 			assert.strictEqual(oEditButton.getVisible(), true, "then the context-based edit menu button is enabled");
 			assert.strictEqual(oMenuButton.getText(), "Adapting for 'Manager'", "then the menu text is rendered correctly");
-			oDeleteButton.firePress();
+
+			this.oToolbar.onDeleteAdaptation();
 			await new Promise((resolve) => {
-				setTimeout(resolve, 50);
+				oReloadStub.callsFake(function() {
+					resolve();
+				});
 			});
 			assert.strictEqual(oAdaptationsModel.getProperty("/count"), 0, "only one adaptation is left in the model");
 			assert.strictEqual(oDeleteButton.getVisible(), false, "then the context-based adaptation delete menu button is enabled");
@@ -737,7 +726,7 @@ sap.ui.define([
 				await RtaQunitUtils.showActionsMenu(this.oToolbar);
 				const oSaveAsButton = this.oToolbar.getControl("saveAs");
 				const bIsSaveAsEnabled = Version.Number.Draft !== oTestSetup.versionNumber && oTestSetup.appVariantMenu.saveAs.enabled;
-				assert.strictEqual(oSaveAsButton.getEnabled(), bIsSaveAsEnabled, `saveAs has enabled stauts ${bIsSaveAsEnabled}`);
+				assert.strictEqual(oSaveAsButton.getEnabled(), bIsSaveAsEnabled, `saveAs has enabled status ${bIsSaveAsEnabled}`);
 				assert.deepEqual(
 					oSaveAsButton.getTooltip(),
 					bIsSaveAsEnabled ? null : "Only active versions can be saved as app variants. Please activate your draft.",
@@ -751,8 +740,8 @@ sap.ui.define([
 			this.oControlsModel.setProperty("/appVariantMenu/manageApps/visible", false);
 			this.oToolbar.animation = false;
 
-			var oGetOverviewStub;
-			var oSaveAsStub;
+			let oGetOverviewStub;
+			let oSaveAsStub;
 			this.oToolbar.animation = false;
 			return this.oToolbar.show()
 			.then(function() {
@@ -761,9 +750,9 @@ sap.ui.define([
 				return RtaQunitUtils.showActionsMenu(this.oToolbar);
 			}.bind(this))
 			.then(function() {
-				var oSaveAsButton = this.oToolbar.getControl("saveAs");
-				var oManageAppsButton = this.oToolbar.getControl("manageApps");
-				var oOverviewButton = this.oToolbar.getControl("appVariantOverview");
+				const oSaveAsButton = this.oToolbar.getControl("saveAs");
+				const oManageAppsButton = this.oToolbar.getControl("manageApps");
+				const oOverviewButton = this.oToolbar.getControl("appVariantOverview");
 
 				assert.notOk(oSaveAsButton.getVisible(), "saveAs is not visible");
 				assert.deepEqual(
@@ -908,9 +897,6 @@ sap.ui.define([
 					manageApps: {
 						visible: true
 					}
-				},
-				visualizationButton: {
-					visible: false
 				}
 			});
 			this.oToolbar.setModel(this.oVersionsModel, "versions");
@@ -922,78 +908,40 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("Given a toolbar is created and mode is set to 'adaptation'", function(assert) {
-			this.oControlsModel.setProperty("/modeSwitcher", "adaptation");
+		QUnit.test("Given a toolbar is created and mode is set to 'adaptation'", async function(assert) {
+			this.oControlsModel.setProperty("/adaptationMode", true);
 			this.oToolbar.animation = false;
-			return this.oToolbar.show()
-			.then(function() {
-				assert.ok(this.oToolbar.getControl("undo").getVisible(), "undo is visible");
-				assert.ok(this.oToolbar.getControl("redo").getVisible(), "redo is visible");
-				assert.notOk(this.oToolbar.getControl("toggleChangeVisualizationMenuButton").getVisible(), "toggleChangeVisualizationMenuButton is not visible");
-				assert.ok(this.oToolbar.getControl("versionButton").getVisible(), "versionButton is visible");
-				assert.ok(this.oToolbar.getControl("activate").getVisible(), "activate is visible");
-				assert.ok(this.oToolbar.getControl("discardDraft").getVisible(), "discardDraft is visible");
-				assert.ok(this.oToolbar.getControl("feedback").getVisible(), "feedback is visible");
+			await this.oToolbar.show();
+			assert.ok(this.oToolbar.getControl("undo").getVisible(), "undo is visible");
+			assert.ok(this.oToolbar.getControl("redo").getVisible(), "redo is visible");
+			assert.ok(this.oToolbar.getControl("versionButton").getVisible(), "versionButton is visible");
+			assert.ok(this.oToolbar.getControl("activate").getVisible(), "activate is visible");
+			assert.ok(this.oToolbar.getControl("discardDraft").getVisible(), "discardDraft is visible");
 
-				return RtaQunitUtils.showActionsMenu(this.oToolbar);
-			}.bind(this))
-			.then(function() {
-				assert.ok(this.oToolbar.getControl("restore").getVisible(), "restore is visible");
-				assert.ok(this.oToolbar.getControl("manageApps").getVisible(), "manageApps is visible");
-				assert.ok(this.oToolbar.getControl("appVariantOverview").getVisible(), "appVariantOverview is visible");
-				assert.ok(this.oToolbar.getControl("saveAs").getVisible(), "saveAs is visible");
-			}.bind(this));
+			await RtaQunitUtils.showActionsMenu(this.oToolbar);
+
+			assert.ok(this.oToolbar.getControl("highlightAllChanges").getVisible(), "highlight all changes is visible");
+			assert.ok(this.oToolbar.getControl("feedback").getVisible(), "feedback is visible");
+			assert.ok(this.oToolbar.getControl("contextBasedAdaptationMenu").getVisible(), "contextBasedAdaptationMenu is visible");
+			assert.ok(this.oToolbar.getControl("translateMenu").getVisible(), "translateMenu is visible");
+			assert.ok(this.oToolbar.getControl("restore").getVisible(), "restore is visible");
+			assert.ok(this.oToolbar.getControl("manageApps").getVisible(), "manageApps is visible");
+			assert.ok(this.oToolbar.getControl("appVariantOverview").getVisible(), "appVariantOverview is visible");
+			assert.ok(this.oToolbar.getControl("saveAs").getVisible(), "saveAs is visible");
 		});
 
-		QUnit.test("Given a toolbar is created and mode is set to 'navigation'", function(assert) {
-			this.oControlsModel.setProperty("/modeSwitcher", "navigation");
+		QUnit.test("Given a toolbar is created and mode is set to 'navigation'", async function(assert) {
+			this.oControlsModel.setProperty("/adaptationMode", false);
 			this.oToolbar.animation = false;
-			return this.oToolbar.show()
-			.then(function() {
-				assert.notOk(this.oToolbar.getControl("undo").getVisible(), "undo is not visible");
-				assert.notOk(this.oToolbar.getControl("redo").getVisible(), "redo is not visible");
-				assert.notOk(this.oToolbar.getControl("toggleChangeVisualizationMenuButton").getVisible(), "toggleChangeVisualizationMenuButton is not visible");
-				assert.notOk(this.oToolbar.getControl("versionButton").getVisible(), "versionButton is not visible");
-				assert.notOk(this.oToolbar.getControl("activate").getVisible(), "activate is not visible");
-				assert.notOk(this.oToolbar.getControl("discardDraft").getVisible(), "discardDraft is not visible");
-				assert.notOk(this.oToolbar.getControl("actionsMenu").getVisible(), "actionsMenu is not visible");
-				assert.ok(this.oToolbar.getControl("feedback").getVisible(), "feedback is visible");
-			}.bind(this));
-		});
+			await this.oToolbar.show();
 
-		QUnit.test("Given a toolbar is created and mode is set to 'visualization'", function(assert) {
-			this.oControlsModel.setProperty("/modeSwitcher", "visualization");
-			this.oVersionsModel.setProperty("/versioningEnabled", false);
-			this.oToolbar.animation = false;
-			return this.oToolbar.show()
-			.then(function() {
-				assert.notOk(this.oToolbar.getControl("undo").getVisible(), "undo is not visible");
-				assert.notOk(this.oToolbar.getControl("redo").getVisible(), "redo is not visible");
-				assert.ok(this.oToolbar.getControl("toggleChangeVisualizationMenuButton").getVisible(), "toggleChangeVisualizationMenuButton is visible");
-				assert.notOk(this.oToolbar.getControl("versionButton").getVisible(), "versionButton is not visible");
-				assert.notOk(this.oToolbar.getControl("activate").getVisible(), "activate is not visible");
-				assert.notOk(this.oToolbar.getControl("discardDraft").getVisible(), "discardDraft is not visible");
-				assert.notOk(this.oToolbar.getControl("actionsMenu").getVisible(), "actionsMenu is not visible");
-				assert.ok(this.oToolbar.getControl("feedback").getVisible(), "feedback is visible");
-			}.bind(this));
-		});
-
-		QUnit.test("Given a toolbar is created and visualizationButton visible property is set to 'true'", function(assert) {
-			this.oControlsModel.setProperty("/visualizationButton/visible", true);
-			this.oToolbar.animation = false;
-			return this.oToolbar.show()
-			.then(function() {
-				assert.ok(this.oToolbar.getControl("visualizationSwitcherButton").getVisible(), "visualizationSwitcherButton is visible");
-			}.bind(this));
-		});
-
-		QUnit.test("Given a toolbar is created and visualizationButton visible property is set to 'false'", function(assert) {
-			this.oControlsModel.setProperty("/visualizationButton/visible", false);
-			this.oToolbar.animation = false;
-			return this.oToolbar.show()
-			.then(function() {
-				assert.notOk(this.oToolbar.getControl("visualizationSwitcherButton").getVisible(), "visualizationSwitcherButton is not visible");
-			}.bind(this));
+			assert.notOk(this.oToolbar.getControl("undo").getVisible(), "undo is not visible");
+			assert.notOk(this.oToolbar.getControl("redo").getVisible(), "redo is not visible");
+			assert.notOk(this.oToolbar.getControl("versionButton").getVisible(), "versionButton is not visible");
+			assert.notOk(this.oToolbar.getControl("activate").getVisible(), "activate is not visible");
+			assert.notOk(this.oToolbar.getControl("discardDraft").getVisible(), "discardDraft is not visible");
+			assert.ok(this.oToolbar.getControl("actionsMenu").getVisible(), "actionsMenu is visible");
+			assert.notOk(this.oToolbar.getControl("actionsMenu").getEnabled(), "actionsMenu is not enabled");
 		});
 	});
 
@@ -1006,384 +954,86 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("when being on a system with LocalStorageConnector", function(assert) {
+		QUnit.test("when being on a system with LocalStorageConnector", async function(assert) {
 			sandbox.stub(FlexRuntimeInfoAPI, "getConfiguredFlexServices").returns([
 				{ connector: "LocalStorageConnector" }
 			]);
-			return createAndStartRTA.call(this).then(function() {
-				assert.notOk(
-					this.oToolbar.getControl("feedback").getVisible(),
-					"then the feedback button is not enabled"
-				);
-			}.bind(this));
+			await createAndStartRTA.call(this);
+			await RtaQunitUtils.showActionsMenu(this.oToolbar);
+			assert.notOk(
+				this.oToolbar.getControl("feedback").getVisible(),
+				"then the feedback button is not enabled"
+			);
 		});
 
 		["KeyUserConnector", "BtpServiceConnector"].forEach(function(sConnectorName) {
-			QUnit.test(`when being on a system with ${sConnectorName}`, function(assert) {
+			QUnit.test(`when being on a system with ${sConnectorName}`, async function(assert) {
 				sandbox.stub(FlexRuntimeInfoAPI, "getFeedbackInformation").returns({
 					appId: "someAppId",
 					appVersion: "someAppVersion",
 					connector: sConnectorName,
 					version: "someVersion"
 				});
-				return createAndStartRTA.call(this)
-				.then(async function() {
-					assert.ok(
-						this.oToolbar.getControl("feedback").getVisible(),
-						"then the feedback button is enabled"
-					);
-					return await this.oToolbar.showFeedbackForm();
-				}.bind(this))
-				.then(function() {
-					var oIframeURL = new URL(this.oToolbar._oFeedbackDialog.getContent()[0].getBindingInfo("url").binding.getValue());
-					assert.ok(
-						oIframeURL.pathname.endsWith("SV_4MANxRymEIl9K06"),
-						"then the proper form id is passed"
-					);
-					assert.strictEqual(
-						oIframeURL.searchParams.get("version"),
-						"someVersion",
-						"then the proper version is passed"
-					);
-					assert.strictEqual(
-						oIframeURL.searchParams.get("feature"),
-						"BTP",
-						"then the proper platform is passed"
-					);
-					assert.strictEqual(
-						oIframeURL.searchParams.get("appId"),
-						"someAppId",
-						"then the proper app id is passed"
-					);
-					assert.strictEqual(
-						oIframeURL.searchParams.get("appVersion"),
-						"someAppVersion",
-						"then the proper app version is passed"
-					);
-					assert.strictEqual(
-						oIframeURL.searchParams.get("product_filter"),
-						"Key%20User%20Adaptation",
-						"then the proper product filter is passed"
-					);
-				}.bind(this));
+				await createAndStartRTA.call(this);
+				await RtaQunitUtils.showActionsMenu(this.oToolbar);
+				assert.ok(
+					this.oToolbar.getControl("feedback").getVisible(),
+					"then the feedback button is enabled"
+				);
+				await this.oToolbar.showFeedbackForm();
+				const oIframeURL = new URL(this.oToolbar._oFeedbackDialog.getContent()[0].getBindingInfo("url").binding.getValue());
+				assert.ok(
+					oIframeURL.pathname.endsWith("SV_4MANxRymEIl9K06"),
+					"then the proper form id is passed"
+				);
+				assert.strictEqual(
+					oIframeURL.searchParams.get("version"),
+					"someVersion",
+					"then the proper version is passed"
+				);
+				assert.strictEqual(
+					oIframeURL.searchParams.get("feature"),
+					"BTP",
+					"then the proper platform is passed"
+				);
+				assert.strictEqual(
+					oIframeURL.searchParams.get("appId"),
+					"someAppId",
+					"then the proper app id is passed"
+				);
+				assert.strictEqual(
+					oIframeURL.searchParams.get("appVersion"),
+					"someAppVersion",
+					"then the proper app version is passed"
+				);
+				assert.strictEqual(
+					oIframeURL.searchParams.get("product_filter"),
+					"Key%20User%20Adaptation",
+					"then the proper product filter is passed"
+				);
 			});
 		});
 
-		QUnit.test("when being on a system with LrepConnector", function(assert) {
+		QUnit.test("when being on a system with LrepConnector", async function(assert) {
 			sandbox.stub(FlexRuntimeInfoAPI, "getFeedbackInformation").returns({
 				appId: "someAppId",
 				appVersion: "someAppVersion",
 				connector: "LrepConnector",
 				version: "someVersion"
 			});
-			return createAndStartRTA.call(this)
-			.then(async function() {
-				assert.ok(
-					this.oToolbar.getControl("feedback").getVisible(),
-					"then the feedback button is enabled"
-				);
-				return await this.oToolbar.showFeedbackForm();
-			}.bind(this))
-			.then(function() {
-				var oIframeURL = new URL(this.oToolbar._oFeedbackDialog.getContent()[0].getBindingInfo("url").binding.getValue());
-				assert.strictEqual(
-					oIframeURL.searchParams.get("feature"),
-					"ABAP",
-					"then the proper platform is passed"
-				);
-			}.bind(this));
-		});
-	});
-
-	QUnit.module("Different screen sizes and common buttons", {
-		beforeEach() {
-			this.oTextResources = Lib.getResourceBundleFor("sap.ui.rta");
-			sandbox.stub(BaseToolbar.prototype, "placeToContainer").callsFake(function() {
-				this.placeAt("qunit-fixture");
-			});
-			var oVersionsModel = new JSONModel({
-				versioningEnabled: true
-			});
-			oVersionsModel.setDirtyChanges = function() {};
-			sandbox.stub(VersionsAPI, "initialize").resolves(oVersionsModel);
-		},
-		afterEach() {
-			this.oContainer.destroy();
-			this.oComponent.destroy();
-			this.oRta.destroy();
-			sandbox.restore();
-		}
-	}, function() {
-		QUnit.test("when the toolbar gets initially shown in a wide window (1200px)", function(assert) {
-			document.getElementById("qunit-fixture").style.width = "1200px";
-			return createAndStartRTA.call(this)
-			.then(function() {
-				var oAdaptationSwitcherButton = this.oToolbar.getControl("adaptationSwitcherButton");
-				var oNavigationSwitcherButton = this.oToolbar.getControl("navigationSwitcherButton");
-				var oVisualizationSwitcherButton = this.oToolbar.getControl("visualizationSwitcherButton");
-				assert.strictEqual(
-					oAdaptationSwitcherButton.getText(),
-					this.oTextResources.getText("BTN_ADAPTATION"),
-					"the adaptation button shows the right text"
-				);
-				assert.strictEqual(
-					oNavigationSwitcherButton.getText(),
-					this.oTextResources.getText("BTN_NAVIGATION"),
-					"the navigation button shows the right text"
-				);
-				assert.strictEqual(
-					oVisualizationSwitcherButton.getText(),
-					this.oTextResources.getText("BTN_VISUALIZATION"),
-					"the visualization button shows the right text"
-				);
-				assert.strictEqual(this.oToolbar.getControl("save").getIcon(), "sap-icon://save", "the save button has save icon");
-				assert.notOk(this.oToolbar.getControl("save").getText(), "the save button has no text");
-				assert.strictEqual(this.oToolbar.getControl("exit").getIcon(), "sap-icon://decline", "the exit button has decline icon");
-				assert.notOk(this.oToolbar.getControl("exit").getText(), "the exit button has no text");
-				return RtaQunitUtils.showActionsMenu(this.oToolbar);
-			}.bind(this))
-			.then(function() {
-				assert.strictEqual(this.oToolbar.getControl("restore").getIcon(), "sap-icon://reset", "the reset button has reset icon");
-			}.bind(this));
-		});
-
-		QUnit.test("when the toolbar gets initially shown in a narrow window (600px)", function(assert) {
-			var fnDone = assert.async();
-			document.getElementById("qunit-fixture").style.width = "600px";
-			var oSwitchIconsStub = sandbox.stub(Adaptation.prototype, "_switchToIcons")
-			.callsFake(function(...aArgs) {
-				oSwitchIconsStub.wrappedMethod.apply(this.oToolbar, aArgs);
-				var oAdaptationSwitcherButton = this.oToolbar.getControl("adaptationSwitcherButton");
-				var oNavigationSwitcherButton = this.oToolbar.getControl("navigationSwitcherButton");
-				var oVisualizationSwitcherButton = this.oToolbar.getControl("visualizationSwitcherButton");
-				assert.strictEqual(
-					oAdaptationSwitcherButton.getText(),
-					"",
-					"the adaptation button has no text"
-				);
-				assert.strictEqual(
-					oNavigationSwitcherButton.getText(),
-					"",
-					"the navigation button has no text"
-				);
-				assert.strictEqual(
-					oVisualizationSwitcherButton.getText(),
-					"",
-					"the visualization button has no text"
-				);
-				assert.strictEqual(
-					oAdaptationSwitcherButton.getIcon(),
-					"sap-icon://wrench",
-					"the adaptation button has the right icon"
-				);
-				assert.strictEqual(
-					oNavigationSwitcherButton.getIcon(),
-					"sap-icon://explorer",
-					"the navigation button has the right icon"
-				);
-				assert.strictEqual(
-					oVisualizationSwitcherButton.getIcon(),
-					"sap-icon://show",
-					"the visualization button has the right icon"
-				);
-				fnDone();
-			}.bind(this));
-			return createAndStartRTA.call(this);
-		});
-
-		QUnit.test("when the toolbar gets initially shown in a wide window (1200px), then reduced to 600px and then expanded to 1600px", function(assert) {
-			var fnDone = assert.async();
-			document.getElementById("qunit-fixture").style.width = "1200px";
-
-			var fnCheckIcon = function() {
-				assert.strictEqual(
-					this.oAdaptationSwitcherButton.getText(),
-					"",
-					"the adaptation button has no text"
-				);
-				assert.strictEqual(
-					this.oAdaptationSwitcherButton.getIcon(),
-					"sap-icon://wrench",
-					"the adaptation button has an icon"
-				);
-			};
-
-			var fnCheckText = function() {
-				assert.strictEqual(
-					this.oAdaptationSwitcherButton.getText(),
-					this.oTextResources.getText("BTN_ADAPTATION"),
-					"the adaptation button shows text"
-				);
-			};
-
-			var oSwitchIconsStub = sandbox.stub(Adaptation.prototype, "_switchToIcons")
-			.callsFake(function(...aArgs) {
-				oSwitchIconsStub.wrappedMethod.apply(this.oToolbar, aArgs);
-				fnCheckIcon.call(this);
-				var oSwitchTextsStub = sandbox.stub(Adaptation.prototype, "_switchToTexts").callsFake(function(...aArgs) {
-					oSwitchTextsStub.wrappedMethod.apply(this.oToolbar, aArgs);
-					fnCheckText.call(this);
-					fnDone();
-				}.bind(this));
-				document.getElementById("qunit-fixture").style.width = "1200px";
-				window.dispatchEvent(new Event("resize"));
-			}.bind(this));
-
-			return createAndStartRTA.call(this)
-			.then(function() {
-				this.oAdaptationSwitcherButton = this.oToolbar.getControl("adaptationSwitcherButton");
-				fnCheckText.call(this);
-				document.getElementById("qunit-fixture").style.width = "600px";
-			}.bind(this));
-		});
-	});
-
-	QUnit.module("Different screen sizes and common buttons with context-based adaptation enabled", {
-		beforeEach() {
-			this.oTextResources = Lib.getResourceBundleFor("sap.ui.rta");
-			sandbox.stub(BaseToolbar.prototype, "placeToContainer").callsFake(function() {
-				this.placeAt("qunit-fixture");
-			});
-			var oVersionsModel = new JSONModel({
-				versioningEnabled: true
-			});
-			oVersionsModel.setDirtyChanges = function() {};
-			var oAdaptationsModel = new JSONModel({
-				adaptations: [],
-				count: 0,
-				displayedAdaptation: {}
-			});
-			sandbox.stub(ContextBasedAdaptationsAPI, "initialize").resolves(oAdaptationsModel);
-			sandbox.stub(VersionsAPI, "initialize").resolves(oVersionsModel);
-		},
-		afterEach() {
-			this.oContainer.destroy();
-			this.oComponent.destroy();
-			this.oRta.destroy();
-			sandbox.restore();
-		}
-	}, function() {
-		QUnit.test("when the toolbar gets initially shown in a wide window (1200px)", function(assert) {
-			document.getElementById("qunit-fixture").style.width = "1200px";
-			return createAndStartRTA.call(this)
-			.then(function() {
-				var oAdaptationSwitcherButton = this.oToolbar.getControl("adaptationSwitcherButton");
-				var oNavigationSwitcherButton = this.oToolbar.getControl("navigationSwitcherButton");
-				var oVisualizationSwitcherButton = this.oToolbar.getControl("visualizationSwitcherButton");
-				assert.strictEqual(
-					oAdaptationSwitcherButton.getText(),
-					this.oTextResources.getText("BTN_ADAPTATION"),
-					"the adaptation button shows the right text"
-				);
-				assert.strictEqual(
-					oNavigationSwitcherButton.getText(),
-					this.oTextResources.getText("BTN_NAVIGATION"),
-					"the navigation button shows the right text"
-				);
-				assert.strictEqual(
-					oVisualizationSwitcherButton.getText(),
-					this.oTextResources.getText("BTN_VISUALIZATION"),
-					"the visualization button shows the right text"
-				);
-				assert.strictEqual(this.oToolbar.getControl("save").getIcon(), "sap-icon://save", "the save button has save icon");
-				assert.notOk(this.oToolbar.getControl("save").getText(), "the save button has no text");
-				assert.strictEqual(this.oToolbar.getControl("exit").getIcon(), "sap-icon://decline", "the exit button has decline icon");
-				assert.notOk(this.oToolbar.getControl("exit").getText(), "the exit button has no text");
-				return RtaQunitUtils.showActionsMenu(this.oToolbar);
-			}.bind(this))
-			.then(function() {
-				assert.strictEqual(this.oToolbar.getControl("restore").getIcon(), "sap-icon://reset", "the reset button has reset icon");
-			}.bind(this));
-		});
-
-		QUnit.test("when the toolbar gets initially shown in a narrow window (600px)", function(assert) {
-			var fnDone = assert.async();
-			document.getElementById("qunit-fixture").style.width = "600px";
-			var oSwitchIconsStub = sandbox.stub(Adaptation.prototype, "_switchToIcons")
-			.callsFake(function(...aArgs) {
-				oSwitchIconsStub.wrappedMethod.apply(this.oToolbar, aArgs);
-				var oAdaptationSwitcherButton = this.oToolbar.getControl("adaptationSwitcherButton");
-				var oNavigationSwitcherButton = this.oToolbar.getControl("navigationSwitcherButton");
-				var oVisualizationSwitcherButton = this.oToolbar.getControl("visualizationSwitcherButton");
-				assert.strictEqual(
-					oAdaptationSwitcherButton.getText(),
-					"",
-					"the adaptation button has no text"
-				);
-				assert.strictEqual(
-					oNavigationSwitcherButton.getText(),
-					"",
-					"the navigation button has no text"
-				);
-				assert.strictEqual(
-					oVisualizationSwitcherButton.getText(),
-					"",
-					"the visualization button has no text"
-				);
-				assert.strictEqual(
-					oAdaptationSwitcherButton.getIcon(),
-					"sap-icon://wrench",
-					"the adaptation button has the right icon"
-				);
-				assert.strictEqual(
-					oNavigationSwitcherButton.getIcon(),
-					"sap-icon://explorer",
-					"the navigation button has the right icon"
-				);
-				assert.strictEqual(
-					oVisualizationSwitcherButton.getIcon(),
-					"sap-icon://show",
-					"the visualization button has the right icon"
-				);
-				fnDone();
-			}.bind(this));
-			return createAndStartRTA.call(this);
-		});
-
-		QUnit.test("when the toolbar gets initially shown in a wide window (1200px), then reduced to 600px and then expanded to 1600px", function(assert) {
-			var fnDone = assert.async();
-			document.getElementById("qunit-fixture").style.width = "1200px";
-
-			var fnCheckIcon = function() {
-				assert.strictEqual(
-					this.oAdaptationSwitcherButton.getText(),
-					"",
-					"the adaptation button has no text"
-				);
-				assert.strictEqual(
-					this.oAdaptationSwitcherButton.getIcon(),
-					"sap-icon://wrench",
-					"the adaptation button has an icon"
-				);
-			};
-
-			var fnCheckText = function() {
-				assert.strictEqual(
-					this.oAdaptationSwitcherButton.getText(),
-					this.oTextResources.getText("BTN_ADAPTATION"),
-					"the adaptation button shows text"
-				);
-			};
-
-			var oSwitchIconsStub = sandbox.stub(Adaptation.prototype, "_switchToIcons")
-			.callsFake(function(...aArgs) {
-				oSwitchIconsStub.wrappedMethod.apply(this.oToolbar, aArgs);
-				fnCheckIcon.call(this);
-				var oSwitchTextsStub = sandbox.stub(Adaptation.prototype, "_switchToTexts").callsFake(function(...aArgs) {
-					oSwitchTextsStub.wrappedMethod.apply(this.oToolbar, aArgs);
-					fnCheckText.call(this);
-					fnDone();
-				}.bind(this));
-				document.getElementById("qunit-fixture").style.width = "1200px";
-				window.dispatchEvent(new Event("resize"));
-			}.bind(this));
-
-			return createAndStartRTA.call(this)
-			.then(function() {
-				this.oAdaptationSwitcherButton = this.oToolbar.getControl("adaptationSwitcherButton");
-				fnCheckText.call(this);
-				document.getElementById("qunit-fixture").style.width = "600px";
-			}.bind(this));
+			await createAndStartRTA.call(this);
+			await RtaQunitUtils.showActionsMenu(this.oToolbar);
+			assert.ok(
+				this.oToolbar.getControl("feedback").getVisible(),
+				"then the feedback button is enabled"
+			);
+			await this.oToolbar.showFeedbackForm();
+			const oIframeURL = new URL(this.oToolbar._oFeedbackDialog.getContent()[0].getBindingInfo("url").binding.getValue());
+			assert.strictEqual(
+				oIframeURL.searchParams.get("feature"),
+				"ABAP",
+				"then the proper platform is passed"
+			);
 		});
 	});
 

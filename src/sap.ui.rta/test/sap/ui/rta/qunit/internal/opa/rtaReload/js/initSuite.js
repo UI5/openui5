@@ -11,7 +11,10 @@ sap.ui.require([
 
 	const oSandbox = sinon.createSandbox();
 	const oStub = oSandbox.stub(sap.ui, "require");
-	oStub.withArgs(["sap/ushell/api/RTA"]).callsFake((_, fnSuccess) => fnSuccess({}));
+	oStub.withArgs(["sap/ushell/api/RTA"]).callsFake((_, fnSuccess) => fnSuccess({
+		getLogo: () => {},
+		setShellHeaderVisibility: () => {}
+	}));
 	oStub.callThrough();
 	oSandbox.stub(FlUtils, "getUShellService").resolves();
 	oSandbox.stub(FlUtils, "getUshellContainer").callsFake(() => ({

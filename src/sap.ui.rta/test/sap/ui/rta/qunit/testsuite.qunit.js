@@ -763,18 +763,6 @@ sap.ui.define([
 					only: ["sap/ui/rta/toolbar/Fiori"]
 				}
 			},
-			"toolbar/FioriLike": {
-				group: "Toolbar",
-				coverage: {
-					only: ["sap/ui/rta/toolbar/FioriLike"]
-				}
-			},
-			"toolbar/OverflowToolbarButton": {
-				group: "Toolbar",
-				coverage: {
-					only: ["sap/ui/rta/toolbar/OverflowToolbarButton"]
-				}
-			},
 
 			// utilities
 			"util/adaptationStarter": {
@@ -884,15 +872,7 @@ sap.ui.define([
 				group: "Change visualization",
 				coverage: {
 					only: [
-						"sap/ui/rta/util/changeVisualization/commands/ChangeCategories"
-					]
-				}
-			},
-			"util/changeVisualization/ChangeIndicator": {
-				group: "Change visualization",
-				coverage: {
-					only: [
-						"sap/ui/rta/util/changeVisualization/ChangeIndicator"
+						"sap/ui/rta/util/changeVisualization/ChangeCategories"
 					]
 				}
 			},
@@ -1171,18 +1151,8 @@ sap.ui.define([
 					coverage: {
 						only: [
 							"sap/ui/rta/util/changeVisualization/ChangeVisualization",
-							"sap/ui/rta/util/changeVisualization/ChangeIndicator",
 							"sap/ui/rta/util/changeVisualization/ChangeIndicatorRegistry"
 						]
-					},
-					ui5: {
-						resourceroots: {
-							qunit: "test-resources/sap/ui/rta/qunit/",
-							"my.connectors": "./test-resources/sap/ui/fl/qunit/testConnectors/",
-							"sap.ui.rta.qunitrta": "test-resources/sap/ui/rta/internal/testdata/qunit_rta/",
-							"sap.ui.rta.test": "test-resources/sap/ui/rta/internal/testdata/rta/"
-						},
-						flexibilityServices: '[{"loadConnector": "my/connectors/TestSessionStorageConnectorWithoutVersioning", "writeConnector": "my/connectors/TestSessionStorageConnectorWithoutVersioning"}]'
 					}
 				},
 				"util/guidedTour/GuidedTour": {

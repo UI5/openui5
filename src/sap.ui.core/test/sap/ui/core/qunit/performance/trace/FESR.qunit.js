@@ -1,6 +1,12 @@
 /*global QUnit, sinon*/
-sap.ui.define(['sap/ui/performance/trace/FESR', 'sap/ui/performance/trace/Interaction', 'sap/ui/performance/XHRInterceptor', 'sap/ui/performance/trace/Passport'],
-	function (FESR, Interaction, XHRInterceptor, Passport) {
+sap.ui.define([
+	'sap/ui/performance/trace/FESR',
+	'sap/ui/performance/trace/Interaction',
+	'sap/ui/performance/XHRInterceptor',
+	'sap/ui/performance/FetchInterceptor',
+	'sap/ui/performance/trace/Passport'
+],
+	function (FESR, Interaction, XHRInterceptor, FetchInterceptor, Passport) {
 	"use strict";
 
 	QUnit.config.reorder = false;
@@ -40,23 +46,64 @@ sap.ui.define(['sap/ui/performance/trace/FESR', 'sap/ui/performance/trace/Intera
 			xhr.open("GET", bUseUrlObject ?  new URL(sUrl, document.baseURI) : sUrl, false);
 			xhr.send();
 			return xhr;
+		},
+		dummyFetch: function(oSignal) {
+			const sUrl = "resources/ui5loader.js?noCache=" + Date.now() + "-" + (++requestCounter);
+			const mSettings = {};
+			if (oSignal) {
+				mSettings.signal = oSignal;
+			}
+			return fetch(sUrl, mSettings);
+		},
+		// Issues a synchronous XHR carrying a request body, so the "send" interceptor has a body to
+		// account for in bytesSent. Returns the body length used, so the test can assert against it.
+		dummyRequestWithBody: function(iBodyLength) {
+			const xhr = new XMLHttpRequest();
+			const sUrl = "resources/ui5loader.js?noCache=" + Date.now() + "-" + (++requestCounter);
+			const sBody = "x".repeat(iBodyLength);
+			xhr.open("POST", sUrl, false);
+			xhr.send(sBody);
+			return { xhr: xhr, bodyLength: sBody.length };
 		}
 	});
 
+	// The FetchInterceptor calls all registered onResponse hooks once the response body is fully
+	// received (its readyState===4 equivalent) — including FESR's own INTERACTION/FESR hooks that
+	// assign the request to the interaction. To await exactly that point deterministically (instead
+	// of guessing with a timer), we register an additional onResponse hook AFTER FESR is active and
+	// resolve a promise when it fires: since all onResponse hooks run in the same pass, our hook
+	// running means FESR's hooks for this response have run too.
+	function whenFetchTracked() {
+		let fnResolve;
+		const pTracked = new Promise(function(resolve) { fnResolve = resolve; });
+		FetchInterceptor.register("FESR_TEST_TRACKED", {
+			onResponse() {
+				FetchInterceptor.unregister("FESR_TEST_TRACKED", "onResponse");
+				fnResolve();
+			}
+		});
+		return pTracked;
+	}
+
 	QUnit.test("activation", async function(assert) {
-		assert.expect(9);
-		assert.notOk(XHRInterceptor.isRegistered("FESR", "open"), "FESR must not be registered");
+		assert.expect(14);
+		assert.notOk(XHRInterceptor.isRegistered("FESR", "open"), "FESR must not be registered for XHR");
+		assert.notOk(FetchInterceptor.isRegistered("FESR", "onRequest"), "FESR must not be registered for Fetch");
 		await FESR.setActive(true);
 		assert.ok(FESR.getActive(), "FESR should must be active");
-		assert.ok(XHRInterceptor.isRegistered("FESR", "open"), "FESR must be registered");
-		assert.ok(XHRInterceptor.isRegistered("PASSPORT_ID", "open"), "PASSPORT_ID must be registered");
-		assert.ok(XHRInterceptor.isRegistered("PASSPORT_HEADER", "open"), "PASSPORT_HEADER must be registered");
+		assert.ok(XHRInterceptor.isRegistered("FESR", "open"), "FESR must be registered for XHR");
+		assert.ok(XHRInterceptor.isRegistered("PASSPORT_ID", "open"), "PASSPORT_ID must be registered for XHR");
+		assert.ok(XHRInterceptor.isRegistered("PASSPORT_HEADER", "open"), "PASSPORT_HEADER must be registered for XHR");
+		assert.ok(FetchInterceptor.isRegistered("FESR", "onRequest"), "FESR must be registered for Fetch");
+		assert.ok(FetchInterceptor.isRegistered("PASSPORT_ID", "onRequest"), "PASSPORT_ID must be registered for Fetch");
+		assert.ok(FetchInterceptor.isRegistered("PASSPORT_HEADER", "onRequest"), "PASSPORT_HEADER must be registered for Fetch");
 		await FESR.setActive(false);
 		assert.notOk(FESR.getActive(), "should must not be active");
-		assert.notOk(XHRInterceptor.isRegistered("FESR", "open"), "FESR must not be registered");
+		assert.notOk(XHRInterceptor.isRegistered("FESR", "open"), "FESR must not be registered for XHR");
+		assert.notOk(FetchInterceptor.isRegistered("FESR", "onRequest"), "FESR must not be registered for Fetch");
 	});
 
-	QUnit.test("onBeforeCreated hook: interactionType 1", async function(assert) {
+	QUnit.test("[XHR] onBeforeCreated hook: interactionType 1", async function(assert) {
 		assert.expect(8);
 
 		var oHandle = {
@@ -123,10 +170,224 @@ sap.ui.define(['sap/ui/performance/trace/FESR', 'sap/ui/performance/trace/Intera
 		await FESR.setActive(false);
 		FESR.onBeforeCreated = fnOnBeforeCreated;
 		oHeaderSpy.restore();
-		oXhrHandle.abort();
 	});
 
-	QUnit.test("onBeforeCreated hook: interactionType 2", async function(assert) {
+	QUnit.test("[FETCH] onBeforeCreated hook: interactionType 1", async function(assert) {
+		assert.expect(8);
+
+		const oHandle = {
+			stepName:"undetermined_startup",
+			appNameLong:"undetermined",
+			appNameShort:"undetermined",
+			interactionType: 1
+		};
+
+		const oHeaderSpy = sinon.spy(Headers.prototype, "append");
+		const fnOnBeforeCreated = FESR.onBeforeCreated;
+
+		await FESR.setActive(true);
+
+		// implement hook
+		FESR.onBeforeCreated = function(oFESRHandle, oInteraction) {
+			assert.ok(oFESRHandle.timeToInteractive > 0, "startup time should be > 0");
+			//delete startup time as we cannot compare it
+			delete oFESRHandle.timeToInteractive;
+			assert.deepEqual(oFESRHandle, oHandle, "Passed FESRHandle should be correct.");
+
+			return {
+				stepName: "newStepName",
+				appNameLong: "newAppNameLong",
+				appNameShort: "newAppNameShort",
+				timeToInteractive: 1000,
+				interactionType: 1
+			};
+		};
+
+		// trigger at least one request for header creation
+		const pTracked = whenFetchTracked();
+		const oResponse = await this.dummyFetch();
+		await oResponse.text();
+
+		// first interaction ends with end
+		// wait until the fetch interceptor has enriched the interaction (body complete + timing entry)
+		await pTracked;
+		Interaction.end(true);
+
+		// trigger another request to send FESR using URL object to ensure isCORSRequest can handle URL objects as well
+		const oResponse1 = await this.dummyFetch();
+		await oResponse1.text();
+
+		assert.ok(oHeaderSpy.args.some(function(args) {
+			if (args[0] === "SAP-Perf-FESRec") {
+				const values = args[1].split(",");
+				// duration - end_to_end_time
+				return values[4] === "1000";
+			}
+			return false;
+		}), "Found the FESR header field values.");
+
+		assert.ok(oHeaderSpy.args.some(function(args) {
+			if (args[0] === "SAP-Perf-FESRec-opt") {
+				const values = args[1].split(",");
+				// application_name, step_name, application_name with 70 characters
+				return values[0] === "newAppNameShort" && values[1] === "newStepName" && values[15] === "1" && values[19] === "newAppNameLong";
+			}
+			return false;
+		}), "Found the optional FESR header field values.");
+
+		Interaction.end(true);
+		const oInteraction = Interaction.getAll()[1];
+		assert.throws(function() { oInteraction.component = "badComponent"; }, "Should throw an error after trying to overwrite the interaction object.");
+		assert.ok(Object.isFrozen(oInteraction), "Interaction is not editable.");
+		Interaction.clear();
+		await FESR.setActive(false);
+		FESR.onBeforeCreated = fnOnBeforeCreated;
+		oHeaderSpy.restore();
+	});
+
+	QUnit.test("[MIXED: XHR -> FETCH] onBeforeCreated hook: interactionType 1", async function(assert) {
+		assert.expect(8);
+
+		const oHandle = {
+			stepName:"undetermined_startup",
+			appNameLong:"undetermined",
+			appNameShort:"undetermined",
+			interactionType: 1
+		};
+
+		const oHeaderSpy = sinon.spy(Headers.prototype, "append");
+		const fnOnBeforeCreated = FESR.onBeforeCreated;
+
+		await FESR.setActive(true);
+
+		// implement hook
+		FESR.onBeforeCreated = function(oFESRHandle, oInteraction) {
+			assert.ok(oFESRHandle.timeToInteractive > 0, "startup time should be > 0");
+			//delete startup time as we cannot compare it
+			delete oFESRHandle.timeToInteractive;
+			assert.deepEqual(oFESRHandle, oHandle, "Passed FESRHandle should be correct.");
+
+			return {
+				stepName: "newStepName",
+				appNameLong: "newAppNameLong",
+				appNameShort: "newAppNameShort",
+				timeToInteractive: 1000,
+				interactionType: 1
+			};
+		};
+
+		// trigger at least one request for header creation
+		const oXhrHandle = this.dummyRequest();
+
+		// first interaction ends with end
+		Interaction.end(true);
+		oXhrHandle.abort();
+
+		// trigger another request to send FESR using URL object to ensure isCORSRequest can handle URL objects as well
+		const oResponse1 = await this.dummyFetch();
+		await oResponse1.text();
+
+		assert.ok(oHeaderSpy.args.some(function(args) {
+			if (args[0] === "SAP-Perf-FESRec") {
+				const values = args[1].split(",");
+				// duration - end_to_end_time
+				return values[4] === "1000";
+			}
+			return false;
+		}), "Found the FESR header field values.");
+
+		assert.ok(oHeaderSpy.args.some(function(args) {
+			if (args[0] === "SAP-Perf-FESRec-opt") {
+				const values = args[1].split(",");
+				// application_name, step_name, application_name with 70 characters
+				return values[0] === "newAppNameShort" && values[1] === "newStepName" && values[15] === "1" && values[19] === "newAppNameLong";
+			}
+			return false;
+		}), "Found the optional FESR header field values.");
+
+		Interaction.end(true);
+		const oInteraction = Interaction.getAll()[1];
+		assert.throws(function() { oInteraction.component = "badComponent"; }, "Should throw an error after trying to overwrite the interaction object.");
+		assert.ok(Object.isFrozen(oInteraction), "Interaction is not editable.");
+		Interaction.clear();
+		await FESR.setActive(false);
+		FESR.onBeforeCreated = fnOnBeforeCreated;
+		oHeaderSpy.restore();
+	});
+
+	QUnit.test("[MIXED: FETCH -> XHR] onBeforeCreated hook: interactionType 1", async function(assert) {
+		assert.expect(8);
+
+		const oHandle = {
+			stepName:"undetermined_startup",
+			appNameLong:"undetermined",
+			appNameShort:"undetermined",
+			interactionType: 1
+		};
+
+		const oHeaderSpy = sinon.spy(XMLHttpRequest.prototype, "setRequestHeader");
+		const fnOnBeforeCreated = FESR.onBeforeCreated;
+
+		await FESR.setActive(true);
+
+		// implement hook
+		FESR.onBeforeCreated = function(oFESRHandle, oInteraction) {
+			assert.ok(oFESRHandle.timeToInteractive > 0, "startup time should be > 0");
+			//delete startup time as we cannot compare it
+			delete oFESRHandle.timeToInteractive;
+			assert.deepEqual(oFESRHandle, oHandle, "Passed FESRHandle should be correct.");
+
+			return {
+				stepName: "newStepName",
+				appNameLong: "newAppNameLong",
+				appNameShort: "newAppNameShort",
+				timeToInteractive: 1000,
+				interactionType: 1
+			};
+		};
+
+		// trigger at least one request for header creation
+		const pTracked = whenFetchTracked();
+		const oResponse1 = await this.dummyFetch();
+		await oResponse1.text();
+
+		// first interaction ends with end
+		// wait until the fetch interceptor has enriched the interaction (body complete + timing entry)
+		await pTracked;
+		Interaction.end(true);
+
+		// trigger another request to send FESR using URL object to ensure isCORSRequest can handle URL objects as well
+		this.dummyRequest(/* bUseUrlObject */ true);
+
+		assert.ok(oHeaderSpy.args.some(function(args) {
+			if (args[0] === "SAP-Perf-FESRec") {
+				const values = args[1].split(",");
+				// duration - end_to_end_time
+				return values[4] === "1000";
+			}
+			return false;
+		}), "Found the FESR header field values.");
+
+		assert.ok(oHeaderSpy.args.some(function(args) {
+			if (args[0] === "SAP-Perf-FESRec-opt") {
+				const values = args[1].split(",");
+				// application_name, step_name, application_name with 70 characters
+				return values[0] === "newAppNameShort" && values[1] === "newStepName" && values[15] === "1" && values[19] === "newAppNameLong";
+			}
+			return false;
+		}), "Found the optional FESR header field values.");
+
+		Interaction.end(true);
+		const oInteraction = Interaction.getAll()[1];
+		assert.throws(function() { oInteraction.component = "badComponent"; }, "Should throw an error after trying to overwrite the interaction object.");
+		assert.ok(Object.isFrozen(oInteraction), "Interaction is not editable.");
+		Interaction.clear();
+		await FESR.setActive(false);
+		FESR.onBeforeCreated = fnOnBeforeCreated;
+		oHeaderSpy.restore();
+	});
+
+	QUnit.test("[XHR] onBeforeCreated hook: interactionType 2", async function(assert) {
 		assert.expect(8);
 
 		var oHandle = {
@@ -202,7 +463,85 @@ sap.ui.define(['sap/ui/performance/trace/FESR', 'sap/ui/performance/trace/Intera
 		oXhrHandle.abort();
 	});
 
-	QUnit.test("Passport Integration - Passport Action in Client ID field", async function(assert) {
+	QUnit.test("[FETCH] onBeforeCreated hook: interactionType 2", async function(assert) {
+		assert.expect(8);
+
+		const oHandle = {
+			stepName:"undetermined_other_interaction",
+			appNameLong:"undetermined",
+			appNameShort:"undetermined",
+			interactionType: 2
+		};
+
+		const oHeaderSpy = sinon.spy(Headers.prototype, "append");
+		const fnOnBeforeCreated = FESR.onBeforeCreated;
+
+		// startup
+		await FESR.setActive(true);
+		Interaction.end(true);
+
+		// next interaction
+		Interaction.start("other_interaction");
+
+		// implement hook
+		FESR.onBeforeCreated = function (oFESRHandle, oInteraction) {
+			assert.ok(oFESRHandle.timeToInteractive > 0, "startup time should be > 0");
+			//delete startup time as we cannot compare it
+			delete oFESRHandle.timeToInteractive;
+			assert.deepEqual(oFESRHandle, oHandle, "Passed FESRHandle should be correct.");
+
+			return {
+				stepName: "newStepName",
+				appNameLong: "newAppNameLong",
+				appNameShort: "newAppNameShort",
+				timeToInteractive: 1000,
+				interactionType: 2
+			};
+		};
+
+		// trigger at least one request for header creation
+		const pTracked = whenFetchTracked();
+		const oResponse = await this.dummyFetch();
+		await oResponse.text();
+
+		// first interaction ends with end
+		// wait until the fetch interceptor has enriched the interaction (body complete + timing entry)
+		await pTracked;
+		Interaction.end(true);
+
+		// trigger another request to send FESR using URL object to ensure isCORSRequest can handle URL objects as well
+		const oResponse1 = await this.dummyFetch();
+		await oResponse1.text();
+
+		assert.ok(oHeaderSpy.args.some(function(args) {
+			if (args[0] === "SAP-Perf-FESRec") {
+				const values = args[1].split(",");
+				// duration - end_to_end_time
+				return values[4] === "1000";
+			}
+			return false;
+		}), "Found the FESR header field values.");
+
+		assert.ok(oHeaderSpy.args.some(function(args) {
+			if (args[0] === "SAP-Perf-FESRec-opt") {
+				const values = args[1].split(",");
+				// application_name, step_name, application_name with 70 characters
+				return values[0] === "newAppNameShort" && values[1] === "newStepName" && values[15] === "2" && values[19] === "newAppNameLong";
+			}
+			return false;
+		}), "Found the optional FESR header field values.");
+
+		Interaction.end(true);
+		const oInteraction = Interaction.getAll()[1];
+		assert.throws(function() { oInteraction.component = "badComponent"; }, "Should throw an error after trying to overwrite the interaction object.");
+		assert.ok(Object.isFrozen(oInteraction), "Interaction is not editable.");
+		Interaction.clear();
+		await FESR.setActive(false);
+		FESR.onBeforeCreated = fnOnBeforeCreated;
+		oHeaderSpy.restore();
+	});
+
+	QUnit.test("[XHR] Passport Integration - Passport Action in Client ID field", async function(assert) {
 		assert.expect(6);
 
 		var oHeaderSpy = sinon.spy(XMLHttpRequest.prototype, "setRequestHeader");
@@ -246,6 +585,55 @@ sap.ui.define(['sap/ui/performance/trace/FESR', 'sap/ui/performance/trace/Intera
 		oHeaderSpy.restore();
 		oPassportHeaderSpy.restore();
 		oXhrHandle.abort();
+	});
+
+	QUnit.test("[FETCH] Passport Integration - Passport Action in Client ID field", async function(assert) {
+		assert.expect(6);
+
+		const oHeaderSpy = sinon.spy(Headers.prototype, "append");
+		const oPassportHeaderSpy = sinon.spy(Passport, "header");
+
+		await FESR.setActive(true);
+		Interaction.notifyStepStart("startup", "startup", true);
+		// trigger at least one request for header creation
+		const pTracked = whenFetchTracked();
+		const oResponse = await this.dummyFetch();
+		await oResponse.text();
+		// wait until the fetch interceptor has enriched the interaction (body complete + timing entry)
+		await pTracked;
+		const sPassportAction = oPassportHeaderSpy.args[0][4];
+
+		oHeaderSpy.resetHistory();
+		oPassportHeaderSpy.resetHistory();
+		// first interaction ends with notifyStepStart - second interaction starts
+		Interaction.end(true);
+
+		// trigger initial FESR header creation (which should include the actual "action")
+		const oResponse1 = await this.dummyFetch();
+		await oResponse1.text();
+
+		assert.ok(oHeaderSpy.args.some(function(args) {
+			if (args[0] === "SAP-Perf-FESRec") {
+				// duration - end_to_end_time
+				const sAction = args[1].split(",")[6];
+				const bStepCountAvailable = sAction.match("^.*\\d$");
+				assert.ok(bStepCountAvailable, "count was properly added");
+				const bEquals = sAction === sPassportAction;
+				assert.ok(bEquals, "action string matches");
+				return bEquals && bStepCountAvailable;
+			}
+			return false;
+		}), "Found the FESR header field values.");
+
+		assert.strictEqual(oHeaderSpy.args.filter(function(args) {
+			return args[0] === "SAP-PASSPORT";
+		}).length, 1, "Header is set once");
+
+		Interaction.end(true);
+		Interaction.clear();
+		await FESR.setActive(false);
+		oHeaderSpy.restore();
+		oPassportHeaderSpy.restore();
 	});
 
 	QUnit.test("Beacon URL", async function(assert) {
@@ -369,6 +757,37 @@ sap.ui.define(['sap/ui/performance/trace/FESR', 'sap/ui/performance/trace/Intera
 		cleanPerformanceObject();
 		sendBeaconStub.restore();
 		this.clock.restore();
+	});
+
+	QUnit.test("[XHR] Request body bytes are counted in bytesSent", async function(assert) {
+		// 3 own assertions + the module's beforeEach/afterEach "FESR is deactivated" checks
+		assert.expect(5);
+
+		// A body large enough to dominate the request header bytes: if the body is counted at all,
+		// bytesSent must be >= the body length. On the buggy code the "send" hook is guarded by the
+		// never-existing this.oPendingInteraction and writes to mRequestInfo.get(this._id === undefined),
+		// so the body is dropped and bytesSent stays at header-size only (< body length) => this test
+		// goes red. With the fix (oPendingInteraction closure + reliable request id) the body is counted.
+		const iBodyLength = 10000;
+
+		await FESR.setActive(true);
+		// close the startup interaction and open a fresh, empty one we fully control
+		Interaction.end(true);
+		Interaction.start("body_bytes_interaction");
+
+		const oResult = this.dummyRequestWithBody(iBodyLength);
+
+		Interaction.end(true);
+		const aInteractions = Interaction.getAll();
+		const oInteraction = aInteractions[aInteractions.length - 1];
+
+		assert.ok(oInteraction.requests.length > 0, "The bodied request was tracked as part of the interaction.");
+		assert.ok(oInteraction.bytesSent > 0, "bytesSent was accumulated for the interaction.");
+		assert.ok(oInteraction.bytesSent > oResult.bodyLength,
+			"bytesSent (" + oInteraction.bytesSent + ") includes the request body of " + oResult.bodyLength + " bytes plus request headers.");
+
+		Interaction.clear();
+		await FESR.setActive(false);
 	});
 
 	QUnit.test("Semantic Stepname", async function(assert) {

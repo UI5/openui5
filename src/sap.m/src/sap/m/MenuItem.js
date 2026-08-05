@@ -597,9 +597,6 @@ sap.ui.define([
 				};
 			}
 
-			// this override is needed to fix the issue with the popover position flip
-			oPopover._oControl._getDocHeight = () => window.innerHeight + window.scrollY;
-
 			return oPopover;
 		};
 

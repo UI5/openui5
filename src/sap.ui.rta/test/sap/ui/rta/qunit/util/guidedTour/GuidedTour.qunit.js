@@ -2,7 +2,6 @@
 
 sap.ui.define([
 	"sap/m/MessageBox",
-	"sap/m/Popover",
 	"sap/ui/core/Element",
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/test/utils/nextUIUpdate",
@@ -14,7 +13,6 @@ sap.ui.define([
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	MessageBox,
-	Popover,
 	Element,
 	OverlayRegistry,
 	nextUIUpdate,
@@ -77,18 +75,11 @@ sap.ui.define([
 
 		QUnit.test("When the close button is pressed and the Ui Adaptation is returned to its original state", async function(assert) {
 			const oPopover = Element.getElementById("guidedTourMarker--guidedTourMarkerPopover");
-			await nextUIUpdate();
-
-			const oNextButton = Element.getElementById("guidedTourMarker--continueButton");
-			oNextButton.firePress();
-			await nextUIUpdate();
-
-			const oNavigationButton = Element.getElementById("sapUIRta_toolbar_fragment--sapUiRta_navigationSwitcherButton-button");
-			const oModel = oPopover.getModel();
-			const oData = oModel.getData();
-			assert.ok(oNavigationButton.getDomRef().getAttribute("aria-selected"), "then the navigation button is selected");
-			assert.strictEqual(oData.title, this.oSteps[1].title, "the title is set correctly for the next step");
-			assert.strictEqual(oData.description, this.oSteps[1].description, "the description is set correctly for the next step");
+			const oModeSwitcher = Element.getElementById("sapUIRta_toolbar_fragment--sapUiRta_modeSwitcher");
+			const oData = oPopover.getModel().getData();
+			assert.strictEqual(oModeSwitcher.getState(), false, "then the mode switcher is in the correct state for the next step");
+			assert.strictEqual(oData.title, this.oSteps[0].title, "the title is set correctly for the next step");
+			assert.strictEqual(oData.description, this.oSteps[0].description, "the description is set correctly for the next step");
 			const oCloseButton = Element.getElementById("guidedTourMarker--closeButton");
 			oCloseButton.firePress();
 			await nextUIUpdate();
@@ -96,11 +87,7 @@ sap.ui.define([
 			assert.notOk(oPopover.isOpen(), "then the popover is closed");
 			assert.notOk(Element.getElementById("guidedTourMarker--guidedTourMarkerPopover"), "then the popover is destroyed");
 			assert.ok(this.oGuidedTour.bIsDestroyed, "then the GuidedTour is destroyed");
-			const oAdaptationButton = Element.getElementById("sapUIRta_toolbar_fragment--sapUiRta_adaptationSwitcherButton-button");
-			assert.ok(
-				oAdaptationButton.getDomRef().getAttribute("aria-selected"),
-				"then the user is returned to the initial state of ui adaptation"
-			);
+			assert.strictEqual(oModeSwitcher.getState(), true, "then the user is returned to the initial state of ui adaptation");
 		});
 
 		QUnit.test("When the Esc key is pressed, the tour should close", async function(assert) {
@@ -142,18 +129,11 @@ sap.ui.define([
 
 			// Navigate back to the beginning
 			const oPreviousButton = Element.getElementById("guidedTourMarker--previousButton");
-			let oVizPopoverSpy;
 			for (let i = 4; i > 0; i--) {
 				const oModel = oPopover.getModel();
 				const oData = oModel.getData();
 				assert.strictEqual(oData.title, this.oSteps[i].title, `The title is correct for step ${i}`);
 				assert.strictEqual(oData.description, this.oSteps[i].description, `The description is correct for step ${i}`);
-				const oVizPopover = Element.getElementById(
-					"sapUIRta_toolbar_fragment--sapUiRta_toggleChangeVisualizationMenuButton--ChangeIndicatorCategorySelection--popover"
-				);
-				if (oVizPopover && !oVizPopoverSpy) {
-					oVizPopoverSpy = sinon.spy(oVizPopover, "setModal");
-				}
 				const oShowMarkerPromise = RtaQunitUtils.waitForMethodCall(sandbox, this.oGuidedTour, "showMarker");
 				oPreviousButton.firePress();
 				await oShowMarkerPromise;
@@ -165,52 +145,11 @@ sap.ui.define([
 			assert.strictEqual(oDataAtStart.title, this.oSteps[0].title, "The title is set correctly for step 0");
 			assert.strictEqual(oDataAtStart.description, this.oSteps[0].description, "The description is set correctly for step 0");
 			assert.ok(oPreviousButton.getVisible() === false, "The Previous button is hidden on the first step");
-			assert.strictEqual(oVizPopoverSpy?.callCount, 2, "The Modal change of the Change Visualization popover was called twice");
-			assert.strictEqual(
-				oVizPopoverSpy?.getCall(0).args[0],
-				true,
-				"The Change Visualization popover was set to modal to prevent popover to close on focus loss"
-			);
-			assert.strictEqual(
-				oVizPopoverSpy?.getCall(1).args[0],
-				false,
-				"The Change Visualization popover was set to not modal after the nav back"
-			);
-		});
-
-		QUnit.test("When opening the guided tour popover on a modal popover", async function(assert) {
-			const oNextButton = Element.getElementById("guidedTourMarker--continueButton");
-			sandbox.stub(Popover.prototype, "getModal").onFirstCall().returns(true).callThrough();
-			const oPopoverModalSpy = sinon.spy(Popover.prototype, "setModal");
-			await nextUIUpdate();
-
-			// Navigate 4 steps forward
-			for (let i = 0; i < 4; i++) {
-				const oShowMarkerPromise = RtaQunitUtils.waitForMethodCall(sandbox, this.oGuidedTour, "showMarker");
-				oNextButton.firePress();
-				await oShowMarkerPromise;
-			}
-			const oVizPopover = Element.getElementById(
-				"sapUIRta_toolbar_fragment--sapUiRta_toggleChangeVisualizationMenuButton--ChangeIndicatorCategorySelection--popover"
-			);
-			assert.strictEqual(oPopoverModalSpy.callCount, 2, "The Modal change of the Change Visualization popover was called twice");
-			assert.strictEqual(
-				oPopoverModalSpy.getCall(0).args[0],
-				true,
-				"The Change Visualization popover was set to modal to prevent popover to close on focus loss"
-			);
-			assert.strictEqual(
-				oPopoverModalSpy.getCall(1).args[0],
-				true,
-				"The Change Visualization popover was set to modal after the nav back to restore the modal state"
-			);
-			assert.strictEqual(oVizPopover.getModal(), true, "Then the modal popover is modal again after navigating through the steps");
 		});
 
 		QUnit.test("When navigating through all steps until completion", async function(assert) {
 			const oPopover = Element.getElementById("guidedTourMarker--guidedTourMarkerPopover");
 			const { oSteps } = this;
-			const oStepWithListContent = oSteps.find((oStep) => oStep.listContent && oStep.listContent.length > 0);
 			const oList = Element.getElementById("guidedTourMarker--navigationList");
 			let currentStepIndex = 0;
 
@@ -221,19 +160,19 @@ sap.ui.define([
 				const oData = oModel.getData();
 
 				// Check if the current step was skipped
-				const expectedStepIndex = oSteps.findIndex((oStep) => oStep.title === oData.title);
-				if (expectedStepIndex !== currentStepIndex) {
+				const nExpectedStepIndex = oSteps.findIndex((oStep) => oStep.title === oData.title);
+				if (nExpectedStepIndex !== currentStepIndex) {
 					assert.ok(true, `Step ${currentStepIndex} was skipped because element was not found`);
-					assert.ok(expectedStepIndex >= currentStepIndex, `Step index progresses forward: current=${currentStepIndex}, next=${expectedStepIndex}`);
-					currentStepIndex = expectedStepIndex;
+					assert.ok(nExpectedStepIndex >= currentStepIndex, `Step index progresses forward: current=${currentStepIndex}, next=${nExpectedStepIndex}`);
+					currentStepIndex = nExpectedStepIndex;
 				}
 
 				if (oList.getVisible()) {
 					assert.ok(oList.getVisible(), "then the list is visible in the popover");
 					assert.strictEqual(
 						oList.getItems().length,
-						oStepWithListContent.listContent.length,
-						"then the  list contains the correct number of items"
+						oSteps[currentStepIndex].listContent.length,
+						"then the list contains the correct number of items"
 					);
 				}
 
@@ -272,33 +211,29 @@ sap.ui.define([
 			this.oGuidedTour = new GuidedTour();
 			this.oRootControl = {};
 			this.sLayer = "CUSTOMER";
+			this.oGuidedTourStartSpy = sandbox.stub(this.oGuidedTour, "start");
 		},
 		afterEach() {
+			sandbox.restore();
 			this.oGuidedTour.destroy();
 		}
 	}, function() {
 		QUnit.test("should start if FeaturesAPI.shouldAutoStartGuidedTour returns true and user confirms", async function(assert) {
-			const oShowMessageBoxStub = sinon.stub(Utils, "showMessageBox").resolves(MessageBox.Action.YES);
-			const oGuidedTourStartSpy = sinon.spy(this.oGuidedTour, "start");
+			const oShowMessageBoxStub = sandbox.stub(Utils, "showMessageBox").resolves(MessageBox.Action.YES);
 
-			await this.oGuidedTour.autoStart(this.oRootControl, this.sLayer);
+			await this.oGuidedTour.autoStart({});
 
 			assert.ok(oShowMessageBoxStub.calledOnce, "showMessageBox was called once");
-			assert.ok(oGuidedTourStartSpy.calledOnce, "start method was called once");
-
-			oShowMessageBoxStub.restore();
+			assert.ok(this.oGuidedTourStartSpy.calledOnce, "start method was called once");
 		});
 
 		QUnit.test("should not start if FeaturesAPI.shouldAutoStartGuidedTour returns true and user declines", async function(assert) {
-			const oShowMessageBoxStub = sinon.stub(Utils, "showMessageBox").resolves(MessageBox.Action.NO);
-			const oGuidedTourStartSpy = sinon.spy(this.oGuidedTour, "start");
+			const oShowMessageBoxStub = sandbox.stub(Utils, "showMessageBox").resolves(MessageBox.Action.NO);
 
-			await this.oGuidedTour.autoStart(this.oRootControl, this.sLayer);
+			await this.oGuidedTour.autoStart({});
 
 			assert.ok(oShowMessageBoxStub.calledOnce, "showMessageBox was called once");
-			assert.notOk(oGuidedTourStartSpy.called, "start method was not called");
-
-			oShowMessageBoxStub.restore();
+			assert.notOk(this.oGuidedTourStartSpy.called, "start method was not called");
 		});
 	});
 

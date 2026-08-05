@@ -5,7 +5,11 @@
  * IMPORTANT: This is a private module, its API must not be used and is subject to change.
  * Code other than the OpenUI5 libraries must not introduce dependencies to this module.
  */
-sap.ui.define(["sap/ui/performance/XHRInterceptor", "sap/ui/util/isCrossOriginURL"], function(XHRInterceptor, isCrossOriginURL) {
+sap.ui.define([
+	"sap/ui/performance/FetchInterceptor",
+	"sap/ui/performance/XHRInterceptor",
+	"sap/ui/util/isCrossOriginURL"
+], function(FetchInterceptor, XHRInterceptor, isCrossOriginURL) {
 	"use strict";
 
 	var iE2eTraceLevel;
@@ -199,6 +203,21 @@ sap.ui.define(["sap/ui/performance/XHRInterceptor", "sap/ui/util/isCrossOriginUR
 				if (!isCrossOriginURL(arguments[1])) {
 					// set passport with Root Context ID, Transaction ID for Trace
 					this.setRequestHeader("SAP-PASSPORT", Passport.header(iE2eTraceLevel, ROOT_ID, sTransactionId));
+				}
+			});
+			FetchInterceptor.register("PASSPORT_ID", {
+				onRequest(oRequest) {
+					if (!isCrossOriginURL(oRequest.url)) {
+						sTransactionId = Passport.createGUID();
+					}
+				}
+			});
+			FetchInterceptor.register("PASSPORT_HEADER", {
+				onRequest(oRequest) {
+					if (!isCrossOriginURL(oRequest.url)) {
+						// set passport with Root Context ID, Transaction ID for Trace
+						oRequest.headers.append("SAP-PASSPORT", Passport.header(iE2eTraceLevel, ROOT_ID, sTransactionId));
+					}
 				}
 			});
 		}

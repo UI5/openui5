@@ -267,7 +267,7 @@ sap.ui.define([
 	RtaQunitUtils.createToolbarControlsModel = function() {
 		return new JSONModel({
 			changesNeedHardReload: false,
-			modeSwitcher: "adaptation",
+			adaptationMode: true,
 			undo: {
 				enabled: false
 			},
@@ -297,9 +297,6 @@ sap.ui.define([
 			contextBasedAdaptation: {
 				visible: false,
 				enabled: false
-			},
-			actionsMenuButton: {
-				enabled: true
 			},
 			visualizationButton: {
 				visible: false,

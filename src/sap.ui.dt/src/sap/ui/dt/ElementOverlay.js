@@ -714,11 +714,10 @@ sap.ui.define([
 		bMovable = !!bMovable;
 		if (this.getMovable() !== bMovable) {
 			this.toggleStyleClass("sapUiDtOverlayMovable", bMovable);
+			this.getDomRef()?.[bMovable ? "setAttribute" : "removeAttribute"]("draggable", bMovable);
 
 			this.setProperty("movable", bMovable);
 			this.fireMovableChange({ movable: bMovable });
-
-			this.getDomRef()?.[bMovable ? "setAttribute" : "removeAttribute"]("draggable", bMovable);
 		}
 
 		return this;
