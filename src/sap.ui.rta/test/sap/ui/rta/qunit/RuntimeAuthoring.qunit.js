@@ -162,37 +162,12 @@ sap.ui.define([
 			assert.ok(this.oMessageBoxStub.notCalled, "then the tour message box does not appear");
 		});
 
-		QUnit.test("when cut is triggered by keydown-event on rootElementOverlay, with macintosh device and metaKey is pushed", function(assert) {
+		// The mac vs. win key-combo mapping and the focus routing are covered exhaustively in the
+		// "Undo/Redo functionality" module of RuntimeAuthoring-3.qunit.js. This test only ensures that a
+		// keydown actually drives the real command stack through undo and redo (integration).
+		QUnit.test("when undo/redo is triggered by keydown-event on rootElementOverlay", function(assert) {
 			var done = assert.async();
-			var bMacintoshOriginal;
-			var fnStackModifiedSpy = sinon.spy(function() {
-				if (fnStackModifiedSpy.calledOnce) {
-					assert.equal(this.oCommandStack.getAllExecutedCommands().length, 0, "after CMD + Z the stack is empty");
-					// redo -> execute -> fireModified (inside promise)
-					triggerKeydown(this.oElement2Overlay.getDomRef(), KeyCodes.Z, true, false, false, true);
-				} else if (fnStackModifiedSpy.calledTwice) {
-					assert.equal(
-						this.oCommandStack.getAllExecutedCommands().length,
-						1,
-						"after CMD + SHIFT + Z is again 1 command in the stack"
-					);
-					Device.os.macintosh = bMacintoshOriginal;
-					done();
-				}
-			}.bind(this));
-			this.oCommandStack.attachModified(fnStackModifiedSpy);
-			bMacintoshOriginal = Device.os.macintosh;
-			Device.os.macintosh = true;
-			assert.equal(this.oCommandStack.getAllExecutedCommands().length, 1, "1 commands is still in the stack");
-
-			// undo -> _unExecute -> fireModified
-			document.activeElement.blur(); // reset focus to body
-			triggerKeydown(this.oRootControlOverlay.getDomRef(), KeyCodes.Z, false, false, false, true);
-		});
-
-		QUnit.test("when cut is triggered by keydown-event on rootElementOverlay, with no macintosh device and ctrlKey is pushed", function(assert) {
-			var done = assert.async();
-			var bMacintoshOriginal;
+			sandbox.stub(Device, "os").value({ ...Device.os, macintosh: false });
 			var fnStackModifiedSpy = sinon.spy(function() {
 				if (fnStackModifiedSpy.calledOnce) {
 					assert.equal(this.oCommandStack.getAllExecutedCommands().length, 0, "after CTRL + Z the stack is empty");
@@ -200,13 +175,10 @@ sap.ui.define([
 					triggerKeydown(this.oElement2Overlay.getDomRef(), KeyCodes.Y, false, false, true, false);
 				} else if (fnStackModifiedSpy.calledTwice) {
 					assert.equal(this.oCommandStack.getAllExecutedCommands().length, 1, "after CTRL + Y is again 1 command in the stack");
-					Device.os.macintosh = bMacintoshOriginal;
 					done();
 				}
 			}.bind(this));
 			this.oCommandStack.attachModified(fnStackModifiedSpy);
-			bMacintoshOriginal = Device.os.macintosh;
-			Device.os.macintosh = false;
 			assert.equal(this.oCommandStack.getAllExecutedCommands().length, 1, "1 commands is still in the stack");
 
 			// undo -> _unExecute -> fireModified

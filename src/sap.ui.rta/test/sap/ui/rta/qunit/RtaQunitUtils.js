@@ -254,6 +254,42 @@ sap.ui.define([
 		return FlQUnitUtils.stubSapUiRequire.apply(undefined, aArgs);
 	};
 
+	RtaQunitUtils.stubFLPContainer = function(sandbox, fnFLPReloadStub, mShellParams, fnFLPNavigateStub) {
+		sandbox.stub(flUtils, "getUshellContainer").returns({
+			getServiceAsync() {
+				return Promise.resolve({
+					navigate: fnFLPNavigateStub || function() {},
+					getHash() {
+						return "Action-somestring";
+					},
+					parseShellHash() {
+						const mHash = {
+							semanticObject: "Action",
+							action: "somestring"
+						};
+
+						if (mShellParams) {
+							mHash.params = mShellParams;
+						}
+						return mHash;
+					},
+					unregisterNavigationFilter() {},
+					registerNavigationFilter() {},
+					reloadCurrentApp: fnFLPReloadStub,
+					getUser() {},
+					getCurrentApplication() {}
+				});
+			}
+		});
+		RtaQunitUtils.stubSapUiRequire(sandbox, [{
+			name: "sap/ushell/api/RTA",
+			stub: {
+				getLogo: sandbox.stub().returns(""),
+				setShellHeaderVisibility: () => {}
+			}
+		}]);
+	};
+
 	RtaQunitUtils.showActionsMenu = function(oToolbar) {
 		return oToolbar.showActionsMenu({
 			getSource() {
