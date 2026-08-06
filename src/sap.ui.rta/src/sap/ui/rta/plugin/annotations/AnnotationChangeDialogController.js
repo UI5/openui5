@@ -91,7 +91,7 @@ sap.ui.define([
 		}
 	};
 
-	AnnotationChangeDialogController.prototype.onSave = function(oEvent) {
+	function onSave(oEvent) {
 		const oModelData = oEvent.getSource().getModel().getData();
 		const aChanges = oModelData.properties
 		.map((oProperty) => {
@@ -111,6 +111,19 @@ sap.ui.define([
 		.filter(Boolean);
 
 		this._fnResolveAfterClose(aChanges);
+	}
+
+	function onSubmit(oEvent) {
+		// The Enter key bypasses the Save button, so ignore it while the input is invalid.
+		// An unchanged value is allowed through (onSave resolves with no changes and closes the dialog).
+		if (oEvent.getSource().getModel().getProperty("/errorCount") > 0) {
+			return;
+		}
+		onSave.call(this, oEvent);
+	}
+
+	AnnotationChangeDialogController.prototype.onSave = function(oEvent) {
+		onSave.call(this, oEvent);
 	};
 
 	AnnotationChangeDialogController.prototype.onCancel = function() {
@@ -123,9 +136,9 @@ sap.ui.define([
 			return;
 		}
 		const aValidators = oModel.getProperty("/validators");
-		const bSingleRename = oModel.getProperty("/singleRename");
+		const bSingleFieldRename = oModel.getProperty("/singleFieldRename");
 		try {
-			validateText(sNewValue, sOldValue, { validators: aValidators, skipSameTextValidator: !bSingleRename });
+			validateText(sNewValue, sOldValue, { validators: aValidators, skipSameTextValidator: !bSingleFieldRename });
 		} catch (oError) {
 			if (oError.message !== "sameTextError") {
 				oInput.setValueState("Error");
@@ -158,7 +171,7 @@ sap.ui.define([
 		oModel.setProperty("/isSaveEnabled", bNoErrors && bHasChanges);
 	};
 
-	function createEditorField(sValueType) {
+	function createEditorField(sValueType, bSingleFieldRename) {
 		if (sValueType === AnnotationTypes.ValueListType) {
 			const oSelect = new Select({
 				selectedKey: {
@@ -198,6 +211,9 @@ sap.ui.define([
 
 		if (sValueType === AnnotationTypes.StringType) {
 			return new Input({
+				// A single-field rename shows exactly one text input, so it carries a stable ID that
+				// onAfterOpen uses to focus it. Multi-field dialogs keep auto-generated IDs (no collision).
+				id: bSingleFieldRename ? "sapUiRtaChangeAnnotationDialog_singleRenameField" : undefined,
 				value: "{currentValue}",
 				liveChange: (oEvent) => {
 					const oSource = oEvent.getSource();
@@ -214,7 +230,8 @@ sap.ui.define([
 					this._validateInput(oSource, sNewText, sOriginalValue);
 					mPropertyBag.hasError = oSource.getValueState() === "Error";
 					this._updateSaveEnabled(oModel, mPropertyBag);
-				}
+				},
+				submit: bSingleFieldRename ? onSubmit.bind(this) : () => {}
 			});
 		}
 
@@ -247,16 +264,18 @@ sap.ui.define([
 
 	AnnotationChangeDialogController.prototype.editorFactory = function(sId, oContext) {
 		const sValueType = oContext.getProperty("/valueType");
-		const bSingleRename = oContext.getProperty("/singleRename");
+		const bSingleFieldRename = !!oContext.getProperty("/singleFieldRename");
 
 		return new FormElement({
 			id: sId,
 			label: new Label({
-				text: bSingleRename ? "{i18n>ANNOTATION_CHANGE_DIALOG_SINGLE_RENAME_LABEL}" : "{= ${label} || ${propertyName}}",
+				text: bSingleFieldRename
+					? "{i18n>ANNOTATION_CHANGE_DIALOG_SINGLE_RENAME_LABEL}"
+					: "{= ${label} || ${propertyName}}",
 				tooltip: "{tooltip}"
 			}),
 			fields: [
-				createEditorField.call(this, sValueType)
+				createEditorField.call(this, sValueType, bSingleFieldRename)
 			]
 		});
 	};
