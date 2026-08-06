@@ -2,8 +2,8 @@
  * ${copyright}
  */
 sap.ui.define([
-	"./QueryPanel", "sap/m/HBox", "sap/m/CheckBox", "sap/ui/layout/Grid"
-], function (QueryPanel, HBox, CheckBox, Grid) {
+	"./QueryPanel", "sap/m/HBox", "sap/m/CheckBox", "sap/ui/layout/Grid", "sap/ui/layout/GridData"
+], function (QueryPanel, HBox, CheckBox, Grid, GridData) {
 	"use strict";
 
 	/**
@@ -76,6 +76,11 @@ sap.ui.define([
 	 *
 	 */
 
+	GroupPanel.prototype.init = function() {
+		QueryPanel.prototype.init.apply(this, arguments);
+		this.addStyleClass("sapMP13nGroupPanel");
+	};
+
 	GroupPanel.prototype._createQueryRowGrid = function(oItem) {
 		var sKey = oItem.name;
 		var oSelect = this._createKeySelect(sKey);
@@ -88,7 +93,17 @@ sap.ui.define([
 			]
 		}).addStyleClass("sapUiTinyMargin");
 
-		if (this.getEnableShowField()){
+		let sSpan = "XL6 L6 M6 S8";
+		if (this.getEnableShowField()) {
+			sSpan = "XL4 L4 M4 S12"; // use full row on small screens to prevent truncation of Checkbox label
+		} else if (!this.getEnableReorder() || this.getQueryLimit() === 1) { // no reordering
+			sSpan = "XL6 L6 M6 S10"; // no reordering, use available space
+		}
+		oSelect.setLayoutData(new GridData(oSelect.getId() + "-GD", {
+			span: sSpan
+		})).setWidth("100%");
+
+		if (this.getEnableShowField()) {
 			var oCheckBox = this._createCheckBox(oItem);
 			oGrid.addContent(oCheckBox);
 		}
@@ -119,10 +134,34 @@ sap.ui.define([
 					}.bind(this),
 					text: this._getResourceText("p13n.GROUP_CHECKBOX")
 				})
-			]
+			],
+			layoutData: new GridData({
+				span: "XL4 L4 M4 S12", // use full row on small screens to prevent truncation
+				linebreakS: true
+			})
 		});
 
 		return oCheckBox;
+	};
+
+	GroupPanel.prototype._createRemoveButton = function() {
+		const oRemoveBtn = QueryPanel.prototype._createRemoveButton.apply(this, arguments);
+		if (this.getEnableShowField()) {
+			oRemoveBtn.setLayoutData(new GridData(oRemoveBtn.getId() + "-GD", {
+				span: "XL4 L4 M4 S4", // use full row on small screens to prevent truncation
+				indentS: 8,
+				linebreakS: true
+			}));
+		} else {
+			let sSpan = "XL6 L6 M6 S4";
+			if (!this.getEnableReorder() || this.getQueryLimit() === 1) { // no reordering
+				sSpan = "XL6 L6 M6 S2";
+			}
+			oRemoveBtn.setLayoutData(new GridData(oRemoveBtn.getId() + "-GD", {
+				span: sSpan
+			}));
+		}
+		return oRemoveBtn;
 	};
 
 	GroupPanel.prototype._changeShowIfGrouped = function (sKey, bShow) {
