@@ -448,12 +448,9 @@ sap.ui.define([
 					return this.waitFor({
 						autoWait: false,
 						timeout: 100,
-						controlType: "sap.m.HBox",
-						matchers(oToolbar) {
-							return oToolbar.getDomRef().classList.contains("sapUiRtaToolbar");
-						},
+						id: "sapUIRta_toolbar",
 						success(oToolbar) {
-							Opa5.assert.ok(oToolbar[0].getVisible(), "The Toolbar is shown.");
+							Opa5.assert.ok(oToolbar.getVisible(), "The Toolbar is shown.");
 						},
 						errorMessage: "Did not find the Toolbar"
 					});
@@ -470,14 +467,10 @@ sap.ui.define([
 				iShouldSeeTheToolbarAndTheLogo() {
 					return this.waitFor({
 						autoWait: false,
-						controlType: "sap.m.HBox",
-						matchers(oToolbar) {
-							return oToolbar.getDomRef().classList.contains("sapUiRtaToolbar");
-						},
+						id: "sapUIRta_toolbar",
 						success(oToolbar) {
-							const oFioriToolbar = oToolbar[0];
-							Opa5.assert.ok(oFioriToolbar.getVisible(), "The Toolbar is shown.");
-							Opa5.assert.ok(oFioriToolbar.getControl("icon"), "The FLP Icon is part of the Toolbar");
+							Opa5.assert.ok(oToolbar.getVisible(), "The Toolbar is shown.");
+							Opa5.assert.ok(oToolbar.getControl("icon"), "The FLP Icon is part of the Toolbar");
 
 							return this.waitFor({
 								controlType: "sap.m.Image",

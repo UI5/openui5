@@ -20,6 +20,7 @@
 	.sapUiRtaToolbar.sapUiRtaToolbarAdaptation {
 
 		/* Buttons */
+		& > .sapMBtn,
 		:not(.sapUiRtaVersionButton) > .sapMBtn {
 
 			&.sapMBtnDisabled .sapMBtnInner {
@@ -33,7 +34,7 @@
 			}
 		}
 
-		.sapMTB:not(.sapMTB-Info-CTX) {
+		&.sapMTB:not(.sapMTB-Info-CTX) {
 			border-top-right-radius: 0;
 			border-top-left-radius: 0;
 		}

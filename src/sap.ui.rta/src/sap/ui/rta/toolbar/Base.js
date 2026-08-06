@@ -3,7 +3,7 @@
  */
 
 sap.ui.define([
-	"sap/m/HBox",
+	"sap/m/OverflowToolbar",
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
 	"sap/ui/core/StaticArea",
@@ -12,7 +12,7 @@ sap.ui.define([
 	"sap/ui/rta/toolbar/BaseRenderer",
 	"sap/ui/rta/util/Animation"
 ], function(
-	HBox,
+	OverflowToolbar,
 	Element,
 	Lib,
 	StaticArea,
@@ -28,7 +28,7 @@ sap.ui.define([
 	 *
 	 * @class
 	 * Base class for Toolbar control
-	 * @extends sap.m.HBox
+	 * @extends sap.m.OverflowToolbar
 	 *
 	 * @author SAP SE
 	 * @version ${version}
@@ -39,8 +39,7 @@ sap.ui.define([
 	 * @alias sap.ui.rta.toolbar.Base
 	 */
 
-	var Base = HBox.extend("sap.ui.rta.toolbar.Base", {
-		// TODO: Change HBox to OverflowToolbar
+	const Base = OverflowToolbar.extend("sap.ui.rta.toolbar.Base", {
 		metadata: {
 			library: "sap.ui.rta",
 			properties: {
@@ -74,10 +73,9 @@ sap.ui.define([
 		},
 		constructor: function(...aArgs) {
 			// call parent constructor
-			HBox.apply(this, aArgs);
+			OverflowToolbar.apply(this, aArgs);
 
 			this._oExtensions = {};
-			this.setAlignItems("Center");
 			this.setVisible(false);
 			this.placeToContainer();
 		},
@@ -105,7 +103,7 @@ sap.ui.define([
 		this._oResourceModel = new ResourceModel({
 			bundle: Lib.getResourceBundleFor("sap.ui.rta")
 		});
-		HBox.prototype.init.apply(this, aArgs);
+		OverflowToolbar.prototype.init.apply(this, aArgs);
 		// Assign the model object to the SAPUI5 core using the name "i18n"
 		this.setModel(this._oResourceModel, "i18n");
 		this._fnOnScrollBound = this._onScroll.bind(this);
@@ -120,7 +118,7 @@ sap.ui.define([
 		this._oExtensions = {};
 		window.removeEventListener("scroll", this._fnOnScrollBound, true);
 
-		HBox.prototype.exit.apply(this, aArgs);
+		OverflowToolbar.prototype.exit.apply(this, aArgs);
 	};
 
 	/**
@@ -187,7 +185,7 @@ sap.ui.define([
 	 */
 	Base.prototype.buildContent = function() {
 		return this.buildControls().then(function(aControls) {
-			aControls.forEach(this.addItem, this);
+			aControls.forEach(this.addContent, this);
 		}.bind(this));
 	};
 
