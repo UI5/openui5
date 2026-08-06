@@ -7650,29 +7650,15 @@ sap.ui.define([
 			$DrillState : "~DrillState~",
 			$LimitedRank : "~LimitedRank~"
 		});
-		const oKeptAndOut = {Name : "(effectively) kept alive, but still OOP"};
 		oCache.aElements.$byPredicate = {
-			"~predicateKeptAndOut~" : oKeptAndOut,
+			"~parent3Predicate~" : "~parent3~", // kept alive outside the collection
+			"~predicateKeptAndOut~" : "~keptAndOut~",
 			"~predicate2~" : "~node2~"
 		};
 		oCache.aElements.push("~node2~"); // already read with the in-place request
 		const oRankResult = {
 			value : ["~parent1RankResult~", "~node2RankResult~", "~node3RankResult~",
 				"~node1RankResult~", "~parent2RankResult~"]
-		};
-		const oOutOfPlaceNodeResult1 = {
-			value : ["~node1Data~", "~node2Data~"]
-		};
-		const oOutData = {Name : "Out"};
-		const oKeptAndOutData = {Name : "n/a"};
-		const oOutOfPlaceNodeResult2 = {
-			value : [oOutData, oKeptAndOutData, "~node3Data~"]
-		};
-		const oOutOfPlaceNodeResult3 = {
-			value : ["~node4Data~"]
-		};
-		const oOutOfPlaceNodeResult4 = {
-			value : ["~node5Data~"]
 		};
 		const oCacheMock = this.mock(oCache);
 		const oFirstLevelMock = this.mock(oCache.oFirstLevel);
@@ -7702,8 +7688,9 @@ sap.ui.define([
 				"~predicate5~", "~predicate6NowInPlace~", "~predicate7NowInPlace~",
 				"~predicateOut~"]);
 
-		// Out
-		// KeptAndOut
+		// out
+		//   outChild
+		// keptAndOut
 		// parent1
 		//   node1
 		//   node2
@@ -7711,6 +7698,8 @@ sap.ui.define([
 		// parent2 (collapsed)
 		//   node4 (no rank)
 		//     node5 (no rank)
+		// parent3 (kept alive outside the collection)
+		//   node6 (no rank)
 
 		// "~node1Data~"
 		oHelperMock.expects("getKeyPredicate").withExactArgs("~node1Data~", "/Foo", "~types~")
@@ -7731,17 +7720,22 @@ sap.ui.define([
 		// "~node2Data~": already in $byPredicate
 		oHelperMock.expects("getKeyPredicate").withExactArgs("~node2Data~", "/Foo", "~types~")
 			.returns("~predicate2~");
-		// oOutData
-		oHelperMock.expects("getKeyPredicate")
-			.withExactArgs(sinon.match.same(oOutData), "/Foo", "~types~")
+		// "~outData~"
+		oHelperMock.expects("getKeyPredicate").withExactArgs("~outData~", "/Foo", "~types~")
 			.returns("~predicateOut~");
 		oTreeStateMock.expects("getOutOfPlace").withExactArgs("~predicateOut~")
 			.returns({/*no parentPredicate*/});
 		oHelperMock.expects("setPrivateAnnotation")
-			.withExactArgs(sinon.match.same(oOutData), "predicate", "~predicateOut~");
-		// oKeptAndOutData
-		oHelperMock.expects("getKeyPredicate")
-			.withExactArgs(sinon.match.same(oKeptAndOutData), "/Foo", "~types~")
+			.withExactArgs("~outData~", "predicate", "~predicateOut~");
+		// "~outChildData~"
+		oHelperMock.expects("getKeyPredicate").withExactArgs("~outChildData~", "/Foo", "~types~")
+			.returns("~predicateOutChild~");
+		oTreeStateMock.expects("getOutOfPlace").withExactArgs("~predicateOutChild~")
+			.returns({parentPredicate : "~predicateOut~"});
+		oHelperMock.expects("setPrivateAnnotation")
+			.withExactArgs("~outChildData~", "predicate", "~predicateOutChild~");
+		// "~keptAndOutData~"
+		oHelperMock.expects("getKeyPredicate").withExactArgs("~keptAndOutData~", "/Foo", "~types~")
 			.returns("~predicateKeptAndOut~");
 		oTreeStateMock.expects("getOutOfPlace").withExactArgs("~predicateKeptAndOut~")
 			.returns({/*no parentPredicate*/});
@@ -7771,6 +7765,11 @@ sap.ui.define([
 			.returns("~predicate5~");
 		oTreeStateMock.expects("getOutOfPlace").withExactArgs("~predicate5~")
 			.returns({parentPredicate : "~predicate4~"});
+		// "~node6Data~": kept alive outside the collection
+		oHelperMock.expects("getKeyPredicate").withExactArgs("~node6Data~", "/Foo", "~types~")
+			.returns("~predicate6~");
+		oTreeStateMock.expects("getOutOfPlace").withExactArgs("~predicate6~")
+			.returns({parentPredicate : "~parent3Predicate~"});
 
 		const oDeleteOutOfPlace6Expectation = oTreeStateMock.expects("deleteOutOfPlace")
 			.withExactArgs("~predicate6NowInPlace~");
@@ -7791,33 +7790,44 @@ sap.ui.define([
 			}]);
 		oHelperMock.expects("drillDown").withExactArgs("~parent1RankResult~", "~LimitedRank~")
 			.returns("42"); // doesn't really matter, but must be a number
-		oCacheMock.expects("moveOutOfPlaceNodes").withExactArgs(42, "~parent1NodePredicates~");
+		oCacheMock.expects("moveOutOfPlaceNodes")
+			.withExactArgs("~parent1NodePredicates~", "~parent1Predicate~", 42);
 		oHelperMock.expects("drillDown").withExactArgs("~parent2RankResult~", "~LimitedRank~")
 			.returns("23"); // doesn't really matter, but must be a number
-		oCacheMock.expects("moveOutOfPlaceNodes").withExactArgs(23, "~parent2NodePredicates~");
-		oCacheMock.expects("moveOutOfPlaceNodes").withExactArgs(undefined, "~rootNodePredicates~")
+		oCacheMock.expects("moveOutOfPlaceNodes")
+			.withExactArgs("~parent2NodePredicates~", "~parent2Predicate~", 23);
+		oCacheMock.expects("moveOutOfPlaceNodes")
+			.withExactArgs("~rootNodePredicates~", undefined, undefined)
 			.callsFake(function () {
-				assert.strictEqual(oCache.aElements.at(-2), oOutData);
-				assert.strictEqual(oCache.aElements.at(-1), oKeptAndOut);
+				assert.strictEqual(oCache.aElements.at(-3), "~outData~");
+				assert.strictEqual(oCache.aElements.at(-2), "~keptAndOut~");
+				assert.strictEqual(oCache.aElements.at(-1), "~outChildData~");
 				assert.deepEqual(oCache.aElements.$byPredicate, {
+					"~parent3Predicate~" : "~parent3~",
 					"~predicate1~" : "~node1Data~",
 					"~predicate2~" : "~node2~",
 					"~predicate3~" : "~node3Data~",
-					"~predicateKeptAndOut~" : { // oKeptAndOut
-						"@$ui5.node.level" : 1,
-						Name : "(effectively) kept alive, but still OOP"
-					},
-					"~predicateOut~" : { // oOutData
-						"@$ui5.node.level" : 1,
-						Name : "Out"
-					}
+					"~predicateKeptAndOut~" : "~keptAndOut~",
+					"~predicateOutChild~" : "~outChildData~",
+					"~predicateOut~" : "~outData~"
 				});
-				assert.strictEqual(oCache.aElements.$byPredicate["~predicateOut~"], oOutData);
+				assert.strictEqual(oCache.aElements.$byPredicate["~predicateOut~"], "~outData~");
 			});
 
 		// code under test
-		oCache.handleOutOfPlaceNodes([oRankResult, oOutOfPlaceNodeResult1, oOutOfPlaceNodeResult2,
-			oOutOfPlaceNodeResult3, oOutOfPlaceNodeResult4]);
+		oCache.handleOutOfPlaceNodes([oRankResult, {
+				value : ["~node1Data~", "~node2Data~"]
+			}, {
+				value : ["~outData~", "~keptAndOutData~", "~node3Data~"]
+			}, {
+				value : ["~node4Data~"]
+			}, {
+				value : ["~node5Data~"]
+			}, {
+				value : ["~node6Data~"]
+			}, {
+				value : ["~outChildData~"]
+			}]);
 
 		sinon.assert.callOrder(oDeleteOutOfPlace6Expectation, oDeleteOutOfPlace7Expectation,
 			oOutOfPlaceGroupedByParentExpectation);
@@ -8336,23 +8346,28 @@ sap.ui.define([
 		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
 			hierarchyQualifier : "X"
 		});
-		const oNode3 = {"@$ui5.node.isExpanded" : true};
+		const oParent = Object.freeze({"@$ui5.node.isExpanded" : "unchanged", Name : "Parent"});
+		const oNode1 = Object.freeze({"@$ui5.node.level" : "L1", Name : "#1"});
+		const oNode2 = Object.freeze({"@$ui5.node.level" : "L2", Name : "#2"});
+		const oNode3 = Object.freeze({"@$ui5.node.level" : "L3", "@$ui5.node.isExpanded" : true,
+			Name : "#3"});
 		oCache.aElements
-			= ["~foo~", "~parent~", "~node2~", "~bar~", "~node1~", oNode3, "~node4~"];
+			= ["~foo~", oParent, oNode2, "~bar~", oNode1, oNode3, "~node4~"];
 		oCache.aElements.$byPredicate = {
-			"~predicate1~" : "~node1~",
-			"~predicate2~" : "~node2~",
+			"~parentPedicate~" : oParent,
+			"~predicate1~" : oNode1,
+			"~predicate2~" : oNode2,
 			"~predicate3~" : oNode3
 		};
 
 		this.mock(oCache).expects("findIndex").withExactArgs("~iParentRank~").returns(1);
 		const oTreeStateMock = this.mock(oCache.oTreeState);
 		oTreeStateMock.expects("stillOutOfPlace")
-			.withExactArgs("~node2~", "~predicate2~");
+			.withExactArgs(sinon.match.same(oNode2), "~predicate2~");
 		oTreeStateMock.expects("stillOutOfPlace")
 			.withExactArgs(sinon.match.same(oNode3), "~predicate3~");
 		oTreeStateMock.expects("stillOutOfPlace")
-			.withExactArgs("~node1~", "~predicate1~");
+			.withExactArgs(sinon.match.same(oNode1), "~predicate1~");
 		this.mock(oCache).expects("collapse").withExactArgs("~predicate3~", {})
 			.callsFake(function () {
 				assert.strictEqual(oCache.aElements.indexOf(oNode3), 5, "not yet moved");
@@ -8366,14 +8381,15 @@ sap.ui.define([
 			});
 
 		// code under test
-		oCache.moveOutOfPlaceNodes("~iParentRank~",
+		oCache.moveOutOfPlaceNodes(
 			// the order is important: node2 is not moved, moving node3 shifts the location of
 			// node1 which must be searched again (aElements.indexOf(...))
 			// node4 has changed its parent
-			["~predicate2~", "~predicate3~", "~predicate4~", "~predicate1~"]);
+			["~predicate2~", "~predicate3~", "~predicate4~", "~predicate1~"],
+			"~parentPedicate~", "~iParentRank~");
 
 		assert.deepEqual(oCache.aElements,
-			["~foo~", "~parent~", "~node1~", oNode3, "~node2~", "~bar~", "~node4~"]);
+			["~foo~", oParent, oNode1, oNode3, oNode2, "~bar~", "~node4~"]);
 	});
 
 	//*********************************************************************************************
@@ -8381,23 +8397,58 @@ sap.ui.define([
 		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
 			hierarchyQualifier : "X"
 		});
-		oCache.aElements = ["~foo~", "~node2~", "~bar~", "~node1~", "~baz~"];
+		const oNode1 = Object.freeze({"@$ui5.node.level" : "unchanged", Name : "#1"});
+		const oNode2 = {Name : "#2"};
+		oCache.aElements = ["~foo~", oNode2, "~bar~", oNode1, "~baz~"];
 		oCache.aElements.$byPredicate = {
-			"~predicate1~" : "~node1~",
-			"~predicate2~" : "~node2~"
+			"~predicate1~" : oNode1,
+			"~predicate2~" : oNode2
 		};
 
 		this.mock(oCache).expects("findIndex").never();
 		const oTreeStateMock = this.mock(oCache.oTreeState);
-		oTreeStateMock.expects("stillOutOfPlace").withExactArgs("~node1~", "~predicate1~");
-		oTreeStateMock.expects("stillOutOfPlace").withExactArgs("~node2~", "~predicate2~");
+		oTreeStateMock.expects("stillOutOfPlace")
+			.withExactArgs(sinon.match.same(oNode1), "~predicate1~");
+		oTreeStateMock.expects("stillOutOfPlace")
+			.withExactArgs(sinon.match.same(oNode2), "~predicate2~");
 		this.mock(oCache).expects("collapse").never();
 		this.mock(oCache).expects("expand").never();
 
 		// code under test
-		oCache.moveOutOfPlaceNodes(undefined, ["~predicate1~", "~predicate2~"]);
+		oCache.moveOutOfPlaceNodes(["~predicate1~", "~predicate2~"]);
 
-		assert.deepEqual(oCache.aElements, ["~node2~", "~node1~", "~foo~", "~bar~", "~baz~"]);
+		assert.deepEqual(oCache.aElements, [oNode2, oNode1, "~foo~", "~bar~", "~baz~"]);
+		assert.deepEqual(oNode2, {"@$ui5.node.level" : 1, Name : "#2"});
+	});
+
+	//*********************************************************************************************
+	QUnit.test("moveOutOfPlaceNodes: parent w/o rank", function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+			hierarchyQualifier : "X"
+		});
+		const oOut = {"@$ui5.node.level" : 23, Name : "Out"};
+		const oOutChild = {Name : "Out_Child"};
+		oCache.aElements = ["~foo~", "~bar~", oOut, "~baz~", oOutChild];
+		oCache.aElements.$byPredicate = {
+			"~predicateOut~" : oOut,
+			"~predicateOutChild~" : oOutChild
+		};
+		this.mock(oCache).expects("findIndex").never();
+		this.mock(oCache.oTreeState).expects("stillOutOfPlace")
+			.withExactArgs(sinon.match.same(oOutChild), "~predicateOutChild~");
+		this.mock(oCache).expects("collapse").never();
+		this.mock(oCache).expects("expand").never();
+
+		// code under test
+		oCache.moveOutOfPlaceNodes(["~predicateOutChild~"], "~predicateOut~");
+
+		assert.deepEqual(oCache.aElements, ["~foo~", "~bar~", oOut, oOutChild, "~baz~"]);
+		assert.deepEqual(oOut, {
+			"@$ui5.node.isExpanded" : true,
+			"@$ui5.node.level" : 23,
+			Name : "Out"
+		});
+		assert.deepEqual(oOutChild, {"@$ui5.node.level" : 24, Name : "Out_Child"});
 	});
 
 	//*********************************************************************************************
