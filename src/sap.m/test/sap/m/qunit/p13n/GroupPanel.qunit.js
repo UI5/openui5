@@ -75,4 +75,89 @@ sap.ui.define([
 		assert.deepEqual(this.oGroupPanel.getP13nData(true), aNewGroupState, "Correct group state");
 
 	});
+
+	QUnit.test("GridData", async function(assert){
+		let aItems = this.oGroupPanel._oListControl.getItems();
+		let oGrid = aItems[0].getContent()[0];
+		let oSelect = oGrid.getContent()[0];
+		const oCheckBox = oGrid.getContent()[1];
+		let oButtonBox = oGrid.getContent()[2];
+
+		assert.equal(oGrid.getDefaultSpan(), "XL4 L4 M4 S4", "Grid: Span");
+		let oGridData = oSelect.getLayoutData();
+		assert.equal(oGridData.getSpan(), "XL4 L4 M4 S12", "Select: Span");
+		oGridData = oCheckBox.getLayoutData();
+		assert.equal(oGridData.getSpan(), "XL4 L4 M4 S12", "CheckBox: Span");
+		assert.ok(oGridData.getLinebreakS(), "CheckBox: linebreakS");
+		oGridData = oButtonBox.getLayoutData();
+		assert.equal(oGridData.getSpan(), "XL4 L4 M4 S4", "ButtonBox: Span");
+		assert.equal(oGridData.getIndentS(), 8, "ButtonBox: indentS");
+		assert.ok(oGridData.getLinebreakS(), "ButtonBox: linebreakS");
+
+		this.oGroupPanel.destroy();
+		this.oGroupPanel = new GroupPanel({
+			enableShowField: false
+		});
+		this.oGroupPanel.setP13nData([
+			{
+				name: "key1",
+				grouped: true,
+				showIfGrouped: true
+			},
+			{
+				name: "key2",
+				grouped: false,
+				showIfGrouped: true
+			}
+		]);
+		this.oGroupPanel.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		aItems = this.oGroupPanel._oListControl.getItems();
+		oGrid = aItems[0].getContent()[0];
+		oSelect = oGrid.getContent()[0];
+		oButtonBox = oGrid.getContent()[1];
+
+		assert.equal(oGrid.getDefaultSpan(), "XL6 L6 M6 S6", "Grid: Span");
+		oGridData = oSelect.getLayoutData();
+		assert.equal(oGridData.getSpan(), "XL6 L6 M6 S8", "Select: Span");
+		oGridData = oButtonBox.getLayoutData();
+		assert.equal(oGridData.getSpan(), "XL6 L6 M6 S4", "ButtonBox: Span");
+		assert.equal(oGridData.getIndentS(), 0, "ButtonBox: indentS");
+		assert.notOk(oGridData.getLinebreakS(), "ButtonBox: linebreakS");
+
+		this.oGroupPanel.destroy();
+		this.oGroupPanel = new GroupPanel({
+			enableShowField: false,
+			queryLimit: 1
+		});
+		this.oGroupPanel.setP13nData([
+			{
+				name: "key1",
+				grouped: true,
+				showIfGrouped: true
+			},
+			{
+				name: "key2",
+				grouped: false,
+				showIfGrouped: true
+			}
+		]);
+		this.oGroupPanel.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		aItems = this.oGroupPanel._oListControl.getItems();
+		oGrid = aItems[0].getContent()[0];
+		oSelect = oGrid.getContent()[0];
+		oButtonBox = oGrid.getContent()[1];
+
+		assert.equal(oGrid.getDefaultSpan(), "XL6 L6 M6 S6", "Grid: Span");
+		oGridData = oSelect.getLayoutData();
+		assert.equal(oGridData.getSpan(), "XL6 L6 M6 S10", "Select: Span");
+		oGridData = oButtonBox.getLayoutData();
+		assert.equal(oGridData.getSpan(), "XL6 L6 M6 S2", "ButtonBox: Span");
+		assert.equal(oGridData.getIndentS(), 0, "ButtonBox: indentS");
+		assert.notOk(oGridData.getLinebreakS(), "ButtonBox: linebreakS");
+	});
+
 });
