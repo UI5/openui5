@@ -2522,7 +2522,7 @@ sap.ui.define([
 		assert.strictEqual(this.oPopover.$().attr('aria-modal'), "true", 'Popover aria-modal attribute is set to true');
 	});
 
-	QUnit.test("Header element should not be rendered when ValueStateHeader has no visible content", async function (assert) {
+	QUnit.test("Header element should not expose a banner landmark when ValueStateHeader has no visible content", async function (assert) {
 		const oValueStateHeader = new ValueStateHeader();
 		this.oPopover.setCustomHeader(oValueStateHeader);
 
@@ -2530,12 +2530,13 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		const oHeaderElement = this.oPopover.getDomRef().querySelector(".sapMPopoverHeader");
-		assert.strictEqual(oHeaderElement, null, "Header element should not be rendered when ValueStateHeader has no visible content");
+		assert.ok(oHeaderElement, "Header element is kept in the DOM to preserve a stable structure for the DOM patcher");
+		assert.strictEqual(oHeaderElement.getAttribute("role"), "presentation", "Empty ValueStateHeader does not expose a banner landmark");
 
 		oValueStateHeader.destroy();
 	});
 
-	QUnit.test("Header element should be rendered when ValueStateHeader has visible content", async function (assert) {
+	QUnit.test("Header element should expose a banner landmark when ValueStateHeader has visible content", async function (assert) {
 		const oValueStateHeader = new ValueStateHeader({
 			valueState: "Error",
 			text: "Error message"
@@ -2547,6 +2548,7 @@ sap.ui.define([
 
 		const oHeaderElement = this.oPopover.getDomRef().querySelector(".sapMPopoverHeader");
 		assert.ok(oHeaderElement, "Header element should be rendered when ValueStateHeader has visible content");
+		assert.strictEqual(oHeaderElement.getAttribute("role"), null, "Header with visible content exposes its default banner landmark");
 
 		oValueStateHeader.destroy();
 	});

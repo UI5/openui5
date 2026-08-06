@@ -128,35 +128,41 @@ sap.ui.define([
 
 			// Header
 			if (oHeader) {
-				const bShouldRenderHeader = !oHeader.isA("sap.m.ValueStateHeader") || oHeader._hasVisibleContent();
-				if (bShouldRenderHeader) {
-					oRm.openStart("header")
-					.class("sapMPopoverHeader")
-					.openEnd();
+				oRm.openStart("header")
+					.class("sapMPopoverHeader");
 
-					if (oHeader._applyContextClassFor) {
-						oHeader._applyContextClassFor("header");
-					}
-					oRm.renderControl(oHeader);
-					oRm.close("header");
+				// An empty ValueStateHeader would expose an empty "banner" landmark to screen readers.
+				// Keep the element in the DOM (stable structure for the DOM patcher) but drop the landmark role.
+				if (oHeader.isA("sap.m.ValueStateHeader") && !oHeader._hasVisibleContent()) {
+					oRm.attr("role", "presentation");
 				}
+
+				oRm.openEnd();
+
+				if (oHeader._applyContextClassFor) {
+					oHeader._applyContextClassFor("header");
+				}
+				oRm.renderControl(oHeader);
+				oRm.close("header");
 			}
 
 			// Sub header
 			if (oSubHeader) {
-				const bShouldRenderSubHeader = !oSubHeader.isA("sap.m.ValueStateHeader") || oSubHeader._hasVisibleContent();
-				if (bShouldRenderSubHeader) {
-					oRm.openStart("header")
-					.class("sapMPopoverSubHeader")
-					.openEnd();
+				oRm.openStart("header")
+					.class("sapMPopoverSubHeader");
 
-					if (oSubHeader._applyContextClassFor) {
-						oSubHeader._applyContextClassFor("subheader");
-					}
-
-					oRm.renderControl(oSubHeader);
-					oRm.close("header");
+				if (oSubHeader.isA("sap.m.ValueStateHeader") && !oSubHeader._hasVisibleContent()) {
+					oRm.attr("role", "presentation");
 				}
+
+				oRm.openEnd();
+
+				if (oSubHeader._applyContextClassFor) {
+					oSubHeader._applyContextClassFor("subheader");
+				}
+
+				oRm.renderControl(oSubHeader);
+				oRm.close("header");
 			}
 
 			// content container
