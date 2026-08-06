@@ -86,6 +86,7 @@ sap.ui.define([
 		 */
 		async loadVariants(mPropertyBag) {
 			const oControl = mPropertyBag.control;
+			const oVMControl = oControl.getVariantManagement?.() || oControl;
 			const sReference = ManifestUtils.getFlexReferenceForControl(oControl);
 			const sPersistencyKey = CompVariantUtils.getPersistencyKey(oControl);
 
@@ -104,7 +105,7 @@ sap.ui.define([
 			const oLoaderData = Loader.getCachedFlexData(sReference);
 			const aControlsWithRemovedVariants = oLoaderData?.parameters?.nonFavoriteVariantsRemoved;
 			if (aControlsWithRemovedVariants?.includes(sPersistencyKey)) {
-				oControl.setDynamicVariantsLoadedCallback(async () => {
+				oVMControl.setDynamicVariantsLoadedCallback(async () => {
 					if (FlexState.getLazyVariantsLoaded(sReference).includes(sPersistencyKey)) {
 						return;
 					}
@@ -118,7 +119,7 @@ sap.ui.define([
 						newData: oResponse
 					}).filter((oNewFlexObject) => oNewFlexObject.getFileType() === "variant");
 					// New variants need to be explicitly added to the control
-					oControl.addVariants(aNewVariants);
+					oVMControl.addVariants(aNewVariants);
 					FlexState.addLazyVariantsLoaded(sReference, sPersistencyKey);
 				});
 			}
