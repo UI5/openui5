@@ -2,10 +2,12 @@
 
 sap.ui.define([
 	"sap/ui/integration/widgets/Card",
-	"qunit/testResources/nextCardManifestReadyEvent"
+	"qunit/testResources/nextCardManifestReadyEvent",
+	"sap/base/Log"
 ], function (
 	Card,
-	nextCardManifestReadyEvent
+	nextCardManifestReadyEvent,
+	Log
 ) {
 	"use strict";
 
@@ -282,14 +284,41 @@ sap.ui.define([
 	});
 
 	QUnit.test("Returns empty array when called before manifest is ready", function (assert) {
+		// Arrange
+		const oLogSpy = this.spy(Log, "error");
 		this.oCard = new Card({
 			manifest: oManifestContextInParams
 		});
 
-		// Call before manifest is ready - should return empty array
+		// Act - call before manifest is ready - should return empty array
 		const aDeps = this.oCard.getContextDependencies();
 
+		// Assert
 		assert.deepEqual(aDeps, [], "Should return empty array when manifest is not ready");
+		assert.ok(oLogSpy.calledOnce, "Error logged when called before manifest ready");
+		assert.ok(oLogSpy.calledWith("The manifest is not ready. Consider using the 'manifestReady' event.", "sap.ui.integration.widgets.Card"), "Correct error message");
+	});
+
+	QUnit.test("Returns empty array when the card is destroyed", async function (assert) {
+		// Arrange
+		this.oCard = new Card({
+			manifest: oManifestContextInParams
+		});
+		this.oCard.startManifestProcessing();
+		await nextCardManifestReadyEvent(this.oCard);
+
+		// Sanity check that dependencies are found while the manifest is ready
+		assert.strictEqual(this.oCard.getContextDependencies().length, 2, "Precondition: dependencies are found before destroy");
+
+		const oLogSpy = this.spy(Log, "error");
+
+		// Act
+		this.oCard.destroy();
+		const aDeps = this.oCard.getContextDependencies();
+
+		// Assert
+		assert.deepEqual(aDeps, [], "Should return empty array when the card is destroyed");
+		assert.ok(oLogSpy.calledOnce, "Error logged when called on a destroyed card");
 	});
 
 	QUnit.test("Returns context paths when manifest is ready", async function (assert) {

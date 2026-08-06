@@ -7,6 +7,7 @@ sap.ui.define([
 		"sap/ui/integration/cards/actions/CardActions",
 		"sap/ui/integration/cards/actions/NavigationAction",
 		"sap/ui/integration/cards/actions/SubmitAction",
+		"sap/ui/integration/cards/actions/CustomAction",
 		"sap/ui/integration/util/RequestDataProvider",
 		"sap/ui/integration/Host",
 		"sap/ui/core/Element",
@@ -24,6 +25,7 @@ sap.ui.define([
 		CardActions,
 		NavigationAction,
 		SubmitAction,
+		CustomAction,
 		RequestDataProvider,
 		Host,
 		Element,
@@ -998,6 +1000,46 @@ sap.ui.define([
 			assert.ok(oStubRequest.called, "DataProvider's getData should have been called.");
 			assert.ok(oSpyActionHandler.called, "Submit Action's handler should have been called.");
 			assert.deepEqual(oSpyActionHandler.thisValues[0].getParameters(), mEventArguments.parameters, "Submit Action's handler should have been called with the event configuration.");
+		});
+
+		QUnit.test("Custom action handler", async function (assert) {
+			var oSpyActionHandler = this.spy(CustomAction.prototype, "execute"),
+				oActionFnSpy = this.spy();
+
+			// Setup
+			this.oCard.setManifest(oManifestActionSubmit);
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			const mEventArguments = {
+				card: this.oCard,
+				host: null,
+				action: {
+					type: CardActionType.Custom,
+					action: oActionFnSpy
+				},
+				parameters: {
+					param1: "test"
+				},
+				source: this.oCard.getCardContent()
+			};
+
+			var fnActionAssert = (oEvent) => {
+				// Assert - the Custom action type also provides formData (CardActions.fireAction)
+				assert.deepEqual(oEvent.getParameter("formData"), this.oCard.getModel("form").getData(), "The 'formData' parameter is passed for Custom actions.");
+				assert.strictEqual(oEvent.getParameter("type"), CardActionType.Custom, "The action type is Custom.");
+			};
+			this.oCard.attachAction(fnActionAssert);
+
+			// Act
+			CardActions.fireAction(mEventArguments);
+			await nextUIUpdate();
+
+			// Assert
+			assert.ok(oSpyActionHandler.called, "Custom Action's handler should have been called.");
+			assert.ok(oActionFnSpy.calledWith(this.oCard, this.oCard.getCardContent()), "The custom action function is called with the card and the source.");
 		});
 
 		QUnit.test("Submit action handler at the Host", async function (assert) {

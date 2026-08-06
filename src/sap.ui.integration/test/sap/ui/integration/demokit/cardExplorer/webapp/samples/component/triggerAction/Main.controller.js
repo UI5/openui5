@@ -7,7 +7,7 @@ sap.ui.define([
 		handleSeeDetails: function () {
 			var oComponent = this.getOwnerComponent(),
 				oCard = oComponent.oCard,
-				oParams = oCard.getCombinedParameters(),
+				oParams = oCard.getResolvedParameters(),
 				sProductName = oParams.productName;
 
 			oCard.triggerAction({

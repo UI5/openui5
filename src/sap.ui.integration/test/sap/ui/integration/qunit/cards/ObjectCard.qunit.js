@@ -3902,10 +3902,11 @@ sap.ui.define([
 		assert.strictEqual(aValidationRecords[0].message, "Field is required.", "Validation error message is correct");
 		assert.strictEqual(aValidationRecords[0].type, "Error", "Validation error type is correct");
 
-		this.oCard.validateControls();
+		const bValid = this.oCard.validateControls();
 
 		await nextUIUpdate();
 
+		assert.strictEqual(bValid, false, "validateControls returns false when there is a required field without value");
 		assert.strictEqual(oRadioButtonGroup.getValueState(), ValueState.Error, "RadioButtonGroup shows error state after validation");
 	});
 
@@ -3921,10 +3922,11 @@ sap.ui.define([
 
 		await nextUIUpdate();
 
-		this.oCard.validateControls();
+		const bValid = this.oCard.validateControls();
 
 		await nextUIUpdate();
 
+		assert.strictEqual(bValid, true, "validateControls returns true when all required fields are valid");
 		assert.strictEqual(this.oCard.getModel("messages").getProperty("/hasErrors"), false, "Form has no validation errors after selection");
 		assert.strictEqual(this.oCard.getModel("messages").getProperty("/records").length, 0, "No validation error records remain");
 		assert.strictEqual(oRadioButtonGroup.getValueState(), ValueState.None, "RadioButtonGroup shows no error state after valid selection");
@@ -4236,6 +4238,36 @@ sap.ui.define([
 		assert.ok(aGroup1Label2.$().hasClass("sapMLabelWrapped"), "Second label is wrapped when labelWrapping is set to true");
 		assert.notOk(aGroup2Label1.$().hasClass("sapMLabelWrapped"), "First label is not wrapped when labelWrapping is set to false");
 		assert.notOk(aGroup2Label2.$().hasClass("sapMLabelWrapped"), "Second label is not wrapped when labelWrapping is set to false");
+	});
+
+	QUnit.test("labelWrapping defaults to true when not specified", async function (assert) {
+		this.oCard.setManifest({
+			"sap.app": {
+				"type": "card",
+				"id": "test.object.card.labelWrappingDefault"
+			},
+			"sap.card": {
+				"type": "Object",
+				"content": {
+					"groups": [{
+						"title": "Group without labelWrapping specified",
+						"items": [{
+							"label": "Some very very long label that should wrap by default"
+						}]
+					}]
+				}
+			}
+		});
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		var oContent = this.oCard.getCardContent(),
+			aGroups = oContent.getAggregation("_content").getItems()[0].getContent(),
+			oLabel = aGroups[0].getItems()[1];
+
+		assert.ok(oLabel.getWrapping(), "Label has wrapping=true by default");
+		assert.ok(oLabel.$().hasClass("sapMLabelWrapped"), "Label is wrapped by default when labelWrapping is not specified");
 	});
 
 	QUnit.module("Forms Extension Validation", {

@@ -10,8 +10,8 @@ sap.ui.define(['sap/ui/core/UIComponent'],
 			// Holds the card for use inside the controller
 			this.card = oCard;
 
-			// Can get all parameters with method getCombinedParameters
-			oCard.getCombinedParameters();
+			// Can get all parameters with method getResolvedParameters
+			oCard.getResolvedParameters();
 
 			// Get any section of the card manifest with method getManifestEntry
 			oCard.getManifestEntry("/sap.card");

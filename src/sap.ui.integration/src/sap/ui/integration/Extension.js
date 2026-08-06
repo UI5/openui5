@@ -47,7 +47,7 @@ sap.ui.define([
 
 				/**
 				 * The formatters that can be used in the manifest.
-				 * @ui5-experimental-since 1.79
+				 * @since 1.79
 				 */
 				formatters: {
 					type: "object"
@@ -61,7 +61,7 @@ sap.ui.define([
 				 * When an action is triggered in the card it can be handled on several places by "action" event handlers. In consecutive order those places are: <code>Extension</code>, <code>Card</code>, <code>Host</code>.
 				 * Each of them can prevent the next one to handle the action by calling <code>oEvent.preventDefault()</code>.
 				 *
-				 * @ui5-experimental-since 1.75
+				 * @since 1.75
 				 */
 				action: {
 
@@ -186,9 +186,14 @@ sap.ui.define([
 	/**
 	 * Override this method to lazy load dependencies for the extension.
 	 *
+	 * The card waits for the returned promise to resolve before it continues with its initialization.
+	 * If the promise is rejected, the card initialization fails and an error message is shown.
+	 *
+	 * The default implementation loads no dependencies and returns an already resolved promise.
+	 *
 	 * @public
-	 * @ui5-experimental-since 1.108
-	 * @returns {Promise} Returns a promise. The card will wait for this promise to be resolved before continuing with the initialization.
+	 * @since 1.108
+	 * @returns {Promise<any>} A promise which resolves when all dependencies of the extension are loaded.
 	 */
 	Extension.prototype.loadDependencies = function () {
 		return Promise.resolve();
@@ -207,8 +212,9 @@ sap.ui.define([
 	 * Starts the process of fetching a resource from the network, returning a promise that is fulfilled once the response is available.
 	 * Use this method to override the default behavior when fetching network resources.
 	 * Mimics the browser native Fetch API.
-	 * @public
-	 * @ui5-experimental-since 1.113
+	 * @private
+	 * @ui5-restricted sap.insights
+	 * @since 1.113
 	 * @param {string} sResource This defines the resource that you wish to fetch.
 	 * @param {object} mOptions An object containing any custom settings that you want to apply to the request.
 	 * @param {object} mRequestSettings The map of request settings defined in the card manifest. Use this only for reading, they can not be modified.

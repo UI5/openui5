@@ -25,7 +25,7 @@ sap.ui.define([
 			});
 
 			this.attachAction(function (oEvent) {
-				Log.error("Action handled in the Extension:" + JSON.stringify(oEvent.getParameters().parameters) + " card city: " + this.getCard().getCombinedParameters().city);
+				Log.error("Action handled in the Extension:" + JSON.stringify(oEvent.getParameters().parameters) + " card city: " + this.getCard().getResolvedParameters().city);
 			}.bind(this));
 		},
 		onCardReady: function () {
@@ -80,7 +80,7 @@ sap.ui.define([
 			var p1 = new Promise(function (resolve, reject) {
 				setTimeout(function () {
 					var cities = [],
-						city = oCard.getCombinedParameters().city;
+						city = oCard.getResolvedParameters().city;
 
 					if (city === "Berlin") {
 						cities.push({ city: "Tokyo", description: "I'm from hardcoded array" });

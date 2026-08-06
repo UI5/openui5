@@ -64,7 +64,6 @@ sap.ui.define([
 						key: 'headerInfoSection',
 						target: 'exploreSamples',
 						title: 'Extended - Info Section',
-						experimental: true,
 						subSamples: [
 							{
 								title: 'Numeric Header',
@@ -501,7 +500,6 @@ sap.ui.define([
 							{
 								title: 'Content Title Max Lines and Label Wrapping',
 								key: 'titleMaxLinesAndLabelWrapping',
-								experimental: true,
 								settings: {
 									columns: 5
 								},
@@ -558,7 +556,6 @@ sap.ui.define([
 							{
 								title: 'Image',
 								key: 'objectCardWithImage',
-								experimental: true,
 								settings: {
 									columns: 4
 								},
@@ -579,7 +576,6 @@ sap.ui.define([
 							{
 								title: 'Image with Overlay',
 								key: 'objectCardWithImageWithOverlay',
-								experimental: true,
 								settings: {
 									columns: 8
 								},
@@ -600,7 +596,6 @@ sap.ui.define([
 							{
 								title: 'Image with Fallback',
 								key: 'objectCardWithFallbackImage',
-								experimental: true,
 								settings: {
 									columns: 4
 								},
@@ -621,7 +616,6 @@ sap.ui.define([
 							{
 								title: 'Horizontal Items Layout',
 								key: 'horizontalItemsLayout',
-								experimental: true,
 								settings: {
 									columns: 8
 								},
@@ -1925,7 +1919,6 @@ sap.ui.define([
 						title: 'ComboBox',
 						target: 'exploreSamples',
 						key: 'comboBoxFilter',
-						experimental: true,
 						subSamples: [
 							{
 								title: 'Dynamically Defined Filter',
@@ -1984,7 +1977,6 @@ sap.ui.define([
 						title: 'DateRange',
 						target: 'exploreSamples',
 						key: 'dateRangeFilter',
-						experimental: true,
 						subSamples: [
 							{
 								title: 'My Activities',
@@ -2306,7 +2298,6 @@ sap.ui.define([
 								title: 'OData Batch Request',
 								key: 'batchRequest',
 								mockServer: true,
-								experimental: true,
 								files: [
 									{
 										url: '/samples/data/batchRequest/manifest.json',
@@ -2370,7 +2361,6 @@ sap.ui.define([
 							{
 								title: 'Model Size Limit',
 								key: 'modelSizeLimit',
-								experimental: true,
 								files: [
 									{
 										url: '/samples/data/modelSizeLimit/manifest.json',
@@ -2391,12 +2381,10 @@ sap.ui.define([
 						key: 'dataTimestamp',
 						target: 'exploreSamples',
 						title: 'Data Timestamp',
-						experimental: true,
 						subSamples: [
 							{
 								title: 'Default Header',
 								key: 'defaultHeader',
-								experimental: true,
 								settings: {
 									rows: 5,
 									columns: 4
@@ -2413,7 +2401,6 @@ sap.ui.define([
 							{
 								title: 'Numeric Header',
 								key: 'numericHeader',
-								experimental: true,
 								settings: {
 									rows: 5,
 									columns: 4
@@ -2426,23 +2413,6 @@ sap.ui.define([
 										editable: true
 									}
 								]
-							}
-						]
-					},
-					{
-						key: 'dateRange',
-						target: 'exploreSamples',
-						title: 'Date Ranges',
-						experimental: true,
-						settings: {
-							columns: 7
-						},
-						files: [
-							{
-								url: '/samples/dateRanges/card1/manifest.json',
-								name: 'manifest.json',
-								key: 'manifest.json',
-								editable: true
 							}
 						]
 					},
@@ -2658,29 +2628,6 @@ sap.ui.define([
 								]
 							},
 							{
-								title: 'Shared Extension With Fetch',
-								key: 'sharedFetchExtension',
-								experimental: true,
-								files: [
-									{
-										url: '/samples/extension/sharedFetchExtension/manifest.json',
-										name: 'manifest.json',
-										key: 'manifest.json',
-										editable: true
-									},
-									{
-										url: '/samples/extension/shared/lib/library.js',
-										name: 'shared/lib/library.js',
-										key: 'shared/lib/library.js'
-									},
-									{
-										url: '/samples/extension/shared/lib/SharedFetchExtension.js',
-										name: 'shared/lib/SharedFetchExtension.js',
-										key: 'shared/lib/SharedFetchExtension.js'
-									}
-								]
-							},
-							{
 								title: 'Translation',
 								key: 'translation',
 								files: [
@@ -2713,12 +2660,10 @@ sap.ui.define([
 						key: 'microCharts',
 						target: 'exploreSamples',
 						title: 'Micro Charts',
-						experimental: true,
 						subSamples: [
 							{
 								title: 'Line Chart',
 								key: 'lineChart',
-								experimental: true,
 								files: [
 									{
 										url: '/samples/microCharts/lineChart/manifest.json',
@@ -2736,7 +2681,6 @@ sap.ui.define([
 							{
 								title: 'Bullet Chart',
 								key: 'bulletChart',
-								experimental: true,
 								files: [
 									{
 										url: '/samples/microCharts/bulletChart/manifest.json',
@@ -2754,7 +2698,6 @@ sap.ui.define([
 							{
 								title: 'Column Chart',
 								key: 'columnChart',
-								experimental: true,
 								files: [
 									{
 										url: '/samples/microCharts/columnChart/manifest.json',
@@ -2772,7 +2715,6 @@ sap.ui.define([
 							{
 								title: 'Harvey Ball Chart',
 								key: 'harveyBallChart',
-								experimental: true,
 								files: [
 									{
 										url: '/samples/microCharts/harveyBallChart/manifest.json',
@@ -2790,7 +2732,6 @@ sap.ui.define([
 							{
 								title: 'Radial Chart',
 								key: 'radialChart',
-								experimental: true,
 								files: [
 									{
 										url: '/samples/microCharts/radialChart/manifest.json',
@@ -2808,7 +2749,6 @@ sap.ui.define([
 							{
 								title: 'Stacked Bar Chart',
 								key: 'stackedBar',
-								experimental: true,
 								files: [
 									{
 										url: '/samples/microCharts/stackedBar/manifest.json',
@@ -2826,7 +2766,6 @@ sap.ui.define([
 							{
 								title: 'Stacked Bar Chart with Zero Values',
 								key: 'stackedBarZeroValues',
-								experimental: true,
 								files: [
 									{
 										url: '/samples/microCharts/stackedBarZeroValues/manifest.json',
@@ -3432,6 +3371,22 @@ sap.ui.define([
 										editable: true
 									}
 								]
+							}
+						]
+					},
+					{
+						key: 'dateRange',
+						target: 'exploreSamples',
+						title: 'Date Ranges',
+						settings: {
+							columns: 7
+						},
+						files: [
+							{
+								url: '/samples/dateRanges/card1/manifest.json',
+								name: 'manifest.json',
+								key: 'manifest.json',
+								editable: true
 							}
 						]
 					},
@@ -4197,7 +4152,6 @@ sap.ui.define([
 						title: 'Host Context',
 						useIFrame: true,
 						isApplication: true,
-						experimental: true,
 						files: [
 							{
 								url: '/samples/hostContext/indexTemplate.html',

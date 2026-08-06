@@ -8,6 +8,7 @@ sap.ui.define([
 	"sap/m/library",
 	"sap/m/Button",
 	"sap/ui/core/Control",
+	"sap/ui/core/library",
 	"sap/ui/core/format/DateFormat",
 	"sap/ui/core/date/UniversalDate",
 	"sap/ui/qunit/QUnitUtils",
@@ -23,6 +24,7 @@ sap.ui.define([
 	mLibrary,
 	Button,
 	Control,
+	coreLibrary,
 	DateFormat,
 	UniversalDate,
 	QUnitUtils,
@@ -35,8 +37,10 @@ sap.ui.define([
 
 	const DOM_RENDER_LOCATION = "qunit-fixture";
 	const AvatarColor = mLibrary.AvatarColor;
+	const AvatarSize = mLibrary.AvatarSize;
 	const ValueColor = mLibrary.ValueColor;
 	const WrappingType = mLibrary.WrappingType;
+	const ValueState = coreLibrary.ValueState;
 
 	const sLongText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum congue libero ut blandit faucibus. Phasellus sed urna id tortor consequat accumsan eget at leo. Cras quis arcu magna.";
 
@@ -191,6 +195,108 @@ sap.ui.define([
 		oHeader.destroy();
 	});
 
+	QUnit.test("Header and NumericHeader iconSize", async function (assert) {
+		// Arrange
+		const oHeader = new CardHeader({
+				iconSrc: "sap-icon://accept",
+				iconSize: AvatarSize.L
+			}),
+			oNumericHeader = new CardNumericHeader({
+				iconSrc: "sap-icon://accept",
+				iconSize: AvatarSize.L
+			});
+
+		// Act
+		oHeader.placeAt(DOM_RENDER_LOCATION);
+		oNumericHeader.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(oHeader._getAvatar().getDisplaySize(), AvatarSize.L, "The iconSize is applied to the avatar of the Header");
+		assert.strictEqual(oNumericHeader._getAvatar().getDisplaySize(), AvatarSize.L, "The iconSize is applied to the avatar of the NumericHeader");
+
+		// Clean up
+		oHeader.destroy();
+		oNumericHeader.destroy();
+	});
+
+	QUnit.test("Header and NumericHeader iconAlt", async function (assert) {
+		// Arrange
+		const sIconAlt = "Icon alt text",
+			oHeader = new CardHeader({
+				iconSrc: "sap-icon://accept",
+				iconAlt: sIconAlt
+			}),
+			oNumericHeader = new CardNumericHeader({
+				iconSrc: "sap-icon://accept",
+				iconAlt: sIconAlt
+			});
+
+		// Act
+		oHeader.placeAt(DOM_RENDER_LOCATION);
+		oNumericHeader.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(oHeader._getAvatar().getTooltip(), sIconAlt, "The iconAlt is applied as tooltip to the avatar of the Header");
+		assert.strictEqual(oNumericHeader._getAvatar().getTooltip(), sIconAlt, "The iconAlt is applied as tooltip to the avatar of the NumericHeader");
+
+		// Clean up
+		oHeader.destroy();
+		oNumericHeader.destroy();
+	});
+
+	QUnit.test("Header and NumericHeader titleMaxLines", async function (assert) {
+		// Arrange
+		const oHeader = new CardHeader({
+				title: sLongText,
+				titleMaxLines: 5
+			}),
+			oNumericHeader = new CardNumericHeader({
+				title: sLongText,
+				titleMaxLines: 5
+			});
+
+		// Act
+		oHeader.placeAt(DOM_RENDER_LOCATION);
+		oNumericHeader.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(oHeader.getAggregation("_title").getMaxLines(), 5, "The titleMaxLines is applied to the inner title of the Header");
+		assert.strictEqual(oNumericHeader.getAggregation("_title").getMaxLines(), 5, "The titleMaxLines is applied to the inner title of the NumericHeader");
+
+		// Clean up
+		oHeader.destroy();
+		oNumericHeader.destroy();
+	});
+
+	QUnit.test("NumericHeader detailsState", async function (assert) {
+		// Arrange
+		const oHeader = new CardNumericHeader({
+			details: "Details",
+			detailsState: ValueState.Error
+		});
+
+		// Act
+		oHeader.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Assert
+		assert.ok(oHeader._getDetails().hasStyleClass("sapFCardNumericHeaderDetailsStateError"), "The detailsState style class is applied to the details control");
+
+		// Act - change the state
+		oHeader.setDetailsState(ValueState.Success);
+		await nextUIUpdate();
+
+		// Assert
+		assert.notOk(oHeader._getDetails().hasStyleClass("sapFCardNumericHeaderDetailsStateError"), "The old detailsState style class is removed from the details control");
+		assert.ok(oHeader._getDetails().hasStyleClass("sapFCardNumericHeaderDetailsStateSuccess"), "The new detailsState style class is applied to the details control");
+
+		// Clean up
+		oHeader.destroy();
+	});
+
 	QUnit.test("Header and NumericHeader dataTimestamp", async function (assert) {
 		// Arrange
 		this.clock = sinon.useFakeTimers();
@@ -339,6 +445,24 @@ sap.ui.define([
 	QUnit.test("Default Header with iconVisibility false", async function (assert) {
 		// Arrange
 		const oHeader = new CardHeader({
+			iconSrc: "sap-icon://accept",
+			iconVisible: false
+		});
+
+		// Act
+		oHeader.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(!!oHeader.$().find(".sapFCardHeaderImage").length, false, "Icon is not visible");
+
+		// Clean up
+		oHeader.destroy();
+	});
+
+	QUnit.test("Numeric Header with iconVisibility false", async function (assert) {
+		// Arrange
+		const oHeader = new CardNumericHeader({
 			iconSrc: "sap-icon://accept",
 			iconVisible: false
 		});
@@ -659,6 +783,33 @@ sap.ui.define([
 
 		// Assert
 		assert.ok(fnPressHandler.notCalled, "Tapping the header with href should NOT result in press event");
+
+		// Clean up
+		oCard.destroy();
+	});
+
+	QUnit.test("Header with href and target renders as a link", async function (assert) {
+		// Arrange
+		const oHeader = new CardNumericHeader({
+			title: "Title",
+			href: "https://www.sap.com",
+			target: "_blank"
+		}),
+			oCard = new Card({
+				header: oHeader
+			});
+
+		// Act
+		oCard.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Assert
+		assert.ok(oHeader.isLink(), "isLink returns true when href is set");
+		const oFocusableDomRef = oHeader.getFocusDomRef();
+		assert.strictEqual(oFocusableDomRef.tagName.toLowerCase(), "a", "The focusable element is rendered as an anchor element");
+		assert.strictEqual(oFocusableDomRef.getAttribute("href"), "https://www.sap.com", "The href attribute is rendered correctly");
+		assert.strictEqual(oFocusableDomRef.getAttribute("target"), "_blank", "The target attribute is rendered correctly");
+		assert.strictEqual(oFocusableDomRef.getAttribute("rel"), "noopener noreferrer", "The rel attribute is rendered correctly");
 
 		// Clean up
 		oCard.destroy();

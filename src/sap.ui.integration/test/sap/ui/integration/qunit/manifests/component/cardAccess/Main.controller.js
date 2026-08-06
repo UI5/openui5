@@ -6,7 +6,7 @@ sap.ui.define([
 	return Controller.extend("test.manifest.component.cardAccess.Main", {
 		onInit: function () {
 			var oComponent = this.getOwnerComponent(),
-				oParameters = oComponent.card.getCombinedParameters(),
+				oParameters = oComponent.card.getResolvedParameters(),
 				sCity = oParameters.city;
 
 			this.byId("cityValue").setText(sCity);

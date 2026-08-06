@@ -11,7 +11,7 @@ sap.ui.define(["sap/ui/integration/Extension"], function (Extension) {
 		return oCard.request({
 			url: "{{destinations.Northwind_V4}}/Orders",
 			parameters: {
-				$top: oCard.getCombinedParameters().maxOrdersShown,
+				$top: oCard.getResolvedParameters().maxOrdersShown,
 				$filter: "Shipper/ShipperID eq " + selectedShipper + " and contains(ShipCountry, '" + countryQuery + "')"
 			}
 		});
