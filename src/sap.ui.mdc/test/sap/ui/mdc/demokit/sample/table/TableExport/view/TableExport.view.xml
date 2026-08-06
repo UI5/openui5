@@ -51,6 +51,17 @@
 					<Text text="{mountains>countries}"/>
 				</mdct:Column>
 				<mdct:Column
+					propertyKey="countryList"
+					header="Countries (Tokens)">
+					<MultiInput
+						editable="false"
+						tokens="{mountains>countryList}">
+						<tokens>
+							<Token text="{mountains>name} ({mountains>code})"/>
+						</tokens>
+					</MultiInput>
+				</mdct:Column>
+				<mdct:Column
 					propertyKey="parent_mountain"
 					header="Parent Mountain">
 					<Text text="{mountains>parent_mountain}"/>
