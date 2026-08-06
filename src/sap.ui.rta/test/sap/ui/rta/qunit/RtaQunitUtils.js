@@ -279,6 +279,20 @@ sap.ui.define([
 					getUser() {},
 					getCurrentApplication() {}
 				});
+			},
+			getRenderer() {
+				return {
+					getRootControl() {
+						return {
+							getShellHeader() {
+								return {
+									addStyleClass: () => {},
+									removeStyleClass: () => {}
+								};
+							}
+						};
+					}
+				};
 			}
 		});
 		RtaQunitUtils.stubSapUiRequire(sandbox, [{

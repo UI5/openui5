@@ -7,14 +7,17 @@ sap.ui.define([
 	"sap/m/Image",
 	"sap/ui/rta/toolbar/Adaptation",
 	"sap/ui/rta/toolbar/AdaptationRenderer",
-	"sap/ui/rta/Utils"
+	"sap/ui/fl/Utils"
 ], function(
 	Log,
 	Image,
 	Adaptation,
-	AdaptationRenderer
+	AdaptationRenderer,
+	Utils
 ) {
 	"use strict";
+
+	const FIORI_HIDDEN_CLASS = "sapUiRtaFioriHeaderInvisible";
 
 	/**
 	 * This class is being assigned to the original Fiori Header Toolbar when RTA Toolbar shows
@@ -50,12 +53,20 @@ sap.ui.define([
 		type: "fiori"
 	});
 
+	function getFiori2Renderer() {
+		var oContainer = Utils.getUshellContainer() || {};
+		return typeof oContainer.getRenderer === "function" ? oContainer.getRenderer("fiori2") : undefined;
+	}
+
 	Fiori.prototype.init = function(...aArgs) {
+		// TODO: Remove, as this does not work in legacy-free
+		this._oRenderer = getFiori2Renderer();
+		this._oFioriHeader = this._oRenderer.getRootControl().getShellHeader();
 		Adaptation.prototype.init.apply(this, aArgs);
 	};
 
 	Fiori.prototype.show = function(...aArgs) {
-		this.getUshellApi().setShellHeaderVisibility(false);
+		this._oFioriHeader.addStyleClass(FIORI_HIDDEN_CLASS);
 		return Adaptation.prototype.show.apply(this, aArgs);
 	};
 
@@ -93,7 +104,7 @@ sap.ui.define([
 	 */
 	Fiori.prototype.hide = async function(...aArgs) {
 		await Adaptation.prototype.hide.apply(this, aArgs);
-		this.getUshellApi().setShellHeaderVisibility(true);
+		this._oFioriHeader.removeStyleClass(FIORI_HIDDEN_CLASS);
 	};
 
 	Fiori.prototype._checkLogoSize = function(oLogo, iWidth, iHeight) {
@@ -111,7 +122,7 @@ sap.ui.define([
 
 	Fiori.prototype.destroy = function(...aArgs) {
 		// In case of destroy() without normal hide() call
-		this.getUshellApi().setShellHeaderVisibility(true);
+		this._oFioriHeader.removeStyleClass(FIORI_HIDDEN_CLASS);
 
 		Adaptation.prototype.destroy.apply(this, aArgs);
 	};

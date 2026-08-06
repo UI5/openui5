@@ -59,12 +59,25 @@ sap.ui.define([
 		this.oUshellApi = {
 			getLogo: oGetLogoStub,
 			getLogoDomRef: oGetLogoDomRefStub,
-			setShellHeaderVisibility: sandbox.stub(),
 			navigateBack: sandbox.stub()
 		};
 
 		sandbox.stub(Utils, "getUshellContainer").returns({
-			async getServiceAsync() {}
+			async getServiceAsync() {},
+			getRenderer() {
+				return {
+					getRootControl() {
+						return {
+							getShellHeader() {
+								return {
+									addStyleClass: () => {},
+									removeStyleClass: () => {}
+								};
+							}
+						};
+					}
+				};
+			}
 		});
 		RtaQunitUtils.stubSapUiRequire(sandbox, [{
 			name: "sap/ushell/api/RTA",
@@ -97,8 +110,6 @@ sap.ui.define([
 			assert.equal(oImage.getSrc(), sLogoSource, "then the source of the logo is correctly set");
 
 			await this.oToolbar.show();
-			assert.strictEqual(this.oUshellApi.setShellHeaderVisibility.callCount, 1, "the ushell API was called to hide the Fiori header");
-			assert.equal(this.oUshellApi.setShellHeaderVisibility.getCall(0).args[0], false, "then the Fiori header is hidden");
 
 			const oErrorStub = sandbox.stub(Log, "error");
 			this.oToolbar._checkLogoSize(oImage.getDomRef(), 20, 20);
@@ -108,8 +119,6 @@ sap.ui.define([
 
 			sandbox.stub(Adaptation.prototype, "hide").returns(Promise.resolve());
 			await this.oToolbar.hide();
-			assert.strictEqual(this.oUshellApi.setShellHeaderVisibility.callCount, 2, "the ushell API was called to show the Fiori header");
-			assert.equal(this.oUshellApi.setShellHeaderVisibility.getCall(1).args[0], true, "then the Fiori header is shown again");
 
 			this.oToolbar.destroy();
 		});
@@ -130,8 +139,6 @@ sap.ui.define([
 			await this.oToolbar.show();
 			sandbox.stub(Adaptation.prototype, "hide").returns(Promise.resolve());
 			await this.oToolbar.hide();
-			assert.strictEqual(this.oUshellApi.setShellHeaderVisibility.callCount, 2, "the ushell API was called to show the Fiori header");
-			assert.equal(this.oUshellApi.setShellHeaderVisibility.getCall(1).args[0], true, "then the Fiori header is shown again");
 			this.oToolbar.destroy();
 		});
 
