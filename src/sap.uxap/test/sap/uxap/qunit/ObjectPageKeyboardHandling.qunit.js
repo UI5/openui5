@@ -11,11 +11,13 @@ sap.ui.define([
 	"sap/ui/events/F6Navigation",
 	"sap/ui/core/mvc/XMLView",
 	"sap/uxap/ObjectPageLayout",
+	"sap/uxap/ObjectPageSection",
 	"sap/uxap/ObjectPageSubSection",
 	"sap/m/OverflowToolbar",
+	"sap/m/Text",
 	"sap/ui/dom/jquery/Focusable" /* jQuery Plugin "firstFocusableDomRef" */
 ],
-function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes, QUtils, Device, F6Navigation, XMLView, ObjectPageLayout, ObjectPageSubSection, OverflowToolbar) {
+function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes, QUtils, Device, F6Navigation, XMLView, ObjectPageLayout, ObjectPageSection, ObjectPageSubSection, OverflowToolbar, Text) {
 	"use strict";
 
 	const sAnchorSelector = ".sapUxAPObjectPageNavigation .sapMITBHead .sapMITBFilter";
@@ -342,6 +344,71 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 
 		this.assertCorrectTabIndex(oContactSubSection.$(), "Given a previously selected sub section, " +
 			"the first focusable sub section should be the first one in the container section", assert);
+	});
+
+	QUnit.test("TAB/click - single section is not focusable (no navigation)", async function (assert) {
+		// Arrange - an ObjectPageLayout with only one section => the anchorBar is hidden
+		const oObjectPage = new ObjectPageLayout({
+			sections: [
+				new ObjectPageSection({
+					title: "Section 1",
+					subSections: [
+						new ObjectPageSubSection({
+							title: "SubSection 1",
+							blocks: [new Text({ text: "Content" })]
+						})
+					]
+				})
+			]
+		});
+		oObjectPage.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oSection1 = oObjectPage.getSections()[0];
+
+		// Assert - with a single section, no tabindex is set,
+		// so the section is not focusable via TAB nor via mouse click
+		assert.strictEqual(oSection1.$().attr("tabindex"), undefined,
+			"When there is only one section, it should not have a tabindex attribute");
+
+		// Act - try to focus the section programmatically (as a mouse click on it would)
+		oSection1.getDomRef().focus();
+
+		// Assert - focus falls through to the body, proving the single section
+		// cannot receive focus (rather than focus landing elsewhere by chance)
+		assert.strictEqual(document.activeElement, document.body,
+			"Focus falls through to the body - the single section cannot receive focus");
+
+		// Act - add a second section => the navigation becomes visible again
+		const oSection2 = new ObjectPageSection({
+			title: "Section 2",
+			subSections: [
+				new ObjectPageSubSection({
+					title: "SubSection 2",
+					blocks: [new Text({ text: "Content" })]
+				})
+			]
+		});
+		oObjectPage.addSection(oSection2);
+		await nextUIUpdate();
+
+		// Assert - the focus values are correctly restored for the multi-section case
+		assert.strictEqual(oSection1.$().attr("tabindex"), "0",
+			"When a second section is added, the first section becomes focusable (tabindex '0')");
+		assert.strictEqual(oSection2.$().attr("tabindex"), "-1",
+			"When a second section is added, the non-selected section is not focusable (tabindex '-1')");
+
+		// Act - remove the second section again => back to the single-section case
+		oObjectPage.removeSection(oSection2);
+		oSection2.destroy();
+		await nextUIUpdate();
+
+		// Assert - the single section is not focusable again
+		assert.strictEqual(oSection1.$().attr("tabindex"), undefined,
+			"When back to a single section, the section should not have a tabindex attribute again");
+
+		// Cleanup
+		oObjectPage.destroy();
 	});
 
 	QUnit.test("RIGHT/DOWN - next section and subsection should be focused with arrow right/down", async function(assert) {
