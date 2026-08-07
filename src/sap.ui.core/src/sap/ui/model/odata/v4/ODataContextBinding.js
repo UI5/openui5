@@ -689,6 +689,7 @@ sap.ui.define([
 			this.mCacheQueryOptions, vEntity);
 		if (bStream) {
 			return oRequestor.fetch(bAction ? "POST" : "GET", sPath,
+				oRequestor.buildQueryString(sMetaPath, this.mCacheQueryOptions),
 				bAction ? mParameters : undefined);
 		}
 
@@ -1399,7 +1400,13 @@ sap.ui.define([
 	 *     <li> <code>body</code>: The response's <code>ReadableStream</code>
 	 *     <li> <code>headers</code>: The response's <code>Headers</code>
 	 *   </ul>
-	 *   The promise rejects if '$stream' is used with a wrong return type.
+	  *  The promise rejects with an <code>Error</code> instance if '$stream' is used with a wrong
+	  *  return type or the fetch request fails. In the latter case, the error contains the
+	  *  following properties:
+	 *   <ul>
+	 *     <li> <code>status</code>: {number} HTTP status code
+	 *     <li> <code>statusText</code>: {string} (optional) HTTP status text
+	 *   </ul>
 	 * @throws {Error} If
 	 *   <ul>
 	 *     <li> the binding's root binding is suspended,

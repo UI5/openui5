@@ -912,17 +912,20 @@ sap.ui.define([
 	/**
 	 * Builds and sends a fetch request. Constructs the request URL from the service URL
 	 * and resource path, assembles the fetch options including headers and optional payload, and
-	 * delegates to {@link #doFetch}.
+	 * delegates to the global fetch API via {@link _Requestor.fetch}.
 	 *
 	 * @param {string} sMethod - HTTP method (e.g. GET or POST)
 	 * @param {string} sResourcePath - Resource path relative to service URL
+	 * @param {string} sQueryString - Query string as returned by {@link #buildQueryString}
 	 * @param {object} [oPayload] - Request payload
-	 * @returns {Promise<Response>} Promise resolving with the response interface of the fetch API
+	 * @returns {Promise<Response>}
+	 *   Promise resolving with the response interface of the fetch API, or rejected with an Error
+	 *   created by {@link sap.ui.model.odata.v4.lib._Helper.createError} if the response is not OK.
 	 *
 	 * @public
 	 */
-	_Requestor.prototype.fetch = function (sMethod, sResourcePath, oPayload) {
-		const sRequestUrl = this.sServiceUrl + sResourcePath;
+	_Requestor.prototype.fetch = function (sMethod, sResourcePath, sQueryString, oPayload) {
+		const sRequestUrl = this.sServiceUrl + sResourcePath + sQueryString;
 		const oFetchOptions = {
 			method : sMethod,
 			headers : {
@@ -937,7 +940,22 @@ sap.ui.define([
 		}
 
 		// Note: fetch API needs to be invoked on window object
-		return _Requestor.fetch.call(window, sRequestUrl, oFetchOptions);
+		return _Requestor.fetch.call(window, sRequestUrl, oFetchOptions).then(async (oResponse) => {
+			if (oResponse.ok) {
+				return oResponse;
+			}
+
+			const jqXHR = {
+				getResponseHeader : function (sHeaderName) {
+					return oResponse.headers.get(sHeaderName);
+				},
+				responseText : await oResponse.text(),
+				status : oResponse.status,
+				statusText : oResponse.statusText
+			};
+
+			throw _Helper.createError(jqXHR, "Communication error", sRequestUrl, sResourcePath);
+		});
 	};
 
 	/**
