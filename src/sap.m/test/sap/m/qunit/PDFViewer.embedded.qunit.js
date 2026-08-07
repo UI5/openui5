@@ -172,7 +172,7 @@ sap.ui.define([
 
 				if (iPhase === 0) {
 					iPhase = 1;
-					oModel.setData({ showDownloadButton: true }, true);
+					oModel.setData({ showDownloadButton: true, source: "test-resources/sap/m/qunit/pdfviewer/sample file with spaces.pdf" }, true);
 					TestUtils.rerender();
 				} else if (iPhase === 1) {
 					iPhase = 2;
@@ -185,7 +185,7 @@ sap.ui.define([
 					var oDownloadButton = oPdfViewer.$('toolbarDownloadButton');
 					assert.ok(oDownloadButton.length === 1, 'Download button should be visible');
 
-					oModel.setData({ showDownloadButton: false }, true);
+					oModel.setData({ showDownloadButton: false, source: "test-resources/sap/m/qunit/pdfviewer/sample-file.pdf" }, true);
 					TestUtils.rerender();
 				} else if (iPhase === 2) {
 					var oOverflowToolbar = oPdfViewer.$('overflowToolbar');
