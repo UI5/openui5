@@ -6,52 +6,65 @@ describe("sap.m.DateTimePickerWithTimezone", function() {
 	browser.testrunner.currentSuite.meta.controlName = 'sap.m.DateTimePicker';
 
 	it("timezone label truncation", function() {
-		var oDTP1 = element(by.id("DTP1")),
-			oBTN20 = element(by.id("BTN20"));
+		const oDTP1 = element(by.id("DTP1"));
+		const oBtnWidth20 = element(by.id("item20-button"));
+		const oBtnWidth40 = element(by.id("item40-button"));
 
 		expect(takeScreenshot(oDTP1)).toLookAs("buenos_aires_label_truncated");
 
-		// shrink to 200px
-		oBTN20.click();
+		// Shrink to 20%
+		oBtnWidth20.click();
 
 		expect(takeScreenshot(oDTP1)).toLookAs("label_and_input_truncated");
+
+		oBtnWidth40.click();
 	});
 
-	it("timezone change", function() {
-		var oDTP1 = element(by.id("DTP1")),
-			oBTN40 = element(by.id("BTN40")),
-			oBTNNY = element(by.id("BTNNY"));
+	it("timezone label change", function() {
+		const oDTP1 = element(by.id("DTP1"));
+		const oBtnNY = element(by.id("itemNY-button"));
+		const oBtnArgentina = element(by.id("itemArgentina-button"));
 
-		// expand to 400px and change the timezone
-		oBTN40.click();
-		oBTNNY.click();
+		// Set timezone property to New York
+		oBtnNY.click();
 
 		expect(takeScreenshot(oDTP1)).toLookAs("new_york_label_fully_visible");
-	});
 
-	it("picker displays the correct date", function() {
-		var oDTP1Popover,
-			oValueHelpIcon = element(by.id("DTP1-icon"));
-
-		// open the picker
-		oValueHelpIcon.click();
-
-		oDTP1Popover = element(by.id("DTP1-RP-popover"));
-
-		expect(takeScreenshot(oDTP1Popover)).toLookAs("picker_displays_20_Nov_2000_5_10_10");
+		oBtnArgentina.click();
 	});
 
 	it("picker displays the correct date when the app timezone is different", function() {
-		var oDTP3Popover,
-			oBtnChangeAppTimezone = element(by.id("BTNCHANGEAPPTIMEZONE")),
-			oValueHelpIcon = element(by.id("DTP3-icon"));
+		const oBtnArgentinaLocale = element(by.id("itemArgentinaLocale-button"));
+		const oBtnBerlinLocale = element(by.id("itemBerlinLocale-button"));
+		const oBtnSofiaLocale = element(by.id("itemSofiaLocale-button"));
+		const oBtnDefaultLocale = element(by.id("itemDefaultLocale-button"));
+		const oValueHelpIcon = element(by.id("DTP3-icon"));
 
-		// open the picker
-		oBtnChangeAppTimezone.click();
+		// Set the app locale to Argentina and open the picker
+		oBtnArgentinaLocale.click();
 		oValueHelpIcon.click();
 
-		oDTP3Popover = element(by.id("DTP3-RP-popover"));
+		const oDTP3Popover = element(by.id("DTP3-RP-popover"));
+
+		expect(takeScreenshot(oDTP3Popover)).toLookAs("picker_displays_24_Mar_2021_19_30_00");
+
+		// Close picker, select Berlin locale and open the picker again
+		oValueHelpIcon.click();
+
+		oBtnBerlinLocale.click();
+		oValueHelpIcon.click();
 
 		expect(takeScreenshot(oDTP3Popover)).toLookAs("picker_displays_24_Mar_2021_23_30_00");
+
+		// Close picker, select Sofia locale and open the picker again
+		oValueHelpIcon.click();
+		oBtnSofiaLocale.click();
+		oValueHelpIcon.click();
+
+		expect(takeScreenshot(oDTP3Popover)).toLookAs("picker_displays_25_Mar_2021_00_30_00");
+
+		// Reset the app locale to default
+		oValueHelpIcon.click();
+		oBtnDefaultLocale.click();
 	});
 });
