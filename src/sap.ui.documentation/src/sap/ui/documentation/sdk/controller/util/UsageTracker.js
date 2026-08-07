@@ -24,10 +24,8 @@ sap.ui.define(
             const oURL = new URL(sURL),
                 sSectionTitle = oRouter.getRouteTopLevelTitle(oRouteConfig);
 
-            var sHash = oURL.hash.replace(/\.html/, '');
-
             this.url = sURL;
-            this.name = oURL.pathname + sHash;
+            this.name = composePageName(oURL);
             this.section = sSectionTitle || "/";
             this.title = undefined;
             this.language = oUserLanguageTag.language;
@@ -251,7 +249,7 @@ sap.ui.define(
                  * Triggered when router does not find the route
                  */
                 _logPageNotFound: function (sHash) {
-                    sHash = sHash.replace(/\.html/, '');
+                    const sNormalized = normalizeHash(sHash) || "/";
                     this._addToLogs({
                         event: "errorPage",
                         page: {
@@ -261,7 +259,7 @@ sap.ui.define(
                         error: {
                             type: 404,
                             pageUrl: window.location.href,
-                            pageName: sHash,
+                            pageName: sNormalized,
                             description: "page not found"
                         }
                     });
@@ -272,14 +270,13 @@ sap.ui.define(
                 _logPageDataNotFound: function () {
                     var oPageInfo;
                     if (this._oLastRouteParameters) {
-                        var oRouteConfig = this._oRouter.getRouteConfig(this._oLastRouteParameters.name);
+                        const oRouteConfig = this._oRouter.getRouteConfig(this._oLastRouteParameters.name);
                         oPageInfo = new PageInfo(oRouteConfig, this._oRouter);
                     } else {
-                        var oURL = new URL(window.location.href);
-                        var sHash = oURL.hash.replace(/\.html/, '');
+                        const oURL = new URL(window.location.href);
                         oPageInfo = {
-                            url: window.location.href,
-                            name: oURL.pathname + sHash,
+                            url: oURL.href,
+                            name: composePageName(oURL),
                             section: "/"
                         };
                     }
@@ -355,6 +352,19 @@ sap.ui.define(
                 }
             }
         );
+
+        function normalizeHash(sHash) {
+            sHash = sHash.replace(/\.html/, '');
+            return sHash === "/" ? "" : sHash;
+        }
+
+        function composePageName(oURL) {
+            const sHash = normalizeHash(oURL.hash.replace(/^#/, ''));
+            if (sHash) {
+                return oURL.pathname + "#" + sHash;
+            }
+            return oURL.pathname;
+        }
 
         return UsageTracker;
     }
