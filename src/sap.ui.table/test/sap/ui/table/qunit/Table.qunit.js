@@ -6114,6 +6114,42 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("Footer container", {
+		beforeEach: function() {
+			this.oTable = TableQUnitUtils.createTable({
+				footer: new HeightTestControl({height: "100px"})
+			});
+
+			return this.oTable.qunit.whenRenderingFinished();
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		},
+		getFooterHeight: function() {
+			const oFooterDomRef = this.oTable.getDomRef().querySelector(".sapUiTableFtr");
+			return oFooterDomRef ? oFooterDomRef.offsetHeight : 0;
+		}
+	});
+
+	QUnit.test("After rendering", async function(assert) {
+		assert.notStrictEqual(this.getFooterHeight(), 0, "Height if footer visible");
+
+		this.oTable.getFooter().setVisible(false);
+		this.oTable.invalidate();
+		await this.oTable.qunit.whenRenderingFinished();
+		assert.strictEqual(this.getFooterHeight(), 0, "height if footer invisible");
+	});
+
+	QUnit.test("After changing footer visibility", async function(assert) {
+		this.oTable.getFooter().setVisible(false);
+		await nextUIUpdate();
+		assert.strictEqual(this.getFooterHeight(), 0, "Height after making footer invisible");
+
+		this.oTable.getFooter().setVisible(true);
+		await nextUIUpdate();
+		assert.ok(this.getFooterHeight() > 0, "Height after making footer visible");
+	});
+
 	QUnit.module("Clear text selection on update", {
 		beforeEach: function() {
 			this.oTable = TableQUnitUtils.createTable({
