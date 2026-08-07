@@ -10,10 +10,12 @@ sap.ui.define([
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
+	"sap/ui/fl/support/api/SupportAPI",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/rta/plugin/Plugin",
 	"sap/ui/rta/plugin/rename/Rename",
 	"sap/ui/rta/RuntimeAuthoring",
+	"sap/ui/rta/service/OverlayInfo",
 	"sap/ui/rta/util/ReloadManager",
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
@@ -27,10 +29,12 @@ sap.ui.define([
 	OverlayRegistry,
 	ChangesWriteAPI,
 	PersistenceWriteAPI,
+	SupportAPI,
 	nextUIUpdate,
 	BasePlugin,
 	RenamePlugin,
 	RuntimeAuthoring,
+	OverlayInfoFactory,
 	ReloadManager,
 	sinon,
 	RtaQunitUtils
@@ -75,7 +79,7 @@ sap.ui.define([
 			sandbox.stub(ReloadManager, "handleReloadOnStart").resolves(false);
 
 			return this.oRta.start().then(function() {
-				return this.oRta.getService("supportTools");
+				return this.oRta.getService("overlayInfo");
 			}.bind(this));
 		},
 		afterEach() {
@@ -143,16 +147,18 @@ sap.ui.define([
 				element: Element.getElementById("button1"),
 				modifier: JsControlTreeModifier,
 				layer: "CUSTOMER"
-			}).then(function(oChangeHandler) {
-				oConsoleStub
-				.callThrough()
-				.withArgs(sinon.match(function(oLoggedObject) {return oLoggedObject.changeHandler === oChangeHandler;}))
-				.callsFake(function(oLoggedObject) {
+			}).then((oChangeHandler) => {
+				const fnMatchLoggedChangeHandler = (oLoggedObject) => oLoggedObject.changeHandler === oChangeHandler;
+				const fnAssertLoggedChangeHandler = (oLoggedObject) => {
 					assert.ok(true, "then the change handler is printed to console");
 					assert.ok(oLoggedObject.savedAs.includes("ui5flex$"), "and a temporary variable is saved");
 					assert.ok(oLoggedObject.description.includes("ChangeHandler"), "and the correct Control Identification is set");
 					fnDone();
-				});
+				};
+				oConsoleStub
+				.callThrough()
+				.withArgs(sinon.match(fnMatchLoggedChangeHandler))
+				.callsFake(fnAssertLoggedChangeHandler);
 
 				window.postMessage({
 					id: "ui5FlexibilitySupport.submodules.overlayInfo",
@@ -173,8 +179,8 @@ sap.ui.define([
 
 			oConsoleStub
 			.callThrough()
-			.withArgs(sinon.match(function(oLoggedObject) {return oLoggedObject.metaData === oButtonDesigntimeMetadata;}))
-			.callsFake(function(oLoggedObject) {
+			.withArgs(sinon.match((oLoggedObject) => oLoggedObject.metaData === oButtonDesigntimeMetadata))
+			.callsFake((oLoggedObject) => {
 				assert.ok(true, "then the design time metadata is printed to console");
 				assert.ok(oLoggedObject.savedAs.includes("ui5flex$"), "and a temporary variable is saved");
 				assert.ok(oLoggedObject.description.includes("DesignTimeMetaData"), "and the correct Control Identification is set");
@@ -195,18 +201,32 @@ sap.ui.define([
 			OverlayRegistry.getOverlay("button1").setSelected(false);
 			OverlayRegistry.getOverlay("button2").setSelected(true);
 			assert.notOk(OverlayRegistry.getOverlay("button1").getSelected(), "Initially, overlay of button1 is not selected");
-			assert.strictEqual(this.oRta.getSelection()[0], OverlayRegistry.getOverlay("button2"), "Initially, overlay of button2 is selected");
-			function onMessage(oEvent) {
+			assert.strictEqual(
+				this.oRta.getSelection()[0],
+				OverlayRegistry.getOverlay("button2"),
+				"Initially, overlay of button2 is selected"
+			);
+			const onMessage = (oEvent) => {
 				if (
 					oEvent.data.id === "ui5FlexibilitySupport.submodules.overlayInfo"
 					&& oEvent.data.type === "changeOverlaySelection"
 				) {
-					assert.strictEqual(this.oRta.getSelection()[0], OverlayRegistry.getOverlay("button1"), "After processing the correct Overlay is selected");
-					assert.ok(OverlayRegistry.getOverlay("button1").getSelected(), "After processing the selection status of the Overlay is correct");
-					assert.notOk(OverlayRegistry.getOverlay("button1").hasStyleClass("sapUiFlexibilitySupportExtension_Selected"), "After processing the extension styleclass is not set");
+					assert.strictEqual(
+						this.oRta.getSelection()[0],
+						OverlayRegistry.getOverlay("button1"),
+						"After processing the correct Overlay is selected"
+					);
+					assert.ok(
+						OverlayRegistry.getOverlay("button1").getSelected(),
+						"After processing the selection status of the Overlay is correct"
+					);
+					assert.notOk(
+						OverlayRegistry.getOverlay("button1").hasStyleClass("sapUiFlexibilitySupportExtension_Selected"),
+						"After processing the extension styleclass is not set"
+					);
 					fnDone();
 				}
-			}
+			};
 
 			window.postMessage({
 				id: "ui5FlexibilitySupport.submodules.overlayInfo",
@@ -216,7 +236,7 @@ sap.ui.define([
 				}
 			});
 
-			window.addEventListener("message", onMessage.bind(this), { once: true });
+			window.addEventListener("message", onMessage, { once: true });
 		});
 
 		QUnit.test("when an 'changeOverlaySelection' event is triggered on a non selectable overlay", function(assert) {
@@ -225,13 +245,20 @@ sap.ui.define([
 			OverlayRegistry.getOverlay("button1").setSelectable(false);
 			OverlayRegistry.getOverlay("button2").setSelected(true);
 			assert.notOk(OverlayRegistry.getOverlay("button1").getSelected(), "Initially, overlay of button1 is not selected");
-			assert.strictEqual(this.oRta.getSelection()[0], OverlayRegistry.getOverlay("button2"), "Initially, overlay of button2 is selected");
-			function onMessage(oEvent) {
+			assert.strictEqual(
+				this.oRta.getSelection()[0],
+				OverlayRegistry.getOverlay("button2"),
+				"Initially, overlay of button2 is selected"
+			);
+			const onMessage = (oEvent) => {
 				if (
 					oEvent.data.id === "ui5FlexibilitySupport.submodules.overlayInfo"
 					&& oEvent.data.type === "changeOverlaySelection"
 				) {
-					assert.notOk(OverlayRegistry.getOverlay("button1").getSelected(), "After processing the non selectable overlay is not selected");
+					assert.notOk(
+						OverlayRegistry.getOverlay("button1").getSelected(),
+						"After processing the non selectable overlay is not selected"
+					);
 					assert.strictEqual(this.oRta.getSelection().length, 0, "After processing the selection is cleared");
 					assert.ok(
 						OverlayRegistry.getOverlay("button1").getDomRef().classList.contains("sapUiFlexibilitySupportExtension_Selected"),
@@ -239,7 +266,7 @@ sap.ui.define([
 					);
 					fnDone();
 				}
-			}
+			};
 
 			window.postMessage({
 				id: "ui5FlexibilitySupport.submodules.overlayInfo",
@@ -249,7 +276,7 @@ sap.ui.define([
 				}
 			});
 
-			window.addEventListener("message", onMessage.bind(this), { once: true });
+			window.addEventListener("message", onMessage, { once: true });
 		});
 
 		QUnit.test("when an 'changeOverlaySelection' event is triggered on a non selectable overlay without DomRef", function(assert) {
@@ -259,13 +286,20 @@ sap.ui.define([
 			OverlayRegistry.getOverlay("button1")._$DomRef = null; // there is no better way to remove DomRef...
 			OverlayRegistry.getOverlay("button2").setSelected(true);
 			assert.notOk(OverlayRegistry.getOverlay("button1").getSelected(), "Initially, overlay of button1 is not selected");
-			assert.strictEqual(this.oRta.getSelection()[0], OverlayRegistry.getOverlay("button2"), "Initially, overlay of button2 is selected");
+			assert.strictEqual(
+				this.oRta.getSelection()[0],
+				OverlayRegistry.getOverlay("button2"),
+				"Initially, overlay of button2 is selected"
+			);
 			function onMessages(oEvent) {
 				if (
 					oEvent.data.id === "ui5FlexibilitySupport.submodules.overlayInfo"
 					&& oEvent.data.type === "changeOverlaySelection"
 				) {
-					assert.notOk(OverlayRegistry.getOverlay("button1").getSelected(), "After processing the non selectable overlay is not selected");
+					assert.notOk(
+						OverlayRegistry.getOverlay("button1").getSelected(),
+						"After processing the non selectable overlay is not selected"
+					);
 				} else if (
 					oEvent.data.id === "ui5FlexibilitySupport.submodules.overlayInfo"
 					&& oEvent.data.type === "getOverlayInfo"
@@ -293,14 +327,21 @@ sap.ui.define([
 			OverlayRegistry.getOverlay("button1").setSelectable(false);
 			OverlayRegistry.getOverlay("button2").setSelected(true);
 			assert.notOk(OverlayRegistry.getOverlay("button1").getSelected(), "Initially, overlay of button1 is not selected");
-			assert.strictEqual(this.oRta.getSelection()[0], OverlayRegistry.getOverlay("button2"), "Initially, overlay of button2 is selected");
+			assert.strictEqual(
+				this.oRta.getSelection()[0],
+				OverlayRegistry.getOverlay("button2"),
+				"Initially, overlay of button2 is selected"
+			);
 			function onMessageReceived(oEvent) {
 				if (
 					oEvent.data.id === "ui5FlexibilitySupport.submodules.overlayInfo"
 					&& oEvent.data.type === "changeOverlaySelection"
 					&& OverlayRegistry.getOverlay(oEvent.data.content.overlayId).getElement().getId() === "button2"
 				) {
-					assert.notOk(OverlayRegistry.getOverlay("button1").hasStyleClass("sapUiFlexibilitySupportExtension_Selected"), "After processing the extension styleclass is removed");
+					assert.notOk(
+						OverlayRegistry.getOverlay("button1").hasStyleClass("sapUiFlexibilitySupportExtension_Selected"),
+						"After processing the extension styleclass is removed"
+					);
 					assert.ok(OverlayRegistry.getOverlay("button2").getSelected(), "the correct overlay is selected");
 					window.removeEventListener("message", onMessageReceived);
 					fnDone();
@@ -334,20 +375,23 @@ sap.ui.define([
 			oSelectionManager.add(OverlayRegistry.getOverlay("button2"));
 			assert.ok(OverlayRegistry.getOverlay("button1").getSelected(), "Initially, button1 is selected");
 			assert.ok(OverlayRegistry.getOverlay("button2").getSelected(), "Initially, button2 is selected");
-			assert.ok(this.oRta.getSelection().length = 2, "Initially, two buttons are selected");
-			function onMessage(oEvent) {
+			assert.strictEqual(this.oRta.getSelection().length, 2, "Initially, two buttons are selected");
+			const onMessage = (oEvent) => {
 				if (
 					oEvent.data.id === "ui5FlexibilitySupport.submodules.overlayInfo"
 					&& oEvent.data.type === "changeOverlaySelection"
 				) {
 					assert.notOk(OverlayRegistry.getOverlay("button1").getSelected(), "After processing button1 is not selected");
 					assert.notOk(OverlayRegistry.getOverlay("button2").getSelected(), "After processing button2 is not selected");
-					assert.ok(this.oRta.getSelection().length = 1, "After processing, only one overlay is selected");
-					assert.strictEqual(this.oRta.getSelection()[0],
-						OverlayRegistry.getOverlay("button3"), "After processing the correct Overlay is selected");
+					assert.strictEqual(this.oRta.getSelection().length, 1, "After processing, only one overlay is selected");
+					assert.strictEqual(
+						this.oRta.getSelection()[0],
+						OverlayRegistry.getOverlay("button3"),
+						"After processing the correct Overlay is selected"
+					);
 					fnDone();
 				}
-			}
+			};
 
 			window.postMessage({
 				id: "ui5FlexibilitySupport.submodules.overlayInfo",
@@ -357,7 +401,7 @@ sap.ui.define([
 				}
 			});
 
-			window.addEventListener("message", onMessage.bind(this), { once: true });
+			window.addEventListener("message", onMessage, { once: true });
 		});
 
 		QUnit.test("when contextmenu is closed", async function(assert) {
@@ -450,8 +494,16 @@ sap.ui.define([
 					assert.strictEqual(aCollectedTableData.length, aTableMockData.length, "correct number of overlays is collected");
 					for (let iIndex = 0; iIndex < aCollectedTableData.length; iIndex++) {
 						assert.strictEqual(aCollectedTableData[iIndex].id, aTableMockData[iIndex].id, `the entry number ${iIndex + 1} has the correct id`);
-						assert.strictEqual(aCollectedTableData[iIndex].elementId, aTableMockData[iIndex].elementId, `the entry number ${iIndex + 1} has the correct elementId`);
-						assert.strictEqual(aCollectedTableData[iIndex].visible, aTableMockData[iIndex].visible, `the entry number ${iIndex + 1} has the correct visible status`);
+						assert.strictEqual(
+							aCollectedTableData[iIndex].elementId,
+							aTableMockData[iIndex].elementId,
+							`the entry number ${iIndex + 1} has the correct elementId`
+						);
+						assert.strictEqual(
+							aCollectedTableData[iIndex].visible,
+							aTableMockData[iIndex].visible,
+							`the entry number ${iIndex + 1} has the correct visible status`
+						);
 					}
 					window.removeEventListener("message", onCollectMessage);
 					fnDone();
@@ -467,6 +519,178 @@ sap.ui.define([
 			window.addEventListener("message", onCollectMessage.bind(this));
 		});
 	});
+
+	// OverlayInfoFactory is a factory, not a constructor - it is invoked without "new".
+	/* eslint-disable new-cap */
+	QUnit.module("MessageBroker (cFLP) scenario", {
+		beforeEach() {
+			// Force the broker path regardless of the test runner iFrame / ushell state.
+			this.oIsBrokerStub = sandbox.stub(OverlayInfoFactory, "_isBrokerScenario").returns(true);
+			// Capture the handlers the service registers per command.
+			this.mRegisteredHandlers = {};
+			// Capture the connection callback that the service passes to connectAppClient.
+			// Presence of the support client is detected through the broker's connection
+			// callback (clientSubscribed / clientUnsubscribed), not through a publish handshake.
+			this.fnConnectionCallback = undefined;
+			sandbox.stub(SupportAPI, "connectAppClient").callsFake((fnConnectionCallback) => {
+				this.fnConnectionCallback = fnConnectionCallback;
+				return Promise.resolve();
+			});
+			sandbox.stub(SupportAPI, "registerMessageHandler").callsFake((sId, fnHandler) => {
+				this.mRegisteredHandlers[sId] = fnHandler;
+			});
+			this.oDeregisterStub = sandbox.stub(SupportAPI, "deregisterMessageHandler");
+			this.oDeregisterCallbackStub = sandbox.stub(SupportAPI, "deregisterConnectionCallback");
+			this.oPublishStub = sandbox.stub(SupportAPI, "publishToSupportClient").resolves();
+
+			// Minimal RTA mock - the service only needs attachEventOnce and getPlugins/getSelection
+			// for the handlers under test here (collectOverlayTableData needs neither).
+			this.oRtaMock = {
+				attachEventOnce: sandbox.stub()
+			};
+
+			// Track every service created in this module so afterEach can destroy it. destroy()
+			// removes the real capture-phase window focus listener and resets the module-level
+			// state (bSupportClientConnected, fnFocusListener), preventing cross-test leakage.
+			this.aServices = [];
+			this.createService = () => {
+				const oService = OverlayInfoFactory(this.oRtaMock);
+				this.aServices.push(oService);
+				return oService;
+			};
+		},
+		afterEach() {
+			this.aServices.forEach((oService) => oService.destroy());
+			delete SupportAPI.pAppClientConnected;
+			sandbox.restore();
+			delete window.ui5flex$temp;
+		}
+	}, function() {
+		QUnit.test("when the service starts in the broker scenario", async function(assert) {
+			const oService = this.createService();
+			await oService.pReady;
+			assert.ok(this.oIsBrokerStub.called, "then the broker scenario is detected");
+			assert.ok(SupportAPI.connectAppClient.calledOnce, "then the app client is connected");
+			assert.strictEqual(
+				typeof this.fnConnectionCallback,
+				"function",
+				"then the app client is connected with a connection callback for presence detection"
+			);
+			assert.ok(
+				this.mRegisteredHandlers["overlayInfo.collectOverlayTableData"],
+				"then a handler for the collectOverlayTableData command is registered"
+			);
+			assert.notOk(
+				this.mRegisteredHandlers["overlayInfo.supportClientReady"],
+				"then NO supportClientReady handler is registered (presence comes from the connection callback)"
+			);
+			assert.notOk(
+				this.oPublishStub.calledWith("overlayInfo.appClientReady"),
+				"then the app client does NOT publish appClientReady (no publish into a possibly empty channel)"
+			);
+			assert.notOk(
+				this.oPublishStub.calledWith("overlayInfo.rtaStarted"),
+				"then rtaStarted is NOT published before the support client is known to be connected"
+			);
+			assert.ok(this.oRtaMock.attachEventOnce.calledWith("stop"), "then the stop handler is attached");
+
+			// once the broker reports the support client subscribed, rtaStarted is published
+			this.fnConnectionCallback("clientSubscribed", "FlexSupportClient", [{ channelId: "flex.support.channel" }]);
+			assert.ok(
+				this.oPublishStub.calledWith("overlayInfo.rtaStarted"),
+				"then rtaStarted is published after the support client subscribes"
+			);
+
+			// destroy deregisters command handlers and does not disconnect the shared client
+			oService.destroy();
+			assert.ok(
+				this.oDeregisterStub.calledWith("overlayInfo.collectOverlayTableData"),
+				"then the command handlers are deregistered on destroy"
+			);
+			assert.ok(
+				this.oDeregisterCallbackStub.calledWith(this.fnConnectionCallback),
+				"then the connection callback is deregistered on destroy so its closure is not retained"
+			);
+		});
+
+		QUnit.test("when the support client subscribes and later unsubscribes", async function(assert) {
+			const oService = this.createService();
+			await oService.pReady;
+
+			// support client connects -> pushes allowed
+			this.fnConnectionCallback("clientSubscribed", "FlexSupportClient", [{ channelId: "flex.support.channel" }]);
+			this.oPublishStub.resetHistory();
+			const fnStopHandler = this.oRtaMock.attachEventOnce.getCall(0).args[1];
+			fnStopHandler();
+			assert.ok(
+				this.oPublishStub.calledWith("overlayInfo.rtaStopped"),
+				"then a push is published while the support client is subscribed"
+			);
+
+			// support client disconnects -> pushes suppressed again
+			this.fnConnectionCallback("clientUnsubscribed", "FlexSupportClient", [{ channelId: "flex.support.channel" }]);
+			this.oPublishStub.resetHistory();
+			fnStopHandler();
+			assert.notOk(
+				this.oPublishStub.calledWith("overlayInfo.rtaStopped"),
+				"then nothing is published after the support client unsubscribes"
+			);
+		});
+
+		QUnit.test("when the connection callback reports a different client", async function(assert) {
+			const oService = this.createService();
+			await oService.pReady;
+			this.oPublishStub.resetHistory();
+
+			// a connection event for an unrelated client must not flip presence
+			this.fnConnectionCallback("clientSubscribed", "SomeOtherClient", [{ channelId: "flex.support.channel" }]);
+			assert.notOk(
+				this.oPublishStub.calledWith("overlayInfo.rtaStarted"),
+				"then rtaStarted is NOT published for an unrelated client"
+			);
+		});
+
+		QUnit.test("when a collectOverlayTableData command is received over the broker", async function(assert) {
+			const oService = this.createService();
+			await oService.pReady;
+			this.oPublishStub.resetHistory();
+
+			// Simulate the broker delivering the command to the registered handler
+			await this.mRegisteredHandlers["overlayInfo.collectOverlayTableData"]({});
+
+			const oResultCall = this.oPublishStub.getCalls().find((oCall) => oCall.args[0] === "overlayInfo.overlayInfoTableData");
+			assert.ok(oResultCall, "then the result is published as overlayInfoTableData via the support client");
+			assert.ok(Array.isArray(oResultCall.args[1]), "then the published content is the overlay table data array");
+		});
+
+		QUnit.test("when RTA stops in the broker scenario", async function(assert) {
+			const oService = this.createService();
+			await oService.pReady;
+			// mark the support client as connected so pushes are allowed
+			this.fnConnectionCallback("clientSubscribed", "FlexSupportClient", [{ channelId: "flex.support.channel" }]);
+			this.oPublishStub.resetHistory();
+
+			// invoke the stop handler that was attached via attachEventOnce("stop", ...)
+			const fnStopHandler = this.oRtaMock.attachEventOnce.getCall(0).args[1];
+			fnStopHandler();
+			assert.ok(this.oPublishStub.calledWith("overlayInfo.rtaStopped"), "then rtaStopped is published via the support client");
+		});
+
+		QUnit.test("when a push happens before the support client is connected", async function(assert) {
+			const oService = this.createService();
+			await oService.pReady;
+			this.oPublishStub.resetHistory();
+
+			// stop fires while no support client has subscribed yet
+			const fnStopHandler = this.oRtaMock.attachEventOnce.getCall(0).args[1];
+			fnStopHandler();
+			assert.notOk(
+				this.oPublishStub.calledWith("overlayInfo.rtaStopped"),
+				"then nothing is published to a missing support client"
+			);
+		});
+	});
+	/* eslint-enable new-cap */
 
 	QUnit.done(function() {
 		document.getElementById("qunit-fixture").style.display = "none";

@@ -11,8 +11,9 @@ sap.ui.define([
 	"sap/ui/core/Item",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/mdc/FilterField",
-	"sap/ui/mdc/filterbar/p13n/FilterGroupLayout"
-], function(AdaptFiltersPanel, P13nBuilder, JSONModel, CustomListItem, Toolbar, Event, Text, List, Item, nextUIUpdate, FilterField, FilterGroupLayout) {
+	"sap/ui/mdc/filterbar/p13n/FilterGroupLayout",
+	"sap/ui/Device"
+], function(AdaptFiltersPanel, P13nBuilder, JSONModel, CustomListItem, Toolbar, Event, Text, List, Item, nextUIUpdate, FilterField, FilterGroupLayout, Device) {
 	"use strict";
 
 	const aInfoData = [
@@ -2146,4 +2147,277 @@ sap.ui.define([
 		assert.equal(this.oComboBox.getValueState(), "None", "ComboBox should still have None state");
 		assert.equal(this.oComboBox.getValue(), "", "ComboBox value should remain empty");
 	});
+
+	// ===========================================================================================
+	// Module 14: Keyboard Navigation Reordering
+	// ===========================================================================================
+	QUnit.module("Keyboard Navigation Reordering", {
+		beforeEach: async function() {
+			// Store original Device.os for restoration
+			this._originalDeviceOS = Device.os;
+
+			this.aMockInfo = aInfoData;
+			this.oAFPanel = new AdaptFiltersPanel("ADP", {
+				defaultView: "list",
+				footer: new Toolbar("ID_TB_KEYBOARD_NAV",{})
+			});
+
+			let iFilterFieldCounter = 0;
+			this.aAllFilterFields = [];
+			this.aAllFilterGroupLayouts = [];
+			this.oAFPanel.setItemFactory(function(){
+				iFilterFieldCounter++;
+				const oFilterField = new FilterField("FF" + iFilterFieldCounter);
+				if (!oFilterField.getConditions) {
+					oFilterField.getConditions = function() {
+						return [];
+					};
+				}
+				const oFilterGroupLayout = new FilterGroupLayout("FGL" + iFilterFieldCounter);
+				oFilterGroupLayout.setFilterField(oFilterField);
+				this.aAllFilterFields.push(oFilterField);
+				this.aAllFilterGroupLayouts.push(oFilterGroupLayout);
+				return oFilterGroupLayout;
+			}.bind(this));
+
+			this.fnEnhancer = function(mItem, oProperty) {
+				mItem.visibleInDialog = true;
+				mItem.visible = aVisible.indexOf(oProperty.key) > -1;
+				return true;
+			};
+
+			this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
+
+			this.oAFPanel.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function(){
+			// Restore original Device.os
+			Device.os = this._originalDeviceOS;
+
+			this.oP13nData = null;
+			this.aMockInfo = null;
+
+			this.aAllFilterGroupLayouts.forEach(function(oFilterGroupLayout){
+				if (!oFilterGroupLayout.bIsDestroyed) {
+					oFilterGroupLayout.destroy();
+				}
+			});
+			this.aAllFilterGroupLayouts = [];
+
+			this.aAllFilterFields.forEach(function(oFilterField){
+				if (!oFilterField.bIsDestroyed) {
+					oFilterField.destroy();
+				}
+			});
+			this.aAllFilterFields = [];
+			this.oAFPanel.destroy();
+		}
+	});
+
+	// Helper function for triggering reorder via _handleReorder
+	async function triggerReorder(oViewContent, oListItem, sDirection, bCtrl, bMeta) {
+		// Focus the item first
+		oListItem.focus();
+		await nextUIUpdate();
+
+		// Create a mock event object
+		const oMockEvent = {
+			ctrlKey: bCtrl,
+			metaKey: bMeta,
+			preventDefault: function() {},
+			stopPropagation: function() {}
+		};
+
+		// Call the handler directly
+		oViewContent._handleReorder(oMockEvent, sDirection);
+
+		// Wait for rendering delay
+		await nextUIUpdate();
+		await new Promise((resolve) => {
+			setTimeout(resolve, 100);
+		});
+	}
+
+	// Test 1: CTRL+Arrow Down moves item down on non-Mac platform
+	QUnit.test("CTRL+Arrow Down moves item down on non-Mac platform", async function(assert){
+		// Stub Device.os for non-Mac platform
+		Device.os = { macintosh: false, windows: true };
+
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		const oViewContent = this.oAFPanel.getCurrentViewContent();
+		const oListControl = oViewContent._oListControl;
+
+		// Enable sort mode
+		oViewContent._oViewModel.setProperty("/editable", false);
+		await nextUIUpdate();
+
+		const aInitialItems = oListControl.getItems().filter((oItem) => oItem.getVisible() && !oItem.isA("sap.m.GroupHeaderListItem"));
+		assert.ok(aInitialItems.length >= 2, "At least 2 items are available");
+
+		const oSecondItem = aInitialItems[1];
+		const sItemName = oViewContent._getModelEntry(oSecondItem).name;
+		const iInitialPosition = oViewContent._getModelEntry(oSecondItem).position;
+
+		const fnChangeSpy = sinon.spy(oViewContent, "fireChange");
+
+		// Trigger CTRL+Arrow Down
+		await triggerReorder(oViewContent, oSecondItem, "DOWN", true, false);
+
+		const aItems = oViewContent._getP13nModel().getProperty("/items");
+		const oMovedItem = aItems.find((oItem) => oItem.name === sItemName);
+
+		assert.ok(oMovedItem, "Item exists in model");
+		assert.notEqual(oMovedItem.position, iInitialPosition, "Item position changed from initial position");
+		assert.ok(fnChangeSpy.called, "fireChange was called");
+		assert.equal(fnChangeSpy.lastCall.args[0].reason, oViewContent.CHANGE_REASON_REORDER, "Change reason is 'Reorder'");
+
+		fnChangeSpy.restore();
+	});
+
+	// Test 2: CMD+Arrow Down moves item down on Mac platform
+	QUnit.test("CMD+Arrow Down moves item down on Mac platform", async function(assert){
+		// Stub Device.os for Mac platform
+		Device.os = { macintosh: true };
+
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		const oViewContent = this.oAFPanel.getCurrentViewContent();
+		const oListControl = oViewContent._oListControl;
+
+		// Enable sort mode
+		oViewContent._oViewModel.setProperty("/editable", false);
+		await nextUIUpdate();
+
+		const aInitialItems = oListControl.getItems().filter((oItem) => oItem.getVisible() && !oItem.isA("sap.m.GroupHeaderListItem"));
+		assert.ok(aInitialItems.length >= 2, "At least 2 items are available");
+
+		const oSecondItem = aInitialItems[1];
+		const sItemName = oViewContent._getModelEntry(oSecondItem).name;
+		const iInitialPosition = oViewContent._getModelEntry(oSecondItem).position;
+
+		const fnChangeSpy = sinon.spy(oViewContent, "fireChange");
+
+		// Trigger CMD+Arrow Down (metaKey)
+		await triggerReorder(oViewContent, oSecondItem, "DOWN", false, true);
+
+		const aItems = oViewContent._getP13nModel().getProperty("/items");
+		const oMovedItem = aItems.find((oItem) => oItem.name === sItemName);
+
+		assert.ok(oMovedItem, "Item exists in model");
+		assert.notEqual(oMovedItem.position, iInitialPosition, "Item position changed from initial position");
+		assert.ok(fnChangeSpy.called, "fireChange was called");
+		assert.equal(fnChangeSpy.lastCall.args[0].reason, oViewContent.CHANGE_REASON_REORDER, "Change reason is 'Reorder'");
+
+		fnChangeSpy.restore();
+	});
+
+	// Test 3: Arrow keys alone do NOT trigger reordering in sort mode
+	QUnit.test("Arrow keys alone do NOT trigger reordering in sort mode", async function(assert){
+		Device.os = { macintosh: false, windows: true };
+
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		const oViewContent = this.oAFPanel.getCurrentViewContent();
+		const oListControl = oViewContent._oListControl;
+
+		// Enable sort mode
+		oViewContent._oViewModel.setProperty("/editable", false);
+		await nextUIUpdate();
+
+		const aInitialItems = oListControl.getItems().filter((oItem) => oItem.getVisible() && !oItem.isA("sap.m.GroupHeaderListItem"));
+		const oSecondItem = aInitialItems[1];
+		const sItemName = oViewContent._getModelEntry(oSecondItem).name;
+		const iInitialPosition = oViewContent._getModelEntry(oSecondItem).position;
+
+		const fnChangeSpy = sinon.spy(oViewContent, "fireChange");
+
+		// Trigger Arrow Down WITHOUT modifier key
+		await triggerReorder(oViewContent, oSecondItem, "DOWN", false, false);
+
+		const aItems = oViewContent._getP13nModel().getProperty("/items");
+		const oItem = aItems.find((oItem) => oItem.name === sItemName);
+
+		assert.equal(oItem.position, iInitialPosition, "Item remains in same position");
+		assert.notOk(fnChangeSpy.called, "fireChange was NOT called");
+
+		fnChangeSpy.restore();
+	});
+
+	// Test 4: Wrong modifier key does NOT trigger reordering
+	QUnit.test("Wrong modifier key does NOT trigger reordering", async function(assert){
+		// Stub Device.os for non-Mac platform
+		Device.os = { macintosh: false, windows: true };
+
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		const oViewContent = this.oAFPanel.getCurrentViewContent();
+		const oListControl = oViewContent._oListControl;
+
+		// Enable sort mode
+		oViewContent._oViewModel.setProperty("/editable", false);
+		await nextUIUpdate();
+
+		const aInitialItems = oListControl.getItems().filter((oItem) => oItem.getVisible() && !oItem.isA("sap.m.GroupHeaderListItem"));
+		const oSecondItem = aInitialItems[1];
+		const sItemName = oViewContent._getModelEntry(oSecondItem).name;
+		const iInitialPosition = oViewContent._getModelEntry(oSecondItem).position;
+
+		const fnChangeSpy = sinon.spy(oViewContent, "fireChange");
+
+		// Trigger CMD+Arrow Down (wrong modifier for Windows)
+		await triggerReorder(oViewContent, oSecondItem, "DOWN", false, true);
+
+		const aItems = oViewContent._getP13nModel().getProperty("/items");
+		const oItem = aItems.find((oItem) => oItem.name === sItemName);
+
+		assert.equal(oItem.position, iInitialPosition, "Item remains in same position");
+		assert.notOk(fnChangeSpy.called, "fireChange was NOT called");
+
+		fnChangeSpy.restore();
+	});
+
+	// Test 5: Keyboard reordering disabled in edit mode
+	QUnit.test("Keyboard reordering disabled in edit mode", async function(assert){
+		Device.os = { macintosh: false, windows: true };
+
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		const oViewContent = this.oAFPanel.getCurrentViewContent();
+		const oListControl = oViewContent._oListControl;
+
+		// Enable edit mode (editable = true)
+		oViewContent._oViewModel.setProperty("/editable", true);
+		await nextUIUpdate();
+
+		const aInitialItems = oListControl.getItems().filter((oItem) => oItem.getVisible() && !oItem.isA("sap.m.GroupHeaderListItem"));
+		const oSecondItem = aInitialItems[1];
+		const sItemName = oViewContent._getModelEntry(oSecondItem).name;
+		const iInitialPosition = oViewContent._getModelEntry(oSecondItem).position;
+
+		const fnChangeSpy = sinon.spy(oViewContent, "fireChange");
+
+		// Trigger CTRL+Arrow Down in edit mode
+		await triggerReorder(oViewContent, oSecondItem, "DOWN", true, false);
+
+		const aItems = oViewContent._getP13nModel().getProperty("/items");
+		const oItem = aItems.find((oItem) => oItem.name === sItemName);
+
+		assert.equal(oItem.position, iInitialPosition, "Item remains in same position");
+		assert.notOk(fnChangeSpy.called, "fireChange was NOT called");
+
+		fnChangeSpy.restore();
+	});
+
 });

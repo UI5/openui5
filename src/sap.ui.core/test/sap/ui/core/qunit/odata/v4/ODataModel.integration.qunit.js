@@ -6188,7 +6188,9 @@ sap.ui.define([
 	// the table is a keep alive context and is refreshed. The late property is edited afterwards.
 	// Check that the correct PATCH request is sent.
 	// SNOW: DINC0649002
-	QUnit.test("SNOW: DINC0649002", async function (assert) {
+	//
+	// No "ETag changed" for late property after single refresh (SNOW: CS20260012960554)
+	QUnit.test("SNOW: DINC0649002, CS20260012960554", async function (assert) {
 		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
 		const sView = `
 <FlexBox id="form" binding="{}">
@@ -6206,7 +6208,11 @@ sap.ui.define([
 
 		this.expectRequest("EMPLOYEES('1')?$select=ID,Name", {ID : "0", Name : "Frederic Fall"})
 			.expectRequest("EMPLOYEES('1')/EMPLOYEE_2_EQUIPMENTS?$select=Category,ID"
-				+ "&$skip=0&$top=100", {value : [{Category : "Electronics", ID : 99}]})
+				+ "&$skip=0&$top=100", {value : [{
+					"@odata.etag" : "old",
+					Category : "Electronics",
+					ID : 99
+				}]})
 			.expectChange("name", "Frederic Fall")
 			.expectChange("category", ["Electronics"]);
 
@@ -6249,9 +6255,13 @@ sap.ui.define([
 		await this.waitForChanges(assert, "back to first employee");
 
 		this.expectRequest("EMPLOYEES('1')/EMPLOYEE_2_EQUIPMENTS(Category='Electronics',ID=99)"
-				+ "?$select=Category,ID&$expand=EQUIPMENT_2_PRODUCT($select=ID,Name)", {
+				+ "?$expand=EQUIPMENT_2_PRODUCT($select=ID,Name)"
+				+ "&$select=Category,EmployeeId,ID,Name", {
+				"@odata.etag" : "new",
 				Category : "Electronics",
+				EmployeeId : "1",
 				ID : 99,
+				Name : "Office PC",
 				EQUIPMENT_2_PRODUCT : {
 					ID : 2,
 					Name : "Notebook Basic 16"
@@ -6262,10 +6272,35 @@ sap.ui.define([
 		oContext.setKeepAlive(true);
 
 		await Promise.all([
-			// code under test
+			oContext.requestProperty("EmployeeId").then(mustFail(assert), function (oError) {
+				assert.strictEqual(oError.message,
+					"GET EMPLOYEES('1')/EMPLOYEE_2_EQUIPMENTS(Category='Electronics',ID=99)"
+					+ "?$select=EmployeeId: ETag changed",
+					"late property before single refresh fails!");
+			}),
+			// code under test ("single refresh")
 			oContext.requestRefresh(),
+			// code under test (SNOW: CS20260012960554)
+			oContext.requestProperty(["Name", "EQUIPMENT_2_PRODUCT/Name"])
+				.then(([sEquipmentName, sProductName]) => {
+					assert.strictEqual(sEquipmentName, "Office PC",
+						"late property after single refresh succeeds");
+					assert.strictEqual(sProductName, "Notebook Basic 16");
+				}),
 			this.waitForChanges(assert, "refresh")
 		]);
+
+		assert.deepEqual(oContext.getObject(), {
+			"@odata.etag" : "new",
+			Category : "Electronics",
+			EmployeeId : "1", // Note: available despite error above
+			ID : 99,
+			Name : "Office PC",
+			EQUIPMENT_2_PRODUCT : {
+				ID : 2,
+				Name : "Notebook Basic 16"
+			}
+		});
 
 		this.expectRequest("PATCH com.sap.gateway.default.iwbep.tea_busi_product.v0001.Container%2F"
 				+ "Products(2)", {

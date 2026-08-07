@@ -493,7 +493,7 @@ sap.ui.define([
 		const sBaseType = this.getBaseType();
 
 
-		if (oOperator.name === OperatorName.Empty && sValue === DynamicDateRange.prototype._stripValue(oMessageBundle.getText("operators.Empty.tokenText.date", undefined, true))) { // Empty should be named "Not Specified (empty)", but only in DynamicDateRange; DynamicDateRange removes brackets so compare with same stripped text
+		if (oOperator.name === OperatorName.Empty && [oMessageBundle.getText("operators.Empty.tokenText.date", undefined, true).toLowerCase(), oMessageBundle.getText("operators.Empty.longText.date", undefined, true).toLowerCase()].indexOf(sValue.toLowerCase()) >= 0) { // Empty should be named "Not Specified (empty)", but only in DynamicDateRange
 			return {operator: this.getKey(), values: []};
 		} else if (sValue && oOperator.test(sValue, sBaseType)) {
 			const oResult = {};

@@ -74,7 +74,8 @@ sap.ui.define([
 				{ input: 'false', value: false },
 				{ input: 'true', value: true },
 				{ input: '', value: false },
-				{ input: 'xyz', value: false }
+				// unrecognized strings return undefined so that isValid() can catch them
+				{ input: 'xyz', value: undefined }
 			]
 		},
 		"int": {
@@ -87,7 +88,7 @@ sap.ui.define([
 				{ input: '123f2', value: 123 },
 				{ input: '123,8', value: 123 },
 				{ input: '123.8', value: 123 },
-				{ input: 'abc', value: NAN }
+				{ input: 'abc', value: undefined }
 			]
 		},
 		"float": {
@@ -101,7 +102,7 @@ sap.ui.define([
 				{ input: '123,8', value: 123 },
 				{ input: '123.8', value: 123.8 },
 				{ input: '.8', value: 0.8 },
-				{ input: 'abc', value: NAN }
+				{ input: 'abc', value: undefined }
 			]
 		},
 		"string": {

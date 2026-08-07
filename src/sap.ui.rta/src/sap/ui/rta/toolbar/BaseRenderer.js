@@ -3,25 +3,32 @@
  */
 
 sap.ui.define([
-	"sap/m/HBoxRenderer"
+	"sap/m/OverflowToolbarRenderer"
 ],
 function(
-	HBoxRenderer
+	OverflowToolbarRenderer
 ) {
 	"use strict";
 
-	const BaseRenderer = HBoxRenderer.extend("sap.ui.rta.toolbar.BaseRenderer", {
+	const BaseRenderer = OverflowToolbarRenderer.extend("sap.ui.rta.toolbar.BaseRenderer", {
 		apiVersion: 2,
-		enhanceRootTag(oRM, oControl) {
+		decorateRootElement(...aArgs) {
+			OverflowToolbarRenderer.decorateRootElement.apply(this, aArgs);
+			const [oRM, oControl] = aArgs;
+
 			oRM.class("sapUiRtaToolbar");
 			oRM.class(`color_${oControl.getColor()}`);
 
-			// setting type if exists
-			oControl.type && oRM.class(`type_${oControl.type}`);
+			// setting type if it exists
+			if (oControl.type) {
+				oRM.class(`type_${oControl.type}`);
+			}
 
-			// setting z-index if exists
-			var iZIndex = oControl.getZIndex();
-			iZIndex && oRM.style("z-index", iZIndex);
+			// setting z-index if control's ZIndex is set
+			const iZIndex = oControl.getZIndex();
+			if (iZIndex > 0) {
+				oRM.style("z-index", iZIndex);
+			}
 		}
 	});
 

@@ -12,6 +12,6 @@ sap.ui.define(function() {
 		outline: "sap.ui.rta.service.Outline",
 		action: "sap.ui.rta.service.Action",
 		property: "sap.ui.rta.service.Property",
-		supportTools: "sap.ui.rta.service.SupportTools"
+		overlayInfo: "sap.ui.rta.service.OverlayInfo"
 	});
 });

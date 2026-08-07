@@ -122,6 +122,26 @@ sap.ui.define([
         assert.ok("'setFilter' does not crash when used with a valid 'IFilter' implementing control");
     });
 
+    QUnit.test("setFilter with null/undefined", function(assert) {
+        oSomeInstance = fnCreateValidInstance();
+        const oFilter = new FilterBarBase();
+        const oOnFilterRemoved = sinon.spy();
+        oSomeInstance._onFilterRemoved = oOnFilterRemoved;
+
+        oSomeInstance.setFilter(oFilter);
+        const oDetachSearch = sinon.spy(oFilter, "detachSearch");
+
+        oSomeInstance.setFilter(null);
+        assert.strictEqual(oSomeInstance.getFilter(), null, "Does not crash when called with 'null'");
+        assert.ok(oOnFilterRemoved.calledOnceWithExactly(oFilter), "_onFilterRemoved is called once with the previously associated filter");
+        assert.ok(oDetachSearch.calledOnce, "The 'search' handler is detached from the previously associated filter");
+
+        oSomeInstance.setFilter();
+        assert.strictEqual(oSomeInstance.getFilter(), null, "Does not crash when called with 'undefined'");
+
+        oFilter.destroy();
+    });
+
     QUnit.module("FilterIntegrationMixin API", {
         beforeEach: function () {
             fnCreateValidInstance();

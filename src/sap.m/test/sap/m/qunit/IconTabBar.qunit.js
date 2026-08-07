@@ -4393,6 +4393,62 @@ sap.ui.define([
 		oITB.destroy();
 	});
 
+	QUnit.test("Arrow Down on tab with many sub-items prevents scrolling - first child is visible", function (assert) {
+		// Arrange
+		const aSubItems = [];
+		for (let i = 1; i <= 20; i++) {
+			aSubItems.push(new IconTabFilter({
+				key: "child" + i,
+				text: "Child Item " + i,
+				content: new Text({ text: "Content " + i })
+			}));
+		}
+
+		const oTab = new IconTabFilter({
+			text: "parent tab",
+			items: aSubItems
+		});
+
+		const oITB = new IconTabBar({
+			items: [
+				new IconTabFilter({ key: "tab1", text: "Tab 1", content: new Text({ text: "Content 1" })}),
+				oTab
+			]
+		});
+
+		oITB.placeAt("qunit-fixture");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		const fnOriginalOnsapdown = oTab.onsapdown.bind(oTab);
+		let bPreventDefaultCalled = false;
+
+		oTab.onsapdown = function(oEvent) {
+			const fnOriginalPreventDefault = oEvent.preventDefault;
+			oEvent.preventDefault = function() {
+				bPreventDefaultCalled = true;
+				fnOriginalPreventDefault.call(oEvent);
+			};
+			fnOriginalOnsapdown(oEvent);
+		};
+
+		// Act
+		qutils.triggerKeydown(oTab.$(), KeyCodes.ARROW_DOWN);
+
+		// Assert
+		assert.ok(bPreventDefaultCalled, "preventDefault was called to prevent scrolling in the popover");
+		assert.ok(oTab._oPopover, "Popover has been created");
+		assert.strictEqual(oTab._oPopover.isOpen(), true, "Tab's popover has been opened");
+
+		const oSelectList = oTab._getSelectList();
+		const oPopoverContent = oTab._oPopover.$("cont")[0];
+		assert.strictEqual(oPopoverContent.scrollTop, 0, "Popover content is scrolled to top, first child is visible");
+
+		const oFirstChild = oSelectList.getItems()[0];
+		assert.strictEqual(oFirstChild.getId(), document.activeElement.id, "First child item has focus");
+
+		oITB.destroy();
+	});
+
 	QUnit.test("Choosing an unselectable item from IconTabBarSelectList doesn't change anything", function (assert) {
 		// Arrange
 		var aTabs = [];

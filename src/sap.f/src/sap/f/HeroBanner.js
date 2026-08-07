@@ -55,8 +55,7 @@ sap.ui.define([
 	 *
 	 * @constructor
 	 * @public
-	 * @experimental since 1.152
-	 * @since 1.152
+	 * @ui5-experimental-since 1.152
 	 * @alias sap.f.HeroBanner
 	 */
 	var HeroBanner = HeroBannerBase.extend("sap.f.HeroBanner", /** @lends sap.f.HeroBanner.prototype */ {

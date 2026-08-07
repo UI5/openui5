@@ -11,9 +11,10 @@ sap.ui.define([
 
 	const AdaptationRenderer = BaseRenderer.extend("sap.ui.rta.toolbar.AdaptationRenderer", {
 		apiVersion: 2,
-		enhanceRootTag(oRM, oControl) {
+		decorateRootElement(...aArgs) {
+			BaseRenderer.decorateRootElement.apply(this, aArgs);
+			const [oRM] = aArgs;
 			oRM.class("sapUiRtaToolbarAdaptation");
-			BaseRenderer.enhanceRootTag(oRM, oControl);
 		}
 	});
 

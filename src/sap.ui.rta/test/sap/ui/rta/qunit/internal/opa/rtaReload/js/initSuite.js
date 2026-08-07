@@ -18,7 +18,21 @@ sap.ui.require([
 	oStub.callThrough();
 	oSandbox.stub(FlUtils, "getUShellService").resolves();
 	oSandbox.stub(FlUtils, "getUshellContainer").callsFake(() => ({
-		getLogonSystem: () => ({ isTrial: () => false })
+		getLogonSystem: () => ({ isTrial: () => false }),
+		getRenderer() {
+			return {
+				getRootControl() {
+					return {
+						getShellHeader() {
+							return {
+								addStyleClass: () => {},
+								removeStyleClass: () => {}
+							};
+						}
+					};
+				}
+			};
+		}
 	}));
 	oSandbox.stub(Storage, "loadFeatures").resolves({
 		isKeyUser: true,
