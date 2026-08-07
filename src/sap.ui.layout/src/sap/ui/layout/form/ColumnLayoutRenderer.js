@@ -57,10 +57,10 @@ sap.ui.define([
 
 	ColumnLayoutRenderer.renderContainer = function(oRm, oLayout, oContainer){
 
-		var bExpandable = oContainer.getExpandable();
-		var oToolbar = oContainer.getToolbar();
-		var oTitle = oContainer.getTitle();
-		var oOptions = oLayout._getContainerSize(oContainer);
+		const bExpandable = oContainer.getExpandable();
+		const oToolbar = oContainer.getToolbar();
+		const oTitle = oContainer.getAggregation("_renderingTitle") || oContainer.getTitle();
+		const oOptions = oLayout._getContainerSize(oContainer);
 		const bEditable = oContainer.getProperty("_editable");
 		const sContentNode = bEditable ? "div" : "dl";
 

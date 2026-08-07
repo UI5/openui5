@@ -9,8 +9,9 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	'sap/ui/core/theming/Parameters',
 	'./FormHelper',
+	'./FormTitleUtil',
 	'sap/base/Log'
-], function(Element, ManagedObjectObserver, Library, Parameters, FormHelper, Log) {
+], function(Element, ManagedObjectObserver, Library, Parameters, FormHelper, FormTitleUtil, Log) {
 	"use strict";
 
 
@@ -85,8 +86,20 @@ sap.ui.define([
 			 * <b>Note:</b> If the title is provided as a string, the title is rendered with a theme-dependent default level.
 			 * As the <code>Form</code> control cannot know the structure of the page, this might not fit the page structure.
 			 * In this case provide the title using a <code>Title</code> element and set its {@link sap.ui.core.Title#setLevel level} to the needed value.
+			 *
+			 * <b>Note:</b> Do not use {@link sap.ui.core.Title#setIcon icon} for {@link sap.ui.core.Title Title}.
+			 * If an icon is needed, use a {@link #setToolbar Toolbar} to show both title and icon.
+			 *
+			 * <b>Note:</b> Do not use {@link sap.ui.core.Title#setEmphasized emphasized} for {@link sap.ui.core.Title Title}.
+			 * This is not supported in current themes and might lead to accessibillity issues.
 			 */
 			title : {type : "sap.ui.core.Title", altTypes : ["string"], multiple : false},
+
+			/**
+			 * Title control used for rendering. It is internally created and synchronized with the setting of the {@link #setTitle title} aggregation.
+			 * @since 1.136.20
+			 */
+			_renderingTitle : {type : "sap.ui.core.Control", multiple : false, visibility: "hidden"},
 
 			/**
 			 * Toolbar of the <code>FormContainer</code>.
@@ -133,7 +146,8 @@ sap.ui.define([
 
 		this._oObserver.observe(this, {
 			properties: ["expanded", "expandable"],
-			aggregations: ["formElements"]
+			aggregations: ["formElements", "title"],
+			parent: true
 		});
 
 	};
@@ -418,8 +432,11 @@ sap.ui.define([
 			_formElementChanged.call(this, oChanges.mutation, oChanges.child);
 		} else if (oChanges.name == "expanded") {
 			_expandedChanged.call(this, oChanges.current);
-		} else if (oChanges.name == "expandable") {
+		} else {
+			if (oChanges.name == "expandable") {
 			_expandableChanged.call(this, oChanges.current);
+			}
+			FormTitleUtil.observeTitleChange.call(this, oChanges);
 		}
 
 	};
