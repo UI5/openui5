@@ -14,7 +14,7 @@ sap.ui.define([
 
 	var sDefaultTimezone = Localization.getTimezone();
 
-	QUnit.module("DateTime format", {
+	QUnit.module("DateFormat - DateTime format", {
 		beforeEach: function () {
 			this.sLanguage = Localization.getLanguage();
 			Localization.setLanguage("en_US");
@@ -51,7 +51,7 @@ sap.ui.define([
 			"showTimezone parameter is ignored and bUTC parameter is truthy.");
 	});
 
-	QUnit.module("DateTimeWithTimezone instance");
+	QUnit.module("DateFormat - DateTimeWithTimezone instance");
 
 	QUnit.test("invalid configuration", function (assert) {
 		assert.throws(function() {
@@ -77,7 +77,7 @@ sap.ui.define([
 		assert.strictEqual(oFormat.format(new Date(), "~sTimezone"), "");
 	});
 
-	QUnit.module("DateTimeWithTimezone format en-US", {
+	QUnit.module("DateFormat - DateTimeWithTimezone format en-US", {
 		beforeEach: function () {
 			Localization.setTimezone("Europe/Berlin");
 			this.sLanguage = Localization.getLanguage();
@@ -152,7 +152,7 @@ sap.ui.define([
 			"Europe, Berlin", "w/o arguments default to Europe, Berlin");
 		});
 
-	QUnit.module("DateTimeWithTimezone format de-DE", {
+	QUnit.module("DateFormat - DateTimeWithTimezone format de-DE", {
 		beforeEach: function () {
 			Localization.setTimezone("Europe/Berlin");
 			this.sLanguage = Localization.getLanguage();
@@ -201,7 +201,7 @@ sap.ui.define([
 			"13.11.2021, 08:22:33 Amerika, New York", "date was converted and timezone name was added.");
 	});
 
-	QUnit.module("DateTimeWithTimezone format", {
+	QUnit.module("DateFormat - DateTimeWithTimezone format", {
 		beforeEach: function () {
 			Localization.setTimezone("Europe/Berlin");
 			this.sLanguage = Localization.getLanguage();
@@ -352,7 +352,7 @@ sap.ui.define([
 			"2021-10-12T22:22:33 -0400 GMT-04:00", "Format for pattern XX and z should be added.");
 	});
 
-	QUnit.module("DateTime parse", {
+	QUnit.module("DateFormat - DateTime parse", {
 		beforeEach: function () {
 			this.sLanguage = Localization.getLanguage();
 			Localization.setLanguage("en_US");
@@ -392,7 +392,7 @@ sap.ui.define([
 			"Timezone and showTimezone parameters are ignored.");
 	});
 
-	QUnit.module("DateTimeWithTimezone parse en-US", {
+	QUnit.module("DateFormat - DateTimeWithTimezone parse en-US", {
 		beforeEach: function () {
 			Localization.setTimezone("Europe/Berlin");
 			this.sLanguage = Localization.getLanguage();
@@ -574,7 +574,7 @@ sap.ui.define([
 			"use the timezone from the parsed string");
 	});
 
-	QUnit.module("DateTimeWithTimezone parse de-DE", {
+	QUnit.module("DateFormat - DateTimeWithTimezone parse de-DE", {
 		beforeEach: function () {
 			Localization.setTimezone("Europe/Berlin");
 			this.sLanguage = Localization.getLanguage();
@@ -697,7 +697,7 @@ sap.ui.define([
 			"The timezone is provided in date string, it is used to calculate the date.");
 	});
 
-	QUnit.module("DateTimeWithTimezone parse", {
+	QUnit.module("DateFormat - DateTimeWithTimezone parse", {
 		beforeEach: function () {
 			this.sLanguage = Localization.getLanguage();
 			Localization.setLanguage("en_US");
@@ -831,7 +831,7 @@ sap.ui.define([
 		assert.notOk(oParseResultEDT3[1], "timezone not part of the pattern");
 	});
 
-	QUnit.module("DateTimeWithTimezone integration - format and parse de-DE", {
+	QUnit.module("DateFormat - DateTimeWithTimezone integration - format and parse de-DE", {
 		beforeEach: function () {
 			Localization.setTimezone("Europe/Berlin");
 			this.sLanguage = Localization.getLanguage();
@@ -894,7 +894,7 @@ sap.ui.define([
 		assert.deepEqual(oParsedDate[1], undefined, "timezone match");
 	});
 
-	QUnit.module("DateTimeWithTimezone integration - format and parse", {
+	QUnit.module("DateFormat - DateTimeWithTimezone integration - format and parse", {
 		beforeEach: function () {
 			this.sLanguage = Localization.getLanguage();
 			Localization.setLanguage("en_US");
@@ -1217,7 +1217,7 @@ sap.ui.define([
 		assert.notOk(oParsedDateEST[1], "timezone not part of the pattern");
 	});
 
-	QUnit.module("DateTimeWithTimezone getDateTimeWithTimezoneInstance en-US", {
+	QUnit.module("DateFormat - DateTimeWithTimezone getDateTimeWithTimezoneInstance en-US", {
 		beforeEach: function () {
 			Localization.setTimezone("Europe/Berlin");
 			this.sLanguage = Localization.getLanguage();
