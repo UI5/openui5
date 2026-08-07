@@ -202,7 +202,7 @@ sap.ui.define([
 		assert.notOk(jQuery("#FC1--Grid").attr("role"), "role \"form\" not set on grid");
 		assert.notOk(jQuery("#FC1--Grid").attr("aria-labelledby"), "aria-labelledby not set on grid");
 		assert.equal(jQuery("#FC2---Panel").attr("role"), "form", "role \"form\" set on panel");
-		assert.equal(jQuery("#FC2---Panel").attr("aria-labelledby"), "T2", "aria-labelledby set on panel");
+		assert.equal(jQuery("#FC2---Panel").attr("aria-labelledby"), "FC2--title", "aria-labelledby set on panel");
 
 		oFormContainer1.addAriaLabelledBy("XXX");
 		oFormContainer2.addAriaLabelledBy("YYY");
@@ -210,7 +210,7 @@ sap.ui.define([
 
 		assert.equal(jQuery("#FC1--Grid").attr("role"), "form", "role \"form\" set on grid");
 		assert.equal(jQuery("#FC1--Grid").attr("aria-labelledby"), "XXX", "aria-labelledby set on grid");
-		assert.equal(jQuery("#FC2---Panel").attr("aria-labelledby"), "YYY T2", "aria-labelledby set on panel");
+		assert.equal(jQuery("#FC2---Panel").attr("aria-labelledby"), "YYY FC2--title", "aria-labelledby set on panel");
 	});
 
 	QUnit.test("Toolbar", async function(assert) {

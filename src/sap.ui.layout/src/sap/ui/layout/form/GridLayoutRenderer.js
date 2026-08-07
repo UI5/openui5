@@ -89,7 +89,7 @@ sap.ui.define([
 			rm.openStart("tr").class("sapUiGridTitle").openEnd();
 			rm.openStart("th").attr("colspan", iTitleCells).openEnd();
 
-			this.renderHeader(rm, oToolbar, oTitle, undefined, false, oLayout._sFormTitleSize, oForm.getId());
+			this.renderHeader(rm, oToolbar, oTitle, undefined, false, oLayout._sFormTitleLevel, oForm.getId());
 			rm.close("th");
 			rm.close("tr");
 		}

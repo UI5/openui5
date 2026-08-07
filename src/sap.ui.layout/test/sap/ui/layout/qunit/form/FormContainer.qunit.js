@@ -9,8 +9,8 @@ sap.ui.define([
 	"sap/m/Toolbar",
 	"sap/m/Label", // to make FormHelper could load all modules
 	"sap/m/Text", // to make FormHelper could load all modules
-	// to make FormHelper could load all modules
-	"sap/m/Button",
+	"sap/m/Button", // to make FormHelper could load all modules
+	"sap/m/Title", // to make FormHelper could load all modules
 	"sap/ui/core/theming/Parameters"
 	],
 	function(
@@ -23,6 +23,7 @@ sap.ui.define([
 			Label,
 			Text,
 			Button,
+			MTitle,
 			Parameters
 	) {
 	"use strict";
@@ -183,18 +184,28 @@ sap.ui.define([
 	QUnit.test("Title as string", function(assert) {
 		oFormContainer.setTitle("Test");
 		assert.equal(oFormContainer.getTitle(), "Test", "Title set");
+		let oRenderingTitle = oFormContainer.getAggregation("_renderingTitle");
+		assert.ok(oRenderingTitle, "rendering title created");
+		assert.equal(oRenderingTitle.getText(), "Test", "Title set");
 
-		oFormContainer.destroyTitle();
+		oFormContainer.setTitle();
 		assert.notOk(oFormContainer.getTitle(), "no Title set");
+		oRenderingTitle = oFormContainer.getAggregation("_renderingTitle");
+		assert.notOk(oRenderingTitle, "no rendering title created");
 	});
 
 	QUnit.test("Title as object", function(assert) {
 		var oTitle = new Title("T1", {text: "Test"});
 		oFormContainer.setTitle(oTitle);
 		assert.equal(oFormContainer.getTitle(), oTitle, "Title set");
+		let oRenderingTitle = oFormContainer.getAggregation("_renderingTitle");
+		assert.ok(oRenderingTitle, "rendering title created");
+		assert.equal(oRenderingTitle.getText(), "Test", "Title set");
 
 		oFormContainer.destroyTitle();
 		assert.notOk(oFormContainer.getTitle(), "no Title set");
+		oRenderingTitle = oFormContainer.getAggregation("_renderingTitle");
+		assert.notOk(oRenderingTitle, "no rendering title created");
 	});
 
 	QUnit.module("Toolbar", {
