@@ -343,5 +343,15 @@
         "text": "p13n.FilterPanel: fix import"
       }
     ]
+  },
+  "1.148.6": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "b40c0b6dfa514837e84480e25ca39e996ba88a0e",
+        "type": "FIX",
+        "text": " GroupPanel, SortPanel: improve for small screens"
+      }
+    ]
   }
 }

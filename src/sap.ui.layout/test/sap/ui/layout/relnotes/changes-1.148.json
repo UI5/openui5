@@ -1,0 +1,12 @@
+{
+  "1.148.6": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "36f6385530fd45ae1e0d6f0afeb754a8989f3bc4",
+        "type": "FIX",
+        "text": " SemanticFormElement: aria-label on Text controls"
+      }
+    ]
+  }
+}
