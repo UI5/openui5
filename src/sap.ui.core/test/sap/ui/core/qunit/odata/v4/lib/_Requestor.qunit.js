@@ -4652,8 +4652,12 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("fetch: error handling", function (assert) {
-		const oRequestor = _Requestor.create("/~/", null, {}, {}, "4.0");
+[false, true].forEach((bStatus503) => {
+	[false, true].forEach((bRetryAfter) => {
+		const sTitle = "fetch: error handling, with status 503 = " + bStatus503
+			+ ", bRetryAfter: " + bRetryAfter;
+	QUnit.test(sTitle, function (assert) {
+		const oRequestor = _Requestor.create("/~/", oModelInterface, {}, {}, "4.0");
 		const oFetchOptions = {
 			method : "~method~",
 			headers : {
@@ -4669,14 +4673,15 @@ sap.ui.define([
 		const oResult = {
 			headers : {get : mustBeMocked},
 			ok : false,
-			status : "~statusCode~",
+			status : (bStatus503 ? 503 : "~statusCode~"),
 			statusText : "~statusText~",
 			text : mustBeMocked
 		};
 		this.mock(_Requestor).expects("fetch").on(window)
 			.withExactArgs(sRequestUrl, oFetchOptions).resolves(oResult);
 		this.mock(oResult).expects("text").withExactArgs().resolves("~sBody~");
-		this.mock(oResult.headers).expects("get").withExactArgs("foo").returns("~bar~");
+		const oHeadersMock = this.mock(oResult.headers);
+		oHeadersMock.expects("get").withExactArgs("foo").returns("~bar~");
 		this.mock(_Helper).expects("createError")
 			.withExactArgs(sinon.match.object, "Communication error", sRequestUrl, "Product(42)")
 			.callsFake((jqXHR) => {
@@ -4684,11 +4689,15 @@ sap.ui.define([
 				assert.strictEqual(jqXHR.getResponseHeader("foo"), "~bar~");
 
 				assert.strictEqual(jqXHR.responseText, "~sBody~");
-				assert.strictEqual(jqXHR.status, "~statusCode~");
+				assert.strictEqual(jqXHR.status, (bStatus503 ? 503 : "~statusCode~"));
 				assert.strictEqual(jqXHR.statusText, "~statusText~");
 
 				return "~oError~";
 			});
+		oHeadersMock.expects("get").exactly(bStatus503 ? 1 : 0)
+			.withExactArgs("Retry-After").returns(bRetryAfter ? "42" : undefined);
+		this.mock(oRequestor.oModelInterface).expects("getOrCreateRetryAfterPromise")
+			.exactly(bStatus503 && bRetryAfter ? 1 : 0).returns(null);
 
 		// code under test
 		return oRequestor.fetch("~method~", "Product(42)", "~queryString~")
@@ -4697,6 +4706,56 @@ sap.ui.define([
 			}, (oError) => {
 				assert.strictEqual(oError, "~oError~");
 			});
+	});
+	});
+});
+
+	//*********************************************************************************************
+	QUnit.test("fetch: 503 handling", async function (assert) {
+		const oRequestor = _Requestor.create("/~/", oModelInterface, {}, {}, "4.0");
+		const oFetchOptions = {
+			method : "~method~",
+			headers : {
+				Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true",
+				"OData-MaxVersion" : "4.0",
+				"OData-Version" : "4.0",
+				"X-CSRF-Token" : "Fetch",
+				"Content-Type" : "application/json;charset=UTF-8;IEEE754Compatible=true"
+			}
+		};
+		const sRequestUrl = "/~/Product(42)~queryString~";
+		const oRequestorMock = this.mock(_Requestor);
+		oRequestorMock.expects("fetch").on(window).withExactArgs(sRequestUrl, oFetchOptions)
+			.resolves({
+				headers : new Headers({"Retry-After" : "n/a"}),
+				ok : false,
+				status : 503,
+				statusText : "~statusText~",
+				text : () => Promise.resolve("~sBody~")
+			});
+		this.mock(_Helper).expects("createError").withExactArgs(sinon.match({
+				responseText : "~sBody~",
+				status : 503,
+				statusText : "~statusText~"
+			}), "Communication error", sRequestUrl, "Product(42)")
+			.returns("~oError~");
+		const oResult200 = Object.freeze({ok : true});
+		this.mock(oRequestor.oModelInterface).expects("getOrCreateRetryAfterPromise")
+			.withExactArgs("~oError~")
+			.callsFake(() => new Promise((resolve) => {
+				const oFetchExpectation = oRequestorMock.expects("fetch").on(window)
+					.withExactArgs(sRequestUrl, oFetchOptions).resolves(oResult200);
+				setTimeout(() => {
+					assert.notOk(oFetchExpectation.called);
+					resolve();
+				});
+			}));
+
+		assert.strictEqual(
+			// code under test
+			await oRequestor.fetch("~method~", "Product(42)", "~queryString~"),
+			oResult200
+		);
 	});
 
 	//*********************************************************************************************

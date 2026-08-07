@@ -10451,6 +10451,85 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	});
 
 	//*********************************************************************************************
+	// Scenario: "Retry-After" handling with streams
+	// 1) Fetch a stream
+	// 2) Fetch answered with 503 "Retry-After"
+	// 3) Resolve "Retry-After" promise repeats the fetch request
+	// JIRA: CPOUI5ODATAV4-3624
+	QUnit.test('Edm.Stream response with 503, "Retry-After" handling', async function (assert) {
+		const oModel = this.createTeaBusiModel123();
+		const sPath = "EMPLOYEES('1')"
+			+ "/com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__AcDownloadDocument";
+		const oBinding = oModel.bindContext("/" + sPath + "(...)");
+		let fnResolveRetryAfter;
+		let fnResolveCallback;
+		const oCallbackPromise = new Promise((resolve) => {
+			fnResolveCallback = resolve;
+		});
+		oModel.setRetryAfterHandler((oError) => {
+			assert.ok(oError instanceof Error);
+			assert.strictEqual(oError.status, 503);
+			assert.strictEqual(oError.message, "DB migration in progress");
+			const iSeconds = (oError.retryAfter.getTime() - Date.now()) / 1000;
+			assert.ok(iSeconds > 41 && iSeconds < 43, `${iSeconds} roughly 42 seconds`);
+
+			fnResolveCallback();
+			return new Promise((resolve) => {
+				fnResolveRetryAfter = resolve;
+			});
+		});
+
+		const oRequestorMock = this.mock(_Requestor);
+		const mHeaders = {
+			Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true",
+			"Accept-Language" : "en-US",
+			"Content-Type" : "application/json;charset=UTF-8;IEEE754Compatible=true",
+			"OData-MaxVersion" : "4.0",
+			"OData-Version" : "4.0",
+			"X-CSRF-Token" : "Fetch"
+		};
+		oRequestorMock.expects("fetch")
+			.withExactArgs(sTeaBusi + sPath + "?sap-client=123", {
+				headers : mHeaders,
+				method : "POST",
+				body : "{}"
+			})
+			.resolves({
+				ok : false,
+				status : 503,
+				statusText : "Service Unavailable",
+				headers : new Headers({
+					"Retry-After" : "42",
+					"Content-Type" : "text/plain"
+				}),
+				text : () => Promise.resolve("DB migration in progress")
+			});
+
+		// code under test
+		const oInvokePromise = oBinding.invoke("$stream");
+
+		await oCallbackPromise;
+
+		oRequestorMock.expects("fetch")
+			.withExactArgs(sTeaBusi + sPath + "?sap-client=123", {
+				headers : mHeaders,
+				method : "POST",
+				body : "{}"
+			})
+			.resolves({
+				ok : true,
+				body : "~body~",
+				headers : "~headers~"
+			});
+
+		// code under test
+		fnResolveRetryAfter();
+		const oResult = await oInvokePromise;
+
+		assert.deepEqual(oResult, {body : "~body~", headers : "~headers~"});
+	});
+
+	//*********************************************************************************************
 	// Scenario: Check that the promise for requesting currency codes does not fail if the model is
 	// destroyed while the request is pending.
 	// JIRA: CPOUI5ODATAV4-2812
