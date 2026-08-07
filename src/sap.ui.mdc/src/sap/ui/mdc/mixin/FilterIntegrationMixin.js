@@ -60,7 +60,7 @@ sap.ui.define([
 	 */
 	FilterIntegrationMixin.setFilter = function(vFilter) {
 
-		const sNewFilter = typeof vFilter === "object" ? vFilter.getId() : vFilter;
+		const sNewFilter = vFilter && typeof vFilter === "object" ? vFilter.getId() : vFilter;
 		const sOldFilter = this.getFilter();
 
 		if (sOldFilter !== sNewFilter) {

@@ -164,7 +164,7 @@ sap.ui.define(
 			}
 		};
 
-		 ValueStateHeader.prototype._hasVisibleContent = function () {
+		ValueStateHeader.prototype._hasVisibleContent = function () {
 			return this.getValueState() !== ValueState.None || !!this.getText() || !!this.getFormattedText();
 		};
 

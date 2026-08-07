@@ -92,32 +92,7 @@ sap.ui.define([
 	}).placeAt("qunit-fixture");
 
 	function givenAnFLP(fnFLPNavigateStub, fnFLPReloadStub, mShellParams) {
-		sandbox.stub(FlexUtils, "getUshellContainer").returns({
-			getServiceAsync() {
-				return Promise.resolve({
-					navigate: fnFLPNavigateStub,
-					getHash() {
-						return "Action-somestring";
-					},
-					parseShellHash() {
-						const mHash = {
-							semanticObject: "Action",
-							action: "somestring"
-						};
-
-						if (mShellParams) {
-							mHash.params = mShellParams;
-						}
-						return mHash;
-					},
-					getCurrentApplication() {},
-					unregisterNavigationFilter() {},
-					registerNavigationFilter() {},
-					reloadCurrentApp: fnFLPReloadStub,
-					getUser() {}
-				});
-			}
-		});
+		return RtaQunitUtils.stubFLPContainer(sandbox, fnFLPReloadStub, mShellParams, fnFLPNavigateStub);
 	}
 
 	function stubManifestChanges(oRta, bExist) {
@@ -527,10 +502,6 @@ sap.ui.define([
 		QUnit.test("when RTA gets started in FLP context with original toolbar available", async function(assert) {
 			givenAnFLP();
 			stubToolbarButtonsVisibility(false, false);
-			RtaQunitUtils.stubSapUiRequire(sandbox, [{
-				name: "sap/ushell/api/RTA",
-				stub: { getLogo: () => {}, setShellHeaderVisibility: () => {} }
-			}]);
 			await this.oRta.start();
 
 			assert.strictEqual(this.oRta.getToolbar().isA("sap.ui.rta.toolbar.Fiori"), true, "then the toolbar is of type Fiori");

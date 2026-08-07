@@ -33,8 +33,6 @@ sap.ui.define([
 	"sap/m/MenuItem",
 	"sap/m/Menu",
 	"sap/m/Panel",
-	"sap/m/Popover",
-	"sap/m/OverflowToolbarAssociativePopover",
 	"sap/m/OverflowToolbarAssociativePopoverControls",
 	"sap/m/ToolbarSeparator",
 	"sap/m/MenuButton",
@@ -75,8 +73,6 @@ sap.ui.define([
 	MenuItem,
 	Menu,
 	Panel,
-	Popover,
-	OverflowToolbarAssociativePopover,
 	OverflowToolbarAssociativePopoverControls,
 	ToolbarSeparator,
 	MenuButton,
@@ -90,8 +86,6 @@ sap.ui.define([
 
 	// shortcut for sap.m.OverflowToolbarPriority
 	const OverflowToolbarPriority = mobileLibrary.OverflowToolbarPriority;
-
-	const PopoverPlacementType = mobileLibrary.PlacementType;
 
 	// shortcut for sap.ui.core.aria.HasPopup
 	const AriaHasPopup = coreLibrary.aria.HasPopup;
@@ -4064,24 +4058,6 @@ sap.ui.define([
 	});
 
 	QUnit.module("Associative popover");
-
-	QUnit.test("Popover _recalculateMargins method overwrite", function (assert) {
-		const oFakeObject = {
-				_fWindowHeight: 5,
-				_fPopoverOffsetY: 5,
-				_$parent: {
-					offset: function () {
-						return {top: 5};
-					}
-				}
-			},
-			oResultPopover = Popover.prototype._recalculateMargins(PopoverPlacementType.Top, Object.assign({}, oFakeObject)),
-			oResultAssociativePopover = OverflowToolbarAssociativePopover.prototype._recalculateMargins(PopoverPlacementType.Top, Object.assign({}, oFakeObject));
-
-		Object.keys(oResultPopover).forEach(function (sProperty) {
-			assert.notEqual(oResultAssociativePopover[sProperty], undefined, "Result object has property: " + sProperty);
-		});
-	});
 
 	QUnit.test("getControlConfig ToggleButton", function (assert) {
 		// Arrange

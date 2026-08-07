@@ -866,8 +866,11 @@ sap.ui.define([
 			values: []
 		};
 
-		const oResult = oOperatorDynamicDateOption.parse(oMessageBundle.getText("operators.Empty.longText.date", undefined, true)); // as DynamicDateRangle removes brackets
-		assert.deepEqual(oResult, oValue, "parsed value");
+		let oResult = oOperatorDynamicDateOption.parse(oMessageBundle.getText("operators.Empty.longText.date", undefined, true));
+		assert.deepEqual(oResult, oValue, "parsed value for longText");
+
+		oResult = oOperatorDynamicDateOption.parse(oMessageBundle.getText("operators.Empty.tokenText.date", undefined, true));
+		assert.deepEqual(oResult, oValue, "parsed value for tokenText");
 
 	});
 

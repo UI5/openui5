@@ -553,6 +553,74 @@ sap.ui.define([
 			assert.strictEqual(aDefaultVariants.length, 0, "the default variant was cleared");
 			assert.strictEqual(aCompVariants.standardVariantChange, undefined, "the standard variant was cleared");
 		});
+
+		QUnit.test("Given a new PUBLIC variant with favorite set to true is persisted", async function(assert) {
+			const sPersistencyKey = "persistency.key";
+			sandbox.stub(Settings.getInstanceOrUndef(), "getIsPublicLayerAvailable").returns(true);
+
+			const oVariant = CompVariantManager.addVariant({
+				changeSpecificData: {
+					type: "pageVariant",
+					isUserDependent: false,
+					favorite: true,
+					content: {}
+				},
+				reference: sComponentId,
+				componentId: sComponentId,
+				persistencyKey: sPersistencyKey
+			});
+
+			assert.strictEqual(oVariant.getLayer(), Layer.PUBLIC, "the variant is in the PUBLIC layer");
+
+			const oSaveSpy = sandbox.spy(FlexObjectManager, "saveFlexObjects");
+
+			await CompVariantManager.persist({
+				reference: sComponentId,
+				componentId: sComponentId,
+				persistencyKey: sPersistencyKey,
+				control: oComponent
+			});
+
+			assert.strictEqual(oVariant.getFavorite(), false, "the favorite flag is reset to false after persisting");
+			assert.strictEqual(
+				oSaveSpy.getCall(0).args[0].flexObjects[0].convertToFileContent().favorite,
+				false,
+				"the favorite:false value is included in the persisted payload"
+			);
+		});
+
+		QUnit.test("Given a new CUSTOMER variant with favorite set to true is persisted", async function(assert) {
+			const sPersistencyKey = "persistency.key";
+			sandbox.stub(Settings.getInstanceOrUndef(), "getIsPublicLayerAvailable").returns(false);
+
+			const oVariant = CompVariantManager.addVariant({
+				changeSpecificData: {
+					type: "pageVariant",
+					isUserDependent: false,
+					favorite: true,
+					content: {}
+				},
+				reference: sComponentId,
+				componentId: sComponentId,
+				persistencyKey: sPersistencyKey,
+				control: {
+					getCurrentVariantId() {
+						return "";
+					}
+				}
+			});
+
+			assert.strictEqual(oVariant.getLayer(), Layer.CUSTOMER, "the variant is in the CUSTOMER layer");
+
+			await CompVariantManager.persist({
+				reference: sComponentId,
+				componentId: sComponentId,
+				persistencyKey: sPersistencyKey,
+				control: oComponent
+			});
+
+			assert.strictEqual(oVariant.getFavorite(), true, "the favorite flag is kept for a non-PUBLIC variant");
+		});
 	});
 
 	QUnit.module("setDefault", {

@@ -448,12 +448,9 @@ sap.ui.define([
 					return this.waitFor({
 						autoWait: false,
 						timeout: 100,
-						controlType: "sap.m.HBox",
-						matchers(oToolbar) {
-							return oToolbar.getDomRef().classList.contains("sapUiRtaToolbar");
-						},
+						id: "sapUIRta_toolbar",
 						success(oToolbar) {
-							Opa5.assert.ok(oToolbar[0].getVisible(), "The Toolbar is shown.");
+							Opa5.assert.ok(oToolbar.getVisible(), "The Toolbar is shown.");
 						},
 						errorMessage: "Did not find the Toolbar"
 					});
@@ -470,14 +467,10 @@ sap.ui.define([
 				iShouldSeeTheToolbarAndTheLogo() {
 					return this.waitFor({
 						autoWait: false,
-						controlType: "sap.m.HBox",
-						matchers(oToolbar) {
-							return oToolbar.getDomRef().classList.contains("sapUiRtaToolbar");
-						},
+						id: "sapUIRta_toolbar",
 						success(oToolbar) {
-							const oFioriToolbar = oToolbar[0];
-							Opa5.assert.ok(oFioriToolbar.getVisible(), "The Toolbar is shown.");
-							Opa5.assert.ok(oFioriToolbar.getControl("icon"), "The FLP Icon is part of the Toolbar");
+							Opa5.assert.ok(oToolbar.getVisible(), "The Toolbar is shown.");
+							Opa5.assert.ok(oToolbar.getControl("icon"), "The FLP Icon is part of the Toolbar");
 
 							return this.waitFor({
 								controlType: "sap.m.Image",
@@ -614,10 +607,10 @@ sap.ui.define([
 				iShouldSeeTheVariantURLParameter() {
 					return this.waitFor({
 						autoWait: true,
-						check() {
+						async check() {
 							const oOpa5Window = Opa5.getWindow();
-							const oHashChanger = new oOpa5Window.sap.ui.core.routing.HashChanger();
-							return oHashChanger.getHash().includes("sap-ui-fl-control-variant-id");
+							const oHasher = await oOpa5Window.sap.ui.require(["sap/ui/thirdparty/hasher"]);
+							return oHasher.getHash().includes("sap-ui-fl-control-variant-id");
 						},
 						success() {
 							Opa5.assert.ok(true, "The URL parameter for variant id is present");
@@ -628,10 +621,10 @@ sap.ui.define([
 				iShouldNotSeeTheVariantURLParameter() {
 					return this.waitFor({
 						autoWait: true,
-						check() {
+						async check() {
 							const oOpa5Window = Opa5.getWindow();
-							const oHashChanger = new oOpa5Window.sap.ui.core.routing.HashChanger();
-							return !oHashChanger.getHash().includes("sap-ui-fl-control-variant-id");
+							const oHasher = await oOpa5Window.sap.ui.require(["sap/ui/thirdparty/hasher"]);
+							return !oHasher.getHash().includes("sap-ui-fl-control-variant-id");
 						},
 						success() {
 							Opa5.assert.ok(true, "The URL parameter for variant id is not present");

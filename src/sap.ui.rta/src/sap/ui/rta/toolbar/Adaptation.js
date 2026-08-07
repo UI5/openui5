@@ -206,7 +206,7 @@ sap.ui.define([
 	 * @returns {Promise<sap.ui.core.Control[]>} Returns the controls in a structure described above.
 	 */
 	Adaptation.prototype.buildControls = async function() {
-		const oControl = await Fragment.load({
+		const aControls = await Fragment.load({
 			name: "sap.ui.rta.toolbar.Adaptation",
 			id: `${this.getId()}_fragment`,
 			controller: {
@@ -229,7 +229,7 @@ sap.ui.define([
 				navigateBack: this.navigateBack.bind(this)
 			}
 		});
-		return oControl.getItems();
+		return aControls;
 	};
 
 	function formatSaveVisibility(bVersioningEnabled, sDisplayedVersion, bAdaptationMode) {

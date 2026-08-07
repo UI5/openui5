@@ -699,10 +699,10 @@ sap.ui.define([
 					only: ["sap/ui/rta/service/Selection"]
 				}
 			},
-			"service/SupportTools": {
+			"service/OverlayInfo": {
 				group: "Service",
 				coverage: {
-					only: ["sap/ui/rta/service/SupportTools"]
+					only: ["sap/ui/rta/service/OverlayInfo"]
 				}
 			},
 			"service/Property": {

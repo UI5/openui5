@@ -253,7 +253,7 @@ sap.ui.define([
 			if (window.parent !== window) {
 				this.pServices = this.getService("receiver");
 			}
-			this.pServices = this.pServices.then(this.getService.bind(this, "supportTools"));
+			this.pServices = this.pServices.then(this.getService.bind(this, "overlayInfo"));
 
 			this._loadUShellServicesPromise = FlexUtils.getUShellServices(["AppLifeCycle", "Navigation"])
 			.then(function(mUShellServices) {

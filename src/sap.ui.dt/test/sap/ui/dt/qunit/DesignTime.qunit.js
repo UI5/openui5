@@ -1047,6 +1047,69 @@ sap.ui.define([
 			}.bind(this));
 		});
 
+		QUnit.test("when a child overlay is parented under a wrong aggregation overlay (e.g. flex move applied between two passes of _createChildrenOverlays), the next _createChildrenOverlays pass for the new model parent re-parents the overlay", async function(assert) {
+			const oInnerLayoutOverlay = OverlayRegistry.getOverlay(this.oInnerLayout);
+			const oOuterLayoutOverlay = OverlayRegistry.getOverlay(this.oOuterLayout);
+			const oButton1Overlay = OverlayRegistry.getOverlay(this.oButton1);
+			const oInnerContentAggOverlay = oInnerLayoutOverlay.getAggregationOverlay("content");
+
+			assert.strictEqual(
+				oButton1Overlay.getParent(),
+				oInnerContentAggOverlay,
+				"precondition: button1 overlay is initially under innerLayout's content aggregation overlay"
+			);
+
+			// Emulate the race where MoveControls applies before the target parent's
+			// _createChildrenOverlays pass starts: move button1 to outerLayout but keep
+			// its overlay attached to innerLayout's content aggregation overlay.
+			this.oInnerLayout.removeContent(this.oButton1);
+			this.oOuterLayout.addContent(this.oButton1);
+			oInnerContentAggOverlay.addChild(oButton1Overlay, true);
+
+			assert.strictEqual(
+				this.oButton1.getParent(),
+				this.oOuterLayout,
+				"after the move, button1's parent is outerLayout"
+			);
+			assert.strictEqual(
+				oButton1Overlay.getParent(),
+				oInnerContentAggOverlay,
+				"but the overlay tree is stale: button1 overlay is still under innerLayout's content aggregation overlay"
+			);
+
+			// Detach (do NOT destroy — that would cascade-destroy inner and its children's
+			// overlays) outerLayout's existing content aggregation overlay from outerLayout
+			// so we can call _createChildrenOverlays without producing a duplicate that
+			// would orphan one.
+			const oOldOuterContentAggOverlay = oOuterLayoutOverlay.getAggregationOverlay("content");
+			oOuterLayoutOverlay.removeAggregation("children", oOldOuterContentAggOverlay, true);
+
+			try {
+				await this.oDesignTime._createChildrenOverlays(oOuterLayoutOverlay, {}, ["content"], false, {});
+				const oNewOuterContentAggOverlay = oOuterLayoutOverlay.getAggregationOverlay("content");
+				assert.ok(oNewOuterContentAggOverlay, "outerLayout has a content aggregation overlay after the pass");
+				assert.notStrictEqual(
+					oNewOuterContentAggOverlay,
+					oOldOuterContentAggOverlay,
+					"and it is the newly created one"
+				);
+				assert.strictEqual(
+					oButton1Overlay.getParent(),
+					oNewOuterContentAggOverlay,
+					"button1 overlay is re-parented to outerLayout's content aggregation overlay"
+				);
+				assert.notStrictEqual(
+					oButton1Overlay.getParent(),
+					oInnerContentAggOverlay,
+					"and it is no longer under innerLayout's content aggregation overlay"
+				);
+			} catch (oError) {
+				assert.notOk(oError, `no error during _createChildrenOverlays: ${oError && oError.message}`);
+			} finally {
+				oOldOuterContentAggOverlay.destroy();
+			}
+		});
+
 		QUnit.test("when oInnerLayout is extended by new button element without existing overlay", function(assert) {
 			var fnDone = assert.async();
 			var oParentOfNewOverlay;
