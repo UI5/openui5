@@ -85914,13 +85914,17 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-3375
 	//
 	// Invoke an additional action in parallel (JIRA: CPOUI5ODATAV4-3591)
+	// Test error handling when the first operation fails (JIRA: CPOUI5ODATAV4-3617)
 	[false, true].forEach((bAction) => {
-		QUnit.test("Edm.Stream: " + (bAction ? "Action" : "Function"), async function (assert) {
-			const oModel = this.createTeaBusiModel();
+		[false, true].forEach((bOk) => {
+			const sTitle = "Edm.Stream: " + (bAction ? "Action" : "Function") + " with Success: " + bOk;
+
+		QUnit.test(sTitle, async function (assert) {
+			const oModel = this.createTeaBusiModel123();
 			const sPath = "EMPLOYEES('1')"
 				+ "/com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__"
 				+ (bAction ? "Ac" : "Fu") + "DownloadDocument";
-			const oBinding = oModel.bindContext("/" + sPath + "(...)");
+			const oBinding = oModel.bindContext("/" + sPath + "(...)", undefined, {custom : "foo"});
 
 			const mHeaders = {
 				Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true",
@@ -85930,28 +85934,47 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"OData-Version" : "4.0",
 				"X-CSRF-Token" : "Fetch"
 			};
-			const oStreamResponse0 = {
+			const oStreamResponse0 = bOk ? {
 				body : "~body0~",
 				headers : "~headers0~",
-				foo : "bar" // must not be part of the result
+				foo : "bar", // must not be part of the result
+				ok : bOk
+			} : {
+				headers : {
+					get : function (sHeader) {
+						if (sHeader === "Content-Type") {
+							return "text/plain";
+						}
+					}
+				},
+				ok : false,
+				status : 500,
+				statusText : "Internal Server Error",
+				text : () => Promise.resolve("Short dump")
 			};
 			const oStreamResponse1 = {
 				body : "~body1~",
 				headers : "~headers1~",
-				foo : "bar" // must not be part of the result
+				foo : "bar", // must not be part of the result
+				ok : true
 			};
 
+			const sMessage = "Internal Server Error";
+			if (!bOk) {
+				this.oLogMock.expects("error").withExactArgs(
+					"Failed to invoke /" + sPath + "(...)", sinon.match(sMessage), sODCB);
+			}
 			const oRequestorMock = this.mock(_Requestor);
 			if (bAction) {
 				oRequestorMock.expects("fetch")
-					.withExactArgs(sTeaBusi + sPath, {
+					.withExactArgs(sTeaBusi + sPath + "?sap-client=123&custom=foo", {
 						headers : mHeaders,
 						method : "POST",
 						body : JSON.stringify({format : "PDF", locale : "en-US"})
 					})
 					.resolves(oStreamResponse0);
 				oRequestorMock.expects("fetch")
-					.withExactArgs(sTeaBusi + sPath, {
+					.withExactArgs(sTeaBusi + sPath + "?sap-client=123&custom=foo", {
 						headers : mHeaders,
 						method : "POST",
 						body : JSON.stringify({format : "JSON", locale : "de"})
@@ -85959,13 +85982,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					.resolves(oStreamResponse1);
 			} else {
 				oRequestorMock.expects("fetch")
-					.withExactArgs(sTeaBusi + sPath + "(format='PDF',locale='en-US')", {
+					.withExactArgs(sTeaBusi + sPath
+							+ "(format='PDF',locale='en-US')?sap-client=123&custom=foo", {
 						headers : mHeaders,
 						method : "GET"
 					})
 					.resolves(oStreamResponse0);
 				oRequestorMock.expects("fetch")
-					.withExactArgs(sTeaBusi + sPath + "(format='JSON',locale='de')", {
+					.withExactArgs(sTeaBusi + sPath
+							+ "(format='JSON',locale='de')?sap-client=123&custom=foo", {
 						headers : mHeaders,
 						method : "GET"
 					})
@@ -85973,16 +85998,22 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}
 
 			const [oResult0, oResult1] = await Promise.all([
-				// code under test (JIRA: CPOUI5ODATAV4-3375) j
-				oBinding.setParameter("format", "PDF").setParameter("locale", "en-US")
-					.invoke("$stream"),
+				// code under test (JIRA: CPOUI5ODATAV4-3375)
+				oBinding.setParameter("format", "PDF").setParameter("locale", "en-US").invoke("$stream")
+					.then(bOk ? null : mustFail(assert), (oError) => {
+						assert.strictEqual(oError.message, "Short dump");
+						assert.strictEqual(oError.status, 500);
+						assert.strictEqual(oError.statusText, sMessage);
+					}),
 				// code under test (JIRA: CPOUI5ODATAV4-3591)
-				oBinding.setParameter("format", "JSON").setParameter("locale", "de")
-					.invoke("$stream")
+				oBinding.setParameter("format", "JSON").setParameter("locale", "de").invoke("$stream")
 			]);
 
-			assert.deepEqual(oResult0, {body : "~body0~", headers : "~headers0~"});
+			if (bOk) {
+				assert.deepEqual(oResult0, {body : "~body0~", headers : "~headers0~"});
+			}
 			assert.deepEqual(oResult1, {body : "~body1~", headers : "~headers1~"});
+		});
 		});
 	});
 });

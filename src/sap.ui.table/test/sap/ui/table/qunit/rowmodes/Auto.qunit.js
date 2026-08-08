@@ -139,13 +139,21 @@ sap.ui.define([
 	});
 
 	QUnit.test("Changing visibility of the footer", async function(assert) {
+		this.oTable.destroyAggregation("extension");
+		this.oTable.destroyAggregation("creationRow");
+		await this.oTable.qunit.resize({height: "430px"});
+
+		const iInitialRowCount = this.oTable.getRows().length;
+
 		this.oTable.getFooter().setVisible(false);
-		await this.oTable.qunit.whenNextRenderingFinished();
-		assert.equal(this.oTable.getRows().length, 15, "Row count after hiding the footer");
+		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === iInitialRowCount + 2);
+		assert.equal(this.oTable.getRows().length, iInitialRowCount + 2, "Row count increased after hiding the footer");
 
 		this.oTable.getFooter().setVisible(true);
-		await this.oTable.qunit.whenNextRenderingFinished();
-		assert.equal(this.oTable.getRows().length, 13, "Row count after showing the footer");
+		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === iInitialRowCount);
+		assert.equal(this.oTable.getRows().length, iInitialRowCount, "Row count restored after showing the footer");
+
+		await this.oTable.qunit.resetSize();
 	});
 
 	QUnit.test("Changing visibility of the creation row", async function(assert) {
