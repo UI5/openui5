@@ -692,6 +692,7 @@ sap.ui.define([
 				});
 
 				Promise.all(aColorPromises).then(() => {
+					this._getChart(oChart).setChartType(oChart.getChartType());
 					this._getChart(oChart).setVisibleDimensions(aVisibleDimensions);
 					this._getChart(oChart).setVisibleMeasures(aVisibleMeasures);
 
@@ -1379,6 +1380,12 @@ sap.ui.define([
 	ChartDelegate.getPropertyAttribute = function(oChart, oPropertyInfo, sAttributeName) {
 		let value = oPropertyInfo.hasOwnProperty(sAttributeName) ? oPropertyInfo[sAttributeName] : null;
 		if (!value) {
+			if (sAttributeName === "timeUnitType") {
+				const sDataType = oPropertyInfo.dataType;
+				if (sDataType === "Edm.DateTimeOffset" || sDataType === "sap.ui.model.odata.type.DateTimeOffset") {
+					return "Date";
+				}
+			}
 			value = this.fetchConfigurationForVizchart(oChart, oPropertyInfo.key, sAttributeName);
 		}
 		return value;

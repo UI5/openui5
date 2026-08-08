@@ -119,4 +119,26 @@ sap.ui.define([
 
 		assert.deepEqual(this.oSortPanel.getP13nData(true), aNewSortState, "Correct sort state");
 	});
+
+	QUnit.test("GridData", function(assert){
+		const aItems = this.oSortPanel._oListControl.getItems();
+		const oGrid = aItems[0].getContent()[0];
+		const oComboBox = oGrid.getContent()[0];
+		const oOrderSwitch = oGrid.getContent()[1];
+		const oText = oGrid.getContent()[2];
+		const oButtonBox = oGrid.getContent()[3];
+
+		assert.equal(oGrid.getDefaultSpan(), "XL4 L4 M4 S5", "Grid: Span");
+		let oGridData = oComboBox.getLayoutData();
+		assert.equal(oGridData.getSpan(), "XL4 L4 M4 S12", "Select: Span");
+		oGridData = oOrderSwitch.getLayoutData();
+		assert.equal(oGridData.getSpan(), "XL2 L2 M2 S3", "OrderSwitch: Span");
+		assert.ok(oGridData.getLinebreakS(), "OrderSwitch: linebreakS");
+		oGridData = oText.getLayoutData();
+		assert.equal(oGridData.getSpan(), "XL3 L3 M3 S3", "Text: Span");
+		assert.notOk(oGridData.getVisibleS(), "Text: visibleS");
+		oGridData = oButtonBox.getLayoutData();
+		assert.equal(oGridData.getSpan(), "XL3 L3 M3 S4", "ButtonBox: Span");
+		assert.equal(oGridData.getIndentS(), 5, "ButtonBox: indentS");
+	});
 });

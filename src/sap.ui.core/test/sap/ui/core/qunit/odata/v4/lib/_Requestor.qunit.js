@@ -4572,12 +4572,12 @@ sap.ui.define([
 
 	//*********************************************************************************************
 [false, true].forEach(function (bAction) {
-	QUnit.test("fetch: with payload: " + bAction, function (assert) {
+	QUnit.test("fetch: with payload: " + bAction, async function (assert) {
 		const oRequestor = _Requestor.create("/~/", null, {
 				"Content-Type" : "n/a",
 				custom : "value",
 				"X-CSRF-Token" : "~token~"
-			}, {}, "4.0");
+			}, {"sap-client" : "n/a"}, "4.0");
 		const oFetchOptions = {
 			method : "~method~",
 			headers : {
@@ -4596,14 +4596,16 @@ sap.ui.define([
 		// code under test
 		assert.strictEqual(_Requestor.fetch, fetch, "trampoline property");
 
+		const oResult = Object.freeze({ok : true});
 		this.mock(_Requestor).expects("fetch").on(window)
-			.withExactArgs("/~/Product(42)", oFetchOptions).returns("~result~");
+			.withExactArgs("/~/Product(42)~queryString~", oFetchOptions).resolves(oResult);
+		this.mock(_Helper).expects("createError").never();
 
-		assert.strictEqual(
-			// code under test
-			oRequestor.fetch("~method~", "Product(42)", bAction ? {foo : "bar"} : undefined),
-			"~result~");
+		// code under test
+		const oResponse = await oRequestor.fetch("~method~", "Product(42)", "~queryString~",
+			bAction ? {foo : "bar"} : undefined);
 
+		assert.strictEqual(oResponse, oResult);
 		assert.deepEqual(oRequestor.mHeaders, {
 			"Content-Type" : "n/a",
 			custom : "value",
@@ -4611,6 +4613,54 @@ sap.ui.define([
 		});
 	});
 });
+
+	//*********************************************************************************************
+	QUnit.test("fetch: error handling", function (assert) {
+		const oRequestor = _Requestor.create("/~/", null, {}, {}, "4.0");
+		const oFetchOptions = {
+			method : "~method~",
+			headers : {
+				Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true",
+				"OData-MaxVersion" : "4.0",
+				"OData-Version" : "4.0",
+				"X-CSRF-Token" : "Fetch",
+				"Content-Type" : "application/json;charset=UTF-8;IEEE754Compatible=true"
+			}
+		};
+
+		const sRequestUrl = "/~/Product(42)~queryString~";
+		const oResult = {
+			headers : {get : mustBeMocked},
+			ok : false,
+			status : "~statusCode~",
+			statusText : "~statusText~",
+			text : mustBeMocked
+		};
+		this.mock(_Requestor).expects("fetch").on(window)
+			.withExactArgs(sRequestUrl, oFetchOptions).resolves(oResult);
+		this.mock(oResult).expects("text").withExactArgs().resolves("~sBody~");
+		this.mock(oResult.headers).expects("get").withExactArgs("foo").returns("~bar~");
+		this.mock(_Helper).expects("createError")
+			.withExactArgs(sinon.match.object, "Communication error", sRequestUrl, "Product(42)")
+			.callsFake((jqXHR) => {
+				// code under test
+				assert.strictEqual(jqXHR.getResponseHeader("foo"), "~bar~");
+
+				assert.strictEqual(jqXHR.responseText, "~sBody~");
+				assert.strictEqual(jqXHR.status, "~statusCode~");
+				assert.strictEqual(jqXHR.statusText, "~statusText~");
+
+				return "~oError~";
+			});
+
+		// code under test
+		return oRequestor.fetch("~method~", "Product(42)", "~queryString~")
+			.then(() => {
+				assert.ok(false, "Unexpected success");
+			}, (oError) => {
+				assert.strictEqual(oError, "~oError~");
+			});
+	});
 
 	//*********************************************************************************************
 	QUnit.test("fetchType", function (assert) {
