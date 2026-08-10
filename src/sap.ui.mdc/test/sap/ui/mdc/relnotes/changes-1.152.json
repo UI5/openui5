@@ -3,6 +3,26 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "aeec8b5f50cf48da77969eec8a907b33c474b46e",
+        "type": "FIX",
+        "text": " sap.ui.mdc.Chart: Support for Timestamp values as TimeDimension"
+      },
+      {
+        "id": "5357e63ec75b8b8fcec4a64e58d3aca964aaafac",
+        "type": "FIX",
+        "text": "p13n.AdaptFiltersPanel: Fix keyboard navigation"
+      },
+      {
+        "id": "c688089bd5f502b7cdd39dbbddb26ebb9edf3c66",
+        "type": "FIX",
+        "text": " DynamicDateRange cannot parse \"empty\" operator"
+      },
+      {
+        "id": "7f6246863b55ba8964a209a6e91d4753c4853796",
+        "type": "FIX",
+        "text": " FilterBarLayoutMixin: prevent buttons from covering filters"
+      },
+      {
         "id": "a60effdf5e151d12a0adfd94b3925bc8ea7bd89e",
         "type": "FIX",
         "text": " MDC.Link: link items caching now works correct when binding path is same with empty stale cache items"

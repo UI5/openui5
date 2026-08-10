@@ -3,9 +3,24 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "d77c863a2b34517920e68fe422a81a51b2b8e376",
+        "type": "FIX",
+        "text": " sap.ui.core: Log error for invalid boolean, int, or float values in declarative views"
+      },
+      {
+        "id": "ac21a8c052c74af5be3a6505961b2aad14897d21",
+        "type": "FEATURE",
+        "text": " performance/FetchInterceptor: Introduce interceptor for Fetch API"
+      },
+      {
         "id": "aeee39f79a50a4c5f2016e57d432e710df0fcd9a",
         "type": "FIX",
         "text": " core/RenderManager: function 'icon' extended with 'mStyles' parameter"
+      },
+      {
+        "id": "316f4ef67c434a93eb74af52e1e4a89e0b95a405",
+        "type": "FIX",
+        "text": " core/Icon: fix focus outline clipped by overflow:hidden"
       },
       {
         "id": "218cd8f0ce53359df92d0cb7d0cfc9cc1d7f9028",

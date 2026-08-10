@@ -3,6 +3,16 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "8eb2603607e9a06662d981d0e660891a981ea94d",
+        "type": "FIX",
+        "text": " sap.ui.integration.widgets.Card: Stabilize PreventKeyboardScrolling test"
+      },
+      {
+        "id": "c6b561aeee284a26979ac547534dda5279c23905",
+        "type": "FIX",
+        "text": " Integration Cards: ShowCard animation is now disabled for Table cards"
+      },
+      {
         "id": "345843a5e02345188a66276c59b57e31d21a8901",
         "type": "FIX",
         "text": " Integration Cards: '{i18n>}' binding in static filter items is now resolved"

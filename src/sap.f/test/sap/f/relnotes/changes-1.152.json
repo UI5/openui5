@@ -3,6 +3,16 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "c6b561aeee284a26979ac547534dda5279c23905",
+        "type": "FIX",
+        "text": " Integration Cards: ShowCard animation is now disabled for Table cards"
+      },
+      {
+        "id": "b841cfb8f256d2d500673d2ab3141c744ba3ab7f",
+        "type": "FIX",
+        "text": " Integration Cards: CardLocalizationCustomizationVisualTests now wait for rendering"
+      },
+      {
         "id": "1646f162498d9bdd0a4ac291ba926ef82633c4b8",
         "type": "FIX",
         "text": " sap.f.HeroBanner: metadata tag property is taken from the parent, instead of hardcoded."

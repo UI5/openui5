@@ -1,0 +1,17 @@
+{
+  "1.152.0": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "fcb73d2040fa9f5afb4b781657f19063fcb8a102",
+        "type": "FIX",
+        "text": " We've now fixed the multiselect checkbox size and the content gap within UploadSet to prevent the focus ring from overlapping the file icon"
+      },
+      {
+        "id": "316f4ef67c434a93eb74af52e1e4a89e0b95a405",
+        "type": "FIX",
+        "text": " core/Icon: fix focus outline clipped by overflow:hidden"
+      }
+    ]
+  }
+}
