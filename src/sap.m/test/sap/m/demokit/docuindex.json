@@ -1217,7 +1217,8 @@
 			"sap.m.sample.SelectWithIcons",
 			"sap.m.sample.SelectValueState",
 			"sap.m.sample.SelectWithWrappedItemText",
-			"sap.m.sample.SelectChangeEvents"
+			"sap.m.sample.SelectChangeEvents",
+			"sap.m.sample.SelectGrouping"
 		  ]
 		},
 		{
@@ -2651,6 +2652,11 @@
 		  "id": "sap.m.sample.SelectChangeEvents",
 		  "name": "Select - Change Events",
 		  "description": "Demonstrates the use of 'change' and 'liveChange' events."
+		},
+		{
+		  "id": "sap.m.sample.SelectGrouping",
+		  "name": "Select - with grouped items",
+		  "description": "Illustrates the usage of a Select with items organized in groups using SeparatorItem as group headers."
 		},
 		{
 		  "id": "sap.m.sample.SelectList",

@@ -558,7 +558,7 @@ sap.ui.define([
 			aItems = aItems || this.getItems();
 
 			for (var i = 0; i < aItems.length; i++) {
-				if (aItems[i].getEnabled()) {
+				if (aItems[i].getEnabled() && !aItems[i].isA("sap.ui.core.SeparatorItem")) {
 					return aItems[i];
 				}
 			}

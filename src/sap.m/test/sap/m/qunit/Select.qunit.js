@@ -1,4 +1,4 @@
-/*global QUnit */
+/*global QUnit, sinon */
 sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/thirdparty/jquery",
@@ -12185,5 +12185,210 @@ sap.ui.define([
 			// cleanup
 			oSelect.destroy();
 		});
+
+		QUnit.module("Grouped items (SeparatorItem as group headers)", {
+			beforeEach: function () {
+				this.clock = sinon.useFakeTimers();
+
+				this.oSelect = new Select({
+					selectedKey: "AR",
+					items: [
+						new SeparatorItem({ text: "Popular Countries" }),
+						new Item({ key: "AR", text: "Argentina" }),
+						new Item({ key: "AL", text: "Albania" }),
+						new Item({ key: "AU", text: "Australia" }),
+						new SeparatorItem({ text: "Other Countries" }),
+						new Item({ key: "AT", text: "Austria" }),
+						new Item({ key: "BE", text: "Belgium" })
+					]
+				});
+
+				this.oSelect.placeAt("content");
+				Core.applyChanges();
+			},
+			afterEach: function () {
+				this.clock.restore();
+				this.oSelect.destroy();
+			}
+		});
+
+		QUnit.test("getSelectableItems excludes group header SeparatorItems", function (assert) {
+			var aSelectable = this.oSelect.getSelectableItems();
+
+			assert.strictEqual(aSelectable.length, 5, "5 selectable items (group headers excluded)");
+			assert.ok(aSelectable.every(function (oItem) {
+				return !oItem.isA("sap.ui.core.SeparatorItem");
+			}), "No SeparatorItem in selectable items");
+		});
+
+		QUnit.test("group header SeparatorItem renders with role=group", function (assert) {
+			var oList = this.oSelect.getList();
+			this.oSelect.open();
+			this.clock.tick(500);
+
+			var aGroupItems = oList.getDomRef().querySelectorAll("li[role='group']");
+			assert.strictEqual(aGroupItems.length, 2, "Two group header elements with role=group");
+			assert.strictEqual(aGroupItems[0].getAttribute("aria-label"), "Popular Countries",
+				"First group header has correct aria-label");
+			assert.strictEqual(aGroupItems[1].getAttribute("aria-label"), "Other Countries",
+				"Second group header has correct aria-label");
+		});
+
+		QUnit.test('group header has aria-roledescription set to "Group Header"', function (assert) {
+			var oList = this.oSelect.getList();
+			this.oSelect.open();
+			this.clock.tick(500);
+
+			var oGroupItem = oList.getDomRef().querySelector("li[role='group']");
+			var sRoleDesc = oGroupItem.getAttribute("aria-roledescription");
+			assert.strictEqual(sRoleDesc,
+				Library.getResourceBundleFor("sap.m").getText("LIST_ITEM_GROUP_HEADER"),
+				"Group header aria-roledescription matches i18n key LIST_ITEM_GROUP_HEADER");
+		});
+
+		QUnit.test("group header has aria-owns listing its option IDs", function (assert) {
+			var oList = this.oSelect.getList();
+			this.oSelect.open();
+			this.clock.tick(500);
+
+			var oFirstGroupHeader = oList.getDomRef().querySelector("li[role='group']");
+			var sOwns = oFirstGroupHeader.getAttribute("aria-owns");
+			assert.ok(sOwns, "aria-owns is present on group header");
+
+			var aOwnedIds = sOwns.split(" ");
+			assert.strictEqual(aOwnedIds.length, 3, "First group owns 3 options");
+
+			var aItems = this.oSelect.getItems();
+			assert.strictEqual(aOwnedIds[0], aItems[1].getId(), "First owned ID matches first option in group");
+			assert.strictEqual(aOwnedIds[1], aItems[2].getId(), "Second owned ID matches second option in group");
+			assert.strictEqual(aOwnedIds[2], aItems[3].getId(), "Third owned ID matches third option in group");
+		});
+
+		QUnit.test("options within a group have global aria-setsize and aria-posinset", function (assert) {
+			var oList = this.oSelect.getList();
+			this.oSelect.open();
+			this.clock.tick(500);
+
+			var aItems = this.oSelect.getItems();
+			var oDomAR = oList.getDomRef().querySelector("#" + aItems[1].getId());
+			assert.strictEqual(oDomAR.getAttribute("aria-setsize"), "5",
+				"Argentina aria-setsize=5 (total selectable count)");
+			assert.strictEqual(oDomAR.getAttribute("aria-posinset"), "1",
+				"Argentina aria-posinset=1 (first overall)");
+
+			var oDomAL = oList.getDomRef().querySelector("#" + aItems[2].getId());
+			assert.strictEqual(oDomAL.getAttribute("aria-posinset"), "2",
+				"Albania aria-posinset=2 (second overall)");
+
+			var oDomAT = oList.getDomRef().querySelector("#" + aItems[5].getId());
+			assert.strictEqual(oDomAT.getAttribute("aria-setsize"), "5",
+				"Austria aria-setsize=5 (total selectable count)");
+			assert.strictEqual(oDomAT.getAttribute("aria-posinset"), "4",
+				"Austria aria-posinset=4 (fourth overall)");
+		});
+
+		QUnit.test("group header is not focusable (no tabindex)", function (assert) {
+			var oList = this.oSelect.getList();
+			this.oSelect.open();
+			this.clock.tick(500);
+
+			var oGroupHeader = oList.getDomRef().querySelector("li[role='group']");
+			assert.notOk(oGroupHeader.hasAttribute("tabindex"),
+				"Group header has no tabindex attribute");
+		});
+
+		QUnit.test("group description DOM node is rendered with correct text", function (assert) {
+			var oGroupDescNode = this.oSelect.getDomRef().querySelector("#" + this.oSelect.getId() + "-groupDesc");
+			assert.ok(oGroupDescNode, "Group description node is rendered");
+
+			var sExpected = Library.getResourceBundleFor("sap.m").getText("SELECT_RESULTS_IN_GROUPS", [5, 2]);
+			assert.strictEqual(oGroupDescNode.textContent, sExpected,
+				'Group description text: "5 results are available in 2 groups"');
+		});
+
+		QUnit.test("focus element has aria-describedby pointing to group description node", function (assert) {
+			var sFocusDescribedBy = this.oSelect.getFocusDomRef().getAttribute("aria-describedby");
+			assert.ok(sFocusDescribedBy, "aria-describedby is set");
+			assert.ok(sFocusDescribedBy.includes(this.oSelect.getId() + "-groupDesc"),
+				"aria-describedby includes the group description node ID");
+		});
+
+		QUnit.test("plain SeparatorItem (no text) still renders with role=separator", function (assert) {
+			var oSelect = new Select({
+				selectedKey: "AL",
+				items: [
+					new Item({ key: "AL", text: "Albania" }),
+					new SeparatorItem(),
+					new Item({ key: "AU", text: "Australia" })
+				]
+			});
+			oSelect.placeAt("content");
+			Core.applyChanges();
+			oSelect.open();
+			this.clock.tick(500);
+
+			var oList = oSelect.getList();
+			assert.ok(oList.getDomRef().querySelector("li[role='separator']"),
+				"Plain SeparatorItem still renders with role=separator");
+			assert.notOk(oList.getDomRef().querySelector("li[role='group']"),
+				"No group header rendered when SeparatorItem has no text");
+
+			oSelect.destroy();
+		});
+
+		QUnit.test("no group description node rendered when no group headers exist", function (assert) {
+			var oSelect = new Select({
+				items: [
+					new Item({ key: "1", text: "Item 1" }),
+					new Item({ key: "2", text: "Item 2" })
+				]
+			});
+			oSelect.placeAt("content");
+			Core.applyChanges();
+
+			var oGroupDescNode = oSelect.getDomRef().querySelector("#" + oSelect.getId() + "-groupDesc");
+			assert.notOk(oGroupDescNode, "No group description node rendered without group headers");
+
+			oSelect.destroy();
+		});
+
+		QUnit.test("addItemGroup creates a SeparatorItem and adds it to the items aggregation", function (assert) {
+			var oSelect = new Select();
+			oSelect.placeAt("content");
+			Core.applyChanges();
+
+			var oHeader = oSelect.addItemGroup({ text: "Europe", key: "EU" });
+
+			assert.ok(oHeader.isA("sap.ui.core.SeparatorItem"), "addItemGroup returns a SeparatorItem");
+			assert.strictEqual(oHeader.getText(), "Europe", "SeparatorItem text is taken from oGroup.text");
+			assert.strictEqual(oSelect.getItems().length, 1, "SeparatorItem was added to the items aggregation");
+			assert.strictEqual(oSelect.getItems()[0], oHeader, "SeparatorItem is the same instance returned");
+
+			oSelect.destroy();
+		});
+
+		QUnit.test("addItemGroup uses oGroup.key as fallback when text is absent", function (assert) {
+			var oSelect = new Select();
+
+			var oHeader = oSelect.addItemGroup({ key: "ASIA" });
+
+			assert.ok(oHeader.isA("sap.ui.core.SeparatorItem"), "Returns a SeparatorItem");
+			assert.strictEqual(oHeader.getText(), "ASIA", "SeparatorItem text falls back to oGroup.key");
+
+			oSelect.destroy();
+		});
+
+		QUnit.test("addItemGroup accepts a pre-created SeparatorItem as oHeader", function (assert) {
+			var oSelect = new Select();
+			var oPreCreated = new SeparatorItem({ text: "Americas" });
+
+			var oHeader = oSelect.addItemGroup({ text: "ignored" }, oPreCreated);
+
+			assert.strictEqual(oHeader, oPreCreated, "Pre-created header is returned as-is");
+			assert.strictEqual(oSelect.getItems()[0], oPreCreated, "Pre-created header is added to items");
+
+			oSelect.destroy();
+		});
+
 });
 
