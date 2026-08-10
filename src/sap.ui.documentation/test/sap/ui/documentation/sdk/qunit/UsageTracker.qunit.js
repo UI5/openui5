@@ -355,4 +355,154 @@ function (UsageTracker, Localization) {
 		// assert
 		assert.strictEqual(oAddToLogsSpy.firstCall.args[0].event, "activityMap", "event type is always activityMap");
 	});
+
+	// Helper: temporarily navigate to a path+hash for one test via history.replaceState,
+	// then restore the original URL. Same-origin only; does not trigger a page reload.
+	function withLocationHash(sPathAndHash, fnTest) {
+		var sOriginal = window.location.pathname + window.location.search + window.location.hash;
+		history.replaceState(null, "", sPathAndHash);
+		try {
+			fnTest();
+		} finally {
+			history.replaceState(null, "", sOriginal);
+		}
+	}
+
+	QUnit.module("PageInfo - name normalization", {
+		before: function () {
+			this.oTracker = new UsageTracker(oFactory.getAppComponent());
+			this.oTracker.start(sVersionName.sapui5);
+		},
+		beforeEach: function () {
+			this.sandbox = sinon.createSandbox();
+			this.sandbox.stub(this.oTracker, "_composeDefaultPageTitleFromRoute").returns("");
+		},
+		after: function () {
+			this.oTracker.destroy();
+			this.oTracker = null;
+		},
+		afterEach: function () {
+			this.sandbox.restore();
+		}
+	});
+
+	// Each test drives composePageName via _logPageDataNotFound (null-route branch):
+	// that path calls composePageName(window.location.href) and emits error.pageName.
+	// window.location is changed via history.replaceState (same-origin, no page reload).
+	[
+		{ desc: "bare root URL", pathAndHash: "/", expected: "/" },
+		{ desc: "root URL with empty hash (#)", pathAndHash: "/#", expected: "/" },
+		{ desc: "root URL with hash-slash (#/)", pathAndHash: "/#/", expected: "/" },
+		{ desc: "non-root topic hash", pathAndHash: "/#/topic/abc123", expected: "/#/topic/abc123" },
+		{ desc: "non-root API hash", pathAndHash: "/#/api/sap.m.Button", expected: "/#/api/sap.m.Button" },
+		{ desc: "legacy .html suffix in hash", pathAndHash: "/#/topic/abc.html", expected: "/#/topic/abc" }
+	].forEach(function (oCase) {
+		QUnit.test(oCase.desc + " -> page.name = \"" + oCase.expected + "\"", function (assert) {
+			var oTracker = this.oTracker,
+				oAddToLogsSpy = this.sandbox.spy(oTracker, "_addToLogs"),
+				oErrorLog;
+
+			withLocationHash(oCase.pathAndHash, function() {
+				oTracker._oLastRouteParameters = null;
+				oTracker._logPageDataNotFound();
+			});
+
+			oErrorLog = oAddToLogsSpy.args.find(function(aArgs) {
+				return aArgs[0].event === "errorPage";
+			})[0];
+			assert.strictEqual(oErrorLog.error.pageName, oCase.expected, oCase.desc);
+		});
+	});
+
+	QUnit.module("PageInfo - name normalization (integration via _addToLogs)", {
+		beforeEach: function () {
+			this.oTracker = new UsageTracker(oFactory.getAppComponent());
+			this.sandbox = sinon.createSandbox();
+			this.sandbox.stub(this.oTracker, "_composeDefaultPageTitleFromRoute").returns("");
+		},
+		afterEach: function () {
+			this.oTracker.destroy();
+			this.oTracker = null;
+			this.sandbox.restore();
+		}
+	});
+
+	QUnit.test("pageView event has normalized page.name for root hash URL", function (assert) {
+		var oTracker = this.oTracker,
+			oAddToLogsSpy = this.sandbox.spy(oTracker, "_addToLogs"),
+			oPageViewCall;
+
+		withLocationHash("/#/", function() {
+			oTracker.start("testSiteName", [oFactory.getRouteMatchEventParameters("welcome")]);
+		});
+
+		oPageViewCall = oAddToLogsSpy.args.find(function(aArgs) {
+			return aArgs[0].event === "pageView";
+		});
+		assert.ok(oPageViewCall, "pageView event was logged");
+		assert.strictEqual(oPageViewCall[0].page.name, "/", "page.name is normalized to '/' for root hash URL");
+	});
+
+	QUnit.module("PageInfo - _logPageNotFound normalization", {
+		beforeEach: function () {
+			this.oTracker = new UsageTracker(oFactory.getAppComponent());
+			this.sandbox = sinon.createSandbox();
+		},
+		afterEach: function () {
+			this.oTracker.destroy();
+			this.oTracker = null;
+			this.sandbox.restore();
+		}
+	});
+
+	[
+		{ desc: "empty hash", input: "", expected: "/" },
+		{ desc: "root slash hash", input: "/", expected: "/" },
+		{ desc: "non-root hash", input: "/topic/abc", expected: "/topic/abc" }
+	].forEach(function (oCase) {
+		QUnit.test(oCase.desc + " -> error.pageName = \"" + oCase.expected + "\"", function (assert) {
+			var oAddToLogsSpy = this.sandbox.spy(this.oTracker, "_addToLogs");
+			this.oTracker._logPageNotFound(oCase.input);
+			assert.strictEqual(oAddToLogsSpy.firstCall.args[0].error.pageName, oCase.expected, oCase.desc);
+		});
+	});
+
+	QUnit.module("PageInfo - _logPrecedingRouteVisits normalization", {
+		beforeEach: function () {
+			this.oTracker = new UsageTracker(oFactory.getAppComponent());
+			this.sandbox = sinon.createSandbox();
+			this.sandbox.stub(this.oTracker, "_composeDefaultPageTitleFromRoute").returns("");
+		},
+		afterEach: function () {
+			this.oTracker.destroy();
+			this.oTracker = null;
+			this.sandbox.restore();
+		}
+	});
+
+	QUnit.test("replay path produces same normalized page.name as live routeMatched event", function (assert) {
+		var oTracker = this.oTracker,
+			oAddToLogsSpy = this.sandbox.spy(oTracker, "_addToLogs"),
+			oMockRouteEvent = oFactory.getRouteMatchEventParameters("welcome"),
+			oLivePageView,
+			oReplayPageView;
+
+		withLocationHash("/#/", function() {
+			oTracker.start("testSiteName");
+			oTracker._logRouteMatched(oMockRouteEvent);
+		});
+		oLivePageView = oAddToLogsSpy.args.find(function(a) { return a[0].event === "pageView"; });
+
+		oTracker.stop();
+		oAddToLogsSpy.resetHistory();
+		oTracker._oLastRouteParameters = null;
+
+		withLocationHash("/#/", function() {
+			oTracker.start("testSiteName", [oMockRouteEvent]);
+		});
+		oReplayPageView = oAddToLogsSpy.args.find(function(a) { return a[0].event === "pageView"; });
+
+		assert.strictEqual(oLivePageView[0].page.name, "/", "live page.name is normalized to '/'");
+		assert.strictEqual(oReplayPageView[0].page.name, oLivePageView[0].page.name, "replay produces same page.name as live event");
+	});
 });
