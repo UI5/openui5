@@ -104,9 +104,6 @@ function(
 		// where 200ms transition sometimes seems to last a little longer
 		var iAnimationDuration = bUseAnimations ? 300 : 10;
 
-		// HTML container scrollbar width
-		var SCROLLBAR_WIDTH = 17;
-
 		var DRAGRESIZE_STEP = Rem.toPx(1);
 
 		/**
@@ -784,9 +781,6 @@ function(
 
 			oPopup.attachOpened(this._handleOpened, this);
 
-			// reset scroll fix check
-			this._iLastWidthAndHeightWithScroll = null;
-
 			// Open popup
 			oPopup.setContent(this);
 
@@ -1380,10 +1374,7 @@ function(
 				return;
 			}
 
-			var $dialog = this.$(),
-			$dialogContent = this.$('cont'),
-			sContentWidth = this.getContentWidth(),
-			iMaxDialogWidth = this._calcMaxSizes().maxWidth, // 90% of the max screen size
+			var $dialogContent = this.$('cont'),
 			oSubHeaderDomRef = this.getSubHeader()?.getDomRef(),
 			oHeaderDomRef = (this.getCustomHeader() || this._header)?.getDomRef();
 
@@ -1394,6 +1385,10 @@ function(
 			this.getDomRef().style.paddingTop = iHeaderHeight + iSubHeaderHeight + "px";
 		}
 
+			// Toggle the class that reserves scrollbar-gutter space only when a vertical
+			// scrollbar is actually present, so the gutter is not reserved when content fits.
+			this.$().toggleClass("sapMDialogVerticalScrollIncluded", this._hasVerticalScrollbar());
+
 			//if height is set by manually resizing return;
 			if (this._oManuallySetSize) {
 				$dialogContent.css({
@@ -1402,49 +1397,21 @@ function(
 				return;
 			}
 
-			// Browsers except chrome do not increase the width of the container to include scrollbar (when width is auto). So we need to compensate
-			if (Device.system.desktop && !Device.browser.chrome) {
-
-				var iCurrentWidthAndHeight = $dialogContent.width() + "x" + $dialogContent.height(),
-					bMinWidth = $dialog.css("min-width") !== $dialog.css("width");
-
-				// Apply the fix only if width or height did actually change.
-				// And when the width is not equal to the min-width.
-				if (iCurrentWidthAndHeight !== this._iLastWidthAndHeightWithScroll && bMinWidth) {
-					if (this._hasVerticalScrollbar() &&					// - there is a vertical scroll
-						(!sContentWidth || sContentWidth == 'auto') &&	// - when the developer hasn't set it explicitly
-						!this.getStretch() && 							// - when the dialog is not stretched
-						$dialogContent.width() < iMaxDialogWidth) {		// - if the dialog can't grow anymore
-
-						$dialog.addClass("sapMDialogVerticalScrollIncluded");
-						$dialogContent.css({"padding-right" : SCROLLBAR_WIDTH});
-						this._iLastWidthAndHeightWithScroll = iCurrentWidthAndHeight;
-					} else {
-						$dialog.removeClass("sapMDialogVerticalScrollIncluded");
-						$dialogContent.css({"padding-right" : ""});
-						this._iLastWidthAndHeightWithScroll = null;
-					}
-				} else if (!this._hasVerticalScrollbar() || !bMinWidth) {
-					$dialog.removeClass("sapMDialogVerticalScrollIncluded");
-					$dialogContent.css({"padding-right" : ""});
-					this._iLastWidthAndHeightWithScroll = null;
-				}
-			}
-
 			if (!this._oManuallySetSize && !this._bDisableRepositioning) {
 				this._positionDialog();
 			}
 		};
 
 		/**
-		 * Checks if the dialog has a vertical scrollbar.
+		 * Checks whether the scroll section currently has a vertical scrollbar.
+		 *
+		 * @returns {boolean} Whether a vertical scrollbar is present
 		 * @private
-		 * @return {boolean} True if there is a vertical scrollbar, false otherwise
 		 */
-		Dialog.prototype._hasVerticalScrollbar = function() {
-			var $dialogContent = this.$('cont');
+		Dialog.prototype._hasVerticalScrollbar = function () {
+			var oSectionDomRef = this.getDomRef("cont");
 
-			return $dialogContent[0].clientHeight < $dialogContent[0].scrollHeight;
+			return !!oSectionDomRef && oSectionDomRef.scrollHeight > oSectionDomRef.clientHeight;
 		};
 
 		/**

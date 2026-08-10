@@ -159,18 +159,11 @@ html.sap-desktop .sapMDialog {
 	box-sizing: border-box;
 }
 
-.sapMDialog.sapMDialogVerticalScrollIncluded {
-
-	.sapMDialogScroll {
-		width: auto;
-	}
-
-	html[data-sap-ui-browser^='sf'] & .sapMDialogSection {
-		/* For Safari - allow the vertical scroll bar to overlap the right padding which we use to compensate for its width.
-		This happens by default for other browsers. */
-		overflow-y: overlay !important;
-		padding-right: 0px !important;
-	}
+.sapMDialog.sapMDialogVerticalScrollIncluded .sapMDialogSection {
+	/* Reserve space for the vertical scrollbar so it does not overlap/truncate content.
+	Class is set at runtime only when a vertical scrollbar is present. No-op for overlay
+	scrollbars, so no layout shift. */
+	scrollbar-gutter: stable;
 }
 
 /* disable scrolling automatically for sap.m.Page sap.m.NavContainer sap.m.ScrollingContainer inside Dialog */
