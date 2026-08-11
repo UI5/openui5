@@ -1005,7 +1005,12 @@ sap.ui.define([
 	 *   The context's index within the binding's collection. It is <code>undefined</code> if
 	 *   <ul>
 	 *     <li> it does not belong to a list binding,
-	 *     <li> it is {@link #isKeepAlive kept alive}, but not in the collection currently.
+	 *     <li> it is {@link #isKeepAlive kept alive}, but not in the collection currently. When
+	 *       collapsing a node's ancestor in a recursive hierarchy, the index becomes
+	 *       <code>undefined</code>. After expanding, the index is only determined again when that
+	 *       node comes into view, so to say. Use
+	 *       {@link sap.ui.model.odata.v4.ODataListBinding#getAllCurrentContexts} to try to
+	 *       determine the index again.
 	 *   </ul>
 	 *
 	 * @public
