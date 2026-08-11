@@ -77,7 +77,7 @@ sap.ui.define([
 			 * Navigates to the tutorial overview
 			 */
 			onGetStarted: function () {
-				this.getRouter().parse("topic/8b49fc198bf04b2d9800fc37fecbb218");
+				this.getRouter().navTo("topicId", {id: "8b49fc198bf04b2d9800fc37fecbb218"});
 			},
 
 			/**

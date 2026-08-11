@@ -403,9 +403,14 @@ TableRenderer.renderNoData = function(rm, oControl) {
 	}
 	rm.openEnd();
 
-	rm.openStart("td").attr("role", "none").openEnd().close("td"); // empty cell for the highlight column
+	// Without visible columns the header only has the highlight + navigated cells (getColCount() is 2),
+	// so skip the pad cells and let nodata-text span all columns; otherwise colspan would be 0 (message invisible).
+	const bHasVisibleColumns = oControl.shouldRenderItems();
+	if (bHasVisibleColumns) {
+		rm.openStart("td").attr("role", "none").openEnd().close("td"); // empty cell for the highlight column
+	}
 	rm.openStart("td", oControl.getId("nodata-text"));
-	rm.attr("colspan", oControl.getColCount() - 2); // no data cell must span all columns except highlight and navigated column
+	rm.attr("colspan", bHasVisibleColumns ? oControl.getColCount() - 2 : oControl.getColCount());
 	rm.class("sapMListTblCell").class("sapMListTblCellNoData");
 	if (oControl.getNoData() === null || ( typeof oControl.getNoData() === "string" || !oControl.getNoData().isA("sap.m.IllustratedMessage"))) {
 		rm.class("sapMListTblCellNoIllustratedMessage");
@@ -424,7 +429,9 @@ TableRenderer.renderNoData = function(rm, oControl) {
 	}
 
 	rm.close("td");
-	rm.openStart("td").attr("role", "none").openEnd().close("td"); // empty cell for the navigated column
+	if (bHasVisibleColumns) {
+		rm.openStart("td").attr("role", "none").openEnd().close("td"); // empty cell for the navigated column
+	}
 	rm.close("tr");
 };
 

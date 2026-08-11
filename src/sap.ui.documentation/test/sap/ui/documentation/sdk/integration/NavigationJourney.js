@@ -23,11 +23,11 @@ sap.ui.define([
 		Then.onTheWelcomePage.iShouldSeeTheWelcomePage();
 	});
 
-	opaTest("Should navigate to Topic Master Page", function (Given, When, Then) {
+	opaTest("Should navigate to the Get Started topic and update the URL", function (Given, When, Then) {
 		// Action
-		When.onTheAppPage.iPressTheTopicMasterTabButton();
+		When.onTheWelcomePage.iPressTheGetStartedButton();
 		// Assertions
-		Then.onTheTopicMasterPage.iShouldSeeTheTopicMasterPage();
+		Then.onTheWelcomePage.iShouldSeeTheGetStartedTopicPage();
 	});
 
 	opaTest("Should navigate to API Reference Page", function (Given, When, Then) {
@@ -35,6 +35,13 @@ sap.ui.define([
 		When.onTheAppPage.iPressTheApiMasterTabButton();
 		// Assertions
 		Then.onTheApiMasterPage.iShouldSeeTheApiMasterPage();
+	});
+
+	opaTest("Should navigate to Topic Master Page", function (Given, When, Then) {
+		// Action
+		When.onTheAppPage.iPressTheTopicMasterTabButton();
+		// Assertions
+		Then.onTheTopicMasterPage.iShouldSeeTheTopicMasterPage();
 	});
 
 	opaTest("Should navigate to Controls Master Page", function (Given, When, Then) {

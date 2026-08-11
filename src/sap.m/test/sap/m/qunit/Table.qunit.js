@@ -3811,8 +3811,10 @@ sap.ui.define([
 		assert.notOk($noData.find(".sapMListTblNavigatedCell")[0], "Navigated cell is NOT rendered for no-data row since there is no column");
 		assert.ok($noDataCell.hasClass("sapMListTblCellNoIllustratedMessage"), "sapMListTblCellNoData contains sapMListTblCellNoIllustratedMessage");
 
+		assert.strictEqual($noData.children().length, 1, "nodata row contains only the nodata-text cell (no highlight/navigated pad cells) since there are no columns");
+
 		let $noDataText = sut.$().find("#" + sut.getId() + "-nodata-text");
-		assert.strictEqual($noDataText.attr("colspan"), "0", "nodata-text colspan is 0 since highlight and navigated are rendered as separate empty cells");
+		assert.strictEqual($noDataText.attr("colspan"), String(sut.getColCount()), "nodata-text spans all columns so the no columns message is visible");
 		assert.strictEqual($noDataText.text(), oBundle.getText("TABLE_NO_COLUMNS"), "Table's no columns nodata-text contains correct string");
 		assert.strictEqual(oInvisibleMessage.getText(), oBundle.getText("TABLE_NO_COLUMNS"), "Invisible Message text is correct.");
 		await timeout();
@@ -3836,6 +3838,27 @@ sap.ui.define([
 		assert.strictEqual($noDataText.children().get(0), oNoColumnsMessage.getDomRef(), "Table's nodata-text contains figure's DOM element");
 		assert.strictEqual(oInvisibleMessage.getText(), oBundle.getText("TABLE_NO_COLUMNS"), "Invisible Message text is correct.");
 		assert.ok($noDataCell.hasClass("sapMListTblCellNoIllustratedMessage"), "sapMListTblCellNoData contains sapMListTblCellNoIllustratedMessage");
+
+		sut.destroy();
+	});
+
+	QUnit.test("No columns message stays visible after removeAllColumns (colspan regression)", async function (assert) {
+		const sut = createSUT(true, false, "None", false);
+		const oBundle = Library.getResourceBundleFor("sap.m");
+		sut.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		sut.removeAllColumns();
+		await nextUIUpdate();
+
+		assert.notOk(sut.shouldRenderItems(), "Table has no visible columns");
+
+		const oNoDataText = sut.getDomRef("nodata-text");
+		assert.ok(oNoDataText, "nodata-text cell is rendered");
+		assert.strictEqual(oNoDataText.textContent, oBundle.getText("TABLE_NO_COLUMNS"), "nodata-text contains the no columns message");
+		assert.strictEqual(parseInt(oNoDataText.getAttribute("colspan")), sut.getColCount(),
+			"nodata-text spans all columns (colspan is not 0), so the message is visible");
+		assert.ok(oNoDataText.getBoundingClientRect().width > 0, "nodata-text cell has a positive width so the message is actually visible");
 
 		sut.destroy();
 	});
