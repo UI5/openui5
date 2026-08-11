@@ -85959,10 +85959,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				ok : true
 			};
 
-			const sMessage = "Internal Server Error";
 			if (!bOk) {
 				this.oLogMock.expects("error").withExactArgs(
-					"Failed to invoke /" + sPath + "(...)", sinon.match(sMessage), sODCB);
+					"Failed to invoke /" + sPath + "(...)", sinon.match("Short dump"), sODCB);
 			}
 			const oRequestorMock = this.mock(_Requestor);
 			if (bAction) {
@@ -86003,7 +86002,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					.then(bOk ? null : mustFail(assert), (oError) => {
 						assert.strictEqual(oError.message, "Short dump");
 						assert.strictEqual(oError.status, 500);
-						assert.strictEqual(oError.statusText, sMessage);
+						assert.strictEqual(oError.statusText, "Internal Server Error");
 					}),
 				// code under test (JIRA: CPOUI5ODATAV4-3591)
 				oBinding.setParameter("format", "JSON").setParameter("locale", "de").invoke("$stream")
