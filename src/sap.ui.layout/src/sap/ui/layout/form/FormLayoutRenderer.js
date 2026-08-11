@@ -48,7 +48,8 @@ sap.ui.define([
 	 */
 	FormLayoutRenderer.renderForm = function(rm, oLayout, oForm){
 
-		var oToolbar = oForm.getToolbar();
+		const oToolbar = oForm.getToolbar();
+		const oTitle = oForm.getAggregation("_renderingTitle") || oForm.getTitle();
 
 		rm.openStart("div", oLayout);
 		rm.class(this.getMainClass());
@@ -59,7 +60,7 @@ sap.ui.define([
 		rm.openEnd();
 
 		// Form header
-		this.renderHeader(rm, oToolbar, oForm.getTitle(), undefined, false, oLayout._sFormTitleSize, oForm.getId());
+		this.renderHeader(rm, oToolbar, oTitle, undefined, false, oLayout._sFormTitleLevel, oForm.getId());
 
 		this.renderContainers(rm, oLayout, oForm);
 
@@ -91,9 +92,9 @@ sap.ui.define([
 
 	FormLayoutRenderer.renderContainer = function(rm, oLayout, oContainer){
 
-		var bExpandable = oContainer.getExpandable();
-		var oToolbar = oContainer.getToolbar();
-		var oTitle = oContainer.getTitle();
+		const bExpandable = oContainer.getExpandable();
+		const oToolbar = oContainer.getToolbar();
+		const oTitle = oContainer.getAggregation("_renderingTitle") || oContainer.getTitle();
 
 		rm.openStart("div", oContainer);
 		rm.class("sapUiFormContainer");
@@ -178,7 +179,7 @@ sap.ui.define([
 	 * If this function is overwritten in a Layout please use the right IDs to be sure aria-describedby works fine
 	 *
 	 * @param {sap.ui.core.RenderManager} rm the RenderManager that can be used for writing to the Render-Output-Buffer
-	 * @param {string|sap.ui.core.Title} oTitle Title text or <code>Title</code> element
+	 * @param {string|sap.ui.core.Title|sap.ui.core.ITitle} oTitle Title text or <code>Title</code> element
 	 * @param {sap.ui.core.Control} [oExpandButton] Button control for expander
 	 * @param {boolean} [bExpander] If <code>true</code> an expander is rendered
 	 * @param {string} sLevel Level of the title. If not set <code>H5</code> is used as default
@@ -187,7 +188,10 @@ sap.ui.define([
 	FormLayoutRenderer.renderTitle = function(rm, oTitle, oExpandButton, bExpander, sLevel, sContentId){
 
 		if (oTitle) {
-			if (typeof oTitle !== "string" && oTitle.getLevel() != TitleLevel.Auto) {
+			const bTitleAsString = typeof oTitle === "string";
+			const bRenderTitleControl = !bTitleAsString && oTitle.isA("sap.ui.core.ITitle");
+
+			if (!bTitleAsString && oTitle.getLevel() != TitleLevel.Auto) {
 				sLevel = oTitle.getLevel();
 			}
 			if (!sLevel) {
@@ -206,53 +210,58 @@ sap.ui.define([
 				rm.renderControl(oExpandButton);
 			}
 
-			if ( typeof oTitle !== "string" ) {
-				rm.openStart(sLevel.toLowerCase(), oTitle);
-				if (oTitle.getTooltip_AsString()) {
-					rm.attr('title', oTitle.getTooltip_AsString());
-				}
-				if (oTitle.getEmphasized()) {
-					rm.class("sapUiFormTitleEmph");
-				}
+			if (bRenderTitleControl) {
+				rm.renderControl(oTitle);
 			} else {
-				rm.openStart(sLevel.toLowerCase(), sContentId + "--title");
-			}
-			if (!bRenderExpander) {
-				rm.class("sapUiFormTitle");
-			}
-			rm.class("sapUiFormTitle" + sLevel);
-			rm.openEnd();
-
-			if (typeof oTitle === "string") {
-				// Title is just a string
-				oTitle.split(/\n/).forEach(function(sLine, iIndex) {
-					if ( iIndex > 0 ) {
-						rm.voidStart("br").voidEnd();
+				if (!bTitleAsString) {
+					rm.openStart(sLevel.toLowerCase(), oTitle);
+					if (oTitle.getTooltip_AsString()) {
+						rm.attr('title', oTitle.getTooltip_AsString());
 					}
-					rm.text(sLine);
-				});
-			} else {
-				// title control
-				var sIcon = oTitle.getIcon();
-
-				if (sIcon) {
-					var aClasses = [];
-					var mAttributes = {
-						"title": null // prevent default icon tooltip
-					};
-
-					mAttributes["id"] = oTitle.getId() + "-ico";
-					rm.icon(sIcon, aClasses, mAttributes);
+					if (oTitle.getEmphasized()) {
+						rm.class("sapUiFormTitleEmph");
+					}
+				} else {
+					rm.openStart(sLevel.toLowerCase(), sContentId + "--title");
 				}
-				oTitle.getText().split(/\n/).forEach(function(sLine, iIndex) {
-					if ( iIndex > 0 ) {
-						rm.voidStart("br").voidEnd();
+				if (!bRenderExpander) {
+					rm.class("sapUiFormTitle");
+				}
+				rm.class("sapUiFormTitle" + sLevel);
+				rm.openEnd();
+
+				if (bTitleAsString) {
+					// Title is just a string
+					oTitle.split(/\n/).forEach(function(sLine, iIndex) {
+						if ( iIndex > 0 ) {
+							rm.voidStart("br").voidEnd();
+						}
+						rm.text(sLine);
+					});
+				} else {
+					// title control
+					var sIcon = oTitle.getIcon();
+
+					if (sIcon) {
+						var aClasses = [];
+						var mAttributes = {
+							"title": null // prevent default icon tooltip
+						};
+
+						mAttributes["id"] = oTitle.getId() + "-ico";
+						rm.icon(sIcon, aClasses, mAttributes);
 					}
-					rm.text(sLine);
-				});
+					oTitle.getText().split(/\n/).forEach(function(sLine, iIndex) {
+						if ( iIndex > 0 ) {
+							rm.voidStart("br").voidEnd();
+						}
+						rm.text(sLine);
+					});
+				}
+
+				rm.close(sLevel.toLowerCase());
 			}
 
-			rm.close(sLevel.toLowerCase());
 			if (bRenderExpander) {
 				rm.close("div");
 			}
@@ -267,7 +276,7 @@ sap.ui.define([
 	 *
 	 * @param {sap.ui.core.RenderManager} rm the RenderManager that can be used for writing to the Render-Output-Buffer
 	 * @param {sap.ui.core.Toolbar} [oToolbar] <code>Toolbar</code> control
-	 * @param {string|sap.ui.core.Title} [oTitle] Title text or <code>Title</code> element
+	 * @param {string|sap.ui.core.Title|sap.ui.core.ITitle} [oTitle] Title text or <code>Title</code> element
 	 * @param {sap.ui.core.Control} [oExpandButton] Button control for expander
 	 * @param {boolean} [bExpander] If <code>true</code> an expander is rendered
 	 * @param {string} sLevel Level of the title.
@@ -312,7 +321,7 @@ sap.ui.define([
 	 */
 	FormLayoutRenderer.getTitleId = function(oContainer){
 
-		const oTitle = oContainer.getTitle();
+		const oTitle = oContainer.getAggregation("_renderingTitle") || oContainer.getTitle();
 		const oToolbar = oContainer.getToolbar();
 		let sID = "";
 		if (oToolbar) {
