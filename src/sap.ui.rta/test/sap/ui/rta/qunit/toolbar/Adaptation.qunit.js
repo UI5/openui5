@@ -1044,13 +1044,25 @@ sap.ui.define([
 			entries() {
 				return aEntries;
 			},
+			setCurrentEntryByIndex(iIndex) {
+				this.currentEntry = aEntries[iIndex];
+			},
 			addEventListener: sandbox.stub(),
 			removeEventListener: sandbox.stub()
 		};
 	}
 
-	function createNavigationEntry(sKey) {
-		return { key: sKey };
+	function createNavigationEntry(sKey, iIndex) {
+		return { key: sKey, index: iIndex };
+	}
+
+	// Minimal in-memory session storage so persistence can be asserted without touching real storage.
+	function stubSessionStorage() {
+		const mStore = {};
+		sandbox.stub(window.sessionStorage, "getItem").callsFake((sKey) => (sKey in mStore ? mStore[sKey] : null));
+		sandbox.stub(window.sessionStorage, "setItem").callsFake((sKey, sValue) => { mStore[sKey] = String(sValue); });
+		sandbox.stub(window.sessionStorage, "removeItem").callsFake((sKey) => { delete mStore[sKey]; });
+		return mStore;
 	}
 
 	QUnit.module("Navigate Back", {
@@ -1079,11 +1091,12 @@ sap.ui.define([
 
 	QUnit.module("Navigation Tracking", {
 		beforeEach() {
+			this.mSessionStore = stubSessionStorage();
 			this.oOriginalNavigation = window.navigation;
 			this.aNavigationEntries = [
-				createNavigationEntry("entry-0"),
-				createNavigationEntry("entry-1"),
-				createNavigationEntry("entry-2")
+				createNavigationEntry("entry-0", 0),
+				createNavigationEntry("entry-1", 1),
+				createNavigationEntry("entry-2", 2)
 			];
 			this.oMockNavigation = createMockNavigationAPI(this.aNavigationEntries, 1);
 			window.navigation = this.oMockNavigation;
@@ -1103,12 +1116,12 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when the toolbar is initialized, setupNavigationTracking is called", function(assert) {
-			// The toolbar is already created in beforeEach, so setupNavigationTracking was already called
-			// We verify by checking that the starting entry was stored
+			// The toolbar is already created in beforeEach, so setupNavigationTracking was already called.
+			// We verify by checking that the starting boundary index was stored.
 			assert.strictEqual(
-				this.oToolbar._oStartingNavigationEntry,
-				this.aNavigationEntries[1],
-				"then setupNavigationTracking was called during init and the starting entry was stored"
+				this.oToolbar._iStartingNavigationIndex,
+				1,
+				"then setupNavigationTracking was called during init and the starting index was stored"
 			);
 			assert.ok(
 				this.oMockNavigation.addEventListener.calledWith("currententrychange"),
@@ -1127,13 +1140,19 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("when setupNavigationTracking is called, the starting entry is stored and listener is added", function(assert) {
+		QUnit.test("when setupNavigationTracking is called, the starting index is stored and persisted", function(assert) {
 			this.oToolbar.setupNavigationTracking();
 
 			assert.strictEqual(
-				this.oToolbar._oStartingNavigationEntry,
-				this.aNavigationEntries[1],
-				"then the starting navigation entry is stored"
+				this.oToolbar._iStartingNavigationIndex,
+				1,
+				"then the starting navigation index is stored"
+			);
+			const oPersisted = JSON.parse(this.mSessionStore["sap.ui.rta.toolbar.navigationBoundary"]);
+			assert.deepEqual(
+				oPersisted,
+				{ index: 1, key: "entry-1" },
+				"then the boundary index and anchor key are persisted to the session storage"
 			);
 			assert.ok(
 				this.oMockNavigation.addEventListener.calledWith("currententrychange"),
@@ -1142,11 +1161,66 @@ sap.ui.define([
 			assert.ok(this.oToolbar._fnNavigationHandler, "then the navigation handler is stored");
 		});
 
+		QUnit.test("when setupNavigationTracking finds a valid persisted boundary, it is restored", function(assert) {
+			// Simulate a discard-draft reload: RTA restarts on a deeper entry (the object page, index 2),
+			// but a boundary from before the reload is still persisted and its anchor entry is unchanged.
+			this.mSessionStore["sap.ui.rta.toolbar.navigationBoundary"] = JSON.stringify({ index: 0, key: "entry-0" });
+			this.oMockNavigation.setCurrentEntryByIndex(2);
+
+			this.oToolbar.setupNavigationTracking();
+
+			assert.strictEqual(
+				this.oToolbar._iStartingNavigationIndex,
+				0,
+				"then the original boundary index is restored instead of re-capturing the current (deeper) index"
+			);
+
+			// The controls model is only evaluated once the toolbar is shown / a navigation occurs.
+			this.oToolbar._updateBackButtonState();
+			assert.strictEqual(
+				this.oToolbarControlsModel.getProperty("/backButton/enabled"),
+				true,
+				"then the back button is enabled because the current position is deeper than the restored boundary"
+			);
+		});
+
+		QUnit.test("when the toolbar is shown, the back button state is recomputed for a restored boundary", function(assert) {
+			// After a discard-draft reload the boundary is restored on a deeper entry, but no navigation
+			// event fires. show() must recompute the state so the button reflects the restored boundary.
+			this.mSessionStore["sap.ui.rta.toolbar.navigationBoundary"] = JSON.stringify({ index: 0, key: "entry-0" });
+			this.oMockNavigation.setCurrentEntryByIndex(2);
+			this.oToolbar.setupNavigationTracking();
+			this.oToolbarControlsModel.setProperty("/backButton/enabled", false);
+			this.oToolbar.animation = false;
+
+			return this.oToolbar.show().then(() => {
+				assert.strictEqual(
+					this.oToolbarControlsModel.getProperty("/backButton/enabled"),
+					true,
+					"then the back button is enabled after the toolbar is shown"
+				);
+			});
+		});
+
+		QUnit.test("when setupNavigationTracking finds a persisted boundary with a mismatching anchor, it is ignored", function(assert) {
+			// A stale value left behind by an abnormal termination: the anchor key no longer matches the
+			// entry at that index, so the boundary must be captured anew (self-heal).
+			this.mSessionStore["sap.ui.rta.toolbar.navigationBoundary"] = JSON.stringify({ index: 0, key: "some-old-key" });
+			this.oMockNavigation.setCurrentEntryByIndex(1);
+
+			this.oToolbar.setupNavigationTracking();
+
+			assert.strictEqual(
+				this.oToolbar._iStartingNavigationIndex,
+				1,
+				"then the stale boundary is ignored and the current index is captured as the new boundary"
+			);
+		});
+
 		QUnit.test("when navigation occurs and current entry is at start position, back button is disabled", function(assert) {
 			this.oToolbar.setupNavigationTracking();
 
-			const [, oStartEntry] = this.aNavigationEntries;
-			this.oMockNavigation.currentEntry = oStartEntry;
+			this.oMockNavigation.setCurrentEntryByIndex(1);
 			this.oToolbar._fnNavigationHandler();
 
 			assert.strictEqual(
@@ -1159,8 +1233,7 @@ sap.ui.define([
 		QUnit.test("when navigation occurs and current entry is ahead of start position, back button is enabled", function(assert) {
 			this.oToolbar.setupNavigationTracking();
 
-			const [,, oForwardEntry] = this.aNavigationEntries;
-			this.oMockNavigation.currentEntry = oForwardEntry;
+			this.oMockNavigation.setCurrentEntryByIndex(2);
 			this.oToolbar._fnNavigationHandler();
 
 			assert.strictEqual(
@@ -1173,8 +1246,7 @@ sap.ui.define([
 		QUnit.test("when navigation occurs and current entry is behind start position, back button is disabled", function(assert) {
 			this.oToolbar.setupNavigationTracking();
 
-			const [oBackwardEntry] = this.aNavigationEntries;
-			this.oMockNavigation.currentEntry = oBackwardEntry;
+			this.oMockNavigation.setCurrentEntryByIndex(0);
 			this.oToolbar._fnNavigationHandler();
 
 			assert.strictEqual(
@@ -1184,7 +1256,26 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("when cleanupNavigationTracking is called, event listener is removed", function(assert) {
+		QUnit.test("when the originally captured entry was evicted but the boundary index still holds, back button is enabled", function(assert) {
+			// Reproduces the incident regression: after a discard-draft reload, browser back and
+			// re-navigation, the entry originally captured on init is evicted and the history is
+			// rebuilt with new keys. The boundary is index 0 (list report) and the current entry is
+			// index 1 (object page), so navigating back to the list report must be possible.
+			this.mSessionStore["sap.ui.rta.toolbar.navigationBoundary"] = JSON.stringify({ index: 0, key: "entry-0" });
+			this.oMockNavigation.setCurrentEntryByIndex(0);
+			this.oToolbar.setupNavigationTracking();
+
+			this.oMockNavigation.setCurrentEntryByIndex(1);
+			this.oToolbar._fnNavigationHandler();
+
+			assert.strictEqual(
+				this.oToolbarControlsModel.getProperty("/backButton/enabled"),
+				true,
+				"then the back button is enabled so the user can return to the list report"
+			);
+		});
+
+		QUnit.test("when cleanupNavigationTracking is called and RTA is not restarting, listener and persisted boundary are removed", function(assert) {
 			this.oToolbar.setupNavigationTracking();
 			const fnHandler = this.oToolbar._fnNavigationHandler;
 
@@ -1195,7 +1286,27 @@ sap.ui.define([
 				"then removeEventListener was called with the handler"
 			);
 			assert.strictEqual(this.oToolbar._fnNavigationHandler, null, "then the handler is cleared");
-			assert.strictEqual(this.oToolbar._oStartingNavigationEntry, null, "then the starting entry is cleared");
+			assert.strictEqual(this.oToolbar._iStartingNavigationIndex, null, "then the starting index is cleared");
+			assert.notOk(
+				"sap.ui.rta.toolbar.navigationBoundary" in this.mSessionStore,
+				"then the persisted boundary is removed from the session storage"
+			);
+		});
+
+		QUnit.test("when cleanupNavigationTracking is called while RTA is about to restart, the persisted boundary is kept", function(assert) {
+			// Simulate the discard-draft reload: ReloadManager set the layer-specific restart flag before
+			// the reload. The toolbar is torn down but the boundary must survive to be restored on restart.
+			this.oToolbar.setRtaInformation({ flexSettings: { layer: "CUSTOMER" } });
+			this.mSessionStore["sap.ui.rta.restart.CUSTOMER"] = "true";
+			this.oToolbar.setupNavigationTracking();
+
+			this.oToolbar.cleanupNavigationTracking();
+
+			assert.ok(
+				"sap.ui.rta.toolbar.navigationBoundary" in this.mSessionStore,
+				"then the persisted boundary is kept in the session storage across the reload"
+			);
+			assert.strictEqual(this.oToolbar._fnNavigationHandler, null, "then the handler is still cleared");
 		});
 	});
 

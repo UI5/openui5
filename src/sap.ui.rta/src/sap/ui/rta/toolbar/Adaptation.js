@@ -451,12 +451,42 @@ sap.ui.define([
 		}
 	};
 
+	// The starting boundary is persisted in the session storage so it survives the full page reload
+	// that happens e.g. when a draft is discarded. Without persistence RTA would re-capture the
+	// current entry (the object page it reloads on) as the boundary and forget the original starting
+	// point (the list report), which must remain the hard limit for navigating back. Navigate-back is
+	// only relevant for Key User Adaptation, so a single generic key without the layer is sufficient.
+	Adaptation.NAVIGATION_BOUNDARY_KEY = "sap.ui.rta.toolbar.navigationBoundary";
+
 	Adaptation.prototype.setupNavigationTracking = function() {
 		if (!window.navigation) {
 			return;
 		}
 
-		this._oStartingNavigationEntry = window.navigation.currentEntry;
+		const oCurrentEntry = window.navigation.currentEntry;
+		const aEntries = window.navigation.entries();
+		this._iStartingNavigationIndex = oCurrentEntry.index;
+
+		// Restore a previously persisted boundary (e.g. from before a discard-draft reload), but only
+		// if its anchor entry is still at the same position in the history. This validation lets a
+		// stale value left behind by an abnormal termination self-heal: a mismatching anchor is ignored
+		// and the boundary is captured anew.
+		const sPersisted = window.sessionStorage.getItem(Adaptation.NAVIGATION_BOUNDARY_KEY);
+		if (sPersisted) {
+			try {
+				const oBoundary = JSON.parse(sPersisted);
+				if (aEntries[oBoundary.index] && aEntries[oBoundary.index].key === oBoundary.key) {
+					this._iStartingNavigationIndex = oBoundary.index;
+				}
+			} catch (oError) {
+				// ignore a corrupted value and fall back to the freshly captured boundary
+			}
+		}
+
+		window.sessionStorage.setItem(Adaptation.NAVIGATION_BOUNDARY_KEY, JSON.stringify({
+			index: this._iStartingNavigationIndex,
+			key: aEntries[this._iStartingNavigationIndex] && aEntries[this._iStartingNavigationIndex].key
+		}));
 
 		this._fnNavigationHandler = () => {
 			this._updateBackButtonState();
@@ -465,24 +495,49 @@ sap.ui.define([
 		window.navigation.addEventListener("currententrychange", this._fnNavigationHandler);
 	};
 
+	Adaptation.prototype.show = function(...aArgs) {
+		// The "controls" model is only set on the toolbar after the fragment is loaded, i.e. after
+		// setupNavigationTracking has run. Recompute the back button state here so that a boundary
+		// restored from a previous session (e.g. after a discard-draft reload) is reflected even
+		// though no navigation event has fired yet.
+		return Base.prototype.show.apply(this, aArgs).then((vResult) => {
+			this._updateBackButtonState();
+			return vResult;
+		});
+	};
+
 	Adaptation.prototype.cleanupNavigationTracking = function() {
 		if (this._fnNavigationHandler && window.navigation) {
 			window.navigation.removeEventListener("currententrychange", this._fnNavigationHandler);
 			this._fnNavigationHandler = null;
-			this._oStartingNavigationEntry = null;
+			this._iStartingNavigationIndex = null;
+			// Keep the persisted boundary when RTA is only being torn down to restart after a reload
+			// (e.g. discarding a draft). ReloadManager sets the restart flag before triggering the
+			// reload, so its presence tells us the boundary must survive to be restored on restart.
+			// On a genuine RTA exit the flag is absent and the boundary is removed to avoid pollution.
+			const sLayer = this.getRtaInformation().flexSettings.layer;
+			const bWillRestart = sLayer && !!window.sessionStorage.getItem(`sap.ui.rta.restart.${sLayer}`);
+			if (!bWillRestart) {
+				window.sessionStorage.removeItem(Adaptation.NAVIGATION_BOUNDARY_KEY);
+			}
 		}
 	};
 
 	Adaptation.prototype._updateBackButtonState = function() {
-		if (!window.navigation || !this._oStartingNavigationEntry) {
+		const oControlsModel = this.getModel("controls");
+		if (
+			!window.navigation
+			|| this._iStartingNavigationIndex === null
+			|| this._iStartingNavigationIndex === undefined
+			|| !oControlsModel
+		) {
 			return;
 		}
-		const oControlsModel = this.getModel("controls");
-		const aEntries = window.navigation.entries();
-		const iCurrentIndex = aEntries.indexOf(window.navigation.currentEntry);
-		const iStartIndex = aEntries.findIndex((oEntry) => oEntry.key === this._oStartingNavigationEntry.key);
-
-		const bCanNavigateBack = iCurrentIndex > iStartIndex;
+		// Comparing by index (rather than by the entry key) is robust against the browser evicting
+		// the starting entry from the history, which happens when the user navigates away from and
+		// back into the app. The button is enabled only while the current position is deeper than
+		// the boundary, so the user can never navigate back past the point where RTA was started.
+		const bCanNavigateBack = window.navigation.currentEntry.index > this._iStartingNavigationIndex;
 		oControlsModel.setProperty("/backButton/enabled", bCanNavigateBack);
 	};
 
