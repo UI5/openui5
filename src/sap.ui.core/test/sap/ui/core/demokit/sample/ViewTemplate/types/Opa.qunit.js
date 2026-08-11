@@ -9,8 +9,9 @@ sap.ui.define([
 	"sap/ui/core/sample/common/pages/Any",
 	"sap/ui/core/sample/ViewTemplate/types/pages/Main",
 	"sap/ui/test/opaQunit",
+	"sap/ui/test/Opa5",
 	"sap/ui/test/TestUtils"
-], function (Localization, Lib, library, MessageType, Any, Main, opaTest, TestUtils) {
+], function (Localization, Lib, library, MessageType, Any, Main, opaTest, Opa5, TestUtils) {
 	"use strict";
 	const sDefaultLanguage = Localization.getLanguage();
 	const ValueState = library.ValueState;
@@ -23,6 +24,8 @@ sap.ui.define([
 			Localization.setLanguage(sDefaultLanguage);
 		}
 	});
+
+	Opa5.extendConfig({timeout : 30});
 
 	//*****************************************************************************
 	opaTest("Boolean Types", (Given, When, Then) => {
@@ -573,4 +576,3 @@ sap.ui.define([
 		Then.iTeardownMyUIComponent();
 	});
 });
-
