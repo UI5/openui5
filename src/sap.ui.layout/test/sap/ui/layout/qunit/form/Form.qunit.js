@@ -110,8 +110,15 @@ sap.ui.define([
 		this.spy(console, "assert");
 		oForm.setTitle("Test");
 		await nextUIUpdate();
+		let oRenderingTitle = oForm.getAggregation("_renderingTitle");
 		assert.equal(oForm.getTitle(), "Test", "Title set");
+		assert.ok(oRenderingTitle, "Title for rendering created");
+		assert.equal(oRenderingTitle.getText(), "Test", "rendering Title: Text");
+		assert.equal(oRenderingTitle.getLevel(), coreLibrary.TitleLevel.H4, "rendering Title: Level");
+		assert.equal(oRenderingTitle.getTitleStyle(), coreLibrary.TitleLevel.H5, "rendering Title: TitleStyle");
+		assert.notOk(oRenderingTitle.getTooltip(), "rendering Title: Tooltip");
 		assert.ok(window.document.getElementById("F1--title"), "Title rendered");
+		assert.ok(Element.getElementById("F1--title")?.isA("sap.m.Title"), "sap.m.Title rendered");
 		assert.equal(jQuery("#F1--title").text(), "Test", "Title rendered");
 		assert.ok(jQuery("#F1--title").is("h4"), "Title is rendered as H4 as default");
 		assert.ok(!jQuery("#F1--title").hasClass("sapUiFormTitleEmph"), "Title rendered not emphasized");
@@ -119,10 +126,13 @@ sap.ui.define([
 		assert.equal(jQuery("#F1").attr("aria-labelledby"), "F1--title", "aria-labelledby points to Title");
 		assert.ok(console.assert.neverCalledWith(sinon.match.falsy), "no assertion should have failed");
 
-		oForm.destroyTitle();
+		oForm.setTitle();
 		await nextUIUpdate();
+		oRenderingTitle = oForm.getAggregation("_renderingTitle");
 		assert.notOk(oForm.getTitle(), "no Title set");
+		assert.notOk(oRenderingTitle, "No Title for rendering created");
 		assert.notOk(window.document.getElementById("F1--title"), "no Title rendered");
+		assert.notOk(Element.getElementById("F1--title"), "no sap.m.Title created");
 		assert.notOk(jQuery("#F1").attr("aria-labelledby"), "no aria-labelledby");
 	});
 
@@ -132,14 +142,21 @@ sap.ui.define([
 		oForm.setTitle(oTitle);
 		await nextUIUpdate();
 
+		let oRenderingTitle = oForm.getAggregation("_renderingTitle");
 		assert.equal(oForm.getTitle(), oTitle, "Title set");
-		assert.ok(window.document.getElementById("T1"), "Title rendered");
-		assert.equal(jQuery("#T1").text(), "Test", "Title rendered");
-		assert.ok(jQuery("#T1").is("h4"), "Title is rendered as H4 as default");
-		assert.notOk(jQuery("#T1").hasClass("sapUiFormTitleEmph"), "Title rendered not emphasized");
-		assert.notOk(jQuery("#T1").attr("title"), "Title: no tooltip rendered per default");
+		assert.ok(oRenderingTitle, "Title for rendering created");
+		assert.equal(oRenderingTitle.getText(), "Test", "rendering Title: Text");
+		assert.equal(oRenderingTitle.getLevel(), coreLibrary.TitleLevel.H4, "rendering Title: Level");
+		assert.equal(oRenderingTitle.getTitleStyle(), coreLibrary.TitleLevel.H5, "rendering Title: TitleStyle");
+		assert.notOk(oRenderingTitle.getTooltip(), "rendering Title: Tooltip");
+		assert.ok(window.document.getElementById("F1--title"), "Title rendered");
+		assert.ok(Element.getElementById("F1--title")?.isA("sap.m.Title"), "sap.m.Title rendered");
+		assert.equal(jQuery("#F1--title").text(), "Test", "Title rendered");
+		assert.ok(jQuery("#F1--title").is("h4"), "Title is rendered as H4 as default");
+		assert.notOk(jQuery("#F1--title").hasClass("sapUiFormTitleEmph"), "Title rendered not emphasized");
+		assert.notOk(jQuery("#F1--title").attr("title"), "Title: no tooltip rendered per default");
 		assert.notOk(window.document.getElementById("T1-ico"), "Title no image is rendered");
-		assert.equal(jQuery("#F1").attr("aria-labelledby"), "T1", "aria-labelledby points to Title");
+		assert.equal(jQuery("#F1").attr("aria-labelledby"), "F1--title", "aria-labelledby points to Title");
 		assert.ok(console.assert.neverCalledWith(sinon.match.falsy), "no assertion should have failed");
 
 		oTitle.setIcon("../../images/controls/sap.ui.layout.form.Form.gif");
@@ -147,6 +164,11 @@ sap.ui.define([
 		oTitle.setEmphasized(true);
 		oTitle.setLevel(coreLibrary.TitleLevel.H1);
 		await nextUIUpdate();
+		oRenderingTitle = oForm.getAggregation("_renderingTitle");
+		assert.notOk(oRenderingTitle, "No Title for rendering created");
+		assert.ok(window.document.getElementById("T1"), "Title rendered");
+		assert.notOk(Element.getElementById("T1")?.isA("sap.m.Title"), "sap.m.Title rendered");
+		assert.notOk(Element.getElementById("F1--title"), "no sap.m.Title created");
 		assert.equal(jQuery("#T1").attr("title"), "Test", "Title: tooltip rendered");
 		assert.ok(jQuery("#T1").is("h1"), "Title is rendered as H1");
 		assert.ok(jQuery("#T1").hasClass("sapUiFormTitleEmph"), "Title rendered as emphasized");
@@ -154,10 +176,46 @@ sap.ui.define([
 		assert.ok(jQuery("#T1-ico").is("img"), "Icon is rendered as image");
 		assert.equal(jQuery("#T1-ico").attr("src"), "../../images/controls/sap.ui.layout.form.Form.gif", "Image URL");
 
+		oTitle.setIcon();
+		oTitle.setEmphasized(false);
+		await nextUIUpdate();
+		oRenderingTitle = oForm.getAggregation("_renderingTitle");
+		assert.ok(oRenderingTitle, "Title for rendering created");
+		assert.equal(oRenderingTitle.getText(), "Test", "rendering Title: Text");
+		assert.equal(oRenderingTitle.getLevel(), coreLibrary.TitleLevel.H1, "rendering Title: Level");
+		assert.equal(oRenderingTitle.getTitleStyle(), coreLibrary.TitleLevel.H5, "rendering Title: TitleStyle");
+		assert.equal(oRenderingTitle.getTooltip(), "Test", "rendering Title: Tooltip");
+		assert.ok(window.document.getElementById("F1--title"), "Title rendered");
+		assert.ok(Element.getElementById("F1--title")?.isA("sap.m.Title"), "sap.m.Title rendered");
+		assert.equal(jQuery("#F1--title").text(), "Test", "Title rendered");
+		assert.ok(jQuery("#F1--title").is("h1"), "Title is rendered as H1");
+		assert.notOk(jQuery("#F1--title").hasClass("sapUiFormTitleEmph"), "Title rendered not emphasized");
+		assert.equal(jQuery("#F1--title").attr("title"), "Test", "Title: tooltip rendered");
+		assert.notOk(window.document.getElementById("T1-ico"), "Title no image is rendered");
+		assert.equal(jQuery("#F1").attr("aria-labelledby"), "F1--title", "aria-labelledby points to Title");
+		assert.ok(console.assert.neverCalledWith(sinon.match.falsy), "no assertion should have failed");
+
+		oTitle.setText("Test 2");
+		oTitle.setLevel(coreLibrary.TitleLevel.H2);
+		await nextUIUpdate();
+		oRenderingTitle = oForm.getAggregation("_renderingTitle");
+		assert.ok(oRenderingTitle, "Title for rendering created");
+		assert.equal(oRenderingTitle.getText(), "Test 2", "rendering Title: Text");
+		assert.equal(oRenderingTitle.getLevel(), coreLibrary.TitleLevel.H2, "rendering Title: Level");
+		assert.equal(oRenderingTitle.getTitleStyle(), coreLibrary.TitleLevel.H5, "rendering Title: TitleStyle");
+		assert.equal(oRenderingTitle.getTooltip(), "Test", "rendering Title: Tooltip");
+		assert.ok(window.document.getElementById("F1--title"), "Title rendered");
+		assert.ok(Element.getElementById("F1--title")?.isA("sap.m.Title"), "sap.m.Title rendered");
+		assert.equal(jQuery("#F1--title").text(), "Test 2", "Title rendered");
+		assert.ok(jQuery("#F1--title").is("h2"), "Title is rendered as H2");
+
 		oForm.destroyTitle();
 		await nextUIUpdate();
+		oRenderingTitle = oForm.getAggregation("_renderingTitle");
 		assert.notOk(oForm.getTitle(), "no Title set");
-		assert.notOk(window.document.getElementById("T1"), "no Title rendered");
+		assert.notOk(oRenderingTitle, "No Title for rendering created");
+		assert.notOk(window.document.getElementById("T1") || window.document.getElementById("F1--title"), "no Title rendered");
+		assert.notOk(Element.getElementById("F1--title"), "no sap.m.Title created");
 		assert.notOk(jQuery("#F1").attr("aria-labelledby"), "no aria-labelledby");
 	});
 	/* eslint-enable no-console */
@@ -208,16 +266,24 @@ sap.ui.define([
 
 		oForm.setTitle("Test");
 		await nextUIUpdate();
+		let oRenderingTitle = oForm.getAggregation("_renderingTitle");
+		assert.equal(oRenderingTitle.getLevel(), coreLibrary.TitleLevel.H4, "rendering Title: Level");
+		assert.equal(oRenderingTitle.getTitleStyle(), coreLibrary.TitleLevel.H5, "rendering Title: TitleStyle");
 		assert.ok(window.document.getElementById("F1--title"), "Title rendered");
 		assert.equal(jQuery("#F1--title").text(), "Test", "Title rendered");
 		assert.ok(jQuery("#F1--title").is("h4"), "Title is rendered as H4 as default");
 
 		fnCallback({
 			"sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormTitleSize": "H1",
-			"sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormSubTitleSize": "H2"
+			"sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormSubTitleSize": "H2",
+			"sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormTitleStyle": "Auto",
+			"sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormSubTitleStyle": "Auto"
 		});
 
 		await nextUIUpdate();
+		oRenderingTitle = oForm.getAggregation("_renderingTitle");
+		assert.equal(oRenderingTitle.getLevel(), coreLibrary.TitleLevel.H1, "rendering Title: Level");
+		assert.equal(oRenderingTitle.getTitleStyle(), coreLibrary.TitleLevel.H1, "rendering Title: TitleStyle");
 		assert.ok(window.document.getElementById("F1--title"), "Title rendered");
 		assert.equal(jQuery("#F1--title").text(), "Test", "Title rendered");
 		assert.ok(jQuery("#F1--title").is("h1"), "Title is rendered as H1");
@@ -231,7 +297,7 @@ sap.ui.define([
 		var oTitle = new Title("T1", {text: "Test"});
 		oForm.setTitle(oTitle);
 		await nextUIUpdate();
-		assert.equal(jQuery("#F1").attr("aria-labelledby"), "X T1", "aria-labelledby points to Title and AriaLabel");
+		assert.equal(jQuery("#F1").attr("aria-labelledby"), "X F1--title", "aria-labelledby points to Title and AriaLabel");
 	});
 
 	QUnit.test("_suggestTitleId", async function(assert) {
@@ -242,11 +308,11 @@ sap.ui.define([
 		var oTitle = new Title("T1", {text: "Test"});
 		oForm.setTitle(oTitle);
 		await nextUIUpdate();
-		assert.equal(jQuery("#F1").attr("aria-labelledby"), "T1", "aria-labelledby points to Title");
+		assert.equal(jQuery("#F1").attr("aria-labelledby"), "F1--title", "aria-labelledby points to Title");
 
 		oForm.addAriaLabelledBy("X");
 		await nextUIUpdate();
-		assert.equal(jQuery("#F1").attr("aria-labelledby"), "X T1", "aria-labelledby points to AriaLabel and Title");
+		assert.equal(jQuery("#F1").attr("aria-labelledby"), "X F1--title", "aria-labelledby points to AriaLabel and Title");
 	});
 
 	QUnit.test("_suggestTitleId with role: region", async function(assert) {
@@ -385,12 +451,18 @@ sap.ui.define([
 		assert.equal(jQuery("#FC1").attr("title"), "Test", "tooltip rendered");
 	});
 
-	QUnit.test("Title  as string", async function(assert) {
+	QUnit.test("Title as string", async function(assert) {
 		var oFormContainer1 = new FormContainer("FC1");
 		oFormContainer1.setTitle("Test");
 		oForm.addFormContainer(oFormContainer1);
 		await nextUIUpdate();
+		let oRenderingTitle = oFormContainer1.getAggregation("_renderingTitle");
+		assert.equal(oRenderingTitle.getText(), "Test", "rendering Title: Text");
+		assert.equal(oRenderingTitle.getLevel(), coreLibrary.TitleLevel.H5, "rendering Title: Level");
+		assert.equal(oRenderingTitle.getTitleStyle(), coreLibrary.TitleLevel.H6, "rendering Title: TitleStyle");
+		assert.notOk(oRenderingTitle.getTooltip(), "rendering Title: Tooltip");
 		assert.ok(window.document.getElementById("FC1--title"), "Title rendered");
+		assert.ok(Element.getElementById("FC1--title")?.isA("sap.m.Title"), "sap.m.Title rendered");
 		assert.equal(jQuery("#FC1--title").text(), "Test", "Title rendered");
 		assert.ok(jQuery("#FC1--title").is("h5"), "Title is rendered as H5 as default");
 		assert.ok(!jQuery("#FC1--title").hasClass("sapUiFormTitleEmph"), "Title rendered not emphasized");
@@ -398,36 +470,50 @@ sap.ui.define([
 		assert.equal(jQuery("#FC1").attr("role"), "form", "role \"form\" set on Container");
 		assert.equal(jQuery("#FC1").attr("aria-labelledby"), "FC1--title", "aria-labelledby points to Title");
 
-		oFormContainer1.destroyTitle();
+		oFormContainer1.setTitle();
 		await nextUIUpdate();
+		oRenderingTitle = oFormContainer1.getAggregation("_renderingTitle");
+		assert.notOk(oRenderingTitle, "No Title for rendering created");
 		assert.notOk(window.document.getElementById("FC1--title"), "no Title rendered");
+		assert.notOk(Element.getElementById("FC1--title"), "no sap.m.Title created");
 		assert.equal(jQuery("#F1").attr("role"), "form", "role \"form\" set on Form");
 		assert.notOk(jQuery("#FC1").attr("role"), "no role set on Container");
 		assert.notOk(jQuery("#FC1").attr("aria-labelledby"), "no aria-labelledby");
 	});
 
-	QUnit.test("Title  as object", async function(assert) {
+	QUnit.test("Title as object", async function(assert) {
 		var oFormContainer1 = new FormContainer("FC1");
 		var oTitle = new Title("T1", {text: "Test"});
 		oFormContainer1.setTitle(oTitle);
 		oForm.addFormContainer(oFormContainer1);
 		await nextUIUpdate();
 
-		assert.ok(window.document.getElementById("T1"), "Title rendered");
-		assert.equal(jQuery("#T1").text(), "Test", "Title rendered");
-		assert.ok(jQuery("#T1").is("h5"), "Title is rendered as H5 as default");
-		assert.notOk(jQuery("#T1").hasClass("sapUiFormTitleEmph"), "Title rendered not emphasized");
-		assert.notOk(jQuery("#T1").attr("title"), "Title: no tooltip rendered per default");
+		let oRenderingTitle = oFormContainer1.getAggregation("_renderingTitle");
+		assert.equal(oRenderingTitle.getText(), "Test", "rendering Title: Text");
+		assert.equal(oRenderingTitle.getLevel(), coreLibrary.TitleLevel.H5, "rendering Title: Level");
+		assert.equal(oRenderingTitle.getTitleStyle(), coreLibrary.TitleLevel.H6, "rendering Title: TitleStyle");
+		assert.notOk(oRenderingTitle.getTooltip(), "rendering Title: Tooltip");
+		assert.ok(window.document.getElementById("FC1--title"), "Title rendered");
+		assert.equal(jQuery("#FC1--title").text(), "Test", "Title rendered");
+		assert.ok(Element.getElementById("FC1--title")?.isA("sap.m.Title"), "sap.m.Title rendered");
+		assert.ok(jQuery("#FC1--title").is("h5"), "Title is rendered as H5 as default");
+		assert.notOk(jQuery("#FC1--title").hasClass("sapUiFormTitleEmph"), "Title rendered not emphasized");
+		assert.notOk(jQuery("#FC1--title").attr("title"), "Title: no tooltip rendered per default");
 		assert.notOk(window.document.getElementById("T1-ico"), "Title no image is rendered");
 		assert.equal(jQuery("#F1").attr("role"), "region", "role \"region\" set on Form");
 		assert.equal(jQuery("#FC1").attr("role"), "form", "role \"form\" set on Container");
-		assert.equal(jQuery("#FC1").attr("aria-labelledby"), "T1", "aria-labelledby points to Title");
+		assert.equal(jQuery("#FC1").attr("aria-labelledby"), "FC1--title", "aria-labelledby points to Title");
 
 		oTitle.setIcon("sap-icon://sap-ui5");
 		oTitle.setTooltip("Test");
 		oTitle.setEmphasized(true);
 		oTitle.setLevel(coreLibrary.TitleLevel.H1);
 		await nextUIUpdate();
+		oRenderingTitle = oFormContainer1.getAggregation("_renderingTitle");
+		assert.notOk(oRenderingTitle, "No Title for rendering created");
+		assert.ok(window.document.getElementById("T1"), "Title rendered");
+		assert.notOk(Element.getElementById("T1")?.isA("sap.m.Title"), "sap.m.Title rendered");
+		assert.notOk(Element.getElementById("FC1--title"), "no sap.m.Title created");
 		assert.equal(jQuery("#T1").attr("title"), "Test", "Title: tooltip rendered");
 		assert.ok(jQuery("#T1").is("h1"), "Title is rendered as H1");
 		assert.ok(jQuery("#T1").hasClass("sapUiFormTitleEmph"), "Title rendered as emphasized");
@@ -436,7 +522,10 @@ sap.ui.define([
 
 		oFormContainer1.destroyTitle();
 		await nextUIUpdate();
-		assert.notOk(window.document.getElementById("T1"), "no Title rendered");
+		oRenderingTitle = oFormContainer1.getAggregation("_renderingTitle");
+		assert.notOk(oRenderingTitle, "No Title for rendering created");
+		assert.notOk(window.document.getElementById("T1") || window.document.getElementById("FC1--title"), "no Title rendered");
+		assert.notOk(Element.getElementById("FC1--title"), "no sap.m.Title created");
 		assert.equal(jQuery("#F1").attr("role"), "form", "role \"form\" set on Form");
 		assert.notOk(jQuery("#FC1").attr("role"), "no role set on Container");
 		assert.notOk(jQuery("#FC1").attr("aria-labelledby"), "no aria-labelledby");
@@ -498,16 +587,24 @@ sap.ui.define([
 		oFormContainer1.setTitle("Test");
 		oForm.addFormContainer(oFormContainer1);
 		await nextUIUpdate();
+		let oRenderingTitle = oFormContainer1.getAggregation("_renderingTitle");
+		assert.equal(oRenderingTitle.getLevel(), coreLibrary.TitleLevel.H5, "rendering Title: Level");
+		assert.equal(oRenderingTitle.getTitleStyle(), coreLibrary.TitleLevel.H6, "rendering Title: TitleStyle");
 		assert.ok(window.document.getElementById("FC1--title"), "Title rendered");
 		assert.equal(jQuery("#FC1--title").text(), "Test", "Title rendered");
 		assert.ok(jQuery("#FC1--title").is("h5"), "Title is rendered as H5 as default");
 
 		fnCallback({
 			"sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormTitleSize": "H1",
-			"sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormSubTitleSize": "H2"
+			"sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormSubTitleSize": "H2",
+			"sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormTitleStyle": "Auto",
+			"sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormSubTitleStyle": "Auto"
 		});
 
 		await nextUIUpdate();
+		oRenderingTitle = oFormContainer1.getAggregation("_renderingTitle");
+		assert.equal(oRenderingTitle.getLevel(), coreLibrary.TitleLevel.H2, "rendering Title: Level");
+		assert.equal(oRenderingTitle.getTitleStyle(), coreLibrary.TitleLevel.H2, "rendering Title: TitleStyle");
 		assert.ok(window.document.getElementById("FC1--title"), "Title rendered");
 		assert.equal(jQuery("#FC1--title").text(), "Test", "Title rendered");
 		assert.ok(jQuery("#FC1--title").is("h2"), "Title is rendered as H2");
@@ -523,7 +620,7 @@ sap.ui.define([
 		var oTitle = new Title("T1", {text: "Test"});
 		oFormContainer1.setTitle(oTitle);
 		await nextUIUpdate();
-		assert.equal(jQuery("#FC1").attr("aria-labelledby"), "X T1", "aria-labelledby points to Title and property");
+		assert.equal(jQuery("#FC1").attr("aria-labelledby"), "X FC1--title", "aria-labelledby points to Title and property");
 	});
 
 	QUnit.test("Expander", async function(assert) {

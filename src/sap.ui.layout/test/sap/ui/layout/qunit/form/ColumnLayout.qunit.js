@@ -402,9 +402,9 @@ sap.ui.define([
 
 		var $Container = jQuery("#FC1");
 		assert.equal($Container.children().length, 2, "two DOM nodes in Container");
-		assert.equal($Container.children()[0].id, "Title1", "Title rendered");
+		assert.equal($Container.children()[0].id, "FC1--title", "Title rendered");
 		assert.equal($Container.children()[1].id, "FC1-content", "content node for Container rendered");
-		assert.equal(jQuery($Container.children()[1]).attr("aria-Labelledby"), oTitle.getId(), "content node has aria-labelledby");
+		assert.equal(jQuery($Container.children()[1]).attr("aria-Labelledby"), "FC1--title", "content node has aria-labelledby");
 		assert.notOk($Container.attr("role"), "no role set on Container");
 		assert.notOk($Container.attr("aria-Labelledby"), "Container has no aria-labelledby");
 		assert.equal(jQuery("#F1").attr("role"), "region", "role \"region\" set on Form");
@@ -526,9 +526,9 @@ sap.ui.define([
 
 		$Container = jQuery("#FC2");
 		assert.equal($Container.children().length, 2, "two DOM nodes in Container");
-		assert.equal($Container.children()[0].id, "Title1", "Title rendered");
+		assert.equal($Container.children()[0].id, "FC2--title", "Title rendered");
 		assert.equal($Container.children()[1].id, "FC2-content", "content node for Container rendered");
-		assert.equal(jQuery($Container.children()[1]).attr("aria-Labelledby"), oTitle.getId(), "content node has aria-labelledby");
+		assert.equal(jQuery($Container.children()[1]).attr("aria-Labelledby"), "FC2--title", "content node has aria-labelledby");
 		assert.notOk($Container.attr("role"), "no role set on Container");
 		assert.notOk($Container.attr("aria-Labelledby"), "Container has no aria-labelledby");
 	});
@@ -847,11 +847,11 @@ sap.ui.define([
 
 		var $Container = jQuery("#FC1");
 		assert.equal($Container.children().length, 2, "two DOM nodes in Container");
-		assert.equal($Container.children()[0].id, "Title1", "Title rendered");
+		assert.equal($Container.children()[0].id, "FC1--title", "Title rendered");
 		assert.equal($Container.children()[1].id, "FC1-content", "content node for Container rendered");
 		assert.notOk(jQuery($Container.children()[1]).attr("aria-Labelledby"), "content node has no aria-labelledby");
 		assert.equal($Container.attr("role"), "form", "role \"form\" set on Container");
-		assert.equal($Container.attr("aria-Labelledby"), oTitle.getId(), "Container has aria-labelledby");
+		assert.equal($Container.attr("aria-Labelledby"), "FC1--title", "Container has aria-labelledby");
 		assert.equal(jQuery("#F1").attr("role"), "region", "role \"region\" set on Form");
 	});
 
@@ -910,11 +910,11 @@ sap.ui.define([
 
 		$Container = jQuery("#FC2");
 		assert.equal($Container.children().length, 2, "two DOM nodes in Container");
-		assert.equal($Container.children()[0].id, "Title1", "Title rendered");
+		assert.equal($Container.children()[0].id, "FC2--title", "Title rendered");
 		assert.equal($Container.children()[1].id, "FC2-content", "content node for Container rendered");
 		assert.notOk(jQuery($Container.children()[1]).attr("aria-Labelledby"), "content node has no aria-labelledby");
 		assert.equal($Container.attr("role"), "form", "role \"form\" set on Container");
-		assert.equal($Container.attr("aria-Labelledby"), oTitle.getId(), "Container has aria-labelledby");
+		assert.equal($Container.attr("aria-Labelledby"), "FC2--title", "Container has aria-labelledby");
 	});
 
 	QUnit.test("Two container - Toolbar", async function(assert) {

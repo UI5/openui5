@@ -2582,7 +2582,8 @@ sap.ui.define([
 		 *   The content ID of the request within the change set
 		 * @param {number} [vRequest.batchNo]
 		 *   The number of the ($direct or $batch) request within the test (starting with 1); use a
-		 *   negative number to expect a $direct request; see also <code>sURL</code>
+		 *   negative number to expect a $direct request; see also <code>sURL</code>; use 0 as a
+		 *   symbolic value for the current batchNo to group multiple requests together
 		 * @param {number} [vRequest.changeSetNo]
 		 *   The number of the change set within $batch (starting with 1)
 		 * @param {string} [vRequest.groupId]
@@ -2646,7 +2647,7 @@ sap.ui.define([
 				vRequest = {url : sURL};
 			}
 			if (vRequest.url.startsWith("#")) { // "#batchNo ..."
-				if (vRequest.batchNo || vRequest.changeSetNo) {
+				if (vRequest.batchNo !== undefined || vRequest.changeSetNo) {
 					throw new Error("Don't mix property usage and compact URL notation of batchNo"
 						+ " and changeSetNo");
 				}
@@ -2659,6 +2660,9 @@ sap.ui.define([
 					vRequest.changeSetNo = parseInt(aNumbers[1]);
 				}
 				vRequest.url = vRequest.url.slice(iSpace + 1);
+			}
+			if (vRequest.batchNo === 0) {
+				vRequest.batchNo = this.iBatchNo + 1;
 			}
 			const aURLParts = rStartsWithMethod.exec(vRequest.url);
 			if (aURLParts) {
@@ -25191,9 +25195,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}).then(function () {
 				assert.strictEqual(oBinding.getCount(), 3);
 
-				const iBatchNo = that.iBatchNo + 1; // don't care about exact no.
-				that.expectRequest(`#${iBatchNo} DELETE SalesOrderList('26')?sap-client=123&custom=foo`)
-					.expectRequest(`#${iBatchNo} SalesOrderList?sap-client=123&custom=foo`
+				that.expectRequest("#0 DELETE SalesOrderList('26')?sap-client=123&custom=foo")
+					.expectRequest("#0 SalesOrderList?sap-client=123&custom=foo"
 						+ "&$apply=filter(LifecycleStatus gt 'P' and GrossAmount lt 100)"
 						+ "/search(covfefe)/aggregate(GrossAmount)", {
 						value : [{GrossAmount : "5"}]
@@ -25218,12 +25221,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}).then(async function () {
 				assert.strictEqual(oBinding.getCount(), 2);
 
-				const iBatchNo = that.iBatchNo + 1; // don't care about exact no.
-
 				function expect(bMessages) {
 					const sSelect = "GrossAmount,LifecycleStatus" + (bMessages ? ",Messages" : "")
 						+ ",Note,SalesOrderID";
-					that.expectRequest(`#${iBatchNo} SalesOrderList('25')?sap-client=123&custom=foo`
+					that.expectRequest("#0 SalesOrderList('25')?sap-client=123&custom=foo"
 							+ "&$select=" + sSelect
 							+ "&$expand=SO_2_BP($select=Address/City,BusinessPartnerID)", {
 							GrossAmount : "5",
@@ -25261,12 +25262,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						that.waitForChanges(assert, sScenario)
 					]);
 				} else if (sScenario === "request properties of a context via side effects") {
-					that.expectRequest(`#${iBatchNo} SalesOrderList('25')?sap-client=123&custom=foo`
+					that.expectRequest("#0 SalesOrderList('25')?sap-client=123&custom=foo"
 							+ "&$select=LifecycleStatus,Note", {
 							LifecycleStatus : "Y*",
 							Note : "Late*"
 						})
-						.expectRequest(`#${iBatchNo} SalesOrderList('25')?sap-client=123&custom=foo`
+						.expectRequest("#0 SalesOrderList('25')?sap-client=123&custom=foo"
 							+ "&$select=SO_2_BP"
 							+ "&$expand=SO_2_BP($select=Address/City,BusinessPartnerID)", {
 							SO_2_BP : {Address : {City : "Heidelberg"}, BusinessPartnerID : "n/a"}
@@ -37127,10 +37128,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			const oDelta = oListBinding.getAllCurrentContexts()[1];
 
-			const sHash = "#" + (this.iBatchNo + 1) + " "; // don't care about exact no.
-			this.expectRequest(sHash + "DELETE EMPLOYEES('3')")
-				.expectRequest(sHash + "EMPLOYEES/$count", 1)
-				.expectRequest(sHash + "EMPLOYEES?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels"
+			this.expectRequest("#0 DELETE EMPLOYEES('3')")
+				.expectRequest("#0 EMPLOYEES/$count", 1)
+				.expectRequest("#0 EMPLOYEES?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels"
 					+ "(HierarchyNodes=$root/EMPLOYEES,HierarchyQualifier='OrgChart',NodeProperty='ID'"
 					//TODO: ExpandLevels not needed, see JIRA: CPOUI5ODATAV4-2550
 					+ ",Levels=1,ExpandLevels=" + JSON.stringify([{NodeID : "0", Levels : 1}]) + ")"
@@ -40095,12 +40095,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// Selection must not make a difference (JIRA: CPOUI5ODATAV4-3605)
 	// Afterwards, deletion still works fine (JIRA: CPOUI5ODATAV4-3608)
-	[false, true].forEach((bSelected) => {
-		const sTitle = "Recursive Hierarchy: DINC0921191, side-effects refresh w/ out-of-place node"
-			+ " outside the collection, selected = " + bSelected;
+	// Add "Out_Child" to either "Out" or to "Alpha" (JIRA: CPOUI5ODATAV4-3621)
+	[undefined, true].forEach((bSelected) => {
+		[false, true].forEach((bParentChild) => {
+			const sTitle = "Recursive Hierarchy: DINC0921191, side-effects refresh w/ out-of-place node"
+				+ " outside the collection, selected = " + bSelected
+				+ ", parent&child OOP = " + bParentChild;
 
 		QUnit.test(sTitle, async function (assert) {
-			const sBaseUrl = "EMPLOYEES?$apply=ancestors($root/EMPLOYEES,OrgChart,ID"
+			let sBaseUrl = "EMPLOYEES?$apply=ancestors($root/EMPLOYEES,OrgChart,ID"
 				+ ",filter(not startswith(Name, 'Out')),keep start)"
 				+ "/com.sap.vocabularies.Hierarchy.v1.TopLevels(HierarchyNodes=$root/EMPLOYEES"
 				+ ",HierarchyQualifier='OrgChart',NodeProperty='ID',Levels=1)";
@@ -40116,11 +40119,16 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				$filter : 'not startswith(Name, \\'Out\\')'
 			}}" threshold="0" visibleRowCount="4">
 		<Text text="{= %{@$ui5.context.isSelected} }"/>
-		<Text text="{= %{@$ui5.node.isExpanded} }"/>
+		<Text id="isExpanded" text="{= %{@$ui5.node.isExpanded} }"/>
 		<Text text="{= %{@$ui5.node.level} }"/>
 		<Text text="{Name}"/>
 	</t:Table>`;
 
+			// Out Out
+			//   Child Out_Child (either here...)
+			// 0 Alpha
+			//   Child Out_Child (...or there)
+			// 1 Beta
 			this.expectRequest("#1 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2)
 				.expectRequest("#1 " + sBaseUrl
 					+ "&$select=DrillState,ID,Name&$count=true&$skip=0&$top=4", {
@@ -40130,7 +40138,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						{DrillState : "leaf", ID : "1", Name : "Beta"}
 					]
 				})
-				.expectChange("count");
+				.expectChange("count")
+				.expectChange("isExpanded", [undefined, undefined]);
 
 			await this.createView(assert, sView, oModel);
 
@@ -40143,6 +40152,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				[undefined, undefined, 1, "Beta"]
 			], 2);
 			const oListBinding = oTable.getBinding("rows");
+			const [oAlpha] = oListBinding.getCurrentContexts();
 
 			this.expectChange("count", "2");
 
@@ -40151,13 +40161,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			await this.waitForChanges(assert, "count");
 
 			// create a new root which does not match the filter (thus w/o rank, "out of place")
-			this.expectRequest("#2 POST EMPLOYEES", {
+			this.expectChange("isExpanded", [,, undefined])
+				.expectRequest("#2 POST EMPLOYEES", {
 					payload : {Name : "Out"}
 				}, {ID : "Out", Name : "Out"})
 				.expectRequest("#2 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2);
 
 			const oOut = oListBinding.create({Name : "Out"}, /*bSkipRefresh*/true);
-			oOut.setSelected(bSelected);
+			oOut.setSelected(!!bSelected); //TODO: avoid !!
 
 			await Promise.all([
 				oOut.created(),
@@ -40169,7 +40180,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/EMPLOYEES('0')",
 				"/EMPLOYEES('1')"
 			], [
-				[bSelected ? true : undefined, undefined, 1, "Out"],
+				[bSelected, undefined, 1, "Out"],
 				[undefined, undefined, 1, "Alpha"],
 				[undefined, undefined, 1, "Beta"]
 			]);
@@ -40191,29 +40202,98 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				Name : "Out"
 			});
 
-			this.expectRequestIf(bSelected, "#4 EMPLOYEES?$filter=ID eq 'Out'&$select=AGE,ID,Name", {
-					value : [{AGE : 44, ID : "Out", Name : "Out"}]
-				})
-				.expectRequest("#4 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2)
-				.expectRequest("#4 " + sBaseUrl
-					+ "&$select=DrillState,ID,Name&$count=true&$skip=0&$top=4", {
-					"@odata.count" : "2",
+			// create a new child which does not match the filter (thus w/o rank, "out of place")
+			this.expectChange("isExpanded", bParentChild ? [true,,, undefined] : [, true,, undefined])
+				.expectRequest("#4 POST EMPLOYEES", {
+					payload : {
+						"EMPLOYEE_2_MANAGER@odata.bind"
+							: bParentChild ? "EMPLOYEES('Out')" : "EMPLOYEES('0')",
+						Name : "Out_Child"
+					}
+				}, {ID : "Child", Name : "Out_Child"})
+				.expectRequest("#4 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2);
+
+			const oOutChild = oListBinding.create({
+				"@$ui5.node.parent" : bParentChild ? oOut : oAlpha,
+				Name : "Out_Child"
+			}, /*bSkipRefresh*/true);
+			oOutChild.setSelected(!!bSelected); //TODO: avoid !!
+
+			await Promise.all([
+				oOutChild.created(),
+				this.waitForChanges(assert, "create Out child")
+			]);
+
+			checkTable("after create Out child", assert, oTable, [
+				oOut,
+				bParentChild && oOutChild,
+				"/EMPLOYEES('0')",
+				bParentChild || oOutChild,
+				"/EMPLOYEES('1')"
+			], [
+				[bSelected, bParentChild ? true : undefined, 1, "Out"],
+				bParentChild && [bSelected, undefined, 2, "Out_Child"],
+				[undefined, bParentChild ? undefined : true, 1, "Alpha"],
+				bParentChild || [bSelected, undefined, 2, "Out_Child"],
+				[undefined, undefined, 1, "Beta"]
+			]);
+			// Note: do not request late property
+
+			sBaseUrl = sBaseUrl.slice(0, -1) + ",ExpandLevels="
+				+ JSON.stringify([{NodeID : bParentChild ? "Out" : "0", Levels : 1}]) + ")";
+			this.expectRequestIf(bSelected,
+					"#0 EMPLOYEES?$filter=ID eq 'Child' or ID eq 'Out'&$select=AGE,ID,Name&$top=2", {
 					value : [
-						{DrillState : "leaf", ID : "0", Name : "Alpha"},
-						{DrillState : "leaf", ID : "1", Name : "Beta"}
+						{AGE : 33, ID : "Child", Name : "Out_Child"},
+						{AGE : 44, ID : "Out", Name : "Out"}
 					]
 				})
-				// rank of the out-of-place node; it is filtered out and thus has no rank
-				.expectRequest("#4 " + sBaseUrl
-					+ "&$select=DistanceFromRoot,DrillState,ID,LimitedRank"
-					+ "&$filter=ID eq 'Out'&$top=1", {
-					value : [] // filtered out -> no rank
+				.expectRequest("#0 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2)
+				.expectRequest("#0 " + sBaseUrl
+					+ "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,Name"
+					+ "&$count=true&$skip=0&$top=4", {
+					"@odata.count" : "2",
+					value : [{
+						DescendantCount : "0", // Note: "Out" child ignored here!
+						DistanceFromRoot : "0",
+						DrillState : "leaf", // Note: "Out" child ignored here!
+						ID : "0",
+						Name : "Alpha"
+					}, {
+						DescendantCount : "0",
+						DistanceFromRoot : "0",
+						DrillState : "leaf",
+						ID : "1",
+						Name : "Beta"
+					}]
+				})
+				// rank of the out-of-place nodes; they are filtered out and thus have no rank
+				.expectRequest("#0 " + sBaseUrl
+					+ "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,LimitedRank"
+					+ (bParentChild
+						? "&$filter=ID eq 'Child' or ID eq 'Out'&$top=2"
+						: "&$filter=ID eq '0' or ID eq 'Child' or ID eq 'Out'&$top=3"), {
+					value : bParentChild
+						? []
+						: [{
+							DescendantCount : "0",
+							DistanceFromRoot : "0",
+							DrillState : "leaf",
+							ID : "0",
+							LimitedRank : "0"
+						}]
 				})
 				// the out-of-place node's data
-				.expectRequest("#4 EMPLOYEES?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
+				.expectRequest("#0 EMPLOYEES?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
 					+ "HierarchyNodes=$root/EMPLOYEES,HierarchyQualifier='OrgChart',NodeProperty='ID'"
 					+ ",Levels=1)&$select=ID,Name&$filter=ID eq 'Out'&$top=1", {
 					value : [{ID : "Out", Name : "Out"}]
+				})
+				// the out-of-place node's data
+				.expectRequest("#0 EMPLOYEES?$apply=descendants($root/EMPLOYEES,OrgChart,ID"
+					+ ",filter(ID eq '" + (bParentChild ? "Out" : "0") + "'),1)"
+					+ "&$select=ID,Name&$filter=ID eq 'Child'&$top=1", {
+					value : [{ID : "Child", Name : "Out_Child"}]
 				});
 
 			await Promise.all([
@@ -40226,39 +40306,61 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			// lost (SNOW: DINC0921191)
 			checkTable("after side-effects refresh", assert, oTable, [
 				oOut,
+				bParentChild && oOutChild,
 				"/EMPLOYEES('0')",
+				bParentChild || oOutChild,
 				"/EMPLOYEES('1')"
 			], [
-				[bSelected ? true : undefined, undefined, 1, "Out"],
-				[undefined, undefined, 1, "Alpha"],
+				[bSelected, bParentChild ? true : undefined, 1, "Out"],
+				bParentChild && [bSelected, undefined, 2, "Out_Child"],
+				[undefined, bParentChild ? undefined : true, 1, "Alpha"],
+				bParentChild || [bSelected, undefined, 2, "Out_Child"],
 				[undefined, undefined, 1, "Beta"]
 			]);
 			assert.deepEqual(oOut.getObject(), {
 				...(bSelected && {"@$ui5.context.isSelected" : true}),
 				"@$ui5.context.isTransient" : false,
+				...(bParentChild && {"@$ui5.node.isExpanded" : true}),
 				"@$ui5.node.level" : 1,
 				...(bSelected && {AGE : 44}), // Note: w/o selection, late property is NOT requested!
 				ID : "Out",
 				Name : "Out"
 			});
-			checkSelected(assert, oOut, bSelected ? true : undefined);
+			checkSelected(assert, oOut, bSelected);
+			assert.deepEqual(oOutChild.getObject(), {
+				...(bSelected && {"@$ui5.context.isSelected" : true}),
+				"@$ui5.context.isTransient" : false,
+				"@$ui5.node.level" : 2,
+				...(bSelected && {AGE : 33}),
+				ID : "Child",
+				Name : "Out_Child"
+			});
+			checkSelected(assert, oOutChild, bSelected);
 
-			this.expectRequest("#5 DELETE EMPLOYEES('Out')")
-				.expectRequest("#5 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2);
+			if (!bParentChild) {
+				return;
+			}
+
+			oOutChild.setSelected(false); //TODO: shouldn't this happen automatically?
+
+			this.expectRequest("#0 DELETE EMPLOYEES('Out')")
+				.expectRequest("#0 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2)
+				.expectChange("isExpanded", [undefined]);
 
 			await Promise.all([
 				// code under test (JIRA: CPOUI5ODATAV4-3608)
 				oOut.delete(), //TODO: ("$auto", /*bDoNotRequestCount*/true),
-				this.waitForChanges(assert, "delete")
+				this.waitForChanges(assert, "delete parent")
 			]);
 
-			checkTable("after delete", assert, oTable, [
+			checkTable("after delete parent", assert, oTable, [
 				"/EMPLOYEES('0')",
 				"/EMPLOYEES('1')"
 			], [
 				[undefined, undefined, 1, "Alpha"],
 				[undefined, undefined, 1, "Beta"]
 			]);
+		});
 		});
 	});
 
@@ -46033,10 +46135,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					]);
 			}
 
-			const iBatchNo = this.iBatchNo + 1; // don't care about exact no., but use thrice below
-			this.expectRequest(`#${iBatchNo} DELETE Artists(ArtistID='1',IsActiveEntity=false)`)
-				.expectRequest(`#${iBatchNo} DELETE Artists(ArtistID='10',IsActiveEntity=false)`)
-				.expectRequest(`#${iBatchNo} DELETE Artists(ArtistID='10.1',IsActiveEntity=false)`);
+			this.expectRequest("#0 DELETE Artists(ArtistID='1',IsActiveEntity=false)")
+				.expectRequest("#0 DELETE Artists(ArtistID='10',IsActiveEntity=false)")
+				.expectRequest("#0 DELETE Artists(ArtistID='10.1',IsActiveEntity=false)");
 
 			await Promise.all([
 				// code under test

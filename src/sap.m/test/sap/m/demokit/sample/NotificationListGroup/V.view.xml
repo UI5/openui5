@@ -103,7 +103,7 @@
 				<NotificationListItem
 					title="New order (#2523)"
 					description="Aliquam quis varius ligula."
-					showCloseButton="falseue"
+					showCloseButton="false"
 					unread="false"
 					datetime="3 days"
 					priority="High"
@@ -157,7 +157,7 @@
 				<NotificationListItem
 					title="New order (#2523)"
 					description="Aliquam quis varius ligula."
-					showCloseButton="falseue"
+					showCloseButton="false"
 					unread="false"
 					datetime="3 days"
 					priority="High"

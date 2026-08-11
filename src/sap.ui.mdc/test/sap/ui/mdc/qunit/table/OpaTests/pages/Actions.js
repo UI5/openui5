@@ -13,7 +13,8 @@ sap.ui.define([
 	"sap/ui/test/actions/EnterText",
 	"sap/ui/test/actions/Drag",
 	"sap/ui/test/actions/Drop",
-	"sap/ui/mdc/enums/TableType"
+	"sap/ui/mdc/enums/TableType",
+	"sap/ui/events/KeyCodes"
 ], function(
 	Library,
 	/** @type sap.ui.test.Opa5 */ Opa5,
@@ -25,7 +26,8 @@ sap.ui.define([
 	/** @type sap.ui.test.actions.EnterText */ EnterText,
 	/** @type sap.ui.test.actions.Drag */ Drag,
 	/** @type sap.ui.test.actions.Drop */ Drop,
-	/** @type sap.ui.mdc.enums.TableType */ TableType) {
+	/** @type sap.ui.mdc.enums.TableType */ TableType,
+	KeyCodes) {
 	"use strict";
 
 	/**
@@ -109,6 +111,68 @@ sap.ui.define([
 						});
 					}
 				}
+			});
+		},
+
+		/**
+		 * Starts observing the <code>afterHeaderSelectorPress</code> event of the table. Use
+		 * {@link sap.ui.mdc.qunit.table.OpaTests.pages.Assertions#iCheckHeaderSelectorPressEventFired} afterwards to wait for the event.
+		 *
+		 * @param {string | sap.ui.mdc.Table} vTable Id or instance of the table
+		 * @returns {Promise} OPA waitFor
+		 */
+		iStartObservingHeaderSelectorPressEvent: function(vTable) {
+			return waitForTable.call(this, vTable, {
+				success: function(oTable) {
+					oTable._bHeaderSelectorPressed = false;
+					oTable._fnHeaderSelectorPressObserver = function() {
+						oTable._bHeaderSelectorPressed = true;
+					};
+					oTable.attachEvent("afterHeaderSelectorPress", oTable._fnHeaderSelectorPressObserver);
+				}
+			});
+		},
+
+		/**
+		 * Emulates pressing the "select all" (Ctrl+A) or "clear all" (Ctrl+Shift+A) keyboard shortcut on the table.
+		 *
+		 * @param {string | sap.ui.mdc.Table} vTable Id or instance of the table
+		 * @param {boolean} bShift Whether the Shift key is pressed (Ctrl+Shift+A) in addition to Ctrl+A
+		 * @returns {Promise} OPA waitFor
+		 */
+		iPressSelectAllKeyboardShortcut: function(vTable, bShift) {
+			function getKeyboardTarget(oTable) {
+				const oInnerTable = oTable._oTable;
+				// The keydown must target an element the inner table's keyboard handling reacts to: a focusable item for the
+				// ResponsiveTable, or a content cell for the GridTable.
+				return oTable._isOfType(TableType.ResponsiveTable)
+					? oInnerTable?.getItems()[0]?.getDomRef()
+					: oInnerTable?.getRows()[0]?.getCells()[0]?.getDomRef().closest("td");
+			}
+
+			return waitForTable.call(this, vTable, {
+				success: function(oTable) {
+					this.waitFor({
+						check: function() {
+							return !!getKeyboardTarget(oTable);
+						},
+						success: function() {
+							const oTarget = getKeyboardTarget(oTable);
+							oTarget.focus();
+							Opa5.getUtils().triggerEvent("keydown", oTarget, {
+								code: "KeyA",
+								key: "a",
+								keyCode: KeyCodes.A,
+								which: KeyCodes.A,
+								ctrlKey: true,
+								shiftKey: !!bShift
+							});
+							Opa5.assert.ok(true, "Pressed Ctrl+" + (bShift ? "Shift+" : "") + "A");
+						},
+						errorMessage: "The inner table keyboard target was not rendered"
+					});
+				},
+				errorMessage: "No table found"
 			});
 		},
 

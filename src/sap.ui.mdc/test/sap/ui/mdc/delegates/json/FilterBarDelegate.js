@@ -50,12 +50,12 @@ sap.ui.define([
 		}
 
 		return oModifier.createControl("sap.ui.mdc.FilterField", oAppComponent, oView, sId, {
-			dataType: oProperty.dataType,
-			conditions: "{$filters>/conditions/" + sName + '}',
+			// dataType: oProperty.dataType,
+			// conditions: "{$filters>/conditions/" + sName + '}',
 			propertyKey: sName,
-			required: oProperty.required,
-			label: oProperty.label,
-			maxConditions: oProperty.maxConditions,
+			// required: oProperty.required,
+			// label: oProperty.label,
+			// maxConditions: oProperty.maxConditions,
 			delegate: {name: "sap/ui/mdc/field/FieldBaseDelegate", payload: {}}
 		}, true)
 		.then(function(oCreatedFilterField) {
