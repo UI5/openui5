@@ -124,6 +124,10 @@ sap.ui.define([
 
 		ListItemBase.prototype.onAfterRendering.call(this);
 		this._checkTypeColumn();
+
+		if (this.bOutput !== false && document.activeElement.id === this.getId()) {
+			this.getTable()?._setFirstLastVisibleCells(document.activeElement);
+		}
 	};
 
 	ColumnListItem.prototype.exit = function() {
