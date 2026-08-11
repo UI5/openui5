@@ -682,6 +682,7 @@ sap.ui.define([
 	Table.prototype.onclick = function(oEvent) {
 		if (this.getMultiSelectMode() == "ClearAll" && this.getDomRef("tblHeadModeCol")?.contains(oEvent.target) && !this._clearAllIcon?.hasStyleClass("sapMTableDisableClearAll")) {
 			this.removeSelections(false, true, false);
+			this._fireHeaderSelectorPress();
 		}
 	};
 
@@ -883,6 +884,7 @@ sap.ui.define([
 				} else {
 					this.removeSelections(false, true);
 				}
+				this._fireHeaderSelectorPress();
 			}, this);
 			this._selectAllCheckBox.useEnabledPropagator(false);
 			this.updateSelectAllCheckbox();
@@ -1088,6 +1090,7 @@ sap.ui.define([
 				this._selectAllCheckBox.setSelected(!this._selectAllCheckBox.getSelected()).fireSelect();
 			} else if (this._clearAllIcon && sMultiSelectMode == "ClearAll" && !this._clearAllIcon.hasStyleClass("sapMTableDisableClearAll")) {
 				this.removeSelections(false, true, false);
+				this._fireHeaderSelectorPress();
 			}
 		} else if (oEvent.target.classList.contains("sapMTblCellFocusable")) {
 			// prevent from scrolling

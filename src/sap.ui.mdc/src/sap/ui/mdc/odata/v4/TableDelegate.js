@@ -527,11 +527,14 @@ sap.ui.define([
 	/**
 	 * @inheritDoc
 	 */
-	Delegate.initializeSelection = function(oTable) {
+	Delegate.initializeSelection = async function(oTable) {
 		if (oTable._isOfType(TableType.Table, true)) {
-			return initializeGridTableSelection(oTable);
+			await initializeGridTableSelection(oTable);
 		} else {
-			return TableDelegate.initializeSelection.apply(this, arguments);
+			await TableDelegate.initializeSelection.apply(this, arguments);
+			if (oTable._isOfType(TableType.ResponsiveTable)) {
+				oTable._oTable.attachEvent("_headerSelectorPress", () => fireAfterHeaderSelectorPress(oTable));
+			}
 		}
 	};
 
@@ -561,6 +564,7 @@ sap.ui.define([
 			"sap/ui/table/plugins/ODataV4SingleSelection"
 		]).then((aModules) => {
 			const [ODataV4MultiSelectionPlugin, ODataV4SingleSelectionPlugin] = aModules;
+			const MDCODataV4MultiSelectionPlugin = getMDCODataV4MultiSelectionPluginClass(ODataV4MultiSelectionPlugin);
 
 			function initSelection(oEvent) {
 				if (!oTable._isOfType(TableType.Table, true)) {
@@ -578,12 +582,13 @@ sap.ui.define([
 				PluginBase.getPlugin(oTable._oTable, "sap.ui.table.plugins.ODataV4Selection")?.destroy();
 
 				if (sSelectionMode === SelectionMode.Multi) {
-					oSelectionPlugin = new ODataV4MultiSelectionPlugin({
+					oSelectionPlugin = new MDCODataV4MultiSelectionPlugin({
 						limit: "{$sap.ui.mdc.Table#type>/selectionLimit}",
 						enableNotification: true,
 						hideHeaderSelector: "{= !${$sap.ui.mdc.Table#type>/showHeaderSelector} }",
 						selectionChange: () => oTable._onSelectionChange({selectAll: undefined})
 					});
+					oSelectionPlugin.attachEvent("afterHeaderSelectorPress", () => fireAfterHeaderSelectorPress(oTable));
 					if (oTable._isOfType(TableType.TreeTable)) {
 						oSelectionPlugin.setProperty("leafSelectionDisabled", oTable.getControlDelegate().isLeafSelectionDisabled(oTable));
 					}
@@ -603,6 +608,46 @@ sap.ui.define([
 				oTable._oSelectionModeBinding.attachChange(initSelection);
 			}
 		});
+	}
+
+	let MDCODataV4MultiSelection;
+
+	/**
+	 * Returns an MDC-internal subclass of <code>sap.ui.table.plugins.ODataV4MultiSelection</code>.
+	 * Ensures the <code>afterHeaderSelectorPress</code> event is fired.
+	 *
+	 * @param {function} ODataV4MultiSelectionPlugin The base <code>sap.ui.table.plugins.ODataV4MultiSelection</code> class.
+	 * @returns {function} The MDC-internal multi-selection plugin class.
+	 */
+	function getMDCODataV4MultiSelectionPluginClass(ODataV4MultiSelectionPlugin) {
+		if (MDCODataV4MultiSelection) {
+			return MDCODataV4MultiSelection;
+		}
+
+		const ODataV4MultiSelection = ODataV4MultiSelectionPlugin.extend("sap.ui.mdc.table.ODataV4MultiSelection");
+
+		ODataV4MultiSelection.prototype.handleHeaderSelectorPress = async function() {
+			await ODataV4MultiSelectionPlugin.prototype.handleHeaderSelectorPress.apply(this, arguments);
+			this.fireEvent("afterHeaderSelectorPress");
+		};
+
+		ODataV4MultiSelection.prototype.handleKeyboardShortcut = async function() {
+			await ODataV4MultiSelectionPlugin.prototype.handleKeyboardShortcut.apply(this, arguments);
+			this.fireEvent("afterHeaderSelectorPress");
+		};
+
+		MDCODataV4MultiSelection = ODataV4MultiSelection;
+		return MDCODataV4MultiSelection;
+	}
+
+	/**
+	 * Fires the <code>afterHeaderSelectorPress</code> event on the given table.
+	 * Restricted event for sap.fe for telemetry purposes only.
+	 *
+	 * @param {sap.ui.mdc.Table} oTable Instance of the MDC table
+	 */
+	function fireAfterHeaderSelectorPress(oTable) {
+		oTable.fireEvent("afterHeaderSelectorPress");
 	}
 
 	/**

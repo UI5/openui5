@@ -299,6 +299,33 @@ sap.ui.define([
 		},
 
 		/**
+		 * Waits until the <code>afterHeaderSelectorPress</code> event has been fired since
+		 * <code>Actions#iStartObservingHeaderSelectorPressEvent</code> was called, then stops observing. The event may be fired
+		 * asynchronously after the selection change completes.
+		 *
+		 * @param {String|sap.ui.mdc.Table} oControl Id or control instance of the MDCTable
+		 * @returns {Promise} OPA waitFor
+		 */
+		iCheckHeaderSelectorPressEventFired: function(oControl) {
+			return waitForTable.call(this, oControl, {
+				success: function(oTable) {
+					this.waitFor({
+						check: function() {
+							return oTable._bHeaderSelectorPressed;
+						},
+						success: function() {
+							Opa5.assert.ok(true, "afterHeaderSelectorPress was fired");
+							oTable.detachEvent("afterHeaderSelectorPress", oTable._fnHeaderSelectorPressObserver);
+							delete oTable._fnHeaderSelectorPressObserver;
+							delete oTable._bHeaderSelectorPressed;
+						},
+						errorMessage: "afterHeaderSelectorPress was not fired"
+					});
+				}
+			});
+		},
+
+		/**
 		 * Checks if the given rows are selected.
 		 *
 		 * @function
