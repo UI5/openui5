@@ -707,8 +707,7 @@ function(
 
 					if (this.getValueState() === ValueState.Error && this._bIsValueInvalid) {
 						this._bIsValueInvalid = false;
-						this.setValueState(this._sInitialValueState);
-						this.setValueStateText(this._sInitialValueStateText || "");
+						this._restoreInitialValueState();
 					}
 				}
 			}
@@ -970,10 +969,9 @@ function(
 		if (this._bIsValueInvalid && (bIsValueValid || sValue === "")) {
 			this._bIsValueInvalid = false;
 			if (bIsPickerDialog && oSuggestionsPopover) {
-				oSuggestionsPopover.updateValueState(this._sInitialValueState, this._sInitialValueStateText || "", true);
+				oSuggestionsPopover.updateValueState(this._sInitialValueState, this._getInitialValueStateText(), true);
 			} else {
-				oInputField.setValueState(this._sInitialValueState);
-				oInputField.setValueStateText(this._sInitialValueStateText || "");
+				this._restoreInitialValueState();
 			}
 		}
 
@@ -1044,7 +1042,7 @@ function(
 		var oSuggestionsPopover = this._getSuggestionsPopover();
 		var sInitialValueStateText = this._sInitialValueStateText;
 		var sInitialValueState = this._sInitialValueState;
-		var sInvalidEntry = sInitialValueStateText || this._oRbC.getText("VALUE_STATE_ERROR");
+		var sInvalidEntry = (sInitialValueState === ValueState.None && sInitialValueStateText) || this._oRbC.getText("VALUE_STATE_ERROR");
 
 		if (sInitialValueState === ValueState.Error) {
 			return;
@@ -1053,15 +1051,57 @@ function(
 		this._bIsValueInvalid = true;
 
 		if (oSuggestionsPopover) {
+			var oValueStateHeader = oSuggestionsPopover._getValueStateHeader();
+
+			if (oValueStateHeader) {
+				oValueStateHeader.setFormattedText(null);
+			}
+
 			oSuggestionsPopover.updateValueState(ValueState.Error, sInvalidEntry, true);
 		}
 
 		if (!this.isPickerDialog()) {
+			this.setFormattedValueStateText(null);
 			this.setValueState(ValueState.Error);
-			this.setValueStateText(this.getValueStateText() || sInvalidEntry);
+			this.setValueStateText(sInvalidEntry);
 		}
 
 		this._syncInputWidth(this.getAggregation("tokenizer"));
+	};
+
+	/**
+	 * Returns the value state message to restore when the control becomes valid again.
+	 * A formatted value state text set by the application takes precedence over the plain text message.
+	 *
+	 * @returns {string|sap.m.FormattedText} The formatted text if one was initially set, otherwise the plain text message.
+	 * @private
+	 */
+	MultiComboBox.prototype._getInitialValueStateText = function() {
+		var oFormattedText = this._oInitialFormattedValueStateText;
+
+		if (oFormattedText && !oFormattedText.bIsDestroyed) {
+			return oFormattedText;
+		}
+
+		return this._sInitialValueState !== ValueState.None ? (this._sInitialValueStateText || "") : "";
+	};
+
+	/**
+	 * Restores the initially set value state and its message (plain or formatted) on the control.
+	 *
+	 * @private
+	 */
+	MultiComboBox.prototype._restoreInitialValueState = function() {
+		var vValueStateText = this._getInitialValueStateText();
+
+		this.setValueState(this._sInitialValueState);
+
+		if (typeof vValueStateText === "object") {
+			this.setValueStateText("");
+			this.setFormattedValueStateText(vValueStateText);
+		} else {
+			this.setValueStateText(vValueStateText);
+		}
 	};
 
 	/**
@@ -1088,6 +1128,7 @@ function(
 			if (!this._bAlreadySelected) {
 				this._sInitialValueState = this.getValueState();
 				this._sInitialValueStateText = this.getValueStateText();
+				this._oInitialFormattedValueStateText = this._getFormattedValueStateText();
 			}
 
 			this._bAlreadySelected = true;
@@ -1281,6 +1322,7 @@ function(
 		if (!this._bAlreadySelected && !this._bIsValueInvalid) {
 			this._sInitialValueState = this.getValueState();
 			this._sInitialValueStateText = this.getValueStateText();
+			this._oInitialFormattedValueStateText = this._getFormattedValueStateText();
 		}
 
 		if (this.getShowClearIcon()) {
@@ -1497,8 +1539,7 @@ function(
 
 			if (this.getValueState() === ValueState.Error && this._bIsValueInvalid) {
 				this._bIsValueInvalid = false;
-				this.setValueState(this._sInitialValueState);
-				this.setValueStateText(this._sInitialValueStateText || "");
+				this._restoreInitialValueState();
 			}
 		}
 
@@ -1676,8 +1717,7 @@ function(
 		if (this.getValueState() === ValueState.Error && this._bIsValueInvalid) {
 			this._bIsValueInvalid = false;
 
-			this.setValueState(this._sInitialValueState);
-			this.setValueStateText(this._sInitialValueState !== ValueState.None ? this._sInitialValueStateText : '');
+			this._restoreInitialValueState();
 		}
 
 		if (mOptions.fireFinishEvent) {
@@ -2366,8 +2406,7 @@ function(
 
 		// reset the value state
 		if (this.getValueState() === ValueState.Error && this.getValueStateText() === this._oRb.getText("VALUE_STATE_ERROR_ALREADY_SELECTED")) {
-			this.setValueState(this._sInitialValueState);
-			this.setValueStateText(this._sInitialValueStateText);
+			this._restoreInitialValueState();
 		}
 
 		ComboBoxBase.prototype.onfocusout.apply(this, arguments);
@@ -2383,8 +2422,7 @@ function(
 			// Reset value state if it was set due to invalid input
 			if (this.getValueState() === ValueState.Error && this._bIsValueInvalid) {
 				this._bIsValueInvalid = false;
-				this.setValueState(this._sInitialValueState);
-				this.setValueStateText(this._sInitialValueStateText || "");
+				this._restoreInitialValueState();
 			}
 		}
 	};
@@ -3362,6 +3400,7 @@ function(
 
 		this._sInitialValueState = this.getValueState();
 		this._sInitialValueStateText = "";
+		this._oInitialFormattedValueStateText = null;
 
 		// ToDo: Remove. Just for backwards compatibility with the runtime layer. When this change merges, we'd need to adjust the code in the runtime
 		this._oTokenizer = this._createTokenizer();
@@ -3428,6 +3467,7 @@ function(
 		this.oValueStateNavDelegate = null;
 
 		this._sInitialValueState = null;
+		this._oInitialFormattedValueStateText = null;
 	};
 
 	/**
@@ -3890,8 +3930,7 @@ function(
 			this._sOldInput = "";
 
 			if (this._sInitialValueState !== this.getValueState()) {
-				this.setValueState(this._sInitialValueState);
-				this.setValueStateText(this._sInitialValueStateText || "");
+				this._restoreInitialValueState();
 			}
 
 			this.bOpenedByKeyboardOrButton ? this.clearFilter() : this.close();
