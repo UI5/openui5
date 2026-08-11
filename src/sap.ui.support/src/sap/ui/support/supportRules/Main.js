@@ -13,7 +13,7 @@ sap.ui.define([
 	"sap/ui/support/supportRules/CoreFacade",
 	"sap/ui/support/supportRules/ExecutionScope",
 	"sap/ui/support/supportRules/ui/external/Highlighter",
-	"sap/ui/support/supportRules/WindowCommunicationBus",
+	"sap/ui/support/supportRules/CommunicationBus",
 	"sap/ui/support/supportRules/IssueManager",
 	"sap/ui/support/supportRules/History",
 	"sap/ui/support/supportRules/report/DataCollector",
@@ -123,34 +123,8 @@ function (jQuery, ManagedObject, Element, Component, Analyzer, CoreFacade,
 
 						IFrameController.injectFrame(aSupportModeConfig);
 
-						// Validate messages
-						CommunicationBus.onMessageChecks.push(function (msg) {
-							try {
-								return new window.URL(msg.origin).origin === new window.URL(IFrameController.getFrameOrigin()).origin;
-							} catch (e) {
-								return false;
-							}
-						});
-
-						CommunicationBus.onMessageChecks.push(function (msg) {
-							return msg.data._frameIdentifier === IFrameController.getFrameIdentifier();
-						});
-
-						CommunicationBus.onMessageChecks.push(function (msg) {
-							try {
-								var oOriginUrl = new window.URL(msg.data._origin);
-								var sFramePath;
-								try {
-									sFramePath = new window.URL(IFrameController.getFrameUrl()).pathname;
-								} catch (e) {
-									// relative URL — strip query string and relative path segments manually
-									sFramePath = IFrameController.getFrameUrl().split("?")[0].replace(/\.\.\//g, "");
-								}
-								return oOriginUrl.pathname.endsWith(sFramePath);
-							} catch (e) {
-								return false;
-							}
-						});
+						// mark the opened frame as a valid participant in the communication
+						CommunicationBus.allowFrame(IFrameController.getCommunicationInfo());
 					});
 				} else {
 					RuleSetLoader.updateRuleSets(function () {
