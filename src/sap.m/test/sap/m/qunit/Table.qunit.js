@@ -893,6 +893,80 @@ sap.ui.define([
 		sut.destroy();
 	});
 
+	QUnit.test("_headerSelectorPress event - default multiSelectMode", async function(assert) {
+		const sut = createSUT(true, true, "MultiSelect");
+		sut.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oHeaderSelectorPressSpy = sinon.spy();
+		sut.attachEvent("_headerSelectorPress", oHeaderSelectorPressSpy);
+
+		// Tap the select-all checkbox to select all.
+		qutils.triggerEvent("tap", sut._selectAllCheckBox.getDomRef());
+		assert.equal(oHeaderSelectorPressSpy.callCount, 1, "Fired when the select-all checkbox is pressed (select)");
+
+		// Tap the select-all checkbox again to deselect all.
+		oHeaderSelectorPressSpy.reset();
+		qutils.triggerEvent("tap", sut._selectAllCheckBox.getDomRef());
+		assert.equal(oHeaderSelectorPressSpy.callCount, 1, "Fired when the select-all checkbox is pressed again (deselect)");
+
+		sut.destroy();
+	});
+
+	QUnit.test("_headerSelectorPress event - ClearAll multiSelectMode", async function(assert) {
+		const sut = createSUT(true, true, "MultiSelect");
+		sut.setMultiSelectMode("ClearAll");
+		sut.placeAt("qunit-fixture");
+		await nextUIUpdate();
+		sut.getItems()[0].setSelected(true);
+		await nextUIUpdate();
+
+		const oHeaderSelectorPressSpy = sinon.spy();
+		sut.attachEvent("_headerSelectorPress", oHeaderSelectorPressSpy);
+
+		// Click the clear-all icon in the header to remove all selections.
+		qutils.triggerEvent("click", sut.getDomRef("tblHeadModeCol"));
+		assert.equal(oHeaderSelectorPressSpy.callCount, 1, "Fired when the clear-all icon is clicked");
+
+		sut.destroy();
+	});
+
+	QUnit.test("_headerSelectorPress event - not fired for programmatic selection changes", async function(assert) {
+		const sut = createSUT(true, true, "MultiSelect");
+		sut.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oHeaderSelectorPressSpy = sinon.spy();
+		sut.attachEvent("_headerSelectorPress", oHeaderSelectorPressSpy);
+
+		// Programmatic selectAll / removeSelections must not fire the event.
+		sut.selectAll();
+		sut.removeSelections(true);
+		assert.equal(oHeaderSelectorPressSpy.callCount, 0, "Not fired for programmatic selectAll/removeSelections");
+
+		sut.destroy();
+	});
+
+	QUnit.test("_headerSelectorPress event is fired after the selectionChange event", async function(assert) {
+		const sut = createSUT(true, true, "MultiSelect");
+		sut.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		sut.attachSelectionChange(function() {
+			assert.step("selectionChange");
+		});
+		sut.attachEvent("_headerSelectorPress", function() {
+			assert.step("_headerSelectorPress");
+		});
+
+		// Press the select-all checkbox: the _headerSelectorPress event must be fired after the selectionChange event.
+		qutils.triggerEvent("tap", sut._selectAllCheckBox.getDomRef());
+		assert.verifySteps(["selectionChange", "_headerSelectorPress"], "_headerSelectorPress is fired after the selectionChange event");
+
+		//clean up
+		sut.destroy();
+	});
+
 	QUnit.test("Test focus event", async function(assert) {
 		const sut = createSUT(true, true);
 		const fnFocusSpy = sinon.spy(sut, "focus");

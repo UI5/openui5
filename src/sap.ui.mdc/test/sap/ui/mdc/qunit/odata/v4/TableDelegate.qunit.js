@@ -3477,6 +3477,145 @@ sap.ui.define([
 			"leafSelectionDisabled is not set for GridTableType even if delegate returns true");
 	});
 
+	QUnit.test("afterHeaderSelectorPress with GridTableType - Fires after the selection change", async function(assert) {
+		const oAfterHeaderSelectorPressSpy = this.spy();
+
+		await this.initTable({
+			selectionMode: SelectionMode.Multi
+		});
+		await this.oTable.initialized();
+		this.oTable.attachEvent("afterHeaderSelectorPress", oAfterHeaderSelectorPressSpy);
+
+		const oSelectionPlugin = PluginBase.getPlugin(this.oTable._oTable, "sap.ui.table.plugins.ODataV4Selection");
+		assert.ok(oSelectionPlugin.isA("sap.ui.table.plugins.ODataV4MultiSelection"), "MDC ODataV4MultiSelection applied");
+
+		// Ensure the promise returned by the handler is what drives the event, i.e. the event fires only after it resolves.
+		let fnResolveSelection;
+		let pBaseSelection;
+		const fnStubHandler = () => {
+			pBaseSelection = new Promise((resolve) => {
+				fnResolveSelection = resolve;
+			});
+			return pBaseSelection;
+		};
+		this.stub(Object.getPrototypeOf(Object.getPrototypeOf(oSelectionPlugin)), "handleHeaderSelectorPress").callsFake(fnStubHandler);
+		this.stub(Object.getPrototypeOf(Object.getPrototypeOf(oSelectionPlugin)), "handleKeyboardShortcut").callsFake(fnStubHandler);
+
+		// Header selector press
+		oSelectionPlugin.handleHeaderSelectorPress();
+		await Promise.resolve();
+		assert.equal(oAfterHeaderSelectorPressSpy.callCount, 0, "Header selector press: not fired before the selection change completes");
+
+		fnResolveSelection();
+		await pBaseSelection;
+		await Promise.resolve();
+		assert.equal(oAfterHeaderSelectorPressSpy.callCount, 1, "Header selector press: fired once after the selection change completes");
+
+		// Keyboard shortcut
+		oAfterHeaderSelectorPressSpy.resetHistory();
+		oSelectionPlugin.handleKeyboardShortcut("toggle", {});
+		await Promise.resolve();
+		assert.equal(oAfterHeaderSelectorPressSpy.callCount, 0, "Keyboard shortcut: not fired before the selection change completes");
+
+		fnResolveSelection();
+		await pBaseSelection;
+		await Promise.resolve();
+		assert.equal(oAfterHeaderSelectorPressSpy.callCount, 1, "Keyboard shortcut: fired once after the selection change completes");
+	});
+
+	QUnit.test("afterHeaderSelectorPress with GridTableType is not fired if the selection mode is not 'Multi'", async function(assert) {
+		const oAfterHeaderSelectorPressSpy = this.spy();
+
+		await this.initTable({
+			selectionMode: SelectionMode.Single
+		});
+		await this.oTable.initialized();
+		this.oTable.attachEvent("afterHeaderSelectorPress", oAfterHeaderSelectorPressSpy);
+
+		const oSelectionPlugin = PluginBase.getPlugin(this.oTable._oTable, "sap.ui.table.plugins.ODataV4Selection");
+
+		await oSelectionPlugin.handleHeaderSelectorPress();
+		await oSelectionPlugin.handleKeyboardShortcut("toggle", {setMarked: function() { }});
+		await oSelectionPlugin.handleKeyboardShortcut("clear", {setMarked: function() { }});
+		assert.equal(oAfterHeaderSelectorPressSpy.callCount, 0, "afterHeaderSelectorPress not fired");
+	});
+
+	QUnit.test("afterHeaderSelectorPress with GridTableType - Reacts to a runtime change of the selection mode", async function(assert) {
+		const oAfterHeaderSelectorPressSpy = this.spy();
+
+		await this.initTable({
+			selectionMode: SelectionMode.Multi
+		});
+		await this.oTable.initialized();
+		this.oTable.attachEvent("afterHeaderSelectorPress", oAfterHeaderSelectorPressSpy);
+
+		let oSelectionPlugin = PluginBase.getPlugin(this.oTable._oTable, "sap.ui.table.plugins.ODataV4Selection");
+		this.stub(Object.getPrototypeOf(Object.getPrototypeOf(oSelectionPlugin)), "handleHeaderSelectorPress").resolves();
+		await oSelectionPlugin.handleHeaderSelectorPress();
+		assert.equal(oAfterHeaderSelectorPressSpy.callCount, 1, "Multi: afterHeaderSelectorPress fired");
+
+		// Switch to Single at runtime -> the single-selection plugin is applied, which does not fire the event.
+		oAfterHeaderSelectorPressSpy.resetHistory();
+		this.oTable.setSelectionMode(SelectionMode.Single);
+		await this.oTable.initialized();
+		oSelectionPlugin = PluginBase.getPlugin(this.oTable._oTable, "sap.ui.table.plugins.ODataV4Selection");
+		await oSelectionPlugin.handleHeaderSelectorPress();
+		await oSelectionPlugin.handleKeyboardShortcut("toggle", {});
+		assert.equal(oAfterHeaderSelectorPressSpy.callCount, 0, "Single: afterHeaderSelectorPress not fired");
+
+		// Switch back to Multi at runtime -> the multi-selection plugin fires the event again (same stubbed prototype).
+		oAfterHeaderSelectorPressSpy.resetHistory();
+		this.oTable.setSelectionMode(SelectionMode.Multi);
+		await this.oTable.initialized();
+		oSelectionPlugin = PluginBase.getPlugin(this.oTable._oTable, "sap.ui.table.plugins.ODataV4Selection");
+		await oSelectionPlugin.handleHeaderSelectorPress();
+		assert.equal(oAfterHeaderSelectorPressSpy.callCount, 1, "Multi again: afterHeaderSelectorPress fired");
+	});
+
+	QUnit.test("afterHeaderSelectorPress with TreeTableType", async function(assert) {
+		const oAfterHeaderSelectorPressSpy = this.spy();
+
+		await this.initTable({
+			selectionMode: SelectionMode.Multi,
+			type: new TreeTableType()
+		});
+		await this.oTable.initialized();
+		this.oTable.attachEvent("afterHeaderSelectorPress", oAfterHeaderSelectorPressSpy);
+
+		const oSelectionPlugin = PluginBase.getPlugin(this.oTable._oTable, "sap.ui.table.plugins.ODataV4Selection");
+		assert.ok(oSelectionPlugin.isA("sap.ui.table.plugins.ODataV4MultiSelection"), "MDC ODataV4MultiSelection applied");
+		// The base handlers do the real work; stub them to resolve synchronously so the test does not depend on data loading.
+		this.stub(Object.getPrototypeOf(Object.getPrototypeOf(oSelectionPlugin)), "handleHeaderSelectorPress").resolves();
+		this.stub(Object.getPrototypeOf(Object.getPrototypeOf(oSelectionPlugin)), "handleKeyboardShortcut").resolves();
+
+		await oSelectionPlugin.handleHeaderSelectorPress();
+		assert.equal(oAfterHeaderSelectorPressSpy.callCount, 1, "afterHeaderSelectorPress fired on header selector press");
+
+		oAfterHeaderSelectorPressSpy.resetHistory();
+		await oSelectionPlugin.handleKeyboardShortcut("toggle", {setMarked: function() { }});
+		assert.equal(oAfterHeaderSelectorPressSpy.callCount, 1, "afterHeaderSelectorPress fired on Ctrl+A");
+
+		oAfterHeaderSelectorPressSpy.resetHistory();
+		await oSelectionPlugin.handleKeyboardShortcut("clear", {setMarked: function() { }});
+		assert.equal(oAfterHeaderSelectorPressSpy.callCount, 1, "afterHeaderSelectorPress fired on Ctrl+Shift+A");
+	});
+
+	QUnit.test("afterHeaderSelectorPress with ResponsiveTableType", async function(assert) {
+		const oAfterHeaderSelectorPressSpy = this.spy();
+
+		await this.initTable({
+			selectionMode: SelectionMode.Multi,
+			type: new ResponsiveTableType()
+		});
+		await this.oTable.initialized();
+		this.oTable.attachEvent("afterHeaderSelectorPress", oAfterHeaderSelectorPressSpy);
+
+		const oInnerTable = this.oTable._oTable;
+
+		oInnerTable.fireEvent("_headerSelectorPress");
+		assert.equal(oAfterHeaderSelectorPressSpy.callCount, 1, "afterHeaderSelectorPress fired when the inner table fires _headerSelectorPress");
+	});
+
 	QUnit.module("Rebind with invalid state", {
 		afterEach: function() {
 			this.oTable?.destroy();

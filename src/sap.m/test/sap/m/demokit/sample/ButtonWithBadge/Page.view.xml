@@ -113,7 +113,8 @@
 				</Toolbar>
 				<MessageStrip
 					class="sapUiSmallMarginTop sapUiTinyMarginBeginEnd"
-					text="While the badge is technically possible on the Accept, Reject and Attention button variants, these combinations should not be used. The badge is intended solely for neutral counter use cases — such as notification or item counts on default and icon-only buttons. Applying a badge to a non-neutral button stacks two competing signals (the button's color type and the badge's value) and creates ambiguity about what the number refers to."
+					enableFormattedText="true"
+					text="Although badges can technically be displayed on the &lt;strong&gt;Accept&lt;/strong&gt;, &lt;strong&gt;Reject&lt;/strong&gt;, and &lt;strong&gt;Attention&lt;/strong&gt; button variants, this is not recommended. These variants already communicate a specific action through their color, making it unclear whether a numeric badge refers to the action&apos;s outcome or an associated item count. Badges are intended only for the &lt;strong&gt;Default&lt;/strong&gt; and &lt;strong&gt;Icon-only&lt;/strong&gt; buttons to display notification counts or the number of related items (for example, unread messages or selected items)."
 					type="Warning"
 					showIcon="true"/>
 				<FlexBox

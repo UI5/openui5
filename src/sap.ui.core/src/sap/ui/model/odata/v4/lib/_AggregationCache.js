@@ -1451,14 +1451,17 @@ sap.ui.define([
 				}
 
 				const sParentPredicate = this.oTreeState.getOutOfPlace(sPredicate).parentPredicate;
-				const oParent = mPredicate2RankResult[sParentPredicate];
-				if (oParent) { // parent has a rank
-					const sDrillState = _Helper.drillDown(oParent, this.oAggregation.$DrillState);
-					if (sDrillState === "collapsed") {
+				const oParentRankResult = mPredicate2RankResult[sParentPredicate];
+				if (oParentRankResult) { // parent has a rank
+					if (_Helper.drillDown(oParentRankResult, this.oAggregation.$DrillState)
+							=== "collapsed") {
 						return; // parent is collapsed -> do not insert
 					}
 				} else if (sParentPredicate) { // parent has no rank
-					return; // do not insert
+					const oParent = this.aElements.$byPredicate[sParentPredicate];
+					if (!(oParent && this.aElements.includes(oParent))) { // parent not OOP
+						return; // do not insert
+					}
 				} // else: no parent (root) -> insert
 
 				if (sPredicate in mPredicate2RankResult) {
@@ -1477,7 +1480,6 @@ sap.ui.define([
 						_Helper.setPrivateAnnotation(oNode, "predicate", sPredicate);
 					}
 					this.aElements.push(oNode); // prerequisite for #moveOutOfPlaceNodes
-					oNode["@$ui5.node.level"] = 1;
 				}
 			});
 		});
@@ -1487,8 +1489,8 @@ sap.ui.define([
 		this.oTreeState.getOutOfPlaceGroupedByParent().forEach((oOutOfPlace) => {
 			// move the out-of-place nodes in creation order
 			const oParentRankResult = mPredicate2RankResult[oOutOfPlace.parentPredicate];
-			this.moveOutOfPlaceNodes(oParentRankResult && getRank(oParentRankResult),
-				oOutOfPlace.nodePredicates);
+			this.moveOutOfPlaceNodes(oOutOfPlace.nodePredicates, oOutOfPlace.parentPredicate,
+				oParentRankResult && getRank(oParentRankResult));
 		});
 	};
 
@@ -1851,15 +1853,22 @@ sap.ui.define([
 	 * Moves the out-of-place nodes below the given parent in the given order. Moves to the start if
 	 * there is no parent.
 	 *
+	 * @param {string[]} aOutOfPlacePredicates
+	 *   The predicates of the out-of-place nodes
+	 * @param {string} [sParentPredicate]
+	 *   The parent's predicate; <code>undefined</code> for root nodes
 	 * @param {number} [iParentRank]
-	 *   The parent's rank or <code>undefined</code> if there is no parent
-	 * @param {string[]} aOutOfPlacePredicates - The predicates of the out-of-place nodes
+	 *   The parent's rank or <code>undefined</code> if there is no parent or if no rank is known
 	 *
 	 * @private
 	 */
-	_AggregationCache.prototype.moveOutOfPlaceNodes = function (iParentRank,
-			aOutOfPlacePredicates) {
-		const iParentIndex = iParentRank === undefined ? -1 : this.findIndex(iParentRank);
+	_AggregationCache.prototype.moveOutOfPlaceNodes = function (aOutOfPlacePredicates,
+			sParentPredicate, iParentRank) {
+		const oParent = this.aElements.$byPredicate[sParentPredicate];
+		// eslint-disable-next-line no-nested-ternary
+		const iParentIndex = iParentRank === undefined
+			? (oParent ? this.aElements.indexOf(oParent) : -1)
+			: this.findIndex(iParentRank);
 		aOutOfPlacePredicates.forEach((sNodePredicate) => {
 			const oNode = this.aElements.$byPredicate[sNodePredicate];
 			if (oNode) {
@@ -1874,6 +1883,10 @@ sap.ui.define([
 				if (bExpanded) { // no mKeptElementPredicates needed
 					this.expand(_GroupLock.$cached, sNodePredicate, 1, {});
 				}
+				if (oParent && oParent["@$ui5.node.isExpanded"] === undefined) {
+					oParent["@$ui5.node.isExpanded"] = true; // not a leaf anymore
+				}
+				oNode["@$ui5.node.level"] ??= oParent ? oParent["@$ui5.node.level"] + 1 : 1;
 			}
 		});
 	};
