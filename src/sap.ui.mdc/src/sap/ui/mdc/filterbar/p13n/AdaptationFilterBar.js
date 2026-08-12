@@ -532,6 +532,9 @@ sap.ui.define([
 				if (this._oFilterBarLayout.getInner().isA("sap.ui.mdc.p13n.panels.AdaptFiltersPanel")) {
 					if (sReason === "Show" || sReason === "Hide" || sReason === "Filter" || sReason === "Add") {
 						this._updateFilterItemMessage(oItem);
+					} else if (sReason === "Validation") {
+						this._validateAdaptationState();
+						return undefined;
 					}
 				}
 
