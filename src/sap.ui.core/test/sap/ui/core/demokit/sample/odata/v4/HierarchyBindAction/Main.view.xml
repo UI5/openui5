@@ -157,6 +157,8 @@
 
 	<m:FormattedText htmlText="&lt;em>Available URL parameters:&lt;/em>
 		&lt;ul>
+			&lt;li> &lt;code>AI&lt;/code> 'All In' removes default filter ('Description' NotStartsWith 'Out')
+			&lt;li> &lt;code>Out&lt;/code> Reverses default filter to 'Description' StartsWith 'Out'
 			&lt;li> &lt;code>clearSelectionOnFilter=false&lt;/code> Value for '$$clearSelectionOnFilter', default is 'true'
 			&lt;li> &lt;code>createInPlace&lt;/code> Either set or unset; default unset
 			&lt;li> &lt;code>hero=1,1.2.3&lt;/code> The directory and hierarchy ID of the hero content
