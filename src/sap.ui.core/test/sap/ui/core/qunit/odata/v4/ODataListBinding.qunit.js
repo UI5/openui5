@@ -11638,7 +11638,7 @@ sap.ui.define([
 			});
 			assert.deepEqual(oBinding.mPreviousContextsByPath, {
 				"/EMPLOYEES/2" : aContextsBefore[2],
-				// "/EMPLOYEES/3" : aContextsBefore[3], // "created" not inserted here!
+				"/EMPLOYEES/3" : aContextsBefore[3], // "created" also inserted here as well
 				"/EMPLOYEES/4" : aContextsBefore[4]
 			});
 		} else {
