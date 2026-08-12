@@ -86257,13 +86257,9 @@ make root = ${bMakeRoot}`;
 			foo : "bar", // must not be part of the result
 			ok : bOk
 		} : {
-			headers : {
-				get : function (sHeader) {
-					if (sHeader === "Content-Type") {
-						return "text/plain";
-					}
-				}
-			},
+			headers : new Headers({
+				"Content-Type" : "text/plain"
+			}),
 			ok : false,
 			status : 500,
 			statusText : "Internal Server Error",
