@@ -357,42 +357,25 @@ sap.ui.define([
 
 	/**
 	 * Resets the navigation state before the enclosing container is opened.
-	 * Clears the item-count tracker and, if the MessageView currently contains
-	 * exactly one navigable item and the user was left on the list page (e.g.
-	 * via the back button), forwards the NavContainer to the details page so
-	 * that the next open starts on the details view - matching the documented
-	 * default behaviour for a single item.
 	 *
-	 * <code>NavContainer.to()</code> is safe to call here even though the
-	 * enclosing container has not rendered yet: the page-stack push happens
-	 * synchronously and the transition step is a no-op when the NavContainer
-	 * has no DOM, so the correct page is picked up when the container
-	 * subsequently renders. See GitHub issue #4334.
+	 * Clears the item-count tracker so that the next <code>onBeforeRendering</code>
+	 * treats the upcoming render as a fresh presentation. For a single navigable
+	 * item this makes <code>onBeforeRendering</code> perform a real forward
+	 * navigation via <code>_fnHandleForwardNavigation</code>, which both moves the
+	 * NavContainer to the details page and refreshes its content (title, subtitle,
+	 * description, icon) with the latest message data - restoring the documented
+	 * default single-item behaviour on every open.
+	 *
+	 * We intentionally do <b>not</b> forward the NavContainer here ourselves: a
+	 * bare <code>NavContainer.to()</code> only swaps the visible page and leaves
+	 * the previously rendered details content in place, so a message received
+	 * while the container was closed would still show the stale title on reopen.
+	 * See GitHub issue #4334.
 	 *
 	 * @private
 	 */
 	MessageView.prototype._resetNavigationState = function () {
 		this._iLastRenderedItemCount = undefined;
-
-		if (!this._oLists || !this._oLists.all || !this._navContainer) {
-			return;
-		}
-
-		var aListItems = this._oLists.all.getItems().filter(function (oItem) {
-			return oItem.isA("sap.m.MessageListItem");
-		});
-
-		if (aListItems.length !== 1
-			|| aListItems[0].getType() !== ListType.Navigation
-			|| this._navContainer.getCurrentPage() === this._detailsPage) {
-			return;
-		}
-
-		this._navContainer.to(this._detailsPage, "show");
-
-		// Prevent onBeforeRendering from treating this as a fresh N->1
-		// transition and forwarding again.
-		this._iLastRenderedItemCount = 1;
 	};
 
 	/**
