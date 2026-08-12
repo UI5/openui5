@@ -573,6 +573,101 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("hasPersistedChanges", {
+		beforeEach() {
+			this.oRegistry = new ChangeIndicatorRegistry({
+				changeCategories: {
+					fooCategory: ["foo"]
+				}
+			});
+			this.oControl = new Control("myControl");
+			sandbox.stub(JsControlTreeModifier, "bySelector").returns(this.oControl);
+			sandbox.stub(ChangesWriteAPI, "getChangeHandler").resolves();
+		},
+		afterEach() {
+			this.oRegistry.destroy();
+			this.oControl.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("returns true for an activated change that is catalogued but not yet resolved", function(assert) {
+			// Add an activated (PERSISTED, applied) change to the catalog ONLY - no resolution.
+			// This mirrors the state right after a version-switch reload, when the change's
+			// target control (e.g. a lazily-rendered section) has not produced an overlay yet.
+			const oChange = createMockChange("persistedChange", FlStates.LifecycleState.PERSISTED);
+			this.oRegistry.addChangeToCatalog(oChange, "foo", createMockVersioning([]));
+
+			assert.strictEqual(
+				this.oRegistry.getRegisteredChangeIds().length,
+				0,
+				"then the change is not in the resolved layer"
+			);
+			assert.strictEqual(
+				this.oRegistry.hasPersistedChanges(),
+				true,
+				"then hasPersistedChanges reads the catalog layer and reports the activated change"
+			);
+		});
+
+		QUnit.test("returns false when the only catalogued change is draft", function(assert) {
+			// A change whose id is in the draft filenames is classified as DRAFT, not ALL,
+			// and must not count as a persisted change.
+			const oChange = createMockChange("draftChange", FlStates.LifecycleState.PERSISTED);
+			this.oRegistry.addChangeToCatalog(oChange, "foo", createMockVersioning(["draftChange"]));
+
+			assert.strictEqual(
+				this.oRegistry.hasPersistedChanges(),
+				false,
+				"then a draft-only change does not count as persisted"
+			);
+		});
+
+		QUnit.test("returns false when there are no changes", function(assert) {
+			assert.strictEqual(
+				this.oRegistry.hasPersistedChanges(),
+				false,
+				"then an empty registry reports no persisted changes"
+			);
+		});
+
+		QUnit.test("returns true for an activated change that has not finished applying yet", function(assert) {
+			// After a version switch the persisted changes are re-applied to the reloaded tree
+			// asynchronously; a change may be queued/applying (not yet successfully applied) without
+			// having failed. It is still a real persisted change and must enable the toggle.
+			const oChange = createMockChange("applyingChange", FlStates.LifecycleState.PERSISTED);
+			oChange.setApplyState(FlStates.ApplyState.APPLYING);
+			this.oRegistry.addChangeToCatalog(oChange, "foo", createMockVersioning([]));
+
+			assert.strictEqual(
+				oChange.isSuccessfullyApplied(),
+				false,
+				"precondition: the change is not (yet) successfully applied"
+			);
+			assert.strictEqual(
+				this.oRegistry.hasPersistedChanges(),
+				true,
+				"then an activated change that is still applying counts as persisted"
+			);
+		});
+
+		QUnit.test("returns false for an activated change whose apply failed", function(assert) {
+			const oChange = createMockChange("failedChange", FlStates.LifecycleState.PERSISTED);
+			oChange.markFinished(undefined, /* bApplySuccessful= */false);
+			this.oRegistry.addChangeToCatalog(oChange, "foo", createMockVersioning([]));
+
+			assert.strictEqual(
+				oChange.hasApplyProcessFailed(),
+				true,
+				"precondition: the change failed to apply"
+			);
+			assert.strictEqual(
+				this.oRegistry.hasPersistedChanges(),
+				false,
+				"then a failed change does not count as persisted"
+			);
+		});
+	});
+
 	QUnit.module("Cleanup", {
 		beforeEach() {
 			this.oRegistry = new ChangeIndicatorRegistry({

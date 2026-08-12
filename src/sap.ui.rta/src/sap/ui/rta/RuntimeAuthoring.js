@@ -505,6 +505,8 @@ sap.ui.define([
 				oChangeVisualization.setDesignTime(this._oDesignTime);
 				oChangeVisualization.setRootControlId(this.getRootControl());
 				oChangeVisualization.setVersionsModel(this.getToolbar());
+				// Recompute the "Highlight All App Changes" enablement whenever CViz refreshes its registry.
+				oChangeVisualization.attachChangesResolved(updateHighlightAllChangesEnabled, this);
 				await oChangeVisualization.initialize();
 				updateHighlightAllChangesEnabled.call(this);
 
