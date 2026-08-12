@@ -8786,6 +8786,30 @@ sap.ui.define([
 		assert.strictEqual(this.oMultiComboBox.getValueState(), ValueState.Error, "The value state error is reset.");
 	});
 
+	QUnit.test("Invalid input should show the default error message instead of reusing a custom Warning message", async function(assert) {
+		this.clock = sinon.useFakeTimers();
+		var oCoreResourceBundle = Library.getResourceBundleFor("sap.ui.core");
+		var sCustomWarningText = "Custom application warning message";
+
+		this.oMultiComboBox.setValueState(ValueState.Warning);
+		this.oMultiComboBox.setValueStateText(sCustomWarningText);
+		await nextUIUpdate(this.clock);
+
+		this.oMultiComboBox.setValue("InvalidValue");
+		this.oMultiComboBox.handleInputValidation({
+			isMarked: function () {},
+			setMarked: function () {},
+			srcControl: this.oMultiComboBox,
+			target: { value: "InvalidValue" }
+		}, false);
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(this.oMultiComboBox.getValueState(), ValueState.Error, "The value state is changed to Error");
+		assert.strictEqual(this.oMultiComboBox.getValueStateText(),
+			oCoreResourceBundle.getText("VALUE_STATE_ERROR"),
+			"The default error message is shown instead of the custom Warning message");
+	});
+
 
 	QUnit.test("value state message should be opened if the input field is on focus", async function(assert) {
 		this.clock = sinon.useFakeTimers();
@@ -9068,6 +9092,77 @@ sap.ui.define([
 			this.oMultiComboBox.destroy();
 			runAllTimersAndRestore(this.clock);
 		}
+	});
+
+	QUnit.test("Formatted value state text should be restored after invalid input becomes valid again", async function(assert) {
+		this.clock = sinon.useFakeTimers();
+		var oInitialFormattedText = this.oMultiComboBox.getFormattedValueStateText();
+
+		this.oMultiComboBox.focus();
+		this.oMultiComboBox.open();
+		this.clock.tick(500);
+
+		this.oMultiComboBox.setValue("InvalidValue");
+		this.oMultiComboBox.oninput({
+			isMarked: function () {},
+			setMarked: function () {},
+			srcControl: this.oMultiComboBox,
+			target: { value: "InvalidValue" }
+		});
+
+		assert.strictEqual(this.oMultiComboBox.getValueState(), ValueState.Error, "The value state is changed to Error");
+
+		this.oMultiComboBox.setValue("");
+		this.oMultiComboBox.oninput({
+			isMarked: function () {},
+			setMarked: function () {},
+			srcControl: this.oMultiComboBox,
+			target: { value: "" }
+		});
+		this.clock.tick(500);
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(this.oMultiComboBox.getValueState(), ValueState.Warning, "The value state is restored to Warning");
+		assert.strictEqual(this.oMultiComboBox.getFormattedValueStateText(), oInitialFormattedText,
+			"The initially set formatted value state text is restored");
+		assert.strictEqual(this.oMultiComboBox.getValueStateText(), "", "No default plain value state text leaks in");
+	});
+
+	QUnit.test("Formatted Error value state text should be restored after invalid input becomes valid again", async function(assert) {
+		this.clock = sinon.useFakeTimers();
+
+		this.oMultiComboBox.setValueState(ValueState.Error);
+		await nextUIUpdate(this.clock);
+		var oInitialFormattedText = this.oMultiComboBox.getFormattedValueStateText();
+
+		this.oMultiComboBox.focus();
+		this.oMultiComboBox.open();
+		this.clock.tick(500);
+
+		this.oMultiComboBox.setValue("InvalidValue");
+		this.oMultiComboBox.oninput({
+			isMarked: function () {},
+			setMarked: function () {},
+			srcControl: this.oMultiComboBox,
+			target: { value: "InvalidValue" }
+		});
+
+		assert.strictEqual(this.oMultiComboBox.getValueState(), ValueState.Error, "The value state stays Error");
+
+		this.oMultiComboBox.setValue("");
+		this.oMultiComboBox.oninput({
+			isMarked: function () {},
+			setMarked: function () {},
+			srcControl: this.oMultiComboBox,
+			target: { value: "" }
+		});
+		this.clock.tick(500);
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(this.oMultiComboBox.getValueState(), ValueState.Error, "The value state remains Error");
+		assert.strictEqual(this.oMultiComboBox.getFormattedValueStateText(), oInitialFormattedText,
+			"The initially set formatted Error value state text is restored");
+		assert.strictEqual(this.oMultiComboBox.getValueStateText(), "", "No default plain value state text leaks in");
 	});
 
 	QUnit.test("onkeydown should focus the first item if the current focus is on the input", function(assert) {
