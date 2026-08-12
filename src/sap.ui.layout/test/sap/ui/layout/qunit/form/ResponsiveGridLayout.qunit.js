@@ -193,7 +193,7 @@ sap.ui.define([
 		assert.ok(oPanel, "panel created for second container");
 		assert.equal(oTitle.getParent().getId(), "FC2", "FormContainer is still parent of Title");
 		assert.equal(oPanel.getContent().getId(), "FC2--Grid", "Grid is inside Panel");
-		assert.ok(window.document.getElementById("T2"), "Title rendered");
+		assert.ok(window.document.getElementById("FC2--title"), "Title rendered");
 		assert.ok(window.document.getElementById("FC2--Exp"), "Expander rendered");
 		assert.equal(jQuery("#FC2---Panel").attr("title"), "Test", "tooltip set on panel");
 	});
