@@ -331,7 +331,7 @@ sap.ui.define([
 			assert.equal(oBindingInfo.length, 50, "Tokens - Bindinginfo length");
 			assert.equal(oBindingInfo.startIndex, 0, "Tokens - Bindinginfo startIndex");
 			assert.equal(oBindingInfo.filters?.getPath(), "isEmpty", "Tokens - Bindinginfo filter");
-			const aTokens = oTokenizer.getTokens();
+			let aTokens = oTokenizer.getTokens();
 			assert.equal(aTokens.length, 1, "number of tokens");
 			assert.equal(aTokens[0].getText(), "Text", "Token text");
 			const oBinding = aTokens[0].getBinding("text");
@@ -357,6 +357,26 @@ sap.ui.define([
 			assert.equal(oButton.getType(), mLibrary.ButtonType.Transparent, "Button type");
 			assert.equal(oButton.getIcon(), "sap-icon://decline", "Button icon");
 			assert.equal(oButton.getTooltip(), oResourceBundle.getText("valuehelp.REMOVEALLTOKEN"), "Button tooltip");
+
+			// check max number of Tokens
+			sinon.spy(oTokenizer, "invalidate");
+			const aConditions = [];
+			for (let i = 0; i < 50; i++) {
+				aConditions.push(Condition.createItemCondition("X-" + i, "Text " + i));
+			}
+			const oData = oModel.getData();
+			oData.conditions = aConditions;
+			oModel.checkUpdate(true);
+			aTokens = oTokenizer.getTokens();
+			assert.equal(aTokens.length, 50, "number of tokens");
+			assert.ok(oTokenizer.invalidate.called, "Tokenizer invalidated");
+			oTokenizer.invalidate.reset();
+
+			aConditions.push(Condition.createItemCondition("X-50", "Text 50"));
+			oModel.checkUpdate(true);
+			aTokens = oTokenizer.getTokens();
+			assert.equal(aTokens.length, 50, "number of tokens"); // still only 50 tokens
+			assert.ok(oTokenizer.invalidate.called, "Tokenizer invalidated"); // needs to be invalidated to update more-indicator
 		}).catch((oError) => {
 			assert.notOk(true, "Promise Catch called");
 		});
