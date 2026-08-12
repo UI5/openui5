@@ -7,8 +7,9 @@ sap.ui.define([
 	'sap/ui/core/Control',
 	'sap/ui/base/ManagedObjectObserver',
 	'./FormRenderer',
-	'./FormHelper'
-	], function(Control, ManagedObjectObserver, FormRenderer, FormHelper) {
+	'./FormHelper',
+	'./FormTitleUtil'
+	], function(Control, ManagedObjectObserver, FormRenderer, FormHelper, FormTitleUtil) {
 	"use strict";
 
 	/**
@@ -86,16 +87,28 @@ sap.ui.define([
 				formContainers : {type : "sap.ui.layout.form.FormContainer", multiple : true, singularName : "formContainer"},
 
 				/**
-				 * Title of the <code>Form</code>. Can either be a <code>Title</code> element or a string.
+				 * Title of the <code>Form</code>. Can either be a {@link sap.ui.core.Title Title} element or a string.
 				 * If a <code>Title</code> element it used, the style of the title can be set.
 				 *
 				 * <b>Note:</b> If a <code>Toolbar</code> is used, the <code>Title</code> is ignored.
 				 *
 				 * <b>Note:</b> If the title is provided as a string, the title is rendered with a theme-dependent default level.
 				 * As the <code>Form</code> control cannot know the structure of the page, this might not fit the page structure.
-				 * In this case provide the title using a <code>Title</code> element and set its {@link sap.ui.core.Title#setLevel level} to the needed value.
+				 * In this case, provide the title using a {@link sap.ui.core.Title Title} element and set its {@link sap.ui.core.Title#setLevel level} to the needed value.
+				 *
+				 * <b>Note:</b> Do not use {@link sap.ui.core.Title#setIcon icon} for {@link sap.ui.core.Title Title}.
+				 * If an icon is needed, use a {@link #setToolbar Toolbar} to show both title and icon.
+				 *
+				 * <b>Note:</b> Do not use {@link sap.ui.core.Title#setEmphasized emphasized} on {@link sap.ui.core.Title Title}.
+				 * This is not supported in current themes and might lead for accessibillity issues.
 				 */
 				title : {type : "sap.ui.core.Title", altTypes : ["string"], multiple : false},
+
+				/**
+				 * Title control used for rendering. It is internally created and synchronized with the setting of the {@link #setTitle title} aggregation.
+				 * @since 1.120.50
+				 */
+				_renderingTitle : {type : "sap.ui.core.Control", multiple : false, visibility: "hidden"},
 
 				/**
 				 * Toolbar of the <code>Form</code>.
@@ -137,7 +150,7 @@ sap.ui.define([
 
 		this._oObserver.observe(this, {
 			properties: ["editable"],
-			aggregations: ["formContainers"]
+			aggregations: ["formContainers", "title"]
 		});
 
 	};
@@ -340,6 +353,8 @@ sap.ui.define([
 			_setEditable.call(this, oChanges.current, oChanges.old);
 		} else if (oChanges.name === "formContainers") {
 			_formContainerChanged.call(this, oChanges.mutation, oChanges.child);
+		} else {
+			FormTitleUtil.observeTitleChange.call(this, oChanges);
 		}
 
 	}

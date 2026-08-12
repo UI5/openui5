@@ -5,6 +5,8 @@
 
 @_sap_ui_layout_FormLayout_FormTitleSize: ~"H4";
 @_sap_ui_layout_FormLayout_FormSubTitleSize: ~"H5";
+@_sap_ui_layout_FormLayout_FormTitleStyle: ~"Auto";
+@_sap_ui_layout_FormLayout_FormSubTitleStyle: ~"Auto";
 
 .sapUiFormLayout {
 	border: 1px solid @sapUiGroupTitleBorderColor;
@@ -24,6 +26,10 @@
 	width: 100%;
 	color: @sapUiGroupTitleTextColor;
 	margin: 0;
+}
+
+.sapUiFormTitle.sapMTitle {
+	display: block;
 }
 
 .sapUiForm .sapUiFormTitle {

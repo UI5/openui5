@@ -6,19 +6,23 @@
 sap.ui.define([
 	'sap/ui/core/Control',
 	'sap/ui/core/Element',
+	'sap/ui/core/library',
 	'sap/ui/layout/library',
 	'./FormLayoutRenderer',
 	'./FormHelper',
+	'./FormTitleUtil',
 	'sap/ui/core/theming/Parameters',
 	'sap/ui/thirdparty/jquery',
 	"sap/ui/core/Configuration",
 	// jQuery custom selectors ":sapFocusable"
 	'sap/ui/dom/jquery/Selectors'
-], function(Control, Element, library, FormLayoutRenderer, FormHelper, Parameters, jQuery, Configuration) {
+], function(Control, Element, coreLibrary, library, FormLayoutRenderer, FormHelper, FormTitleUtil, Parameters, jQuery, Configuration) {
 	"use strict";
 
 	// shortcut for sap.ui.layout.BackgroundDesign
 	var BackgroundDesign = library.BackgroundDesign;
+
+	const TitleLevel = coreLibrary.TitleLevel;
 
 	/**
 	 * Constructor for a new sap.ui.layout.form.FormLayout.
@@ -67,8 +71,10 @@ sap.ui.define([
 
 		this._oInitPromise = FormHelper.init();
 
-		this._sFormTitleSize = "H4"; // to have default as Theme parameter could be loaded async.
-		this._sFormSubTitleSize = "H5";
+		this._sFormTitleLevel = TitleLevel.H4; // to have default as Theme parameter could be loaded async.
+		this._sFormSubTitleLevel = TitleLevel.H5;
+		this._sFormTitleStyle = TitleLevel.Auto; // as default use the same style like level
+		this._sFormSubTitleStyle = TitleLevel.Auto;
 
 	};
 
@@ -991,7 +997,8 @@ sap.ui.define([
 
 		// read theme parameters to get current header sizes
 		var oSizes = Parameters.get({
-			name: ['sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormTitleSize', 'sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormSubTitleSize'],
+			name: ['sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormTitleSize', 'sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormSubTitleSize',
+				'sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormTitleStyle', 'sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormSubTitleStyle'],
 			callback: this.applyTitleSizes.bind(this)
 		});
 		if (oSizes && oSizes.hasOwnProperty('sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormTitleSize')) { // sync case
@@ -1010,15 +1017,22 @@ sap.ui.define([
 	 */
 	FormLayout.prototype.applyTitleSizes = function(oSizes, bSync) {
 
-		if (oSizes && (this._sFormTitleSize !== oSizes["sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormTitleSize"] ||
-				this._sFormSubTitleSize !== oSizes["sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormSubTitleSize"])) {
-			this._sFormTitleSize = oSizes["sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormTitleSize"];
-			this._sFormSubTitleSize = oSizes["sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormSubTitleSize"];
+		if (oSizes && (this._sFormTitleLevel !== oSizes["sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormTitleSize"] ||
+				this._sFormSubTitleLevel !== oSizes["sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormSubTitleSize"] ||
+				this._sFormTitleStyle !== oSizes["sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormTitleStyle"] ||
+				this._sFormSubTitleStyle !== oSizes["sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormSubTitleStyle"])) {
+			this._sFormTitleLevel = oSizes["sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormTitleSize"];
+			this._sFormSubTitleLevel = oSizes["sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormSubTitleSize"];
+			this._sFormTitleStyle = oSizes["sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormTitleStyle"];
+			this._sFormSubTitleStyle = oSizes["sap.ui.layout.FormLayout:_sap_ui_layout_FormLayout_FormSubTitleStyle"];
 
 			if (!bSync) {
 				this.invalidate(); // re-render
 			}
 		}
+
+		// apply level on Title for rendering.
+		FormTitleUtil.applyTitleLevels.call(this);
 
 	};
 
