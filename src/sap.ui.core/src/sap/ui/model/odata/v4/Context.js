@@ -158,6 +158,9 @@ sap.ui.define([
 	/**
 	 * Collapses the group node that this context points to.
 	 *
+	 * <b>Note:</b> It is unsafe to keep a reference to a context instance which is not
+	 * {@link #isKeepAlive kept alive}.
+	 *
 	 * @param {boolean} [bAll]
 	 *   Whether to collapse the node and all its descendants (since 1.132.0)
 	 * @throws {Error}
