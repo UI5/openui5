@@ -33704,6 +33704,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// When creating a node the count is requested again. (JIRA: CPOUI5ODATAV4-3081)
 	QUnit.test("Recursive Hierarchy: expand to 2, collapse & expand root etc.", function (assert) {
 		var oCollapsed,
+			oLambda,
 			oListBinding,
 			oModel = this.createTeaBusiModel({autoExpandSelect : true}),
 			oNewRoot,
@@ -33810,7 +33811,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					Name : "Kappa"
 				}, "technical properties have been removed");
 
-			const [oBeta, oKappa, oLambda] = oListBinding.getCurrentContexts();
+			const [oBeta, oKappa, oLambda0] = oListBinding.getCurrentContexts();
+			oLambda = oLambda0;
+			oLambda.setKeepAlive(true);
 			// code under test
 			assert.strictEqual(oKappa.getSibling(-1), oBeta, "CPOUI5ODATAV4-2558");
 			assert.strictEqual(oKappa.getSibling(), oLambda, "CPOUI5ODATAV4-2558");
@@ -33856,7 +33859,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/EMPLOYEES('0')",
 				"/EMPLOYEES('1')",
 				"/EMPLOYEES('2')",
-				"/EMPLOYEES('3')"
+				oLambda
 			], [
 				[true, 1, "0", "", "Alpha", 60],
 				[false, 2, "1", "0", "Beta", 55],
@@ -33871,7 +33874,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					Name : "Alpha"
 				}, "technical properties have been removed");
 
-			const [oAlpha, oBeta, oKappa, oLambda] = oListBinding.getAllCurrentContexts();
+			const [oAlpha, oBeta, oKappa] = oListBinding.getAllCurrentContexts();
 			// code under test
 			assert.strictEqual(oAlpha.getSibling(), null, "CPOUI5ODATAV4-2558");
 			assert.strictEqual(oBeta.getSibling(-1), null, "CPOUI5ODATAV4-2558");
@@ -33904,12 +33907,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/EMPLOYEES('0')",
 				"/EMPLOYEES('1')",
 				"/EMPLOYEES('2')",
-				"/EMPLOYEES('3')"
+				oLambda
 			], [
 				[true, 1, "0", "", "Alpha", 60],
 				[false, 2, "1", "0", "Beta", 55],
 				[undefined, 2, "2", "0", "Kappa: κ", 66]
 			], 6);
+			assert.strictEqual(oLambda.getIndex(), 3);
 			const [, oBeta] = oListBinding.getCurrentContexts();
 
 			// code under test
@@ -33923,10 +33927,19 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			return that.waitForChanges(assert, "collapse root");
 		}).then(function () {
 			checkTable("root collapsed", assert, oTable, [
-				"/EMPLOYEES('0')"
+				"/EMPLOYEES('0')",
+				oLambda
 			], [
 				[false, 1, "0", "", "Alpha", 60]
-			]);
+			], 1);
+			assert.strictEqual(oLambda.getIndex(), undefined, "ancestor collapsed");
+			assert.deepEqual(oLambda.getObject(), {
+				"@$ui5.node.level" : 2,
+				AGE : 57,
+				ID : "3",
+				MANAGER_ID : "0",
+				Name : "Lambda"
+			});
 
 			// code under test
 			assert.strictEqual(oListBinding.getCount(), 24);
@@ -33940,12 +33953,16 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			checkTable("root expanded", assert, oTable, [
 				"/EMPLOYEES('0')",
 				"/EMPLOYEES('1')",
-				"/EMPLOYEES('2')"
+				"/EMPLOYEES('2')",
+				oLambda
 			], [
 				[true, 1, "0", "", "Alpha", 60],
 				[false, 2, "1", "0", "Beta", 55],
 				[undefined, 2, "2", "0", "Kappa: κ", 66]
 			], 6);
+			assert.strictEqual(oLambda.getIndex(), undefined, "not yet found again");
+			oListBinding.getAllCurrentContexts(); // Note: this finds Lambda again
+			assert.strictEqual(oLambda.getIndex(), 3);
 			oCollapsed = oTable.getRows()[1].getBindingContext();
 
 			that.expectRequest("EMPLOYEES"
@@ -33983,12 +34000,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/EMPLOYEES('1')",
 				"/EMPLOYEES('1.1')",
 				"/EMPLOYEES('1.2')",
-				"/EMPLOYEES('2')"
+				"/EMPLOYEES('2')",
+				oLambda
 			], [
 				[true, 1, "0", "", "Alpha", 60],
 				[true, 2, "1", "0", "Beta", 55],
 				[false, 3, "1.1", "1", "Gamma", 41]
 			], 8);
+			assert.strictEqual(oLambda.getIndex(), 5);
 			assert.deepEqual(oCollapsed.getObject(), {
 					"@$ui5.node.groupLevelCount" : 2,
 					"@$ui5.node.isExpanded" : true,
@@ -34040,7 +34059,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/EMPLOYEES('1.1')",
 				"/EMPLOYEES('1.2')",
 				"/EMPLOYEES('2')",
-				"/EMPLOYEES('3')",
+				oLambda,
 				"/EMPLOYEES('4')",
 				"/EMPLOYEES('5')"
 			], [
@@ -34048,7 +34067,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				[false, 2, "4", "0", "Mu", 58],
 				[false, 2, "5", "0", "Xi", 59]
 			]);
-			const [, oBeta,,, oKappa, oLambda, oMu, oXi]
+			assert.strictEqual(oLambda.getIndex(), 5);
+			const [, oBeta,,, oKappa,, oMu, oXi]
 				= oRoot.getBinding().getAllCurrentContexts();
 
 			// code under test (JIRA: CPOUI5ODATAV4-2652)
@@ -34063,10 +34083,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			]);
 		}).then(function () {
 			checkTable("root collapsed", assert, oTable, [
-				"/EMPLOYEES('0')"
+				"/EMPLOYEES('0')",
+				oLambda
 			], [
 				[false, 1, "0", "", "Alpha", 60]
-			]);
+			], 1);
+			assert.strictEqual(oLambda.getIndex(), undefined, "ancestor collapsed");
 
 			that.expectRequest("#6 POST EMPLOYEES", {
 					payload : {
@@ -34080,10 +34102,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					MANAGER_ID : null,
 					Name : "Aleph: ℵ" // side effect
 				})
-				.expectRequest("#6 EMPLOYEES?$select=AGE,ID&$filter=ID eq '0'", {
+			.expectRequest("#6 EMPLOYEES?$select=AGE,ID&$filter=ID eq '0' or ID eq '3'&$top=2", {
 					value : [{
-						AGE : 160,
+						AGE : 160, // side effect
 						ID : "0"
+					}, {
+						AGE : 157, // side effect
+						ID : "3"
 					}]
 				})
 				.expectRequest("#6 EMPLOYEES/$count", 25)
@@ -34115,13 +34140,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		}).then(function () {
 			checkTable("new root created, after side effect: AGE for all rows", assert, oTable, [
 				"/EMPLOYEES('9')",
-				"/EMPLOYEES('0')"
+				"/EMPLOYEES('0')",
+				oLambda
 			], [
 				[undefined, 1, "9", "", "Aleph: ℵ", 199],
 				[false, 1, "0", "", "Alpha", 160]
-			]);
+			], 2);
 			checkCreatedPersisted(assert, oNewRoot, oNewRootCreated);
 			assert.strictEqual(oListBinding.getCount(), 25);
+			assert.strictEqual(oLambda.getIndex(), undefined, "ancestor collapsed");
 
 			// code under test (JIRA: CPOUI5ODATAV4-2652)
 			checkSiblingOrder(assert, /*in place*/[oRoot], /*out of place*/[oNewRoot]);
@@ -34147,12 +34174,16 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			checkTable("after expand 0 (Alpha) again", assert, oTable, [
 				"/EMPLOYEES('9')",
 				"/EMPLOYEES('0')",
-				"/EMPLOYEES('1')"
+				"/EMPLOYEES('1')",
+				oLambda
 			], [
 				[undefined, 1, "9", "", "Aleph: ℵ", 199],
 				[true, 1, "0", "", "Alpha", 160],
 				[true, 2, "1", "0", "Beta", 155]
 			], 9);
+			assert.strictEqual(oLambda.getIndex(), undefined, "not yet found again");
+			oListBinding.getAllCurrentContexts(); // Note: this finds Lambda again
+			assert.strictEqual(oLambda.getIndex(), 6);
 
 			that.expectRequest("EMPLOYEES"
 					+ "?$apply=descendants($root/EMPLOYEES,OrgChart,ID,filter(ID eq '1'),1)"
@@ -34195,12 +34226,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/EMPLOYEES('1')",
 				"/EMPLOYEES('1.1')",
 				"/EMPLOYEES('1.2')",
-				"/EMPLOYEES('2')"
+				"/EMPLOYEES('2')",
+				oLambda
 			], [
 				[false, 3, "1.1", "1", "Gamma", 141],
 				[false, 3, "1.2", "1", "Zeta", 142],
 				[undefined, 2, "2", "0", "Kappa: κ", 166]
 			], 9);
+			assert.strictEqual(oLambda.getIndex(), 6);
 
 			// code under test
 			oTable.setFirstVisibleRow(0);
@@ -34216,16 +34249,27 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/EMPLOYEES('1')",
 				"/EMPLOYEES('1.1')",
 				"/EMPLOYEES('1.2')",
-				"/EMPLOYEES('2')"
+				"/EMPLOYEES('2')",
+				oLambda
 			], [
 				[undefined, 1, "9", "", "Aleph: ℵ", 199],
 				[true, 1, "0", "", "Alpha", 160],
 				[true, 2, "1", "0", "Beta", 155]
 			], 9);
 			checkCreatedPersisted(assert, oNewRoot, oNewRootCreated); // still out-of-place
+			assert.strictEqual(oLambda.isKeepAlive(), true, "still kept alive");
+			assert.strictEqual(oLambda.getIndex(), 6);
+			assert.deepEqual(oLambda.getObject(), {
+				"@$ui5.node.level" : 2,
+				AGE : 157,
+				ID : "3",
+				MANAGER_ID : "0",
+				Name : "Lambda"
+			});
 
 			// simplify out-of-place tests below
 			oRoot.collapse();
+			oLambda.setKeepAlive(false);
 
 			return that.waitForChanges(assert, "collapse root again");
 		}).then(function () {
