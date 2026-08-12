@@ -83,6 +83,11 @@ sap.ui.define([
 				return;
 			}
 
+			if (oRenderingTitle) { // in some edge cases ManagedObjectObserver don't fire a "remove" but Insert again -> just destroy rendering title and create a new one
+				oRenderingTitle.destroy();
+				oRenderingTitle = null;
+			}
+
 			const oLevel = _getDefaultLevel.call(this);
 
 			oRenderingTitle = FormHelper.createRenderingTitle(vTitle, this.getId() + "--title", oLevel.level, oLevel.style);
@@ -94,13 +99,19 @@ sap.ui.define([
 			}
 			if (typeof vTitle !== "string") {
 				this._oObserver.observe(vTitle, {
-					properties: true
+					properties: true,
+					aggregations: true
 				});
+				vTitle.getRenderedDomRef = function() { // for RTA-overlay
+					const oRenderingTitle = this.getParent()?.getAggregation("_renderingTitle");
+					return oRenderingTitle?.getDomRef() || this.getDomRef();
+				};
 			}
 		} else if (oRenderingTitle) { // remove
 			this.destroyAggregation("_renderingTitle", true);
 			if (typeof vTitle !== "string") {
 				this._oObserver.unobserve(vTitle);
+				delete vTitle.getRenderedDomRef;
 			}
 		}
 
@@ -111,9 +122,21 @@ sap.ui.define([
 		const oRenderingTitle = this.getAggregation("_renderingTitle");
 
 		if (oRenderingTitle) {
+			const oTitle = oChanges.object.isA("sap.ui.core.Title") ? oChanges.object : oChanges.object.getParent(); // If tooltip changed use parent
+
+			if (oChanges.name === "tooltip" && typeof oChanges.child !== "string") {
+				if (oChanges.mutation === "insert") {
+					this._oObserver.observe(oChanges.child, {
+						properties: true
+					});
+				} else {
+					this._oObserver.unobserve(oChanges.child);
+				}
+			}
+
 			const oLevel = _getDefaultLevel.call(this);
 
-			FormHelper.updateRenderingTitle(oChanges.object, oRenderingTitle, oLevel.level, oLevel.style); // at this point in time FormHelper must be initialized (As RenderingTitle exist)
+			FormHelper.updateRenderingTitle(oTitle, oRenderingTitle, oLevel.level, oLevel.style); // at this point in time FormHelper must be initialized (As RenderingTitle exist)
 		} else { // no internal title -> check if it can be created now
 			_titleChanged.call(this, {object: this, mutation: "insert", child: oChanges.object});
 		}

@@ -565,7 +565,10 @@ sap.ui.define([
 		var oPageTitle = oPage._oPageTitle.getDomRef();
 		assert.strictEqual(oPageTitle.tagName, "H3", "page heading has correct level");
 
-		var oGroupTitleDomRef = oPage._mPageContent.form.getContent()[0].getDomRef();
+		var oGroupTitle = oPage._mPageContent.form.getContent()[0];
+		var oFormContainer = oGroupTitle.getParent();
+		var oRenderedTitle = oFormContainer.getAggregation("_renderingTitle") || oGroupTitle;
+		var oGroupTitleDomRef = oRenderedTitle.getDomRef();
 		assert.strictEqual(oGroupTitleDomRef.tagName, "H4", "quick view group headings have correct level");
 	});
 
