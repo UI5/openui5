@@ -107,7 +107,7 @@ sap.ui.define([
 
 		// Assertions
 		Then.onTheSearchControl.iShouldSeeSearchFieldValue("xyzabc123notfound");
-		Then.onTheSearchPicker.iShouldSeeTheSearchPicker();
+		Then.onTheSearchPicker.iShouldSeeNoResultsMessage();
 	});
 
 	opaTest("Should see no results message", function (Given, When, Then) {
@@ -129,7 +129,7 @@ sap.ui.define([
 
 		// Assertions - verify special characters are displayed correctly
 		Then.onTheSearchControl.iShouldSeeSearchFieldValue("test&value<tag>");
-		Then.onTheSearchPicker.iShouldSeeTheSearchPicker();
+		Then.onTheSearchPicker.iShouldSeeNoResultsMessage();
 	});
 
 	opaTest("Should handle single character search", function (Given, When, Then) {

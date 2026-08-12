@@ -1,9 +1,8 @@
 sap.ui.define([
 	'sap/ui/test/Opa5',
 	"sap/ui/test/matchers/I18NText",
-	'sap/ui/test/matchers/PropertyStrictEquals',
 	'sap/ui/test/actions/Press'
-], function (Opa5, I18NText, PropertyStrictEquals, Press) {
+], function (Opa5, I18NText, Press) {
 	"use strict";
 
 	Opa5.createPageObjects({
@@ -60,55 +59,48 @@ sap.ui.define([
 				},
 
 				iPressTheSettingsMenuButton: function () {
-					// On narrow viewports (e.g. CI headless) the OverflowToolbar moves
-					// aboutMenuButton into the overflow popover so it is not rendered.
-					// Open the overflow first when that happens, then press the button.
+					// The settings/about button is a fiori:ShellBarItem in the ShellBar
+					// header (id "aboutMenuButton"); its press fires onOpenAboutMenu, which
+					// opens the "aboutMenu" Web Component menu.
 					return this.waitFor({
-						controlType: "sap.m.OverflowToolbar",
-						matchers: function (oToolbar) {
-							return oToolbar.$().hasClass("sapUiDemoKitHeaderOTB");
+						id: "aboutMenuButton",
+						success: function (oShellBarItem) {
+							oShellBarItem.fireClick();
 						},
-						success: function (aToolbars) {
-							var oToolbar = aToolbars[0];
-							var oOverflowBtn = oToolbar.getAggregation("_overflowButton");
-							if (oOverflowBtn && oOverflowBtn.getDomRef()) {
-								return this.waitFor({
-									controlType: "sap.m.ToggleButton",
-									matchers: function (oBtn) {
-										return oBtn === oOverflowBtn;
-									},
-									actions: new Press(),
-									success: function () {
-										return this.waitFor({
-											id: "aboutMenuButton",
-											actions: new Press(),
-											errorMessage: "Settings menu button not found in overflow"
-										});
-									},
-									errorMessage: "Overflow button not found"
-								});
-							}
-							return this.waitFor({
-								id: "aboutMenuButton",
-								actions: new Press(),
-								errorMessage: "Settings menu button not found"
-							});
-						},
-						errorMessage: "DemoKit header toolbar not found"
+						errorMessage: "Settings menu button (aboutMenuButton) not found"
 					});
 				},
 
 				iSelectAppearanceOption: function (sKey) {
-					// First open the "appearance" submenu, then press the leaf item
+					// The appearance options are Web Component menu items (webcc:MenuItem)
+					// inside the "aboutMenu" menu, identified by their "action" custom data.
+					// The menu renders into the static area (outside the "App" view) and its
+					// items live in the Menu's shadow DOM, so their light-DOM host has no
+					// rendered box - OPA's default visibility filter would never find them.
+					// Search with visible:false across the whole registry, then simulate a
+					// real user click on the item's interactive <li> inside its shadow DOM.
+					// Clicking the shadow <li> (rather than firing the Menu's "itemClick"
+					// event directly) exercises the full web component interaction chain -
+					// ListItem activation, the List's item-click, the Menu closing its
+					// popup - so the test fails if any part of that real click path breaks.
 					return this.waitFor({
-						controlType: "sap.m.MenuItem",
-						matchers: new PropertyStrictEquals({ name: "key", value: "appearance" }),
-						actions: new Press(),
-						errorMessage: "Appearance submenu item not found"
-					}).waitFor({
-						controlType: "sap.m.MenuItem",
-						matchers: new PropertyStrictEquals({ name: "key", value: sKey }),
-						actions: new Press(),
+						viewName: undefined,
+						visible: false,
+						controlType: "sap.f.gen.ui5.webcomponents.dist.MenuItem",
+						matchers: function (oItem) {
+							return oItem.getCustomData().some(function (oData) {
+								return oData.getKey() === "action" && oData.getValue() === sKey;
+							});
+						},
+						success: function (aItems) {
+							var oItem = aItems[0],
+								oHost = oItem.getDomRef(),
+								oClickTarget = oHost && oHost.shadowRoot
+									&& oHost.shadowRoot.querySelector("li[part='native-li']");
+
+							Opa5.assert.ok(oClickTarget, "Appearance menu item '" + sKey + "' has a clickable shadow element");
+							oClickTarget.click();
+						},
 						errorMessage: "Appearance menu item '" + sKey + "' not found"
 					});
 				}
