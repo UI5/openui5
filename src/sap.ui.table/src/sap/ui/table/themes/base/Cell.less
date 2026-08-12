@@ -477,6 +477,80 @@
 	display: none;
 }
 
+.sapUiTableRowSkeleton > .sapUiTableCell:not(.sapUiTableRowSelectionCell) {
+	position: relative;
+	overflow: hidden;
+
+	> * {
+		visibility: hidden;
+	}
+
+	&::after {
+		content: '';
+		position: absolute;
+		top: 0.5rem;
+		bottom: 0.5rem;
+		left: 0.25rem;
+		/* The bar width is driven by a SINGLE seed custom property (--sapUiTable_SkeletonSeed, 0..100) set on the table root on
+		 * every scroll tick. Each cell reacts to that one seed differently: it has its own base width and its own slope (the
+		 * coefficient applied to the seed), combined from a per-column and a per-row part selected via nth-child. Because the
+		 * slopes have mixed signs and magnitudes, a change in the shared seed moves each cell's bar by a different amount and in a
+		 * different direction, so neighbouring bars no longer grow or shrink together - all from a single JS-updated value and with
+		 * no per-cell DOM writes. The result is clamped to keep the bars within a sensible range. */
+		width: ~"clamp(18%, calc((var(--_sap_ui_table_Skeleton_ColBase, 60%) + var(--_sap_ui_table_Skeleton_RowBase, 0%)) + (var(--_sap_ui_table_Skeleton_Seed, 50) - 50) * (var(--_sap_ui_table_Skeleton_ColSlope, 0.3%) + var(--_sap_ui_table_Skeleton_RowSlope, 0%))), 96%)";
+		border-radius: 0.25rem;
+		background: var(--sapContent_ImagePlaceholderBackground);
+		pointer-events: none;
+	}
+
+	/* Per-column base width and slope (period 5). Slopes mix sign and magnitude so adjacent columns react to the seed differently. */
+	&:nth-child(5n+1)::after {
+		--_sap_ui_table_Skeleton_ColBase: 40%;
+		--_sap_ui_table_Skeleton_ColSlope: 0.34%;
+	}
+
+	&:nth-child(5n+2)::after {
+		--_sap_ui_table_Skeleton_ColBase: 68%;
+		--_sap_ui_table_Skeleton_ColSlope: -0.26%;
+	}
+
+	&:nth-child(5n+3)::after {
+		--_sap_ui-table_Skeleton_ColBase: 52%;
+		--_sap_ui_table_Skeleton_ColSlope: 0.18%;
+	}
+
+	&:nth-child(5n+4)::after {
+		--_sap_ui_table_Skeleton_ColBase: 80%;
+		--_sap_ui_table_Skeleton_ColSlope: -0.38%;
+	}
+
+	&:nth-child(5n+5)::after {
+		--_sap_ui_table_Skeleton_ColBase: 60%;
+		--_sap_ui_table_Skeleton_ColSlope: 0.24%;
+	}
+}
+
+/* Per-row base offset and slope (period 4, coprime with the column period for up to 20 distinct cell combinations). */
+.sapUiTableRowSkeleton:nth-child(4n+1) > .sapUiTableCell:not(.sapUiTableRowSelectionCell)::after {
+	--_sap_ui_table_Skeleton_RowBase: 0%;
+	--_sap_ui_table_Skeleton_RowSlope: 0.10%;
+}
+
+.sapUiTableRowSkeleton:nth-child(4n+2) > .sapUiTableCell:not(.sapUiTableRowSelectionCell)::after {
+	--_sap_ui_table_Skeleton_RowBase: 8%;
+	--_sap_ui_table_Skeleton_RowSlope: -0.16%;
+}
+
+.sapUiTableRowSkeleton:nth-child(4n+3) > .sapUiTableCell:not(.sapUiTableRowSelectionCell)::after {
+	--_sap_ui_table_Skeleton_RowBase: -6%;
+	--_sap_ui_table_Skeleton_RowSlope: 0.22%;
+}
+
+.sapUiTableRowSkeleton:nth-child(4n+4) > .sapUiTableCell:not(.sapUiTableRowSelectionCell)::after {
+	--_sap_ui_table_Skeleton_RowBase: 4%;
+	--_sap_ui_table_Skeleton_RowSlope: -0.08%;
+}
+
 /**
  * If there is no element (selection/highlight/expand/collapse) at the left most of the table
  * then the first cell must have 1rem left padding while regular cells have 0.5rem left padding

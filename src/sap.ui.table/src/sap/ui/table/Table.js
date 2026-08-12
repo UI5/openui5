@@ -4063,7 +4063,28 @@ sap.ui.define([
 	}
 
 	/**
+	 * By default, large data scrolling is enabled automatically for large data sets with non-client bindings. Call this method with
+	 * <code>false</code> to opt out of it.
+	 *
+	 * Potential public candidate:
+	 * This could become the setter of a public property. To not lock-in on the API too much, only <code>false</code> is accepted.
+	 *
+	 * @param {boolean} bLargeDataScrolling Must be <code>false</code> to disable the automatic large data scrolling behavior.
+	 * @throws {Error} If <code>bLargeDataScrolling</code> is not <code>false</code>.
+	 * @private
+	 */
+	Table.prototype.setLargeDataScrolling = function(bLargeDataScrolling) {
+		if (bLargeDataScrolling !== false) {
+			throw new Error("Only 'false' is accepted to disable the automatic large data scrolling behavior");
+		}
+		this._bLargeDataScrolling = false;
+	};
+
+	/**
 	 * Lets you control in which situation the <code>Scrollbar</code> fires scroll events.
+	 *
+	 * Note: Replaced in favor of <code>setLargeDataScrolling</code>. Can't be deleted yet, because it is still used in the SmartTable. Delete the
+	 * usage in the SmartTable - large data scrolling is automatically enabled - and delete this method.
 	 *
 	 * @param {boolean} bLargeDataScrolling Set to true to let the <code>Scrollbar</code> only fire scroll events when
 	 * the scroll handle is released. No matter what the setting is, the <code>Scrollbar</code> keeps on firing scroll events
