@@ -147,9 +147,9 @@ sap.ui.define([
 					oURLSearchParams = new URLSearchParams(window.location.search);
 
 				if (oURLSearchParams.get("clearSelectionOnFilter") === "false") {
-					const oBindingInfo = this.byId("table").getBindingInfo("rows");
+					const oBindingInfo = oTreeTable.getBindingInfo("rows");
 					delete oBindingInfo.parameters.$$clearSelectionOnFilter;
-					this.byId("table").bindRows(oBindingInfo);
+					oTreeTable.bindRows(oBindingInfo);
 				}
 				const sVisibleRowCount = oURLSearchParams.get("visibleRowCount");
 				if (sVisibleRowCount) {
@@ -184,9 +184,14 @@ sap.ui.define([
 						.attachEventOnce("dataReceived", this.onChangeHierarchy.bind(this));
 				}
 
-				this.byId("table").getBinding("rows").filter(
-					new Filter("Description", FilterOperator.NotStartsWith, "Out"),
-					FilterType.Control);
+				if (!oURLSearchParams.has("AI")) {
+					const oOperator = oURLSearchParams.has("Out")
+						? FilterOperator.StartsWith
+						: FilterOperator.NotStartsWith;
+					oTreeTable.getBinding("rows").filter(
+						new Filter("Description", oOperator, "Out"),
+						FilterType.Control);
+				}
 
 				this.initMessagePopover("table");
 			}, this);
