@@ -15,7 +15,8 @@ sap.ui.define([
 	"sap/ui/core/library",
 	"sap/ui/core/VariantLayoutData",
 	"sap/ui/core/Title",
-	'sap/ui/core/theming/Parameters',
+	"sap/ui/core/TooltipBase",
+	"sap/ui/core/theming/Parameters",
 	"sap/m/library",
 	"sap/m/Toolbar",
 	"sap/m/Title",
@@ -38,6 +39,7 @@ sap.ui.define([
 		coreLibrary,
 		VariantLayoutData,
 		Title,
+		TooltipBase,
 		Parameters,
 		mLibrary,
 		Toolbar,
@@ -191,17 +193,29 @@ sap.ui.define([
 
 		oTitle.setText("Test 2");
 		oTitle.setLevel(coreLibrary.TitleLevel.H2);
+		const oTooltip = new TooltipBase("TB1", {text: "my Tooltip"});
+		oTitle.setTooltip(oTooltip);
 		await nextUIUpdate();
 		oRenderingTitle = oForm.getAggregation("_renderingTitle");
+		let oRenderingTooltip = oRenderingTitle?.getTooltip();
 		assert.ok(oRenderingTitle, "Title for rendering created");
 		assert.equal(oRenderingTitle.getText(), "Test 2", "rendering Title: Text");
 		assert.equal(oRenderingTitle.getLevel(), coreLibrary.TitleLevel.H2, "rendering Title: Level");
 		assert.equal(oRenderingTitle.getTitleStyle(), coreLibrary.TitleLevel.H5, "rendering Title: TitleStyle");
-		assert.equal(oRenderingTitle.getTooltip(), "Test", "rendering Title: Tooltip");
 		assert.ok(window.document.getElementById("F1--title"), "Title rendered");
 		assert.ok(Element.getElementById("F1--title")?.isA("sap.m.Title"), "sap.m.Title rendered");
 		assert.equal(jQuery("#F1--title").text(), "Test 2", "Title rendered");
 		assert.ok(jQuery("#F1--title").is("h2"), "Title is rendered as H2");
+		assert.ok(oRenderingTooltip?.isA?.("sap.ui.core.TooltipBase"), "Tooltip set on rendering title");
+		assert.equal(oRenderingTooltip?.getId?.(), oTooltip.getId() + "--inner", "Tooltip ID on rendering title");
+		assert.equal(oRenderingTooltip?.getText?.(), oTooltip.getText(), "Rendering Title tooltip text");
+
+		oTooltip.setText("my Tooltip 2");
+		oRenderingTooltip = oRenderingTitle?.getTooltip();
+		assert.equal(oRenderingTooltip?.getText(), oTooltip.getText(), "Form Title tooltip text");
+
+		oRenderingTitle.destroyTooltip();
+		assert.notOk(oRenderingTitle?.getTooltip(), "No tooltip on Form title");
 
 		oForm.destroyTitle();
 		await nextUIUpdate();

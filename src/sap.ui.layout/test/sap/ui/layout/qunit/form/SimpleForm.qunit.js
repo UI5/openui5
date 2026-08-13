@@ -10,6 +10,7 @@ sap.ui.define([
 	"sap/ui/layout/ResponsiveFlowLayoutData",
 	"sap/ui/core/VariantLayoutData",
 	"sap/ui/core/Title",
+	"sap/ui/core/TooltipBase",
 	"sap/m/Toolbar",
 	"sap/m/Label",
 	"sap/m/Input",
@@ -24,6 +25,7 @@ sap.ui.define([
 		ResponsiveFlowLayoutData,
 		VariantLayoutData,
 		Title,
+		TooltipBase,
 		Toolbar,
 		Label,
 		Input,
@@ -115,7 +117,7 @@ sap.ui.define([
 	}
 
 	async function asyncLayoutTest(assert, sLayout, fnTest) {
-		oFormLayout = oForm.getLayout(); // as might loadud right now
+		oFormLayout = oForm.getLayout(); // as might loaded right now
 		if (oFormLayout) {
 			await nextUIUpdate();
 			if (oSimpleForm.getDomRef()) { // only test if SimpleForm is rendered
@@ -201,16 +203,42 @@ sap.ui.define([
 	});
 
 	QUnit.test("Title", function(assert) {
-		var oTitle = new Title("T1", {text: "Test"});
+		const oTitle = new Title("T1", {text: "Test"});
 		oSimpleForm.setTitle(oTitle);
+		const oFormTitle = oForm.getTitle();
 
 		assert.equal(oSimpleForm.getTitle().getId(), "T1", "SimpleForm getTitle");
-		assert.equal(oForm.getTitle().getId(), "T1", "Form getTitle");
+		assert.equal(oFormTitle?.getId(), "T1---Form", "Form getTitle");
+		assert.equal(oFormTitle?.getText(), oTitle.getText(), "Form getTitle - Text");
 		assert.equal(oTitle.getParent().getId(), "SF1", "SimpleForm still parent of Title");
+
+		oTitle.setText("Test 2");
+		oTitle.setTooltip("Test 2");
+		assert.equal(oFormTitle?.getText(), oTitle.getText(), "Form getTitle - Text");
+		assert.equal(oFormTitle?.getTooltip(), oTitle.getTooltip(), "Form getTitle - Tooltip");
+
+		const oTooltip = new TooltipBase("TB1", {text: "my Tooltip"});
+		oTitle.setTooltip(oTooltip);
+		const oFormTooltip = oFormTitle?.getTooltip();
+		assert.ok(oFormTooltip?.isA("sap.ui.core.TooltipBase"), "Tooltip set on Form title");
+		assert.equal(oFormTooltip?.getText(), oTooltip.getText(), "Form Title tooltip text");
+
+		oTooltip.setText("My Tooltip 2");
+		assert.equal(oFormTooltip?.getText(), oTooltip.getText(), "Form Title tooltip text");
+
+		oFormTitle.destroyTooltip();
+		assert.notOk(oFormTitle?.getTooltip(), "No tooltip on Form title");
 
 		oSimpleForm.destroyTitle();
 		assert.notOk(!!oSimpleForm.getTitle(), "SimpleForm getTitle");
 		assert.notOk(!!oForm.getTitle(), "Form getTitle");
+
+		oSimpleForm.setTitle("Test");
+		assert.equal(oForm.getTitle(), "Test", "Form getTitle");
+
+		oSimpleForm.setTitle();
+		assert.notOk(oForm.getTitle(), "Form getTitle");
+
 	});
 
 	QUnit.test("Toolbar", function(assert) {
@@ -230,24 +258,31 @@ sap.ui.define([
 		oSimpleForm.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		assert.equal(oForm.getAriaLabelledBy(), "XXX", "Form getAriaLabelledBy");
-		assert.equal(jQuery("#SF1--Form").attr("aria-labelledby"), "XXX", "aria-labelledby");
+		const fnTest = function(assert) {
+			assert.equal(oForm.getAriaLabelledBy(), "XXX", "Form getAriaLabelledBy");
+			assert.equal(jQuery("#SF1--Form").attr("aria-labelledby"), "XXX", "aria-labelledby");
+		};
+		await asyncLayoutTest(assert, "sap/ui/layout/form/ResponsiveGridLayout", fnTest);
 	});
 
 	QUnit.test("_suggestTitleId", async function(assert) {
 		oSimpleForm._suggestTitleId("ID1");
 		oSimpleForm.placeAt("qunit-fixture");
 		await nextUIUpdate();
-		assert.equal(jQuery("#SF1--Form").attr("aria-labelledby"), "ID1", "aria-labelledby points to TitleID");
 
-		var oTitle = new Title("T1", {text: "Test"});
-		oSimpleForm.setTitle(oTitle);
-		await nextUIUpdate();
-		assert.equal(jQuery("#SF1--Form").attr("aria-labelledby"), "T1", "aria-labelledby points to Title");
+		const fnTest = async function(assert) {
+			assert.equal(jQuery("#SF1--Form").attr("aria-labelledby"), "ID1", "aria-labelledby points to TitleID");
 
-		oSimpleForm.addAriaLabelledBy("X");
-		await nextUIUpdate();
-		assert.equal(jQuery("#SF1--Form").attr("aria-labelledby"), "X T1", "aria-labelledby points to AriaLabel and Title");
+			var oTitle = new Title("T1", {text: "Test"});
+			oSimpleForm.setTitle(oTitle);
+			await nextUIUpdate();
+			assert.equal(jQuery("#SF1--Form").attr("aria-labelledby"), "SF1--Form--title", "aria-labelledby points to Title");
+
+			oSimpleForm.addAriaLabelledBy("X");
+			await nextUIUpdate();
+			assert.equal(jQuery("#SF1--Form").attr("aria-labelledby"), "X SF1--Form--title", "aria-labelledby points to AriaLabel and Title");
+		};
+		await asyncLayoutTest(assert, "sap/ui/layout/form/ResponsiveGridLayout", fnTest);
 	});
 
 	QUnit.module("addContent", {

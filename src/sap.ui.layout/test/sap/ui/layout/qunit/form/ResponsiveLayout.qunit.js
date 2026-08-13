@@ -188,7 +188,7 @@ sap.ui.define([
 		assert.equal(oTitle.getParent().getId(), "FC2", "FormContainer is still parent of Title");
 		assert.equal(oPanel.getContent().getId(), "FC2--RFLayout", "RF-Layout is inside Panel");
 		assert.ok(oPanel.getContent().isA("sap.ui.layout.ResponsiveFlowLayout"), "content of Panel is ResponsiveFlowLayout");
-		assert.ok(window.document.getElementById("T2"), "Title rendered");
+		assert.ok(window.document.getElementById("FC2--title"), "Title rendered");
 		assert.ok(window.document.getElementById("FC2--Exp"), "Expander rendered");
 		assert.equal(jQuery("#FC2--Panel").attr("title"), "Test", "tooltip set on panel");
 	});
