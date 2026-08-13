@@ -75,6 +75,7 @@ sap.ui.define([
 	AdaptFiltersPanelContent.prototype.CHANGE_REASON_REORDER = "Reorder";
 	AdaptFiltersPanelContent.prototype.CHANGE_REASON_SHOW = "Show";
 	AdaptFiltersPanelContent.prototype.CHANGE_REASON_HIDE = "Hide";
+	AdaptFiltersPanelContent.prototype.CHANGE_REASON_VALIDATION = "Validation";
 	AdaptFiltersPanelContent.prototype.LIST_KEY = "list";
 	AdaptFiltersPanelContent.prototype.PRESENCE_ATTRIBUTE = "visible";
 	AdaptFiltersPanelContent.prototype.CONTROL_MODEL = "$sap.ui.mdc.p13n";
@@ -114,7 +115,39 @@ sap.ui.define([
 
 		this._getSearchField().setValue("");
 		this._filterByModeAndSearch();
+
+		setTimeout(() => {
+			this._triggerValidationAfterReset();
+		}, RENDERING_DELAY_MS);
 	};
+
+	/**
+	 * Triggers validation for all visible filter fields after reset.
+	 * Marks items for validation and fires a special validation event that
+	 * does not affect the dialog's dirty state but triggers validation in AdaptationFilterBar.
+	 * @private
+	 */
+	AdaptFiltersPanelContent.prototype._triggerValidationAfterReset = function() {
+		const aItems = this._getP13nModel().getProperty("/items");
+		if (!aItems) {
+			return;
+		}
+
+		aItems.forEach((oItem) => {
+			if (oItem.visible || oItem.isFiltered) {
+				oItem.requiresValidation = true;
+			}
+		});
+
+		this._getP13nModel().setProperty("/items", aItems, null, true);
+		this._getP13nModel().checkUpdate(true, true);
+
+		this.fireChange({
+			reason: this.CHANGE_REASON_VALIDATION,
+			item: null
+		});
+	};
+
 
 	AdaptFiltersPanelContent.prototype.setP13nModel = function(oModel) {
 		this.setModel(oModel, this.P13N_MODEL);
@@ -179,6 +212,12 @@ sap.ui.define([
 			delete oItem.oldPosition;
 			this._sortItems(aP13nData);
 		}
+		//DINC0877637:
+		// Track initial state to keep invisible items with values visible when value is cleared (e.g., boolean field "Not Selected")
+		aP13nData.forEach((oItem) => {
+			oItem.initiallyVisible = oItem.visible;
+			oItem.hadInitialFilterValue = oItem.isFiltered;
+		});
 
 		return aP13nData;
 	};
@@ -511,10 +550,20 @@ sap.ui.define([
 					`${this.P13N_MODEL}>isFiltered`,
 					`${this.P13N_MODEL}>position`,
 					`${this.P13N_MODEL}>visibleInDialog`,
-					`${this.P13N_MODEL}>required`
+					`${this.P13N_MODEL}>required`,
+					`${this.P13N_MODEL}>initiallyVisible`,
+					`${this.P13N_MODEL}>hadInitialFilterValue`
 				],
-				formatter: (bVisible, bIsFiltered, iPosition, visibleInDialog, bRequired) => {
-					return visibleInDialog && (bVisible || bIsFiltered || iPosition >= 0 || bRequired);
+				formatter: (bVisible, bIsFiltered, iPosition, visibleInDialog, bRequired, bInitiallyVisible, bHadInitialFilterValue) => {
+					// Base conditions that always make an item visible
+					const bBaseConditions = bVisible || bIsFiltered || iPosition >= 0 || bRequired;
+
+					// Special case: Item was initially invisible but had a filter value
+					// Keep it visible during the session even if the filter value is cleared
+					// This prevents items from disappearing when changing from true/false to "Not Selected"
+					const bKeepVisibleDespiteValueClearing = !bInitiallyVisible && bHadInitialFilterValue && !bIsFiltered;
+
+					return visibleInDialog && (bBaseConditions || bKeepVisibleDespiteValueClearing);
 				}
 			}
 		});
@@ -971,13 +1020,20 @@ sap.ui.define([
 		this._updatePresence(sKey, false);
 		this._updatePosition(sKey, false);
 
+		// Reset hadInitialFilterValue so the item disappears immediately when removed
+		// This ensures items removed via the remove button don't stay visible due to the special handling for boolean fields (see _enhanceP13nData)
+		const aItems = this._getP13nModel().getProperty("/items");
+		const iIndex = aItems.findIndex((oItem) => oItem.name === sKey);
+		if (iIndex >= 0) {
+			aItems[iIndex].hadInitialFilterValue = false;
+		}
+
 		const oItem = this.getP13nData().find((oItem) => oItem.name === sKey);
 		this.fireChange({
 			reason: this.CHANGE_REASON_REMOVE,
 			item: oItem
 		});
 
-		const aItems = this._getP13nModel().getProperty("/items");
 		this._sortItems(aItems);
 		this._getP13nModel().setProperty("/items", aItems, null, true);
 		this._getP13nModel().checkUpdate(true, true);
