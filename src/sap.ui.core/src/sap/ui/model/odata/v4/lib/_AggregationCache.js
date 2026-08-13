@@ -57,6 +57,7 @@ sap.ui.define([
 		this.aElements = [];
 		this.aElements.$byPredicate = {};
 		this.aElements.$created = 0; // required for _Cache#drillDown (see _Cache.from$skip)
+		this.fnOnAfterReset = undefined;
 		this.iReadLength = undefined;
 		this.iResetCount = 0;
 		this.bKeptFirstLevel = !!oFirstLevel;
@@ -2541,6 +2542,9 @@ sap.ui.define([
 	 * @param {boolean} [bRefreshNeeded]
 	 *   Whether to request the rank with up-to-date ExpandLevels because a side-effects refresh is
 	 *   about to follow; cannot be used in combination with <code>bDropFilter</code>
+	 * @param {boolean} [bFixOnReset]
+	 *   Whether to fix the request's ExpandLevels on {@link #reset} by using
+	 *   <code>bRefreshNeeded</code>; this helps in case a side-effects refresh follows unexpectedly
 	 * @returns {Promise<object|undefined|void>}
 	 *   A promise which is resolved without a defined result in case <code>bInheritResult</code> is
 	 *   set to <code>true</code>, or with the result object (which may be <code>undefined</code>),
@@ -2549,7 +2553,7 @@ sap.ui.define([
 	 * @private
 	 */
 	_AggregationCache.prototype.requestProperties = async function (oElement, aSelect, oGroupLock,
-			bInheritResult, bDropFilter, bRefreshNeeded) {
+			bInheritResult, bDropFilter, bRefreshNeeded, bFixOnReset) {
 		function getApply(mQueryOptions) { // keep $apply and custom query options
 			mQueryOptions = {...mQueryOptions};
 			// Note: $filter is overwritten below, $orderby is part of $apply already
@@ -2577,10 +2581,23 @@ sap.ui.define([
 		mQueryOptions.$filter = _Helper.getKeyFilter(oElement, this.sMetaPath, this.getTypes());
 		const sResourcePathWithQuery = this.sResourcePath
 			+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions, false, true);
-		const oResult = await this.oRequestor.request("GET", sResourcePathWithQuery,
+		const oPromise = this.oRequestor.request("GET", sResourcePathWithQuery,
 			oGroupLock.getUnlockedCopy(), undefined, undefined, undefined, undefined,
 			this.sMetaPath, undefined, false, {$select : aSelect}, this);
-		const oRequestedProperties = oResult.value[0];
+
+		if (bFixOnReset && !bRefreshNeeded
+				&& this.oAggregation.$ExpandLevels !== this.oTreeState.getExpandLevels()) {
+			this.fnOnAfterReset = () => {
+				this.requestProperties(oElement, aSelect, oGroupLock, bInheritResult, bDropFilter,
+					/*bRefreshNeeded*/true);
+				this.oRequestor.replaceWithLast(oGroupLock, oPromise);
+			};
+			oPromise.finally(() => {
+				this.fnOnAfterReset = undefined; // not needed anymore, request is done
+			}).catch(() => { /* catch is only needed due to finally */ });
+		}
+
+		const oRequestedProperties = (await oPromise).value[0];
 
 		if (bInheritResult && oRequestedProperties) {
 			aSelect.forEach((sPath) => {
@@ -2611,7 +2628,7 @@ sap.ui.define([
 	_AggregationCache.prototype.requestRank = async function (oElement, oGroupLock,
 			bRefreshNeeded) {
 		const oResult = await this.requestProperties(oElement, [this.oAggregation.$LimitedRank],
-			oGroupLock, false, false, bRefreshNeeded);
+			oGroupLock, false, false, bRefreshNeeded, /*bFixOnReset*/true);
 
 		return oResult && parseInt(_Helper.drillDown(oResult, this.oAggregation.$LimitedRank));
 	};
@@ -2749,6 +2766,8 @@ sap.ui.define([
 			delete oKeptElement["@$ui5._"];
 			_Helper.setPrivateAnnotation(oKeptElement, "predicate", sPredicate);
 		}
+		this.fnOnAfterReset?.();
+		this.fnOnAfterReset = undefined; // do not call twice
 	};
 
 	/**
