@@ -53,6 +53,8 @@ sap.ui.define([
 	 * @property {boolean} enabled - Indicates whether the action is active and can be executed
 	 * @property {int} rank - Sorting rank for visual representation of the action position
 	 * @property {string} text - Action name
+	 * @property {sap.ui.rta.service.Action.ActionObject[]} [submenu] - Nested actions (e.g. selectable variants).
+	 *   Each entry's <code>id</code> is the target value passed as <code>{ key }</code> to <code>execute</code>
 	*/
 
 	return function(oRta) {
@@ -60,6 +62,38 @@ sap.ui.define([
 			return typeof vValue === "function"
 				? vValue(oOverlay, oMenuItem)
 				: vValue;
+		}
+
+		// Resolve the function-valued fields of a menu (or submenu) item, mirroring how the context menu builds them.
+		function normalizeMenuItem(mMenuItem, aElementOverlays) {
+			return {
+				...mMenuItem,
+				enabled: invoke(mMenuItem.enabled, aElementOverlays, mMenuItem),
+				text: invoke(mMenuItem.text, aElementOverlays[0])
+			};
+		}
+
+		// Normalize a menu item and, if present, its submenu entries.
+		// Submenu entries carry the actual target (e.g. a variant key) in their id.
+		function normalizeMenuItemWithSubmenu(mMenuItem, aElementOverlays) {
+			const mNormalizedItem = normalizeMenuItem(mMenuItem, aElementOverlays);
+			if (mMenuItem.submenu) {
+				mNormalizedItem.submenu = mMenuItem.submenu.map(function(mSubMenuItem) {
+					return normalizeMenuItem(mSubMenuItem, aElementOverlays);
+				});
+			}
+			return mNormalizedItem;
+		}
+
+		// Reduce a menu item to the public action shape, keeping submenu entries in the same reduced shape.
+		function pickAction(mMenuItem) {
+			const mAction = _pick(mMenuItem, ["id", "icon", "rank", "group", "enabled", "text"]);
+			if (mMenuItem.submenu) {
+				mAction.submenu = mMenuItem.submenu.map(function(mSubMenuItem) {
+					return _pick(mSubMenuItem, ["id", "icon", "enabled", "text"]);
+				});
+			}
+			return mAction;
 		}
 
 		function getActions(aElementOverlays) {
@@ -76,11 +110,7 @@ sap.ui.define([
 						: aResult;
 				}, [])
 				.map(function(mMenuItem) {
-					return {
-						...mMenuItem,
-						enabled: invoke(mMenuItem.enabled, aElementOverlays, mMenuItem),
-						text: invoke(mMenuItem.text, aElementOverlays[0])
-					};
+					return normalizeMenuItemWithSubmenu(mMenuItem, aElementOverlays);
 				});
 			});
 		}
@@ -99,13 +129,11 @@ sap.ui.define([
 
 			return getActions(aElementOverlays)
 			.then(function(aMenuItems) {
-				return aMenuItems.map(function(mMenuItem) {
-					return _pick(mMenuItem, ["id", "icon", "rank", "group", "enabled", "text"]);
-				});
+				return aMenuItems.map(pickAction);
 			});
 		}
 
-		function execute(vControlIds, sActionId) {
+		function execute(vControlIds, sActionId, mPayload) {
 			var aControlIds = _castArray(vControlIds);
 			var aElementOverlays = aControlIds.map(function(sControlId) {
 				var oElementOverlay = OverlayRegistry.getOverlay(sControlId);
@@ -126,7 +154,11 @@ sap.ui.define([
 				if (!mAction) {
 					throw new Error("No action found by specified ID");
 				} else {
-					return mAction.handler(aElementOverlays, { menuItem: mAction });
+					return mAction.handler(aElementOverlays, {
+						menuItem: mAction,
+						contextElement: aElementOverlays[0] && aElementOverlays[0].getElement(),
+						payload: mPayload
+					});
 				}
 			});
 		}
@@ -193,6 +225,8 @@ sap.ui.define([
 				 * @name sap.ui.rta.service.Action.execute
 				 * @param {string|string[]} vControlIds - Control ID or an array of IDs to get actions for
 				 * @param {string} sActionId - Action ID to be executed on the specified controls
+				 * @param {object} [mPayload] - Payload forwarded to the plugin handler as <code>mPropertyBag.payload</code>,
+				 *   e.g. <code>{ key }</code> for the variant switch actions
 				 * @returns {Promise.<any>} Result of the operation wrapped in a promise.
 				 * @public
 				 * @function

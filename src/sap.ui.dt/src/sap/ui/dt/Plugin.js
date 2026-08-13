@@ -345,8 +345,8 @@ sap.ui.define([
 	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target overlays
 	 * @param {object} mPropertyBag - Additional properties for the action defined by the plugin
 	 * @param {object} mPropertyBag.menuItem - The menu item object containing the action to be executed
-	 * @param {object} mPropertyBag.eventItem - The event item object containing the event which triggered the action
-	 * @param {object} mPropertyBag.contextElement - The element which is the context of the action, e.g. the element on which the context menu was opened
+	 * @param {object} [mPropertyBag.contextElement] - The element which is the context of the action, e.g. the element on which the context menu was opened
+	 * @param {object} [mPropertyBag.payload] - Action-specific data provided by the context menu or the <code>sap.ui.rta.service.Action</code> service. The context menu sets <code>payload.key</code> to the selected menu item's key; other fields are defined per plugin
 	 * @override
 	 * @public
 	 */
