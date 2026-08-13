@@ -18,9 +18,9 @@ sap.ui.define(
 
         const aNotFoundViews = ["sap.ui.documentation.sdk.view.NotFound", "sap.ui.documentation.sdk.view.SampleNotFound"];
 
-        var PageInfo = function(oRouteConfig, oRouter, sURL, referrer) {
+        var PageInfo = function(oRouteConfig, oRouter, sURL, sReferrer) {
             sURL = sURL || window.location.href;
-            referrer = referrer || document.referrer;
+            sReferrer = sReferrer || document.referrer;
             const oURL = new URL(sURL),
                 sSectionTitle = oRouter.getRouteTopLevelTitle(oRouteConfig);
 
@@ -31,7 +31,7 @@ sap.ui.define(
             this.language = oUserLanguageTag.language;
             this.locale = oUserLanguageTag.toString();
             this.country = "glo";
-            this.referrer = document.referrer;
+            this.referrer = sReferrer;
         };
 
         PageInfo.prototype.toObject = function() {
@@ -70,6 +70,7 @@ sap.ui.define(
                     this._oRouter = oComponent.getRouter();
                     this._oConfig = oComponent.getConfig();
                     this._oLastRouteParameters = null;
+                    this._sLastLoggedPageUrl = null;
                     this._isStarted = false;
                 },
                 start: function(sVersionName, aRouterEventsToLog) {
@@ -94,6 +95,7 @@ sap.ui.define(
                     Localization.detachChange(this._updateLanguageTag);
                     this._isStarted = false;
                     this._oLastRouteParameters = null;
+                    this._sLastLoggedPageUrl = null;
                 },
                 _initRemoteServiceConnector: function(sVersionName) {
                     window.adobeDataLayer = window.adobeDataLayer || [];
@@ -138,6 +140,7 @@ sap.ui.define(
                     this._oLastRouteParameters = oEventParameters;
                     this._getPageInfoFromRoute(oEventParameters, function(oPageInfo) {
                         this._logPageVisit(oPageInfo);
+                        this._sLastLoggedPageUrl = oPageInfo.url;
                         this._publishLoggedInfo(true);
                     }.bind(this));
                 },
@@ -167,7 +170,7 @@ sap.ui.define(
                 },
                 _getPageInfoFromRoute: function(oEventParameters, fnCallback) {
                     var oRouteConfig = oEventParameters.config,
-                        oPageInfo = new PageInfo(oRouteConfig, this._oRouter);
+                        oPageInfo = new PageInfo(oRouteConfig, this._oRouter, window.location.href, this._sLastLoggedPageUrl);
                     this._getPageTitleFromRoute(oEventParameters, function(sPageTitle) {
                         oPageInfo.title = sPageTitle;
                         fnCallback(oPageInfo);

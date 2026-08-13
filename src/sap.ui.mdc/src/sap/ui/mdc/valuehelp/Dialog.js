@@ -616,8 +616,10 @@ sap.ui.define([
 									}
 								}
 
+								this.oTokenizer.invalidate(); // invalidate Tokenizer to update more-indicator even if binding not updated because of length-limit
+
 								let sTitle;
-								if (aContent && aContent.length == 1) { // in case of single content the title will be provided by the content
+								if (aContent && aContent.length === 1) { // in case of single content the title will be provided by the content
 									sTitle = aContent[0].getFormattedTokenizerTitle(iCount);
 									return sTitle;
 								} else {

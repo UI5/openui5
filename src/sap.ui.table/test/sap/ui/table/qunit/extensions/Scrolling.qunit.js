@@ -2310,7 +2310,7 @@ sap.ui.define([
 
 			return oTable.qunit.whenRenderingFinished().then(function() {
 				oTable.setFirstVisibleRow(1);
-			}).then(oTable.qunit.whenNextRowsUpdated).then(TableQUnitUtils.$wait(0)).then(function() {
+			}).then(oTable.qunit.whenNextRowsUpdated).then(TableQUnitUtils.wait(0)).then(function() {
 				oTable.invalidate();
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
@@ -2341,7 +2341,7 @@ sap.ui.define([
 
 			return oTable.qunit.whenRenderingFinished().then(function() {
 				oTable.setFirstVisibleRow(1);
-			}).then(TableQUnitUtils.$wait(0)).then(function() {
+			}).then(TableQUnitUtils.wait(0)).then(function() {
 				oTable.invalidate();
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
@@ -5587,7 +5587,7 @@ sap.ui.define([
 			return oTable.qunit.whenVSbScrolled();
 		}).then(function() {
 			oTableParentElement.removeChild(oTableElement);
-		}).then(TableQUnitUtils.$wait()).then(function() {
+		}).then(TableQUnitUtils.wait()).then(function() {
 			assert.strictEqual(oTable.getFirstVisibleRow(), 2,
 				"Remove DOM after scrolling with scrollbar: The firstVisibleRow is correct");
 
@@ -5598,8 +5598,8 @@ sap.ui.define([
 			return oTable.qunit.whenVSbScrolled();
 		}).then(function() {
 			oTableParentElement.removeChild(oTableElement);
-		}).then(TableQUnitUtils.$wait(300)).then(function() {
-			assert.strictEqual(oTable.getFirstVisibleRow(), 2,
+		}).then(TableQUnitUtils.wait(300)).then(function() {
+			assert.strictEqual(oTable.getFirstVisibleRow(), 4,
 				"Remove DOM after scrolling with scrollbar and large data scrolling enabled: The firstVisibleRow is correct");
 		});
 	});
@@ -5614,21 +5614,21 @@ sap.ui.define([
 			oTableParentElement = oTableElement.parentNode;
 			oTable.setFirstVisibleRow(5);
 			oTableParentElement.removeChild(oTableElement);
-		}).then(TableQUnitUtils.$wait()).then(function() {
+		}).then(TableQUnitUtils.wait()).then(function() {
 			assert.strictEqual(oTable.getFirstVisibleRow(), 5,
 				"Remove DOM synchronously after setting firstVisibleRow: The firstVisibleRow is correct");
 
 			oTable.setFirstVisibleRow(6);
-		}).then(TableQUnitUtils.$wait()).then(function() {
+		}).then(TableQUnitUtils.wait()).then(function() {
 			assert.strictEqual(oTable.getFirstVisibleRow(), 6,
 				"Set firstVisibleRow if DOM is removed: The firstVisibleRow is correct");
 
 		}).then(function() {
 			oTableParentElement.appendChild(oTableElement);
 			oTable.setFirstVisibleRow(5);
-		}).then(TableQUnitUtils.$wait()).then(function() {
+		}).then(TableQUnitUtils.wait()).then(function() {
 			oTableParentElement.removeChild(oTableElement);
-		}).then(TableQUnitUtils.$wait()).then(function() {
+		}).then(TableQUnitUtils.wait()).then(function() {
 			assert.strictEqual(oTable.getFirstVisibleRow(), 5,
 				"Remove DOM asynchronously after setting firstVisibleRow: The firstVisibleRow is correct");
 		});
@@ -5798,21 +5798,21 @@ sap.ui.define([
 
 		oTargetElement.scrollTop = 70;
 		oTargetElement.dispatchEvent(oWheelEvent);
-		await TableQUnitUtils.$wait(100);
+		await TableQUnitUtils.wait(100);
 		assert.ok(this.oTable._getScrollExtension().getVerticalScrollbar().scrollTop === 0, "TextArea is scrolled to bottom, Table did not scroll");
 		assert.ok(!oWheelEvent.defaultPrevented, "Default action was not prevented");
 		assert.ok(oStopPropagationSpy.notCalled, "Propagation was not stopped");
 
 		oWheelEvent = TableQUnitUtils.createMouseWheelEvent(-20, MouseWheelDeltaMode.PIXEL, false);
 		oTargetElement.dispatchEvent(oWheelEvent);
-		await TableQUnitUtils.$wait(100);
+		await TableQUnitUtils.wait(100);
 		assert.ok(this.oTable._getScrollExtension().getVerticalScrollbar().scrollTop === 0, "Table did not scroll");
 		assert.ok(!oWheelEvent.defaultPrevented, "Default action was not prevented");
 		assert.ok(oStopPropagationSpy.notCalled, "Propagation was not stopped");
 
 		oTargetElement.scrollTop = 0;
 		oTargetElement.dispatchEvent(oWheelEvent);
-		await TableQUnitUtils.$wait(100);
+		await TableQUnitUtils.wait(100);
 		assert.ok(this.oTable._getScrollExtension().getVerticalScrollbar().scrollTop === 0, "TextArea is scrolled to top, Table did not scroll");
 		assert.ok(!oWheelEvent.defaultPrevented, "Default action was not prevented");
 		assert.ok(oStopPropagationSpy.notCalled, "Propagation was not stopped");
@@ -6115,5 +6115,186 @@ sap.ui.define([
 		const oCell = this.oTable.qunit.getRowActionCell(1);
 		this.testTouchOnCell(assert, oCell, true);
 		this.testTouchOnCell(assert, oCell, false);
+	});
+
+	QUnit.module("LargeDataScrolling", {
+		beforeEach: function() {
+			this.oTable = TableQUnitUtils.createTable({
+				rowMode: new FixedRowMode({rowCount: 5}),
+				rows: {path: "/"},
+				models: TableQUnitUtils.createJSONModelWithEmptyRows(1000),
+				columns: [TableQUnitUtils.createTextColumn()]
+			});
+
+			return this.oTable.qunit.whenRenderingFinished();
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		},
+		makeBindingNonClient: function() {
+			const oBinding = this.oTable.getBinding();
+			const fnIsA = oBinding.isA.bind(oBinding);
+			sinon.stub(oBinding, "isA").callsFake(function(sType) {
+				return sType === "sap.ui.model.ClientListBinding" ? false : fnIsA(sType);
+			});
+		},
+		/**
+		 * Performs a fast scroll and returns once the scroll event has been processed.
+		 */
+		fastScroll: async function() {
+			const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
+			oVSb.dispatchEvent(new MouseEvent("mousedown")); // Seed the baseline for the speed calculation.
+			oVSb.scrollTop += 490; // 10 rows at once.
+			await this.oTable.qunit.whenVSbScrolled();
+		},
+		/**
+		 * Performs a slow scroll and returns once the scroll event has been processed.
+		 */
+		slowScroll: async function() {
+			const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
+			oVSb.dispatchEvent(new MouseEvent("mousedown")); // Seed the baseline for the speed calculation.
+			await TableQUnitUtils.wait(50); // Wait so that a 1-row delta is below the fast scroll threshold.
+			oVSb.scrollTop += 49; // One row.
+			await this.oTable.qunit.whenVSbScrolled();
+		},
+		assertSkeletons: function(bExpected, sPrefix) {
+			this.oTable.getRows().forEach(function(oRow, iIndex) {
+				QUnit.assert.equal(oRow.getDomRef().classList.contains("sapUiTableRowSkeleton"), bExpected,
+					(sPrefix ? sPrefix + ": " : "") + "Row " + iIndex + (bExpected ? " has" : " does not have") + " the skeleton class");
+			});
+		}
+	});
+
+	QUnit.test("Client model", async function(assert) {
+		const iInitialFirstVisibleRow = this.oTable.getFirstVisibleRow();
+
+		assert.ok(this.oTable.getBinding().isA("sap.ui.model.ClientListBinding"), "The binding is a client binding");
+
+		await this.fastScroll();
+		await TableQUnitUtils.wait(200);
+
+		assert.ok(this.oTable.getFirstVisibleRow() > iInitialFirstVisibleRow,
+			"firstVisibleRow is updated immediately - large data scrolling is not active for a client binding");
+		this.assertSkeletons(false);
+	});
+
+	QUnit.test("Non-client model - Slow scroll", async function(assert) {
+		const iInitialFirstVisibleRow = this.oTable.getFirstVisibleRow();
+
+		this.makeBindingNonClient();
+
+		await this.slowScroll();
+
+		assert.ok(this.oTable.getFirstVisibleRow() > iInitialFirstVisibleRow, "firstVisibleRow updated immediately for slow scroll (no debounce)");
+		this.assertSkeletons(false);
+	});
+
+	QUnit.test("Non-client model - Fast scroll", async function(assert) {
+		this.makeBindingNonClient();
+
+		const iInitialFirstVisibleRow = this.oTable.getFirstVisibleRow();
+		await this.fastScroll();
+		await TableQUnitUtils.wait(200);
+
+		assert.equal(this.oTable.getFirstVisibleRow(), iInitialFirstVisibleRow,
+			"firstVisibleRow not updated immediately for fast scroll (debounced 300ms)");
+		this.assertSkeletons(true);
+
+		await TableQUnitUtils.wait(200);
+		assert.ok(this.oTable.getFirstVisibleRow() > iInitialFirstVisibleRow, "firstVisibleRow updated after debounce for fast scroll");
+		this.assertSkeletons(false);
+	});
+
+	QUnit.test("Explicitly enabled with a client model - Fast scroll", async function(assert) {
+		this.oTable._setLargeDataScrolling(true);
+
+		const iInitialFirstVisibleRow = this.oTable.getFirstVisibleRow();
+		await this.fastScroll();
+		await TableQUnitUtils.wait(200);
+
+		assert.equal(this.oTable.getFirstVisibleRow(), iInitialFirstVisibleRow,
+			"firstVisibleRow not updated immediately for fast scroll - large data scrolling is active");
+		this.assertSkeletons(true);
+	});
+
+	QUnit.test("Explicitly disabled with a non-client model - Fast scroll", async function(assert) {
+		this.makeBindingNonClient();
+		this.oTable._setLargeDataScrolling(false);
+
+		const iInitialFirstVisibleRow = this.oTable.getFirstVisibleRow();
+		await this.fastScroll();
+		await TableQUnitUtils.wait(200);
+
+		assert.ok(this.oTable.getFirstVisibleRow() > iInitialFirstVisibleRow,
+			"firstVisibleRow is updated immediately - large data scrolling is not active");
+		this.assertSkeletons(false);
+	});
+
+	QUnit.test("Threshold combinations", async function(assert) {
+		this.makeBindingNonClient();
+		const oGetTotalRowCountStub = sinon.stub(this.oTable, "_getTotalRowCount");
+
+		const aTestCases = [
+			{threshold: 100, scrollThreshold: -1, totalRowCount: 501, expectLargeDataScrolling: true},
+			{threshold: 100, scrollThreshold: -1, totalRowCount: 500, expectLargeDataScrolling: false},
+			{threshold: 100, scrollThreshold: 200, totalRowCount: 1001, expectLargeDataScrolling: true},
+			{threshold: 100, scrollThreshold: 200, totalRowCount: 1000, expectLargeDataScrolling: false},
+			{threshold: 100, scrollThreshold: 0, totalRowCount: 100000, expectLargeDataScrolling: false}
+		];
+
+		for (const oTestCase of aTestCases) {
+			const sTitle = `threshold=${oTestCase.threshold}, scrollThreshold=${oTestCase.scrollThreshold}, totalRowCount=${oTestCase.totalRowCount}`;
+			this.oTable.setThreshold(oTestCase.threshold);
+			this.oTable.setScrollThreshold(oTestCase.scrollThreshold);
+			oGetTotalRowCountStub.returns(oTestCase.totalRowCount);
+
+			// Each case scrolls a bit further down; the position does not affect whether large data scrolling is active.
+			const iInitialFirstVisibleRow = this.oTable.getFirstVisibleRow();
+			await this.fastScroll();
+
+			// Observe the state within the debounce window (300ms). Large data scrolling is debounced, so the rows are not yet updated
+			// and skeletons are shown. Otherwise the rows are updated immediately without skeletons.
+			await TableQUnitUtils.wait(200);
+
+			if (oTestCase.expectLargeDataScrolling) {
+				assert.equal(this.oTable.getFirstVisibleRow(), iInitialFirstVisibleRow, sTitle + ": debounced update");
+				this.assertSkeletons(true, sTitle);
+			} else {
+				assert.ok(this.oTable.getFirstVisibleRow() > iInitialFirstVisibleRow, sTitle + ": immediate update");
+				this.assertSkeletons(false, sTitle);
+			}
+
+			// Wait for the (debounced) update to finish so the next case starts from a settled state.
+			await this.oTable.qunit.whenRenderingFinished();
+		}
+	});
+
+	QUnit.test("Fast scroll to the already rendered position", async function(assert) {
+		const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
+
+		this.makeBindingNonClient();
+
+		await this.fastScroll();
+		oVSb.scrollTop = 0; // Scroll back to previous position.
+		await this.oTable.qunit.whenVSbScrolled();
+		this.assertSkeletons(true);
+		await TableQUnitUtils.wait(500); // Wait for the debounce (300ms) and the update to finish.
+
+		// Even though no rows update was triggered, the skeletons must be cleared once the debounced update finishes.
+		this.assertSkeletons(false);
+	});
+
+	QUnit.test("Slow scroll while a fast scroll update is pending", async function(assert) {
+		this.makeBindingNonClient();
+
+		await this.fastScroll();
+		const iFastScrollFirstVisibleRow = this.oTable.getFirstVisibleRow();
+		this.assertSkeletons(true);
+
+		// Continue scrolling slowly before the debounced fast scroll elapses.
+		await this.slowScroll();
+
+		assert.ok(this.oTable.getFirstVisibleRow() > iFastScrollFirstVisibleRow, "firstVisibleRow updated immediately for the slow scroll");
+		this.assertSkeletons(false);
 	});
 });

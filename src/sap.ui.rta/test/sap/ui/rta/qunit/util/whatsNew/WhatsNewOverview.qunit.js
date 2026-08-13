@@ -187,7 +187,15 @@ sap.ui.define([
 					formatSaveAsAppVariants: sinon.stub(),
 					saveAs: sinon.stub(),
 					openWhatsNewOverviewDialog: sinon.stub(),
-					openGuidedTour: sinon.stub()
+					openGuidedTour: sinon.stub(),
+					formatAdaptationsMenuText: sinon.stub(),
+					saveAsAdaptation: sinon.stub(),
+					editAdaptation: sinon.stub(),
+					deleteAdaptation: sinon.stub(),
+					manageAdaptations: sinon.stub(),
+					switchAdaptation: sinon.stub(),
+					highlightAllChanges: sinon.stub(),
+					showFeedbackForm: sinon.stub()
 				}
 			});
 			assert.ok(oFragment, "ActionsMenu fragment is loaded successfully");

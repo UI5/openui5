@@ -1963,4 +1963,51 @@ sap.ui.define([
 		oMessagePopover.destroy();
 		runAllTimersAndRestore(this.clock, true);
 	});
+
+	QUnit.test("Details page title reflects the latest message when a new message arrives while closed", async function (assert) {
+		// Arrange: single-item popover, open once so the details page is shown
+		this.clock = sinon.useFakeTimers();
+		this.oMessagePopover.openBy(this.oButton);
+		this.clock.tick(500);
+		await nextUIUpdate(this.clock);
+
+		var oMessageView = this.oMessagePopover._oMessageView;
+
+		assert.strictEqual(
+			oMessageView._navContainer.getCurrentPage().getId(),
+			oMessageView._detailsPage.getId(),
+			"Precondition: details page is shown initially for a single item"
+		);
+
+		// Close the popover
+		this.oMessagePopover.close();
+		this.clock.tick(500);
+		await nextUIUpdate(this.clock);
+
+		// Act: while the popover is closed, replace the single item with a new message
+		this.oMessagePopover.getItems()[0].destroy();
+		this.oMessagePopover.addItem(new MessageItem({ title: "Brand New Message", description: "New description" }));
+		await nextUIUpdate(this.clock);
+
+		// Reopen the popover
+		this.oMessagePopover.openBy(this.oButton);
+		this.clock.tick(500);
+		await nextUIUpdate(this.clock);
+
+		// Assert: the details page title is refreshed with the latest message (not the stale one)
+		assert.strictEqual(
+			oMessageView._navContainer.getCurrentPage().getId(),
+			oMessageView._detailsPage.getId(),
+			"Details page is shown on reopen for a single item"
+		);
+		var oContentTitle = Element.getElementById(oMessageView.getId() + "MessageTitleText");
+		assert.ok(oContentTitle, "Details page title control exists");
+		assert.strictEqual(
+			oContentTitle.getText(),
+			"Brand New Message",
+			"Details page title is updated to the latest message received while the popover was closed"
+		);
+
+		runAllTimersAndRestore(this.clock, true);
+	});
 });
