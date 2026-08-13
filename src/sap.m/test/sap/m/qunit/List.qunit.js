@@ -2484,6 +2484,25 @@ sap.ui.define([
 		oItem.destroy();
 	});
 
+	QUnit.test("ListItemBase - getGroupAnnouncement", async function(assert) {
+		const oGroupHeader = new GroupHeaderListItem({ title: "My Group" });
+		const oItem = new StandardListItem({ title: "Item" });
+		const oList = new List({ items: [oGroupHeader, oItem] });
+
+		oList.applyAriaRole("listbox");
+		oList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		assert.strictEqual(oItem.getGroupAnnouncement(), "My Group", "Regular item returns group header text when list role is listbox");
+
+		assert.strictEqual(oGroupHeader.getGroupAnnouncement(), "", "Group header item returns empty string");
+
+		oList.applyAriaRole("list");
+		assert.strictEqual(oItem.getGroupAnnouncement(), "", "Regular item returns empty string when list role is not listbox");
+
+		oList.destroy();
+	});
+
 	QUnit.module("ARIA role", {
 		beforeEach: function() {
 			this.oSLI = new StandardListItem();
