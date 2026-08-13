@@ -269,6 +269,16 @@ sap.ui.define(["sap/ui/Device"], function (Device) {
 					]
 				}
 			},
+			"SortFlexOrphanedMoveSortJourney": {
+				group: "Table UI Test",
+				autostart: false,
+				module: "./OpaTests/SortFlexOrphanedMoveSortJourney.qunit",
+				ui5: {
+					libs: [
+						"sap.ui.fl", "sap.ui.mdc"
+					]
+				}
+			},
 			"PersonalizationDynamicProperties": {
 				group: "Table UI Test",
 				autostart: false,
