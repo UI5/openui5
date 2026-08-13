@@ -24,13 +24,11 @@ sap.ui.define([
 	"sap/base/util/Version",
 	"sap/ui/util/openWindow",
 	"sap/ui/documentation/sdk/model/formatter",
-	"sap/m/ResponsivePopover",
-	"sap/ui/documentation/sdk/controller/util/Highlighter",
 	"sap/m/Button",
-	"sap/m/Toolbar",
 	"sap/ui/documentation/sdk/util/Resources",
 	'sap/base/util/LoaderExtensions',
-	"sap/ui/documentation/sdk/controller/util/ThemePicker"
+	"sap/ui/documentation/sdk/controller/util/ThemePicker",
+	"sap/ui/documentation/sdk/controller/util/SearchRenderer"
 ], function(
 	Localization,
 	Element,
@@ -53,13 +51,11 @@ sap.ui.define([
 	Version,
 	openWindow,
 	globalFormatter,
-	ResponsivePopover,
-	Highlighter,
 	Button,
-	Toolbar,
 	ResourcesUtil,
 	LoaderExtensions,
-	ThemePicker
+	ThemePicker,
+	SearchRenderer
 ) {
 	"use strict";
 
@@ -142,7 +138,6 @@ sap.ui.define([
 				bShowVersionSwitchButton: false,
 				bLandscape: Device.orientation.landscape,
 				bHasMaster: false,
-				bSearchMode: false,
 				bHideTopicSection: !!window['sap-ui-documentation-hideTopicSection'],
 				bHideApiSection: !!window['sap-ui-documentation-hideApiSection'],
 				sAboutInfoSAPUI5: "Looking for the Demo Kit for a specific SAPUI5 version? " +
@@ -160,6 +155,10 @@ sap.ui.define([
 			var oController = this;
 
 			ThemePicker.init(oController);
+
+			this.getModel("i18n").getResourceBundle().then(function (oBundle) {
+				this._oI18nBundle = oBundle;
+			}.bind(this));
 
 			this.MENU_LINKS_MAP = {
 				"copyright": "https://www.sap.com/corporate/en/legal/copyright.html",
@@ -274,7 +273,7 @@ sap.ui.define([
 			}.bind(this));
 
 			// Handle page resize
-			ResizeHandler.register(this._demoKitPage, this.onPageResize.bind(this));
+			this._sResizeHandlerId = ResizeHandler.register(this._demoKitPage, this.onPageResize.bind(this));
 		},
 
 		onBeforeRendering: function () {
@@ -290,16 +289,16 @@ sap.ui.define([
 			Device.orientation.attachHandler(this._onOrientationChange, this);
 
 			this._syncNewsModelWithNewsInfo();
-
-			// Adds additional class in order to manipulate the version switch button content in the header
-			this._adjustVersionSwitchButton();
 		},
 
 		onExit: function () {
 			Device.orientation.detachHandler(this._onOrientationChange, this);
 
-			if (this.highlighter) {
-				this.highlighter.destroy();
+			clearTimeout(this._iSearchDebounceTimer);
+
+			if (this._sResizeHandlerId) {
+				ResizeHandler.deregister(this._sResizeHandlerId);
+				this._sResizeHandlerId = null;
 			}
 
 			this._oCookiesConsentManager = null;
@@ -409,7 +408,7 @@ sap.ui.define([
 		},
 
 		onNewsButtonPress: function (oEvent) {
-			var oButton = oEvent.getSource(),
+			var oOpener = oEvent.getParameter("targetRef"),
 				oView = this.getView();
 
 			if (this._oNewsModel.getProperty("/newsCount") === 0) {
@@ -421,10 +420,10 @@ sap.ui.define([
 				}).then(function (oPopover) {
 					oView.addDependent(oPopover);
 					this._oNewsPopover = oPopover;
-					this._oNewsPopover.openBy(oButton);
+					this._oNewsPopover.openBy(oOpener);
 				}.bind(this));
 			} else {
-				this._oNewsPopover.openBy(oButton);
+				this._oNewsPopover.openBy(oOpener);
 			}
 		},
 
@@ -508,8 +507,47 @@ sap.ui.define([
 			this._oNewsModel.setProperty("/newsPreparationFailureMessage", sPreparationFailureMessage);
 		},
 
+		/**
+		 * Opens the policies (legal) menu anchored to its button.
+		 *
+		 * @param {sap.ui.base.Event} oEvent The button's click event
+		 */
+		onOpenPoliciesMenu: function (oEvent) {
+			this._openHeaderMenu("policiesMenu", oEvent.getSource());
+		},
+
+		/**
+		 * Opens the settings/about menu anchored to its button.
+		 *
+		 * @param {sap.ui.base.Event} oEvent The button's click event
+		 */
+		onOpenAboutMenu: function (oEvent) {
+			this._openHeaderMenu("aboutMenu", oEvent.getSource());
+		},
+
+		/**
+		 * Opens a header Web Component menu below the given opener.
+		 *
+		 * @param {string} sMenuId The stable (non-prefixed) id of the menu control
+		 * @param {sap.ui.core.Control} oOpener The control that triggered the menu
+		 * @private
+		 */
+		_openHeaderMenu: function (sMenuId, oOpener) {
+			var oMenu = this.byId(sMenuId);
+
+			// The opener must be a control (or its id): a UI5 association does not accept
+			// a raw DOM node, so passing the click event's targetRef would leave the
+			// menu unanchored (positioned at the top-left of the page).
+			oMenu.setAssociation("opener", oOpener);
+			oMenu.setOpen(true);
+		},
+
 		onMenuButtonItemSelected: function (oEvent) {
-			var sTargetText = oEvent.getParameter("item").getKey(),
+			var oItem = oEvent.getParameter("item"),
+				oKeyData = oItem && oItem.getCustomData().find(function (oData) {
+					return oData.getKey() === "action";
+				}),
+				sTargetText = oKeyData ? oKeyData.getValue() : undefined,
 				sTarget = this.MENU_LINKS_MAP[sTargetText];
 
 			if (sTargetText === ABOUT_TEXT) {
@@ -530,180 +568,6 @@ sap.ui.define([
 				URLHelper.redirect(sTarget, true);
 			}
 			this.sTarget = sTarget;
-		},
-
-		createSearchPopover: function () {
-			var PlacementType = mobileLibrary.PlacementType,
-				searchInput = this.getView().byId("searchControl"),
-				oPopover = new ResponsivePopover({
-					showArrow: false,
-					showHeader: false,
-					contentWidth: "600px",
-					placement: PlacementType.Vertical,
-					horizontalScrolling: false,
-					initialFocus: this.getView().byId("searchControl-searchField")
-				}).addStyleClass("sapMSltPicker-CTX");
-
-			// implement the same <code>open</code> function as in the dialog
-			// to allow the controller open the search picker regardless its type (popover or dialog)
-			oPopover.open = function () {
-				oPopover.openBy(searchInput);
-			};
-
-			this.getView().addDependent(oPopover);
-
-			return oPopover;
-		},
-
-		createSearchPicker: function () {
-			var oPicker = Device.system.phone ? this.createSearchDialog() : this.createSearchPopover();
-			this.createSearchPickerContent().then(function (oContent) {
-				oPicker.addContent(oContent);
-			});
-			return oPicker;
-		},
-
-		createSearchDialog: function () {
-			var dialog,
-				originalValue,
-				dialogSearchField,
-				customHeader,
-				okButton,
-				closeButton,
-				bSearchRequested;
-
-			var oInput = this.getView().byId("searchControl");
-
-			// Helper functions
-			function handleDialogButtonPress() {
-				var sCurrentSearchValue = oInput.getValue();
-
-				if (sCurrentSearchValue !== originalValue) {
-					oInput._updateValue(sCurrentSearchValue);
-					oInput.fireLiveChange({ newValue: sCurrentSearchValue });
-				} else {
-					oInput.fireLiveChange({ newValue: originalValue });
-				}
-
-				dialog.close();
-				oInput._toggleOpen(false);
-			}
-
-			function moveCursorToEnd(el) {
-				if (typeof el.selectionStart == "number") {
-					el.selectionStart = el.selectionEnd = el.value.length;
-				} else if (typeof el.createTextRange != "undefined") {
-					el.focus();
-					var range = el.createTextRange();
-					range.collapse(false);
-					range.select();
-				}
-			}
-
-			// use sap.ui.require to avoid circular dependency between the SearchField and Suggest
-			dialogSearchField = new (sap.ui.require('sap/m/SearchField'))({
-				liveChange: function (oEvent) {
-					var value = oEvent.getParameter("newValue");
-					oInput._updateValue(value);
-					oInput.fireLiveChange({ newValue: value });
-				},
-				search: function (oEvent) {
-					if (!oEvent.getParameter("clearButtonPressed")) {
-						dialog.close();
-						bSearchRequested = true;
-					}
-				}
-			});
-
-			closeButton = new Button({
-				icon: "sap-icon://decline",
-				press: function () {
-					handleDialogButtonPress();
-				}
-			});
-
-			customHeader = new Toolbar({
-				content: [dialogSearchField, closeButton]
-			});
-
-			okButton = new Button({
-				text: Library.getResourceBundleFor("sap.m").getText("MSGBOX_OK"),
-				press: function () {
-					handleDialogButtonPress();
-				}
-			});
-
-			dialog = new (sap.ui.require('sap/m/Dialog'))({
-				stretch: true,
-				customHeader: customHeader,
-				beginButton: okButton,
-				beforeClose: function () {
-					oInput._bSuggestionSuppressed = true;
-				},
-				beforeOpen: function () {
-					originalValue = oInput.getValue();
-					dialogSearchField._updateValue(originalValue);
-					bSearchRequested = false; // reset flag
-				},
-				afterOpen: function () {
-					var $input = dialogSearchField.$().find('input');
-					$input.trigger("focus");
-					moveCursorToEnd($input.get(0));
-				},
-				afterClose: function (oEvent) {
-					if (bSearchRequested) { // fire the search event if not cancelled
-						oInput.fireSearch({
-							query: oInput.getValue(),
-							clearButtonPressed: false
-						});
-					}
-
-					oInput._toggleOpen(false);
-				}
-			});
-
-			this.getView().addDependent(dialog);
-
-			return dialog;
-		},
-
-		openSearchPicker: function () {
-			if (!this.oPicker) {
-				this.oPicker = this.createSearchPicker();
-			}
-
-			if (!this.oPicker.isOpen()) {
-				this.oPicker.open();
-			}
-		},
-
-		createSearchPickerContent: function () {
-			return Fragment.load({
-				name: "sap.ui.documentation.sdk.view.GlobalSearchPicker",
-				controller: this
-			}).then(function (oContent) {
-
-				var oShortList = Element.getElementById("shortList"),
-					oController = this,
-					sSearchQuery;
-
-				oShortList.addEventDelegate({
-					onAfterRendering: function () {
-						var oConfig = {
-							useExternalStyles: false,
-							shouldBeObserved: true,
-							isCaseSensitive: false
-						};
-
-						oController.highlighter = new Highlighter(oShortList.getDomRef(), oConfig);
-						sSearchQuery = oController.getModel("searchData").getProperty("/query");
-						sSearchQuery && oController.highlighter.highlight(sSearchQuery);
-						oShortList.removeEventDelegate(this);
-					}
-				});
-
-				return oContent;
-			}.bind(this));
 		},
 
 		initSearch: function () {
@@ -728,61 +592,6 @@ sap.ui.define([
 					});
 				}.bind(this));
 			}.bind(this));
-		},
-
-		getSearchPickerTitle: function (oContext) {
-			var getMessageBundle = Library.getResourceBundleFor("sap.ui.documentation"),
-				sTitle;
-
-			switch (this.getModel("searchData").getProperty("/preferencedCategory")) {
-				case "topics":
-					sTitle = getMessageBundle.getText("SEARCH_SUGGESTIONS_TITLE_DOCUMENTATION");
-					break;
-				case "apiref":
-					sTitle = getMessageBundle.getText("SEARCH_SUGGESTIONS_TITLE_API_REFERENCE");
-					break;
-				case "entity":
-					sTitle = getMessageBundle.getText("SEARCH_SUGGESTIONS_TITLE_SAMPLES");
-					break;
-				default:
-					sTitle = getMessageBundle.getText("SEARCH_SUGGESTIONS_TITLE_ALL");
-			}
-
-			return sTitle;
-		},
-
-		formatSuggestionTitle: function (sTitle, sSummary) {
-			var sFormatted = sTitle || "";
-			if (sSummary) {
-				sFormatted += ": " + sSummary;
-			}
-			return sFormatted;
-		},
-
-		onSearchResultsSummaryPress: function (oEvent) {
-			var sCategory = oEvent.oSource.data("category");
-			this.navToSearchResults(sCategory);
-		},
-
-		onSearchPickerItemPress: function (oEvent) {
-			var contextPath = oEvent.oSource.getBindingContextPath(),
-				oDataItem = this.getModel("searchData").getProperty(contextPath),
-				oSearchDataModel = this.getOwnerComponent().getModel("searchData"),
-				sQuery = oSearchDataModel.getProperty("/query"),
-				isDocumentationItem = oDataItem.category === "Documentation",
-				baseURL = oDataItem.external ? new URL(oDataItem.path, document.baseURI).href : oDataItem.path;
-
-			if (sQuery && isDocumentationItem) {
-				baseURL += `?q=${encodeURIComponent(sQuery)}`;
-			}
-
-			if (oDataItem.external) {
-				openWindow(baseURL);
-			} else {
-				this.getRouter().parsePath(baseURL);
-			}
-
-			this.oPicker.close();
 		},
 
 		/**
@@ -1319,7 +1128,8 @@ sap.ui.define([
 		 * @param {boolean} bMenu Whether the pressed button is hidden in the 'About' menu
 		 */
 		launchSurvey: function (oEvent, bMenu) {
-			var oTarget = this.byId(!bMenu ? "surveyButton" : "aboutMenuButton"),
+			var oTarget = (oEvent && oEvent.getParameter && oEvent.getParameter("targetRef"))
+					|| this.byId(bMenu ? "aboutMenuButton" : "surveyButton"),
 				oView = this.getView(),
 				oViewModel = this.getModel("appView"),
 				bShowLongSurvey = oViewModel.getProperty("/bShowLongSurvey");
@@ -1440,14 +1250,56 @@ sap.ui.define([
 		},
 
 		onSearch: function (oEvent) {
-			var sQuery = encodeURIComponent(oEvent.getParameter("query"));
+			var oItem = oEvent.getParameter("item"),
+				// Use the model query as the authoritative value — the DOM value may have
+				// been replaced by ShellBarSearch typeahead autocomplete (e.g. "g" → "Git Guidelines").
+				sQuery = this.getModel("searchData").getProperty("/query") || "";
 
-			if (!sQuery) {
-				return;
+			if (oItem) {
+				var oPayload = typeof oItem.data === "function" ? oItem.data("_payload") : null;
+				if (!oPayload) { return; }
+
+				switch (oPayload.type) {
+					case "noData":
+						return;
+					case "allResults":
+						this.navToSearchResults();
+						this._restoreSearchValue(sQuery);
+						return;
+					case "category":
+						if (sQuery) {
+							this.getRouter().navTo("search", { searchParam: encodeURIComponent(sQuery), "?options": { category: oPayload.key } }, false);
+						}
+						this._restoreSearchValue(sQuery);
+						return;
+					case "result":
+						var sItemText = oPayload.item.summary ? oPayload.item.title + ": " + oPayload.item.summary : (oPayload.item.title || sQuery);
+						this._navigateToSearchItem(oPayload.item, sQuery);
+						this._restoreSearchValue(sItemText);
+						return;
+				}
 			}
 
-			this.getRouter().navTo("search", { searchParam: sQuery }, false);
-			this.oPicker.close();
+			// Plain Enter — fall back to DOM value in case model hasn't updated yet (e.g. paste)
+			sQuery = sQuery || this._getSearchValue();
+			if (!sQuery) { return; }
+			this.getRouter().navTo("search", { searchParam: encodeURIComponent(sQuery) }, false);
+		},
+
+		/**
+		 * Navigates to a selected search result item (internal route or external link).
+		 *
+		 * @param {object} oDataItem The search match backing the selected suggestion item
+		 * @param {string} sQuery    The current search query (appended to Documentation links)
+		 * @private
+		 */
+		_navigateToSearchItem: function (oDataItem, sQuery) {
+			if (oDataItem.external) {
+				openWindow(new URL(oDataItem.path, document.baseURI).href);
+			} else {
+				var sPath = oDataItem.path + (sQuery && oDataItem.category === "Documentation" ? "?q=" + encodeURIComponent(sQuery) : "");
+				this.getRouter().parsePath(sPath);
+			}
 		},
 
 		navToSearchResults: function (sCategory) {
@@ -1465,7 +1317,7 @@ sap.ui.define([
 			}
 
 			this.getRouter().navTo("search", oRouterParams, true);
-			this.oPicker.close();
+			if (this._getSearchControl()) { SearchRenderer.clear(this._getSearchControl()); }
 		},
 
 		/**
@@ -1476,35 +1328,172 @@ sap.ui.define([
 		 * @param {Object} oEvent - The live change event object.
 		 * @returns {void}
 		 */
-		onSearchLiveChange: function (oEvent) {
-			var oModel = this.getModel("searchData"),
-				sQuery = oEvent.getParameter("newValue"),
-				sPreferencedCategory = oModel.getProperty("/preferencedCategory"),
-				bIncludeDeprecated = oModel.getProperty("/includeDeprecated");
+		onSearchLiveChange: function (/* oEvent */) {
+			// ShellBarSearch fires an input event without a value parameter — read value from DOM directly.
+			var sQuery = this._getSearchValue();
+			this.getModel("searchData").setProperty("/query", sQuery);
 
-			// Handle the case when the user deletes the query and the search picker is open
-			// Only on desktop, because on mobile we don't want to close the picker
-			if (!sQuery && Device.system.desktop) {
-				if (this.oPicker && this.oPicker.isOpen()) {
-					this.oPicker.close();
-				}
+			clearTimeout(this._iSearchDebounceTimer);
 
+			if (!sQuery) {
+				this._setSearchMode(false);
 				return;
 			}
 
-			this.openSearchPicker();
+			// Show the popup loading indicator during the debounce + async lookup window,
+			// so the suggest panel shows a spinner rather than a transient "No data" state.
+			this._setSearchLoading(true);
+			this._iSearchDebounceTimer = setTimeout(this._executeSearch.bind(this, sQuery), 200);
+		},
 
-			if (this.highlighter) {
-				this.highlighter.highlight(sQuery);
-			}
+		_executeSearch: function (sQuery) {
+			var oSearchModel = this.getModel("searchData");
+			this._sLastSearchQuery = sQuery;
 
-			oModel.setProperty("/query", sQuery);
 			SearchUtil.search(sQuery, {
-				preferencedCategory: sPreferencedCategory,
-				includeDeprecated: bIncludeDeprecated
+				preferencedCategory: oSearchModel.getProperty("/preferencedCategory"),
+				includeDeprecated: oSearchModel.getProperty("/includeDeprecated")
 			}).then(function (result) {
-				oModel.setProperty("/matches", result.matches);
-			});
+
+				if (sQuery !== this._sLastSearchQuery) { return; }
+
+				this._setSearchLoading(false);
+
+				if (!result) {
+					if (this._getSearchControl()) { SearchRenderer.clear(this._getSearchControl()); }
+					oSearchModel.setProperty("/messageAreaText", "");
+					return;
+				}
+
+				var oMatches = result.matches,
+					aTop10 = (oMatches.filteredData || []).slice(0, 10),
+					oCounts = {
+						AllLength:     oMatches.AllLength || 0,
+						APILength:     (oMatches.aDataAPI || []).length,
+						DocLength:     (oMatches.aDataDoc || []).length,
+						SamplesLength: (oMatches.aDataExplored || []).length,
+						ExternalLength:(oMatches.aDataExternal || []).length
+					};
+
+				oSearchModel.setProperty("/matches", {
+					filteredData:  aTop10,
+					data:          oMatches.data || [],
+					aDataAPI:      oMatches.aDataAPI || [],
+					aDataDoc:      oMatches.aDataDoc || [],
+					aDataExplored: oMatches.aDataExplored || [],
+					aDataExternal: oMatches.aDataExternal || [],
+					AllLength:     oCounts.AllLength,
+					APILength:     oCounts.APILength,
+					DocLength:     oCounts.DocLength,
+					ExploredLength:oCounts.SamplesLength,
+					SamplesLength: oCounts.SamplesLength,
+					ExternalLength:oCounts.ExternalLength
+				});
+
+				this._renderSearchResults(aTop10, oCounts);
+			}.bind(this)).catch(function () {
+				if (sQuery === this._sLastSearchQuery) {
+					this._setSearchLoading(false);
+				}
+			}.bind(this));
+		},
+
+		/**
+		 * Restores the input value after ShellBarSearch overwrites it on item selection.
+		 * The component sets its own value after the search event fires (post-click microtask),
+		 * so the restore must be deferred past that with setTimeout(0).
+		 *
+		 *
+		 * @param {string} sQuery The value to restore into the search field
+		 * @private
+		 */
+		_restoreSearchValue: function (sQuery) {
+			setTimeout(function () {
+				var oCtrl = this._getSearchControl();
+				if (oCtrl) {
+					oCtrl.setValue(sQuery);
+				}
+			}.bind(this), 0);
+		},
+
+		/**
+		 * Returns the cached searchControl instance, resolving it once via byId.
+		 *
+		 * @returns {sap.ui.core.Control|undefined} The search control, or undefined if not yet rendered
+		 * @private
+		 */
+		_getSearchControl: function () {
+			if (!this._oSearchControl) {
+				this._oSearchControl = this.byId("searchControl");
+				if (this._oSearchControl) {
+					this._oSearchControl.addEventDelegate({
+						onfocusin: this._onSuggestionItemFocusIn.bind(this)
+					});
+				}
+			}
+			return this._oSearchControl;
+		},
+
+		/**
+		 * Keeps the actual user query in the search field while arrow-navigating the
+		 * suggestion list.
+		 *
+		 * On item focus the ShellBarSearch web component copies the focused item's
+		 * text into the field value. That is meaningful for real result items, but
+		 * the "All" and per-category entries are navigation shortcuts rather than
+		 * search suggestions, so their labels (e.g. "All (1028)") must not appear in
+		 * the field. When such an item is focused, the user's query is restored.
+		 *
+		 * @param {jQuery.Event} oEvent The focusin event
+		 * @private
+		 */
+		_onSuggestionItemFocusIn: function (oEvent) {
+			var oNode = oEvent.target;
+			if (!oNode || !oNode.id) { return; }
+
+			var oItem = Element.getElementById(oNode.id),
+				oPayload = oItem && typeof oItem.data === "function" ? oItem.data("_payload") : null;
+
+			// Only result items may replace the field value with their own text;
+			// "allResults", "category" and "noData" entries keep the user's query.
+			if (!oPayload || oPayload.type === "result") { return; }
+
+			this._getSearchControl().setValue(this.getModel("searchData").getProperty("/query") || "");
+		},
+
+		/**
+		 * Reads the current input value from the ShellBarSearch control.
+		 * ShellBarSearch fires input events without a value parameter, so the
+		 * value is read from the control property instead.
+		 *
+		 * @returns {string} The current search field value (empty string if unavailable)
+		 * @private
+		 */
+		_getSearchValue: function () {
+			return this._getSearchControl() ? this._getSearchControl().getValue().trim() : "";
+		},
+
+		/**
+		 * Toggles the ShellBarSearch popup loading indicator, shown while a search
+		 * is pending (debounce + async lookup) so the suggest panel displays a
+		 * spinner instead of an empty "No data" state.
+		 *
+		 * @param {boolean} bLoading true to show the loading indicator, false to hide it
+		 * @private
+		 */
+		_setSearchLoading: function (bLoading) {
+			if (this._getSearchControl()) {
+				this._getSearchControl().setLoading(!!bLoading);
+			}
+		},
+
+		_renderSearchResults: function (aItems, oCounts) {
+			if (!this._getSearchControl()) { return; }
+
+			var bPhone = this.getModel("appView").getProperty("/bPhoneSize"),
+				oSearchModel = this.getModel("searchData");
+
+			SearchRenderer.render(this._getSearchControl(), aItems, oCounts, this._oI18nBundle, bPhone, oSearchModel);
 		},
 
 		/**
@@ -1531,10 +1520,6 @@ sap.ui.define([
 
 			if (bDesktopSize !== oViewModel.getProperty("/bDesktopSize")) {
 				oViewModel.setProperty("/bDesktopSize", bDesktopSize);
-
-				setTimeout(function () {
-					this._updateSearchFieldState();
-				}.bind(this), 0);
 			}
 		},
 
@@ -1546,21 +1531,74 @@ sap.ui.define([
 			this.getModel("appView").setProperty("/bLandscape", Device.orientation.landscape);
 		},
 
-		onToggleSearchMode: function (oEvent) {
-			var bSearchMode = oEvent.getParameter("isOpen"),
-				oViewModel = this.getModel("appView");
+		/**
+		 * Handles the ShellBar search field expanding or collapsing on phone.
+		 * When it expands with an empty field, proactively open the suggestion
+		 * popup with the category empty-state so it is not blank.
+		 *
+		 * @param {sap.ui.base.Event} oEvent
+		 */
+		onSearchFieldToggle: function (oEvent) {
+			var bOpen = oEvent.getParameter("expanded");
+			if (!bOpen) { return; }
+			var bPhone = this.getModel("appView").getProperty("/bPhoneSize");
+			if (!bPhone) { return; }
+			if (!this._getSearchControl()) { return; }
+			this._setSearchMode(true);
+			this._getSearchControl().setOpen(true);
+		},
 
-			// This flag is used to hide action buttons when search is opened
-			oViewModel.setProperty("/bSearchMode", bSearchMode);
+		/**
+		 * Handles the closing of the search suggestion popup.
+		 *
+		 * @returns {void}
+		 */
+		onSearchClose: function () {
+			this._setSearchMode(false);
+		},
 
-			if (bSearchMode) {
-				setTimeout(function () {
-					if (Device.system.desktop) {
-						this._oView.byId("searchControl").getAggregation("_searchField").getFocusDomRef().focus();
-					} else {
-						this.openSearchPicker();
-					}
-				}.bind(this), 0);
+		/**
+		 * Populates or resets the suggestion popup for the current search state.
+		 *
+		 * @param {boolean} bOpen Whether the search popup is open
+		 * @private
+		 */
+		_setSearchMode: function (bOpen) {
+			var oViewModel = this.getModel("appView");
+			if (!bOpen) {
+				if (this._getSearchControl()) { SearchRenderer.clear(this._getSearchControl()); }
+				this._setSearchLoading(false);
+				return;
+			}
+
+			var bPhone = oViewModel.getProperty("/bPhoneSize");
+			if (bPhone) {
+				var oSearchModel = this.getModel("searchData"),
+					sQuery = oSearchModel.getProperty("/query"),
+					sCurrentValue = this._getSearchValue(),
+					oMatches = oSearchModel.getProperty("/matches");
+				if (sCurrentValue && sCurrentValue !== sQuery) {
+					oSearchModel.setProperty("/query", sCurrentValue);
+					this._setSearchLoading(true);
+					this._executeSearch(sCurrentValue);
+					return;
+				}
+				if (sQuery && oMatches) {
+					var aTop10 = oMatches.filteredData || [],
+						oCounts = {
+							AllLength:     oMatches.AllLength || 0,
+							APILength:     oMatches.APILength || 0,
+							DocLength:     oMatches.DocLength || 0,
+							SamplesLength: oMatches.SamplesLength || 0,
+							ExternalLength:oMatches.ExternalLength || 0
+						};
+					SearchRenderer.render(this._getSearchControl(), aTop10, oCounts, this._oI18nBundle, bPhone, oSearchModel);
+					return;
+				}
+			}
+
+			if (this._getSearchControl()) {
+				bPhone ? SearchRenderer.renderEmptyState(this._getSearchControl(), this._oI18nBundle) : SearchRenderer.clear(this._getSearchControl());
 			}
 		},
 
@@ -1770,26 +1808,6 @@ sap.ui.define([
 		},
 
 		/**
-		 * Updates the state of the search field.
-		 * Expand/collapse the search field depending on the screen size.
-		 * Hide/show header button actions if the search field is expanded/collapsed.
-		 *
-		 * @returns {void}
-		 */
-		_updateSearchFieldState: function () {
-			var oViewModel = this.getModel("appView"),
-				bDesktopSize = oViewModel.getProperty("/bDesktopSize"),
-				oClosingButton = this.byId("searchControl").getAggregation("_closingButton");
-
-			if (bDesktopSize) {
-				oViewModel.setProperty("/bSearchMode", false);
-				oClosingButton.setVisible(false);
-			} else {
-				oClosingButton.setVisible(true);
-			}
-		},
-
-		/**
 		 * Sets the selected section title based on the provided key.
 		 *
 		 * @param {string} sKey - The key of the selected section.
@@ -1810,32 +1828,6 @@ sap.ui.define([
 
 			var selectedItem = items.find(function (item) { return item.key === sKey; });
 			oViewModel.setProperty("/selectedSectionTitle", selectedItem.text);
-		},
-
-		/**
-		 * Tweak the appearance of the version switch button.
-		 * This function adds a CSS class to the button's text content DOM element
-		 * to customize its styling after rendering.
-		 *
-		 * @returns {void} This function does not return a value.
-		 */
-		_adjustVersionSwitchButton: function () {
-			var oVersionSwitchButton = this.byId("versionSwitchButton");
-
-			if (oVersionSwitchButton) {
-				oVersionSwitchButton.addEventDelegate({
-					onAfterRendering: function () {
-						var oVersionSwitchButtonDomRef = oVersionSwitchButton.getDomRef(),
-							oVersionSwitchButtonTextContentDomRef = oVersionSwitchButtonDomRef.querySelector(".sapMBtnContent");
-
-						if (oVersionSwitchButtonTextContentDomRef) {
-							if (!oVersionSwitchButtonTextContentDomRef.classList.contains("sapUiDemoKitHeaderActionsVersionSwitchTextContent")) {
-								oVersionSwitchButtonTextContentDomRef.classList.add("sapUiDemoKitHeaderActionsVersionSwitchTextContent");
-							}
-						}
-					}
-				});
-			}
 		}
 	});
 });

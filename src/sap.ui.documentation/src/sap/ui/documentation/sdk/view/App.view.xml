@@ -4,219 +4,121 @@
 	xmlns:tnt="sap.tnt"
 	xmlns:core="sap.ui.core"
 	xmlns:mvc="sap.ui.core.mvc"
-	xmlns:grid="sap.ui.layout.cssgrid"
-	xmlns:custom="sap.ui.documentation"
+	xmlns:webcc="sap.f.gen.ui5.webcomponents.dist"
+	xmlns:fiori="sap.f.gen.ui5.webcomponents_fiori.dist"
 	displayBlock="true"
 	busy="{appView>/busy}"
-	busyIndicatorDelay="{appView>/delay}">
-
+	busyIndicatorDelay="{appView>/delay}"
+	core:require="{ allIcons: 'sap/f/thirdparty/ui5/webcomponents_icons/AllIcons' }">
 	<tnt:ToolPage id="demoKitPage" class="sapUiDemokit">
 		<tnt:header>
-			<tnt:ToolHeader id="demoKitHeader" class="sapUiDemokitMainHeader">
-				<grid:CSSGrid width="100%" class="sapUiDemokitMainHeaderGrid">
+			<fiori:ShellBar
+				id="demoKitShellBar"
+				class="sapUiDemokitMainHeader"
+				showNotifications="{= !${versionData>/isURLVersioned} }"
+				notificationsCount="{news>/newsCount}"
+				notificationsClick="onNewsButtonPress"
+				searchFieldToggle="onSearchFieldToggle">
+				<fiori:startButton>
+					<webcc:Button
+						id="sideNavigationToggleButton"
+						icon="sap-icon://menu2"
+						design="Transparent"
+						tooltip="{i18n>APP_TABHEADER_SIDE_NAVIGATION_TOGGLE_TOOLTIP}"
+						accessibleName="{i18n>APP_TABHEADER_SIDE_NAVIGATION_TOGGLE_TOOLTIP}"
+						visible="{appView>/bPhoneSize}"
+						click="onSideNavigationButtonPress" />
+				</fiori:startButton>
+				<fiori:branding>
+					<fiori:ShellBarBranding text="{i18n>APP_HEADER_TITLE}" click="onHeaderLogoPress">
+						<fiori:logo>
+							<Image
+								src="{= ${versionData>/isOpenUI5} ? ${theme>/OpenUI5Logo} : ${theme>/SAPUI5Logo} }"
+								alt="{i18n>APP_HEADER_LOGO_ALT}"
+								height="2rem"
+								id="sap_logo"
+								decorative="false" />
+						</fiori:logo>
+					</fiori:ShellBarBranding>
+				</fiori:branding>
 
-					<grid:customLayout>
-						<grid:GridResponsiveLayout>
-							<grid:layoutXL>
-								<grid:GridSettings
-									gridTemplateColumns="1fr auto 1fr">
-								</grid:GridSettings>
-							</grid:layoutXL>
-							<grid:layoutL>
-								<grid:GridSettings gridTemplateColumns="1fr auto 1fr">
-								</grid:GridSettings>
-							</grid:layoutL>
-							<grid:layoutM>
-								<grid:GridSettings gridTemplateColumns="1fr auto auto">
-								</grid:GridSettings>
-							</grid:layoutM>
-							<grid:layoutS>
-								<grid:GridSettings gridTemplateColumns="1fr auto auto">
-								</grid:GridSettings>
-							</grid:layoutS>
-						</grid:GridResponsiveLayout>
-					</grid:customLayout>
+				<fiori:searchField>
+					<fiori:ShellBarSearch
+						id="searchControl"
+						placeholder="{i18n>APP_HEADER_SEARCH_FIELD_PLACEHOLDER}"
+						showClearIcon="true"
+						input="onSearchLiveChange"
+						search="onSearch"
+						close="onSearchClose"
+						class="sapUiDemokitSearchInput">
+						<fiori:messageArea>
+							<fiori:SearchMessageArea
+								text="{searchData>/messageAreaText}"
+								visible="{= !${appView>/bPhoneSize} }"
+								class="sapUiDemokitSearchMessageArea">
+							</fiori:SearchMessageArea>
+						</fiori:messageArea>
 
-					<HBox alignItems="{= ${appView>/bPhoneSize} ? 'Center' : 'Baseline' }">
-						<Button
-							icon="sap-icon://menu2"
-							press=".onSideNavigationButtonPress"
-							visible="{appView>/bPhoneSize}" />
+					</fiori:ShellBarSearch>
+				</fiori:searchField>
 
-						<Image
-							src="{= ${versionData>/isOpenUI5} ? ${theme>/OpenUI5Logo} : ${theme>/SAPUI5Logo} }"
-							alt="{i18n>APP_HEADER_LOGO_ALT}"
-							class="sapUiDemokitMainHeaderLogo"
-							height="2rem"
-							id="sap_logo"
-							decorative="false"
-							press=".onHeaderLogoPress" />
+				<fiori:content>
+					<!-- Version Info and Switch Button -->
+					<webcc:Label
+						text="{parts: ['appView>/bShowVersionSwitchButton', 'versionData>/isDevVersion', 'versionData>/fullVersion'], formatter: '.formatter.formatVersionStatus'}"
+						visible="{= ${appView>/bDesktopSize} }">
+					</webcc:Label>
 
-						<Title
-							class="sapUiSmallMarginBeginEnd"
-							text="{i18n>APP_HEADER_TITLE}"
-							tooltip="{i18n>APP_HEADER_TITLE}"
-							visible="{= !${appView>/bPhoneSize} }" />
-					</HBox>
+					<webcc:Button
+						id="versionSwitchButton"
+						class="sapUiDemoKitHeaderActionsVersionSwitch"
+						design="Default"
+						icon="sap-icon://dimension"
+						endIcon="sap-icon://slim-arrow-down"
+						text="{= ${appView>/bDesktopSize}
+							? [${i18n>APP_VERSION_VERSION}, ${versionData>/fullVersion}].join(' ')
+							: '' }"
+						accessibleName="{= ${appView>/bDesktopSize}
+							? [${i18n>APP_VERSION_VERSION}, ${versionData>/fullVersion}].join(' ')
+							: '' }"
+						visible="{= ${appView>/bShowVersionSwitchButton} }"
+						click="onChangeVersionButtonPress" />
 
-					<HBox justifyContent="Center" alignItems="Center">
-						<custom:Search
-							id="searchControl"
-							toggle="onToggleSearchMode"
-							search="onSearch"
-							liveChange="onSearchLiveChange"
-							isOpen="{appView>/bDesktopSize}" />
-					</HBox>
+					<fiori:ShellBarSpacer/>
 
-					<OverflowToolbar class="sapUiDemoKitHeaderOTB" style="Clear">
-						<ObjectStatus
-							text="{ parts:
-								['appView>/bShowVersionSwitchButton', 'versionData>/isDevVersion', 'versionData>/fullVersion'],
-								formatter: '.formatter.formatVersionStatus'
-							}"
-							state="Information"
-							inverted="false"
-							visible="{= ${appView>/bDesktopSize} &amp;&amp; !${appView>/bSearchMode} }">
-						</ObjectStatus>
+				</fiori:content>
 
-						<Button
-							id="versionSwitchButton"
-							class="sapUiDemoKitHeaderActionsVersionSwitch"
-							type="Default"
-							icon="sap-icon://dimension"
-							text="{= ${appView>/bDesktopSize}
-								? [${i18n>APP_VERSION_VERSION}, ${versionData>/fullVersion}].join(' ')
-								: '' }"
-							tooltip="{= ${appView>/bDesktopSize}
-								? [${i18n>APP_VERSION_VERSION}, ${versionData>/fullVersion}].join(' ')
-								: '' }"
-							press=".onChangeVersionButtonPress"
-							visible="{= ${appView>/bShowVersionSwitchButton} }">
-						</Button>
+				<fiori:ShellBarItem
+					id="surveyButton"
+					icon="sap-icon://feedback"
+					class="sapUiDemoKitHeaderActionsSurveyButton"
+					count="{= ${appView>/bShowLongSurvey} ? '1' : '' }"
+					click="launchSurvey"
+					text="{i18n>APP_FEEDBACK_BTN_TOOLTIP}"/>
 
-						<OverflowToolbarButton
-							id="surveyButton"
-							class="sapUiDemoKitHeaderActionsSurveyButton"
-							icon="sap-icon://feedback"
-							press=".launchSurvey"
-							text="{i18n>APP_INFORMATION_BTN_FEEDBACK}"
-							tooltip="{i18n>APP_FEEDBACK_BTN_TOOLTIP}">
-							<customData>
-								<BadgeCustomData visible="{appView>/bShowLongSurvey}" value="1" />
-							</customData>
-						</OverflowToolbarButton>
+				<fiori:ShellBarItem
+					id="policiesMenuButton"
+					icon="sap-icon://official-service"
+					class="sapUiDemoKitHeaderActionsMenuButton"
+					text="{i18n>APP_LEGAL_BTN_TOOLTIP}"
+					click="onOpenPoliciesMenu"/>
 
-						<OverflowToolbarMenuButton
-							class="sapUiDemoKitHeaderActionsMenuButton"
-							icon="sap-icon://official-service"
-							text="{i18n>APP_INFORMATION_BTN_POLICIES}"
-							tooltip="{i18n>APP_LEGAL_BTN_TOOLTIP}">
-							<menu>
-								<Menu itemSelected=".onMenuButtonItemSelected">
-									<MenuItem
-										key="legal"
-										icon="sap-icon://compare"
-										text="{i18n>APP_INFORMATION_BTN_LEGAL}" />
-									<MenuItem
-										key="privacy"
-										icon="sap-icon://locked"
-										text="{i18n>APP_INFORMATION_BTN_PRIVACY}" />
-									<MenuItem
-										key="license"
-										icon="sap-icon://permission"
-										text="{i18n>APP_INFORMATION_BTN_LICENSE}"
-										visible="{versionData>/isOpenUI5}" />
-									<MenuItem
-										key="terms_of_use"
-										icon="sap-icon://document-text"
-										text="{i18n>APP_INFORMATION_BTN_TERMS_OF_USE}"
-										visible="{versionData>/isOpenUI5}" />
-									<MenuItem
-										key="cookie_preferences"
-										icon="sap-icon://user-settings"
-										text="{i18n>APP_SETTINGS_DIALOG_COOKIE_PREFERENCES}" />
-									<MenuItem
-										key="terms_of_use"
-										icon="sap-icon://document-text"
-										text="{i18n>APP_INFORMATION_BTN_TERMS_OF_USE}"
-										visible="{= !${versionData>/isOpenUI5} &amp;&amp; !${versionData>/isDevEnv} }">
-										<items>
-											<MenuItem key="terms_of_use" text="{i18n>APP_INFORMATION_BTN_TERMS_OF_USE}" />
-											<MenuItem key="copyright" text="{i18n>APP_INFORMATION_BTN_COPYRIGHT}" />
-											<MenuItem key="trademark" text="{i18n>APP_INFORMATION_BTN_TRADEMARK}" />
-											<MenuItem key="disclaimer" text="{i18n>APP_INFORMATION_BTN_DISCLAIMER}" />
-										</items>
-									</MenuItem>
-								</Menu>
-							</menu>
-						</OverflowToolbarMenuButton>
+				<fiori:ShellBarItem
+					id="aboutMenuButton"
+					class="sapUiDemoKitHeaderActionsMenuButton"
+					icon="sap-icon://action-settings"
+					text="{i18n>APP_INFORMATION_BTN_TOOLTIP}"
+					click="onOpenAboutMenu"/>
 
-						<OverflowToolbarMenuButton
-							id="aboutMenuButton"
-							class="sapUiDemoKitHeaderActionsMenuButton"
-							icon="sap-icon://action-settings"
-							text="{i18n>APP_INFORMATION_BTN_SETTINGS}"
-							tooltip="{i18n>APP_INFORMATION_BTN_TOOLTIP}">
-							<menu>
-								<Menu itemSelected=".onMenuButtonItemSelected">
-									<items>
-										<MenuItem
-											key="about"
-											icon="sap-icon://hint"
-											text="{i18n>APP_INFORMATION_BTN_ABOUT}" />
-										<MenuItem
-											key="appearance"
-											icon="sap-icon://palette"
-											text="{i18n>APP_INFORMATION_BTN_APPEARANCE}">
-											<items>
-												<MenuItem key="light" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_LIGHT}" />
-												<MenuItem key="dark" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_DARK}" />
-												<MenuItem key="hcb" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_HCB}" />
-												<MenuItem key="hcw" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_HCW}" />
-												<MenuItem key="auto" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_AUTO}" />
-											</items>
-										</MenuItem>
-										<MenuItem
-											key="sitemap"
-											icon="sap-icon://tree"
-											text="{i18n>APP_INFORMATION_BTN_SITEMAP}"
-											visible="{versionData>/isOpenUI5}" />
-										<MenuItem
-											key="settings"
-											icon="sap-icon://hello-world"
-											text="{i18n>APP_SETTINGS_DIALOG_LANGUAGE}" />
-										<MenuItem
-											key="cookie_preferences"
-											icon="sap-icon://customize"
-											text="{i18n>APP_SETTINGS_DIALOG_COOKIE_PREFERENCES}"
-											visible="{versionData>/enableAdvancedCookieSettings}" />
-									</items>
-								</Menu>
-							</menu>
-						</OverflowToolbarMenuButton>
+			</fiori:ShellBar>
 
-						<OverflowToolbarButton
-							class="sapUiDemoKitHeaderActionsNewsButton"
-							icon="sap-icon://bell"
-							press=".onNewsButtonPress"
-							text="{i18n>APP_INFORMATION_BTN_NEWS}"
-							tooltip="{i18n>APP_NEWS_BTN_TOOLTIP}"
-							visible="{= !${versionData>/isURLVersioned} }">
-							<customData>
-								<BadgeCustomData key="badge" value="{news>/newsCount}" />
-							</customData>
-						</OverflowToolbarButton>
-					</OverflowToolbar>
-				</grid:CSSGrid>
-			</tnt:ToolHeader>
 		</tnt:header>
-
 		<tnt:subHeader>
 			<tnt:ToolHeader class="sapUiDemokitSubHeader" visible="{= !${appView>/bPhoneSize} }">
 				<IconTabHeader
 					id="demoKitSubHeader"
 					mode="Inline"
-					select=".navigateToSection"
+					select="navigateToSection"
 					selectedKey="home">
 					<items>
 						<IconTabFilter
@@ -259,14 +161,13 @@
 				</IconTabHeader>
 			</tnt:ToolHeader>
 		</tnt:subHeader>
-
 		<tnt:sideContent>
 			<tnt:SideNavigation
 				id="demoKitSideNavigation"
 				visible="{appView>/bPhoneSize}"
 				expanded="false"
 				selectedKey="home"
-				itemSelect=".navigateToSection">
+				itemSelect="navigateToSection">
 				<tnt:NavigationList>
 					<tnt:NavigationListItem
 						key="home"
@@ -300,7 +201,7 @@
 		<tnt:mainContents>
 			<VBox items="{messagesData>/messages}" width="100%" class="sapUiTinyMarginTop" visible="{=!!${messagesData>/iVisibleMessagesCount}}">
 				<items>
-					<MessageStrip close=".onCloseImportantMessage" text="{
+					<MessageStrip close="onCloseImportantMessage" text="{
 						parts: [
 							'messagesData>text'
 						],
@@ -323,7 +224,7 @@
 				visible="{= (${appView>/bHasMaster} &amp;&amp; !${appView>/bLandscape}) &#124;&#124; ${appView>/bHasMaster} &amp;&amp; ${appView>/device/system/phone} }">
 				<ToggleButton
 					class="sapUiDocumentationMasterToggleButton"
-					press=".toggleMaster"
+					press="toggleMaster"
 					pressed="{appView>/bIsShownMaster}"
 					icon="{= ${appView>/bIsShownMaster} ? 'sap-icon://navigation-left-arrow' : 'sap-icon://navigation-right-arrow' }" />
 				<Title level="H3" text="{appView>/selectedSectionTitle}" />
@@ -348,4 +249,113 @@
 			</ScrollContainer>
 		</tnt:mainContents>
 	</tnt:ToolPage>
+
+	<webcc:Menu id="aboutMenu" itemClick="onMenuButtonItemSelected">
+		<webcc:MenuItem
+			text="{i18n>APP_INFORMATION_BTN_ABOUT}"
+			icon="sap-icon://hint"
+			id="menuItem-about">
+			<webcc:customData>
+				<core:CustomData key="action" value="about" />
+			</webcc:customData>
+		</webcc:MenuItem>
+		<webcc:MenuItem text="{i18n>APP_INFORMATION_BTN_APPEARANCE}" icon="sap-icon://palette" id="menuItem-appearance">
+			<webcc:customData>
+				<core:CustomData key="action" value="appearance" />
+			</webcc:customData>
+			<webcc:MenuItem text="{i18n>APP_INFORMATION_BTN_APPEARANCE_LIGHT}" id="menuItem-light">
+				<webcc:customData>
+					<core:CustomData key="action" value="light" />
+				</webcc:customData>
+			</webcc:MenuItem>
+			<webcc:MenuItem text="{i18n>APP_INFORMATION_BTN_APPEARANCE_DARK}" id="menuItem-dark">
+				<webcc:customData>
+					<core:CustomData key="action" value="dark" />
+				</webcc:customData>
+			</webcc:MenuItem>
+			<webcc:MenuItem text="{i18n>APP_INFORMATION_BTN_APPEARANCE_HCB}" id="menuItem-hcb">
+				<webcc:customData>
+					<core:CustomData key="action" value="hcb" />
+				</webcc:customData>
+			</webcc:MenuItem>
+			<webcc:MenuItem text="{i18n>APP_INFORMATION_BTN_APPEARANCE_HCW}" id="menuItem-hcw">
+				<webcc:customData>
+					<core:CustomData key="action" value="hcw" />
+				</webcc:customData>
+			</webcc:MenuItem>
+			<webcc:MenuItem text="{i18n>APP_INFORMATION_BTN_APPEARANCE_AUTO}" id="menuItem-auto">
+				<webcc:customData>
+					<core:CustomData key="action" value="auto" />
+				</webcc:customData>
+			</webcc:MenuItem>
+		</webcc:MenuItem>
+		<webcc:MenuItem text="{i18n>APP_INFORMATION_BTN_SITEMAP}" icon="sap-icon://tree" visible="{versionData>/isOpenUI5}" id="menuItem-sitemap">
+			<webcc:customData>
+				<core:CustomData key="action" value="sitemap" />
+			</webcc:customData>
+		</webcc:MenuItem>
+		<webcc:MenuItem text="{i18n>APP_SETTINGS_DIALOG_LANGUAGE}" icon="sap-icon://hello-world" id="menuItem-settings">
+			<webcc:customData>
+				<core:CustomData key="action" value="settings" />
+			</webcc:customData>
+		</webcc:MenuItem>
+		<webcc:MenuItem text="{i18n>APP_SETTINGS_DIALOG_COOKIE_PREFERENCES}" icon="sap-icon://customize" visible="{versionData>/enableAdvancedCookieSettings}" id="menuItem-cookie_preferences">
+			<webcc:customData>
+				<core:CustomData key="action" value="cookie_preferences" />
+			</webcc:customData>
+		</webcc:MenuItem>
+	</webcc:Menu>
+
+	<webcc:Menu id="policiesMenu" itemClick="onMenuButtonItemSelected">
+		<webcc:MenuItem text="{i18n>APP_INFORMATION_BTN_LEGAL}" icon="sap-icon://compare" id="menuItem-legal">
+			<webcc:customData>
+				<core:CustomData key="action" value="legal" />
+			</webcc:customData>
+		</webcc:MenuItem>
+		<webcc:MenuItem text="{i18n>APP_INFORMATION_BTN_PRIVACY}" icon="sap-icon://locked" id="menuItem-privacy">
+			<webcc:customData>
+				<core:CustomData key="action" value="privacy" />
+			</webcc:customData>
+		</webcc:MenuItem>
+		<webcc:MenuItem text="{i18n>APP_INFORMATION_BTN_LICENSE}" icon="sap-icon://permission" visible="{versionData>/isOpenUI5}" id="menuItem-license">
+			<webcc:customData>
+				<core:CustomData key="action" value="license" />
+			</webcc:customData>
+		</webcc:MenuItem>
+		<webcc:MenuItem text="{i18n>APP_INFORMATION_BTN_TERMS_OF_USE}" icon="sap-icon://document-text" visible="{versionData>/isOpenUI5}" id="menuItem-terms_of_use">
+			<webcc:customData>
+				<core:CustomData key="action" value="terms_of_use" />
+			</webcc:customData>
+		</webcc:MenuItem>
+		<webcc:MenuItem text="{i18n>APP_SETTINGS_DIALOG_COOKIE_PREFERENCES}" icon="sap-icon://user-settings" id="menuItem-cookie_preferences_policies">
+			<webcc:customData>
+				<core:CustomData key="action" value="cookie_preferences" />
+			</webcc:customData>
+		</webcc:MenuItem>
+		<webcc:MenuItem text="{i18n>APP_INFORMATION_BTN_TERMS_OF_USE}" icon="sap-icon://document-text" visible="{= !${versionData>/isOpenUI5} &amp;&amp; !${versionData>/isDevEnv} }" id="menuItem-terms_parent">
+			<webcc:customData>
+				<core:CustomData key="action" value="terms_parent" />
+			</webcc:customData>
+			<webcc:MenuItem text="{i18n>APP_INFORMATION_BTN_TERMS_OF_USE}" id="menuItem-terms_of_use_sub">
+				<webcc:customData>
+					<core:CustomData key="action" value="terms_of_use" />
+				</webcc:customData>
+			</webcc:MenuItem>
+			<webcc:MenuItem text="{i18n>APP_INFORMATION_BTN_COPYRIGHT}" id="menuItem-copyright">
+				<webcc:customData>
+					<core:CustomData key="action" value="copyright" />
+				</webcc:customData>
+			</webcc:MenuItem>
+			<webcc:MenuItem text="{i18n>APP_INFORMATION_BTN_TRADEMARK}" id="menuItem-trademark">
+				<webcc:customData>
+					<core:CustomData key="action" value="trademark" />
+				</webcc:customData>
+			</webcc:MenuItem>
+			<webcc:MenuItem text="{i18n>APP_INFORMATION_BTN_DISCLAIMER}" id="menuItem-disclaimer">
+				<webcc:customData>
+					<core:CustomData key="action" value="disclaimer" />
+				</webcc:customData>
+			</webcc:MenuItem>
+		</webcc:MenuItem>
+	</webcc:Menu>
 </mvc:View>

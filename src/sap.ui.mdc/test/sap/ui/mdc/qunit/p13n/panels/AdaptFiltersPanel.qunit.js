@@ -2420,4 +2420,158 @@ sap.ui.define([
 		fnChangeSpy.restore();
 	});
 
+	QUnit.module("Boolean Field Visibility with Value Changes", {
+		beforeEach: async function() {
+			// Mock info data for boolean field scenario
+			this.aMockInfo = [
+				{
+					key: "visibleField",
+					label: "Visible Field",
+					dataType: "String"
+				},
+				{
+					key: "booleanField",
+					label: "Boolean Field",
+					dataType: "Boolean"
+				}
+			];
+
+			this.oAFPanel = new AdaptFiltersPanel({
+				defaultView: "list"
+			});
+
+			let iFilterFieldCounter = 0;
+			this.aAllFilterFields = [];
+			this.aAllFilterGroupLayouts = [];
+
+			this.oAFPanel.setItemFactory(function(oContext){
+				iFilterFieldCounter++;
+				const oItem = oContext.getObject();
+				const oFilterField = new FilterField("FF" + iFilterFieldCounter);
+
+				// Mock conditions based on item
+				if (oItem.name === "booleanField" && oItem.isFiltered) {
+					oFilterField.setConditions([{operator: "EQ", values: [true]}]);
+				}
+
+				if (!oFilterField.getConditions) {
+					oFilterField.getConditions = function() {
+						return this.getProperty("conditions") || [];
+					};
+				}
+
+				const oFilterGroupLayout = new FilterGroupLayout("FGL" + iFilterFieldCounter);
+				oFilterGroupLayout.setFilterField(oFilterField);
+				this.aAllFilterFields.push(oFilterField);
+				this.aAllFilterGroupLayouts.push(oFilterGroupLayout);
+				return oFilterGroupLayout;
+			}.bind(this));
+
+			// Enhancer function to set up test data properly
+			this.fnEnhancer = function(mItem, oProperty) {
+				mItem.visibleInDialog = true;
+				// visibleField is visible in FilterBar
+				if (oProperty.key === "visibleField") {
+					mItem.visible = true;
+					mItem.isFiltered = false;
+					mItem.initiallyVisible = true;
+					mItem.hadInitialFilterValue = false;
+				}
+				// booleanField is invisible but has filter value
+				if (oProperty.key === "booleanField") {
+					mItem.visible = false;
+					mItem.isFiltered = true;  // Has value "Yes"
+					mItem.initiallyVisible = false;
+					mItem.hadInitialFilterValue = true;
+				}
+				return true;
+			};
+
+			// Use P13nBuilder like other tests
+			this.oP13nData = P13nBuilder.prepareAdaptationData(this.aMockInfo, this.fnEnhancer, true);
+
+			this.oAFPanel.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.aAllFilterGroupLayouts.forEach(function(oFilterGroupLayout){
+				if (!oFilterGroupLayout.bIsDestroyed) {
+					oFilterGroupLayout.destroy();
+				}
+			});
+			this.aAllFilterGroupLayouts = [];
+			this.aAllFilterFields.forEach(function(oFilterField){
+				if (!oFilterField.bIsDestroyed) {
+					oFilterField.destroy();
+				}
+			});
+			this.aAllFilterFields = [];
+			this.oAFPanel.destroy();
+		}
+	});
+
+	QUnit.test("Boolean field initially invisible with value 'Yes' stays visible when changed to 'Not Selected'", async function(assert) {
+		// Setup using P13nBuilder data
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		const oViewContent = this.oAFPanel.getCurrentViewContent();
+		const oListControl = oViewContent._oListControl;
+
+		// Verify: Boolean field should be visible in the dialog because it has a filter value
+		const aVisibleItems = oListControl.getItems().filter((oItem) =>
+			oItem.getVisible() && !oItem.isA("sap.m.GroupHeaderListItem")
+		);
+
+		assert.equal(aVisibleItems.length, 2, "Both fields should be visible in the dialog");
+
+		const oBooleanListItem = aVisibleItems.find((oItem) => {
+			const oEntry = oViewContent._getModelEntry(oItem);
+			return oEntry && oEntry.name === "booleanField";
+		});
+
+		assert.ok(oBooleanListItem, "Boolean field should be visible in the list");
+
+		// Get the actual FilterField from the list item
+		const oBooleanFilterField = this.aAllFilterFields.find((_oFF, idx) => {
+			// Find the field that corresponds to booleanField
+			const oItem = this.oP13nData.items[idx];
+			return oItem && oItem.name === "booleanField";
+		});
+
+		// Simulate: User changes boolean value from "Yes" to "Not Selected" (clears conditions)
+		if (oBooleanFilterField) {
+			oBooleanFilterField.setConditions([]);  // Clear conditions = "Not Selected"
+			oBooleanFilterField.fireChange();
+		}
+		await nextUIUpdate();
+
+		// Update model: isFiltered should now be false
+		const aItems = oViewContent._getP13nModel().getProperty("/items");
+		const oBooleanItem = aItems.find((oItem) => oItem.name === "booleanField");
+		oBooleanItem.isFiltered = false;
+		oViewContent._getP13nModel().setProperty("/items", aItems, null, true);
+		oViewContent._getP13nModel().checkUpdate(true, true);
+		await nextUIUpdate();
+
+		// Verify: Boolean field should STILL be visible due to hadInitialFilterValue flag
+		const aVisibleItemsAfter = oListControl.getItems().filter((oItem) =>
+			oItem.getVisible() && !oItem.isA("sap.m.GroupHeaderListItem")
+		);
+
+		const oBooleanListItemAfter = aVisibleItemsAfter.find((oItem) => {
+			const oEntry = oViewContent._getModelEntry(oItem);
+			return oEntry && oEntry.name === "booleanField";
+		});
+
+		assert.ok(oBooleanListItemAfter, "Boolean field should remain visible after value change to 'Not Selected'");
+		assert.equal(aVisibleItemsAfter.length, 2, "Both fields should still be visible");
+
+		// Verify model flags are correct
+		assert.equal(oBooleanItem.initiallyVisible, false, "initiallyVisible flag should be false");
+		assert.equal(oBooleanItem.hadInitialFilterValue, true, "hadInitialFilterValue flag should still be true");
+		assert.equal(oBooleanItem.isFiltered, false, "isFiltered should now be false");
+		assert.equal(oBooleanItem.visible, false, "visible (in FilterBar) should remain false");
+	});
 });

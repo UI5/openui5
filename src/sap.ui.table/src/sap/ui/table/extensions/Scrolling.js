@@ -723,42 +723,175 @@ sap.ui.define([
 				};
 
 				oTable._getKeyboardExtension().setActionMode(false);
-				const oScrollExtension = oTable._getScrollExtension();
 
-				// No large data scrolling on touch move
-				if (oTable._bLargeDataScrolling && !oScrollExtension._bTouchScroll) {
-					_private(oTable).mTimeouts.largeDataScrolling = setTimeout(function() {
-						delete _private(oTable).mTimeouts.largeDataScrolling;
+				VerticalScrollingHelper.adjustScrollPositionToScrollbar(oTable, oProcessInterface).then(function() {
+					if (oProcessInterface.isCancelled()) {
+						return false;
+					}
 
-						if (oScrollExtension.getVerticalScrollbar() != null) {
-							log("VerticalScrollingHelper.performUpdateFromScrollbar (async: large data scrolling)", oTable);
-							VerticalScrollingHelper._performUpdateFromScrollbar(oTable, oProcessInterface).then(resolve);
-						} else {
-							log("VerticalScrollingHelper.performUpdateFromScrollbar (async: large data scrolling): No scrollbar", oTable);
+					const bLargeDataScrolling = !oTable._getScrollExtension()._bTouchScroll
+						&& VerticalScrollingHelper._isLargeDataScrollingActive(oTable);
+
+					if (bLargeDataScrolling) {
+						const bFastScroll = VerticalScrollingHelper._trackScrollSpeed(oTable);
+
+						if (bFastScroll) {
+							// Show skeletons and wait until the user stops scrolling before updating the rows.
+							return VerticalScrollingHelper._debounceLargeDataUpdate(oTable, oProcessInterface);
 						}
-					}, 300);
+					}
 
-					oProcessInterface.addCancelListener(function() {
-						if (_private(oTable).mTimeouts.largeDataScrolling != null) {
-							clearTimeout(_private(oTable).mTimeouts.largeDataScrolling);
-							delete _private(oTable).mTimeouts.largeDataScrolling;
-							resolve();
-						}
+					return true;
+				}).then(function(bUpdateRows) {
+					if (!bUpdateRows) {
+						return undefined;
+					}
+
+					return VerticalScrollingHelper.adjustFirstVisibleRowToScrollPosition(oTable, null, oProcessInterface).then(function() {
+						return VerticalScrollingHelper.fixScrollPosition(oTable, oProcessInterface);
+					}).then(function() {
+						return VerticalScrollingHelper.scrollViewport(oTable, oProcessInterface);
 					});
-				} else {
-					VerticalScrollingHelper._performUpdateFromScrollbar(oTable, oProcessInterface).then(resolve);
-				}
+				}).then(function() {
+					// The rows have been updated (or no update was necessary). Remove any skeletons shown during a large-data fast scroll.
+					VerticalScrollingHelper._clearSkeletons(oTable);
+					resolve();
+				});
 			});
 		},
 
-		_performUpdateFromScrollbar: function(oTable, oProcessInterface) {
-			return VerticalScrollingHelper.adjustScrollPositionToScrollbar(oTable, oProcessInterface).then(function() {
-				return VerticalScrollingHelper.adjustFirstVisibleRowToScrollPosition(oTable, null, oProcessInterface);
-			}).then(function() {
-				return VerticalScrollingHelper.fixScrollPosition(oTable, oProcessInterface);
-			}).then(function() {
-				return VerticalScrollingHelper.scrollViewport(oTable, oProcessInterface);
+		/**
+		 * Records the current scroll position as a speed sample and returns whether the table is being scrolled fast. The speed is measured in
+		 * rows per second relative to the previous sample.
+		 *
+		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @returns {boolean} Whether the table is being scrolled fast.
+		 */
+		_trackScrollSpeed: function(oTable) {
+			const iTargetRow = _private(oTable).oVerticalScrollPosition.getIndex();
+			const nNow = Date.now();
+			const oScrollState = _private(oTable).oLargeDataScrollState;
+			let nSpeed = 0;
+
+			if (oScrollState) {
+				const nElapsedMs = Math.max(nNow - oScrollState.timestamp, 1);
+				nSpeed = Math.abs(iTargetRow - oScrollState.rowIndex) / (nElapsedMs / 1000);
+			}
+
+			const bFastScroll = nSpeed >= 60; // Empirically determined threshold for fast scrolling.
+			_private(oTable).oLargeDataScrollState = {timestamp: nNow, rowIndex: iTargetRow};
+
+			return bFastScroll;
+		},
+
+		/**
+		 * Shows skeletons and debounces the rows update until the user stops scrolling. The rows themselves are not updated here; the caller
+		 * performs the update depending on the resolved value.
+		 *
+		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {ProcessInterface} oProcessInterface The interface to the process.
+		 * @returns {Promise<boolean>} A Promise that resolves with whether the rows should be updated by the caller.
+		 */
+		_debounceLargeDataUpdate: function(oTable, oProcessInterface) {
+			VerticalScrollingHelper._showSkeletons(oTable);
+
+			return new Promise(function(resolve) {
+				_private(oTable).mTimeouts.largeDataScrolling = setTimeout(function() {
+					delete _private(oTable).mTimeouts.largeDataScrolling;
+					delete _private(oTable).oLargeDataScrollState;
+
+					if (oTable._getScrollExtension().getVerticalScrollbar() == null) {
+						log("VerticalScrollingHelper.performUpdateFromScrollbar (async: large data scrolling): No scrollbar", oTable);
+						VerticalScrollingHelper._clearSkeletons(oTable);
+						resolve(false);
+						return;
+					}
+
+					log("VerticalScrollingHelper.performUpdateFromScrollbar (async: large data scrolling)", oTable);
+					resolve(true);
+				}, 300);
+
+				oProcessInterface.addCancelListener(function() {
+					if (_private(oTable).mTimeouts.largeDataScrolling != null) {
+						clearTimeout(_private(oTable).mTimeouts.largeDataScrolling);
+						delete _private(oTable).mTimeouts.largeDataScrolling;
+						delete _private(oTable).oLargeDataScrollState;
+						resolve(false);
+					}
+
+					// The update was superseded or cancelled before the rows were updated. Remove the skeletons so they do not stay visible
+					// until the process that takes over updates the rows.
+					VerticalScrollingHelper._clearSkeletons(oTable);
+				});
 			});
+		},
+
+		/**
+		 * Returns whether the large-data scrolling behaviour should be active for the given table. This is the case either when explicitly enabled
+		 * via {@link sap.ui.table.Table#_setLargeDataScrolling} or when the ratio of total rows to the scroll threshold exceeds 5 (i.e. more than 5
+		 * pages of data).
+		 *
+		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @returns {boolean} Whether large-data scrolling should be active.
+		 */
+		_isLargeDataScrollingActive: function(oTable) {
+			if (oTable._bLargeDataScrolling !== undefined) {
+				return oTable._bLargeDataScrolling;
+			}
+			if (oTable.getBinding()?.isA("sap.ui.model.ClientListBinding")) {
+				return false;
+			}
+			const iScrollThreshold = oTable._getScrollThreshold();
+			return iScrollThreshold > 0 && oTable._getTotalRowCount() / iScrollThreshold > 5;
+		},
+
+		/**
+		 * Shows skeletons on all scrollable rows and reseeds the skeleton bar widths without updating the rows. Used during high-speed scrolling to
+		 * reduce unnecessary data requests.
+		 *
+		 * A single seed custom property is set on the table root; it inherits down to every cell, where the CSS derives each bar's width from a
+		 * per-column/per-row base and a per-column/per-row slope applied to the seed. Because the slopes differ in sign and magnitude between
+		 * cells, a change in the shared seed moves each bar by a different amount and direction, so neighbouring bars vary and no longer grow or
+		 * shrink together - all from a single JS-updated value and without any per-cell DOM writes.
+		 *
+		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 */
+		_showSkeletons: function(oTable) {
+			const mRowCounts = oTable._getRowCounts();
+			const aRows = oTable.getRows();
+			const iScrollableCount = mRowCounts.scrollable;
+			const iScrollableStart = mRowCounts.fixedTop;
+
+			const oTableDom = oTable.getDomRef();
+			if (oTableDom) {
+				oTableDom.style.setProperty("--_sap_ui_table_Skeleton_Seed", Math.round(Math.random() * 100));
+			}
+
+			for (let i = 0; i < iScrollableCount; i++) {
+				const oRow = aRows[iScrollableStart + i];
+				if (oRow) {
+					oRow.getDomRefs(true).row.addClass("sapUiTableRowSkeleton");
+				}
+			}
+		},
+
+		/**
+		 * Removes the <code>sapUiTableRowSkeleton</code> class from all scrollable rows.
+		 *
+		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 */
+		_clearSkeletons: function(oTable) {
+			const mRowCounts = oTable._getRowCounts();
+			const aRows = oTable.getRows();
+			const iScrollableCount = mRowCounts.scrollable;
+			const iScrollableStart = mRowCounts.fixedTop;
+
+			for (let i = 0; i < iScrollableCount; i++) {
+				const oRow = aRows[iScrollableStart + i];
+				if (oRow) {
+					oRow.getDomRefs(true).row.removeClass("sapUiTableRowSkeleton");
+				}
+			}
 		},
 
 		/**
@@ -783,6 +916,18 @@ sap.ui.define([
 					return VerticalScrollingHelper.scrollScrollbar(oTable, oProcessInterface);
 				}).then(resolve);
 			});
+		},
+
+		/**
+		 * Will be called if the vertical scrollbar is clicked.
+		 */
+		onScrollbarMouseDown: function() {
+			if (VerticalScrollingHelper._isLargeDataScrollingActive(this)) {
+				_private(this).oLargeDataScrollState = {
+					timestamp: Date.now(),
+					rowIndex: _private(this).oVerticalScrollPosition.getIndex()
+				};
+			}
 		},
 
 		/**
@@ -1766,6 +1911,7 @@ sap.ui.define([
 			const oScrollExtension = oTable._getScrollExtension();
 			const aScrollAreas = VerticalScrollingHelper.getScrollAreas(oTable);
 			const oViewport = oTable.getDomRef("tableCCnt");
+			const oVSb = oScrollExtension.getVerticalScrollbar();
 
 			if (!oScrollExtension._onVerticalScrollEventHandler) {
 				oScrollExtension._onVerticalScrollEventHandler = VerticalScrollingHelper.onScrollbarScroll.bind(oTable);
@@ -1773,6 +1919,13 @@ sap.ui.define([
 
 			for (let i = 0; i < aScrollAreas.length; i++) {
 				aScrollAreas[i].addEventListener("scroll", oScrollExtension._onVerticalScrollEventHandler);
+			}
+
+			if (oVSb) {
+				if (!oScrollExtension._onVerticalScrollbarMouseDownEventHandler) {
+					oScrollExtension._onVerticalScrollbarMouseDownEventHandler = VerticalScrollingHelper.onScrollbarMouseDown.bind(oTable);
+				}
+				oVSb.addEventListener("mousedown", oScrollExtension._onVerticalScrollbarMouseDownEventHandler);
 			}
 
 			if (oViewport) {
@@ -1794,12 +1947,18 @@ sap.ui.define([
 			const oScrollExtension = oTable._getScrollExtension();
 			const aScrollAreas = VerticalScrollingHelper.getScrollAreas(oTable);
 			const oViewport = oTable.getDomRef("tableCCnt");
+			const oVSb = oScrollExtension.getVerticalScrollbar();
 
 			if (oScrollExtension._onVerticalScrollEventHandler) {
 				for (let i = 0; i < aScrollAreas.length; i++) {
 					aScrollAreas[i].removeEventListener("scroll", oScrollExtension._onVerticalScrollEventHandler);
 				}
 				delete oScrollExtension._onVerticalScrollEventHandler;
+			}
+
+			if (oVSb && oScrollExtension._onVerticalScrollbarMouseDownEventHandler) {
+				oVSb.removeEventListener("mousedown", oScrollExtension._onVerticalScrollbarMouseDownEventHandler);
+				delete oScrollExtension._onVerticalScrollbarMouseDownEventHandler;
 			}
 
 			if (oViewport && oScrollExtension._onViewportScrollEventHandler) {

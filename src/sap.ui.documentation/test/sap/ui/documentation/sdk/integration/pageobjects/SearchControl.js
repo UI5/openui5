@@ -1,9 +1,10 @@
 sap.ui.define([
-	'sap/ui/test/Opa5',
-	'sap/ui/test/actions/EnterText',
-	'sap/ui/test/actions/Press'
-], function (Opa5, EnterText, Press) {
+	'sap/ui/test/Opa5'
+], function (Opa5) {
 	"use strict";
+
+	var SEARCH_CONTROL_ID = "searchControl";
+	var SEARCH_CONTROL_TYPE = "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarSearch";
 
 	Opa5.createPageObjects({
 		onTheSearchControl: {
@@ -11,69 +12,74 @@ sap.ui.define([
 
 			actions: {
 				/**
-				 * Enter text in the search field
+				 * Enter text in the Web Component search field.
+				 * The <code>ShellBarSearch</code> renders in shadow DOM, so the value is set
+				 * on the control and the native <code>input</code> event handler is triggered.
 				 * @param {string} sSearchQuery - The text to enter in the search field
 				 */
 				iEnterTextInTheSearchField: function (sSearchQuery) {
 					return this.waitFor({
-						id: "searchControl-searchField",
-						actions: new EnterText({
-							text: sSearchQuery,
-							clearTextFirst: true,
-							keepFocus: true
-						}),
+						id: SEARCH_CONTROL_ID,
+						success: function (oSearchField) {
+							oSearchField.setValue(sSearchQuery);
+							oSearchField.fireEvent("input");
+						},
 						errorMessage: "Could not enter text in search field"
 					});
 				},
 
 				/**
-				 * Clear the search field
+				 * Clear the search field.
 				 */
 				iClearTheSearchField: function () {
 					return this.waitFor({
-						id: "searchControl-searchField",
-						actions: new EnterText({
-							text: "",
-							clearTextFirst: true
-						}),
+						id: SEARCH_CONTROL_ID,
+						success: function (oSearchField) {
+							oSearchField.setValue("");
+							oSearchField.fireEvent("input");
+						},
 						errorMessage: "Could not clear the search field"
 					});
 				},
 
 				/**
-				 * Press the search button (for collapsed state, e.g., on phone)
+				 * Trigger the native search (Enter key / search button).
 				 */
 				iPressTheSearchButton: function () {
 					return this.waitFor({
-						controlType: "sap.ui.documentation.Search",
-						actions: new Press(),
-						errorMessage: "Could not press the search button"
+						id: SEARCH_CONTROL_ID,
+						success: function (oSearchField) {
+							oSearchField.fireEvent("search");
+						},
+						errorMessage: "Could not trigger the search"
 					});
 				}
 			},
 
 			assertions: {
 				/**
-				 * Verify the search field is visible and enabled
+				 * Verify the search field is present and is the ShellBarSearch Web Component.
 				 */
 				iShouldSeeTheSearchField: function () {
 					return this.waitFor({
-						id: "searchControl-searchField",
+						id: SEARCH_CONTROL_ID,
 						success: function (oSearchField) {
-							Opa5.assert.ok(oSearchField.getVisible(), "Search field is visible");
-							Opa5.assert.ok(oSearchField.getEnabled(), "Search field is enabled");
+							Opa5.assert.ok(
+								oSearchField.isA(SEARCH_CONTROL_TYPE),
+								"Search field is the Web Component ShellBarSearch"
+							);
 						},
 						errorMessage: "Search field was not found"
 					});
 				},
 
 				/**
-				 * Verify the search field has a specific value
+				 * Verify the search field has a specific value.
 				 * @param {string} sExpectedValue - The expected value in the search field
 				 */
 				iShouldSeeSearchFieldValue: function (sExpectedValue) {
 					return this.waitFor({
-						id: "searchControl-searchField",
+						id: SEARCH_CONTROL_ID,
 						success: function (oSearchField) {
 							Opa5.assert.strictEqual(
 								oSearchField.getValue(),
@@ -86,11 +92,11 @@ sap.ui.define([
 				},
 
 				/**
-				 * Verify the search field is empty
+				 * Verify the search field is empty.
 				 */
 				iShouldSeeEmptySearchField: function () {
 					return this.waitFor({
-						id: "searchControl-searchField",
+						id: SEARCH_CONTROL_ID,
 						success: function (oSearchField) {
 							Opa5.assert.strictEqual(
 								oSearchField.getValue(),
@@ -99,42 +105,6 @@ sap.ui.define([
 							);
 						},
 						errorMessage: "Search field is not empty"
-					});
-				},
-
-				/**
-				 * Verify the search control is collapsed (button visible)
-				 */
-				iShouldSeeSearchButton: function () {
-					return this.waitFor({
-						controlType: "sap.ui.documentation.Search",
-						success: function (aSearchControls) {
-							var oSearch = aSearchControls[0];
-							Opa5.assert.ok(
-								!oSearch.getIsOpen(),
-								"Search control is collapsed (button visible)"
-							);
-						},
-						errorMessage: "Search control state is incorrect"
-					});
-				},
-
-				/**
-				 * Verify that special characters are properly escaped/displayed in the search field
-				 * @param {string} sExpectedValue - The expected value including special characters
-				 */
-				iShouldSeeSpecialCharactersInSearchField: function (sExpectedValue) {
-					return this.waitFor({
-						id: "searchControl-searchField",
-						success: function (oSearchField) {
-							var sActualValue = oSearchField.getValue();
-							Opa5.assert.strictEqual(
-								sActualValue,
-								sExpectedValue,
-								"Search field correctly displays special characters"
-							);
-						},
-						errorMessage: "Search field special character handling failed"
 					});
 				}
 			}

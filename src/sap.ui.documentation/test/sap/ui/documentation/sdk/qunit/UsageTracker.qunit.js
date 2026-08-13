@@ -45,6 +45,9 @@ function (UsageTracker, Localization) {
 						detachEvent: function () {}, // not relevant to this test
 						getRouteTopLevelTitle: function () {
 							return testRouteTitle;
+						},
+						getRouteConfig: function (sName) {
+							return {name: sName};
 						}
 					};
 				}
@@ -504,5 +507,198 @@ function (UsageTracker, Localization) {
 
 		assert.strictEqual(oLivePageView[0].page.name, "/", "live page.name is normalized to '/'");
 		assert.strictEqual(oReplayPageView[0].page.name, oLivePageView[0].page.name, "replay produces same page.name as live event");
+	});
+
+	QUnit.module("page.referrer chain", {
+		beforeEach: function () {
+			this.oTracker = new UsageTracker(oFactory.getAppComponent());
+			this.sandbox = sinon.createSandbox();
+			this.sandbox.stub(this.oTracker, "_composeDefaultPageTitleFromRoute")
+				.returns(""); // not relevant to this test
+			this.sDocumentReferrer = "https://www.google.com/";
+			this.sandbox.stub(document, "referrer").get(() => this.sDocumentReferrer);
+			this.oTracker.start("testSiteName");
+			this.oAddToLogsSpy = this.sandbox.spy(this.oTracker, "_addToLogs");
+		},
+		afterEach: function () {
+			this.oTracker.destroy();
+			this.oTracker = null;
+			this.sandbox.restore();
+		}
+	});
+
+	function getPageViewCalls(oSpy) {
+		return oSpy.args.map((args) => args[0]).filter((oLog) => oLog.event === "pageView");
+	}
+
+	QUnit.test("first pageView uses document.referrer", function (assert) {
+		var oRoute = oFactory.getRouteMatchEventParameters("welcome");
+
+		this.oTracker._logRouteMatched(oRoute);
+
+		var aPageViews = getPageViewCalls(this.oAddToLogsSpy);
+		assert.strictEqual(aPageViews.length, 1, "one pageView emitted");
+		assert.strictEqual(aPageViews[0].page.referrer, this.sDocumentReferrer, "first pageView referrer is document.referrer");
+	});
+
+	QUnit.test("second pageView uses first page URL as referrer", function (assert) {
+		var oRoute1 = oFactory.getRouteMatchEventParameters("welcome"),
+			oRoute2 = oFactory.getRouteMatchEventParameters("topic");
+
+		this.oTracker._logRouteMatched(oRoute1);
+		this.oTracker._logRouteMatched(oRoute2);
+
+		var aPageViews = getPageViewCalls(this.oAddToLogsSpy);
+		assert.strictEqual(aPageViews.length, 2, "two pageViews emitted");
+		assert.strictEqual(aPageViews[1].page.referrer, aPageViews[0].page.url, "second pageView referrer equals first page URL");
+	});
+
+	QUnit.test("third pageView uses second page URL as referrer", function (assert) {
+		var oRoute1 = oFactory.getRouteMatchEventParameters("welcome"),
+			oRoute2 = oFactory.getRouteMatchEventParameters("topic"),
+			oRoute3 = oFactory.getRouteMatchEventParameters("apiId");
+
+		this.oTracker._logRouteMatched(oRoute1);
+		this.oTracker._logRouteMatched(oRoute2);
+		this.oTracker._logRouteMatched(oRoute3);
+
+		var aPageViews = getPageViewCalls(this.oAddToLogsSpy);
+		assert.strictEqual(aPageViews.length, 3, "three pageViews emitted");
+		assert.strictEqual(aPageViews[2].page.referrer, aPageViews[1].page.url, "third pageView referrer equals second page URL");
+	});
+
+	QUnit.test("duplicate routeMatched does not advance referrer", function (assert) {
+		var oRouteA = oFactory.getRouteMatchEventParameters("welcome"),
+			oRouteB = oFactory.getRouteMatchEventParameters("topic");
+
+		this.oTracker._logRouteMatched(oRouteA); // A — logged
+		this.oTracker._logRouteMatched(oRouteA); // A duplicate — suppressed
+		this.oTracker._logRouteMatched(oRouteB); // B
+
+		var aPageViews = getPageViewCalls(this.oAddToLogsSpy);
+		assert.strictEqual(aPageViews.length, 2, "only two pageViews emitted (duplicate suppressed)");
+		assert.strictEqual(aPageViews[1].page.referrer, aPageViews[0].page.url, "B's referrer is A's URL, not the duplicate");
+	});
+
+	QUnit.test("legacy route does not advance referrer", function (assert) {
+		var oRouteA = oFactory.getRouteMatchEventParameters("welcome"),
+			oRouteLegacy = oFactory.getRouteMatchEventParameters("LegacyRoute"),
+			oRouteB = oFactory.getRouteMatchEventParameters("topic");
+
+		this.oTracker._logRouteMatched(oRouteA);      // A — logged
+		this.oTracker._logRouteMatched(oRouteLegacy); // legacy — skipped
+		this.oTracker._logRouteMatched(oRouteB);      // B
+
+		var aPageViews = getPageViewCalls(this.oAddToLogsSpy);
+		assert.strictEqual(aPageViews.length, 2, "only two pageViews emitted (legacy skipped)");
+		assert.strictEqual(aPageViews[1].page.referrer, aPageViews[0].page.url, "B's referrer is A's URL, not the legacy URL");
+	});
+
+	QUnit.test("route-not-found (404) does not advance referrer", function (assert) {
+		var oRouteA = oFactory.getRouteMatchEventParameters("welcome"),
+			oRouteB = oFactory.getRouteMatchEventParameters("topic");
+
+		this.oTracker._logRouteMatched(oRouteA);             // A — pageView
+		this.oTracker._logRouteNotFound({hash: "notFound"}); // 404 errorPage
+		this.oTracker._logRouteMatched(oRouteB);             // B — pageView
+
+		var aPageViews = getPageViewCalls(this.oAddToLogsSpy);
+		assert.strictEqual(aPageViews.length, 2, "only two pageViews emitted (404 is errorPage, not pageView)");
+		assert.strictEqual(aPageViews[1].page.referrer, aPageViews[0].page.url, "B's referrer is A's URL, not the 404 hash");
+	});
+
+	QUnit.test("page-data-not-found does not advance referrer", function (assert) {
+		var oRouteA = oFactory.getRouteMatchEventParameters("welcome"),
+			oRouteB = oFactory.getRouteMatchEventParameters("topic");
+
+		this.oTracker._logRouteMatched(oRouteA); // A — pageView
+		// trigger _logPageDataNotFound via _logNavToWithoutHash
+		this.oTracker._logNavToWithoutHash({viewName: "sap.ui.documentation.sdk.view.NotFound"});
+		this.oTracker._logRouteMatched(oRouteB); // B — pageView
+
+		var aPageViews = getPageViewCalls(this.oAddToLogsSpy);
+		assert.strictEqual(aPageViews.length, 2, "only two pageViews emitted (data-not-found is errorPage)");
+		assert.strictEqual(aPageViews[1].page.referrer, aPageViews[0].page.url, "B's referrer is A's URL, not the not-found URL");
+	});
+
+	QUnit.test("stop() clears remembered URL so first post-restart pageView uses document.referrer", function (assert) {
+		var oRouteA = oFactory.getRouteMatchEventParameters("welcome"),
+			oRouteB = oFactory.getRouteMatchEventParameters("topic");
+
+		this.oTracker._logRouteMatched(oRouteA); // A — pageView
+		this.oTracker.stop();
+		this.oTracker.start("testSiteName"); // restart
+		this.oAddToLogsSpy.resetHistory();
+
+		this.oTracker._logRouteMatched(oRouteB); // B — first post-restart pageView
+
+		var aPageViews = getPageViewCalls(this.oAddToLogsSpy);
+		assert.strictEqual(aPageViews.length, 1, "one pageView emitted after restart");
+		assert.strictEqual(aPageViews[0].page.referrer, this.sDocumentReferrer, "post-restart pageView uses document.referrer, not A's URL");
+	});
+
+	QUnit.test("replay path (_logPrecedingRouteVisits) builds correct referrer chain", function (assert) {
+		this.oTracker.stop();
+		var oNewTracker = new UsageTracker(oFactory.getAppComponent());
+		this.sandbox.stub(oNewTracker, "_composeDefaultPageTitleFromRoute").returns("");
+		var oReplaySpy = this.sandbox.spy(oNewTracker, "_addToLogs"),
+			oRoute1 = oFactory.getRouteMatchEventParameters("welcome"),
+			oRoute2 = oFactory.getRouteMatchEventParameters("topic");
+
+		oNewTracker.start("testSiteName", [oRoute1, oRoute2]);
+
+		var aPageViews = oReplaySpy.args.map((args) => args[0]).filter((oLog) => oLog.event === "pageView");
+		assert.strictEqual(aPageViews.length, 2, "two pageViews replayed");
+		assert.strictEqual(aPageViews[1].page.referrer, aPageViews[0].page.url, "second replayed pageView referrer equals first replayed page URL");
+
+		oNewTracker.destroy();
+	});
+
+	QUnit.module("getPageInfo — PageInfo constructor", {
+		before: function () {
+			this.oTracker = new UsageTracker(oFactory.getAppComponent());
+			this.oTracker.start("testSiteName");
+		},
+		beforeEach: function () {
+			this.sandbox = sinon.createSandbox();
+			this.sandbox.stub(this.oTracker, "_composeDefaultPageTitleFromRoute").returns("");
+		},
+		after: function () {
+			this.oTracker.destroy();
+			this.oTracker = null;
+		},
+		afterEach: function () {
+			this.sandbox.restore();
+		}
+	});
+
+	QUnit.test("explicit referrer argument is honoured", function (assert) {
+		var sExplicitReferrer = "http://x/#/prev",
+			oRoute = oFactory.getRouteMatchEventParameters("welcome"),
+			oAddToLogsSpy = this.sandbox.spy(this.oTracker, "_addToLogs");
+
+		// inject explicit referrer by pre-populating _sLastLoggedPageUrl
+		this.oTracker._sLastLoggedPageUrl = sExplicitReferrer;
+		this.oTracker._oLastRouteParameters = null; // reset so route is not treated as duplicate
+		this.oTracker._logRouteMatched(oRoute);
+
+		var aPageViews = oAddToLogsSpy.args.map((args) => args[0]).filter((oLog) => oLog.event === "pageView");
+		assert.strictEqual(aPageViews.length, 1, "one pageView emitted");
+		assert.strictEqual(aPageViews[0].page.referrer, sExplicitReferrer, "referrer parameter is honoured in PageInfo");
+	});
+
+	QUnit.test("referrer falls back to document.referrer when no previous URL is set", function (assert) {
+		var sDocReferrer = "https://external.example.com/",
+			oRoute = oFactory.getRouteMatchEventParameters("welcome2"),
+			oAddToLogsSpy = this.sandbox.spy(this.oTracker, "_addToLogs");
+
+		this.sandbox.stub(document, "referrer").get(() => sDocReferrer);
+		this.oTracker._sLastLoggedPageUrl = null;
+		this.oTracker._oLastRouteParameters = null;
+		this.oTracker._logRouteMatched(oRoute);
+
+		var aPageViews = oAddToLogsSpy.args.map((args) => args[0]).filter((oLog) => oLog.event === "pageView");
+		assert.strictEqual(aPageViews.length, 1, "one pageView emitted");
+		assert.strictEqual(aPageViews[0].page.referrer, sDocReferrer, "PageInfo falls back to document.referrer when no previous URL");
 	});
 });
