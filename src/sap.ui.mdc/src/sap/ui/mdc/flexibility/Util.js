@@ -183,7 +183,12 @@ sap.ui.define([
 							fConfigModified(oControl, oChange);
 						})
 						.catch((oError) => {
-							SAPLog.error(`Error during mdc flex handling - change appliance: ${oError}`);
+							// Plain objects (not Error instances) signal markAsNotApplicable —
+							// pass them through silently so the fl Applier handles them via its
+							// notApplicable custom data key.
+							if (oError instanceof Error) {
+								SAPLog.error(`Error during mdc flex handling - change appliance: ${oError}`);
+							}
 							resumeInvalidation(oControl);
 							throw oError;
 						});
@@ -200,7 +205,9 @@ sap.ui.define([
 							fConfigModified(oControl, oChange);
 						})
 						.catch((oError) => {
-							SAPLog.error(`Error during mdc flex handling - change appliance: ${oError}`);
+							if (oError instanceof Error) {
+								SAPLog.error(`Error during mdc flex handling - change appliance: ${oError}`);
+							}
 							resumeInvalidation(oControl);
 							throw oError;
 						});
