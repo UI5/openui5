@@ -5,6 +5,7 @@
 // Provides control sap.m.Table.
 sap.ui.define([
 	"sap/ui/core/ControlBehavior",
+	"sap/ui/core/Element",
 	"./library",
 	"./ListBase",
 	"./ListItemBase",
@@ -24,7 +25,7 @@ sap.ui.define([
     // jQuery custom selectors ":sapTabbable"
 	"sap/ui/dom/jquery/Selectors"
 ],
-	function(ControlBehavior, library, ListBase, ListItemBase, CheckBox, TableRenderer, PluginBase, BaseObject, ResizeHandler, PasteHelper, jQuery, ListBaseRenderer, Icon, Util, Library, Log, getScrollbarSize) {
+	function(ControlBehavior, Element, library, ListBase, ListItemBase, CheckBox, TableRenderer, PluginBase, BaseObject, ResizeHandler, PasteHelper, jQuery, ListBaseRenderer, Icon, Util, Library, Log, getScrollbarSize) {
 	"use strict";
 
 
@@ -1097,6 +1098,22 @@ sap.ui.define([
 		this.updateInvisibleText(sAnnouncement);
 	};
 
+	Table.prototype._setFooterCellAnnouncement = function(oTarget) {
+		const oColumn = Element.getElementById(oTarget.getAttribute("data-sap-ui-column"));
+		if (!oColumn) {
+			return;
+		}
+
+		const oFooter = oColumn.getFooter();
+		let sAnnouncement = ListItemBase.getAccessibilityText(oFooter, true);
+
+		if (jQuery(oTarget).find(":sapTabbable").length > 0) {
+			sAnnouncement = Library.getResourceBundleFor("sap.m").getText("TABLE_CELL_INCLUDES", [sAnnouncement]);
+		}
+
+		this.updateInvisibleText(sAnnouncement, oTarget);
+	};
+
 	Table.prototype._setNoColumnsMessageAnnouncement = function (oTarget) {
 		if (!this.shouldRenderItems()) {
 			var oNoData = this.getNoData();
@@ -1215,6 +1232,8 @@ sap.ui.define([
 		} else if (oTarget.id == this.getId("tblFooter")) {
 			this._setFooterAnnouncement();
 			this._setFirstLastVisibleCells(oTarget);
+		} else if (oTarget.matches(".sapMListTblFooter>.sapMTblCellFocusable")) {
+			this._setFooterCellAnnouncement(oTarget);
 		} else if (!this._bIgnoreFocusIn && this.getShowOverlay()) {
 			this._bIgnoreFocusIn = true;
 			this.$("overlay").trigger("focus");
