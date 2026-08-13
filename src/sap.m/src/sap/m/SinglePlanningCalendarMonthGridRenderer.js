@@ -277,10 +277,6 @@ sap.ui.define([
 					}
 
 					this.renderAppointment(oRm, oControl, oApp, iColumn, oDensitySizes, iRow, oDay);
-
-					if (oApp.level === iMaxLvl && iMore) {
-						this.renderMoreLink(oRm, oControl, iMore, oDay, iColumn, iColumns, oApp, oDensitySizes, iCellIndex);
-					}
 				} else if (oApp._overflows) {
 					//If it's an overflowing appointment, start from first available level of next day.
 					oApp.level = oApp._nextDayLevel;
@@ -288,6 +284,10 @@ sap.ui.define([
 						this.renderAppointment(oRm, oControl, oApp, oApp._nextDay, oDensitySizes, iRow, oDay);
 					}
 				}
+			}
+
+			if (iMore) {
+				this.renderMoreLink(oRm, oControl, iMore, oDay, iColumn, iColumns, iMaxLvl, oDensitySizes, iCellIndex);
 			}
 
 		};
@@ -503,12 +503,11 @@ sap.ui.define([
 			oRm.close("div");
 		};
 
-		SinglePlanningCalendarMonthGridRenderer.renderMoreLink = function(oRm, oControl, iMore, oDay, iColumn, iColumns, app, oDensitySizes, iCellIndex) {
+		SinglePlanningCalendarMonthGridRenderer.renderMoreLink = function(oRm, oControl, iMore, oDay, iColumn, iColumns, iLevel, oDensitySizes, iCellIndex) {
 				const oFormat = oControl._getDateFormatter();
 				const sMoreLinkDescId = oFormat.format(oDay.toLocalJSDate()) + "-MoreLinkDesc";
 				const oToday = oDay && oDay.isSame(CalendarDate.fromLocalJSDate(UI5Date.getInstance()));
 				const iBorderThickness = this.getBorderThickness(Theming.getTheme(), oToday);
-				const iLevel = app.level;
 				const iRight = iColumns - iColumn - 1;
 				const bIsRTL = Localization.getRTL();
 
