@@ -435,6 +435,33 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	{
+		const oFilterTree = {
+			at : 5,
+			id : "eq",
+			left : {at : 1, id : "PATH", precedence : 99, value : "foo"},
+			precedence : 3,
+			right : {at : 8, id : "VALUE", precedence : 99, value : "42"},
+			type : "Edm.Boolean",
+			value : " eq "
+		};
+
+		[{
+			sInput : "$filter=foo eq 42",
+			oExpected : {$filter : oFilterTree}
+		}, {
+			sInput : "$expand=Foo($filter=foo eq 42)",
+			oExpected : {$expand : {Foo : {$filter : oFilterTree}}}
+		}].forEach(({sInput, oExpected}) => {
+			QUnit.test("parseSystemQueryOption: bParseFilter, " + sInput, (assert) => {
+				assert.deepEqual(
+					// code under test
+					_Parser.parseSystemQueryOption(sInput, true), oExpected);
+			});
+		});
+	}
+
+	//*********************************************************************************************
 	["eq", "ge", "gt", "le", "lt", "ne"].forEach(function (sOperator) {
 		QUnit.test("parseFilter: operator=" + sOperator, function (assert) {
 			// Part 1: foo op 'bar'
