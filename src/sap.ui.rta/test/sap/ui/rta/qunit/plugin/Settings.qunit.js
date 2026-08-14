@@ -509,7 +509,7 @@ sap.ui.define([
 				const oMenuItems = await this.oSettingsPlugin.getMenuItems([oButtonOverlay]);
 				return this.oSettingsPlugin.handler(
 					aSelectedOverlays,
-					{ menuItem: oMenuItems[0], eventItem: {}, contextElement: this.oButton }
+					{ menuItem: oMenuItems[0], payload: {}, contextElement: this.oButton }
 				);
 			});
 		});

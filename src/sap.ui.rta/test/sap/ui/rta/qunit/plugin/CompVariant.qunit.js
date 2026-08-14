@@ -264,26 +264,27 @@ sap.ui.define([
 				text: "text3"
 			}, "the third variant is there and correct");
 
-			var oEvent = {
-				getParameters() {
-					return {
-						item: {
-							getProperty() {
-								return "id3";
-							}
-						}
-					};
-				}
-			};
-
 			var pReturn = waitForCommandToBeCreated(this.oPlugin).then(function(oParameters) {
 				var oCommand = oParameters.command;
 				assert.strictEqual(oCommand.getTargetVariantId(), "id3", "the targetVariantId property is set");
 				assert.deepEqual(oCommand.getSourceVariantId(), "id2", "the sourceVariantId property is set");
 			});
 
-			oMenuItem.handler([this.oVariantManagementOverlay], { eventItem: oEvent });
+			oMenuItem.handler([this.oVariantManagementOverlay], { payload: { key: "id3" } });
 			return pReturn;
+		});
+
+		QUnit.test("Switch without a resolvable target key throws", function(assert) {
+			var oMenuItem = getContextMenuEntryById.call(this, "CTX_COMP_VARIANT_SWITCH");
+
+			assert.throws(
+				function() {
+					// No payload.key is provided
+					oMenuItem.handler([this.oVariantManagementOverlay], { payload: {} });
+				}.bind(this),
+				/Target variant key is missing/,
+				"the handler throws when the target variant key cannot be resolved"
+			);
 		});
 
 		function testSwitchDialogOptions(fnDialogCheck, pReturn) {
@@ -318,21 +319,9 @@ sap.ui.define([
 
 			var oMenuItem = getContextMenuEntryById.call(this, "CTX_COMP_VARIANT_SWITCH");
 
-			var oEvent = {
-				getParameters() {
-					return {
-						item: {
-							getProperty() {
-								return "id2";
-							}
-						}
-					};
-				}
-			};
-
 			sandbox.stub(MessageBox, "warning").callsFake(fnDialogCheck.bind(this));
 
-			oMenuItem.handler([this.oVariantManagementOverlay], { eventItem: oEvent });
+			oMenuItem.handler([this.oVariantManagementOverlay], { payload: { key: "id2" } });
 			return pReturn;
 		}
 

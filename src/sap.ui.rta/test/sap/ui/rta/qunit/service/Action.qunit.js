@@ -72,6 +72,52 @@ sap.ui.define([
 			});
 		});
 
+		QUnit.test("get() exposes and normalizes submenu entries", function(assert) {
+			// A plugin whose menu item carries a submenu with function-valued fields (like the variant switch actions)
+			const oPlugin = this.oRta._oDesignTime.getPlugins()[0];
+			sandbox.stub(oPlugin, "getMenuItems").returns([{
+				id: "CTX_TEST_SWITCH",
+				text: "Switch",
+				rank: 10,
+				handler() {},
+				submenu: [
+					{
+						id: "variant1",
+						text: () => "Variant 1",
+						icon: "sap-icon://accept",
+						enabled: () => false,
+						someInternalField: "should-be-stripped"
+					},
+					{
+						id: "variant2",
+						text: "Variant 2",
+						icon: "blank",
+						enabled: true
+					}
+				]
+			}]);
+
+			return this.oActionService.get(this.oGroupOverlay.getId()).then(function(aActions) {
+				const oSwitchAction = aActions.find((mAction) => mAction.id === "CTX_TEST_SWITCH");
+				assert.ok(oSwitchAction, "the action carrying the submenu is exposed");
+				assert.ok(Array.isArray(oSwitchAction.submenu), "the submenu is exposed as an array");
+				assert.strictEqual(oSwitchAction.submenu.length, 2, "both submenu entries are exposed");
+
+				const oFirst = oSwitchAction.submenu[0];
+				assert.strictEqual(oFirst.id, "variant1", "the submenu entry id (target key) is preserved");
+				assert.strictEqual(oFirst.text, "Variant 1", "a function-valued text is resolved to its value");
+				assert.strictEqual(oFirst.enabled, false, "a function-valued enabled is resolved to its value");
+				assert.strictEqual(oFirst.icon, "sap-icon://accept", "the icon is preserved");
+				assert.notOk(
+					oFirst.hasOwnProperty("someInternalField"),
+					"internal fields are stripped from submenu entries"
+				);
+
+				assert.strictEqual(oSwitchAction.submenu[1].id, "variant2", "the second target key is preserved");
+				assert.strictEqual(oSwitchAction.submenu[1].enabled, true, "a plain enabled value is preserved");
+			});
+		});
+
 		QUnit.test("get() with non-existent control/non under RTA control", function(assert) {
 			return this.oActionService.get([this.oGroupOverlay.getId(), "fakeControl"]).then(
 				function() {
@@ -88,7 +134,35 @@ sap.ui.define([
 			await this.oActionService.execute(this.oGroupOverlay.getId(), "CTX_REMOVE");
 			assert.ok(oHandlerStub.calledOnce, "the handler of the remove action was called");
 			assert.strictEqual(oHandlerStub.firstCall.args[0][0], this.oGroupOverlay, "the handler was called with the correct overlay");
-			assert.strictEqual(oHandlerStub.firstCall.args[1].menuItem.id, "CTX_REMOVE", "the handler was called with the remove item");
+			const mPropertyBag = oHandlerStub.firstCall.args[1];
+			assert.strictEqual(mPropertyBag.menuItem.id, "CTX_REMOVE", "the handler was called with the remove item");
+			assert.strictEqual(
+				mPropertyBag.contextElement,
+				this.oGroupOverlay.getElement(),
+				"the handler received the contextElement matching the targeted overlay"
+			);
+		});
+
+		QUnit.test("execute() forwards the payload to the handler", async function(assert) {
+			const oHandlerStub = sandbox.stub(Remove.prototype, "handler").resolves();
+			const mPayload = { key: "variant-id-42", extra: "abc" };
+			await this.oActionService.execute(this.oGroupOverlay.getId(), "CTX_REMOVE", mPayload);
+			assert.ok(oHandlerStub.calledOnce, "the handler was called");
+			assert.deepEqual(
+				oHandlerStub.firstCall.args[1].payload,
+				mPayload,
+				"the third argument to execute() is forwarded verbatim as mPropertyBag.payload"
+			);
+		});
+
+		QUnit.test("execute() without payload leaves mPropertyBag.payload undefined", async function(assert) {
+			const oHandlerStub = sandbox.stub(Remove.prototype, "handler").resolves();
+			await this.oActionService.execute(this.oGroupOverlay.getId(), "CTX_REMOVE");
+			assert.strictEqual(
+				oHandlerStub.firstCall.args[1].payload,
+				undefined,
+				"payload is undefined when no third argument is passed"
+			);
 		});
 
 		QUnit.test("execute() with non-existent control/non under RTA control", function(assert) {

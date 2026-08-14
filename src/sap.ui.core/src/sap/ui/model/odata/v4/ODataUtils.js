@@ -252,6 +252,60 @@ sap.ui.define([
 			},
 
 			/**
+			 * Parses a filter string to a syntax tree. In this tree:
+			 * <ul>
+			 *   <li> Paths are leaves with <code>id="PATH"</code> and the path in
+			 *     <code>value</code>.
+			 *   <li> Literals are leaves with <code>id="VALUE"</code> and the literal (as parsed)
+			 *     in <code>value</code>.
+			 *   <li> Operations are nodes with the operator in <code>id</code>, the operator
+			 *     including the surrounding required space in <code>value</code>, and
+			 *     <code>left</code> and <code>right</code> containing syntax trees for the
+			 *     operands. <code>not</code> only uses <code>right</code>.
+			 *   <li> Functions are nodes with <code>id="FUNCTION"</code>, the name in
+			 *     <code>value</code>, and an array of <code>parameters</code>.
+			 * </ul>
+			 * If the type is known (especially for logical operators and functions), it is given in
+			 * <code>type</code>. If a function parameter may have different types (like Edm.Decimal
+			 * or Edm.Double in <code>round</code>), it has the property
+			 * <code>ambiguous: true</code>.
+			 * <code>at</code> always contains the position where this token started
+			 * (starting with 1).
+			 *
+			 * Example: <code>parseFilter("foo eq 'bar' and length(baz) ne 5")</code> results in
+			 * <pre>
+			 * {
+			 *     id : "and", value : " and ", type : "Edm.Boolean", at : 14,
+			 *     left : {
+			 *         id : "eq", value : " eq ", type : "Edm.Boolean", at : 5,
+			 *         left : {id : "PATH", value : "foo", at : 1},
+			 *         right : {id : "VALUE", value : "'bar'", at : 8}
+			 *     },
+			 *     right : {
+			 *         id : "ne", value : " ne ", type : "Edm.Boolean", at : 30,
+			 *         left : {
+			 *             id : "FUNCTION", value : "length", type : "Edm.Int32", at : 18,
+			 *             parameters : [{id : "PATH", value : "baz", at : 25}]
+			 *         },
+			 *         right : {id : "VALUE", value : "5", at : 33}
+			 *     }
+			 * }
+			 * </pre>
+			 *
+			 * @param {string} sFilter
+			 *   The filter string
+			 * @returns {object}
+			 *   The syntax tree
+			 * @throws {SyntaxError}
+			 *   If there is a syntax error
+			 *
+			 * @function
+			 * @public
+			 * @since 1.152.0
+			 */
+			parseFilter : _Parser.parseFilter,
+
+			/**
 			 * Parses a system query option "$select" or "$expand" into an object representation.
 			 *
 			 * The value for "$select" is an array of strings.
@@ -260,6 +314,9 @@ sap.ui.define([
 			 * value. Each option itself becomes a property with the option name as key and the
 			 * option value as value. If there are no options, the value for the path is
 			 * <code>null</code>.
+			 *
+			 * If <code>bParseFilter</code> is set, the value for "$filter" is a syntax tree as
+			 * described in {@link #.parseFilter}; otherwise it is the string passed to it.
 			 *
 			 * The value for all other options is the string passed to them.
 			 *
@@ -293,6 +350,9 @@ sap.ui.define([
 			 *
 			 * @param {string} sOption
 			 *   The option string
+			 * @param {boolean} [bParseFilter]
+			 *   Whether to parse the value of "$filter" into a syntax tree as described in
+			 *   {@link #.parseFilter}; by default, the value remains a string
 			 * @returns {object}
 			 *   The option as an object with the option name as key and the parsed value as value
 			 * @throws {SyntaxError}

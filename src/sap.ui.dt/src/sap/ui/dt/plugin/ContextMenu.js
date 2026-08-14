@@ -492,7 +492,7 @@ sap.ui.define([
 	ContextMenu.prototype._onItemSelected = function(oEventItem) {
 		this._ensureSelection(this._oCurrentOverlay);
 
-		function callHandler(oMenuItem, oEventItem) {
+		function callHandler(oMenuItem, sSelectedItemId) {
 			let aSelection;
 			if (oMenuItem.propagatingControl) {
 				aSelection = [OverlayRegistry.getOverlay(oMenuItem.propagatingControl)];
@@ -502,7 +502,9 @@ sap.ui.define([
 			assert(aSelection.length > 0, "sap.ui.rta - Opening context menu, with empty selection - check event order");
 			const mPropertyBag = {
 				menuItem: oMenuItem,
-				eventItem: oEventItem,
+				// Generic payload: the key of the selected menu item (equals oMenuItem.id / submenu entry id).
+				// Plugins that need it (e.g. variant switch) read payload.key; others ignore it.
+				payload: { key: sSelectedItemId },
 				contextElement: this.getContextElement()
 			};
 			oMenuItem.handler(aSelection, mPropertyBag);
@@ -520,12 +522,12 @@ sap.ui.define([
 		this._aMenuItems.some(function(mMenuItemEntry) {
 			const oItem = mMenuItemEntry.menuItem;
 			if (sSelectedItemId === mMenuItemEntry.menuItem.id) {
-				callHandler.apply(this, [oItem, oEventItem]);
+				callHandler.apply(this, [oItem, sSelectedItemId]);
 				return true;
 			} else if (oItem.submenu) {
 				oItem.submenu.some(function(mSubMenuItem) {
 					if (sSelectedItemId === mSubMenuItem.id) {
-						callHandler.apply(this, [mSubMenuItem, oEventItem]);
+						callHandler.apply(this, [mSubMenuItem, sSelectedItemId]);
 						return true;
 					}
 				}.bind(this));

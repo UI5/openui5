@@ -197,11 +197,14 @@ sap.ui.define([
 	function switchVariant(aOverlays, mPropertyBag) {
 		const oVariantManagementOverlay = aOverlays[0];
 		const oVariantManagementControl = oVariantManagementOverlay.getElement();
+		const sTargetVariantId = mPropertyBag.payload?.key;
+		if (sTargetVariantId === undefined) {
+			throw new Error("Target variant key is missing");
+		}
 
 		// If the variant was modified, user must choose whether to save changes before switching
 		if (oVariantManagementControl.getModified()) {
 			const oLibraryBundle = Lib.getResourceBundleFor("sap.ui.rta");
-			const sTargetVariantId = mPropertyBag.eventItem.getParameters().item.getProperty("key");
 			MessageBox.warning(oLibraryBundle.getText("MSG_CHANGE_MODIFIED_VARIANT"), {
 				onClose: onDirtySwitchWarningClose.bind(this, oVariantManagementOverlay, sTargetVariantId),
 				actions: [
@@ -215,7 +218,7 @@ sap.ui.define([
 			});
 		} else {
 			createCommandAndFireEvent.call(this, oVariantManagementOverlay, ["compVariantSwitch"], {
-				targetVariantId: mPropertyBag.eventItem.getParameters().item.getProperty("key"),
+				targetVariantId: sTargetVariantId,
 				sourceVariantId: oVariantManagementControl.getPresentVariantId()
 			});
 		}

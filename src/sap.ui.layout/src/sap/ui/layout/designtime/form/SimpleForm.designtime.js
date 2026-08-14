@@ -193,7 +193,7 @@ sap.ui.define([
 					isEnabled: !(oRenamedElement.getToolbar() || !oRenamedElement.getTitle()),
 					domRef: function (oControl){
 						if (oControl.getTitle && oControl.getTitle()) {
-							return oControl.getTitle().getDomRef();
+							return oControl.getTitle().getRenderedDomRef();
 						}
 					}
 				};

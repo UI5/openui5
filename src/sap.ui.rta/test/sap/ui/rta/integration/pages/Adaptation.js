@@ -222,6 +222,32 @@ sap.ui.define([
 						errorMessage: "Did not find the Element Overlay"
 					});
 				},
+				iSelectOverlays(aElementIds) {
+					aElementIds.forEach((sElementId, iIndex) => {
+						this.waitFor({
+							controlType: "sap.ui.dt.ElementOverlay",
+							matchers(oOverlay) {
+								return oOverlay.getElement().getId() === sElementId;
+							},
+							actions: new Press({ ctrlKey: iIndex !== 0 }),
+							errorMessage: `Did not find the Element Overlay for ${sElementId}`
+						});
+					});
+					return this;
+				},
+				iRightClickOnACombinedElementOverlay() {
+					return this.waitFor({
+						controlType: "sap.ui.dt.ElementOverlay",
+						matchers(oOverlay) {
+							const oElement = oOverlay.getElement();
+							return oElement.getFields?.().length > 1;
+						},
+						success(aOverlays) {
+							aOverlays[0].getDomRef().dispatchEvent(oContextMenuEvent);
+						},
+						errorMessage: "Did not find a combined Element Overlay"
+					});
+				},
 				iClickOnAContextMenuEntryWithKey(sKey) {
 					return this.waitFor({
 						controlType: "sap.m.MenuItem",
@@ -560,17 +586,54 @@ sap.ui.define([
 						errorMessage: "Did not find the element or it is still invisible"
 					});
 				},
-				iShouldSeeTheElementWithText(sText) {
+				iShouldSeeACombinedElementOverlay() {
 					return this.waitFor({
 						controlType: "sap.ui.dt.ElementOverlay",
 						matchers(oOverlay) {
-							if (oOverlay.getElement().getText) {
-								return oOverlay.getElement().getText() === sText;
+							const oElement = oOverlay.getElement();
+							return oElement.getFields?.().length > 1;
+						},
+						success(aOverlays) {
+							Opa5.assert.ok(aOverlays[0].getElement().getVisible(), "The combined element is visible on the UI");
+						},
+						errorMessage: "Did not find a combined Element Overlay"
+					});
+				},
+				iShouldNotSeeACombinedElementOverlay() {
+					return this.waitFor({
+						controlType: "sap.ui.dt.ElementOverlay",
+						check(aOverlays) {
+							return !aOverlays.some((oOverlay) => oOverlay.getElement().getFields?.().length > 1);
+						},
+						success() {
+							Opa5.assert.ok(true, "There is no combined element anymore");
+						},
+						errorMessage: "A combined Element Overlay is still present"
+					});
+				},
+				iShouldSeeTheElementWithText(sText, iExpectedCount) {
+					return this.waitFor({
+						controlType: "sap.ui.dt.ElementOverlay",
+						matchers(oOverlay) {
+							const oElement = oOverlay.getElement();
+							if (oElement.getLabelText) {
+								return oElement.getLabelText() === sText;
+							}
+							if (oElement.getText) {
+								return oElement.getText() === sText;
 							}
 							return undefined;
 						},
+						check(aOverlays) {
+							return iExpectedCount === undefined || aOverlays.length === iExpectedCount;
+						},
 						success(aOverlays) {
-							Opa5.assert.ok(aOverlays[0].getElement(), "The element with the Text was found");
+							if (iExpectedCount === undefined) {
+								Opa5.assert.ok(aOverlays[0].getElement(), `Found an element with the text '${sText}'`);
+							} else {
+								Opa5.assert.strictEqual(aOverlays.length, iExpectedCount,
+									`Found ${iExpectedCount} element(s) with the text '${sText}'`);
+							}
 						},
 						errorMessage: "Did not find the element"
 					});

@@ -628,7 +628,10 @@ sap.ui.define([
 				id: "CTX_VARIANT_SWITCH_SUBMENU",
 				text: Lib.getResourceBundleFor("sap.ui.rta").getText("CTX_VARIANT_SWITCH"),
 				handler: function(aElementOverlays, mPropertyBag) {
-					const sNewVariantKey = mPropertyBag.eventItem.getParameters().item.getProperty("key");
+					const sNewVariantKey = mPropertyBag.payload?.key;
+					if (sNewVariantKey === undefined) {
+						throw new Error("Target variant key is missing");
+					}
 					const oTargetOverlay = aElementOverlays[0];
 					const sCurrentVariantKey = oCurrentVariant.getKey();
 					return this.switchVariant(oTargetOverlay, sNewVariantKey, sCurrentVariantKey);
