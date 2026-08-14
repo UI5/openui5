@@ -134,7 +134,15 @@ sap.ui.define([
 		}
 		// only save the revert data in the custom data when the change is being processed in XML,
 		// as it's only relevant for viewCache at the moment
-		await FlexCustomData.addAppliedCustomData(mControl.control, oChange, mPropertyBag, isXmlModifier(mPropertyBag));
+		const bXmlModifier = isXmlModifier(mPropertyBag);
+		const aCustomDataPromises = [
+			FlexCustomData.addAppliedCustomData(mControl.control, oChange, mPropertyBag, bXmlModifier)
+		];
+		// additionally mark XML-applied changes for support tools so that they can distinguish the applier
+		if (bXmlModifier) {
+			aCustomDataPromises.push(FlexCustomData.addAppliedXmlMarker(mControl.control, oChange, mPropertyBag));
+		}
+		await Promise.all(aCustomDataPromises);
 		// if a change was reverted previously remove the flag as it is not reverted anymore
 		const oResult = { success: true };
 		oChange.markSuccessful(oResult);

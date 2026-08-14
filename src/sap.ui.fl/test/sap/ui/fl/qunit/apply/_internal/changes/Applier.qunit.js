@@ -546,7 +546,9 @@ sap.ui.define([
 			.then(Applier.applyAllChangesForControl.bind(Applier, {}, "DummyFlexReference", oNotProcessedControl))
 			.then(function() {
 				assert.strictEqual(this.oApplyChangeOnControlStub.callCount, 2, "then two changes were processed");
-				assert.strictEqual(this.oApplyChangeOnControlStub.getCall(0).args[0].getId(), "appliedChange", "then first change was processed");
+				assert.strictEqual(this.oApplyChangeOnControlStub.getCall(0).args[0].getId(),
+					"appliedChange",
+					"then first change was processed");
 				assert.strictEqual(
 					this.oApplyChangeOnControlStub.getCall(1).args[0].getId(),
 					"processedChange",
@@ -1170,6 +1172,7 @@ sap.ui.define([
 
 			this.oErrorStub = sandbox.stub(Log, "error");
 			this.oAddAppliedCustomDataSpy = sandbox.spy(FlexCustomData, "addAppliedCustomData");
+			this.oAddAppliedXmlMarkerSpy = sandbox.spy(FlexCustomData, "addAppliedXmlMarker");
 			this.oChangeHandlerApplyChangeStub = sandbox.stub();
 			sandbox.stub(ChangeUtils, "getChangeHandler").resolves({
 				applyChange: this.oChangeHandlerApplyChangeStub,
@@ -1288,6 +1291,7 @@ sap.ui.define([
 			return Applier.applyChangeOnControl(this.oChange, this.oControl, this.mPropertyBag).then(function() {
 				assert.strictEqual(this.oChangeHandlerApplyChangeStub.callCount, 1, "the change was applied");
 				assert.strictEqual(this.oAddAppliedCustomDataSpy.callCount, 1, "the customData was written");
+				assert.strictEqual(this.oAddAppliedXmlMarkerSpy.callCount, 0, "the xml applier marker was not added for a JS apply");
 			}.bind(this));
 		});
 
@@ -1356,6 +1360,7 @@ sap.ui.define([
 			this.oChange = FlexObjectFactory.createFromFileContent(getLabelChangeContent("fileName", sLabelId));
 
 			this.oAddAppliedCustomDataStub = sandbox.stub(FlexCustomData, "addAppliedCustomData").resolves();
+			this.oAddAppliedXmlMarkerStub = sandbox.stub(FlexCustomData, "addAppliedXmlMarker").resolves();
 			this.oAddFailedCustomDataStub = sandbox.stub(FlexCustomData, "addFailedCustomData").resolves();
 			this.oChangeHandlerApplyChangeStub = sandbox.stub();
 			sandbox.stub(ChangeUtils, "getChangeHandler").resolves({
@@ -1402,6 +1407,7 @@ sap.ui.define([
 				assert.ok(this.oChangeHandlerApplyChangeStub.calledOnce, "the change was applied");
 				assert.strictEqual(this.oAddAppliedCustomDataStub.callCount, 1, "custom data was added");
 				assert.ok(this.oAddAppliedCustomDataStub.lastCall.args[3], "the last parameter is true ('bSaveRevertData')");
+				assert.strictEqual(this.oAddAppliedXmlMarkerStub.callCount, 1, "the xml applier marker was added");
 			}.bind(this));
 		});
 
