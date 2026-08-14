@@ -4312,6 +4312,16 @@ sap.ui.define([
 			oSelectedElement,
 			oFirstSection = aSections[0];
 
+		// When there is only one visible section, the navigation is hidden and the section
+		// should not be focusable at all (neither via TAB nor via mouse click),
+		// so the tabindex attribute is removed (same rule as for a single subSection).
+		// The sSectionId argument is irrelevant here, as the only visible section is the one to handle.
+		if (aSections.length === 1) {
+			oFirstSection.$().removeAttr(sTabIndex);
+			oFirstSection._setSubSectionsFocusValues();
+			return oFirstSection;
+		}
+
 		aSections.forEach(function (oSection) {
 			$section = oSection.$();
 

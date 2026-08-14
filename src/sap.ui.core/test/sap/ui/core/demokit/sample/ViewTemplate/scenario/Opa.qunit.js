@@ -34,10 +34,10 @@ sap.ui.define([
 
 			// check for existing controls
 			[
-				{controlType : "sap.ui.core.Title", text : "HeaderInfo"},
+				{controlType : "sap.m.Title", text : "HeaderInfo"},
 				{controlType : "sap.m.Text", text : "[Type Name] Business Partner"},
 				{controlType : "sap.m.Text", text : "[Name] SAPSE"},
-				{controlType : "sap.ui.core.Title", text : "Identification"},
+				{controlType : "sap.m.Title", text : "Identification"},
 				{controlType : "sap.m.Label", text : "ID"},
 				{controlType : "sap.m.Text", text : "0100000000"},
 				{controlType : "sap.m.Label", text : "Address"},
@@ -103,7 +103,7 @@ sap.ui.define([
 
 		// wait for application to load before any interaction
 		Then.waitFor({
-			controlType : "sap.ui.core.Title",
+			controlType : "sap.m.Title",
 			success : onLoad,
 			errorMessage : "No title found, application did not load?!"
 		});

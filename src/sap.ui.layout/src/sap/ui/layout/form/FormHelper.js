@@ -125,7 +125,12 @@ sap.ui.define([
 		updateRenderingTitle: function(vTitle, oRenderingTitle, sDefaultLevel, sDefaultStyle) {
 			let sText;
 			let sLevel = sDefaultLevel;
-			let vTooltip;
+			let vTooltip = oRenderingTitle.getTooltip();
+
+			if (vTooltip && typeof vTooltip !== "string") {
+				oRenderingTitle.destroyTooltip(); // just destroy and create new -> tooltip as object not supported in sap.m
+			}
+			vTooltip = null;
 
 			if (typeof vTitle !== "string") {
 				if (vTitle.getIcon() || vTitle.getEmphasized()) { // icon and emphasized is not supported by sap.m.Title
@@ -136,7 +141,10 @@ sap.ui.define([
 					sLevel = vTitle.getLevel();
 				}
 				sText = vTitle.getText();
-				vTooltip = vTitle.getTooltip(); // TODO, hor to handle tooltip as ManagedObject -> clone it?
+				vTooltip = vTitle.getTooltip();
+				if (vTooltip && typeof vTooltip !== "string") {
+					vTooltip = vTooltip.clone("-inner");
+				}
 			} else {
 				sText = vTitle;
 			}

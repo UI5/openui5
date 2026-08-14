@@ -1938,6 +1938,26 @@ sap.ui.define([
 	};
 
 	/**
+	 * Replaces the GET request identified by the given promise with the last one inside the same
+	 * group.
+	 *
+	 * @param {sap.ui.model.odata.v4.lib._GroupLock} oGroupLock
+	 *   The group lock of the request to be replaced
+	 * @param {Promise} oPromise
+	 *   The promise of the request to be replaced as returned by {@link #request}
+	 *
+	 * @private
+	 */
+	_Requestor.prototype.replaceWithLast = function (oGroupLock, oPromise) {
+		const aRequests = this.mBatchQueue[oGroupLock.getGroupId()];
+		const iIndex = aRequests.findIndex((oRequest) => oRequest.$promise === oPromise);
+		const oNewRequest = aRequests.pop();
+
+		aRequests[iIndex].$resolve(oNewRequest.$promise);
+		aRequests[iIndex] = oNewRequest;
+	};
+
+	/**
 	 * Reports OData messages from the "sap-messages" response header (or forwards them via the
 	 * response object) in case of success. The original messages are preserved in
 	 * "@$ui5.originalMessage" of each message. When reporting, the longtext URL is already resolved

@@ -276,6 +276,12 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("parseFilter", function (assert) {
+		// code under test
+		assert.strictEqual(ODataUtils.parseFilter, _Parser.parseFilter);
+	});
+
+	//*********************************************************************************************
 	QUnit.test("parseSystemQueryOption", function (assert) {
 		// code under test
 		assert.strictEqual(ODataUtils.parseSystemQueryOption, _Parser.parseSystemQueryOption);

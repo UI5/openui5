@@ -86,6 +86,7 @@ sap.ui.define([
 				getServiceUrl : function () { return "/~/"; },
 				getUnlockedAutoCopy : mustBeMocked,
 				lockGroup : mustBeMocked,
+				replaceWithLast : mustBeMocked,
 				request : mustBeMocked
 			};
 
@@ -483,6 +484,8 @@ sap.ui.define([
 			assert.deepEqual(oCache.aElements, []);
 			assert.deepEqual(oCache.aElements.$byPredicate, {});
 			assert.strictEqual(oCache.aElements.$created, 0);
+			assert.ok("fnOnAfterReset" in oCache);
+			assert.strictEqual(oCache.fnOnAfterReset, undefined);
 			assert.ok("iReadLength" in oCache);
 			assert.strictEqual(oCache.iReadLength, undefined);
 			assert.strictEqual(oCache.iResetCount, 0);
@@ -5075,9 +5078,11 @@ sap.ui.define([
 			[false, true].forEach(function (bDataAggregation) {
 				[false, true].forEach(function (bHasCreated) {
 					[false, true].forEach(function (bKeptFirstLevel) {
+						[false, true].forEach(function (bOnAfterReset) {
 		var sTitle = "reset: sGroupId = " + sGroupId + ", has grand total = " + bHasGrandTotal
 				+ ", data aggregation = " + bDataAggregation + ", has $created = " + bHasCreated
-				+ ", has kept oFirstLevel = " + bKeptFirstLevel;
+				+ ", has kept oFirstLevel = " + bKeptFirstLevel
+				+ ", has onAfterReset = " + bOnAfterReset;
 
 		QUnit.test(sTitle, function (assert) {
 			var oCache = _AggregationCache.create(this.oRequestor, "~", "", {},
@@ -5183,6 +5188,11 @@ sap.ui.define([
 			const oDoResetExpectation = this.mock(oCache).expects("doReset")
 				.withExactArgs(Object.assign({}, oNewAggregation, {$ExpandLevels : "~sExpandLevels~"}),
 					bHasGrandTotal, bReuse ? oFirstLevel : undefined);
+			let oOnAfterResetSpy;
+			if (bOnAfterReset) {
+				oOnAfterResetSpy = this.spy();
+				oCache.fnOnAfterReset = oOnAfterResetSpy;
+			}
 
 			// code under test
 			oCache.reset(mKeptElementPredicates, sGroupId, mQueryOptions, oNewAggregation);
@@ -5194,6 +5204,10 @@ sap.ui.define([
 			if (bReuse) {
 				sinon.assert.callOrder(oResetExpectation, oResetFirstExpectation, oDoResetExpectation);
 				// Note: no order for oGetExpandLevelsExpectation vs. oResetFirstExpectation
+			}
+			if (bOnAfterReset) {
+				assert.ok(oOnAfterResetSpy.calledOnceWithExactly());
+				sinon.assert.callOrder(oDoResetExpectation, oOnAfterResetSpy);
 			}
 			assert.deepEqual(oCache.aElements.$byPredicate, {
 				"($uid=1-23)" : {
@@ -5261,7 +5275,10 @@ sap.ui.define([
 			assert.strictEqual(JSON.stringify(oNewAggregation), sNewAggregation, "unchanged");
 			assert.strictEqual(oCache.oFirstLevel, null);
 			assert.strictEqual(JSON.stringify(mQueryOptions), sQueryOptions, "unchanged");
+			assert.ok("fnOnAfterReset" in oCache);
+			assert.strictEqual(oCache.fnOnAfterReset, undefined);
 		});
+						});
 					});
 				});
 			});
@@ -7015,11 +7032,17 @@ sap.ui.define([
 		[true, false].forEach((bDropFilter) => {
 			[true, false].forEach((bRefreshNeeded) => {
 				[true, false].forEach((bEntityFound) => {
-					const sTitle = "requestProperties: bInheritResult = " + bInheritResult
-						+ ", bDropFilter = " + bDropFilter + ", bRefreshNeeded = " + bRefreshNeeded
-						+ ", entity was found: " + bEntityFound;
+					[undefined, false, true].forEach((bFixOnReset) => {
+						[true, false].forEach((bDifferentExpandLevels) => {
+							[true, false].forEach((bRequestFailed) => {
+		const sTitle = "requestProperties: bInheritResult = " + bInheritResult
+			+ ", bDropFilter = " + bDropFilter + ", bRefreshNeeded = " + bRefreshNeeded
+			+ ", entity was found: " + bEntityFound
+			+ ", bFixOnReset = " + bFixOnReset
+			+ ", different expand levels = " + bDifferentExpandLevels
+			+ ", request failed = " + bRequestFailed;
 
-		QUnit.test(sTitle, async function (assert) {
+		QUnit.test(sTitle, function (assert) {
 			const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
 				hierarchyQualifier : "X",
 				$ExpandLevels : "~ExpandLevels~",
@@ -7042,9 +7065,12 @@ sap.ui.define([
 				foo : "bar",
 				"sap-client" : "123"
 			};
-			this.mock(oCache.oTreeState).expects("getExpandLevels").exactly(bRefreshNeeded ? 1 : 0)
+			this.mock(oCache.oTreeState).expects("getExpandLevels")
+				.exactly(bRefreshNeeded || bFixOnReset ? 1 : 0)
 				.withExactArgs()
-				.returns("~UpToDateExpandLevels~");
+				.returns(bRefreshNeeded || bDifferentExpandLevels
+					? "~UpToDateExpandLevels~"
+					: "~ExpandLevels~");
 			this.mock(_AggregationHelper).expects("buildApply4Hierarchy")
 				.exactly(bRefreshNeeded ? 1 : 0)
 				.withExactArgs({
@@ -7084,29 +7110,64 @@ sap.ui.define([
 			const oGroupLock = {getUnlockedCopy : mustBeMocked};
 			this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs()
 				.returns("~oGroupLockCopy~");
-			this.mock(oCache.oRequestor).expects("request")
-				.withExactArgs("GET", "Foo?~queryString~", "~oGroupLockCopy~", undefined, undefined,
-					undefined, undefined, "/Foo", undefined, false, {$select : aSelect},
-					sinon.match.same(oCache))
-				.resolves({
+			const oRequestPromise = bRequestFailed
+				? Promise.reject("~error~")
+				: Promise.resolve({
 					"@odata.context" : "n/a",
 					"@odata.metadataEtag" : "W/...",
 					value : bEntityFound ? ["~oResult~"] : []
 				});
+			this.mock(oCache.oRequestor).expects("request")
+				.withExactArgs("GET", "Foo?~queryString~", "~oGroupLockCopy~", undefined, undefined,
+					undefined, undefined, "/Foo", undefined, false, {$select : aSelect},
+					sinon.match.same(oCache))
+				.returns(oRequestPromise);
 
-			oHelperMock.expects("inheritPathValue").exactly(bInheritResult && bEntityFound ? 1 : 0)
+			oHelperMock.expects("inheritPathValue")
+				.exactly(bInheritResult && bEntityFound && !bRequestFailed ? 1 : 0)
 				.withExactArgs(["path", "to", "property0"], "~oResult~", "~oElement~", true);
-			oHelperMock.expects("inheritPathValue").exactly(bInheritResult && bEntityFound ? 1 : 0)
+			oHelperMock.expects("inheritPathValue")
+				.exactly(bInheritResult && bEntityFound && !bRequestFailed ? 1 : 0)
 				.withExactArgs(["path", "to", "property1"], "~oResult~", "~oElement~", true);
 
-			assert.strictEqual(
-				// code under test
-				await oCache.requestProperties("~oElement~", aSelect, oGroupLock, bInheritResult,
-					bDropFilter, bRefreshNeeded),
-				bInheritResult || !bEntityFound ? undefined : "~oResult~");
+			// code under test
+			const oPromise = oCache.requestProperties("~oElement~", aSelect, oGroupLock, bInheritResult,
+				bDropFilter, bRefreshNeeded, bFixOnReset);
 
-			assert.strictEqual(oCache.oAggregation.$ExpandLevels, "~ExpandLevels~", "not overwritten");
+			if (bFixOnReset && !bRefreshNeeded && bDifferentExpandLevels) {
+				this.mock(oCache).expects("requestProperties")
+					.withExactArgs("~oElement~", sinon.match.same(aSelect),
+						sinon.match.same(oGroupLock), bInheritResult, bDropFilter,
+						/*bRefreshNeeded*/true)
+					.resolves("~oNewResult~");
+				this.mock(oCache.oRequestor).expects("replaceWithLast")
+					.withExactArgs(sinon.match.same(oGroupLock), sinon.match.same(oRequestPromise));
+
+				// code under test
+				oCache.fnOnAfterReset();
+			} else {
+				assert.ok("fnOnAfterReset" in oCache);
+				assert.strictEqual(oCache.fnOnAfterReset, undefined);
+			}
+
+			return oPromise.then((oResult) => {
+				assert.ok(!bRequestFailed, "Unexpected success");
+				assert.strictEqual(
+					oResult,
+					bInheritResult || !bEntityFound ? undefined : "~oResult~");
+			}, (oError) => {
+					assert.ok(bRequestFailed, "Unexpected failure");
+					assert.strictEqual(oError, "~error~");
+			}).finally(() => {
+				assert.strictEqual(oCache.oAggregation.$ExpandLevels, "~ExpandLevels~",
+					"not overwritten");
+				assert.ok("fnOnAfterReset" in oCache);
+				assert.strictEqual(oCache.fnOnAfterReset, undefined);
+			});
 		});
+							});
+						});
+					});
 				});
 			});
 		});
@@ -7120,7 +7181,7 @@ sap.ui.define([
 		});
 		this.mock(oCache).expects("requestProperties")
 			.withExactArgs("~oElement~", ["~LimitedRank~"], "~oGroupLock~", false, false,
-				"~bRefreshNeeded~")
+				"~bRefreshNeeded~", /*bFixOnReset*/true)
 			.resolves("~oResult~");
 		this.mock(_Helper).expects("drillDown").withExactArgs("~oResult~", "~LimitedRank~")
 			.returns("42");
@@ -7139,7 +7200,7 @@ sap.ui.define([
 		});
 		this.mock(oCache).expects("requestProperties")
 			.withExactArgs("~oElement~", ["~LimitedRank~"], "~oGroupLock~", false, false,
-				"~bRefreshNeeded~")
+				"~bRefreshNeeded~", /*bFixOnReset*/true)
 			.resolves(undefined);
 		this.mock(_Helper).expects("drillDown").never();
 

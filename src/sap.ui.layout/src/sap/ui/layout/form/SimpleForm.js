@@ -381,10 +381,6 @@ sap.ui.define([
 		this._iLabelWeight = 3;
 		this._iCurrentWidth = 0;
 		var oForm = new Form(this.getId() + "--Form");
-		// use title of SimpleForm in Form
-		oForm.getTitle = function(){
-			return this.getParent().getTitle();
-		};
 		oForm._origInvalidate = oForm.invalidate;
 		oForm.invalidate = function(oOrigin) {
 			if (this.bOutput) {
@@ -415,6 +411,9 @@ sap.ui.define([
 		this._changedFormElements = [];
 
 		this._oObserver = new ManagedObjectObserver(_observeChanges.bind(this));
+		this._oObserver.observe(this, {
+			aggregations: ["title"]
+		});
 	};
 
 	SimpleForm.prototype.exit = function() {
@@ -1284,7 +1283,58 @@ sap.ui.define([
 
 	function _observeChanges(oChanges) {
 
-		if (oChanges.name == "visible") {
+		if (oChanges.object === this) { // SimpleForm changed
+			if (oChanges.name === "title") { // use title of SimpleForm in Form
+				const oForm = this.getAggregation("form");
+				const vTitle = oChanges.child;
+				if (oChanges.mutation === "insert") {
+					if (typeof vTitle === "string") {
+						oForm.setTitle(vTitle);
+					} else {
+						const oFormTitle = vTitle.clone("--Form");
+						oForm.setTitle(oFormTitle);
+						this._oObserver.observe(vTitle, {
+							properties: true,
+							aggregations: true
+						});
+					}
+				} else if (typeof vTitle === "string") { // remove text
+					oForm.setTitle();
+				} else { // remove Title element
+					this._oObserver.unobserve(vTitle);
+					oForm.destroyTitle();
+				}
+			}
+		} else if (oChanges.object.isA("sap.ui.core.Title")) {
+				const oForm = this.getAggregation("form");
+				const oFormTitle = oForm.getTitle();
+				if (oChanges.name === "tooltip") {
+					const vTooltip = oChanges.child;
+					if (oChanges.mutation === "insert") {
+						if (typeof vTooltip === "string") {
+							oFormTitle.setTooltip(vTooltip);
+						} else {
+							const oFormTooltip = vTooltip.clone("-Form");
+							oFormTitle.setTooltip(oFormTooltip);
+							this._oObserver.observe(vTooltip, {
+								properties: true
+							});
+						}
+						} else if (typeof vTooltip === "string") { // remove text
+							oFormTitle.setTooltip();
+						} else { // remove Title element
+							this._oObserver.unobserve(vTooltip);
+							oFormTitle.destroyTooltip();
+					}
+				} else {
+					oFormTitle.setProperty(oChanges.name, oChanges.current);
+				}
+		} else if (oChanges.object.isA("sap.ui.core.TooltipBase")) {
+				const oForm = this.getAggregation("form");
+				const oFormTitle = oForm.getTitle();
+				const oFormTooltip = oFormTitle.getTooltip();
+				oFormTooltip.setProperty(oChanges.name, oChanges.current);
+		} else if (oChanges.name === "visible") {
 			var oFormElement = oChanges.object.getParent();
 			oFormElement.invalidate();
 		}

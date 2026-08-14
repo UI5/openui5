@@ -4102,6 +4102,36 @@ sap.ui.define([
 	});
 
 	//*****************************************************************************************
+	QUnit.test("replaceWithLast", function (assert) {
+		const oRequestor = _Requestor.create("/Service/", oModelInterface, {}, {}, "4.0");
+		const oOldRequest = {
+			$promise : "~promiseOld~",
+			$resolve : mustBeMocked
+		};
+		const oNewRequest = Object.freeze({$promise : "~promiseNew~"});
+		oRequestor.mBatchQueue.groupId = [
+			[/*change set*/],
+			{$promise : "~promise0~"},
+			oOldRequest,
+			{$promise : "~promise1~"},
+			oNewRequest
+		];
+		const oGroupLock = {getGroupId : mustBeMocked};
+		this.mock(oGroupLock).expects("getGroupId").withExactArgs().returns("groupId");
+		this.mock(oOldRequest).expects("$resolve").withExactArgs("~promiseNew~");
+
+		// code under test
+		oRequestor.replaceWithLast(oGroupLock, "~promiseOld~");
+
+		assert.deepEqual(oRequestor.mBatchQueue.groupId, [
+			[/*change set*/],
+			{$promise : "~promise0~"},
+			oNewRequest,
+			{$promise : "~promise1~"}
+		]);
+	});
+
+	//*****************************************************************************************
 	QUnit.test("isChangeSetOptional", function (assert) {
 		var oRequestor = _Requestor.create("/", null, {}, {}, "4.0");
 

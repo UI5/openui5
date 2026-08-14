@@ -688,11 +688,13 @@ sap.ui.define([
 
 		const aFlexObjects = aCompVariantEntities.filter((oFlexObject) => oFlexObject.getState() !== States.LifecycleState.PERSISTED);
 		aFlexObjects.forEach((oFlexObject) => {
-			// The SmartVariantManagement control always creates new variants with favorite set to true.
 			// A PUBLIC variant must not be a favorite for other users, so the flag is reset before persisting.
+			// The runtime favorite can be true for a new variant (the SmartVariantManagement control creates it
+			// as favorite) or for an updated/renamed one (a USER-layer favorite change is applied on top). In both
+			// cases the shared PUBLIC file must stay favorite:false; the user's personal favorite is kept in the
+			// separate USER-layer change.
 			if (
 				oFlexObject instanceof CompVariant
-				&& oFlexObject.getState() === States.LifecycleState.NEW
 				&& oFlexObject.getLayer() === Layer.PUBLIC
 			) {
 				oFlexObject.setFavorite(false);

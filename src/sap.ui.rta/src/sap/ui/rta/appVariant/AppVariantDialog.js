@@ -315,8 +315,14 @@ sap.ui.define([
 			this.addStyleClass(RtaUtils.getRtaStyleClassName());
 		},
 		onAfterRendering() {
-			document.getElementById("title1").style.height = "0px";
-			document.getElementById("title2").style.height = "0px";
+			let oTitle = Element.getElementById("title1");
+			let oFormContainer = oTitle.getParent();
+			oTitle = oFormContainer.getAggregation("_renderingTitle");
+			document.getElementById(oTitle.getId()).style.height = "0px";
+			oTitle = Element.getElementById("title2");
+			oFormContainer = oTitle.getParent();
+			oTitle = oFormContainer.getAggregation("_renderingTitle");
+			document.getElementById(oTitle.getId()).style.height = "0px";
 			document.getElementById("tile").style.float = "left";
 		},
 		_onCreate() {

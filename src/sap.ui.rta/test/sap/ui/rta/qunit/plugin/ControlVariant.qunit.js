@@ -755,17 +755,7 @@ sap.ui.define([
 
 			// Switch SubMenu
 			const mPropertyBag = {
-				eventItem: {
-					getParameters() {
-						return {
-							item: {
-								getProperty() {
-									return "variant2";
-								}
-							}
-						};
-					}
-				}
+				payload: { key: "variant2" }
 			};
 			this.oVariantManagementOverlay.getVariantManagement = function() {
 				return "varMgtKey";
@@ -823,6 +813,76 @@ sap.ui.define([
 			assert.ok(aMenuItems[4].enabled([this.oVariantManagementOverlay]), "and the entry is enabled");
 			assert.propEqual(aMenuItems[4].submenu, aExpectedSubmenu, "and the submenu array is correct");
 			aMenuItems[4].handler([this.oVariantManagementOverlay], mPropertyBag);
+		});
+
+		QUnit.test("when the switch submenu handler is invoked with payload.key (Action service path)", function(assert) {
+			const switchDone = assert.async();
+			sandbox.stub(this.oVariantManagementControl, "getCurrentVariantReference").returns("variant1");
+			sandbox.stub(this.oVariantManagementControl, "getVariantByKey").withArgs("variant1").returns({
+				getKey: () => "variant1"
+			});
+			sandbox.stub(this.oVariantManagementControl, "getVariants").returns([
+				{ getKey: () => "variant1", getTitle: () => "Variant 1", getVisible: () => true },
+				{ getKey: () => "variant2", getTitle: () => "Variant 2", getVisible: () => true }
+			]);
+			this.oVariantManagementOverlay.getVariantManagement = function() {
+				return "varMgtKey";
+			};
+
+			sandbox.stub(this.oControlVariantPlugin, "switchVariant")
+			.callsFake(function(oTargetOverlay, sNewVariantReference, sCurrentVariantReference) {
+				assert.strictEqual(
+					oTargetOverlay,
+					this.oVariantManagementOverlay,
+					"the handler forwards the target overlay"
+				);
+				assert.strictEqual(
+					sNewVariantReference,
+					"variant2",
+					"the new variant key is read from mPropertyBag.payload.key"
+				);
+				assert.strictEqual(
+					sCurrentVariantReference,
+					"variant1",
+					"the current variant key is unchanged"
+				);
+				switchDone();
+			}.bind(this));
+
+			const aMenuItems = this.oControlVariantPlugin.getMenuItems([this.oVariantManagementOverlay]);
+			const oSwitchSubmenuItem = aMenuItems.find((mItem) => mItem.id === "CTX_VARIANT_SWITCH_SUBMENU");
+			assert.ok(oSwitchSubmenuItem, "the switch submenu entry exists");
+
+			// The target variant key is forwarded via payload by both the context menu and the Action service.
+			oSwitchSubmenuItem.handler([this.oVariantManagementOverlay], { payload: { key: "variant2" } });
+		});
+
+		QUnit.test("when the switch submenu handler is invoked without a resolvable target key", function(assert) {
+			sandbox.stub(this.oVariantManagementControl, "getCurrentVariantReference").returns("variant1");
+			sandbox.stub(this.oVariantManagementControl, "getVariantByKey").withArgs("variant1").returns({
+				getKey: () => "variant1"
+			});
+			sandbox.stub(this.oVariantManagementControl, "getVariants").returns([
+				{ getKey: () => "variant1", getTitle: () => "Variant 1", getVisible: () => true },
+				{ getKey: () => "variant2", getTitle: () => "Variant 2", getVisible: () => true }
+			]);
+			this.oVariantManagementOverlay.getVariantManagement = function() {
+				return "varMgtKey";
+			};
+			const oSwitchVariantStub = sandbox.stub(this.oControlVariantPlugin, "switchVariant");
+
+			const aMenuItems = this.oControlVariantPlugin.getMenuItems([this.oVariantManagementOverlay]);
+			const oSwitchSubmenuItem = aMenuItems.find((mItem) => mItem.id === "CTX_VARIANT_SWITCH_SUBMENU");
+
+			assert.throws(
+				function() {
+					// No payload.key is provided
+					oSwitchSubmenuItem.handler([this.oVariantManagementOverlay], { payload: {} });
+				}.bind(this),
+				/Target variant key is missing/,
+				"the handler throws when the target variant key cannot be resolved"
+			);
+			assert.strictEqual(oSwitchVariantStub.callCount, 0, "switchVariant is not called");
 		});
 	});
 
