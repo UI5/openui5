@@ -150,6 +150,31 @@ sap.ui.define([
 			assert.ok(oMorePressSpy.calledWithMatch("moreLinkPress", { date: o2Aug2018_00_00, sourceLink: oLink }), "it's the right event + parameters");
 		});
 
+		QUnit.test("more link shows on days spanned by overflowing multi-day appointments where none start", async function(assert) {
+			// Prepare - 4 appointments all starting Aug 2, spanning into Aug 3; nothing starts on Aug 3
+			var o4Aug2018_00_00 = UI5Date.getInstance(2018, 7, 4);
+			var oGrid = new SinglePlanningCalendarMonthGrid({
+				startDate: o2Aug2018_00_00,
+				firstDayOfWeek: 1,
+				appointments: [
+					new CalendarAppointment({ startDate: o2Aug2018_00_00, endDate: o4Aug2018_00_00 }),
+					new CalendarAppointment({ startDate: o2Aug2018_00_00, endDate: o4Aug2018_00_00 }),
+					new CalendarAppointment({ startDate: o2Aug2018_00_00, endDate: o4Aug2018_00_00 }),
+					new CalendarAppointment({ startDate: o2Aug2018_00_00, endDate: o4Aug2018_00_00 })
+				]
+			}).placeAt("qunit-fixture");
+			await nextUIUpdate(this.clock);
+
+			// Aug 3 is cell index 4 (week starts Mon Jul 30); no appointment starts there
+			var oMoreLinkAug3 = oGrid._aLinks[4];
+
+			// Assert
+			assert.ok(oMoreLinkAug3, "more link is rendered on a day spanned by overflowing appointments where none start");
+			assert.equal(oMoreLinkAug3.getText().toLowerCase(), "2 more", "more link shows the correct overflow count");
+
+			oGrid.destroy();
+		});
+
 		QUnit.module("Grid days", {
 			beforeEach: async function() {
 				this.oSPC = new SinglePlanningCalendarMonthGrid({
