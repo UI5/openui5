@@ -1020,6 +1020,35 @@ sap.ui.define([
 		assert.ok(this.oStub.calledOnce, "The method has been called once.");
 	});
 
+	QUnit.test("The internal InvisibleText id is added to ariaLabelledBy exactly once during init", function (assert) {
+		// Arrange
+		var sInvisibleTextId = this.oFeedListItem._oInvisibleText.getId();
+
+		// Assert
+		assert.equal(
+			this.oFeedListItem.getAriaLabelledBy().filter(function(sId) { return sId === sInvisibleTextId; }).length,
+			1,
+			"The InvisibleText id appears exactly once in ariaLabelledBy after init"
+		);
+	});
+
+	QUnit.test("Repeated onBeforeRendering calls do not duplicate the InvisibleText id in ariaLabelledBy", function (assert) {
+		// Arrange
+		var sInvisibleTextId = this.oFeedListItem._oInvisibleText.getId();
+
+		// Act
+		this.oFeedListItem.onBeforeRendering();
+		this.oFeedListItem.onBeforeRendering();
+		this.oFeedListItem.onBeforeRendering();
+
+		// Assert
+		assert.equal(
+			this.oFeedListItem.getAriaLabelledBy().filter(function(sId) { return sId === sInvisibleTextId; }).length,
+			1,
+			"The InvisibleText id appears exactly once in ariaLabelledBy after multiple onBeforeRendering calls"
+		);
+	});
+
 	QUnit.module("Method '_onActionButtonPress'", {
 		beforeEach: function () {
 			this.oFeedListItem = new FeedListItem();
