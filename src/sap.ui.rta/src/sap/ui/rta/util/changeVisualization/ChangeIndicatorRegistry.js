@@ -327,18 +327,17 @@ sap.ui.define([
 	};
 
 	/**
-	 * Indicates whether the registry currently holds at least one activated change that can be
-	 * visualized. Considers only registered (resolved) changes — those whose visualization info
-	 * has been resolved against the live control tree — that carry ChangeStates.ALL and whose
-	 * isSuccessfullyApplied() returns true.
+	 * Indicates whether the catalog (Layer 1) holds at least one activated change (ChangeStates.ALL)
+	 * whose application has not failed. Reads the catalog rather than the resolution cache so the
+	 * result is available before the target controls have produced overlays.
 	 *
-	 * @returns {boolean} true if at least one activated, resolved change is registered
+	 * @returns {boolean} true if at least one activated, non-failed change is catalogued
 	 */
 	ChangeIndicatorRegistry.prototype.hasPersistedChanges = function() {
-		return this.getAllRegisteredChanges().some((oEntry) => {
+		return Object.values(this._oChangeCatalog).some((oEntry) => {
 			return Array.isArray(oEntry.changeStates)
 				&& oEntry.changeStates.includes(ChangeStates.ALL)
-				&& !!oEntry.change.isSuccessfullyApplied?.();
+				&& !oEntry.change.hasApplyProcessFailed?.();
 		});
 	};
 

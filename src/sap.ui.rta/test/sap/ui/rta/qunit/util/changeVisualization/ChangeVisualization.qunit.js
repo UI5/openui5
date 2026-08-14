@@ -582,6 +582,36 @@ sap.ui.define([
 			});
 		});
 
+		QUnit.test("when the registry is refreshed, the changesResolved event is fired", function(assert) {
+			const fnDone = assert.async();
+			prepareChanges([
+				createMockChange("testChange1", "rename", "button1")
+			], {
+				getChangeVisualizationInfo(oChange) {
+					return {
+						affectedControls: [oChange.getSelector()]
+					};
+				}
+			});
+
+			let iChangesResolved = 0;
+			this.oChangeVisualization.attachChangesResolved(function() {
+				iChangesResolved++;
+			});
+
+			this.oChangeVisualization.initialize().then(function() {
+				assert.ok(iChangesResolved >= 1, "then changesResolved is fired during initialize");
+				const iAfterInit = iChangesResolved;
+				return this.oChangeVisualization.refreshBorders().then(function() {
+					assert.ok(
+						iChangesResolved > iAfterInit,
+						"then changesResolved is fired again on every refreshBorders"
+					);
+					fnDone();
+				});
+			}.bind(this));
+		});
+
 		QUnit.test("when refreshBorders is called a second time, the registry is not reset again", function(assert) {
 			const fnDone = assert.async();
 			prepareChanges([
@@ -1778,7 +1808,8 @@ sap.ui.define([
 		function createChangeStub(sApplyState) {
 			return {
 				getApplyState: () => sApplyState,
-				isSuccessfullyApplied: () => sApplyState === States.ApplyState.APPLY_SUCCESSFUL
+				isSuccessfullyApplied: () => sApplyState === States.ApplyState.APPLY_SUCCESSFUL,
+				hasApplyProcessFailed: () => sApplyState === States.ApplyState.APPLY_FAILED
 			};
 		}
 
@@ -1808,12 +1839,25 @@ sap.ui.define([
 			assert.strictEqual(this.oCviz.hasPersistedChanges(), true, "then the successfully applied persisted change is reported");
 		});
 
-		QUnit.test("returns false when no persisted change has apply state APPLY_SUCCESSFUL", function(assert) {
+		QUnit.test("returns true for a persisted change that has not failed to apply (still applying)", function(assert) {
+			// A persisted change re-applied after a version switch may be queued/applying without
+			// having failed. It is a real persisted change and must count.
 			setRegisteredChanges(this.oRegistry, {
 				c1: {
-					change: createChangeStub(States.ApplyState.INITIAL),
+					change: createChangeStub(States.ApplyState.APPLYING),
 					changeStates: [ChangeStates.ALL],
 					visualizationInfo: { affectedElementIds: [], displayElementIds: [] }
+				}
+			});
+			assert.strictEqual(this.oCviz.hasPersistedChanges(), true, "then a persisted change that is still applying counts");
+		});
+
+		QUnit.test("returns false when every persisted change failed to apply", function(assert) {
+			setRegisteredChanges(this.oRegistry, {
+				c1: {
+					change: createChangeStub(States.ApplyState.APPLY_FAILED),
+					changeStates: [ChangeStates.ALL],
+					visualizationInfo: {}
 				},
 				c2: {
 					change: createChangeStub(States.ApplyState.APPLY_FAILED),
@@ -1821,7 +1865,7 @@ sap.ui.define([
 					visualizationInfo: {}
 				}
 			});
-			assert.strictEqual(this.oCviz.hasPersistedChanges(), false, "then unsuccessfully applied persisted changes are ignored");
+			assert.strictEqual(this.oCviz.hasPersistedChanges(), false, "then failed persisted changes are ignored");
 		});
 
 		QUnit.test("returns true when at least one of the persisted changes has apply state APPLY_SUCCESSFUL", function(assert) {
@@ -1840,35 +1884,35 @@ sap.ui.define([
 			assert.strictEqual(this.oCviz.hasPersistedChanges(), true, "then the successfully applied entry wins over the others");
 		});
 
-		QUnit.test("returns true when isSuccessfullyApplied() is true on a UIChange-like object", function(assert) {
+		QUnit.test("returns true when hasApplyProcessFailed() is false on a UIChange-like object", function(assert) {
 			setRegisteredChanges(this.oRegistry, {
 				c1: {
-					change: { isSuccessfullyApplied: () => true },
+					change: { hasApplyProcessFailed: () => false },
 					changeStates: [ChangeStates.ALL],
 					visualizationInfo: { affectedElementIds: ["b1"], displayElementIds: ["b1"] }
 				}
 			});
 			assert.strictEqual(
 				this.oCviz.hasPersistedChanges(), true,
-				"then the persisted change is reported via the isSuccessfullyApplied path"
+				"then the persisted change is reported when its apply has not failed"
 			);
 		});
 
-		QUnit.test("returns false when isSuccessfullyApplied() is false", function(assert) {
+		QUnit.test("returns false when hasApplyProcessFailed() is true", function(assert) {
 			setRegisteredChanges(this.oRegistry, {
 				c1: {
-					change: { isSuccessfullyApplied: () => false },
+					change: { hasApplyProcessFailed: () => true },
 					changeStates: [ChangeStates.ALL],
 					visualizationInfo: {}
 				}
 			});
 			assert.strictEqual(
 				this.oCviz.hasPersistedChanges(), false,
-				"then the change is not reported when isSuccessfullyApplied returns false"
+				"then the change is not reported when its apply failed"
 			);
 		});
 
-		QUnit.test("returns false when the change has neither isSuccessfullyApplied nor getApplyState", function(assert) {
+		QUnit.test("returns true when the change has no apply-state accessor (treated as not failed)", function(assert) {
 			setRegisteredChanges(this.oRegistry, {
 				c1: {
 					change: {},
@@ -1877,8 +1921,8 @@ sap.ui.define([
 				}
 			});
 			assert.strictEqual(
-				this.oCviz.hasPersistedChanges(), false,
-				"then changes without an apply-state accessor are ignored"
+				this.oCviz.hasPersistedChanges(), true,
+				"then a persisted change without a failure accessor still counts"
 			);
 		});
 

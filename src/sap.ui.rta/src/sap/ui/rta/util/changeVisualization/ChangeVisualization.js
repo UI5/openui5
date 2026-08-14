@@ -243,6 +243,8 @@ sap.ui.define([
 		await resolveAllPending.call(this);
 
 		applyDecorationDiff.call(this);
+
+		this.fireChangesResolved();
 	}
 
 	/**
@@ -403,6 +405,14 @@ sap.ui.define([
 				designTime: {
 					type: "object"
 				}
+			},
+			events: {
+				/**
+				 * Fired after the change registry has been refreshed and change states have been
+				 * (re-)classified against the current versions model.
+				 * @since 1.152
+				 */
+				changesResolved: {}
 			}
 		},
 		renderer: null,
