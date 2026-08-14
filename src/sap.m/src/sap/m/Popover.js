@@ -2786,7 +2786,7 @@ sap.ui.define([
 			mAccOptions.role = "dialog";
 			mAccOptions.modal = this.getProperty("ariaModal");
 
-			if (!this.getShowHeader() || !oHeader || !oHeader.getVisible()) {
+			if (!oHeader || !oHeader.getVisible()) {
 				return mAccOptions;
 			}
 
