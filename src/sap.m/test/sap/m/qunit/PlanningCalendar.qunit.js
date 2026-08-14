@@ -3243,6 +3243,56 @@ sap.ui.define([
 		assert.notOk(oPlanningCalendarRowTimeLine._isNonWorkingInterval(4, aNonWorkingDays, iStartOffest, iNonWorkingMax), "5th of November is a working day");
 	});
 
+	QUnit.test("NonWorking Days don't show in Hours view", function(assert) {
+		// Prepare: day 2015-01-05 is marked NonWorking at the PC level
+		const oPC = new PlanningCalendar({
+			startDate: UI5Date.getInstance(2015, 0, 5, 8, 0),
+			viewKey: CalendarIntervalType.Hour,
+			specialDates: [
+				new DateTypeRange({
+					startDate: UI5Date.getInstance(2015, 0, 5),
+					type: CalendarDayType.NonWorking
+				})
+			],
+			rows: [new PlanningCalendarRow()]
+		});
+		oPC.placeAt("bigUiArea");
+		const oTimeline = _getRowTimeline(oPC.getRows()[0]);
+		const aNonWorkingHours = oTimeline.getNonWorkingHours() || [];
+		const iStartOffset = oTimeline._getStartDate().getUTCHours();
+		const iNonWorkingMax = 24;
+
+		// Assert: no hour is non-working because nonWorkingHours is not set
+		assert.notOk(oTimeline._isNonWorkingInterval(0, aNonWorkingHours, iStartOffset, iNonWorkingMax),
+			"Hour 8 is working despite the day having a NonWorking special date");
+		assert.notOk(oTimeline._isNonWorkingInterval(6, aNonWorkingHours, iStartOffset, iNonWorkingMax),
+			"Hour 14 is working despite the day having a NonWorking special date");
+
+		oPC.destroy();
+	});
+
+	QUnit.test("NonWorking Hours show in Hours view", function(assert) {
+		// Prepare: Monday 2015-01-05 at 08:00; iStartOffset = 8, so interval 5 = hour 13
+		const oPC = new PlanningCalendar({
+			startDate: UI5Date.getInstance(2015, 0, 5, 8, 0),
+			viewKey: CalendarIntervalType.Hour,
+			rows: [new PlanningCalendarRow({ nonWorkingHours: [13] })]
+		});
+		oPC.placeAt("bigUiArea");
+		const oTimeline = _getRowTimeline(oPC.getRows()[0]);
+		const aNonWorkingHours = oTimeline.getNonWorkingHours() || [];
+		const iStartOffset = oTimeline._getStartDate().getUTCHours();
+		const iNonWorkingMax = 24;
+
+		// Assert
+		assert.ok(oTimeline._isNonWorkingInterval(5, aNonWorkingHours, iStartOffset, iNonWorkingMax),
+			"Hour 13 (interval 5, offset 8) is non-working because it is in nonWorkingHours");
+		assert.notOk(oTimeline._isNonWorkingInterval(6, aNonWorkingHours, iStartOffset, iNonWorkingMax),
+			"Hour 14 (interval 6, offset 8) is working");
+
+		oPC.destroy();
+	});
+
 	QUnit.module("events");
 
 	QUnit.test("appointmentSelect", async function(assert) {

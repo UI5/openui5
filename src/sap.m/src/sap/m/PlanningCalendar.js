@@ -4293,6 +4293,11 @@ sap.ui.define([
 	 * @override
 	 */
 	PlanningCalendarRowTimeline.prototype._isNonWorkingInterval = function (iInterval, aNonWorkingItems, iStartOffset, iNonWorkingMax) {
+		// In hours view only show nonworking hours
+		if (this.getIntervalType() === CalendarIntervalType.Hour) {
+			return CalendarRow.prototype._isNonWorkingInterval.call(this, iInterval, aNonWorkingItems, iStartOffset, iNonWorkingMax);
+		}
+
 		const oRow = Element.getElementById(this.getAssociation("row")),
 			oDate = CalendarDate.fromUTCDate(this._getStartDate().getJSDate()),
 			oRowSpecialDates = oRow._getSpecialDates(),
