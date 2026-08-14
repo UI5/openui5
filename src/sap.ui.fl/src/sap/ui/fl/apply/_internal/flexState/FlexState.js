@@ -296,12 +296,20 @@ sap.ui.define([
 				// Only keep FlexObjects found in the storage change definitions
 				const oExistingFlexObject = aFlexObjects.find(function(oFlexObject, iIndex) {
 					iObjectIndex = iIndex;
-					return oFlexObject.getId() === oChangeDef.fileName;
+					return oChangeDef.fileName
+						? oFlexObject.getId() === oChangeDef.fileName
+						// A change without a fileName receives a runtime-generated id during FlexObject creation.
+						// Storage still returns it without a fileName, so it cannot be matched by id and is
+						// instead matched via the generated-fileName flag rather than treated as unknown.
+						// If several fileName-less objects coexist, they are matched first-available
+						// since no shared key exists to correlate them more precisely.
+						: oFlexObject.getFileNameWasGenerated();
 				});
 				if (oExistingFlexObject) {
 					aFlexObjects.splice(iObjectIndex, 1);
 					// Only update FlexObjects which were modified (new, updated)
 					if (oExistingFlexObject.getState() !== States.LifecycleState.PERSISTED) {
+						// setResponse omits fileName, so a runtime-generated id is preserved
 						oExistingFlexObject.setResponse(oChangeDef);
 						bUpdate = true;
 					}

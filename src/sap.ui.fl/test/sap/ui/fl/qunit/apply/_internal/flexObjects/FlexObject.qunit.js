@@ -480,6 +480,15 @@ sap.ui.define([
 			);
 		});
 
+		QUnit.test("when exporting file content of a FlexObject with a generated fileName", function(assert) {
+			// fileNameWasGenerated is a runtime-only flag and must never be persisted
+			this.oFlexObject.setFileNameWasGenerated(true);
+			assert.notOk(
+				"fileNameWasGenerated" in this.oFlexObject.convertToFileContent(),
+				"then the runtime-only flag is not part of the file content"
+			);
+		});
+
 		QUnit.test("when cloning file content", function(assert) {
 			const oExpectedFileContent = { ...oFileContent };
 			oExpectedFileContent.selector = {};

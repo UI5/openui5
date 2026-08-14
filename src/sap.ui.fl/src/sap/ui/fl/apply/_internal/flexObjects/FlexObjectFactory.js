@@ -89,6 +89,7 @@ sap.ui.define([
 		const sChangeType = mProperties.type || mProperties.changeType;
 
 		let sFileName = mProperties.fileName || mProperties.id;
+		const bFileNameWasGenerated = !sFileName;
 		if (!sFileName) {
 			sFileName = Utils.createDefaultFileName(sChangeType);
 			// ABAP only supports 64 characters for the file name
@@ -105,6 +106,7 @@ sap.ui.define([
 
 		return {
 			id: sFileName,
+			fileNameWasGenerated: bFileNameWasGenerated,
 			adaptationId: mProperties.adaptationId,
 			layer: mProperties.layer,
 			content: cloneIfObject(mProperties.content),
