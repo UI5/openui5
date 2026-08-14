@@ -3281,6 +3281,34 @@ sap.ui.define([
 	};
 
 	/**
+	 * Called by the designtime tool hook when RTA starts.
+	 * @private
+	 */
+	ObjectPageLayout.prototype.enteringRtaMode = function () {
+		this._bRtaActive = true;
+		this._adjustTitlePositioning();
+	};
+
+	/**
+	 * Called by the designtime tool hook when RTA stops.
+	 * @private
+	 */
+	ObjectPageLayout.prototype.leavingRtaMode = function () {
+		this._bRtaActive = false;
+		this._adjustTitlePositioning();
+	};
+
+	/**
+	 * Returns whether RTA (runtime adaptation) is currently active.
+	 * The flag is set/unset via the designtime tool start/stop hooks.
+	 * @returns {boolean}
+	 * @private
+	 */
+	ObjectPageLayout.prototype._isRTAActive = function () {
+		return !!this._bRtaActive;
+	};
+
+	/**
 	 * Makes the area underneath the title element invisible using clip-path,
 	 * to allow usage of a transparent background on the title element.
 	 * Without this, content from the scroll overflow would show underneath the transparent title.
@@ -3293,8 +3321,9 @@ sap.ui.define([
 	 */
 	ObjectPageLayout.prototype._adjustClipPathForTitleTransparency = function (oWrapperElement, oTitleMetrics, iScrollbarWidth) {
 		var oHeaderTitle = this.getHeaderTitle(),
-			bRequiresClipPath = oHeaderTitle && oHeaderTitle.supportsBackgroundDesign()
+			bIsTitleTransparent = oHeaderTitle && oHeaderTitle.supportsBackgroundDesign()
 				&& oHeaderTitle.getBackgroundDesign() === BackgroundDesign.Transparent,
+			bRequiresClipPath = bIsTitleTransparent || this._isRTAActive(),
 			iTitleHeight = oTitleMetrics.height,
 			iTitleWidth = oTitleMetrics.width,
 			sClipPath;
