@@ -2240,6 +2240,17 @@ sap.ui.define([
 		oInvisibleText.destroy();
 	});
 
+	QUnit.test("Popover with internal title and showHeader disabled", async function(assert) {
+		this.oPopover.setTitle("Title text");
+		this.oPopover.setShowHeader(false);
+
+		this.oPopover.openBy(this.oButton);
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(this.oPopover.getDomRef().getAttribute("aria-labelledby"), null,
+			"aria-labelledby does not reference the internal title when the standard header is disabled");
+	});
+
 	QUnit.test("Popover with internal header and title", async function(assert) {
 		var sInvTextId = "invisibleText",
 			oInvisibleText = new InvisibleText(sInvTextId, {text: "invisible text"});
@@ -2288,6 +2299,21 @@ sap.ui.define([
 		//Cleanup
 		oInvisibleText.destroy();
 		oCustomHeader.destroy();
+	});
+
+	QUnit.test("Popover with custom header with Title and showHeader disabled", async function(assert) {
+		const sCustomHeaderTitleId = "customHeaderTitleId";
+		const oCustomHeader = new Bar({
+			contentLeft: [new Title(sCustomHeaderTitleId, {text: "Just Title"})]
+		});
+
+		this.oPopover.setShowHeader(false);
+		this.oPopover.setCustomHeader(oCustomHeader);
+		this.oPopover.openBy(this.oButton);
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(this.oPopover.getDomRef().getAttribute("aria-labelledby"), sCustomHeaderTitleId,
+			"aria-labelledby points to the custom header title despite showHeader being disabled");
 	});
 
 	QUnit.test("Popover with custom header without Title", async function(assert) {
