@@ -8,30 +8,19 @@ OpenUI5 is an enterprise-grade JavaScript UI framework implementing SAP Fiori de
 
 **Requirements:** Node.js ^20.17.0 || >=22.9.0, npm >=8
 
-## Running QUnit Tests for a Single Module
+## Running Tests
 
-**Always use `/run-test` skill for single module testing. Do NOT use karma for individual modules.**
+- Single QUnit module: use the `/run-test <module>` skill. Do NOT use karma for individual modules.
+- Visual/screenshot tests: use the `/run-visual-tests <lib> <SpecName>` skill.
 
-```bash
-/run-test <module-name>
-```
+## Linting
 
-**Examples:**
-```bash
-/run-test BlockLayerUtils
-/run-test sap.m.Button
-/run-test sap/ui/core/routing/Router
-```
+After editing sources, run `npm run lint` (ESLint over `src/`, cached). This is also the repo's `npm test` script.
+For LESS/theme changes, run `npm run lint:styles`.
 
-## Running Visual (uiveri5) Tests
+## Starting the Testsuite Server
 
-**Use the `/run-visual-tests` skill for visual/image-comparison/screenshot tests.**
-
-```bash
-/run-visual-tests <lib> <SpecName>
-```
-
-e.g. `/run-visual-tests sap.m Text`. `<SpecName>` is the `*.spec.js` basename; omit it to run all of a library's specs.
+Run `npm start` to serve the testsuite locally, useful for reproducing behavior in a browser.
 
 ## Determining the @since Tag for New API
 
@@ -51,8 +40,7 @@ This repository uses **Gerrit** for code review, not GitHub pull requests. Key r
 - Do not force-push or rewrite commits that are already under review without explicit user instruction.
 
 ## Metadata-Driven Controls (MDC)
-When the context is related to Metadata-Driven Controls (MDC) this relates to sap.ui.mdc library.
-@src/sap.ui.mdc/AGENTS.md
+When working on the `sap.ui.mdc` library (Metadata-Driven Controls), read `src/sap.ui.mdc/AGENTS.md` first. It covers the delegate pattern, PropertyInfo, personalization, and where MDC code belongs. Skip it for all other libraries.
 
 ## Key References
 
