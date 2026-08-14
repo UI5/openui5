@@ -142,7 +142,8 @@ test("HTTP urls", function() {
 	equal(jQuery.sap.validateUrl("http://www.host.com?name=value#somehash"), true, "http://www.host.com?name=value#somehash");
 	equal(jQuery.sap.validateUrl("http://www.host.com/path%7e+13?_name@=!value+#somehash?/"), true, "http://www.host.com/path%7e+13?_name@=!value+#somehash?/");
 
-	equal(jQuery.sap.validateUrl("http://www.host.com/invalid\\path"), false, "Invalid character in path");
+	equal(jQuery.sap.validateUrl("http://www.host.com/invalid\\path"), true, "Backslash in a special-scheme path is normalized to '/' (WHATWG), so the URL is valid");
+	equal(jQuery.sap.validateUrl("http://www.host.com/invalid<path"), false, "Invalid character in path");
 	equal(jQuery.sap.validateUrl("http://www.host.com/path?name=invalid>value"), false, "Invalid character in query");
 	equal(jQuery.sap.validateUrl("http://www.host.com/path?invalid>value"), false, "Invalid character in query without equal sign");
 	equal(jQuery.sap.validateUrl("http://www.host.com/path#invalid#hash"), false, "Invalid character in hash");
@@ -323,6 +324,105 @@ test("Whitelist", function() {
 	jQuery.sap.clearUrlWhitelist();
 });
 
+QUnit.test("hostname match with allow-list", function(assert) {
+	//is ok with empty allow-list
+	var sUrl = "http://example.com";
+	assert.ok(jQuery.sap.validateUrl(sUrl), sUrl + " valid");
+
+	jQuery.sap.addUrlWhitelist("http", "sap.com");
+	sUrl = "http://example.com";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid");
+
+	sUrl = "http:/example.com";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid");
+
+	var sUrl2 = "http://sap.com";
+	assert.ok(jQuery.sap.validateUrl(sUrl2), sUrl2 + " valid");
+
+	sUrl2 = "http:/sap.com";
+	assert.ok(jQuery.sap.validateUrl(sUrl2), sUrl2 + " valid");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
+QUnit.test("userinfo in URL with allow-list", function(assert) {
+	//is ok with empty allow-list
+	var sUrl = "http://user:password@example.com";
+	assert.ok(jQuery.sap.validateUrl(sUrl), sUrl + " valid");
+
+	jQuery.sap.addUrlWhitelist("http", "sap.com");
+	sUrl = "http://user:password@example.com";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid");
+
+	sUrl = "http://:password@example.com";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid");
+
+	sUrl = "http:/:@example.com";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid");
+
+	// Test that "@" in the path-component of the URL is not treated as userinfo
+	sUrl = "http://example.com/path@sap.com";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid");
+
+	sUrl = "http://example.com?path@sap.com";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid");
+
+	sUrl = "http://example.com#path@sap.com";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
+QUnit.test("chained userinfo does not confuse the host with the allow-list", function(assert) {
+	jQuery.sap.addUrlWhitelist("http", "allowed.example");
+
+	// WHATWG binds userinfo at the LAST "@" in the authority, so a browser reads the host
+	// of "http://x@allowed.example:@other.example/" as "other.example". The allowed host only
+	// appears in the userinfo, so the URL must not match the "allowed.example" entry. A
+	// single userinfo run stopping at the first "@" would read the host as "allowed.example"
+	// (the ":" ends the host group) and wrongly accept the URL.
+	var sUrl = "http://x@allowed.example:@other.example/";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid (host is other.example)");
+
+	// A non-empty password before the second "@" behaves the same way.
+	sUrl = "http://x@allowed.example:password@other.example/";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid (host is other.example)");
+
+	// The protocol-relative form resolves under the page's http-family origin, so the same
+	// last-"@" host rule applies.
+	sUrl = "//x@allowed.example:@other.example/";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid (host is other.example)");
+
+	// Contrast: a single "@" with a colon-separated decoy left of it was already rejected
+	// (host is other.example), and stays rejected.
+	sUrl = "http://allowed.example:password@other.example/";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid (host is other.example)");
+
+	// Contrast: a chained "@" without a colon was already rejected, and stays rejected.
+	sUrl = "http://x@allowed.example@other.example/";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid (host is other.example)");
+
+	// A legitimate "user:pass@host" URL with a single "@" and the allowed host still validates.
+	sUrl = "http://user:pass@allowed.example/";
+	assert.ok(jQuery.sap.validateUrl(sUrl), sUrl + " is valid (host is allowed.example)");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
+QUnit.test("relative path with allow-list", function(assert) {
+	// Note: It is strongly advised that consumers do not use relative URLs.
+	var sUrl = "/test";
+	assert.ok(jQuery.sap.validateUrl(sUrl), sUrl + " valid");
+
+	jQuery.sap.addUrlWhitelist("http", "sap.com", undefined, "/test");
+	assert.ok(jQuery.sap.validateUrl(sUrl), sUrl + " valid");
+
+	var sUrl2 = "/test2";
+	assert.notOk(jQuery.sap.validateUrl(sUrl2), sUrl2 + " is not valid");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
 QUnit.test("Unusual number of slashes in front of host", function(assert) {
 	jQuery.sap.addUrlWhitelist("http", "sap.com");
 
@@ -334,6 +434,331 @@ QUnit.test("Unusual number of slashes in front of host", function(assert) {
 	assert.notOk(jQuery.sap.validateUrl("http:/\\//evil.com"), "URL is not valid");
 	assert.notOk(jQuery.sap.validateUrl("http:///evil.com"), "URL is not valid");
 	assert.notOk(jQuery.sap.validateUrl("http:\\\\evil.com"), "URL is not valid");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
+QUnit.test("unknown protocol", function(assert) {
+	var sUrl = "httpg://www.example.com";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid (only http/https/ftp accepted with empty allowlist)");
+});
+
+QUnit.test("backslash in authority is treated as slash before host matching", function(assert) {
+	jQuery.sap.addUrlWhitelist("http", "allowed.example");
+
+	// In special schemes the whatwg spec treats "\" like "/", so a browser reads
+	// the host of "http://other.example\@allowed.example" as "other.example" and
+	// "@allowed.example" as path. The validator resolves the host the same way, so
+	// the URL does not match the "allowed.example" entry.
+	var sUrl = "http://other.example\\@allowed.example";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid (host is other.example)");
+
+	sUrl = "http://other.example\\@allowed.example/path";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid (host is other.example)");
+
+	// With the sides swapped, "\" becomes "/" so the host is "allowed.example" and
+	// the URL matches the entry.
+	sUrl = "http://allowed.example\\@other.example";
+	assert.ok(jQuery.sap.validateUrl(sUrl), sUrl + " is valid (host is allowed.example)");
+
+	// A plain "@" is userinfo, so the host is "other.example" and the URL does not match.
+	sUrl = "http://allowed.example@other.example";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid (host is other.example)");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
+QUnit.test("backslash normalization applies to non-lowercase special schemes", function(assert) {
+	// WHATWG scheme comparison is case-insensitive and a browser lowercases the scheme,
+	// so "HTTP:", "Http:", "HtTpS:", "FTP:", "WS:" are all special schemes and the same
+	// backslash-in-authority normalization must apply. rSpecialSchemeURLs is matched
+	// case-insensitively so the "\" is treated as "/" and the host is read the same way
+	// a browser reads it, regardless of scheme case.
+	jQuery.sap.addUrlWhitelist("http", "allowed.example");
+
+	var sUrl = "HTTP://other.example\\@allowed.example";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid (host is other.example)");
+
+	sUrl = "Http://other.example\\@allowed.example";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid (host is other.example)");
+
+	// The legitimate control case still passes: with the allowed host left of the "\",
+	// the host is "allowed.example" and the URL matches the entry.
+	sUrl = "HTTP://allowed.example\\@other.example";
+	assert.ok(jQuery.sap.validateUrl(sUrl), sUrl + " is valid (host is allowed.example)");
+
+	// A falsy-protocol entry accepts the default special schemes; the normalization must
+	// still apply so the host is read after the "\".
+	jQuery.sap.clearUrlWhitelist();
+	jQuery.sap.addUrlWhitelist(undefined, "allowed.example");
+
+	sUrl = "HtTpS://other.example\\@allowed.example";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid (host is other.example)");
+
+	sUrl = "FTP://other.example\\@allowed.example";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid (host is other.example)");
+
+	// The "ws"/"wss" schemes are special too.
+	jQuery.sap.clearUrlWhitelist();
+	jQuery.sap.addUrlWhitelist("ws", "allowed.example");
+
+	sUrl = "WS://other.example\\@allowed.example";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid (host is other.example)");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
+QUnit.test("backslash normalization applies to the file scheme", function(assert) {
+	// "file" is a WHATWG special scheme, so a browser treats "\" like "/" in the authority.
+	// new URL("file:\\other.example\\@allowed.example").host === "other.example" and
+	// "@allowed.example" becomes part of the path. Without normalizing the "\", rBasicUrl
+	// would read "other.example\@" as userinfo and "allowed.example" as the host, so a
+	// "file"/"allowed.example" entry would wrongly match. The validator must resolve the
+	// host the same way a browser does.
+	jQuery.sap.addUrlWhitelist("file", "allowed.example");
+
+	var sUrl = "file:\\\\other.example\\\\@allowed.example";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid (host is other.example)");
+
+	sUrl = "file:\\\\other.example\\\\@allowed.example/path";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid (host is other.example)");
+
+	// Scheme comparison is case-insensitive, so the normalization applies regardless of case.
+	sUrl = "FILE:\\\\other.example\\\\@allowed.example";
+	assert.notOk(jQuery.sap.validateUrl(sUrl), sUrl + " is not valid (host is other.example)");
+
+	// With the sides swapped, "\" becomes "/" so the host is "allowed.example" and the URL matches.
+	sUrl = "file:\\\\allowed.example\\\\@other.example";
+	assert.ok(jQuery.sap.validateUrl(sUrl), sUrl + " is valid (host is allowed.example)");
+
+	// A genuine file URL for the allowed host still validates. Over-rejecting these would
+	// break a consumer that legitimately adds a file allow-list entry.
+	assert.ok(jQuery.sap.validateUrl("file://allowed.example"),
+		"file://allowed.example is valid (host is allowed.example)");
+	assert.ok(jQuery.sap.validateUrl("file://allowed.example/path/to/file.txt"),
+		"file://allowed.example/path/to/file.txt is valid (host is allowed.example)");
+
+	// A file URL for a foreign host is rejected.
+	assert.notOk(jQuery.sap.validateUrl("file://other.example/path"),
+		"file://other.example/path is not valid (host is other.example)");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
+QUnit.test("special schemes still accept legitimate URLs after file was added to the gate", function(assert) {
+	// Adding "file" to the special-scheme gate must not change how the other special
+	// schemes (http/https/ftp/ws/wss) are normalized and matched.
+	jQuery.sap.addUrlWhitelist("http", "allowed.example");
+	jQuery.sap.addUrlWhitelist("https", "allowed.example");
+	jQuery.sap.addUrlWhitelist("ftp", "allowed.example");
+	jQuery.sap.addUrlWhitelist("ws", "allowed.example");
+	jQuery.sap.addUrlWhitelist("wss", "allowed.example");
+
+	assert.ok(jQuery.sap.validateUrl("http://allowed.example/path"), "http host matches");
+	assert.ok(jQuery.sap.validateUrl("https://allowed.example/path"), "https host matches");
+	assert.ok(jQuery.sap.validateUrl("ftp://allowed.example"), "ftp host matches");
+	assert.ok(jQuery.sap.validateUrl("ws://allowed.example"), "ws host matches");
+	assert.ok(jQuery.sap.validateUrl("wss://allowed.example"), "wss host matches");
+
+	// The backslash-in-authority host resolution stays correct for the other special
+	// schemes: the host is read after the "\", so these do not match the entry.
+	assert.notOk(jQuery.sap.validateUrl("http://other.example\\@allowed.example"),
+		"http://other.example\\@allowed.example is not valid (host is other.example)");
+	assert.notOk(jQuery.sap.validateUrl("ftp://other.example\\@allowed.example"),
+		"ftp://other.example\\@allowed.example is not valid (host is other.example)");
+	assert.notOk(jQuery.sap.validateUrl("wss://other.example\\@allowed.example"),
+		"wss://other.example\\@allowed.example is not valid (host is other.example)");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
+QUnit.test("protocol-relative authority is not treated as a relative path", function(assert) {
+	jQuery.sap.addUrlWhitelist("http", "allowed.example");
+
+	// An input starting with "//" is an authority, never a relative path. When the
+	// authority defeats rBasicUrl's host sub-pattern (e.g. a colon-led userinfo with
+	// several "@"), the host group is empty. A browser still resolves a foreign host
+	// (here new URL(...).hostname === "0.0.0.1"), so the URL must not match the entry
+	// via the relative-path branch.
+	assert.notOk(jQuery.sap.validateUrl("//:a@:a@b@@1"),
+		"a // authority whose host rBasicUrl cannot parse is rejected, not treated as relative");
+	assert.notOk(jQuery.sap.validateUrl("//:80"),
+		"a // authority with an empty host is rejected, not treated as relative");
+
+	// A clean protocol-relative URL parses a host, so it is matched against the entry
+	// as usual: the matching host passes, a foreign host is rejected.
+	assert.ok(jQuery.sap.validateUrl("//allowed.example"),
+		"a // authority resolving to the allowed host is valid");
+	assert.notOk(jQuery.sap.validateUrl("//evil.example"),
+		"a // authority resolving to a foreign host is not valid");
+
+	// Genuine relative paths (single leading slash, no authority marker) stay valid.
+	assert.ok(jQuery.sap.validateUrl("/news"), "/news is a relative path and valid");
+	assert.ok(jQuery.sap.validateUrl("/test"), "/test is a relative path and valid");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
+QUnit.test("backslash in a schemeless authority is treated as slash before host matching", function(assert) {
+	jQuery.sap.addUrlWhitelist("http", "allowed.example");
+
+	// A schemeless input starting with an authority marker resolves against the page's
+	// special-scheme origin, so the whatwg spec treats "\" as "/" just as it does for an
+	// explicit special scheme. A browser reads the host of "//other.example\@allowed.example"
+	// as "other.example" (the "\" becomes a "/", ending the authority) and of
+	// "///another.example\@allowed.example" as "another.example". The validator resolves the
+	// host the same way, so neither matches "allowed.example".
+	assert.notOk(jQuery.sap.validateUrl("//other.example\\@allowed.example"),
+		"//other.example\\@allowed.example is not valid (host is other.example)");
+	assert.notOk(jQuery.sap.validateUrl("///another.example\\@allowed.example"),
+		"///another.example\\@allowed.example is not valid (host is another.example)");
+
+	// A leading "/\" is also an authority marker; the "\" becomes a "/" so the host is the
+	// segment after it, which is foreign here.
+	assert.notOk(jQuery.sap.validateUrl("/\\other.example"),
+		"/\\other.example is not valid (host is other.example)");
+
+	// With the allowed host left of the "\", the host is "allowed.example" and the
+	// URL matches the entry.
+	assert.ok(jQuery.sap.validateUrl("//allowed.example\\@other.example"),
+		"//allowed.example\\@other.example is valid (host is allowed.example)");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
+QUnit.test("protocol-relative authority does not match a scheme-only entry for a foreign host", function(assert) {
+	// A scheme-only entry allows a non-http scheme on any host. A protocol-relative
+	// URL ("//host", "/\\host", "\\\\host") is not that scheme: a browser resolves it
+	// under the page's special (http-family) origin to a foreign host, e.g.
+	// new URL("/\\other.example\\x", "http://allowed.example/").host === "other.example".
+	// Such a URL must not match the scheme-only entry through the relative-URL leniency.
+	var SCHEME_JS = ["java", "script:"].join("");
+	jQuery.sap.addUrlWhitelist("http", "*.trusted.com");
+	jQuery.sap.addUrlWhitelist("javascript", "");
+
+	assert.notOk(jQuery.sap.validateUrl("//other.example/x"),
+		"// authority to a foreign host does not match the javascript scheme-only entry");
+	assert.notOk(jQuery.sap.validateUrl("/\\other.example\\x"),
+		"/\\ authority to a foreign host does not match the javascript scheme-only entry");
+	assert.notOk(jQuery.sap.validateUrl("\\\\other.example\\x"),
+		"\\\\ authority to a foreign host does not match the javascript scheme-only entry");
+
+	// A protocol-relative URL to a trusted host still matches the http entry.
+	assert.ok(jQuery.sap.validateUrl("//sub.trusted.com/x"),
+		"// authority to a trusted host matches the http entry");
+	// The scheme-only entry still matches a URL that uses its scheme.
+	assert.ok(jQuery.sap.validateUrl(SCHEME_JS + "alert(1)"),
+		"a URL using the javascript scheme still matches the scheme-only entry");
+	// A genuine relative path (single leading slash, no authority) stays valid.
+	assert.ok(jQuery.sap.validateUrl("/news"),
+		"a relative path stays valid");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
+QUnit.test("protocol-relative authority does not match an exact-host entry with a non-http protocol", function(assert) {
+	// The entry allows a mailto: URL for a specific host. A protocol-relative URL that
+	// resolves to that same host is an http-family URL, not mailto, so it must not match.
+	jQuery.sap.addUrlWhitelist("mailto", "other.example");
+
+	assert.notOk(jQuery.sap.validateUrl("//other.example/x"),
+		"// authority to other.example does not match the mailto entry for other.example");
+	assert.notOk(jQuery.sap.validateUrl("/\\other.example\\x"),
+		"/\\ authority to other.example does not match the mailto entry for other.example");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
+QUnit.test("empty-host entry accepting http still allows a protocol-relative URL", function(assert) {
+	// An entry that allows any http host must keep accepting a protocol-relative URL,
+	// which resolves under the http-family scheme. This is the accepted counterpart to
+	// the scheme-only (non-http) rejection above.
+	jQuery.sap.addUrlWhitelist("http", "");
+
+	assert.ok(jQuery.sap.validateUrl("//any.example/x"),
+		"// authority matches the http any-host entry");
+	assert.ok(jQuery.sap.validateUrl("http://any.example/x"),
+		"schemed http URL matches the http any-host entry");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
+QUnit.test("schemed URL without host does not match a host entry", function(assert) {
+	var SCHEME_JS = ["java", "script:"].join("");
+	jQuery.sap.addUrlWhitelist(undefined, "example.com");
+	assert.notOk(jQuery.sap.validateUrl(SCHEME_JS + "body"),
+		"a schemed URL without a host does not match a host entry");
+	assert.notOk(jQuery.sap.validateUrl(SCHEME_JS.toUpperCase() + "body"),
+		"scheme matching is case-insensitive");
+	assert.notOk(jQuery.sap.validateUrl("data:text/plain,body"),
+		"a data: URL has no host and does not match a host entry");
+	assert.notOk(jQuery.sap.validateUrl("vbscript:body"),
+		"a vbscript: URL has no host and does not match a host entry");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
+QUnit.test("legitimate URLs still pass with falsy-protocol host entry", function(assert) {
+	jQuery.sap.addUrlWhitelist(undefined, "example.com");
+	assert.ok(jQuery.sap.validateUrl("http://example.com"), "http://example.com valid");
+	assert.ok(jQuery.sap.validateUrl("https://example.com/path"), "https://example.com/path valid");
+	assert.ok(jQuery.sap.validateUrl("ftp://example.com"), "ftp://example.com valid");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
+QUnit.test("falsy-protocol entry restricts to default-safe schemes", function(assert) {
+	jQuery.sap.addUrlWhitelist(undefined, "example.com");
+	assert.ok(jQuery.sap.validateUrl("http://example.com"), "http allowed");
+	assert.ok(jQuery.sap.validateUrl("https://example.com"), "https allowed");
+	assert.ok(jQuery.sap.validateUrl("ftp://example.com"), "ftp allowed");
+	assert.notOk(jQuery.sap.validateUrl("ssh://example.com"),
+		"non-default scheme rejected via falsy-protocol entry");
+	assert.notOk(jQuery.sap.validateUrl("ws://example.com"),
+		"ws rejected via falsy-protocol entry (must use explicit protocol)");
+	assert.notOk(jQuery.sap.validateUrl("mailto:a@example.com"),
+		"mailto rejected via falsy-protocol entry, consistent with empty-allowlist behavior");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
+QUnit.test("falsy-protocol entry default-safe scheme set requires a full match on https?/ftp", function(assert) {
+	jQuery.sap.addUrlWhitelist(undefined, "example.com");
+	// Only http, https and ftp are accepted via a falsy-protocol entry, and the
+	// regex requires a full match, so a prefix like "httpg" or "ftpz" is rejected.
+	assert.notOk(jQuery.sap.validateUrl("httpg://example.com"),
+		"httpg rejected via falsy-protocol entry");
+	assert.notOk(jQuery.sap.validateUrl("ftpz://example.com"),
+		"ftpz rejected via falsy-protocol entry");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
+QUnit.test("explicit-protocol entry only matches that scheme", function(assert) {
+	var SCHEME_JS = ["java", "script:"].join("");
+	jQuery.sap.addUrlWhitelist("ssh", "example.com");
+	assert.ok(jQuery.sap.validateUrl("ssh://example.com"), "ssh matches its explicit entry");
+	assert.notOk(jQuery.sap.validateUrl(SCHEME_JS + "//example.com/path"),
+		"a different scheme does not match an ssh-protocol entry");
+	assert.notOk(jQuery.sap.validateUrl("http://example.com"),
+		"http does not match an ssh-only entry");
+
+	jQuery.sap.clearUrlWhitelist();
+});
+
+QUnit.test("scheme with //host does not match a falsy-protocol host entry", function(assert) {
+	var SCHEME_JS = ["java", "script:"].join("");
+	jQuery.sap.addUrlWhitelist(undefined, "trusted.com");
+	assert.notOk(jQuery.sap.validateUrl(SCHEME_JS + "//trusted.com/path"),
+		"a javascript: scheme with //host does not match a falsy-protocol host entry");
+	assert.notOk(jQuery.sap.validateUrl("data://trusted.com/foo"),
+		"data://host does not match a falsy-protocol host entry");
+	assert.notOk(jQuery.sap.validateUrl("vbscript://trusted.com/foo"),
+		"vbscript://host does not match a falsy-protocol host entry");
+	assert.notOk(jQuery.sap.validateUrl("blob://trusted.com/foo"),
+		"blob://host does not match a falsy-protocol host entry");
+	assert.notOk(jQuery.sap.validateUrl("file://trusted.com/foo"),
+		"file://host does not match a falsy-protocol host entry");
 
 	jQuery.sap.clearUrlWhitelist();
 });
