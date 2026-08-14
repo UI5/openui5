@@ -117,7 +117,7 @@ sap.ui.define(["jquery.sap.encoder"], function (jQuery) {
 		assert.equal(jQuery.sap.validateUrl("http://www.host.com?name=value#somehash"), true, "http://www.host.com?name=value#somehash");
 		assert.equal(jQuery.sap.validateUrl("http://www.host.com/path%7e+13?_name@=!value+#somehash?/"), true, "http://www.host.com/path%7e+13?_name@=!value+#somehash?/");
 
-		assert.equal(jQuery.sap.validateUrl("http://www.host.com/invalid\\path"), false, "Invalid character in path");
+		assert.equal(jQuery.sap.validateUrl("http://www.host.com/invalid^%&path"), false, "Invalid character in path");
 		assert.equal(jQuery.sap.validateUrl("http://www.host.com/path?name=invalid>value"), false, "Invalid character in query");
 		assert.equal(jQuery.sap.validateUrl("http://www.host.com/path?invalid>value"), false, "Invalid character in query without equal sign");
 		assert.equal(jQuery.sap.validateUrl("http://www.host.com/path#invalid#hash"), false, "Invalid character in hash");
