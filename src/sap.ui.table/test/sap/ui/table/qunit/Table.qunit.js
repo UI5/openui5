@@ -109,14 +109,6 @@ sap.ui.define([
 	const ToolbarDesign = MLibrary.ToolbarDesign;
 	const ToolbarStyle = MLibrary.ToolbarStyle;
 
-	// mapping of global function calls
-	const getCell = window.getCell;
-	const getColumnHeader = window.getColumnHeader;
-	const getRowHeader = window.getRowHeader;
-	const getRowAction = window.getRowAction;
-	const getSelectAll = window.getSelectAll;
-	const checkFocus = window.checkFocus;
-
 	const personImg = "../images/Person.png";
 	const jobPosImg = "../images/JobPosition.png";
 	let oTable;
@@ -165,10 +157,6 @@ sap.ui.define([
 		if (oConfig) {
 			sTitle = oConfig.title;
 			delete oConfig.title;
-		}
-		oTable = new Table(oConfig);
-		if (sTitle) {
-			oTable.addExtension(new Title({text: sTitle}));
 		}
 
 		if (!fnCreateColumns) {
@@ -240,12 +228,20 @@ sap.ui.define([
 				}));
 			};
 		}
-		fnCreateColumns(oTable);
+		oTable = TableQUnitUtils.createTable(Object.assign({}, oConfig, {placeAt: false}), function(oCreatedTable) {
+			oTable = oCreatedTable;
 
-		const oModel = new JSONModel();
-		oModel.setData({modelData: aData});
-		oTable.setModel(oModel, sModelName);
-		oTable.bindRows(sBindingPrefix + "/modelData");
+			if (sTitle) {
+				oTable.addExtension(new Title({text: sTitle}));
+			}
+
+			fnCreateColumns(oTable);
+
+			const oModel = new JSONModel();
+			oModel.setData({modelData: aData});
+			oTable.setModel(oModel, sModelName);
+			oTable.bindRows(sBindingPrefix + "/modelData");
+		});
 
 		oTable.placeAt("qunit-fixture");
 		await nextUIUpdate();
@@ -1514,10 +1510,10 @@ sap.ui.define([
 	QUnit.test("Hide one column in fixed area", async function(assert) {
 		const iVisibleRowCount = oTable._getRowCounts().count;
 		function checkCellsFixedBorder(oTable, iCol, sMsg) {
-			const oColHeader = getColumnHeader(iCol, null, null, oTable)[0];
+			const oColHeader = oTable.qunit.getColumnHeaderCell(iCol);
 			assert.ok(oColHeader.classList.contains("sapUiTableCellLastFixed"), sMsg);
 			for (let i = 0; i < iVisibleRowCount; i++) {
-				const oCell = getCell(i, iCol, null, null, oTable)[0];
+				const oCell = oTable.qunit.getDataCell(i, iCol);
 				assert.ok(oCell.classList.contains("sapUiTableCellLastFixed"), sMsg);
 			}
 		}
@@ -1619,54 +1615,54 @@ sap.ui.define([
 		};
 		oTable.focus();
 		assert.ok(fnFocusSpy.calledWith(), "Focus event called without any parameter");
-		checkFocus(getColumnHeader(0, null, null, oTable), assert);
+		TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(0));
 
 		oTable.focus(oFocusInfo);
 		assert.ok(fnFocusSpy.calledWith(oFocusInfo), "Focus event called with core:Message parameter");
-		checkFocus(getColumnHeader(0, null, null, oTable), assert);
+		TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(0));
 
 		oTable.setColumnHeaderVisible(false);
 		await nextUIUpdate();
 		oTable.focus();
 		assert.ok(fnFocusSpy.calledWith(), "Focus event called without any parameter");
-		checkFocus(getCell(0, 0, null, null, oTable), assert);
+		TableQUnitUtils.assertFocus(assert, oTable.qunit.getDataCell(0, 0));
 
 		oTable.focus(oFocusInfo);
 		assert.ok(fnFocusSpy.calledWith(oFocusInfo), "Focus event called with core:Message parameter");
-		checkFocus(getCell(0, 0, null, null, oTable), assert);
+		TableQUnitUtils.assertFocus(assert, oTable.qunit.getDataCell(0, 0));
 
 		oTable.unbindRows();
 		await nextUIUpdate();
 		oTable.focus();
 		assert.ok(fnFocusSpy.calledWith(), "Focus event called without any parameter");
-		checkFocus(oTable.getDomRef("noDataCnt"), assert);
+		TableQUnitUtils.assertFocus(assert, oTable.getDomRef("noDataCnt"));
 
 		oTable.setShowOverlay(true);
 		oTable.focus();
 		assert.ok(fnFocusSpy.calledWith(), "Focus event called without any parameter");
-		checkFocus(oTable.getDomRef("overlay"), assert);
+		TableQUnitUtils.assertFocus(assert, oTable.getDomRef("overlay"));
 
 		oTable.focus(oFocusInfo);
 		assert.ok(fnFocusSpy.calledWith(oFocusInfo), "Focus event called with core:Message parameter");
-		checkFocus(oTable.getDomRef("overlay"), assert);
+		TableQUnitUtils.assertFocus(assert, oTable.getDomRef("overlay"));
 
 		oTable.setShowOverlay(false);
 		oTable.destroyColumns();
 		await nextUIUpdate();
 		oTable.focus(oFocusInfo);
 		assert.ok(fnFocusSpy.calledWith(oFocusInfo), "Focus event called with core:Message parameter");
-		checkFocus(oTable.getDomRef("noDataCnt"), assert);
+		TableQUnitUtils.assertFocus(assert, oTable.getDomRef("noDataCnt"));
 	});
 
 	QUnit.test("#getFocusDomRef", async function(assert) {
-		assert.strictEqual(oTable.getFocusDomRef(), getColumnHeader(0, null, null, oTable)[0], "Column header visible");
+		assert.strictEqual(oTable.getFocusDomRef(), oTable.qunit.getColumnHeaderCell(0), "Column header visible");
 
 		oTable.setColumnHeaderVisible(false);
 		await nextUIUpdate();
-		assert.strictEqual(oTable.getFocusDomRef(), getCell(0, 0, null, null, oTable)[0], "Column header not visible");
+		assert.strictEqual(oTable.getFocusDomRef(), oTable.qunit.getDataCell(0, 0), "Column header not visible");
 
-		getCell(0, 1, true, null, oTable);
-		assert.strictEqual(oTable.getFocusDomRef(), getCell(0, 1, null, null, oTable)[0], "Last focused cell");
+		oTable.qunit.getDataCell(0, 1).focus();
+		assert.strictEqual(oTable.getFocusDomRef(), oTable.qunit.getDataCell(0, 1), "Last focused cell");
 
 		oTable.unbindRows();
 		assert.strictEqual(oTable.getFocusDomRef(), oTable.getDomRef("noDataCnt"), "NoData visible");
@@ -4053,15 +4049,15 @@ sap.ui.define([
 	});
 
 	QUnit.test("Cells", function(assert) {
-		this.test(assert, "SelectAll", getSelectAll(null, null, oTable)[0], true);
-		this.test(assert, "Header cell in fixed column", getColumnHeader(0, null, null, oTable)[0], true);
-		this.test(assert, "Header cell in scrollable column", getColumnHeader(1, null, null, oTable)[0], true);
-		this.test(assert, "Row selector cell", getRowHeader(0, null, null, oTable)[0], true);
-		this.test(assert, "Content cell in fixed column", getCell(0, 0, null, null, oTable)[0], true);
-		this.test(assert, "Content cell in scrollable column", getCell(0, 1, null, null, oTable)[0], true);
-		this.test(assert, "Row action cell", getRowAction(0, null, null, oTable)[0], true);
+		this.test(assert, "SelectAll", oTable.qunit.getSelectAllCell(), true);
+		this.test(assert, "Header cell in fixed column", oTable.qunit.getColumnHeaderCell(0), true);
+		this.test(assert, "Header cell in scrollable column", oTable.qunit.getColumnHeaderCell(1), true);
+		this.test(assert, "Row selector cell", oTable.qunit.getRowHeaderCell(0), true);
+		this.test(assert, "Content cell in fixed column", oTable.qunit.getDataCell(0, 0), true);
+		this.test(assert, "Content cell in scrollable column", oTable.qunit.getDataCell(0, 1), true);
+		this.test(assert, "Row action cell", oTable.qunit.getRowActionCell(0), true);
 		this.test(assert, "Content cell when paste event target is inner input",
-			getCell(0, 2, null, null, oTable)[0], true, oTable.getRows()[0].getCells()[2].getDomRef());
+			oTable.qunit.getDataCell(0, 2), true, oTable.getRows()[0].getCells()[2].getDomRef());
 	});
 
 	QUnit.test("Cell content", function(assert) {
@@ -4078,9 +4074,9 @@ sap.ui.define([
 
 	QUnit.test("No paste data", function(assert) {
 		sinon.stub(PasteHelper, "getPastedDataAs2DArray").returns([]);
-		this.test(assert, "Element that allows paste on table", getCell(0, 1, null, null, oTable)[0], false);
+		this.test(assert, "Element that allows paste on table", oTable.qunit.getDataCell(0, 1), false);
 		PasteHelper.getPastedDataAs2DArray.returns([[]]);
-		this.test(assert, "Element that allows paste on table", getCell(0, 1, null, null, oTable)[0], false);
+		this.test(assert, "Element that allows paste on table", oTable.qunit.getDataCell(0, 1), false);
 		PasteHelper.getPastedDataAs2DArray.restore();
 	});
 
@@ -6005,7 +6001,7 @@ sap.ui.define([
 			});
 		}
 
-		this.oTable.qunit.addTextColumn();
+		this.oTable.addColumn(TableQUnitUtils.createTextColumn());
 		this.oTable.setFixedColumnCount(1);
 		this.oTable.setRowActionCount(1);
 		this.oTable.setRowActionTemplate(TableQUnitUtils.createRowAction(null));

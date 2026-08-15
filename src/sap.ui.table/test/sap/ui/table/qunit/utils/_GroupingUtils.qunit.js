@@ -1,4 +1,4 @@
-/*global QUnit, sinon, oTable */
+/*global QUnit, sinon */
 
 sap.ui.define([
 	"sap/ui/table/qunit/TableQUnitUtils",
@@ -23,9 +23,6 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	const createTables = window.createTables;
-	const destroyTables = window.destroyTables;
-	const iNumberOfRows = window.iNumberOfRows;
 	const Grouping = TableUtils.Grouping;
 
 	QUnit.module("Misc");
@@ -369,22 +366,31 @@ sap.ui.define([
 	 */
 	QUnit.module("sap.ui.table.Table: Experimental Grouping", {
 		beforeEach: async function() {
-			await createTables();
-			const oData = window.oModel.getData();
-			for (let i = 0; i < iNumberOfRows; i++) {
-				oData.rows[i][window.aFields[0]] = i < 4 ? "A" : "B";
-			}
-			window.oModel.setData(oData);
-			oTable.getColumns()[0].setSortProperty(window.aFields[0]);
-			oTable.getRowMode().setRowCount(12);
-			oTable.setFixedColumnCount(0);
-			oTable.setEnableGrouping(true);
+			this.oTable = TableQUnitUtils.createTable({
+				rows: {path: "/"},
+				models: TableQUnitUtils.createJSONModel(8),
+				rowMode: new FixedRowMode({rowCount: 3}),
+				columns: ["A", "B", "C", "D", "E"].map((sField) => {
+					return TableQUnitUtils.createTextColumn({text: sField, bind: true});
+				})
+			});
+
+			// The grouping assertions require exactly two groups. Override column "A" on cloned rows
+			// (not the shared test data) so rows 0-3 form group "A" and rows 4-7 form group "B".
+			const oModel = this.oTable.getModel();
+			oModel.setData(oModel.getData().map((oRow, i) => ({...oRow, A: i < 4 ? "A" : "B"})));
+
+			await this.oTable.qunit.whenRenderingFinished();
+			this.oTable.getColumns()[0].setSortProperty("A");
+			this.oTable.getRowMode().setRowCount(12);
+			this.oTable.setEnableGrouping(true);
 			await nextUIUpdate();
 		},
 		afterEach: function() {
-			destroyTables();
+			this.oTable.destroy();
 		},
 		testAsync: function(mTestConfig) {
+			const oTable = this.oTable;
 			return new Promise(function(resolve) {
 				const oOnAfterRenderingDelegate = {
 					onAfterRendering: onAfterRendering
@@ -415,6 +421,7 @@ sap.ui.define([
 	 * @deprecated As of version 1.28
 	 */
 	QUnit.test("Activate / Deactivate", function(assert) {
+		const oTable = this.oTable;
 		const oBinding = oTable.getBinding();
 		const that = this;
 
@@ -451,6 +458,7 @@ sap.ui.define([
 	 * @deprecated As of version 1.28
 	 */
 	QUnit.test("Collapse / Expand", function(assert) {
+		const oTable = this.oTable;
 		const that = this;
 
 		assert.equal(oTable._getTotalRowCount(), 8, "Row count before Grouping");

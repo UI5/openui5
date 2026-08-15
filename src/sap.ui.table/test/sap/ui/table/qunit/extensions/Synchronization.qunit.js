@@ -94,7 +94,7 @@ sap.ui.define([
 			oSyncInterface.rowHeights = sinon.spy();
 			oSyncInterface.innerVerticalScrollPosition = sinon.spy();
 			oSyncInterface.layout = sinon.spy();
-		}).then(TableQUnitUtils.$wait(0)).then(function() {
+		}).then(() => TableQUnitUtils.wait(0)).then(function() {
 			assert.ok(oSyncInterface.rowCount.notCalled, "The row count was not synced");
 			assert.ok(oSyncInterface.rowSelection.notCalled, "The row selection was not synced");
 			assert.ok(oSyncInterface.rowHover.notCalled, "The row hover state was not synced");
@@ -584,7 +584,7 @@ sap.ui.define([
 			assert.ok(oTableInvalidate.notCalled, "The table was not invalidated");
 			assert.ok(Div.contains(oOldExternalVSb), "The new external and the old external scrollbars are the same elements");
 
-		}).then(TableQUnitUtils.$wait(100)).then(function() {
+		}).then(() => TableQUnitUtils.wait(100)).then(function() {
 			const oVSb = oTable._getScrollExtension().getVerticalScrollbar();
 			assert.strictEqual(oVSb.scrollTop, oTable._getBaseRowHeight() * 2, "The scrollbar has the correct scroll position");
 

@@ -1,4 +1,4 @@
-/*global QUnit, sinon, oTable, oTreeTable */
+/*global QUnit, sinon */
 
 sap.ui.define([
 	"sap/ui/table/qunit/TableQUnitUtils",
@@ -8,6 +8,7 @@ sap.ui.define([
 	"sap/ui/table/extensions/KeyboardDelegate",
 	"sap/ui/table/library",
 	"sap/ui/table/Table",
+	"sap/ui/table/TreeTable",
 	"sap/ui/table/Column",
 	"sap/ui/table/Row",
 	"sap/ui/table/CreationRow",
@@ -31,6 +32,7 @@ sap.ui.define([
 	KeyboardDelegate,
 	library,
 	Table,
+	TreeTable,
 	Column,
 	Row,
 	CreationRow,
@@ -47,19 +49,33 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	const createTables = window.createTables;
-	const destroyTables = window.destroyTables;
-	const getCell = window.getCell;
-	const getColumnHeader = window.getColumnHeader;
-	const getRowHeader = window.getRowHeader;
-	const getRowAction = window.getRowAction;
-	const getRowActionHeader = window.getRowActionHeader;
-	const getSelectAll = window.getSelectAll;
-	const iNumberOfRows = window.iNumberOfRows;
-	const checkFocus = window.checkFocus;
 	const TestInputControl = TableQUnitUtils.TestInputControl;
 	const TestControl = TableQUnitUtils.TestControl;
+	const iNumberOfRows = 8;
 	let aFocusDummyIds = [];
+
+	const mGridTableSettings = () => ({
+		rows: {path: "/"},
+		models: TableQUnitUtils.createJSONModel(iNumberOfRows),
+		extension: [new TestControl({text: "Grid Table"})],
+		rowMode: new FixedRowMode({rowCount: 3}),
+		fixedColumnCount: 1,
+		placeAt: false,
+		columns: ["A", "B", "C", "D", "E"].map((sField, j) => {
+			const oColumn = TableQUnitUtils.createTextColumn({label: sField + "_TITLE", text: sField, bind: true, tabbable: true, templateHidden: j === 3});
+			return j === 2 ? oColumn.setTooltip(sField + "_TOOLTIP") : oColumn;
+		})
+	});
+	const mTreeTableSettings = () => ({
+		rows: {path: "/", parameters: {arrayNames: ["children"]}},
+		models: TableQUnitUtils.createJSONModel(iNumberOfRows),
+		extension: [new TestControl({text: "Tree Table"})],
+		selectionMode: "Single",
+		rowMode: new FixedRowMode({rowCount: 3}),
+		groupHeaderProperty: "A",
+		placeAt: false,
+		columns: ["A", "B", "C", "D", "E"].map((sField) => TableQUnitUtils.createTextColumn({label: sField + "_TITLE", text: sField, bind: true, tabbable: true}))
+	});
 
 	function checkDelegateType(sExpectedType) {
 		const oTbl = new Table();
@@ -162,17 +178,19 @@ sap.ui.define([
 	}
 
 	async function setupTest() {
-		await createTables(true, true);
+		this.oTable = TableQUnitUtils.createTable(mGridTableSettings());
 		renderFocusDummy("Focus1");
-		oTable.placeAt("qunit-fixture");
+		this.oTable.placeAt("qunit-fixture");
 		renderFocusDummy("Focus2");
-		oTreeTable.placeAt("qunit-fixture");
 		renderFocusDummy("Focus3");
 		await nextUIUpdate();
 	}
 
 	function teardownTest() {
-		destroyTables();
+		this.oTable.destroy();
+		if (this.oTreeTable) {
+			this.oTreeTable.destroy();
+		}
 		removeFocusDummies();
 	}
 
@@ -221,7 +239,7 @@ sap.ui.define([
 			qutils.triggerKeydown(oTarget, iKeyCode, mKeyInfo.shift, mKeyInfo.alt, mKeyInfo.ctrl);
 
 			function assert() {
-				checkFocus(oDestination, QUnit.assert);
+				TableQUnitUtils.assertFocus(QUnit.assert, oDestination);
 
 				QUnit.assert.ok(that[mKeyInfo.eventName].defaultPrevented === mExpectation.defaultPrevented,
 					"Event default " + (mExpectation.defaultPrevented ? "" : "not ") + "prevented");
@@ -470,7 +488,7 @@ sap.ui.define([
 		const testInputElement = (mInputType, bSilentFocus) => {
 			oElement = getInputElement(mInputType.columnIndex);
 			KeyboardDelegate._focusElement(this.oTable, oElement, bSilentFocus);
-			checkFocus(oElement, assert);
+			TableQUnitUtils.assertFocus(assert, oElement);
 
 			if (mInputType.supportsTextSelectionReadAPI) {
 				assertTextSelection(oElement, true, "Input type: " + oElement.type + " - The text is selected");
@@ -506,18 +524,18 @@ sap.ui.define([
 
 		oElement = getInputElement(mInputTypes.text.columnIndex);
 		KeyboardDelegate._focusElement(this.oTable, oElement);
-		checkFocus(oElement, assert);
+		TableQUnitUtils.assertFocus(assert, oElement);
 		assert.ok(oSetSilentFocusSpy.notCalled, "The element was not focused silently");
 		assertTextSelection(oElement, true, "The text is selected");
 
 		oElement = this.oTable.getRows()[0].getCells()[0].getDomRef();
 		KeyboardDelegate._focusElement(this.oTable, oElement);
-		checkFocus(oElement, assert);
+		TableQUnitUtils.assertFocus(assert, oElement);
 		assert.ok(oSetSilentFocusSpy.notCalled, "The element was not focused silently");
 
 		oElement = this.oTable.getRows()[0].getCells()[0].getDomRef();
 		KeyboardDelegate._focusElement(this.oTable, oElement, true);
-		checkFocus(oElement, assert);
+		TableQUnitUtils.assertFocus(assert, oElement);
 		assert.ok(oSetSilentFocusSpy.calledOnce, "The element was focused silently");
 
 		oSetSilentFocusSpy.restore();
@@ -847,114 +865,121 @@ sap.ui.define([
 
 	QUnit.module("Navigation > Tab & Shift+Tab", {
 		beforeEach: async function() {
-			await setupTest();
+			await setupTest.call(this);
 		},
 		afterEach: function() {
-			teardownTest();
+			teardownTest.call(this);
 		}
 	});
 
 	QUnit.test("Default Test Table", function(assert) {
+		const oTable = this.oTable;
 		let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus1");
 		simulateTabEvent(oElem, false);
-		oElem = checkFocus(getColumnHeader(0), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(0));
 		qutils.triggerKeydown(oElem, Key.Arrow.RIGHT);
-		oElem = checkFocus(getColumnHeader(1), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(1));
 		simulateTabEvent(oElem, false);
-		oElem = checkFocus(getCell(0, 1), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getDataCell(0, 1));
 		qutils.triggerKeydown(oElem, Key.Arrow.DOWN);
-		oElem = checkFocus(getCell(1, 1), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getDataCell(1, 1));
 		simulateTabEvent(oElem, false);
-		oElem = checkFocus(document.getElementById("Focus2"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, document.getElementById("Focus2"));
 
 		simulateTabEvent(oElem, true);
-		checkFocus(getCell(1, 1), assert);
+		TableQUnitUtils.assertFocus(assert, oTable.qunit.getDataCell(1, 1));
 
 		oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus1");
 		simulateTabEvent(oElem, false);
-		oElem = checkFocus(getColumnHeader(1), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(1));
 		simulateTabEvent(oElem, false);
-		checkFocus(getCell(1, 1), assert);
+		TableQUnitUtils.assertFocus(assert, oTable.qunit.getDataCell(1, 1));
 
 		oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus1");
 		simulateTabEvent(oElem, false);
-		oElem = checkFocus(getColumnHeader(1), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(1));
 		qutils.triggerKeydown(oElem, Key.Arrow.RIGHT);
-		oElem = checkFocus(getColumnHeader(2), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(2));
 		simulateTabEvent(oElem, false);
-		checkFocus(getCell(1, 2), assert);
+		TableQUnitUtils.assertFocus(assert, oTable.qunit.getDataCell(1, 2));
 	});
 
 	QUnit.test("Row Actions", async function(assert) {
+		const oTable = this.oTable;
 		oTable.setRowActionTemplate(TableQUnitUtils.createRowAction(null));
 		oTable.setRowActionCount(1);
 		await nextUIUpdate();
 
-		let oElem = checkFocus(getRowAction(1, true), assert);
+		oTable.qunit.getRowActionCell(1).focus();
+		let oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getRowActionCell(1));
 		simulateTabEvent(oElem, false);
-		oElem = checkFocus(document.getElementById("Focus2"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, document.getElementById("Focus2"));
 		simulateTabEvent(oElem, true);
-		oElem = checkFocus(getRowAction(1), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getRowActionCell(1));
 		simulateTabEvent(oElem, true);
-		oElem = checkFocus(getRowActionHeader(), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getRowActionHeaderCell());
 		simulateTabEvent(oElem, true);
-		checkFocus(document.getElementById("Focus1"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Focus1"));
 	});
 
 	QUnit.test("Extension and Footer", async function(assert) {
+		const oTable = this.oTable;
 		oTable.addExtension(new TestControl("Extension", {text: "Extension", tabbable: true}));
 		oTable.setFooter(new TestControl("Footer", {text: "Footer", tabbable: true}));
 		await nextUIUpdate();
 
 		let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus2");
 		simulateTabEvent(oElem, true);
-		oElem = checkFocus(document.getElementById("Footer"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, document.getElementById("Footer"));
 		simulateTabEvent(oElem, true);
-		oElem = checkFocus(getCell(0, 0), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getDataCell(0, 0));
 		qutils.triggerKeydown(oElem, Key.Arrow.LEFT);
-		oElem = checkFocus(getRowHeader(0), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getRowHeaderCell(0));
 		simulateTabEvent(oElem, true);
-		oElem = checkFocus(getSelectAll(0), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getSelectAllCell());
 		simulateTabEvent(oElem, true);
-		oElem = checkFocus(document.getElementById("Extension"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, document.getElementById("Extension"));
 		simulateTabEvent(oElem, true);
-		oElem = checkFocus(document.getElementById("Focus1"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, document.getElementById("Focus1"));
 		simulateTabEvent(oElem, false);
-		oElem = checkFocus(document.getElementById("Extension"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, document.getElementById("Extension"));
 		simulateTabEvent(oElem, false);
-		oElem = checkFocus(getSelectAll(0), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getSelectAllCell());
 		simulateTabEvent(oElem, false);
-		oElem = checkFocus(getRowHeader(0), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getRowHeaderCell(0));
 		simulateTabEvent(oElem, false);
-		oElem = checkFocus(document.getElementById("Footer"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, document.getElementById("Footer"));
 		simulateTabEvent(oElem, false);
-		checkFocus(document.getElementById("Focus2"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Focus2"));
 
 		oTable.setColumnHeaderVisible(false);
 		await nextUIUpdate();
-		oElem = getCell(1, 1, true);
+		oElem = oTable.qunit.getDataCell(1, 1);
+		oElem.focus();
 		simulateTabEvent(oElem, true);
-		checkFocus(document.getElementById("Extension"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Extension"));
 	});
 
 	QUnit.test("On a non-interactive element inside a cell", function(assert) {
+		const oTable = this.oTable;
 		const oNonInteractiveElement = oTable.getRows()[0].getCells()[1].getDomRef();
 		oNonInteractiveElement.tabIndex = -1; // Make it non-interactive.
 
 		oNonInteractiveElement.focus();
-		checkFocus(oNonInteractiveElement, assert);
+		TableQUnitUtils.assertFocus(assert, oNonInteractiveElement);
 
 		simulateTabEvent(oNonInteractiveElement, false);
-		checkFocus(getCell(0, 1), assert);
+		TableQUnitUtils.assertFocus(assert, oTable.qunit.getDataCell(0, 1));
 
 		oNonInteractiveElement.focus();
-		checkFocus(oNonInteractiveElement, assert);
+		TableQUnitUtils.assertFocus(assert, oNonInteractiveElement);
 
 		simulateTabEvent(oNonInteractiveElement, true);
-		checkFocus(getCell(0, 1), assert);
+		TableQUnitUtils.assertFocus(assert, oTable.qunit.getDataCell(0, 1));
 	});
 
 	QUnit.test("No cells", async function(assert) {
+		const oTable = this.oTable;
 		let oElem;
 
 		oTable.setColumnHeaderVisible(false);
@@ -963,27 +988,30 @@ sap.ui.define([
 
 		oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus1");
 		simulateTabEvent(oElem);
-		oElem = checkFocus(document.getElementById("Focus2"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, document.getElementById("Focus2"));
 
 		simulateTabEvent(oElem, true);
-		checkFocus(document.getElementById("Focus1"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Focus1"));
 	});
 
 	QUnit.test("No content cells", async function(assert) {
+		const oTable = this.oTable;
 		let oElem;
 
 		oTable.getRowMode().setRowCount(0);
 		await nextUIUpdate();
 
-		oElem = checkFocus(getColumnHeader(0, true), assert);
+		oTable.qunit.getColumnHeaderCell(0).focus();
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(0));
 		simulateTabEvent(oElem);
-		oElem = checkFocus(document.getElementById("Focus2"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, document.getElementById("Focus2"));
 
 		simulateTabEvent(oElem, true);
-		checkFocus(getColumnHeader(0), assert);
+		TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(0));
 	});
 
 	QUnit.test("No columns", async function(assert) {
+		const oTable = this.oTable;
 		let oElem;
 
 		oTable.removeAllColumns();
@@ -991,42 +1019,43 @@ sap.ui.define([
 
 		oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus1");
 		simulateTabEvent(oElem);
-		oElem = checkFocus(oTable.getDomRef("selall"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("selall"));
 		simulateTabEvent(oElem);
-		oElem = checkFocus(oTable.getDomRef("noDataCnt"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("noDataCnt"));
 		simulateTabEvent(oElem);
-		oElem = checkFocus(document.getElementById("Focus2"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, document.getElementById("Focus2"));
 
 		simulateTabEvent(oElem, true);
-		oElem = checkFocus(oTable.getDomRef("noDataCnt"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("noDataCnt"));
 		simulateTabEvent(oElem, true);
-		oElem = checkFocus(oTable.getDomRef("selall"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("selall"));
 		simulateTabEvent(oElem, true);
-		oElem = checkFocus(document.getElementById("Focus1"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, document.getElementById("Focus1"));
 
 		oTable.setSelectionMode(library.SelectionMode.None);
 		await nextUIUpdate();
 
 		simulateTabEvent(oElem);
-		oElem = checkFocus(oTable.getDomRef("noDataCnt"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("noDataCnt"));
 		simulateTabEvent(oElem);
-		oElem = checkFocus(document.getElementById("Focus2"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, document.getElementById("Focus2"));
 
 		simulateTabEvent(oElem, true);
-		oElem = checkFocus(oTable.getDomRef("noDataCnt"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("noDataCnt"));
 		simulateTabEvent(oElem, true);
-		checkFocus(document.getElementById("Focus1"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Focus1"));
 
 		oTable.setSelectionMode(library.SelectionMode.MultiToggle);
 		oTable.setSelectionBehavior(library.SelectionBehavior.RowOnly);
 		await nextUIUpdate();
 		simulateTabEvent(oElem);
-		oElem = checkFocus(oTable.getDomRef("noDataCnt"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("noDataCnt"));
 		simulateTabEvent(oElem);
-		oElem = checkFocus(document.getElementById("Focus2"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, document.getElementById("Focus2"));
 	});
 
 	QUnit.test("No Column Headers", async function(assert) {
+		const oTable = this.oTable;
 		let oElem;
 
 		oTable.setColumnHeaderVisible(false);
@@ -1034,16 +1063,17 @@ sap.ui.define([
 
 		oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus1");
 		simulateTabEvent(oElem);
-		oElem = checkFocus(getCell(0, 0), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getDataCell(0, 0));
 		simulateTabEvent(oElem);
-		oElem = checkFocus(document.getElementById("Focus2"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, document.getElementById("Focus2"));
 		simulateTabEvent(oElem, true);
-		oElem = checkFocus(getCell(0, 0), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getDataCell(0, 0));
 		simulateTabEvent(oElem, true);
-		checkFocus(document.getElementById("Focus1"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Focus1"));
 	});
 
 	QUnit.test("No Column Headers, No Data", async function(assert) {
+		const oTable = this.oTable;
 		const done = assert.async();
 		let oElem;
 
@@ -1052,13 +1082,13 @@ sap.ui.define([
 
 			oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus1");
 			simulateTabEvent(oElem);
-			oElem = checkFocus(oTable.getDomRef("noDataCnt"), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("noDataCnt"));
 			simulateTabEvent(oElem);
-			oElem = checkFocus(document.getElementById("Focus2"), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, document.getElementById("Focus2"));
 			simulateTabEvent(oElem, true);
-			oElem = checkFocus(oTable.getDomRef("noDataCnt"), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("noDataCnt"));
 			simulateTabEvent(oElem, true);
-			checkFocus(document.getElementById("Focus1"), assert);
+			TableQUnitUtils.assertFocus(assert, document.getElementById("Focus1"));
 
 			done();
 		}
@@ -1070,6 +1100,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("CreationRow when hideEmptyRows is set to true", async function(assert) {
+		const oTable = this.oTable;
 		let oElem;
 		const oCreationRow = new CreationRow();
 
@@ -1080,26 +1111,27 @@ sap.ui.define([
 		oTable.unbindRows();
 		await nextUIUpdate();
 
-		oElem = checkFocus(getColumnHeader(0, true), assert);
+		oTable.qunit.getColumnHeaderCell(0).focus();
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(0));
 		simulateTabEvent(oElem);
 
 		const oInput = oTable.getCreationRow().getCells()[0].getFocusDomRef();
-		oElem = checkFocus(oInput, assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oInput);
 		simulateTabEvent(oElem);
 
 		const oApplyButton = document.getElementById(oCreationRow.getId() + "-applyBtn");
-		oElem = checkFocus(oApplyButton, assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oApplyButton);
 		simulateTabEvent(oElem);
 
-		oElem = checkFocus(document.getElementById("Focus2"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, document.getElementById("Focus2"));
 		simulateTabEvent(oElem, true);
 
-		oElem = checkFocus(oApplyButton, assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oApplyButton);
 		simulateTabEvent(oElem, true);
 
-		oElem = checkFocus(oInput, assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oInput);
 		simulateTabEvent(oElem, true);
-		checkFocus(getColumnHeader(0), assert);
+		TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(0));
 	});
 
 	QUnit.module("Navigation > Arrow Keys", {
@@ -1152,11 +1184,11 @@ sap.ui.define([
 			const bHasRowHeaders = TableUtils.hasRowHeader(this.oTable);
 			const bHasRowActions = TableUtils.hasRowActions(this.oTable);
 			const iColumnCount = this.oTable._getVisibleColumns().length;
-			let iRowCount = window.iNumberOfRows;
+			let iRowCount = iNumberOfRows;
 			/**
 			 *  @deprecated As of version 1.119.
 			 */
-			iRowCount = (this.oTable.getGroupBy && this.oTable.getGroupBy()) ? 2 * window.iNumberOfRows : window.iNumberOfRows;
+			iRowCount = (this.oTable.getGroupBy && this.oTable.getGroupBy()) ? 2 * iNumberOfRows : iNumberOfRows;
 			let oTarget; let i; let iRowIndex; let oRow;
 
 			oTarget = TableQUnitUtils.setFocusOutsideOfTable(assert, "FocusDummyBeforeTable");
@@ -2589,7 +2621,7 @@ sap.ui.define([
 
 		// *ARROW_UP* -> Bottom fixed area - Second-last row
 		qutils.triggerKeydown(this.oTable.qunit.getRowHeaderCell(-1), Key.Arrow.UP);
-		checkFocus(this.oTable.qunit.getRowHeaderCell(-2), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getRowHeaderCell(-2));
 
 		// *END* -> Bottom fixed area - Last row
 		this.triggerKey(Key.END, this.oTable.qunit.getRowHeaderCell(-2), this.oTable.qunit.getRowHeaderCell(-1));
@@ -2777,7 +2809,7 @@ sap.ui.define([
 
 		// *ARROW_UP* -> Bottom fixed area - Second-last row
 		qutils.triggerKeydown(this.oTable.qunit.getDataCell(-1, 0), Key.Arrow.UP);
-		checkFocus(this.oTable.qunit.getDataCell(-2, 0), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getDataCell(-2, 0));
 
 		// *END* -> Bottom fixed area - Last row
 		this.triggerKey(Key.END, this.oTable.qunit.getDataCell(-2, 0), this.oTable.qunit.getDataCell(-1, 0));
@@ -2999,7 +3031,7 @@ sap.ui.define([
 
 		// *ARROW_UP* -> Bottom fixed area - Second-last row
 		qutils.triggerKeydown(this.oTable.qunit.getRowActionCell(-1), Key.Arrow.UP);
-		checkFocus(this.oTable.qunit.getRowActionCell(-2), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getRowActionCell(-2));
 
 		// *END* -> Bottom fixed area - Last row
 		this.triggerKey(Key.END, this.oTable.qunit.getRowActionCell(-2), this.oTable.qunit.getRowActionCell(-1));
@@ -3170,7 +3202,7 @@ sap.ui.define([
 			if (mRowCounts.fixedBottom > 1) {
 				// *ARROW_UP* -> Bottom fixed area - Second-last row
 				qutils.triggerKeydown(this.oTable.qunit.getRowHeaderCell(iNonEmptyRowCount - 1), Key.Arrow.UP);
-				checkFocus(this.oTable.qunit.getRowHeaderCell(iNonEmptyRowCount - 2), assert);
+				TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getRowHeaderCell(iNonEmptyRowCount - 2));
 
 				// *PAGE_DOWN* -> Bottom fixed area - Last row
 				this.triggerKey(Key.Page.DOWN, this.oTable.qunit.getRowHeaderCell(iNonEmptyRowCount - 2),
@@ -3196,7 +3228,7 @@ sap.ui.define([
 			if (mRowCounts.fixedTop > 1) {
 				// *ARROW_DOWN* -> Top fixed area - Second row
 				qutils.triggerKeydown(this.oTable.qunit.getRowHeaderCell(0), Key.Arrow.DOWN);
-				checkFocus(this.oTable.qunit.getRowHeaderCell(1), assert);
+				TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getRowHeaderCell(1));
 
 				// *PAGE_UP* -> Top fixed area - First row
 				this.triggerKey(Key.Page.UP, this.oTable.qunit.getRowHeaderCell(1), this.oTable.qunit.getRowHeaderCell(0));
@@ -3255,7 +3287,7 @@ sap.ui.define([
 			if (mRowCounts.fixedBottom > 1) {
 				// *ARROW_UP* -> Bottom fixed area - Second-last row
 				qutils.triggerKeydown(this.oTable.qunit.getDataCell(iNonEmptyRowCount - 1, 0), Key.Arrow.UP);
-				checkFocus(this.oTable.qunit.getDataCell(iNonEmptyRowCount - 2, 0), assert);
+				TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getDataCell(iNonEmptyRowCount - 2, 0));
 
 				// *PAGE_DOWN* -> Bottom fixed area - Last row
 				this.triggerKey(Key.Page.DOWN, this.oTable.qunit.getDataCell(iNonEmptyRowCount - 2, 0),
@@ -3282,7 +3314,7 @@ sap.ui.define([
 			if (mRowCounts.fixedTop > 1) {
 				// *ARROW_DOWN* -> Top fixed area - Second row
 				qutils.triggerKeydown(this.oTable.qunit.getDataCell(0, 0), Key.Arrow.DOWN);
-				checkFocus(this.oTable.qunit.getDataCell(1, 0), assert);
+				TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getDataCell(1, 0));
 
 				// *PAGE_UP* -> Top fixed area - First row
 				this.triggerKey(Key.Page.UP, this.oTable.qunit.getDataCell(1, 0), this.oTable.qunit.getDataCell(0, 0));
@@ -3332,7 +3364,7 @@ sap.ui.define([
 			if (mRowCounts.fixedBottom > 1) {
 				// *ARROW_UP* -> Bottom fixed area - Second-last row
 				qutils.triggerKeydown(this.oTable.qunit.getRowActionCell(iNonEmptyRowCount - 1), Key.Arrow.UP);
-				checkFocus(this.oTable.qunit.getRowActionCell(iNonEmptyRowCount - 2), assert);
+				TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getRowActionCell(iNonEmptyRowCount - 2));
 
 				// *PAGE_DOWN* -> Bottom fixed area - Last row
 				this.triggerKey(Key.Page.DOWN, this.oTable.qunit.getRowActionCell(iNonEmptyRowCount - 2),
@@ -3359,7 +3391,7 @@ sap.ui.define([
 			if (mRowCounts.fixedTop > 1) {
 				// *ARROW_DOWN* -> Top fixed area - Second row
 				qutils.triggerKeydown(this.oTable.qunit.getRowActionCell(0), Key.Arrow.DOWN);
-				checkFocus(this.oTable.qunit.getRowActionCell(1), assert);
+				TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getRowActionCell(1));
 
 				// *PAGE_UP* -> Top fixed area - First row
 				this.triggerKey(Key.Page.UP, this.oTable.qunit.getRowActionCell(0), this.oTable.qunit.getRowActionCell(0));
@@ -3836,7 +3868,7 @@ sap.ui.define([
 
 	QUnit.module("Navigation > F6 & Shift+F6", {
 		beforeEach: async function() {
-			await setupTest();
+			await setupTest.call(this);
 
 			// Enhance the Navigation Handler to use the test scope only (not the QUnit related DOM)
 			this.handleF6GroupNavigationOriginal = F6Navigation.handleF6GroupNavigation;
@@ -3850,7 +3882,7 @@ sap.ui.define([
 			};
 		},
 		afterEach: function() {
-			teardownTest();
+			teardownTest.call(this);
 
 			F6Navigation.handleF6GroupNavigation = this.handleF6GroupNavigationOriginal;
 			this.handleF6GroupNavigationOriginal = null;
@@ -3858,81 +3890,101 @@ sap.ui.define([
 	});
 
 	QUnit.test("F6 - Forward navigation - With Extension and Footer", async function(assert) {
+		const oTable = this.oTable;
 		oTable.addExtension(new TestControl("Extension", {text: "Extension", tabbable: true}));
 		oTable.setFooter(new TestControl("Footer", {text: "Footer", tabbable: true}));
 		await nextUIUpdate();
 
 		let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus1");
 		qutils.triggerKeydown(oElem, "F6");
-		oElem = checkFocus(getColumnHeader(0), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(0));
 		qutils.triggerKeydown(oElem, "F6");
-		checkFocus(document.getElementById("Footer"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Footer"));
 
-		oElem = getCell(1, 1, true, assert);
+		oElem = oTable.qunit.getDataCell(1, 1);
+		oElem.focus();
+		TableQUnitUtils.assertFocus(assert, oElem);
 		qutils.triggerKeydown(oElem, "F6");
-		checkFocus(document.getElementById("Footer"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Footer"));
 
-		oElem = getRowHeader(1, true, assert);
+		oElem = oTable.qunit.getRowHeaderCell(1);
+		oElem.focus();
+		TableQUnitUtils.assertFocus(assert, oElem);
 		qutils.triggerKeydown(oElem, "F6");
-		checkFocus(document.getElementById("Footer"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Footer"));
 
-		oElem = getSelectAll(true, assert);
+		oElem = oTable.qunit.getSelectAllCell();
+		oElem.focus();
+		TableQUnitUtils.assertFocus(assert, oElem);
 		qutils.triggerKeydown(oElem, "F6");
-		checkFocus(document.getElementById("Footer"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Footer"));
 
-		oElem = getColumnHeader(1, true, assert);
+		oElem = oTable.qunit.getColumnHeaderCell(1);
+		oElem.focus();
+		TableQUnitUtils.assertFocus(assert, oElem);
 		qutils.triggerKeydown(oElem, "F6");
-		checkFocus(document.getElementById("Footer"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Footer"));
 	});
 
 	QUnit.test("Shift+F6 - Backward navigation - With Extension and Footer", async function(assert) {
+		const oTable = this.oTable;
 		oTable.addExtension(new TestControl("Extension", {text: "Extension", tabbable: true}));
 		oTable.setFooter(new TestControl("Footer", {text: "Footer", tabbable: true}));
 		await nextUIUpdate();
 
 		let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus2");
 		qutils.triggerKeydown(oElem, "F6", true);
-		oElem = checkFocus(getColumnHeader(0), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(0));
 		qutils.triggerKeydown(oElem, "F6", true);
-		checkFocus(document.getElementById("Focus1"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Focus1"));
 
-		oElem = getCell(1, 1, true, assert);
+		oElem = oTable.qunit.getDataCell(1, 1);
+		oElem.focus();
+		TableQUnitUtils.assertFocus(assert, oElem);
 		qutils.triggerKeydown(oElem, "F6", true);
-		checkFocus(document.getElementById("Focus1"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Focus1"));
 
-		oElem = getRowHeader(1, true, assert);
+		oElem = oTable.qunit.getRowHeaderCell(1);
+		oElem.focus();
+		TableQUnitUtils.assertFocus(assert, oElem);
 		qutils.triggerKeydown(oElem, "F6", true);
-		checkFocus(document.getElementById("Focus1"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Focus1"));
 
-		oElem = getSelectAll(true, assert);
+		oElem = oTable.qunit.getSelectAllCell();
+		oElem.focus();
+		TableQUnitUtils.assertFocus(assert, oElem);
 		qutils.triggerKeydown(oElem, "F6", true);
-		checkFocus(document.getElementById("Focus1"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Focus1"));
 
-		oElem = getColumnHeader(1, true, assert);
+		oElem = oTable.qunit.getColumnHeaderCell(1);
+		oElem.focus();
+		TableQUnitUtils.assertFocus(assert, oElem);
 		qutils.triggerKeydown(oElem, "F6", true);
-		checkFocus(document.getElementById("Focus1"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Focus1"));
 	});
 
 	QUnit.module("Navigation > Overlay", {
 		beforeEach: async function() {
-			await setupTest();
+			await setupTest.call(this);
 		},
 		afterEach: function() {
-			teardownTest();
+			teardownTest.call(this);
 		}
 	});
 
 	QUnit.test("Tab - Default Test Table", function(assert) {
+		const oTable = this.oTable;
 		oTable.setShowOverlay(true);
 
 		let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus1");
 		simulateTabEvent(oElem, false);
-		oElem = checkFocus(oTable.getDomRef("overlay"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("overlay"));
 		simulateTabEvent(oElem, false);
-		checkFocus(document.getElementById("Focus2"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Focus2"));
 	});
 
 	QUnit.test("Tab - With Extension and Footer", async function(assert) {
+		const oTable = this.oTable;
 		oTable.setShowOverlay(true);
 		oTable.addExtension(new TestControl("Extension", {text: "Extension", tabbable: true}));
 		oTable.setFooter(new TestControl("Footer", {text: "Footer", tabbable: true}));
@@ -3940,22 +3992,24 @@ sap.ui.define([
 
 		let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus1");
 		simulateTabEvent(oElem, false);
-		oElem = checkFocus(oTable.getDomRef("overlay"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("overlay"));
 		simulateTabEvent(oElem, false);
-		checkFocus(document.getElementById("Focus2"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Focus2"));
 	});
 
 	QUnit.test("Shift+Tab - Default", function(assert) {
+		const oTable = this.oTable;
 		oTable.setShowOverlay(true);
 
 		let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus2");
 		simulateTabEvent(oElem, true);
-		oElem = checkFocus(oTable.getDomRef("overlay"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("overlay"));
 		simulateTabEvent(oElem, true);
-		checkFocus(document.getElementById("Focus1"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Focus1"));
 	});
 
 	QUnit.test("Shift+Tab - With Extension and Footer", async function(assert) {
+		const oTable = this.oTable;
 		oTable.setShowOverlay(true);
 		oTable.addExtension(new TestControl("Extension", {text: "Extension", tabbable: true}));
 		oTable.setFooter(new TestControl("Footer", {text: "Footer", tabbable: true}));
@@ -3963,21 +4017,22 @@ sap.ui.define([
 
 		let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus2");
 		simulateTabEvent(oElem, true);
-		oElem = checkFocus(oTable.getDomRef("overlay"), assert);
+		oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("overlay"));
 		simulateTabEvent(oElem, true);
-		checkFocus(document.getElementById("Focus1"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Focus1"));
 	});
 
 	QUnit.module("Navigation > NoData", {
 		beforeEach: async function() {
-			await setupTest();
+			await setupTest.call(this);
 		},
 		afterEach: function() {
-			teardownTest();
+			teardownTest.call(this);
 		}
 	});
 
 	QUnit.test("Tab - Default Test Table", function(assert) {
+		const oTable = this.oTable;
 		const done = assert.async();
 
 		function doAfterNoDataDisplayed() {
@@ -3985,11 +4040,11 @@ sap.ui.define([
 
 			let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus1");
 			simulateTabEvent(oElem, false);
-			oElem = checkFocus(getColumnHeader(0), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(0));
 			simulateTabEvent(oElem, false);
-			oElem = checkFocus(oTable.getDomRef("noDataCnt"), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("noDataCnt"));
 			simulateTabEvent(oElem, false);
-			checkFocus(document.getElementById("Focus2"), assert);
+			TableQUnitUtils.assertFocus(assert, document.getElementById("Focus2"));
 
 			done();
 		}
@@ -3999,6 +4054,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Tab - Without Column Header", async function(assert) {
+		const oTable = this.oTable;
 		const done = assert.async();
 
 		function doAfterNoDataDisplayed() {
@@ -4006,9 +4062,9 @@ sap.ui.define([
 
 			let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus1");
 			simulateTabEvent(oElem, false);
-			oElem = checkFocus(oTable.getDomRef("noDataCnt"), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("noDataCnt"));
 			simulateTabEvent(oElem, false);
-			checkFocus(document.getElementById("Focus2"), assert);
+			TableQUnitUtils.assertFocus(assert, document.getElementById("Focus2"));
 
 			done();
 		}
@@ -4020,6 +4076,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Tab - With Extension and Footer", async function(assert) {
+		const oTable = this.oTable;
 		const done = assert.async();
 
 		function doAfterNoDataDisplayed() {
@@ -4027,15 +4084,15 @@ sap.ui.define([
 
 			let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus1");
 			simulateTabEvent(oElem, false);
-			checkFocus(document.getElementById("Extension"), assert);
+			TableQUnitUtils.assertFocus(assert, document.getElementById("Extension"));
 			simulateTabEvent(oElem, false);
-			oElem = checkFocus(getColumnHeader(0), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(0));
 			simulateTabEvent(oElem, false);
-			oElem = checkFocus(oTable.getDomRef("noDataCnt"), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("noDataCnt"));
 			simulateTabEvent(oElem, false);
-			checkFocus(document.getElementById("Footer"), assert);
+			TableQUnitUtils.assertFocus(assert, document.getElementById("Footer"));
 			simulateTabEvent(oElem, false);
-			checkFocus(document.getElementById("Focus2"), assert);
+			TableQUnitUtils.assertFocus(assert, document.getElementById("Focus2"));
 
 			done();
 		}
@@ -4048,6 +4105,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Shift+Tab", function(assert) {
+		const oTable = this.oTable;
 		const done = assert.async();
 
 		function doAfterNoDataDisplayed() {
@@ -4055,11 +4113,11 @@ sap.ui.define([
 
 			let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus2");
 			simulateTabEvent(oElem, true);
-			oElem = checkFocus(oTable.getDomRef("noDataCnt"), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("noDataCnt"));
 			simulateTabEvent(oElem, true);
-			oElem = checkFocus(getColumnHeader(0), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(0));
 			simulateTabEvent(oElem, true);
-			checkFocus(document.getElementById("Focus1"), assert);
+			TableQUnitUtils.assertFocus(assert, document.getElementById("Focus1"));
 
 			done();
 		}
@@ -4069,6 +4127,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Shift+Tab - With Extension and Footer", async function(assert) {
+		const oTable = this.oTable;
 		const done = assert.async();
 
 		function doAfterNoDataDisplayed() {
@@ -4076,15 +4135,15 @@ sap.ui.define([
 
 			let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus2");
 			simulateTabEvent(oElem, true);
-			oElem = checkFocus(document.getElementById("Footer"), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, document.getElementById("Footer"));
 			simulateTabEvent(oElem, true);
-			oElem = checkFocus(oTable.getDomRef("noDataCnt"), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("noDataCnt"));
 			simulateTabEvent(oElem, true);
-			oElem = checkFocus(getColumnHeader(0), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(0));
 			simulateTabEvent(oElem, true);
-			oElem = checkFocus(document.getElementById("Extension"), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, document.getElementById("Extension"));
 			simulateTabEvent(oElem, true);
-			checkFocus(document.getElementById("Focus1"), assert);
+			TableQUnitUtils.assertFocus(assert, document.getElementById("Focus1"));
 
 			done();
 		}
@@ -4097,6 +4156,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("No Vertical Navigation (Header <-> Content)", function(assert) {
+		const oTable = this.oTable;
 		const done = assert.async();
 
 		function doAfterNoDataDisplayed() {
@@ -4104,17 +4164,17 @@ sap.ui.define([
 
 			let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus1");
 			simulateTabEvent(oElem, false);
-			oElem = checkFocus(getColumnHeader(0), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(0));
 			qutils.triggerKeydown(oElem, Key.Arrow.DOWN);
-			oElem = checkFocus(getColumnHeader(0), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(0));
 			qutils.triggerKeydown(oElem, Key.Arrow.RIGHT);
-			oElem = checkFocus(getColumnHeader(1), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(1));
 			qutils.triggerKeydown(oElem, Key.Arrow.LEFT);
-			oElem = checkFocus(getColumnHeader(0), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(0));
 			qutils.triggerKeydown(oElem, Key.Page.DOWN);
-			oElem = checkFocus(getColumnHeader(0), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(0));
 			qutils.triggerKeydown(oElem, Key.END, false, false, true);
-			checkFocus(getColumnHeader(0), assert);
+			TableQUnitUtils.assertFocus(assert, oTable.qunit.getColumnHeaderCell(0));
 
 			done();
 		}
@@ -4125,14 +4185,15 @@ sap.ui.define([
 
 	QUnit.module("Navigation > NoData & Overlay", {
 		beforeEach: async function() {
-			await setupTest();
+			await setupTest.call(this);
 		},
 		afterEach: function() {
-			teardownTest();
+			teardownTest.call(this);
 		}
 	});
 
 	QUnit.test("No Navigation", function(assert) {
+		const oTable = this.oTable;
 		const done = assert.async();
 
 		function doAfterNoDataDisplayed() {
@@ -4142,31 +4203,31 @@ sap.ui.define([
 			while (sId) {
 				let oElem = oTable.$(sId);
 				oElem.trigger("focus");
-				oElem = checkFocus(oElem, assert);
+				oElem = TableQUnitUtils.assertFocus(assert, oElem);
 				qutils.triggerKeydown(oElem, Key.Arrow.DOWN);
-				checkFocus(oElem, assert);
+				TableQUnitUtils.assertFocus(assert, oElem);
 				qutils.triggerKeydown(oElem, Key.Arrow.LEFT);
-				checkFocus(oElem, assert);
+				TableQUnitUtils.assertFocus(assert, oElem);
 				qutils.triggerKeydown(oElem, Key.Arrow.RIGHT);
-				checkFocus(oElem, assert);
+				TableQUnitUtils.assertFocus(assert, oElem);
 				qutils.triggerKeydown(oElem, Key.Arrow.UP);
-				checkFocus(oElem, assert);
+				TableQUnitUtils.assertFocus(assert, oElem);
 				qutils.triggerKeydown(oElem, Key.HOME);
-				checkFocus(oElem, assert);
+				TableQUnitUtils.assertFocus(assert, oElem);
 				qutils.triggerKeydown(oElem, Key.END);
-				checkFocus(oElem, assert);
+				TableQUnitUtils.assertFocus(assert, oElem);
 				qutils.triggerKeydown(oElem, Key.HOME, false, false, true);
-				checkFocus(oElem, assert);
+				TableQUnitUtils.assertFocus(assert, oElem);
 				qutils.triggerKeydown(oElem, Key.END, false, false, true);
-				checkFocus(oElem, assert);
+				TableQUnitUtils.assertFocus(assert, oElem);
 				qutils.triggerKeydown(oElem, Key.Page.UP);
-				checkFocus(oElem, assert);
+				TableQUnitUtils.assertFocus(assert, oElem);
 				qutils.triggerKeydown(oElem, Key.Page.DOWN);
-				checkFocus(oElem, assert);
+				TableQUnitUtils.assertFocus(assert, oElem);
 				qutils.triggerKeydown(oElem, Key.Page.UP, false, true);
-				checkFocus(oElem, assert);
+				TableQUnitUtils.assertFocus(assert, oElem);
 				qutils.triggerKeydown(oElem, Key.Page.DOWN, false, true);
-				checkFocus(oElem, assert);
+				TableQUnitUtils.assertFocus(assert, oElem);
 
 				sId = sId === "noDataCnt" ? "overlay" : null;
 				oTable.setShowOverlay(true);
@@ -4180,6 +4241,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Tab", function(assert) {
+		const oTable = this.oTable;
 		const done = assert.async();
 
 		function doAfterNoDataDisplayed() {
@@ -4187,9 +4249,9 @@ sap.ui.define([
 
 			let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus1");
 			simulateTabEvent(oElem, false);
-			oElem = checkFocus(oTable.getDomRef("overlay"), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("overlay"));
 			simulateTabEvent(oElem, false);
-			checkFocus(document.getElementById("Focus2"), assert);
+			TableQUnitUtils.assertFocus(assert, document.getElementById("Focus2"));
 
 			done();
 		}
@@ -4200,6 +4262,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Shift+Tab", function(assert) {
+		const oTable = this.oTable;
 		const done = assert.async();
 
 		function doAfterNoDataDisplayed() {
@@ -4207,9 +4270,9 @@ sap.ui.define([
 
 			let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus2");
 			simulateTabEvent(oElem, true);
-			oElem = checkFocus(oTable.getDomRef("overlay"), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.getDomRef("overlay"));
 			simulateTabEvent(oElem, true);
-			checkFocus(document.getElementById("Focus1"), assert);
+			TableQUnitUtils.assertFocus(assert, document.getElementById("Focus1"));
 
 			done();
 		}
@@ -4221,67 +4284,74 @@ sap.ui.define([
 
 	QUnit.module("Navigation > BusyIndicator", {
 		beforeEach: async function() {
-			await setupTest();
+			await setupTest.call(this);
 
-			oTable.setBusyIndicatorDelay(0);
-			oTable.setBusy(true);
+			this.oTable.setBusyIndicatorDelay(0);
+			this.oTable.setBusy(true);
 			await nextUIUpdate();
 		},
 		afterEach: function() {
-			teardownTest();
+			teardownTest.call(this);
 		}
 	});
 
 	QUnit.test("Tab", function(assert) {
+		const oTable = this.oTable;
 		let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus1");
 		simulateTabEvent(oElem, false);
 		// Due to changed BusyIndicator handling - BusyIndicator is now tabbable
 		oElem = oTable.getDomRef("busyIndicator");
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 		simulateTabEvent(oElem, false);
-		checkFocus(document.getElementById("Focus2"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Focus2"));
 	});
 
 	QUnit.test("Shift+Tab", function(assert) {
+		const oTable = this.oTable;
 		let oElem = TableQUnitUtils.setFocusOutsideOfTable(assert, "Focus2");
 		simulateTabEvent(oElem, true);
 		// Due to changed BusyIndicator handling - BusyIndicator is now tabbable
 		oElem = oTable.getDomRef("busyIndicator");
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 		simulateTabEvent(oElem, true);
-		checkFocus(document.getElementById("Focus1"), assert);
+		TableQUnitUtils.assertFocus(assert, document.getElementById("Focus1"));
 	});
 
 	QUnit.module("Navigation > Special Cases", {
 		beforeEach: async function() {
-			await setupTest();
+			await setupTest.call(this);
 		},
 		afterEach: function() {
-			teardownTest();
+			teardownTest.call(this);
 		}
 	});
 
 	QUnit.test("Focus on cell content - Home & End & Arrow Keys", function(assert) {
-		const oElem = findTabbables(getCell(0, 0).get(0), [getCell(0, 0).get(0)], true);
+		const oTable = this.oTable;
+		const oElem = findTabbables(oTable.qunit.getDataCell(0, 0), [oTable.qunit.getDataCell(0, 0)], true);
 		oElem.trigger("focus");
 
 		// If the focus is on an element inside the cell,
 		// the focus should not be changed when pressing one of the following keys.
 		const aKeys = [Key.HOME, Key.END, Key.Arrow.LEFT, Key.Arrow.RIGHT];
 
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 		for (let i = 0; i < aKeys.length; i++) {
 			qutils.triggerKeydown(oElem, aKeys[i]);
-			checkFocus(oElem, assert);
+			TableQUnitUtils.assertFocus(assert, oElem);
 		}
 	});
 
 	QUnit.test("Page scrolling", async function(assert) {
+		const oTable = this.oTable;
+		const oTreeTable = this.oTreeTable = TableQUnitUtils.createTable(TreeTable, mTreeTableSettings());
+		oTreeTable.placeAt("qunit-fixture");
+		await oTreeTable.qunit.whenRenderingFinished();
 		const aEventTargetGetters = [
-			getCell.bind(window, 0, 0),
-			getCell.bind(window, oTable._getRowCounts().count - 1, 0),
-			getCell.bind(window, 2, 1),
-			getColumnHeader.bind(window, 0)
+			oTable.qunit.getDataCell.bind(oTable.qunit, 0, 0),
+			oTable.qunit.getDataCell.bind(oTable.qunit, oTable._getRowCounts().count - 1, 0),
+			oTable.qunit.getDataCell.bind(oTable.qunit, 2, 1),
+			oTable.qunit.getColumnHeaderCell.bind(oTable.qunit, 0)
 		];
 		const aKeystrokes = [
 			{keyName: "Space (keydown)", trigger: qutils.triggerKeydown, arguments: [null, Key.SPACE]},
@@ -4312,15 +4382,15 @@ sap.ui.define([
 			await nextUIUpdate();
 
 			const oEventTarget = aEventTargetGetters[i]();
-			oEventTarget.trigger("focus");
-			checkFocus(oEventTarget, assert);
+			oEventTarget.focus();
+			TableQUnitUtils.assertFocus(assert, oEventTarget);
 
 			for (let j = 0; j < aKeystrokes.length; j++) {
 				const oKeystroke = aKeystrokes[j];
 				const aArguments = oKeystroke.arguments;
 
-				oEventTarget.trigger("focus");
-				oEventTarget[0]._oKeystroke = oKeystroke;
+				oEventTarget.focus();
+				oEventTarget._oKeystroke = oKeystroke;
 				aArguments[0] = oEventTarget; // The first parameter is the event target.
 				oKeystroke.trigger.apply(qutils, aArguments);
 			}
@@ -4332,15 +4402,15 @@ sap.ui.define([
 			}
 		});
 
-		const oTreeIcon = getCell(0, 0, null, null, oTreeTable).find(".sapUiTableTreeIconNodeClosed");
+		const oTreeIcon = jQuery(oTreeTable.qunit.getDataCell(0, 0)).find(".sapUiTableTreeIconNodeClosed");
 		oTreeIcon.trigger("focus");
-		checkFocus(oTreeIcon, assert);
+		TableQUnitUtils.assertFocus(assert, oTreeIcon);
 		qutils.triggerKeydown(oTreeIcon, Key.SPACE);
 
-		const oCell = getRowHeader(0);
+		const oCell = oTable.qunit.getRowHeaderCell(0);
 		oTable._getKeyboardExtension()._actionMode = true;
-		oCell.trigger("focus");
-		oCell[0]._oKeystroke = {keyName: "Space (keydown, action mode)"};
+		oCell.focus();
+		oCell._oKeystroke = {keyName: "Space (keydown, action mode)"};
 		qutils.triggerKeydown(oCell, Key.SPACE);
 
 		let bDefaultPrevented = false;
@@ -4351,13 +4421,14 @@ sap.ui.define([
 				}
 			}
 		});
-		const oInputElement = TableUtils.getInteractiveElements(getCell(0, 0))[0];
+		const oInputElement = TableUtils.getInteractiveElements(oTable.qunit.getDataCell(0, 0))[0];
 		oInputElement.focus();
 		qutils.triggerKeydown(oInputElement, Key.SPACE);
 		assert.ok(!bDefaultPrevented, "Space (keydown, input inside cell): Default action was not prevented");
 	});
 
 	QUnit.test("After leaving action mode", async function(assert) {
+		const oTable = this.oTable;
 		oTable.setFixedColumnCount(1);
 		oTable.setRowActionTemplate(TableQUnitUtils.createRowAction());
 		oTable.setRowActionCount(1);
@@ -4366,13 +4437,13 @@ sap.ui.define([
 		function test(oInitiallyFocusedCell, oTestedCell, oFinallyFocusedCell, fnKeyPress, sTitle) {
 			const bTestedCellIsRowHeader = TableUtils.getCellInfo(oTestedCell).isOfType(TableUtils.CELLTYPE.ROWHEADER);
 
-			oInitiallyFocusedCell.trigger("focus");
+			oInitiallyFocusedCell.focus();
 
 			// Enter action mode
 			if (bTestedCellIsRowHeader) {
 				oTable._getKeyboardExtension()._actionMode = true;
 				oTable._getKeyboardExtension().suspendItemNavigation();
-				oTestedCell.trigger("focus");
+				oTestedCell.focus();
 			} else {
 				TableUtils.getInteractiveElements(oTestedCell)[0].focus();
 			}
@@ -4382,62 +4453,62 @@ sap.ui.define([
 
 			fnKeyPress();
 			assert.ok(!oTable._getKeyboardExtension().isInActionMode(), sTitle + " - Table is in navigation mode");
-			checkFocus(oFinallyFocusedCell, assert);
+			TableQUnitUtils.assertFocus(assert, oFinallyFocusedCell);
 		}
 
 		// Row header cell
-		test(getCell(2, 2), getRowHeader(1), getRowHeader(0), function() {
+		test(oTable.qunit.getDataCell(2, 2), oTable.qunit.getRowHeaderCell(1), oTable.qunit.getRowHeaderCell(0), function() {
 			qutils.triggerKeydown(document.activeElement, Key.Arrow.UP);
 		}, "Row header cell: ArrowUp");
-		test(getCell(2, 2), getRowHeader(1), getRowHeader(2), function() {
+		test(oTable.qunit.getDataCell(2, 2), oTable.qunit.getRowHeaderCell(1), oTable.qunit.getRowHeaderCell(2), function() {
 			qutils.triggerKeydown(document.activeElement, Key.Arrow.DOWN);
 		}, "Row header cell: ArrowDown");
-		test(getCell(2, 2), getRowHeader(1), getRowHeader(1), function() {
+		test(oTable.qunit.getDataCell(2, 2), oTable.qunit.getRowHeaderCell(1), oTable.qunit.getRowHeaderCell(1), function() {
 			qutils.triggerKeydown(document.activeElement, Key.Arrow.LEFT);
 		}, "Row header cell: ArrowLeft");
-		test(getCell(2, 2), getRowHeader(1), getCell(1, 0), function() {
+		test(oTable.qunit.getDataCell(2, 2), oTable.qunit.getRowHeaderCell(1), oTable.qunit.getDataCell(1, 0), function() {
 			qutils.triggerKeydown(document.activeElement, Key.Arrow.RIGHT);
 		}, "Row header cell: ArrowRight");
 
 		// Cell in fixed column
-		test(getCell(2, 2), getCell(1, 0), getCell(0, 0), function() {
+		test(oTable.qunit.getDataCell(2, 2), oTable.qunit.getDataCell(1, 0), oTable.qunit.getDataCell(0, 0), function() {
 			qutils.triggerKeydown(document.activeElement, Key.Arrow.UP);
 		}, "Cell in fixed column: ArrowUp");
-		test(getCell(2, 2), getCell(1, 0), getCell(2, 0), function() {
+		test(oTable.qunit.getDataCell(2, 2), oTable.qunit.getDataCell(1, 0), oTable.qunit.getDataCell(2, 0), function() {
 			qutils.triggerKeydown(document.activeElement, Key.Arrow.DOWN);
 		}, "Cell in fixed column: ArrowDown");
-		test(getCell(2, 2), getCell(1, 0), getRowHeader(1), function() {
+		test(oTable.qunit.getDataCell(2, 2), oTable.qunit.getDataCell(1, 0), oTable.qunit.getRowHeaderCell(1), function() {
 			qutils.triggerKeydown(document.activeElement, Key.Arrow.LEFT);
 		}, "Cell in fixed column: ArrowLeft");
-		test(getCell(2, 2), getCell(1, 0), getCell(1, 1), function() {
+		test(oTable.qunit.getDataCell(2, 2), oTable.qunit.getDataCell(1, 0), oTable.qunit.getDataCell(1, 1), function() {
 			qutils.triggerKeydown(document.activeElement, Key.Arrow.RIGHT);
 		}, "Cell in fixed column: ArrowRight");
 
 		// Cell in scrollable column
-		test(getCell(2, 3), getCell(1, 1), getCell(0, 1), function() {
+		test(oTable.qunit.getDataCell(2, 3), oTable.qunit.getDataCell(1, 1), oTable.qunit.getDataCell(0, 1), function() {
 			qutils.triggerKeydown(document.activeElement, Key.Arrow.UP);
 		}, "Cell in scrollable column: ArrowUp");
-		test(getCell(2, 3), getCell(1, 1), getCell(2, 1), function() {
+		test(oTable.qunit.getDataCell(2, 3), oTable.qunit.getDataCell(1, 1), oTable.qunit.getDataCell(2, 1), function() {
 			qutils.triggerKeydown(document.activeElement, Key.Arrow.DOWN);
 		}, "Cell in scrollable column: ArrowDown");
-		test(getCell(2, 3), getCell(1, 1), getCell(1, 0), function() {
+		test(oTable.qunit.getDataCell(2, 3), oTable.qunit.getDataCell(1, 1), oTable.qunit.getDataCell(1, 0), function() {
 			qutils.triggerKeydown(document.activeElement, Key.Arrow.LEFT);
 		}, "Cell in scrollable column: ArrowLeft");
-		test(getCell(2, 3), getCell(1, 1), getCell(1, 2), function() {
+		test(oTable.qunit.getDataCell(2, 3), oTable.qunit.getDataCell(1, 1), oTable.qunit.getDataCell(1, 2), function() {
 			qutils.triggerKeydown(document.activeElement, Key.Arrow.RIGHT);
 		}, "Cell in scrollable column: ArrowRight");
 
 		// Row action cell
-		test(getCell(2, 2), getRowAction(1), getRowAction(0), function() {
+		test(oTable.qunit.getDataCell(2, 2), oTable.qunit.getRowActionCell(1), oTable.qunit.getRowActionCell(0), function() {
 			qutils.triggerKeydown(document.activeElement, Key.Arrow.UP);
 		}, "Row action cell: ArrowUp");
-		test(getCell(2, 2), getRowAction(1), getRowAction(2), function() {
+		test(oTable.qunit.getDataCell(2, 2), oTable.qunit.getRowActionCell(1), oTable.qunit.getRowActionCell(2), function() {
 			qutils.triggerKeydown(document.activeElement, Key.Arrow.DOWN);
 		}, "Row action cell: ArrowDown");
-		test(getCell(2, 2), getRowAction(1), getCell(1, oTable.columnCount - 1), function() {
+		test(oTable.qunit.getDataCell(2, 2), oTable.qunit.getRowActionCell(1), oTable.qunit.getDataCell(1, oTable.getColumns().length - 1), function() {
 			qutils.triggerKeydown(document.activeElement, Key.Arrow.LEFT);
 		}, "Row action cell: ArrowLeft");
-		test(getCell(2, 2), getRowAction(1), getRowAction(1), function() {
+		test(oTable.qunit.getDataCell(2, 2), oTable.qunit.getRowActionCell(1), oTable.qunit.getRowActionCell(1), function() {
 			qutils.triggerKeydown(document.activeElement, Key.Arrow.RIGHT);
 		}, "Row action cell: ArrowRight");
 	});
@@ -4541,7 +4612,7 @@ sap.ui.define([
 		await this.oTable.qunit.whenRenderingFinished();
 
 		this.oTable.qunit.getDataCell(1, 1).focus();
-		await this.oTable.qunit.$resize({height: "500px"});
+		await this.oTable.qunit.resize({height: "500px"});
 		assert.strictEqual(document.activeElement, this.oTable.qunit.getDataCell(1, 1),
 			"Height decreased: The data cell at the same position is focused");
 
@@ -4557,7 +4628,7 @@ sap.ui.define([
 		assert.strictEqual(document.activeElement, this.oTable.qunit.getDataCell(0, 1), "ArrowUp -> The data cell above is focused");
 
 		this.oTable.qunit.getDataCell(0, 1).focus();
-		await this.oTable.qunit.$resize({height: "500px"});
+		await this.oTable.qunit.resize({height: "500px"});
 		assert.strictEqual(document.activeElement, this.oTable.qunit.getDataCell(0, 1),
 			"Height decreased: The data cell at the same position is focused");
 
@@ -4573,7 +4644,7 @@ sap.ui.define([
 		assert.strictEqual(document.activeElement, this.oTable.qunit.getColumnHeaderCell(1), "ArrowUp -> The header cell above is focused");
 
 		this.oTable.qunit.getColumnHeaderCell(1).focus();
-		await this.oTable.qunit.$resize({height: "500px"});
+		await this.oTable.qunit.resize({height: "500px"});
 		assert.strictEqual(document.activeElement, this.oTable.qunit.getColumnHeaderCell(1),
 			"Height decreased: The header cell at the same position is focused");
 
@@ -4977,21 +5048,23 @@ sap.ui.define([
 
 	QUnit.module("Interaction > Shift+Left & Shift+Right (Column Resizing)", {
 		beforeEach: async function() {
-			await setupTest();
-			oTable._getVisibleColumns()[2].setResizable(false);
+			await setupTest.call(this);
+			this.oTable._getVisibleColumns()[2].setResizable(false);
 			await nextUIUpdate();
 		},
 		afterEach: function() {
-			teardownTest();
+			teardownTest.call(this);
 		}
 	});
 
 	QUnit.test("Default Test Table - Resize fixed column", function(assert) {
+		const oTable = this.oTable;
 		const iMinColumnWidth = TableUtils.Column.getMinColumnWidth();
 		const iColumnResizeStep = TableUtils.convertCSSSizeToPixel("1rem");
 		let i;
 
-		const oElem = getColumnHeader(0, true);
+		const oElem = oTable.qunit.getColumnHeaderCell(0);
+		oElem.focus();
 		for (i = TableUtils.Column.getColumnWidth(oTable, 0); i - iColumnResizeStep > iMinColumnWidth; i -= iColumnResizeStep) {
 			qutils.triggerKeydown(oElem, Key.Arrow.LEFT, true);
 			assert.strictEqual(TableUtils.Column.getColumnWidth(oTable, 0), i - iColumnResizeStep,
@@ -5016,11 +5089,13 @@ sap.ui.define([
 	});
 
 	QUnit.test("Default Test Table - Resize column", function(assert) {
+		const oTable = this.oTable;
 		const iMinColumnWidth = TableUtils.Column.getMinColumnWidth();
 		const iColumnResizeStep = TableUtils.convertCSSSizeToPixel("1rem");
 		let i;
 
-		const oElem = getColumnHeader(1, true);
+		const oElem = oTable.qunit.getColumnHeaderCell(1);
+		oElem.focus();
 		for (i = TableUtils.Column.getColumnWidth(oTable, 1); i - iColumnResizeStep > iMinColumnWidth; i -= iColumnResizeStep) {
 			qutils.triggerKeydown(oElem, Key.Arrow.LEFT, true);
 			assert.strictEqual(TableUtils.Column.getColumnWidth(oTable, 1), i - iColumnResizeStep,
@@ -5045,6 +5120,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Multi Header - Resize spans", async function(assert) {
+		const oTable = this.oTable;
 		oTable.setFixedColumnCount(0);
 		oTable.getColumns()[0].addMultiLabel(new TestControl({text: "a_1_1"}));
 		oTable.getColumns()[0].addMultiLabel(new TestControl({text: "a_2_1"}));
@@ -5144,24 +5220,27 @@ sap.ui.define([
 		}
 
 		// Top row - Span over all 3 columns (3rd. column is not resizable)
-		oElem = getColumnHeader(0, true);
+		oElem = oTable.qunit.getColumnHeaderCell(0);
+		oElem.focus();
 		test.call(this, [aVisibleColumns[0], aVisibleColumns[1]], [aVisibleColumns[2]]);
 
 		// Second row - First span over 2 columns
-		oElem = document.getElementById(getColumnHeader(0).attr("id") + "_1");
+		oElem = oTable.qunit.getColumnHeaderCell(0, 1);
 		oElem.focus();
 		test.call(this, [aVisibleColumns[0], aVisibleColumns[1]], aVisibleColumns[2]);
 
 		// Last row - Second column
-		oElem = document.getElementById(getColumnHeader(1).attr("id") + "_2");
+		oElem = oTable.qunit.getColumnHeaderCell(1, 2);
 		oElem.focus();
 		test.call(this, [aVisibleColumns[1]], [aVisibleColumns[0], aVisibleColumns[2]]);
 	});
 
 	QUnit.test("Default Test Table - Resize not resizable column", function(assert) {
+		const oTable = this.oTable;
 		const iOriginalColumnWidth = TableUtils.Column.getColumnWidth(oTable, 2);
 
-		const oElem = getColumnHeader(2, true);
+		const oElem = oTable.qunit.getColumnHeaderCell(2);
+		oElem.focus();
 		qutils.triggerKeydown(oElem, Key.Arrow.LEFT, true);
 		assert.strictEqual(iOriginalColumnWidth, TableUtils.Column.getColumnWidth(oTable, 2),
 			"Column width did not change (" + iOriginalColumnWidth + "px)");
@@ -5172,29 +5251,30 @@ sap.ui.define([
 
 	QUnit.module("Interaction > Ctrl+Left & Ctrl+Right (Column Reordering)", {
 		beforeEach: async function() {
-			await setupTest();
-			oTable.setFixedColumnCount(0);
+			await setupTest.call(this);
+			this.oTable.setFixedColumnCount(0);
 			await nextUIUpdate();
 		},
 		afterEach: function() {
-			teardownTest();
+			teardownTest.call(this);
 		}
 	});
 
 	QUnit.test("Default Test Table - Move columns", function(assert) {
+		const oTable = this.oTable;
 		const oFirstColumn = oTable.getColumns()[0];
-		const oLastColumn = oTable.getColumns()[oTable.columnCount - 1];
+		const oLastColumn = oTable.getColumns()[oTable.getColumns().length - 1];
 		let iOldColumnIndex;
 
 		// First column.
 		iOldColumnIndex = oFirstColumn.getIndex();
 		oFirstColumn.focus();
-		qutils.triggerKeydown(getColumnHeader(0), Key.Arrow.LEFT, false, false, true);
+		qutils.triggerKeydown(oTable.qunit.getColumnHeaderCell(0), Key.Arrow.LEFT, false, false, true);
 
 		return new Promise(function(resolve) {
 			window.setTimeout(function() {
 				assert.strictEqual(oFirstColumn.getIndex(), iOldColumnIndex, "First column was not moved to the left");
-				qutils.triggerKeydown(getColumnHeader(0), Key.Arrow.RIGHT, false, false, true);
+				qutils.triggerKeydown(oTable.qunit.getColumnHeaderCell(0), Key.Arrow.RIGHT, false, false, true);
 				resolve();
 			}, 0);
 		}).then(function() {
@@ -5202,7 +5282,7 @@ sap.ui.define([
 				window.setTimeout(function() {
 					assert.strictEqual(oFirstColumn.getIndex(), iOldColumnIndex + 1, "First column was moved to the right");
 					iOldColumnIndex = oFirstColumn.getIndex();
-					qutils.triggerKeydown(getColumnHeader(1), Key.Arrow.LEFT, false, false, true);
+					qutils.triggerKeydown(oTable.qunit.getColumnHeaderCell(1), Key.Arrow.LEFT, false, false, true);
 					resolve();
 				}, 0);
 			});
@@ -5213,7 +5293,7 @@ sap.ui.define([
 
 					// Last column.
 					iOldColumnIndex = oLastColumn.getIndex();
-					qutils.triggerKeydown(getColumnHeader(oTable.columnCount - 1), Key.Arrow.RIGHT, false, false, true);
+					qutils.triggerKeydown(oTable.qunit.getColumnHeaderCell(oTable.getColumns().length - 1), Key.Arrow.RIGHT, false, false, true);
 					resolve();
 				}, 0);
 			});
@@ -5221,7 +5301,7 @@ sap.ui.define([
 			return new Promise(function(resolve) {
 				window.setTimeout(function() {
 					assert.strictEqual(oLastColumn.getIndex(), iOldColumnIndex, "Last column was not moved to the right");
-					qutils.triggerKeydown(getColumnHeader(oTable.columnCount - 1), Key.Arrow.LEFT, false, false, true);
+					qutils.triggerKeydown(oTable.qunit.getColumnHeaderCell(oTable.getColumns().length - 1), Key.Arrow.LEFT, false, false, true);
 					resolve();
 				}, 0);
 			});
@@ -5230,7 +5310,7 @@ sap.ui.define([
 				window.setTimeout(function() {
 					assert.strictEqual(oLastColumn.getIndex(), iOldColumnIndex - 1, "Last column was moved to the left");
 					iOldColumnIndex = oLastColumn.getIndex();
-					qutils.triggerKeydown(getColumnHeader(oTable.columnCount - 2), Key.Arrow.RIGHT, false, false, true);
+					qutils.triggerKeydown(oTable.qunit.getColumnHeaderCell(oTable.getColumns().length - 2), Key.Arrow.RIGHT, false, false, true);
 					resolve();
 				}, 0);
 			});
@@ -5245,6 +5325,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Fixed Columns - Move fixed columns", async function(assert) {
+		const oTable = this.oTable;
 		oTable.setFixedColumnCount(2);
 		await nextUIUpdate();
 
@@ -5254,12 +5335,12 @@ sap.ui.define([
 
 		// First fixed column.
 		iOldColumnIndex = oFirstFixedColumn.getIndex();
-		qutils.triggerKeydown(getColumnHeader(0), Key.Arrow.LEFT, false, false, true);
+		qutils.triggerKeydown(oTable.qunit.getColumnHeaderCell(0), Key.Arrow.LEFT, false, false, true);
 
 		return new Promise(function(resolve) {
 			window.setTimeout(function() {
 				assert.strictEqual(oFirstFixedColumn.getIndex(), iOldColumnIndex, "First fixed column was not moved to the left");
-				qutils.triggerKeydown(getColumnHeader(0), Key.Arrow.RIGHT, false, false, true);
+				qutils.triggerKeydown(oTable.qunit.getColumnHeaderCell(0), Key.Arrow.RIGHT, false, false, true);
 				resolve();
 			}, 0);
 		}).then(function() {
@@ -5269,7 +5350,7 @@ sap.ui.define([
 
 					// Last fixed column.
 					iOldColumnIndex = oLastFixedColumn.getIndex();
-					qutils.triggerKeydown(getColumnHeader(1), Key.Arrow.RIGHT, false, false, true);
+					qutils.triggerKeydown(oTable.qunit.getColumnHeaderCell(1), Key.Arrow.RIGHT, false, false, true);
 					resolve();
 				}, 0);
 			});
@@ -5277,7 +5358,7 @@ sap.ui.define([
 			return new Promise(function(resolve) {
 				window.setTimeout(function() {
 					assert.strictEqual(oLastFixedColumn.getIndex(), iOldColumnIndex, "Last fixed column was not moved to the right");
-					qutils.triggerKeydown(getColumnHeader(1), Key.Arrow.LEFT, false, false, true);
+					qutils.triggerKeydown(oTable.qunit.getColumnHeaderCell(1), Key.Arrow.LEFT, false, false, true);
 					resolve();
 				}, 0);
 			});
@@ -5290,21 +5371,22 @@ sap.ui.define([
 	});
 
 	QUnit.test("Fixed Columns - Move scrollable columns", async function(assert) {
+		const oTable = this.oTable;
 		oTable.setFixedColumnCount(2);
 		await nextUIUpdate();
 
 		const oFirstColumn = oTable.getColumns()[2];
-		const oLastColumn = oTable.getColumns()[oTable.columnCount - 1];
+		const oLastColumn = oTable.getColumns()[oTable.getColumns().length - 1];
 		let iOldColumnIndex;
 
 		// First scrollable column.
 		iOldColumnIndex = oFirstColumn.getIndex();
-		qutils.triggerKeydown(getColumnHeader(2), Key.Arrow.LEFT, false, false, true);
+		qutils.triggerKeydown(oTable.qunit.getColumnHeaderCell(2), Key.Arrow.LEFT, false, false, true);
 
 		return new Promise(function(resolve) {
 			window.setTimeout(function() {
 				assert.strictEqual(oFirstColumn.getIndex(), iOldColumnIndex, "First movable column was not moved to the left");
-				qutils.triggerKeydown(getColumnHeader(2), Key.Arrow.RIGHT, false, false, true);
+				qutils.triggerKeydown(oTable.qunit.getColumnHeaderCell(2), Key.Arrow.RIGHT, false, false, true);
 				resolve();
 			}, 0);
 		}).then(function() {
@@ -5312,7 +5394,7 @@ sap.ui.define([
 				window.setTimeout(function() {
 					assert.strictEqual(oFirstColumn.getIndex(), iOldColumnIndex + 1, "First movable column was moved to the right");
 					iOldColumnIndex = oFirstColumn.getIndex();
-					qutils.triggerKeydown(getColumnHeader(3), Key.Arrow.LEFT, false, false, true);
+					qutils.triggerKeydown(oTable.qunit.getColumnHeaderCell(3), Key.Arrow.LEFT, false, false, true);
 					resolve();
 				}, 0);
 			});
@@ -5323,7 +5405,7 @@ sap.ui.define([
 
 					// Last scrollable column.
 					iOldColumnIndex = oLastColumn.getIndex();
-					qutils.triggerKeydown(getColumnHeader(oTable.columnCount - 1), Key.Arrow.RIGHT, false, false, true);
+					qutils.triggerKeydown(oTable.qunit.getColumnHeaderCell(oTable.getColumns().length - 1), Key.Arrow.RIGHT, false, false, true);
 					resolve();
 				}, 0);
 			});
@@ -5331,7 +5413,7 @@ sap.ui.define([
 			return new Promise(function(resolve) {
 				window.setTimeout(function() {
 					assert.strictEqual(oLastColumn.getIndex(), iOldColumnIndex, "Last movable column was not moved to the right");
-					qutils.triggerKeydown(getColumnHeader(oTable.columnCount - 1), Key.Arrow.LEFT, false, false, true);
+					qutils.triggerKeydown(oTable.qunit.getColumnHeaderCell(oTable.getColumns().length - 1), Key.Arrow.LEFT, false, false, true);
 					resolve();
 				}, 0);
 			});
@@ -5340,7 +5422,7 @@ sap.ui.define([
 				window.setTimeout(function() {
 					assert.strictEqual(oLastColumn.getIndex(), iOldColumnIndex - 1, "Last movable column was moved to the left");
 					iOldColumnIndex = oLastColumn.getIndex();
-					qutils.triggerKeydown(getColumnHeader(oTable.columnCount - 2), Key.Arrow.RIGHT, false, false, true);
+					qutils.triggerKeydown(oTable.qunit.getColumnHeaderCell(oTable.getColumns().length - 2), Key.Arrow.RIGHT, false, false, true);
 					resolve();
 				}, 0);
 			});
@@ -5758,7 +5840,7 @@ sap.ui.define([
 			_testKey(oTarget, Key.ENTER, bExpectToggleExpandedState, bExpectCellClickEvent);
 		};
 
-		this.oTable.qunit.addTextColumn();
+		this.oTable.addColumn(TableQUnitUtils.createTextColumn());
 		this.oTable.attachCellClick(oCellClickEventHandler);
 		TableUtils.Grouping.setHierarchyMode(this.oTable, TableUtils.Grouping.HierarchyMode.Tree);
 		await this.oTable.qunit.setRowStates([{expandable: true}]);
@@ -5777,7 +5859,7 @@ sap.ui.define([
 		this.oTable.qunit.getDataCell(0, 0).querySelector(".sapUiTableTreeIcon").focus();
 		await this.oTable.qunit.setRowStates();
 
-		checkFocus(this.oTable.qunit.getDataCell(0, 0), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getDataCell(0, 0));
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 	});
 
@@ -5956,7 +6038,7 @@ sap.ui.define([
 				assert.equal(oRow[sMethod].callCount, 0, `${sKey} - ${oTarget.id}: Row#${sMethod} not called`);
 			}
 
-			checkFocus(oTarget, assert);
+			TableQUnitUtils.assertFocus(assert, oTarget);
 
 			oRow[sMethod].restore();
 		},
@@ -5970,9 +6052,9 @@ sap.ui.define([
 		function test(oCellElement) {
 			oCellElement.focus();
 			qutils.triggerKeydown(oCellElement, Key.Arrow.DOWN, false, true, false);
-			checkFocus(oCellElement, assert);
+			TableQUnitUtils.assertFocus(assert, oCellElement);
 			qutils.triggerKeydown(oCellElement, Key.Arrow.UP, false, true, false);
-			checkFocus(oCellElement, assert);
+			TableQUnitUtils.assertFocus(assert, oCellElement);
 		}
 
 		TableUtils.Grouping.setHierarchyMode(this.oTable, TableUtils.Grouping.HierarchyMode.Group);
@@ -5986,7 +6068,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Tree row", async function(assert) {
-		this.oTable.qunit.addTextColumn();
+		this.oTable.addColumn(TableQUnitUtils.createTextColumn());
 		TableUtils.Grouping.setHierarchyMode(this.oTable, TableUtils.Grouping.HierarchyMode.Tree);
 		await this.oTable.qunit.setRowStates([{expandable: true}]);
 
@@ -6034,7 +6116,7 @@ sap.ui.define([
 		function test(oCellElement) {
 			oCellElement.focus();
 			qutils.triggerKeydown(oCellElement, Key.F4);
-			checkFocus(oCellElement, assert);
+			TableQUnitUtils.assertFocus(assert, oCellElement);
 		}
 
 		TableUtils.Grouping.setHierarchyMode(this.oTable, TableUtils.Grouping.HierarchyMode.Group);
@@ -6048,7 +6130,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Tree row", async function(assert) {
-		this.oTable.qunit.addTextColumn();
+		this.oTable.addColumn(TableQUnitUtils.createTextColumn());
 		TableUtils.Grouping.setHierarchyMode(this.oTable, TableUtils.Grouping.HierarchyMode.Tree);
 		await this.oTable.qunit.setRowStates([{expandable: true}]);
 
@@ -6091,7 +6173,7 @@ sap.ui.define([
 				assert.equal(oRow.collapse.callCount, 0, `${sKey} - ${oTarget.id}: Row#collapse not called`);
 			}
 
-			checkFocus(oTarget, assert);
+			TableQUnitUtils.assertFocus(assert, oTarget);
 
 			oRow.expand.restore();
 			oRow.collapse.restore();
@@ -6106,9 +6188,9 @@ sap.ui.define([
 		function test(oCellElement) {
 			oCellElement.focus();
 			qutils.triggerKeypress(oCellElement, Key.PLUS);
-			checkFocus(oCellElement, assert);
+			TableQUnitUtils.assertFocus(assert, oCellElement);
 			qutils.triggerKeypress(oCellElement, Key.MINUS);
-			checkFocus(oCellElement, assert);
+			TableQUnitUtils.assertFocus(assert, oCellElement);
 		}
 
 		TableUtils.Grouping.setHierarchyMode(this.oTable, TableUtils.Grouping.HierarchyMode.Group);
@@ -6122,7 +6204,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Tree row", async function(assert) {
-		this.oTable.qunit.addTextColumn();
+		this.oTable.addColumn(TableQUnitUtils.createTextColumn());
 		TableUtils.Grouping.setHierarchyMode(this.oTable, TableUtils.Grouping.HierarchyMode.Tree);
 		await this.oTable.qunit.setRowStates([{expandable: true}]);
 
@@ -6171,7 +6253,7 @@ sap.ui.define([
 
 			assert.ok(oOpenContextMenuSpy.calledOnceWithExactly(this.oTable, oContextMenuEventArgument),
 				"TableUtils.Menu.openContextMenu was called with the correct arguments");
-			checkFocus(oElem, assert);
+			TableQUnitUtils.assertFocus(assert, oElem);
 
 			oOpenContextMenuSpy.resetHistory();
 			oContextMenuEventHandlerSpy.resetHistory();
@@ -6189,7 +6271,7 @@ sap.ui.define([
 		oElem.focus();
 		jQuery(oElem).trigger("contextmenu");
 		assert.ok(oOpenContextMenuSpy.notCalled, "TableUtils.Menu.openContextMenu was not called");
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 
 		oContextMenuEventArgument = oContextMenuEventHandlerSpy.args[0][0];
 		assert.ok(!oContextMenuEventArgument.isDefaultPrevented(), "Opening of the default context menu was not prevented");
@@ -6201,7 +6283,7 @@ sap.ui.define([
 		oElem.focus();
 		jQuery(oElem).trigger("contextmenu");
 		assert.ok(oOpenContextMenuSpy.notCalled, "TableUtils.Menu.openContextMenu was not called");
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 
 		oContextMenuEventArgument = oContextMenuEventHandlerSpy.args[0][0];
 		assert.ok(!oContextMenuEventArgument.isDefaultPrevented(), "Opening of the default context menu was not prevented");
@@ -6222,7 +6304,7 @@ sap.ui.define([
 			oElem.focus();
 			jQuery(oElem).trigger("contextmenu");
 			assert.ok(oOpenContextMenuSpy.notCalled, "TableUtils.Menu.openContextMenu was not called");
-			checkFocus(oElem, assert);
+			TableQUnitUtils.assertFocus(assert, oElem);
 
 			const oContextMenuEventArgument = oContextMenuEventHandlerSpy.args[0][0];
 			assert.ok(!oContextMenuEventArgument.isDefaultPrevented(), "Opening of the default context menu was not prevented");
@@ -6334,16 +6416,16 @@ sap.ui.define([
 			// Column header cell without interactive elements
 			oElem = this.oTable.qunit.getColumnHeaderCell(1);
 			oElem.focus();
-			checkFocus(oElem, assert);
+			TableQUnitUtils.assertFocus(assert, oElem);
 			assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 			fEventTriggerer(oElem, key, bShift, bAlt, bCtrl);
-			checkFocus(this.oTable.qunit.getColumnHeaderCell(1), assert);
+			TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getColumnHeaderCell(1));
 			assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 			// Column header cell with interactive elements
 			oElem = this.oTable.qunit.getColumnHeaderCell(0);
 			oElem.focus();
-			checkFocus(oElem, assert);
+			TableQUnitUtils.assertFocus(assert, oElem);
 			assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 			fEventTriggerer(oElem, key, bShift, bAlt, bCtrl);
 
@@ -6352,7 +6434,7 @@ sap.ui.define([
 				assert.strictEqual(document.activeElement, oElem, sKeyCombination + ": First interactive element in the cell is focused");
 				assert.ok(this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 			} else {
-				checkFocus(this.oTable.qunit.getColumnHeaderCell(0), assert);
+				TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getColumnHeaderCell(0));
 				assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 			}
 
@@ -6360,10 +6442,10 @@ sap.ui.define([
 			this.oTable._getKeyboardExtension().setActionMode(false);
 			oElem = this.oTable.qunit.getRowHeaderCell(0);
 			oElem.focus();
-			checkFocus(oElem, assert);
+			TableQUnitUtils.assertFocus(assert, oElem);
 			assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 			fEventTriggerer(oElem, key, bShift, bAlt, bCtrl);
-			checkFocus(this.oTable.qunit.getRowHeaderCell(0), assert);
+			TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getRowHeaderCell(0));
 			assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 			if (bTestLeaveActionMode) {
@@ -6372,17 +6454,17 @@ sap.ui.define([
 				assert.ok(this.oTable._getKeyboardExtension().isInActionMode() && this.oTable._getKeyboardExtension().isItemNavigationSuspended(),
 					"Table was programmatically set to Action Mode");
 				fEventTriggerer(oElem, key, bShift, bAlt, bCtrl);
-				checkFocus(this.oTable.qunit.getRowHeaderCell(0), assert);
+				TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getRowHeaderCell(0));
 				assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), sKeyCombination + ": Table is in Navigation Mode");
 			}
 
 			// SelectAll cell
 			oElem = this.oTable.qunit.getSelectAllCell();
 			oElem.focus();
-			checkFocus(oElem, assert);
+			TableQUnitUtils.assertFocus(assert, oElem);
 			assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 			fEventTriggerer(oElem, key, bShift, bAlt, bCtrl);
-			checkFocus(this.oTable.qunit.getSelectAllCell(), assert);
+			TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getSelectAllCell());
 			assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 			if (bTestLeaveActionMode) {
@@ -6391,7 +6473,7 @@ sap.ui.define([
 				assert.ok(this.oTable._getKeyboardExtension().isInActionMode() && this.oTable._getKeyboardExtension().isItemNavigationSuspended(),
 					"Table was programmatically set to Action Mode");
 				fEventTriggerer(oElem, key, bShift, bAlt, bCtrl);
-				checkFocus(this.oTable.qunit.getSelectAllCell(), assert);
+				TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getSelectAllCell());
 				assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), sKeyCombination + ": Table is in Navigation Mode");
 			}
 
@@ -6399,11 +6481,11 @@ sap.ui.define([
 			await this.setupGrouping();
 			oElem = this.oTable.qunit.getRowHeaderCell(0);
 			oElem.focus();
-			checkFocus(oElem, assert);
+			TableQUnitUtils.assertFocus(assert, oElem);
 			assert.ok(TableUtils.Grouping.isInGroupHeaderRow(oElem), "Cell to be tested is in a group header row");
 			assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Focus group header icon cell: Table is in Navigation Mode");
 			fEventTriggerer(oElem, key, bShift, bAlt, bCtrl);
-			checkFocus(this.oTable.qunit.getRowHeaderCell(0), assert);
+			TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getRowHeaderCell(0));
 			assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), sKeyCombination + ": Table is in Navigation Mode");
 
 			if (bTestLeaveActionMode) {
@@ -6412,7 +6494,7 @@ sap.ui.define([
 				assert.ok(this.oTable._getKeyboardExtension().isInActionMode() && this.oTable._getKeyboardExtension().isItemNavigationSuspended(),
 					"Table was programmatically set to Action Mode");
 				fEventTriggerer(oElem, key, bShift, bAlt, bCtrl);
-				checkFocus(this.oTable.qunit.getRowHeaderCell(0), assert);
+				TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getRowHeaderCell(0));
 				assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), sKeyCombination + ": Table is in Navigation Mode");
 			}
 
@@ -6628,7 +6710,7 @@ sap.ui.define([
 		// Focus cell with a focusable & tabbable element inside.
 		let oElem = this.oTable.qunit.getRowActionCell(0);
 		oElem.focus();
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Focus row action cell with content: Table is in Navigation Mode");
 
 		// Enter action mode.
@@ -6639,7 +6721,7 @@ sap.ui.define([
 
 		// Leave action mode.
 		qutils.triggerKeydown(oElem, Key.F2);
-		checkFocus(this.oTable.qunit.getRowActionCell(0), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getRowActionCell(0));
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 		// No content in row action cell
@@ -6647,9 +6729,9 @@ sap.ui.define([
 		await this.oTable.qunit.whenRenderingFinished();
 		oElem = this.oTable.qunit.getRowActionCell(0);
 		oElem.focus();
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 		qutils.triggerKeydown(oElem, Key.F2);
-		checkFocus(this.oTable.qunit.getRowActionCell(0), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getRowActionCell(0));
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 	});
 
@@ -6663,28 +6745,28 @@ sap.ui.define([
 		let oCell = this.oTable.qunit.getDataCell(0, 0);
 		oCell.focus();
 		qutils.triggerKeydown(oCell, Key.F2);
-		checkFocus(oCell.querySelector(".sapUiTableTreeIcon"), assert);
+		TableQUnitUtils.assertFocus(assert, oCell.querySelector(".sapUiTableTreeIcon"));
 		assert.ok(this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 		qutils.triggerKeydown(oCell, Key.F2);
-		checkFocus(oCell, assert);
+		TableQUnitUtils.assertFocus(assert, oCell);
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 		oCell = this.oTable.qunit.getDataCell(1, 0);
 		oCell.focus();
 		qutils.triggerKeydown(oCell, Key.F2);
-		checkFocus(oCell.querySelector(".sapUiTableTreeIcon"), assert);
+		TableQUnitUtils.assertFocus(assert, oCell.querySelector(".sapUiTableTreeIcon"));
 		assert.ok(this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 		qutils.triggerKeydown(oCell, Key.F2);
-		checkFocus(oCell, assert);
+		TableQUnitUtils.assertFocus(assert, oCell);
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 		oCell = this.oTable.qunit.getDataCell(2, 0);
 		oCell.focus();
 		qutils.triggerKeydown(oCell, Key.F2);
-		checkFocus(this.oTable.getRows()[2].getCells()[0].getFocusDomRef(), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.getRows()[2].getCells()[0].getFocusDomRef());
 		assert.ok(this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 		qutils.triggerKeydown(oCell, Key.F2);
-		checkFocus(oCell, assert);
+		TableQUnitUtils.assertFocus(assert, oCell);
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 		this.oTable.getRows()[2].getCells()[0].setTabbable(false);
@@ -6692,7 +6774,7 @@ sap.ui.define([
 		oCell = this.oTable.qunit.getDataCell(2, 0);
 		oCell.focus();
 		qutils.triggerKeydown(oCell, Key.F2);
-		checkFocus(oCell, assert);
+		TableQUnitUtils.assertFocus(assert, oCell);
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 	});
 
@@ -6764,7 +6846,7 @@ sap.ui.define([
 
 		let oElem = this.oTable.qunit.getDataCell(0, 0);
 		oElem.focus();
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 		const oInteractiveElement = TableUtils.getInteractiveElements(this.oTable.qunit.getDataCell(0, 0))[0];
 
 		// Space
@@ -6778,7 +6860,7 @@ sap.ui.define([
 
 		oElem = this.oTable.qunit.getDataCell(0, 0);
 		oElem.focus();
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 
 		// Enter
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
@@ -6792,7 +6874,7 @@ sap.ui.define([
 
 		oElem = this.oTable.qunit.getDataCell(0, 1);
 		oElem.focus();
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 
 		// Space
 		assert.equal(this.oTable.isIndexSelected(0), false, "Row 1: Not Selected");
@@ -6800,18 +6882,18 @@ sap.ui.define([
 		qutils.triggerKeyup(oElem, Key.SPACE);
 		assert.equal(this.oTable.isIndexSelected(0), false, "Space: Row 1: Not Selected");
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 
 		oElem = this.oTable.qunit.getDataCell(0, 1);
 		oElem.focus();
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 
 		// Enter
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 		qutils.triggerKeydown(oElem, Key.ENTER);
 		assert.equal(this.oTable.isIndexSelected(0), false, "Enter: Row 1: Not Selected");
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 	});
 
 	QUnit.test("Space & Enter - On a Row Action Cell - Row selection not possible and no click handler", async function(assert) {
@@ -6824,7 +6906,7 @@ sap.ui.define([
 		// Focus cell with a focusable & tabbable element inside.
 		let oElem = this.oTable.qunit.getRowActionCell(0);
 		oElem.focus();
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Focus row action cell with content: Table is in Navigation Mode");
 		// Enter action mode.
 		qutils.triggerKeydown(oElem, Key.ENTER);
@@ -6841,7 +6923,7 @@ sap.ui.define([
 		// Focus cell with a focusable & tabbable element inside.
 		oElem = this.oTable.qunit.getRowActionCell(0);
 		oElem.focus();
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Focus row action cell with content: Table is in Navigation Mode");
 		// Enter action mode.
 		qutils.triggerKeyup(oElem, Key.SPACE);
@@ -6858,13 +6940,13 @@ sap.ui.define([
 		await this.oTable.qunit.whenRenderingFinished();
 		oElem = this.oTable.qunit.getRowActionCell(0);
 		oElem.focus();
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 		qutils.triggerKeydown(oElem, Key.ENTER);
-		checkFocus(this.oTable.qunit.getRowActionCell(0), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getRowActionCell(0));
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 		assert.equal(this.oTable.isIndexSelected(0), false, "Row 1: Not Selected");
 		qutils.triggerKeyup(oElem, Key.SPACE);
-		checkFocus(this.oTable.qunit.getRowActionCell(0), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getRowActionCell(0));
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 		assert.equal(this.oTable.isIndexSelected(0), false, "Row 1: Not Selected");
 	});
@@ -6914,28 +6996,28 @@ sap.ui.define([
 
 			oElem.focus();
 			simulateTabEvent(oElem, false);
-			oElem = checkFocus(oTable.qunit.getRowHeaderCell(1), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getRowHeaderCell(1));
 			simulateTabEvent(oElem, false);
-			oElem = checkFocus(oTable.qunit.getRowHeaderCell(2), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getRowHeaderCell(2));
 			simulateTabEvent(oElem, false);
 			oTable.attachEventOnce("rowsUpdated", function() {
 				setTimeout(function() {
 					assert.equal(oTable.getRows()[2].getIndex(), 3, "The table is scrolled");
 					assert.ok(oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
-					oElem = checkFocus(oTable.qunit.getRowHeaderCell(2), assert);
+					oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getRowHeaderCell(2));
 					resolve(oElem);
 				}, 0);
 			});
 		}).then(function(oElem) {
 			return new Promise(function(resolve) {
 				simulateTabEvent(oElem, false);
-				oElem = checkFocus(oTable.getRows()[2].getCells()[1].getDomRef(), assert);
+				oElem = TableQUnitUtils.assertFocus(assert, oTable.getRows()[2].getCells()[1].getDomRef());
 				simulateTabEvent(oElem, false);
 				oTable.attachEventOnce("rowsUpdated", function() {
 					setTimeout(function() {
 						assert.equal(oTable.getRows()[2].getIndex(), 4, "The table is scrolled");
 						assert.ok(oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
-						oElem = checkFocus(oTable.qunit.getRowHeaderCell(2), assert);
+						oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getRowHeaderCell(2));
 						resolve(oElem);
 					}, 0);
 				});
@@ -6943,17 +7025,17 @@ sap.ui.define([
 		}).then(function(oElem) {
 			return new Promise(function(resolve) {
 				simulateTabEvent(oElem, true);
-				oElem = checkFocus(oTable.getRows()[1].getCells()[1].getDomRef(), assert);
+				oElem = TableQUnitUtils.assertFocus(assert, oTable.getRows()[1].getCells()[1].getDomRef());
 				simulateTabEvent(oElem, true);
-				oElem = checkFocus(oTable.qunit.getRowHeaderCell(1), assert);
+				oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getRowHeaderCell(1));
 				simulateTabEvent(oElem, true);
-				oElem = checkFocus(oTable.qunit.getRowHeaderCell(0), assert);
+				oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getRowHeaderCell(0));
 				simulateTabEvent(oElem, true);
 				oTable.attachEventOnce("rowsUpdated", function() {
 					setTimeout(function() {
 						assert.equal(oTable.getRows()[0].getIndex(), 1, "The table is scrolled");
 						assert.ok(oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
-						oElem = checkFocus(oTable.qunit.getRowHeaderCell(0), assert);
+						oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getRowHeaderCell(0));
 						resolve(oElem);
 					}, 0);
 				});
@@ -6965,7 +7047,7 @@ sap.ui.define([
 					setTimeout(function() {
 						assert.equal(oTable.getRows()[0].getIndex(), 0, "The table is scrolled");
 						assert.ok(oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
-						oElem = checkFocus(oTable.getRows()[0].getCells()[1].getDomRef(), assert);
+						oElem = TableQUnitUtils.assertFocus(assert, oTable.getRows()[0].getCells()[1].getDomRef());
 						resolve();
 					}, 0);
 				});
@@ -6988,7 +7070,7 @@ sap.ui.define([
 					setTimeout(function() {
 						assert.equal(oTable.getRows()[2].getIndex(), 3, "The table is scrolled");
 						assert.ok(oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
-						oElem = checkFocus(oTable.getRows()[2].getCells()[1].getDomRef(), assert);
+						oElem = TableQUnitUtils.assertFocus(assert, oTable.getRows()[2].getCells()[1].getDomRef());
 						resolve(oElem);
 					}, 0);
 				});
@@ -7000,7 +7082,7 @@ sap.ui.define([
 					setTimeout(function() {
 						assert.equal(oTable.getRows()[2].getIndex(), 4, "The table is scrolled");
 						assert.ok(oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
-						oElem = checkFocus(oTable.getRows()[2].getCells()[1].getDomRef(), assert);
+						oElem = TableQUnitUtils.assertFocus(assert, oTable.getRows()[2].getCells()[1].getDomRef());
 						resolve(oElem);
 					}, 0);
 				});
@@ -7012,7 +7094,7 @@ sap.ui.define([
 					setTimeout(function() {
 						assert.equal(oTable.getRows()[2].getIndex(), 5, "The table is scrolled");
 						assert.ok(oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
-						oElem = checkFocus(oTable.qunit.getDataCell(2, 0), assert);
+						oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getDataCell(2, 0));
 						resolve(oElem);
 					}, 0);
 				});
@@ -7020,15 +7102,15 @@ sap.ui.define([
 		}).then(function(oElem) {
 			return new Promise(function(resolve) {
 				simulateTabEvent(oElem, true);
-				oElem = checkFocus(oTable.getRows()[1].getCells()[1].getDomRef(), assert);
+				oElem = TableQUnitUtils.assertFocus(assert, oTable.getRows()[1].getCells()[1].getDomRef());
 				simulateTabEvent(oElem, true);
-				oElem = checkFocus(oTable.getRows()[0].getCells()[1].getDomRef(), assert);
+				oElem = TableQUnitUtils.assertFocus(assert, oTable.getRows()[0].getCells()[1].getDomRef());
 				simulateTabEvent(oElem, true);
 				oTable.attachEventOnce("rowsUpdated", function() {
 					setTimeout(function() {
 						assert.equal(oTable.getRows()[0].getIndex(), 2, "The table is scrolled");
 						assert.ok(oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
-						oElem = checkFocus(oTable.qunit.getDataCell(0, 0), assert);
+						oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getDataCell(0, 0));
 						resolve(oElem);
 					}, 0);
 				});
@@ -7040,7 +7122,7 @@ sap.ui.define([
 					setTimeout(function() {
 						assert.equal(oTable.getRows()[0].getIndex(), 1, "The table is scrolled");
 						assert.ok(oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
-						oElem = checkFocus(oTable.qunit.getDataCell(0, 0), assert);
+						oElem = TableQUnitUtils.assertFocus(assert, oTable.qunit.getDataCell(0, 0));
 						resolve(oElem);
 					}, 0);
 				});
@@ -7052,7 +7134,7 @@ sap.ui.define([
 					setTimeout(function() {
 						assert.equal(oTable.getRows()[0].getIndex(), 0, "The table is scrolled");
 						assert.ok(oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
-						checkFocus(oTable.getRows()[0].getCells()[1].getDomRef(), assert);
+						TableQUnitUtils.assertFocus(assert, oTable.getRows()[0].getCells()[1].getDomRef());
 						resolve();
 					}, 0);
 				});
@@ -7332,9 +7414,9 @@ sap.ui.define([
 						const oRowActionElementCell = this.oTable.qunit.getRowActionCell(iVisibleRowCount - 1);
 
 						if (bTableHasRowActions && TableUtils.getInteractiveElements(oRowActionElementCell) !== null) {
-							checkFocus(oRowActionElementCell, assert);
+							TableQUnitUtils.assertFocus(assert, oRowActionElementCell);
 						} else {
-							checkFocus(this.oTable.qunit.getDataCell(iVisibleRowCount - 1, iColumnCount - 1), assert);
+							TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getDataCell(iVisibleRowCount - 1, iColumnCount - 1));
 						}
 
 						assert.ok(!oKeyboardExtension.isInActionMode(), "Table is in Navigation Mode");
@@ -7498,14 +7580,14 @@ sap.ui.define([
 					if (iAbsoluteRowIndex === 0 && iColumnIndex === (bTableHasRowHeader ? -1 : 0)) {
 						if (bTableHasRowHeader) {
 							if (TableUtils.hasSelectAll(this.oTable)) {
-								checkFocus(this.oTable.qunit.getSelectAllCell(0), assert);
+								TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getSelectAllCell(0));
 								assert.ok(oKeyboardExtension.isInActionMode(), "Table is in Action Mode");
 							} else {
-								checkFocus(this.oTable.qunit.getRowHeaderCell(0), assert);
+								TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getRowHeaderCell(0));
 								assert.ok(!oKeyboardExtension.isInActionMode(), "Table is in Navigation Mode");
 							}
 						} else {
-							checkFocus(this.oTable.qunit.getDataCell(0, 0), assert);
+							TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getDataCell(0, 0));
 							assert.ok(!oKeyboardExtension.isInActionMode(), "Table is in Navigation Mode");
 						}
 					} else {
@@ -7519,7 +7601,7 @@ sap.ui.define([
 
 				if (document.activeElement === this.oTable.qunit.getSelectAllCell(0)) {
 					await this.simulateTabEvent(true);
-					checkFocus(this.oTable.qunit.getSelectAllCell(0), assert);
+					TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getSelectAllCell(0));
 					assert.ok(!oKeyboardExtension.isInActionMode(), "Table is in Navigation Mode");
 				}
 			}
@@ -7568,10 +7650,10 @@ sap.ui.define([
 
 			oElem = this.getElement(0, iColumnIndex);
 			oElem.focus();
-			checkFocus(oElem, assert);
+			TableQUnitUtils.assertFocus(assert, oElem);
 
 			qutils.triggerKeydown(oElem, Key.Arrow.DOWN, false, false, true); // Use Ctrl to enter the action mode.
-			oElem = checkFocus(this.getElement(1, iColumnIndex, true), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, this.getElement(1, iColumnIndex, true));
 
 			if (iColumnIndex === -1) {
 				// In case of row header cells enter the action mode manually.
@@ -7583,7 +7665,7 @@ sap.ui.define([
 			// Navigate down to the last visible row.
 			for (let i = 2; i < iVisibleRowCount; i++) {
 				qutils.triggerKeydown(oElem, Key.Arrow.DOWN, false, false, bCtrlKey);
-				oElem = checkFocus(this.getElement(i, iColumnIndex, true), assert);
+				oElem = TableQUnitUtils.assertFocus(assert, this.getElement(i, iColumnIndex, true));
 				assert.ok(this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 			}
 
@@ -7591,13 +7673,13 @@ sap.ui.define([
 			for (let i = iVisibleRowCount; i < iTotalRowCount; i++) {
 				qutils.triggerKeydown(oElem, Key.Arrow.DOWN, false, false, bCtrlKey);
 				await this.oTable.qunit.whenNextRenderingFinished();
-				oElem = checkFocus(this.getElement(iVisibleRowCount - 1, iColumnIndex, true), assert);
+				oElem = TableQUnitUtils.assertFocus(assert, this.getElement(iVisibleRowCount - 1, iColumnIndex, true));
 				assert.ok(this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 			}
 
 			// Navigating down on the last row switches the action mode off.
 			qutils.triggerKeydown(oElem, Key.Arrow.DOWN, false, false, bCtrlKey);
-			oElem = checkFocus(this.getElement(iVisibleRowCount - 1, iColumnIndex), assert);
+			oElem = TableQUnitUtils.assertFocus(assert, this.getElement(iVisibleRowCount - 1, iColumnIndex));
 			assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 			// Navigate up to the first visible row.
@@ -7610,7 +7692,7 @@ sap.ui.define([
 					this.oTable._getKeyboardExtension()._actionMode = true;
 				}
 
-				oElem = checkFocus(this.getElement(i, iColumnIndex, true), assert);
+				oElem = TableQUnitUtils.assertFocus(assert, this.getElement(i, iColumnIndex, true));
 				assert.ok(this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 			}
 
@@ -7618,18 +7700,18 @@ sap.ui.define([
 			for (let i = iVisibleRowCount; i < iTotalRowCount; i++) {
 				qutils.triggerKeydown(oElem, Key.Arrow.UP, false, false, bCtrlKey);
 				await this.oTable.qunit.whenNextRenderingFinished();
-				oElem = checkFocus(this.getElement(0, iColumnIndex, true), assert);
+				oElem = TableQUnitUtils.assertFocus(assert, this.getElement(0, iColumnIndex, true));
 				assert.ok(this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 			}
 
 			// Navigating up on the first row switches the action mode off.
 			qutils.triggerKeydown(oElem, Key.Arrow.UP, false, false, bCtrlKey);
-			checkFocus(this.getElement(0, iColumnIndex), assert);
+			TableQUnitUtils.assertFocus(assert, this.getElement(0, iColumnIndex));
 			assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 			// Ctrl+Up on the first row does not navigate to the column header.
 			qutils.triggerKeydown(oElem, Key.Arrow.UP, false, false, true);
-			checkFocus(this.getElement(0, iColumnIndex), assert);
+			TableQUnitUtils.assertFocus(assert, this.getElement(0, iColumnIndex));
 			assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 		}
 	});
@@ -7741,13 +7823,13 @@ sap.ui.define([
 
 		TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(1))[0].focus();
 		this.simulateTabEvent(true);
-		checkFocus(this.oTable.qunit.getColumnHeaderCell(1), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getColumnHeaderCell(1));
 
 		TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(1))[0].focus();
 		this.simulateTabEvent();
-		checkFocus(this.oTable.getRows()[0].getCells()[0].getFocusDomRef(), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.getRows()[0].getCells()[0].getFocusDomRef());
 		this.simulateTabEvent(true);
-		checkFocus(TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(1))[0], assert);
+		TableQUnitUtils.assertFocus(assert, TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(1))[0]);
 	});
 
 	QUnit.test("TAB & Shift+TAB - Column header, Row Headers", async function(assert) {
@@ -7756,19 +7838,19 @@ sap.ui.define([
 
 		TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(1))[0].focus();
 		this.simulateTabEvent(true);
-		checkFocus(this.oTable.qunit.getSelectAllCell(), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getSelectAllCell());
 		this.simulateTabEvent();
-		checkFocus(TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(1))[0], assert);
+		TableQUnitUtils.assertFocus(assert, TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(1))[0]);
 		this.oTable.qunit.getSelectAllCell().focus();
 		this.simulateTabEvent(true);
-		checkFocus(this.oTable.qunit.getSelectAllCell(), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getSelectAllCell());
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Shift+TAB on SelectAll Cell: Table is in Navigation Mode");
 
 		TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(1))[0].focus();
 		this.simulateTabEvent();
-		checkFocus(this.oTable.qunit.getRowHeaderCell(0), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getRowHeaderCell(0));
 		this.simulateTabEvent(true);
-		checkFocus(TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(1))[0], assert);
+		TableQUnitUtils.assertFocus(assert, TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(1))[0]);
 	});
 
 	QUnit.test("TAB & Shift+TAB - Column header, Multiple header rows, Fixed Columns", async function(assert) {
@@ -7819,21 +7901,21 @@ sap.ui.define([
 
 		TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(0))[0].focus();
 		this.simulateTabEvent();
-		checkFocus(TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(0))[1], assert);
+		TableQUnitUtils.assertFocus(assert, TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(0))[1]);
 		this.simulateTabEvent();
-		checkFocus(TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(4))[0], assert);
+		TableQUnitUtils.assertFocus(assert, TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(4))[0]);
 		this.simulateTabEvent();
-		checkFocus(TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(1, 1))[0], assert);
+		TableQUnitUtils.assertFocus(assert, TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(1, 1))[0]);
 		this.simulateTabEvent();
-		checkFocus(TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(3, 1))[0], assert);
+		TableQUnitUtils.assertFocus(assert, TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(3, 1))[0]);
 		this.simulateTabEvent(true);
-		checkFocus(TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(1, 1))[0], assert);
+		TableQUnitUtils.assertFocus(assert, TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(1, 1))[0]);
 		this.simulateTabEvent(true);
-		checkFocus(TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(4))[0], assert);
+		TableQUnitUtils.assertFocus(assert, TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(4))[0]);
 		this.simulateTabEvent(true);
-		checkFocus(TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(0))[1], assert);
+		TableQUnitUtils.assertFocus(assert, TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(0))[1]);
 		this.simulateTabEvent(true);
-		checkFocus(TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(0))[0], assert);
+		TableQUnitUtils.assertFocus(assert, TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(0))[0]);
 	});
 
 	QUnit.test("TAB & Shift+TAB - Column header, NoData", async function(assert) {
@@ -7844,7 +7926,7 @@ sap.ui.define([
 
 		TableUtils.getInteractiveElements(this.oTable.qunit.getColumnHeaderCell(1))[0].focus();
 		this.simulateTabEvent();
-		checkFocus(this.oTable.qunit.getColumnHeaderCell(1), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getColumnHeaderCell(1));
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 	});
 
@@ -7855,7 +7937,7 @@ sap.ui.define([
 
 		this.oTable.getRows()[0].getCells()[3].focus();
 		this.simulateTabEvent();
-		checkFocus(this.oTable.qunit.getDataCell(0, 3), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getDataCell(0, 3));
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 	});
 
@@ -7867,22 +7949,22 @@ sap.ui.define([
 		oElement = this.oTable.qunit.getDataCell(0, 1).querySelector("span");
 		oElement.tabIndex = -1;
 		oElement.focus();
-		checkFocus(oElement, assert);
+		TableQUnitUtils.assertFocus(assert, oElement);
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 		qutils.triggerKeydown(oElement, Key.Arrow.UP, false, false, true);
-		checkFocus(this.oTable.qunit.getDataCell(0, 1), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getDataCell(0, 1));
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 		this.oTable._getScrollExtension().scrollVerticallyMax(true);
 		oElement = this.oTable.qunit.getDataCell(this.oTable._getRowCounts().count - 1, 1).querySelector("span");
 		oElement.tabIndex = -1;
 		oElement.focus();
-		checkFocus(oElement, assert);
+		TableQUnitUtils.assertFocus(assert, oElement);
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 		qutils.triggerKeydown(oElement, Key.Arrow.DOWN, false, false, true);
-		checkFocus(this.oTable.qunit.getDataCell(this.oTable._getRowCounts().count - 1, 1), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getDataCell(this.oTable._getRowCounts().count - 1, 1));
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 	});
 
@@ -7918,37 +8000,37 @@ sap.ui.define([
 
 		oElem = this.oTable.qunit.getDataCell(0, 0);
 		oElem.focus();
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 		qutils.triggerKeydown(oElem, Key.Arrow.DOWN, false, false, true);
 		oElem = this.oTable.qunit.getDataCell(1, 0);
-		checkFocus(oElem, assert); // The cell without interactive elements should be focused.
+		TableQUnitUtils.assertFocus(assert, oElem); // The cell without interactive elements should be focused.
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 		oElem = this.oTable.getRows()[1].getCells()[0].getDomRef();
 		oElem.focus();
-		checkFocus(oElem, assert); // The non-interactive element should be focused.
+		TableQUnitUtils.assertFocus(assert, oElem); // The non-interactive element should be focused.
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 		qutils.triggerKeydown(oElem, Key.Arrow.DOWN, false, false, true);
 		oElem = TableUtils.getInteractiveElements(this.oTable.qunit.getDataCell(2, 0)).first();
-		checkFocus(oElem, assert); // The cells interactive element should be focused.
+		TableQUnitUtils.assertFocus(assert, oElem); // The cells interactive element should be focused.
 		assert.ok(this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 
 		qutils.triggerKeydown(oElem, Key.Arrow.UP, false, false, true);
 		oElem = this.oTable.qunit.getDataCell(1, 0);
-		checkFocus(oElem, assert); // The cell without interactive elements should be focused.
+		TableQUnitUtils.assertFocus(assert, oElem); // The cell without interactive elements should be focused.
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 		oElem = this.oTable.getRows()[1].getCells()[0].getDomRef();
 		oElem.focus();
-		checkFocus(oElem, assert); // The non-interactive element should be focused.
+		TableQUnitUtils.assertFocus(assert, oElem); // The non-interactive element should be focused.
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 		qutils.triggerKeydown(oElem, Key.Arrow.UP, false, false, true);
 		oElem = TableUtils.getInteractiveElements(this.oTable.qunit.getDataCell(0, 0)).first();
-		checkFocus(oElem, assert); // The cells interactive element should be focused.
+		TableQUnitUtils.assertFocus(assert, oElem); // The cells interactive element should be focused.
 		assert.ok(this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 	});
 
@@ -7970,33 +8052,33 @@ sap.ui.define([
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 		qutils.triggerKeydown(document.activeElement, Key.Arrow.DOWN, false, false, true);
-		checkFocus(oInputElement, assert);
+		TableQUnitUtils.assertFocus(assert, oInputElement);
 		assert.ok(this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 		assertTextSelection(oInputElement, true, "The text in the input element is selected");
 
 		qutils.triggerKeydown(document.activeElement, Key.Arrow.DOWN, false, false, true);
-		checkFocus(oTextAreaElement, assert);
+		TableQUnitUtils.assertFocus(assert, oTextAreaElement);
 		assert.ok(this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 		assertTextSelection(oTextAreaElement, false, "The text in the textarea is not selected");
 
 		qutils.triggerKeydown(document.activeElement, Key.Arrow.DOWN, false, false, true);
 		// The interactive element in the cell under the textarea cell should be focused.
-		checkFocus(TableUtils.getInteractiveElements(this.oTable.qunit.getDataCell(3, 0)).first(), assert);
+		TableQUnitUtils.assertFocus(assert, TableUtils.getInteractiveElements(this.oTable.qunit.getDataCell(3, 0)).first());
 		assert.ok(this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 
 		qutils.triggerKeydown(document.activeElement, Key.Arrow.UP, false, false, true);
-		checkFocus(oTextAreaElement, assert);
+		TableQUnitUtils.assertFocus(assert, oTextAreaElement);
 		assert.ok(this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 		assertTextSelection(oTextAreaElement, false, "The text in the textarea element is not selected");
 
 		qutils.triggerKeydown(document.activeElement, Key.Arrow.UP, false, false, true);
-		checkFocus(oInputElement, assert);
+		TableQUnitUtils.assertFocus(assert, oInputElement);
 		assert.ok(this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 		assertTextSelection(oInputElement, true, "The text in the input element is selected");
 
 		qutils.triggerKeydown(document.activeElement, Key.Arrow.UP, false, false, true);
 		// The interactive element in the cell above the input cell should be focused.
-		checkFocus(TableUtils.getInteractiveElements(this.oTable.qunit.getDataCell(0, 0)).first(), assert);
+		TableQUnitUtils.assertFocus(assert, TableUtils.getInteractiveElements(this.oTable.qunit.getDataCell(0, 0)).first());
 		assert.ok(this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 	});
 
@@ -8020,31 +8102,31 @@ sap.ui.define([
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 		qutils.triggerKeydown(document.activeElement, Key.Arrow.DOWN);
-		checkFocus(oCellWithInput, assert);
+		TableQUnitUtils.assertFocus(assert, oCellWithInput);
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 		assertTextSelection(oInputElement, false, "The text in the input element of type \"text\" is not selected");
 
 		qutils.triggerKeydown(document.activeElement, Key.Arrow.DOWN);
-		checkFocus(oCellWithTextArea, assert);
+		TableQUnitUtils.assertFocus(assert, oCellWithTextArea);
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 		assertTextSelection(oTextAreaElement, false, "The text in the textarea element is not selected");
 
 		qutils.triggerKeydown(document.activeElement, Key.Arrow.DOWN);
-		checkFocus(this.oTable.qunit.getDataCell(3, 0), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getDataCell(3, 0));
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 
 		qutils.triggerKeydown(document.activeElement, Key.Arrow.UP);
-		checkFocus(oCellWithTextArea, assert);
+		TableQUnitUtils.assertFocus(assert, oCellWithTextArea);
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 		assertTextSelection(oTextAreaElement, false, "The text in the textarea element is not selected");
 
 		qutils.triggerKeydown(document.activeElement, Key.Arrow.UP);
-		checkFocus(oCellWithInput, assert);
+		TableQUnitUtils.assertFocus(assert, oCellWithInput);
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 		assertTextSelection(oInputElement, false, "The text in the input element of type \"text\" is not selected");
 
 		qutils.triggerKeydown(document.activeElement, Key.Arrow.UP);
-		checkFocus(this.oTable.qunit.getDataCell(0, 0), assert);
+		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getDataCell(0, 0));
 		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
 	});
 
@@ -8066,13 +8148,14 @@ sap.ui.define([
 		this.oTable.getRowMode().setRowCount(1);
 		this.oTable.setSelectionMode(library.SelectionMode.None);
 		this.oTable.destroyColumns();
-		this.oTable.qunit.addTextColumn({
+		const oTextColumn = TableQUnitUtils.createTextColumn({
 			label: "Focusable & Tabbable",
 			text: "A",
 			bind: true,
 			focusable: true,
 			tabbable: true
-		}).getTemplate().addEventDelegate({
+		});
+		oTextColumn.getTemplate().addEventDelegate({
 			onsapfocusleave: function() {
 				aEvents.push("sapfocusleave");
 			},
@@ -8080,6 +8163,7 @@ sap.ui.define([
 				aEvents.push("focusin");
 			}
 		});
+		this.oTable.addColumn(oTextColumn);
 		await this.oTable.qunit.whenRenderingFinished();
 
 		this.oTable.getRows()[0].getCells()[0].focus();
@@ -8097,12 +8181,13 @@ sap.ui.define([
 		});
 
 		this.oTable.destroyColumns();
-		this.oTable.qunit.addInputColumn({
+		const oInputColumn = TableQUnitUtils.createInputColumn({
 			label: "Focusable & Tabbable",
 			text: "Value",
 			bind: true,
 			tabbable: true
-		}).getTemplate()
+		});
+		oInputColumn.getTemplate()
 			.setFieldGroupIds(["fieldGroup1"])
 			.attachValidateFieldGroup(function() {
 				aEvents.push("validateFieldGroup");
@@ -8115,6 +8200,7 @@ sap.ui.define([
 					aEvents.push("focusin");
 				}
 			});
+		this.oTable.addColumn(oInputColumn);
 		this.oTable.setFirstVisibleRow(0);
 		await this.oTable.qunit.whenRenderingFinished();
 

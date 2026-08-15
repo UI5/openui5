@@ -1,4 +1,4 @@
-/*global QUnit, sinon, oTable */
+/*global QUnit, sinon */
 
 sap.ui.define([
 	"sap/ui/table/qunit/TableQUnitUtils",
@@ -201,9 +201,7 @@ sap.ui.define([
 			this.oTable = TableQUnitUtils.createTable({
 				rows: "{/}",
 				contextMenu: new TestContextMenu(),
-				beforeOpenContextMenu: this.oBeforeOpenContextMenuEventInfo.handler,
-				extension: new TableQUnitUtils.TestControl(),
-				footer: new TableQUnitUtils.TestControl()
+				beforeOpenContextMenu: this.oBeforeOpenContextMenuEventInfo.handler
 			});
 			this.oTable.qunit.setRowStates(aRowStates);
 
@@ -240,7 +238,11 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Elements that do not support a custom context menu", function(assert) {
+	QUnit.test("Elements that do not support a custom context menu", async function(assert) {
+		this.oTable.addExtension(new TableQUnitUtils.TestControl());
+		this.oTable.setFooter(new TableQUnitUtils.TestControl());
+		await this.oTable.qunit.whenRenderingFinished();
+
 		const test = (oElement, sElementName) => {
 			const oEvent = createFakeEventObject(oElement);
 
@@ -346,9 +348,7 @@ sap.ui.define([
 					TableQUnitUtils.createTextColumn({text: "firstName", bind: true}).setFilterProperty("firstName"),
 					TableQUnitUtils.createTextColumn()
 				],
-				beforeOpenContextMenu: this.oBeforeOpenContextMenuEvenHandler,
-				extension: new TableQUnitUtils.TestControl(),
-				footer: new TableQUnitUtils.TestControl()
+				beforeOpenContextMenu: this.oBeforeOpenContextMenuEvenHandler
 			});
 			this.oTable.qunit.setRowStates(aRowStates);
 			this.oDefaultContextMenu = this.oTable._getDefaultContextMenu();
@@ -377,7 +377,11 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Elements that do not support context menus", function(assert) {
+	QUnit.test("Elements that do not support context menus", async function(assert) {
+		this.oTable.addExtension(new TableQUnitUtils.TestControl());
+		this.oTable.setFooter(new TableQUnitUtils.TestControl());
+		await this.oTable.qunit.whenRenderingFinished();
+
 		const test = (oElement, sElementName) => {
 			const oEvent = createFakeEventObject(oElement);
 
@@ -531,17 +535,29 @@ sap.ui.define([
 			this.oCellContextMenuEventInfo = oCellContextMenuEventInfo;
 		},
 		beforeEach: async function() {
-			await window.createTables();
-			oTable.attachCellContextmenu(this.oCellContextMenuEventInfo.handler);
+			this.oTable = TableQUnitUtils.createTable({
+				rows: {path: "/"},
+				models: TableQUnitUtils.createJSONModel(8),
+				// This module builds the grid fixture, which has no row action. Neutralize the
+				// default rowActionTemplate/rowActionCount set via setDefaultSettings above.
+				rowActionTemplate: null,
+				rowActionCount: 0,
+				columns: [
+					TableQUnitUtils.createTextColumn({text: "A", bind: true}),
+					TableQUnitUtils.createTextColumn({text: "B", bind: true})
+				]
+			});
+			await this.oTable.qunit.whenRenderingFinished();
+			this.oTable.attachCellContextmenu(this.oCellContextMenuEventInfo.handler);
 		},
 		afterEach: function() {
-			window.destroyTables();
+			this.oTable.destroy();
 			this.oCellContextMenuEventInfo.handler.resetHistory();
 		},
 		assertEventCalled: function(assert, oEventInfo, bCalled, mExpectedParameters) {
 			if (bCalled) {
 				assert.ok(oEventInfo.handler.calledOnce, oEventInfo.name + ": The event handler has been called");
-				assert.deepEqual(oEventInfo.lastCallParameters, Object.assign({id: oTable.getId()}, mExpectedParameters),
+				assert.deepEqual(oEventInfo.lastCallParameters, Object.assign({id: this.oTable.getId()}, mExpectedParameters),
 					oEventInfo.name + ": The event object contains the correct parameters");
 			} else {
 				assert.ok(oEventInfo.handler.notCalled, oEventInfo.name + ": The event handler has not been called");
@@ -556,6 +572,7 @@ sap.ui.define([
 	 * @deprecated As of version 1.54
 	 */
 	QUnit.test("openContextMenu - Header cells", async function(assert) {
+		const oTable = this.oTable;
 		const oColumnA = oTable.getColumns()[0];
 		const oColumnB = oTable.getColumns()[1];
 		const bOriginalDeviceSystemDesktop = Device.system.desktop;
@@ -620,6 +637,7 @@ sap.ui.define([
 	 */
 	QUnit.test("openContextMenu - Content cells", function(assert) {
 		let oDomRef;
+		const oTable = this.oTable;
 		const aColumns = oTable.getColumns();
 		const aRows = oTable.getRows();
 		const oColumnA = aColumns[0];
@@ -694,14 +712,14 @@ sap.ui.define([
 		});
 		this.oCellContextMenuEventInfo.handler.resetHistory();
 
-		oDomRef = window.getRowHeader(0)[0];
+		oDomRef = oTable.qunit.getRowHeaderCell(0);
 		oEvent = createFakeEventObject(oDomRef);
 		TableUtils.Menu.openContextMenu(oTable, oEvent);
 		assert.ok(oEvent.preventDefault.called, "preventDefault");
 		this.assertEventCalled(assert, this.oCellContextMenuEventInfo, false);
 
 		oTable.destroyContextMenu();
-		oDomRef = window.getRowAction(0)[0];
+		oDomRef = oTable.qunit.getRowActionCell(0);
 		oEvent = createFakeEventObject(oDomRef);
 		TableUtils.Menu.openContextMenu(oTable, oEvent);
 		assert.notOk(oEvent.preventDefault.called, "preventDefault");

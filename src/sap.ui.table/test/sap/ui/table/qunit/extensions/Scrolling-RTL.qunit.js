@@ -102,7 +102,7 @@ sap.ui.define([
 		function test(sTestTitle, oDomElementToFocus, iInitialScrollLeft, bScrollPositionShouldChange) {
 			document.body.focus();
 
-			return oTable.qunit.scrollHSbTo(iInitialScrollLeft).then(oTable.qunit.$focus(oDomElementToFocus)).then(function() {
+			return oTable.qunit.scrollHSbTo(iInitialScrollLeft).then(() => oTable.qunit.focus(oDomElementToFocus)).then(function() {
 				if (bScrollPositionShouldChange) {
 					return oTable.qunit.whenHSbScrolled().then(function() {
 						assert.notStrictEqual(getScrollLeft(), iInitialScrollLeft, sTestTitle + ": The horizontal scroll position did change");

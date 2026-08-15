@@ -519,7 +519,7 @@ sap.ui.define([
 
 		return oTable.qunit.whenRenderingFinished().then(function() {
 			oGetContextsSpy.resetHistory();
-		}).then(oTable.qunit.$resize({height: "756px"})).then(function() {
+		}).then(() => oTable.qunit.resize({height: "756px"})).then(function() {
 			assert.strictEqual(oGetContextsSpy.callCount, 1,
 				"Height decreased when scroll to top: Method to get contexts called once");
 			assert.ok(oGetContextsSpy.calledWithExactly(0, oTable.getRowMode().getComputedRowCounts().count, 100),
@@ -535,7 +535,7 @@ sap.ui.define([
 			oTable.setFirstVisibleRow(10);
 		}).then(oTable.qunit.whenRenderingFinished).then(function() {
 			oGetContextsSpy.resetHistory();
-		}).then(oTable.qunit.$resize({height: "756px"})).then(function() {
+		}).then(() => oTable.qunit.resize({height: "756px"})).then(function() {
 			assert.strictEqual(oGetContextsSpy.callCount, 1,
 				"Height decreased when scrolled in middle: Method to get contexts called once");
 			assert.ok(oGetContextsSpy.calledWithExactly(10, oTable.getRowMode().getComputedRowCounts().count, 100),
@@ -554,7 +554,7 @@ sap.ui.define([
 		}).then(oTable.qunit.whenRenderingFinished).then(function() {
 			oGetContextsSpy.resetHistory();
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
-		}).then(oTable.qunit.$resize({height: "756px"})).then(function() {
+		}).then(() => oTable.qunit.resize({height: "756px"})).then(function() {
 			assert.strictEqual(oGetContextsSpy.callCount, 1,
 				"Height decreased when scrolled to bottom: Method to get contexts called once");
 			assert.ok(oGetContextsSpy.calledWithExactly(iFirstVisibleRow, oTable.getRowMode().getComputedRowCounts().count, 100),
@@ -592,7 +592,7 @@ sap.ui.define([
 		this.createTable();
 		return this.oTable.qunit.whenRenderingFinished().then(() => {
 			this.resetRowsUpdatedSpy();
-		}).then(this.oTable.qunit.$resize({height: "500px"})).then(() => {
+		}).then(() => this.oTable.qunit.resize({height: "500px"})).then(() => {
 			return this.checkRowsUpdated(assert, [
 				TableUtils.RowsUpdateReason.Render
 			]);

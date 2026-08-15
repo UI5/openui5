@@ -117,7 +117,7 @@ sap.ui.define([
 
 		oTable.setRowMode(RowModeType.Auto);
 		await oTable.qunit.whenRenderingFinished();
-		await oTable.qunit.$resize({height: "400px"});
+		await oTable.qunit.resize({height: "400px"});
 		assert.ok(oHSb.offsetWidth > 0 && oHSb.offsetHeight > 0,
 			"Decrease visible rows so that vertical scrollbar appears: Horizontal scrollbar is visible");
 		assert.equal(oVSb.style.bottom, oHSbComputedStyle.height, "Vertical scrollbar position is correct");
@@ -706,7 +706,7 @@ sap.ui.define([
 			return oTable.qunit.scrollHSbTo(0).then(function() {
 				iCurrentScrollPosition = 0;
 				return scrollWithMouseWheel(oTargetElement, -150, DeltaMode.PIXEL, true, 0, true);
-			}).then(oTable.qunit.$scrollHSbTo(oHSb.scrollWidth - oHSb.getBoundingClientRect().width)).then(function() {
+			}).then(() => oTable.qunit.scrollHSbTo(oHSb.scrollWidth - oHSb.getBoundingClientRect().width)).then(function() {
 				iCurrentScrollPosition = oHSb.scrollLeft;
 				return scrollWithMouseWheel(oTargetElement, 150, DeltaMode.PIXEL, true, iCurrentScrollPosition, true);
 			});
@@ -808,7 +808,7 @@ sap.ui.define([
 				return scrollWithTouch(-150, 0, true);
 			}).then(function() {
 				TableQUnitUtils.endTouchScrolling();
-			}).then(oTable.qunit.$scrollHSbTo(oHSb.scrollWidth - oHSb.getBoundingClientRect().width)).then(function() {
+			}).then(() => oTable.qunit.scrollHSbTo(oHSb.scrollWidth - oHSb.getBoundingClientRect().width)).then(function() {
 				iCurrentScrollPosition = oHSb.scrollLeft;
 				TableQUnitUtils.startTouchScrolling(oTargetElement, 200);
 				return scrollWithTouch(150, iCurrentScrollPosition, true);
@@ -932,7 +932,7 @@ sap.ui.define([
 		function test(sTestTitle, oDomElementToFocus, iInitialScrollLeft, bScrollPositionShouldChange) {
 			document.body.focus();
 
-			return oTable.qunit.scrollHSbTo(iInitialScrollLeft).then(oTable.qunit.$focus(oDomElementToFocus)).then(function() {
+			return oTable.qunit.scrollHSbTo(iInitialScrollLeft).then(() => oTable.qunit.focus(oDomElementToFocus)).then(function() {
 				if (bScrollPositionShouldChange) {
 					return oTable.qunit.whenHSbScrolled().then(function() {
 						assert.notStrictEqual(getScrollLeft(), iInitialScrollLeft, sTestTitle + ": The horizontal scroll position did change");
@@ -2024,19 +2024,19 @@ sap.ui.define([
 			});
 			const sTitle = mConfig.rowMode + ", ScrollTop set to ";
 
-			return oTable.qunit.whenRenderingFinished().then(oTable.qunit.$scrollVSbTo(1)).then(function() {
+			return oTable.qunit.whenRenderingFinished().then(() => oTable.qunit.scrollVSbTo(1)).then(function() {
 				that.assertPosition(assert, 0, 1, 5, sTitle + "1");
-			}).then(oTable.qunit.$scrollVSbTo(48)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(48)).then(function() {
 				that.assertPosition(assert, 2, 48, 247, sTitle + "48");
-			}).then(oTable.qunit.$scrollVSbTo(49)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(49)).then(function() {
 				that.assertPosition(assert, 3, 49, 253, sTitle + "49");
-			}).then(oTable.qunit.$scrollVSbTo(48)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(48)).then(function() {
 				that.assertPosition(assert, 2, 48, 247, sTitle + "48");
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.assertPosition(assert, 5, 98, 505, sTitle + "MAX");
-			}).then(oTable.qunit.$scrollVSbTo(1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(1)).then(function() {
 				that.assertPosition(assert, 0, 1, 5, sTitle + "1");
-			}).then(oTable.qunit.$scrollVSbTo(0)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(0)).then(function() {
 				that.assertPosition(assert, 0, 0, 0, sTitle + "0");
 			});
 		}
@@ -2064,33 +2064,33 @@ sap.ui.define([
 			});
 			const sTitle = mConfig.rowMode + ", ScrollTop set to ";
 
-			return oTable.qunit.whenRenderingFinished().then(oTable.qunit.$scrollVSbTo(1)).then(function() {
+			return oTable.qunit.whenRenderingFinished().then(() => oTable.qunit.scrollVSbTo(1)).then(function() {
 				that.assertPosition(assert, 0, 1, 0, sTitle + "1");
-			}).then(oTable.qunit.$scrollVSbTo(48)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(48)).then(function() {
 				that.assertPosition(assert, 0, 48, 0, sTitle + "48");
-			}).then(oTable.qunit.$scrollVSbTo(49)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(49)).then(function() {
 				that.assertPosition(assert, 1, 49, 0, sTitle + "49");
-			}).then(oTable.qunit.$scrollVSbTo(48)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(48)).then(function() {
 				that.assertPosition(assert, 0, 48, 0, sTitle + "48");
-			}).then(oTable.qunit.$scrollVSbTo(200)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(200)).then(function() {
 				that.assertPosition(assert, 4, 200, 0, sTitle + "200");
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, sTitle + "MAX");
-			}).then(oTable.qunit.$scrollVSbBy(-1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbBy(-1)).then(function() {
 				that.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 1, 0, sTitle + "MAX - 1");
-			}).then(oTable.qunit.$scrollVSbBy(-48)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbBy(-48)).then(function() {
 				that.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 49, 0, sTitle + "MAX - 49");
-			}).then(oTable.qunit.$scrollVSbBy(-1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbBy(-1)).then(function() {
 				that.assertPosition(assert, iMaxFirstVisibleRow - 2, iMaxScrollTop - 50, 0, sTitle + "MAX - 50");
-			}).then(oTable.qunit.$scrollVSbBy(1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbBy(1)).then(function() {
 				that.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 49, 0, sTitle + "MAX - 49");
-			}).then(oTable.qunit.$scrollVSbTo(iMaxScrollTop - 1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(iMaxScrollTop - 1)).then(function() {
 				that.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 1, 0, sTitle + "MAX - 1");
-			}).then(oTable.qunit.$scrollVSbBy(1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbBy(1)).then(function() {
 				that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, sTitle + "MAX");
-			}).then(oTable.qunit.$scrollVSbTo(1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(1)).then(function() {
 				that.assertPosition(assert, 0, 1, 0, sTitle + "1");
-			}).then(oTable.qunit.$scrollVSbTo(0)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(0)).then(function() {
 				that.assertPosition(assert, 0, 0, 0, sTitle + "0");
 			}).then(function() {
 				const oScrollExtension = oTable._getScrollExtension();
@@ -2139,33 +2139,33 @@ sap.ui.define([
 			});
 			const sTitle = mConfig.rowMode + ", ScrollTop set to ";
 
-			return oTable.qunit.whenRenderingFinished().then(oTable.qunit.$scrollVSbTo(1)).then(function() {
+			return oTable.qunit.whenRenderingFinished().then(() => oTable.qunit.scrollVSbTo(1)).then(function() {
 				that.assertPosition(assert, 0, 1, 1, sTitle + "1");
-			}).then(oTable.qunit.$scrollVSbTo(48)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(48)).then(function() {
 				that.assertPosition(assert, 0, 48, 48, sTitle + "48");
-			}).then(oTable.qunit.$scrollVSbTo(49)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(49)).then(function() {
 				that.assertPosition(assert, 1, 49, 0, sTitle + "49");
-			}).then(oTable.qunit.$scrollVSbTo(48)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(48)).then(function() {
 				that.assertPosition(assert, 0, 48, 48, sTitle + "48");
-			}).then(oTable.qunit.$scrollVSbTo(200)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(200)).then(function() {
 				that.assertPosition(assert, 4, 200, 4, sTitle + "200");
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, sTitle + "MAX");
-			}).then(oTable.qunit.$scrollVSbBy(-1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbBy(-1)).then(function() {
 				that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop - 1, 648, sTitle + "MAX - 1");
-			}).then(oTable.qunit.$scrollVSbBy(-48)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbBy(-48)).then(function() {
 				that.assertPosition(assert, 91, iMaxScrollTop - 49, 328, sTitle + "MAX - 49");
-			}).then(oTable.qunit.$scrollVSbBy(-1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbBy(-1)).then(function() {
 				that.assertPosition(assert, 91, iMaxScrollTop - 50, 321, sTitle + "MAX - 50");
-			}).then(oTable.qunit.$scrollVSbBy(1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbBy(1)).then(function() {
 				that.assertPosition(assert, 91, iMaxScrollTop - 49, 328, sTitle + "MAX - 49");
-			}).then(oTable.qunit.$scrollVSbTo(iMaxScrollTop - 1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(iMaxScrollTop - 1)).then(function() {
 				that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop - 1, 648, sTitle + "MAX - 1");
-			}).then(oTable.qunit.$scrollVSbBy(1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbBy(1)).then(function() {
 				that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, sTitle + "MAX");
-			}).then(oTable.qunit.$scrollVSbTo(1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(1)).then(function() {
 				that.assertPosition(assert, 0, 1, 1, sTitle + "1");
-			}).then(oTable.qunit.$scrollVSbTo(0)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(0)).then(function() {
 				that.assertPosition(assert, 0, 0, 0, sTitle + "0");
 			}).then(function() {
 				const oScrollExtension = oTable._getScrollExtension();
@@ -2214,27 +2214,27 @@ sap.ui.define([
 			});
 			const sTitle = mConfig.rowMode + ", ScrollTop set to ";
 
-			return oTable.qunit.whenRenderingFinished().then(oTable.qunit.$scrollVSbTo(1)).then(function() {
+			return oTable.qunit.whenRenderingFinished().then(() => oTable.qunit.scrollVSbTo(1)).then(function() {
 				that.assertPosition(assert, Math.floor(iRowsPerPixel), 1, 0, sTitle + "1");
-			}).then(oTable.qunit.$scrollVSbTo(48)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(48)).then(function() {
 				that.assertPosition(assert, Math.floor(iRowsPerPixel * 48), 48, 0, sTitle + "48");
-			}).then(oTable.qunit.$scrollVSbTo(500000)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(500000)).then(function() {
 				that.assertPosition(assert, Math.floor(iRowsPerPixel * 500000), 500000, 0, sTitle + "500000");
-			}).then(oTable.qunit.$scrollVSbTo(500001)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(500001)).then(function() {
 				that.assertPosition(assert, Math.floor(iRowsPerPixel * 500001), 500001, 0, sTitle + "500001");
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, sTitle + "MAX");
-			}).then(oTable.qunit.$scrollVSbBy(-1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbBy(-1)).then(function() {
 				that.assertPosition(assert, Math.floor(iRowsPerPixel * (iMaxScrollTop - 1)), iMaxScrollTop - 1, 0, sTitle + "MAX - 1");
-			}).then(oTable.qunit.$scrollVSbBy(-47)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbBy(-47)).then(function() {
 				that.assertPosition(assert, Math.floor(iRowsPerPixel * (iMaxScrollTop - 48)), iMaxScrollTop - 48, 0, sTitle + "MAX - 48");
-			}).then(oTable.qunit.$scrollVSbTo(iMaxScrollTop - 1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(iMaxScrollTop - 1)).then(function() {
 				that.assertPosition(assert, Math.floor(iRowsPerPixel * (iMaxScrollTop - 1)), iMaxScrollTop - 1, 0, sTitle + "MAX - 1");
-			}).then(oTable.qunit.$scrollVSbBy(1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbBy(1)).then(function() {
 				that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, sTitle + "MAX");
-			}).then(oTable.qunit.$scrollVSbTo(1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(1)).then(function() {
 				that.assertPosition(assert, Math.floor(iRowsPerPixel), 1, 0, sTitle + "1");
-			}).then(oTable.qunit.$scrollVSbTo(0)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(0)).then(function() {
 				that.assertPosition(assert, 0, 0, 0, sTitle + "0");
 			});
 		}
@@ -2264,29 +2264,29 @@ sap.ui.define([
 				_bVariableRowHeightEnabled: true
 			});
 
-			return oTable.qunit.whenRenderingFinished().then(oTable.qunit.$scrollVSbTo(1)).then(function() {
+			return oTable.qunit.whenRenderingFinished().then(() => oTable.qunit.scrollVSbTo(1)).then(function() {
 				that.assertPosition(assert, 1000, 1, 29, "ScrollTop set to 1");
-			}).then(oTable.qunit.$scrollVSbTo(48)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(48)).then(function() {
 				that.assertPosition(assert, 48028, 48, 12, "ScrollTop set to 48");
-			}).then(oTable.qunit.$scrollVSbTo(500000)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(500000)).then(function() {
 				that.assertPosition(assert, 500294167, 500000, 146, "ScrollTop set to 500000");
-			}).then(oTable.qunit.$scrollVSbTo(500001)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(500001)).then(function() {
 				that.assertPosition(assert, 500295168, 500001, 27, "ScrollTop set to 500001");
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, "ScrollTop set to MAX");
-			}).then(oTable.qunit.$scrollVSbBy(-1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbBy(-1)).then(function() {
 				that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop - 1, 648, "ScrollTop set to MAX - 1");
-			}).then(oTable.qunit.$scrollVSbBy(-9)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbBy(-9)).then(function() {
 				that.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 10, 588, "ScrollTop set to MAX - 10");
-			}).then(oTable.qunit.$scrollVSbBy(-38)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbBy(-38)).then(function() {
 				that.assertPosition(assert, 999999991, iMaxScrollTop - 48, 334, "ScrollTop set to MAX - 48");
-			}).then(oTable.qunit.$scrollVSbTo(iMaxScrollTop - 1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(iMaxScrollTop - 1)).then(function() {
 				that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop - 1, 648, "ScrollTop set to MAX - 1");
-			}).then(oTable.qunit.$scrollVSbBy(1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbBy(1)).then(function() {
 				that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, "ScrollTop set to MAX");
-			}).then(oTable.qunit.$scrollVSbTo(1)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(1)).then(function() {
 				that.assertPosition(assert, 1000, 1, 29, "ScrollTop set to 1");
-			}).then(oTable.qunit.$scrollVSbTo(0)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(0)).then(function() {
 				that.assertPosition(assert, 0, 0, 0, "ScrollTop set to 0");
 			});
 		}
@@ -2316,7 +2316,7 @@ sap.ui.define([
 				});
 			});
 
-			return oTable.qunit.whenRenderingFinished().then(oTable.qunit.$scrollVSbTo(49)).then(function() {
+			return oTable.qunit.whenRenderingFinished().then(() => oTable.qunit.scrollVSbTo(49)).then(function() {
 				that.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", ScrollTop set to 49");
 			});
 		}
@@ -2347,7 +2347,7 @@ sap.ui.define([
 				oTable.invalidate();
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
-			}).then(oTable.qunit.$scrollVSbTo(98)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(98)).then(function() {
 				that.assertPosition(assert, 2, 98, 0, mConfig.rowMode + ", ScrollTop set to 98");
 			});
 		}
@@ -2378,7 +2378,7 @@ sap.ui.define([
 				oTable.invalidate();
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
-			}).then(oTable.qunit.$scrollVSbTo(98)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(98)).then(function() {
 				that.assertPosition(assert, 2, 98, 0, mConfig.rowMode + ", ScrollTop set to 98");
 			});
 		}
@@ -2475,7 +2475,7 @@ sap.ui.define([
 				oTable.setFirstVisibleRow(0);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, 0, 0, 0, sTitle + "0");
-			}).then(oTable.qunit.$scrollVSbTo(2 * that.iBaseRowHeight + 10)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(2 * that.iBaseRowHeight + 10)).then(function() {
 				that.assertPosition(assert, 2, 2 * that.iBaseRowHeight + 10, 0,
 					mConfig.rowMode + ", Scrolled to FirstVisibleRow = 2 by setting ScrollTop");
 				oTable.setFirstVisibleRow(2);
@@ -2537,7 +2537,7 @@ sap.ui.define([
 				oTable.setFirstVisibleRow(0);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, 0, 0, 0, sTitle + "0");
-			}).then(oTable.qunit.$scrollVSbTo(2 * that.iBaseRowHeight + 10)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(2 * that.iBaseRowHeight + 10)).then(function() {
 				that.assertPosition(assert, 2, 2 * that.iBaseRowHeight + 10, 10,
 					mConfig.rowMode + ", Scrolled to FirstVisibleRow = 2 by setting ScrollTop");
 				oTable.setFirstVisibleRow(2);
@@ -2906,7 +2906,7 @@ sap.ui.define([
 			that.assertPosition(assert, 1, that.iBaseRowHeight, 0, "Scrolled 60 pixels down");
 		}).then(scrollWithMouseWheel(20, MouseWheelDeltaMode.PIXEL)).then(function() {
 			that.assertPosition(assert, 2, 2 * that.iBaseRowHeight, 0, "Scrolled 20 pixels down");
-		}).then(oTable.qunit.$scrollVSbBy(1)).then(function() {
+		}).then(() => oTable.qunit.scrollVSbBy(1)).then(function() {
 			that.assertPosition(assert, 2, 2 * that.iBaseRowHeight + 1, 1, "Scrolled 1 pixel down with the scrollbar");
 		}).then(scrollWithMouseWheel(2, MouseWheelDeltaMode.LINE)).then(function() {
 			that.assertPosition(assert, 4, 4 * that.iBaseRowHeight + 1, 1, "Scrolled 2 rows down");
@@ -3235,7 +3235,7 @@ sap.ui.define([
 				});
 			});
 
-			pTestSequence = pTestSequence.then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			pTestSequence = pTestSequence.then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				return test({
 					name: "Scrolling down if already scrolled to bottom",
 					element: oTable.qunit.getDataCell(0, 1),
@@ -3508,7 +3508,7 @@ sap.ui.define([
 				});
 			});
 
-			pTestSequence = pTestSequence.then(oTable.qunit.$scrollVSbTo(0)).then(function() {
+			pTestSequence = pTestSequence.then(() => oTable.qunit.scrollVSbTo(0)).then(function() {
 				const iMaxScrollTop = that.getMaxScrollTop();
 
 				function testOutsideBoundaries(iScrollDelta) {
@@ -3615,7 +3615,7 @@ sap.ui.define([
 				});
 			});
 
-			pTestSequence = pTestSequence.then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			pTestSequence = pTestSequence.then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				return test({
 					name: "Scrolling down if already scrolled to bottom",
 					element: oTable.qunit.getDataCell(0, 1),
@@ -3714,7 +3714,7 @@ sap.ui.define([
 			}).then(scrollViewport(0)).then(function() {
 				that.assertPosition(assert, 0, 0, 0,
 					mConfig.rowMode + ", Scrolled viewport to 0 when scrolled to top");
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(scrollViewport(180)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(scrollViewport(180)).then(function() {
 				that.assertPosition(assert, iMaxFirstRenderedRow + 1, 4388, 180,
 					mConfig.rowMode + ", Scrolled viewport to 100 when scrolled to bottom");
 			}).then(scrollViewport(1000)).then(function() {
@@ -3773,7 +3773,7 @@ sap.ui.define([
 			}).then(scrollViewport(0, true)).then(function() {
 				that.assertPosition(assert, 0, 0, 0,
 					mConfig.rowMode + ", Scrolled viewport to 0 when scrolled to top");
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(scrollViewport(180, true)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(scrollViewport(180, true)).then(function() {
 				that.assertPosition(assert, iMaxFirstRenderedRow + 1, 999439, 180,
 					mConfig.rowMode + ", Scrolled viewport to 100 when scrolled to bottom");
 			}).then(scrollViewport(1000, true)).then(function() {
@@ -4379,11 +4379,11 @@ sap.ui.define([
 
 			return oTable.qunit.whenRenderingFinished().then(changeRowHeights(100, 175)).then(function() {
 				that.assertPosition(assert, 0, 0, 0, sTitle + " when scrolled to top");
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(changeRowHeights(90, 125)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(changeRowHeights(90, 125)).then(function() {
 				that.assertPosition(assert, 5, 98, 595, sTitle + " when scrolled to bottom");
 			}).then(changeRowHeights(100, 175)).then(function() {
 				that.assertPosition(assert, 5, 79, 725, sTitle + " when scrolled to bottom");
-			}).then(oTable.qunit.$scrollVSbTo(50)).then(changeRowHeights(80, 100)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(50)).then(changeRowHeights(80, 100)).then(function() {
 				that.assertPosition(assert, 3, 80, 342, sTitle);
 			}).then(changeRowHeights(150, 150)).then(function() {
 				that.assertPosition(assert, 3, 51, 532, sTitle);
@@ -4423,13 +4423,13 @@ sap.ui.define([
 
 			return oTable.qunit.whenRenderingFinished().then(changeRowHeights(100, 175)).then(function() {
 				that.assertPosition(assert, 0, 0, 0, sTitle + " when scrolled to top");
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(changeRowHeights(90, 125)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(changeRowHeights(90, 125)).then(function() {
 				that.assertPosition(assert, 95, 4459, 721, sTitle + " when scrolled to bottom");
 			}).then(changeRowHeights(5, 5)).then(function() {
 				that.assertPosition(assert, 90, 4459, that.iBaseRowHeight, sTitle + " when scrolled to bottom");
 			}).then(changeRowHeights(100, 175)).then(function() {
 				that.assertPosition(assert, 90, 4377, 176, sTitle + " when scrolled to bottom");
-			}).then(oTable.qunit.$scrollVSbTo(500)).then(changeRowHeights(80, 100)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(500)).then(changeRowHeights(80, 100)).then(function() {
 				that.assertPosition(assert, 10, 503, 21, sTitle);
 			}).then(changeRowHeights(150, 150)).then(function() {
 				that.assertPosition(assert, 10, 497, 21, sTitle);
@@ -4470,13 +4470,13 @@ sap.ui.define([
 
 			return oTable.qunit.whenRenderingFinished().then(changeRowHeights(100, 175)).then(function() {
 				that.assertPosition(assert, 0, 0, 0, sTitle + " when scrolled to top");
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(changeRowHeights(90, 125)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(changeRowHeights(90, 125)).then(function() {
 				that.assertPosition(assert, 999999995, 999510, 721, sTitle + " when scrolled to bottom");
 			}).then(changeRowHeights(5, 5)).then(function() {
 				that.assertPosition(assert, 999999990, 999510, that.iBaseRowHeight, sTitle + " when scrolled to bottom");
 			}).then(changeRowHeights(100, 175)).then(function() {
 				that.assertPosition(assert, 999999990, 999428, 176, sTitle + " when scrolled to bottom");
-			}).then(oTable.qunit.$scrollVSbTo(500)).then(changeRowHeights(80, 100)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(500)).then(changeRowHeights(80, 100)).then(function() {
 				that.assertPosition(assert, 500294, 500, 17, sTitle);
 			}).then(changeRowHeights(150, 150)).then(function() {
 				that.assertPosition(assert, 500294, 500, 17, sTitle);
@@ -4520,7 +4520,7 @@ sap.ui.define([
 			let iScrollPosition;
 			let iInnerScrollPosition;
 
-			return oTable.qunit.whenRenderingFinished().then(oTable.qunit.$scrollVSbTo(50)).then(function() {
+			return oTable.qunit.whenRenderingFinished().then(() => oTable.qunit.scrollVSbTo(50)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 				iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
@@ -4545,7 +4545,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
 					sTitle + "ScrollTop = 50; After visible row count decreased");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 				iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
@@ -4604,7 +4604,7 @@ sap.ui.define([
 			let iFirstVisibleRow;
 			let iScrollPosition;
 
-			return oTable.qunit.whenRenderingFinished().then(oTable.qunit.$scrollVSbTo(50)).then(function() {
+			return oTable.qunit.whenRenderingFinished().then(() => oTable.qunit.scrollVSbTo(50)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 
@@ -4624,7 +4624,7 @@ sap.ui.define([
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = 50; After visible row count decreased");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 
@@ -4682,7 +4682,7 @@ sap.ui.define([
 			let iScrollPosition;
 			let iInnerScrollPosition;
 
-			return oTable.qunit.whenRenderingFinished().then(oTable.qunit.$scrollVSbTo(50)).then(function() {
+			return oTable.qunit.whenRenderingFinished().then(() => oTable.qunit.scrollVSbTo(50)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 				iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
@@ -4707,7 +4707,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
 					sTitle + "ScrollTop = 50; After visible row count decreased");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 				iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
@@ -4781,7 +4781,7 @@ sap.ui.define([
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, 0, 0, 0, sTitle + "ScrollTop = 0; After visible row count increased");
 
-			}).then(oTable.qunit.$scrollVSbTo(50)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(50)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 
@@ -4801,7 +4801,7 @@ sap.ui.define([
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = 50; After visible row count decreased");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 
@@ -4871,7 +4871,7 @@ sap.ui.define([
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, 0, 0, 0, sTitle + "ScrollTop = 0; After visible row count increased");
 
-			}).then(oTable.qunit.$scrollVSbTo(50)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(50)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 				iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
@@ -4896,7 +4896,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
 					sTitle + "ScrollTop = 50; After visible row count decreased");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 				iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
@@ -4947,19 +4947,19 @@ sap.ui.define([
 		let iFirstVisibleRow;
 		let iScrollPosition;
 
-		return oTable.qunit.whenRenderingFinished().then(oTable.qunit.$scrollVSbTo(200)).then(function() {
+		return oTable.qunit.whenRenderingFinished().then(() => oTable.qunit.scrollVSbTo(200)).then(function() {
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
-		}).then(oTable.qunit.$resize({height: "400px"})).then(function() {
+		}).then(() => oTable.qunit.resize({height: "400px"})).then(function() {
 			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, "ScrollTop = 200; After height decreased");
 		}).then(oTable.qunit.resetSize).then(function() {
 			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, "ScrollTop = 200; After height increased");
-		}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+		}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
-		}).then(oTable.qunit.$resize({height: "400px"})).then(function() {
+		}).then(() => oTable.qunit.resize({height: "400px"})).then(function() {
 			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, "ScrollTop = MAX; After height decreased");
-		}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+		}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 		}).then(oTable.qunit.resetSize).then(function() {
@@ -4983,7 +4983,7 @@ sap.ui.define([
 			let iScrollPosition;
 			let iInnerScrollPosition;
 
-			return oTable.qunit.whenRenderingFinished().then(oTable.qunit.$scrollVSbTo(40)).then(function() {
+			return oTable.qunit.whenRenderingFinished().then(() => oTable.qunit.scrollVSbTo(40)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 				iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
@@ -5008,7 +5008,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
 					sTitle + "ScrollTop = 40; After binding length decreased (collapse)");
 
-			}).then(oTable.qunit.$scrollVSbTo(40)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(40)).then(function() {
 				that.fakeODataBindingRefresh(9);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow, 57, iInnerScrollPosition,
@@ -5029,7 +5029,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
 					sTitle + "ScrollTop = 40; After binding length decreased (refresh)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 				iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
@@ -5044,7 +5044,7 @@ sap.ui.define([
 				that.assertPosition(assert, 3, 69, 355,
 					sTitle + "ScrollTop = MAX; After binding length increased (expand)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.changeBindingLength(11, ChangeReason.Expand);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow, 89, iInnerScrollPosition,
@@ -5055,7 +5055,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
 					sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.fakeODataBindingRefresh(9);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, 3, iScrollPosition, iInnerScrollPosition - 150,
@@ -5066,7 +5066,7 @@ sap.ui.define([
 				that.assertPosition(assert, 3, 69, 355,
 					sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.fakeODataBindingRefresh(11);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow, 89, iInnerScrollPosition,
@@ -5112,7 +5112,7 @@ sap.ui.define([
 			let iFirstVisibleRow;
 			let iScrollPosition;
 
-			return oTable.qunit.whenRenderingFinished().then(oTable.qunit.$scrollVSbTo(60)).then(function() {
+			return oTable.qunit.whenRenderingFinished().then(() => oTable.qunit.scrollVSbTo(60)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 
@@ -5136,7 +5136,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
 					sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
 
-			}).then(oTable.qunit.$scrollVSbTo(60)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(60)).then(function() {
 				that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength - 1);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
@@ -5157,7 +5157,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
 					sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 
@@ -5171,7 +5171,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - that.iBaseRowHeight, 0,
 					sTitle + "ScrollTop = MAX; After binding length increased (expand)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.changeBindingLength(that.mDefaultSettings.bindingLength + 1, ChangeReason.Expand);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
@@ -5182,7 +5182,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
 					sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength - 1);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - that.iBaseRowHeight, 0,
@@ -5193,7 +5193,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - that.iBaseRowHeight, 0,
 					sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength + 1);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
@@ -5236,7 +5236,7 @@ sap.ui.define([
 			let iScrollPosition;
 			let iInnerScrollPosition;
 
-			return oTable.qunit.whenRenderingFinished().then(oTable.qunit.$scrollVSbTo(60)).then(function() {
+			return oTable.qunit.whenRenderingFinished().then(() => oTable.qunit.scrollVSbTo(60)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 				iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
@@ -5261,7 +5261,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
 					sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
 
-			}).then(oTable.qunit.$scrollVSbTo(60)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(60)).then(function() {
 				that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength - 1);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
@@ -5282,7 +5282,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
 					sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 				iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
@@ -5297,7 +5297,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow - 2, 4437, iInnerScrollPosition - 150,
 					sTitle + "ScrollTop = MAX; After binding length increased (expand)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.changeBindingLength(that.mDefaultSettings.bindingLength + 1, ChangeReason.Expand);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow, 4499, iInnerScrollPosition - 150,
@@ -5308,7 +5308,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
 					sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength - 1);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow - 2, iScrollPosition - that.iBaseRowHeight, iInnerScrollPosition - 150 + that.iBaseRowHeight,
@@ -5319,7 +5319,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow - 2, 4437, iInnerScrollPosition - 150,
 					sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength + 1);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow, 4499, iInnerScrollPosition - 150,
@@ -5367,7 +5367,7 @@ sap.ui.define([
 			let iFirstVisibleRow;
 			let iScrollPosition;
 
-			return oTable.qunit.whenRenderingFinished().then(oTable.qunit.$scrollVSbTo(60)).then(function() {
+			return oTable.qunit.whenRenderingFinished().then(() => oTable.qunit.scrollVSbTo(60)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 
@@ -5391,7 +5391,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
 					sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
 
-			}).then(oTable.qunit.$scrollVSbTo(60)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(60)).then(function() {
 				that.fakeODataBindingRefresh(iBindingLength - 1);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
@@ -5412,7 +5412,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
 					sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 
@@ -5426,7 +5426,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - 1, 0,
 					sTitle + "ScrollTop = MAX; After binding length increased (expand)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.changeBindingLength(iBindingLength + 1, ChangeReason.Expand);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition - 1, 0,
@@ -5437,7 +5437,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
 					sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.fakeODataBindingRefresh(iBindingLength - 1);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition, 0,
@@ -5448,7 +5448,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - 1, 0,
 					sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.fakeODataBindingRefresh(iBindingLength + 1);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition - 1, 0,
@@ -5493,7 +5493,7 @@ sap.ui.define([
 			let iScrollPosition;
 			let iInnerScrollPosition;
 
-			return oTable.qunit.whenRenderingFinished().then(oTable.qunit.$scrollVSbTo(60)).then(function() {
+			return oTable.qunit.whenRenderingFinished().then(() => oTable.qunit.scrollVSbTo(60)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 				iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
@@ -5518,7 +5518,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
 					sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
 
-			}).then(oTable.qunit.$scrollVSbTo(60)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(60)).then(function() {
 				that.fakeODataBindingRefresh(iBindingLength - 1);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
@@ -5539,7 +5539,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
 					sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				iFirstVisibleRow = oTable.getFirstVisibleRow();
 				iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 				iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
@@ -5554,7 +5554,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow - 2, 999488, iInnerScrollPosition - 150,
 					sTitle + "ScrollTop = MAX; After binding length increased (expand)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.changeBindingLength(iBindingLength + 1, ChangeReason.Expand);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow, 999501, iInnerScrollPosition - 150,
@@ -5565,7 +5565,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
 					sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.fakeODataBindingRefresh(iBindingLength - 1);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow - 2, iScrollPosition, iInnerScrollPosition - 150 + that.iBaseRowHeight,
@@ -5576,7 +5576,7 @@ sap.ui.define([
 				that.assertPosition(assert, iFirstVisibleRow - 2, 999488, iInnerScrollPosition - 150,
 					sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
 
-			}).then(oTable.qunit.$scrollVSbTo(9999999)).then(function() {
+			}).then(() => oTable.qunit.scrollVSbTo(9999999)).then(function() {
 				that.fakeODataBindingRefresh(iBindingLength + 1);
 			}).then(oTable.qunit.whenRenderingFinished).then(function() {
 				that.assertPosition(assert, iFirstVisibleRow, 999501, iInnerScrollPosition - 150,
@@ -5766,7 +5766,7 @@ sap.ui.define([
 			oTable._getScrollExtension().getHorizontalScrollbar().dispatchEvent(oEvent);
 			assert.ok(!oTable._getKeyboardExtension().isInActionMode(), "Clicked on horizontal scrollbar -> Table is in Navigation Mode");
 			assert.strictEqual(document.activeElement, oTable.qunit.getDataCell(0, 0), "Cell has focus");
-		}).then(oTable.qunit.$focus(oCellContent)).then(function() {
+		}).then(() => oTable.qunit.focus(oCellContent)).then(function() {
 			// Vertical
 			assert.ok(oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 			oTable._getScrollExtension().getVerticalScrollbar().scrollTop = 1;
@@ -5807,7 +5807,7 @@ sap.ui.define([
 			oTableContainer.dispatchEvent(oWheelEvent);
 			assert.ok(!oTable._getKeyboardExtension().isInActionMode(), "Scrolled horizontally -> Table is in Navigation Mode");
 			assert.strictEqual(document.activeElement, oTable.qunit.getDataCell(0, 0), "Cell has focus");
-		}).then(oTable.qunit.$focus(oCellContent)).then(function() {
+		}).then(() => oTable.qunit.focus(oCellContent)).then(function() {
 			// Vertical
 			assert.ok(oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 			oWheelEvent = TableQUnitUtils.createMouseWheelEvent(150, MouseWheelDeltaMode.PIXEL, false);
@@ -5866,7 +5866,7 @@ sap.ui.define([
 		oTable.invalidate();
 		oTable.qunit.preventFocusOnTouch();
 
-		return oTable.qunit.whenRenderingFinished().then(oTable.qunit.$focus(oTable.getRows()[0].getCells()[0].getDomRef())).then(function() {
+		return oTable.qunit.whenRenderingFinished().then(() => oTable.qunit.focus(oTable.getRows()[0].getCells()[0].getDomRef())).then(function() {
 			// Horizontal
 			assert.ok(oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 			TableQUnitUtils.startTouchScrolling(oTable.getDomRef("tableCCnt"), 200);
@@ -5874,7 +5874,7 @@ sap.ui.define([
 			TableQUnitUtils.endTouchScrolling();
 			assert.ok(!oTable._getKeyboardExtension().isInActionMode(), "Scrolled horizontally -> Table is in Navigation Mode");
 			assert.strictEqual(document.activeElement, oTable.qunit.getDataCell(0, 0), "Cell has focus");
-		}).then(oTable.qunit.$focus(oTable.getRows()[0].getCells()[0].getDomRef())).then(function() {
+		}).then(() => oTable.qunit.focus(oTable.getRows()[0].getCells()[0].getDomRef())).then(function() {
 			// Vertical
 			assert.ok(oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
 			TableQUnitUtils.startTouchScrolling(oTable.getDomRef("tableCCnt"), 200);

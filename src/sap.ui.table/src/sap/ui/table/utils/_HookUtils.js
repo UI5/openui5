@@ -190,12 +190,6 @@ sap.ui.define(["sap/ui/base/DataType", "sap/ui/model/ChangeReason"], function(Da
 					{type: "string"}
 				]
 			}
-		},
-		// Can be used to send any signal.
-		Signal: {
-			arguments: [
-				{type: "string"}
-			]
 		}
 	};
 
