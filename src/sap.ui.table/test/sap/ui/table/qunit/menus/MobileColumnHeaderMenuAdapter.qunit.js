@@ -80,7 +80,7 @@ sap.ui.define([
 				enableColumnFreeze: true
 			});
 
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oMenu1.destroy();
@@ -315,7 +315,7 @@ sap.ui.define([
 
 		await new Promise(function(resolve) {
 			oMenu.attachEventOnce("afterClose", async function() {
-				await TableQUnitUtils.wait(100); // Timeout to ensure this the event is fired after the menu is closed
+				await TableQUnitUtils.sleep(100); // Timeout to ensure this the event is fired after the menu is closed
 				assert.ok(oColumnSetGroupedSpy.calledOnceWithExactly(true), "Column#_setGrouped is called once with the correct parameters");
 				resolve();
 			});

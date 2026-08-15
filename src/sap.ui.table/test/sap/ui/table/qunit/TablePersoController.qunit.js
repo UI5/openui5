@@ -272,7 +272,7 @@ sap.ui.define([
 		assert.equal(oNumberColumn.getVisible(), true, "Number column should be invisible.");
 
 		oNameColumn.attachEventOnce("columnMenuOpen", function() {
-			TableQUnitUtils.wait(0).then(function() {
+			TableQUnitUtils.sleep(0).then(function() {
 				const oNameMenu = oNameColumn.getMenu();
 				const sVisibilityMenuItemId = oNameMenu.getId() + "-column-visibilty";
 				const aSubmenuItems = oTable._oColumnVisibilityMenuItem.getSubmenu().getItems();
@@ -386,7 +386,7 @@ sap.ui.define([
 		assert.equal(oNumberColumn.getVisible(), true, "Number column should be invisible.");
 
 		oNameColumn.attachEventOnce("columnMenuOpen", function() {
-			TableQUnitUtils.wait(0).then(function() {
+			TableQUnitUtils.sleep(0).then(function() {
 				const oNameMenu = oNameColumn.getMenu();
 				const sVisibilityMenuItemId = oNameMenu.getId() + "-column-visibilty";
 

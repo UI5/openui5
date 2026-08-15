@@ -160,7 +160,7 @@ sap.ui.define([
 			this.oTable = TableQUnitUtils.createTable((oTable) => {
 				oTable.getBinding().resume();
 			});
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -283,7 +283,7 @@ sap.ui.define([
 				oTable.getBinding().resume();
 			});
 			this.oPlugin = this.oTable.getDependents()[0];
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -329,7 +329,7 @@ sap.ui.define([
 		const aRows = this.oTable.getRows();
 
 		await aRows[3].getBindingContext().expand();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertRowState(aRows[3], {
 			type: "GroupHeader",
@@ -351,14 +351,14 @@ sap.ui.define([
 		const aRows = this.oTable.getRows();
 
 		await aRows[3].getBindingContext().expand();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.oTable.setFirstVisibleRow(6);
-		await this.oTable.qunit.whenBindingChange();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
 		await aRows[4].getBindingContext().expand();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.oTable.setFirstVisibleRow(9);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertRowState(aRows[1], {
 			type: "GroupHeader",
@@ -381,7 +381,7 @@ sap.ui.define([
 
 		await TableQUnitUtils.expandAndScrollTableWithDataAggregation(this.oTable);
 		this.oTable.setFirstVisibleRow(20);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertRowState(aRows[0], {
 			type: "Standard",
@@ -426,7 +426,7 @@ sap.ui.define([
 
 		this.oPlugin.setGroupHeaderFormatter(oFormatter);
 		this.oTable.getBinding().refresh();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.assertRowState(aRows[1], {
 			type: "GroupHeader",
 			level: 1,
@@ -449,7 +449,7 @@ sap.ui.define([
 		oFormatter.resetHistory();
 		oFormatter.returns("My Custom Group Header Title 2");
 		await aRows[3].getBindingContext().expand();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.assertRowState(aRows[4], {
 			type: "GroupHeader",
 			level: 2,
@@ -462,9 +462,9 @@ sap.ui.define([
 
 		this.oPlugin.setGroupHeaderFormatter(() => "Formatter changed");
 		await aRows[3].getBindingContext().collapse();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		await aRows[3].getBindingContext().expand();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.assertRowState(aRows[4], {
 			type: "GroupHeader",
 			level: 2,

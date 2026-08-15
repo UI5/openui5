@@ -21,9 +21,9 @@ sap.ui.define([
 
 	oAnnotationMockServer.simulate(sURLPrefix + "/model/metadata_odtbmd.xml", sURLPrefix + "/model/odtbmd/");
 	const aAnnotationsMockdata = oAnnotationMockServer._oMockdata.GLAccountHierarchyInChartOfAccountsLiSet;
-	aAnnotationsMockdata.forEach(function(oAnnotationMockdata) {
+	for (const oAnnotationMockdata of aAnnotationsMockdata) {
 		oAnnotationMockdata.FinStatementHierarchyLevelVal = parseInt(oAnnotationMockdata.FinStatementHierarchyLevelVal);
-	});
+	}
 	oAnnotationMockServer.start();
 
 	QUnit.module("Selection API", {
@@ -40,14 +40,14 @@ sap.ui.define([
 				models: TableQUnitUtils.createODataModel("/metadata")
 			});
 
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
 		}
 	});
 
-	QUnit.test("#setSelected", function(assert) {
+	QUnit.test("#setSelected", async function(assert) {
 		const oSelectionPlugin = this.oTable._getSelectionPlugin();
 		const oSelectionChangeSpy = sinon.spy();
 
@@ -76,16 +76,14 @@ sap.ui.define([
 		this.oTable.setSelectionMode(SelectionMode.MultiToggle);
 		this.oTable.collapseAll();
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			oSelectionChangeSpy.resetHistory();
-			oSelectionPlugin.setSelected(this.oTable.getRows()[1], true);
-			return new Promise(function(resolve) {
-				setTimeout(resolve, 100);
-			});
-		}.bind(this)).then(function() {
-			assert.deepEqual(oSelectionPlugin.getSelectedIndices(), [], "Select a row that is not selectable");
-			assert.equal(oSelectionChangeSpy.callCount, 0, "'selectionChange' event not fired");
+		await this.oTable.qunit.rendered();
+		oSelectionChangeSpy.resetHistory();
+		oSelectionPlugin.setSelected(this.oTable.getRows()[1], true);
+		await new Promise((resolve) => {
+			setTimeout(resolve, 100);
 		});
+		assert.deepEqual(oSelectionPlugin.getSelectedIndices(), [], "Select a row that is not selectable");
+		assert.equal(oSelectionChangeSpy.callCount, 0, "'selectionChange' event not fired");
 	});
 
 	QUnit.test("#handleKeyboardShortcut - Event Marking", function(assert) {
@@ -140,7 +138,7 @@ sap.ui.define([
 				models: TableQUnitUtils.createODataModel("/metadata")
 			});
 
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();

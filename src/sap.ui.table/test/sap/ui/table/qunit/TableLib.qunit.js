@@ -5,18 +5,14 @@ sap.ui.define(["sap/ui/core/Lib"], function(Library) {
 
 	QUnit.module("Library", {});
 
-	QUnit.test("load", function(assert) {
-		const done = assert.async();
-		const oPromise = Library.load("sap.ui.table");
-		oPromise.then(function() {
+	QUnit.test("load", async function(assert) {
+		try {
+			await Library.load("sap.ui.table");
 			const tableNamespace = sap.ui.require("sap/ui/table/library");
 			assert.ok(!!tableNamespace, "Table Lib loaded");
-			done();
-		});
-		oPromise["catch"](function() {
+		} catch (e) {
 			assert.ok(false, "Fail on load");
-			done();
-		});
+		}
 	});
 
 	/**

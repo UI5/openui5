@@ -59,7 +59,7 @@ sap.ui.define([
 				columns: TableQUnitUtils.createTextColumn()
 			});
 
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -97,7 +97,7 @@ sap.ui.define([
 	QUnit.module("Item Navigation", {
 		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -243,7 +243,7 @@ sap.ui.define([
 	QUnit.module("Misc", {
 		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -341,7 +341,7 @@ sap.ui.define([
 	QUnit.module("Focus handling", {
 		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 			this.oTable.addColumn(TableQUnitUtils.createInputColumn({text: "test3"}));
 			await nextUIUpdate();
 		},
@@ -523,7 +523,7 @@ sap.ui.define([
 		const oTreeTable = this.oTreeTable = TableQUnitUtils.createTable(TreeTable, {
 			rows: {path: "/", parameters: {arrayNames: ["children"]}}
 		});
-		await oTreeTable.qunit.whenRenderingFinished();
+		await oTreeTable.qunit.rendered();
 		oTable.setRowActionTemplate(TableQUnitUtils.createRowAction(null));
 		oTable.setRowActionCount(1);
 		await nextUIUpdate();

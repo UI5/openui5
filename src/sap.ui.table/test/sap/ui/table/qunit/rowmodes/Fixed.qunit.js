@@ -117,9 +117,8 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.test("Row height", function(assert) {
+	QUnit.test("Row height", async function(assert) {
 		const oTable = this.oTable;
-		let sequence = Promise.resolve();
 
 		oTable.addColumn(new Column({template: new HeightTestControl()}));
 		oTable.addColumn(new Column({template: new HeightTestControl()}));
@@ -127,73 +126,69 @@ sap.ui.define([
 		oTable.setRowActionCount(1);
 		oTable.setRowActionTemplate(TableQUnitUtils.createRowAction(null));
 
-		function test(mTestSettings) {
-			sequence = sequence.then(async function() {
-				oTable.setRowHeight(mTestSettings.rowHeight || 0);
-				oTable.getColumns()[1].setTemplate(new HeightTestControl({height: (mTestSettings.templateHeight || 1) + "px"}));
-				await oTable.qunit.setDensity(mTestSettings.density);
-				TableQUnitUtils.assertRowHeights(assert, oTable, mTestSettings);
-			});
+		async function test(mTestSettings) {
+			oTable.setRowHeight(mTestSettings.rowHeight || 0);
+			oTable.getColumns()[1].setTemplate(new HeightTestControl({height: (mTestSettings.templateHeight || 1) + "px"}));
+			await oTable.qunit.setDensity(mTestSettings.density);
+			TableQUnitUtils.assertRowHeights(assert, oTable, mTestSettings);
 		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Default height",
 				density: sDensity,
 				expectedHeight: TableUtils.DefaultRowHeight[sDensity]
 			});
-		});
+		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Default height; With large content",
 				density: sDensity,
 				templateHeight: TableUtils.DefaultRowHeight[sDensity] * 2,
 				expectedHeight: TableUtils.DefaultRowHeight[sDensity]
 			});
-		});
+		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Application-defined height; Less than default",
 				density: sDensity,
 				rowHeight: 20,
 				expectedHeight: 21
 			});
-		});
+		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Application-defined height; Less than default; With large content",
 				density: sDensity,
 				rowHeight: 20,
 				templateHeight: 100,
 				expectedHeight: 21
 			});
-		});
+		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Application-defined height; Greater than default",
 				density: sDensity,
 				rowHeight: 100,
 				expectedHeight: 101
 			});
-		});
+		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Application-defined height; Greater than default; With large content",
 				density: sDensity,
 				rowHeight: 100,
 				templateHeight: 120,
 				expectedHeight: 101
 			});
-		});
+		}
 
-		return sequence.then(function() {
-			oTable.qunit.resetDensity();
-		});
+		oTable.qunit.resetDensity();
 	});
 
 	QUnit.module("Hide empty rows", {
@@ -281,73 +276,68 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Initialization", function(assert) {
+	QUnit.test("Initialization", async function(assert) {
 		const oTable = this.createTable();
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			assert.strictEqual(this.oGetContextsSpy.callCount, 1, "Method to get contexts called once");
-			assert.ok(this.oGetContextsSpy.calledWithExactly(0, 10, 100), "The call considers the row count");
-		}.bind(this));
+		await oTable.qunit.rendered();
+		assert.strictEqual(this.oGetContextsSpy.callCount, 1, "Method to get contexts called once");
+		assert.ok(this.oGetContextsSpy.calledWithExactly(0, 10, 100), "The call considers the row count");
 	});
 
-	QUnit.test("Initialization; Variable row heights", function(assert) {
+	QUnit.test("Initialization; Variable row heights", async function(assert) {
 		const oTable = this.createTable(true);
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			assert.strictEqual(this.oGetContextsSpy.callCount, 2, "Method to get contexts called twice");
-			assert.ok(this.oGetContextsSpy.getCall(1).calledWithExactly(0, 11, 100), "The second call considers the row count");
-		}.bind(this));
+		await oTable.qunit.rendered();
+		assert.strictEqual(this.oGetContextsSpy.callCount, 2, "Method to get contexts called twice");
+		assert.ok(this.oGetContextsSpy.getCall(1).calledWithExactly(0, 11, 100), "The second call considers the row count");
 	});
 
-	QUnit.test("Change row count", function(assert) {
+	QUnit.test("Change row count", async function(assert) {
 		const oTable = this.createTable();
 		const oGetContextsSpy = this.oGetContextsSpy;
 
 		oTable.setFirstVisibleRow(10);
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			oGetContextsSpy.resetHistory();
+		await oTable.qunit.rendered();
+		oGetContextsSpy.resetHistory();
+		oTable.getRowMode().setRowCount(8);
+		await oTable.qunit.rendered();
+		assert.strictEqual(oGetContextsSpy.callCount, 1, "Decreased row count: Method to get contexts called once");
+		assert.ok(oGetContextsSpy.calledWithExactly(10, 8, 100), "Decreased row count: The call considers the row count");
 
-			oTable.getRowMode().setRowCount(8);
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(oGetContextsSpy.callCount, 1, "Decreased row count: Method to get contexts called once");
-			assert.ok(oGetContextsSpy.calledWithExactly(10, 8, 100), "Decreased row count: The call considers the row count");
+		oGetContextsSpy.resetHistory();
+		oTable.getRowMode().setRowCount(10);
+		await oTable.qunit.rendered();
+		assert.strictEqual(oGetContextsSpy.callCount, 1, "Increased row count: Method to get contexts called once");
+		assert.ok(oGetContextsSpy.calledWithExactly(10, 10, 100), "Decreased row count: The call considers the row count");
 
-			oGetContextsSpy.resetHistory();
-			oTable.getRowMode().setRowCount(10);
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(oGetContextsSpy.callCount, 1, "Increased row count: Method to get contexts called once");
-			assert.ok(oGetContextsSpy.calledWithExactly(10, 10, 100), "Decreased row count: The call considers the row count");
+		oTable.setFirstVisibleRow(100);
+		await oTable.qunit.rendered();
+		oGetContextsSpy.resetHistory();
+		oTable.getRowMode().setRowCount(8);
+		await oTable.qunit.rendered();
+		assert.strictEqual(oGetContextsSpy.callCount, 1,
+			"Decreased row count when scrolled to bottom: Method to get contexts called once");
+		assert.ok(oGetContextsSpy.calledWithExactly(90, 8, 100),
+			"Decreased row count when scrolled to bottom: The call considers the row count");
 
-			oTable.setFirstVisibleRow(100);
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			oGetContextsSpy.resetHistory();
-			oTable.getRowMode().setRowCount(8);
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(oGetContextsSpy.callCount, 1,
-				"Decreased row count when scrolled to bottom: Method to get contexts called once");
-			assert.ok(oGetContextsSpy.calledWithExactly(90, 8, 100),
-				"Decreased row count when scrolled to bottom: The call considers the row count");
-
-			oTable.setFirstVisibleRow(100);
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			oGetContextsSpy.resetHistory();
-			oTable.getRowMode().setRowCount(10);
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(oGetContextsSpy.callCount, 1,
-				"Increased row count when scrolled to bottom: Method to get contexts called once");
-			assert.ok(oGetContextsSpy.calledWithExactly(90, 10, 100),
-				"Increased row count when scrolled to bottom: The call considers the row count");
-		});
+		oTable.setFirstVisibleRow(100);
+		await oTable.qunit.rendered();
+		oGetContextsSpy.resetHistory();
+		oTable.getRowMode().setRowCount(10);
+		await oTable.qunit.rendered();
+		assert.strictEqual(oGetContextsSpy.callCount, 1,
+			"Increased row count when scrolled to bottom: Method to get contexts called once");
+		assert.ok(oGetContextsSpy.calledWithExactly(90, 10, 100),
+			"Increased row count when scrolled to bottom: The call considers the row count");
 	});
 
-	RowCountConstraintsTest.test("Force fixed rows if row count too low", function(assert) {
+	RowCountConstraintsTest.test("Force fixed rows if row count too low", async function(assert) {
 		this.oRowMode.setRowCount(1);
 		this.oTable._setRowCountConstraints({fixedTop: true, fixedBottom: true});
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			TableQUnitUtils.assertRenderedRows(assert, this.oTable, 0, 1, 0);
-		}.bind(this));
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertRenderedRows(assert, this.oTable, 0, 1, 0);
 	});
 
 	FixedRowHeightTest.registerTo(QUnit);

@@ -118,15 +118,14 @@ sap.ui.define([
 	});
 
 	QUnit.test("After rendering", function(assert) {
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
+		return this.oTable.qunit.rendered().then(() => {
 			assert.equal(this.oTable.getRows().length, 19, "Row count");
 			assert.equal(this.oTable.getVisibleRowCount(), 19, "'visibleRowCount' property value");
-		}.bind(this));
+		});
 	});
 
-	QUnit.test("Row height", function(assert) {
+	QUnit.test("Row height", async function(assert) {
 		const oTable = this.oTable;
-		let sequence = Promise.resolve();
 
 		oTable.addColumn(new Column({template: new HeightTestControl()}));
 		oTable.addColumn(new Column({template: new HeightTestControl()}));
@@ -134,73 +133,69 @@ sap.ui.define([
 		oTable.setRowActionCount(1);
 		oTable.setRowActionTemplate(TableQUnitUtils.createRowAction(null));
 
-		function test(mTestSettings) {
-			sequence = sequence.then(async function() {
-				oTable.setRowHeight(mTestSettings.rowHeight || 0);
-				oTable.getColumns()[1].setTemplate(new HeightTestControl({height: (mTestSettings.templateHeight || 1) + "px"}));
-				await oTable.qunit.setDensity(mTestSettings.density);
-				TableQUnitUtils.assertRowHeights(assert, oTable, mTestSettings);
-			});
+		async function test(mTestSettings) {
+			oTable.setRowHeight(mTestSettings.rowHeight || 0);
+			oTable.getColumns()[1].setTemplate(new HeightTestControl({height: (mTestSettings.templateHeight || 1) + "px"}));
+			await oTable.qunit.setDensity(mTestSettings.density);
+			TableQUnitUtils.assertRowHeights(assert, oTable, mTestSettings);
 		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Default height",
 				density: sDensity,
 				expectedHeight: TableUtils.DefaultRowHeight[sDensity]
 			});
-		});
+		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Default height; With large content",
 				density: sDensity,
 				templateHeight: TableUtils.DefaultRowHeight[sDensity] * 2,
 				expectedHeight: TableUtils.DefaultRowHeight[sDensity]
 			});
-		});
+		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Application-defined height; Less than default",
 				density: sDensity,
 				rowHeight: 20,
 				expectedHeight: 21
 			});
-		});
+		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Application-defined height; Less than default; With large content",
 				density: sDensity,
 				rowHeight: 20,
 				templateHeight: 100,
 				expectedHeight: 21
 			});
-		});
+		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Application-defined height; Greater than default",
 				density: sDensity,
 				rowHeight: 100,
 				expectedHeight: 101
 			});
-		});
+		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Application-defined height; Greater than default; With large content",
 				density: sDensity,
 				rowHeight: 100,
 				templateHeight: 120,
 				expectedHeight: 101
 			});
-		});
+		}
 
-		return sequence.then(function() {
-			oTable.qunit.resetDensity();
-		});
+		oTable.qunit.resetDensity();
 	});
 
 	QUnit.module("Automatic row count adjustment", {
@@ -217,7 +212,7 @@ sap.ui.define([
 				creationRow: new CreationRow()
 			});
 
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -257,14 +252,14 @@ sap.ui.define([
 		});
 
 		oContainer.placeAt("qunit-fixture");
-		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === 13);
+		await this.oTable.qunit.rendered(() => this.oTable.getRows().length === 13);
 		assert.equal(this.oTable.getRows().length, 13, "Initial rendering");
 
 		oContainer.invalidate();
 		await nextUIUpdate();
 
 		oContainer.setHeight("765px");
-		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === 9);
+		await this.oTable.qunit.rendered(() => this.oTable.getRows().length === 9);
 		assert.equal(this.oTable.getRows().length, 9, "Resize after rendering new elemnents: Row count is adjusted");
 
 		oContainer.destroy();
@@ -278,11 +273,11 @@ sap.ui.define([
 		await nextUIUpdate();
 		oTableContainer.setAttribute("style", "height: 765px");
 		this.oTable.setVisible(true);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.equal(this.oTable.getRows().length, 9, "Row count after showing the table");
 
 		oTableContainer.setAttribute("style", `height: ${sOriginalContainerHeight}`);
-		await this.oTable.qunit.whenNextRenderingFinished();
+		await this.oTable.qunit.nextRender();
 		assert.equal(this.oTable.getRows().length, 13, "Row count after resize");
 	});
 
@@ -317,33 +312,30 @@ sap.ui.define([
 		await nextUIUpdate();
 		oTableContainer.setHeight("765px");
 		oTableContainer.setVisible(true);
-		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === 9);
+		await this.oTable.qunit.rendered(() => this.oTable.getRows().length === 9);
 		assert.equal(this.oTable.getRows().length, 9, "Row count after showing the parent");
 
 		oTableContainer.setHeight();
-		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === 13);
+		await this.oTable.qunit.rendered(() => this.oTable.getRows().length === 13);
 		assert.equal(this.oTable.getRows().length, 13, "Row count after resize");
 
 		oTableContainer.destroy();
 	});
 
-	QUnit.test("Resize", function(assert) {
-		const that = this;
-
-		return this.oTable.qunit.resize({height: "765px"}).then(function() {
-			assert.equal(that.oTable.getRows().length, 9, "Row count after decreasing height");
-		}).then(this.oTable.qunit.resetSize).then(function() {
-			assert.equal(that.oTable.getRows().length, 13, "Row count after increasing height");
-		});
+	QUnit.test("Resize", async function(assert) {
+		await this.oTable.qunit.resize({height: "765px"});
+		assert.equal(this.oTable.getRows().length, 9, "Row count after decreasing height");
+		await this.oTable.qunit.resetSize();
+		assert.equal(this.oTable.getRows().length, 13, "Row count after increasing height");
 	});
 
 	QUnit.test("Changing visibility of an extension", async function(assert) {
 		this.oTable.getExtension()[0].setVisible(false);
-		await this.oTable.qunit.whenNextRenderingFinished();
+		await this.oTable.qunit.nextRender();
 		assert.equal(this.oTable.getRows().length, 15, "Row count after hiding an extension");
 
 		this.oTable.getExtension()[0].setVisible(true);
-		await this.oTable.qunit.whenNextRenderingFinished();
+		await this.oTable.qunit.nextRender();
 		assert.equal(this.oTable.getRows().length, 13, "Row count after showing an extension");
 	});
 
@@ -355,11 +347,11 @@ sap.ui.define([
 		const iInitialRowCount = this.oTable.getRows().length;
 
 		this.oTable.getFooter().setVisible(false);
-		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === iInitialRowCount + 2);
+		await this.oTable.qunit.rendered(() => this.oTable.getRows().length === iInitialRowCount + 2);
 		assert.equal(this.oTable.getRows().length, iInitialRowCount + 2, "Row count increased after hiding the footer");
 
 		this.oTable.getFooter().setVisible(true);
-		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === iInitialRowCount);
+		await this.oTable.qunit.rendered(() => this.oTable.getRows().length === iInitialRowCount);
 		assert.equal(this.oTable.getRows().length, iInitialRowCount, "Row count restored after showing the footer");
 
 		await this.oTable.qunit.resetSize();
@@ -367,11 +359,11 @@ sap.ui.define([
 
 	QUnit.test("Changing visibility of the creation row", async function(assert) {
 		this.oTable.getCreationRow().setVisible(false);
-		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === 14);
+		await this.oTable.qunit.rendered(() => this.oTable.getRows().length === 14);
 		assert.equal(this.oTable.getRows().length, 14, "Row count after hiding the creation row");
 
 		this.oTable.getCreationRow().setVisible(true);
-		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === 13);
+		await this.oTable.qunit.rendered(() => this.oTable.getRows().length === 13);
 		assert.equal(this.oTable.getRows().length, 13, "Row count after showing the creation row");
 	});
 
@@ -382,7 +374,7 @@ sap.ui.define([
 		this.oTable.addExtension(this.oTable.getExtension()[0].clone());
 		this.oTable.getFooter().addStyleClass("sapUiLargeMargin");
 		this.oTable.destroyAggregation("creationRow");
-		await this.oTable.qunit.whenRenderingFinished(() => oTableContainer.clientHeight === oTableContainer.scrollHeight);
+		await this.oTable.qunit.rendered(() => oTableContainer.clientHeight === oTableContainer.scrollHeight);
 		assert.equal(oTableContainer.clientHeight, oTableContainer.scrollHeight, "The table container has no vertical overflow");
 	});
 
@@ -492,95 +484,90 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Initialization", function(assert) {
+	QUnit.test("Initialization", async function(assert) {
 		const oTable = this.createTable();
 
-		return oTable.qunit.whenRenderingFinished().then(() => {
-			assert.strictEqual(this.oGetContextsSpy.callCount, 1, "Method to get contexts called once"); // auto rerender
-			assert.ok(this.oGetContextsSpy.getCall(0).calledWithExactly(0, this.oTable.getRowMode().getComputedRowCounts().count, 100),
-				"The call considers the row count");
-		});
+		await oTable.qunit.rendered();
+		assert.strictEqual(this.oGetContextsSpy.callCount, 1, "Method to get contexts called once"); // auto rerender
+		assert.ok(this.oGetContextsSpy.getCall(0).calledWithExactly(0, this.oTable.getRowMode().getComputedRowCounts().count, 100),
+			"The call considers the row count");
 	});
 
-	QUnit.test("Initialization; Variable row heights", function(assert) {
+	QUnit.test("Initialization; Variable row heights", async function(assert) {
 		const oTable = this.createTable(true);
 
-		return oTable.qunit.whenRenderingFinished().then(() => {
-			assert.strictEqual(this.oGetContextsSpy.callCount, 1, "Method to get contexts called once"); // auto render
-			assert.ok(this.oGetContextsSpy.getCall(0).calledWithExactly(0, this.oTable.getRowMode().getComputedRowCounts().count + 1, 100),
-				"The call considers the row count");
-		});
+		await oTable.qunit.rendered();
+		assert.strictEqual(this.oGetContextsSpy.callCount, 1, "Method to get contexts called once"); // auto render
+		assert.ok(this.oGetContextsSpy.getCall(0).calledWithExactly(0, this.oTable.getRowMode().getComputedRowCounts().count + 1, 100),
+			"The call considers the row count");
 	});
 
-	QUnit.test("Resize", function(assert) {
+	QUnit.test("Resize", async function(assert) {
 		const oGetContextsSpy = this.oGetContextsSpy;
 		const oTable = this.createTable();
-		let iFirstVisibleRow;
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			oGetContextsSpy.resetHistory();
-		}).then(() => oTable.qunit.resize({height: "756px"})).then(function() {
-			assert.strictEqual(oGetContextsSpy.callCount, 1,
-				"Height decreased when scroll to top: Method to get contexts called once");
-			assert.ok(oGetContextsSpy.calledWithExactly(0, oTable.getRowMode().getComputedRowCounts().count, 100),
-				"The call considers the row count");
+		await oTable.qunit.rendered();
+		oGetContextsSpy.resetHistory();
+		await oTable.qunit.resize({height: "756px"});
+		assert.strictEqual(oGetContextsSpy.callCount, 1,
+			"Height decreased when scroll to top: Method to get contexts called once");
+		assert.ok(oGetContextsSpy.calledWithExactly(0, oTable.getRowMode().getComputedRowCounts().count, 100),
+			"The call considers the row count");
 
-			oGetContextsSpy.resetHistory();
-		}).then(oTable.qunit.resetSize).then(function() {
-			assert.strictEqual(oGetContextsSpy.callCount, 1,
-				"Height increased when scroll to top: Method to get contexts called once");
-			assert.ok(oGetContextsSpy.calledWithExactly(0, oTable.getRowMode().getComputedRowCounts().count, 100),
-				"The call considers the row count");
+		oGetContextsSpy.resetHistory();
+		await oTable.qunit.resetSize();
+		assert.strictEqual(oGetContextsSpy.callCount, 1,
+			"Height increased when scroll to top: Method to get contexts called once");
+		assert.ok(oGetContextsSpy.calledWithExactly(0, oTable.getRowMode().getComputedRowCounts().count, 100),
+			"The call considers the row count");
 
-			oTable.setFirstVisibleRow(10);
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			oGetContextsSpy.resetHistory();
-		}).then(() => oTable.qunit.resize({height: "756px"})).then(function() {
-			assert.strictEqual(oGetContextsSpy.callCount, 1,
-				"Height decreased when scrolled in middle: Method to get contexts called once");
-			assert.ok(oGetContextsSpy.calledWithExactly(10, oTable.getRowMode().getComputedRowCounts().count, 100),
-				"The call considers the row count");
+		oTable.setFirstVisibleRow(10);
+		await oTable.qunit.rendered();
+		oGetContextsSpy.resetHistory();
+		await oTable.qunit.resize({height: "756px"});
+		assert.strictEqual(oGetContextsSpy.callCount, 1,
+			"Height decreased when scrolled in middle: Method to get contexts called once");
+		assert.ok(oGetContextsSpy.calledWithExactly(10, oTable.getRowMode().getComputedRowCounts().count, 100),
+			"The call considers the row count");
 
-			oTable.setFirstVisibleRow(10);
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			oGetContextsSpy.resetHistory();
-		}).then(oTable.qunit.resetSize).then(function() {
-			assert.strictEqual(oGetContextsSpy.callCount, 1,
-				"Height increased when scrolled in middle: Method to get contexts called once");
-			assert.ok(oGetContextsSpy.calledWithExactly(10, oTable.getRowMode().getComputedRowCounts().count, 100),
-				"The call considers the row count");
+		oTable.setFirstVisibleRow(10);
+		await oTable.qunit.rendered();
+		oGetContextsSpy.resetHistory();
+		await oTable.qunit.resetSize();
+		assert.strictEqual(oGetContextsSpy.callCount, 1,
+			"Height increased when scrolled in middle: Method to get contexts called once");
+		assert.ok(oGetContextsSpy.calledWithExactly(10, oTable.getRowMode().getComputedRowCounts().count, 100),
+			"The call considers the row count");
 
-			oTable.setFirstVisibleRow(100);
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			oGetContextsSpy.resetHistory();
-			iFirstVisibleRow = oTable.getFirstVisibleRow();
-		}).then(() => oTable.qunit.resize({height: "756px"})).then(function() {
-			assert.strictEqual(oGetContextsSpy.callCount, 1,
-				"Height decreased when scrolled to bottom: Method to get contexts called once");
-			assert.ok(oGetContextsSpy.calledWithExactly(iFirstVisibleRow, oTable.getRowMode().getComputedRowCounts().count, 100),
-				"The call considers the row count");
+		oTable.setFirstVisibleRow(100);
+		await oTable.qunit.rendered();
+		oGetContextsSpy.resetHistory();
+		const iFirstVisibleRow = oTable.getFirstVisibleRow();
+		await oTable.qunit.resize({height: "756px"});
+		assert.strictEqual(oGetContextsSpy.callCount, 1,
+			"Height decreased when scrolled to bottom: Method to get contexts called once");
+		assert.ok(oGetContextsSpy.calledWithExactly(iFirstVisibleRow, oTable.getRowMode().getComputedRowCounts().count, 100),
+			"The call considers the row count");
 
-			oTable.setFirstVisibleRow(100);
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			oGetContextsSpy.resetHistory();
-		}).then(oTable.qunit.resetSize).then(function() {
-			const iRowCount = oTable.getRowMode().getComputedRowCounts().count;
-			assert.strictEqual(oGetContextsSpy.callCount, 1,
-				"Height increased when scrolled to bottom: Method to get contexts called once");
-			assert.ok(oGetContextsSpy.calledWithExactly(100 - iRowCount, iRowCount, 100),
-				"The call considers the row count");
-		});
+		oTable.setFirstVisibleRow(100);
+		await oTable.qunit.rendered();
+		oGetContextsSpy.resetHistory();
+		await oTable.qunit.resetSize();
+		const iRowCount = oTable.getRowMode().getComputedRowCounts().count;
+		assert.strictEqual(oGetContextsSpy.callCount, 1,
+			"Height increased when scrolled to bottom: Method to get contexts called once");
+		assert.ok(oGetContextsSpy.calledWithExactly(100 - iRowCount, iRowCount, 100),
+			"The call considers the row count");
 	});
 
 	FixedRowHeightTest.registerTo(QUnit);
 
-	RowCountConstraintsTest.test("Force fixed rows if row count too low", function(assert) {
+	RowCountConstraintsTest.test("Force fixed rows if row count too low", async function(assert) {
 		this.oRowMode.setMaxRowCount(1);
 		this.oTable._setRowCountConstraints({fixedTop: true, fixedBottom: true});
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			TableQUnitUtils.assertRenderedRows(assert, this.oTable, 0, 1, 0);
-		}.bind(this));
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertRenderedRows(assert, this.oTable, 0, 1, 0);
 	});
 
 	RowCountConstraintsTest.registerTo(QUnit, function(assert, fnOriginalTest) {
@@ -588,47 +575,49 @@ sap.ui.define([
 		return fnOriginalTest();
 	});
 
-	RowsUpdatedTest.test("Resize", function(assert) {
+	RowsUpdatedTest.test("Resize", async function(assert) {
 		this.createTable();
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
+		try {
+			await this.oTable.qunit.rendered();
 			this.resetRowsUpdatedSpy();
-		}).then(() => this.oTable.qunit.resize({height: "500px"})).then(() => {
-			return this.checkRowsUpdated(assert, [
+			await this.oTable.qunit.resize({height: "500px"});
+			await this.checkRowsUpdated(assert, [
 				TableUtils.RowsUpdateReason.Render
 			]);
-		}).finally(this.oTable.qunit.resetSize);
+		} finally {
+			await this.oTable.qunit.resetSize();
+		}
 	});
 
-	RowsUpdatedTest.test("Animation", function(assert) {
+	RowsUpdatedTest.test("Animation", async function(assert) {
 		this.createTable();
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.getRowMode().setProperty("rowContentHeight", 30, true); // Simulate that the row count changes after animation.
-			document.body.dispatchEvent(new Event("transitionend"));
-		}).then(TableQUnitUtils.wait).then(() => {
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Render
-			]);
-		});
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable.getRowMode().setProperty("rowContentHeight", 30, true); // Simulate that the row count changes after animation.
+		document.body.dispatchEvent(new Event("transitionend"));
+		await TableQUnitUtils.nextFrame();
+		await this.checkRowsUpdated(assert, [
+			TableUtils.RowsUpdateReason.Render
+		]);
 	});
 
-	RowsUpdatedTest.test("Render when theme not applied", function(assert) {
+	RowsUpdatedTest.test("Render when theme not applied", async function(assert) {
 		const oIsThemeApplied = sinon.stub(TableUtils, "isThemeApplied").returns(false);
 		this.createTable();
-		return this.checkRowsUpdated(assert, []).then(() => {
+		try {
+			await this.checkRowsUpdated(assert, []);
 			this.resetRowsUpdatedSpy();
 			this.oTable.invalidate();
-			return this.checkRowsUpdated(assert, []);
-		}).then(() => {
+			await this.checkRowsUpdated(assert, []);
 			this.resetRowsUpdatedSpy();
 			oIsThemeApplied.returns(true);
 			this.oTable.onThemeChanged();
-			return this.checkRowsUpdated(assert, [
+			await this.checkRowsUpdated(assert, [
 				TableUtils.RowsUpdateReason.Render
 			]);
-		}).finally(() => {
+		} finally {
 			oIsThemeApplied.restore();
-		});
+		}
 	});
 
 	RowsUpdatedTest.registerTo(QUnit, function(assert, fnOriginalTest) {
@@ -671,7 +660,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("getTableBottomPlaceholderStyles - hideEmptyRows=false", async function(assert) {
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.strictEqual(this.oTable.getRowMode().getTableBottomPlaceholderStyles(), undefined);
 	});
 
@@ -688,7 +677,7 @@ sap.ui.define([
 		const oRowMode = this.oTable.getRowMode();
 
 		oRowMode.setHideEmptyRows(true);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.deepEqual(oRowMode.getTableBottomPlaceholderStyles(), {
 			height: 7 * oRowMode.getBaseRowHeightOfTable() + "px"
 		});
@@ -699,7 +688,7 @@ sap.ui.define([
 
 		oRowMode.setHideEmptyRows(true);
 		this.oTable.setModel(TableQUnitUtils.createJSONModelWithEmptyRows(6));
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.deepEqual(oRowMode.getTableBottomPlaceholderStyles(), {
 			height: 4 * oRowMode.getBaseRowHeightOfTable() + "px"
 		});
@@ -710,7 +699,7 @@ sap.ui.define([
 
 		oRowMode.setHideEmptyRows(true);
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.strictEqual(oRowMode.getComputedRowCounts().count, 3, "Initial computed row count");
 		assert.deepEqual(oRowMode.getTableBottomPlaceholderStyles(), {
 			height: 7 * oRowMode.getBaseRowHeightOfTable() + "px"
@@ -718,7 +707,7 @@ sap.ui.define([
 
 		const oInvalidate = sinon.spy(oRowMode, "invalidate");
 		this.oTable.setModel(TableQUnitUtils.createJSONModelWithEmptyRows(4));
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.strictEqual(oRowMode.getComputedRowCounts().count, 4, "Added one data row: new computed row count");
 		assert.deepEqual(oRowMode.getTableBottomPlaceholderStyles(), {
 			height: 6 * oRowMode.getBaseRowHeightOfTable() + "px"
@@ -732,7 +721,7 @@ sap.ui.define([
 
 		oRowMode.setHideEmptyRows(true);
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.strictEqual(oRowMode.getComputedRowCounts().count, 3, "Initial computed row count");
 		assert.deepEqual(oRowMode.getTableBottomPlaceholderStyles(), {
 			height: 7 * oRowMode.getBaseRowHeightOfTable() + "px"
@@ -861,13 +850,13 @@ sap.ui.define([
 		let bCallback1Called = false;
 		let bCallback2Called = false;
 
-		const fnThrottled1 = TableUtils.throttleFrameWise(function() { bCallback1Called = true; });
-		const fnThrottled2 = TableUtils.throttleFrameWise(function() { bCallback2Called = true; });
+		const fnThrottled1 = TableUtils.throttleFrameWise(() => { bCallback1Called = true; });
+		const fnThrottled2 = TableUtils.throttleFrameWise(() => { bCallback2Called = true; });
 
 		fnThrottled1();
 		fnThrottled2();
 
-		window.requestAnimationFrame(function() {
+		window.requestAnimationFrame(() => {
 			assert.ok(bCallback1Called, "First callback executed");
 			assert.ok(bCallback2Called, "Second callback executed");
 			done();
@@ -879,7 +868,7 @@ sap.ui.define([
 			this.oTable = TableQUnitUtils.createTable({
 				models: TableQUnitUtils.createJSONModelWithEmptyRows(10)
 			});
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -933,7 +922,7 @@ sap.ui.define([
 			this.oTable = TableQUnitUtils.createTable({
 				models: TableQUnitUtils.createJSONModelWithEmptyRows(100)
 			});
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();

@@ -63,7 +63,7 @@ sap.ui.define([
 				.concat({type: Row.prototype.Type.GroupHeader, expandable: true})
 				.concat({type: Row.prototype.Type.Summary}));
 
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -216,7 +216,7 @@ sap.ui.define([
 
 	QUnit.test("Rendering - Settings not configured", async function(assert) {
 		this.oTable.setRowSettingsTemplate(null);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertRendering(assert, false);
 	});
@@ -225,14 +225,14 @@ sap.ui.define([
 		this.oTable.setRowSettingsTemplate(new RowSettings({
 			highlight: null
 		}));
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertRendering(assert, false);
 
 		this.oTable.setRowSettingsTemplate(new RowSettings({
 			highlight: MessageType.None
 		}));
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertRendering(assert, false);
 	});
@@ -272,7 +272,7 @@ sap.ui.define([
 
 		this.oTable.addEventDelegate({onAfterRendering: oOnAfterRenderingEventListener});
 		this.oTable.getRows()[0].getAggregation("_settings").setHighlight(MessageType.Error);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.ok(oOnAfterRenderingEventListener.notCalled, "The table did not re-render after changing a highlight");
 		this.assertColor(assert, 0, this.getColorRgb("sapUiErrorBorder"));
@@ -286,7 +286,7 @@ sap.ui.define([
 
 		this.oTable.addEventDelegate({onAfterRendering: oOnAfterRenderingEventListener});
 		this.oTable.getRows()[0].getAggregation("_settings").setHighlightText("testitext");
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.ok(oOnAfterRenderingEventListener.notCalled, "The table did not re-render after changing a highlight text");
 		this.assertText(assert, 0, "testitext");
@@ -407,7 +407,7 @@ sap.ui.define([
 				setRowActionCount: 1
 			});
 
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -438,7 +438,7 @@ sap.ui.define([
 
 	QUnit.test("Rendering - Settings not configured", async function(assert) {
 		this.oTable.setRowSettingsTemplate(null);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertNavIndicatorRendering(assert, true, false);
 	});
@@ -447,14 +447,14 @@ sap.ui.define([
 		this.oTable.setRowSettingsTemplate(new RowSettings({
 			navigated: null
 		}));
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertNavIndicatorRendering(assert, true, false);
 
 		this.oTable.setRowSettingsTemplate(new RowSettings({
 			navigated: false
 		}));
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertNavIndicatorRendering(assert, true, false);
 	});
@@ -464,7 +464,7 @@ sap.ui.define([
 
 		this.oTable.destroyRowActionTemplate();
 		this.oTable.setRowActionCount(0);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertNavIndicatorRendering(assert, false, true);
 	});

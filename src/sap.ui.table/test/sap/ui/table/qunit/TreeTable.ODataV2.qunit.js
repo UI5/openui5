@@ -35,9 +35,9 @@ sap.ui.define([
 	 * This is necessary because, the V1 ODataTreeBinding implements routines not conform to the Hierarchy Annotation Spec.
 	 */
 	const aAnnotationsMockdata = oAnnotationMockServer._oMockdata.GLAccountHierarchyInChartOfAccountsLiSet;
-	for (let i = 0; i < aAnnotationsMockdata.length; i++) {
+	for (const oItem of aAnnotationsMockdata) {
 		//convert string based level properties (NUMC fields) to real numbers
-		aAnnotationsMockdata[i].FinStatementHierarchyLevelVal = parseInt(aAnnotationsMockdata[i].FinStatementHierarchyLevelVal);
+		oItem.FinStatementHierarchyLevelVal = parseInt(oItem.FinStatementHierarchyLevelVal);
 	}
 
 	// TODO: Refactor tests to use TableQunitUtils. See "TreeTable with Annotations, starting level 1 > Expand and Collapse" for reference. Delete
@@ -85,7 +85,7 @@ sap.ui.define([
 				parameters: {rootLevel: 1}
 			}
 		});
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		const oBinding = this.oTable.getBinding();
 		assert.notOk(oBinding.mParameters.numberOfExpandedLevels, "Number of expanded levels is not in parameters when not set explicitly");
@@ -97,8 +97,8 @@ sap.ui.define([
 		assert.equal(aRows.length, 10, "10 Rows present");
 
 		let iContexts = 0;
-		for (let i = 0; i < aRows.length; i++) {
-			if (aRows[i].getBindingContext()) {
+		for (const oRow of aRows) {
+			if (oRow.getBindingContext()) {
 				iContexts++;
 			}
 		}
@@ -114,7 +114,7 @@ sap.ui.define([
 			},
 			threshold: 10
 		});
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		const oBinding = this.oTable.getBinding();
 		assert.ok(oBinding.isA("sap.ui.model.odata.v2.ODataTreeBinding"), "treeBinding class check");
@@ -123,29 +123,29 @@ sap.ui.define([
 
 		// expand first node
 		this.oTable.expand(0);
-		await this.oTable.qunit.whenBindingChange();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
 		assert.equal(this.oTable.getRows()[0].$().find(".sapUiTableTreeIconNodeOpen").length, 1, "Expand(0): 1st node is expanded");
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeOpen").length, 1, "Expand(0): One node is expanded");
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeClosed").length, 9, "Expand(0): 9 nodes are collapsed");
 
 		// expand second node
 		this.oTable.expand(1);
-		await this.oTable.qunit.whenBindingChange();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeOpen").length, 2, "Expand(1): 2 nodes are expanded");
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeClosed").length, 8, "Expand(1): 8 nodes are collapsed");
 
 		// collapse to root, collapse recursive true
 		this.oTable.collapse(0);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeClosed").length, 1, "Collapse(0): One node is rendered, State: collapsed");
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeOpen").length, 0, "Collapse(0): There shall be no other rows");
 
 		// expand root
 		this.oTable.expand(0);
 		// data already loaded, only one change event fired by expand
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.equal(this.oTable.getRows()[0].$().find(".sapUiTableTreeIconNodeOpen").length, 1, "Expand(0) after collapse(0): 1st node is expanded");
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeOpen").length, 1, "Expand(0) after collapse(0): One node is expanded");
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeClosed").length, 9, "Expand(0) after collapse(0): 9 nodes are collapsed");
@@ -153,14 +153,14 @@ sap.ui.define([
 		// expand first node
 		this.oTable.expand(1);
 		// data already loaded, only one change event fired by expand
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeOpen").length, 2, "Expand(1): 2 nodes are expanded");
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeClosed").length, 8, "Expand(1): 8 nodes are collapsed");
 
 		// collapseRecursive=false, collapse to root
 		this.oTable.getBinding().setCollapseRecursive(false);
 		this.oTable.collapse(0);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeClosed").length, 1,
 			"Collapse(0) recursive false: One node is rendered, State: collapsed");
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeOpen").length, 0,
@@ -168,7 +168,7 @@ sap.ui.define([
 
 		// expand root
 		this.oTable.expand(0);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeOpen").length, 2,
 			"Expand(0) after Collapse recursive: 2 nodes are expanded");
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeClosed").length, 8,
@@ -203,13 +203,13 @@ sap.ui.define([
 
 		this.oTable.getBinding().setCollapseRecursive(true);
 		this.oTable.collapseAll();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeClosed").length, 1, "CollapseAll: One node is rendered, State: collapsed");
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeOpen").length, 0, "CollapseAll: There shall be no other rows");
 
 		// expand root
 		this.oTable.expand(0);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.equal(this.oTable.getRows()[0].$().find(".sapUiTableTreeIconNodeOpen").length, 1,
 			"Expand(0) after collapseAll recursive: 1st node is expanded");
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeOpen").length, 1,
@@ -219,8 +219,8 @@ sap.ui.define([
 
 		// expand to level 2
 		this.oTable.expandToLevel(2);
-		await this.oTable.qunit.whenBindingChange();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
 
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeOpen").length, 3, "ExpandToLevel(2): 3 nodes are expanded");
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeClosed").length, 7, "ExpandToLevel(2): 7 nodes are collapsed");
@@ -245,7 +245,7 @@ sap.ui.define([
 		assert.ok(!this.oTable.isExpanded(33), "Node 001132 NOT expanded");
 
 		this.oTable.setFirstVisibleRow(20);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeOpen").length, 1, "After Scrolling: One node is expanded");
 		assert.equal(jQuery("#table0").find(".sapUiTableTreeIconNodeClosed").length, 9, "After Scrolling: 9 nodes are collapsed");
 		assert.ok(!this.oTable.isExpanded(31), "Node 001114 NOT expanded");
@@ -273,8 +273,8 @@ sap.ui.define([
 			assert.equal(aRows.length, 15, "15 Rows present");
 
 			let iCountContexts = 0;
-			for (let i = 0; i < aRows.length; i++) {
-				if (aRows[i].getBindingContext()) {
+			for (const oRow of aRows) {
+				if (oRow.getBindingContext()) {
 					iCountContexts++;
 				}
 			}
@@ -318,8 +318,8 @@ sap.ui.define([
 			assert.equal(aRows.length, 10, "10 Rows present");
 
 			let iCountContexts = 0;
-			for (let i = 0; i < aRows.length; i++) {
-				if (aRows[i].getBindingContext()) {
+			for (const oRow of aRows) {
+				if (oRow.getBindingContext()) {
 					iCountContexts++;
 				}
 			}
@@ -640,7 +640,7 @@ sap.ui.define([
 					dataReceived: function() {
 						that.assertState(assert, "On 'dataReceived'", {pendingRequests: false, busy: false});
 
-						setTimeout(function() {
+						setTimeout(() => {
 							that.assertState(assert, "200ms after 'dataReceived'", {pendingRequests: false, busy: false});
 							done();
 						}, 200);
@@ -747,23 +747,22 @@ sap.ui.define([
 
 			return this.oDataModel.metadataLoaded();
 		},
-		beforeEach: function() {
+		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable(TreeTable);
 			this.iNoDataVisibilityChanges = 0;
 
-			return this.oTable.qunit.whenRenderingFinished().then(function() {
-				this.oObserver = new MutationObserver(function(aRecords) {
-					const oRecord = aRecords[0];
-					const bNoDataWasVisible = oRecord.oldValue.includes("sapUiTableEmpty");
-					const bNoDataIsVisible = oRecord.target.classList.contains("sapUiTableEmpty");
+			await this.oTable.qunit.rendered();
+			this.oObserver = new MutationObserver((aRecords) => {
+				const oRecord = aRecords[0];
+				const bNoDataWasVisible = oRecord.oldValue.includes("sapUiTableEmpty");
+				const bNoDataIsVisible = oRecord.target.classList.contains("sapUiTableEmpty");
 
-					if (bNoDataWasVisible !== bNoDataIsVisible) {
-						this.iNoDataVisibilityChanges++;
-					}
-				}.bind(this));
+				if (bNoDataWasVisible !== bNoDataIsVisible) {
+					this.iNoDataVisibilityChanges++;
+				}
+			});
 
-				this.oObserver.observe(this.oTable.getDomRef(), {attributes: true, attributeOldValue: true, attributeFilter: ["class"]});
-			}.bind(this));
+			this.oObserver.observe(this.oTable.getDomRef(), {attributes: true, attributeOldValue: true, attributeFilter: ["class"]});
 		},
 		afterEach: function() {
 			if (this.oObserver) {
@@ -789,15 +788,15 @@ sap.ui.define([
 		const done = assert.async();
 
 		this.oTable.destroy();
-		this.oTable = TableQUnitUtils.createTable(TreeTable, function(oTable) {
-			new Promise(function(resolve) {
-				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", function() {
+		this.oTable = TableQUnitUtils.createTable(TreeTable, (oTable) => {
+			new Promise((resolve) => {
+				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", () => {
 					// the underlying TreeBinding adapter is loaded async and therefore no requests are pending initially
 					// this means the no data message is visible
 					TableQUnitUtils.assertNoDataVisible(assert, oTable, true);
 					resolve();
 				});
-			}).then(oTable.qunit.whenRenderingFinished).then(function() {
+			}).then(oTable.qunit.rendered).then(() => {
 				TableQUnitUtils.assertNoDataVisible(assert, oTable, false);
 				done();
 			});
@@ -813,33 +812,32 @@ sap.ui.define([
 				path: "/GLAccountHierarchyInChartOfAccountsSet(P_MANDT='902',P_VERSN='INT',P_KTOPL='INT')/Result",
 				filters: [new Filter({path: "GLAccountName", operator: "EQ", value1: "DoesNotExist"})]
 			}
-		}, function(oTable) {
-			new Promise(function(resolve) {
-				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", function() {
+		}, (oTable) => {
+			new Promise((resolve) => {
+				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", () => {
 					// the underlying TreeBinding adapter is loaded async and therefore no requests are pending
 					// this means the no data message is visible
 					TableQUnitUtils.assertNoDataVisible(assert, oTable, true);
 					resolve();
 				});
-			}).then(oTable.qunit.whenRenderingFinished).then(function() {
+			}).then(oTable.qunit.rendered).then(() => {
 				TableQUnitUtils.assertNoDataVisible(assert, oTable, true);
 				done();
 			});
 		});
 	});
 
-	QUnit.test("Filter", function(assert) {
+	QUnit.test("Filter", async function(assert) {
 		const that = this;
 
 		this.oTable.getBinding().filter(new Filter({path: "GLAccountName", operator: "EQ", value1: "DoesNotExist"}), "Application");
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Filter");
-			that.assertNoDataVisibilityChangeCount(assert, 1);
-			that.oTable.getBinding().filter(undefined, "Application");
-		}).then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Remove filter");
-			that.assertNoDataVisibilityChangeCount(assert, 1);
-		});
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Filter");
+		that.assertNoDataVisibilityChangeCount(assert, 1);
+		that.oTable.getBinding().filter(undefined, "Application");
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Remove filter");
+		that.assertNoDataVisibilityChangeCount(assert, 1);
 	});
 
 	QUnit.test("Rerender while filtering", async function(assert) {
@@ -847,43 +845,42 @@ sap.ui.define([
 
 		this.oTable.getBinding().filter(new Filter({path: "GLAccountName", operator: "EQ", value1: "DoesNotExist"}), "Application");
 		this.oTable.invalidate();
-		await this.oTable.qunit.whenBindingChange();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Filter");
 		that.assertNoDataVisibilityChangeCount(assert, 1);
 
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Rerender");
 		that.assertNoDataVisibilityChangeCount(assert, 0);
 
 		that.oTable.getBinding().filter(undefined, "Application");
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenBindingChange();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Remove Filter");
 		that.assertNoDataVisibilityChangeCount(assert, 1);
 
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Rerender");
 		that.assertNoDataVisibilityChangeCount(assert, 0);
 	});
 
-	QUnit.test("Bind/Unbind", function(assert) {
+	QUnit.test("Bind/Unbind", async function(assert) {
 		const oBindingInfo = this.oTable.getBindingInfo("rows");
 		const that = this;
 
 		this.oTable.unbindRows();
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Unbind");
-			that.assertNoDataVisibilityChangeCount(assert, 1);
-			oBindingInfo.parameters.rootLevel = 1;
-			that.oTable.bindRows(oBindingInfo);
-		}).then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Bind");
-			that.assertNoDataVisibilityChangeCount(assert, 1);
-		});
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Unbind");
+		that.assertNoDataVisibilityChangeCount(assert, 1);
+		oBindingInfo.parameters.rootLevel = 1;
+		that.oTable.bindRows(oBindingInfo);
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Bind");
+		that.assertNoDataVisibilityChangeCount(assert, 1);
 	});
 
 	QUnit.test("Rerender while binding/unbinding", async function(assert) {
@@ -892,26 +889,26 @@ sap.ui.define([
 
 		this.oTable.unbindRows();
 		this.oTable.invalidate();
-		await this.oTable.qunit.whenBindingChange();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Unbind");
 		that.assertNoDataVisibilityChangeCount(assert, 1);
 
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Rerender");
 		that.assertNoDataVisibilityChangeCount(assert, 0);
 
 		oBindingInfo.parameters.rootLevel = 1;
 		that.oTable.bindRows(oBindingInfo);
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenBindingChange();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Bind");
 		that.assertNoDataVisibilityChangeCount(assert, 1);
 
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Rerender");
 		that.assertNoDataVisibilityChangeCount(assert, 0);
 	});

@@ -30,39 +30,37 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Initialization", function(assert) {
+	QUnit.test("Initialization", async function(assert) {
 		// The synchronization extension should be loaded asynchronously on demand.
 		assert.strictEqual(undefined, this.oTable._getSyncExtension, "Before initialization, the extension getter does not exist");
 		assert.ok(!ExtensionBase.isEnrichedWith(this.oTable, "sap.ui.table.extensions.Synchronization"),
 			"Before initialization, the table is not enriched with the synchronization extension");
 
-		return this.oTable._enableSynchronization().then((oSyncInterface) => {
-			const oExtension = this.oTable._getSyncExtension();
-			let iDelegateCount = 0;
+		const oSyncInterface = await this.oTable._enableSynchronization();
+		const oExtension = this.oTable._getSyncExtension();
+		let iDelegateCount = 0;
 
-			assert.ok(oExtension, "Extension available in table");
-			assert.ok(oSyncInterface != null && oExtension.getInterface() === oSyncInterface,
-				"Promise resolved with the synchronization extension interface");
-			assert.notStrictEqual(oSyncInterface, oExtension, "The interface is not the extension itself");
+		assert.ok(oExtension, "Extension available in table");
+		assert.ok(oSyncInterface != null && oExtension.getInterface() === oSyncInterface,
+			"Promise resolved with the synchronization extension interface");
+		assert.notStrictEqual(oSyncInterface, oExtension, "The interface is not the extension itself");
 
-			for (let i = 0; i < this.oTable.aDelegates.length; i++) {
-				if (this.oTable.aDelegates[i].oDelegate === oExtension._delegate) {
-					iDelegateCount++;
-				}
+		for (let i = 0; i < this.oTable.aDelegates.length; i++) {
+			if (this.oTable.aDelegates[i].oDelegate === oExtension._delegate) {
+				iDelegateCount++;
 			}
+		}
 
-			assert.equal(iDelegateCount, 1, "Sync Delegate registered");
-		});
+		assert.equal(iDelegateCount, 1, "Sync Delegate registered");
 	});
 
-	QUnit.test("Destruction", function(assert) {
-		return this.oTable._enableSynchronization().then(() => {
-			const oExtension = this.oTable._getSyncExtension();
+	QUnit.test("Destruction", async function(assert) {
+		await this.oTable._enableSynchronization();
+		const oExtension = this.oTable._getSyncExtension();
 
-			this.oTable.destroy();
-			assert.ok(!oExtension.getTable(), "Reference to table removed");
-			assert.ok(!oExtension._delegate, "Delegate cleared");
-		});
+		this.oTable.destroy();
+		assert.ok(!oExtension.getTable(), "Reference to table removed");
+		assert.ok(!oExtension._delegate, "Delegate cleared");
 	});
 
 	QUnit.module("Synchronization hooks", {
@@ -75,33 +73,30 @@ sap.ui.define([
 				models: TableQUnitUtils.createJSONModelWithEmptyRows(10)
 			});
 
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
 		}
 	});
 
-	QUnit.test("No sync when initializing synchronization", function(assert) {
+	QUnit.test("No sync when initializing synchronization", async function(assert) {
 		const oTable = this.oTable;
-		let oSyncInterface;
 
-		return oTable._enableSynchronization().then(function(_oSyncInterface) {
-			oSyncInterface = _oSyncInterface;
-			oSyncInterface.rowCount = sinon.spy();
-			oSyncInterface.rowSelection = sinon.spy();
-			oSyncInterface.rowHover = sinon.spy();
-			oSyncInterface.rowHeights = sinon.spy();
-			oSyncInterface.innerVerticalScrollPosition = sinon.spy();
-			oSyncInterface.layout = sinon.spy();
-		}).then(() => TableQUnitUtils.wait(0)).then(function() {
-			assert.ok(oSyncInterface.rowCount.notCalled, "The row count was not synced");
-			assert.ok(oSyncInterface.rowSelection.notCalled, "The row selection was not synced");
-			assert.ok(oSyncInterface.rowHover.notCalled, "The row hover state was not synced");
-			assert.ok(oSyncInterface.rowHeights.notCalled, "The row heights were not synced");
-			assert.ok(oSyncInterface.innerVerticalScrollPosition.notCalled, "The inner vertical scroll position was not synced");
-			assert.ok(oSyncInterface.layout.notCalled, "The layout was not synced");
-		});
+		const oSyncInterface = await oTable._enableSynchronization();
+		oSyncInterface.rowCount = sinon.spy();
+		oSyncInterface.rowSelection = sinon.spy();
+		oSyncInterface.rowHover = sinon.spy();
+		oSyncInterface.rowHeights = sinon.spy();
+		oSyncInterface.innerVerticalScrollPosition = sinon.spy();
+		oSyncInterface.layout = sinon.spy();
+		await TableQUnitUtils.sleep(0);
+		assert.ok(oSyncInterface.rowCount.notCalled, "The row count was not synced");
+		assert.ok(oSyncInterface.rowSelection.notCalled, "The row selection was not synced");
+		assert.ok(oSyncInterface.rowHover.notCalled, "The row hover state was not synced");
+		assert.ok(oSyncInterface.rowHeights.notCalled, "The row heights were not synced");
+		assert.ok(oSyncInterface.innerVerticalScrollPosition.notCalled, "The inner vertical scroll position was not synced");
+		assert.ok(oSyncInterface.layout.notCalled, "The layout was not synced");
 	});
 
 	QUnit.test("Sync row count", async function(assert) {
@@ -110,18 +105,18 @@ sap.ui.define([
 		oSyncInterface.rowCount = sinon.spy();
 
 		this.oTable.getRowMode().setRowCount(4);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.ok(oSyncInterface.rowCount.calledWithExactly(4), "Row count changed: The correct row count was synced");
 		assert.strictEqual(oSyncInterface.rowCount.callCount, 1, "The row count was synced once");
 		oSyncInterface.rowCount.resetHistory();
 
 		this.oTable.getRowMode().setRowCount(4);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.ok(oSyncInterface.rowCount.notCalled, "Row count not changed (but setter called): The row count was not synced");
 		oSyncInterface.rowCount.resetHistory();
 
 		this.oTable.setRowMode(RowModeType.Auto);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.ok(oSyncInterface.rowCount.calledWithExactly(0), "Switched to row mode Auto: A count of 0 was synced");
 		assert.ok(oSyncInterface.rowCount.calledWithExactly(this.oTable.getRows().length),
@@ -131,7 +126,7 @@ sap.ui.define([
 
 		this.oTable._bVariableRowHeightEnabled = true;
 		this.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.ok(oSyncInterface.rowCount.calledWithExactly(this.oTable.getRows().length),
 			"Variable row heights enabled: The correct row count was synced");
@@ -143,127 +138,118 @@ sap.ui.define([
 		assert.strictEqual(oSyncInterface.rowCount.callCount, 1, "Unbind rows: The row count was synced once");
 		oSyncInterface.rowCount.resetHistory();
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.oTable.bindRows({path: "/"});
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.ok(oSyncInterface.rowCount.calledWithExactly(this.oTable.getRows().length), "Bind rows: The correct row count was synced");
 		assert.strictEqual(oSyncInterface.rowCount.callCount, 1, "The row count was synced once");
 	});
 
-	QUnit.test("Sync row selection", function(assert) {
+	QUnit.test("Sync row selection", async function(assert) {
 		const oTable = this.oTable;
-		let oSyncInterface;
 
-		return oTable._enableSynchronization().then(function(_oSyncInterface) {
-			oSyncInterface = _oSyncInterface;
-			oSyncInterface.rowSelection = sinon.spy();
+		const oSyncInterface = await oTable._enableSynchronization();
+		oSyncInterface.rowSelection = sinon.spy();
 
-			oTable.setSelectedIndex(0);
-			if (oSyncInterface.rowSelection.callCount === 3) {
-				assert.ok(true, "Selection changed: The selection of all 3 rows was synced");
-				assert.ok(oSyncInterface.rowSelection.getCall(0).calledWithExactly(0, true), "The correct selection state of row 1 was synced");
-				assert.ok(oSyncInterface.rowSelection.getCall(1).calledWithExactly(1, false), "The correct selection state of row 2 was synced");
-				assert.ok(oSyncInterface.rowSelection.getCall(2).calledWithExactly(2, false), "The correct selection state of row 3 was synced");
-			} else {
-				assert.ok(false, "Selection changed: The selection of all 3 rows should have been synced");
-			}
-			oSyncInterface.rowSelection.resetHistory();
+		oTable.setSelectedIndex(0);
+		if (oSyncInterface.rowSelection.callCount === 3) {
+			assert.ok(true, "Selection changed: The selection of all 3 rows was synced");
+			assert.ok(oSyncInterface.rowSelection.getCall(0).calledWithExactly(0, true), "The correct selection state of row 1 was synced");
+			assert.ok(oSyncInterface.rowSelection.getCall(1).calledWithExactly(1, false), "The correct selection state of row 2 was synced");
+			assert.ok(oSyncInterface.rowSelection.getCall(2).calledWithExactly(2, false), "The correct selection state of row 3 was synced");
+		} else {
+			assert.ok(false, "Selection changed: The selection of all 3 rows should have been synced");
+		}
+		oSyncInterface.rowSelection.resetHistory();
 
-		}).then(function() {
-			oTable.unbindRows(); // No Binding, no rows, no selection.
-			oTable.setSelectedIndex(1);
-			assert.ok(oSyncInterface.rowSelection.notCalled, "No rows: The row selection was not synced");
+		oTable.unbindRows(); // No Binding, no rows, no selection.
+		oTable.setSelectedIndex(1);
+		assert.ok(oSyncInterface.rowSelection.notCalled, "No rows: The row selection was not synced");
 
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			oTable.setSelectedIndex(2);
-			assert.ok(oSyncInterface.rowSelection.notCalled, "No rows: The row selection was not synced");
+		await oTable.qunit.rendered();
+		oTable.setSelectedIndex(2);
+		assert.ok(oSyncInterface.rowSelection.notCalled, "No rows: The row selection was not synced");
 
-		}).then(function() {
-			oTable.bindRows({path: "/"});
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			oSyncInterface.rowSelection.resetHistory();
-			oTable.setSelectedIndex(0);
+		oTable.bindRows({path: "/"});
+		await oTable.qunit.rendered();
+		oSyncInterface.rowSelection.resetHistory();
+		oTable.setSelectedIndex(0);
 
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			if (oSyncInterface.rowSelection.callCount === 3) {
-				assert.ok(true, "Selection changed: The selection of all 3 rows was synced");
-				assert.ok(oSyncInterface.rowSelection.getCall(0).calledWithExactly(0, true), "The correct selection state of row 1 was synced");
-				assert.ok(oSyncInterface.rowSelection.getCall(1).calledWithExactly(1, false), "The correct selection state of row 2 was synced");
-				assert.ok(oSyncInterface.rowSelection.getCall(2).calledWithExactly(2, false), "The correct selection state of row 3 was synced");
-			} else {
-				assert.ok(false, "Selection changed: The selection of all 3 rows should have been synced");
-			}
-			oSyncInterface.rowSelection.resetHistory();
+		await oTable.qunit.rendered();
+		if (oSyncInterface.rowSelection.callCount === 3) {
+			assert.ok(true, "Selection changed: The selection of all 3 rows was synced");
+			assert.ok(oSyncInterface.rowSelection.getCall(0).calledWithExactly(0, true), "The correct selection state of row 1 was synced");
+			assert.ok(oSyncInterface.rowSelection.getCall(1).calledWithExactly(1, false), "The correct selection state of row 2 was synced");
+			assert.ok(oSyncInterface.rowSelection.getCall(2).calledWithExactly(2, false), "The correct selection state of row 3 was synced");
+		} else {
+			assert.ok(false, "Selection changed: The selection of all 3 rows should have been synced");
+		}
+		oSyncInterface.rowSelection.resetHistory();
 
-		}).then(function() {
-			oTable.setFirstVisibleRow(1);
-			oTable.setSelectedIndex(2);
+		oTable.setFirstVisibleRow(1);
+		oTable.setSelectedIndex(2);
 
-			// After the selection update triggered by #setSelectedIndex.
-			if (oSyncInterface.rowSelection.callCount === 3) {
-				assert.ok(true, "Selection changed: The selection of all 3 rows was synced");
-				assert.ok(oSyncInterface.rowSelection.getCall(0).calledWithExactly(0, false), "The correct selection state of row 1 was synced");
-				assert.ok(oSyncInterface.rowSelection.getCall(1).calledWithExactly(1, true), "The correct selection state of row 2 was synced");
-				assert.ok(oSyncInterface.rowSelection.getCall(2).calledWithExactly(2, false), "The correct selection state of row 3 was synced");
-			} else {
-				assert.ok(false, "Selection changed: The selection of all 3 rows should have been synced");
-			}
-			oSyncInterface.rowSelection.resetHistory();
+		// After the selection update triggered by #setSelectedIndex.
+		if (oSyncInterface.rowSelection.callCount === 3) {
+			assert.ok(true, "Selection changed: The selection of all 3 rows was synced");
+			assert.ok(oSyncInterface.rowSelection.getCall(0).calledWithExactly(0, false), "The correct selection state of row 1 was synced");
+			assert.ok(oSyncInterface.rowSelection.getCall(1).calledWithExactly(1, true), "The correct selection state of row 2 was synced");
+			assert.ok(oSyncInterface.rowSelection.getCall(2).calledWithExactly(2, false), "The correct selection state of row 3 was synced");
+		} else {
+			assert.ok(false, "Selection changed: The selection of all 3 rows should have been synced");
+		}
+		oSyncInterface.rowSelection.resetHistory();
 
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			// After the rows update triggered by #setFirstVisibleRow.
-			if (oSyncInterface.rowSelection.callCount === 3) {
-				assert.ok(true, "Selection changed: The selection of all 3 rows was synced");
-				assert.ok(oSyncInterface.rowSelection.getCall(0).calledWithExactly(0, false), "The correct selection state of row 1 was synced");
-				assert.ok(oSyncInterface.rowSelection.getCall(1).calledWithExactly(1, true), "The correct selection state of row 2 was synced");
-				assert.ok(oSyncInterface.rowSelection.getCall(2).calledWithExactly(2, false), "The correct selection state of row 3 was synced");
-			} else {
-				assert.ok(false, "Selection changed: The selection of all 3 rows should have been synced");
-			}
-			oSyncInterface.rowSelection.resetHistory();
+		await oTable.qunit.rendered();
+		// After the rows update triggered by #setFirstVisibleRow.
+		if (oSyncInterface.rowSelection.callCount === 3) {
+			assert.ok(true, "Selection changed: The selection of all 3 rows was synced");
+			assert.ok(oSyncInterface.rowSelection.getCall(0).calledWithExactly(0, false), "The correct selection state of row 1 was synced");
+			assert.ok(oSyncInterface.rowSelection.getCall(1).calledWithExactly(1, true), "The correct selection state of row 2 was synced");
+			assert.ok(oSyncInterface.rowSelection.getCall(2).calledWithExactly(2, false), "The correct selection state of row 3 was synced");
+		} else {
+			assert.ok(false, "Selection changed: The selection of all 3 rows should have been synced");
+		}
+		oSyncInterface.rowSelection.resetHistory();
 
-		}).then(function() {
-			oTable.setSelectedIndex(2); // No change of selection.
-			assert.ok(oSyncInterface.rowSelection.notCalled, "No selection change: The row selection was not synced");
+		oTable.setSelectedIndex(2); // No change of selection.
+		assert.ok(oSyncInterface.rowSelection.notCalled, "No selection change: The row selection was not synced");
 
-		}).then(function() {
-			oTable.addSelectionInterval(3, 3);
-			oTable.clearSelection();
+		oTable.addSelectionInterval(3, 3);
+		oTable.clearSelection();
 
-			if (oSyncInterface.rowSelection.callCount === 6) {
-				assert.ok(true, "The row selection was synced 2 times for all 3 rows");
-				// addSelectionInterval
-				assert.ok(oSyncInterface.rowSelection.getCall(0).calledWithExactly(0, false), "The correct selection state of row 1 was synced");
-				assert.ok(oSyncInterface.rowSelection.getCall(1).calledWithExactly(1, true), "The correct selection state of row 2 was synced");
-				assert.ok(oSyncInterface.rowSelection.getCall(2).calledWithExactly(2, true), "The correct selection state of row 3 was synced");
-				// clearSelection
-				assert.ok(oSyncInterface.rowSelection.getCall(3).calledWithExactly(0, false), "The correct selection state of row 1 was synced");
-				assert.ok(oSyncInterface.rowSelection.getCall(4).calledWithExactly(1, false), "The correct selection state of row 2 was synced");
-				assert.ok(oSyncInterface.rowSelection.getCall(5).calledWithExactly(2, false), "The correct selection state of row 3 was synced");
-			} else {
-				assert.ok(false, "The row selection should have been synced 2 times for all 3 rows");
-			}
-		});
+		if (oSyncInterface.rowSelection.callCount === 6) {
+			assert.ok(true, "The row selection was synced 2 times for all 3 rows");
+			// addSelectionInterval
+			assert.ok(oSyncInterface.rowSelection.getCall(0).calledWithExactly(0, false), "The correct selection state of row 1 was synced");
+			assert.ok(oSyncInterface.rowSelection.getCall(1).calledWithExactly(1, true), "The correct selection state of row 2 was synced");
+			assert.ok(oSyncInterface.rowSelection.getCall(2).calledWithExactly(2, true), "The correct selection state of row 3 was synced");
+			// clearSelection
+			assert.ok(oSyncInterface.rowSelection.getCall(3).calledWithExactly(0, false), "The correct selection state of row 1 was synced");
+			assert.ok(oSyncInterface.rowSelection.getCall(4).calledWithExactly(1, false), "The correct selection state of row 2 was synced");
+			assert.ok(oSyncInterface.rowSelection.getCall(5).calledWithExactly(2, false), "The correct selection state of row 3 was synced");
+		} else {
+			assert.ok(false, "The row selection should have been synced 2 times for all 3 rows");
+		}
 	});
 
-	QUnit.test("Sync row hover", function(assert) {
+	QUnit.test("Sync row hover", async function(assert) {
 		const oTable = this.oTable;
 
-		return oTable._enableSynchronization().then(function(oSyncInterface) {
-			oSyncInterface.rowHover = sinon.spy();
+		const oSyncInterface = await oTable._enableSynchronization();
+		oSyncInterface.rowHover = sinon.spy();
 
-			oTable.setFirstVisibleRow(1);
-			oTable.getRows()[0]._setHovered(true);
-			oTable.getRows()[0]._setHovered(false);
+		oTable.setFirstVisibleRow(1);
+		oTable.getRows()[0]._setHovered(true);
+		oTable.getRows()[0]._setHovered(false);
 
-			if (oSyncInterface.rowHover.callCount === 2) {
-				assert.ok(true, "The row hover state was synced 2 times");
-				assert.ok(oSyncInterface.rowHover.getCall(0).calledWithExactly(0, true), "Hovering of the row was synced");
-				assert.ok(oSyncInterface.rowHover.getCall(1).calledWithExactly(0, false), "Unhovering of the row was synced");
-			} else {
-				assert.ok(false, "The row hover state should have been synced 2 times");
-			}
-		});
+		if (oSyncInterface.rowHover.callCount === 2) {
+			assert.ok(true, "The row hover state was synced 2 times");
+			assert.ok(oSyncInterface.rowHover.getCall(0).calledWithExactly(0, true), "Hovering of the row was synced");
+			assert.ok(oSyncInterface.rowHover.getCall(1).calledWithExactly(0, false), "Unhovering of the row was synced");
+		} else {
+			assert.ok(false, "The row hover state should have been synced 2 times");
+		}
 	});
 
 	QUnit.test("Sync row heights", async function(assert) {
@@ -273,7 +259,7 @@ sap.ui.define([
 		oSyncInterface.rowHeights = sinon.spy();
 
 		this.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.equal(oSyncInterface.rowHeights.callCount, 2, "The row heights were synced 2 times");
 		assert.ok(oSyncInterface.rowHeights.getCall(0).calledWithExactly([iRowHeight, iRowHeight, iRowHeight]),
@@ -289,7 +275,7 @@ sap.ui.define([
 
 		this.oTable._bVariableRowHeightEnabled = true;
 		this.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.ok(oSyncInterface.innerVerticalScrollPosition.calledWithExactly(0),
 			"After rendering: The inner vertical scroll position was correctly synced");
 		assert.strictEqual(oSyncInterface.innerVerticalScrollPosition.callCount, 1,
@@ -298,7 +284,7 @@ sap.ui.define([
 
 		await Promise.all([
 			this.oTable.qunit.scrollVSbTo(23),
-			this.oTable.qunit.whenViewportScrolled()
+			this.oTable.qunit.viewportScrolled()
 		]);
 		assert.ok(oSyncInterface.innerVerticalScrollPosition.calledWithExactly(23),
 			"After scrolling: The inner vertical scroll position was correctly synced");
@@ -312,7 +298,7 @@ sap.ui.define([
 		oSyncInterface.layout = sinon.spy();
 
 		this.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.ok(oSyncInterface.layout.calledWithExactly({
 			top: this.oTable.getDomRef("sapUiTableCnt").offsetTop,
 			headerHeight: this.oTable.getDomRef().querySelector(".sapUiTableColHdrCnt").getBoundingClientRect().height,
@@ -336,25 +322,24 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Sync row selection", function(assert) {
+	QUnit.test("Sync row selection", async function(assert) {
 		const oTable = this.oTable;
 
-		return oTable._enableSynchronization().then(function(oSyncInterface) {
-			oTable.setFirstVisibleRow(1);
-			oSyncInterface.syncRowSelection(1, true);
-			assert.deepEqual(oTable.getSelectedIndices(), [2], "The correct index was selected");
+		const oSyncInterface = await oTable._enableSynchronization();
+		oTable.setFirstVisibleRow(1);
+		oSyncInterface.syncRowSelection(1, true);
+		assert.deepEqual(oTable.getSelectedIndices(), [2], "The correct index was selected");
 
-			oSyncInterface.syncRowSelection(1, true);
-			assert.deepEqual(oTable.getSelectedIndices(), [2], "The selection should not change, if the same row is selected again");
+		oSyncInterface.syncRowSelection(1, true);
+		assert.deepEqual(oTable.getSelectedIndices(), [2], "The selection should not change, if the same row is selected again");
 
-			oTable.setFirstVisibleRow(0);
-			oSyncInterface.syncRowSelection(2, false);
-			assert.deepEqual(oTable.getSelectedIndices(), [], "The correct index was deselected");
+		oTable.setFirstVisibleRow(0);
+		oSyncInterface.syncRowSelection(2, false);
+		assert.deepEqual(oTable.getSelectedIndices(), [], "The correct index was deselected");
 
-			oTable.setSelectionMode(library.SelectionMode.None);
-			oSyncInterface.syncRowSelection(0, true);
-			assert.deepEqual(oTable.getSelectedIndices(), [], "SelectionMode=None: No selection was performed");
-		});
+		oTable.setSelectionMode(library.SelectionMode.None);
+		oSyncInterface.syncRowSelection(0, true);
+		assert.deepEqual(oTable.getSelectedIndices(), [], "SelectionMode=None: No selection was performed");
 	});
 
 	QUnit.test("Sync row hover", async function(assert) {
@@ -362,7 +347,7 @@ sap.ui.define([
 			return this.oTable.getRows()[iIndex].getDomRef().classList.contains("sapUiTableRowHvr");
 		};
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		const oSyncInterface = await this.oTable._enableSynchronization();
 
 		this.oTable.setFirstVisibleRow(1);
@@ -382,9 +367,8 @@ sap.ui.define([
 		assert.ok(isRowHovered(2), "The third rendered row is hovered");
 	});
 
-	QUnit.test("Register vertical scrolling", function(assert) {
+	QUnit.test("Register vertical scrolling", async function(assert) {
 		const oTable = this.oTable;
-		let oSynchronizationInterface;
 		const Div1 = document.createElement("div");
 		const Div2 = document.createElement("div");
 		const Div3 = document.createElement("div");
@@ -439,7 +423,7 @@ sap.ui.define([
 				oTargetElement.dispatchEvent(createWheelEvent(iScrollDelta, true));
 				oTargetElement.dispatchEvent(createWheelEvent(iScrollDelta, false));
 
-				return TableQUnitUtils.wait(100);
+				return TableQUnitUtils.sleep(100);
 			};
 		}
 
@@ -450,7 +434,7 @@ sap.ui.define([
 				oTargetElement.dispatchEvent(createTouchStartEvent(oTargetElement));
 				oTargetElement.dispatchEvent(createTouchMoveEvent(oTargetElement, iScrollDelta, false));
 
-				return TableQUnitUtils.wait(100);
+				return TableQUnitUtils.sleep(100);
 			};
 		}
 
@@ -471,125 +455,140 @@ sap.ui.define([
 			oVSb.scrollTop = 0;
 			oHSb.scrollLeft = 0;
 
-			return TableQUnitUtils.wait(100);
+			return TableQUnitUtils.sleep(100);
 		}
 
-		return oTable
-			.qunit.whenRenderingFinished()
-			.then(function() {
-				return oTable._enableSynchronization().then(function(oSyncInterface) {
-					oSynchronizationInterface = oSyncInterface;
+		await oTable.qunit.rendered();
+		const oSynchronizationInterface = await oTable._enableSynchronization();
 
-					// Should not throw an error
-					oSynchronizationInterface.registerVerticalScrolling();
-					oSynchronizationInterface.registerVerticalScrolling({});
-					oSynchronizationInterface.registerVerticalScrolling({wheelAreas: undefined});
+		// Should not throw an error
+		oSynchronizationInterface.registerVerticalScrolling();
+		oSynchronizationInterface.registerVerticalScrolling({});
+		oSynchronizationInterface.registerVerticalScrolling({wheelAreas: undefined});
 
-					oSynchronizationInterface.registerVerticalScrolling({
-						wheelAreas: [Div1, Div2],
-						touchAreas: [Div1, Div3]
-					});
-				});
-			})
-			.then(scrollWithMouseWheel(Div1, iBaseRowHeight)).then(assertScrollPositions(iBaseRowHeight)).then(resetScrollPositions)
-			.then(scrollWithMouseWheel(Div2, iBaseRowHeight)).then(assertScrollPositions(iBaseRowHeight)).then(resetScrollPositions)
-			.then(scrollWithMouseWheel(Div3, iBaseRowHeight)).then(assertScrollPositions(0)).then(resetScrollPositions)
-			.then(scrollWithTouch(Div1, iBaseRowHeight)).then(assertScrollPositions(iBaseRowHeight)).then(resetScrollPositions)
-			.then(scrollWithTouch(Div2, iBaseRowHeight)).then(assertScrollPositions(0)).then(resetScrollPositions)
-			.then(scrollWithTouch(Div3, iBaseRowHeight)).then(assertScrollPositions(iBaseRowHeight)).then(resetScrollPositions)
-			.then(function() {
-				oSynchronizationInterface.registerVerticalScrolling({
-					wheelAreas: [Div1],
-					touchAreas: [Div3]
-				});
-			})
-			.then(scrollWithMouseWheel(Div1, iBaseRowHeight)).then(assertScrollPositions(iBaseRowHeight)).then(resetScrollPositions)
-			.then(scrollWithMouseWheel(Div2, iBaseRowHeight)).then(assertScrollPositions(0)).then(resetScrollPositions)
-			.then(scrollWithTouch(Div1, iBaseRowHeight)).then(assertScrollPositions(0)).then(resetScrollPositions)
-			.then(scrollWithTouch(Div3, iBaseRowHeight)).then(assertScrollPositions(iBaseRowHeight)).then(resetScrollPositions)
-			.then(function() {
-				oSynchronizationInterface.deregisterVerticalScrolling();
-			})
-			.then(scrollWithMouseWheel(Div1, iBaseRowHeight)).then(assertScrollPositions(0)).then(resetScrollPositions)
-			.then(scrollWithTouch(Div3, iBaseRowHeight)).then(assertScrollPositions(0)).then(resetScrollPositions)
-			.then(function() {
-				Device.support.pointer = bOriginalPointerSupport;
-				Device.support.touch = bOriginalTouchSupport;
-			});
+		oSynchronizationInterface.registerVerticalScrolling({
+			wheelAreas: [Div1, Div2],
+			touchAreas: [Div1, Div3]
+		});
+
+		await scrollWithMouseWheel(Div1, iBaseRowHeight)();
+		assertScrollPositions(iBaseRowHeight)();
+		await resetScrollPositions();
+		await scrollWithMouseWheel(Div2, iBaseRowHeight)();
+		assertScrollPositions(iBaseRowHeight)();
+		await resetScrollPositions();
+		await scrollWithMouseWheel(Div3, iBaseRowHeight)();
+		assertScrollPositions(0)();
+		await resetScrollPositions();
+		await scrollWithTouch(Div1, iBaseRowHeight)();
+		assertScrollPositions(iBaseRowHeight)();
+		await resetScrollPositions();
+		await scrollWithTouch(Div2, iBaseRowHeight)();
+		assertScrollPositions(0)();
+		await resetScrollPositions();
+		await scrollWithTouch(Div3, iBaseRowHeight)();
+		assertScrollPositions(iBaseRowHeight)();
+		await resetScrollPositions();
+
+		oSynchronizationInterface.registerVerticalScrolling({
+			wheelAreas: [Div1],
+			touchAreas: [Div3]
+		});
+
+		await scrollWithMouseWheel(Div1, iBaseRowHeight)();
+		assertScrollPositions(iBaseRowHeight)();
+		await resetScrollPositions();
+		await scrollWithMouseWheel(Div2, iBaseRowHeight)();
+		assertScrollPositions(0)();
+		await resetScrollPositions();
+		await scrollWithTouch(Div1, iBaseRowHeight)();
+		assertScrollPositions(0)();
+		await resetScrollPositions();
+		await scrollWithTouch(Div3, iBaseRowHeight)();
+		assertScrollPositions(iBaseRowHeight)();
+		await resetScrollPositions();
+
+		oSynchronizationInterface.deregisterVerticalScrolling();
+
+		await scrollWithMouseWheel(Div1, iBaseRowHeight)();
+		assertScrollPositions(0)();
+		await resetScrollPositions();
+		await scrollWithTouch(Div3, iBaseRowHeight)();
+		assertScrollPositions(0)();
+		await resetScrollPositions();
+
+		Device.support.pointer = bOriginalPointerSupport;
+		Device.support.touch = bOriginalTouchSupport;
 	});
 
-	QUnit.skip("Place vertical scrollbar at", function(assert) {
+	QUnit.skip("Place vertical scrollbar at", async function(assert) {
 		const oTable = this.oTable;
 		const Div = document.createElement("div");
 		const oInternalVSb = oTable._getScrollExtension().getVerticalScrollbar();
 		const sInternalVSbId = oInternalVSb.getAttribute("id");
-		let oExternalVSbContainer;
 		const oTableInvalidate = sinon.spy(oTable, "invalidate");
-		let oSyncInterface;
 
 		Div.appendChild(document.createElement("div"));
 		Div.appendChild(document.createElement("div"));
 		document.getElementById("qunit-fixture").appendChild(Div);
 
-		return oTable._enableSynchronization().then(function(_oSyncInterface) {
-			oSyncInterface = _oSyncInterface;
+		const oSyncInterface = await oTable._enableSynchronization();
 
-			// The table will be invalidated.
-			oSyncInterface.placeVerticalScrollbarAt(Div);
-			oExternalVSbContainer = Div.firstChild;
+		// The table will be invalidated.
+		oSyncInterface.placeVerticalScrollbarAt(Div);
+		const oExternalVSbContainer = Div.firstChild;
 
-			assert.ok(oTableInvalidate.calledOnce, "The table was invalidated");
-			assert.strictEqual(Div.childElementCount, 1, "The container contains only one element");
-			oTableInvalidate.resetHistory();
+		assert.ok(oTableInvalidate.calledOnce, "The table was invalidated");
+		assert.strictEqual(Div.childElementCount, 1, "The container contains only one element");
+		oTableInvalidate.resetHistory();
 
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			const oExternalVSb = oTable._getScrollExtension().getVerticalScrollbar();
-			const sExternalVSbId = oExternalVSb.getAttribute("id");
-			const oDomRef = oTable.getDomRef();
+		await oTable.qunit.rendered();
+		const oExternalVSb = oTable._getScrollExtension().getVerticalScrollbar();
+		const sExternalVSbId = oExternalVSb.getAttribute("id");
+		const oDomRef = oTable.getDomRef();
 
-			assert.notEqual(oExternalVSb, oInternalVSb, "The new external and the old internal scrollbars are different elements");
-			assert.strictEqual(sExternalVSbId, sInternalVSbId, "The external scrollbar has the same id as the old internal scrollbar");
-			assert.ok(Div.contains(oExternalVSb), "The external scrollbar is placed in the correct container");
-			assert.equal(oDomRef.querySelector(sInternalVSbId), null, "The table's DOM does not contain the vertical scrollbar");
-			assert.ok(!oDomRef.classList.contains("sapUiTableVScr"), "The table's element does not contain the 'sapUiTableVScr' CSS class");
+		assert.notEqual(oExternalVSb, oInternalVSb, "The new external and the old internal scrollbars are different elements");
+		assert.strictEqual(sExternalVSbId, sInternalVSbId, "The external scrollbar has the same id as the old internal scrollbar");
+		assert.ok(Div.contains(oExternalVSb), "The external scrollbar is placed in the correct container");
+		assert.equal(oDomRef.querySelector(sInternalVSbId), null, "The table's DOM does not contain the vertical scrollbar");
+		assert.ok(!oDomRef.classList.contains("sapUiTableVScr"), "The table's element does not contain the 'sapUiTableVScr' CSS class");
 
-			// Invalidate the table and remove the external scrollbar from DOM. This simulates the situation where the parent of the table was
-			// invalidated. The user of the synchronization is supposed to call placeVerticalScrollbarAt again in onAfterRendering. The table should
-			// still have the reference to the external scrollbar in this situation and insert it back into the DOM.
-			oTable.invalidate();
-			oTableInvalidate.resetHistory();
-			Div.firstChild.remove();
+		// Invalidate the table and remove the external scrollbar from DOM. This simulates the situation where the parent of the table was
+		// invalidated. The user of the synchronization is supposed to call placeVerticalScrollbarAt again in onAfterRendering. The table should
+		// still have the reference to the external scrollbar in this situation and insert it back into the DOM.
+		oTable.invalidate();
+		oTableInvalidate.resetHistory();
+		Div.firstChild.remove();
 
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			const oExternalVSb = oTable._getScrollExtension().getVerticalScrollbar();
-			oSyncInterface.placeVerticalScrollbarAt(Div);
+		await oTable.qunit.rendered();
+		const oExternalVSb2 = oTable._getScrollExtension().getVerticalScrollbar();
+		oSyncInterface.placeVerticalScrollbarAt(Div);
 
-			assert.ok(oTableInvalidate.notCalled, "Insert existing scrollbar back into DOM: The table was not invalidated");
-			assert.equal(Div.firstChild, oExternalVSbContainer, "Insert existing scrollbar back into DOM: Same element was inserted");
-			assert.ok(Div.contains(oExternalVSb), "Insert existing scrollbar back into DOM: External scrollbar is placed in the correct container");
+		assert.ok(oTableInvalidate.notCalled, "Insert existing scrollbar back into DOM: The table was not invalidated");
+		assert.equal(Div.firstChild, oExternalVSbContainer, "Insert existing scrollbar back into DOM: Same element was inserted");
+		assert.ok(Div.contains(oExternalVSb2), "Insert existing scrollbar back into DOM: External scrollbar is placed in the correct container");
 
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			const oExternalVSb = oTable._getScrollExtension().getVerticalScrollbar();
+		await oTable.qunit.rendered();
+		const oExternalVSb3 = oTable._getScrollExtension().getVerticalScrollbar();
 
-			// Scroll the external scrollbar.
-			oExternalVSb.scrollTop = oTable._getBaseRowHeight() * 2;
+		// Scroll the external scrollbar.
+		oExternalVSb3.scrollTop = oTable._getBaseRowHeight() * 2;
 
-		}).then(oTable.qunit.whenNextRowsUpdated).then(function() {
-			assert.strictEqual(oTable.getFirstVisibleRow(), 2, "Scrolling the external scrollbar correctly changes the table's first visible row");
+		await oTable.qunit.rowsUpdated();
+		assert.strictEqual(oTable.getFirstVisibleRow(), 2, "Scrolling the external scrollbar correctly changes the table's first visible row");
 
-			const oOldExternalVSb = oTable._getScrollExtension().getVerticalScrollbar();
-			Div.firstChild.remove();
-			oSyncInterface.placeVerticalScrollbarAt(Div);
+		const oOldExternalVSb = oTable._getScrollExtension().getVerticalScrollbar();
+		Div.firstChild.remove();
+		oSyncInterface.placeVerticalScrollbarAt(Div);
 
-			assert.ok(oTableInvalidate.notCalled, "The table was not invalidated");
-			assert.ok(Div.contains(oOldExternalVSb), "The new external and the old external scrollbars are the same elements");
+		assert.ok(oTableInvalidate.notCalled, "The table was not invalidated");
+		assert.ok(Div.contains(oOldExternalVSb), "The new external and the old external scrollbars are the same elements");
 
-		}).then(() => TableQUnitUtils.wait(100)).then(function() {
-			const oVSb = oTable._getScrollExtension().getVerticalScrollbar();
-			assert.strictEqual(oVSb.scrollTop, oTable._getBaseRowHeight() * 2, "The scrollbar has the correct scroll position");
+		await TableQUnitUtils.sleep(100);
+		const oVSb = oTable._getScrollExtension().getVerticalScrollbar();
+		assert.strictEqual(oVSb.scrollTop, oTable._getBaseRowHeight() * 2, "The scrollbar has the correct scroll position");
 
-			Div.remove();
-		});
+		Div.remove();
 	});
 
 	QUnit.test("Place vertical scrollbar at without an HTMLElement", async function(assert) {
@@ -606,7 +605,7 @@ sap.ui.define([
 		const oContainer = document.createElement("div");
 		document.getElementById("qunit-fixture").appendChild(oContainer);
 
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 		const oSyncInterface = await oTable._enableSynchronization();
 		const oScrollExtension = oTable._getScrollExtension();
 		const oInvalidateSpy = this.spy(oTable, "invalidate");
@@ -621,7 +620,7 @@ sap.ui.define([
 		const oExternalVSb = oContainer.querySelector('[id="' + sVSbId + '"]');
 		assert.ok(oExternalVSb, "The external vertical scrollbar is placed inside the given container");
 
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 		assert.ok(oUpdateHeightSpy.called, "onAfterRendering updated the vertical scrollbar height while external");
 		assert.ok(oUpdateScrollHeightSpy.called, "onAfterRendering updated the vertical scroll height while external");
 
@@ -635,12 +634,12 @@ sap.ui.define([
 		document.getElementById("qunit-fixture").appendChild(oContainer);
 		document.getElementById("qunit-fixture").appendChild(oOtherContainer);
 
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 		const oSyncInterface = await oTable._enableSynchronization();
 		const oScrollExtension = oTable._getScrollExtension();
 
 		oSyncInterface.placeVerticalScrollbarAt(oContainer);
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 
 		const oExternalVSb = oScrollExtension.getVerticalScrollbar();
 		const oVSbParent = oExternalVSb.parentElement;
@@ -657,25 +656,24 @@ sap.ui.define([
 		oOtherContainer.remove();
 	});
 
-	QUnit.test("Render horizontal scrollbar", function(assert) {
+	QUnit.test("Render horizontal scrollbar", async function(assert) {
 		const oTable = this.oTable;
 		const Div = document.createElement("div");
 
 		Div.style.width = "0px";
 		document.getElementById("qunit-fixture").appendChild(Div);
 
-		return oTable._enableSynchronization().then(function(oSyncInterface) {
-			const oRenderManager = new RenderManager().getInterface();
-			oSyncInterface.renderHorizontalScrollbar(oRenderManager, "hsbid", 100);
-			oRenderManager.flush(Div);
+		const oSyncInterface = await oTable._enableSynchronization();
+		const oRenderManager = new RenderManager().getInterface();
+		oSyncInterface.renderHorizontalScrollbar(oRenderManager, "hsbid", 100);
+		oRenderManager.flush(Div);
 
-			const oHSb = Div.firstElementChild;
-			assert.strictEqual(Div.childElementCount, 1, "One element was rendered");
-			assert.strictEqual(oHSb.getAttribute("id"), "hsbid", "The rendered element has the correct id");
-			assert.strictEqual(oHSb.scrollWidth - oHSb.clientWidth, 100, "The rendered element has the correct scroll range");
+		const oHSb = Div.firstElementChild;
+		assert.strictEqual(Div.childElementCount, 1, "One element was rendered");
+		assert.strictEqual(oHSb.getAttribute("id"), "hsbid", "The rendered element has the correct id");
+		assert.strictEqual(oHSb.scrollWidth - oHSb.clientWidth, 100, "The rendered element has the correct scroll range");
 
-			document.getElementById("qunit-fixture").removeChild(Div);
-		});
+		document.getElementById("qunit-fixture").removeChild(Div);
 	});
 
 	QUnit.test("Render horizontal scrollbar without an id", async function(assert) {

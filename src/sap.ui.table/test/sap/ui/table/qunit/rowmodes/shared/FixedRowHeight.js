@@ -35,99 +35,89 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Content", function(assert) {
+	QUnit.test("Content", async function(assert) {
 		const oTable = this.oTable;
-		let pSequence = Promise.resolve();
 
-		function test(mTestSettings) {
-			pSequence = pSequence.then(async function() {
-				oTable.getRowMode().setRowContentHeight(mTestSettings.rowContentHeight || 0);
-				oTable.getColumns()[1].getTemplate().setHeight((mTestSettings.templateHeight || 1) + "px");
-				await oTable.qunit.setDensity(mTestSettings.density);
-				TableQUnitUtils.assertRowHeights(assert, oTable, mTestSettings);
-			});
+		async function test(mTestSettings) {
+			oTable.getRowMode().setRowContentHeight(mTestSettings.rowContentHeight || 0);
+			oTable.getColumns()[1].getTemplate().setHeight((mTestSettings.templateHeight || 1) + "px");
+			await oTable.qunit.setDensity(mTestSettings.density);
+			TableQUnitUtils.assertRowHeights(assert, oTable, mTestSettings);
 		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Default height",
 				density: sDensity,
 				expectedHeight: TableUtils.DefaultRowHeight[sDensity]
 			});
-		});
+		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Default height; With large content",
 				density: sDensity,
 				templateHeight: TableUtils.DefaultRowHeight[sDensity] * 2,
 				expectedHeight: TableUtils.DefaultRowHeight[sDensity]
 			});
-		});
+		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Application-defined height; Less than default",
 				density: sDensity,
 				rowContentHeight: 20,
 				expectedHeight: 21
 			});
-		});
+		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Application-defined height; Less than default; With large content",
 				density: sDensity,
 				rowContentHeight: 20,
 				templateHeight: 100,
 				expectedHeight: 21
 			});
-		});
+		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Application-defined height; Greater than default",
 				density: sDensity,
 				rowContentHeight: 100,
 				expectedHeight: 101
 			});
-		});
+		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Application-defined height; Greater than default; With large content",
 				density: sDensity,
 				rowContentHeight: 100,
 				templateHeight: 120,
 				expectedHeight: 101
 			});
-		});
-
-		return pSequence;
+		}
 	});
 
-	QUnit.test("Header", function(assert) {
+	QUnit.test("Header", async function(assert) {
 		const oTable = this.oTable;
-		let pSequence = Promise.resolve();
 
-		function test(mTestSettings) {
-			pSequence = pSequence.then(async function() {
-				oTable.getRowMode().setRowContentHeight(mTestSettings.rowContentHeight || 0);
-				await oTable.qunit.setDensity(mTestSettings.density);
-				TableQUnitUtils.assertColumnHeaderHeights(assert, oTable, mTestSettings);
-			});
+		async function test(mTestSettings) {
+			oTable.getRowMode().setRowContentHeight(mTestSettings.rowContentHeight || 0);
+			await oTable.qunit.setDensity(mTestSettings.density);
+			TableQUnitUtils.assertColumnHeaderHeights(assert, oTable, mTestSettings);
 		}
 
-		aDensities.forEach(function(sDensity) {
-			test({
+		for (const sDensity of aDensities) {
+			await test({
 				title: "Row content height should not apply to header rows",
 				density: sDensity,
 				rowContentHeight: 55,
 				expectedHeight: TableUtils.DefaultRowHeight[sDensity === "sapUiSizeCondensed" ? "sapUiSizeCompact" : sDensity]
 			});
-		});
-
-		return pSequence;
+		}
 	});
 
 	return QUnit;

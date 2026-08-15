@@ -59,72 +59,66 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Initialization if metadata not yet loaded", function(assert) {
+	QUnit.test("Initialization if metadata not yet loaded", async function(assert) {
 		this.createTable({models: TableQUnitUtils.createODataModel(null, true)});
 
 		// render, refreshRows, updateRows
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			assert.equal(this.oGetContextsSpy.callCount, 3, "Call count of method to get contexts");
-			sinon.assert.alwaysCalledWithExactly(this.oGetContextsSpy, 0, 10, 100);
-		});
+		await this.oTable.qunit.rendered();
+		assert.equal(this.oGetContextsSpy.callCount, 3, "Call count of method to get contexts");
+		sinon.assert.alwaysCalledWithExactly(this.oGetContextsSpy, 0, 10, 100);
 	});
 
-	QUnit.test("Initialization", function(assert) {
+	QUnit.test("Initialization", async function(assert) {
 		this.createTable();
 
 		// refreshRows, render, updateRows
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			assert.equal(this.oGetContextsSpy.callCount, 3, "Call count of method to get contexts");
-			sinon.assert.alwaysCalledWithExactly(this.oGetContextsSpy, 0, 10, 100);
-		});
+		await this.oTable.qunit.rendered();
+		assert.equal(this.oGetContextsSpy.callCount, 3, "Call count of method to get contexts");
+		sinon.assert.alwaysCalledWithExactly(this.oGetContextsSpy, 0, 10, 100);
 	});
 
-	QUnit.test("Initialization; Bound on initialization; threshold = 1", function(assert) {
+	QUnit.test("Initialization; Bound on initialization; threshold = 1", async function(assert) {
 		this.createTable({threshold: 1});
 
 		// refreshRows, render, updateRows
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			assert.equal(this.oGetContextsSpy.callCount, 3, "Call count of method to get contexts");
-			sinon.assert.calledWithExactly(this.oGetContextsSpy.getCall(0), 0, 10, 10);
-			sinon.assert.calledWithExactly(this.oGetContextsSpy.getCall(1), 0, 10, 10);
-			sinon.assert.calledWithExactly(this.oGetContextsSpy.getCall(2), 0, 10, 10);
-		});
+		await this.oTable.qunit.rendered();
+		assert.equal(this.oGetContextsSpy.callCount, 3, "Call count of method to get contexts");
+		sinon.assert.calledWithExactly(this.oGetContextsSpy.getCall(0), 0, 10, 10);
+		sinon.assert.calledWithExactly(this.oGetContextsSpy.getCall(1), 0, 10, 10);
+		sinon.assert.calledWithExactly(this.oGetContextsSpy.getCall(2), 0, 10, 10);
 	});
 
-	QUnit.test("Initialization; Bound between initialization and rendering; threshold = 1", function(assert) {
+	QUnit.test("Initialization; Bound between initialization and rendering; threshold = 1", async function(assert) {
 		this.createTable({threshold: 1, rows: undefined}, function(oTable) {
 			oTable.bindRows({path: "/Products"});
 		});
 
 		// refreshRows, render, updateRows
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			assert.equal(this.oGetContextsSpy.callCount, 3, "Call count of method to get contexts");
-			sinon.assert.alwaysCalledWithExactly(this.oGetContextsSpy, 0, 10, 10);
-		});
+		await this.oTable.qunit.rendered();
+		assert.equal(this.oGetContextsSpy.callCount, 3, "Call count of method to get contexts");
+		sinon.assert.alwaysCalledWithExactly(this.oGetContextsSpy, 0, 10, 10);
 	});
 
 	QUnit.test("Initialization; Bound after rendering; threshold = 1", async function(assert) {
 		this.createTable({threshold: 1, rows: undefined});
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.oTable.bindRows({path: "/Products"});
 
 		// refreshRows, updateRows
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			assert.equal(this.oGetContextsSpy.callCount, 2, "Call count of method to get contexts");
-			sinon.assert.alwaysCalledWithExactly(this.oGetContextsSpy, 0, 10, 10);
-		});
+		await this.oTable.qunit.rendered();
+		assert.equal(this.oGetContextsSpy.callCount, 2, "Call count of method to get contexts");
+		sinon.assert.alwaysCalledWithExactly(this.oGetContextsSpy, 0, 10, 10);
 	});
 
-	QUnit.test("Refresh", function(assert) {
+	QUnit.test("Refresh", async function(assert) {
 		this.createTable();
 
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			this.oGetContextsSpy.resetHistory();
-			this.oTable.getBinding().refresh();
-		}).then(this.oTable.qunit.whenRenderingFinished).then(() => {
-			assert.equal(this.oGetContextsSpy.callCount, 2, "Call count of method to get contexts"); // refreshRows, updateRows
-			sinon.assert.alwaysCalledWithExactly(this.oGetContextsSpy, 0, 10, 100);
-		});
+		await this.oTable.qunit.rendered();
+		this.oGetContextsSpy.resetHistory();
+		this.oTable.getBinding().refresh();
+		await this.oTable.qunit.rendered();
+		assert.equal(this.oGetContextsSpy.callCount, 2, "Call count of method to get contexts"); // refreshRows, updateRows
+		sinon.assert.alwaysCalledWithExactly(this.oGetContextsSpy, 0, 10, 100);
 	});
 
 	RowsUpdatedTest.registerTo(QUnit);
