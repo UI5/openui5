@@ -636,17 +636,14 @@ sap.ui.define([
 			});
 		},
 
-		_performUpdateFromFirstVisibleRow: function(oTable, oProcessInterface) {
-			return VerticalScrollingHelper.adjustScrollPositionToFirstVisibleRow(oTable, oProcessInterface).then(function() {
-				return VerticalScrollingHelper.fixTemporaryFirstVisibleRow(oTable, null, oProcessInterface);
-			}).then(function() {
-				return VerticalScrollingHelper.fixScrollPosition(oTable, oProcessInterface);
-			}).then(function() {
-				return Promise.all([
-					VerticalScrollingHelper.scrollViewport(oTable, oProcessInterface),
-					VerticalScrollingHelper.scrollScrollbar(oTable, oProcessInterface)
-				]);
-			});
+		_performUpdateFromFirstVisibleRow: async function(oTable, oProcessInterface) {
+			await VerticalScrollingHelper.adjustScrollPositionToFirstVisibleRow(oTable, oProcessInterface);
+			await VerticalScrollingHelper.fixTemporaryFirstVisibleRow(oTable, null, oProcessInterface);
+			await VerticalScrollingHelper.fixScrollPosition(oTable, oProcessInterface);
+			await Promise.all([
+				VerticalScrollingHelper.scrollViewport(oTable, oProcessInterface),
+				VerticalScrollingHelper.scrollScrollbar(oTable, oProcessInterface)
+			]);
 		},
 
 		/**
@@ -657,12 +654,10 @@ sap.ui.define([
 		performUpdateFromScrollPosition: function(oTable) {
 			log("VerticalScrollingHelper.performUpdateFromScrollPosition", oTable);
 
-			VerticalScrollProcess.start(oTable, VerticalScrollProcess.UpdateFromScrollPosition, function(resolve, reject, oProcessInterface) {
-				VerticalScrollingHelper.adjustFirstVisibleRowToScrollPosition(oTable, null, oProcessInterface).then(function() {
-					if (oProcessInterface.isCancelled()) {
-						return;
-					}
+			VerticalScrollProcess.start(oTable, VerticalScrollProcess.UpdateFromScrollPosition, async function(resolve, reject, oProcessInterface) {
+				await VerticalScrollingHelper.adjustFirstVisibleRowToScrollPosition(oTable, null, oProcessInterface);
 
+				if (!oProcessInterface.isCancelled()) {
 					const oScrollPosition = _private(oTable).oVerticalScrollPosition;
 
 					log("VerticalScrollingHelper.performUpdateFromScrollPosition (async: firstVisibleRow update)", oTable);
@@ -677,14 +672,14 @@ sap.ui.define([
 							oScrollPosition.setOffset(0);
 						}
 					}
-				}).then(function() {
-					return VerticalScrollingHelper.fixScrollPosition(oTable, oProcessInterface);
-				}).then(function() {
-					return Promise.all([
-						VerticalScrollingHelper.scrollViewport(oTable, oProcessInterface),
-						VerticalScrollingHelper.scrollScrollbar(oTable, oProcessInterface)
-					]);
-				}).then(resolve);
+				}
+
+				await VerticalScrollingHelper.fixScrollPosition(oTable, oProcessInterface);
+				await Promise.all([
+					VerticalScrollingHelper.scrollViewport(oTable, oProcessInterface),
+					VerticalScrollingHelper.scrollScrollbar(oTable, oProcessInterface)
+				]);
+				resolve();
 			});
 		},
 
@@ -698,14 +693,16 @@ sap.ui.define([
 			clearTimeout(_private(oTable).mTimeouts.largeDataScrolling);
 			delete _private(oTable).mTimeouts.largeDataScrolling;
 
-			VerticalScrollProcess.start(oTable, VerticalScrollProcess.UpdateFromScrollbar, function(resolve, reject, oProcessInterface) {
+			VerticalScrollProcess.start(oTable, VerticalScrollProcess.UpdateFromScrollbar, async function(resolve, reject, oProcessInterface) {
 				oTable._getKeyboardExtension().setActionMode(false);
 
-				VerticalScrollingHelper.adjustScrollPositionToScrollbar(oTable, oProcessInterface).then(function() {
-					if (oProcessInterface.isCancelled()) {
-						return false;
-					}
+				await VerticalScrollingHelper.adjustScrollPositionToScrollbar(oTable, oProcessInterface);
 
+				let bUpdateRows = true;
+
+				if (oProcessInterface.isCancelled()) {
+					bUpdateRows = false;
+				} else {
 					const bLargeDataScrolling = !oTable._getScrollExtension()._bTouchScroll
 						&& VerticalScrollingHelper._isLargeDataScrollingActive(oTable);
 
@@ -714,26 +711,20 @@ sap.ui.define([
 
 						if (bFastScroll) {
 							// Show skeletons and wait until the user stops scrolling before updating the rows.
-							return VerticalScrollingHelper._debounceLargeDataUpdate(oTable, oProcessInterface);
+							bUpdateRows = await VerticalScrollingHelper._debounceLargeDataUpdate(oTable, oProcessInterface);
 						}
 					}
+				}
 
-					return true;
-				}).then(function(bUpdateRows) {
-					if (!bUpdateRows) {
-						return undefined;
-					}
+				if (bUpdateRows) {
+					await VerticalScrollingHelper.adjustFirstVisibleRowToScrollPosition(oTable, null, oProcessInterface);
+					await VerticalScrollingHelper.fixScrollPosition(oTable, oProcessInterface);
+					await VerticalScrollingHelper.scrollViewport(oTable, oProcessInterface);
+				}
 
-					return VerticalScrollingHelper.adjustFirstVisibleRowToScrollPosition(oTable, null, oProcessInterface).then(function() {
-						return VerticalScrollingHelper.fixScrollPosition(oTable, oProcessInterface);
-					}).then(function() {
-						return VerticalScrollingHelper.scrollViewport(oTable, oProcessInterface);
-					});
-				}).then(function() {
-					// The rows have been updated (or no update was necessary). Remove any skeletons shown during a large-data fast scroll.
-					VerticalScrollingHelper._clearSkeletons(oTable);
-					resolve();
-				});
+				// The rows have been updated (or no update was necessary). Remove any skeletons shown during a large-data fast scroll.
+				VerticalScrollingHelper._clearSkeletons(oTable);
+				resolve();
 			});
 		},
 
@@ -879,12 +870,11 @@ sap.ui.define([
 		performUpdateFromViewport: function(oTable) {
 			log("VerticalScrollingHelper.performUpdateFromViewport", oTable);
 
-			VerticalScrollProcess.start(oTable, VerticalScrollProcess.UpdateFromViewport, function(resolve, reject, oProcessInterface) {
-				VerticalScrollingHelper.adjustScrollPositionToViewport(oTable, oProcessInterface).then(function() {
-					return VerticalScrollingHelper.adjustFirstVisibleRowToScrollPosition(oTable, true, oProcessInterface);
-				}).then(function() {
-					return VerticalScrollingHelper.scrollScrollbar(oTable, oProcessInterface);
-				}).then(resolve);
+			VerticalScrollProcess.start(oTable, VerticalScrollProcess.UpdateFromViewport, async function(resolve, reject, oProcessInterface) {
+				await VerticalScrollingHelper.adjustScrollPositionToViewport(oTable, oProcessInterface);
+				await VerticalScrollingHelper.adjustFirstVisibleRowToScrollPosition(oTable, true, oProcessInterface);
+				await VerticalScrollingHelper.scrollScrollbar(oTable, oProcessInterface);
+				resolve();
 			});
 		},
 

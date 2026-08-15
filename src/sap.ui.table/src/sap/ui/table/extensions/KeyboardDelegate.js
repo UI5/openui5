@@ -226,14 +226,11 @@ sap.ui.define([
 		});
 	}
 
-	function waitForData(oTable) {
+	async function waitForData(oTable) {
 		if (oTable._isWaitingForData()) {
-			return waitForRowsUpdated(oTable).then(function() {
-				return waitForData(oTable);
-			});
+			await waitForRowsUpdated(oTable);
+			return waitForData(oTable);
 		}
-
-		return Promise.resolve();
 	}
 
 	function scrollDown(oTable, oEvent, bPage, fnFocus) {
@@ -256,7 +253,7 @@ sap.ui.define([
 		return _scroll(oTable, oEvent, false, bPage, fnFocus);
 	}
 
-	function _scroll(oTable, oEvent, bDown, bPage, fnFocus) {
+	async function _scroll(oTable, oEvent, bDown, bPage, fnFocus) {
 		const oCellInfo = TableUtils.getCellInfo(TableUtils.getCell(oTable, oEvent.target));
 		const bActionMode = oTable._getKeyboardExtension().isInActionMode();
 		const bCtrlKeyPressed = KeyboardDelegate._isKeyCombination(oEvent, null, ModKey.CTRL);
@@ -272,13 +269,13 @@ sap.ui.define([
 			oTable._getScrollExtension().scrollVertically(bDown === true, bPage);
 		}
 
-		return waitForRowsUpdated(oTable).then(function() {
-			if (fnFocus) {
-				fnFocus();
-			} else if (bActionModeNavigation) {
-				focusCell(oTable, oCellInfo.type, oCellInfo.rowIndex, oCellInfo.columnIndex, true);
-			}
-		});
+		await waitForRowsUpdated(oTable);
+
+		if (fnFocus) {
+			fnFocus();
+		} else if (bActionModeNavigation) {
+			focusCell(oTable, oCellInfo.type, oCellInfo.rowIndex, oCellInfo.columnIndex, true);
+		}
 	}
 
 	/**
