@@ -644,7 +644,7 @@ sap.ui.define([
 				const sWidth = oColumn.getWidth();
 				let $columnElement;
 
-				if (oTableElement && aResizableColumns.indexOf(oColumn) < 0 && ColumnUtils.TableUtils.isVariableWidth(sWidth)) {
+				if (oTableElement && !aResizableColumns.includes(oColumn) && ColumnUtils.TableUtils.isVariableWidth(sWidth)) {
 					$columnElement = oTableElement.querySelector("th[data-sap-ui-colid=\"" + oColumn.getId() + "\"]");
 					if ($columnElement) {
 						oColumn._minWidth = Math.max($columnElement.offsetWidth, ColumnUtils.getMinColumnWidth());

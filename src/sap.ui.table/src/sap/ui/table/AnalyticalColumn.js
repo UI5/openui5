@@ -184,7 +184,7 @@ sap.ui.define([
 			if (isInstanceOfAnalyticalTable(oParent)) {
 				const oBinding = oParent.getBinding();
 				const sLeadingProperty = this.getLeadingProperty();
-				if (oBinding && oBinding.getFilterablePropertyNames().indexOf(sLeadingProperty) > -1) {
+				if (oBinding && oBinding.getFilterablePropertyNames().includes(sLeadingProperty)) {
 					sProperty = sLeadingProperty;
 				}
 			}
@@ -199,7 +199,7 @@ sap.ui.define([
 			if (isInstanceOfAnalyticalTable(oParent)) {
 				const oBinding = oParent.getBinding();
 				const sLeadingProperty = this.getLeadingProperty();
-				if (oBinding && oBinding.getSortablePropertyNames().indexOf(sLeadingProperty) > -1) {
+				if (oBinding && oBinding.getSortablePropertyNames().includes(sLeadingProperty)) {
 					sProperty = sLeadingProperty;
 				}
 			}
@@ -325,7 +325,7 @@ sap.ui.define([
 				 * solely checks sap:filterable=”false” for providing the filter function. Check for measure is hence removed. For more
 				 * details, see BCP: 1770355530
 				 */
-				if (oBinding.getFilterablePropertyNames().indexOf(sFilterProperty) > -1 &&
+				if (oBinding.getFilterablePropertyNames().includes(sFilterProperty) &&
 					oBinding.getProperty(sFilterProperty)) {
 					return true;
 				}

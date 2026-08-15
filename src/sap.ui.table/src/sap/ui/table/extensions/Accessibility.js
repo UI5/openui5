@@ -1510,7 +1510,7 @@ sap.ui.define([
 			}
 		}
 		const aLabels = oControl.getAriaLabelledBy();
-		if (sLabel && aLabels.indexOf(sLabel) < 0) {
+		if (sLabel && !aLabels.includes(sLabel)) {
 			oControl.addAriaLabelledBy(sLabel);
 		}
 	};

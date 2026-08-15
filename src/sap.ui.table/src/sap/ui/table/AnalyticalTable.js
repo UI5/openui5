@@ -734,11 +734,11 @@ sap.ui.define([
 
 					// if one column of a dimension is grouped, the dimension is considered as grouped.
 					// all columns which are not explicitly grouped will be flagged as dependendGrouped in the next step
-					if (oColumn.getGrouped() && aGroupedDimensions.indexOf(sDimensionName) === -1) {
+					if (oColumn.getGrouped() && !aGroupedDimensions.includes(sDimensionName)) {
 						aGroupedDimensions.push(sDimensionName);
 					}
 
-					if (aDimensions.indexOf(sDimensionName) === -1) {
+					if (!aDimensions.includes(sDimensionName)) {
 						aDimensions.push(sDimensionName);
 					}
 				}
@@ -843,7 +843,7 @@ sap.ui.define([
 	};
 
 	AnalyticalTable.prototype._addGroupedColumn = function(sColumnId) {
-		if (this._aGroupedColumns.indexOf(sColumnId) === -1) {
+		if (!this._aGroupedColumns.includes(sColumnId)) {
 			this._aGroupedColumns.push(sColumnId);
 		}
 	};

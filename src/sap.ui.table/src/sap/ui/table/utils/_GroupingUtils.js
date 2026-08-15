@@ -6,9 +6,8 @@
 sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/model/Sorter",
-	"sap/ui/Device",
-	"sap/ui/thirdparty/jquery"
-], function(Element, Sorter, Device, jQuery) {
+	"sap/ui/Device"
+], function(Element, Sorter, Device) {
 	"use strict";
 
 	/**
@@ -435,7 +434,7 @@ sap.ui.define([
 			aContexts.splice(0, 0, oGroupContext);
 
 			// extend the binding and hook into the relevant functions to provide access to the grouping information
-			jQuery.extend(oBinding, {
+			Object.assign(oBinding, {
 				getLength: function() {
 					return aContexts.length;
 				},

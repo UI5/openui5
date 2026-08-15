@@ -777,7 +777,7 @@ sap.ui.define([
 
 		// Reset the sorting status of all columns which are not sorted anymore.
 		for (let i = 0, l = aColumns.length; i < l; i++) {
-			if (aSortedColumns.indexOf(aColumns[i]) < 0) {
+			if (!aSortedColumns.includes(aColumns[i])) {
 				// Column is not sorted anymore. Reset to default and remove sorter.
 				/** @deprecated As of version 1.120 */
 				aColumns[i].resetProperty("sorted");
