@@ -14331,16 +14331,34 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("CollectionCache#removeKeptElement", function (assert) {
-		var oCache = this.createCache("Employees");
+		var oCache = this.createCache("Employees"),
+			oCacheMock = this.mock(oCache);
 
+		oCache.aElements = ["~bar~"]; // not to be removed!
 		oCache.aElements.$byPredicate = {
 			"('foo')" : "~foo~",
 			"('bar')" : "~bar~"
 		};
-		this.mock(oCache).expects("checkSharedRequest").withExactArgs();
+
+		oCacheMock.expects("checkSharedRequest").withExactArgs();
 
 		// code under test
 		oCache.removeKeptElement("('foo')");
+
+		assert.deepEqual(oCache.aElements.$byPredicate, {"('bar')" : "~bar~"});
+
+		oCacheMock.expects("checkSharedRequest").withExactArgs();
+
+		// code under test
+		oCache.removeKeptElement("('bar')");
+
+		assert.deepEqual(oCache.aElements.$byPredicate, {"('bar')" : "~bar~"});
+
+		oCacheMock.expects("checkSharedRequest").withExactArgs();
+		oCache.aElements.includes = mustBeMocked;
+
+		// code under test
+		oCache.removeKeptElement("('n/a')");
 
 		assert.deepEqual(oCache.aElements.$byPredicate, {"('bar')" : "~bar~"});
 	});

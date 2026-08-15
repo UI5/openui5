@@ -1504,6 +1504,85 @@ sap.ui.define([
 			);
 		});
 
+		QUnit.test("A locally created change without a fileName is not treated as unknown on reload", async function(assert) {
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: this.sComponentId
+			});
+			// Created via the factory without a fileName, so a fileName is generated
+			// and the runtime-only fileNameWasGenerated flag is set.
+			const oNewChange = FlexObjectFactory.createUIChange({
+				changeType: "rename",
+				reference: sReference,
+				layer: LayerUtils.getCurrentLayer()
+			});
+			const sGeneratedId = oNewChange.getId();
+			assert.ok(oNewChange.getFileNameWasGenerated(), "then the fileNameWasGenerated flag is set on the new change");
+			FlexState.addDirtyFlexObjects(sReference, [oNewChange], this.sComponentId);
+
+			// Storage returns the change without a fileName; it cannot be matched by id.
+			mockLoader({
+				changes: {
+					changes: [{
+						fileType: "change",
+						changeType: "rename",
+						reference: sReference,
+						layer: LayerUtils.getCurrentLayer(),
+						support: {
+							user: "supportUser"
+						}
+					}]
+				}
+			});
+
+			await FlexState.reinitialize({
+				reference: sReference,
+				componentId: this.sComponentId,
+				manifest: {},
+				componentData: {}
+			});
+
+			const aChanges = FlexState.getFlexObjectsDataSelector().get({ reference: sReference });
+			assert.strictEqual(aChanges.length, 1, "then the change is kept and no error is thrown");
+			assert.strictEqual(aChanges[0].getId(), sGeneratedId, "then the generated id is preserved");
+			assert.strictEqual(
+				aChanges[0].getSupportInformation().user,
+				"supportUser",
+				"then the change is updated with the additional information from the backend"
+			);
+		});
+
+		QUnit.test("A change without a fileName and without a matching flagged runtime object is rejected", async function(assert) {
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: this.sComponentId
+			});
+
+			// A fileName-less change with no locally created flagged counterpart must still be rejected.
+			mockLoader({
+				changes: {
+					changes: [{
+						fileType: "change",
+						changeType: "rename",
+						reference: sReference,
+						layer: LayerUtils.getCurrentLayer()
+					}]
+				}
+			});
+
+			try {
+				await FlexState.reinitialize({
+					reference: sReference,
+					componentId: this.sComponentId,
+					manifest: {},
+					componentData: {}
+				});
+				assert.ok(false, "then an error is raised");
+			} catch (oError) {
+				assert.ok(oError, "then an error is raised");
+			}
+		});
+
 		QUnit.test("A deleted ctrl_variant is returned from storage with its auto-generated setVisible change", async function(assert) {
 			await FlexState.initialize({
 				reference: sReference,
