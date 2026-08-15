@@ -2200,7 +2200,7 @@ sap.ui.define([
 			}
 		};
 
-		assert.ok((oTable.$("cellacc").html() || "").indexOf("A_2") >= 0, "Acc Text before scrolling");
+		assert.ok((oTable.$("cellacc").html() || "").includes("A_2"), "Acc Text before scrolling");
 		oTable.addEventDelegate(oDelegate);
 		oTable.setFirstVisibleRow(1); // Simulate scrolling by one row
 		assert.ok(!bFocusTriggered, "No sync refocus of cell done");
@@ -2211,7 +2211,7 @@ sap.ui.define([
 			testAriaLabelsForFocusedDataCell(oTable, $Cell[0], 2, 0, assert, {rowChange: true});
 			assert.ok(!$Cell.attr("aria-busy"), "Cell is not in busy mode anymore");
 			assert.ok(!$Cell.attr("aria-hidden"), "Cell is not hidden anymore");
-			assert.ok((oTable.$("cellacc").html() || "").indexOf("A_3") >= 0, "Acc Text after scrolling");
+			assert.ok((oTable.$("cellacc").html() || "").includes("A_3"), "Acc Text after scrolling");
 			TableQUnitUtils.setFocusOutsideOfTable(assert);
 			oTable.setFirstVisibleRow(0);
 			setTimeout(function() {
@@ -2330,18 +2330,18 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		const sHtml = oTable.$().html();
-		assert.ok(sHtml.indexOf("aria") < 0, "No ACC related information in DOM");
+		assert.ok(!sHtml.includes("aria"), "No ACC related information in DOM");
 
 		let i;
 		for (i = 0; i < oTable.getColumns().length; i++) {
 			oTable.qunit.getDataCell(0, i).focus();
 			assert.strictEqual(document.activeElement, oTable.qunit.getDataCell(0, i), "Cell [0, " + i + "] focused");
-			assert.ok(sHtml.indexOf("aria") < 0, "No ACC related information in DOM on focus of cell [0, " + i + "]");
+			assert.ok(!sHtml.includes("aria"), "No ACC related information in DOM on focus of cell [0, " + i + "]");
 		}
 		for (i = 0; i < oTable.getColumns().length; i++) {
 			oTable.qunit.getDataCell(1, i).focus();
 			assert.strictEqual(document.activeElement, oTable.qunit.getDataCell(1, i), "Cell [1, " + i + "] focused");
-			assert.ok(sHtml.indexOf("aria") < 0, "No ACC related information in DOM on focus of cell [1, " + i + "]");
+			assert.ok(!sHtml.includes("aria"), "No ACC related information in DOM on focus of cell [1, " + i + "]");
 		}
 
 		assert.strictEqual(oTable.$().find(".sapUiTableHiddenTexts").length, 0, "No Hidden Texts");

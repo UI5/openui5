@@ -1497,7 +1497,7 @@ sap.ui.define([
 		const y = 20;
 		const oCoord = {pageX: x, pageY: y};
 
-		oEvent = jQuery.extend({originalEvent: {}}, oCoord);
+		oEvent = {originalEvent: {}, ...oCoord};
 
 		oPos = TableUtils.getEventPosition(oEvent, oTable);
 		assert.equal(oPos.x, x, "MouseEvent - X");

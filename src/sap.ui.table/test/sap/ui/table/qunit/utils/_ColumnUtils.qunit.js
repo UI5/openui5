@@ -719,7 +719,7 @@ sap.ui.define([
 
 		function assertUnchanged(aExcludedColumns) {
 			for (let i = 0; i < aVisibleColumns.length; i++) {
-				if (aExcludedColumns && aExcludedColumns.indexOf(i) !== -1) {
+				if (aExcludedColumns && aExcludedColumns.includes(i)) {
 					continue;
 				}
 				const oColumn = aVisibleColumns[i];

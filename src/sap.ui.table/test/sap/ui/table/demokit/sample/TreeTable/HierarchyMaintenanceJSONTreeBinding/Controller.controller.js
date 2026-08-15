@@ -33,7 +33,7 @@ sap.ui.define([
 
 			if (aSelectedIndices.length > 0) {
 				// If rows are selected, do not allow to start dragging from a row which is not selected.
-				if (aSelectedIndices.indexOf(iDraggedRowIndex) === -1) {
+				if (!aSelectedIndices.includes(iDraggedRowIndex)) {
 					oEvent.preventDefault();
 				} else {
 					for (let i = 0; i < aSelectedIndices.length; i++) {

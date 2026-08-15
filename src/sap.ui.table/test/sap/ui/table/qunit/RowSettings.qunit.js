@@ -425,10 +425,10 @@ sap.ui.define([
 
 				if (bRendered) {
 					if (iRowIndex === 1) {
-						assert.ok(oNavIndicator.className.indexOf("sapUiTableRowNavigated") > -1,
+						assert.ok(oNavIndicator.className.includes("sapUiTableRowNavigated"),
 							"The navigated indicator of row " + (iRowIndex + 1) + " has the correct css class");
 					} else {
-						assert.ok(oNavIndicator.className.indexOf("sapUiTableRowNavigated") === -1,
+						assert.ok(!oNavIndicator.className.includes("sapUiTableRowNavigated"),
 							"The css class hasn't been assigned to the navigated indicator of row " + (iRowIndex + 1));
 					}
 				}
