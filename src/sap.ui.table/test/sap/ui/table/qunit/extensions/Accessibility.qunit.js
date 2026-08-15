@@ -1935,7 +1935,7 @@ sap.ui.define([
 		});
 		let $Elem = jQuery(document.getElementById(sTableId + "-overlay"));
 		assert.strictEqual($Elem.attr("aria-labelledby"),
-			oTable.getAriaLabelledBy() + " " + oTable.getTitle().getId() + " " + sTableId + "-ariainvalid", "aria-labelledby");
+			`${oTable.getAriaLabelledBy()} ${oTable.getTitle().getId()} ${sTableId}-ariainvalid`, "aria-labelledby");
 		oTable.invalidate();
 		await nextUIUpdate();
 
@@ -1996,8 +1996,7 @@ sap.ui.define([
 			}));
 
 			await nextUIUpdate();
-			assert.strictEqual($Elem.attr("aria-labelledby"), oTable.getDomRef("noDataCnt").querySelector("figcaption>div").getAttribute("id") +
-				" " + oTable.getDomRef("noDataCnt").querySelector("figcaption>span").getAttribute("id"));
+			assert.strictEqual($Elem.attr("aria-labelledby"), `${oTable.getDomRef("noDataCnt").querySelector("figcaption>div").getAttribute("id")} ${oTable.getDomRef("noDataCnt").querySelector("figcaption>span").getAttribute("id")}`);
 
 			oTable.setShowNoData(false);
 			await nextUIUpdate();
@@ -2067,8 +2066,7 @@ sap.ui.define([
 
 		oTreeTable.qunit.getDataCell(2, 0).focus();
 		$Cell = jQuery(oTreeTable.qunit.getDataCell(2, 0));
-		assert.equal(oTreeTable.$("cellacc").text(), TableUtils.getResourceText("TBL_LEAF") + " " +
-			TableUtils.getResourceText("TBL_CELL_INCLUDES", ["TYPE_A_1_child_0 DESCRIPTION_A_1_child_0 Read Only"]),
+		assert.equal(oTreeTable.$("cellacc").text(), `${TableUtils.getResourceText("TBL_LEAF")} ${TableUtils.getResourceText("TBL_CELL_INCLUDES", ["TYPE_A_1_child_0 DESCRIPTION_A_1_child_0 Read Only"])}`,
 			"TreeTable: HiddenText cellacc for leaf node is correct");
 	});
 

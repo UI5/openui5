@@ -731,7 +731,7 @@ sap.ui.define([
 		function assertColumnWidth(iColumnIndex, iWidth) {
 			const iActualColumnWidth = parseInt(aVisibleColumns[iColumnIndex].getWidth());
 			assert.strictEqual(iActualColumnWidth, iWidth,
-				"Column " + (iColumnIndex + 1) + " width is " + iActualColumnWidth + "px and should be " + iWidth + "px");
+				`Column ${(iColumnIndex + 1)} width is ${iActualColumnWidth}px and should be ${iWidth}px`);
 		}
 
 		// Invalid input should not change the column widths.
