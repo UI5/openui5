@@ -278,10 +278,14 @@ sap.ui.define([
 					if (sValue === "") {
 						return NaN;
 					}
-					var iValue = parseInt(sValue);
-					// return undefined for unparseable strings so that isValid() can
-					// detect and report the invalid input (consistent with boolean behavior)
-					return isNaN(iValue) ? undefined : iValue;
+					// Number() rejects strings with non-parsable suffix (e.g. "2fA")
+					var iValue = Number(sValue);
+					if (!Number.isInteger(iValue)) {
+						// return undefined for unparseable strings so that isValid() can
+						// detect and report the invalid input
+						return undefined;
+					}
+					return iValue;
 				}
 			}),
 
@@ -295,10 +299,14 @@ sap.ui.define([
 					if (sValue === "") {
 						return NaN;
 					}
-					var fValue = parseFloat(sValue);
-					// return undefined for unparseable strings so that isValid() can
-					// detect and report the invalid input (consistent with boolean behavior)
-					return isNaN(fValue) ? undefined : fValue;
+					// Number() rejects strings with non-parsable suffix (e.g. "2.5fA"), unlike parseFloat
+					var fValue = Number(sValue);
+					if (isNaN(fValue)) {
+						// return undefined for unparseable strings so that isValid() can
+						// detect and report the invalid input
+						return undefined;
+					}
+					return fValue;
 				}
 			}),
 

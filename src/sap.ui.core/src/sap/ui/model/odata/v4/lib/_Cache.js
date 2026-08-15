@@ -3682,7 +3682,8 @@ sap.ui.define([
 	};
 
 	/**
-	 * Removes the element with the given predicate from $byPredicate of the cache's element list.
+	 * Removes the element with the given predicate from $byPredicate of the cache's element list,
+	 * unless it is part of that list.
 	 *
 	 * @param {string} sPredicate - The predicate
 	 * @throws {Error}
@@ -3692,7 +3693,12 @@ sap.ui.define([
 	 */
 	_CollectionCache.prototype.removeKeptElement = function (sPredicate) {
 		this.checkSharedRequest();
-		delete this.aElements.$byPredicate[sPredicate];
+		if (sPredicate in this.aElements.$byPredicate) {
+			if (this.aElements.includes(this.aElements.$byPredicate[sPredicate])) {
+				return; // not just a "kept element", but now inside the collection!
+			}
+			delete this.aElements.$byPredicate[sPredicate];
+		}
 	};
 
 	/**

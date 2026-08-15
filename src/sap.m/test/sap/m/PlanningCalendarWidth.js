@@ -775,6 +775,7 @@ sap.ui.define([
 			  title: "Max Mustermann",
 			  text: "Musterteam",
 			  tooltip: "Header tooltip",
+			  nonWorkingHours: [13],
 			  specialDates: [
 				  new DateTypeRange({
 					  startDate: UI5Date.getInstance(2015, 0, 7),
@@ -1273,6 +1274,10 @@ sap.ui.define([
 		  })
 	  ],
 	  specialDates: [
+		  new DateTypeRange({
+			  startDate: UI5Date.getInstance(2015, 0, 2),
+			  type: CalendarDayType.NonWorking
+		  }),
 		  new DateTypeRange({
 			  startDate: UI5Date.getInstance(2015, 0, 1, 12, 0),
 			  endDate: UI5Date.getInstance(2015, 0, 1, 14, 0),

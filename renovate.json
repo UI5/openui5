@@ -31,6 +31,20 @@
             "minimumReleaseAge": null
         },
         {
+            "matchPackageNames": [
+                "@ui5/webcomponents",
+                "@ui5/webcomponents-fiori",
+                "@ui5/webcomponents-icons",
+                "@ui5/webcomponents-icons-business-suite",
+                "@ui5/webcomponents-icons-tnt",
+                "fs-extra",
+                "ui5-tooling-modules"
+            ],
+            "matchFileNames": ["src/sap.f/**"],
+            "groupName": "All UI5 Web Components related devDependencies",
+            "reviewers": ["SAPUISOFIA_PIRIN_REVIEWS"]
+        },
+        {
             "matchDepTypes": ["overrides"],
             "enabled": false
         }

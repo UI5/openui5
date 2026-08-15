@@ -789,6 +789,7 @@ sap.ui.define([
 			const aContexts = this.aContexts;
 			const iModelIndex = this.getModelIndex(oContext);
 			aContexts.splice(iModelIndex + 1, iCount).forEach((oContext0) => {
+				oContext0.iIndex = undefined; // "outside the collection"
 				if (!oContext0.created()) {
 					this.mPreviousContextsByPath[oContext0.getPath()] = oContext0;
 				} // else: created (even persisted) is kept inside "context" annotation
@@ -1491,10 +1492,17 @@ sap.ui.define([
 	 *   If given, only contexts with paths in this list except kept alive and pending deletes are
 	 *   removed and destroyed (transient contexts are removed only); otherwise all contexts in the
 	 *   list are removed and destroyed
+	 * @param {sap.ui.model.odata.v4.lib._CollectionCache} [oCache]
+	 *   The cache from which we are supposed to remove data for the kept element(s) identified by
+	 *   the given path(s). If the cache has changed in the meantime (or was reset), no data must be
+	 *   removed
+	 * @param {number} [iResetCount]
+	 *   The cache's expected reset count
 	 *
 	 * @private
 	 */
-	ODataListBinding.prototype.destroyPreviousContexts = function (aPathsToDelete) {
+	ODataListBinding.prototype.destroyPreviousContexts = function (aPathsToDelete, oCache,
+			iResetCount) {
 		var mPreviousContextsByPath = this.mPreviousContextsByPath,
 			that = this;
 
@@ -1509,7 +1517,8 @@ sap.ui.define([
 					} else {
 						if (!oContext.isTransient()) {
 							oContext.destroy();
-							if (oContext.iIndex === undefined && that.oCache) {
+							if (oContext.iIndex === undefined && oCache && oCache === that.oCache
+									&& iResetCount === oCache.iResetCount) {
 								// was kept alive (or deleted)
 								that.oCache.removeKeptElement(
 									_Helper.getRelativePath(sPath, that.oHeaderContext.getPath()));
@@ -1529,13 +1538,18 @@ sap.ui.define([
 	 * @param {string[]} aPathsToDelete
 	 *   Only contexts with paths in this list except kept alive and pending deletes are removed and
 	 *   destroyed (transient contexts are removed only)
+	 * @param {sap.ui.model.odata.v4.lib._CollectionCache} [oCache]
+	 *   The cache from which {@link #destroyPreviousContexts} is supposed to remove data for the
+	 *   kept element(s) identified by the given path(s). If the cache changes in the meantime (or
+	 *   is reset), no data must be removed
 	 *
 	 * @private
 	 */
-	ODataListBinding.prototype.destroyPreviousContextsLater = function (aPathsToDelete) {
+	ODataListBinding.prototype.destroyPreviousContextsLater = function (aPathsToDelete, oCache) {
 		if (aPathsToDelete.length) {
 			this.oModel.addPrerenderingTask(
-				this.destroyPreviousContexts.bind(this, aPathsToDelete));
+				this.destroyPreviousContexts
+					.bind(this, aPathsToDelete, oCache, oCache?.iResetCount));
 		}
 	};
 
@@ -4130,7 +4144,7 @@ sap.ui.define([
 		if (!oContext.isDeleted() // data of a deleted context must remain for the exclusion filter
 				&& oContext.getPath() in this.mPreviousContextsByPath
 				&& !oContext.isEffectivelyKeptAlive()) {
-			this.destroyPreviousContextsLater([oContext.getPath()]);
+			this.destroyPreviousContextsLater([oContext.getPath()], this.oCache);
 		}
 	};
 

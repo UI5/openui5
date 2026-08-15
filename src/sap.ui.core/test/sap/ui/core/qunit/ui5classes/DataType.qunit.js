@@ -84,10 +84,10 @@ sap.ui.define([
 			parseValue: [
 				{ input: '0', value: 0 },
 				{ input: '123', value: 123 },
-				{ input: '123e4', value: 123 },
-				{ input: '123f2', value: 123 },
-				{ input: '123,8', value: 123 },
-				{ input: '123.8', value: 123 },
+				{ input: '123e4', value: 1230000 },
+				{ input: '123f2', value: undefined },
+				{ input: '123,8', value: undefined },
+				{ input: '123.8', value: undefined },
 				{ input: 'abc', value: undefined }
 			]
 		},
@@ -98,8 +98,8 @@ sap.ui.define([
 				{ input: '0', value: 0 },
 				{ input: '123', value: 123 },
 				{ input: '123e4', value: 1230000 },
-				{ input: '123f2', value: 123 },
-				{ input: '123,8', value: 123 },
+				{ input: '123f2', value: undefined },
+				{ input: '123,8', value: undefined },
 				{ input: '123.8', value: 123.8 },
 				{ input: '.8', value: 0.8 },
 				{ input: 'abc', value: undefined }

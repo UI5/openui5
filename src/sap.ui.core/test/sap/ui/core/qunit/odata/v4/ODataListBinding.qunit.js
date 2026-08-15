@@ -4324,6 +4324,7 @@ sap.ui.define([
 				isOutOfPlace : mustBeMocked
 			};
 
+		oBinding.oCache = undefined; // DO NOT USE!
 		oBinding.mPreviousContextsByPath = {
 			p1 : oContext1,
 			p2 : oContext2,
@@ -4361,8 +4362,14 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("destroyPreviousContexts: cache & hidden context", function (assert) {
+[undefined, "~same~", "~different~"].forEach((oCache) => {
+	[9, 10].forEach((iResetCount) => {
+		const sTitle = "destroyPreviousContexts: cache & hidden context, oCache = " + oCache
+			+ ", iResetCount = " + iResetCount;
+
+	QUnit.test(sTitle, function (assert) {
 		var oBinding = this.bindList("/EMPLOYEES"),
+			iCallCount = oCache === "~same~" && iResetCount === 9 ? 1 : 0,
 			oContext1 = {
 				destroy : function () {},
 				isEffectivelyKeptAlive : function () {},
@@ -4377,6 +4384,7 @@ sap.ui.define([
 				isTransient : function () {}
 			};
 
+		oBinding.oCache.iResetCount = 9;
 		oBinding.mPreviousContextsByPath = {
 			p1 : oContext1,
 			p2 : oContext2,
@@ -4390,16 +4398,21 @@ sap.ui.define([
 		this.mock(oContext2).expects("isOutOfPlace").withExactArgs().returns(false);
 		this.mock(oContext2).expects("isTransient").withExactArgs().returns(false);
 		this.mock(oContext2).expects("destroy").withExactArgs();
-		this.mock(oBinding.oHeaderContext).expects("getPath").withExactArgs().returns("/EMPLOYEES");
-		this.mock(_Helper).expects("getRelativePath")
+		this.mock(oBinding.oHeaderContext).expects("getPath").exactly(iCallCount)
+			.withExactArgs().returns("/EMPLOYEES");
+		this.mock(_Helper).expects("getRelativePath").exactly(iCallCount)
 			.withExactArgs("p1", "/EMPLOYEES").returns("relative/path");
-		this.mock(oBinding.oCache).expects("removeKeptElement").withExactArgs("relative/path");
+		this.mock(oBinding.oCache).expects("removeKeptElement").exactly(iCallCount)
+			.withExactArgs("relative/path");
 
 		// code under test
-		oBinding.destroyPreviousContexts(["p1", "p2"]);
+		oBinding.destroyPreviousContexts(["p1", "p2"],
+			oCache === "~same~" ? oBinding.oCache : oCache, iResetCount);
 
 		assert.deepEqual(oBinding.mPreviousContextsByPath, {p3 : "~oContext3~"});
 	});
+	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("destroyPreviousContexts: binding already destroyed", function (assert) {
@@ -4435,7 +4448,30 @@ sap.ui.define([
 		oBinding.destroyPreviousContextsLater(aPaths);
 
 		oBindingMock.expects("destroyPreviousContexts")
-			.on(oBinding).withExactArgs(sinon.match.same(aPaths));
+			.on(oBinding).withExactArgs(sinon.match.same(aPaths), undefined, undefined);
+
+		// code under test - callback function
+		oTaskExpectation.args[0][0]();
+	});
+
+	//*********************************************************************************************
+	QUnit.test("destroyPreviousContextsLater: w/ cache", function () {
+		const oBinding = this.bindList("/EMPLOYEES");
+		const aPaths = ["path"];
+		const oCache = Object.freeze({
+			iResetCount : "~iResetCount~"
+		});
+		const oTaskExpectation = this.mock(this.oModel).expects("addPrerenderingTask")
+			.withExactArgs(sinon.match.func);
+		// mock early to catch even the function created using bind()
+		const oBindingMock = this.mock(oBinding);
+		oBindingMock.expects("destroyPreviousContexts").never();
+
+		// code under test
+		oBinding.destroyPreviousContextsLater(aPaths, oCache);
+
+		oBindingMock.expects("destroyPreviousContexts").on(oBinding)
+			.withExactArgs(sinon.match.same(aPaths), sinon.match.same(oCache), "~iResetCount~");
 
 		// code under test - callback function
 		oTaskExpectation.args[0][0]();
@@ -11592,6 +11628,9 @@ sap.ui.define([
 			assert.strictEqual(oBinding.aContexts[4], aContextsBefore[7], "4");
 			assert.strictEqual(oBinding.aContexts.length, 5);
 			assert.strictEqual(oBinding.iMaxLength, 5);
+			assert.strictEqual(aContextsBefore[2].iIndex, undefined);
+			assert.strictEqual(aContextsBefore[3].iIndex, undefined);
+			assert.strictEqual(aContextsBefore[4].iIndex, undefined);
 			oBinding.aContexts.forEach(function (oContext0, iIndex) {
 				if (iIndex !== 3) { // 6 - iCount
 					assert.strictEqual(oContext0.iIndex, iIndex);
@@ -14068,6 +14107,7 @@ sap.ui.define([
 				getPath : function () {}
 			};
 
+		oBinding.oCache = "~oCache~";
 		oBinding.mPreviousContextsByPath = {
 			"/SalesOrderList('1')" : "~" // would actually be the context
 		};
@@ -14076,7 +14116,7 @@ sap.ui.define([
 			.withExactArgs().returns("/SalesOrderList('1')");
 		this.mock(oContext).expects("isEffectivelyKeptAlive").withExactArgs().returns(false);
 		this.mock(oBinding).expects("destroyPreviousContextsLater")
-			.withExactArgs(["/SalesOrderList('1')"]);
+			.withExactArgs(["/SalesOrderList('1')"], "~oCache~");
 
 		// code under test
 		oBinding.onKeepAliveChanged(oContext);
