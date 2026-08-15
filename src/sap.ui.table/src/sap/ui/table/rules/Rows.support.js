@@ -132,8 +132,7 @@ sap.ui.define([
 
 						if (bUnexpectedRowHeightDetected) {
 							SupportHelper.reportIssue(oIssueManager,
-								"The row height was expected to be " + iExpectedRowHeight + "px, but was " + nHeightToReport + "px instead."
-								+ " This causes issues with vertical scrolling.",
+								`The row height was expected to be ${iExpectedRowHeight}px, but was ${nHeightToReport}px instead. This causes issues with vertical scrolling.`,
 								Severity.High, aVisibleRows[j].getId());
 							break;
 						}

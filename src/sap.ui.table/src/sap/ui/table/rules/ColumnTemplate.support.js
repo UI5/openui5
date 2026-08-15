@@ -54,8 +54,7 @@ sap.ui.define([
 				const sColumnId = oColumn.getId();
 
 				if (oMTextTemplate.isBound("wrapping") || (!oMTextTemplate.isBound("wrapping") && oMTextTemplate.getWrapping())) {
-					SupportHelper.reportIssue(oIssueManager, "Column '" + sColumnId + "' of table '" + oTable.getId() + "' uses an "
-															 + "'sap.m.Text' control with wrapping enabled.", Severity.High, sColumnId);
+					SupportHelper.reportIssue(oIssueManager, `Column '${sColumnId}' of table '${oTable.getId()}' uses an 'sap.m.Text' control with wrapping enabled.`, Severity.High, sColumnId);
 				}
 			}, oScope, "sap.m.Text");
 		}
@@ -72,8 +71,7 @@ sap.ui.define([
 			checkColumnTemplate(function(oTable, oColumn, oMLinkTemplate) {
 				if (oMLinkTemplate.isBound("wrapping") || (!oMLinkTemplate.isBound("wrapping") && oMLinkTemplate.getWrapping())) {
 					const sColumnId = oColumn.getId();
-					SupportHelper.reportIssue(oIssueManager, "Column '" + sColumnId + "' of table '" + oTable.getId() + "' uses an "
-															 + "'sap.m.Link' control with wrapping enabled.", Severity.High, sColumnId);
+					SupportHelper.reportIssue(oIssueManager, `Column '${sColumnId}' of table '${oTable.getId()}' uses an 'sap.m.Link' control with wrapping enabled.`, Severity.High, sColumnId);
 				}
 			}, oScope, "sap.m.Link");
 		}

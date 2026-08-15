@@ -265,7 +265,7 @@ sap.ui.define([
 	 * @param {ScrollPosition.OffsetType} [sOffsetType=ScrollPosition.OffsetType.Pixel] The type of the offset.
 	 */
 	ScrollPosition.prototype.setPosition = function(iIndex, nOffset, sOffsetType) {
-		log("ScrollPosition#setPosition(index: " + iIndex + ", offset: " + nOffset + ", offsetType: " + sOffsetType + ")");
+		log(`ScrollPosition#setPosition(index: ${iIndex}, offset: ${nOffset}, offsetType: ${sOffsetType})`);
 
 		if (!ScrollPosition._isPositiveNumber(iIndex)) {
 			return;
@@ -357,8 +357,7 @@ sap.ui.define([
 			const oCurrentProcessInfo = pCurrentProcess ? pCurrentProcess.getInfo() : null;
 
 			if (pCurrentProcess && pCurrentProcess.isRunning() && oCurrentProcessInfo.rank > oProcessInfo.rank) {
-				log("Cannot start update process " + oProcessInfo.id
-					+ " - A higher-ranked update process is currently running (" + oCurrentProcessInfo.id + ")", oTable);
+				log(`Cannot start update process ${oProcessInfo.id} - A higher-ranked update process is currently running (${oCurrentProcessInfo.id})`, oTable);
 				return false;
 			}
 
@@ -966,8 +965,7 @@ sap.ui.define([
 			// increased if the offset is specified in percentage of the viewport.
 			// The firstVisibleRowChanged event needs to be prevented in these cases. It will be fired later in
 			// VerticalScrollingHelper.fixTemporaryFirstVisibleRow.
-			log("VerticalScrollingHelper.adjustFirstVisibleRowToScrollPosition:"
-				+ " Set \"firstVisibleRow\" from " + iOldIndex + " to " + iNewIndex, oTable);
+			log(`VerticalScrollingHelper.adjustFirstVisibleRowToScrollPosition: Set "firstVisibleRow" from ${iOldIndex} to ${iNewIndex}`, oTable);
 			const bExpectRowsUpdatedEvent = oTable._setFirstVisibleRowIndex(iNewIndex, {
 				onScroll: true,
 				suppressEvent: bNewIndexIsTemporary,
@@ -983,8 +981,7 @@ sap.ui.define([
 
 			return new Promise(function(resolve) {
 				const fnOnRowsUpdatedPreprocessor = function(oEvent) {
-					log("VerticalScrollingHelper.adjustFirstVisibleRowToScrollPosition (async: rows updated):"
-						+ " Reason " + oEvent.getParameters().reason, this);
+					log(`VerticalScrollingHelper.adjustFirstVisibleRowToScrollPosition (async: rows updated): Reason ${oEvent.getParameters().reason}`, this);
 					if (bNewIndexIsTemporary) {
 						VerticalScrollingHelper.fixTemporaryFirstVisibleRow(oTable, true, oProcessInterface).then(resolve);
 					} else {
@@ -1754,8 +1751,7 @@ sap.ui.define([
 			const oScrollPosition = _private(oTable).oVerticalScrollPosition;
 			const bScrollPositionIsInitial = oScrollPosition.isInitial();
 
-			log("VerticalScrollingHelper.restoreScrollPosition: "
-				+ "Scroll position is" + (bScrollPositionIsInitial ? " " : " not ") + "initial", oTable);
+			log(`VerticalScrollingHelper.restoreScrollPosition: Scroll position is${bScrollPositionIsInitial ? " " : " not "}initial`, oTable);
 
 			if (bScrollPositionIsInitial) {
 				VerticalScrollingHelper.performUpdateFromFirstVisibleRow(oTable);

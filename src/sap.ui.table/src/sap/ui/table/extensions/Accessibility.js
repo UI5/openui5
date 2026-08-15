@@ -993,7 +993,7 @@ sap.ui.define([
 			}
 
 			for (let j = 0; j < TableUtils.getVisibleColumnCount(oTable); j++) {
-				mAttributes["aria-owns"].push(sTableId + "-rows-row" + mParams.index + "-col" + j);
+				mAttributes["aria-owns"].push(`${sTableId}-rows-row${mParams.index}-col${j}`);
 			}
 
 			if (TableUtils.hasRowActions(oTable)) {
