@@ -6,8 +6,9 @@ sap.ui.define([
 	'./TabStripItem',
 	'sap/ui/Device',
 	'sap/ui/core/InvisibleText',
-	"sap/ui/core/Element"
-], function(TabStripItem,  Device, InvisibleText, Element) {
+	"sap/ui/core/Element",
+	'sap/ui/core/IconPool' // because oRm.icon is used
+], function(TabStripItem, Device, InvisibleText, Element) {
 	"use strict";
 
 	/**

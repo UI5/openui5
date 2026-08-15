@@ -45,7 +45,7 @@
 
 				<core:Title text="Recurrence (optional)" />
 				<Label text="Repeat" />
-				<Select selectedKey="{create>/recurrenceType}" change="onRecurrenceTypeChange">
+				<Select selectedKey="{create>/recurrenceType}" change=".onRecurrenceTypeChange">
 					<core:Item key="" text="Does not repeat" />
 					<core:Item key="Daily" text="Daily" />
 					<core:Item key="Weekly" text="Weekly" />
@@ -123,10 +123,10 @@
 			</form:SimpleForm>
 		</content>
 		<beginButton>
-			<Button text="Create" type="Emphasized" press="onCreateDialogSave" />
+			<Button text="Create" type="Emphasized" press=".onCreateDialogSave" />
 		</beginButton>
 		<endButton>
-			<Button text="Cancel" press="onCreateDialogCancel" />
+			<Button text="Cancel" press=".onCreateDialogCancel" />
 		</endButton>
 	</Dialog>
 </core:FragmentDefinition>

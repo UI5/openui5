@@ -17,8 +17,8 @@
 				class="sapUiDemokitMainHeader"
 				showNotifications="{= !${versionData>/isURLVersioned} }"
 				notificationsCount="{news>/newsCount}"
-				notificationsClick="onNewsButtonPress"
-				searchFieldToggle="onSearchFieldToggle">
+				notificationsClick=".onNewsButtonPress"
+				searchFieldToggle=".onSearchFieldToggle">
 				<fiori:startButton>
 					<webcc:Button
 						id="sideNavigationToggleButton"
@@ -27,7 +27,7 @@
 						tooltip="{i18n>APP_TABHEADER_SIDE_NAVIGATION_TOGGLE_TOOLTIP}"
 						accessibleName="{i18n>APP_TABHEADER_SIDE_NAVIGATION_TOGGLE_TOOLTIP}"
 						visible="{appView>/bPhoneSize}"
-						click="onSideNavigationButtonPress" />
+						click=".onSideNavigationButtonPress" />
 				</fiori:startButton>
 				<fiori:branding>
 					<fiori:ShellBarBranding text="{i18n>APP_HEADER_TITLE}" click="onHeaderLogoPress">
@@ -47,9 +47,9 @@
 						id="searchControl"
 						placeholder="{i18n>APP_HEADER_SEARCH_FIELD_PLACEHOLDER}"
 						showClearIcon="true"
-						input="onSearchLiveChange"
-						search="onSearch"
-						close="onSearchClose"
+						input=".onSearchLiveChange"
+						search=".onSearch"
+						close=".onSearchClose"
 						class="sapUiDemokitSearchInput">
 						<fiori:messageArea>
 							<fiori:SearchMessageArea
@@ -82,7 +82,7 @@
 							? [${i18n>APP_VERSION_VERSION}, ${versionData>/fullVersion}].join(' ')
 							: '' }"
 						visible="{= ${appView>/bShowVersionSwitchButton} }"
-						click="onChangeVersionButtonPress" />
+						click=".onChangeVersionButtonPress" />
 
 					<fiori:ShellBarSpacer/>
 
@@ -93,7 +93,7 @@
 					icon="sap-icon://feedback"
 					class="sapUiDemoKitHeaderActionsSurveyButton"
 					count="{= ${appView>/bShowLongSurvey} ? '1' : '' }"
-					click="launchSurvey"
+					click=".launchSurvey"
 					text="{i18n>APP_FEEDBACK_BTN_TOOLTIP}"/>
 
 				<fiori:ShellBarItem
@@ -101,14 +101,14 @@
 					icon="sap-icon://official-service"
 					class="sapUiDemoKitHeaderActionsMenuButton"
 					text="{i18n>APP_LEGAL_BTN_TOOLTIP}"
-					click="onOpenPoliciesMenu"/>
+					click=".onOpenPoliciesMenu"/>
 
 				<fiori:ShellBarItem
 					id="aboutMenuButton"
 					class="sapUiDemoKitHeaderActionsMenuButton"
 					icon="sap-icon://action-settings"
 					text="{i18n>APP_INFORMATION_BTN_TOOLTIP}"
-					click="onOpenAboutMenu"/>
+					click=".onOpenAboutMenu"/>
 
 			</fiori:ShellBar>
 
@@ -118,7 +118,7 @@
 				<IconTabHeader
 					id="demoKitSubHeader"
 					mode="Inline"
-					select="navigateToSection"
+					select=".navigateToSection"
 					selectedKey="home">
 					<items>
 						<IconTabFilter
@@ -167,7 +167,7 @@
 				visible="{appView>/bPhoneSize}"
 				expanded="false"
 				selectedKey="home"
-				itemSelect="navigateToSection">
+				itemSelect=".navigateToSection">
 				<tnt:NavigationList>
 					<tnt:NavigationListItem
 						key="home"
@@ -201,7 +201,7 @@
 		<tnt:mainContents>
 			<VBox items="{messagesData>/messages}" width="100%" class="sapUiTinyMarginTop" visible="{=!!${messagesData>/iVisibleMessagesCount}}">
 				<items>
-					<MessageStrip close="onCloseImportantMessage" text="{
+					<MessageStrip close=".onCloseImportantMessage" text="{
 						parts: [
 							'messagesData>text'
 						],
@@ -224,7 +224,7 @@
 				visible="{= (${appView>/bHasMaster} &amp;&amp; !${appView>/bLandscape}) &#124;&#124; ${appView>/bHasMaster} &amp;&amp; ${appView>/device/system/phone} }">
 				<ToggleButton
 					class="sapUiDocumentationMasterToggleButton"
-					press="toggleMaster"
+					press=".toggleMaster"
 					pressed="{appView>/bIsShownMaster}"
 					icon="{= ${appView>/bIsShownMaster} ? 'sap-icon://navigation-left-arrow' : 'sap-icon://navigation-right-arrow' }" />
 				<Title level="H3" text="{appView>/selectedSectionTitle}" />
