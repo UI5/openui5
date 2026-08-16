@@ -78,8 +78,8 @@ sap.ui.define([
 
 		assert.ok(oExtension, "Extension available in table");
 
-		for (let i = 0; i < this.oTable.aDelegates.length; i++) {
-			if (this.oTable.aDelegates[i].oDelegate === oExtension._delegate) {
+		for (const oDelegate of this.oTable.aDelegates) {
+			if (oDelegate.oDelegate === oExtension._delegate) {
 				iDelegateCount++;
 			}
 		}
@@ -496,13 +496,13 @@ sap.ui.define([
 		const aKnownClickableControls = this.oPointerExtension._KNOWNCLICKABLECONTROLS;
 		const $CellContent = oTable.getRows()[0].getCells()[0].$();
 
-		for (let i = 0; i < aKnownClickableControls.length; i++) {
+		for (const sClass of aKnownClickableControls) {
 			TableUtils.Menu.openContextMenu.resetHistory();
-			$CellContent.toggleClass(aKnownClickableControls[i], true);
+			$CellContent.toggleClass(sClass, true);
 			this.triggerMouseDownEvent($CellContent, 2);
 			$CellContent[0].dispatchEvent(oContextMenuEvent);
 			assert.notOk(TableUtils.Menu.openContextMenu.called, "openContextMenu call");
-			$CellContent.toggleClass(aKnownClickableControls[i], false);
+			$CellContent.toggleClass(sClass, false);
 		}
 	});
 
@@ -773,23 +773,23 @@ sap.ui.define([
 		const aKnownClickableControls = oExtension._KNOWNCLICKABLECONTROLS;
 
 		$Cell = oRowColCell.cell.$();
-		for (let i = 0; i < aKnownClickableControls.length; i++) {
-			$Cell.toggleClass(aKnownClickableControls[i], true);
+		for (const sClass of aKnownClickableControls) {
+			$Cell.toggleClass(sClass, true);
 			qutils.triggerMouseEvent($Cell, "tap");
 			assert.equal(iSelectCount, 3, iSelectCount + " selections performed");
 			assert.ok(!bClickHandlerCalled, "Cell Click Event handler not called");
-			$Cell.toggleClass(aKnownClickableControls[i], false);
+			$Cell.toggleClass(sClass, false);
 		}
 
 		oRowColCell.cell.getEnabled = function() { return false; };
 		$Cell = oRowColCell.cell.$();
 		const iStartCount = iSelectCount;
-		for (let i = 0; i < aKnownClickableControls.length; i++) {
-			$Cell.toggleClass(aKnownClickableControls[i], true);
+		for (const [i, sClass] of aKnownClickableControls.entries()) {
+			$Cell.toggleClass(sClass, true);
 			qutils.triggerMouseEvent($Cell, "tap");
 			assert.equal(iSelectCount, iStartCount + i + 1, iSelectCount + " selections performed");
 			assert.ok(bClickHandlerCalled, "Cell Click Event handler called");
-			$Cell.toggleClass(aKnownClickableControls[i], false);
+			$Cell.toggleClass(sClass, false);
 		}
 
 		oExtension._ExtensionHelper._handleClickSelection = oExtension._ExtensionHelper.__handleClickSelection;

@@ -1692,8 +1692,8 @@ sap.ui.define([
 					render: function(rm, oControl) {
 						rm.openStart("div", oControl).openEnd();
 						const aContent = oControl.getContent();
-						for (let i = 0; i < aContent.length; i++) {
-							rm.renderControl(aContent[i]);
+						for (const oItem of aContent) {
+							rm.renderControl(oItem);
 						}
 						rm.close("div");
 					}

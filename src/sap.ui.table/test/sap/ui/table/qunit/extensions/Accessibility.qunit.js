@@ -1505,8 +1505,8 @@ sap.ui.define([
 		const oTable = this.oTable;
 		const aColumns = oTable._getVisibleColumns();
 		const aCells = oTable.getRows()[0].getCells();
-		for (let i = 0; i < aCells.length; i++) {
-			assert.strictEqual(aCells[i].getAriaLabelledBy()[0], aColumns[i].getId(), "ArialabelledBy to column header for cell in column " + i);
+		for (const [i, oCell] of aCells.entries()) {
+			assert.strictEqual(oCell.getAriaLabelledBy()[0], aColumns[i].getId(), "ArialabelledBy to column header for cell in column " + i);
 		}
 	});
 
@@ -2023,8 +2023,8 @@ sap.ui.define([
 		assert.strictEqual($Elem.length, 1, "Hidden Text Area available");
 		$Elem = $Elem.children();
 		assert.strictEqual($Elem.length, aHiddenTexts.length, "Number of hidden Texts");
-		for (let i = 0; i < aHiddenTexts.length; i++) {
-			assert.ok(oTable.getDomRef(aHiddenTexts[i]) != null, "Hidden Text " + aHiddenTexts[i] + " available");
+		for (const sText of aHiddenTexts) {
+			assert.ok(oTable.getDomRef(sText) != null, "Hidden Text " + sText + " available");
 		}
 		$Elem.each(function() {
 			const $T = jQuery(this);
@@ -2273,8 +2273,8 @@ sap.ui.define([
 			const aHeaders = oHelper.getRelevantColumnHeaders(tbl, col);
 			const sId = tbl && col ? col.getId() : "";
 			assert.equal(aHeaders.length, aExpectedHeaders.length, sId + ": Number of relevant headers");
-			for (let i = 0; i < aExpectedHeaders.length; i++) {
-				assert.equal(aHeaders[i], aExpectedHeaders[i], sId + ": Header " + i + " == " + aHeaders[i]);
+			for (const [i, sExpected] of aExpectedHeaders.entries()) {
+				assert.equal(aHeaders[i], sExpected, sId + ": Header " + i + " == " + aHeaders[i]);
 			}
 		}
 

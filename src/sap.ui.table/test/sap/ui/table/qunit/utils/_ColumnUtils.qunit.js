@@ -71,11 +71,7 @@ sap.ui.define([
 			};
 
 			this.fnColumnArrayToIdArray = function(aColumns) {
-				const aColumnIDs = [];
-				for (let i = 0; i < aColumns.length; i++) {
-					aColumnIDs.push({column: aColumns[i].column.getId(), level: aColumns[i].level});
-				}
-				return aColumnIDs;
+				return aColumns.map((oItem) => ({column: oItem.column.getId(), level: oItem.level}));
 			};
 
 			this.fnColumnBoundariesToId = function(mBoundaries) {
@@ -711,18 +707,13 @@ sap.ui.define([
 
 		const aVisibleColumns = oTable._getVisibleColumns();
 
-		const aOriginalColumnWidths = [];
-		for (let i = 0; i < aVisibleColumns.length; i++) {
-			const oColumn = aVisibleColumns[i];
-			aOriginalColumnWidths.push(parseInt(oColumn.getWidth()));
-		}
+		const aOriginalColumnWidths = aVisibleColumns.map((oColumn) => parseInt(oColumn.getWidth()));
 
 		function assertUnchanged(aExcludedColumns) {
-			for (let i = 0; i < aVisibleColumns.length; i++) {
+			for (const [i, oColumn] of aVisibleColumns.entries()) {
 				if (aExcludedColumns && aExcludedColumns.includes(i)) {
 					continue;
 				}
-				const oColumn = aVisibleColumns[i];
 				assert.strictEqual(parseInt(oColumn.getWidth()), aOriginalColumnWidths[i],
 					"Column " + (i + 1) + " has its original width of " + aOriginalColumnWidths[i] + "px");
 			}
@@ -893,9 +884,9 @@ sap.ui.define([
 			this.oTable = TableQUnitUtils.createTable();
 			await this.oTable.qunit.rendered();
 			this.aColumns = this.oTable.getColumns();
-			for (let i = 0; i < this.aColumns.length; i++) {
-				this.aColumns[i].setVisible(true);
-				this.aColumns[i].setWidth("100px");
+			for (const oColumn of this.aColumns) {
+				oColumn.setVisible(true);
+				oColumn.setWidth("100px");
 			}
 			this.oTable.setWidth(((this.aColumns.length * 100) + 200) + "px");
 			await nextUIUpdate();

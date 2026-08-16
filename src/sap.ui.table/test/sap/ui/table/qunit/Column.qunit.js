@@ -1245,8 +1245,7 @@ sap.ui.define([
 
 		const oGetFreeTemplateCloneSpy = sinon.spy(this.oColumn, "_getFreeTemplateClone");
 
-		for (let i = 0; i < this.aTemplateTypes.length; i++) {
-			const sTemplateType = this.aTemplateTypes[i];
+		for (const sTemplateType of this.aTemplateTypes) {
 			const oTemplateClone = this.oColumn.getTemplateClone(null, sTemplateType);
 
 			assert.strictEqual(oTemplateClone, null, sTemplateType + " type: Returned null");
@@ -1259,8 +1258,7 @@ sap.ui.define([
 	QUnit.test("getTemplateClone: No template is defined", function(assert) {
 		const oGetFreeTemplateCloneSpy = sinon.spy(this.oColumn, "_getFreeTemplateClone");
 
-		for (let i = 0; i < this.aTemplateTypes.length; i++) {
-			const sTemplateType = this.aTemplateTypes[i];
+		for (const sTemplateType of this.aTemplateTypes) {
 			const oTemplateClone = this.oColumn.getTemplateClone(0, sTemplateType);
 
 			assert.strictEqual(oTemplateClone, null, sTemplateType + " type: Returned null");
@@ -1287,9 +1285,7 @@ sap.ui.define([
 
 		const oGetFreeTemplateCloneSpy = sinon.spy(this.oColumn, "_getFreeTemplateClone");
 
-		for (let i = 0; i < this.aTemplateTypes.length; i++) {
-			sTemplateType = this.aTemplateTypes[i];
-
+		for (const [i, sTemplateType] of this.aTemplateTypes.entries()) {
 			const oTemplateClone = this.oColumn.getTemplateClone(5, sTemplateType);
 
 			assert.ok(oTemplateClone === this.oColumn._mTemplateClones[sTemplateType][0],
@@ -1328,9 +1324,7 @@ sap.ui.define([
 
 		const oGetFreeTemplateCloneSpy = sinon.spy(this.oColumn, "_getFreeTemplateClone");
 
-		for (let i = 0; i < this.aTemplateTypes.length; i++) {
-			sTemplateType = this.aTemplateTypes[i];
-
+		for (const [i, sTemplateType] of this.aTemplateTypes.entries()) {
 			const oTemplateClone = this.oColumn.getTemplateClone(5, sTemplateType);
 
 			assert.ok(oTemplateClone === this.oColumn._mTemplateClones[sTemplateType][1],
@@ -1376,9 +1370,7 @@ sap.ui.define([
 
 		const oGetFreeTemplateCloneSpy = sinon.spy(this.oColumn, "_getFreeTemplateClone");
 
-		for (let i = 0; i < this.aTemplateTypes.length; i++) {
-			sTemplateType = this.aTemplateTypes[i];
-
+		for (const sTemplateType of this.aTemplateTypes) {
 			oTemplateClone = this.oColumn.getTemplateClone(5, sTemplateType);
 
 			assert.ok(oTemplateClone === mFreeTemplateClones[sTemplateType], sTemplateType + " type: Returned the free template clone");
@@ -1435,9 +1427,7 @@ sap.ui.define([
 		createTemplateClones();
 		this.oColumn._destroyTemplateClones();
 
-		for (let i = 0; i < this.aTemplateTypes.length; i++) {
-			sTemplateType = this.aTemplateTypes[i];
-
+		for (const sTemplateType of this.aTemplateTypes) {
 			assert.ok(
 				mCloneSpies[sTemplateType][0].calledOnce
 				&& mCloneSpies[sTemplateType][1].calledOnce
@@ -1475,9 +1465,7 @@ sap.ui.define([
 	QUnit.test("Setting a template", function(assert) {
 		const oDestroyTemplateClonesSpy = sinon.spy(this.oColumn, "_destroyTemplateClones");
 
-		for (let i = 0; i < this.aTemplateTypes.length; i++) {
-			const sTemplateType = this.aTemplateTypes[i];
-
+		for (const sTemplateType of this.aTemplateTypes) {
 			this.setTemplate(sTemplateType, new TableQUnitUtils.TestControl());
 			assert.ok(oDestroyTemplateClonesSpy.calledOnce,
 				sTemplateType + " type: Column#_destroyTemplateClones was called once when setting a template");

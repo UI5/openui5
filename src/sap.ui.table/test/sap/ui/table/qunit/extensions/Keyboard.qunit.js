@@ -73,8 +73,8 @@ sap.ui.define([
 		assert.ok(oExtension, "Extension available in table");
 		assert.ok(!oExtension._itemNavigation, "Item Navigation not yet initialized");
 
-		for (let i = 0; i < this.oTable.aDelegates.length; i++) {
-			if (this.oTable.aDelegates[i].oDelegate === oExtension._delegate) {
+		for (const oDelegate of this.oTable.aDelegates) {
+			if (oDelegate.oDelegate === oExtension._delegate) {
 				iDelegateCount++;
 			}
 		}
@@ -135,8 +135,8 @@ sap.ui.define([
 			destroy: function() {
 			}
 		};
-		for (let i = 0; i < aEvents.length; i++) {
-			oExtension._itemNavigation["on" + aEvents[i]] = function(oEvent) {
+		for (const sEvent of aEvents) {
+			oExtension._itemNavigation["on" + sEvent] = function(oEvent) {
 				assert.ok(true, oEvent.type + " reached ItemNavigation");
 			};
 		}
@@ -148,8 +148,8 @@ sap.ui.define([
 		const oControl = setupItemNavigationFakeTest(assert);
 
 		assert.expect(14);
-		for (let i = 0; i < aEvents.length; i++) {
-			oControl._handleEvent(new jQuery.Event(aEvents[i]));
+		for (const sEvent of aEvents) {
+			oControl._handleEvent(new jQuery.Event(sEvent));
 		}
 
 		oControl._getKeyboardExtension().destroy();
