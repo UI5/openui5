@@ -455,15 +455,7 @@ sap.ui.define([
 			return oColumn.getVisible() || (oColumn.getGrouped ? oColumn.getGrouped() : false);
 		});
 
-		for (let i = 0; i < aVisibleAndGroupedColumns.length; i++) {
-			const oVisibleOrGroupedColumn = aVisibleAndGroupedColumns[i];
-
-			if (oVisibleOrGroupedColumn === oColumn) {
-				return i;
-			}
-		}
-
-		return -1;
+		return aVisibleAndGroupedColumns.findIndex((oVisibleOrGroupedColumn) => oVisibleOrGroupedColumn === oColumn);
 	}
 
 	function moveRangeSelection(oTable, iRowIndex, bReverse) {

@@ -97,9 +97,9 @@ sap.ui.define([
 			const aTables = SupportHelper.find(oScope, true, "sap.ui.table.Table");
 			const bIsZoomedInChrome = Device.browser.chrome && window.devicePixelRatio !== 1;
 
-			for (let i = 0; i < aTables.length; i++) {
-				const aVisibleRows = aTables[i].getRows();
-				const iExpectedRowHeight = aTables[i]._getBaseRowHeight();
+			for (const oTable of aTables) {
+				const aVisibleRows = oTable.getRows();
+				const iExpectedRowHeight = oTable._getBaseRowHeight();
 				let bUnexpectedRowHeightDetected = false;
 
 				for (let j = 0; j < aVisibleRows.length; j++) {
@@ -195,9 +195,7 @@ sap.ui.define([
 				}
 			}
 
-			for (let i = 0; i < aTables.length; i++) {
-				checkAllParentDynamicPages(aTables[i], checkConfiguration.bind(null, aTables[i]));
-			}
+			aTables.forEach((oTable) => checkAllParentDynamicPages(oTable, checkConfiguration.bind(null, oTable)));
 		}
 	});
 

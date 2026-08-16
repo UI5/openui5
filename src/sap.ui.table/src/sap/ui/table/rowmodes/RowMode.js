@@ -503,10 +503,8 @@ sap.ui.define([
 				}
 
 				const aRows = createRows(oTable, iRowCount);
-				let oRow;
 
-				for (let i = 0; i < aRows.length; i++) {
-					oRow = aRows[i];
+				for (const oRow of aRows) {
 					// prevent propagation of parent binding context; else incorrect data might be requested by the model.
 					oRow.setRowBindingContext(null, oTable);
 					oTable.addAggregation("rows", oRow, true);
@@ -697,9 +695,7 @@ sap.ui.define([
 
 		const aContexts = oMode.getRowContexts(aRows.length);
 
-		for (let i = 0; i < aRows.length; i++) {
-			aRows[i].setRowBindingContext(aContexts[i], oTable);
-		}
+		aRows.forEach((oRow, i) => oRow.setRowBindingContext(aContexts[i], oTable));
 	}
 
 	function throwNotImplementedError(oPlugin, sFunctionName) {

@@ -22,16 +22,13 @@ sap.ui.define([
 	 */
 	function checkColumnTemplate(fnDoCheck, oScope, sType) {
 		const aTables = SupportHelper.find(oScope, true, "sap.ui.table.Table");
-		let aColumns; let oTemplate;
 
-		for (let i = 0; i < aTables.length; i++) {
-			aColumns = aTables[i].getColumns();
-
-			for (let k = 0; k < aColumns.length; k++) {
-				oTemplate = aColumns[k].getTemplate();
+		for (const oTable of aTables) {
+			for (const oColumn of oTable.getColumns()) {
+				const oTemplate = oColumn.getTemplate();
 
 				if (oTemplate && oTemplate.isA(sType)) {
-					fnDoCheck(aTables[i], aColumns[k], oTemplate);
+					fnDoCheck(oTable, oColumn, oTemplate);
 				}
 			}
 		}

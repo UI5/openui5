@@ -128,15 +128,11 @@ sap.ui.define([
 		 */
 		checkLogEntries: function(fnFilter, fnCheck) {
 			const aLog = Log.getLogEntries(); //oScope.getLoggedObjects(); /*getLoggedObjects returns only log entries with supportinfo*/
-			let oLogEntry;
-			for (let i = 0; i < aLog.length; i++) {
-				oLogEntry = aLog[i];
+			aLog.some((oLogEntry) => {
 				if (fnFilter(oLogEntry)) {
-					if (fnCheck(oLogEntry)) {
-						return;
-					}
+					return fnCheck(oLogEntry);
 				}
-			}
+			});
 		}
 	};
 

@@ -185,10 +185,10 @@ sap.ui.define([
 		const aColumns = oTable.getColumns();
 
 		// Close all menus.
-		for (let i = 0; i < aColumns.length; i++) {
+		for (const oCol of aColumns) {
 			// If column menus of other columns are open, close them.
-			if (aColumns[i] !== oColumn) {
-				this._closeColumnContextMenu(aColumns[i]);
+			if (oCol !== oColumn) {
+				this._closeColumnContextMenu(oCol);
 			}
 		}
 

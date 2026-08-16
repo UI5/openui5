@@ -49,10 +49,8 @@ sap.ui.define([
 			if (oClickedControl) {
 				const $ClickedControl = oClickedControl.$();
 				if ($ClickedControl.length) {
-					for (let i = 0; i < KNOWNCLICKABLECONTROLS.length; i++) {
-						if ($ClickedControl.hasClass(KNOWNCLICKABLECONTROLS[i])) {
-							return typeof oClickedControl.getEnabled === "function" ? oClickedControl.getEnabled() : true;
-						}
+					if (KNOWNCLICKABLECONTROLS.some((sCls) => $ClickedControl.hasClass(sCls))) {
+						return typeof oClickedControl.getEnabled === "function" ? oClickedControl.getEnabled() : true;
 					}
 				}
 			}

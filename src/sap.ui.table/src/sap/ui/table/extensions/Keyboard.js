@@ -522,9 +522,9 @@ sap.ui.define([
 				const oItemNav = oTable._getItemNavigation();
 
 				if (oItemNav && oItemNav.aItemDomRefs) {
-					for (let i = 0; i < oItemNav.aItemDomRefs.length; i++) {
-						if (oItemNav.aItemDomRefs[i]) {
-							oItemNav.aItemDomRefs[i].setAttribute("tabindex", "-1");
+					for (const oDomRef of oItemNav.aItemDomRefs) {
+						if (oDomRef) {
+							oDomRef.setAttribute("tabindex", "-1");
 						}
 					}
 				}

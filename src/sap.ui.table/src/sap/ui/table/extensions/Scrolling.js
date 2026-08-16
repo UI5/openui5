@@ -2477,21 +2477,21 @@ sap.ui.define([
 			const fnOnTouchEndEventHandler = ScrollingHelper.onTouchEnd.bind(oTable, mOptions);
 			let mListeners = {};
 
-			for (let i = 0; i < aEventListenerTargets.length; i++) {
+			for (const oTarget of aEventListenerTargets) {
 				/* Touch events */
 				// Chrome on desktops and windows tablets - pointer events.
 				// Other browsers and tablets - touch events.
 				if (Device.support.pointer && Device.system.desktop) {
-					aEventListenerTargets[i].addEventListener("pointerdown", fnOnTouchStartEventHandler);
-					aEventListenerTargets[i].addEventListener("pointermove", fnOnTouchMoveEventHandler,
+					oTarget.addEventListener("pointerdown", fnOnTouchStartEventHandler);
+					oTarget.addEventListener("pointermove", fnOnTouchMoveEventHandler,
 						Device.browser.chrome ? {passive: true} : false);
-					aEventListenerTargets[i].addEventListener("pointerup", fnOnTouchEndEventHandler);
-					aEventListenerTargets[i].addEventListener("pointercancel", fnOnTouchEndEventHandler);
+					oTarget.addEventListener("pointerup", fnOnTouchEndEventHandler);
+					oTarget.addEventListener("pointercancel", fnOnTouchEndEventHandler);
 				} else if (Device.support.touch) {
-					aEventListenerTargets[i].addEventListener("touchstart", fnOnTouchStartEventHandler);
-					aEventListenerTargets[i].addEventListener("touchmove", fnOnTouchMoveEventHandler);
-					aEventListenerTargets[i].addEventListener("touchend", fnOnTouchEndEventHandler);
-					aEventListenerTargets[i].addEventListener("touchcancel", fnOnTouchEndEventHandler);
+					oTarget.addEventListener("touchstart", fnOnTouchStartEventHandler);
+					oTarget.addEventListener("touchmove", fnOnTouchMoveEventHandler);
+					oTarget.addEventListener("touchend", fnOnTouchEndEventHandler);
+					oTarget.addEventListener("touchcancel", fnOnTouchEndEventHandler);
 				}
 			}
 
@@ -2532,9 +2532,9 @@ sap.ui.define([
 				}
 			}
 
-			for (let i = 0; i < aEventTargets.length; i++) {
-				removeEventListener(aEventTargets[i], oScrollExtension._mMouseWheelEventListener);
-				removeEventListener(aEventTargets[i], oScrollExtension._mTouchEventListener);
+			for (const oTarget of aEventTargets) {
+				removeEventListener(oTarget, oScrollExtension._mMouseWheelEventListener);
+				removeEventListener(oTarget, oScrollExtension._mTouchEventListener);
 			}
 
 			delete oScrollExtension._mMouseWheelEventListener;

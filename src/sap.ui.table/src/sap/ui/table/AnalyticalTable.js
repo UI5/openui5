@@ -418,8 +418,8 @@ sap.ui.define([
 		const aColumns = [];
 		const aTableColumns = this.getColumns();
 
-		for (let i = 0; i < this._aGroupedColumns.length; i++) {
-			const oColumn = Element.getElementById(this._aGroupedColumns[i]);
+		for (const sId of this._aGroupedColumns) {
+			const oColumn = Element.getElementById(sId);
 
 			if (!oColumn) {
 				continue;
@@ -435,9 +435,7 @@ sap.ui.define([
 			});
 		}
 
-		for (let i = 0; i < aTableColumns.length; i++) {
-			const oColumn = aTableColumns[i];
-
+		for (const oColumn of aTableColumns) {
 			if (this._aGroupedColumns.indexOf(oColumn.getId()) > -1) {
 				continue;
 			}

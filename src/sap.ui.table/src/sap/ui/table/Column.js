@@ -1164,9 +1164,9 @@ sap.ui.define([
 	};
 
 	function destroyClones(aClones) {
-		for (let i = 0; i < aClones.length; i++) {
-			if (aClones[i] != null && !aClones[i].bIsDestroyed) {
-				aClones[i].destroy();
+		for (const oClone of aClones) {
+			if (oClone != null && !oClone.bIsDestroyed) {
+				oClone.destroy();
 			}
 		}
 	}

@@ -404,13 +404,11 @@ sap.ui.define([
 		const aCells = this.getCells();
 		const iAbsoluteRowIndex = this.getIndex();
 		const bHasTableCellUpdate = !!oTable._updateTableCell;
-		let oCell; let $Td; let bHasCellUpdate;
 		const oBindingContext = TableUtils.getBindingContextOfRow(this);
 
-		for (let i = 0; i < aCells.length; i++) {
-			oCell = aCells[i];
-			bHasCellUpdate = !!oCell._updateTableCell;
-			$Td = bHasCellUpdate || bHasTableCellUpdate ? oCell.$().closest("td") : null;
+		for (const oCell of aCells) {
+			const bHasCellUpdate = !!oCell._updateTableCell;
+			const $Td = bHasCellUpdate || bHasTableCellUpdate ? oCell.$().closest("td") : null;
 
 			if (bHasCellUpdate) {
 				oCell._updateTableCell(oCell, oBindingContext, $Td, iAbsoluteRowIndex);
