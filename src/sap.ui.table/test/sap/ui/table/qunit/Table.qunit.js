@@ -450,27 +450,27 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		const oHeaderSelector = oTable._getHeaderSelector();
-		const $SelectAll = oTable.$("selall");
+		const oSelectAll = oTable.getDomRef("selall");
 		const sSelectAllTitleText = TableUtils.getResourceText("TBL_SELECT_ALL");
 
 		// Initially no rows are selected.
 		assert.ok(!oHeaderSelector.getCheckBoxSelected(), "Initial: The SelectAll checkbox is not checked");
-		assert.strictEqual($SelectAll.attr("title"), sSelectAllTitleText, "Initial: The SelectAll title text is correct");
+		assert.strictEqual(oSelectAll.getAttribute("title"), sSelectAllTitleText, "Initial: The SelectAll title text is correct");
 
 		// Select all rows. The SelectAll checkbox should be checked.
 		oTable.selectAll();
 		assert.ok(oHeaderSelector.getCheckBoxSelected(), "Called selectAll: The SelectAll checkbox is checked");
-		assert.strictEqual($SelectAll.attr("title"), sSelectAllTitleText, "Called selectAll: The SelectAll title text is correct");
+		assert.strictEqual(oSelectAll.getAttribute("title"), sSelectAllTitleText, "Called selectAll: The SelectAll title text is correct");
 
 		// Deselect the first row. The SelectAll checkbox should not be checked.
 		oTable.removeSelectionInterval(0, 0);
 		assert.ok(!oHeaderSelector.getCheckBoxSelected(), "Deselected the first row: The SelectAll checkbox is not checked");
-		assert.strictEqual($SelectAll.attr("title"), sSelectAllTitleText, "Deselected the first row: The SelectAll title text is correct");
+		assert.strictEqual(oSelectAll.getAttribute("title"), sSelectAllTitleText, "Deselected the first row: The SelectAll title text is correct");
 
 		// Select the first row again. The SelectAll checkbox should be checked.
 		oTable.addSelectionInterval(0, 0);
 		assert.ok(oHeaderSelector.getCheckBoxSelected(), "Selected the first row again: The SelectAll checkbox is checked");
-		assert.strictEqual($SelectAll.attr("title"), sSelectAllTitleText, "Selected the first row again: The SelectAll title text is correct");
+		assert.strictEqual(oSelectAll.getAttribute("title"), sSelectAllTitleText, "Selected the first row again: The SelectAll title text is correct");
 	});
 
 	/**
@@ -636,20 +636,20 @@ sap.ui.define([
 
 		oTable.setEnableColumnReordering(false);
 		await nextUIUpdate();
-		assert.notOk(oColumn.$().hasClass("sapUiTableHeaderCellActive"), "Reordering disabled and the column doesn't have a header menu");
+		assert.notOk(oColumn.getDomRef().classList.contains("sapUiTableHeaderCellActive"), "Reordering disabled and the column doesn't have a header menu");
 
 		oColumn.setHeaderMenu(oHeaderMenu);
 		await nextUIUpdate();
-		assert.ok(oColumn.$().hasClass("sapUiTableHeaderCellActive"), "Column has a header menu that returns HasPopup.Menu");
+		assert.ok(oColumn.getDomRef().classList.contains("sapUiTableHeaderCellActive"), "Column has a header menu that returns HasPopup.Menu");
 
 		oHeaderMenu.getAriaHasPopupType = () => { return CoreLibrary.aria.HasPopup.None; };
 		oTable.invalidate();
 		await nextUIUpdate();
-		assert.notOk(oColumn.$().hasClass("sapUiTableHeaderCellActive"), "Column has a header menu that returns HasPopup.None");
+		assert.notOk(oColumn.getDomRef().classList.contains("sapUiTableHeaderCellActive"), "Column has a header menu that returns HasPopup.None");
 
 		oTable.setEnableColumnReordering(true);
 		await nextUIUpdate();
-		assert.ok(oColumn.$().hasClass("sapUiTableHeaderCellActive"), "Reordering is enabled");
+		assert.ok(oColumn.getDomRef().classList.contains("sapUiTableHeaderCellActive"), "Reordering is enabled");
 	});
 
 	/** @deprecated As of version 1.117 */
@@ -659,7 +659,7 @@ sap.ui.define([
 		oTable.setEnableColumnReordering(false);
 		await nextUIUpdate();
 
-		assert.ok(oColumn.$().hasClass("sapUiTableHeaderCellActive"), "Column has active state styling because of the column header popup");
+		assert.ok(oColumn.getDomRef().classList.contains("sapUiTableHeaderCellActive"), "Column has active state styling because of the column header popup");
 
 		oTable.attachColumnSelect(function(oEvent) {
 			oEvent.preventDefault();
@@ -667,7 +667,7 @@ sap.ui.define([
 		oTable.setEnableColumnReordering(false);
 		await nextUIUpdate();
 
-		assert.ok(oColumn.$().hasClass("sapUiTableHeaderCellActive"), "Column has active state styling");
+		assert.ok(oColumn.getDomRef().classList.contains("sapUiTableHeaderCellActive"), "Column has active state styling");
 	});
 
 	QUnit.test("Skip _updateTableSizes if table has no width", function(assert) {
@@ -729,48 +729,48 @@ sap.ui.define([
 
 	QUnit.test("Row Actions", async function(assert) {
 		assert.equal(oTable.getRowActionCount(), 0, "RowActionCount is 0: Table has no row actions");
-		assert.ok(!oTable.$().hasClass("sapUiTableRAct"), "RowActionCount is 0: No CSS class sapUiTableRAct");
+		assert.ok(!oTable.getDomRef().classList.contains("sapUiTableRAct"), "RowActionCount is 0: No CSS class sapUiTableRAct");
 		assert.ok(!oTable.$("sapUiTableRowActionScr").length, "RowActionCount is 0: No action area");
 
 		oTable.setRowActionCount(2);
 		await nextUIUpdate();
-		assert.ok(!oTable.$().hasClass("sapUiTableRAct"), "No row action template: No CSS class sapUiTableRAct");
+		assert.ok(!oTable.getDomRef().classList.contains("sapUiTableRAct"), "No row action template: No CSS class sapUiTableRAct");
 		assert.ok(!oTable.$("sapUiTableRowActionScr").length, "No row action template: No action area");
 
 		oTable.setRowActionTemplate(TableQUnitUtils.createRowAction(null));
 		await nextUIUpdate();
-		assert.ok(oTable.$().hasClass("sapUiTableRAct"), "CSS class sapUiTableRAct");
+		assert.ok(oTable.getDomRef().classList.contains("sapUiTableRAct"), "CSS class sapUiTableRAct");
 		assert.ok(oTable.$("sapUiTableRowActionScr").length, "Action area exists");
 
 		oTable.setRowActionCount(1);
 		await nextUIUpdate();
-		assert.ok(oTable.$().hasClass("sapUiTableRAct"), "RowActionCount is 1: CSS class sapUiTableRAct");
-		assert.ok(oTable.$().hasClass("sapUiTableRActS"), "RowActionCount is 1: CSS class sapUiTableRActS");
+		assert.ok(oTable.getDomRef().classList.contains("sapUiTableRAct"), "RowActionCount is 1: CSS class sapUiTableRAct");
+		assert.ok(oTable.getDomRef().classList.contains("sapUiTableRActS"), "RowActionCount is 1: CSS class sapUiTableRActS");
 
 		oTable.setRowActionCount(2);
 		await nextUIUpdate();
-		assert.ok(oTable.$().hasClass("sapUiTableRAct"), "RowActionCount is 2: CSS class sapUiTableRAct");
-		assert.ok(oTable.$().hasClass("sapUiTableRActM"), "RowActionCount is 2: CSS class sapUiTableRActM");
+		assert.ok(oTable.getDomRef().classList.contains("sapUiTableRAct"), "RowActionCount is 2: CSS class sapUiTableRAct");
+		assert.ok(oTable.getDomRef().classList.contains("sapUiTableRActM"), "RowActionCount is 2: CSS class sapUiTableRActM");
 
 		oTable.setRowActionCount(3);
 		await nextUIUpdate();
-		assert.ok(oTable.$().hasClass("sapUiTableRAct"), "RowActionCount is 3: CSS class sapUiTableRAct");
-		assert.ok(oTable.$().hasClass("sapUiTableRActL"), "RowActionCount is 3: CSS class sapUiTableRActL");
+		assert.ok(oTable.getDomRef().classList.contains("sapUiTableRAct"), "RowActionCount is 3: CSS class sapUiTableRAct");
+		assert.ok(oTable.getDomRef().classList.contains("sapUiTableRActL"), "RowActionCount is 3: CSS class sapUiTableRActL");
 
 		assert.ok(oTable.$("sapUiTableRowActionScr").length, "Action area exists");
-		assert.notOk(oTable.$().hasClass("sapUiTableRActFlexible"), "The RowActions column is positioned right");
+		assert.notOk(oTable.getDomRef().classList.contains("sapUiTableRActFlexible"), "The RowActions column is positioned right");
 
 		for (const oCol of oTable.getColumns()) {
 			oCol.setWidth("150.23999999px");
 		}
 		await nextUIUpdate();
-		assert.notOk(oTable.$().hasClass("sapUiTableRActFlexible"), "The RowActions column is positioned right");
+		assert.notOk(oTable.getDomRef().classList.contains("sapUiTableRActFlexible"), "The RowActions column is positioned right");
 
 		for (const oCol of oTable.getColumns()) {
 			oCol.setWidth("50px");
 		}
 		await nextUIUpdate();
-		assert.ok(oTable.$().hasClass("sapUiTableRActFlexible"), "The position of the RowActions column is calculated based on the table content");
+		assert.ok(oTable.getDomRef().classList.contains("sapUiTableRActFlexible"), "The position of the RowActions column is calculated based on the table content");
 		let oTableSizes = oTable._collectTableSizes();
 		assert.ok(oTable.$("sapUiTableRowActionScr").css("left") === 400 + oTableSizes.tableRowHdrScrWidth + oTableSizes.tableCtrlFixedWidth + "px",
 			"The RowActions column is positioned correctly");

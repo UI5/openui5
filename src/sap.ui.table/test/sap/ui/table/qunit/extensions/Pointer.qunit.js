@@ -328,9 +328,9 @@ sap.ui.define([
 		oTable._getPointerExtension()._debug();
 		const ColumnResizeHelper = oTable._getPointerExtension()._ColumnResizeHelper;
 		oTable._bIsColumnResizerMoving = true;
-		assert.ok(!oTable.$().hasClass("sapUiTableResizing"), "Before Trigger");
+		assert.ok(!oTable.getDomRef().classList.contains("sapUiTableResizing"), "Before Trigger");
 		ColumnResizeHelper.initColumnResizing(oTable);
-		assert.ok(!oTable.$().hasClass("sapUiTableResizing"), "After Trigger");
+		assert.ok(!oTable.getDomRef().classList.contains("sapUiTableResizing"), "After Trigger");
 	});
 
 	QUnit.module("Context menu", {
@@ -571,7 +571,7 @@ sap.ui.define([
 		qutils.triggerMouseEvent(oColumn.$(), "mousedown", 1, 1, oSettings.left, oSettings.top, 0);
 		await TableQUnitUtils.sleep(250);
 		assert.ok(oTable._$ReorderGhost, "Column Reordering triggered");
-		assert.ok(oTable.$().hasClass("sapUiTableDragDrop"), "Table has drag drop class");
+		assert.ok(oTable.getDomRef().classList.contains("sapUiTableDragDrop"), "Table has drag drop class");
 
 		qutils.triggerMouseEvent(oTable.qunit.getColumnHeaderCell(3), "mouseup", 1, 1, oSettings.left, oSettings.top, 0);
 		await TableQUnitUtils.sleep(100);
@@ -1576,7 +1576,7 @@ sap.ui.define([
 
 		oExtension.showColumnResizer(oColumn);
 
-		assert.ok(oTable.$().hasClass("sapUiTableResizing"), "Table has resizing class");
+		assert.ok(oTable.getDomRef().classList.contains("sapUiTableResizing"), "Table has resizing class");
 		assert.ok(oTable._$colResize.hasClass("sapUiTableColRszActive"), "Resizer marked active");
 		assert.strictEqual(oTable._$colResize.css("left"), (oColumnHeaderRect.right - oTableRect.left) + "px",
 			"Resizer positioned at the column's right edge in LTR mode");

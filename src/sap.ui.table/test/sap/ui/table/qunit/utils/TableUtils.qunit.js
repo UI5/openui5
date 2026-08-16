@@ -1392,8 +1392,8 @@ sap.ui.define([
 		assert.equal(TableUtils.getFirstInteractiveElement(oRow, false), null, "ActionCells are not taken in consideration");
 		assert.equal(TableUtils.getFirstInteractiveElement(oRow, true), $RowActionIcons[0], "ActionCells are taken in consideration");
 
-		oRow.getCells()[0].$().attr("tabindex", 0);
-		oRow.getCells()[1].$().attr("tabindex", 0);
+		oRow.getCells()[0].getDomRef().setAttribute("tabindex", 0);
+		oRow.getCells()[1].getDomRef().setAttribute("tabindex", 0);
 		assert.equal(TableUtils.getFirstInteractiveElement(oRow, true), oRow.getCells()[0].getDomRef(), "Returns the first interactive element");
 	});
 
@@ -1706,14 +1706,14 @@ sap.ui.define([
 	QUnit.test("getContentDensity", async function(assert) {
 		const oSecondLevel = new this.TableUtilsDummyControl({content: [this.oTable]});
 		const oFirstLevel = new this.TableUtilsDummyControl({content: [oSecondLevel]});
-		const $Body = jQuery(document.body);
-		$Body.toggleClass("sapUiSizeCozy", false);
+		const oBody = document.body;
+		oBody.classList.toggle("sapUiSizeCozy", false);
 
 		oFirstLevel.placeAt("__table-outer", 0);
 		await nextUIUpdate();
 		assert.strictEqual(TableUtils.getContentDensity(this.oTable), undefined, "No content density set to far");
 
-		$Body.toggleClass("sapUiSizeCozy", true);
+		oBody.classList.toggle("sapUiSizeCozy", true);
 		assert.equal(TableUtils.getContentDensity(this.oTable), "sapUiSizeCozy", "sapUiSizeCozy at Body");
 
 		oFirstLevel.addStyleClass("sapUiSizeCompact");
@@ -1740,27 +1740,27 @@ sap.ui.define([
 		assert.equal(TableUtils.getContentDensity(this.oTable), "sapUiSizeCompact", "sapUiSizeCompact at Table");
 
 		oSecondLevel.addStyleClass("sapUiSizeCompact");
-		this.oTable.$().toggleClass("sapUiSizeCompact", false);
-		this.oTable.$().toggleClass("sapUiSizeCozy", true);
+		this.oTable.getDomRef().classList.toggle("sapUiSizeCompact", false);
+		this.oTable.getDomRef().classList.toggle("sapUiSizeCozy", true);
 		assert.equal(TableUtils.getContentDensity(this.oTable), "sapUiSizeCozy",
 			"sapUiSizeCozy at table DOM and sapUiSizeCompact at control level. DOM wins -> sapUiSizeCozy");
 
-		this.oTable.$().toggleClass("sapUiSizeCondensed", true);
+		this.oTable.getDomRef().classList.toggle("sapUiSizeCondensed", true);
 		assert.equal(TableUtils.getContentDensity(this.oTable), "sapUiSizeCondensed",
 			"sapUiSizeCondensed at table DOM, sapUiSizeCozy at table DOM and sapUiSizeCompact at control level. DOM wins. -> sapUiSizeCondensed");
 
-		$Body.toggleClass("sapUiSizeCozy", true);
+		oBody.classList.toggle("sapUiSizeCozy", true);
 	});
 
 	QUnit.test("getContentDensity without DOM", function(assert) {
 		const oSecondLevel = new this.TableUtilsDummyControl({content: [this.oTable]});
 		const oFirstLevel = new this.TableUtilsDummyControl({content: [oSecondLevel]});
-		const $Body = jQuery(document.body);
-		$Body.toggleClass("sapUiSizeCozy", false);
+		const oBody = document.body;
+		oBody.classList.toggle("sapUiSizeCozy", false);
 
 		assert.strictEqual(TableUtils.getContentDensity(this.oTable), undefined, "No content density set to far");
 
-		$Body.toggleClass("sapUiSizeCozy", true);
+		oBody.classList.toggle("sapUiSizeCozy", true);
 		assert.equal(TableUtils.getContentDensity(this.oTable), "sapUiSizeCozy", "sapUiSizeCozy at Body");
 
 		oFirstLevel.addStyleClass("sapUiSizeCompact");
@@ -1780,14 +1780,14 @@ sap.ui.define([
 		this.oTable.addStyleClass("sapUiSizeCozy");
 		assert.equal(TableUtils.getContentDensity(this.oTable), "sapUiSizeCozy", "sapUiSizeCozy at Table");
 
-		$Body.toggleClass("sapUiSizeCozy", true);
+		oBody.classList.toggle("sapUiSizeCozy", true);
 	});
 
 	QUnit.test("getContentDensity table in UI Area", async function(assert) {
 		this.oTable.placeAt("__table-outer", 0);
 		await nextUIUpdate();
-		const $Body = jQuery(document.body);
-		$Body.toggleClass("sapUiSizeCozy", false);
+		const oBody = document.body;
+		oBody.classList.toggle("sapUiSizeCozy", false);
 
 		assert.strictEqual(TableUtils.getContentDensity(this.oTable), undefined, "No content density set to far");
 
@@ -1795,7 +1795,7 @@ sap.ui.define([
 		await nextUIUpdate();
 		assert.equal(TableUtils.getContentDensity(this.oTable), "sapUiSizeCozy", "sapUiSizeCozy at table");
 
-		$Body.toggleClass("sapUiSizeCozy", true);
+		oBody.classList.toggle("sapUiSizeCozy", true);
 	});
 
 	QUnit.module("Cell Content", {

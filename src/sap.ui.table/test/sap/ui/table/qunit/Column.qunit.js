@@ -1832,7 +1832,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("aria-haspopup", function(assert) {
-		assert.equal(this.oColumn1.$().attr("aria-haspopup"), "dialog", "aria-haspopup was set correctly");
+		assert.equal(this.oColumn1.getDomRef().getAttribute("aria-haspopup"), "dialog", "aria-haspopup was set correctly");
 	});
 
 	QUnit.module("FieldHelp support", {

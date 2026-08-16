@@ -860,12 +860,10 @@ sap.ui.define([
 	QUnit.test("aria-describedby with Focus", function(assert) {
 		const oTable = this.oTable;
 		const done = assert.async();
-		let $Cell;
 		for (let i = 0; i < oTable.getColumns().length; i++) {
 			oTable.qunit.getColumnHeaderCell(i).focus();
 			assert.strictEqual(document.activeElement, oTable.qunit.getColumnHeaderCell(i), "Column Header " + i + " focused");
-			$Cell = jQuery(oTable.qunit.getColumnHeaderCell(i));
-			assert.strictEqual(($Cell.attr("aria-describedby") || "").trim(), "", "aria-describedby of column header " + i);
+			assert.strictEqual((oTable.qunit.getColumnHeaderCell(i).getAttribute("aria-describedby") || "").trim(), "", "aria-describedby of column header " + i);
 		}
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
 		setTimeout(() => {
@@ -876,11 +874,9 @@ sap.ui.define([
 	QUnit.test("aria-describedby without Focus", function(assert) {
 		const oTable = this.oTable;
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		let $Cell;
 		for (let i = 0; i < oTable.getColumns().length; i++) {
 			assert.notStrictEqual(document.activeElement, oTable.qunit.getColumnHeaderCell(i), "Column Header " + i + " not focused");
-			$Cell = jQuery(oTable.qunit.getColumnHeaderCell(i));
-			assert.strictEqual(($Cell.attr("aria-describedby") || "").trim(), "", "aria-describedby of column header " + i);
+			assert.strictEqual((oTable.qunit.getColumnHeaderCell(i).getAttribute("aria-describedby") || "").trim(), "", "aria-describedby of column header " + i);
 		}
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
 	});
@@ -889,7 +885,6 @@ sap.ui.define([
 		const oTable = this.oTable;
 		const sTableId = oTable.getId();
 		const oCell = oTable._getVisibleColumns()[1].getDomRef();
-		const $Cell = jQuery(oCell);
 		oTable.getColumns()[1].setLabel(null);
 		oTable.getColumns()[1].addMultiLabel(new TestControl());
 		oTable.getColumns()[1].addMultiLabel(new TestControl());
@@ -899,7 +894,7 @@ sap.ui.define([
 
 		oCell.focus();
 
-		assert.ok($Cell.attr("aria-labelledby").includes(sTableId + "-ariarequired"), "aria-required");
+		assert.ok(oCell.getAttribute("aria-labelledby").includes(sTableId + "-ariarequired"), "aria-required");
 	});
 
 	// This use case applies for the MDC Table
@@ -907,7 +902,6 @@ sap.ui.define([
 		const oTable = this.oTable;
 		const sTableId = oTable.getId();
 		const oCell = oTable._getVisibleColumns()[1].getDomRef();
-		const $Cell = jQuery(oCell);
 		oTable.getColumns()[1].setLabel(new CustomLabelControl({
 			label: new Label({required: true})
 		}));
@@ -915,7 +909,7 @@ sap.ui.define([
 
 		oCell.focus();
 
-		assert.ok($Cell.attr("aria-labelledby").includes(sTableId + "-ariarequired"), "aria-required");
+		assert.ok(oCell.getAttribute("aria-labelledby").includes(sTableId + "-ariarequired"), "aria-required");
 	});
 
 	QUnit.test("aria-haspopup", async function(assert) {
@@ -1044,8 +1038,8 @@ sap.ui.define([
 		const oTable = this.oTable;
 		function testAriaColIndex(oTable, assert) {
 			for (let i = 0; i < oTable._getVisibleColumns().length; i++) {
-				const oCell = jQuery(oTable.qunit.getColumnHeaderCell(i));
-				assert.strictEqual(oCell.attr("aria-colindex"), (i + 2).toString(), "aria-colindex of column header [" + i + "]");
+				const oCell = oTable.qunit.getColumnHeaderCell(i);
+				assert.strictEqual(oCell.getAttribute("aria-colindex"), (i + 2).toString(), "aria-colindex of column header [" + i + "]");
 			}
 		}
 
@@ -1557,7 +1551,7 @@ sap.ui.define([
 		const oTable = this.oTable;
 		const $Elem = oTable.$().find("table");
 		$Elem.each(function() {
-			assert.strictEqual(jQuery(this).attr("role"), "presentation", "role");
+			assert.strictEqual(this.getAttribute("role"), "presentation", "role");
 		});
 	});
 
@@ -1886,31 +1880,31 @@ sap.ui.define([
 		//Heading + Extension + Footer + 2xTable + Row Selector + 2xColumn Headers + NoData Container = 8
 		assert.strictEqual($OverlayCoveredElements.length, 8, "Number of potentionally covered elements");
 		$OverlayCoveredElements.each(function() {
-			assert.ok(!jQuery(this).attr("aria-hidden"), "No aria-hidden");
+			assert.ok(!this.getAttribute("aria-hidden"), "No aria-hidden");
 		});
 		oTable.setShowOverlay(true);
 		$OverlayCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='overlay']");
 		$OverlayCoveredElements.each(function() {
-			assert.ok(jQuery(this).attr("aria-hidden") === "true", "aria-hidden");
+			assert.ok(this.getAttribute("aria-hidden") === "true", "aria-hidden");
 		});
-		let $Elem = jQuery(document.getElementById(sTableId + "-overlay"));
-		assert.strictEqual($Elem.attr("aria-labelledby"), oTable.getAriaLabelledBy() + " " + sTableId + "-ariainvalid", "aria-labelledby");
+		let oElem = document.getElementById(sTableId + "-overlay");
+		assert.strictEqual(oElem.getAttribute("aria-labelledby"), oTable.getAriaLabelledBy() + " " + sTableId + "-ariainvalid", "aria-labelledby");
 		oTable.invalidate();
 		await nextUIUpdate();
 		$OverlayCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='overlay']");
 		$OverlayCoveredElements.each(function() {
-			assert.ok(jQuery(this).attr("aria-hidden") === "true", "aria-hidden");
+			assert.ok(this.getAttribute("aria-hidden") === "true", "aria-hidden");
 		});
 		oTable.setShowOverlay(false);
 		$OverlayCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='overlay']");
 		$OverlayCoveredElements.each(function() {
-			assert.ok(!jQuery(this).attr("aria-hidden"), "No aria-hidden");
+			assert.ok(!this.getAttribute("aria-hidden"), "No aria-hidden");
 		});
 
 		oTable.removeAllAriaLabelledBy();
 		await nextUIUpdate();
-		$Elem = jQuery(document.getElementById(sTableId + "-overlay"));
-		assert.strictEqual($Elem.attr("aria-labelledby"), sTableId + "-ariainvalid",
+		oElem = document.getElementById(sTableId + "-overlay");
+		assert.strictEqual(oElem.getAttribute("aria-labelledby"), sTableId + "-ariainvalid",
 			"aria-labelledby when ariaLabelledBy association is empty array");
 	});
 
@@ -1926,34 +1920,34 @@ sap.ui.define([
 		//Heading + Extension + Footer + 2xTable + Row Selector + 2xColumn Headers + NoData Container = 8
 		assert.strictEqual($OverlayCoveredElements.length, 8, "Number of potentionally covered elements");
 		$OverlayCoveredElements.each(function() {
-			assert.ok(!jQuery(this).attr("aria-hidden"), "No aria-hidden");
+			assert.ok(!this.getAttribute("aria-hidden"), "No aria-hidden");
 		});
 		oTable.setShowOverlay(true);
 		$OverlayCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='overlay']");
 		$OverlayCoveredElements.each(function() {
-			assert.ok(jQuery(this).attr("aria-hidden") === "true", "aria-hidden");
+			assert.ok(this.getAttribute("aria-hidden") === "true", "aria-hidden");
 		});
-		let $Elem = jQuery(document.getElementById(sTableId + "-overlay"));
-		assert.strictEqual($Elem.attr("aria-labelledby"),
+		let oElem = document.getElementById(sTableId + "-overlay");
+		assert.strictEqual(oElem.getAttribute("aria-labelledby"),
 			`${oTable.getAriaLabelledBy()} ${oTable.getTitle().getId()} ${sTableId}-ariainvalid`, "aria-labelledby");
 		oTable.invalidate();
 		await nextUIUpdate();
 
 		$OverlayCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='overlay']");
 		$OverlayCoveredElements.each(function() {
-			assert.ok(jQuery(this).attr("aria-hidden") === "true", "aria-hidden");
+			assert.ok(this.getAttribute("aria-hidden") === "true", "aria-hidden");
 		});
 		oTable.setShowOverlay(false);
 		$OverlayCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='overlay']");
 		$OverlayCoveredElements.each(function() {
-			assert.ok(!jQuery(this).attr("aria-hidden"), "No aria-hidden");
+			assert.ok(!this.getAttribute("aria-hidden"), "No aria-hidden");
 		});
 
 		oTable.removeAriaLabelledBy(oTable.getAriaLabelledBy()[0]);
 		await nextUIUpdate();
 
-		$Elem = jQuery(document.getElementById(sTableId + "-overlay"));
-		assert.strictEqual($Elem.attr("aria-labelledby"),
+		oElem = document.getElementById(sTableId + "-overlay");
+		assert.strictEqual(oElem.getAttribute("aria-labelledby"),
 			oTable.getTitle().getId() + " " + sTableId + "-ariainvalid", "aria-labelledby when ariaLabelledBy association is empty array");
 	});
 
@@ -1965,21 +1959,21 @@ sap.ui.define([
 		// 2xTable + Row Selector = 3
 		assert.strictEqual($NoDataCoveredElements.length, 3, "Number of potentially covered elements");
 		$NoDataCoveredElements.each(function() {
-			assert.ok(!jQuery(this).attr("aria-hidden"), "No aria-hidden");
+			assert.ok(!this.getAttribute("aria-hidden"), "No aria-hidden");
 		});
 
 		async function onNewModelApplied() {
 			oTable.detachRowsUpdated(onNewModelApplied);
 			$NoDataCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='nodata']");
 			$NoDataCoveredElements.each(function() {
-				assert.ok(jQuery(this).attr("aria-hidden") === "true", "aria-hidden");
+				assert.ok(this.getAttribute("aria-hidden") === "true", "aria-hidden");
 			});
 			oTable.invalidate();
 			await nextUIUpdate();
 			// eslint-disable-next-line require-atomic-updates
 			$NoDataCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='nodata']");
 			$NoDataCoveredElements.each(function() {
-				assert.ok(jQuery(this).attr("aria-hidden") === "true", "aria-hidden");
+				assert.ok(this.getAttribute("aria-hidden") === "true", "aria-hidden");
 			});
 
 			const $Elem = oTable.$("noDataCnt");
@@ -2003,7 +1997,7 @@ sap.ui.define([
 			// eslint-disable-next-line require-atomic-updates
 			$NoDataCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='nodata']");
 			$NoDataCoveredElements.each(function() {
-				assert.ok(!jQuery(this).attr("aria-hidden"), "No aria-hidden");
+				assert.ok(!this.getAttribute("aria-hidden"), "No aria-hidden");
 			});
 			done();
 		}
@@ -2027,10 +2021,9 @@ sap.ui.define([
 			assert.ok(oTable.getDomRef(sText) != null, "Hidden Text " + sText + " available");
 		}
 		$Elem.each(function() {
-			const $T = jQuery(this);
-			const sId = $T.attr("id");
-			assert.strictEqual($T.attr("aria-hidden"), "true", "aria-hidden " + sId);
-			assert.ok($T.hasClass("sapUiInvisibleText"), "sapUiInvisibleText " + sId);
+			const sId = this.getAttribute("id");
+			assert.strictEqual(this.getAttribute("aria-hidden"), "true", "aria-hidden " + sId);
+			assert.ok(this.classList.contains("sapUiInvisibleText"), "sapUiInvisibleText " + sId);
 		});
 	});
 
@@ -2185,15 +2178,15 @@ sap.ui.define([
 		const done = assert.async();
 		oTable.qunit.getDataCell(2, 0).focus();
 		assert.strictEqual(document.activeElement, oTable.qunit.getDataCell(2, 0), "Cell [2, 0] focused");
-		const $Cell = jQuery(oTable.qunit.getDataCell(2, 0));
-		testAriaLabelsForFocusedDataCell(oTable, $Cell[0], 2, 0, assert, {firstTime: true});
+		const oCell = oTable.qunit.getDataCell(2, 0);
+		testAriaLabelsForFocusedDataCell(oTable, oCell, 2, 0, assert, {firstTime: true});
 
 		let bFocusTriggered = false;
 		const iDelay = 150;
 
 		const oDelegate = {
 			onfocusin: function(oEvent) {
-				assert.ok(oEvent.target === $Cell.get(0), "Refocus of cell done to trigger screenreader refresh");
+				assert.ok(oEvent.target === oCell, "Refocus of cell done to trigger screenreader refresh");
 				bFocusTriggered = true;
 			}
 		};
@@ -2206,14 +2199,14 @@ sap.ui.define([
 		setTimeout(() => {
 			oTable.removeEventDelegate(oDelegate);
 			assert.ok(!bFocusTriggered, "No Refocus of cell done after " + (iDelay + 10) + " ms");
-			testAriaLabelsForFocusedDataCell(oTable, $Cell[0], 2, 0, assert, {rowChange: true});
-			assert.ok(!$Cell.attr("aria-busy"), "Cell is not in busy mode anymore");
-			assert.ok(!$Cell.attr("aria-hidden"), "Cell is not hidden anymore");
+			testAriaLabelsForFocusedDataCell(oTable, oCell, 2, 0, assert, {rowChange: true});
+			assert.ok(!oCell.getAttribute("aria-busy"), "Cell is not in busy mode anymore");
+			assert.ok(!oCell.getAttribute("aria-hidden"), "Cell is not hidden anymore");
 			assert.ok((oTable.$("cellacc").html() || "").includes("A_3"), "Acc Text after scrolling");
 			TableQUnitUtils.setFocusOutsideOfTable(assert);
 			oTable.setFirstVisibleRow(0);
 			setTimeout(() => {
-				testAriaLabelsForNonFocusedDataCell(oTable, $Cell[0], 2, 0, assert);
+				testAriaLabelsForNonFocusedDataCell(oTable, oCell, 2, 0, assert);
 				done();
 			}, 100);
 		}, iDelay + 50);
