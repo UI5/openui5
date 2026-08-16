@@ -21,13 +21,13 @@ sap.ui.define([],
 			hScroll: {
 				ignore: false,
 				domRef: function(oElement) {
-					return oElement.$("hsb").get(0);
+					return oElement.getDomRef("hsb");
 				}
 			},
 			vScroll: {
 				ignore: false,
 				domRef: function(oElement) {
-					return oElement.$("vsb").get(0);
+					return oElement.getDomRef("vsb");
 				}
 			}
 		}

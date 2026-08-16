@@ -9,16 +9,14 @@ sap.ui.define([
 	"../utils/TableUtils",
 	"sap/ui/core/delegate/ItemNavigation",
 	"sap/ui/Device",
-	"sap/ui/dom/containsOrEquals",
-	"sap/ui/thirdparty/jquery"
+	"sap/ui/dom/containsOrEquals"
 ], function(
 	ExtensionBase,
 	KeyboardDelegate,
 	TableUtils,
 	ItemNavigation,
 	Device,
-	containsOrEquals,
-	jQuery
+	containsOrEquals
 ) {
 	"use strict";
 
@@ -113,7 +111,7 @@ sap.ui.define([
 				return;
 			}
 
-			const $Table = oTable.$();
+			const oTableDomRef = oTable.getDomRef();
 			const iRowCount = oTable.getRows().length;
 			let iColumnCount = TableUtils.getVisibleColumnCount(oTable);
 			const bHasRowHeader = TableUtils.hasRowHeader(oTable);
@@ -123,25 +121,25 @@ sap.ui.define([
 
 			// create the list of item dom refs
 			let aItemDomRefs = [];
-			let aRowHdrDomRefs; let aRowActionDomRefs; let $topLeft; let $middleLeft; let $bottomLeft;
+			let aRowHdrDomRefs; let aRowActionDomRefs; let oTopLeft; let oMiddleLeft; let oBottomLeft;
 
 			if (bHasFixedColumns) {
-				$topLeft = $Table.find(".sapUiTableCtrlFixed.sapUiTableCtrlRowFixed:not(.sapUiTableCHT)");
-				$middleLeft = $Table.find(".sapUiTableCtrlFixed.sapUiTableCtrlRowScroll:not(.sapUiTableCHT)");
-				$bottomLeft = $Table.find(".sapUiTableCtrlFixed.sapUiTableCtrlRowFixedBottom:not(.sapUiTableCHT)");
+				oTopLeft = oTableDomRef?.querySelector(".sapUiTableCtrlFixed.sapUiTableCtrlRowFixed:not(.sapUiTableCHT)");
+				oMiddleLeft = oTableDomRef?.querySelector(".sapUiTableCtrlFixed.sapUiTableCtrlRowScroll:not(.sapUiTableCHT)");
+				oBottomLeft = oTableDomRef?.querySelector(".sapUiTableCtrlFixed.sapUiTableCtrlRowFixedBottom:not(.sapUiTableCHT)");
 			}
 
-			const $topRight = $Table.find(".sapUiTableCtrlScroll.sapUiTableCtrlRowFixed:not(.sapUiTableCHT)");
-			const $middleRight = $Table.find(".sapUiTableCtrlScroll.sapUiTableCtrlRowScroll:not(.sapUiTableCHT)");
-			const $bottomRight = $Table.find(".sapUiTableCtrlScroll.sapUiTableCtrlRowFixedBottom:not(.sapUiTableCHT)");
+			const oTopRight = oTableDomRef?.querySelector(".sapUiTableCtrlScroll.sapUiTableCtrlRowFixed:not(.sapUiTableCHT)");
+			const oMiddleRight = oTableDomRef?.querySelector(".sapUiTableCtrlScroll.sapUiTableCtrlRowScroll:not(.sapUiTableCHT)");
+			const oBottomRight = oTableDomRef?.querySelector(".sapUiTableCtrlScroll.sapUiTableCtrlRowFixedBottom:not(.sapUiTableCHT)");
 
 			if (bHasRowHeader) {
-				aRowHdrDomRefs = $Table.find(".sapUiTableRowSelectionCell").get();
+				aRowHdrDomRefs = Array.from(oTableDomRef?.querySelectorAll(".sapUiTableRowSelectionCell") ?? []);
 				iColumnCount++;
 			}
 
 			if (bHasRowActions) {
-				aRowActionDomRefs = $Table.find(".sapUiTableRowActionCell").get();
+				aRowActionDomRefs = Array.from(oTableDomRef?.querySelectorAll(".sapUiTableRowActionCell") ?? []);
 				iColumnCount++;
 			}
 
@@ -150,17 +148,17 @@ sap.ui.define([
 					aItemDomRefs.push(aRowHdrDomRefs[i]);
 				}
 				if (bHasFixedColumns) {
-					aItemDomRefs = aItemDomRefs.concat($topLeft.find("tr[data-sap-ui-rowindex=\"" + i + "\"]").find("td[tabindex]").get());
+					aItemDomRefs = aItemDomRefs.concat(Array.from(oTopLeft?.querySelectorAll(`tr[data-sap-ui-rowindex="${i}"] td[tabindex]`) ?? []));
 				}
-				aItemDomRefs = aItemDomRefs.concat($topRight.find("tr[data-sap-ui-rowindex=\"" + i + "\"]").find("td[tabindex]").get());
+				aItemDomRefs = aItemDomRefs.concat(Array.from(oTopRight?.querySelectorAll(`tr[data-sap-ui-rowindex="${i}"] td[tabindex]`) ?? []));
 				if (bHasFixedColumns) {
-					aItemDomRefs = aItemDomRefs.concat($middleLeft.find("tr[data-sap-ui-rowindex=\"" + i + "\"]").find("td[tabindex]").get());
+					aItemDomRefs = aItemDomRefs.concat(Array.from(oMiddleLeft?.querySelectorAll(`tr[data-sap-ui-rowindex="${i}"] td[tabindex]`) ?? []));
 				}
-				aItemDomRefs = aItemDomRefs.concat($middleRight.find("tr[data-sap-ui-rowindex=\"" + i + "\"]").find("td[tabindex]").get());
+				aItemDomRefs = aItemDomRefs.concat(Array.from(oMiddleRight?.querySelectorAll(`tr[data-sap-ui-rowindex="${i}"] td[tabindex]`) ?? []));
 				if (bHasFixedColumns) {
-					aItemDomRefs = aItemDomRefs.concat($bottomLeft.find("tr[data-sap-ui-rowindex=\"" + i + "\"]").find("td[tabindex]").get());
+					aItemDomRefs = aItemDomRefs.concat(Array.from(oBottomLeft?.querySelectorAll(`tr[data-sap-ui-rowindex="${i}"] td[tabindex]`) ?? []));
 				}
-				aItemDomRefs = aItemDomRefs.concat($bottomRight.find("tr[data-sap-ui-rowindex=\"" + i + "\"]").find("td[tabindex]").get());
+				aItemDomRefs = aItemDomRefs.concat(Array.from(oBottomRight?.querySelectorAll(`tr[data-sap-ui-rowindex="${i}"] td[tabindex]`) ?? []));
 				if (bHasRowActions) {
 					aItemDomRefs.push(aRowActionDomRefs[i]);
 				}
@@ -171,9 +169,9 @@ sap.ui.define([
 				let aHeaderDomRefs = [];
 
 				// Returns the .sapUiTableColHdr elements (.sapUiTableColHdrCnt .sapUiTableCtrlFixed .sapUiTableColHdrTr)
-				const $FixedHeaders = $Table.find(".sapUiTableCHT.sapUiTableCtrlFixed>tbody>tr");
+				const aFixedHeaders = Array.from(oTableDomRef?.querySelectorAll(".sapUiTableCHT.sapUiTableCtrlFixed>tbody>tr") ?? []);
 				// Returns the .sapUiTableColHdr elements (.sapUiTableColHdrCnt .sapUiTableCtrlScr .sapUiTableColHdrTr)
-				const $ScrollHeaders = $Table.find(".sapUiTableCHT.sapUiTableCtrlScroll>tbody>tr");
+				const aScrollHeaders = Array.from(oTableDomRef?.querySelectorAll(".sapUiTableCHT.sapUiTableCtrlScroll>tbody>tr") ?? []);
 				const iHeaderRowCount = TableUtils.getHeaderRowCount(oTable);
 
 				for (i = 0; i < iHeaderRowCount; i++) {
@@ -181,11 +179,11 @@ sap.ui.define([
 						aHeaderDomRefs.push(oTable.getDomRef("selall"));
 					}
 
-					if ($FixedHeaders.length) {
-						aHeaderDomRefs = aHeaderDomRefs.concat(jQuery($FixedHeaders.get(i)).find(".sapUiTableHeaderCell").get());
+					if (aFixedHeaders.length) {
+						aHeaderDomRefs = aHeaderDomRefs.concat(Array.from(aFixedHeaders[i].querySelectorAll(".sapUiTableHeaderCell")));
 					}
-					if ($ScrollHeaders.length) {
-						aHeaderDomRefs = aHeaderDomRefs.concat(jQuery($ScrollHeaders.get(i)).find(".sapUiTableHeaderCell").get());
+					if (aScrollHeaders.length) {
+						aHeaderDomRefs = aHeaderDomRefs.concat(Array.from(aScrollHeaders[i].querySelectorAll(".sapUiTableHeaderCell")));
 					}
 
 					if (bHasRowActions) {
@@ -213,7 +211,7 @@ sap.ui.define([
 
 			// configure the item navigation
 			oExtension._itemNavigation.setColumns(iColumnCount);
-			oExtension._itemNavigation.setRootDomRef($Table.find(".sapUiTableCnt").get(0));
+			oExtension._itemNavigation.setRootDomRef(oTableDomRef?.querySelector(".sapUiTableCnt"));
 			oExtension._itemNavigation.setItemDomRefs(aItemDomRefs);
 
 			if (!bSkipInitFocusedIndex) {
@@ -382,12 +380,12 @@ sap.ui.define([
 		}
 
 		if (oTable.getShowOverlay()) {
-			if (containsOrEquals(oTable.getDomRef(), oActiveElement) && oTable.$("overlay")[0] !== oActiveElement) {
+			if (containsOrEquals(oTable.getDomRef(), oActiveElement) && oTable.getDomRef("overlay") !== oActiveElement) {
 				this._oLastFocus = {Ref: oActiveElement, Pos: "overlay"};
 				oTable.getDomRef("overlay").focus();
 			}
 		} else if (TableUtils.isNoDataVisible(oTable)) {
-			if (oTable.$("noDataCnt")[0] === oActiveElement) {
+			if (oTable.getDomRef("noDataCnt") === oActiveElement) {
 				return;
 			}
 			if (containsOrEquals(oTable.getDomRef("tableCCnt"), oActiveElement)) {
@@ -396,7 +394,7 @@ sap.ui.define([
 					oTable.getDomRef("noDataCnt").getBoundingClientRect();
 				}
 				oTable.getDomRef("noDataCnt").focus();
-			} else if (oTable.$("overlay")[0] === oActiveElement) {
+			} else if (oTable.getDomRef("overlay") === oActiveElement) {
 				setFocusFallback(oTable, this);
 			}
 		} else if (this._oLastFocus) {
@@ -418,10 +416,10 @@ sap.ui.define([
 	};
 
 	function restoreFocusToDataCell(oTable, oKeyboardExtension) {
-		if (!jQuery(oKeyboardExtension._oLastFocus.Ref).hasClass("sapUiTableCell")) {
+		if (!oKeyboardExtension._oLastFocus.Ref.classList.contains("sapUiTableCell")) {
 			const oParentCell = TableUtils.getParentCell(oTable, oKeyboardExtension._oLastFocus.Ref);
 
-			if (oParentCell && oParentCell[0] && jQuery(oParentCell[0]).hasClass("sapUiTableCell")) {
+			if (oParentCell && oParentCell[0] && oParentCell[0].classList.contains("sapUiTableCell")) {
 				oParentCell[0].focus();
 			} else {
 				oKeyboardExtension._oLastFocus.Ref.focus();
@@ -516,9 +514,7 @@ sap.ui.define([
 		const oCellInfo = TableUtils.getCellInfo(oElement);
 
 		if (oCellInfo.isOfType(TableUtils.CELLTYPE.ANY) && oTable) {
-			const $Elem = jQuery(oElement);
-
-			if ($Elem.attr("tabindex") !== "0") {
+			if (oElement.getAttribute("tabindex") !== "0") {
 				const oItemNav = oTable._getItemNavigation();
 
 				if (oItemNav && oItemNav.aItemDomRefs) {
@@ -528,7 +524,7 @@ sap.ui.define([
 						}
 					}
 				}
-				$Elem.attr("tabindex", "0");
+				oElement.setAttribute("tabindex", "0");
 			}
 		}
 

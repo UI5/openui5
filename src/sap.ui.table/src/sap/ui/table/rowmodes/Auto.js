@@ -4,13 +4,11 @@
 sap.ui.define([
 	"../utils/TableUtils",
 	"./RowMode",
-	"sap/ui/Device",
-	"sap/ui/thirdparty/jquery"
+	"sap/ui/Device"
 ], function(
 	TableUtils,
 	RowMode,
-	Device,
-	jQuery
+	Device
 ) {
 	"use strict";
 
@@ -466,7 +464,7 @@ sap.ui.define([
 		}
 
 		const oReferenceElement = _private(this).bTableIsFlexItem ? oTableDomRef : oTableDomRef.parentNode;
-		const iNewAvailableSpace = Math.max(0, Math.floor(jQuery(oReferenceElement).height() - iUsedHeight));
+		const iNewAvailableSpace = Math.max(0, Math.floor(oReferenceElement.getBoundingClientRect().height - iUsedHeight));
 		const iAvailableSpaceDifference = Math.abs(iNewAvailableSpace - _private(this).iLastAvailableSpace);
 
 		if (iAvailableSpaceDifference >= 5) {

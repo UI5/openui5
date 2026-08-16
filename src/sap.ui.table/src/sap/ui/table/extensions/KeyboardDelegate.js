@@ -793,13 +793,13 @@ sap.ui.define([
 		}
 
 		const oKeyboardExtension = this._getKeyboardExtension();
-		const $Target = jQuery(oEvent.target);
+		const oTarget = oEvent.target;
 
-		if ($Target.hasClass("sapUiTableOuterBefore") || $Target.hasClass("sapUiTableOuterAfter")
+		if (oTarget.classList.contains("sapUiTableOuterBefore") || oTarget.classList.contains("sapUiTableOuterAfter")
 			|| (oEvent.target !== this.getDomRef("overlay") && this.getShowOverlay())) {
-			this.$("overlay").trigger("focus");
+			this.getDomRef("overlay")?.focus();
 
-		} else if ($Target.hasClass("sapUiTableCtrlBefore")) {
+		} else if (oTarget.classList.contains("sapUiTableCtrlBefore")) {
 			const bNoData = TableUtils.isNoDataVisible(this);
 			const oBusyIndicator = this.getDomRef("busyIndicator");
 			if (oBusyIndicator) {
@@ -816,7 +816,7 @@ sap.ui.define([
 				oKeyboardExtension.setSilentFocus(this.$("noDataCnt"));
 			}
 
-		} else if ($Target.hasClass("sapUiTableCtrlAfter")) {
+		} else if (oTarget.classList.contains("sapUiTableCtrlAfter")) {
 			const oBusyIndicator = this.getDomRef("busyIndicator");
 			if (oBusyIndicator) {
 				oKeyboardExtension.setSilentFocus(oBusyIndicator);
@@ -1025,7 +1025,7 @@ sap.ui.define([
 			if (this.getRows().length === 0) {
 				forwardFocusToTabDummy(this, "sapUiTableCtrlAfter");
 			} else if (TableUtils.isNoDataVisible(this)) {
-				this.$("noDataCnt").trigger("focus");
+				this.getDomRef("noDataCnt")?.focus();
 				oEvent.preventDefault();
 			} else if (this.getRows().length > 0) {
 				restoreFocusOnLastFocusedDataCell(this, oEvent);
