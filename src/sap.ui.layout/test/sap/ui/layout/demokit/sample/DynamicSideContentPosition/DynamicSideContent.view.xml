@@ -40,7 +40,7 @@
 			<Toolbar>
 				<Button text="Toggle" type="Accept" press=".handleToggleClick" id="toggleButton"/>
 				<Slider id='DSCWidthSlider' value="100" liveChange=".handleSliderChange" />
-				<Text id='DSCWidthHintText' text="Best view in full screen mode" visible="getVisible()"/>
+				<Text id='DSCWidthHintText' text="Best view in full screen mode"/>
 			</Toolbar>
 		</footer>
 	</Page>
