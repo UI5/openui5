@@ -189,13 +189,13 @@ sap.ui.define([
 			moveResizer(this.oColumn);
 
 			// Simulate double click on resizer
-			await new Promise(function(resolve) {
+			await new Promise((resolve) => {
 				oResizer.dispatchEvent(createPointerEvent("mousedown"));
 				oResizer.dispatchEvent(createPointerEvent("mouseup"));
 				oResizer.dispatchEvent(createPointerEvent("click"));
 				setTimeout(resolve, 50);
 			});
-			await new Promise(function(resolve) {
+			await new Promise((resolve) => {
 				oResizer.dispatchEvent(createPointerEvent("mousedown"));
 				oResizer.dispatchEvent(createPointerEvent("mouseup"));
 				oResizer.dispatchEvent(createPointerEvent("click"));
@@ -1324,11 +1324,11 @@ sap.ui.define([
 		assert.equal(oTreeTable.indexOfColumn(oColumn), 1, "Initial index of column");
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousedown", 1, 1, oSettings.left, oSettings.top, 0);
-		setTimeout(function() {
+		setTimeout(() => {
 			qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft + 30, oSettings.top, 0);
 			qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft - 20, oSettings.top, 0);
 			qutils.triggerMouseEvent(oColumn.$(), "mouseup", 1, 1, iLeft - 20, oSettings.top, 0);
-			setTimeout(async function() {
+			setTimeout(async () => {
 				await nextUIUpdate();
 				assert.equal(oTreeTable.indexOfColumn(oColumn), 1, "Index of column not changed");
 				done();
@@ -1530,7 +1530,7 @@ sap.ui.define([
 		oTable.setSelectionBehavior(library.SelectionBehavior.RowSelector);
 		oTable.invalidate();
 		await nextUIUpdate();
-		oTable.attachCellClick(function() {});
+		oTable.attachCellClick(() => {});
 		jQuery(oTable.qunit.getDataCell(0, 2)).trigger("mouseover");
 		assert.ok(jQuery(oTable.qunit.getRowHeaderCell(0)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on row header");
 		assert.ok(jQuery(oTable.qunit.getDataCell(0, 0)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on fixed part of row");

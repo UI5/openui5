@@ -155,7 +155,7 @@ sap.ui.define([
 		mGroupModeSetter[HierarchyMode.Tree] = Grouping.setHierarchyMode.bind(Grouping, this.oTable, HierarchyMode.Tree);
 		mGroupModeSetter[HierarchyMode.GroupedTree] = Grouping.setHierarchyMode.bind(Grouping, this.oTable, HierarchyMode.GroupedTree);
 
-		[
+		for (const mTestSettings of [
 			{newMode: HierarchyMode.Flat, expectInvalidation: false},
 			{newMode: HierarchyMode.Group, expectInvalidation: true},
 			{newMode: HierarchyMode.Group, expectInvalidation: false},
@@ -164,13 +164,13 @@ sap.ui.define([
 			{newMode: HierarchyMode.GroupedTree, expectInvalidation: true},
 			{newMode: HierarchyMode.GroupedTree, expectInvalidation: false},
 			{newMode: HierarchyMode.Flat, expectInvalidation: true}
-		].forEach(function(mTestSettings) {
+		]) {
 			mGroupModeSetter[mTestSettings.newMode]();
 			assert.equal(oInvalidate.callCount, mTestSettings.expectInvalidation ? 1 : 0,
 				"Set from " + sCurrentMode + " mode to " + mTestSettings.newMode + " mode");
 			oInvalidate.resetHistory();
 			sCurrentMode = mTestSettings.newMode;
-		});
+		}
 	});
 
 	QUnit.module("Rendering", {

@@ -208,35 +208,35 @@ sap.ui.define([
 			summary: {group: true, total: true}
 		}, "Reset settings");
 
-		assert.throws(function() {
+		assert.throws(() => {
 			this._oColumn._setCellContentVisibilitySettings("notAnObject");
-		}.bind(this), new Error("Invalid value"), "Settings is not an object");
+		}, new Error("Invalid value"), "Settings is not an object");
 
-		assert.throws(function() {
+		assert.throws(() => {
 			this._oColumn._setCellContentVisibilitySettings({
 				standard: false,
 				iAmNotAllowed: false
 			});
-		}.bind(this), new Error("Unsupported setting 'iAmNotAllowed'"), "Settings contain invalid keys on first level");
+		}, new Error("Unsupported setting 'iAmNotAllowed'"), "Settings contain invalid keys on first level");
 
-		assert.throws(function() {
+		assert.throws(() => {
 			this._oColumn._setCellContentVisibilitySettings({
 				standard: false,
 				groupHeader: {expanded: false, iAmNotAllowed: false}
 			});
-		}.bind(this), new Error("Unsupported setting 'groupHeader.iAmNotAllowed'"), "Settings contain invalid keys on second level");
+		}, new Error("Unsupported setting 'groupHeader.iAmNotAllowed'"), "Settings contain invalid keys on second level");
 
-		assert.throws(function() {
+		assert.throws(() => {
 			this._oColumn._setCellContentVisibilitySettings({
 				standard: 0
 			});
-		}.bind(this), new Error("Invalid value for 'standard'"), "Settings contain invalid value for boolean setting");
+		}, new Error("Invalid value for 'standard'"), "Settings contain invalid value for boolean setting");
 
-		assert.throws(function() {
+		assert.throws(() => {
 			this._oColumn._setCellContentVisibilitySettings({
 				groupHeader: "true"
 			});
-		}.bind(this), new Error("Invalid value for 'groupHeader'"), "Settings contain invalid value for boolean|object setting");
+		}, new Error("Invalid value for 'groupHeader'"), "Settings contain invalid value for boolean|object setting");
 
 		const oInvalidate = this.spy(this._oColumn, "invalidate");
 		this._oColumn._setCellContentVisibilitySettings({standard: false});

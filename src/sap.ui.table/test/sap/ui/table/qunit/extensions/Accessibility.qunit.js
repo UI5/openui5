@@ -156,7 +156,7 @@ sap.ui.define([
 	TestInputControl.prototype.getAccessibilityInfo = TestControl.prototype.getAccessibilityInfo;
 
 	async function _modifyTables(oTable, oTreeTable) {
-		[oTable, oTreeTable].forEach(function(_oTable) {
+		for (const _oTable of [oTable, oTreeTable]) {
 			_oTable.destroyColumns();
 			_oTable.addColumn(TableQUnitUtils.createTextColumn({label: "A Label", text: "A", bind: true, focusable: true, tabbable: true}));
 
@@ -188,7 +188,7 @@ sap.ui.define([
 				highlight: "Success",
 				navigated: true
 			}));
-		});
+		}
 
 		oTable.setSelectedIndex(0);
 		oTreeTable.setFixedColumnCount(1);
@@ -772,7 +772,7 @@ sap.ui.define([
 			testAriaLabelsForColumnHeader(oTable, $Cell, i, assert, {firstTime: false, colChange: true, focus: true});
 		}
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		setTimeout(function() {
+		setTimeout(() => {
 			testAriaLabelsForColumnHeader(oTable, $Cell, oTable.getColumns().length - 1, assert);
 			done();
 		}, 100);
@@ -868,7 +868,7 @@ sap.ui.define([
 			assert.strictEqual(($Cell.attr("aria-describedby") || "").trim(), "", "aria-describedby of column header " + i);
 		}
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		setTimeout(function() {
+		setTimeout(() => {
 			done();
 		}, 100);
 	});
@@ -1515,7 +1515,7 @@ sap.ui.define([
 		const done = assert.async();
 		let $Elem;
 
-		oTreeTable.attachEventOnce("rowsUpdated", function() {
+		oTreeTable.attachEventOnce("rowsUpdated", () => {
 			$Elem = oTreeTable.$("rows-row0-col0").find(".sapUiTableTreeIcon");
 			assert.strictEqual($Elem.attr("role"), "button", "Expanded Tree icon role of expandable row");
 			assert.strictEqual($Elem.attr("aria-expanded"), "true", "Expanded Tree icon aria-expanded property");
@@ -2203,7 +2203,7 @@ sap.ui.define([
 		oTable.setFirstVisibleRow(1); // Simulate scrolling by one row
 		assert.ok(!bFocusTriggered, "No sync refocus of cell done");
 
-		setTimeout(function() {
+		setTimeout(() => {
 			oTable.removeEventDelegate(oDelegate);
 			assert.ok(!bFocusTriggered, "No Refocus of cell done after " + (iDelay + 10) + " ms");
 			testAriaLabelsForFocusedDataCell(oTable, $Cell[0], 2, 0, assert, {rowChange: true});
@@ -2212,7 +2212,7 @@ sap.ui.define([
 			assert.ok((oTable.$("cellacc").html() || "").includes("A_3"), "Acc Text after scrolling");
 			TableQUnitUtils.setFocusOutsideOfTable(assert);
 			oTable.setFirstVisibleRow(0);
-			setTimeout(function() {
+			setTimeout(() => {
 				testAriaLabelsForNonFocusedDataCell(oTable, $Cell[0], 2, 0, assert);
 				done();
 			}, 100);

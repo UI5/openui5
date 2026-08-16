@@ -486,7 +486,7 @@ sap.ui.define([
 			}
 		}
 
-		setTimeout(function() {
+		setTimeout(() => {
 			oTable.attachRowsUpdated(onRowsUpdated);
 			oTable.setModel(new JSONModel());
 		}, 200);
@@ -544,7 +544,7 @@ sap.ui.define([
 
 		oKeyboardExtension._debug();
 
-		await aTestElementIds.reduce(async function(acc, sId) {
+		await aTestElementIds.reduce(async (acc, sId) => {
 			await acc;
 
 			document.getElementById(sId).focus();
@@ -584,13 +584,13 @@ sap.ui.define([
 		oCell.focus();
 		oTable.setModel(new JSONModel());
 
-		oTable.attachEventOnce("rowsUpdated", function() {
+		oTable.attachEventOnce("rowsUpdated", () => {
 			assert.strictEqual(document.activeElement.id, oTable.getDomRef("noDataCnt").id, "Focus on NoData");
 
 			oTable.setModel(oModel);
 			oTable.bindRows("/modelData");
 
-			oTable.attachEventOnce("rowsUpdated", function() {
+			oTable.attachEventOnce("rowsUpdated", () => {
 				assert.strictEqual(document.activeElement.id, oCell.id, "2nd focus on cell");
 				done();
 			});

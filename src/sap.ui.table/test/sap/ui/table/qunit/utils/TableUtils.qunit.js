@@ -914,9 +914,7 @@ sap.ui.define([
 				return this.length;
 			},
 			getContexts: function(iStartIndex, iLength, iThreshold, bKeepCurrent) {
-				this.loadedContexts = this.loadedContexts.filter(function(item) {
-					return Boolean(item);
-				});
+				this.loadedContexts = this.loadedContexts.filter((item) => Boolean(item));
 				const iLoadedContextsCount = this.loadedContexts.length;
 				for (let j = Math.max(iLoadedContextsCount, iStartIndex); j < Math.min(this.length, iLength); j++) {
 					if (j < iLoadedContextsCount + this.limit) {
@@ -1076,9 +1074,9 @@ sap.ui.define([
 		testNoDataVisibility("With visible columns", false, 1, false);
 		testNoDataVisibility("With visible columns", false, 0, false);
 
-		oTable.getColumns().forEach(function(oColumn) {
+		for (const oColumn of oTable.getColumns()) {
 			oColumn.setVisible(false);
-		});
+		}
 		testNoDataVisibility("Without visible columns", true, 1, true);
 		testNoDataVisibility("Without visible columns", true, 0, true);
 		testNoDataVisibility("Without visible columns", false, 1, true);
@@ -1110,13 +1108,13 @@ sap.ui.define([
 		// TableUtils.isA is just a wrapper for sap.ui.base.Object.isA. Therefore, we only check whether TableUtils.isA correctly calls the base
 		// method and returns the same value.
 
-		[
+		for (const aArguments of [
 			[oTable, null],
 			[null, "sap.ui.table.Table"],
 			[oTable, "sap.ui.table.Table"],
 			[oTable, "sap.ui.table.AnalyticalTable"],
 			[oTable, ["sap.ui.table.Table", "sap.ui.table.AnalyticalTable"]]
-		].forEach(function(aArguments) {
+		]) {
 			const vBaseObjectReturnValue = BaseObject.isObjectA(aArguments[0], aArguments[1]);
 
 			oBaseObjectIsA.resetHistory();
@@ -1124,7 +1122,7 @@ sap.ui.define([
 				"TableUtils.isA returns the same as sap.ui.base.Object.isObjectA");
 			assert.ok(oBaseObjectIsA.calledOnceWithExactly(aArguments[0], aArguments[1]),
 				"sap.ui.base.Object.isObjectA was called once with the same parameters as TableUtils.isA");
-		});
+		}
 
 		oBaseObjectIsA.restore();
 	});

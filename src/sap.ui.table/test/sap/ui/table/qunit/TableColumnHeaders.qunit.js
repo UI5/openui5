@@ -163,10 +163,8 @@ sap.ui.define([
 	}
 
 	QUnit.test("Check column spans", function(assert) {
-		oTable.getColumns().forEach(function(oColumn, iCol) {
-			[0, 1].forEach(function(iRow) {
-				checkSpan(iCol, iRow, assert);
-			});
+		oTable.getColumns().forEach((oColumn, iCol) => {
+			[0, 1].forEach((iRow) => checkSpan(iCol, iRow, assert));
 		});
 	});
 

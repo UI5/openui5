@@ -290,8 +290,8 @@ sap.ui.define([
 		assert.strictEqual(oHeaderSelector.getIcon(), IconPool.getIconURI(TableUtils.ThemeParameters.checkboxIcon), "checkboxIcon is correct");
 		assert.strictEqual(oHeaderSelector.getTooltip(), TableUtils.getResourceText("TBL_SELECT_ALL"), "Tooltip is correct");
 
-		await new Promise(function(resolve) {
-			oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
+		await new Promise((resolve) => {
+			oSelectionPlugin.attachEventOnce("selectionChange", (oEvent) => {
 				assert.strictEqual(oHeaderSelector.getEnabled(), true, "After rows are selected: HeaderSelector is enabled");
 				oTable.unbindRows();
 				resolve();
@@ -454,9 +454,9 @@ sap.ui.define([
 		oSelectionPlugin.setSelectionMode(SelectionMode.None);
 		fnGetContexts.resetHistory();
 		oSelectionChangeSpy.resetHistory();
-		oSelectionPlugin.addSelectionInterval(6, 7).then(function() {
+		oSelectionPlugin.addSelectionInterval(6, 7).then(() => {
 			assert.ok(false, "The promise should have been rejected because the selection mode is \"None\"");
-		}).catch(function(oError) {
+		}).catch((oError) => {
 			assert.equal(oError.toString(), "Error: SelectionMode is 'None'", "Promise rejected with Error: SelectionMode is 'None'");
 			assert.ok(fnGetContexts.notCalled, "getContexts was not called");
 			assert.equal(oSelectionPlugin.getSelectedCount(), 0, "No items are selected");
@@ -466,9 +466,9 @@ sap.ui.define([
 		oSelectionPlugin.setEnabled(false);
 		fnGetContexts.resetHistory();
 		oSelectionChangeSpy.resetHistory();
-		oSelectionPlugin.addSelectionInterval(6, 7).then(function() {
+		oSelectionPlugin.addSelectionInterval(6, 7).then(() => {
 			assert.ok(false, "The promise should have been rejected because the plugin is disabled");
-		}).catch(function(oError) {
+		}).catch((oError) => {
 			assert.equal(oError.toString(), "Error: Plugin is disabled", "Promise rejected with Error: Plugin is disabled");
 			assert.ok(fnGetContexts.notCalled, "getContexts was not called");
 			assert.equal(oSelectionPlugin.getSelectedCount(), 0, "No items are selected");
@@ -485,7 +485,7 @@ sap.ui.define([
 		oSelectionPlugin.setLimit(5);
 		oSelectionPlugin.attachSelectionChange(oSelectionChangeSpy);
 
-		oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
+		oSelectionPlugin.attachEventOnce("selectionChange", (oEvent) => {
 			assert.deepEqual(oEvent.getParameters().rowIndices, [0, 1, 2, 3, 4], "selectionChange event: \"rowIndices\" parameter is correct");
 			assert.notOk(oEvent.getParameters().limitReached, "selectionChange event: \"limitReached\" parameter is correct");
 		});
@@ -495,7 +495,7 @@ sap.ui.define([
 			"Range selection is possible for number of items below limit");
 		assert.ok(oSelectionChangeSpy.calledOnce, "The \"selectionChange\" event was fired once");
 
-		oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
+		oSelectionPlugin.attachEventOnce("selectionChange", (oEvent) => {
 			assert.deepEqual(oEvent.getParameters().rowIndices, [5], "selectionChange event: \"rowIndices\" parameter is correct");
 			assert.notOk(oEvent.getParameters().limitReached, "selectionChange event: \"limitReached\" parameter is correct");
 		});
@@ -517,7 +517,7 @@ sap.ui.define([
 			"The selection is not changed because the index was already selected");
 		assert.ok(oSelectionChangeSpy.notCalled, "The \"selectionChange\" event was not fired");
 
-		oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
+		oSelectionPlugin.attachEventOnce("selectionChange", (oEvent) => {
 			assert.deepEqual(oEvent.getParameters().rowIndices, [iSelectableCount - 1],
 				"selectionChange event: \"rowIndices\" parameter is correct");
 			assert.notOk(oEvent.getParameters().limitReached, "selectionChange event: \"limitReached\" parameter is correct");
@@ -544,8 +544,8 @@ sap.ui.define([
 
 		oSelectionPlugin.setLimit(5);
 
-		await new Promise(function(resolve) {
-			oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
+		await new Promise((resolve) => {
+			oSelectionPlugin.attachEventOnce("selectionChange", (oEvent) => {
 				assert.ok(fnGetContexts.calledOnceWithExactly(5, 5, 0, true), "getContexts was called once with the correct parameters");
 				assert.deepEqual(oEvent.getParameters().rowIndices, [5, 6, 7, 8, 9], "rowIndices parameter is correct");
 				assert.notOk(oEvent.getParameters().limitReached, "limitReached parameter is correct");
@@ -557,8 +557,8 @@ sap.ui.define([
 		});
 
 		fnGetContexts.resetHistory();
-		await new Promise(function(resolve) {
-			oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
+		await new Promise((resolve) => {
+			oSelectionPlugin.attachEventOnce("selectionChange", (oEvent) => {
 				assert.ok(fnGetContexts.calledOnceWithExactly(4, 5, 0, true), "getContexts was called once with the correct parameters");
 				assert.deepEqual(oEvent.getParameters().rowIndices, [4], "rowIndices parameter is correct");
 				assert.notOk(oEvent.getParameters().limitReached, "limitReached parameter is correct");
@@ -587,8 +587,8 @@ sap.ui.define([
 		oTable.attachFirstVisibleRowChanged(oFirstVisibleRowChangedSpy);
 		oTable.attachRowsUpdated(oRowsUpdatedSpy);
 
-		await new Promise(function(resolve) {
-			oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
+		await new Promise((resolve) => {
+			oSelectionPlugin.attachEventOnce("selectionChange", (oEvent) => {
 				assert.ok(fnGetContexts.calledOnceWithExactly(0, 1, 0, true), "getContexts was called once with the correct parameters");
 				assert.deepEqual(oSelectionPlugin.getSelectedIndices(), [0], "First row is selected");
 				assert.deepEqual(oEvent.getParameters().rowIndices, [0], "rowIndices parameter is correct");
@@ -602,7 +602,7 @@ sap.ui.define([
 			oSelectionPlugin.addSelectionInterval(0, 0);
 		});
 
-		oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
+		oSelectionPlugin.attachEventOnce("selectionChange", (oEvent) => {
 			assert.deepEqual(oEvent.getParameters().rowIndices, [1, 2, 3, 4, 5], "rowIndices parameter is correct");
 			assert.ok(oEvent.getParameters().limitReached, "limitReached parameter is correct");
 			assert.ok(fnGetContexts.calledOnceWithExactly(1, 6, 0, true), "getContexts was called once with the correct parameters");
@@ -620,7 +620,7 @@ sap.ui.define([
 		assert.ok(oRowsUpdatedSpy.calledOnce, "The \"rowsUpdated\" event was fired");
 
 		oSelectionPlugin.setEnableNotification(true);
-		oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
+		oSelectionPlugin.attachEventOnce("selectionChange", (oEvent) => {
 			assert.deepEqual(oEvent.getParameters().rowIndices, [6, 7, 8, 9, 10], "rowIndices parameter is correct");
 			assert.ok(oEvent.getParameters().limitReached, "limitReached parameter is correct");
 			assert.ok(fnGetContexts.calledOnceWithExactly(6, 6, 0, true), "getContexts was called once with the correct parameters");
@@ -703,9 +703,9 @@ sap.ui.define([
 		oSelectionPlugin.setSelectionMode(SelectionMode.None);
 		fnGetContexts.resetHistory();
 		oSelectionChangeSpy.resetHistory();
-		oSelectionPlugin.setSelectionInterval(6, 7).then(function() {
+		oSelectionPlugin.setSelectionInterval(6, 7).then(() => {
 			assert.ok(false, "The promise should have been rejected because the selection mode is \"None\"");
-		}).catch(function(oError) {
+		}).catch((oError) => {
 			assert.equal(oError.toString(), "Error: SelectionMode is 'None'", "Promise rejected with Error: SelectionMode is 'None'");
 			assert.ok(fnGetContexts.notCalled, "getContexts was not called");
 			assert.equal(oSelectionPlugin.getSelectedCount(), 0, "No items are selected");
@@ -715,9 +715,9 @@ sap.ui.define([
 		oSelectionPlugin.setEnabled(false);
 		fnGetContexts.resetHistory();
 		oSelectionChangeSpy.resetHistory();
-		oSelectionPlugin.setSelectionInterval(6, 7).then(function() {
+		oSelectionPlugin.setSelectionInterval(6, 7).then(() => {
 			assert.ok(false, "The promise should have been rejected because the plugin is disabled");
-		}).catch(function(oError) {
+		}).catch((oError) => {
 			assert.equal(oError.toString(), "Error: Plugin is disabled", "Promise rejected with Error: Plugin is disabled");
 			assert.ok(fnGetContexts.notCalled, "getContexts was not called");
 			assert.equal(oSelectionPlugin.getSelectedCount(), 0, "No items are selected");
@@ -733,7 +733,7 @@ sap.ui.define([
 
 		oSelectionPlugin.setLimit(5);
 		oSelectionPlugin.attachSelectionChange(oSelectionChangeSpy);
-		oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
+		oSelectionPlugin.attachEventOnce("selectionChange", (oEvent) => {
 			assert.deepEqual(oEvent.getParameters().rowIndices, [0, 1, 2, 3, 4], "selectionChange event: \"rowIndices\" parameter is correct");
 			assert.ok(oEvent.getParameters().limitReached, "selectionChange event: \"limitReached\" parameter is correct");
 		});
@@ -745,7 +745,7 @@ sap.ui.define([
 		assert.deepEqual(oSelectionPlugin.getSelectedIndices(), [0, 1, 2, 3, 4], "Selection is cut down to the possible limit");
 		assert.ok(oSelectionChangeSpy.calledOnce, "The \"selectionChange\" event was fired once");
 
-		oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
+		oSelectionPlugin.attachEventOnce("selectionChange", (oEvent) => {
 			assert.deepEqual(oEvent.getParameters().rowIndices, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
 				"selectionChange event: \"rowIndices\" parameter is correct");
 			assert.ok(oEvent.getParameters().limitReached, "selectionChange event: \"limitReached\" parameter is correct");
@@ -775,7 +775,7 @@ sap.ui.define([
 		assert.deepEqual(oSelectionPlugin.getSelectedIndices(), [5, 6, 7, 8, 9], "The selection did not change");
 		assert.ok(oSelectionChangeSpy.notCalled, "The selectionChange event was not fired");
 
-		oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
+		oSelectionPlugin.attachEventOnce("selectionChange", (oEvent) => {
 			assert.deepEqual(oEvent.getParameters().rowIndices, [5, 6, 7, 8, 9, iSelectableCount - 1],
 				"selectionChange event: \"rowIndices\" parameter is correct");
 			assert.notOk(oEvent.getParameters().limitReached, "selectionChange event: \"limitReached\" parameter is correct");
@@ -842,9 +842,9 @@ sap.ui.define([
 		oSelectionPlugin.setSelectionMode(SelectionMode.None);
 		fnGetContexts.resetHistory();
 		oSelectionChangeSpy.resetHistory();
-		oSelectionPlugin.setSelectedIndex(1).then(function() {
+		oSelectionPlugin.setSelectedIndex(1).then(() => {
 			assert.ok(false, "The promise should have been rejected because the selection mode is \"None\"");
-		}).catch(function(oError) {
+		}).catch((oError) => {
 			assert.equal(oError.toString(), "Error: SelectionMode is 'None'", "Promise rejected with Error: SelectionMode is 'None'");
 			assert.ok(fnGetContexts.notCalled, "getContexts was not called");
 			assert.equal(oSelectionPlugin.getSelectedCount(), 0, "No items are selected");
@@ -854,9 +854,9 @@ sap.ui.define([
 		oSelectionPlugin.setEnabled(false);
 		fnGetContexts.resetHistory();
 		oSelectionChangeSpy.resetHistory();
-		oSelectionPlugin.setSelectedIndex(1).then(function() {
+		oSelectionPlugin.setSelectedIndex(1).then(() => {
 			assert.ok(false, "The promise should have been rejected because the plugin is disabled");
-		}).catch(function(oError) {
+		}).catch((oError) => {
 			assert.equal(oError.toString(), "Error: Plugin is disabled", "Promise rejected with Error: Plugin is disabled");
 			assert.ok(fnGetContexts.notCalled, "getContexts was not called");
 			assert.equal(oSelectionPlugin.getSelectedCount(), 0, "No items are selected");
@@ -872,7 +872,7 @@ sap.ui.define([
 		oSelectionPlugin.setLimit(5);
 		oSelectionPlugin.attachSelectionChange(oSelectionChangeSpy);
 
-		oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
+		oSelectionPlugin.attachEventOnce("selectionChange", (oEvent) => {
 			assert.deepEqual(oEvent.getParameters().rowIndices, [3], "selectionChange event: \"rowIndices\" parameter is correct");
 			assert.notOk(oEvent.getParameters().limitReached, "selectionChange event: \"limitReached\" parameter is correct");
 		});
@@ -881,7 +881,7 @@ sap.ui.define([
 		assert.deepEqual(oSelectionPlugin.getSelectedIndices(), [3], "The selection is correct");
 		assert.ok(oSelectionChangeSpy.calledOnce, "The \"selectionChange\" event was fired once");
 
-		oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
+		oSelectionPlugin.attachEventOnce("selectionChange", (oEvent) => {
 			assert.deepEqual(oEvent.getParameters().rowIndices, [3, 5], "selectionChange event: \"rowIndices\" parameter is correct");
 			assert.notOk(oEvent.getParameters().limitReached, "selectionChange event: \"limitReached\" parameter is correct");
 		});
@@ -908,7 +908,7 @@ sap.ui.define([
 		await oSelectionPlugin.setSelectionInterval(0, 1);
 		const aPromises = [];
 
-		oSelectionPlugin.attachSelectionChange(function(oEvent) {
+		oSelectionPlugin.attachSelectionChange((oEvent) => {
 			const oCustomPayload = oEvent.getParameter("customPayload");
 			assert.step(oCustomPayload ? oCustomPayload.d : "" + oCustomPayload);
 		});
@@ -939,7 +939,7 @@ sap.ui.define([
 
 		function doSelection(fnSelect) {
 			return Promise.race([
-				new Promise(function(resolve) {
+				new Promise((resolve) => {
 					oSelectionPlugin.attachEventOnce("selectionChange", resolve);
 					fnSelect();
 				}),
@@ -949,7 +949,7 @@ sap.ui.define([
 		}
 
 		function pressHeaderSelector() {
-			return doSelection(function() {
+			return doSelection(() => {
 				oSelectionPlugin.handleHeaderSelectorPress();
 			});
 		}
@@ -958,7 +958,7 @@ sap.ui.define([
 		assert.equal(oSelectionPlugin.getSelectedIndices().length, 16,
 			"Limit enabled: Pressing the HeaderSelector triggers select all and selects until its limit is reached");
 
-		await doSelection(function() {
+		await doSelection(() => {
 			oSelectionPlugin.addSelectionInterval(0, 5);
 		});
 		await pressHeaderSelector();
@@ -976,7 +976,7 @@ sap.ui.define([
 
 		oSelectionPlugin.setShowHeaderSelector(false);
 
-		await doSelection(function() {
+		await doSelection(() => {
 			oSelectionPlugin.addSelectionInterval(0, 5);
 		});
 		await pressHeaderSelector();
@@ -996,7 +996,7 @@ sap.ui.define([
 
 		function doSelection(fnSelect) {
 			return Promise.race([
-				new Promise(function(resolve) {
+				new Promise((resolve) => {
 					oSelectionPlugin.attachEventOnce("selectionChange", resolve);
 					fnSelect();
 				}),
@@ -1006,12 +1006,12 @@ sap.ui.define([
 		}
 
 		function pressKeyboardShortcut(sType) {
-			return doSelection(function() {
+			return doSelection(() => {
 				oSelectionPlugin.handleKeyboardShortcut(sType, {setMarked: () => { }});
 			});
 		}
 
-		await doSelection(function() {
+		await doSelection(() => {
 			oSelectionPlugin.addSelectionInterval(0, 5);
 			oSelectionPlugin.setLimit(7);
 		});
@@ -1035,7 +1035,7 @@ sap.ui.define([
 		assert.equal(oSelectionPlugin.getSelectedIndices().length, 0,
 			"Limit disabled: The \"toggle\" shortcut deselects everything if everything is selected");
 
-		await doSelection(function() {
+		await doSelection(() => {
 			oSelectionPlugin.addSelectionInterval(0, 5);
 		});
 		await pressKeyboardShortcut("clear");
@@ -1082,9 +1082,9 @@ sap.ui.define([
 		oSelectionPlugin.setSelectionMode(SelectionMode.None);
 		fnGetContexts.resetHistory();
 		oSelectionChangeSpy.resetHistory();
-		oSelectionPlugin.selectAll().then(function() {
+		oSelectionPlugin.selectAll().then(() => {
 			assert.ok(false, "The promise should have been rejected because the selection mode is \"None\"");
-		}).catch(function(oError) {
+		}).catch((oError) => {
 			assert.equal(oError.toString(), "Error: SelectionMode is 'None'", "Promise rejected with Error: SelectionMode is 'None'");
 			assert.ok(fnGetContexts.notCalled, "getContexts was not called");
 			assert.equal(oSelectionPlugin.getSelectedCount(), 0, "No items are selected");
@@ -1094,9 +1094,9 @@ sap.ui.define([
 		oSelectionPlugin.setEnabled(false);
 		fnGetContexts.resetHistory();
 		oSelectionChangeSpy.resetHistory();
-		oSelectionPlugin.selectAll().then(function() {
+		oSelectionPlugin.selectAll().then(() => {
 			assert.ok(false, "The promise should have been rejected because the plugin is disabled");
-		}).catch(function(oError) {
+		}).catch((oError) => {
 			assert.equal(oError.toString(), "Error: Plugin is disabled", "Promise rejected with Error: Plugin is disabled");
 			assert.ok(fnGetContexts.notCalled, "getContexts was not called");
 			assert.equal(oSelectionPlugin.getSelectedCount(), 0, "No items are selected");
@@ -1121,7 +1121,7 @@ sap.ui.define([
 		assert.equal(oHeaderSelector.getType(), "CheckBox", "The headerSelector type is checkbox");
 
 		fnGetContexts.resetHistory();
-		oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
+		oSelectionPlugin.attachEventOnce("selectionChange", (oEvent) => {
 			assert.deepEqual(oEvent.getParameters().rowIndices, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
 				"selectionChange event: \"rowIndices\" parameter is correct");
 			assert.notOk(oEvent.getParameters().limitReached, "selectionChange event: \"limitReached\" parameter is correct");
@@ -1163,7 +1163,7 @@ sap.ui.define([
 
 		sinon.stub(oSelectionPlugin, "_getHighestSelectableIndex").returns(250); // simulate count is not available
 
-		await new Promise(function(resolve) {
+		await new Promise((resolve) => {
 			oSelectionPlugin.attachEventOnce("selectionChange", resolve);
 			oSelectionPlugin.handleHeaderSelectorPress();
 		});
@@ -1323,8 +1323,8 @@ sap.ui.define([
 		await TableUtils.showNotificationPopoverAtIndex(oTable, 0, oSelectionPlugin.getLimit());
 		assert.ok(oTable._oNotificationPopover, "Notification popover was created");
 
-		await new Promise(function(resolve) {
-			oTable._oNotificationPopover.attachEventOnce("afterClose", function() {
+		await new Promise((resolve) => {
+			oTable._oNotificationPopover.attachEventOnce("afterClose", () => {
 				resolve();
 			});
 			oTable._oNotificationPopover.close();
@@ -1346,11 +1346,11 @@ sap.ui.define([
 		assert.ok(oPopoverOpenBySpy.notCalled, "Popover.openBy is not called because the limit is not reached");
 		resetSpies();
 
-		await new Promise(function(resolve) {
+		await new Promise((resolve) => {
 			oTable._oNotificationPopover.attachEventOnce("afterOpen", resolve);
 			oSelectionPlugin.setSelectionInterval(0, iLimit);
 		});
-		await new Promise(function(resolve) {
+		await new Promise((resolve) => {
 			oTable._oNotificationPopover.attachEventOnce("afterClose", resolve);
 			oTable.setFirstVisibleRow(oTable.getFirstVisibleRow() + 1);
 		});

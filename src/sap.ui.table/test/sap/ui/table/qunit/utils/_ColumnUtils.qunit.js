@@ -619,7 +619,7 @@ sap.ui.define([
 		const oColumn = this.oTable.getColumns()[2];
 		assert.ok(ColumnUtils.isColumnMovable(oColumn), "Ensure column is movable");
 
-		this.oTable.attachColumnMove(function(oEvent) {
+		this.oTable.attachColumnMove((oEvent) => {
 			assert.equal(oEvent.getParameter("newPos"), 3, "Correct Index in event parameter");
 			assert.ok(oEvent.getParameter("column") === oColumn, "Correct Column in event parameter");
 		});
@@ -634,7 +634,7 @@ sap.ui.define([
 		const oColumn = this.oTable.getColumns()[0];
 		assert.ok(!ColumnUtils.isColumnMovable(oColumn), "Column is not movable");
 
-		this.oTable.attachColumnMove(function(oEvent) {
+		this.oTable.attachColumnMove((oEvent) => {
 			assert.ok(false, "No event was triggered");
 		});
 
@@ -648,7 +648,7 @@ sap.ui.define([
 		const oColumn = this.oTable.getColumns()[4];
 		assert.ok(ColumnUtils.isColumnMovable(oColumn), "Column is movable");
 
-		this.oTable.attachColumnMove(function(oEvent) {
+		this.oTable.attachColumnMove((oEvent) => {
 			assert.ok(false, "No event was triggered");
 		});
 
@@ -662,7 +662,7 @@ sap.ui.define([
 		const oColumn = this.oTable.getColumns()[2];
 		assert.ok(ColumnUtils.isColumnMovable(oColumn), "Column is movable");
 
-		this.oTable.attachColumnMove(function(oEvent) {
+		this.oTable.attachColumnMove((oEvent) => {
 			assert.equal(oEvent.getParameter("newPos"), 3, "Correct Index in event parameter");
 			assert.ok(oEvent.getParameter("column") === oColumn, "Correct Column in event parameter");
 			oEvent.preventDefault();
