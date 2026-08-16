@@ -626,7 +626,7 @@ sap.ui.define([
 		_fixAutoColumns: function(oTable, aResizableColumns) {
 			const oTableElement = oTable.getDomRef();
 
-			oTable._getVisibleColumns().forEach(function(oColumn) {
+			for (const oColumn of oTable._getVisibleColumns()) {
 				const sWidth = oColumn.getWidth();
 				let $columnElement;
 
@@ -636,7 +636,7 @@ sap.ui.define([
 						oColumn._minWidth = Math.max($columnElement.offsetWidth, ColumnUtils.getMinColumnWidth());
 					}
 				}
-			});
+			}
 		},
 
 		/**

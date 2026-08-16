@@ -168,7 +168,7 @@ sap.ui.define([
 
 		Object.assign(pCancellablePromise, oProcessInterface);
 
-		pCancellablePromise.then(function() {
+		pCancellablePromise.then(() => {
 			if (oProcessInterface.isCancelled()) {
 				log("Process finished due to cancellation: " + oProcessInfo.id);
 			} else {
@@ -589,9 +589,7 @@ sap.ui.define([
 				oTable._getScrollExtension().getHorizontalScrollbar()
 			].concat(aScrollableColumnAreas);
 
-			return aScrollAreas.filter(function(oScrollArea) {
-				return oScrollArea != null;
-			});
+			return aScrollAreas.filter((oScrollArea) => oScrollArea != null);
 		}
 	};
 
@@ -613,7 +611,7 @@ sap.ui.define([
 		performUpdateFromFirstVisibleRow: function(oTable, bExpectRowsUpdatedEvent) {
 			log("VerticalScrollingHelper.performUpdateFromFirstVisibleRow", oTable);
 
-			VerticalScrollProcess.start(oTable, VerticalScrollProcess.UpdateFromFirstVisibleRow, function(resolve, reject, oProcessInterface) {
+			VerticalScrollProcess.start(oTable, VerticalScrollProcess.UpdateFromFirstVisibleRow, (resolve, reject, oProcessInterface) => {
 				if (bExpectRowsUpdatedEvent === true) {
 					const fnOnRowsUpdatedPreprocessor = function() {
 						log("VerticalScrollingHelper.performUpdateFromFirstVisibleRow (async: rows update)", oTable);
@@ -623,7 +621,7 @@ sap.ui.define([
 
 					VerticalScrollingHelper.addOnRowsUpdatedPreprocessor(oTable, fnOnRowsUpdatedPreprocessor);
 
-					oProcessInterface.addCancelListener(function() {
+					oProcessInterface.addCancelListener(() => {
 						const bRemoved = VerticalScrollingHelper.removeOnRowsUpdatedPreprocessor(oTable, fnOnRowsUpdatedPreprocessor);
 						if (bRemoved) {
 							resolve();
@@ -762,8 +760,8 @@ sap.ui.define([
 		_debounceLargeDataUpdate: function(oTable, oProcessInterface) {
 			VerticalScrollingHelper._showSkeletons(oTable);
 
-			return new Promise(function(resolve) {
-				_private(oTable).mTimeouts.largeDataScrolling = setTimeout(function() {
+			return new Promise((resolve) => {
+				_private(oTable).mTimeouts.largeDataScrolling = setTimeout(() => {
 					delete _private(oTable).mTimeouts.largeDataScrolling;
 					delete _private(oTable).oLargeDataScrollState;
 
@@ -778,7 +776,7 @@ sap.ui.define([
 					resolve(true);
 				}, 300);
 
-				oProcessInterface.addCancelListener(function() {
+				oProcessInterface.addCancelListener(() => {
 					if (_private(oTable).mTimeouts.largeDataScrolling != null) {
 						clearTimeout(_private(oTable).mTimeouts.largeDataScrolling);
 						delete _private(oTable).mTimeouts.largeDataScrolling;
@@ -979,7 +977,7 @@ sap.ui.define([
 				return Promise.resolve();
 			}
 
-			return new Promise(function(resolve) {
+			return new Promise((resolve) => {
 				const fnOnRowsUpdatedPreprocessor = function(oEvent) {
 					log(`VerticalScrollingHelper.adjustFirstVisibleRowToScrollPosition (async: rows updated): Reason ${oEvent.getParameters().reason}`, this);
 					if (bNewIndexIsTemporary) {
@@ -993,7 +991,7 @@ sap.ui.define([
 				VerticalScrollingHelper.addOnRowsUpdatedPreprocessor(oTable, fnOnRowsUpdatedPreprocessor);
 
 				if (oProcessInterface) {
-					oProcessInterface.addCancelListener(function() {
+					oProcessInterface.addCancelListener(() => {
 						const bRemoved = VerticalScrollingHelper.removeOnRowsUpdatedPreprocessor(oTable, fnOnRowsUpdatedPreprocessor);
 						if (bRemoved) {
 							resolve();
@@ -1464,7 +1462,7 @@ sap.ui.define([
 
 				if (bScrolledToEnd && !oVSb._unblockScrolling) {
 					if (!oVSb._timeoutBlock) {
-						oVSb._timeoutBlock = setTimeout(function() {
+						oVSb._timeoutBlock = setTimeout(() => {
 							oVSb._unblockScrolling = true;
 							oVSb._timeoutBlock = null;
 						}, SCROLL_BLOCK_TIMEOUT);
@@ -1613,7 +1611,7 @@ sap.ui.define([
 				aRowHeights = aRowHeights.slice(0, oTable._getTotalRowCount());
 			}
 
-			let iInnerVerticalScrollRange = aRowHeights.reduce(function(a, b) { return a + b; }, 0) - iViewportHeight;
+			let iInnerVerticalScrollRange = aRowHeights.reduce((a, b) => a + b, 0) - iViewportHeight;
 			if (iInnerVerticalScrollRange > 0) {
 				iInnerVerticalScrollRange = Math.ceil(iInnerVerticalScrollRange);
 			}
@@ -1694,8 +1692,8 @@ sap.ui.define([
 
 			const that = this;
 
-			VerticalScrollProcess.start(this, VerticalScrollProcess.OnRowsUpdated, function(resolve, reject, oProcessInterface) {
-				VerticalScrollingHelper.fixScrollPosition(that, oProcessInterface).then(function() {
+			VerticalScrollProcess.start(this, VerticalScrollProcess.OnRowsUpdated, (resolve, reject, oProcessInterface) => {
+				VerticalScrollingHelper.fixScrollPosition(that, oProcessInterface).then(() => {
 					return Promise.all([
 						VerticalScrollingHelper.adjustFirstVisibleRowToScrollPosition(that, true, oProcessInterface),
 						VerticalScrollingHelper.scrollViewport(that, oProcessInterface),
@@ -1715,9 +1713,9 @@ sap.ui.define([
 		restoreScrollPosition: function(oTable, bExpectRowsUpdatedEvent) {
 			log("VerticalScrollingHelper.restoreScrollPosition", oTable);
 
-			VerticalScrollProcess.start(oTable, VerticalScrollProcess.RestoreScrollPosition, function(resolve, reject, oProcessInterface) {
+			VerticalScrollProcess.start(oTable, VerticalScrollProcess.RestoreScrollPosition, (resolve, reject, oProcessInterface) => {
 				oProcessInterface.onPromiseCreated = function(oPromise) {
-					oPromise.then(function() {
+					oPromise.then(() => {
 						if (!oProcessInterface.isCancelled()) {
 							// Starts a new process.
 							VerticalScrollingHelper._restoreScrollPosition(oTable);
@@ -1738,7 +1736,7 @@ sap.ui.define([
 
 				VerticalScrollingHelper.addOnRowsUpdatedPreprocessor(oTable, fnOnRowsUpdatedPreprocessor);
 
-				oProcessInterface.addCancelListener(function() {
+				oProcessInterface.addCancelListener(() => {
 					const bRemoved = VerticalScrollingHelper.removeOnRowsUpdatedPreprocessor(oTable, fnOnRowsUpdatedPreprocessor);
 					if (bRemoved) {
 						resolve();
@@ -1772,9 +1770,9 @@ sap.ui.define([
 			HorizontalScrollingHelper.updateScrollbar(oTable);
 			oScrollExtension.updateVerticalScrollHeight();
 
-			VerticalScrollProcess.start(oTable, VerticalScrollProcess.AdjustToTotalRowCount, function(resolve, reject, oProcessInterface) {
+			VerticalScrollProcess.start(oTable, VerticalScrollProcess.AdjustToTotalRowCount, (resolve, reject, oProcessInterface) => {
 				oProcessInterface.onPromiseCreated = function(oPromise) {
-					oPromise.then(function() {
+					oPromise.then(() => {
 						if (oProcessInterface.isCancelled() || _private(oTable).oVerticalScrollPosition.isInitial()) {
 							return;
 						}
@@ -1795,7 +1793,7 @@ sap.ui.define([
 
 					VerticalScrollingHelper.addOnRowsUpdatedPreprocessor(oTable, fnOnRowsUpdatedPreprocessor);
 
-					oProcessInterface.addCancelListener(function() {
+					oProcessInterface.addCancelListener(() => {
 						const bRemoved = VerticalScrollingHelper.removeOnRowsUpdatedPreprocessor(oTable, fnOnRowsUpdatedPreprocessor);
 						if (bRemoved) {
 							resolve();
@@ -1922,9 +1920,7 @@ sap.ui.define([
 				oTable._getScrollExtension().getVerticalScrollbar()
 			];
 
-			return aScrollAreas.filter(function(oScrollArea) {
-				return oScrollArea != null;
-			});
+			return aScrollAreas.filter((oScrollArea) => oScrollArea != null);
 		}
 	};
 
@@ -2251,13 +2247,13 @@ sap.ui.define([
 
 			if (mTouchSessionData.velocityHistory.length > 0) {
 				let fTotalWeight = 0;
-				mTouchSessionData.velocityHistory.forEach(function(entry, index) {
+				for (const [index, entry] of mTouchSessionData.velocityHistory.entries()) {
 					// Linear weighting: more recent = higher weight
 					const fWeight = index + 1;
 					fFinalVelocityX += entry.x * fWeight;
 					fFinalVelocityY += entry.y * fWeight;
 					fTotalWeight += fWeight;
-				});
+				}
 
 				fFinalVelocityX /= fTotalWeight;
 				fFinalVelocityY /= fTotalWeight;
@@ -2555,9 +2551,7 @@ sap.ui.define([
 				oTable.getDomRef("tableCCnt")
 			];
 
-			return aEventListenerTargets.filter(function(oEventListenerTarget) {
-				return oEventListenerTarget != null;
-			});
+			return aEventListenerTargets.filter((oEventListenerTarget) => oEventListenerTarget != null);
 		}
 	};
 
@@ -2617,7 +2611,7 @@ sap.ui.define([
 
 			if ($ParentCell) {
 				const that = this;
-				const fnScrollBack = function() {
+				const fnScrollBack = () => {
 					const $InnerCellElement = $ParentCell.find(".sapUiTableCellInner");
 
 					if ($InnerCellElement.length > 0) {
@@ -2630,7 +2624,7 @@ sap.ui.define([
 					}
 				};
 
-				Promise.resolve().then(function() {
+				Promise.resolve().then(() => {
 					if (Device.browser.safari) {
 						window.setTimeout(fnScrollBack, 0);
 					} else {

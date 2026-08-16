@@ -167,7 +167,7 @@ sap.ui.define([
 		oCreationRow.getTable().getDomRef("focusDummy").focus();
 		oEvent.setMarked();
 
-		window.setTimeout(function() {
+		window.setTimeout(() => {
 			if (!oCreationRow._fireApply()) {
 				oFocusedElement.focus();
 			}
@@ -285,7 +285,7 @@ sap.ui.define([
 	 */
 	CreationRow.prototype._getCell = function(iColumnIndex) {
 		const aCells = this.getCells();
-		const oCell = aCells.filter(function(oCell) {
+		const oCell = aCells.filter((oCell) => {
 			return Column.ofCell(oCell).getIndex() === iColumnIndex;
 		})[0];
 

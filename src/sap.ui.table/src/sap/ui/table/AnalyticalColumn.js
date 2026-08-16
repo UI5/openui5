@@ -163,9 +163,9 @@ sap.ui.define([
 						if (oBinding) {
 							this._oBindingLabel = TableUtils._getTableTemplateHelper().createLabel();
 							this.addDependent(this._oBindingLabel);
-							oParent._metadataLoaded().then(function() {
+							oParent._metadataLoaded().then(() => {
 								this._oBindingLabel.setText(oBinding.getPropertyLabel(this.getLeadingProperty()));
-							}.bind(this));
+							});
 						}
 					}
 				}

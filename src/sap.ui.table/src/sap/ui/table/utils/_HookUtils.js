@@ -301,15 +301,15 @@ sap.ui.define(["sap/ui/base/DataType", "sap/ui/model/ChangeReason"], function(Da
 	};
 
 	function extractKeys(mKeys, mCurrent, sCurrentKey) {
-		Object.keys(mCurrent).forEach(function(sProperty) {
+		for (const sProperty of Object.keys(mCurrent)) {
 			const sKey = sCurrentKey ? sCurrentKey + "." + sProperty : sProperty;
 
 			if ("arguments" in mCurrent[sProperty]) {
-				aForbiddenTypes.forEach(function(sForbiddenType) {
+				for (const sForbiddenType of aForbiddenTypes) {
 					if (mCurrent[sProperty].arguments.includes(sForbiddenType)) {
 						throw new Error("Forbidden type found in metadata of hook " + sCurrentKey + ": " + sForbiddenType);
 					}
-				});
+				}
 
 				mKeys[sProperty] = sKey;
 				mHookMetadataByKey[sKey] = mCurrent[sProperty];
@@ -317,7 +317,7 @@ sap.ui.define(["sap/ui/base/DataType", "sap/ui/model/ChangeReason"], function(Da
 				mKeys[sProperty] = {};
 				extractKeys(mKeys[sProperty], mCurrent[sProperty], sKey);
 			}
-		});
+		}
 
 		return mKeys;
 	}
@@ -348,7 +348,7 @@ sap.ui.define(["sap/ui/base/DataType", "sap/ui/model/ChangeReason"], function(Da
 	}
 
 	function validateArguments(mHookMetadata, aArguments) {
-		return mHookMetadata.arguments.length >= aArguments.length && aArguments.every(function(vValue, iIndex) {
+		return mHookMetadata.arguments.length >= aArguments.length && aArguments.every((vValue, iIndex) => {
 			const mArgument = mHookMetadata.arguments[iIndex];
 			if (typeof mArgument.type === "function") {
 				return mArgument.type(vValue);

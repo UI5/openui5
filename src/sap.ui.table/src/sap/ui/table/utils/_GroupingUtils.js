@@ -332,13 +332,9 @@ sap.ui.define([
 		 */
 		updateGroups: function(oTable) { // TODO: Move rendering parts to Table or an extension (Grouping/Hierarchy/WhateverExtension)
 			if (oTable.getBinding()) {
-				oTable.getRows().forEach(function(oRow) {
-					GroupingUtils._updateTableRowForGrouping(oRow);
-				});
+				oTable.getRows().forEach((oRow) => GroupingUtils._updateTableRowForGrouping(oRow));
 			} else {
-				oTable.getRows().forEach(function(oRow) {
-					GroupingUtils._cleanupTableRowForGrouping(oRow);
-				});
+				oTable.getRows().forEach((oRow) => GroupingUtils._cleanupTableRowForGrouping(oRow));
 			}
 		},
 

@@ -493,11 +493,11 @@ sap.ui.define([
 			return;
 		}
 
-		oBinding.attachEventOnce("dataRequested", function() {
+		oBinding.attachEventOnce("dataRequested", () => {
 			// Create the rows while the data is requested in the background.
 			// Doing it in a timeout will allow the data request to be sent before the rows get created.
 			clearTimeout(oTable._mTimeouts.refreshRowsCreateRows);
-			oTable._mTimeouts.refreshRowsCreateRows = setTimeout(function() {
+			oTable._mTimeouts.refreshRowsCreateRows = setTimeout(() => {
 				if (oTable.getRows().length > 0) {
 					return;
 				}
@@ -645,9 +645,9 @@ sap.ui.define([
 			// Set the binding context before adding the new rows to the aggregation to avoid double propagation.
 			updateBindingContextsOfRows(oMode, aRows);
 
-			aNewRows.forEach(function(oNewRow) {
+			for (const oNewRow of aNewRows) {
 				oTable.addAggregation("rows", oNewRow);
-			});
+			}
 		} else {
 			// Remove rows that are not required.
 			for (let i = aRows.length - 1; i >= iNewNumberOfRows; i--) {

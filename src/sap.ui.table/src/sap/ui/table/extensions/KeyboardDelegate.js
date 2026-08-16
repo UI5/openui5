@@ -221,7 +221,7 @@ sap.ui.define([
 	}
 
 	function waitForRowsUpdated(oTable) {
-		return new Promise(function(resolve) {
+		return new Promise((resolve) => {
 			oTable.attachEventOnce("_rowsUpdated", resolve);
 		});
 	}
@@ -262,7 +262,7 @@ sap.ui.define([
 
 		if (bAllowSapFocusLeave) {
 			oTable._getKeyboardExtension().setSilentFocus(oTable.getDomRef("focusDummy"));
-			setTimeout(function() {
+			setTimeout(() => {
 				oTable._getScrollExtension().scrollVertically(bDown === true, bPage);
 			}, 0);
 		} else {
@@ -411,7 +411,7 @@ sap.ui.define([
 		function selectItems() {
 			let _doSelect = null;
 			if (oTable._legacyMultiSelection) {
-				_doSelect = function(oRow) {
+				_doSelect = (oRow) => {
 					oTable._legacyMultiSelection(oRow.getIndex(), oEvent);
 				};
 			}
@@ -451,7 +451,7 @@ sap.ui.define([
 	 *                Returns -1 if the column is not in this list.
 	 */
 	function getColumnIndexInVisibleAndGroupedColumns(oTable, oColumn) {
-		const aVisibleAndGroupedColumns = oTable.getColumns().filter(function(oColumn) {
+		const aVisibleAndGroupedColumns = oTable.getColumns().filter((oColumn) => {
 			return oColumn.getVisible() || (oColumn.getGrouped ? oColumn.getGrouped() : false);
 		});
 
@@ -1214,12 +1214,12 @@ sap.ui.define([
 
 				if (pScroll) {
 					preventItemNavigation(oEvent);
-					pScroll.then(function() {
+					pScroll.then(() => {
 						return waitForData(this);
-					}.bind(this)).then(function() {
+					}).then(() => {
 						moveRangeSelection(this, iFocusedRowIndex - (bReverse ? 1 : 0), bReverse);
 						delete this._oRangeSelection.pScroll;
-					}.bind(this));
+					});
 				} else {
 					moveRangeSelection(this, iFocusedRowIndex + (bReverse ? 0 : 1), bReverse);
 				}
@@ -1304,12 +1304,12 @@ sap.ui.define([
 
 				if (pScroll) {
 					preventItemNavigation(oEvent);
-					pScroll.then(function() {
+					pScroll.then(() => {
 						return waitForData(this);
-					}.bind(this)).then(function() {
+					}).then(() => {
 						moveRangeSelection(this, bReverse ? 1 : 0, bReverse);
 						delete this._oRangeSelection.pScroll;
-					}.bind(this));
+					});
 				} else {
 					moveRangeSelection(this, iFocusedRowIndex - (bReverse ? 0 : 1), bReverse);
 				}
