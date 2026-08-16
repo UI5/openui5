@@ -99,7 +99,7 @@
 
 					<!-- common info pane -->
 
-					<l:SplitPane requiredParentWidth="900px">
+					<l:SplitPane requiredParentWidth="900">
 						<Panel class="ttCommonInfoPanel">
 							<IconTabBar
 								id="tabBar"

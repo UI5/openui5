@@ -7,7 +7,7 @@
 	xmlns="sap.m">
 	<VBox class="sapUiSmallMargin">
 			<OverflowToolbar height="100%" width="100%">
-				<Button text="Create Appointment" icon="sap-icon://add-activity" press="onCreateAppointment" type="Emphasized" />
+				<Button text="Create Appointment" icon="sap-icon://add-activity" press=".onCreateAppointment" type="Emphasized" />
 				<ToolbarSeparator/>
 			</OverflowToolbar>
 		<SinglePlanningCalendar
