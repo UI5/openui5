@@ -41,7 +41,7 @@
 					</l:Splitter>
 					<Button width="100%" text="Content 5">
 						<layoutData>
-							<l:SplitterLayoutData size="30%" minSize="200px" />
+							<l:SplitterLayoutData size="30%" minSize="200" />
 						</layoutData>
 					</Button>
 				</l:contentAreas>

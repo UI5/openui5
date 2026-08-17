@@ -2006,348 +2006,348 @@ sap.ui.define([
 	// Integration test for correct path calculation during ODataModel#read(...).
 	// JIRA: CPOUI5MODELS-404
 	// BCP: 2080464216
-	[{
-		expectedCanonicalRequest : "SalesOrderSet",
-		expectedRequest : "SalesOrderSet",
-		isArrayResponse : true,
-		path : "/SalesOrderSet",
-		title : "Absolute path with one segment to a collection"
-	}, {
-		expectedCanonicalRequest : "SalesOrderSet('1')",
-		expectedRequest : "SalesOrderSet('1')",
-		isArrayResponse : false,
-		path : "/SalesOrderSet('1')",
-		title : "Absolute path with one segment to a single entity"
-	}, {
-		expectedCanonicalRequest : "SalesOrder_Confirm(SalesOrderID='1')",
-		expectedRequest : "SalesOrder_Confirm(SalesOrderID='1')",
-		isArrayResponse : false,
-		path : "/SalesOrder_Confirm(SalesOrderID='1')",
-		title : "Function import"
-	}, {
-		expectedCanonicalRequest : "SalesOrderSet('1')/ToLineItems",
-		expectedRequest : "SalesOrderSet('1')/ToLineItems",
-		isArrayResponse : true,
-		path : "/SalesOrderSet('1')/ToLineItems",
-		title : "Absolute path with two segments to a collection"
-	}, {
+[{
+	expectedCanonicalRequest : "SalesOrderSet",
+	expectedRequest : "SalesOrderSet",
+	isArrayResponse : true,
+	path : "/SalesOrderSet",
+	title : "Absolute path with one segment to a collection"
+}, {
+	expectedCanonicalRequest : "SalesOrderSet('1')",
+	expectedRequest : "SalesOrderSet('1')",
+	isArrayResponse : false,
+	path : "/SalesOrderSet('1')",
+	title : "Absolute path with one segment to a single entity"
+}, {
+	expectedCanonicalRequest : "SalesOrder_Confirm(SalesOrderID='1')",
+	expectedRequest : "SalesOrder_Confirm(SalesOrderID='1')",
+	isArrayResponse : false,
+	path : "/SalesOrder_Confirm(SalesOrderID='1')",
+	title : "Function import"
+}, {
+	expectedCanonicalRequest : "SalesOrderSet('1')/ToLineItems",
+	expectedRequest : "SalesOrderSet('1')/ToLineItems",
+	isArrayResponse : true,
+	path : "/SalesOrderSet('1')/ToLineItems",
+	title : "Absolute path with two segments to a collection"
+}, {
+	// MockServer does not support navigation properties with key predicates; as long as the
+	// addressed entity set is addressable we can shorten the path
+	expectedCanonicalRequest : {
+		deepPath : "/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')",
+		requestUri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
+	},
+	expectedRequest : "SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')",
+	isArrayResponse : false,
+	path : "/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')",
+	title : "Absolute path with two segments to a single entity of a collection"
+}, {
+	expectedCanonicalRequest : "SalesOrderSet('1')/ToBusinessPartner",
+	expectedRequest : "SalesOrderSet('1')/ToBusinessPartner",
+	isArrayResponse : false,
+	path : "/SalesOrderSet('1')/ToBusinessPartner",
+	title : "Absolute path with two segments to a single entity via 'to 1' navigation property"
+}, {
+	expectedCanonicalRequest : "BusinessPartnerSet('BP1')/Address",
+	expectedRequest : "BusinessPartnerSet('BP1')/Address",
+	isArrayResponse : false,
+	path : "/BusinessPartnerSet('BP1')/Address",
+	title : "Absolute path with two segments to a complex type"
+}, {
+	expectedCanonicalRequest : {
+		deepPath : "/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')/ToProduct",
+		requestUri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
+	},
+	expectedRequest : "SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')"
+		+ "/ToProduct",
+	isArrayResponse : false,
+	path : "/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')/ToProduct",
+	title : "Absolute path with three segments to a single entity; 'to n' navigation in the"
+		+ " middle"
+}, {
+	expectedCanonicalRequest : {
+		deepPath : "/BusinessPartnerSet('BP1')/ToProducts('P1')/ToSalesOrderLineItems",
+		requestUri : "ProductSet('P1')/ToSalesOrderLineItems"
+	},
+	expectedRequest : "BusinessPartnerSet('BP1')/ToProducts('P1')/ToSalesOrderLineItems",
+	isArrayResponse : true,
+	path : "/BusinessPartnerSet('BP1')/ToProducts('P1')/ToSalesOrderLineItems",
+	title : "Absolute path with three segments to a collection; 'to n' navigation in the middle"
+}, {
+	expectedCanonicalRequest : {
+		deepPath : "/BusinessPartnerSet('BP1')/ToProducts('P1')"
+			+ "/ToSalesOrderLineItems(SalesOrderID='1',ItemPosition='10')",
 		// MockServer does not support navigation properties with key predicates; as long as the
 		// addressed entity set is addressable we can shorten the path
-		expectedCanonicalRequest : {
-			deepPath : "/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')",
-			requestUri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
-		},
-		expectedRequest : "SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')",
-		isArrayResponse : false,
-		path : "/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')",
-		title : "Absolute path with two segments to a single entity of a collection"
-	}, {
-		expectedCanonicalRequest : "SalesOrderSet('1')/ToBusinessPartner",
-		expectedRequest : "SalesOrderSet('1')/ToBusinessPartner",
-		isArrayResponse : false,
-		path : "/SalesOrderSet('1')/ToBusinessPartner",
-		title : "Absolute path with two segments to a single entity via 'to 1' navigation property"
-	}, {
-		expectedCanonicalRequest : "BusinessPartnerSet('BP1')/Address",
-		expectedRequest : "BusinessPartnerSet('BP1')/Address",
-		isArrayResponse : false,
-		path : "/BusinessPartnerSet('BP1')/Address",
-		title : "Absolute path with two segments to a complex type"
-	}, {
-		expectedCanonicalRequest : {
-			deepPath : "/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')/ToProduct",
-			requestUri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
-		},
-		expectedRequest : "SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')"
-			+ "/ToProduct",
-		isArrayResponse : false,
-		path : "/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')/ToProduct",
-		title : "Absolute path with three segments to a single entity; 'to n' navigation in the"
-			+ " middle"
-	}, {
-		expectedCanonicalRequest : {
-			deepPath : "/BusinessPartnerSet('BP1')/ToProducts('P1')/ToSalesOrderLineItems",
-			requestUri : "ProductSet('P1')/ToSalesOrderLineItems"
-		},
-		expectedRequest : "BusinessPartnerSet('BP1')/ToProducts('P1')/ToSalesOrderLineItems",
-		isArrayResponse : true,
-		path : "/BusinessPartnerSet('BP1')/ToProducts('P1')/ToSalesOrderLineItems",
-		title : "Absolute path with three segments to a collection; 'to n' navigation in the middle"
-	}, {
-		expectedCanonicalRequest : {
-			deepPath : "/BusinessPartnerSet('BP1')/ToProducts('P1')"
-				+ "/ToSalesOrderLineItems(SalesOrderID='1',ItemPosition='10')",
-			// MockServer does not support navigation properties with key predicates; as long as the
-			// addressed entity set is addressable we can shorten the path
-			requestUri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
-		},
-		expectedRequest : "BusinessPartnerSet('BP1')/ToProducts('P1')"
-			+ "/ToSalesOrderLineItems(SalesOrderID='1',ItemPosition='10')",
-		isArrayResponse : false,
-		path : "/BusinessPartnerSet('BP1')/ToProducts('P1')"
-			+ "/ToSalesOrderLineItems(SalesOrderID='1',ItemPosition='10')",
-		title : "Absolute path with three segments to a single entity of a collection; 'to n'"
-			+ " navigation in the middle"
-	}, {
-		// path cannot be made canonical as the key predicate for the referenced product is missing
-		expectedCanonicalRequest : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
-			+ "/ToSupplier",
-		expectedRequest : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
-			+ "/ToSupplier",
-		isArrayResponse : false,
-		path : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct/ToSupplier",
-		title : "Absolute path with three segments to a single entity; 'to 1' navigation in the"
-			+ " middle"
-	}, {
-		// path cannot be made canonical as the key predicate for the business partner is missing
-		expectedCanonicalRequest : "SalesOrderSet('1')/ToBusinessPartner/ToProducts",
-		expectedRequest : "SalesOrderSet('1')/ToBusinessPartner/ToProducts",
-		isArrayResponse : true,
-		path : "/SalesOrderSet('1')/ToBusinessPartner/ToProducts",
-		title : "Absolute path with three segments to a collection; 'to 1' navigation in the middle"
-	}, {
-		// even if key predicate for ToBusinessPartner cannot be resolved, canonical path for the
-		// product can be computed
-		expectedCanonicalRequest : {
-			deepPath : "/SalesOrderSet('1')/ToBusinessPartner/ToProducts('P1')",
-			requestUri : "ProductSet('P1')"
-		},
-		expectedRequest : "SalesOrderSet('1')/ToBusinessPartner/ToProducts('P1')",
-		isArrayResponse : false,
-		path : "/SalesOrderSet('1')/ToBusinessPartner/ToProducts('P1')",
-		title : "Absolute path with three segments to a single entity of a collection; 'to 1'"
-			+ " navigation in the middle"
-	}, {
-		expectedCanonicalRequest : "SalesOrderSet('1')/ToBusinessPartner/Address",
-		expectedRequest : "SalesOrderSet('1')/ToBusinessPartner/Address",
-		isArrayResponse : false,
-		path : "/SalesOrderSet('1')/ToBusinessPartner/Address",
-		title : "Absolute path with three segments to a complex type; 'to 1' navigation in the"
-			+ " middle"
-	}, {
-		expectedCanonicalRequest : "SalesOrderSet/$count",
-		expectedRequest : "SalesOrderSet/$count",
-		isArrayResponse : false,
-		path : "/SalesOrderSet/$count",
-		title : "Absolute path; second segment is $count"
-	}, {
-		expectedCanonicalRequest : "SalesOrderSet('1')/ToLineItems/$count",
-		expectedRequest : "SalesOrderSet('1')/ToLineItems/$count",
-		isArrayResponse : false,
-		path : "/SalesOrderSet('1')/ToLineItems/$count",
-		title : "Absolute path; third segment is $count; 'to n' navigation in the middle"
-	}, {
-		expectedCanonicalRequest : {
-			deepPath : "/BusinessPartnerSet('BP1')/ToProducts('P1')/ToSalesOrderLineItems/$count",
-			requestUri : "ProductSet('P1')/ToSalesOrderLineItems/$count"
-		},
-		expectedRequest : "BusinessPartnerSet('BP1')/ToProducts('P1')/ToSalesOrderLineItems/$count",
-		isArrayResponse : false,
-		path : "/BusinessPartnerSet('BP1')/ToProducts('P1')/ToSalesOrderLineItems/$count",
-		title : "Absolute path; 4th segment is $count"
-	}, {
-		contextDeepPath : "/SalesOrderSet",
-		contextPath : "/SalesOrderSet",
-		expectedCanonicalRequest : "SalesOrderSet",
-		expectedRequest : "SalesOrderSet",
-		isArrayResponse : true,
-		path : "",
-		title : "Relative empty path; resolved path has 1 segment referencing a collection"
-	}, {
-		contextDeepPath : "/SalesOrderSet('1')",
-		contextPath : "/SalesOrderSet('1')",
-		expectedCanonicalRequest : "SalesOrderSet('1')",
-		expectedRequest : "SalesOrderSet('1')",
-		isArrayResponse : false,
-		path : "",
-		title : "Relative empty path; resolved path has 1 segment referencing a single entity"
-	}].forEach(function (oFixture) {
-		[false, true].forEach(function (bCanonical) {
-		var sTitle = "ODataModel#read:" + oFixture.title
-				+ (bCanonical ? "; using canonical requests" : "");
+		requestUri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
+	},
+	expectedRequest : "BusinessPartnerSet('BP1')/ToProducts('P1')"
+		+ "/ToSalesOrderLineItems(SalesOrderID='1',ItemPosition='10')",
+	isArrayResponse : false,
+	path : "/BusinessPartnerSet('BP1')/ToProducts('P1')"
+		+ "/ToSalesOrderLineItems(SalesOrderID='1',ItemPosition='10')",
+	title : "Absolute path with three segments to a single entity of a collection; 'to n'"
+		+ " navigation in the middle"
+}, {
+	// path cannot be made canonical as the key predicate for the referenced product is missing
+	expectedCanonicalRequest : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
+		+ "/ToSupplier",
+	expectedRequest : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
+		+ "/ToSupplier",
+	isArrayResponse : false,
+	path : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct/ToSupplier",
+	title : "Absolute path with three segments to a single entity; 'to 1' navigation in the"
+		+ " middle"
+}, {
+	// path cannot be made canonical as the key predicate for the business partner is missing
+	expectedCanonicalRequest : "SalesOrderSet('1')/ToBusinessPartner/ToProducts",
+	expectedRequest : "SalesOrderSet('1')/ToBusinessPartner/ToProducts",
+	isArrayResponse : true,
+	path : "/SalesOrderSet('1')/ToBusinessPartner/ToProducts",
+	title : "Absolute path with three segments to a collection; 'to 1' navigation in the middle"
+}, {
+	// even if key predicate for ToBusinessPartner cannot be resolved, canonical path for the
+	// product can be computed
+	expectedCanonicalRequest : {
+		deepPath : "/SalesOrderSet('1')/ToBusinessPartner/ToProducts('P1')",
+		requestUri : "ProductSet('P1')"
+	},
+	expectedRequest : "SalesOrderSet('1')/ToBusinessPartner/ToProducts('P1')",
+	isArrayResponse : false,
+	path : "/SalesOrderSet('1')/ToBusinessPartner/ToProducts('P1')",
+	title : "Absolute path with three segments to a single entity of a collection; 'to 1'"
+		+ " navigation in the middle"
+}, {
+	expectedCanonicalRequest : "SalesOrderSet('1')/ToBusinessPartner/Address",
+	expectedRequest : "SalesOrderSet('1')/ToBusinessPartner/Address",
+	isArrayResponse : false,
+	path : "/SalesOrderSet('1')/ToBusinessPartner/Address",
+	title : "Absolute path with three segments to a complex type; 'to 1' navigation in the"
+		+ " middle"
+}, {
+	expectedCanonicalRequest : "SalesOrderSet/$count",
+	expectedRequest : "SalesOrderSet/$count",
+	isArrayResponse : false,
+	path : "/SalesOrderSet/$count",
+	title : "Absolute path; second segment is $count"
+}, {
+	expectedCanonicalRequest : "SalesOrderSet('1')/ToLineItems/$count",
+	expectedRequest : "SalesOrderSet('1')/ToLineItems/$count",
+	isArrayResponse : false,
+	path : "/SalesOrderSet('1')/ToLineItems/$count",
+	title : "Absolute path; third segment is $count; 'to n' navigation in the middle"
+}, {
+	expectedCanonicalRequest : {
+		deepPath : "/BusinessPartnerSet('BP1')/ToProducts('P1')/ToSalesOrderLineItems/$count",
+		requestUri : "ProductSet('P1')/ToSalesOrderLineItems/$count"
+	},
+	expectedRequest : "BusinessPartnerSet('BP1')/ToProducts('P1')/ToSalesOrderLineItems/$count",
+	isArrayResponse : false,
+	path : "/BusinessPartnerSet('BP1')/ToProducts('P1')/ToSalesOrderLineItems/$count",
+	title : "Absolute path; 4th segment is $count"
+}, {
+	contextDeepPath : "/SalesOrderSet",
+	contextPath : "/SalesOrderSet",
+	expectedCanonicalRequest : "SalesOrderSet",
+	expectedRequest : "SalesOrderSet",
+	isArrayResponse : true,
+	path : "",
+	title : "Relative empty path; resolved path has 1 segment referencing a collection"
+}, {
+	contextDeepPath : "/SalesOrderSet('1')",
+	contextPath : "/SalesOrderSet('1')",
+	expectedCanonicalRequest : "SalesOrderSet('1')",
+	expectedRequest : "SalesOrderSet('1')",
+	isArrayResponse : false,
+	path : "",
+	title : "Relative empty path; resolved path has 1 segment referencing a single entity"
+}].forEach(function (oFixture) {
+	[false, true].forEach(function (bCanonical) {
+	var sTitle = "ODataModel#read:" + oFixture.title
+			+ (bCanonical ? "; using canonical requests" : "");
 
-		QUnit.test(sTitle, function (assert) {
-			var oModel = createSalesOrdersModel({tokenHandling : false}),
-				that = this;
+	QUnit.test(sTitle, function (assert) {
+		var oModel = createSalesOrdersModel({tokenHandling : false}),
+			that = this;
 
-			return this.createView(assert, "", oModel).then(function () {
-				var oContext = oFixture.contextPath
-						? oModel.getContext(oFixture.contextPath, oFixture.contextDeepPath)
-						: undefined,
-					vExpectedRequest = bCanonical
-						? oFixture.expectedCanonicalRequest
-						: oFixture.expectedRequest,
-					mParameters = {canonicalRequest : bCanonical, context : oContext};
+		return this.createView(assert, "", oModel).then(function () {
+			var oContext = oFixture.contextPath
+					? oModel.getContext(oFixture.contextPath, oFixture.contextDeepPath)
+					: undefined,
+				vExpectedRequest = bCanonical
+					? oFixture.expectedCanonicalRequest
+					: oFixture.expectedRequest,
+				mParameters = {canonicalRequest : bCanonical, context : oContext};
 
-				if (oFixture.pathCache) {
-					oModel.mPathCache = oFixture.pathCache;
-				}
-				that.expectRequest(vExpectedRequest,
-					// response not relevant for this test
-					oFixture.isArrayResponse ? {results : []} : {});
+			if (oFixture.pathCache) {
+				oModel.mPathCache = oFixture.pathCache;
+			}
+			that.expectRequest(vExpectedRequest,
+				// response not relevant for this test
+				oFixture.isArrayResponse ? {results : []} : {});
 
-				// code under test
-				oModel.read(oFixture.path, mParameters);
+			// code under test
+			oModel.read(oFixture.path, mParameters);
 
-				return that.waitForChanges(assert);
-			});
-		});
+			return that.waitForChanges(assert);
 		});
 	});
+	});
+});
 
 	//*********************************************************************************************
 	// Integration test for correct path calculation during ODataModel#read(...). A previous read
 	// filled already the path cache, that "to 1" navigation properties can be resolved.
 	// JIRA: CPOUI5MODELS-404
 	// BCP: 2080464216
-	[{
-		expectedCanonicalRequest : {
-			deepPath : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
-				+ "/ToSupplier",
-			requestUri : "ProductSet('P1')/ToSupplier"
-		},
-		expectedRequest : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
+[{
+	expectedCanonicalRequest : {
+		deepPath : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
 			+ "/ToSupplier",
-		isArrayResponse : false,
-		path : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct/ToSupplier",
-		previousReads : [{
-			request : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct",
-			response : {__metadata : {uri : "ProductSet('P1')"} /*content not relevant*/}
-		}, {
-			request : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct/ToSupplier",
-			response : {__metadata : {uri : "BusinessPartnerSet('BP1')"} /*content not relevant*/}
-		}],
-		title : "Absolute path with three segments to a single entity; 'to 1' navigation in the"
-			+ " middle"
+		requestUri : "ProductSet('P1')/ToSupplier"
+	},
+	expectedRequest : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
+		+ "/ToSupplier",
+	isArrayResponse : false,
+	path : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct/ToSupplier",
+	previousReads : [{
+		request : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct",
+		response : {__metadata : {uri : "ProductSet('P1')"} /*content not relevant*/}
 	}, {
-		expectedCanonicalRequest : {
-			deepPath : "/SalesOrderSet('1')/ToBusinessPartner/ToProducts",
-			requestUri : "BusinessPartnerSet('BP1')/ToProducts"
-		},
-		expectedRequest : "SalesOrderSet('1')/ToBusinessPartner/ToProducts",
-		isArrayResponse : true,
-		path : "/SalesOrderSet('1')/ToBusinessPartner/ToProducts",
-		previousReads : [{
-			request : "SalesOrderSet('1')/ToBusinessPartner",
-			response : {__metadata : {uri : "BusinessPartnerSet('BP1')"} /*content not relevant*/}
-		}],
-		title : "Absolute path with three segments to a collection; 'to 1' navigation in the middle"
+		request : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct/ToSupplier",
+		response : {__metadata : {uri : "BusinessPartnerSet('BP1')"} /*content not relevant*/}
+	}],
+	title : "Absolute path with three segments to a single entity; 'to 1' navigation in the"
+		+ " middle"
+}, {
+	expectedCanonicalRequest : {
+		deepPath : "/SalesOrderSet('1')/ToBusinessPartner/ToProducts",
+		requestUri : "BusinessPartnerSet('BP1')/ToProducts"
+	},
+	expectedRequest : "SalesOrderSet('1')/ToBusinessPartner/ToProducts",
+	isArrayResponse : true,
+	path : "/SalesOrderSet('1')/ToBusinessPartner/ToProducts",
+	previousReads : [{
+		request : "SalesOrderSet('1')/ToBusinessPartner",
+		response : {__metadata : {uri : "BusinessPartnerSet('BP1')"} /*content not relevant*/}
+	}],
+	title : "Absolute path with three segments to a collection; 'to 1' navigation in the middle"
+}, {
+	expectedCanonicalRequest : {
+		deepPath : "/SalesOrderSet('1')/ToBusinessPartner/ToProducts('P1')",
+		// MockServer does not support navigation properties with key predicates; as long as the
+		// addressed entity set is addressable we can shorten the path
+		requestUri : "ProductSet('P1')"
+	},
+	expectedRequest : "SalesOrderSet('1')/ToBusinessPartner/ToProducts('P1')",
+	isArrayResponse : false,
+	path : "/SalesOrderSet('1')/ToBusinessPartner/ToProducts('P1')",
+	previousReads : [{
+		request : "SalesOrderSet('1')/ToBusinessPartner",
+		response : {__metadata : {uri : "BusinessPartnerSet('BP1')"} /*content not relevant*/}
 	}, {
-		expectedCanonicalRequest : {
-			deepPath : "/SalesOrderSet('1')/ToBusinessPartner/ToProducts('P1')",
-			// MockServer does not support navigation properties with key predicates; as long as the
-			// addressed entity set is addressable we can shorten the path
-			requestUri : "ProductSet('P1')"
-		},
-		expectedRequest : "SalesOrderSet('1')/ToBusinessPartner/ToProducts('P1')",
-		isArrayResponse : false,
-		path : "/SalesOrderSet('1')/ToBusinessPartner/ToProducts('P1')",
-		previousReads : [{
-			request : "SalesOrderSet('1')/ToBusinessPartner",
-			response : {__metadata : {uri : "BusinessPartnerSet('BP1')"} /*content not relevant*/}
-		}, {
-			request : "SalesOrderSet('1')/ToBusinessPartner/ToProducts('P1')",
-			response : {__metadata : {uri : "ProductSet('P1')"} /*content not relevant*/}
-		}],
-		title : "Absolute path with three segments to a single entity of a collection; 'to 1'"
-			+ " navigation in the middle"
-	}, {
-		expectedCanonicalRequest : "SalesOrderSet('1')/ToBusinessPartner/Address",
-		expectedRequest : "SalesOrderSet('1')/ToBusinessPartner/Address",
-		isArrayResponse : false,
-		path : "/SalesOrderSet('1')/ToBusinessPartner/Address",
-		previousReads : [{
-			request : "SalesOrderSet('1')/ToBusinessPartner",
-			response : {__metadata : {uri : "BusinessPartnerSet('BP1')"} /*content not relevant*/}
-		}],
-		title : "Absolute path with three segments to a complex type; 'to 1' navigation in the"
-			+ " middle"
-	}, {
-		contextDeepPath : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct",
-		contextPath : "/ProductSet('P1')",
-		expectedCanonicalRequest : {
-			deepPath : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
-				+ "/ToSupplier",
-			requestUri : "ProductSet('P1')/ToSupplier"
-		},
-		expectedRequest : {
-			deepPath : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
-				+ "/ToSupplier",
-			requestUri : "ProductSet('P1')/ToSupplier"
-		},
-		isArrayResponse : false,
-		path : "ToSupplier",
-		previousReads : [{
-			request : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct",
-			response : {__metadata : {uri : "ProductSet('P1')"} /*content not relevant*/}
-		}, {
-			request : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct/ToSupplier",
-			response : {__metadata : {uri : "BusinessPartnerSet('BP1')"} /*content not relevant*/}
-		}],
-		title : "Relative path 'ToSupplier'; resolved deep path has 3 segments"
-	}, {
-		contextDeepPath : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
+		request : "SalesOrderSet('1')/ToBusinessPartner/ToProducts('P1')",
+		response : {__metadata : {uri : "ProductSet('P1')"} /*content not relevant*/}
+	}],
+	title : "Absolute path with three segments to a single entity of a collection; 'to 1'"
+		+ " navigation in the middle"
+}, {
+	expectedCanonicalRequest : "SalesOrderSet('1')/ToBusinessPartner/Address",
+	expectedRequest : "SalesOrderSet('1')/ToBusinessPartner/Address",
+	isArrayResponse : false,
+	path : "/SalesOrderSet('1')/ToBusinessPartner/Address",
+	previousReads : [{
+		request : "SalesOrderSet('1')/ToBusinessPartner",
+		response : {__metadata : {uri : "BusinessPartnerSet('BP1')"} /*content not relevant*/}
+	}],
+	title : "Absolute path with three segments to a complex type; 'to 1' navigation in the"
+		+ " middle"
+}, {
+	contextDeepPath : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct",
+	contextPath : "/ProductSet('P1')",
+	expectedCanonicalRequest : {
+		deepPath : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
 			+ "/ToSupplier",
-		contextPath : "/ProductSet('P1')/ToSupplier",
-		expectedCanonicalRequest : {
-			deepPath : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
-				+ "/ToSupplier",
-			requestUri : "ProductSet('P1')/ToSupplier"
-		},
-		expectedRequest : {
-			deepPath : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
-				+ "/ToSupplier",
-			requestUri : "ProductSet('P1')/ToSupplier"
-		},
-		isArrayResponse : false,
-		path : "",
-		previousReads : [{
-			request : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct",
-			response : {__metadata : {uri : "ProductSet('P1')"} /*content not relevant*/}
-		}, {
-			request : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct/ToSupplier",
-			response : {__metadata : {uri : "BusinessPartnerSet('BP1')"} /*content not relevant*/}
-		}],
-		title : "Relative empty path with '/ProductSet('P1')/ToSupplier' as context path; resolved"
-			+ " deep path has 3 segments"
-	}].forEach(function (oFixture) {
-		[false, true].forEach(function (bCanonical) {
-		var sTitle = "ODataModel#read:" + oFixture.title
-				+ (bCanonical ? "; using canonical requests" : "")
-				+ "; 'to 1' navigation property in the middle already read";
+		requestUri : "ProductSet('P1')/ToSupplier"
+	},
+	expectedRequest : {
+		deepPath : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
+			+ "/ToSupplier",
+		requestUri : "ProductSet('P1')/ToSupplier"
+	},
+	isArrayResponse : false,
+	path : "ToSupplier",
+	previousReads : [{
+		request : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct",
+		response : {__metadata : {uri : "ProductSet('P1')"} /*content not relevant*/}
+	}, {
+		request : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct/ToSupplier",
+		response : {__metadata : {uri : "BusinessPartnerSet('BP1')"} /*content not relevant*/}
+	}],
+	title : "Relative path 'ToSupplier'; resolved deep path has 3 segments"
+}, {
+	contextDeepPath : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
+		+ "/ToSupplier",
+	contextPath : "/ProductSet('P1')/ToSupplier",
+	expectedCanonicalRequest : {
+		deepPath : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
+			+ "/ToSupplier",
+		requestUri : "ProductSet('P1')/ToSupplier"
+	},
+	expectedRequest : {
+		deepPath : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct"
+			+ "/ToSupplier",
+		requestUri : "ProductSet('P1')/ToSupplier"
+	},
+	isArrayResponse : false,
+	path : "",
+	previousReads : [{
+		request : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct",
+		response : {__metadata : {uri : "ProductSet('P1')"} /*content not relevant*/}
+	}, {
+		request : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct/ToSupplier",
+		response : {__metadata : {uri : "BusinessPartnerSet('BP1')"} /*content not relevant*/}
+	}],
+	title : "Relative empty path with '/ProductSet('P1')/ToSupplier' as context path; resolved"
+		+ " deep path has 3 segments"
+}].forEach(function (oFixture) {
+	[false, true].forEach(function (bCanonical) {
+	var sTitle = "ODataModel#read:" + oFixture.title
+			+ (bCanonical ? "; using canonical requests" : "")
+			+ "; 'to 1' navigation property in the middle already read";
 
-		QUnit.test(sTitle, function (assert) {
-			var oModel = createSalesOrdersModel({tokenHandling : false}),
-				that = this;
+	QUnit.test(sTitle, function (assert) {
+		var oModel = createSalesOrdersModel({tokenHandling : false}),
+			that = this;
 
-			oFixture.previousReads.forEach(function (oPreviousRead) {
-				that.expectRequest(oPreviousRead.request, oPreviousRead.response);
+		oFixture.previousReads.forEach(function (oPreviousRead) {
+			that.expectRequest(oPreviousRead.request, oPreviousRead.response);
 
-				// trigger previous read to be able to resolve the "to 1" navigation property
-				oModel.read("/" + oPreviousRead.request);
-			});
-
-			return this.createView(assert, "", oModel).then(function () {
-				var oContext = oFixture.contextPath
-						? oModel.getContext(oFixture.contextPath, oFixture.contextDeepPath)
-						: undefined,
-					vExpectedRequest = bCanonical
-						? oFixture.expectedCanonicalRequest
-						: oFixture.expectedRequest,
-					mParameters = {canonicalRequest : bCanonical, context : oContext};
-
-				that.expectRequest(vExpectedRequest,
-					// response not relevant for this test
-					oFixture.isArrayResponse ? {results : []} : {});
-
-				// code under test
-				oModel.read(oFixture.path, mParameters);
-
-				return that.waitForChanges(assert);
-			});
+			// trigger previous read to be able to resolve the "to 1" navigation property
+			oModel.read("/" + oPreviousRead.request);
 		});
+
+		return this.createView(assert, "", oModel).then(function () {
+			var oContext = oFixture.contextPath
+					? oModel.getContext(oFixture.contextPath, oFixture.contextDeepPath)
+					: undefined,
+				vExpectedRequest = bCanonical
+					? oFixture.expectedCanonicalRequest
+					: oFixture.expectedRequest,
+				mParameters = {canonicalRequest : bCanonical, context : oContext};
+
+			that.expectRequest(vExpectedRequest,
+				// response not relevant for this test
+				oFixture.isArrayResponse ? {results : []} : {});
+
+			// code under test
+			oModel.read(oFixture.path, mParameters);
+
+			return that.waitForChanges(assert);
 		});
 	});
+	});
+});
 
 	//*********************************************************************************************
 	// Integration test for correct path calculation during ODataModel#read(...). "To n" navigation
@@ -2406,30 +2406,30 @@ sap.ui.define([
 	// has a query string, the query string is ignored by ODataModel#read.
 	// JIRA: CPOUI5MODELS-404
 	// BCP: 2080464216
-	[{
-		path : "/SalesOrderSet('1')/ToBusinessPartner?sap-client=100"
-	}, {
-		contextPath : "/SalesOrderSet('1')/ToBusinessPartner",
-		path : "?sap-client=100"
-	}].forEach(function (oFixture) {
-		QUnit.test("ODataModel#read: path with query string: " + oFixture.path, function (assert) {
-			var oModel = createSalesOrdersModel({tokenHandling : false}),
-				that = this;
+[{
+	path : "/SalesOrderSet('1')/ToBusinessPartner?sap-client=100"
+}, {
+	contextPath : "/SalesOrderSet('1')/ToBusinessPartner",
+	path : "?sap-client=100"
+}].forEach(function (oFixture) {
+	QUnit.test("ODataModel#read: path with query string: " + oFixture.path, function (assert) {
+		var oModel = createSalesOrdersModel({tokenHandling : false}),
+			that = this;
 
-			return this.createView(assert, "", oModel).then(function () {
-				that.expectRequest("SalesOrderSet('1')/ToBusinessPartner",
-					// response not relevant for this test
-					{results : {}});
+		return this.createView(assert, "", oModel).then(function () {
+			that.expectRequest("SalesOrderSet('1')/ToBusinessPartner",
+				// response not relevant for this test
+				{results : {}});
 
-				// code under test
-				oModel.read(oFixture.path, oFixture.contextPath
-					? {context : oModel.getContext(oFixture.contextPath)}
-					: {});
+			// code under test
+			oModel.read(oFixture.path, oFixture.contextPath
+				? {context : oModel.getContext(oFixture.contextPath)}
+				: {});
 
-				return that.waitForChanges(assert);
-			});
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: Read and display data for a single field in a form
@@ -2801,28 +2801,28 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	// Scenario: Message with empty target (tested as single request and as batch request)
-	[false, true].forEach(function (bUseBatch) {
-		QUnit.test("Messages: empty target (useBatch=" + bUseBatch + ")", function (assert) {
-			var oModel = createSalesOrdersModel({useBatch : bUseBatch}),
-				oResponseMessage = this.createResponseMessage(""),
-				sView = '\
+[false, true].forEach(function (bUseBatch) {
+	QUnit.test("Messages: empty target (useBatch=" + bUseBatch + ")", function (assert) {
+		var oModel = createSalesOrdersModel({useBatch : bUseBatch}),
+			oResponseMessage = this.createResponseMessage(""),
+			sView = '\
 <FlexBox binding="{/SalesOrderSet(\'1\')}">\
 	<Text id="id" text="{SalesOrderID}" />\
 </FlexBox>';
 
-			if (bUseBatch) {
-				this.expectHeadRequest();
-			}
+		if (bUseBatch) {
+			this.expectHeadRequest();
+		}
 
-			this.expectRequest("SalesOrderSet('1')", {SalesOrderID : "1"},
-					{"sap-message" : getMessageHeader(oResponseMessage)})
-				.expectValue("id", "1")
-				.expectMessage(oResponseMessage, "/SalesOrderSet('1')");
+		this.expectRequest("SalesOrderSet('1')", {SalesOrderID : "1"},
+				{"sap-message" : getMessageHeader(oResponseMessage)})
+			.expectValue("id", "1")
+			.expectMessage(oResponseMessage, "/SalesOrderSet('1')");
 
-			// code under test
-			return this.createView(assert, sView, oModel);
-		});
+		// code under test
+		return this.createView(assert, sView, oModel);
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: Message with a simple target in a complex data type
@@ -2854,37 +2854,37 @@ sap.ui.define([
 	//*********************************************************************************************
 	// Scenario: Messages with a http status code of 4xx/5xx are expected to be technical
 	// JIRA: CPOUI5MODELS-103
-	[
-		{message : "Bad Request", statusCode : 400},
-		{message : "Internal Server Error", statusCode : 500}
-	].forEach(function (oFixture) {
-		var sTitle = "Messages: http status code '" + oFixture.statusCode + "' expects a technical "
-				+ "error message";
+[
+	{message : "Bad Request", statusCode : 400},
+	{message : "Internal Server Error", statusCode : 500}
+].forEach(function (oFixture) {
+	var sTitle = "Messages: http status code '" + oFixture.statusCode + "' expects a technical "
+			+ "error message";
 
-		QUnit.test(sTitle , function (assert) {
-			var sView = '\
+	QUnit.test(sTitle , function (assert) {
+		var sView = '\
 <FlexBox binding="{/SalesOrderSet(\'1\')}">\
 	<Text text="{SalesOrderID}" />\
 </FlexBox>';
 
-			this.oLogMock.expects("error").once();
+		this.oLogMock.expects("error").once();
 
-			this.expectHeadRequest()
-				.expectRequest("SalesOrderSet('1')", createErrorResponse(oFixture))
-				.expectMessages([{
-					code : "UF0",
-					fullTarget : "/SalesOrderSet('1')",
-					message : oFixture.message,
-					persistent : false,
-					technical : true,
-					target : "/SalesOrderSet('1')",
-					type : MessageType.Error
-				}]);
+		this.expectHeadRequest()
+			.expectRequest("SalesOrderSet('1')", createErrorResponse(oFixture))
+			.expectMessages([{
+				code : "UF0",
+				fullTarget : "/SalesOrderSet('1')",
+				message : oFixture.message,
+				persistent : false,
+				technical : true,
+				target : "/SalesOrderSet('1')",
+				type : MessageType.Error
+			}]);
 
-			// code under test
-			return this.createView(assert, sView);
-		});
+		// code under test
+		return this.createView(assert, sView);
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: Error responses that contain messages within the response body (technical messages)
@@ -3050,78 +3050,78 @@ sap.ui.define([
 	// Scenario: Messages are not removed after refresh, if messages are flagged as persistent
 	// (transient or transition)
 	// JIRA: CPOUI5MODELS-35
-	[
-		{
-			bIsPersistent : true,
-			sTarget : "Note",
-			bTransient : true
-		}, {
-			bIsPersistent : true,
-			sTarget : "Note",
-			bTransition : true
-		}, {
-			bIsPersistent : true,
-			sTarget : "/#TRANSIENT#Note"
-		}, {
-			bIsPersistent : false,
-			sTarget : "Note"
-		}
-	].forEach(function (oFixture) {
-		var sTitle = "Messages: message is persistent=" + oFixture.bIsPersistent + " (transient="
-				+ oFixture.bTransient + ", transition=" + oFixture.bTransition + ", target='"
-				+ oFixture.sTarget + "')";
+[
+	{
+		bIsPersistent : true,
+		sTarget : "Note",
+		bTransient : true
+	}, {
+		bIsPersistent : true,
+		sTarget : "Note",
+		bTransition : true
+	}, {
+		bIsPersistent : true,
+		sTarget : "/#TRANSIENT#Note"
+	}, {
+		bIsPersistent : false,
+		sTarget : "Note"
+	}
+].forEach(function (oFixture) {
+	var sTitle = "Messages: message is persistent=" + oFixture.bIsPersistent + " (transient="
+			+ oFixture.bTransient + ", transition=" + oFixture.bTransition + ", target='"
+			+ oFixture.sTarget + "')";
 
-		QUnit.test(sTitle, function (assert) {
-			var oExpectedMessage = {
-					code : "code",
-					fullTarget : "/SalesOrderSet('1')/Note",
-					message : "Foo",
-					persistent : oFixture.bIsPersistent,
-					target : "/SalesOrderSet('1')/Note",
-					type : MessageType.Error
-				},
-				that = this,
-				sView = '\
+	QUnit.test(sTitle, function (assert) {
+		var oExpectedMessage = {
+				code : "code",
+				fullTarget : "/SalesOrderSet('1')/Note",
+				message : "Foo",
+				persistent : oFixture.bIsPersistent,
+				target : "/SalesOrderSet('1')/Note",
+				type : MessageType.Error
+			},
+			that = this,
+			sView = '\
 <FlexBox binding="{/SalesOrderSet(\'1\')}">\
 	<Input id="note" value="{Note}" />\
 </FlexBox>';
 
-			this.expectHeadRequest()
-				.expectRequest("SalesOrderSet('1')", {
-					SalesOrderID : "1",
-					Note : "NoteA"
-				}, {
-					"sap-message" : getMessageHeader({
-						code : "code",
-						message : "Foo",
-						severity : "error",
-						target : oFixture.sTarget,
-						transient : oFixture.bTransient,
-						transition : oFixture.bTransition
-					})
+		this.expectHeadRequest()
+			.expectRequest("SalesOrderSet('1')", {
+				SalesOrderID : "1",
+				Note : "NoteA"
+			}, {
+				"sap-message" : getMessageHeader({
+					code : "code",
+					message : "Foo",
+					severity : "error",
+					target : oFixture.sTarget,
+					transient : oFixture.bTransient,
+					transition : oFixture.bTransition
 				})
-				.expectValue("note", "NoteA")
-				.expectMessages([oExpectedMessage])
-				.expectValueState("note", "Error", "Foo");
+			})
+			.expectValue("note", "NoteA")
+			.expectMessages([oExpectedMessage])
+			.expectValueState("note", "Error", "Foo");
+
+		// code under test
+		return this.createView(assert, sView).then(function () {
+			that.expectRequest("SalesOrderSet('1')", {
+					SalesOrderID : "1",
+					Note : "NoteB"
+				})
+				.expectValue("note", "NoteB")
+				.expectMessages(oFixture.bIsPersistent ? [oExpectedMessage] : [])
+				.expectValueState("note", oFixture.bIsPersistent ? "Error" : "None",
+					oFixture.bIsPersistent ? "Foo" : "");
 
 			// code under test
-			return this.createView(assert, sView).then(function () {
-				that.expectRequest("SalesOrderSet('1')", {
-						SalesOrderID : "1",
-						Note : "NoteB"
-					})
-					.expectValue("note", "NoteB")
-					.expectMessages(oFixture.bIsPersistent ? [oExpectedMessage] : [])
-					.expectValueState("note", oFixture.bIsPersistent ? "Error" : "None",
-						oFixture.bIsPersistent ? "Foo" : "");
+			that.oModel.refresh();
 
-				// code under test
-				that.oModel.refresh();
-
-				return that.waitForChanges(assert);
-			});
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: When two bindings reference the same entity only one GET request is send and the
@@ -3847,21 +3847,21 @@ usePreliminaryContext : false}}">\
 	// displayed. In case of message scope BusinessObject also messages for child entities are
 	// displayed.
 	// JIRA: CPOUI5MODELS-111
-	[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
-		QUnit.test("Message lifecycle (1), scope: " + sMessageScope, function (assert) {
-			var oModel = createSalesOrdersModel({preliminaryContext : true}),
-				oSalesOrderNoteError = this.createResponseMessage("Note"),
-				oSalesOrderToBusinessPartnerAddress
-					= this.createResponseMessage("ToBusinessPartner/Address"),
-				oSalesOrderToItemNoteError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='10')/Note"),
-				oSalesOrderToItemPositionError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='10')/ItemPosition"),
-				oSalesOrderItemNoteError = cloneODataMessage(oSalesOrderToItemNoteError,
-					"(SalesOrderID='1',ItemPosition='10')/Note"),
-				oSalesOrderItemPositionError = cloneODataMessage(oSalesOrderToItemPositionError,
-					"(SalesOrderID='1',ItemPosition='10')/ItemPosition"),
-				sView = '\
+[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
+	QUnit.test("Message lifecycle (1), scope: " + sMessageScope, function (assert) {
+		var oModel = createSalesOrdersModel({preliminaryContext : true}),
+			oSalesOrderNoteError = this.createResponseMessage("Note"),
+			oSalesOrderToBusinessPartnerAddress
+				= this.createResponseMessage("ToBusinessPartner/Address"),
+			oSalesOrderToItemNoteError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='10')/Note"),
+			oSalesOrderToItemPositionError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='10')/ItemPosition"),
+			oSalesOrderItemNoteError = cloneODataMessage(oSalesOrderToItemNoteError,
+				"(SalesOrderID='1',ItemPosition='10')/Note"),
+			oSalesOrderItemPositionError = cloneODataMessage(oSalesOrderToItemPositionError,
+				"(SalesOrderID='1',ItemPosition='10')/ItemPosition"),
+			sView = '\
 <FlexBox binding="{/SalesOrderSet(\'1\')}">\
 	<Text id="salesOrderID" text="{SalesOrderID}" />\
 	<Input id="note" value="{Note}" />\
@@ -3873,53 +3873,53 @@ usePreliminaryContext : false}}">\
 		<Input id="note::item" value="{Note}" />\
 	</Table>\
 </FlexBox>',
-				bWithMessageScope = sMessageScope === MessageScope.BusinessObject;
+			bWithMessageScope = sMessageScope === MessageScope.BusinessObject;
 
-			this.expectHeadRequest(bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {})
-				.expectRequest({
-					headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
-					requestUri : "SalesOrderSet('1')"
-				}, {
-					__metadata : {uri : "SalesOrderSet('1')"},
-					Note : "Foo",
+		this.expectHeadRequest(bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {})
+			.expectRequest({
+				headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
+				requestUri : "SalesOrderSet('1')"
+			}, {
+				__metadata : {uri : "SalesOrderSet('1')"},
+				Note : "Foo",
+				SalesOrderID : "1"
+			}, {
+				"sap-message" : getMessageHeader(bWithMessageScope
+					? [oSalesOrderNoteError, oSalesOrderToBusinessPartnerAddress,
+						oSalesOrderToItemNoteError, oSalesOrderToItemPositionError]
+					: [oSalesOrderNoteError])
+			})
+			.expectValue("note", "Foo")
+			.expectValue("salesOrderID", "1")
+			.expectRequest({
+				headers : {"sap-messages" : "transientOnly"},
+				requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=100"
+			}, {
+				results : [{
+					__metadata : {
+						uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
+					},
+					Note : "Bar",
+					ItemPosition : "10",
 					SalesOrderID : "1"
-				}, {
-					"sap-message" : getMessageHeader(bWithMessageScope
-						? [oSalesOrderNoteError, oSalesOrderToBusinessPartnerAddress,
-							oSalesOrderToItemNoteError, oSalesOrderToItemPositionError]
-						: [oSalesOrderNoteError])
-				})
-				.expectValue("note", "Foo")
-				.expectValue("salesOrderID", "1")
-				.expectRequest({
-					headers : {"sap-messages" : "transientOnly"},
-					requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=100"
-				}, {
-					results : [{
-						__metadata : {
-							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
-						},
-						Note : "Bar",
-						ItemPosition : "10",
-						SalesOrderID : "1"
-					}]
-				})
-				.expectValue("itemPosition", ["10"])
-				.expectValue("note::item", ["Bar"])
-				.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/");
+				}]
+			})
+			.expectValue("itemPosition", ["10"])
+			.expectValue("note::item", ["Bar"])
+			.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/");
 
-			if (bWithMessageScope) {
-				this.expectMessage(oSalesOrderItemNoteError, "/SalesOrderLineItemSet",
-						"/SalesOrderSet('1')/ToLineItems")
-					.expectMessage(oSalesOrderItemPositionError, "/SalesOrderLineItemSet",
-						"/SalesOrderSet('1')/ToLineItems")
-					.expectMessage(oSalesOrderToBusinessPartnerAddress, "/SalesOrderSet('1')/");
-			}
-			oModel.setMessageScope(sMessageScope);
+		if (bWithMessageScope) {
+			this.expectMessage(oSalesOrderItemNoteError, "/SalesOrderLineItemSet",
+					"/SalesOrderSet('1')/ToLineItems")
+				.expectMessage(oSalesOrderItemPositionError, "/SalesOrderLineItemSet",
+					"/SalesOrderSet('1')/ToLineItems")
+				.expectMessage(oSalesOrderToBusinessPartnerAddress, "/SalesOrderSet('1')/");
+		}
+		oModel.setMessageScope(sMessageScope);
 
-			return this.createView(assert, sView, oModel);
-		});
+		return this.createView(assert, sView, oModel);
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: On an object page a sales order with its sales order items is displayed. Only a
@@ -3932,21 +3932,21 @@ usePreliminaryContext : false}}">\
 	// Paging must not remove messages of items that are already on the client. New messages for the
 	// sales order items are added, if they are not yet contained in the message model.
 	// JIRA: CPOUI5MODELS-111, CPOUI5MODELS-112
-	[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
-		QUnit.test("Message lifecycle (2) + (3), scope: " + sMessageScope, function (assert) {
-			var oModel = createSalesOrdersModel({preliminaryContext : true}),
-				oSalesOrderNoteError = this.createResponseMessage("Note"),
-				oSalesOrderToBusinessPartnerAddress
-					= this.createResponseMessage("ToBusinessPartner/Address"),
-				oSalesOrderToItem10NoteError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='10')/Note"),
-				oSalesOrderToItem30NoteError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='30')/Note"),
-				oSalesOrderItem10NoteError = cloneODataMessage(oSalesOrderToItem10NoteError,
-					"(SalesOrderID='1',ItemPosition='10')/Note"),
-				oSalesOrderItem30NoteError = cloneODataMessage(oSalesOrderToItem30NoteError,
-					"(SalesOrderID='1',ItemPosition='30')/Note"),
-				sView = '\
+[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
+	QUnit.test("Message lifecycle (2) + (3), scope: " + sMessageScope, function (assert) {
+		var oModel = createSalesOrdersModel({preliminaryContext : true}),
+			oSalesOrderNoteError = this.createResponseMessage("Note"),
+			oSalesOrderToBusinessPartnerAddress
+				= this.createResponseMessage("ToBusinessPartner/Address"),
+			oSalesOrderToItem10NoteError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='10')/Note"),
+			oSalesOrderToItem30NoteError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='30')/Note"),
+			oSalesOrderItem10NoteError = cloneODataMessage(oSalesOrderToItem10NoteError,
+				"(SalesOrderID='1',ItemPosition='10')/Note"),
+			oSalesOrderItem30NoteError = cloneODataMessage(oSalesOrderToItem30NoteError,
+				"(SalesOrderID='1',ItemPosition='30')/Note"),
+			sView = '\
 <FlexBox binding="{/SalesOrderSet(\'1\')}">\
 	<Text id="salesOrderID" text="{SalesOrderID}" />\
 	<Input id="note" value="{Note}" />\
@@ -3958,93 +3958,93 @@ usePreliminaryContext : false}}">\
 		<Input id="note::item" value="{Note}" />\
 	</Table>\
 </FlexBox>',
-				bWithMessageScope = sMessageScope === MessageScope.BusinessObject,
-				that = this;
+			bWithMessageScope = sMessageScope === MessageScope.BusinessObject,
+			that = this;
 
-			this.expectHeadRequest(bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {})
-				.expectRequest({
-					headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
-					requestUri : "SalesOrderSet('1')"
-				}, {
-					__metadata : {uri : "SalesOrderSet('1')"},
-					Note : "Foo",
+		this.expectHeadRequest(bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {})
+			.expectRequest({
+				headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
+				requestUri : "SalesOrderSet('1')"
+			}, {
+				__metadata : {uri : "SalesOrderSet('1')"},
+				Note : "Foo",
+				SalesOrderID : "1"
+			}, {
+				"sap-message" : getMessageHeader(bWithMessageScope
+					? [oSalesOrderNoteError, oSalesOrderToBusinessPartnerAddress,
+						oSalesOrderToItem10NoteError, oSalesOrderToItem30NoteError]
+					: oSalesOrderNoteError)
+			})
+			.expectValue("note", "Foo")
+			.expectValue("salesOrderID", "1")
+			.expectRequest({
+				headers : {"sap-messages" : "transientOnly"},
+				requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=2"
+			}, {
+				results : [{
+					__metadata : {
+						uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
+					},
+					Note : "Bar",
+					ItemPosition : "10",
 					SalesOrderID : "1"
 				}, {
-					"sap-message" : getMessageHeader(bWithMessageScope
-						? [oSalesOrderNoteError, oSalesOrderToBusinessPartnerAddress,
-							oSalesOrderToItem10NoteError, oSalesOrderToItem30NoteError]
-						: oSalesOrderNoteError)
-				})
-				.expectValue("note", "Foo")
-				.expectValue("salesOrderID", "1")
-				.expectRequest({
-					headers : {"sap-messages" : "transientOnly"},
-					requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=2"
+					__metadata : {
+						uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20')"
+					},
+					Note : "Baz",
+					ItemPosition : "20",
+					SalesOrderID : "1"
+				}]
+			}/*, { // message is not sent because of transitionMessagesOnly
+				"sap-message" : getMessageHeader(oSalesOrderItem10NoteError)
+			}*/)
+			.expectValue("itemPosition", ["10", "20"])
+			.expectValue("note::item", ["Bar", "Baz"])
+			.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/");
+
+		if (bWithMessageScope) {
+			this.expectMessage(oSalesOrderToBusinessPartnerAddress, "/SalesOrderSet('1')/")
+				.expectMessage(oSalesOrderItem10NoteError, "/SalesOrderLineItemSet",
+					"/SalesOrderSet('1')/ToLineItems")
+				.expectMessage(oSalesOrderItem30NoteError, "/SalesOrderLineItemSet",
+					"/SalesOrderSet('1')/ToLineItems");
+		}
+		oModel.setMessageScope(sMessageScope);
+
+		return this.createView(assert, sView, oModel).then(function () {
+			that.expectRequest({
+				headers : {"sap-messages" : "transientOnly"},
+				requestUri : "SalesOrderSet('1')/ToLineItems?$skip=2&$top=2"
+			}, {
+				results : [{
+					__metadata : {
+						uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='30')"
+					},
+					Note : "Qux",
+					ItemPosition : "30",
+					SalesOrderID : "1"
 				}, {
-					results : [{
-						__metadata : {
-							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
-						},
-						Note : "Bar",
-						ItemPosition : "10",
-						SalesOrderID : "1"
-					}, {
-						__metadata : {
-							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20')"
-						},
-						Note : "Baz",
-						ItemPosition : "20",
-						SalesOrderID : "1"
-					}]
-				}/*, { // message is not sent because of transitionMessagesOnly
-					"sap-message" : getMessageHeader(oSalesOrderItem10NoteError)
-				}*/)
-				.expectValue("itemPosition", ["10", "20"])
-				.expectValue("note::item", ["Bar", "Baz"])
-				.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/");
+					__metadata : {
+						uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='40')"
+					},
+					Note : "Quux",
+					ItemPosition : "40",
+					SalesOrderID : "1"
+				}]
+			})
+			.expectValue("itemPosition", "30", 2)
+			.expectValue("itemPosition", "40", 3)
+			.expectValue("note::item", "Qux", 2)
+			.expectValue("note::item", "Quux", 3);
 
-			if (bWithMessageScope) {
-				this.expectMessage(oSalesOrderToBusinessPartnerAddress, "/SalesOrderSet('1')/")
-					.expectMessage(oSalesOrderItem10NoteError, "/SalesOrderLineItemSet",
-						"/SalesOrderSet('1')/ToLineItems")
-					.expectMessage(oSalesOrderItem30NoteError, "/SalesOrderLineItemSet",
-						"/SalesOrderSet('1')/ToLineItems");
-			}
-			oModel.setMessageScope(sMessageScope);
+			// do paging
+			that.oView.byId("table").requestItems();
 
-			return this.createView(assert, sView, oModel).then(function () {
-				that.expectRequest({
-					headers : {"sap-messages" : "transientOnly"},
-					requestUri : "SalesOrderSet('1')/ToLineItems?$skip=2&$top=2"
-				}, {
-					results : [{
-						__metadata : {
-							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='30')"
-						},
-						Note : "Qux",
-						ItemPosition : "30",
-						SalesOrderID : "1"
-					}, {
-						__metadata : {
-							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='40')"
-						},
-						Note : "Quux",
-						ItemPosition : "40",
-						SalesOrderID : "1"
-					}]
-				})
-				.expectValue("itemPosition", "30", 2)
-				.expectValue("itemPosition", "40", 3)
-				.expectValue("note::item", "Qux", 2)
-				.expectValue("note::item", "Quux", 3);
-
-				// do paging
-				that.oView.byId("table").requestItems();
-
-				return that.waitForChanges(assert);
-			});
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: On an object page a sales order with its sales order items is displayed. Only a
@@ -4056,28 +4056,28 @@ usePreliminaryContext : false}}">\
 	// object page. The topmost entity is responsible for the message handling.
 	// In case of message scope "Request", old messages are untouched, new messages are added.
 	// JIRA: CPOUI5MODELS-111, CPOUI5MODELS-112
-	[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
-		QUnit.test("Message lifecycle (4), scope: " + sMessageScope, function (assert) {
-			var oModel = createSalesOrdersModel({preliminaryContext : true}),
-				oSalesOrderNoteError = this.createResponseMessage("Note"),
-				oSalesOrderToBusinessPartnerAddress
-					= this.createResponseMessage("ToBusinessPartner/Address"),
-				oSalesOrderToItem10GrossAmountError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='10')/GrossAmount"),
-				oSalesOrderToItem20GrossAmountError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='20')/GrossAmount"),
-				oSalesOrderToItem30GrossAmountError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='30')/GrossAmount"),
-				oSalesOrderItem10GrossAmountError
-					= cloneODataMessage(oSalesOrderToItem10GrossAmountError,
-						"(SalesOrderID='1',ItemPosition='10')/GrossAmount"),
-				oSalesOrderItem20GrossAmountError
-					= cloneODataMessage(oSalesOrderToItem20GrossAmountError,
-						"(SalesOrderID='1',ItemPosition='20')/GrossAmount"),
-				oSalesOrderItem30GrossAmountError
-					= cloneODataMessage(oSalesOrderToItem30GrossAmountError,
-						"(SalesOrderID='1',ItemPosition='30')/GrossAmount"),
-				sView = '\
+[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
+	QUnit.test("Message lifecycle (4), scope: " + sMessageScope, function (assert) {
+		var oModel = createSalesOrdersModel({preliminaryContext : true}),
+			oSalesOrderNoteError = this.createResponseMessage("Note"),
+			oSalesOrderToBusinessPartnerAddress
+				= this.createResponseMessage("ToBusinessPartner/Address"),
+			oSalesOrderToItem10GrossAmountError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='10')/GrossAmount"),
+			oSalesOrderToItem20GrossAmountError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='20')/GrossAmount"),
+			oSalesOrderToItem30GrossAmountError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='30')/GrossAmount"),
+			oSalesOrderItem10GrossAmountError
+				= cloneODataMessage(oSalesOrderToItem10GrossAmountError,
+					"(SalesOrderID='1',ItemPosition='10')/GrossAmount"),
+			oSalesOrderItem20GrossAmountError
+				= cloneODataMessage(oSalesOrderToItem20GrossAmountError,
+					"(SalesOrderID='1',ItemPosition='20')/GrossAmount"),
+			oSalesOrderItem30GrossAmountError
+				= cloneODataMessage(oSalesOrderToItem30GrossAmountError,
+					"(SalesOrderID='1',ItemPosition='30')/GrossAmount"),
+			sView = '\
 <FlexBox binding="{/SalesOrderSet(\'1\')}">\
 	<Text id="salesOrderID" text="{SalesOrderID}" />\
 	<Input id="note" value="{Note}" />\
@@ -4089,29 +4089,67 @@ usePreliminaryContext : false}}">\
 		<Input id="grossAmount" value="{GrossAmount}" />\
 	</Table>\
 </FlexBox>',
-				bWithMessageScope = sMessageScope === MessageScope.BusinessObject,
-				that = this;
+			bWithMessageScope = sMessageScope === MessageScope.BusinessObject,
+			that = this;
 
-			this.expectHeadRequest(bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {})
-				.expectRequest({
-					headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
-					requestUri : "SalesOrderSet('1')"
-				}, {
-					__metadata : {uri : "SalesOrderSet('1')"},
-					Note : "Foo",
+		this.expectHeadRequest(bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {})
+			.expectRequest({
+				headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
+				requestUri : "SalesOrderSet('1')"
+			}, {
+				__metadata : {uri : "SalesOrderSet('1')"},
+				Note : "Foo",
+				SalesOrderID : "1"
+			}, {
+				"sap-message" : getMessageHeader(bWithMessageScope
+					? [oSalesOrderNoteError, oSalesOrderToBusinessPartnerAddress,
+						oSalesOrderToItem10GrossAmountError, oSalesOrderToItem20GrossAmountError,
+						oSalesOrderToItem30GrossAmountError]
+					: oSalesOrderNoteError)
+			})
+			.expectValue("note", "Foo")
+			.expectValue("salesOrderID", "1")
+			.expectRequest({
+				headers : {"sap-messages" : "transientOnly"},
+				requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=2"
+			}, {
+				results : [{
+					__metadata : {
+						uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
+					},
+					GrossAmount : "111.0",
+					ItemPosition : "10",
 					SalesOrderID : "1"
 				}, {
-					"sap-message" : getMessageHeader(bWithMessageScope
-						? [oSalesOrderNoteError, oSalesOrderToBusinessPartnerAddress,
-							oSalesOrderToItem10GrossAmountError, oSalesOrderToItem20GrossAmountError,
-							oSalesOrderToItem30GrossAmountError]
-						: oSalesOrderNoteError)
-				})
-				.expectValue("note", "Foo")
-				.expectValue("salesOrderID", "1")
-				.expectRequest({
+					__metadata : {
+						uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20')"
+					},
+					GrossAmount : "42.0",
+					ItemPosition : "20",
+					SalesOrderID : "1"
+				}]
+			})
+			.expectValue("itemPosition", ["10", "20"])
+			.expectValue("grossAmount", ["111.0", "42.0"])
+			.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/");
+
+		if (bWithMessageScope) {
+			this.expectMessage(oSalesOrderToBusinessPartnerAddress, "/SalesOrderSet('1')/")
+				.expectMessage(oSalesOrderItem10GrossAmountError, "/SalesOrderLineItemSet",
+					"/SalesOrderSet('1')/ToLineItems")
+				.expectMessage(oSalesOrderItem20GrossAmountError, "/SalesOrderLineItemSet",
+					"/SalesOrderSet('1')/ToLineItems")
+				.expectMessage(oSalesOrderItem30GrossAmountError, "/SalesOrderLineItemSet",
+					"/SalesOrderSet('1')/ToLineItems");
+
+		}
+		oModel.setMessageScope(sMessageScope);
+
+		return this.createView(assert, sView, oModel).then(function() {
+			that.expectRequest({
 					headers : {"sap-messages" : "transientOnly"},
 					requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=2"
+						+ "&$filter=GrossAmount gt 100.0m"
 				}, {
 					results : [{
 						__metadata : {
@@ -4122,65 +4160,27 @@ usePreliminaryContext : false}}">\
 						SalesOrderID : "1"
 					}, {
 						__metadata : {
-							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20')"
+							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='30')"
 						},
-						GrossAmount : "42.0",
-						ItemPosition : "20",
+						GrossAmount : "222.0",
+						ItemPosition : "30",
 						SalesOrderID : "1"
 					}]
 				})
-				.expectValue("itemPosition", ["10", "20"])
-				.expectValue("grossAmount", ["111.0", "42.0"])
-				.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/");
+				.expectValue("itemPosition", "30", 1)
+				.expectValue("grossAmount", "222.0", 1);
 
-			if (bWithMessageScope) {
-				this.expectMessage(oSalesOrderToBusinessPartnerAddress, "/SalesOrderSet('1')/")
-					.expectMessage(oSalesOrderItem10GrossAmountError, "/SalesOrderLineItemSet",
-						"/SalesOrderSet('1')/ToLineItems")
-					.expectMessage(oSalesOrderItem20GrossAmountError, "/SalesOrderLineItemSet",
-						"/SalesOrderSet('1')/ToLineItems")
-					.expectMessage(oSalesOrderItem30GrossAmountError, "/SalesOrderLineItemSet",
-						"/SalesOrderSet('1')/ToLineItems");
+			// Code under test
+			that.oView.byId("table").getBinding("items").filter([new Filter({
+				path : 'GrossAmount',
+				operator : FilterOperator.GT,
+				value1 : "100.0"
+			})]);
 
-			}
-			oModel.setMessageScope(sMessageScope);
-
-			return this.createView(assert, sView, oModel).then(function() {
-				that.expectRequest({
-						headers : {"sap-messages" : "transientOnly"},
-						requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=2"
-							+ "&$filter=GrossAmount gt 100.0m"
-					}, {
-						results : [{
-							__metadata : {
-								uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
-							},
-							GrossAmount : "111.0",
-							ItemPosition : "10",
-							SalesOrderID : "1"
-						}, {
-							__metadata : {
-								uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='30')"
-							},
-							GrossAmount : "222.0",
-							ItemPosition : "30",
-							SalesOrderID : "1"
-						}]
-					})
-					.expectValue("itemPosition", "30", 1)
-					.expectValue("grossAmount", "222.0", 1);
-
-				// Code under test
-				that.oView.byId("table").getBinding("items").filter([new Filter({
-					path : 'GrossAmount',
-					operator : FilterOperator.GT,
-					value1 : "100.0"
-				})]);
-
-				return that.waitForChanges(assert);
-			});
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: On an object page a sales order with its sales order items is displayed. There are
@@ -4194,28 +4194,28 @@ usePreliminaryContext : false}}">\
 	// In case of message scope "Request" only the messages for the sales order and all messages for
 	// both item list are displayed.
 	// JIRA: CPOUI5MODELS-111, CPOUI5MODELS-112
-	[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
-		QUnit.test("Message lifecycle (5) + (6), scope: " + sMessageScope, function (assert) {
-			var oModel = createSalesOrdersModel({preliminaryContext : true}),
-				oSalesOrderNoteError = this.createResponseMessage("Note"),
-				oSalesOrderToBusinessPartnerAddress
-					= this.createResponseMessage("ToBusinessPartner/Address"),
-				oSalesOrderToItem10GrossAmountError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='10~0~')/GrossAmount"),
-				oSalesOrderToItem20GrossAmountError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='20~0~')/GrossAmount"),
-				oSalesOrderToItem30GrossAmountError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='30~0~')/GrossAmount"),
-				oSalesOrderItem10GrossAmountError
-					= cloneODataMessage(oSalesOrderToItem10GrossAmountError,
-						"(SalesOrderID='1',ItemPosition='10~0~')/GrossAmount"),
-				oSalesOrderItem20GrossAmountError
-					= cloneODataMessage(oSalesOrderToItem20GrossAmountError,
-						"(SalesOrderID='1',ItemPosition='20~0~')/GrossAmount"),
-				oSalesOrderItem30GrossAmountError
-					= cloneODataMessage(oSalesOrderToItem30GrossAmountError,
-						"(SalesOrderID='1',ItemPosition='30~0~')/GrossAmount"),
-				sView = '\
+[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
+	QUnit.test("Message lifecycle (5) + (6), scope: " + sMessageScope, function (assert) {
+		var oModel = createSalesOrdersModel({preliminaryContext : true}),
+			oSalesOrderNoteError = this.createResponseMessage("Note"),
+			oSalesOrderToBusinessPartnerAddress
+				= this.createResponseMessage("ToBusinessPartner/Address"),
+			oSalesOrderToItem10GrossAmountError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='10~0~')/GrossAmount"),
+			oSalesOrderToItem20GrossAmountError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='20~0~')/GrossAmount"),
+			oSalesOrderToItem30GrossAmountError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='30~0~')/GrossAmount"),
+			oSalesOrderItem10GrossAmountError
+				= cloneODataMessage(oSalesOrderToItem10GrossAmountError,
+					"(SalesOrderID='1',ItemPosition='10~0~')/GrossAmount"),
+			oSalesOrderItem20GrossAmountError
+				= cloneODataMessage(oSalesOrderToItem20GrossAmountError,
+					"(SalesOrderID='1',ItemPosition='20~0~')/GrossAmount"),
+			oSalesOrderItem30GrossAmountError
+				= cloneODataMessage(oSalesOrderToItem30GrossAmountError,
+					"(SalesOrderID='1',ItemPosition='30~0~')/GrossAmount"),
+			sView = '\
 <FlexBox binding="{/SalesOrderSet(\'1\')}">\
 	<Text id="salesOrderID" text="{SalesOrderID}" />\
 	<Input id="note" value="{Note}" />\
@@ -4234,150 +4234,150 @@ usePreliminaryContext : false}}">\
 		<Input id="grossAmount2" value="{GrossAmount}" />\
 	</Table>\
 </FlexBox>',
-				bWithMessageScope = sMessageScope === MessageScope.BusinessObject,
-				that = this;
+			bWithMessageScope = sMessageScope === MessageScope.BusinessObject,
+			that = this;
 
-			this.expectHeadRequest(bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {})
-				.expectRequest({
-					headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
-					requestUri : "SalesOrderSet('1')"
-				}, {
-					__metadata : {uri : "SalesOrderSet('1')"},
-					Note : "Foo",
+		this.expectHeadRequest(bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {})
+			.expectRequest({
+				headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
+				requestUri : "SalesOrderSet('1')"
+			}, {
+				__metadata : {uri : "SalesOrderSet('1')"},
+				Note : "Foo",
+				SalesOrderID : "1"
+			}, {
+				"sap-message" : getMessageHeader(bWithMessageScope
+					? [oSalesOrderNoteError, oSalesOrderToBusinessPartnerAddress,
+						oSalesOrderToItem10GrossAmountError, oSalesOrderToItem20GrossAmountError,
+						oSalesOrderToItem30GrossAmountError]
+					: oSalesOrderNoteError)
+			})
+			.expectChange("note", null)
+			.expectChange("note", "Foo")
+			.expectChange("salesOrderID", null)
+			.expectChange("salesOrderID", "1")
+			.expectRequest({
+				headers : {"sap-messages" : "transientOnly"},
+				requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=100&"
+					+ "$filter=GrossAmount gt 100.0m"
+			}, {
+				results : [{
+					__metadata : {
+						uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10~0~')"
+					},
+					GrossAmount : "111.0",
+					ItemPosition : "10~0~",
 					SalesOrderID : "1"
-				}, {
-					"sap-message" : getMessageHeader(bWithMessageScope
-						? [oSalesOrderNoteError, oSalesOrderToBusinessPartnerAddress,
-							oSalesOrderToItem10GrossAmountError, oSalesOrderToItem20GrossAmountError,
-							oSalesOrderToItem30GrossAmountError]
-						: oSalesOrderNoteError)
-				})
-				.expectChange("note", null)
-				.expectChange("note", "Foo")
-				.expectChange("salesOrderID", null)
-				.expectChange("salesOrderID", "1")
-				.expectRequest({
+				}]
+			})
+			.expectChange("itemPosition1", ["10~0~"])
+			.expectChange("grossAmount1", ["111.0"])
+			.expectRequest({
+				headers : {"sap-messages" : "transientOnly"},
+				requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=100&"
+					+ "$filter=GrossAmount le 100.0m"
+			}, {
+				results : [{
+					__metadata : {
+						uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20~0~')"
+					},
+					GrossAmount : "42.0",
+					ItemPosition : "20~0~",
+					SalesOrderID : "1"
+				}]
+			})
+			.expectChange("itemPosition2", ["20~0~"])
+			.expectChange("grossAmount2", ["42.0"])
+			.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/");
+
+		if (bWithMessageScope) {
+			this.expectMessage(oSalesOrderToBusinessPartnerAddress, "/SalesOrderSet('1')/")
+				.expectMessage(oSalesOrderItem10GrossAmountError, {
+					isComplete : true,
+					path : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10~0~')"
+						+ "/GrossAmount"
+				}, "/SalesOrderSet('1')/ToLineItems")
+				.expectMessage(oSalesOrderItem20GrossAmountError, {
+					isComplete : true,
+					path : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20~0~')"
+						+ "/GrossAmount"
+				}, "/SalesOrderSet('1')/ToLineItems")
+				.expectMessage(oSalesOrderItem30GrossAmountError, {
+					isComplete : true,
+					path : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='30~0~')"
+						+ "/GrossAmount"
+				}, "/SalesOrderSet('1')/ToLineItems");
+		}
+		oModel.setMessageScope(sMessageScope);
+
+		return this.createView(assert, sView, oModel).then(function () {
+			// assume a sideeffect removed entity (SalesOrderID='1',ItemPosition='10~0~')
+			// with refresh only the data and the messages for that data is updated
+			that.expectRequest({
 					headers : {"sap-messages" : "transientOnly"},
 					requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=100&"
 						+ "$filter=GrossAmount gt 100.0m"
 				}, {
 					results : [{
 						__metadata : {
-							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10~0~')"
+							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='30~0~')"
 						},
-						GrossAmount : "111.0",
-						ItemPosition : "10~0~",
+						GrossAmount : "123.0",
+						ItemPosition : "30~0~",
 						SalesOrderID : "1"
 					}]
 				})
-				.expectChange("itemPosition1", ["10~0~"])
-				.expectChange("grossAmount1", ["111.0"])
-				.expectRequest({
-					headers : {"sap-messages" : "transientOnly"},
-					requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=100&"
-						+ "$filter=GrossAmount le 100.0m"
+				.expectChange("itemPosition1", ["30~0~"])
+				.expectChange("grossAmount1", ["123.0"]);
+
+			// Code under test
+			that.oView.byId("table1").getBinding("items").refresh();
+
+			return that.waitForChanges(assert);
+		}).then(function () {
+			// to update also the messages, the messages need to be read again via the root entity
+			that.expectRequest({
+					headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
+					requestUri : "SalesOrderSet('1')?$select=SalesOrderID"
 				}, {
-					results : [{
-						__metadata : {
-							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20~0~')"
-						},
-						GrossAmount : "42.0",
-						ItemPosition : "20~0~",
-						SalesOrderID : "1"
-					}]
+					__metadata : {uri : "SalesOrderSet('1')"},
+					SalesOrderID : "1"
+				}, {
+					"sap-message" : getMessageHeader(bWithMessageScope
+						? [oSalesOrderNoteError, oSalesOrderToBusinessPartnerAddress,
+							oSalesOrderToItem20GrossAmountError,
+							oSalesOrderToItem30GrossAmountError]
+						: oSalesOrderNoteError)
 				})
-				.expectChange("itemPosition2", ["20~0~"])
-				.expectChange("grossAmount2", ["42.0"])
+				.expectMessages([]) // clean all expected messages
 				.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/");
 
 			if (bWithMessageScope) {
-				this.expectMessage(oSalesOrderToBusinessPartnerAddress, "/SalesOrderSet('1')/")
-					.expectMessage(oSalesOrderItem10GrossAmountError, {
-						isComplete : true,
-						path : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10~0~')"
-							+ "/GrossAmount"
-					}, "/SalesOrderSet('1')/ToLineItems")
+				that.expectMessage(oSalesOrderToBusinessPartnerAddress, "/SalesOrderSet('1')/")
 					.expectMessage(oSalesOrderItem20GrossAmountError, {
 						isComplete : true,
 						path : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20~0~')"
 							+ "/GrossAmount"
 					}, "/SalesOrderSet('1')/ToLineItems")
-					.expectMessage(oSalesOrderItem30GrossAmountError, {
-						isComplete : true,
-						path : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='30~0~')"
-							+ "/GrossAmount"
-					}, "/SalesOrderSet('1')/ToLineItems");
-			}
-			oModel.setMessageScope(sMessageScope);
-
-			return this.createView(assert, sView, oModel).then(function () {
-				// assume a sideeffect removed entity (SalesOrderID='1',ItemPosition='10~0~')
-				// with refresh only the data and the messages for that data is updated
-				that.expectRequest({
-						headers : {"sap-messages" : "transientOnly"},
-						requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=100&"
-							+ "$filter=GrossAmount gt 100.0m"
-					}, {
-						results : [{
-							__metadata : {
-								uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='30~0~')"
-							},
-							GrossAmount : "123.0",
-							ItemPosition : "30~0~",
-							SalesOrderID : "1"
-						}]
-					})
-					.expectChange("itemPosition1", ["30~0~"])
-					.expectChange("grossAmount1", ["123.0"]);
-
-				// Code under test
-				that.oView.byId("table1").getBinding("items").refresh();
-
-				return that.waitForChanges(assert);
-			}).then(function () {
-				// to update also the messages, the messages need to be read again via the root entity
-				that.expectRequest({
-						headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
-						requestUri : "SalesOrderSet('1')?$select=SalesOrderID"
-					}, {
-						__metadata : {uri : "SalesOrderSet('1')"},
-						SalesOrderID : "1"
-					}, {
-						"sap-message" : getMessageHeader(bWithMessageScope
-							? [oSalesOrderNoteError, oSalesOrderToBusinessPartnerAddress,
-								oSalesOrderToItem20GrossAmountError,
-								oSalesOrderToItem30GrossAmountError]
-							: oSalesOrderNoteError)
-					})
-					.expectMessages([]) // clean all expected messages
-					.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/");
-
-				if (bWithMessageScope) {
-					that.expectMessage(oSalesOrderToBusinessPartnerAddress, "/SalesOrderSet('1')/")
-						.expectMessage(oSalesOrderItem20GrossAmountError, {
+					.expectMessage(oSalesOrderToItem30GrossAmountError, {
 							isComplete : true,
-							path : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20~0~')"
+							path : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='30~0~')"
 								+ "/GrossAmount"
-						}, "/SalesOrderSet('1')/ToLineItems")
-						.expectMessage(oSalesOrderToItem30GrossAmountError, {
-								isComplete : true,
-								path : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='30~0~')"
-									+ "/GrossAmount"
-							}, "/SalesOrderSet('1')/");
+						}, "/SalesOrderSet('1')/");
+			}
+
+			// code under test
+			oModel.read("/SalesOrderSet('1')", {
+				updateAggregatedMessages : true,
+				urlParameters : {
+					$select : "SalesOrderID"
 				}
-
-				// code under test
-				oModel.read("/SalesOrderSet('1')", {
-					updateAggregatedMessages : true,
-					urlParameters : {
-						$select : "SalesOrderID"
-					}
-				});
-
-				return that.waitForChanges(assert);
 			});
+
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: On an object page a sales order with its sales order items is displayed. Only a
@@ -4391,21 +4391,21 @@ usePreliminaryContext : false}}">\
 	// Sorting must not remove messages of items, new messages for the sales order items are added,
 	// if they are not yet contained in the message model.
 	// JIRA: CPOUI5MODELS-111, CPOUI5MODELS-112
-	[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
-		QUnit.test("Message lifecycle (2) + (7), scope: " + sMessageScope, function (assert) {
-			var oModel = createSalesOrdersModel({preliminaryContext : true}),
-				oSalesOrderNoteError = this.createResponseMessage("Note"),
-				oSalesOrderToBusinessPartnerAddress
-					= this.createResponseMessage("ToBusinessPartner/Address"),
-				oSalesOrderToItem10NoteError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='10')/Note"),
-				oSalesOrderToItem30NoteError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='30')/Note"),
-				oSalesOrderItem10NoteError = cloneODataMessage(oSalesOrderToItem10NoteError,
-					"(SalesOrderID='1',ItemPosition='10')/Note"),
-				oSalesOrderItem30NoteError = cloneODataMessage(oSalesOrderToItem30NoteError,
-					"(SalesOrderID='1',ItemPosition='30')/Note"),
-				sView = '\
+[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
+	QUnit.test("Message lifecycle (2) + (7), scope: " + sMessageScope, function (assert) {
+		var oModel = createSalesOrdersModel({preliminaryContext : true}),
+			oSalesOrderNoteError = this.createResponseMessage("Note"),
+			oSalesOrderToBusinessPartnerAddress
+				= this.createResponseMessage("ToBusinessPartner/Address"),
+			oSalesOrderToItem10NoteError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='10')/Note"),
+			oSalesOrderToItem30NoteError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='30')/Note"),
+			oSalesOrderItem10NoteError = cloneODataMessage(oSalesOrderToItem10NoteError,
+				"(SalesOrderID='1',ItemPosition='10')/Note"),
+			oSalesOrderItem30NoteError = cloneODataMessage(oSalesOrderToItem30NoteError,
+				"(SalesOrderID='1',ItemPosition='30')/Note"),
+			sView = '\
 <FlexBox binding="{/SalesOrderSet(\'1\')}">\
 	<Text id="salesOrderID" text="{SalesOrderID}" />\
 	<Input id="note" value="{Note}" />\
@@ -4417,91 +4417,91 @@ usePreliminaryContext : false}}">\
 		<Input id="note::item" value="{Note}" />\
 	</Table>\
 </FlexBox>',
-				bWithMessageScope = sMessageScope === MessageScope.BusinessObject,
-				that = this;
+			bWithMessageScope = sMessageScope === MessageScope.BusinessObject,
+			that = this;
 
-			this.expectHeadRequest(bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {})
-				.expectRequest({
-					headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
-					requestUri : "SalesOrderSet('1')"
-				}, {
-					__metadata : {uri : "SalesOrderSet('1')"},
-					Note : "Foo",
+		this.expectHeadRequest(bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {})
+			.expectRequest({
+				headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
+				requestUri : "SalesOrderSet('1')"
+			}, {
+				__metadata : {uri : "SalesOrderSet('1')"},
+				Note : "Foo",
+				SalesOrderID : "1"
+			}, {
+				"sap-message" : getMessageHeader(bWithMessageScope
+					? [oSalesOrderNoteError, oSalesOrderToBusinessPartnerAddress,
+						oSalesOrderToItem10NoteError, oSalesOrderToItem30NoteError]
+					: oSalesOrderNoteError)
+			})
+			.expectValue("note", "Foo")
+			.expectValue("salesOrderID", "1")
+			.expectRequest({
+				headers : {"sap-messages" : "transientOnly"},
+				requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=2"
+			}, {
+				results : [{
+					__metadata : {
+						uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
+					},
+					Note : "Bar",
+					ItemPosition : "10",
 					SalesOrderID : "1"
 				}, {
-					"sap-message" : getMessageHeader(bWithMessageScope
-						? [oSalesOrderNoteError, oSalesOrderToBusinessPartnerAddress,
-							oSalesOrderToItem10NoteError, oSalesOrderToItem30NoteError]
-						: oSalesOrderNoteError)
-				})
-				.expectValue("note", "Foo")
-				.expectValue("salesOrderID", "1")
-				.expectRequest({
+					__metadata : {
+						uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20')"
+					},
+					Note : "Baz",
+					ItemPosition : "20",
+					SalesOrderID : "1"
+				}]
+			})
+			.expectValue("itemPosition", ["10", "20"])
+			.expectValue("note::item", ["Bar", "Baz"])
+			.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/");
+
+		if (bWithMessageScope) {
+			this.expectMessage(oSalesOrderToBusinessPartnerAddress, "/SalesOrderSet('1')/")
+				.expectMessage(oSalesOrderItem10NoteError, "/SalesOrderLineItemSet",
+					"/SalesOrderSet('1')/ToLineItems")
+				.expectMessage(oSalesOrderItem30NoteError, "/SalesOrderLineItemSet",
+					"/SalesOrderSet('1')/ToLineItems");
+
+		}
+		oModel.setMessageScope(sMessageScope);
+
+		return this.createView(assert, sView, oModel).then(function () {
+			that.expectRequest({
 					headers : {"sap-messages" : "transientOnly"},
 					requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=2"
+						+ "&$orderby=GrossAmount asc"
 				}, {
 					results : [{
 						__metadata : {
-							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
+							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='30')"
 						},
-						Note : "Bar",
-						ItemPosition : "10",
+						Note : "Qux",
+						ItemPosition : "30",
 						SalesOrderID : "1"
 					}, {
 						__metadata : {
-							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20')"
+							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='40')"
 						},
-						Note : "Baz",
-						ItemPosition : "20",
+						Note : "Quux",
+						ItemPosition : "40",
 						SalesOrderID : "1"
 					}]
 				})
-				.expectValue("itemPosition", ["10", "20"])
-				.expectValue("note::item", ["Bar", "Baz"])
-				.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/");
+				.expectValue("itemPosition", ["30", "40"])
+				.expectValue("note::item", ["Qux", "Quux"]);
 
-			if (bWithMessageScope) {
-				this.expectMessage(oSalesOrderToBusinessPartnerAddress, "/SalesOrderSet('1')/")
-					.expectMessage(oSalesOrderItem10NoteError, "/SalesOrderLineItemSet",
-						"/SalesOrderSet('1')/ToLineItems")
-					.expectMessage(oSalesOrderItem30NoteError, "/SalesOrderLineItemSet",
-						"/SalesOrderSet('1')/ToLineItems");
+			// Code under test
+			that.oView.byId("table").getBinding("items").sort(new Sorter("GrossAmount"));
 
-			}
-			oModel.setMessageScope(sMessageScope);
-
-			return this.createView(assert, sView, oModel).then(function () {
-				that.expectRequest({
-						headers : {"sap-messages" : "transientOnly"},
-						requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=2"
-							+ "&$orderby=GrossAmount asc"
-					}, {
-						results : [{
-							__metadata : {
-								uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='30')"
-							},
-							Note : "Qux",
-							ItemPosition : "30",
-							SalesOrderID : "1"
-						}, {
-							__metadata : {
-								uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='40')"
-							},
-							Note : "Quux",
-							ItemPosition : "40",
-							SalesOrderID : "1"
-						}]
-					})
-					.expectValue("itemPosition", ["30", "40"])
-					.expectValue("note::item", ["Qux", "Quux"]);
-
-				// Code under test
-				that.oView.byId("table").getBinding("items").sort(new Sorter("GrossAmount"));
-
-				return that.waitForChanges(assert);
-			});
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: On an object page a sales order with its sales order items is displayed. Only a
@@ -4516,31 +4516,31 @@ usePreliminaryContext : false}}">\
 	// corresponding messages are removed.
 	// JIRA: CPOUI5MODELS-111, CPOUI5MODELS-112
 	// BCP: 1980510782
-	[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
-		QUnit.test("Message lifecycle (8), scope: " + sMessageScope, function (assert) {
-			var oModel = createSalesOrdersModel({
-					canonicalRequests : true,
-					preliminaryContext : true,
-					refreshAfterChange : false,
-					useBatch : false
-				}),
-				oSalesOrderNoteError = this.createResponseMessage("Note"),
-				oSalesOrderToBusinessPartnerAddress
-					= this.createResponseMessage("ToBusinessPartner/Address"),
-				oSalesOrderToItem10ToProductPriceError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='10')/ToProduct/Price"),
-				oSalesOrderToItem10NoteError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='10')/Note"),
-				oSalesOrderToItem30NoteError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='30')/Note"),
-				oSalesOrderItem10NoteError = cloneODataMessage(oSalesOrderToItem10NoteError,
-					"(SalesOrderID='1',ItemPosition='10')/Note"),
-				oSalesOrderItem30NoteError = cloneODataMessage(oSalesOrderToItem30NoteError,
-					"(SalesOrderID='1',ItemPosition='30')/Note"),
-				oSalesOrderItem10ToProductPriceError
-					= cloneODataMessage(oSalesOrderToItem10ToProductPriceError,
-						"(SalesOrderID='1',ItemPosition='10')/ToProduct/Price"),
-				sView = '\
+[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
+	QUnit.test("Message lifecycle (8), scope: " + sMessageScope, function (assert) {
+		var oModel = createSalesOrdersModel({
+				canonicalRequests : true,
+				preliminaryContext : true,
+				refreshAfterChange : false,
+				useBatch : false
+			}),
+			oSalesOrderNoteError = this.createResponseMessage("Note"),
+			oSalesOrderToBusinessPartnerAddress
+				= this.createResponseMessage("ToBusinessPartner/Address"),
+			oSalesOrderToItem10ToProductPriceError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='10')/ToProduct/Price"),
+			oSalesOrderToItem10NoteError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='10')/Note"),
+			oSalesOrderToItem30NoteError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='30')/Note"),
+			oSalesOrderItem10NoteError = cloneODataMessage(oSalesOrderToItem10NoteError,
+				"(SalesOrderID='1',ItemPosition='10')/Note"),
+			oSalesOrderItem30NoteError = cloneODataMessage(oSalesOrderToItem30NoteError,
+				"(SalesOrderID='1',ItemPosition='30')/Note"),
+			oSalesOrderItem10ToProductPriceError
+				= cloneODataMessage(oSalesOrderToItem10ToProductPriceError,
+					"(SalesOrderID='1',ItemPosition='10')/ToProduct/Price"),
+			sView = '\
 <FlexBox binding="{/SalesOrderSet(\'1\')}">\
 	<Text id="salesOrderID" text="{SalesOrderID}" />\
 	<Input id="note" value="{Note}" />\
@@ -4552,135 +4552,135 @@ usePreliminaryContext : false}}">\
 		<Input id="note::item" value="{Note}" />\
 	</Table>\
 </FlexBox>',
-				bWithMessageScope = sMessageScope === MessageScope.BusinessObject,
-				that = this;
+			bWithMessageScope = sMessageScope === MessageScope.BusinessObject,
+			that = this;
 
-			this.expectRequest({
-					headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
-					requestUri : "SalesOrderSet('1')"
-				}, {
-					__metadata : {uri : "SalesOrderSet('1')"},
-					Note : "Foo",
+		this.expectRequest({
+				headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
+				requestUri : "SalesOrderSet('1')"
+			}, {
+				__metadata : {uri : "SalesOrderSet('1')"},
+				Note : "Foo",
+				SalesOrderID : "1"
+			}, {
+				"sap-message" : getMessageHeader(bWithMessageScope
+					? [oSalesOrderNoteError, oSalesOrderToBusinessPartnerAddress,
+						oSalesOrderToItem10NoteError, oSalesOrderToItem10ToProductPriceError,
+						oSalesOrderToItem30NoteError]
+					: oSalesOrderNoteError)
+			})
+			.expectValue("note", "Foo")
+			.expectValue("salesOrderID", "1")
+			.expectRequest({
+				headers : {"sap-messages" : "transientOnly"},
+				requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=2"
+			}, {
+				results : [{
+					__metadata : {
+						uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
+					},
+					Note : "Bar",
+					ItemPosition : "10",
 					SalesOrderID : "1"
 				}, {
-					"sap-message" : getMessageHeader(bWithMessageScope
-						? [oSalesOrderNoteError, oSalesOrderToBusinessPartnerAddress,
-							oSalesOrderToItem10NoteError, oSalesOrderToItem10ToProductPriceError,
-							oSalesOrderToItem30NoteError]
-						: oSalesOrderNoteError)
-				})
-				.expectValue("note", "Foo")
-				.expectValue("salesOrderID", "1")
+					__metadata : {
+						uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20')"
+					},
+					Note : "Baz",
+					ItemPosition : "20",
+					SalesOrderID : "1"
+				}]
+			})
+			.expectValue("itemPosition", ["10", "20"])
+			.expectValue("note::item", ["Bar", "Baz"])
+			.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/");
+
+		if (bWithMessageScope) {
+			this.expectMessage(oSalesOrderToBusinessPartnerAddress, "/SalesOrderSet('1')/")
+				.expectMessage(oSalesOrderItem10NoteError, "/SalesOrderLineItemSet",
+					"/SalesOrderSet('1')/ToLineItems")
+				.expectMessage(oSalesOrderItem30NoteError, "/SalesOrderLineItemSet",
+					"/SalesOrderSet('1')/ToLineItems")
+				.expectMessage(oSalesOrderItem10ToProductPriceError, "/SalesOrderLineItemSet",
+					"/SalesOrderSet('1')/ToLineItems");
+		}
+		oModel.setMessageScope(sMessageScope);
+
+		return this.createView(assert, sView, oModel).then(function () {
+			var oItem10ToProductPriceError = cloneODataMessage(oSalesOrderItem10ToProductPriceError,
+					"ToProduct/Price");
+
+			that.expectValue("note::item", "Qux", 0)
+				.expectHeadRequest(bWithMessageScope
+					? {"sap-message-scope" : "BusinessObject"}
+					: {})
 				.expectRequest({
-					headers : {"sap-messages" : "transientOnly"},
-					requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=2"
-				}, {
-					results : [{
+					data : {
+						Note : "Qux",
 						__metadata : {
 							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
-						},
-						Note : "Bar",
-						ItemPosition : "10",
-						SalesOrderID : "1"
-					}, {
-						__metadata : {
-							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20')"
-						},
-						Note : "Baz",
-						ItemPosition : "20",
-						SalesOrderID : "1"
-					}]
-				})
-				.expectValue("itemPosition", ["10", "20"])
-				.expectValue("note::item", ["Bar", "Baz"])
+						}
+					},
+					deepPath :
+						"/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')",
+					headers : bWithMessageScope
+						? {"sap-message-scope" : "BusinessObject", "x-http-method" : "MERGE"}
+						: {"x-http-method" : "MERGE"},
+					key : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')",
+					method : "POST",
+					requestUri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
+				}, NO_CONTENT, bWithMessageScope
+					? {"sap-message" : getMessageHeader(oItem10ToProductPriceError)}
+					: undefined
+				)
+				.expectMessages([]) // clean all expected messages
 				.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/");
 
 			if (bWithMessageScope) {
-				this.expectMessage(oSalesOrderToBusinessPartnerAddress, "/SalesOrderSet('1')/")
-					.expectMessage(oSalesOrderItem10NoteError, "/SalesOrderLineItemSet",
-						"/SalesOrderSet('1')/ToLineItems")
-					.expectMessage(oSalesOrderItem30NoteError, "/SalesOrderLineItemSet",
-						"/SalesOrderSet('1')/ToLineItems")
-					.expectMessage(oSalesOrderItem10ToProductPriceError, "/SalesOrderLineItemSet",
-						"/SalesOrderSet('1')/ToLineItems");
-			}
-			oModel.setMessageScope(sMessageScope);
-
-			return this.createView(assert, sView, oModel).then(function () {
-				var oItem10ToProductPriceError = cloneODataMessage(oSalesOrderItem10ToProductPriceError,
-						"ToProduct/Price");
-
-				that.expectValue("note::item", "Qux", 0)
-					.expectHeadRequest(bWithMessageScope
-						? {"sap-message-scope" : "BusinessObject"}
-						: {})
-					.expectRequest({
-						data : {
-							Note : "Qux",
-							__metadata : {
-								uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
-							}
-						},
-						deepPath :
-							"/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')",
-						headers : bWithMessageScope
-							? {"sap-message-scope" : "BusinessObject", "x-http-method" : "MERGE"}
-							: {"x-http-method" : "MERGE"},
-						key : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')",
-						method : "POST",
-						requestUri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
-					}, NO_CONTENT, bWithMessageScope
-						? {"sap-message" : getMessageHeader(oItem10ToProductPriceError)}
-						: undefined
-					)
-					.expectMessages([]) // clean all expected messages
-					.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/");
-
-				if (bWithMessageScope) {
-					that.expectMessage(oSalesOrderToBusinessPartnerAddress, "/SalesOrderSet('1')/")
-						.expectMessage(oItem10ToProductPriceError,
-							"/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/",
-							"/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')/")
-						.expectMessage(oSalesOrderItem30NoteError,
-							"/SalesOrderLineItemSet", "/SalesOrderSet('1')/ToLineItems");
-				}
-
-				// code under test - modify a sales order item
-				oModel.setProperty(
-					"/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')/Note",
-					"Qux");
-				oModel.submitChanges();
-
-				return that.waitForChanges(assert);
-			}).then(function () {
-				that.expectValue("note", "Quxx")
-					.expectRequest({
-						data : {
-							Note : "Quxx",
-							__metadata : {uri : "SalesOrderSet('1')"}
-						},
-						headers : bWithMessageScope
-							? {"sap-message-scope" : "BusinessObject", "x-http-method" : "MERGE"}
-							: {"x-http-method" : "MERGE"},
-						key : "SalesOrderSet('1')",
-						method : "POST",
-						requestUri : "SalesOrderSet('1')"
-					}, NO_CONTENT, bWithMessageScope
-						? {"sap-message" : getMessageHeader(oSalesOrderToItem30NoteError)}
-						: undefined
-					)
-					.expectMessages([]) // clean all expected messages
-					.expectMessage(bWithMessageScope ? oSalesOrderItem30NoteError : null,
+				that.expectMessage(oSalesOrderToBusinessPartnerAddress, "/SalesOrderSet('1')/")
+					.expectMessage(oItem10ToProductPriceError,
+						"/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/",
+						"/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')/")
+					.expectMessage(oSalesOrderItem30NoteError,
 						"/SalesOrderLineItemSet", "/SalesOrderSet('1')/ToLineItems");
+			}
 
-				// code under test - modify the sales order
-				oModel.setProperty("/SalesOrderSet('1')/Note", "Quxx");
-				oModel.submitChanges();
+			// code under test - modify a sales order item
+			oModel.setProperty(
+				"/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')/Note",
+				"Qux");
+			oModel.submitChanges();
 
-				return that.waitForChanges(assert);
-			});
+			return that.waitForChanges(assert);
+		}).then(function () {
+			that.expectValue("note", "Quxx")
+				.expectRequest({
+					data : {
+						Note : "Quxx",
+						__metadata : {uri : "SalesOrderSet('1')"}
+					},
+					headers : bWithMessageScope
+						? {"sap-message-scope" : "BusinessObject", "x-http-method" : "MERGE"}
+						: {"x-http-method" : "MERGE"},
+					key : "SalesOrderSet('1')",
+					method : "POST",
+					requestUri : "SalesOrderSet('1')"
+				}, NO_CONTENT, bWithMessageScope
+					? {"sap-message" : getMessageHeader(oSalesOrderToItem30NoteError)}
+					: undefined
+				)
+				.expectMessages([]) // clean all expected messages
+				.expectMessage(bWithMessageScope ? oSalesOrderItem30NoteError : null,
+					"/SalesOrderLineItemSet", "/SalesOrderSet('1')/ToLineItems");
+
+			// code under test - modify the sales order
+			oModel.setProperty("/SalesOrderSet('1')/Note", "Quxx");
+			oModel.submitChanges();
+
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: On an object page a sales order with its sales order items is displayed. Only a
@@ -4694,26 +4694,26 @@ usePreliminaryContext : false}}">\
 	// messages for the requested sales order items are displayed. After the deletion only the
 	// messages for the deleted entity are removed.
 	// JIRA: CPOUI5MODELS-111, CPOUI5MODELS-112
-	[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
-		QUnit.test("Message lifecycle (10), scope: " + sMessageScope, function (assert) {
-			var oModel = createSalesOrdersModel({preliminaryContext : true}),
-				oSalesOrderNoteError = this.createResponseMessage("Note"),
-				oSalesOrderToBusinessPartnerAddress
-					= this.createResponseMessage("ToBusinessPartner/Address"),
-				oSalesOrderToItem10ToProductPriceError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='10')/ToProduct/Price"),
-				oSalesOrderToItem10NoteError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='10')/Note"),
-				oSalesOrderToItem20NoteError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='20')/Note"),
-				oSalesOrderItem10NoteError = cloneODataMessage(oSalesOrderToItem10NoteError,
-					"(SalesOrderID='1',ItemPosition='10')/Note"),
-				oSalesOrderItem10ToProductPriceError
-					= cloneODataMessage(oSalesOrderToItem10ToProductPriceError,
-						"(SalesOrderID='1',ItemPosition='10')/ToProduct/Price"),
-				oSalesOrderItem20NoteError = cloneODataMessage(oSalesOrderToItem20NoteError,
-					"(SalesOrderID='1',ItemPosition='20')/Note"),
-				sView = '\
+[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
+	QUnit.test("Message lifecycle (10), scope: " + sMessageScope, function (assert) {
+		var oModel = createSalesOrdersModel({preliminaryContext : true}),
+			oSalesOrderNoteError = this.createResponseMessage("Note"),
+			oSalesOrderToBusinessPartnerAddress
+				= this.createResponseMessage("ToBusinessPartner/Address"),
+			oSalesOrderToItem10ToProductPriceError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='10')/ToProduct/Price"),
+			oSalesOrderToItem10NoteError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='10')/Note"),
+			oSalesOrderToItem20NoteError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='20')/Note"),
+			oSalesOrderItem10NoteError = cloneODataMessage(oSalesOrderToItem10NoteError,
+				"(SalesOrderID='1',ItemPosition='10')/Note"),
+			oSalesOrderItem10ToProductPriceError
+				= cloneODataMessage(oSalesOrderToItem10ToProductPriceError,
+					"(SalesOrderID='1',ItemPosition='10')/ToProduct/Price"),
+			oSalesOrderItem20NoteError = cloneODataMessage(oSalesOrderToItem20NoteError,
+				"(SalesOrderID='1',ItemPosition='20')/Note"),
+			sView = '\
 <FlexBox binding="{/SalesOrderSet(\'1\')}">\
 	<Text id="salesOrderID" text="{SalesOrderID}" />\
 	<Input id="note" value="{Note}" />\
@@ -4725,91 +4725,91 @@ usePreliminaryContext : false}}">\
 		<Input id="note::item" value="{Note}" />\
 	</Table>\
 </FlexBox>',
-				bWithMessageScope = sMessageScope === MessageScope.BusinessObject,
-				that = this;
+			bWithMessageScope = sMessageScope === MessageScope.BusinessObject,
+			that = this;
 
-			this.expectHeadRequest(bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {})
-				.expectRequest({
-					headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
-					requestUri : "SalesOrderSet('1')"
-				}, {
-					__metadata : {uri : "SalesOrderSet('1')"},
-					Note : "Foo",
+		this.expectHeadRequest(bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {})
+			.expectRequest({
+				headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
+				requestUri : "SalesOrderSet('1')"
+			}, {
+				__metadata : {uri : "SalesOrderSet('1')"},
+				Note : "Foo",
+				SalesOrderID : "1"
+			}, {
+				"sap-message" : getMessageHeader(bWithMessageScope
+					? [oSalesOrderNoteError, oSalesOrderToBusinessPartnerAddress,
+						oSalesOrderToItem10NoteError, oSalesOrderToItem10ToProductPriceError,
+						oSalesOrderToItem20NoteError]
+					: oSalesOrderNoteError)
+			})
+			.expectValue("note", "Foo")
+			.expectValue("salesOrderID", "1")
+			.expectRequest({
+				headers : {"sap-messages" : "transientOnly"},
+				requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=2"
+			}, {
+				results : [{
+					__metadata : {
+						uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
+					},
+					Note : "Bar",
+					ItemPosition : "10",
 					SalesOrderID : "1"
 				}, {
-					"sap-message" : getMessageHeader(bWithMessageScope
-						? [oSalesOrderNoteError, oSalesOrderToBusinessPartnerAddress,
-							oSalesOrderToItem10NoteError, oSalesOrderToItem10ToProductPriceError,
-							oSalesOrderToItem20NoteError]
-						: oSalesOrderNoteError)
-				})
-				.expectValue("note", "Foo")
-				.expectValue("salesOrderID", "1")
-				.expectRequest({
-					headers : {"sap-messages" : "transientOnly"},
-					requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=2"
-				}, {
-					results : [{
-						__metadata : {
-							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
-						},
-						Note : "Bar",
-						ItemPosition : "10",
-						SalesOrderID : "1"
-					}, {
-						__metadata : {
-							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20')"
-						},
-						Note : "Baz",
-						ItemPosition : "20",
-						SalesOrderID : "1"
-					}]
-				})
-				.expectValue("itemPosition", ["10", "20"])
-				.expectValue("note::item", ["Bar", "Baz"])
-				.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/");
+					__metadata : {
+						uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20')"
+					},
+					Note : "Baz",
+					ItemPosition : "20",
+					SalesOrderID : "1"
+				}]
+			})
+			.expectValue("itemPosition", ["10", "20"])
+			.expectValue("note::item", ["Bar", "Baz"])
+			.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/");
 
-			if (bWithMessageScope) {
-				this.expectMessage(oSalesOrderToBusinessPartnerAddress, "/SalesOrderSet('1')/")
-					.expectMessage(oSalesOrderItem10NoteError, "/SalesOrderLineItemSet",
-						"/SalesOrderSet('1')/ToLineItems")
-					.expectMessage(oSalesOrderItem10ToProductPriceError, "/SalesOrderLineItemSet",
-						"/SalesOrderSet('1')/ToLineItems")
-					.expectMessage(oSalesOrderItem20NoteError, "/SalesOrderLineItemSet",
-						"/SalesOrderSet('1')/ToLineItems");
-			}
-			oModel.setMessageScope(sMessageScope);
+		if (bWithMessageScope) {
+			this.expectMessage(oSalesOrderToBusinessPartnerAddress, "/SalesOrderSet('1')/")
+				.expectMessage(oSalesOrderItem10NoteError, "/SalesOrderLineItemSet",
+					"/SalesOrderSet('1')/ToLineItems")
+				.expectMessage(oSalesOrderItem10ToProductPriceError, "/SalesOrderLineItemSet",
+					"/SalesOrderSet('1')/ToLineItems")
+				.expectMessage(oSalesOrderItem20NoteError, "/SalesOrderLineItemSet",
+					"/SalesOrderSet('1')/ToLineItems");
+		}
+		oModel.setMessageScope(sMessageScope);
 
-			return this.createView(assert, sView, oModel).then(function () {
-				that.expectRequest({
-						deepPath :
-							"/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')",
-						headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
-						method : "DELETE",
-						requestUri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
-					}, NO_CONTENT)
-					// ODataModel#remove does not remove the item from the list. A refresh needs to be
-					// triggered or refreshAfterChange has to be true to trigger refresh automatically
-					.expectValue("itemPosition", "", 0)
-					.expectValue("note::item", "", 0)
-					.expectMessages([]) // clean all expected messages
-					.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/")
-					.expectMessage(bWithMessageScope ? oSalesOrderToBusinessPartnerAddress : null,
-						"/SalesOrderSet('1')/")
-					.expectMessage(bWithMessageScope ? oSalesOrderItem20NoteError : null,
-						"/SalesOrderLineItemSet", "/SalesOrderSet('1')/ToLineItems");
+		return this.createView(assert, sView, oModel).then(function () {
+			that.expectRequest({
+					deepPath :
+						"/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')",
+					headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
+					method : "DELETE",
+					requestUri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
+				}, NO_CONTENT)
+				// ODataModel#remove does not remove the item from the list. A refresh needs to be
+				// triggered or refreshAfterChange has to be true to trigger refresh automatically
+				.expectValue("itemPosition", "", 0)
+				.expectValue("note::item", "", 0)
+				.expectMessages([]) // clean all expected messages
+				.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/")
+				.expectMessage(bWithMessageScope ? oSalesOrderToBusinessPartnerAddress : null,
+					"/SalesOrderSet('1')/")
+				.expectMessage(bWithMessageScope ? oSalesOrderItem20NoteError : null,
+					"/SalesOrderLineItemSet", "/SalesOrderSet('1')/ToLineItems");
 
-				// code under test
-				oModel.remove("", {
-					context : that.oView.byId("table").getItems()[0].getBindingContext(),
-					refreshAfterChange : false
-				});
-				oModel.submitChanges();
-
-				return that.waitForChanges(assert);
+			// code under test
+			oModel.remove("", {
+				context : that.oView.byId("table").getItems()[0].getBindingContext(),
+				refreshAfterChange : false
 			});
+			oModel.submitChanges();
+
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: On a list report page a list of sales orders is displayed. Only a part of the sales
@@ -4823,123 +4823,123 @@ usePreliminaryContext : false}}">\
 	// are displayed. A refresh/filtering does not cause a deletion of messages for entities that
 	// are not returned any more.
 	// JIRA: CPOUI5MODELS-111, CPOUI5MODELS-112
-	[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
-		[true, false].forEach(function (bFilter) {
-		var sTitle = "Message lifecycle (11), scope: " + sMessageScope + ", bFilter: " + bFilter;
+[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
+	[true, false].forEach(function (bFilter) {
+	var sTitle = "Message lifecycle (11), scope: " + sMessageScope + ", bFilter: " + bFilter;
 
-		QUnit.test(sTitle, function (assert) {
-			var oModel = createSalesOrdersModel({preliminaryContext : true}),
-				oSalesOrder1NoteError = this.createResponseMessage("('1')/Note"),
-				oSalesOrder1ToBusinessPartnerAddress
-					= this.createResponseMessage("('1')/ToBusinessPartner/Address"),
-				oSalesOrder2NoteError = this.createResponseMessage("('2')/Note"),
-				oSalesOrder2ToBusinessPartnerAddress
-					= this.createResponseMessage("('2')/ToBusinessPartner/Address"),
-				sView = '\
+	QUnit.test(sTitle, function (assert) {
+		var oModel = createSalesOrdersModel({preliminaryContext : true}),
+			oSalesOrder1NoteError = this.createResponseMessage("('1')/Note"),
+			oSalesOrder1ToBusinessPartnerAddress
+				= this.createResponseMessage("('1')/ToBusinessPartner/Address"),
+			oSalesOrder2NoteError = this.createResponseMessage("('2')/Note"),
+			oSalesOrder2ToBusinessPartnerAddress
+				= this.createResponseMessage("('2')/ToBusinessPartner/Address"),
+			sView = '\
 <Table growing="true" growingThreshold="2" id="table" items="{/SalesOrderSet}">\
 	<Input id="note" value="{Note}" />\
 </Table>',
-				bWithMessageScope = sMessageScope === MessageScope.BusinessObject,
-				that = this;
+			bWithMessageScope = sMessageScope === MessageScope.BusinessObject,
+			that = this;
 
-			this.expectHeadRequest(bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {})
-				.expectRequest({
+		this.expectHeadRequest(bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {})
+			.expectRequest({
+				headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
+				requestUri : "SalesOrderSet?$skip=0&$top=2"
+			}, {
+				results : [{
+					__metadata : {uri : "SalesOrderSet('1')"},
+					Note : "Foo",
+					SalesOrderID : "1"
+				}, {
+					__metadata : {uri : "SalesOrderSet('2')"},
+					Note : "Bar",
+					SalesOrderID : "2"
+				}]
+			}, {
+				"sap-message" : getMessageHeader(bWithMessageScope
+					? [oSalesOrder1NoteError, oSalesOrder1ToBusinessPartnerAddress,
+						oSalesOrder2NoteError, oSalesOrder2ToBusinessPartnerAddress]
+					: [oSalesOrder1NoteError, oSalesOrder2NoteError])
+			})
+			.expectValue("note", ["Foo", "Bar"])
+			.expectMessage(oSalesOrder1NoteError, "/SalesOrderSet")
+			.expectMessage(bWithMessageScope ? oSalesOrder1ToBusinessPartnerAddress : null,
+				"/SalesOrderSet")
+			.expectMessage(oSalesOrder2NoteError, "/SalesOrderSet")
+			.expectMessage(bWithMessageScope ? oSalesOrder2ToBusinessPartnerAddress : null,
+				"/SalesOrderSet");
+
+		oModel.setMessageScope(sMessageScope);
+
+		return this.createView(assert, sView, oModel).then(function () {
+			var oSalesOrder3NoteError = that.createResponseMessage("('3')/Note");
+
+			that.expectRequest({
 					headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
 					requestUri : "SalesOrderSet?$skip=0&$top=2"
+						+ (bFilter ? "&$filter=GrossAmount gt 100.0m" : "")
 				}, {
 					results : [{
 						__metadata : {uri : "SalesOrderSet('1')"},
 						Note : "Foo",
 						SalesOrderID : "1"
-					}, {
-						__metadata : {uri : "SalesOrderSet('2')"},
-						Note : "Bar",
-						SalesOrderID : "2"
+					},
+					// "SalesOrderSet('2')" has been filtered out, or in case of a refresh the
+					// entity has been removed in meantime
+					{
+						__metadata : {
+							uri : "SalesOrderSet('3')"
+						},
+						Note : "Baz",
+						SalesOrderID : "3"
 					}]
 				}, {
 					"sap-message" : getMessageHeader(bWithMessageScope
 						? [oSalesOrder1NoteError, oSalesOrder1ToBusinessPartnerAddress,
-							oSalesOrder2NoteError, oSalesOrder2ToBusinessPartnerAddress]
-						: [oSalesOrder1NoteError, oSalesOrder2NoteError])
+							oSalesOrder3NoteError]
+						: [oSalesOrder1NoteError, oSalesOrder3NoteError])
 				})
-				.expectValue("note", ["Foo", "Bar"])
+				.expectValue("note", "Baz", 1)
+				.expectMessages([]) // clean all expected messages
 				.expectMessage(oSalesOrder1NoteError, "/SalesOrderSet")
 				.expectMessage(bWithMessageScope ? oSalesOrder1ToBusinessPartnerAddress : null,
 					"/SalesOrderSet")
-				.expectMessage(oSalesOrder2NoteError, "/SalesOrderSet")
-				.expectMessage(bWithMessageScope ? oSalesOrder2ToBusinessPartnerAddress : null,
-					"/SalesOrderSet");
+				//TODO: MessageScope.RequestedObjects: how to get rid of messages of entities that
+				// are removed from the list?
+				.expectMessage(!bWithMessageScope ? oSalesOrder2NoteError : null, "/SalesOrderSet")
+				.expectMessage(oSalesOrder3NoteError, "/SalesOrderSet");
 
-			oModel.setMessageScope(sMessageScope);
+			if (bFilter) {
+				// code under test
+				that.oView.byId("table").getBinding("items").filter([new Filter({
+					path : 'GrossAmount',
+					operator : FilterOperator.GT,
+					value1 : "100.0"
+				})]);
+			} else {
+				// code under test - somehow the data changed - refresh to get current data
+				that.oView.byId("table").getBinding("items").refresh();
+			}
 
-			return this.createView(assert, sView, oModel).then(function () {
-				var oSalesOrder3NoteError = that.createResponseMessage("('3')/Note");
-
-				that.expectRequest({
-						headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
-						requestUri : "SalesOrderSet?$skip=0&$top=2"
-							+ (bFilter ? "&$filter=GrossAmount gt 100.0m" : "")
-					}, {
-						results : [{
-							__metadata : {uri : "SalesOrderSet('1')"},
-							Note : "Foo",
-							SalesOrderID : "1"
-						},
-						// "SalesOrderSet('2')" has been filtered out, or in case of a refresh the
-						// entity has been removed in meantime
-						{
-							__metadata : {
-								uri : "SalesOrderSet('3')"
-							},
-							Note : "Baz",
-							SalesOrderID : "3"
-						}]
-					}, {
-						"sap-message" : getMessageHeader(bWithMessageScope
-							? [oSalesOrder1NoteError, oSalesOrder1ToBusinessPartnerAddress,
-								oSalesOrder3NoteError]
-							: [oSalesOrder1NoteError, oSalesOrder3NoteError])
-					})
-					.expectValue("note", "Baz", 1)
-					.expectMessages([]) // clean all expected messages
-					.expectMessage(oSalesOrder1NoteError, "/SalesOrderSet")
-					.expectMessage(bWithMessageScope ? oSalesOrder1ToBusinessPartnerAddress : null,
-						"/SalesOrderSet")
-					//TODO: MessageScope.RequestedObjects: how to get rid of messages of entities that
-					// are removed from the list?
-					.expectMessage(!bWithMessageScope ? oSalesOrder2NoteError : null, "/SalesOrderSet")
-					.expectMessage(oSalesOrder3NoteError, "/SalesOrderSet");
-
-				if (bFilter) {
-					// code under test
-					that.oView.byId("table").getBinding("items").filter([new Filter({
-						path : 'GrossAmount',
-						operator : FilterOperator.GT,
-						value1 : "100.0"
-					})]);
-				} else {
-					// code under test - somehow the data changed - refresh to get current data
-					that.oView.byId("table").getBinding("items").refresh();
-				}
-
-				return that.waitForChanges(assert);
-			});
-		});
+			return that.waitForChanges(assert);
 		});
 	});
+	});
+});
 
 	//*********************************************************************************************
 	// Scenario: When destroying a control, the control ID gets properly removed from the message.
 	// BCP: 2180415452
-	[true, false].forEach(function (bRemoveContext) {
-		var sTitle = "Messages: Remove the control ID from the message object when the control gets"
-				+ " destroyed; remove context before destroy: " + bRemoveContext;
+[true, false].forEach(function (bRemoveContext) {
+	var sTitle = "Messages: Remove the control ID from the message object when the control gets"
+			+ " destroyed; remove context before destroy: " + bRemoveContext;
 
-		QUnit.test(sTitle, function (assert) {
-			var oMessage, oObjectPage,
-				oModel = createSalesOrdersModel(),
-				oSalesOrder1NoteError = this.createResponseMessage("('1')/Note"),
-				sView = '\
+	QUnit.test(sTitle, function (assert) {
+		var oMessage, oObjectPage,
+			oModel = createSalesOrdersModel(),
+			oSalesOrder1NoteError = this.createResponseMessage("('1')/Note"),
+			sView = '\
 <Table growing="true" growingThreshold="1" id="table" items="{/SalesOrderSet}">\
 	<Text id="note" text="{Note}" />\
 </Table>\
@@ -4947,58 +4947,58 @@ usePreliminaryContext : false}}">\
 	<Input id="note1" value="{Note}" />\
 	<Input id="note2" value="{= ${SalesOrderID} + \' - \' + ${Note}}" />\
 </FlexBox>',
-				that = this;
+			that = this;
 
-			this.expectHeadRequest({"sap-message-scope" : "BusinessObject"})
-				.expectRequest({
-					headers : {"sap-message-scope" : "BusinessObject"},
-					requestUri : "SalesOrderSet?$skip=0&$top=1"
-				}, {
-					results : [{
-						__metadata : {uri : "SalesOrderSet('1')"},
-						Note : "Foo",
-						SalesOrderID : "1"
-					}]
-				}, {
-					"sap-message" : getMessageHeader([oSalesOrder1NoteError])
-				})
-				.expectValue("note", ["Foo"])
-				.expectMessage(oSalesOrder1NoteError, "/SalesOrderSet");
+		this.expectHeadRequest({"sap-message-scope" : "BusinessObject"})
+			.expectRequest({
+				headers : {"sap-message-scope" : "BusinessObject"},
+				requestUri : "SalesOrderSet?$skip=0&$top=1"
+			}, {
+				results : [{
+					__metadata : {uri : "SalesOrderSet('1')"},
+					Note : "Foo",
+					SalesOrderID : "1"
+				}]
+			}, {
+				"sap-message" : getMessageHeader([oSalesOrder1NoteError])
+			})
+			.expectValue("note", ["Foo"])
+			.expectMessage(oSalesOrder1NoteError, "/SalesOrderSet");
 
-			oModel.setMessageScope(MessageScope.BusinessObject);
+		oModel.setMessageScope(MessageScope.BusinessObject);
 
-			return this.createView(assert, sView, oModel).then(function () {
-				oMessage = Messaging.getMessageModel().getObject("/")[0];
-				oObjectPage = that.oView.byId("objectPage");
+		return this.createView(assert, sView, oModel).then(function () {
+			oMessage = Messaging.getMessageModel().getObject("/")[0];
+			oObjectPage = that.oView.byId("objectPage");
 
-				assert.deepEqual(oMessage.getControlIds(), []);
-				that.expectValueState("note1", "Error", oSalesOrder1NoteError.message)
-					.expectValueState("note2", "Error", oSalesOrder1NoteError.message);
+			assert.deepEqual(oMessage.getControlIds(), []);
+			that.expectValueState("note1", "Error", oSalesOrder1NoteError.message)
+				.expectValueState("note2", "Error", oSalesOrder1NoteError.message);
 
-				oObjectPage.setBindingContext(
-					that.oView.byId("table").getItems()[0].getBindingContext());
+			oObjectPage.setBindingContext(
+				that.oView.byId("table").getItems()[0].getBindingContext());
 
-				return that.waitForChanges(assert);
-			}).then(function () {
-				var aControlIds = oMessage.getControlIds();
+			return that.waitForChanges(assert);
+		}).then(function () {
+			var aControlIds = oMessage.getControlIds();
 
-				assert.ok(aControlIds.includes(that.oView.byId("note1").getId()), "simple binding");
-				assert.ok(aControlIds.includes(that.oView.byId("note2").getId()), "composite binding");
+			assert.ok(aControlIds.includes(that.oView.byId("note1").getId()), "simple binding");
+			assert.ok(aControlIds.includes(that.oView.byId("note2").getId()), "composite binding");
 
-				if (bRemoveContext) {
-					oObjectPage.setBindingContext(null);
-				}
+			if (bRemoveContext) {
+				oObjectPage.setBindingContext(null);
+			}
 
-				// code under test
-				oObjectPage.getItems().forEach(function (oItem) { oItem.destroy(); });
-				oObjectPage.removeAllItems();
+			// code under test
+			oObjectPage.getItems().forEach(function (oItem) { oItem.destroy(); });
+			oObjectPage.removeAllItems();
 
-				return that.waitForChanges(assert);
-			}).then(function () {
-				assert.deepEqual(oMessage.getControlIds(), []);
-			});
+			return that.waitForChanges(assert);
+		}).then(function () {
+			assert.deepEqual(oMessage.getControlIds(), []);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: Show entity with sub entities in same business object. Both have massages. Refresh
@@ -5403,137 +5403,137 @@ usePreliminaryContext : false}}">\
 	// successfully creation and the creation of the first entity fails which leads to single error
 	// response for the change set. Ensure that test framework processes the requests as expected.
 	// JIRA: CPOUI5MODELS-198
-	[{
-		aExpectedMessages : [],
-		aResponses : [{ // 1st create
-			data : {
-				__metadata : {uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"},
-				ItemPosition : "10",
-				SalesOrderID : "1"
-			},
-			statusCode : 201
-		}, { // 2nd create
-			data : {
-				__metadata : {uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20')"},
-				ItemPosition : "20",
-				SalesOrderID : "1"
-			},
-			statusCode : 201
-		}, { // read all items
-			results : [{
-				__metadata : {uri : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"},
-				ItemPosition : "10",
-				Note : "Foo",
-				SalesOrderID : "1"
-			}, {
-				__metadata : {
-					uri : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20')"
-				},
-				ItemPosition : "20",
-				Note : "Bar",
-				SalesOrderID : "1"
-			}]
-		}],
-		sTitle : "Successfully create 2 entities"
-	}, {
-		aExpectedMessages : [{
-			code : "UF0",
-			descriptionUrl : "",
-			fullTarget : "/SalesOrderSet('1')/ToLineItems('~key~')",
-			message : "Internal Server Error",
-			persistent : false,
-			target : "/SalesOrderLineItemSet('~key~')",
-			technical : true,
-			type : "Error"
+[{
+	aExpectedMessages : [],
+	aResponses : [{ // 1st create
+		data : {
+			__metadata : {uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"},
+			ItemPosition : "10",
+			SalesOrderID : "1"
+		},
+		statusCode : 201
+	}, { // 2nd create
+		data : {
+			__metadata : {uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20')"},
+			ItemPosition : "20",
+			SalesOrderID : "1"
+		},
+		statusCode : 201
+	}, { // read all items
+		results : [{
+			__metadata : {uri : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"},
+			ItemPosition : "10",
+			Note : "Foo",
+			SalesOrderID : "1"
 		}, {
-			code : "UF0",
-			descriptionUrl : "",
-			fullTarget : "/SalesOrderSet('1')/ToLineItems('~key~')",
-			message : "Internal Server Error",
-			persistent : false,
-			target : "/SalesOrderLineItemSet('~key~')",
-			technical : true,
-			type : "Error"
-		}],
-		aResponses : [createErrorResponse(), undefined/*no response needed*/, {results : []}],
-		sTitle : "Create 2 entities with error response"
-	}].forEach(function (oFixture) {
-		QUnit.test("ODataModel#createEntry: " + oFixture.sTitle, function (assert) {
-			var oContext, oCreatedPromise,
-				oModel = createSalesOrdersModel({canonicalRequests : true}),
-				bWithError = oFixture.aExpectedMessages.length > 0,
-				that = this;
+			__metadata : {
+				uri : "/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20')"
+			},
+			ItemPosition : "20",
+			Note : "Bar",
+			SalesOrderID : "1"
+		}]
+	}],
+	sTitle : "Successfully create 2 entities"
+}, {
+	aExpectedMessages : [{
+		code : "UF0",
+		descriptionUrl : "",
+		fullTarget : "/SalesOrderSet('1')/ToLineItems('~key~')",
+		message : "Internal Server Error",
+		persistent : false,
+		target : "/SalesOrderLineItemSet('~key~')",
+		technical : true,
+		type : "Error"
+	}, {
+		code : "UF0",
+		descriptionUrl : "",
+		fullTarget : "/SalesOrderSet('1')/ToLineItems('~key~')",
+		message : "Internal Server Error",
+		persistent : false,
+		target : "/SalesOrderLineItemSet('~key~')",
+		technical : true,
+		type : "Error"
+	}],
+	aResponses : [createErrorResponse(), undefined/*no response needed*/, {results : []}],
+	sTitle : "Create 2 entities with error response"
+}].forEach(function (oFixture) {
+	QUnit.test("ODataModel#createEntry: " + oFixture.sTitle, function (assert) {
+		var oContext, oCreatedPromise,
+			oModel = createSalesOrdersModel({canonicalRequests : true}),
+			bWithError = oFixture.aExpectedMessages.length > 0,
+			that = this;
 
-			return this.createView(assert, "", oModel).then(function () {
-				var oEventHandlers = {
-						requestCompleted : function () {},
-						requestFailed : function () {}
-					};
+		return this.createView(assert, "", oModel).then(function () {
+			var oEventHandlers = {
+					requestCompleted : function () {},
+					requestFailed : function () {}
+				};
 
-				that.expectHeadRequest()
-					.expectRequest({
-						batchNo : 1,
-						created : true,
-						data : {
-							__metadata : {
-								type : "GWSAMPLE_BASIC.SalesOrderLineItem"
-							}
-						},
-						method : "POST",
-						requestUri : "SalesOrderSet('1')/ToLineItems"
-					}, oFixture.aResponses[0])
-					.expectRequest({
-						batchNo : 1,
-						created : true,
-						data : {
-							__metadata : {
-								type : "GWSAMPLE_BASIC.SalesOrderLineItem"
-							}
-						},
-						method : "POST",
-						requestUri : "SalesOrderSet('1')/ToLineItems"
-					}, oFixture.aResponses[1])
-					.expectRequest({
-						batchNo : 1,
-						requestUri : "SalesOrderSet('1')/ToLineItems"
-					}, oFixture.aResponses[2])
-					.expectMessages(oFixture.aExpectedMessages);
-				if (bWithError) {
-					that.oLogMock.expects("error").twice()
-						.withExactArgs("Request failed with status code 500: "
-								+ "POST SalesOrderSet('1')/ToLineItems",
-							/*details not relevant*/ sinon.match.string, sODataMessageParserClassName);
-				}
+			that.expectHeadRequest()
+				.expectRequest({
+					batchNo : 1,
+					created : true,
+					data : {
+						__metadata : {
+							type : "GWSAMPLE_BASIC.SalesOrderLineItem"
+						}
+					},
+					method : "POST",
+					requestUri : "SalesOrderSet('1')/ToLineItems"
+				}, oFixture.aResponses[0])
+				.expectRequest({
+					batchNo : 1,
+					created : true,
+					data : {
+						__metadata : {
+							type : "GWSAMPLE_BASIC.SalesOrderLineItem"
+						}
+					},
+					method : "POST",
+					requestUri : "SalesOrderSet('1')/ToLineItems"
+				}, oFixture.aResponses[1])
+				.expectRequest({
+					batchNo : 1,
+					requestUri : "SalesOrderSet('1')/ToLineItems"
+				}, oFixture.aResponses[2])
+				.expectMessages(oFixture.aExpectedMessages);
+			if (bWithError) {
+				that.oLogMock.expects("error").twice()
+					.withExactArgs("Request failed with status code 500: "
+							+ "POST SalesOrderSet('1')/ToLineItems",
+						/*details not relevant*/ sinon.match.string, sODataMessageParserClassName);
+			}
 
-				// don't care about passed arguments
-				that.mock(oEventHandlers).expects("requestCompleted").exactly(3);
-				that.mock(oEventHandlers).expects("requestFailed").exactly(bWithError ? 2 : 0);
-				oModel.attachRequestCompleted(oEventHandlers.requestCompleted);
-				oModel.attachRequestFailed(oEventHandlers.requestFailed);
+			// don't care about passed arguments
+			that.mock(oEventHandlers).expects("requestCompleted").exactly(3);
+			that.mock(oEventHandlers).expects("requestFailed").exactly(bWithError ? 2 : 0);
+			oModel.attachRequestCompleted(oEventHandlers.requestCompleted);
+			oModel.attachRequestFailed(oEventHandlers.requestFailed);
 
-				// code under test
-				oContext = oModel.createEntry("/SalesOrderSet('1')/ToLineItems", {properties : {}});
+			// code under test
+			oContext = oModel.createEntry("/SalesOrderSet('1')/ToLineItems", {properties : {}});
 
-				assert.strictEqual(oContext.isTransient(), true);
+			assert.strictEqual(oContext.isTransient(), true);
 
-				oCreatedPromise = oContext.created();
+			oCreatedPromise = oContext.created();
 
-				assert.ok(oCreatedPromise);
+			assert.ok(oCreatedPromise);
 
-				// code under test
-				oModel.createEntry("/SalesOrderSet('1')/ToLineItems", {properties : {}});
+			// code under test
+			oModel.createEntry("/SalesOrderSet('1')/ToLineItems", {properties : {}});
 
-				oModel.read("/SalesOrderSet('1')/ToLineItems", {groupId : "changes"});
+			oModel.read("/SalesOrderSet('1')/ToLineItems", {groupId : "changes"});
 
-				oModel.submitChanges();
+			oModel.submitChanges();
 
-				return that.waitForChanges(assert);
-			}).then(function () {
-				assert.strictEqual(oContext.isTransient(), bWithError ? true : undefined);
-				assert.strictEqual(oContext.created(),  bWithError ? oCreatedPromise : undefined);
-			});
+			return that.waitForChanges(assert);
+		}).then(function () {
+			assert.strictEqual(oContext.isTransient(), bWithError ? true : undefined);
+			assert.strictEqual(oContext.created(),  bWithError ? oCreatedPromise : undefined);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: Ensure that 'refreshAfterChange' flag given to ODataModel#createEntry is also
@@ -5623,166 +5623,146 @@ usePreliminaryContext : false}}">\
 	// set and no request is sent after deletion.
 	// JIRA: CPOUI5MODELS-198, CPOUI5MODELS-614, CPOUI5MODELS-615
 	// BCP: 2170206361; delete entity only if explicitly requested
-	[false, true].forEach(function (bWithFailedPOST) {
-		[false, true].forEach(function (bWithPath) {
-			[false, true].forEach(function (bDeleteCreatedEntities) {
-				[false, true].forEach(function (bPersistTechnicalMessages) {
-		var sTitle = "ODataModel#createEntry: discard created entity by using ODataModel#resetChanges "
-				+ (bWithPath ? "called with the context path " : "")
-				+ (bWithFailedPOST ? "after failed submit " : " immediately ")
-				+ (bDeleteCreatedEntities ? "; delete" : "; keep") + " cache data"
-				+ "; bPersistTechnicalMessages: " + bPersistTechnicalMessages;
+[false, true].forEach(function (bWithFailedPOST) {
+	[false, true].forEach(function (bWithPath) {
+		[false, true].forEach(function (bDeleteCreatedEntities) {
+			[false, true].forEach(function (bPersistTechnicalMessages) {
+	var sTitle = "ODataModel#createEntry: discard created entity by using ODataModel#resetChanges "
+			+ (bWithPath ? "called with the context path " : "")
+			+ (bWithFailedPOST ? "after failed submit " : " immediately ")
+			+ (bDeleteCreatedEntities ? "; delete" : "; keep") + " cache data"
+			+ "; bPersistTechnicalMessages: " + bPersistTechnicalMessages;
 
-		QUnit.test(sTitle, function (assert) {
-			var oCreatedContext,
-				oModel = createSalesOrdersModel({
-					persistTechnicalMessages : bPersistTechnicalMessages
-				}),
-				that = this;
+	QUnit.test(sTitle, function (assert) {
+		var oCreatedContext,
+			oModel = createSalesOrdersModel({
+				persistTechnicalMessages : bPersistTechnicalMessages
+			}),
+			that = this;
 
-			return this.createView(assert, /*sView*/"", oModel).then(function () {
-				// code under test
-				oCreatedContext = oModel.createEntry("/SalesOrderSet('1')/ToLineItems", {
-					properties : {Note : "Foo"}
-				});
-
-				if (bWithFailedPOST) {
-					that.expectHeadRequest()
-						.expectRequest({
-							created : true,
-							data : {
-								__metadata : {
-									type : "GWSAMPLE_BASIC.SalesOrderLineItem"
-								},
-								Note : "Foo"
-							},
-							headers : {"Content-ID" : "~key~"},
-							method : "POST",
-							requestUri : "SalesOrderSet('1')/ToLineItems"
-						}, createErrorResponse({
-							message : "POST failed",
-							statusCode : 400,
-							target : ""
-						}))
-						.expectMessages([{
-							code : "UF0",
-							fullTarget : "/SalesOrderSet('1')/ToLineItems('~key~')",
-							message : "POST failed",
-							persistent : bPersistTechnicalMessages,
-							target : "/SalesOrderLineItemSet('~key~')",
-							technical : true,
-							type : "Error"
-						}]);
-
-					that.oLogMock.expects("error")
-						.withExactArgs("Request failed with status code 400: "
-								+ "POST SalesOrderSet('1')/ToLineItems",
-							/*details not relevant*/ sinon.match.string, sODataMessageParserClassName);
-
-					oModel.submitChanges();
-				}
-
-				return that.waitForChanges(assert);
-			}).then(function () {
-				var oResetPromise;
-
-				if (bWithFailedPOST && bPersistTechnicalMessages) {
-					that.expectMessages([{
-							code : "UF0",
-							fullTarget : "/SalesOrderSet('1')/ToLineItems('~key~')",
-							message : "POST failed",
-							persistent : bPersistTechnicalMessages,
-							target : "/SalesOrderLineItemSet('~key~')",
-							technical : true,
-							type : "Error"
-						}]);
-				} else {
-					that.expectMessages([]);
-				}
-
-				// code under test
-				oResetPromise = oModel.resetChanges(bWithPath
-						? [oCreatedContext.getPath()]
-						: undefined,
-					/*bAll*/undefined,
-					bDeleteCreatedEntities);
-
-				// check that data cache is cleaned synchronously if bDeleteCreatedEntities is true
-				if (bDeleteCreatedEntities) {
-					assert.strictEqual(oModel.getObject(oCreatedContext.getPath()), undefined);
-				} else {
-					assert.ok(oModel.getObject(oCreatedContext.getPath()));
-					assert.strictEqual(oModel.getObject(oCreatedContext.getPath() + "/Note"), "Foo");
-				}
-
-				oModel.submitChanges(); // no request is sent
-
-				return Promise.all([
-					oResetPromise,
-					that.waitForChanges(assert)
-				]);
+		return this.createView(assert, /*sView*/"", oModel).then(function () {
+			// code under test
+			oCreatedContext = oModel.createEntry("/SalesOrderSet('1')/ToLineItems", {
+				properties : {Note : "Foo"}
 			});
+
+			if (bWithFailedPOST) {
+				that.expectHeadRequest()
+					.expectRequest({
+						created : true,
+						data : {
+							__metadata : {
+								type : "GWSAMPLE_BASIC.SalesOrderLineItem"
+							},
+							Note : "Foo"
+						},
+						headers : {"Content-ID" : "~key~"},
+						method : "POST",
+						requestUri : "SalesOrderSet('1')/ToLineItems"
+					}, createErrorResponse({
+						message : "POST failed",
+						statusCode : 400,
+						target : ""
+					}))
+					.expectMessages([{
+						code : "UF0",
+						fullTarget : "/SalesOrderSet('1')/ToLineItems('~key~')",
+						message : "POST failed",
+						persistent : bPersistTechnicalMessages,
+						target : "/SalesOrderLineItemSet('~key~')",
+						technical : true,
+						type : "Error"
+					}]);
+
+				that.oLogMock.expects("error")
+					.withExactArgs("Request failed with status code 400: "
+							+ "POST SalesOrderSet('1')/ToLineItems",
+						/*details not relevant*/ sinon.match.string, sODataMessageParserClassName);
+
+				oModel.submitChanges();
+			}
+
+			return that.waitForChanges(assert);
+		}).then(function () {
+			var oResetPromise;
+
+			if (bWithFailedPOST && bPersistTechnicalMessages) {
+				that.expectMessages([{
+						code : "UF0",
+						fullTarget : "/SalesOrderSet('1')/ToLineItems('~key~')",
+						message : "POST failed",
+						persistent : bPersistTechnicalMessages,
+						target : "/SalesOrderLineItemSet('~key~')",
+						technical : true,
+						type : "Error"
+					}]);
+			} else {
+				that.expectMessages([]);
+			}
+
+			// code under test
+			oResetPromise = oModel.resetChanges(bWithPath
+					? [oCreatedContext.getPath()]
+					: undefined,
+				/*bAll*/undefined,
+				bDeleteCreatedEntities);
+
+			// check that data cache is cleaned synchronously if bDeleteCreatedEntities is true
+			if (bDeleteCreatedEntities) {
+				assert.strictEqual(oModel.getObject(oCreatedContext.getPath()), undefined);
+			} else {
+				assert.ok(oModel.getObject(oCreatedContext.getPath()));
+				assert.strictEqual(oModel.getObject(oCreatedContext.getPath() + "/Note"), "Foo");
+			}
+
+			oModel.submitChanges(); // no request is sent
+
+			return Promise.all([
+				oResetPromise,
+				that.waitForChanges(assert)
+			]);
 		});
-				});
+	});
 			});
 		});
 	});
-	[false, true].forEach(function (bWithTransientOnlyHeader) {
-		var sTitle = "createEntry: automatic expand of navigation properties"
-				+ (bWithTransientOnlyHeader ? ", GET with header: 'sap-messages': 'transientOnly'" : "");
+});
+	/** @deprecated As of version 1.95.0 */
+	//*********************************************************************************************
+	// Scenario: Create a new entity and call deleteCreatedEntry either immediately or after a
+	// failed attempt to submit the creation. The created entity is deleted and no request is sent
+	// after deletion.
+	// JIRA: CPOUI5MODELS-198, CPOUI5MODELS-614
+[false, true].forEach(function (bWithFailedPOST) {
+	var sTitle = "ODataModel#createEntry: discard created entity by using "
+			+ "ODataModel#deleteCreatedEntry "
+			+ (bWithFailedPOST ? "after failed submit" : "immediately");
 
-		QUnit.test(sTitle, function (assert) {
-			var iBatchNo = 1,
-				oCreatedContext,
-				oGETRequest = {
-					requestUri : "$~key~?$expand=ToProduct&$select=ToProduct",
-					headers : bWithTransientOnlyHeader ? {"sap-messages" : "transientOnly"} : {}
-				},
-				oModel = createSalesOrdersModel({canonicalRequests : true}),
-				oNoteError = this.createResponseMessage("Note"),
-				oPOSTRequest = {
-					created : true,
-					data : {
-						__metadata : {
-							type : "GWSAMPLE_BASIC.SalesOrderLineItem"
-						}
-					},
-					headers : {"Content-ID" : "~key~", "sap-messages" : "transientOnly"},
-					method : "POST",
-					requestUri : "SalesOrderSet('1')/ToLineItems"
-				},
-				sView = '\
-<FlexBox id="productDetails"\
-	binding="{path : \'ToProduct\', parameters : {select : \'Name\'}}">\
-	<Text id="productName" text="{Name}" />\
-</FlexBox>',
-				that = this;
+	QUnit.test(sTitle, function (assert) {
+		var oCreatedContext,
+			oModel = createSalesOrdersModel(),
+			that = this;
 
-			oModel.setTransitionMessagesOnlyForGroup("changes", bWithTransientOnlyHeader);
-
-			return this.createView(assert, sView, oModel).then(function () {
-				var oErrorGET = createErrorResponse({message : "GET failed", statusCode : 424}),
-					oErrorPOST = createErrorResponse({message : "POST failed", statusCode : 400}),
-					bHandlerCalled;
-
-				function fnHandleError (oEvent) {
-					var oResponse = oEvent.getParameter("response");
-
-					if (!bHandlerCalled) {
-						assert.strictEqual(oResponse.expandAfterCreateFailed, undefined);
-						bHandlerCalled = true;
-					} else {
-						assert.strictEqual(oResponse.expandAfterCreateFailed, true);
-						oModel.detachRequestFailed(fnHandleError);
-					}
-				}
-
+		return this.createView(assert, /*sView*/"", oModel).then(function () {
+			// code under test
+			oCreatedContext = oModel.createEntry("/SalesOrderSet('1')/ToLineItems", {
+				properties : {}
+			});
+			if (bWithFailedPOST) {
 				that.expectHeadRequest()
-					.expectRequest(Object.assign({batchNo : iBatchNo}, oPOSTRequest), oErrorPOST)
-					.expectRequest(Object.assign({batchNo : iBatchNo}, oGETRequest), oErrorGET)
+					.expectRequest({
+						created : true,
+						data : {
+							__metadata : {
+								type : "GWSAMPLE_BASIC.SalesOrderLineItem"
+							}
+						},
+						headers : {"Content-ID" : "~key~"},
+						method : "POST",
+						requestUri : "SalesOrderSet('1')/ToLineItems"
+					}, createErrorResponse({message : "POST failed", statusCode : 400}))
 					.expectMessages([{
 						code : "UF0",
-						descriptionUrl : "",
 						fullTarget : "/SalesOrderSet('1')/ToLineItems('~key~')",
 						message : "POST failed",
 						persistent : false,
@@ -5791,80 +5771,178 @@ usePreliminaryContext : false}}">\
 						type : "Error"
 					}]);
 
-				oModel.attachRequestFailed(fnHandleError);
-
-				// code under test
-				oCreatedContext = oModel.createEntry("/SalesOrderSet('1')/ToLineItems", {
-					expand : "ToProduct",
-					properties : {}
-				});
-
 				that.oLogMock.expects("error")
 					.withExactArgs("Request failed with status code 400: "
 							+ "POST SalesOrderSet('1')/ToLineItems",
 						/*details not relevant*/ sinon.match.string, sODataMessageParserClassName);
-				that.oLogMock.expects("error")
-					.withExactArgs(sinon.match(new RegExp("Request failed with status code 424: "
-							+ "GET \\$id-\\d*-\\d*\\?\\$expand=ToProduct&\\$select=ToProduct")),
-						/*details not relevant*/ sinon.match.string, sODataMessageParserClassName);
 
 				oModel.submitChanges();
+			}
 
-				iBatchNo += 1;
-				return that.waitForChanges(assert);
-			}).then(function () {
-				that.expectRequest(Object.assign({batchNo : iBatchNo}, oPOSTRequest), {
-						data : {
-							__metadata : {
-								uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
-							},
-							ItemPosition : "10",
-							SalesOrderID : "1"
-						},
-						statusCode : 201
-					})
-					.expectRequest(Object.assign({batchNo : iBatchNo}, oGETRequest), {
+			return that.waitForChanges(assert);
+		}).then(function () {
+			that.expectMessages([]);
+
+			// code under test
+			oModel.deleteCreatedEntry(oCreatedContext);
+
+			// check that data cache is cleaned synchronously
+			assert.strictEqual(oModel.getObject(oCreatedContext.getPath()), undefined);
+
+			oModel.submitChanges(); // no request is sent
+
+			return that.waitForChanges(assert);
+		});
+	});
+});
+
+	//*********************************************************************************************
+	// Scenario: The creation (POST) of a new entity leads to an automatic expand of the given
+	// navigation properties (GET) within the same $batch. If the creation fails, the POST request
+	// and the corresponding GET request for the expansion of the navigation properties are repeated
+	// with the next call of submitBatch.
+	// JIRA: CPOUI5MODELS-198
+	// Scenario 2: If the change group is marked for transient messages only the GET request must also
+	// have the "sap-message" header set to "transientOnly".
+	// JIRA: CPOUI5MODELS-1129
+[false, true].forEach(function (bWithTransientOnlyHeader) {
+	var sTitle = "createEntry: automatic expand of navigation properties"
+			+ (bWithTransientOnlyHeader ? ", GET with header: 'sap-messages': 'transientOnly'" : "");
+
+	QUnit.test(sTitle, function (assert) {
+		var iBatchNo = 1,
+			oCreatedContext,
+			oGETRequest = {
+				requestUri : "$~key~?$expand=ToProduct&$select=ToProduct",
+				headers : bWithTransientOnlyHeader ? {"sap-messages" : "transientOnly"} : {}
+			},
+			oModel = createSalesOrdersModel({canonicalRequests : true}),
+			oNoteError = this.createResponseMessage("Note"),
+			oPOSTRequest = {
+				created : true,
+				data : {
+					__metadata : {
+						type : "GWSAMPLE_BASIC.SalesOrderLineItem"
+					}
+				},
+				headers : {"Content-ID" : "~key~", "sap-messages" : "transientOnly"},
+				method : "POST",
+				requestUri : "SalesOrderSet('1')/ToLineItems"
+			},
+			sView = '\
+<FlexBox id="productDetails"\
+	binding="{path : \'ToProduct\', parameters : {select : \'Name\'}}">\
+	<Text id="productName" text="{Name}" />\
+</FlexBox>',
+			that = this;
+
+		oModel.setTransitionMessagesOnlyForGroup("changes", bWithTransientOnlyHeader);
+
+		return this.createView(assert, sView, oModel).then(function () {
+			var oErrorGET = createErrorResponse({message : "GET failed", statusCode : 424}),
+				oErrorPOST = createErrorResponse({message : "POST failed", statusCode : 400}),
+				bHandlerCalled;
+
+			function fnHandleError (oEvent) {
+				var oResponse = oEvent.getParameter("response");
+
+				if (!bHandlerCalled) {
+					assert.strictEqual(oResponse.expandAfterCreateFailed, undefined);
+					bHandlerCalled = true;
+				} else {
+					assert.strictEqual(oResponse.expandAfterCreateFailed, true);
+					oModel.detachRequestFailed(fnHandleError);
+				}
+			}
+
+			that.expectHeadRequest()
+				.expectRequest(Object.assign({batchNo : iBatchNo}, oPOSTRequest), oErrorPOST)
+				.expectRequest(Object.assign({batchNo : iBatchNo}, oGETRequest), oErrorGET)
+				.expectMessages([{
+					code : "UF0",
+					descriptionUrl : "",
+					fullTarget : "/SalesOrderSet('1')/ToLineItems('~key~')",
+					message : "POST failed",
+					persistent : false,
+					target : "/SalesOrderLineItemSet('~key~')",
+					technical : true,
+					type : "Error"
+				}]);
+
+			oModel.attachRequestFailed(fnHandleError);
+
+			// code under test
+			oCreatedContext = oModel.createEntry("/SalesOrderSet('1')/ToLineItems", {
+				expand : "ToProduct",
+				properties : {}
+			});
+
+			that.oLogMock.expects("error")
+				.withExactArgs("Request failed with status code 400: "
+						+ "POST SalesOrderSet('1')/ToLineItems",
+					/*details not relevant*/ sinon.match.string, sODataMessageParserClassName);
+			that.oLogMock.expects("error")
+				.withExactArgs(sinon.match(new RegExp("Request failed with status code 424: "
+						+ "GET \\$id-\\d*-\\d*\\?\\$expand=ToProduct&\\$select=ToProduct")),
+					/*details not relevant*/ sinon.match.string, sODataMessageParserClassName);
+
+			oModel.submitChanges();
+
+			iBatchNo += 1;
+			return that.waitForChanges(assert);
+		}).then(function () {
+			that.expectRequest(Object.assign({batchNo : iBatchNo}, oPOSTRequest), {
+					data : {
 						__metadata : {
 							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
 						},
-						ToProduct : {
-							__metadata : {uri : "ProductSet(ProductID='P1')"},
-							Name : "Product 1",
-							ProductID : "P1"
-						}
-					}, bWithTransientOnlyHeader ? undefined : {"sap-message" : getMessageHeader([oNoteError])});
+						ItemPosition : "10",
+						SalesOrderID : "1"
+					},
+					statusCode : 201
+				})
+				.expectRequest(Object.assign({batchNo : iBatchNo}, oGETRequest), {
+					__metadata : {
+						uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
+					},
+					ToProduct : {
+						__metadata : {uri : "ProductSet(ProductID='P1')"},
+						Name : "Product 1",
+						ProductID : "P1"
+					}
+				}, bWithTransientOnlyHeader ? undefined : {"sap-message" : getMessageHeader([oNoteError])});
 
-				if (!bWithTransientOnlyHeader) {
-					that.expectMessage(oNoteError,
-						"/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/",
-						"/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')/");
-				}
+			if (!bWithTransientOnlyHeader) {
+				that.expectMessage(oNoteError,
+					"/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/",
+					"/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')/");
+			}
 
-				oModel.submitChanges();
+			oModel.submitChanges();
 
-				return that.waitForChanges(assert);
-			}).then(function () {
-				that.expectValue("productName", "Product 1");
+			return that.waitForChanges(assert);
+		}).then(function () {
+			that.expectValue("productName", "Product 1");
 
-				// code under test
-				that.oView.byId("productDetails").setBindingContext(oCreatedContext);
+			// code under test
+			that.oView.byId("productDetails").setBindingContext(oCreatedContext);
 
-				return that.waitForChanges(assert);
-			}).then(function () {
-				[
-					"/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')/ToProduct",
-					"/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct",
-					"/ProductSet(ProductID='P1')"
-				].forEach(function (sPath) {
-					var oData = oModel.getObject(sPath, null, {select : "Name"});
+			return that.waitForChanges(assert);
+		}).then(function () {
+			[
+				"/SalesOrderSet('1')/ToLineItems(SalesOrderID='1',ItemPosition='10')/ToProduct",
+				"/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')/ToProduct",
+				"/ProductSet(ProductID='P1')"
+			].forEach(function (sPath) {
+				var oData = oModel.getObject(sPath, null, {select : "Name"});
 
-					assert.strictEqual(oData.Name, "Product 1", "getObject for " + sPath);
-				});
-
-				return that.waitForChanges(assert);
+				assert.strictEqual(oData.Name, "Product 1", "getObject for " + sPath);
 			});
+
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: The creation (POST) of a new entity leads to an automatic expand of the given
@@ -6483,48 +6561,48 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// sent without a target. The empty ("") target leads still to a target creation for UI5
 	// messages.
 	// JIRA: CPOUI5MODELS-153
-	["", undefined].forEach(function (sTarget) {
-		[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
-		var sTitle = "Messages: unbound transition messages; target = '" + sTarget + "'; scope = "
-				+ sMessageScope;
+["", undefined].forEach(function (sTarget) {
+	[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
+	var sTitle = "Messages: unbound transition messages; target = '" + sTarget + "'; scope = "
+			+ sMessageScope;
 
-		QUnit.test(sTitle, function (assert) {
-			var bIsBusinessObject = sMessageScope === MessageScope.BusinessObject,
-				oErrorWithoutTarget = this.createResponseMessage(sTarget, undefined, undefined, true),
-				bHasTarget = sTarget !== undefined || !bIsBusinessObject,
-				sExpectedTarget = bHasTarget ? "/SalesOrderSet('1')" : "",
-				oModel = createSalesOrdersModel(),
-				sView = '\
+	QUnit.test(sTitle, function (assert) {
+		var bIsBusinessObject = sMessageScope === MessageScope.BusinessObject,
+			oErrorWithoutTarget = this.createResponseMessage(sTarget, undefined, undefined, true),
+			bHasTarget = sTarget !== undefined || !bIsBusinessObject,
+			sExpectedTarget = bHasTarget ? "/SalesOrderSet('1')" : "",
+			oModel = createSalesOrdersModel(),
+			sView = '\
 <FlexBox binding="{/SalesOrderSet(\'1\')}">\
 	<Input id="note" value="{Note}" />\
 </FlexBox>';
 
-			this.expectHeadRequest(bIsBusinessObject ? {"sap-message-scope" : "BusinessObject"} : {})
-				.expectRequest({
-					headers : bIsBusinessObject ? {"sap-message-scope" : "BusinessObject"} : {},
-					requestUri : "SalesOrderSet('1')"
-				}, {
-					SalesOrderID : "1",
-					Note : "Foo"
-				}, {
-					"sap-message" : getMessageHeader(oErrorWithoutTarget)
-				})
-				.expectValue("note", "Foo")
-				.expectMessages([{
-					code : "code-0",
-					fullTarget : sExpectedTarget,
-					message : "message-0",
-					persistent : true,
-					target : sExpectedTarget,
-					type : MessageType.Error
-				}]);
+		this.expectHeadRequest(bIsBusinessObject ? {"sap-message-scope" : "BusinessObject"} : {})
+			.expectRequest({
+				headers : bIsBusinessObject ? {"sap-message-scope" : "BusinessObject"} : {},
+				requestUri : "SalesOrderSet('1')"
+			}, {
+				SalesOrderID : "1",
+				Note : "Foo"
+			}, {
+				"sap-message" : getMessageHeader(oErrorWithoutTarget)
+			})
+			.expectValue("note", "Foo")
+			.expectMessages([{
+				code : "code-0",
+				fullTarget : sExpectedTarget,
+				message : "message-0",
+				persistent : true,
+				target : sExpectedTarget,
+				type : MessageType.Error
+			}]);
 
-			oModel.setMessageScope(sMessageScope);
+		oModel.setMessageScope(sMessageScope);
 
-			return this.createView(assert, sView, oModel);
-		});
-		});
+		return this.createView(assert, sView, oModel);
 	});
+	});
+});
 
 	//*********************************************************************************************
 	// Scenario: If the change group is marked to only request transient messages from the server,
@@ -6762,68 +6840,68 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// Scenario: Child messages are cleared when an entity is removed.
 	// BCP: 2070222122
 	// JIRA: CPOUI5MODELS-79
-	[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
-		var sTitle = "BCP 2070222122: cleanup child messages for #remove, scope: " + sMessageScope;
+[MessageScope.BusinessObject, MessageScope.RequestedObjects].forEach(function (sMessageScope) {
+	var sTitle = "BCP 2070222122: cleanup child messages for #remove, scope: " + sMessageScope;
 
-		QUnit.test(sTitle, function (assert) {
-			var oModel = createSalesOrdersModel(),
-				oSalesOrderNoteError = this.createResponseMessage("Note"),
-				oSalesOrderToItem10ToProductPriceError = this.createResponseMessage(
-					"ToLineItems(SalesOrderID='1',ItemPosition='10')/ToProduct/Price"),
-				oSalesOrderItem10ToProductPriceError
-					= cloneODataMessage(oSalesOrderToItem10ToProductPriceError,
-						"(SalesOrderID='1',ItemPosition='10')/ToProduct/Price"),
-				sView = '\
+	QUnit.test(sTitle, function (assert) {
+		var oModel = createSalesOrdersModel(),
+			oSalesOrderNoteError = this.createResponseMessage("Note"),
+			oSalesOrderToItem10ToProductPriceError = this.createResponseMessage(
+				"ToLineItems(SalesOrderID='1',ItemPosition='10')/ToProduct/Price"),
+			oSalesOrderItem10ToProductPriceError
+				= cloneODataMessage(oSalesOrderToItem10ToProductPriceError,
+					"(SalesOrderID='1',ItemPosition='10')/ToProduct/Price"),
+			sView = '\
 <FlexBox binding="{/SalesOrderSet(\'1\')}">\
 	<Text id="salesOrderID" text="{SalesOrderID}" />\
 </FlexBox>',
-				bWithMessageScope = sMessageScope === MessageScope.BusinessObject,
-				that = this;
+			bWithMessageScope = sMessageScope === MessageScope.BusinessObject,
+			that = this;
 
-			this.expectHeadRequest(bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {})
-				.expectRequest({
-					batchNo : 1,
+		this.expectHeadRequest(bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {})
+			.expectRequest({
+				batchNo : 1,
+				headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
+				requestUri : "SalesOrderSet('1')"
+			}, {
+				__metadata : {uri : "SalesOrderSet('1')"},
+				SalesOrderID : "1"
+			}, {
+				"sap-message" : getMessageHeader([
+					oSalesOrderNoteError,
+					oSalesOrderToItem10ToProductPriceError
+				])
+			})
+			.expectValue("salesOrderID", "1")
+			.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/")
+			.expectMessage(oSalesOrderItem10ToProductPriceError, "/SalesOrderLineItemSet",
+				"/SalesOrderSet('1')/ToLineItems");
+
+		oModel.setMessageScope(sMessageScope);
+
+		return this.createView(assert, sView, oModel).then(function () {
+			that.expectRequest({
+					batchNo : 2,
 					headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
+					method : "DELETE",
 					requestUri : "SalesOrderSet('1')"
-				}, {
-					__metadata : {uri : "SalesOrderSet('1')"},
-					SalesOrderID : "1"
-				}, {
-					"sap-message" : getMessageHeader([
-						oSalesOrderNoteError,
-						oSalesOrderToItem10ToProductPriceError
-					])
-				})
-				.expectValue("salesOrderID", "1")
-				.expectMessage(oSalesOrderNoteError, "/SalesOrderSet('1')/")
-				.expectMessage(oSalesOrderItem10ToProductPriceError, "/SalesOrderLineItemSet",
+				}, NO_CONTENT)
+				.expectValue("salesOrderID", "")
+				.expectMessages([]);
+
+			if (!bWithMessageScope) {
+				that.expectMessage(oSalesOrderItem10ToProductPriceError, "/SalesOrderLineItemSet",
 					"/SalesOrderSet('1')/ToLineItems");
+			}
 
-			oModel.setMessageScope(sMessageScope);
+			// code under test
+			oModel.remove("/SalesOrderSet('1')");
+			oModel.submitChanges();
 
-			return this.createView(assert, sView, oModel).then(function () {
-				that.expectRequest({
-						batchNo : 2,
-						headers : bWithMessageScope ? {"sap-message-scope" : "BusinessObject"} : {},
-						method : "DELETE",
-						requestUri : "SalesOrderSet('1')"
-					}, NO_CONTENT)
-					.expectValue("salesOrderID", "")
-					.expectMessages([]);
-
-				if (!bWithMessageScope) {
-					that.expectMessage(oSalesOrderItem10ToProductPriceError, "/SalesOrderLineItemSet",
-						"/SalesOrderSet('1')/ToLineItems");
-				}
-
-				// code under test
-				oModel.remove("/SalesOrderSet('1')");
-				oModel.submitChanges();
-
-				return that.waitForChanges(assert);
-			});
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: Messages with multiple targets are visualized at controls that are bound against
@@ -6882,73 +6960,73 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// The result of a FunctionImport returning a collection can be accessed via $result relative
 	// to the returned context.
 	// BCP: 2170085431, 2170084065
-	[
-		{functionName : "allUserAssignmentsGET", method : "GET"},
-		{functionName : "allUserAssignmentsPOST", method : "POST"}
-	].forEach(function (oFixture) {
-		var sTitle = "ODataModel#callFunction: bind result ($result) to a list, using method "
-				+ oFixture.method + " " + oFixture.functionName;
+[
+	{functionName : "allUserAssignmentsGET", method : "GET"},
+	{functionName : "allUserAssignmentsPOST", method : "POST"}
+].forEach(function (oFixture) {
+	var sTitle = "ODataModel#callFunction: bind result ($result) to a list, using method "
+			+ oFixture.method + " " + oFixture.functionName;
 
-		QUnit.test(sTitle, function (assert) {
-			var oFunctionHandle, fnResolve,
-				oModel = createSpecialCasesModel({tokenHandling : false}),
-				oRequestPromise = new Promise(function (resolve) {
-					fnResolve = resolve;
-				}),
-				sView = '\
+	QUnit.test(sTitle, function (assert) {
+		var oFunctionHandle, fnResolve,
+			oModel = createSpecialCasesModel({tokenHandling : false}),
+			oRequestPromise = new Promise(function (resolve) {
+				fnResolve = resolve;
+			}),
+			sView = '\
 <t:Table id="table" rows="{path : \'$result\', templateShareable : true}" visibleRowCount="2">\
 	<Text id="userId" text="{UserId}" />\
 </t:Table>',
-				that = this;
+			that = this;
 
-			this.expectValue("userId", ["", ""]);
+		this.expectValue("userId", ["", ""]);
 
-			return this.createView(assert, sView, oModel).then(function () {
-				that.expectRequest({
-						method : oFixture.method,
-						requestUri : oFixture.functionName
-					}, oRequestPromise);
+		return this.createView(assert, sView, oModel).then(function () {
+			that.expectRequest({
+					method : oFixture.method,
+					requestUri : oFixture.functionName
+				}, oRequestPromise);
 
-				// code under test
-				oFunctionHandle = oModel.callFunction("/" + oFixture.functionName,
-					{method : oFixture.method});
+			// code under test
+			oFunctionHandle = oModel.callFunction("/" + oFixture.functionName,
+				{method : oFixture.method});
 
-				return oFunctionHandle.contextCreated();
-			}).then(function (oContext) {
-				var oTable = that.oView.byId("table"),
-					oResponse = {
-						statusCode : 200,
-						data : {
-							results : [{
-								__metadata : {uri : "UserAssignments('User1')"},
-								UserId : "User1"
-							}, {
-								__metadata : {uri : "UserAssignments('User2')"},
-								UserId : "User2"
-							}]
-						}
-					};
+			return oFunctionHandle.contextCreated();
+		}).then(function (oContext) {
+			var oTable = that.oView.byId("table"),
+				oResponse = {
+					statusCode : 200,
+					data : {
+						results : [{
+							__metadata : {uri : "UserAssignments('User1')"},
+							UserId : "User1"
+						}, {
+							__metadata : {uri : "UserAssignments('User2')"},
+							UserId : "User2"
+						}]
+					}
+				};
 
-				that.oLogMock.expects("error").withExactArgs(sinon.match(function (sError) {
-					return sError.startsWith("List Binding is not bound against a list for "
-							+ "/allUserAssignments");
-					}), undefined, sODataListBindingClassName);
+			that.oLogMock.expects("error").withExactArgs(sinon.match(function (sError) {
+				return sError.startsWith("List Binding is not bound against a list for "
+						+ "/allUserAssignments");
+				}), undefined, sODataListBindingClassName);
 
-				// code under test
-				oTable.setBindingContext(oContext);
+			// code under test
+			oTable.setBindingContext(oContext);
 
-				that.expectValue("userId", ["User1", "User2"]);
+			that.expectValue("userId", ["User1", "User2"]);
 
-				// code under test - server data processed
-				fnResolve(oResponse);
+			// code under test - server data processed
+			fnResolve(oResponse);
 
-				return Promise.all([
-					oRequestPromise,
-					that.waitForChanges(assert)
-				]);
-			});
+			return Promise.all([
+				oRequestPromise,
+				that.waitForChanges(assert)
+			]);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: Messages returned by a function import for an entity contained in a relative
@@ -7238,98 +7316,98 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// Scenario: Messages returned by a function import for a single entity referenced by a
 	// navigation property get the correct full target.
 	// JIRA: CPOUI5MODELS-230
-	[false, true].forEach(function (bMultipleOccurrences) {
-		var sTitle = "Messages: function import for a navigation property; bMultipleOccurrences = "
-				+ bMultipleOccurrences;
+[false, true].forEach(function (bMultipleOccurrences) {
+	var sTitle = "Messages: function import for a navigation property; bMultipleOccurrences = "
+			+ bMultipleOccurrences;
 
-		QUnit.test(sTitle, function (assert) {
-			var oModel = createSalesOrdersModelSpecialFunctionImports(),
-				oToBPCompanyNameError = this.createResponseMessage("ToBusinessPartner/CompanyName"),
-				oCompanyNameError = cloneODataMessage(oToBPCompanyNameError, "CompanyName"),
-				oToProductADescriptionError = this.createResponseMessage(
-					"ToBusinessPartner/ToProducts('A')/Description"),
-				oProductADescriptionError = cloneODataMessage(oToProductADescriptionError,
-					"('A')/Description"),
-				sFlexBox = '\
+	QUnit.test(sTitle, function (assert) {
+		var oModel = createSalesOrdersModelSpecialFunctionImports(),
+			oToBPCompanyNameError = this.createResponseMessage("ToBusinessPartner/CompanyName"),
+			oCompanyNameError = cloneODataMessage(oToBPCompanyNameError, "CompanyName"),
+			oToProductADescriptionError = this.createResponseMessage(
+				"ToBusinessPartner/ToProducts('A')/Description"),
+			oProductADescriptionError = cloneODataMessage(oToProductADescriptionError,
+				"('A')/Description"),
+			sFlexBox = '\
 <FlexBox binding="{path : \'ToBusinessPartner\', parameters : {select : \'BusinessPartnerID\'}}">\
 	<Text id="bpID0" text="{BusinessPartnerID}" />\
 </FlexBox>\
 			',
-				sView = '\
+			sView = '\
 <FlexBox binding="{path : \'/SalesOrderSet(\\\'1\\\')\', parameters : {\
 	expand : \'ToBusinessPartner\', select : \'ToBusinessPartner/BusinessPartnerID\'}}">'
-		+ sFlexBox + (bMultipleOccurrences ? sFlexBox.replace("bpID0", "bpID1") : "")
-	+ '</FlexBox>',
-				that = this;
+	+ sFlexBox + (bMultipleOccurrences ? sFlexBox.replace("bpID0", "bpID1") : "")
++ '</FlexBox>',
+			that = this;
 
-			this.expectHeadRequest({"sap-message-scope" : "BusinessObject"})
-				.expectRequest({
+		this.expectHeadRequest({"sap-message-scope" : "BusinessObject"})
+			.expectRequest({
+				headers : {"sap-message-scope" : "BusinessObject"},
+				requestUri : "SalesOrderSet('1')?$expand=ToBusinessPartner"
+					+ "&$select=ToBusinessPartner/BusinessPartnerID"
+			}, {
+				__metadata : {uri : "SalesOrderSet('1')"},
+				SalesOrderID : "1",
+				ToBusinessPartner : {
+					__metadata : {uri : "BusinessPartnerSet('100')"},
+					BusinessPartnerID : "100"
+				}
+			}, {
+				"sap-message" : getMessageHeader([
+					oToBPCompanyNameError, oToProductADescriptionError
+				])
+			})
+			.expectMessage(oCompanyNameError, "/BusinessPartnerSet('100')/",
+				"/SalesOrderSet('1')/ToBusinessPartner/")
+			.expectMessage(oProductADescriptionError, "/ProductSet",
+				"/SalesOrderSet('1')/ToBusinessPartner/ToProducts")
+			.expectValue("bpID0", "100");
+
+		if (bMultipleOccurrences) {
+			this.expectValue("bpID1", "100");
+		}
+
+		oModel.setMessageScope(MessageScope.BusinessObject);
+
+		return this.createView(assert, sView, oModel).then(function () {
+			var oPromise,
+				oToProductBNameError = that.createResponseMessage("ToProducts('B')/Name"),
+				oProductBNameError = cloneODataMessage(oToProductBNameError, "('B')/Name"),
+				oWebAddressError = that.createResponseMessage("WebAddress");
+
+			that.expectRequest({
+					encodeRequestUri : false,
 					headers : {"sap-message-scope" : "BusinessObject"},
-					requestUri : "SalesOrderSet('1')?$expand=ToBusinessPartner"
-						+ "&$select=ToBusinessPartner/BusinessPartnerID"
-				}, {
-					__metadata : {uri : "SalesOrderSet('1')"},
-					SalesOrderID : "1",
-					ToBusinessPartner : {
-						__metadata : {uri : "BusinessPartnerSet('100')"},
-						BusinessPartnerID : "100"
-					}
-				}, {
-					"sap-message" : getMessageHeader([
-						oToBPCompanyNameError, oToProductADescriptionError
-					])
-				})
-				.expectMessage(oCompanyNameError, "/BusinessPartnerSet('100')/",
-					"/SalesOrderSet('1')/ToBusinessPartner/")
-				.expectMessage(oProductADescriptionError, "/ProductSet",
-					"/SalesOrderSet('1')/ToBusinessPartner/ToProducts")
-				.expectValue("bpID0", "100");
-
-			if (bMultipleOccurrences) {
-				this.expectValue("bpID1", "100");
-			}
-
-			oModel.setMessageScope(MessageScope.BusinessObject);
-
-			return this.createView(assert, sView, oModel).then(function () {
-				var oPromise,
-					oToProductBNameError = that.createResponseMessage("ToProducts('B')/Name"),
-					oProductBNameError = cloneODataMessage(oToProductBNameError, "('B')/Name"),
-					oWebAddressError = that.createResponseMessage("WebAddress");
-
-				that.expectRequest({
-						encodeRequestUri : false,
-						headers : {"sap-message-scope" : "BusinessObject"},
-						method : "POST",
-						requestUri : "BusinessPartner_Refresh?BusinessPartnerID='100'"
-					}, {
-						__metadata : {uri : "BusinessPartnerSet('100')"},
-						BusinessPartnerID : "100"
-					}, {
-						location : "/SalesOrderSrv/BusinessPartnerSet('100')",
-						"sap-message" : getMessageHeader([oWebAddressError, oToProductBNameError])
-					})
-					.expectMessage(oWebAddressError,
-						"/BusinessPartnerSet('100')/",
-						"/SalesOrderSet('1')/ToBusinessPartner/", true)
-					.expectMessage(oProductBNameError, "/ProductSet",
-						"/SalesOrderSet('1')/ToBusinessPartner/ToProducts");
-
-				oPromise = oModel.callFunction("/BusinessPartner_Refresh", {
 					method : "POST",
-					refreshAfterChange : false,
-					urlParameters : {
-						BusinessPartnerID : "100"
-					}
-				});
+					requestUri : "BusinessPartner_Refresh?BusinessPartnerID='100'"
+				}, {
+					__metadata : {uri : "BusinessPartnerSet('100')"},
+					BusinessPartnerID : "100"
+				}, {
+					location : "/SalesOrderSrv/BusinessPartnerSet('100')",
+					"sap-message" : getMessageHeader([oWebAddressError, oToProductBNameError])
+				})
+				.expectMessage(oWebAddressError,
+					"/BusinessPartnerSet('100')/",
+					"/SalesOrderSet('1')/ToBusinessPartner/", true)
+				.expectMessage(oProductBNameError, "/ProductSet",
+					"/SalesOrderSet('1')/ToBusinessPartner/ToProducts");
 
-				return Promise.all([
-					oPromise.contextCreated(),
-					that.waitForChanges(assert)
-				]);
+			oPromise = oModel.callFunction("/BusinessPartner_Refresh", {
+				method : "POST",
+				refreshAfterChange : false,
+				urlParameters : {
+					BusinessPartnerID : "100"
+				}
 			});
+
+			return Promise.all([
+				oPromise.contextCreated(),
+				that.waitForChanges(assert)
+			]);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	//TODO: Scenario: Messages returned by a function import for a different single entity
@@ -7337,109 +7415,109 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// described in CPOUI5MODELS-230 we correct only the full target of messages for entities that
 	// are already on the UI.
 	// JIRA: CPOUI5MODELS-230
-	[false, true].forEach(function (bResultingEntityOnUI) {
-		var sTitle = "Messages: function import returns different entity; bResultingEntityOnUI = "
-				+ bResultingEntityOnUI;
+[false, true].forEach(function (bResultingEntityOnUI) {
+	var sTitle = "Messages: function import returns different entity; bResultingEntityOnUI = "
+			+ bResultingEntityOnUI;
 
-		QUnit.test(sTitle, function (assert) {
-			var oModel = createSalesOrdersModelSpecialFunctionImports(),
-				oCompanyNameError = this.createResponseMessage("CompanyName"),
-				oToProductADescriptionError = this.createResponseMessage("ToProducts('A')/Description"),
-				oProductADescriptionError = cloneODataMessage(oToProductADescriptionError,
-					"('A')/Description"),
-				sView = '\
+	QUnit.test(sTitle, function (assert) {
+		var oModel = createSalesOrdersModelSpecialFunctionImports(),
+			oCompanyNameError = this.createResponseMessage("CompanyName"),
+			oToProductADescriptionError = this.createResponseMessage("ToProducts('A')/Description"),
+			oProductADescriptionError = cloneODataMessage(oToProductADescriptionError,
+				"('A')/Description"),
+			sView = '\
 <FlexBox binding="{/SalesOrderSet(\'1\')}">\
 	<FlexBox binding="{ToBusinessPartner}">\
 		<Text id="bpID0" text="{BusinessPartnerID}" />\
 	</FlexBox>\
 </FlexBox>'
-	+ (bResultingEntityOnUI
-		? '<FlexBox binding="{/ProductSet(\'Z\')}">\
++ (bResultingEntityOnUI
+	? '<FlexBox binding="{/ProductSet(\'Z\')}">\
 		<FlexBox binding="{ToSupplier}">\
 			<Text id="bpID1" text="{BusinessPartnerID}" />\
 		</FlexBox>\
 	</FlexBox>'
-		: ''),
-				that = this;
+	: ''),
+			that = this;
 
-			this.expectHeadRequest({"sap-message-scope" : "BusinessObject"})
-				.expectRequest({
+		this.expectHeadRequest({"sap-message-scope" : "BusinessObject"})
+			.expectRequest({
+				headers : {"sap-message-scope" : "BusinessObject"},
+				requestUri : "SalesOrderSet('1')"
+			}, {
+				__metadata : {uri : "SalesOrderSet('1')"},
+				SalesOrderID : "1"
+			})
+			.expectRequest({
+				headers : {"sap-message-scope" : "BusinessObject"},
+				requestUri : "SalesOrderSet('1')/ToBusinessPartner"
+			}, {
+				__metadata : {uri : "BusinessPartnerSet('100')"},
+				BusinessPartnerID : "100"
+			}, {"sap-message" : getMessageHeader([oCompanyNameError, oToProductADescriptionError])})
+			.expectMessage(oCompanyNameError,
+				"/BusinessPartnerSet('100')/",
+				"/SalesOrderSet('1')/ToBusinessPartner/")
+			.expectMessage(oProductADescriptionError, "/ProductSet",
+				"/SalesOrderSet('1')/ToBusinessPartner/ToProducts")
+			.expectValue("bpID0", "100");
+		if (bResultingEntityOnUI) {
+			this.expectRequest({
 					headers : {"sap-message-scope" : "BusinessObject"},
-					requestUri : "SalesOrderSet('1')"
+					requestUri : "ProductSet('Z')"
 				}, {
-					__metadata : {uri : "SalesOrderSet('1')"},
-					SalesOrderID : "1"
+					__metadata : {uri : "ProductSet('Z')"},
+					ProductID : "Z"
 				})
 				.expectRequest({
 					headers : {"sap-message-scope" : "BusinessObject"},
-					requestUri : "SalesOrderSet('1')/ToBusinessPartner"
+					requestUri : "ProductSet('Z')/ToSupplier"
 				}, {
-					__metadata : {uri : "BusinessPartnerSet('100')"},
-					BusinessPartnerID : "100"
-				}, {"sap-message" : getMessageHeader([oCompanyNameError, oToProductADescriptionError])})
-				.expectMessage(oCompanyNameError,
-					"/BusinessPartnerSet('100')/",
-					"/SalesOrderSet('1')/ToBusinessPartner/")
-				.expectMessage(oProductADescriptionError, "/ProductSet",
-					"/SalesOrderSet('1')/ToBusinessPartner/ToProducts")
-				.expectValue("bpID0", "100");
-			if (bResultingEntityOnUI) {
-				this.expectRequest({
-						headers : {"sap-message-scope" : "BusinessObject"},
-						requestUri : "ProductSet('Z')"
-					}, {
-						__metadata : {uri : "ProductSet('Z')"},
-						ProductID : "Z"
-					})
-					.expectRequest({
-						headers : {"sap-message-scope" : "BusinessObject"},
-						requestUri : "ProductSet('Z')/ToSupplier"
-					}, {
-						__metadata : {uri : "BusinessPartnerSet('200')"},
-						BusinessPartnerID : "200"
-					})
-					.expectValue("bpID1", "200");
-			}
+					__metadata : {uri : "BusinessPartnerSet('200')"},
+					BusinessPartnerID : "200"
+				})
+				.expectValue("bpID1", "200");
+		}
 
-			oModel.setMessageScope(MessageScope.BusinessObject);
+		oModel.setMessageScope(MessageScope.BusinessObject);
 
-			return this.createView(assert, sView, oModel).then(function () {
-				var oPromise,
-					oToProductBNameError = that.createResponseMessage("ToProducts('B')/Name"),
-					oProductBNameError = cloneODataMessage(oToProductBNameError, "('B')/Name"),
-					oWebAddressError = that.createResponseMessage("WebAddress");
+		return this.createView(assert, sView, oModel).then(function () {
+			var oPromise,
+				oToProductBNameError = that.createResponseMessage("ToProducts('B')/Name"),
+				oProductBNameError = cloneODataMessage(oToProductBNameError, "('B')/Name"),
+				oWebAddressError = that.createResponseMessage("WebAddress");
 
-				that.expectRequest({
-						encodeRequestUri : false,
-						headers : {"sap-message-scope" : "BusinessObject"},
-						method : "POST",
-						requestUri : "BusinessPartner_Refresh?BusinessPartnerID='100'"
-					}, {
-						__metadata : {uri : "BusinessPartnerSet('200')"},
-						BusinessPartnerID : "200"
-					}, {
-						location : "/SalesOrderSrv/BusinessPartnerSet('200')",
-						"sap-message" : getMessageHeader([oWebAddressError, oToProductBNameError])
-					})
-					.expectMessage(oWebAddressError, "/BusinessPartnerSet('200')/")
-					.expectMessage(oProductBNameError, "/ProductSet",
-						"/BusinessPartnerSet('200')/ToProducts");
-
-				oPromise = oModel.callFunction("/BusinessPartner_Refresh", {
+			that.expectRequest({
+					encodeRequestUri : false,
+					headers : {"sap-message-scope" : "BusinessObject"},
 					method : "POST",
-					refreshAfterChange : false,
-					urlParameters : {
-						BusinessPartnerID : "100"
-					}
-				});
+					requestUri : "BusinessPartner_Refresh?BusinessPartnerID='100'"
+				}, {
+					__metadata : {uri : "BusinessPartnerSet('200')"},
+					BusinessPartnerID : "200"
+				}, {
+					location : "/SalesOrderSrv/BusinessPartnerSet('200')",
+					"sap-message" : getMessageHeader([oWebAddressError, oToProductBNameError])
+				})
+				.expectMessage(oWebAddressError, "/BusinessPartnerSet('200')/")
+				.expectMessage(oProductBNameError, "/ProductSet",
+					"/BusinessPartnerSet('200')/ToProducts");
 
-				return Promise.all([
-					oPromise.contextCreated(),
-					that.waitForChanges(assert)
-				]);
+			oPromise = oModel.callFunction("/BusinessPartner_Refresh", {
+				method : "POST",
+				refreshAfterChange : false,
+				urlParameters : {
+					BusinessPartnerID : "100"
+				}
 			});
+
+			return Promise.all([
+				oPromise.contextCreated(),
+				that.waitForChanges(assert)
+			]);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: Messages returned by a function import for a single entity with two different deep
@@ -7554,21 +7632,21 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// JIRA: CPOUI5MODELS-230
 	// Scenario 2: Function call is retriggered with each change of a parameter value
 	// JIRA: CPOUI5MODELS-1233
-	[
-		{method : "GET", functionName : "SalesOrder_Confirm_GET"},
-		{method : "POST", functionName : "SalesOrder_Confirm"}
-	].forEach(function (oFixture) {
-		var sTitle = "Messages: function import with lazy parameter determination, method="
-				+ oFixture.method;
+[
+	{method : "GET", functionName : "SalesOrder_Confirm_GET"},
+	{method : "POST", functionName : "SalesOrder_Confirm"}
+].forEach(function (oFixture) {
+	var sTitle = "Messages: function import with lazy parameter determination, method="
+			+ oFixture.method;
 
-		QUnit.test(sTitle, function (assert) {
-			var oModel = createSalesOrdersModelSpecialFunctionImports({
-					defaultBindingMode : "TwoWay",
-					// avoid reloading ToSalesOrders table with the second attempt
-					refreshAfterChange : false,
-					tokenHandling : false
-				}),
-				sView = '\
+	QUnit.test(sTitle, function (assert) {
+		var oModel = createSalesOrdersModelSpecialFunctionImports({
+				defaultBindingMode : "TwoWay",
+				// avoid reloading ToSalesOrders table with the second attempt
+				refreshAfterChange : false,
+				tokenHandling : false
+			}),
+			sView = '\
 <FlexBox binding="{/BusinessPartnerSet(\'100\')}">\
 	<Table items="{ToSalesOrders}">\
 		<Text id="soID" text="{SalesOrderID}" />\
@@ -7577,89 +7655,89 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 <FlexBox id="form">\
 	<Input id="soIDParameter" value="{SalesOrderID}" />\
 </FlexBox>',
-				that = this;
+			that = this;
 
-			this.expectRequest({
+		this.expectRequest({
+				headers : {"sap-message-scope" : "BusinessObject"},
+				requestUri : "BusinessPartnerSet('100')"
+			}, {
+				__metadata : {uri : "BusinessPartnerSet('100')"}
+			})
+			.expectRequest({
+				headers : {"sap-message-scope" : "BusinessObject"},
+				requestUri : "BusinessPartnerSet('100')/ToSalesOrders?$skip=0&$top=100"
+			}, {
+				results : [{
+					__metadata : {uri : "SalesOrderSet('42')"},
+					SalesOrderID : "42"
+				}]
+			})
+			.expectValue("soID", ["42"]);
+
+		oModel.setMessageScope(MessageScope.BusinessObject);
+
+		return this.createView(assert, sView, oModel).then(function () {
+			return oModel.callFunction("/" + oFixture.functionName, {
+					groupId : "changes",
+					method : oFixture.method,
+					refreshAfterChange : false,
+					urlParameters : {
+						SalesOrderID : "1"
+					}
+				}).contextCreated();
+		}).then(function (oFunctionContext) {
+			var oWebAddressError = that.createResponseMessage("WebAddress");
+
+			that.expectRequest({
+					encodeRequestUri : false,
 					headers : {"sap-message-scope" : "BusinessObject"},
-					requestUri : "BusinessPartnerSet('100')"
+					method : oFixture.method,
+					requestUri : oFixture.functionName + "?SalesOrderID='42'"
 				}, {
-					__metadata : {uri : "BusinessPartnerSet('100')"}
+					__metadata : {uri : "SalesOrderSet('42')"},
+					SalesOrderID : "42"
+				}, {
+					location : "/SalesOrderSrv/SalesOrderSet('42')",
+					"sap-message" : getMessageHeader(oWebAddressError)
 				})
-				.expectRequest({
+				.expectMessage(oWebAddressError, "/SalesOrderSet('42')/",
+					"/BusinessPartnerSet('100')/ToSalesOrders('42')/");
+
+			that.oView.byId("form").setBindingContext(oFunctionContext);
+			that.oView.byId("soIDParameter").setValue("42");
+
+			// code under test
+			oModel.submitChanges({groupId : "changes"});
+
+			return that.waitForChanges(assert);
+		}).then(function () {
+			assert.strictEqual(oModel.hasPendingChanges(true), false);
+
+			var oWebAddressError = that.createResponseMessage("WebAddress");
+
+			that.expectRequest({
+					encodeRequestUri : false,
 					headers : {"sap-message-scope" : "BusinessObject"},
-					requestUri : "BusinessPartnerSet('100')/ToSalesOrders?$skip=0&$top=100"
+					method : oFixture.method,
+					requestUri : oFixture.functionName + "?SalesOrderID='13'"
 				}, {
-					results : [{
-						__metadata : {uri : "SalesOrderSet('42')"},
-						SalesOrderID : "42"
-					}]
+					__metadata : {uri : "SalesOrderSet('13')"},
+					SalesOrderID : "13"
+				}, {
+					location : "/SalesOrderSrv/SalesOrderSet('13')",
+					"sap-message" : getMessageHeader(oWebAddressError)
 				})
-				.expectValue("soID", ["42"]);
+				 // object has not been read so deep path is equal to the path
+				.expectMessage(oWebAddressError, "/SalesOrderSet('13')/");
 
-			oModel.setMessageScope(MessageScope.BusinessObject);
+			// code under test - successful funtion import calls are repeated if parameter value changes
+			that.oView.byId("soIDParameter").setValue("13");
+			oModel.submitChanges({groupId : "changes"});
 
-			return this.createView(assert, sView, oModel).then(function () {
-				return oModel.callFunction("/" + oFixture.functionName, {
-						groupId : "changes",
-						method : oFixture.method,
-						refreshAfterChange : false,
-						urlParameters : {
-							SalesOrderID : "1"
-						}
-					}).contextCreated();
-			}).then(function (oFunctionContext) {
-				var oWebAddressError = that.createResponseMessage("WebAddress");
-
-				that.expectRequest({
-						encodeRequestUri : false,
-						headers : {"sap-message-scope" : "BusinessObject"},
-						method : oFixture.method,
-						requestUri : oFixture.functionName + "?SalesOrderID='42'"
-					}, {
-						__metadata : {uri : "SalesOrderSet('42')"},
-						SalesOrderID : "42"
-					}, {
-						location : "/SalesOrderSrv/SalesOrderSet('42')",
-						"sap-message" : getMessageHeader(oWebAddressError)
-					})
-					.expectMessage(oWebAddressError, "/SalesOrderSet('42')/",
-						"/BusinessPartnerSet('100')/ToSalesOrders('42')/");
-
-				that.oView.byId("form").setBindingContext(oFunctionContext);
-				that.oView.byId("soIDParameter").setValue("42");
-
-				// code under test
-				oModel.submitChanges({groupId : "changes"});
-
-				return that.waitForChanges(assert);
-			}).then(function () {
-				assert.strictEqual(oModel.hasPendingChanges(true), false);
-
-				var oWebAddressError = that.createResponseMessage("WebAddress");
-
-				that.expectRequest({
-						encodeRequestUri : false,
-						headers : {"sap-message-scope" : "BusinessObject"},
-						method : oFixture.method,
-						requestUri : oFixture.functionName + "?SalesOrderID='13'"
-					}, {
-						__metadata : {uri : "SalesOrderSet('13')"},
-						SalesOrderID : "13"
-					}, {
-						location : "/SalesOrderSrv/SalesOrderSet('13')",
-						"sap-message" : getMessageHeader(oWebAddressError)
-					})
-					 // object has not been read so deep path is equal to the path
-					.expectMessage(oWebAddressError, "/SalesOrderSet('13')/");
-
-				// code under test - successful funtion import calls are repeated if parameter value changes
-				that.oView.byId("soIDParameter").setValue("13");
-				oModel.submitChanges({groupId : "changes"});
-
-				return that.waitForChanges(assert);
-			});
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: Parameters of a function import are changed after calling ODataModel#callFunction
@@ -8622,23 +8700,42 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	//**********************************************************************************************
 	// Scenario: Allow changing of persistTechnicalMessages on model after instantiation.
 	// JIRA: CPOUI5MODELS-344
-	[true, undefined, false].forEach(function (bPersistTechnicalMessages) {
-		var sTitle = "Messages: Change persistTechnicalMessages after instantiation, "
-			+ "bPersistTechnicalMessages=" + bPersistTechnicalMessages;
+[true, undefined, false].forEach(function (bPersistTechnicalMessages) {
+	var sTitle = "Messages: Change persistTechnicalMessages after instantiation, "
+		+ "bPersistTechnicalMessages=" + bPersistTechnicalMessages;
 
-		QUnit.test(sTitle, function (assert) {
-			var oErrorMessage = createErrorResponse({message : "Not Found", statusCode : 404}),
-				oModel = createSalesOrdersModel({
-					persistTechnicalMessages : bPersistTechnicalMessages,
-					tokenHandling : false
-				}),
-				sView = '\
+	QUnit.test(sTitle, function (assert) {
+		var oErrorMessage = createErrorResponse({message : "Not Found", statusCode : 404}),
+			oModel = createSalesOrdersModel({
+				persistTechnicalMessages : bPersistTechnicalMessages,
+				tokenHandling : false
+			}),
+			sView = '\
 <FlexBox binding="{/SalesOrderSet(\'1\')}">\
 	<Input id="idNote" value="{Note}" />\
 </FlexBox>',
-				that = this;
+			that = this;
 
-			this.expectRequest("SalesOrderSet('1')", oErrorMessage)
+		this.expectRequest("SalesOrderSet('1')", oErrorMessage)
+			.expectMessages([{
+				code : "UF0",
+				descriptionUrl : "",
+				fullTarget : bPersistTechnicalMessages ? "" : "/SalesOrderSet('1')",
+				message : "Not Found",
+				persistent : !!bPersistTechnicalMessages,
+				target : bPersistTechnicalMessages ? "" : "/SalesOrderSet('1')",
+				technical : true,
+				type : "Error"
+			}]);
+
+		this.oLogMock.expects("error")
+			.withExactArgs("Request failed with status code 404: GET SalesOrderSet('1')",
+				/*details not relevant*/ sinon.match.string, sODataMessageParserClassName);
+
+		return this.createView(assert, sView, oModel).then(function () {
+			oErrorMessage = createErrorResponse({message : "Not Found", statusCode : 404});
+
+			that.expectRequest("SalesOrderSet('1')", oErrorMessage)
 				.expectMessages([{
 					code : "UF0",
 					descriptionUrl : "",
@@ -8648,55 +8745,36 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 					target : bPersistTechnicalMessages ? "" : "/SalesOrderSet('1')",
 					technical : true,
 					type : "Error"
+				}, {
+					code : "UF0",
+					descriptionUrl : "",
+					fullTarget : !bPersistTechnicalMessages ? "" : "/SalesOrderSet('1')",
+					message : "Not Found",
+					persistent : !bPersistTechnicalMessages,
+					target : !bPersistTechnicalMessages ? "" : "/SalesOrderSet('1')",
+					technical : true,
+					type : "Error"
 				}]);
 
-			this.oLogMock.expects("error")
+			that.oLogMock.expects("error")
 				.withExactArgs("Request failed with status code 404: GET SalesOrderSet('1')",
 					/*details not relevant*/ sinon.match.string, sODataMessageParserClassName);
 
-			return this.createView(assert, sView, oModel).then(function () {
-				oErrorMessage = createErrorResponse({message : "Not Found", statusCode : 404});
+			if (bPersistTechnicalMessages !== undefined) {
+				that.oLogMock.expects("warning")
+					.withExactArgs("The flag whether technical messages should always be treated as"
+						+ " persistent has been overwritten to " + !bPersistTechnicalMessages,
+						undefined, sODataModelClassName);
+			}
 
-				that.expectRequest("SalesOrderSet('1')", oErrorMessage)
-					.expectMessages([{
-						code : "UF0",
-						descriptionUrl : "",
-						fullTarget : bPersistTechnicalMessages ? "" : "/SalesOrderSet('1')",
-						message : "Not Found",
-						persistent : !!bPersistTechnicalMessages,
-						target : bPersistTechnicalMessages ? "" : "/SalesOrderSet('1')",
-						technical : true,
-						type : "Error"
-					}, {
-						code : "UF0",
-						descriptionUrl : "",
-						fullTarget : !bPersistTechnicalMessages ? "" : "/SalesOrderSet('1')",
-						message : "Not Found",
-						persistent : !bPersistTechnicalMessages,
-						target : !bPersistTechnicalMessages ? "" : "/SalesOrderSet('1')",
-						technical : true,
-						type : "Error"
-					}]);
+			// code under test
+			oModel.setPersistTechnicalMessages(!bPersistTechnicalMessages);
+			oModel.refresh(true);
 
-				that.oLogMock.expects("error")
-					.withExactArgs("Request failed with status code 404: GET SalesOrderSet('1')",
-						/*details not relevant*/ sinon.match.string, sODataMessageParserClassName);
-
-				if (bPersistTechnicalMessages !== undefined) {
-					that.oLogMock.expects("warning")
-						.withExactArgs("The flag whether technical messages should always be treated as"
-							+ " persistent has been overwritten to " + !bPersistTechnicalMessages,
-							undefined, sODataModelClassName);
-				}
-
-				// code under test
-				oModel.setPersistTechnicalMessages(!bPersistTechnicalMessages);
-				oModel.refresh(true);
-
-				return that.waitForChanges(assert);
-			});
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: When scrolling in an AnalyticalTable then the AnalyticalBinding requests an
@@ -8847,57 +8925,57 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// different for different "Edm.Time" values. "Edm.Time" objects are the only ones that do not
 	// provide a useful toString representation.
 	// SNOW: CS20230006325114
-	[{
-		sTitle: "no multi-unit case ([a, b, c,| d, e,| f, g, h, i, j])",
-		aLengths: [551, 551, 551],
-		aKeyIndexForRoot: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-		aMultiUnitIndices: [],
-		aMultiUnitKeysForRoot: undefined,
-		aSkip: [5, 3],
-		aTop: [5, 2],
-		aVisibleRow: [7, 2],
-		bWithWarning: false
-	}, {
-		sTitle: "multi-unit at the end of the gap ([a, a, b,| c, d, d, e, f,| f, g, h, ...]); case c) II",
-		aKeyIndexForRoot: ["ZERO", 2, 3, -4, 6, -7, 9, 10, 11, 12, 13, 14, 15],
-		aLengths: [550, 550, 548],
-		aMultiUnitIndices: [[0, 1], [4,5], [7, 8]],
-		aMultiUnitKeysForRoot: [
-			",,,0,*,,,-multiple-units-not-dereferencable",
-			undefined,
-			undefined,
-			",,,4,*,,,-multiple-units-not-dereferencable",
-			undefined,
-			",,,7,*,,,-multiple-units-not-dereferencable"
-		],
-		aSkip: [8, 3],
-		aTop: [8, 5],
-		aVisibleRow: [9, 2],
-		bWithWarning: true
-	}, {
-		sTitle: "multi-unit in block one and at the beginning and the end of last block"
-			+ " ([a, a, b,| b, c, d, e, e,| e, g, h, ...])",
-		aKeyIndexForRoot: ["ZERO", -2, 4, 5, -6, 9, 10, 11, 12, 13, 14, 15],
-		aLengths: [550, 550, 547],
-		aMultiUnitIndices: [[0, 1], [2, 3], [6, 8]],
-		aMultiUnitKeysForRoot: [
-			",,,0,*,,,-multiple-units-not-dereferencable",
-			",,,2,*,,,-multiple-units-not-dereferencable",
-			undefined,
-			undefined,
-			",,,6,*,,,-multiple-units-not-dereferencable"
-		],
-		aSkip: [8, 3],
-		aTop: [8, 5],
-		aVisibleRow: [9, 2],
-		bWithWarning: true
-	}].forEach(function (oFixture) {
-		QUnit.test("AnalyticalBinding: grouping by property of type Edm.Time, " + oFixture.sTitle, function (assert) {
-			var oBinding, oTable,
-				oModel = createModel("/sap/opu/odata/sap/FAR_CUSTOMER_LINE_ITEMS", {
-					tokenHandling : false
-				}),
-				sView = '\
+[{
+	sTitle: "no multi-unit case ([a, b, c,| d, e,| f, g, h, i, j])",
+	aLengths: [551, 551, 551],
+	aKeyIndexForRoot: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+	aMultiUnitIndices: [],
+	aMultiUnitKeysForRoot: undefined,
+	aSkip: [5, 3],
+	aTop: [5, 2],
+	aVisibleRow: [7, 2],
+	bWithWarning: false
+}, {
+	sTitle: "multi-unit at the end of the gap ([a, a, b,| c, d, d, e, f,| f, g, h, ...]); case c) II",
+	aKeyIndexForRoot: ["ZERO", 2, 3, -4, 6, -7, 9, 10, 11, 12, 13, 14, 15],
+	aLengths: [550, 550, 548],
+	aMultiUnitIndices: [[0, 1], [4,5], [7, 8]],
+	aMultiUnitKeysForRoot: [
+		",,,0,*,,,-multiple-units-not-dereferencable",
+		undefined,
+		undefined,
+		",,,4,*,,,-multiple-units-not-dereferencable",
+		undefined,
+		",,,7,*,,,-multiple-units-not-dereferencable"
+	],
+	aSkip: [8, 3],
+	aTop: [8, 5],
+	aVisibleRow: [9, 2],
+	bWithWarning: true
+}, {
+	sTitle: "multi-unit in block one and at the beginning and the end of last block"
+		+ " ([a, a, b,| b, c, d, e, e,| e, g, h, ...])",
+	aKeyIndexForRoot: ["ZERO", -2, 4, 5, -6, 9, 10, 11, 12, 13, 14, 15],
+	aLengths: [550, 550, 547],
+	aMultiUnitIndices: [[0, 1], [2, 3], [6, 8]],
+	aMultiUnitKeysForRoot: [
+		",,,0,*,,,-multiple-units-not-dereferencable",
+		",,,2,*,,,-multiple-units-not-dereferencable",
+		undefined,
+		undefined,
+		",,,6,*,,,-multiple-units-not-dereferencable"
+	],
+	aSkip: [8, 3],
+	aTop: [8, 5],
+	aVisibleRow: [9, 2],
+	bWithWarning: true
+}].forEach(function (oFixture) {
+	QUnit.test("AnalyticalBinding: grouping by property of type Edm.Time, " + oFixture.sTitle, function (assert) {
+		var oBinding, oTable,
+			oModel = createModel("/sap/opu/odata/sap/FAR_CUSTOMER_LINE_ITEMS", {
+				tokenHandling : false
+			}),
+			sView = '\
 <t:AnalyticalTable id="table" rows="{path : \'/Items\', parameters : {useBatchRequests : true}}"\
 		threshold="2" visibleRowCount="2">\
 	<t:AnalyticalColumn grouped="true" leadingProperty="CreationTime">\
@@ -8909,99 +8987,99 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 		<t:template><Text wrapping="false" text="{AmountInCompanyCodeCurrency}"/></t:template>\
 	</t:AnalyticalColumn>\
 </t:AnalyticalTable>',
-				that = this;
+			that = this;
 
-			var aItems = [];
-			for (var i = 0; i < 50; i += 1) {
-				aItems.push({
-					__metadata : {uri : "/sap/opu/odata/sap/FAR_CUSTOMER_LINE_ITEMS/Items(" + i + ")"},
-					CreationTime : {ms: i, __edmType: 'Edm.Time'},
-					AmountInCompanyCodeCurrency : String(i),
+		var aItems = [];
+		for (var i = 0; i < 50; i += 1) {
+			aItems.push({
+				__metadata : {uri : "/sap/opu/odata/sap/FAR_CUSTOMER_LINE_ITEMS/Items(" + i + ")"},
+				CreationTime : {ms: i, __edmType: 'Edm.Time'},
+				AmountInCompanyCodeCurrency : String(i),
+				Currency : "USD"
+			});
+		}
+		// create multi-unit situations by reusing the dimension value of the grouped column (CreationTime) of the first
+		// item of the range for all others in the range; a multi-unit situation requires also a different dimension
+		// value of the measure's dimension, so use different the Currency values.
+		oFixture.aMultiUnitIndices.forEach(function (aMultiUnitRange) {
+			var iFrom = aMultiUnitRange[0],
+				iTo = aMultiUnitRange[1];
+
+			for (var i = iFrom + 1; i <= iTo; i += 1) {
+				aItems[i].CreationTime = aItems[iFrom].CreationTime;
+				aItems[i].Currency = aItems[iFrom].Currency + i;
+			}
+		});
+
+		this.oLogMock.expects("warning")
+			.withExactArgs("Detected a multi-unit case, so sorting is only possible on leaves", "/Items",
+				"sap.ui.model.analytics.AnalyticalBinding", undefined)
+			.exactly(oFixture.bWithWarning ? 1 : 0);
+
+		this.expectRequest({
+				encodeRequestUri : false,
+				requestUri : "Items" // Grand Total Request
+					+ "?$select=AmountInCompanyCodeCurrency,Currency&$top=100"
+					+ "&$inlinecount=allpages"
+			}, {
+				__count : "1",
+				results : [{
+					__metadata : {uri : "/sap/opu/odata/sap/FAR_CUSTOMER_LINE_ITEMS/Items('grandTotal')"},
+					AmountInCompanyCodeCurrency : "42.00",
 					Currency : "USD"
-				});
-			}
-			// create multi-unit situations by reusing the dimension value of the grouped column (CreationTime) of the first
-			// item of the range for all others in the range; a multi-unit situation requires also a different dimension
-			// value of the measure's dimension, so use different the Currency values.
-			oFixture.aMultiUnitIndices.forEach(function (aMultiUnitRange) {
-				var iFrom = aMultiUnitRange[0],
-					iTo = aMultiUnitRange[1];
-
-				for (var i = iFrom + 1; i <= iTo; i += 1) {
-					aItems[i].CreationTime = aItems[iFrom].CreationTime;
-					aItems[i].Currency = aItems[iFrom].Currency + i;
-				}
+				}]
+			})
+			.expectRequest({
+				encodeRequestUri : false,
+				requestUri : "Items" // Data and Count Request
+					+ "?$select=CreationTime,AmountInCompanyCodeCurrency,Currency"
+					+ "&$orderby=CreationTime%20asc&$top=3&$inlinecount=allpages"
+			}, {
+				__count : "550",
+				results : aItems.slice(0, 3)
 			});
 
-			this.oLogMock.expects("warning")
-				.withExactArgs("Detected a multi-unit case, so sorting is only possible on leaves", "/Items",
-					"sap.ui.model.analytics.AnalyticalBinding", undefined)
-				.exactly(oFixture.bWithWarning ? 1 : 0);
+		function readBlock(i) {
+			assert.strictEqual(oBinding.getLength(), oFixture.aLengths[i]);
 
-			this.expectRequest({
+			var iSkip = oFixture.aSkip[i];
+			var iTop = oFixture.aTop[i];
+			that.expectRequest({
 					encodeRequestUri : false,
-					requestUri : "Items" // Grand Total Request
-						+ "?$select=AmountInCompanyCodeCurrency,Currency&$top=100"
-						+ "&$inlinecount=allpages"
+					requestUri : "Items"
+						+ "?$select=CreationTime,AmountInCompanyCodeCurrency,"
+						+ "Currency&$orderby=CreationTime%20asc&$skip=" + iSkip + "&$top=" + iTop
 				}, {
-					__count : "1",
-					results : [{
-						__metadata : {uri : "/sap/opu/odata/sap/FAR_CUSTOMER_LINE_ITEMS/Items('grandTotal')"},
-						AmountInCompanyCodeCurrency : "42.00",
-						Currency : "USD"
-					}]
-				})
-				.expectRequest({
-					encodeRequestUri : false,
-					requestUri : "Items" // Data and Count Request
-						+ "?$select=CreationTime,AmountInCompanyCodeCurrency,Currency"
-						+ "&$orderby=CreationTime%20asc&$top=3&$inlinecount=allpages"
-				}, {
-					__count : "550",
-					results : aItems.slice(0, 3)
+					results : aItems.slice(iSkip, iSkip + iTop)
 				});
 
-			function readBlock(i) {
-				assert.strictEqual(oBinding.getLength(), oFixture.aLengths[i]);
+			// code under test
+			oTable.setFirstVisibleRow(oFixture.aVisibleRow[i]);
 
-				var iSkip = oFixture.aSkip[i];
-				var iTop = oFixture.aTop[i];
-				that.expectRequest({
-						encodeRequestUri : false,
-						requestUri : "Items"
-							+ "?$select=CreationTime,AmountInCompanyCodeCurrency,"
-							+ "Currency&$orderby=CreationTime%20asc&$skip=" + iSkip + "&$top=" + iTop
-					}, {
-						results : aItems.slice(iSkip, iSkip + iTop)
-					});
+			return that.waitForChanges(assert);
+		}
 
-				// code under test
-				oTable.setFirstVisibleRow(oFixture.aVisibleRow[i]);
+		return this.createView(assert, sView, oModel).then(function () {
+			oTable = that.oView.byId("table");
+			oBinding = oTable.getBinding("rows");
 
-				return that.waitForChanges(assert);
+			return readBlock(0);
+		}).then(function () {
+			return readBlock(1);
+		}).then(function () {
+			assert.strictEqual(oBinding.getLength(), oFixture.aLengths[2]);
+			var aMultiUnitKeysForRoot = oBinding.mMultiUnitKey["/"];
+			// strip trailing |<number> to before comparing; number is a global counter of multi-unit situations
+			if (aMultiUnitKeysForRoot) {
+				aMultiUnitKeysForRoot = aMultiUnitKeysForRoot.map(function (sKey) {
+					return sKey.split("|")[0];
+				});
 			}
-
-			return this.createView(assert, sView, oModel).then(function () {
-				oTable = that.oView.byId("table");
-				oBinding = oTable.getBinding("rows");
-
-				return readBlock(0);
-			}).then(function () {
-				return readBlock(1);
-			}).then(function () {
-				assert.strictEqual(oBinding.getLength(), oFixture.aLengths[2]);
-				var aMultiUnitKeysForRoot = oBinding.mMultiUnitKey["/"];
-				// strip trailing |<number> to before comparing; number is a global counter of multi-unit situations
-				if (aMultiUnitKeysForRoot) {
-					aMultiUnitKeysForRoot = aMultiUnitKeysForRoot.map(function (sKey) {
-						return sKey.split("|")[0];
-					});
-				}
-				assert.deepEqual(aMultiUnitKeysForRoot, oFixture.aMultiUnitKeysForRoot);
-				assert.deepEqual(oBinding.mKeyIndex["/"], oFixture.aKeyIndexForRoot);
-			});
+			assert.deepEqual(aMultiUnitKeysForRoot, oFixture.aMultiUnitKeysForRoot);
+			assert.deepEqual(oBinding.mKeyIndex["/"], oFixture.aKeyIndexForRoot);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: A user scrolls in an AnalyticalTable. Further data needs to be requested. The first
@@ -10656,113 +10734,113 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// returned entities. Old messages for the entities returned by the function call are properly
 	// updated. Messages for other entities of the same entity set are kept untouched.
 	// JIRA: CPOUI5MODELS-287
-	[
-		"BusinessPartner_Alternatives",
-		"BusinessPartner_Alternatives_ReturnType"
-	].forEach(function (sFunctionName) {
-		var sTitle = "Messages: function import returning a collection for different entities;"
-			+ " messages are updated only for returned entities: " + sFunctionName;
+[
+	"BusinessPartner_Alternatives",
+	"BusinessPartner_Alternatives_ReturnType"
+].forEach(function (sFunctionName) {
+	var sTitle = "Messages: function import returning a collection for different entities;"
+		+ " messages are updated only for returned entities: " + sFunctionName;
 
-		QUnit.test(sTitle, function (assert) {
-			var oCompanyNameError1 = this.createResponseMessage("CompanyName"),
-				oCompanyNameError2 = this.createResponseMessage("CompanyName"),
-				oModel = createSalesOrdersModelSpecialFunctionImports(),
-				oToProductADescriptionError1
-					= this.createResponseMessage("ToProducts('A')/Description"),
-				oProductADescriptionError1 = cloneODataMessage(oToProductADescriptionError1,
-					"('A')/Description"),
-				oToProductADescriptionError2
-					= this.createResponseMessage("ToProducts('B')/Description"),
-				oProductADescriptionError2 = cloneODataMessage(oToProductADescriptionError2,
-					"('B')/Description"),
-				sView = '\
+	QUnit.test(sTitle, function (assert) {
+		var oCompanyNameError1 = this.createResponseMessage("CompanyName"),
+			oCompanyNameError2 = this.createResponseMessage("CompanyName"),
+			oModel = createSalesOrdersModelSpecialFunctionImports(),
+			oToProductADescriptionError1
+				= this.createResponseMessage("ToProducts('A')/Description"),
+			oProductADescriptionError1 = cloneODataMessage(oToProductADescriptionError1,
+				"('A')/Description"),
+			oToProductADescriptionError2
+				= this.createResponseMessage("ToProducts('B')/Description"),
+			oProductADescriptionError2 = cloneODataMessage(oToProductADescriptionError2,
+				"('B')/Description"),
+			sView = '\
 <FlexBox binding="{/BusinessPartnerSet(\'1\')}">\
 	<Input id="companyName1" value="{CompanyName}" />\
 </FlexBox>\
 <FlexBox binding="{/BusinessPartnerSet(\'2\')}">\
 	<Input id="companyName2" value="{CompanyName}" />\
 </FlexBox>',
-				that = this;
+			that = this;
 
-			this.expectHeadRequest({"sap-message-scope" : "BusinessObject"})
-				.expectRequest({
+		this.expectHeadRequest({"sap-message-scope" : "BusinessObject"})
+			.expectRequest({
+				headers : {"sap-message-scope" : "BusinessObject"},
+				requestUri : "BusinessPartnerSet('1')"
+			}, {
+				__metadata : {uri : "BusinessPartnerSet('1')"},
+				BusinessPartnerID : "1",
+				CompanyName : "company1"
+			}, {"sap-message" : getMessageHeader([
+					oCompanyNameError1,
+					oToProductADescriptionError1
+				])})
+			.expectRequest({
+				headers : {"sap-message-scope" : "BusinessObject"},
+				requestUri : "BusinessPartnerSet('2')"
+			}, {
+				__metadata : {uri : "BusinessPartnerSet('2')"},
+				BusinessPartnerID : "2",
+				CompanyName : "company2"
+			}, {"sap-message" : getMessageHeader([
+					oCompanyNameError2,
+					oToProductADescriptionError2
+				])})
+			.expectValue("companyName1", "company1")
+			.expectValue("companyName2", "company2")
+			.expectMessage(oCompanyNameError1, "/BusinessPartnerSet('1')/")
+			.expectMessage(oProductADescriptionError1, "/ProductSet",
+				"/BusinessPartnerSet('1')/ToProducts")
+			.expectMessage(oCompanyNameError2, "/BusinessPartnerSet('2')/")
+			.expectMessage(oProductADescriptionError2, "/ProductSet",
+				"/BusinessPartnerSet('2')/ToProducts");
+
+		oModel.setMessageScope(MessageScope.BusinessObject);
+
+		return this.createView(assert, sView, oModel).then(function () {
+			var oCompanyNameError2Update = that.createResponseMessage("('2')/CompanyName"),
+				oToProductADescriptionError2
+					= that.createResponseMessage("('2')/ToProducts('B')/Description"),
+				oProductADescriptionError2 = cloneODataMessage(oToProductADescriptionError2,
+					"('B')/Description");
+
+			that.expectRequest({
+					encodeRequestUri : false,
 					headers : {"sap-message-scope" : "BusinessObject"},
-					requestUri : "BusinessPartnerSet('1')"
+					method : "POST",
+					requestUri : sFunctionName + "?BusinessPartnerID='1'"
 				}, {
-					__metadata : {uri : "BusinessPartnerSet('1')"},
-					BusinessPartnerID : "1",
-					CompanyName : "company1"
-				}, {"sap-message" : getMessageHeader([
-						oCompanyNameError1,
-						oToProductADescriptionError1
-					])})
-				.expectRequest({
-					headers : {"sap-message-scope" : "BusinessObject"},
-					requestUri : "BusinessPartnerSet('2')"
+					results : [{
+						__metadata : {uri : "BusinessPartnerSet('2')"},
+						BusinessPartnerID : "2",
+						CompanyName : "companyName2New"
+					}]
 				}, {
-					__metadata : {uri : "BusinessPartnerSet('2')"},
-					BusinessPartnerID : "2",
-					CompanyName : "company2"
-				}, {"sap-message" : getMessageHeader([
-						oCompanyNameError2,
+					"sap-message" : getMessageHeader([
+						oCompanyNameError2Update,
 						oToProductADescriptionError2
-					])})
-				.expectValue("companyName1", "company1")
-				.expectValue("companyName2", "company2")
+					])
+				})
+				.expectValue("companyName2", "companyName2New")
+				.expectMessage(oCompanyNameError2Update, "/BusinessPartnerSet", undefined, true)
+				.expectMessage(oProductADescriptionError2, "/ProductSet",
+					"/BusinessPartnerSet('2')/ToProducts")
 				.expectMessage(oCompanyNameError1, "/BusinessPartnerSet('1')/")
 				.expectMessage(oProductADescriptionError1, "/ProductSet",
-					"/BusinessPartnerSet('1')/ToProducts")
-				.expectMessage(oCompanyNameError2, "/BusinessPartnerSet('2')/")
-				.expectMessage(oProductADescriptionError2, "/ProductSet",
-					"/BusinessPartnerSet('2')/ToProducts");
+					"/BusinessPartnerSet('1')/ToProducts");
 
-			oModel.setMessageScope(MessageScope.BusinessObject);
-
-			return this.createView(assert, sView, oModel).then(function () {
-				var oCompanyNameError2Update = that.createResponseMessage("('2')/CompanyName"),
-					oToProductADescriptionError2
-						= that.createResponseMessage("('2')/ToProducts('B')/Description"),
-					oProductADescriptionError2 = cloneODataMessage(oToProductADescriptionError2,
-						"('B')/Description");
-
-				that.expectRequest({
-						encodeRequestUri : false,
-						headers : {"sap-message-scope" : "BusinessObject"},
-						method : "POST",
-						requestUri : sFunctionName + "?BusinessPartnerID='1'"
-					}, {
-						results : [{
-							__metadata : {uri : "BusinessPartnerSet('2')"},
-							BusinessPartnerID : "2",
-							CompanyName : "companyName2New"
-						}]
-					}, {
-						"sap-message" : getMessageHeader([
-							oCompanyNameError2Update,
-							oToProductADescriptionError2
-						])
-					})
-					.expectValue("companyName2", "companyName2New")
-					.expectMessage(oCompanyNameError2Update, "/BusinessPartnerSet", undefined, true)
-					.expectMessage(oProductADescriptionError2, "/ProductSet",
-						"/BusinessPartnerSet('2')/ToProducts")
-					.expectMessage(oCompanyNameError1, "/BusinessPartnerSet('1')/")
-					.expectMessage(oProductADescriptionError1, "/ProductSet",
-						"/BusinessPartnerSet('1')/ToProducts");
-
-				return Promise.all([
-					oModel.callFunction("/" + sFunctionName, {
-						method : "POST",
-						refreshAfterChange : false,
-						urlParameters : {
-							BusinessPartnerID : "1"
-						}
-					}).contextCreated(),
-					that.waitForChanges(assert)
-				]);
-			});
+			return Promise.all([
+				oModel.callFunction("/" + sFunctionName, {
+					method : "POST",
+					refreshAfterChange : false,
+					urlParameters : {
+						BusinessPartnerID : "1"
+					}
+				}).contextCreated(),
+				that.waitForChanges(assert)
+			]);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: A function import returning a collection of entities with the same parent may
@@ -10978,57 +11056,57 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	//*********************************************************************************************
 	// Scenario: Abort a function call with given expand parameter.
 	// JIRA: CPOUI5MODELS-221
-	[true, false].forEach(function (bDeferred) {
-		var sTitle = "callFunction: abort function call with given expand parameter; deferred: "
-				+ bDeferred;
+[true, false].forEach(function (bDeferred) {
+	var sTitle = "callFunction: abort function call with given expand parameter; deferred: "
+			+ bDeferred;
 
-		QUnit.test(sTitle, function (assert) {
-			var oCallFunctionResult,
-				oModel = createSalesOrdersModel(),
-				that = this;
+	QUnit.test(sTitle, function (assert) {
+		var oCallFunctionResult,
+			oModel = createSalesOrdersModel(),
+			that = this;
 
-			oModel.setDeferredGroups(["change", "callFunction"]);
+		oModel.setDeferredGroups(["change", "callFunction"]);
 
-			return this.createView(assert, /*sView*/"", oModel).then(function () {
-				oCallFunctionResult = oModel.callFunction("/SalesOrderItem_Clone", {
-						adjustDeepPath : function (mParameters) {
-							assert.strictEqual(mParameters.deepPath,
-								"/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20')",
-								"Deep path adjusted");
+		return this.createView(assert, /*sView*/"", oModel).then(function () {
+			oCallFunctionResult = oModel.callFunction("/SalesOrderItem_Clone", {
+					adjustDeepPath : function (mParameters) {
+						assert.strictEqual(mParameters.deepPath,
+							"/SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='20')",
+							"Deep path adjusted");
 
-							return "/SalesOrderSet('1')"
-								+ "/ToLineItems(SalesOrderID='1',ItemPosition='20')";
-						},
-						expand : "ToProduct",
-						groupId : bDeferred ? "callFunction" : undefined,
-						method : "POST",
-						urlParameters : {
-							ItemPosition : "10",
-							SalesOrderID : "1"
-						}
-					});
-
-				if (!bDeferred) {
-					// code under test
-					oCallFunctionResult.abort();
-					oModel.submitChanges();
-
-					return that.waitForChanges(assert);
-				}
-				// deferred case
-				return Promise.all([
-					Promise.resolve(), // request object is created async; wait for it
-					that.waitForChanges(assert)
-				]).then(function () {
-					// code under test
-					oCallFunctionResult.abort();
-					oModel.submitChanges("callFunction");
-
-					return that.waitForChanges(assert);
+						return "/SalesOrderSet('1')"
+							+ "/ToLineItems(SalesOrderID='1',ItemPosition='20')";
+					},
+					expand : "ToProduct",
+					groupId : bDeferred ? "callFunction" : undefined,
+					method : "POST",
+					urlParameters : {
+						ItemPosition : "10",
+						SalesOrderID : "1"
+					}
 				});
+
+			if (!bDeferred) {
+				// code under test
+				oCallFunctionResult.abort();
+				oModel.submitChanges();
+
+				return that.waitForChanges(assert);
+			}
+			// deferred case
+			return Promise.all([
+				Promise.resolve(), // request object is created async; wait for it
+				that.waitForChanges(assert)
+			]).then(function () {
+				// code under test
+				oCallFunctionResult.abort();
+				oModel.submitChanges("callFunction");
+
+				return that.waitForChanges(assert);
 			});
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: Function call with given expand parameter fails.
@@ -11357,22 +11435,22 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// Scenario: Controls with PropertyBinding and CompositeBinding discard invalid values when the
 	// context gets overwritten by another context that has the same values stored in the model.
 	// JIRA: CPOUI5MODELS-336
-	[true, false].forEach(function (bUseStatic) {
-		var sTitle = "CompositeBinding: Overwrite invalid entry with model value after context switch, "
-				+ "static = " + bUseStatic;
+[true, false].forEach(function (bUseStatic) {
+	var sTitle = "CompositeBinding: Overwrite invalid entry with model value after context switch, "
+			+ "static = " + bUseStatic;
 
-		QUnit.test(sTitle, function (assert) {
-			var oAmount0,
-				oCurrency0,
-				sCurrencyCodeJSON = "path : 'JSONModel>CurrencyCode',"
-					+ "type : 'sap.ui.model.odata.type.String'",
-				sCurrencyCodeStatic = "value : 'USD'",
-				oJSONModel = new JSONModel({CurrencyCode : "USD"}),
-				oModel = createSalesOrdersModel({
-					defaultBindingMode : BindingMode.TwoWay,
-					refreshAfterChange : false
-				}),
-				sView = '\
+	QUnit.test(sTitle, function (assert) {
+		var oAmount0,
+			oCurrency0,
+			sCurrencyCodeJSON = "path : 'JSONModel>CurrencyCode',"
+				+ "type : 'sap.ui.model.odata.type.String'",
+			sCurrencyCodeStatic = "value : 'USD'",
+			oJSONModel = new JSONModel({CurrencyCode : "USD"}),
+			oModel = createSalesOrdersModel({
+				defaultBindingMode : BindingMode.TwoWay,
+				refreshAfterChange : false
+			}),
+			sView = '\
 <FlexBox binding="{/SalesOrderSet(\'1\')}">\
 	<Input id="Amount0" value="{\
 			formatOptions : {showMeasure : false},\
@@ -11381,8 +11459,8 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 				path : \'GrossAmount\',\
 				type : \'sap.ui.model.odata.type.Decimal\'\
 			}, {'
-					+ (bUseStatic ? sCurrencyCodeStatic : sCurrencyCodeJSON) +
-				'}],\
+				+ (bUseStatic ? sCurrencyCodeStatic : sCurrencyCodeJSON) +
+			'}],\
 			type : \'sap.ui.model.type.Currency\'\
 		}" />\
 	<Input id="Currency0" value="{\
@@ -11395,71 +11473,71 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	<Input id="Amount1" value="{GrossAmount}" />\
 	<Input id="Currency1" value="{CurrencyCode}" />\
 </FlexBox>',
-				that = this;
+			that = this;
 
-			this.expectHeadRequest()
-				.expectRequest("SalesOrderSet('1')", {
-					CurrencyCode : "USD",
-					GrossAmount : "10",
-					SalesOrderID : "1"
-				})
-				.expectRequest("SalesOrderSet('2')", {
-					CurrencyCode : "USD",
-					GrossAmount : "10",
-					SalesOrderID : "2"
-				})
+		this.expectHeadRequest()
+			.expectRequest("SalesOrderSet('1')", {
+				CurrencyCode : "USD",
+				GrossAmount : "10",
+				SalesOrderID : "1"
+			})
+			.expectRequest("SalesOrderSet('2')", {
+				CurrencyCode : "USD",
+				GrossAmount : "10",
+				SalesOrderID : "2"
+			})
+			.expectValue("Amount0", "10.00")
+			.expectValue("Currency0", "USD")
+			.expectValue("Amount1", "10")
+			.expectValue("Currency1", "USD");
+
+		return this.createView(assert, sView, {undefined : oModel, JSONModel : oJSONModel}).then(
+				function () {
+			oAmount0 = that.oView.byId("Amount0");
+			oCurrency0 = that.oView.byId("Currency0");
+
+			that.expectMessages([{
+					descriptionUrl : undefined,
+					message : "EnterNumber",
+					target : oAmount0.getId() + "/value",
+					type : "Error"
+				}, {
+					descriptionUrl : undefined,
+					message : "EnterTextMaxLength 3",
+					target : oCurrency0.getId() + "/value",
+					type : "Error"
+				}])
+				.expectValue("Amount0", "invalid amount")
+				.expectValue("Currency0", "invalid currency")
+				.expectValueState(oAmount0, "Error", "EnterNumber")
+				.expectValueState(oCurrency0, "Error", "EnterTextMaxLength 3");
+
+
+			TestUtils.withNormalizedMessages(function () {
+				// code under test
+				oAmount0.setValue("invalid amount");
+				oCurrency0.setValue("invalid currency");
+			});
+
+			return that.waitForChanges(assert);
+		}).then(function () {
+			that.expectMessages([])
 				.expectValue("Amount0", "10.00")
 				.expectValue("Currency0", "USD")
-				.expectValue("Amount1", "10")
-				.expectValue("Currency1", "USD");
+				.expectValueState(oAmount0, "None", "")
+				.expectValueState(oCurrency0, "None", "");
 
-			return this.createView(assert, sView, {undefined : oModel, JSONModel : oJSONModel}).then(
-					function () {
-				oAmount0 = that.oView.byId("Amount0");
-				oCurrency0 = that.oView.byId("Currency0");
+			// code under test
+			oAmount0.setBindingContext(that.oView.byId("Amount1").getBindingContext());
+			oCurrency0.setBindingContext(that.oView.byId("Currency1").getBindingContext());
 
-				that.expectMessages([{
-						descriptionUrl : undefined,
-						message : "EnterNumber",
-						target : oAmount0.getId() + "/value",
-						type : "Error"
-					}, {
-						descriptionUrl : undefined,
-						message : "EnterTextMaxLength 3",
-						target : oCurrency0.getId() + "/value",
-						type : "Error"
-					}])
-					.expectValue("Amount0", "invalid amount")
-					.expectValue("Currency0", "invalid currency")
-					.expectValueState(oAmount0, "Error", "EnterNumber")
-					.expectValueState(oCurrency0, "Error", "EnterTextMaxLength 3");
+			assert.strictEqual(oAmount0.getBindingContext().getPath(), "/SalesOrderSet('2')");
+			assert.strictEqual(oCurrency0.getBindingContext().getPath(), "/SalesOrderSet('2')");
 
-
-				TestUtils.withNormalizedMessages(function () {
-					// code under test
-					oAmount0.setValue("invalid amount");
-					oCurrency0.setValue("invalid currency");
-				});
-
-				return that.waitForChanges(assert);
-			}).then(function () {
-				that.expectMessages([])
-					.expectValue("Amount0", "10.00")
-					.expectValue("Currency0", "USD")
-					.expectValueState(oAmount0, "None", "")
-					.expectValueState(oCurrency0, "None", "");
-
-				// code under test
-				oAmount0.setBindingContext(that.oView.byId("Amount1").getBindingContext());
-				oCurrency0.setBindingContext(that.oView.byId("Currency1").getBindingContext());
-
-				assert.strictEqual(oAmount0.getBindingContext().getPath(), "/SalesOrderSet('2')");
-				assert.strictEqual(oCurrency0.getBindingContext().getPath(), "/SalesOrderSet('2')");
-
-				return that.waitForChanges(assert);
-			});
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: One model instance is defined as two named models. Setting a new binding context to
@@ -11594,102 +11672,102 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// maxFractionDigits, nor minFractionDigits nor decimals are given. If the scale is lower than 3
 	// it defines the number of decimals in the formatted output.
 	// SNOR: DINC0320964
-	[
-		{vScale: "variable", sExpected0: "12.340", sExpected1: "23.400 kg", sExpected2: "0.000 kg"},
-		{vScale: 2, sExpected0: "12.34", sExpected1: "23.40 kg", sExpected2: "0.00 kg"},
-		{vScale: 5, sExpected0: "12.340", sExpected1: "23.400 kg", sExpected2: "0.000 kg"}
-	].forEach(({vScale, sExpected0, sExpected1, sExpected2}, i) => {
-		QUnit.test(`OData Unit type without unit customizing falls back to CLDR; #${i}`, function (assert) {
-			const oModel = createSpecialCasesModel({defaultBindingMode : "TwoWay"});
-			const sView = `
-	<FlexBox binding="{/ProductSet('P1')}">
-		<Input id="weight" value="{
-			parts : [{
-				constraints : { scale : '${vScale}' },
-				path : 'WeightMeasure',
-				type : 'sap.ui.model.odata.type.Decimal'
-			}, {
-				path : 'WeightUnit',
-				type : 'sap.ui.model.odata.type.String'
-			}, {
-				mode : 'OneTime',
-				path : '/##@@requestUnitsOfMeasure',
-				targetType : 'any'
-			}],
-			mode : 'TwoWay',
-			type : 'sap.ui.model.odata.type.Unit'
-		}" />
-	</FlexBox>`;
-		const that = this;
+[
+	{vScale: "variable", sExpected0: "12.340", sExpected1: "23.400 kg", sExpected2: "0.000 kg"},
+	{vScale: 2, sExpected0: "12.34", sExpected1: "23.40 kg", sExpected2: "0.00 kg"},
+	{vScale: 5, sExpected0: "12.340", sExpected1: "23.400 kg", sExpected2: "0.000 kg"}
+].forEach(({vScale, sExpected0, sExpected1, sExpected2}, i) => {
+	QUnit.test(`OData Unit type without unit customizing falls back to CLDR; #${i}`, function (assert) {
+		const oModel = createSpecialCasesModel({defaultBindingMode : "TwoWay"});
+		const sView = `
+<FlexBox binding="{/ProductSet('P1')}">
+	<Input id="weight" value="{
+		parts : [{
+			constraints : { scale : '${vScale}' },
+			path : 'WeightMeasure',
+			type : 'sap.ui.model.odata.type.Decimal'
+		}, {
+			path : 'WeightUnit',
+			type : 'sap.ui.model.odata.type.String'
+		}, {
+			mode : 'OneTime',
+			path : '/##@@requestUnitsOfMeasure',
+			targetType : 'any'
+		}],
+		mode : 'TwoWay',
+		type : 'sap.ui.model.odata.type.Unit'
+	}" />
+</FlexBox>`;
+	const that = this;
 
-			this.expectHeadRequest()
-				.expectRequest("ProductSet('P1')", {
-					ProductID : "P1",
-					WeightMeasure : "12.34",
-					WeightUnit : "mass-kilogram"
-				})
-				.expectValue("weight", sExpected0)
-				.expectValue("weight", `${sExpected0} kg`);
+		this.expectHeadRequest()
+			.expectRequest("ProductSet('P1')", {
+				ProductID : "P1",
+				WeightMeasure : "12.34",
+				WeightUnit : "mass-kilogram"
+			})
+			.expectValue("weight", sExpected0)
+			.expectValue("weight", `${sExpected0} kg`);
 
-			return this.createView(assert, sView, oModel).then(function () {
-				var oControl = that.oView.byId("weight");
+		return this.createView(assert, sView, oModel).then(function () {
+			var oControl = that.oView.byId("weight");
 
-				that.expectValue("weight", sExpected1);
+			that.expectValue("weight", sExpected1);
 
-				// code under test
-				oControl.setValue(sExpected1);
+			// code under test
+			oControl.setValue(sExpected1);
 
-				that.expectValue("weight", sExpected2)
-					.expectValue("weight", sExpected2);
+			that.expectValue("weight", sExpected2)
+				.expectValue("weight", sExpected2);
 
-				// code under test
-				oControl.setValue("");
-			});
+			// code under test
+			oControl.setValue("");
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: For Unit Types do not show any decimal places if the type of the measure part is an integer type unless
 	// the unit type itself is configured to do so.
 	// SNOW: DINC0532239
-	[
-		{sFormatOptions : "", sNumber : "12", sUnit : "12 kg"},
-		// explicitly set format options may overwrite the default of 0 resulting from the integer type
-		{sFormatOptions : "{minFractionDigits : 2, maxFractionDigits : 2}", sNumber : "12.00", sUnit : "12.00 kg"}
-	].forEach(({sFormatOptions, sNumber, sUnit}, i) => {
-		QUnit.test(`UnitType with measure part as integer (${i})`, async function (assert) {
-			const oModel = createSpecialCasesModel({defaultBindingMode : "TwoWay"});
-			const sView = `
-	<FlexBox binding="{/ProductSet('P1')}">
-		<Input id="weight" value="{
-			parts : [{
-				path : 'WeightMeasure',
-				type : 'sap.ui.model.odata.type.Int32'
-			}, {
-				path : 'WeightUnit',
-				type : 'sap.ui.model.odata.type.String'
-			}, {
-				mode : 'OneTime',
-				path : '/##@@requestUnitsOfMeasure',
-				targetType : 'any'
-			}],
-			mode : 'TwoWay',
-			type : 'sap.ui.model.odata.type.Unit'
-			${sFormatOptions ? ", formatOptions : " + sFormatOptions : ""}
-		}"/>
-	</FlexBox>`;
-			this.expectHeadRequest()
-				.expectRequest("ProductSet('P1')", {
-					ProductID : "P1",
-					WeightMeasure : 12,
-					WeightUnit : "mass-kilogram"
-				})
-				.expectValue("weight", sNumber)
-				.expectValue("weight", sUnit);
+[
+	{sFormatOptions : "", sNumber : "12", sUnit : "12 kg"},
+	// explicitly set format options may overwrite the default of 0 resulting from the integer type
+	{sFormatOptions : "{minFractionDigits : 2, maxFractionDigits : 2}", sNumber : "12.00", sUnit : "12.00 kg"}
+].forEach(({sFormatOptions, sNumber, sUnit}, i) => {
+	QUnit.test(`UnitType with measure part as integer (${i})`, async function (assert) {
+		const oModel = createSpecialCasesModel({defaultBindingMode : "TwoWay"});
+		const sView = `
+<FlexBox binding="{/ProductSet('P1')}">
+	<Input id="weight" value="{
+		parts : [{
+			path : 'WeightMeasure',
+			type : 'sap.ui.model.odata.type.Int32'
+		}, {
+			path : 'WeightUnit',
+			type : 'sap.ui.model.odata.type.String'
+		}, {
+			mode : 'OneTime',
+			path : '/##@@requestUnitsOfMeasure',
+			targetType : 'any'
+		}],
+		mode : 'TwoWay',
+		type : 'sap.ui.model.odata.type.Unit'
+		${sFormatOptions ? ", formatOptions : " + sFormatOptions : ""}
+	}"/>
+</FlexBox>`;
+		this.expectHeadRequest()
+			.expectRequest("ProductSet('P1')", {
+				ProductID : "P1",
+				WeightMeasure : 12,
+				WeightUnit : "mass-kilogram"
+			})
+			.expectValue("weight", sNumber)
+			.expectValue("weight", sUnit);
 
-			await this.createView(assert, sView, oModel);
-		});
+		await this.createView(assert, sView, oModel);
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: Do not show more decimal places than available for the amount/quantity part
@@ -11765,59 +11843,59 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// with a fix unit decimal places of 7 for the used unit code
 	// JIRA: CPOUI5MODELS-1600
 	// SNOW: DINC0152691 => consider scale default value 0 for sap.ui.model.odata.type.Decimal
-	[
-		{iMaxFractionDigits: 1, iScale: 3, sExpected: "12.3\u00a0KWH"},  // maxFractionDigits wins
-		{iMaxFractionDigits: 9, iScale: 3, sExpected: "12.3410000\u00a0KWH"}, // unit's decimal places wins
-		{iMaxFractionDigits: undefined, iScale: 3, sExpected: "12.341\u00a0KWH"}, // scale wins
-		{iMaxFractionDigits: undefined, iScale: "'variable'", sExpected: "12.3410000\u00a0KWH"}, // decimal places win
-		// DINC0152691: Decimal type scale defaults to 0 => scale wins
-		{iMaxFractionDigits: undefined, iScale: undefined, sExpected: "12\u00a0KWH"}
-	].forEach(({iMaxFractionDigits, iScale, sExpected}, i) => {
-		QUnit.test(`CPOUI5MODELS-1600: UnitType with unit maxFractionDigits, ${i}`, function (assert) {
-			const oModel = createModel("/sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/?sap-language=EN",
-				{defaultBindingMode : "TwoWay", tokenHandling : false});
-			const sScaleConstraint = iScale ? `, scale : ${iScale}` : "";
-			const sMaxFractionDigitsOption = iMaxFractionDigits ? `, maxFractionDigits : ${iMaxFractionDigits}` : "";
-			const sView = `\
-	<FlexBox binding="{/ProductSet('P1')}">
-		<Input id="weight" value="{
-			parts : [{
-				constraints : {precision : 13${sScaleConstraint}},
-				path : 'WeightMeasure',
-				type : 'sap.ui.model.odata.type.Decimal'
-			}, {
-				path : 'WeightUnit',
-				type : 'sap.ui.model.odata.type.String'
-			}, {
-				mode : 'OneTime',
-				path : '/##@@requestUnitsOfMeasure',
-				targetType : 'any'
-			}],
-			mode : 'TwoWay',
-			type : 'sap.ui.model.odata.type.Unit',
-			formatOptions : {preserveDecimals : false${sMaxFractionDigitsOption}}
-		}"/>\
-	</FlexBox>`;
+[
+	{iMaxFractionDigits: 1, iScale: 3, sExpected: "12.3\u00a0KWH"},  // maxFractionDigits wins
+	{iMaxFractionDigits: 9, iScale: 3, sExpected: "12.3410000\u00a0KWH"}, // unit's decimal places wins
+	{iMaxFractionDigits: undefined, iScale: 3, sExpected: "12.341\u00a0KWH"}, // scale wins
+	{iMaxFractionDigits: undefined, iScale: "'variable'", sExpected: "12.3410000\u00a0KWH"}, // decimal places win
+	// DINC0152691: Decimal type scale defaults to 0 => scale wins
+	{iMaxFractionDigits: undefined, iScale: undefined, sExpected: "12\u00a0KWH"}
+].forEach(({iMaxFractionDigits, iScale, sExpected}, i) => {
+	QUnit.test(`CPOUI5MODELS-1600: UnitType with unit maxFractionDigits, ${i}`, function (assert) {
+		const oModel = createModel("/sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/?sap-language=EN",
+			{defaultBindingMode : "TwoWay", tokenHandling : false});
+		const sScaleConstraint = iScale ? `, scale : ${iScale}` : "";
+		const sMaxFractionDigitsOption = iMaxFractionDigits ? `, maxFractionDigits : ${iMaxFractionDigits}` : "";
+		const sView = `\
+<FlexBox binding="{/ProductSet('P1')}">
+	<Input id="weight" value="{
+		parts : [{
+			constraints : {precision : 13${sScaleConstraint}},
+			path : 'WeightMeasure',
+			type : 'sap.ui.model.odata.type.Decimal'
+		}, {
+			path : 'WeightUnit',
+			type : 'sap.ui.model.odata.type.String'
+		}, {
+			mode : 'OneTime',
+			path : '/##@@requestUnitsOfMeasure',
+			targetType : 'any'
+		}],
+		mode : 'TwoWay',
+		type : 'sap.ui.model.odata.type.Unit',
+		formatOptions : {preserveDecimals : false${sMaxFractionDigitsOption}}
+	}"/>\
+</FlexBox>`;
 
-			this.expectRequest("ProductSet('P1')?sap-language=EN", {
-					ProductID : "P1",
-					WeightMeasure : "12.341",
-					WeightUnit : "KWH"
-				})
-				.expectRequest("SAP__UnitsOfMeasure?sap-language=EN&$skip=0&$top=5000", {
-					results : [{
-						DecimalPlaces : 7, // more decimals than WeightMeasure's scale
-						ExternalCode : "KWH",
-						ISOCode : "KWH",
-						Text : "Kilowatt hour",
-						UnitCode : "KWH"
-					}]
-				})
-				.expectValue("weight", sExpected);
+		this.expectRequest("ProductSet('P1')?sap-language=EN", {
+				ProductID : "P1",
+				WeightMeasure : "12.341",
+				WeightUnit : "KWH"
+			})
+			.expectRequest("SAP__UnitsOfMeasure?sap-language=EN&$skip=0&$top=5000", {
+				results : [{
+					DecimalPlaces : 7, // more decimals than WeightMeasure's scale
+					ExternalCode : "KWH",
+					ISOCode : "KWH",
+					Text : "Kilowatt hour",
+					UnitCode : "KWH"
+				}]
+			})
+			.expectValue("weight", sExpected);
 
-			return this.createView(assert, sView, oModel);
-		});
+		return this.createView(assert, sView, oModel);
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: Do not show more decimal places than available for the amount/quantity part.
@@ -11896,57 +11974,57 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// with a fix currency decimal places of 7 for the used currency
 	// JIRA: CPOUI5MODELS-1600
 	// SNOW: DINC0152691 => consider scale default value 0 for sap.ui.model.odata.type.Decimal
-	[
-		{iMaxFractionDigits: 1, iScale: 3, sExpected: "12.3\u00a0FOO"},  // maxFractionDigits wins
-		{iMaxFractionDigits: 9, iScale: 3, sExpected: "12.3410000\u00a0FOO"}, // currency's decimal places wins
-		{iMaxFractionDigits: undefined, iScale: 3, sExpected: "12.341\u00a0FOO"}, // scale wins
-		// currency's decimal places wins
-		{iMaxFractionDigits: undefined, iScale: "'variable'", sExpected: "12.3410000\u00a0FOO"},
-		// DINC0152691: Decimal type scale defaults to 0 => scale wins
-		{iMaxFractionDigits: undefined, iScale: undefined, sExpected: "12\u00a0FOO"}
-	].forEach(({iMaxFractionDigits, iScale, sExpected}, i) => {
-		QUnit.test(`CPOUI5MODELS-1619: CurrencyType with unit maxFractionDigits: ${i}`, function (assert) {
-			const oModel = createModel("/sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/",
-				{defaultBindingMode : "TwoWay", tokenHandling : false});
-			const sScaleConstraint = iScale ? `, scale : ${iScale}` : "";
-			const sMaxFractionDigitsOption = iMaxFractionDigits ? `, maxFractionDigits : ${iMaxFractionDigits}` : "";
-			const sView = `\
-	<FlexBox binding="{/ProductSet('P1')}">
-		<Input id="price" value="{
-			parts : [{
-				constraints : {precision : 13${sScaleConstraint}},
-				path : 'Price',
-				type : 'sap.ui.model.odata.type.Decimal'
-			}, {
-				path : 'CurrencyCode',
-				type : 'sap.ui.model.odata.type.String'
-			}, {
-				mode : 'OneTime',
-				path : '/##@@requestCurrencyCodes',
-				targetType : 'any'
-			}],
-			mode : 'TwoWay',
-			type : 'sap.ui.model.odata.type.Currency',
-			formatOptions : {preserveDecimals : false${sMaxFractionDigitsOption}}
-		}" />
-	</FlexBox>`;
+[
+	{iMaxFractionDigits: 1, iScale: 3, sExpected: "12.3\u00a0FOO"},  // maxFractionDigits wins
+	{iMaxFractionDigits: 9, iScale: 3, sExpected: "12.3410000\u00a0FOO"}, // currency's decimal places wins
+	{iMaxFractionDigits: undefined, iScale: 3, sExpected: "12.341\u00a0FOO"}, // scale wins
+	// currency's decimal places wins
+	{iMaxFractionDigits: undefined, iScale: "'variable'", sExpected: "12.3410000\u00a0FOO"},
+	// DINC0152691: Decimal type scale defaults to 0 => scale wins
+	{iMaxFractionDigits: undefined, iScale: undefined, sExpected: "12\u00a0FOO"}
+].forEach(({iMaxFractionDigits, iScale, sExpected}, i) => {
+	QUnit.test(`CPOUI5MODELS-1619: CurrencyType with unit maxFractionDigits: ${i}`, function (assert) {
+		const oModel = createModel("/sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/",
+			{defaultBindingMode : "TwoWay", tokenHandling : false});
+		const sScaleConstraint = iScale ? `, scale : ${iScale}` : "";
+		const sMaxFractionDigitsOption = iMaxFractionDigits ? `, maxFractionDigits : ${iMaxFractionDigits}` : "";
+		const sView = `\
+<FlexBox binding="{/ProductSet('P1')}">
+	<Input id="price" value="{
+		parts : [{
+			constraints : {precision : 13${sScaleConstraint}},
+			path : 'Price',
+			type : 'sap.ui.model.odata.type.Decimal'
+		}, {
+			path : 'CurrencyCode',
+			type : 'sap.ui.model.odata.type.String'
+		}, {
+			mode : 'OneTime',
+			path : '/##@@requestCurrencyCodes',
+			targetType : 'any'
+		}],
+		mode : 'TwoWay',
+		type : 'sap.ui.model.odata.type.Currency',
+		formatOptions : {preserveDecimals : false${sMaxFractionDigitsOption}}
+	}" />
+</FlexBox>`;
 
-			this.expectRequest("ProductSet('P1')", {
-					ProductID : "P1",
-					Price : "12.341",
-					CurrencyCode : "FOO"
-				})
-				.expectRequest("SAP__Currencies?sap-language=EN&$skip=0&$top=5000", {
-					results : [{
-						CurrencyCode : "FOO",
-						DecimalPlaces : 7 // more decimals than Price's scale
-					}]
-				})
-				.expectValue("price", sExpected);
+		this.expectRequest("ProductSet('P1')", {
+				ProductID : "P1",
+				Price : "12.341",
+				CurrencyCode : "FOO"
+			})
+			.expectRequest("SAP__Currencies?sap-language=EN&$skip=0&$top=5000", {
+				results : [{
+					CurrencyCode : "FOO",
+					DecimalPlaces : 7 // more decimals than Price's scale
+				}]
+			})
+			.expectValue("price", sExpected);
 
-			return this.createView(assert, sView, oModel);
-		});
+		return this.createView(assert, sView, oModel);
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: If the OData service has no customizing for currencies, the OData Currency type
@@ -12458,31 +12536,85 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 		});
 	});
 
-	[{
-		sConstraints : "",
-		sMessageText : "EnterInt",
-		sMessageType : "Error"
-	}, {
-		sConstraints : "constraints : { skipDecimalsValidation : false },",
-		sMessageText : "EnterInt",
-		sMessageType : "Error"
-	}, {
-		sConstraints : "constraints : { skipDecimalsValidation : true },",
-		sMessageText : "",
-		sMessageType : "None"
-	}].forEach(function (oFixture, i) {
-		var sTitle = "OData Unit type with code list for units; " + oFixture.sConstraints;
+	/** @deprecated As of version 1.102.0, reason OperationMode.Auto */
+	//*********************************************************************************************
+	// Scenario: If operation mode auto and a threshold is set as binding parameter and a count
+	// request returns a count smaller than the threshold then this count is used as the $top
+	// value for requesting the complete tree data.
+	// BCP: 2270014869
+	// Custom parameters are included in $count request
+	// SNOW: DINC0621482
+	QUnit.test("ODataTreeBinding: _loadCompleteTreeWithAnnotations sets $top URL parameter",
+			function (assert) {
+		var oModel = createSpecialCasesModel(),
+			sView = '\
+<t:TreeTable rows="{\
+			parameters : {\
+				countMode : \'Inline\',\
+				numberOfExpandedLevels : 2,\
+				operationMode : \'Auto\',\
+				rootLevel : 0,\
+				threshold : 200,\
+				custom: {\
+					foo: \'bar\'\
+				},\
+				treeAnnotationProperties : {\
+					hierarchyDrillStateFor : \'OrderOperationIsExpanded\',\
+					hierarchyLevelFor : \'OrderOperationRowLevel\',\
+					hierarchyNodeFor : \'OrderOperationRowID\',\
+					hierarchyParentNodeFor : \'OrderOperationParentRowID\'\
+				}\
+			},\
+			path : \'/C_RSHMaintSchedSmltdOrdAndOp\'\
+		}"\
+		visibleRowCount="2">\
+	<Text text="{MaintenanceOrder}" />\
+</t:TreeTable>';
 
-		QUnit.test(sTitle, function (assert) {
-			var oControl,
-				// Make URI distinct for each test to prevent code list caching
-				oModel = createModel("/sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC", {
-					defaultBindingMode : "TwoWay",
-					metadataUrlParams : {customMeta : "custom/meta"},
-					serviceUrlParams : {customService : "custom/service"},
-					tokenHandling : false
-				}),
-				sView = '\
+		this.expectHeadRequest()
+			.expectRequest("C_RSHMaintSchedSmltdOrdAndOp?$top=0&$inlinecount=allpages&foo=bar", {
+				__count : "150",
+				results : []
+			})
+			.expectRequest("C_RSHMaintSchedSmltdOrdAndOp?foo=bar&$top=150", {
+				results : [/*data not neccessary*/]
+			});
+
+		return this.createView(assert, sView, oModel);
+	});
+
+	//*********************************************************************************************
+	// Scenario: If the OData service works with code list for units, the OData Unit type uses this
+	// information for formatting and parsing.
+	// JIRA: CPOUI5MODELS-437
+	// If skipDecimalsValidation constraint is set to true, validation of decimal places based on
+	// the code list customizing is disabled.
+	// JIRA: CPOUI5MODELS-607
+[{
+	sConstraints : "",
+	sMessageText : "EnterInt",
+	sMessageType : "Error"
+}, {
+	sConstraints : "constraints : { skipDecimalsValidation : false },",
+	sMessageText : "EnterInt",
+	sMessageType : "Error"
+}, {
+	sConstraints : "constraints : { skipDecimalsValidation : true },",
+	sMessageText : "",
+	sMessageType : "None"
+}].forEach(function (oFixture, i) {
+	var sTitle = "OData Unit type with code list for units; " + oFixture.sConstraints;
+
+	QUnit.test(sTitle, function (assert) {
+		var oControl,
+			// Make URI distinct for each test to prevent code list caching
+			oModel = createModel("/sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC", {
+				defaultBindingMode : "TwoWay",
+				metadataUrlParams : {customMeta : "custom/meta"},
+				serviceUrlParams : {customService : "custom/service"},
+				tokenHandling : false
+			}),
+			sView = '\
 <FlexBox binding="{/ProductSet(\'P1\')}">\
 	<Input id="weight" value="{' + oFixture.sConstraints + '\
 		parts : [{\
@@ -12501,84 +12633,84 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 		type : \'sap.ui.model.odata.type.Unit\'\
 	}" />\
 </FlexBox>',
-				that = this;
+			that = this;
 
-			this.expectRequest("ProductSet('P1')?customService=custom%2Fservice", {
-					ProductID : "P1",
-					WeightMeasure : "12.34",
-					WeightUnit : "KG"
-				})
-				.expectRequest("SAP__UnitsOfMeasure?sap-language=EN&$skip=0&$top=5000", {
-					results : [{
-						DecimalPlaces : 0,
-						ExternalCode : "EA",
-						ISOCode : "EA",
-						Text : "Each",
-						UnitCode : "EA"
-					}, {
-						DecimalPlaces : 3,
-						ExternalCode : "KG",
-						ISOCode : "KGM",
-						Text : "Kilogramm",
-						UnitCode : "KG"
-					}]
-				})
-				.expectValue("weight", "12.340\u00a0KG");
+		this.expectRequest("ProductSet('P1')?customService=custom%2Fservice", {
+				ProductID : "P1",
+				WeightMeasure : "12.34",
+				WeightUnit : "KG"
+			})
+			.expectRequest("SAP__UnitsOfMeasure?sap-language=EN&$skip=0&$top=5000", {
+				results : [{
+					DecimalPlaces : 0,
+					ExternalCode : "EA",
+					ISOCode : "EA",
+					Text : "Each",
+					UnitCode : "EA"
+				}, {
+					DecimalPlaces : 3,
+					ExternalCode : "KG",
+					ISOCode : "KGM",
+					Text : "Kilogramm",
+					UnitCode : "KG"
+				}]
+			})
+			.expectValue("weight", "12.340\u00a0KG");
 
-			return this.createView(assert, sView, oModel).then(function () {
-				oControl = that.oView.byId("weight");
+		return this.createView(assert, sView, oModel).then(function () {
+			oControl = that.oView.byId("weight");
 
-				// change event for each part of the composite type
-				that.expectValue("weight", "23.400\u00a0KG")
-					.expectValue("weight", "23.400\u00a0KG");
+			// change event for each part of the composite type
+			that.expectValue("weight", "23.400\u00a0KG")
+				.expectValue("weight", "23.400\u00a0KG");
 
+			// code under test
+			oControl.setValue("23.4 KG");
+
+			that.expectValue("weight", "0.000\u00a0KG")
+				.expectValue("weight", "0.000\u00a0KG");
+
+			// code under test
+			oControl.setValue("");
+
+			that.expectMessages([{
+					descriptionUrl : undefined,
+					message : "EnterNumberFraction 3",
+					target : oControl.getId() + "/value",
+					type : "Error"
+				}])
+				.expectValue("weight", "12.3456 KG")
+				.expectValueState(that.oView.byId("weight"), "Error", "EnterNumberFraction 3");
+
+			TestUtils.withNormalizedMessages(function () {
 				// code under test
-				oControl.setValue("23.4 KG");
-
-				that.expectValue("weight", "0.000\u00a0KG")
-					.expectValue("weight", "0.000\u00a0KG");
-
-				// code under test
-				oControl.setValue("");
-
-				that.expectMessages([{
-						descriptionUrl : undefined,
-						message : "EnterNumberFraction 3",
-						target : oControl.getId() + "/value",
-						type : "Error"
-					}])
-					.expectValue("weight", "12.3456 KG")
-					.expectValueState(that.oView.byId("weight"), "Error", "EnterNumberFraction 3");
-
-				TestUtils.withNormalizedMessages(function () {
-					// code under test
-					oControl.setValue("12.3456 KG");
-				});
-
-				return that.waitForChanges(assert);
-			}).then(function () {
-				that.expectMessages(
-					oFixture.sMessageText
-					? [{
-						descriptionUrl : undefined,
-						message : oFixture.sMessageText,
-						target : oControl.getId() + "/value",
-						type : "Error"
-					}]
-					: [])
-					.expectValue("weight", "1.1\u00a0EA")
-					.expectValueState(that.oView.byId("weight"), oFixture.sMessageType,
-						oFixture.sMessageText);
-
-				TestUtils.withNormalizedMessages(function () {
-					// code under test
-					oControl.setValue("1.1\u00a0EA");
-				});
-
-				return that.waitForChanges(assert);
+				oControl.setValue("12.3456 KG");
 			});
+
+			return that.waitForChanges(assert);
+		}).then(function () {
+			that.expectMessages(
+				oFixture.sMessageText
+				? [{
+					descriptionUrl : undefined,
+					message : oFixture.sMessageText,
+					target : oControl.getId() + "/value",
+					type : "Error"
+				}]
+				: [])
+				.expectValue("weight", "1.1\u00a0EA")
+				.expectValueState(that.oView.byId("weight"), oFixture.sMessageType,
+					oFixture.sMessageText);
+
+			TestUtils.withNormalizedMessages(function () {
+				// code under test
+				oControl.setValue("1.1\u00a0EA");
+			});
+
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: If the OData service works with code list for currencies, the OData Currency type
@@ -13685,121 +13817,121 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// ODataModel#submitChanges must not create a second POST request but has to create a MERGE
 	// request with the etag received from the POST request.
 	// BCP: 2270069046
-	[false, true].forEach(function (bCustomChangeGroup) {
-		var sTitle = "ODataListBinding#create: create, modify before create is done"
-				+ (bCustomChangeGroup ? "; with custom change group" : "");
+[false, true].forEach(function (bCustomChangeGroup) {
+	var sTitle = "ODataListBinding#create: create, modify before create is done"
+			+ (bCustomChangeGroup ? "; with custom change group" : "");
 
-		QUnit.test(sTitle, function (assert) {
-			var oBinding, oCreatedContext, fnResolve, oTable,
-				oModel = createSalesOrdersModel({
-					defaultBindingMode : BindingMode.TwoWay,
-					refreshAfterChange : false
-				}),
-				sView = '\
+	QUnit.test(sTitle, function (assert) {
+		var oBinding, oCreatedContext, fnResolve, oTable,
+			oModel = createSalesOrdersModel({
+				defaultBindingMode : BindingMode.TwoWay,
+				refreshAfterChange : false
+			}),
+			sView = '\
 <Table growing="true" growingThreshold="2" id="table" items="{/SalesOrderSet}">\
 	<Input id="note" value="{Note}" />\
 	<Input id="customerID" value="{CustomerID}" />\
 </Table>',
-				that = this;
+			that = this;
 
-			function fnSubmitChanges() {
-				var mParams = {groupId : bCustomChangeGroup ? "~groupId" : undefined};
+		function fnSubmitChanges() {
+			var mParams = {groupId : bCustomChangeGroup ? "~groupId" : undefined};
 
-				oModel.submitChanges(mParams);
-			}
+			oModel.submitChanges(mParams);
+		}
 
-			this.expectHeadRequest()
-				.expectRequest("SalesOrderSet?$skip=0&$top=2", {
-					results : []
-				});
+		this.expectHeadRequest()
+			.expectRequest("SalesOrderSet?$skip=0&$top=2", {
+				results : []
+			});
 
-			if (bCustomChangeGroup) {
-				oModel.setDeferredGroups(["~groupId"]);
-				oModel.setChangeGroups({"*":{groupId: "~groupId"}});
-			}
+		if (bCustomChangeGroup) {
+			oModel.setDeferredGroups(["~groupId"]);
+			oModel.setChangeGroups({"*":{groupId: "~groupId"}});
+		}
 
-			return this.createView(assert, sView, oModel).then(function () {
-				oTable = that.oView.byId("table");
-				oBinding = oTable.getBinding("items");
+		return this.createView(assert, sView, oModel).then(function () {
+			oTable = that.oView.byId("table");
+			oBinding = oTable.getBinding("items");
 
-				that.expectValue("customerID", [""])
-					.expectValue("note", ["foo"]);
+			that.expectValue("customerID", [""])
+				.expectValue("note", ["foo"]);
 
-				// code under test
-				oCreatedContext = oBinding.create({Note : "foo"});
+			// code under test
+			oCreatedContext = oBinding.create({Note : "foo"});
 
-				return that.waitForChanges(assert);
-			}).then(function () {
-				that.expectRequest({
-						created : true,
-						data : {
-							__metadata : {
-								type : "GWSAMPLE_BASIC.SalesOrder"
-							},
-							Note : "foo"
+			return that.waitForChanges(assert);
+		}).then(function () {
+			that.expectRequest({
+					created : true,
+					data : {
+						__metadata : {
+							type : "GWSAMPLE_BASIC.SalesOrder"
 						},
-						method : "POST",
-						requestUri : "SalesOrderSet"
-					}, new Promise(function (resolve) { fnResolve = resolve; }));
+						Note : "foo"
+					},
+					method : "POST",
+					requestUri : "SalesOrderSet"
+				}, new Promise(function (resolve) { fnResolve = resolve; }));
 
-				fnSubmitChanges();
+			fnSubmitChanges();
 
-				return that.waitForChanges(assert);
-			}).then(function () {
-				that.expectValue("customerID", ["13"]);
+			return that.waitForChanges(assert);
+		}).then(function () {
+			that.expectValue("customerID", ["13"]);
 
-				oTable.getItems()[0].getCells()[1].setValue("13");
+			oTable.getItems()[0].getCells()[1].setValue("13");
 
-				return that.waitForChanges(assert);
-			}).then(function () {
-				that.expectValue("note", ["bar"]);
+			return that.waitForChanges(assert);
+		}).then(function () {
+			that.expectValue("note", ["bar"]);
 
-				fnResolve({
+			fnResolve({
+				data : {
+					__metadata : {
+						etag : "W/\"2022-04-14T08:08:58.312Z\"",
+						uri : "SalesOrderSet('42')"
+					},
+					CustomerID : "0",
+					Note : "bar",
+					SalesOrderID : "42"
+				},
+				statusCode : 201
+			});
+
+			return Promise.all([
+				// code under test
+				oCreatedContext.created(),
+				that.waitForChanges(assert)
+			]);
+		}).then(function () {
+			that.expectRequest({
 					data : {
 						__metadata : {
 							etag : "W/\"2022-04-14T08:08:58.312Z\"",
 							uri : "SalesOrderSet('42')"
 						},
-						CustomerID : "0",
-						Note : "bar",
-						SalesOrderID : "42"
+						CustomerID : "13"
 					},
-					statusCode : 201
+					headers : {
+						"If-Match" : "W/\"2022-04-14T08:08:58.312Z\""
+					},
+					key : "SalesOrderSet('42')",
+					method : "MERGE",
+					requestUri : "SalesOrderSet('42')"
+				}, {
+					data : NO_CONTENT,
+					headers : {etag : "W/\"2020-05-19T08:10:00.146Z\""},
+					statusCode : 204
 				});
 
-				return Promise.all([
-					// code under test
-					oCreatedContext.created(),
-					that.waitForChanges(assert)
-				]);
-			}).then(function () {
-				that.expectRequest({
-						data : {
-							__metadata : {
-								etag : "W/\"2022-04-14T08:08:58.312Z\"",
-								uri : "SalesOrderSet('42')"
-							},
-							CustomerID : "13"
-						},
-						headers : {
-							"If-Match" : "W/\"2022-04-14T08:08:58.312Z\""
-						},
-						key : "SalesOrderSet('42')",
-						method : "MERGE",
-						requestUri : "SalesOrderSet('42')"
-					}, {
-						data : NO_CONTENT,
-						headers : {etag : "W/\"2020-05-19T08:10:00.146Z\""},
-						statusCode : 204
-					});
+			// code under test
+			fnSubmitChanges();
 
-				// code under test
-				fnSubmitChanges();
-
-				return that.waitForChanges(assert);
-			});
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: Create a new entity and modify data before response is processed. After the
@@ -15951,72 +16083,72 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// Scenario: If the table displays only transient entities (no threshold is set) and a new
 	// control filter is set on the table the number of available entities is properly displayed.
 	// CPOUI5MODELS-692
-	[CountMode.Request, CountMode.Inline, CountMode.InlineRepeat].forEach(function (sCountMode) {
-		var sTitle = "More button is updated after filtering the data and if only transient entities"
-				+ " are displayed; count mode: " + sCountMode;
+[CountMode.Request, CountMode.Inline, CountMode.InlineRepeat].forEach(function (sCountMode) {
+	var sTitle = "More button is updated after filtering the data and if only transient entities"
+			+ " are displayed; count mode: " + sCountMode;
 
-		QUnit.test(sTitle, function (assert) {
-			var oBinding, oTable,
-				bInlineCount = sCountMode !== CountMode.Request,
-				oModel = createSalesOrdersModel({defaultCountMode : sCountMode}),
-				oResponse = {
-					results : [{__metadata : {uri : "SalesOrderSet('42')"}, SalesOrderID : "42"}]
-				},
-				sUrl = "SalesOrderSet?$skip=0&$top=1",
-				sView = '\
+	QUnit.test(sTitle, function (assert) {
+		var oBinding, oTable,
+			bInlineCount = sCountMode !== CountMode.Request,
+			oModel = createSalesOrdersModel({defaultCountMode : sCountMode}),
+			oResponse = {
+				results : [{__metadata : {uri : "SalesOrderSet('42')"}, SalesOrderID : "42"}]
+			},
+			sUrl = "SalesOrderSet?$skip=0&$top=1",
+			sView = '\
 <Table growing="true" growingThreshold="1" id="table" items="{/SalesOrderSet}">\
 	<Text id="id" text="{SalesOrderID}"/>\
 </Table>',
-				that = this;
+			that = this;
 
+		if (bInlineCount) {
+			oResponse.__count = "17";
+			sUrl += "&$inlinecount=allpages";
+		} else {
+			this.expectRequest("SalesOrderSet/$count", "17");
+		}
+		this.expectHeadRequest()
+			.expectRequest(sUrl, oResponse)
+			.expectValue("id", ["42"]);
+
+		return this.createView(assert, sView, oModel).then(function () {
+			oTable = that.oView.byId("table");
+			oBinding = oTable.getBinding("items");
+
+			assert.deepEqual(oTable.getGrowingInfo(), {actual : 1, total : 17});
+
+			that.expectValue("id", [""]);
+
+			oBinding.create({}, false);
+
+			assert.deepEqual(oTable.getGrowingInfo(), {actual : 1, total : 18});
+
+			return that.waitForChanges(assert);
+		}).then(function () {
+			oResponse = {
+				results : [{__metadata : {uri : "SalesOrderSet('42')"}, SalesOrderID : "42"}]
+			};
+			sUrl = "SalesOrderSet?$skip=0&$top=1&$filter=SalesOrderID ge '13'";
 			if (bInlineCount) {
-				oResponse.__count = "17";
+				oResponse.__count = "11";
 				sUrl += "&$inlinecount=allpages";
 			} else {
-				this.expectRequest("SalesOrderSet/$count", "17");
+				that.expectRequest("SalesOrderSet/$count?$filter=SalesOrderID ge '13'", "11");
 			}
-			this.expectHeadRequest()
-				.expectRequest(sUrl, oResponse)
-				.expectValue("id", ["42"]);
+			that.expectRequest(sUrl, oResponse);
 
-			return this.createView(assert, sView, oModel).then(function () {
-				oTable = that.oView.byId("table");
-				oBinding = oTable.getBinding("items");
+			// Simulate control filter
+			oBinding.filter(new Filter("SalesOrderID", FilterOperator.GE, "13"));
 
-				assert.deepEqual(oTable.getGrowingInfo(), {actual : 1, total : 17});
+			return that.waitForChanges(assert);
+		}).then(function () {
+			assert.strictEqual(oBinding.getCount(), 12);
+			assert.deepEqual(oTable.getGrowingInfo(), {actual : 1, total : 12});
 
-				that.expectValue("id", [""]);
-
-				oBinding.create({}, false);
-
-				assert.deepEqual(oTable.getGrowingInfo(), {actual : 1, total : 18});
-
-				return that.waitForChanges(assert);
-			}).then(function () {
-				oResponse = {
-					results : [{__metadata : {uri : "SalesOrderSet('42')"}, SalesOrderID : "42"}]
-				};
-				sUrl = "SalesOrderSet?$skip=0&$top=1&$filter=SalesOrderID ge '13'";
-				if (bInlineCount) {
-					oResponse.__count = "11";
-					sUrl += "&$inlinecount=allpages";
-				} else {
-					that.expectRequest("SalesOrderSet/$count?$filter=SalesOrderID ge '13'", "11");
-				}
-				that.expectRequest(sUrl, oResponse);
-
-				// Simulate control filter
-				oBinding.filter(new Filter("SalesOrderID", FilterOperator.GE, "13"));
-
-				return that.waitForChanges(assert);
-			}).then(function () {
-				assert.strictEqual(oBinding.getCount(), 12);
-				assert.deepEqual(oTable.getGrowingInfo(), {actual : 1, total : 12});
-
-				return that.waitForChanges(assert);
-			});
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: Simple test for creation at the end of the list; more complex cases are tested in
@@ -16550,75 +16682,75 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// and creating an entry synchronously in this order (and vice versa), the corresponding
 	// requests are in the same order in the change set in the $batch request.
 	// BCP: 2280012509
-	[
-		["callFunction", "createEntry"],
-		["createEntry", "callFunction"]
-	].forEach(function (aOrderedFunctions) {
-		var sTitle = "Correct request order with createEntry and callFunction; applied order: "
-				+ JSON.stringify(aOrderedFunctions);
+[
+	["callFunction", "createEntry"],
+	["createEntry", "callFunction"]
+].forEach(function (aOrderedFunctions) {
+	var sTitle = "Correct request order with createEntry and callFunction; applied order: "
+			+ JSON.stringify(aOrderedFunctions);
 
-		QUnit.test(sTitle, function (assert) {
-			var oModel = createSalesOrdersModel({refreshAfterChange : false, useBatch : true}),
-				oFunctions = {
-					callFunction : function () {
-						oModel.callFunction("/SalesOrder_Confirm", {
-							groupId : "changes",
-							method : "POST",
-							refreshAfterChange : false,
-							urlParameters : {
-								SalesOrderID : "0500000001"
-							}
-						});
-					},
-					createEntry : function () {
-						oModel.createEntry("/SalesOrderSet", {properties : {Note : "note"}});
-					}
-				},
-				that = this;
-
-			return this.createView(assert, "", oModel).then(function () {
-				that.expectHeadRequest()
-					.expectRequest({
-						batchNo : 1,
-						encodeRequestUri : false,
+	QUnit.test(sTitle, function (assert) {
+		var oModel = createSalesOrdersModel({refreshAfterChange : false, useBatch : true}),
+			oFunctions = {
+				callFunction : function () {
+					oModel.callFunction("/SalesOrder_Confirm", {
+						groupId : "changes",
 						method : "POST",
-						requestNo : (aOrderedFunctions.indexOf("callFunction") + 1),
-						requestUri : "SalesOrder_Confirm?SalesOrderID='0500000001'"
-					}, {
-						__metadata : {uri : "SalesOrderSet('1')"},
-						SalesOrderID : "1"
-					}, {
-						location : "/sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/SalesOrderSet('0500000001')"
-					})
-					.expectRequest({
-						batchNo : 1,
-						created : true,
-						data : {
-							__metadata : {type : "GWSAMPLE_BASIC.SalesOrder"},
-							Note : "note"
-						},
-						method : "POST",
-						requestNo : (aOrderedFunctions.indexOf("createEntry") + 1),
-						requestUri : "SalesOrderSet"
-					}, {
-						data : {
-							__metadata : {uri : "SalesOrderSet('0500000002')"},
-							Note : "note",
-							SalesOrderID : "0500000002"
-						},
-						statusCode : 201
+						refreshAfterChange : false,
+						urlParameters : {
+							SalesOrderID : "0500000001"
+						}
 					});
+				},
+				createEntry : function () {
+					oModel.createEntry("/SalesOrderSet", {properties : {Note : "note"}});
+				}
+			},
+			that = this;
 
-				// code under test
-				aOrderedFunctions.forEach(function (sFunction) {
-					oFunctions[sFunction]();
+		return this.createView(assert, "", oModel).then(function () {
+			that.expectHeadRequest()
+				.expectRequest({
+					batchNo : 1,
+					encodeRequestUri : false,
+					method : "POST",
+					requestNo : (aOrderedFunctions.indexOf("callFunction") + 1),
+					requestUri : "SalesOrder_Confirm?SalesOrderID='0500000001'"
+				}, {
+					__metadata : {uri : "SalesOrderSet('1')"},
+					SalesOrderID : "1"
+				}, {
+					location : "/sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/SalesOrderSet('0500000001')"
+				})
+				.expectRequest({
+					batchNo : 1,
+					created : true,
+					data : {
+						__metadata : {type : "GWSAMPLE_BASIC.SalesOrder"},
+						Note : "note"
+					},
+					method : "POST",
+					requestNo : (aOrderedFunctions.indexOf("createEntry") + 1),
+					requestUri : "SalesOrderSet"
+				}, {
+					data : {
+						__metadata : {uri : "SalesOrderSet('0500000002')"},
+						Note : "note",
+						SalesOrderID : "0500000002"
+					},
+					statusCode : 201
 				});
-				oModel.submitChanges();
 
-				return that.waitForChanges(assert);
+			// code under test
+			aOrderedFunctions.forEach(function (sFunction) {
+				oFunctions[sFunction]();
 			});
+			oModel.submitChanges();
+
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: Load list data with $select, create a new entry in the list, but only few
@@ -18038,14 +18170,14 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// side-effects response. The created persisted entity gets removed from the list, either after
 	// resuming the list binding, or after rebinding the table.
 	// JIRA: CPOUI5MODELS-844
-	[false, true].forEach(function (bRebind) {
-		var sTitle = "Request side effects: Remove created persisted after "
-				+ (bRebind ? "rebind" : "resume");
+[false, true].forEach(function (bRebind) {
+	var sTitle = "Request side effects: Remove created persisted after "
+			+ (bRebind ? "rebind" : "resume");
 
-		QUnit.test(sTitle, function (assert) {
-			var oBinding, oTable,
-				oModel = createSalesOrdersModel(),
-				sView = '\
+	QUnit.test(sTitle, function (assert) {
+		var oBinding, oTable,
+			oModel = createSalesOrdersModel(),
+			sView = '\
 <FlexBox id="objectPage" binding="{/BusinessPartnerSet(\'42\')}">\
 	<Text id="businessPartnerID" text="{BusinessPartnerID}"/>\
 	<t:Table id="table" rows="{ToSalesOrders}" visibleRowCount="2">\
@@ -18053,101 +18185,101 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 		<Input id="note" value="{Note}"/>\
 	</t:Table>\
 </FlexBox>',
-				that = this;
+			that = this;
 
-			this.expectHeadRequest()
-				.expectRequest("BusinessPartnerSet('42')", {
+		this.expectHeadRequest()
+			.expectRequest("BusinessPartnerSet('42')", {
+				__metadata : {uri : "BusinessPartnerSet('42')"},
+				BusinessPartnerID : "42"
+			})
+			.expectRequest("BusinessPartnerSet('42')/ToSalesOrders?$skip=0&$top=102", {
+				results : [{
+					__metadata : {uri : "SalesOrderSet('1')"},
+					SalesOrderID : "1",
+					Note : "Sales Order 1"
+				}]
+			})
+			.expectValue("businessPartnerID", "42")
+			.expectValue("salesOrderID", ["1", ""])
+			.expectValue("note", ["Sales Order 1", ""]);
+
+		return this.createView(assert, sView, oModel).then(function () {
+			oTable = that.oView.byId("table");
+			oBinding = oTable.getBinding("rows");
+
+			that.expectValue("note", "Sales Order New 1", 1);
+
+			oBinding.create({Note : "Sales Order New 1"}, true);
+
+			return that.waitForChanges(assert);
+		}).then(function () {
+			that.expectRequest({
+					created : true,
+					data : {
+						__metadata : {type : "GWSAMPLE_BASIC.SalesOrder"},
+						CustomerID : "42",
+						Note : "Sales Order New 1"
+					},
+					method : "POST",
+					requestUri : "BusinessPartnerSet('42')/ToSalesOrders"
+				}, {
+					data : {
+						__metadata : {uri : "SalesOrderSet('2')"},
+						CustomerID : "42",
+						SalesOrderID : "2",
+						Note : "Sales Order New 1"
+					},
+					statusCode : 201
+				})
+				.expectValue("salesOrderID", "2", 1);
+
+			oModel.submitChanges();
+
+			return that.waitForChanges(assert);
+		}).then(function () {
+			that.expectRequest("BusinessPartnerSet('42')?$expand=ToSalesOrders", {
 					__metadata : {uri : "BusinessPartnerSet('42')"},
-					BusinessPartnerID : "42"
-				})
-				.expectRequest("BusinessPartnerSet('42')/ToSalesOrders?$skip=0&$top=102", {
-					results : [{
-						__metadata : {uri : "SalesOrderSet('1')"},
-						SalesOrderID : "1",
-						Note : "Sales Order 1"
-					}]
-				})
-				.expectValue("businessPartnerID", "42")
-				.expectValue("salesOrderID", ["1", ""])
-				.expectValue("note", ["Sales Order 1", ""]);
-
-			return this.createView(assert, sView, oModel).then(function () {
-				oTable = that.oView.byId("table");
-				oBinding = oTable.getBinding("rows");
-
-				that.expectValue("note", "Sales Order New 1", 1);
-
-				oBinding.create({Note : "Sales Order New 1"}, true);
-
-				return that.waitForChanges(assert);
-			}).then(function () {
-				that.expectRequest({
-						created : true,
-						data : {
-							__metadata : {type : "GWSAMPLE_BASIC.SalesOrder"},
-							CustomerID : "42",
-							Note : "Sales Order New 1"
-						},
-						method : "POST",
-						requestUri : "BusinessPartnerSet('42')/ToSalesOrders"
-					}, {
-						data : {
-							__metadata : {uri : "SalesOrderSet('2')"},
-							CustomerID : "42",
-							SalesOrderID : "2",
-							Note : "Sales Order New 1"
-						},
-						statusCode : 201
-					})
-					.expectValue("salesOrderID", "2", 1);
-
-				oModel.submitChanges();
-
-				return that.waitForChanges(assert);
-			}).then(function () {
-				that.expectRequest("BusinessPartnerSet('42')?$expand=ToSalesOrders", {
-						__metadata : {uri : "BusinessPartnerSet('42')"},
-						BusinessPartnerID : "42",
-						ToSalesOrders : {
-							results : [{
-								__metadata : {uri : "SalesOrderSet('1')"},
-								SalesOrderID : "1",
-								Note : "Sales Order 1"
-							}]
-						}
-					});
-
-				// code under test
-				oBinding.suspend();
-				oModel.requestSideEffects(that.oView.byId("objectPage").getBindingContext(), {
-					urlParameters : {$expand : "ToSalesOrders"}
+					BusinessPartnerID : "42",
+					ToSalesOrders : {
+						results : [{
+							__metadata : {uri : "SalesOrderSet('1')"},
+							SalesOrderID : "1",
+							Note : "Sales Order 1"
+						}]
+					}
 				});
 
-				return that.waitForChanges(assert);
-			}).then(function () {
-				that.expectValue("salesOrderID", "", 1)
-					.expectValue("note", "", 1);
-
-				if (bRebind) {
-					that.expectRequest("BusinessPartnerSet('42')/ToSalesOrders?$skip=0&$top=102", {
-							results : [{
-								__metadata : {uri : "SalesOrderSet('1')"},
-								SalesOrderID : "1",
-								Note : "Sales Order 1"
-							}]
-						});
-
-					// code under test: rebind
-					oTable.bindRows(oTable.getBindingInfo("rows"));
-				} else {
-					// code under test: resume
-					oBinding.resume();
-				}
-
-				return that.waitForChanges(assert);
+			// code under test
+			oBinding.suspend();
+			oModel.requestSideEffects(that.oView.byId("objectPage").getBindingContext(), {
+				urlParameters : {$expand : "ToSalesOrders"}
 			});
+
+			return that.waitForChanges(assert);
+		}).then(function () {
+			that.expectValue("salesOrderID", "", 1)
+				.expectValue("note", "", 1);
+
+			if (bRebind) {
+				that.expectRequest("BusinessPartnerSet('42')/ToSalesOrders?$skip=0&$top=102", {
+						results : [{
+							__metadata : {uri : "SalesOrderSet('1')"},
+							SalesOrderID : "1",
+							Note : "Sales Order 1"
+						}]
+					});
+
+				// code under test: rebind
+				oTable.bindRows(oTable.getBindingInfo("rows"));
+			} else {
+				// code under test: resume
+				oBinding.resume();
+			}
+
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: When a table with created persisted entries is refreshed, then the created
@@ -18156,17 +18288,17 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// of the requests (requestSideEffects and then refresh, and vice versa) has no impact on the
 	// final result.
 	// JIRA: CPOUI5MODELS-844
-	[
-		["refresh", "requestSideEffects"],
-		["requestSideEffects", "refresh"]
-	].forEach(function (aOrderedFunctions) {
-		var sTitle = "Request side effects: refresh overrules the side-effects response; applied "
-				+ "order: " + JSON.stringify(aOrderedFunctions);
+[
+	["refresh", "requestSideEffects"],
+	["requestSideEffects", "refresh"]
+].forEach(function (aOrderedFunctions) {
+	var sTitle = "Request side effects: refresh overrules the side-effects response; applied "
+			+ "order: " + JSON.stringify(aOrderedFunctions);
 
-		QUnit.test(sTitle, function (assert) {
-			var oBinding,
-				oModel = createSalesOrdersModel({preliminaryContext : true}),
-				sView = '\
+	QUnit.test(sTitle, function (assert) {
+		var oBinding,
+			oModel = createSalesOrdersModel({preliminaryContext : true}),
+			sView = '\
 <FlexBox id="objectPage" binding="{/BusinessPartnerSet(\'42\')}">\
 	<Text id="businessPartnerID" text="{BusinessPartnerID}"/>\
 	<t:Table id="table" rows="{ToSalesOrders}" visibleRowCount="5">\
@@ -18174,143 +18306,143 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 		<Text id="note" text="{Note}"/>\
 	</t:Table>\
 </FlexBox>',
-				that = this;
+			that = this;
 
-			this.expectHeadRequest()
-				.expectRequest({
-					batchNo : 1,
-					requestUri : "BusinessPartnerSet('42')"
+		this.expectHeadRequest()
+			.expectRequest({
+				batchNo : 1,
+				requestUri : "BusinessPartnerSet('42')"
+			}, {
+				__metadata : {uri : "BusinessPartnerSet('42')"},
+				BusinessPartnerID : "42"
+			})
+			.expectValue("businessPartnerID", "42")
+			.expectRequest({
+				batchNo : 1,
+				requestUri : "BusinessPartnerSet('42')/ToSalesOrders?$skip=0&$top=105"
+			}, {
+				results : [{
+					__metadata : {uri : "SalesOrderSet('1')"},
+					SalesOrderID : "1",
+					Note : "Sales Order 1"
+				}]
+			})
+			.expectValue("salesOrderID", ["", "", "", "", ""])
+			.expectValue("note", ["", "", "", "", ""])
+			.expectValue("salesOrderID", ["1"])
+			.expectValue("note", ["Sales Order 1"]);
+
+		return this.createView(assert, sView, oModel).then(function () {
+			oBinding = that.oView.byId("table").getBinding("rows");
+
+			that.expectRequest({
+					batchNo : 2,
+					created : true,
+					data : {
+						__metadata : {type : "GWSAMPLE_BASIC.SalesOrder"},
+						CustomerID : "42",
+						Note : "Sales Order New: created persisted"
+					},
+					method : "POST",
+					requestUri : "BusinessPartnerSet('42')/ToSalesOrders"
+				}, {
+					data : {
+						__metadata : {uri : "SalesOrderSet('2')"},
+						CustomerID : "42",
+						SalesOrderID : "2",
+						Note : "Sales Order New: created persisted"
+					},
+					statusCode : 201
+				})
+				.expectValue("salesOrderID", ["", "1"])
+				.expectValue("note", ["Sales Order New: created persisted", "Sales Order 1"])
+				.expectValue("salesOrderID", "2", 0);
+
+			// code under test: new created persisted entity
+			oBinding.create({Note : "Sales Order New: created persisted"}, false);
+			oModel.submitChanges();
+
+			return that.waitForChanges(assert);
+		}).then(function () {
+			that.expectValue("salesOrderID", ["", "1"], 1)
+				.expectValue("note", ["Sales Order New: transient", "Sales Order 1"], 1);
+
+			// code under test: new transient entity
+			oBinding.create({Note : "Sales Order New: transient"}, true);
+
+			return that.waitForChanges(assert);
+		}).then(function () {
+			var mFunctions = {
+					refresh : function () {
+						oBinding.refresh();
+					},
+					requestSideEffects : function () {
+						oModel.requestSideEffects(that.oView.byId("objectPage").getBindingContext(),
+							{urlParameters : {$expand : "ToSalesOrders"}});
+					}
+				};
+
+			that.expectRequest({
+					batchNo : 3,
+					requestNo : (aOrderedFunctions.indexOf("requestSideEffects") + 1),
+					requestUri : "BusinessPartnerSet('42')?$expand=ToSalesOrders"
 				}, {
 					__metadata : {uri : "BusinessPartnerSet('42')"},
-					BusinessPartnerID : "42"
-				})
-				.expectValue("businessPartnerID", "42")
-				.expectRequest({
-					batchNo : 1,
-					requestUri : "BusinessPartnerSet('42')/ToSalesOrders?$skip=0&$top=105"
-				}, {
-					results : [{
-						__metadata : {uri : "SalesOrderSet('1')"},
-						SalesOrderID : "1",
-						Note : "Sales Order 1"
-					}]
-				})
-				.expectValue("salesOrderID", ["", "", "", "", ""])
-				.expectValue("note", ["", "", "", "", ""])
-				.expectValue("salesOrderID", ["1"])
-				.expectValue("note", ["Sales Order 1"]);
-
-			return this.createView(assert, sView, oModel).then(function () {
-				oBinding = that.oView.byId("table").getBinding("rows");
-
-				that.expectRequest({
-						batchNo : 2,
-						created : true,
-						data : {
-							__metadata : {type : "GWSAMPLE_BASIC.SalesOrder"},
-							CustomerID : "42",
-							Note : "Sales Order New: created persisted"
-						},
-						method : "POST",
-						requestUri : "BusinessPartnerSet('42')/ToSalesOrders"
-					}, {
-						data : {
-							__metadata : {uri : "SalesOrderSet('2')"},
-							CustomerID : "42",
-							SalesOrderID : "2",
-							Note : "Sales Order New: created persisted"
-						},
-						statusCode : 201
-					})
-					.expectValue("salesOrderID", ["", "1"])
-					.expectValue("note", ["Sales Order New: created persisted", "Sales Order 1"])
-					.expectValue("salesOrderID", "2", 0);
-
-				// code under test: new created persisted entity
-				oBinding.create({Note : "Sales Order New: created persisted"}, false);
-				oModel.submitChanges();
-
-				return that.waitForChanges(assert);
-			}).then(function () {
-				that.expectValue("salesOrderID", ["", "1"], 1)
-					.expectValue("note", ["Sales Order New: transient", "Sales Order 1"], 1);
-
-				// code under test: new transient entity
-				oBinding.create({Note : "Sales Order New: transient"}, true);
-
-				return that.waitForChanges(assert);
-			}).then(function () {
-				var mFunctions = {
-						refresh : function () {
-							oBinding.refresh();
-						},
-						requestSideEffects : function () {
-							oModel.requestSideEffects(that.oView.byId("objectPage").getBindingContext(),
-								{urlParameters : {$expand : "ToSalesOrders"}});
-						}
-					};
-
-				that.expectRequest({
-						batchNo : 3,
-						requestNo : (aOrderedFunctions.indexOf("requestSideEffects") + 1),
-						requestUri : "BusinessPartnerSet('42')?$expand=ToSalesOrders"
-					}, {
-						__metadata : {uri : "BusinessPartnerSet('42')"},
-						BusinessPartnerID : "42",
-						ToSalesOrders : {
-							results : [{
-								__metadata : {uri : "SalesOrderSet('1')"},
-								SalesOrderID : "1",
-								Note : "Sales Order 1 - SideEffect"
-							}, {
-								__metadata : {uri : "SalesOrderSet('2')"},
-								SalesOrderID : "2",
-								Note : "Sales Order New: created persisted - SideEffect"
-							}, {
-								__metadata : {uri : "SalesOrderSet('3')"},
-								SalesOrderID : "3",
-								Note : "Added via side effect - but unused due to refresh"
-							}]
-						}
-					})
-					.expectRequest({
-						batchNo : 3,
-						requestNo : (aOrderedFunctions.indexOf("refresh") + 1),
-						requestUri : "BusinessPartnerSet('42')/ToSalesOrders?$skip=0&$top=105"
-					}, {
+					BusinessPartnerID : "42",
+					ToSalesOrders : {
 						results : [{
-							__metadata : {uri : "SalesOrderSet('43')"},
-							SalesOrderID : "43",
-							Note : "Sales Order 43"
+							__metadata : {uri : "SalesOrderSet('1')"},
+							SalesOrderID : "1",
+							Note : "Sales Order 1 - SideEffect"
 						}, {
 							__metadata : {uri : "SalesOrderSet('2')"},
 							SalesOrderID : "2",
 							Note : "Sales Order New: created persisted - SideEffect"
 						}, {
-							__metadata : {uri : "SalesOrderSet('42')"},
-							SalesOrderID : "42",
-							Note : "Sales Order 42"
-						}, {
-							__metadata : {uri : "SalesOrderSet('1')"},
-							SalesOrderID : "1",
-							Note : "Sales Order 1 - SideEffect"
+							__metadata : {uri : "SalesOrderSet('3')"},
+							SalesOrderID : "3",
+							Note : "Added via side effect - but unused due to refresh"
 						}]
-					})
-					.expectValue("salesOrderID", ["", "43", "2", "42", "1"])
-					.expectValue("note", ["Sales Order New: transient", "Sales Order 43",
-						"Sales Order New: created persisted - SideEffect", "Sales Order 42",
-						"Sales Order 1 - SideEffect"]);
+					}
+				})
+				.expectRequest({
+					batchNo : 3,
+					requestNo : (aOrderedFunctions.indexOf("refresh") + 1),
+					requestUri : "BusinessPartnerSet('42')/ToSalesOrders?$skip=0&$top=105"
+				}, {
+					results : [{
+						__metadata : {uri : "SalesOrderSet('43')"},
+						SalesOrderID : "43",
+						Note : "Sales Order 43"
+					}, {
+						__metadata : {uri : "SalesOrderSet('2')"},
+						SalesOrderID : "2",
+						Note : "Sales Order New: created persisted - SideEffect"
+					}, {
+						__metadata : {uri : "SalesOrderSet('42')"},
+						SalesOrderID : "42",
+						Note : "Sales Order 42"
+					}, {
+						__metadata : {uri : "SalesOrderSet('1')"},
+						SalesOrderID : "1",
+						Note : "Sales Order 1 - SideEffect"
+					}]
+				})
+				.expectValue("salesOrderID", ["", "43", "2", "42", "1"])
+				.expectValue("note", ["Sales Order New: transient", "Sales Order 43",
+					"Sales Order New: created persisted - SideEffect", "Sales Order 42",
+					"Sales Order 1 - SideEffect"]);
 
-				// code under test: calling refresh and requestSideEffects (and vice versa) in one batch
-				// leads to the same result (refresh response wins)
-				aOrderedFunctions.forEach(function (sFunction) {
-					mFunctions[sFunction]();
-				});
-
-				return that.waitForChanges(assert);
+			// code under test: calling refresh and requestSideEffects (and vice versa) in one batch
+			// leads to the same result (refresh response wins)
+			aOrderedFunctions.forEach(function (sFunction) {
+				mFunctions[sFunction]();
 			});
+
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: When enforcing the update of a relative list binding with a transient context via
@@ -18738,139 +18870,139 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// the creation area. When these entries become created persisted, they are removed from the
 	// creation area and are handled as normal persisted entries.
 	// JIRA: CPOUI5MODELS-780
-	["refresh", "filter", "sort"].forEach(function (sAction) {
-		QUnit.test("#create with OperationMode.Client: " + sAction, function (assert) {
-			var oBinding, oContext,
-				oModel = createSalesOrdersModel({defaultOperationMode : "Client"}),
-				sView = '\
+["refresh", "filter", "sort"].forEach(function (sAction) {
+	QUnit.test("#create with OperationMode.Client: " + sAction, function (assert) {
+		var oBinding, oContext,
+			oModel = createSalesOrdersModel({defaultOperationMode : "Client"}),
+			sView = '\
 <Table id="table" items="{/SalesOrderSet}">\
 	<Input id="note" value="{Note}"/>\
 </Table>',
-				that = this;
+			that = this;
 
-			this.expectHeadRequest()
-				.expectRequest("SalesOrderSet", {
-					results : [{
-						__metadata : {uri : "SalesOrderSet('1')"},
-						SalesOrderID : "1",
-						Note : "Note 1"
-					}, {
-						__metadata : {uri : "SalesOrderSet('2')"},
-						SalesOrderID : "2",
-						Note : "Note 2"
-					}]
+		this.expectHeadRequest()
+			.expectRequest("SalesOrderSet", {
+				results : [{
+					__metadata : {uri : "SalesOrderSet('1')"},
+					SalesOrderID : "1",
+					Note : "Note 1"
+				}, {
+					__metadata : {uri : "SalesOrderSet('2')"},
+					SalesOrderID : "2",
+					Note : "Note 2"
+				}]
+			})
+			.expectValue("note", ["Note 1", "Note 2"]);
+
+		return this.createView(assert, sView, oModel).then(function () {
+			oBinding = that.oView.byId("table").getBinding("items");
+
+			that.expectValue("note", ["transient", "Note 1", "Note 2"]);
+
+			oContext = oBinding.create({Note : "transient"}, false);
+
+			return that.waitForChanges(assert);
+		}).then(function () {
+			that.expectValue("note", ["inactive", "Note 1", "Note 2"], 1);
+
+			oBinding.create({Note : "inactive"}, true, {inactive : true});
+
+			return that.waitForChanges(assert);
+		}).then(function () {
+			if (sAction === "refresh") {
+				that.expectRequest("SalesOrderSet", {
+						results : [{
+							__metadata : {uri : "SalesOrderSet('1')"},
+							SalesOrderID : "1",
+							Note : "Note 1"
+						}, {
+							__metadata : {uri : "SalesOrderSet('2')"},
+							SalesOrderID : "2",
+							Note : "Note 2"
+						}]
+					});
+
+				// code under test
+				oBinding.refresh();
+			} else if (sAction === "filter") {
+				that.expectValue("note", ["Note 2"], 2);
+
+				// code under test
+				oBinding.filter(new Filter("SalesOrderID", FilterOperator.EQ, "2"));
+			} else if (sAction === "sort") {
+				that.expectValue("note", ["Note 2", "Note 1"], 2);
+
+				// code under test
+				oBinding.sort(new Sorter("SalesOrderID", /*bDescending*/true));
+			}
+
+			return that.waitForChanges(assert);
+		}).then(function () {
+			that.expectRequest({
+					created : true,
+					data : {
+						__metadata : {type : "GWSAMPLE_BASIC.SalesOrder"},
+						Note : "transient"
+					},
+					method : "POST",
+					requestUri : "SalesOrderSet"
+				}, {
+					data : {
+						__metadata : {uri : "SalesOrderSet('3')"},
+						SalesOrderID : "3",
+						Note : "persisted"
+					},
+					statusCode : 201
 				})
-				.expectValue("note", ["Note 1", "Note 2"]);
+				.expectValue("note", "persisted", 0);
 
-			return this.createView(assert, sView, oModel).then(function () {
-				oBinding = that.oView.byId("table").getBinding("items");
+			oModel.submitChanges();
 
-				that.expectValue("note", ["transient", "Note 1", "Note 2"]);
-
-				oContext = oBinding.create({Note : "transient"}, false);
-
-				return that.waitForChanges(assert);
-			}).then(function () {
-				that.expectValue("note", ["inactive", "Note 1", "Note 2"], 1);
-
-				oBinding.create({Note : "inactive"}, true, {inactive : true});
-
-				return that.waitForChanges(assert);
-			}).then(function () {
-				if (sAction === "refresh") {
-					that.expectRequest("SalesOrderSet", {
-							results : [{
-								__metadata : {uri : "SalesOrderSet('1')"},
-								SalesOrderID : "1",
-								Note : "Note 1"
-							}, {
-								__metadata : {uri : "SalesOrderSet('2')"},
-								SalesOrderID : "2",
-								Note : "Note 2"
-							}]
-						});
-
-					// code under test
-					oBinding.refresh();
-				} else if (sAction === "filter") {
-					that.expectValue("note", ["Note 2"], 2);
-
-					// code under test
-					oBinding.filter(new Filter("SalesOrderID", FilterOperator.EQ, "2"));
-				} else if (sAction === "sort") {
-					that.expectValue("note", ["Note 2", "Note 1"], 2);
-
-					// code under test
-					oBinding.sort(new Sorter("SalesOrderID", /*bDescending*/true));
-				}
-
-				return that.waitForChanges(assert);
-			}).then(function () {
-				that.expectRequest({
-						created : true,
-						data : {
-							__metadata : {type : "GWSAMPLE_BASIC.SalesOrder"},
-							Note : "transient"
-						},
-						method : "POST",
-						requestUri : "SalesOrderSet"
-					}, {
-						data : {
+			return Promise.all([
+				oContext.created(),
+				that.waitForChanges(assert)
+			]);
+		}).then(function () {
+			if (sAction === "refresh") {
+				that.expectRequest("SalesOrderSet", {
+						results : [{
+							__metadata : {uri : "SalesOrderSet('1')"},
+							SalesOrderID : "1",
+							Note : "Note 1"
+						}, {
+							__metadata : {uri : "SalesOrderSet('2')"},
+							SalesOrderID : "2",
+							Note : "Note 2"
+						}, {
 							__metadata : {uri : "SalesOrderSet('3')"},
 							SalesOrderID : "3",
 							Note : "persisted"
-						},
-						statusCode : 201
+						}]
 					})
-					.expectValue("note", "persisted", 0);
+					.expectValue("note", ["inactive", "Note 1", "Note 2", "persisted"]);
 
-				oModel.submitChanges();
+				// code under test
+				oBinding.refresh();
+			} else if (sAction === "filter") {
+				that.expectValue("note", ["inactive", "Note 1"])
+					// "Note 2" in row 3 is unchanged
+					.expectValue("note", "persisted", 3);
 
-				return Promise.all([
-					oContext.created(),
-					that.waitForChanges(assert)
-				]);
-			}).then(function () {
-				if (sAction === "refresh") {
-					that.expectRequest("SalesOrderSet", {
-							results : [{
-								__metadata : {uri : "SalesOrderSet('1')"},
-								SalesOrderID : "1",
-								Note : "Note 1"
-							}, {
-								__metadata : {uri : "SalesOrderSet('2')"},
-								SalesOrderID : "2",
-								Note : "Note 2"
-							}, {
-								__metadata : {uri : "SalesOrderSet('3')"},
-								SalesOrderID : "3",
-								Note : "persisted"
-							}]
-						})
-						.expectValue("note", ["inactive", "Note 1", "Note 2", "persisted"]);
+				// code under test
+				oBinding.filter();
+			} else if (sAction === "sort") {
+				that.expectValue("note", ["inactive", "Note 1"])
+					// "Note 2" in row 3 is unchanged
+					.expectValue("note", "persisted", 3);
 
-					// code under test
-					oBinding.refresh();
-				} else if (sAction === "filter") {
-					that.expectValue("note", ["inactive", "Note 1"])
-						// "Note 2" in row 3 is unchanged
-						.expectValue("note", "persisted", 3);
+				// code under test
+				oBinding.sort();
+			}
 
-					// code under test
-					oBinding.filter();
-				} else if (sAction === "sort") {
-					that.expectValue("note", ["inactive", "Note 1"])
-						// "Note 2" in row 3 is unchanged
-						.expectValue("note", "persisted", 3);
-
-					// code under test
-					oBinding.sort();
-				}
-
-				return that.waitForChanges(assert);
-			});
+			return that.waitForChanges(assert);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: A list binding in "Client" mode has an inactive, a transient and a created
@@ -19439,53 +19571,53 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// Scenario: To perform hierarchy changes ODataModel#submitChanges can be used. For simple property
 	// changes a refresh/restoreTreeState is not needed.
 	// JIRA: CPOUI5MODELS-745
-	[false, true].forEach(function (bRefreshAfterChange) {
-		var sTitle = "ODataTreeBindingFlat: ODataModel#submitChanges for refreshAfterChange="
-				+ bRefreshAfterChange + " and restoreTreeStateAfterChange=true";
+[false, true].forEach(function (bRefreshAfterChange) {
+	var sTitle = "ODataTreeBindingFlat: ODataModel#submitChanges for refreshAfterChange="
+			+ bRefreshAfterChange + " and restoreTreeStateAfterChange=true";
 
-		QUnit.test(sTitle, function (assert) {
-			var oBinding, oTable,
-				oModel = createHierarchyMaintenanceModel({refreshAfterChange : bRefreshAfterChange}),
-				oNode100 = {
-					__metadata : {uri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='100')"},
-					ErhaOrder : "1",
-					ErhaOrderItem : "100",
-					ErhaOrderItemName : "foo",
-					HierarchyNode : "100",
-					HierarchyParentNode : "",
-					HierarchyDescendantCount : 0,
-					HierarchyDistanceFromRoot : 0,
-					HierarchyDrillState : "collapsed",
-					HierarchyPreorderRank : 0,
-					HierarchySiblingRank : 0
-				},
-				oNode200 = {
-					__metadata : {uri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='200')"},
-					ErhaOrder : "1",
-					ErhaOrderItem : "200",
-					ErhaOrderItemName : "bar",
-					HierarchyNode : "200",
-					HierarchyParentNode : "100",
-					HierarchyDescendantCount : 0,
-					HierarchyDistanceFromRoot : 1,
-					HierarchyDrillState : "leaf",
-					HierarchyPreorderRank : 0,
-					HierarchySiblingRank : 0
-				},
-				oNode300 = {
-					__metadata : {uri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='300')"},
-					ErhaOrder : "1",
-					ErhaOrderItem : "300",
-					ErhaOrderItemName : "baz",
-					HierarchyNode : "300",
-					HierarchyParentNode : "100",
-					HierarchyDescendantCount : 0,
-					HierarchyDistanceFromRoot : 1,
-					HierarchyDrillState : "leaf",
-					HierarchyPreorderRank : 1,
-					HierarchySiblingRank : 1
-				},
-				sView = '\
+	QUnit.test(sTitle, function (assert) {
+		var oBinding, oTable,
+			oModel = createHierarchyMaintenanceModel({refreshAfterChange : bRefreshAfterChange}),
+			oNode100 = {
+				__metadata : {uri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='100')"},
+				ErhaOrder : "1",
+				ErhaOrderItem : "100",
+				ErhaOrderItemName : "foo",
+				HierarchyNode : "100",
+				HierarchyParentNode : "",
+				HierarchyDescendantCount : 0,
+				HierarchyDistanceFromRoot : 0,
+				HierarchyDrillState : "collapsed",
+				HierarchyPreorderRank : 0,
+				HierarchySiblingRank : 0
+			},
+			oNode200 = {
+				__metadata : {uri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='200')"},
+				ErhaOrder : "1",
+				ErhaOrderItem : "200",
+				ErhaOrderItemName : "bar",
+				HierarchyNode : "200",
+				HierarchyParentNode : "100",
+				HierarchyDescendantCount : 0,
+				HierarchyDistanceFromRoot : 1,
+				HierarchyDrillState : "leaf",
+				HierarchyPreorderRank : 0,
+				HierarchySiblingRank : 0
+			},
+			oNode300 = {
+				__metadata : {uri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='300')"},
+				ErhaOrder : "1",
+				ErhaOrderItem : "300",
+				ErhaOrderItemName : "baz",
+				HierarchyNode : "300",
+				HierarchyParentNode : "100",
+				HierarchyDescendantCount : 0,
+				HierarchyDistanceFromRoot : 1,
+				HierarchyDrillState : "leaf",
+				HierarchyPreorderRank : 1,
+				HierarchySiblingRank : 1
+			},
+			sView = '\
 <t:TreeTable id="table"\
 		rows="{\
 			parameters : {\
@@ -19499,91 +19631,91 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	<Text id="itemName" text="{ErhaOrderItemName}" />\
 </t:TreeTable>';
 
-			this.expectHeadRequest()
-				.expectRequest({
-					batchNo : 1,
+		this.expectHeadRequest()
+			.expectRequest({
+				batchNo : 1,
+				requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=103&$inlinecount=allpages"
+					+ "&$filter=HierarchyDistanceFromRoot le 0"
+			}, {
+				__count : "1",
+				results : [oNode100]
+			});
+
+		return this.createView(assert, sView, oModel).then(() => {
+			oTable = this.oView.byId("table");
+
+			// don't use expectValue to avoid timing issues causing flaky tests
+			assert.deepEqual(getTableContent(oTable), [["foo"], [""], [""]]);
+
+			this.expectRequest({
+					batchNo : 2,
 					requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=103&$inlinecount=allpages"
+						+ "&$filter=HierarchyParentNode eq '100'"
+				}, {
+					__count : "2",
+					results : [oNode200, oNode300]
+				});
+
+			oTable.expand(0);
+
+			return this.waitForChanges(assert);
+		}).then(() => {
+			oBinding = oTable.getBinding("rows");
+
+			assert.deepEqual(getTableContent(oTable), [["foo"], ["bar"], ["baz"]]);
+
+			this.expectRequest({
+					batchNo : 3,
+					method : "DELETE",
+					requestUri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='300')"
+				}, NO_CONTENT)
+				.expectRequest({
+					batchNo : 4,
+					requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=1&$inlinecount=allpages"
 						+ "&$filter=HierarchyDistanceFromRoot le 0"
 				}, {
 					__count : "1",
 					results : [oNode100]
+				})
+				.expectRequest({
+					batchNo : 4,
+					requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=1&$inlinecount=allpages"
+						+ "&$filter=HierarchyParentNode eq '100'"
+				}, {
+					__count : "1",
+					results : [oNode200]
 				});
 
-			return this.createView(assert, sView, oModel).then(() => {
-				oTable = this.oView.byId("table");
+			// code under test: hierarchy change
+			oBinding.removeContext(oTable.getContextByIndex(2));
+			oModel.submitChanges();
 
-				// don't use expectValue to avoid timing issues causing flaky tests
-				assert.deepEqual(getTableContent(oTable), [["foo"], [""], [""]]);
+			return this.waitForChanges(assert);
+		}).then(() => {
+			assert.deepEqual(getTableContent(oTable), [["foo"], ["bar"], [""]]);
 
-				this.expectRequest({
-						batchNo : 2,
-						requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=103&$inlinecount=allpages"
-							+ "&$filter=HierarchyParentNode eq '100'"
-					}, {
-						__count : "2",
-						results : [oNode200, oNode300]
-					});
+			this.expectRequest({
+					batchNo : 5,
+					data : {
+						__metadata : {uri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='200')"},
+						ErhaOrderItemName : "bar: renamed"
+					},
+					deepPath : "/ErhaOrder('1')/to_Item(ErhaOrder='1',ErhaOrderItem='200')",
+					key : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='200')",
+					method : "MERGE",
+					requestUri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='200')"
+				}, NO_CONTENT);
 
-				oTable.expand(0);
+			// code under test: property change
+			oModel.setProperty("ErhaOrderItemName", "bar: renamed", oTable.getContextByIndex(1));
+			oModel.submitChanges();
 
-				return this.waitForChanges(assert);
-			}).then(() => {
-				oBinding = oTable.getBinding("rows");
-
-				assert.deepEqual(getTableContent(oTable), [["foo"], ["bar"], ["baz"]]);
-
-				this.expectRequest({
-						batchNo : 3,
-						method : "DELETE",
-						requestUri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='300')"
-					}, NO_CONTENT)
-					.expectRequest({
-						batchNo : 4,
-						requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=1&$inlinecount=allpages"
-							+ "&$filter=HierarchyDistanceFromRoot le 0"
-					}, {
-						__count : "1",
-						results : [oNode100]
-					})
-					.expectRequest({
-						batchNo : 4,
-						requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=1&$inlinecount=allpages"
-							+ "&$filter=HierarchyParentNode eq '100'"
-					}, {
-						__count : "1",
-						results : [oNode200]
-					});
-
-				// code under test: hierarchy change
-				oBinding.removeContext(oTable.getContextByIndex(2));
-				oModel.submitChanges();
-
-				return this.waitForChanges(assert);
-			}).then(() => {
-				assert.deepEqual(getTableContent(oTable), [["foo"], ["bar"], [""]]);
-
-				this.expectRequest({
-						batchNo : 5,
-						data : {
-							__metadata : {uri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='200')"},
-							ErhaOrderItemName : "bar: renamed"
-						},
-						deepPath : "/ErhaOrder('1')/to_Item(ErhaOrder='1',ErhaOrderItem='200')",
-						key : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='200')",
-						method : "MERGE",
-						requestUri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='200')"
-					}, NO_CONTENT);
-
-				// code under test: property change
-				oModel.setProperty("ErhaOrderItemName", "bar: renamed", oTable.getContextByIndex(1));
-				oModel.submitChanges();
-
-				return this.waitForChanges(assert);
-			}).then(() => {
-				assert.deepEqual(getTableContent(oTable), [["foo"], ["bar: renamed"], [""]]);
-			});
+			return this.waitForChanges(assert);
+		}).then(() => {
+			assert.deepEqual(getTableContent(oTable), [["foo"], ["bar: renamed"], [""]]);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: A filtered tree table correctly maintains its state when nodes are moved to different
@@ -19726,6 +19858,177 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 		// code under test: tree state restored
 		assert.deepEqual(getTableContent(oTable), [["foo"], ["bar"], ["baz"]]);
 	});
+
+	/** @deprecated As of version 1.104.0 */
+	//*********************************************************************************************
+	// Scenario: A table using ODataTreeBindingFlat with restoreTreeStateAfterChange=true correctly
+	// restores the tree state for property and hierarchy changes, regardless of whether
+	// refreshAfterChange is true or false.
+	// JIRA: CPOUI5MODELS-958
+	// Scenario: To perform hierarchy changes ODataTreeBinding#submitChanges can be used. For simple property
+	// changes a refresh/restoreTreeState is needed.
+	// JIRA: CPOUI5MODELS-745
+[false, true].forEach(function (bRefreshAfterChange) {
+	var sTitle = "ODataTreeBindingFlat: ODataTreeBindingFlat#submitChanges for refreshAfterChange="
+			+ bRefreshAfterChange + " and restoreTreeStateAfterChange=true";
+
+	QUnit.test(sTitle, function (assert) {
+		var oBinding, oTable,
+			oModel = createHierarchyMaintenanceModel({refreshAfterChange : bRefreshAfterChange}),
+			oNode100 = {
+				__metadata : {uri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='100')"},
+				ErhaOrder : "1",
+				ErhaOrderItem : "100",
+				ErhaOrderItemName : "foo",
+				HierarchyNode : "100",
+				HierarchyParentNode : "",
+				HierarchyDescendantCount : 0,
+				HierarchyDistanceFromRoot : 0,
+				HierarchyDrillState : "collapsed",
+				HierarchyPreorderRank : 0,
+				HierarchySiblingRank : 0
+			},
+			oNode200 = {
+				__metadata : {uri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='200')"},
+				ErhaOrder : "1",
+				ErhaOrderItem : "200",
+				ErhaOrderItemName : "bar",
+				HierarchyNode : "200",
+				HierarchyParentNode : "100",
+				HierarchyDescendantCount : 0,
+				HierarchyDistanceFromRoot : 1,
+				HierarchyDrillState : "leaf",
+				HierarchyPreorderRank : 0,
+				HierarchySiblingRank : 0
+			},
+			oNode300 = {
+				__metadata : {uri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='300')"},
+				ErhaOrder : "1",
+				ErhaOrderItem : "300",
+				ErhaOrderItemName : "baz",
+				HierarchyNode : "300",
+				HierarchyParentNode : "100",
+				HierarchyDescendantCount : 0,
+				HierarchyDistanceFromRoot : 1,
+				HierarchyDrillState : "leaf",
+				HierarchyPreorderRank : 1,
+				HierarchySiblingRank : 1
+			},
+			sView = '\
+<t:TreeTable id="table"\
+		rows="{\
+			parameters : {\
+				countMode : \'Inline\',\
+				numberOfExpandedLevels : 0,\
+				restoreTreeStateAfterChange : true\
+			},\
+			path : \'/ErhaOrder(\\\'1\\\')/to_Item\'\
+		}"\
+		visibleRowCount="3">\
+	<Text id="itemName" text="{ErhaOrderItemName}" />\
+</t:TreeTable>';
+
+		this.expectHeadRequest()
+			.expectRequest({
+				batchNo : 1,
+				requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=103&$inlinecount=allpages"
+					+ "&$filter=HierarchyDistanceFromRoot le 0"
+			}, {
+				__count : "1",
+				results : [oNode100]
+			});
+
+		return this.createView(assert, sView, oModel).then(() => {
+			oTable = this.oView.byId("table");
+
+			// don't use expectValue to avoid timing issues causing flaky tests
+			assert.deepEqual(getTableContent(oTable), [["foo"], [""], [""]]);
+
+			this.expectRequest({
+					batchNo : 2,
+					requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=103&$inlinecount=allpages"
+						+ "&$filter=HierarchyParentNode eq '100'"
+				}, {
+					__count : "2",
+					results : [oNode200, oNode300]
+				});
+
+			oTable.expand(0);
+
+			return this.waitForChanges(assert);
+		}).then(() => {
+			oBinding = oTable.getBinding("rows");
+
+			assert.deepEqual(getTableContent(oTable), [["foo"], ["bar"], ["baz"]]);
+
+			this.expectRequest({
+					batchNo : 3,
+					method : "DELETE",
+					requestUri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='300')"
+				}, NO_CONTENT)
+				.expectRequest({
+					batchNo : 4,
+					requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=1&$inlinecount=allpages"
+						+ "&$filter=HierarchyDistanceFromRoot le 0"
+				}, {
+					__count : "1",
+					results : [oNode100]
+				})
+				.expectRequest({
+					batchNo : 4,
+					requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=1&$inlinecount=allpages"
+						+ "&$filter=HierarchyParentNode eq '100'"
+				}, {
+					__count : "1",
+					results : [oNode200]
+				});
+
+			// code under test: hierarchy change
+			oBinding.removeContext(oTable.getContextByIndex(2));
+			oBinding.submitChanges();
+
+			return this.waitForChanges(assert);
+		}).then(() => {
+			assert.deepEqual(getTableContent(oTable), [["foo"], ["bar"], [""]]);
+
+			this.expectRequest({
+					batchNo : 5,
+					data : {
+						__metadata : {uri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='200')"},
+						ErhaOrderItemName : "bar: renamed"
+					},
+					deepPath : "/ErhaOrder('1')/to_Item(ErhaOrder='1',ErhaOrderItem='200')",
+					key : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='200')",
+					method : "MERGE",
+					requestUri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='200')"
+				}, NO_CONTENT)
+				.expectRequest({
+					batchNo : 6,
+					requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=1&$inlinecount=allpages"
+						+ "&$filter=HierarchyDistanceFromRoot le 0"
+				}, {
+					__count : "1",
+					results : [oNode100]
+				})
+				.expectRequest({
+					batchNo : 6,
+					requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=1&$inlinecount=allpages"
+						+ "&$filter=HierarchyParentNode eq '100'"
+				}, {
+					__count : "1",
+					results : [Object.assign(oNode200, {ErhaOrderItemName : "bar: renamed"})]
+				});
+
+			// code under test: property change
+			oModel.setProperty("ErhaOrderItemName", "bar: renamed", oTable.getContextByIndex(1));
+			oBinding.submitChanges();
+
+			return this.waitForChanges(assert);
+		}).then(() => {
+			assert.deepEqual(getTableContent(oTable), [["foo"], ["bar: renamed"], [""]]);
+		});
+	});
+});
 
 	//*********************************************************************************************
 	// Scenario: A table using ODataTreeBindingFlat with refreshAfterChange=false and
@@ -19882,6 +20185,174 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 			return this.waitForChanges(assert);
 		}).then(() => {
 			assert.deepEqual(getTableContent(oTable), [["foo"], ["bar: renamed"], [""]]);
+		});
+	});
+
+	/** @deprecated As of version 1.104.0 */
+	//*********************************************************************************************
+	// Scenario: A table using ODataTreeBindingFlat with refreshAfterChange=false and
+	// restoreTreeStateAfterChange=false. After property / hierarchy changes have been submitted the
+	// binding gets refreshed.
+	// JIRA: CPOUI5MODELS-959
+	// Scenario: To perform hierarchy changes ODataTreeBinding#submitChanges can be used. For simple property
+	// changes a refresh/restoreTreeState is needed.
+	// JIRA: CPOUI5MODELS-745
+	QUnit.test("ODataTreeBindingFlat: ODataTreeBindingFlat#submitChanges for refreshAfterChange=false and "
+			+ "restoreTreeStateAfterChange=false", function (assert) {
+		var oBinding, oTable,
+			oModel = createHierarchyMaintenanceModel({refreshAfterChange : false}),
+			oNode100 = {
+				__metadata : {uri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='100')"},
+				ErhaOrder : "1",
+				ErhaOrderItem : "100",
+				ErhaOrderItemName : "foo",
+				HierarchyNode : "100",
+				HierarchyParentNode : "",
+				HierarchyDescendantCount : 0,
+				HierarchyDistanceFromRoot : 0,
+				HierarchyDrillState : "collapsed",
+				HierarchyPreorderRank : 0,
+				HierarchySiblingRank : 0
+			},
+			oNode200 = {
+				__metadata : {uri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='200')"},
+				ErhaOrder : "1",
+				ErhaOrderItem : "200",
+				ErhaOrderItemName : "bar",
+				HierarchyNode : "200",
+				HierarchyParentNode : "100",
+				HierarchyDescendantCount : 0,
+				HierarchyDistanceFromRoot : 1,
+				HierarchyDrillState : "leaf",
+				HierarchyPreorderRank : 0,
+				HierarchySiblingRank : 0
+			},
+			oNode300 = {
+				__metadata : {uri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='300')"},
+				ErhaOrder : "1",
+				ErhaOrderItem : "300",
+				ErhaOrderItemName : "baz",
+				HierarchyNode : "300",
+				HierarchyParentNode : "100",
+				HierarchyDescendantCount : 0,
+				HierarchyDistanceFromRoot : 1,
+				HierarchyDrillState : "leaf",
+				HierarchyPreorderRank : 1,
+				HierarchySiblingRank : 1
+			},
+			sView = '\
+<t:TreeTable id="table"\
+		rows="{\
+			parameters : {\
+				countMode : \'Inline\',\
+				numberOfExpandedLevels : 0\
+			},\
+			path : \'/ErhaOrder(\\\'1\\\')/to_Item\'\
+		}"\
+		visibleRowCount="3">\
+	<Text id="itemName" text="{ErhaOrderItemName}" />\
+</t:TreeTable>';
+
+		this.expectHeadRequest()
+			.expectRequest({
+				batchNo : 1,
+				requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=103&$inlinecount=allpages"
+					+ "&$filter=HierarchyDistanceFromRoot le 0"
+			}, {
+				__count : "1",
+				results : [oNode100]
+			});
+
+		return this.createView(assert, sView, oModel).then(() => {
+			oTable = this.oView.byId("table");
+
+			// don't use expectValue to avoid timing issues causing flaky tests
+			assert.deepEqual(getTableContent(oTable), [["foo"], [""], [""]]);
+
+			this.expectRequest({
+					batchNo : 2,
+					requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=103&$inlinecount=allpages"
+						+ "&$filter=HierarchyParentNode eq '100'"
+				}, {
+					__count : "2",
+					results : [oNode200, oNode300]
+				});
+
+			oTable.expand(0);
+
+			return this.waitForChanges(assert);
+		}).then(() => {
+			oBinding = oTable.getBinding("rows");
+
+			assert.deepEqual(getTableContent(oTable), [["foo"], ["bar"], ["baz"]]);
+
+			this.expectRequest({
+					batchNo : 3,
+					method : "DELETE",
+					requestUri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='300')"
+				}, NO_CONTENT)
+				.expectRequest({
+					batchNo : 4,
+					requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=103&$inlinecount=allpages"
+						+ "&$filter=HierarchyDistanceFromRoot le 0"
+				}, {
+					__count : "1",
+					results : [oNode100]
+				});
+
+			// code under test: hierarchy change
+			oBinding.removeContext(oTable.getContextByIndex(2));
+			oBinding.submitChanges();
+
+			return this.waitForChanges(assert);
+		}).then(() => {
+			// binding gets refreshed, no restore tree state
+			assert.deepEqual(getTableContent(oTable), [["foo"], [""], [""]]);
+
+			this.expectRequest({
+					batchNo : 5,
+					requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=103&$inlinecount=allpages"
+						+ "&$filter=HierarchyParentNode eq '100'"
+				}, {
+					__count : "1",
+					results : [oNode200]
+				});
+
+			// manually expand the node again
+			oTable.expand(0);
+
+			return this.waitForChanges(assert);
+		}).then(() => {
+			assert.deepEqual(getTableContent(oTable), [["foo"], ["bar"], [""]]);
+
+			this.expectRequest({
+					batchNo : 6,
+					data : {
+						__metadata : {uri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='200')"},
+						ErhaOrderItemName : "bar: renamed"
+					},
+					deepPath : "/ErhaOrder('1')/to_Item(ErhaOrder='1',ErhaOrderItem='200')",
+					key : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='200')",
+					method : "MERGE",
+					requestUri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='200')"
+				}, NO_CONTENT)
+				.expectRequest({
+					batchNo : 7,
+					requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=103&$inlinecount=allpages"
+						+ "&$filter=HierarchyDistanceFromRoot le 0"
+				}, {
+					__count : "1",
+					results : [oNode100]
+				});
+
+			// code under test: property change
+			oModel.setProperty("ErhaOrderItemName", "bar: renamed", oTable.getContextByIndex(1));
+			oBinding.submitChanges();
+
+			return this.waitForChanges(assert);
+		}).then(() => {
+			// binding gets refreshed, no restore tree state
+			assert.deepEqual(getTableContent(oTable), [["foo"], [""], [""]]);
 		});
 	});
 
@@ -23326,93 +23797,93 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// Scenario: If the server uses server side paging and the OData model uses "Client" mode all
 	// data is requested up to the model size limit.
 	// BCP: 2380127053
-	[false, true].forEach(function (bShortRead) {
-		QUnit.test("OperationMode.Client: with server side paging, short read:" + bShortRead, function (assert) {
-			var oTable,
-				iDataReceived = 0,
-				iDataRequested = 0,
-				iExpectedSize = bShortRead ? 15 : 30,
-				oModel = createSalesOrdersModel({defaultOperationMode: "Client"}),
-				sView = '\
+[false, true].forEach(function (bShortRead) {
+	QUnit.test("OperationMode.Client: with server side paging, short read:" + bShortRead, function (assert) {
+		var oTable,
+			iDataReceived = 0,
+			iDataRequested = 0,
+			iExpectedSize = bShortRead ? 15 : 30,
+			oModel = createSalesOrdersModel({defaultOperationMode: "Client"}),
+			sView = '\
 <t:Table id="table">\
 	<Text id="note" text="{Note}"/>\
 </t:Table>',
-				that = this;
+			that = this;
 
-			function dataRequested() {
-				iDataRequested += 1;
-			}
-			function dataReceived(oEvent) {
-				var oEventData = oEvent.getParameter("data");
+		function dataRequested() {
+			iDataRequested += 1;
+		}
+		function dataReceived(oEvent) {
+			var oEventData = oEvent.getParameter("data");
 
-				iDataReceived += 1;
-				// responses are merged
-				assert.strictEqual(oEventData.results.length, iExpectedSize);
-				oEventData.results.forEach((oData, i) => {
-					assert.strictEqual(oData.Note, "SO" + (i + 1));
-				});
-				assert.strictEqual(oEventData.__count, "" + iExpectedSize);
-			}
+			iDataReceived += 1;
+			// responses are merged
+			assert.strictEqual(oEventData.results.length, iExpectedSize);
+			oEventData.results.forEach((oData, i) => {
+				assert.strictEqual(oData.Note, "SO" + (i + 1));
+			});
+			assert.strictEqual(oEventData.__count, "" + iExpectedSize);
+		}
 
-			oModel.setSizeLimit(30);
+		oModel.setSizeLimit(30);
 
-			return this.createView(assert, sView, oModel).then(function () {
-				function createItems(iFrom, iLength) {
-					var i,
-						aItems = [];
+		return this.createView(assert, sView, oModel).then(function () {
+			function createItems(iFrom, iLength) {
+				var i,
+					aItems = [];
 
-					for (i = 0; i < iLength; i += 1) {
-						aItems.push({
-							__metadata: {uri : "SalesOrderSet('" + iFrom + "')"},
-							GrossAmount: "501", // ensure all items match filter
-							Note: "SO" + iFrom,
-							SalesOrderID: "" + iFrom
-						});
-						iFrom += 1;
-					}
-
-					return aItems;
+				for (i = 0; i < iLength; i += 1) {
+					aItems.push({
+						__metadata: {uri : "SalesOrderSet('" + iFrom + "')"},
+						GrossAmount: "501", // ensure all items match filter
+						Note: "SO" + iFrom,
+						SalesOrderID: "" + iFrom
+					});
+					iFrom += 1;
 				}
 
-				that.expectHeadRequest()
-					.expectRequest("SalesOrderSet", {
-						__next: "/sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/SalesOrderSet?$skiptoken=3",
-						results: createItems(1, 3) // whitout $top server returns 3; in real maybe 100
-					})
-					.expectRequest("SalesOrderSet?$skip=3&$top=27", {
-						// if $top is given server limit is used; here 10, in real maybe 5000
-						__next: "/sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/SalesOrderSet?$top=24$skiptoken=13",
-						results: createItems(4, 10)
-					})
-					.expectRequest("SalesOrderSet?$skip=13&$top=17", {
-						// no _next link, that means server returned all requestd entries; there may be
-						// more on the server but the amount of data exceeds the model size limit
-						results: createItems(14, bShortRead ? 2 : 17)
-					});
+				return aItems;
+			}
 
-				oTable = that.oView.byId("table");
-				// code under test - client mode reads all data
-				oTable.bindRows({
-						events: {
-							dataRequested: dataRequested,
-							dataReceived: dataReceived
-						},
-						filters: [new Filter("GrossAmount", FilterOperator.GT, 500)],
-						path: "/SalesOrderSet",
-						sorter: [new Sorter("CustomerID", true)]
-					});
+			that.expectHeadRequest()
+				.expectRequest("SalesOrderSet", {
+					__next: "/sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/SalesOrderSet?$skiptoken=3",
+					results: createItems(1, 3) // whitout $top server returns 3; in real maybe 100
+				})
+				.expectRequest("SalesOrderSet?$skip=3&$top=27", {
+					// if $top is given server limit is used; here 10, in real maybe 5000
+					__next: "/sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/SalesOrderSet?$top=24$skiptoken=13",
+					results: createItems(4, 10)
+				})
+				.expectRequest("SalesOrderSet?$skip=13&$top=17", {
+					// no _next link, that means server returned all requestd entries; there may be
+					// more on the server but the amount of data exceeds the model size limit
+					results: createItems(14, bShortRead ? 2 : 17)
+				});
 
-				return that.waitForChanges(assert);
-			}).then(function () {
-				var oBinding = oTable.getBinding("rows");
+			oTable = that.oView.byId("table");
+			// code under test - client mode reads all data
+			oTable.bindRows({
+					events: {
+						dataRequested: dataRequested,
+						dataReceived: dataReceived
+					},
+					filters: [new Filter("GrossAmount", FilterOperator.GT, 500)],
+					path: "/SalesOrderSet",
+					sorter: [new Sorter("CustomerID", true)]
+				});
 
-				assert.strictEqual(oBinding.getLength(), iExpectedSize);
-				assert.strictEqual(oBinding.getCount(), iExpectedSize);
-				assert.strictEqual(iDataRequested, 1);
-				assert.strictEqual(iDataReceived, 1);
-			});
+			return that.waitForChanges(assert);
+		}).then(function () {
+			var oBinding = oTable.getBinding("rows");
+
+			assert.strictEqual(oBinding.getLength(), iExpectedSize);
+			assert.strictEqual(oBinding.getCount(), iExpectedSize);
+			assert.strictEqual(iDataRequested, 1);
+			assert.strictEqual(iDataReceived, 1);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: Skip server cache for security tokens, so that two services running on different backends behind
@@ -23569,178 +24040,178 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// request occurs. It is still possible to create new inactive entries. Check that count and length of the binding
 	// is always correct.
 	// JIRA:CPOUI5MODELS-1421
-	["Default", "Client"].forEach((sOperationMode) => {
-		const sTitle = "Filter table where only transient items have messages: operation mode=" + sOperationMode;
-		QUnit.test(sTitle, function (assert) {
-			let oMessage, oRowsBinding, oTable;
-			let aExpectedMessages = [];
-			const oModel = createSalesOrdersModel({
-					defaultBindingMode : BindingMode.TwoWay,
-					defaultCountMode : CountMode.Request,
-					defaultOperationMode : sOperationMode,
-					preliminaryContext : true
-				});
-			const sView = '\
+["Default", "Client"].forEach((sOperationMode) => {
+	const sTitle = "Filter table where only transient items have messages: operation mode=" + sOperationMode;
+	QUnit.test(sTitle, function (assert) {
+		let oMessage, oRowsBinding, oTable;
+		let aExpectedMessages = [];
+		const oModel = createSalesOrdersModel({
+				defaultBindingMode : BindingMode.TwoWay,
+				defaultCountMode : CountMode.Request,
+				defaultOperationMode : sOperationMode,
+				preliminaryContext : true
+			});
+		const sView = '\
 <t:Table id="table" rows="{/SalesOrderSet(\'1\')/ToLineItems}" visibleRowCount="3">\
 	<Input id="itemPosition" value="{ItemPosition}" />\
 	<Input id="note" value="{Note}" />\
 </t:Table>';
-			const that = this;
+		const that = this;
 
-			/* Prevents activation of passed inactive context, adds a message to the message model for
-			this context, creates another inactive context at the end if ItemPosition is empty.*/
-			function onCreateActivate(oEvent) {
-				const oCreatedContext = oEvent.getParameter("context");
-				if (!oCreatedContext.getObject("").ItemPosition) {
-					oMessage = {
-						message : "Item position is required",
-						type : "Error",
-						target : oCreatedContext.getPath() + "/ItemPosition",
-						fullTarget : oCreatedContext.getDeepPath() + "/ItemPosition",
-						processor : oModel
-					};
-					aExpectedMessages.push(oMessage);
-					that.expectMessages(aExpectedMessages);
-					Messaging.addMessages(new Message(oMessage));
-					oEvent.preventDefault();
-				} else {
-					const aCurrentMessages = Messaging.getMessageModel().getObject("/");
-					aCurrentMessages.some((oMessage) => {
-						if (oMessage.getTargets()[0] === oCreatedContext.getPath() + "/ItemPosition") {
-							Messaging.removeMessages(oMessage);
-							aExpectedMessages = aExpectedMessages.slice(0, 1);
-							return true;
-						}
-						return false;
-					});
-					that.expectMessages(aExpectedMessages);
+		/* Prevents activation of passed inactive context, adds a message to the message model for
+		this context, creates another inactive context at the end if ItemPosition is empty.*/
+		function onCreateActivate(oEvent) {
+			const oCreatedContext = oEvent.getParameter("context");
+			if (!oCreatedContext.getObject("").ItemPosition) {
+				oMessage = {
+					message : "Item position is required",
+					type : "Error",
+					target : oCreatedContext.getPath() + "/ItemPosition",
+					fullTarget : oCreatedContext.getDeepPath() + "/ItemPosition",
+					processor : oModel
+				};
+				aExpectedMessages.push(oMessage);
+				that.expectMessages(aExpectedMessages);
+				Messaging.addMessages(new Message(oMessage));
+				oEvent.preventDefault();
+			} else {
+				const aCurrentMessages = Messaging.getMessageModel().getObject("/");
+				aCurrentMessages.some((oMessage) => {
+					if (oMessage.getTargets()[0] === oCreatedContext.getPath() + "/ItemPosition") {
+						Messaging.removeMessages(oMessage);
+						aExpectedMessages = aExpectedMessages.slice(0, 1);
+						return true;
+					}
+					return false;
+				});
+				that.expectMessages(aExpectedMessages);
 
-					return; // do not create another inactive row
-				}
-
-				// code under test - create works also if binding length is not final but Filter.NONE is set
-				oRowsBinding.create({}, /*bAtEnd*/ true, {inactive: true});
+				return; // do not create another inactive row
 			}
 
-			this.expectHeadRequest()
-				.expectRequest("SalesOrderSet('1')/ToLineItems/$count", "1")
-				.expectRequest({
-					requestUri : "SalesOrderSet('1')/ToLineItems"
-						+ (sOperationMode === "Default" ? "?$skip=0&$top=103" : "")
-				}, {
-					results : [{
-						__metadata : {
-							uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
-						},
-						Note : "Bar",
-						ItemPosition : "10",
-						SalesOrderID : "1"
-					}]
-				})
-				.expectValue("itemPosition", ["10", "", ""])
-				.expectValue("note", ["Bar", "", ""]);
+			// code under test - create works also if binding length is not final but Filter.NONE is set
+			oRowsBinding.create({}, /*bAtEnd*/ true, {inactive: true});
+		}
 
-			return this.createView(assert, sView, oModel).then(() => {
-				oTable = this.oView.byId("table");
-				oRowsBinding = oTable.getBinding("rows");
-				oRowsBinding.attachCreateActivate(onCreateActivate);
-				oRowsBinding.create({}, /*bAtEnd*/ true, {inactive: true});
+		this.expectHeadRequest()
+			.expectRequest("SalesOrderSet('1')/ToLineItems/$count", "1")
+			.expectRequest({
+				requestUri : "SalesOrderSet('1')/ToLineItems"
+					+ (sOperationMode === "Default" ? "?$skip=0&$top=103" : "")
+			}, {
+				results : [{
+					__metadata : {
+						uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
+					},
+					Note : "Bar",
+					ItemPosition : "10",
+					SalesOrderID : "1"
+				}]
+			})
+			.expectValue("itemPosition", ["10", "", ""])
+			.expectValue("note", ["Bar", "", ""]);
 
-				assert.strictEqual(oRowsBinding.getCount(), 1, "1 active entry - count 1");
-				assert.strictEqual(oRowsBinding.getLength(), 2, "length is 2");
+		return this.createView(assert, sView, oModel).then(() => {
+			oTable = this.oView.byId("table");
+			oRowsBinding = oTable.getBinding("rows");
+			oRowsBinding.attachCreateActivate(onCreateActivate);
+			oRowsBinding.create({}, /*bAtEnd*/ true, {inactive: true});
 
-				return this.waitForChanges(assert);
-			}).then(() => {
-				this.expectValue("note", "Foo", 1)
-					.expectValueState(oTable.getRows()[0].getCells()[0], "None", "")
-					.expectValueState(oTable.getRows()[1].getCells()[0], "Error", "Item position is required")
-					.expectValueState(oTable.getRows()[2].getCells()[0], "None", "");
+			assert.strictEqual(oRowsBinding.getCount(), 1, "1 active entry - count 1");
+			assert.strictEqual(oRowsBinding.getLength(), 2, "length is 2");
 
-				oTable.getRows()[1].getCells()[1].setValue("Foo");
+			return this.waitForChanges(assert);
+		}).then(() => {
+			this.expectValue("note", "Foo", 1)
+				.expectValueState(oTable.getRows()[0].getCells()[0], "None", "")
+				.expectValueState(oTable.getRows()[1].getCells()[0], "Error", "Item position is required")
+				.expectValueState(oTable.getRows()[2].getCells()[0], "None", "");
 
-				return this.waitForChanges(assert);
-			}).then(() => {
-				assert.strictEqual(oRowsBinding.getCount(), 1, "1 active entry - count 1");
-				assert.strictEqual(oRowsBinding.getLength(), 3, "length is 3");
+			oTable.getRows()[1].getCells()[1].setValue("Foo");
 
-				return Promise.all([
-					oRowsBinding.requestFilterForMessages(),
-					this.waitForChanges(assert)
-				]);
-			}).then((aResults) => {
-				assert.strictEqual(aResults[0], Filter.NONE, "only transient items have messages");
+			return this.waitForChanges(assert);
+		}).then(() => {
+			assert.strictEqual(oRowsBinding.getCount(), 1, "1 active entry - count 1");
+			assert.strictEqual(oRowsBinding.getLength(), 3, "length is 3");
 
-				this.expectValue("itemPosition", "", 0)
-					.expectValue("note", "Foo", 0)
-					.expectValue("note", "", 1)
-					.expectValueState(oTable.getRows()[0].getCells()[0], "Error", "Item position is required")
-					.expectValueState(oTable.getRows()[1].getCells()[0], "None", "")
-					.expectValueState(oTable.getRows()[2].getCells()[0], "None", "");
+			return Promise.all([
+				oRowsBinding.requestFilterForMessages(),
+				this.waitForChanges(assert)
+			]);
+		}).then((aResults) => {
+			assert.strictEqual(aResults[0], Filter.NONE, "only transient items have messages");
 
-				// code under test - no requests
-				oRowsBinding.filter(aResults[0], FilterType.Application);
+			this.expectValue("itemPosition", "", 0)
+				.expectValue("note", "Foo", 0)
+				.expectValue("note", "", 1)
+				.expectValueState(oTable.getRows()[0].getCells()[0], "Error", "Item position is required")
+				.expectValueState(oTable.getRows()[1].getCells()[0], "None", "")
+				.expectValueState(oTable.getRows()[2].getCells()[0], "None", "");
 
-				assert.strictEqual(oRowsBinding.getCount(), 0, "no active entry - count 0");
-				assert.strictEqual(oRowsBinding.getLength(), 2, "length is 2");
+			// code under test - no requests
+			oRowsBinding.filter(aResults[0], FilterType.Application);
 
-				return this.waitForChanges(assert);
-			}).then(() => {
-				this.expectValue("note", "Bar", 1)
-					.expectValueState(oTable.getRows()[0].getCells()[0], "Error", "Item position is required")
-					.expectValueState(oTable.getRows()[1].getCells()[0], "Error", "Item position is required")
-					.expectValueState(oTable.getRows()[2].getCells()[0], "None", "");
+			assert.strictEqual(oRowsBinding.getCount(), 0, "no active entry - count 0");
+			assert.strictEqual(oRowsBinding.getLength(), 2, "length is 2");
 
-				oTable.getRows()[1].getCells()[1].setValue("Bar");
+			return this.waitForChanges(assert);
+		}).then(() => {
+			this.expectValue("note", "Bar", 1)
+				.expectValueState(oTable.getRows()[0].getCells()[0], "Error", "Item position is required")
+				.expectValueState(oTable.getRows()[1].getCells()[0], "Error", "Item position is required")
+				.expectValueState(oTable.getRows()[2].getCells()[0], "None", "");
 
-				return this.waitForChanges(assert);
-			}).then(() => {
-				this.expectValue("itemPosition", "30", 1)
-					.expectValueState(oTable.getRows()[0].getCells()[0], "Error", "Item position is required")
-					.expectValueState(oTable.getRows()[1].getCells()[0], "None", "")
-					.expectValueState(oTable.getRows()[2].getCells()[0], "None", "");
+			oTable.getRows()[1].getCells()[1].setValue("Bar");
 
-				oTable.getRows()[1].getCells()[0].setValue("30");
+			return this.waitForChanges(assert);
+		}).then(() => {
+			this.expectValue("itemPosition", "30", 1)
+				.expectValueState(oTable.getRows()[0].getCells()[0], "Error", "Item position is required")
+				.expectValueState(oTable.getRows()[1].getCells()[0], "None", "")
+				.expectValueState(oTable.getRows()[2].getCells()[0], "None", "");
 
-				return this.waitForChanges(assert);
-			}).then(() => {
-				assert.strictEqual(oRowsBinding.getCount(), 1, "one active entry - count 1");
-				assert.strictEqual(oRowsBinding.getLength(), 3, "length is 3");
-				if (sOperationMode === "Default" ) {
-					this.expectRequest("SalesOrderSet('1')/ToLineItems/$count", "1")
-						.expectRequest({
-							requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=103"
-						}, {
-							results : [{
-								__metadata : {
-									uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
-								},
-								Note : "Bar",
-								ItemPosition : "10",
-								SalesOrderID : "1"
-							}]
-						});
-				}
-				this.expectValue("itemPosition", ["10", "", "30"])
-					.expectValue("note", ["Bar", "Foo", "Bar"]);
+			oTable.getRows()[1].getCells()[0].setValue("30");
 
-				// code under test
-				oRowsBinding.filter([], FilterType.Application);
+			return this.waitForChanges(assert);
+		}).then(() => {
+			assert.strictEqual(oRowsBinding.getCount(), 1, "one active entry - count 1");
+			assert.strictEqual(oRowsBinding.getLength(), 3, "length is 3");
+			if (sOperationMode === "Default" ) {
+				this.expectRequest("SalesOrderSet('1')/ToLineItems/$count", "1")
+					.expectRequest({
+						requestUri : "SalesOrderSet('1')/ToLineItems?$skip=0&$top=103"
+					}, {
+						results : [{
+							__metadata : {
+								uri : "SalesOrderLineItemSet(SalesOrderID='1',ItemPosition='10')"
+							},
+							Note : "Bar",
+							ItemPosition : "10",
+							SalesOrderID : "1"
+						}]
+					});
+			}
+			this.expectValue("itemPosition", ["10", "", "30"])
+				.expectValue("note", ["Bar", "Foo", "Bar"]);
 
-				return this.waitForChanges(assert);
-			}).then(() => {
-				assert.strictEqual(oRowsBinding.getCount(), 2, "1 active entry - count 1");
-				assert.strictEqual(oRowsBinding.getLength(), 4, "length is 4");
+			// code under test
+			oRowsBinding.filter([], FilterType.Application);
 
-				return Promise.all([
-					// code under test (filter out all messages)
-					oRowsBinding.requestFilterForMessages(() => false),
-					this.waitForChanges(assert)
-				]);
-			}).then((aResults) => {
-				assert.strictEqual(aResults[0], null);
-			});
+			return this.waitForChanges(assert);
+		}).then(() => {
+			assert.strictEqual(oRowsBinding.getCount(), 2, "1 active entry - count 1");
+			assert.strictEqual(oRowsBinding.getLength(), 4, "length is 4");
+
+			return Promise.all([
+				// code under test (filter out all messages)
+				oRowsBinding.requestFilterForMessages(() => false),
+				this.waitForChanges(assert)
+			]);
+		}).then((aResults) => {
+			assert.strictEqual(aResults[0], null);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: The data state of a control in a table needs to be reevaluated if the row context changes but the
@@ -24692,432 +25163,432 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// 5c) After rejection the change is still present and can be repeated via #submitChanges wereas GET is not
 	//   repeated
 	// JIRA: CPOUI5MODELS-1750, CPOUI5MODELS-1776, CPOUI5MODELS-1787 check proper eventing
-	[true, false].forEach((bDisableHeadRequestForToken) => {
-		[true, false].forEach((bUseBatch) => {
-		const sTitle = `503 "Retry-After" handling, bUseBatch:${bUseBatch}, `
-			+ `disableHeadRequest:${bDisableHeadRequestForToken}`;
-		QUnit.test(sTitle, function (assert) {
-			let iCallbackCounter = 0;
-			let bCallbackWaiting = false;
-			let iErrorHandlerCalled = 0;
-			const mParameters = {
-				error() {
-					assert.ok(true);
-					iErrorHandlerCalled += 1;
-				},
-				success() {
-					assert.ok(false);
-				}
-			};
-			let fnRejectRetryAfter;
-			let pRetryAfterFinished;
-			let fnResolveRetryAfter;
-			let fnRolveLate503Response;
-			let oSuppliedError;
-			const oModel = createSalesOrdersModel({
-				refreshAfterChange: false,
-				useBatch: bUseBatch,
-				disableHeadRequestForToken: bDisableHeadRequestForToken
+[true, false].forEach((bDisableHeadRequestForToken) => {
+	[true, false].forEach((bUseBatch) => {
+	const sTitle = `503 "Retry-After" handling, bUseBatch:${bUseBatch}, `
+		+ `disableHeadRequest:${bDisableHeadRequestForToken}`;
+	QUnit.test(sTitle, function (assert) {
+		let iCallbackCounter = 0;
+		let bCallbackWaiting = false;
+		let iErrorHandlerCalled = 0;
+		const mParameters = {
+			error() {
+				assert.ok(true);
+				iErrorHandlerCalled += 1;
+			},
+			success() {
+				assert.ok(false);
+			}
+		};
+		let fnRejectRetryAfter;
+		let pRetryAfterFinished;
+		let fnResolveRetryAfter;
+		let fnRolveLate503Response;
+		let oSuppliedError;
+		const oModel = createSalesOrdersModel({
+			refreshAfterChange: false,
+			useBatch: bUseBatch,
+			disableHeadRequestForToken: bDisableHeadRequestForToken
+		});
+		const sView = `
+<FlexBox id="objectPage1" binding="{/SalesOrderSet('1')}">
+	<Text id="note1" text="{Note}" />
+</FlexBox>
+<FlexBox id="objectPage2">
+	<Text id="note2" text="{Note}" />
+</FlexBox>
+<FlexBox id="objectPage3">
+	<Text id="note3" text="{Note}" />
+</FlexBox>`;
+
+		oModel.setRetryAfterHandler((oError) => {
+			iCallbackCounter += 1;
+			bCallbackWaiting = true;
+			oSuppliedError = oError;
+			assert.ok(oError instanceof Error);
+			assert.strictEqual(oError.message, "HTTP request failed");
+			assert.ok(oError.retryAfter instanceof Date);
+			const pRetryAfter = new Promise((resolve, reject) => {
+				fnResolveRetryAfter = resolve;
+				fnRejectRetryAfter = reject;
 			});
-			const sView = `
-	<FlexBox id="objectPage1" binding="{/SalesOrderSet('1')}">
-		<Text id="note1" text="{Note}" />
-	</FlexBox>
-	<FlexBox id="objectPage2">
-		<Text id="note2" text="{Note}" />
-	</FlexBox>
-	<FlexBox id="objectPage3">
-		<Text id="note3" text="{Note}" />
-	</FlexBox>`;
+			pRetryAfterFinished = pRetryAfter.catch(() => {}).finally(() => {bCallbackWaiting = false;});
+			return pRetryAfter;
+		});
 
-			oModel.setRetryAfterHandler((oError) => {
-				iCallbackCounter += 1;
-				bCallbackWaiting = true;
-				oSuppliedError = oError;
-				assert.ok(oError instanceof Error);
-				assert.strictEqual(oError.message, "HTTP request failed");
-				assert.ok(oError.retryAfter instanceof Date);
-				const pRetryAfter = new Promise((resolve, reject) => {
-					fnResolveRetryAfter = resolve;
-					fnRejectRetryAfter = reject;
-				});
-				pRetryAfterFinished = pRetryAfter.catch(() => {}).finally(() => {bCallbackWaiting = false;});
-				return pRetryAfter;
-			});
+		const oEventHandlers = {
+			onBatchRequestCompleted() {},
+			onBatchRequestFailed() {},
+			onBatchRequestSent() {},
+			onRequestCompleted() {},
+			onRequestFailed() {},
+			onRequestSent() {}
+		};
+		const oEventHandlersMock = this.mock(oEventHandlers);
+		oEventHandlersMock.expects("onRequestCompleted").never();
+		oEventHandlersMock.expects("onRequestFailed").never();
+		oEventHandlersMock.expects("onRequestSent").never();
+		oEventHandlersMock.expects("onBatchRequestCompleted").never();
+		oEventHandlersMock.expects("onBatchRequestFailed").never();
+		oEventHandlersMock.expects("onBatchRequestSent").never();
+		oModel.attachRequestCompleted(null, oEventHandlers.onRequestCompleted);
+		oModel.attachRequestFailed(null, oEventHandlers.onRequestFailed);
+		oModel.attachRequestSent(null, oEventHandlers.onRequestSent);
+		oModel.attachBatchRequestCompleted(null, oEventHandlers.onBatchRequestCompleted);
+		oModel.attachBatchRequestFailed(null, oEventHandlers.onBatchRequestFailed);
+		oModel.attachBatchRequestSent(null, oEventHandlers.onBatchRequestSent);
 
-			const oEventHandlers = {
-				onBatchRequestCompleted() {},
-				onBatchRequestFailed() {},
-				onBatchRequestSent() {},
-				onRequestCompleted() {},
-				onRequestFailed() {},
-				onRequestSent() {}
-			};
-			const oEventHandlersMock = this.mock(oEventHandlers);
-			oEventHandlersMock.expects("onRequestCompleted").never();
-			oEventHandlersMock.expects("onRequestFailed").never();
-			oEventHandlersMock.expects("onRequestSent").never();
-			oEventHandlersMock.expects("onBatchRequestCompleted").never();
-			oEventHandlersMock.expects("onBatchRequestFailed").never();
-			oEventHandlersMock.expects("onBatchRequestSent").never();
-			oModel.attachRequestCompleted(null, oEventHandlers.onRequestCompleted);
-			oModel.attachRequestFailed(null, oEventHandlers.onRequestFailed);
-			oModel.attachRequestSent(null, oEventHandlers.onRequestSent);
-			oModel.attachBatchRequestCompleted(null, oEventHandlers.onBatchRequestCompleted);
-			oModel.attachBatchRequestFailed(null, oEventHandlers.onBatchRequestFailed);
-			oModel.attachBatchRequestSent(null, oEventHandlers.onBatchRequestSent);
+		function getUrl(iSalesOrderId) {
+			const sUrl = !bUseBatch ? "/sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/" : "";
+			return sUrl + "SalesOrderSet('" + iSalesOrderId + "')";
+		}
 
-			function getUrl(iSalesOrderId) {
-				const sUrl = !bUseBatch ? "/sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/" : "";
-				return sUrl + "SalesOrderSet('" + iSalesOrderId + "')";
+		function expectEvent(sEventHandlerName, iSalesOrderId, bBatch = true) {
+			const sNestedPath = bBatch ? "mParameters.requests[0].url" : "mParameters.url";
+			oEventHandlersMock.expects(sEventHandlerName)
+				.withArgs(sinon.match.hasNested(sNestedPath, getUrl(iSalesOrderId)));
 			}
 
-			function expectEvent(sEventHandlerName, iSalesOrderId, bBatch = true) {
-				const sNestedPath = bBatch ? "mParameters.requests[0].url" : "mParameters.url";
-				oEventHandlersMock.expects(sEventHandlerName)
-					.withArgs(sinon.match.hasNested(sNestedPath, getUrl(iSalesOrderId)));
-				}
+		if (bUseBatch) {
+			this.expectHeadRequest(undefined, bDisableHeadRequestForToken);
+			expectEvent("onBatchRequestSent", 1);
+		}
+		expectEvent("onRequestSent", 1, false);
+		this.expectRequest("SalesOrderSet('1')", create503ErrorResponse("1)", bUseBatch));
 
+		// code under test (1)
+		return this.createView(assert, sView, oModel).then(() => {
+			assert.ok(bCallbackWaiting);
+			assert.strictEqual(iCallbackCounter, 1);
+
+			// code under test
+			this.oView.byId("objectPage2").bindObject("/SalesOrderSet('2')");
+
+			// waitForChanges only needed for progress output
+			return this.waitForChanges(assert, "1a) reuse callback promise, no request");
+		}).then(() => {
+			assert.ok(bCallbackWaiting);
+			assert.strictEqual(iCallbackCounter, 1);
 			if (bUseBatch) {
-				this.expectHeadRequest(undefined, bDisableHeadRequestForToken);
+				expectEvent("onBatchRequestSent", 2);
+				expectEvent("onBatchRequestCompleted", 1);
+				expectEvent("onBatchRequestCompleted", 2);
+			}
+			expectEvent("onRequestSent", 2, false);
+			expectEvent("onRequestCompleted", 1, false);
+			expectEvent("onRequestCompleted", 2, false);
+
+			this.expectRequest("SalesOrderSet('1')", {SalesOrderID: "1", Note: "Foo1"})
+				.expectRequest("SalesOrderSet('2')", {SalesOrderID: "2", Note: "Foo2"})
+				.expectValue("note1", "Foo1")
+				.expectValue("note2", "Foo2");
+
+			// code under test
+			fnResolveRetryAfter();
+
+			return Promise.all([
+				pRetryAfterFinished,
+				this.waitForChanges(assert, "2) resolve -> both batches repeated")
+			]);
+		}).then(() => {
+			assert.notOk(bCallbackWaiting);
+			assert.strictEqual(iCallbackCounter, 1);
+			if (bUseBatch) {
 				expectEvent("onBatchRequestSent", 1);
+				expectEvent("onBatchRequestSent", 2);
 			}
 			expectEvent("onRequestSent", 1, false);
-			this.expectRequest("SalesOrderSet('1')", create503ErrorResponse("1)", bUseBatch));
+			expectEvent("onRequestSent", 2, false);
 
-			// code under test (1)
-			return this.createView(assert, sView, oModel).then(() => {
-				assert.ok(bCallbackWaiting);
-				assert.strictEqual(iCallbackCounter, 1);
-
-				// code under test
-				this.oView.byId("objectPage2").bindObject("/SalesOrderSet('2')");
-
-				// waitForChanges only needed for progress output
-				return this.waitForChanges(assert, "1a) reuse callback promise, no request");
-			}).then(() => {
-				assert.ok(bCallbackWaiting);
-				assert.strictEqual(iCallbackCounter, 1);
-				if (bUseBatch) {
-					expectEvent("onBatchRequestSent", 2);
-					expectEvent("onBatchRequestCompleted", 1);
-					expectEvent("onBatchRequestCompleted", 2);
-				}
-				expectEvent("onRequestSent", 2, false);
-				expectEvent("onRequestCompleted", 1, false);
-				expectEvent("onRequestCompleted", 2, false);
-
-				this.expectRequest("SalesOrderSet('1')", {SalesOrderID: "1", Note: "Foo1"})
-					.expectRequest("SalesOrderSet('2')", {SalesOrderID: "2", Note: "Foo2"})
-					.expectValue("note1", "Foo1")
-					.expectValue("note2", "Foo2");
-
-				// code under test
-				fnResolveRetryAfter();
-
-				return Promise.all([
-					pRetryAfterFinished,
-					this.waitForChanges(assert, "2) resolve -> both batches repeated")
-				]);
-			}).then(() => {
-				assert.notOk(bCallbackWaiting);
-				assert.strictEqual(iCallbackCounter, 1);
-				if (bUseBatch) {
-					expectEvent("onBatchRequestSent", 1);
-					expectEvent("onBatchRequestSent", 2);
-				}
-				expectEvent("onRequestSent", 1, false);
-				expectEvent("onRequestSent", 2, false);
-
-				this.expectRequest("SalesOrderSet('1')", resolveLater(() => {
-					// process 503 a little later than 2nd request's response, callback promise reused
-					assert.ok(bCallbackWaiting);
-					assert.strictEqual(iCallbackCounter, 2);
-					return {response: create503ErrorResponse("3) late", bUseBatch)};
-				}))
-					.expectRequest("SalesOrderSet('2')", create503ErrorResponse("3) early", bUseBatch));
-
-				// code under test (refresh via different groups in order to get separate batches)
-				this.oView.byId("objectPage1").getElementBinding().refresh(true, "refresh1");
-				this.oView.byId("objectPage2").getElementBinding().refresh(true, "refresh2");
-
-				return Promise.all([
-					resolveLater(), // wait until error processing for 1st $batch is done
-					this.waitForChanges(assert, "3) refresh answered with 503, callback only once")
-				]);
-			}).then(() => {
+			this.expectRequest("SalesOrderSet('1')", resolveLater(() => {
+				// process 503 a little later than 2nd request's response, callback promise reused
 				assert.ok(bCallbackWaiting);
 				assert.strictEqual(iCallbackCounter, 2);
-				if (bUseBatch) {
-					expectEvent("onBatchRequestFailed", 1);
-					expectEvent("onBatchRequestFailed", 2);
-					expectEvent("onBatchRequestCompleted", 1);
-					expectEvent("onBatchRequestCompleted", 2);
-				}
-				expectEvent("onRequestFailed", 1, false);
-				expectEvent("onRequestFailed", 2, false);
-				expectEvent("onRequestCompleted", 1, false);
-				expectEvent("onRequestCompleted", 2, false);
+				return {response: create503ErrorResponse("3) late", bUseBatch)};
+			}))
+				.expectRequest("SalesOrderSet('2')", create503ErrorResponse("3) early", bUseBatch));
 
-				this.expectValue("note1", "")
-					.expectValue("note2", "")
-					.expectMessages(bUseBatch ? [{
-							code: "3) late",  // 3) early was overwritten because same target "/batch"
-							message: "Service Unavailable",
-							persistent: false,
-							fullTarget: "/$batch",
-							target: "/$batch",
-							technical: true,
-							type: "Error"
-						}] : [{
-							code: "3) early",
-							message: "Service Unavailable",
-							persistent: false,
-							fullTarget: "/SalesOrderSet('2')",
-							target: "/SalesOrderSet('2')",
-							technical: true,
-							type: "Error"
-						}, {
-							code: "3) late",
-							message: "Service Unavailable",
-							persistent: false,
-							fullTarget: "/SalesOrderSet('1')",
-							target: "/SalesOrderSet('1')",
-							technical: true,
-							type: "Error"
-					}]);
+			// code under test (refresh via different groups in order to get separate batches)
+			this.oView.byId("objectPage1").getElementBinding().refresh(true, "refresh1");
+			this.oView.byId("objectPage2").getElementBinding().refresh(true, "refresh2");
 
-				let sRequest = bUseBatch
-					? "POST /sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/$batch"
-					: "GET /sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/SalesOrderSet('2')";
-				this.oLogMock.expects("error")
-					.withExactArgs("Request failed with status code 503: " + sRequest, sinon.match("3) early"),
-						sODataMessageParserClassName);
-				sRequest = bUseBatch
-					? "POST /sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/$batch"
-					: "GET /sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/SalesOrderSet('1')";
-				this.oLogMock.expects("error")
-					.withExactArgs("Request failed with status code 503: " + sRequest, sinon.match("3) late"),
-						sODataMessageParserClassName);
+			return Promise.all([
+				resolveLater(), // wait until error processing for 1st $batch is done
+				this.waitForChanges(assert, "3) refresh answered with 503, callback only once")
+			]);
+		}).then(() => {
+			assert.ok(bCallbackWaiting);
+			assert.strictEqual(iCallbackCounter, 2);
+			if (bUseBatch) {
+				expectEvent("onBatchRequestFailed", 1);
+				expectEvent("onBatchRequestFailed", 2);
+				expectEvent("onBatchRequestCompleted", 1);
+				expectEvent("onBatchRequestCompleted", 2);
+			}
+			expectEvent("onRequestFailed", 1, false);
+			expectEvent("onRequestFailed", 2, false);
+			expectEvent("onRequestCompleted", 1, false);
+			expectEvent("onRequestCompleted", 2, false);
 
-				// code under test
-				fnRejectRetryAfter(oSuppliedError);
+			this.expectValue("note1", "")
+				.expectValue("note2", "")
+				.expectMessages(bUseBatch ? [{
+						code: "3) late",  // 3) early was overwritten because same target "/batch"
+						message: "Service Unavailable",
+						persistent: false,
+						fullTarget: "/$batch",
+						target: "/$batch",
+						technical: true,
+						type: "Error"
+					}] : [{
+						code: "3) early",
+						message: "Service Unavailable",
+						persistent: false,
+						fullTarget: "/SalesOrderSet('2')",
+						target: "/SalesOrderSet('2')",
+						technical: true,
+						type: "Error"
+					}, {
+						code: "3) late",
+						message: "Service Unavailable",
+						persistent: false,
+						fullTarget: "/SalesOrderSet('1')",
+						target: "/SalesOrderSet('1')",
+						technical: true,
+						type: "Error"
+				}]);
 
-				return Promise.all([
-					pRetryAfterFinished,
-					this.waitForChanges(assert, "3a) callback rejects promise with reason oSuppliedError")
-				]);
-			}).then(() => {
-				assert.notOk(bCallbackWaiting);
-				assert.strictEqual(iCallbackCounter, 2);
-				this.removePersistentAndTechnicalMessages(); // reset messages
-				if (bUseBatch) {
-					expectEvent("onBatchRequestSent", 1);
-					expectEvent("onBatchRequestSent", 2);
-					expectEvent("onBatchRequestSent", 3);
-				}
+			let sRequest = bUseBatch
+				? "POST /sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/$batch"
+				: "GET /sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/SalesOrderSet('2')";
+			this.oLogMock.expects("error")
+				.withExactArgs("Request failed with status code 503: " + sRequest, sinon.match("3) early"),
+					sODataMessageParserClassName);
+			sRequest = bUseBatch
+				? "POST /sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/$batch"
+				: "GET /sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/SalesOrderSet('1')";
+			this.oLogMock.expects("error")
+				.withExactArgs("Request failed with status code 503: " + sRequest, sinon.match("3) late"),
+					sODataMessageParserClassName);
+
+			// code under test
+			fnRejectRetryAfter(oSuppliedError);
+
+			return Promise.all([
+				pRetryAfterFinished,
+				this.waitForChanges(assert, "3a) callback rejects promise with reason oSuppliedError")
+			]);
+		}).then(() => {
+			assert.notOk(bCallbackWaiting);
+			assert.strictEqual(iCallbackCounter, 2);
+			this.removePersistentAndTechnicalMessages(); // reset messages
+			if (bUseBatch) {
+				expectEvent("onBatchRequestSent", 1);
+				expectEvent("onBatchRequestSent", 2);
+				expectEvent("onBatchRequestSent", 3);
+			}
+			expectEvent("onRequestSent", 1, false);
+			expectEvent("onRequestSent", 2, false);
+			expectEvent("onRequestSent", 3, false);
+
+			this.expectRequest("SalesOrderSet('1')", new Promise((resolve) => {fnRolveLate503Response = resolve;}))
+				.expectRequest("SalesOrderSet('2')", create503ErrorResponse("3) for SalesOrder 2", bUseBatch))
+				.expectRequest("SalesOrderSet('3')", create503ErrorResponse("3) for SalesOrder 3", bUseBatch))
+				.expectMessages([]);
+
+			// code under test
+			this.oView.byId("objectPage1").getElementBinding().refresh(true, "refresh1");
+			this.oView.byId("objectPage2").getElementBinding().refresh(true, "refresh2");
+			this.oView.byId("objectPage3").bindObject("/SalesOrderSet('3')");
+
+			return this.waitForChanges(assert, "4) three $batchs, 2nd+3rd answered with 503, 1st answer pending");
+		}).then(() => {
+			assert.ok(bCallbackWaiting);
+			assert.strictEqual(iCallbackCounter, 3);
+			assert.ok(oModel.hasPendingRequests());
+
+			// code under test
+			fnRolveLate503Response({response: create503ErrorResponse("4) for SalesOrder 1", bUseBatch)});
+
+			return Promise.all([
+				resolveLater(), // wait until error processing for 1st $batch is done
+				this.waitForChanges(assert, "4a) 1st $batch now answered also with 503")
+			]);
+		}).then(() => {
+			assert.ok(bCallbackWaiting);
+			assert.strictEqual(iCallbackCounter, 3);
+			if (bUseBatch) {
+				expectEvent("onBatchRequestCompleted", 1);
+				expectEvent("onBatchRequestCompleted", 2);
+				expectEvent("onBatchRequestCompleted", 3);
+			}
+			expectEvent("onRequestCompleted", 1, false);
+			expectEvent("onRequestCompleted", 2, false);
+			expectEvent("onRequestCompleted", 3, false);
+
+			this.expectRequest("SalesOrderSet('1')", {SalesOrderID: "1", Note: "Bar1"})
+				.expectRequest("SalesOrderSet('2')", {SalesOrderID: "2", Note: "Bar2"})
+				.expectRequest("SalesOrderSet('3')", {SalesOrderID: "3", Note: "Bar3"});
+
+			this.expectValue("note1", "Bar1")
+				.expectValue("note2", "Bar2")
+				.expectValue("note3", "Bar3")
+				.expectMessages([]);
+
+			fnResolveRetryAfter();
+
+			return Promise.all([
+				pRetryAfterFinished,
+				this.waitForChanges(assert, '4b) see $batches once "Retry-After" resolved')
+			]);
+		}).then(() => {
+			assert.notOk(bCallbackWaiting);
+			assert.strictEqual(iCallbackCounter, 3);
+			assert.notOk(oModel.hasPendingRequests());
+			if (bUseBatch) {
+				expectEvent("onBatchRequestSent", 2);
+			}
+			expectEvent("onRequestSent", 2, false);
+
+			this.removePersistentAndTechnicalMessages(); // reset messages
+			this.expectRequest("SalesOrderSet('2')", create503ErrorResponse("5)", bUseBatch))
+				.expectMessages([]);
+
+			this.oView.byId("objectPage2").getElementBinding().refresh(true, "refresh2");
+
+			return Promise.all([
+				resolveLater(), // we have to wait until error processing for $batch is done
+				this.waitForChanges(assert, "5a) preparation")
+			]);
+		}).then(() => {
+			assert.ok(bCallbackWaiting);
+			assert.strictEqual(iCallbackCounter, 4);
+			if (bUseBatch) {
+				expectEvent("onBatchRequestSent", 1);
+				// the request cannot be send in non-batch mode as it is waiting for the security token request
 				expectEvent("onRequestSent", 1, false);
-				expectEvent("onRequestSent", 2, false);
-				expectEvent("onRequestSent", 3, false);
+			 }
+			this.expectValue("note1", "Note1 5)");
 
-				this.expectRequest("SalesOrderSet('1')", new Promise((resolve) => {fnRolveLate503Response = resolve;}))
-					.expectRequest("SalesOrderSet('2')", create503ErrorResponse("3) for SalesOrder 2", bUseBatch))
-					.expectRequest("SalesOrderSet('3')", create503ErrorResponse("3) for SalesOrder 3", bUseBatch))
-					.expectMessages([]);
+			// code under test
+			oModel.setProperty("/SalesOrderSet('1')/Note", "Note1 5)");
+			oModel.submitChanges(mParameters);
 
-				// code under test
-				this.oView.byId("objectPage1").getElementBinding().refresh(true, "refresh1");
-				this.oView.byId("objectPage2").getElementBinding().refresh(true, "refresh2");
-				this.oView.byId("objectPage3").bindObject("/SalesOrderSet('3')");
-
-				return this.waitForChanges(assert, "4) three $batchs, 2nd+3rd answered with 503, 1st answer pending");
-			}).then(() => {
-				assert.ok(bCallbackWaiting);
-				assert.strictEqual(iCallbackCounter, 3);
-				assert.ok(oModel.hasPendingRequests());
-
-				// code under test
-				fnRolveLate503Response({response: create503ErrorResponse("4) for SalesOrder 1", bUseBatch)});
-
-				return Promise.all([
-					resolveLater(), // wait until error processing for 1st $batch is done
-					this.waitForChanges(assert, "4a) 1st $batch now answered also with 503")
-				]);
-			}).then(() => {
-				assert.ok(bCallbackWaiting);
-				assert.strictEqual(iCallbackCounter, 3);
-				if (bUseBatch) {
-					expectEvent("onBatchRequestCompleted", 1);
-					expectEvent("onBatchRequestCompleted", 2);
-					expectEvent("onBatchRequestCompleted", 3);
-				}
-				expectEvent("onRequestCompleted", 1, false);
-				expectEvent("onRequestCompleted", 2, false);
-				expectEvent("onRequestCompleted", 3, false);
-
-				this.expectRequest("SalesOrderSet('1')", {SalesOrderID: "1", Note: "Bar1"})
-					.expectRequest("SalesOrderSet('2')", {SalesOrderID: "2", Note: "Bar2"})
-					.expectRequest("SalesOrderSet('3')", {SalesOrderID: "3", Note: "Bar3"});
-
-				this.expectValue("note1", "Bar1")
-					.expectValue("note2", "Bar2")
-					.expectValue("note3", "Bar3")
-					.expectMessages([]);
-
-				fnResolveRetryAfter();
-
-				return Promise.all([
-					pRetryAfterFinished,
-					this.waitForChanges(assert, '4b) see $batches once "Retry-After" resolved')
-				]);
-			}).then(() => {
-				assert.notOk(bCallbackWaiting);
-				assert.strictEqual(iCallbackCounter, 3);
-				assert.notOk(oModel.hasPendingRequests());
-				if (bUseBatch) {
-					expectEvent("onBatchRequestSent", 2);
-				}
-				expectEvent("onRequestSent", 2, false);
-
-				this.removePersistentAndTechnicalMessages(); // reset messages
-				this.expectRequest("SalesOrderSet('2')", create503ErrorResponse("5)", bUseBatch))
-					.expectMessages([]);
-
-				this.oView.byId("objectPage2").getElementBinding().refresh(true, "refresh2");
-
-				return Promise.all([
-					resolveLater(), // we have to wait until error processing for $batch is done
-					this.waitForChanges(assert, "5a) preparation")
-				]);
-			}).then(() => {
-				assert.ok(bCallbackWaiting);
-				assert.strictEqual(iCallbackCounter, 4);
-				if (bUseBatch) {
-					expectEvent("onBatchRequestSent", 1);
-					// the request cannot be send in non-batch mode as it is waiting for the security token request
-					expectEvent("onRequestSent", 1, false);
-				 }
-				this.expectValue("note1", "Note1 5)");
-
-				// code under test
-				oModel.setProperty("/SalesOrderSet('1')/Note", "Note1 5)");
-				oModel.submitChanges(mParameters);
-
-				return this.waitForChanges(assert, "5a) preparation (2nd request, a MERGE, is queued)");
-			}).then(() => {
-				assert.ok(bCallbackWaiting);
-				assert.strictEqual(iCallbackCounter, 4);
-				assert.strictEqual(oModel.hasPendingChanges(true), true);
-				assert.notOk(oModel.hasPendingRequests());
-				if (bUseBatch) {
-					oEventHandlersMock.expects("onBatchRequestSent")
-						.withArgs(sinon.match.hasNested("mParameters.requests[0].url", getUrl(3))
-							.and(sinon.match.hasNested("mParameters.requests[1].url", getUrl(1))));
-					// the requests cannot be send in non-batch mode as it is waiting for the security token request
-					expectEvent("onRequestSent", 1, false);
-					expectEvent("onRequestSent", 3, false);
-				}
-
-				this.expectValue("note3", "Note3 5)");
-
-				// code under test
-				oModel.setProperty("/SalesOrderSet('3')/Note", "Note3 5)");
-				oModel.submitChanges(mParameters);
-
-				return this.waitForChanges(assert, "5a) preparation (3nd request, another MERGE is queued)");
-			}).then(() => {
-				assert.ok(bCallbackWaiting);
-				assert.strictEqual(iCallbackCounter, 4);
-				assert.ok(oModel.hasPendingChanges(true));
-				assert.notOk(oModel.hasPendingRequests());
-				if (bUseBatch) {
-					expectEvent("onBatchRequestFailed", 1);
-					expectEvent("onBatchRequestFailed", 2);
-					oEventHandlersMock.expects("onBatchRequestFailed")
-						.withArgs(sinon.match.hasNested("mParameters.requests[0].url", getUrl(3))
-							.and(sinon.match.hasNested("mParameters.requests[1].url", getUrl(1))));
-					expectEvent("onBatchRequestCompleted", 1);
-					expectEvent("onBatchRequestCompleted", 2);
-					oEventHandlersMock.expects("onBatchRequestCompleted")
-						.withArgs(sinon.match.hasNested("mParameters.requests[0].url", getUrl(3))
-							.and(sinon.match.hasNested("mParameters.requests[1].url", getUrl(1))));
-				}
-				expectEvent("onRequestFailed", 1, false);
-				expectEvent("onRequestFailed", 1, false);
-				expectEvent("onRequestFailed", 2, false);
-				expectEvent("onRequestFailed", 3, false);
-				expectEvent("onRequestCompleted", 1, false);
-				expectEvent("onRequestCompleted", 1, false);
-				expectEvent("onRequestCompleted", 2, false);
-				expectEvent("onRequestCompleted", 3, false);
-
-				this.expectValue("note2", "")
-					.expectMessages([]);
-				this.oLogMock.expects("error")
-					.withExactArgs("Retry-After handler rejected with: Rejected by User",
-						sinon.match.string, sODataModelClassName);
-
-				// code under test
-				fnRejectRetryAfter(new Error("Rejected by User"));
-
-				return Promise.all([
-					pRetryAfterFinished,
-					this.waitForChanges(assert, "5b) rejection with own error, only logged")
-				]);
-			}).then(() => {
-				// Note: for bUseBatch:false the supplied errorhandler is not called because in
-				// ODataModel#_processRequestQueue fnError is NOT passed to #_submitSingleRequest.
-				assert.strictEqual(iErrorHandlerCalled, bUseBatch ? 2 : 0);
-				assert.strictEqual(oModel.hasPendingChanges(true), true);
-				if (bUseBatch) {
-					oEventHandlersMock.expects("onBatchRequestSent")
-						.withArgs(sinon.match.hasNested("mParameters.requests[0].url", getUrl(1))
-							.and(sinon.match.hasNested("mParameters.requests[1].url", getUrl(3))));
-					oEventHandlersMock.expects("onBatchRequestCompleted")
-						.withArgs(sinon.match.hasNested("mParameters.requests[0].url", getUrl(1))
-							.and(sinon.match.hasNested("mParameters.requests[1].url", getUrl(3))));
-				}
+			return this.waitForChanges(assert, "5a) preparation (2nd request, a MERGE, is queued)");
+		}).then(() => {
+			assert.ok(bCallbackWaiting);
+			assert.strictEqual(iCallbackCounter, 4);
+			assert.strictEqual(oModel.hasPendingChanges(true), true);
+			assert.notOk(oModel.hasPendingRequests());
+			if (bUseBatch) {
+				oEventHandlersMock.expects("onBatchRequestSent")
+					.withArgs(sinon.match.hasNested("mParameters.requests[0].url", getUrl(3))
+						.and(sinon.match.hasNested("mParameters.requests[1].url", getUrl(1))));
+				// the requests cannot be send in non-batch mode as it is waiting for the security token request
 				expectEvent("onRequestSent", 1, false);
 				expectEvent("onRequestSent", 3, false);
-				expectEvent("onRequestCompleted", 1, false);
-				expectEvent("onRequestCompleted", 3, false);
+			}
 
-				if (!bUseBatch) {
-					this.expectHeadRequest(undefined, bDisableHeadRequestForToken);
-				}
-				this.expectRequest({
-						data: {
-							__metadata: {uri: "SalesOrderSet('3')"},
-							Note: "Note3 5)"
-						},
-						key: "SalesOrderSet('3')",
-						method: bUseBatch ? "MERGE" : "POST",
-						headers: bUseBatch ? {} : {"x-http-method": "MERGE"},
-						requestUri: "SalesOrderSet('3')"
-					}, NO_CONTENT)
-					.expectRequest({
-						data : {
-							__metadata: {uri: "SalesOrderSet('1')"},
-							Note: "Note1 5)"
-						},
-						key: "SalesOrderSet('1')",
-						method: bUseBatch ? "MERGE" : "POST",
-						headers: bUseBatch ? {} : {"x-http-method": "MERGE"},
-						requestUri: "SalesOrderSet('1')"
-					}, NO_CONTENT)
-					.expectMessages([]);
+			this.expectValue("note3", "Note3 5)");
 
-				// code under test
-				oModel.submitChanges();
+			// code under test
+			oModel.setProperty("/SalesOrderSet('3')/Note", "Note3 5)");
+			oModel.submitChanges(mParameters);
 
-				return this.waitForChanges(assert, "5c) changes still present and sent");
-			}).then(() => {
-				assert.notOk(oModel.hasPendingChanges(true));
-				assert.notOk(oModel.hasPendingRequests());
-			});
-		});
+			return this.waitForChanges(assert, "5a) preparation (3nd request, another MERGE is queued)");
+		}).then(() => {
+			assert.ok(bCallbackWaiting);
+			assert.strictEqual(iCallbackCounter, 4);
+			assert.ok(oModel.hasPendingChanges(true));
+			assert.notOk(oModel.hasPendingRequests());
+			if (bUseBatch) {
+				expectEvent("onBatchRequestFailed", 1);
+				expectEvent("onBatchRequestFailed", 2);
+				oEventHandlersMock.expects("onBatchRequestFailed")
+					.withArgs(sinon.match.hasNested("mParameters.requests[0].url", getUrl(3))
+						.and(sinon.match.hasNested("mParameters.requests[1].url", getUrl(1))));
+				expectEvent("onBatchRequestCompleted", 1);
+				expectEvent("onBatchRequestCompleted", 2);
+				oEventHandlersMock.expects("onBatchRequestCompleted")
+					.withArgs(sinon.match.hasNested("mParameters.requests[0].url", getUrl(3))
+						.and(sinon.match.hasNested("mParameters.requests[1].url", getUrl(1))));
+			}
+			expectEvent("onRequestFailed", 1, false);
+			expectEvent("onRequestFailed", 1, false);
+			expectEvent("onRequestFailed", 2, false);
+			expectEvent("onRequestFailed", 3, false);
+			expectEvent("onRequestCompleted", 1, false);
+			expectEvent("onRequestCompleted", 1, false);
+			expectEvent("onRequestCompleted", 2, false);
+			expectEvent("onRequestCompleted", 3, false);
+
+			this.expectValue("note2", "")
+				.expectMessages([]);
+			this.oLogMock.expects("error")
+				.withExactArgs("Retry-After handler rejected with: Rejected by User",
+					sinon.match.string, sODataModelClassName);
+
+			// code under test
+			fnRejectRetryAfter(new Error("Rejected by User"));
+
+			return Promise.all([
+				pRetryAfterFinished,
+				this.waitForChanges(assert, "5b) rejection with own error, only logged")
+			]);
+		}).then(() => {
+			// Note: for bUseBatch:false the supplied errorhandler is not called because in
+			// ODataModel#_processRequestQueue fnError is NOT passed to #_submitSingleRequest.
+			assert.strictEqual(iErrorHandlerCalled, bUseBatch ? 2 : 0);
+			assert.strictEqual(oModel.hasPendingChanges(true), true);
+			if (bUseBatch) {
+				oEventHandlersMock.expects("onBatchRequestSent")
+					.withArgs(sinon.match.hasNested("mParameters.requests[0].url", getUrl(1))
+						.and(sinon.match.hasNested("mParameters.requests[1].url", getUrl(3))));
+				oEventHandlersMock.expects("onBatchRequestCompleted")
+					.withArgs(sinon.match.hasNested("mParameters.requests[0].url", getUrl(1))
+						.and(sinon.match.hasNested("mParameters.requests[1].url", getUrl(3))));
+			}
+			expectEvent("onRequestSent", 1, false);
+			expectEvent("onRequestSent", 3, false);
+			expectEvent("onRequestCompleted", 1, false);
+			expectEvent("onRequestCompleted", 3, false);
+
+			if (!bUseBatch) {
+				this.expectHeadRequest(undefined, bDisableHeadRequestForToken);
+			}
+			this.expectRequest({
+					data: {
+						__metadata: {uri: "SalesOrderSet('3')"},
+						Note: "Note3 5)"
+					},
+					key: "SalesOrderSet('3')",
+					method: bUseBatch ? "MERGE" : "POST",
+					headers: bUseBatch ? {} : {"x-http-method": "MERGE"},
+					requestUri: "SalesOrderSet('3')"
+				}, NO_CONTENT)
+				.expectRequest({
+					data : {
+						__metadata: {uri: "SalesOrderSet('1')"},
+						Note: "Note1 5)"
+					},
+					key: "SalesOrderSet('1')",
+					method: bUseBatch ? "MERGE" : "POST",
+					headers: bUseBatch ? {} : {"x-http-method": "MERGE"},
+					requestUri: "SalesOrderSet('1')"
+				}, NO_CONTENT)
+				.expectMessages([]);
+
+			// code under test
+			oModel.submitChanges();
+
+			return this.waitForChanges(assert, "5c) changes still present and sent");
+		}).then(() => {
+			assert.notOk(oModel.hasPendingChanges(true));
+			assert.notOk(oModel.hasPendingRequests());
 		});
 	});
+	});
+});
 
 	//*********************************************************************************************
 	// Scenario: HTTP status 503 "Retry-After" handling in combination with sequentializeRequests
@@ -25171,98 +25642,121 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// 3c) rejecting "Retry-After" promise with original error own reason -> 503 error is logged and reported
 	// 3d) rejecting "Retry-After" promise with own error -> 503 error is only logged
 	// JIRA: CPOUI5MODELS-1769
-	[true, false].forEach((bDisableHeadRequestForToken) => {
-		[true, false, null].forEach((bResolve) => {
-		const sTitle = `503 "Retry-After" handling (fetch securityToken): resolve:${bResolve}, `
-			+ `disableHeadRequest:${bDisableHeadRequestForToken}`;
-		QUnit.test(sTitle, function (assert) {
-			const sView = `
-	<FlexBox id="objectPage1" binding="{/SalesOrderSet('1')}">
-		<Text id="note1" text="{Note}"/>
-	</FlexBox>`;
-			const oModel = createSalesOrdersModel({
-				disableHeadRequestForToken: bDisableHeadRequestForToken,
-				refreshAfterChange: false,
-				useBatch: false
+[true, false].forEach((bDisableHeadRequestForToken) => {
+	[true, false, null].forEach((bResolve) => {
+	const sTitle = `503 "Retry-After" handling (fetch securityToken): resolve:${bResolve}, `
+		+ `disableHeadRequest:${bDisableHeadRequestForToken}`;
+	QUnit.test(sTitle, function (assert) {
+		const sView = `
+<FlexBox id="objectPage1" binding="{/SalesOrderSet('1')}">
+	<Text id="note1" text="{Note}"/>
+</FlexBox>`;
+		const oModel = createSalesOrdersModel({
+			disableHeadRequestForToken: bDisableHeadRequestForToken,
+			refreshAfterChange: false,
+			useBatch: false
+		});
+		let oRetryAfterError, fnResolveRetryAfter, fnRejectRetryAfter;
+		oModel.setRetryAfterHandler((oError) => {
+			oRetryAfterError = oError;
+			return new Promise((resolve, reject) => {
+				fnResolveRetryAfter = resolve;
+				fnRejectRetryAfter = reject;
 			});
-			let oRetryAfterError, fnResolveRetryAfter, fnRejectRetryAfter;
-			oModel.setRetryAfterHandler((oError) => {
-				oRetryAfterError = oError;
-				return new Promise((resolve, reject) => {
-					fnResolveRetryAfter = resolve;
-					fnRejectRetryAfter = reject;
-				});
-			});
-			clearCaches(); // do not fail on cached "x-csrf-token" from other tests
-			this.expectRequest("SalesOrderSet('1')", {SalesOrderID: "1", Note: "Foo"})
-				.expectValue("note1", "Foo")
-				.expectMessages([]);
+		});
+		clearCaches(); // do not fail on cached "x-csrf-token" from other tests
+		this.expectRequest("SalesOrderSet('1')", {SalesOrderID: "1", Note: "Foo"})
+			.expectValue("note1", "Foo")
+			.expectMessages([]);
 
-			// code under test
-			return this.createView(assert, sView, oModel).then(() => {
-				this.expectValue("note1", "Foo*")
-					.expectHeadRequest(undefined, bDisableHeadRequestForToken, create503ErrorResponse());
+		// code under test
+		return this.createView(assert, sView, oModel).then(() => {
+			this.expectValue("note1", "Foo*")
+				.expectHeadRequest(undefined, bDisableHeadRequestForToken, create503ErrorResponse());
 
-				// code under test (1)
-				oModel.setProperty("/SalesOrderSet('1')/Note", "Foo*");
-				oModel.submitChanges();
+			// code under test (1)
+			oModel.setProperty("/SalesOrderSet('1')/Note", "Foo*");
+			oModel.submitChanges();
 
-				return this.waitForChanges(assert, "1)");
-			}).then(() => {
-				if (bResolve) {
-					this.expectHeadRequest(undefined, bDisableHeadRequestForToken, undefined, "token1")
-						.expectRequest({
-							data: {
-								__metadata: {uri: "SalesOrderSet('1')"},
-								Note: "Foo*"
-							},
-							headers: {
-								"x-csrf-token": "token1",
-								"x-http-method": "MERGE"
-							},
-							key: "SalesOrderSet('1')",
-							method: "POST",
-							requestUri: "SalesOrderSet('1')"
-						}, NO_CONTENT);
-
-					// code under test (2a)
-					fnResolveRetryAfter();
-				} else {
-					this.expectMessages(bResolve === null ? [/*own reason not reported*/] : [{
-						code: "HTTP 503",
-						message: "Service Unavailable",
-						persistent: false,
-						fullTarget: "/SalesOrderSet('1')",
-						target: "/SalesOrderSet('1')",
-						technical: true,
-						type: "Error"
-					}]);
-
-					this.oLogMock.expects("error")
-						.withArgs(
-							bResolve === null
-								? "Retry-After handler rejected with: Own Reason"
-								: "Request failed with status code 503: "
-									+ "POST /sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/SalesOrderSet('1')"
-							, sinon.match.string
-							, bResolve === null ? sODataModelClassName : sODataMessageParserClassName);
-
-					// code under test (2b)
-					fnRejectRetryAfter(bResolve === null ? new Error("Own Reason") : oRetryAfterError);
-				}
-
-				return resolveLater().then(() => { // message processing may take some time
-					return this.waitForChanges(assert, bResolve ? "2a) resolve" : "2b) reject");
-				});
-			}).then(() => {
-				if (bResolve) {
-					// we only proceed with repetition if the promise was rejected in the .then() before
-					return Promise.resolve();
-				}
-				Messaging.removeAllMessages(); // simulate confirmation of prior messages by user
-				this.expectMessages([]);
-				this.expectHeadRequest(undefined, bDisableHeadRequestForToken, undefined, "token2")
+			return this.waitForChanges(assert, "1)");
+		}).then(() => {
+			if (bResolve) {
+				this.expectHeadRequest(undefined, bDisableHeadRequestForToken, undefined, "token1")
 					.expectRequest({
+						data: {
+							__metadata: {uri: "SalesOrderSet('1')"},
+							Note: "Foo*"
+						},
+						headers: {
+							"x-csrf-token": "token1",
+							"x-http-method": "MERGE"
+						},
+						key: "SalesOrderSet('1')",
+						method: "POST",
+						requestUri: "SalesOrderSet('1')"
+					}, NO_CONTENT);
+
+				// code under test (2a)
+				fnResolveRetryAfter();
+			} else {
+				this.expectMessages(bResolve === null ? [/*own reason not reported*/] : [{
+					code: "HTTP 503",
+					message: "Service Unavailable",
+					persistent: false,
+					fullTarget: "/SalesOrderSet('1')",
+					target: "/SalesOrderSet('1')",
+					technical: true,
+					type: "Error"
+				}]);
+
+				this.oLogMock.expects("error")
+					.withArgs(
+						bResolve === null
+							? "Retry-After handler rejected with: Own Reason"
+							: "Request failed with status code 503: "
+								+ "POST /sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/SalesOrderSet('1')"
+						, sinon.match.string
+						, bResolve === null ? sODataModelClassName : sODataMessageParserClassName);
+
+				// code under test (2b)
+				fnRejectRetryAfter(bResolve === null ? new Error("Own Reason") : oRetryAfterError);
+			}
+
+			return resolveLater().then(() => { // message processing may take some time
+				return this.waitForChanges(assert, bResolve ? "2a) resolve" : "2b) reject");
+			});
+		}).then(() => {
+			if (bResolve) {
+				// we only proceed with repetition if the promise was rejected in the .then() before
+				return Promise.resolve();
+			}
+			Messaging.removeAllMessages(); // simulate confirmation of prior messages by user
+			this.expectMessages([]);
+			this.expectHeadRequest(undefined, bDisableHeadRequestForToken, undefined, "token2")
+				.expectRequest({
+					data: {
+						__metadata: {uri: "SalesOrderSet('1')"},
+						Note: "Foo*"
+					},
+					headers: {
+						"x-csrf-token": "token2",
+						"x-http-method": "MERGE"
+					},
+					key: "SalesOrderSet('1')",
+					method: "POST",
+					requestUri: "SalesOrderSet('1')"
+				}, create503ErrorResponse(undefined, false));
+
+			// code under test (repeat sending changes via "save")
+			oModel.submitChanges();
+
+			return resolveLater().then(() => { // message processing may take some time
+				return this.waitForChanges(assert, "3a)");
+			}).then(() => {
+				let sScenario;
+				if (bResolve === null) {
+					sScenario = "3b";
+					this.expectRequest({
 						data: {
 							__metadata: {uri: "SalesOrderSet('1')"},
 							Note: "Foo*"
@@ -25274,63 +25768,40 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 						key: "SalesOrderSet('1')",
 						method: "POST",
 						requestUri: "SalesOrderSet('1')"
-					}, create503ErrorResponse(undefined, false));
+					}, NO_CONTENT);
 
-				// code under test (repeat sending changes via "save")
-				oModel.submitChanges();
+					// code under test (3b)
+					fnResolveRetryAfter();
+				} else {
+					sScenario = bDisableHeadRequestForToken && "3c" || "3d";
+					this.expectMessages(sScenario === "3c" ? [{
+						code: "HTTP 503",
+						message: "Service Unavailable",
+						persistent: false,
+						fullTarget: "/SalesOrderSet('1')",
+						target: "/SalesOrderSet('1')",
+						technical: true,
+						type: "Error"
+					}] : [/*own reason not reported*/]);
+					this.oLogMock.expects("error")
+						.withExactArgs(sScenario === "3c"
+								? "Request failed with status code 503: "
+									+ "POST /sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/SalesOrderSet('1')"
+								: "Retry-After handler rejected with: Own reason",
+							sinon.match.string,
+							sScenario === "3c" ? sODataMessageParserClassName : sODataModelClassName);
 
+					// code under test (3c/3d)
+					fnRejectRetryAfter(sScenario === "3c" ? oRetryAfterError : new Error("Own reason"));
+				}
 				return resolveLater().then(() => { // message processing may take some time
-					return this.waitForChanges(assert, "3a)");
-				}).then(() => {
-					let sScenario;
-					if (bResolve === null) {
-						sScenario = "3b";
-						this.expectRequest({
-							data: {
-								__metadata: {uri: "SalesOrderSet('1')"},
-								Note: "Foo*"
-							},
-							headers: {
-								"x-csrf-token": "token2",
-								"x-http-method": "MERGE"
-							},
-							key: "SalesOrderSet('1')",
-							method: "POST",
-							requestUri: "SalesOrderSet('1')"
-						}, NO_CONTENT);
-
-						// code under test (3b)
-						fnResolveRetryAfter();
-					} else {
-						sScenario = bDisableHeadRequestForToken && "3c" || "3d";
-						this.expectMessages(sScenario === "3c" ? [{
-							code: "HTTP 503",
-							message: "Service Unavailable",
-							persistent: false,
-							fullTarget: "/SalesOrderSet('1')",
-							target: "/SalesOrderSet('1')",
-							technical: true,
-							type: "Error"
-						}] : [/*own reason not reported*/]);
-						this.oLogMock.expects("error")
-							.withExactArgs(sScenario === "3c"
-									? "Request failed with status code 503: "
-										+ "POST /sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/SalesOrderSet('1')"
-									: "Retry-After handler rejected with: Own reason",
-								sinon.match.string,
-								sScenario === "3c" ? sODataMessageParserClassName : sODataModelClassName);
-
-						// code under test (3c/3d)
-						fnRejectRetryAfter(sScenario === "3c" ? oRetryAfterError : new Error("Own reason"));
-					}
-					return resolveLater().then(() => { // message processing may take some time
-						return this.waitForChanges(assert, sScenario + ")");
-					});
+					return this.waitForChanges(assert, sScenario + ")");
 				});
-			}).finally(clearCaches);
-		});
-		});
+			});
+		}).finally(clearCaches);
 	});
+	});
+});
 
 	//*********************************************************************************************
 	// Scenario: HTTP status 503 "Retry-After" handling in combination with abort() (erroneous use cases)
@@ -25344,84 +25815,84 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// 3b) rejecting -> no error log, no error reporting
 	//
 	// JIRA: CPOUI5MODELS-1766
-	[false, true].forEach((bResolve) => {
-		const sTitle = `503 "Retry-After" handling and erroneous abort(): ${bResolve ? "resolve" : "reject"}`;
-		QUnit.test(sTitle, function (assert) {
-			let oChangeRequestHandle;
-			const oModel = createSalesOrdersModel({refreshAfterChange : false});
-			let oReadRequestHandle;
-			let oRetryAfterError;
-			let oSecurityTokenRequestHandle;
-			const sView = `
-	<FlexBox id="objectPage1" binding="{/SalesOrderSet('1')}">
-		<Text id="note1" text="{Note}"/>
-	</FlexBox>`;
+[false, true].forEach((bResolve) => {
+	const sTitle = `503 "Retry-After" handling and erroneous abort(): ${bResolve ? "resolve" : "reject"}`;
+	QUnit.test(sTitle, function (assert) {
+		let oChangeRequestHandle;
+		const oModel = createSalesOrdersModel({refreshAfterChange : false});
+		let oReadRequestHandle;
+		let oRetryAfterError;
+		let oSecurityTokenRequestHandle;
+		const sView = `
+<FlexBox id="objectPage1" binding="{/SalesOrderSet('1')}">
+	<Text id="note1" text="{Note}"/>
+</FlexBox>`;
 
-			let fnResolveRetryAfter, fnRejectRetryAfter;
-			oModel.setRetryAfterHandler((oError) => {
-				oRetryAfterError = oError;
-				return new Promise((resolve, reject) => {
-					fnResolveRetryAfter = resolve;
-					fnRejectRetryAfter = reject;
-				});
-			});
-
-			this.expectHeadRequest()
-				.expectRequest("SalesOrderSet('1')", createErrorResponse({
-					crashBatch: true,
-					message: "Service Unavailable",
-					statusCode: 503,
-					headers: {"retry-after": 5},
-					messageCode: "HTTP 503"
-				}));
-
-			// code under test
-			return this.createView(assert, sView, oModel).then(() => {
-				// preparation (1a)
-				oSecurityTokenRequestHandle = oModel.refreshSecurityToken();
-
-				return resolveLater();
-			}).then(() => {
-				assert.throws(() => {
-					// code under test (1a)
-					oSecurityTokenRequestHandle.abort();
-				}, new Error("abort() during HTTP 503 'Retry-after' processing not supported"));
-			}).then(() => {
-				// preparation (1b)
-				oReadRequestHandle = oModel.read("/SalesOrderSet('1')");
-
-				return resolveLater();
-			}).then(() => {
-				assert.throws(() => {
-					// code under test (1b)
-					oReadRequestHandle.abort();
-				}, new Error("abort() during HTTP 503 'Retry-after' processing not supported"));
-			}).then(() => {
-				// preparation (1c)
-				oModel.setProperty("/SalesOrderSet('3')/Note", "Note3");
-				oChangeRequestHandle = oModel.submitChanges();
-
-				return resolveLater();
-			}).then(() => {
-				assert.throws(() => {
-					// code under test (1c)
-					oChangeRequestHandle.abort();
-				}, new Error("abort() during HTTP 503 'Retry-after' processing not supported"));
-			}).then(() => {
-				// code under test (2)
-				oModel.destroy();
-			}).then(() => {
-				if (bResolve) {
-					// code under test (3a)
-					fnResolveRetryAfter();
-				} else {
-					// code under test (3b)
-					fnRejectRetryAfter(oRetryAfterError);
-				}
-				return resolveLater();
+		let fnResolveRetryAfter, fnRejectRetryAfter;
+		oModel.setRetryAfterHandler((oError) => {
+			oRetryAfterError = oError;
+			return new Promise((resolve, reject) => {
+				fnResolveRetryAfter = resolve;
+				fnRejectRetryAfter = reject;
 			});
 		});
+
+		this.expectHeadRequest()
+			.expectRequest("SalesOrderSet('1')", createErrorResponse({
+				crashBatch: true,
+				message: "Service Unavailable",
+				statusCode: 503,
+				headers: {"retry-after": 5},
+				messageCode: "HTTP 503"
+			}));
+
+		// code under test
+		return this.createView(assert, sView, oModel).then(() => {
+			// preparation (1a)
+			oSecurityTokenRequestHandle = oModel.refreshSecurityToken();
+
+			return resolveLater();
+		}).then(() => {
+			assert.throws(() => {
+				// code under test (1a)
+				oSecurityTokenRequestHandle.abort();
+			}, new Error("abort() during HTTP 503 'Retry-after' processing not supported"));
+		}).then(() => {
+			// preparation (1b)
+			oReadRequestHandle = oModel.read("/SalesOrderSet('1')");
+
+			return resolveLater();
+		}).then(() => {
+			assert.throws(() => {
+				// code under test (1b)
+				oReadRequestHandle.abort();
+			}, new Error("abort() during HTTP 503 'Retry-after' processing not supported"));
+		}).then(() => {
+			// preparation (1c)
+			oModel.setProperty("/SalesOrderSet('3')/Note", "Note3");
+			oChangeRequestHandle = oModel.submitChanges();
+
+			return resolveLater();
+		}).then(() => {
+			assert.throws(() => {
+				// code under test (1c)
+				oChangeRequestHandle.abort();
+			}, new Error("abort() during HTTP 503 'Retry-after' processing not supported"));
+		}).then(() => {
+			// code under test (2)
+			oModel.destroy();
+		}).then(() => {
+			if (bResolve) {
+				// code under test (3a)
+				fnResolveRetryAfter();
+			} else {
+				// code under test (3b)
+				fnRejectRetryAfter(oRetryAfterError);
+			}
+			return resolveLater();
+		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: HTTP status 503 "Retry-After" handling in combination with abort(), valid use cases:
@@ -25446,76 +25917,61 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// 8) code under test: Call abort on the remembered request handle and check that no pending requests remain
 	//
 	// JIRA: CPOUI5MODELS-1778
-	[{
-		sAPI: "ODataModel#read",
-		fn2() {
-			const oRequestHandle = this.oModel.read("/SalesOrderSet('2')", {groupId: "read2"});
-			this.oModel.read("/SalesOrderSet('3')", {groupId: "read3"});
-			return oRequestHandle;
-		},
-		fn3(_bUseBatch, p3rdResponse) {
-			this.expectRequest("SalesOrderSet('1')", {SalesOrderID: "1", Note: "Bar1"})
-				.expectRequest({
-					abortId: "~abortId0",
-					requestUri: "SalesOrderSet('2')"
-				}, new Promise(() => {/*resolves never -> will be aborted*/}))
-				.expectRequest("SalesOrderSet('3')", p3rdResponse);
-		},
-		fn6(_bUseBatch) {
-			this.expectRequest("SalesOrderSet('2')", create503ErrorResponse());
+[{
+	sAPI: "ODataModel#read",
+	fn2() {
+		const oRequestHandle = this.oModel.read("/SalesOrderSet('2')", {groupId: "read2"});
+		this.oModel.read("/SalesOrderSet('3')", {groupId: "read3"});
+		return oRequestHandle;
+	},
+	fn3(_bUseBatch, p3rdResponse) {
+		this.expectRequest("SalesOrderSet('1')", {SalesOrderID: "1", Note: "Bar1"})
+			.expectRequest({
+				abortId: "~abortId0",
+				requestUri: "SalesOrderSet('2')"
+			}, new Promise(() => {/*resolves never -> will be aborted*/}))
+			.expectRequest("SalesOrderSet('3')", p3rdResponse);
+	},
+	fn6(_bUseBatch) {
+		this.expectRequest("SalesOrderSet('2')", create503ErrorResponse());
 
-			return this.oModel.read("/SalesOrderSet('2')", {groupId: "read2"});
-		},
-		fn7(bUseBatch) {
-			this.expectRequest({
-					abortId: "~abortId1",
-					requestUri: "SalesOrderSet('2')"
-				}, new Promise(() => {/*resolves never -> will be aborted*/}));
-		}
-	}, {
-		sAPI: "ODataModel#submitChanges",
-		fn2() {
-			this.oModel.setProperty("/SalesOrderSet('2')/Note", "Note2*");
-			const oRequestHandle = this.oModel.submitChanges();
-			this.oView.byId("objectPage3").getElementBinding().refresh(true, "refresh1");
-			return oRequestHandle;
-		},
-		fn3(bUseBatch, p3rdResponse) {
-			this.expectRequest("SalesOrderSet('1')", {SalesOrderID: "1", Note: "Note1"});
-			if (!bUseBatch) {
-				this.expectHeadRequest();
-			}
-			this.expectRequest({
-					abortId: "~abortId0",
-					data: {
-						__metadata: {uri: "SalesOrderSet('2')"},
-						Note: "Note2*"
-					},
-					key: "SalesOrderSet('2')",
-					method: bUseBatch ? "MERGE" : "POST",
-					headers: bUseBatch ? {} : {"x-http-method": "MERGE"},
-					requestUri: "SalesOrderSet('2')"
-				}, new Promise(() => {/*resolves never -> will be aborted*/}))
-				.expectRequest("SalesOrderSet('3')", p3rdResponse);
-		},
-		fn6(bUseBatch) {
-			this.oModel.resetChanges(); // clean up to changes from aborted request
-			this.expectRequest({
-					data: {
-						__metadata: {uri: "SalesOrderSet('2')"},
-						Note: "Note2**"
-					},
-					key: "SalesOrderSet('2')",
-					method: bUseBatch ? "MERGE" : "POST",
-					headers: bUseBatch ? {} : {"x-http-method": "MERGE"},
-					requestUri: "SalesOrderSet('2')"
-				}, create503ErrorResponse());
-			this.oModel.setProperty("/SalesOrderSet('2')/Note", "Note2**");
-			return this.oModel.submitChanges();
-		},
-		fn7(bUseBatch) {
-			this.expectRequest({
+		return this.oModel.read("/SalesOrderSet('2')", {groupId: "read2"});
+	},
+	fn7(bUseBatch) {
+		this.expectRequest({
 				abortId: "~abortId1",
+				requestUri: "SalesOrderSet('2')"
+			}, new Promise(() => {/*resolves never -> will be aborted*/}));
+	}
+}, {
+	sAPI: "ODataModel#submitChanges",
+	fn2() {
+		this.oModel.setProperty("/SalesOrderSet('2')/Note", "Note2*");
+		const oRequestHandle = this.oModel.submitChanges();
+		this.oView.byId("objectPage3").getElementBinding().refresh(true, "refresh1");
+		return oRequestHandle;
+	},
+	fn3(bUseBatch, p3rdResponse) {
+		this.expectRequest("SalesOrderSet('1')", {SalesOrderID: "1", Note: "Note1"});
+		if (!bUseBatch) {
+			this.expectHeadRequest();
+		}
+		this.expectRequest({
+				abortId: "~abortId0",
+				data: {
+					__metadata: {uri: "SalesOrderSet('2')"},
+					Note: "Note2*"
+				},
+				key: "SalesOrderSet('2')",
+				method: bUseBatch ? "MERGE" : "POST",
+				headers: bUseBatch ? {} : {"x-http-method": "MERGE"},
+				requestUri: "SalesOrderSet('2')"
+			}, new Promise(() => {/*resolves never -> will be aborted*/}))
+			.expectRequest("SalesOrderSet('3')", p3rdResponse);
+	},
+	fn6(bUseBatch) {
+		this.oModel.resetChanges(); // clean up to changes from aborted request
+		this.expectRequest({
 				data: {
 					__metadata: {uri: "SalesOrderSet('2')"},
 					Note: "Note2**"
@@ -25524,140 +25980,155 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 				method: bUseBatch ? "MERGE" : "POST",
 				headers: bUseBatch ? {} : {"x-http-method": "MERGE"},
 				requestUri: "SalesOrderSet('2')"
-			}, new Promise(() => {/*resolves never -> will be aborted*/}));
-		}
-	}].forEach((oFixture) => {
-		[false, true].forEach((bUseBatch) => {
-		const sTitle = `503 "Retry-After" handling and abort(): succesful, ${oFixture.sAPI}, useBatch:${bUseBatch}`;
-		QUnit.test(sTitle, function (assert) {
-			let oRequestHandle;
-			let fnResolve;
-			const oModel = createSalesOrdersModel({refreshAfterChange: false, useBatch: bUseBatch});
-			const sView = `
-	<FlexBox id="objectPage1" binding="{/SalesOrderSet('1')}">
-		<Text text="{Note}"/>
-	</FlexBox>
-	<FlexBox binding="{/SalesOrderSet('2')}">
-		<Text text="{Note}"/>
-	</FlexBox>
-	<FlexBox id="objectPage3" binding="{/SalesOrderSet('3')}">
-		<Text text="{Note}"/>
-	</FlexBox>`;
-			let fnResolveRetryAfter;
-			let pRetryAfterFinished;
-			let bCallbackWaiting = false;
-			oModel.setRetryAfterHandler(() => {
-				bCallbackWaiting = true;
-				const pRetryAfter = new Promise((resolve, reject) => {
-					fnResolveRetryAfter = resolve;
-				});
-				pRetryAfterFinished = pRetryAfter.finally(() => {bCallbackWaiting = false;});
-				return pRetryAfter;
+			}, create503ErrorResponse());
+		this.oModel.setProperty("/SalesOrderSet('2')/Note", "Note2**");
+		return this.oModel.submitChanges();
+	},
+	fn7(bUseBatch) {
+		this.expectRequest({
+			abortId: "~abortId1",
+			data: {
+				__metadata: {uri: "SalesOrderSet('2')"},
+				Note: "Note2**"
+			},
+			key: "SalesOrderSet('2')",
+			method: bUseBatch ? "MERGE" : "POST",
+			headers: bUseBatch ? {} : {"x-http-method": "MERGE"},
+			requestUri: "SalesOrderSet('2')"
+		}, new Promise(() => {/*resolves never -> will be aborted*/}));
+	}
+}].forEach((oFixture) => {
+	[false, true].forEach((bUseBatch) => {
+	const sTitle = `503 "Retry-After" handling and abort(): succesful, ${oFixture.sAPI}, useBatch:${bUseBatch}`;
+	QUnit.test(sTitle, function (assert) {
+		let oRequestHandle;
+		let fnResolve;
+		const oModel = createSalesOrdersModel({refreshAfterChange: false, useBatch: bUseBatch});
+		const sView = `
+<FlexBox id="objectPage1" binding="{/SalesOrderSet('1')}">
+	<Text text="{Note}"/>
+</FlexBox>
+<FlexBox binding="{/SalesOrderSet('2')}">
+	<Text text="{Note}"/>
+</FlexBox>
+<FlexBox id="objectPage3" binding="{/SalesOrderSet('3')}">
+	<Text text="{Note}"/>
+</FlexBox>`;
+		let fnResolveRetryAfter;
+		let pRetryAfterFinished;
+		let bCallbackWaiting = false;
+		oModel.setRetryAfterHandler(() => {
+			bCallbackWaiting = true;
+			const pRetryAfter = new Promise((resolve, reject) => {
+				fnResolveRetryAfter = resolve;
 			});
-
-			if (bUseBatch) {
-				this.expectHeadRequest();
-			}
-			this.expectRequest("SalesOrderSet('1')", {SalesOrderID: "1", Note: "Note1"})
-				.expectRequest("SalesOrderSet('2')", {SalesOrderID: "2", Note: "Note2"})
-				.expectRequest("SalesOrderSet('3')", {SalesOrderID: "3", Note: "Note3"});
-
-			return this.createView(assert, sView, oModel).then(() => {
-				this.expectRequest("SalesOrderSet('1')", create503ErrorResponse());
-
-				//1) 503 "Retry-After" error happen for a first GET request for SalesOrder #1
-				this.oView.byId("objectPage1").getElementBinding().refresh(true, "refresh");
-
-				return Promise.all([
-					resolveLater(),
-					this.waitForChanges(assert,"1")
-				]);
-			}).then(() => {
-				assert.ok(bCallbackWaiting);
-				// the registered 1st request on pending "Retry-After" promise must NOT count as pending request
-				assert.notOk(oModel.hasPendingRequests());
-
-				// 2) 2nd request triggered via API, supposed to be aborted, - hence rember request handle
-				//    3rd request triggered via API, not supposed to be aborted
-				oRequestHandle = oFixture.fn2.bind(this)();
-
-				 // still no request pending, only registered on "Retry-After" promise
-				assert.notOk(oModel.hasPendingRequests());
-
-				return Promise.all([
-					resolveLater(),
-					this.waitForChanges(assert, "2")
-				]);
-			}).then(() => {
-				assert.notOk(oModel.hasPendingRequests());
-
-				oFixture.fn3.bind(this)(bUseBatch, new Promise((resolve) => {fnResolve = resolve;}));
-
-				// 3) Resolving "Retry-After" promise repeats all 3 requests, answers of 2nd and 3rd pending
-				fnResolveRetryAfter();
-
-				return Promise.all([
-					pRetryAfterFinished,
-					this.waitForChanges(assert, "3")
-				]);
-			}).then(() => {
-				assert.strictEqual(this.oModel.aPendingRequestHandles.length, 2, "2 pending requests");
-
-				this.expectAbort("~abortId0");
-
-				// 4) code under test: Call abort() on the remembered request handle and see that the abort function on the
-				//    2nd request repetition is called.
-				oRequestHandle.abort();
-
-				return Promise.all([
-					resolveLater(),
-					this.waitForChanges(assert, "4")
-				]);
-			}).then(() => {
-				assert.strictEqual(this.oModel.aPendingRequestHandles.length, 1, "1 pending GET request");
-
-				// 5) Check that no pending requests remain after response of 3rd request is resolved
-				fnResolve({statusCode: 200, data: {results: {/*n/a*/}}});
-
-				return Promise.all([
-					resolveLater(),
-					this.waitForChanges(assert, "5")
-				]);
-			}).then(() => {
-				assert.notOk(oModel.hasPendingRequests(), "still 5");
-
-				// 6) 1st request triggered via API and fails on 503, remember request handle
-				oRequestHandle = oFixture.fn6.bind(this)(bUseBatch);
-
-				return this.waitForChanges(assert, "6");
-			}).then(() => {
-				oFixture.fn7.bind(this)(bUseBatch);
-
-				// 7) Resolve "Retry-After" promise, response pending
-				fnResolveRetryAfter();
-
-				return Promise.all([
-					pRetryAfterFinished,
-					this.waitForChanges(assert, "7")
-				]);
-			}).then(() => {
-				assert.ok(oModel.hasPendingRequests());
-
-				this.expectAbort("~abortId1");
-
-				// 8) code under test: Call abort on the remembered request handle and check that no pending requests remain
-				oRequestHandle.abort();
-
-				return Promise.all([
-					resolveLater(),
-					this.waitForChanges(assert, "8")
-				]);
-			}).then(() => {
-				assert.notOk(oModel.hasPendingRequests(), "still 8");
-			});
-		}, sTitle);
+			pRetryAfterFinished = pRetryAfter.finally(() => {bCallbackWaiting = false;});
+			return pRetryAfter;
 		});
+
+		if (bUseBatch) {
+			this.expectHeadRequest();
+		}
+		this.expectRequest("SalesOrderSet('1')", {SalesOrderID: "1", Note: "Note1"})
+			.expectRequest("SalesOrderSet('2')", {SalesOrderID: "2", Note: "Note2"})
+			.expectRequest("SalesOrderSet('3')", {SalesOrderID: "3", Note: "Note3"});
+
+		return this.createView(assert, sView, oModel).then(() => {
+			this.expectRequest("SalesOrderSet('1')", create503ErrorResponse());
+
+			//1) 503 "Retry-After" error happen for a first GET request for SalesOrder #1
+			this.oView.byId("objectPage1").getElementBinding().refresh(true, "refresh");
+
+			return Promise.all([
+				resolveLater(),
+				this.waitForChanges(assert,"1")
+			]);
+		}).then(() => {
+			assert.ok(bCallbackWaiting);
+			// the registered 1st request on pending "Retry-After" promise must NOT count as pending request
+			assert.notOk(oModel.hasPendingRequests());
+
+			// 2) 2nd request triggered via API, supposed to be aborted, - hence rember request handle
+			//    3rd request triggered via API, not supposed to be aborted
+			oRequestHandle = oFixture.fn2.bind(this)();
+
+			 // still no request pending, only registered on "Retry-After" promise
+			assert.notOk(oModel.hasPendingRequests());
+
+			return Promise.all([
+				resolveLater(),
+				this.waitForChanges(assert, "2")
+			]);
+		}).then(() => {
+			assert.notOk(oModel.hasPendingRequests());
+
+			oFixture.fn3.bind(this)(bUseBatch, new Promise((resolve) => {fnResolve = resolve;}));
+
+			// 3) Resolving "Retry-After" promise repeats all 3 requests, answers of 2nd and 3rd pending
+			fnResolveRetryAfter();
+
+			return Promise.all([
+				pRetryAfterFinished,
+				this.waitForChanges(assert, "3")
+			]);
+		}).then(() => {
+			assert.strictEqual(this.oModel.aPendingRequestHandles.length, 2, "2 pending requests");
+
+			this.expectAbort("~abortId0");
+
+			// 4) code under test: Call abort() on the remembered request handle and see that the abort function on the
+			//    2nd request repetition is called.
+			oRequestHandle.abort();
+
+			return Promise.all([
+				resolveLater(),
+				this.waitForChanges(assert, "4")
+			]);
+		}).then(() => {
+			assert.strictEqual(this.oModel.aPendingRequestHandles.length, 1, "1 pending GET request");
+
+			// 5) Check that no pending requests remain after response of 3rd request is resolved
+			fnResolve({statusCode: 200, data: {results: {/*n/a*/}}});
+
+			return Promise.all([
+				resolveLater(),
+				this.waitForChanges(assert, "5")
+			]);
+		}).then(() => {
+			assert.notOk(oModel.hasPendingRequests(), "still 5");
+
+			// 6) 1st request triggered via API and fails on 503, remember request handle
+			oRequestHandle = oFixture.fn6.bind(this)(bUseBatch);
+
+			return this.waitForChanges(assert, "6");
+		}).then(() => {
+			oFixture.fn7.bind(this)(bUseBatch);
+
+			// 7) Resolve "Retry-After" promise, response pending
+			fnResolveRetryAfter();
+
+			return Promise.all([
+				pRetryAfterFinished,
+				this.waitForChanges(assert, "7")
+			]);
+		}).then(() => {
+			assert.ok(oModel.hasPendingRequests());
+
+			this.expectAbort("~abortId1");
+
+			// 8) code under test: Call abort on the remembered request handle and check that no pending requests remain
+			oRequestHandle.abort();
+
+			return Promise.all([
+				resolveLater(),
+				this.waitForChanges(assert, "8")
+			]);
+		}).then(() => {
+			assert.notOk(oModel.hasPendingRequests(), "still 8");
+		});
+	}, sTitle);
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: HTTP status 503 "Retry-After" handling in combination with abort(), allowed usecase:
@@ -25681,144 +26152,144 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// 7) Resolve "Retry-After" promise, response pending
 	// 8) code under test: Call abort on the remembered request handle and check that no pending requests remain
 	// JIRA: CPOUI5MODELS-1778
-	[true, false].forEach((bDisableHeadRequestForToken) => {
-		const sTitle = '503 "Retry-After" handling and abort(), allowed, #refreshSecurityToken, '
-			+ `disableHeadRequest:${bDisableHeadRequestForToken}`;
-		QUnit.test(sTitle, function (assert) {
-			const oAbortedError = {
-				aborted: true,
-				message: "Request aborted",
-				statusCode: 0,
-				statusText: "abort"
-			};
-			let oRequestHandle;
-			let fnResolve;
-			const oModel = createSalesOrdersModel({
-				refreshAfterChange: false,
-				useBatch: false,
-				disableHeadRequestForToken: bDisableHeadRequestForToken
+[true, false].forEach((bDisableHeadRequestForToken) => {
+	const sTitle = '503 "Retry-After" handling and abort(), allowed, #refreshSecurityToken, '
+		+ `disableHeadRequest:${bDisableHeadRequestForToken}`;
+	QUnit.test(sTitle, function (assert) {
+		const oAbortedError = {
+			aborted: true,
+			message: "Request aborted",
+			statusCode: 0,
+			statusText: "abort"
+		};
+		let oRequestHandle;
+		let fnResolve;
+		const oModel = createSalesOrdersModel({
+			refreshAfterChange: false,
+			useBatch: false,
+			disableHeadRequestForToken: bDisableHeadRequestForToken
+		});
+		const sView = `
+<FlexBox binding="{/SalesOrderSet('1')}">
+	<Text text="{Note}"/>
+</FlexBox>`;
+		let fnResolveRetryAfter;
+		let pRetryAfterFinished;
+		let bCallbackWaiting = false;
+		oModel.setRetryAfterHandler(() => {
+			bCallbackWaiting = true;
+			const pRetryAfter = new Promise((resolve, reject) => {
+				fnResolveRetryAfter = resolve;
 			});
-			const sView = `
-	<FlexBox binding="{/SalesOrderSet('1')}">
-		<Text text="{Note}"/>
-	</FlexBox>`;
-			let fnResolveRetryAfter;
-			let pRetryAfterFinished;
-			let bCallbackWaiting = false;
-			oModel.setRetryAfterHandler(() => {
-				bCallbackWaiting = true;
-				const pRetryAfter = new Promise((resolve, reject) => {
-					fnResolveRetryAfter = resolve;
-				});
-				pRetryAfterFinished = pRetryAfter.finally(() => {bCallbackWaiting = false;});
-				return pRetryAfter;
-			});
-			const oHelper = {error() {}, success: "~neverCalled"};
-			const oHelperMock = this.mock(oHelper);
+			pRetryAfterFinished = pRetryAfter.finally(() => {bCallbackWaiting = false;});
+			return pRetryAfter;
+		});
+		const oHelper = {error() {}, success: "~neverCalled"};
+		const oHelperMock = this.mock(oHelper);
 
-			this.expectRequest("SalesOrderSet('1')", create503ErrorResponse())
-				.expectMessages([]);
+		this.expectRequest("SalesOrderSet('1')", create503ErrorResponse())
+			.expectMessages([]);
 
-			// 1) 503 "Retry-After" error happens for the first GET request for SalesOrder #1
-			return this.createView(assert, sView, oModel).then(() => {
-				assert.ok(bCallbackWaiting);
-				// the registered 1st request on pending "Retry-After" promise must NOT count as pending request
-				assert.notOk(oModel.hasPendingRequests());
+		// 1) 503 "Retry-After" error happens for the first GET request for SalesOrder #1
+		return this.createView(assert, sView, oModel).then(() => {
+			assert.ok(bCallbackWaiting);
+			// the registered 1st request on pending "Retry-After" promise must NOT count as pending request
+			assert.notOk(oModel.hasPendingRequests());
 
-				oHelperMock.expects("error").never();
+			oHelperMock.expects("error").never();
 
-				// 2) 2nd request triggered via #refreshSecurityToken, supposed to be aborted, - hence rember request handle
-				oRequestHandle = oModel.refreshSecurityToken("~fnSuccess", oHelper.error, true);
-				//    3rd request triggered via #read, not supposed to be aborted
-				oModel.read("/SalesOrderSet('2')", {groupId: "read2"});
+			// 2) 2nd request triggered via #refreshSecurityToken, supposed to be aborted, - hence rember request handle
+			oRequestHandle = oModel.refreshSecurityToken("~fnSuccess", oHelper.error, true);
+			//    3rd request triggered via #read, not supposed to be aborted
+			oModel.read("/SalesOrderSet('2')", {groupId: "read2"});
 
-				 // still no request pending, only registered on "Retry-After" promise
-				assert.notOk(oModel.hasPendingRequests());
+			 // still no request pending, only registered on "Retry-After" promise
+			assert.notOk(oModel.hasPendingRequests());
 
-				return Promise.all([
-					resolveLater(),
-					this.waitForChanges(assert, "2")
-				]);
-			}).then(() => {
-				assert.notOk(oModel.hasPendingRequests());
+			return Promise.all([
+				resolveLater(),
+				this.waitForChanges(assert, "2")
+			]);
+		}).then(() => {
+			assert.notOk(oModel.hasPendingRequests());
 
-				this.expectRequest("SalesOrderSet('1')", {SalesOrderID: "1", Note: "Bar1"})
-					.expectHeadRequest(undefined, bDisableHeadRequestForToken,
-						new Promise(() => {/*resolves never -> will be aborted*/}), "", "~abortId0")
-					.expectRequest("SalesOrderSet('2')", new Promise((resolve) => {fnResolve = resolve;}));
+			this.expectRequest("SalesOrderSet('1')", {SalesOrderID: "1", Note: "Bar1"})
+				.expectHeadRequest(undefined, bDisableHeadRequestForToken,
+					new Promise(() => {/*resolves never -> will be aborted*/}), "", "~abortId0")
+				.expectRequest("SalesOrderSet('2')", new Promise((resolve) => {fnResolve = resolve;}));
 
-				// 3) Resolving "Retry-After" promise repeats all 3 requests, answers of 2nd and 3rd pending
-				fnResolveRetryAfter();
+			// 3) Resolving "Retry-After" promise repeats all 3 requests, answers of 2nd and 3rd pending
+			fnResolveRetryAfter();
 
-				return Promise.all([
-					pRetryAfterFinished,
-					this.waitForChanges(assert, "3")
-				]);
-			}).then(() => {
-				assert.notOk(bCallbackWaiting);
-				assert.ok(oModel.hasPendingRequests());
+			return Promise.all([
+				pRetryAfterFinished,
+				this.waitForChanges(assert, "3")
+			]);
+		}).then(() => {
+			assert.notOk(bCallbackWaiting);
+			assert.ok(oModel.hasPendingRequests());
 
-				this.expectAbort("~abortId0");
-				oHelperMock.expects("error").withExactArgs(sinon.match(oAbortedError));
+			this.expectAbort("~abortId0");
+			oHelperMock.expects("error").withExactArgs(sinon.match(oAbortedError));
 
-				// 4) code under test: Call abort() on the remembered request handle and see that the abort function on the
-				//    2nd request repetition is called.
-				oRequestHandle.abort();
+			// 4) code under test: Call abort() on the remembered request handle and see that the abort function on the
+			//    2nd request repetition is called.
+			oRequestHandle.abort();
 
-				return Promise.all([
-					resolveLater(),
-					this.waitForChanges(assert, "4")
-				]);
-			}).then(() => {
-				assert.ok(oModel.hasPendingRequests()); // still pending because wait for fnResolve3
+			return Promise.all([
+				resolveLater(),
+				this.waitForChanges(assert, "4")
+			]);
+		}).then(() => {
+			assert.ok(oModel.hasPendingRequests()); // still pending because wait for fnResolve3
 
-				// 5) Check that no pending requests remain after response of 3rd request is resolved
-				fnResolve({statusCode: 200, data: {results: {/*n/a*/}}});
+			// 5) Check that no pending requests remain after response of 3rd request is resolved
+			fnResolve({statusCode: 200, data: {results: {/*n/a*/}}});
 
-				return Promise.all([
-					resolveLater(),
-					this.waitForChanges(assert, "5")
-				]);
-			}).then(() => {
-				assert.notOk(oModel.hasPendingRequests(), "still 5");
+			return Promise.all([
+				resolveLater(),
+				this.waitForChanges(assert, "5")
+			]);
+		}).then(() => {
+			assert.notOk(oModel.hasPendingRequests(), "still 5");
 
-				this.expectHeadRequest(undefined, bDisableHeadRequestForToken, create503ErrorResponse());
+			this.expectHeadRequest(undefined, bDisableHeadRequestForToken, create503ErrorResponse());
 
-				// 6) 1st request triggered via API and fails on 503, remember request handle
-				oRequestHandle = oModel.refreshSecurityToken("~fnSuccess", oHelper.error, true);
+			// 6) 1st request triggered via API and fails on 503, remember request handle
+			oRequestHandle = oModel.refreshSecurityToken("~fnSuccess", oHelper.error, true);
 
-				return this.waitForChanges(assert, "6");
-			}).then(() => {
-				assert.ok(bCallbackWaiting);
+			return this.waitForChanges(assert, "6");
+		}).then(() => {
+			assert.ok(bCallbackWaiting);
 
-				this.expectHeadRequest(undefined, bDisableHeadRequestForToken,
-						new Promise(() => {/*resolves never -> will be aborted*/}), "", "~abortId1");
+			this.expectHeadRequest(undefined, bDisableHeadRequestForToken,
+					new Promise(() => {/*resolves never -> will be aborted*/}), "", "~abortId1");
 
-				// 7) Resolve "Retry-After" promise, response pending
-				fnResolveRetryAfter();
+			// 7) Resolve "Retry-After" promise, response pending
+			fnResolveRetryAfter();
 
-				return Promise.all([
-					pRetryAfterFinished,
-					this.waitForChanges(assert, "7")
-				]);
-			}).then(() => {
-				assert.ok(oModel.hasPendingRequests());
+			return Promise.all([
+				pRetryAfterFinished,
+				this.waitForChanges(assert, "7")
+			]);
+		}).then(() => {
+			assert.ok(oModel.hasPendingRequests());
 
-				this.expectAbort("~abortId1");
-				oHelperMock.expects("error").withExactArgs(sinon.match(oAbortedError));
+			this.expectAbort("~abortId1");
+			oHelperMock.expects("error").withExactArgs(sinon.match(oAbortedError));
 
-				// 8) code under test: Call abort on the remembered request handle and check that no pending requests remain
-				oRequestHandle.abort();
+			// 8) code under test: Call abort on the remembered request handle and check that no pending requests remain
+			oRequestHandle.abort();
 
-				return Promise.all([
-					resolveLater(),
-					this.waitForChanges(assert, "8")
-				]);
-			}).then(() => {
-				assert.notOk(oModel.hasPendingRequests(), "still 8");
-			});
+			return Promise.all([
+				resolveLater(),
+				this.waitForChanges(assert, "8")
+			]);
+		}).then(() => {
+			assert.notOk(oModel.hasPendingRequests(), "still 8");
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: If the server uses server side paging and the ODataTreeBinding is in "Client" mode all data is
@@ -26641,118 +27112,118 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	//    the data request and code list requests with the original 503 error.
 	// JIRA: CPOUI5MODELS-1826
 	// JIRA: CPOUI5MODELS-1856
-	[true, false, /*c) own error*/null].forEach((bResolve, i) => {
-		QUnit.test('503 "Retry-After" handling, valuelist metadata: bResolve=' + bResolve, async function (assert) {
-			const sCustomParam = "custom=1856-" + i;
-			const sServiceUrl = "/sap/opu/odata/sap/FAR_CUSTOMER_LINE_ITEMS/?" + sCustomParam;
-			const mModelParameters = {metadataUrlParams: {"sap-value-list": "none"}, useBatch: false};
-			// create a model for the same service w/o usage only to have a shared metadata cache created
-			// by another ODataModel than the model with the actual "Retry-After" handler
-			const oModel0 = createModel(sServiceUrl, mModelParameters);
-			oModel0.setRetryAfterHandler("~MustNotBeCalled");
+[true, false, /*c) own error*/null].forEach((bResolve, i) => {
+	QUnit.test('503 "Retry-After" handling, valuelist metadata: bResolve=' + bResolve, async function (assert) {
+		const sCustomParam = "custom=1856-" + i;
+		const sServiceUrl = "/sap/opu/odata/sap/FAR_CUSTOMER_LINE_ITEMS/?" + sCustomParam;
+		const mModelParameters = {metadataUrlParams: {"sap-value-list": "none"}, useBatch: false};
+		// create a model for the same service w/o usage only to have a shared metadata cache created
+		// by another ODataModel than the model with the actual "Retry-After" handler
+		const oModel0 = createModel(sServiceUrl, mModelParameters);
+		oModel0.setRetryAfterHandler("~MustNotBeCalled");
 
-			await oModel0.getMetaModel().loaded();
+		await oModel0.getMetaModel().loaded();
 
-			const oMetadata0 = oModel0.getMetaModel().getMetadata();
-			oModel0.destroy();
+		const oMetadata0 = oModel0.getMetaModel().getMetadata();
+		oModel0.destroy();
 
-			const oModel = createModel(sServiceUrl, mModelParameters);
-			let iCallbackCounter = 0;
-			let fnReject;
-			let fnResolve;
-			let oRetryAfterError;
-			oModel.setRetryAfterHandler((oError) => {
-				iCallbackCounter += 1;
-				assert.ok(oError instanceof Error);
-				assert.strictEqual(oError.message, "HTTP request failed");
-				assert.ok(oError.retryAfter instanceof Date, "retryAfter is a Date");
-				oRetryAfterError = oError;
-				return new Promise((resolve, reject) => {
-					fnResolve = resolve;
-					fnReject = reject;
-				});
-			});
-			const oMetaModel = oModel.getMetaModel();
-
-			await this.createView(assert, "", oModel);
-
-			await oMetaModel.loaded();
-
-			assert.ok(oMetadata0 && oMetadata0 === oMetaModel.getMetadata(), "b) metadata cache reused");
-
-			const oCompanyCodeMetaContext = oMetaModel.getMetaContext("/Items('~guid')/CompanyCode");
-			this.expectRequest(`Items('~guid')/CompanyCode?${sCustomParam}`, create503ErrorResponse())
-				.expectRequest("SAP__Currencies?sap-language=EN&$skip=0&$top=5000", create503ErrorResponse())
-				.expectRequest("SAP__UnitsOfMeasure?sap-language=EN&$skip=0&$top=5000", create503ErrorResponse());
-			this.bAnswerWith503 = true; // $metadata request for valuehelp will be answered with 503
-
-			// code under test c)
-			const pCompanyCodeVH = oMetaModel.getODataValueLists(oCompanyCodeMetaContext);
-			// code under test d)
-			oModel.read("/Items('~guid')/CompanyCode");
-			// code under test e)
-			const pCurrencies = oMetaModel.requestCurrencyCodes();
-			const pUnits = oMetaModel.requestUnitsOfMeasure();
-
-			await this.waitForChanges(assert);
-
-			if (bResolve) {
-				this.expectRequest(`Items('~guid')/CompanyCode?${sCustomParam}`, {results: "42"})
-					.expectRequest("SAP__Currencies?sap-language=EN&$skip=0&$top=5000", {
-						results : [{
-							CurrencyCode : "FOO",
-							DecimalPlaces : 42
-						}]
-					})
-					.expectRequest("SAP__UnitsOfMeasure?sap-language=EN&$skip=0&$top=5000", {
-						results : [{
-							ExternalCode : "BAR",
-							DecimalPlaces : 42
-						}]
-					});
-
-			} else {
-				this.oLogMock.expects("error")
-					.thrice()
-					.withArgs(sinon.match(bResolve === false
-						? "Request failed with status code 503" : "own error"));
-				this.oLogMock.expects("error").withArgs(sinon.match("Couldn't load code list: SAP__Currencies"));
-				this.oLogMock.expects("error").withArgs(sinon.match("Couldn't load code list: SAP__UnitsOfMeasure"));
-			}
-
-			resolveLater(() => { // because of setTimeout in ODataMetaModel#_sendBundledRequest
-				this.bAnswerWith503 = false;
-				if (bResolve) {
-					// code under test f)
-					fnResolve();
-				} else {
-					// code under test g) or h) - reject with own error or error passed to the handler
-					fnReject(bResolve === null ? new Error("own error") : oRetryAfterError);
-				}
-			});
-
-			return Promise.all([
-				pCompanyCodeVH,
-				pCurrencies,
-				pUnits
-			]).then((aResults) => {
-				const oValueHelp = aResults[0];
-				assert.ok(bResolve);
-				assert.strictEqual(oValueHelp[""].CollectionPath.String, "VL_SH_H_T001");
-			}, (oError) => {
-				assert.notOk(bResolve);
-				assert.strictEqual(oError.message,
-					bResolve === false
-						? "Retry-After handler rejected with: HTTP request failed"
-						: "Retry-After handler rejected with: own error",
-					oError.message);
-				// Note: a rejected value list promise is cached, hence no retry for fetching metadata possible
-				assert.strictEqual(oMetaModel.getODataValueLists(oCompanyCodeMetaContext), pCompanyCodeVH);
-			}).finally(() => {
-				assert.strictEqual(iCallbackCounter, 1);
+		const oModel = createModel(sServiceUrl, mModelParameters);
+		let iCallbackCounter = 0;
+		let fnReject;
+		let fnResolve;
+		let oRetryAfterError;
+		oModel.setRetryAfterHandler((oError) => {
+			iCallbackCounter += 1;
+			assert.ok(oError instanceof Error);
+			assert.strictEqual(oError.message, "HTTP request failed");
+			assert.ok(oError.retryAfter instanceof Date, "retryAfter is a Date");
+			oRetryAfterError = oError;
+			return new Promise((resolve, reject) => {
+				fnResolve = resolve;
+				fnReject = reject;
 			});
 		});
+		const oMetaModel = oModel.getMetaModel();
+
+		await this.createView(assert, "", oModel);
+
+		await oMetaModel.loaded();
+
+		assert.ok(oMetadata0 && oMetadata0 === oMetaModel.getMetadata(), "b) metadata cache reused");
+
+		const oCompanyCodeMetaContext = oMetaModel.getMetaContext("/Items('~guid')/CompanyCode");
+		this.expectRequest(`Items('~guid')/CompanyCode?${sCustomParam}`, create503ErrorResponse())
+			.expectRequest("SAP__Currencies?sap-language=EN&$skip=0&$top=5000", create503ErrorResponse())
+			.expectRequest("SAP__UnitsOfMeasure?sap-language=EN&$skip=0&$top=5000", create503ErrorResponse());
+		this.bAnswerWith503 = true; // $metadata request for valuehelp will be answered with 503
+
+		// code under test c)
+		const pCompanyCodeVH = oMetaModel.getODataValueLists(oCompanyCodeMetaContext);
+		// code under test d)
+		oModel.read("/Items('~guid')/CompanyCode");
+		// code under test e)
+		const pCurrencies = oMetaModel.requestCurrencyCodes();
+		const pUnits = oMetaModel.requestUnitsOfMeasure();
+
+		await this.waitForChanges(assert);
+
+		if (bResolve) {
+			this.expectRequest(`Items('~guid')/CompanyCode?${sCustomParam}`, {results: "42"})
+				.expectRequest("SAP__Currencies?sap-language=EN&$skip=0&$top=5000", {
+					results : [{
+						CurrencyCode : "FOO",
+						DecimalPlaces : 42
+					}]
+				})
+				.expectRequest("SAP__UnitsOfMeasure?sap-language=EN&$skip=0&$top=5000", {
+					results : [{
+						ExternalCode : "BAR",
+						DecimalPlaces : 42
+					}]
+				});
+
+		} else {
+			this.oLogMock.expects("error")
+				.thrice()
+				.withArgs(sinon.match(bResolve === false
+					? "Request failed with status code 503" : "own error"));
+			this.oLogMock.expects("error").withArgs(sinon.match("Couldn't load code list: SAP__Currencies"));
+			this.oLogMock.expects("error").withArgs(sinon.match("Couldn't load code list: SAP__UnitsOfMeasure"));
+		}
+
+		resolveLater(() => { // because of setTimeout in ODataMetaModel#_sendBundledRequest
+			this.bAnswerWith503 = false;
+			if (bResolve) {
+				// code under test f)
+				fnResolve();
+			} else {
+				// code under test g) or h) - reject with own error or error passed to the handler
+				fnReject(bResolve === null ? new Error("own error") : oRetryAfterError);
+			}
+		});
+
+		return Promise.all([
+			pCompanyCodeVH,
+			pCurrencies,
+			pUnits
+		]).then((aResults) => {
+			const oValueHelp = aResults[0];
+			assert.ok(bResolve);
+			assert.strictEqual(oValueHelp[""].CollectionPath.String, "VL_SH_H_T001");
+		}, (oError) => {
+			assert.notOk(bResolve);
+			assert.strictEqual(oError.message,
+				bResolve === false
+					? "Retry-After handler rejected with: HTTP request failed"
+					: "Retry-After handler rejected with: own error",
+				oError.message);
+			// Note: a rejected value list promise is cached, hence no retry for fetching metadata possible
+			assert.strictEqual(oMetaModel.getODataValueLists(oCompanyCodeMetaContext), pCompanyCodeVH);
+		}).finally(() => {
+			assert.strictEqual(iCallbackCounter, 1);
+		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: If a text property is bound, the field help for the corresponding ID property is
@@ -27008,62 +27479,62 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	// the numeric type part (i.e. the amount) does have the parseEmtpyValueToZero=true format option and the
 	// constraint nullable=false.
 	// SNOW: DINC0414289, DINC0424927
-	[
-		{sType: "Currency", sCode: "EUR", sCustomizingPath: "requestCurrencyCodes", sRequestPath: "SAP__Currencies"},
-		{sType: "Unit", sCode: "KG", sCustomizingPath: "requestUnitsOfMeasure", sRequestPath: "SAP__UnitsOfMeasure"}
-	].forEach(({sType, sCode, sCustomizingPath, sRequestPath}) => {
-		QUnit.test(`odata.type.${sType}: Parse empty value to 0 instead of null`, async function (assert) {
-			const oModel = createSalesOrdersModel({defaultBindingMode: "TwoWay"});
-			const sView = `
-		<FlexBox id="form" binding="{/SalesOrderSet('1')}">
-			<Input id="grossAmount"
-				value="{
-					formatOptions: {showMeasure: false},
-					parts: [{
-						constraints: {scale: 'variable', nullable: false},
-						formatOptions: {parseEmptyValueToZero: true},
-						path: 'GrossAmount',
-						type: 'sap.ui.model.odata.type.Decimal'
-					}, {
-						path: 'CurrencyCode',
-						type: 'sap.ui.model.odata.type.String'
-					}, {
-						mode: 'OneTime',
-						path: '/##@@${sCustomizingPath}',
-						targetType: 'any'
-					}],
-					mode: 'TwoWay',
-					type: 'sap.ui.model.odata.type.${sType}'
-				}"
-			/>
-		</FlexBox>`;
+[
+	{sType: "Currency", sCode: "EUR", sCustomizingPath: "requestCurrencyCodes", sRequestPath: "SAP__Currencies"},
+	{sType: "Unit", sCode: "KG", sCustomizingPath: "requestUnitsOfMeasure", sRequestPath: "SAP__UnitsOfMeasure"}
+].forEach(({sType, sCode, sCustomizingPath, sRequestPath}) => {
+	QUnit.test(`odata.type.${sType}: Parse empty value to 0 instead of null`, async function (assert) {
+		const oModel = createSalesOrdersModel({defaultBindingMode: "TwoWay"});
+		const sView = `
+	<FlexBox id="form" binding="{/SalesOrderSet('1')}">
+		<Input id="grossAmount"
+			value="{
+				formatOptions: {showMeasure: false},
+				parts: [{
+					constraints: {scale: 'variable', nullable: false},
+					formatOptions: {parseEmptyValueToZero: true},
+					path: 'GrossAmount',
+					type: 'sap.ui.model.odata.type.Decimal'
+				}, {
+					path: 'CurrencyCode',
+					type: 'sap.ui.model.odata.type.String'
+				}, {
+					mode: 'OneTime',
+					path: '/##@@${sCustomizingPath}',
+					targetType: 'any'
+				}],
+				mode: 'TwoWay',
+				type: 'sap.ui.model.odata.type.${sType}'
+			}"
+		/>
+	</FlexBox>`;
 
-			this.expectHeadRequest()
-				.expectRequest("SalesOrderSet('1')", {
-						GrossAmount: "50",
-						CurrencyCode: sCode
-				})
-				.expectRequest(`${sRequestPath}?sap-language=EN&$skip=0&$top=5000`, {
-					results: [{
-						...(sType === "Unit" ? {ExternalCode: sCode} : {CurrencyCode: sCode}),
-						DecimalPlaces: 2,
-						ISOCode: sCode,
-						Text: "FooBar"
-					}]
-				})
-				.expectValue("grossAmount", "50.00");
+		this.expectHeadRequest()
+			.expectRequest("SalesOrderSet('1')", {
+					GrossAmount: "50",
+					CurrencyCode: sCode
+			})
+			.expectRequest(`${sRequestPath}?sap-language=EN&$skip=0&$top=5000`, {
+				results: [{
+					...(sType === "Unit" ? {ExternalCode: sCode} : {CurrencyCode: sCode}),
+					DecimalPlaces: 2,
+					ISOCode: sCode,
+					Text: "FooBar"
+				}]
+			})
+			.expectValue("grossAmount", "50.00");
 
-			await this.createView(assert, sView, oModel);
+		await this.createView(assert, sView, oModel);
 
-			this.expectValue("grossAmount", "0.00")
-				.expectValue("grossAmount", "0.00");
+		this.expectValue("grossAmount", "0.00")
+			.expectValue("grossAmount", "0.00");
 
-			// code under test
-			this.oView.byId("grossAmount").setValue("");
+		// code under test
+		this.oView.byId("grossAmount").setValue("");
 
-			await this.waitForChanges(assert);
-		});
+		await this.waitForChanges(assert);
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: Explicit field help (set via FieldHelpUtil.setDocumentationRef) has precedence over implicit field help
