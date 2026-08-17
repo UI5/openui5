@@ -3,6 +3,16 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "b604c3f0a18af4459847781b438ff13d5686ed7a",
+        "type": "FEATURE",
+        "text": " Form: use sap.m.Title for rendering"
+      },
+      {
+        "id": "a998cf717daef134858a855e7fe3e0d1b264fc19",
+        "type": "FEATURE",
+        "text": " core/IconPool: add SVG icon LESS theme configuration"
+      },
+      {
         "id": "21841c989e847d0c8731a2dea7566d913928ebaa",
         "type": "FIX",
         "text": " sap.tnt.SideNavigation: Content no longer reflows during collapse/expand animation"

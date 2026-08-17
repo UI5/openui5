@@ -3,6 +3,11 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "b604c3f0a18af4459847781b438ff13d5686ed7a",
+        "type": "FEATURE",
+        "text": " Form: use sap.m.Title for rendering"
+      },
+      {
         "id": "316f4ef67c434a93eb74af52e1e4a89e0b95a405",
         "type": "FIX",
         "text": " core/Icon: fix focus outline clipped by overflow:hidden"

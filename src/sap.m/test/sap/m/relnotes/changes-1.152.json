@@ -3,6 +3,46 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "d08a64f801121aacf7cc1d04ffc1cdc8ada3c453",
+        "type": "FIX",
+        "text": "sap.m.ComboBox: Dialog opens when tapping on mobile"
+      },
+      {
+        "id": "a346c9daddd4ec071e192bd4552025c64cce3738",
+        "type": "FIX",
+        "text": " We've now fixed the accessibility issue of FeedListItem control by preventing ariaLabelledBy duplication on re-render"
+      },
+      {
+        "id": "b29a9259718bfcc029f03e2814455fc321d5db17",
+        "type": "FIX",
+        "text": " sap.m.SinglePlanningCalendar: Show correct more link count"
+      },
+      {
+        "id": "4c338cd31749930ed9d9bd53b89c8538ec34f358",
+        "type": "FIX",
+        "text": " sap.m.PlanningCalendar: Correctly show NonWorking in Hours view"
+      },
+      {
+        "id": "8a4653b5419e8243b925a064e612049c9a8748c8",
+        "type": "FEATURE",
+        "text": " SimpleForm: use sap.m.Title for rendering"
+      },
+      {
+        "id": "48621eacdd8797db279e0253699fa8f39674f58b",
+        "type": "FIX",
+        "text": " sap.m.MultiComboBox: Custom value state message is now correctly restored"
+      },
+      {
+        "id": "fa9467a30a02fbcf7a4bd54f0ea4dfec0df81293",
+        "type": "FIX",
+        "text": " sap.m.MessageView: Details view is correctly updated on message update"
+      },
+      {
+        "id": "102cc17ede1aa39f824cbb905cd32df60e436cfc",
+        "type": "FIX",
+        "text": " m.Table: No columns message not visible"
+      },
+      {
         "id": "dd468a78e443ff7c7291e071716e580d65ffaed1",
         "type": "FIX",
         "text": " sap.m.MultiInput:  Read-only focus outline in compact mode is now fixed"

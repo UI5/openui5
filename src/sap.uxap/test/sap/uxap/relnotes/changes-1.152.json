@@ -3,6 +3,11 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "60b3151359bd65cb2bfc3bf22cae0f50682b126f",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: Single section is not focusable"
+      },
+      {
         "id": "d0b85ad910a36b8da1666786ee8a3519ffc3254d",
         "type": "FIX",
         "text": " sap.uxap.AnchorBar: Remove redundant \"navigation bar\" from landmark label"

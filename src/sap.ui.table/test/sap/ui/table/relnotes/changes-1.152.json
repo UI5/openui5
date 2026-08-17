@@ -1,0 +1,12 @@
+{
+  "1.152.0": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "97aa4682daf1b9c0b087b7b83b8dd3dfae2f4716",
+        "type": "FEATURE",
+        "text": " LargeDataScrolling with placeholder visualisation"
+      }
+    ]
+  }
+}

@@ -3,9 +3,19 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "8a4653b5419e8243b925a064e612049c9a8748c8",
+        "type": "FEATURE",
+        "text": " SimpleForm: use sap.m.Title for rendering"
+      },
+      {
         "id": "d77c863a2b34517920e68fe422a81a51b2b8e376",
         "type": "FIX",
         "text": " sap.ui.core: Log error for invalid boolean, int, or float values in declarative views"
+      },
+      {
+        "id": "a998cf717daef134858a855e7fe3e0d1b264fc19",
+        "type": "FEATURE",
+        "text": " core/IconPool: add SVG icon LESS theme configuration"
       },
       {
         "id": "ac21a8c052c74af5be3a6505961b2aad14897d21",
@@ -36,6 +46,11 @@
         "id": "d18452e9e42ffc0528da0906dcc6748794e99995",
         "type": "FIX",
         "text": " sap.ui.test.actions.Action: fix focus issue on Firefox"
+      },
+      {
+        "id": "75033c99f34d50f95dd6127daf3369cd9e9f69bc",
+        "type": "FEATURE",
+        "text": " core/IconPool: add SVG icon assets"
       }
     ]
   }

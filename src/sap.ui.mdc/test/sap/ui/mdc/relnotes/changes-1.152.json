@@ -3,6 +3,16 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "36d79eedc0bf8a4f9fa0eff8069c627431baea8f",
+        "type": "FIX",
+        "text": "p13n.AdaptFiltersPanel: fix boolean field visibility"
+      },
+      {
+        "id": "d12a769286b94b150b801f300025219748fc00e7",
+        "type": "FIX",
+        "text": " ValueHelp: Token counter not updated"
+      },
+      {
         "id": "aeec8b5f50cf48da77969eec8a907b33c474b46e",
         "type": "FIX",
         "text": " sap.ui.mdc.Chart: Support for Timestamp values as TimeDimension"

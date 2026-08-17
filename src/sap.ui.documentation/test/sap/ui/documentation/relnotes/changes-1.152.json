@@ -1,0 +1,27 @@
+{
+  "1.152.0": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "68d8c224b5ad0f97925b150ef0646204b52d9db9",
+        "type": "FIX",
+        "text": " DemoKit: UsageTracker now tracks in-app referrer"
+      },
+      {
+        "id": "f8c92e6bd2cf099bbccb677a166a603d6936e760",
+        "type": "FEATURE",
+        "text": " Demo Kit: Replace ToolHeader with ui5-shellbar web component"
+      },
+      {
+        "id": "b05886fbd9b6646fe19f9d2b5517f396d0e331f6",
+        "type": "FIX",
+        "text": " Demo Kit: \"Get Started\" button now updates the URL"
+      },
+      {
+        "id": "8d98440e1ce371730a410e5893ec2025f171983d",
+        "type": "FIX",
+        "text": " DemoKit: UsageTracker now normalizes root hash in page.name"
+      }
+    ]
+  }
+}

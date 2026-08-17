@@ -3,6 +3,16 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "8a4653b5419e8243b925a064e612049c9a8748c8",
+        "type": "FEATURE",
+        "text": " SimpleForm: use sap.m.Title for rendering"
+      },
+      {
+        "id": "b604c3f0a18af4459847781b438ff13d5686ed7a",
+        "type": "FEATURE",
+        "text": " Form: use sap.m.Title for rendering"
+      },
+      {
         "id": "34d249ed7f631f849acf3d4299cd8c8f88c8518e",
         "type": "FIX",
         "text": " SemanticFormElement: aria-label on Text controls"

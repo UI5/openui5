@@ -3,6 +3,11 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "b604c3f0a18af4459847781b438ff13d5686ed7a",
+        "type": "FEATURE",
+        "text": " Form: use sap.m.Title for rendering"
+      },
+      {
         "id": "fcb73d2040fa9f5afb4b781657f19063fcb8a102",
         "type": "FIX",
         "text": " We've now fixed the multiselect checkbox size and the content gap within UploadSet to prevent the focus ring from overlapping the file icon"
