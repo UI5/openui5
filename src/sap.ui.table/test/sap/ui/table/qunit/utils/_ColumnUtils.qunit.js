@@ -71,11 +71,7 @@ sap.ui.define([
 			};
 
 			this.fnColumnArrayToIdArray = function(aColumns) {
-				const aColumnIDs = [];
-				for (let i = 0; i < aColumns.length; i++) {
-					aColumnIDs.push({column: aColumns[i].column.getId(), level: aColumns[i].level});
-				}
-				return aColumnIDs;
+				return aColumns.map((oItem) => ({column: oItem.column.getId(), level: oItem.level}));
 			};
 
 			this.fnColumnBoundariesToId = function(mBoundaries) {
@@ -623,7 +619,7 @@ sap.ui.define([
 		const oColumn = this.oTable.getColumns()[2];
 		assert.ok(ColumnUtils.isColumnMovable(oColumn), "Ensure column is movable");
 
-		this.oTable.attachColumnMove(function(oEvent) {
+		this.oTable.attachColumnMove((oEvent) => {
 			assert.equal(oEvent.getParameter("newPos"), 3, "Correct Index in event parameter");
 			assert.ok(oEvent.getParameter("column") === oColumn, "Correct Column in event parameter");
 		});
@@ -638,7 +634,7 @@ sap.ui.define([
 		const oColumn = this.oTable.getColumns()[0];
 		assert.ok(!ColumnUtils.isColumnMovable(oColumn), "Column is not movable");
 
-		this.oTable.attachColumnMove(function(oEvent) {
+		this.oTable.attachColumnMove((oEvent) => {
 			assert.ok(false, "No event was triggered");
 		});
 
@@ -652,7 +648,7 @@ sap.ui.define([
 		const oColumn = this.oTable.getColumns()[4];
 		assert.ok(ColumnUtils.isColumnMovable(oColumn), "Column is movable");
 
-		this.oTable.attachColumnMove(function(oEvent) {
+		this.oTable.attachColumnMove((oEvent) => {
 			assert.ok(false, "No event was triggered");
 		});
 
@@ -666,7 +662,7 @@ sap.ui.define([
 		const oColumn = this.oTable.getColumns()[2];
 		assert.ok(ColumnUtils.isColumnMovable(oColumn), "Column is movable");
 
-		this.oTable.attachColumnMove(function(oEvent) {
+		this.oTable.attachColumnMove((oEvent) => {
 			assert.equal(oEvent.getParameter("newPos"), 3, "Correct Index in event parameter");
 			assert.ok(oEvent.getParameter("column") === oColumn, "Correct Column in event parameter");
 			oEvent.preventDefault();
@@ -711,18 +707,13 @@ sap.ui.define([
 
 		const aVisibleColumns = oTable._getVisibleColumns();
 
-		const aOriginalColumnWidths = [];
-		for (let i = 0; i < aVisibleColumns.length; i++) {
-			const oColumn = aVisibleColumns[i];
-			aOriginalColumnWidths.push(parseInt(oColumn.getWidth()));
-		}
+		const aOriginalColumnWidths = aVisibleColumns.map((oColumn) => parseInt(oColumn.getWidth()));
 
 		function assertUnchanged(aExcludedColumns) {
-			for (let i = 0; i < aVisibleColumns.length; i++) {
-				if (aExcludedColumns && aExcludedColumns.indexOf(i) !== -1) {
+			for (const [i, oColumn] of aVisibleColumns.entries()) {
+				if (aExcludedColumns && aExcludedColumns.includes(i)) {
 					continue;
 				}
-				const oColumn = aVisibleColumns[i];
 				assert.strictEqual(parseInt(oColumn.getWidth()), aOriginalColumnWidths[i],
 					"Column " + (i + 1) + " has its original width of " + aOriginalColumnWidths[i] + "px");
 			}
@@ -731,7 +722,7 @@ sap.ui.define([
 		function assertColumnWidth(iColumnIndex, iWidth) {
 			const iActualColumnWidth = parseInt(aVisibleColumns[iColumnIndex].getWidth());
 			assert.strictEqual(iActualColumnWidth, iWidth,
-				"Column " + (iColumnIndex + 1) + " width is " + iActualColumnWidth + "px and should be " + iWidth + "px");
+				`Column ${(iColumnIndex + 1)} width is ${iActualColumnWidth}px and should be ${iWidth}px`);
 		}
 
 		// Invalid input should not change the column widths.
@@ -893,9 +884,9 @@ sap.ui.define([
 			this.oTable = TableQUnitUtils.createTable();
 			await this.oTable.qunit.rendered();
 			this.aColumns = this.oTable.getColumns();
-			for (let i = 0; i < this.aColumns.length; i++) {
-				this.aColumns[i].setVisible(true);
-				this.aColumns[i].setWidth("100px");
+			for (const oColumn of this.aColumns) {
+				oColumn.setVisible(true);
+				oColumn.setWidth("100px");
 			}
 			this.oTable.setWidth(((this.aColumns.length * 100) + 200) + "px");
 			await nextUIUpdate();

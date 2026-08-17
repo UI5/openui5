@@ -328,7 +328,7 @@ sap.ui.define([
 	QUnit.test("preventDefault", function(assert) {
 		const oEvent = createFakeEventObject(this.oTable.qunit.getDataCell(0, 0));
 
-		this.oTable.attachEventOnce("beforeOpenContextMenu", function(oEvent) {
+		this.oTable.attachEventOnce("beforeOpenContextMenu", (oEvent) => {
 			oEvent.preventDefault();
 		});
 		TableUtils.Menu.openContextMenu(this.oTable, oEvent);

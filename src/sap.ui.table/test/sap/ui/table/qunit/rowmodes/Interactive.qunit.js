@@ -356,7 +356,7 @@ sap.ui.define([
 				"Prevent Default of selectstart event");
 			assert.ok(oEvent.isPropagationStopped() && bDuringResize || !oEvent.isPropagationStopped() && !bDuringResize,
 				"Stopped Propagation of selectstart event");
-			const sUnselectable = jQuery(document.body).attr("unselectable") || "off";
+			const sUnselectable = document.body.getAttribute("unselectable") || "off";
 			assert.ok(sUnselectable === (bDuringResize ? "on" : "off"), "Text Selection switched " + (bDuringResize ? "off" : "on"));
 		};
 

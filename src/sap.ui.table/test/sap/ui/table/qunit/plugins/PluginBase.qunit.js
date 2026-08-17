@@ -43,9 +43,7 @@ sap.ui.define([
 		const oNotATable = new (Control.extend("sap.ui.table.plugins.test.Control"))();
 
 		assert.throws(
-			function() {
-				oNotATable.addDependent(this.oPlugin);
-			}.bind(this),
+			() => { oNotATable.addDependent(this.oPlugin); },
 			new Error(this.oPlugin + " is not applicable to " + oNotATable), "By default, applying a plugin to a non-table throws an error"
 		);
 
@@ -55,9 +53,7 @@ sap.ui.define([
 
 		this.oPlugin.isApplicable.returns(false);
 		assert.throws(
-			function() {
-				this.oTable.addDependent(this.oPlugin);
-			}.bind(this),
+			() => { this.oTable.addDependent(this.oPlugin); },
 			new Error(this.oPlugin + " is not applicable to " + this.oTable),
 			"If applying a plugin to a table and #isApplicable returns false, an error is thrown"
 		);

@@ -1371,11 +1371,11 @@ sap.ui.define([
 	QUnit.test("Delete last unselected context", async function(assert) {
 		const aContexts = await TableUtils.loadContexts(this.oTable, 0, this.oTable.getBinding().getLength());
 
-		aContexts.forEach((oContext) => {
+		for (const oContext of aContexts) {
 			if (oContext.getIndex() > 0) {
 				oContext.setSelected(true);
 			}
-		});
+		}
 		await aContexts[0].delete();
 		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.allSelectedIcon,
@@ -1416,13 +1416,14 @@ sap.ui.define([
 		await this.createTableWithDataAggregation();
 		await TableQUnitUtils.expandAndScrollTableWithDataAggregation(this.oTable);
 
-		(await TableUtils.loadContexts(this.oTable, 0, this.oTable.getBinding().getLength())).filter((oContext) => {
+		const aLeafContexts = (await TableUtils.loadContexts(this.oTable, 0, this.oTable.getBinding().getLength())).filter((oContext) => {
 			const bIsLeaf = oContext.getProperty("@$ui5.node.isExpanded") === undefined;
 			const bIsTotal = oContext.getProperty("@$ui5.node.isTotal");
 			return bIsLeaf && !bIsTotal;
-		}).forEach((oContext) => {
-			oContext.setSelected(true);
 		});
+		for (const oContext of aLeafContexts) {
+			oContext.setSelected(true);
+		}
 
 		await this.assertHeaderSelector({
 			icon: TableUtils.ThemeParameters.clearSelectionIcon,

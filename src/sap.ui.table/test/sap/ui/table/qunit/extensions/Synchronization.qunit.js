@@ -45,8 +45,8 @@ sap.ui.define([
 			"Promise resolved with the synchronization extension interface");
 		assert.notStrictEqual(oSyncInterface, oExtension, "The interface is not the extension itself");
 
-		for (let i = 0; i < this.oTable.aDelegates.length; i++) {
-			if (this.oTable.aDelegates[i].oDelegate === oExtension._delegate) {
+		for (const oDelegate of this.oTable.aDelegates) {
+			if (oDelegate.oDelegate === oExtension._delegate) {
 				iDelegateCount++;
 			}
 		}

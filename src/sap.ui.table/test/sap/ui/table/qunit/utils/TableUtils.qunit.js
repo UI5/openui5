@@ -914,9 +914,7 @@ sap.ui.define([
 				return this.length;
 			},
 			getContexts: function(iStartIndex, iLength, iThreshold, bKeepCurrent) {
-				this.loadedContexts = this.loadedContexts.filter(function(item) {
-					return Boolean(item);
-				});
+				this.loadedContexts = this.loadedContexts.filter((item) => Boolean(item));
 				const iLoadedContextsCount = this.loadedContexts.length;
 				for (let j = Math.max(iLoadedContextsCount, iStartIndex); j < Math.min(this.length, iLength); j++) {
 					if (j < iLoadedContextsCount + this.limit) {
@@ -1076,9 +1074,9 @@ sap.ui.define([
 		testNoDataVisibility("With visible columns", false, 1, false);
 		testNoDataVisibility("With visible columns", false, 0, false);
 
-		oTable.getColumns().forEach(function(oColumn) {
+		for (const oColumn of oTable.getColumns()) {
 			oColumn.setVisible(false);
-		});
+		}
 		testNoDataVisibility("Without visible columns", true, 1, true);
 		testNoDataVisibility("Without visible columns", true, 0, true);
 		testNoDataVisibility("Without visible columns", false, 1, true);
@@ -1110,13 +1108,13 @@ sap.ui.define([
 		// TableUtils.isA is just a wrapper for sap.ui.base.Object.isA. Therefore, we only check whether TableUtils.isA correctly calls the base
 		// method and returns the same value.
 
-		[
+		for (const aArguments of [
 			[oTable, null],
 			[null, "sap.ui.table.Table"],
 			[oTable, "sap.ui.table.Table"],
 			[oTable, "sap.ui.table.AnalyticalTable"],
 			[oTable, ["sap.ui.table.Table", "sap.ui.table.AnalyticalTable"]]
-		].forEach(function(aArguments) {
+		]) {
 			const vBaseObjectReturnValue = BaseObject.isObjectA(aArguments[0], aArguments[1]);
 
 			oBaseObjectIsA.resetHistory();
@@ -1124,7 +1122,7 @@ sap.ui.define([
 				"TableUtils.isA returns the same as sap.ui.base.Object.isObjectA");
 			assert.ok(oBaseObjectIsA.calledOnceWithExactly(aArguments[0], aArguments[1]),
 				"sap.ui.base.Object.isObjectA was called once with the same parameters as TableUtils.isA");
-		});
+		}
 
 		oBaseObjectIsA.restore();
 	});
@@ -1394,8 +1392,8 @@ sap.ui.define([
 		assert.equal(TableUtils.getFirstInteractiveElement(oRow, false), null, "ActionCells are not taken in consideration");
 		assert.equal(TableUtils.getFirstInteractiveElement(oRow, true), $RowActionIcons[0], "ActionCells are taken in consideration");
 
-		oRow.getCells()[0].$().attr("tabindex", 0);
-		oRow.getCells()[1].$().attr("tabindex", 0);
+		oRow.getCells()[0].getDomRef().setAttribute("tabindex", 0);
+		oRow.getCells()[1].getDomRef().setAttribute("tabindex", 0);
 		assert.equal(TableUtils.getFirstInteractiveElement(oRow, true), oRow.getCells()[0].getDomRef(), "Returns the first interactive element");
 	});
 
@@ -1497,7 +1495,7 @@ sap.ui.define([
 		const y = 20;
 		const oCoord = {pageX: x, pageY: y};
 
-		oEvent = jQuery.extend({originalEvent: {}}, oCoord);
+		oEvent = {originalEvent: {}, ...oCoord};
 
 		oPos = TableUtils.getEventPosition(oEvent, oTable);
 		assert.equal(oPos.x, x, "MouseEvent - X");
@@ -1692,8 +1690,8 @@ sap.ui.define([
 					render: function(rm, oControl) {
 						rm.openStart("div", oControl).openEnd();
 						const aContent = oControl.getContent();
-						for (let i = 0; i < aContent.length; i++) {
-							rm.renderControl(aContent[i]);
+						for (const oItem of aContent) {
+							rm.renderControl(oItem);
 						}
 						rm.close("div");
 					}
@@ -1708,14 +1706,14 @@ sap.ui.define([
 	QUnit.test("getContentDensity", async function(assert) {
 		const oSecondLevel = new this.TableUtilsDummyControl({content: [this.oTable]});
 		const oFirstLevel = new this.TableUtilsDummyControl({content: [oSecondLevel]});
-		const $Body = jQuery(document.body);
-		$Body.toggleClass("sapUiSizeCozy", false);
+		const oBody = document.body;
+		oBody.classList.toggle("sapUiSizeCozy", false);
 
 		oFirstLevel.placeAt("__table-outer", 0);
 		await nextUIUpdate();
 		assert.strictEqual(TableUtils.getContentDensity(this.oTable), undefined, "No content density set to far");
 
-		$Body.toggleClass("sapUiSizeCozy", true);
+		oBody.classList.toggle("sapUiSizeCozy", true);
 		assert.equal(TableUtils.getContentDensity(this.oTable), "sapUiSizeCozy", "sapUiSizeCozy at Body");
 
 		oFirstLevel.addStyleClass("sapUiSizeCompact");
@@ -1742,27 +1740,27 @@ sap.ui.define([
 		assert.equal(TableUtils.getContentDensity(this.oTable), "sapUiSizeCompact", "sapUiSizeCompact at Table");
 
 		oSecondLevel.addStyleClass("sapUiSizeCompact");
-		this.oTable.$().toggleClass("sapUiSizeCompact", false);
-		this.oTable.$().toggleClass("sapUiSizeCozy", true);
+		this.oTable.getDomRef().classList.toggle("sapUiSizeCompact", false);
+		this.oTable.getDomRef().classList.toggle("sapUiSizeCozy", true);
 		assert.equal(TableUtils.getContentDensity(this.oTable), "sapUiSizeCozy",
 			"sapUiSizeCozy at table DOM and sapUiSizeCompact at control level. DOM wins -> sapUiSizeCozy");
 
-		this.oTable.$().toggleClass("sapUiSizeCondensed", true);
+		this.oTable.getDomRef().classList.toggle("sapUiSizeCondensed", true);
 		assert.equal(TableUtils.getContentDensity(this.oTable), "sapUiSizeCondensed",
 			"sapUiSizeCondensed at table DOM, sapUiSizeCozy at table DOM and sapUiSizeCompact at control level. DOM wins. -> sapUiSizeCondensed");
 
-		$Body.toggleClass("sapUiSizeCozy", true);
+		oBody.classList.toggle("sapUiSizeCozy", true);
 	});
 
 	QUnit.test("getContentDensity without DOM", function(assert) {
 		const oSecondLevel = new this.TableUtilsDummyControl({content: [this.oTable]});
 		const oFirstLevel = new this.TableUtilsDummyControl({content: [oSecondLevel]});
-		const $Body = jQuery(document.body);
-		$Body.toggleClass("sapUiSizeCozy", false);
+		const oBody = document.body;
+		oBody.classList.toggle("sapUiSizeCozy", false);
 
 		assert.strictEqual(TableUtils.getContentDensity(this.oTable), undefined, "No content density set to far");
 
-		$Body.toggleClass("sapUiSizeCozy", true);
+		oBody.classList.toggle("sapUiSizeCozy", true);
 		assert.equal(TableUtils.getContentDensity(this.oTable), "sapUiSizeCozy", "sapUiSizeCozy at Body");
 
 		oFirstLevel.addStyleClass("sapUiSizeCompact");
@@ -1782,14 +1780,14 @@ sap.ui.define([
 		this.oTable.addStyleClass("sapUiSizeCozy");
 		assert.equal(TableUtils.getContentDensity(this.oTable), "sapUiSizeCozy", "sapUiSizeCozy at Table");
 
-		$Body.toggleClass("sapUiSizeCozy", true);
+		oBody.classList.toggle("sapUiSizeCozy", true);
 	});
 
 	QUnit.test("getContentDensity table in UI Area", async function(assert) {
 		this.oTable.placeAt("__table-outer", 0);
 		await nextUIUpdate();
-		const $Body = jQuery(document.body);
-		$Body.toggleClass("sapUiSizeCozy", false);
+		const oBody = document.body;
+		oBody.classList.toggle("sapUiSizeCozy", false);
 
 		assert.strictEqual(TableUtils.getContentDensity(this.oTable), undefined, "No content density set to far");
 
@@ -1797,7 +1795,7 @@ sap.ui.define([
 		await nextUIUpdate();
 		assert.equal(TableUtils.getContentDensity(this.oTable), "sapUiSizeCozy", "sapUiSizeCozy at table");
 
-		$Body.toggleClass("sapUiSizeCozy", true);
+		oBody.classList.toggle("sapUiSizeCozy", true);
 	});
 
 	QUnit.module("Cell Content", {

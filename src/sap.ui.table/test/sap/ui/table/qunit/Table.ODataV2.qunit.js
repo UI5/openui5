@@ -483,7 +483,7 @@ sap.ui.define([
 					dataReceived: function() {
 						that.assertState(assert, "On 'dataReceived'", {pendingRequests: false, busy: false});
 
-						setTimeout(function() {
+						setTimeout(() => {
 							that.assertState(assert, "200ms after 'dataReceived'", {pendingRequests: false, busy: false});
 							done();
 						}, 200);
@@ -689,7 +689,7 @@ sap.ui.define([
 				events: {
 					dataRequested: function() {
 						that.assertState(assert, "On 'dataRequested'", {pendingRequests: true, busy: true});
-						setTimeout(function() {
+						setTimeout(() => {
 							that.getTable().unbindRows();
 						}, 0);
 					},
@@ -721,7 +721,7 @@ sap.ui.define([
 				events: {
 					dataRequested: function() {
 						that.assertState(assert, "On 'dataRequested'", {pendingRequests: true, busy: false});
-						setTimeout(function() {
+						setTimeout(() => {
 							that.getTable().setEnableBusyIndicator(true);
 						}, 0);
 					},
@@ -756,7 +756,7 @@ sap.ui.define([
 				events: {
 					dataRequested: function() {
 						that.assertState(assert, "On 'dataRequested'", {pendingRequests: true, busy: true});
-						setTimeout(function() {
+						setTimeout(() => {
 							that.getTable().setEnableBusyIndicator(false);
 						}, 0);
 					},
@@ -882,7 +882,7 @@ sap.ui.define([
 			this.iNoDataVisibilityChanges = 0;
 
 			await this.oTable.qunit.rendered();
-			this.oObserver = new MutationObserver(function(aRecords) {
+			this.oObserver = new MutationObserver((aRecords) => {
 				const oRecord = aRecords[0];
 				const bNoDataWasVisible = oRecord.oldValue.includes("sapUiTableEmpty");
 				const bNoDataIsVisible = oRecord.target.classList.contains("sapUiTableEmpty");
@@ -890,7 +890,7 @@ sap.ui.define([
 				if (bNoDataWasVisible !== bNoDataIsVisible) {
 					this.iNoDataVisibilityChanges++;
 				}
-			}.bind(this));
+			});
 
 			this.oObserver.observe(this.oTable.getDomRef(), {attributes: true, attributeOldValue: true, attributeFilter: ["class"]});
 		},
@@ -918,13 +918,13 @@ sap.ui.define([
 		const done = assert.async();
 
 		this.oTable.destroy();
-		this.oTable = TableQUnitUtils.createTable(function(oTable) {
-			new Promise(function(resolve) {
-				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", function() {
+		this.oTable = TableQUnitUtils.createTable((oTable) => {
+			new Promise((resolve) => {
+				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", () => {
 					TableQUnitUtils.assertNoDataVisible(assert, oTable, true); // Initial rendering has no data
 					resolve();
 				});
-			}).then(oTable.qunit.rendered).then(function() {
+			}).then(oTable.qunit.rendered).then(() => {
 				TableQUnitUtils.assertNoDataVisible(assert, oTable, false);
 				done();
 			});
@@ -937,13 +937,13 @@ sap.ui.define([
 		this.oTable.destroy();
 		this.oTable = TableQUnitUtils.createTable({
 			rows: {path: "/Products", filters: [new Filter({path: "Name", operator: "EQ", value1: "DoesNotExist"})]}
-		}, function(oTable) {
-			new Promise(function(resolve) {
-				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", function() {
+		}, (oTable) => {
+			new Promise((resolve) => {
+				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", () => {
 					TableQUnitUtils.assertNoDataVisible(assert, oTable, true); // Initial rendering has no data
 					resolve();
 				});
-			}).then(oTable.qunit.rendered).then(function() {
+			}).then(oTable.qunit.rendered).then(() => {
 				TableQUnitUtils.assertNoDataVisible(assert, oTable, true);
 				done();
 			});

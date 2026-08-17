@@ -111,7 +111,7 @@ sap.ui.define([
         assert.ok(this.oTable.getBinding().getLength() === 0, "Binding length is 0");
 
         let bResolved = false;
-        this.oTable._scrollToIndex(7).then(function() {
+        this.oTable._scrollToIndex(7).then(() => {
             bResolved = true;
         });
 

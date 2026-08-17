@@ -209,7 +209,7 @@ sap.ui.define([
 			this.oTable.destroy();
 		},
 		assertColumnCellVisibilitySettings: function(assert, mExpectedSettings) {
-			this.oTable.getColumns().forEach(function(oColumn) {
+			for (const oColumn of this.oTable.getColumns()) {
 				const sColumnId = oColumn.getId();
 				const oSpy = oColumn._setCellContentVisibilitySettings;
 				const sMessagePrefix = sColumnId + " - ";
@@ -221,21 +221,21 @@ sap.ui.define([
 				} else {
 					sinon.assert.calledWithExactly(oSpy);
 				}
-			});
+			}
 			this.resetSpies();
 		},
 		resetSpies: function() {
-			this.oTable.getColumns().forEach(function(oColumn) {
+			for (const oColumn of this.oTable.getColumns()) {
 				oColumn._setCellContentVisibilitySettings.resetHistory();
-			});
+			}
 		}
 	});
 
 	QUnit.test("Initial", function(assert) {
-		this.oTable.getColumns().forEach(function(oColumn) {
+		for (const oColumn of this.oTable.getColumns()) {
 			assert.ok(oColumn._setCellContentVisibilitySettings.notCalled,
 				`Column#_setCellContentVisibilitySettings not called (${oColumn.getId()})`);
-		});
+		}
 	});
 
 	QUnit.test("Declare which columns have totals", function(assert) {

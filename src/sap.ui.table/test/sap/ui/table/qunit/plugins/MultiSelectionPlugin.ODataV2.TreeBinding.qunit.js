@@ -20,9 +20,9 @@ sap.ui.define([
 
 	oAnnotationMockServer.simulate(sURLPrefix + "/model/metadata_odtbmd.xml", sURLPrefix + "/model/odtbmd/");
 	const aAnnotationsMockdata = oAnnotationMockServer._oMockdata.GLAccountHierarchyInChartOfAccountsLiSet;
-	aAnnotationsMockdata.forEach(function(oAnnotationMockdata) {
+	for (const oAnnotationMockdata of aAnnotationsMockdata) {
 		oAnnotationMockdata.FinStatementHierarchyLevelVal = parseInt(oAnnotationMockdata.FinStatementHierarchyLevelVal);
-	});
+	}
 	oAnnotationMockServer.start();
 
 	TableQUnitUtils.setDefaultSettings({

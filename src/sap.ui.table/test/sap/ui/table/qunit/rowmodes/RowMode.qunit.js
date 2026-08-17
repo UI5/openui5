@@ -108,8 +108,7 @@ sap.ui.define([
 		];
 		const oGetRowCountConstraints = this.stub(this.oRowMode, "getRowCountConstraints");
 
-		for (let i = 0; i < aTestParameters.length; i++) {
-			const mTestParameter = aTestParameters[i];
+		for (const mTestParameter of aTestParameters) {
 			oGetRowCountConstraints.returns(mTestParameter.constraints || {});
 			assert.deepEqual(this.oRowMode.computeStandardizedRowCounts.apply(this.oRowMode, mTestParameter.input), mTestParameter.output,
 				"(count: " + mTestParameter.input[0]

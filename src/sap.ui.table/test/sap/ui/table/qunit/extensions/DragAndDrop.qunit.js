@@ -761,8 +761,8 @@ sap.ui.define([
 		this.oTreeTable.invalidate();
 		await nextUIUpdate();
 
-		for (let i = 0; i < aColumns.length; i++) {
-			const oColumnRef = aColumns[i].getDomRef();
+		for (const [i, oColumn] of aColumns.entries()) {
+			const oColumnRef = oColumn.getDomRef();
 			assert.equal(oColumnRef.getAttribute("draggable"), i === 0 ? null : "true", "Column " + i + " has correct value for draggable");
 			assert.equal(oColumnRef.getAttribute("data-sap-ui-draggable"), i === 0 ? null : "true", "Column " + i + " has correct value for data-sap-ui-draggable");
 		}
@@ -800,8 +800,8 @@ sap.ui.define([
 		this.oTable.invalidate();
 		await nextUIUpdate();
 
-		for (let i = 0; i < aColumns.length; i++) {
-			const oColumnRef = aColumns[i].getDomRef();
+		for (const [i, oColumn] of aColumns.entries()) {
+			const oColumnRef = oColumn.getDomRef();
 			assert.equal(oColumnRef.getAttribute("draggable"), i < 2 ? null : "true", "Column " + i + " has correct value for draggable");
 			assert.equal(oColumnRef.getAttribute("data-sap-ui-draggable"), i < 2 ? null : "true", "Column " + i + " has correct value for data-sap-ui-draggable");
 		}

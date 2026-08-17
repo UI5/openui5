@@ -36,9 +36,7 @@ sap.ui.define([
 			return this.oTable.qunit.rendered();
 		},
 		assertCells: function(assert) {
-			const aActualCells = this.oTable.getRows()[0].getCells().map(function(oCell) {
-				return oCell.getText();
-			});
+			const aActualCells = this.oTable.getRows()[0].getCells().map((oCell) => oCell.getText());
 			const aExpectedCells = Array.prototype.slice.call(arguments, 1);
 
 			assert.deepEqual(aActualCells, aExpectedCells, "The row has the correct cells");
@@ -250,7 +248,7 @@ sap.ui.define([
 	QUnit.test("isSelectable - not selectable via Row.UpdateState hook", function(assert) {
 		const oRow = this.oTable.getRows()[0];
 
-		TableUtils.Hook.register(this.oTable, TableUtils.Hook.Keys.Row.UpdateState, function(oState) {
+		TableUtils.Hook.register(this.oTable, TableUtils.Hook.Keys.Row.UpdateState, (oState) => {
 			oState.selectable = false;
 		});
 		oRow.setRowBindingContext(oRow.getBindingContext(), this.oTable);

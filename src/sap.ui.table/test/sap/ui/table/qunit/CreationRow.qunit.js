@@ -544,7 +544,7 @@ sap.ui.define([
 			this.oTable.destroy();
 		},
 		assertCells: function(assert) {
-			const aActualCells = this.oTable.getCreationRow().getCells().map(function(oCell) {
+			const aActualCells = this.oTable.getCreationRow().getCells().map((oCell) => {
 				const sText = oCell.getText();
 				return sText.substring(0, sText.length - 1);
 			});

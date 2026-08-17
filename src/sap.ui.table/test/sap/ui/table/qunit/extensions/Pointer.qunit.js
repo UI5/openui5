@@ -78,8 +78,8 @@ sap.ui.define([
 
 		assert.ok(oExtension, "Extension available in table");
 
-		for (let i = 0; i < this.oTable.aDelegates.length; i++) {
-			if (this.oTable.aDelegates[i].oDelegate === oExtension._delegate) {
+		for (const oDelegate of this.oTable.aDelegates) {
+			if (oDelegate.oDelegate === oExtension._delegate) {
 				iDelegateCount++;
 			}
 		}
@@ -189,13 +189,13 @@ sap.ui.define([
 			moveResizer(this.oColumn);
 
 			// Simulate double click on resizer
-			await new Promise(function(resolve) {
+			await new Promise((resolve) => {
 				oResizer.dispatchEvent(createPointerEvent("mousedown"));
 				oResizer.dispatchEvent(createPointerEvent("mouseup"));
 				oResizer.dispatchEvent(createPointerEvent("click"));
 				setTimeout(resolve, 50);
 			});
-			await new Promise(function(resolve) {
+			await new Promise((resolve) => {
 				oResizer.dispatchEvent(createPointerEvent("mousedown"));
 				oResizer.dispatchEvent(createPointerEvent("mouseup"));
 				oResizer.dispatchEvent(createPointerEvent("click"));
@@ -328,9 +328,9 @@ sap.ui.define([
 		oTable._getPointerExtension()._debug();
 		const ColumnResizeHelper = oTable._getPointerExtension()._ColumnResizeHelper;
 		oTable._bIsColumnResizerMoving = true;
-		assert.ok(!oTable.$().hasClass("sapUiTableResizing"), "Before Trigger");
+		assert.ok(!oTable.getDomRef().classList.contains("sapUiTableResizing"), "Before Trigger");
 		ColumnResizeHelper.initColumnResizing(oTable);
-		assert.ok(!oTable.$().hasClass("sapUiTableResizing"), "After Trigger");
+		assert.ok(!oTable.getDomRef().classList.contains("sapUiTableResizing"), "After Trigger");
 	});
 
 	QUnit.module("Context menu", {
@@ -496,13 +496,13 @@ sap.ui.define([
 		const aKnownClickableControls = this.oPointerExtension._KNOWNCLICKABLECONTROLS;
 		const $CellContent = oTable.getRows()[0].getCells()[0].$();
 
-		for (let i = 0; i < aKnownClickableControls.length; i++) {
+		for (const sClass of aKnownClickableControls) {
 			TableUtils.Menu.openContextMenu.resetHistory();
-			$CellContent.toggleClass(aKnownClickableControls[i], true);
+			$CellContent.toggleClass(sClass, true);
 			this.triggerMouseDownEvent($CellContent, 2);
 			$CellContent[0].dispatchEvent(oContextMenuEvent);
 			assert.notOk(TableUtils.Menu.openContextMenu.called, "openContextMenu call");
-			$CellContent.toggleClass(aKnownClickableControls[i], false);
+			$CellContent.toggleClass(sClass, false);
 		}
 	});
 
@@ -571,7 +571,7 @@ sap.ui.define([
 		qutils.triggerMouseEvent(oColumn.$(), "mousedown", 1, 1, oSettings.left, oSettings.top, 0);
 		await TableQUnitUtils.sleep(250);
 		assert.ok(oTable._$ReorderGhost, "Column Reordering triggered");
-		assert.ok(oTable.$().hasClass("sapUiTableDragDrop"), "Table has drag drop class");
+		assert.ok(oTable.getDomRef().classList.contains("sapUiTableDragDrop"), "Table has drag drop class");
 
 		qutils.triggerMouseEvent(oTable.qunit.getColumnHeaderCell(3), "mouseup", 1, 1, oSettings.left, oSettings.top, 0);
 		await TableQUnitUtils.sleep(100);
@@ -773,23 +773,23 @@ sap.ui.define([
 		const aKnownClickableControls = oExtension._KNOWNCLICKABLECONTROLS;
 
 		$Cell = oRowColCell.cell.$();
-		for (let i = 0; i < aKnownClickableControls.length; i++) {
-			$Cell.toggleClass(aKnownClickableControls[i], true);
+		for (const sClass of aKnownClickableControls) {
+			$Cell.toggleClass(sClass, true);
 			qutils.triggerMouseEvent($Cell, "tap");
 			assert.equal(iSelectCount, 3, iSelectCount + " selections performed");
 			assert.ok(!bClickHandlerCalled, "Cell Click Event handler not called");
-			$Cell.toggleClass(aKnownClickableControls[i], false);
+			$Cell.toggleClass(sClass, false);
 		}
 
 		oRowColCell.cell.getEnabled = function() { return false; };
 		$Cell = oRowColCell.cell.$();
 		const iStartCount = iSelectCount;
-		for (let i = 0; i < aKnownClickableControls.length; i++) {
-			$Cell.toggleClass(aKnownClickableControls[i], true);
+		for (const [i, sClass] of aKnownClickableControls.entries()) {
+			$Cell.toggleClass(sClass, true);
 			qutils.triggerMouseEvent($Cell, "tap");
 			assert.equal(iSelectCount, iStartCount + i + 1, iSelectCount + " selections performed");
 			assert.ok(bClickHandlerCalled, "Cell Click Event handler called");
-			$Cell.toggleClass(aKnownClickableControls[i], false);
+			$Cell.toggleClass(sClass, false);
 		}
 
 		oExtension._ExtensionHelper._handleClickSelection = oExtension._ExtensionHelper.__handleClickSelection;
@@ -1324,11 +1324,11 @@ sap.ui.define([
 		assert.equal(oTreeTable.indexOfColumn(oColumn), 1, "Initial index of column");
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousedown", 1, 1, oSettings.left, oSettings.top, 0);
-		setTimeout(function() {
+		setTimeout(() => {
 			qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft + 30, oSettings.top, 0);
 			qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft - 20, oSettings.top, 0);
 			qutils.triggerMouseEvent(oColumn.$(), "mouseup", 1, 1, iLeft - 20, oSettings.top, 0);
-			setTimeout(async function() {
+			setTimeout(async () => {
 				await nextUIUpdate();
 				assert.equal(oTreeTable.indexOfColumn(oColumn), 1, "Index of column not changed");
 				done();
@@ -1530,7 +1530,7 @@ sap.ui.define([
 		oTable.setSelectionBehavior(library.SelectionBehavior.RowSelector);
 		oTable.invalidate();
 		await nextUIUpdate();
-		oTable.attachCellClick(function() {});
+		oTable.attachCellClick(() => {});
 		jQuery(oTable.qunit.getDataCell(0, 2)).trigger("mouseover");
 		assert.ok(jQuery(oTable.qunit.getRowHeaderCell(0)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on row header");
 		assert.ok(jQuery(oTable.qunit.getDataCell(0, 0)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on fixed part of row");
@@ -1576,7 +1576,7 @@ sap.ui.define([
 
 		oExtension.showColumnResizer(oColumn);
 
-		assert.ok(oTable.$().hasClass("sapUiTableResizing"), "Table has resizing class");
+		assert.ok(oTable.getDomRef().classList.contains("sapUiTableResizing"), "Table has resizing class");
 		assert.ok(oTable._$colResize.hasClass("sapUiTableColRszActive"), "Resizer marked active");
 		assert.strictEqual(oTable._$colResize.css("left"), (oColumnHeaderRect.right - oTableRect.left) + "px",
 			"Resizer positioned at the column's right edge in LTR mode");

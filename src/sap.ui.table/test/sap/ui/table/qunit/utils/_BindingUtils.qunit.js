@@ -64,13 +64,13 @@ sap.ui.define([
 		}
 
 		oTable.setModel(createODataModel("/top/secret/service"));
-		TableUtils.Binding.metadataLoaded(oTable).then(function() {
+		TableUtils.Binding.metadataLoaded(oTable).then(() => {
 			assert.ok(false, "No metadata: MetadataLoaded promise should be pending, but was resolved");
-		}).catch(function() {
+		}).catch(() => {
 			assert.ok(false, "No metadata: MetadataLoaded promise should be pending, but was rejected");
 		});
-		await new Promise(function(resolve) {
-			window.setTimeout(function() {
+		await new Promise((resolve) => {
+			window.setTimeout(() => {
 				assert.ok(true, "No metadata: MetadataLoaded promise is pending");
 				resolve();
 			}, iResponseTime + 10);

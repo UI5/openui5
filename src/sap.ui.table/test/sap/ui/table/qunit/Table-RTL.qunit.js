@@ -103,8 +103,7 @@ sap.ui.define([
 				return iPixel === 0 ? "" : iPixel + "px";
 			}
 
-			for (let i = 0; i < aRows.length; i++) {
-				const oRow = aRows[i];
+			for (const [i, oRow] of aRows.entries()) {
 				const mRowDomRefs = oRow.getDomRefs();
 				const oRowHeader = mRowDomRefs.rowHeaderPart;
 				const oFirstCellContentInRow = mRowDomRefs.rowScrollPart.querySelector("td.sapUiTableCellFirst > .sapUiTableCellInner");

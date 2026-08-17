@@ -155,7 +155,7 @@ sap.ui.define([
 		mGroupModeSetter[HierarchyMode.Tree] = Grouping.setHierarchyMode.bind(Grouping, this.oTable, HierarchyMode.Tree);
 		mGroupModeSetter[HierarchyMode.GroupedTree] = Grouping.setHierarchyMode.bind(Grouping, this.oTable, HierarchyMode.GroupedTree);
 
-		[
+		for (const mTestSettings of [
 			{newMode: HierarchyMode.Flat, expectInvalidation: false},
 			{newMode: HierarchyMode.Group, expectInvalidation: true},
 			{newMode: HierarchyMode.Group, expectInvalidation: false},
@@ -164,13 +164,13 @@ sap.ui.define([
 			{newMode: HierarchyMode.GroupedTree, expectInvalidation: true},
 			{newMode: HierarchyMode.GroupedTree, expectInvalidation: false},
 			{newMode: HierarchyMode.Flat, expectInvalidation: true}
-		].forEach(function(mTestSettings) {
+		]) {
 			mGroupModeSetter[mTestSettings.newMode]();
 			assert.equal(oInvalidate.callCount, mTestSettings.expectInvalidation ? 1 : 0,
 				"Set from " + sCurrentMode + " mode to " + mTestSettings.newMode + " mode");
 			oInvalidate.resetHistory();
 			sCurrentMode = mTestSettings.newMode;
-		});
+		}
 	});
 
 	QUnit.module("Rendering", {
@@ -432,11 +432,11 @@ sap.ui.define([
 			},
 			test: function() {
 				assert.equal(oTable._getTotalRowCount(), 10, "Row count after grouping");
-				for (let i = 0; i < oTable.getRows().length; i++) {
+				for (const [i, oRow] of oTable.getRows().entries()) {
 					if (i === 0 || i === 5) {
-						assert.ok(oTable.getRows()[i].isGroupHeader(), "Row " + i + " is group header");
+						assert.ok(oRow.isGroupHeader(), "Row " + i + " is group header");
 					} else {
-						assert.ok(!oTable.getRows()[i].isGroupHeader(), "Row " + i + " is leaf");
+						assert.ok(!oRow.isGroupHeader(), "Row " + i + " is leaf");
 					}
 				}
 			},
