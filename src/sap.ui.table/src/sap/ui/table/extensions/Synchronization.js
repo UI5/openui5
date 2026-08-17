@@ -76,9 +76,7 @@ sap.ui.define([
 				for (const sEventName in mEventListenerMap) {
 					const fnListener = mEventListenerMap[sEventName];
 					if (fnListener) {
-						for (let i = 0; i < aTargets.length; i++) {
-							aTargets[i].removeEventListener(sEventName, fnListener);
-						}
+						aTargets.forEach((oTarget) => oTarget.removeEventListener(sEventName, fnListener));
 					}
 				}
 			}

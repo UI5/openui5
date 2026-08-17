@@ -200,7 +200,7 @@ sap.ui.define([
 			if (!oExtension._itemNavigation) {
 				oExtension._itemNavigation = new ItemNavigation();
 				oExtension._itemNavigation.setTableMode(true);
-				oExtension._itemNavigation.attachEvent(ItemNavigation.Events.AfterFocus, function(oEvent) {
+				oExtension._itemNavigation.attachEvent(ItemNavigation.Events.AfterFocus, (oEvent) => {
 					const oInfo = TableUtils.getFocusedItemInfo(oTable);
 					oInfo.header = TableUtils.getHeaderRowCount(oTable);
 					oInfo.domRef = null; //Do not keep dom references
@@ -272,9 +272,9 @@ sap.ui.define([
 			 * @returns {sap.ui.core.delegate.ItemNavigation} The item navigation.
 			 * @private
 			 */
-			oTable._getItemNavigation = function() {
+			oTable._getItemNavigation = () => {
 				return this._itemNavigation;
-			}.bind(this);
+			};
 
 			return "KeyboardExtension";
 		},
@@ -522,9 +522,9 @@ sap.ui.define([
 				const oItemNav = oTable._getItemNavigation();
 
 				if (oItemNav && oItemNav.aItemDomRefs) {
-					for (let i = 0; i < oItemNav.aItemDomRefs.length; i++) {
-						if (oItemNav.aItemDomRefs[i]) {
-							oItemNav.aItemDomRefs[i].setAttribute("tabindex", "-1");
+					for (const oDomRef of oItemNav.aItemDomRefs) {
+						if (oDomRef) {
+							oDomRef.setAttribute("tabindex", "-1");
 						}
 					}
 				}

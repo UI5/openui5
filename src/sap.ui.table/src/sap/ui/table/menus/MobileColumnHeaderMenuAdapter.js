@@ -295,7 +295,7 @@ sap.ui.define([
 				const oColumn = this._oColumn;
 				const oTable = oColumn._getTable();
 
-				this._oMenu.attachEventOnce("afterClose", function() {
+				this._oMenu.attachEventOnce("afterClose", () => {
 					if (bGrouped && (!oColumn.getShowIfGrouped || !oColumn.getShowIfGrouped())) {
 						let oDomRef;
 

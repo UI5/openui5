@@ -49,10 +49,8 @@ sap.ui.define([
 			if (oClickedControl) {
 				const $ClickedControl = oClickedControl.$();
 				if ($ClickedControl.length) {
-					for (let i = 0; i < KNOWNCLICKABLECONTROLS.length; i++) {
-						if ($ClickedControl.hasClass(KNOWNCLICKABLECONTROLS[i])) {
-							return typeof oClickedControl.getEnabled === "function" ? oClickedControl.getEnabled() : true;
-						}
+					if (KNOWNCLICKABLECONTROLS.some((sCls) => $ClickedControl.hasClass(sCls))) {
+						return typeof oClickedControl.getEnabled === "function" ? oClickedControl.getEnabled() : true;
 					}
 				}
 			}
@@ -453,9 +451,9 @@ sap.ui.define([
 
 		initRowHovering: function(oTable) {
 			const $Table = oTable.$();
-			RowHoverHandler.ROWAREAS.forEach(function(sRowArea) {
+			for (const sRowArea of RowHoverHandler.ROWAREAS) {
 				RowHoverHandler._initRowHoveringForArea(oTable, $Table, sRowArea);
-			});
+			}
 		},
 
 		_initRowHoveringForArea: function(oTable, $Table, sArea) {
@@ -525,7 +523,7 @@ sap.ui.define([
 					if (!bMenuOpen) {
 						// A long click starts column reordering, so it should not also open the menu in the onclick event handler.
 						oPointerExtension._bShowMenu = true;
-						this._mTimeouts.delayedMenuTimerId = setTimeout(function() {
+						this._mTimeouts.delayedMenuTimerId = setTimeout(() => {
 							delete oPointerExtension._bShowMenu;
 						}, 200);
 					}

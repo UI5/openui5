@@ -19,9 +19,9 @@ sap.ui.define([
 		aCSSClasses.push("sapUiInvisibleText");
 
 		oRm.openStart("span", sParentId + "-" + sId);
-		aCSSClasses.forEach(function(sClass) {
+		for (const sClass of aCSSClasses) {
 			oRm.class(sClass);
-		});
+		}
 		oRm.attr("aria-hidden", "true");
 		oRm.openEnd();
 		if (sText) {

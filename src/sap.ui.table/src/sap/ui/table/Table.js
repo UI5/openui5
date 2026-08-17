@@ -1122,9 +1122,7 @@ sap.ui.define([
 			 */
 			aEarlySettings.push("plugins");
 
-			for (let i = 0; i < aEarlySettings.length; i++) {
-				const sSetting = aEarlySettings[i];
-
+			for (const sSetting of aEarlySettings) {
 				if (sSetting in mSettings) {
 					mEarlySettings[sSetting] = mSettings[sSetting];
 					delete mSettings[sSetting]; // Avoid applying it twice.
@@ -1156,11 +1154,11 @@ sap.ui.define([
 		ExtensionBase.enrich(this, DragAndDropExtension);
 
 		if (Device.os.ios /*iPhone*/ || (Device.os.macintosh && !Device.system.desktop) /*iPad*/) {
-			sap.ui.require(["sap/ui/table/extensions/ScrollingIOS"], function(ScrollingIOSExtension) {
+			sap.ui.require(["sap/ui/table/extensions/ScrollingIOS"], (ScrollingIOSExtension) => {
 				if (!this.bIsDestroyed) {
 					ExtensionBase.enrich(this, ScrollingIOSExtension);
 				}
-			}.bind(this));
+			});
 		}
 
 		this._bExtensionsInitialized = true;
@@ -1312,7 +1310,7 @@ sap.ui.define([
 		}
 
 		if (aRowHeights.length > 0 && !bHeader) {
-			TableUtils.dynamicCall(this._getSyncExtension, function(oSyncExtension) {
+			TableUtils.dynamicCall(this._getSyncExtension, (oSyncExtension) => {
 				const aModifiedHeights = oSyncExtension.syncRowHeights(aRowHeights.slice());
 				if (aModifiedHeights && aModifiedHeights.length === aRowHeights.length) {
 					aRowHeights = aModifiedHeights.slice();
@@ -1538,9 +1536,7 @@ sap.ui.define([
 
 	Table.prototype._initRowDomRefs = function() {
 		const aRows = this.getRows();
-		for (let i = 0; i < aRows.length; i++) {
-			aRows[i].initDomRefs();
-		}
+		aRows.forEach((oRow) => oRow.initDomRefs());
 	};
 
 	/**
@@ -1608,7 +1604,7 @@ sap.ui.define([
 
 			function adaptColWidth(oColInfo) {
 				if (oColInfo) {
-					Array.prototype.forEach.call(oColInfo.headers, function(header) {
+					Array.prototype.forEach.call(oColInfo.headers, (header) => {
 						header.style.width = oColInfo.newWidth;
 					});
 				}
@@ -1620,12 +1616,11 @@ sap.ui.define([
 			//Check the rest of the flexible non-adapted columns
 			//Due to adaptations they could be smaller now.
 			if (aNotFixedVariableColumns.length) {
-				let iDomWidth;
-				for (let i = 0; i < aNotFixedVariableColumns.length; i++) {
-					iDomWidth = aNotFixedVariableColumns[i].header && aNotFixedVariableColumns[i].header.offsetWidth;
-					aNotFixedVariableColumns[i].newWidth = calcNewWidth(iDomWidth, aNotFixedVariableColumns[i].minWidth);
-					if (parseInt(aNotFixedVariableColumns[i].newWidth) >= 0) {
-						adaptColWidth(aNotFixedVariableColumns[i]);
+				for (const oCol of aNotFixedVariableColumns) {
+					const iDomWidth = oCol.header && oCol.header.offsetWidth;
+					oCol.newWidth = calcNewWidth(iDomWidth, oCol.minWidth);
+					if (parseInt(oCol.newWidth) >= 0) {
+						adaptColWidth(oCol);
 					}
 				}
 			}
@@ -1656,13 +1651,13 @@ sap.ui.define([
 				const bDummyColumnHasWidth = oDummyColumn.clientWidth > 2;
 
 				if (!bHasFlexibleRowActions && bDummyColumnHasWidth) {
-					const iColumnsWidth = this.getColumns().reduce(function(iColumnsWidth, oColumn) {
+					const iColumnsWidth = this.getColumns().reduce((iColumnsWidth, oColumn) => {
 						const oDomRef = oColumn.getDomRef();
 						if (oDomRef && oColumn.getIndex() >= this.getComputedFixedColumnCount()) {
 							iColumnsWidth += oDomRef.offsetWidth;
 						}
 						return iColumnsWidth;
-					}.bind(this), 0);
+					}, 0);
 					let iRowActionPos = iColumnsWidth + oTableSizes.tableRowHdrScrWidth + oTableSizes.tableCtrlFixedWidth;
 					const oRowActionStyles = {};
 					if (!TableUtils.hasRowActions(this)) {
@@ -1928,34 +1923,30 @@ sap.ui.define([
 	 * @private
 	 * @returns {Promise} A <code>Promise</code> that resolves after the focus has been set
 	 */
-	Table.prototype._setFocus = function(iIndex, bFirstInteractiveElement) {
-		return new Promise(function(resolve) {
-			if (iIndex === -1) {
-				iIndex = this._getTotalRowCount() - 1;
-			}
+	Table.prototype._setFocus = async function(iIndex, bFirstInteractiveElement) {
+		if (iIndex === -1) {
+			iIndex = this._getTotalRowCount() - 1;
+		}
 
-			if (typeof iIndex !== 'number' || iIndex < -1) {
-				iIndex = 0;
-			}
+		if (typeof iIndex !== 'number' || iIndex < -1) {
+			iIndex = 0;
+		}
 
-			const iFirstVisibleRow = this.getFirstVisibleRow();
-			const iRowCount = this._getRowCounts().count;
+		const iFirstVisibleRow = this.getFirstVisibleRow();
+		const iRowCount = this._getRowCounts().count;
 
-			if (iIndex > iFirstVisibleRow && iIndex < iFirstVisibleRow + iRowCount) {
-				this.getRows()[iIndex - iFirstVisibleRow]._setFocus(bFirstInteractiveElement);
-				return resolve();
-			}
+		if (iIndex > iFirstVisibleRow && iIndex < iFirstVisibleRow + iRowCount) {
+			this.getRows()[iIndex - iFirstVisibleRow]._setFocus(bFirstInteractiveElement);
+			return;
+		}
 
-			if (this._setFirstVisibleRowIndex(iIndex)) {
-				this.attachEventOnce("_rowsUpdated", function() {
-					setFocus(this, iIndex, bFirstInteractiveElement);
-					return resolve();
-				});
-			} else {
-				setFocus(this, iIndex, bFirstInteractiveElement);
-				return resolve();
-			}
-		}.bind(this));
+		if (this._setFirstVisibleRowIndex(iIndex)) {
+			await new Promise((resolve) => {
+				this.attachEventOnce("_rowsUpdated", resolve);
+			});
+		}
+
+		setFocus(this, iIndex, bFirstInteractiveElement);
 	};
 
 	function setFocus(oTable, iIndex, bFirstInteractiveElement) {
@@ -2372,8 +2363,7 @@ sap.ui.define([
 
 		const iFixedRowsCount = this.getFixedRowCount() + this.getFixedBottomRowCount();
 		if (iVisibleRowCount <= iFixedRowsCount && iFixedRowsCount > 0) {
-			Log.error("Table: " + this.getId() + " visibleRowCount('" + iVisibleRowCount + "') must be bigger than number of"
-					  + " fixed rows('" + (this.getFixedRowCount() + this.getFixedBottomRowCount()) + "')", this);
+			Log.error(`Table: ${this.getId()} visibleRowCount('${iVisibleRowCount}') must be bigger than number of fixed rows('${this.getFixedRowCount() + this.getFixedBottomRowCount()}')`, this);
 			return this;
 		}
 
@@ -2385,7 +2375,7 @@ sap.ui.define([
 		iVisibleRowCount = this.validateProperty("visibleRowCount", iVisibleRowCount);
 		this.setProperty("visibleRowCount", iVisibleRowCount);
 
-		TableUtils.dynamicCall(this._getSyncExtension, function(oSyncExtension) {
+		TableUtils.dynamicCall(this._getSyncExtension, (oSyncExtension) => {
 			oSyncExtension.syncRowCount(iVisibleRowCount);
 		});
 
@@ -2744,11 +2734,11 @@ sap.ui.define([
 
 		if (ControlBehavior.getAnimationMode() !== AnimationMode.none) {
 			jQuery(document.body).on("webkitTransitionEnd." + sTableId + " transitionend." + sTableId,
-				function(oEvent) {
+				(oEvent) => {
 					if (jQuery(oEvent.target).has($this).length > 0) {
 						this._updateTableSizes(TableUtils.RowsUpdateReason.Animation);
 					}
-				}.bind(this)
+				}
 			);
 		}
 
@@ -3045,7 +3035,7 @@ sap.ui.define([
 				"-webkit-user-select": "none",
 				"user-select": "none"
 			}).
-			on("selectstart", function(oEvent) {
+			on("selectstart", (oEvent) => {
 				oEvent.preventDefault();
 				return false;
 			});
@@ -3159,7 +3149,7 @@ sap.ui.define([
 		if (!bAdd) {
 			this._aSortedColumns = [];
 		}
-		if (this._aSortedColumns.indexOf(oColumn) === -1) {
+		if (!this._aSortedColumns.includes(oColumn)) {
 			this._aSortedColumns.push(oColumn);
 		}
 	};
@@ -3209,7 +3199,7 @@ sap.ui.define([
 			this._aSortedColumns = [];
 		}
 
-		if (this.getColumns().indexOf(oColumn) >= 0) {
+		if (this.getColumns().includes(oColumn)) {
 			oColumn._sort(sSortOrder ?? SortOrder.Ascending, bAdd);
 		}
 	};
@@ -3224,7 +3214,7 @@ sap.ui.define([
 	 * @public
 	 */
 	Table.prototype.filter = function(oColumn, sValue) {
-		if (this.getColumns().indexOf(oColumn) >= 0) {
+		if (this.getColumns().includes(oColumn)) {
 			if (sValue == null) {
 				sValue = "";
 			} else if (typeof sValue !== "string") {
@@ -3253,10 +3243,7 @@ sap.ui.define([
 		// trigger the rows to update their selection
 		const aRows = this.getRows();
 
-		for (let i = 0; i < aRows.length; i++) {
-			const oRow = aRows[i];
-			oRow._updateSelection();
-		}
+		aRows.forEach((oRow) => oRow._updateSelection());
 	};
 
 	/**
@@ -3519,7 +3506,7 @@ sap.ui.define([
 		if (oGroupByColumn instanceof Column && oGroupByColumn !== oOldGroupByColumn) {
 
 			// check for column being part of the columns aggregation
-			if (this.getColumns().indexOf(oGroupByColumn) === -1) {
+			if (!this.getColumns().includes(oGroupByColumn)) {
 				throw new Error("Column has to be part of the columns aggregation!");
 			}
 
@@ -3663,8 +3650,7 @@ sap.ui.define([
 		}
 
 		if ((iFixedRowCount + this.getFixedBottomRowCount()) >= this.getVisibleRowCount()) {
-			Log.error("Table '" + this.getId() + "' fixed rows('" + (iFixedRowCount + this.getFixedBottomRowCount()) + "') must be smaller than"
-					  + " numberOfVisibleRows('" + this.getVisibleRowCount() + "')", this);
+			Log.error(`Table '${this.getId()}' fixed rows('${iFixedRowCount + this.getFixedBottomRowCount()}') must be smaller than numberOfVisibleRows('${this.getVisibleRowCount()}')`, this);
 			return this;
 		}
 
@@ -3683,8 +3669,7 @@ sap.ui.define([
 		}
 
 		if ((iFixedRowCount + this.getFixedRowCount()) >= this.getVisibleRowCount()) {
-			Log.error("Table '" + this.getId() + "' fixed rows('" + (iFixedRowCount + this.getFixedRowCount()) + "') must be smaller than"
-					  + " numberOfVisibleRows('" + this.getVisibleRowCount() + "')", this);
+			Log.error(`Table '${this.getId()}' fixed rows('${iFixedRowCount + this.getFixedRowCount()}') must be smaller than numberOfVisibleRows('${this.getVisibleRowCount()}')`, this);
 			return this;
 		}
 
@@ -3871,7 +3856,7 @@ sap.ui.define([
 
 		_private(oTable).bIsLoadingNoColumnsMessage = true;
 
-		sap.ui.require(["sap/m/table/Util"], function(MTableUtil) {
+		sap.ui.require(["sap/m/table/Util"], (MTableUtil) => {
 			if (!TableUtils.isA(oTable.getNoData(), "sap.m.IllustratedMessage")) {
 				return;
 			}
@@ -4268,9 +4253,7 @@ sap.ui.define([
 
 		if (sAggregationName === "rows") {
 			// Rows that are not in the aggregation must be destroyed manually.
-			this._aRowClones.forEach(function(oRowClone) {
-				oRowClone.destroy();
-			});
+			this._aRowClones.forEach((oRowClone) => oRowClone.destroy());
 			this._aRowClones = [];
 		}
 
@@ -4314,7 +4297,7 @@ sap.ui.define([
 		this.onRowsUpdated(mParameters);
 
 		clearTimeout(this._mTimeouts.fireRowsUpdated);
-		this._mTimeouts.fireRowsUpdated = setTimeout(function() {
+		this._mTimeouts.fireRowsUpdated = setTimeout(() => {
 			// If the rows are updated by setting new binding contexts, the cell contents are updated asynchronously (re-rendering).
 			// This has to be waited for before the update process of the rows can be completed.
 			this.onRowsContentUpdated(mParameters);
@@ -4329,7 +4312,7 @@ sap.ui.define([
 			 */
 			this.fireEvent("_rowsUpdated", mParameters);
 			this.fireRowsUpdated();
-		}.bind(this), 0);
+		}, 0);
 	};
 
 	Table.prototype.onRowsUpdated = function(mParameters) {
@@ -4340,15 +4323,15 @@ sap.ui.define([
 		updateNoData(this);
 
 		// TODO: Move somewhere else. Row or GroupingUtils
-		this.getRows().forEach(function(oRow) {
-			oRow.getCells().forEach(function(oCell) {
+		for (const oRow of this.getRows()) {
+			for (const oCell of oRow.getCells()) {
 				const oColumn = Column.ofCell(oCell);
 				const oCellContentVisibilitySettings = oColumn._getCellContentVisibilitySettings();
 				const $Cell = oRow.getDomRefs(true).row.find("td[data-sap-ui-colid=\"" + oColumn.getId() + "\"]");
 				let bShowCellContent = true;
 
 				if (!$Cell) {
-					return;
+					continue;
 				}
 
 				if (oRow.isGroupHeader()) {
@@ -4368,8 +4351,8 @@ sap.ui.define([
 				}
 
 				$Cell.toggleClass("sapUiTableCellHidden", !bShowCellContent);
-			});
-		});
+			}
+		}
 	};
 
 	Table.prototype.onRowsContentUpdated = function(mParameters) {
@@ -4390,15 +4373,12 @@ sap.ui.define([
 	 * @private
 	 * @ui5-restricted sap.gantt
 	 */
-	Table.prototype._enableSynchronization = function() {
-		const that = this;
-		return new Promise(function(resolve, reject) {
-			sap.ui.require(["sap/ui/table/extensions/Synchronization"], function(SyncExtension) {
-				resolve(ExtensionBase.enrich(that, SyncExtension).getInterface());
-			}, function(oError) {
-				reject(oError);
-			});
+	Table.prototype._enableSynchronization = async function() {
+		const SyncExtension = await new Promise((resolve, reject) => {
+			sap.ui.require(["sap/ui/table/extensions/Synchronization"], resolve, reject);
 		});
+
+		return ExtensionBase.enrich(this, SyncExtension).getInterface();
 	};
 
 	/**

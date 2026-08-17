@@ -22,16 +22,13 @@ sap.ui.define([
 	 */
 	function checkColumnTemplate(fnDoCheck, oScope, sType) {
 		const aTables = SupportHelper.find(oScope, true, "sap.ui.table.Table");
-		let aColumns; let oTemplate;
 
-		for (let i = 0; i < aTables.length; i++) {
-			aColumns = aTables[i].getColumns();
-
-			for (let k = 0; k < aColumns.length; k++) {
-				oTemplate = aColumns[k].getTemplate();
+		for (const oTable of aTables) {
+			for (const oColumn of oTable.getColumns()) {
+				const oTemplate = oColumn.getTemplate();
 
 				if (oTemplate && oTemplate.isA(sType)) {
-					fnDoCheck(aTables[i], aColumns[k], oTemplate);
+					fnDoCheck(oTable, oColumn, oTemplate);
 				}
 			}
 		}
@@ -54,8 +51,7 @@ sap.ui.define([
 				const sColumnId = oColumn.getId();
 
 				if (oMTextTemplate.isBound("wrapping") || (!oMTextTemplate.isBound("wrapping") && oMTextTemplate.getWrapping())) {
-					SupportHelper.reportIssue(oIssueManager, "Column '" + sColumnId + "' of table '" + oTable.getId() + "' uses an "
-															 + "'sap.m.Text' control with wrapping enabled.", Severity.High, sColumnId);
+					SupportHelper.reportIssue(oIssueManager, `Column '${sColumnId}' of table '${oTable.getId()}' uses an 'sap.m.Text' control with wrapping enabled.`, Severity.High, sColumnId);
 				}
 			}, oScope, "sap.m.Text");
 		}
@@ -72,8 +68,7 @@ sap.ui.define([
 			checkColumnTemplate(function(oTable, oColumn, oMLinkTemplate) {
 				if (oMLinkTemplate.isBound("wrapping") || (!oMLinkTemplate.isBound("wrapping") && oMLinkTemplate.getWrapping())) {
 					const sColumnId = oColumn.getId();
-					SupportHelper.reportIssue(oIssueManager, "Column '" + sColumnId + "' of table '" + oTable.getId() + "' uses an "
-															 + "'sap.m.Link' control with wrapping enabled.", Severity.High, sColumnId);
+					SupportHelper.reportIssue(oIssueManager, `Column '${sColumnId}' of table '${oTable.getId()}' uses an 'sap.m.Link' control with wrapping enabled.`, Severity.High, sColumnId);
 				}
 			}, oScope, "sap.m.Link");
 		}

@@ -44,9 +44,9 @@ sap.ui.define([
 			this._mInjectionTarget = null;
 
 			// The menu is just associated with the column. There is no automatic notification about the destruction of the menu.
-			this._oColumnHeaderMenuObserver = new ManagedObjectObserver(function(oChange) {
+			this._oColumnHeaderMenuObserver = new ManagedObjectObserver((oChange) => {
 				this.onAfterMenuDestroyed(oChange.object);
-			}.bind(this));
+			});
 		}
 	});
 
@@ -72,15 +72,15 @@ sap.ui.define([
 		}
 
 		// Unlink column from other adapters. Can be necessary if the column is associated with a different menu of another type.
-		oAdapterRegistry.forEach(function(_mRegistryData, _sAdapterName) {
+		for (const _sAdapterName of oAdapterRegistry.keys()) {
 			if (_sAdapterName !== sAdapterName) {
 				unlink(oColumn, _sAdapterName);
 			}
-		});
+		}
 
 		if (!oAdapterRegistry.has(sAdapterName)) {
 			mRegistryData = {
-				adapter: requireAdapter(sAdapterName).then(function(Adapter) {
+				adapter: requireAdapter(sAdapterName).then((Adapter) => {
 					mRegistryData = oAdapterRegistry.get(sAdapterName);
 					mRegistryData.adapter = new Adapter();
 					mRegistryData.adapter._injectMenuItems(mRegistryData.activeFor.getHeaderMenuInstance(), mRegistryData.activeFor);
@@ -176,10 +176,10 @@ sap.ui.define([
 	};
 
 	function requireAdapter(sAdapterName) {
-		return new Promise(function(resolve, reject) {
-			sap.ui.require(["sap/ui/table/menus/" + sAdapterName], function(Module) {
+		return new Promise((resolve, reject) => {
+			sap.ui.require(["sap/ui/table/menus/" + sAdapterName], (Module) => {
 				resolve(Module);
-			}, function(oError) {
+			}, (oError) => {
 				reject(oError);
 			});
 		});
@@ -201,12 +201,12 @@ sap.ui.define([
 		if (sAdapterName) {
 			mRegistryData = oAdapterRegistry.get(sAdapterName);
 		} else {
-			oAdapterRegistry.forEach(function(_mRegistryData, _sAdapterName) {
+			for (const [_sAdapterName, _mRegistryData] of oAdapterRegistry) {
 				if (_mRegistryData.columns.includes(oColumn)) {
 					mRegistryData = _mRegistryData;
 					sAdapterName = _sAdapterName;
 				}
-			});
+			}
 		}
 
 		if (!mRegistryData) {
@@ -214,9 +214,7 @@ sap.ui.define([
 		}
 
 		if (mRegistryData.adapter instanceof Promise) {
-			mRegistryData.adapter.then(function() {
-				unlink(oColumn, sAdapterName);
-			});
+			mRegistryData.adapter.then(() => unlink(oColumn, sAdapterName));
 		} else {
 			if (mRegistryData.columns.includes(oColumn)) {
 				mRegistryData.columns.splice(mRegistryData.columns.indexOf(oColumn), 1);

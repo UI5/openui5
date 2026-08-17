@@ -99,9 +99,7 @@ sap.ui.define([
 	 * @private
 	 */
 	RowAction.prototype._getVisibleItems = function() {
-		return this.getItems().filter(function(oItem) {
-			return oItem.getVisible();
-		});
+		return this.getItems().filter((oItem) => oItem.getVisible());
 	};
 
 	/**
