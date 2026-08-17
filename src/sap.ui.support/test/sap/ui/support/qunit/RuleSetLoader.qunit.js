@@ -5,7 +5,7 @@ sap.ui.define([
 	"sap/ui/support/Bootstrap",
 	"sap/ui/support/supportRules/RuleSet",
 	"sap/ui/support/supportRules/RuleSetLoader",
-	"sap/ui/support/supportRules/WindowCommunicationBus",
+	"sap/ui/support/supportRules/CommunicationBus",
 	"sap/ui/support/supportRules/WCBChannels"
 ], function (jQuery,
 			 Bootstrap,
