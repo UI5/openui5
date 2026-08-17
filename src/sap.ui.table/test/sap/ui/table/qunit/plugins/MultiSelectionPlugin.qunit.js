@@ -1376,14 +1376,14 @@ sap.ui.define([
 		}).then(function() {
 			oSelectionPlugin.setLimit(iLimit);
 			oSelectionPlugin.setEnableNotification(false);
-			return oSelectionPlugin.setSelectionInterval(0, iLimit).then(TableQUnitUtils.$wait(200)).then(function() {
+			return oSelectionPlugin.setSelectionInterval(0, iLimit).then(() => TableQUnitUtils.wait(200)).then(function() {
 				assert.ok(oPopoverOpenBySpy.notCalled, "Popover.openBy is not called because enableNotification is false");
 				resetSpies();
 			});
 
 		}).then(function() {
 			oSelectionPlugin.setEnableNotification(true);
-			return oSelectionPlugin.setSelectionInterval(0, iLimit - 1).then(TableQUnitUtils.$wait(200)).then(function() {
+			return oSelectionPlugin.setSelectionInterval(0, iLimit - 1).then(() => TableQUnitUtils.wait(200)).then(function() {
 				assert.ok(oPopoverOpenBySpy.notCalled, "Popover.openBy is not called because the limit is not reached");
 				resetSpies();
 			});

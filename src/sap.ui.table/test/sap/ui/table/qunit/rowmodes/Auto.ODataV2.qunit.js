@@ -253,7 +253,7 @@ sap.ui.define([
 
 		return this.oTable.qunit.whenRenderingFinished().then(() => {
 			this.oGetContextsSpy.resetHistory();
-		}).then(this.oTable.qunit.$resize({height: "756px"})).then(() => {
+		}).then(() => this.oTable.qunit.resize({height: "756px"})).then(() => {
 			assert.equal(this.oGetContextsSpy.callCount, 1, "Method to get contexts called once");
 			sinon.assert.calledWithExactly(this.oGetContextsSpy.getCall(0), 0, this.oTable.getRowMode().getComputedRowCounts().count, 100);
 			this.oGetContextsSpy.resetHistory();

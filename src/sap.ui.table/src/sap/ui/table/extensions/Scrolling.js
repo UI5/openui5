@@ -16,7 +16,6 @@ sap.ui.define([
 	"use strict";
 
 	const SharedDomRef = library.SharedDomRef;
-	const Hook = TableUtils.Hook.Keys;
 	const _private = TableUtils.createWeakMapFacade();
 
 	/*
@@ -616,13 +615,6 @@ sap.ui.define([
 			log("VerticalScrollingHelper.performUpdateFromFirstVisibleRow", oTable);
 
 			VerticalScrollProcess.start(oTable, VerticalScrollProcess.UpdateFromFirstVisibleRow, function(resolve, reject, oProcessInterface) {
-				TableUtils.Hook.call(oTable, Hook.Signal, "StartTableUpdate");
-				oProcessInterface.onPromiseCreated = function(oPromise) {
-					oPromise.finally(function() {
-						TableUtils.Hook.call(oTable, Hook.Signal, "EndTableUpdate");
-					});
-				};
-
 				if (bExpectRowsUpdatedEvent === true) {
 					const fnOnRowsUpdatedPreprocessor = function() {
 						log("VerticalScrollingHelper.performUpdateFromFirstVisibleRow (async: rows update)", oTable);
@@ -666,13 +658,6 @@ sap.ui.define([
 			log("VerticalScrollingHelper.performUpdateFromScrollPosition", oTable);
 
 			VerticalScrollProcess.start(oTable, VerticalScrollProcess.UpdateFromScrollPosition, function(resolve, reject, oProcessInterface) {
-				TableUtils.Hook.call(oTable, Hook.Signal, "StartTableUpdate");
-				oProcessInterface.onPromiseCreated = function(oPromise) {
-					oPromise.finally(function() {
-						TableUtils.Hook.call(oTable, Hook.Signal, "EndTableUpdate");
-					});
-				};
-
 				VerticalScrollingHelper.adjustFirstVisibleRowToScrollPosition(oTable, null, oProcessInterface).then(function() {
 					if (oProcessInterface.isCancelled()) {
 						return;
@@ -714,14 +699,6 @@ sap.ui.define([
 			delete _private(oTable).mTimeouts.largeDataScrolling;
 
 			VerticalScrollProcess.start(oTable, VerticalScrollProcess.UpdateFromScrollbar, function(resolve, reject, oProcessInterface) {
-				TableUtils.Hook.call(oTable, Hook.Signal, "StartTableUpdate");
-
-				oProcessInterface.onPromiseCreated = function(oPromise) {
-					oPromise.finally(function() {
-						TableUtils.Hook.call(oTable, Hook.Signal, "EndTableUpdate");
-					});
-				};
-
 				oTable._getKeyboardExtension().setActionMode(false);
 
 				VerticalScrollingHelper.adjustScrollPositionToScrollbar(oTable, oProcessInterface).then(function() {
@@ -903,13 +880,6 @@ sap.ui.define([
 			log("VerticalScrollingHelper.performUpdateFromViewport", oTable);
 
 			VerticalScrollProcess.start(oTable, VerticalScrollProcess.UpdateFromViewport, function(resolve, reject, oProcessInterface) {
-				TableUtils.Hook.call(oTable, Hook.Signal, "StartTableUpdate");
-				oProcessInterface.onPromiseCreated = function(oPromise) {
-					oPromise.finally(function() {
-						TableUtils.Hook.call(oTable, Hook.Signal, "EndTableUpdate");
-					});
-				};
-
 				VerticalScrollingHelper.adjustScrollPositionToViewport(oTable, oProcessInterface).then(function() {
 					return VerticalScrollingHelper.adjustFirstVisibleRowToScrollPosition(oTable, true, oProcessInterface);
 				}).then(function() {
@@ -1738,13 +1708,6 @@ sap.ui.define([
 			const that = this;
 
 			VerticalScrollProcess.start(this, VerticalScrollProcess.OnRowsUpdated, function(resolve, reject, oProcessInterface) {
-				TableUtils.Hook.call(that, Hook.Signal, "StartTableUpdate");
-				oProcessInterface.onPromiseCreated = function(oPromise) {
-					oPromise.finally(function() {
-						TableUtils.Hook.call(that, Hook.Signal, "EndTableUpdate");
-					});
-				};
-
 				VerticalScrollingHelper.fixScrollPosition(that, oProcessInterface).then(function() {
 					return Promise.all([
 						VerticalScrollingHelper.adjustFirstVisibleRowToScrollPosition(that, true, oProcessInterface),
@@ -1766,16 +1729,12 @@ sap.ui.define([
 			log("VerticalScrollingHelper.restoreScrollPosition", oTable);
 
 			VerticalScrollProcess.start(oTable, VerticalScrollProcess.RestoreScrollPosition, function(resolve, reject, oProcessInterface) {
-				TableUtils.Hook.call(oTable, Hook.Signal, "StartTableUpdate");
-
 				oProcessInterface.onPromiseCreated = function(oPromise) {
 					oPromise.then(function() {
 						if (!oProcessInterface.isCancelled()) {
 							// Starts a new process.
 							VerticalScrollingHelper._restoreScrollPosition(oTable);
 						}
-					}).finally(function() {
-						TableUtils.Hook.call(oTable, Hook.Signal, "EndTableUpdate");
 					});
 				};
 
@@ -1828,8 +1787,6 @@ sap.ui.define([
 			oScrollExtension.updateVerticalScrollHeight();
 
 			VerticalScrollProcess.start(oTable, VerticalScrollProcess.AdjustToTotalRowCount, function(resolve, reject, oProcessInterface) {
-				TableUtils.Hook.call(oTable, Hook.Signal, "StartTableUpdate");
-
 				oProcessInterface.onPromiseCreated = function(oPromise) {
 					oPromise.then(function() {
 						if (oProcessInterface.isCancelled() || _private(oTable).oVerticalScrollPosition.isInitial()) {
@@ -1838,8 +1795,6 @@ sap.ui.define([
 
 						// Starts a new process.
 						VerticalScrollingHelper.performUpdateFromScrollPosition(oTable);
-					}).finally(function() {
-						TableUtils.Hook.call(oTable, Hook.Signal, "EndTableUpdate");
 					});
 				};
 
@@ -2687,13 +2642,8 @@ sap.ui.define([
 						}
 						$InnerCellElement[0].scrollTop = 0;
 					}
-
-					TableUtils.Hook.call(that, Hook.Signal, "EndFocusHandling");
-					TableUtils.Hook.call(that, Hook.Signal, "EndTableUpdate");
 				};
 
-				TableUtils.Hook.call(this, Hook.Signal, "StartTableUpdate");
-				TableUtils.Hook.call(this, Hook.Signal, "StartFocusHandling");
 				Promise.resolve().then(function() {
 					if (Device.browser.safari) {
 						window.setTimeout(fnScrollBack, 0);

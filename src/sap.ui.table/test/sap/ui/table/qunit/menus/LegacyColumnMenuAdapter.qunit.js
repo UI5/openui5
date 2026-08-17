@@ -9,6 +9,7 @@ sap.ui.define([
 	"sap/ui/table/ColumnMenu",
 	"sap/m/Label",
 	"sap/ui/core/Popup",
+	"sap/ui/table/rowmodes/Fixed",
 	"sap/ui/qunit/utils/nextUIUpdate"
 ], function(
 	TableQUnitUtils,
@@ -19,12 +20,11 @@ sap.ui.define([
 	ColumnMenu,
 	Label,
 	Popup,
+	FixedRowMode,
 	nextUIUpdate
 ) {
 	"use strict";
 
-	const createTables = window.createTables;
-	const destroyTables = window.destroyTables;
 	const Dock = Popup.Dock;
 
 	/**
@@ -32,16 +32,29 @@ sap.ui.define([
 	 */
 	QUnit.module("Misc", {
 		beforeEach: async function() {
-			await createTables();
+			this.oTable = TableQUnitUtils.createTable({
+				rows: {path: "/"},
+				models: TableQUnitUtils.createJSONModel(8),
+				columns: ["A", "B", "C", "D", "E"].map((sField) => {
+					return TableQUnitUtils.createTextColumn({
+						label: sField + "_TITLE",
+						text: sField,
+						bind: true
+					});
+				}),
+				rowMode: new FixedRowMode({rowCount: 3})
+			});
+
+			await this.oTable.qunit.whenRenderingFinished();
 		},
 		afterEach: function() {
-			destroyTables();
+			this.oTable.destroy();
 		}
 	});
 
 	QUnit.test("Open Menu", function(assert) {
-		const oTable = window.oTable;
 		const done = assert.async();
+		const oTable = this.oTable;
 		const oColumnA = oTable.getColumns()[0];
 		const oColumnB = oTable.getColumns()[1];
 		const oMenuA = oColumnA.getMenu();
@@ -77,8 +90,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("Menu has no items", function(assert) {
-		const oTable = window.oTable;
 		const done = assert.async();
+		const oTable = this.oTable;
 		const oColumn = oTable.getColumns()[0];
 		const oCellDomRef = oColumn.getDomRef();
 		oColumn.setFilterProperty("A");
@@ -101,8 +114,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("Column Header CellMenu", function(assert) {
-		const oTable = window.oTable;
 		const done = assert.async();
+		const oTable = this.oTable;
 		const oColumn = oTable.getColumns()[0];
 		const oCellDomRef = oColumn.getDomRef();
 		const bOriginalDeviceSystemDesktop = Device.system.desktop;
@@ -138,8 +151,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("Hooks", function(assert) {
-		const oTable = window.oTable;
 		const done = assert.async();
+		const oTable = this.oTable;
 		const oColumn = oTable.getColumns()[0];
 		oColumn.setSortProperty("A");
 		oColumn.setFilterProperty("A");

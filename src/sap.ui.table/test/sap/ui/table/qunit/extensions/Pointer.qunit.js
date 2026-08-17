@@ -1,10 +1,12 @@
-/*global QUnit, sinon, oTable, oTreeTable */
+/*global QUnit, sinon */
 
 sap.ui.define([
 	"sap/ui/table/qunit/TableQUnitUtils",
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/ui/table/extensions/Pointer",
+	"sap/ui/table/Table",
+	"sap/ui/table/TreeTable",
 	"sap/ui/table/Row",
 	"sap/ui/table/Column",
 	"sap/ui/table/utils/TableUtils",
@@ -17,6 +19,8 @@ sap.ui.define([
 	qutils,
 	nextUIUpdate,
 	PointerExtension,
+	Table,
+	TreeTable,
 	Row,
 	Column,
 	TableUtils,
@@ -27,16 +31,30 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	const oModel = window.oModel;
-	const aFields = window.aFields;
-	const createTables = window.createTables;
-	const destroyTables = window.destroyTables;
-	const getCell = window.getCell;
-	const getColumnHeader = window.getColumnHeader;
-	const getRowHeader = window.getRowHeader;
-	const getRowAction = window.getRowAction;
-	const iNumberOfRows = window.iNumberOfRows;
-	const checkFocus = window.checkFocus;
+	const iNumberOfRows = 8;
+
+	TableQUnitUtils.setDefaultSettings({
+		rows: {path: "/"},
+		models: TableQUnitUtils.createJSONModel(iNumberOfRows),
+		rowMode: new FixedRowMode({rowCount: 3}),
+		fixedColumnCount: 1,
+		columns: ["A", "B", "C", "D", "E"].map((sField) => TableQUnitUtils.createTextColumn({
+			label: sField + "_TITLE",
+			text: sField,
+			bind: true
+		}))
+	});
+
+	const mTreeTableSettings = () => ({
+		rows: {path: "/", parameters: {arrayNames: ["children"]}},
+		selectionMode: "Single",
+		groupHeaderProperty: "A",
+		columns: ["A", "B", "C", "D", "E"].map((sField) => TableQUnitUtils.createTextColumn({
+			label: sField + "_TITLE",
+			text: sField,
+			bind: true
+		}))
+	});
 
 	function createPointerEvent(sEventType) {
 		return new window.PointerEvent(sEventType, {
@@ -81,20 +99,22 @@ sap.ui.define([
 		beforeEach: async function() {
 			this.bOriginalSystemDesktop = Device.system.desktop;
 
-			await createTables();
+			this.oTable = TableQUnitUtils.createTable({
+				models: TableQUnitUtils.createJSONModel(iNumberOfRows)
+			});
+			await this.oTable.qunit.whenRenderingFinished();
 
 			// Ensure that the last column is "streched" and the others have their defined size
-			const oLastColumn = oTable.getColumns()[oTable.getColumns().length - 1];
+			const oLastColumn = this.oTable.getColumns()[this.oTable.getColumns().length - 1];
 			oLastColumn.setWidth(null);
 
-			// Ensure bigger cell content for the column with index 1
-			const aRows = oModel.getData().rows;
-			for (let i = 0; i < aRows.length; i++) {
-				aRows[i][aFields[1]] = "AAAAAAAAAAAAAAAAAAAAAAAAA" + i;
-			}
+			// Ensure bigger cell content for the column with index 1 ("B"). Mutate cloned rows,
+			// not the shared test data, so other modules keep the default values.
+			const oModel = this.oTable.getModel();
+			oModel.setData(oModel.getData().map((oRow, i) => ({...oRow, B: "AAAAAAAAAAAAAAAAAAAAAAAAA" + i})));
 			oModel.refresh(true);
 
-			this.oColumn = oTable.getColumns()[1];
+			this.oColumn = this.oTable.getColumns()[1];
 			this.oColumn.setResizable(false);
 
 			await nextUIUpdate();
@@ -107,12 +127,13 @@ sap.ui.define([
 		afterEach: function() {
 			Device.system.desktop = this.bOriginalSystemDesktop;
 
-			destroyTables();
+			this.oTable.destroy();
 			PointerExtension._fnCheckTextBasedControl = null;
 		}
 	});
 
 	function moveResizer(oColumn, assert, bExpect, iIndex) {
+		const oTable = oColumn.getParent();
 		qutils.triggerEvent("mousemove", oColumn.getId(), {
 			clientX: Math.floor(oColumn.getDomRef().getBoundingClientRect().left + 10),
 			clientY: Math.floor(oColumn.getDomRef().getBoundingClientRect().top + 100)
@@ -127,6 +148,7 @@ sap.ui.define([
 	}
 
 	QUnit.test("Moving Resizer", function(assert) {
+		const oTable = this.oTable;
 		const aVisibleColumns = oTable._getVisibleColumns();
 		moveResizer(aVisibleColumns[0], assert, true, 0);
 		moveResizer(aVisibleColumns[1], assert, false, 0);
@@ -136,6 +158,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Moving Resizer with padding on the root element", function(assert) {
+		const oTable = this.oTable;
 		oTable.getDomRef().style.padding = "1rem";
 		const aVisibleColumns = oTable._getVisibleColumns();
 		moveResizer(aVisibleColumns[0], assert, true, 0);
@@ -146,6 +169,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Automatic Column Resize via Double Click", async function(assert) {
+		const oTable = this.oTable;
 		const assertAutoResizeCalled = (bCalled) => {
 			const sMessage =
 				` - resizable=${this.oColumn.getResizable()}, autoResizable=${this.oColumn.getAutoResizable()}, desktop=${Device.system.desktop}`;
@@ -208,6 +232,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Resize via Drag&Drop", async function(assert) {
+		const oTable = this.oTable;
 		const oColumn = this.oColumn;
 		let $Resizer = oTable.$("rsz");
 
@@ -249,6 +274,7 @@ sap.ui.define([
 	 * @deprecated As of version 1.117
 	 */
 	QUnit.test("Resize via Resize Button", async function(assert) {
+		const oTable = this.oTable;
 		const oColumn = this.oColumn;
 		const oColumnDomRef = oColumn.getDomRef();
 		let iWidthBeforeResize;
@@ -299,6 +325,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Skip trigger resize when resizing already started", function(assert) {
+		const oTable = this.oTable;
 		oTable._getPointerExtension()._debug();
 		const ColumnResizeHelper = oTable._getPointerExtension()._ColumnResizeHelper;
 		oTable._bIsColumnResizerMoving = true;
@@ -309,12 +336,13 @@ sap.ui.define([
 
 	QUnit.module("Context menu", {
 		beforeEach: async function() {
-			await createTables();
-			this.oPointerExtension = oTable._getPointerExtension();
+			this.oTable = TableQUnitUtils.createTable();
+			await this.oTable.qunit.whenRenderingFinished();
+			this.oPointerExtension = this.oTable._getPointerExtension();
 			this.oPointerExtension._debug();
 		},
 		afterEach: function() {
-			destroyTables();
+			this.oTable.destroy();
 		},
 		/**
 		 * Triggers a mouse down event on the passed element simulating the specified button.
@@ -344,7 +372,9 @@ sap.ui.define([
 	 * @deprecated As of version 1.117
 	 */
 	QUnit.test("Column header", async function(assert) {
-		let oElem = getColumnHeader(0, true);
+		const oTable = this.oTable;
+		let oElem = oTable.qunit.getColumnHeaderCell(0);
+		oElem.focus();
 		let oColumn = oTable.getColumns()[0];
 		const oContextMenuEvent = this.spy(this.oPointerExtension._delegate, "oncontextmenu");
 		let oContextMenuEventArgument;
@@ -371,7 +401,7 @@ sap.ui.define([
 		this.triggerMouseDownEvent(oElem, 0);
 		qutils.triggerMouseEvent(oElem, "click");
 		assert.ok(!oColumnMenu.isOpen(), "Menu is closed");
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 
 		// Open the menu with the right mouse button.
 		this.triggerMouseDownEvent(oElem, 2);
@@ -387,7 +417,7 @@ sap.ui.define([
 		this.triggerMouseDownEvent(oElem, 2);
 		jQuery(oElem).trigger("contextmenu");
 		assert.ok(!oColumnMenu.isOpen(), "Menu is closed");
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 		oContextMenuEventArgument = oContextMenuEvent.args[0][0];
 		oContextMenuEvent.resetHistory();
 		assert.ok(oContextMenuEventArgument.isDefaultPrevented(), "Opening of the default context menu was prevented");
@@ -403,7 +433,7 @@ sap.ui.define([
 		this.triggerMouseDownEvent(oElem, 2);
 		jQuery(oElem).trigger("contextmenu");
 		assert.ok(!oColumnMenu.isOpen(), "Menu is closed");
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 		oContextMenuEventArgument = oContextMenuEvent.args[0][0];
 		oContextMenuEvent.resetHistory();
 		assert.ok(oContextMenuEventArgument.isDefaultPrevented(), "Opening of the default context menu was prevented");
@@ -412,32 +442,35 @@ sap.ui.define([
 		await nextUIUpdate();
 		oColumn = oTable.getColumns()[oTable.getColumns().length - 1];
 		oColumn.setSortProperty("dummy");
-		oElem = getColumnHeader(oTable._getVisibleColumns().indexOf(oColumn), true);
+		oElem = oTable.qunit.getColumnHeaderCell(oTable._getVisibleColumns().indexOf(oColumn));
+		oElem.focus();
 		this.triggerMouseDownEvent(oElem, 0);
 		qutils.triggerMouseEvent(oElem, "click");
 		oColumnMenu = oColumn.getMenu();
 		assert.ok(oColumnMenu.isOpen(), "Menu is opened if there are invisible columns in the aggregation before this column");
 
 		oColumn = oTable.getColumns()[1];
-		oElem = getColumnHeader(1, true);
+		oElem = oTable.qunit.getColumnHeaderCell(1);
+		oElem.focus();
 		// Try to open the menu with the left mouse button.
 		this.triggerMouseDownEvent(oElem, 0);
 		qutils.triggerMouseEvent(oElem, "click");
 		oColumnMenu = oColumn.getMenu();
 		assert.ok(!oColumnMenu, "No column menu");
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 
 		// Try to open the menu with the right mouse button.
 		this.triggerMouseDownEvent(oElem, 2);
 		jQuery(oElem).trigger("contextmenu");
 		assert.ok(!oColumnMenu, "No column menu");
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 
 		oContextMenuEvent.resetHistory();
 	});
 
 	QUnit.test("Data cell", function(assert) {
-		const oElem = getCell(0, 0)[0];
+		const oTable = this.oTable;
+		const oElem = oTable.qunit.getDataCell(0, 0);
 		const oContextMenuEvent = createPointerEvent("contextmenu");
 
 		this.spy(TableUtils.Menu, "openContextMenu");
@@ -446,13 +479,13 @@ sap.ui.define([
 		this.triggerMouseDownEvent(oElem, 0);
 		qutils.triggerMouseEvent(oElem, "click");
 		assert.notOk(TableUtils.Menu.openContextMenu.called, "openContextMenu call");
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 
 		// Try to open the menu with the right mouse button.
 		this.triggerMouseDownEvent(oElem, 2);
 		oElem.dispatchEvent(oContextMenuEvent);
 		this.assertOpenContextMenuCall(oTable, oContextMenuEvent);
-		checkFocus(oElem, assert);
+		TableQUnitUtils.assertFocus(assert, oElem);
 
 		// Open the menu with the right mouse button on the same element.
 		this.triggerMouseDownEvent(oElem, 2);
@@ -476,10 +509,11 @@ sap.ui.define([
 
 	QUnit.module("Mousedown", {
 		beforeEach: async function() {
-			await createTables();
+			this.oTable = TableQUnitUtils.createTable();
+			await this.oTable.qunit.whenRenderingFinished();
 		},
 		afterEach: function() {
-			destroyTables();
+			this.oTable.destroy();
 		}
 	});
 
@@ -487,6 +521,7 @@ sap.ui.define([
 	 * @deprecated As of version 1.117
 	 */
 	QUnit.test("Column header", async function(assert) {
+		const oTable = this.oTable;
 		const done = assert.async();
 		const oColumn = oTable._getVisibleColumns()[3];
 		let bColumnReorderingTriggered = false;
@@ -499,9 +534,9 @@ sap.ui.define([
 			bColumnReorderingTriggered = true;
 		};
 
-		qutils.triggerMouseEvent(getColumnHeader(3), "mousedown", 1, 1, 1, 1, 0);
+		qutils.triggerMouseEvent(oTable.qunit.getColumnHeaderCell(3), "mousedown", 1, 1, 1, 1, 0);
 		assert.ok(oPointerExtension._bShowMenu, "Show Menu flag set to be used in onSelect later");
-		qutils.triggerMouseEvent(getColumnHeader(3), "click", 1, 1, 1, 1, 0);
+		qutils.triggerMouseEvent(oTable.qunit.getColumnHeaderCell(3), "click", 1, 1, 1, 1, 0);
 		assert.ok(oOpenContextMenuSpy.calledOnce, "openContextMenu is called");
 		await TableQUnitUtils.wait(250);
 
@@ -516,9 +551,9 @@ sap.ui.define([
 		bColumnReorderingTriggered = false;
 		oOpenContextMenuSpy.resetHistory();
 
-		qutils.triggerMouseEvent(getColumnHeader(3), "mousedown", 1, 1, 1, 1, 0);
+		qutils.triggerMouseEvent(oTable.qunit.getColumnHeaderCell(3), "mousedown", 1, 1, 1, 1, 0);
 		assert.ok(!oPointerExtension._bShowMenu, "Menu was opened -> _bShowMenu is false");
-		qutils.triggerMouseEvent(getColumnHeader(3), "click", 1, 1, 1, 1, 0);
+		qutils.triggerMouseEvent(oTable.qunit.getColumnHeaderCell(3), "click", 1, 1, 1, 1, 0);
 		assert.ok(oOpenContextMenuSpy.notCalled, "Menu was opened -> openContextMenu is not called");
 		await TableQUnitUtils.wait(250);
 
@@ -527,6 +562,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Column header long press doesn't open menu", async function(assert) {
+		const oTable = this.oTable;
 		const oSettings = computeSettingsForReordering(oTable, 2, true);
 		const oColumn = oSettings.column;
 		const oOpenHeaderMenuSpy = this.spy(oColumn, "_openHeaderMenu");
@@ -538,7 +574,7 @@ sap.ui.define([
 		assert.ok(oTable._$ReorderGhost, "Column Reordering triggered");
 		assert.ok(oTable.$().hasClass("sapUiTableDragDrop"), "Table has drag drop class");
 
-		qutils.triggerMouseEvent(getColumnHeader(3), "mouseup", 1, 1, oSettings.left, oSettings.top, 0);
+		qutils.triggerMouseEvent(oTable.qunit.getColumnHeaderCell(3), "mouseup", 1, 1, oSettings.left, oSettings.top, 0);
 		await TableQUnitUtils.wait(100);
 		assert.ok(oOpenHeaderMenuSpy.notCalled, "_openHeaderMenu is not called");
 	});
@@ -566,20 +602,21 @@ sap.ui.define([
 				"Resizer is at the correct position");
 		}
 
-		assertResizerPosition(oTable, true);
+		assertResizerPosition(this.oTable, true);
 
-		destroyTables();
+		this.oTable.destroy();
 		const bOriginalDesktopSupport = Device.system.desktop;
 		Device.system.desktop = false;
-		createTables();
-		await nextUIUpdate();
+		this.oTable = TableQUnitUtils.createTable();
+		await this.oTable.qunit.whenRenderingFinished();
 
-		assertResizerPosition(oTable, false);
+		assertResizerPosition(this.oTable, false);
 
 		Device.system.desktop = bOriginalDesktopSupport;
 	});
 
 	QUnit.test("Scrollbar", function(assert) {
+		const oTable = this.oTable;
 		const oEvent = jQuery.Event({type: "mousedown"});
 		oEvent.target = oTable._getScrollExtension().getHorizontalScrollbar();
 		oEvent.button = 0;
@@ -594,14 +631,21 @@ sap.ui.define([
 
 	QUnit.module("Click", {
 		beforeEach: async function() {
-			await createTables();
+			this.oTable = TableQUnitUtils.createTable();
+			this.oTreeTable = TableQUnitUtils.createTable(TreeTable, mTreeTableSettings());
+			await Promise.all([
+				this.oTable.qunit.whenRenderingFinished(),
+				this.oTreeTable.qunit.whenRenderingFinished()
+			]);
 		},
 		afterEach: function() {
-			destroyTables();
+			this.oTable.destroy();
+			this.oTreeTable.destroy();
 		}
 	});
 
 	QUnit.test("Tree Icon", async function(assert) {
+		const oTreeTable = this.oTreeTable;
 		const oExtension = oTreeTable._getPointerExtension();
 		oExtension._debug();
 
@@ -624,6 +668,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Group Header", async function(assert) {
+		const oTreeTable = this.oTreeTable;
 		const oExtension = oTreeTable._getPointerExtension();
 		oExtension._debug();
 
@@ -649,6 +694,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("Cell + Cell Click Event", function(assert) {
+		const oTable = this.oTable;
+		const oTreeTable = this.oTreeTable;
 		let oExtension = oTreeTable._getPointerExtension();
 		oExtension._debug();
 
@@ -751,6 +798,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Single Selection", async function(assert) {
+		const oTable = this.oTable;
 		oTable.clearSelection();
 		oTable.setSelectionBehavior(library.SelectionBehavior.Row);
 		oTable.setSelectionMode(library.SelectionMode.Single);
@@ -760,16 +808,16 @@ sap.ui.define([
 
 		assert.ok(!oTable.isIndexSelected(0), "First row is not selected");
 
-		qutils.triggerMouseEvent(getCell(0, 0), "tap");
+		qutils.triggerMouseEvent(oTable.qunit.getDataCell(0, 0), "tap");
 		assert.ok(oTable.isIndexSelected(0), "Click on data cell in first row -> First row selected");
 
-		qutils.triggerMouseEvent(getRowHeader(0), "tap");
+		qutils.triggerMouseEvent(oTable.qunit.getRowHeaderCell(0), "tap");
 		assert.ok(!oTable.isIndexSelected(0), "Click on row header cell in first row -> First row  not selected");
 
-		qutils.triggerMouseEvent(getRowAction(0), "tap");
+		qutils.triggerMouseEvent(oTable.qunit.getRowActionCell(0), "tap");
 		assert.ok(oTable.isIndexSelected(0), "Click on row action cell in first row -> First row selected");
 
-		qutils.triggerMouseEvent(getCell(1, 0), "tap");
+		qutils.triggerMouseEvent(oTable.qunit.getDataCell(1, 0), "tap");
 		assert.deepEqual(oTable.getSelectedIndices(), [1], "Click on data cell in second row -> Second row selected");
 	});
 
@@ -777,6 +825,7 @@ sap.ui.define([
 	 * @deprecated As of version 1.115
 	 */
 	QUnit.test("Single Selection - legacyMultiSelection", async function(assert) {
+		const oTable = this.oTable;
 		oTable.clearSelection();
 		oTable.setSelectionBehavior(library.SelectionBehavior.Row);
 		oTable.setSelectionMode(library.SelectionMode.Single);
@@ -785,31 +834,32 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		oTable._enableLegacyMultiSelection();
-		qutils.triggerEvent("tap", getCell(0, 0), {metaKey: true, ctrlKey: true});
+		qutils.triggerEvent("tap", oTable.qunit.getDataCell(0, 0), {metaKey: true, ctrlKey: true});
 		assert.deepEqual(oTable.getSelectedIndices(), [0],
 			"Ctrl+Click on data cell in first row with legacy multi selection enabled -> First row selected");
 	});
 
 	QUnit.test("MultiToggle Selection - Range", async function(assert) {
+		const oTable = this.oTable;
 		oTable.clearSelection();
 		oTable.setSelectionBehavior(library.SelectionBehavior.Row);
 		oTable.setRowActionTemplate(TableQUnitUtils.createRowAction(null));
 		oTable.setRowActionCount(1);
 		await nextUIUpdate();
 
-		qutils.triggerMouseEvent(getCell(0, 0), "tap");
+		qutils.triggerMouseEvent(oTable.qunit.getDataCell(0, 0), "tap");
 		assert.ok(oTable.isIndexSelected(0), "Click on first row -> Row selected");
 
 		oTable.setFirstVisibleRow(3); // Scroll down 3 rows
 		await nextUIUpdate();
-		qutils.triggerEvent("tap", getCell(2, 0), {shiftKey: true});
+		qutils.triggerEvent("tap", oTable.qunit.getDataCell(2, 0), {shiftKey: true});
 		assert.deepEqual(oTable.getSelectedIndices(), [0, 1, 2, 3, 4, 5], "Range selection with Shift + Click selected the correct rows");
 		assert.strictEqual(window.getSelection().toString(), "", "Range selection with Shift + Click did not select text");
 
-		qutils.triggerMouseEvent(getCell(0, 0), "tap"); // Deselect row with index 3
-		qutils.triggerMouseEvent(getCell(0, 0), "tap"); // Select row with index 3
-		qutils.triggerMouseEvent(getCell(0, 0), "tap"); // Deselect row with index 3
-		qutils.triggerEvent("tap", getCell(2, 0), {shiftKey: true});
+		qutils.triggerMouseEvent(oTable.qunit.getDataCell(0, 0), "tap"); // Deselect row with index 3
+		qutils.triggerMouseEvent(oTable.qunit.getDataCell(0, 0), "tap"); // Select row with index 3
+		qutils.triggerMouseEvent(oTable.qunit.getDataCell(0, 0), "tap"); // Deselect row with index 3
+		qutils.triggerEvent("tap", oTable.qunit.getDataCell(2, 0), {shiftKey: true});
 		assert.deepEqual(oTable.getSelectedIndices(), [0, 1, 2, 4, 5], "Range selection with Shift + Click did not deselect");
 	});
 
@@ -817,6 +867,7 @@ sap.ui.define([
 	 * @deprecated As of version 1.115
 	 */
 	QUnit.test("MultiToggle Selection - Range - legacyMultiSelection", async function(assert) {
+		const oTable = this.oTable;
 		oTable.clearSelection();
 		oTable.setSelectionBehavior(library.SelectionBehavior.Row);
 		oTable.setRowActionTemplate(TableQUnitUtils.createRowAction(null));
@@ -827,8 +878,8 @@ sap.ui.define([
 		oTable.setFirstVisibleRow(0);
 		await nextUIUpdate();
 
-		qutils.triggerMouseEvent(getCell(0, 0), "tap"); // Select row with index 5
-		qutils.triggerEvent("tap", getCell(2, 0), {shiftKey: true, ctrlKey: true});
+		qutils.triggerMouseEvent(oTable.qunit.getDataCell(0, 0), "tap"); // Select row with index 5
+		qutils.triggerEvent("tap", oTable.qunit.getDataCell(2, 0), {shiftKey: true, ctrlKey: true});
 		assert.deepEqual(oTable.getSelectedIndices(), [0, 1, 2],
 			"Range selection with Shift + Click selected the correct rows,"
 			+ "even though Ctrl was also pressed and legacy multi selection was enabled");
@@ -837,19 +888,20 @@ sap.ui.define([
 	});
 
 	QUnit.test("MultiToggle Selection - Toggle", async function(assert) {
+		const oTable = this.oTable;
 		oTable.clearSelection();
 		oTable.setSelectionBehavior(library.SelectionBehavior.Row);
 		oTable.setRowActionTemplate(TableQUnitUtils.createRowAction(null));
 		oTable.setRowActionCount(1);
 		await nextUIUpdate();
 
-		qutils.triggerMouseEvent(getCell(0, 0), "tap");
+		qutils.triggerMouseEvent(oTable.qunit.getDataCell(0, 0), "tap");
 		assert.deepEqual(oTable.getSelectedIndices(), [0], "Click on unselected row with index 0");
 
-		qutils.triggerMouseEvent(getCell(1, 0), "tap");
+		qutils.triggerMouseEvent(oTable.qunit.getDataCell(1, 0), "tap");
 		assert.deepEqual(oTable.getSelectedIndices(), [0, 1], "Click on unselected row with index 1");
 
-		qutils.triggerMouseEvent(getCell(0, 0), "tap");
+		qutils.triggerMouseEvent(oTable.qunit.getDataCell(0, 0), "tap");
 		assert.deepEqual(oTable.getSelectedIndices(), [1], "Click on selected row with index 0");
 	});
 
@@ -857,6 +909,7 @@ sap.ui.define([
 	 * @deprecated As of version 1.115
 	 */
 	QUnit.test("Legacy Multi Selection", async function(assert) {
+		const oTable = this.oTable;
 		oTable.clearSelection();
 		oTable.setSelectionBehavior(library.SelectionBehavior.Row);
 		oTable.setRowActionTemplate(TableQUnitUtils.createRowAction(null));
@@ -865,22 +918,22 @@ sap.ui.define([
 
 		oTable._enableLegacyMultiSelection();
 
-		qutils.triggerMouseEvent(getCell(0, 0), "tap");
+		qutils.triggerMouseEvent(oTable.qunit.getDataCell(0, 0), "tap");
 		assert.deepEqual(oTable.getSelectedIndices(), [0], "Click on unselected row with index 0");
 
-		qutils.triggerMouseEvent(getCell(1, 0), "tap");
+		qutils.triggerMouseEvent(oTable.qunit.getDataCell(1, 0), "tap");
 		assert.deepEqual(oTable.getSelectedIndices(), [1], "Click on unselected row with index 1");
 
-		qutils.triggerEvent("tap", getCell(2, 0), {metaKey: true, ctrlKey: true});
+		qutils.triggerEvent("tap", oTable.qunit.getDataCell(2, 0), {metaKey: true, ctrlKey: true});
 		assert.deepEqual(oTable.getSelectedIndices(), [1, 2], "Ctrl + Click on unselected row with index 2");
 
-		qutils.triggerEvent("tap", getCell(0, 0), {metaKey: true, ctrlKey: true});
+		qutils.triggerEvent("tap", oTable.qunit.getDataCell(0, 0), {metaKey: true, ctrlKey: true});
 		assert.deepEqual(oTable.getSelectedIndices(), [0, 1, 2], "Ctrl + Click on unselected row with index 0");
 
-		qutils.triggerEvent("tap", getCell(1, 0), {metaKey: true, ctrlKey: true});
+		qutils.triggerEvent("tap", oTable.qunit.getDataCell(1, 0), {metaKey: true, ctrlKey: true});
 		assert.deepEqual(oTable.getSelectedIndices(), [0, 2], "Ctrl + Click on selected row with index 1");
 
-		qutils.triggerMouseEvent(getCell(2, 0), "tap");
+		qutils.triggerMouseEvent(oTable.qunit.getDataCell(2, 0), "tap");
 		assert.deepEqual(oTable.getSelectedIndices(), [2], "Click on selected row with index 2");
 	});
 
@@ -1061,10 +1114,16 @@ sap.ui.define([
 
 	QUnit.module("Column Reordering", {
 		beforeEach: async function() {
-			await createTables();
+			this.oTable = TableQUnitUtils.createTable();
+			this.oTreeTable = TableQUnitUtils.createTable(TreeTable, mTreeTableSettings());
+			await Promise.all([
+				this.oTable.qunit.whenRenderingFinished(),
+				this.oTreeTable.qunit.whenRenderingFinished()
+			]);
 		},
 		afterEach: function() {
-			destroyTables();
+			this.oTable.destroy();
+			this.oTreeTable.destroy();
 		}
 	});
 
@@ -1084,6 +1143,7 @@ sap.ui.define([
 	}
 
 	QUnit.test("Reordering via Drag&Drop - increase Index", async function(assert) {
+		const oTable = this.oTable;
 		const oSettings = computeSettingsForReordering(oTable, 2, true);
 		const oColumn = oSettings.column;
 		const iLeft = oSettings.left + oSettings.breakeven;
@@ -1115,6 +1175,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Reordering via Drag&Drop - decrease Index", async function(assert) {
+		const oTable = this.oTable;
 		const oSettings = computeSettingsForReordering(oTable, 2, false);
 		const oColumn = oSettings.column;
 		const iLeft = oSettings.left - oSettings.breakeven;
@@ -1147,6 +1208,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("No Reordering of fixed columns (within fixed)", async function(assert) {
+		const oTable = this.oTable;
 		oTable.setFixedColumnCount(4);
 		await nextUIUpdate();
 
@@ -1169,6 +1231,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("No Reordering of fixed columns (fixed to not fixed)", async function(assert) {
+		const oTable = this.oTable;
 		oTable.setFixedColumnCount(3);
 		await nextUIUpdate();
 
@@ -1191,6 +1254,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("No Reordering of fixed columns (not fixed to fixed)", async function(assert) {
+		const oTable = this.oTable;
 		oTable.setFixedColumnCount(2);
 		await nextUIUpdate();
 
@@ -1213,6 +1277,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("TreeTable - No Reordering via Drag&Drop of first column - increase index", async function(assert) {
+		const oTreeTable = this.oTreeTable;
 		const done = assert.async();
 		oTreeTable.setFixedColumnCount(0);
 		await nextUIUpdate();
@@ -1248,6 +1313,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("TreeTable - No Reordering via Drag&Drop of first column - decrease index", async function(assert) {
+		const oTreeTable = this.oTreeTable;
 		const done = assert.async();
 		oTreeTable.setFixedColumnCount(0);
 		await nextUIUpdate();
@@ -1370,113 +1436,120 @@ sap.ui.define([
 
 	QUnit.module("Row Hover Effect", {
 		beforeEach: async function() {
-			await createTables();
-			oTable.setSelectionBehavior(library.SelectionBehavior.Row);
-			oTable.invalidate();
+			this.oTable = TableQUnitUtils.createTable();
+			await this.oTable.qunit.whenRenderingFinished();
+			this.oTable.setSelectionBehavior(library.SelectionBehavior.Row);
+			this.oTable.invalidate();
 			await nextUIUpdate();
 		},
 		afterEach: function() {
-			destroyTables();
+			this.oTable.destroy();
 		}
 	});
 
 	QUnit.test("RowHeader", function(assert) {
-		assert.ok(!getRowHeader(0).parent().hasClass("sapUiTableRowHvr"), "No hover effect on row header");
-		assert.ok(!getCell(0, 0).parent().hasClass("sapUiTableRowHvr"), "No hover effect on fixed part of row");
-		assert.ok(!getCell(0, 2).parent().hasClass("sapUiTableRowHvr"), "No hover effect on scroll part of row");
-		getRowHeader(0).trigger("mouseover");
-		assert.ok(getRowHeader(0).parent().hasClass("sapUiTableRowHvr"), "Hover effect on row header");
-		assert.ok(getCell(0, 0).parent().hasClass("sapUiTableRowHvr"), "Hover effect on fixed part of row");
-		assert.ok(getCell(0, 2).parent().hasClass("sapUiTableRowHvr"), "Hover effect on scroll part of row");
-		getRowHeader(0).trigger("mouseout");
-		assert.ok(!getRowHeader(0).parent().hasClass("sapUiTableRowHvr"), "No hover effect on row header");
-		assert.ok(!getCell(0, 0).parent().hasClass("sapUiTableRowHvr"), "No hover effect on fixed part of row");
-		assert.ok(!getCell(0, 2).parent().hasClass("sapUiTableRowHvr"), "No hover effect on scroll part of row");
+		const oTable = this.oTable;
+		assert.ok(!jQuery(oTable.qunit.getRowHeaderCell(0)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on row header");
+		assert.ok(!jQuery(oTable.qunit.getDataCell(0, 0)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on fixed part of row");
+		assert.ok(!jQuery(oTable.qunit.getDataCell(0, 2)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on scroll part of row");
+		jQuery(oTable.qunit.getRowHeaderCell(0)).trigger("mouseover");
+		assert.ok(jQuery(oTable.qunit.getRowHeaderCell(0)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on row header");
+		assert.ok(jQuery(oTable.qunit.getDataCell(0, 0)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on fixed part of row");
+		assert.ok(jQuery(oTable.qunit.getDataCell(0, 2)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on scroll part of row");
+		jQuery(oTable.qunit.getRowHeaderCell(0)).trigger("mouseout");
+		assert.ok(!jQuery(oTable.qunit.getRowHeaderCell(0)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on row header");
+		assert.ok(!jQuery(oTable.qunit.getDataCell(0, 0)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on fixed part of row");
+		assert.ok(!jQuery(oTable.qunit.getDataCell(0, 2)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on scroll part of row");
 	});
 
 	QUnit.test("Fixed column area", function(assert) {
-		assert.ok(!getRowHeader(0).parent().hasClass("sapUiTableRowHvr"), "No hover effect on row header");
-		assert.ok(!getCell(0, 0).parent().hasClass("sapUiTableRowHvr"), "No hover effect on fixed part of row");
-		assert.ok(!getCell(0, 2).parent().hasClass("sapUiTableRowHvr"), "No hover effect on scroll part of row");
-		getCell(0, 0).trigger("mouseover");
-		assert.ok(getRowHeader(0).parent().hasClass("sapUiTableRowHvr"), "Hover effect on row header");
-		assert.ok(getCell(0, 0).parent().hasClass("sapUiTableRowHvr"), "Hover effect on fixed part of row");
-		assert.ok(getCell(0, 2).parent().hasClass("sapUiTableRowHvr"), "Hover effect on scroll part of row");
-		getCell(0, 0).trigger("mouseout");
-		assert.ok(!getRowHeader(0).parent().hasClass("sapUiTableRowHvr"), "No hover effect on row header");
-		assert.ok(!getCell(0, 0).parent().hasClass("sapUiTableRowHvr"), "No hover effect on fixed part of row");
-		assert.ok(!getCell(0, 2).parent().hasClass("sapUiTableRowHvr"), "No hover effect on scroll part of row");
+		const oTable = this.oTable;
+		assert.ok(!jQuery(oTable.qunit.getRowHeaderCell(0)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on row header");
+		assert.ok(!jQuery(oTable.qunit.getDataCell(0, 0)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on fixed part of row");
+		assert.ok(!jQuery(oTable.qunit.getDataCell(0, 2)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on scroll part of row");
+		jQuery(oTable.qunit.getDataCell(0, 0)).trigger("mouseover");
+		assert.ok(jQuery(oTable.qunit.getRowHeaderCell(0)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on row header");
+		assert.ok(jQuery(oTable.qunit.getDataCell(0, 0)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on fixed part of row");
+		assert.ok(jQuery(oTable.qunit.getDataCell(0, 2)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on scroll part of row");
+		jQuery(oTable.qunit.getDataCell(0, 0)).trigger("mouseout");
+		assert.ok(!jQuery(oTable.qunit.getRowHeaderCell(0)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on row header");
+		assert.ok(!jQuery(oTable.qunit.getDataCell(0, 0)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on fixed part of row");
+		assert.ok(!jQuery(oTable.qunit.getDataCell(0, 2)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on scroll part of row");
 	});
 
 	QUnit.test("Scroll column area", function(assert) {
-		assert.ok(!getRowHeader(0).parent().hasClass("sapUiTableRowHvr"), "No hover effect on row header");
-		assert.ok(!getCell(0, 0).parent().hasClass("sapUiTableRowHvr"), "No hover effect on fixed part of row");
-		assert.ok(!getCell(0, 2).parent().hasClass("sapUiTableRowHvr"), "No hover effect on scroll part of row");
-		getCell(0, 2).trigger("mouseover");
-		assert.ok(getRowHeader(0).parent().hasClass("sapUiTableRowHvr"), "Hover effect on row header");
-		assert.ok(getCell(0, 0).parent().hasClass("sapUiTableRowHvr"), "Hover effect on fixed part of row");
-		assert.ok(getCell(0, 2).parent().hasClass("sapUiTableRowHvr"), "Hover effect on scroll part of row");
-		getCell(0, 2).trigger("mouseout");
-		assert.ok(!getRowHeader(0).parent().hasClass("sapUiTableRowHvr"), "No hover effect on row header");
-		assert.ok(!getCell(0, 0).parent().hasClass("sapUiTableRowHvr"), "No hover effect on fixed part of row");
-		assert.ok(!getCell(0, 2).parent().hasClass("sapUiTableRowHvr"), "No hover effect on scroll part of row");
+		const oTable = this.oTable;
+		assert.ok(!jQuery(oTable.qunit.getRowHeaderCell(0)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on row header");
+		assert.ok(!jQuery(oTable.qunit.getDataCell(0, 0)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on fixed part of row");
+		assert.ok(!jQuery(oTable.qunit.getDataCell(0, 2)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on scroll part of row");
+		jQuery(oTable.qunit.getDataCell(0, 2)).trigger("mouseover");
+		assert.ok(jQuery(oTable.qunit.getRowHeaderCell(0)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on row header");
+		assert.ok(jQuery(oTable.qunit.getDataCell(0, 0)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on fixed part of row");
+		assert.ok(jQuery(oTable.qunit.getDataCell(0, 2)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on scroll part of row");
+		jQuery(oTable.qunit.getDataCell(0, 2)).trigger("mouseout");
+		assert.ok(!jQuery(oTable.qunit.getRowHeaderCell(0)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on row header");
+		assert.ok(!jQuery(oTable.qunit.getDataCell(0, 0)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on fixed part of row");
+		assert.ok(!jQuery(oTable.qunit.getDataCell(0, 2)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on scroll part of row");
 	});
 
 	QUnit.test("Row Hover Effect depending on SelectionMode and SelectionBehavior", async function(assert) {
+		const oTable = this.oTable;
 		oTable.setSelectionMode("None");
 		oTable.invalidate();
 		await nextUIUpdate();
-		getCell(0, 2).trigger("mouseover");
-		assert.ok(!getRowHeader(0).parent().hasClass("sapUiTableRowHvr"), "No hover effect on row header");
-		assert.ok(!getCell(0, 0).parent().hasClass("sapUiTableRowHvr"), "No hover effect on fixed part of row");
-		assert.ok(!getCell(0, 2).parent().hasClass("sapUiTableRowHvr"), "No hover effect on scroll part of row");
-		getCell(0, 2).trigger("mouseout");
+		jQuery(oTable.qunit.getDataCell(0, 2)).trigger("mouseover");
+		assert.ok(!jQuery(oTable.qunit.getRowHeaderCell(0)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on row header");
+		assert.ok(!jQuery(oTable.qunit.getDataCell(0, 0)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on fixed part of row");
+		assert.ok(!jQuery(oTable.qunit.getDataCell(0, 2)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on scroll part of row");
+		jQuery(oTable.qunit.getDataCell(0, 2)).trigger("mouseout");
 		oTable.setSelectionBehavior(library.SelectionBehavior.RowOnly);
 		oTable.invalidate();
 		await nextUIUpdate();
-		getCell(0, 2).trigger("mouseover");
-		assert.ok(!getRowHeader(0).parent().hasClass("sapUiTableRowHvr"), "No hover effect on row header");
-		assert.ok(!getCell(0, 0).parent().hasClass("sapUiTableRowHvr"), "No hover effect on fixed part of row");
-		assert.ok(!getCell(0, 2).parent().hasClass("sapUiTableRowHvr"), "No hover effect on scroll part of row");
-		getCell(0, 2).trigger("mouseout");
+		jQuery(oTable.qunit.getDataCell(0, 2)).trigger("mouseover");
+		assert.ok(!jQuery(oTable.qunit.getRowHeaderCell(0)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on row header");
+		assert.ok(!jQuery(oTable.qunit.getDataCell(0, 0)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on fixed part of row");
+		assert.ok(!jQuery(oTable.qunit.getDataCell(0, 2)).parent().hasClass("sapUiTableRowHvr"), "No hover effect on scroll part of row");
+		jQuery(oTable.qunit.getDataCell(0, 2)).trigger("mouseout");
 		oTable.setSelectionMode("MultiToggle");
 		oTable.setSelectionBehavior(library.SelectionBehavior.Row);
 		oTable.invalidate();
 		await nextUIUpdate();
-		getCell(0, 2).trigger("mouseover");
-		assert.ok(getRowHeader(0).parent().hasClass("sapUiTableRowHvr"), "Hover effect on row header");
-		assert.ok(getCell(0, 0).parent().hasClass("sapUiTableRowHvr"), "Hover effect on fixed part of row");
-		assert.ok(getCell(0, 2).parent().hasClass("sapUiTableRowHvr"), "Hover effect on scroll part of row");
-		getCell(0, 2).trigger("mouseout");
+		jQuery(oTable.qunit.getDataCell(0, 2)).trigger("mouseover");
+		assert.ok(jQuery(oTable.qunit.getRowHeaderCell(0)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on row header");
+		assert.ok(jQuery(oTable.qunit.getDataCell(0, 0)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on fixed part of row");
+		assert.ok(jQuery(oTable.qunit.getDataCell(0, 2)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on scroll part of row");
+		jQuery(oTable.qunit.getDataCell(0, 2)).trigger("mouseout");
 		oTable.setSelectionBehavior(library.SelectionBehavior.RowOnly);
 		oTable.invalidate();
 		await nextUIUpdate();
-		getCell(0, 2).trigger("mouseover");
-		assert.ok(getRowHeader(0).parent().hasClass("sapUiTableRowHvr"), "Hover effect on row header");
-		assert.ok(getCell(0, 0).parent().hasClass("sapUiTableRowHvr"), "Hover effect on fixed part of row");
-		assert.ok(getCell(0, 2).parent().hasClass("sapUiTableRowHvr"), "Hover effect on scroll part of row");
-		getCell(0, 2).trigger("mouseout");
+		jQuery(oTable.qunit.getDataCell(0, 2)).trigger("mouseover");
+		assert.ok(jQuery(oTable.qunit.getRowHeaderCell(0)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on row header");
+		assert.ok(jQuery(oTable.qunit.getDataCell(0, 0)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on fixed part of row");
+		assert.ok(jQuery(oTable.qunit.getDataCell(0, 2)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on scroll part of row");
+		jQuery(oTable.qunit.getDataCell(0, 2)).trigger("mouseout");
 		oTable.setSelectionMode("None");
 		oTable.setSelectionBehavior(library.SelectionBehavior.RowSelector);
 		oTable.invalidate();
 		await nextUIUpdate();
 		oTable.attachCellClick(function() {});
-		getCell(0, 2).trigger("mouseover");
-		assert.ok(getRowHeader(0).parent().hasClass("sapUiTableRowHvr"), "Hover effect on row header");
-		assert.ok(getCell(0, 0).parent().hasClass("sapUiTableRowHvr"), "Hover effect on fixed part of row");
-		assert.ok(getCell(0, 2).parent().hasClass("sapUiTableRowHvr"), "Hover effect on scroll part of row");
+		jQuery(oTable.qunit.getDataCell(0, 2)).trigger("mouseover");
+		assert.ok(jQuery(oTable.qunit.getRowHeaderCell(0)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on row header");
+		assert.ok(jQuery(oTable.qunit.getDataCell(0, 0)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on fixed part of row");
+		assert.ok(jQuery(oTable.qunit.getDataCell(0, 2)).parent().hasClass("sapUiTableRowHvr"), "Hover effect on scroll part of row");
 	});
 
 	QUnit.module("Helpers", {
 		beforeEach: async function() {
-			await createTables();
+			this.oTable = TableQUnitUtils.createTable();
+			await this.oTable.qunit.whenRenderingFinished();
 		},
 		afterEach: function() {
-			destroyTables();
+			this.oTable.destroy();
 		}
 	});
 
 	QUnit.test("_debug()", function(assert) {
+		const oTable = this.oTable;
 		const oExtension = oTable._getPointerExtension();
 		assert.ok(!oExtension._ExtensionHelper, "_ExtensionHelper: No debug mode");
 		assert.ok(!oExtension._ColumnResizeHelper, "_ColumnResizeHelper: No debug mode");
@@ -1496,6 +1569,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("showColumnResizer", function(assert) {
+		const oTable = this.oTable;
 		const oExtension = oTable._getPointerExtension();
 		const oColumn = oTable._getVisibleColumns()[1];
 		const oColumnHeaderRect = oTable._aTableHeaders[oColumn.getIndex()].getBoundingClientRect();
@@ -1510,6 +1584,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("showColumnResizer in RTL mode", function(assert) {
+		const oTable = this.oTable;
 		const oExtension = oTable._getPointerExtension();
 		const oColumn = oTable._getVisibleColumns()[1];
 		const oColumnHeaderRect = oTable._aTableHeaders[oColumn.getIndex()].getBoundingClientRect();
@@ -1525,16 +1600,18 @@ sap.ui.define([
 
 	QUnit.module("Column resize helpers", {
 		beforeEach: async function() {
-			await createTables();
-			this.oPointerExtension = oTable._getPointerExtension();
+			this.oTable = TableQUnitUtils.createTable();
+			await this.oTable.qunit.whenRenderingFinished();
+			this.oPointerExtension = this.oTable._getPointerExtension();
 			this.oPointerExtension._debug();
 		},
 		afterEach: function() {
-			destroyTables();
+			this.oTable.destroy();
 		}
 	});
 
 	QUnit.test("onMouseMoveWhileColumnResizing prevents default for touch events", function(assert) {
+		const oTable = this.oTable;
 		const ColumnResizeHelper = this.oPointerExtension._ColumnResizeHelper;
 
 		oTable._$colResize = oTable.$("rsz");
@@ -1554,6 +1631,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Resizer position is not updated while a resize is already in progress", function(assert) {
+		const oTable = this.oTable;
 		oTable._bIsColumnResizerMoving = true;
 		const sInitialLeft = oTable.$("rsz").css("left");
 
@@ -1568,6 +1646,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Resizer position tracking in RTL mode", function(assert) {
+		const oTable = this.oTable;
 		oTable._bRtlMode = true;
 
 		const oColumnHeaderRect = oTable._aTableHeaders[1].getBoundingClientRect();
@@ -1587,18 +1666,20 @@ sap.ui.define([
 
 	QUnit.module("Tap and context menu handling", {
 		beforeEach: async function() {
-			await createTables();
-			this.oPointerExtension = oTable._getPointerExtension();
+			this.oTable = TableQUnitUtils.createTable();
+			await this.oTable.qunit.whenRenderingFinished();
+			this.oPointerExtension = this.oTable._getPointerExtension();
 			this.oPointerExtension._debug();
 		},
 		afterEach: function() {
-			destroyTables();
+			this.oTable.destroy();
 		}
 	});
 
 	QUnit.test("_skipClick returns true when event is marked on data cell", function(assert) {
+		const oTable = this.oTable;
 		const ExtensionHelper = this.oPointerExtension._ExtensionHelper;
-		const $Cell = getCell(0, 0);
+		const $Cell = jQuery(oTable.qunit.getDataCell(0, 0));
 		const oCellInfo = TableUtils.getCellInfo($Cell);
 		const oEvent = jQuery.Event({type: "tap"});
 
@@ -1608,6 +1689,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("oncontextmenu on non-cell content sets default menu flag", function(assert) {
+		const oTable = this.oTable;
 		const oEvent = jQuery.Event({type: "mousedown"});
 		oEvent.button = 2;
 		oEvent.target = oTable.getDomRef("sapUiTableCnt"); // container, not a cell
@@ -1619,6 +1701,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("ontap returns early for non-cell targets", function(assert) {
+		const oTable = this.oTable;
 		const oHandleClickSpy = this.spy(this.oPointerExtension._ExtensionHelper, "_handleClickSelection");
 		const oOpenContextMenuSpy = this.spy(TableUtils.Menu, "openContextMenu");
 
@@ -1631,21 +1714,23 @@ sap.ui.define([
 	});
 
 	QUnit.test("ontap on data cell is skipped when browser has an active text selection", function(assert) {
+		const oTable = this.oTable;
 		const oHandleClickSpy = this.spy(this.oPointerExtension._ExtensionHelper, "_handleClickSelection");
 		const oGetSelectionStub = this.stub(window, "getSelection");
 
 		oGetSelectionStub.returns({toString: () => "selected text"});
 
-		qutils.triggerMouseEvent(getCell(0, 0), "tap");
+		qutils.triggerMouseEvent(oTable.qunit.getDataCell(0, 0), "tap");
 
 		assert.ok(oHandleClickSpy.notCalled, "Selection prevents click handling");
 	});
 
 	QUnit.test("oncontextmenu is prevented while a column reorder is in progress", function(assert) {
+		const oTable = this.oTable;
 		this.oPointerExtension._bReorderInProgress = true;
 
 		const oEvent = jQuery.Event({type: "contextmenu"});
-		oEvent.target = getCell(0, 0)[0];
+		oEvent.target = oTable.qunit.getDataCell(0, 0);
 		jQuery(oEvent.target).trigger(oEvent);
 
 		assert.ok(oEvent.isDefaultPrevented(), "Default context menu prevented");
@@ -1656,16 +1741,18 @@ sap.ui.define([
 
 	QUnit.module("Reorder helpers", {
 		beforeEach: async function() {
-			await createTables();
-			this.oPointerExtension = oTable._getPointerExtension();
+			this.oTable = TableQUnitUtils.createTable();
+			await this.oTable.qunit.whenRenderingFinished();
+			this.oPointerExtension = this.oTable._getPointerExtension();
 			this.oPointerExtension._debug();
 		},
 		afterEach: function() {
-			destroyTables();
+			this.oTable.destroy();
 		}
 	});
 
 	QUnit.test("findColumnForPosition returns null when position is outside every column", function(assert) {
+		const oTable = this.oTable;
 		const ReorderHelper = this.oPointerExtension._ReorderHelper;
 
 		assert.strictEqual(ReorderHelper.findColumnForPosition(oTable, -10000), null, "Far-left position");
@@ -1673,6 +1760,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("adaptReorderMarkerPosition returns without effect when position is falsy", function(assert) {
+		const oTable = this.oTable;
 		assert.expect(0);
 		const ReorderHelper = this.oPointerExtension._ReorderHelper;
 
@@ -1682,6 +1770,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("onMouseMoveWhileReordering restores previous position when target column is missing", function(assert) {
+		const oTable = this.oTable;
 		const ReorderHelper = this.oPointerExtension._ReorderHelper;
 
 		oTable._iDnDColIndex = 2;
@@ -1796,6 +1885,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("doScroll clears a pending timer and schedules a follow-up", function(assert) {
+		const oTable = this.oTable;
 		const ReorderHelper = this.oPointerExtension._ReorderHelper;
 		const oClearTimeoutSpy = this.spy(window, "clearTimeout");
 		const oSetTimeoutSpy = this.spy(window, "setTimeout");
@@ -1814,6 +1904,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("doScroll uses scrollLeftRTL in RTL mode", function(assert) {
+		const oTable = this.oTable;
 		const ReorderHelper = this.oPointerExtension._ReorderHelper;
 		const oOriginal$ = oTable.$;
 		const $Scr = oTable.$("sapUiTableColHdrScr");
