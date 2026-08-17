@@ -1924,6 +1924,74 @@ sap.ui.define([
 
 	//*********************************************************************************************
 [{
+	hierarchyQualifier : "X"
+}, {
+	aggregate : {},
+	group : {},
+	// Note: a single group level would define the leaf level (JIRA: CPOUI5ODATAV4-2755)
+	groupLevels : ["a", "b"]
+}].forEach(function (oAggregation, i) {
+	QUnit.test("requestCount: unsupported #" + i, function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, oAggregation);
+
+		assert.throws(function () {
+			// code under test
+			oCache.requestCount("~oGroupLock~");
+		}, new Error("Unsupported with recursive hierarchy or groupLevels"));
+	});
+});
+
+	//*********************************************************************************************
+[[], ["a"]].forEach(function (aGroupLevels) { // both equivalent: last group level = leaf level
+	[false, true].forEach(function (bFilter) {
+		[false, true].forEach(function (bSearch) {
+			[undefined, false, true].forEach(function (bGrandTotalAtBottomOnly) {
+	const sTitle = "requestCount: filter=" + bFilter + ", search=" + bSearch
+		+ ", grandTotalAtBottomOnly=" + bGrandTotalAtBottomOnly;
+
+	QUnit.test(sTitle, async function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, {
+			aggregate : {foo : {grandTotal : true}},
+			grandTotalAtBottomOnly : bGrandTotalAtBottomOnly,
+			groupLevels : aGroupLevels
+		});
+		oCache.oFirstLevel.mQueryOptions = Object.freeze({
+			"sap-client" : "123",
+			...(bFilter && {$$filterBeforeAggregate : "filter"}),
+			$apply : "apply",
+			$count : true, // always set via #createGroupLevelCache
+			$expand : "expand",
+			$orderby : "orderby",
+			$select : "select"
+		});
+		if (bSearch) {
+			oCache.oAggregation.search = "search";
+		}
+
+		this.mock(oCache.oFirstLevel).expects("requestCount")
+			.withExactArgs("~oGroupLock~", {
+				"sap-client" : "123",
+				$count : true,
+				$expand : "expand",
+				...(bFilter && {$filter : "filter"}),
+				$orderby : "orderby",
+				...(bSearch && {$search : "search"}),
+				$select : "select"
+			})
+			.resolves(42);
+
+		assert.strictEqual(
+			// code under test
+			await oCache.requestCount("~oGroupLock~"),
+			bGrandTotalAtBottomOnly === false ? 44 : 43);
+	});
+			});
+		});
+	});
+});
+
+	//*********************************************************************************************
+[{
 	bHasGrandTotal : false,
 	iFirstLevelIndex : 0,
 	iFirstLevelLength : 3,
@@ -7549,6 +7617,29 @@ sap.ui.define([
 		assert.throws(function () {
 			oCache._delete("~oGroupLock~", "~sEditUrl~", "('1')");
 		}, new Error("Unsupported kept-alive entity: Foo('1')"));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("_delete: kept-alive not in collection, data aggregation", function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+			aggregate : {foo : {grandTotal : true}},
+			groupLevels : []
+		});
+		this.mock(_Cache.prototype).expects("_delete").on(oCache)
+			.withExactArgs("~oGroupLock~", "~sEditUrl~", "('1')", "~oETagEntity~", "~fnCallback~")
+			.returns("~deleteResult~");
+		this.mock(oCache).expects("readGrandTotal").withExactArgs("~oGroupLock~")
+			.returns("~readGrandTotalResult~");
+
+		// code under test
+		const oResult = oCache._delete("~oGroupLock~", "~sEditUrl~", "('1')", "~oETagEntity~",
+			"~fnCallback~");
+
+		assert.ok(oResult instanceof SyncPromise);
+
+		return oResult.then(function (aResults) {
+			assert.deepEqual(aResults, ["~deleteResult~", "~readGrandTotalResult~"]);
+		});
 	});
 
 	//*********************************************************************************************

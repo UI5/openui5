@@ -25125,6 +25125,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// Requesting side effects via a :1 nav.prop. works fine (JIRA: CPOUI5ODATAV4-3514)
 	// Test single refresh for messages (JIRA: CPOUI5ODATAV4-3390)
+	//
+	// A kept-alive context outside the collection can be deleted. Both the count and the grand
+	// total are requested in the same $batch, but as the deleted entity was excluded by the filter,
+	// the count and the grand total remain unchanged.
+	// JIRA: CPOUI5ODATAV4-3260
 [
 	"context refresh",
 	"context refresh via side effects",
@@ -25449,6 +25454,42 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				$count : 2,
 				$selectionCount : 0
 			});
+		}).then(async function () {
+			that.expectRequest("SalesOrderList('23')?sap-client=123&custom=foo"
+					+ "&$select=SalesOrderID", {
+					SalesOrderID : "23"
+				});
+
+			const oKeptContext = oBinding.getKeepAliveContext("/SalesOrderList('23')");
+			assert.strictEqual(oKeptContext.getIndex(), undefined, "outside collection");
+
+			await that.waitForChanges(assert, "kept-alive outside collection");
+
+			assert.strictEqual(oBinding.getCount(), 2);
+			assert.strictEqual(oBinding.getLength(), 4);
+
+			that.expectRequest("#7 DELETE SalesOrderList('23')?sap-client=123&custom=foo")
+				.expectRequest("#7 SalesOrderList?sap-client=123&custom=foo&$count=true"
+					+ "&$filter=LifecycleStatus gt 'P' and GrossAmount lt 100&$search=covfefe"
+					+ "&$top=0", {
+					"@odata.count" : "2", // unchanged count
+					value : []
+				})
+				.expectRequest("#7 SalesOrderList?sap-client=123&custom=foo"
+					+ "&$apply=filter(LifecycleStatus gt 'P' and GrossAmount lt 100)"
+					+ "/search(covfefe)/aggregate(GrossAmount)", {
+					value : [{GrossAmount : "15"}] // unchanged grand total
+				})
+				.expectChange("isOutdated", [false,,, false]);
+
+			await Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3260)
+				oKeptContext.delete(),
+				that.waitForChanges(assert, "delete kept-alive outside collection")
+			]);
+
+			assert.strictEqual(oBinding.getCount(), 2);
+			assert.strictEqual(oBinding.getLength(), 4);
 		}).then(function () {
 			checkTable("before delete via model", assert, oTable, [
 				"/SalesOrderList()",
@@ -25457,13 +25498,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/SalesOrderList($isTotal=true)"
 			], [ // isOutdated|isExpanded|isTotal|level|LifecycleStatus|GrossAmount|SalesOrderID
 				 //   |SO_2_BP/Address/City
-				["", "true", "true", "0", "", "15", "", ""],
+				[false, "true", "true", "0", "", "15", "", ""],
 				["", "", "false", "1", "Y", "7", "25", "Walldorf"],
 				["", "", "false", "1", "X", "8", "24", ""],
-				["", "", "true", "0", "", "15", "", ""]
+				[false, "", "true", "0", "", "15", "", ""]
 			]);
 
-			that.expectRequest("#6 DELETE SalesOrderList('25')?sap-client=123", {
+			that.expectRequest("#8 DELETE SalesOrderList('25')?sap-client=123", {
 					groupId : "$single",
 					headers : {
 						"If-Match" : "*"
@@ -25539,6 +25580,120 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		});
 	});
 });
+
+	//*********************************************************************************************
+	// Scenario: Data aggregation without groupLevels and without binding parameter "$count",
+	// showing single entities and a grand total. Even though the "$count" parameter is not set, it
+	// is always requested for each group level cache. So, without groupLevels we automatically get
+	// the collection's count as there is only one group level cache. A kept-alive context outside
+	// the collection is requested via ODLB#getKeepAliveContext and then deleted. In the same $batch
+	// the collection's count and the grand total are refreshed. The kept-alive was part of the
+	// filtered collection. Thus the binding's count and grand total are updated accordingly. The
+	// length (scrollbar) is kept unchanged; instead the header context is flagged as outdated to
+	// signal the table is in an invalid state.
+	// JIRA: CPOUI5ODATAV4-3260
+	QUnit.test("Data Aggregation: delete kept-alive outside collection", async function (assert) {
+		const oModel = this.createSalesOrdersModel123({autoExpandSelect : true});
+		const sView = `
+<Text id="count" text="{$count}"/>
+<Text id="isOutdatedHeader" text="{= %{@$ui5.context.isOutdated} }"/>
+<t:Table id="table" rows="{path : '/SalesOrderList',
+		filters : {path : 'LifecycleStatus', operator : 'GT', value1 : 'P'},
+		parameters : {
+			$$aggregation : {
+				aggregate : {
+					GrossAmount : {grandTotal : true}
+				},
+				group : {
+					SalesOrderID : {}
+				}
+			}
+		}}" threshold="0" visibleRowCount="2">
+	<Text id="isOutdated" text="{= %{@$ui5.context.isOutdated} }"/>
+	<Text id="isTotal" text="{= %{@$ui5.node.isTotal} }"/>
+	<Text id="level" text="{= %{@$ui5.node.level} }"/>
+	<Text id="grossAmount" text="{= %{GrossAmount} }"/>
+	<Text id="salesOrderID" text="{SalesOrderID}"/>
+</t:Table>`;
+
+		this.expectRequest("SalesOrderList?sap-client=123&$apply="
+				+ "filter(LifecycleStatus gt 'P')/concat(aggregate(GrossAmount)"
+				+ ",groupby((SalesOrderID),aggregate(GrossAmount))"
+				+ "/concat(aggregate($count as UI5__count),top(1)))", {
+				value : [
+					{GrossAmount : "100"},
+					{UI5__count : "42", "UI5__count@odata.type" : "#Decimal"},
+					{GrossAmount : "10", SalesOrderID : "21"}
+				]
+			})
+			.expectChange("count")
+			.expectChange("isOutdatedHeader")
+			.expectChange("isOutdated", [undefined, undefined])
+			.expectChange("isTotal", [true, false])
+			.expectChange("level", [0, 1])
+			.expectChange("grossAmount", ["100", "10"])
+			.expectChange("salesOrderID", [null, "21"]);
+
+		await this.createView(assert, sView, oModel);
+
+		const oTable = this.oView.byId("table");
+		const oBinding = oTable.getBinding("rows");
+		const oHeaderContext = oBinding.getHeaderContext();
+
+		this.expectChange("count", "42")
+			.expectChange("isOutdatedHeader", undefined);
+
+		this.oView.byId("count").setBindingContext(oHeaderContext);
+		this.oView.byId("isOutdatedHeader").setBindingContext(oHeaderContext);
+
+		await this.waitForChanges(assert, "set header context");
+
+		checkTable("initial state", assert, oTable, [
+			"/SalesOrderList()",
+			"/SalesOrderList('21')"
+		], [ // isOutdated|isTotal|level|GrossAmount|SalesOrderID
+			[undefined, "true", "0", "100", ""],
+			[undefined, "false", "1", "10", "21"]
+		], 43); // 42 entities + grand total row
+
+		this.expectRequest("SalesOrderList('31')?sap-client=123&$select=SalesOrderID", {
+				SalesOrderID : "31"
+			});
+
+		const oKeptContext = oBinding.getKeepAliveContext("/SalesOrderList('31')");
+		assert.strictEqual(oKeptContext.getIndex(), undefined, "outside collection");
+
+		await this.waitForChanges(assert, "kept-alive outside collection");
+
+		this.expectRequest("#3 DELETE SalesOrderList('31')?sap-client=123")
+			.expectRequest("#3 SalesOrderList?sap-client=123&$count=true"
+				+ "&$filter=LifecycleStatus gt 'P'&$top=0", {
+				"@odata.count" : "41", // reduced count
+				value : []
+			})
+			.expectRequest("#3 SalesOrderList?sap-client=123&$apply="
+				+ "filter(LifecycleStatus gt 'P')/aggregate(GrossAmount)", {
+				value : [{GrossAmount : "90"}] // reduced grand total
+			})
+			.expectChange("isOutdated", [false])
+			.expectChange("grossAmount", ["90"])
+			.expectChange("count", "41")
+			.expectChange("isOutdatedHeader", true);
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3260)
+			oKeptContext.delete(),
+			this.waitForChanges(assert, "delete kept-alive outside collection")
+		]);
+
+		checkTable("after delete kept-alive outside collection", assert, oTable, [
+			"/SalesOrderList()",
+			"/SalesOrderList('21')"
+		], [ // isOutdated|isTotal|level|GrossAmount|SalesOrderID
+			[false, "true", "0", "90", ""],
+			[undefined, "false", "1", "10", "21"]
+		], 43); // length unchanged, header context is outdated instead
+	});
 
 	//*********************************************************************************************
 	// Scenario: When refreshing a single entity or requesting side effects for a single property,
@@ -71554,6 +71709,8 @@ make root = ${bMakeRoot}`;
 	// JIRA: CPOUI5ODATAV4-365
 	// JIRA: CPOUI5ODATAV4-473
 	// JIRA: CPOUI5ODATAV4-1638
+	//
+	// The header context is not outdated after deletion with a new count (JIRA: CPOUI5ODATAV4-3260)
 [
 	{bCountHasChanged : true, bDeferred : false, bFilter : false},
 	{bCountHasChanged : false, bDeferred : false, bFilter : true},
@@ -71672,6 +71829,9 @@ make root = ${bMakeRoot}`;
 			} else {
 				that.checkMoreButton(assert, "[3/103]");
 			}
+
+			// code under test (JIRA: CPOUI5ODATAV4-3260)
+			assert.strictEqual(oListBinding.getHeaderContext().isOutdated(), undefined);
 
 			return that.waitForChanges(assert, "await rendering so that the context is destroyed");
 		}).then(function () {

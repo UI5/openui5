@@ -1395,6 +1395,9 @@ sap.ui.define([
 						// event needs to be fired in order to notify the control about the new
 						// length, for example, to update the 'More' button or the scrollbar.
 						if (iOldMaxLength !== that.iMaxLength) {
+							if (_Helper.isDataAggregation(that.mParameters)) {
+								that.oHeaderContext.setOutdated(true);
+							}
 							that._fireChange({reason : ChangeReason.Remove});
 						}
 					});

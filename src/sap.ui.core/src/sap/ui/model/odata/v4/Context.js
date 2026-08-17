@@ -258,8 +258,8 @@ sap.ui.define([
 	 * {@link sap.ui.model.odata.v4.SubmitMode.API}. Such a deletion is not a pending change.
 	 *
 	 * When using data aggregation without <code>groupLevels</code>, single entities can be deleted
-	 * (since 1.151.0, see {@link #isAggregated}). The same restrictions as for a recursive
-	 * hierarchy apply.
+	 * (since 1.151.0, see {@link #isAggregated}). The group ID must not have
+	 * {@link sap.ui.model.odata.v4.SubmitMode.API}.
 	 *
 	 * @param {string} [sGroupId]
 	 *   The group ID to be used for the DELETE request; if not specified, the update group ID for
@@ -342,7 +342,8 @@ sap.ui.define([
 			}
 		}
 		if (this.oBinding.mParameters.$$aggregation) {
-			if (this.iIndex === undefined) {
+			if (this.oBinding.mParameters.$$aggregation.hierarchyQualifier
+					&& this.iIndex === undefined) {
 				throw new Error("Unsupported kept-alive context: " + this);
 			}
 			if (sGroupId !== null) {
