@@ -368,6 +368,33 @@ sap.ui.define([
 		assert.ok(true, "Еxception is not thrown when running onBeforeOpen without date value");
 	});
 
+	QUnit.test("onBeforeOpen sets Dialog initialFocus to the active toggle button", async function(assert) {
+		// Open the picker so the clocks control renders and its toggle buttons are created
+		this.oTimePicker._openPicker();
+		this.clock.tick(500);
+		await nextUIUpdate(this.clock);
+
+		var oPopup = this.oTimePicker._getPicker().getAggregation("_popup");
+
+		// On desktop the popup is a Popover (no setInitialFocus); patch it to simulate the Dialog scenario
+		var sInitialFocusId = null;
+		oPopup.setInitialFocus = function(sId) { sInitialFocusId = sId; };
+
+		// Re-invoke onBeforeOpen to exercise the fix
+		this.oTimePicker.onBeforeOpen();
+
+		var oClocks = this.oTimePicker._getClocks();
+		var aButtons = oClocks.getAggregation("_buttons");
+		var oActiveBtn = aButtons && aButtons[oClocks._getActiveClockIndex()];
+
+		assert.ok(oActiveBtn, "active toggle button exists in clocks aggregation");
+		assert.strictEqual(
+			sInitialFocusId,
+			oActiveBtn && oActiveBtn.getId(),
+			"setInitialFocus is called with the ID of the active toggle button"
+		);
+	});
+
 	QUnit.module("Placeholder", {
 		beforeEach: async function () {
 			// SUT
