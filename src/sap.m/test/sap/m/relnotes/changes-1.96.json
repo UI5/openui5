@@ -2181,5 +2181,20 @@
         "text": " sap.m.Text: Skip unstable test in Chrome"
       }
     ]
+  },
+  "1.96.48": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "f17468970c5915a8ac5f9950c6a534f9a69f1801",
+        "type": "FIX",
+        "text": " sap.m.TimePickerClock: Replace inline drag event attributes with addEventListener"
+      },
+      {
+        "id": "6084ac18cbac89b0a98ba9224a858e6633856fbc",
+        "type": "FIX",
+        "text": " sap.m.ComboBox: adjust failing tests in FF"
+      }
+    ]
   }
 }

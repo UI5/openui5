@@ -168,5 +168,15 @@
         "text": " sap.uxap.ObjectPageLayout: Fix initial title rendering in FCL"
       }
     ]
+  },
+  "1.96.48": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "7bcc9d315a6ad1d6738e852546c518285f8b74af",
+        "type": "FIX",
+        "text": " sap.uxap.AnchorBar: fix Firefox-flaky resize test"
+      }
+    ]
   }
 }

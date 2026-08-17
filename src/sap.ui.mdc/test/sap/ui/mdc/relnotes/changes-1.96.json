@@ -153,5 +153,20 @@
         "text": " odata.v4.TableDelegate: Clear selection when updating the binding"
       }
     ]
+  },
+  "1.96.48": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "fae0de750989fa4893df89c0b537869818afa7d0",
+        "type": "FIX",
+        "text": " FilterField: allow to paste multiple values"
+      },
+      {
+        "id": "074b794b68a3249a5098af43a569a9f44f621b27",
+        "type": "FIX",
+        "text": " FilterField: error state still applied after select from value help"
+      }
+    ]
   }
 }
