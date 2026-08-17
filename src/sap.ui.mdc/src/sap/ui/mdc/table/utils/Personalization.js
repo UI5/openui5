@@ -111,6 +111,15 @@ sap.ui.define([
 		const oEngine = oTable.getEngine();
 		await oEngine.show(oTable, vChangeKeys, {
 			reset: mSettings.reset,
+			validateBeforeClose: async () => {
+				await oTable.awaitControlDelegate();
+				const oDelegate = oTable.getControlDelegate();
+				try {
+					return await oDelegate.validateP13nState(oTable, oEngine.retrieveTheoreticalState(oTable));
+				} catch {
+					return true; // a failed validation must not trap the user in the dialog
+				}
+			},
 			open: () => {
 				// Engine#show resolves with a control instance only if the dialog is opened.
 				oTable._bUserPersonalizationActive = true;

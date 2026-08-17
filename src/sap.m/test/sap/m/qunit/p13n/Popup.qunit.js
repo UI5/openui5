@@ -568,4 +568,82 @@ sap.ui.define([
 		assert.strictEqual(oModel.getProperty("/cancelText"), "Abbrechen", "cancel button model text is correctly translated");
 	});
 
+	QUnit.module("p13n.Popup validateBeforeClose", {
+		beforeEach: function() {
+			this.oSource = new Button();
+		},
+		afterEach: function() {
+			this.oPopup.destroy();
+			this.oSource.destroy();
+		},
+		pressButton: async function(mSettings, iButton) {
+			this.oPopup = new P13nPopup(mSettings);
+			this.oPopup.placeAt("qunit-fixture");
+			await nextUIUpdate();
+			const pClosed = new Promise((resolve) => {
+				this.oPopup.attachClose((oEvent) => resolve(oEvent.getParameter("reason")));
+			});
+			this.oPopup.open(this.oSource);
+			this.oPopup._oPopup.getButtons()[iButton].firePress();
+			return pClosed;
+		}
+	});
+
+	QUnit.test("OK keeps the dialog open when validateBeforeClose resolves false", async function(assert) {
+		let iCalls = 0;
+		const {promise: pValidation, resolve: fnResolve} = Promise.withResolvers();
+		this.oPopup = new P13nPopup({
+			validateBeforeClose: () => {
+				iCalls++;
+				return pValidation;
+			}
+		});
+		this.oPopup.placeAt("qunit-fixture");
+		await nextUIUpdate();
+		this.oPopup.attachClose(() => assert.ok(false, "close must not fire when validation fails"));
+
+		this.oPopup.open(this.oSource);
+		const oDialog = this.oPopup._oPopup;
+		const iOldDelay = oDialog.getBusyIndicatorDelay();
+		const oOkButton = oDialog.getButtons()[0];
+		oOkButton.firePress();
+		oOkButton.firePress();
+		assert.equal(iCalls, 1, "A pending validation is not re-triggered by a second OK press");
+		assert.ok(oDialog.getBusy(), "Dialog is busy while the validation is pending");
+		assert.equal(oDialog.getBusyIndicatorDelay(), 0, "Busy indicator delay is 0 while the validation is pending");
+
+		fnResolve(false);
+		await Promise.resolve();
+		assert.ok(this.oPopup._bIsOpen, "Dialog stays open");
+		assert.notOk(oDialog.getBusy(), "Dialog is not busy after the validation resolved");
+		assert.equal(oDialog.getBusyIndicatorDelay(), iOldDelay, "Busy indicator delay is restored after the validation resolved");
+	});
+
+	QUnit.test("OK closes the dialog when validation passes, is missing or fails", async function(assert) {
+		const aSettings = [
+			{validateBeforeClose: () => Promise.resolve(true)},
+			undefined,
+			{validateBeforeClose: () => Promise.reject(new Error("failed"))}
+		];
+
+		for (const mSettings of aSettings) {
+			const sReason = await this.pressButton(mSettings, 0);
+			assert.equal(sReason, "Ok", "Closes with reason Ok");
+			this.oPopup.destroy();
+		}
+	});
+
+	QUnit.test("Cancel closes without calling validateBeforeClose", async function(assert) {
+		let bCalled = false;
+		const sReason = await this.pressButton({
+			validateBeforeClose: () => {
+				bCalled = true;
+				return Promise.resolve(false);
+			}
+		}, 1);
+
+		assert.equal(sReason, "Cancel", "Closes with reason Cancel");
+		assert.notOk(bCalled, "Hook not called on Cancel");
+	});
+
 });

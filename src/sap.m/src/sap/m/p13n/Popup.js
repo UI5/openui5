@@ -94,6 +94,17 @@ sap.ui.define([
 				 */
 				reset: {
 					type: "function"
+				},
+				/**
+				 * A callback executed before the dialog is closed by confirming with the OK button.
+				 * If the callback returns (or resolves to) <code>false</code>, the dialog stays open.
+				 *
+				 * @private
+				 * @ui5-restricted sap.ui.mdc
+				 * @since 1.152
+				 */
+				validateBeforeClose: {
+					type: "function"
 				}
 			},
 			aggregations: {
@@ -561,6 +572,31 @@ sap.ui.define([
 	Popup.prototype._onClose = async function(oContainer, sReason) {
 		if (!oContainer && !this._oPopup) {
 			return;
+		}
+
+		// ignore further close attempts while an async validation is still pending
+		if (this._bValidationPending) {
+			return;
+		}
+
+		const fnValidate = this.getValidateBeforeClose();
+		if (fnValidate && sReason === "Ok") {
+			this._bValidationPending = true;
+			const oPopupControl = oContainer || this._oPopup;
+			const iOldDelay = oPopupControl.getBusyIndicatorDelay();
+			oPopupControl.setBusyIndicatorDelay(0);
+			oPopupControl.setBusy(true);
+			try {
+				if (await fnValidate() === false) {
+					return;
+				}
+			} catch {
+				// a failed validation must not trap the user in the dialog
+			} finally {
+				oPopupControl.setBusy(false);
+				oPopupControl.setBusyIndicatorDelay(iOldDelay);
+				this._bValidationPending = false;
+			}
 		}
 
 		const aPanels = this.getPanels();
