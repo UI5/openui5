@@ -758,9 +758,30 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("formatLiteral: error case", function (assert) {
-		assert.throws(
-			function () { _Helper.formatLiteral("foo", "Edm.bar"); },
-			new Error("Unsupported type: Edm.bar")
+		assert.throws(function () {
+			_Helper.formatLiteral("foo", "Edm.bar");
+		}, new Error("Unsupported type: Edm.bar"));
+		assert.throws(function () {
+			_Helper.formatLiteral("foo", "special.cases.Address", {$kind : "ComplexType"});
+		}, new Error("Unsupported type: special.cases.Address"));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("formatLiteral: enum type", function (assert) {
+		assert.strictEqual(
+			_Helper.formatLiteral("Male", "special.cases.Gender", {$kind : "EnumType"}),
+			"special.cases.Gender'Male'",
+			"enum member by name"
+		);
+		assert.strictEqual(
+			_Helper.formatLiteral("1", "com.example.Priority", {$kind : "EnumType"}),
+			"com.example.Priority'1'",
+			"enum member by numeric string"
+		);
+		assert.strictEqual(
+			_Helper.formatLiteral(1, "com.example.Priority", {$kind : "EnumType"}),
+			"com.example.Priority'1'",
+			"enum member by numeric value"
 		);
 	});
 

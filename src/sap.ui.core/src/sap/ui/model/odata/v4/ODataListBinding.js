@@ -2115,9 +2115,10 @@ sap.ui.define([
 		 * @param {string} sEdmType - The Edm type
 		 * @param {boolean} bWithinAnd - Whether the embedding filter is an 'and'
 		 * @param {boolean} bThese - Whether the special syntax "$these/aggregate(...)" is needed
+		 * @param {object} [oTypeMetadata] - The metadata of sEdmType
 		 * @returns {string} The $filter value
 		 */
-		function getSingleFilterValue(oFilter, sEdmType, bWithinAnd, bThese) {
+		function getSingleFilterValue(oFilter, sEdmType, bWithinAnd, bThese, oTypeMetadata) {
 			var sFilter, sFilterPath, bToLower, sValue;
 
 			function setCase(sText) {
@@ -2128,16 +2129,18 @@ sap.ui.define([
 			sFilterPath = bThese && !aFiltersNoThese?.includes(oFilter)
 				? setCase(`$these/aggregate(${oFilter.getPath()})`)
 				: setCase(decodeURIComponent(oFilter.getPath()));
-			sValue = setCase(_Helper.formatLiteral(oFilter.getValue1(), sEdmType));
+			sValue = setCase(_Helper.formatLiteral(oFilter.getValue1(), sEdmType, oTypeMetadata));
 
 			switch (oFilter.getOperator()) {
 				case FilterOperator.BT:
 					sFilter = sFilterPath + " ge " + sValue + " and " + sFilterPath + " le "
-						+ setCase(_Helper.formatLiteral(oFilter.getValue2(), sEdmType));
+						+ setCase(
+							_Helper.formatLiteral(oFilter.getValue2(), sEdmType, oTypeMetadata));
 					break;
 				case FilterOperator.NB:
 					sFilter = wrap(sFilterPath + " lt " + sValue + " or " + sFilterPath + " gt "
-						+ setCase(_Helper.formatLiteral(oFilter.getValue2(), sEdmType)),
+						+ setCase(
+							_Helper.formatLiteral(oFilter.getValue2(), sEdmType, oTypeMetadata)),
 						bWithinAnd);
 					break;
 				case FilterOperator.EQ:
@@ -2224,7 +2227,12 @@ sap.ui.define([
 							+ "(" + sLambdaVariable + ":" + sFilterValue + ")";
 					});
 				}
-				return getSingleFilterValue(oFilter, oPropertyMetadata.$Type, bWithinAnd, bThese);
+
+				const sType = oPropertyMetadata.$Type;
+				const oTypeMetadata = sType.startsWith("Edm.")
+					? undefined
+					: oMetaModel.getObject("/" + sType);
+				return getSingleFilterValue(oFilter, sType, bWithinAnd, bThese, oTypeMetadata);
 			});
 		}
 

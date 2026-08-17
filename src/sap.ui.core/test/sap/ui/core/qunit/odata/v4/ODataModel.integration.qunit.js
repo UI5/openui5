@@ -81886,6 +81886,9 @@ make root = ${bMakeRoot}`;
 	// Invoke the EditAction with empty response to check that bReplaceWithRVC requires a key
 	// predicate.
 	// JIRA: CPOUI5ODATAV4-1683
+	//
+	// Filter an EnumType property (Gender). Also check that caseSensitive has no impact.
+	// JIRA: CPOUI5ODATAV4-3633
 	QUnit.test("JIRA: CPOUI5ODATAV4-1683", function (assert) {
 		var oActiveContext,
 			oDraftContext,
@@ -81896,7 +81899,12 @@ make root = ${bMakeRoot}`;
 
 		return this.createView(assert, "", oModel).then(function () {
 			oListBinding = oModel.bindList("/Artists", null, [],
-				[new Filter("sendsAutographs", FilterOperator.EQ, true)]);
+				[new Filter({
+						path : "Gender",
+						operator : FilterOperator.EQ,
+						value1 : "Male",
+						caseSensitive : false
+				})]);
 
 			that.expectRequest("POST Artists", {
 					ArtistID : "23",
@@ -81934,9 +81942,9 @@ make root = ${bMakeRoot}`;
 						IsActiveEntity : true
 					}] // still alive
 				})
-				.expectRequest("Artists?$filter=(sendsAutographs eq true)"
+				.expectRequest("Artists?$filter=(Gender eq special.cases.Gender'Male')"
 					+ " and ArtistID eq '23' and IsActiveEntity eq true&$count=true&$top=0", {
-					"@odata.count" : "0", // sorry, no autographs anymore ;-)
+					"@odata.count" : "0",
 					value : []
 				});
 
