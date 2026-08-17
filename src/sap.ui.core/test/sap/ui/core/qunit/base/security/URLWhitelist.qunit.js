@@ -53,7 +53,7 @@ sap.ui.define(["sap/base/security/URLWhitelist"], function(URLWhitelist) {
 
 	QUnit.test("unknown protocol", function(assert) {
 		var sUrl = "httpg://www.sap.com";
-		assert.ok(URLWhitelist.validate(sUrl), sUrl + " valid");
+		assert.notOk(URLWhitelist.validate(sUrl), sUrl + " is not valid (only http/https/ftp accepted with empty allowlist)");
 	});
 
 	QUnit.test("ipv6 address", function(assert) {
@@ -93,9 +93,8 @@ sap.ui.define(["sap/base/security/URLWhitelist"], function(URLWhitelist) {
 	});
 
 	QUnit.test("protocol match with whitelist", function(assert) {
-		//is ok with empty whitelist
 		var sUrl = "httpg://www.sap.com";
-		assert.ok(URLWhitelist.validate(sUrl), sUrl + " valid");
+		assert.notOk(URLWhitelist.validate(sUrl), sUrl + " is not valid (only http/https/ftp accepted with empty allowlist)");
 
 		URLWhitelist.add("httpm");
 		sUrl = "httpg://www.sap.com";
