@@ -1959,7 +1959,7 @@ sap.ui.define([
 			"sap-client" : "123",
 			...(bFilter && {$$filterBeforeAggregate : "filter"}),
 			$apply : "apply",
-			$count : true, // always set via #createGroupLevelCache
+			$count : "count", // maybe true (#createGroupLevelCache) or absent (#readGap)
 			$expand : "expand",
 			$orderby : "orderby",
 			$select : "select"
@@ -1980,10 +1980,8 @@ sap.ui.define([
 			})
 			.resolves(42);
 
-		assert.strictEqual(
-			// code under test
-			await oCache.requestCount("~oGroupLock~"),
-			bGrandTotalAtBottomOnly === false ? 44 : 43);
+		// code under test
+		assert.strictEqual(await oCache.requestCount("~oGroupLock~"), 42);
 	});
 			});
 		});
@@ -4401,28 +4399,70 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("addElements: duplicate key predicate (inside)", function (assert) {
+[undefined, 1].forEach(function (iStart) {
+	[false, true].forEach(function (bAtEnd) {
+		const sTitle = "addElements: duplicate key predicate (inside), iStart=" + iStart
+			+ ", bAtEnd=" + bAtEnd;
+
+	QUnit.test(sTitle, function (assert) {
 		var oAggregation = {
 				hierarchyQualifier : "X"
 			},
 			oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, oAggregation),
-			oElement = {},
+			oElement0 = {},
+			oElement1 = {},
+			oElement2 = {},
 			oGroupLevelCache = {fixDuplicatePredicate : mustBeMocked};
 
-		oCache.aElements.length = 2; // avoid "Array index out of bounds: 1"
-		oCache.aElements[0] = {/*unexpected element inside*/};
-		oCache.aElements.$byPredicate["foo"] = oCache.aElements[0];
-		_Helper.setPrivateAnnotation(oElement, "predicate", "foo");
+		oCache.aElements.length = 4; // avoid "Array index out of bounds: 1"
+		oCache.aElements[0] = "~any element~";
+		_Helper.setPrivateAnnotation(oElement0, "predicate", bAtEnd ? "foo" : "same");
+		_Helper.setPrivateAnnotation(oElement1, "predicate", "same");
+		_Helper.setPrivateAnnotation(oElement2, "predicate", bAtEnd ? "same" : "foo");
 		this.mock(oGroupLevelCache).expects("fixDuplicatePredicate")
-			.withExactArgs(sinon.match.same(oElement), "foo").returns(undefined);
+			.withExactArgs(sinon.match.same(bAtEnd ? oElement2 : oElement1), "same")
+			.returns(undefined);
 		this.mock(_Helper).expects("updateNonExisting").never();
 		this.mock(oCache).expects("hasPendingChangesForPath").never();
 
 		assert.throws(function () {
 			// code under test
-			oCache.addElements([oElement], 1, oGroupLevelCache); // iStart does not matter here
-		}, new Error("Duplicate key predicate: foo"));
+			oCache.addElements([oElement0, oElement1, oElement2], 1, oGroupLevelCache, iStart);
+		}, new Error("Duplicate key predicate: same"));
 	});
+	});
+});
+
+	//*********************************************************************************************
+[false, true].forEach(function (bBefore) {
+	const sTitle = "addElements: duplicate key predicate outside read range, before=" + bBefore;
+
+	QUnit.test(sTitle, function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, {
+			groupLevels : ["a"]
+		});
+		oCache.aElements.length = 3; // avoid "Array index out of bounds: 1"
+		oCache.aElements[bBefore ? 0 : 2] = "~any element~";
+		oCache.aElements.$byPredicate["foo"] = "~any element~";
+		const oElement = {};
+		_Helper.setPrivateAnnotation(oElement, "predicate", "foo");
+		this.mock(_AggregationHelper).expects("beforeOverwritePlaceholder").never();
+		const oGroupLevelCache = {fixDuplicatePredicate : mustBeMocked};
+		this.mock(oGroupLevelCache).expects("fixDuplicatePredicate")
+			.withExactArgs(sinon.match.same(oElement), "foo").returns(undefined);
+		this.mock(_Helper).expects("updateNonExisting")
+			.withExactArgs(sinon.match.same(oElement), sinon.match.same(oElement)); // no-op
+		this.mock(oCache).expects("hasPendingChangesForPath").never();
+		this.mock(_Helper).expects("copySelected").never();
+
+		// code under test
+		oCache.addElements([oElement], 1, oGroupLevelCache, /*iStart*/1);
+
+		assert.deepEqual(oCache.aElements,
+			bBefore ? ["~any element~", oElement, undefined] : [, oElement, "~any element~"]);
+		assert.deepEqual(oCache.aElements.$byPredicate, {foo : oElement});
+	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("addElements: fix duplicate key predicate", function (assert) {
