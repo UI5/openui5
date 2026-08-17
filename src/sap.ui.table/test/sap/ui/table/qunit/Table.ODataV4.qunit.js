@@ -28,8 +28,8 @@ sap.ui.define([
 	QUnit.test("setBusy call", async function(assert) {
 		const oTable = this.oTable;
 
-		await oTable.qunit.whenRenderingFinished();
-		await TableQUnitUtils.wait(10); // Wait for the busy state to be set to false
+		await oTable.qunit.rendered();
+		await TableQUnitUtils.sleep(10); // Wait for the busy state to be set to false
 
 		const oSetBusySpy = sinon.spy(oTable, "setBusy");
 		const oScrollExtension = oTable._getScrollExtension();
@@ -46,7 +46,7 @@ sap.ui.define([
 		 * Nevertheless, we need to wait for 10 ms because removing the
 		 * busy state is done asynchronously to prevent flickering.
 		 */
-		await TableQUnitUtils.wait(10);
+		await TableQUnitUtils.sleep(10);
 
 		assert.ok(oDataRequestedSpy.calledOnce, "DataRequested event fired");
 		assert.ok(oSetBusySpy.called, "setBusy is called");
@@ -74,7 +74,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Initialization", async function(assert) {
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		assert.ok(this.fnBindingGetContextSpy.notCalled, "Binding#getContexts not called");
 	});
 
@@ -82,14 +82,14 @@ sap.ui.define([
 		this.fnBindingGetContextSpy.resetHistory();
 		this.oTable.setVisible(true);
 		this.oTable.getBinding().resume();
-		await this.oTable.qunit.whenBindingChange();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
 		assert.ok(this.fnBindingGetContextSpy.called, "Show table and resume binding: Binding#getContexts called");
 
 		this.fnBindingGetContextSpy.resetHistory();
 		this.oTable.setVisible(false);
 		this.oTable.getBinding().suspend();
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		assert.ok(this.fnBindingGetContextSpy.notCalled, "Hide table and suspend binding: Binding#getContexts not called");
 	});
 
@@ -115,14 +115,14 @@ sap.ui.define([
             bResolved = true;
         });
 
-        await TableQUnitUtils.wait(100);
+        await TableQUnitUtils.sleep(100);
 
         this.oTable.setVisible(true);
         this.oTable.getBinding().resume();
 
 		assert.ok(!bResolved, "Promise still pending");
-        await this.oTable.qunit.whenBindingChange();
-        await this.oTable.qunit.whenRenderingFinished();
+        await this.oTable.qunit.bindingChangeEvent();
+        await this.oTable.qunit.rendered();
 
         assert.ok(this.oTable.getBinding().getLength() > 0, "Binding length > 0");
 		assert.ok(bResolved, "Promise resolved");

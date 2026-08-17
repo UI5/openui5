@@ -19,10 +19,10 @@ sap.ui.define([
 		before: function() {
 			Device.os.ios = true;
 		},
-		beforeEach: function() {
+		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable();
 
-			return new Promise(function(resolve) {
+			await new Promise((resolve) => {
 				sap.ui.require(["sap/ui/table/extensions/ScrollingIOS"], resolve);
 			});
 		},
@@ -47,7 +47,7 @@ sap.ui.define([
 		before: function() {
 			Device.os.ios = true;
 		},
-		beforeEach: function() {
+		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable({
 				columns: [TableQUnitUtils.createTextColumn()],
 				rows: {path: "/"},
@@ -57,9 +57,9 @@ sap.ui.define([
 				})
 			});
 
-			return Promise.all([
-				this.oTable.qunit.whenRenderingFinished(),
-				new Promise(function(resolve) {
+			await Promise.all([
+				this.oTable.qunit.rendered(),
+				new Promise((resolve) => {
 					sap.ui.require(["sap/ui/table/extensions/ScrollingIOS"], resolve);
 				})
 			]);
@@ -95,7 +95,7 @@ sap.ui.define([
 			"Table content fits height -> Vertical scrollbar is not visible");
 
 		this.oTable.getRowMode().setRowCount(3);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		oVSbIOS = oVSb.nextSibling;
 		oVSbThumb = oVSbIOS.firstChild;
 		assert.ok(oUpdateVerticalScrollbarPositionSpy.called, "updateVerticalScrollbarPosition has been called");
@@ -107,7 +107,7 @@ sap.ui.define([
 		this.assertThumbHeight(assert);
 
 		this.oTable.getBinding().filter(new Filter("A", "EQ", "A1"));
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.ok(oTotalRowCountChangeSpy.calledOnce, "onTotalRowCountChanged hook has been called once");
 		assert.ok(oVSbIOS.parentElement.classList.contains("sapUiTableHidden") && oVSbThumb.style.height === "0px",
 			"Table content fits height -> Vertical scrollbar is not visible");
@@ -119,16 +119,16 @@ sap.ui.define([
 			Device.support.pointer = false;
 			Device.support.touch = true;
 		},
-		beforeEach: function() {
+		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable({
 				columns: [TableQUnitUtils.createTextColumn()],
 				rows: {path: "/"},
 				models: TableQUnitUtils.createJSONModelWithEmptyRows(100)
 			});
 
-			return Promise.all([
-				this.oTable.qunit.whenRenderingFinished(),
-				new Promise(function(resolve) {
+			await Promise.all([
+				this.oTable.qunit.rendered(),
+				new Promise((resolve) => {
 					sap.ui.require(["sap/ui/table/extensions/ScrollingIOS"], resolve);
 				})
 			]);
@@ -137,10 +137,11 @@ sap.ui.define([
 			this.oTable.destroy();
 		},
 		scrollWithTouch: function(iScrollDelta) {
-			return function() {
+			return async () => {
 				TableQUnitUtils.doTouchScrolling(0, iScrollDelta);
-				return this.oTable.qunit.whenVSbScrolled().then(this.oTable.qunit.whenRenderingFinished);
-			}.bind(this);
+				await this.oTable.qunit.vScrolled();
+				await this.oTable.qunit.rendered();
+			};
 		},
 		assertThumbPosition: function(assert) {
 			const oScrollExtension = this.oTable._getScrollExtension();
@@ -158,104 +159,95 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Scroll by setting FirstVisibleRow", function(assert) {
+	QUnit.test("Scroll by setting FirstVisibleRow", async function(assert) {
 		const that = this;
 		const oTable = this.oTable;
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			that.assertThumbPosition(assert);
-			oTable.setFirstVisibleRow(10);
-		}).then(function() {
-			that.assertThumbPosition(assert);
-			oTable.setFirstVisibleRow(50);
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			that.assertThumbPosition(assert);
-			oTable.setFirstVisibleRow(90);
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			that.assertThumbPosition(assert);
-		});
-
+		await oTable.qunit.rendered();
+		that.assertThumbPosition(assert);
+		oTable.setFirstVisibleRow(10);
+		that.assertThumbPosition(assert);
+		oTable.setFirstVisibleRow(50);
+		await oTable.qunit.rendered();
+		that.assertThumbPosition(assert);
+		oTable.setFirstVisibleRow(90);
+		await oTable.qunit.rendered();
+		that.assertThumbPosition(assert);
 	});
 
-	QUnit.test("Touch scroll on table content", function(assert) {
+	QUnit.test("Touch scroll on table content", async function(assert) {
 		const that = this;
 		const oTable = this.oTable;
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			oTable.qunit.preventFocusOnTouch();
-			TableQUnitUtils.startTouchScrolling(oTable.qunit.getDataCell(0, 0));
-		}).then(that.scrollWithTouch(200)).then(function() {
-			that.assertThumbPosition(assert);
-		}).then(that.scrollWithTouch(300)).then(function() {
-			that.assertThumbPosition(assert);
-		}).then(that.scrollWithTouch(-300)).then(function() {
-			that.assertThumbPosition(assert);
-		}).then(that.scrollWithTouch(-1000, true, "Scrolled to the top")).then(function() {
-			that.assertThumbPosition(assert);
-			TableQUnitUtils.endTouchScrolling();
-		});
+		await oTable.qunit.rendered();
+		oTable.qunit.preventFocusOnTouch();
+		TableQUnitUtils.startTouchScrolling(oTable.qunit.getDataCell(0, 0));
+		await that.scrollWithTouch(200)();
+		that.assertThumbPosition(assert);
+		await that.scrollWithTouch(300)();
+		that.assertThumbPosition(assert);
+		await that.scrollWithTouch(-300)();
+		that.assertThumbPosition(assert);
+		await that.scrollWithTouch(-1000, true, "Scrolled to the top")();
+		that.assertThumbPosition(assert);
+		TableQUnitUtils.endTouchScrolling();
 	});
 
-	QUnit.test("touchMove on scroll thumb", function(assert) {
+	QUnit.test("touchMove on scroll thumb", async function(assert) {
 		const that = this;
 		const oTable = this.oTable;
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
+		try {
+			await oTable.qunit.rendered();
 			oTable.qunit.preventFocusOnTouch();
 			TableQUnitUtils.startTouchScrolling(oTable._getScrollIOSExtension().getVerticalScrollbarThumb());
-		}).then(that.scrollWithTouch(-400)).then(function() {
+			await that.scrollWithTouch(-400)();
 			that.assertThumbPosition(assert);
-		}).then(that.scrollWithTouch(-400)).then(function() {
+			await that.scrollWithTouch(-400)();
 			that.assertThumbPosition(assert);
-		}).then(that.scrollWithTouch(1000)).then(function() {
+			await that.scrollWithTouch(1000)();
 			that.assertThumbPosition(assert);
-		}).finally(function() {
+		} finally {
 			TableQUnitUtils.endTouchScrolling();
-		});
+		}
 	});
 
-	QUnit.test("pointerDown on scrollbar", function(assert) {
+	QUnit.test("pointerDown on scrollbar", async function(assert) {
 		const that = this;
 		const oTable = this.oTable;
 		const oTarget = oTable._getScrollIOSExtension().getVerticalScrollbar();
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			oTarget.dispatchEvent(new PointerEvent("pointerdown", {
-				clientX: oTarget.getBoundingClientRect().x + 5,
-				clientY: oTarget.getBoundingClientRect().y + 200
-			}));
-		}).then(function() {
-			return that.oTable.qunit.whenVSbScrolled().then(that.oTable.qunit.whenRenderingFinished);
-		}).then(function() {
-			that.assertThumbPosition(assert);
-			oTarget.dispatchEvent(new PointerEvent("pointerdown", {
-				clientX: oTarget.getBoundingClientRect().x + 5,
-				clientY: oTarget.getBoundingClientRect().y + 400
-			}));
-		}).then(function() {
-			return that.oTable.qunit.whenVSbScrolled().then(that.oTable.qunit.whenRenderingFinished);
-		}).then(function() {
-			that.assertThumbPosition(assert);
-		});
+		await oTable.qunit.rendered();
+		oTarget.dispatchEvent(new PointerEvent("pointerdown", {
+			clientX: oTarget.getBoundingClientRect().x + 5,
+			clientY: oTarget.getBoundingClientRect().y + 200
+		}));
+		await that.oTable.qunit.vScrolled();
+		await that.oTable.qunit.rendered();
+		that.assertThumbPosition(assert);
+		oTarget.dispatchEvent(new PointerEvent("pointerdown", {
+			clientX: oTarget.getBoundingClientRect().x + 5,
+			clientY: oTarget.getBoundingClientRect().y + 400
+		}));
+		await that.oTable.qunit.vScrolled();
+		await that.oTable.qunit.rendered();
+		that.assertThumbPosition(assert);
 	});
 
-	QUnit.test("pointerDown on scrollbar after rendering only rows", function(assert) {
+	QUnit.test("pointerDown on scrollbar after rendering only rows", async function(assert) {
 		const that = this;
 		const oTable = this.oTable;
-		let oTarget;
 
 		oTable.setRowMode(RowModeType.Auto);
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			oTarget = oTable._getScrollIOSExtension().getVerticalScrollbar();
-			oTarget.dispatchEvent(new PointerEvent("pointerdown", {
-				clientX: oTarget.getBoundingClientRect().x + 5,
-				clientY: oTarget.getBoundingClientRect().y + 200
-			}));
-		}).then(function() {
-			return that.oTable.qunit.whenVSbScrolled().then(that.oTable.qunit.whenRenderingFinished);
-		}).then(function() {
-			that.assertThumbPosition(assert);
-		});
+		await oTable.qunit.rendered();
+		const oTarget = oTable._getScrollIOSExtension().getVerticalScrollbar();
+		oTarget.dispatchEvent(new PointerEvent("pointerdown", {
+			clientX: oTarget.getBoundingClientRect().x + 5,
+			clientY: oTarget.getBoundingClientRect().y + 200
+		}));
+		await that.oTable.qunit.vScrolled();
+		await that.oTable.qunit.rendered();
+		that.assertThumbPosition(assert);
 	});
 });

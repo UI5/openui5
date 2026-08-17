@@ -102,7 +102,7 @@ sap.ui.define([
 			this.oTable = TableQUnitUtils.createTable({
 				models: TableQUnitUtils.createJSONModel(iNumberOfRows)
 			});
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 
 			// Ensure that the last column is "streched" and the others have their defined size
 			const oLastColumn = this.oTable.getColumns()[this.oTable.getColumns().length - 1];
@@ -182,26 +182,25 @@ sap.ui.define([
 
 			this.oColumn.autoResize.resetHistory();
 		};
-		const triggerDoubleClick = () => {
+		const triggerDoubleClick = async () => {
 			const oResizer = oTable.getDomRef("rsz");
 
 			// Move resizer to correct column
 			moveResizer(this.oColumn);
 
 			// Simulate double click on resizer
-			return new Promise(function(resolve) {
+			await new Promise(function(resolve) {
 				oResizer.dispatchEvent(createPointerEvent("mousedown"));
 				oResizer.dispatchEvent(createPointerEvent("mouseup"));
 				oResizer.dispatchEvent(createPointerEvent("click"));
 				setTimeout(resolve, 50);
-			}).then(function() {
-				return new Promise(function(resolve) {
-					oResizer.dispatchEvent(createPointerEvent("mousedown"));
-					oResizer.dispatchEvent(createPointerEvent("mouseup"));
-					oResizer.dispatchEvent(createPointerEvent("click"));
-					oResizer.dispatchEvent(createPointerEvent("dblclick"));
-					setTimeout(resolve, 50);
-				});
+			});
+			await new Promise(function(resolve) {
+				oResizer.dispatchEvent(createPointerEvent("mousedown"));
+				oResizer.dispatchEvent(createPointerEvent("mouseup"));
+				oResizer.dispatchEvent(createPointerEvent("click"));
+				oResizer.dispatchEvent(createPointerEvent("dblclick"));
+				setTimeout(resolve, 50);
 			});
 		};
 
@@ -285,7 +284,7 @@ sap.ui.define([
 
 			iWidthBeforeResize = oColumnDomRef.offsetWidth;
 			oColumn._openHeaderMenu(oColumnDomRef);
-			await TableQUnitUtils.wait(0);
+			await TableQUnitUtils.sleep(0);
 
 			const $ResizeButton = $Column.find(".sapUiTableColResizer");
 			const $ResizeButtonOffset = $ResizeButton.offset();
@@ -337,7 +336,7 @@ sap.ui.define([
 	QUnit.module("Context menu", {
 		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 			this.oPointerExtension = this.oTable._getPointerExtension();
 			this.oPointerExtension._debug();
 		},
@@ -510,7 +509,7 @@ sap.ui.define([
 	QUnit.module("Mousedown", {
 		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -538,7 +537,7 @@ sap.ui.define([
 		assert.ok(oPointerExtension._bShowMenu, "Show Menu flag set to be used in onSelect later");
 		qutils.triggerMouseEvent(oTable.qunit.getColumnHeaderCell(3), "click", 1, 1, 1, 1, 0);
 		assert.ok(oOpenContextMenuSpy.calledOnce, "openContextMenu is called");
-		await TableQUnitUtils.wait(250);
+		await TableQUnitUtils.sleep(250);
 
 		assert.ok(!oPointerExtension._bShowMenu, "ShowMenu flag reset again");
 		assert.ok(bColumnReorderingTriggered, "Column Reordering triggered");
@@ -555,7 +554,7 @@ sap.ui.define([
 		assert.ok(!oPointerExtension._bShowMenu, "Menu was opened -> _bShowMenu is false");
 		qutils.triggerMouseEvent(oTable.qunit.getColumnHeaderCell(3), "click", 1, 1, 1, 1, 0);
 		assert.ok(oOpenContextMenuSpy.notCalled, "Menu was opened -> openContextMenu is not called");
-		await TableQUnitUtils.wait(250);
+		await TableQUnitUtils.sleep(250);
 
 		assert.ok(!bColumnReorderingTriggered, "Column Reordering not triggered (enableColumnReordering == false)");
 		done();
@@ -570,12 +569,12 @@ sap.ui.define([
 		assert.equal(oTable.indexOfColumn(oColumn), 2, "Initial index of column");
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousedown", 1, 1, oSettings.left, oSettings.top, 0);
-		await TableQUnitUtils.wait(250);
+		await TableQUnitUtils.sleep(250);
 		assert.ok(oTable._$ReorderGhost, "Column Reordering triggered");
 		assert.ok(oTable.$().hasClass("sapUiTableDragDrop"), "Table has drag drop class");
 
 		qutils.triggerMouseEvent(oTable.qunit.getColumnHeaderCell(3), "mouseup", 1, 1, oSettings.left, oSettings.top, 0);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		assert.ok(oOpenHeaderMenuSpy.notCalled, "_openHeaderMenu is not called");
 	});
 
@@ -608,7 +607,7 @@ sap.ui.define([
 		const bOriginalDesktopSupport = Device.system.desktop;
 		Device.system.desktop = false;
 		this.oTable = TableQUnitUtils.createTable();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assertResizerPosition(this.oTable, false);
 
@@ -634,8 +633,8 @@ sap.ui.define([
 			this.oTable = TableQUnitUtils.createTable();
 			this.oTreeTable = TableQUnitUtils.createTable(TreeTable, mTreeTableSettings());
 			await Promise.all([
-				this.oTable.qunit.whenRenderingFinished(),
-				this.oTreeTable.qunit.whenRenderingFinished()
+				this.oTable.qunit.rendered(),
+				this.oTreeTable.qunit.rendered()
 			]);
 		},
 		afterEach: function() {
@@ -956,7 +955,7 @@ sap.ui.define([
 			});
 			this.oSetSelected = this.spy(this.oSelectionPlugin, "setSelected");
 
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -1117,8 +1116,8 @@ sap.ui.define([
 			this.oTable = TableQUnitUtils.createTable();
 			this.oTreeTable = TableQUnitUtils.createTable(TreeTable, mTreeTableSettings());
 			await Promise.all([
-				this.oTable.qunit.whenRenderingFinished(),
-				this.oTreeTable.qunit.whenRenderingFinished()
+				this.oTable.qunit.rendered(),
+				this.oTreeTable.qunit.rendered()
 			]);
 		},
 		afterEach: function() {
@@ -1151,17 +1150,17 @@ sap.ui.define([
 		assert.equal(oTable.indexOfColumn(oColumn), 2, "Initial index of column");
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousedown", 1, 1, oSettings.left, oSettings.top, 0);
-		await TableQUnitUtils.wait(250);
+		await TableQUnitUtils.sleep(250);
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft - 30, oSettings.top, 0);
 		qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft - 20, oSettings.top, 0);
 		qutils.triggerMouseEvent(oColumn.$(), "mouseup", 1, 1, iLeft - 20, oSettings.top, 0);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		await nextUIUpdate();
 
 		assert.equal(oTable.indexOfColumn(oColumn), 2, "Index of column not changed because not dragged enough");
 		qutils.triggerMouseEvent(oColumn.$(), "mousedown", 1, 1, oSettings.left, oSettings.top, 0);
-		await TableQUnitUtils.wait(250);
+		await TableQUnitUtils.sleep(250);
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft - 20, oSettings.top, 0);
 		qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft + 20, oSettings.top, 0);
@@ -1183,18 +1182,18 @@ sap.ui.define([
 		assert.equal(oTable.indexOfColumn(oColumn), 2, "Initial index of column");
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousedown", 1, 1, oSettings.left, oSettings.top, 0);
-		await TableQUnitUtils.wait(250);
+		await TableQUnitUtils.sleep(250);
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft + 30, oSettings.top, 0);
 		qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft + 20, oSettings.top, 0);
 		qutils.triggerMouseEvent(oColumn.$(), "mouseup", 1, 1, iLeft + 20, oSettings.top, 0);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 
 		await nextUIUpdate();
 		assert.equal(oTable.indexOfColumn(oColumn), 2, "Index of column not changed because not dragged enough");
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousedown", 1, 1, oSettings.left, oSettings.top, 0);
-		await TableQUnitUtils.wait(250);
+		await TableQUnitUtils.sleep(250);
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft + 20, oSettings.top, 0);
 		qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft - 20, oSettings.top, 0);
@@ -1219,12 +1218,12 @@ sap.ui.define([
 		assert.equal(oTable.indexOfColumn(oColumn), 2, "Initial index of column");
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousedown", 1, 1, oSettings.left, oSettings.top, 0);
-		await TableQUnitUtils.wait(250);
+		await TableQUnitUtils.sleep(250);
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft - 30, oSettings.top, 0);
 		qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft + 20, oSettings.top, 0);
 		qutils.triggerMouseEvent(oColumn.$(), "mouseup", 1, 1, iLeft + 20, oSettings.top, 0);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 
 		await nextUIUpdate();
 		assert.equal(oTable.indexOfColumn(oColumn), 2, "Index of column not changed");
@@ -1242,12 +1241,12 @@ sap.ui.define([
 		assert.equal(oTable.indexOfColumn(oColumn), 2, "Initial index of column");
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousedown", 1, 1, oSettings.left, oSettings.top, 0);
-		await TableQUnitUtils.wait(250);
+		await TableQUnitUtils.sleep(250);
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft - 30, oSettings.top, 0);
 		qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft + 20, oSettings.top, 0);
 		qutils.triggerMouseEvent(oColumn.$(), "mouseup", 1, 1, iLeft + 20, oSettings.top, 0);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 
 		await nextUIUpdate();
 		assert.equal(oTable.indexOfColumn(oColumn), 2, "Index of column not changed");
@@ -1265,12 +1264,12 @@ sap.ui.define([
 		assert.equal(oTable.indexOfColumn(oColumn), 2, "Initial index of column");
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousedown", 1, 1, oSettings.left, oSettings.top, 0);
-		await TableQUnitUtils.wait(250);
+		await TableQUnitUtils.sleep(250);
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft + 30, oSettings.top, 0);
 		qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft - 20, oSettings.top, 0);
 		qutils.triggerMouseEvent(oColumn.$(), "mouseup", 1, 1, iLeft - 20, oSettings.top, 0);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 
 		await nextUIUpdate();
 		assert.equal(oTable.indexOfColumn(oColumn), 2, "Index of column not changed");
@@ -1289,23 +1288,23 @@ sap.ui.define([
 		assert.equal(oTreeTable.indexOfColumn(oColumn), 0, "Initial index of column");
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousedown", 1, 1, oSettings.left, oSettings.top, 0);
-		await TableQUnitUtils.wait(250);
+		await TableQUnitUtils.sleep(250);
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft - 30, oSettings.top, 0);
 		qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft - 20, oSettings.top, 0);
 		qutils.triggerMouseEvent(oColumn.$(), "mouseup", 1, 1, iLeft - 20, oSettings.top, 0);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		await nextUIUpdate();
 
 		assert.equal(oTreeTable.indexOfColumn(oColumn), 0, "Index of column not changed because not dragged enough");
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousedown", 1, 1, oSettings.left, oSettings.top, 0);
-		await TableQUnitUtils.wait(250);
+		await TableQUnitUtils.sleep(250);
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft - 30, oSettings.top, 0);
 		qutils.triggerMouseEvent(oColumn.$(), "mousemove", 1, 1, iLeft + 20, oSettings.top, 0);
 		qutils.triggerMouseEvent(oColumn.$(), "mouseup", 1, 1, iLeft + 20, oSettings.top, 0);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 
 		await nextUIUpdate();
 		assert.equal(oTreeTable.indexOfColumn(oColumn), 0, "Index of column not changed");
@@ -1371,7 +1370,7 @@ sap.ui.define([
 					})
 				]
 			});
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 			const oPointerExtension = this.oTable._getPointerExtension();
 			oPointerExtension._debug();
 			this.oReorderHelper = oPointerExtension._ReorderHelper;
@@ -1401,7 +1400,7 @@ sap.ui.define([
 				oColumn.setLabel(new TableQUnitUtils.TestControl({text: "Plain" + iIndex}));
 			}
 		});
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.oReorderHelper.initReordering(this.oTable, 1, createPointerEvent("mousedown"));
 
@@ -1437,7 +1436,7 @@ sap.ui.define([
 	QUnit.module("Row Hover Effect", {
 		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 			this.oTable.setSelectionBehavior(library.SelectionBehavior.Row);
 			this.oTable.invalidate();
 			await nextUIUpdate();
@@ -1541,7 +1540,7 @@ sap.ui.define([
 	QUnit.module("Helpers", {
 		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -1601,7 +1600,7 @@ sap.ui.define([
 	QUnit.module("Column resize helpers", {
 		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 			this.oPointerExtension = this.oTable._getPointerExtension();
 			this.oPointerExtension._debug();
 		},
@@ -1667,7 +1666,7 @@ sap.ui.define([
 	QUnit.module("Tap and context menu handling", {
 		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 			this.oPointerExtension = this.oTable._getPointerExtension();
 			this.oPointerExtension._debug();
 		},
@@ -1742,7 +1741,7 @@ sap.ui.define([
 	QUnit.module("Reorder helpers", {
 		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 			this.oPointerExtension = this.oTable._getPointerExtension();
 			this.oPointerExtension._debug();
 		},

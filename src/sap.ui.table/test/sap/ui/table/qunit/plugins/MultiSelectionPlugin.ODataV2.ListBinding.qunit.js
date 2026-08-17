@@ -103,12 +103,13 @@ sap.ui.define([
 	}
 
 	QUnit.module("Load data", {
-		beforeEach: function() {
+		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable({
 				models: new ODataModel("/MyService/")
 			});
 			this.oMultiSelectionPlugin = this.oTable.getDependents()[0];
-			return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished);
+			await this.oTable.qunit.bindingChangeEvent();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -117,24 +118,24 @@ sap.ui.define([
 
 	QUnit.test("Select all", async function(assert) {
 		this.oMultiSelectionPlugin.setLimit(0);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		await this.oMultiSelectionPlugin.selectAll();
 		assertAllContextsAvailable(assert, this.oTable);
 	});
 
-	QUnit.test("Select range", function(assert) {
-		return this.oMultiSelectionPlugin.setSelectionInterval(0, 189).then(function() {
-			assertContextsAvailable(assert, this.oTable, 190);
-		}.bind(this));
+	QUnit.test("Select range", async function(assert) {
+		await this.oMultiSelectionPlugin.setSelectionInterval(0, 189);
+		assertContextsAvailable(assert, this.oTable, 190);
 	});
 
 	QUnit.module("Load data with server-driven paging", {
-		beforeEach: function() {
+		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable({
 				models: new ODataModel("/MyServiceWithPaging/")
 			});
 			this.oMultiSelectionPlugin = this.oTable.getDependents()[0];
-			return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished);
+			await this.oTable.qunit.bindingChangeEvent();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -143,19 +144,18 @@ sap.ui.define([
 
 	QUnit.test("Select all", async function(assert) {
 		this.oMultiSelectionPlugin.setLimit(0);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		await this.oMultiSelectionPlugin.selectAll();
 		assertAllContextsAvailable(assert, this.oTable);
 	});
 
-	QUnit.test("Select range", function(assert) {
-		return this.oMultiSelectionPlugin.setSelectionInterval(0, 189).then(function() {
-			assertContextsAvailable(assert, this.oTable, 190);
-		}.bind(this));
+	QUnit.test("Select range", async function(assert) {
+		await this.oMultiSelectionPlugin.setSelectionInterval(0, 189);
+		assertContextsAvailable(assert, this.oTable, 190);
 	});
 
 	QUnit.module("Load data without count", {
-		beforeEach: function() {
+		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable({
 				threshold: 60,
 				models: new ODataModel("/MyService/", {
@@ -163,7 +163,8 @@ sap.ui.define([
 				})
 			});
 			this.oMultiSelectionPlugin = this.oTable.getDependents()[0];
-			return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished);
+			await this.oTable.qunit.bindingChangeEvent();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -172,31 +173,31 @@ sap.ui.define([
 
 	QUnit.test("Select all", async function(assert) {
 		this.oMultiSelectionPlugin.setLimit(0);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		await this.oMultiSelectionPlugin.selectAll();
 		assert.ok(this.oTable.getBinding().getAllCurrentContexts().length < iCount,
 			"Not all binding contexts are available, but at least the Promise resolved");
 	});
 
-	QUnit.test("Select range", function(assert) {
-		return this.oMultiSelectionPlugin.setSelectionInterval(0, 189).then(function() {
-			assert.ok(this.oTable.getBinding().getAllCurrentContexts().length < 190,
-				"Not all binding contexts are available, but at least the Promise resolved");
-		}.bind(this));
+	QUnit.test("Select range", async function(assert) {
+		await this.oMultiSelectionPlugin.setSelectionInterval(0, 189);
+		assert.ok(this.oTable.getBinding().getAllCurrentContexts().length < 190,
+			"Not all binding contexts are available, but at least the Promise resolved");
 	});
 
 	QUnit.module("Load data without count and short read", {
 		before: function() {
 			iCount = 180;
 		},
-		beforeEach: function() {
+		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable({
 				models: new ODataModel("/MyService/", {
 					defaultCountMode: "None"
 				})
 			});
 			this.oMultiSelectionPlugin = this.oTable.getDependents()[0];
-			return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished);
+			await this.oTable.qunit.bindingChangeEvent();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -208,24 +209,24 @@ sap.ui.define([
 
 	QUnit.test("Select all", async function(assert) {
 		this.oMultiSelectionPlugin.setLimit(0);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		await this.oMultiSelectionPlugin.selectAll();
 		assertAllContextsAvailable(assert, this.oTable);
 	});
 
-	QUnit.test("Select range", function(assert) {
-		return this.oMultiSelectionPlugin.setSelectionInterval(0, 189).then(function() {
-			assertAllContextsAvailable(assert, this.oTable);
-		}.bind(this));
+	QUnit.test("Select range", async function(assert) {
+		await this.oMultiSelectionPlugin.setSelectionInterval(0, 189);
+		assertAllContextsAvailable(assert, this.oTable);
 	});
 
 	QUnit.module("HeaderSelector", {
-		beforeEach: function() {
+		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable({
 				models: new ODataModel("/MyService/")
 			});
 			this.oMultiSelectionPlugin = this.oTable.getDependents()[0];
-			return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished);
+			await this.oTable.qunit.bindingChangeEvent();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -247,7 +248,8 @@ sap.ui.define([
 		await this.oMultiSelectionPlugin.setSelectionInterval(0, 1);
 		this.oTable.getBinding().refresh();
 		this.oMultiSelectionPlugin.clearSelection();
-		await this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished);
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
 		this.assertHeaderSelector(this.oTable._getHeaderSelector(), {
 			visible: true,
 			type: "Icon",

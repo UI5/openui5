@@ -27,7 +27,7 @@ sap.ui.define([
 			});
 			this.oTable.qunit.setRowStates(this.aRowStates);
 
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -130,27 +130,21 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test(TableUtils.Grouping.HierarchyMode.Group, function(assert) {
+	QUnit.test(TableUtils.Grouping.HierarchyMode.Group, async function(assert) {
 		TableUtils.Grouping.setHierarchyMode(this.oTable, TableUtils.Grouping.HierarchyMode.Group);
-
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			return this.assertRowIndentation(assert, [0, 0, 24, 36, 44, 0, 24, 36, 36, 0, 0, 44]);
-		}.bind(this));
+		await this.oTable.qunit.rendered();
+		this.assertRowIndentation(assert, [0, 0, 24, 36, 44, 0, 24, 36, 36, 0, 0, 44]);
 	});
 
-	QUnit.test(TableUtils.Grouping.HierarchyMode.Tree, function(assert) {
+	QUnit.test(TableUtils.Grouping.HierarchyMode.Tree, async function(assert) {
 		TableUtils.Grouping.setHierarchyMode(this.oTable, TableUtils.Grouping.HierarchyMode.Tree);
-
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			return this.assertRowIndentation(assert, [0, 17, 34, 51, 68, 0, 17, 34, 51, 0, 17, 68]);
-		}.bind(this));
+		await this.oTable.qunit.rendered();
+		this.assertRowIndentation(assert, [0, 17, 34, 51, 68, 0, 17, 34, 51, 0, 17, 68]);
 	});
 
-	QUnit.test(TableUtils.Grouping.HierarchyMode.GroupedTree, function(assert) {
+	QUnit.test(TableUtils.Grouping.HierarchyMode.GroupedTree, async function(assert) {
 		TableUtils.Grouping.setHierarchyMode(this.oTable, TableUtils.Grouping.HierarchyMode.GroupedTree);
-
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			return this.assertRowIndentation(assert, [0, 24, 36, 44, 52, 0, 24, 36, 44, 0, 24, 52]);
-		}.bind(this));
+		await this.oTable.qunit.rendered();
+		this.assertRowIndentation(assert, [0, 24, 36, 44, 52, 0, 24, 36, 44, 0, 24, 52]);
 	});
 });

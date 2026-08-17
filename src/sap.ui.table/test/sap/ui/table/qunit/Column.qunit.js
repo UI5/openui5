@@ -409,12 +409,12 @@ sap.ui.define([
 			template: new CheckBox({text: this.longText})
 		}));
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		for (const oColumn of this.oTable.getColumns()) {
 			this.oColumnResizeHandler.resetHistory();
 			oColumn.autoResize();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 
 			const iLabelWidth = await this.measureControlWidth(oColumn.getLabel().clone());
 			const iTemplateWidth = await this.measureControlWidth(oColumn.getTemplate().clone());
@@ -444,9 +444,9 @@ sap.ui.define([
 		});
 
 		this.oTable.addColumn(oColumn);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		oColumn.autoResize();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.strictEqual(oColumn.getWidth(), TableUtils.Column.getMinColumnWidth() + "px", "Column has the minimum width");
 		assert.ok(this.oColumnResizeHandler.calledOnceWithExactly({
@@ -464,9 +464,9 @@ sap.ui.define([
 		});
 
 		this.oTable.addColumn(oColumn);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		oColumn.autoResize();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.strictEqual(oColumn.getWidth(), "1000px" /* qunit-fixture width */, "Column width is equal to the table width");
 		assert.ok(this.oColumnResizeHandler.calledOnceWithExactly({
@@ -484,9 +484,9 @@ sap.ui.define([
 		});
 
 		this.oTable.addColumn(oColumn);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		oColumn.autoResize();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.strictEqual(oColumn.getWidth(), TableUtils.Column.getMinColumnWidth() + "px", "Column has the minimum width");
 		assert.ok(this.oColumnResizeHandler.calledOnceWithExactly({
@@ -509,13 +509,13 @@ sap.ui.define([
 			template: new Text({text: this.longText, wrapping: false})
 		}));
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		// Labels are ignored for both columns. First column label has a span, second column label is hidden by this span.
 		for (const oColumn of this.oTable.getColumns()) {
 			this.oColumnResizeHandler.resetHistory();
 			oColumn.autoResize();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 
 			const iContentWidth = await this.measureControlWidth(oColumn.getTemplate().clone());
 			const iColumnIndex = oColumn.getIndex();
@@ -554,12 +554,12 @@ sap.ui.define([
 			template: new Text()
 		}));
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		for (const oColumn of this.oTable.getColumns()) {
 			this.oColumnResizeHandler.resetHistory();
 			oColumn.autoResize();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 
 			const iColumnIndex = oColumn.getIndex();
 			const iMultiLabelIndex = iColumnIndex === 0 ? 1 : 2;
@@ -595,7 +595,7 @@ sap.ui.define([
 
 		sinon.stub(oColumn, "shouldRender").returns(false);
 		this.oTable.addColumn(oColumn);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.throws(() => {
 			oColumn.autoResize();
@@ -892,7 +892,7 @@ sap.ui.define([
 		const oCellDomRef = this._oColumnWithColumnMenu.getDomRef();
 
 		this._oColumnWithColumnMenu.attachEventOnce("columnMenuOpen", function() {
-			TableQUnitUtils.wait(0).then(function() {
+			TableQUnitUtils.sleep(0).then(function() {
 				const oColumnMenu = that._oColumnWithColumnMenu.getMenu();
 				const oSpyColumnMenu = that.spy(oColumnMenu, "_setFilterValue");
 				that._oColumnWithColumnMenu.filter("filterValue");
@@ -934,7 +934,7 @@ sap.ui.define([
 		oColumn.setSortProperty("myProp");
 
 		oColumn.attachEventOnce("columnMenuOpen", function() {
-			TableQUnitUtils.wait(0).then(function() {
+			TableQUnitUtils.sleep(0).then(function() {
 				const oGroupMenuItem = oColumn.getMenu().getItems()[3];
 				assert.strictEqual(oGroupMenuItem.getText(), TableUtils.getResourceText("TBL_GROUP"), "The group menu item exists");
 				oGroupMenuItem.fireSelect();
@@ -971,7 +971,7 @@ sap.ui.define([
 		const oCellDomRef = this._oColumnWithColumnMenu.getDomRef();
 
 		this._oColumnWithColumnMenu.attachEventOnce("columnMenuOpen", function() {
-			TableQUnitUtils.wait(0).then(function() {
+			TableQUnitUtils.sleep(0).then(function() {
 				const oColumnMenu = that._oColumnWithColumnMenu.getMenu();
 				assert.ok(!oColumnMenu._bInvalidated, "ColumnMenu not invalidated");
 				that._oTable._invalidateColumnMenus();
@@ -1594,7 +1594,7 @@ sap.ui.define([
 		const oCellDomRef = that._oColumn1.getDomRef();
 
 		this._oColumn1.attachEventOnce("columnMenuOpen", function() {
-			TableQUnitUtils.wait(0).then(function() {
+			TableQUnitUtils.sleep(0).then(function() {
 				let oColumnMenuBefore = that._oColumn1.getMenu();
 				let oVisibilitySubmenu = oColumnMenuBefore.getItems()[0].getSubmenu();
 				assert.strictEqual(oVisibilitySubmenu.getItems().length, 2, "The visibility submenu has 2 items");
@@ -1638,7 +1638,7 @@ sap.ui.define([
 		const oCell2DomRef = this._oColumn2.getDomRef();
 
 		this._oColumn1.attachEventOnce("columnMenuOpen", function() {
-			TableQUnitUtils.wait(0).then(function() {
+			TableQUnitUtils.sleep(0).then(function() {
 				const oColumnMenuBefore = that._oColumn1.getMenu();
 				const oVisibilitySubmenuBefore = oColumnMenuBefore.getItems()[0].getSubmenu();
 				assert.strictEqual(oVisibilitySubmenuBefore.getItems()[0].getIcon(), "sap-icon://accept", "The visibility submenu item is checked");
@@ -1669,7 +1669,7 @@ sap.ui.define([
 		const oCellDomRef = this._oColumn1.getDomRef();
 
 		this._oColumn1.attachEventOnce("columnMenuOpen", function() {
-			TableQUnitUtils.wait(0).then(function() {
+			TableQUnitUtils.sleep(0).then(function() {
 				let oColumnMenu = that._oColumn1.getMenu();
 				let oVisibilitySubmenu = oColumnMenu.getItems()[0].getSubmenu();
 
@@ -1731,7 +1731,7 @@ sap.ui.define([
 		this._oColumn2.setVisible(false);
 
 		this._oColumn1.attachEventOnce("columnMenuOpen", function() {
-			TableQUnitUtils.wait(0).then(function() {
+			TableQUnitUtils.sleep(0).then(function() {
 				const oColumnMenuTable1 = that._oColumn1.getMenu();
 				const oVisibilitySubmenuTable1 = oColumnMenuTable1.getItems()[0].getSubmenu();
 				assert.strictEqual(oVisibilitySubmenuTable1.getItems()[0].getIcon(), "sap-icon://accept", "The visibility submenu item is checked");
@@ -1785,7 +1785,7 @@ sap.ui.define([
 			});
 			this.oTable.setEnableColumnFreeze(true);
 
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oMenu1.destroy();

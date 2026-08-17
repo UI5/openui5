@@ -197,7 +197,7 @@ sap.ui.define([
 		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.UnbindRows, _fireRenderingTriggered, this);
 		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.RowsUnbound, onTableRowsUnbound, this);
 
-		const wrapForRenderingDetection = function(oObject, sFunctionName) {
+		const wrapForRenderingDetection = (oObject, sFunctionName) => {
 			const fnOriginalFunction = oObject[sFunctionName];
 			oObject[sFunctionName] = function() {
 				if (sFunctionName !== "rerenderControl" || arguments[0] === oTable) {
@@ -205,7 +205,7 @@ sap.ui.define([
 				}
 				fnOriginalFunction.apply(oObject, arguments);
 			}.bind(this);
-		}.bind(this);
+		};
 
 		// Add wrappers and hooks for functions that inevitably trigger a "rowsUpdated" event.
 		wrapForRenderingDetection(oTable, "invalidate");
@@ -260,8 +260,8 @@ sap.ui.define([
 		}
 
 		let iTimeoutId;
-		const pTimeout = new Promise(function(resolve, reject) {
-			iTimeoutId = setTimeout(function() {
+		const pTimeout = new Promise((resolve, reject) => {
+			iTimeoutId = setTimeout(() => {
 				reject(new TimeoutError(iTimeout));
 			}, iTimeout);
 		});
@@ -269,7 +269,7 @@ sap.ui.define([
 			fnExecutor.apply(this, Array.prototype.slice.call(arguments));
 		});
 
-		pAction.then(function() {
+		pAction.then(() => {
 			clearTimeout(iTimeoutId);
 		});
 
@@ -317,7 +317,7 @@ sap.ui.define([
 		};
 	};
 
-	[Table, TreeTable].forEach(function(TableClass) {
+	for (const TableClass of [Table, TreeTable]) {
 		// TODO: Remove this once CreationRow is removed.
 		const fnApplySettings = TableClass.prototype.applySettings;
 		TableClass.prototype.applySettings = function(mSettings) {
@@ -327,15 +327,15 @@ sap.ui.define([
 			}
 			fnApplySettings.apply(this, arguments);
 		};
-	});
+	}
 
 	function createTableSettings(TableClass, mSettings) {
 		let aAllSettingKeys = Object.keys(TableClass.getMetadata().getAllSettings());
 
 		aAllSettingKeys = aAllSettingKeys.concat(["creationRow"]); // TODO: Remove this once CreationRow is removed.
 
-		return Object.keys(mSettings).reduce(function(oObject, sKey) {
-			if (aAllSettingKeys.indexOf(sKey) >= 0) {
+		return Object.keys(mSettings).reduce((oObject, sKey) => {
+			if (aAllSettingKeys.includes(sKey)) {
 				oObject[sKey] = mSettings[sKey];
 			}
 			return oObject;
@@ -346,7 +346,7 @@ sap.ui.define([
 		const aExperimentalProperties = ["_bVariableRowHeightEnabled", "_bLargeDataScrolling"];
 
 		for (const sKey in mSettings) {
-			if (aExperimentalProperties.indexOf(sKey) >= 0) {
+			if (aExperimentalProperties.includes(sKey)) {
 				oTable[sKey] = mSettings[sKey];
 			}
 		}
@@ -358,24 +358,22 @@ sap.ui.define([
 		 *
 		 * @returns {Promise<Object>} A promise. Resolves with the event parameters.
 		 */
-		oTable.qunit.whenNextRowsUpdated = function() {
-			return new Promise(function(resolve) {
-				oTable.attachEventOnce("rowsUpdated", function(oEvent) {
+		oTable.qunit.rowsUpdated = function() {
+			return new Promise((resolve) => {
+				oTable.attachEventOnce("rowsUpdated", (oEvent) => {
 					resolve(oEvent.getParameters());
 				});
 			});
 		};
 
-		function waitForRowsUpdatedAndFinalDomUpdates() {
-			return oTable.qunit.whenNextRowsUpdated().then(function(mParameters) {
-				if (oTable._isWaitingForData()) {
-					return TableQUnitUtils.nextEvent("dataReceived", oTable.getBinding());
-				} else {
-					return TableQUnitUtils.wait().then(function() {
-						return mParameters;
-					});
-				}
-			});
+		async function waitForRowsUpdatedAndFinalDomUpdates() {
+			const mParameters = await oTable.qunit.rowsUpdated();
+			if (oTable._isWaitingForData()) {
+				return TableQUnitUtils.nextEvent("dataReceived", oTable.getBinding());
+			} else {
+				await TableQUnitUtils.nextFrame();
+				return mParameters;
+			}
 		}
 
 		function waitForFullRendering() {
@@ -384,14 +382,12 @@ sap.ui.define([
 			}
 
 			// A table without binding does not fire rowsUpdated events.
-			return new Promise(function(resolve) {
-				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", function() {
+			return new Promise((resolve) => {
+				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", () => {
 					if (oTable.getBinding()) { // In case the table has been bound in the meanwhile.
-						waitForRowsUpdatedAndFinalDomUpdates().then(function(mParameters) {
-							resolve(mParameters);
-						});
+						waitForRowsUpdatedAndFinalDomUpdates().then(resolve);
 					} else {
-						TableQUnitUtils.wait().then(resolve);
+						TableQUnitUtils.nextFrame().then(resolve);
 					}
 				});
 			});
@@ -406,7 +402,7 @@ sap.ui.define([
 		let fnResolveLatestRenderingChanged;
 
 		function resetLatestRenderingChanged() {
-			pLatestRenderingChanged = new Promise(function(resolve) {
+			pLatestRenderingChanged = new Promise((resolve) => {
 				fnResolveLatestRenderingChanged = resolve;
 			});
 		}
@@ -423,7 +419,7 @@ sap.ui.define([
 
 			pLatestRendering = pRendering;
 			signalLatestRenderingChanged();
-			pRendering.then(function() {
+			pRendering.then(() => {
 				if (pLatestRendering === pRendering) { // Reset to idle only if this rendering has not been superseded by a newer one.
 					pLatestRendering = null;
 					signalLatestRenderingChanged();
@@ -442,7 +438,7 @@ sap.ui.define([
 		 *     occurs.
 		 * @returns {Promise} A promise.
 		 */
-		oTable.qunit.whenRenderingFinished = async function(fnCheck) {
+		oTable.qunit.rendered = async function(fnCheck) {
 			if (pLatestRendering != null) {
 				// A rendering is pending. Wait until the table becomes idle again. We always follow the latest rendering: racing against
 				// "pLatestRenderingChanged" ensures we re-read "pLatestRendering" when it is superseded or reset, rather than blocking on a
@@ -453,9 +449,9 @@ sap.ui.define([
 				}
 			} else {
 				// Idle: nothing pending, but still wait for post-render scroll adjustments and one animation frame to settle the DOM.
-				await TableQUnitUtils.wait();
+				await TableQUnitUtils.nextFrame();
 				if (pLatestRendering != null) { // A rendering was triggered during the animation frame.
-					return oTable.qunit.whenRenderingFinished(fnCheck);
+					return oTable.qunit.rendered(fnCheck);
 				}
 			}
 
@@ -466,7 +462,7 @@ sap.ui.define([
 			await new ExpiringPromise(1000, async (resolve, reject) => {
 				try {
 					while (fnCheck() !== true) {
-						await oTable.qunit.whenRenderingFinished();
+						await oTable.qunit.rendered();
 					}
 					resolve();
 				} catch (oError) {
@@ -485,19 +481,19 @@ sap.ui.define([
 		 *
 		 * @returns {Promise<Object>} A promise. Resolves with the event parameters.
 		 */
-		oTable.qunit.whenNextRenderingFinished = function() {
-			return new Promise(function(resolve) {
+		oTable.qunit.nextRender = function() {
+			return new Promise((resolve) => {
 				let pRendering = waitForFullRendering();
 
 				const attachResolver = function(pPromise) {
-					pPromise.then(function(mParameters) {
+					pPromise.then((mParameters) => {
 						if (pPromise === pRendering) { // Resolve only for the latest tracked rendering.
 							oHelperPlugin.detachRenderingTriggered(onTriggered);
 							resolve(mParameters);
 						}
 					});
 				};
-				const onTriggered = function() {
+				const onTriggered = () => {
 					pRendering = waitForFullRendering();
 					attachResolver(pRendering);
 				};
@@ -516,14 +512,14 @@ sap.ui.define([
 		 *
 		 * @returns {Promise} A promise.
 		 */
-		oTable.qunit.whenBindingChange = function() {
+		oTable.qunit.bindingChangeEvent = function() {
 			const oBinding = oTable.getBinding();
 
 			if (!oBinding) {
 				return Promise.resolve();
 			}
 
-			return new Promise(function(resolve) {
+			return new Promise((resolve) => {
 				oBinding.attachEventOnce("change", resolve);
 			});
 		};
@@ -533,8 +529,8 @@ sap.ui.define([
 		 *
 		 * @returns {Promise} A promise.
 		 */
-		oTable.qunit.whenVSbScrolled = function() {
-			return new Promise(function(resolve) {
+		oTable.qunit.vScrolled = function() {
+			return new Promise((resolve) => {
 				const oVSb = oTable._getScrollExtension().getVerticalScrollbar();
 				TableQUnitUtils.addEventListenerOnce(oVSb, "scroll", resolve);
 			});
@@ -545,8 +541,8 @@ sap.ui.define([
 		 *
 		 * @returns {Promise} A promise.
 		 */
-		oTable.qunit.whenHSbScrolled = function() {
-			return new Promise(function(resolve) {
+		oTable.qunit.hScrolled = function() {
+			return new Promise((resolve) => {
 				const oHSb = oTable._getScrollExtension().getHorizontalScrollbar();
 				TableQUnitUtils.addEventListenerOnce(oHSb, "scroll", resolve);
 			});
@@ -557,8 +553,8 @@ sap.ui.define([
 		 *
 		 * @returns {Promise} A promise.
 		 */
-		oTable.qunit.whenViewportScrolled = function() {
-			return new Promise(function(resolve) {
+		oTable.qunit.viewportScrolled = function() {
+			return new Promise((resolve) => {
 				TableQUnitUtils.addEventListenerOnce(oTable.getDomRef("tableCCnt"), "scroll", resolve);
 			});
 		};
@@ -569,16 +565,15 @@ sap.ui.define([
 		 * @param {int} iScrollPosition The new vertical scroll position.
 		 * @returns {Promise} A promise.
 		 */
-		oTable.qunit.scrollVSbTo = function(iScrollPosition) {
+		oTable.qunit.scrollVSbTo = async function(iScrollPosition) {
 			const oVSb = oTable._getScrollExtension().getVerticalScrollbar();
 			const iOldScrollTop = oVSb.scrollTop;
 
 			oVSb.scrollTop = iScrollPosition;
 
-			if (oVSb.scrollTop === iOldScrollTop) {
-				return Promise.resolve();
-			} else {
-				return oTable.qunit.whenVSbScrolled().then(oTable.qunit.whenRenderingFinished);
+			if (oVSb.scrollTop !== iOldScrollTop) {
+				await oTable.qunit.vScrolled();
+				await oTable.qunit.rendered();
 			}
 		};
 
@@ -614,7 +609,7 @@ sap.ui.define([
 			if ((bRTL ? $HSb.scrollLeftRTL() : oHSb.scrollLeft) === iOldScrollLeft) {
 				return Promise.resolve();
 			} else {
-				return oTable.qunit.whenHSbScrolled();
+				return oTable.qunit.hScrolled();
 			}
 		};
 
@@ -626,12 +621,12 @@ sap.ui.define([
 		 * @param {string} [mSizes.width] The new width. Must be a valid CSSSize.
 		 * @returns {Promise} A promise.
 		 */
-		oTable.qunit.resize = function(mSizes) {
+		oTable.qunit.resize = async function(mSizes) {
 			const oDomRef = oTable.getDomRef();
 			const oContainerElement = oDomRef ? oDomRef.parentNode : null;
 
 			if (!oContainerElement) {
-				return Promise.resolve();
+				return;
 			}
 
 			const sOldHeight = oContainerElement.style.height;
@@ -653,9 +648,8 @@ sap.ui.define([
 
 			if ((mSizes.height != null && mSizes.height !== sOldHeight) || (mSizes.width != null && mSizes.width !== sOldWidth)) {
 				// Give the table time to react. The polling interval of the Auto row mode is 200ms.
-				return TableQUnitUtils.wait(250).then(oTable.qunit.whenRenderingFinished);
-			} else {
-				return Promise.resolve();
+				await TableQUnitUtils.sleep(250);
+				await oTable.qunit.rendered();
 			}
 		};
 
@@ -685,9 +679,9 @@ sap.ui.define([
 
 			// Mirrors the scroll extension's focus handling schedule (see Scrolling#onfocusin).
 			const whenFocusHandlingFinished = function() {
-				return Promise.resolve().then(function() {
+				return Promise.resolve().then(() => {
 					if (Device.browser.safari) {
-						return new Promise(function(resolve) {
+						return new Promise((resolve) => {
 							setTimeout(resolve, 0);
 						});
 					}
@@ -695,11 +689,11 @@ sap.ui.define([
 			};
 
 			return new ExpiringPromise(0, function(resolve) {
-				oEventListener = TableQUnitUtils.addEventListenerOnce(oElement, "focusin", function() {
+				oEventListener = TableQUnitUtils.addEventListenerOnce(oElement, "focusin", () => {
 					whenFocusHandlingFinished().then(resolve);
 				});
 				oElement.focus();
-			}).catch(function(oError) {
+			}).catch((oError) => {
 				if (oError instanceof TimeoutError) {
 					// If the tab or browser are in the background, or the focus is in the dev tools, the are no focus events. To be able to continue
 					// with the test execution, fake the focus events.
@@ -733,7 +727,7 @@ sap.ui.define([
 			}
 
 			oTable.invalidate();
-			return oTable.qunit.whenRenderingFinished();
+			return oTable.qunit.rendered();
 		};
 
 		/**
@@ -851,7 +845,7 @@ sap.ui.define([
 			}
 
 			oTable.getBinding().refresh(true);
-			return oTable.qunit.whenRenderingFinished();
+			return oTable.qunit.rendered();
 		};
 	}
 
@@ -957,9 +951,9 @@ sap.ui.define([
 
 		oDataTemplate[sProperty] = sProperty;
 
-		for (let i = 0; i < aData.length; i++) {
-			aData[i][sProperty] = sProperty + "_" + i;
-			aData[i].children[0][sProperty] = aData[i][sProperty] + "_child_0";
+		for (const [i, oItem] of aData.entries()) {
+			oItem[sProperty] = sProperty + "_" + i;
+			oItem.children[0][sProperty] = oItem[sProperty] + "_child_0";
 		}
 	}
 
@@ -1078,9 +1072,7 @@ sap.ui.define([
 		{type: "Delete"}
 	]) {
 		return new RowAction({
-			items: (aItemSettings ?? []).map(function(mItemSettings) {
-				return new RowActionItem(mItemSettings);
-			})
+			items: (aItemSettings ?? []).map((mItemSettings) => new RowActionItem(mItemSettings))
 		});
 	};
 
@@ -1134,18 +1126,23 @@ sap.ui.define([
 	/**
 	 * Returns a promise that resolves after a certain delay.
 	 *
-	 * @param {int} [iMilliseconds] The delay in milliseconds. If none is set, <code>requestAnimationFrame</code> is used.
+	 * @param {int} iMilliseconds The delay in milliseconds.
 	 * @returns {Promise} A promise.
 	 */
-	TableQUnitUtils.wait = function(iMilliseconds) {
-		const bUseRequestAnimationFrame = iMilliseconds == null;
+	TableQUnitUtils.sleep = function(iMilliseconds) {
+		return new Promise((resolve) => {
+			setTimeout(resolve, iMilliseconds);
+		});
+	};
 
-		return new Promise(function(resolve) {
-			if (bUseRequestAnimationFrame) {
-				window.requestAnimationFrame(resolve);
-			} else {
-				setTimeout(resolve, iMilliseconds);
-			}
+	/**
+	 * Returns a promise that resolves on the next animation frame.
+	 *
+	 * @returns {Promise} A promise.
+	 */
+	TableQUnitUtils.nextFrame = function() {
+		return new Promise((resolve) => {
+			window.requestAnimationFrame(resolve);
 		});
 	};
 
@@ -1467,7 +1464,7 @@ sap.ui.define([
 		oQunitFixture.dataset.originalDisplayStyle = oQunitFixture.style.display;
 		oQunitFixture.style.display = "none";
 
-		return new Promise(function(resolve) {
+		return new Promise((resolve) => {
 			window.requestAnimationFrame(resolve);
 		});
 	};
@@ -1478,7 +1475,7 @@ sap.ui.define([
 		oQunitFixture.style.display = oQunitFixture.dataset.originalDisplayStyle;
 		delete oQunitFixture.dataset.originalDisplayStyle;
 
-		return new Promise(function(resolve) {
+		return new Promise((resolve) => {
 			window.requestAnimationFrame(resolve);
 		});
 	};

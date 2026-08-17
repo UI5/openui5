@@ -98,7 +98,7 @@ sap.ui.define([
 			this.oDragAndDropExtension = this.oTable._getDragAndDropExtension();
 			this.oDragAndDropExtension._debug();
 
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -218,9 +218,9 @@ sap.ui.define([
 			this.oDragAndDropExtension._ExtensionDelegate.ondragover.call(this.oTable, oFakeEvent);
 
 			if (bExpectScrolling) {
-				await this.oTable.qunit.whenVSbScrolled();
+				await this.oTable.qunit.vScrolled();
 			} else {
-				await TableQUnitUtils.wait(500);
+				await TableQUnitUtils.sleep(500);
 			}
 
 			const oScrollExtension = this.oTable._getScrollExtension();
@@ -321,7 +321,7 @@ sap.ui.define([
 			this.oDragAndDropExtension = this.oTable._getDragAndDropExtension();
 			this.oDragAndDropExtension._debug();
 
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -341,7 +341,7 @@ sap.ui.define([
 		assert.notOk(oRowDomRefs.rowActionPart.getAttribute("data-sap-ui-draggable"), "Row action part");
 
 		this.oTable.getDragDropConfig()[0].setEnabled(false);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.notOk(oRowDomRefs.rowScrollPart.getAttribute("draggable"), "Scrollable part not draggable");
 		assert.notOk(oRowDomRefs.rowScrollPart.getAttribute("data-sap-ui-draggable"), "Scrollable part not draggable");
@@ -362,7 +362,7 @@ sap.ui.define([
 		assert.notOk(oRowDomRefs.rowActionPart.getAttribute("data-sap-ui-draggable"), "Row action part");
 
 		this.oTable.getDragDropConfig()[0].setEnabled(false);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.notOk(oRowDomRefs.rowScrollPart.getAttribute("draggable"), "Scrollable part not draggable");
 		assert.notOk(oRowDomRefs.rowScrollPart.getAttribute("data-sap-ui-draggable"), "Scrollable part not draggable");
@@ -415,7 +415,7 @@ sap.ui.define([
 			test(this.oTable.qunit.getDataCell(0, 1).parentElement, {sRowType: "Group header", sRowAreaType: "Scrollable", iRowIndex: 0});
 
 			TableUtils.Grouping.setHierarchyMode(this.oTable, TableUtils.Grouping.HierarchyMode.Flat);
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		};
 
 		const testSumRow = async () => {
@@ -539,7 +539,7 @@ sap.ui.define([
 			test({sRowType: "Group header", sRowAreaType: "Action", iFromRowIndex: 0, iToRowIndex: 1});
 
 			TableUtils.Grouping.setHierarchyMode(this.oTable, TableUtils.Grouping.HierarchyMode.Flat);
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		};
 
 		const testSumRow = async () => {
@@ -567,7 +567,7 @@ sap.ui.define([
 			})
 		});
 
-		await oOtherTable.qunit.whenRenderingFinished();
+		await oOtherTable.qunit.rendered();
 
 		this.oTable.addEventDelegate({
 			ondragenter: (oEvent) => {
@@ -664,7 +664,7 @@ sap.ui.define([
 				}))
 			});
 
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 
 			this.oDragAndDropExtension = this.oTable._getDragAndDropExtension();
 			this.oDragAndDropExtension._debug();
@@ -750,7 +750,7 @@ sap.ui.define([
 				bind: true
 			}))
 		});
-		await oTreeTable.qunit.whenRenderingFinished();
+		await oTreeTable.qunit.rendered();
 
 		const fnOriginalDragEnterHandler = this.oDragAndDropExtension._ExtensionDelegate.ondragenter;
 		const aColumns = this.oTreeTable.getColumns();

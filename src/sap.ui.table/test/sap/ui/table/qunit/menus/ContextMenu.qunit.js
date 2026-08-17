@@ -147,7 +147,7 @@ sap.ui.define([
 			}, {
 				type: Row.prototype.Type.Summary
 			}]);
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();

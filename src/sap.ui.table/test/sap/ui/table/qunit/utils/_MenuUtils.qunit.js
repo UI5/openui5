@@ -121,7 +121,7 @@ sap.ui.define([
 
 			this.oTable.getColumns().forEach((oColumn) => sinon.spy(oColumn, "_openHeaderMenu"));
 
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.resetSpies();
@@ -205,7 +205,7 @@ sap.ui.define([
 			});
 			this.oTable.qunit.setRowStates(aRowStates);
 
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.resetSpies();
@@ -241,7 +241,7 @@ sap.ui.define([
 	QUnit.test("Elements that do not support a custom context menu", async function(assert) {
 		this.oTable.addExtension(new TableQUnitUtils.TestControl());
 		this.oTable.setFooter(new TableQUnitUtils.TestControl());
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		const test = (oElement, sElementName) => {
 			const oEvent = createFakeEventObject(oElement);
@@ -282,7 +282,7 @@ sap.ui.define([
 		this.resetSpies();
 		this.oTable.setModel(this.oTable.getModel(), "OtherModel");
 		this.oTable.bindRows({path: "OtherModel>/"});
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		oEvent = createFakeEventObject(this.oTable.qunit.getDataCell(1, 1));
 		TableUtils.Menu.openContextMenu(this.oTable, oEvent);
 		this.assertEventCalled(true, {
@@ -357,7 +357,7 @@ sap.ui.define([
 			sinon.spy(this.oDefaultContextMenu, "open");
 			sinon.stub(this.oDefaultContextMenu, "isEmpty").returns(false);
 
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.resetSpies();
@@ -380,7 +380,7 @@ sap.ui.define([
 	QUnit.test("Elements that do not support context menus", async function(assert) {
 		this.oTable.addExtension(new TableQUnitUtils.TestControl());
 		this.oTable.setFooter(new TableQUnitUtils.TestControl());
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		const test = (oElement, sElementName) => {
 			const oEvent = createFakeEventObject(oElement);
@@ -487,7 +487,7 @@ sap.ui.define([
 			this.oTable = TableQUnitUtils.createTable({
 				rows: "{/}"
 			});
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -547,7 +547,7 @@ sap.ui.define([
 					TableQUnitUtils.createTextColumn({text: "B", bind: true})
 				]
 			});
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 			this.oTable.attachCellContextmenu(this.oCellContextMenuEventInfo.handler);
 		},
 		afterEach: function() {

@@ -50,7 +50,7 @@ sap.ui.define([
 
 				oTable.setCreationRow(new CreationRow());
 			});
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -72,7 +72,7 @@ sap.ui.define([
 		// With the input column gone, the next interactive cell is a non-HTMLInputElement.
 		// resetFocus must focus it but must not call select() on it.
 		this.oTable.getColumns()[1].destroy();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.oTable.qunit.getDataCell(0, 0).focus();
 
 		const oNonInput = oCreationRow.getCells()[1].getDomRef();
@@ -81,7 +81,7 @@ sap.ui.define([
 
 		// With both interactive columns gone, no element can be focused.
 		this.oTable.getColumns()[1].destroy();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.oTable.qunit.getDataCell(0, 0).focus();
 
 		assert.strictEqual(oCreationRow.resetFocus(), false, "Returned false, because no element was focused");
@@ -115,7 +115,7 @@ sap.ui.define([
 		oResetFocusSpy.resetHistory();
 		this.oTable.getColumns()[1].destroy();
 		this.oTable.getColumns()[1].destroy();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.strictEqual(oCreationRow._fireApply(), false, "Returned false, because no element was focused");
 		assert.ok(oApplySpy.calledOnce, "The CreationRow's \"apply\" event was called once");
@@ -131,7 +131,7 @@ sap.ui.define([
 		// Remove the columns that contribute interactive cells.
 		this.oTable.getColumns()[1].destroy();
 		this.oTable.getColumns()[1].destroy();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.strictEqual(oCreationRow.getFocusDomRef(), oCreationRow.getDomRef(),
 			"Returned the CreationRow's own DOM ref when no interactive elements exist");
@@ -246,34 +246,34 @@ sap.ui.define([
 
 	QUnit.test("If child of a table", async function(assert) {
 		this.oTable.setCreationRow(this.oCreationRow);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.notEqual(this.oCreationRow.getDomRef(), null, "The creation row is rendered");
 	});
 
 	QUnit.test("If not child of a table", async function(assert) {
 		this.oCreationRow.placeAt("qunit-fixture");
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.equal(this.oCreationRow.getDomRef(), null, "The creation row did not render anything");
 	});
 
 	QUnit.test("Toolbar", async function(assert) {
 		this.oTable.setCreationRow(this.oCreationRow);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		const oDefaultToolbar = this.oCreationRow.getAggregation("_defaultToolbar");
 
 		assert.notEqual(oDefaultToolbar.getDomRef(), null, "No custom toolbar is set: The default toolbar is rendered");
 
 		this.oCreationRow.setToolbar(new Toolbar());
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.notEqual(this.oCreationRow.getToolbar().getDomRef(), null, "Custom toolbar is set: The custom toolbar is rendered");
 		assert.equal(oDefaultToolbar.getDomRef(), null, "Custom toolbar is set: The default toolbar is not rendered");
 
 		this.oCreationRow.destroyToolbar();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.notEqual(oDefaultToolbar.getDomRef(), null, "No custom toolbar is set: The default toolbar is rendered");
 	});
@@ -282,31 +282,31 @@ sap.ui.define([
 		let sBusySection = "sapUiTableGridCnt";
 
 		this.oTable.setCreationRow(this.oCreationRow);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.notOk(this.oTable.getDomRef(sBusySection).contains(this.oTable._getScrollExtension().getHorizontalScrollbar()),
 			"After rendering the table with a visible creation row,"
 			+ " the horizontal scrollbar is rendered outside the element that is covered by the busy indicator.");
 
 		this.oCreationRow.setVisible(false);
 		sBusySection = "sapUiTableCnt";
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.ok(this.oTable.getDomRef(sBusySection).contains(this.oTable._getScrollExtension().getHorizontalScrollbar()),
 			"After making the creation row invisible,"
 			+ " the horizontal scrollbar is rendered inside the element that is covered by the busy indicator.");
 
 		this.oCreationRow.setVisible(true);
 		sBusySection = "sapUiTableGridCnt";
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.notOk(this.oTable.getDomRef(sBusySection).contains(this.oTable._getScrollExtension().getHorizontalScrollbar()),
 			"After making the creation row visible,"
 			+ " the horizontal scrollbar is rendered outside the element that is covered by the busy indicator.");
 
 		this.oTable.setCreationRow();
 		sBusySection = "sapUiTableCnt";
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.oCreationRow.setVisible(false);
 		this.oTable.setCreationRow(this.oCreationRow);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.ok(this.oTable.getDomRef(sBusySection).contains(this.oTable._getScrollExtension().getHorizontalScrollbar()),
 			"After rendering the table with an invisible creation row,"
@@ -335,7 +335,7 @@ sap.ui.define([
 
 				oTable.setCreationRow(new CreationRow());
 			});
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -399,14 +399,14 @@ sap.ui.define([
 
 				oTable.setCreationRow(new CreationRow());
 			});
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
 		}
 	});
 
-	QUnit.test("Fire apply with Enter, CTRL+Enter", function(assert) {
+	QUnit.test("Fire apply with Enter, CTRL+Enter", async function(assert) {
 		const oTable = this.oTable;
 		const oCreationRow = oTable.getCreationRow();
 		const oInput = oCreationRow.getCells()[0];
@@ -452,78 +452,66 @@ sap.ui.define([
 		oFormElement.focus();
 		oClock.tick(1);
 
-		return test(function() {
-				expectKeyboardEventMarked("onsapenter", true);
-				qutils.triggerKeydown(oFormElement, KeyCodes.ENTER, false, false, false);
-			}, function() {
-				assert.ok(oFireApplySpy.calledOnce, "CreationRow#_fireApply was called once");
-				assert.deepEqual(aEvents, ["sapfocusleave", "validateFieldGroup", "apply", "focusin"],
-					"The events on the form element were correctly fired");
-			}
+		await test(function() {
+			expectKeyboardEventMarked("onsapenter", true);
+			qutils.triggerKeydown(oFormElement, KeyCodes.ENTER, false, false, false);
+		}, function() {
+			assert.ok(oFireApplySpy.calledOnce, "CreationRow#_fireApply was called once");
+			assert.deepEqual(aEvents, ["sapfocusleave", "validateFieldGroup", "apply", "focusin"],
+				"The events on the form element were correctly fired");
+		});
 
-		).then(function() {
-			return test(function() {
-				expectKeyboardEventMarked("onsapentermodifiers", true);
-				qutils.triggerKeydown(oFormElement, KeyCodes.ENTER, false, false, true);
-			}, function() {
-				assert.ok(oFireApplySpy.calledOnce, "CreationRow#_fireApply was called once");
-				assert.deepEqual(aEvents, ["sapfocusleave", "validateFieldGroup", "apply", "focusin"],
-					"The events on the form element were correctly fired");
+		await test(function() {
+			expectKeyboardEventMarked("onsapentermodifiers", true);
+			qutils.triggerKeydown(oFormElement, KeyCodes.ENTER, false, false, true);
+		}, function() {
+			assert.ok(oFireApplySpy.calledOnce, "CreationRow#_fireApply was called once");
+			assert.deepEqual(aEvents, ["sapfocusleave", "validateFieldGroup", "apply", "focusin"],
+				"The events on the form element were correctly fired");
+		});
 
+		await test(function() {
+			oCreationRow.getCells()[0].attachBrowserEvent("keydown", function(oEvent) {
+				if (oEvent.keyCode === KeyCodes.ENTER && !(oEvent.metaKey || oEvent.ctrlKey)) {
+					oEvent.setMarked();
+				}
 			});
+			expectKeyboardEventMarked("onsapenter", true);
+			qutils.triggerKeydown(oFormElement, KeyCodes.ENTER, false, false, false);
+		}, function() {
+			assert.ok(oFireApplySpy.notCalled, "CreationRow#_fireApply was not called because the input control handles the keydown event");
+		});
 
-		}).then(function() {
-			return test(function() {
-				oCreationRow.getCells()[0].attachBrowserEvent("keydown", function(oEvent) {
-					if (oEvent.keyCode === KeyCodes.ENTER && !(oEvent.metaKey || oEvent.ctrlKey)) {
-						oEvent.setMarked();
-					}
-				});
-				expectKeyboardEventMarked("onsapenter", true);
-				qutils.triggerKeydown(oFormElement, KeyCodes.ENTER, false, false, false);
-			}, function() {
-				assert.ok(oFireApplySpy.notCalled, "CreationRow#_fireApply was not called because the input control handles the keydown event");
-
+		await test(function() {
+			oCreationRow.attachEventOnce("apply", function(oEvent) {
+				oEvent.preventDefault();
 			});
+			expectKeyboardEventMarked("onsapentermodifiers", true);
+			qutils.triggerKeydown(oFormElement, KeyCodes.ENTER, false, false, true);
+		}, function() {
+			assert.ok(oFireApplySpy.calledOnce, "CreationRow#_fireApply was called once");
+			assert.deepEqual(aEvents, ["sapfocusleave", "validateFieldGroup", "apply", "focusin"],
+				"The events on the form element were correctly fired");
+		});
 
-		}).then(function() {
-			return test(function() {
-				oCreationRow.attachEventOnce("apply", function(oEvent) {
-					oEvent.preventDefault();
-				});
-				expectKeyboardEventMarked("onsapentermodifiers", true);
-				qutils.triggerKeydown(oFormElement, KeyCodes.ENTER, false, false, true);
-			}, function() {
-				assert.ok(oFireApplySpy.calledOnce, "CreationRow#_fireApply was called once");
-				assert.deepEqual(aEvents, ["sapfocusleave", "validateFieldGroup", "apply", "focusin"],
-					"The events on the form element were correctly fired");
+		await test(function() {
+			oFormElement = oCreationRow.getCells()[2].getDomRef();
+			oCreationRow.setApplyEnabled(false);
+			expectKeyboardEventMarked("onsapenter", false);
+			qutils.triggerKeydown(oFormElement, KeyCodes.ENTER, false, false, false);
+		}, function() {
+			assert.ok(oFireApplySpy.notCalled, "CreationRow#_fireApply was not called");
+			assert.deepEqual(aEvents, [], "The events on the form element were not fired");
+		});
 
-			});
-
-		}).then(function() {
-			return test(function() {
-				oFormElement = oCreationRow.getCells()[2].getDomRef();
-				oCreationRow.setApplyEnabled(false);
-				expectKeyboardEventMarked("onsapenter", false);
-				qutils.triggerKeydown(oFormElement, KeyCodes.ENTER, false, false, false);
-			}, function() {
-				assert.ok(oFireApplySpy.notCalled, "CreationRow#_fireApply was not called");
-				assert.deepEqual(aEvents, [], "The events on the form element were not fired");
-
-			});
-
-		}).then(function() {
-			return test(function() {
-				oCreationRow.setApplyEnabled(false);
-				expectKeyboardEventMarked("onsapentermodifiers", false);
-				qutils.triggerKeydown(oFormElement, KeyCodes.ENTER, false, false, true);
-			}, function() {
-				assert.ok(oFireApplySpy.notCalled, "CreationRow#_fireApply was not called");
-				assert.deepEqual(aEvents, [], "The events on the form element were not fired");
-				oClock.restore();
-
-			});
-
+		await test(function() {
+			oCreationRow.setApplyEnabled(false);
+			expectKeyboardEventMarked("onsapentermodifiers", false);
+			qutils.triggerKeydown(oFormElement, KeyCodes.ENTER, false, false, true);
+		}, function() {
+			assert.ok(oFireApplySpy.notCalled, "CreationRow#_fireApply was not called");
+			assert.deepEqual(aEvents, [], "The events on the form element were not fired");
+			oClock.restore();
 		});
 	});
 
@@ -663,7 +651,7 @@ sap.ui.define([
 			"No default toolbar exists if rendered while not a child of the table");
 
 		this.oTable.setCreationRow(this.oCreationRow);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.ok(this.oCreationRow.getToolbar() === null, "No custom toolbar is set");
 		assert.ok(this.oCreationRow.getAggregation("_defaultToolbar") != null,
@@ -674,7 +662,7 @@ sap.ui.define([
 		const oToolbar = new Toolbar();
 		this.oCreationRow.setToolbar(oToolbar);
 		this.oTable.setCreationRow(this.oCreationRow);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.ok(this.oCreationRow.getToolbar() === oToolbar, "A custom toolbar is set");
 		assert.ok(this.oCreationRow.getAggregation("_defaultToolbar") == null, "The default toolbar is not created");
@@ -697,7 +685,7 @@ sap.ui.define([
 
 	QUnit.test("Destroy when the CreationRow is destroyed", async function(assert) {
 		this.oTable.setCreationRow(this.oCreationRow);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		const oToolbarDestroySpy = sinon.spy(this.oCreationRow.getAggregation("_defaultToolbar"), "destroy");
 
@@ -708,7 +696,7 @@ sap.ui.define([
 
 	QUnit.test("Content", async function(assert) {
 		this.oTable.setCreationRow(this.oCreationRow);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		const oApplyButton = this.oCreationRow.getAggregation("_defaultToolbar").getContent().slice(-1)[0];
 		const oApplySpy = sinon.spy(this.oCreationRow, "_fireApply");
@@ -724,14 +712,14 @@ sap.ui.define([
 			applyEnabled: false
 		});
 		this.oTable.setCreationRow(this.oCreationRow);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.strictEqual(oApplyButton.getEnabled(), true, "The button is disabled");
 	});
 
 	QUnit.test("Update content", async function(assert) {
 		this.oTable.setCreationRow(this.oCreationRow);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		const oApplyButton = this.oCreationRow.getAggregation("_defaultToolbar").getContent().slice(-1)[0];
 		const oApplyButtonAfterRendering = sinon.spy();

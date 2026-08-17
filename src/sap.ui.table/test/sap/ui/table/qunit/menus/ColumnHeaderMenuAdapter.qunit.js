@@ -84,13 +84,12 @@ sap.ui.define([
 		 * @deprecated As of Version 1.117
 		 */
 		await (async () => {
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 			this.oColumn1._cellPressed = this.oColumn1.getDomRef();
 		})();
 
-		await ColumnHeaderMenuAdapter.activateFor(this.oColumn1).then(function() {
-			assert.ok(true, "The Promise resolved");
-		});
+		await ColumnHeaderMenuAdapter.activateFor(this.oColumn1);
+		assert.ok(true, "The Promise resolved");
 	});
 
 	QUnit.test("activateFor - With headerMenu association", function(assert) {

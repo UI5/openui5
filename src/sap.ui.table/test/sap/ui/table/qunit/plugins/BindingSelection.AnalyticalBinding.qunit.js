@@ -145,8 +145,8 @@ sap.ui.define([
 				}
 			});
 
-			await this.oTable.qunit.whenBindingChange();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.bindingChangeEvent();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -166,8 +166,8 @@ sap.ui.define([
 		assert.ok(this.oTable._getHeaderSelector().getCheckBoxSelected(), "HeaderSelector is selected");
 
 		this.oTable.sort(this.oTable.getColumns()[0]);
-		await this.oTable.qunit.whenBindingChange();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
 		assert.notOk(this.oTable._getHeaderSelector().getCheckBoxSelected(), "HeaderSelector is not selected after binding deselected rows");
 	});
 });

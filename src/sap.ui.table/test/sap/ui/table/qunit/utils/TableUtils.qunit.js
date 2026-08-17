@@ -71,7 +71,7 @@ sap.ui.define([
 	QUnit.module("TableUtils", {
 		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 			Theming.setTheme();
 			await waitForThemeApplied();
 		},
@@ -100,7 +100,7 @@ sap.ui.define([
 
 	QUnit.test("isRowSelectionAllowed", async function(assert) {
 		const oTreeTable = this.oTreeTable = TableQUnitUtils.createTable(TreeTable, mTreeTableSettings());
-		await this.oTreeTable.qunit.whenRenderingFinished();
+		await this.oTreeTable.qunit.rendered();
 
 		async function check(sSelectionBehavior, sSelectionMode, bGroup, bExpected) {
 			oTreeTable.setSelectionBehavior(sSelectionBehavior);
@@ -135,7 +135,7 @@ sap.ui.define([
 
 	QUnit.test("isRowSelectorSelectionAllowed", async function(assert) {
 		const oTreeTable = this.oTreeTable = TableQUnitUtils.createTable(TreeTable, mTreeTableSettings());
-		await this.oTreeTable.qunit.whenRenderingFinished();
+		await this.oTreeTable.qunit.rendered();
 
 		async function check(sSelectionBehavior, sSelectionMode, bGroup, bExpected) {
 			oTreeTable.setSelectionBehavior(sSelectionBehavior);
@@ -187,7 +187,7 @@ sap.ui.define([
 		const oTreeTable = this.oTreeTable = TableQUnitUtils.createTable(TreeTable, mTreeTableSettings());
 		await Promise.all([
 			nextUIUpdate(),
-			this.oTreeTable.qunit.whenRenderingFinished()
+			this.oTreeTable.qunit.rendered()
 		]);
 
 		assert.ok(TableUtils.hasFixedColumns(oTable), "Table has fixed columns");
@@ -824,34 +824,28 @@ sap.ui.define([
 		assert.strictEqual(TableUtils.getRowIndexOfFocusedCell(oTable), -1, "COLUMNROWHEADER");
 	});
 
-	QUnit.test("scrollTableToIndex", function(assert) {
+	QUnit.test("scrollTableToIndex", async function(assert) {
 		const oTable = this.oTable;
 		const oRowsUpdatedSpy = sinon.spy();
 		oTable.attachRowsUpdated(oRowsUpdatedSpy);
 
-		return TableUtils.scrollTableToIndex(oTable, 5, false).then(function() {
-			assert.equal(oTable.getFirstVisibleRow(), 4, "table is scrolled to the correct position");
-			assert.ok(oRowsUpdatedSpy.calledOnce, "rowsUpdated event is fired");
-			oRowsUpdatedSpy.resetHistory();
+		await TableUtils.scrollTableToIndex(oTable, 5, false);
+		assert.equal(oTable.getFirstVisibleRow(), 4, "table is scrolled to the correct position");
+		assert.ok(oRowsUpdatedSpy.calledOnce, "rowsUpdated event is fired");
+		oRowsUpdatedSpy.resetHistory();
 
-			return TableUtils.scrollTableToIndex(oTable, 5, true);
-		}).then(function() {
-			assert.equal(oTable.getFirstVisibleRow(), 4, "table scroll position is already correct");
-			assert.ok(oRowsUpdatedSpy.notCalled, "rowsUpdated event is not fired"); // the table didn't scroll
+		await TableUtils.scrollTableToIndex(oTable, 5, true);
+		assert.equal(oTable.getFirstVisibleRow(), 4, "table scroll position is already correct");
+		assert.ok(oRowsUpdatedSpy.notCalled, "rowsUpdated event is not fired"); // the table didn't scroll
 
-			return TableUtils.scrollTableToIndex(oTable, 0, true);
-		}).then(function() {
-			assert.equal(oTable.getFirstVisibleRow(), 0, "table is scrolled to the correct position");
-			assert.ok(oRowsUpdatedSpy.calledOnce, "rowsUpdated event is fired");
-			oRowsUpdatedSpy.resetHistory();
+		await TableUtils.scrollTableToIndex(oTable, 0, true);
+		assert.equal(oTable.getFirstVisibleRow(), 0, "table is scrolled to the correct position");
+		assert.ok(oRowsUpdatedSpy.calledOnce, "rowsUpdated event is fired");
+		oRowsUpdatedSpy.resetHistory();
 
-			return TableUtils.scrollTableToIndex(oTable, 10, false);
-		}).then(function() {
-			assert.equal(oTable.getFirstVisibleRow(), 5, "table is scrolled to the end"); // the table has 3 visible rows and 8 rows in total
-			assert.ok(oRowsUpdatedSpy.calledOnce, "rowsUpdated event is fired");
-
-			return Promise.resolve();
-		});
+		await TableUtils.scrollTableToIndex(oTable, 10, false);
+		assert.equal(oTable.getFirstVisibleRow(), 5, "table is scrolled to the end"); // the table has 3 visible rows and 8 rows in total
+		assert.ok(oRowsUpdatedSpy.calledOnce, "rowsUpdated event is fired");
 	});
 
 	QUnit.test("showNotificationPopoverAtIndex", async function(assert) {
@@ -911,7 +905,7 @@ sap.ui.define([
 		fnInvisibleMessageAnnounce.restore();
 	});
 
-	QUnit.test("loadContexts", function(assert) {
+	QUnit.test("loadContexts", async function(assert) {
 		const oFakeBinding = {
 			limit: 2,
 			length: 8,
@@ -942,19 +936,17 @@ sap.ui.define([
 		const oGetContextsSpy = sinon.spy(oFakeBinding, "getContexts");
 		const oAttachEventSpy = sinon.spy(oFakeBinding, "attachEventOnce");
 
-		return TableUtils.loadContexts(oFakeTable, 0, 2).then(function(aContexts) {
-			assert.ok(oGetContextsSpy.calledOnceWithExactly(0, 2, 0, true), "Binding#getContexts is called once with the correct parameters");
-			assert.ok(oAttachEventSpy.notCalled, "requested contexts are available, so no dataReceived event listener is attached");
-			assert.equal(aContexts.length, 2, "the method resolves with 2 contexts");
-			oGetContextsSpy.resetHistory();
-			return TableUtils.loadContexts(oFakeTable, 0, 7);
-		}).then(function(aContexts) {
-			assert.equal(oGetContextsSpy.callCount, 3, "Binding#getContexts is called thrice");
-			assert.ok(oGetContextsSpy.alwaysCalledWith(0, 7, 0, true), "with the correct parameters");
-			assert.ok(oAttachEventSpy.callCount === 2 && oAttachEventSpy.alwaysCalledWith("dataReceived"),
-				"dataReceived event listener is attached twice");
-			assert.equal(aContexts.length, 7, "the method resolves with 7 contexts");
-		});
+		let aContexts = await TableUtils.loadContexts(oFakeTable, 0, 2);
+		assert.ok(oGetContextsSpy.calledOnceWithExactly(0, 2, 0, true), "Binding#getContexts is called once with the correct parameters");
+		assert.ok(oAttachEventSpy.notCalled, "requested contexts are available, so no dataReceived event listener is attached");
+		assert.equal(aContexts.length, 2, "the method resolves with 2 contexts");
+		oGetContextsSpy.resetHistory();
+		aContexts = await TableUtils.loadContexts(oFakeTable, 0, 7);
+		assert.equal(oGetContextsSpy.callCount, 3, "Binding#getContexts is called thrice");
+		assert.ok(oGetContextsSpy.alwaysCalledWith(0, 7, 0, true), "with the correct parameters");
+		assert.ok(oAttachEventSpy.callCount === 2 && oAttachEventSpy.alwaysCalledWith("dataReceived"),
+			"dataReceived event listener is attached twice");
+		assert.equal(aContexts.length, 7, "the method resolves with 7 contexts");
 	});
 
 	QUnit.test("loadContexts - busy indicator", async function(assert) {
@@ -1340,7 +1332,7 @@ sap.ui.define([
 
 	QUnit.test("getInteractiveElements - TreeTable Icon Cell", async function(assert) {
 		this.oTreeTable = TableQUnitUtils.createTable(TreeTable, mTreeTableSettings());
-		await this.oTreeTable.qunit.whenRenderingFinished();
+		await this.oTreeTable.qunit.rendered();
 
 		const $TreeIconCell = jQuery(this.oTreeTable.qunit.getDataCell(0, 0));
 		const sTreeIconOpenClass = "sapUiTableTreeIconNodeOpen";
@@ -1545,25 +1537,25 @@ sap.ui.define([
 			},
 			rowMode: new FixedRowMode({rowCount: 3})
 		});
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 
 		const aRows = oTable.getRows();
 
 		assert.strictEqual(TableUtils.getBindingContextOfRow(aRows[0]), aRows[0].getBindingContext(), "Unnamed model");
 
 		oTable.bindRows({path: "/", model: "myModel"});
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 		assert.strictEqual(TableUtils.getBindingContextOfRow(aRows[0]), aRows[0].getBindingContext("myModel"), "Named model");
 
 		// Returns the binding context of the unnamed model if the row is not a child of the table.
 		oTable.getRowMode().setRowCount(2);
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 		assert.strictEqual(TableUtils.getBindingContextOfRow(aRows[2]), aRows[2].getBindingContext(), "Row was removed from the aggregation");
 
 		// Returns the binding context of the unnamed model if the rows aggregation is not bound.
 		oTable.setShowNoData(false);
 		oTable.unbindRows();
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 		assert.strictEqual(TableUtils.getBindingContextOfRow(aRows[0]), aRows[0].getBindingContext(), "Table is not bound");
 
 		assert.throws(() => { TableUtils.getBindingContextOfRow({}); }, "Invalid row passed");
@@ -1814,7 +1806,7 @@ sap.ui.define([
 			this.oTable.addColumn(TableQUnitUtils.createTextColumn({label: "Not Focusable & Not Tabbable", text: "NoFocusNoTab"}));
 			this.oTable.addColumn(TableQUnitUtils.createInputColumn({label: "Focusable & Tabbable", text: "FocusTab", tabbable: true}));
 			this.oTable.addColumn(TableQUnitUtils.createInputColumn({label: "Focusable & Not Tabbable", text: "NoTab", tabbable: false}));
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -1928,62 +1920,62 @@ sap.ui.define([
 		assert.ok(TableUtils.throttle(this.fnTestFunction, 50).cancel, "The throttled function is returned");
 	});
 
-	QUnit.test("Asynchronous leading invocation", function(assert) {
+	QUnit.test("Asynchronous leading invocation", async function(assert) {
 		let fnThrottled = TableUtils.throttle(this.fnTestFunction, 50, {
 			leading: false,
 			asyncLeading: true
 		});
 		const oContext = {iAmThis: true};
-		const that = this;
 
 		fnThrottled();
 
-		return Promise.resolve().then(function() {
-			that.assertNotCalled(assert);
-			that.oClock.tick(50);
-			that.assertCalled(assert);
-		}).then(function() {
-			fnThrottled = TableUtils.throttle(that.fnTestFunction, 50, {
-				leading: true,
-				asyncLeading: true
-			});
-			assert.ok(fnThrottled.cancel, "The throttled function is returned");
+		await Promise.resolve();
+		this.assertNotCalled(assert);
+		this.oClock.tick(50);
+		this.assertCalled(assert);
 
-			fnThrottled.call(oContext, "something");
-			that.assertNotCalled(assert);
-		}).then(function() {
-			that.assertCalled(assert, oContext, ["something"]);
-			that.oClock.tick(50);
-			that.assertNotCalled(assert);
-
-			fnThrottled.call(oContext, "something");
-			fnThrottled.call(oContext, "something 2");
-			that.assertNotCalled(assert);
-		}).then(function() {
-			that.assertCalled(assert, oContext, ["something 2"]);
-			that.oClock.tick(50);
-			that.assertCalled(assert, oContext, ["something 2"]);
-
-			fnThrottled.call(oContext, "something");
-			that.assertNotCalled(assert);
-		}).then(function() {
-			that.assertCalled(assert, oContext, ["something"]);
+		await Promise.resolve();
+		fnThrottled = TableUtils.throttle(this.fnTestFunction, 50, {
+			leading: true,
+			asyncLeading: true
 		});
+		assert.ok(fnThrottled.cancel, "The throttled function is returned");
+
+		fnThrottled.call(oContext, "something");
+		this.assertNotCalled(assert);
+
+		await Promise.resolve();
+		this.assertCalled(assert, oContext, ["something"]);
+		this.oClock.tick(50);
+		this.assertNotCalled(assert);
+
+		fnThrottled.call(oContext, "something");
+		fnThrottled.call(oContext, "something 2");
+		this.assertNotCalled(assert);
+
+		await Promise.resolve();
+		this.assertCalled(assert, oContext, ["something 2"]);
+		this.oClock.tick(50);
+		this.assertCalled(assert, oContext, ["something 2"]);
+
+		fnThrottled.call(oContext, "something");
+		this.assertNotCalled(assert);
+
+		await Promise.resolve();
+		this.assertCalled(assert, oContext, ["something"]);
 	});
 
-	QUnit.test("Cancellation of asynchronous leading invocation", function(assert) {
+	QUnit.test("Cancellation of asynchronous leading invocation", async function(assert) {
 		const fnThrottled = TableUtils.throttle(this.fnTestFunction, 50, {
 			leading: true,
 			asyncLeading: true
 		});
-		const that = this;
 
 		fnThrottled();
 		fnThrottled.cancel();
 
-		return Promise.resolve().then(function() {
-			that.assertNotCalled(assert);
-		});
+		await Promise.resolve();
+		this.assertNotCalled(assert);
 	});
 
 	QUnit.test("Frame-wise - No calls", function(assert) {

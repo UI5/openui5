@@ -679,7 +679,7 @@ sap.ui.define([
 	QUnit.module("Column Widths", {
 		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -891,7 +891,7 @@ sap.ui.define([
 	QUnit.module("Fixed Columns", {
 		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 			this.aColumns = this.oTable.getColumns();
 			for (let i = 0; i < this.aColumns.length; i++) {
 				this.aColumns[i].setVisible(true);

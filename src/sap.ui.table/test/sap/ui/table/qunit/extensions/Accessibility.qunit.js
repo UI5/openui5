@@ -352,7 +352,7 @@ sap.ui.define([
 				})
 			});
 
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -383,7 +383,7 @@ sap.ui.define([
 		}
 
 		this.oTable.destroyRowActionTemplate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		for (let i = 0; i < this.oTable.getColumns().length; i++) {
 			oCell = this.oTable.qunit.getDataCell(2, i);
@@ -392,7 +392,7 @@ sap.ui.define([
 		}
 
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		testAriaLabelsForNonFocusedDataCell(this.oTable, oCell, 1, this.oTable.getColumns().length - 1, assert);
 	});
 
@@ -413,7 +413,7 @@ sap.ui.define([
 		}
 
 		this.oTable.destroyRowActionTemplate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		for (let i = 0; i < this.oTable.getColumns().length; i++) {
 			oCell = this.oTable.qunit.getDataCell(2, i);
@@ -422,7 +422,7 @@ sap.ui.define([
 		}
 
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		testAriaLabelsForNonFocusedDataCell(this.oTable, oCell, 1, this.oTable.getColumns().length - 1, assert);
 	});
 
@@ -460,7 +460,7 @@ sap.ui.define([
 				children: [new TextControl({text: "CHILD1"}), new TextControl({text: "CHILD2"})]
 			})
 		}));
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		for (let i = 0; i < this.oTable.getColumns().length; i++) {
 			this.oTable.qunit.getDataCell(0, i).focus();
@@ -468,7 +468,7 @@ sap.ui.define([
 		}
 
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		testAriaLabelsForNonFocusedDataCell(this.oTable, this.oTable.qunit.getDataCell(0, -1), 0, this.oTable.getColumns().length - 1, assert);
 	});
 
@@ -486,7 +486,7 @@ sap.ui.define([
 		}
 
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		assert.ok(!this.oTable.qunit.getDataCell(1, -1).getAttribute("aria-describedby"),
 			"No aria-describedby on cell [1, " + (this.oTable.getColumns().length - 1) + "]");
 	});
@@ -513,7 +513,7 @@ sap.ui.define([
 		}
 
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		assert.ok(!this.oTable.qunit.getDataCell(1, 0).getAttribute("aria-describedby"), "No aria-describedby on cell [1, 0]");
 	});
 
@@ -567,7 +567,7 @@ sap.ui.define([
 		}
 
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		testAriaLabelsForNonFocusedDataCell(this.oTable, this.oTable.qunit.getDataCell(0, -1), 0, this.oTable.getColumns().length - 1, assert);
 	});
 
@@ -615,7 +615,7 @@ sap.ui.define([
 		}
 
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		testAriaLabelsForNonFocusedDataCell(this.oTable, this.oTable.qunit.getDataCell(0, -1), 0, this.oTable.getColumns().length - 1, assert);
 	});
 
@@ -653,11 +653,11 @@ sap.ui.define([
 		}
 
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		testAriaLabelsForNonFocusedDataCell(this.oTable, this.oTable.qunit.getDataCell(0, -1), 0, this.oTable.getColumns().length - 1, assert);
 
 		TableUtils.Grouping.setHierarchyMode(this.oTable, TableUtils.Grouping.HierarchyMode.Flat);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.notOk(oRowDomRefs.rowScrollPart.getAttribute("aria-level"), "aria-level is not set on scrollable part");
 		assert.notOk(oRowDomRefs.rowFixedPart.getAttribute("aria-level"), "aria-level is not set on fixed part");
@@ -684,7 +684,7 @@ sap.ui.define([
 		const oSelectionPlugin = new TableQUnitUtils.TestSelectionPlugin();
 		this.oTable.addDependent(oSelectionPlugin);
 		oSelectionPlugin.setSelected(this.oTable.getRows()[0], true);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		let oCell = this.oTable.qunit.getDataCell(0, 0);
 		assert.strictEqual(oCell.getAttribute("role"), "gridcell", "role");
@@ -696,7 +696,7 @@ sap.ui.define([
 		assert.strictEqual(oCell.getAttribute("role"), "presentation", "role");
 
 		this.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		await this.setupTree();
 		assert.strictEqual(this.oTable.qunit.getDataCell(0, 0).getAttribute("role"), "gridcell", "role");
@@ -708,8 +708,8 @@ sap.ui.define([
 			this.oTable = TableQUnitUtils.createTable(mGridTableSettings());
 			this.oTreeTable = TableQUnitUtils.createTable(TreeTable, mTreeTableSettings());
 			await Promise.all([
-				this.oTable.qunit.whenRenderingFinished(),
-				this.oTreeTable.qunit.whenRenderingFinished()
+				this.oTable.qunit.rendered(),
+				this.oTreeTable.qunit.rendered()
 			]);
 			await _modifyTables(this.oTable, this.oTreeTable);
 		},
@@ -1068,7 +1068,7 @@ sap.ui.define([
 				})
 			});
 
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -1122,7 +1122,7 @@ sap.ui.define([
 		}
 
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		this.testAriaLabels(this.oTable.qunit.getRowHeaderCell(2), 2, assert);
 	});
 
@@ -1181,7 +1181,7 @@ sap.ui.define([
 		assert.notOk(oCell.hasAttribute("title"), "Has title");
 
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		this.testAriaLabels(oCell, 0, assert);
 	});
 
@@ -1228,11 +1228,11 @@ sap.ui.define([
 		assert.notOk(oCell.hasAttribute("title"), "Has title");
 
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		this.testAriaLabels(oCell, 0, assert);
 
 		TableUtils.Grouping.setHierarchyMode(this.oTable, TableUtils.Grouping.HierarchyMode.Flat);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.notOk(oRowDomRefs.rowHeaderPart.hasAttribute("aria-level"), "Has aria-level");
 	});
 
@@ -1240,7 +1240,7 @@ sap.ui.define([
 		const oSelectionPlugin = new TableQUnitUtils.TestSelectionPlugin();
 		this.oTable.addDependent(oSelectionPlugin);
 		oSelectionPlugin.setSelected(this.oTable.getRows()[0], true);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		const oCell = this.oTable.qunit.getRowHeaderCell(0);
 		assert.strictEqual(oCell.getAttribute("role"), "gridcell", "role");
@@ -1260,7 +1260,7 @@ sap.ui.define([
 				})
 			});
 
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -1320,7 +1320,7 @@ sap.ui.define([
 		}
 
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		this.testAriaLabels(this.oTable.qunit.getRowActionCell(2), 2, assert);
 	});
 
@@ -1379,7 +1379,7 @@ sap.ui.define([
 		assert.notOk(oCell.hasAttribute("title"), "Has title");
 
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		this.testAriaLabels(oCell, 0, assert);
 	});
 
@@ -1426,11 +1426,11 @@ sap.ui.define([
 		assert.notOk(oCell.hasAttribute("title"), "Has title");
 
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		this.testAriaLabels(oCell, 0, assert);
 
 		TableUtils.Grouping.setHierarchyMode(this.oTable, TableUtils.Grouping.HierarchyMode.Flat);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.notOk(oRowDomRefs.rowActionPart.hasAttribute("aria-level"), "Has aria-level");
 	});
 
@@ -1438,7 +1438,7 @@ sap.ui.define([
 		const oSelectionPlugin = new TableQUnitUtils.TestSelectionPlugin();
 		this.oTable.addDependent(oSelectionPlugin);
 		oSelectionPlugin.setSelected(this.oTable.getRows()[0], true);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		const oCell = this.oTable.qunit.getRowActionCell(0);
 		assert.strictEqual(oCell.getAttribute("role"), "gridcell", "role");
@@ -1449,8 +1449,8 @@ sap.ui.define([
 			this.oTable = TableQUnitUtils.createTable(mGridTableSettings());
 			this.oTreeTable = TableQUnitUtils.createTable(TreeTable, mTreeTableSettings());
 			await Promise.all([
-				this.oTable.qunit.whenRenderingFinished(),
-				this.oTreeTable.qunit.whenRenderingFinished()
+				this.oTable.qunit.rendered(),
+				this.oTreeTable.qunit.rendered()
 			]);
 			await _modifyTables(this.oTable, this.oTreeTable);
 		},
@@ -1487,8 +1487,8 @@ sap.ui.define([
 			this.oTable = TableQUnitUtils.createTable(mGridTableSettings());
 			this.oTreeTable = TableQUnitUtils.createTable(TreeTable, mTreeTableSettings());
 			await Promise.all([
-				this.oTable.qunit.whenRenderingFinished(),
-				this.oTreeTable.qunit.whenRenderingFinished()
+				this.oTable.qunit.rendered(),
+				this.oTreeTable.qunit.rendered()
 			]);
 			await _modifyTables(this.oTable, this.oTreeTable);
 			this.oTable.addExtension(new TestControl({text: "Extension"}));
@@ -2060,7 +2060,7 @@ sap.ui.define([
 		await nextUIUpdate();
 		oTreeTable.qunit.getDataCell(1, 0).focus();
 		$Cell = jQuery(oTreeTable.qunit.getDataCell(1, 0));
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		const sCollapseButtonText = TableUtils.getResourceText("TBL_COLLAPSE_BUTTON");
 		sCellAccText = TableUtils.getResourceText("TBL_CELL_INCLUDES", [sCollapseButtonText]).concat(" TYPE_A_1 DESCRIPTION_A_1 Read Only");
 		assert.equal(oTreeTable.$("cellacc").text(), sCellAccText, "TreeTable: HiddenText cellacc for expanded row is correct");
@@ -2308,8 +2308,8 @@ sap.ui.define([
 			this.oTable = TableQUnitUtils.createTable(mGridTableSettings());
 			this.oTreeTable = TableQUnitUtils.createTable(TreeTable, mTreeTableSettings());
 			await Promise.all([
-				this.oTable.qunit.whenRenderingFinished(),
-				this.oTreeTable.qunit.whenRenderingFinished()
+				this.oTable.qunit.rendered(),
+				this.oTreeTable.qunit.rendered()
 			]);
 			await _modifyTables(this.oTable, this.oTreeTable);
 		},

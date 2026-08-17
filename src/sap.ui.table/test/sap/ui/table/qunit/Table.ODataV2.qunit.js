@@ -28,7 +28,7 @@ sap.ui.define([
 				models: this.oDataModel
 			});
 
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -39,7 +39,7 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("#_getTotalRowCount", function(assert) {
+	QUnit.test("#_getTotalRowCount", async function(assert) {
 		const oTable = this.oTable;
 
 		assert.strictEqual(oTable._getTotalRowCount(), 16, "Binding#getLength defines the total row count in the table");
@@ -47,37 +47,36 @@ sap.ui.define([
 		oTable.bindRows({path: "/Products"});
 		assert.strictEqual(oTable._getTotalRowCount(), 16, "On rebind, the last known binding length of the previous binding is returned");
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			assert.strictEqual(oTable._getTotalRowCount(), 16, "After rebind, the new binding length is returned");
-			oTable.getBinding().refresh();
-			assert.strictEqual(oTable._getTotalRowCount(), 16, "On refresh, the last known binding length is returned");
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(oTable._getTotalRowCount(), 16, "After refresh, the new binding length is returned");
-			oTable.getBinding().filter(new Filter({
-				path: "Category",
-				operator: "EQ",
-				value1: "GC"
-			}));
-			assert.strictEqual(oTable._getTotalRowCount(), 16, "On filter, the last known binding length is returned");
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(oTable._getTotalRowCount(), 3, "After filter, the new binding length is returned");
-			oTable.bindRows({path: "/Products", length: 5});
-			assert.strictEqual(oTable._getTotalRowCount(), 5, "The \"length\" parameter in the binding info overrides Binding#getLength");
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(oTable._getTotalRowCount(), 5, "After data is received, still the \"length\" parameter is returned");
-			oTable.getBinding().refresh();
-			assert.strictEqual(oTable._getTotalRowCount(), 5, "On refresh, still the \"length\" parameter is returned");
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(oTable._getTotalRowCount(), 5, "After refresh, still the \"length\" parameter is returned");
+		await oTable.qunit.rendered();
+		assert.strictEqual(oTable._getTotalRowCount(), 16, "After rebind, the new binding length is returned");
+		oTable.getBinding().refresh();
+		assert.strictEqual(oTable._getTotalRowCount(), 16, "On refresh, the last known binding length is returned");
+		await oTable.qunit.rendered();
+		assert.strictEqual(oTable._getTotalRowCount(), 16, "After refresh, the new binding length is returned");
+		oTable.getBinding().filter(new Filter({
+			path: "Category",
+			operator: "EQ",
+			value1: "GC"
+		}));
+		assert.strictEqual(oTable._getTotalRowCount(), 16, "On filter, the last known binding length is returned");
+		await oTable.qunit.rendered();
+		assert.strictEqual(oTable._getTotalRowCount(), 3, "After filter, the new binding length is returned");
+		oTable.bindRows({path: "/Products", length: 5});
+		assert.strictEqual(oTable._getTotalRowCount(), 5, "The \"length\" parameter in the binding info overrides Binding#getLength");
+		await oTable.qunit.rendered();
+		assert.strictEqual(oTable._getTotalRowCount(), 5, "After data is received, still the \"length\" parameter is returned");
+		oTable.getBinding().refresh();
+		assert.strictEqual(oTable._getTotalRowCount(), 5, "On refresh, still the \"length\" parameter is returned");
+		await oTable.qunit.rendered();
+		assert.strictEqual(oTable._getTotalRowCount(), 5, "After refresh, still the \"length\" parameter is returned");
 
-			const oModel = oTable.getModel();
-			oTable.setModel(null);
-			assert.strictEqual(oTable._getTotalRowCount(), 0, "Without a binding the total row count is 0, regardless of the binding info");
+		const oModel = oTable.getModel();
+		oTable.setModel(null);
+		assert.strictEqual(oTable._getTotalRowCount(), 0, "Without a binding the total row count is 0, regardless of the binding info");
 
-			oTable.unbindRows();
-			oTable.setModel(oModel);
-			assert.strictEqual(oTable._getTotalRowCount(), 0, "Without a binding or binding info the total row count is 0");
-		});
+		oTable.unbindRows();
+		oTable.setModel(oModel);
+		assert.strictEqual(oTable._getTotalRowCount(), 0, "Without a binding or binding info the total row count is 0");
 	});
 
 	/**
@@ -107,41 +106,39 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Initialization", function(assert) {
+	QUnit.test("Initialization", async function(assert) {
 		const oTable = TableQUnitUtils.createTable();
 		const oGetContextsSpy = this.oGetContextsSpy;
 
 		// refreshRows, render, updateRows
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			assert.equal(oGetContextsSpy.callCount, 3, "Call count of method to get contexts");
-			sinon.assert.alwaysCalledWithExactly(oGetContextsSpy, 0, 10, 100);
-			oTable.destroy();
-		});
+		await oTable.qunit.rendered();
+		assert.equal(oGetContextsSpy.callCount, 3, "Call count of method to get contexts");
+		sinon.assert.alwaysCalledWithExactly(oGetContextsSpy, 0, 10, 100);
+		oTable.destroy();
 	});
 
-	QUnit.test("Initialization; With fixed rows", function(assert) {
+	QUnit.test("Initialization; With fixed rows", async function(assert) {
 		const oTable = TableQUnitUtils.createTable({
 			fixedRowCount: 1,
 			fixedBottomRowCount: 1
 		});
 		const oGetContextsSpy = this.oGetContextsSpy;
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			assert.equal(oGetContextsSpy.callCount, 4, "Call count of method to get contexts");
+		await oTable.qunit.rendered();
+		assert.equal(oGetContextsSpy.callCount, 4, "Call count of method to get contexts");
 
-			// The initial getContexts call does not consider fixed row counts, because binding is initialized before properties for fixed row counts
-			// are set (see ManagedObject#applySettings).
+		// The initial getContexts call does not consider fixed row counts, because binding is initialized before properties for fixed row counts
+		// are set (see ManagedObject#applySettings).
 
-			sinon.assert.calledWithExactly(oGetContextsSpy.getCall(0), 0, 10, 100); // refreshRows
-			sinon.assert.calledWithExactly(oGetContextsSpy.getCall(1), 0, 9, 100); // render
-			sinon.assert.calledWithExactly(oGetContextsSpy.getCall(2), 0, 9, 100); // updateRows
-			sinon.assert.calledWithExactly(oGetContextsSpy.getCall(3), 15, 1, 0, true); // fixed bottom rows
+		sinon.assert.calledWithExactly(oGetContextsSpy.getCall(0), 0, 10, 100); // refreshRows
+		sinon.assert.calledWithExactly(oGetContextsSpy.getCall(1), 0, 9, 100); // render
+		sinon.assert.calledWithExactly(oGetContextsSpy.getCall(2), 0, 9, 100); // updateRows
+		sinon.assert.calledWithExactly(oGetContextsSpy.getCall(3), 15, 1, 0, true); // fixed bottom rows
 
-			oTable.destroy();
-		});
+		oTable.destroy();
 	});
 
-	QUnit.test("Initialization; With fixed rows, firstVisibleRow = 1, threshold = 1", function(assert) {
+	QUnit.test("Initialization; With fixed rows, firstVisibleRow = 1, threshold = 1", async function(assert) {
 		const oTable = TableQUnitUtils.createTable({
 			visibleRowCount: 5,
 			fixedRowCount: 1,
@@ -151,62 +148,59 @@ sap.ui.define([
 		});
 		const oGetContextsSpy = this.oGetContextsSpy;
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			assert.equal(oGetContextsSpy.callCount, 6, "Call count of method to get contexts");
+		await oTable.qunit.rendered();
+		assert.equal(oGetContextsSpy.callCount, 6, "Call count of method to get contexts");
 
-			// The initial getContexts call does not consider fixed row counts, because the binding is initialized before
-			// the corresponding properties are set (see ManagedObject#applySettings).
-			// Fixed bottom rows can't be requested if the count is unknown. As soon as the binding receives a getContexts call that triggers a
-			// request, it ignores subsequent calls.
+		// The initial getContexts call does not consider fixed row counts, because the binding is initialized before
+		// the corresponding properties are set (see ManagedObject#applySettings).
+		// Fixed bottom rows can't be requested if the count is unknown. As soon as the binding receives a getContexts call that triggers a
+		// request, it ignores subsequent calls.
 
-			// refreshRows
-			sinon.assert.calledWithExactly(oGetContextsSpy.getCall(0), 1, 10, 10); // scrollable rows
-			// render
-			sinon.assert.calledWithExactly(oGetContextsSpy.getCall(1), 0, 1, 0, true); // fixed top rows
-			sinon.assert.calledWithExactly(oGetContextsSpy.getCall(2), 2, 3, 3); // scrollable rows
-			// updateRows: Received rows requested in refreshRows
-			sinon.assert.calledWithExactly(oGetContextsSpy.getCall(3), 0, 1, 0, true); // fixed top rows
-			sinon.assert.calledWithExactly(oGetContextsSpy.getCall(4), 2, 3, 3); // scrollable rows
-			sinon.assert.calledWithExactly(oGetContextsSpy.getCall(5), 15, 1, 0, true); // fixed bottom rows
+		// refreshRows
+		sinon.assert.calledWithExactly(oGetContextsSpy.getCall(0), 1, 10, 10); // scrollable rows
+		// render
+		sinon.assert.calledWithExactly(oGetContextsSpy.getCall(1), 0, 1, 0, true); // fixed top rows
+		sinon.assert.calledWithExactly(oGetContextsSpy.getCall(2), 2, 3, 3); // scrollable rows
+		// updateRows: Received rows requested in refreshRows
+		sinon.assert.calledWithExactly(oGetContextsSpy.getCall(3), 0, 1, 0, true); // fixed top rows
+		sinon.assert.calledWithExactly(oGetContextsSpy.getCall(4), 2, 3, 3); // scrollable rows
+		sinon.assert.calledWithExactly(oGetContextsSpy.getCall(5), 15, 1, 0, true); // fixed bottom rows
 
-			oTable.destroy();
-		});
+		oTable.destroy();
 	});
 
-	QUnit.test("Refresh", function(assert) {
+	QUnit.test("Refresh", async function(assert) {
 		const oTable = TableQUnitUtils.createTable();
 		const oGetContextsSpy = this.oGetContextsSpy;
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			oGetContextsSpy.resetHistory();
-			oTable.getBinding().refresh();
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.equal(oGetContextsSpy.callCount, 2, "Call count of method to get contexts");
-			sinon.assert.alwaysCalledWithExactly(oGetContextsSpy, 0, 10, 100);
-			oTable.destroy();
-		});
+		await oTable.qunit.rendered();
+		oGetContextsSpy.resetHistory();
+		oTable.getBinding().refresh();
+		await oTable.qunit.rendered();
+		assert.equal(oGetContextsSpy.callCount, 2, "Call count of method to get contexts");
+		sinon.assert.alwaysCalledWithExactly(oGetContextsSpy, 0, 10, 100);
+		oTable.destroy();
 	});
 
-	QUnit.test("Refresh; With fixed rows", function(assert) {
+	QUnit.test("Refresh; With fixed rows", async function(assert) {
 		const oTable = TableQUnitUtils.createTable({
 			fixedRowCount: 1,
 			fixedBottomRowCount: 1
 		});
 		const oGetContextsSpy = this.oGetContextsSpy;
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			oGetContextsSpy.resetHistory();
-			oTable.getBinding().refresh();
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.equal(oGetContextsSpy.callCount, 3, "Call count of method to get contexts");
-			sinon.assert.calledWithExactly(oGetContextsSpy.getCall(0), 0, 9, 100);
-			sinon.assert.calledWithExactly(oGetContextsSpy.getCall(1), 0, 9, 100);
-			sinon.assert.calledWithExactly(oGetContextsSpy.getCall(2), 15, 1, 0, true);
-			oTable.destroy();
-		});
+		await oTable.qunit.rendered();
+		oGetContextsSpy.resetHistory();
+		oTable.getBinding().refresh();
+		await oTable.qunit.rendered();
+		assert.equal(oGetContextsSpy.callCount, 3, "Call count of method to get contexts");
+		sinon.assert.calledWithExactly(oGetContextsSpy.getCall(0), 0, 9, 100);
+		sinon.assert.calledWithExactly(oGetContextsSpy.getCall(1), 0, 9, 100);
+		sinon.assert.calledWithExactly(oGetContextsSpy.getCall(2), 15, 1, 0, true);
+		oTable.destroy();
 	});
 
-	QUnit.test("Refresh; With fixed rows, firstVisibleRow = 1, threshold = 1", function(assert) {
+	QUnit.test("Refresh; With fixed rows, firstVisibleRow = 1, threshold = 1", async function(assert) {
 		const oTable = TableQUnitUtils.createTable({
 			visibleRowCount: 5,
 			fixedRowCount: 1,
@@ -216,79 +210,76 @@ sap.ui.define([
 		});
 		const oGetContextsSpy = this.oGetContextsSpy;
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			oGetContextsSpy.resetHistory();
-			oTable.getBinding().refresh();
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			return new Promise(function(resolve) {
-				setTimeout(function() {
-					assert.equal(oGetContextsSpy.callCount, 11, "Call count of method to get contexts");
-					// Fixed bottom rows can't be requested if the count is unknown, e.g. during refresh. As soon as the binding receives a
-					// getContexts call that triggers a request, it ignores subsequent calls. Therefore, only fixed top rows are loaded initially.
+		await oTable.qunit.rendered();
+		oGetContextsSpy.resetHistory();
+		oTable.getBinding().refresh();
+		await oTable.qunit.rendered();
+		await new Promise(function(resolve) {
+			setTimeout(function() {
+				assert.equal(oGetContextsSpy.callCount, 11, "Call count of method to get contexts");
+				// Fixed bottom rows can't be requested if the count is unknown, e.g. during refresh. As soon as the binding receives a
+				// getContexts call that triggers a request, it ignores subsequent calls. Therefore, only fixed top rows are loaded initially.
 
-					// refreshRows
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(0), 0, 1, 0, true); // fixed top rows
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(1), 2, 3, 3); // scrollable rows
-					// updateRows: Received fixed top rows
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(2), 0, 1, 0, true); // fixed top rows
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(3), 2, 3, 3); // scrollable rows
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(4), 15, 1, 0, true); // fixed bottom rows
-					// updateRows: Received scrollable rows
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(5), 0, 1, 0, true); // fixed top rows
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(6), 2, 3, 3); // scrollable rows
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(7), 15, 1, 0, true); // fixed bottom rows
-					// updateRows: Received fixed bottom rows
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(8), 0, 1, 0, true); // fixed top rows
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(9), 2, 3, 3); // scrollable rows
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(10), 15, 1, 0, true); // fixed bottom rows
+				// refreshRows
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(0), 0, 1, 0, true); // fixed top rows
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(1), 2, 3, 3); // scrollable rows
+				// updateRows: Received fixed top rows
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(2), 0, 1, 0, true); // fixed top rows
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(3), 2, 3, 3); // scrollable rows
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(4), 15, 1, 0, true); // fixed bottom rows
+				// updateRows: Received scrollable rows
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(5), 0, 1, 0, true); // fixed top rows
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(6), 2, 3, 3); // scrollable rows
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(7), 15, 1, 0, true); // fixed bottom rows
+				// updateRows: Received fixed bottom rows
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(8), 0, 1, 0, true); // fixed top rows
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(9), 2, 3, 3); // scrollable rows
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(10), 15, 1, 0, true); // fixed bottom rows
 
-					oTable.destroy();
-					resolve();
-				}, 500);
-			});
+				oTable.destroy();
+				resolve();
+			}, 500);
 		});
 	});
 
-	QUnit.test("Sort", function(assert) {
+	QUnit.test("Sort", async function(assert) {
 		const oTable = TableQUnitUtils.createTable();
 		const oGetContextsSpy = this.oGetContextsSpy;
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			oGetContextsSpy.resetHistory();
-			oTable.getBinding().sort();
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.equal(oGetContextsSpy.callCount, 2, "Call count of method to get contexts");
-			sinon.assert.alwaysCalledWithExactly(oGetContextsSpy, 0, 10, 100);
-			oTable.destroy();
-		});
+		await oTable.qunit.rendered();
+		oGetContextsSpy.resetHistory();
+		oTable.getBinding().sort();
+		await oTable.qunit.rendered();
+		assert.equal(oGetContextsSpy.callCount, 2, "Call count of method to get contexts");
+		sinon.assert.alwaysCalledWithExactly(oGetContextsSpy, 0, 10, 100);
+		oTable.destroy();
 	});
 
-	QUnit.test("Sort; With fixed rows", function(assert) {
+	QUnit.test("Sort; With fixed rows", async function(assert) {
 		const oTable = TableQUnitUtils.createTable({
 			fixedRowCount: 1,
 			fixedBottomRowCount: 1
 		});
 		const oGetContextsSpy = this.oGetContextsSpy;
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			oGetContextsSpy.resetHistory();
-			oTable.getBinding().sort();
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			return new Promise(function(resolve) {
-				setTimeout(function() {
-					assert.equal(oGetContextsSpy.callCount, 4, "Call count of method to get contexts");
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(0), 0, 9, 100);
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(1), 15, 1, 0, true);
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(2), 0, 9, 100);
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(3), 15, 1, 0, true);
-					oTable.destroy();
-					resolve();
-				}, 500);
-			});
+		await oTable.qunit.rendered();
+		oGetContextsSpy.resetHistory();
+		oTable.getBinding().sort();
+		await oTable.qunit.rendered();
+		await new Promise(function(resolve) {
+			setTimeout(function() {
+				assert.equal(oGetContextsSpy.callCount, 4, "Call count of method to get contexts");
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(0), 0, 9, 100);
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(1), 15, 1, 0, true);
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(2), 0, 9, 100);
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(3), 15, 1, 0, true);
+				oTable.destroy();
+				resolve();
+			}, 500);
 		});
 	});
 
-	QUnit.test("Sort; With fixed rows, firstVisibleRow = 1, threshold = 1", function(assert) {
+	QUnit.test("Sort; With fixed rows, firstVisibleRow = 1, threshold = 1", async function(assert) {
 		const oTable = TableQUnitUtils.createTable({
 			visibleRowCount: 5,
 			fixedRowCount: 1,
@@ -298,23 +289,22 @@ sap.ui.define([
 		});
 		const oGetContextsSpy = this.oGetContextsSpy;
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			oGetContextsSpy.resetHistory();
-			oTable.getBinding().sort();
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			return new Promise(function(resolve) {
-				setTimeout(function() {
-					assert.equal(oGetContextsSpy.callCount, 6, "Call count of method to get contexts");
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(0), 0, 4, 3); // refreshRows
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(1), 15, 1, 0, true); // fixed bottom contexts
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(2), 0, 4, 3); // updateRows
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(3), 15, 1, 0, true); // fixed bottom contexts
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(4), 0, 4, 3); // updateRows
-					sinon.assert.calledWithExactly(oGetContextsSpy.getCall(5), 15, 1, 0, true); // fixed bottom contexts
-					oTable.destroy();
-					resolve();
-				}, 500);
-			});
+		await oTable.qunit.rendered();
+		oGetContextsSpy.resetHistory();
+		oTable.getBinding().sort();
+		await oTable.qunit.rendered();
+		await new Promise(function(resolve) {
+			setTimeout(function() {
+				assert.equal(oGetContextsSpy.callCount, 6, "Call count of method to get contexts");
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(0), 0, 4, 3); // refreshRows
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(1), 15, 1, 0, true); // fixed bottom contexts
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(2), 0, 4, 3); // updateRows
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(3), 15, 1, 0, true); // fixed bottom contexts
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(4), 0, 4, 3); // updateRows
+				sinon.assert.calledWithExactly(oGetContextsSpy.getCall(5), 15, 1, 0, true); // fixed bottom contexts
+				oTable.destroy();
+				resolve();
+			}, 500);
 		});
 	});
 
@@ -355,7 +345,7 @@ sap.ui.define([
 		const oTable = this.oTable;
 		const oGetContextsSpy = this.oGetContextsSpy;
 
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 
 		// refreshRows, render, updateRows
 		assert.equal(oGetContextsSpy.callCount, 3, "Call count of method to get contexts");
@@ -367,7 +357,7 @@ sap.ui.define([
 		const oTable = this.oTable;
 		const oGetContextsSpy = this.oGetContextsSpy;
 
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 		oGetContextsSpy.resetHistory();
 
 		oTable._getScrollExtension().scrollVertically(true, false);
@@ -404,7 +394,7 @@ sap.ui.define([
 		const oTable = this.oTable;
 		const oGetContextsSpy = this.oGetContextsSpy;
 
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 		oGetContextsSpy.resetHistory();
 
 		oTable._getScrollExtension().scrollVertically(true, false);
@@ -587,8 +577,8 @@ sap.ui.define([
 			})
 		});
 
-		await oTable.qunit.whenRenderingFinished();
-		await TableQUnitUtils.wait(10); // Wait for the busy state to be set to false
+		await oTable.qunit.rendered();
+		await TableQUnitUtils.sleep(10); // Wait for the busy state to be set to false
 
 		const oScrollExtension = oTable._getScrollExtension();
 		const oDataRequestedSpy = sinon.spy(oTable.getBinding("rows"), "fireDataRequested");
@@ -887,23 +877,22 @@ sap.ui.define([
 
 			return this.oDataModel.metadataLoaded();
 		},
-		beforeEach: function() {
+		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable();
 			this.iNoDataVisibilityChanges = 0;
 
-			return this.oTable.qunit.whenRenderingFinished().then(function() {
-				this.oObserver = new MutationObserver(function(aRecords) {
-					const oRecord = aRecords[0];
-					const bNoDataWasVisible = oRecord.oldValue.includes("sapUiTableEmpty");
-					const bNoDataIsVisible = oRecord.target.classList.contains("sapUiTableEmpty");
+			await this.oTable.qunit.rendered();
+			this.oObserver = new MutationObserver(function(aRecords) {
+				const oRecord = aRecords[0];
+				const bNoDataWasVisible = oRecord.oldValue.includes("sapUiTableEmpty");
+				const bNoDataIsVisible = oRecord.target.classList.contains("sapUiTableEmpty");
 
-					if (bNoDataWasVisible !== bNoDataIsVisible) {
-						this.iNoDataVisibilityChanges++;
-					}
-				}.bind(this));
-
-				this.oObserver.observe(this.oTable.getDomRef(), {attributes: true, attributeOldValue: true, attributeFilter: ["class"]});
+				if (bNoDataWasVisible !== bNoDataIsVisible) {
+					this.iNoDataVisibilityChanges++;
+				}
 			}.bind(this));
+
+			this.oObserver.observe(this.oTable.getDomRef(), {attributes: true, attributeOldValue: true, attributeFilter: ["class"]});
 		},
 		afterEach: function() {
 			if (this.oObserver) {
@@ -935,7 +924,7 @@ sap.ui.define([
 					TableQUnitUtils.assertNoDataVisible(assert, oTable, true); // Initial rendering has no data
 					resolve();
 				});
-			}).then(oTable.qunit.whenRenderingFinished).then(function() {
+			}).then(oTable.qunit.rendered).then(function() {
 				TableQUnitUtils.assertNoDataVisible(assert, oTable, false);
 				done();
 			});
@@ -954,25 +943,22 @@ sap.ui.define([
 					TableQUnitUtils.assertNoDataVisible(assert, oTable, true); // Initial rendering has no data
 					resolve();
 				});
-			}).then(oTable.qunit.whenRenderingFinished).then(function() {
+			}).then(oTable.qunit.rendered).then(function() {
 				TableQUnitUtils.assertNoDataVisible(assert, oTable, true);
 				done();
 			});
 		});
 	});
 
-	QUnit.test("Filter", function(assert) {
-		const that = this;
-
+	QUnit.test("Filter", async function(assert) {
 		this.oTable.getBinding().filter(new Filter({path: "Name", operator: "EQ", value1: "DoesNotExist"}));
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Filter");
-			that.assertNoDataVisibilityChangeCount(assert, 1);
-			that.oTable.getBinding().filter();
-		}).then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Remove filter");
-			that.assertNoDataVisibilityChangeCount(assert, 1);
-		});
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, true, "Filter");
+		this.assertNoDataVisibilityChangeCount(assert, 1);
+		this.oTable.getBinding().filter();
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, false, "Remove filter");
+		this.assertNoDataVisibilityChangeCount(assert, 1);
 	});
 
 	QUnit.test("Rerender while filtering", async function(assert) {
@@ -980,40 +966,38 @@ sap.ui.define([
 
 		this.oTable.getBinding().filter(new Filter({path: "Name", operator: "EQ", value1: "DoesNotExist"}));
 		this.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Filter");
 		that.assertNoDataVisibilityChangeCount(assert, 1);
 
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Rerender");
 		that.assertNoDataVisibilityChangeCount(assert, 0);
 
 		that.oTable.getBinding().filter();
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Remove Filter");
 		that.assertNoDataVisibilityChangeCount(assert, 1);
 
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Rerender");
 		that.assertNoDataVisibilityChangeCount(assert, 0);
 	});
 
-	QUnit.test("Bind/Unbind", function(assert) {
+	QUnit.test("Bind/Unbind", async function(assert) {
 		const oBindingInfo = this.oTable.getBindingInfo("rows");
-		const that = this;
 
 		this.oTable.unbindRows();
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Unbind");
-			that.assertNoDataVisibilityChangeCount(assert, 1);
-			that.oTable.bindRows(oBindingInfo);
-		}).then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Bind");
-			that.assertNoDataVisibilityChangeCount(assert, 1);
-		});
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, true, "Unbind");
+		this.assertNoDataVisibilityChangeCount(assert, 1);
+		this.oTable.bindRows(oBindingInfo);
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, false, "Bind");
+		this.assertNoDataVisibilityChangeCount(assert, 1);
 	});
 
 	QUnit.test("Rerender while binding/unbinding", async function(assert) {
@@ -1022,23 +1006,23 @@ sap.ui.define([
 
 		this.oTable.unbindRows();
 		this.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Unbind");
 		that.assertNoDataVisibilityChangeCount(assert, 1);
 
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Rerender");
 		that.assertNoDataVisibilityChangeCount(assert, 0);
 
 		that.oTable.bindRows(oBindingInfo);
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Bind");
 		that.assertNoDataVisibilityChangeCount(assert, 1);
 
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Rerender");
 		that.assertNoDataVisibilityChangeCount(assert, 0);
 	});
