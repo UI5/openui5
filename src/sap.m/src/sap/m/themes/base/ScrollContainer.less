@@ -18,5 +18,5 @@
 
 .sapMScrollCont:focus {
 	outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
-	outline-offset: 0.0625rem;
+	outline-offset: ~"calc(-1 * var(--sapContent_FocusWidth))";
 }
