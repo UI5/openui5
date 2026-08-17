@@ -790,9 +790,8 @@ sap.ui.define([
 			const iModelIndex = this.getModelIndex(oContext);
 			aContexts.splice(iModelIndex + 1, iCount).forEach((oContext0) => {
 				oContext0.iIndex = undefined; // "outside the collection"
-				if (!oContext0.created()) {
-					this.mPreviousContextsByPath[oContext0.getPath()] = oContext0;
-				} // else: created (even persisted) is kept inside "context" annotation
+				// Note: created (even persisted) is also kept inside "context" annotation
+				this.mPreviousContextsByPath[oContext0.getPath()] = oContext0;
 			});
 			for (let i = iModelIndex + 1; i < aContexts.length; i += 1) {
 				if (aContexts[i]) {

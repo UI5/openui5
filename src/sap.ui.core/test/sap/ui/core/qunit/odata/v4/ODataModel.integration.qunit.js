@@ -45878,6 +45878,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-2510
 	//
 	// Observe #getIndex/#getObject for node w/ collapsed ancestor (JIRA: CPOUI5ODATAV4-3627)
+	// Selection keeps a node alive despite parent's collapse (JIRA: CPOUI5ODATAV4-3632)
 	QUnit.test("Recursive Hierarchy: out of place, bonus item, collapse", async function (assert) {
 		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
 		const sUrl = "EMPLOYEES"
@@ -46004,7 +46005,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		]);
 		assert.strictEqual(iAge, 42);
 
-		const expectSideEffectsRequests = () => {
+		const expectSideEffectsRequests = (iRevision) => {
 			this.expectRequest(sUrl + "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,Name"
 					+ "&$count=true&$skip=0&$top=2", {
 					"@odata.count" : "7",
@@ -46013,13 +46014,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						DistanceFromRoot : "0",
 						DrillState : "expanded",
 						ID : "1",
-						Name : "Alpha*"
+						Name : "Alpha#" + iRevision
 					}, {
 						DescendantCount : "0",
 						DistanceFromRoot : "1",
 						DrillState : "leaf",
 						ID : "2",
-						Name : "Beta*"
+						Name : "Beta#" + iRevision
 					}]
 				})
 				.expectRequest(sUrl
@@ -46049,19 +46050,19 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					+ "?$apply=descendants($root/EMPLOYEES,OrgChart,ID,filter(ID eq '1'),1)"
 					+ "&$select=ID,Name&$filter=ID eq '11'&$top=1", {
 					value : [
-						{ID : "11", Name : "New1*"}
+						{ID : "11", Name : "New1#" + iRevision}
 					]
 				})
 				.expectRequest("EMPLOYEES"
 					+ "?$apply=descendants($root/EMPLOYEES,OrgChart,ID,filter(ID eq '11'),1)"
 					+ "&$select=ID,Name&$filter=ID eq '12'&$top=1", {
 					value : [
-						{ID : "12", Name : "New2*"}
+						{ID : "12", Name : "New2#" + iRevision}
 					]
 				});
 		};
 
-		expectSideEffectsRequests();
+		expectSideEffectsRequests(1);
 
 		await Promise.all([
 			// code under test
@@ -46077,10 +46078,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"@$ui5.node.level" : 3,
 			// AGE : 42,
 			ID : "12",
-			Name : "New2*"
+			Name : "New2#1"
 		});
 
-		const checkAllContexts = async (iStep) => {
+		const checkAllContexts = async (iStep, iRevision) => {
 			this.expectRequest(sUrl + "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,Name"
 					+ "&$skip=3&$top=2", {
 					value : [{
@@ -46088,13 +46089,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						DistanceFromRoot : "2",
 						DrillState : "expanded",
 						ID : "21",
-						Name : "NewFromServer1*"
+						Name : "NewFromServer1#" + iRevision
 					}, {
 						DescendantCount : "0",
 						DistanceFromRoot : "3",
 						DrillState : "leaf",
 						ID : "22",
-						Name : "NewFromServer2*"
+						Name : "NewFromServer2#" + iRevision
 					}]
 				})
 				.expectRequest(sUrl + "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,Name"
@@ -46104,39 +46105,62 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						DistanceFromRoot : "0",
 						DrillState : "leaf",
 						ID : "3",
-						Name : "Gamma*"
+						Name : "Gamma#" + iRevision
 					}]
 				});
 
 			await this.checkAllContexts(`(${iStep}) check all contexts`, assert, oBinding,
 				["@$ui5.node.isExpanded", "@$ui5.node.level", "Name"], [
-					[true, 1, "Alpha*"],
-					[true, 2, "New1*"],
-					[undefined, 3, "New2*"],
-					[true, 3, "NewFromServer1*"],
-					[undefined, 4, "NewFromServer2*"],
-					[undefined, 2, "Beta*"],
-					[undefined, 1, "Gamma*"]
+					[true, 1, "Alpha#" + iRevision],
+					[true, 2, "New1#" + iRevision],
+					[undefined, 3, "New2#" + iRevision],
+					[true, 3, "NewFromServer1#" + iRevision],
+					[undefined, 4, "NewFromServer2#" + iRevision],
+					[undefined, 2, "Beta#" + iRevision],
+					[undefined, 1, "Gamma#" + iRevision]
 				]);
 		};
 
-		await checkAllContexts(3);
+		await checkAllContexts(3, 1);
 
+		// code under test
+		oNew2.setSelected(true);
 		oAlpha.collapse();
 
 		assert.strictEqual(oNew2.getIndex(), undefined, "JIRA: CPOUI5ODATAV4-3627");
-		assert.notOk(oBinding._getAllExistingContexts().includes(oNew2), "gone");
-		assert.strictEqual(oNew2.getObject(), undefined);
+		assert.ok(oBinding._getAllExistingContexts().includes(oNew2), "effectively kept alive");
+		assert.deepEqual(oNew2.getObject(), {
+			"@$ui5.context.isSelected" : true,
+			"@$ui5.context.isTransient" : false,
+			"@$ui5.node.level" : 3,
+			ID : "12",
+			Name : "New2#1"
+		});
 
 		await this.waitForChanges(assert, "(4) collapse Alpha");
 
 		checkTable("after (4)", assert, oTable, [
 			"/EMPLOYEES('1')",
-			"/EMPLOYEES('3')"
+			"/EMPLOYEES('3')",
+			oNew2
 		], [
-			[false, 1, "Alpha*"],
-			[undefined, 1, "Gamma*"]
-		]);
+			[false, 1, "Alpha#1"],
+			[undefined, 1, "Gamma#1"]
+		], 2);
+		assert.ok(oBinding._getAllExistingContexts().includes(oNew2), "effectively kept alive");
+
+		// code under test (and simplify tests below)
+		oNew2.setSelected(false);
+
+		assert.notOk(oBinding._getAllExistingContexts().includes(oNew2), "gone");
+		assert.strictEqual(oNew2.getIndex(), undefined, "JIRA: CPOUI5ODATAV4-3627");
+		assert.deepEqual(oNew2.getObject(), {
+			"@$ui5.context.isSelected" : false,
+			"@$ui5.context.isTransient" : false,
+			"@$ui5.node.level" : 3,
+			ID : "12",
+			Name : "New2#1"
+		});
 
 		this.expectRequest(sUrlWithExpandLevelsCollapsed
 				+ "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,Name"
@@ -46147,13 +46171,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					DistanceFromRoot : "0",
 					DrillState : "collapsed",
 					ID : "1",
-					Name : "Alpha*"
+					Name : "Alpha#2"
 				}, {
 					DescendantCount : "0",
 					DistanceFromRoot : "0",
 					DrillState : "leaf",
 					ID : "3",
-					Name : "Gamma*"
+					Name : "Gamma#2"
 				}]
 			})
 			.expectRequest(sUrlWithExpandLevelsCollapsed
@@ -46171,14 +46195,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				+ "?$apply=descendants($root/EMPLOYEES,OrgChart,ID,filter(ID eq '1'),1)"
 				+ "&$select=ID,Name&$filter=ID eq '11'&$top=1", {
 				value : [
-					{ID : "11", Name : "New1*"}
+					{ID : "11", Name : "New1#2"}
 				]
 			})
 			.expectRequest("EMPLOYEES"
 				+ "?$apply=descendants($root/EMPLOYEES,OrgChart,ID,filter(ID eq '11'),1)"
 				+ "&$select=ID,Name&$filter=ID eq '12'&$top=1", {
 				value : [
-					{ID : "12", Name : "New2*"}
+					{ID : "12", Name : "New2#2"}
 				]
 			});
 
@@ -46192,11 +46216,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"/EMPLOYEES('1')",
 			"/EMPLOYEES('3')"
 		], [
-			[false, 1, "Alpha*"],
-			[undefined, 1, "Gamma*"]
+			[false, 1, "Alpha#2"],
+			[undefined, 1, "Gamma#2"]
 		]);
 
-		expectSideEffectsRequests();
+		expectSideEffectsRequests(3);
 
 		await Promise.all([
 			// code under test
@@ -46211,14 +46235,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		assert.strictEqual(oNew1.getBinding().getAllCurrentContexts()[2], oNew2, "still the same");
 		assert.strictEqual(oNew2.getIndex(), 2);
 		assert.deepEqual(oNew2.getObject(), {
+			// "@$ui5.context.isSelected" : false,
 			"@$ui5.context.isTransient" : false,
 			"@$ui5.node.level" : 3,
 			// AGE : 42,
 			ID : "12",
-			Name : "New2*"
+			Name : "New2#3"
 		});
 
-		await checkAllContexts(7);
+		await checkAllContexts(7, 3);
 	});
 
 	//*********************************************************************************************
