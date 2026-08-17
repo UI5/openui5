@@ -130,15 +130,6 @@ sap.ui.define([
 				texts: {
 					type: "object",
 					defaultValue: {}
-				},
-				/**
-				 * Runtime-only flag set to <code>true</code> when the fileName/id was
-				 * auto-generated at creation time because none was provided.
-				 * Never persisted (intentionally absent from getMappingInfo).
-				 */
-				fileNameWasGenerated: {
-					type: "boolean",
-					defaultValue: false
 				}
 			}
 		},
