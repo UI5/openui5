@@ -102,14 +102,12 @@ sap.ui.define([
 		/**
 		 * Date selection. Available only for Calendar cards.
 		 * @public
-		 * @ui5-experimental-since 1.87
 		 */
 		DateChange: "DateChange",
 
 		/**
 		 * Month selection. Available only for Calendar cards.
 		 * @public
-		 * @ui5-experimental-since 1.87
 		 */
 		MonthChange: "MonthChange",
 
