@@ -96,7 +96,13 @@
 			 oRm.attr("href", sHref);
 	 }
 
-	 oAccAttributes.describedby = sTypeSemanticInfo ? {value: sTypeSemanticInfo.trim(), append: true} : undefined;
+	 var sTooltip = oControl.getTooltip_AsString();
+	 var sDescr = sTypeSemanticInfo ? sTypeSemanticInfo.trim() : "";
+	 var sTooltipSpanId = sDescr && sTooltip ? oControl.getId() + "-tooltip" : "";
+	 if (sTooltipSpanId) {
+		 sDescr += " " + sTooltipSpanId;
+	 }
+	 oAccAttributes.describedby = sDescr ? {value: sDescr, append: true} : undefined;
 
 	 if (!bEnabled) {
 		 oRm.class("sapMLnkDsbl");
@@ -112,8 +118,8 @@
 		 oRm.class("sapMLinkContainsEmptyIdicator");
 	 }
 
-	 if (oControl.getTooltip_AsString()) {
-		 oRm.attr("title", oControl.getTooltip_AsString());
+	 if (sTooltip) {
+		 oRm.attr("title", sTooltip);
 	 }
 
 	 if (oControl.getTarget()) {
@@ -170,6 +176,14 @@
 	 // Render end icon only if there is text
 	 if (sText && oControl.getEndIcon()) {
 		 oRm.renderControl(oControl._getEndIcon());
+	 }
+
+	 if (sTooltipSpanId) {
+		 oRm.openStart("span", sTooltipSpanId);
+		 oRm.class("sapUiInvisibleText");
+		 oRm.openEnd();
+		 oRm.text(sTooltip);
+		 oRm.close("span");
 	 }
 
 	 oRm.close("a");

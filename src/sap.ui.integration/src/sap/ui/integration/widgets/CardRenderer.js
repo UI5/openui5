@@ -49,6 +49,13 @@ sap.ui.define([
 
 			oRm.class("sapUiIntCard" + oCard.getDisplayVariant());
 
+			if (oCard.isTileDisplayVariant()) {
+				// Shared marker class for all tile variants, so styling can
+				// target tiles with a single class instead of listing every
+				// individual sapUiIntCardTile* variant.
+				oRm.class("sapUiIntCardTile");
+			}
+
 			this.renderCardAppId(oRm, oCard);
 
 			this.renderHelpId(oRm, oCard);

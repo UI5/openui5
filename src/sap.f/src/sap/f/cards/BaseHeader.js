@@ -5,6 +5,7 @@ sap.ui.define([
 	"sap/ui/core/Control",
 	"sap/ui/core/IntervalTrigger",
 	"sap/ui/core/Lib",
+	"sap/ui/core/ResizeHandler",
 	"sap/ui/core/format/DateFormat",
 	"sap/ui/core/date/UniversalDate",
 	"sap/ui/core/library",
@@ -18,6 +19,7 @@ sap.ui.define([
 	Control,
 	IntervalTrigger,
 	Library,
+	ResizeHandler,
 	DateFormat,
 	UniversalDate,
 	coreLibrary,
@@ -34,6 +36,8 @@ sap.ui.define([
 	 * @const int The refresh interval for dataTimestamp in ms.
 	 */
 	const DATA_TIMESTAMP_REFRESH_INTERVAL = 15000;
+
+	const XS_WIDTH_THRESHOLD = 180;
 
 	const oResourceBundle = Library.getResourceBundleFor("sap.f");
 
@@ -212,6 +216,11 @@ sap.ui.define([
 			this._oToolbarDelegate = null;
 		}
 
+		if (this._sXSWidthResizeHandlerId) {
+			ResizeHandler.deregister(this._sXSWidthResizeHandlerId);
+			this._sXSWidthResizeHandlerId = null;
+		}
+
 		this._oRb = null;
 	};
 
@@ -244,6 +253,56 @@ sap.ui.define([
 		this.getBannerLines()?.forEach((oText) => {
 			this._enhanceText(oText);
 		});
+
+		this._observeXSWidth();
+
+		// Apply the initial state to the DOM.
+		const oHeaderDomRef = this.getDomRef();
+		if (oHeaderDomRef) {
+			this._toggleXSHeaderClass(oHeaderDomRef.offsetWidth);
+		}
+	};
+
+	/**
+	 * Registers a {@link sap.ui.core.ResizeHandler} that toggles the
+	 * <code>sapFCardXSHeader</code> class on the header DOM when the header
+	 * becomes extra small (<= 180px, i.e. a 360px device at 200% zoom).
+	 *
+	 *
+	 * Note: CSS container queries would be the natural fit here, but they were
+	 * not available for use at the time of implementation, therefore
+	 * ResizeHandler is used instead. ResizeHandler already defers its callback,
+	 * so no manual <code>requestAnimationFrame</code> is needed.
+	 *
+	 * Tile-like cards are excluded in all their variants, as they are already
+	 * optimized for small sizes. The exclusion is done purely in CSS (the XS
+	 * rules are scoped to <code>:not(.sapUiIntCardTile)</code>), so the class is
+	 * always toggled here and tiles simply do not react to it. This avoids
+	 * relying on <code>isTile()</code> at render time, whose value could
+	 * otherwise become stale.
+	 *
+	 * @private
+	 */
+	BaseHeader.prototype._observeXSWidth = function () {
+		if (this._sXSWidthResizeHandlerId) {
+			return;
+		}
+
+		this._sXSWidthResizeHandlerId = ResizeHandler.register(this, (oEvent) => {
+			this._toggleXSHeaderClass(oEvent.size.width);
+		});
+	};
+
+	/**
+	 * Toggles the <code>sapFCardXSHeader</code> class on the header DOM based on
+	 * the given width. Tile-like cards are excluded in CSS (see the class
+	 * documentation of {@link sap.f.cards.BaseHeader#_observeXSWidth}).
+	 *
+	 * @param {float} fWidth The current header width in pixels.
+	 * @private
+	 */
+	BaseHeader.prototype._toggleXSHeaderClass = function (fWidth) {
+		this.getDomRef()?.classList.toggle("sapFCardXSHeader", fWidth <= XS_WIDTH_THRESHOLD);
 	};
 
 	BaseHeader.prototype.getFocusDomRef = function () {
