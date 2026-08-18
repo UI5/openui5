@@ -1423,6 +1423,18 @@ sap.ui.define([
 sap.ui.require([
 	"sap/ui/core/format/DateFormatTimezoneDisplay"
 ], function (DateFormatTimezoneDisplay) {
+
+	QUnit.module("DateFormatTimezones - Deprecated tests", {
+		beforeEach: function () {
+			this.sLanguage = Localization.getLanguage();
+			Localization.setLanguage("en_US");
+		},
+		afterEach: function () {
+			// Restore default locale
+			Localization.setLanguage(this.sLanguage);
+		}
+	});
+
 [{
 	formatOptions: {showTimezone: DateFormatTimezoneDisplay.Hide},
 	expected: {showDate: undefined, showTime: undefined, showTimezone: false}
