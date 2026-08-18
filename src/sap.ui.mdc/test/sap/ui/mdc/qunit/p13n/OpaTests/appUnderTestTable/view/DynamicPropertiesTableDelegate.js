@@ -11,6 +11,9 @@ sap.ui.define([
 				if (oProperty.key === "name" || oProperty.key === "foundingYear") {
 					oProperty.isActive = true;
 				}
+				if (oProperty.key === "breakupYear") {
+					oProperty.isActive = false;
+				}
 			});
 			return aProperties;
 		});

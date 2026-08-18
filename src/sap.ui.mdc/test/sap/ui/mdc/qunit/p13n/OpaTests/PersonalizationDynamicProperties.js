@@ -28,12 +28,23 @@ sap.ui.define([
 			Then.iShouldSeeButtonWithIcon(Arrangement.P13nDialog.Settings.Icon);
 		});
 
-		opaTestOrSkip("Table p13n dialog shows updated labels after property label change", function(Given, When, Then) {
+		opaTestOrSkip("Table p13n dialog shows updated label and does not show inactive property", function(Given, When, Then) {
 			When.iApplyPropertyAttributeChanges(sTableID, {name: {label: "New Name"}});
 
 			When.iPressOnButtonWithIcon(Arrangement.P13nDialog.Settings.Icon);
 			Then.thePersonalizationDialogOpens();
 			Then.iShouldSeeP13nItem("New Name", 0, true);
+			Then.iShouldNotSeeP13nItem("Breakout Year");
+
+			When.iPressDialogOk();
+		});
+
+		opaTestOrSkip("Activated property is added to Table p13n dialog", function(Given, When, Then) {
+			When.iApplyPropertyAttributeChanges(sTableID, {breakupYear: {isActive: true}});
+
+			When.iPressOnButtonWithIcon(Arrangement.P13nDialog.Settings.Icon);
+			Then.thePersonalizationDialogOpens();
+			Then.iShouldSeeP13nItem("Breakout Year", 5, false);
 
 			When.iPressDialogOk();
 		});
@@ -43,19 +54,7 @@ sap.ui.define([
 
 			When.iPressOnButtonWithIcon(Arrangement.P13nDialog.Settings.Icon);
 			Then.thePersonalizationDialogOpens();
-
-			Then.waitFor({
-				searchOpenDialogs: true,
-				controlType: "sap.m.Label",
-				check: function(aLabels) {
-					return !aLabels.some(function(oLabel) {
-						return oLabel.getText() === "Founding Year";
-					});
-				},
-				success: function() {
-					Opa5.assert.ok(true, "Deactivated property 'Founding Year' is not visible in the dialog");
-				}
-			});
+			Then.iShouldNotSeeP13nItem("Founding Year");
 
 			When.iPressDialogOk();
 		});
@@ -70,7 +69,7 @@ sap.ui.define([
 			When.iPressDialogOk();
 		});
 
-		opaTestOrSkip("FilterBar adapt filters dialog shows updated label", function(Given, When, Then) {
+		opaTestOrSkip("FilterBar adapt filters dialog shows updated label and does not show inactive property", function(Given, When, Then) {
 			When.iApplyPropertyAttributeChanges(sFilterBarID, {name: {label: "New FB Name"}});
 
 			When.iPressButtonWithText(Arrangement.P13nDialog.AdaptFilter.button);
@@ -79,6 +78,17 @@ sap.ui.define([
 				{p13nItem: "New FB Name", selected: true},
 				{p13nItem: "Founding Year", selected: true}
 			]);
+			Then.iShouldNotSeeP13nItem("Breakout Year");
+
+			When.iPressDialogOk();
+		});
+
+		opaTestOrSkip("Activated property is added to FilterBar p13n dialog", function(Given, When, Then) {
+			When.iApplyPropertyAttributeChanges(sFilterBarID, {breakupYear: {isActive: true}});
+
+			When.iPressButtonWithText(Arrangement.P13nDialog.AdaptFilter.button);
+			Then.thePersonalizationDialogOpens();
+			Then.iShouldSeeListFilterItem("Breakout Year");
 
 			When.iPressDialogOk();
 		});
@@ -92,6 +102,7 @@ sap.ui.define([
 				{p13nItem: "New FB Name", selected: true},
 				{p13nItem: "Founding Year", selected: false}
 			]);
+			Then.iShouldNotSeeListFilterItem("Founding Year");
 
 			When.iPressDialogOk();
 		});
