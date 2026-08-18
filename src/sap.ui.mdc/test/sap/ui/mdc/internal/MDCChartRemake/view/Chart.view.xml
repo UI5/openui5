@@ -784,21 +784,19 @@
 						</mdc:items>
 					</mdc:Chart>
 
-					<!-- TimeSeries fix: Edm.DateTimeOffset auto-detected as TimeDimension via getPropertyAttribute.
-					     Generated minute-level data to demonstrate the fix. -->
 					<mdc:Chart id="bookChart-timeseries" autoBindOnInit="true" noDataText="No data"
 						p13nMode="Item,Sort,Type"
-						delegate='\{"name": "sap/ui/v4demo/delegate/BidHistory.delegate", "payload": \{\}\}'
+						delegate='\{"name": "delegates/odata/v4/vizChart/ChartDelegate", "payload": \{"collectionName": "Books"\}\}'
 						chartType="timeseries_line"
-						header="Bid History — Edm.DateTimeOffset auto-detected as TimeDimension"
+						header="Books created over time (Edm.DateTimeOffset — auto TimeDimension)"
 						height="400px" width="100%"
 						propertyInfo='[\{
-							"key": "ts",
-							"label": "Submission Time",
+							"key": "createdAt",
+							"label": "Created On",
 							"groupable": true,
 							"aggregatable": false,
-							"sortable": false,
-							"filterable": false,
+							"sortable": true,
+							"filterable": true,
 							"maxConditions": -1,
 							"role": "category",
 							"visible": true,
@@ -807,27 +805,14 @@
 							"caseSensitive": true,
 							"dataType": "Edm.DateTimeOffset"
 						\},\{
-							"key": "supplier",
-							"label": "Supplier — Item",
-							"groupable": true,
-							"aggregatable": false,
-							"sortable": false,
-							"filterable": false,
-							"maxConditions": -1,
-							"role": "series",
-							"visible": true,
-							"group": "",
-							"groupLabel": "",
-							"caseSensitive": true,
-							"dataType": "Edm.String"
-						\},\{
-							"key": "price",
-							"label": "Price",
+							"key": "averagemetricsWords",
+							"path": "metricsWords",
+							"label": "Words (average)",
 							"groupable": false,
 							"aggregatable": true,
 							"aggregationMethod": "average",
-							"sortable": false,
-							"filterable": false,
+							"sortable": true,
+							"filterable": true,
 							"maxConditions": -1,
 							"role": "axis1",
 							"datapoint": null,
@@ -835,12 +820,11 @@
 							"group": "",
 							"groupLabel": "",
 							"caseSensitive": true,
-							"dataType": "Edm.Decimal"
+							"dataType": "Edm.Int32"
 						\}]'>
 						<mdc:items>
-							<mdcc:Item id="dim-ts" type="groupable" propertyKey="ts" role="category" label="Submission Time"/>
-							<mdcc:Item id="dim-supplier" type="groupable" propertyKey="supplier" role="series" label="Supplier — Item"/>
-							<mdcc:Item id="meas-price" type="aggregatable" propertyKey="price" role="axis1" label="Price"/>
+							<mdcc:Item id="dim-createdAt" type="groupable" propertyKey="createdAt" role="category" label="Created On"/>
+							<mdcc:Item id="meas-avgWords-ts" type="aggregatable" propertyKey="averagemetricsWords" role="axis1" label="Words (average)"/>
 						</mdc:items>
 					</mdc:Chart>
 				</VBox>
