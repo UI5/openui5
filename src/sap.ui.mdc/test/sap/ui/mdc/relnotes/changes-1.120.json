@@ -290,5 +290,15 @@
         "text": " ValueHelp: typeahed used value not mapping"
       }
     ]
+  },
+  "1.120.49": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "24f9d21c82628fe2dfb31e33cc86c88f465667df",
+        "type": "FIX",
+        "text": " GroupPanel, SortPanel: improve for small screens"
+      }
+    ]
   }
 }

@@ -1571,5 +1571,20 @@
         "text": " sap.m.Dialog: min-width 100% on narrow viewports"
       }
     ]
+  },
+  "1.120.49": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "b52fc49de0f46a2e0cc797c7943c7ba767a01e1f",
+        "type": "FIX",
+        "text": " Form: use sap.m.Title for rendering"
+      },
+      {
+        "id": "24f9d21c82628fe2dfb31e33cc86c88f465667df",
+        "type": "FIX",
+        "text": " GroupPanel, SortPanel: improve for small screens"
+      }
+    ]
   }
 }

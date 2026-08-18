@@ -192,5 +192,20 @@
         "text": " sap.m.Button: Press event is fired correctly on pressing SPACE"
       }
     ]
+  },
+  "1.120.49": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "861a0cefc6f6451f9302012763f3119331680ba7",
+        "type": "FIX",
+        "text": " sap.uxap.AnchorBar: fix Firefox-flaky resize test"
+      },
+      {
+        "id": "e30d314f1163485acacc26c8c35ec330fa4ab4a3",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: stabilize flaky ObjectPageState QUnit test"
+      }
+    ]
   }
 }
