@@ -274,7 +274,9 @@ sap.ui.define([
 		for (const sPredicate in aElements.$byPredicate) {
 			const oElement = aElements.$byPredicate[sPredicate];
 			strictEqual(oElement["@$ui5.context.isDeleted"] || aElements.includes(oElement)
-					|| isKeepAlive(_Helper.getPrivateAnnotation(oElement, "predicate", sPredicate)),
+					|| isKeepAlive(_Helper.getPrivateAnnotation(oElement, "predicate", sPredicate))
+					// Note: OOP may (but need not at all cost/times) be present in $byPredicate
+					|| _Helper.getPrivateAnnotation(oElement, "context")?.isOutOfPlace(),
 				true, `$byPredicate[${sPredicate}] in aElements`, oElement);
 			strictEqual(_Helper.getPrivateAnnotation(oElement, "predicate") === sPredicate
 					|| _Helper.getPrivateAnnotation(oElement, "transientPredicate") === sPredicate,
@@ -499,8 +501,8 @@ sap.ui.define([
 	 * @param {sap.m.Table|sap.ui.table.Table} oTable - A table
 	 * @param {string[]|sap.ui.model.odata.v4.Context[]|undefined} aExpectedPaths
 	 *   List of all expected (normalized) current context paths or the corresponding contexts;
-	 *   <code>undefined</code> means to ignore the list binding; boolean entries inside the array
-	 *   are skipped and may be used to define conditional entries easily
+	 *   <code>undefined</code> means to ignore the list binding; boolean or undefined entries
+	 *   inside the array are skipped and may be used to define conditional entries easily
 	 * @param {any[][]} [aExpectedContent]
 	 *   "Table" of expected cell contents (boolean: dito); empty entries of sparse arrays are
 	 *   handled as <code>undefined</code>
@@ -515,8 +517,9 @@ sap.ui.define([
 			aRows = oTable.getItems ? oTable.getItems() : oTable.getRows();
 
 		if (aExpectedPaths) {
-			aExpectedPaths
-				= aExpectedPaths.filter((vExpectedPath) => typeof vExpectedPath !== "boolean");
+			aExpectedPaths = aExpectedPaths.filter((vExpectedPath) => {
+				return vExpectedPath !== undefined && typeof vExpectedPath !== "boolean";
+			});
 			assert.strictEqual(oListBinding.isLengthFinal(), bLengthFinal, "length is final");
 			assert.strictEqual(oListBinding.getLength(), iExpectedLength || aExpectedPaths.length,
 				sTitle);
@@ -40758,11 +40761,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Selection must not make a difference (JIRA: CPOUI5ODATAV4-3605)
 	// Afterwards, deletion still works fine (JIRA: CPOUI5ODATAV4-3608)
 	// Add "Out_Child" to either "Out" or to "Alpha" (JIRA: CPOUI5ODATAV4-3621)
+	// Optionally, collapse OOP node's parent before side-effects refresh (JIRA: CPOUI5ODATAV4-3626)
 [undefined, true].forEach((bSelected) => {
 	[false, true].forEach((bParentChild) => {
-		const sTitle = "Recursive Hierarchy: DINC0921191, side-effects refresh w/ out-of-place node"
-			+ " outside the collection, selected = " + bSelected
-			+ ", parent&child OOP = " + bParentChild;
+		[false, true].forEach((bCollapse) => {
+			const sTitle = "Recursive Hierarchy: DINC0921191"
+				+ ", side-effects refresh w/ out-of-place node outside the collection"
+				+ ", selected = " + bSelected
+				+ ", parent&child OOP = " + bParentChild
+				+ ", collapse parent before side-effects refresh = " + bCollapse;
 
 	QUnit.test(sTitle, async function (assert) {
 		let sBaseUrl = "EMPLOYEES?$apply=ancestors($root/EMPLOYEES,OrgChart,ID"
@@ -40901,8 +40908,41 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		]);
 		// Note: do not request late property
 
-		sBaseUrl = sBaseUrl.slice(0, -1) + ",ExpandLevels="
-			+ JSON.stringify([{NodeID : bParentChild ? "Out" : "0", Levels : 1}]) + ")";
+		if (bCollapse) {
+			this.expectChange("isExpanded", bParentChild ? [false] : [, false]);
+
+			oOutChild.getParent().collapse();
+
+			assert.strictEqual(oOutChild.getIndex(), undefined, "JIRA: CPOUI5ODATAV4-3631");
+
+			await this.waitForChanges(assert, "collapse");
+
+			checkTable("after collapse", assert, oTable, [
+				oOut,
+				"/EMPLOYEES('0')",
+				"/EMPLOYEES('1')",
+				bSelected && oOutChild
+			], [
+				[bSelected, bParentChild ? false : undefined, 1, "Out"],
+				[undefined, bParentChild ? undefined : false, 1, "Alpha"],
+				[undefined, undefined, 1, "Beta"]
+			], 3);
+			checkSelected(assert, oOutChild, bSelected);
+			assert.strictEqual(oOutChild.getIndex(), undefined, "JIRA: CPOUI5ODATAV4-3631");
+			assert.strictEqual(oListBinding._getAllExistingContexts().includes(oOutChild),
+				!!bSelected, "effectively kept alive");
+			assert.deepEqual(oOutChild.getObject(), bSelected ? {
+				"@$ui5.context.isSelected" : true,
+				"@$ui5.context.isTransient" : false,
+				"@$ui5.node.level" : 2, // Note: outside the hierarchy, but level still known
+				ID : "Child",
+				Name : "Out_Child"
+			} : undefined);
+		} else {
+			sBaseUrl = sBaseUrl.slice(0, -1) + ",ExpandLevels="
+				+ JSON.stringify([{NodeID : bParentChild ? "Out" : "0", Levels : 1}]) + ")";
+		}
+
 		this.expectRequestIf(bSelected,
 				"#0 EMPLOYEES?$filter=ID eq 'Child' or ID eq 'Out'&$select=AGE,ID,Name&$top=2", {
 				value : [
@@ -40911,8 +40951,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				]
 			})
 			.expectRequest("#0 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2)
-			.expectRequest("#0 " + sBaseUrl
-				+ "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,Name"
+			.expectRequest("#0 " + sBaseUrl + "&$select="
+				+ (bCollapse ? "" : "DescendantCount,DistanceFromRoot,") + "DrillState,ID,Name"
 				+ "&$count=true&$skip=0&$top=4", {
 				"@odata.count" : "2",
 				value : [{
@@ -40930,11 +40970,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				}]
 			})
 			// rank of the out-of-place nodes; they are filtered out and thus have no rank
-			.expectRequest("#0 " + sBaseUrl
-				+ "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,LimitedRank"
+			.expectRequest("#0 " + sBaseUrl + "&$select=" + (bCollapse ? "" : "DescendantCount,")
+				+ "DistanceFromRoot,DrillState,ID,LimitedRank&$filter="
 				+ (bParentChild
-					? "&$filter=ID eq 'Child' or ID eq 'Out'&$top=2"
-					: "&$filter=ID eq '0' or ID eq 'Child' or ID eq 'Out'&$top=3"), {
+					? "ID eq 'Child' or ID eq 'Out'&$top=2"
+					: "ID eq '0' or ID eq 'Child' or ID eq 'Out'&$top=3"), {
 				value : bParentChild
 					? []
 					: [{
@@ -40968,21 +41008,22 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		// lost (SNOW: DINC0921191)
 		checkTable("after side-effects refresh", assert, oTable, [
 			oOut,
-			bParentChild && oOutChild,
+			bCollapse || bParentChild && oOutChild,
 			"/EMPLOYEES('0')",
-			bParentChild || oOutChild,
-			"/EMPLOYEES('1')"
+			bCollapse || bParentChild || oOutChild,
+			"/EMPLOYEES('1')",
+			bSelected && bCollapse && oOutChild
 		], [
-			[bSelected, bParentChild ? true : undefined, 1, "Out"],
-			bParentChild && [bSelected, undefined, 2, "Out_Child"],
-			[undefined, bParentChild ? undefined : true, 1, "Alpha"],
-			bParentChild || [bSelected, undefined, 2, "Out_Child"],
+			[bSelected, bParentChild ? !bCollapse : undefined, 1, "Out"],
+			bCollapse || bParentChild && [bSelected, undefined, 2, "Out_Child"],
+			[undefined, bParentChild ? undefined : !bCollapse, 1, "Alpha"],
+			bCollapse || bParentChild || [bSelected, undefined, 2, "Out_Child"],
 			[undefined, undefined, 1, "Beta"]
-		]);
+		], bCollapse ? 3 : 4);
 		assert.deepEqual(oOut.getObject(), {
 			...(bSelected && {"@$ui5.context.isSelected" : true}),
 			"@$ui5.context.isTransient" : false,
-			...(bParentChild && {"@$ui5.node.isExpanded" : true}),
+			...(bParentChild && {"@$ui5.node.isExpanded" : !bCollapse}),
 			"@$ui5.node.level" : 1,
 			...(bSelected && {AGE : 44}), // Note: w/o selection, late property is NOT requested!
 			ID : "Out",
@@ -40992,18 +41033,23 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		assert.deepEqual(oOutChild.getObject(), {
 			...(bSelected && {"@$ui5.context.isSelected" : true}),
 			"@$ui5.context.isTransient" : false,
-			"@$ui5.node.level" : 2,
+			...(bCollapse || {"@$ui5.node.level" : 2}), // Note: no level outside the hierarchy
 			...(bSelected && {AGE : 33}),
 			ID : "Child",
 			Name : "Out_Child"
 		});
 		checkSelected(assert, oOutChild, bSelected);
+		if (bCollapse) {
+			assert.strictEqual(oOutChild.getIndex(), undefined, "JIRA: CPOUI5ODATAV4-3631");
+			assert.strictEqual(oListBinding._getAllExistingContexts().includes(oOutChild),
+				!!bSelected, "effectively kept alive");
+		}
 
 		if (!bParentChild) {
 			return;
 		}
 
-		oOutChild.setSelected(false); //TODO: shouldn't this happen automatically?
+		oOutChild.setSelected(false);
 
 		this.expectRequest("#0 DELETE EMPLOYEES('Out')")
 			.expectRequest("#0 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2)
@@ -41023,6 +41069,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[undefined, undefined, 1, "Beta"]
 		]);
 	});
+		});
 	});
 });
 
@@ -45938,7 +45985,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oGamma,
 			oBeta,
 			"/EMPLOYEES('1')",
-			!!bSelected && oDelta
+			bSelected && oDelta
 		], [
 			[false, 1, "3", "Gamma"],
 			[undefined, 1, "2", "Beta"],
@@ -46023,7 +46070,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oGamma,
 			oBeta,
 			"/EMPLOYEES('1')",
-			!!bSelected && oDelta
+			bSelected && oDelta
 		], [
 			[false, 1, "3", "Gamma*"],
 			[undefined, 1, "2", "Beta*"],

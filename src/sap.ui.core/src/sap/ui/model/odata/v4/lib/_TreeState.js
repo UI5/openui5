@@ -77,19 +77,21 @@ sap.ui.define([
 		 * that the node is collapsed.
 		 *
 		 * @param {object} oNode - The node
+		 * @param {function(string):void} [fnOnDelete]
+		 *   Callback for every predicate that is not OOP anymore, see {@link #deleteOutOfPlace}
 		 *
 		 * @public
 		 */
-		delete(oNode) {
+		delete(oNode, fnOnDelete) {
 			if (!this.sNodeProperty) {
 				return;
 			}
 
 			const sPredicate = _Helper.getPrivateAnnotation(oNode, "predicate");
 			delete this.mPredicate2ExpandInfo[sPredicate];
-			this.deleteOutOfPlace(sPredicate);
+			this.deleteOutOfPlace(sPredicate, false, fnOnDelete);
 			_Helper.getPrivateAnnotation(oNode, "spliced", []).forEach((oChild) => {
-				this.delete(oChild);
+				this.delete(oChild, fnOnDelete);
 			});
 		}
 
@@ -112,10 +114,12 @@ sap.ui.define([
 		 *
 		 * @param {string} sPredicate - The node's key predicate
 		 * @param {boolean} [bUpAndDown] - Whether to start from top-most out-of-place ancestor
+		 * @param {function(string):void} [fnOnDelete]
+		 *   Callback for every predicate that is not OOP anymore
 		 *
 		 * @public
 		 */
-		deleteOutOfPlace(sPredicate, bUpAndDown) {
+		deleteOutOfPlace(sPredicate, bUpAndDown, fnOnDelete) {
 			if (!this.isOutOfPlace(sPredicate)) {
 				return; // already in place
 			}
@@ -130,9 +134,10 @@ sap.ui.define([
 			}
 			this.mPredicate2OutOfPlace[sPredicate].context.setOutOfPlace(false);
 			delete this.mPredicate2OutOfPlace[sPredicate];
+			fnOnDelete?.(sPredicate);
 			Object.values(this.mPredicate2OutOfPlace).forEach((oOutOfPlace) => {
 				if (oOutOfPlace.parentPredicate === sPredicate) {
-					this.deleteOutOfPlace(oOutOfPlace.nodePredicate);
+					this.deleteOutOfPlace(oOutOfPlace.nodePredicate, false, fnOnDelete);
 				}
 			});
 		}
@@ -264,6 +269,19 @@ sap.ui.define([
 		 */
 		getOutOfPlacePredicates() {
 			return Object.keys(this.mPredicate2OutOfPlace);
+		}
+
+		/**
+		 * Tells whether the node with the given key predicate is currently known to be expanded.
+		 *
+		 * @param {string} sPredicate - The node's key predicate
+		 * @returns {boolean} Whether the node is (known to be) expanded
+		 *
+		 * @public
+		 */
+		isExpanded(sPredicate) {
+			const vLevels = this.mPredicate2ExpandInfo[sPredicate]?.levels;
+			return vLevels > 0 || vLevels === null;
 		}
 
 		/**
