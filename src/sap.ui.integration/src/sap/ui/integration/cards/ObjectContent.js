@@ -467,7 +467,7 @@ sap.ui.define([
 			oLabel = new Label({
 				text: vLabel,
 				visible: vVisible,
-				wrapping: oItem.labelWrapping,
+				wrapping: (oItem.labelWrapping === undefined) ? true : oItem.labelWrapping,
 				showColon: oItem.showColon
 			}).addStyleClass("sapFCardObjectItemLabel");
 

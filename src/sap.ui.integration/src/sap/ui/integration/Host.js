@@ -82,7 +82,7 @@ sap.ui.define([
 					 * When an action is triggered in the card it can be handled on several places by "action" event handlers. In consecutive order those places are: <code>Extension</code>, <code>Card</code>, <code>Host</code>.
 					 * Each of them can prevent the next one to handle the action by calling <code>oEvent.preventDefault()</code>.
 					 *
-					 * @ui5-experimental-since 1.75
+					 * @since 1.75
 					 */
 					action: {
 
@@ -165,7 +165,8 @@ sap.ui.define([
 					/**
 					 * Fired when the state of a card is changed.
 					 * For example - the card is ready, new page is selected inside the card, a filter is changed or data is refreshed.
-					 * @ui5-experimental-since 1.107
+					 * @protected
+					 * @since 1.107
 					 */
 					cardStateChanged: {
 						parameters: {
@@ -179,7 +180,7 @@ sap.ui.define([
 					/**
 					 * Fired when the card is initially ready for the first time.
 					 * Will not be fired for consecutive refreshes or data changes.
-					 * @ui5-experimental-since 1.116
+					 * @since 1.116
 					 */
 					cardInitialized: {
 						parameters: {
@@ -342,7 +343,7 @@ sap.ui.define([
 		 *
 		 * @param {string} sPath The path to a context
 		 * @returns {Promise<null>} A promise which resolves with the value of this context.
-		 * @ui5-experimental-since 1.143
+		 * @since 1.143
 		 * @abstract
 		 * @public
 		 */
@@ -388,7 +389,7 @@ sap.ui.define([
 		 * The context information and texts should be translated as they appear in the design-time UI of the Card Editor.
 		 *
 		 * @returns {Promise<object>} A promise which contains the context structure.
-		 * @ui5-experimental-since 1.143
+		 * @since 1.143
 		 * @abstract
 		 * @public
 		 */
@@ -455,7 +456,7 @@ sap.ui.define([
 		 * Use this method to override the default behavior when fetching network resources.
 		 * Mimics the browser native Fetch API.
 		 * @private
-		 * @ui5-restricted
+		 * @ui5-restricted Work Zone
 		 * @since 1.113
 		 * @param {string} sResource This defines the resource that you wish to fetch.
 		 * @param {object} mOptions An object containing any custom settings that you want to apply to the request.
@@ -478,10 +479,13 @@ sap.ui.define([
 		/**
 		 * Override this method to change the source for the analytics cloud widget script.
 		 * @private
-		 * @ui5-restricted
+		 * @ui5-restricted Joule
 		 * @since 1.125
+		 * @returns {string|undefined} The source for the analytics cloud widget script, or <code>undefined</code> to use the default.
 		 */
-		Host.prototype.getAnalyticsCloudWidgetSrc = function () { };
+		Host.prototype.getAnalyticsCloudWidgetSrc = function () {
+			return undefined;
+		};
 
 		Host.prototype._addStatisticsParameter = function (sUrl) {
 			var oUrl = new URL(sUrl, window.location.href);

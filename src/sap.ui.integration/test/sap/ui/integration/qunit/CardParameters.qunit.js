@@ -175,6 +175,42 @@ sap.ui.define([
 		assert.strictEqual(oSetterProperties.city, "Sofia", "Parameter property is set correctly");
 	});
 
+	QUnit.test("getResolvedParameters before the manifest is ready", function (assert) {
+		// Arrange
+		var oLogSpy = sinon.spy(Log, "error");
+
+		// Act
+		var oResult = this.oCard.getResolvedParameters();
+
+		// Assert
+		assert.strictEqual(oResult, null, "getResolvedParameters returns null when the manifest is not ready.");
+		assert.ok(oLogSpy.calledWith("The manifest is not ready. Consider using the 'manifestReady' event.", "sap.ui.integration.widgets.Card"), "Error is logged when the manifest is not ready.");
+
+		// Clean
+		oLogSpy.restore();
+	});
+
+	QUnit.test("[Deprecated] getCombinedParameters delegates to getResolvedParameters", async function (assert) {
+		// Arrange
+		this.oCard.setManifest(oManifest_DefaultParameters);
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		var oResolvedSpy = sinon.spy(this.oCard, "getResolvedParameters");
+
+		// Act
+		var oCombined = this.oCard.getCombinedParameters();
+
+		// Assert
+		assert.ok(oResolvedSpy.calledOnce, "getCombinedParameters delegates to getResolvedParameters.");
+		assert.strictEqual(oCombined.city, "Vratza", "The deprecated method returns the resolved parameters.");
+		assert.strictEqual(oCombined.country, "Bulgaria", "The deprecated method returns the resolved parameters.");
+
+		// Clean
+		oResolvedSpy.restore();
+	});
+
 	QUnit.test("Default Parameters - In manifest only parameters", async function (assert) {
 		// Act
 		this.oCard.setManifest(oManifest_DefaultParameters);
@@ -208,7 +244,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		var oListItems = this.oCard.getCardContent()._getList().getItems(),
-			oParameters = this.oCard.getCombinedParameters();
+			oParameters = this.oCard.getResolvedParameters();
 
 		// Assert
 		assert.ok(oListItems[0].getDescription().indexOf("Sofia") > -1, "Card parameter 'city' should be replaced in rendered html  with 'Sofia'");
@@ -235,7 +271,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		var oListItems = this.oCard.getCardContent()._getList().getItems(),
-			oParameters = this.oCard.getCombinedParameters();
+			oParameters = this.oCard.getResolvedParameters();
 
 		// Assert
 		assert.ok(oListItems[0].getDescription().indexOf("Waldorf") > -1, "Card parameter 'city' should be replaced in rendered html with 'Waldorf'");
@@ -320,6 +356,29 @@ sap.ui.define([
 		// Assert
 		var oListItems = this.oCard.getCardContent()._getList().getItems();
 		assert.ok(oListItems[0].getDescription().indexOf("Tokyo") > -1, "Card parameter 'city' should be replaced in rendered html with 'Tokyo'");
+	});
+
+	QUnit.test("setParameter merges with existing parameters and returns the card", function (assert) {
+		// Arrange
+		this.oCard.setParameters({ "city": "Sofia", "country": "Bulgaria" });
+
+		// Act
+		var oResult = this.oCard.setParameter("city", "Tokyo");
+
+		// Assert
+		assert.strictEqual(oResult, this.oCard, "setParameter returns the card instance to allow method chaining");
+		assert.deepEqual(this.oCard.getParameters(), { "city": "Tokyo", "country": "Bulgaria" }, "Existing parameter is overwritten while other parameters are kept untouched");
+	});
+
+	QUnit.test("setParameter adds a parameter when 'parameters' property is not set", function (assert) {
+		// Arrange - 'parameters' property defaults to null
+		assert.strictEqual(this.oCard.getParameters(), null, "Precondition: 'parameters' property is null");
+
+		// Act
+		this.oCard.setParameter("city", "Tokyo");
+
+		// Assert
+		assert.deepEqual(this.oCard.getParameters(), { "city": "Tokyo" }, "Parameter is added even when 'parameters' was not previously set");
 	});
 
 	QUnit.test("Allow visibility change based on a parameter of type array", async function (assert) {

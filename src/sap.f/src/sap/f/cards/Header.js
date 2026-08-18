@@ -71,7 +71,7 @@ sap.ui.define([
 
 				/**
 				 * Limits the number of lines for the title.
-				 * @ui5-experimental-since 1.101
+				 * @since 1.101
 				 */
 				titleMaxLines: { type: "int", defaultValue: 3 },
 
@@ -82,7 +82,7 @@ sap.ui.define([
 
 				/**
 				 * Limits the number of lines for the subtitle.
-				 * @ui5-experimental-since 1.101
+				 * @since 1.101
 				 */
 				subtitleMaxLines: { type: "int", defaultValue: 2 },
 
@@ -109,28 +109,30 @@ sap.ui.define([
 				/**
 				 * Defines an alt text for the avatar or icon.
 				 *
-				 * @ui5-experimental-since 1.81
+				 * @since 1.81
 				 */
 				iconAlt: { type: "string", defaultValue: "" },
 
 				/**
 				 * Defines a background color for the avatar or icon.
 				 *
-				 * @ui5-experimental-since 1.83
+				 * @since 1.83
 				 */
 				iconBackgroundColor: { type: "sap.m.AvatarColor", defaultValue: AvatarColor.Transparent },
 
 				/**
 				 * Defines whether the card icon is visible.
 				 *
-				 * @ui5-experimental-since 1.83
+				 * @private
+				 * @ui5-restricted sap.ui.integration
+				 * @since 1.83
 				 */
 				iconVisible: { type: "boolean", defaultValue: true },
 
 				/**
 				 * Defines the size of the icon.
 				 *
-				 * @ui5-experimental-since 1.119
+				 * @since 1.119
 				 */
 				iconSize: { type: "sap.m.AvatarSize", defaultValue: AvatarSize.S },
 

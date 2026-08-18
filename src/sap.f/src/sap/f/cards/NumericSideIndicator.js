@@ -55,7 +55,7 @@ sap.ui.define([
 
 				/**
 				 * The semantic color which represents the state of the side indicator.
-				 * @ui5-experimental-since 1.95
+				 * @since 1.95
 				 */
 				state: { "type": "sap.m.ValueColor", group: "Appearance", defaultValue : "None" },
 

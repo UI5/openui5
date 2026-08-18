@@ -9,7 +9,7 @@ sap.ui.define([
 		onInit: function () {
 			var oComponent = this.getOwnerComponent(),
 				oCard = oComponent.card,
-				oParameters = oCard.getCombinedParameters(),
+				oParameters = oCard.getResolvedParameters(),
 				sCity = oParameters.city;
 			if (oCard.getPreviewMode() === CardPreviewMode.MockData) {
 				sCity = "MockData " + sCity;
