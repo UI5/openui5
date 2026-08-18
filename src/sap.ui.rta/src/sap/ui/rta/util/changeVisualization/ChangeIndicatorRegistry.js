@@ -76,6 +76,11 @@ sap.ui.define([
 			// can look up pending changes in O(1) without scanning the whole catalog.
 			this._oSelectorIndex = {};
 
+			// Forward index: changeId → Set<elementId> — the element ids a change was indexed under
+			// in _oSelectorIndex. Lets removeRegisteredChange clean up in O(k) without scanning
+			// every entry. Kept in sync by _addToSelectorIndex.
+			this._oSelectorIndexByChange = {};
+
 			// Reverse index: elementId → Set<changeId> for both display and affected element ids.
 			// Maintained by resolveVisualizationInfo / invalidateResolution so that
 			// hasChangesForElement is O(k) where k is the number of changes on that element.
@@ -125,9 +130,22 @@ sap.ui.define([
 		// Update reverse selector index so _onElementOverlayCreated can find this change by element ID.
 		const oSelector = oChange.getOriginalSelector?.() || oChange.getSelector?.();
 		if (oSelector?.id) {
-			this._oSelectorIndex[oSelector.id] ||= new Set();
-			this._oSelectorIndex[oSelector.id].add(oChange.getId());
+			this._addToSelectorIndex(oSelector.id, oChange.getId());
 		}
+	};
+
+	/**
+	 * Adds a change id to the reverse selector index Set for an element id. Shared by catalog
+	 * registration and the provisional-resolution path so both index changes the same way.
+	 *
+	 * @param {string} sElementId - The element ID to index under
+	 * @param {string} sChangeId - The change ID to add
+	 */
+	ChangeIndicatorRegistry.prototype._addToSelectorIndex = function(sElementId, sChangeId) {
+		this._oSelectorIndex[sElementId] ||= new Set();
+		this._oSelectorIndex[sElementId].add(sChangeId);
+		this._oSelectorIndexByChange[sChangeId] ||= new Set();
+		this._oSelectorIndexByChange[sChangeId].add(sElementId);
 	};
 
 	/**
@@ -203,8 +221,19 @@ sap.ui.define([
 		const sCommandName = oCatalogEntry.commandName;
 
 		const mChangeVisualizationInfo = await getVisualizationInfo(oChange, oAppComponent);
-		if (!mChangeVisualizationInfo || mChangeVisualizationInfo.displayElementIds.length === 0) {
-			// Control not yet in the tree — leave cache empty so the next overlay creation retries.
+		if (
+			!mChangeVisualizationInfo
+			|| mChangeVisualizationInfo.displayElementIds.length === 0
+			|| mChangeVisualizationInfo.provisional
+		) {
+			// Not resolvable to a final target yet: the control is absent (empty displayElementIds)
+			// or the change is not applied yet (provisional). Leave the cache empty and index the
+			// change under its intended target ids so _onElementOverlayCreated re-resolves it once
+			// that control's overlay appears — otherwise a lazily-rendered add-field change would be
+			// cached against its container and never corrected.
+			(mChangeVisualizationInfo?.localIdsOfMissingControls || []).forEach((sId) => {
+				this._addToSelectorIndex(sId, sChangeId);
+			});
 			return undefined;
 		}
 
@@ -413,6 +442,7 @@ sap.ui.define([
 		this._oChangeCatalog = {};
 		this._oResolutionCache = {};
 		this._oSelectorIndex = {};
+		this._oSelectorIndexByChange = {};
 		this._oElementIndex = {};
 	};
 
@@ -426,15 +456,19 @@ sap.ui.define([
 		if (oCatalogEntry) {
 			// Clean up display-element reverse index (must happen before the cache entry is deleted).
 			this.invalidateResolution(sChangeId);
-			// Clean up selector index
-			const oChange = oCatalogEntry.change;
-			const oSelector = oChange.getOriginalSelector?.() || oChange.getSelector?.();
-			if (oSelector?.id && this._oSelectorIndex[oSelector.id]) {
-				this._oSelectorIndex[oSelector.id].delete(sChangeId);
-				if (this._oSelectorIndex[oSelector.id].size === 0) {
-					delete this._oSelectorIndex[oSelector.id];
+			// A change may be indexed under its own selector and its intended display ids. The forward
+			// index tells us exactly which entries to touch, so we clean up in O(k) rather than
+			// scanning every entry.
+			(this._oSelectorIndexByChange[sChangeId] || new Set()).forEach((sElementId) => {
+				const oSet = this._oSelectorIndex[sElementId];
+				if (oSet) {
+					oSet.delete(sChangeId);
+					if (oSet.size === 0) {
+						delete this._oSelectorIndex[sElementId];
+					}
 				}
-			}
+			});
+			delete this._oSelectorIndexByChange[sChangeId];
 		}
 		delete this._oChangeCatalog[sChangeId];
 	};
@@ -455,7 +489,7 @@ sap.ui.define([
 	async function getVisualizationInfo(oChange, oAppComponent) {
 		function getSelectorIds(aSelectorList) {
 			if (!aSelectorList) {
-				return undefined;
+				return [];
 			}
 			return aSelectorList
 			.map((vSelector) => {
@@ -467,12 +501,28 @@ sap.ui.define([
 			.filter(Boolean);
 		}
 
+		// Local ids of the change's intended display targets, resolved from the selectors without a
+		// live-tree lookup so they are available even for controls not yet in the tree. Uses the
+		// stable local id (a selector's .id, or a plain id string) to match the key
+		// _onElementOverlayCreated looks up by — not the global control id from getId().
+		function getLocalIdsOfMissingControls(aSelectorList) {
+			if (!aSelectorList) {
+				return [];
+			}
+			return aSelectorList
+			.map((vSelector) => (typeof vSelector === "string" ? vSelector : vSelector?.id))
+			.filter(Boolean);
+		}
+
 		const oInfoFromChangeHandler = await getInfoFromChangeHandler(oAppComponent, oChange);
 		const mVisualizationInfo = oInfoFromChangeHandler || {};
 		const aChangeSelectors = oChange.getSelector?.() && [oChange.getSelector()];
 		const aAffectedElementSelectors = mVisualizationInfo.affectedControls || aChangeSelectors || [];
 		const oChangeOriginalSelector = oChange.getOriginalSelector?.();
 		const aDisplayElementSelectors = oChangeOriginalSelector ? aChangeSelectors : aAffectedElementSelectors;
+		const aIntendedDisplaySelectors = mVisualizationInfo.displayControls || aDisplayElementSelectors;
+
+		const bProvisional = !!mVisualizationInfo.notApplied;
 
 		// updateRequired: true means the display target can shift after other changes are applied
 		// (e.g. HideControl must find the first visible ancestor). Cache is invalidated via
@@ -482,9 +532,17 @@ sap.ui.define([
 			: false;
 
 		return {
-			affectedElementIds: getSelectorIds(aAffectedElementSelectors) || [],
-			dependentElementIds: getSelectorIds(mVisualizationInfo.dependentControls) || [],
-			displayElementIds: getSelectorIds(mVisualizationInfo.displayControls || getSelectorIds(aDisplayElementSelectors)) || [],
+			affectedElementIds: getSelectorIds(aAffectedElementSelectors),
+			dependentElementIds: getSelectorIds(mVisualizationInfo.dependentControls),
+			// Prefer the handler's explicit displayControls; otherwise fall back to the default
+			// display selectors. Resolve each list once — do NOT re-feed resolved ids through
+			// getSelectorIds, which would treat plain id strings as selectors and misresolve them.
+			displayElementIds: getSelectorIds(aIntendedDisplaySelectors),
+			// Local ids of the change's intended display targets, resolvable even for controls not yet
+			// in the tree, so a change can be indexed and re-resolved once its (e.g. not-yet-rendered)
+			// target control's overlay is created.
+			localIdsOfMissingControls: getLocalIdsOfMissingControls(aIntendedDisplaySelectors),
+			provisional: bProvisional,
 			updateRequired: bUpdateRequired,
 			descriptionPayload: mVisualizationInfo.descriptionPayload || {}
 		};
@@ -504,8 +562,11 @@ sap.ui.define([
 				modifier: JsControlTreeModifier,
 				layer: oChange.getLayer()
 			});
-			if (typeof oChangeHandler?.getChangeVisualizationInfo === "function" && oChange.isSuccessfullyApplied?.()) {
-				return oChangeHandler.getChangeVisualizationInfo(oChange, oAppComponent);
+			if (typeof oChangeHandler?.getChangeVisualizationInfo === "function") {
+				if (oChange.isSuccessfullyApplied?.()) {
+					return oChangeHandler.getChangeVisualizationInfo(oChange, oAppComponent);
+				}
+				return { notApplied: true };
 			}
 			return { noVisualizationInfo: true };
 		} catch (vErr) {

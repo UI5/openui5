@@ -306,6 +306,52 @@ sap.ui.define([
 			}.bind(this));
 		});
 
+		QUnit.test("_onElementOverlayCreated resolves an unresolved container change when a descendant overlay arrives", function(assert) {
+			const fnDone = assert.async();
+			// Change is registered against the container (VBox), but stays unresolved — mimicking an
+			// add-field change whose real target (a child) was not applied when the container's
+			// overlay was first created. The container overlay will not fire again, so resolution
+			// must be retried when the descendant (button1) overlay arrives.
+			prepareChanges([
+				createMockChange("containerChange", "addDelegateProperty", "container")
+			], {
+				getChangeVisualizationInfo(oChange) {
+					return { affectedControls: [oChange.getSelector()] };
+				}
+			});
+
+			this.oChangeVisualization.initialize().then(function() {
+				const oRegistry = this.oChangeVisualization._oChangeIndicatorRegistry;
+				oRegistry.invalidateResolution("containerChange");
+				assert.strictEqual(
+					oRegistry.getUnresolvedChangeIds().length, 1,
+					"then the container change is unresolved"
+				);
+
+				// A descendant overlay (button1) arrives — its own selector has no change, but its
+				// ancestor (container) does. The ancestor walk must pick it up.
+				const aPending = this.oChangeVisualization._collectPendingChangesFromAncestors(
+					Element.getElementById("button1"),
+					new Set(oRegistry.getUnresolvedChangeIds())
+				);
+				assert.deepEqual(
+					aPending, ["containerChange"],
+					"then the container change is found by walking up from the descendant element"
+				);
+
+				const oButtonOverlay = OverlayRegistry.getOverlay("button1");
+				this.oChangeVisualization._onElementOverlayCreated({ getParameter: () => oButtonOverlay });
+				return this.oChangeVisualization._resolveAndDecorate(aPending);
+			}.bind(this)).then(function() {
+				const oRegistry = this.oChangeVisualization._oChangeIndicatorRegistry;
+				assert.strictEqual(
+					oRegistry.getUnresolvedChangeIds().length, 0,
+					"then the container change is resolved after the descendant overlay arrives"
+				);
+				fnDone();
+			}.bind(this));
+		});
+
 		QUnit.test("_onElementOverlayCreated ignores an overlay whose element has no valid selector (unstable Id)", async function(assert) {
 			prepareChanges([
 				createMockChange("testChange1", "rename", "button1")
