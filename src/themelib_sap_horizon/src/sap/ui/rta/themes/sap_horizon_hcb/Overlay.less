@@ -3,8 +3,10 @@
 /* Horizon High Contrast Black theme   */
 /* =================================== */
 
-@_sap_ui_rta_Overlay_ResizeHandleColor: darken(@sapUiSuccessBorder, 25%); /* #4c994c */
-@_sap_ui_rta_Overlay_PlaceholderBackgroundColor: darken(@sapUiFieldPlaceholderTextColor, 30%); /* #4d4d4d */
+.sapUI5Scope {
+	--_sap_ui_rta_Overlay_ResizeHandleColor: ~'hsl(from var(--sapSuccessBorderColor) h s calc(l - 25))';
+	--_sap_ui_rta_Overlay_PlaceholderBackgroundColor: ~'hsl(from var(--sapField_PlaceholderTextColor) h s calc(l - 30))';
+}
 
 .sapUiRta {
 
@@ -13,7 +15,7 @@
 		> .sapUiDtOverlayChildren {
 
 			> .sapUiRtaOverlayPlaceholder {
-				background: @_sap_ui_rta_Overlay_PlaceholderBackgroundColor !important;
+				background: var(--_sap_ui_rta_Overlay_PlaceholderBackgroundColor) !important;
 
 				/* no "focus" border */
 				&:focus {
@@ -25,7 +27,7 @@
 
 				/* all descendants */
 				* {
-					background: @_sap_ui_rta_Overlay_PlaceholderBackgroundColor;
+					background: var(--_sap_ui_rta_Overlay_PlaceholderBackgroundColor);
 
 					/* no "focus" border */
 					&:focus {
@@ -42,5 +44,5 @@
 
 /* HCB: white full-screen border instead of green. */
 .sapUiRtaAdaptationBorder.sapUiRtaAdaptationBorderVisible {
-	border-color: var(--sapShell_BorderColor); /* #fff */
+	border-color: var(--sapShell_BorderColor);
 }
