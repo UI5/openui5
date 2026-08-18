@@ -395,6 +395,56 @@ sap.ui.define([
 		);
 	});
 
+	QUnit.test("onBeforeOpen switches to numeric input view when opened by clicking the input (phone)", async function(assert) {
+		// Simulate phone so the header toggle button (and its handler) exist
+		this.stub(Device.system, "phone").value(true);
+		this.stub(Device.system, "desktop").value(false);
+
+		// Open the picker so the clocks control and the toggle button are created
+		this.oTimePicker._openPicker();
+		this.clock.tick(500);
+		await nextUIUpdate(this.clock);
+
+		const oClocks = this.oTimePicker._getClocks();
+		assert.notOk(oClocks.getProperty("_onManualInput"), "clocks start in clock view");
+
+		// Simulate an open triggered by clicking the input field
+		this.oTimePicker._bOpenAsNumericInput = true;
+		const oTogglePressSpy = this.spy(this.oTimePicker, "_onToggleViewPress");
+		this.oTimePicker.onBeforeOpen();
+
+		assert.ok(oTogglePressSpy.calledOnce, "_onToggleViewPress is called to switch to the numeric input view");
+		assert.ok(oClocks.getProperty("_onManualInput"), "clocks are now in numeric input view");
+	});
+
+	QUnit.test("onBeforeOpen keeps the clock view when opened by clicking the icon", async function(assert) {
+		this.stub(Device.system, "phone").value(true);
+		this.stub(Device.system, "desktop").value(false);
+
+		this.oTimePicker._openPicker();
+		this.clock.tick(500);
+		await nextUIUpdate(this.clock);
+
+		// Icon open path leaves the numeric request flag down
+		this.oTimePicker._bOpenAsNumericInput = false;
+		const oTogglePressSpy = this.spy(this.oTimePicker, "_onToggleViewPress");
+		this.oTimePicker.onBeforeOpen();
+
+		assert.notOk(oTogglePressSpy.called, "_onToggleViewPress is not called");
+		assert.notOk(this.oTimePicker._getClocks().getProperty("_onManualInput"), "clocks stay in clock view");
+	});
+
+	QUnit.test("onAfterClose resets the numeric-open request flag", async function(assert) {
+		this.oTimePicker._openPicker();
+		this.clock.tick(500);
+		await nextUIUpdate(this.clock);
+
+		this.oTimePicker._bOpenAsNumericInput = true;
+		this.oTimePicker.onAfterClose();
+
+		assert.notOk(this.oTimePicker._bOpenAsNumericInput, "the numeric-open request flag is reset after close");
+	});
+
 	QUnit.module("Placeholder", {
 		beforeEach: async function () {
 			// SUT
