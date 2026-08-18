@@ -81,6 +81,7 @@ sap.ui.define([
 	let TimeDimension;
 	let Measure;
 	let VizTooltip;
+	let DateFormat;
 
 	//API to access state
 	ChartDelegate._getState = function(oChart) {
@@ -1306,11 +1307,14 @@ sap.ui.define([
 		let oDimension;
 		const sName = this.getInternalChartNameFromPropertyNameAndKind(oItem?.getPropertyKey() || oPropertyInfo.key, "groupable", oChart);
 
+		const oTextFormatter = this.getPropertyAttribute(oChart, oPropertyInfo, "textFormatter");
+		const fnTextFormatter = (typeof oTextFormatter === "function" ? oTextFormatter : null) || this.formatText.bind(oPropertyInfo);
+
 		let mSettings = {
 			name: sName,
 			role: oItem?.getRole() || oPropertyInfo.role,
 			label: oItem?.getLabel() || oPropertyInfo.label,
-			textFormatter: this.formatText.bind(oPropertyInfo)
+			textFormatter: fnTextFormatter
 		};
 
 		const timeUnitType = this.getPropertyAttribute(oChart, oPropertyInfo, "timeUnitType");
@@ -1384,6 +1388,20 @@ sap.ui.define([
 				const sDataType = oPropertyInfo.dataType;
 				if (sDataType === "Edm.DateTimeOffset" || sDataType === "sap.ui.model.odata.type.DateTimeOffset") {
 					return "Date";
+				}
+			}
+			if (sAttributeName === "textFormatter") {
+				const sDataType = oPropertyInfo.dataType;
+				const sTimezoneProperty = oPropertyInfo.textProperty;
+				if (sTimezoneProperty && (sDataType === "Edm.DateTimeOffset" || sDataType === "sap.ui.model.odata.type.DateTimeOffset")) {
+					const oDateTimeWithTimezoneFormat = DateFormat.getDateTimeWithTimezoneInstance();
+					return function(sTimestamp, sTimezone) {
+						if (!sTimestamp) {
+							return sTimestamp;
+						}
+						const oDate = new Date(sTimestamp);
+						return oDateTimeWithTimezoneFormat.format(oDate, sTimezone || undefined);
+					};
 				}
 			}
 			value = this.fetchConfigurationForVizchart(oChart, oPropertyInfo.key, sAttributeName);
@@ -1594,15 +1612,17 @@ sap.ui.define([
 				'sap/chart/data/Dimension',
 				'sap/chart/data/TimeDimension',
 				'sap/chart/data/Measure',
-				'sap/viz/ui5/controls/VizTooltip'
+				'sap/viz/ui5/controls/VizTooltip',
+				'sap/ui/core/format/DateFormat'
 			];
 
-			function onModulesLoadedSuccess(fnChart, fnDimension, fnTimeDimension, fnMeasure, fnVizTooltip) {
+			function onModulesLoadedSuccess(fnChart, fnDimension, fnTimeDimension, fnMeasure, fnVizTooltip, fnDateFormat) {
 				Chart = fnChart;
 				Dimension = fnDimension;
 				TimeDimension = fnTimeDimension;
 				Measure = fnMeasure;
 				VizTooltip = fnVizTooltip;
+				DateFormat = fnDateFormat;
 
 				resolve();
 			}

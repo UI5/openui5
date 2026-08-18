@@ -1,0 +1,233 @@
+<mvc:View
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:f="sap.f"
+	xmlns:w="sap.ui.integration.widgets"
+	controllerName="sap.f.cardsdemo.controller.ExtraSmallCards"
+	displayBlock="true">
+	<Page title="{i18n>appTitle}">
+		<subHeader>
+			<Toolbar>
+				<ToolbarSpacer />
+				<Title text="Extra Small Cards" />
+				<ToolbarSpacer />
+			</Toolbar>
+		</subHeader>
+
+		<MessageStrip
+			text="ACC-260: 200% Zoom — these cards demonstrate the extra small (XS) header layout applied when a card header is 180px wide or less (e.g. a 360px device at 200% zoom)."
+			type="Information"
+			showIcon="true"
+			class="sapUiSmallMargin" />
+
+		<Panel headerText="Normal Layout (360px - same device without zoom)">
+			<f:GridContainer>
+				<w:Card
+					id="normalCard1"
+					manifest="{manifests>/acc260Manifests/card1_avatarNoToolbar}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card
+					id="normalCard2"
+					manifest="{manifests>/acc260Manifests/card2_toolbarNoAvatar}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card
+					id="normalCard3"
+					manifest="{manifests>/acc260Manifests/card3_avatarAndToolbar}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+			</f:GridContainer>
+		</Panel>
+
+		<Panel headerText="XS Layout (180px - simulates 360px device at 200% zoom)">
+			<f:GridContainer>
+				<w:Card
+					id="xsCard1"
+					manifest="{manifests>/acc260Manifests/card1_avatarNoToolbar}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					width="180px"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="2" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card
+					id="xsCard2"
+					manifest="{manifests>/acc260Manifests/card2_toolbarNoAvatar}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					width="180px"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="2" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card
+					id="xsCard3"
+					manifest="{manifests>/acc260Manifests/card3_avatarAndToolbar}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					width="180px"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="2" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card
+					id="xsLongInfoSection"
+					manifest="{manifests>/acc260Manifests/cardLongInfoSection}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					width="180px"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="2" />
+					</w:layoutData>
+				</w:Card>
+			</f:GridContainer>
+		</Panel>
+
+		<Panel headerText="Various Card Types at Normal Width (zoom to see XS layout)">
+			<f:GridContainer>
+				<w:Card
+					id="normalLongInfoSection"
+					manifest="{manifests>/acc260Manifests/cardLongInfoSection}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card
+					id="normalNumericInfoSection"
+					manifest="{manifests>/acc260Manifests/numericHeaderInfoSection}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card
+					id="normalBulletChart"
+					manifest="{manifests>/acc260Manifests/bulletChartCard}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card
+					id="normalDefaultHeaderCard"
+					manifest="{manifests>/acc260Manifests/defaultHeaderCard}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card
+					id="normalActionStatusTimestamp"
+					manifest="{manifests>/kpiManifests/cardWithActionStatusAndTimestamp}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card
+					id="normal3Indicators"
+					manifest="{manifests>/acc260Manifests/card_3indicators}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card
+					id="normal4Indicators"
+					manifest="{manifests>/acc260Manifests/card_4indicators}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+			</f:GridContainer>
+		</Panel>
+
+		<Panel headerText="Various Card Types at XS (180px)">
+			<f:GridContainer>
+				<w:Card
+					id="xsNumericInfoSection"
+					manifest="{manifests>/acc260Manifests/numericHeaderInfoSection}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					width="180px"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="2" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card
+					id="xsBulletChart"
+					manifest="{manifests>/acc260Manifests/bulletChartCard}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					width="180px"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="2" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card
+					id="xsDefaultHeaderCard"
+					manifest="{manifests>/acc260Manifests/defaultHeaderCard}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					width="180px"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="2" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card
+					id="xsActionStatusTimestamp"
+					manifest="{manifests>/kpiManifests/cardWithActionStatusAndTimestamp}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					width="180px"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="2" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card
+					id="xs3Indicators"
+					manifest="{manifests>/acc260Manifests/card_3indicators}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					width="180px"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="2" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card
+					id="xs4Indicators"
+					manifest="{manifests>/acc260Manifests/card_4indicators}"
+					baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+					width="180px"
+					class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="2" />
+					</w:layoutData>
+				</w:Card>
+			</f:GridContainer>
+		</Panel>
+	</Page>
+</mvc:View>

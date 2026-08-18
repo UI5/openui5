@@ -380,6 +380,11 @@
 					"pattern": "destinations",
 					"name": "destinations",
 					"target": "destinations"
+				},
+				{
+					"pattern": "extraSmallCards",
+					"name": "extraSmallCards",
+					"target": "extraSmallCards"
 				}
 			],
 			"targets": {
@@ -685,6 +690,11 @@
 				"destinations": {
 					"id": "destinations",
 					"name": "Destinations",
+					"level": 1
+				},
+				"extraSmallCards": {
+					"id": "extraSmallCards",
+					"name": "ExtraSmallCards",
 					"level": 1
 				}
 			}

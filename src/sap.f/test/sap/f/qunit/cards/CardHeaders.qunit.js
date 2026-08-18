@@ -881,4 +881,139 @@ sap.ui.define([
 		// Clean up
 		oHeader.destroy();
 	});
+
+	QUnit.module("XS zoom layout (ACC-260)", {
+		beforeEach: function () {
+			this.createCard = function (oHeader, sWidth) {
+				this.oCard = new Card({
+					width: sWidth || "180px",
+					header: oHeader
+				});
+				this.oCard.placeAt(DOM_RENDER_LOCATION);
+				return this.oCard;
+			}.bind(this);
+
+			this.waitForXSClass = function (bExpected) {
+				const oHeaderDomRef = this.oCard.getCardHeader().getDomRef();
+				return new Promise((resolve) => {
+					let iAttempts = 0;
+					const fnCheck = function () {
+						if (oHeaderDomRef.classList.contains("sapFCardXSHeader") === bExpected || iAttempts++ > 30) {
+							resolve();
+							return;
+						}
+						requestAnimationFrame(fnCheck);
+					};
+					fnCheck();
+				});
+			}.bind(this);
+		},
+		afterEach: function () {
+			if (this.oCard) {
+				this.oCard.destroy();
+				this.oCard = null;
+			}
+		}
+	});
+
+	QUnit.test("Observer adds the sapFCardXSHeader class when the header is narrow", async function (assert) {
+		// Arrange
+		const oHeader = new CardNumericHeader({ title: "Title", number: "65" });
+		this.createCard(oHeader, "150px");
+
+		// Act
+		await nextUIUpdate();
+		await this.waitForXSClass(true);
+
+		// Assert
+		assert.ok(oHeader.getDomRef().classList.contains("sapFCardXSHeader"), "Header DOM has the sapFCardXSHeader class at <= 180px width");
+	});
+
+	QUnit.test("Observer does not add the sapFCardXSHeader class above the threshold", async function (assert) {
+		// Arrange
+		const oHeader = new CardNumericHeader({ title: "Title", number: "65" });
+		this.createCard(oHeader, "400px");
+
+		// Act
+		await nextUIUpdate();
+		await this.waitForXSClass(false);
+
+		// Assert
+		assert.notOk(oHeader.getDomRef().classList.contains("sapFCardXSHeader"), "Header DOM does not have the sapFCardXSHeader class above 180px width");
+	});
+
+	QUnit.test("The sapFCardXSHeader class is re-applied after a re-render", async function (assert) {
+		// Arrange
+		const oHeader = new CardNumericHeader({ title: "Title", number: "65" });
+		this.createCard(oHeader, "150px");
+
+		await nextUIUpdate();
+		await this.waitForXSClass(true);
+		assert.ok(oHeader.getDomRef().classList.contains("sapFCardXSHeader"), "XS class is present after the initial render");
+
+		// Act - force a re-render; the DOM node is recreated, but the
+		// ResizeHandler is only registered once, so onAfterRendering must
+		// re-apply the class to the fresh DOM.
+		oHeader.invalidate();
+		await nextUIUpdate();
+		await this.waitForXSClass(true);
+
+		// Assert
+		assert.ok(oHeader.getDomRef().classList.contains("sapFCardXSHeader"), "XS class is still present after a re-render");
+	});
+
+	QUnit.test("C: Side indicators use a two-column grid at XS width", async function (assert) {
+		// Arrange
+		const oHeader = new CardNumericHeader({
+			title: "Title",
+			number: "65",
+			sideIndicators: [
+				new CardNumericSideIndicator({ title: "Target", number: "100" }),
+				new CardNumericSideIndicator({ title: "Deviation", number: "34" }),
+				new CardNumericSideIndicator({ title: "Forecast", number: "620" })
+			]
+		});
+		this.createCard(oHeader);
+
+		// Act
+		await nextUIUpdate();
+		await this.waitForXSClass(true);
+
+		// Assert
+		const oNumericIndicators = oHeader._getNumericIndicators().getDomRef();
+		const oSide = oNumericIndicators.querySelector(".sapFCardNumericIndicatorsSide");
+		const oIndicatorsStyle = window.getComputedStyle(oNumericIndicators);
+		const oSideStyle = window.getComputedStyle(oSide);
+
+		assert.strictEqual(oIndicatorsStyle.flexDirection, "column", "Indicators stack the value above the side indicators");
+		assert.strictEqual(oSideStyle.display, "grid", "Side indicators are laid out in a grid");
+		assert.strictEqual(oSideStyle.gridTemplateColumns.split(" ").length, 2, "Grid has two columns");
+	});
+
+	QUnit.test("C: Side indicators are not clipped horizontally at XS width", async function (assert) {
+		// Arrange
+		const oHeader = new CardNumericHeader({
+			title: "Title",
+			number: "65",
+			sideIndicators: [
+				new CardNumericSideIndicator({ title: "Target", number: "100" }),
+				new CardNumericSideIndicator({ title: "Deviation", number: "34" }),
+				new CardNumericSideIndicator({ title: "Forecast", number: "620" }),
+				new CardNumericSideIndicator({ title: "Risk", number: "12" })
+			]
+		});
+		this.createCard(oHeader);
+
+		// Act
+		await nextUIUpdate();
+		await this.waitForXSClass(true);
+
+		// Assert
+		const oCardRect = this.oCard.getDomRef().getBoundingClientRect();
+		oHeader.getSideIndicators().forEach((oIndicator) => {
+			const oRect = oIndicator.getDomRef().getBoundingClientRect();
+			assert.ok(oRect.right <= oCardRect.right + 1, "Side indicator '" + oIndicator.getTitle() + "' does not overflow the right edge");
+			assert.ok(oRect.left >= oCardRect.left - 1, "Side indicator '" + oIndicator.getTitle() + "' does not overflow the left edge");
+		});
+	});
 });

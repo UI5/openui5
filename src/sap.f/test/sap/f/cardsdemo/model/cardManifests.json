@@ -5068,5 +5068,678 @@
 				}
 			}
 		}
+	},
+	"acc260Manifests": {
+		"card1_avatarNoToolbar": {
+			"sap.app": { "id": "acc260.card1", "type": "card" },
+			"sap.card": {
+				"type": "Object",
+				"header": {
+					"type": "Numeric",
+					"data": {
+						"json": {
+							"number": "65.5",
+							"unit": "MM",
+							"trend": "Down",
+							"state": "Good"
+						}
+					},
+					"title": "Lorem ipsum dolor sit amet, consetetur sadipscing",
+					"subtitle": "Lorem ipsum dolor sit amet, consetetur",
+					"icon": { "src": "./images/Woman_avatar_01.png" },
+					"mainIndicator": {
+						"number": "{number}",
+						"unit": "{unit}",
+						"trend": "{trend}",
+						"state": "{state}"
+					},
+					"details": "Total Value",
+					"sideIndicators": [
+						{ "title": "Indicator 1", "number": "500", "unit": "K" },
+						{ "title": "Indicator 2", "number": "500", "unit": "K" }
+					],
+					"infoSection": {
+						"rows": [
+							{
+								"items": [
+									{
+										"type": "Status",
+										"value": "Information",
+										"state": "Information",
+										"inverted": true,
+										"showStateIcon": true
+									}
+								]
+							}
+						]
+					},
+					"chart": {
+						"type": "Bullet",
+						"minValue": 0,
+						"maxValue": 100,
+						"target": 80.5,
+						"value": 75.5,
+						"scale": "M",
+						"displayValue": "80.5M",
+						"color": "Good"
+					}
+				},
+				"footer": {
+					"actionsStrip": [
+						{
+							"text": "Button",
+							"actions": [{ "type": "Navigation", "parameters": { "url": "#" } }]
+						}
+					]
+				}
+			}
+		},
+		"card2_toolbarNoAvatar": {
+			"sap.app": { "id": "acc260.card2", "type": "card" },
+			"sap.card": {
+				"type": "Object",
+				"header": {
+					"type": "Numeric",
+					"data": {
+						"json": {
+							"number": "65.5",
+							"unit": "MM",
+							"trend": "Down",
+							"state": "Good"
+						}
+					},
+					"title": "Lorem ipsum dolor sit amet, consetetur sadipscing",
+					"subtitle": "Lorem ipsum dolor sit amet, consetetur",
+					"status": { "text": "6 of 12" },
+					"dataTimestamp": "{parameters>/NOW_ISO}",
+					"mainIndicator": {
+						"number": "{number}",
+						"unit": "{unit}",
+						"trend": "{trend}",
+						"state": "{state}"
+					},
+					"details": "Total Value",
+					"sideIndicators": [
+						{ "title": "Indicator 1", "number": "500", "unit": "K" },
+						{ "title": "Indicator 2", "number": "500", "unit": "K" }
+					],
+					"infoSection": {
+						"rows": [
+							{
+								"items": [
+									{
+										"type": "Status",
+										"value": "Information",
+										"state": "Information",
+										"inverted": true,
+										"showStateIcon": true
+									}
+								]
+							}
+						]
+					},
+					"chart": {
+						"type": "Bullet",
+						"minValue": 0,
+						"maxValue": 100,
+						"target": 80.5,
+						"value": 75.5,
+						"scale": "M",
+						"displayValue": "80.5M",
+						"color": "Good"
+					}
+				},
+				"footer": {
+					"actionsStrip": [
+						{
+							"text": "Button",
+							"actions": [{ "type": "Navigation", "parameters": { "url": "#" } }]
+						}
+					]
+				}
+			}
+		},
+		"card3_avatarAndToolbar": {
+			"sap.app": { "id": "acc260.card3", "type": "card" },
+			"sap.card": {
+				"type": "Object",
+				"header": {
+					"type": "Numeric",
+					"data": {
+						"json": {
+							"number": "65.5",
+							"unit": "MM",
+							"trend": "Down",
+							"state": "Good"
+						}
+					},
+					"title": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam",
+					"subtitle": "Lorem ipsum dolor sit amet, consetetur sadipscing",
+					"icon": { "src": "./images/Woman_avatar_01.png" },
+					"status": { "text": "6 of 12" },
+					"dataTimestamp": "{parameters>/NOW_ISO}",
+					"mainIndicator": {
+						"number": "{number}",
+						"unit": "{unit}",
+						"trend": "{trend}",
+						"state": "{state}"
+					},
+					"details": "Total Value",
+					"sideIndicators": [
+						{ "title": "Indicator 1", "number": "500", "unit": "K" },
+						{ "title": "Indicator 2", "number": "500", "unit": "K" }
+					],
+					"infoSection": {
+						"rows": [
+							{
+								"items": [
+									{
+										"type": "Status",
+										"value": "Information",
+										"state": "Information",
+										"inverted": true,
+										"showStateIcon": true
+									}
+								]
+							}
+						]
+					},
+					"chart": {
+						"type": "Bullet",
+						"minValue": 0,
+						"maxValue": 100,
+						"target": 80.5,
+						"value": 75.5,
+						"scale": "M",
+						"displayValue": "80.5M",
+						"color": "Good"
+					}
+				},
+				"footer": {
+					"actionsStrip": [
+						{
+							"text": "Button",
+							"actions": [{ "type": "Navigation", "parameters": { "url": "#" } }]
+						}
+					]
+				}
+			}
+		},
+		"bulletChartCard": {
+			"sap.app": {
+				"id": "card.explorer.bulletChart.list.card",
+				"type": "card",
+				"title": "Sample of a List with Bullet Chart",
+				"subTitle": "Sample of a List with Bullet Chart",
+				"applicationVersion": {
+					"version": "1.0.0"
+				}
+			},
+			"sap.card": {
+				"type": "List",
+				"data": {
+					"json": {
+						"header": {
+							"number": "225",
+							"unit": "K",
+							"trend": "Down",
+							"state": "Critical",
+							"details": "Q1, 2018",
+							"target": {
+								"number": 250,
+								"unit": "K"
+							},
+							"expected": 300000,
+							"chartActual": 225000,
+							"chartTarget": 250000
+						},
+						"items": [
+							{
+								"Name": "Comfort Easy",
+								"Description": "32 GB Digital Assistant",
+								"Highlight": "Success",
+								"Expected": 300000,
+								"Actual": 330000,
+								"Target": 280000,
+								"ChartColor": "Good"
+							},
+							{
+								"Name": "ITelO Vault",
+								"Description": "Digital Organizer",
+								"Highlight": "Success",
+								"Expected": 300000,
+								"Actual": 225000,
+								"Target": 210000,
+								"ChartColor": "Good"
+							},
+							{
+								"Name": "Notebook Professional 15",
+								"Description": "Multitouch LCD",
+								"Highlight": "Success",
+								"Expected": 300000,
+								"Actual": 150000,
+								"Target": 149000,
+								"ChartColor": "Good"
+							},
+							{
+								"Name": "Ergo Screen E-I",
+								"Description": "Optimum Hi-Resolution max.",
+								"Highlight": "Warning",
+								"Expected": 300000,
+								"Actual": 100000,
+								"Target": 100000,
+								"ChartColor": "Neutral"
+							},
+							{
+								"Name": "Laser Professional Eco",
+								"Description": "Powerful 500 MHz processor",
+								"Highlight": "Error",
+								"Expected": 300000,
+								"Actual": 60000,
+								"Target": 75000,
+								"ChartColor": "Error"
+							}
+						]
+					}
+				},
+				"header": {
+					"data": {
+						"path": "/header"
+					},
+					"type": "Numeric",
+					"title": "Income from products",
+					"subtitle": "Revenue",
+					"status": {
+						"text": "5 of 20"
+					},
+					"unitOfMeasurement": "EUR",
+					"mainIndicator": {
+						"number": "{number}",
+						"unit": "{unit}",
+						"trend": "{trend}",
+						"state": "{state}"
+					},
+					"sideIndicators": [
+						{
+							"title": "Target",
+							"number": "{target/number}",
+							"unit": "{target/unit}"
+						}
+					],
+					"details": "{details}",
+					"chart": {
+						"type": "Bullet",
+						"minValue": 0,
+						"maxValue": "{expected}",
+						"target": "{chartTarget}",
+						"value": "{chartActual}",
+						"scale": "€",
+						"color": "{state}"
+					}
+				},
+				"content": {
+					"data": {
+						"path": "/items"
+					},
+					"maxItems": 5,
+					"item": {
+						"title": "{Name}",
+						"description": "{Description}",
+						"info": {
+							"value": "{= format.currency(${Actual} - ${Target}, 'EUR', {currencyCode:false})} {= ${Actual} - ${Target} >= 0 ? 'Profit' : 'Loss' }",
+							"state": "{Highlight}"
+						},
+						"chart": {
+							"type": "Bullet",
+							"minValue": 0,
+							"maxValue": "{Expected}",
+							"target": "{Target}",
+							"value": "{Actual}",
+							"scale": "€",
+							"displayValue": "{= format.currency(${Actual}, 'EUR', {currencyCode:false})}",
+							"color": "{ChartColor}"
+						}
+					}
+				}
+			}
+		},
+		"defaultHeaderCard": {
+			"sap.app": { "id": "acc260.defaultHeader", "type": "card" },
+			"sap.card": {
+				"type": "Object",
+				"header": {
+					"title": "Donna Moore",
+					"subtitle": "Complete your time recording",
+					"icon": { "src": "sap-icon://person-placeholder" },
+					"status": { "text": "3 of 10" },
+					"dataTimestamp": "{parameters>/NOW_ISO}"
+				},
+				"content": {
+					"groups": [
+						{
+							"alignment": "Stretch",
+							"items": [
+								{
+									"type": "NumericData",
+									"mainIndicator": {
+										"number": "35",
+										"unit": "h",
+										"state": "Error",
+										"size": "S"
+									},
+									"details": "Project Nanga Prabat - 0 hours recorded."
+								}
+							]
+						}
+					]
+				}
+			}
+		},
+		"numericHeaderInfoSection": {
+			"sap.app": {
+				"id": "card.explorer.header.info.section.card",
+				"type": "card",
+				"title": "Sample of an Extended Header with Info Section",
+				"applicationVersion": {
+					"version": "1.0.0"
+				}
+			},
+			"sap.card": {
+				"type": "Analytical",
+				"header": {
+					"type": "Numeric",
+					"data": {
+						"json": {
+							"number": "65.34",
+							"unit": "K",
+							"trend": "Down",
+							"state": "Error",
+							"target": {
+								"number": 100,
+								"unit": "K"
+							},
+							"deviation": {
+								"number": 34.7,
+								"state": "Critical"
+							},
+							"details": "Q1, 2018"
+						}
+					},
+					"title": "Project Cloud Transformation",
+					"subtitle": "Revenue",
+					"unitOfMeasurement": "EUR",
+					"status": { "text": "3 of 12" },
+					"infoSection": {
+						"rows": [
+							{
+								"items": [
+									{
+										"type": "Status",
+										"value": "On Track",
+										"state": "Success",
+										"inverted": true,
+										"showStateIcon": true
+									},
+									{
+										"type": "Status",
+										"value": "OKR Relevant",
+										"state": "None",
+										"inverted": true,
+										"showStateIcon": true
+									}
+								]
+							}
+						]
+					},
+					"mainIndicator": {
+						"number": "{number}",
+						"unit": "{unit}",
+						"trend": "{trend}",
+						"state": "{state}"
+					},
+					"details": "{details}",
+					"sideIndicators": [
+						{
+							"title": "Target",
+							"number": "{target/number}",
+							"unit": "{target/unit}"
+						},
+						{
+							"title": "Deviation",
+							"number": "{deviation/number}",
+							"unit": "%",
+							"state": "{deviation/state}"
+						}
+					]
+				},
+				"content": {
+					"chartType": "Line",
+					"chartProperties": {
+						"title": {
+							"text": "Line chart",
+							"visible": true,
+							"alignment": "left"
+						},
+						"legend": {
+							"visible": "{legend/visible}"
+						},
+						"legendGroup": {
+							"layout": {
+								"position": "{legend/position}",
+								"alignment": "{legend/alignment}"
+							}
+						},
+						"plotArea": {
+							"dataLabel": {
+								"visible": true
+							}
+						},
+						"categoryAxis": {
+							"title": {
+								"visible": false
+							}
+						},
+						"valueAxis": {
+							"title": {
+								"visible": false
+							}
+						}
+					},
+					"data": {
+						"json": {
+							"dimensions": {
+								"weekLabel": "Weeks"
+							},
+							"measures": {
+								"revenueLabel": "Revenue",
+								"costLabel": "Costs"
+							},
+							"legend": {
+								"visible": true,
+								"position": "bottom",
+								"alignment": "topLeft"
+							},
+							"list": [
+								{ "Week": "CW14", "Revenue": 431000.22, "Cost": 230000.00 },
+								{ "Week": "CW15", "Revenue": 494000.30, "Cost": 238000.00 },
+								{ "Week": "CW16", "Revenue": 491000.17, "Cost": 221000.00 },
+								{ "Week": "CW17", "Revenue": 536000.34, "Cost": 280000.00 },
+								{ "Week": "CW18", "Revenue": 675000.00, "Cost": 230000.00 },
+								{ "Week": "CW19", "Revenue": 680000.00, "Cost": 250000.00 },
+								{ "Week": "CW20", "Revenue": 659000.14, "Cost": 325000.00 }
+							]
+						},
+						"path": "/list"
+					},
+					"dimensions": [
+						{
+							"name": "{dimensions/weekLabel}",
+							"value": "{Week}"
+						}
+					],
+					"measures": [
+						{
+							"name": "{measures/revenueLabel}",
+							"value": "{Revenue}"
+						},
+						{
+							"name": "{measures/costLabel}",
+							"value": "{Cost}"
+						}
+					],
+					"feeds": [
+						{
+							"uid": "valueAxis",
+							"type": "Measure",
+							"values": [
+								"{measures/revenueLabel}",
+								"{measures/costLabel}"
+							]
+						},
+						{
+							"uid": "categoryAxis",
+							"type": "Dimension",
+							"values": [
+								"{dimensions/weekLabel}"
+							]
+						}
+					]
+				}
+			}
+		},
+		"card_3indicators": {
+			"sap.app": { "id": "acc260.card3indicators", "type": "card" },
+			"sap.card": {
+				"type": "Object",
+				"header": {
+					"type": "Numeric",
+					"data": {
+						"json": {
+							"number": "65.5",
+							"unit": "MM",
+							"trend": "Down",
+							"state": "Good"
+						}
+					},
+					"title": "Card with 3 Side Indicators",
+					"subtitle": "Testing two-column grid layout",
+					"mainIndicator": {
+						"number": "{number}",
+						"unit": "{unit}",
+						"trend": "{trend}",
+						"state": "{state}"
+					},
+					"details": "Total Value",
+					"sideIndicators": [
+						{ "title": "Target", "number": "500", "unit": "K" },
+						{ "title": "Deviation", "number": "34.7", "unit": "%" },
+						{ "title": "Forecast", "number": "620", "unit": "K" }
+					]
+				}
+			}
+		},
+		"card_4indicators": {
+			"sap.app": { "id": "acc260.card4indicators", "type": "card" },
+			"sap.card": {
+				"type": "Object",
+				"header": {
+					"type": "Numeric",
+					"data": {
+						"json": {
+							"number": "80.5",
+							"unit": "K",
+							"trend": "Up",
+							"state": "Critical"
+						}
+					},
+					"title": "Card with 4 Side Indicators",
+					"subtitle": "Testing multi-row grid layout",
+					"mainIndicator": {
+						"number": "{number}",
+						"unit": "{unit}",
+						"trend": "{trend}",
+						"state": "{state}"
+					},
+					"details": "Q1, 2024",
+					"sideIndicators": [
+						{ "title": "Target", "number": "100", "unit": "K" },
+						{ "title": "Deviation", "number": "20.5", "unit": "%" },
+						{ "title": "Forecast", "number": "95", "unit": "K" },
+						{ "title": "Risk", "number": "12", "unit": "%" }
+					]
+				}
+			}
+		},
+		"cardLongInfoSection": {
+			"sap.app": { "id": "acc260.longInfoSection", "type": "card" },
+			"sap.card": {
+				"type": "Object",
+				"header": {
+					"type": "Numeric",
+					"data": {
+						"json": {
+							"number": "65.5",
+							"unit": "MM",
+							"trend": "Down",
+							"state": "Good"
+						}
+					},
+					"title": "Lorem ipsum dolor sit amet, consetetur sadipscing",
+					"subtitle": "Lorem ipsum dolor sit amet, consetetur",
+					"icon": { "src": "./images/Woman_avatar_01.png" },
+					"mainIndicator": {
+						"number": "{number}",
+						"unit": "{unit}",
+						"trend": "{trend}",
+						"state": "{state}"
+					},
+					"details": "Total Value",
+					"sideIndicators": [
+						{ "title": "Indicator 1", "number": "500", "unit": "K" },
+						{ "title": "Indicator 2", "number": "500", "unit": "K" }
+					],
+					"infoSection": {
+						"rows": [
+							{
+								"items": [
+									{
+										"type": "Status",
+										"value": "Information",
+										"state": "Information",
+										"inverted": true,
+										"showStateIcon": true
+									},
+									{
+										"type": "Status",
+										"value": "Critical Overdue — Requires Immediate Attention From Responsible Team",
+										"state": "None",
+										"inverted": true,
+										"showStateIcon": true
+									}
+								]
+							}
+						]
+					},
+					"chart": {
+						"type": "Bullet",
+						"minValue": 0,
+						"maxValue": 100,
+						"target": 80.5,
+						"value": 75.5,
+						"scale": "M",
+						"displayValue": "80.5M",
+						"color": "Good"
+					}
+				},
+				"footer": {
+					"actionsStrip": [
+						{
+							"text": "Button",
+							"actions": [{ "type": "Navigation", "parameters": { "url": "#" } }]
+						}
+					]
+				}
+			}
+		}
 	}
 }

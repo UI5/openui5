@@ -1909,6 +1909,111 @@ function(
         }.bind(this));
     });
 
+    QUnit.test("getPropertyAttribute returns textFormatter function for DateTimeOffset with textProperty (Common.Timezone)", function(assert) {
+        const oPropertyInfo = {
+            key: "bidSubmissionTimestamp",
+            dataType: "Edm.DateTimeOffset",
+            textProperty: "timezone"
+        };
+        sandbox.stub(ChartDelegate, "fetchConfigurationForVizchart").returns(null);
+        const done = assert.async();
+        ChartDelegate._loadChart().then(function() {
+            const fnFormatter = ChartDelegate.getPropertyAttribute(this.oMDCChart, oPropertyInfo, "textFormatter");
+            assert.ok(typeof fnFormatter === "function", "textFormatter function returned for DateTimeOffset with textProperty");
+            done();
+        }.bind(this));
+    });
+
+    QUnit.test("getPropertyAttribute textFormatter formats timestamp in given timezone", function(assert) {
+        const oPropertyInfo = {
+            key: "bidSubmissionTimestamp",
+            dataType: "Edm.DateTimeOffset",
+            textProperty: "timezone"
+        };
+        const done = assert.async();
+        ChartDelegate._loadChart().then(function() {
+            const fnFormatter = ChartDelegate.getPropertyAttribute(this.oMDCChart, oPropertyInfo, "textFormatter");
+            const sResult = fnFormatter("2026-03-26T11:00:00.000Z", "Europe/Berlin");
+            assert.ok(typeof sResult === "string" && sResult.length > 0, "Formatter returns a non-empty string for valid timestamp and timezone");
+            done();
+        }.bind(this));
+    });
+
+    QUnit.test("getPropertyAttribute textFormatter returns falsy input unchanged", function(assert) {
+        const oPropertyInfo = {
+            key: "bidSubmissionTimestamp",
+            dataType: "Edm.DateTimeOffset",
+            textProperty: "timezone"
+        };
+        const done = assert.async();
+        ChartDelegate._loadChart().then(function() {
+            const fnFormatter = ChartDelegate.getPropertyAttribute(this.oMDCChart, oPropertyInfo, "textFormatter");
+            assert.equal(fnFormatter(null, "Europe/Berlin"), null, "Null timestamp returned as-is");
+            assert.equal(fnFormatter("", "Europe/Berlin"), "", "Empty string returned as-is");
+            done();
+        }.bind(this));
+    });
+
+    QUnit.test("getPropertyAttribute returns no textFormatter for DateTimeOffset without textProperty", function(assert) {
+        const oPropertyInfo = {
+            key: "createdAt",
+            dataType: "Edm.DateTimeOffset"
+        };
+        sandbox.stub(ChartDelegate, "fetchConfigurationForVizchart").returns(null);
+        const fnFormatter = ChartDelegate.getPropertyAttribute(this.oMDCChart, oPropertyInfo, "textFormatter");
+        assert.ok(!fnFormatter, "No textFormatter returned when textProperty is absent");
+    });
+
+    QUnit.test("_addInnerDimension sets textProperty and textFormatter for DateTimeOffset with timezone", function(assert) {
+        const done = assert.async();
+        const aAddedDimensions = [];
+        const oMockChart = {
+            addDimension: function(oDim) { aAddedDimensions.push(oDim); }
+        };
+        ChartDelegate._setState(this.oMDCChart, { innerChart: oMockChart });
+
+        ChartDelegate._loadChart().then(function() {
+            const oPropertyInfo = {
+                key: "bidSubmissionTimestamp",
+                groupable: true,
+                label: "Submission Time",
+                role: "category",
+                dataType: "Edm.DateTimeOffset",
+                textProperty: "timezone"
+            };
+            ChartDelegate._addInnerDimension(this.oMDCChart, new Item({ propertyKey: "bidSubmissionTimestamp", type: "groupable", label: "Submission Time" }), oPropertyInfo);
+            assert.equal(aAddedDimensions.length, 1, "One dimension was added");
+            assert.equal(aAddedDimensions[0].getMetadata().getName(), "sap.chart.data.TimeDimension", "TimeDimension created");
+            assert.equal(aAddedDimensions[0].getTextProperty(), "timezone", "textProperty set to timezone path");
+            assert.ok(typeof aAddedDimensions[0].getTextFormatter() === "function", "textFormatter is a function");
+            done();
+        }.bind(this));
+    });
+
+    QUnit.test("_addInnerDimension does not set textProperty for DateTimeOffset without timezone", function(assert) {
+        const done = assert.async();
+        const aAddedDimensions = [];
+        const oMockChart = {
+            addDimension: function(oDim) { aAddedDimensions.push(oDim); }
+        };
+        ChartDelegate._setState(this.oMDCChart, { innerChart: oMockChart });
+
+        ChartDelegate._loadChart().then(function() {
+            const oPropertyInfo = {
+                key: "createdAt",
+                groupable: true,
+                label: "Created On",
+                role: "category",
+                dataType: "Edm.DateTimeOffset"
+            };
+            ChartDelegate._addInnerDimension(this.oMDCChart, new Item({ propertyKey: "createdAt", type: "groupable", label: "Created On" }), oPropertyInfo);
+            assert.equal(aAddedDimensions.length, 1, "One dimension was added");
+            assert.equal(aAddedDimensions[0].getMetadata().getName(), "sap.chart.data.TimeDimension", "TimeDimension created");
+            assert.ok(!aAddedDimensions[0].getTextProperty(), "No textProperty when not configured");
+            done();
+        }.bind(this));
+    });
+
     QUnit.test("fetchProperties", function(assert) {
         assert.ok(true, "Must be implemented by custom delegate");
     });
