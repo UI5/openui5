@@ -265,10 +265,10 @@ sap.ui.define([
 		oVSbThumb.style.top = iOffset + "px";
 
 		clearTimeout(this._iUpdateDefaultScrollbarPositionTimeoutId);
-		this._iUpdateDefaultScrollbarPositionTimeoutId = setTimeout(function() {
+		this._iUpdateDefaultScrollbarPositionTimeoutId = setTimeout(() => {
 			this.updateDefaultScrollbarPosition(iOffset, iThumbHeight);
 			delete this._iUpdateDefaultScrollbarPositionTimeoutId;
-		}.bind(this), 30);
+		}, 30);
 	};
 
 	/**

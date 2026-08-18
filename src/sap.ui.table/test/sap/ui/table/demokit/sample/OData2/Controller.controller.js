@@ -91,7 +91,7 @@ sap.ui.define([
 				filterProperty: oContext.getProperty("sap:filterable") === "true" ? sName : null,
 				width: sColumnWidth,
 				label: new Label({text: "{/#Product/" + sName + "/@sap:label}"}),
-				hAlign: sType && sType.indexOf("Decimal") >= 0 ? "End" : "Begin",
+				hAlign: sType && sType.includes("Decimal") ? "End" : "Begin",
 				template: specialTemplate() || new Text({text: {path: sName}, wrapping: false})
 			});
 		}

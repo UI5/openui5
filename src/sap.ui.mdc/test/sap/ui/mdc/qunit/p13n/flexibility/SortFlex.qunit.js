@@ -267,7 +267,7 @@ sap.ui.define([
 					view: this.oView
 				}).then(function(){
 
-					//'addSort' reverted --> no sorters
+				//'addSort' reverted --> no sorters
 					const oSortConditions = this.oTable.getSortConditions();
 					assert.equal(oSortConditions.sorters.length, 0, "no sorter available - addSort successfully reverted");
 
@@ -276,6 +276,223 @@ sap.ui.define([
 				done();
 			}.bind(this));
 		}.bind(this));
+	});
+
+	// ---------------------------------------------------------------
+	// Tests for the condenser configuration and orphaned moveSort fix
+	// ---------------------------------------------------------------
+
+	const sTableView = '<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:m="sap.m" xmlns="sap.ui.mdc" xmlns:mdcTable="sap.ui.mdc.table"><Table id="myTable"></Table></mvc:View>';
+
+	QUnit.module("fMoveSort: orphaned moveSort guard", {
+		beforeEach: function() {
+			return createAppEnvironment(sTableView, "Table").then(async function(mCreatedApp) {
+				this.oView = mCreatedApp.view;
+				this.oUiComponentContainer = mCreatedApp.container;
+				this.oUiComponentContainer.placeAt("qunit-fixture");
+				await nextUIUpdate();
+				this.oTable = this.oView.byId("myTable");
+				this.fMoveSort = SortFlex.moveSort.changeHandler.applyChange;
+				this.mPropertyBag = {
+					modifier: JsControlTreeModifier,
+					appComponent: this.oUiComponent,
+					view: this.oView
+				};
+			}.bind(this));
+		},
+		afterEach: function() {
+			this.oUiComponentContainer.destroy();
+		}
+	});
+
+	QUnit.test("moveSort on missing key leaves sortConditions unchanged and does not insert null", function(assert) {
+		this.oTable.setSortConditions({ sorters: [{ key: "Amount", name: "Amount", descending: false }] });
+
+		return ChangesWriteAPI.create({
+			changeSpecificData: {
+				changeType: "moveSort",
+				selector: { id: "comp---view--myTable" },
+				content: { key: "NetAmount", name: "NetAmount", index: 0 }
+			},
+			selector: this.oTable
+		}).then((oChange) => {
+			oChange.setRevertData({ key: "NetAmount", index: 0 });
+
+			return this.fMoveSort(oChange, this.oTable, this.mPropertyBag)
+				.then(() => {
+					assert.ok(true, "apply resolved (key was found, unexpected)");
+				})
+				.catch((oError) => {
+					// markAsNotApplicable rejects with a plain object {message} — not an Error.
+					// This is the expected outcome for an orphaned moveSort.
+					assert.ok(!(oError instanceof Error), "rejected with notApplicable signal, not a real error");
+				})
+				.finally(() => {
+					const aSorters = this.oTable.getSortConditions().sorters;
+					assert.strictEqual(aSorters.length, 1, "sortConditions is unchanged — no entry was added or removed");
+					assert.strictEqual(aSorters[0].key, "Amount", "existing sorter is still present");
+					assert.ok(aSorters.every(Boolean), "no null entries in sorters array");
+				});
+		});
+	});
+
+	QUnit.test("moveSort on missing key with empty sorters array does not insert null", function(assert) {
+		// No pre-existing sorters — this is the case that produced [null]
+		this.oTable.setSortConditions({ sorters: [] });
+
+		return ChangesWriteAPI.create({
+			changeSpecificData: {
+				changeType: "moveSort",
+				selector: { id: "comp---view--myTable" },
+				content: { key: "NetAmount", name: "NetAmount", index: 0 }
+			},
+			selector: this.oTable
+		}).then((oChange) => {
+			oChange.setRevertData({ key: "NetAmount", index: 0 });
+
+			return this.fMoveSort(oChange, this.oTable, this.mPropertyBag)
+				.then(() => {
+					assert.ok(true, "apply resolved (key was found, unexpected)");
+				})
+				.catch((oError) => {
+					assert.ok(!(oError instanceof Error), "rejected with notApplicable signal, not a real error");
+				})
+				.finally(() => {
+					const aSorters = this.oTable.getSortConditions().sorters;
+					assert.strictEqual(aSorters.length, 0, "sorters array remains empty — no null injected");
+				});
+		});
+	});
+
+	QUnit.test("moveSort on present key moves it correctly", function(assert) {
+		this.oTable.setSortConditions({
+			sorters: [
+				{ key: "Amount", name: "Amount", descending: false },
+				{ key: "NetAmount", name: "NetAmount", descending: true }
+			]
+		});
+
+		return ChangesWriteAPI.create({
+			changeSpecificData: {
+				changeType: "moveSort",
+				selector: { id: "comp---view--myTable" },
+				content: { key: "NetAmount", name: "NetAmount", index: 0 }
+			},
+			selector: this.oTable
+		}).then((oChange) => {
+			oChange.setRevertData({ key: "NetAmount", index: 1 });
+
+			return this.fMoveSort(oChange, this.oTable, this.mPropertyBag).then(() => {
+				const aSorters = this.oTable.getSortConditions().sorters;
+				assert.strictEqual(aSorters.length, 2, "sorter count unchanged");
+				assert.strictEqual(aSorters[0].key, "NetAmount", "NetAmount moved to index 0");
+				assert.strictEqual(aSorters[1].key, "Amount", "Amount shifted to index 1");
+			});
+		});
+	});
+
+	QUnit.module("moveSort.getCondenserInfo: affectedControl id includes sort direction", {
+		beforeEach: function() {
+			return createAppEnvironment(sTableView, "Table").then(async function(mCreatedApp) {
+				this.oView = mCreatedApp.view;
+				this.oUiComponentContainer = mCreatedApp.container;
+				this.oUiComponentContainer.placeAt("qunit-fixture");
+				await nextUIUpdate();
+				this.oTable = this.oView.byId("myTable");
+				this.mPropertyBag = {
+					modifier: { bySelector: () => this.oTable },
+					appComponent: this.oUiComponent
+				};
+			}.bind(this));
+		},
+		afterEach: function() {
+			this.oUiComponentContainer.destroy();
+		}
+	});
+
+	QUnit.test("moveSort affectedControl id matches addSort id for descending sorter", function(assert) {
+		this.oTable.setSortConditions({ sorters: [{ key: "NetAmount", name: "NetAmount", descending: true }] });
+
+		return Promise.all([
+			ChangesWriteAPI.create({
+				changeSpecificData: {
+					changeType: "addSort",
+					selector: { id: "comp---view--myTable" },
+					content: { key: "NetAmount", descending: true, index: 0 }
+				},
+				selector: this.oTable
+			}),
+			ChangesWriteAPI.create({
+				changeSpecificData: {
+					changeType: "moveSort",
+					selector: { id: "comp---view--myTable" },
+					content: { key: "NetAmount", index: 1 }
+				},
+				selector: this.oTable
+			})
+		]).then(([oAddChange, oMoveChange]) => {
+			oMoveChange.setRevertData({ key: "NetAmount", index: 0 });
+
+			const oAddInfo = SortFlex.addSort.changeHandler.getCondenserInfo(oAddChange, this.mPropertyBag);
+			const oMoveInfo = SortFlex.moveSort.changeHandler.getCondenserInfo(oMoveChange, this.mPropertyBag);
+
+			assert.strictEqual(oAddInfo.affectedControl.id, "NetAmount-desc",
+				"addSort affectedControl id is NetAmount-desc");
+			assert.strictEqual(oMoveInfo.affectedControl.id, "NetAmount-desc",
+				"moveSort affectedControl id reads direction from live sorters");
+			assert.strictEqual(oAddInfo.affectedControl.id, oMoveInfo.affectedControl.id,
+				"addSort and moveSort land in the same condenser slot");
+		});
+	});
+
+	QUnit.test("moveSort affectedControl id matches addSort id for ascending sorter", function(assert) {
+		this.oTable.setSortConditions({ sorters: [{ key: "Amount", name: "Amount", descending: false }] });
+
+		return Promise.all([
+			ChangesWriteAPI.create({
+				changeSpecificData: {
+					changeType: "addSort",
+					selector: { id: "comp---view--myTable" },
+					content: { key: "Amount", descending: false, index: 0 }
+				},
+				selector: this.oTable
+			}),
+			ChangesWriteAPI.create({
+				changeSpecificData: {
+					changeType: "moveSort",
+					selector: { id: "comp---view--myTable" },
+					content: { key: "Amount", index: 1 }
+				},
+				selector: this.oTable
+			})
+		]).then(([oAddChange, oMoveChange]) => {
+			oMoveChange.setRevertData({ key: "Amount", index: 0 });
+
+			const oAddInfo = SortFlex.addSort.changeHandler.getCondenserInfo(oAddChange, this.mPropertyBag);
+			const oMoveInfo = SortFlex.moveSort.changeHandler.getCondenserInfo(oMoveChange, this.mPropertyBag);
+
+			assert.strictEqual(oAddInfo.affectedControl.id, oMoveInfo.affectedControl.id,
+				"addSort and moveSort share the same condenser slot for ascending sorter");
+		});
+	});
+
+	QUnit.test("moveSort affectedControl id falls back to asc when sorter is not in live array", function(assert) {
+		this.oTable.setSortConditions({ sorters: [] });
+
+		return ChangesWriteAPI.create({
+			changeSpecificData: {
+				changeType: "moveSort",
+				selector: { id: "comp---view--myTable" },
+				content: { key: "NetAmount", index: 0 }
+			},
+			selector: this.oTable
+		}).then((oMoveChange) => {
+			oMoveChange.setRevertData({ key: "NetAmount", index: 0 });
+
+			const oMoveInfo = SortFlex.moveSort.changeHandler.getCondenserInfo(oMoveChange, this.mPropertyBag);
+			assert.strictEqual(oMoveInfo.affectedControl.id, "NetAmount-asc",
+				"falls back to asc when live sorter is not found");
+		});
 	});
 
 });

@@ -107,13 +107,13 @@ sap.ui.define([
 			await destroyTable(this.table);
 		},
 		testAsync: function(mTestConfig) {
-			return new Promise(function(resolve) {
-				this.table.attachEventOnce("rowsUpdated", function() {
+			return new Promise((resolve) => {
+				this.table.attachEventOnce("rowsUpdated", () => {
 					mTestConfig.test();
 					resolve();
 				});
 				mTestConfig.act();
-			}.bind(this));
+			});
 		}
 	});
 
@@ -121,12 +121,11 @@ sap.ui.define([
 		assert.equal(this.table._getTotalRowCount(), 3, "Initial row count is correct");
 	});
 
-	QUnit.test("Insert and remove a row", function(assert) {
-		const done = assert.async();
+	QUnit.test("Insert and remove a row", async function(assert) {
 		const that = this;
 		let oData = JSON.parse(JSON.stringify(that.table.getModel().getData()));
 
-		this.testAsync({
+		await this.testAsync({
 			act: function() {
 				oData.root[3] = {
 					name: "new item",
@@ -137,18 +136,16 @@ sap.ui.define([
 			test: function() {
 				assert.equal(that.table._getTotalRowCount(), 4, "Row inserted: Row count is correct");
 			}
-		}).then(function() {
-			that.testAsync({
-				act: function() {
-					oData = JSON.parse(JSON.stringify(oData));
-					delete oData.root[3];
-					that.table.getModel().setData(oData);
-				},
-				test: function() {
-					assert.equal(that.table._getTotalRowCount(), 3, "Row removed: Row count is correct");
-					done();
-				}
-			});
+		});
+		await that.testAsync({
+			act: function() {
+				oData = JSON.parse(JSON.stringify(oData));
+				delete oData.root[3];
+				that.table.getModel().setData(oData);
+			},
+			test: function() {
+				assert.equal(that.table._getTotalRowCount(), 3, "Row removed: Row count is correct");
+			}
 		});
 	});
 
@@ -176,57 +173,51 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.test("Add and remove a filter", function(assert) {
-		const done = assert.async();
+	QUnit.test("Add and remove a filter", async function(assert) {
 		const that = this;
 
-		this.testAsync({
+		await this.testAsync({
 			act: function() {
 				that.table.filter(that.table.getColumns()[0], "subitem1-1");
 			},
 			test: function() {
 				assert.equal(that.table._getTotalRowCount(), 1, "Filter added: Row count is correct");
 			}
-		}).then(function() {
-			return that.testAsync({
-				act: function() {
-					that.table.filter(that.table.getColumns()[0], "");
-				},
-				test: function() {
-					assert.equal(that.table._getTotalRowCount(), 3, "Filter removed: Row count is correct");
-				}
-			});
-		}).then(function() {
-			return that.testAsync({
-				act: function() {
-					that.table.expand(0);
-					that.table.expand(1);
-					that.table.filter(that.table.getColumns()[0], "subsubitem1-1-1");
-					that.table.filter(that.table.getColumns()[0], "");
-				},
-				test: function() {
-					assert.equal(that.table._getTotalRowCount(), 7, "Expanded first node and its first child node: Row count is correct");
-				}
-			});
-		}).then(function() {
-			return that.testAsync({
-				act: function() {
-					that.table.filter(that.table.getColumns()[0], "subsubitem1-1-1");
-				},
-				test: function() {
-					assert.equal(that.table._getTotalRowCount(), 3, "Filter added: Row count is correct");
-				}
-			});
-		}).then(function() {
-			that.testAsync({
-				act: function() {
-					that.table.filter(that.table.getColumns()[0], "");
-				},
-				test: function() {
-					assert.equal(that.table._getTotalRowCount(), 7, "Filter removed: Row count is correct");
-					done();
-				}
-			});
+		});
+		await that.testAsync({
+			act: function() {
+				that.table.filter(that.table.getColumns()[0], "");
+			},
+			test: function() {
+				assert.equal(that.table._getTotalRowCount(), 3, "Filter removed: Row count is correct");
+			}
+		});
+		await that.testAsync({
+			act: function() {
+				that.table.expand(0);
+				that.table.expand(1);
+				that.table.filter(that.table.getColumns()[0], "subsubitem1-1-1");
+				that.table.filter(that.table.getColumns()[0], "");
+			},
+			test: function() {
+				assert.equal(that.table._getTotalRowCount(), 7, "Expanded first node and its first child node: Row count is correct");
+			}
+		});
+		await that.testAsync({
+			act: function() {
+				that.table.filter(that.table.getColumns()[0], "subsubitem1-1-1");
+			},
+			test: function() {
+				assert.equal(that.table._getTotalRowCount(), 3, "Filter added: Row count is correct");
+			}
+		});
+		await that.testAsync({
+			act: function() {
+				that.table.filter(that.table.getColumns()[0], "");
+			},
+			test: function() {
+				assert.equal(that.table._getTotalRowCount(), 7, "Filter removed: Row count is correct");
+			}
 		});
 	});
 
@@ -341,7 +332,7 @@ sap.ui.define([
 					assert.equal(oEvent.getParameter("userInteraction"), true, sTestCase + ": Parameter userInteraction correct");
 					assert.equal(oEvent.getParameter("rowIndex"), 0, sTestCase + ": Parameter rowIndex correct");
 					assert.equal(oEvent.getParameter("rowContext"), oTable.getContextByIndex(0), sTestCase + ": Parameter rowContext correct");
-					assert.deepEqual(oEvent.getParameter("rowIndices"), Array.apply(0, new Array(3)).map(function(c, i) { return i; }),
+					assert.deepEqual(oEvent.getParameter("rowIndices"), Array.apply(0, new Array(3)).map((c, i) => i),
 						sTestCase + ": Parameter rowIndices correct");
 					assert.ok(oHeaderSelector.getCheckBoxSelected(), "Select all icon is checked.");
 					break;
@@ -350,7 +341,7 @@ sap.ui.define([
 					assert.equal(oEvent.getParameter("userInteraction"), true, sTestCase + ": Parameter userInteraction correct");
 					assert.equal(oEvent.getParameter("rowIndex"), -1, sTestCase + ": Parameter rowIndex correct");
 					assert.equal(oEvent.getParameter("rowContext"), undefined, sTestCase + ": Parameter rowContext correct");
-					assert.deepEqual(oEvent.getParameter("rowIndices"), Array.apply(0, new Array(3)).map(function(c, i) { return i; }),
+					assert.deepEqual(oEvent.getParameter("rowIndices"), Array.apply(0, new Array(3)).map((c, i) => i),
 						sTestCase + ": Parameter rowIndices correct");
 					assert.ok(!oHeaderSelector.getCheckBoxSelected(), "Select all icon is not checked.");
 					break;
@@ -359,7 +350,7 @@ sap.ui.define([
 					assert.equal(oEvent.getParameter("userInteraction"), false, sTestCase + ": Parameter userInteraction correct");
 					assert.equal(oEvent.getParameter("rowIndex"), 2, sTestCase + ": Parameter rowIndex correct");
 					assert.equal(oEvent.getParameter("rowContext"), oTable.getContextByIndex(2), sTestCase + ": Parameter rowContext correct");
-					assert.deepEqual(oEvent.getParameter("rowIndices"), Array.apply(0, new Array(3)).map(function(c, i) { return i; }),
+					assert.deepEqual(oEvent.getParameter("rowIndices"), Array.apply(0, new Array(3)).map((c, i) => i),
 						sTestCase + ": Parameter rowIndices correct");
 					assert.ok(oHeaderSelector.getCheckBoxSelected(), "Select all icon is checked.");
 					break;
@@ -368,7 +359,7 @@ sap.ui.define([
 					assert.equal(oEvent.getParameter("userInteraction"), false, sTestCase + ": Parameter userInteraction correct");
 					assert.equal(oEvent.getParameter("rowIndex"), -1, sTestCase + ": Parameter rowIndex correct");
 					assert.equal(oEvent.getParameter("rowContext"), undefined, sTestCase + ": Parameter rowContext correct");
-					assert.deepEqual(oEvent.getParameter("rowIndices"), Array.apply(0, new Array(3)).map(function(c, i) { return i; }),
+					assert.deepEqual(oEvent.getParameter("rowIndices"), Array.apply(0, new Array(3)).map((c, i) => i),
 						sTestCase + ": Parameter rowIndices correct");
 					assert.ok(!oHeaderSelector.getCheckBoxSelected(), "Select all icon is not checked.");
 					break;
@@ -504,8 +495,8 @@ sap.ui.define([
 			return this.oTable;
 		},
 		checkRowsUpdated: function(assert, aActualReasons, aExpectedReasons) {
-			return new Promise(function(resolve) {
-				setTimeout(function() {
+			return new Promise((resolve) => {
+				setTimeout(() => {
 					assert.deepEqual(aActualReasons, aExpectedReasons,
 						aExpectedReasons.length > 0
 						   ? "The event _rowsUpdated has been fired in order with reasons: " + aExpectedReasons.join(", ")
@@ -518,40 +509,36 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("_rowsUpdated - Expand", function(assert) {
+	QUnit.test("_rowsUpdated - Expand", async function(assert) {
 		const aFiredReasons = [];
-		const that = this;
 		const oTable = this.createTable();
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			oTable.attachEvent("_rowsUpdated", function(oEvent) {
-				aFiredReasons.push(oEvent.getParameter("reason"));
-			});
-			oTable.getRows()[0].expand();
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			return that.checkRowsUpdated(assert, aFiredReasons, [
-				TableUtils.RowsUpdateReason.Expand
-			]);
+		await oTable.qunit.rendered();
+		oTable.attachEvent("_rowsUpdated", (oEvent) => {
+			aFiredReasons.push(oEvent.getParameter("reason"));
 		});
+		oTable.getRows()[0].expand();
+		await oTable.qunit.rendered();
+		await this.checkRowsUpdated(assert, aFiredReasons, [
+			TableUtils.RowsUpdateReason.Expand
+		]);
 	});
 
-	QUnit.test("_rowsUpdated - Collapse", function(assert) {
+	QUnit.test("_rowsUpdated - Collapse", async function(assert) {
 		const aFiredReasons = [];
-		const that = this;
 		const oTable = this.createTable();
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			oTable.getRows()[0].expand();
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			oTable.attachEvent("_rowsUpdated", function(oEvent) {
-				aFiredReasons.push(oEvent.getParameter("reason"));
-			});
-			oTable.getRows()[0].collapse();
-
-			return that.checkRowsUpdated(assert, aFiredReasons, [
-				TableUtils.RowsUpdateReason.Collapse
-			]);
+		await oTable.qunit.rendered();
+		oTable.getRows()[0].expand();
+		await oTable.qunit.rendered();
+		oTable.attachEvent("_rowsUpdated", (oEvent) => {
+			aFiredReasons.push(oEvent.getParameter("reason"));
 		});
+		oTable.getRows()[0].collapse();
+
+		await this.checkRowsUpdated(assert, aFiredReasons, [
+			TableUtils.RowsUpdateReason.Collapse
+		]);
 	});
 
 	QUnit.module("Selection", {
@@ -717,7 +704,7 @@ sap.ui.define([
 			this.oChangeEventSpy = sinon.spy();
 			oBinding.attachChange(this.oChangeEventSpy);
 
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -739,12 +726,12 @@ sap.ui.define([
 				this.oTable.collapse(oTestConfig.indices);
 			}
 
-			this.oBindingExpandSpy.getCalls().forEach(function(oCall) {
+			for (const oCall of this.oBindingExpandSpy.getCalls()) {
 				mOperations.push({operation: "expand", index: oCall.args[0], suppressChange: oCall.args[1]});
-			});
-			this.oBindingCollapseSpy.getCalls().forEach(function(oCall) {
+			}
+			for (const oCall of this.oBindingCollapseSpy.getCalls()) {
 				mOperations.push({operation: "collapse", index: oCall.args[0], suppressChange: oCall.args[1]});
-			});
+			}
 
 			if (oTestConfig.expectedOperations && oTestConfig.expectedOperations.length > 0) {
 				assert.deepEqual(mOperations, oTestConfig.expectedOperations, sMessage + ": Operations were performed correctly");
@@ -759,7 +746,7 @@ sap.ui.define([
 	QUnit.test("#expand", function(assert) {
 		const that = this;
 
-		[0, [0]].forEach(function(vIndexParameter) {
+		for (const vIndexParameter of [0, [0]]) {
 			that.test("Expand a collapsed row", {
 				prepare: function() {
 					that.oTable.collapse(0);
@@ -774,9 +761,9 @@ sap.ui.define([
 				indices: vIndexParameter,
 				expand: true
 			}, assert);
-		});
+		}
 
-		[1, [1]].forEach(function(vIndexParameter) {
+		for (const vIndexParameter of [1, [1]]) {
 			that.test("Expand a leaf", {
 				prepare: function() {
 					that.oTable.expand(0);
@@ -784,7 +771,7 @@ sap.ui.define([
 				indices: vIndexParameter,
 				expand: true
 			}, assert);
-		});
+		}
 
 		this.test("Expand multiple rows", {
 			prepare: function() {
@@ -811,7 +798,7 @@ sap.ui.define([
 	QUnit.test("#collapse", function(assert) {
 		const that = this;
 
-		[0, [0]].forEach(function(vIndexParameter) {
+		for (const vIndexParameter of [0, [0]]) {
 			that.test("Collapse an expanded row", {
 				prepare: function() {
 					that.oTable.expand(0);
@@ -826,9 +813,9 @@ sap.ui.define([
 				indices: vIndexParameter,
 				expand: false
 			}, assert);
-		});
+		}
 
-		[1, [1]].forEach(function(vIndexParameter) {
+		for (const vIndexParameter of [1, [1]]) {
 			that.test("Collapse a leaf", {
 				prepare: function() {
 					that.oTable.expand(0);
@@ -836,7 +823,7 @@ sap.ui.define([
 				indices: vIndexParameter,
 				expand: false
 			}, assert);
-		});
+		}
 
 		this.test("Collapse multiple rows", {
 			prepare: function() {
@@ -866,7 +853,7 @@ sap.ui.define([
 	QUnit.test("#expand/#collapse with invalid parameters", function(assert) {
 		const that = this;
 
-		[-1, [-1]].forEach(function(vIndexParameter) {
+		for (const vIndexParameter of [-1, [-1]]) {
 			that.test("Expand index < 0", {
 				indices: vIndexParameter,
 				expand: true
@@ -875,10 +862,10 @@ sap.ui.define([
 				indices: vIndexParameter,
 				expand: false
 			}, assert);
-		});
+		}
 
 		const iTotalRowCount = this.oTable._getTotalRowCount();
-		[iTotalRowCount, [iTotalRowCount]].forEach(function(vIndexParameter) {
+		for (const vIndexParameter of [iTotalRowCount, [iTotalRowCount]]) {
 			that.test("Expand index > maximum row index", {
 				indices: vIndexParameter,
 				expand: true
@@ -887,44 +874,37 @@ sap.ui.define([
 				indices: vIndexParameter,
 				expand: false
 			}, assert);
-		});
+		}
 	});
 
-	QUnit.test("Row#expand", function(assert) {
+	QUnit.test("Row#expand", async function(assert) {
 		this.oTable.getRows()[0].expand();
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			assert.strictEqual(this.oTable._getTotalRowCount(), 9, "Expanded: Total row count");
-			assert.ok(this.oTable.isExpanded(0), "Expanded: Expanded state");
-		}.bind(this));
+		await this.oTable.qunit.rendered();
+		assert.strictEqual(this.oTable._getTotalRowCount(), 9, "Expanded: Total row count");
+		assert.ok(this.oTable.isExpanded(0), "Expanded: Expanded state");
 	});
 
-	QUnit.test("Row#collapse", function(assert) {
-		const that = this;
-
+	QUnit.test("Row#collapse", async function(assert) {
 		this.oTable.getRows()[0].expand();
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			that.oTable.getRows()[0].collapse();
-		}).then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(that.oTable._getTotalRowCount(), 8, "Collapsed: Total row count");
-			assert.notOk(that.oTable.isExpanded(0), "Collapsed: Expanded state");
-		});
+		await this.oTable.qunit.rendered();
+		this.oTable.getRows()[0].collapse();
+		await this.oTable.qunit.rendered();
+		assert.strictEqual(this.oTable._getTotalRowCount(), 8, "Collapsed: Total row count");
+		assert.notOk(this.oTable.isExpanded(0), "Collapsed: Expanded state");
 	});
 
-	QUnit.test("Row#toggleExpandedState", function(assert) {
-		const that = this;
-
+	QUnit.test("Row#toggleExpandedState", async function(assert) {
 		this.oTable.getRows()[0].toggleExpandedState();
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			assert.strictEqual(that.oTable._getTotalRowCount(), 9, "Expanded: Total row count");
-			assert.ok(that.oTable.isExpanded(0), "Expanded: Expanded state");
-			that.oTable.getRows()[0].toggleExpandedState();
-		}).then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(that.oTable._getTotalRowCount(), 8, "Collapsed: Total row count");
-			assert.notOk(that.oTable.isExpanded(0), "Collapsed: Expanded state");
-		});
+		await this.oTable.qunit.rendered();
+		assert.strictEqual(this.oTable._getTotalRowCount(), 9, "Expanded: Total row count");
+		assert.ok(this.oTable.isExpanded(0), "Expanded: Expanded state");
+		this.oTable.getRows()[0].toggleExpandedState();
+		await this.oTable.qunit.rendered();
+		assert.strictEqual(this.oTable._getTotalRowCount(), 8, "Collapsed: Total row count");
+		assert.notOk(this.oTable.isExpanded(0), "Collapsed: Expanded state");
 	});
 
 	QUnit.test("toggleOpenState event parameters when collapsing while scrolled to bottom", async function(assert) {
@@ -932,12 +912,12 @@ sap.ui.define([
 		const iLastRowIndex = oTable._getTotalRowCount() - 1;
 
 		oTable.expand(iLastRowIndex);
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 		assert.strictEqual(oTable._getTotalRowCount(), 9, "Expanded: Total row count");
 		assert.ok(oTable.isExpanded(iLastRowIndex), "Last row is expanded");
 
 		oTable.setFirstVisibleRow(oTable._getMaxFirstRenderedRowIndex());
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 		assert.strictEqual(oTable._getFirstRenderedRowIndex(), 4, "Scrolled to bottom");
 
 		const oExpandedRow = oTable.getRows().find((oRow) => oRow.getIndex() === iLastRowIndex);
@@ -963,60 +943,51 @@ sap.ui.define([
 		assert.strictEqual(oReceivedEvent.expanded, false, "expanded parameter");
 	});
 
-	QUnit.test("Result of expand/collapse a single row", function(assert) {
-		const that = this;
-
+	QUnit.test("Result of expand/collapse a single row", async function(assert) {
 		this.oTable.expand(0);
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			assert.strictEqual(that.oTable._getTotalRowCount(), 9, "Expanded: Total row count");
-			assert.ok(that.oTable.isExpanded(0), "Expanded: Expanded state");
-			that.oTable.collapse(0);
-		}).then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(that.oTable._getTotalRowCount(), 8, "Collapsed: Total row count");
-			assert.notOk(that.oTable.isExpanded(0), "Collapsed: Expanded state");
-		});
+		await this.oTable.qunit.rendered();
+		assert.strictEqual(this.oTable._getTotalRowCount(), 9, "Expanded: Total row count");
+		assert.ok(this.oTable.isExpanded(0), "Expanded: Expanded state");
+		this.oTable.collapse(0);
+		await this.oTable.qunit.rendered();
+		assert.strictEqual(this.oTable._getTotalRowCount(), 8, "Collapsed: Total row count");
+		assert.notOk(this.oTable.isExpanded(0), "Collapsed: Expanded state");
 	});
 
-	QUnit.test("Result of expand/collapse a single row synchronously after bind", function(assert) {
-		const that = this;
-
+	QUnit.test("Result of expand/collapse a single row synchronously after bind", async function(assert) {
 		this.oTable.bindRows(this.oTable.getBindingInfo("rows"));
 		this.oTable.expand(0);
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			assert.strictEqual(that.oTable._getTotalRowCount(), 9, "Expanded: Total row count");
-			assert.ok(that.oTable.isExpanded(0), "Expanded: Expanded state");
+		await this.oTable.qunit.rendered();
+		assert.strictEqual(this.oTable._getTotalRowCount(), 9, "Expanded: Total row count");
+		assert.ok(this.oTable.isExpanded(0), "Expanded: Expanded state");
 
-			that.oTable.bindRows({
-				path: "/",
-				parameters: {
-					numberOfExpandedLevels: 1
-				}
-			});
-			that.oTable.collapse(0);
-		}).then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(that.oTable._getTotalRowCount(), 15, "Collapsed: Total row count");
-			assert.notOk(that.oTable.isExpanded(0), "Collapsed: Expanded state");
+		this.oTable.bindRows({
+			path: "/",
+			parameters: {
+				numberOfExpandedLevels: 1
+			}
 		});
+		this.oTable.collapse(0);
+		await this.oTable.qunit.rendered();
+		assert.strictEqual(this.oTable._getTotalRowCount(), 15, "Collapsed: Total row count");
+		assert.notOk(this.oTable.isExpanded(0), "Collapsed: Expanded state");
 	});
 
-	QUnit.test("Result of expand/collapse multiple rows", function(assert) {
-		const that = this;
-
+	QUnit.test("Result of expand/collapse multiple rows", async function(assert) {
 		this.oTable.expand([0, 1]);
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			assert.equal(that.oTable._getTotalRowCount(), 10, "Expanded: Total row count");
-			assert.equal(that.oTable.isExpanded(0), true, "Expanded state of the first expanded row");
-			assert.equal(that.oTable.isExpanded(2), true, "Expanded state of the second expanded row");
+		await this.oTable.qunit.rendered();
+		assert.equal(this.oTable._getTotalRowCount(), 10, "Expanded: Total row count");
+		assert.equal(this.oTable.isExpanded(0), true, "Expanded state of the first expanded row");
+		assert.equal(this.oTable.isExpanded(2), true, "Expanded state of the second expanded row");
 
-			that.oTable.collapse([0, 2]);
-		}).then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			assert.equal(that.oTable._getTotalRowCount(), 8, "Collapsed: Total row count");
-			assert.equal(that.oTable.isExpanded(0), false, "Expanded state of the first collapsed row");
-			assert.equal(that.oTable.isExpanded(1), false, "Expanded state of the second collapsed row");
-		});
+		this.oTable.collapse([0, 2]);
+		await this.oTable.qunit.rendered();
+		assert.equal(this.oTable._getTotalRowCount(), 8, "Collapsed: Total row count");
+		assert.equal(this.oTable.isExpanded(0), false, "Expanded state of the first collapsed row");
+		assert.equal(this.oTable.isExpanded(1), false, "Expanded state of the second collapsed row");
 	});
 
 	QUnit.module("TreeBindingProxy", {

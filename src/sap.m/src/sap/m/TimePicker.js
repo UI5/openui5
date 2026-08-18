@@ -804,6 +804,18 @@ function(
 			oControl._setTimeValues(oDateValue, bIs24);
 			if (!bShowInputs) {
 				this._getClocks().prepareForOpen();
+				// Point the Dialog's initial focus at the active toggle button so it
+				// doesn't land on the OK button after the open animation.
+				// Popover (desktop) lacks setInitialFocus, so guard before calling.
+				const oPopup = this._getPicker() && this._getPicker().getAggregation("_popup");
+				if (oPopup && oPopup.setInitialFocus) {
+					const oClocks = this._getClocks();
+					const aButtons = oClocks.getAggregation("_buttons");
+					const oActiveBtn = aButtons && aButtons[oClocks._getActiveClockIndex()];
+					if (oActiveBtn) {
+						oPopup.setInitialFocus(oActiveBtn.getId());
+					}
+				}
 			}
 		};
 

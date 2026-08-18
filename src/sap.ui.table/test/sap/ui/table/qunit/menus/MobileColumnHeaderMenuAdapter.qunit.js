@@ -78,7 +78,7 @@ sap.ui.define([
 				enableColumnFreeze: true
 			});
 
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oMenu1.destroy();
@@ -92,7 +92,7 @@ sap.ui.define([
 			qutils.triggerMouseEvent(oElement, "mousedown", null, null, null, null, 0);
 			qutils.triggerMouseEvent(oElement, "click");
 
-			return new Promise(function(resolve) {
+			return new Promise((resolve) => {
 				const oMenu = this["oMenu" + (iColumnIndex + 1)];
 
 				if (oMenu.isOpen()) {
@@ -100,11 +100,11 @@ sap.ui.define([
 				} else {
 					oMenu.attachEventOnce("beforeOpen", resolve);
 				}
-			}.bind(this));
+			});
 		},
 		closeMenu: function(oMenu) {
 			oMenu.close();
-			return new Promise(function(resolve) {
+			return new Promise((resolve) => {
 				if (!oMenu._oPopover.isOpen()) {
 					resolve();
 				} else {
@@ -113,7 +113,7 @@ sap.ui.define([
 			});
 		},
 		getQuickAction: function(oMenu, sType) {
-			const aQuickActions = oMenu.getAggregation("_quickActions").filter(function(oQuickAction) {
+			const aQuickActions = oMenu.getAggregation("_quickActions").filter((oQuickAction) => {
 				return oQuickAction.isA("sap.m.table.columnmenu." + sType);
 			});
 
@@ -262,8 +262,8 @@ sap.ui.define([
 		assert.equal(oCustomFilter.getLabel(), TableUtils.getResourceText("TBL_FILTER_ITEM"), "Custom filter label is correct");
 		assert.equal(oCustomFilter.getIcon(), "sap-icon://filter", "Custom filter icon is correct");
 
-		return new Promise(function(resolve) {
-			oTable.attachCustomFilter(function(oEvent) {
+		return new Promise((resolve) => {
+			oTable.attachCustomFilter((oEvent) => {
 				assert.ok(true, "'customFilter' event was fired");
 				assert.equal(oEvent.getParameter("column"), oColumn, "Event parameter 'column'");
 				resolve();
@@ -296,8 +296,8 @@ sap.ui.define([
 		const oQuickTotal = this.getQuickAction(oMenu, "QuickTotal");
 		const oSwitch = oQuickTotal.getEffectiveQuickActions()[0].getContent()[0];
 
-		await new Promise(function(resolve) {
-			oMenu.attachEventOnce("afterClose", function() {
+		await new Promise((resolve) => {
+			oMenu.attachEventOnce("afterClose", () => {
 				assert.ok(oColumnSetSummedSpy.calledOnceWithExactly(true), "Column#setSummed is called once with the correct parameters");
 				resolve();
 			});
@@ -317,7 +317,7 @@ sap.ui.define([
 	QUnit.test("Quick Freeze", async function(assert) {
 		const oTable = this.oTable;
 		const oColumnFreezeSpy = this.spy();
-		oTable.attachColumnFreeze(function(oEvent) {
+		oTable.attachColumnFreeze((oEvent) => {
 			oColumnFreezeSpy(oEvent.getParameters());
 		});
 
@@ -329,8 +329,8 @@ sap.ui.define([
 
 		assert.notOk(this.getFreezeSwitchState(1), "Switch is OFF when no columns are frozen");
 
-		await new Promise(function(resolve) {
-			oMenu.attachEventOnce("afterClose", function() {
+		await new Promise((resolve) => {
+			oMenu.attachEventOnce("afterClose", () => {
 				assert.ok(oColumnFreezeSpy.calledOnceWithExactly({
 					id: oTable.getId(),
 					column: oColumn
@@ -353,7 +353,7 @@ sap.ui.define([
 		assert.ok(this.getFreezeSwitchState(1), "Switch is ON for the last frozen column");
 
 		// Unfreezing resets fixedColumnCount to 0, not to the column's index
-		await new Promise(function(resolve) {
+		await new Promise((resolve) => {
 			oMenu.attachEventOnce("afterClose", resolve);
 			qutils.triggerKeyup(oSwitch.getDomRef(), "SPACE");
 		});
@@ -414,7 +414,7 @@ sap.ui.define([
 	QUnit.test("Resize Input", async function(assert) {
 		const oTable = this.oTable;
 		const oColumnResizeSpy = this.spy();
-		oTable.attachColumnResize(function(oEvent) {
+		oTable.attachColumnResize((oEvent) => {
 			oColumnResizeSpy(oEvent.getParameters());
 		});
 		await this.openColumnMenu(0);

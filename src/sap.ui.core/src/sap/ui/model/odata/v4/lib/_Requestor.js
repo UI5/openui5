@@ -925,22 +925,24 @@ sap.ui.define([
 	 * @public
 	 */
 	_Requestor.prototype.fetch = function (sMethod, sResourcePath, sQueryString, oPayload) {
+		const that = this;
 		const sRequestUrl = this.sServiceUrl + sResourcePath + sQueryString;
-		const oFetchOptions = {
-			method : sMethod,
-			headers : {
-				...this.mPredefinedRequestHeaders,
-				...this.mHeaders,
-				...this.mFinalHeaders
+
+		async function doFetch() {
+			const oFetchOptions = {
+				method : sMethod,
+				headers : {
+					...that.mPredefinedRequestHeaders,
+					...that.mHeaders,
+					...that.mFinalHeaders
+				}
+			};
+			if (oPayload) {
+				oFetchOptions.body = JSON.stringify(oPayload);
 			}
-		};
 
-		if (oPayload) {
-			oFetchOptions.body = JSON.stringify(oPayload);
-		}
-
-		// Note: fetch API needs to be invoked on window object
-		return _Requestor.fetch.call(window, sRequestUrl, oFetchOptions).then(async (oResponse) => {
+			// Note: fetch API needs to be invoked on window object
+			const oResponse = await _Requestor.fetch.call(window, sRequestUrl, oFetchOptions);
 			if (oResponse.ok) {
 				return oResponse;
 			}
@@ -953,9 +955,21 @@ sap.ui.define([
 				status : oResponse.status,
 				statusText : oResponse.statusText
 			};
+			const oError
+				= _Helper.createError(jqXHR, "Communication error", sRequestUrl, sResourcePath);
+			if (oResponse.status === 503 && oResponse.headers.get("Retry-After")) {
+				const oPromise = that.oModelInterface.getOrCreateRetryAfterPromise(oError);
+				if (oPromise) {
+					await oPromise;
 
-			throw _Helper.createError(jqXHR, "Communication error", sRequestUrl, sResourcePath);
-		});
+					return doFetch();
+				}
+			}
+
+			throw oError;
+		}
+
+		return doFetch();
 	};
 
 	/**

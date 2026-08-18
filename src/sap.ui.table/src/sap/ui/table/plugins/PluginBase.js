@@ -59,7 +59,7 @@ sap.ui.define([
 			vPlugin = vPlugin.getMetadata().getName();
 		}
 
-		const fnCheck = function(oElem) {
+		const fnCheck = (oElem) => {
 			/* TBD Cleanup sap.m and sap.ui.table plugins should be aligned in future.*/
 			return oElem.isA(vPlugin) && (
 					oElem.isA(["sap.m.plugins.PluginBase", "sap.ui.table.plugins.PluginBase"]));

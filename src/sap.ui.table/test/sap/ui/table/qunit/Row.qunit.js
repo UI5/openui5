@@ -33,12 +33,10 @@ sap.ui.define([
 				]
 			});
 
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		assertCells: function(assert) {
-			const aActualCells = this.oTable.getRows()[0].getCells().map(function(oCell) {
-				return oCell.getText();
-			});
+			const aActualCells = this.oTable.getRows()[0].getCells().map((oCell) => oCell.getText());
 			const aExpectedCells = Array.prototype.slice.call(arguments, 1);
 
 			assert.deepEqual(aActualCells, aExpectedCells, "The row has the correct cells");
@@ -54,66 +52,66 @@ sap.ui.define([
 
 	QUnit.test("After changing column visibility", async function(assert) {
 		this.oTable.getColumns()[1].setVisible(false);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.assertCells(assert, "Column4");
 
 		this.oTable.getColumns()[2].setVisible(true);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.assertCells(assert, "Column3", "Column4");
 	});
 
 	QUnit.test("After setting column templates", async function(assert) {
 		this.oTable.getColumns()[0].setTemplate(new TestControl({text: "Column1"}));
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.assertCells(assert, "Column1", "Column2", "Column4");
 	});
 
 	QUnit.test("After removing column templates", async function(assert) {
 		this.oTable.getColumns()[1].setTemplate(null);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.assertCells(assert, "Column4");
 	});
 
 	QUnit.test("After destroying column templates", async function(assert) {
 		this.oTable.getColumns()[1].destroyTemplate();
 		this.oTable.getColumns()[3].getTemplate().destroy();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.assertCells(assert);
 	});
 
 	QUnit.test("After changing column templates", async function(assert) {
 		this.oTable.getColumns()[1].getTemplate().setText("Not Column2");
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.assertCells(assert, "Column2", "Column4");
 	});
 
 	QUnit.test("After removing columns", async function(assert) {
 		this.oTable.removeColumn(this.oTable.getColumns()[1]);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.assertCells(assert, "Column4");
 
 		this.oTable.removeAllColumns();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.assertCells(assert);
 	});
 
 	QUnit.test("After destroying columns", async function(assert) {
 		this.oTable.getColumns()[1].destroy();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.assertCells(assert, "Column4");
 
 		this.oTable.destroyColumns();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.assertCells(assert);
 	});
 
 	QUnit.test("After adding columns", async function(assert) {
 		this.oTable.addColumn(new Column({template: new TestControl({text: "Column5"})}));
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.assertCells(assert, "Column2", "Column4", "Column5");
 
 		this.oTable.insertColumn(new Column({template: new TestControl({text: "Column0"})}), 0);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.assertCells(assert, "Column0", "Column2", "Column4", "Column5");
 	});
 
@@ -136,7 +134,7 @@ sap.ui.define([
 				rowActionCount: 2
 			});
 
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -250,7 +248,7 @@ sap.ui.define([
 	QUnit.test("isSelectable - not selectable via Row.UpdateState hook", function(assert) {
 		const oRow = this.oTable.getRows()[0];
 
-		TableUtils.Hook.register(this.oTable, TableUtils.Hook.Keys.Row.UpdateState, function(oState) {
+		TableUtils.Hook.register(this.oTable, TableUtils.Hook.Keys.Row.UpdateState, (oState) => {
 			oState.selectable = false;
 		});
 		oRow.setRowBindingContext(oRow.getBindingContext(), this.oTable);

@@ -177,35 +177,35 @@ sap.ui.define([
 			summary: {group: true, total: true}
 		}, "Reset settings");
 
-		assert.throws(function() {
+		assert.throws(() => {
 			this._oColumn._setCellContentVisibilitySettings("notAnObject");
-		}.bind(this), new Error("Invalid value"), "Settings is not an object");
+		}, new Error("Invalid value"), "Settings is not an object");
 
-		assert.throws(function() {
+		assert.throws(() => {
 			this._oColumn._setCellContentVisibilitySettings({
 				standard: false,
 				iAmNotAllowed: false
 			});
-		}.bind(this), new Error("Unsupported setting 'iAmNotAllowed'"), "Settings contain invalid keys on first level");
+		}, new Error("Unsupported setting 'iAmNotAllowed'"), "Settings contain invalid keys on first level");
 
-		assert.throws(function() {
+		assert.throws(() => {
 			this._oColumn._setCellContentVisibilitySettings({
 				standard: false,
 				groupHeader: {expanded: false, iAmNotAllowed: false}
 			});
-		}.bind(this), new Error("Unsupported setting 'groupHeader.iAmNotAllowed'"), "Settings contain invalid keys on second level");
+		}, new Error("Unsupported setting 'groupHeader.iAmNotAllowed'"), "Settings contain invalid keys on second level");
 
-		assert.throws(function() {
+		assert.throws(() => {
 			this._oColumn._setCellContentVisibilitySettings({
 				standard: 0
 			});
-		}.bind(this), new Error("Invalid value for 'standard'"), "Settings contain invalid value for boolean setting");
+		}, new Error("Invalid value for 'standard'"), "Settings contain invalid value for boolean setting");
 
-		assert.throws(function() {
+		assert.throws(() => {
 			this._oColumn._setCellContentVisibilitySettings({
 				groupHeader: "true"
 			});
-		}.bind(this), new Error("Invalid value for 'groupHeader'"), "Settings contain invalid value for boolean|object setting");
+		}, new Error("Invalid value for 'groupHeader'"), "Settings contain invalid value for boolean|object setting");
 
 		const oInvalidate = this.spy(this._oColumn, "invalidate");
 		this._oColumn._setCellContentVisibilitySettings({standard: false});
@@ -335,12 +335,12 @@ sap.ui.define([
 			template: new CheckBox({text: this.longText})
 		}));
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		for (const oColumn of this.oTable.getColumns()) {
 			this.oColumnResizeHandler.resetHistory();
 			oColumn.autoResize();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 
 			const iLabelWidth = await this.measureControlWidth(oColumn.getLabel().clone());
 			const iTemplateWidth = await this.measureControlWidth(oColumn.getTemplate().clone());
@@ -370,9 +370,9 @@ sap.ui.define([
 		});
 
 		this.oTable.addColumn(oColumn);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		oColumn.autoResize();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.strictEqual(oColumn.getWidth(), TableUtils.Column.getMinColumnWidth() + "px", "Column has the minimum width");
 		assert.ok(this.oColumnResizeHandler.calledOnceWithExactly({
@@ -390,9 +390,9 @@ sap.ui.define([
 		});
 
 		this.oTable.addColumn(oColumn);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		oColumn.autoResize();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.strictEqual(oColumn.getWidth(), "1000px" /* qunit-fixture width */, "Column width is equal to the table width");
 		assert.ok(this.oColumnResizeHandler.calledOnceWithExactly({
@@ -410,9 +410,9 @@ sap.ui.define([
 		});
 
 		this.oTable.addColumn(oColumn);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		oColumn.autoResize();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.strictEqual(oColumn.getWidth(), TableUtils.Column.getMinColumnWidth() + "px", "Column has the minimum width");
 		assert.ok(this.oColumnResizeHandler.calledOnceWithExactly({
@@ -435,13 +435,13 @@ sap.ui.define([
 			template: new Text({text: this.longText, wrapping: false})
 		}));
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		// Labels are ignored for both columns. First column label has a span, second column label is hidden by this span.
 		for (const oColumn of this.oTable.getColumns()) {
 			this.oColumnResizeHandler.resetHistory();
 			oColumn.autoResize();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 
 			const iContentWidth = await this.measureControlWidth(oColumn.getTemplate().clone());
 			const iColumnIndex = oColumn.getIndex();
@@ -480,12 +480,12 @@ sap.ui.define([
 			template: new Text()
 		}));
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		for (const oColumn of this.oTable.getColumns()) {
 			this.oColumnResizeHandler.resetHistory();
 			oColumn.autoResize();
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 
 			const iColumnIndex = oColumn.getIndex();
 			const iMultiLabelIndex = iColumnIndex === 0 ? 1 : 2;
@@ -521,7 +521,7 @@ sap.ui.define([
 
 		sinon.stub(oColumn, "shouldRender").returns(false);
 		this.oTable.addColumn(oColumn);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.throws(() => {
 			oColumn.autoResize();
@@ -961,8 +961,7 @@ sap.ui.define([
 
 		const oGetFreeTemplateCloneSpy = sinon.spy(this.oColumn, "_getFreeTemplateClone");
 
-		for (let i = 0; i < this.aTemplateTypes.length; i++) {
-			const sTemplateType = this.aTemplateTypes[i];
+		for (const sTemplateType of this.aTemplateTypes) {
 			const oTemplateClone = this.oColumn.getTemplateClone(null, sTemplateType);
 
 			assert.strictEqual(oTemplateClone, null, sTemplateType + " type: Returned null");
@@ -975,8 +974,7 @@ sap.ui.define([
 	QUnit.test("getTemplateClone: No template is defined", function(assert) {
 		const oGetFreeTemplateCloneSpy = sinon.spy(this.oColumn, "_getFreeTemplateClone");
 
-		for (let i = 0; i < this.aTemplateTypes.length; i++) {
-			const sTemplateType = this.aTemplateTypes[i];
+		for (const sTemplateType of this.aTemplateTypes) {
 			const oTemplateClone = this.oColumn.getTemplateClone(0, sTemplateType);
 
 			assert.strictEqual(oTemplateClone, null, sTemplateType + " type: Returned null");
@@ -1003,9 +1001,7 @@ sap.ui.define([
 
 		const oGetFreeTemplateCloneSpy = sinon.spy(this.oColumn, "_getFreeTemplateClone");
 
-		for (let i = 0; i < this.aTemplateTypes.length; i++) {
-			sTemplateType = this.aTemplateTypes[i];
-
+		for (const [i, sTemplateType] of this.aTemplateTypes.entries()) {
 			const oTemplateClone = this.oColumn.getTemplateClone(5, sTemplateType);
 
 			assert.ok(oTemplateClone === this.oColumn._mTemplateClones[sTemplateType][0],
@@ -1044,9 +1040,7 @@ sap.ui.define([
 
 		const oGetFreeTemplateCloneSpy = sinon.spy(this.oColumn, "_getFreeTemplateClone");
 
-		for (let i = 0; i < this.aTemplateTypes.length; i++) {
-			sTemplateType = this.aTemplateTypes[i];
-
+		for (const [i, sTemplateType] of this.aTemplateTypes.entries()) {
 			const oTemplateClone = this.oColumn.getTemplateClone(5, sTemplateType);
 
 			assert.ok(oTemplateClone === this.oColumn._mTemplateClones[sTemplateType][1],
@@ -1092,9 +1086,7 @@ sap.ui.define([
 
 		const oGetFreeTemplateCloneSpy = sinon.spy(this.oColumn, "_getFreeTemplateClone");
 
-		for (let i = 0; i < this.aTemplateTypes.length; i++) {
-			sTemplateType = this.aTemplateTypes[i];
-
+		for (const sTemplateType of this.aTemplateTypes) {
 			oTemplateClone = this.oColumn.getTemplateClone(5, sTemplateType);
 
 			assert.ok(oTemplateClone === mFreeTemplateClones[sTemplateType], sTemplateType + " type: Returned the free template clone");
@@ -1151,9 +1143,7 @@ sap.ui.define([
 		createTemplateClones();
 		this.oColumn._destroyTemplateClones();
 
-		for (let i = 0; i < this.aTemplateTypes.length; i++) {
-			sTemplateType = this.aTemplateTypes[i];
-
+		for (const sTemplateType of this.aTemplateTypes) {
 			assert.ok(
 				mCloneSpies[sTemplateType][0].calledOnce
 				&& mCloneSpies[sTemplateType][1].calledOnce
@@ -1191,9 +1181,7 @@ sap.ui.define([
 	QUnit.test("Setting a template", function(assert) {
 		const oDestroyTemplateClonesSpy = sinon.spy(this.oColumn, "_destroyTemplateClones");
 
-		for (let i = 0; i < this.aTemplateTypes.length; i++) {
-			const sTemplateType = this.aTemplateTypes[i];
-
+		for (const sTemplateType of this.aTemplateTypes) {
 			this.setTemplate(sTemplateType, new TableQUnitUtils.TestControl());
 			assert.ok(oDestroyTemplateClonesSpy.calledOnce,
 				sTemplateType + " type: Column#_destroyTemplateClones was called once when setting a template");
@@ -1294,7 +1282,7 @@ sap.ui.define([
 			});
 			this.oTable.setEnableColumnFreeze(true);
 
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oMenu1.destroy();
@@ -1353,7 +1341,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("aria-haspopup", function(assert) {
-		assert.equal(this.oColumn1.$().attr("aria-haspopup"), "dialog", "aria-haspopup was set correctly");
+		assert.equal(this.oColumn1.getDomRef().getAttribute("aria-haspopup"), "dialog", "aria-haspopup was set correctly");
 	});
 
 	QUnit.module("FieldHelp support", {

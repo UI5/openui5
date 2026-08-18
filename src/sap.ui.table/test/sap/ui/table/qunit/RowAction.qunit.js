@@ -369,7 +369,7 @@ sap.ui.define([
 
 	QUnit.test("Press on first item", function(assert) {
 		let oEventParams = null;
-		this.oRowAction.getItems()[0].attachPress(function(oEvent) {
+		this.oRowAction.getItems()[0].attachPress((oEvent) => {
 			oEventParams = oEvent.getParameters();
 		});
 		Element.closestTo(this.oRowAction.getDomRef().children[0]).firePress();
@@ -380,7 +380,7 @@ sap.ui.define([
 
 	QUnit.test("Press on second item", function(assert) {
 		let oEventParams = null;
-		this.oRowAction.getItems()[1].attachPress(function(oEvent) {
+		this.oRowAction.getItems()[1].attachPress((oEvent) => {
 			oEventParams = oEvent.getParameters();
 		});
 		Element.closestTo(this.oRowAction.getDomRef().children[1]).firePress();
@@ -423,7 +423,7 @@ sap.ui.define([
 		assert.equal(oMenu.getItems().length, 2, "Menu has 2 items");
 
 		let oEventParams = null;
-		oRowAction.getItems()[2].attachPress(function(oEvent) {
+		oRowAction.getItems()[2].attachPress((oEvent) => {
 			oEventParams = oEvent.getParameters();
 		});
 

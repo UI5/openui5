@@ -3020,9 +3020,10 @@ sap.ui.define([
 	 * type <code>Date</code>, which is the earliest point in time when the request should be
 	 * repeated. The handler has to return a promise. With this promise, you can control the
 	 * repetition of all pending requests including the failed HTTP request. If the promise is
-	 * resolved, the requests are repeated; if it is rejected, the requests are not repeated. If it
-	 * is rejected with the same <code>Error</code> reason as previously passed to the handler, then
-	 * this reason is reported to the message model.
+	 * resolved, the requests are repeated; if it is rejected, the requests are not repeated but
+	 * fail with same reason as the promise. If the promise is rejected with the same
+	 * <code>Error</code> reason as previously passed to the handler, this reason is reported to the
+	 * message model.
 	 *
 	 * @param {function(Error):Promise<void>} fnRetryAfter
 	 *   A "Retry-After" handler

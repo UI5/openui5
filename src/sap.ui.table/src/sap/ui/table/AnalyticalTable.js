@@ -183,9 +183,9 @@ sap.ui.define([
 
 		if (sName === "rows") {
 			this._updateTotalRow(true);
-			this._metadataLoaded().then(function() {
+			this._metadataLoaded().then(() => {
 				this._updateColumns(true);
-			}.bind(this));
+			});
 		}
 	};
 
@@ -225,8 +225,8 @@ sap.ui.define([
 		const aColumns = [];
 		const aTableColumns = this.getColumns();
 
-		for (let i = 0; i < this._aGroupedColumns.length; i++) {
-			const oColumn = Element.getElementById(this._aGroupedColumns[i]);
+		for (const sId of this._aGroupedColumns) {
+			const oColumn = Element.getElementById(sId);
 
 			if (!oColumn) {
 				continue;
@@ -242,9 +242,7 @@ sap.ui.define([
 			});
 		}
 
-		for (let i = 0; i < aTableColumns.length; i++) {
-			const oColumn = aTableColumns[i];
-
+		for (const oColumn of aTableColumns) {
 			if (this._aGroupedColumns.indexOf(oColumn.getId()) > -1) {
 				continue;
 			}
@@ -399,7 +397,7 @@ sap.ui.define([
 
 		// only remove from grouped columns if not caused by column move.
 		if (!this._bReorderInProcess) {
-			this._aGroupedColumns = jQuery.grep(this._aGroupedColumns, function(sValue) {
+			this._aGroupedColumns = jQuery.grep(this._aGroupedColumns, (sValue) => {
 				//check if vColum is an object with getId function
 				if (vColumn.getId) {
 					return sValue !== vColumn.getId();
@@ -541,25 +539,25 @@ sap.ui.define([
 
 					// if one column of a dimension is grouped, the dimension is considered as grouped.
 					// all columns which are not explicitly grouped will be flagged as dependendGrouped in the next step
-					if (oColumn.getGrouped() && aGroupedDimensions.indexOf(sDimensionName) === -1) {
+					if (oColumn.getGrouped() && !aGroupedDimensions.includes(sDimensionName)) {
 						aGroupedDimensions.push(sDimensionName);
 					}
 
-					if (aDimensions.indexOf(sDimensionName) === -1) {
+					if (!aDimensions.includes(sDimensionName)) {
 						aDimensions.push(sDimensionName);
 					}
 				}
 			}
 
-			aUngroupedDimensions = jQuery.grep(aDimensions, function(s) {
+			aUngroupedDimensions = jQuery.grep(aDimensions, (s) => {
 				return aGroupedDimensions.indexOf(aGroupedDimensions, s) === -1;
 			});
 
 			// for all grouped dimensions
 			if (aGroupedDimensions.length > 0) {
 				// calculate and flag the dependendly grouped columns of the dimension
-				jQuery.each(aGroupedDimensions, function(i, s) {
-					jQuery.each(oDimensionIndex[s].columns, function(j, o) {
+				jQuery.each(aGroupedDimensions, (i, s) => {
+					jQuery.each(oDimensionIndex[s].columns, (j, o) => {
 						if (!o.getGrouped()) {
 							o._bDependendGrouped = true;
 						}
@@ -571,14 +569,14 @@ sap.ui.define([
 				if (aGroupedDimensions.length === aDimensions.length) {
 					oDimension = oResult.findDimensionByPropertyName(Element.getElementById(this._aGroupedColumns[this._aGroupedColumns.length - 1]).getLeadingProperty());
 					const aGroupedDimensionColumns = oDimensionIndex[oDimension.getName()].columns;
-					jQuery.each(aGroupedDimensionColumns, function(i, o) {
+					jQuery.each(aGroupedDimensionColumns, (i, o) => {
 						o._bLastGroupAndGrouped = true;
 					});
 				}
 			}
 
 			if (aUngroupedDimensions.length === 1) {
-				jQuery.each(oDimensionIndex[aUngroupedDimensions[0]].columns, function(j, o) {
+				jQuery.each(oDimensionIndex[aUngroupedDimensions[0]].columns, (j, o) => {
 					o._isLastGroupableLeft = true;
 				});
 			}
@@ -634,7 +632,7 @@ sap.ui.define([
 	};
 
 	AnalyticalTable.prototype._addGroupedColumn = function(sColumnId) {
-		if (this._aGroupedColumns.indexOf(sColumnId) === -1) {
+		if (!this._aGroupedColumns.includes(sColumnId)) {
 			this._aGroupedColumns.push(sColumnId);
 		}
 	};

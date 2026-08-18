@@ -68,91 +68,88 @@ sap.ui.define([
 		return this.checkRowsUpdated(assert, 1);
 	});
 
-	QUnit.test("Initial rendering in invisible container", function(assert) {
-		return TableQUnitUtils.hideTestContainer().then(() => {
-			this.createTable();
-			return this.checkRowsUpdated(assert, 1);
-		}).then(() => {
-			this.resetRowsUpdatedSpy();
-			return TableQUnitUtils.showTestContainer();
-		}).then(() => {
-			return this.checkRowsUpdated(assert, 0);
-		});
+	QUnit.test("Initial rendering in invisible container", async function(assert) {
+		await TableQUnitUtils.hideTestContainer();
+		this.createTable();
+		await this.checkRowsUpdated(assert, 1);
+		this.resetRowsUpdatedSpy();
+		await TableQUnitUtils.showTestContainer();
+		await this.checkRowsUpdated(assert, 0);
 	});
 
-	QUnit.test("Re-render and refresh", function(assert) {
+	QUnit.test("Re-render and refresh", async function(assert) {
 		this.createTable();
 
-		return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished).then(async () => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.invalidate();
-			this.oTable.getBinding().refresh(true);
-			await this.oTable.qunit.whenRenderingFinished();
-			return this.checkRowsUpdated(assert, 1);
-		});
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable.invalidate();
+		this.oTable.getBinding().refresh(true);
+		await this.oTable.qunit.rendered();
+		await this.checkRowsUpdated(assert, 1);
 	});
 
-	QUnit.test("Refresh", function(assert) {
+	QUnit.test("Refresh", async function(assert) {
 		this.createTable();
 
-		return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished).then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.getBinding().refresh(true);
-			return this.checkRowsUpdated(assert, 1);
-		});
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable.getBinding().refresh(true);
+		await this.checkRowsUpdated(assert, 1);
 	});
 
-	QUnit.test("Sort with Table#sort", function(assert) {
+	QUnit.test("Sort with Table#sort", async function(assert) {
 		this.createTable();
 
-		return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished).then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.sort(this.oTable.getColumns()[0], "Ascending");
-			return this.checkRowsUpdated(assert, 1);
-		});
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable.sort(this.oTable.getColumns()[0], "Ascending");
+		await this.checkRowsUpdated(assert, 1);
 	});
 
-	QUnit.test("Sort with Binding#sort", function(assert) {
+	QUnit.test("Sort with Binding#sort", async function(assert) {
 		this.createTable();
 
-		return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished).then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.getBinding().sort(new Sorter(this.oTable.getColumns()[0].getSortProperty()));
-			return this.checkRowsUpdated(assert, 1);
-		});
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable.getBinding().sort(new Sorter(this.oTable.getColumns()[0].getSortProperty()));
+		await this.checkRowsUpdated(assert, 1);
 	});
 
-	QUnit.test("Filter with Table#filter", function(assert) {
+	QUnit.test("Filter with Table#filter", async function(assert) {
 		this.createTable();
 
-		return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished).then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.filter(this.oTable.getColumns()[0], "test");
-			return this.checkRowsUpdated(assert, 1);
-		});
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable.filter(this.oTable.getColumns()[0], "test");
+		await this.checkRowsUpdated(assert, 1);
 	});
 
-	QUnit.test("Filter with Binding#filter", function(assert) {
+	QUnit.test("Filter with Binding#filter", async function(assert) {
 		this.createTable();
 
-		return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished).then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.getBinding().filter(new Filter(this.oTable.getColumns()[0].getFilterProperty(), "Contains", "test"));
-			return this.checkRowsUpdated(assert, 1);
-		});
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable.getBinding().filter(new Filter(this.oTable.getColumns()[0].getFilterProperty(), "Contains", "test"));
+		await this.checkRowsUpdated(assert, 1);
 	});
 
-	QUnit.test("Bind", function(assert) {
+	QUnit.test("Bind", async function(assert) {
 		this.createTable();
 		this.oBindingInfo = this.oTable.getBindingInfo("rows");
 
-		return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished).then(() => {
-			this.oTable.unbindRows();
-		}).then(this.oTable.qunit.whenRenderingFinished).then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.bindRows(this.oBindingInfo);
-			return this.checkRowsUpdated(assert, 1);
-		});
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
+		this.oTable.unbindRows();
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable.bindRows(this.oBindingInfo);
+		await this.checkRowsUpdated(assert, 1);
 	});
 
 	return QUnit;

@@ -162,7 +162,7 @@ sap.ui.define([
 			this.oTable = TableQUnitUtils.createTable((oTable) => {
 				oTable.getBinding().resume();
 			});
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -196,7 +196,7 @@ sap.ui.define([
 			this.oTable = TableQUnitUtils.createTable((oTable) => {
 				oTable.getBinding().resume();
 			});
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -244,7 +244,7 @@ sap.ui.define([
 		const aRows = this.oTable.getRows();
 
 		await aRows[2].getBindingContext().expand();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertRowState(aRows[2], {
 			type: "Standard",
@@ -264,9 +264,9 @@ sap.ui.define([
 		const aRows = this.oTable.getRows();
 
 		await aRows[2].getBindingContext().expand();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.oTable.setFirstVisibleRow(2);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertRowState(aRows[0], {
 			type: "Standard",

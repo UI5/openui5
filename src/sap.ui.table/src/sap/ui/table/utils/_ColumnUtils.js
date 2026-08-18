@@ -165,13 +165,7 @@ sap.ui.define([
 				return undefined;
 			}
 
-			const aParents = [];
-			for (let i = 0; i < oColumnMapItem.parents.length; i++) {
-				const oParent = oColumnMapItem.parents[i];
-				if (iLevel === undefined || oParent.level === iLevel) {
-					aParents.push(oParent);
-				}
-			}
+			const aParents = oColumnMapItem.parents.filter((oParent) => iLevel === undefined || oParent.level === iLevel);
 
 			return aParents;
 		},
@@ -335,8 +329,8 @@ sap.ui.define([
 			const mBoundaries = {startColumn: oColumnMapItem.column, startIndex: iColumnIndex, endColumn: oColumnMapItem.column, endIndex: -1};
 			const aColumns = oTable.getColumns();
 			const aKeys = Object.getOwnPropertyNames(mColumns);
-			for (let i = 0; i < aKeys.length; i++) {
-				const oColumn = mColumns[aKeys[i]];
+			for (const sKey of aKeys) {
+				const oColumn = mColumns[sKey];
 				iColumnIndex = oColumn.getIndex();
 				const iHeaderSpan = ColumnUtils._getMaxHeaderSpan(oColumn);
 				// start
@@ -616,15 +610,7 @@ sap.ui.define([
 		 * @private
 		 */
 		_getResizableColumns: function(aVisibleColumns) {
-			const aResizableColumns = [];
-
-			for (let i = 0; i < aVisibleColumns.length; i++) {
-				const oVisibleColumn = aVisibleColumns[i];
-				if (oVisibleColumn.getResizable()) {
-					aResizableColumns.push(oVisibleColumn);
-				}
-			}
-			return aResizableColumns;
+			return aVisibleColumns.filter((oVisibleColumn) => oVisibleColumn.getResizable());
 		},
 
 		/**
@@ -640,17 +626,17 @@ sap.ui.define([
 		_fixAutoColumns: function(oTable, aResizableColumns) {
 			const oTableElement = oTable.getDomRef();
 
-			oTable._getVisibleColumns().forEach(function(oColumn) {
+			for (const oColumn of oTable._getVisibleColumns()) {
 				const sWidth = oColumn.getWidth();
 				let $columnElement;
 
-				if (oTableElement && aResizableColumns.indexOf(oColumn) < 0 && ColumnUtils.TableUtils.isVariableWidth(sWidth)) {
+				if (oTableElement && !aResizableColumns.includes(oColumn) && ColumnUtils.TableUtils.isVariableWidth(sWidth)) {
 					$columnElement = oTableElement.querySelector("th[data-sap-ui-colid=\"" + oColumn.getId() + "\"]");
 					if ($columnElement) {
 						oColumn._minWidth = Math.max($columnElement.offsetWidth, ColumnUtils.getMinColumnWidth());
 					}
 				}
-			});
+			}
 		},
 
 		/**

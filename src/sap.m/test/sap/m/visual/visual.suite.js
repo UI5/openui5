@@ -94,6 +94,7 @@ module.exports = [
  "RangeSlider.spec.js",
  "RatingIndicator.spec.js",
  "ResponsivePopover.spec.js",
+ "ScrollContainer.spec.js",
  "SearchField.spec.js",
  "SearchField_Suggestions.spec.js",
  "SegmentedButton.spec.js",

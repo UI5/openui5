@@ -39,13 +39,12 @@ sap.ui.define([
 				// Check the remaining Issues
 				const sBindingId = oLogEntry.supportInfo.analyticalBindingId;
 				if (sBindingId && !oIssues[sAnalyticalErrorId + "-" + sBindingId]) {
-					let oBinding;
-					for (let i = 0; i < aTables.length; i++) {
-						oBinding = aTables[i].getBinding();
+					for (const oTable of aTables) {
+						const oBinding = oTable.getBinding();
 						if (oBinding && oBinding.__supportUID === sBindingId) {
 							oIssues[sAnalyticalErrorId + "-" + sBindingId] = true; // Ensure is only reported once
 							SupportHelper.reportIssue(oIssueManager, "Analytical Binding reports 'No deviating units found...'",
-								Severity.High, aTables[i].getId());
+								Severity.High, oTable.getId());
 						}
 					}
 				}

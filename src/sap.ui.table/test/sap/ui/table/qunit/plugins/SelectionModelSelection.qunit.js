@@ -28,7 +28,7 @@ sap.ui.define([
 	QUnit.test("#setSelected", async function(assert) {
 		const oSelectionPlugin = this.oTable._getSelectionPlugin();
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		oSelectionPlugin.setSelected(this.oTable.getRows()[0], true);
 		assert.deepEqual(oSelectionPlugin.getSelectedIndices(), [0], "Select a row");
@@ -41,10 +41,10 @@ sap.ui.define([
 
 		oSelectionPlugin.clearSelection();
 		this.oTable.getModel().setData();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		oSelectionPlugin.setSelected(this.oTable.getRows()[0], true);
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		assert.deepEqual(oSelectionPlugin.getSelectedIndices(), [], "Select a row that is not selectable");
 	});
 
@@ -101,27 +101,25 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Rebind", function(assert) {
+	QUnit.test("Rebind", async function(assert) {
 		this.oTable.bindRows(this.oTable.getBindingInfo("rows"));
 		assert.deepEqual(this.oTable.getSelectedIndices(), [], "Selection");
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			assert.equal(this.oSelectionChangeSpy.callCount, 0, "rowSelectionChange event not fired");
-		}.bind(this));
+		await this.oTable.qunit.rendered();
+		assert.equal(this.oSelectionChangeSpy.callCount, 0, "rowSelectionChange event not fired");
 	});
 
-	QUnit.test("Unbind", function(assert) {
+	QUnit.test("Unbind", async function(assert) {
 		this.oTable.unbindRows();
 		assert.deepEqual(this.oTable.getSelectedIndices(), [], "Selection");
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			assert.equal(this.oSelectionChangeSpy.callCount, 0, "rowSelectionChange event not fired");
-		}.bind(this));
+		await this.oTable.qunit.rendered();
+		assert.equal(this.oSelectionChangeSpy.callCount, 0, "rowSelectionChange event not fired");
 	});
 
 	QUnit.test("Sort", function(assert) {
 		assert.expect(3);
-		this.oTable._getSelectionPlugin().attachEventOnce("selectionChange", function(oEvent) {
+		this.oTable._getSelectionPlugin().attachEventOnce("selectionChange", (oEvent) => {
 			assert.deepEqual(oEvent.getParameter("_internalTrigger"), true, "SelectionChange _internalTrigger parameter");
 		});
 		this.oTable.getBinding().sort(new Sorter({path: "something"}));
@@ -142,7 +140,7 @@ sap.ui.define([
 
 	QUnit.test("Filter", function(assert) {
 		assert.expect(3);
-		this.oTable._getSelectionPlugin().attachEventOnce("selectionChange", function(oEvent) {
+		this.oTable._getSelectionPlugin().attachEventOnce("selectionChange", (oEvent) => {
 			assert.deepEqual(oEvent.getParameter("_internalTrigger"), true, "SelectionChange _internalTrigger parameter");
 		});
 		this.oTable.getBinding().filter(new Filter({path: "something", operator: "EQ", value1: "something"}));
@@ -161,50 +159,47 @@ sap.ui.define([
 		assert.equal(this.oSelectionChangeSpy.callCount, 1, "rowSelectionChange event fired");
 	});
 
-	QUnit.test("Initial change of total number of rows", function(assert) {
+	QUnit.test("Initial change of total number of rows", async function(assert) {
 		this.oTable.destroy();
 		this.oTable = TableQUnitUtils.createTable({
 			rows: {path: "/"},
 			models: TableQUnitUtils.createJSONModelWithEmptyRows(10)
-		}, function(oTable) {
-			oTable._getSelectionPlugin().attachEventOnce("selectionChange", function(oEvent) {
+		}, (oTable) => {
+			oTable._getSelectionPlugin().attachEventOnce("selectionChange", (oEvent) => {
 				assert.deepEqual(oEvent.getParameter("_internalTrigger"), undefined,
 					"SelectionChange _internalTrigger parameter is undefined");
 			});
 			oTable.setSelectionInterval(2, 6);
 		});
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			assert.deepEqual(this.oTable.getSelectedIndices(), [2, 3, 4, 5, 6], "Selection");
-		}.bind(this));
+		await this.oTable.qunit.rendered();
+		assert.deepEqual(this.oTable.getSelectedIndices(), [2, 3, 4, 5, 6], "Selection");
 	});
 
-	QUnit.test("Change total number of rows before rendering", function(assert) {
+	QUnit.test("Change total number of rows before rendering", async function(assert) {
 		this.oTable.getBinding().getModel().getData().push({});
 		this.oTable.getBinding().refresh();
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			assert.deepEqual(this.oTable.getSelectedIndices(), [], "Selection");
-			assert.equal(this.oSelectionChangeSpy.callCount, 1, "rowSelectionChange event fired");
-		}.bind(this));
+		await this.oTable.qunit.rendered();
+		assert.deepEqual(this.oTable.getSelectedIndices(), [], "Selection");
+		assert.equal(this.oSelectionChangeSpy.callCount, 1, "rowSelectionChange event fired");
 	});
 
-	QUnit.test("Change total number of rows after rendering", function(assert) {
+	QUnit.test("Change total number of rows after rendering", async function(assert) {
 		const oSelectionPlugin = this.oTable._getSelectionPlugin();
-		oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
+		oSelectionPlugin.attachEventOnce("selectionChange", (oEvent) => {
 			assert.deepEqual(oEvent.getParameter("_internalTrigger"), true,
 				"SelectionChange _internalTrigger parameter is true after total number of row change");
 		});
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			this.oTable.getBinding().getModel().getData().push({});
-			this.oTable.getBinding().refresh();
-		}.bind(this)).then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			assert.deepEqual(this.oTable.getSelectedIndices(), [], "Selection");
-			assert.equal(this.oSelectionChangeSpy.callCount, 1, "rowSelectionChange event fired");
-		}.bind(this));
+		await this.oTable.qunit.rendered();
+		this.oTable.getBinding().getModel().getData().push({});
+		this.oTable.getBinding().refresh();
+		await this.oTable.qunit.rendered();
+		assert.deepEqual(this.oTable.getSelectedIndices(), [], "Selection");
+		assert.equal(this.oSelectionChangeSpy.callCount, 1, "rowSelectionChange event fired");
 	});
 
-	QUnit.test("Change total number of rows if activated after binding initialization", function(assert) {
+	QUnit.test("Change total number of rows if activated after binding initialization", async function(assert) {
 		this.oTable.insertDependent(new (SelectionPlugin.extend("sap.ui.table.test.SelectionPlugin"))(), 0);
 		this.oTable.getDependents()[0].destroy();
 		this.oTable.setSelectionInterval(2, 6);
@@ -212,19 +207,17 @@ sap.ui.define([
 		this.oTable.getBinding().getModel().getData().push({});
 		this.oTable.getBinding().refresh();
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			assert.deepEqual(this.oTable.getSelectedIndices(), [], "Selection");
-			assert.equal(this.oSelectionChangeSpy.callCount, 1, "rowSelectionChange event fired");
-		}.bind(this));
+		await this.oTable.qunit.rendered();
+		assert.deepEqual(this.oTable.getSelectedIndices(), [], "Selection");
+		assert.equal(this.oSelectionChangeSpy.callCount, 1, "rowSelectionChange event fired");
 	});
 
-	QUnit.test("Selection during rebind (rebind changes total number of rows)", function(assert) {
+	QUnit.test("Selection during rebind (rebind changes total number of rows)", async function(assert) {
 		this.oTable.bindRows(this.oTable.getBindingInfo("rows"));
 		this.oTable.setSelectionInterval(2, 6);
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			assert.deepEqual(this.oTable.getSelectedIndices(), [2, 3, 4, 5, 6], "Selection");
-		}.bind(this));
+		await this.oTable.qunit.rendered();
+		assert.deepEqual(this.oTable.getSelectedIndices(), [2, 3, 4, 5, 6], "Selection");
 	});
 
 	QUnit.module("HeaderSelector", {

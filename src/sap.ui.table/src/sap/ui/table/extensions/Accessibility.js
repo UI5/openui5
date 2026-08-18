@@ -89,16 +89,16 @@ sap.ui.define([
 
 			oTargetInfo._descriptions.push(ACCInfoHelper._getFullDescription(oSourceInfo));
 
-			oSourceInfo.children.forEach(function(oChild) {
+			for (const oChild of oSourceInfo.children) {
 				if (!oChild.getAccessibilityInfo || (oChild.getVisible && !oChild.getVisible())) {
-					return;
+					continue;
 				}
 
 				const oChildInfo = oChild.getAccessibilityInfo();
 				if (oChildInfo) {
 					ACCInfoHelper._flatten(oChildInfo, oTargetInfo, iLevel + 1);
 				}
-			});
+			}
 
 			if (iLevel === 0) {
 				oTargetInfo.description = oTargetInfo._descriptions.join(" ").trim();
@@ -466,7 +466,7 @@ sap.ui.define([
 			}
 
 			ExtensionHelper.performCellModifications(this, $Cell, null, null, aLabels, aDescriptions, sText, oChangeInfo,
-				function(aLabels, aDescriptions, bRowChange, bColChange) {
+				(aLabels, aDescriptions, bRowChange, bColChange) => {
 					if (bIsGroupHeader && bRowChange) {
 						aLabels.splice(1, 0, sRowId + "-groupHeader");
 					}
@@ -586,7 +586,7 @@ sap.ui.define([
 			}
 
 			ExtensionHelper.performCellModifications(this, $Cell, aDefaultLabels, [], aLabels, aDescriptions, sText, oChangeInfo,
-				function(aLabels, aDescriptions, bRowChange) {
+				(aLabels, aDescriptions, bRowChange) => {
 					if (bIsGroupHeader && bRowChange) {
 						const iIndex = aLabels.indexOf(sTableId + "-ariarowgrouplabel") + 1;
 						aLabels.splice(iIndex, 0, sRowId + "-groupHeader");
@@ -980,7 +980,7 @@ sap.ui.define([
 			}
 
 			for (let j = 0; j < TableUtils.getVisibleColumnCount(oTable); j++) {
-				mAttributes["aria-owns"].push(sTableId + "-rows-row" + mParams.index + "-col" + j);
+				mAttributes["aria-owns"].push(`${sTableId}-rows-row${mParams.index}-col${j}`);
 			}
 
 			if (TableUtils.hasRowActions(oTable)) {
@@ -1243,7 +1243,7 @@ sap.ui.define([
 				return;
 			}
 
-			oTable._mTimeouts._cleanupACCExtension = setTimeout(function() {
+			oTable._mTimeouts._cleanupACCExtension = setTimeout(() => {
 				const oTable = this.getTable();
 				if (!oTable) {
 					return;
@@ -1252,7 +1252,7 @@ sap.ui.define([
 				this._iLastColumnNumber = null;
 				ExtensionHelper.cleanupCellModifications(this);
 				oTable._mTimeouts._cleanupACCExtension = null;
-			}.bind(this), 100);
+			}, 100);
 		}
 	});
 
@@ -1494,7 +1494,7 @@ sap.ui.define([
 			}
 		}
 		const aLabels = oControl.getAriaLabelledBy();
-		if (sLabel && aLabels.indexOf(sLabel) < 0) {
+		if (sLabel && !aLabels.includes(sLabel)) {
 			oControl.addAriaLabelledBy(sLabel);
 		}
 	};

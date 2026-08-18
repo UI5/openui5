@@ -221,19 +221,16 @@ sap.ui.define([
 	}
 
 	function waitForRowsUpdated(oTable) {
-		return new Promise(function(resolve) {
+		return new Promise((resolve) => {
 			oTable.attachEventOnce("_rowsUpdated", resolve);
 		});
 	}
 
-	function waitForData(oTable) {
+	async function waitForData(oTable) {
 		if (oTable._isWaitingForData()) {
-			return waitForRowsUpdated(oTable).then(function() {
-				return waitForData(oTable);
-			});
+			await waitForRowsUpdated(oTable);
+			return waitForData(oTable);
 		}
-
-		return Promise.resolve();
 	}
 
 	function scrollDown(oTable, oEvent, bPage, fnFocus) {
@@ -256,7 +253,7 @@ sap.ui.define([
 		return _scroll(oTable, oEvent, false, bPage, fnFocus);
 	}
 
-	function _scroll(oTable, oEvent, bDown, bPage, fnFocus) {
+	async function _scroll(oTable, oEvent, bDown, bPage, fnFocus) {
 		const oCellInfo = TableUtils.getCellInfo(TableUtils.getCell(oTable, oEvent.target));
 		const bActionMode = oTable._getKeyboardExtension().isInActionMode();
 		const bCtrlKeyPressed = KeyboardDelegate._isKeyCombination(oEvent, null, ModKey.CTRL);
@@ -265,20 +262,20 @@ sap.ui.define([
 
 		if (bAllowSapFocusLeave) {
 			oTable._getKeyboardExtension().setSilentFocus(oTable.getDomRef("focusDummy"));
-			setTimeout(function() {
+			setTimeout(() => {
 				oTable._getScrollExtension().scrollVertically(bDown === true, bPage);
 			}, 0);
 		} else {
 			oTable._getScrollExtension().scrollVertically(bDown === true, bPage);
 		}
 
-		return waitForRowsUpdated(oTable).then(function() {
-			if (fnFocus) {
-				fnFocus();
-			} else if (bActionModeNavigation) {
-				focusCell(oTable, oCellInfo.type, oCellInfo.rowIndex, oCellInfo.columnIndex, true);
-			}
-		});
+		await waitForRowsUpdated(oTable);
+
+		if (fnFocus) {
+			fnFocus();
+		} else if (bActionModeNavigation) {
+			focusCell(oTable, oCellInfo.type, oCellInfo.rowIndex, oCellInfo.columnIndex, true);
+		}
 	}
 
 	/**
@@ -414,7 +411,7 @@ sap.ui.define([
 		function selectItems() {
 			let _doSelect = null;
 			if (oTable._legacyMultiSelection) {
-				_doSelect = function(oRow) {
+				_doSelect = (oRow) => {
 					oTable._legacyMultiSelection(oRow.getIndex(), oEvent);
 				};
 			}
@@ -454,19 +451,11 @@ sap.ui.define([
 	 *                Returns -1 if the column is not in this list.
 	 */
 	function getColumnIndexInVisibleAndGroupedColumns(oTable, oColumn) {
-		const aVisibleAndGroupedColumns = oTable.getColumns().filter(function(oColumn) {
+		const aVisibleAndGroupedColumns = oTable.getColumns().filter((oColumn) => {
 			return oColumn.getVisible() || (oColumn.getGrouped ? oColumn.getGrouped() : false);
 		});
 
-		for (let i = 0; i < aVisibleAndGroupedColumns.length; i++) {
-			const oVisibleOrGroupedColumn = aVisibleAndGroupedColumns[i];
-
-			if (oVisibleOrGroupedColumn === oColumn) {
-				return i;
-			}
-		}
-
-		return -1;
+		return aVisibleAndGroupedColumns.findIndex((oVisibleOrGroupedColumn) => oVisibleOrGroupedColumn === oColumn);
 	}
 
 	function moveRangeSelection(oTable, iRowIndex, bReverse) {
@@ -1225,12 +1214,12 @@ sap.ui.define([
 
 				if (pScroll) {
 					preventItemNavigation(oEvent);
-					pScroll.then(function() {
+					pScroll.then(() => {
 						return waitForData(this);
-					}.bind(this)).then(function() {
+					}).then(() => {
 						moveRangeSelection(this, iFocusedRowIndex - (bReverse ? 1 : 0), bReverse);
 						delete this._oRangeSelection.pScroll;
-					}.bind(this));
+					});
 				} else {
 					moveRangeSelection(this, iFocusedRowIndex + (bReverse ? 0 : 1), bReverse);
 				}
@@ -1315,12 +1304,12 @@ sap.ui.define([
 
 				if (pScroll) {
 					preventItemNavigation(oEvent);
-					pScroll.then(function() {
+					pScroll.then(() => {
 						return waitForData(this);
-					}.bind(this)).then(function() {
+					}).then(() => {
 						moveRangeSelection(this, bReverse ? 1 : 0, bReverse);
 						delete this._oRangeSelection.pScroll;
-					}.bind(this));
+					});
 				} else {
 					moveRangeSelection(this, iFocusedRowIndex - (bReverse ? 0 : 1), bReverse);
 				}

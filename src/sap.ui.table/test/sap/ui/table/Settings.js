@@ -687,7 +687,7 @@ sap.ui.define("test-resources/sap/ui/table/Settings", [
 					text: "Density",
 					value: function(oTable) {
 						const sDensity = TableUtils.getContentDensity(oTable);
-						if (!sDensity || sDensity.indexOf("sapUiSize") === -1) {
+						if (!sDensity || !sDensity.includes("sapUiSize")) {
 							return null;
 						}
 						return sDensity.substring(9, sDensity.length).toUpperCase();

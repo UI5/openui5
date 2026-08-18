@@ -65,17 +65,13 @@ sap.ui.define([
 		return this.checkRowsUpdated(assert, []);
 	});
 
-	QUnit.test("Initial rendering without binding in invisible container", function(assert) {
-		return TableQUnitUtils.hideTestContainer().then(() => {
-			this.createTable({rows: ""});
-			return this.checkRowsUpdated(assert, []);
-		})
-			.then(() => {
-				this.resetRowsUpdatedSpy();
-				return TableQUnitUtils.showTestContainer();
-			}).then(() => {
-				return this.checkRowsUpdated(assert, []);
-			});
+	QUnit.test("Initial rendering without binding in invisible container", async function(assert) {
+		await TableQUnitUtils.hideTestContainer();
+		this.createTable({rows: ""});
+		await this.checkRowsUpdated(assert, []);
+		this.resetRowsUpdatedSpy();
+		await TableQUnitUtils.showTestContainer();
+		await this.checkRowsUpdated(assert, []);
 	});
 
 	QUnit.test("Initial rendering with binding", function(assert) {
@@ -86,36 +82,33 @@ sap.ui.define([
 		]);
 	});
 
-	QUnit.test("Initial rendering with binding in invisible container", function(assert) {
-		return TableQUnitUtils.hideTestContainer().then(() => {
-			this.createTable();
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Render
-			]);
-		}).then(() => {
-			this.resetRowsUpdatedSpy();
-			return TableQUnitUtils.showTestContainer();
-		}).then(() => {
-			return this.checkRowsUpdated(assert, []);
-		});
+	QUnit.test("Initial rendering with binding in invisible container", async function(assert) {
+		await TableQUnitUtils.hideTestContainer();
+		this.createTable();
+		await this.checkRowsUpdated(assert, [
+			TableUtils.RowsUpdateReason.Render
+		]);
+		this.resetRowsUpdatedSpy();
+		await TableQUnitUtils.showTestContainer();
+		await this.checkRowsUpdated(assert, []);
 	});
 
 	QUnit.test("Re-render without binding", async function(assert) {
 		this.createTable({rows: ""});
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.resetRowsUpdatedSpy();
 		this.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		await this.checkRowsUpdated(assert, []);
 	});
 
 	QUnit.test("Re-render without binding in invisible container", async function(assert) {
 		this.createTable({rows: ""});
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.resetRowsUpdatedSpy();
 		await TableQUnitUtils.hideTestContainer();
 		this.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		await this.checkRowsUpdated(assert, []);
 		this.resetRowsUpdatedSpy();
 		await TableQUnitUtils.showTestContainer();
@@ -124,10 +117,10 @@ sap.ui.define([
 
 	QUnit.test("Re-render with binding", async function(assert) {
 		this.createTable();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.resetRowsUpdatedSpy();
 		this.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		await this.checkRowsUpdated(assert, [
 			TableUtils.RowsUpdateReason.Render
 		]);
@@ -135,11 +128,11 @@ sap.ui.define([
 
 	QUnit.test("Re-render with binding in invisible container", async function(assert) {
 		this.createTable();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.resetRowsUpdatedSpy();
 		await TableQUnitUtils.hideTestContainer();
 		this.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		await this.checkRowsUpdated(assert, [
 			TableUtils.RowsUpdateReason.Render
 		]);
@@ -148,151 +141,138 @@ sap.ui.define([
 		await this.checkRowsUpdated(assert, []);
 	});
 
-	QUnit.test("Sort with Table#sort", function(assert) {
+	QUnit.test("Sort with Table#sort", async function(assert) {
 		this.createTable();
 
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.sort(this.oTable.getColumns()[0], "Ascending");
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Render
-			]);
-		});
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable.sort(this.oTable.getColumns()[0], "Ascending");
+		await this.checkRowsUpdated(assert, [
+			TableUtils.RowsUpdateReason.Render
+		]);
 	});
 
-	QUnit.test("Sort with Binding#sort", function(assert) {
+	QUnit.test("Sort with Binding#sort", async function(assert) {
 		this.createTable();
 
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.getBinding().sort(new Sorter(this.oTable.getColumns()[0].getSortProperty()));
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Sort
-			]);
-		});
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable.getBinding().sort(new Sorter(this.oTable.getColumns()[0].getSortProperty()));
+		await this.checkRowsUpdated(assert, [
+			TableUtils.RowsUpdateReason.Sort
+		]);
 	});
 
-	QUnit.test("Filter with Table#filter", function(assert) {
+	QUnit.test("Filter with Table#filter", async function(assert) {
 		this.createTable();
 
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.filter(this.oTable.getColumns()[0], "test");
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Render
-			]);
-		});
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable.filter(this.oTable.getColumns()[0], "test");
+		await this.checkRowsUpdated(assert, [
+			TableUtils.RowsUpdateReason.Render
+		]);
 	});
 
-	QUnit.test("Filter with Binding#filter", function(assert) {
+	QUnit.test("Filter with Binding#filter", async function(assert) {
 		this.createTable();
 
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.getBinding().filter(new Filter(this.oTable.getColumns()[0].getFilterProperty(), "Contains", "test"));
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Filter
-			]);
-		});
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable.getBinding().filter(new Filter(this.oTable.getColumns()[0].getFilterProperty(), "Contains", "test"));
+		await this.checkRowsUpdated(assert, [
+			TableUtils.RowsUpdateReason.Filter
+		]);
 	});
 
-	QUnit.test("Unbind with showNoData=true", function(assert) {
+	QUnit.test("Unbind with showNoData=true", async function(assert) {
 		this.createTable();
 
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.unbindRows();
-			return this.checkRowsUpdated(assert, []);
-		});
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable.unbindRows();
+		await this.checkRowsUpdated(assert, []);
 	});
 
-	QUnit.test("Unbind with showNoData=false", function(assert) {
+	QUnit.test("Unbind with showNoData=false", async function(assert) {
 		this.createTable({showNoData: false});
 
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.unbindRows();
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Unbind
-			]);
-		});
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable.unbindRows();
+		await this.checkRowsUpdated(assert, [
+			TableUtils.RowsUpdateReason.Unbind
+		]);
 	});
 
-	QUnit.test("Unbind when invalid", function(assert) {
+	QUnit.test("Unbind when invalid", async function(assert) {
 		this.createTable();
 
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.invalidate();
-			this.oTable.unbindRows();
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable.invalidate();
+		this.oTable.unbindRows();
 
-			// Because the table was invalidated, rows will be re-rendered, clearing all modifications that were done in a "rowsUpdated" event
-			// listener. It is therefore not required to fire the event because of the unbind. In general, the "rowsUpdated" event is not fired
-			// if the table has no binding for the rows aggregation.
-			return this.checkRowsUpdated(assert, []);
-		});
+		// Because the table was invalidated, rows will be re-rendered, clearing all modifications that were done in a "rowsUpdated" event
+		// listener. It is therefore not required to fire the event because of the unbind. In general, the "rowsUpdated" event is not fired
+		// if the table has no binding for the rows aggregation.
+		await this.checkRowsUpdated(assert, []);
 	});
 
-	QUnit.test("Bind with client binding", function(assert) {
+	QUnit.test("Bind with client binding", async function(assert) {
 		this.createTable();
 		this.oBindingInfo = this.oTable.getBindingInfo("rows");
 
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			this.oTable.unbindRows();
-		}).then(this.oTable.qunit.whenRenderingFinished).then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.bindRows(this.oBindingInfo);
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Render
-			]);
-		});
+		await this.oTable.qunit.rendered();
+		this.oTable.unbindRows();
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable.bindRows(this.oBindingInfo);
+		await this.checkRowsUpdated(assert, [
+			TableUtils.RowsUpdateReason.Render
+		]);
 	});
 
-	QUnit.test("Vertical scrolling", function(assert) {
+	QUnit.test("Vertical scrolling", async function(assert) {
 		this.createTable();
 
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable._getScrollExtension().getVerticalScrollbar().scrollTop = 100;
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.VerticalScroll
-			]);
-		});
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable._getScrollExtension().getVerticalScrollbar().scrollTop = 100;
+		await this.checkRowsUpdated(assert, [
+			TableUtils.RowsUpdateReason.VerticalScroll
+		]);
 	});
 
-	QUnit.test("Change first visible row by API call (setFirstVisibleRow)", function(assert) {
+	QUnit.test("Change first visible row by API call (setFirstVisibleRow)", async function(assert) {
 		this.createTable();
 
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.setFirstVisibleRow(1);
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.FirstVisibleRowChange
-			]);
-		}).then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.setFirstVisibleRow();
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.FirstVisibleRowChange
-			]);
-		}).then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.setFirstVisibleRow(null);
-			return this.checkRowsUpdated(assert, []);
-		});
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable.setFirstVisibleRow(1);
+		await this.checkRowsUpdated(assert, [
+			TableUtils.RowsUpdateReason.FirstVisibleRowChange
+		]);
+		this.resetRowsUpdatedSpy();
+		this.oTable.setFirstVisibleRow();
+		await this.checkRowsUpdated(assert, [
+			TableUtils.RowsUpdateReason.FirstVisibleRowChange
+		]);
+		this.resetRowsUpdatedSpy();
+		this.oTable.setFirstVisibleRow(null);
+		await this.checkRowsUpdated(assert, []);
 	});
 
-	QUnit.test("Theme change", function(assert) {
+	QUnit.test("Theme change", async function(assert) {
 		this.createTable();
 
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			this.resetRowsUpdatedSpy();
-			this.oTable.onThemeChanged();
-		}).then(this.oTable.qunit.whenRenderingFinished).then(() => {
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Render
-			]);
-		});
+		await this.oTable.qunit.rendered();
+		this.resetRowsUpdatedSpy();
+		this.oTable.onThemeChanged();
+		await this.oTable.qunit.rendered();
+		await this.checkRowsUpdated(assert, [
+			TableUtils.RowsUpdateReason.Render
+		]);
 	});
 
 	return QUnit;

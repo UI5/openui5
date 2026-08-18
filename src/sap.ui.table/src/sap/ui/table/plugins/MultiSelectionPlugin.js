@@ -195,33 +195,31 @@ sap.ui.define([
 	/**
 	 * @inheritDoc
 	 */
-	MultiSelectionPlugin.prototype.handleHeaderSelectorPress = function() {
+	MultiSelectionPlugin.prototype.handleHeaderSelectorPress = async function() {
 		const oHeaderSelector = this._getHeaderSelector();
 
 		if (!oHeaderSelector.getVisible() || !oHeaderSelector.getEnabled()) {
-			return Promise.resolve();
+			return;
 		}
 
 		if (oHeaderSelector.getType() === "CheckBox") {
-			return toggleSelection(this).promise;
+			return await toggleSelection(this).promise;
 		} else if (oHeaderSelector.getType() === "Icon") {
 			if (this.getSelectedCount() > 0) {
 				this.clearSelection();
 			} else {
-				return this.addSelectionInterval(0, this._getHighestSelectableIndex());
+				return await this.addSelectionInterval(0, this._getHighestSelectableIndex());
 			}
 		}
-
-		return Promise.resolve();
 	};
 
 	/**
 	 * @inheritDoc
 	 */
-	MultiSelectionPlugin.prototype.handleKeyboardShortcut = function(sType, oEvent) {
+	MultiSelectionPlugin.prototype.handleKeyboardShortcut = async function(sType, oEvent) {
 		if (sType === "toggle") { // ctrl + a
 			if (this.getSelectionMode() !== SelectionMode.MultiToggle) {
-				return Promise.resolve();
+				return;
 			}
 
 			if (this._bLimitDisabled) {
@@ -229,16 +227,14 @@ sap.ui.define([
 				if (!mResult.selectAll) {
 					oEvent.setMarked("sapUiTableClearAll");
 				}
-				return mResult.promise;
+				return await mResult.promise;
 			} else {
-				return this.addSelectionInterval(0, this._getHighestSelectableIndex());
+				return await this.addSelectionInterval(0, this._getHighestSelectableIndex());
 			}
 		} else if (sType === "clear") { // ctrl + shift + a
 			this.clearSelection();
 			oEvent.setMarked("sapUiTableClearAll");
 		}
-
-		return Promise.resolve();
 	};
 
 	/**
@@ -324,22 +320,22 @@ sap.ui.define([
 	 * @returns {Promise} A Promise that resolves after the selection has been completed or is rejected with an error
 	 * @public
 	 */
-	MultiSelectionPlugin.prototype.selectAll = function(oEventPayload) {
+	MultiSelectionPlugin.prototype.selectAll = async function(oEventPayload) {
 		if (!this.isActive()) {
-			return Promise.reject(new Error("Plugin is disabled"));
+			throw new Error("Plugin is disabled");
 		}
 
 		if (!this._bLimitDisabled) {
-			return Promise.reject(new Error("Not possible if the limit is enabled"));
+			throw new Error("Not possible if the limit is enabled");
 		}
 
 		const iSelectableCount = this.getSelectableCount();
 
 		if (iSelectableCount === 0) {
-			return Promise.reject(new Error("Nothing to select"));
+			throw new Error("Nothing to select");
 		}
 
-		return this.addSelectionInterval(0, this._getHighestSelectableIndex(), oEventPayload);
+		return await this.addSelectionInterval(0, this._getHighestSelectableIndex(), oEventPayload);
 	};
 
 	/**
@@ -352,12 +348,12 @@ sap.ui.define([
 	 * @return {Promise|Promise<{indexTo: int, indexFrom: int}>} A promise that resolves with the corrected start and end index when the contexts are
 	 * loaded. The Promise is rejected if the index is out of range.
 	 */
-	function prepareSelection(oPlugin, iIndexFrom, iIndexTo, bAddSelection) {
+	async function prepareSelection(oPlugin, iIndexFrom, iIndexTo, bAddSelection) {
 		const iHighestSelectableIndex = oPlugin._getHighestSelectableIndex();
 
 		if (iIndexFrom < 0 && iIndexTo < 0 || iIndexFrom > iHighestSelectableIndex && iIndexTo > iHighestSelectableIndex) {
 			// Selection is not possible if the index range it completely out of the selectable range.
-			return Promise.reject(new Error("Out of range"));
+			throw new Error("Out of range");
 		}
 
 		// Restrict indices to boundaries.
@@ -398,17 +394,17 @@ sap.ui.define([
 			}
 		}
 
-		return TableUtils.loadContexts(oPlugin.getControl(), iGetContextsStartIndex, iGetContextsLength, true).then((aContexts) => {
-			if (!oPlugin._bLimitDisabled && aContexts.length < iLimit) {
-				oPlugin.setLimitReached(false);
-				if (bReverse) {
-					iIndexTo = iIndexFrom - aContexts.length + 1;
-				} else {
-					iIndexTo = iIndexFrom + aContexts.length - 1;
-				}
+		const aContexts = await TableUtils.loadContexts(oPlugin.getControl(), iGetContextsStartIndex, iGetContextsLength, true);
+
+		if (!oPlugin._bLimitDisabled && aContexts.length < iLimit) {
+			oPlugin.setLimitReached(false);
+			if (bReverse) {
+				iIndexTo = iIndexFrom - aContexts.length + 1;
+			} else {
+				iIndexTo = iIndexFrom + aContexts.length - 1;
 			}
-			return {indexFrom: iIndexFrom, indexTo: iIndexTo};
-		});
+		}
+		return {indexFrom: iIndexFrom, indexTo: iIndexTo};
 	}
 
 	/**
@@ -426,39 +422,39 @@ sap.ui.define([
 	 * @returns {Promise} A Promise that resolves after the selection has been completed or is rejected with an error
 	 * @public
 	 */
-	MultiSelectionPlugin.prototype.setSelectionInterval = function(iIndexFrom, iIndexTo, oEventPayload) {
+	MultiSelectionPlugin.prototype.setSelectionInterval = async function(iIndexFrom, iIndexTo, oEventPayload) {
 		const oTable = this.getControl();
 		const sSelectionMode = this.getSelectionMode();
 
 		if (!this.isActive()) {
-			return Promise.reject(new Error("Plugin is disabled"));
+			throw new Error("Plugin is disabled");
 		}
 
 		if (sSelectionMode === SelectionMode.None) {
-			return Promise.reject(new Error("SelectionMode is '" + SelectionMode.None + "'"));
+			throw new Error("SelectionMode is '" + SelectionMode.None + "'");
 		}
 
 		if (sSelectionMode === SelectionMode.Single) {
 			iIndexFrom = iIndexTo;
 		}
 
-		return prepareSelection(this, iIndexFrom, iIndexTo, false).then(function(mIndices) {
-			this._oCustomEventPayloadTmp = oEventPayload;
-			this.oInnerSelectionPlugin.setSelectionInterval(mIndices.indexFrom, mIndices.indexTo);
-			delete this._oCustomEventPayloadTmp;
+		const mIndices = await prepareSelection(this, iIndexFrom, iIndexTo, false);
 
-			if (!this.isLimitReached()) {
-				return Promise.resolve();
-			}
+		this._oCustomEventPayloadTmp = oEventPayload;
+		this.oInnerSelectionPlugin.setSelectionInterval(mIndices.indexFrom, mIndices.indexTo);
+		delete this._oCustomEventPayloadTmp;
 
-			return TableUtils.scrollTableToIndex(oTable, mIndices.indexTo, mIndices.indexFrom > mIndices.indexTo).then(function() {
-				if (!this.getEnableNotification()) {
-					return Promise.resolve();
-				}
+		if (!this.isLimitReached()) {
+			return;
+		}
 
-				return TableUtils.showNotificationPopoverAtIndex(oTable, mIndices.indexTo, this.getLimit());
-			}.bind(this));
-		}.bind(this));
+		await TableUtils.scrollTableToIndex(oTable, mIndices.indexTo, mIndices.indexFrom > mIndices.indexTo);
+
+		if (!this.getEnableNotification()) {
+			return;
+		}
+
+		return await TableUtils.showNotificationPopoverAtIndex(oTable, mIndices.indexTo, this.getLimit());
 	};
 
 	/**
@@ -489,40 +485,40 @@ sap.ui.define([
 	 * @returns {Promise} A Promise that resolves after the selection has been completed or is rejected with an error
 	 * @public
 	 */
-	MultiSelectionPlugin.prototype.addSelectionInterval = function(iIndexFrom, iIndexTo, oEventPayload) {
+	MultiSelectionPlugin.prototype.addSelectionInterval = async function(iIndexFrom, iIndexTo, oEventPayload) {
 		const oTable = this.getControl();
 		const sSelectionMode = this.getSelectionMode();
 
 		if (!this.isActive()) {
-			return Promise.reject(new Error("Plugin is disabled"));
+			throw new Error("Plugin is disabled");
 		}
 
 		if (sSelectionMode === SelectionMode.None) {
-			return Promise.reject(new Error("SelectionMode is '" + SelectionMode.None + "'"));
+			throw new Error("SelectionMode is '" + SelectionMode.None + "'");
 		}
 
 		if (sSelectionMode === SelectionMode.Single) {
-			return this.setSelectionInterval(iIndexTo, iIndexTo);
+			return await this.setSelectionInterval(iIndexTo, iIndexTo);
 		}
 
 		if (sSelectionMode === SelectionMode.MultiToggle) {
-			return prepareSelection(this, iIndexFrom, iIndexTo, true).then(function(mIndices) {
-				this._oCustomEventPayloadTmp = oEventPayload;
-				this.oInnerSelectionPlugin.addSelectionInterval(mIndices.indexFrom, mIndices.indexTo);
-				delete this._oCustomEventPayloadTmp;
+			const mIndices = await prepareSelection(this, iIndexFrom, iIndexTo, true);
 
-				if (!this.isLimitReached()) {
-					return Promise.resolve();
-				}
+			this._oCustomEventPayloadTmp = oEventPayload;
+			this.oInnerSelectionPlugin.addSelectionInterval(mIndices.indexFrom, mIndices.indexTo);
+			delete this._oCustomEventPayloadTmp;
 
-				return TableUtils.scrollTableToIndex(oTable, mIndices.indexTo, mIndices.indexFrom > mIndices.indexTo).then(function() {
-					if (!this.getEnableNotification()) {
-						return Promise.resolve();
-					}
+			if (!this.isLimitReached()) {
+				return;
+			}
 
-					return TableUtils.showNotificationPopoverAtIndex(oTable, mIndices.indexTo, this.getLimit());
-				}.bind(this));
-			}.bind(this));
+			await TableUtils.scrollTableToIndex(oTable, mIndices.indexTo, mIndices.indexFrom > mIndices.indexTo);
+
+			if (!this.getEnableNotification()) {
+				return;
+			}
+
+			return await TableUtils.showNotificationPopoverAtIndex(oTable, mIndices.indexTo, this.getLimit());
 		}
 	};
 

@@ -82,8 +82,7 @@ sap.ui.define([
 		}
 
 		if (!DataType.getType("sap.ui.core.message.MessageType").isValid(oValue) && !DataType.getType("sap.ui.core.IndicationColor").isValid(oValue)) {
-			throw new Error("\"" + oValue + "\" is of type " + typeof oValue + ", expected is a value of the enums sap/ui/core/message/MessageType or sap.ui.core.IndicationColor"
-				+ " for property \"" + sPropertyName + "\" of " + this);
+			throw new Error(`"${oValue}" is of type ${typeof oValue}, expected is a value of the enums sap/ui/core/message/MessageType or sap.ui.core.IndicationColor for property "${sPropertyName}" of ${this}`);
 		}
 		return oValue;
 	};

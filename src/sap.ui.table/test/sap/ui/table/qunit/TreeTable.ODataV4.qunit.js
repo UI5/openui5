@@ -33,10 +33,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("Scrolling to existing data", async function(assert) {
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.spy(this.oTable, "setBusy");
 		this.oTable.setFirstVisibleRow(1);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.ok(this.oTable.setBusy.neverCalledWith(true), "Table not set to busy");
 	});
@@ -58,7 +58,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Initialization", async function(assert) {
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		assert.ok(this.fnBindingContextSpy.notCalled, "Binding#getContexts was not called");
 	});
 
@@ -66,14 +66,14 @@ sap.ui.define([
 		this.fnBindingContextSpy.resetHistory();
 		this.oTable.setVisible(true);
 		this.oTable.getBinding().resume();
-		await this.oTable.qunit.whenBindingChange();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
 		assert.ok(this.fnBindingContextSpy.called, "Show table and resume binding: Binding#getContexts called");
 
 		this.fnBindingContextSpy.resetHistory();
 		this.oTable.setVisible(false);
 		this.oTable.getBinding().suspend();
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		assert.ok(this.fnBindingContextSpy.notCalled, "Hide table and suspend binding: Binding#getContexts not called");
 	});
 });

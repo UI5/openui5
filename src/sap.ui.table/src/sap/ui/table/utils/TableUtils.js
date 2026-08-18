@@ -451,11 +451,11 @@ sap.ui.define([
 				} else {
 					let iHeaderRows = 1;
 					const aColumns = oTable.getColumns();
-					for (let i = 0; i < aColumns.length; i++) {
-						if (aColumns[i].shouldRender()) {
+					for (const oColumn of aColumns) {
+						if (oColumn.shouldRender()) {
 							// only visible columns need to be considered. We don't invoke getVisibleColumns due to
 							// performance considerations. With several dozens of columns, it's quite costy to loop them twice.
-							iHeaderRows = Math.max(iHeaderRows, aColumns[i].getMultiLabels().length);
+							iHeaderRows = Math.max(iHeaderRows, oColumn.getMultiLabels().length);
 						}
 					}
 					oTable._iHeaderRowCount = iHeaderRows;
@@ -558,9 +558,9 @@ sap.ui.define([
 		 * @param {boolean} bReverse Whether the row should be displayed at the bottom of the table.
 		 * @returns {Promise} A promise that resolves when the table is scrolled.
 		 */
-		scrollTableToIndex: function(oTable, iIndex, bReverse) {
+		scrollTableToIndex: async function(oTable, iIndex, bReverse) {
 			if (!oTable) {
-				return Promise.resolve();
+				return;
 			}
 
 			const iFirstVisibleRow = oTable.getFirstVisibleRow();
@@ -574,13 +574,11 @@ sap.ui.define([
 				bExpectRowsUpdatedEvent = oTable._setFirstVisibleRowIndex(Math.max(0, iNewIndex));
 			}
 
-			return new Promise(function(resolve) {
-				if (bExpectRowsUpdatedEvent) {
+			if (bExpectRowsUpdatedEvent) {
+				await new Promise((resolve) => {
 					oTable.attachEventOnce("_rowsUpdated", resolve);
-				} else {
-					resolve();
-				}
-			});
+				});
+			}
 		},
 
 		/**
@@ -592,65 +590,69 @@ sap.ui.define([
 		 * @param {number} iLimit Maximum number of rows that can be selected at once
 		 * @returns {Promise} A Promise that resolves after the notification popover has been opened
 		 */
-		showNotificationPopoverAtIndex: function(oTable, iIndex, iLimit) {
+		showNotificationPopoverAtIndex: async function(oTable, iIndex, iLimit) {
 			let oPopover = oTable._oNotificationPopover;
 			const oRow = oTable.getRows()[iIndex - oTable._getFirstRenderedRowIndex()];
 			const sTitle = TableUtils.getResourceText("TBL_SELECT_LIMIT_TITLE");
 			const sMessage = TableUtils.getResourceText("TBL_SELECT_LIMIT", [iLimit]);
 
 			if (!oRow) {
-				return Promise.resolve();
+				return;
 			}
 
-			return new Promise(function(resolve) {
+			const [Popover, Bar, Title, Text, HBox, coreLib, mLib] = await new Promise((resolve) => {
 				sap.ui.require([
 					"sap/m/Popover", "sap/m/Bar", "sap/m/Title", "sap/m/Text", "sap/m/HBox", "sap/ui/core/library", "sap/m/library"
-				], function(Popover, Bar, Title, Text, HBox, coreLib, mLib) {
-					if (!oPopover) {
-						oPopover = new Popover(oTable.getId() + "-notificationPopover", {
-							customHeader: [
-								new Bar({
-									contentMiddle: [
-										new HBox({
-											items: [
-												new Icon({src: "sap-icon://message-warning", color: coreLib.IconColor.Critical})
-													.addStyleClass("sapUiTinyMarginEnd"),
-												new Title({text: sTitle, level: coreLib.TitleLevel.H2})
-											],
-											renderType: mLib.FlexRendertype.Bare,
-											justifyContent: mLib.FlexJustifyContent.Center,
-											alignItems: mLib.FlexAlignItems.Center
-										})
-									]
+				], (...aModules) => {
+					resolve(aModules);
+				});
+			});
+
+			if (!oPopover) {
+				oPopover = new Popover(oTable.getId() + "-notificationPopover", {
+					customHeader: [
+						new Bar({
+							contentMiddle: [
+								new HBox({
+									items: [
+										new Icon({src: "sap-icon://message-warning", color: coreLib.IconColor.Critical})
+											.addStyleClass("sapUiTinyMarginEnd"),
+										new Title({text: sTitle, level: coreLib.TitleLevel.H2})
+									],
+									renderType: mLib.FlexRendertype.Bare,
+									justifyContent: mLib.FlexJustifyContent.Center,
+									alignItems: mLib.FlexAlignItems.Center
 								})
-							],
-							content: new Text({text: sMessage})
-						});
+							]
+						})
+					],
+					content: new Text({text: sMessage})
+				});
 
-						oPopover.addStyleClass("sapUiContentPadding");
-						oTable._oNotificationPopover = oPopover;
-						oTable.addAggregation("_hiddenDependents", oTable._oNotificationPopover);
-					} else {
-						oPopover.getContent()[0].setText(sMessage);
-					}
+				oPopover.addStyleClass("sapUiContentPadding");
+				oTable._oNotificationPopover = oPopover;
+				oTable.addAggregation("_hiddenDependents", oTable._oNotificationPopover);
+			} else {
+				oPopover.getContent()[0].setText(sMessage);
+			}
 
-					oTable.detachFirstVisibleRowChanged(this._onFirstVisibleRowChange, this);
-					oTable.attachFirstVisibleRowChanged(this._onFirstVisibleRowChange, this);
+			oTable.detachFirstVisibleRowChanged(this._onFirstVisibleRowChange, this);
+			oTable.attachFirstVisibleRowChanged(this._onFirstVisibleRowChange, this);
 
-					const oRowSelector = oRow.getDomRefs().rowSelector;
+			const oRowSelector = oRow.getDomRefs().rowSelector;
 
-					if (oRowSelector) {
-						oPopover.attachEventOnce("afterOpen", function() {
-							const sWarning = Lib.getResourceBundleFor("sap.m").getText("SEMANTIC_COLOR_CRITICAL");
-							InvisibleMessage.getInstance().announce(sWarning + ". " + sMessage);
-							resolve();
-						});
-						oPopover.openBy(oRowSelector);
-					} else {
-						resolve();
-					}
-				}.bind(this));
-			}.bind(this));
+			if (!oRowSelector) {
+				return;
+			}
+
+			await new Promise((resolve) => {
+				oPopover.attachEventOnce("afterOpen", () => {
+					const sWarning = Lib.getResourceBundleFor("sap.m").getText("SEMANTIC_COLOR_CRITICAL");
+					InvisibleMessage.getInstance().announce(sWarning + ". " + sMessage);
+					resolve();
+				});
+				oPopover.openBy(oRowSelector);
+			});
 		},
 
 		_onFirstVisibleRowChange: function(oEvent) {
@@ -851,9 +853,7 @@ sap.ui.define([
 					Column = ColumnMetadata.getClass();
 				}
 
-				oCell = oRow.getCells().find(function(oCell) {
-					return oColumn === Column.ofCell(oCell);
-				}) || null;
+				oCell = oRow.getCells().find((oCell) => oColumn === Column.ofCell(oCell)) || null;
 			}
 
 			return {row: oRow, column: oColumn, cell: oCell};
@@ -984,9 +984,7 @@ sap.ui.define([
 				aHandlerIds = vHandlerId;
 			}
 
-			for (let i = 0; i < aHandlerIds.length; i++) {
-				const sHandlerId = aHandlerIds[i];
-
+			for (const sHandlerId of aHandlerIds) {
 				if (oTable._mResizeHandlerIds[sHandlerId]) {
 					ResizeHandler.deregister(oTable._mResizeHandlerIds[sHandlerId]);
 					oTable._mResizeHandlerIds[sHandlerId] = undefined;
@@ -1015,11 +1013,7 @@ sap.ui.define([
 					return;
 				}
 
-				for (let i = 0; i < aContentDensityStyleClasses.length; i++) {
-					if (oObject[sFnName](aContentDensityStyleClasses[i])) {
-						return aContentDensityStyleClasses[i];
-					}
-				}
+				return aContentDensityStyleClasses.find((sCls) => oObject[sFnName](sCls));
 			};
 
 			let $DomRef = oControl.$();
@@ -1199,7 +1193,7 @@ sap.ui.define([
 				_fn = function() {
 					if (bIsCalling) {
 
-						const oPromise = Promise.resolve().then(function() {
+						const oPromise = Promise.resolve().then(() => {
 							if (!oPromise.canceled) {
 								fn.apply(mLastCallInfo.context, mLastCallInfo.args);
 							}
@@ -1434,7 +1428,7 @@ sap.ui.define([
 		 */
 		isThemeApplied: function() {
 			let bIsApplied = false;
-			const fnOnThemeApplied = function() {
+			const fnOnThemeApplied = () => {
 				bIsApplied = true;
 			};
 			Theming.attachApplied(fnOnThemeApplied); // Will be called immediately when theme is applied

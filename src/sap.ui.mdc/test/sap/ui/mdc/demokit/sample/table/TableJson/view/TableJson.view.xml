@@ -19,7 +19,7 @@
 				showRowCount="false"
 				useColumnLabelsAsTooltips="true"
 				delegate="{
-					name: 'mdc/sample/delegate/JSONTableDelegate',
+					name: 'mdc/sample/delegate/ValidationJSONTableDelegate',
 					payload: {
 						bindingPath: 'mountains>/mountains'
 					}

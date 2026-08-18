@@ -124,9 +124,7 @@ sap.ui.define([
 			return;
 		}
 
-		for (let i = 0; i < oTable._aExtensions.length; i++) {
-			oTable._aExtensions[i]._attachEvents();
-		}
+		oTable._aExtensions.forEach((oExtension) => oExtension._attachEvents());
 	};
 
 	/**
@@ -141,9 +139,7 @@ sap.ui.define([
 		if (!oTable._aExtensions) {
 			return;
 		}
-		for (let i = 0; i < oTable._aExtensions.length; i++) {
-			oTable._aExtensions[i]._detachEvents();
-		}
+		oTable._aExtensions.forEach((oExtension) => oExtension._detachEvents());
 	};
 
 	/**
@@ -180,9 +176,7 @@ sap.ui.define([
 		if (!oTable._bExtensionsInitialized || !oTable._aExtensions) {
 			return;
 		}
-		for (let i = 0; i < oTable._aExtensions.length; i++) {
-			oTable._aExtensions[i].destroy();
-		}
+		oTable._aExtensions.forEach((oExtension) => oExtension.destroy());
 		delete oTable._aExtensions;
 		delete oTable._bExtensionsInitialized;
 	};
@@ -200,13 +194,7 @@ sap.ui.define([
 			return false;
 		}
 
-		for (let i = 0; i < oTable._aExtensions.length; i++) {
-			if (oTable._aExtensions[i].getMetadata().getName() === sExtensionFullName) {
-				return true;
-			}
-		}
-
-		return false;
+		return oTable._aExtensions.some((oExtension) => oExtension.getMetadata().getName() === sExtensionFullName);
 	};
 
 	return ExtensionBase;

@@ -63,7 +63,7 @@ sap.ui.define([
 				.concat({type: Row.prototype.Type.GroupHeader, expandable: true})
 				.concat({type: Row.prototype.Type.Summary}));
 
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -83,9 +83,7 @@ sap.ui.define([
 			let sHexColor = ThemeParameters.get({name: sThemeParameterName});
 			// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
 			const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-			sHexColor = sHexColor.replace(shorthandRegex, function(m, r, g, b) {
-				return r + r + g + g + b + b;
-			});
+			sHexColor = sHexColor.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
 
 			const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(sHexColor);
 
@@ -216,7 +214,7 @@ sap.ui.define([
 
 	QUnit.test("Rendering - Settings not configured", async function(assert) {
 		this.oTable.setRowSettingsTemplate(null);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertRendering(assert, false);
 	});
@@ -225,14 +223,14 @@ sap.ui.define([
 		this.oTable.setRowSettingsTemplate(new RowSettings({
 			highlight: null
 		}));
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertRendering(assert, false);
 
 		this.oTable.setRowSettingsTemplate(new RowSettings({
 			highlight: MessageType.None
 		}));
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertRendering(assert, false);
 	});
@@ -272,7 +270,7 @@ sap.ui.define([
 
 		this.oTable.addEventDelegate({onAfterRendering: oOnAfterRenderingEventListener});
 		this.oTable.getRows()[0].getAggregation("_settings").setHighlight(MessageType.Error);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.ok(oOnAfterRenderingEventListener.notCalled, "The table did not re-render after changing a highlight");
 		this.assertColor(assert, 0, this.getColorRgb("sapUiErrorBorder"));
@@ -286,7 +284,7 @@ sap.ui.define([
 
 		this.oTable.addEventDelegate({onAfterRendering: oOnAfterRenderingEventListener});
 		this.oTable.getRows()[0].getAggregation("_settings").setHighlightText("testitext");
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.ok(oOnAfterRenderingEventListener.notCalled, "The table did not re-render after changing a highlight text");
 		this.assertText(assert, 0, "testitext");
@@ -407,7 +405,7 @@ sap.ui.define([
 				setRowActionCount: 1
 			});
 
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -425,10 +423,10 @@ sap.ui.define([
 
 				if (bRendered) {
 					if (iRowIndex === 1) {
-						assert.ok(oNavIndicator.className.indexOf("sapUiTableRowNavigated") > -1,
+						assert.ok(oNavIndicator.className.includes("sapUiTableRowNavigated"),
 							"The navigated indicator of row " + (iRowIndex + 1) + " has the correct css class");
 					} else {
-						assert.ok(oNavIndicator.className.indexOf("sapUiTableRowNavigated") === -1,
+						assert.ok(!oNavIndicator.className.includes("sapUiTableRowNavigated"),
 							"The css class hasn't been assigned to the navigated indicator of row " + (iRowIndex + 1));
 					}
 				}
@@ -438,7 +436,7 @@ sap.ui.define([
 
 	QUnit.test("Rendering - Settings not configured", async function(assert) {
 		this.oTable.setRowSettingsTemplate(null);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertNavIndicatorRendering(assert, true, false);
 	});
@@ -447,14 +445,14 @@ sap.ui.define([
 		this.oTable.setRowSettingsTemplate(new RowSettings({
 			navigated: null
 		}));
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertNavIndicatorRendering(assert, true, false);
 
 		this.oTable.setRowSettingsTemplate(new RowSettings({
 			navigated: false
 		}));
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertNavIndicatorRendering(assert, true, false);
 	});
@@ -464,7 +462,7 @@ sap.ui.define([
 
 		this.oTable.destroyRowActionTemplate();
 		this.oTable.setRowActionCount(0);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		this.assertNavIndicatorRendering(assert, false, true);
 	});

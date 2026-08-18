@@ -28,7 +28,7 @@ sap.ui.define([
 	"use strict";
 
 	QUnit.module("Scrollbars", {
-		beforeEach: function() {
+		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable({
 				width: "500px",
 				columns: [TableQUnitUtils.createTextColumn().setWidth("500px")],
@@ -39,7 +39,7 @@ sap.ui.define([
 				rowActionTemplate: new RowAction({items: [new RowActionItem({type: tableLibrary.RowActionType.Navigation})]})
 			});
 
-			return this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -59,7 +59,7 @@ sap.ui.define([
 	});
 
 	QUnit.module("Horizontal scrolling", {
-		beforeEach: function() {
+		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable({
 				rows: {path: "/"},
 				models: TableQUnitUtils.createJSONModelWithEmptyRows(10),
@@ -73,14 +73,14 @@ sap.ui.define([
 				fixedColumnCount: 1
 			});
 
-			return this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
 		}
 	});
 
-	QUnit.test("Focus", function(assert) {
+	QUnit.test("Focus", async function(assert) {
 		const oTable = this.oTable;
 
 		function getScrollLeft() {
@@ -99,62 +99,44 @@ sap.ui.define([
 			return iOffsetLeft >= 0 && iOffsetRight <= 0;
 		}
 
-		function test(sTestTitle, oDomElementToFocus, iInitialScrollLeft, bScrollPositionShouldChange) {
+		async function test(sTestTitle, oDomElementToFocus, iInitialScrollLeft, bScrollPositionShouldChange) {
 			document.body.focus();
-
-			return oTable.qunit.scrollHSbTo(iInitialScrollLeft).then(oTable.qunit.$focus(oDomElementToFocus)).then(function() {
-				if (bScrollPositionShouldChange) {
-					return oTable.qunit.whenHSbScrolled().then(function() {
-						assert.notStrictEqual(getScrollLeft(), iInitialScrollLeft, sTestTitle + ": The horizontal scroll position did change");
-						assert.ok(isScrolledIntoView(oDomElementToFocus), sTestTitle + ": The focused cell is fully visible");
-					});
-				} else {
-					return TableQUnitUtils.wait(50).then(function() {
-						assert.strictEqual(getScrollLeft(), iInitialScrollLeft, sTestTitle + ": The horizontal scroll position did not change");
-					});
-				}
-			});
+			await oTable.qunit.scrollHSbTo(iInitialScrollLeft);
+			await oTable.qunit.focus(oDomElementToFocus);
+			if (bScrollPositionShouldChange) {
+				await oTable.qunit.hScrolled();
+				assert.notStrictEqual(getScrollLeft(), iInitialScrollLeft, sTestTitle + ": The horizontal scroll position did change");
+				assert.ok(isScrolledIntoView(oDomElementToFocus), sTestTitle + ": The focused cell is fully visible");
+			} else {
+				await TableQUnitUtils.sleep(50);
+				assert.strictEqual(getScrollLeft(), iInitialScrollLeft, sTestTitle + ": The horizontal scroll position did not change");
+			}
 		}
 
-		return test("Focus header cell in column 3 (scrollable column)", oTable.qunit.getColumnHeaderCell(2), 950, true).then(function() {
-			return test("Focus header cell in column 1 (fixed column)", oTable.qunit.getColumnHeaderCell(0), 880, false);
-		}).then(function() {
-			return test("Focus header cell in column 2 (scrollable column)", oTable.qunit.getColumnHeaderCell(1), 880, true);
-		}).then(function() {
-			return test("Focus header cell in column 3 (scrollable column)", oTable.qunit.getColumnHeaderCell(2), 100, true);
-		}).then(function() {
-			return test("Focus header cell in column 4 (scrollable column)", oTable.qunit.getColumnHeaderCell(3), 750, true);
-		}).then(function() {
-			return test("Focus data cell in column 3, row 1 (scrollable column)", oTable.qunit.getDataCell(0, 2), 950, true);
-		}).then(function() {
-			return test("Focus data cell in column 1, row 1 (fixed column)", oTable.qunit.getDataCell(0, 0), 880, false);
-		}).then(function() {
-			return test("Focus data cell in column 2, row 1 (scrollable column)", oTable.qunit.getDataCell(0, 1), 880, true);
-		}).then(function() {
-			return test("Focus data cell in column 3, row 1 (scrollable column)", oTable.qunit.getDataCell(0, 2), 100, true);
-		}).then(function() {
-			return test("Focus data cell in column 4, row 1 (scrollable column)", oTable.qunit.getDataCell(0, 3), 750, true);
-		}).then(function() {
-			oTable.getColumns()[1].setWidth("1000px");
-			oTable.getColumns()[3].setWidth("1000px");
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			return test("Focus header cell in column 2 (scrollable column)", oTable.qunit.getColumnHeaderCell(1), 1250, false);
-		}).then(function() {
-			return test("Focus header cell in column 4 (scrollable column)", oTable.qunit.getColumnHeaderCell(3), 150, false);
-		}).then(function() {
-			return test("Focus data cell in column 2, row 1 (scrollable column)", oTable.qunit.getDataCell(0, 1), 1250, false);
-		}).then(function() {
-			return test("Focus data cell in column 2, row 2 (scrollable column)", oTable.qunit.getDataCell(1, 1), 1250, false);
-		}).then(function() {
-			return test("Focus data cell in column 4, row 1 (scrollable column)", oTable.qunit.getDataCell(0, 3), 150, false);
-		}).then(function() {
-			return test("Focus data cell in column 4, row 2 (scrollable column)", oTable.qunit.getDataCell(1, 3), 150, false);
-		});
+		await test("Focus header cell in column 3 (scrollable column)", oTable.qunit.getColumnHeaderCell(2), 950, true);
+		await test("Focus header cell in column 1 (fixed column)", oTable.qunit.getColumnHeaderCell(0), 880, false);
+		await test("Focus header cell in column 2 (scrollable column)", oTable.qunit.getColumnHeaderCell(1), 880, true);
+		await test("Focus header cell in column 3 (scrollable column)", oTable.qunit.getColumnHeaderCell(2), 100, true);
+		await test("Focus header cell in column 4 (scrollable column)", oTable.qunit.getColumnHeaderCell(3), 750, true);
+		await test("Focus data cell in column 3, row 1 (scrollable column)", oTable.qunit.getDataCell(0, 2), 950, true);
+		await test("Focus data cell in column 1, row 1 (fixed column)", oTable.qunit.getDataCell(0, 0), 880, false);
+		await test("Focus data cell in column 2, row 1 (scrollable column)", oTable.qunit.getDataCell(0, 1), 880, true);
+		await test("Focus data cell in column 3, row 1 (scrollable column)", oTable.qunit.getDataCell(0, 2), 100, true);
+		await test("Focus data cell in column 4, row 1 (scrollable column)", oTable.qunit.getDataCell(0, 3), 750, true);
+		oTable.getColumns()[1].setWidth("1000px");
+		oTable.getColumns()[3].setWidth("1000px");
+		await oTable.qunit.rendered();
+		await test("Focus header cell in column 2 (scrollable column)", oTable.qunit.getColumnHeaderCell(1), 1250, false);
+		await test("Focus header cell in column 4 (scrollable column)", oTable.qunit.getColumnHeaderCell(3), 150, false);
+		await test("Focus data cell in column 2, row 1 (scrollable column)", oTable.qunit.getDataCell(0, 1), 1250, false);
+		await test("Focus data cell in column 2, row 2 (scrollable column)", oTable.qunit.getDataCell(1, 1), 1250, false);
+		await test("Focus data cell in column 4, row 1 (scrollable column)", oTable.qunit.getDataCell(0, 3), 150, false);
+		await test("Focus data cell in column 4, row 2 (scrollable column)", oTable.qunit.getDataCell(1, 3), 150, false);
 	});
 
 	QUnit.module("Special cases");
 
-	QUnit.test("Scrolling inside the cell", function(assert) {
+	QUnit.test("Scrolling inside the cell", async function(assert) {
 		const DummyControl = Control.extend("sap.ui.table.test.DummyControl", {
 			renderer: {
 				apiVersion: 2,
@@ -199,24 +181,19 @@ sap.ui.define([
 			fixedColumnCount: 1
 		});
 
-		function test(sTitle, iColumnIndex) {
+		async function test(sTitle, iColumnIndex) {
 			const oCellContent = oTable.getRows()[0].getCells()[iColumnIndex].getDomRef();
+			await oTable.qunit.focus(oCellContent);
+			const $InnerCellElement = TableUtils.getCell(oTable, oCellContent).find(".sapUiTableCellInner");
 
-			return oTable.qunit.focus(oCellContent).then(function() {
-				const $InnerCellElement = TableUtils.getCell(oTable, oCellContent).find(".sapUiTableCellInner");
-
-				assert.strictEqual($InnerCellElement.scrollLeftRTL(), $InnerCellElement[0].scrollWidth - $InnerCellElement[0].clientWidth,
-					sTitle + ": The cell content is not scrolled horizontally");
-				assert.strictEqual($InnerCellElement[0].scrollTop, 0, sTitle + ": The cell content is not scrolled vertically");
-			});
+			assert.strictEqual($InnerCellElement.scrollLeftRTL(), $InnerCellElement[0].scrollWidth - $InnerCellElement[0].clientWidth,
+				sTitle + ": The cell content is not scrolled horizontally");
+			assert.strictEqual($InnerCellElement[0].scrollTop, 0, sTitle + ": The cell content is not scrolled vertically");
 		}
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			return test("Fixed column", 0);
-		}).then(function() {
-			return test("Scrollable column", 1);
-		}).then(function() {
-			oTable.destroy();
-		});
+		await oTable.qunit.rendered();
+		await test("Fixed column", 0);
+		await test("Scrollable column", 1);
+		oTable.destroy();
 	});
 });

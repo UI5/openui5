@@ -20,9 +20,9 @@ sap.ui.define([
 
 	oAnnotationMockServer.simulate(sURLPrefix + "/model/metadata_odtbmd.xml", sURLPrefix + "/model/odtbmd/");
 	const aAnnotationsMockdata = oAnnotationMockServer._oMockdata.GLAccountHierarchyInChartOfAccountsLiSet;
-	aAnnotationsMockdata.forEach(function(oAnnotationMockdata) {
+	for (const oAnnotationMockdata of aAnnotationsMockdata) {
 		oAnnotationMockdata.FinStatementHierarchyLevelVal = parseInt(oAnnotationMockdata.FinStatementHierarchyLevelVal);
-	});
+	}
 	oAnnotationMockServer.start();
 
 	TableQUnitUtils.setDefaultSettings({
@@ -43,7 +43,7 @@ sap.ui.define([
 			this.oTable = TableQUnitUtils.createTable(TreeTable);
 			this.oMultiSelectionPlugin = this.oTable.getDependents()[0];
 
-			await this.oTable.qunit.whenRenderingFinished(() => {
+			await this.oTable.qunit.rendered(() => {
 				return this.oTable._getTotalRowCount() === 197;
 			});
 		},
@@ -54,7 +54,7 @@ sap.ui.define([
 
 	QUnit.test("Select all", async function(assert) {
 		this.oMultiSelectionPlugin.setLimit(0);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		await this.oMultiSelectionPlugin.selectAll();
 		const oBinding = this.oTable.getBinding();
 		const iExpectedLength = 197;
@@ -65,11 +65,10 @@ sap.ui.define([
 		assert.ok(!aContexts.includes(undefined), "There are no undefined contexts");
 	});
 
-	QUnit.test("Select range", function(assert) {
-		return this.oMultiSelectionPlugin.setSelectionInterval(0, 189).then(function() {
-			const aContexts = this.oTable.getBinding().getContexts(0, 190, 0);
-			assert.equal(aContexts.length, 190, "Binding contexts in selected range are available");
-			assert.ok(!aContexts.includes(undefined), "There are no undefined contexts");
-		}.bind(this));
+	QUnit.test("Select range", async function(assert) {
+		await this.oMultiSelectionPlugin.setSelectionInterval(0, 189);
+		const aContexts = this.oTable.getBinding().getContexts(0, 190, 0);
+		assert.equal(aContexts.length, 190, "Binding contexts in selected range are available");
+		assert.ok(!aContexts.includes(undefined), "There are no undefined contexts");
 	});
 });

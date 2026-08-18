@@ -197,7 +197,7 @@ sap.ui.define([
 	});
 
 	QUnit.module("Load data", {
-		beforeEach: function() {
+		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable(AnalyticalTable, {
 				columns: new AnalyticalColumn({
 					leadingProperty: "CostCenter",
@@ -206,7 +206,8 @@ sap.ui.define([
 			});
 			this.oTable.bindRows({path: "/ActualPlannedCosts(P_ControllingArea='US01',P_CostCenter='100-1000',P_CostCenterTo='999-9999')/Results"});
 			this.oMultiSelectionPlugin = this.oTable.getDependents()[0];
-			return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished);
+			await this.oTable.qunit.bindingChangeEvent();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -215,7 +216,7 @@ sap.ui.define([
 
 	QUnit.test("Select all", async function(assert) {
 		this.oMultiSelectionPlugin.setLimit(0);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		await this.oMultiSelectionPlugin.selectAll();
 		const oBinding = this.oTable.getBinding();
 		const aContexts = oBinding.getContexts(0, 200, 0);
@@ -224,17 +225,16 @@ sap.ui.define([
 		assert.ok(!aContexts.includes(undefined), "There are no undefined contexts");
 	});
 
-	QUnit.test("Select range", function(assert) {
-		return this.oMultiSelectionPlugin.setSelectionInterval(0, 189).then(function() {
-			const aContexts = this.oTable.getBinding().getContexts(0, 190, 0);
+	QUnit.test("Select range", async function(assert) {
+		await this.oMultiSelectionPlugin.setSelectionInterval(0, 189);
+		const aContexts = this.oTable.getBinding().getContexts(0, 190, 0);
 
-			assert.equal(aContexts.length, 190, "Binding contexts in selected range are available");
-			assert.ok(!aContexts.includes(undefined), "There are no undefined contexts");
-		}.bind(this));
+		assert.equal(aContexts.length, 190, "Binding contexts in selected range are available");
+		assert.ok(!aContexts.includes(undefined), "There are no undefined contexts");
 	});
 
 	QUnit.module("Load data with grand total", {
-		beforeEach: function() {
+		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable(AnalyticalTable, {
 				columns: [
 					new AnalyticalColumn({
@@ -250,7 +250,8 @@ sap.ui.define([
 			});
 			this.oTable.bindRows({path: "/ActualPlannedCosts(P_ControllingArea='US01',P_CostCenter='100-1000',P_CostCenterTo='999-9999')/Results"});
 			this.oMultiSelectionPlugin = this.oTable.getDependents()[0];
-			return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished);
+			await this.oTable.qunit.bindingChangeEvent();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -259,7 +260,7 @@ sap.ui.define([
 
 	QUnit.test("Select all", async function(assert) {
 		this.oMultiSelectionPlugin.setLimit(0);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		await this.oMultiSelectionPlugin.selectAll();
 		const aContexts = this.oTable.getBinding().getContexts(0, 200, 0);
 		assert.equal(aContexts.length, 200, "All binding contexts are available");
@@ -267,7 +268,7 @@ sap.ui.define([
 	});
 
 	QUnit.module("HeaderSelector", {
-		beforeEach: function() {
+		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable(AnalyticalTable, {
 				columns: [
 					new AnalyticalColumn({
@@ -278,7 +279,8 @@ sap.ui.define([
 			});
 			this.oTable.bindRows({path: "/ActualPlannedCosts(P_ControllingArea='US01',P_CostCenter='100-1000',P_CostCenterTo='999-9999')/Results"});
 			this.oMultiSelectionPlugin = this.oTable.getDependents()[0];
-			return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished);
+			await this.oTable.qunit.bindingChangeEvent();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -296,8 +298,8 @@ sap.ui.define([
 		const oHeaderSelector = this.oTable._getHeaderSelector();
 
 		this.oTable.sort(this.oTable.getColumns()[0]);
-		await this.oTable.qunit.whenBindingChange();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
 		assert.strictEqual(oHeaderSelector.getEnabled(), true, "HeaderSelector is enabled");
 		assert.strictEqual(oHeaderSelector.getVisible(), true, "HeaderSelector is visible");
 	});

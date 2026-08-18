@@ -275,18 +275,18 @@ sap.ui.define([
 		const aRows = oTable.getRows();
 
 		await aRows[3].getBindingContext().expand();
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 		oTable.setFirstVisibleRow(6);
-		await oTable.qunit.whenBindingChange();
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.bindingChangeEvent();
+		await oTable.qunit.rendered();
 		await aRows[4].getBindingContext().expand();
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 		oTable.setFirstVisibleRow(9);
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 		await aRows[4].getBindingContext().expand();
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 		oTable.setFirstVisibleRow(12);
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 	};
 
 	return TableQUnitUtilsODataV4;
