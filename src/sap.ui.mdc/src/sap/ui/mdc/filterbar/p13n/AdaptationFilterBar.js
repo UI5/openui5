@@ -343,28 +343,21 @@ sap.ui.define([
 			this.setFilterConditions(mConditions);
 			const pConditions = this._setXConditions(mConditions);
 
-			if (this._bFilterFieldsCreated) {
-				return pConditions.then(() => {
-					this._updateActiveStatus(this.oAdaptationData.items);
-					this._oFilterBarLayout.setP13nData(this.getP13nData());
-					return this;
-				});
-			}
-
 			const oAdaptationControl = this._getAdaptationControlInstance();
 			const oDelegate = oAdaptationControl.getControlDelegate();
 			const oFilterDelegate = this._checkAdvancedParent(oAdaptationControl) ? oDelegate : oDelegate.getFilterDelegate();
 
 			//used to store the originals
-			this._mOriginalsForClone = {};
-			this.mFilterFields = {};
+			this._mOriginalsForClone ??= {};
+			this.mFilterFields ??= {};
 			const aFieldPromises = [];
 
-			this.getP13nData().items.forEach((oItem, iIndex) => {
+			const aItemsToCreate = this.getP13nData().items.filter((oItem) => !this.mFilterFields[oItem.name]);
+
+			aItemsToCreate.forEach((oItem) => {
 				const oFilterFieldPromise = this._checkExisting(oItem, oFilterDelegate);
 
 				oFilterFieldPromise.then((oFilterField) => {
-
 					let oFieldForDialog;
 
 					//Important: always use clones for the personalization dialog. The "originals" should never be shown in the P13n UI
@@ -398,12 +391,14 @@ sap.ui.define([
 
 			});
 
-			return Promise.all(aFieldPromises).then(() => {
+			return Promise.all([pConditions, ...aFieldPromises]).then(() => {
+				// Add filter fields in the original P13n model order (not in promise resolution order)
+				for (const oItem of aItemsToCreate) {
+					const oField = this.mFilterFields[oItem.name];
+					this.addAggregation("filterItems", oField);
+					oField.attachChange(() => this.fireChange());
+				}
 				const oP13nData = this.getP13nData();
-				oP13nData.items.forEach((oItem) => {
-					this.addAggregation("filterItems", this.mFilterFields[oItem.name]);
-				});
-				this._attachFields();
 				this._updateActiveStatus(oP13nData.items);
 				this._oFilterBarLayout.setP13nData(oP13nData);
 
@@ -411,19 +406,10 @@ sap.ui.define([
 				if (this._oFilterBarLayout.getInner().isA("sap.ui.mdc.p13n.panels.AdaptFiltersPanel")) {
 					this._validateAdaptationState();
 				}
-				this._bFilterFieldsCreated = true;
 
 				return this;
 			});
 
-		});
-	};
-
-	AdaptationFilterBar.prototype._attachFields = function() {
-		this.getFilterItems().forEach((oField) => {
-			oField.attachChange((oEvt) => {
-				this.fireChange();
-			});
 		});
 	};
 
