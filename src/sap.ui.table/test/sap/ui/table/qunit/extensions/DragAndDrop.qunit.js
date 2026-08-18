@@ -1,10 +1,12 @@
-/*global QUnit, sinon, oTable, oTreeTable*/
+/*global QUnit, sinon */
 
 sap.ui.define([
 	"sap/ui/table/qunit/TableQUnitUtils",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/table/utils/TableUtils",
+	"sap/ui/table/TreeTable",
 	"sap/ui/table/Row",
+	"sap/ui/table/rowmodes/Fixed",
 	"sap/ui/core/dnd/DragDropInfo",
 	"sap/ui/core/library",
 	"sap/ui/core/Control",
@@ -13,7 +15,9 @@ sap.ui.define([
 	TableQUnitUtils,
 	nextUIUpdate,
 	TableUtils,
+	TreeTable,
 	Row,
+	FixedRowMode,
 	DragDropInfo,
 	CoreLibrary,
 	Control,
@@ -21,8 +25,6 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	const createTables = window.createTables;
-	const destroyTables = window.destroyTables;
 	const DropPosition = CoreLibrary.dnd.DropPosition;
 
 	function createDragEvent(sDragEventType) {
@@ -96,7 +98,7 @@ sap.ui.define([
 			this.oDragAndDropExtension = this.oTable._getDragAndDropExtension();
 			this.oDragAndDropExtension._debug();
 
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -216,9 +218,9 @@ sap.ui.define([
 			this.oDragAndDropExtension._ExtensionDelegate.ondragover.call(this.oTable, oFakeEvent);
 
 			if (bExpectScrolling) {
-				await this.oTable.qunit.whenVSbScrolled();
+				await this.oTable.qunit.vScrolled();
 			} else {
-				await TableQUnitUtils.wait(500);
+				await TableQUnitUtils.sleep(500);
 			}
 
 			const oScrollExtension = this.oTable._getScrollExtension();
@@ -319,7 +321,7 @@ sap.ui.define([
 			this.oDragAndDropExtension = this.oTable._getDragAndDropExtension();
 			this.oDragAndDropExtension._debug();
 
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -339,7 +341,7 @@ sap.ui.define([
 		assert.notOk(oRowDomRefs.rowActionPart.getAttribute("data-sap-ui-draggable"), "Row action part");
 
 		this.oTable.getDragDropConfig()[0].setEnabled(false);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.notOk(oRowDomRefs.rowScrollPart.getAttribute("draggable"), "Scrollable part not draggable");
 		assert.notOk(oRowDomRefs.rowScrollPart.getAttribute("data-sap-ui-draggable"), "Scrollable part not draggable");
@@ -360,7 +362,7 @@ sap.ui.define([
 		assert.notOk(oRowDomRefs.rowActionPart.getAttribute("data-sap-ui-draggable"), "Row action part");
 
 		this.oTable.getDragDropConfig()[0].setEnabled(false);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.notOk(oRowDomRefs.rowScrollPart.getAttribute("draggable"), "Scrollable part not draggable");
 		assert.notOk(oRowDomRefs.rowScrollPart.getAttribute("data-sap-ui-draggable"), "Scrollable part not draggable");
@@ -413,7 +415,7 @@ sap.ui.define([
 			test(this.oTable.qunit.getDataCell(0, 1).parentElement, {sRowType: "Group header", sRowAreaType: "Scrollable", iRowIndex: 0});
 
 			TableUtils.Grouping.setHierarchyMode(this.oTable, TableUtils.Grouping.HierarchyMode.Flat);
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		};
 
 		const testSumRow = async () => {
@@ -537,7 +539,7 @@ sap.ui.define([
 			test({sRowType: "Group header", sRowAreaType: "Action", iFromRowIndex: 0, iToRowIndex: 1});
 
 			TableUtils.Grouping.setHierarchyMode(this.oTable, TableUtils.Grouping.HierarchyMode.Flat);
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		};
 
 		const testSumRow = async () => {
@@ -565,7 +567,7 @@ sap.ui.define([
 			})
 		});
 
-		await oOtherTable.qunit.whenRenderingFinished();
+		await oOtherTable.qunit.rendered();
 
 		this.oTable.addEventDelegate({
 			ondragenter: (oEvent) => {
@@ -650,9 +652,21 @@ sap.ui.define([
 
 	QUnit.module("Columns", {
 		beforeEach: async function() {
-			await createTables();
+			this.oTable = TableQUnitUtils.createTable({
+				rows: {path: "/"},
+				models: TableQUnitUtils.createJSONModel(8),
+				rowMode: new FixedRowMode({rowCount: 3}),
+				fixedColumnCount: 1,
+				columns: ["A", "B", "C", "D", "E"].map((sField) => TableQUnitUtils.createTextColumn({
+					label: sField + "_TITLE",
+					text: sField,
+					bind: true
+				}))
+			});
 
-			this.oDragAndDropExtension = oTable._getDragAndDropExtension();
+			await this.oTable.qunit.rendered();
+
+			this.oDragAndDropExtension = this.oTable._getDragAndDropExtension();
 			this.oDragAndDropExtension._debug();
 
 			this.oDDI = new DragDropInfo({
@@ -661,17 +675,20 @@ sap.ui.define([
 				dropPosition: "Between"
 			});
 
-			oTable.addDragDropConfig(this.oDDI);
+			this.oTable.addDragDropConfig(this.oDDI);
 			await nextUIUpdate();
 		},
 		afterEach: function() {
-			destroyTables();
+			this.oTable.destroy();
+			if (this.oTreeTable) {
+				this.oTreeTable.destroy();
+			}
 			this.oDDI = null;
 		}
 	});
 
 	QUnit.test("Draggable", function(assert) {
-		const aColumns = oTable.getColumns();
+		const aColumns = this.oTable.getColumns();
 		assert.notOk(this.oDDI.isDraggable(aColumns[1]), "Columns are not draggable by default");
 
 		this.oDDI.bIgnoreMetadataCheck = true;
@@ -679,7 +696,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Droppable", function(assert) {
-		const aColumns = oTable.getColumns();
+		const aColumns = this.oTable.getColumns();
 		const oDragEnterEvent = {
 			setMark: () => { },
 			target: aColumns[0].getDomRef()
@@ -692,10 +709,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("Indicator Size", async function(assert) {
-		const aColumns = oTable.getColumns();
+		const aColumns = this.oTable.getColumns();
 
 		this.oDDI.bIgnoreMetadataCheck = true;
-		oTable.invalidate();
+		this.oTable.invalidate();
 		await nextUIUpdate();
 
 		// move non-fixed columns
@@ -703,7 +720,7 @@ sap.ui.define([
 		triggerDragEvent("dragenter", aColumns[2]);
 		assert.equal(
 			document.querySelector(".sapUiDnDIndicator").getBoundingClientRect().height,
-			oTable.getDomRef("sapUiTableCnt").getBoundingClientRect().height,
+			this.oTable.getDomRef("sapUiTableCnt").getBoundingClientRect().height,
 			"Drop indicaator's height is set to Table height"
 		);
 
@@ -714,7 +731,7 @@ sap.ui.define([
 		triggerDragEvent("dragenter", aColumns[2]);
 		assert.equal(
 			document.querySelector(".sapUiDnDIndicator").getBoundingClientRect().height,
-			oTable.getDomRef("sapUiTableCnt").getBoundingClientRect().height - 16,
+			this.oTable.getDomRef("sapUiTableCnt").getBoundingClientRect().height - 16,
 			"Drop indicaator is not visible on the horizontal scrollbar"
 		);
 
@@ -722,17 +739,30 @@ sap.ui.define([
 	});
 
 	QUnit.test("Draggable - TreeTable case", async function(assert) {
-		const fnOriginalDragEnterHandler = this.oDragAndDropExtension._ExtensionDelegate.ondragenter;
-		const aColumns = oTreeTable.getColumns();
+		const oTreeTable = this.oTreeTable = TableQUnitUtils.createTable(TreeTable, {
+			rows: {path: "/", parameters: {arrayNames: ["children"]}},
+			models: this.oTable.getModel(),
+			rowMode: new FixedRowMode({rowCount: 3}),
+			groupHeaderProperty: "A",
+			columns: ["A", "B", "C", "D", "E"].map((sField) => TableQUnitUtils.createTextColumn({
+				label: sField + "_TITLE",
+				text: sField,
+				bind: true
+			}))
+		});
+		await oTreeTable.qunit.rendered();
 
-		oTreeTable.addDragDropConfig(this.oDDI);
+		const fnOriginalDragEnterHandler = this.oDragAndDropExtension._ExtensionDelegate.ondragenter;
+		const aColumns = this.oTreeTable.getColumns();
+
+		this.oTreeTable.addDragDropConfig(this.oDDI);
 		this.oDDI.bIgnoreMetadataCheck = true;
 
-		oTreeTable.invalidate();
+		this.oTreeTable.invalidate();
 		await nextUIUpdate();
 
-		for (let i = 0; i < aColumns.length; i++) {
-			const oColumnRef = aColumns[i].getDomRef();
+		for (const [i, oColumn] of aColumns.entries()) {
+			const oColumnRef = oColumn.getDomRef();
 			assert.equal(oColumnRef.getAttribute("draggable"), i === 0 ? null : "true", "Column " + i + " has correct value for draggable");
 			assert.equal(oColumnRef.getAttribute("data-sap-ui-draggable"), i === 0 ? null : "true", "Column " + i + " has correct value for data-sap-ui-draggable");
 		}
@@ -761,16 +791,17 @@ sap.ui.define([
 
 	QUnit.test("Draggable - Fixed Columns", async function(assert) {
 		const fnOriginalDragEnterHandler = this.oDragAndDropExtension._ExtensionDelegate.ondragenter;
-		const aColumns = oTable.getColumns();
-		oTable.setFixedColumnCount(2);
+		const aColumns = this.oTable.getColumns();
+		const oTable = this.oTable;
+		this.oTable.setFixedColumnCount(2);
 
 		this.oDDI.bIgnoreMetadataCheck = true;
 
-		oTable.invalidate();
+		this.oTable.invalidate();
 		await nextUIUpdate();
 
-		for (let i = 0; i < aColumns.length; i++) {
-			const oColumnRef = aColumns[i].getDomRef();
+		for (const [i, oColumn] of aColumns.entries()) {
+			const oColumnRef = oColumn.getDomRef();
 			assert.equal(oColumnRef.getAttribute("draggable"), i < 2 ? null : "true", "Column " + i + " has correct value for draggable");
 			assert.equal(oColumnRef.getAttribute("data-sap-ui-draggable"), i < 2 ? null : "true", "Column " + i + " has correct value for data-sap-ui-draggable");
 		}

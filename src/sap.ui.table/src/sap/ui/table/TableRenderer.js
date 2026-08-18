@@ -1153,9 +1153,7 @@ sap.ui.define([
 			return;
 		}
 
-		const bRowsDraggable = oTable.getDragDropConfig().some(function(oDragDropInfo) {
-			return oDragDropInfo.isDraggable(oTable, "rows");
-		});
+		const bRowsDraggable = oTable.getDragDropConfig().some((oDragDropInfo) => oDragDropInfo.isDraggable(oTable, "rows"));
 		const iLastFixedColumnIndex = this.getLastFixedColumnIndex(oTable);
 
 		for (let iRowIndex = mConfig.startRowIndex; iRowIndex < mConfig.endRowIndex; iRowIndex++) {
@@ -1284,7 +1282,7 @@ sap.ui.define([
 		let nSpan = 0;
 		let iLastVisibleCol = -1;
 
-		aColumns.forEach(function(oColumn, index, aCols) {
+		for (const [index, oColumn] of aColumns.entries()) {
 			let colSpan = TableUtils.Column.getHeaderSpan(oColumn, iRowIndex);
 			let iColIndex;
 
@@ -1292,7 +1290,7 @@ sap.ui.define([
 				if (colSpan > 1) {
 					// In case when a user makes some of the underlying columns invisible, adjust colspan
 					iColIndex = oColumn.getIndex();
-					colSpan = aCols.slice(index + 1, index + colSpan).reduce(function(span, column) {
+					colSpan = aColumns.slice(index + 1, index + colSpan).reduce((span, column) => {
 						return column.getIndex() - iColIndex < colSpan ? span + 1 : span;
 					}, 1);
 				}
@@ -1304,7 +1302,7 @@ sap.ui.define([
 				oColumn._nSpan = 0;
 			}
 			nSpan--;
-		});
+		}
 
 		return iLastVisibleCol;
 	};
@@ -2142,9 +2140,7 @@ sap.ui.define([
 	 * @private
 	 */
 	TableRenderer.getColumnsToRender = function(oTable, iStartIndex, iEndIndex) {
-		return oTable.getColumns().slice(iStartIndex, iEndIndex).filter(function(oColumn) {
-			return oColumn && oColumn.shouldRender();
-		});
+		return oTable.getColumns().slice(iStartIndex, iEndIndex).filter((oColumn) => oColumn && oColumn.shouldRender());
 	};
 
 	/**

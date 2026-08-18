@@ -31,7 +31,7 @@ sap.ui.define([
 		beforeEach: function() {
 			this.oTable = TableQUnitUtils.createTable();
 			this.oMultiSelectionPlugin = this.oTable.getDependents()[0];
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -40,7 +40,7 @@ sap.ui.define([
 
 	QUnit.test("Select all", async function(assert) {
 		this.oMultiSelectionPlugin.setLimit(0);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		await this.oMultiSelectionPlugin.selectAll();
 		assertAllContextsAvailable(assert, this.oTable);
 	});
@@ -54,7 +54,7 @@ sap.ui.define([
 		beforeEach: function() {
 			this.oTable = TableQUnitUtils.createTable(TableQUnitUtils.createSettingsForList({paging: true}));
 			this.oMultiSelectionPlugin = this.oTable.getDependents()[0];
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -63,7 +63,7 @@ sap.ui.define([
 
 	QUnit.test("Select all", async function(assert) {
 		this.oMultiSelectionPlugin.setLimit(0);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		await this.oMultiSelectionPlugin.selectAll();
 		assertAllContextsAvailable(assert, this.oTable);
 	});
@@ -85,7 +85,7 @@ sap.ui.define([
 				}
 			}));
 			this.oMultiSelectionPlugin = this.oTable.getDependents()[0];
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -94,7 +94,7 @@ sap.ui.define([
 
 	QUnit.test("Select all", async function(assert) {
 		this.oMultiSelectionPlugin.setLimit(0);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		await this.oMultiSelectionPlugin.selectAll();
 		assert.ok(this.oTable.getBinding().getAllCurrentContexts().length < 400,
 			"Not all binding contexts are available, but at least the Promise resolved");
@@ -119,7 +119,7 @@ sap.ui.define([
 				}
 			}));
 			this.oMultiSelectionPlugin = this.oTable.getDependents()[0];
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();

@@ -21,7 +21,7 @@ sap.ui.define([
 		beforeEach: function() {
 			this.oTable = TableQUnitUtils.createTable(TableQUnitUtils.createSettingsForList());
 			this.oSelectionPlugin = this.oTable.getDependents()[0];
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -37,12 +37,12 @@ sap.ui.define([
 
 		this.oTable.getRows()[0].getBindingContext().setSelected(true);
 		this.oSelectionPlugin.setEnabled(false);
-		await TableQUnitUtils.wait(10);
+		await TableQUnitUtils.sleep(10);
 		assert.equal(oFireSelectionChange.callCount, 0, "Disabled: #fireSelectionChange call");
 
 		oFireSelectionChange.resetHistory();
 		this.oSelectionPlugin.setEnabled(true);
-		await TableQUnitUtils.wait(10);
+		await TableQUnitUtils.sleep(10);
 		assert.equal(oFireSelectionChange.callCount, 0, "Enabled: #fireSelectionChange call");
 
 		// When the plugin was disabled with a pending selectionChange event, it should have reset the timeout and selections after enabling again
@@ -61,7 +61,7 @@ sap.ui.define([
 		beforeEach: function() {
 			this.oTable = TableQUnitUtils.createTable(TableQUnitUtils.createSettingsForList());
 			this.oSelectionPlugin = this.oTable.getDependents()[0];
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -183,7 +183,7 @@ sap.ui.define([
 			this.oSelectionPlugin = this.oTable.getDependents()[0];
 			this.oSelectionChangeHandler = this.spy();
 			this.oSelectionPlugin.attachSelectionChange(this.oSelectionChangeHandler);
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -292,7 +292,7 @@ sap.ui.define([
 
 		this.spy(oEvent, "setMarked");
 		this.oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
-		await TableQUnitUtils.wait(200);
+		await TableQUnitUtils.sleep(200);
 		assert.equal(this.oSelectionChangeHandler.callCount, 0, "Toggle selection: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0, "Toggle selection: Selected contexts");
 
@@ -316,7 +316,7 @@ sap.ui.define([
 			this.oSelectionPlugin = this.oTable.getDependents()[0];
 			this.oSelectionChangeHandler = this.spy();
 			this.oSelectionPlugin.attachSelectionChange(this.oSelectionChangeHandler);
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -343,7 +343,7 @@ sap.ui.define([
 		this.oSelectionPlugin = this.oTable.getDependents()[0];
 		this.oSelectionChangeHandler = this.spy();
 		this.oSelectionPlugin.attachSelectionChange(this.oSelectionChangeHandler);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		const aRows = this.oTable.getRows();
 
@@ -372,7 +372,7 @@ sap.ui.define([
 		this.oSelectionPlugin = this.oTable.getDependents()[0];
 		this.oSelectionChangeHandler = this.spy();
 		this.oSelectionPlugin.attachSelectionChange(this.oSelectionChangeHandler);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		const aRows = this.oTable.getRows();
 
@@ -435,7 +435,7 @@ sap.ui.define([
 		this.oSelectionChangeHandler.resetHistory();
 		this.oSelectionPlugin.setEnabled(false);
 		oHeaderContext.setSelected(true);
-		await TableQUnitUtils.wait(10);
+		await TableQUnitUtils.sleep(10);
 		assert.equal(this.oSelectionChangeHandler.callCount, 0, "Plugin disabled: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0, "Plugin disabled: Selected contexts");
 		assert.equal(oHeaderContext.isSelected(), true, "Plugin disabled: HeaderContext selected state");

@@ -23,36 +23,31 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Force fixed rows", function(assert) {
+	QUnit.test("Force fixed rows", async function(assert) {
 		this.oTable._setRowCountConstraints({fixedTop: true, fixedBottom: true});
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			TableQUnitUtils.assertRenderedRows(assert, this.oTable, 1, 8, 1);
-		}.bind(this));
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertRenderedRows(assert, this.oTable, 1, 8, 1);
 	});
 
-	QUnit.test("Disable fixed rows", function(assert) {
+	QUnit.test("Disable fixed rows", async function(assert) {
 		this.oRowMode.setFixedTopRowCount(2);
 		this.oRowMode.setFixedBottomRowCount(2);
 		this.oTable._setRowCountConstraints({fixedTop: false, fixedBottom: false});
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			TableQUnitUtils.assertRenderedRows(assert, this.oTable, 0, 10, 0);
-		}.bind(this));
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertRenderedRows(assert, this.oTable, 0, 10, 0);
 	});
 
-	QUnit.test("Change constraints", function(assert) {
-		const that = this;
-
+	QUnit.test("Change constraints", async function(assert) {
 		this.oRowMode.setFixedTopRowCount(2);
 		this.oRowMode.setFixedBottomRowCount(2);
 		this.oTable._setRowCountConstraints({fixedTop: false, fixedBottom: false});
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			that.oTable._setRowCountConstraints({fixedTop: false});
-		}).then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			TableQUnitUtils.assertRenderedRows(assert, that.oTable, 0, 8, 2);
-		});
+		await this.oTable.qunit.rendered();
+		this.oTable._setRowCountConstraints({fixedTop: false});
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertRenderedRows(assert, this.oTable, 0, 8, 2);
 	});
 
 	return QUnit;

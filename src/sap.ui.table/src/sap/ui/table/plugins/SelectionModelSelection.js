@@ -263,7 +263,7 @@ sap.ui.define([
 	 * @inheritDoc
 	 */
 	SelectionModelSelection.prototype.isIndexSelected = function(iIndex) {
-		return this.getSelectedIndices().indexOf(iIndex) !== -1;
+		return this.getSelectedIndices().includes(iIndex);
 	};
 
 	/**

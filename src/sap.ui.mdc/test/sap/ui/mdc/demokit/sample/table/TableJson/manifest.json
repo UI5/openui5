@@ -28,6 +28,7 @@
 			"sample": {
 				"files": [
 					"view/TableJson.view.xml",
+					"../delegates/ValidationJSONTableDelegate.js",
 					"../delegates/JSONTableDelegate.js",
 					"../delegates/JSONTableFilterDelegate.js",
 					"../mockdata/metadata/JSONPropertyInfo.js",

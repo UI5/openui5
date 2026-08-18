@@ -237,35 +237,6 @@ sap.ui.define([
 				});
 			}, new Error(`File name '${sExpectedFileName}' must not exceed 64 characters`), "then an error is thrown");
 		});
-
-		QUnit.test("when a UIChange is created without a fileName", function(assert) {
-			const oFlexObject = FlexObjectFactory.createUIChange({
-				changeType: "renameField"
-			});
-			assert.ok(oFlexObject.getId(), "then a fileName is generated");
-			assert.strictEqual(
-				oFlexObject.getFileNameWasGenerated(),
-				true,
-				"then the fileNameWasGenerated flag is set"
-			);
-			assert.notOk(
-				"fileNameWasGenerated" in oFlexObject.convertToFileContent(),
-				"then the runtime-only flag is not part of the persisted file content"
-			);
-		});
-
-		QUnit.test("when a UIChange is created with a fileName", function(assert) {
-			const oFlexObject = FlexObjectFactory.createUIChange({
-				id: "myFileName",
-				changeType: "renameField"
-			});
-			assert.strictEqual(oFlexObject.getId(), "myFileName", "then the provided fileName is used");
-			assert.strictEqual(
-				oFlexObject.getFileNameWasGenerated(),
-				false,
-				"then the fileNameWasGenerated flag is not set"
-			);
-		});
 	});
 
 	QUnit.done(function() {

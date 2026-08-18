@@ -60,11 +60,11 @@ sap.ui.define([
 					const aCategoryData = [];
 					for (let i = 0; i < oData.ProductCollection.length; i++) {
 						const oProduct = oData.ProductCollection[i];
-						if (oProduct.SupplierName && aTemp1.indexOf(oProduct.SupplierName) < 0) {
+						if (oProduct.SupplierName && !aTemp1.includes(oProduct.SupplierName)) {
 							aTemp1.push(oProduct.SupplierName);
 							aSuppliersData.push({Name: oProduct.SupplierName});
 						}
-						if (oProduct.Category && aTemp2.indexOf(oProduct.Category) < 0) {
+						if (oProduct.Category && !aTemp2.includes(oProduct.Category)) {
 							aTemp2.push(oProduct.Category);
 							aCategoryData.push({Name: oProduct.Category});
 						}

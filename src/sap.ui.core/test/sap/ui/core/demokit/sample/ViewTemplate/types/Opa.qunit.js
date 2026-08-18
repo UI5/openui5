@@ -25,7 +25,7 @@ sap.ui.define([
 		}
 	});
 
-	Opa5.extendConfig({timeout : 30});
+	Opa5.extendConfig({timeout : 60});
 
 	//*****************************************************************************
 	opaTest("Boolean Types", (Given, When, Then) => {

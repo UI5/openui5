@@ -333,7 +333,7 @@ sap.ui.define([
 	 * @private
 	 */
 	Column.prototype._initTemplateClonePool = function() {
-		this._mTemplateClones = Object.keys(TemplateType).reduce(function(oTemplatePool, sTemplateType) {
+		this._mTemplateClones = Object.keys(TemplateType).reduce((oTemplatePool, sTemplateType) => {
 			oTemplatePool[sTemplateType] = [];
 			return oTemplatePool;
 		}, {});
@@ -564,7 +564,7 @@ sap.ui.define([
 
 	Column.prototype._openHeaderMenu = function(oDomRef) {
 		const oHeaderMenu = this.getHeaderMenuInstance();
-		ColumnHeaderMenuAdapter.activateFor(this).then(function() {
+		ColumnHeaderMenuAdapter.activateFor(this).then(() => {
 			if (oHeaderMenu) {
 				oHeaderMenu.openBy(oDomRef);
 			}
@@ -623,7 +623,7 @@ sap.ui.define([
 
 		// Reset the sorting status of all columns which are not sorted anymore.
 		for (let i = 0, l = aColumns.length; i < l; i++) {
-			if (aSortedColumns.indexOf(aColumns[i]) < 0) {
+			if (!aSortedColumns.includes(aColumns[i])) {
 				// Column is not sorted anymore. Reset to default and remove sorter.
 				/* -------------------------------------- */
 				aColumns[i].resetProperty("sortOrder");
@@ -985,9 +985,9 @@ sap.ui.define([
 	};
 
 	function destroyClones(aClones) {
-		for (let i = 0; i < aClones.length; i++) {
-			if (aClones[i] != null && !aClones[i].bIsDestroyed) {
-				aClones[i].destroy();
+		for (const oClone of aClones) {
+			if (oClone != null && !oClone.bIsDestroyed) {
+				oClone.destroy();
 			}
 		}
 	}
@@ -1080,7 +1080,7 @@ sap.ui.define([
 		}
 
 		if (aAllowedObjectKeys && vValue != null && typeof vValue === "object") {
-			Object.keys(vValue).forEach(function(sSetting) {
+			for (const sSetting of Object.keys(vValue)) {
 				if (aAllowedObjectKeys.includes(sSetting)) {
 					if (sSettingName != null) {
 						validateCellContentVisibilitySetting(vValue[sSetting], sSettingName + "." + sSetting, true);
@@ -1088,7 +1088,7 @@ sap.ui.define([
 				} else {
 					throw new Error("Unsupported setting '" + (sSettingName ? sSettingName + "." : "") + sSetting + "'");
 				}
-			});
+			}
 		}
 	}
 

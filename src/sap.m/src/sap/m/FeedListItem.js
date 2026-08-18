@@ -257,6 +257,7 @@ function(
 		this._oInvisibleText = new InvisibleText();
 		this._oInvisibleText.toStatic();
 		this._oInvisibleText.setText(FeedListItem._sTextListItem);
+		this.addAssociation("ariaLabelledBy", this._oInvisibleText, true);
 	};
 
 	FeedListItem.prototype.validateAggregation = function(sAggregationName, vObject) {
@@ -346,7 +347,6 @@ function(
 	};
 
 	FeedListItem.prototype.onBeforeRendering = function() {
-		this.addAssociation("ariaLabelledBy", this._oInvisibleText, true);
 		this.$("realtext").find('a[target="_blank"]').off("click");
 
 		var oFormattedText = this.getAggregation("_text");

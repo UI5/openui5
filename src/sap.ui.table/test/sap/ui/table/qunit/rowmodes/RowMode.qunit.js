@@ -108,8 +108,7 @@ sap.ui.define([
 		];
 		const oGetRowCountConstraints = this.stub(this.oRowMode, "getRowCountConstraints");
 
-		for (let i = 0; i < aTestParameters.length; i++) {
-			const mTestParameter = aTestParameters[i];
+		for (const mTestParameter of aTestParameters) {
 			oGetRowCountConstraints.returns(mTestParameter.constraints || {});
 			assert.deepEqual(this.oRowMode.computeStandardizedRowCounts.apply(this.oRowMode, mTestParameter.input), mTestParameter.output,
 				"(count: " + mTestParameter.input[0]
@@ -171,7 +170,7 @@ sap.ui.define([
 		}, function(oTable) {
 			oTable.getRowMode().disableNoData();
 		});
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, false);
 	});
 
@@ -179,32 +178,32 @@ sap.ui.define([
 		this.oTable.setShowNoData(false);
 		this.oTable.unbindRows();
 		this.oTable.getRowMode().enableNoData();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, false);
 	});
 
 	QUnit.test("Enable with data", async function(assert) {
 		this.oTable.getRowMode().enableNoData();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, false);
 	});
 
 	QUnit.test("Disable/Enable without data", async function(assert) {
 		this.oTable.unbindRows();
 		this.oTable.getRowMode().disableNoData();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, false, "Disable");
 
 		this.oTable.getRowMode().disableNoData();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, false, "Disable again");
 
 		this.oTable.getRowMode().enableNoData();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, true, "Enable");
 
 		this.oTable.getRowMode().enableNoData();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, true, "Enable again");
 	});
 
@@ -212,7 +211,7 @@ sap.ui.define([
 		this.oTable.removeAllColumns();
 		this.oTable.setShowNoData(false);
 		this.oTable.getRowMode().disableNoData();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, true, "Disable");
 	});
 
@@ -226,11 +225,11 @@ sap.ui.define([
 			assert.strictEqual(oTable.getRows().length, 0, "Before rendering without binding: The table has no rows");
 		});
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		assert.strictEqual(this.oTable.getRows().length, 0, "After rendering without binding: The table has no rows");
 
 		this.oTable.bindRows({path: "/"});
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.strictEqual(this.oTable.getRows().length, 1, "After asynchronous row update: The table has the correct number of rows");
 		this.oTable.destroy();
@@ -265,11 +264,11 @@ sap.ui.define([
 			columns: [TableQUnitUtils.createTextColumn()]
 		});
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.oGetContextsSpy.resetHistory();
 
 		this.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.strictEqual(this.oGetContextsSpy.callCount, 0, "RowMode#getRowContexts was not called on pure rerendering");
 	});
@@ -282,11 +281,11 @@ sap.ui.define([
 			columns: [TableQUnitUtils.createTextColumn()]
 		});
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.oGetContextsSpy.resetHistory();
 
 		this.oTable.getModel().setData(new Array(50).fill({}));
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.ok(this.oGetContextsSpy.callCount > 0, "RowMode#getRowContexts was called after binding change");
 	});
@@ -299,11 +298,11 @@ sap.ui.define([
 			columns: [TableQUnitUtils.createTextColumn()]
 		});
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.oGetContextsSpy.resetHistory();
 
 		this.oTable.setFirstVisibleRow(10);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.ok(this.oGetContextsSpy.callCount > 0, "RowMode#getRowContexts was called after scroll");
 	});
@@ -316,11 +315,11 @@ sap.ui.define([
 			columns: [TableQUnitUtils.createTextColumn()]
 		});
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.oGetContextsSpy.resetHistory();
 
 		this.oTable.unbindRows();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.strictEqual(this.oGetContextsSpy.callCount, 0, "RowMode#getRowContexts was not called after unbind");
 	});
@@ -336,11 +335,11 @@ sap.ui.define([
 		});
 
 		oRowMode.disableNoData();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.oGetContextsSpy.resetHistory();
 
 		this.oTable.unbindRows();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.ok(this.oGetContextsSpy.callCount > 0, "RowMode#getRowContexts was called after unbind when NoData is disabled");
 	});
@@ -355,11 +354,11 @@ sap.ui.define([
 			columns: [TableQUnitUtils.createTextColumn()]
 		});
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.oGetContextsSpy.resetHistory();
 
 		oRowMode.setRowCount(3);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.ok(this.oGetContextsSpy.callCount > 0, "RowMode#getRowContexts was called when rows were added");
 	});
@@ -374,11 +373,11 @@ sap.ui.define([
 			columns: [TableQUnitUtils.createTextColumn()]
 		});
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.oGetContextsSpy.resetHistory();
 
 		oRowMode.setRowCount(1);
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.ok(this.oGetContextsSpy.callCount > 0, "RowMode#getRowContexts was called when rows were removed");
 	});
@@ -391,12 +390,12 @@ sap.ui.define([
 			columns: [TableQUnitUtils.createTextColumn()]
 		});
 
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		this.oGetContextsSpy.resetHistory();
 
 		this.oTable.invalidateRowsAggregation();
 		this.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 
 		assert.ok(this.oGetContextsSpy.callCount > 0, "RowMode#getRowContexts was called after row aggregation invalidation");
 	});

@@ -101,7 +101,7 @@ sap.ui.define([
 			sServiceUrl = "../../../../../proxy/" + sServiceUrl.replace("://", "/");
 
 			// auto expand mock service
-			if (sServiceUrl.indexOf("odataFake") >= 0) {
+			if (sServiceUrl.includes("odataFake")) {
 				sServiceUrl = "/odataFake/";
 				if (!this.oMockServer) {
 					//Mock server for use with navigation properties
@@ -114,7 +114,7 @@ sap.ui.define([
 			}
 
 			// sequential expand mock service
-			if (sServiceUrl.indexOf("classicFake") >= 0) {
+			if (sServiceUrl.includes("classicFake")) {
 				sServiceUrl = "/classicFake/";
 				if (!this.oMockServer) {
 					//Mock server for use with navigation properties
@@ -346,7 +346,7 @@ sap.ui.define([
 		attachMeasurementTools: function() {
 			const oViewModel = this.getView().getModel();
 			const aJSMeasure = Measurement.filterMeasurements(function(oMeasurement) {
-				return oMeasurement.categories.indexOf("JS") > -1 ? oMeasurement : null;
+				return oMeasurement.categories.includes("JS") ? oMeasurement : null;
 			});
 
 			function getValue(attributeName, oObject) {
@@ -681,7 +681,7 @@ sap.ui.define([
 
 			if (aSelectedIndices.length > 0) {
 				// If rows are selected, do not allow to start dragging from a row which is not selected.
-				if (aSelectedIndices.indexOf(iDraggedRowIndex) === -1) {
+				if (!aSelectedIndices.includes(iDraggedRowIndex)) {
 					oEvent.preventDefault();
 				} else {
 					aSelectedIndices.forEach(function(iSelectedIndex) {

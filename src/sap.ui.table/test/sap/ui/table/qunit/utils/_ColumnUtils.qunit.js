@@ -1,4 +1,4 @@
-/*global QUnit, oTable */
+/*global QUnit */
 
 sap.ui.define([
 	"sap/ui/table/qunit/TableQUnitUtils",
@@ -6,6 +6,7 @@ sap.ui.define([
 	"sap/ui/table/utils/TableUtils",
 	"sap/ui/table/Table",
 	"sap/ui/table/Column",
+	"sap/ui/table/rowmodes/Fixed",
 	"sap/ui/core/Control",
 	"sap/ui/Device"
 ], function(
@@ -14,15 +15,27 @@ sap.ui.define([
 	TableUtils,
 	Table,
 	Column,
+	FixedRowMode,
 	Control,
 	Device
 ) {
 	"use strict";
 
-	const createTables = window.createTables;
-	const destroyTables = window.destroyTables;
 	const ColumnUtils = TableUtils.Column;
 	const TestControl = TableQUnitUtils.TestControl;
+
+	TableQUnitUtils.setDefaultSettings({
+		rows: {path: "/"},
+		models: TableQUnitUtils.createJSONModel(8),
+		columns: ["A", "B", "C", "D", "E"].map((sField) => {
+			return TableQUnitUtils.createTextColumn({
+				label: sField + "_TITLE",
+				text: sField,
+				bind: true
+			});
+		}),
+		rowMode: new FixedRowMode({rowCount: 3})
+	});
 
 	QUnit.module("Misc", {
 		beforeEach: function() {
@@ -58,11 +71,7 @@ sap.ui.define([
 			};
 
 			this.fnColumnArrayToIdArray = function(aColumns) {
-				const aColumnIDs = [];
-				for (let i = 0; i < aColumns.length; i++) {
-					aColumnIDs.push({column: aColumns[i].column.getId(), level: aColumns[i].level});
-				}
-				return aColumnIDs;
+				return aColumns.map((oItem) => ({column: oItem.column.getId(), level: oItem.level}));
 			};
 
 			this.fnColumnBoundariesToId = function(mBoundaries) {
@@ -610,7 +619,7 @@ sap.ui.define([
 		const oColumn = this.oTable.getColumns()[2];
 		assert.ok(ColumnUtils.isColumnMovable(oColumn), "Ensure column is movable");
 
-		this.oTable.attachColumnMove(function(oEvent) {
+		this.oTable.attachColumnMove((oEvent) => {
 			assert.equal(oEvent.getParameter("newPos"), 3, "Correct Index in event parameter");
 			assert.ok(oEvent.getParameter("column") === oColumn, "Correct Column in event parameter");
 		});
@@ -625,7 +634,7 @@ sap.ui.define([
 		const oColumn = this.oTable.getColumns()[0];
 		assert.ok(!ColumnUtils.isColumnMovable(oColumn), "Column is not movable");
 
-		this.oTable.attachColumnMove(function(oEvent) {
+		this.oTable.attachColumnMove((oEvent) => {
 			assert.ok(false, "No event was triggered");
 		});
 
@@ -639,7 +648,7 @@ sap.ui.define([
 		const oColumn = this.oTable.getColumns()[4];
 		assert.ok(ColumnUtils.isColumnMovable(oColumn), "Column is movable");
 
-		this.oTable.attachColumnMove(function(oEvent) {
+		this.oTable.attachColumnMove((oEvent) => {
 			assert.ok(false, "No event was triggered");
 		});
 
@@ -653,7 +662,7 @@ sap.ui.define([
 		const oColumn = this.oTable.getColumns()[2];
 		assert.ok(ColumnUtils.isColumnMovable(oColumn), "Column is movable");
 
-		this.oTable.attachColumnMove(function(oEvent) {
+		this.oTable.attachColumnMove((oEvent) => {
 			assert.equal(oEvent.getParameter("newPos"), 3, "Correct Index in event parameter");
 			assert.ok(oEvent.getParameter("column") === oColumn, "Correct Column in event parameter");
 			oEvent.preventDefault();
@@ -665,10 +674,11 @@ sap.ui.define([
 
 	QUnit.module("Column Widths", {
 		beforeEach: async function() {
-			await createTables();
+			this.oTable = TableQUnitUtils.createTable();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
-			destroyTables();
+			this.oTable.destroy();
 		}
 	});
 
@@ -682,7 +692,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("resizeColumn", async function(assert) {
-		oTable.setFixedColumnCount(0);
+		const oTable = this.oTable;
 		oTable.getColumns()[0].addMultiLabel(new TestControl({text: "a_1_1"}));
 		oTable.getColumns()[0].addMultiLabel(new TestControl({text: "a_2_1"}));
 		oTable.getColumns()[0].addMultiLabel(new TestControl({text: "a_3_1"}));
@@ -697,18 +707,13 @@ sap.ui.define([
 
 		const aVisibleColumns = oTable._getVisibleColumns();
 
-		const aOriginalColumnWidths = [];
-		for (let i = 0; i < aVisibleColumns.length; i++) {
-			const oColumn = aVisibleColumns[i];
-			aOriginalColumnWidths.push(parseInt(oColumn.getWidth()));
-		}
+		const aOriginalColumnWidths = aVisibleColumns.map((oColumn) => parseInt(oColumn.getWidth()));
 
 		function assertUnchanged(aExcludedColumns) {
-			for (let i = 0; i < aVisibleColumns.length; i++) {
-				if (aExcludedColumns && aExcludedColumns.indexOf(i) !== -1) {
+			for (const [i, oColumn] of aVisibleColumns.entries()) {
+				if (aExcludedColumns && aExcludedColumns.includes(i)) {
 					continue;
 				}
-				const oColumn = aVisibleColumns[i];
 				assert.strictEqual(parseInt(oColumn.getWidth()), aOriginalColumnWidths[i],
 					"Column " + (i + 1) + " has its original width of " + aOriginalColumnWidths[i] + "px");
 			}
@@ -717,7 +722,7 @@ sap.ui.define([
 		function assertColumnWidth(iColumnIndex, iWidth) {
 			const iActualColumnWidth = parseInt(aVisibleColumns[iColumnIndex].getWidth());
 			assert.strictEqual(iActualColumnWidth, iWidth,
-				"Column " + (iColumnIndex + 1) + " width is " + iActualColumnWidth + "px and should be " + iWidth + "px");
+				`Column ${(iColumnIndex + 1)} width is ${iActualColumnWidth}px and should be ${iWidth}px`);
 		}
 
 		// Invalid input should not change the column widths.
@@ -773,9 +778,9 @@ sap.ui.define([
 
 		// Invalid span values default to 1
 		ColumnUtils.resizeColumn(oTable, aVisibleColumns[aVisibleColumns.length - 1], 150, false, 2);
-		assertColumnWidth(oTable.columnCount - 1, 150);
-		assertUnchanged([oTable.columnCount - 1]);
-		ColumnUtils.resizeColumn(oTable, aVisibleColumns[aVisibleColumns.length - 1], aOriginalColumnWidths[oTable.columnCount - 1], false, 0);
+		assertColumnWidth(oTable.getColumns().length - 1, 150);
+		assertUnchanged([oTable.getColumns().length - 1]);
+		ColumnUtils.resizeColumn(oTable, aVisibleColumns[aVisibleColumns.length - 1], aOriginalColumnWidths[oTable.getColumns().length - 1], false, 0);
 		assertUnchanged();
 
 		// Do not decrease column width below the minimum column width value.
@@ -821,6 +826,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("getColumnWidth", async function(assert) {
+		const oTable = this.oTable;
 		const aVisibleColumns = oTable._getVisibleColumns();
 		let iColumnWidth;
 
@@ -875,23 +881,24 @@ sap.ui.define([
 
 	QUnit.module("Fixed Columns", {
 		beforeEach: async function() {
-			await createTables();
-			oTable.setFixedColumnCount(0);
-			this.aColumns = oTable.getColumns();
-			for (let i = 0; i < this.aColumns.length; i++) {
-				this.aColumns[i].setVisible(true);
-				this.aColumns[i].setWidth("100px");
+			this.oTable = TableQUnitUtils.createTable();
+			await this.oTable.qunit.rendered();
+			this.aColumns = this.oTable.getColumns();
+			for (const oColumn of this.aColumns) {
+				oColumn.setVisible(true);
+				oColumn.setWidth("100px");
 			}
-			oTable.setWidth(((this.aColumns.length * 100) + 200) + "px");
+			this.oTable.setWidth(((this.aColumns.length * 100) + 200) + "px");
 			await nextUIUpdate();
 		},
 		afterEach: function() {
 			this.aColumns = null;
-			destroyTables();
+			this.oTable.destroy();
 		}
 	});
 
 	QUnit.test("getHeaderText", function(assert) {
+		const oTable = this.oTable;
 		assert.strictEqual(ColumnUtils.getColumnWidth(), null, "Returned null: No parameters passed");
 
 		oTable.removeAllColumns();
@@ -928,6 +935,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("getHeaderLabel", function(assert) {
+		const oTable = this.oTable;
 		assert.strictEqual(ColumnUtils.getColumnWidth(), null, "Returned null: No parameters passed");
 
 		const oLabelA = new TableQUnitUtils.HeightTestControl();
@@ -971,6 +979,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("_getVisibleColumnsInSpan", function(assert) {
+		const oTable = this.oTable;
 		const oLabelA = new TestControl({text: "Column1Label1"});
 		const oLabelB = new TestControl({text: "Column2Label1"});
 		const oLabelC = new TestControl({text: "Column3Label2"});

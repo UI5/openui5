@@ -193,14 +193,14 @@ sap.ui.define([
 	function attachEventHandler(oControl, iSkipCalls, fnHandler, thisArg) {
 		let iCalled = 0;
 		const fnEventHandler = function() {
-			const fnTest = function() {
+			const fnTest = () => {
 				iCalled++;
 				if (iSkipCalls === iCalled) {
 					oControl.detachRowsUpdated(fnEventHandler);
 					oControl.attachEventOnce("rowsUpdated", fnHandler, thisArg);
 				}
 			};
-			Promise.resolve().then(fnTest.bind(this));
+			Promise.resolve().then(fnTest);
 		};
 
 		if (iSkipCalls === 0) {
@@ -211,7 +211,7 @@ sap.ui.define([
 	}
 
 	function performTestAfterTableIsUpdated(doTest, done) {
-		this.oModel.metadataLoaded().then(function() {
+		this.oModel.metadataLoaded().then(() => {
 			attachEventHandler(this.oTable, 0, function() {
 				doTest(this.oTable);
 				if (done) {
@@ -219,7 +219,7 @@ sap.ui.define([
 				}
 			}, this);
 			this.oTable.bindRows("/ActualPlannedCosts(P_ControllingArea='US01',P_CostCenter='100-1000',P_CostCenterTo='999-9999')/Results");
-		}.bind(this));
+		});
 	}
 
 	function createColumn(mSettings) {
@@ -415,7 +415,7 @@ sap.ui.define([
 		oInnerBindRows.restore();
 	});
 
-	QUnit.test("BindRows - Update columns", function(assert) {
+	QUnit.test("BindRows - Update columns", async function(assert) {
 		const oBindingInfo = {path: "/ActualPlannedCosts(P_ControllingArea='US01',P_CostCenter='100-1000',P_CostCenterTo='999-9999')/Results"};
 
 		async function testRun(mTestSettings) {
@@ -436,26 +436,23 @@ sap.ui.define([
 				oTable.bindRows(mTestSettings.bindingInfo);
 			}
 
-			return oTable._metadataLoaded().then(function() {
-				mTestSettings.metadataLoaded(oUpdateColumnsSpy, oInvalidateSpy, mTestSettings.renderTable);
-				oTable.destroy();
-			}).catch(function() {
-				mTestSettings.metadataLoaded(oUpdateColumnsSpy, oInvalidateSpy, mTestSettings.renderTable);
-				oTable.destroy();
-			});
+			try {
+				await oTable._metadataLoaded();
+			} catch (e) {
+				// metadataLoaded rejected - proceed with test regardless
+			}
+			mTestSettings.metadataLoaded(oUpdateColumnsSpy, oInvalidateSpy, mTestSettings.renderTable);
+			oTable.destroy();
 		}
 
-		function test(mTestSettings) {
-			return new Promise(function(resolve) {
-				mTestSettings.renderTable = true;
-				testRun(mTestSettings).then(function() {
-					mTestSettings.renderTable = false;
-					return testRun(mTestSettings);
-				}).then(resolve);
-			});
+		async function test(mTestSettings) {
+			mTestSettings.renderTable = true;
+			await testRun(mTestSettings);
+			mTestSettings.renderTable = false;
+			await testRun(mTestSettings);
 		}
 
-		return test({
+		await test({
 			bindingInfo: oBindingInfo,
 			metadataLoaded: function(oUpdateColumnsSpy, oInvalidateSpy, bTableIsRendered) {
 				assert.ok(oUpdateColumnsSpy.notCalled, "No Model -> Columns not updated");
@@ -465,31 +462,29 @@ sap.ui.define([
 					assert.ok(oInvalidateSpy.notCalled, "Table is not rendered -> Not invalidated");
 				}
 			}
-		}).then(function() {
-			return test({
-				model: new ODataModelV2(sServiceURI),
-				metadataLoaded: function(oUpdateColumnsSpy, oInvalidateSpy, bTableIsRendered) {
-					assert.ok(oUpdateColumnsSpy.notCalled, "No BindingInfo -> Columns not updated");
-					if (bTableIsRendered) {
-						assert.ok(oInvalidateSpy.notCalled, "Table is rendered -> Not invalidated");
-					} else {
-						assert.ok(oInvalidateSpy.notCalled, "Table is not rendered -> Not invalidated");
-					}
+		});
+		await test({
+			model: new ODataModelV2(sServiceURI),
+			metadataLoaded: function(oUpdateColumnsSpy, oInvalidateSpy, bTableIsRendered) {
+				assert.ok(oUpdateColumnsSpy.notCalled, "No BindingInfo -> Columns not updated");
+				if (bTableIsRendered) {
+					assert.ok(oInvalidateSpy.notCalled, "Table is rendered -> Not invalidated");
+				} else {
+					assert.ok(oInvalidateSpy.notCalled, "Table is not rendered -> Not invalidated");
 				}
-			});
-		}).then(function() {
-			return test({
-				bindingInfo: oBindingInfo,
-				model: new ODataModelV2(sServiceURI),
-				metadataLoaded: function(oUpdateColumnsSpy, oInvalidateSpy, bTableIsRendered) {
-					assert.ok(oUpdateColumnsSpy.calledOnce, "V2 model -> Columns updated");
-					if (bTableIsRendered) {
-						assert.ok(oInvalidateSpy.calledOnce, "Table is rendered -> Invalidated");
-					} else {
-						assert.ok(oInvalidateSpy.notCalled, "Table is not rendered -> Not invalidated");
-					}
+			}
+		});
+		await test({
+			bindingInfo: oBindingInfo,
+			model: new ODataModelV2(sServiceURI),
+			metadataLoaded: function(oUpdateColumnsSpy, oInvalidateSpy, bTableIsRendered) {
+				assert.ok(oUpdateColumnsSpy.calledOnce, "V2 model -> Columns updated");
+				if (bTableIsRendered) {
+					assert.ok(oInvalidateSpy.calledOnce, "Table is rendered -> Invalidated");
+				} else {
+					assert.ok(oInvalidateSpy.notCalled, "Table is not rendered -> Not invalidated");
 				}
-			});
+			}
 		});
 	});
 
@@ -522,30 +517,28 @@ sap.ui.define([
 		assert.ok(oSelectionChangedSpy.calledOnce, "The original selectionChanged event listener was called once");
 	});
 
-	QUnit.test("_metadataLoaded", function(assert) {
+	QUnit.test("_metadataLoaded", async function(assert) {
 		const oModel = this.oTable.getModel();
 
 		assert.expect(3);
 		this.oTable.setModel(null);
 
-		return this.oTable._metadataLoaded()
-			.catch(() => {
-				assert.ok(true, "No binding, no model: Promise rejected");
-			})
-			.then(() => {
-				this.oTable.bindRows("/ActualPlannedCosts(P_ControllingArea='US01',P_CostCenter='100-1000',P_CostCenterTo='999-9999')/Results");
-				return this.oTable._metadataLoaded();
-			})
-			.catch(() => {
-				assert.ok(true, "No model: Promise rejected");
-			})
-			.then(() => {
-				this.oTable.setModel(oModel);
-				return this.oTable._metadataLoaded();
-			})
-			.then(() => {
-				assert.ok(true, "Binding, model and metadata available: Promise resolved");
-			});
+		try {
+			await this.oTable._metadataLoaded();
+		} catch (e) {
+			assert.ok(true, "No binding, no model: Promise rejected");
+		}
+
+		this.oTable.bindRows("/ActualPlannedCosts(P_ControllingArea='US01',P_CostCenter='100-1000',P_CostCenterTo='999-9999')/Results");
+		try {
+			await this.oTable._metadataLoaded();
+		} catch (e) {
+			assert.ok(true, "No model: Promise rejected");
+		}
+
+		this.oTable.setModel(oModel);
+		await this.oTable._metadataLoaded();
+		assert.ok(true, "Binding, model and metadata available: Promise resolved");
 	});
 
 	QUnit.module("Context menu", {
@@ -575,7 +568,7 @@ sap.ui.define([
 
 	QUnit.test("Grouping and focus handling", function(assert) {
 		const done = assert.async();
-		this.oModel.metadataLoaded().then(function() {
+		this.oModel.metadataLoaded().then(() => {
 			const mSettings = {
 				columns: [
 					createColumn({name: "CostCenter"}),
@@ -595,7 +588,7 @@ sap.ui.define([
 				oColumn._openHeaderMenu(oColumn.getDomRef());
 				await nextBeforeOpen;
 
-				await TableQUnitUtils.wait(0);
+				await TableQUnitUtils.sleep(0);
 
 				const oGroupSwitch = oColumnMenu._getAllEffectiveQuickActions()[2].getContent()[0];
 				oGroupSwitch.setState(true);
@@ -612,12 +605,12 @@ sap.ui.define([
 			attachEventHandler(this.oTable, 0, fnHandler1, this);
 			this.oTable.bindRows("/ActualPlannedCosts(P_ControllingArea='US01',P_CostCenter='100-1000',P_CostCenterTo='999-9999')/Results");
 
-		}.bind(this));
+		});
 	});
 
 	QUnit.test("getAnalyticalInfoOfRow", function(assert) {
 		const done = assert.async();
-		this.oModel.metadataLoaded().then(function() {
+		this.oModel.metadataLoaded().then(() => {
 			this.oTable = createTable.call(this);
 
 			const fnHandler1 = function() {
@@ -668,12 +661,12 @@ sap.ui.define([
 			attachEventHandler(this.oTable, 0, fnHandler1, this);
 			this.oTable.bindRows("/ActualPlannedCosts(P_ControllingArea='US01',P_CostCenter='100-1000',P_CostCenterTo='999-9999')/Results");
 
-		}.bind(this));
+		});
 	});
 
 	QUnit.test("Simple expand/collapse", function(assert) {
 		const done = assert.async();
-		this.oModel.metadataLoaded().then(function() {
+		this.oModel.metadataLoaded().then(() => {
 			this.oTable = createTable.call(this);
 
 			const fnHandler1 = function() {
@@ -706,12 +699,12 @@ sap.ui.define([
 			attachEventHandler(this.oTable, 0, fnHandler1, this);
 			this.oTable.bindRows("/ActualPlannedCosts(P_ControllingArea='US01',P_CostCenter='100-1000',P_CostCenterTo='999-9999')/Results");
 
-		}.bind(this));
+		});
 	});
 
 	QUnit.test("Row#expand & Row#collapse", function(assert) {
 		const done = assert.async();
-		this.oModel.metadataLoaded().then(function() {
+		this.oModel.metadataLoaded().then(() => {
 			this.oTable = createTable.call(this);
 
 			const fnHandler1 = function() {
@@ -739,12 +732,12 @@ sap.ui.define([
 			attachEventHandler(this.oTable, 0, fnHandler1, this);
 			this.oTable.bindRows("/ActualPlannedCosts(P_ControllingArea='US01',P_CostCenter='100-1000',P_CostCenterTo='999-9999')/Results");
 
-		}.bind(this));
+		});
 	});
 
 	QUnit.test("ProvideGrandTotals = false: No Sum row available", function(assert) {
 		const done = assert.async();
-		this.oModel.metadataLoaded().then(function() {
+		this.oModel.metadataLoaded().then(() => {
 			this.oTable = createTable.call(this);
 
 			const fnHandler1 = function() {
@@ -783,13 +776,13 @@ sap.ui.define([
 				}
 			});
 
-		}.bind(this));
+		});
 	});
 
 	QUnit.test("Row state", function(assert) {
 		const done = assert.async();
 
-		this.oModel.metadataLoaded().then(function() {
+		this.oModel.metadataLoaded().then(() => {
 			this.oTable = createTable.call(this);
 
 			const fnHandler1 = function() {
@@ -833,7 +826,7 @@ sap.ui.define([
 
 			attachEventHandler(this.oTable, 0, fnHandler1, this);
 			this.oTable.bindRows("/ActualPlannedCosts(P_ControllingArea='US01',P_CostCenter='100-1000',P_CostCenterTo='999-9999')/Results");
-		}.bind(this));
+		});
 	});
 
 	QUnit.module("AnalyticalColumn", {
@@ -851,12 +844,12 @@ sap.ui.define([
 		const oColumn = this.oTable.getColumns()[1];
 
 		assert.ok(!oColumn.getGrouped(), "The column is not grouped initially");
-		this.oTable.attachGroup(function(oEvent) {
+		this.oTable.attachGroup((oEvent) => {
 			assert.ok(oEvent.getParameter("column") === oColumn &&
 					  oEvent.getParameter("groupedColumns") === this.oTable._aGroupedColumns &&
 					  oEvent.getParameter("type") === "group", "The group event is fired with the correct parameters");
 			done();
-		}.bind(this));
+		});
 		oColumn._setGrouped(true);
 		assert.ok(oColumn.getGrouped(), "The column is grouped");
 	});
@@ -906,40 +899,23 @@ sap.ui.define([
 				];
 
 				oBinding.isMeasure = function(sPropertyName) {
-					for (let i = 0; i < aProperties.length; i++) {
-						if (aProperties[i].name === sPropertyName && aProperties[i].type === "measure") {
-							return true;
-						}
-					}
-					return false;
+					return aProperties.some((oProperty) => oProperty.name === sPropertyName && oProperty.type === "measure");
 				};
 
 				oBinding.getProperty = function(sPropertyName) {
-					for (let i = 0; i < aProperties.length; i++) {
-						if (aProperties[i].name === sPropertyName) {
-							return aProperties[i];
-						}
-					}
+					return aProperties.find((oProperty) => oProperty.name === sPropertyName);
 				};
 
 				oBinding.getSortablePropertyNames = function() {
-					const aPropertyNames = [];
-					for (let i = 0; i < aProperties.length; i++) {
-						if (aProperties[i].sortProperty) {
-							aPropertyNames.push(aProperties[i].name);
-						}
-					}
-					return aPropertyNames;
+					return aProperties
+						.filter((oProperty) => oProperty.sortProperty)
+						.map((oProperty) => oProperty.name);
 				};
 
 				oBinding.getFilterablePropertyNames = function() {
-					const aPropertyNames = [];
-					for (let i = 0; i < aProperties.length; i++) {
-						if (aProperties[i].filterable === true) {
-							aPropertyNames.push(aProperties[i].name);
-						}
-					}
-					return aPropertyNames;
+					return aProperties
+						.filter((oProperty) => oProperty.filterable === true)
+						.map((oProperty) => oProperty.name);
 				};
 
 				oBinding.getAnalyticalQueryResult = function() {
@@ -1321,7 +1297,7 @@ sap.ui.define([
 
 			return this.oDataModel.metadataLoaded();
 		},
-		beforeEach: function() {
+		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable(AnalyticalTable, {
 				rows: {
 					path: "/ActualPlannedCosts(P_ControllingArea='US01',P_CostCenter='100-1000',P_CostCenterTo='999-9999')/Results",
@@ -1332,19 +1308,18 @@ sap.ui.define([
 			});
 			this.iNoDataVisibilityChanges = 0;
 
-			return this.oTable.qunit.whenRenderingFinished().then(function() {
-				this.oObserver = new MutationObserver(function(aRecords) {
-					const oRecord = aRecords[0];
-					const bNoDataWasVisible = oRecord.oldValue.includes("sapUiTableEmpty");
-					const bNoDataIsVisible = oRecord.target.classList.contains("sapUiTableEmpty");
+			await this.oTable.qunit.rendered();
+			this.oObserver = new MutationObserver((aRecords) => {
+				const oRecord = aRecords[0];
+				const bNoDataWasVisible = oRecord.oldValue.includes("sapUiTableEmpty");
+				const bNoDataIsVisible = oRecord.target.classList.contains("sapUiTableEmpty");
 
-					if (bNoDataWasVisible !== bNoDataIsVisible) {
-						this.iNoDataVisibilityChanges++;
-					}
-				}.bind(this));
+				if (bNoDataWasVisible !== bNoDataIsVisible) {
+					this.iNoDataVisibilityChanges++;
+				}
+			});
 
-				this.oObserver.observe(this.oTable.getDomRef(), {attributes: true, attributeOldValue: true, attributeFilter: ["class"]});
-			}.bind(this));
+			this.oObserver.observe(this.oTable.getDomRef(), {attributes: true, attributeOldValue: true, attributeFilter: ["class"]});
 		},
 		afterEach: function() {
 			if (this.oObserver) {
@@ -1377,12 +1352,12 @@ sap.ui.define([
 				}
 			}
 		}, function(oTable) {
-			new Promise(function(resolve) {
-				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", function() {
+			new Promise((resolve) => {
+				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", () => {
 					TableQUnitUtils.assertNoDataVisible(assert, oTable, true);
 					resolve();
 				});
-			}).then(oTable.qunit.whenRenderingFinished).then(function() {
+			}).then(oTable.qunit.rendered).then(() => {
 				TableQUnitUtils.assertNoDataVisible(assert, oTable, false);
 				done();
 			});
@@ -1402,12 +1377,12 @@ sap.ui.define([
 				filters: [new Filter({path: "CostCenter", operator: "eq", value1: "DoesNotExist"})]
 			}
 		}, function(oTable) {
-			new Promise(function(resolve) {
-				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", function() {
+			new Promise((resolve) => {
+				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", () => {
 					TableQUnitUtils.assertNoDataVisible(assert, oTable, true);
 					resolve();
 				});
-			}).then(oTable.qunit.whenRenderingFinished).then(function() {
+			}).then(oTable.qunit.rendered).then(() => {
 				TableQUnitUtils.assertNoDataVisible(assert, oTable, true);
 				done();
 			});
@@ -1427,31 +1402,29 @@ sap.ui.define([
 				filters: [new Filter({path: "CostCenter", operator: "eq", value1: "DoesNotExistButReturnsGrandTotal"})]
 			}
 		}, function(oTable) {
-			new Promise(function(resolve) {
-				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", function() {
+			new Promise((resolve) => {
+				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", () => {
 					TableQUnitUtils.assertNoDataVisible(assert, oTable, true);
 					resolve();
 				});
-			}).then(oTable.qunit.whenRenderingFinished).then(function() {
+			}).then(oTable.qunit.rendered).then(() => {
 				TableQUnitUtils.assertNoDataVisible(assert, oTable, true);
 				done();
 			});
 		});
 	});
 
-	QUnit.test("Bind/Unbind", function(assert) {
+	QUnit.test("Bind/Unbind", async function(assert) {
 		const oBindingInfo = this.oTable.getBindingInfo("rows");
-		const that = this;
 
 		this.oTable.unbindRows();
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Unbind");
-			that.assertNoDataVisibilityChangeCount(assert, 1);
-			that.oTable.bindRows(oBindingInfo);
-		}).then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Bind");
-			that.assertNoDataVisibilityChangeCount(assert, 1);
-		});
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, true, "Unbind");
+		this.assertNoDataVisibilityChangeCount(assert, 1);
+		this.oTable.bindRows(oBindingInfo);
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, false, "Bind");
+		this.assertNoDataVisibilityChangeCount(assert, 1);
 	});
 
 	QUnit.test("Rerender while binding/unbinding", async function(assert) {
@@ -1460,25 +1433,25 @@ sap.ui.define([
 
 		this.oTable.unbindRows();
 		this.oTable.invalidate();
-		await this.oTable.qunit.whenBindingChange();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Unbind");
 		that.assertNoDataVisibilityChangeCount(assert, 1);
 
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Rerender");
 		that.assertNoDataVisibilityChangeCount(assert, 0);
 
 		that.oTable.bindRows(oBindingInfo);
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenBindingChange();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.bindingChangeEvent();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Bind");
 		that.assertNoDataVisibilityChangeCount(assert, 1);
 
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Rerender");
 		that.assertNoDataVisibilityChangeCount(assert, 0);
 	});
@@ -1570,7 +1543,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Initialization", async function(assert) {
-		await TableQUnitUtils.wait(100);
+		await TableQUnitUtils.sleep(100);
 		assert.ok(this.fnBindingNodesSpy.notCalled, "Binding.getNodes was not called");
 	});
 

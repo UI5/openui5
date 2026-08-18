@@ -1400,18 +1400,10 @@ sap.ui.define([
 		const oController = this.getController(vControl, sKey);
 		const oControl = Engine.getControlInstance(vControl);
 
-
-		const mControllers = this._getRegistryEntry(vControl).controller;
-		const oTheoreticalState = {};
-
-		Object.keys(mControllers).forEach((sControllerKey) => {
-			oTheoreticalState[sControllerKey] = mControllers[sControllerKey].getCurrentState();
-		});
+		const oTheoreticalState = this._getTheoreticalState(vControl);
 
 		//Only execute validation for controllers that support 'model2State'
 		if (oController && oController.model2State instanceof Function) {
-			oTheoreticalState[sKey] = oController.model2State();
-
 			let mInfoState = {
 				validation: MessageType.None
 			};
@@ -1436,6 +1428,45 @@ sap.ui.define([
 
 		}
 
+	};
+
+	/**
+	 * Retrieves the theoretical (not yet applied) state of all registered subcontrollers.
+	 * In contrast to {@link sap.m.p13n.Engine#retrieveState}, which returns the applied state,
+	 * this method reflects the live personalization currently held in the open personalization dialog.
+	 *
+	 * @private
+	 * @ui5-restricted sap.ui.mdc
+	 * @since 1.152
+	 *
+	 * @param {sap.ui.core.Control} vControl The registered control instance
+	 * @returns {object} The theoretical state of the control's personalization matching the format processed by {@link sap.ui.mdc.p13n.StateUtil StateUtil}.
+	 */
+	Engine.prototype.retrieveTheoreticalState = function(vControl) {
+		const oControl = Engine.getControlInstance(vControl);
+		return this.externalizeKeys(oControl, this._getTheoreticalState(vControl));
+	};
+
+	/**
+	 * Builds the theoretical (not yet applied) internal state of all registered subcontrollers.
+	 * <code>model2State</code> is only used when the controller supports it and its panel is
+	 * instantiated and not destroyed; otherwise <code>getCurrentState</code> is used as a fallback.
+	 *
+	 * @private
+	 * @param {sap.ui.core.Control} vControl The registered control instance
+	 * @returns {object} The theoretical internal state keyed by controller key
+	 */
+	Engine.prototype._getTheoreticalState = function(vControl) {
+		const mControllers = this._getRegistryEntry(vControl).controller;
+		const mTheoreticalState = {};
+
+		Object.keys(mControllers).forEach((sControllerKey) => {
+			const oController = mControllers[sControllerKey];
+			const bUseModel2State = oController.model2State instanceof Function && !!oController._oPanel && !oController._oPanel.isDestroyed();
+			mTheoreticalState[sControllerKey] = bUseModel2State ? oController.model2State() : oController.getCurrentState();
+		});
+
+		return mTheoreticalState;
 	};
 
 	/**

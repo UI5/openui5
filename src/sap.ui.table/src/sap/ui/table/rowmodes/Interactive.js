@@ -462,7 +462,7 @@ sap.ui.define([
 					new MenuItem({
 						text: TableUtils.getResourceText("TBL_RSZ_ROW_UP"),
 						shortcutText: TableUtils.getResourceText("TBL_RSZ_ROW_UP_SHORTCUT"),
-						select: function() {
+						select: () => {
 							const iRowCount = oMode.getActualRowCount();
 							setNewRowCount.call(oMode, Math.max(iRowCount - 1, oMode.getMinRowCount()), true);
 						}
@@ -470,7 +470,7 @@ sap.ui.define([
 					new MenuItem({
 						text: TableUtils.getResourceText("TBL_RSZ_ROW_DOWN"),
 						shortcutText: TableUtils.getResourceText("TBL_RSZ_ROW_DOWN_SHORTCUT"),
-						select: function() {
+						select: () => {
 							const iRowCount = oMode.getActualRowCount();
 							setNewRowCount.call(oMode, Math.min(iRowCount + 1, oMode._getMaxRowCount()), true);
 						}
@@ -478,19 +478,19 @@ sap.ui.define([
 					new MenuItem({
 						text: TableUtils.getResourceText("TBL_RSZ_MINIMIZE"),
 						shortcutText: TableUtils.getResourceText("TBL_RSZ_MINIMIZE_SHORTCUT"),
-						select: function() {
+						select: () => {
 							setNewRowCount.call(oMode, oMode.getMinRowCount(), true);
 						}
 					}),
 					new MenuItem({
 						text: TableUtils.getResourceText("TBL_RSZ_MAXIMIZE"),
 						shortcutText: TableUtils.getResourceText("TBL_RSZ_MAXIMIZE_SHORTCUT"),
-						select: function() {
+						select: () => {
 							setNewRowCount.call(oMode, oMode._getMaxRowCount(), true);
 						}
 					})
 				],
-				closed: function() {
+				closed: () => {
 					oTable.getDomRef("heightResizer").classList.remove("sapUiTableHeightResizerActive");
 				}
 			});

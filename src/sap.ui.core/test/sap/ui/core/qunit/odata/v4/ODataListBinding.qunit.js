@@ -5361,7 +5361,8 @@ sap.ui.define([
 	{lengthFinal : true, noGroup : true},
 	{lengthFinal : true, noGroup : true, newMaxLength : 42},
 	{lengthFinal : true, apiGroup : false, newMaxLength : 42},
-	{lengthFinal : true, apiGroup : true, newMaxLength : 41}
+	{lengthFinal : true, apiGroup : true, newMaxLength : 41},
+	{lengthFinal : true, apiGroup : true, newMaxLength : 41, dataAggregation : true}
 ].forEach(function (oFixture) {
 	var sTitle = "delete: kept-alive context not in the collection: " + JSON.stringify(oFixture);
 
@@ -5449,7 +5450,14 @@ sap.ui.define([
 		this.mock(oBinding.oCache).expects("requestCount").exactly(oFixture.newMaxLength ? 1 : 0)
 			.withExactArgs("~groupLock~")
 			.returns(oCountPromise);
-		oBindingMock.expects("_fireChange").exactly(bFireChange ? 1 : 0)
+		oHelperMock.expects("isDataAggregation").exactly(bFireChange ? 1 : 0)
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
+			.returns(oFixture.dataAggregation);
+		const oSetOutdatedExpectation = this.mock(oBinding.oHeaderContext).expects("setOutdated")
+			.exactly(bFireChange && oFixture.dataAggregation ? 1 : 0)
+			.withExactArgs(true);
+		const oFireChangeExpectation = oBindingMock.expects("_fireChange")
+			.exactly(bFireChange ? 1 : 0)
 			.withExactArgs({reason : ChangeReason.Remove})
 			.callsFake(function () {
 				assert.strictEqual(oBinding.iMaxLength, 41);
@@ -5469,6 +5477,9 @@ sap.ui.define([
 		return oPromise.then(function () {
 			assert.deepEqual(oBinding.aContexts, aContexts);
 			assert.strictEqual(oBinding.iMaxLength, oFixture.newMaxLength || iOldMaxLength);
+			if (oFixture.dataAggregation) {
+				sinon.assert.callOrder(oSetOutdatedExpectation, oFireChangeExpectation);
+			}
 		}, function (oError) {
 			assert.strictEqual(oError, "~oError~");
 
@@ -11638,7 +11649,7 @@ sap.ui.define([
 			});
 			assert.deepEqual(oBinding.mPreviousContextsByPath, {
 				"/EMPLOYEES/2" : aContextsBefore[2],
-				// "/EMPLOYEES/3" : aContextsBefore[3], // "created" not inserted here!
+				"/EMPLOYEES/3" : aContextsBefore[3], // "created" also inserted here as well
 				"/EMPLOYEES/4" : aContextsBefore[4]
 			});
 		} else {

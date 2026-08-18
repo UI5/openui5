@@ -53,55 +53,52 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Initialization", function(assert) {
+	QUnit.test("Initialization", async function(assert) {
 		const oGetContextsSpy = this.oGetContextsSpy;
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			assert.strictEqual(oGetContextsSpy.callCount, 1, "Method to get contexts called once");
-			assert.ok(oGetContextsSpy.calledWithExactly(0, 10, 100), "The call considers the rendered row count");
-		});
+		await this.oTable.qunit.rendered();
+		assert.strictEqual(oGetContextsSpy.callCount, 1, "Method to get contexts called once");
+		assert.ok(oGetContextsSpy.calledWithExactly(0, 10, 100), "The call considers the rendered row count");
 	});
 
-	QUnit.test("Change row count", function(assert) {
+	QUnit.test("Change row count", async function(assert) {
 		const oTable = this.oTable;
 		const oGetContextsSpy = this.oGetContextsSpy;
 
 		oTable.setFirstVisibleRow(10);
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			oGetContextsSpy.resetHistory();
+		await oTable.qunit.rendered();
+		oGetContextsSpy.resetHistory();
+		oTable.getRowMode().setRowCount(8);
+		await oTable.qunit.rendered();
+		assert.strictEqual(oGetContextsSpy.callCount, 1, "Decreased row count: Method to get contexts called once");
+		assert.ok(oGetContextsSpy.calledWithExactly(10, 8, 100), "Decreased row count: The call considers the row count");
 
-			oTable.getRowMode().setRowCount(8);
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(oGetContextsSpy.callCount, 1, "Decreased row count: Method to get contexts called once");
-			assert.ok(oGetContextsSpy.calledWithExactly(10, 8, 100), "Decreased row count: The call considers the row count");
+		oGetContextsSpy.resetHistory();
+		oTable.getRowMode().setRowCount(10);
+		await oTable.qunit.rendered();
+		assert.strictEqual(oGetContextsSpy.callCount, 1, "Increased row count: Method to get contexts called once");
+		assert.ok(oGetContextsSpy.calledWithExactly(10, 10, 100), "Increased row count: The call considers the row count");
 
-			oGetContextsSpy.resetHistory();
-			oTable.getRowMode().setRowCount(10);
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(oGetContextsSpy.callCount, 1, "Increased row count: Method to get contexts called once");
-			assert.ok(oGetContextsSpy.calledWithExactly(10, 10, 100), "Increased row count: The call considers the row count");
+		oTable.setFirstVisibleRow(100);
+		await oTable.qunit.rendered();
+		oGetContextsSpy.resetHistory();
+		oTable.getRowMode().setRowCount(8);
+		await oTable.qunit.rendered();
+		assert.strictEqual(oGetContextsSpy.callCount, 1,
+			"Decreased row count when scrolled to bottom: Method to get contexts called once");
+		assert.ok(oGetContextsSpy.calledWithExactly(90, 8, 100),
+			"Decreased row count when scrolled to bottom: The call considers the row count");
 
-			oTable.setFirstVisibleRow(100);
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			oGetContextsSpy.resetHistory();
-			oTable.getRowMode().setRowCount(8);
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(oGetContextsSpy.callCount, 1,
-				"Decreased row count when scrolled to bottom: Method to get contexts called once");
-			assert.ok(oGetContextsSpy.calledWithExactly(90, 8, 100),
-				"Decreased row count when scrolled to bottom: The call considers the row count");
-
-			oTable.setFirstVisibleRow(100);
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			oGetContextsSpy.resetHistory();
-			oTable.getRowMode().setRowCount(10);
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(oGetContextsSpy.callCount, 1,
-				"Increased row count when scrolled to bottom: Method to get contexts called once");
-			assert.ok(oGetContextsSpy.calledWithExactly(90, 10, 100),
-				"Increased row count when scrolled to bottom: The call considers the row count");
-		});
+		oTable.setFirstVisibleRow(100);
+		await oTable.qunit.rendered();
+		oGetContextsSpy.resetHistory();
+		oTable.getRowMode().setRowCount(10);
+		await oTable.qunit.rendered();
+		assert.strictEqual(oGetContextsSpy.callCount, 1,
+			"Increased row count when scrolled to bottom: Method to get contexts called once");
+		assert.ok(oGetContextsSpy.calledWithExactly(90, 10, 100),
+			"Increased row count when scrolled to bottom: The call considers the row count");
 	});
 
 	QUnit.module("Resizer", {
@@ -115,7 +112,7 @@ sap.ui.define([
 				placeAt: "qunit-fixture",
 				ariaLabelledBy: [oTitle.getId(), oLabel.getId()]
 			});
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -182,7 +179,7 @@ sap.ui.define([
 				"Prevent Default of selectstart event");
 			assert.ok(oEvent.isPropagationStopped() && bDuringResize || !oEvent.isPropagationStopped() && !bDuringResize,
 				"Stopped Propagation of selectstart event");
-			const sUnselectable = jQuery(document.body).attr("unselectable") || "off";
+			const sUnselectable = document.body.getAttribute("unselectable") || "off";
 			assert.ok(sUnselectable === (bDuringResize ? "on" : "off"), "Text Selection switched " + (bDuringResize ? "off" : "on"));
 		};
 
@@ -341,14 +338,13 @@ sap.ui.define([
 
 	FixedRowHeightTest.registerTo(QUnit);
 
-	RowCountConstraintsTest.test("Force fixed rows if row count too low", function(assert) {
+	RowCountConstraintsTest.test("Force fixed rows if row count too low", async function(assert) {
 		this.oRowMode.setRowCount(1);
 		this.oRowMode.setMinRowCount(1);
 		this.oTable._setRowCountConstraints({fixedTop: true, fixedBottom: true});
 
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			TableQUnitUtils.assertRenderedRows(assert, this.oTable, 0, 1, 0);
-		}.bind(this));
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertRenderedRows(assert, this.oTable, 0, 1, 0);
 	});
 
 	RowCountConstraintsTest.registerTo(QUnit);

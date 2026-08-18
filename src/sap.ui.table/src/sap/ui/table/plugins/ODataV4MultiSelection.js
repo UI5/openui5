@@ -470,11 +470,11 @@ sap.ui.define([
 			return;
 		}
 
-		oPlugin.getControl()?.getBinding()?.getAllCurrentContexts().forEach(function(oContext) {
+		for (const oContext of (oPlugin.getControl()?.getBinding()?.getAllCurrentContexts() ?? [])) {
 			if (oContext.isSelected() && oContext.getProperty("@$ui5.node.isExpanded") === undefined) {
 				oContext.setSelected(false);
 			}
-		});
+		}
 	}
 
 	function onRowUpdateState(oState) {
@@ -520,9 +520,9 @@ sap.ui.define([
 
 		const aContexts = await TableUtils.loadContexts(oTable, iGetContextsStartIndex, iGetContextsLength, true);
 
-		aContexts.forEach(function(oContext) {
+		for (const oContext of aContexts) {
 			if (!oPlugin.isContextSelectable(oContext) || oContext.isSelected()) {
-				return;
+				continue;
 			}
 			if (bUpwardSelection && oContext.getIndex() >= iIndexTo || oContext.getIndex() <= iIndexTo) {
 				oContext.setSelected(true);
@@ -530,7 +530,7 @@ sap.ui.define([
 			if (oContext.getIndex() === iIndexTo) {
 				_private(oPlugin).oRangeSelectionStartContext = oContext;
 			}
-		});
+		}
 
 		if (_private(oPlugin).bLimitReached) {
 			await TableUtils.scrollTableToIndex(oTable, iIndexTo, bUpwardSelection);

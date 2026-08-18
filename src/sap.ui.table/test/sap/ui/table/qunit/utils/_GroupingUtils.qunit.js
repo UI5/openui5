@@ -40,7 +40,7 @@ sap.ui.define([
 				rowActionCount: 1
 			});
 
-			await this.oTable.qunit.whenRenderingFinished();
+			await this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -153,7 +153,7 @@ sap.ui.define([
 		mGroupModeSetter[HierarchyMode.Tree] = Grouping.setHierarchyMode.bind(Grouping, this.oTable, HierarchyMode.Tree);
 		mGroupModeSetter[HierarchyMode.GroupedTree] = Grouping.setHierarchyMode.bind(Grouping, this.oTable, HierarchyMode.GroupedTree);
 
-		[
+		for (const mTestSettings of [
 			{newMode: HierarchyMode.Flat, expectInvalidation: false},
 			{newMode: HierarchyMode.Group, expectInvalidation: true},
 			{newMode: HierarchyMode.Group, expectInvalidation: false},
@@ -162,13 +162,13 @@ sap.ui.define([
 			{newMode: HierarchyMode.GroupedTree, expectInvalidation: true},
 			{newMode: HierarchyMode.GroupedTree, expectInvalidation: false},
 			{newMode: HierarchyMode.Flat, expectInvalidation: true}
-		].forEach(function(mTestSettings) {
+		]) {
 			mGroupModeSetter[mTestSettings.newMode]();
 			assert.equal(oInvalidate.callCount, mTestSettings.expectInvalidation ? 1 : 0,
 				"Set from " + sCurrentMode + " mode to " + mTestSettings.newMode + " mode");
 			oInvalidate.resetHistory();
 			sCurrentMode = mTestSettings.newMode;
-		});
+		}
 	});
 
 	QUnit.module("Rendering", {
@@ -181,7 +181,7 @@ sap.ui.define([
 				columns: TableQUnitUtils.createTextColumn(),
 				models: TableQUnitUtils.createJSONModel(11)
 			});
-			await this.oTreeTable.qunit.whenRenderingFinished();
+			await this.oTreeTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTreeTable.destroy();
@@ -244,7 +244,7 @@ sap.ui.define([
 
 	QUnit.test("Tree Mode; After expand", async function(assert) {
 		this.oTreeTable.getRows()[0].expand();
-		await this.oTreeTable.qunit.whenRenderingFinished();
+		await this.oTreeTable.qunit.rendered();
 
 		for (const oRow of this.oTreeTable.getRows()) {
 			const oTreeIcon = oRow.getDomRef("col0").querySelector(".sapUiTableTreeIcon");
@@ -265,7 +265,7 @@ sap.ui.define([
 	QUnit.test("Tree Mode; After unbind with showNoData=false", async function(assert) {
 		this.oTreeTable.setShowNoData(false);
 		this.oTreeTable.unbindRows();
-		await this.oTreeTable.qunit.whenRenderingFinished();
+		await this.oTreeTable.qunit.rendered();
 
 		for (const oRow of this.oTreeTable.getRows()) {
 			const oTreeIcon = oRow.getDomRef("col0").querySelector(".sapUiTableTreeIcon");
@@ -281,7 +281,7 @@ sap.ui.define([
 
 	QUnit.test("Group Mode", async function(assert) {
 		this.oTreeTable.setUseGroupMode(true);
-		await this.oTreeTable.qunit.whenRenderingFinished();
+		await this.oTreeTable.qunit.rendered();
 
 		for (const oRow of this.oTreeTable.getRows()) {
 			const iRowIndex = oRow.getIndex();
@@ -314,7 +314,7 @@ sap.ui.define([
 	QUnit.test("Group Mode; After expand", async function(assert) {
 		this.oTreeTable.setUseGroupMode(true);
 		this.oTreeTable.getRows()[0].expand();
-		await this.oTreeTable.qunit.whenRenderingFinished();
+		await this.oTreeTable.qunit.rendered();
 
 		for (const oRow of this.oTreeTable.getRows()) {
 			const iRowIndex = oRow.getIndex();
@@ -353,7 +353,7 @@ sap.ui.define([
 		this.oTreeTable.setUseGroupMode(true);
 		this.oTreeTable.setShowNoData(false);
 		this.oTreeTable.unbindRows();
-		await this.oTreeTable.qunit.whenRenderingFinished();
+		await this.oTreeTable.qunit.rendered();
 
 		assert.notOk(this.oTreeTable.getRows().some((oRow) => oRow.getDomRef().classList.contains("sapUiTableGroupHeaderRow")),
 			"Group headers after unbind");

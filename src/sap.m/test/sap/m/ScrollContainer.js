@@ -22,7 +22,8 @@ sap.ui.define([
 		vertical: true,
 		content: [oBigContent],
 		height: "400px",
-		width: "200px"
+		width: "200px",
+		focusable: true
 	});
 
 	var oBigContent2;

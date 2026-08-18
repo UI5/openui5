@@ -790,9 +790,8 @@ sap.ui.define([
 			const iModelIndex = this.getModelIndex(oContext);
 			aContexts.splice(iModelIndex + 1, iCount).forEach((oContext0) => {
 				oContext0.iIndex = undefined; // "outside the collection"
-				if (!oContext0.created()) {
-					this.mPreviousContextsByPath[oContext0.getPath()] = oContext0;
-				} // else: created (even persisted) is kept inside "context" annotation
+				// Note: created (even persisted) is also kept inside "context" annotation
+				this.mPreviousContextsByPath[oContext0.getPath()] = oContext0;
 			});
 			for (let i = iModelIndex + 1; i < aContexts.length; i += 1) {
 				if (aContexts[i]) {
@@ -1395,6 +1394,9 @@ sap.ui.define([
 						// event needs to be fired in order to notify the control about the new
 						// length, for example, to update the 'More' button or the scrollbar.
 						if (iOldMaxLength !== that.iMaxLength) {
+							if (_Helper.isDataAggregation(that.mParameters)) {
+								that.oHeaderContext.setOutdated(true);
+							}
 							that._fireChange({reason : ChangeReason.Remove});
 						}
 					});

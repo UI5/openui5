@@ -28,7 +28,7 @@ sap.ui.define([
 				models: this.oDataModel
 			});
 
-			return this.oTable.qunit.whenRenderingFinished();
+			return this.oTable.qunit.rendered();
 		},
 		afterEach: function() {
 			this.oTable.destroy();
@@ -39,7 +39,7 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("#_getTotalRowCount", function(assert) {
+	QUnit.test("#_getTotalRowCount", async function(assert) {
 		const oTable = this.oTable;
 
 		assert.strictEqual(oTable._getTotalRowCount(), 16, "Binding#getLength defines the total row count in the table");
@@ -47,37 +47,36 @@ sap.ui.define([
 		oTable.bindRows({path: "/Products"});
 		assert.strictEqual(oTable._getTotalRowCount(), 16, "On rebind, the last known binding length of the previous binding is returned");
 
-		return oTable.qunit.whenRenderingFinished().then(function() {
-			assert.strictEqual(oTable._getTotalRowCount(), 16, "After rebind, the new binding length is returned");
-			oTable.getBinding().refresh();
-			assert.strictEqual(oTable._getTotalRowCount(), 16, "On refresh, the last known binding length is returned");
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(oTable._getTotalRowCount(), 16, "After refresh, the new binding length is returned");
-			oTable.getBinding().filter(new Filter({
-				path: "Category",
-				operator: "EQ",
-				value1: "GC"
-			}));
-			assert.strictEqual(oTable._getTotalRowCount(), 16, "On filter, the last known binding length is returned");
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(oTable._getTotalRowCount(), 3, "After filter, the new binding length is returned");
-			oTable.bindRows({path: "/Products", length: 5});
-			assert.strictEqual(oTable._getTotalRowCount(), 5, "The \"length\" parameter in the binding info overrides Binding#getLength");
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(oTable._getTotalRowCount(), 5, "After data is received, still the \"length\" parameter is returned");
-			oTable.getBinding().refresh();
-			assert.strictEqual(oTable._getTotalRowCount(), 5, "On refresh, still the \"length\" parameter is returned");
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.strictEqual(oTable._getTotalRowCount(), 5, "After refresh, still the \"length\" parameter is returned");
+		await oTable.qunit.rendered();
+		assert.strictEqual(oTable._getTotalRowCount(), 16, "After rebind, the new binding length is returned");
+		oTable.getBinding().refresh();
+		assert.strictEqual(oTable._getTotalRowCount(), 16, "On refresh, the last known binding length is returned");
+		await oTable.qunit.rendered();
+		assert.strictEqual(oTable._getTotalRowCount(), 16, "After refresh, the new binding length is returned");
+		oTable.getBinding().filter(new Filter({
+			path: "Category",
+			operator: "EQ",
+			value1: "GC"
+		}));
+		assert.strictEqual(oTable._getTotalRowCount(), 16, "On filter, the last known binding length is returned");
+		await oTable.qunit.rendered();
+		assert.strictEqual(oTable._getTotalRowCount(), 3, "After filter, the new binding length is returned");
+		oTable.bindRows({path: "/Products", length: 5});
+		assert.strictEqual(oTable._getTotalRowCount(), 5, "The \"length\" parameter in the binding info overrides Binding#getLength");
+		await oTable.qunit.rendered();
+		assert.strictEqual(oTable._getTotalRowCount(), 5, "After data is received, still the \"length\" parameter is returned");
+		oTable.getBinding().refresh();
+		assert.strictEqual(oTable._getTotalRowCount(), 5, "On refresh, still the \"length\" parameter is returned");
+		await oTable.qunit.rendered();
+		assert.strictEqual(oTable._getTotalRowCount(), 5, "After refresh, still the \"length\" parameter is returned");
 
-			const oModel = oTable.getModel();
-			oTable.setModel(null);
-			assert.strictEqual(oTable._getTotalRowCount(), 0, "Without a binding the total row count is 0, regardless of the binding info");
+		const oModel = oTable.getModel();
+		oTable.setModel(null);
+		assert.strictEqual(oTable._getTotalRowCount(), 0, "Without a binding the total row count is 0, regardless of the binding info");
 
-			oTable.unbindRows();
-			oTable.setModel(oModel);
-			assert.strictEqual(oTable._getTotalRowCount(), 0, "Without a binding or binding info the total row count is 0");
-		});
+		oTable.unbindRows();
+		oTable.setModel(oModel);
+		assert.strictEqual(oTable._getTotalRowCount(), 0, "Without a binding or binding info the total row count is 0");
 	});
 
 	QUnit.module("ScrollThreshold", {
@@ -117,7 +116,7 @@ sap.ui.define([
 		const oTable = this.oTable;
 		const oGetContextsSpy = this.oGetContextsSpy;
 
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 
 		// refreshRows, render, updateRows
 		assert.equal(oGetContextsSpy.callCount, 3, "Call count of method to get contexts");
@@ -129,7 +128,7 @@ sap.ui.define([
 		const oTable = this.oTable;
 		const oGetContextsSpy = this.oGetContextsSpy;
 
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 		oGetContextsSpy.resetHistory();
 
 		oTable._getScrollExtension().scrollVertically(true, false);
@@ -166,7 +165,7 @@ sap.ui.define([
 		const oTable = this.oTable;
 		const oGetContextsSpy = this.oGetContextsSpy;
 
-		await oTable.qunit.whenRenderingFinished();
+		await oTable.qunit.rendered();
 		oGetContextsSpy.resetHistory();
 
 		oTable._getScrollExtension().scrollVertically(true, false);
@@ -255,7 +254,7 @@ sap.ui.define([
 					dataReceived: function() {
 						that.assertState(assert, "On 'dataReceived'", {pendingRequests: false, busy: false});
 
-						setTimeout(function() {
+						setTimeout(() => {
 							that.assertState(assert, "200ms after 'dataReceived'", {pendingRequests: false, busy: false});
 							done();
 						}, 200);
@@ -349,8 +348,8 @@ sap.ui.define([
 			})
 		});
 
-		await oTable.qunit.whenRenderingFinished();
-		await TableQUnitUtils.wait(10); // Wait for the busy state to be set to false
+		await oTable.qunit.rendered();
+		await TableQUnitUtils.sleep(10); // Wait for the busy state to be set to false
 
 		const oScrollExtension = oTable._getScrollExtension();
 		const oDataRequestedSpy = sinon.spy(oTable.getBinding("rows"), "fireDataRequested");
@@ -461,7 +460,7 @@ sap.ui.define([
 				events: {
 					dataRequested: function() {
 						that.assertState(assert, "On 'dataRequested'", {pendingRequests: true, busy: true});
-						setTimeout(function() {
+						setTimeout(() => {
 							that.getTable().unbindRows();
 						}, 0);
 					},
@@ -493,7 +492,7 @@ sap.ui.define([
 				events: {
 					dataRequested: function() {
 						that.assertState(assert, "On 'dataRequested'", {pendingRequests: true, busy: false});
-						setTimeout(function() {
+						setTimeout(() => {
 							that.getTable().setEnableBusyIndicator(true);
 						}, 0);
 					},
@@ -528,7 +527,7 @@ sap.ui.define([
 				events: {
 					dataRequested: function() {
 						that.assertState(assert, "On 'dataRequested'", {pendingRequests: true, busy: true});
-						setTimeout(function() {
+						setTimeout(() => {
 							that.getTable().setEnableBusyIndicator(false);
 						}, 0);
 					},
@@ -649,23 +648,22 @@ sap.ui.define([
 
 			return this.oDataModel.metadataLoaded();
 		},
-		beforeEach: function() {
+		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable();
 			this.iNoDataVisibilityChanges = 0;
 
-			return this.oTable.qunit.whenRenderingFinished().then(function() {
-				this.oObserver = new MutationObserver(function(aRecords) {
-					const oRecord = aRecords[0];
-					const bNoDataWasVisible = oRecord.oldValue.includes("sapUiTableEmpty");
-					const bNoDataIsVisible = oRecord.target.classList.contains("sapUiTableEmpty");
+			await this.oTable.qunit.rendered();
+			this.oObserver = new MutationObserver((aRecords) => {
+				const oRecord = aRecords[0];
+				const bNoDataWasVisible = oRecord.oldValue.includes("sapUiTableEmpty");
+				const bNoDataIsVisible = oRecord.target.classList.contains("sapUiTableEmpty");
 
-					if (bNoDataWasVisible !== bNoDataIsVisible) {
-						this.iNoDataVisibilityChanges++;
-					}
-				}.bind(this));
+				if (bNoDataWasVisible !== bNoDataIsVisible) {
+					this.iNoDataVisibilityChanges++;
+				}
+			});
 
-				this.oObserver.observe(this.oTable.getDomRef(), {attributes: true, attributeOldValue: true, attributeFilter: ["class"]});
-			}.bind(this));
+			this.oObserver.observe(this.oTable.getDomRef(), {attributes: true, attributeOldValue: true, attributeFilter: ["class"]});
 		},
 		afterEach: function() {
 			if (this.oObserver) {
@@ -691,13 +689,13 @@ sap.ui.define([
 		const done = assert.async();
 
 		this.oTable.destroy();
-		this.oTable = TableQUnitUtils.createTable(function(oTable) {
-			new Promise(function(resolve) {
-				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", function() {
+		this.oTable = TableQUnitUtils.createTable((oTable) => {
+			new Promise((resolve) => {
+				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", () => {
 					TableQUnitUtils.assertNoDataVisible(assert, oTable, true); // Initial rendering has no data
 					resolve();
 				});
-			}).then(oTable.qunit.whenRenderingFinished).then(function() {
+			}).then(oTable.qunit.rendered).then(() => {
 				TableQUnitUtils.assertNoDataVisible(assert, oTable, false);
 				done();
 			});
@@ -710,31 +708,28 @@ sap.ui.define([
 		this.oTable.destroy();
 		this.oTable = TableQUnitUtils.createTable({
 			rows: {path: "/Products", filters: [new Filter({path: "Name", operator: "EQ", value1: "DoesNotExist"})]}
-		}, function(oTable) {
-			new Promise(function(resolve) {
-				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", function() {
+		}, (oTable) => {
+			new Promise((resolve) => {
+				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", () => {
 					TableQUnitUtils.assertNoDataVisible(assert, oTable, true); // Initial rendering has no data
 					resolve();
 				});
-			}).then(oTable.qunit.whenRenderingFinished).then(function() {
+			}).then(oTable.qunit.rendered).then(() => {
 				TableQUnitUtils.assertNoDataVisible(assert, oTable, true);
 				done();
 			});
 		});
 	});
 
-	QUnit.test("Filter", function(assert) {
-		const that = this;
-
+	QUnit.test("Filter", async function(assert) {
 		this.oTable.getBinding().filter(new Filter({path: "Name", operator: "EQ", value1: "DoesNotExist"}));
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Filter");
-			that.assertNoDataVisibilityChangeCount(assert, 1);
-			that.oTable.getBinding().filter();
-		}).then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Remove filter");
-			that.assertNoDataVisibilityChangeCount(assert, 1);
-		});
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, true, "Filter");
+		this.assertNoDataVisibilityChangeCount(assert, 1);
+		this.oTable.getBinding().filter();
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, false, "Remove filter");
+		this.assertNoDataVisibilityChangeCount(assert, 1);
 	});
 
 	QUnit.test("Rerender while filtering", async function(assert) {
@@ -742,40 +737,38 @@ sap.ui.define([
 
 		this.oTable.getBinding().filter(new Filter({path: "Name", operator: "EQ", value1: "DoesNotExist"}));
 		this.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Filter");
 		that.assertNoDataVisibilityChangeCount(assert, 1);
 
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Rerender");
 		that.assertNoDataVisibilityChangeCount(assert, 0);
 
 		that.oTable.getBinding().filter();
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Remove Filter");
 		that.assertNoDataVisibilityChangeCount(assert, 1);
 
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Rerender");
 		that.assertNoDataVisibilityChangeCount(assert, 0);
 	});
 
-	QUnit.test("Bind/Unbind", function(assert) {
+	QUnit.test("Bind/Unbind", async function(assert) {
 		const oBindingInfo = this.oTable.getBindingInfo("rows");
-		const that = this;
 
 		this.oTable.unbindRows();
-		return this.oTable.qunit.whenRenderingFinished().then(function() {
-			TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Unbind");
-			that.assertNoDataVisibilityChangeCount(assert, 1);
-			that.oTable.bindRows(oBindingInfo);
-		}).then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Bind");
-			that.assertNoDataVisibilityChangeCount(assert, 1);
-		});
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, true, "Unbind");
+		this.assertNoDataVisibilityChangeCount(assert, 1);
+		this.oTable.bindRows(oBindingInfo);
+		await this.oTable.qunit.rendered();
+		TableQUnitUtils.assertNoDataVisible(assert, this.oTable, false, "Bind");
+		this.assertNoDataVisibilityChangeCount(assert, 1);
 	});
 
 	QUnit.test("Rerender while binding/unbinding", async function(assert) {
@@ -784,23 +777,23 @@ sap.ui.define([
 
 		this.oTable.unbindRows();
 		this.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Unbind");
 		that.assertNoDataVisibilityChangeCount(assert, 1);
 
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, true, "Rerender");
 		that.assertNoDataVisibilityChangeCount(assert, 0);
 
 		that.oTable.bindRows(oBindingInfo);
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Bind");
 		that.assertNoDataVisibilityChangeCount(assert, 1);
 
 		that.oTable.invalidate();
-		await this.oTable.qunit.whenRenderingFinished();
+		await this.oTable.qunit.rendered();
 		TableQUnitUtils.assertNoDataVisible(assert, that.oTable, false, "Rerender");
 		that.assertNoDataVisibilityChangeCount(assert, 0);
 	});

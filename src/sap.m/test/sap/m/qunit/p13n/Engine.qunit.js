@@ -364,6 +364,56 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("Check 'retrieveTheoreticalState'", function(assert){
+		var oController = Engine.getInstance().getController(this.oControl, "Test");
+		var oGetCurrentStateSpy = sinon.spy(oController, "getCurrentState");
+
+		var oState = Engine.getInstance().retrieveTheoreticalState(this.oControl);
+		assert.deepEqual(oState, {items: [{key: "a"}]}, "'getCurrentState' used as fallback and returned with external keys");
+		assert.ok(oGetCurrentStateSpy.called, "'getCurrentState' used when 'model2State' is absent");
+
+		oGetCurrentStateSpy.restore();
+
+		oController.model2State = function() {
+			return {items: [{key: "b"}]};
+		};
+		var oModel2StateSpy = sinon.spy(oController, "model2State");
+		oGetCurrentStateSpy = sinon.spy(oController, "getCurrentState");
+
+		Engine.getInstance().retrieveTheoreticalState(this.oControl);
+		assert.ok(oModel2StateSpy.notCalled, "'model2State' not called while the panel is not instantiated");
+		assert.ok(oGetCurrentStateSpy.called, "'getCurrentState' used as fallback when the panel is not instantiated");
+
+		oModel2StateSpy.restore();
+		oGetCurrentStateSpy.restore();
+
+		oController._oPanel = {
+			isDestroyed: function() {
+				return false;
+			}
+		};
+		oModel2StateSpy = sinon.spy(oController, "model2State");
+		oGetCurrentStateSpy = sinon.spy(oController, "getCurrentState");
+
+		Engine.getInstance().retrieveTheoreticalState(this.oControl);
+		assert.ok(oModel2StateSpy.calledOnce, "'model2State' preferred once the panel is instantiated");
+		assert.ok(oGetCurrentStateSpy.notCalled, "'getCurrentState' not called when 'model2State' is used");
+
+		oModel2StateSpy.resetHistory();
+		oGetCurrentStateSpy.resetHistory();
+		oController._oPanel.isDestroyed = function() {
+			return true;
+		};
+
+		Engine.getInstance().retrieveTheoreticalState(this.oControl);
+		assert.ok(oModel2StateSpy.notCalled, "'model2State' not called when the panel is destroyed");
+		assert.ok(oGetCurrentStateSpy.called, "'getCurrentState' used as fallback when the panel is destroyed");
+
+		delete oController._oPanel;
+		oModel2StateSpy.restore();
+		oGetCurrentStateSpy.restore();
+	});
+
 	QUnit.test("Check 'Engine.show' to return a sap.m.p13n.Popup instance", function(assert){
 		return Engine.getInstance().show(this.oControl, ["Test"], {source: this.oControl}).then((oP13nPopup) => {
 			assert.ok(oP13nPopup.isA("sap.m.p13n.Popup"), "A p13n.Popup instance has been returned as UI");

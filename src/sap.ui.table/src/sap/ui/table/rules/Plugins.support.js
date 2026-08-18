@@ -24,8 +24,7 @@ sap.ui.define([
 		check: function(oIssueManager, oCoreFacade, oScope) {
 			const aTables = SupportHelper.find(oScope, true, "sap.ui.table.Table");
 
-			for (let i = 0; i < aTables.length; i++) {
-				const oTable = aTables[i];
+			for (const oTable of aTables) {
 				const aSelectionPlugins = oTable.getDependents().filter((oPlugin) => oPlugin.isA("sap.ui.table.plugins.SelectionPlugin"));
 
 				if (aSelectionPlugins.length > 1) {

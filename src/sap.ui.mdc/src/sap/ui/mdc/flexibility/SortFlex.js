@@ -110,6 +110,14 @@ sap.ui.define([
 
 					//remove the item from the 'sortConditions' array, insert it at the new position
 					const iOldIndex = aValue.indexOf(aFoundValue[0]);
+					if (iOldIndex === -1) {
+						// The sorter is not present (e.g. the paired addSort was eliminated by the
+						// flex condenser). Applying the move would corrupt sortConditions via
+						// splice(-1, 1), so treat this the same way fRemoveSort treats a missing key.
+						return FLChangeHandlerBase.markAsNotApplicable(
+							"moveSort: key not found in sorters - change appliance ignored", true
+						);
+					}
 					aValue.splice(oChangeContent.index, 0, aValue.splice(iOldIndex, 1)[0]);
 
 					oSortConditions = {
@@ -121,7 +129,7 @@ sap.ui.define([
 					const oRevertContent = merge({}, oChangeContent);
 					oRevertContent.index = iOldIndex;
 					fFinalizeSortChange(oChange, oControl, oRevertContent, bIsRevert);
-					resolve();
+					return resolve();
 				})
 				.catch((oError) => {
 					reject(oError);
@@ -221,21 +229,28 @@ sap.ui.define([
 		apply: fMoveSort,
 		revert: fMoveSort,
 		getCondenserInfo: function(oChange, mPropertyBag) {
+			const oControl = mPropertyBag.modifier.bySelector(oChange.getSelector(), mPropertyBag.appComponent);
+			const aSorters = oControl.getSortConditions()?.sorters ?? [];
+			// moveSort change content carries no 'descending' field, so getAffectedSorter on the
+			// raw content always produces "{key}-asc", landing in a different condenser slot than
+			// the paired addSort which does carry 'descending'. Read the direction from the live
+			// sorters so both changes share the same slot and the condenser treats them as a unit.
+			const oLiveSorter = aSorters.find((o) => (o.key ?? o.name) === oChange.getContent().key);
 			return {
-				affectedControl: { id: getAffectedSorter(oChange.getContent()) },
+				affectedControl: { id: getAffectedSorter(oLiveSorter ?? oChange.getContent()) },
 				affectedControlIdProperty: "name",
 				targetContainer: oChange.getSelector(),
 				targetAggregation: "sorters",
 				classification: CondenserClassification.Move,
 				//sourceIndex: oChange.getContent().index,
 				sourceIndex: oChange.getRevertData().index,
-				customAggregation: mPropertyBag.modifier.bySelector(oChange.getSelector(), mPropertyBag.appComponent).getSortConditions().sorters.map((oSorter) => ({ ...oSorter, name: getAffectedSorter(oSorter) })),
+				customAggregation: aSorters.map((oSorter) => ({ ...oSorter, name: getAffectedSorter(oSorter) })),
 				sourceContainer: oChange.getSelector(),
 				sourceAggregation: "sorters",
 				setTargetIndex: function(oChange, iNewTargetIndex) {
 					oChange.getContent().index = iNewTargetIndex;
 				},
-				getTargetIndex: function(oChange) {
+			getTargetIndex: function(oChange) {
 					return oChange.getContent().index;
 				},
 				setIndexInRevertData: function(oChange, iIndex) {
