@@ -349,5 +349,11 @@
 		"description": "Card with child cards",
 		"route": "changesChildCards",
 		"group": "Manifest Changes"
+	},
+	{
+		"title": "Extra Small Cards",
+		"description": "ACC-260: 200% Zoom — card headers in the extra small (XS) layout at 180px effective width (a 360px device at 200% zoom)",
+		"route": "extraSmallCards",
+		"group": "Header and Footer"
 	}
 ]
