@@ -40,7 +40,7 @@ sap.ui.define(["sap/ui/integration/Extension"], function (Extension) {
 
 	// Gets all data for the card.
 	SampleExtension.prototype.getData = function () {
-		var mParameters = this.getCard().getCombinedParameters(),
+		var mParameters = this.getCard().getResolvedParameters(),
 			iProductId = mParameters.productId,
 			pProduct = this._getProduct(iProductId),
 			pCategories = this._getCategories();

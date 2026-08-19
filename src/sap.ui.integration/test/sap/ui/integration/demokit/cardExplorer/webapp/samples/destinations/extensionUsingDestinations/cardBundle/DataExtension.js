@@ -11,7 +11,7 @@ sap.ui.define(["sap/ui/integration/Extension", "sap/base/Log"], function (Extens
 				"url": "{{destinations.myDestination}}/Products",
 				"parameters": {
 					"$format": "json",
-					"$top": oCard.getCombinedParameters().maxItems,
+					"$top": oCard.getResolvedParameters().maxItems,
 					"$orderby": "ProductID asc"
 				}
 			}).then(function (oData) {

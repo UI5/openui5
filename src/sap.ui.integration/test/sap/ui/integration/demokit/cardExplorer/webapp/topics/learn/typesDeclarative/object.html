@@ -123,9 +123,6 @@
 								<li>"Default" - group takes flexible width, aligned with the other non-stretched groups.</li>
 								<li>"Stretch" - the group stretches to the full width of the card.</li>
 							</ul>
-							<br>
-							<b>Note:</b> This property is experimental and may change.
-							<br>
 							<span class="mobileNoteIcon"></span>
 							<b>Note:</b> Not yet implemented for <a href="../../../index.html#/overview/supportedPlatforms/native" target="_parent">mobile native cards</a>.
 						</td>
@@ -143,9 +140,6 @@
 								<li>"Vertical" - items are arranged vertically.</li>
 								<li>"Horizontal" - items are arranged horizontally.</li>
 							</ul>
-							<br>
-							<b>Note:</b> This property is experimental and may change.
-							<br>
 							<span class="mobileNoteIcon"></span>
 							<b>Note:</b> Not yet implemented for <a href="../../../index.html#/overview/supportedPlatforms/native" target="_parent">mobile native cards</a>.
 						</td>
@@ -159,8 +153,6 @@
 						<td>No</td>
 						<td>
 							Limits the number of lines for wrapping the group title.
-							<br>
-							<b>Note:</b> This property is experimental and may change.<br>
 						</td>
 						<td>1.46</td>
 						<td>1.106</td>
@@ -168,12 +160,10 @@
 					<tr>
 						<td>labelWrapping</td>
 						<td>boolean</td>
-						<td>false</td>
+						<td>true</td>
 						<td>No</td>
 						<td>
 							Determines whether the labels of the group items will be wrapped.
-							<br>
-							<b>Note:</b> This property is experimental and may change.<br>
 						</td>
 						<td>1.46</td>
 						<td>1.106</td>
@@ -204,14 +194,14 @@
 							<ul>
 								<li>"Default"- see <a href="#defaultProperties">Additional Properties for ObjectGroupItem of type Default</a></li>
 								<li>"NumericData" (experimental since 1.98) - see <a href="#numericDataProperties">Additional Properties for ObjectGroupItem of type NumericData</a></li>
-								<li>"Status" (experimental since 1.98) - see <a href="#statusProperties">Additional Properties for ObjectGroupItem of type Status</a></li>
+								<li>"Status" - see <a href="#statusProperties">Additional Properties for ObjectGroupItem of type Status</a></li>
 								<li>"IconGroup" (experimental since 1.100) - see <a href="#iconGroupProperties">Additional Properties for ObjectGroupItem of type IconGroup</a></li>
 								<li>"ComboBox" (experimental since 1.104) - see <a href="#comboBoxProperties">Additional Properties for ObjectGroupItem of type ComboBox</a></li>
 								<li>"TextArea" (experimental since 1.104) - see <a href="#textAreaProperties">Additional Properties for ObjectGroupItem of type TextArea</a></li>
 								<li>"Input" (experimental since 1.112) - see <a href="#inputProperties">Additional Properties for ObjectGroupItem of type Input</a></li>
 								<li>"Duration" (experimental since 1.114) - see <a href="#durationProperties">Additional Properties for ObjectGroupItem of type Duration</a></li>
-								<li>"RatingIndicator" (experimental since 1.111) - see <a href="#ratingIndicatorProperties">Additional Properties for ObjectGroupItem of type RatingIndicator</a></li>
-								<li>"Image" (experimental since 1.112) - see <a href="#imageProperties">Additional Properties for ObjectGroupItem of type Image</a></li>
+								<li>"RatingIndicator" - see <a href="#ratingIndicatorProperties">Additional Properties for ObjectGroupItem of type RatingIndicator</a></li>
+								<li>"Image" - see <a href="#imageProperties">Additional Properties for ObjectGroupItem of type Image</a></li>
 								<li>"DateRange" (experimental since 1.115) - see <a href="#dateRangeProperties">Additional Properties for ObjectGroupItem of type DateRange</a></li>
 								<li>"RadioButtonGroup" (experimental since 1.144) - see <a href="#radioButtonGroupProperties">Additional Properties for ObjectGroupItem of type RadioButtonGroup</a></li>
 							</ul>
@@ -324,8 +314,6 @@
 						<td>No</td>
 						<td>
 							Limits the number of lines for wrapping texts.
-							<br>
-							<b>Note:</b> This property is experimental and may change.
 							<br>
 							<b>Note:</b> This property cannot be used together with <code>actions</code>.
 						</td>
@@ -676,8 +664,7 @@
 						<td>string</td>
 						<td>No</td>
 						<td>
-							One of "XS", "S" or "M". By default it is set to "XS".<br>
-							<b>Note:</b> This property is experimental and may change.
+							One of "XS", "S" or "M". By default it is set to "XS".
 						</td>
 						<td>1.26.0</td>
 						<td>1.82</td>
@@ -1072,7 +1059,7 @@
 				</table>
 			</div>
 
-			<div id="ratingIndicatorProperties" class="boldBlock">Additional Properties for ObjectGroupItem of type RatingIndicator (experimental since 1.111)</div>
+			<div id="ratingIndicatorProperties" class="boldBlock">Additional Properties for ObjectGroupItem of type RatingIndicator</div>
 			<div class="tableWrapper">
 				<table>
 					<tr>
@@ -1114,7 +1101,7 @@
 				</table>
 			</div>
 
-			<div id="imageProperties" class="boldBlock">Additional Properties for ObjectGroupItem of type Image (experimental since 1.112)</div>
+			<div id="imageProperties" class="boldBlock">Additional Properties for ObjectGroupItem of type Image</div>
 			<div class="tableWrapper">
 				<table>
 					<tr>
@@ -1213,14 +1200,14 @@
 						<td><a href="#imageOverlayProperties">Overlay</a></td>
 						<td></td>
 						<td>No</td>
-						<td>Defines if the image will have overlay with texts (experimental since 1.121)</td>
+						<td>Defines if the image will have overlay with texts</td>
 						<td>1.61</td>
 						<td>1.121</td>
 					</tr>
 				</table>
 			</div>
 
-			<div id="imageOverlayProperties" class="boldBlock">Properties of Overlay property (experimental since 1.121)</div>
+			<div id="imageOverlayProperties" class="boldBlock">Properties of Overlay property</div>
 			<div class="tableWrapper">
 				<table>
 					<tr>

@@ -9,7 +9,7 @@ sap.ui.define([
 	return Controller.extend("my.component.sample.requestData.Main", {
 		onInit: function () {
 			var oCard = this.getOwnerComponent().oCard;
-			var mCardParameters = oCard.getCombinedParameters();
+			var mCardParameters = oCard.getResolvedParameters();
 
 			oCard.showLoadingPlaceholders();
 			oCard.request({

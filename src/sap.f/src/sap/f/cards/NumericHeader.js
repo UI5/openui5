@@ -75,7 +75,7 @@ sap.ui.define([
 
 				/**
 				 * Limits the number of lines for the title.
-				 * @ui5-experimental-since 1.101
+				 * @since 1.101
 				 */
 				titleMaxLines: { type: "int", defaultValue: 3 },
 
@@ -86,7 +86,7 @@ sap.ui.define([
 
 				/**
 				 * Limits the number of lines for the subtitle.
-				 * @ui5-experimental-since 1.101
+				 * @since 1.101
 				 */
 				subtitleMaxLines: { type: "int", defaultValue: 2 },
 
@@ -97,53 +97,49 @@ sap.ui.define([
 
 				/**
 				 * Defines the shape of the icon.
-				 * @ui5-experimental-since 1.118
-				 * @ui5-restricted Work Zone
+				 * @since 1.118
 				 */
 				iconDisplayShape: { type: "sap.m.AvatarShape", defaultValue: AvatarShape.Circle },
 
 				/**
 				 * Defines the icon source.
-				 * @ui5-experimental-since 1.118
-				 * @ui5-restricted Work Zone
+				 * @since 1.118
 				 */
 				iconSrc: { type: "sap.ui.core.URI", defaultValue: "" },
 
 				/**
 				 * Defines the initials of the icon.
-				 * @ui5-experimental-since 1.118
-				 * @ui5-restricted Work Zone
+				 * @since 1.118
 				 */
 				iconInitials: { type: "string", defaultValue: "" },
 
 				/**
 				 * Defines an alt text for the avatar or icon.
 				 *
-				 * @ui5-experimental-since 1.118
-				 * @ui5-restricted Work Zone
+				 * @since 1.118
 				 */
 				iconAlt: { type: "string", defaultValue: "" },
 
 				/**
 				 * Defines a background color for the avatar or icon.
 				 *
-				 * @ui5-experimental-since 1.118
-				 * @ui5-restricted Work Zone
+				 * @since 1.118
 				 */
 				iconBackgroundColor: { type: "sap.m.AvatarColor", defaultValue: AvatarColor.Transparent },
 
 				/**
 				 * Defines whether the card icon is visible.
 				 *
-				 * @ui5-experimental-since 1.118
-				 * @ui5-restricted Work Zone
+				 * @private
+				 * @ui5-restricted sap.ui.integration
+				 * @since 1.118
 				 */
 				iconVisible: { type: "boolean", defaultValue: true },
 
 				/**
 				 * Defines the size of the icon.
 				 *
-				 * @ui5-experimental-since 1.119
+				 * @since 1.119
 				 */
 				iconSize: { type: "sap.m.AvatarSize", defaultValue: AvatarSize.S },
 
@@ -190,7 +186,7 @@ sap.ui.define([
 
 				/**
 				 * The semantic color which represents the state of the main number indicator.
-				 * @ui5-experimental-since 1.64
+				 * @since 1.64
 				 */
 				state: { "type": "sap.m.ValueColor", group: "Appearance", defaultValue : "Neutral" },
 
@@ -201,14 +197,15 @@ sap.ui.define([
 
 				/**
 				 * The semantic color which represents the state of the details text.
-				 * @ui5-experimental-since 1.118
+				 * @private
 				 * @ui5-restricted Work Zone
+				 * @since 1.118
 				 */
 				detailsState: { type : "sap.ui.core.ValueState", group: "Appearance", defaultValue: ValueState.None },
 
 				/**
 				 * Limits the number of lines for the details.
-				 * @ui5-experimental-since 1.101
+				 * @since 1.101
 				 */
 				detailsMaxLines: { type: "int", defaultValue: 1 },
 
@@ -233,7 +230,7 @@ sap.ui.define([
 
 				/**
 				 * Micro Chart
-				 * @ui5-experimental-since 1.124
+				 * @since 1.124
 				 */
 				microChart: {
 					type: "sap.ui.core.Control",
