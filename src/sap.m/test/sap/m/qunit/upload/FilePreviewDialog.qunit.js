@@ -3,8 +3,10 @@
 sap.ui.define("sap.m.qunit.upload.FilePreviewDialog", [
 	"sap/m/upload/FilePreviewDialog",
 	"sap/m/upload/UploadItem",
-	"sap/m/IllustratedMessage"
-], function (FilePreviewDialog, UploadItem, IllustratedMessage) {
+	"sap/m/IllustratedMessage",
+	"sap/m/library",
+	"sap/m/Carousel"
+], function (FilePreviewDialog, UploadItem, IllustratedMessage, MobileLibrary, Carousel) {
 	"use strict";
 
 	// Minimal RTE stub — mimics the API _createRichTextEditor expects
@@ -64,6 +66,52 @@ sap.ui.define("sap.m.qunit.upload.FilePreviewDialog", [
 			"getPageContent must return IllustratedMessage when the txt fetch fails, not an RTE with a raw error");
 
 		oPage.destroy();
+	});
+
+	QUnit.module("FilePreviewDialog - Download button type", {
+		beforeEach: function () {
+			this.oFPD = new FilePreviewDialog();
+		},
+		afterEach: function () {
+			this.oFPD.destroy();
+		}
+	});
+
+	QUnit.test("Download button has type Emphasized", function (assert) {
+		var oMockItem = { getFileName: function() { return "test.pdf"; }, download: function() {} };
+		this.oFPD._getActiveUploadSetwithTableItem = function() { return oMockItem; };
+		this.oFPD._oCarousel = new Carousel();
+
+		var oDialog = this.oFPD._createDialog();
+		var aButtons = oDialog.getButtons();
+		// buttons = [ ...additionalFooterButtons (0 by default), Download, Close ]
+		var oDownloadButton = aButtons[aButtons.length - 2];
+
+		assert.strictEqual(
+			oDownloadButton.getType(),
+			MobileLibrary.ButtonType.Emphasized,
+			"Download button must be Emphasized per Fiori action placement standard (AC1)"
+		);
+
+		oDialog.destroy();
+	});
+
+	QUnit.test("Close button retains Default type", function (assert) {
+		var oMockItem = { getFileName: function() { return "test.pdf"; }, download: function() {} };
+		this.oFPD._getActiveUploadSetwithTableItem = function() { return oMockItem; };
+		this.oFPD._oCarousel = new Carousel();
+
+		var oDialog = this.oFPD._createDialog();
+		var aButtons = oDialog.getButtons();
+		var oCloseButton = aButtons[aButtons.length - 1];
+
+		assert.strictEqual(
+			oCloseButton.getType(),
+			MobileLibrary.ButtonType.Default,
+			"Close button must remain Default type (AC3)"
+		);
+
+		oDialog.destroy();
 	});
 });
 
