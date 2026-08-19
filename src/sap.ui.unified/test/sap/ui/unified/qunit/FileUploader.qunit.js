@@ -2112,6 +2112,30 @@ sap.ui.define([
 		await nextUIUpdate();
 	});
 
+	QUnit.test("tokens created from selected files containing curly braces", async function (assert) {
+		// arrange
+		var oFileUploader = new FileUploader({ multiple: true });
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// populate tokens with curly braces
+		addFilesToFileUploaderTokenizer(oFileUploader, ["{a}.txt", "prefix_{b}_suffix.txt"]);
+		await nextUIUpdate();
+
+		// assert
+		var oTokenizer = oFileUploader._getTokenizer();
+		var aTokens = oTokenizer.getTokens();
+		assert.strictEqual(aTokens.length, 2, "Tokenizer contains two tokens");
+		assert.strictEqual(aTokens[0].getText(), "{a}.txt", "First token text preserves curly braces");
+		assert.strictEqual(aTokens[0].getTooltip(), "{a}.txt", "First token tooltip preserves curly braces");
+		assert.strictEqual(aTokens[1].getText(), "prefix_{b}_suffix.txt", "Second token text preserves curly braces");
+		assert.strictEqual(aTokens[1].getTooltip(), "prefix_{b}_suffix.txt", "Second token tooltip preserves curly braces");
+
+		// cleanup
+		oFileUploader.destroy();
+		await nextUIUpdate();
+	});
+
 	QUnit.test("tokens cleared when clear() is called", async function (assert) {
 		// arrange
 		var oFileUploader = new FileUploader({ multiple: true });

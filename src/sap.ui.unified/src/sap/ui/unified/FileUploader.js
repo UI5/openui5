@@ -20,6 +20,7 @@ sap.ui.define([
 	"sap/ui/core/library",
 	"sap/ui/core/StaticArea",
 	"sap/ui/Device",
+	"sap/ui/base/ManagedObject",
 	"./FileUploaderRenderer",
 	"sap/ui/dom/containsOrEquals",
 	"sap/ui/events/KeyCodes",
@@ -45,6 +46,7 @@ sap.ui.define([
 	coreLibrary,
 	StaticArea,
 	Device,
+	ManagedObject,
 	FileUploaderRenderer,
 	containsOrEquals,
 	KeyCodes,
@@ -899,8 +901,8 @@ sap.ui.define([
 		// Add new tokens for selected files
 		this._selectedFileNames.forEach((fileName) => {
 			oTokenizer.addToken(new Token({
-				text: fileName,
-				tooltip: fileName,
+				text: ManagedObject.escapeSettingsValue(fileName),
+				tooltip: ManagedObject.escapeSettingsValue(fileName),
 				selected: false
 			}));
 		});
