@@ -33,25 +33,26 @@ sap.ui.define([
 	var DOMUtil = {};
 
 	/**
+	 * Derives the document offset from an already-read bounding client rect.
+	 * Kept separate so callers holding a rect (e.g. getGeometry) can avoid a second layout read.
+	 * @param {DOMRect} oClientRect - Bounding client rect of the element
+	 * @returns {PositionObject} the calculated offset containing left and top values
+	 */
+	function getOffsetFromRect(oClientRect) {
+		const oDocElement = document.documentElement;
+		return {
+			top: oClientRect.top + window.scrollY - oDocElement.clientTop,
+			left: oClientRect.left + window.scrollX - oDocElement.clientLeft
+		};
+	}
+
+	/**
 	 * Returns the offset for an element
 	 * @param {HTMLElement} oElement - Element
 	 * @returns {PositionObject} the calculated offset containing left and top values
 	 */
 	DOMUtil.getOffset = function(oElement) {
-		var oBox = oElement.getBoundingClientRect();
-		var oDocElement = document.documentElement;
-		return {
-			top: oBox.top + window.scrollY - oDocElement.clientTop,
-			left: oBox.left + window.scrollX - oDocElement.clientLeft
-		};
-	};
-
-	DOMUtil.getSize = function(oDomRef) {
-		var oClientRec = oDomRef.getBoundingClientRect();
-		return {
-			width: oClientRec.width,
-			height: oClientRec.height
-		};
+		return getOffsetFromRect(oElement.getBoundingClientRect());
 	};
 
 	/**
@@ -253,7 +254,10 @@ sap.ui.define([
 
 	DOMUtil.getGeometry = function(oDomRef, bUseWindowOffset) {
 		if (oDomRef) {
-			var oOffset = DOMUtil.getOffset(oDomRef);
+			// Read the bounding client rect once and derive both position and size from it,
+			// avoiding a second forced reflow (getOffset + getSize each read the rect otherwise).
+			const oClientRect = oDomRef.getBoundingClientRect();
+			const oOffset = getOffsetFromRect(oClientRect);
 			if (bUseWindowOffset) {
 				oOffset.left = oOffset.left - window.scrollX;
 				oOffset.top = oOffset.top - window.scrollY;
@@ -261,7 +265,10 @@ sap.ui.define([
 
 			return {
 				domRef: oDomRef,
-				size: DOMUtil.getSize(oDomRef),
+				size: {
+					width: oClientRect.width,
+					height: oClientRect.height
+				},
 				position: oOffset,
 				visible: DOMUtil.isVisible(oDomRef)
 			};
