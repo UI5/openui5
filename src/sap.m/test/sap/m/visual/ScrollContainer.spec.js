@@ -17,7 +17,7 @@ describe("sap.m.ScrollContainer", function () {
 	it("Should show focus outline when scrolled", function () {
 		element(by.id("oScrollContainer1")).click();
 		// Scroll down to check focus remains visible
-		browser.executeScript('document.getElementById("oScrollContainer1-scroll").scrollTop = 100');
+		browser.executeScript('document.getElementById("oScrollContainer1").scrollTop = 100');
 		expect(takeScreenshot(element(by.id("oScrollContainer1")))).toLookAs("scrollcontainer-focused-scrolled");
 	});
 });
