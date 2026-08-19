@@ -208,6 +208,7 @@ sap.ui.define([
 	_AggregationCache.prototype.addElements = function (vReadElements, iOffset, oCache, iStart) {
 		var aElements = this.aElements,
 			sNodeProperty = this.oAggregation.$NodeProperty,
+			iReadLength = Array.isArray(vReadElements) ? vReadElements.length : 1,
 			that = this;
 
 		function addElement(oElement, i) {
@@ -231,10 +232,13 @@ sap.ui.define([
 			oKeptElement = aElements.$byPredicate[sPredicate];
 			if (oKeptElement && oKeptElement !== oElement
 					&& !(oKeptElement instanceof SyncPromise)) {
-				if (aElements.includes(oKeptElement)) {
+				const iIndex = aElements.indexOf(oKeptElement);
+				if (iIndex >= 0) {
 					const sNewPredicate = oCache.fixDuplicatePredicate(oElement, sPredicate);
 					if (sNewPredicate) {
 						sPredicate = sNewPredicate;
+						oKeptElement = oElement; // leads to no-op for _Helper.updateNonExisting
+					} else if (iIndex < iStart || iIndex >= iStart + iReadLength) {
 						oKeptElement = oElement; // leads to no-op for _Helper.updateNonExisting
 					} else {
 						throw new Error("Duplicate key predicate: " + sPredicate);
@@ -2427,6 +2431,7 @@ sap.ui.define([
 		}
 
 		const mQueryOptions = {...this.oFirstLevel.mQueryOptions};
+		mQueryOptions.$count = true; // may have been removed in #readGap
 		// drop not needed system query options; $expand, $filter, $search, and $select must not be
 		// used with grand totals; all filters are contained in $$filterBeforeAggregate
 		delete mQueryOptions.$apply;
@@ -2438,10 +2443,7 @@ sap.ui.define([
 			mQueryOptions.$search = this.oAggregation.search;
 		}
 
-		return this.oFirstLevel.requestCount(oGroupLock, mQueryOptions).then((iCount) => {
-			// an _AggregationCache instance w/o groupLevels has always at least one grand total row
-			return iCount + (this.oAggregation.grandTotalAtBottomOnly === false ? 2 : 1);
-		});
+		return this.oFirstLevel.requestCount(oGroupLock, mQueryOptions);
 	};
 
 	/**

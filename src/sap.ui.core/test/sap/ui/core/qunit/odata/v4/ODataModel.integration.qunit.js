@@ -128,6 +128,7 @@ sap.ui.define([
 		const bUnifiedCache = oListBinding.oCache.bUnifiedCache;
 		const oAggregation = oListBinding.getAggregation();
 		const bRecursiveHierarchy = !!oAggregation.hierarchyQualifier;
+		const bOutdated = oListBinding.getHeaderContext().isOutdated();
 
 		function checkCache(oCache) {
 			for (let i = 0, n = oCache.aElements.$created; i < n; i += 1) {
@@ -239,7 +240,8 @@ sap.ui.define([
 							return;
 						}
 						const oActual = oListBinding.oCache.aElements.$byPredicate[sPredicate];
-						if (oActual !== oElement) {
+						if (oActual !== oElement && !bOutdated) {
+							// if outdated, duplicate elements could occur (acceptable)
 							assert.ok(false, `${sPredicate} in $byPredicate:\n`
 								+ JSON.stringify(_Helper.publicClone(oActual)) + "\nvs.\n"
 								+ JSON.stringify(_Helper.publicClone(oElement))
@@ -338,6 +340,7 @@ sap.ui.define([
 			strictEqualSilent(assert, vActual, vExpected, sTitle, sMyTitle, oElement);
 		}
 
+		const bOutdated = oListBinding.getHeaderContext().isOutdated();
 		const aElements = oListBinding.oCache.aElements;
 		for (const sPredicate in aElements.$byPredicate) {
 			const oElement = aElements.$byPredicate[sPredicate];
@@ -347,9 +350,14 @@ sap.ui.define([
 				`unknown predicate ${sPredicate}`, oElement);
 			const oGroupLevelCache = _Helper.getPrivateAnnotation(oElement, "parent");
 			if (oGroupLevelCache) {
-				strictEqual(oGroupLevelCache.aElements.length,
-					Object.keys(oGroupLevelCache.aElements.$byPredicate).length,
-					"group level cache: number of items in $byPredicate");
+				if (!bOutdated) {
+					// if outdated, duplicate elements could occur (acceptable);
+					// Note: this check may be insufficient in scrolling scenarios that cause gaps
+					// or when having kept-alive outside the collection
+					strictEqual(oGroupLevelCache.aElements.length,
+						Object.keys(oGroupLevelCache.aElements.$byPredicate).length,
+						"group level cache: number of items in $byPredicate");
+				}
 				strictEqual(oGroupLevelCache.aElements.includes(oElement), true,
 					`group level cache: ${sPredicate} in aElements`, oElement);
 				strictEqual(oGroupLevelCache.aElements.$byPredicate[sPredicate], oElement,
@@ -25604,9 +25612,16 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// the collection's count as there is only one group level cache. A kept-alive context outside
 	// the collection is requested via ODLB#getKeepAliveContext and then deleted. In the same $batch
 	// the collection's count and the grand total are refreshed. The kept-alive was part of the
-	// filtered collection. Thus the binding's count and grand total are updated accordingly. The
-	// length (scrollbar) is kept unchanged; instead the header context is flagged as outdated to
-	// signal the table is in an invalid state.
+	// filtered collection. Thus the binding's count and grand total are updated accordingly.
+	//
+	// The length (scrollbar) is kept unchanged; instead the header context is flagged as outdated
+	// to signal the table is in an invalid state. Due to the unadjusted scrollbar, scrolling shows
+	// an empty row at the end of the table. A grand total at the bottom is not affected by this.
+	//
+	// Afterwards another kept-alive context outside the collection is deleted. Due to the deletion
+	// the position of elements is shifted in the back end. When scrolling up by one row the back
+	// end responds with the same element again. It is shown as a duplicate, which is acceptable in
+	// the outdated state.
 	// JIRA: CPOUI5ODATAV4-3260
 	QUnit.test("Data Aggregation: delete kept-alive outside collection", async function (assert) {
 		const oModel = this.createSalesOrdersModel123({autoExpandSelect : true});
@@ -25620,11 +25635,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				aggregate : {
 					GrossAmount : {grandTotal : true}
 				},
+				grandTotalAtBottomOnly : true,
 				group : {
 					SalesOrderID : {}
 				}
 			}
-		}}" threshold="0" visibleRowCount="2">
+		}}" threshold="0">
+	<t:rowMode>
+		<trm:Fixed rowCount="3" fixedBottomRowCount="1"/>
+	</t:rowMode>
 	<Text id="isOutdated" text="{= %{@$ui5.context.isOutdated} }"/>
 	<Text id="isTotal" text="{= %{@$ui5.node.isTotal} }"/>
 	<Text id="level" text="{= %{@$ui5.node.level} }"/>
@@ -25635,20 +25654,26 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		this.expectRequest("SalesOrderList?sap-client=123&$apply="
 				+ "filter(LifecycleStatus gt 'P')/concat(aggregate(GrossAmount)"
 				+ ",groupby((SalesOrderID),aggregate(GrossAmount))"
-				+ "/concat(aggregate($count as UI5__count),top(1)))", {
+				+ "/concat(aggregate($count as UI5__count),top(2)))", {
 				value : [
-					{GrossAmount : "100"},
+					{GrossAmount : "1000"},
 					{UI5__count : "42", "UI5__count@odata.type" : "#Decimal"},
-					{GrossAmount : "10", SalesOrderID : "21"}
+					{GrossAmount : "10", SalesOrderID : "1"},
+					{GrossAmount : "20", SalesOrderID : "2"}
 				]
 			})
 			.expectChange("count")
 			.expectChange("isOutdatedHeader")
 			.expectChange("isOutdated", [undefined, undefined])
-			.expectChange("isTotal", [true, false])
-			.expectChange("level", [0, 1])
-			.expectChange("grossAmount", ["100", "10"])
-			.expectChange("salesOrderID", [null, "21"]);
+			.expectChange("isOutdated", undefined, 42)
+			.expectChange("isTotal", [false, false])
+			.expectChange("isTotal", true, 42)
+			.expectChange("level", [1, 1])
+			.expectChange("level", 0, 42)
+			.expectChange("grossAmount", ["10", "20"])
+			.expectChange("grossAmount", "1000", 42)
+			.expectChange("salesOrderID", ["1", "2"])
+			.expectChange("salesOrderID", null, 42);
 
 		await this.createView(assert, sView, oModel);
 
@@ -25665,11 +25690,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		await this.waitForChanges(assert, "set header context");
 
 		checkTable("initial state", assert, oTable, [
-			"/SalesOrderList()",
-			"/SalesOrderList('21')"
+			"/SalesOrderList('1')",
+			"/SalesOrderList('2')",
+			"/SalesOrderList()"
 		], [ // isOutdated|isTotal|level|GrossAmount|SalesOrderID
-			[undefined, "true", "0", "100", ""],
-			[undefined, "false", "1", "10", "21"]
+			[undefined, "false", "1", "10", "1"],
+			[undefined, "false", "1", "20", "2"],
+			[undefined, "true", "0", "1000", ""]
 		], 43); // 42 entities + grand total row
 
 		this.expectRequest("SalesOrderList('31')?sap-client=123&$select=SalesOrderID", {
@@ -25689,10 +25716,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			})
 			.expectRequest("#3 SalesOrderList?sap-client=123&$apply="
 				+ "filter(LifecycleStatus gt 'P')/aggregate(GrossAmount)", {
-				value : [{GrossAmount : "90"}] // reduced grand total
+				value : [{GrossAmount : "990"}] // reduced grand total
 			})
-			.expectChange("isOutdated", [false])
-			.expectChange("grossAmount", ["90"])
+			.expectChange("isOutdated", false, 42)
+			.expectChange("grossAmount", "990", 42)
 			.expectChange("count", "41")
 			.expectChange("isOutdatedHeader", true);
 
@@ -25703,12 +25730,112 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		]);
 
 		checkTable("after delete kept-alive outside collection", assert, oTable, [
-			"/SalesOrderList()",
-			"/SalesOrderList('21')"
+			"/SalesOrderList('1')",
+			"/SalesOrderList('2')",
+			"/SalesOrderList()"
 		], [ // isOutdated|isTotal|level|GrossAmount|SalesOrderID
-			[false, "true", "0", "90", ""],
-			[undefined, "false", "1", "10", "21"]
+			[undefined, "false", "1", "10", "1"],
+			[undefined, "false", "1", "20", "2"],
+			[false, "true", "0", "990", ""]
 		], 43); // length unchanged, header context is outdated instead
+
+		this.expectRequest("SalesOrderList?sap-client=123&$apply="
+				+ "filter(LifecycleStatus gt 'P')"
+				+ "/groupby((SalesOrderID),aggregate(GrossAmount))/skip(40)/top(1)", {
+				value : [
+					{GrossAmount : "420", SalesOrderID : "42"}
+				]
+			})
+			.expectChange("isTotal", false, 40)
+			.expectChange("level", 1, 40)
+			.expectChange("grossAmount", "420", 40)
+			.expectChange("salesOrderID", "42", 40);
+
+		oTable.setFirstVisibleRow(43);
+
+		await this.waitForChanges(assert, "scroll to the end");
+
+		checkTable("after scroll to the end", assert, oTable, [
+			"/SalesOrderList('1')",
+			"/SalesOrderList('2')",
+			"/SalesOrderList('42')",
+			"/SalesOrderList()"
+		], [ // isOutdated|isTotal|level|GrossAmount|SalesOrderID
+			[undefined, "false", "1", "420", "42"],
+			["", "", "", "", ""], // empty row due to reduced count
+			[false, "true", "0", "990", ""]
+		], 43);
+
+		this.expectRequest("SalesOrderList('32')?sap-client=123&$select=SalesOrderID", {
+				SalesOrderID : "32"
+			});
+
+		const oKeptContext2 = oBinding.getKeepAliveContext("/SalesOrderList('32')");
+		assert.strictEqual(oKeptContext2.getIndex(), undefined, "outside collection");
+
+		await this.waitForChanges(assert, "2nd kept-alive outside collection");
+
+		this.expectRequest("#6 DELETE SalesOrderList('32')?sap-client=123")
+			.expectRequest("#6 SalesOrderList?sap-client=123&$count=true"
+				+ "&$filter=LifecycleStatus gt 'P'&$top=0", {
+				"@odata.count" : "40", // reduced count
+				value : []
+			})
+			.expectRequest("#6 SalesOrderList?sap-client=123&$apply="
+				+ "filter(LifecycleStatus gt 'P')/aggregate(GrossAmount)", {
+				value : [{GrossAmount : "980"}] // reduced grand total
+			})
+			.expectChange("grossAmount", "980", 42)
+			.expectChange("count", "40");
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3260)
+			oKeptContext2.delete(),
+			this.waitForChanges(assert, "delete 2nd kept-alive outside collection")
+		]);
+
+		checkTable("after delete 2nd kept-alive outside collection", assert, oTable, [
+			"/SalesOrderList('1')",
+			"/SalesOrderList('2')",
+			"/SalesOrderList('42')",
+			"/SalesOrderList()"
+		], [ // isOutdated|isTotal|level|GrossAmount|SalesOrderID
+			[undefined, "false", "1", "420", "42"],
+			["", "", "", "", ""], //still an empty row as the scroll position has not changed
+			[false, "true", "0", "980", ""]
+		], 43);
+
+		this.expectChange("isTotal", false, 40)
+			.expectChange("level", 1, 40)
+			.expectChange("grossAmount", "420", 40)
+			.expectChange("salesOrderID", "42", 40)
+			.expectRequest("SalesOrderList?sap-client=123&$apply="
+				+ "filter(LifecycleStatus gt 'P')"
+				+ "/groupby((SalesOrderID),aggregate(GrossAmount))/skip(39)/top(1)", {
+				value : [
+					{GrossAmount : "420", SalesOrderID : "42"} // duplicate
+				]
+			})
+			.expectChange("isTotal", false, 39)
+			.expectChange("level", 1, 39)
+			.expectChange("grossAmount", "420", 39)
+			.expectChange("salesOrderID", "42", 39);
+
+		oTable.setFirstVisibleRow(39);
+
+		await this.waitForChanges(assert, "scroll up by one row");
+
+		checkTable("after scroll up by one row", assert, oTable, [
+			"/SalesOrderList('1')",
+			"/SalesOrderList('2')",
+			"/SalesOrderList('42')",
+			"/SalesOrderList('42')",
+			"/SalesOrderList()"
+		], [ // isOutdated|isTotal|level|GrossAmount|SalesOrderID
+			[undefined, "false", "1", "420", "42"],
+			[undefined, "false", "1", "420", "42"], // shows duplicate
+			[false, "true", "0", "980", ""]
+		], 43);
 	});
 
 	//*********************************************************************************************

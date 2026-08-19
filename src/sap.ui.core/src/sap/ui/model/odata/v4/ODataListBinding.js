@@ -1381,22 +1381,31 @@ sap.ui.define([
 					bReset = true;
 					fnUndelete();
 				} else if (that.bLengthFinal && !bDoNotRequestCount) {
+					const bDataAggregation = _Helper.isDataAggregation(that.mParameters);
+					const iOldCount = bDataAggregation && that.getCount();
 					// a kept-alive context is not in aContexts -> request the count
 					that.oCache.requestCount(
 						oGroupLock && !that.oModel.isApiGroup(oGroupLock.getGroupId())
 							? oGroupLock.getUnlockedCopy()
 							: that.lockGroup("$auto")
 					).then(function (iCount) {
-						var iOldMaxLength = that.iMaxLength;
-
-						that.iMaxLength = iCount - that.iActiveContexts;
-						// Note: Although we know that oContext is not in aContexts, a "change"
-						// event needs to be fired in order to notify the control about the new
-						// length, for example, to update the 'More' button or the scrollbar.
-						if (iOldMaxLength !== that.iMaxLength) {
-							if (_Helper.isDataAggregation(that.mParameters)) {
+						let bChanged;
+						if (bDataAggregation) {
+							bChanged = iCount !== iOldCount;
+							if (bChanged) {
 								that.oHeaderContext.setOutdated(true);
 							}
+							// must not affect iMaxLength; keep #getLength unchanged
+						} else {
+							const iOldMaxLength = that.iMaxLength;
+							that.iMaxLength = iCount - that.iActiveContexts;
+							bChanged = iOldMaxLength !== that.iMaxLength;
+						}
+
+						// Note: Although we know that oContext is not in aContexts, a "change"
+						// event needs to be fired in order to notify the control about the new
+						// #getLength, for example, to update the 'More' button or the scrollbar.
+						if (bChanged) {
 							that._fireChange({reason : ChangeReason.Remove});
 						}
 					});
