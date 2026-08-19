@@ -451,6 +451,29 @@ sap.ui.define([
 		oErrorSpy.restore();
 	});
 
+	QUnit.test("setFormatters method before the extension is attached to a card", function (assert) {
+		// arrange
+		var oErrorSpy = sinon.spy(Log, "error");
+		var oExtension = new Extension();
+		var oFormatters = {
+			toUpperCase: function (sValue) {
+				return sValue.toUpperCase();
+			}
+		};
+
+		// act
+		var oResult = oExtension.setFormatters(oFormatters);
+
+		// assert
+		assert.strictEqual(oExtension.getFormatters(), oFormatters, "The formatters are stored on the extension.");
+		assert.notOk(oErrorSpy.called, "No error is logged when formatters are set before the card is available.");
+		assert.strictEqual(oResult, oExtension, "The method returns the extension instance for chaining.");
+
+		// clean up
+		oErrorSpy.restore();
+		oExtension.destroy();
+	});
+
 	QUnit.test("Formatters are local to card instance", async function (assert) {
 		// arrange
 		var oCard2 = new Card({
@@ -545,6 +568,72 @@ sap.ui.define([
 
 		// assert
 		assert.ok(loadDependenciesStub.calledOnce, "'loadDependencies' is called once.");
+	});
+
+	QUnit.test("Card waits for the loadDependencies promise before it is ready", async function (assert) {
+		// arrange
+		var fnResolveDependencies;
+		var bReadyFired = false;
+		var pDependencies = new Promise(function (resolve) {
+			fnResolveDependencies = resolve;
+		});
+		this.stub(Extension.prototype, "loadDependencies").returns(pDependencies);
+
+		this.oCard.attachEventOnce("_ready", function () {
+			bReadyFired = true;
+		});
+
+		// act - give the card time to initialize as far as it can while dependencies are pending
+		await new Promise(function (resolve) { setTimeout(resolve, 100); });
+
+		// assert - the card must not be ready while the dependencies promise is pending
+		assert.notOk(bReadyFired, "The card is not ready while the loadDependencies promise is pending.");
+		assert.notOk(this.oCard.isReady(), "isReady returns false while the loadDependencies promise is pending.");
+
+		// act - resolve the dependencies
+		fnResolveDependencies();
+
+		await nextCardReadyEvent(this.oCard);
+
+		// assert - the card becomes ready only after the promise resolves
+		assert.ok(this.oCard.isReady(), "The card is ready after the loadDependencies promise resolves.");
+	});
+
+	QUnit.test("Default loadDependencies implementation resolves immediately", async function (assert) {
+		// arrange
+		var oExtension = new Extension();
+
+		// act
+		var pDependencies = oExtension.loadDependencies();
+
+		// assert
+		assert.ok(pDependencies instanceof Promise, "'loadDependencies' returns a Promise.");
+
+		var vResult = await pDependencies;
+		assert.strictEqual(vResult, undefined, "The default 'loadDependencies' promise resolves with no value.");
+
+		// clean up
+		oExtension.destroy();
+	});
+
+	QUnit.test("Card awaits an overridden loadDependencies promise which loads real dependencies", async function (assert) {
+		// arrange
+		var bDependenciesLoaded = false;
+		this.stub(Extension.prototype, "loadDependencies").callsFake(function () {
+			return new Promise(function (resolve) {
+				setTimeout(function () {
+					bDependenciesLoaded = true;
+					resolve();
+				}, 100);
+			});
+		});
+
+		// act
+		await nextCardReadyEvent(this.oCard);
+
+		// assert
+		assert.ok(bDependenciesLoaded, "The overridden 'loadDependencies' promise is awaited before the card is ready.");
+		assert.ok(this.oCard.isReady(), "The card is ready after the overridden 'loadDependencies' promise resolves.");
 	});
 
 	QUnit.module("Use translations from inside the extension", {
@@ -787,6 +876,7 @@ sap.ui.define([
 			{ name: "getDomRef", params: [] },
 			{ name: "setVisible", params: ["bVisible"], testArgs: [false] },
 			{ name: "getParameters", params: [] },
+			{ name: "getResolvedParameters", params: [] },
 			{ name: "getCombinedParameters", params: [] },
 			{ name: "getManifestEntry", params: ["sPath"], testArgs: ["/sap.app/id"] },
 			{ name: "resolveDestination", params: ["sKey"], testArgs: ["testDestination"] },

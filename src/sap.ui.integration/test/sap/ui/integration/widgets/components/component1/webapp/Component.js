@@ -10,7 +10,7 @@ sap.ui.define([
 			manifest: "json"
 		},
 		onCardReady: function (oCard) {
-			Log.info("Widget parameters: " + JSON.stringify(oCard.getCombinedParameters()));
+			Log.info("Widget parameters: " + JSON.stringify(oCard.getResolvedParameters()));
 			Log.info("Widget manifest: " + JSON.stringify(oCard.getManifestEntry("/sap.card")));
 
 			this.card = oCard;
@@ -20,7 +20,7 @@ sap.ui.define([
 				this.setModel(oModel, "products");
 			}.bind(this));
 
-			this.setModel(new JSONModel(oCard.getCombinedParameters()), "cardParameters");
+			this.setModel(new JSONModel(oCard.getResolvedParameters()), "cardParameters");
 		}
 	});
 });

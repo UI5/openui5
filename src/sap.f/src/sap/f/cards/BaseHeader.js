@@ -81,13 +81,15 @@ sap.ui.define([
 				 *
 				 * Will be shown as a relative time like "5 minutes ago".
 				 *
-				 * @ui5-experimental-since 1.89
+				 * @since 1.89
 				 */
 				dataTimestamp: { type: "string", defaultValue: ""},
 
 				/**
 				 * Defines the status text visibility.
-				 * @ui5-experimental-since 1.116
+				 * @private
+				 * @ui5-restricted sap.ui.integration
+				 * @since 1.116
 				 */
 				statusVisible: { type: "boolean", defaultValue: true },
 
@@ -122,7 +124,7 @@ sap.ui.define([
 
 				/**
 				 * Defines the type of text wrapping to be used inside the header. This applies to title, subtitle and details texts of the header.
-				 * @ui5-experimental-since 1.122
+				 * @since 1.122
 				 */
 				wrappingType : {type: "sap.m.WrappingType", group : "Appearance", defaultValue : WrappingType.Normal},
 
@@ -135,16 +137,18 @@ sap.ui.define([
 				/**
 				 * Defines the href which the header should open. If set - the header will act and render as a link.
 				 *
-				 * @ui5-experimental-since 1.122
-				 * @ui5-restricted sap.ui.integration.widgets.Card
+				 * @private
+				 * @ui5-restricted sap.ui.integration
+				 * @since 1.122
 				 */
 				href: { type: "string" },
 
 				/**
 				 * Defines the target for the case when <code>href</code> is given.
 				 *
-				 * @ui5-experimental-since 1.122
-				 * @ui5-restricted sap.ui.integration.widgets.Card
+				 * @private
+				 * @ui5-restricted sap.ui.integration
+				 * @since 1.122
 				 */
 				target: { type: "string" }
 			},
@@ -152,7 +156,7 @@ sap.ui.define([
 
 				/**
 				 * Info sections to be displayed in the header.
-				 * @ui5-experimental-since 1.136
+				 * @since 1.136
 				 */
 				infoSection: {type: "sap.ui.core.Control", multiple: true, singularName: "infoSection"},
 
@@ -162,8 +166,8 @@ sap.ui.define([
 				_dataTimestamp: { type: "sap.m.Text", multiple: false, visibility: "hidden"},
 
 				/**
-				 * Defines the toolbar.
-				 * @ui5-experimental-since 1.86
+				 * Defines an additional content shown in the header's toolbar area, typically actions such as a close button or a menu.
+				 * @since 1.86
 				 */
 				toolbar: { type: "sap.ui.core.Control", multiple: false },
 

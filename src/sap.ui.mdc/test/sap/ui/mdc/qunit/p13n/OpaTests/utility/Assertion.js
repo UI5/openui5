@@ -415,6 +415,27 @@ sap.ui.define([
 		},
 
 		/**
+		 * Checks that a p13n item with the given text is not shown in the currently open personalization dialog.
+		 *
+		 * @param {string} sItemText - the label text of the p13n item that must not be present
+		 * @private
+		 */
+		iShouldNotSeeP13nItem: function(sItemText) {
+			return this.waitFor({
+				searchOpenDialogs: true,
+				controlType: "sap.m.Label",
+				check: function(aLabels) {
+					return !aLabels.some(function(oLabel) {
+						return oLabel.getText() === sItemText;
+					});
+				},
+				success: function() {
+					Opa5.assert.ok(true, "Property '" + sItemText + "' is not visible in the dialog");
+				}
+			});
+		},
+
+		/**
 		 * This method will check for existing FilterFields with label + index
 		 *
 		 * @param {object} mSettings - a map containing the settings to check for
@@ -510,6 +531,67 @@ sap.ui.define([
 						Opa5.assert.ok(aActual.indexOf(sExp) !== -1, "Filter '" + sExp + "' is visible");
 					});
 				}
+			});
+		},
+
+		iShouldNotSeeListFilterItem: function(sP13nItem) {
+			return this.waitFor({
+				searchOpenDialogs: true,
+				controlType: "sap.m.CustomListItem",
+				success: function(aCustomListItems) {
+					const aActual = aCustomListItems.map(function(oItem) {
+						return oItem.getContent()[0].getContent()[0].getText();
+					}).filter(function(s) {return !!s;});
+
+					Opa5.assert.ok(aActual.indexOf(sP13nItem) === -1, "Filter '" + sP13nItem + "' is not shown as an active filter");
+				}
+			}).waitFor({
+				searchOpenDialogs: true,
+				controlType: "sap.m.ComboBox",
+				success: function(aComboBoxes) {
+					const aAvailable = aComboBoxes.reduce(function(aAcc, oComboBox) {
+						return aAcc.concat(oComboBox.getItems().map(function(oItem) {
+							return oItem.getText();
+						}));
+					}, []).filter(function(s) {return !!s;});
+
+					Opa5.assert.ok(aAvailable.indexOf(sP13nItem) === -1, "Filter '" + sP13nItem + "' is not available in the 'Add Filter' dropdown");
+				}
+			});
+		},
+
+		/**
+		 * Checks that a filter is offered in the currently open adapt filters dialog, either as an active filter
+		 * or as a selectable entry of the 'Add Filter' dropdown.
+		 *
+		 * @param {string} sP13nItem - the label text of the filter that must be available
+		 * @private
+		 */
+		iShouldSeeListFilterItem: function(sP13nItem) {
+			let bShownAsActiveFilter = false;
+
+			return this.waitFor({
+				searchOpenDialogs: true,
+				controlType: "sap.m.CustomListItem",
+				success: function(aCustomListItems) {
+					bShownAsActiveFilter = aCustomListItems.some(function(oItem) {
+						return oItem.getContent()[0].getContent()[0].getText() === sP13nItem;
+					});
+				}
+			}).waitFor({
+				searchOpenDialogs: true,
+				controlType: "sap.m.ComboBox",
+				check: function(aComboBoxes) {
+					return bShownAsActiveFilter || aComboBoxes.some(function(oComboBox) {
+						return oComboBox.getItems().some(function(oItem) {
+							return oItem.getText() === sP13nItem;
+						});
+					});
+				},
+				success: function() {
+					Opa5.assert.ok(true, "Filter '" + sP13nItem + "' is available in the dialog");
+				},
+				errorMessage: "Filter '" + sP13nItem + "' is not available in the dialog"
 			});
 		},
 

@@ -5,6 +5,7 @@ sap.ui.define([
 	"sap/ui/integration/Host",
 	"sap/ui/integration/util/Utils",
 	"sap/ui/integration/widgets/Card",
+	"sap/base/Log",
 	"sap/ui/test/utils/nextUIUpdate",
 	"qunit/testResources/nextCardReadyEvent"
 ],
@@ -13,6 +14,7 @@ function(
 	Host,
 	Utils,
 	Card,
+	Log,
 	nextUIUpdate,
 	nextCardReadyEvent
 ) {
@@ -161,6 +163,43 @@ function(
 			oModel.destroy();
 			oHost.destroy();
 			fnSpy.restore();
+			done();
+		});
+
+		// act
+		this.clock.tick(Utils.DEFAULT_PROMISE_TIMEOUT + 100);
+	});
+
+	QUnit.test("Call #getProperty with Host whose getContextValue rejects", function (assert) {
+		// arrange
+		var done = assert.async(),
+			oModel = new ContextModel(),
+			oHost = new Host(),
+			sSamplePath = "/sap.host/property/value",
+			oErrorSpy = sinon.spy(Log, "error"),
+			fnSpy;
+
+		oHost.getContextValue = function (sPath) {
+			return Promise.reject("not found");
+		};
+
+		fnSpy = sinon.spy(oHost, "getContextValue");
+
+		oModel.setHost(oHost);
+
+		// assert
+		assert.strictEqual(oModel.getProperty(sSamplePath), null, "The property returns null the first time.");
+
+		oModel.waitForPendingProperties().then(function () {
+			assert.strictEqual(oModel.getProperty(sSamplePath), null, "The property remains null when getContextValue rejects.");
+			assert.ok(fnSpy.calledOnce, "Host#getContextValue is called only once. There is no infinite loop.");
+			assert.ok(oErrorSpy.calledWith("Path " + sSamplePath + " could not be resolved. Reason: not found"), "An error is logged with the rejection reason.");
+
+			// cleanup
+			oModel.destroy();
+			oHost.destroy();
+			fnSpy.restore();
+			oErrorSpy.restore();
 			done();
 		});
 

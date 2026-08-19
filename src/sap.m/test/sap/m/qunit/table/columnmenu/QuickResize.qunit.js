@@ -63,5 +63,8 @@ sap.ui.define([
 
 		await testValidation(this.oQuickResize, 10, oBundle.getText("table.COLUMNMENU_QUICK_RESIZE_MIN_ERROR", [48]));
 		await testValidation(this.oQuickResize, 3000, oBundle.getText("table.COLUMNMENU_QUICK_RESIZE_MAX_ERROR", [2560]));
+
+		this.oQuickResize.setWidth(100);
+		assert.equal(oStepInput.getValueState(), "None", "The value state is reset when setWidth is called");
 	});
 });

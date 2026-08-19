@@ -232,7 +232,7 @@ sap.ui.define([
 				 * Overrides the default values of the parameters, which are defined in the manifest.
 				 * The value is an object containing parameters in format <code>{parameterKey: parameterValue}</code>.
 				 *
-				 * @ui5-experimental-since 1.65
+				 * @since 1.65
 				 */
 				parameters: {
 					type: "object",
@@ -314,10 +314,7 @@ sap.ui.define([
 				 * 	}
 				 * ]
 				 * </pre>
-				 *
-				 * Disclaimer: this API might be removed when a permanent solution for flexibility changes is implemented.
-				 *
-				 * @ui5-experimental-since 1.76
+				 * @since 1.76
 				 */
 				manifestChanges: {
 					type: "object[]",
@@ -502,7 +499,7 @@ sap.ui.define([
 				 * When an action is triggered in the card it can be handled on several places by "action" event handlers. In consecutive order those places are: <code>Extension</code>, <code>Card</code>, <code>Host</code>.
 				 * Each of them can prevent the next one to handle the action by calling <code>oEvent.preventDefault()</code>.
 				 *
-				 * @ui5-experimental-since 1.64
+				 * @since 1.64
 				 */
 				action: {
 					allowPreventDefault: true,
@@ -546,7 +543,9 @@ sap.ui.define([
 				/**
 				 * Fired when some configuration settings are changed as a result of user interaction.
 				 * For example - filter value is changed.
-				 * @ui5-experimental-since 1.96
+				 * @private
+				 * @ui5-restricted
+				 * @since 1.96
 				 */
 				configurationChange: {
 					parameters: {
@@ -569,7 +568,8 @@ sap.ui.define([
 
 				/**
 				 * Fired when the manifest is loaded.
-				 * @ui5-experimental-since 1.72
+				 * @since 1.72
+				 * @public
 				 */
 				manifestReady: {},
 
@@ -585,7 +585,8 @@ sap.ui.define([
 				/**
 				 * Fired when the state of the card is changed.
 				 * For example - the card is ready, new page is selected, a filter is changed or data is refreshed.
-				 * @ui5-experimental-since 1.107
+				 * @since 1.107
+				 * @public
 				 */
 				stateChanged: {}
 			},
@@ -659,6 +660,7 @@ sap.ui.define([
 		 * @author SAP SE
 		 * @version ${version}
 		 * @borrows sap.ui.integration.widgets.Card#getId as getId
+		 * @borrows sap.ui.integration.widgets.Card#getResolvedParameters as getResolvedParameters
 		 * @borrows sap.ui.integration.widgets.Card#getCombinedParameters as getCombinedParameters
 		 * @borrows sap.ui.integration.widgets.Card#getManifestEntry as getManifestEntry
 		 * @borrows sap.ui.integration.widgets.Card#resolveDestination as resolveDestination
@@ -691,6 +693,7 @@ sap.ui.define([
 			"getDomRef",
 			"setVisible",
 			"getParameters",
+			"getResolvedParameters",
 			"getCombinedParameters",
 			"getManifestEntry",
 			"resolveDestination",
@@ -739,7 +742,7 @@ sap.ui.define([
 	 * @public
 	 * @method
 	 * @name sap.ui.integration.widgets.CardFacade.getParameters
-	 * @deprecated Since 1.143. Use <code>getCombinedParameters()</code> instead.
+	 * @deprecated Since 1.143. Use <code>getResolvedParameters()</code> instead.
 	 * @returns {object} Value of property <code>parameters<code>
 	 */
 
@@ -1007,7 +1010,17 @@ sap.ui.define([
 	};
 
 	/**
-	 * Sets a single parameter in the parameters property
+	 * Sets a single parameter in the <code>parameters</code> property.
+	 *
+	 * Merges the given key-value pair into the existing parameters, keeping all other
+	 * parameters untouched. If the key already exists, its value is overwritten.
+	 *
+	 * @private
+	 * @ui5-restricted sap.ui.integration
+	 * @since 1.79
+	 * @param {string} sKey The key of the parameter to set.
+	 * @param {any} vValue The value to set for the given key.
+	 * @returns {this} Reference to <code>this</code> in order to allow method chaining.
 	 */
 	Card.prototype.setParameter = function (sKey, vValue) {
 		var mParameters = this.getParameters() || {};
@@ -1169,7 +1182,7 @@ sap.ui.define([
 	 * Causes all the controls within the Card
 	 * that support validation to validate their data.
 	 * @public
-	 * @ui5-experimental-since 1.106
+	 * @since 1.106
 	 * @returns {boolean} if all the controls validated successfully; otherwise, false
 	 */
 	Card.prototype.validateControls = function () {
@@ -1311,8 +1324,12 @@ sap.ui.define([
 	};
 
 	/**
+	 * Checks if the card is ready.
+	 *
+	 * The card is ready when all of its content, header, filters and data are loaded and rendered.
+	 *
 	 * @public
-	 * @ui5-experimental-since 1.65
+	 * @since 1.65
 	 * @returns {boolean} If the card is ready or not.
 	 */
 	Card.prototype.isReady = function () {
@@ -1323,7 +1340,7 @@ sap.ui.define([
 	 * Refreshes the card by re-applying the manifest settings and triggering all data requests.
 	 *
 	 * @public
-	 * @ui5-experimental-since 1.65
+	 * @since 1.65
 	 */
 	Card.prototype.refresh = function () {
 		if (this._getActualDataMode() === CardDataMode.Active) {
@@ -1618,10 +1635,10 @@ sap.ui.define([
 	 * - Use when developing a Component card.
 	 *
 	 * @public
-	 * @ui5-experimental-since 1.77
+	 * @since 1.152
 	 * @returns {map} Object containing parameters in format <code>{parameterKey: parameterValue}</code>.
 	 */
-	Card.prototype.getCombinedParameters = function () {
+	Card.prototype.getResolvedParameters = function () {
 		if (!this._isManifestReady) {
 			Log.error("The manifest is not ready. Consider using the 'manifestReady' event.", "sap.ui.integration.widgets.Card");
 			return null;
@@ -1639,6 +1656,24 @@ sap.ui.define([
 	};
 
 	/**
+	 * Gets values of manifest parameters combined with the parameters from <code>parameters</code> property.
+	 *
+	 * <b>Notes</b>
+	 *
+	 * - Use this method when the manifest is ready. Check <code>manifestReady</code> event.
+	 *
+	 * - Use when developing a Component card.
+	 *
+	 * @public
+	 * @since 1.77
+	 * @deprecated Since 1.152. Use <code>getResolvedParameters()</code> instead.
+	 * @returns {map} Object containing parameters in format <code>{parameterKey: parameterValue}</code>.
+	 */
+	Card.prototype.getCombinedParameters = function () {
+		return this.getResolvedParameters();
+	};
+
+	/**
 	 * Gets the merged custom settings from the manifest combined with the settings from <code>customSettings</code> property.
 	 * Card manifest values take precedence for individual properties (shallow merge).
 	 *
@@ -1651,7 +1686,7 @@ sap.ui.define([
 	 * @private
 	 * @ui5-restricted Mobile SDK
 	 * @returns {object} Object containing the merged custom settings. Returns <code>null</code> if the manifest is not ready.
-	 * @ui5-experimental-since 1.146
+	 * @since 1.146
 	 */
 	Card.prototype.getCombinedCustomSettings = function () {
 		if (!this._isManifestReady) {
@@ -1674,7 +1709,7 @@ sap.ui.define([
 	 * <b>Note</b> Use this method when the manifest is ready. Check <code>manifestReady</code> event.
 	 *
 	 * @public
-	 * @ui5-experimental-since 1.77
+	 * @since 1.77
 	 * @param {string} sPath The path to return a value for.
 	 * @returns {any} The value at the specified path.
 	 */
@@ -1700,7 +1735,7 @@ sap.ui.define([
 	 * If context needs to be used from an extension, assign it to a parameter first.
 	 *
 	 * @public
-	 * @ui5-experimental-since 1.151
+	 * @since 1.151
 	 * @returns {string[]} An array of context paths found in the manifest
 	 * (for example, <code>["/sample/currentUser/id", "/sample/supplier/id/value"]</code>).
 	 * Returns an empty array if no context dependencies are found or if the manifest is not ready.
@@ -2158,7 +2193,7 @@ sap.ui.define([
 	Card.prototype._setParametersModelData = function () {
 		var oPredefinedParameters = ParameterMap.getParamsForModel(),
 			oCustomParameters = {},
-			oCombinedParameters = this.getCombinedParameters(),
+			oCombinedParameters = this.getResolvedParameters(),
 			sKey;
 
 		for (sKey in oCombinedParameters) {
@@ -2547,7 +2582,7 @@ sap.ui.define([
 	 * Gets the instance of the <code>host</code> association.
 	 *
 	 * @public
-	 * @ui5-experimental-since 1.77
+	 * @since 1.77
 	 * @returns {sap.ui.integration.Host} The host object associated with this card.
 	 */
 	Card.prototype.getHostInstance = function () {
@@ -2937,7 +2972,7 @@ sap.ui.define([
 	 * }
 	 *
 	 * @public
-	 * @ui5-experimental-since 1.73
+	 * @since 1.73
 	 * @returns {Promise<object>} Promise resolves after the designtime configuration is loaded.
 	 */
 	Card.prototype.loadDesigntime = function () {
@@ -3226,7 +3261,7 @@ sap.ui.define([
 	 * </pre>
 	 *
 	 * @public
-	 * @ui5-experimental-since 1.84
+	 * @since 1.84
 	 * @param {object} oAction The settings of the action.
 	 * @param {sap.ui.integration.CardActionType} oAction.type The type of the action.
 	 * @param {object} [oAction.parameters] Additional parameters which will be used by the action handler to perform the action.

@@ -132,7 +132,9 @@ sap.ui.define([
 
 	QuickResize.prototype.setWidth = function(iValue) {
 		this.setProperty("width", iValue);
-		this.getContent()[0].setValue(iValue);
+		const oStepInput = this.getContent()[0];
+		oStepInput.setValueState(null);
+		oStepInput.setValue(iValue);
 		return this;
 	};
 

@@ -76,7 +76,7 @@ sap.ui.define([
 	 * Enumeration of possible card action types.
 	 *
 	 * @enum {string}
-	 * @ui5-experimental-since 1.64
+	 * @since 1.64
 	 * @public
 	 */
 	thisLib.CardActionType = {
@@ -95,21 +95,19 @@ sap.ui.define([
 		/**
 		 * Used for custom actions.
 		 * @public
-		 * @ui5-experimental-since 1.76
+		 * @since 1.76
 		 */
 		Custom: "Custom",
 
 		/**
 		 * Date selection. Available only for Calendar cards.
 		 * @public
-		 * @ui5-experimental-since 1.87
 		 */
 		DateChange: "DateChange",
 
 		/**
 		 * Month selection. Available only for Calendar cards.
 		 * @public
-		 * @ui5-experimental-since 1.87
 		 */
 		MonthChange: "MonthChange",
 

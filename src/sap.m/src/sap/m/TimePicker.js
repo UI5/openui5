@@ -482,6 +482,8 @@ function(
 			}, this);
 
 			oIcon.attachPress(function () {
+				// Opening via the icon always shows the clock view
+				this._bOpenAsNumericInput = false;
 				this.toggleOpen(this._bShouldClosePicker);
 			}, this);
 
@@ -649,6 +651,8 @@ function(
 				if (!this._isHighZoom()) {
 					this._openByFocusIn = false;
 					this._openByClick = false;
+					// Opening by clicking the input field (not the icon) shows the numeric input view
+					this._bOpenAsNumericInput = Device.system.phone;
 					this.toggleOpen(this._getPicker() && this._getPicker().isOpen());
 					this._openByFocusIn = true;
 				}
@@ -702,6 +706,8 @@ function(
 				const oPicker = this._getPicker();
 				this._openByFocusIn = false;
 				this._openByClick = false;
+				// Opening by clicking the input field (not the icon) shows the numeric input view
+				this._bOpenAsNumericInput = Device.system.phone;
 				this.toggleOpen(oPicker && oPicker.isOpen());
 			}
 			this._openByClick = true;
@@ -803,13 +809,18 @@ function(
 			}
 			oControl._setTimeValues(oDateValue, bIs24);
 			if (!bShowInputs) {
-				this._getClocks().prepareForOpen();
+				const oClocks = this._getClocks();
+				// When opened by clicking the input field (phone), show the numeric input view
+				// directly, as if the header toggle button had been pressed.
+				if (this._bOpenAsNumericInput && !oClocks.getProperty("_onManualInput")) {
+					this._onToggleViewPress();
+				}
+				oClocks.prepareForOpen();
 				// Point the Dialog's initial focus at the active toggle button so it
 				// doesn't land on the OK button after the open animation.
 				// Popover (desktop) lacks setInitialFocus, so guard before calling.
 				const oPopup = this._getPicker() && this._getPicker().getAggregation("_popup");
 				if (oPopup && oPopup.setInitialFocus) {
-					const oClocks = this._getClocks();
 					const aButtons = oClocks.getAggregation("_buttons");
 					const oActiveBtn = aButtons && aButtons[oClocks._getActiveClockIndex()];
 					if (oActiveBtn) {
@@ -854,6 +865,9 @@ function(
 		 TimePicker.prototype.onAfterClose = function() {
 			this.$().removeClass(InputBase.ICON_PRESSED_CSS_CLASS);
 			this.fireAfterValueHelpClose();
+
+			// Reset the numeric-open request so the next open (icon/keyboard) defaults to clocks
+			this._bOpenAsNumericInput = false;
 
 			// Reset input mode so next open via icon shows clocks
 			const oClocks = this._getClocks();

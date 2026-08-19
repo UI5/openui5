@@ -1881,11 +1881,15 @@ sap.ui.define([
 			const oNode = this.aElements.$byPredicate[sNodePredicate];
 			if (oNode) {
 				this.oTreeState.stillOutOfPlace(oNode, sNodePredicate);
+				const iNodeIndex = this.aElements.indexOf(oNode);
+				if (iNodeIndex < 0) { // (effectively) kept-alive outside the collection
+					return;
+				}
+
 				const bExpanded = oNode["@$ui5.node.isExpanded"];
 				if (bExpanded) {
 					this.collapse(sNodePredicate, {}); // no mKeptElementPredicates needed
 				}
-				const iNodeIndex = this.aElements.indexOf(oNode);
 				this.aElements.splice(iNodeIndex, 1);
 				this.aElements.splice(iParentIndex + 1, 0, oNode);
 				if (bExpanded) { // no mKeptElementPredicates needed

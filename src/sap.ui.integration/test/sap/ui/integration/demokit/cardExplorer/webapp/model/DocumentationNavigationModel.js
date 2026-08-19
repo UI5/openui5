@@ -38,8 +38,7 @@ sap.ui.define([
 					{
 						title: 'Extended - Info Section',
 						target: 'learnDetail',
-						key: 'infoSection',
-						experimental: true
+						key: 'infoSection'
 					}
 				]
 			},
@@ -149,8 +148,7 @@ sap.ui.define([
 					{
 						title: 'Help ID',
 						target: 'learnDetail',
-						key: 'helpId',
-						experimental: true
+						key: 'helpId'
 					},
 					{
 						title: 'Manifest Parameters',
@@ -175,14 +173,12 @@ sap.ui.define([
 					{
 						title: 'ComboBox',
 						target: 'learnDetail',
-						key: 'comboBox',
-						experimental: true
+						key: 'comboBox'
 					},
 					{
 						title: 'DateRange',
 						target: 'learnDetail',
-						key: 'dateRange',
-						experimental: true
+						key: 'dateRange'
 					},
 					{
 						title: 'Search',
@@ -219,12 +215,6 @@ sap.ui.define([
 						key: 'data'
 					},
 					{
-						title: 'Date Ranges',
-						target: 'learnDetail',
-						key: 'dateRanges',
-						experimental: true
-					},
-					{
 						title: 'Dynamic Counter',
 						target: 'learnDetail',
 						key: 'dynamicCounter'
@@ -253,8 +243,7 @@ sap.ui.define([
 					{
 						title: 'Micro Charts',
 						target: 'learnDetail',
-						key: 'microcharts',
-						experimental: true
+						key: 'microcharts'
 					},
 					{
 						title: 'OAuth 3LO',
@@ -301,8 +290,7 @@ sap.ui.define([
 					{
 						title: 'Custom',
 						target: 'learnDetail',
-						key: 'custom',
-						experimental: true
+						key: 'custom'
 					},
 					{
 						title: 'ShowCard',
@@ -348,6 +336,11 @@ sap.ui.define([
 						title: 'Date and Time',
 						target: 'learnDetail',
 						key: 'dateAndTime'
+					},
+					{
+						title: 'Date Ranges',
+						target: 'learnDetail',
+						key: 'dateRanges'
 					},
 					{
 						title: 'Float',

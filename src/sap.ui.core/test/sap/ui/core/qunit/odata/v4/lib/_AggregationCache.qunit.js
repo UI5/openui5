@@ -8581,6 +8581,27 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("moveOutOfPlaceNodes: kept-alive outside the collection", function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+			hierarchyQualifier : "X"
+		});
+		oCache.aElements = ["~foo~", "~bar~", "~baz~"];
+		oCache.aElements.$byPredicate = {
+			"~predicateOut~" : "~out~"
+		};
+		this.mock(oCache).expects("findIndex").never();
+		this.mock(oCache.oTreeState).expects("stillOutOfPlace")
+			.withExactArgs("~out~", "~predicateOut~");
+		this.mock(oCache).expects("collapse").never();
+		this.mock(oCache).expects("expand").never();
+
+		// code under test
+		oCache.moveOutOfPlaceNodes(["~predicateOut~"]);
+
+		assert.deepEqual(oCache.aElements, ["~foo~", "~bar~", "~baz~"]);
+	});
+
+	//*********************************************************************************************
 	QUnit.test("resetOutOfPlace", function () {
 		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
 			hierarchyQualifier : "X"

@@ -50,7 +50,7 @@ sap.ui.define(["sap/ui/integration/Extension"], function (Extension) {
 	// Gets the trainers names.
 	DataExtension.prototype.getTrainers = function () {
 		var oCard = this.getCard(),
-			oParameters = oCard.getCombinedParameters();
+			oParameters = oCard.getResolvedParameters();
 
 		return oCard.request({
 			"url": "{{destinations.northwind}}/Employees",

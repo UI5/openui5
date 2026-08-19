@@ -11,7 +11,7 @@ sap.ui.define(["sap/ui/integration/Extension"], function (Extension) {
 				return sName.toUpperCase();
 			},
 			appendSuffix: function (sDescription) {
-				var oParameters = this.getCard().getCombinedParameters();
+				var oParameters = this.getCard().getResolvedParameters();
 				return sDescription + ". Available since: " + oParameters.suffix;
 			}.bind(this)
 		});

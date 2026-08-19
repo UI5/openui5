@@ -1615,6 +1615,37 @@ sap.ui.define([
 			assert.ok(oDataProviderFactory instanceof DataProviderFactory, "The result is of type sap.ui.integration.util.DataProviderFactory.");
 		});
 
+		QUnit.test("getHostInstance", function (assert) {
+			// Arrange
+			var oHost = new Host();
+
+			// Assert - no host associated
+			assert.strictEqual(this.oCard.getHostInstance(), null, "getHostInstance returns null when no host is set.");
+
+			// Act - associate a host
+			this.oCard.setHost(oHost);
+
+			// Assert
+			assert.strictEqual(this.oCard.getHostInstance(), oHost, "getHostInstance returns the associated host instance.");
+
+			// Cleanup
+			oHost.destroy();
+		});
+
+		QUnit.test("isReady", async function (assert) {
+			// Assert - before the card is ready
+			assert.notOk(this.oCard.isReady(), "isReady returns false before the card is ready.");
+
+			// Act
+			this.oCard.setManifest(oManifest_ListCard);
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+
+			await nextCardReadyEvent(this.oCard);
+
+			// Assert - after the card is ready
+			assert.ok(this.oCard.isReady(), "isReady returns true after the card is ready.");
+		});
+
 		QUnit.test("resolveUrl when baseUrl is not set", async function (assert) {
 			// Arrange
 			var oManifest = {
@@ -2516,6 +2547,25 @@ sap.ui.define([
 			assert.ok(true, "Should have fired _ready event after refresh.");
 		});
 
+		QUnit.test("Refresh is a no-op when data mode is Inactive", async function (assert) {
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+			this.oCard.setManifest(this.oManifest);
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			// Arrange
+			this.oCard.setDataMode(CardDataMode.Inactive);
+			var oInvalidateSpy = this.spy(this.oCard, "invalidate");
+
+			// Act
+			this.oCard.refresh();
+
+			// Assert
+			assert.notOk(this.oCard._bApplyManifest, "Manifest is not re-applied when the card is Inactive.");
+			assert.notOk(oInvalidateSpy.called, "The card is not invalidated when it is Inactive.");
+		});
+
 		QUnit.module("Refreshing data", {
 			beforeEach: function () {
 				this.oCard = new Card();
@@ -3100,6 +3150,18 @@ sap.ui.define([
 			assert.deepEqual(this.oCard.getManifestEntry("/"), oManifest_ListCard, "getManifestEntry returns correct result for '/'");
 			assert.deepEqual(this.oCard.getManifestEntry("/sap.card"), oManifest_ListCard["sap.card"], "getManifestEntry returns correct result for '/sap.card'");
 			assert.strictEqual(this.oCard.getManifestEntry("/sap.card/header/title"), oManifest_ListCard["sap.card"]["header"]["title"], "getManifestEntry returns correct result for '/sap.card/header/title'");
+		});
+
+		QUnit.test("getManifestEntry before the manifest is ready.", function (assert) {
+			// Arrange
+			var oLogSpy = this.spy(Log, "error");
+
+			// Act
+			var vResult = this.oCard.getManifestEntry("/sap.card/header/title");
+
+			// Assert
+			assert.strictEqual(vResult, null, "getManifestEntry returns null when the manifest is not ready.");
+			assert.ok(oLogSpy.calledWith("The manifest is not ready. Consider using the 'manifestReady' event.", "sap.ui.integration.widgets.Card"), "Error is logged when the manifest is not ready.");
 		});
 
 		QUnit.test("'manifestApplied' event is fired.", async function (assert) {
