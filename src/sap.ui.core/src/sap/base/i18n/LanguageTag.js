@@ -152,7 +152,7 @@ sap.ui.define([
 			this.variant = (aResult[4] && aResult[4].slice(1)) || null; // remove leading hyphen from capturing group
 			this.variantSubtags = this.variant ? this.variant.split('-') : [];
 			this.extension = (aResult[5] && aResult[5].slice(1)) || null; // remove leading hyphen from capturing group
-			this.extensionSubtags = this.variant ? this.variant.split('-') : [];
+			this.extensionSubtags = this.extension ? this.extension.split('-') : [];
 			this.privateUse = aResult[6] || null;
 			this.privateUseSubtags = this.privateUse ? this.privateUse.slice(2).split('-') : [];
 			// convert subtags according to the BCP47 recommendations
