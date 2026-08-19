@@ -15,10 +15,14 @@ sap.ui.define([
 	 * A CustomData object will be added to the control with the key depending on the success of the applyChange method.
 	 * Possible keys are:
 	 * 	- 'sap.ui.fl.appliedChanges.<sChangeId>'
+	 * 	- 'sap.ui.fl.appliedChanges.xml.<sChangeId>'
 	 * 	- 'sap.ui.fl.failedChanges.js.<sChangeId>'
 	 * 	- 'sap.ui.fl.failedChanges.xml.<sChangeId>'
 	 * 	- 'sap.ui.fl.notApplicableChanges.<sChangeId>'
 	 * The value for applied changes is the serialized revert data, for every other it's just 'true'
+	 * The 'sap.ui.fl.appliedChanges.xml' marker is an additional support-only marker written next to the
+	 * canonical applied key when a change is applied by the XML applier; its absence on an applied change
+	 * indicates it was applied by the JS applier
 	 * notApplicable describes a state where the change could not be applied, but it's still fine
 	 * and doesn't harm the other changes (e.g. duplicate addFields change)
 	 * The CustomData is also persisted in the view cache if it's active
@@ -32,6 +36,7 @@ sap.ui.define([
 	const FlexCustomData = {};
 
 	FlexCustomData.appliedChangesCustomDataKey = "sap.ui.fl.appliedChanges";
+	FlexCustomData.appliedChangesXmlCustomDataKey = "sap.ui.fl.appliedChanges.xml";
 	FlexCustomData.failedChangesCustomDataKeyJs = "sap.ui.fl.failedChanges.js";
 	FlexCustomData.failedChangesCustomDataKeyXml = "sap.ui.fl.failedChanges.xml";
 	FlexCustomData.notApplicableChangesCustomDataKey = "sap.ui.fl.notApplicableChanges";
@@ -141,6 +146,24 @@ sap.ui.define([
 	};
 
 	/**
+	 * Adds an additional marker custom data to the control indicating that the change was applied by the XML applier.
+	 * This is written next to the canonical applied custom data (see {@link FlexCustomData.addAppliedCustomData})
+	 * and is only consumed by support tools. The value is just 'true'. The absence of this marker on an applied
+	 * change indicates that it was applied by the JS applier.
+	 *
+	 * @param {sap.ui.core.Control} oControl The control that the marker is added to
+	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject} oChange The change instance
+	 * @param {object} mPropertyBag The propertyBag
+	 * @param {object} mPropertyBag.modifier The polymorph reuse operations handling the changes on the given view type
+	 * @param {object} mPropertyBag.appComponent The component instance that is currently loading
+	 * @returns {Promise} resolves when custom data is written
+	 */
+	FlexCustomData.addAppliedXmlMarker = function(oControl, oChange, mPropertyBag) {
+		const sCustomDataKey = FlexCustomData._getCustomDataKey(oChange, FlexCustomData.appliedChangesXmlCustomDataKey);
+		return writeCustomData(oControl, sCustomDataKey, "true", mPropertyBag);
+	};
+
+	/**
 	 * Adds failed custom data to the control. The value is just 'true'
 	 *
 	 * @param {sap.ui.core.Control} oControl The Control that should be checked
@@ -159,18 +182,26 @@ sap.ui.define([
 	};
 
 	/**
-	 * Destroys the applied custom data for the given control
+	 * Destroys the applied custom data for the given control.
+	 * This also removes the additional XML applier marker (see {@link FlexCustomData.addAppliedXmlMarker})
+	 * so that reverted changes are not reported as XML-applied by support tools.
 	 *
 	 * @param {sap.ui.core.Control} oControl The Control that should be checked
 	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject} oChange - The change instance
 	 * @param {sap.ui.core.util.reflection.BaseTreeModifier} oModifier The control tree modifier
 	 */
 	FlexCustomData.destroyAppliedCustomData = function(oControl, oChange, oModifier) {
-		const sKey = FlexCustomData._getCustomDataKey(oChange, FlexCustomData.appliedChangesCustomDataKey);
-		const mCustomData = oModifier.getCustomDataInfo(oControl, sKey);
-		if (mCustomData.customData) {
-			oModifier.destroy(mCustomData.customData);
-		}
+		const aCustomDataKeys = [
+			FlexCustomData.appliedChangesCustomDataKey,
+			FlexCustomData.appliedChangesXmlCustomDataKey
+		];
+		aCustomDataKeys.forEach((sIdentifier) => {
+			const sKey = FlexCustomData._getCustomDataKey(oChange, sIdentifier);
+			const mCustomData = oModifier.getCustomDataInfo(oControl, sKey);
+			if (mCustomData.customData) {
+				oModifier.destroy(mCustomData.customData);
+			}
+		});
 	};
 
 	/**

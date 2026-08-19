@@ -127,6 +127,11 @@ sap.ui.define([
 		},
 		{
 			getKey() {
+				return "sap.ui.fl.appliedChanges.xml.fileNameChange1";
+			}
+		},
+		{
+			getKey() {
 				return "sap.ui.fl.failedChanges.js.fileNameChange5";
 			}
 		}]);
@@ -149,6 +154,31 @@ sap.ui.define([
 		assert.strictEqual(oResult.aAppliedChanges.length, 2, "two changes applied");
 		assert.strictEqual(oResult.aFailedChanges.length, 2, "two changes failed");
 		assert.strictEqual(oResult.aNotApplicableChanges.length, 1, "one change not applicable");
+		assert.deepEqual(
+			oResult.mControlData.controlId1.aAppliedChanges,
+			["fileNameChange1"],
+			"the applied change is listed once without the xml marker being counted as a separate change"
+		);
+		assert.deepEqual(
+			oResult.mControlData.controlId1.aAppliedChangesXml,
+			["fileNameChange1"],
+			"the xml-applied change is listed in the dedicated xml bucket"
+		);
+		assert.deepEqual(
+			oResult.mControlData.controlId1.aAppliedChangesJs,
+			[],
+			"the xml-applied change is not listed in the js bucket"
+		);
+		assert.deepEqual(
+			oResult.mControlData.controlId2.aAppliedChangesXml,
+			[],
+			"a JS-applied change is not listed in the xml bucket"
+		);
+		assert.deepEqual(
+			oResult.mControlData.controlId2.aAppliedChangesJs,
+			["fileNameChange2"],
+			"a JS-applied change is listed in the js bucket"
+		);
 	});
 
 	QUnit.test("VM Independent + VM Dependent Changes", async function(assert) {

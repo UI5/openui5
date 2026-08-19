@@ -31,6 +31,8 @@ sap.ui.define([
 					const mControlData = {
 						bPresent: !!JsControlTreeModifier.bySelector(oSelector, oAppComponent),
 						aAppliedChanges: [],
+						aAppliedChangesXml: [],
+						aAppliedChangesJs: [],
 						aFailedChangesJs: [],
 						aFailedChangesXml: [],
 						aNotApplicableChanges: []
@@ -56,20 +58,25 @@ sap.ui.define([
 	function enhanceWithChangetypeSpecificData(oExport, sExportParameterName, mControlData, sControlDataParameterName, aCustomDataChanges) {
 		if (aCustomDataChanges) {
 			mControlData[sControlDataParameterName] = aCustomDataChanges;
-			mControlData[sControlDataParameterName].map(function(sChangeId) {
-				if (!(sChangeId in oExport[sExportParameterName])) {
-					oExport[sExportParameterName].push(sChangeId);
-				}
-			});
+			// sExportParameterName is optional: when omitted the data is only stored per control and not
+			// aggregated into a top-level array (used for the XML-applied subset, which is already part of
+			// the top-level applied changes)
+			if (sExportParameterName) {
+				mControlData[sControlDataParameterName].forEach(function(sChangeId) {
+					if (!oExport[sExportParameterName].includes(sChangeId)) {
+						oExport[sExportParameterName].push(sChangeId);
+					}
+				});
+			}
 		}
 	}
 
-	function getChangesForControlFromCustomData(oControl, sIdentifier) {
+	function getChangesForControlFromCustomData(oControl, sIdentifier, sExcludedIdentifier) {
 		const aCustomData = oControl.getCustomData();
 		const aChangeIds = [];
 		aCustomData.forEach(function(oCustomData) {
 			const sKey = oCustomData.getKey();
-			if (sKey.startsWith(sIdentifier)) {
+			if (sKey.startsWith(sIdentifier) && !(sExcludedIdentifier && sKey.startsWith(sExcludedIdentifier))) {
 				aChangeIds.push(sKey.replace(sIdentifier, ""));
 			}
 		});
@@ -83,6 +90,8 @@ sap.ui.define([
 			const mControlData = {
 				bPresent: false,
 				aAppliedChanges: [],
+				aAppliedChangesXml: [],
+				aAppliedChangesJs: [],
 				aFailedChangesJs: [],
 				aFailedChangesXml: [],
 				aNotApplicableChanges: []
@@ -97,8 +106,21 @@ sap.ui.define([
 					"aAppliedChanges",
 					mControlData,
 					"aAppliedChanges",
-					getChangesForControlFromCustomData(oControl, "sap.ui.fl.appliedChanges.")
+					// exclude the XML-applied marker so it is not counted as a separate (bogus) applied change
+					getChangesForControlFromCustomData(oControl, "sap.ui.fl.appliedChanges.", "sap.ui.fl.appliedChanges.xml.")
 				);
+				enhanceWithChangetypeSpecificData(
+					oExport,
+					null,
+					mControlData,
+					"aAppliedChangesXml",
+					getChangesForControlFromCustomData(oControl, "sap.ui.fl.appliedChanges.xml.")
+				);
+				// the JS-applied changes are the applied changes that were not marked as XML-applied;
+				// there is no dedicated marker for the JS applier, so the set is derived here
+				mControlData.aAppliedChangesJs = mControlData.aAppliedChanges.filter(function(sChangeId) {
+					return !mControlData.aAppliedChangesXml.includes(sChangeId);
+				});
 				enhanceWithChangetypeSpecificData(
 					oExport,
 					"aFailedChanges",

@@ -585,10 +585,13 @@ sap.ui.define([
 			}
 
 			const bIsSynchronized = oHSb.scrollLeft === iScrollPosition
-								  && oHSb.scrollLeft === oHeaderScroll.scrollLeft
-								  && oHSb.scrollLeft === oContentScroll.scrollLeft;
+				&& oHSb.scrollLeft === oHeaderScroll.scrollLeft
+				&& oHSb.scrollLeft === oContentScroll.scrollLeft;
 
-			assert.ok(bIsSynchronized, `Scroll positions are synchronized at position ${iScrollPosition} [HSb: ${oHSb.scrollLeft}, Header: ${oHeaderScroll.scrollLeft}, Content: ${oContentScroll.scrollLeft}]`);
+			assert.ok(bIsSynchronized,
+				`Scroll positions are synchronized at position ${iScrollPosition} ` +
+				`[HSb: ${oHSb.scrollLeft}, Header: ${oHeaderScroll.scrollLeft}, ` +
+				`Content: ${oContentScroll.scrollLeft}]`);
 		}
 	});
 
@@ -640,7 +643,37 @@ sap.ui.define([
 		let iCurrentScrollPosition;
 		const iMinColumnWidth = TableUtils.Column.getMinColumnWidth();
 		const DeltaMode = MouseWheelDeltaMode;
-		const that = this;
+
+		const scrollWithMouseWheel = async (oTargetElement, iScrollDelta, iDeltaMode, bShift, iExpectedScrollPosition, bValidTarget) => {
+			const oWheelEvent = TableQUnitUtils.createMouseWheelEvent(iScrollDelta, iDeltaMode, bShift);
+			const oStopPropagationSpy = sinon.spy(oWheelEvent, "stopPropagation");
+			let bExpectScrolling = false;
+
+			oTargetElement.dispatchEvent(oWheelEvent);
+
+			if (!bValidTarget) {
+				assert.ok(!oWheelEvent.defaultPrevented, "Target does not support mousewheel scrolling: Default action was not prevented");
+				assert.ok(oStopPropagationSpy.notCalled, "Target does not support mousewheel scrolling: Propagation was not stopped");
+			} else if (iCurrentScrollPosition === 0 && iScrollDelta < 0) {
+				assert.ok(!oWheelEvent.defaultPrevented, "Scroll position is at the beginning: Default action was not prevented");
+				assert.ok(oStopPropagationSpy.notCalled, "Scroll position is at the beginning: Propagation was not stopped");
+			} else if (iCurrentScrollPosition === oHSb.scrollWidth - oHSb.getBoundingClientRect().width && iScrollDelta > 0) {
+				assert.ok(!oWheelEvent.defaultPrevented, "Scroll position is at the end: Default action was not prevented");
+				assert.ok(oStopPropagationSpy.notCalled, "Scroll position is at the end: Propagation was not stopped");
+			} else {
+				assert.ok(oWheelEvent.defaultPrevented, "Default action was prevented");
+				assert.ok(oStopPropagationSpy.calledOnce, "Propagation was stopped");
+				bExpectScrolling = true;
+			}
+
+			iCurrentScrollPosition = iExpectedScrollPosition;
+
+			if (bExpectScrolling) {
+				await oTable.qunit.hScrolled();
+			}
+
+			this.assertSynchronization(assert, iExpectedScrollPosition);
+		};
 
 		async function scrollForwardAndBackToBeginning(oTargetElement) {
 			await oTable.qunit.scrollHSbTo(0);
@@ -670,37 +703,6 @@ sap.ui.define([
 			await scrollWithMouseWheel(oTargetElement, -150, DeltaMode.PIXEL, true, iCurrentScrollPosition, false);
 		}
 
-		async function scrollWithMouseWheel(oTargetElement, iScrollDelta, iDeltaMode, bShift, iExpectedScrollPosition, bValidTarget) {
-			const oWheelEvent = TableQUnitUtils.createMouseWheelEvent(iScrollDelta, iDeltaMode, bShift);
-			const oStopPropagationSpy = sinon.spy(oWheelEvent, "stopPropagation");
-			let bExpectScrolling = false;
-
-			oTargetElement.dispatchEvent(oWheelEvent);
-
-			if (!bValidTarget) {
-				assert.ok(!oWheelEvent.defaultPrevented, "Target does not support mousewheel scrolling: Default action was not prevented");
-				assert.ok(oStopPropagationSpy.notCalled, "Target does not support mousewheel scrolling: Propagation was not stopped");
-			} else if (iCurrentScrollPosition === 0 && iScrollDelta < 0) {
-				assert.ok(!oWheelEvent.defaultPrevented, "Scroll position is at the beginning: Default action was not prevented");
-				assert.ok(oStopPropagationSpy.notCalled, "Scroll position is at the beginning: Propagation was not stopped");
-			} else if (iCurrentScrollPosition === oHSb.scrollWidth - oHSb.getBoundingClientRect().width && iScrollDelta > 0) {
-				assert.ok(!oWheelEvent.defaultPrevented, "Scroll position is at the end: Default action was not prevented");
-				assert.ok(oStopPropagationSpy.notCalled, "Scroll position is at the end: Propagation was not stopped");
-			} else {
-				assert.ok(oWheelEvent.defaultPrevented, "Default action was prevented");
-				assert.ok(oStopPropagationSpy.calledOnce, "Propagation was stopped");
-				bExpectScrolling = true;
-			}
-
-			iCurrentScrollPosition = iExpectedScrollPosition;
-
-			if (bExpectScrolling) {
-				await oTable.qunit.hScrolled();
-			}
-
-			that.assertSynchronization(assert, iExpectedScrollPosition);
-		}
-
 		oTable.setFixedColumnCount(1);
 		oTable.setRowActionTemplate(TableQUnitUtils.createRowAction(null));
 		oTable.setRowActionCount(1);
@@ -723,42 +725,8 @@ sap.ui.define([
 		let iCurrentScrollPosition;
 		const bOriginalPointerSupport = Device.support.pointer;
 		const bOriginalTouchSupport = Device.support.touch;
-		const that = this;
 
-		async function scrollForwardAndBackToBeginning(oTargetElement) {
-			await oTable.qunit.scrollHSbTo(0);
-			iCurrentScrollPosition = 0;
-			TableQUnitUtils.startTouchScrolling(oTargetElement, 200);
-			await scrollWithTouch(150, iCurrentScrollPosition + 150, true);
-			await scrollWithTouch(-150, iCurrentScrollPosition - 150, true);
-			TableQUnitUtils.endTouchScrolling();
-		}
-
-		async function scrollBeyondBoundaries(oTargetElement) {
-			await oTable.qunit.scrollHSbTo(0);
-			iCurrentScrollPosition = 0;
-			TableQUnitUtils.startTouchScrolling(oTargetElement, 200);
-			await scrollWithTouch(-150, 0, true);
-			TableQUnitUtils.endTouchScrolling();
-			await oTable.qunit.scrollHSbTo(oHSb.scrollWidth - oHSb.getBoundingClientRect().width);
-			iCurrentScrollPosition = oHSb.scrollLeft;
-			TableQUnitUtils.startTouchScrolling(oTargetElement, 200);
-			await scrollWithTouch(150, iCurrentScrollPosition, true);
-			TableQUnitUtils.endTouchScrolling();
-		}
-
-		async function scrollOnInvalidTarget(oTargetElement) {
-			await oTable.qunit.scrollHSbTo(50);
-			iCurrentScrollPosition = 50;
-			TableQUnitUtils.startTouchScrolling(oTargetElement, 200);
-			await scrollWithTouch(150, iCurrentScrollPosition, false);
-			TableQUnitUtils.endTouchScrolling();
-			TableQUnitUtils.startTouchScrolling(oTargetElement, 200);
-			await scrollWithTouch(-150, iCurrentScrollPosition, false);
-			TableQUnitUtils.endTouchScrolling();
-		}
-
-		async function scrollWithTouch(iScrollDelta, iExpectedScrollPosition, bValidTarget) {
+		const scrollWithTouch = async (iScrollDelta, iExpectedScrollPosition, bValidTarget) => {
 			const oTouchEvent = TableQUnitUtils.doTouchScrolling(iScrollDelta);
 			let bExpectScrolling = false;
 
@@ -797,7 +765,40 @@ sap.ui.define([
 				await oTable.qunit.hScrolled();
 			}
 
-			that.assertSynchronization(assert, iExpectedScrollPosition);
+			this.assertSynchronization(assert, iExpectedScrollPosition);
+		};
+
+		async function scrollForwardAndBackToBeginning(oTargetElement) {
+			await oTable.qunit.scrollHSbTo(0);
+			iCurrentScrollPosition = 0;
+			TableQUnitUtils.startTouchScrolling(oTargetElement, 200);
+			await scrollWithTouch(150, iCurrentScrollPosition + 150, true);
+			await scrollWithTouch(-150, iCurrentScrollPosition - 150, true);
+			TableQUnitUtils.endTouchScrolling();
+		}
+
+		async function scrollBeyondBoundaries(oTargetElement) {
+			await oTable.qunit.scrollHSbTo(0);
+			iCurrentScrollPosition = 0;
+			TableQUnitUtils.startTouchScrolling(oTargetElement, 200);
+			await scrollWithTouch(-150, 0, true);
+			TableQUnitUtils.endTouchScrolling();
+			await oTable.qunit.scrollHSbTo(oHSb.scrollWidth - oHSb.getBoundingClientRect().width);
+			iCurrentScrollPosition = oHSb.scrollLeft;
+			TableQUnitUtils.startTouchScrolling(oTargetElement, 200);
+			await scrollWithTouch(150, iCurrentScrollPosition, true);
+			TableQUnitUtils.endTouchScrolling();
+		}
+
+		async function scrollOnInvalidTarget(oTargetElement) {
+			await oTable.qunit.scrollHSbTo(50);
+			iCurrentScrollPosition = 50;
+			TableQUnitUtils.startTouchScrolling(oTargetElement, 200);
+			await scrollWithTouch(150, iCurrentScrollPosition, false);
+			TableQUnitUtils.endTouchScrolling();
+			TableQUnitUtils.startTouchScrolling(oTargetElement, 200);
+			await scrollWithTouch(-150, iCurrentScrollPosition, false);
+			TableQUnitUtils.endTouchScrolling();
 		}
 
 		Device.support.pointer = false;
@@ -910,7 +911,7 @@ sap.ui.define([
 								rowCount: 10
 							});
 							this._oFixedRowMode.toString = function() { return "FixedRowMode"; };
-							this._oFixedRowMode.renderCellContentStyles = function() {}; // Allow row mode to have variable row heights.
+							this._oFixedRowMode.renderCellContentStyles = function() { }; // Allow row mode to have variable row heights.
 						}
 
 						return this._oFixedRowMode;
@@ -925,7 +926,7 @@ sap.ui.define([
 								maxRowCount: 10
 							});
 							this._oAutoRowMode.toString = function() { return "AutoRowMode"; };
-							this._oAutoRowMode.renderCellContentStyles = function() {}; // Allow row mode to have variable row heights.
+							this._oAutoRowMode.renderCellContentStyles = function() { }; // Allow row mode to have variable row heights.
 						}
 
 						return this._oAutoRowMode;
@@ -985,7 +986,7 @@ sap.ui.define([
 
 			const iRowCount = 10 + (bVariableRowHeights ? 1 : 0);
 			const iScrollHeight = (Math.max(iBindingLength, iRowCount) - (bVariableRowHeights ? 1 : 0)) * this.iBaseRowHeight
-								+ (bVariableRowHeights ? 98 : 0); // Buffer
+				+ (bVariableRowHeights ? 98 : 0); // Buffer
 			const iScrollbarHeight = 10 * this.iBaseRowHeight;
 
 			return Math.min(1000000, iScrollHeight) - iScrollbarHeight;
@@ -1177,21 +1178,20 @@ sap.ui.define([
 	});
 
 	QUnit.test("Initial scroll position; Tiny data; Fixed row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				firstVisibleRow: mConfig.firstVisibleRow,
 				bindingLength: 5
 			});
 
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 0, 0, 0,
-			mConfig.rowMode + ", " + mConfig.title + "; After rendering");
-			await that.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
+			this.assertPosition(assert, 0, 0, 0,
+				mConfig.rowMode + ", " + mConfig.title + "; After rendering");
+			await this.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -1199,21 +1199,20 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "FirstVisibleRow = 1",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 1
-				});
+				title: "FirstVisibleRow = 1",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 1
+			});
 		}
 
 	});
 
 	QUnit.test("Initial scroll position; Tiny data; Variable row heights", async function(assert) {
-		const that = this;
-		const iMaxFirstVisibleRow = that.getMaxFirstVisibleRow(10, true);
-		const iMaxScrollTop = that.getMaxScrollTop(10, true);
+		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(10, true);
+		const iMaxScrollTop = this.getMaxScrollTop(10, true);
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				firstVisibleRow: mConfig.initialFirstVisibleRow,
 				bindingLength: mConfig.bindingLength,
@@ -1221,11 +1220,11 @@ sap.ui.define([
 			});
 
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, mConfig.firstVisibleRow, mConfig.scrollTop, mConfig.innerScrollTop,
-			mConfig.rowMode + ", " + mConfig.title + "; After rendering");
-			await that.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
+			this.assertPosition(assert, mConfig.firstVisibleRow, mConfig.scrollTop, mConfig.innerScrollTop,
+				mConfig.rowMode + ", " + mConfig.title + "; After rendering");
+			await this.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -1233,52 +1232,51 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "No overflow, FirstVisibleRow = 1",
-					rowMode: oRowModeConfig.rowMode,
-					bindingLength: 2,
-					initialFirstVisibleRow: 1,
-					firstVisibleRow: 0,
-					scrollTop: 0,
-					innerScrollTop: 0
-				});
+				title: "No overflow, FirstVisibleRow = 1",
+				rowMode: oRowModeConfig.rowMode,
+				bindingLength: 2,
+				initialFirstVisibleRow: 1,
+				firstVisibleRow: 0,
+				scrollTop: 0,
+				innerScrollTop: 0
+			});
 			await test({
-					title: "Overflow, FirstVisibleRow = 1",
-					rowMode: oRowModeConfig.rowMode,
-					bindingLength: 10,
-					initialFirstVisibleRow: 1,
-					firstVisibleRow: 1,
-					scrollTop: 10,
-					innerScrollTop: that.iBaseRowHeight
-				});
+				title: "Overflow, FirstVisibleRow = 1",
+				rowMode: oRowModeConfig.rowMode,
+				bindingLength: 10,
+				initialFirstVisibleRow: 1,
+				firstVisibleRow: 1,
+				scrollTop: 10,
+				innerScrollTop: this.iBaseRowHeight
+			});
 			await test({
-					title: "Overflow, FirstVisibleRow = MAX",
-					rowMode: oRowModeConfig.rowMode,
-					bindingLength: 10,
-					initialFirstVisibleRow: 10,
-					firstVisibleRow: iMaxFirstVisibleRow,
-					scrollTop: iMaxScrollTop,
-					innerScrollTop: 505
-				});
+				title: "Overflow, FirstVisibleRow = MAX",
+				rowMode: oRowModeConfig.rowMode,
+				bindingLength: 10,
+				initialFirstVisibleRow: 10,
+				firstVisibleRow: iMaxFirstVisibleRow,
+				scrollTop: iMaxScrollTop,
+				innerScrollTop: 505
+			});
 		}
 
 	});
 
 	QUnit.test("Initial scroll position; Small data; Fixed row heights", async function(assert) {
-		const that = this;
-		const iMaxFirstVisibleRow = that.getMaxFirstVisibleRow();
+		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow();
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				firstVisibleRow: mConfig.firstVisibleRow
 			});
 
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, mConfig.firstVisibleRow, mConfig.firstVisibleRow * that.iBaseRowHeight, 0,
-			mConfig.rowMode + ", " + mConfig.title + "; After rendering");
-			await that.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
+			this.assertPosition(assert, mConfig.firstVisibleRow, mConfig.firstVisibleRow * this.iBaseRowHeight, 0,
+				mConfig.rowMode + ", " + mConfig.title + "; After rendering");
+			await this.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -1286,44 +1284,43 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "FirstVisibleRow = 0",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 0
-				});
+				title: "FirstVisibleRow = 0",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 0
+			});
 			await test({
-					title: "FirstVisibleRow = 1",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 1
-				});
+				title: "FirstVisibleRow = 1",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 1
+			});
 			await test({
-					title: "FirstVisibleRow = MAX",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: iMaxFirstVisibleRow,
-					firstVisibleRow: iMaxFirstVisibleRow
-				});
+				title: "FirstVisibleRow = MAX",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: iMaxFirstVisibleRow,
+				firstVisibleRow: iMaxFirstVisibleRow
+			});
 		}
 
 	});
 
 	QUnit.test("Initial scroll position; Small data; Variable row heights", async function(assert) {
-		const that = this;
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(null, true);
 		const iMaxFirstRenderedRow = this.getMaxFirstRenderedRow();
 		const iMaxScrollTop = this.getMaxScrollTop(null, true);
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				firstVisibleRow: mConfig.initialFirstVisibleRow,
 				_bVariableRowHeightEnabled: true
 			});
 
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, mConfig.firstVisibleRow, mConfig.scrollTop, mConfig.innerScrollTop,
-			mConfig.rowMode + ", " + mConfig.title + "; After rendering");
-			await that.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
+			this.assertPosition(assert, mConfig.firstVisibleRow, mConfig.scrollTop, mConfig.innerScrollTop,
+				mConfig.rowMode + ", " + mConfig.title + "; After rendering");
+			await this.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -1331,92 +1328,91 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "FirstVisibleRow = 0",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: 0,
-					firstVisibleRow: 0,
-					scrollTop: 0,
-					innerScrollTop: 0
-				});
+				title: "FirstVisibleRow = 0",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: 0,
+				firstVisibleRow: 0,
+				scrollTop: 0,
+				innerScrollTop: 0
+			});
 			await test({
-					title: "FirstVisibleRow = 1",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: 1,
-					firstVisibleRow: 1,
-					scrollTop: that.iBaseRowHeight,
-					innerScrollTop: 0
-				});
+				title: "FirstVisibleRow = 1",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: 1,
+				firstVisibleRow: 1,
+				scrollTop: this.iBaseRowHeight,
+				innerScrollTop: 0
+			});
 			await test({
-					title: "FirstVisibleRow = 5",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: 5,
-					firstVisibleRow: 5,
-					scrollTop: 5 * that.iBaseRowHeight,
-					innerScrollTop: 0
-				});
+				title: "FirstVisibleRow = 5",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: 5,
+				firstVisibleRow: 5,
+				scrollTop: 5 * this.iBaseRowHeight,
+				innerScrollTop: 0
+			});
 			await test({
-					title: "FirstVisibleRow = Max first rendered row index",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: iMaxFirstRenderedRow,
-					firstVisibleRow: iMaxFirstRenderedRow,
-					scrollTop: iMaxFirstRenderedRow * that.iBaseRowHeight,
-					innerScrollTop: 0
-				});
+				title: "FirstVisibleRow = Max first rendered row index",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: iMaxFirstRenderedRow,
+				firstVisibleRow: iMaxFirstRenderedRow,
+				scrollTop: iMaxFirstRenderedRow * this.iBaseRowHeight,
+				innerScrollTop: 0
+			});
 			await test({
-					title: "FirstVisibleRow = Max first rendered row index + 1",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: iMaxFirstRenderedRow + 1,
-					firstVisibleRow: iMaxFirstRenderedRow + 1,
-					scrollTop: 4383,
-					innerScrollTop: 150
-				});
+				title: "FirstVisibleRow = Max first rendered row index + 1",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: iMaxFirstRenderedRow + 1,
+				firstVisibleRow: iMaxFirstRenderedRow + 1,
+				scrollTop: 4383,
+				innerScrollTop: 150
+			});
 			await test({
-					title: "FirstVisibleRow = Max first rendered row index + 2",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: iMaxFirstRenderedRow + 2,
-					firstVisibleRow: iMaxFirstRenderedRow + 2,
-					scrollTop: 4391,
-					innerScrollTop: that.iBaseRowHeight + 150
-				});
+				title: "FirstVisibleRow = Max first rendered row index + 2",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: iMaxFirstRenderedRow + 2,
+				firstVisibleRow: iMaxFirstRenderedRow + 2,
+				scrollTop: 4391,
+				innerScrollTop: this.iBaseRowHeight + 150
+			});
 			await test({
-					title: "FirstVisibleRow = MAX - 1",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: that.mDefaultSettings.bindingLength - 2,
-					firstVisibleRow: iMaxFirstVisibleRow,
-					scrollTop: iMaxScrollTop,
-					innerScrollTop: 655
-				});
+				title: "FirstVisibleRow = MAX - 1",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: this.mDefaultSettings.bindingLength - 2,
+				firstVisibleRow: iMaxFirstVisibleRow,
+				scrollTop: iMaxScrollTop,
+				innerScrollTop: 655
+			});
 			await test({
-					title: "FirstVisibleRow = MAX",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: that.mDefaultSettings.bindingLength - 1,
-					firstVisibleRow: iMaxFirstVisibleRow,
-					scrollTop: iMaxScrollTop,
-					innerScrollTop: 655
-				});
+				title: "FirstVisibleRow = MAX",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: this.mDefaultSettings.bindingLength - 1,
+				firstVisibleRow: iMaxFirstVisibleRow,
+				scrollTop: iMaxScrollTop,
+				innerScrollTop: 655
+			});
 		}
 
 	});
 
 	QUnit.test("Initial scroll position; Large data; Fixed row heights", async function(assert) {
-		const that = this;
 		const iBindingLength = 1000000000;
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(iBindingLength);
 		const iMaxScrollTop = this.getMaxScrollTop(iBindingLength);
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				firstVisibleRow: mConfig.firstVisibleRow,
 				bindingLength: iBindingLength
 			});
 
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, mConfig.firstVisibleRow, mConfig.scrollTop, 0,
-			mConfig.rowMode + ", " + mConfig.title + "; After rendering");
-			await that.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
+			this.assertPosition(assert, mConfig.firstVisibleRow, mConfig.scrollTop, 0,
+				mConfig.rowMode + ", " + mConfig.title + "; After rendering");
+			await this.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -1424,48 +1420,47 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "FirstVisibleRow = 0",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 0,
-					scrollTop: 0
-				});
+				title: "FirstVisibleRow = 0",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 0,
+				scrollTop: 0
+			});
 			await test({
-					title: "FirstVisibleRow = 1",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 1,
-					scrollTop: 1
-				});
+				title: "FirstVisibleRow = 1",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 1,
+				scrollTop: 1
+			});
 			await test({
-					title: "FirstVisibleRow = 987654",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 987654,
-					scrollTop: 987
-				});
+				title: "FirstVisibleRow = 987654",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 987654,
+				scrollTop: 987
+			});
 			await test({
-					title: "FirstVisibleRow = MAX - 1",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: iMaxFirstVisibleRow - 1,
-					scrollTop: iMaxScrollTop - 1
-				});
+				title: "FirstVisibleRow = MAX - 1",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: iMaxFirstVisibleRow - 1,
+				scrollTop: iMaxScrollTop - 1
+			});
 			await test({
-					title: "FirstVisibleRow = MAX",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: iMaxFirstVisibleRow,
-					scrollTop: iMaxScrollTop
-				});
+				title: "FirstVisibleRow = MAX",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: iMaxFirstVisibleRow,
+				scrollTop: iMaxScrollTop
+			});
 		}
 
 	});
 
 	QUnit.test("Initial scroll position; Large data; Variable row heights", async function(assert) {
-		const that = this;
 		const iBindingLength = 1000000000;
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(iBindingLength, true);
 		const iMaxFirstRenderedRow = this.getMaxFirstRenderedRow(iBindingLength);
 		const iMaxScrollTop = this.getMaxScrollTop(iBindingLength, true);
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				firstVisibleRow: mConfig.initialFirstVisibleRow,
 				bindingLength: iBindingLength,
@@ -1473,11 +1468,11 @@ sap.ui.define([
 			});
 
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, mConfig.firstVisibleRow, mConfig.scrollTop, mConfig.innerScrollTop,
-			mConfig.rowMode + ", " + mConfig.title + "; After rendering");
-			await that.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
+			this.assertPosition(assert, mConfig.firstVisibleRow, mConfig.scrollTop, mConfig.innerScrollTop,
+				mConfig.rowMode + ", " + mConfig.title + "; After rendering");
+			await this.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -1485,75 +1480,74 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "FirstVisibleRow = 0",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: 0,
-					firstVisibleRow: 0,
-					scrollTop: 0,
-					innerScrollTop: 0
-				});
+				title: "FirstVisibleRow = 0",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: 0,
+				firstVisibleRow: 0,
+				scrollTop: 0,
+				innerScrollTop: 0
+			});
 			await test({
-					title: "FirstVisibleRow = 1",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: 1,
-					firstVisibleRow: 1,
-					scrollTop: 1,
-					innerScrollTop: 0
-				});
+				title: "FirstVisibleRow = 1",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: 1,
+				firstVisibleRow: 1,
+				scrollTop: 1,
+				innerScrollTop: 0
+			});
 			await test({
-					title: "FirstVisibleRow = 987654",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: 987654,
-					firstVisibleRow: 987654,
-					scrollTop: 987,
-					innerScrollTop: 0
-				});
+				title: "FirstVisibleRow = 987654",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: 987654,
+				firstVisibleRow: 987654,
+				scrollTop: 987,
+				innerScrollTop: 0
+			});
 			await test({
-					title: "FirstVisibleRow = Max first rendered row index",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: iMaxFirstRenderedRow,
-					firstVisibleRow: iMaxFirstRenderedRow,
-					scrollTop: 999412,
-					innerScrollTop: 0
-				});
+				title: "FirstVisibleRow = Max first rendered row index",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: iMaxFirstRenderedRow,
+				firstVisibleRow: iMaxFirstRenderedRow,
+				scrollTop: 999412,
+				innerScrollTop: 0
+			});
 			await test({
-					title: "FirstVisibleRow = Max first rendered row index + 1",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: iMaxFirstRenderedRow + 1,
-					firstVisibleRow: iMaxFirstRenderedRow + 1,
-					scrollTop: 999434,
-					innerScrollTop: 150
-				});
+				title: "FirstVisibleRow = Max first rendered row index + 1",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: iMaxFirstRenderedRow + 1,
+				firstVisibleRow: iMaxFirstRenderedRow + 1,
+				scrollTop: 999434,
+				innerScrollTop: 150
+			});
 			await test({
-					title: "FirstVisibleRow = Max first rendered row index + 2",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: iMaxFirstRenderedRow + 2,
-					firstVisibleRow: iMaxFirstRenderedRow + 2,
-					scrollTop: 999442,
-					innerScrollTop: that.iBaseRowHeight + 150
-				});
+				title: "FirstVisibleRow = Max first rendered row index + 2",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: iMaxFirstRenderedRow + 2,
+				firstVisibleRow: iMaxFirstRenderedRow + 2,
+				scrollTop: 999442,
+				innerScrollTop: this.iBaseRowHeight + 150
+			});
 			await test({
-					title: "FirstVisibleRow = MAX - 1",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: iBindingLength - 2,
-					firstVisibleRow: iMaxFirstVisibleRow,
-					scrollTop: iMaxScrollTop,
-					innerScrollTop: 655
-				});
+				title: "FirstVisibleRow = MAX - 1",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: iBindingLength - 2,
+				firstVisibleRow: iMaxFirstVisibleRow,
+				scrollTop: iMaxScrollTop,
+				innerScrollTop: 655
+			});
 			await test({
-					title: "FirstVisibleRow = MAX",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: iBindingLength - 1,
-					firstVisibleRow: iMaxFirstVisibleRow,
-					scrollTop: iMaxScrollTop,
-					innerScrollTop: 655
-				});
+				title: "FirstVisibleRow = MAX",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: iBindingLength - 1,
+				firstVisibleRow: iMaxFirstVisibleRow,
+				scrollTop: iMaxScrollTop,
+				innerScrollTop: 655
+			});
 		}
 
 	});
 
 	QUnit.test("Initial scroll position; Large data; Fixed row heights; Floating point precision edge case", async function(assert) {
-		const that = this;
 		const iBindingLength = 1000000000;
 		const oTable = this.createTable({
 			rowMode: this.mTestedRowModes.FixedRowMode.setRowCount(18),
@@ -1564,13 +1558,12 @@ sap.ui.define([
 		await oTable.qunit.rendered();
 		const iExpectedFirstVisibleRow = iBindingLength - 18;
 		const iExpectedScrollPosition = 1000000 - oTable._getScrollExtension().getVerticalScrollbar().clientHeight;
-		that.assertPosition(assert, iExpectedFirstVisibleRow, iExpectedScrollPosition, 0, "After rendering");
-		await that.testRestoration(assert);
+		this.assertPosition(assert, iExpectedFirstVisibleRow, iExpectedScrollPosition, 0, "After rendering");
+		await this.testRestoration(assert);
 
 	});
 
 	QUnit.test("Initial scroll position; Large data; Variable row heights; Floating point precision edge case", async function(assert) {
-		const that = this;
 		const iBindingLength = 1000000000;
 		const oTable = this.createTable({
 			rowMode: this.mTestedRowModes.FixedRowMode.setRowCount(18),
@@ -1581,31 +1574,30 @@ sap.ui.define([
 
 		await oTable.qunit.rendered();
 		const iExpectedScrollPosition = 1000000 - oTable._getScrollExtension().getVerticalScrollbar().clientHeight;
-		that.assertPosition(assert, 999999991, iExpectedScrollPosition, 1059, "After rendering");
-		await that.testRestoration(assert);
+		this.assertPosition(assert, 999999991, iExpectedScrollPosition, 1059, "After rendering");
+		await this.testRestoration(assert);
 
 	});
 
 	QUnit.test("Initial scroll position if bound after rendering; Small data; Fixed row heights", async function(assert) {
-		const that = this;
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow();
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				models: undefined,
 				rowMode: mConfig.rowMode,
 				firstVisibleRow: mConfig.initialFirstVisibleRow
 			});
 
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, mConfig.initialFirstVisibleRow, 0, 0,
-			mConfig.rowMode + ", " + mConfig.title + "; Before binding created");
-			oTable.setModel(that.mDefaultSettings.models);
+			this.assertPosition(assert, mConfig.initialFirstVisibleRow, 0, 0,
+				mConfig.rowMode + ", " + mConfig.title + "; Before binding created");
+			oTable.setModel(this.mDefaultSettings.models);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, mConfig.firstVisibleRow, mConfig.firstVisibleRow * that.iBaseRowHeight, 0,
-			mConfig.rowMode + ", " + mConfig.title + "; After binding created");
+			this.assertPosition(assert, mConfig.firstVisibleRow, mConfig.firstVisibleRow * this.iBaseRowHeight, 0,
+				mConfig.rowMode + ", " + mConfig.title + "; After binding created");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -1613,34 +1605,33 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "FirstVisibleRow = 0",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: 0,
-					firstVisibleRow: 0
-				});
+				title: "FirstVisibleRow = 0",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: 0,
+				firstVisibleRow: 0
+			});
 			await test({
-					title: "FirstVisibleRow = 5",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: 5,
-					firstVisibleRow: 5
-				});
+				title: "FirstVisibleRow = 5",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: 5,
+				firstVisibleRow: 5
+			});
 			await test({
-					title: "FirstVisibleRow = MAX",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: that.mDefaultSettings.bindingLength,
-					firstVisibleRow: iMaxFirstVisibleRow
-				});
+				title: "FirstVisibleRow = MAX",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: this.mDefaultSettings.bindingLength,
+				firstVisibleRow: iMaxFirstVisibleRow
+			});
 		}
 
 	});
 
 	QUnit.test("Initial scroll position if bound after rendering; Small data; Variable row heights", async function(assert) {
-		const that = this;
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(null, true);
 		const iMaxScrollTop = this.getMaxScrollTop(null, true);
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				models: undefined,
 				rowMode: mConfig.rowMode,
 				_bVariableRowHeightEnabled: true,
@@ -1648,14 +1639,14 @@ sap.ui.define([
 			});
 
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, mConfig.initialFirstVisibleRow, 0, 0,
-			mConfig.rowMode + ", " + mConfig.title + "; Before binding created");
-			oTable.setModel(that.mDefaultSettings.models);
+			this.assertPosition(assert, mConfig.initialFirstVisibleRow, 0, 0,
+				mConfig.rowMode + ", " + mConfig.title + "; Before binding created");
+			oTable.setModel(this.mDefaultSettings.models);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, mConfig.firstVisibleRow, mConfig.scrollTop, mConfig.innerScrollTop,
-			mConfig.rowMode + ", " + mConfig.title + "; After binding created");
+			this.assertPosition(assert, mConfig.firstVisibleRow, mConfig.scrollTop, mConfig.innerScrollTop,
+				mConfig.rowMode + ", " + mConfig.title + "; After binding created");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -1663,54 +1654,53 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "FirstVisibleRow = 0",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: 0,
-					firstVisibleRow: 0,
-					scrollTop: 0,
-					innerScrollTop: 0
-				});
+				title: "FirstVisibleRow = 0",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: 0,
+				firstVisibleRow: 0,
+				scrollTop: 0,
+				innerScrollTop: 0
+			});
 			await test({
-					title: "FirstVisibleRow = 5",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: 5,
-					firstVisibleRow: 5,
-					scrollTop: 5 * that.iBaseRowHeight,
-					innerScrollTop: 0
-				});
+				title: "FirstVisibleRow = 5",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: 5,
+				firstVisibleRow: 5,
+				scrollTop: 5 * this.iBaseRowHeight,
+				innerScrollTop: 0
+			});
 			await test({
-					title: "FirstVisibleRow = MAX",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: that.mDefaultSettings.bindingLength,
-					firstVisibleRow: iMaxFirstVisibleRow,
-					scrollTop: iMaxScrollTop,
-					innerScrollTop: 655
-				});
+				title: "FirstVisibleRow = MAX",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: this.mDefaultSettings.bindingLength,
+				firstVisibleRow: iMaxFirstVisibleRow,
+				scrollTop: iMaxScrollTop,
+				innerScrollTop: 655
+			});
 		}
 
 	});
 
 	QUnit.test("Initial scroll position if binding length initialized after rendering; Small data; Fixed row heights", async function(assert) {
-		const that = this;
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow();
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				firstVisibleRow: mConfig.initialFirstVisibleRow,
 				bindingLength: 0,
 				bindingSuspended: true // Avoid change event of client binding when it is initialized.
-			}, function(oTable) {
-				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", function() {
-					that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength);
+			}, (oTable) => {
+				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", () => {
+					this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength);
 				});
 			});
 
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, mConfig.firstVisibleRow, mConfig.firstVisibleRow * that.iBaseRowHeight, 0,
-			mConfig.rowMode + ", " + mConfig.title + "; After rendering");
+			this.assertPosition(assert, mConfig.firstVisibleRow, mConfig.firstVisibleRow * this.iBaseRowHeight, 0,
+				mConfig.rowMode + ", " + mConfig.title + "; After rendering");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -1718,50 +1708,49 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "FirstVisibleRow = 0",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: 0,
-					firstVisibleRow: 0
-				});
+				title: "FirstVisibleRow = 0",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: 0,
+				firstVisibleRow: 0
+			});
 			await test({
-					title: "FirstVisibleRow = 5",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: 5,
-					firstVisibleRow: 5
-				});
+				title: "FirstVisibleRow = 5",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: 5,
+				firstVisibleRow: 5
+			});
 			await test({
-					title: "FirstVisibleRow = MAX",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: that.mDefaultSettings.bindingLength,
-					firstVisibleRow: iMaxFirstVisibleRow
-				});
+				title: "FirstVisibleRow = MAX",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: this.mDefaultSettings.bindingLength,
+				firstVisibleRow: iMaxFirstVisibleRow
+			});
 		}
 
 	});
 
 	QUnit.test("Initial scroll position if binding length initialized after rendering; Small data; Variable row heights", async function(assert) {
-		const that = this;
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(null, true);
 		const iMaxScrollTop = this.getMaxScrollTop(null, true);
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				_bVariableRowHeightEnabled: true,
 				firstVisibleRow: mConfig.initialFirstVisibleRow,
 				bindingLength: 0,
 				bindingSuspended: true // Avoid change event of client binding when it is initialized.
-			}, function(oTable) {
-				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", function() {
-					that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength);
+			}, (oTable) => {
+				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", () => {
+					this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength);
 				});
 			});
 
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, mConfig.firstVisibleRow, mConfig.scrollTop, mConfig.innerScrollTop,
-			mConfig.rowMode + ", " + mConfig.title + "; After rendering");
+			this.assertPosition(assert, mConfig.firstVisibleRow, mConfig.scrollTop, mConfig.innerScrollTop,
+				mConfig.rowMode + ", " + mConfig.title + "; After rendering");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -1769,52 +1758,51 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "FirstVisibleRow = 0",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: 0,
-					firstVisibleRow: 0,
-					scrollTop: 0,
-					innerScrollTop: 0
-				});
+				title: "FirstVisibleRow = 0",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: 0,
+				firstVisibleRow: 0,
+				scrollTop: 0,
+				innerScrollTop: 0
+			});
 			await test({
-					title: "FirstVisibleRow = 5",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: 5,
-					firstVisibleRow: 5,
-					scrollTop: 5 * that.iBaseRowHeight,
-					innerScrollTop: 0
-				});
+				title: "FirstVisibleRow = 5",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: 5,
+				firstVisibleRow: 5,
+				scrollTop: 5 * this.iBaseRowHeight,
+				innerScrollTop: 0
+			});
 			await test({
-					title: "FirstVisibleRow = MAX",
-					rowMode: oRowModeConfig.rowMode,
-					initialFirstVisibleRow: that.mDefaultSettings.bindingLength,
-					firstVisibleRow: iMaxFirstVisibleRow,
-					scrollTop: iMaxScrollTop,
-					innerScrollTop: 655
-				});
+				title: "FirstVisibleRow = MAX",
+				rowMode: oRowModeConfig.rowMode,
+				initialFirstVisibleRow: this.mDefaultSettings.bindingLength,
+				firstVisibleRow: iMaxFirstVisibleRow,
+				scrollTop: iMaxScrollTop,
+				innerScrollTop: 655
+			});
 		}
 
 	});
 
 	QUnit.test("Initial scroll position if binding length changed after rendering; Small data; Fixed row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				firstVisibleRow: mConfig.firstVisibleRow,
-				bindingLength: that.mDefaultSettings.bindingLength - 1
-			}, function(oTable) {
-				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", function() {
-					that.changeBindingLength(that.mDefaultSettings.bindingLength, ChangeReason.Change);
+				bindingLength: this.mDefaultSettings.bindingLength - 1
+			}, (oTable) => {
+				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", () => {
+					this.changeBindingLength(this.mDefaultSettings.bindingLength, ChangeReason.Change);
 				});
 			});
 
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, mConfig.firstVisibleRow, mConfig.firstVisibleRow * that.iBaseRowHeight, 0,
-			mConfig.rowMode + ", " + mConfig.title + "; After rendering");
+			this.assertPosition(assert, mConfig.firstVisibleRow, mConfig.firstVisibleRow * this.iBaseRowHeight, 0,
+				mConfig.rowMode + ", " + mConfig.title + "; After rendering");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -1822,39 +1810,38 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "FirstVisibleRow = 0",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 0
-				});
+				title: "FirstVisibleRow = 0",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 0
+			});
 			await test({
-					title: "FirstVisibleRow = 5",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 5
-				});
+				title: "FirstVisibleRow = 5",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 5
+			});
 		}
 
 	});
 
 	QUnit.test("Initial scroll position if binding length changed after rendering; Small data; Variable row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				firstVisibleRow: mConfig.firstVisibleRow,
-				bindingLength: that.mDefaultSettings.bindingLength - 1,
+				bindingLength: this.mDefaultSettings.bindingLength - 1,
 				_bVariableRowHeightEnabled: true
-			}, function(oTable) {
-				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", function() {
-					that.changeBindingLength(that.mDefaultSettings.bindingLength, ChangeReason.Change);
+			}, (oTable) => {
+				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", () => {
+					this.changeBindingLength(this.mDefaultSettings.bindingLength, ChangeReason.Change);
 				});
 			});
 
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, mConfig.firstVisibleRow, mConfig.firstVisibleRow * that.iBaseRowHeight, 0,
-			mConfig.rowMode + ", " + mConfig.title + "; After rendering");
+			this.assertPosition(assert, mConfig.firstVisibleRow, mConfig.firstVisibleRow * this.iBaseRowHeight, 0,
+				mConfig.rowMode + ", " + mConfig.title + "; After rendering");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -1862,24 +1849,23 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "FirstVisibleRow = 0",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 0
-				});
+				title: "FirstVisibleRow = 0",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 0
+			});
 			await test({
-					title: "FirstVisibleRow = 5",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 5
-				});
+				title: "FirstVisibleRow = 5",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 5
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll with scrollbar; Tiny data; Variable row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: 10,
 				_bVariableRowHeightEnabled: true
@@ -1888,21 +1874,21 @@ sap.ui.define([
 
 			await oTable.qunit.rendered();
 			await oTable.qunit.scrollVSbTo(1);
-			that.assertPosition(assert, 0, 1, 5, sTitle + "1");
+			this.assertPosition(assert, 0, 1, 5, sTitle + "1");
 			await oTable.qunit.scrollVSbTo(48);
-			that.assertPosition(assert, 2, 48, 247, sTitle + "48");
+			this.assertPosition(assert, 2, 48, 247, sTitle + "48");
 			await oTable.qunit.scrollVSbTo(49);
-			that.assertPosition(assert, 3, 49, 253, sTitle + "49");
+			this.assertPosition(assert, 3, 49, 253, sTitle + "49");
 			await oTable.qunit.scrollVSbTo(48);
-			that.assertPosition(assert, 2, 48, 247, sTitle + "48");
+			this.assertPosition(assert, 2, 48, 247, sTitle + "48");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.assertPosition(assert, 5, 98, 505, sTitle + "MAX");
+			this.assertPosition(assert, 5, 98, 505, sTitle + "MAX");
 			await oTable.qunit.scrollVSbTo(1);
-			that.assertPosition(assert, 0, 1, 5, sTitle + "1");
+			this.assertPosition(assert, 0, 1, 5, sTitle + "1");
 			await oTable.qunit.scrollVSbTo(0);
-			that.assertPosition(assert, 0, 0, 0, sTitle + "0");
+			this.assertPosition(assert, 0, 0, 0, sTitle + "0");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -1910,69 +1896,68 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll with scrollbar; Small data; Fixed row heights", async function(assert) {
-		const that = this;
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow();
 		const iMaxScrollTop = this.getMaxScrollTop();
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode
 			});
 			const sTitle = mConfig.rowMode + ", ScrollTop set to ";
 
 			await oTable.qunit.rendered();
 			await oTable.qunit.scrollVSbTo(1);
-			that.assertPosition(assert, 0, 1, 0, sTitle + "1");
+			this.assertPosition(assert, 0, 1, 0, sTitle + "1");
 			await oTable.qunit.scrollVSbTo(48);
-			that.assertPosition(assert, 0, 48, 0, sTitle + "48");
+			this.assertPosition(assert, 0, 48, 0, sTitle + "48");
 			await oTable.qunit.scrollVSbTo(49);
-			that.assertPosition(assert, 1, 49, 0, sTitle + "49");
+			this.assertPosition(assert, 1, 49, 0, sTitle + "49");
 			await oTable.qunit.scrollVSbTo(48);
-			that.assertPosition(assert, 0, 48, 0, sTitle + "48");
+			this.assertPosition(assert, 0, 48, 0, sTitle + "48");
 			await oTable.qunit.scrollVSbTo(200);
-			that.assertPosition(assert, 4, 200, 0, sTitle + "200");
+			this.assertPosition(assert, 4, 200, 0, sTitle + "200");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, sTitle + "MAX");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, sTitle + "MAX");
 			await oTable.qunit.scrollVSbBy(-1);
-			that.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 1, 0, sTitle + "MAX - 1");
+			this.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 1, 0, sTitle + "MAX - 1");
 			await oTable.qunit.scrollVSbBy(-48);
-			that.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 49, 0, sTitle + "MAX - 49");
+			this.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 49, 0, sTitle + "MAX - 49");
 			await oTable.qunit.scrollVSbBy(-1);
-			that.assertPosition(assert, iMaxFirstVisibleRow - 2, iMaxScrollTop - 50, 0, sTitle + "MAX - 50");
+			this.assertPosition(assert, iMaxFirstVisibleRow - 2, iMaxScrollTop - 50, 0, sTitle + "MAX - 50");
 			await oTable.qunit.scrollVSbBy(1);
-			that.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 49, 0, sTitle + "MAX - 49");
+			this.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 49, 0, sTitle + "MAX - 49");
 			await oTable.qunit.scrollVSbTo(iMaxScrollTop - 1);
-			that.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 1, 0, sTitle + "MAX - 1");
+			this.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 1, 0, sTitle + "MAX - 1");
 			await oTable.qunit.scrollVSbBy(1);
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, sTitle + "MAX");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, sTitle + "MAX");
 			await oTable.qunit.scrollVSbTo(1);
-			that.assertPosition(assert, 0, 1, 0, sTitle + "1");
+			this.assertPosition(assert, 0, 1, 0, sTitle + "1");
 			await oTable.qunit.scrollVSbTo(0);
-			that.assertPosition(assert, 0, 0, 0, sTitle + "0");
+			this.assertPosition(assert, 0, 0, 0, sTitle + "0");
 			const oScrollExtension = oTable._getScrollExtension();
 			const oScrollbar = oTable._getScrollExtension().getVerticalScrollbar();
 			// Test restarting the scrollbar scroll process.
 			oScrollbar.scrollTop = 100;
 			oScrollbar.dispatchEvent(TableQUnitUtils.createScrollEvent());
 			setTimeout(() => {
-			oScrollbar.scrollTop = 200;
-			oScrollbar.dispatchEvent(TableQUnitUtils.createScrollEvent());
-			// Avoid that scroll events triggered by the browser are processed.
-			oScrollbar.removeEventListener("scroll", oScrollExtension._onVerticalScrollEventHandler);
+				oScrollbar.scrollTop = 200;
+				oScrollbar.dispatchEvent(TableQUnitUtils.createScrollEvent());
+				// Avoid that scroll events triggered by the browser are processed.
+				oScrollbar.removeEventListener("scroll", oScrollExtension._onVerticalScrollEventHandler);
 			}, 0);
 			await oTable.qunit.vScrolled();
 			await oTable.qunit.vScrolled();
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 4, 200, 0, sTitle + "200 with 2 scroll events");
+			this.assertPosition(assert, 4, 200, 0, sTitle + "200 with 2 scroll events");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -1980,19 +1965,18 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll with scrollbar; Small data; Variable row heights", async function(assert) {
-		const that = this;
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(null, true);
 		const iMaxScrollTop = this.getMaxScrollTop(null, true);
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				_bVariableRowHeightEnabled: true
 			});
@@ -2000,49 +1984,49 @@ sap.ui.define([
 
 			await oTable.qunit.rendered();
 			await oTable.qunit.scrollVSbTo(1);
-			that.assertPosition(assert, 0, 1, 1, sTitle + "1");
+			this.assertPosition(assert, 0, 1, 1, sTitle + "1");
 			await oTable.qunit.scrollVSbTo(48);
-			that.assertPosition(assert, 0, 48, 48, sTitle + "48");
+			this.assertPosition(assert, 0, 48, 48, sTitle + "48");
 			await oTable.qunit.scrollVSbTo(49);
-			that.assertPosition(assert, 1, 49, 0, sTitle + "49");
+			this.assertPosition(assert, 1, 49, 0, sTitle + "49");
 			await oTable.qunit.scrollVSbTo(48);
-			that.assertPosition(assert, 0, 48, 48, sTitle + "48");
+			this.assertPosition(assert, 0, 48, 48, sTitle + "48");
 			await oTable.qunit.scrollVSbTo(200);
-			that.assertPosition(assert, 4, 200, 4, sTitle + "200");
+			this.assertPosition(assert, 4, 200, 4, sTitle + "200");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, sTitle + "MAX");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, sTitle + "MAX");
 			await oTable.qunit.scrollVSbBy(-1);
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop - 1, 648, sTitle + "MAX - 1");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop - 1, 648, sTitle + "MAX - 1");
 			await oTable.qunit.scrollVSbBy(-48);
-			that.assertPosition(assert, 91, iMaxScrollTop - 49, 328, sTitle + "MAX - 49");
+			this.assertPosition(assert, 91, iMaxScrollTop - 49, 328, sTitle + "MAX - 49");
 			await oTable.qunit.scrollVSbBy(-1);
-			that.assertPosition(assert, 91, iMaxScrollTop - 50, 321, sTitle + "MAX - 50");
+			this.assertPosition(assert, 91, iMaxScrollTop - 50, 321, sTitle + "MAX - 50");
 			await oTable.qunit.scrollVSbBy(1);
-			that.assertPosition(assert, 91, iMaxScrollTop - 49, 328, sTitle + "MAX - 49");
+			this.assertPosition(assert, 91, iMaxScrollTop - 49, 328, sTitle + "MAX - 49");
 			await oTable.qunit.scrollVSbTo(iMaxScrollTop - 1);
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop - 1, 648, sTitle + "MAX - 1");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop - 1, 648, sTitle + "MAX - 1");
 			await oTable.qunit.scrollVSbBy(1);
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, sTitle + "MAX");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, sTitle + "MAX");
 			await oTable.qunit.scrollVSbTo(1);
-			that.assertPosition(assert, 0, 1, 1, sTitle + "1");
+			this.assertPosition(assert, 0, 1, 1, sTitle + "1");
 			await oTable.qunit.scrollVSbTo(0);
-			that.assertPosition(assert, 0, 0, 0, sTitle + "0");
+			this.assertPosition(assert, 0, 0, 0, sTitle + "0");
 			const oScrollExtension = oTable._getScrollExtension();
 			const oScrollbar = oTable._getScrollExtension().getVerticalScrollbar();
 			// Test restarting the scrollbar scroll process.
 			oScrollbar.scrollTop = 100;
 			oScrollbar.dispatchEvent(TableQUnitUtils.createScrollEvent());
 			setTimeout(() => {
-			oScrollbar.scrollTop = 200;
-			oScrollbar.dispatchEvent(TableQUnitUtils.createScrollEvent());
-			oScrollbar.removeEventListener("scroll", oScrollExtension._onVerticalScrollEventHandler);
+				oScrollbar.scrollTop = 200;
+				oScrollbar.dispatchEvent(TableQUnitUtils.createScrollEvent());
+				oScrollbar.removeEventListener("scroll", oScrollExtension._onVerticalScrollEventHandler);
 			}, 0);
 			await oTable.qunit.vScrolled();
 			await oTable.qunit.vScrolled();
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 4, 200, 4, sTitle + "200 with 2 scroll events");
+			this.assertPosition(assert, 4, 200, 4, sTitle + "200 with 2 scroll events");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -2050,21 +2034,20 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll with scrollbar; Large data; Fixed row heights", async function(assert) {
-		const that = this;
 		const iBindingLength = 1000000000;
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(iBindingLength);
 		const iMaxScrollTop = this.getMaxScrollTop(iBindingLength);
 		const iRowsPerPixel = iMaxFirstVisibleRow / iMaxScrollTop;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: iBindingLength
 			});
@@ -2072,29 +2055,29 @@ sap.ui.define([
 
 			await oTable.qunit.rendered();
 			await oTable.qunit.scrollVSbTo(1);
-			that.assertPosition(assert, Math.floor(iRowsPerPixel), 1, 0, sTitle + "1");
+			this.assertPosition(assert, Math.floor(iRowsPerPixel), 1, 0, sTitle + "1");
 			await oTable.qunit.scrollVSbTo(48);
-			that.assertPosition(assert, Math.floor(iRowsPerPixel * 48), 48, 0, sTitle + "48");
+			this.assertPosition(assert, Math.floor(iRowsPerPixel * 48), 48, 0, sTitle + "48");
 			await oTable.qunit.scrollVSbTo(500000);
-			that.assertPosition(assert, Math.floor(iRowsPerPixel * 500000), 500000, 0, sTitle + "500000");
+			this.assertPosition(assert, Math.floor(iRowsPerPixel * 500000), 500000, 0, sTitle + "500000");
 			await oTable.qunit.scrollVSbTo(500001);
-			that.assertPosition(assert, Math.floor(iRowsPerPixel * 500001), 500001, 0, sTitle + "500001");
+			this.assertPosition(assert, Math.floor(iRowsPerPixel * 500001), 500001, 0, sTitle + "500001");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, sTitle + "MAX");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, sTitle + "MAX");
 			await oTable.qunit.scrollVSbBy(-1);
-			that.assertPosition(assert, Math.floor(iRowsPerPixel * (iMaxScrollTop - 1)), iMaxScrollTop - 1, 0, sTitle + "MAX - 1");
+			this.assertPosition(assert, Math.floor(iRowsPerPixel * (iMaxScrollTop - 1)), iMaxScrollTop - 1, 0, sTitle + "MAX - 1");
 			await oTable.qunit.scrollVSbBy(-47);
-			that.assertPosition(assert, Math.floor(iRowsPerPixel * (iMaxScrollTop - 48)), iMaxScrollTop - 48, 0, sTitle + "MAX - 48");
+			this.assertPosition(assert, Math.floor(iRowsPerPixel * (iMaxScrollTop - 48)), iMaxScrollTop - 48, 0, sTitle + "MAX - 48");
 			await oTable.qunit.scrollVSbTo(iMaxScrollTop - 1);
-			that.assertPosition(assert, Math.floor(iRowsPerPixel * (iMaxScrollTop - 1)), iMaxScrollTop - 1, 0, sTitle + "MAX - 1");
+			this.assertPosition(assert, Math.floor(iRowsPerPixel * (iMaxScrollTop - 1)), iMaxScrollTop - 1, 0, sTitle + "MAX - 1");
 			await oTable.qunit.scrollVSbBy(1);
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, sTitle + "MAX");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, sTitle + "MAX");
 			await oTable.qunit.scrollVSbTo(1);
-			that.assertPosition(assert, Math.floor(iRowsPerPixel), 1, 0, sTitle + "1");
+			this.assertPosition(assert, Math.floor(iRowsPerPixel), 1, 0, sTitle + "1");
 			await oTable.qunit.scrollVSbTo(0);
-			that.assertPosition(assert, 0, 0, 0, sTitle + "0");
+			this.assertPosition(assert, 0, 0, 0, sTitle + "0");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -2102,20 +2085,19 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll with scrollbar; Large data; Variable row heights", async function(assert) {
-		const that = this;
 		const iBindingLength = 1000000000;
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(iBindingLength, true);
 		const iMaxScrollTop = this.getMaxScrollTop(iBindingLength, true);
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: iBindingLength,
 				_bVariableRowHeightEnabled: true
@@ -2123,31 +2105,31 @@ sap.ui.define([
 
 			await oTable.qunit.rendered();
 			await oTable.qunit.scrollVSbTo(1);
-			that.assertPosition(assert, 1000, 1, 29, "ScrollTop set to 1");
+			this.assertPosition(assert, 1000, 1, 29, "ScrollTop set to 1");
 			await oTable.qunit.scrollVSbTo(48);
-			that.assertPosition(assert, 48028, 48, 12, "ScrollTop set to 48");
+			this.assertPosition(assert, 48028, 48, 12, "ScrollTop set to 48");
 			await oTable.qunit.scrollVSbTo(500000);
-			that.assertPosition(assert, 500294167, 500000, 146, "ScrollTop set to 500000");
+			this.assertPosition(assert, 500294167, 500000, 146, "ScrollTop set to 500000");
 			await oTable.qunit.scrollVSbTo(500001);
-			that.assertPosition(assert, 500295168, 500001, 27, "ScrollTop set to 500001");
+			this.assertPosition(assert, 500295168, 500001, 27, "ScrollTop set to 500001");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, "ScrollTop set to MAX");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, "ScrollTop set to MAX");
 			await oTable.qunit.scrollVSbBy(-1);
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop - 1, 648, "ScrollTop set to MAX - 1");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop - 1, 648, "ScrollTop set to MAX - 1");
 			await oTable.qunit.scrollVSbBy(-9);
-			that.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 10, 588, "ScrollTop set to MAX - 10");
+			this.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 10, 588, "ScrollTop set to MAX - 10");
 			await oTable.qunit.scrollVSbBy(-38);
-			that.assertPosition(assert, 999999991, iMaxScrollTop - 48, 334, "ScrollTop set to MAX - 48");
+			this.assertPosition(assert, 999999991, iMaxScrollTop - 48, 334, "ScrollTop set to MAX - 48");
 			await oTable.qunit.scrollVSbTo(iMaxScrollTop - 1);
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop - 1, 648, "ScrollTop set to MAX - 1");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop - 1, 648, "ScrollTop set to MAX - 1");
 			await oTable.qunit.scrollVSbBy(1);
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, "ScrollTop set to MAX");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, "ScrollTop set to MAX");
 			await oTable.qunit.scrollVSbTo(1);
-			that.assertPosition(assert, 1000, 1, 29, "ScrollTop set to 1");
+			this.assertPosition(assert, 1000, 1, 29, "ScrollTop set to 1");
 			await oTable.qunit.scrollVSbTo(0);
-			that.assertPosition(assert, 0, 0, 0, "ScrollTop set to 0");
+			this.assertPosition(assert, 0, 0, 0, "ScrollTop set to 0");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -2155,30 +2137,29 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll with scrollbar if binding length changed after rendering; Small data; Fixed row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: 99
-			}, function(oTable) {
-				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", function() {
-					that.changeBindingLength(100, ChangeReason.Change);
+			}, (oTable) => {
+				TableQUnitUtils.addDelegateOnce(oTable, "onAfterRendering", () => {
+					this.changeBindingLength(100, ChangeReason.Change);
 				});
 			});
 
 			await oTable.qunit.rendered();
 			await oTable.qunit.scrollVSbTo(49);
-			that.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", ScrollTop set to 49");
+			this.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", ScrollTop set to 49");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -2186,17 +2167,16 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll with scrollbar if re-rendered after setting FirstVisibleRow; Small data; Fixed row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode
 			});
 
@@ -2206,11 +2186,11 @@ sap.ui.define([
 			await TableQUnitUtils.sleep(0);
 			oTable.invalidate();
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
+			this.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
 			await oTable.qunit.scrollVSbTo(98);
-			that.assertPosition(assert, 2, 98, 0, mConfig.rowMode + ", ScrollTop set to 98");
+			this.assertPosition(assert, 2, 98, 0, mConfig.rowMode + ", ScrollTop set to 98");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -2218,17 +2198,16 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll with scrollbar if re-rendered while setting FirstVisibleRow; Small data; Fixed row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode
 			});
 
@@ -2237,11 +2216,11 @@ sap.ui.define([
 			await TableQUnitUtils.sleep(0);
 			oTable.invalidate();
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
+			this.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
 			await oTable.qunit.scrollVSbTo(98);
-			that.assertPosition(assert, 2, 98, 0, mConfig.rowMode + ", ScrollTop set to 98");
+			this.assertPosition(assert, 2, 98, 0, mConfig.rowMode + ", ScrollTop set to 98");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -2249,19 +2228,18 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll by setting FirstVisibleRow; Tiny data; Variable row heights", async function(assert) {
-		const that = this;
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(10, true);
 		const iMaxScrollTop = this.getMaxScrollTop(10, true);
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: 10,
 				_bVariableRowHeightEnabled: true
@@ -2272,25 +2250,25 @@ sap.ui.define([
 			oTable.setFirstVisibleRow(1);
 			await oTable.qunit.vScrolled();
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 1, 10, 49, sTitle + "1");
+			this.assertPosition(assert, 1, 10, 49, sTitle + "1");
 			oTable.setFirstVisibleRow(3);
 			await oTable.qunit.vScrolled();
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 3, 48, 248, sTitle + "3");
+			this.assertPosition(assert, 3, 48, 248, sTitle + "3");
 			oTable.setFirstVisibleRow(7);
 			await oTable.qunit.vScrolled();
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 505, "FirstVisibleRow set to > MAX");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 505, "FirstVisibleRow set to > MAX");
 			oTable.setFirstVisibleRow(iMaxFirstVisibleRow);
 			await oTable.qunit.vScrolled();
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iMaxFirstVisibleRow, 87, 447, sTitle + "MAX");
+			this.assertPosition(assert, iMaxFirstVisibleRow, 87, 447, sTitle + "MAX");
 			oTable.setFirstVisibleRow(0);
 			await oTable.qunit.vScrolled();
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 0, 0, 0, sTitle + "0");
+			this.assertPosition(assert, 0, 0, 0, sTitle + "0");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -2298,19 +2276,18 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll by setting FirstVisibleRow; Small data; Fixed row heights", async function(assert) {
-		const that = this;
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow();
 		const iMaxScrollTop = this.getMaxScrollTop();
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode
 			});
 			const sTitle = mConfig.rowMode + ", FirstVisibleRow set to ";
@@ -2318,27 +2295,27 @@ sap.ui.define([
 			await oTable.qunit.rendered();
 			oTable.setFirstVisibleRow(1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 1, that.iBaseRowHeight, 0, sTitle + "1");
+			this.assertPosition(assert, 1, this.iBaseRowHeight, 0, sTitle + "1");
 			oTable.setFirstVisibleRow(33);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 33, 33 * that.iBaseRowHeight, 0, sTitle + "33");
+			this.assertPosition(assert, 33, 33 * this.iBaseRowHeight, 0, sTitle + "33");
 			oTable.setFirstVisibleRow(iMaxFirstVisibleRow);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, sTitle + "MAX");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, sTitle + "MAX");
 			oTable.setFirstVisibleRow(iMaxFirstVisibleRow - 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - that.iBaseRowHeight, 0, sTitle + "MAX - 1");
+			this.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - this.iBaseRowHeight, 0, sTitle + "MAX - 1");
 			oTable.setFirstVisibleRow(0);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 0, 0, 0, sTitle + "0");
-			await oTable.qunit.scrollVSbTo(2 * that.iBaseRowHeight + 10);
-			that.assertPosition(assert, 2, 2 * that.iBaseRowHeight + 10, 0,
-			mConfig.rowMode + ", Scrolled to FirstVisibleRow = 2 by setting ScrollTop");
+			this.assertPosition(assert, 0, 0, 0, sTitle + "0");
+			await oTable.qunit.scrollVSbTo(2 * this.iBaseRowHeight + 10);
+			this.assertPosition(assert, 2, 2 * this.iBaseRowHeight + 10, 0,
+				mConfig.rowMode + ", Scrolled to FirstVisibleRow = 2 by setting ScrollTop");
 			oTable.setFirstVisibleRow(2);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 2, 2 * that.iBaseRowHeight, 0, sTitle + "2");
+			this.assertPosition(assert, 2, 2 * this.iBaseRowHeight, 0, sTitle + "2");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -2346,20 +2323,19 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll by setting FirstVisibleRow; Small data; Variable row heights", async function(assert) {
-		const that = this;
 		const iMaxFirstRenderedRow = this.getMaxFirstRenderedRow();
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(null, true);
 		const iMaxScrollTop = this.getMaxScrollTop(null, true);
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				_bVariableRowHeightEnabled: true
 			});
@@ -2368,39 +2344,39 @@ sap.ui.define([
 			await oTable.qunit.rendered();
 			oTable.setFirstVisibleRow(1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 1, that.iBaseRowHeight, 0, sTitle + "1");
+			this.assertPosition(assert, 1, this.iBaseRowHeight, 0, sTitle + "1");
 			oTable.setFirstVisibleRow(33);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 33, 33 * that.iBaseRowHeight, 0, sTitle + "33");
+			this.assertPosition(assert, 33, 33 * this.iBaseRowHeight, 0, sTitle + "33");
 			oTable.setFirstVisibleRow(iMaxFirstRenderedRow);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iMaxFirstRenderedRow, iMaxFirstRenderedRow * that.iBaseRowHeight, 0,
-			sTitle + "Max first rendered row index");
+			this.assertPosition(assert, iMaxFirstRenderedRow, iMaxFirstRenderedRow * this.iBaseRowHeight, 0,
+				sTitle + "Max first rendered row index");
 			oTable.setFirstVisibleRow(iMaxFirstRenderedRow + 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iMaxFirstRenderedRow + 1, 4383, 150,
-			sTitle + "Max first rendered row index + 1");
+			this.assertPosition(assert, iMaxFirstRenderedRow + 1, 4383, 150,
+				sTitle + "Max first rendered row index + 1");
 			oTable.setFirstVisibleRow(iMaxFirstRenderedRow + 2);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iMaxFirstRenderedRow + 2, 4391, that.iBaseRowHeight + 150,
-			sTitle + "Max first rendered row index + 2");
-			oTable.setFirstVisibleRow(that.mDefaultSettings.bindingLength - 2);
+			this.assertPosition(assert, iMaxFirstRenderedRow + 2, 4391, this.iBaseRowHeight + 150,
+				sTitle + "Max first rendered row index + 2");
+			oTable.setFirstVisibleRow(this.mDefaultSettings.bindingLength - 2);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, sTitle + "MAX - 1");
-			oTable.setFirstVisibleRow(that.mDefaultSettings.bindingLength - 1);
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, sTitle + "MAX - 1");
+			oTable.setFirstVisibleRow(this.mDefaultSettings.bindingLength - 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, sTitle + "MAX");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, sTitle + "MAX");
 			oTable.setFirstVisibleRow(0);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 0, 0, 0, sTitle + "0");
-			await oTable.qunit.scrollVSbTo(2 * that.iBaseRowHeight + 10);
-			that.assertPosition(assert, 2, 2 * that.iBaseRowHeight + 10, 10,
-			mConfig.rowMode + ", Scrolled to FirstVisibleRow = 2 by setting ScrollTop");
+			this.assertPosition(assert, 0, 0, 0, sTitle + "0");
+			await oTable.qunit.scrollVSbTo(2 * this.iBaseRowHeight + 10);
+			this.assertPosition(assert, 2, 2 * this.iBaseRowHeight + 10, 10,
+				mConfig.rowMode + ", Scrolled to FirstVisibleRow = 2 by setting ScrollTop");
 			oTable.setFirstVisibleRow(2);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 2, 2 * that.iBaseRowHeight, 0, sTitle + "2");
+			this.assertPosition(assert, 2, 2 * this.iBaseRowHeight, 0, sTitle + "2");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -2408,21 +2384,20 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll by setting FirstVisibleRow; Large data; Fixed row heights", async function(assert) {
-		const that = this;
 		const iBindingLength = 1000000000;
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(iBindingLength);
 		const iMaxScrollTop = this.getMaxScrollTop(iBindingLength);
 		const iMiddleFirstVisibleRow = Math.floor((Math.round(iMaxScrollTop / 2) / iMaxScrollTop) * iMaxFirstVisibleRow);
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: iBindingLength
 			});
@@ -2431,28 +2406,28 @@ sap.ui.define([
 			await oTable.qunit.rendered();
 			oTable.setFirstVisibleRow(1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 1, 1, 0, sTitle + "1");
+			this.assertPosition(assert, 1, 1, 0, sTitle + "1");
 			oTable.setFirstVisibleRow(500000000);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 500000000, Math.round(iMaxScrollTop / 2), 0, sTitle + "500000000");
+			this.assertPosition(assert, 500000000, Math.round(iMaxScrollTop / 2), 0, sTitle + "500000000");
 			oTable.setFirstVisibleRow(iMaxFirstVisibleRow);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, sTitle + "MAX");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, sTitle + "MAX");
 			oTable.setFirstVisibleRow(iMaxFirstVisibleRow - 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 1, 0, sTitle + "MAX - 1");
+			this.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 1, 0, sTitle + "MAX - 1");
 			oTable.setFirstVisibleRow(0);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 0, 0, 0, sTitle + "0");
+			this.assertPosition(assert, 0, 0, 0, sTitle + "0");
 			await oTable.qunit.scrollVSbTo(Math.round(iMaxScrollTop / 2));
 			// Scrolltop of iMaxScrollTop / 2 does not exactly match row 500000000 (ScrollExtensions internal float vs browsers scrolltop integer)
-			that.assertPosition(assert, iMiddleFirstVisibleRow, Math.round(iMaxScrollTop / 2), 0,
-			mConfig.rowMode + ", Scrolled to FirstVisibleRow = " + iMiddleFirstVisibleRow + " by setting ScrollTop");
+			this.assertPosition(assert, iMiddleFirstVisibleRow, Math.round(iMaxScrollTop / 2), 0,
+				mConfig.rowMode + ", Scrolled to FirstVisibleRow = " + iMiddleFirstVisibleRow + " by setting ScrollTop");
 			oTable.setFirstVisibleRow(iMiddleFirstVisibleRow);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iMiddleFirstVisibleRow, Math.round(iMaxScrollTop / 2), 0, sTitle + iMiddleFirstVisibleRow);
+			this.assertPosition(assert, iMiddleFirstVisibleRow, Math.round(iMaxScrollTop / 2), 0, sTitle + iMiddleFirstVisibleRow);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -2460,21 +2435,20 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll by setting FirstVisibleRow; Large data; Variable row heights", async function(assert) {
-		const that = this;
 		const iBindingLength = 1000000000;
 		const iMaxFirstRenderedRow = this.getMaxFirstRenderedRow(iBindingLength);
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(iBindingLength, true);
 		const iMaxScrollTop = this.getMaxScrollTop(iBindingLength, true);
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: iBindingLength,
 				_bVariableRowHeightEnabled: true
@@ -2484,38 +2458,38 @@ sap.ui.define([
 			await oTable.qunit.rendered();
 			oTable.setFirstVisibleRow(1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 1, 1, 0, sTitle + "1");
+			this.assertPosition(assert, 1, 1, 0, sTitle + "1");
 			oTable.setFirstVisibleRow(500000000);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 500000000, 499706, 0, sTitle + "500000000");
+			this.assertPosition(assert, 500000000, 499706, 0, sTitle + "500000000");
 			oTable.setFirstVisibleRow(iMaxFirstRenderedRow);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iMaxFirstRenderedRow, 999412, 0, sTitle + "Max first rendered row index");
+			this.assertPosition(assert, iMaxFirstRenderedRow, 999412, 0, sTitle + "Max first rendered row index");
 			oTable.setFirstVisibleRow(iMaxFirstRenderedRow + 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iMaxFirstRenderedRow + 1, 999434, 150, sTitle + "Max first rendered row index + 1");
+			this.assertPosition(assert, iMaxFirstRenderedRow + 1, 999434, 150, sTitle + "Max first rendered row index + 1");
 			oTable.setFirstVisibleRow(iMaxFirstRenderedRow + 2);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iMaxFirstRenderedRow + 2, 999442, that.iBaseRowHeight + 150,
-			sTitle + "Max first rendered row index + 2");
+			this.assertPosition(assert, iMaxFirstRenderedRow + 2, 999442, this.iBaseRowHeight + 150,
+				sTitle + "Max first rendered row index + 2");
 			oTable.setFirstVisibleRow(iBindingLength - 2);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, sTitle + "MAX - 1");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, sTitle + "MAX - 1");
 			oTable.setFirstVisibleRow(iBindingLength - 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, sTitle + "MAX");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, sTitle + "MAX");
 			oTable.setFirstVisibleRow(0);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 0, 0, 0, sTitle + "0");
+			this.assertPosition(assert, 0, 0, 0, sTitle + "0");
 			await oTable.qunit.scrollVSbTo(Math.round(iMaxScrollTop / 2));
 			// Scrolltop of iMaxScrollTop / 2 does not exactly match row 500000000 (ScrollExtensions internal float vs browsers scrolltop integer)
-			that.assertPosition(assert, 500049023, Math.round(iMaxScrollTop / 2), 124,
-			mConfig.rowMode + ", Scrolled to FirstVisibleRow = 500049023 by setting ScrollTop");
+			this.assertPosition(assert, 500049023, Math.round(iMaxScrollTop / 2), 124,
+				mConfig.rowMode + ", Scrolled to FirstVisibleRow = 500049023 by setting ScrollTop");
 			oTable.setFirstVisibleRow(500049023);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 500049023, Math.round(iMaxScrollTop / 2), 0, sTitle + "500049023");
+			this.assertPosition(assert, 500049023, Math.round(iMaxScrollTop / 2), 0, sTitle + "500049023");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -2523,29 +2497,28 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll by setting FirstVisibleRow when re-rendering; Small data; Fixed row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode
 			});
 
 			await oTable.qunit.rendered();
 			TableQUnitUtils.addDelegateOnce(oTable, "onBeforeRendering", function() {
-			oTable.setFirstVisibleRow(1);
+				oTable.setFirstVisibleRow(1);
 			});
 			oTable.invalidate();
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
+			this.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -2553,30 +2526,29 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll by setting FirstVisibleRow when re-rendering; Small data; Variable row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				_bVariableRowHeightEnabled: true
 			});
 
 			await oTable.qunit.rendered();
 			TableQUnitUtils.addDelegateOnce(oTable, "onBeforeRendering", function() {
-			oTable.setFirstVisibleRow(1);
+				oTable.setFirstVisibleRow(1);
 			});
 			oTable.invalidate();
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
+			this.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -2584,27 +2556,26 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll by setting FirstVisibleRow when binding refresh; Small data; Fixed row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode
 			});
 
 			await oTable.qunit.rendered();
-			that.fakeODataBindingRefresh();
+			this.fakeODataBindingRefresh();
 			oTable.setFirstVisibleRow(1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
+			this.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -2612,28 +2583,27 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll by setting FirstVisibleRow when binding refresh; Small data; Variable row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				_bVariableRowHeightEnabled: true
 			});
 
 			await oTable.qunit.rendered();
-			that.fakeODataBindingRefresh();
+			this.fakeODataBindingRefresh();
 			oTable.setFirstVisibleRow(1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
+			this.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -2641,17 +2611,16 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll by setting FirstVisibleRow before being bound; Small data; Fixed row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				models: undefined,
 				rowMode: mConfig.rowMode
 			});
@@ -2659,11 +2628,11 @@ sap.ui.define([
 			await oTable.qunit.rendered();
 			oTable.setFirstVisibleRow(1);
 			await oTable.qunit.rendered();
-			oTable.setModel(that.mDefaultSettings.models);
+			oTable.setModel(this.mDefaultSettings.models);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
+			this.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -2671,17 +2640,16 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll by setting FirstVisibleRow before being bound; Small data; Variable row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				models: undefined,
 				rowMode: mConfig.rowMode,
 				_bVariableRowHeightEnabled: true
@@ -2690,11 +2658,11 @@ sap.ui.define([
 			await oTable.qunit.rendered();
 			oTable.setFirstVisibleRow(1);
 			await oTable.qunit.rendered();
-			oTable.setModel(that.mDefaultSettings.models);
+			oTable.setModel(this.mDefaultSettings.models);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
+			this.assertPosition(assert, 1, 49, 0, mConfig.rowMode + ", FirstVisibleRow = 1");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -2702,102 +2670,99 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll with mouse wheel; Small data; Fixed row heights", async function(assert) {
-		const that = this;
 		const oTable = this.createTable();
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow();
 		const iMaxScrollTop = this.getMaxScrollTop();
 
-		function scrollWithMouseWheel(iScrollDelta, iDeltaMode) {
-			return async function() {
+		const scrollWithMouseWheel = (iScrollDelta, iDeltaMode) => {
+			return async () => {
 				oTable.qunit.getDataCell(0, 0).dispatchEvent(TableQUnitUtils.createMouseWheelEvent(iScrollDelta, iDeltaMode, false));
-				await that.oTable.qunit.vScrolled();
+				await this.oTable.qunit.vScrolled();
 				await oTable.qunit.rendered();
 			};
-		}
+		};
 
 		await oTable.qunit.rendered();
 		await scrollWithMouseWheel(20, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, 1, that.iBaseRowHeight, 0, "Scrolled 20 pixels down");
+		this.assertPosition(assert, 1, this.iBaseRowHeight, 0, "Scrolled 20 pixels down");
 		await scrollWithMouseWheel(2, MouseWheelDeltaMode.LINE)();
-		that.assertPosition(assert, 3, 3 * that.iBaseRowHeight, 0, "Scrolled 2 rows down");
+		this.assertPosition(assert, 3, 3 * this.iBaseRowHeight, 0, "Scrolled 2 rows down");
 		await scrollWithMouseWheel(2, MouseWheelDeltaMode.PAGE)();
-		that.assertPosition(assert, 23, 23 * that.iBaseRowHeight, 0, "Scrolled 2 pages down");
+		this.assertPosition(assert, 23, 23 * this.iBaseRowHeight, 0, "Scrolled 2 pages down");
 		await scrollWithMouseWheel(9999999, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, "Scrolled to the bottom");
+		this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, "Scrolled to the bottom");
 		await scrollWithMouseWheel(-20, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - that.iBaseRowHeight, 0, "Scrolled 20 pixels up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - this.iBaseRowHeight, 0, "Scrolled 20 pixels up");
 		await scrollWithMouseWheel(-2, MouseWheelDeltaMode.LINE)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 3, iMaxScrollTop - (3 * that.iBaseRowHeight), 0, "Scrolled 2 rows up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 3, iMaxScrollTop - (3 * this.iBaseRowHeight), 0, "Scrolled 2 rows up");
 		await scrollWithMouseWheel(-2, MouseWheelDeltaMode.PAGE)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 23, iMaxScrollTop - (23 * that.iBaseRowHeight), 0, "Scrolled 2 pages up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 23, iMaxScrollTop - (23 * this.iBaseRowHeight), 0, "Scrolled 2 pages up");
 		await scrollWithMouseWheel(-9999999, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
+		this.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
 
 	});
 
 	QUnit.test("Scroll with mouse wheel; Small data; Variable row heights", async function(assert) {
-		const that = this;
 		const oTable = this.createTable({
 			_bVariableRowHeightEnabled: true
 		});
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(null, true);
 		const iMaxScrollTop = this.getMaxScrollTop(null, true);
 
-		function scrollWithMouseWheel(iScrollDelta, iDeltaMode) {
-			return async function() {
+		const scrollWithMouseWheel = (iScrollDelta, iDeltaMode) => {
+			return async () => {
 				oTable.qunit.getDataCell(0, 0).dispatchEvent(TableQUnitUtils.createMouseWheelEvent(iScrollDelta, iDeltaMode, false));
-				await that.oTable.qunit.vScrolled();
+				await this.oTable.qunit.vScrolled();
 				await oTable.qunit.rendered();
 			};
-		}
+		};
 
 		await oTable.qunit.rendered();
 		await scrollWithMouseWheel(60, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, 1, that.iBaseRowHeight, 0, "Scrolled 60 pixels down");
+		this.assertPosition(assert, 1, this.iBaseRowHeight, 0, "Scrolled 60 pixels down");
 		await scrollWithMouseWheel(20, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, 2, 2 * that.iBaseRowHeight, 0, "Scrolled 20 pixels down");
+		this.assertPosition(assert, 2, 2 * this.iBaseRowHeight, 0, "Scrolled 20 pixels down");
 		await oTable.qunit.scrollVSbBy(1);
-		that.assertPosition(assert, 2, 2 * that.iBaseRowHeight + 1, 1, "Scrolled 1 pixel down with the scrollbar");
+		this.assertPosition(assert, 2, 2 * this.iBaseRowHeight + 1, 1, "Scrolled 1 pixel down with the scrollbar");
 		await scrollWithMouseWheel(2, MouseWheelDeltaMode.LINE)();
-		that.assertPosition(assert, 4, 4 * that.iBaseRowHeight + 1, 1, "Scrolled 2 rows down");
+		this.assertPosition(assert, 4, 4 * this.iBaseRowHeight + 1, 1, "Scrolled 2 rows down");
 		await scrollWithMouseWheel(2, MouseWheelDeltaMode.PAGE)();
-		that.assertPosition(assert, 24, 24 * that.iBaseRowHeight + 1, 1, "Scrolled 2 pages down");
+		this.assertPosition(assert, 24, 24 * this.iBaseRowHeight + 1, 1, "Scrolled 2 pages down");
 		await scrollWithMouseWheel(9999999, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, "Scrolled to the bottom");
+		this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, "Scrolled to the bottom");
 		await scrollWithMouseWheel(-1, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 1, 4450, 597, "Scrolled 1 pixel up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 1, 4450, 597, "Scrolled 1 pixel up");
 		await scrollWithMouseWheel(-20, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 2, 4428, 447, "Scrolled 20 pixels up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 2, 4428, 447, "Scrolled 20 pixels up");
 		await scrollWithMouseWheel(-2, MouseWheelDeltaMode.LINE)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 4, 4398, 248, "Scrolled 2 rows up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 4, 4398, 248, "Scrolled 2 rows up");
 		await scrollWithMouseWheel(15, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 3, 4421, 398, "Scrolled 15 pixels down");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 3, 4421, 398, "Scrolled 15 pixels down");
 		await scrollWithMouseWheel(-16, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 4, 4398, 248, "Scrolled 16 pixels up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 4, 4398, 248, "Scrolled 16 pixels up");
 		await scrollWithMouseWheel(-1, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 5, 4391, 199, "Scrolled 1 pixel up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 5, 4391, 199, "Scrolled 1 pixel up");
 		await scrollWithMouseWheel(-100, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 7, (iMaxFirstVisibleRow - 6) * that.iBaseRowHeight, 49, "Scrolled 100 pixels up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 7, (iMaxFirstVisibleRow - 6) * this.iBaseRowHeight, 49, "Scrolled 100 pixels up");
 		await scrollWithMouseWheel(-1, MouseWheelDeltaMode.LINE)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 8, 4279, 49, "Scrolled 1 row up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 8, 4279, 49, "Scrolled 1 row up");
 		await scrollWithMouseWheel(-1, MouseWheelDeltaMode.LINE)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 9, (iMaxFirstVisibleRow - 8) * that.iBaseRowHeight, 49, "Scrolled 1 row up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 9, (iMaxFirstVisibleRow - 8) * this.iBaseRowHeight, 49, "Scrolled 1 row up");
 		await scrollWithMouseWheel(-2, MouseWheelDeltaMode.PAGE)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 29, (iMaxFirstVisibleRow - 28) * that.iBaseRowHeight, 49, "Scrolled 2 pages up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 29, (iMaxFirstVisibleRow - 28) * this.iBaseRowHeight, 49, "Scrolled 2 pages up");
 		await scrollWithMouseWheel(-9999999, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
+		this.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
 
 	});
 
 	QUnit.test("Scroll with mouse wheel; Large data; Fixed row heights", async function(assert) {
-		const that = this;
 		const iBindingLength = 1000000000;
 		const oTable = this.createTable({
 			bindingLength: iBindingLength
@@ -2806,51 +2771,50 @@ sap.ui.define([
 		const iMaxScrollTop = this.getMaxScrollTop(iBindingLength);
 		const nPixelsPerRow = iMaxScrollTop / iMaxFirstVisibleRow;
 
-		function scrollWithMouseWheel(iScrollDelta, iDeltaMode) {
-			return function() {
+		const scrollWithMouseWheel = (iScrollDelta, iDeltaMode) => {
+			return () => {
 				oTable.qunit.getDataCell(0, 0).dispatchEvent(TableQUnitUtils.createMouseWheelEvent(iScrollDelta, iDeltaMode, false));
 				return Promise.race([
-					that.oTable.qunit.vScrolled().then(oTable.qunit.rendered),
-					that.oTable.qunit.nextRender()
+					this.oTable.qunit.vScrolled().then(oTable.qunit.rendered),
+					this.oTable.qunit.nextRender()
 				]);
 			};
-		}
+		};
 
 		await oTable.qunit.rendered();
-		await scrollWithMouseWheel(that.iBaseRowHeight - 1, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, 1, 1, 0, "Scrolled " + (that.iBaseRowHeight - 1) + " pixels down");
+		await scrollWithMouseWheel(this.iBaseRowHeight - 1, MouseWheelDeltaMode.PIXEL)();
+		this.assertPosition(assert, 1, 1, 0, "Scrolled " + (this.iBaseRowHeight - 1) + " pixels down");
 		await scrollWithMouseWheel(1, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, 2, 1, 0, "Scrolled 1 pixel down");
+		this.assertPosition(assert, 2, 1, 0, "Scrolled 1 pixel down");
 		await scrollWithMouseWheel(500000, MouseWheelDeltaMode.PIXEL)();
-		const iFirstVisibleRow1 = 2 + Math.floor(500000 / that.iBaseRowHeight);
-		that.assertPosition(assert, iFirstVisibleRow1, Math.round(iFirstVisibleRow1 * nPixelsPerRow), 0, "Scrolled 500000 pixels down");
+		const iFirstVisibleRow1 = 2 + Math.floor(500000 / this.iBaseRowHeight);
+		this.assertPosition(assert, iFirstVisibleRow1, Math.round(iFirstVisibleRow1 * nPixelsPerRow), 0, "Scrolled 500000 pixels down");
 		await scrollWithMouseWheel(2, MouseWheelDeltaMode.LINE)();
-		const iFirstVisibleRow2 = 4 + Math.floor(500000 / that.iBaseRowHeight);
-		that.assertPosition(assert, iFirstVisibleRow2, Math.round(iFirstVisibleRow2 * nPixelsPerRow), 0, "Scrolled 2 rows down");
+		const iFirstVisibleRow2 = 4 + Math.floor(500000 / this.iBaseRowHeight);
+		this.assertPosition(assert, iFirstVisibleRow2, Math.round(iFirstVisibleRow2 * nPixelsPerRow), 0, "Scrolled 2 rows down");
 		await scrollWithMouseWheel(2, MouseWheelDeltaMode.PAGE)();
-		const iFirstVisibleRow3 = 24 + Math.floor(500000 / that.iBaseRowHeight);
-		that.assertPosition(assert, iFirstVisibleRow3, Math.round(iFirstVisibleRow3 * nPixelsPerRow), 0, "Scrolled 2 pages down");
+		const iFirstVisibleRow3 = 24 + Math.floor(500000 / this.iBaseRowHeight);
+		this.assertPosition(assert, iFirstVisibleRow3, Math.round(iFirstVisibleRow3 * nPixelsPerRow), 0, "Scrolled 2 pages down");
 		await scrollWithMouseWheel(1000000000000, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, "Scrolled to the bottom");
-		await scrollWithMouseWheel(-(that.iBaseRowHeight - 1), MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 1, 0, "Scrolled " + (that.iBaseRowHeight - 1) + " pixels up");
+		this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, "Scrolled to the bottom");
+		await scrollWithMouseWheel(-(this.iBaseRowHeight - 1), MouseWheelDeltaMode.PIXEL)();
+		this.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 1, 0, "Scrolled " + (this.iBaseRowHeight - 1) + " pixels up");
 		await scrollWithMouseWheel(-1, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 2, iMaxScrollTop - 1, 0, "Scrolled 1 pixel up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 2, iMaxScrollTop - 1, 0, "Scrolled 1 pixel up");
 		await scrollWithMouseWheel(-500000, MouseWheelDeltaMode.PIXEL)();
-		const iFirstVisibleRow4 = iMaxFirstVisibleRow - 2 - Math.floor(500000 / that.iBaseRowHeight);
-		that.assertPosition(assert, iFirstVisibleRow4, Math.round(iFirstVisibleRow4 * nPixelsPerRow), 0, "Scrolled 500000 pixels up");
+		const iFirstVisibleRow4 = iMaxFirstVisibleRow - 2 - Math.floor(500000 / this.iBaseRowHeight);
+		this.assertPosition(assert, iFirstVisibleRow4, Math.round(iFirstVisibleRow4 * nPixelsPerRow), 0, "Scrolled 500000 pixels up");
 		await scrollWithMouseWheel(-2, MouseWheelDeltaMode.LINE)();
-		const iFirstVisibleRow5 = iMaxFirstVisibleRow - 4 - Math.floor(500000 / that.iBaseRowHeight);
-		that.assertPosition(assert, iFirstVisibleRow5, Math.round(iFirstVisibleRow5 * nPixelsPerRow), 0, "Scrolled 2 rows up");
+		const iFirstVisibleRow5 = iMaxFirstVisibleRow - 4 - Math.floor(500000 / this.iBaseRowHeight);
+		this.assertPosition(assert, iFirstVisibleRow5, Math.round(iFirstVisibleRow5 * nPixelsPerRow), 0, "Scrolled 2 rows up");
 		await scrollWithMouseWheel(-2, MouseWheelDeltaMode.PAGE)();
-		const iFirstVisibleRow6 = iMaxFirstVisibleRow - 24 - Math.floor(500000 / that.iBaseRowHeight);
-		that.assertPosition(assert, iFirstVisibleRow6, Math.round(iFirstVisibleRow6 * nPixelsPerRow), 0, "Scrolled 2 pages up");
+		const iFirstVisibleRow6 = iMaxFirstVisibleRow - 24 - Math.floor(500000 / this.iBaseRowHeight);
+		this.assertPosition(assert, iFirstVisibleRow6, Math.round(iFirstVisibleRow6 * nPixelsPerRow), 0, "Scrolled 2 pages up");
 		await scrollWithMouseWheel(-1000000000000, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
+		this.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
 	});
 
 	QUnit.test("Scroll with mouse wheel when the table is inside a scrollable container", async function(assert) {
-		const that = this;
 		const iBindingLength = 20;
 		const oTable = this.createTable({
 			bindingLength: iBindingLength
@@ -2859,14 +2823,14 @@ sap.ui.define([
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(iBindingLength);
 		const iMaxScrollTop = this.getMaxScrollTop(iBindingLength);
 
-		async function scrollWithMouseWheel(iScrollDelta, iDeltaMode, bTableScrolls, bContainerScrolls) {
+		const scrollWithMouseWheel = async (iScrollDelta, iDeltaMode, bTableScrolls, bContainerScrolls) => {
 			const oEvent = TableQUnitUtils.createMouseWheelEvent(iScrollDelta, iDeltaMode, false);
 			const oPreventDefaultSpy = sinon.spy(oEvent, "preventDefault");
 			oTable.qunit.getDataCell(0, 0).dispatchEvent(oEvent);
 			if (bTableScrolls) {
 				await Promise.race([
-					that.oTable.qunit.vScrolled().then(oTable.qunit.rendered),
-					that.oTable.qunit.nextRender()
+					this.oTable.qunit.vScrolled().then(oTable.qunit.rendered),
+					this.oTable.qunit.nextRender()
 				]);
 				assert.ok(oPreventDefaultSpy.calledOnce, "Page scrolling is prevented");
 			} else {
@@ -2877,7 +2841,7 @@ sap.ui.define([
 					assert.ok(oPreventDefaultSpy.calledOnce, "Page scrolling is prevented");
 				}
 			}
-		}
+		};
 
 		function wait(iMilliseconds) {
 			return new Promise((resolve) => {
@@ -2887,22 +2851,21 @@ sap.ui.define([
 
 		await oTable.qunit.rendered();
 		await scrollWithMouseWheel(9999999, MouseWheelDeltaMode.PIXEL, true, false);
-		that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, "Scrolled to the bottom");
+		this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, "Scrolled to the bottom");
 		await scrollWithMouseWheel(20, MouseWheelDeltaMode.PIXEL, false, false);
-		that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, "The table is already scrolled to the bottom");
+		this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, "The table is already scrolled to the bottom");
 		await scrollWithMouseWheel(20, MouseWheelDeltaMode.PIXEL, false, true);
-		that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, "The table is already scrolled to the bottom");
+		this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, "The table is already scrolled to the bottom");
 		await scrollWithMouseWheel(-9999999, MouseWheelDeltaMode.PIXEL, true, false);
-		that.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
+		this.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
 		await scrollWithMouseWheel(-20, MouseWheelDeltaMode.PIXEL, false, false);
-		that.assertPosition(assert, 0, 0, 0, "The table is already scrolled to the top");
+		this.assertPosition(assert, 0, 0, 0, "The table is already scrolled to the top");
 		await scrollWithMouseWheel(-20, MouseWheelDeltaMode.PIXEL, false, true);
-		that.assertPosition(assert, 0, 0, 0, "The table is already scrolled to the top");
+		this.assertPosition(assert, 0, 0, 0, "The table is already scrolled to the top");
 
 	});
 
 	QUnit.test("Scroll with mouse wheel; Large data; Variable row heights", async function(assert) {
-		const that = this;
 		const iBindingLength = 1000000000;
 		const oTable = this.createTable({
 			bindingLength: iBindingLength,
@@ -2911,59 +2874,58 @@ sap.ui.define([
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(iBindingLength, true);
 		const iMaxScrollTop = this.getMaxScrollTop(iBindingLength, true);
 
-		function scrollWithMouseWheel(iScrollDelta, iDeltaMode) {
-			return function() {
+		const scrollWithMouseWheel = (iScrollDelta, iDeltaMode) => {
+			return () => {
 				oTable.qunit.getDataCell(0, 0).dispatchEvent(TableQUnitUtils.createMouseWheelEvent(iScrollDelta, iDeltaMode, false));
 				return Promise.race([
-					that.oTable.qunit.vScrolled().then(oTable.qunit.rendered),
-					that.oTable.qunit.nextRender()
+					this.oTable.qunit.vScrolled().then(oTable.qunit.rendered),
+					this.oTable.qunit.nextRender()
 				]);
 			};
-		}
+		};
 
 		await oTable.qunit.rendered();
-		await scrollWithMouseWheel(that.iBaseRowHeight - 1, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, 1, 1, 0, "Scrolled " + (that.iBaseRowHeight - 1) + " pixels down");
+		await scrollWithMouseWheel(this.iBaseRowHeight - 1, MouseWheelDeltaMode.PIXEL)();
+		this.assertPosition(assert, 1, 1, 0, "Scrolled " + (this.iBaseRowHeight - 1) + " pixels down");
 		await scrollWithMouseWheel(60, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, 2, 1, 0, "Scrolled 60 pixels down");
+		this.assertPosition(assert, 2, 1, 0, "Scrolled 60 pixels down");
 		await scrollWithMouseWheel(2, MouseWheelDeltaMode.LINE)();
-		that.assertPosition(assert, 4, 1, 0, "Scrolled 2 rows down");
+		this.assertPosition(assert, 4, 1, 0, "Scrolled 2 rows down");
 		await scrollWithMouseWheel(2, MouseWheelDeltaMode.PAGE)();
-		that.assertPosition(assert, 24, 1, 0, "Scrolled 2 pages down");
+		this.assertPosition(assert, 24, 1, 0, "Scrolled 2 pages down");
 		await scrollWithMouseWheel(1, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, 25, 1, 0, "Scrolled 1 pixels down");
+		this.assertPosition(assert, 25, 1, 0, "Scrolled 1 pixels down");
 		await scrollWithMouseWheel(5000000, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, 102065, 102, 0, "Scrolled 5000000 pixel down");
+		this.assertPosition(assert, 102065, 102, 0, "Scrolled 5000000 pixel down");
 		await scrollWithMouseWheel(1000000000000, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, "Scrolled to the bottom");
+		this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, "Scrolled to the bottom");
 		await scrollWithMouseWheel(-1, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 1, 999501, 597, "Scrolled 1 pixel up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 1, 999501, 597, "Scrolled 1 pixel up");
 		await scrollWithMouseWheel(-20, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 2, 999479, 447, "Scrolled 20 pixels up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 2, 999479, 447, "Scrolled 20 pixels up");
 		await scrollWithMouseWheel(-1, MouseWheelDeltaMode.LINE)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 3, 999472, 398, "Scrolled 1 row up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 3, 999472, 398, "Scrolled 1 row up");
 		await scrollWithMouseWheel(1, MouseWheelDeltaMode.LINE)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 2, 999479, 447, "Scrolled 1 row down");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 2, 999479, 447, "Scrolled 1 row down");
 		await scrollWithMouseWheel(-1, MouseWheelDeltaMode.PAGE)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 12, 999412, 49, "Scrolled 1 page up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 12, 999412, 49, "Scrolled 1 page up");
 		await scrollWithMouseWheel(15, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 11, 999412, 49, "Scrolled 15 pixels down");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 11, 999412, 49, "Scrolled 15 pixels down");
 		await scrollWithMouseWheel(-16, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 12, 999412, 49, "Scrolled 16 pixels up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 12, 999412, 49, "Scrolled 16 pixels up");
 		await scrollWithMouseWheel(-100, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 14, 999412, 49, "Scrolled 100 pixels up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 14, 999412, 49, "Scrolled 100 pixels up");
 		await scrollWithMouseWheel(-1, MouseWheelDeltaMode.LINE)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 15, 999412, 49, "Scrolled 1 row up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 15, 999412, 49, "Scrolled 1 row up");
 		await scrollWithMouseWheel(-2, MouseWheelDeltaMode.PAGE)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 35, 999412, 49, "Scrolled 2 pages up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 35, 999412, 49, "Scrolled 2 pages up");
 		await scrollWithMouseWheel(-5000000, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, 999897920, 999310, 49, "Scrolled 5000000 pixels up");
+		this.assertPosition(assert, 999897920, 999310, 49, "Scrolled 5000000 pixels up");
 		await scrollWithMouseWheel(-1000000000000, MouseWheelDeltaMode.PIXEL)();
-		that.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
+		this.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
 	});
 
 	QUnit.test("Handling of mouse wheel events that do scroll", async function(assert) {
-		const that = this;
 		const oTable = this.createTable({
 			fixedColumnCount: 1,
 			rowActionCount: 1,
@@ -2974,16 +2936,16 @@ sap.ui.define([
 		let oWheelEvent;
 		let oStopPropagationSpy;
 
-		async function test(mConfig) {
+		const test = async (mConfig) => {
 			await oTable.qunit.scrollVSbTo(0);
 			oWheelEvent = TableQUnitUtils.createMouseWheelEvent(20, MouseWheelDeltaMode.PIXEL, false);
 			oStopPropagationSpy = sinon.spy(oWheelEvent, "stopPropagation");
 			mConfig.element.dispatchEvent(oWheelEvent);
 			await oTable.qunit.vScrolled();
-			that.assertPosition(assert, 1, 49, 0, "Mouse Wheel - " + mConfig.name + ": Scrolled");
+			this.assertPosition(assert, 1, 49, 0, "Mouse Wheel - " + mConfig.name + ": Scrolled");
 			assert.ok(oWheelEvent.defaultPrevented, "Mouse Wheel - " + mConfig.name + ": Default action was prevented");
 			assert.ok(oStopPropagationSpy.calledOnce, "Mouse Wheel - " + mConfig.name + ": Propagation was stopped");
-		}
+		};
 
 		await oTable.qunit.rendered();
 
@@ -3003,8 +2965,6 @@ sap.ui.define([
 	});
 
 	QUnit.test("Handling of mouse wheel events that do not scroll", async function(assert) {
-		const that = this;
-
 		const oTable = this.createTable({
 			title: "test",
 			extension: [new HeightControl()],
@@ -3013,7 +2973,7 @@ sap.ui.define([
 			oTable.addColumn(new Column({template: new HeightControl()}));
 		});
 
-		async function test(mConfig) {
+		const test = async (mConfig) => {
 			const iScrollDelta = mConfig.scrollDelta == null ? 50 : mConfig.scrollDelta;
 			const oWheelEvent = TableQUnitUtils.createMouseWheelEvent(iScrollDelta, MouseWheelDeltaMode.PIXEL, false);
 			const oStopPropagationSpy = sinon.spy(oWheelEvent, "stopPropagation");
@@ -3023,11 +2983,11 @@ sap.ui.define([
 			mConfig.element.dispatchEvent(oWheelEvent);
 
 			await TableQUnitUtils.sleep(600);
-			that.assertPosition(assert, iExpectedFirstVisibleRow, iExpectedScrollTop, 0,
+			this.assertPosition(assert, iExpectedFirstVisibleRow, iExpectedScrollTop, 0,
 				"Mouse Wheel - " + mConfig.name + ": Not scrolled");
 			assert.ok(!oWheelEvent.defaultPrevented, "Mouse Wheel - " + mConfig.name + ": Default action was not prevented");
 			assert.ok(oStopPropagationSpy.notCalled, "Mouse Wheel - " + mConfig.name + ": Propagation was not stopped");
-		}
+		};
 
 		await oTable.qunit.rendered();
 
@@ -3060,7 +3020,6 @@ sap.ui.define([
 	});
 
 	QUnit.test("Scroll with touch; Small data; Fixed row heights", async function(assert) {
-		const that = this;
 		const bOriginalPointerSupport = Device.support.pointer;
 		const bOriginalTouchSupport = Device.support.touch;
 
@@ -3071,29 +3030,29 @@ sap.ui.define([
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow();
 		const iMaxScrollTop = this.getMaxScrollTop();
 
-		function scrollWithTouch(iScrollDelta) {
-			return async function() {
+		const scrollWithTouch = (iScrollDelta) => {
+			return async () => {
 				TableQUnitUtils.doTouchScrolling(0, iScrollDelta);
-				await that.oTable.qunit.vScrolled();
+				await this.oTable.qunit.vScrolled();
 				await oTable.qunit.rendered();
 			};
-		}
+		};
 
 		await oTable.qunit.rendered();
 		oTable.qunit.preventFocusOnTouch();
 		TableQUnitUtils.startTouchScrolling(oTable.qunit.getDataCell(0, 0));
 		await scrollWithTouch(20)();
-		that.assertPosition(assert, 0, 20, 0, "Scrolled 20 pixels down");
+		this.assertPosition(assert, 0, 20, 0, "Scrolled 20 pixels down");
 		await scrollWithTouch(30)();
-		that.assertPosition(assert, 1, 50, 0, "Scrolled 30 pixels down");
+		this.assertPosition(assert, 1, 50, 0, "Scrolled 30 pixels down");
 		await scrollWithTouch(-30)();
-		that.assertPosition(assert, 0, 20, 0, "Scrolled 30 pixels up");
+		this.assertPosition(assert, 0, 20, 0, "Scrolled 30 pixels up");
 		await scrollWithTouch(-100, true, "Scrolled to the top")();
-		that.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
+		this.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
 		await scrollWithTouch(iMaxScrollTop + 100, true, "Scrolled to the bottom")();
-		that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, "Scrolled to the bottom");
+		this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, "Scrolled to the bottom");
 		await scrollWithTouch(-50)();
-		that.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 30, 0, "Scrolled 30 pixels up");
+		this.assertPosition(assert, iMaxFirstVisibleRow - 1, iMaxScrollTop - 30, 0, "Scrolled 30 pixels up");
 		TableQUnitUtils.endTouchScrolling();
 
 		Device.support.pointer = bOriginalPointerSupport;
@@ -3101,7 +3060,6 @@ sap.ui.define([
 	});
 
 	QUnit.test("Scroll with touch; Small data; Variable row heights", async function(assert) {
-		const that = this;
 		const bOriginalPointerSupport = Device.support.pointer;
 		const bOriginalTouchSupport = Device.support.touch;
 
@@ -3114,33 +3072,33 @@ sap.ui.define([
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(null, true);
 		const iMaxScrollTop = this.getMaxScrollTop(null, true);
 
-		function scrollWithTouch(iScrollDelta) {
-			return async function() {
+		const scrollWithTouch = (iScrollDelta) => {
+			return async () => {
 				TableQUnitUtils.doTouchScrolling(0, iScrollDelta);
-				await that.oTable.qunit.vScrolled();
+				await this.oTable.qunit.vScrolled();
 				await oTable.qunit.rendered();
 			};
-		}
+		};
 
 		await oTable.qunit.rendered();
 		oTable.qunit.preventFocusOnTouch();
 		TableQUnitUtils.startTouchScrolling(oTable.qunit.getDataCell(0, 0));
 		await scrollWithTouch(20)();
-		that.assertPosition(assert, 0, 20, 20, "Scrolled 20 pixels down");
+		this.assertPosition(assert, 0, 20, 20, "Scrolled 20 pixels down");
 		await scrollWithTouch(30)();
-		that.assertPosition(assert, 1, 50, 3, "Scrolled 30 pixels down");
+		this.assertPosition(assert, 1, 50, 3, "Scrolled 30 pixels down");
 		await scrollWithTouch(-30)();
-		that.assertPosition(assert, 0, 20, 20, "Scrolled 30 pixels up");
+		this.assertPosition(assert, 0, 20, 20, "Scrolled 30 pixels up");
 		await scrollWithTouch(-100, true, "Scrolled to the top")();
-		that.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
+		this.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
 		await scrollWithTouch(4559, true, "Scrolled to the bottom")();
-		that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, "Scrolled to the bottom");
+		this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655, "Scrolled to the bottom");
 		await scrollWithTouch(-50)();
-		that.assertPosition(assert, 93, 4429, 454, "Scrolled 30 pixels up");
+		this.assertPosition(assert, 93, 4429, 454, "Scrolled 30 pixels up");
 		await scrollWithTouch(-100)();
-		that.assertPosition(assert, 88, 4329, 17, "Scrolled 100 pixels up");
+		this.assertPosition(assert, 88, 4329, 17, "Scrolled 100 pixels up");
 		await scrollWithTouch(-50)();
-		that.assertPosition(assert, 87, 4279, 49, "Scrolled 50 pixels up");
+		this.assertPosition(assert, 87, 4279, 49, "Scrolled 50 pixels up");
 		TableQUnitUtils.endTouchScrolling();
 
 		Device.support.pointer = bOriginalPointerSupport;
@@ -3148,7 +3106,6 @@ sap.ui.define([
 	});
 
 	QUnit.test("Scroll with touch; Large data; Fixed row heights;", async function(assert) {
-		const that = this;
 		const bOriginalPointerSupport = Device.support.pointer;
 		const bOriginalTouchSupport = Device.support.touch;
 
@@ -3165,36 +3122,36 @@ sap.ui.define([
 		const nSensitivityFactor = Math.max(0.002, Math.min(1, nScrollRangeRowFraction / this.iBaseRowHeight));
 		const iRowsPerPixel = iMaxFirstVisibleRow / iMaxScrollTop;
 
-		function scrollWithTouch(iScrollDelta) {
-			return async function() {
+		const scrollWithTouch = (iScrollDelta) => {
+			return async () => {
 				TableQUnitUtils.doTouchScrolling(0, iScrollDelta);
-				await that.oTable.qunit.vScrolled();
+				await this.oTable.qunit.vScrolled();
 				await oTable.qunit.rendered();
 			};
-		}
+		};
 
 		await oTable.qunit.rendered();
 		oTable.qunit.preventFocusOnTouch();
 		TableQUnitUtils.startTouchScrolling(oTable.qunit.getDataCell(0, 0));
 		await scrollWithTouch(500)();
 		const iScrollTop1 = Math.round(500 * nSensitivityFactor);
-		that.assertPosition(assert, Math.floor(iScrollTop1 * iRowsPerPixel), iScrollTop1, 0, "Scrolled 500 pixels down");
+		this.assertPosition(assert, Math.floor(iScrollTop1 * iRowsPerPixel), iScrollTop1, 0, "Scrolled 500 pixels down");
 		await scrollWithTouch(499500)();
 		const iScrollTop2 = Math.round(500000 * nSensitivityFactor);
-		that.assertPosition(assert, Math.floor(iScrollTop2 * iRowsPerPixel), iScrollTop2, 0, "Scrolled 499.500 pixels down");
+		this.assertPosition(assert, Math.floor(iScrollTop2 * iRowsPerPixel), iScrollTop2, 0, "Scrolled 499.500 pixels down");
 		await scrollWithTouch(-500000)();
-		that.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
+		this.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
 		await scrollWithTouch(iMaxScrollTop / nSensitivityFactor)();
-		that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, "Scrolled to the bottom");
+		this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0, "Scrolled to the bottom");
 		await scrollWithTouch(-50000)();
 		const iScrollTop3 = Math.round(iMaxScrollTop - 50000 * nSensitivityFactor);
 		// iRowsPerPixel can be very large here (~200): a 1px scrollbar slack amplifies into many rows.
-		that.assertPosition(assert, Math.floor(iScrollTop3 * iRowsPerPixel), iScrollTop3, 0, "Scrolled 50.000 pixels up",
-		Math.ceil(iRowsPerPixel));
+		this.assertPosition(assert, Math.floor(iScrollTop3 * iRowsPerPixel), iScrollTop3, 0, "Scrolled 50.000 pixels up",
+			Math.ceil(iRowsPerPixel));
 		await scrollWithTouch(-500000)();
 		const iScrollTop4 = Math.round(iMaxScrollTop - 550000 * nSensitivityFactor);
-		that.assertPosition(assert, Math.floor(iScrollTop4 * iRowsPerPixel), iScrollTop4, 0,
-		"Scrolled 500000 pixels up", Math.ceil(iRowsPerPixel));
+		this.assertPosition(assert, Math.floor(iScrollTop4 * iRowsPerPixel), iScrollTop4, 0,
+			"Scrolled 500000 pixels up", Math.ceil(iRowsPerPixel));
 		TableQUnitUtils.endTouchScrolling();
 
 		Device.support.pointer = bOriginalPointerSupport;
@@ -3202,7 +3159,6 @@ sap.ui.define([
 	});
 
 	QUnit.test("Scroll with touch; Large data; Variable row heights", async function(assert) {
-		const that = this;
 		const bOriginalPointerSupport = Device.support.pointer;
 		const bOriginalTouchSupport = Device.support.touch;
 
@@ -3225,35 +3181,35 @@ sap.ui.define([
 		const nSensitivityFactor = Math.max(0.002, Math.min(1, nScrollRangeRowFraction / this.iBaseRowHeight));
 
 		// Touch deltas are multiplied by the sensitivity factor to obtain the effective scrollbar position.
-		function scrollWithTouch(iScrollDelta) {
-			return async function() {
+		const scrollWithTouch = (iScrollDelta) => {
+			return async () => {
 				TableQUnitUtils.doTouchScrolling(0, iScrollDelta);
-				await that.oTable.qunit.vScrolled();
+				await this.oTable.qunit.vScrolled();
 				await oTable.qunit.rendered();
 			};
-		}
+		};
 
 		await oTable.qunit.rendered();
 		oTable.qunit.preventFocusOnTouch();
 		TableQUnitUtils.startTouchScrolling(oTable.qunit.getDataCell(0, 0));
 		await scrollWithTouch(500)();
 		const iScrollTop1 = Math.round(500 * nSensitivityFactor);
-		that.assertPosition(assert, Math.floor(iScrollTop1 / nScrollRangeRowFraction), iScrollTop1, 10, "Scrolled 500 pixels down");
+		this.assertPosition(assert, Math.floor(iScrollTop1 / nScrollRangeRowFraction), iScrollTop1, 10, "Scrolled 500 pixels down");
 		await scrollWithTouch(499500)();
 		const iScrollTop2 = Math.round(500000 * nSensitivityFactor);
-		that.assertPosition(assert, Math.floor(iScrollTop2 / nScrollRangeRowFraction), iScrollTop2, 8, "Scrolled 499500 pixels down");
+		this.assertPosition(assert, Math.floor(iScrollTop2 / nScrollRangeRowFraction), iScrollTop2, 8, "Scrolled 499500 pixels down");
 		await scrollWithTouch(-500000)();
-		that.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
+		this.assertPosition(assert, 0, 0, 0, "Scrolled to the top");
 		await scrollWithTouch(iMaxScrollTop / nSensitivityFactor)();
 		const iScrollTop3 = iMaxScrollTop;
-		that.assertPosition(assert, iMaxFirstVisibleRow, iScrollTop3, 655, "Scrolled to the bottom");
+		this.assertPosition(assert, iMaxFirstVisibleRow, iScrollTop3, 655, "Scrolled to the bottom");
 		await scrollWithTouch(-50000)();
 		const iScrollTop4 = Math.round((iMaxScrollTop / nSensitivityFactor - 50000) * nSensitivityFactor);
-		that.assertPosition(assert, Math.floor(iScrollTop4 / nScrollRangeRowFraction), iScrollTop4, 23, "Scrolled 50000 pixels up");
+		this.assertPosition(assert, Math.floor(iScrollTop4 / nScrollRangeRowFraction), iScrollTop4, 23, "Scrolled 50000 pixels up");
 		await scrollWithTouch(-500000)();
 		const iScrollTop5 = Math.round((iMaxScrollTop / nSensitivityFactor - 550000) * nSensitivityFactor);
-		that.assertPosition(assert, Math.floor(iScrollTop5 / nScrollRangeRowFraction), iScrollTop5, 49,
-		"Scrolled 550000 pixels up");
+		this.assertPosition(assert, Math.floor(iScrollTop5 / nScrollRangeRowFraction), iScrollTop5, 49,
+			"Scrolled 550000 pixels up");
 		TableQUnitUtils.endTouchScrolling();
 
 		Device.support.pointer = bOriginalPointerSupport;
@@ -3261,7 +3217,6 @@ sap.ui.define([
 	});
 
 	QUnit.test("Handling of touch events that do scroll", async function(assert) {
-		const that = this;
 		const bOriginalPointerSupport = Device.support.pointer;
 		const bOriginalTouchSupport = Device.support.touch;
 
@@ -3278,19 +3233,19 @@ sap.ui.define([
 		let oTouchMoveEvent;
 		let oStopPropagationSpy;
 
-		async function test(mConfig) {
+		const test = async (mConfig) => {
 			await oTable.qunit.scrollVSbTo(0);
 			TableQUnitUtils.startTouchScrolling(mConfig.element);
 			oTouchMoveEvent = TableQUnitUtils.doTouchScrolling(0, 20);
 			TableQUnitUtils.endTouchScrolling();
 			oStopPropagationSpy = sinon.spy(oTouchMoveEvent, "stopPropagation");
 			await oTable.qunit.vScrolled();
-			that.assertPositionWithMomentumScroll(assert, 0, 20, 0, "Touch - " + mConfig.name + ": Scrolled");
+			this.assertPositionWithMomentumScroll(assert, 0, 20, 0, "Touch - " + mConfig.name + ": Scrolled");
 			assert.ok(oTouchMoveEvent.defaultPrevented, "Touch - " + mConfig.name + ": Default action was prevented");
 			assert.ok(oStopPropagationSpy.notCalled, "Touch - " + mConfig.name + ": Propagation was not stopped");
 			TableQUnitUtils.startTouchScrolling(mConfig.element);
 			TableQUnitUtils.endTouchScrolling();
-		}
+		};
 
 		oTable.qunit.preventFocusOnTouch();
 
@@ -3312,7 +3267,7 @@ sap.ui.define([
 			}
 
 			await oTable.qunit.scrollVSbTo(0);
-			const iMaxScrollTop = that.getMaxScrollTop();
+			const iMaxScrollTop = this.getMaxScrollTop();
 
 			const testOutsideBoundaries = async (iScrollDelta) => {
 				oTouchMoveEvent = TableQUnitUtils.doTouchScrolling(0, iScrollDelta);
@@ -3337,7 +3292,6 @@ sap.ui.define([
 	});
 
 	QUnit.test("Handling of touch events that do not scroll", async function(assert) {
-		const that = this;
 		const bOriginalPointerSupport = Device.support.pointer;
 		const bOriginalTouchSupport = Device.support.touch;
 
@@ -3345,14 +3299,13 @@ sap.ui.define([
 		Device.support.touch = true;
 
 		const oTable = this.createTable({
-			title: "test",
 			extension: [new HeightControl()],
 			footer: new HeightControl()
 		}, function(oTable) {
 			oTable.addColumn(new Column({template: new HeightControl()}));
 		});
 
-		async function test(mConfig) {
+		const test = async (mConfig) => {
 			const iScrollDelta = mConfig.scrollDelta == null ? 50 : mConfig.scrollDelta;
 
 			if (mConfig.skipStartTouchScrolling !== true) {
@@ -3368,10 +3321,10 @@ sap.ui.define([
 			const iExpectedScrollTop = mConfig.scrollTop == null ? 0 : mConfig.scrollTop;
 
 			await TableQUnitUtils.sleep(100);
-			that.assertPosition(assert, iExpectedFirstVisibleRow, iExpectedScrollTop, 0, "Touch - " + mConfig.name + ": Not scrolled");
+			this.assertPosition(assert, iExpectedFirstVisibleRow, iExpectedScrollTop, 0, "Touch - " + mConfig.name + ": Not scrolled");
 			assert.ok(!oTouchMoveEvent.defaultPrevented, "Touch - " + mConfig.name + ": Default action was not prevented");
 			assert.ok(oStopPropagationSpy.notCalled, "Touch - " + mConfig.name + ": Propagation was not stopped");
-		}
+		};
 
 		oTable.qunit.preventFocusOnTouch();
 
@@ -3382,7 +3335,6 @@ sap.ui.define([
 			const aTestConfigs = [
 				{name: "Horizontal scrollbar", element: oTable._getScrollExtension().getHorizontalScrollbar()},
 				{name: "Column header container", element: oDomRef.querySelector(".sapUiTableColHdrCnt")},
-				{name: "Title container", element: oDomRef.querySelector(".sapUiTableHdr")},
 				{name: "Extension container", element: oDomRef.querySelector(".sapUiTableExt")},
 				{name: "Footer container", element: oDomRef.querySelector(".sapUiTableFtr")}
 			];
@@ -3426,19 +3378,18 @@ sap.ui.define([
 	});
 
 	QUnit.test("Scroll the viewport; Tiny data; Variable row heights", async function(assert) {
-		const that = this;
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(10, true);
 		const iMaxScrollTop = this.getMaxScrollTop(10, true);
 
-		function scrollViewport(iScrollTop) {
-			return function() {
-				that.oTable.getDomRef("tableCCnt").scrollTop = iScrollTop;
-				return that.oTable.qunit.vScrolled();
+		const scrollViewport = (iScrollTop) => {
+			return () => {
+				this.oTable.getDomRef("tableCCnt").scrollTop = iScrollTop;
+				return this.oTable.qunit.vScrolled();
 			};
-		}
+		};
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: 10,
 				_bVariableRowHeightEnabled: true
@@ -3446,16 +3397,16 @@ sap.ui.define([
 
 			await oTable.qunit.rendered();
 			await scrollViewport(100)();
-			that.assertPosition(assert, 1, 19, 100,
-			mConfig.rowMode + ", Scrolled viewport to 100");
+			this.assertPosition(assert, 1, 19, 100,
+				mConfig.rowMode + ", Scrolled viewport to 100");
 			await scrollViewport(1000)();
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655 - 150 + that.iBaseRowHeight,
-			mConfig.rowMode + "Scrolled viewport to MAX");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655 - 150 + this.iBaseRowHeight,
+				mConfig.rowMode + "Scrolled viewport to MAX");
 			await scrollViewport(0)();
-			that.assertPosition(assert, 0, 0, 0,
-			mConfig.rowMode + ", Scrolled viewport to 0");
+			this.assertPosition(assert, 0, 0, 0,
+				mConfig.rowMode + ", Scrolled viewport to 0");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -3463,53 +3414,52 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll the viewport; Small data; Variable row heights", async function(assert) {
-		const that = this;
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(null, true);
 		const iMaxFirstRenderedRow = this.getMaxFirstRenderedRow();
 		const iMaxScrollTop = this.getMaxScrollTop(null, true);
 
-		function scrollViewport(iScrollTop) {
-			return function() {
-				that.oTable.getDomRef("tableCCnt").scrollTop = iScrollTop;
-				return that.oTable.qunit.vScrolled();
+		const scrollViewport = (iScrollTop) => {
+			return () => {
+				this.oTable.getDomRef("tableCCnt").scrollTop = iScrollTop;
+				return this.oTable.qunit.vScrolled();
 			};
-		}
+		};
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				_bVariableRowHeightEnabled: true
 			});
 
 			await oTable.qunit.rendered();
 			await scrollViewport(100)();
-			that.assertPosition(assert, 1, 66, 100,
-			mConfig.rowMode + ", Scrolled viewport to 100 when scrolled to top");
+			this.assertPosition(assert, 1, 66, 100,
+				mConfig.rowMode + ", Scrolled viewport to 100 when scrolled to top");
 			await scrollViewport(1000)();
-			that.assertPosition(assert, 5, 280, 655 - 150 + that.iBaseRowHeight,
-			mConfig.rowMode + ", Scrolled viewport to MAX when scrolled to top");
+			this.assertPosition(assert, 5, 280, 655 - 150 + this.iBaseRowHeight,
+				mConfig.rowMode + ", Scrolled viewport to MAX when scrolled to top");
 			await scrollViewport(0)();
-			that.assertPosition(assert, 0, 0, 0,
-			mConfig.rowMode + ", Scrolled viewport to 0 when scrolled to top");
+			this.assertPosition(assert, 0, 0, 0,
+				mConfig.rowMode + ", Scrolled viewport to 0 when scrolled to top");
 			await oTable.qunit.scrollVSbTo(9999999);
 			await scrollViewport(180)();
-			that.assertPosition(assert, iMaxFirstRenderedRow + 1, 4388, 180,
-			mConfig.rowMode + ", Scrolled viewport to 100 when scrolled to bottom");
+			this.assertPosition(assert, iMaxFirstRenderedRow + 1, 4388, 180,
+				mConfig.rowMode + ", Scrolled viewport to 100 when scrolled to bottom");
 			await scrollViewport(1000)();
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655,
-			mConfig.rowMode + ", Scrolled viewport to MAX when scrolled to bottom");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655,
+				mConfig.rowMode + ", Scrolled viewport to MAX when scrolled to bottom");
 			await scrollViewport(0)();
-			that.assertPosition(assert, iMaxFirstRenderedRow, iMaxScrollTop - 98, 0,
-			mConfig.rowMode + ", Scrolled viewport to 0 when scrolled to bottom");
+			this.assertPosition(assert, iMaxFirstRenderedRow, iMaxScrollTop - 98, 0,
+				mConfig.rowMode + ", Scrolled viewport to 0 when scrolled to bottom");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -3517,33 +3467,32 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll the viewport; Large data; Variable row heights", async function(assert) {
-		const that = this;
 		const iBindingLength = 1000000000;
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(iBindingLength, true);
 		const iMaxFirstRenderedRow = this.getMaxFirstRenderedRow(iBindingLength);
 		const iMaxScrollTop = this.getMaxScrollTop(iBindingLength, true);
 
-		function scrollViewport(iScrollTop, bExpectScrollbarScrolling) {
-			return function() {
-				that.oTable.getDomRef("tableCCnt").scrollTop = iScrollTop;
+		const scrollViewport = (iScrollTop, bExpectScrollbarScrolling) => {
+			return () => {
+				this.oTable.getDomRef("tableCCnt").scrollTop = iScrollTop;
 
 				if (bExpectScrollbarScrolling) {
-					return that.oTable.qunit.vScrolled();
+					return this.oTable.qunit.vScrolled();
 				} else {
-					return that.oTable.qunit.viewportScrolled();
+					return this.oTable.qunit.viewportScrolled();
 				}
 			};
-		}
+		};
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: iBindingLength,
 				_bVariableRowHeightEnabled: true
@@ -3551,26 +3500,26 @@ sap.ui.define([
 
 			await oTable.qunit.rendered();
 			await scrollViewport(100, true)();
-			that.assertPosition(assert, 1, 1, 100,
-			mConfig.rowMode + ", Scrolled viewport to 100 when scrolled to top");
+			this.assertPosition(assert, 1, 1, 100,
+				mConfig.rowMode + ", Scrolled viewport to 100 when scrolled to top");
 			await scrollViewport(1000, false)();
-			that.assertPosition(assert, 5, 1, 655 - 150 + that.iBaseRowHeight,
-			mConfig.rowMode + "Scrolled viewport to MAX when scrolled to top");
+			this.assertPosition(assert, 5, 1, 655 - 150 + this.iBaseRowHeight,
+				mConfig.rowMode + "Scrolled viewport to MAX when scrolled to top");
 			await scrollViewport(0, true)();
-			that.assertPosition(assert, 0, 0, 0,
-			mConfig.rowMode + ", Scrolled viewport to 0 when scrolled to top");
+			this.assertPosition(assert, 0, 0, 0,
+				mConfig.rowMode + ", Scrolled viewport to 0 when scrolled to top");
 			await oTable.qunit.scrollVSbTo(9999999);
 			await scrollViewport(180, true)();
-			that.assertPosition(assert, iMaxFirstRenderedRow + 1, 999439, 180,
-			mConfig.rowMode + ", Scrolled viewport to 100 when scrolled to bottom");
+			this.assertPosition(assert, iMaxFirstRenderedRow + 1, 999439, 180,
+				mConfig.rowMode + ", Scrolled viewport to 100 when scrolled to bottom");
 			await scrollViewport(1000, true)();
-			that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655,
-			mConfig.rowMode + "Scrolled viewport to MAX when scrolled to bottom");
+			this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655,
+				mConfig.rowMode + "Scrolled viewport to MAX when scrolled to bottom");
 			await scrollViewport(0, true)();
-			that.assertPosition(assert, iMaxFirstRenderedRow, iMaxScrollTop - 98, 0,
-			mConfig.rowMode + ", Scrolled viewport to 0 when scrolled to bottom");
+			this.assertPosition(assert, iMaxFirstRenderedRow, iMaxScrollTop - 98, 0,
+				mConfig.rowMode + ", Scrolled viewport to 0 when scrolled to bottom");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -3578,81 +3527,76 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Scroll row-wise with #scrollVertically; Small data; Fixed row heights", async function(assert) {
 		const oTable = this.createTable();
-		const that = this;
 
 		await this.oTable.qunit.rendered();
 		oTable._getScrollExtension().scrollVertically(true, false);
 		await oTable.qunit.rendered();
-		that.assertPosition(assert, 1, that.iBaseRowHeight, 0);
+		this.assertPosition(assert, 1, this.iBaseRowHeight, 0);
 		oTable._getScrollExtension().scrollVertically(false, false);
 		await oTable.qunit.rendered();
-		that.assertPosition(assert, 0, 0, 0);
+		this.assertPosition(assert, 0, 0, 0);
 	});
 
 	QUnit.test("Scroll row-wise with #scrollVertically; Small data; Variable row heights", async function(assert) {
 		const oTable = this.createTable({
 			_bVariableRowHeightEnabled: true
 		});
-		const that = this;
 
 		await this.oTable.qunit.rendered();
 		oTable._getScrollExtension().scrollVertically(true, false);
 		await oTable.qunit.rendered();
-		that.assertPosition(assert, 7, 362, 655);
+		this.assertPosition(assert, 7, 362, 655);
 		oTable._getScrollExtension().scrollVertically(false, false);
 		await oTable.qunit.rendered();
-		that.assertPosition(assert, 0, 0, 0);
+		this.assertPosition(assert, 0, 0, 0);
 	});
 
 	QUnit.test("Scroll page-wise with #scrollVertically; Small data; Fixed row heights", async function(assert) {
 		const oTable = this.createTable();
-		const that = this;
 
 		await this.oTable.qunit.rendered();
 		oTable._getScrollExtension().scrollVertically(true, true);
 		await oTable.qunit.rendered();
-		that.assertPosition(assert, 10, 490, 0);
+		this.assertPosition(assert, 10, 490, 0);
 		oTable._getScrollExtension().scrollVertically(false, true);
 		await oTable.qunit.rendered();
-		that.assertPosition(assert, 0, 0, 0);
+		this.assertPosition(assert, 0, 0, 0);
 	});
 
 	QUnit.test("Scroll page-wise with #scrollVertically; Small data; Variable row heights", async function(assert) {
 		const oTable = this.createTable({
 			_bVariableRowHeightEnabled: true
 		});
-		const that = this;
 
 		await this.oTable.qunit.rendered();
 		oTable._getScrollExtension().scrollVertically(true, true);
 		await oTable.qunit.rendered();
-		that.assertPosition(assert, 17, 852, 655);
+		this.assertPosition(assert, 17, 852, 655);
 		oTable._getScrollExtension().scrollVertically(false, true);
 		await oTable.qunit.rendered();
-		that.assertPosition(assert, 0, 0, 0);
+		this.assertPosition(assert, 0, 0, 0);
 	});
 
 	QUnit.test("Scroll to top and bottom with #scrollVerticallyMax; Small data; Fixed row heights", async function(assert) {
 		const oTable = this.createTable();
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow();
 		const iMaxScrollTop = this.getMaxScrollTop();
-		const that = this;
 
 		await this.oTable.qunit.rendered();
 		oTable._getScrollExtension().scrollVerticallyMax(true);
 		await oTable.qunit.rendered();
-		that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0);
+		this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 0);
 		oTable._getScrollExtension().scrollVerticallyMax(false);
 		await oTable.qunit.rendered();
-		that.assertPosition(assert, 0, 0, 0);
+		this.assertPosition(assert, 0, 0, 0);
 	});
 
 	QUnit.test("Scroll to top and bottom with #scrollVerticallyMax; Small data; Variable row heights", async function(assert) {
@@ -3661,22 +3605,20 @@ sap.ui.define([
 		});
 		const iMaxFirstVisibleRow = this.getMaxFirstVisibleRow(null, true);
 		const iMaxScrollTop = this.getMaxScrollTop(null, true);
-		const that = this;
 
 		await this.oTable.qunit.rendered();
 		oTable._getScrollExtension().scrollVerticallyMax(true);
 		await oTable.qunit.rendered();
-		that.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655);
+		this.assertPosition(assert, iMaxFirstVisibleRow, iMaxScrollTop, 655);
 		oTable._getScrollExtension().scrollVerticallyMax(false);
 		await oTable.qunit.rendered();
-		that.assertPosition(assert, 0, 0, 0);
+		this.assertPosition(assert, 0, 0, 0);
 	});
 
 	QUnit.test("Restore scroll position after setting ScrollTop; Tiny data; Variable row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: 10,
 				_bVariableRowHeightEnabled: true
@@ -3684,9 +3626,9 @@ sap.ui.define([
 
 			await oTable.qunit.rendered();
 			await oTable.qunit.scrollVSbTo(mConfig.scrollTop);
-			await that.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
+			await this.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -3694,34 +3636,33 @@ sap.ui.define([
 		});
 		for (let i = 0; i < aRowModeConfigs.length; i++) {
 			await test({
-					title: "ScrollTop = 1",
-					scrollTop: 1
-				});
+				title: "ScrollTop = 1",
+				scrollTop: 1
+			});
 			await test({
-					title: "ScrollTop = 50",
-					scrollTop: 50
-				});
+				title: "ScrollTop = 50",
+				scrollTop: 50
+			});
 			await test({
-					title: "ScrollTop = MAX",
-					scrollTop: 9999999
-				});
+				title: "ScrollTop = MAX",
+				scrollTop: 9999999
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after setting ScrollTop; Small data; Fixed row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode
 			});
 
 			await oTable.qunit.rendered();
 			await oTable.qunit.scrollVSbTo(mConfig.scrollTop);
-			await that.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
+			await this.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -3729,43 +3670,42 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "ScrollTop = 1",
-					rowMode: oRowModeConfig.rowMode,
-					scrollTop: 1
-				});
+				title: "ScrollTop = 1",
+				rowMode: oRowModeConfig.rowMode,
+				scrollTop: 1
+			});
 			await test({
-					title: "ScrollTop = 123",
-					rowMode: oRowModeConfig.rowMode,
-					scrollTop: 123
-				});
+				title: "ScrollTop = 123",
+				rowMode: oRowModeConfig.rowMode,
+				scrollTop: 123
+			});
 			await test({
-					title: "ScrollTop = MAX",
-					rowMode: oRowModeConfig.rowMode,
-					scrollTop: 9999999
-				});
+				title: "ScrollTop = MAX",
+				rowMode: oRowModeConfig.rowMode,
+				scrollTop: 9999999
+			});
 			await test({
-					title: "ScrollTop = MAX - 1",
-					rowMode: oRowModeConfig.rowMode,
-					scrollTop: that.getMaxScrollTop() - 1
-				});
+				title: "ScrollTop = MAX - 1",
+				rowMode: oRowModeConfig.rowMode,
+				scrollTop: this.getMaxScrollTop() - 1
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after setting ScrollTop; Small data; Variable row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				_bVariableRowHeightEnabled: true
 			});
 
 			await oTable.qunit.rendered();
 			await oTable.qunit.scrollVSbTo(mConfig.scrollTop);
-			await that.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
+			await this.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -3773,43 +3713,42 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "ScrollTop = 1",
-					rowMode: oRowModeConfig.rowMode,
-					scrollTop: 1
-				});
+				title: "ScrollTop = 1",
+				rowMode: oRowModeConfig.rowMode,
+				scrollTop: 1
+			});
 			await test({
-					title: "ScrollTop = 123",
-					rowMode: oRowModeConfig.rowMode,
-					scrollTop: 123
-				});
+				title: "ScrollTop = 123",
+				rowMode: oRowModeConfig.rowMode,
+				scrollTop: 123
+			});
 			await test({
-					title: "ScrollTop = MAX",
-					rowMode: oRowModeConfig.rowMode,
-					scrollTop: 9999999
-				});
+				title: "ScrollTop = MAX",
+				rowMode: oRowModeConfig.rowMode,
+				scrollTop: 9999999
+			});
 			await test({
-					title: "ScrollTop = MAX - 1",
-					rowMode: oRowModeConfig.rowMode,
-					scrollTop: that.getMaxScrollTop() - 1
-				});
+				title: "ScrollTop = MAX - 1",
+				rowMode: oRowModeConfig.rowMode,
+				scrollTop: this.getMaxScrollTop() - 1
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after setting ScrollTop; Large data; Fixed row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: 1000000000
 			});
 
 			await oTable.qunit.rendered();
 			await oTable.qunit.scrollVSbTo(mConfig.scrollTop);
-			await that.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
+			await this.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -3817,34 +3756,33 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "ScrollTop = 1",
-					rowMode: oRowModeConfig.rowMode,
-					scrollTop: 1
-				});
+				title: "ScrollTop = 1",
+				rowMode: oRowModeConfig.rowMode,
+				scrollTop: 1
+			});
 			await test({
-					title: "ScrollTop = 500000",
-					rowMode: oRowModeConfig.rowMode,
-					scrollTop: 500000
-				});
+				title: "ScrollTop = 500000",
+				rowMode: oRowModeConfig.rowMode,
+				scrollTop: 500000
+			});
 			await test({
-					title: "ScrollTop = MAX",
-					rowMode: oRowModeConfig.rowMode,
-					scrollTop: 9999999
-				});
+				title: "ScrollTop = MAX",
+				rowMode: oRowModeConfig.rowMode,
+				scrollTop: 9999999
+			});
 			await test({
-					title: "ScrollTop = MAX - 1",
-					rowMode: oRowModeConfig.rowMode,
-					scrollTop: that.getMaxScrollTop(1000000000) - 1
-				});
+				title: "ScrollTop = MAX - 1",
+				rowMode: oRowModeConfig.rowMode,
+				scrollTop: this.getMaxScrollTop(1000000000) - 1
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after setting ScrollTop; Large data; Variable row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: 1000000000,
 				_bVariableRowHeightEnabled: true
@@ -3852,9 +3790,9 @@ sap.ui.define([
 
 			await oTable.qunit.rendered();
 			await oTable.qunit.scrollVSbTo(mConfig.scrollTop);
-			await that.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
+			await this.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -3862,34 +3800,33 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "ScrollTop = 1",
-					rowMode: oRowModeConfig.rowMode,
-					scrollTop: 1
-				});
+				title: "ScrollTop = 1",
+				rowMode: oRowModeConfig.rowMode,
+				scrollTop: 1
+			});
 			await test({
-					title: "ScrollTop = 500000",
-					rowMode: oRowModeConfig.rowMode,
-					scrollTop: 500000
-				});
+				title: "ScrollTop = 500000",
+				rowMode: oRowModeConfig.rowMode,
+				scrollTop: 500000
+			});
 			await test({
-					title: "ScrollTop = MAX",
-					rowMode: oRowModeConfig.rowMode,
-					scrollTop: 9999999
-				});
+				title: "ScrollTop = MAX",
+				rowMode: oRowModeConfig.rowMode,
+				scrollTop: 9999999
+			});
 			await test({
-					title: "ScrollTop = MAX - 1",
-					rowMode: oRowModeConfig.rowMode,
-					scrollTop: that.getMaxScrollTop(1000000000, true) - 1
-				});
+				title: "ScrollTop = MAX - 1",
+				rowMode: oRowModeConfig.rowMode,
+				scrollTop: this.getMaxScrollTop(1000000000, true) - 1
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after setting FirstVisibleRow; Tiny data; Variable row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: 10,
 				_bVariableRowHeightEnabled: true
@@ -3899,9 +3836,9 @@ sap.ui.define([
 			oTable.setFirstVisibleRow(mConfig.firstVisibleRow);
 			await oTable.qunit.vScrolled();
 			await oTable.qunit.rendered();
-			await that.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
+			await this.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -3909,38 +3846,37 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "FirstVisibleRow = 1",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 1
-				});
+				title: "FirstVisibleRow = 1",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 1
+			});
 			await test({
-					title: "FirstVisibleRow = 3",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 3
-				});
+				title: "FirstVisibleRow = 3",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 3
+			});
 			await test({
-					title: "FirstVisibleRow = MAX",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 7
-				});
+				title: "FirstVisibleRow = MAX",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 7
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after setting FirstVisibleRow; Small data; Fixed row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode
 			});
 
 			await oTable.qunit.rendered();
 			oTable.setFirstVisibleRow(mConfig.firstVisibleRow);
 			await oTable.qunit.rendered();
-			await that.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
+			await this.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -3948,34 +3884,33 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "FirstVisibleRow = 1",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 1
-				});
+				title: "FirstVisibleRow = 1",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 1
+			});
 			await test({
-					title: "FirstVisibleRow = 33",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 33
-				});
+				title: "FirstVisibleRow = 33",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 33
+			});
 			await test({
-					title: "FirstVisibleRow = MAX",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: that.mDefaultSettings.bindingLength
-				});
+				title: "FirstVisibleRow = MAX",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: this.mDefaultSettings.bindingLength
+			});
 			await test({
-					title: "FirstVisibleRow = MAX - 1",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: that.getMaxFirstVisibleRow() - 1
-				});
+				title: "FirstVisibleRow = MAX - 1",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: this.getMaxFirstVisibleRow() - 1
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after setting FirstVisibleRow; Small data; Variable row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				_bVariableRowHeightEnabled: true
 			});
@@ -3983,9 +3918,9 @@ sap.ui.define([
 			await oTable.qunit.rendered();
 			oTable.setFirstVisibleRow(mConfig.firstVisibleRow);
 			await oTable.qunit.rendered();
-			await that.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
+			await this.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -3993,34 +3928,33 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "FirstVisibleRow = 1",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 1
-				});
+				title: "FirstVisibleRow = 1",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 1
+			});
 			await test({
-					title: "FirstVisibleRow = 33",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 33
-				});
+				title: "FirstVisibleRow = 33",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 33
+			});
 			await test({
-					title: "FirstVisibleRow = MAX",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: that.mDefaultSettings.bindingLength
-				});
+				title: "FirstVisibleRow = MAX",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: this.mDefaultSettings.bindingLength
+			});
 			await test({
-					title: "FirstVisibleRow = MAX - 1",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: that.getMaxFirstVisibleRow() - 1
-				});
+				title: "FirstVisibleRow = MAX - 1",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: this.getMaxFirstVisibleRow() - 1
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after setting FirstVisibleRow; Large data; Fixed row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: 1000000000
 			});
@@ -4028,9 +3962,9 @@ sap.ui.define([
 			await oTable.qunit.rendered();
 			oTable.setFirstVisibleRow(mConfig.firstVisibleRow);
 			await oTable.qunit.rendered();
-			await that.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
+			await this.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -4038,34 +3972,33 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "FirstVisibleRow = 1",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 1
-				});
+				title: "FirstVisibleRow = 1",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 1
+			});
 			await test({
-					title: "FirstVisibleRow = 500000000",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 500000000
-				});
+				title: "FirstVisibleRow = 500000000",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 500000000
+			});
 			await test({
-					title: "FirstVisibleRow = MAX",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 1000000000
-				});
+				title: "FirstVisibleRow = MAX",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 1000000000
+			});
 			await test({
-					title: "FirstVisibleRow = MAX - 1",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: that.getMaxFirstVisibleRow(1000000000) - 1
-				});
+				title: "FirstVisibleRow = MAX - 1",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: this.getMaxFirstVisibleRow(1000000000) - 1
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after setting FirstVisibleRow; Large data; Variable row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: 1000000000,
 				_bVariableRowHeightEnabled: true
@@ -4074,9 +4007,9 @@ sap.ui.define([
 			await oTable.qunit.rendered();
 			oTable.setFirstVisibleRow(mConfig.firstVisibleRow);
 			await oTable.qunit.rendered();
-			await that.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
+			await this.testRestoration(assert, mConfig.rowMode + ", " + mConfig.title);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -4084,41 +4017,40 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					title: "FirstVisibleRow = 1",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 1
-				});
+				title: "FirstVisibleRow = 1",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 1
+			});
 			await test({
-					title: "FirstVisibleRow = 500000000",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 500000000
-				});
+				title: "FirstVisibleRow = 500000000",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 500000000
+			});
 			await test({
-					title: "FirstVisibleRow = MAX",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: 1000000000
-				});
+				title: "FirstVisibleRow = MAX",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: 1000000000
+			});
 			await test({
-					title: "FirstVisibleRow = MAX - 1",
-					rowMode: oRowModeConfig.rowMode,
-					firstVisibleRow: that.getMaxFirstVisibleRow(1000000000) - 1
-				});
+				title: "FirstVisibleRow = MAX - 1",
+				rowMode: oRowModeConfig.rowMode,
+				firstVisibleRow: this.getMaxFirstVisibleRow(1000000000) - 1
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after changing the row heights; Tiny data; Variable row heights", async function(assert) {
-		const that = this;
 
-		function changeRowHeights(iHeightA, iHeightB) {
-			return function() {
-				that.changeRowHeights(iHeightA, iHeightB);
-				return that.oTable.qunit.rendered();
+		const changeRowHeights = (iHeightA, iHeightB) => {
+			return () => {
+				this.changeRowHeights(iHeightA, iHeightB);
+				return this.oTable.qunit.rendered();
 			};
-		}
+		};
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: 10,
 				_bVariableRowHeightEnabled: true
@@ -4127,21 +4059,21 @@ sap.ui.define([
 
 			await oTable.qunit.rendered();
 			await changeRowHeights(100, 175)();
-			that.assertPosition(assert, 0, 0, 0, sTitle + " when scrolled to top");
+			this.assertPosition(assert, 0, 0, 0, sTitle + " when scrolled to top");
 			await oTable.qunit.scrollVSbTo(9999999);
 			await changeRowHeights(90, 125)();
-			that.assertPosition(assert, 5, 98, 595, sTitle + " when scrolled to bottom");
+			this.assertPosition(assert, 5, 98, 595, sTitle + " when scrolled to bottom");
 			await changeRowHeights(100, 175)();
-			that.assertPosition(assert, 5, 79, 725, sTitle + " when scrolled to bottom");
+			this.assertPosition(assert, 5, 79, 725, sTitle + " when scrolled to bottom");
 			await oTable.qunit.scrollVSbTo(50);
 			await changeRowHeights(80, 100)();
-			that.assertPosition(assert, 3, 80, 342, sTitle);
+			this.assertPosition(assert, 3, 80, 342, sTitle);
 			await changeRowHeights(150, 150)();
-			that.assertPosition(assert, 3, 51, 532, sTitle);
+			this.assertPosition(assert, 3, 51, 532, sTitle);
 			await changeRowHeights(5, 5)();
-			that.assertPosition(assert, 0, 0, 0, sTitle);
+			this.assertPosition(assert, 0, 0, 0, sTitle);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -4149,24 +4081,23 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after changing the row heights; Small data; Variable row heights", async function(assert) {
-		const that = this;
 
-		function changeRowHeights(iHeightA, iHeightB) {
-			return function() {
-				that.changeRowHeights(iHeightA, iHeightB);
-				return that.oTable.qunit.rendered();
+		const changeRowHeights = (iHeightA, iHeightB) => {
+			return () => {
+				this.changeRowHeights(iHeightA, iHeightB);
+				return this.oTable.qunit.rendered();
 			};
-		}
+		};
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				_bVariableRowHeightEnabled: true
 			});
@@ -4174,23 +4105,23 @@ sap.ui.define([
 
 			await oTable.qunit.rendered();
 			await changeRowHeights(100, 175)();
-			that.assertPosition(assert, 0, 0, 0, sTitle + " when scrolled to top");
+			this.assertPosition(assert, 0, 0, 0, sTitle + " when scrolled to top");
 			await oTable.qunit.scrollVSbTo(9999999);
 			await changeRowHeights(90, 125)();
-			that.assertPosition(assert, 95, 4459, 721, sTitle + " when scrolled to bottom");
+			this.assertPosition(assert, 95, 4459, 721, sTitle + " when scrolled to bottom");
 			await changeRowHeights(5, 5)();
-			that.assertPosition(assert, 90, 4459, that.iBaseRowHeight, sTitle + " when scrolled to bottom");
+			this.assertPosition(assert, 90, 4459, this.iBaseRowHeight, sTitle + " when scrolled to bottom");
 			await changeRowHeights(100, 175)();
-			that.assertPosition(assert, 90, 4377, 176, sTitle + " when scrolled to bottom");
+			this.assertPosition(assert, 90, 4377, 176, sTitle + " when scrolled to bottom");
 			await oTable.qunit.scrollVSbTo(500);
 			await changeRowHeights(80, 100)();
-			that.assertPosition(assert, 10, 503, 21, sTitle);
+			this.assertPosition(assert, 10, 503, 21, sTitle);
 			await changeRowHeights(150, 150)();
-			that.assertPosition(assert, 10, 497, 21, sTitle);
+			this.assertPosition(assert, 10, 497, 21, sTitle);
 			await changeRowHeights(5, 5)();
-			that.assertPosition(assert, 10, 511, 21, sTitle);
+			this.assertPosition(assert, 10, 511, 21, sTitle);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -4198,24 +4129,23 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after changing the row heights; Large data; Variable row heights", async function(assert) {
-		const that = this;
 
-		function changeRowHeights(iHeightA, iHeightB) {
-			return function() {
-				that.changeRowHeights(iHeightA, iHeightB);
-				return that.oTable.qunit.rendered();
+		const changeRowHeights = (iHeightA, iHeightB) => {
+			return () => {
+				this.changeRowHeights(iHeightA, iHeightB);
+				return this.oTable.qunit.rendered();
 			};
-		}
+		};
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: 1000000000,
 				_bVariableRowHeightEnabled: true
@@ -4224,23 +4154,23 @@ sap.ui.define([
 
 			await oTable.qunit.rendered();
 			await changeRowHeights(100, 175)();
-			that.assertPosition(assert, 0, 0, 0, sTitle + " when scrolled to top");
+			this.assertPosition(assert, 0, 0, 0, sTitle + " when scrolled to top");
 			await oTable.qunit.scrollVSbTo(9999999);
 			await changeRowHeights(90, 125)();
-			that.assertPosition(assert, 999999995, 999510, 721, sTitle + " when scrolled to bottom");
+			this.assertPosition(assert, 999999995, 999510, 721, sTitle + " when scrolled to bottom");
 			await changeRowHeights(5, 5)();
-			that.assertPosition(assert, 999999990, 999510, that.iBaseRowHeight, sTitle + " when scrolled to bottom");
+			this.assertPosition(assert, 999999990, 999510, this.iBaseRowHeight, sTitle + " when scrolled to bottom");
 			await changeRowHeights(100, 175)();
-			that.assertPosition(assert, 999999990, 999428, 176, sTitle + " when scrolled to bottom");
+			this.assertPosition(assert, 999999990, 999428, 176, sTitle + " when scrolled to bottom");
 			await oTable.qunit.scrollVSbTo(500);
 			await changeRowHeights(80, 100)();
-			that.assertPosition(assert, 500294, 500, 17, sTitle);
+			this.assertPosition(assert, 500294, 500, 17, sTitle);
 			await changeRowHeights(150, 150)();
-			that.assertPosition(assert, 500294, 500, 17, sTitle);
+			this.assertPosition(assert, 500294, 500, 17, sTitle);
 			await changeRowHeights(5, 5)();
-			that.assertPosition(assert, 500294, 500, 17, sTitle);
+			this.assertPosition(assert, 500294, 500, 17, sTitle);
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -4248,14 +4178,13 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after changing the row count; Tiny data; Variable row heights", async function(assert) {
-		const that = this;
 
 		function setRowCount(oRowMode, iRowCount) {
 			if (oRowMode instanceof FixedRowMode) {
@@ -4266,8 +4195,8 @@ sap.ui.define([
 			}
 		}
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: 10,
 				_bVariableRowHeightEnabled: true
@@ -4284,42 +4213,42 @@ sap.ui.define([
 			iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
 			setRowCount(mConfig.rowMode, 9);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 46, iInnerScrollPosition,
-			sTitle + "ScrollTop = 50; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow, 46, iInnerScrollPosition,
+				sTitle + "ScrollTop = 50; After visible row count decreased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 50; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 50; After visible row count increased");
 			setRowCount(mConfig.rowMode, 11);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 55, iInnerScrollPosition,
-			sTitle + "ScrollTop = 50; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow, 55, iInnerScrollPosition,
+				sTitle + "ScrollTop = 50; After visible row count increased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 50; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 50; After visible row count decreased");
 			await oTable.qunit.scrollVSbTo(9999999);
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 			iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
 			setRowCount(mConfig.rowMode, 9);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 89, iInnerScrollPosition,
-			sTitle + "ScrollTop = MAX; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow, 89, iInnerScrollPosition,
+				sTitle + "ScrollTop = MAX; After visible row count decreased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = MAX; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = MAX; After visible row count increased");
 			setRowCount(mConfig.rowMode, 11);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition - that.iBaseRowHeight,
-			sTitle + "ScrollTop = MAX; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition - this.iBaseRowHeight,
+				sTitle + "ScrollTop = MAX; After visible row count increased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 88, iInnerScrollPosition - that.iBaseRowHeight,
-			sTitle + "ScrollTop = MAX; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow, 88, iInnerScrollPosition - this.iBaseRowHeight,
+				sTitle + "ScrollTop = MAX; After visible row count decreased");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -4327,14 +4256,13 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after changing the row count; Small data; Fixed row heights", async function(assert) {
-		const that = this;
 
 		function setRowCount(oRowMode, iRowCount) {
 			if (oRowMode instanceof FixedRowMode) {
@@ -4345,8 +4273,8 @@ sap.ui.define([
 			}
 		}
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode
 			});
 			const sTitle = mConfig.rowMode + ", ";
@@ -4359,35 +4287,35 @@ sap.ui.define([
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 			setRowCount(mConfig.rowMode, 9);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = 50; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = 50; After visible row count decreased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = 50; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = 50; After visible row count increased");
 			setRowCount(mConfig.rowMode, 11);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = 50; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = 50; After visible row count increased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = 50; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = 50; After visible row count decreased");
 			await oTable.qunit.scrollVSbTo(9999999);
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 			setRowCount(mConfig.rowMode, 9);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = MAX; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = MAX; After visible row count decreased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = MAX; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = MAX; After visible row count increased");
 			setRowCount(mConfig.rowMode, 11);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - that.iBaseRowHeight, 0,
-			sTitle + "ScrollTop = MAX; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - this.iBaseRowHeight, 0,
+				sTitle + "ScrollTop = MAX; After visible row count increased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - that.iBaseRowHeight, 0,
-			sTitle + "ScrollTop = MAX; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - this.iBaseRowHeight, 0,
+				sTitle + "ScrollTop = MAX; After visible row count decreased");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -4395,14 +4323,13 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after changing the row count; Small data; Variable row heights", async function(assert) {
-		const that = this;
 
 		function setRowCount(oRowMode, iRowCount) {
 			if (oRowMode instanceof FixedRowMode) {
@@ -4413,8 +4340,8 @@ sap.ui.define([
 			}
 		}
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				_bVariableRowHeightEnabled: true
 			});
@@ -4430,46 +4357,46 @@ sap.ui.define([
 			iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
 			setRowCount(mConfig.rowMode, 9);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 50; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 50; After visible row count decreased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 50; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 50; After visible row count increased");
 			setRowCount(mConfig.rowMode, 11);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 50; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 50; After visible row count increased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 50; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 50; After visible row count decreased");
 			await oTable.qunit.scrollVSbTo(9999999);
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 			iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
 			setRowCount(mConfig.rowMode, 9);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 4499, iInnerScrollPosition - 150,
-			sTitle + "ScrollTop = MAX; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow, 4499, iInnerScrollPosition - 150,
+				sTitle + "ScrollTop = MAX; After visible row count decreased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = MAX; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = MAX; After visible row count increased");
 			setRowCount(mConfig.rowMode, 11);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition - that.iBaseRowHeight, iInnerScrollPosition,
-			sTitle + "ScrollTop = MAX; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition - this.iBaseRowHeight, iInnerScrollPosition,
+				sTitle + "ScrollTop = MAX; After visible row count increased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 4452, iInnerScrollPosition - that.iBaseRowHeight,
-			sTitle + "ScrollTop = MAX; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow, 4452, iInnerScrollPosition - this.iBaseRowHeight,
+				sTitle + "ScrollTop = MAX; After visible row count decreased");
 			setRowCount(mConfig.rowMode, 30);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 85, iScrollPosition - (20 * that.iBaseRowHeight), 1665,
-			sTitle + "ScrollTop = MAX; After visible row count increased");
+			this.assertPosition(assert, 85, iScrollPosition - (20 * this.iBaseRowHeight), 1665,
+				sTitle + "ScrollTop = MAX; After visible row count increased");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -4477,14 +4404,13 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after changing the row count; Large data; Fixed row heights", async function(assert) {
-		const that = this;
 
 		function setRowCount(oRowMode, iRowCount) {
 			if (oRowMode instanceof FixedRowMode) {
@@ -4495,8 +4421,8 @@ sap.ui.define([
 			}
 		}
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: 1000000000
 			});
@@ -4507,46 +4433,46 @@ sap.ui.define([
 			await oTable.qunit.rendered();
 			setRowCount(mConfig.rowMode, 9);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 0, 0, 0, sTitle + "ScrollTop = 0; After visible row count decreased");
+			this.assertPosition(assert, 0, 0, 0, sTitle + "ScrollTop = 0; After visible row count decreased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 0, 0, 0, sTitle + "ScrollTop = 0; After visible row count increased");
+			this.assertPosition(assert, 0, 0, 0, sTitle + "ScrollTop = 0; After visible row count increased");
 			await oTable.qunit.scrollVSbTo(50);
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 			setRowCount(mConfig.rowMode, 9);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = 50; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = 50; After visible row count decreased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = 50; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = 50; After visible row count increased");
 			setRowCount(mConfig.rowMode, 11);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = 50; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = 50; After visible row count increased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = 50; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, sTitle + "ScrollTop = 50; After visible row count decreased");
 			await oTable.qunit.scrollVSbTo(9999999);
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 			setRowCount(mConfig.rowMode, 9);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition + that.iBaseRowHeight - 1, 0,
-			sTitle + "ScrollTop = MAX; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition + this.iBaseRowHeight - 1, 0,
+				sTitle + "ScrollTop = MAX; After visible row count decreased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = MAX; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = MAX; After visible row count increased");
 			setRowCount(mConfig.rowMode, 11);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - that.iBaseRowHeight, 0,
-			sTitle + "ScrollTop = MAX; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - this.iBaseRowHeight, 0,
+				sTitle + "ScrollTop = MAX; After visible row count increased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - 1, 0,
-			sTitle + "ScrollTop = MAX; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - 1, 0,
+				sTitle + "ScrollTop = MAX; After visible row count decreased");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -4554,14 +4480,13 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after changing the row count; Large data; Variable row heights", async function(assert) {
-		const that = this;
 
 		function setRowCount(oRowMode, iRowCount) {
 			if (oRowMode instanceof FixedRowMode) {
@@ -4572,8 +4497,8 @@ sap.ui.define([
 			}
 		}
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: 1000000000,
 				_bVariableRowHeightEnabled: true
@@ -4586,56 +4511,56 @@ sap.ui.define([
 			await oTable.qunit.rendered();
 			setRowCount(mConfig.rowMode, 9);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 0, 0, 0, sTitle + "ScrollTop = 0; After visible row count decreased");
+			this.assertPosition(assert, 0, 0, 0, sTitle + "ScrollTop = 0; After visible row count decreased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 0, 0, 0, sTitle + "ScrollTop = 0; After visible row count increased");
+			this.assertPosition(assert, 0, 0, 0, sTitle + "ScrollTop = 0; After visible row count increased");
 			await oTable.qunit.scrollVSbTo(50);
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 			iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
 			setRowCount(mConfig.rowMode, 9);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 50; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 50; After visible row count decreased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 50; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 50; After visible row count increased");
 			setRowCount(mConfig.rowMode, 11);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 50; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 50; After visible row count increased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 50; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 50; After visible row count decreased");
 			await oTable.qunit.scrollVSbTo(9999999);
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 			iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
 			setRowCount(mConfig.rowMode, 9);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 999550, iInnerScrollPosition - 150,
-			sTitle + "ScrollTop = MAX; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow, 999550, iInnerScrollPosition - 150,
+				sTitle + "ScrollTop = MAX; After visible row count decreased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = MAX; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = MAX; After visible row count increased");
 			setRowCount(mConfig.rowMode, 11);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition - that.iBaseRowHeight, iInnerScrollPosition,
-			sTitle + "ScrollTop = MAX; After visible row count increased");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition - this.iBaseRowHeight, iInnerScrollPosition,
+				sTitle + "ScrollTop = MAX; After visible row count increased");
 			setRowCount(mConfig.rowMode, 10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 999503, iInnerScrollPosition - that.iBaseRowHeight,
-			sTitle + "ScrollTop = MAX; After visible row count decreased");
+			this.assertPosition(assert, iFirstVisibleRow, 999503, iInnerScrollPosition - this.iBaseRowHeight,
+				sTitle + "ScrollTop = MAX; After visible row count decreased");
 			setRowCount(mConfig.rowMode, 30);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 999999985, iScrollPosition - (20 * that.iBaseRowHeight), 1665,
-			sTitle + "ScrollTop = MAX; After visible row count increased");
+			this.assertPosition(assert, 999999985, iScrollPosition - (20 * this.iBaseRowHeight), 1665,
+				sTitle + "ScrollTop = MAX; After visible row count increased");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -4643,14 +4568,13 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after changing the row count on resize; Small data; Fixed row heights", async function(assert) {
-		const that = this;
 		const oTable = this.createTable({
 			rowMode: this.mTestedRowModes.AutoRowMode.setMinRowCount(8)
 		});
@@ -4662,28 +4586,27 @@ sap.ui.define([
 		iFirstVisibleRow = oTable.getFirstVisibleRow();
 		iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 		await oTable.qunit.resize({height: "400px"});
-		that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, "ScrollTop = 200; After height decreased");
+		this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, "ScrollTop = 200; After height decreased");
 		await oTable.qunit.resetSize();
-		that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, "ScrollTop = 200; After height increased");
+		this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, "ScrollTop = 200; After height increased");
 		await oTable.qunit.scrollVSbTo(9999999);
 		iFirstVisibleRow = oTable.getFirstVisibleRow();
 		iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 		await oTable.qunit.resize({height: "400px"});
-		that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, "ScrollTop = MAX; After height decreased");
+		this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0, "ScrollTop = MAX; After height decreased");
 		await oTable.qunit.scrollVSbTo(9999999);
 		iFirstVisibleRow = oTable.getFirstVisibleRow();
 		iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 		await oTable.qunit.resetSize();
-		that.assertPosition(assert, iFirstVisibleRow - 2, iScrollPosition - that.iBaseRowHeight * 2, 0,
-		"ScrollTop = MAX; After height increased");
+		this.assertPosition(assert, iFirstVisibleRow - 2, iScrollPosition - this.iBaseRowHeight * 2, 0,
+			"ScrollTop = MAX; After height increased");
 
 	});
 
 	QUnit.test("Restore scroll position after binding length change; Tiny data; Variable row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: 10,
 				_bVariableRowHeightEnabled: true
@@ -4698,87 +4621,87 @@ sap.ui.define([
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 			iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
-			that.changeBindingLength(9, ChangeReason.Collapse);
+			this.changeBindingLength(9, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 57, iInnerScrollPosition,
-			sTitle + "ScrollTop = 40; After binding length decreased (collapse)");
-			that.changeBindingLength(10, ChangeReason.Expand);
+			this.assertPosition(assert, iFirstVisibleRow, 57, iInnerScrollPosition,
+				sTitle + "ScrollTop = 40; After binding length decreased (collapse)");
+			this.changeBindingLength(10, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 40; After binding length increased (expand)");
-			that.changeBindingLength(11, ChangeReason.Expand);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 40; After binding length increased (expand)");
+			this.changeBindingLength(11, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 36, iInnerScrollPosition,
-			sTitle + "ScrollTop = 40; After binding length increased (expand)");
-			that.changeBindingLength(10, ChangeReason.Collapse);
+			this.assertPosition(assert, iFirstVisibleRow, 36, iInnerScrollPosition,
+				sTitle + "ScrollTop = 40; After binding length increased (expand)");
+			this.changeBindingLength(10, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 40; After binding length decreased (collapse)");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 40; After binding length decreased (collapse)");
 			await oTable.qunit.scrollVSbTo(40);
-			that.fakeODataBindingRefresh(9);
+			this.fakeODataBindingRefresh(9);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 57, iInnerScrollPosition,
-			sTitle + "ScrollTop = 40; After binding length decreased (refresh)");
-			that.fakeODataBindingRefresh(10);
+			this.assertPosition(assert, iFirstVisibleRow, 57, iInnerScrollPosition,
+				sTitle + "ScrollTop = 40; After binding length decreased (refresh)");
+			this.fakeODataBindingRefresh(10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 40; After binding length increased (refresh)");
-			that.fakeODataBindingRefresh(11);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 40; After binding length increased (refresh)");
+			this.fakeODataBindingRefresh(11);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 36, iInnerScrollPosition,
-			sTitle + "ScrollTop = 40; After binding length increased (refresh)");
-			that.fakeODataBindingRefresh(10);
+			this.assertPosition(assert, iFirstVisibleRow, 36, iInnerScrollPosition,
+				sTitle + "ScrollTop = 40; After binding length increased (refresh)");
+			this.fakeODataBindingRefresh(10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 40; After binding length decreased (refresh)");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 40; After binding length decreased (refresh)");
 			await oTable.qunit.scrollVSbTo(9999999);
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 			iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
-			that.changeBindingLength(9, ChangeReason.Collapse);
+			this.changeBindingLength(9, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 3, iScrollPosition, iInnerScrollPosition - 150,
-			sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
-			that.changeBindingLength(10, ChangeReason.Expand);
+			this.assertPosition(assert, 3, iScrollPosition, iInnerScrollPosition - 150,
+				sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
+			this.changeBindingLength(10, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 3, 69, 355,
-			sTitle + "ScrollTop = MAX; After binding length increased (expand)");
+			this.assertPosition(assert, 3, 69, 355,
+				sTitle + "ScrollTop = MAX; After binding length increased (expand)");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.changeBindingLength(11, ChangeReason.Expand);
+			this.changeBindingLength(11, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 89, iInnerScrollPosition,
-			sTitle + "ScrollTop = MAX; After binding length increased (expand)");
-			that.changeBindingLength(10, ChangeReason.Collapse);
+			this.assertPosition(assert, iFirstVisibleRow, 89, iInnerScrollPosition,
+				sTitle + "ScrollTop = MAX; After binding length increased (expand)");
+			this.changeBindingLength(10, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.fakeODataBindingRefresh(9);
+			this.fakeODataBindingRefresh(9);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 3, iScrollPosition, iInnerScrollPosition - 150,
-			sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
-			that.fakeODataBindingRefresh(10);
+			this.assertPosition(assert, 3, iScrollPosition, iInnerScrollPosition - 150,
+				sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
+			this.fakeODataBindingRefresh(10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 3, 69, 355,
-			sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
+			this.assertPosition(assert, 3, 69, 355,
+				sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.fakeODataBindingRefresh(11);
+			this.fakeODataBindingRefresh(11);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 89, iInnerScrollPosition,
-			sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
-			that.fakeODataBindingRefresh(10);
+			this.assertPosition(assert, iFirstVisibleRow, 89, iInnerScrollPosition,
+				sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
+			this.fakeODataBindingRefresh(10);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
-			that.fakeODataBindingRefresh(100);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
+			this.fakeODataBindingRefresh(100);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 264, 58,
-			sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
-			that.changeBindingLength(0, ChangeReason.Change);
+			this.assertPosition(assert, iFirstVisibleRow, 264, 58,
+				sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
+			this.changeBindingLength(0, ChangeReason.Change);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 0, 0, 0, sTitle + "After binding length changed to 0");
+			this.assertPosition(assert, 0, 0, 0, sTitle + "After binding length changed to 0");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -4786,17 +4709,16 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after binding length change; Small data; Fixed row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode
 			});
 			const sTitle = mConfig.rowMode + ", ";
@@ -4807,82 +4729,82 @@ sap.ui.define([
 			await oTable.qunit.scrollVSbTo(60);
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
-			that.changeBindingLength(that.mDefaultSettings.bindingLength - 1, ChangeReason.Collapse);
+			this.changeBindingLength(this.mDefaultSettings.bindingLength - 1, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
-			that.changeBindingLength(that.mDefaultSettings.bindingLength, ChangeReason.Expand);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
+			this.changeBindingLength(this.mDefaultSettings.bindingLength, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = 60; After binding length increased (expand)");
-			that.changeBindingLength(that.mDefaultSettings.bindingLength + 1, ChangeReason.Expand);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = 60; After binding length increased (expand)");
+			this.changeBindingLength(this.mDefaultSettings.bindingLength + 1, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = 60; After binding length increased (expand)");
-			that.changeBindingLength(that.mDefaultSettings.bindingLength, ChangeReason.Collapse);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = 60; After binding length increased (expand)");
+			this.changeBindingLength(this.mDefaultSettings.bindingLength, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
 			await oTable.qunit.scrollVSbTo(60);
-			that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength - 1);
+			this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength - 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
-			that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
+			this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = 60; After binding length increased (refresh)");
-			that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength + 1);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = 60; After binding length increased (refresh)");
+			this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength + 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = 60; After binding length increased (refresh)");
-			that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = 60; After binding length increased (refresh)");
+			this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
 			await oTable.qunit.scrollVSbTo(9999999);
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
-			that.changeBindingLength(that.mDefaultSettings.bindingLength - 1, ChangeReason.Collapse);
+			this.changeBindingLength(this.mDefaultSettings.bindingLength - 1, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - that.iBaseRowHeight, 0,
-			sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
-			that.changeBindingLength(that.mDefaultSettings.bindingLength, ChangeReason.Expand);
+			this.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - this.iBaseRowHeight, 0,
+				sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
+			this.changeBindingLength(this.mDefaultSettings.bindingLength, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - that.iBaseRowHeight, 0,
-			sTitle + "ScrollTop = MAX; After binding length increased (expand)");
+			this.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - this.iBaseRowHeight, 0,
+				sTitle + "ScrollTop = MAX; After binding length increased (expand)");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.changeBindingLength(that.mDefaultSettings.bindingLength + 1, ChangeReason.Expand);
+			this.changeBindingLength(this.mDefaultSettings.bindingLength + 1, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = MAX; After binding length increased (expand)");
-			that.changeBindingLength(that.mDefaultSettings.bindingLength, ChangeReason.Collapse);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = MAX; After binding length increased (expand)");
+			this.changeBindingLength(this.mDefaultSettings.bindingLength, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength - 1);
+			this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength - 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - that.iBaseRowHeight, 0,
-			sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
-			that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength);
+			this.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - this.iBaseRowHeight, 0,
+				sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
+			this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - that.iBaseRowHeight, 0,
-			sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
+			this.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - this.iBaseRowHeight, 0,
+				sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength + 1);
+			this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength + 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
-			that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
+			this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
-			that.changeBindingLength(0, ChangeReason.Change);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
+			this.changeBindingLength(0, ChangeReason.Change);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 0, 0, 0, sTitle + "After binding length changed to 0");
+			this.assertPosition(assert, 0, 0, 0, sTitle + "After binding length changed to 0");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -4890,17 +4812,16 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after binding length change; Small data; Variable row heights", async function(assert) {
-		const that = this;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				_bVariableRowHeightEnabled: true
 			});
@@ -4914,87 +4835,87 @@ sap.ui.define([
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 			iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
-			that.changeBindingLength(that.mDefaultSettings.bindingLength - 1, ChangeReason.Collapse);
+			this.changeBindingLength(this.mDefaultSettings.bindingLength - 1, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
-			that.changeBindingLength(that.mDefaultSettings.bindingLength, ChangeReason.Expand);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
+			this.changeBindingLength(this.mDefaultSettings.bindingLength, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 60; After binding length increased (expand)");
-			that.changeBindingLength(that.mDefaultSettings.bindingLength + 1, ChangeReason.Expand);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 60; After binding length increased (expand)");
+			this.changeBindingLength(this.mDefaultSettings.bindingLength + 1, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 60; After binding length increased (expand)");
-			that.changeBindingLength(that.mDefaultSettings.bindingLength, ChangeReason.Collapse);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 60; After binding length increased (expand)");
+			this.changeBindingLength(this.mDefaultSettings.bindingLength, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
 			await oTable.qunit.scrollVSbTo(60);
-			that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength - 1);
+			this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength - 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
-			that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
+			this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 60; After binding length increased (refresh)");
-			that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength + 1);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 60; After binding length increased (refresh)");
+			this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength + 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 60; After binding length increased (refresh)");
-			that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 60; After binding length increased (refresh)");
+			this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
 			await oTable.qunit.scrollVSbTo(9999999);
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 			iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
-			that.changeBindingLength(that.mDefaultSettings.bindingLength - 1, ChangeReason.Collapse);
+			this.changeBindingLength(this.mDefaultSettings.bindingLength - 1, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 2, iScrollPosition - that.iBaseRowHeight, iInnerScrollPosition - 150 + that.iBaseRowHeight,
-			sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
-			that.changeBindingLength(that.mDefaultSettings.bindingLength, ChangeReason.Expand);
+			this.assertPosition(assert, iFirstVisibleRow - 2, iScrollPosition - this.iBaseRowHeight, iInnerScrollPosition - 150 + this.iBaseRowHeight,
+				sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
+			this.changeBindingLength(this.mDefaultSettings.bindingLength, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 2, 4437, iInnerScrollPosition - 150,
-			sTitle + "ScrollTop = MAX; After binding length increased (expand)");
+			this.assertPosition(assert, iFirstVisibleRow - 2, 4437, iInnerScrollPosition - 150,
+				sTitle + "ScrollTop = MAX; After binding length increased (expand)");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.changeBindingLength(that.mDefaultSettings.bindingLength + 1, ChangeReason.Expand);
+			this.changeBindingLength(this.mDefaultSettings.bindingLength + 1, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 4499, iInnerScrollPosition - 150,
-			sTitle + "ScrollTop = MAX; After binding length increased (expand)");
-			that.changeBindingLength(that.mDefaultSettings.bindingLength, ChangeReason.Collapse);
+			this.assertPosition(assert, iFirstVisibleRow, 4499, iInnerScrollPosition - 150,
+				sTitle + "ScrollTop = MAX; After binding length increased (expand)");
+			this.changeBindingLength(this.mDefaultSettings.bindingLength, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength - 1);
+			this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength - 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 2, iScrollPosition - that.iBaseRowHeight, iInnerScrollPosition - 150 + that.iBaseRowHeight,
-			sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
-			that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength);
+			this.assertPosition(assert, iFirstVisibleRow - 2, iScrollPosition - this.iBaseRowHeight, iInnerScrollPosition - 150 + this.iBaseRowHeight,
+				sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
+			this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 2, 4437, iInnerScrollPosition - 150,
-			sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
+			this.assertPosition(assert, iFirstVisibleRow - 2, 4437, iInnerScrollPosition - 150,
+				sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength + 1);
+			this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength + 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 4499, iInnerScrollPosition - 150,
-			sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
-			that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength);
+			this.assertPosition(assert, iFirstVisibleRow, 4499, iInnerScrollPosition - 150,
+				sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
+			this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
-			that.fakeODataBindingRefresh(that.mDefaultSettings.bindingLength + 100);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
+			this.fakeODataBindingRefresh(this.mDefaultSettings.bindingLength + 100);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 4674, 58,
-			sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
-			that.changeBindingLength(0, ChangeReason.Change);
+			this.assertPosition(assert, iFirstVisibleRow, 4674, 58,
+				sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
+			this.changeBindingLength(0, ChangeReason.Change);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 0, 0, 0, sTitle + "After binding length changed to 0");
+			this.assertPosition(assert, 0, 0, 0, sTitle + "After binding length changed to 0");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -5002,18 +4923,17 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after binding length change; Large data; Fixed row heights", async function(assert) {
-		const that = this;
 		const iBindingLength = 1000000000;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: iBindingLength
 			});
@@ -5025,82 +4945,82 @@ sap.ui.define([
 			await oTable.qunit.scrollVSbTo(60);
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
-			that.changeBindingLength(iBindingLength - 1, ChangeReason.Collapse);
+			this.changeBindingLength(iBindingLength - 1, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
-			that.changeBindingLength(iBindingLength, ChangeReason.Expand);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
+			this.changeBindingLength(iBindingLength, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = 60; After binding length increased (expand)");
-			that.changeBindingLength(iBindingLength + 1, ChangeReason.Expand);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = 60; After binding length increased (expand)");
+			this.changeBindingLength(iBindingLength + 1, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = 60; After binding length increased (expand)");
-			that.changeBindingLength(iBindingLength, ChangeReason.Collapse);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = 60; After binding length increased (expand)");
+			this.changeBindingLength(iBindingLength, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
 			await oTable.qunit.scrollVSbTo(60);
-			that.fakeODataBindingRefresh(iBindingLength - 1);
+			this.fakeODataBindingRefresh(iBindingLength - 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
-			that.fakeODataBindingRefresh(iBindingLength);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
+			this.fakeODataBindingRefresh(iBindingLength);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = 60; After binding length increased (refresh)");
-			that.fakeODataBindingRefresh(iBindingLength + 1);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = 60; After binding length increased (refresh)");
+			this.fakeODataBindingRefresh(iBindingLength + 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = 60; After binding length increased (refresh)");
-			that.fakeODataBindingRefresh(iBindingLength);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = 60; After binding length increased (refresh)");
+			this.fakeODataBindingRefresh(iBindingLength);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
 			await oTable.qunit.scrollVSbTo(9999999);
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
-			that.changeBindingLength(iBindingLength - 1, ChangeReason.Collapse);
+			this.changeBindingLength(iBindingLength - 1, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition, 0,
-			sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
-			that.changeBindingLength(iBindingLength, ChangeReason.Expand);
+			this.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition, 0,
+				sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
+			this.changeBindingLength(iBindingLength, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - 1, 0,
-			sTitle + "ScrollTop = MAX; After binding length increased (expand)");
+			this.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - 1, 0,
+				sTitle + "ScrollTop = MAX; After binding length increased (expand)");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.changeBindingLength(iBindingLength + 1, ChangeReason.Expand);
+			this.changeBindingLength(iBindingLength + 1, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition - 1, 0,
-			sTitle + "ScrollTop = MAX; After binding length increased (expand)");
-			that.changeBindingLength(iBindingLength, ChangeReason.Collapse);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition - 1, 0,
+				sTitle + "ScrollTop = MAX; After binding length increased (expand)");
+			this.changeBindingLength(iBindingLength, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.fakeODataBindingRefresh(iBindingLength - 1);
+			this.fakeODataBindingRefresh(iBindingLength - 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition, 0,
-			sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
-			that.fakeODataBindingRefresh(iBindingLength);
+			this.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition, 0,
+				sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
+			this.fakeODataBindingRefresh(iBindingLength);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - 1, 0,
-			sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
+			this.assertPosition(assert, iFirstVisibleRow - 1, iScrollPosition - 1, 0,
+				sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.fakeODataBindingRefresh(iBindingLength + 1);
+			this.fakeODataBindingRefresh(iBindingLength + 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition - 1, 0,
-			sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
-			that.fakeODataBindingRefresh(iBindingLength);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition - 1, 0,
+				sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
+			this.fakeODataBindingRefresh(iBindingLength);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
-			sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
-			that.changeBindingLength(0, ChangeReason.Change);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, 0,
+				sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
+			this.changeBindingLength(0, ChangeReason.Change);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 0, 0, 0, sTitle + "After binding length changed to 0");
+			this.assertPosition(assert, 0, 0, 0, sTitle + "After binding length changed to 0");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -5108,18 +5028,17 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
 
 	QUnit.test("Restore scroll position after binding length change; Large data; Variable row heights", async function(assert) {
-		const that = this;
 		const iBindingLength = 1000000000;
 
-		async function test(mConfig) {
-			const oTable = await that.createTable({
+		const test = async (mConfig) => {
+			const oTable = await this.createTable({
 				rowMode: mConfig.rowMode,
 				bindingLength: iBindingLength,
 				_bVariableRowHeightEnabled: true
@@ -5134,87 +5053,87 @@ sap.ui.define([
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 			iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
-			that.changeBindingLength(iBindingLength - 1, ChangeReason.Collapse);
+			this.changeBindingLength(iBindingLength - 1, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
-			that.changeBindingLength(iBindingLength, ChangeReason.Expand);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
+			this.changeBindingLength(iBindingLength, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 60; After binding length increased (expand)");
-			that.changeBindingLength(iBindingLength + 1, ChangeReason.Expand);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 60; After binding length increased (expand)");
+			this.changeBindingLength(iBindingLength + 1, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 60; After binding length increased (expand)");
-			that.changeBindingLength(iBindingLength, ChangeReason.Collapse);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 60; After binding length increased (expand)");
+			this.changeBindingLength(iBindingLength, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 60; After binding length decreased (collapse)");
 			await oTable.qunit.scrollVSbTo(60);
-			that.fakeODataBindingRefresh(iBindingLength - 1);
+			this.fakeODataBindingRefresh(iBindingLength - 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
-			that.fakeODataBindingRefresh(iBindingLength);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
+			this.fakeODataBindingRefresh(iBindingLength);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 60; After binding length increased (refresh)");
-			that.fakeODataBindingRefresh(iBindingLength + 1);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 60; After binding length increased (refresh)");
+			this.fakeODataBindingRefresh(iBindingLength + 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 60; After binding length increased (refresh)");
-			that.fakeODataBindingRefresh(iBindingLength);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 60; After binding length increased (refresh)");
+			this.fakeODataBindingRefresh(iBindingLength);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = 60; After binding length decreased (refresh)");
 			await oTable.qunit.scrollVSbTo(9999999);
 			iFirstVisibleRow = oTable.getFirstVisibleRow();
 			iScrollPosition = oTable._getScrollExtension().getVerticalScrollbar().scrollTop;
 			iInnerScrollPosition = oTable.getDomRef("tableCCnt").scrollTop;
-			that.changeBindingLength(iBindingLength - 1, ChangeReason.Collapse);
+			this.changeBindingLength(iBindingLength - 1, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 2, iScrollPosition, iInnerScrollPosition - 150 + that.iBaseRowHeight,
-			sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
-			that.changeBindingLength(iBindingLength, ChangeReason.Expand);
+			this.assertPosition(assert, iFirstVisibleRow - 2, iScrollPosition, iInnerScrollPosition - 150 + this.iBaseRowHeight,
+				sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
+			this.changeBindingLength(iBindingLength, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 2, 999488, iInnerScrollPosition - 150,
-			sTitle + "ScrollTop = MAX; After binding length increased (expand)");
+			this.assertPosition(assert, iFirstVisibleRow - 2, 999488, iInnerScrollPosition - 150,
+				sTitle + "ScrollTop = MAX; After binding length increased (expand)");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.changeBindingLength(iBindingLength + 1, ChangeReason.Expand);
+			this.changeBindingLength(iBindingLength + 1, ChangeReason.Expand);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 999501, iInnerScrollPosition - 150,
-			sTitle + "ScrollTop = MAX; After binding length increased (expand)");
-			that.changeBindingLength(iBindingLength, ChangeReason.Collapse);
+			this.assertPosition(assert, iFirstVisibleRow, 999501, iInnerScrollPosition - 150,
+				sTitle + "ScrollTop = MAX; After binding length increased (expand)");
+			this.changeBindingLength(iBindingLength, ChangeReason.Collapse);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = MAX; After binding length decreased (collapse)");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.fakeODataBindingRefresh(iBindingLength - 1);
+			this.fakeODataBindingRefresh(iBindingLength - 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 2, iScrollPosition, iInnerScrollPosition - 150 + that.iBaseRowHeight,
-			sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
-			that.fakeODataBindingRefresh(iBindingLength);
+			this.assertPosition(assert, iFirstVisibleRow - 2, iScrollPosition, iInnerScrollPosition - 150 + this.iBaseRowHeight,
+				sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
+			this.fakeODataBindingRefresh(iBindingLength);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow - 2, 999488, iInnerScrollPosition - 150,
-			sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
+			this.assertPosition(assert, iFirstVisibleRow - 2, 999488, iInnerScrollPosition - 150,
+				sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
 			await oTable.qunit.scrollVSbTo(9999999);
-			that.fakeODataBindingRefresh(iBindingLength + 1);
+			this.fakeODataBindingRefresh(iBindingLength + 1);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 999501, iInnerScrollPosition - 150,
-			sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
-			that.fakeODataBindingRefresh(iBindingLength);
+			this.assertPosition(assert, iFirstVisibleRow, 999501, iInnerScrollPosition - 150,
+				sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
+			this.fakeODataBindingRefresh(iBindingLength);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
-			sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
-			that.fakeODataBindingRefresh(iBindingLength + 100);
+			this.assertPosition(assert, iFirstVisibleRow, iScrollPosition, iInnerScrollPosition,
+				sTitle + "ScrollTop = MAX; After binding length decreased (refresh)");
+			this.fakeODataBindingRefresh(iBindingLength + 100);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, iFirstVisibleRow, 999412, 58,
-			sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
-			that.changeBindingLength(0, ChangeReason.Change);
+			this.assertPosition(assert, iFirstVisibleRow, 999412, 58,
+				sTitle + "ScrollTop = MAX; After binding length increased (refresh)");
+			this.changeBindingLength(0, ChangeReason.Change);
 			await oTable.qunit.rendered();
-			that.assertPosition(assert, 0, 0, 0, sTitle + "After binding length changed to 0");
+			this.assertPosition(assert, 0, 0, 0, sTitle + "After binding length changed to 0");
 
-		}
+		};
 
 		const aRowModeConfigs = [];
 		this.forEachTestedRowMode(function(oRowModeConfig) {
@@ -5222,8 +5141,8 @@ sap.ui.define([
 		});
 		for (const oRowModeConfig of aRowModeConfigs) {
 			await test({
-					rowMode: oRowModeConfig.rowMode
-				});
+				rowMode: oRowModeConfig.rowMode
+			});
 		}
 
 	});
@@ -5239,7 +5158,7 @@ sap.ui.define([
 		oTableParentElement.removeChild(oTableElement);
 		await TableQUnitUtils.nextFrame();
 		assert.strictEqual(oTable.getFirstVisibleRow(), 2,
-		"Remove DOM after scrolling with scrollbar: The firstVisibleRow is correct");
+			"Remove DOM after scrolling with scrollbar: The firstVisibleRow is correct");
 		oTableParentElement.appendChild(oTableElement);
 		oTable._setLargeDataScrolling(true);
 		oScrollExtension.getVerticalScrollbar().scrollTop = 200;
@@ -5247,7 +5166,7 @@ sap.ui.define([
 		oTableParentElement.removeChild(oTableElement);
 		await TableQUnitUtils.sleep(300);
 		assert.strictEqual(oTable.getFirstVisibleRow(), 4,
-		"Remove DOM after scrolling with scrollbar and large data scrolling enabled: The firstVisibleRow is correct");
+			"Remove DOM after scrolling with scrollbar and large data scrolling enabled: The firstVisibleRow is correct");
 
 	});
 
@@ -5260,18 +5179,18 @@ sap.ui.define([
 		oTableParentElement.removeChild(oTableElement);
 		await TableQUnitUtils.nextFrame();
 		assert.strictEqual(oTable.getFirstVisibleRow(), 5,
-		"Remove DOM synchronously after setting firstVisibleRow: The firstVisibleRow is correct");
+			"Remove DOM synchronously after setting firstVisibleRow: The firstVisibleRow is correct");
 		oTable.setFirstVisibleRow(6);
 		await TableQUnitUtils.nextFrame();
 		assert.strictEqual(oTable.getFirstVisibleRow(), 6,
-		"Set firstVisibleRow if DOM is removed: The firstVisibleRow is correct");
+			"Set firstVisibleRow if DOM is removed: The firstVisibleRow is correct");
 		oTableParentElement.appendChild(oTableElement);
 		oTable.setFirstVisibleRow(5);
 		await TableQUnitUtils.nextFrame();
 		oTableParentElement.removeChild(oTableElement);
 		await TableQUnitUtils.nextFrame();
 		assert.strictEqual(oTable.getFirstVisibleRow(), 5,
-		"Remove DOM asynchronously after setting firstVisibleRow: The firstVisibleRow is correct");
+			"Remove DOM asynchronously after setting firstVisibleRow: The firstVisibleRow is correct");
 
 	});
 
@@ -5566,7 +5485,6 @@ sap.ui.define([
 		const oTable = this.oTable;
 		const oVSb = oTable._getScrollExtension().getVerticalScrollbar();
 		const iInitialScrollTop = oVSb.scrollTop;
-		const that = this;
 
 		Device.support.pointer = false;
 		Device.support.touch = true;
@@ -5587,12 +5505,13 @@ sap.ui.define([
 		TableQUnitUtils.endTouchScrolling();
 
 		// Wait for momentum animation to complete
-		await that.waitForMomentumEnd(oVSb);
+		await this.waitForMomentumEnd(oVSb);
 
 		const iScrollTopAfterMomentum = oVSb.scrollTop;
 		// Momentum should scroll beyond the initial touch distance (240px total touch movement)
 		assert.ok(iScrollTopAfterMomentum > iInitialScrollTop + 240,
-			`Momentum scrolling continued after touch end (scrolled more than touch distance). Initial: ${iInitialScrollTop}, After: ${iScrollTopAfterMomentum}`);
+			`Momentum scrolling continued after touch end (scrolled more than touch distance). Initial: ${iInitialScrollTop}, ` +
+			`After: ${iScrollTopAfterMomentum}`);
 	});
 
 	QUnit.test("New touch cancels active momentum animation", async function(assert) {
@@ -5640,7 +5559,6 @@ sap.ui.define([
 		const oTable = this.oTable;
 		const oHSb = oTable._getScrollExtension().getHorizontalScrollbar();
 		const iInitialScrollLeft = oHSb.scrollLeft;
-		const that = this;
 
 		Device.support.pointer = false;
 		Device.support.touch = true;
@@ -5657,7 +5575,7 @@ sap.ui.define([
 		TableQUnitUtils.endTouchScrolling();
 
 		// Wait for momentum to complete
-		await that.waitForMomentumEnd(oHSb);
+		await this.waitForMomentumEnd(oHSb);
 
 		const iScrollLeftAfterMomentum = oHSb.scrollLeft;
 		assert.ok(iScrollLeftAfterMomentum > iInitialScrollLeft + 160,

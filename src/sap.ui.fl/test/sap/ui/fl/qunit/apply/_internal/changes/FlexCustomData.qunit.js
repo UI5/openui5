@@ -24,6 +24,7 @@ sap.ui.define([
 	var sandbox = sinon.createSandbox();
 
 	var sAppliedKey = FlexCustomData.appliedChangesCustomDataKey;
+	var sAppliedXmlKey = FlexCustomData.appliedChangesXmlCustomDataKey;
 	var sFailedJSKey = FlexCustomData.failedChangesCustomDataKeyJs;
 	var sFailedXMLKey = FlexCustomData.failedChangesCustomDataKeyXml;
 	var sNotApplicableKey = FlexCustomData.notApplicableChangesCustomDataKey;
@@ -83,7 +84,9 @@ sap.ui.define([
 			.then(function() {
 				var oCustomData = getCustomData(this.oControl, createCustomDataKey(this.oChange, sAppliedKey));
 				assert.ok(oCustomData, "the custom data was added");
-				assert.equal(oCustomData.getValue(), "true", "the value is the standard 'true'");
+				assert.strictEqual(oCustomData.getValue(), "true", "the value is the standard 'true'");
+				var oMarker = getCustomData(this.oControl, createCustomDataKey(this.oChange, sAppliedXmlKey));
+				assert.notOk(oMarker, "no xml applier marker is added for a JS apply");
 			}.bind(this));
 		});
 
@@ -109,15 +112,38 @@ sap.ui.define([
 			}.bind(this));
 		});
 
+		QUnit.test("addAppliedXmlMarker", function(assert) {
+			this.oChange.setRevertData({ value: "revert" });
+			return Promise.all([
+				FlexCustomData.addAppliedCustomData(this.oControl, this.oChange, this.mPropertyBag, true),
+				FlexCustomData.addAppliedXmlMarker(this.oControl, this.oChange, this.mPropertyBag)
+			]).then(function() {
+				var oMarker = getCustomData(this.oControl, createCustomDataKey(this.oChange, sAppliedXmlKey));
+				assert.ok(oMarker, "the xml marker custom data was added");
+				assert.strictEqual(oMarker.getValue(), "true", "the marker value is 'true'");
+				var oAppliedCustomData = getCustomData(this.oControl, createCustomDataKey(this.oChange, sAppliedKey));
+				assert.strictEqual(
+					oAppliedCustomData.getValue(),
+					'\\{\"value\":\"revert\"\\}',
+					"the canonical applied custom data with its revert data is not disturbed by the marker"
+				);
+			}.bind(this));
+		});
+
 		QUnit.test("getCustomDataIdentifier", function(assert) {
 			assert.equal(FlexCustomData.getCustomDataIdentifier(true), sAppliedKey, "the correct identifier is returned");
 			assert.equal(FlexCustomData.getCustomDataIdentifier(false, false), sNotApplicableKey, "the correct identifier is returned");
 			assert.equal(FlexCustomData.getCustomDataIdentifier(false, true, true), sFailedXMLKey, "the correct identifier is returned");
 			assert.equal(FlexCustomData.getCustomDataIdentifier(false, true, false), sFailedJSKey, "the correct identifier is returned");
+			assert.notStrictEqual(
+				FlexCustomData.getCustomDataIdentifier(true), sAppliedXmlKey,
+				"the applied identifier is the canonical key, not the xml marker key"
+			);
 		});
 
 		QUnit.test("hasChangeApplyFinishedCustomData", function(assert) {
-			assert.notOk(FlexCustomData.hasChangeApplyFinishedCustomData(this.oControl, this.oChange, this.mPropertyBag.modifier), "the control has no flex custom data");
+			assert.notOk(FlexCustomData.hasChangeApplyFinishedCustomData(this.oControl, this.oChange, this.mPropertyBag.modifier),
+				"the control has no flex custom data");
 		});
 	});
 
@@ -186,18 +212,29 @@ sap.ui.define([
 		});
 
 		QUnit.test("getParsedRevertDataFromCustomData with js control tree modifier", function(assert) {
-			var oParsedRevertData = FlexCustomData.getParsedRevertDataFromCustomData(this.oControl, this.oChange, this.mPropertyBag.modifier);
+			var oParsedRevertData = FlexCustomData.getParsedRevertDataFromCustomData(this.oControl,
+				this.oChange,
+				this.mPropertyBag.modifier);
 			assert.deepEqual(oParsedRevertData, { value: "revert" }, "the parsed data is correct");
 		});
 
 		QUnit.test("getParsedRevertDataFromCustomData with js control tree modifier without custom data", function(assert) {
-			var oParsedRevertData = FlexCustomData.getParsedRevertDataFromCustomData(this.oControl, this.oChange2, this.mPropertyBag.modifier);
+			var oParsedRevertData = FlexCustomData.getParsedRevertDataFromCustomData(this.oControl,
+				this.oChange2,
+				this.mPropertyBag.modifier);
 			assert.notOk(oParsedRevertData, "the parsed data returns undefined");
 		});
 
 		QUnit.test("destroyAppliedCustomData", function(assert) {
+			this.oControl.addCustomData(new CustomData({
+				key: createCustomDataKey(this.oChange, sAppliedXmlKey),
+				value: "true"
+			}));
 			FlexCustomData.destroyAppliedCustomData(this.oControl, this.oChange, this.mPropertyBag.modifier);
-			assert.notOk(getCustomData(this.oControl, createCustomDataKey(this.oChange, sAppliedKey)));
+			assert.notOk(getCustomData(this.oControl, createCustomDataKey(this.oChange, sAppliedKey)),
+				"the canonical applied custom data was destroyed");
+			assert.notOk(getCustomData(this.oControl, createCustomDataKey(this.oChange, sAppliedXmlKey)),
+				"the xml applier marker was destroyed as well so a reverted change is not reported as xml-applied");
 		});
 
 		QUnit.test("hasChangeApplyFinishedCustomData", function(assert) {
