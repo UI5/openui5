@@ -4610,7 +4610,7 @@ sap.ui.define([
 	//*********************************************************************************************
 [false, true].forEach(function (bAction) {
 	QUnit.test("fetch: with payload: " + bAction, async function (assert) {
-		const oRequestor = _Requestor.create("/~/", null, {
+		const oRequestor = _Requestor.create("/~/", oModelInterface, {
 				"Content-Type" : "n/a",
 				custom : "value",
 				"X-CSRF-Token" : "~token~"
@@ -4634,8 +4634,15 @@ sap.ui.define([
 		assert.strictEqual(_Requestor.fetch, fetch, "trampoline property");
 
 		const oResult = Object.freeze({ok : true});
-		this.mock(_Requestor).expects("fetch").on(window)
-			.withExactArgs("/~/Product(42)~queryString~", oFetchOptions).resolves(oResult);
+		this.mock(oModelInterface).expects("getOrCreateRetryAfterPromise").withExactArgs()
+			.callsFake(() => new Promise((resolve) => {
+				const oFetchExpectation = this.mock(_Requestor).expects("fetch").on(window)
+					.withExactArgs("/~/Product(42)~queryString~", oFetchOptions).resolves(oResult);
+				setTimeout(() => {
+					assert.notOk(oFetchExpectation.called);
+					resolve();
+				});
+			}));
 		this.mock(_Helper).expects("createError").never();
 
 		// code under test
@@ -4669,6 +4676,8 @@ sap.ui.define([
 			}
 		};
 
+		const oModelInterfaceMock = this.mock(oModelInterface);
+		oModelInterfaceMock.expects("getOrCreateRetryAfterPromise").withExactArgs().returns(null);
 		const sRequestUrl = "/~/Product(42)~queryString~";
 		const oResult = {
 			headers : {get : mustBeMocked},
@@ -4696,8 +4705,9 @@ sap.ui.define([
 			});
 		oHeadersMock.expects("get").exactly(bStatus503 ? 1 : 0)
 			.withExactArgs("Retry-After").returns(bRetryAfter ? "42" : undefined);
-		this.mock(oRequestor.oModelInterface).expects("getOrCreateRetryAfterPromise")
-			.exactly(bStatus503 && bRetryAfter ? 1 : 0).returns(null);
+		// Note: no "Retry-After" handler is set
+		oModelInterfaceMock.expects("getOrCreateRetryAfterPromise")
+			.withExactArgs("~oError~").exactly(bStatus503 && bRetryAfter ? 1 : 0).returns(null);
 
 		// code under test
 		return oRequestor.fetch("~method~", "Product(42)", "~queryString~")
@@ -4711,7 +4721,7 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("fetch: 503 handling", async function (assert) {
+	QUnit.test("fetch: 503 handling, Retry-After handler is set", async function (assert) {
 		const oRequestor = _Requestor.create("/~/", oModelInterface, {}, {}, "4.0");
 		const oFetchOptions = {
 			method : "~method~",
@@ -4724,8 +4734,12 @@ sap.ui.define([
 			}
 		};
 		const sRequestUrl = "/~/Product(42)~queryString~";
-		const oRequestorMock = this.mock(_Requestor);
-		oRequestorMock.expects("fetch").on(window).withExactArgs(sRequestUrl, oFetchOptions)
+		const oRequestorMock = this.mock(oRequestor);
+		oRequestorMock.expects("fetch").withExactArgs("~method~", "Product(42)", "~queryString~")
+			.callThrough(); // start the recursion
+		const oModelInterfaceMock = this.mock(oModelInterface);
+		oModelInterfaceMock.expects("getOrCreateRetryAfterPromise").withExactArgs().returns(null);
+		this.mock(_Requestor).expects("fetch").on(window).withExactArgs(sRequestUrl, oFetchOptions)
 			.resolves({
 				headers : new Headers({"Retry-After" : "n/a"}),
 				ok : false,
@@ -4739,23 +4753,35 @@ sap.ui.define([
 				statusText : "~statusText~"
 			}), "Communication error", sRequestUrl, "Product(42)")
 			.returns("~oError~");
-		const oResult200 = Object.freeze({ok : true});
-		this.mock(oRequestor.oModelInterface).expects("getOrCreateRetryAfterPromise")
-			.withExactArgs("~oError~")
-			.callsFake(() => new Promise((resolve) => {
-				const oFetchExpectation = oRequestorMock.expects("fetch").on(window)
-					.withExactArgs(sRequestUrl, oFetchOptions).resolves(oResult200);
-				setTimeout(() => {
-					assert.notOk(oFetchExpectation.called);
-					resolve();
-				});
-			}));
+		oModelInterfaceMock.expects("getOrCreateRetryAfterPromise").withExactArgs("~oError~")
+			.resolves("~retryAfterPromise~");
+		oRequestorMock.expects("fetch")
+			.withExactArgs("~method~", "Product(42)", "~queryString~", undefined)
+			.resolves("~result~");
 
 		assert.strictEqual(
 			// code under test
 			await oRequestor.fetch("~method~", "Product(42)", "~queryString~"),
-			oResult200
+			"~result~"
 		);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("fetch: Retry-After handler rejects", function (assert) {
+		const oRequestor = _Requestor.create("/~/", oModelInterface, {}, {}, "4.0");
+		const oRetryAfterError = new Error("Retry-After failed");
+		this.mock(oModelInterface).expects("getOrCreateRetryAfterPromise")
+			.withExactArgs().rejects(oRetryAfterError);
+		this.mock(_Requestor).expects("fetch").never();
+		this.mock(_Helper).expects("createError").never();
+
+		// code under test
+		return oRequestor.fetch("~method~", "Product(42)", "~queryString~")
+			.then(function () {
+				assert.ok(false, "Unexpected success");
+			}, function (oError) {
+				assert.strictEqual(oError, oRetryAfterError);
+			});
 	});
 
 	//*********************************************************************************************

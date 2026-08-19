@@ -924,52 +924,44 @@ sap.ui.define([
 	 *
 	 * @public
 	 */
-	_Requestor.prototype.fetch = function (sMethod, sResourcePath, sQueryString, oPayload) {
-		const that = this;
-		const sRequestUrl = this.sServiceUrl + sResourcePath + sQueryString;
+	_Requestor.prototype.fetch = async function (sMethod, sResourcePath, sQueryString, oPayload) {
+		await this.oModelInterface.getOrCreateRetryAfterPromise();
 
-		async function doFetch() {
-			const oFetchOptions = {
-				method : sMethod,
-				headers : {
-					...that.mPredefinedRequestHeaders,
-					...that.mHeaders,
-					...that.mFinalHeaders
-				}
-			};
-			if (oPayload) {
-				oFetchOptions.body = JSON.stringify(oPayload);
+		const oFetchOptions = {
+			method : sMethod,
+			headers : {
+				...this.mPredefinedRequestHeaders,
+				...this.mHeaders,
+				...this.mFinalHeaders
 			}
-
-			// Note: fetch API needs to be invoked on window object
-			const oResponse = await _Requestor.fetch.call(window, sRequestUrl, oFetchOptions);
-			if (oResponse.ok) {
-				return oResponse;
-			}
-
-			const jqXHR = {
-				getResponseHeader : function (sHeaderName) {
-					return oResponse.headers.get(sHeaderName);
-				},
-				responseText : await oResponse.text(),
-				status : oResponse.status,
-				statusText : oResponse.statusText
-			};
-			const oError
-				= _Helper.createError(jqXHR, "Communication error", sRequestUrl, sResourcePath);
-			if (oResponse.status === 503 && oResponse.headers.get("Retry-After")) {
-				const oPromise = that.oModelInterface.getOrCreateRetryAfterPromise(oError);
-				if (oPromise) {
-					await oPromise;
-
-					return doFetch();
-				}
-			}
-
-			throw oError;
+		};
+		if (oPayload) {
+			oFetchOptions.body = JSON.stringify(oPayload);
 		}
 
-		return doFetch();
+		const sRequestUrl = this.sServiceUrl + sResourcePath + sQueryString;
+		// Note: fetch API needs to be invoked on window object
+		const oResponse = await _Requestor.fetch.call(window, sRequestUrl, oFetchOptions);
+		if (oResponse.ok) {
+			return oResponse;
+		}
+
+		const jqXHR = {
+			getResponseHeader : function (sHeaderName) {
+				return oResponse.headers.get(sHeaderName);
+			},
+			responseText : await oResponse.text(),
+			status : oResponse.status,
+			statusText : oResponse.statusText
+		};
+		const oError
+			= _Helper.createError(jqXHR, "Communication error", sRequestUrl, sResourcePath);
+		if (oResponse.status === 503 && oResponse.headers.get("Retry-After")
+				&& this.oModelInterface.getOrCreateRetryAfterPromise(oError)) {
+			return this.fetch(sMethod, sResourcePath, sQueryString, oPayload);
+		}
+
+		throw oError;
 	};
 
 	/**

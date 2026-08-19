@@ -10454,7 +10454,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Scenario: "Retry-After" handling with streams
 	// 1) Fetch a stream
 	// 2) Fetch answered with 503 "Retry-After"
-	// 3) Resolve "Retry-After" promise repeats the fetch request
+	// 3) Invoke a second stream while waiting for "Retry-After"
+	// 4) No additional request is sent until "Retry-After" is resolved
+	// 5) After resolving "Retry-After", both requests are sent (again)
 	// JIRA: CPOUI5ODATAV4-3624
 	QUnit.test('Edm.Stream response with 503, "Retry-After" handling', async function (assert) {
 		const oModel = this.createTeaBusiModel123();
@@ -10506,9 +10508,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			});
 
 		// code under test
-		const oInvokePromise = oBinding.invoke("$stream");
+		const oInvokePromise0 = oBinding.invoke("$stream");
 
 		await oCallbackPromise;
+
+		// code under test - invoke a second stream while waiting for retry-after
+		const oInvokePromise1 = oBinding.setParameter("locale", "en-US").invoke("$stream");
 
 		oRequestorMock.expects("fetch")
 			.withExactArgs(sTeaBusi + sPath + "?sap-client=123", {
@@ -10521,12 +10526,23 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				body : "~body~",
 				headers : "~headers~"
 			});
+		oRequestorMock.expects("fetch")
+			.withExactArgs(sTeaBusi + sPath + "?sap-client=123", {
+				headers : mHeaders,
+				method : "POST",
+				body : JSON.stringify({locale : "en-US"})
+			})
+			.resolves({
+				ok : true,
+				body : "~body2~",
+				headers : "~headers2~"
+			});
 
 		// code under test
 		fnResolveRetryAfter();
-		const oResult = await oInvokePromise;
 
-		assert.deepEqual(oResult, {body : "~body~", headers : "~headers~"});
+		assert.deepEqual(await oInvokePromise0, {body : "~body~", headers : "~headers~"});
+		assert.deepEqual(await oInvokePromise1, {body : "~body2~", headers : "~headers2~"});
 	});
 
 	//*********************************************************************************************
