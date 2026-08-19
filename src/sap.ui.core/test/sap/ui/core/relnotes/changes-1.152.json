@@ -3,6 +3,16 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "9270c57d5f6cf41f1ed5bce7695a1eac21218f77",
+        "type": "FEATURE",
+        "text": " Revert: core/IconPool: add SVG icon assets"
+      },
+      {
+        "id": "e6ee5c895fe6c6c7ec049867c6fd30bad671684b",
+        "type": "FEATURE",
+        "text": " Revert: core/IconPool: add SVG icon LESS theme configuration"
+      },
+      {
         "id": "8a4653b5419e8243b925a064e612049c9a8748c8",
         "type": "FEATURE",
         "text": " SimpleForm: use sap.m.Title for rendering"

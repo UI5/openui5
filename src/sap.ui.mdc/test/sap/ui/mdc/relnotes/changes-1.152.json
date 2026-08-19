@@ -3,6 +3,11 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "039b2bf279739d8958d47c7f9083a42cebfa6884",
+        "type": "FEATURE",
+        "text": " mdc.Table: Add delegate validation hook for the P13n dialog"
+      },
+      {
         "id": "36d79eedc0bf8a4f9fa0eff8069c627431baea8f",
         "type": "FIX",
         "text": "p13n.AdaptFiltersPanel: fix boolean field visibility"

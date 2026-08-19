@@ -3,6 +3,36 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "43729379b84f124eadf09d2982185e36e3460f3f",
+        "type": "FEATURE",
+        "text": " We now highlight the Download button as the primary action in the File Preview dialog"
+      },
+      {
+        "id": "b67eee565a0182742e7367ca836bdc174fb108c1",
+        "type": "FIX",
+        "text": " sap.m.Link: announce tooltip via aria-describedby when emphasized"
+      },
+      {
+        "id": "f7af44f9d2b27665c6e613f85f1f47070c56c436",
+        "type": "FIX",
+        "text": " We've now replaced sap.m.ActionSheet with sap.m.Menu component in the feed list item control"
+      },
+      {
+        "id": "eb8dbe2e0d180f212840590f1c271c46a3d48766",
+        "type": "FIX",
+        "text": " sap.m.ScrollContainer: fix focus outline visibility at container edges"
+      },
+      {
+        "id": "3d7a75d4271cfd725e3374e4a18e39163cd003bb",
+        "type": "FIX",
+        "text": " sap.m.Popover: Label custom header when showHeader is false"
+      },
+      {
+        "id": "039b2bf279739d8958d47c7f9083a42cebfa6884",
+        "type": "FEATURE",
+        "text": " mdc.Table: Add delegate validation hook for the P13n dialog"
+      },
+      {
         "id": "d08a64f801121aacf7cc1d04ffc1cdc8ada3c453",
         "type": "FIX",
         "text": "sap.m.ComboBox: Dialog opens when tapping on mobile"

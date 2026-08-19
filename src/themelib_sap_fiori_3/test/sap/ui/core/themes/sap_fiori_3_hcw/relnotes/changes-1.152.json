@@ -3,6 +3,11 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "e6ee5c895fe6c6c7ec049867c6fd30bad671684b",
+        "type": "FEATURE",
+        "text": " Revert: core/IconPool: add SVG icon LESS theme configuration"
+      },
+      {
         "id": "b604c3f0a18af4459847781b438ff13d5686ed7a",
         "type": "FEATURE",
         "text": " Form: use sap.m.Title for rendering"
