@@ -5910,4 +5910,268 @@ sap.ui.define([
 		assert.ok(this.oTable.getFirstVisibleRow() > iFastScrollFirstVisibleRow, "firstVisibleRow updated immediately for the slow scroll");
 		this.assertSkeletons(false);
 	});
+
+	QUnit.module("Scroll handle", {
+		beforeEach: async function() {
+			this.oTable = TableQUnitUtils.createTable({
+				rowMode: new FixedRowMode({rowCount: 10}),
+				rows: {path: "/"},
+				models: TableQUnitUtils.createJSONModelWithEmptyRows(100),
+				columns: [TableQUnitUtils.createTextColumn()]
+			});
+
+			await this.oTable.qunit.rendered();
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		},
+		getHandle: function() {
+			return this.oTable._getScrollExtension().getVerticalScrollbar()?.parentElement.querySelector(".sapUiTableVScrHandle");
+		}
+	});
+
+	QUnit.test("showScrollHandle is Off", function(assert) {
+		this.oTable.setShowScrollHandle(library.ShowScrollHandle.Off);
+		const oScrollExtension = this.oTable._getScrollExtension();
+		const oVSb = oScrollExtension.getVerticalScrollbar();
+
+		oScrollExtension._bTouchScroll = true;
+		oVSb.dispatchEvent(new Event("pointerdown"));
+		assert.notOk(this.getHandle(), "ShowScrollHandle.Off with _bTouchScroll: handle is not created");
+		delete oScrollExtension._bTouchScroll;
+
+		oScrollExtension._bIOSThumbDrag = true;
+		oVSb.dispatchEvent(new Event("pointerdown"));
+		assert.notOk(this.getHandle(), "ShowScrollHandle.Off with _bIOSThumbDrag: handle is not created");
+		delete oScrollExtension._bIOSThumbDrag;
+	});
+
+	QUnit.test("showScrollHandle is On", function(assert) {
+		this.oTable.setShowScrollHandle(library.ShowScrollHandle.On);
+		const oScrollExtension = this.oTable._getScrollExtension();
+		const oVSb = oScrollExtension.getVerticalScrollbar();
+
+		delete oScrollExtension._bTouchScroll;
+		delete oScrollExtension._bIOSThumbDrag;
+		oVSb.dispatchEvent(new Event("pointerdown"));
+		assert.ok(this.getHandle(), "ShowScrollHandle.On without touch flags: handle is created");
+	});
+
+	QUnit.test("showScrollHandle is Default, no touch scroll or thumb dragging", function(assert) {
+		this.oTable.setShowScrollHandle(library.ShowScrollHandle.Default);
+		const oScrollExtension = this.oTable._getScrollExtension();
+		const oVSb = oScrollExtension.getVerticalScrollbar();
+
+		delete oScrollExtension._bTouchScroll;
+		delete oScrollExtension._bIOSThumbDrag;
+
+		oVSb.dispatchEvent(new Event("pointerdown"));
+		assert.notOk(this.getHandle(), "ShowScrollHandle.Default without touch: handle is not created");
+	});
+
+	QUnit.test("showScrollHandle is Default with touch scroll", function(assert) {
+		this.oTable.setShowScrollHandle(library.ShowScrollHandle.Default);
+		const oScrollExtension = this.oTable._getScrollExtension();
+		const oVSb = oScrollExtension.getVerticalScrollbar();
+
+		oScrollExtension._bTouchScroll = true;
+		oVSb.dispatchEvent(new Event("pointerdown"));
+		assert.ok(this.getHandle(), "ShowScrollHandle.Default with _bTouchScroll: handle is created");
+		delete oScrollExtension._bTouchScroll;
+	});
+
+	QUnit.test("Rendering", function(assert) {
+		this.oTable.setShowScrollHandle(library.ShowScrollHandle.On);
+		const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
+
+		oVSb.dispatchEvent(new Event("pointerdown"));
+
+		const oHandle = this.getHandle();
+		assert.ok(oHandle, "Handle element exists in DOM");
+		assert.ok(oHandle.classList.contains("sapUiTableVScrHandleVisible"), "Handle has visible CSS class");
+		assert.strictEqual(oHandle.getAttribute("tabindex"), "-1", "tabindex is -1");
+		assert.strictEqual(oHandle.getAttribute("role"), "none", "role is none");
+		assert.strictEqual(oHandle.getAttribute("aria-hidden"), "true", "aria-hidden is true");
+		assert.ok(oHandle.querySelector(".sapUiTableVScrHandleGrip"), "Grip icon span exists");
+		assert.ok(oHandle.classList.contains("sapUiTableVScrHandleVisible"), "Handle has visible CSS class after update");
+		assert.ok(oHandle.style.top, "Top style is set");
+	});
+
+	QUnit.test("Content", function(assert) {
+		this.oTable.setShowScrollHandle(library.ShowScrollHandle.On);
+		const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
+
+		// Binding length is final for JSONModel (100 rows, 10 visible).
+		oVSb.dispatchEvent(new Event("pointerdown"));
+
+		let oHandle = this.getHandle();
+		assert.ok(oHandle, "Handle element exists");
+		let sText = oHandle.firstChild.textContent;
+		assert.equal(sText, TableUtils.getResourceText("TBL_SCROLL_HANDLE_ROWS_OF", [1, 10, 100]));
+
+		const oBinding = this.oTable.getBinding();
+		const oIsLengthFinalStub = sinon.stub(oBinding, "isLengthFinal").returns(false);
+		oVSb.dispatchEvent(new Event("pointerdown"));
+
+		oHandle = this.getHandle();
+		assert.ok(oHandle, "Handle element exists");
+		sText = oHandle.firstChild.textContent;
+		assert.equal(sText, TableUtils.getResourceText("TBL_SCROLL_HANDLE_ROWS", [1, 10]));
+
+		// With 2 fixed top and 2 fixed bottom rows (6 scrollable rows visible).
+		const oRowMode = this.oTable.getRowMode();
+		oRowMode.setFixedTopRowCount(2);
+		oRowMode.setFixedBottomRowCount(2);
+
+		oVSb.dispatchEvent(new Event("pointerdown"));
+
+		oHandle = this.getHandle();
+		sText = oHandle.firstChild.textContent;
+		assert.equal(sText, TableUtils.getResourceText("TBL_SCROLL_HANDLE_ROWS", [3, 8]));
+
+		oIsLengthFinalStub.restore();
+		oVSb.dispatchEvent(new Event("pointerdown"));
+
+		oHandle = this.getHandle();
+		sText = oHandle.firstChild.textContent;
+		assert.equal(sText, TableUtils.getResourceText("TBL_SCROLL_HANDLE_ROWS_OF", [3, 8, 100]));
+	});
+
+	QUnit.test("Reuses existing element on repeated calls", function(assert) {
+		this.oTable.setShowScrollHandle(library.ShowScrollHandle.On);
+		const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
+
+		oVSb.dispatchEvent(new Event("pointerdown"));
+		const oHandle1 = this.getHandle();
+
+		oVSb.dispatchEvent(new Event("pointerdown"));
+		const oHandle2 = this.getHandle();
+
+		assert.strictEqual(oHandle1, oHandle2, "The same handle element is reused");
+		assert.strictEqual(oVSb.parentElement.querySelectorAll(".sapUiTableVScrHandle").length, 1, "Only one handle element exists in the DOM");
+	});
+
+	QUnit.test("hideScrollHandle - hides handle after timeout", function(assert) {
+		const clock = sinon.useFakeTimers();
+		this.oTable.setShowScrollHandle(library.ShowScrollHandle.On);
+		const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
+
+		oVSb.dispatchEvent(new Event("pointerdown"));
+		const oHandle = this.getHandle();
+		assert.ok(oHandle, "Handle is shown");
+
+		oVSb.dispatchEvent(new Event("pointerup"));
+		assert.ok(oHandle.classList.contains("sapUiTableVScrHandleVisible"), "Visible class still present before timeout");
+
+		clock.tick(3000);
+		assert.notOk(oHandle.classList.contains("sapUiTableVScrHandleVisible"), "Visible class removed after timeout");
+		clock.restore();
+	});
+
+	QUnit.test("hideScrollHandle - debounces repeated calls", function(assert) {
+		const clock = sinon.useFakeTimers();
+		this.oTable.setShowScrollHandle(library.ShowScrollHandle.On);
+		const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
+
+		oVSb.dispatchEvent(new Event("pointerdown"));
+		const oHandle = this.getHandle();
+
+		// First hide call starts a 3s timeout.
+		oVSb.dispatchEvent(new Event("pointerup"));
+		clock.tick(2000);
+		// Second hide call before timeout fires must reset it.
+		oVSb.dispatchEvent(new Event("pointerup"));
+		clock.tick(2000);
+		// Only 2000ms elapsed since last hide call, so handle is still visible.
+		assert.ok(oHandle.classList.contains("sapUiTableVScrHandleVisible"), "Handle still visible: debounce reset the timer");
+
+		clock.tick(1001);
+		assert.notOk(oHandle.classList.contains("sapUiTableVScrHandleVisible"), "Handle hidden after full 3s from last hide call");
+		clock.restore();
+	});
+
+	QUnit.test("hideScrollHandle - waits 3000ms after dragging", function(assert) {
+		const clock = sinon.useFakeTimers();
+		this.oTable.setShowScrollHandle(library.ShowScrollHandle.On);
+		const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
+
+		// Show the handle first.
+		oVSb.dispatchEvent(new PointerEvent("pointerdown"));
+		const oHandle = this.getHandle();
+		assert.ok(oHandle, "Handle is shown");
+
+		// Start a drag on the handle.
+		oHandle.dispatchEvent(new PointerEvent("pointerdown", {bubbles: true, cancelable: true, clientY: 100}));
+		clock.tick(1000);
+		assert.ok(oHandle.classList.contains("sapUiTableVScrHandleVisible"), "Handle stays visible while dragging");
+
+		// End drag.
+		document.dispatchEvent(new PointerEvent("pointerup", {bubbles: true}));
+		clock.tick(3000);
+		assert.notOk(oHandle.classList.contains("sapUiTableVScrHandleVisible"), "Handle hidden after drag ends and timeout fires");
+		clock.restore();
+	});
+
+	QUnit.test("drag via mouse - updates scrollbar scrollTop", function(assert) {
+		this.oTable.setShowScrollHandle(library.ShowScrollHandle.On);
+		const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
+
+		oVSb.dispatchEvent(new PointerEvent("pointerdown"));
+		const oHandle = this.getHandle();
+		assert.ok(oHandle, "Handle is shown");
+
+		const iScrollRangeBefore = oVSb.scrollHeight - oVSb.clientHeight;
+		assert.ok(iScrollRangeBefore > 0, "Table is scrollable");
+
+		// Simulate a pointerdown on the handle at Y=200, then move down by 50px.
+		oHandle.dispatchEvent(new PointerEvent("pointerdown", {bubbles: true, cancelable: true, clientY: 200}));
+		document.dispatchEvent(new PointerEvent("pointermove", {bubbles: true, clientY: 250}));
+
+		assert.ok(oVSb.scrollTop > 0, "scrollTop increased after dragging the handle down");
+
+		document.dispatchEvent(new PointerEvent("pointerup", {bubbles: true}));
+	});
+
+	QUnit.test("drag via touch - updates scrollbar scrollTop", function(assert) {
+		this.oTable.setShowScrollHandle(library.ShowScrollHandle.On);
+		const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
+
+		oVSb.dispatchEvent(new PointerEvent("pointerdown"));
+		const oHandle = this.getHandle();
+		assert.ok(oHandle, "Handle is shown");
+
+		const iScrollRangeBefore = oVSb.scrollHeight - oVSb.clientHeight;
+		assert.ok(iScrollRangeBefore > 0, "Table is scrollable");
+
+		oHandle.dispatchEvent(new PointerEvent("pointerdown", {bubbles: true, cancelable: true, clientY: 200}));
+		document.dispatchEvent(new PointerEvent("pointermove", {bubbles: true, clientY: 250}));
+
+		assert.ok(oVSb.scrollTop > 0, "scrollTop increased after touch-dragging the handle down");
+
+		document.dispatchEvent(new PointerEvent("pointerup", {bubbles: true}));
+	});
+
+	QUnit.test("pointerdown on scrollbar shows handle", function(assert) {
+		this.oTable.setShowScrollHandle(library.ShowScrollHandle.On);
+		const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
+
+		assert.notOk(this.getHandle(), "Handle does not exist before pointerdown");
+		oVSb.dispatchEvent(new Event("pointerdown"));
+		assert.ok(this.getHandle(), "Handle exists after pointerdown on scrollbar");
+		assert.ok(this.getHandle().classList.contains("sapUiTableVScrHandleVisible"), "Handle is visible after pointerdown");
+	});
+
+	QUnit.test("pointerup on scrollbar schedules hide", function(assert) {
+		const clock = sinon.useFakeTimers();
+		this.oTable.setShowScrollHandle(library.ShowScrollHandle.On);
+		const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
+
+		oVSb.dispatchEvent(new Event("pointerdown"));
+		const oHandle = this.getHandle();
+		oVSb.dispatchEvent(new Event("pointerup"));
+
+		clock.tick(3000);
+		assert.notOk(oHandle.classList.contains("sapUiTableVScrHandleVisible"), "Handle is hidden after pointerup and timeout");
+		clock.restore();
+	});
 });

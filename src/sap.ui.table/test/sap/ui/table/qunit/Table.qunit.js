@@ -4759,7 +4759,7 @@ sap.ui.define([
 		const bOriginalDeviceOsMac = Device.os.macintosh;
 		const bOriginalDeviceSystem = Device.system.desktop;
 		Device.os.macintosh = true;
-		Device.system.desktop = false;
+		Device.browser.mobile = true;
 		oTable.destroy();
 		await createTable();
 
