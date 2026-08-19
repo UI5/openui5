@@ -619,7 +619,7 @@ sap.ui.define([
 									items: [
 										new Icon({src: "sap-icon://message-warning", color: coreLib.IconColor.Critical})
 											.addStyleClass("sapUiTinyMarginEnd"),
-										new Title({text: sTitle, level: coreLib.TitleLevel.H2})
+										new Title({text: sTitle, level: coreLib.TitleLevel.H1})
 									],
 									renderType: mLib.FlexRendertype.Bare,
 									justifyContent: mLib.FlexJustifyContent.Center,
