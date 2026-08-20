@@ -137,7 +137,9 @@ sap.ui.define([
 				/**
 				 * Fired when some card configuration settings are changed as a result of user interaction.
 				 * For example - filter value is changed.
-				 * @ui5-experimental-since 1.96
+				 * @private
+				 * @ui5-restricted
+				 * @since 1.96
 				 */
 				cardConfigurationChange: {
 					parameters: {
@@ -165,7 +167,6 @@ sap.ui.define([
 				/**
 				 * Fired when the state of a card is changed.
 				 * For example - the card is ready, new page is selected inside the card, a filter is changed or data is refreshed.
-				 * @protected
 				 * @since 1.107
 				 */
 				cardStateChanged: {

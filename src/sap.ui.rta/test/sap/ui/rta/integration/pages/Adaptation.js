@@ -302,6 +302,35 @@ sap.ui.define([
 						errorMessage: "Did not find the change annotation dialog"
 					});
 				},
+				iEnterANewAnnotationLabelForProperty(sPropertyLabel, sNewLabel) {
+					return this.waitFor({
+						controlType: "sap.m.Dialog",
+						id: "sapUiRtaChangeAnnotationDialog",
+						actions(oDialog) {
+							const oForm = oDialog.getContent()[0].getItems()[3];
+							const aFormElements = oForm.getFormContainers()[0].getFormElements();
+							const oFormElement = aFormElements.find((oElement) => {
+								const vLabel = oElement.getLabel();
+								const sLabelText = typeof vLabel === "string" ? vLabel : vLabel?.getText?.();
+								return sLabelText === sPropertyLabel;
+							});
+							const oInput = oFormElement.getFields()[0];
+							new EnterText({
+								text: sNewLabel
+							}).executeOn(oInput);
+							new Press().executeOn(oDialog.getBeginButton());
+						},
+						errorMessage: `Did not find the property '${sPropertyLabel}' in the change annotation dialog`
+					});
+				},
+				iCancelTheAnnotationDialog() {
+					return this.waitFor({
+						controlType: "sap.m.Button",
+						id: "sapUiRtaChangeAnnotationDialog_cancelButton",
+						actions: new Press(),
+						errorMessage: "Did not find the cancel button of the change annotation dialog"
+					});
+				},
 				iSelectAFieldByBindingPathInTheAddDialog(sBindingPath) {
 					return this.waitFor({
 						searchOpenDialogs: true,
@@ -744,6 +773,27 @@ sap.ui.define([
 						errorMessage: "Did not find the Context Menu entries"
 					});
 				},
+				iShouldSeeTheContextMenuEntryInfoButton(sKey) {
+					return this.waitFor({
+						controlType: "sap.m.Popover",
+						matchers(oPopover) {
+							return oPopover.hasStyleClass("sapUiDtContextMenu");
+						},
+						success(aPopover) {
+							const oMenu = aPopover[0].getContent()[0];
+							const oMenuItem = oMenu.getItems().find((oItem) => oItem.getKey() === sKey);
+							Opa5.assert.ok(oMenuItem, `Found the context menu entry with key '${sKey}'`);
+							const oInfoButton = oMenuItem.getEndContent().find((oControl) => {
+								return oControl.isA("sap.m.Button") && oControl.getIcon() === "sap-icon://message-information";
+							});
+							Opa5.assert.ok(oInfoButton, `The entry '${sKey}' has an additional info button`);
+							const sTooltip = oInfoButton?.getTooltip();
+							Opa5.assert.ok(typeof sTooltip === "string" && sTooltip.length > 0,
+								`The additional info button of '${sKey}' has a non-empty tooltip`);
+						},
+						errorMessage: "Did not find the Context Menu"
+					});
+				},
 				iShouldSeeTheDialog(sId, sTitle) {
 					return this.waitFor({
 						controlType: "sap.m.Dialog",
@@ -754,6 +804,18 @@ sap.ui.define([
 							Opa5.assert.strictEqual(oControl.getTitle(), sTitle, "The dialog is shown");
 						},
 						errorMessage: "Did not find the Dialog"
+					});
+				},
+				iShouldSeeTheAnnotationDialog() {
+					return this.waitFor({
+						controlType: "sap.m.Dialog",
+						id: "sapUiRtaChangeAnnotationDialog",
+						searchOpenDialogs: true,
+						success(oDialog) {
+							const oControl = oDialog[0] || oDialog;
+							Opa5.assert.ok(oControl.isOpen(), "The change annotation dialog is open");
+						},
+						errorMessage: "Did not find the change annotation dialog"
 					});
 				},
 				iShouldNotSeeARestartFlag() {
