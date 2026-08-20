@@ -267,6 +267,8 @@ sap.ui.define([
 		oPopover.attachEventOnce("afterOpen", function() {
 			assert.strictEqual(fnGetSelectAllPopoverSpy.callCount, 2, "Util#getSelectAllPopover is called when showSelectionLimitPopovers is called");
 			assert.strictEqual(oPopover.getContent()[0].getText(), sMessage, "Correct warning message displayed on the popover");
+			const oTitle = oPopover.getCustomHeader().getContentMiddle()[0].getItems()[1];
+			assert.strictEqual(oTitle.getLevel(), "H1", "Popover title has heading level H1");
 			assert.ok(oPopover.isOpen(), "Popover should be open");
 			assert.ok(fnInvisibleMessageAnnounce.calledOnceWith(sMessage), "The message text is announced");
 			Util.hideSelectionLimitPopover();
