@@ -750,7 +750,7 @@ sap.ui.define([
 		 * collapsing. If requested, adds corresponding <code>null</code> updates for expansion.
 		 *
 		 * @param {object} oAggregation
-		 *   An object holding the information needed for data aggregation; see {@link .buildApply}
+		 *   An object holding the information needed for data aggregation; see {@link #.buildApply}
 		 * @param {object} oGroupNode
 		 *   The group node which is about to be expanded
 		 * @param {object} oCollapsed
@@ -797,7 +797,7 @@ sap.ui.define([
 		 * @param {object} mQueryOptions
 		 *   A read-only map of key-value pairs representing the query string
 		 * @param {object} oAggregation
-		 *   An object holding the information needed for data aggregation; see {@link .buildApply}
+		 *   An object holding the information needed for data aggregation; see {@link #.buildApply}
 		 * @param {number} [iLevel=0]
 		 *   The current level; use <code>0</code> to bypass group levels
 		 * @returns {object}
@@ -862,7 +862,7 @@ sap.ui.define([
 		 * Returns an unsorted list of all aggregatable or groupable properties, including units.
 		 *
 		 * @param {object} oAggregation
-		 *   An object holding the information needed for data aggregation; see {@link .buildApply}
+		 *   An object holding the information needed for data aggregation; see {@link #.buildApply}
 		 * @returns {Array<(string|Array<string>)>}
 		 *   An unsorted list of all aggregatable or groupable properties, including units and
 		 *   additional properties (where paths are given as arrays of segments)
@@ -919,7 +919,7 @@ sap.ui.define([
 		 * @param {string} [sOrderby]
 		 *   The original "$orderby" system query option
 		 * @param {object} oAggregation
-		 *   An object holding the information needed for data aggregation; see {@link .buildApply}
+		 *   An object holding the information needed for data aggregation; see {@link #.buildApply}
 		 * @param {number} [iLevel=0]
 		 *   The current level; use <code>0</code> to bypass group levels
 		 * @returns {string|undefined}
@@ -1001,7 +1001,7 @@ sap.ui.define([
 		 * when collapsing the node again, if needed. Takes placement of subtotals into account.
 		 *
 		 * @param {object} oAggregation
-		 *   An object holding the information needed for data aggregation; see {@link .buildApply}
+		 *   An object holding the information needed for data aggregation; see {@link #.buildApply}
 		 * @param {object} oGroupNode
 		 *   The group node which is about to be expanded
 		 * @returns {object}
@@ -1038,7 +1038,7 @@ sap.ui.define([
 		 * @param {sap.ui.model.Filter} oFilter
 		 *   A filter for which the EDM type should be determined
 		 * @param {object} oAggregation
-		 *   An object holding the information needed for data aggregation; see {@link .buildApply}
+		 *   An object holding the information needed for data aggregation; see {@link #.buildApply}
 		 * @param {string} sResolvedPath
 		 *   The resolved meta path for <code>oFilter</code>
 		 * @returns {{$Type: string}|undefined}
@@ -1073,7 +1073,7 @@ sap.ui.define([
 		 * @param {object} oOutOfPlace
 		 *   Out-of-place node information containing key filters
 		 * @param {object} oAggregation
-		 *   An object holding the information needed for data aggregation; see {@link .buildApply}
+		 *   An object holding the information needed for data aggregation; see {@link #.buildApply}
 		 * @param {object} mQueryOptions
 		 *   A read-only map of key-value pairs representing the query string
 		 * @returns {object}
@@ -1113,7 +1113,7 @@ sap.ui.define([
 		 * @param {object[]} aOutOfPlaceByParent
 		 *   Out-of-place node information containing key filters grouped by parent
 		 * @param {object} oAggregation
-		 *   An object holding the information needed for data aggregation; see {@link .buildApply}
+		 *   An object holding the information needed for data aggregation; see {@link #.buildApply}
 		 * @param {object} mQueryOptions
 		 *   A read-only map of key-value pairs representing the query string
 		 * @returns {object}
@@ -1158,7 +1158,7 @@ sap.ui.define([
 		 * client.
 		 *
 		 * @param {object} oAggregation
-		 *   An object holding the information needed for data aggregation; see {@link .buildApply}
+		 *   An object holding the information needed for data aggregation; see {@link #.buildApply}
 		 * @param {object} oGrandTotal
 		 *   An object representing a grand total row response from the server
 		 *
@@ -1203,7 +1203,7 @@ sap.ui.define([
 		 * whether that grand total is shown (also) at the bottom.
 		 *
 		 * @param {object} oAggregation
-		 *   An object holding the information needed for data aggregation; see {@link .buildApply}
+		 *   An object holding the information needed for data aggregation; see {@link #.buildApply}
 		 * @returns {boolean}
 		 *   Whether there is a grand total (also) at bottom
 		 *
@@ -1239,8 +1239,8 @@ sap.ui.define([
 		 * requesting side effects for the given paths.
 		 *
 		 * @param {object} [oAggregation]
-		 *   An object holding the information needed for data aggregation, see {@link .buildApply};
-		 *   if omitted, aggregation related checks are skipped
+		 *   An object holding the information needed for data aggregation, see
+		 *   {@link #.buildApply}; if omitted, aggregation related checks are skipped
 		 * @param {sap.ui.model.Filter[]} aFilters
 		 *   The binding's current filters
 		 * @param {string[]} aSideEffectPaths
@@ -1414,7 +1414,7 @@ sap.ui.define([
 		 *
 		 *
 		 * @param {object} oAggregation
-		 *   An object holding the information needed for data aggregation; see {@link .buildApply}
+		 *   An object holding the information needed for data aggregation; see {@link #.buildApply}
 		 * @param {string} [sPath]
 		 *   The list binding's absolute data path, <code>undefined</code> if currently unresolved
 		 *
@@ -1432,7 +1432,7 @@ sap.ui.define([
 		 * @param {sap.ui.model.Filter} oFilter
 		 *   The filter object that is split
 		 * @param {object} [oAggregation]
-		 *   An object holding the information needed for data aggregation; see {@link .buildApply}
+		 *   An object holding the information needed for data aggregation; see {@link #.buildApply}
 		 * @returns {sap.ui.model.Filter[]}
 		 *   An array that consists of three filters where each can be <code>undefined</code>. The
 		 *   first one has to be applied after data aggregation. The second one can simply be
@@ -1558,7 +1558,7 @@ sap.ui.define([
 		 * Validates the given data aggregation information.
 		 *
 		 * @param {object} oAggregation
-		 *   An object holding the information needed for data aggregation; see {@link .buildApply}
+		 *   An object holding the information needed for data aggregation; see {@link #.buildApply}
 		 * @param {boolean} bAutoExpandSelect
 		 *   The value of the model's parameter <code>autoExpandSelect</code>
 		 * @throws {Error}
@@ -1585,7 +1585,7 @@ sap.ui.define([
 		 * respectively.
 		 *
 		 * @param {object} oAggregation
-		 *   An object holding the information needed for data aggregation; see {@link .buildApply}
+		 *   An object holding the information needed for data aggregation; see {@link #.buildApply}
 		 * @param {boolean} bAutoExpandSelect
 		 *   The value of the model's parameter <code>autoExpandSelect</code>
 		 * @param {function} fnFetchMetadata

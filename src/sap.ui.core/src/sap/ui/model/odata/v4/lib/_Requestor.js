@@ -73,7 +73,7 @@ sap.ui.define([
 	 *   A map of query parameters as described in
 	 *   {@link sap.ui.model.odata.v4.lib._Helper.buildQuery}; used only to request the CSRF token
 	 * @param {object} oModelInterface
-	 *   An interface allowing to call back to the owning model (see {@link .create})
+	 *   An interface allowing to call back to the owning model (see {@link #.create})
 	 * @param {string} sODataVersion
 	 *   The version of the OData service. Supported values are "2.0", "4.0", and "4.01".
 	 * @param {boolean} [bWithCredentials]
