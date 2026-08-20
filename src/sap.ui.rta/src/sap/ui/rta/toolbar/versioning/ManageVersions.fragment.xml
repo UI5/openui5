@@ -16,7 +16,9 @@
 		<content>
 			<Table
 				id="versionList"
-				
+				growing="true"
+				growingThreshold="20"
+				growingScrollToLoad="true"
 				keyboardMode="Edit"
 				fixedLayout="false"
 				sticky="ColumnHeaders"

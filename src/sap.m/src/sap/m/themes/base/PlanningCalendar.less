@@ -211,7 +211,8 @@
 	width: 100%;
 }
 
-.sapMSize0.sapMPlanCal > .sapMList .sapMListInfoTBar .sapUiCalWeeksRow .sapMPlanWeeksLabelRow .sapUiCalRowWeekLabel{
+.sapMSize0.sapMPlanCal > .sapMList .sapMListInfoTBar .sapUiCalWeeksRow .sapMPlanWeeksLabelRow .sapUiCalRowWeekLabel,
+.sapMSize1.sapMPlanCal:not(.sapPCRelative) > .sapMList .sapMListInfoTBar .sapUiCalWeeksRow .sapMPlanWeeksLabelRow .sapUiCalRowWeekLabel {
 	text-align: center;
 	padding-left: 0;
 }
@@ -230,6 +231,37 @@
 .sapMSize0.sapMPlanCal > .sapMList .sapMListInfoTBar > .sapMPlanCalHead,
 .sapMSize1.sapMPlanCal > .sapMList .sapMListInfoTBar > .sapMPlanCalHead {
 	height: auto;
+}
+
+.sapMSize1.sapMPlanCal:not(.sapPCRelative) > .sapMList .sapMListInfoTBar {
+
+	> .sapMPlanCalHead {
+		display: none;
+	}
+
+	> .sapUiCalRow {
+		width: 100%;
+	}
+
+	.sapUiCalWeeksRow {
+		flex-wrap: wrap;
+
+		.sapMPlanWeeksLabelRow {
+			width: 100%;
+			justify-content: center;
+		}
+
+		&.sapMPlanWeeksRowDayView,
+		&.sapMPlanWeeksRowWeekView {
+			.sapMPlanWeeksLabelRow {
+				display: none;
+			}
+		}
+
+		.sapMPlanWeeksDataRow {
+			width: 100%;
+		}
+	}
 }
 
 .sapMPlanCal.sapMPlanCalNoHead.sapMPlanCalMultiSel > .sapMList .sapMListInfoTBar > .sapUiCalRow {

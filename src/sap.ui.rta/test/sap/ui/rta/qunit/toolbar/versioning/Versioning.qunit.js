@@ -107,6 +107,14 @@ sap.ui.define([
 			assert.strictEqual(oDialog.isOpen(), true, "the dialog is open again");
 		});
 
+		QUnit.test("the version list is configured to grow to avoid rendering all versions at once", async function(assert) {
+			await this.oToolbar.showManageVersions();
+			const oVersionList = this.oToolbar.getControl("manageVersionsDialog--versionList");
+			assert.strictEqual(oVersionList.getGrowing(), true, "growing is enabled");
+			assert.strictEqual(oVersionList.getGrowingThreshold(), 20, "the growing threshold is 20");
+			assert.strictEqual(oVersionList.getGrowingScrollToLoad(), true, "more versions are loaded on scroll");
+		});
+
 		QUnit.test("when a version is selected the switchVersion event is fired", async function(assert) {
 			await this.oToolbar.showManageVersions();
 			const oDialog = this.oToolbar.getControl("manageVersionsDialog--manageVersionsDialog");
