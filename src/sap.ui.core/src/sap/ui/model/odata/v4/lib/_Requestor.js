@@ -931,6 +931,7 @@ sap.ui.define([
 			method : sMethod,
 			headers : {
 				...this.mPredefinedRequestHeaders,
+				Accept : "*/*",
 				...this.mHeaders,
 				...this.mFinalHeaders
 			}
