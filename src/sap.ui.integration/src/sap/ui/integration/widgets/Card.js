@@ -1708,7 +1708,7 @@ sap.ui.define([
 	 * - Use when developing a Component card.
 	 *
 	 * @public
-	 * @since 1.77
+	 * @ui5-experimental-since 1.77
 	 * @deprecated Since 1.152. Use <code>getResolvedParameters()</code> instead.
 	 * @returns {map} Object containing parameters in format <code>{parameterKey: parameterValue}</code>.
 	 */
