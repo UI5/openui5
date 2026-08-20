@@ -904,7 +904,6 @@ sap.ui.define([
 	});
 
 	QUnit.test("separators should be rendered between groups and updated correctly", async function(assert) {
-		ActionToolbar.ShowGroupSeparators = true;
 		const aControlActionsWithPosition = this.createActionsWithPosition().sort(() => Math.random() - 0.5);
 		const oToolbar = new ActionToolbar("TB", {
 			controlActions: aControlActionsWithPosition
@@ -978,7 +977,6 @@ sap.ui.define([
 		assert.equal(oDomRef.querySelectorAll(".sapMTBSeparator").length, 1, "G3 separator is rendered again since layout data of the actions are removed and the action goes to the end as a new group");
 
 		oToolbar.destroy();
-		ActionToolbar.ShowGroupSeparators = false;
 	});
 
 	QUnit.module("sap.ui.mdc.ActionToolbar - _updateSeparators", {
