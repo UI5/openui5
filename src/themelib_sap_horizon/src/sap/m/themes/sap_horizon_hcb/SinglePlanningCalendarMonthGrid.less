@@ -12,7 +12,9 @@
 }
 
 html.sap-desktop .sapMSPCMonthDay:not(.sapMSPCMonthDayToday):focus::after,
-html.sap-desktop .sapMSPCMonthDay.sapMSPCMonthDayToday:focus .sapMSPCMonthNowMarker::after {
+html.sap-desktop .sapMSPCMonthDay.sapMSPCMonthDayToday:focus .sapMSPCMonthNowMarker::after,
+.sapMSPCMonthDay:not(.sapUiCalItemFocusFromTouch):not(.sapUiCalItemFocusFromTouch):not(.sapMSPCMonthDayToday):focus-visible::after,
+.sapMSPCMonthDay.sapMSPCMonthDayToday:focus-visible .sapMSPCMonthNowMarker::after {
 	border-width: 0.125rem;
 }
 

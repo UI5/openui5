@@ -19,6 +19,38 @@
 	border-radius: 0 0.125rem 0.125rem 0.125rem;
 }
 
+html.sap-desktop .sapMSinglePC {
+	.sapMSinglePCAppointmentWrap.sapUiCalendarRowApps {
+
+		&:focus {
+
+			.sapUiCalendarAppSel > .sapUiCalendarAppCont::after {
+				border: 0.0625rem dotted var(--sapContent_ContrastFocusColor);
+			}
+		}
+	}
+
+	.sapUiCalItem:focus {
+		outline: none;
+	}
+}
+
+.sapMSinglePC {
+	.sapMSinglePCAppointmentWrap.sapUiCalendarRowApps {
+
+		&:focus-visible {
+
+			.sapUiCalendarAppSel > .sapUiCalendarAppCont::after {
+				border: 0.0625rem dotted var(--sapContent_ContrastFocusColor);
+			}
+		}
+	}
+
+	.sapUiCalItem:focus-visible {
+		outline: none;
+	}
+}
+
 .sapMSinglePC {
 
 	.sapMSinglePCRow,
@@ -49,20 +81,6 @@
 
 	.sapMPCHeadNavToolbar.sapMTB-Transparent-CTX.sapMTB {
 		background-color: var(--sapList_Background);
-	}
-
-	.sapMSinglePCAppointmentWrap.sapUiCalendarRowApps {
-
-		&:focus {
-
-			.sapUiCalendarAppSel > .sapUiCalendarAppCont::after {
-				border: 0.0625rem dotted var(--sapContent_ContrastFocusColor);
-			}
-		}
-	}
-
-	.sapUiCalItem:focus {
-		outline: none;
 	}
 
 	.sapMSinglePCColumnHeader {
@@ -99,6 +117,30 @@
 	}
 }
 
+html.sap-desktop .sapUiSizeCompact .sapMSinglePC {
+	.sapMSinglePCColumnHeader {
+		.sapUiCalItem.sapUiCalItemSel:not(.sapUiCalItemNow):not(.sapUiCalItemSelBetween):focus > .sapUiCalItemText {
+			border: transparent;
+		}
+
+		.sapUiCalItem:focus > .sapUiCalItemText {
+			outline: none;
+		}
+	}
+}
+
+.sapUiSizeCompact .sapMSinglePC {
+	.sapMSinglePCColumnHeader {
+		.sapUiCalItem:not(.sapUiCalItemFocusFromTouch).sapUiCalItemSel:not(.sapUiCalItemNow):not(.sapUiCalItemSelBetween):focus-visible > .sapUiCalItemText {
+			border: transparent;
+		}
+
+		.sapUiCalItem:focus-visible > .sapUiCalItemText {
+			outline: none;
+		}
+	}
+}
+
 .sapUiSizeCompact .sapMSinglePC {
 
 	.sapMSinglePCColumnHeader {
@@ -124,18 +166,13 @@
 			}
 		}
 
-		.sapUiCalItem.sapUiCalItemSel:not(.sapUiCalItemSelBetween) > .sapUiCalItemText,
-		.sapUiCalItem.sapUiCalItemSel:not(.sapUiCalItemNow):not(.sapUiCalItemSelBetween):focus > .sapUiCalItemText {
+		.sapUiCalItem.sapUiCalItemSel:not(.sapUiCalItemSelBetween) > .sapUiCalItemText {
 			border: transparent;
 		}
 
 		.sapUiCalItem.sapUiCalItemSel .sapUiCalItemText,
 		.sapUiCalItemText {
 			line-height: 1.5rem;
-		}
-
-		.sapUiCalItem:focus > .sapUiCalItemText {
-			outline: none;
 		}
 
 		.sapUiCalItem {

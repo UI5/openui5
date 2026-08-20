@@ -2235,12 +2235,7 @@ sap.ui.define([
 			this._sLastTargetId = oDomRef.id;
 			this._selectedWithMouse = true;
 		}
-
-		if (this._bFocusFromTouch) {
-			oDomRef.classList.add("sapUiCalItemFocusFromTouch");
-		} else {
-			oDomRef.classList.remove("sapUiCalItemFocusFromTouch");
-		}
+		oDomRef.classList.toggle("sapUiCalItemFocusFromTouch", !!this._bFocusFromTouch);
 
 		if (bFireFocus) {
 			this.fireFocus({date: oFocusedDate.toLocalJSDate(), otherMonth: bOtherMonth});
