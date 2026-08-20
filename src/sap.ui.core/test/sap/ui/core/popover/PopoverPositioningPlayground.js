@@ -35,8 +35,6 @@ sap.ui.define([
 
 	const PlacementType = mLibrary.PlacementType;
 
-	// ---- Configuration --------------------------------------------------
-
 	const aPlacements = [
 		PlacementType.Top,
 		PlacementType.Bottom,
@@ -80,36 +78,39 @@ sap.ui.define([
 		{ id: "BR", row: "bottom", col: "right" }
 	];
 
-	// Inset from the active-area edges, in px.
 	const OPENER_INSET = 8;
 
 	// ---- State ----------------------------------------------------------
 
-	let sControl = "Popover";                       // "Popover" | "Tooltip"
+	let sControl = "Popover";
 	let sPlacement = PlacementType.Top;
-	let sSize = "medium";                           // "short" | "medium" | "huge"
-	let bWithinArea = false;                        // whether the within-area is active
-	let bShowArrow = true;                          // whether the popover shows its arrow (Popover only)
-	let bScroll = false;                            // whether the page is made scrollable + scrolled to bottom-right
-	let oCurrent = null;                            // currently open Popover/Tooltip
+	let sSize = "medium";
+	let bWithinArea = false;
+	let bShowArrow = true;
+	let bScroll = false;
+	let bScrollH = false;
+	let oCurrent = null;
 
-	// UI5 content root, so <body> is not a UIArea and UI5's preserve sweep leaves
-	// the plain flow container / within-area overlay (its <body> siblings) alone.
+	// Content root so <body> is not a UIArea; UI5's preserve sweep leaves the plain
+	// flow container / within-area overlay alone.
 	const oRoot = document.createElement("div");
 	oRoot.id = "ppp-root";
 	document.body.appendChild(oRoot);
 
-	// Flow container: tall spacers around the opener row. In scroll mode it makes
-	// a real long page; in grid mode the spacers collapse.
+	// Spacers around the opener row create real overflow in scroll mode; the mid
+	// band is a horizontal flex: [left spacer][row][right spacer].
 	const oFlow = document.createElement("div");
 	oFlow.innerHTML =
 		"<div id='ppp-spacer-top'></div>" +
-		"<div id='ppp-openers-row'></div>" +
+		"<div id='ppp-mid-band' style='display:flex;align-items:stretch'>" +
+			"<div id='ppp-spacer-left'></div>" +
+			"<div id='ppp-openers-row'></div>" +
+			"<div id='ppp-spacer-right'></div>" +
+		"</div>" +
 		"<div id='ppp-spacer-bottom'></div>";
 	document.body.appendChild(oFlow);
 
-	// Centered within-area overlay for non-scroll mode. In scroll mode the flow
-	// row itself acts as the within-area instead.
+	// Centered within-area overlay for non-scroll mode.
 	const oWithinArea = document.createElement("div");
 	oWithinArea.setAttribute("aria-hidden", "true");
 	oWithinArea.style.cssText = [
@@ -128,39 +129,48 @@ sap.ui.define([
 	].join(";");
 	document.body.appendChild(oWithinArea);
 
-	// Flow-mode opener row: a size-filling 3x3 grid (row-major TL..BR), edges
-	// spread. Grey full-viewport frame for scroll-only; blue within-area-sized
-	// frame for scroll+within.
+	// Size-filling 3x3 grid, edges spread.
 	function rowFlowCss(sWidth, sHeight, sBorder, sBg) {
-		return "display:grid;box-sizing:border-box;width:" + sWidth + ";height:" + sHeight + ";margin:0 auto;" +
+		return "flex:0 0 auto;display:grid;box-sizing:border-box;width:" + sWidth + ";height:" + sHeight + ";" +
 			"grid-template-columns:repeat(3, max-content);grid-template-rows:repeat(3, max-content);" +
 			"justify-content:space-between;align-content:space-between;" +
 			"padding:12px;border:" + sBorder + ";background:" + sBg;
 	}
 
-	// Applies the current (Scroll, Within area) combo: sizes the row, sets the
-	// clamp target, positions openers, scrolls into view.
+	// Applies the current (Scroll V/H, Within area) combo.
 	function applyLayout() {
 		const oRow = document.getElementById("ppp-openers-row");
-		const bFlowWithin = bScroll && bWithinArea;
+		const bFlow = bScroll || bScrollH;
+		const bFlowWithin = bFlow && bWithinArea;
 
-		// Tall spacers put the grid mid-document: after scrollIntoView it sits near
-		// the viewport bottom with document still below — triggers the flip bug.
+		// Spacers put the grid mid-document; scrollIntoView leaves room past it,
+		// exercising the popup scroll-flip.
 		document.getElementById("ppp-spacer-top").style.height = bScroll ? "1400px" : "0";
 		document.getElementById("ppp-spacer-bottom").style.height = bScroll ? "1600px" : "0";
+		document.getElementById("ppp-spacer-left").style.width = bScrollH ? "1400px" : "0";
+		document.getElementById("ppp-spacer-right").style.width = bScrollH ? "1600px" : "0";
+		document.getElementById("ppp-spacer-left").style.flex = "0 0 auto";
+		document.getElementById("ppp-spacer-right").style.flex = "0 0 auto";
 
-		// Fixed overlay only for non-scroll within-area.
-		oWithinArea.style.display = bWithinArea && !bScroll ? "block" : "none";
+		oWithinArea.style.display = bWithinArea && !bFlow ? "block" : "none";
 
-		if (bScroll) {
+		// Lock the non-scrolling axis; vw/vh ignore the active scrollbar and would
+		// leak a phantom bar on the other axis.
+		document.documentElement.style.overflowX = bScrollH ? "auto" : "hidden";
+		document.documentElement.style.overflowY = bScroll ? "auto" : "hidden";
+
+		if (bFlow) {
+			// Non-scrolling axis sized from the client box (scrollbar-aware) so the
+			// grid spreads without leaking overflow.
+			const sW = bScrollH ? "100vw" : document.documentElement.clientWidth + "px";
+			const sH = bScroll ? "100vh" : document.documentElement.clientHeight + "px";
 			oRow.style.cssText = bFlowWithin
 				? rowFlowCss("60vw", "60vh", "3px dashed #0070f2", "rgba(0, 112, 242, 0.08)")
-				: rowFlowCss("auto", "100vh", "2px dashed #888", "transparent");
+				: rowFlowCss(sW, sH, "2px dashed #888", "transparent");
 		} else {
 			oRow.style.cssText = "";
 		}
 
-		// Clamp target: flow row (scroll+within), fixed overlay (within only), else none.
 		let oClamp = null;
 		if (bFlowWithin) {
 			oClamp = oRow;
@@ -171,8 +181,11 @@ sap.ui.define([
 
 		repositionOpeners();
 
-		if (bScroll) {
-			oRow.scrollIntoView({ block: "end" });
+		if (bFlow) {
+			oRow.scrollIntoView({
+				block: bScroll ? "end" : "nearest",
+				inline: bScrollH ? "end" : "nearest"
+			});
 		} else {
 			window.scrollTo(0, 0);
 		}
@@ -181,7 +194,7 @@ sap.ui.define([
 	// ---- Behaviour ------------------------------------------------------
 
 	function closeCurrent() {
-		// Clear oCurrent before close(): afterClose may fire synchronously and null it.
+		// Clear before close(): afterClose may fire synchronously and null it.
 		const oToClose = oCurrent;
 		oCurrent = null;
 
@@ -214,7 +227,7 @@ sap.ui.define([
 
 	// ---- UI: control panel ---------------------------------------------
 
-	// showArrow applies to sap.m.Popover only; the core Tooltip has no such property.
+	// showArrow is a sap.m.Popover property; the core Tooltip has none.
 	const oShowArrowCheck = new CheckBox({
 		text: "Show arrow",
 		selected: bShowArrow,
@@ -234,7 +247,6 @@ sap.ui.define([
 		],
 		selectionChange: function (oEvent) {
 			sControl = oEvent.getParameter("item").getKey();
-			// showArrow is a sap.m.Popover property; the core Tooltip has none.
 			oShowArrowCheck.setVisible(sControl === "Popover");
 			closeCurrent();
 		}
@@ -298,7 +310,7 @@ sap.ui.define([
 	});
 
 	const oScrollCheck = new CheckBox({
-		text: "Scroll",
+		text: "Scroll V",
 		selected: bScroll,
 		select: function (oEvent) {
 			bScroll = oEvent.getParameter("selected");
@@ -307,25 +319,36 @@ sap.ui.define([
 		}
 	});
 
-	// ---- UI: single draggable panel holding both rows ------------------
-	// grip + two HBox rows in one VBox; moves as one pinned/draggable panel.
+	const oScrollHCheck = new CheckBox({
+		text: "Scroll H",
+		selected: bScrollH,
+		select: function (oEvent) {
+			bScrollH = oEvent.getParameter("selected");
+			closeCurrent();
+			applyLayout();
+		}
+	});
+
+	// ---- UI: single draggable panel ------------------------------------
+
 	const oRows = new VBox({
 		items: [
 			new HBox({
 				alignItems: "Center",
 				items: [
-					new Label({ text: "Control:" }).addStyleClass("sapUiTinyMarginEnd"),
+					new Label({ text: "Control", showColon: true }).addStyleClass("sapUiTinyMarginEnd"),
 					oControlSwitch,
-					new Label({ text: "Content:" }).addStyleClass("sapUiTinyMarginBegin sapUiTinyMarginEnd"),
+					new Label({ text: "Content", showColon: true }).addStyleClass("sapUiTinyMarginBegin sapUiTinyMarginEnd"),
 					oSizeSwitch,
 					oWithinAreaCheck.addStyleClass("sapUiTinyMarginBegin"),
-					oScrollCheck.addStyleClass("sapUiTinyMarginBegin")
+					oScrollCheck.addStyleClass("sapUiTinyMarginBegin"),
+					oScrollHCheck.addStyleClass("sapUiTinyMarginBegin")
 				]
 			}),
 			new HBox({
 				alignItems: "Center",
 				items: [
-					new Label({ text: "Placement:" }).addStyleClass("sapUiTinyMarginEnd"),
+					new Label({ text: "Placement", showColon: true }).addStyleClass("sapUiTinyMarginEnd"),
 					oPlacementSelect,
 					oShowArrowCheck.addStyleClass("sapUiTinyMarginBegin")
 				]
@@ -349,8 +372,6 @@ sap.ui.define([
 		}
 	});
 
-	// Pin the panel; border/background/shadow live here so the pin's re-render
-	// hook keeps them.
 	const mPanelPin = pin(oPanel, {
 		top: "25%", bottom: "auto", left: "50%", transform: "translate(-50%, -50%)", zIndex: 3,
 		padding: ".5rem .75rem",
@@ -370,7 +391,6 @@ sap.ui.define([
 		}
 		const iLeft = iOrigLeft + e.clientX - iStartX;
 		const iTop = iOrigTop + e.clientY - iStartY;
-		// Persist into the pin map so re-renders keep the dragged position.
 		mPanelPin.left = iLeft + "px";
 		mPanelPin.top = iTop + "px";
 		const oDom = oPanel.getDomRef();
@@ -382,7 +402,6 @@ sap.ui.define([
 		bDragging = false;
 	});
 
-	// Bind the grip mousedown once both the panel and grip DOM exist.
 	function bindDrag() {
 		const oDom = oPanel.getDomRef();
 		const oGrip = oDragHandle.getDomRef();
@@ -419,7 +438,6 @@ sap.ui.define([
 			tooltip: "Open from " + oDef.id,
 			press: function () { openFrom(oBtn); }
 		});
-		// Positioning per mode is set by repositionOpeners().
 		oBtn.addEventDelegate({
 			onAfterRendering: function () {
 				oBtn.getDomRef().style.zIndex = 2;
@@ -430,13 +448,10 @@ sap.ui.define([
 		return { def: oDef, btn: oBtn };
 	});
 
-	// Two opener layouts (openers always live in the flow row):
-	//  - grid mode (Scroll off): position:fixed in the 3x3 cell; row collapses.
-	//  - flow mode (Scroll on): position:static — genuine document-flow children of
-	//    the scrolled row, the case that exercises the popup scroll-flip.
+	// Grid mode (scroll off): openers position:fixed in their cell.
+	// Flow mode (scroll on): openers static, laid out by the row's CSS grid.
 	function repositionOpeners() {
-		if (bScroll) {
-			// Flow mode: static; the row's CSS grid lays the openers out.
+		if (bScroll || bScrollH) {
 			aOpenerButtons.forEach(function (o) {
 				const oDom = o.btn.getDomRef();
 				if (!oDom) {
@@ -449,8 +464,6 @@ sap.ui.define([
 			return;
 		}
 
-		// Grid mode: pin each opener to its cell. clientWidth/clientHeight exclude
-		// the scrollbar gutter, keeping right/bottom openers clear of scrollbars.
 		const oArea = bWithinArea
 			? oWithinArea.getBoundingClientRect()
 			: { top: 0, left: 0, width: document.documentElement.clientWidth, height: document.documentElement.clientHeight };
@@ -490,6 +503,5 @@ sap.ui.define([
 		});
 	}
 
-	// Keep openers aligned to the active area on viewport changes.
 	window.addEventListener("resize", repositionOpeners);
 });
