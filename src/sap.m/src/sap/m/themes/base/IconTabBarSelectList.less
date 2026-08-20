@@ -3,10 +3,12 @@
 /* Base theme                                  */
 /* =========================================== */
 
-@_sap_m_IconTabBar_SelectListItem_PaddingLeft: 0.5rem;
-@_sap_m_IconTabBar_SelectListItem_PaddingLeftAdditional: 0;
-@_sap_m_IconTabBar_ListBorderRadius: 0px;
-@_sap_m_IconTabBar_List_Focus_Offset: 1px;
+.sapUI5Scope {
+	--_sap_m_IconTabBar_SelectListItem_PaddingLeft: 0.5rem;
+	--_sap_m_IconTabBar_SelectListItem_PaddingLeftAdditional: 0;
+	--_sap_m_IconTabBar_ListBorderRadius: 0;
+	--_sap_m_IconTabBar_List_Focus_Offset: 1px;
+}
 
 .sapMITBSelectList {
 	margin: 0;
@@ -78,7 +80,6 @@
 .sapMITBSelectItem .sapMITBSelectItemIcon {
 	outline: none;
 	-webkit-user-select: none; /* Chrome all / Safari all */
-	-moz-user-select: none; /* Firefox all */
 	user-select: none;
 }
 
@@ -89,7 +90,7 @@
 	min-width: 0; /* chrome flex overflow issue */
 	overflow: visible;
 	white-space: normal;
-	font-size: @sapMFontMediumSize;
+	font-size: var(--sapFontSize);
 }
 
 .sapMITBSelectListTextOnly .sapMITBSelectItem .sapMITBText {
@@ -180,12 +181,12 @@
 	border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 	position: absolute;
 	content: ' ';
-	top: @_sap_m_IconTabBar_List_Focus_Offset;
-	right:  @_sap_m_IconTabBar_List_Focus_Offset;
-	bottom:  @_sap_m_IconTabBar_List_Focus_Offset;
-	left:  @_sap_m_IconTabBar_List_Focus_Offset;
+	top: var(--_sap_m_IconTabBar_List_Focus_Offset);
+	right: var(--_sap_m_IconTabBar_List_Focus_Offset);
+	bottom: var(--_sap_m_IconTabBar_List_Focus_Offset);
+	left: var(--_sap_m_IconTabBar_List_Focus_Offset);
 	z-index: 2;
-	border-radius: @_sap_m_IconTabBar_ListBorderRadius;
+	border-radius: var(--_sap_m_IconTabBar_ListBorderRadius);
 	pointer-events: none;
 }
 
@@ -194,7 +195,7 @@
 }
 
 .sapMITBSelectItem.sapMITBSelectItemSelected:hover {
-	background-color: @sapUiListSelectionHoverBackground;
+	background-color: var(--sapList_Hover_SelectionBackground);
 }
 
 .sapUiDnDIndicator {
