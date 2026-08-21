@@ -9,9 +9,8 @@ sap.ui.define([
 	"../utils/TableUtils",
 	"../library",
 	"sap/ui/core/ControlBehavior",
-	"sap/ui/core/Element",
-	"sap/ui/thirdparty/jquery"
-], function(ExtensionBase, AccRenderExtension, TableUtils, library, ControlBehavior, Element, jQuery) {
+	"sap/ui/core/Element"
+], function(ExtensionBase, AccRenderExtension, TableUtils, library, ControlBehavior, Element) {
 	"use strict";
 
 	// shortcuts
@@ -221,13 +220,13 @@ sap.ui.define([
 		/**
 		 * Checks whether the given cell is hidden.
 		 *
-		 * @param {jQuery} $Cell The cell DOM element
+		 * @param {HTMLElement} oCellElement The cell DOM element
 		 * @param {sap.ui.table.Column} oCell The control in the cell
 		 * @param {sap.ui.table.Row} oRow The row the cell is inside
 		 * @returns {boolean} Whether the cell is hidden
 		 */
-		isHiddenCell: function($Cell, oCell, oRow) {
-			const bIsCellHidden = $Cell.hasClass("sapUiTableCellHidden");
+		isHiddenCell: function(oCellElement, oCell, oRow) {
+			const bIsCellHidden = oCellElement.classList.contains("sapUiTableCellHidden");
 			const bGroupCellHiddenByApp = oRow.isGroupHeader() && (oCell?.hasStyleClass?.("sapUiAnalyticalTableGroupCellHidden") ?? false);
 			const bSumCellHiddenByApp = oRow.isSummary() && (oCell?.hasStyleClass?.("sapUiAnalyticalTableSumCellHidden") ?? false);
 
@@ -237,8 +236,8 @@ sap.ui.define([
 		/*
 		 * Returns whether the given cell is in the tree column of a TreeTable
 		 */
-		isTreeColumnCell: function(oExtension, $Cell) {
-			return TableUtils.Grouping.isInTreeMode(oExtension.getTable()) && $Cell.hasClass("sapUiTableCellFirst");
+		isTreeColumnCell: function(oExtension, oCellElement) {
+			return TableUtils.Grouping.isInTreeMode(oExtension.getTable()) && oCellElement.classList.contains("sapUiTableCellFirst");
 		},
 
 		/*
@@ -344,7 +343,14 @@ sap.ui.define([
 		 */
 		cleanupCellModifications: function(oExtension) {
 			if (oExtension._cleanupInfo) {
-				oExtension._cleanupInfo.cell.attr(oExtension._cleanupInfo.attr);
+				const oCell = oExtension._cleanupInfo.cell;
+				for (const [sKey, vValue] of Object.entries(oExtension._cleanupInfo.attr)) {
+					if (vValue === null) {
+						oCell.removeAttribute(sKey);
+					} else {
+						oCell.setAttribute(sKey, vValue);
+					}
+				}
 				oExtension._cleanupInfo = null;
 			}
 		},
@@ -353,9 +359,9 @@ sap.ui.define([
 		 * Stores the defaults before modifications of a cell for later cleanup
 		 * @see ExtensionHelper.cleanupCellModifications
 		 */
-		storeDefaultsBeforeCellModifications: function(oExtension, $Cell, aDefaultLabels, aDefaultDescriptions) {
+		storeDefaultsBeforeCellModifications: function(oExtension, oCellElement, aDefaultLabels, aDefaultDescriptions) {
 			oExtension._cleanupInfo = {
-				cell: $Cell,
+				cell: oCellElement,
 				attr: {
 					"aria-labelledby": aDefaultLabels && aDefaultLabels.length ? aDefaultLabels.join(" ") : null,
 					"aria-describedby": aDefaultDescriptions && aDefaultDescriptions.length ? aDefaultDescriptions.join(" ") : null
@@ -369,8 +375,8 @@ sap.ui.define([
 		 * @see ExtensionHelper.getRowColChange
 		 * @see ExtensionHelper.storeDefaultsBeforeCellModifications
 		 */
-		performCellModifications: function(oExtension, $Cell, aDefaultLabels, aDefaultDescriptions, aLabels, aDescriptions, sText, oChangeInfo, fAdapt) {
-			ExtensionHelper.storeDefaultsBeforeCellModifications(oExtension, $Cell, aDefaultLabels, aDefaultDescriptions);
+		performCellModifications: function(oExtension, oCellElement, aDefaultLabels, aDefaultDescriptions, aLabels, aDescriptions, sText, oChangeInfo, fAdapt) {
+			ExtensionHelper.storeDefaultsBeforeCellModifications(oExtension, oCellElement, aDefaultLabels, aDefaultDescriptions);
 
 			const oTable = oExtension.getTable();
 			const sTableId = oTable.getId();
@@ -382,7 +388,7 @@ sap.ui.define([
 
 			if (oChangeInfo.initial || oChangeInfo.rowChange) {
 				if (TableUtils.hasRowNavigationIndicators(oTable)) {
-					const oCellInfo = TableUtils.getCellInfo($Cell);
+					const oCellInfo = TableUtils.getCellInfo(oCellElement);
 					if (oCellInfo.isOfType(CellType.ANYCONTENTCELL)) {
 						const oRowSettings = oTable.getRows()[oCellInfo.rowIndex].getAggregation("_settings");
 						if (oRowSettings.getNavigated()) {
@@ -393,11 +399,18 @@ sap.ui.define([
 			}
 
 			const sLabel = aLabels && aLabels.length ? aLabels.join(" ") : null;
+			const sDescribedBy = aDescriptions && aDescriptions.length ? aDescriptions.join(" ") : null;
 
-			$Cell.attr({
-				"aria-labelledby": sLabel,
-				"aria-describedby": aDescriptions && aDescriptions.length ? aDescriptions.join(" ") : null
-			});
+			if (sLabel !== null) {
+				oCellElement.setAttribute("aria-labelledby", sLabel);
+			} else {
+				oCellElement.removeAttribute("aria-labelledby");
+			}
+			if (sDescribedBy !== null) {
+				oCellElement.setAttribute("aria-describedby", sDescribedBy);
+			} else {
+				oCellElement.removeAttribute("aria-describedby");
+			}
 		},
 
 		/*
@@ -413,15 +426,15 @@ sap.ui.define([
 				return;
 			}
 
-			const $Cell = jQuery(oCellInfo.cell);
+			const oCellElement = oCellInfo.cell;
 			const iRow = TableUtils.getRowIndexOfFocusedCell(oTable);
 			const iCol = ExtensionHelper.getColumnIndexOfFocusedCell(this); // This is the index in the visible columns	array
 			const oTableInstances = TableUtils.getRowColCell(oTable, iRow, iCol, false);
 			let oInfo = null;
 			const oRow = oTableInstances.row;
 			const sRowId = oRow.getId();
-			const bHidden = ExtensionHelper.isHiddenCell($Cell, oTableInstances.cell, oRow);
-			const bIsTreeColumnCell = ExtensionHelper.isTreeColumnCell(this, $Cell);
+			const bHidden = ExtensionHelper.isHiddenCell(oCellElement, oTableInstances.cell, oRow);
+			const bIsTreeColumnCell = ExtensionHelper.isTreeColumnCell(this, oCellElement);
 			const aDescriptions = [];
 			const aLabels = [];
 			const bIsGroupHeader = oRow.isGroupHeader();
@@ -453,7 +466,7 @@ sap.ui.define([
 
 					sText = sExpandCollapseButtonText.concat(" ", oInfo.description);
 				}
-				if (TableUtils.getInteractiveElements($Cell) !== null) {
+				if (TableUtils.getInteractiveElements(oCellElement) !== null) {
 					sText = TableUtils.getResourceText("TBL_CELL_INCLUDES", [sText]);
 				}
 			}
@@ -465,7 +478,7 @@ sap.ui.define([
 				}
 			}
 
-			ExtensionHelper.performCellModifications(this, $Cell, null, null, aLabels, aDescriptions, sText, oChangeInfo,
+			ExtensionHelper.performCellModifications(this, oCellElement, null, null, aLabels, aDescriptions, sText, oChangeInfo,
 				(aLabels, aDescriptions, bRowChange, bColChange) => {
 					if (bIsGroupHeader && bRowChange) {
 						aLabels.splice(1, 0, sRowId + "-groupHeader");
@@ -481,7 +494,7 @@ sap.ui.define([
 		modifyAccOfRowHeader: function(oCellInfo, oChangeInfo) {
 			const oTable = this.getTable();
 			const sTableId = oTable.getId();
-			const $Cell = jQuery(oCellInfo.cell);
+			const oCellElement = oCellInfo.cell;
 			const oRow = oTable.getRows()[oCellInfo.rowIndex];
 			const sRowId = oRow.getId();
 			const aDefaultLabels = ExtensionHelper.getAriaAttributesForRowHeader(this)["aria-labelledby"] || [];
@@ -504,7 +517,7 @@ sap.ui.define([
 				aLabels.push(sTableId + "-ariagrouptotallabel");
 			}
 
-			ExtensionHelper.performCellModifications(this, $Cell, aDefaultLabels, null, aLabels, null, null, oChangeInfo);
+			ExtensionHelper.performCellModifications(this, oCellElement, aDefaultLabels, null, aLabels, null, null, oChangeInfo);
 		},
 
 		/*
@@ -513,10 +526,10 @@ sap.ui.define([
 		 */
 		modifyAccOfColumnHeader: function(oCellInfo, oChangeInfo) {
 			const oTable = this.getTable();
-			const $Cell = jQuery(oCellInfo.cell);
-			const oColumn = Element.getElementById($Cell.attr("data-sap-ui-colid"));
+			const oCellElement = oCellInfo.cell;
+			const oColumn = Element.getElementById(oCellElement.getAttribute("data-sap-ui-colid"));
 			const mAttributes = ExtensionHelper.getAriaAttributesForColumnHeader(this, {
-					headerId: $Cell.attr("id"),
+					headerId: oCellElement.getAttribute("id"),
 					column: oColumn,
 					index: oTable._getVisibleColumns().indexOf(oColumn)
 				});
@@ -538,7 +551,7 @@ sap.ui.define([
 				aLabels.push(oTable.getId() + "-ariacolfiltered");
 			}
 
-			ExtensionHelper.performCellModifications(this, $Cell, mAttributes["aria-labelledby"], mAttributes["aria-describedby"],
+			ExtensionHelper.performCellModifications(this, oCellElement, mAttributes["aria-labelledby"], mAttributes["aria-describedby"],
 				aLabels, mAttributes["aria-describedby"], sText, oChangeInfo
 			);
 		},
@@ -550,10 +563,10 @@ sap.ui.define([
 		modifyAccOfRowAction: function(oCellInfo, oChangeInfo) {
 			const oTable = this.getTable();
 			const sTableId = oTable.getId();
-			const $Cell = jQuery(oCellInfo.cell);
+			const oCellElement = oCellInfo.cell;
 			const oRow = oTable.getRows()[oCellInfo.rowIndex];
 			const sRowId = oRow.getId();
-			const bHidden = ExtensionHelper.isHiddenCell($Cell, null, oRow);
+			const bHidden = ExtensionHelper.isHiddenCell(oCellElement, null, oRow);
 			const aDefaultLabels = ExtensionHelper.getAriaAttributesForRowAction(this)["aria-labelledby"] || [];
 			const aLabels = [].concat(aDefaultLabels);
 			const aDescriptions = [];
@@ -585,7 +598,7 @@ sap.ui.define([
 				}
 			}
 
-			ExtensionHelper.performCellModifications(this, $Cell, aDefaultLabels, [], aLabels, aDescriptions, sText, oChangeInfo,
+			ExtensionHelper.performCellModifications(this, oCellElement, aDefaultLabels, [], aLabels, aDescriptions, sText, oChangeInfo,
 				(aLabels, aDescriptions, bRowChange) => {
 					if (bIsGroupHeader && bRowChange) {
 						const iIndex = aLabels.indexOf(sTableId + "-ariarowgrouplabel") + 1;

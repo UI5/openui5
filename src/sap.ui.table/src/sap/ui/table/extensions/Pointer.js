@@ -12,8 +12,7 @@ sap.ui.define([
 	"sap/ui/core/Popup",
 	"sap/base/Log",
 	"sap/ui/thirdparty/jquery",
-	"sap/ui/dom/jquery/scrollLeftRTL",
-	"sap/ui/dom/jquery/control"
+	"sap/ui/dom/jquery/scrollLeftRTL"
 ], function(ExtensionBase, TableUtils, library, Device, Element, Popup, Log, jQuery) {
 	"use strict";
 
@@ -34,7 +33,7 @@ sap.ui.define([
 		 * Returns true, when the given click event should be skipped because it happened on a
 		 * interactive control inside a table cell.
 		 */
-		_skipClick: function(oEvent, $Target, oCellInfo) {
+		_skipClick: function(oEvent, oTarget, oCellInfo) {
 			if (!oCellInfo.isOfType(TableUtils.CELLTYPE.DATACELL | TableUtils.CELLTYPE.ROWACTION)) {
 				return false;
 			}
@@ -45,11 +44,11 @@ sap.ui.define([
 			}
 
 			// Special handling for known clickable controls
-			const oClickedControl = Element.closestTo($Target[0]);
+			const oClickedControl = Element.closestTo(oTarget);
 			if (oClickedControl) {
-				const $ClickedControl = oClickedControl.$();
-				if ($ClickedControl.length) {
-					if (KNOWNCLICKABLECONTROLS.some((sCls) => $ClickedControl.hasClass(sCls))) {
+				const oDomRef = oClickedControl.getDomRef();
+				if (oDomRef) {
+					if (KNOWNCLICKABLECONTROLS.some((sCls) => oDomRef.classList.contains(sCls))) {
 						return typeof oClickedControl.getEnabled === "function" ? oClickedControl.getEnabled() : true;
 					}
 				}
@@ -90,12 +89,12 @@ sap.ui.define([
 			oTable._bIsColumnResizerMoving = true;
 			oTable._bColumnResizerMoved = false;
 			oTable._iColumnResizeStart = TableUtils.getEventPosition(oEvent, oTable).x;
-			oTable.$().toggleClass("sapUiTableResizing", true);
+			oTable.getDomRef().classList.toggle("sapUiTableResizing", true);
 
 			const $Document = jQuery(document);
 			const bTouch = oTable._isTouchEvent(oEvent);
 
-			oTable._$colResize = oTable.$("rsz");
+			oTable._oColResize = oTable.getDomRef("rsz");
 
 			$Document.on((bTouch ? "touchend" : "mouseup") + ".sapUiTableColumnResize",
 				ColumnResizeHelper.exitColumnResizing.bind(oTable));
@@ -135,8 +134,8 @@ sap.ui.define([
 				this._bColumnResizerMoved = true;
 			}
 
-			this._$colResize.css("left", iRszLeft + "px");
-			this._$colResize.toggleClass("sapUiTableColRszActive", true);
+			this._oColResize.style.left = iRszLeft + "px";
+			this._oColResize.classList.toggle("sapUiTableColRszActive", true);
 
 			if (this._isTouchEvent(oEvent)) {
 				oEvent.stopPropagation();
@@ -150,12 +149,12 @@ sap.ui.define([
 		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 */
 		_cleanupColumResizing: function(oTable) {
-			if (oTable._$colResize) {
-				oTable._$colResize.toggleClass("sapUiTableColRszActive", false);
-				oTable._$colResize = null;
+			if (oTable._oColResize) {
+				oTable._oColResize.classList.toggle("sapUiTableColRszActive", false);
+				oTable._oColResize = null;
 			}
 			oTable._bIsColumnResizerMoving = false;
-			oTable.$().toggleClass("sapUiTableResizing", false);
+			oTable.getDomRef().classList.toggle("sapUiTableResizing", false);
 			oTable._enableTextSelection();
 
 			const $Document = jQuery(document);
@@ -199,7 +198,7 @@ sap.ui.define([
 
 				const oColumn = this._getVisibleColumns()[iLastHoveredColumn];
 				if (oColumn && oColumn.getResizable()) {
-					this.$("rsz").css("left", iResizerPositionX + "px");
+					this.getDomRef("rsz").style.left = iResizerPositionX + "px";
 					this._iLastHoveredVisibleColumnIndex = iLastHoveredColumn;
 				}
 			}.bind(oTable));
@@ -243,7 +242,7 @@ sap.ui.define([
 				  });
 			$Ghost.toggleClass(TableUtils.getContentDensity(oTable), true);
 			$Ghost.appendTo(document.body);
-			oTable._$ReorderGhost = oTable.getDomRef("roghost");
+			oTable._oReorderGhost = oTable.getDomRef("roghost");
 
 			// Fade out whole column
 			$Table.find("td[data-sap-ui-colid='" + oColumn.getId() + "']").toggleClass("sapUiTableColReorderFade", true);
@@ -252,7 +251,7 @@ sap.ui.define([
 			const $Indicator = jQuery("<div id='" + oTable.getId()
 									+ "-roind' class='sapUiTableColReorderIndicator'><div class='sapUiTableColReorderIndicatorArrow'></div><div class='sapUiTableColReorderIndicatorInner'></div></div>");
 			$Indicator.appendTo(oTable.getDomRef("sapUiTableCnt"));
-			oTable._$ReorderIndicator = oTable.getDomRef("roind");
+			oTable._oReorderIndicator = oTable.getDomRef("roind");
 
 			// Collect the needed column information
 			oTable._iDnDColIndex = iColIndex;
@@ -310,10 +309,8 @@ sap.ui.define([
 			}
 
 			// update the ghost position
-			jQuery(this._$ReorderGhost).css({
-				"left": iLocationX + 5,
-				"top": iLocationY + 5
-			});
+			this._oReorderGhost.style.left = (iLocationX + 5) + "px";
+			this._oReorderGhost.style.top = (iLocationY + 5) + "px";
 
 			if (this._bReorderScroll || !oPos) {
 				return;
@@ -355,10 +352,10 @@ sap.ui.define([
 			delete this._iDnDColIndex;
 			delete this._iNewColPos;
 
-			jQuery(this._$ReorderGhost).remove();
-			delete this._$ReorderGhost;
-			jQuery(this._$ReorderIndicator).remove();
-			delete this._$ReorderIndicator;
+			this._oReorderGhost?.remove();
+			delete this._oReorderGhost;
+			this._oReorderIndicator?.remove();
+			delete this._oReorderIndicator;
 			this.$().find(".sapUiTableColReorderFade").removeClass("sapUiTableColReorderFade");
 
 			this._enableTextSelection();
@@ -369,20 +366,19 @@ sap.ui.define([
 		 * Finds the column which belongs to the current x position and returns information about this column.
 		 */
 		findColumnForPosition: function(oTable, iLocationX) {
-			let oHeaderDomRef; let $HeaderDomRef; let oRect; let iWidth; let oPos; let bBefore; let bAfter;
+			let oHeaderDomRef; let oRect; let iWidth; let oPos; let bBefore; let bAfter;
 
 			for (let i = 0; i < oTable._aTableHeaders.length; i++) {
 				oHeaderDomRef = oTable._aTableHeaders[i];
-				$HeaderDomRef = jQuery(oHeaderDomRef);
 				oRect = oHeaderDomRef.getBoundingClientRect();
-				iWidth = $HeaderDomRef.outerWidth();
+				iWidth = oHeaderDomRef.offsetWidth;
 				oPos = {
 					left: oRect.left,
 					center: oRect.left + iWidth / 2,
 					right: oRect.left + iWidth,
 					width: iWidth,
-					index: parseInt($HeaderDomRef.attr("data-sap-ui-headcolindex")),
-					id: $HeaderDomRef.attr("data-sap-ui-colid")
+					index: parseInt(oHeaderDomRef.getAttribute("data-sap-ui-headcolindex")),
+					id: oHeaderDomRef.getAttribute("data-sap-ui-colid")
 				};
 
 				bBefore = iLocationX >= oPos.left && iLocationX <= oPos.center;
@@ -423,7 +419,7 @@ sap.ui.define([
 		 * @see findColumnForPosition
 		 */
 		adaptReorderMarkerPosition: function(oTable, oPos, bShow) {
-			if (!oPos || !oTable._$ReorderIndicator) {
+			if (!oPos || !oTable._oReorderIndicator) {
 				return;
 			}
 
@@ -432,9 +428,8 @@ sap.ui.define([
 				iLeft = iLeft + oPos.width;
 			}
 
-			jQuery(oTable._$ReorderIndicator).css({
-				"left": iLeft + "px"
-			}).toggleClass("sapUiTableColReorderIndicatorActive", bShow);
+			oTable._oReorderIndicator.style.left = iLeft + "px";
+			oTable._oReorderIndicator.classList.toggle("sapUiTableColReorderIndicatorActive", bShow);
 		}
 
 	};
@@ -496,7 +491,6 @@ sap.ui.define([
 			const oPointerExtension = this._getPointerExtension();
 			const $Cell = TableUtils.getCell(this, oEvent.target);
 			const oCellInfo = TableUtils.getCellInfo($Cell);
-			const $Target = jQuery(oEvent.target);
 			let oColumn;
 			let oMenu;
 			let bMenuOpen;
@@ -510,8 +504,8 @@ sap.ui.define([
 					oEvent.stopPropagation();
 					ColumnResizeHelper.initColumnResizing(this, oEvent);
 
-				} else if ($Target.hasClass("sapUiTableColResizer")) { // mousedown on mobile column resize button
-					const iColumnIndex = $Target.closest(".sapUiTableHeaderCell").attr("data-sap-ui-colindex");
+				} else if (oEvent.target.classList.contains("sapUiTableColResizer")) { // mousedown on mobile column resize button
+					const iColumnIndex = oEvent.target.closest(".sapUiTableHeaderCell").getAttribute("data-sap-ui-colindex");
 					this._iLastHoveredVisibleColumnIndex = this._getVisibleColumns().indexOf(this.getColumns()[iColumnIndex]);
 					ColumnResizeHelper.initColumnResizing(this, oEvent);
 
@@ -530,7 +524,7 @@ sap.ui.define([
 
 					if (this.getEnableColumnReordering()
 						&& !(this._isTouchEvent(oEvent)
-						&& $Target.hasClass("sapUiTableColDropDown")) /* Target is not the mobile column menu button */) {
+						&& oEvent.target.classList.contains("sapUiTableColDropDown")) /* Target is not the mobile column menu button */) {
 						// Start column reordering
 						this._getPointerExtension().doReorderColumn(oCellInfo.columnIndex, oEvent);
 					}
@@ -540,15 +534,17 @@ sap.ui.define([
 				//   => prevent the default behavior only in this case (to still allow text selection)
 				// Also prevent default when clicking on scrollbars to prevent ItemNavigation to re-apply
 				// focus to old position (table cell).
+				const oHSb = oEvent.target.closest(".sapUiTableHSb");
+				const oVSb = oEvent.target.closest(".sapUiTableVSb");
 				if ((Device.browser.firefox && (oEvent.metaKey || oEvent.ctrlKey))
-					|| $Target.closest(".sapUiTableHSb", this.getDomRef()).length === 1
-					|| $Target.closest(".sapUiTableVSb", this.getDomRef()).length === 1) {
+					|| (oHSb && this.getDomRef().contains(oHSb))
+					|| (oVSb && this.getDomRef().contains(oVSb))) {
 					oEvent.preventDefault();
 				}
 			}
 
 			if (oEvent.button === 2) { // Right mouse button.
-				if (ExtensionHelper._skipClick(oEvent, $Target, oCellInfo)) {
+				if (ExtensionHelper._skipClick(oEvent, oEvent.target, oCellInfo)) {
 					oPointerExtension._bShowDefaultMenu = true;
 					return;
 				}
@@ -598,7 +594,6 @@ sap.ui.define([
 				return;
 			}
 
-			const $Target = jQuery(oEvent.target);
 			const $Cell = TableUtils.getCell(this, oEvent.target);
 			const oCellInfo = TableUtils.getCellInfo($Cell);
 			const oRow = this.getRows()[oCellInfo.rowIndex];
@@ -619,11 +614,11 @@ sap.ui.define([
 			} else if (oRow && oRow.isSummary()) {
 				// Sum row cannot be selected
 				oEvent.preventDefault();
-			} else if ($Target.hasClass("sapUiTableGroupIcon") || $Target.hasClass("sapUiTableTreeIcon")) {
+			} else if (oEvent.target.classList.contains("sapUiTableGroupIcon") || oEvent.target.classList.contains("sapUiTableTreeIcon")) {
 				// Expand/Collapse icon
 				oRow.toggleExpandedState();
 			} else {
-				if (ExtensionHelper._skipClick(oEvent, $Target, oCellInfo)) {
+				if (ExtensionHelper._skipClick(oEvent, oEvent.target, oCellInfo)) {
 					return;
 				}
 
@@ -756,10 +751,10 @@ sap.ui.define([
 			const oColumnHeaderRect = oTable._aTableHeaders[iColIndex].getBoundingClientRect();
 			const iResizerPositionX = oTable._bRtlMode ? oColumnHeaderRect.left - oTableRect.left : oColumnHeaderRect.right - oTableRect.left;
 
-			oTable.$().toggleClass("sapUiTableResizing", true);
-			oTable._$colResize = oTable.$("rsz");
-			oTable._$colResize.toggleClass("sapUiTableColRszActive", true);
-			oTable._$colResize.css("left", iResizerPositionX + "px");
+			oTable.getDomRef().classList.toggle("sapUiTableResizing", true);
+			oTable._oColResize = oTable.getDomRef("rsz");
+			oTable._oColResize.classList.toggle("sapUiTableColRszActive", true);
+			oTable._oColResize.style.left = iResizerPositionX + "px";
 		},
 
 		/**

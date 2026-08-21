@@ -570,7 +570,7 @@ sap.ui.define([
 
 		qutils.triggerMouseEvent(oColumn.$(), "mousedown", 1, 1, oSettings.left, oSettings.top, 0);
 		await TableQUnitUtils.sleep(250);
-		assert.ok(oTable._$ReorderGhost, "Column Reordering triggered");
+		assert.ok(oTable._oReorderGhost, "Column Reordering triggered");
 		assert.ok(oTable.getDomRef().classList.contains("sapUiTableDragDrop"), "Table has drag drop class");
 
 		qutils.triggerMouseEvent(oTable.qunit.getColumnHeaderCell(3), "mouseup", 1, 1, oSettings.left, oSettings.top, 0);
@@ -586,8 +586,8 @@ sap.ui.define([
 			const iResizerPositionX = oTable._bRtlMode ? oColumn1HeaderRect.left - oTableRect.left : oColumn1HeaderRect.right - oTableRect.left;
 
 			oTable.$().toggleClass("sapUiTableResizing", true);
-			oTable._$colResize = oTable.$("rsz");
-			oTable._$colResize.toggleClass("sapUiTableColRszActive", true);
+			oTable._oColResize = oTable.getDomRef("rsz");
+			oTable._oColResize.classList.toggle("sapUiTableColRszActive", true);
 			oTable.$("rsz").css("left", iResizerPositionX + "px");
 
 			const oEvent = jQuery.Event({type: "mousemove"});
@@ -1385,10 +1385,10 @@ sap.ui.define([
 		cleanupReorder: function() {
 			// Unbind the document handlers attached by initReordering and remove the created DOM
 			jQuery(document).off(".sapUiColumnMove");
-			jQuery(this.oTable._$ReorderGhost).remove();
-			delete this.oTable._$ReorderGhost;
-			jQuery(this.oTable._$ReorderIndicator).remove();
-			delete this.oTable._$ReorderIndicator;
+			this.oTable._oReorderGhost?.remove();
+			delete this.oTable._oReorderGhost;
+			this.oTable._oReorderIndicator?.remove();
+			delete this.oTable._oReorderIndicator;
 		}
 	});
 
@@ -1577,8 +1577,8 @@ sap.ui.define([
 		oExtension.showColumnResizer(oColumn);
 
 		assert.ok(oTable.getDomRef().classList.contains("sapUiTableResizing"), "Table has resizing class");
-		assert.ok(oTable._$colResize.hasClass("sapUiTableColRszActive"), "Resizer marked active");
-		assert.strictEqual(oTable._$colResize.css("left"), (oColumnHeaderRect.right - oTableRect.left) + "px",
+		assert.ok(oTable._oColResize.classList.contains("sapUiTableColRszActive"), "Resizer marked active");
+		assert.strictEqual(oTable._oColResize.style.left, (oColumnHeaderRect.right - oTableRect.left) + "px",
 			"Resizer positioned at the column's right edge in LTR mode");
 	});
 
@@ -1593,7 +1593,7 @@ sap.ui.define([
 		oExtension.showColumnResizer(oColumn);
 		oTable._bRtlMode = false;
 
-		assert.strictEqual(oTable._$colResize.css("left"), (oColumnHeaderRect.left - oTableRect.left) + "px",
+		assert.strictEqual(oTable._oColResize.style.left, (oColumnHeaderRect.left - oTableRect.left) + "px",
 			"Resizer positioned at the column's left edge in RTL mode");
 	});
 
@@ -1613,7 +1613,7 @@ sap.ui.define([
 		const oTable = this.oTable;
 		const ColumnResizeHelper = this.oPointerExtension._ColumnResizeHelper;
 
-		oTable._$colResize = oTable.$("rsz");
+		oTable._oColResize = oTable.getDomRef("rsz");
 		oTable._iColumnResizeStart = 0;
 
 		const oEvent = jQuery.Event({type: "touchmove"});
@@ -1774,8 +1774,8 @@ sap.ui.define([
 
 		oTable._iDnDColIndex = 2;
 		oTable._iNewColPos = 5;
-		oTable._$ReorderGhost = document.createElement("div");
-		document.body.appendChild(oTable._$ReorderGhost);
+		oTable._oReorderGhost = document.createElement("div");
+		document.body.appendChild(oTable._oReorderGhost);
 		this.stub(ReorderHelper, "findColumnForPosition").returns(null);
 
 		const oEvent = jQuery.Event({type: "mousemove"});
@@ -1786,8 +1786,8 @@ sap.ui.define([
 
 		assert.strictEqual(oTable._iNewColPos, 5, "New position restored to previous value");
 
-		oTable._$ReorderGhost.remove();
-		delete oTable._$ReorderGhost;
+		oTable._oReorderGhost.remove();
+		delete oTable._oReorderGhost;
 		delete oTable._iDnDColIndex;
 		delete oTable._iNewColPos;
 	});
@@ -1817,7 +1817,7 @@ sap.ui.define([
 			_iNewColPos: 0,
 			_bRtlMode: false,
 			_bReorderScroll: false,
-			_$ReorderGhost: oGhost,
+			_oReorderGhost: oGhost,
 			_isTouchEvent: () => false,
 			getDomRef: () => oScrollArea,
 			getColumns: () => []
@@ -1863,7 +1863,7 @@ sap.ui.define([
 			_iNewColPos: 0,
 			_bRtlMode: false,
 			_bReorderScroll: false,
-			_$ReorderGhost: oGhost,
+			_oReorderGhost: oGhost,
 			_isTouchEvent: () => false,
 			getDomRef: () => oScrollArea,
 			getColumns: () => []
