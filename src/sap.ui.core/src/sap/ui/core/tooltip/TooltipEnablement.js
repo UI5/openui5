@@ -42,9 +42,7 @@ sap.ui.define([
 		 * host is destroyed.
 		 *
 		 * The inner <code>sap.ui.core.tooltip.Tooltip</code> is created on first
-		 * use. Its <code>sap.m.Popover</code> positioning surface is loaded
-		 * lazily, so a host in another library may use this helper without
-		 * statically depending on <code>sap.m</code>.
+		 * use and reused across subsequent open/close cycles.
 		 *
 		 * <h3>Usage</h3>
 		 * Use the tooltip for brief, supplementary information about a control.

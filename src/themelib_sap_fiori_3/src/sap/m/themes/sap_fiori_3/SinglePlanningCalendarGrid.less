@@ -19,6 +19,38 @@
 	border-radius: 0 0.125rem 0.125rem 0.125rem;
 }
 
+html.sap-desktop .sapMSinglePC {
+	.sapMSinglePCAppointmentWrap.sapUiCalendarRowApps {
+
+		&:focus {
+
+			.sapUiCalendarAppSel>.sapUiCalendarAppCont::after {
+				border: 0.0625rem dotted var(--sapContent_ContrastFocusColor);
+			}
+		}
+	}
+
+	.sapUiCalItem:focus {
+		outline: none;
+	}
+}
+
+.sapMSinglePC {
+	.sapMSinglePCAppointmentWrap.sapUiCalendarRowApps {
+
+		&:focus-visible {
+
+			.sapUiCalendarAppSel>.sapUiCalendarAppCont::after {
+				border: 0.0625rem dotted var(--sapContent_ContrastFocusColor);
+			}
+		}
+	}
+
+	.sapUiCalItem:focus-visible {
+		outline: none;
+	}
+}
+
 .sapMSinglePC {
 
 	.sapMSinglePCRow,
@@ -49,20 +81,6 @@
 
 	.sapMPCHeadNavToolbar.sapMTB-Transparent-CTX.sapMTB {
 		background-color: var(--sapList_Background);
-	}
-
-	.sapMSinglePCAppointmentWrap.sapUiCalendarRowApps {
-
-		&:focus {
-
-			.sapUiCalendarAppSel > .sapUiCalendarAppCont::after {
-				border: 0.0625rem dotted var(--sapContent_ContrastFocusColor);
-			}
-		}
-	}
-
-	.sapUiCalItem:focus {
-		outline: none;
 	}
 
 	.sapMSinglePCColumnHeader {
@@ -96,6 +114,26 @@
 	.sapUiCalendarApp,
 	.sapUiCalendarApp:hover:not(:active) {
 		background-color: transparent;
+	}
+}
+
+html.sap-desktop .sapUiSizeCompact .sapMSinglePC {
+	.sapMSinglePCColumnHeader {
+
+		.sapUiCalItem.sapUiCalItemNow:focus {
+			outline: 0.0625rem solid white;
+			box-shadow: inset white;
+		}
+	}
+}
+
+.sapUiSizeCompact .sapMSinglePC {
+	.sapMSinglePCColumnHeader {
+
+		.sapUiCalItem:not(.sapUiCalItemFocusFromTouch).sapUiCalItemNow:focus-visible {
+			outline: 0.0625rem solid white;
+			box-shadow: inset white;
+		}
 	}
 }
 

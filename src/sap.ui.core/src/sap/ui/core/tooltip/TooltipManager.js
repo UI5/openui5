@@ -19,10 +19,9 @@ sap.ui.define([],
 
 		/**
 		 * @class
-		 * Static helper that owns cross-tooltip concerns: creation of
-		 * <code>sap.ui.core.tooltip.Tooltip</code>, the shared registry of open
-		 * tooltips, and the timing constants used for handoff between adjacent
-		 * tooltips.
+		 * Static helper that owns cross-tooltip concerns: the shared registry
+		 * of open tooltips, and the timing constants used for handoff between
+		 * adjacent tooltips.
 		 *
 		 * Per-host gesture wiring lives in
 		 * {@link sap.ui.core.tooltip.TooltipEnablement} and

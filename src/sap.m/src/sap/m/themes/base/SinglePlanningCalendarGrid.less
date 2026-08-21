@@ -353,6 +353,19 @@ html.sap-desktop {
 	}
 }
 
+.sapMSinglePCBlockersRow > .sapMSinglePCBlockersColumns > .sapMSinglePCBlockersColumn:focus-visible::after,
+.sapMSinglePCGridContent .sapMSinglePCColumns .sapMSinglePCRow:focus-visible::after {
+		content: '';
+		position: absolute;
+		top: 0.0625rem;
+		left: 0.0625rem;
+		right: 0.0625rem;
+		bottom: 0.0625rem;
+		border: 0.0625rem dotted var(--sapContent_FocusColor);
+		pointer-events: none;
+		z-index: 3;
+	}
+
 .sapMSinglePCGrid {
 	.sapUiCalendarAppointmentWrapper,
 	.sapUiCalendarAppTitle,
@@ -415,13 +428,7 @@ html.sap-desktop {
 	}
 }
 
-.sapMSinglePCAppointmentWrap.sapUiCalendarRowApps {
-	/* TODO: this styles will be removed when Appointments refactoring occured */
-	box-sizing: border-box;
-	padding: 0.0625rem;
-	position: absolute;
-	pointer-events: all;
-
+html.sap-desktop .sapMSinglePCAppointmentWrap.sapUiCalendarRowApps {
 	&:focus {
 		outline: none;
 
@@ -436,6 +443,31 @@ html.sap-desktop {
 			pointer-events: none;
 		}
 	}
+}
+
+.sapMSinglePCAppointmentWrap.sapUiCalendarRowApps {
+	&:focus-visible {
+		outline: none;
+
+		.sapUiCalendarAppCont::after {
+			position: absolute;
+			top: 0.0625rem;
+			left: 0.0625rem;
+			right: 0.0625rem;
+			bottom: 0.0625rem;
+			content: '';
+			border: 0.0625rem dotted var(--sapContent_FocusColor);
+			pointer-events: none;
+		}
+	}
+}
+
+.sapMSinglePCAppointmentWrap.sapUiCalendarRowApps {
+	/* TODO: this styles will be removed when Appointments refactoring occured */
+	box-sizing: border-box;
+	padding: 0.0625rem;
+	position: absolute;
+	pointer-events: all;
 
 	.sapUiCalendarApp {
 		border-left: 0;

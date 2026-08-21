@@ -39,10 +39,10 @@ describe("sap.m.PlanningCalendarWidth", function() {
 	 5. 2677
 	*/
 	it("should render the whole days page", function() {
-		element(by.id("PC1-Header-ViewSwitch")).click();
-		element(by.cssContainingText(".sapMSelectListItem", "Days")).click();
 		element(by.id("select_width-label")).click();
 		element(by.id("select_width_item_0")).click();
+		element(by.id("PC1-Header-ViewSwitch")).click();
+		element(by.cssContainingText(".sapMSelectListItem", "Days")).click();
 		expect(takeScreenshot(element(by.id("page1-cont")))).toLookAs("days_page");
 	});
 	/*
@@ -73,10 +73,10 @@ describe("sap.m.PlanningCalendarWidth", function() {
 	 9. 2686
 	 */
 	it("should render the whole months page", function() {
-		element(by.id("PC1-Header-ViewSwitch")).click();
-		element(by.cssContainingText(".sapMSelectListItem", "Months")).click();
 		element(by.id("select_width-label")).click();
 		element(by.id("select_width_item_0")).click();
+		element(by.id("PC1-Header-ViewSwitch")).click();
+		element(by.cssContainingText(".sapMSelectListItem", "Months")).click();
 		expect(takeScreenshot(element(by.id("page1-cont")))).toLookAs("months_page");
 	});
 	/*
@@ -107,10 +107,10 @@ describe("sap.m.PlanningCalendarWidth", function() {
 	 13. 2695
 	 */
 	it("should render the whole 1week page", function() {
-		element(by.id("PC1-Header-ViewSwitch")).click();
-		element(by.cssContainingText(".sapMSelectListItem", "1 Week")).click();
 		element(by.id("select_width-label")).click();
 		element(by.id("select_width_item_0")).click();
+		element(by.id("PC1-Header-ViewSwitch")).click();
+		element(by.cssContainingText(".sapMSelectListItem", "1 Week")).click();
 		expect(takeScreenshot(element(by.id("page1-cont")))).toLookAs("1week_page");
 	});
 	/*
@@ -141,10 +141,10 @@ describe("sap.m.PlanningCalendarWidth", function() {
 	 17. 2702
 	 */
 	it("should render the whole 1month page", function() {
-		element(by.id("PC1-Header-ViewSwitch")).click();
-		element(by.cssContainingText(".sapMSelectListItem", "1 Month")).click();
 		element(by.id("select_width-label")).click();
 		element(by.id("select_width_item_0")).click();
+		element(by.id("PC1-Header-ViewSwitch")).click();
+		element(by.cssContainingText(".sapMSelectListItem", "1 Month")).click();
 		expect(takeScreenshot(element(by.id("page1-cont")))).toLookAs("1month_page");
 	});
 	/*

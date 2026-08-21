@@ -680,7 +680,7 @@ sap.ui.define([
 
 		await nextUIUpdate();
 
-		assert.strictEqual(popover._oCalcedPos, undefined, "Calculated position is not set");
+		assert.strictEqual(popover._oCalcedPos, PlacementType.Right, "Calculated position resolves to the default Right");
 		assert.strictEqual(popover._getCalculatedPlacement(), PlacementType.Right, "Calculated placement is Right as a default");
 		assert.ok(oSpy.firstCall.args[0], "Method _calcOffset is called with no non null argument");
 

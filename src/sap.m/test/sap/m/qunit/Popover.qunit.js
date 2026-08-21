@@ -21,6 +21,7 @@ sap.ui.define([
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/Device",
 	"sap/ui/core/Popup",
+	"sap/ui/core/popover/Positioning",
 	"sap/m/NavContainer",
 	"sap/m/SegmentedButton",
 	"sap/m/SegmentedButtonItem",
@@ -57,6 +58,7 @@ sap.ui.define([
 	jQuery,
 	Device,
 	Popup,
+	Positioning,
 	NavContainer,
 	SegmentedButton,
 	SegmentedButtonItem,
@@ -540,15 +542,22 @@ sap.ui.define([
 
 	QUnit.test("vertical calculation of Popover positioning should be correct", function (assert){
 		var testCase = function (offset, outerHeight, height, placement, expectedPlace) {
-			var stubOffset = sinon.stub(Element.prototype, "getBoundingClientRect").returns({top: offset, height: outerHeight});
-			var stubOffsetTop = sinon.stub(jQuery.fn, "offset").returns({top: offset});
-			var stubOuterHeight = sinon.stub(jQuery.fn, "outerHeight").returns(outerHeight);
+			const stubOffset = sinon.stub(Element.prototype, "getBoundingClientRect").returns({top: offset, height: outerHeight, left: 0, width: 0});
+			const oScrollDesc = Object.getOwnPropertyDescriptor(window, "scrollY");
+			Object.defineProperty(window, "scrollY", { configurable: true, get: function () { return 0; } });
+			const oInnerHeightDesc = Object.getOwnPropertyDescriptor(window, "innerHeight");
+			Object.defineProperty(window, "innerHeight", { configurable: true, get: function () { return height; } });
 
 			const oPopover = new Popover({
 				placement: placement
 			});
 
-			var stubWindowHeight = sinon.stub(oPopover, "_getBottomBound").returns(height);
+			// The popover is measured via getDomRef().getBoundingClientRect(); return a
+			// fake element with its own BCR so it is independent of the globally stubbed
+			// opener rect (matches the old $().outerWidth/Height stub of outerHeight).
+			const stubDomRef = sinon.stub(oPopover, "getDomRef").returns({
+				getBoundingClientRect: function () { return { top: 0, left: 0, width: outerHeight, height: outerHeight }; }
+			});
 			var stubOpenByRef = sinon.stub(oPopover, "_getOpenByDomRef").returns(document.createElement("div"));
 
 			oPopover._calcPlacement();
@@ -557,9 +566,9 @@ sap.ui.define([
 
 			stubOpenByRef.restore();
 			stubOffset.restore();
-			stubOffsetTop.restore();
-			stubOuterHeight.restore();
-			stubWindowHeight.restore();
+			Object.defineProperty(window, "scrollY", oScrollDesc);
+			Object.defineProperty(window, "innerHeight", oInnerHeightDesc);
+			stubDomRef.restore();
 			oPopover.destroy();
 		};
 
@@ -609,16 +618,20 @@ sap.ui.define([
 
 	QUnit.test("Vertical (top/bottom) calculation and flip functionality", function (assert){
 		var testCase = function (offset, outerHeight, height, placement, expectedPlace) {
-			var stubOffset = sinon.stub(Element.prototype, "getBoundingClientRect").returns({top: offset, height: outerHeight});
-			var stubOffsetTop = sinon.stub(jQuery.fn, "offset").returns({top: offset});
-			var stubOuterHeight = sinon.stub(jQuery.fn, "outerHeight").returns(outerHeight);
+			const stubOffset = sinon.stub(Element.prototype, "getBoundingClientRect").returns({top: offset, height: outerHeight, left: 0, width: 0});
+			const oScrollDesc = Object.getOwnPropertyDescriptor(window, "scrollY");
+			Object.defineProperty(window, "scrollY", { configurable: true, get: function () { return 0; } });
+			const oInnerHeightDesc = Object.getOwnPropertyDescriptor(window, "innerHeight");
+			Object.defineProperty(window, "innerHeight", { configurable: true, get: function () { return height; } });
 
 
 			const oPopover = new Popover({
 				placement: placement
 			});
 
-			var stubWindowHeight = sinon.stub(oPopover, "_getBottomBound").returns(height);
+			const stubDomRef = sinon.stub(oPopover, "getDomRef").returns({
+				getBoundingClientRect: function () { return { top: 0, left: 0, width: outerHeight, height: outerHeight }; }
+			});
 			var stubOpenByRef = sinon.stub(oPopover, "_getOpenByDomRef").returns(document.createElement("div"));
 
 			oPopover._calcPlacement();
@@ -627,9 +640,9 @@ sap.ui.define([
 
 			stubOpenByRef.restore();
 			stubOffset.restore();
-			stubOffsetTop.restore();
-			stubOuterHeight.restore();
-			stubWindowHeight.restore();
+			Object.defineProperty(window, "scrollY", oScrollDesc);
+			Object.defineProperty(window, "innerHeight", oInnerHeightDesc);
+			stubDomRef.restore();
 			oPopover.destroy();
 		};
 
@@ -732,15 +745,19 @@ sap.ui.define([
 
 	QUnit.test("Horizontal (right/left) calculation and flip functionality", function(assert){
 		var testCase = function (offset, outerWidth, width, placement, expectedPlace) {
-			var stubOffset = sinon.stub(Element.prototype, "getBoundingClientRect").returns({left: offset, width: outerWidth});
-
-			var stubOuterWidth = sinon.stub(jQuery.fn, "outerWidth").returns(outerWidth);
-			var stubWindowWidth = sinon.stub(jQuery.fn, "width").returns(width);
+			const stubOffset = sinon.stub(Element.prototype, "getBoundingClientRect").returns({left: offset, width: outerWidth, top: 0, height: 0});
+			// Positioning reads the viewport size from documentElement.clientWidth/Height;
+			// define own getters and delete afterwards to restore inheritance.
+			Object.defineProperty(document.documentElement, "clientWidth", { configurable: true, get: function () { return width; } });
+			Object.defineProperty(document.documentElement, "clientHeight", { configurable: true, get: function () { return width; } });
 
 			const oPopover = new Popover({
 				placement: placement
 			});
 
+			const stubDomRef = sinon.stub(oPopover, "getDomRef").returns({
+				getBoundingClientRect: function () { return { top: 0, left: 0, width: outerWidth, height: outerWidth }; }
+			});
 			var stubOpenByRef = sinon.stub(oPopover, "_getOpenByDomRef").returns(document.createElement("div"));
 			oPopover._calcPlacement();
 
@@ -748,8 +765,9 @@ sap.ui.define([
 
 			stubOpenByRef.restore();
 			stubOffset.restore();
-			stubOuterWidth.restore();
-			stubWindowWidth.restore();
+			stubDomRef.restore();
+			delete document.documentElement.clientWidth;
+			delete document.documentElement.clientHeight;
 			oPopover.destroy();
 		};
 
@@ -762,15 +780,17 @@ sap.ui.define([
 
 	QUnit.test("horizontal calculation of Popover positioning should be correct", function (assert){
 		var testCase = function (offset, outerWidth, width, placement, expectedPlace) {
-			var stubOffset = sinon.stub(Element.prototype, "getBoundingClientRect").returns({left: offset, width: outerWidth});
-
-			var stubOuterWidth = sinon.stub(jQuery.fn, "outerWidth").returns(outerWidth);
-			var stubWindowWidth = sinon.stub(jQuery.fn, "width").returns(width);
+			const stubOffset = sinon.stub(Element.prototype, "getBoundingClientRect").returns({left: offset, width: outerWidth, top: 0, height: 0});
+			Object.defineProperty(document.documentElement, "clientWidth", { configurable: true, get: function () { return width; } });
+			Object.defineProperty(document.documentElement, "clientHeight", { configurable: true, get: function () { return width; } });
 
 			var oPopover = new Popover({
 				placement: placement
 			});
 
+			const stubDomRef = sinon.stub(oPopover, "getDomRef").returns({
+				getBoundingClientRect: function () { return { top: 0, left: 0, width: outerWidth, height: outerWidth }; }
+			});
 			var stubOpenByRef = sinon.stub(oPopover, "_getOpenByDomRef").returns(document.createElement("div"));
 			oPopover._calcPlacement();
 
@@ -778,8 +798,9 @@ sap.ui.define([
 
 			stubOpenByRef.restore();
 			stubOffset.restore();
-			stubOuterWidth.restore();
-			stubWindowWidth.restore();
+			stubDomRef.restore();
+			delete document.documentElement.clientWidth;
+			delete document.documentElement.clientHeight;
 			oPopover.destroy();
 		};
 
@@ -796,45 +817,44 @@ sap.ui.define([
 
 	QUnit.test("auto calculation of Popover positioning should be correct", function (assert){
 		var testCase = function (offsetLeft, offsetTop, outerWidth, outerHeight, width, height, expectedPlace) {
-			var stubOffset = sinon.stub(Element.prototype, "getBoundingClientRect").returns({
+			const stubOffset = sinon.stub(Element.prototype, "getBoundingClientRect").returns({
 				left: offsetLeft,
 				top: offsetTop,
 				width: outerWidth,
 				height: outerHeight
 			});
+			// Opener top is BCR.top + window.scrollY; pin scroll to 0.
+			const oScrollDesc = Object.getOwnPropertyDescriptor(window, "scrollY");
+			Object.defineProperty(window, "scrollY", { configurable: true, get: function () { return 0; } });
+			// Positioning derives the bottom bound from window.innerHeight + scrollY.
+			const oInnerHeightDesc = Object.getOwnPropertyDescriptor(window, "innerHeight");
+			Object.defineProperty(window, "innerHeight", { configurable: true, get: function () { return height; } });
+			Object.defineProperty(document.documentElement, "clientWidth", { configurable: true, get: function () { return width; } });
+			Object.defineProperty(document.documentElement, "clientHeight", { configurable: true, get: function () { return height; } });
 
-			var stubOffsetTop = sinon.stub(jQuery.fn, "offset").returns({top: offsetTop});
-			var stubOuterWidth = sinon.stub(jQuery.fn, "outerWidth").returns(outerWidth);
-			var stubViewportWidth = sinon.stub(jQuery.fn, "width").returns(width);
-			var stubViewportHeight = sinon.stub(jQuery.fn, "height").returns(height);
-			var stubOuterHeight = sinon.stub(jQuery.fn, "outerHeight").returns(outerHeight);
-
-
-			var stubPopover = sinon.stub(Popover.prototype, "$").returns(
-					{
-						outerWidth: sinon.stub().returns(200),
-						outerHeight: sinon.stub().returns(200)
-					});
 			var oPopover = new Popover({
 				placement: PlacementType.Auto
 			});
 
-			var stubWindowHeight = sinon.stub(oPopover, "_getBottomBound").returns(height);
+			// The popover is measured via getDomRef().getBoundingClientRect(); return a
+			// fake element with its own BCR (200x200) so it is independent of the
+			// globally stubbed opener rect.
+			const stubDomRef = sinon.stub(oPopover, "getDomRef").returns({
+				getBoundingClientRect: function () { return { top: 0, left: 0, width: 200, height: 200 }; }
+			});
 
 			var stubOpenByRef = sinon.stub(oPopover, "_getOpenByDomRef").returns(document.createElement("div"));
 			oPopover._calcPlacement();
 
 			assert.strictEqual(oPopover._oCalcedPos, expectedPlace);
 
-			stubOffsetTop.restore();
 			stubOpenByRef.restore();
 			stubOffset.restore();
-			stubOuterWidth.restore();
-			stubViewportHeight.restore();
-			stubViewportWidth.restore();
-			stubOuterHeight.restore();
-			stubWindowHeight.restore();
-			stubPopover.restore();
+			Object.defineProperty(window, "scrollY", oScrollDesc);
+			Object.defineProperty(window, "innerHeight", oInnerHeightDesc);
+			stubDomRef.restore();
+			delete document.documentElement.clientWidth;
+			delete document.documentElement.clientHeight;
 			oPopover.destroy();
 		};
 
@@ -2004,22 +2024,35 @@ sap.ui.define([
 				_fPopoverHeight: 802,
 				_fWithinAreaWidth: 1920,
 				_fWithinAreaHeight: 1139,
-				_fPopoverMarginTop: 50,
-				_fPopoverMarginRight: 10,
-				_fPopoverMarginBottom: 10,
-				_fPopoverMarginLeft: 265,
 				_fPopoverOffset: {
 					top: 21,
 					left: 265
 				}
 			};
 
-		var oCalculatedParams = this.oPopover._getPopoverPositionCss(oPosParams);
+		// withinAreaRef=window + no openerRef => margins pass through unchanged.
+		const oStubFold = sinon.stub(this.oPopover, "_getMarginFoldParams").returns({
+			margin: { top: 50, right: 10, bottom: 10, left: 265 },
+			withinAreaRef: window,
+			side: PlacementType.Bottom
+		});
+		const oStubDomRef = sinon.stub(this.oPopover, "getDomRef").returns({ getBoundingClientRect: () => ({ left: 265, top: 21, width: 416, height: 802 }) });
+
+		// Positioning reads the viewport from documentElement.clientWidth/Height.
+		Object.defineProperty(document.documentElement, "clientWidth", { configurable: true, get: () => 1920 });
+		Object.defineProperty(document.documentElement, "clientHeight", { configurable: true, get: () => 1139 });
+
+		var oCalculatedParams = this.oPopover._getPopoverPositionCss(PlacementType.Bottom, oPosParams);
 
 		assert.equal(oCalculatedParams.top, 50, "top position should be equal to the _marginTop after calculations");
 		assert.equal(oCalculatedParams.right, undefined, "right position should be equal to 'undefined' after calculations");
 		assert.ok(isNaN(oCalculatedParams.bottom), "bottom position should be equal to 'NaN' after calculations");
 		assert.equal(oCalculatedParams.left, undefined, "left position should be equal to 'undefined' after calculations");
+
+		delete document.documentElement.clientWidth;
+		delete document.documentElement.clientHeight;
+		oStubDomRef.restore();
+		oStubFold.restore();
 	});
 
 	QUnit.test("_getPopoverPositionCss should return an object with correct top, bottom, right and left position when Popover do not exceed vertically or horizontally of the window but exceeds the defined 10px border of the screen", function (assert){
@@ -2028,41 +2061,68 @@ sap.ui.define([
 			_fPopoverHeight: 754,
 			_fWithinAreaWidth: 1920,
 			_fWithinAreaHeight: 1139,
-			_fPopoverMarginTop: 50,
-			_fPopoverMarginRight: 10,
-			_fPopoverMarginBottom: 162,
-			_fPopoverMarginLeft: 10,
 			_fPopoverOffset: {
 				top: 223,
 				left: 0
 			}
 		};
 
-		var oCalculatedParams = this.oPopover._getPopoverPositionCss(oPosParams);
+		const oStubFold = sinon.stub(this.oPopover, "_getMarginFoldParams").returns({
+			margin: { top: 50, right: 10, bottom: 162, left: 10 },
+			withinAreaRef: window,
+			side: PlacementType.Bottom
+		});
+		const oStubDomRef = sinon.stub(this.oPopover, "getDomRef").returns({ getBoundingClientRect: () => ({ left: 0, top: 223, width: 416, height: 754 }) });
+
+		// Positioning reads the viewport from documentElement.clientWidth/Height.
+		Object.defineProperty(document.documentElement, "clientWidth", { configurable: true, get: () => 1920 });
+		Object.defineProperty(document.documentElement, "clientHeight", { configurable: true, get: () => 1139 });
+
+		var oCalculatedParams = this.oPopover._getPopoverPositionCss(PlacementType.Bottom, oPosParams);
 
 		assert.equal(oCalculatedParams.top, undefined, "top position should be equal to the 'undefined after calculations");
 		assert.equal(oCalculatedParams.right, undefined, "right position should be equal to the 'undefined after calculations");
 		assert.ok(isNaN(oCalculatedParams.bottom), "bottom position should be equal to 'NaN' after calculations");
 		assert.equal(oCalculatedParams.left, 10, "left position should be equal to _fPopoverMarginLeft after calculations");
+
+		delete document.documentElement.clientWidth;
+		delete document.documentElement.clientHeight;
+		oStubDomRef.restore();
+		oStubFold.restore();
 	});
 
 	QUnit.test("_getMaxContentWidth should return calculated max content width", function (assert){
-		var iMaxContentWidth = this.oPopover._getMaxContentWidth({
-			_fDocumentWidth: 500,
-			_fPopoverMarginLeft: 10,
-			_fPopoverMarginRight: 10,
+		// Positioning reads the reference width from documentElement.clientWidth.
+		Object.defineProperty(document.documentElement, "clientWidth", { configurable: true, get: () => 500 });
+
+		const oStubFold = sinon.stub(this.oPopover, "_getMarginFoldParams").returns({
+			margin: { top: 0, right: 10, bottom: 0, left: 10 },
+			withinAreaRef: window,
+			side: PlacementType.Bottom
+		});
+
+		var iMaxContentWidth = this.oPopover._getMaxContentWidth(PlacementType.Bottom, {
 			_fPopoverBorderLeft: 10,
 			_fPopoverBorderRight: 10
 		});
 
 		assert.equal(iMaxContentWidth, 460, "Popover maxContentWidth should be equal to the documentWidth minus left and right margins and borders");
+
+		delete document.documentElement.clientWidth;
+		oStubFold.restore();
 	});
 
 	QUnit.test("_getMaxContentHeight should return calculated max content width", function (assert){
-		var iMaxContentHeight = this.oPopover._getMaxContentHeight({
-			_fDocumentHeight: 500,
-			_fPopoverMarginTop: 10,
-			_fPopoverMarginBottom: 10,
+		// Positioning reads the reference height from documentElement.clientHeight.
+		Object.defineProperty(document.documentElement, "clientHeight", { configurable: true, get: () => 500 });
+
+		const oStubFold = sinon.stub(this.oPopover, "_getMarginFoldParams").returns({
+			margin: { top: 10, right: 0, bottom: 10, left: 0 },
+			withinAreaRef: window,
+			side: PlacementType.Bottom
+		});
+
+		var iMaxContentHeight = this.oPopover._getMaxContentHeight(PlacementType.Bottom, {
 			_fHeaderHeight: 10,
 			_fSubHeaderHeight: 10,
 			_fFooterHeight: 10,
@@ -2073,6 +2133,9 @@ sap.ui.define([
 		});
 
 		assert.equal(iMaxContentHeight, 410, "Popover maxContentHeight should be equal to the documentHeight minus header, subheader, footer height; top and bottom margins, borders and content margins");
+
+		delete document.documentElement.clientHeight;
+		oStubFold.restore();
 	});
 
 	QUnit.test("_getContentDimensionsCss should return max-width and max-height computed right", function (assert){
@@ -2085,7 +2148,7 @@ sap.ui.define([
 				"max-height": "400px"
 			};
 
-		var oContentDimensions = this.oPopover._getContentDimensionsCss({
+		var oContentDimensions = this.oPopover._getContentDimensionsCss(PlacementType.Bottom, {
 			_$content: jQuery(oElement)
 		});
 
@@ -2107,7 +2170,7 @@ sap.ui.define([
 				"max-height": "400px"
 			};
 
-		var oContentDimensions = this.oPopover._getContentDimensionsCss({
+		var oContentDimensions = this.oPopover._getContentDimensionsCss(PlacementType.Bottom, {
 			_$content: jQuery(oElement)
 		});
 
@@ -2150,36 +2213,42 @@ sap.ui.define([
 		stubWidth.restore();
 	});
 
-	QUnit.test("_getArrowOffsetCss should return top position of the arrow when placement type is left or right", function (assert){
-		var oPosParams = {
-				_$popover: jQuery(),
-				_$parent: jQuery(),
-				_$arrow: jQuery(),
-				_fPopoverBorderTop: 1,
-				_fPopoverOffsetY: 0
-			},
-			oExpectedPos = {
-				top: 355
-			},
-			stubPopoverOuterWidth = sinon.stub(oPosParams._$popover, "outerWidth").returns(416),
-			stubPopoverOuterHeight = sinon.stub(oPosParams._$popover, "outerHeight").returns(802),
-			stubPopoverOffset = sinon.stub(oPosParams._$popover, "offset").returns({top: 50, left: 265}),
-			stubParentOuterHeight = sinon.stub(Popover, "outerHeight").returns(40),
-			stubParentOffset = sinon.stub(oPosParams._$parent, "offset").returns({top: 402, left: 100}),
-			stubArrowOuterHeight = sinon.stub(oPosParams._$arrow, "outerHeight").returns(32);
+	QUnit.test("_getArrowOffsetCss delegates to Positioning.computeArrowOffset and maps the result per side", function (assert){
+		const oParentEl = document.createElement("div"),
+			oPopoverEl = document.createElement("div"),
+			oArrowEl = document.createElement("div"),
+			oPosParams = {
+				_$arrow: jQuery(oArrowEl)
+			};
 
-		var oCalculatedPos = this.oPopover._getArrowOffsetCss(PlacementType.Left, oPosParams);
-		assert.deepEqual(oCalculatedPos, oExpectedPos, "top position should be 355px");
+		const oStubDomRef = sinon.stub(this.oPopover, "getDomRef").returns(oPopoverEl);
+		const oStubOpener = sinon.stub(this.oPopover, "_getOpenByDomRef").returns(oParentEl);
+		const oStub = sinon.stub(Positioning, "computeArrowOffset");
 
-		var oCalculatedPos = this.oPopover._getArrowOffsetCss(PlacementType.Right, oPosParams);
-		assert.deepEqual(oCalculatedPos, oExpectedPos, "top position should be 355px");
+		// Left / Right → { top: along }
+		oStub.returns({along: 355, cross: 0, rtlRight: false});
+		assert.deepEqual(this.oPopover._getArrowOffsetCss(PlacementType.Left, oPosParams), {top: 355}, "Left → top");
+		assert.deepEqual(this.oPopover._getArrowOffsetCss(PlacementType.Right, oPosParams), {top: 355}, "Right → top");
 
-		stubPopoverOuterWidth.restore();
-		stubPopoverOuterHeight.restore();
-		stubPopoverOffset.restore();
-		stubParentOuterHeight.restore();
-		stubParentOffset.restore();
-		stubArrowOuterHeight.restore();
+		// Top / Bottom LTR → { left: along }
+		oStub.returns({along: 120, cross: 0, rtlRight: false});
+		assert.deepEqual(this.oPopover._getArrowOffsetCss(PlacementType.Top, oPosParams), {left: 120}, "Top LTR → left");
+		assert.deepEqual(this.oPopover._getArrowOffsetCss(PlacementType.Bottom, oPosParams), {left: 120}, "Bottom LTR → left");
+
+		// Top / Bottom RTL (rtlRight) → { right: along }
+		oStub.returns({along: 80, cross: 0, rtlRight: true});
+		assert.deepEqual(this.oPopover._getArrowOffsetCss(PlacementType.Top, oPosParams), {right: 80}, "Top RTL → right");
+		assert.deepEqual(this.oPopover._getArrowOffsetCss(PlacementType.Bottom, oPosParams), {right: 80}, "Bottom RTL → right");
+
+		// The DOM refs (not jQuery wrappers) are forwarded to Positioning.
+		const oCall = oStub.getCall(0).args[0];
+		assert.strictEqual(oCall.openerRef, oParentEl, "openerRef is the opener element");
+		assert.strictEqual(oCall.popoverRef, oPopoverEl, "popoverRef is the popover element");
+		assert.strictEqual(oCall.arrowRef, oArrowEl, "arrowRef is the arrow element");
+
+		oStub.restore();
+		oStubDomRef.restore();
+		oStubOpener.restore();
 	});
 
 	QUnit.test("_getArrowPositionCssClass returns the right CSS class for different position options", function (assert){

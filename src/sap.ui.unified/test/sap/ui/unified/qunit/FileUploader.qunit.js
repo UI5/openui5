@@ -2109,8 +2109,52 @@ sap.ui.define([
 		await nextUIUpdate();
 	});
 
-	QUnit.test("tokens cleared when clear() is called", async function (assert) {
+	QUnit.test("tokens preserve filename with embedded curly braces", async function (assert) {
 		// arrange
+		var oFileUploader = new FileUploader({ multiple: true });
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// act — "report_{2024}.pdf" contains {2024} which looks like a binding expression
+		var sFileName = "report_{2024}.pdf";
+		addFilesToFileUploaderTokenizer(oFileUploader, [sFileName]);
+		await nextUIUpdate();
+
+		// assert
+		var oTokenizer = oFileUploader._getTokenizer();
+		var aTokens = oTokenizer.getTokens();
+		assert.strictEqual(aTokens.length, 1, "Tokenizer contains one token");
+		assert.strictEqual(aTokens[0].getText(), sFileName, "Token text preserves curly braces in filename");
+		assert.strictEqual(aTokens[0].getTooltip(), sFileName, "Token tooltip preserves curly braces in filename");
+
+		// cleanup
+		oFileUploader.destroy();
+		await nextUIUpdate();
+	});
+
+	QUnit.test("tokens preserve filename that is a binding-like expression", async function (assert) {
+		// arrange
+		var oFileUploader = new FileUploader({ multiple: true });
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// act — "{filename}" is a pure binding expression syntax; without the fix, text would be empty
+		var sFileName = "{filename}";
+		addFilesToFileUploaderTokenizer(oFileUploader, [sFileName]);
+		await nextUIUpdate();
+
+		// assert
+		var oTokenizer = oFileUploader._getTokenizer();
+		var aTokens = oTokenizer.getTokens();
+		assert.strictEqual(aTokens.length, 1, "Tokenizer contains one token");
+		assert.strictEqual(aTokens[0].getText(), sFileName, "Token text is not treated as a binding expression");
+
+		// cleanup
+		oFileUploader.destroy();
+		await nextUIUpdate();
+	});
+
+	QUnit.test("tokens cleared when clear() is called", async function (assert) {		// arrange
 		var oFileUploader = new FileUploader({ multiple: true });
 		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();

@@ -10488,7 +10488,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		const oRequestorMock = this.mock(_Requestor);
 		const mHeaders = {
-			Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true",
+			Accept : "*/*",
 			"Accept-Language" : "en-US",
 			"Content-Type" : "application/json;charset=UTF-8;IEEE754Compatible=true",
 			"OData-MaxVersion" : "4.0",
@@ -86688,7 +86688,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			const oBinding = oModel.bindContext("/" + sPath + "(...)", undefined, {custom : "foo"});
 
 			const mHeaders = {
-				Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true",
+				Accept : "*/*",
 				"Accept-Language" : "en-US",
 				"Content-Type" : "application/json;charset=UTF-8;IEEE754Compatible=true",
 				"OData-MaxVersion" : "4.0",

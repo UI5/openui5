@@ -21,6 +21,10 @@ sap.ui.define(function() {
 				}
 			},
 
+			"popover/Positioning": {
+				title: "sap.ui.core.popover.Positioning"
+			},
+
 			"util/BusyIndicator": {
 				title: "sap.ui.core.BusyIndicator"
 			},

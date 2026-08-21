@@ -1421,6 +1421,66 @@ sap.ui.define([
 		assert.equal(oUploadSetwithTablePlugin.getItemValidationHandler(), fnValidationHandler, "UploadSetwithTable Plugin has item validation handler set");
 	});
 
+	QUnit.test("setMediaTypes - setting with an array of types", async function (assert) {
+		// arrange
+		const oTable = await createMDCTable();
+		const oPlugin = new UploadSetwithTable();
+		oTable.addDependent(oPlugin);
+		await oTable.initialized();
+
+		const oFileUploaderSpy = sinon.spy(oPlugin.getDefaultFileUploader(), "setMimeType");
+
+		// act
+		oPlugin.setMediaTypes(["image/png", "image/jpeg"]);
+
+		// assert
+		assert.deepEqual(oPlugin.getMediaTypes(), ["image/png", "image/jpeg"], "mediaTypes property is set to the provided array");
+		assert.ok(oFileUploaderSpy.calledOnceWith(["image/png", "image/jpeg"]), "setMimeType was called on the file uploader with the new types");
+
+		oFileUploaderSpy.restore();
+		oTable.destroy();
+	});
+
+	QUnit.test("setMediaTypes - setting with a comma-separated string", async function (assert) {
+		// arrange
+		const oTable = await createMDCTable();
+		const oPlugin = new UploadSetwithTable();
+		oTable.addDependent(oPlugin);
+		await oTable.initialized();
+
+		const oFileUploaderSpy = sinon.spy(oPlugin.getDefaultFileUploader(), "setMimeType");
+
+		// act
+		oPlugin.setMediaTypes("image/png,image/jpeg,application/pdf");
+
+		// assert
+		assert.deepEqual(oPlugin.getMediaTypes(), ["image/png", "image/jpeg", "application/pdf"], "mediaTypes property is split from the comma-separated string");
+		assert.ok(oFileUploaderSpy.calledOnceWith(["image/png", "image/jpeg", "application/pdf"]), "setMimeType was called on the file uploader with the split array");
+
+		oFileUploaderSpy.restore();
+		oTable.destroy();
+	});
+
+	QUnit.test("setMediaTypes - setting the same value does not update the property or file uploader", async function (assert) {
+		// arrange
+		const oTable = await createMDCTable();
+		const oPlugin = new UploadSetwithTable({ mediaTypes: ["image/png"] });
+		oTable.addDependent(oPlugin);
+		await oTable.initialized();
+
+		const oFileUploaderSpy = sinon.spy(oPlugin.getDefaultFileUploader(), "setMimeType");
+
+		// act
+		oPlugin.setMediaTypes(["image/png"]);
+
+		// assert
+		assert.deepEqual(oPlugin.getMediaTypes(), ["image/png"], "mediaTypes property remains unchanged");
+		assert.ok(oFileUploaderSpy.notCalled, "setMimeType was NOT called because the value did not change");
+
+		oFileUploaderSpy.restore();
+		oTable.destroy();
+	});
+
 	QUnit.test("Plugin aggregation defaults", async function (assert) {
 		// arrange
 		const oTable = await createMDCTable();

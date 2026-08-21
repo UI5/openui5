@@ -32,11 +32,13 @@
 .calendarSpecialDayTypeColorMixIn(sapUiCalendarSpecialDayType19, @sapLegendColor19);
 .calendarSpecialDayTypeColorMixIn(sapUiCalendarSpecialDayType20, @sapLegendColor20);
 
-html.sap-desktop .sapMSPCMonthDay:not(.sapMSPCMonthDayToday):focus::after {
+html.sap-desktop .sapMSPCMonthDay:not(.sapMSPCMonthDayToday):focus::after,
+.sapMSPCMonthDay:not(.sapUiCalItemFocusFromTouch):not(.sapMSPCMonthDayToday):focus-visible::after  {
 	border: 0.125rem solid var(--sapContent_FocusColor);
 }
 
-html.sap-desktop .sapMSPCMonthDay.sapMSPCMonthDayToday:focus .sapMSPCMonthNowMarker::after {
+html.sap-desktop .sapMSPCMonthDay.sapMSPCMonthDayToday:focus .sapMSPCMonthNowMarker::after,
+.sapMSPCMonthDay:not(.sapUiCalItemFocusFromTouch).sapMSPCMonthDayToday:focus-visible .sapMSPCMonthNowMarker::after {
 	border: none;
 	outline: 0.125rem solid var(--sapContent_FocusColor);
 	outline-offset: -0.3125rem;
@@ -58,4 +60,20 @@ html.sap-desktop .sapMSPCMonthDay.sapMSPCMonthDayToday:focus .sapMSPCMonthNowMar
 
 .sapMSPCMonthGrid .sapMSPCMonthDay.sapMSPCMonthDayToday .sapMSPCMonthLnkMore {
 	right: 0.3125rem;
+}
+
+html.sap-desktop .sapMSinglePCAppointmentWrap.sapUiCalendarRowApps {
+    &:focus {
+        .sapUiCalendarAppCont::after {
+            border: .125rem solid var(--sapContent_FocusColor);
+        }
+    }
+}
+
+.sapMSinglePCAppointmentWrap.sapUiCalendarRowApps {
+    &:focus-visible {
+        .sapUiCalendarAppCont::after {
+			border: .125rem solid var(--sapContent_FocusColor);
+        }
+    }
 }

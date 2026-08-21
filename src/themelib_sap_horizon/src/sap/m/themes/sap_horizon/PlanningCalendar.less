@@ -76,33 +76,32 @@ html.sap-desktop .sapMPlanCal .sapUiCalItemOtherMonth:not(.sapUiCalItemSel):hove
 .sapMPlanCal {
 	border-radius: 0.5rem;
 
-	.sapUiCalDatesRow {
-
-		.sapUiCalItemSel:focus > .sapUiCalItemText::after {
-			left: 0.015rem;
-			right: 0.015rem;
-		}
-	}
-
-	.sapUiCalTimesRow {
-
-		.sapUiCalItemSel:focus > .sapUiCalItemText::after {
-			left: 0.0rem;
-			right: 0.0rem;
-		}
-	}
-
 	.sapUiCalMonthsRow {
 
 		.sapUiCalItemSel:not(.sapUiCalItemSelBetween) > .sapUiCalItemText {
 			position: initial;
 		}
-
-		.sapUiCalItemSel:focus > .sapUiCalItemText::after {
-			left: 0;
-		}
 	}
 }
+
+html.sap-desktop .sapMPlanCal .sapUiCalDatesRow .sapUiCalItemSel:focus > .sapUiCalItemText::after,
+.sapMPlanCal .sapUiCalDatesRow .sapUiCalItemSel:focus-visible > .sapUiCalItemText::after {
+	left: 0.015rem;
+	right: 0.015rem;
+}
+
+html.sap-desktop .sapMPlanCal .sapUiCalTimesRow .sapUiCalItemSel:focus > .sapUiCalItemText::after,
+.sapMPlanCal .sapUiCalTimesRow .sapUiCalItemSel:focus-visible > .sapUiCalItemText::after {
+	left: 0.0rem;
+	right: 0.0rem;
+}
+
+html.sap-desktop .sapMPlanCal .sapUiCalMonthsRow .sapUiCalItemSel:focus > .sapUiCalItemText::after,
+.sapMPlanCal .sapUiCalMonthsRow .sapUiCalItemSel:focus-visible > .sapUiCalItemText::after {
+	left: 0;
+}
+
+
 
 .sapMPlanCal .sapUiCalendarRowAppsIntHead {
 	border-radius: 0.25rem;
@@ -129,4 +128,22 @@ html.sap-desktop .sapMPlanCal .sapUiCalItemOtherMonth:not(.sapUiCalItemSel):hove
 	.sapMFlexItem .sapMText {
 		line-height: inherit;
 	}
+}
+
+html.sap-desktop .sapMPlanCal .sapUiCalItem:focus.sapUiCalItemNow .sapUiCalItemText::after,
+.sapMPlanCal .sapUiCalItem:not(.sapUiCalItemFocusFromTouch):focus-visible.sapUiCalItemNow .sapUiCalItemText::after,
+html.sap-desktop .sapMPlanCal .sapUiCalItem:focus.sapUiCalItemSel .sapUiCalItemText::after,
+.sapMPlanCal .sapUiCalItem:not(.sapUiCalItemFocusFromTouch):focus-visible.sapUiCalItemSel .sapUiCalItemText::after,
+html.sap-desktop .sapMPlanCal .sapUiCalItem:focus.sapUiCalItemSelStart .sapUiCalItemText::after,
+.sapMPlanCal .sapUiCalItem:not(.sapUiCalItemFocusFromTouch):focus-visible.sapUiCalItemSelStart .sapUiCalItemText::after,
+html.sap-desktop .sapMPlanCal .sapUiCalItem:focus.sapUiCalItemSelEnd .sapUiCalItemText::after,
+.sapMPlanCal .sapUiCalItem:not(.sapUiCalItemFocusFromTouch):focus-visible.sapUiCalItemSelEnd .sapUiCalItemText::after {
+	content: '';
+	position: absolute;
+	top: 0.3125rem;
+	left: 0.3125rem;
+	right: 0.3125rem;
+	bottom: 0.3125rem;
+	border: 0.125rem solid var(--sapContent_FocusColor);
+	border-radius: 0.1875rem;
 }
