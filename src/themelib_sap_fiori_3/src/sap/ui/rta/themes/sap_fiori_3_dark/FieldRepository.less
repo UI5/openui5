@@ -3,10 +3,12 @@
 /* Quartz Dark theme                           */
 /* =========================================== */
 
-@_sap_ui_rta_FieldRepository_BtnHoverBorderColor: var(--sapButton_BorderColor); /* #91c8f6 */
-@_sap_ui_rta_FieldRepository_BtnBorderColor: transparent;
-@_sap_ui_rta_FieldRepository_BtnFocusBorderColor: var(--sapContent_FocusColor); /* #fff */
-@_sap_ui_rta_FieldRepository_ListSelectedBorderColor: var(--sapList_Background); /* #29313a */
+.sapUI5Scope {
+	--_sap_ui_rta_FieldRepository_BtnHoverBorderColor: var(--sapButton_BorderColor);
+	--_sap_ui_rta_FieldRepository_BtnBorderColor: transparent;
+	--_sap_ui_rta_FieldRepository_BtnFocusBorderColor: var(--sapContent_FocusColor);
+	--_sap_ui_rta_FieldRepository_ListSelectedBorderColor: var(--sapList_Background);
+}
 
 .sapUiRtaMode {
 
@@ -17,24 +19,25 @@
 			&:hover {
 
 				.sapMBtnInner {
-					border: 0.0625rem solid @_sap_ui_rta_FieldRepository_BtnHoverBorderColor !important; /* 1px */
+					border: 0.0625rem solid var(--_sap_ui_rta_FieldRepository_BtnHoverBorderColor) !important; /* 1px */
 				}
 			}
 
 			> .sapMBtnInner {
-				border: 0.0625rem solid @_sap_ui_rta_FieldRepository_BtnBorderColor; /* 1px */
+				border: 0.0625rem solid var(--_sap_ui_rta_FieldRepository_BtnBorderColor); /* 1px */
 			}
 
 			&:focus {
+
 				&:not(:hover) > .sapMFocusable {
-					border: 0.0625rem dotted @_sap_ui_rta_FieldRepository_BtnFocusBorderColor; /* 1px */
+					border: 0.0625rem dotted var(--_sap_ui_rta_FieldRepository_BtnFocusBorderColor); /* 1px */
 					outline: none;
 				}
 			}
 		}
 
 		.sapMLIB.sapMLIBSelected {
-			border-color: @_sap_ui_rta_FieldRepository_ListSelectedBorderColor;
+			border-color: var(--_sap_ui_rta_FieldRepository_ListSelectedBorderColor);
 		}
 	}
 }
