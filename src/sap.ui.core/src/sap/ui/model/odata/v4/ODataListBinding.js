@@ -1665,7 +1665,8 @@ sap.ui.define([
 			if (this.iCreatedContexts || this.iDeletedContexts || bHasEffectivelyKeptAlive
 					// the cache in a recursive hierarchy must be reused (to keep the tree state)
 					// but immediately after #setAggregation it might still be a _CollectionCache
-					|| this.mParameters.$$aggregation?.hierarchyQualifier
+					|| (this.mParameters.$$aggregation?.hierarchyQualifier
+						|| this.mParameters.$$aggregation?.expandTo)
 					&& oOldCache instanceof _AggregationCache) {
 				if (bResetViaSideEffects && this.mParameters.$$aggregation?.hierarchyQualifier) {
 					sGroupId = this.getGroupId(); // reset via a side-effects refresh
@@ -5190,10 +5191,11 @@ sap.ui.define([
 	 *       aggregatable property are needed
 	 *     <li> <code>with</code>: An optional string that provides the name of the method (for
 	 *       example "sum") used for aggregation of this aggregatable property; see
-	 *       "3.1.2 Keyword with".
+	 *       "3.1.2 Keyword with"; cannot be combined with <code>expandTo</code>
 	 *     <li> <code>name</code>: An optional string that provides the original aggregatable
 	 *       property name in case a different alias is chosen as the name of the dynamic property
-	 *       used for aggregation of this aggregatable property; see "3.1.1 Keyword as"
+	 *       used for aggregation of this aggregatable property; see "3.1.1 Keyword as"; cannot be
+	 *       combined with <code>expandTo</code>
 	 *      <li> <code>unit</code>: An optional string that provides the name of the custom
 	 *       aggregate for a currency or unit of measure corresponding to this aggregatable property
 	 *       (since 1.86.0). The custom aggregate must return the single value of that unit in case
@@ -5214,7 +5216,10 @@ sap.ui.define([
 	 *   <code>expandTo >= Number.MAX_SAFE_INTEGER</code> can be used to expand all levels
 	 *   (<code>1E16</code> is recommended inside XML views for simplicity). Since 1.139.0,
 	 *   {@link #getAggregation} returns <code>expandTo : Number.MAX_SAFE_INTEGER</code> instead of
-	 *   values greater than this. These differences do not count as changes.
+	 *   values greater than this. These differences do not count as changes. Since 1.153.0 it is
+	 *   also supported for visual grouping (@experimental as of version 1.153.0) and requires the
+	 *   <a href="https://sap.github.io/odata-vocabularies/vocabularies/Analytics.html#MultiLevelExpand">"com.sap.vocabularies.Analytics.v1.MultiLevelExpand"</a>
+	 *   "$apply" transformation.
 	 * @param {boolean} [oAggregation.grandTotalAtBottomOnly]
 	 *   Tells whether the grand totals for aggregatable properties are displayed at the bottom only
 	 *   (since 1.86.0); <code>true</code> for bottom only, <code>false</code> for top and bottom,
@@ -5276,7 +5281,7 @@ sap.ui.define([
 	 *   needed. Beware that methods like "average" or "countdistinct" are not compatible with this
 	 *   approach, and it cannot be combined with group levels. Since 1.129.0, this property is not
 	 *   needed anymore and filtering by aggregated properties is supported even while grand totals
-	 *   or subtotals are needed.
+	 *   or subtotals are needed. Must not be combined with <code>expandTo</code>.
 	 * @throws {Error} If
 	 *   <ul>
 	 *     <li> the given data aggregation object is unsupported,

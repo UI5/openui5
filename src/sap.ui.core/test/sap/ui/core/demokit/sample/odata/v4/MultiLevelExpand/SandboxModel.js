@@ -21,6 +21,8 @@ sap.ui.define([
 		UA : "United Airlines, Inc."
 	};
 	const aAirlineIDs = Object.keys(mAirline2Name);
+	const aGroupLevels = ["airline", "ConnectionID", "FlightDate", "status", "BookingDate"];
+	const sLevelInformation = "@com.sap.vocabularies.Analytics.v1.LevelInformation";
 	const iNoOfAirlines = aAirlineIDs.length;
 
 	/**
@@ -35,9 +37,10 @@ sap.ui.define([
 		const iSkip = parseInt(sApply.match(/[,\/]skip\((\d+)\)/)?.[1] ?? "0"); // optional
 		const iTop = parseFloat(sApply.match(/[,\/]top\((\d+)\)/)?.[1] ?? "Infinity"); // optional
 
-		let iLevels = 1;
+		let fnIsExpanded;
 		let vSubtotalsAtBottom;
-		if (sApply.includes("MultiLevelExpand(")) {
+		const bMultiLevelExpand = sApply.includes("MultiLevelExpand(");
+		if (bMultiLevelExpand) {
 			//     ,com.sap.vocabularies.Analytics.v1.MultiLevelExpand(
 			//         LevelProperties=[{
 			//             "DimensionProperties":["airline"]
@@ -47,12 +50,41 @@ sap.ui.define([
 			//         ,SiblingOrder=[{"Property":"FlightPrice","Descending":true}]
 			//         ,Levels=3)
 			//         /concat(aggregate($count as UI5__count),top(119)))
-			const sParameters = sApply
+			let sParameters = sApply
 				.split("com.sap.vocabularies.Analytics.v1.MultiLevelExpand(")[1] // from
-				.split(")/")[0]; //to ")/concat(" or ")/skip("
+				.split(")/")[0]; // to ")/concat(" or ")/skip(" (optional)
+			if (sParameters.at(-1) === ")") { // at end of $apply
+				sParameters = sParameters.slice(0, -1); // remove trailing ")"
+			}
 			const mParameters = JSTokenizer.parseJS(
 				"{" + decodeURIComponent(sParameters).replaceAll("=", ":") + "}");
-			iLevels = mParameters.Levels ?? Infinity;
+			const iLevels = mParameters.Levels ?? Infinity;
+			const mEntry2Level = {};
+			mParameters.ExpandLevels?.forEach(({Entry : aValues, Levels : iLevels0}) => {
+				mEntry2Level[aValues.join()] = iLevels0 ?? Infinity;
+			});
+			fnIsExpanded = (iDistanceFromRoot, oNode) => {
+				function isParentExpandedEnough(sEntry, iLevelsUp = 0) {
+					if (!sEntry.includes(",")) {
+						return false;
+					}
+					sEntry = sEntry.split(",").slice(0, -1).join();
+					iLevelsUp += 1;
+					return mEntry2Level[sEntry] > iLevelsUp
+						|| isParentExpandedEnough(sEntry, iLevelsUp);
+				}
+
+				const sEntry = aGroupLevels.slice(0, iDistanceFromRoot + 1)
+					.map((sGroup) => oNode[sGroup])
+					.join();
+				if (sEntry in mEntry2Level) {
+					return mEntry2Level[sEntry] !== 0;
+				}
+				if (isParentExpandedEnough(sEntry)) {
+					return true;
+				}
+				return iDistanceFromRoot + 1 < iLevels;
+			};
 			vSubtotalsAtBottom = mParameters.Aggregation.length
 				? mParameters.SubtotalsAtBottom
 				: "off";
@@ -62,7 +94,7 @@ sap.ui.define([
 		//     ,groupby((airline,airlineName),aggregate(FlightPrice,CurrencyCode_code))
 		//         /orderby(FlightPrice desc)/concat(aggregate($count as UI5__count),top(119)))
 
-		let aRows = getAirlines(vSubtotalsAtBottom, iLevels);
+		let aRows = getAirlines(vSubtotalsAtBottom, fnIsExpanded);
 		if (sApply.includes("concat(")) {
 			// $apply=filter(status ne '')/concat(
 			//     groupby((BookingDate,ConnectionID,FlightDate,airline,status))
@@ -88,12 +120,10 @@ sap.ui.define([
 
 			return;
 		}
-		if (iLevels > 1) {
+		if (bMultiLevelExpand) {
 			// $apply=filter(status ne '')/....MultiLevelExpand(...)/skip(119)/top(110)
-			oResponse.message = JSON.stringify({
-				// "@odata.context" : "$metadata#Bookings(@SAP__core.AnyStructure)", ...
-				value : aRows.slice(iSkip, iSkip + iTop)
-			});
+			// $apply=....MultiLevelExpand(...)&$count=true&$skip=0&$top=120
+			selectCountSkipTop(aRows.slice(iSkip, iSkip + iTop), mQueryOptions, oResponse);
 
 			return;
 		}
@@ -149,83 +179,105 @@ sap.ui.define([
 	}
 
 	/**
-	 * Inherits missing properties from the given parent to all of its children. Adds the level
-	 * information as instance annotation with distance from root and limited descendant count.
+	 * Expands the given parent "nodes" (group levels), which have a given distance from root, as
+	 * indicated per node by the given function. Takes care of subtotals at the bottom and of the
+	 * level information as instance annotation.
 	 *
 	 * @param {number} iDistanceFromRoot - The parents' distance from root
 	 * @param {object[]} aRows - The parent "nodes" (group levels)
 	 * @param {boolean|"off"} vSubtotalsAtBottom - Whether to duplicate group headers...
-	 * @param {number} iLevels - The number of levels to return
+	 * @param {function(object):boolean} [fnIsExpanded] - Tell whether a parent node is expanded
 	 * @param {function(number,number,boolean):object[]} fnExpand
 	 *   Function to expand a single parent node identified by its index
 	 * @returns {object[]} The group levels, possibly expanded
 	 */
-	function expand(iDistanceFromRoot, aRows, vSubtotalsAtBottom, iLevels, fnExpand) {
+	function expand(iDistanceFromRoot, aRows, vSubtotalsAtBottom, fnIsExpanded, fnExpand) {
 		/*
-		 * Inherits missing properties from the given parent to all of its children. Adds the level
-		 * information as instance annotation with distance from root and limited descendant count.
+		 * Adds the level information as instance annotation with distance from root, drill state,
+		 * and limited descendant count.
 		 *
-		 * @param {object} oParent - A parent "node" (group level)
-		 * @param {object[]} aChildren - The child "nodes"
-		 * @returns {object[]} The modified children
+		 * @param {object} oParent - A collapsed parent node (group level)
+		 * @returns {object} The modified parent
 		 */
-		function inherit(oParent, aChildren) {
+		function collapsed(oParent) {
+			oParent[sLevelInformation] = {
+				DistanceFromRoot : String(iDistanceFromRoot), // Edm.Int64
+				// "expanded|subtotal|leaf|collapsed"
+				DrillState : iDistanceFromRoot + 1 >= aGroupLevels.length ? "leaf" : "collapsed"
+				// LimitedDescendantCount : "0"
+			};
+			return oParent;
+		}
+
+		/*
+		 * Adds the level information as instance annotation with distance from root, drill state,
+		 * and limited descendant count. Takes care of subtotals at the bottom.
+		 *
+		 * @param {object} oParent - An expanded parent node (group level)
+		 * @param {object[]} aDescendants - The descendant nodes
+		 * @returns {object[]} The modified descendants
+		 */
+		function expanded(oParent, aDescendants) {
 			let iLimitedDescendantCount = 0;
-			aChildren = aChildren.map((oChild) => ({...oParent, ...oChild}));
-			aChildren.forEach((oChild) => {
-				// BEWARE: not all children belong to the same level!
-				oChild["@com.sap.vocabularies.Analytics.v1.LevelInformation"] ??= {
+			aDescendants.forEach((oDescendant) => {
+				// BEWARE: not all descendants belong to the same level!
+				if (oDescendant[sLevelInformation]
+						&& oDescendant[sLevelInformation].DistanceFromRoot
+							!== String(iDistanceFromRoot + 1)) {
+					return; // not a next-level child
+				}
+				oDescendant[sLevelInformation] ??= {
 					DistanceFromRoot : String(iDistanceFromRoot + 1),
-					DrillState : iDistanceFromRoot >= 4
+					// Note: iDistanceFromRoot refers to oParent!
+					DrillState : iDistanceFromRoot + 2 >= aGroupLevels.length
 						? "leaf"
 						: "collapsed" // Note: overridden for parent nodes later on!
 					// LimitedDescendantCount : "0"
 				};
 				const sLimitedDescendantCount
-					= oChild["@com.sap.vocabularies.Analytics.v1.LevelInformation"]
-						.LimitedDescendantCount ?? "0";
+					= oDescendant[sLevelInformation].LimitedDescendantCount ?? "0";
 				iLimitedDescendantCount += parseInt(sLimitedDescendantCount) + 1;
 			});
-			oParent["@com.sap.vocabularies.Analytics.v1.LevelInformation"] = {
+			oParent[sLevelInformation] = {
 				DistanceFromRoot : String(iDistanceFromRoot), // Edm.Int64
 				DrillState : "expanded", // "expanded|subtotal|leaf|collapsed"
 				LimitedDescendantCount : String(iLimitedDescendantCount) // Edm.Int64
 			};
 			if (vSubtotalsAtBottom === true) {
-				const oSubtotal = _Helper.clone(oParent); //TODO: avoid deep clone?
-				oSubtotal["@com.sap.vocabularies.Analytics.v1.LevelInformation"].DrillState
-					= "subtotal";
-				aChildren.push(oSubtotal);
+				const oSubtotal = _Helper.clone(oParent); //TODO avoid deep clone?
+				oSubtotal[sLevelInformation].DrillState = "subtotal";
+				delete oSubtotal[sLevelInformation].LimitedDescendantCount;
+				aDescendants.push(oSubtotal);
 			}
 
-			return aChildren;
+			return aDescendants;
 		}
 
 		if (vSubtotalsAtBottom === "off") {
-			aRows.forEach((oParent) => { //TODO: MUST not be done on leaf level!
+			aRows.forEach((oParent) => { //TODO MUST not be done on leaf level!
 				delete oParent.CurrencyCode_code;
 				delete oParent.FlightPrice;
 			});
 		}
 
-		return iLevels <= 1
-			? aRows
-			: aRows.map((oParent, i) => {
-				return [
+		return fnIsExpanded
+			? aRows.map((oParent, i) => {
+				return fnIsExpanded(iDistanceFromRoot, oParent) ? [
 					oParent,
-					...inherit(oParent, fnExpand(i, vSubtotalsAtBottom, iLevels - 1))
-				];
-			}).flat();
+					...expanded(oParent, fnExpand(i, vSubtotalsAtBottom, fnIsExpanded, oParent))
+				] : collapsed(oParent);
+			}).flat()
+			: aRows;
 	}
 
 	/**
 	 * Returns group levels for airlines, expanded to achieve the given number of levels.
 	 *
 	 * @param {boolean|"off"} vSubtotalsAtBottom - Whether to duplicate group headers...
-	 * @param {number} [iLevels=1] - The number of levels to return
+	 * @param {function(object):boolean} [fnIsExpanded] - Tell whether a parent node is expanded
 	 * @returns {object[]} Group levels for airlines, possibly expanded
 	 */
-	function getAirlines(vSubtotalsAtBottom, iLevels = 1) {
+	function getAirlines(vSubtotalsAtBottom, fnIsExpanded) {
 		const aRows = aAirlineIDs.map((sAirline, iAirline) => {
 			return {
 				airline : sAirline,
@@ -235,7 +287,8 @@ sap.ui.define([
 			};
 		});
 
-		return expand(/*iDistanceFromRoot*/0, aRows, vSubtotalsAtBottom, iLevels, getConnections);
+		return expand(/*iDistanceFromRoot*/0, aRows, vSubtotalsAtBottom, fnIsExpanded,
+			getConnections);
 	}
 
 	/**
@@ -245,15 +298,17 @@ sap.ui.define([
 	 * @param {number} [iConnectionID] - Index of connection ID
 	 * @param {number} [iFlightDate] - Index of flight date
 	 * @param {number} [iStatus] - Index of status (0 for "B", 1 for "N")
-	 * @param {boolean|"off"} [_vSubtotalsAtBottom] - Whether to duplicate group headers...
-	 * @param {number} [_iLevels] - Ignored
+	 * @param {boolean} [_vSubtotalsAtBottom] - Whether to duplicate group headers...
+	 * @param {function(object):boolean} [_fnIsExpanded] - Ignored
+	 * @param {object} [oStatus] - Optional parent in case of expansion
 	 * @returns {object[]} Leaves for bookings
 	 */
 	function getBookings(iAirline, iConnectionID, iFlightDate, iStatus, _vSubtotalsAtBottom,
-			_iLevels) {
+			_fnIsExpanded, oStatus) {
 		const aRows = [];
 		for (let iBookingDate = 0; iBookingDate < 10; iBookingDate++) {
 			aRows.push({
+				...oStatus,
 				BookingDate : `2024-0${iAirline + 1}-1${iBookingDate}`,
 				CurrencyCode_code : aAirlineCurrencyCodes[iAirline],
 				FlightPrice : String(
@@ -269,13 +324,15 @@ sap.ui.define([
 	 *
 	 * @param {number} [iAirline] - Index of airline
 	 * @param {boolean|"off"} vSubtotalsAtBottom - Whether to duplicate group headers...
-	 * @param {number} [iLevels=1] - The number of levels to return
+	 * @param {function(object):boolean} [fnIsExpanded] - Tell whether a parent node is expanded
+	 * @param {object} [oAirline] - Optional parent in case of expansion
 	 * @returns {object[]} Group levels for connections, possibly expanded
 	 */
-	function getConnections(iAirline, vSubtotalsAtBottom, iLevels = 1) {
+	function getConnections(iAirline, vSubtotalsAtBottom, fnIsExpanded, oAirline) {
 		const aRows = [];
 		for (let iConnectionID = 0; iConnectionID < 10; iConnectionID++) {
 			aRows.push({
+				...oAirline,
 				// IsDigitSequence: avoid leading zeroes!
 				ConnectionID : `1${iAirline}0${iConnectionID}`,
 				CurrencyCode_code : aAirlineCurrencyCodes[iAirline],
@@ -283,7 +340,7 @@ sap.ui.define([
 			});
 		}
 
-		return expand(/*iDistanceFromRoot*/1, aRows, vSubtotalsAtBottom, iLevels,
+		return expand(/*iDistanceFromRoot*/1, aRows, vSubtotalsAtBottom, fnIsExpanded,
 			getFlights.bind(null, iAirline));
 	}
 
@@ -364,20 +421,22 @@ sap.ui.define([
 	 * @param {number} [iAirline] - Index of airline
 	 * @param {number} [iConnectionID] - Index of connection ID
 	 * @param {boolean|"off"} vSubtotalsAtBottom - Whether to duplicate group headers...
-	 * @param {number} [iLevels=1] - The number of levels to return
+	 * @param {function(object):boolean} [fnIsExpanded] - Tell whether a parent node is expanded
+	 * @param {object} [oConnection] - Optional parent in case of expansion
 	 * @returns {object[]} Group levels for flights, possibly expanded
 	 */
-	function getFlights(iAirline, iConnectionID, vSubtotalsAtBottom, iLevels = 1) {
+	function getFlights(iAirline, iConnectionID, vSubtotalsAtBottom, fnIsExpanded, oConnection) {
 		const aRows = [];
 		for (let iFlightDate = 0; iFlightDate < 10; iFlightDate++) {
 			aRows.push({
+				...oConnection,
 				CurrencyCode_code : aAirlineCurrencyCodes[iAirline],
 				FlightDate : `2025-0${iAirline + 1}-1${iFlightDate}`,
 				FlightPrice : String(getFlightPrice(iAirline, iConnectionID, iFlightDate))
 			});
 		}
 
-		return expand(/*iDistanceFromRoot*/1, aRows, vSubtotalsAtBottom, iLevels,
+		return expand(/*iDistanceFromRoot*/2, aRows, vSubtotalsAtBottom, fnIsExpanded,
 			getStatus.bind(null, iAirline, iConnectionID));
 	}
 
@@ -404,22 +463,26 @@ sap.ui.define([
 	 * @param {number} [iConnectionID] - Index of connection ID
 	 * @param {number} [iFlightDate] - Index of flight date
 	 * @param {boolean|"off"} vSubtotalsAtBottom - Whether to duplicate group headers...
-	 * @param {number} [iLevels=1] - The number of levels to return
+	 * @param {function(object):boolean} [fnIsExpanded] - Tell whether a parent node is expanded
+	 * @param {object} [oFlight] - Optional parent in case of expansion
 	 * @returns {object[]} Group levels for status, possibly expanded
 	 */
-	function getStatus(iAirline, iConnectionID, iFlightDate, vSubtotalsAtBottom, iLevels = 1) {
+	function getStatus(iAirline, iConnectionID, iFlightDate, vSubtotalsAtBottom, fnIsExpanded,
+			oFlight) {
 		const aRows = [{
+			...oFlight,
 			status : "B",
 			CurrencyCode_code : aAirlineCurrencyCodes[iAirline],
 			FlightPrice : String(getFlightPrice(iAirline, iConnectionID, iFlightDate, 0))
 		}, {
+			...oFlight,
 			status : "N",
 			CurrencyCode_code : aAirlineCurrencyCodes[iAirline],
 			FlightPrice : String(getFlightPrice(iAirline, iConnectionID, iFlightDate, 1))
 		}];
 		// Note: in theory, there can also be "X"...
 
-		return expand(/*iDistanceFromRoot*/1, aRows, vSubtotalsAtBottom, iLevels,
+		return expand(/*iDistanceFromRoot*/3, aRows, vSubtotalsAtBottom, fnIsExpanded,
 			getBookings.bind(null, iAirline, iConnectionID, iFlightDate));
 	}
 
