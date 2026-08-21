@@ -95,10 +95,6 @@ sap.ui.define([
 		name: "_sap_m_Popover_ArrowOffset"
 	}));
 
-	const fCompactArrowOffset = Rem.toPx(Parameters.get({
-		name: "_sap_m_Popover_ArrowOffset"
-	}));
-
 	var app = new App("myApp", {
 		initialPage: "myFirstPage"
 	});
@@ -2353,12 +2349,12 @@ sap.ui.define([
 		assert.deepEqual(this.oPopover._atPositions, ["begin top", "end center", "begin bottom", "begin center"], "atPositions should be correct");
 	});
 
-	QUnit.test("Popover should use compact arrow offset if _bSizeCompact is true", async function (assert){
+	QUnit.test("Popover should use arrow offset if _bSizeCompact is true", async function (assert){
 		this.oPopover.addStyleClass("sapUiSizeCompact");
 		this.oPopover.openBy(this.oButton);
 		await nextUIUpdate();
 
-		assert.equal(this.oPopover._arrowOffset, fCompactArrowOffset, "_arrowoffset should have correct value");
+		assert.equal(this.oPopover._arrowOffset, fArrowOffset, "_arrowoffset should have correct value");
 		assert.deepEqual(this.oPopover._offsets, [`0 -${fArrowOffset}`, `${fArrowOffset} 0`, `0 ${fArrowOffset}`, `-${fArrowOffset} 0`], "offsets should be correct according the arrowOffset");
 	});
 
