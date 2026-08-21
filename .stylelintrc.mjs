@@ -69,5 +69,8 @@ export default {
     "@stylistic/string-quotes": "single",
     "@stylistic/no-eol-whitespace": true,
     "@stylistic/block-opening-brace-space-before": "always",
+    "@stylistic/selector-combinator-space-after": "before",
+    "@stylistic/selector-combinator-space-after": "always",
+    "@stylistic/declaration-bang-space-before": "always",
   }
 };
