@@ -7443,8 +7443,10 @@ sap.ui.define([
 		this.mock(oCache).expects("createCountPromise").exactly(bCount ? 1 : 0).withExactArgs();
 		const oParentCacheMock = this.mock(oParentCache);
 		const mock = () => {
+			this.mock(oCache.removeKeptElement).expects("bind")
+				.withExactArgs(sinon.match.same(oCache)).returns("~removeKeptElement~");
 			this.mock(oCache.oTreeState).expects("delete")
-				.withExactArgs(sinon.match.same(oElement));
+				.withExactArgs(sinon.match.same(oElement), "~removeKeptElement~");
 			this.mock(_Cache).expects("getElementIndex")
 				.withExactArgs(sinon.match.same(oCache.aElements), "~predicate~", 2)
 				.returns(4);
@@ -7538,7 +7540,10 @@ sap.ui.define([
 		this.mock(oParentCache).expects("_delete")
 			.withExactArgs("~oGroupLock~", "~editUrl~", "~sPredicate~", "~oETagEntity~", null)
 			.callsFake(() => {
-				this.mock(oCache.oTreeState).expects("delete").withExactArgs("~oElement~");
+				this.mock(oCache.removeKeptElement).expects("bind")
+					.withExactArgs(sinon.match.same(oCache)).returns("~removeKeptElement~");
+				this.mock(oCache.oTreeState).expects("delete")
+					.withExactArgs("~oElement~", "~removeKeptElement~");
 				oCache.aElements.length = 0; // => side-effects refresh in progress
 
 				return Promise.resolve();
@@ -8564,6 +8569,7 @@ sap.ui.define([
 			.callsFake(function () {
 				assert.strictEqual(oCache.aElements.indexOf(oNode3), 5, "not yet moved");
 			});
+		this.mock(oCache.oTreeState).expects("isExpanded").never();
 		this.mock(oCache).expects("expand")
 			.withExactArgs(sinon.match.same(_GroupLock.$cached), "~predicate3~", 1,
 				{/*mKeptElementPredicates*/})
@@ -8604,6 +8610,7 @@ sap.ui.define([
 		oTreeStateMock.expects("stillOutOfPlace")
 			.withExactArgs(sinon.match.same(oNode2), "~predicate2~");
 		this.mock(oCache).expects("collapse").never();
+		this.mock(oCache.oTreeState).expects("isExpanded").never();
 		this.mock(oCache).expects("expand").never();
 
 		// code under test
@@ -8629,6 +8636,8 @@ sap.ui.define([
 		this.mock(oCache.oTreeState).expects("stillOutOfPlace")
 			.withExactArgs(sinon.match.same(oOutChild), "~predicateOutChild~");
 		this.mock(oCache).expects("collapse").never();
+		this.mock(oCache.oTreeState).expects("isExpanded").withExactArgs("~predicateOut~")
+			.returns("~isExpanded~");
 		this.mock(oCache).expects("expand").never();
 
 		// code under test
@@ -8636,7 +8645,7 @@ sap.ui.define([
 
 		assert.deepEqual(oCache.aElements, ["~foo~", "~bar~", oOut, oOutChild, "~baz~"]);
 		assert.deepEqual(oOut, {
-			"@$ui5.node.isExpanded" : true,
+			"@$ui5.node.isExpanded" : "~isExpanded~",
 			"@$ui5.node.level" : 23,
 			Name : "Out"
 		});
@@ -8656,6 +8665,7 @@ sap.ui.define([
 		this.mock(oCache.oTreeState).expects("stillOutOfPlace")
 			.withExactArgs("~out~", "~predicateOut~");
 		this.mock(oCache).expects("collapse").never();
+		this.mock(oCache.oTreeState).expects("isExpanded").never();
 		this.mock(oCache).expects("expand").never();
 
 		// code under test
@@ -8663,6 +8673,45 @@ sap.ui.define([
 
 		assert.deepEqual(oCache.aElements, ["~foo~", "~bar~", "~baz~"]);
 	});
+
+	//*********************************************************************************************
+[false, true].forEach((bAlreadyCollapsed) => {
+	const sTitle = "moveOutOfPlaceNodes: parent is collapsed, already=" + bAlreadyCollapsed;
+
+	QUnit.test(sTitle, function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+			hierarchyQualifier : "X"
+		});
+		const oOut = bAlreadyCollapsed
+		? Object.freeze({"@$ui5.node.isExpanded" : false, "@$ui5.node.level" : 23, Name : "Out"})
+		: {"@$ui5.node.level" : 23, Name : "Out"};
+		const oOutChild = Object.freeze({
+			"@$ui5.node.isExpanded" : true,
+			Name : "Out_Child"
+		});
+		oCache.aElements = ["~foo~", "~bar~", oOut, "~baz~", oOutChild];
+		oCache.aElements.$byPredicate = {
+			"~predicateOut~" : oOut,
+			"~predicateOutChild~" : oOutChild
+		};
+		this.mock(oCache).expects("findIndex").never();
+		this.mock(oCache.oTreeState).expects("stillOutOfPlace")
+			.withExactArgs(sinon.match.same(oOutChild), "~predicateOutChild~");
+		this.mock(oCache).expects("collapse").withExactArgs("~predicateOutChild~", {});
+		this.mock(oCache.oTreeState).expects("isExpanded").exactly(bAlreadyCollapsed ? 0 : 1)
+			.withExactArgs("~predicateOut~").returns(false);
+		this.mock(oCache).expects("expand").never();
+
+		// code under test
+		oCache.moveOutOfPlaceNodes(["~predicateOutChild~"], "~predicateOut~");
+
+		assert.deepEqual(oCache.aElements, ["~foo~", "~bar~", oOut, "~baz~"]);
+		assert.deepEqual(oCache.aElements.$byPredicate,
+			{"~predicateOut~" : oOut, "~predicateOutChild~" : oOutChild});
+		assert.deepEqual(oOut,
+			{"@$ui5.node.isExpanded" : false, "@$ui5.node.level" : 23, Name : "Out"});
+	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("resetOutOfPlace", function () {

@@ -191,18 +191,19 @@ sap.ui.define([
 
 		const oTreeStateMock = this.mock(oTreeState);
 		// initial call
-		oTreeStateMock.expects("delete").withExactArgs("~oNode~").callThrough();
+		oTreeStateMock.expects("delete").withExactArgs("~oNode~", "~fnOnDelete~").callThrough();
 		const oHelperMock = this.mock(_Helper);
 		oHelperMock.expects("getPrivateAnnotation")
 			.withExactArgs("~oNode~", "predicate").returns("~predicate~");
-		oTreeStateMock.expects("deleteOutOfPlace").withExactArgs("~predicate~");
+		oTreeStateMock.expects("deleteOutOfPlace")
+			.withExactArgs("~predicate~", false, "~fnOnDelete~");
 		oHelperMock.expects("getPrivateAnnotation").withExactArgs("~oNode~", "spliced", [])
 			.returns(["~oChild0~", "~oChild1~"]);
-		oTreeStateMock.expects("delete").withExactArgs("~oChild0~");
-		oTreeStateMock.expects("delete").withExactArgs("~oChild1~");
+		oTreeStateMock.expects("delete").withExactArgs("~oChild0~", "~fnOnDelete~");
+		oTreeStateMock.expects("delete").withExactArgs("~oChild1~", "~fnOnDelete~");
 
 		// code under test
-		oTreeState.delete("~oNode~");
+		oTreeState.delete("~oNode~", "~fnOnDelete~");
 
 		assert.deepEqual(oTreeState.mPredicate2ExpandInfo, {foo : "bar"});
 	});
@@ -590,9 +591,10 @@ sap.ui.define([
 			.expects("setOutOfPlace").withExactArgs(false);
 		this.mock(oTreeState.mPredicate2OutOfPlace["~node4Predicate~"].context)
 			.expects("setOutOfPlace").withExactArgs(false);
+		const fnOnDelete = sinon.spy();
 
 		// code under test
-		oTreeState.deleteOutOfPlace("~node1Predicate~");
+		oTreeState.deleteOutOfPlace("~node1Predicate~", false, fnOnDelete);
 
 		assert.deepEqual(oTreeState.mPredicate2OutOfPlace, {
 			"~node0Predicate~" : {
@@ -603,6 +605,10 @@ sap.ui.define([
 				nodePredicate : "~node2Predicate~"
 			}
 		});
+		assert.strictEqual(fnOnDelete.callCount, 3);
+		sinon.assert.calledWithExactly(fnOnDelete, "~node1Predicate~");
+		sinon.assert.calledWithExactly(fnOnDelete, "~node3Predicate~");
+		sinon.assert.calledWithExactly(fnOnDelete, "~node4Predicate~");
 	});
 
 	//*********************************************************************************************
@@ -676,6 +682,36 @@ sap.ui.define([
 				nodePredicate : "~node2Predicate~"
 			}
 		});
+	});
+
+	//*********************************************************************************************
+	QUnit.test("isExpanded", function (assert) {
+		const oTreeState = new _TreeState("~sNodeProperty~");
+		oTreeState.mPredicate2ExpandInfo = {
+			collapsed : {levels : 0},
+			one : {levels : 1},
+			two : {levels : 2},
+			three : {levels : 3},
+			all : {levels : null}
+		};
+
+		// code under test
+		assert.strictEqual(oTreeState.isExpanded("not found"), false);
+
+		// code under test
+		assert.strictEqual(oTreeState.isExpanded("collapsed"), false);
+
+		// code under test
+		assert.strictEqual(oTreeState.isExpanded("one"), true);
+
+		// code under test
+		assert.strictEqual(oTreeState.isExpanded("two"), true);
+
+		// code under test
+		assert.strictEqual(oTreeState.isExpanded("three"), true);
+
+		// code under test
+		assert.strictEqual(oTreeState.isExpanded("all"), true);
 	});
 
 	//*********************************************************************************************
