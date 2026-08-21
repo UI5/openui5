@@ -500,12 +500,13 @@ sap.ui.define([
 	 * or once it has completed is the responsibility of the implementation.
 	 *
 	 * @param {sap.ui.mdc.Table} oTable Instance of the table
-	 * @param {object} oState The theoretical (not yet applied) external state of the table's personalization. The format matches the one
-	 * processed by {@link sap.ui.mdc.p13n.StateUtil StateUtil}.
-	 * @returns {Promise<boolean>|boolean} A promise that resolves to <code>false</code> (or the literal value <code>false</code>) to prevent
-	 * the dialog from closing. Any other value allows the dialog to close.
-	 *
-	 * @public
+	 * @param {object} oState
+	 *     The theoretical (not yet applied) external state of the table's personalization. The format matches the one processed by
+	 *     {@link sap.ui.mdc.p13n.StateUtil StateUtil}.
+	 * @returns {Promise<boolean>|boolean}
+	 *     A promise that resolves to <code>false</code> (or the literal value <code>false</code>) to prevent the dialog from closing. Any other
+	 *     value allows the dialog to close.
+	 * @protected
 	 * @since 1.152
 	 */
 	TableDelegate.validateP13nState = function(oTable, oState) {
