@@ -3,12 +3,14 @@
 /* Quartz High Contrast White theme        */
 /* ======================================= */
 
-@_sap_ui_rta_ContextMenu_BorderLightColor: var(--sapShell_Background); /* #fff */
-@_sap_ui_rta_ContextMenu_BorderDarkColor: var(--sapLegendColor7);
-@_sap_ui_rta_ContextMenu_BoxShadowColor: fade(@sapUiContentContrastShadowColor, 50%);
+.sapUI5Scope {
+	--_sap_ui_rta_ContextMenu_BorderLightColor: var(--sapShell_Background);
+	--_sap_ui_rta_ContextMenu_BorderDarkColor: var(--sapLegendColor7);
+	--_sap_ui_rta_ContextMenu_BoxShadowColor: ~'hsl(from var(--sapContent_ContrastShadowColor) h s l / .5)';
+}
 
 .sapUiRtaMode .sapUiDtContextMenu.sapMMenu {
-	box-shadow: 0 0 1rem 0 @_sap_ui_rta_ContextMenu_BoxShadowColor, 0 0 0 0.125rem @_sap_ui_rta_ContextMenu_BorderLightColor;
+	box-shadow: 0 0 1rem 0 var(--_sap_ui_rta_ContextMenu_BoxShadowColor), 0 0 0 0.125rem  var(--_sap_ui_rta_ContextMenu_BorderLightColor);
 
 	.sapMMenuList {
 
