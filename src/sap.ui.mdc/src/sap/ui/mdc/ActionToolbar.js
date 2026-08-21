@@ -150,8 +150,6 @@ sap.ui.define([
 		return iPosition1 - iPosition2;
 	};
 
-	ActionToolbar.ShowGroupSeparators = window.location.search.includes("sap-ui-action-toolbar-separators");
-
 	ActionToolbar.prototype.init = function() {
 		OverflowToolbar.prototype.init.apply(this, arguments);
 		// Separator between begin (title) and between (variant) content of the toolbar.
@@ -418,7 +416,7 @@ sap.ui.define([
 	ActionToolbar.prototype.getContent = function() {
 		const aEndAndControlActions = [...this.getEnd(), ...this.getControlActions()];
 		const aSortedEndAndControlActions = aEndAndControlActions.sort(fnActionsSorter);
-		ActionToolbar.ShowGroupSeparators && this._insertGroupSeparators(aSortedEndAndControlActions);
+		this._insertGroupSeparators(aSortedEndAndControlActions);
 
 		return [
 			...this.getBegin(),
