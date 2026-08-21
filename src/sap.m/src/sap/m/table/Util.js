@@ -373,7 +373,7 @@ sap.ui.define([
 		})).then(function(oModules) {
 			var oResourceBundle = Library.getResourceBundleFor("sap.m");
 			var sIconColor = oModules.coreLib.IconColor.Critical,
-			sTitleLevel = oModules.coreLib.TitleLevel.H2;
+			sTitleLevel = oModules.coreLib.TitleLevel.H1;
 
 			oSelectAllNotificationPopover = new oModules.Popover({
 				customHeader: new oModules.Bar({

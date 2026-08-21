@@ -6,11 +6,7 @@ sap.ui.define([
 	"./FakeControls",
 	"sap/ui/core/RenderManager",
 	"sap/ui/test/utils/nextUIUpdate",
-	"sap/ui/Device",
-	// Preloaded so the lazy sap.ui.require(["sap/m/Popover","sap/m/Text"]) inside
-	// Tooltip#_createPopover resolves synchronously under fake timers.
-	"sap/m/Popover",
-	"sap/m/Text"
+	"sap/ui/Device"
 ], function(TooltipEnablement, TooltipManager, Tooltip, FakeControls, RenderManager, nextUIUpdate, Device) {
 	"use strict";
 

@@ -847,7 +847,7 @@ sap.ui.define([
 		 * Decomposes the given error into an array of errors, one for each of the given requests.
 		 *
 		 * @param {Error} oError
-		 *   The error created by {@link .createError}.
+		 *   The error created by {@link #.createError}.
 		 * @param {object} oError.error
 		 *   An error response as sent from the OData server
 		 * @param {object[]} [oError.error.details]
@@ -1100,7 +1100,7 @@ sap.ui.define([
 		 * Extracts all (top and detail) messages from the given error instance.
 		 *
 		 * @param {Error} oError
-		 *   An error instance as created by {@link .createError} or {@link .decomposeError}
+		 *   An error instance as created by {@link #.createError} or {@link #.decomposeError}
 		 * @param {object} [oError.error]
 		 *   An error response as sent from the OData server
 		 * @param {object[]} [oError.error.details]
@@ -1966,7 +1966,7 @@ sap.ui.define([
 
 		/**
 		 * Tells whether <code>sPath</code> has <code>sBasePath</code> as path prefix. It returns
-		 * <code>true</code> iff {@link .getRelativePath} does not return <code>undefined</code>.
+		 * <code>true</code> iff {@link #.getRelativePath} does not return <code>undefined</code>.
 		 *
 		 * @param {string} sPath The path
 		 * @param {string} sBasePath The base path

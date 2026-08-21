@@ -24,6 +24,7 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/base/Log",
 	"sap/base/security/encodeXML",
+	"sap/ui/base/ManagedObject",
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/unified/FileUploaderHttpRequestMethod",
 	// jQuery Plugin "addAriaDescribedBy"
@@ -49,6 +50,7 @@ sap.ui.define([
 	KeyCodes,
 	Log,
 	encodeXML,
+	ManagedObject,
 	jQuery,
 	HttpRequestMethod
 ) {
@@ -897,8 +899,8 @@ sap.ui.define([
 		// Add new tokens for selected files
 		this._selectedFileNames.forEach((fileName) => {
 			oTokenizer.addToken(new Token({
-				text: fileName,
-				tooltip: fileName,
+				text: ManagedObject.escapeSettingsValue(fileName),
+				tooltip: ManagedObject.escapeSettingsValue(fileName),
 				selected: false
 			}));
 		});

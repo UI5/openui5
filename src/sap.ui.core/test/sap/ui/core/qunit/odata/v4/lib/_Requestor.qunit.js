@@ -4611,7 +4611,7 @@ sap.ui.define([
 		const oFetchOptions = {
 			method : "~method~",
 			headers : {
-				Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true",
+				Accept : "*/*",
 				"OData-MaxVersion" : "4.0",
 				"OData-Version" : "4.0",
 				"X-CSRF-Token" : "~token~",
@@ -4661,7 +4661,7 @@ sap.ui.define([
 		const oFetchOptions = {
 			method : "~method~",
 			headers : {
-				Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true",
+				Accept : "*/*",
 				"OData-MaxVersion" : "4.0",
 				"OData-Version" : "4.0",
 				"X-CSRF-Token" : "Fetch",
@@ -4719,7 +4719,7 @@ sap.ui.define([
 		const oFetchOptions = {
 			method : "~method~",
 			headers : {
-				Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true",
+				Accept : "*/*",
 				"OData-MaxVersion" : "4.0",
 				"OData-Version" : "4.0",
 				"X-CSRF-Token" : "Fetch",

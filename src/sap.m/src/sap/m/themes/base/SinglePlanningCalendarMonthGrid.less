@@ -86,7 +86,8 @@
 	}
 }
 
-html.sap-desktop .sapMSPCMonthDay.sapMSPCMonthDayToday:focus .sapMSPCMonthNowMarker::after {
+html.sap-desktop .sapMSPCMonthDay.sapMSPCMonthDayToday:focus .sapMSPCMonthNowMarker::after,
+.sapMSPCMonthDay:not(.sapUiCalItemFocusFromTouch).sapMSPCMonthDayToday:focus-visible .sapMSPCMonthNowMarker::after {
 	content: '';
 	position: absolute;
 	top: 0.0625rem;
@@ -164,7 +165,8 @@ html.sap-desktop .sapMSPCMonthDay.sapMSPCMonthDayToday:focus .sapMSPCMonthNowMar
 	top: initial;
 }
 
-html.sap-desktop .sapMSPCMonthDay:not(.sapMSPCMonthDayToday):focus::after {
+html.sap-desktop .sapMSPCMonthDay:not(.sapMSPCMonthDayToday):focus::after,
+.sapMSPCMonthDay:not(.sapUiCalItemFocusFromTouch):not(.sapMSPCMonthDayToday):focus-visible::after {
 	content: '';
 	position: absolute;
 	top: 0.0625rem;

@@ -243,7 +243,8 @@ Use it only if there's one appointment per day for a row that doesn't have inter
 }
 
 html.sap-desktop .sapUiCalendarApp:hover:not(:active),
-html.sap-desktop .sapUiCalendarApp:focus:not(:active) > .sapUiCalendarAppCont {
+html.sap-desktop .sapUiCalendarApp:focus:not(:active) > .sapUiCalendarAppCont,
+.sapUiCalendarApp:not(.sapUiCalItemFocusFromTouch):focus-visible:not(:active) > .sapUiCalendarAppCont {
 	background-color: var(--sapList_Hover_Background);
 }
 
@@ -257,7 +258,8 @@ html.sap-desktop .sapUiCalendarApp:hover:not(:active) > .sapUiCalendarAppCont {
 }
 
 html.sap-desktop .sapUiCalendarApp.sapUiCalendarAppSel:hover:not(:active),
-html.sap-desktop .sapUiCalendarApp.sapUiCalendarAppSel:focus:not(:active) > .sapUiCalendarAppCont {
+html.sap-desktop .sapUiCalendarApp.sapUiCalendarAppSel:focus:not(:active) > .sapUiCalendarAppCont,
+.sapUiCalendarApp.sapUiCalendarAppSel:not(.sapUiCalItemFocusFromTouch):focus-visible:not(:active) > .sapUiCalendarAppCont {
 	background-color: darken(@sapUiSelected, 10);
 }
 

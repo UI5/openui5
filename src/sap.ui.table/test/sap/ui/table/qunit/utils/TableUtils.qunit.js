@@ -798,6 +798,8 @@ sap.ui.define([
 
 		await TableUtils.showNotificationPopoverAtIndex(oTable, 0, 3);
 		assert.ok(oTable._oNotificationPopover, "the notification popover is initialized");
+		const oTitle = oTable._oNotificationPopover.getCustomHeader().getContentMiddle()[0].getItems()[1];
+		assert.strictEqual(oTitle.getLevel(), "H1", "the notification popover title has heading level H1");
 		sMessage = oTable._oNotificationPopover.getContent()[0].getText();
 		assert.equal(sMessage, TableUtils.getResourceText("TBL_SELECT_LIMIT", [3]),
 			"the notification message is correct");
