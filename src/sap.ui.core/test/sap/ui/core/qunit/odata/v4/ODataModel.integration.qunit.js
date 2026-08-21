@@ -40761,6 +40761,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Selection must not make a difference (JIRA: CPOUI5ODATAV4-3605)
 	// Afterwards, deletion still works fine (JIRA: CPOUI5ODATAV4-3608)
 	// Add "Out_Child" to either "Out" or to "Alpha" (JIRA: CPOUI5ODATAV4-3621)
+	// Add "Out_Grand_Child" to "Out_Child" (JIRA: CPOUI5ODATAV4-3637)
 	// Optionally, collapse OOP node's parent before side-effects refresh (JIRA: CPOUI5ODATAV4-3626)
 [undefined, true].forEach((bSelected) => {
 	[false, true].forEach((bParentChild) => {
@@ -40786,7 +40787,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			},
 			$count : true,
 			$filter : 'not startswith(Name, \\'Out\\')'
-		}}" threshold="0" visibleRowCount="4">
+		}}" threshold="0">
 	<Text text="{= %{@$ui5.context.isSelected} }"/>
 	<Text id="isExpanded" text="{= %{@$ui5.node.isExpanded} }"/>
 	<Text text="{= %{@$ui5.node.level} }"/>
@@ -40795,12 +40796,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		// Out Out
 		//   Child Out_Child (either here...)
+		//     Grand Out_Grand_Child (dito)
 		// 0 Alpha
 		//   Child Out_Child (...or there)
+		//     Grand Out_Grand_Child (dito)
 		// 1 Beta
 		this.expectRequest("#1 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2)
 			.expectRequest("#1 " + sBaseUrl
-				+ "&$select=DrillState,ID,Name&$count=true&$skip=0&$top=4", {
+				+ "&$select=DrillState,ID,Name&$count=true&$skip=0&$top=10", {
 				"@odata.count" : "2",
 				value : [
 					{DrillState : "leaf", ID : "0", Name : "Alpha"},
@@ -40908,8 +40911,48 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		]);
 		// Note: do not request late property
 
+		// create a new grand child which does not match the filter (thus w/o rank, "out of place")
+		this.expectChange("isExpanded",
+				bParentChild ? [, true,,, undefined] : [,, true,, undefined])
+			.expectRequest("#0 POST EMPLOYEES", {
+				payload : {
+					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('Child')",
+					Name : "Out_Grand_Child"
+				}
+			}, {ID : "Grand", Name : "Out_Grand_Child"})
+			.expectRequest("#0 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2);
+
+		const oOutGrandChild = oListBinding.create({
+			"@$ui5.node.parent" : oOutChild,
+			Name : "Out_Grand_Child"
+		}, /*bSkipRefresh*/true);
+		oOutGrandChild.setSelected(!!bSelected); //TODO: avoid !!
+
+		await Promise.all([
+			oOutGrandChild.created(),
+			this.waitForChanges(assert, "create Out grand child")
+		]);
+
+		checkTable("after create Out grand child", assert, oTable, [
+			oOut,
+			...(bParentChild ? [oOutChild, oOutGrandChild] : []),
+			"/EMPLOYEES('0')",
+			...(bParentChild ? [] : [oOutChild, oOutGrandChild]),
+			"/EMPLOYEES('1')"
+		], [
+			[bSelected, bParentChild ? true : undefined, 1, "Out"],
+			bParentChild && [bSelected, true, 2, "Out_Child"],
+			bParentChild && [bSelected, undefined, 3, "Out_Grand_Child"],
+			[undefined, bParentChild ? undefined : true, 1, "Alpha"],
+			bParentChild || [bSelected, true, 2, "Out_Child"],
+			bParentChild || [bSelected, undefined, 3, "Out_Grand_Child"],
+			[undefined, undefined, 1, "Beta"]
+		]);
+		// Note: do not request late property
+
 		if (bCollapse) {
-			this.expectChange("isExpanded", bParentChild ? [false] : [, false]);
+			this.expectChange("isExpanded",
+				bParentChild ? [false, undefined] : [, false, undefined]);
 
 			oOutChild.getParent().collapse();
 
@@ -40921,7 +40964,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				oOut,
 				"/EMPLOYEES('0')",
 				"/EMPLOYEES('1')",
-				bSelected && oOutChild
+				bSelected && oOutChild,
+				bSelected && oOutGrandChild
 			], [
 				[bSelected, bParentChild ? false : undefined, 1, "Out"],
 				[undefined, bParentChild ? undefined : false, 1, "Alpha"],
@@ -40934,26 +40978,31 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			assert.deepEqual(oOutChild.getObject(), bSelected ? {
 				"@$ui5.context.isSelected" : true,
 				"@$ui5.context.isTransient" : false,
+				"@$ui5.node.isExpanded" : true, // Note: see below
 				"@$ui5.node.level" : 2, // Note: outside the hierarchy, but level still known
 				ID : "Child",
 				Name : "Out_Child"
 			} : undefined);
-		} else {
-			sBaseUrl = sBaseUrl.slice(0, -1) + ",ExpandLevels="
-				+ JSON.stringify([{NodeID : bParentChild ? "Out" : "0", Levels : 1}]) + ")";
 		}
 
-		this.expectRequestIf(bSelected,
-				"#0 EMPLOYEES?$filter=ID eq 'Child' or ID eq 'Out'&$select=AGE,ID,Name&$top=2", {
+		const aExpandLevels = [
+			...(bCollapse ? [] : [{NodeID : bParentChild ? "Out" : "0", Levels : 1}]),
+			{NodeID : "Child", Levels : 1}
+		];
+		sBaseUrl = sBaseUrl.slice(0, -1)
+			+ ",ExpandLevels=" + JSON.stringify(aExpandLevels) + ")";
+		this.expectRequestIf(bSelected, "#0 EMPLOYEES?$filter="
+				+ "ID eq 'Child' or ID eq 'Grand' or ID eq 'Out'&$select=AGE,ID,Name&$top=3", {
 				value : [
 					{AGE : 33, ID : "Child", Name : "Out_Child"},
+					{AGE : 22, ID : "Grand", Name : "Out_Grand_Child"},
 					{AGE : 44, ID : "Out", Name : "Out"}
 				]
 			})
 			.expectRequest("#0 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2)
-			.expectRequest("#0 " + sBaseUrl + "&$select="
-				+ (bCollapse ? "" : "DescendantCount,DistanceFromRoot,") + "DrillState,ID,Name"
-				+ "&$count=true&$skip=0&$top=4", {
+			.expectRequest("#0 " + sBaseUrl
+				+ "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,Name"
+				+ "&$count=true&$skip=0&$top=10", {
 				"@odata.count" : "2",
 				value : [{
 					DescendantCount : "0", // Note: "Out" child ignored here!
@@ -40970,11 +41019,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				}]
 			})
 			// rank of the out-of-place nodes; they are filtered out and thus have no rank
-			.expectRequest("#0 " + sBaseUrl + "&$select=" + (bCollapse ? "" : "DescendantCount,")
-				+ "DistanceFromRoot,DrillState,ID,LimitedRank&$filter="
-				+ (bParentChild
-					? "ID eq 'Child' or ID eq 'Out'&$top=2"
-					: "ID eq '0' or ID eq 'Child' or ID eq 'Out'&$top=3"), {
+			.expectRequest("#0 " + sBaseUrl
+				+ "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,LimitedRank"
+				+ "&$filter=" + (bParentChild
+					? "ID eq 'Child' or ID eq 'Grand' or ID eq 'Out'&$top=3"
+					: "ID eq '0' or ID eq 'Child' or ID eq 'Grand' or ID eq 'Out'&$top=4"), {
 				value : bParentChild
 					? []
 					: [{
@@ -40996,6 +41045,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				+ ",filter(ID eq '" + (bParentChild ? "Out" : "0") + "'),1)"
 				+ "&$select=ID,Name&$filter=ID eq 'Child'&$top=1", {
 				value : [{ID : "Child", Name : "Out_Child"}]
+			})
+			// the out-of-place node's data
+			.expectRequest("#0 EMPLOYEES?$apply=descendants($root/EMPLOYEES,OrgChart,ID"
+				+ ",filter(ID eq 'Child'),1)"
+				+ "&$select=ID,Name&$filter=ID eq 'Grand'&$top=1", {
+				value : [{ID : "Grand", Name : "Out_Grand_Child"}]
 			});
 
 		await Promise.all([
@@ -41008,18 +41063,20 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		// lost (SNOW: DINC0921191)
 		checkTable("after side-effects refresh", assert, oTable, [
 			oOut,
-			bCollapse || bParentChild && oOutChild,
+			...(bParentChild && !bCollapse ? [oOutChild, oOutGrandChild] : []),
 			"/EMPLOYEES('0')",
-			bCollapse || bParentChild || oOutChild,
+			...(!bParentChild && !bCollapse ? [oOutChild, oOutGrandChild] : []),
 			"/EMPLOYEES('1')",
-			bSelected && bCollapse && oOutChild
+			...(bSelected && bCollapse ? [oOutChild, oOutGrandChild] : [])
 		], [
 			[bSelected, bParentChild ? !bCollapse : undefined, 1, "Out"],
-			bCollapse || bParentChild && [bSelected, undefined, 2, "Out_Child"],
+			bCollapse || bParentChild && [bSelected, true, 2, "Out_Child"],
+			bCollapse || bParentChild && [bSelected, undefined, 3, "Out_Grand_Child"],
 			[undefined, bParentChild ? undefined : !bCollapse, 1, "Alpha"],
-			bCollapse || bParentChild || [bSelected, undefined, 2, "Out_Child"],
+			bCollapse || bParentChild || [bSelected, true, 2, "Out_Child"],
+			bCollapse || bParentChild || [bSelected, undefined, 3, "Out_Grand_Child"],
 			[undefined, undefined, 1, "Beta"]
-		], bCollapse ? 3 : 4);
+		], bCollapse ? 3 : 5);
 		assert.deepEqual(oOut.getObject(), {
 			...(bSelected && {"@$ui5.context.isSelected" : true}),
 			"@$ui5.context.isTransient" : false,
@@ -41033,6 +41090,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		assert.deepEqual(oOutChild.getObject(), {
 			...(bSelected && {"@$ui5.context.isSelected" : true}),
 			"@$ui5.context.isTransient" : false,
+			...(bCollapse || {"@$ui5.node.isExpanded" : true}), // Note: see below
 			...(bCollapse || {"@$ui5.node.level" : 2}), // Note: no level outside the hierarchy
 			...(bSelected && {AGE : 33}),
 			ID : "Child",
@@ -41050,10 +41108,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		}
 
 		oOutChild.setSelected(false);
+		oOutGrandChild.setSelected(false);
 
 		this.expectRequest("#0 DELETE EMPLOYEES('Out')")
 			.expectRequest("#0 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2)
-			.expectChange("isExpanded", [undefined]);
+			.expectChange("isExpanded", bCollapse ? [undefined] : [undefined, undefined]);
 
 		await Promise.all([
 			// code under test (JIRA: CPOUI5ODATAV4-3608)

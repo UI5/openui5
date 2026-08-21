@@ -8627,7 +8627,8 @@ sap.ui.define([
 		});
 		const oOut = {"@$ui5.node.level" : 23, Name : "Out"};
 		const oOutChild = {Name : "Out_Child"};
-		oCache.aElements = ["~foo~", "~bar~", oOut, "~baz~", oOutChild];
+		// Note: iParentIndex === 0, almost -1 ;-)
+		oCache.aElements = [oOut, "~foo~", "~bar~", "~baz~", oOutChild];
 		oCache.aElements.$byPredicate = {
 			"~predicateOut~" : oOut,
 			"~predicateOutChild~" : oOutChild
@@ -8643,7 +8644,7 @@ sap.ui.define([
 		// code under test
 		oCache.moveOutOfPlaceNodes(["~predicateOutChild~"], "~predicateOut~");
 
-		assert.deepEqual(oCache.aElements, ["~foo~", "~bar~", oOut, oOutChild, "~baz~"]);
+		assert.deepEqual(oCache.aElements, [oOut, oOutChild, "~foo~", "~bar~", "~baz~"]);
 		assert.deepEqual(oOut, {
 			"@$ui5.node.isExpanded" : "~isExpanded~",
 			"@$ui5.node.level" : 23,
@@ -8675,6 +8676,29 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("moveOutOfPlaceNodes: parent kept-alive outside the collection", function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+			hierarchyQualifier : "X"
+		});
+		oCache.aElements = ["~foo~", "~bar~", "~baz~", "~outChild~"];
+		oCache.aElements.$byPredicate = {
+			"~predicateOut~" : "~out~",
+			"~predicateOutChild~" : "~outChild~"
+		};
+		this.mock(oCache).expects("findIndex").never();
+		this.mock(oCache.oTreeState).expects("stillOutOfPlace")
+			.withExactArgs("~outChild~", "~predicateOutChild~");
+		this.mock(oCache).expects("collapse").never();
+		this.mock(oCache.oTreeState).expects("isExpanded").never();
+		this.mock(oCache).expects("expand").never();
+
+		// code under test
+		oCache.moveOutOfPlaceNodes(["~predicateOutChild~"], "~predicateOut~");
+
+		assert.deepEqual(oCache.aElements, ["~foo~", "~bar~", "~baz~"]);
+	});
+
+	//*********************************************************************************************
 [false, true].forEach((bAlreadyCollapsed) => {
 	const sTitle = "moveOutOfPlaceNodes: parent is collapsed, already=" + bAlreadyCollapsed;
 
@@ -8689,7 +8713,8 @@ sap.ui.define([
 			"@$ui5.node.isExpanded" : true,
 			Name : "Out_Child"
 		});
-		oCache.aElements = ["~foo~", "~bar~", oOut, "~baz~", oOutChild];
+		// Note: iParentIndex === 0, almost -1 ;-)
+		oCache.aElements = [oOut, "~foo~", "~bar~", "~baz~", oOutChild];
 		oCache.aElements.$byPredicate = {
 			"~predicateOut~" : oOut,
 			"~predicateOutChild~" : oOutChild
@@ -8705,7 +8730,7 @@ sap.ui.define([
 		// code under test
 		oCache.moveOutOfPlaceNodes(["~predicateOutChild~"], "~predicateOut~");
 
-		assert.deepEqual(oCache.aElements, ["~foo~", "~bar~", oOut, "~baz~"]);
+		assert.deepEqual(oCache.aElements, [oOut, "~foo~", "~bar~", "~baz~"]);
 		assert.deepEqual(oCache.aElements.$byPredicate,
 			{"~predicateOut~" : oOut, "~predicateOutChild~" : oOutChild});
 		assert.deepEqual(oOut,
