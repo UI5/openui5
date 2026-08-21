@@ -12,6 +12,7 @@ sap.ui.define([
 	"sap/ui/dt/DesignTimeMetadata",
 	"sap/ui/dt/Overlay",
 	"sap/ui/dt/OverlayRegistry",
+	"sap/ui/dt/plugin/ContextMenu",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/fl/apply/_internal/changes/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
@@ -19,6 +20,7 @@ sap.ui.define([
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/fl/Utils",
 	"sap/ui/qunit/utils/nextUIUpdate",
+	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/rta/util/changeVisualization/ChangeCategories",
 	"sap/ui/rta/util/changeVisualization/ChangeIndicatorRegistry",
 	"sap/ui/rta/util/changeVisualization/ChangeStates",
@@ -38,6 +40,7 @@ sap.ui.define([
 	DesignTimeMetadata,
 	Overlay,
 	OverlayRegistry,
+	ContextMenuPlugin,
 	KeyCodes,
 	ChangesUtils,
 	States,
@@ -45,6 +48,7 @@ sap.ui.define([
 	PersistenceWriteAPI,
 	FlUtils,
 	nextUIUpdate,
+	QUnitUtils,
 	ChangeCategories,
 	ChangeIndicatorRegistry,
 	ChangeStates,
@@ -1241,6 +1245,74 @@ sap.ui.define([
 				"then the context menu plugin was set to busy"
 			);
 			fnDone();
+		});
+
+		QUnit.test("opens the popover via the 'View Changes' button in the context menu", async function(assert) {
+			prepareChanges([
+				createMockChange("testChange1", "rename", "button1")
+			], {
+				getChangeVisualizationInfo(oChange) {
+					return {
+						affectedControls: [oChange.getSelector()]
+					};
+				}
+			});
+
+			await this.oChangeVisualization.initialize();
+
+			let pOpenPopup;
+			const oContextMenuPlugin = new ContextMenuPlugin();
+			// a menu item is required so the context menu builds the control title item that hosts the button
+			oContextMenuPlugin.addMenuItem({
+				id: "CTX_TEST_ITEM",
+				text: "Test item",
+				handler: () => {}
+			});
+			this.oDesignTime.addPlugin(oContextMenuPlugin);
+			oContextMenuPlugin.setChangeVisualizationCallbackFunctions({
+				findOverlayWithChanges: (oOverlay) => this.oChangeVisualization.findOverlayWithChanges(oOverlay),
+				openPopup: (oOverlay, mContextMenuRect, oOpenerEvent, oOpenerOverlay) => {
+					pOpenPopup = this.oChangeVisualization.openChangeDetailPopup({
+						overlay: oOverlay,
+						contextMenuRect: mContextMenuRect,
+						openerEvent: oOpenerEvent,
+						openerOverlay: oOpenerOverlay,
+						contextMenuPlugin: oContextMenuPlugin
+					});
+				}
+			});
+
+			const oOverlay = OverlayRegistry.getOverlay("button1");
+			oOverlay.setSelectable(true);
+			oOverlay.setSelected(true);
+
+			await new Promise((resolve) => {
+				oContextMenuPlugin.attachEventOnce("openedContextMenu", resolve);
+				oOverlay.getDomRef().dispatchEvent(new MouseEvent("contextmenu"));
+			});
+
+			const oControlTitleItem = oContextMenuPlugin.oContextMenuControl.getItems().find((oItem) => {
+				return oItem.getId().endsWith("CTX_CONTROL_NAME");
+			});
+			assert.strictEqual(
+				oControlTitleItem.getEndContent()[0].getIcon(),
+				"sap-icon://show-edit",
+				"then the 'View Changes' button has the correct icon"
+			);
+
+			// selecting the title item emulates a click on the 'View Changes' button
+			QUnitUtils.triggerEvent("click", oControlTitleItem.sId, {});
+			await pOpenPopup;
+			await new Promise((resolve) => {
+				this.oChangeVisualization._oChangeDetailPopup.attachEventOnce("afterOpen", resolve);
+			});
+
+			assert.ok(
+				this.oChangeVisualization._oChangeDetailPopup.isOpen(),
+				"then the real change detail popup is opened"
+			);
+
+			oContextMenuPlugin.destroy();
 		});
 
 		QUnit.test("does nothing for overlay without changes", async function(assert) {
