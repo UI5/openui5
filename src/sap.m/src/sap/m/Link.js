@@ -18,7 +18,8 @@ sap.ui.define([
 	"./LinkRenderer",
 	"sap/ui/events/KeyCodes",
 	"sap/base/security/URLListValidator",
-	"sap/base/Log"
+	"sap/base/Log",
+	"sap/ui/core/tooltip/TooltipEnablement"
 ],
 function(
 	library,
@@ -35,7 +36,8 @@ function(
 	LinkRenderer,
 	KeyCodes,
 	URLListValidator,
-	Log
+	Log,
+	TooltipEnablement
 ) {
 	"use strict";
 
@@ -348,6 +350,15 @@ function(
 
 	Link.prototype.init = function () {
 		AccessKeysEnablement.registerControl(this);
+
+		if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+			this._oTooltipEnablement = new TooltipEnablement(this, {
+				textProvider: () => {
+					return this.getEnabled() ? (this.getTooltip_AsString() || "") : "";
+				},
+				enableForTouchDevices: false
+			});
+		}
 	};
 
 	/**
@@ -355,7 +366,11 @@ function(
 	 *
 	 * @private
 	 */
-	Link.prototype.onBeforeRendering = function() {};
+	Link.prototype.onBeforeRendering = function() {
+		if (this._oTooltipEnablement && !this.getEnabled()) {
+			this._oTooltipEnablement.close();
+		}
+	};
 
 	Link.prototype.getAccessKeysFocusTarget = function () {
 		return this.getFocusDomRef();
@@ -389,6 +404,11 @@ function(
 	Link.prototype.exit = function() {
 		var oIcon = this.getAggregation("_icon"),
 			oEndIcon = this.getAggregation("_endIcon");
+
+		if (this._oTooltipEnablement) {
+			this._oTooltipEnablement.destroy();
+			this._oTooltipEnablement = null;
+		}
 
 		if (Device.system.phone || Device.system.tablet) {
 			var oAnchorElement = this.getDomRef();

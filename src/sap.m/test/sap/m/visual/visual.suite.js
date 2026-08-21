@@ -44,6 +44,7 @@ module.exports = [
 	"LabelRTL.spec.js",
 	"LightBox.spec.js",
 	"Link.spec.js",
+	"LinkTooltip.spec.js",
 	"MenuButton.spec.js",
 	"MenuButtonMenuPosition.spec.js",
 	"MessageBox.spec.js",
