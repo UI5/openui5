@@ -3,11 +3,14 @@
 /* Horizon High Contrast White theme        */
 /* ======================================== */
 
-@_sap_ui_rta_Toolbar_Base_OutlineColor: var(--sapLegendColor7);
+.sapUI5Scope {
+	--_sap_ui_rta_Toolbar_Base_OutlineColor: var(--sapLegendColor7);
+}
+
 .sapUiRtaMode {
 
 	.sapUiRtaToolbar {
-		outline: 0.125rem dashed @_sap_ui_rta_Toolbar_Base_OutlineColor;
+		outline: 0.125rem dashed var(--_sap_ui_rta_Toolbar_Base_OutlineColor);
 		outline-offset: -0.125rem;
 		border: none;
 		border-image: none;

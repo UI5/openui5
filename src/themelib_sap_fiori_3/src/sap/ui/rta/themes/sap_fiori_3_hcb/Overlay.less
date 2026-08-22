@@ -3,8 +3,10 @@
 /* Quartz High Contrast Black theme    */
 /* =================================== */
 
-@_sap_ui_rta_Overlay_ResizeHandleColor: var(--sapSuccessBorderColor); /* #9c9 */
-@_sap_ui_rta_Overlay_PlaceholderBackgroundColor: darken(@sapUiFieldPlaceholderTextColor, 30%); /* #4d4d4d */
+.sapUI5Scope {
+	--_sap_ui_rta_Overlay_ResizeHandleColor: var(--sapSuccessBorderColor);
+	--_sap_ui_rta_Overlay_PlaceholderBackgroundColor: ~'hsl(from var(--sapField_PlaceholderTextColor) h s calc(l - 30))';
+}
 
 .sapUiRta {
 
@@ -13,7 +15,7 @@
 		> .sapUiDtOverlayChildren {
 
 			> .sapUiRtaOverlayPlaceholder {
-				background: @_sap_ui_rta_Overlay_PlaceholderBackgroundColor !important;
+				background: var(--_sap_ui_rta_Overlay_PlaceholderBackgroundColor) !important;
 
 				/* no "focus" border */
 				&:focus {
@@ -25,7 +27,7 @@
 
 				/* all descendants */
 				* {
-					background: @_sap_ui_rta_Overlay_PlaceholderBackgroundColor;
+					background: var(--_sap_ui_rta_Overlay_PlaceholderBackgroundColor);
 
 					/* no "focus" border */
 					&:focus {
@@ -45,5 +47,5 @@
 }
 
 .sapUiRtaAdaptationBorder.sapUiRtaAdaptationBorderVisible {
-	border-color: var(--sapShell_BorderColor); /* #fff */
+	border-color: var(--sapShell_BorderColor);
 }

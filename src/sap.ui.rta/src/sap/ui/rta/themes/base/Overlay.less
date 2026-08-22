@@ -3,27 +3,29 @@
 /* Base theme                          */
 /* =================================== */
 
-@_sap_ui_rta_Overlay_ResizeHandleColor: var(--sapSelectedColor); /* #8fb5ff */
-@_sap_ui_rta_Overlay_ErrorBorderColor: var(--sapErrorBorderColor); /* #ff0000 */
+.sapUI5Scope {
+	--_sap_ui_rta_Overlay_ResizeHandleColor: var(--sapSelectedColor);
+	--_sap_ui_rta_Overlay_ErrorBorderColor: var(--sapErrorBorderColor);
+}
 
 .sapUiRtaRoot {
 
 	.sapUiRtaMarginBottom {
-		margin-bottom: var(--sapContent_Space_Medium); //32px // To be compliant with standard paddings
+		margin-bottom: var(--sapContent_Space_Medium); /* 32px, to be compliant with standard paddings */
 	}
 
 	.sapUiRtaPaddingTop {
-		padding-top: var(--sapContent_Space_Medium); //32px // To be compliant with standard paddings
+		padding-top: var(--sapContent_Space_Medium); /* 32px, to be compliant with standard paddings */
 	}
 
 	&.sapUiRtaStretchPaddingTop, .sapUiRtaStretchPaddingTop {
-		padding-top: var(--sapContent_Space_Medium); //32px // To be compliant with standard paddings
+		padding-top: var(--sapContent_Space_Medium); /* 32px, to be compliant with standard paddings */
 	}
 }
 
 .sapUiSizeCozy .sapUiRtaRoot .sapUiRtaStretchPaddingTop,
 .sapUiSizeCozy .sapUiRtaRoot.sapUiRtaStretchPaddingTop {
-	padding-top: var(--sapContent_Space_Medium); //32px
+	padding-top: var(--sapContent_Space_Medium); /* 32px */
 }
 
 .sapUiRta {
@@ -35,7 +37,7 @@
 		bottom: 0;
 		width: 0.625rem; /* 10px */
 		background-clip: content-box;
-		background-color: @_sap_ui_rta_Overlay_ResizeHandleColor;
+		background-color: var(--_sap_ui_rta_Overlay_ResizeHandleColor);
 		-webkit-user-select: none;
 		user-select: none;
 
@@ -63,7 +65,7 @@
 		top: 0;
 		bottom: 0;
 		width: 0.5rem; /* 8px */
-		border-right: 0.125rem dotted @_sap_ui_rta_Overlay_ResizeHandleColor; /* 2px */
+		border-right: 0.125rem dotted var(--_sap_ui_rta_Overlay_ResizeHandleColor); /* 2px */
 		background-clip: content-box;
 		-webkit-user-select: none;
 		user-select: none;
@@ -83,7 +85,7 @@
 		box-shadow: var(--sapContent_Shadow2);
 
 		&.sapUiRtaErrorBg::after {
-			outline: 0.125rem solid @_sap_ui_rta_Overlay_ErrorBorderColor; /* 2px */
+			outline: 0.125rem solid var(--_sap_ui_rta_Overlay_ErrorBorderColor); /* 2px */
 			outline-offset: -0.125rem; /* 2px */
 			border: none
 		}
@@ -102,7 +104,7 @@
 	}
 }
 
-// Border around the whole screen in RTA Adaptation Mode.
+/* Border around the whole screen in RTA Adaptation Mode. */
 .sapUiRtaAdaptationBorder {
 	position: fixed;
 	inset: 0;

@@ -25,7 +25,7 @@ sap.ui.define([
 
 			if (bIsTableInAutoMode) {
 				//control domRef has height:0px set, but footer & scrollbar is missing
-				return oTable.$("sapUiTableCnt").get(0);
+				return oTable.getDomRef("sapUiTableCnt");
 			}
 
 			return oTable.getDomRef();
@@ -42,14 +42,14 @@ sap.ui.define([
 			hScroll: {
 				ignore: false,
 				domRef: function(oTable) {
-					return oTable.$("hsb").get(0);
+					return oTable.getDomRef("hsb");
 				}
 			},
 			// vertical scroll is not possible because it is not a common scorll of controls. The controls keeps the same on scrolling, just the data is changing
 			scrollContainers: [
 				{
 					domRef: function(oTable) {
-						return oTable.$("sapUiTableCnt").get(0);
+						return oTable.getDomRef("sapUiTableCnt");
 					},
 					aggregations: ["rows"]
 				}

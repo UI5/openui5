@@ -153,7 +153,7 @@ sap.ui.define([
 		] : [
 			this.readCount(this.oRequestor.lockGroup("$auto", this))
 		]).then(() => {
-			this.oTreeState.delete(oElement);
+			this.oTreeState.delete(oElement, this.removeKeptElement.bind(this));
 			if (this.aElements.length === 0) {
 				return; // concurrent side-effects refresh takes care of cleanup
 			}
@@ -1895,12 +1895,18 @@ sap.ui.define([
 					this.collapse(sNodePredicate, {}); // no mKeptElementPredicates needed
 				}
 				this.aElements.splice(iNodeIndex, 1);
+
+				if (oParent && oParent["@$ui5.node.isExpanded"] === undefined) {
+					// not a leaf anymore
+					oParent["@$ui5.node.isExpanded"] = this.oTreeState.isExpanded(sParentPredicate);
+				}
+				if (oParent?.["@$ui5.node.isExpanded"] === false) {
+					return; // parent is collapsed -> do not insert
+				}
+
 				this.aElements.splice(iParentIndex + 1, 0, oNode);
 				if (bExpanded) { // no mKeptElementPredicates needed
 					this.expand(_GroupLock.$cached, sNodePredicate, 1, {});
-				}
-				if (oParent && oParent["@$ui5.node.isExpanded"] === undefined) {
-					oParent["@$ui5.node.isExpanded"] = true; // not a leaf anymore
 				}
 				oNode["@$ui5.node.level"] ??= oParent ? oParent["@$ui5.node.level"] + 1 : 1;
 			}

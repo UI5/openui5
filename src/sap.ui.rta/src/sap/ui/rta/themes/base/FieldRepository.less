@@ -1,10 +1,13 @@
-/******************************************************************
-	Style of the RTA Add Fields Dialog  - base Theme
-*******************************************************************/
-@_sap_ui_rta_FieldRepository_BC_Container_BorderColor: @sapUiGroupContentBorderColor; //#000
+/* =========================================== */
+/* CSS for control sap.ui.rta/FieldRepository  */
+/* Base theme                                  */
+/* =========================================== */
+
+.sapUI5Scope {
+	--_sap_ui_rta_FieldRepository_BC_Container_BorderColor: var(--sapGroup_ContentBorderColor);
+}
 
 .sapUIRtaFieldRepositoryDialog {
-
 	min-height: 30vh;
 
 	.sapUIRtaListItem {
@@ -14,7 +17,7 @@
 	.sapUIRtaBusinessContextContainer {
 		width: 100%;
 		padding: var(--sapContent_Space_Tiny) 0; /* 8px */
-		border-bottom: 0.0625rem solid @_sap_ui_rta_FieldRepository_BC_Container_BorderColor; /* 1px */
+		border-bottom: 0.0625rem solid var(--_sap_ui_rta_FieldRepository_BC_Container_BorderColor); /* 1px */
 
 		> div:not(:first-child) {
 			padding-left: var(--sapContent_Space_Medium); /* 32px */

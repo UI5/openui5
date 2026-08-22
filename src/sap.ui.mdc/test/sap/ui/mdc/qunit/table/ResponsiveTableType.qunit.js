@@ -17,6 +17,7 @@ sap.ui.define([
 	"sap/m/plugins/ColumnResizer",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/type/Boolean",
+	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
 	"sap/ui/core/Icon",
 	"sap/ui/model/Filter",
@@ -41,6 +42,7 @@ sap.ui.define([
 	ColumnResizer,
 	JSONModel,
 	BooleanType,
+	Element,
 	Lib,
 	Icon,
 	Filter,
@@ -525,6 +527,10 @@ sap.ui.define([
 
 		assert.ok(this.oType._oShowDetailsButton, "button is created");
 		assert.notOk(this.oType._oShowDetailsButton.getVisible(), "button is hidden since there are no popins");
+		const aAriaLabelledBy = this.oType._oShowDetailsButton.getAriaLabelledBy();
+		assert.strictEqual(aAriaLabelledBy.length, 1, "ariaLabelledBy contains one entry");
+		assert.strictEqual(Element.getElementById(aAriaLabelledBy[0]).getText(), oRb.getText("table.TOGGLEDETAILS_TEXT"),
+			"Correct ariaLabelledBy text for Show/Hide Details button");
 		assert.strictEqual(this.oType._oShowDetailsButton.getItems()[0].getIcon(), "sap-icon://detail-more", "correct icon is set on the button");
 		assert.strictEqual(this.oType._oShowDetailsButton.getItems()[0].getTooltip(), oRb.getText("table.SHOWDETAILS_TEXT"), "Correct tooltip");
 		assert.strictEqual(this.oType._oShowDetailsButton.getItems()[1].getIcon(), "sap-icon://detail-less", "correct icon is set on the button");

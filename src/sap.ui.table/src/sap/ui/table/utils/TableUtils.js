@@ -380,11 +380,11 @@ sap.ui.define([
 			} else if (typeof vRowIndicator === "number") {
 				oRow = oTable.getRows()[vRowIndicator];
 			} else { // vRowIndicator is a jQuery object or a DOM element.
-				const $Cell = jQuery(vRowIndicator);
-				const oCellInfo = TableUtils.getCellInfo($Cell[0]);
+				const oCellEl = vRowIndicator?.nodeType === 1 ? vRowIndicator : vRowIndicator?.[0];
+				const oCellInfo = TableUtils.getCellInfo(oCellEl);
 				const bIsRowSelectionAllowed = TableUtils.isRowSelectionAllowed(oTable);
 
-				if (!TableUtils.Grouping.isInGroupHeaderRow($Cell[0])
+				if (!TableUtils.Grouping.isInGroupHeaderRow(oCellEl)
 					&& ((oCellInfo.isOfType(TableUtils.CELLTYPE.DATACELL | TableUtils.CELLTYPE.ROWACTION) && bIsRowSelectionAllowed)
 						|| (oCellInfo.isOfType(TableUtils.CELLTYPE.ROWHEADER) && TableUtils.isRowSelectorSelectionAllowed(oTable)))) {
 
@@ -738,57 +738,57 @@ sap.ui.define([
 				columnIndex: null,
 				columnSpan: null
 			};
-			const $Cell = jQuery(oCellRef);
+			const oCell = oCellRef?.nodeType === 1 ? oCellRef : oCellRef?.[0];
 			let sColumnId;
 			let oColumn;
 			let rRowIndex;
 			let aRowIndexMatch;
 			let iRowIndex;
 
-			if ($Cell.hasClass("sapUiTableDataCell")) {
-				sColumnId = $Cell.attr("data-sap-ui-colid");
+			if (oCell?.classList.contains("sapUiTableDataCell")) {
+				sColumnId = oCell.getAttribute("data-sap-ui-colid");
 				oColumn = Element.getElementById(sColumnId);
 
 				oCellInfo.type = TableUtils.CELLTYPE.DATACELL;
-				oCellInfo.rowIndex = parseInt($Cell.parent().attr("data-sap-ui-rowindex"));
+				oCellInfo.rowIndex = parseInt(oCell.parentElement.getAttribute("data-sap-ui-rowindex"));
 				oCellInfo.columnIndex = oColumn?.getIndex() ?? -1;
 				oCellInfo.columnSpan = 1;
 
-			} else if ($Cell.hasClass("sapUiTableHeaderDataCell")) {
+			} else if (oCell?.classList.contains("sapUiTableHeaderDataCell")) {
 				rRowIndex = /_([\d]+)/;
-				sColumnId = $Cell.attr("id");
+				sColumnId = oCell.getAttribute("id");
 				aRowIndexMatch = rRowIndex.exec(sColumnId);
 				iRowIndex = aRowIndexMatch && aRowIndexMatch[1] != null ? parseInt(aRowIndexMatch[1]) : 0;
 
 				oCellInfo.type = TableUtils.CELLTYPE.COLUMNHEADER;
 				oCellInfo.rowIndex = iRowIndex;
-				oCellInfo.columnIndex = parseInt($Cell.attr("data-sap-ui-colindex"));
-				oCellInfo.columnSpan = parseInt($Cell.attr("colspan") || 1);
+				oCellInfo.columnIndex = parseInt(oCell.getAttribute("data-sap-ui-colindex"));
+				oCellInfo.columnSpan = parseInt(oCell.getAttribute("colspan") || 1);
 
-			} else if ($Cell.hasClass("sapUiTableRowSelectionCell")) {
+			} else if (oCell?.classList.contains("sapUiTableRowSelectionCell")) {
 				oCellInfo.type = TableUtils.CELLTYPE.ROWHEADER;
-				oCellInfo.rowIndex = parseInt($Cell.parent().attr("data-sap-ui-rowindex"));
+				oCellInfo.rowIndex = parseInt(oCell.parentElement.getAttribute("data-sap-ui-rowindex"));
 				oCellInfo.columnIndex = -1;
 				oCellInfo.columnSpan = 1;
 
-			} else if ($Cell.hasClass("sapUiTableRowActionCell")) {
+			} else if (oCell?.classList.contains("sapUiTableRowActionCell")) {
 				oCellInfo.type = TableUtils.CELLTYPE.ROWACTION;
-				oCellInfo.rowIndex = parseInt($Cell.parent().attr("data-sap-ui-rowindex"));
+				oCellInfo.rowIndex = parseInt(oCell.parentElement.getAttribute("data-sap-ui-rowindex"));
 				oCellInfo.columnIndex = -2;
 				oCellInfo.columnSpan = 1;
 
-			} else if ($Cell.hasClass("sapUiTableRowActionHeaderCell")) {
+			} else if (oCell?.classList.contains("sapUiTableRowActionHeaderCell")) {
 				oCellInfo.type = TableUtils.CELLTYPE.ROWACTIONCOLUMNHEADER;
 				oCellInfo.columnIndex = -2;
 				oCellInfo.columnSpan = 1;
 
-			} else if ($Cell.hasClass("sapUiTableRowSelectionHeaderCell")) {
+			} else if (oCell?.classList.contains("sapUiTableRowSelectionHeaderCell")) {
 				oCellInfo.type = TableUtils.CELLTYPE.COLUMNROWHEADER;
 				oCellInfo.columnIndex = -1;
 				oCellInfo.columnSpan = 1;
 
-			} else if ($Cell.hasClass("sapUiTablePseudoCell")) {
-				sColumnId = $Cell.attr("data-sap-ui-colid");
+			} else if (oCell?.classList.contains("sapUiTablePseudoCell")) {
+				sColumnId = oCell.getAttribute("data-sap-ui-colid");
 				oColumn = Element.getElementById(sColumnId);
 
 				oCellInfo.type = TableUtils.CELLTYPE.PSEUDO;
@@ -799,7 +799,7 @@ sap.ui.define([
 
 			// Set the cell object for easier access to the cell for the caller.
 			if (oCellInfo.type !== 0) {
-				oCellInfo.cell = $Cell[0];
+				oCellInfo.cell = oCell;
 			}
 
 			/**

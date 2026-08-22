@@ -1398,7 +1398,7 @@ sap.ui.define([
 		this.setProperty("showOverlay", bShow, true);
 
 		if (this.getDomRef()) {
-			this.$().toggleClass("sapUiTableOverlay", this.getShowOverlay());
+			this.getDomRef().classList.toggle("sapUiTableOverlay", this.getShowOverlay());
 			this._getAccExtension().updateAriaStateForOverlayAndNoData();
 			this._getKeyboardExtension().updateNoDataAndOverlayFocus();
 		}
@@ -1417,8 +1417,8 @@ sap.ui.define([
 		const aRows = this.getRows();
 		let $rowDomRefs;
 
-		jQuery(oDomRef).find(".sapUiTableRowLastScrollable").removeClass("sapUiTableRowLastScrollable");
-		jQuery(oDomRef).find(".sapUiTableRowFirstFixedBottom").removeClass("sapUiTableRowFirstFixedBottom");
+		for (const el of oDomRef.querySelectorAll(".sapUiTableRowLastScrollable")) { el.classList.remove("sapUiTableRowLastScrollable"); }
+		for (const el of oDomRef.querySelectorAll(".sapUiTableRowFirstFixedBottom")) { el.classList.remove("sapUiTableRowFirstFixedBottom"); }
 
 		if (iFirstFixedButtomRowIndex >= 0 && iFirstFixedButtomRowIndex < aRows.length) {
 			$rowDomRefs = aRows[iFirstFixedButtomRowIndex].getDomRefs(true);
@@ -1454,7 +1454,7 @@ sap.ui.define([
 	};
 
 	Table.prototype.getFocusInfo = function() {
-		const sId = this.$().find(":focus").attr("id");
+		const sId = this.getDomRef()?.querySelector(":focus")?.id;
 		if (sId) {
 			return {customId: sId};
 		} else {
@@ -1464,7 +1464,7 @@ sap.ui.define([
 
 	Table.prototype.applyFocusInfo = function(mFocusInfo) {
 		if (mFocusInfo && mFocusInfo.customId) {
-			jQuery(document.getElementById(mFocusInfo.customId)).trigger("focus");
+			document.getElementById(mFocusInfo.customId)?.focus();
 		} else {
 			Control.prototype.applyFocusInfo.apply(this, arguments);
 		}
@@ -2305,13 +2305,13 @@ sap.ui.define([
 	 * @private
 	 */
 	Table.prototype._attachEvents = function() {
-		const $this = this.$();
+		const oTableDomRef = this.getDomRef();
 		const sTableId = this.getId();
 
 		if (ControlBehavior.getAnimationMode() !== AnimationMode.none) {
 			jQuery(document.body).on("webkitTransitionEnd." + sTableId + " transitionend." + sTableId,
 				(oEvent) => {
-					if (jQuery(oEvent.target).has($this).length > 0) {
+					if (oEvent.target !== oTableDomRef && oEvent.target.contains(oTableDomRef)) {
 						this._updateTableSizes(TableUtils.RowsUpdateReason.Animation);
 					}
 				}
@@ -2646,10 +2646,9 @@ sap.ui.define([
 	 * @private
 	 */
 	Table.prototype._findAndfireCellEvent = function(fnFire, oEvent, fnContextMenu) {
-		const $target = jQuery(oEvent.target);
 		// find out which cell has been clicked
-		const $cell = $target.closest(".sapUiTableDataCell");
-		const sId = $cell.attr("id");
+		const oCellDomRef = oEvent.target.closest(".sapUiTableDataCell");
+		const sId = oCellDomRef?.getAttribute("id");
 		const aMatches = /.*-row(\d*)-col(\d*)/i.exec(sId);
 		let bCancel = false;
 		// TBD: cellClick event is currently not fired on row action cells.
@@ -2668,11 +2667,11 @@ sap.ui.define([
 				columnId: sColId,
 				cellControl: oCell,
 				rowBindingContext: oRowBindingContext,
-				cellDomRef: $cell.get(0)
+				cellDomRef: oCellDomRef
 			};
 			bCancel = !fnFire.call(this, mParams);
 			if (!bCancel && typeof fnContextMenu === "function") {
-				mParams.cellDomRef = $cell[0];
+				mParams.cellDomRef = oCellDomRef;
 				bCancel = fnContextMenu.call(this, mParams);
 			}
 		}
@@ -3261,7 +3260,10 @@ sap.ui.define([
 		if (typeof vOldNoContentMessage === "string" && typeof vNewNoContentMessage === "string") {
 			// Old and new NoData texts are plain strings, therefore we are able to directly update the DOM in case of a text change.
 			if (vOldNoContentMessage !== vNewNoContentMessage) {
-				this.$("noDataMsg").text(vNewNoContentMessage);
+				const oNoDataMsg = this.getDomRef("noDataMsg");
+				if (oNoDataMsg) {
+					oNoDataMsg.textContent = vNewNoContentMessage;
+				}
 			}
 		} else {
 			this.invalidate();
