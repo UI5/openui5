@@ -15,7 +15,6 @@ sap.ui.define([
 	"./utils/TableUtils",
 	"./plugins/BindingSelection",
 	"sap/base/Log",
-	"sap/ui/thirdparty/jquery",
 	"sap/ui/model/controlhelper/TreeBindingProxy"
 ], function(
 	AnalyticalColumn,
@@ -29,7 +28,6 @@ sap.ui.define([
 	TableUtils,
 	BindingSelectionPlugin,
 	Log,
-	jQuery,
 	TreeBindingProxy
 ) {
 	"use strict";
@@ -313,7 +311,7 @@ sap.ui.define([
 			for (let iCellIndex = 0; iCellIndex < iCellCount; iCellIndex++) {
 				const oAnalyticalColumn = Column.ofCell(aCells[iCellIndex]);
 				const bIsMeasureCell = oBinding ? oBinding.isMeasure(oAnalyticalColumn.getLeadingProperty()) : false;
-				const $td = jQuery(aCells[iCellIndex].$().closest("td"));
+				const oTd = aCells[iCellIndex].getDomRef()?.closest("td");
 				let bHideCellContent = false;
 
 				if (oRow.isSummary() && bIsMeasureCell) {
@@ -322,7 +320,7 @@ sap.ui.define([
 					bHideCellContent = !bIsMeasureCell;
 				}
 
-				$td.toggleClass("sapUiTableCellHidden", bHideCellContent);
+				oTd?.classList.toggle("sapUiTableCellHidden", bHideCellContent);
 			}
 		}
 	};
@@ -396,7 +394,7 @@ sap.ui.define([
 
 		// only remove from grouped columns if not caused by column move.
 		if (!this._bReorderInProcess) {
-			this._aGroupedColumns = jQuery.grep(this._aGroupedColumns, (sValue) => {
+			this._aGroupedColumns = this._aGroupedColumns.filter((sValue) => {
 				//check if vColum is an object with getId function
 				if (vColumn.getId) {
 					return sValue !== vColumn.getId();
@@ -548,36 +546,36 @@ sap.ui.define([
 				}
 			}
 
-			aUngroupedDimensions = jQuery.grep(aDimensions, (s) => {
+			aUngroupedDimensions = aDimensions.filter((s) => {
 				return aGroupedDimensions.indexOf(aGroupedDimensions, s) === -1;
 			});
 
 			// for all grouped dimensions
 			if (aGroupedDimensions.length > 0) {
 				// calculate and flag the dependendly grouped columns of the dimension
-				jQuery.each(aGroupedDimensions, (i, s) => {
-					jQuery.each(oDimensionIndex[s].columns, (j, o) => {
+				for (const s of aGroupedDimensions) {
+					for (const o of oDimensionIndex[s].columns) {
 						if (!o.getGrouped()) {
 							o._bDependendGrouped = true;
 						}
-					});
-				});
+					}
+				}
 
 				// if there is only one dimension left, their columns must remain visible even though they are grouped.
 				// this behavior is controlled by the flag _bLastGroupAndGrouped
 				if (aGroupedDimensions.length === aDimensions.length) {
 					oDimension = oResult.findDimensionByPropertyName(Element.getElementById(this._aGroupedColumns[this._aGroupedColumns.length - 1]).getLeadingProperty());
 					const aGroupedDimensionColumns = oDimensionIndex[oDimension.getName()].columns;
-					jQuery.each(aGroupedDimensionColumns, (i, o) => {
+					for (const o of aGroupedDimensionColumns) {
 						o._bLastGroupAndGrouped = true;
-					});
+					}
 				}
 			}
 
 			if (aUngroupedDimensions.length === 1) {
-				jQuery.each(oDimensionIndex[aUngroupedDimensions[0]].columns, (j, o) => {
+				for (const o of oDimensionIndex[aUngroupedDimensions[0]].columns) {
 					o._isLastGroupableLeft = true;
-				});
+				}
 			}
 		}
 	};

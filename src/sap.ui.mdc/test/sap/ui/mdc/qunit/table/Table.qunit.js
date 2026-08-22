@@ -6104,11 +6104,11 @@ sap.ui.define([
 			}, {
 				action: "reorder",
 				position: TableActionPosition.ModificationActionsEnd,
-				selector: "#table-paste + #reorder + #table-showHideDetails"
+				selector: "#table-paste + #reorder + #table-toolbar-Modification-separator + #table-showHideDetails"
 			}, {
 				action: "filter",
 				position: TableActionPosition.PersonalizationActions,
-				selector: "#reorder + #filter + #table-showHideDetails"
+				selector: "#reorder + #table-toolbar-Modification-separator + #filter + #table-showHideDetails"
 			}, {
 				action: "expand",
 				position: TableActionPosition.PersonalizationActionsMiddle,
@@ -6120,22 +6120,22 @@ sap.ui.define([
 			}, {
 				action: "share",
 				position: TableActionPosition.ShareActions,
-				selector: "#table-settings + #share + #table-export"
+				selector: "#table-settings + #table-toolbar-Personalization-separator + #share + #table-toolbar-Share-separator + #table-export"
 			}, {
 				action: "print",
 				position: TableActionPosition.ExportActions,
-				selector: "#share + #print + #table-export"
+				selector: "#share + #table-toolbar-Share-separator + #print + #table-export"
 			}, {
 				action: "fullscreen",
 				position: TableActionPosition.ViewActions,
-				selector: "#print + #table-export + #fullscreen:last-of-type"
+				selector: "#print + #table-export + #table-toolbar-Export-separator + #fullscreen:last-of-type"
 			}, {
 				action: "refresh",
 				position: TableActionPosition.EndActions,
-				selector: "#table-export + #fullscreen + #refresh:last-of-type"
+				selector: "#table-export + #table-toolbar-Export-separator + #fullscreen + #table-toolbar-View-separator + #refresh:last-of-type"
 			}, {
 				action: "help",
-				selector: "#fullscreen + #refresh + #help:last-of-type"
+				selector: "#table-toolbar-View-separator + #refresh + #help:last-of-type"
 			}
 		];
 

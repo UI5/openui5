@@ -6,28 +6,26 @@ sap.ui.define([
 	"sap/ui/table/rowmodes/Type",
 	"./TableHelper.support",
 	"sap/ui/support/library",
-	"sap/ui/Device",
-	"sap/ui/thirdparty/jquery"
+	"sap/ui/Device"
 ], function(
 	Lib,
 	RowModeType,
 	SupportHelper,
 	SupportLibrary,
-	Device,
-	jQuery
+	Device
 ) {
 	"use strict";
 
 	const Categories = SupportLibrary.Categories;
 	const Severity = SupportLibrary.Severity;
 
-	function checkDensity($Source, sTargetClass, sMessage, oIssueManager) {
+	function checkDensity(aSource, sTargetClass, sMessage, oIssueManager) {
 		let bFound = false;
-		$Source.each(function() {
-			if (jQuery(this).closest(sTargetClass).length) {
+		for (const oNode of aSource) {
+			if (oNode.closest(sTargetClass)) {
 				bFound = true;
 			}
-		});
+		}
 		if (bFound && sMessage) {
 			SupportHelper.reportIssue(oIssueManager, sMessage, Severity.High);
 		}
@@ -49,25 +47,24 @@ sap.ui.define([
 			SupportHelper.createDocuRef("Documentation: Content Densities", "topic/e54f729da8e3405fae5e4fe8ae7784c1")
 		],
 		check: function(oIssueManager, oCoreFacade, oScope) {
-			const $Document = jQuery("html");
-			const $Cozy = $Document.find(".sapUiSizeCozy");
-			const $Compact = $Document.find(".sapUiSizeCompact");
-			const $Condensed = $Document.find(".sapUiSizeCondensed");
+			const aCozy = document.documentElement.querySelectorAll(".sapUiSizeCozy");
+			const aCompact = document.documentElement.querySelectorAll(".sapUiSizeCompact");
+			const aCondensed = document.documentElement.querySelectorAll(".sapUiSizeCondensed");
 
-			checkDensity($Compact, ".sapUiSizeCozy", "'Compact' content density is used within 'Cozy' area.", oIssueManager);
-			checkDensity($Cozy, ".sapUiSizeCompact", "'Cozy' content density is used within 'Compact' area.", oIssueManager);
-			checkDensity($Condensed, ".sapUiSizeCozy", "'Condensed' content density is used within 'Cozy' area.", oIssueManager);
-			checkDensity($Cozy, ".sapUiSizeCondensed", "'Cozy' content density is used within 'Condensed' area.", oIssueManager);
+			checkDensity(aCompact, ".sapUiSizeCozy", "'Compact' content density is used within 'Cozy' area.", oIssueManager);
+			checkDensity(aCozy, ".sapUiSizeCompact", "'Cozy' content density is used within 'Compact' area.", oIssueManager);
+			checkDensity(aCondensed, ".sapUiSizeCozy", "'Condensed' content density is used within 'Cozy' area.", oIssueManager);
+			checkDensity(aCozy, ".sapUiSizeCondensed", "'Cozy' content density is used within 'Condensed' area.", oIssueManager);
 
-			if ($Condensed.length > 0) {
-				const bFound = checkDensity($Condensed, ".sapUiSizeCompact", oIssueManager);
+			if (aCondensed.length > 0) {
+				const bFound = checkDensity(aCondensed, ".sapUiSizeCompact", oIssueManager);
 				if (!bFound) {
 					SupportHelper.reportIssue(oIssueManager, "'Condensed' content density must be used in combination with 'Compact'.",
 						Severity.High);
 				}
 			}
 
-			if (Lib.all()["sap.m"] && $Cozy.length === 0 && $Compact.length === 0 && $Condensed.length === 0) {
+			if (Lib.all()["sap.m"] && aCozy.length === 0 && aCompact.length === 0 && aCondensed.length === 0) {
 				SupportHelper.reportIssue(oIssueManager,
 					"If the sap.ui.table and the sap.m libraries are used together, a content density must be specified.",
 					Severity.High

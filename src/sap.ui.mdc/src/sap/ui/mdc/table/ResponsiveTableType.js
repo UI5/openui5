@@ -14,6 +14,7 @@ sap.ui.define([
 	"sap/m/SegmentedButtonItem",
 	"sap/ui/Device",
 	"sap/ui/core/Element",
+	"sap/ui/core/InvisibleText",
 	"sap/ui/core/Lib"
 ], (
 	TableTypeBase,
@@ -27,6 +28,7 @@ sap.ui.define([
 	SegmentedButtonItem,
 	Device,
 	Element,
+	InvisibleText,
 	Library
 ) => {
 	"use strict";
@@ -590,6 +592,7 @@ sap.ui.define([
 	ResponsiveTableType.prototype._getShowDetailsButton = function() {
 		if (!this._oShowDetailsButton) {
 			const oRb = Library.getResourceBundleFor("sap.ui.mdc");
+			const oToggleDetailsLabel = new InvisibleText({text: oRb.getText("table.TOGGLEDETAILS_TEXT")}).toStatic();
 			const sId = this.getTable().getId();
 			this.bShowDetails = false;
 			this._oShowDetailsButton = new SegmentedButton(sId + "-showHideDetails", {
@@ -618,6 +621,7 @@ sap.ui.define([
 						]
 					})
 				],
+				ariaLabelledBy: oToggleDetailsLabel.getId(),
 				layoutData: new ActionLayoutData({
 					position: TableActionPosition.PersonalizationActionsShowHideDetails
 				})
