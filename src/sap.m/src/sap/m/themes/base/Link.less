@@ -8,7 +8,7 @@
 	text-decoration: var(--sapLink_TextDecoration);
 	display: inline-block;
 	font-family: var(--sapFontFamily);
-	font-size: @sapMFontMediumSize;
+	font-size: var(--sapFontSize);
 	cursor: pointer;
 	-webkit-touch-callout: default;
 
@@ -54,6 +54,7 @@
 }
 
 html.sap-desktop .sapMLnk:not(.sapMLnkDsbl) {
+
 	&:focus {
 		outline: 1px dotted var(--sapContent_FocusColor);
 		outline-offset: -1px;
@@ -112,9 +113,11 @@ html.sap-desktop .sapMLnk:not(.sapMLnkDsbl) {
 
 /* Link focus offset and visualization in sap.ui.table.* tables */
 html.sap-desktop .sapUiSizeCondensed .sapUiTableCell {
+
 	.sapMLnk:focus:not(.sapMLnkDsbl) {
 		outline-offset: -2.5px;
 	}
+
 	.sapMLnkText {
 		padding-left: 2.5px;
 		padding-right: 2.5px;
@@ -165,7 +168,7 @@ html.sap-desktop .sapUiSizeCondensed .sapUiTableCell {
 .sapMLIB.sapMLIBActive .sapMLink {
 	text-decoration: none;
 	text-shadow: none;
- }
+}
 
 /* Compact size */
 .sapUiSizeCompact .sapUiFormEdit .sapMLnk {
@@ -173,6 +176,6 @@ html.sap-desktop .sapUiSizeCondensed .sapUiTableCell {
 	margin-bottom: 0.25rem;
 }
 
-.sapMLnk:-webkit-any-link:focus {
+.sapMLnk:any-link:focus {
 	outline: none;
 }
