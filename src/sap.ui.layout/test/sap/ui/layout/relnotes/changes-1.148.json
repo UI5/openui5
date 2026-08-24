@@ -8,5 +8,20 @@
         "text": " SemanticFormElement: aria-label on Text controls"
       }
     ]
+  },
+  "1.148.7": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "486e4cd4722df136444fb13da1832e25b1b2c6c6",
+        "type": "FIX",
+        "text": " SimpleForm: use sap.m.Title for rendering"
+      },
+      {
+        "id": "e6b048279d61c43fb1e73f80b6676d7dc84a7af2",
+        "type": "FIX",
+        "text": " Form: use sap.m.Title for rendering"
+      }
+    ]
   }
 }

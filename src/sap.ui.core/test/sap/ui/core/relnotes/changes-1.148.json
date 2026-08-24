@@ -58,5 +58,15 @@
         "text": " sap.ui.test.autowaiter._timeoutWaiter: Guard log construction with level check"
       }
     ]
+  },
+  "1.148.7": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "486e4cd4722df136444fb13da1832e25b1b2c6c6",
+        "type": "FIX",
+        "text": " SimpleForm: use sap.m.Title for rendering"
+      }
+    ]
   }
 }

@@ -183,5 +183,20 @@
         "text": " FilterBar: Clear button - focus lost"
       }
     ]
+  },
+  "1.148.7": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "307c3d6a6b773a5c76b2d23bc9b4ff870c7bd52a",
+        "type": "FIX",
+        "text": "p13n.AdaptFiltersPanel: fix boolean field visibility"
+      },
+      {
+        "id": "3704b36e6af66b78efaed0f65a43f530f23b63e0",
+        "type": "FIX",
+        "text": " ValueHelp: Token counter not updated"
+      }
+    ]
   }
 }

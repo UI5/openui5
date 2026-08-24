@@ -353,5 +353,25 @@
         "text": " GroupPanel, SortPanel: improve for small screens"
       }
     ]
+  },
+  "1.148.7": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "0837bbc70678576e683e50c050a97fb0cecfc42d",
+        "type": "FIX",
+        "text": " sap.m.Popover: Label custom header when showHeader is false"
+      },
+      {
+        "id": "486e4cd4722df136444fb13da1832e25b1b2c6c6",
+        "type": "FIX",
+        "text": " SimpleForm: use sap.m.Title for rendering"
+      },
+      {
+        "id": "e34fec97a5835a496bc6b8454cc50671e82ed919",
+        "type": "FIX",
+        "text": " m.Table: No columns message not visible"
+      }
+    ]
   }
 }

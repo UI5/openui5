@@ -48,5 +48,15 @@
         "text": " sap.f: add missing Search component to ui5-build.yaml"
       }
     ]
+  },
+  "1.148.7": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "31491f877e7f4dd5a77d844af43ee6488260cfe6",
+        "type": "FIX",
+        "text": " sap.f: Search - use correct background-color parameter on hover"
+      }
+    ]
   }
 }

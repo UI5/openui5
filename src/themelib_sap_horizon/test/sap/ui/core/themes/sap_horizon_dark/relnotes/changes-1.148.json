@@ -38,5 +38,15 @@
         "text": " sap.m.MessageBox: box shadow of the header fixed"
       }
     ]
+  },
+  "1.148.7": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "e6b048279d61c43fb1e73f80b6676d7dc84a7af2",
+        "type": "FIX",
+        "text": " Form: use sap.m.Title for rendering"
+      }
+    ]
   }
 }
