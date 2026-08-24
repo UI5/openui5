@@ -238,6 +238,14 @@ tr.sapMListTblHeaderNone > .sapMTableTH {
 
 .sapMTableClearAll {
 	cursor: pointer;
+	/* the cell is a <th>, whose default center alignment would not match the <td> selection cells below */
+	text-align: start;
+}
+
+/* Mirror the .sapMLIBSelectM checkbox box */
+.sapMTableClearAll > .sapUiIcon {
+	width: 3rem;
+	margin-inline-end: 0.75rem;
 }
 
 /* backgound-clip is required in other browsers, so that focus outline is visible on all sides of the header row */
@@ -623,6 +631,10 @@ html[data-sap-ui-browser^='ff'] .sapMTableRowCustomFocus:focus > :not(.sapMListT
 .sapUiSizeCompact .sapMListTblSelCol {
 	line-height: 2rem;
 	text-align: center;
+}
+
+.sapUiSizeCompact .sapMTableClearAll > .sapUiIcon {
+	width: 2rem;
 }
 
 .sapUiSizeCompact .sapMListTbl:not(.sapMListModeDelete) {
