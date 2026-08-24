@@ -46,7 +46,7 @@
 						<tnt:NavigationList>
 							<tnt:NavigationListItem
 								text="{i18n>APP_INFORMATION_BTN_LEGAL_INFORMATION}" expanded="false"
-								icon="sap-icon://official-service" selectable="fase">
+								icon="sap-icon://official-service" selectable="false">
 								<tnt:NavigationListItem
 									selectable="false" href="https://www.sap.com/corporate/en/legal/impressum.html" target="_blank"
 									text="{i18n>APP_INFORMATION_BTN_LEGAL_DISCLOSURE}" />
