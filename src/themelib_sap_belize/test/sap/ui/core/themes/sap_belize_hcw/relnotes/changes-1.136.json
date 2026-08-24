@@ -28,5 +28,15 @@
         "text": " sap.m.TimePicker: Remove custom shadow overwriting"
       }
     ]
+  },
+  "1.136.20": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "0b395baf3c827022f274069eba3d3f9a2b4812f4",
+        "type": "FIX",
+        "text": " Form: use sap.m.Title for rendering"
+      }
+    ]
   }
 }

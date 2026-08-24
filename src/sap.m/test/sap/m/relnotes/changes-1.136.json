@@ -803,5 +803,35 @@
         "text": " sap.m.ComboBox: Group header announced only once"
       }
     ]
+  },
+  "1.136.20": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "40b55d1690db0919a3a8962cc1f812185fe15640",
+        "type": "FIX",
+        "text": " sap.m.Popover: Added proper aria-labelledby for custom headers"
+      },
+      {
+        "id": "1889a54409776d888035b5d373d18f173344e253",
+        "type": "FIX",
+        "text": " SimpleForm: use sap.m.Title for rendering"
+      },
+      {
+        "id": "edda85dc99919c5d6bcd306cb5ad0a330e4b6097",
+        "type": "FIX",
+        "text": " GroupPanel, SortPanel: improve for small screens"
+      },
+      {
+        "id": "c721c02539721235568117d1c87317f706e35ebb",
+        "type": "FIX",
+        "text": " sap.m.DynamicDateRange: MonthPicker fits in width on 200% zoom"
+      },
+      {
+        "id": "04ec7a94f6ca962c89fe7373d4838db0a476784d",
+        "type": "FIX",
+        "text": " sap.m.Dialog: Screen reader no longer announces the footer button before the link in content"
+      }
+    ]
   }
 }

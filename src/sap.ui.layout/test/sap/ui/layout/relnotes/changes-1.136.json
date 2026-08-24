@@ -58,5 +58,20 @@
         "text": " ColumnLayout: role=\"form\" rendered in display mode"
       }
     ]
+  },
+  "1.136.20": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "1889a54409776d888035b5d373d18f173344e253",
+        "type": "FIX",
+        "text": " SimpleForm: use sap.m.Title for rendering"
+      },
+      {
+        "id": "0b395baf3c827022f274069eba3d3f9a2b4812f4",
+        "type": "FIX",
+        "text": " Form: use sap.m.Title for rendering"
+      }
+    ]
   }
 }

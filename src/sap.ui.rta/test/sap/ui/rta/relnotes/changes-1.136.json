@@ -18,5 +18,15 @@
         "text": " sap.m.Page: headerContent controls are now selectable in UI Adapt mode"
       }
     ]
+  },
+  "1.136.20": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "1889a54409776d888035b5d373d18f173344e253",
+        "type": "FIX",
+        "text": " SimpleForm: use sap.m.Title for rendering"
+      }
+    ]
   }
 }
