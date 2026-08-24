@@ -2595,6 +2595,32 @@ sap.ui.define([
 		oSelectList.destroy();
 	});
 
+	QUnit.test("findFirstEnabledItem() - skips leading SeparatorItem group header", function(assert) {
+
+		// system under test
+		let oExpectedItem;
+		const aItems = [
+			new SeparatorItem({ text: "Group A" }),
+			oExpectedItem = new Item({ key: "0", text: "item 0" }),
+			new Item({ key: "1", text: "item 1" })
+		];
+
+		const oSelectList = new SelectList({ items: aItems });
+
+		// arrange
+		oSelectList.placeAt("content");
+		Core.applyChanges();
+
+		// act
+		const oFirstEnabledItem = oSelectList.findFirstEnabledItem(aItems);
+
+		// assert
+		assert.ok(oFirstEnabledItem === oExpectedItem, "SeparatorItem group header is skipped");
+
+		// cleanup
+		oSelectList.destroy();
+	});
+
 	QUnit.module("findLastEnabledItem()");
 
 	QUnit.test("findLastEnabledItem() — last enabled item at index 2", function(assert) {
@@ -3457,10 +3483,7 @@ sap.ui.define([
 		let oItem;
 		const oSelectList = new SelectList({
 			items: [
-				oItem = new SeparatorItem({
-					key: "GER",
-					text: "Germany"
-				})
+				oItem = new SeparatorItem()
 			]
 		});
 

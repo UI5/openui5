@@ -117,6 +117,19 @@ html.sap-desktop .sapMSelectListItemBase:focus {
 	border: 1px solid var(--sapList_BorderColor);
 }
 
+/* group header */
+
+.sapMSelectListGroupItem {
+	padding: 1.25rem 1rem 0.5rem;
+	font-size: var(--sapFontHeader6Size);
+	font-weight: bold;
+	color: var(--sapList_TableGroupHeaderTextColor);
+	background-color: var(--sapList_GroupHeaderBackground);
+	border-bottom: 1px solid var(--sapList_GroupHeaderBorderColor);
+	cursor: default;
+	pointer-events: none;
+}
+
 /* compact size  */
 
 /* commons styles */
@@ -127,4 +140,8 @@ html.sap-desktop .sapMSelectListItemBase:focus {
 
 .sapUiSizeCompact .sapMSelectListItem {
 	line-height: @_sap_m_SelectList_ItemCompactHeight;
+}
+
+.sapUiSizeCompact .sapMSelectListGroupItem {
+	padding: 0.625rem 1rem 0.25rem;
 }
