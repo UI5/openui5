@@ -1,0 +1,37 @@
+{
+  "1.153.0": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "334ea727130ef70d2402fd9c2930bf9e1f8cf20f",
+        "type": "FIX",
+        "text": " Table: Selection Limit Popover heading level should be H1"
+      },
+      {
+        "id": "5ba3c4344fd28223b577385338f8f3664811e19d",
+        "type": "FIX",
+        "text": " sap.m.Link: fixed outlines of focused Link border in HC themes"
+      },
+      {
+        "id": "47d9cc875f3c9d309aa659c154dd528144f85543",
+        "type": "FIX",
+        "text": " sap.m.ScrollContainer: fix visual scrollContainer test"
+      },
+      {
+        "id": "005941b662c3f499ade705ec93f423193da07249",
+        "type": "FIX",
+        "text": " We've now fixed the MIME type mismatch error by ensuring that the mediaTypes are stored with the original case to avoid case-insensitive comparison in UploadSetwithTable"
+      },
+      {
+        "id": "a205b1f45753a5a2d7f9b686e796238c1056d08f",
+        "type": "FIX",
+        "text": " sap.m.PlanningCalendar: fixed date/time/weeks header in narrow screen width"
+      },
+      {
+        "id": "efd806bae9e403635e49cf33023076bea95bf1bd",
+        "type": "FEATURE",
+        "text": " Calendar related controls focus management for mobile devices accessed by keyboard"
+      }
+    ]
+  }
+}

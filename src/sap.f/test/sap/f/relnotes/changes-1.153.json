@@ -1,0 +1,12 @@
+{
+  "1.153.0": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "1be8fa243b17f1aa4592f4ce63fe7749d4994c1f",
+        "type": "FIX",
+        "text": " sap.f: Search - use correct background-color parameter on hover"
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "1.153.0": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "5ba3c4344fd28223b577385338f8f3664811e19d",
+        "type": "FIX",
+        "text": " sap.m.Link: fixed outlines of focused Link border in HC themes"
+      },
+      {
+        "id": "efd806bae9e403635e49cf33023076bea95bf1bd",
+        "type": "FEATURE",
+        "text": " Calendar related controls focus management for mobile devices accessed by keyboard"
+      }
+    ]
+  }
+}

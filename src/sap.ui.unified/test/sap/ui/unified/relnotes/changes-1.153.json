@@ -1,0 +1,17 @@
+{
+  "1.153.0": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "efa8262c018256090511dbeb6b9ac0325558e527",
+        "type": "FIX",
+        "text": " sap.ui.unified.FileUploader: fix curly braces stripped from token"
+      },
+      {
+        "id": "efd806bae9e403635e49cf33023076bea95bf1bd",
+        "type": "FEATURE",
+        "text": " Calendar related controls focus management for mobile devices accessed by keyboard"
+      }
+    ]
+  }
+}
