@@ -1084,15 +1084,18 @@ sap.ui.define([
 	 * @private
 	 */
 	ObjectPageHeader.prototype._getBreadcrumbsAggregation = function () {
-		var oBreadCrumbs = this.getBreadcrumbs(),
+		var oBreadCrumbs = this.getBreadcrumbs();
+
 		/**
 		 * @deprecated As of version 1.50, <code>breadCrumbsLinks</code> has been deprecated
 		 * @ui5-transform-hint replace-local null
 		 */
-		oBreadCrumbsLegacy = this._lazyLoadInternalAggregation('_breadCrumbs', true);
+		if (!oBreadCrumbs) {
+			var oBreadCrumbsLegacy = this._lazyLoadInternalAggregation('_breadCrumbs', true);
+			return (oBreadCrumbsLegacy && oBreadCrumbsLegacy.getLinks().length) ? oBreadCrumbsLegacy : null;
+		}
 
-		return oBreadCrumbs
-			|| ((oBreadCrumbsLegacy && oBreadCrumbsLegacy.getLinks().length) ? oBreadCrumbsLegacy : null);
+		return oBreadCrumbs;
 	};
 
 	/*************************************************************************************/
