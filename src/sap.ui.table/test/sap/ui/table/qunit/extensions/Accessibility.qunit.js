@@ -2,7 +2,7 @@
 
 sap.ui.define([
 	"sap/ui/table/qunit/TableQUnitUtils",
-	"sap/ui/test/utils/nextUIUpdate",
+	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/ui/table/utils/TableUtils",
 	"sap/ui/table/AnalyticalTable",
 	"sap/ui/table/Table",
@@ -180,6 +180,8 @@ sap.ui.define([
 			oColumn.setSortProperty("SomeSortProperty");
 			oColumn.setFilterProperty("SomeFilterProperty");
 			oColumn.setSortOrder(SortOrder.Ascending);
+			/** @deprecated As of version 1.120 */
+			oColumn.setSorted(true);
 			oColumn.setFiltered(true);
 
 			_oTable.setRowSettingsTemplate(new RowSettings({
@@ -928,6 +930,21 @@ sap.ui.define([
 		oHeaderMenu.destroy();
 	});
 
+	/** @deprecated As of Version 1.117 */
+	QUnit.test("aria-haspopup (legacy)", async function(assert) {
+		const oTable = this.oTable;
+		const oColumn = oTable.getColumns()[1];
+		const oDomRef = oColumn.getDomRef();
+
+		assert.strictEqual(oDomRef.getAttribute("aria-haspopup"), "menu", "aria-haspopup");
+
+		oColumn.setSortProperty();
+		oColumn.setFilterProperty();
+		await nextUIUpdate();
+
+		assert.notOk(oDomRef.hasAttribute("aria-haspopup"), "aria-haspopup");
+	});
+
 	QUnit.test("aria-sort", async function(assert) {
 		const oTable = this.oTable;
 		const oFirstColumn = oTable.getColumns()[0];
@@ -936,6 +953,8 @@ sap.ui.define([
 		assert.strictEqual(oFirstColumn.getDomRef().getAttribute("aria-sort"), "none", "First column");
 		assert.strictEqual(oSecondColumn.getDomRef().getAttribute("aria-sort"), "ascending", "Second column");
 
+		/** @deprecated As of version 1.120 */
+		oFirstColumn.setSorted(true);
 		oFirstColumn.setSortOrder(SortOrder.Ascending);
 		await new Promise((resolve) => {
 			oTable.attachEventOnce("rowsUpdated", resolve);
@@ -993,6 +1012,11 @@ sap.ui.define([
 		oTable.addColumn(oColumn1);
 		oTable.addColumn(oColumn2);
 		oTable.addColumn(oColumn3);
+		/** @deprecated As of version 1.120 */
+		(function() {
+			oColumn1.setSorted(true);
+			oColumn3.setSorted(true);
+		})();
 		await nextUIUpdate();
 
 		// Check only visible cells. The others are not relevant since they can't be focused.
@@ -1510,6 +1534,19 @@ sap.ui.define([
 		await nextUIUpdate();
 	});
 
+	/**
+	 * @deprecated As of version 1.38
+	 */
+	QUnit.test("ARIA attributes of table header", async function(assert) {
+		const oTable = this.oTable;
+		oTable.setTitle(new Label());
+		await nextUIUpdate();
+
+		const $Elem = oTable.$().find(".sapUiTableHdr");
+		assert.strictEqual($Elem.attr("role"), "heading", "role");
+		assert.strictEqual($Elem.attr("aria-level"), "2", "aria-level");
+	});
+
 	QUnit.test("ARIA attributes of table elements", function(assert) {
 		const oTable = this.oTable;
 		const $Elem = oTable.$().find("table");
@@ -1594,6 +1631,22 @@ sap.ui.define([
 		);
 
 		oAnalyticalTable.destroy();
+	});
+
+	/** @deprecated As of version 1.72 */
+	QUnit.test("ARIA attributes of content element with title (legacy)", async function(assert) {
+		const oTable = this.oTable;
+		oTable.setTitle(new Label());
+		await nextUIUpdate();
+
+		assert.strictEqual(oTable.$("sapUiTableGridCnt").attr("aria-labelledby"), oTable.getAriaLabelledBy() + " " + oTable.getTitle().getId(),
+			"aria-labelledby");
+
+		oTable.removeAriaLabelledBy(oTable.getAriaLabelledBy()[0]);
+		await nextUIUpdate();
+
+		assert.strictEqual(oTable.$("sapUiTableGridCnt").attr("aria-labelledby"), oTable.getTitle().getId(),
+			"aria-labelledby when ariaLabelledBy association is empty array");
 	});
 
 	QUnit.test("ARIA attributes of TH elements", function(assert) {
@@ -1855,6 +1908,49 @@ sap.ui.define([
 			"aria-labelledby when ariaLabelledBy association is empty array");
 	});
 
+	/** @deprecated As of version 1.72 */
+	QUnit.test("ARIA for Overlay with title (legacy)", async function(assert) {
+		const oTable = this.oTable;
+		let $OverlayCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='overlay']");
+		const sTableId = oTable.getId();
+
+		oTable.setTitle(new Label());
+		await nextUIUpdate();
+
+		//Heading + Extension + Footer + 2xTable + Row Selector + 2xColumn Headers + NoData Container = 8
+		assert.strictEqual($OverlayCoveredElements.length, 8, "Number of potentionally covered elements");
+		$OverlayCoveredElements.each(function() {
+			assert.ok(!this.getAttribute("aria-hidden"), "No aria-hidden");
+		});
+		oTable.setShowOverlay(true);
+		$OverlayCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='overlay']");
+		$OverlayCoveredElements.each(function() {
+			assert.ok(this.getAttribute("aria-hidden") === "true", "aria-hidden");
+		});
+		let oElem = document.getElementById(sTableId + "-overlay");
+		assert.strictEqual(oElem.getAttribute("aria-labelledby"),
+			`${oTable.getAriaLabelledBy()} ${oTable.getTitle().getId()} ${sTableId}-ariainvalid`, "aria-labelledby");
+		oTable.invalidate();
+		await nextUIUpdate();
+
+		$OverlayCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='overlay']");
+		$OverlayCoveredElements.each(function() {
+			assert.ok(this.getAttribute("aria-hidden") === "true", "aria-hidden");
+		});
+		oTable.setShowOverlay(false);
+		$OverlayCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='overlay']");
+		$OverlayCoveredElements.each(function() {
+			assert.ok(!this.getAttribute("aria-hidden"), "No aria-hidden");
+		});
+
+		oTable.removeAriaLabelledBy(oTable.getAriaLabelledBy()[0]);
+		await nextUIUpdate();
+
+		oElem = document.getElementById(sTableId + "-overlay");
+		assert.strictEqual(oElem.getAttribute("aria-labelledby"),
+			oTable.getTitle().getId() + " " + sTableId + "-ariainvalid", "aria-labelledby when ariaLabelledBy association is empty array");
+	});
+
 	QUnit.test("ARIA for NoData", function(assert) {
 		const oTable = this.oTable;
 		const done = assert.async();
@@ -1965,6 +2061,35 @@ sap.ui.define([
 		$Cell = jQuery(oTreeTable.qunit.getDataCell(2, 0));
 		assert.equal(oTreeTable.$("cellacc").text(), `${TableUtils.getResourceText("TBL_LEAF")} ${TableUtils.getResourceText("TBL_CELL_INCLUDES", ["TYPE_A_1_child_0 DESCRIPTION_A_1_child_0 Read Only"])}`,
 			"TreeTable: HiddenText cellacc for leaf node is correct");
+	});
+
+	/**
+	 * @deprecated As of version 1.110
+	 */
+	QUnit.test("HiddenText cellacc with grouping", async function(assert) {
+		const oTable = this.oTable;
+		const oTreeTable = this.oTreeTable;
+		let oCol1 = oTable.getColumns()[0];
+		oTable.setFixedColumnCount(0);
+		oTable.setEnableGrouping(true);
+		oTable.setGroupBy(oCol1);
+		await nextUIUpdate();
+
+		oTable.qunit.getDataCell(1, 1).focus();
+		let $Cell = jQuery(oTable.qunit.getDataCell(1, 1));
+		assert.ok((oTable.$("cellacc").text()).indexOf($Cell.text()) > -1,
+			"Table: HiddenText cellacc is properly set after the first column is grouped");
+
+		oCol1 = oTreeTable.getColumns()[0];
+		oTreeTable.setFixedColumnCount(0);
+		oTreeTable.setEnableGrouping(true);
+		oTreeTable.setGroupBy(oCol1);
+		await nextUIUpdate();
+
+		oTreeTable.qunit.getDataCell(1, 1).focus();
+		$Cell = jQuery(oTreeTable.qunit.getDataCell(1, 1));
+		assert.ok((oTreeTable.$("cellacc").text()).indexOf($Cell.text()) > -1,
+			"TreeTable: HiddenText cellacc is properly set after the first column is grouped");
 	});
 
 	QUnit.test("Highlight texts", async function(assert) {

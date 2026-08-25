@@ -2,7 +2,7 @@
  * ${copyright}
  */
 
-sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/IconPool', 'sap/m/library', 'sap/ui/Device', 'sap/ui/core/library'], function(Renderer, IconPool, library, Device, coreLibrary) {
+sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/IconPool', 'sap/m/library', 'sap/ui/Device', 'sap/ui/core/library', 'sap/ui/core/Lib'], function(Renderer, IconPool, library, Device, coreLibrary, Library) {
 	"use strict";
 
 	// shortcut for sap.ui.core.TextDirection
@@ -44,7 +44,7 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/IconPool', 'sap/m/library', 
 			bWidthPercentage = sCSSWidth.indexOf("%") > -1,
 			bSelectWithFlexibleWidth = bAutoAdjustWidth || sCSSWidth === "auto" || bWidthPercentage,
 			CSS_CLASS = SelectRenderer.CSS_CLASS,
-			bEditabledAndEnabled = bEnabled && bEditable;
+			bEditableAndEnabled = bEnabled && bEditable;
 
 		oRm.openStart("div", oSelect);
 		this.addClass(oRm, oSelect);
@@ -71,13 +71,13 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/IconPool', 'sap/m/library', 
 			oRm.class(CSS_CLASS + "WithIcon");
 		}
 
-		if (bEditabledAndEnabled && Device.system.desktop) {
+		if (bEditableAndEnabled && Device.system.desktop) {
 			oRm.class(CSS_CLASS + "Hoverable");
 		}
 
 		oRm.class(CSS_CLASS + "WithArrow");
 
-		if (oSelect.getValueState() !== ValueState.None && bEditabledAndEnabled) {
+		if (oSelect.getValueState() !== ValueState.None && bEditableAndEnabled) {
 			this.addValueStateClasses(oRm, oSelect);
 		}
 
@@ -212,13 +212,13 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/IconPool', 'sap/m/library', 
 		var sTextDir = oSelect.getTextDirection(),
 			sTextAlign = Renderer.getTextAlign(oSelect.getTextAlign(), sTextDir),
 			CSS_CLASS = SelectRenderer.CSS_CLASS,
-			bEditabledAndEnabled = oSelect.getEnabled() && oSelect.getEditable();
+			bEditableAndEnabled = oSelect.getEnabled() && oSelect.getEditable();
 
 		oRm.openStart("span", oSelect.getId() + "-label");
 		oRm.attr("aria-hidden", true);
 		oRm.class(CSS_CLASS + "Label");
 
-		if (oSelect.getValueState() !== ValueState.None && bEditabledAndEnabled) {
+		if (oSelect.getValueState() !== ValueState.None && bEditableAndEnabled) {
 			oRm.class(CSS_CLASS + "LabelState");
 			oRm.class(CSS_CLASS + "Label" + oSelect.getValueState());
 		}
@@ -381,7 +381,7 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/IconPool', 'sap/m/library', 
 			oSelectedItem = oSelect.getSelectedItem(),
 			bIconOnly = oSelect.getType() === SelectType.IconOnly,
 			oValueIcon = oSelect._getValueIcon(),
-			bEditabledAndEnabled = oSelect.getEnabled() && oSelect.getEditable(),
+			bEditableAndEnabled = oSelect.getEnabled() && oSelect.getEditable(),
 			aLabels = [],
 			aAriaLabelledBy = [],
 			oAriaLabelledBy,
@@ -408,8 +408,14 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/IconPool', 'sap/m/library', 
 			}
 		}
 
-		if (sValueState !== ValueState.None && bEditabledAndEnabled) {
+		if (sValueState !== ValueState.None && bEditableAndEnabled) {
 			sAriaDescribedBy = oSelect.getValueStateMessageId() + "-sr";
+		}
+
+		var aGroupHeaders = SelectRenderer._getGroupHeaderItems(oSelect);
+		if (aGroupHeaders.length > 0 && bEditableAndEnabled) {
+			var sGroupDescId = oSelect.getId() + "-groupDesc";
+			sAriaDescribedBy = sAriaDescribedBy ? sAriaDescribedBy + " " + sGroupDescId : sGroupDescId;
 		}
 
 		// For IconOnly Select (role="button"), the selected item text is rendered
@@ -440,7 +446,7 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/IconPool', 'sap/m/library', 
 			required: oSelect._isRequired() || undefined,
 			disabled: !oSelect.getEnabled() || undefined,
 			expanded: oSelect.isOpen(),
-			invalid: (oSelect.getValueState() === ValueState.Error && bEditabledAndEnabled) ? true : undefined,
+			invalid: (oSelect.getValueState() === ValueState.Error && bEditableAndEnabled) ? true : undefined,
 			labelledby: (bIconOnly || oAriaLabelledBy.value === "") ? undefined : oAriaLabelledBy,
 			describedby: sAriaDescribedBy,
 			activedescendant: sActiveDescendant,
@@ -457,19 +463,37 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/IconPool', 'sap/m/library', 
 	SelectRenderer.renderAccessibilityDomNodes = function (oRm, oControl) {
 		var sValueState = oControl.getValueState(),
 			sValueStateText,
-			bEditabledAndEnabled = oControl.getEnabled() && oControl.getEditable();
+			bEditableAndEnabled = oControl.getEnabled() && oControl.getEditable();
 
-		if (sValueState === ValueState.None || !bEditabledAndEnabled) {
-			return;
+		if (sValueState !== ValueState.None && bEditableAndEnabled) {
+			sValueStateText = oControl._getValueStateText();
+			oRm.openStart("div", oControl.getValueStateMessageId() + "-sr")
+				.class("sapUiPseudoInvisibleText")
+				.attr("aria-hidden", true)
+				.openEnd()
+				.text(sValueStateText)
+				.close("div");
 		}
 
-		sValueStateText = oControl._getValueStateText();
-		oRm.openStart("div", oControl.getValueStateMessageId() + "-sr")
-			.class("sapUiPseudoInvisibleText")
-			.attr("aria-hidden", true)
-			.openEnd()
-			.text(sValueStateText)
-			.close("div");
+		if (bEditableAndEnabled) {
+			var aGroupHeaders = SelectRenderer._getGroupHeaderItems(oControl);
+			if (aGroupHeaders.length > 0) {
+				var iSelectableCount = oControl.getSelectableItems().length;
+				var sGroupDesc = Library.getResourceBundleFor("sap.m").getText(
+					"SELECT_RESULTS_IN_GROUPS", [iSelectableCount, aGroupHeaders.length]);
+				oRm.openStart("div", oControl.getId() + "-groupDesc")
+					.class("sapUiPseudoInvisibleText")
+					.openEnd()
+					.text(sGroupDesc)
+					.close("div");
+			}
+		}
+	};
+
+	SelectRenderer._getGroupHeaderItems = function(oSelect) {
+		return oSelect.getItems().filter(function(oItem) {
+			return oItem.isA("sap.ui.core.SeparatorItem") && oItem.getText();
+		});
 	};
 
 	return SelectRenderer;

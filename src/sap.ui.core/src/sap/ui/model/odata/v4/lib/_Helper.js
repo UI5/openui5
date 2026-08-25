@@ -1303,7 +1303,10 @@ sap.ui.define([
 		 * @param {any} vValue
 		 *   The value according to "OData JSON Format Version 4.01" section "7.1 Primitive Value"
 		 * @param {string} sType
-		 *   The OData Edm type, e.g. "Edm.String"
+		 *   The name of the type, e.g. "Edm.String"
+		 * @param {object} [oTypeMetadata]
+		 *   The type metadata for non-Edm types (as returned by
+		 *   {@link sap.ui.model.odata.v4.ODataMetaModel#fetchObject})
 		 * @returns {string}
 		 *   The literal according to "OData Version 4.01 Part 2: URL Conventions" section
 		 *   "5.1.1.14.1 Primitive Literals"
@@ -1312,7 +1315,7 @@ sap.ui.define([
 		 *
 		 * @public
 		 */
-		formatLiteral : function (vValue, sType) {
+		formatLiteral : function (vValue, sType, oTypeMetadata) {
 			if (vValue === undefined) {
 				throw new Error("Illegal value: undefined");
 			}
@@ -1348,6 +1351,9 @@ sap.ui.define([
 					return "'" + String(vValue).replace(rSingleQuote, "''") + "'";
 
 				default:
+					if (oTypeMetadata?.$kind === "EnumType") {
+						return sType + "'" + vValue + "'";
+					}
 					throw new Error("Unsupported type: " + sType);
 			}
 		},

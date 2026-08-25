@@ -1035,11 +1035,7 @@ sap.ui.define([
 	 * @private
 	 */
 	ObjectPageHeader.prototype._getBreadcrumbsAggregation = function () {
-		var oBreadCrumbs = this.getBreadcrumbs(),
-		/**
-		 * @deprecated As of version 1.50, <code>breadCrumbsLinks</code> has been deprecated
-		 */
-		oBreadCrumbsLegacy = this._lazyLoadInternalAggregation('_breadCrumbs', true);
+		var oBreadCrumbs = this.getBreadcrumbs();
 
 		return oBreadCrumbs
 			|| ((oBreadCrumbsLegacy && oBreadCrumbsLegacy.getLinks().length) ? oBreadCrumbsLegacy : null);

@@ -1199,6 +1199,16 @@ sap.ui.define([
 				showCurrentTimeButton: this.getShowCurrentTimeButton()
 			});
 			this._oPopupContent.setClocks(this._oClocks);
+
+			this._oClocks.addEventDelegate({
+				onAfterRendering: () => {
+					const oSwitcher = this._oPopupContent?.getAggregation("_switcher");
+					if (oSwitcher?.getVisible()) {
+						const sKey = oSwitcher.getSelectedKey() || "Cal";
+						this._oClocks.$().css("display", sKey === "Clk" ? "" : "none");
+					}
+				}
+			});
 		}
 
 		// Now that _oClocks exists, apply high-zoom switch if needed

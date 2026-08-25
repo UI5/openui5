@@ -1,0 +1,49 @@
+<mvc:View
+	height="100%"
+	controllerName="sap.m.sample.SelectGrouping.Page"
+	xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m">
+	<Page
+		showHeader="false"
+		class="sapUiContentPadding">
+		<content>
+			<VBox class="sapUiSmallMargin">
+				<Label text="Static groups (SeparatorItem in XML):" class="sapUiSmallMarginBottom" design="Bold"/>
+				<Select
+					id="selectGrouped"
+					selectedKey="{/selectedKey}"
+					change=".onSelectionChange">
+					<core:SeparatorItem text="Popular Countries"/>
+					<core:Item key="AR" text="Argentina"/>
+					<core:Item key="AL" text="Albania"/>
+					<core:Item key="AU" text="Australia"/>
+					<core:SeparatorItem text="Other Countries"/>
+					<core:Item key="AT" text="Austria"/>
+					<core:Item key="BE" text="Belgium"/>
+					<core:Item key="BR" text="Brazil"/>
+					<core:Item key="CA" text="Canada"/>
+					<core:Item key="FR" text="France"/>
+				</Select>
+				<HBox class="sapUiSmallMarginTop" alignItems="Center">
+					<Label text="Selected:" class="sapUiTinyMarginEnd"/>
+					<Text text="{/selectedText}"/>
+				</HBox>
+
+				<Label text="Dynamic groups (data binding with group sorter):" class="sapUiSmallMarginTop sapUiSmallMarginBottom" design="Bold"/>
+				<Select
+					id="selectSorter"
+					items="{
+						path: '/countries',
+						sorter: {
+							path: 'region',
+							descending: false,
+							group: true
+						}
+					}">
+					<core:Item key="{key}" text="{name}"/>
+				</Select>
+			</VBox>
+		</content>
+	</Page>
+</mvc:View>
