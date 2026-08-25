@@ -4,10 +4,8 @@
 
 sap.ui.define([
 	"sap/m/library",
-	"sap/base/strings/capitalize",
-	"sap/ui/Device",
-	"sap/ui/core/Lib"
-], function (library, capitalize, Device, Library) {
+	"sap/base/strings/capitalize"
+], function (library, capitalize) {
 	"use strict";
 
 	// shortcut for sap.m.CarouselArrowsPlacement
@@ -15,8 +13,6 @@ sap.ui.define([
 
 	// shortcut for sap.m.CarouselPageIndicatorPlacementType
 	var CarouselPageIndicatorPlacementType = library.CarouselPageIndicatorPlacementType;
-
-	var oResourceBundle = Library.getResourceBundleFor("sap.m");
 
 	/**
 	 * Carousel renderer.
@@ -48,21 +44,23 @@ sap.ui.define([
 		//visual indicator
 		if (sPageIndicatorPlacement === CarouselPageIndicatorPlacementType.Top ||
 			sPageIndicatorPlacement === CarouselPageIndicatorPlacementType.OverContentTop) {
-			this._renderPageIndicatorAndArrows(oRM, oCarousel, {
-				iPageCount: iPageCount,
-				iIndex: iIndex,
-				sArrowsPlacement : sArrowsPlacement,
-				sPlacement: sPageIndicatorPlacement,
-				bShowPageIndicator: oCarousel.getShowPageIndicator()
-			});
-		}
-
+				this._renderPageIndicatorAndArrows(oRM, oCarousel, {
+					iPageCount: iPageCount,
+					iIndex: iIndex,
+					sArrowsPlacement : sArrowsPlacement,
+					sPlacement: sPageIndicatorPlacement,
+					bShowPageIndicator: oCarousel.getShowPageIndicator()
+				});
+			}
+		this._renderListDiv(oRM, oCarousel);
 		this._renderInnerDiv(oRM, oCarousel, aPages, sPageIndicatorPlacement);
 
 		if (iPageCount > oCarousel._getNumberOfItemsToShow() && sArrowsPlacement === CarouselArrowsPlacement.Content) {
 			this._renderHudArrows(oRM, oCarousel);
 		}
 
+		//close list div
+		oRM.close("div");
 		//visual indicator
 		if (sPageIndicatorPlacement === CarouselPageIndicatorPlacementType.OverContentBottom
 			|| sPageIndicatorPlacement === CarouselPageIndicatorPlacementType.Bottom) {
@@ -76,6 +74,7 @@ sap.ui.define([
 		}
 
 		this._renderDummyArea(oRM, oCarousel, "after");
+		//close opening div
 		oRM.close("div");
 		//page-wrap ends
 	};
@@ -93,13 +92,24 @@ sap.ui.define([
 			.style("height", oCarousel.getHeight())
 			.attr("data-sap-ui-customfastnavgroup", true) // custom F6 handling
 			.accessibilityState(oCarousel, {
-				role: "list",
-				roledescription: Library.getResourceBundleFor("sap.m").getText("CAROUSEL_ARIA_ROLE_DESCRIPTION")
+				role: "region",
+				roledescription: oCarousel._oRb.getText("CAROUSEL_ARIA_ROLE_DESCRIPTION")
 			});
 
 		if (sTooltip) {
 			oRM.attr("title", sTooltip);
 		}
+
+		oRM.openEnd();
+	};
+
+	CarouselRenderer._renderListDiv = function (oRM, oCarousel) {
+		oRM.openStart("div")
+			.class("sapMCrslList")
+			.accessibilityState({
+				role: "list",
+				label: oCarousel._oRb.getText("CAROUSEL_ARIA_LIST_LABEL")
+		});
 
 		oRM.openEnd();
 	};
@@ -151,7 +161,6 @@ sap.ui.define([
 				role: "listitem",
 				posinset: iIndex + 1,
 				setsize: aArray.length,
-				selected: bSelected,
 				hidden: !oCarousel._isPageDisplayed(iIndex)
 			})
 			.attr("tabindex", bSelected ? 0 : -1)
@@ -170,6 +179,7 @@ sap.ui.define([
 			.attr("tabindex", 0)
 			.class("sapMCrslNoDataItem")
 			.accessibilityState({
+				role: "listitem",
 				label: oAccInfo.type + " " + oAccInfo.description
 			})
 			.openEnd();
@@ -249,8 +259,8 @@ sap.ui.define([
 				oRM.openStart("span")
 					.attr("data-slide", i)
 					.accessibilityState({
-						role: "img",
-						label: oResourceBundle.getText("CAROUSEL_POSITION", [i, iPageCount])
+						role: "presentation",
+						hidden: true
 					}).openEnd()
 					.close("span");
 			}
@@ -259,9 +269,13 @@ sap.ui.define([
 			oRM.class("sapMCrslNumeric")
 				.openEnd();
 
-			var sTextBetweenNumbers = oResourceBundle.getText("CAROUSEL_PAGE_INDICATOR_TEXT", [mSettings.iIndex + 1, iPageCount - iNumberOfItemsToShow + 1]);
+			var sTextBetweenNumbers = oCarousel._oRb.getText("CAROUSEL_PAGE_INDICATOR_TEXT", [mSettings.iIndex + 1, iPageCount - iNumberOfItemsToShow + 1]);
 			oRM.openStart("span", sId + "-" + "slide-number")
 				.attr("dir", "auto")
+				.accessibilityState({
+					role: "presentation",
+					hidden: true
+				})
 				.openEnd()
 				.text(sTextBetweenNumbers)
 				.close("span");
@@ -316,7 +330,11 @@ sap.ui.define([
 			.class("sapMCrslArrow")
 			.class("sapMCrsl" + capitalize(sShort))
 			.attr("data-slide", sShort)
-			.attr("title", oResourceBundle.getText("PAGINGBUTTON_" + sDirection.toUpperCase()));
+			.accessibilityState({
+				role: "presentation",
+				hidden: true
+			})
+			.attr("title", oCarousel._oRb.getText("PAGINGBUTTON_" + sDirection.toUpperCase()));
 
 		// Hide unneeded arrow when we are on the first or last page and "loop" property is set to false
 		if (bFirstPageIsActive && sDirection === "previous" && !bLoop) {
