@@ -5,14 +5,12 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/table/rowmodes/Type",
 	"./TableHelper.support",
-	"sap/ui/support/library",
-	"sap/ui/Device"
+	"sap/ui/support/library"
 ], function(
 	Lib,
 	RowModeType,
 	SupportHelper,
-	SupportLibrary,
-	Device
+	SupportLibrary
 ) {
 	"use strict";
 
@@ -74,72 +72,6 @@ sap.ui.define([
 	});
 
 	/*
-	 * Checks whether the currently rendered rows have the expected height.
-	 */
-	const oRowHeights = SupportHelper.normalizeRule({
-		id: "RowHeights",
-		minversion: "1.38",
-		categories: [Categories.Usage],
-		title: "Row heights",
-		description: "Checks whether the currently rendered rows have the expected height.",
-		resolution: "Check whether content densities are correctly used, and only the supported controls are used as column templates, with their"
-					+ " wrapping property set to \"false\"",
-		resolutionurls: [
-			SupportHelper.createDocuRef("Documentation: Content Densities", "#/topic/e54f729da8e3405fae5e4fe8ae7784c1"),
-			SupportHelper.createDocuRef("Documentation: Supported controls", "#/topic/148892ff9aea4a18b912829791e38f3e"),
-			SupportHelper.createDocuRef("API Reference: sap.ui.table.Column#getTemplate", "#/api/sap.ui.table.Column/methods/getTemplate"),
-			SupportHelper.createFioriGuidelineResolutionEntry()
-		],
-		check: function(oIssueManager, oCoreFacade, oScope) {
-			const aTables = SupportHelper.find(oScope, true, "sap.ui.table.Table");
-			const bIsZoomedInChrome = Device.browser.chrome && window.devicePixelRatio !== 1;
-
-			for (const oTable of aTables) {
-				const aVisibleRows = oTable.getRows();
-				const iExpectedRowHeight = oTable._getBaseRowHeight();
-				let bUnexpectedRowHeightDetected = false;
-
-				for (let j = 0; j < aVisibleRows.length; j++) {
-					const oRowElement = aVisibleRows[j].getDomRef();
-					const oRowElementFixedPart = aVisibleRows[j].getDomRef("fixed");
-
-					if (oRowElement) {
-						const nActualRowHeight = oRowElement.getBoundingClientRect().height;
-						const nActualRowHeightFixedPart = oRowElementFixedPart ? oRowElementFixedPart.getBoundingClientRect().height : null;
-						let nHeightToReport = nActualRowHeight;
-
-						if (bIsZoomedInChrome) {
-							const nHeightDeviation = Math.abs(iExpectedRowHeight - nActualRowHeight);
-							const nHeightDeviationFixedPart = Math.abs(nActualRowHeightFixedPart - nActualRowHeight);
-
-							// If zoomed in Chrome, the actual height may deviate from the expected height by less than 1 pixel. Any higher
-							// deviation shall be considered as defective.
-							if (nHeightDeviation > 1) {
-								bUnexpectedRowHeightDetected = true;
-							} else if (nActualRowHeightFixedPart != null && nHeightDeviationFixedPart > 1) {
-								bUnexpectedRowHeightDetected = true;
-								nHeightToReport = nActualRowHeightFixedPart;
-							}
-						} else if (nActualRowHeight !== iExpectedRowHeight) {
-							bUnexpectedRowHeightDetected = true;
-						} else if (nActualRowHeightFixedPart != null && nActualRowHeightFixedPart !== iExpectedRowHeight) {
-							bUnexpectedRowHeightDetected = true;
-							nHeightToReport = nActualRowHeightFixedPart;
-						}
-
-						if (bUnexpectedRowHeightDetected) {
-							SupportHelper.reportIssue(oIssueManager,
-								`The row height was expected to be ${iExpectedRowHeight}px, but was ${nHeightToReport}px instead. This causes issues with vertical scrolling.`,
-								Severity.High, aVisibleRows[j].getId());
-							break;
-						}
-					}
-				}
-			}
-		}
-	});
-
-	/*
 	 * Checks the configuration of the sap.f.DynamicPage. If the DynamicPage contains a table with row mode <code>Auto</code>, the
 	 * <code>fitContent</code> property of the DynamicPage should be set to true, otherwise false.
 	 */
@@ -196,6 +128,6 @@ sap.ui.define([
 		}
 	});
 
-	return [oContentDensity, oRowHeights, oDynamicPageConfiguration];
+	return [oContentDensity, oDynamicPageConfiguration];
 
 }, true);
