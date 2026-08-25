@@ -56,7 +56,7 @@
 				tooltip="{i18n>TOL_ACTIVATE}" />
 			<MenuItem
 				id="sapUiRta_publishVersion"
-				enabled="{parts: ['versions>/publishVersionVisible', 'versions>/displayedVersion'], formatter: '.formatPublishVersionEnabled'}"
+				enabled="{parts: ['versions>/publishVersionVisible', 'versions>/displayedVersion', 'versions>/publishVersionEnabled'], formatter: '.formatPublishVersionEnabled'}"
 				visible="{= (${versions>/versioningEnabled} &amp;&amp; ${controls>/adaptationMode} &amp;&amp; ${versions>/publishVersionVisible})}"
 				press=".publishVersion"
 				icon="sap-icon://shipping-status"
