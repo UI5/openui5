@@ -2541,6 +2541,7 @@ sap.ui.define([
 	 * @param {string[]} [vConfig.asyncHints.libs] Libraries that should be (pre-)loaded before the Component (experimental setting)
 	 * @param {string[]} [vConfig.asyncHints.components] Components that should be (pre-)loaded before the Component (experimental setting)
 	 * @param {Promise|Promise[]} [vConfig.asyncHints.waitFor] {@since 1.37.0} a <code>Promise</code> or and array of <code>Promise</code>s for which the Component instantiation should wait (experimental setting)
+	 * @param {boolean} [vConfig.asyncHints.isLauncher] {@since 1.153.0} a marker to indicate that the Component is a launcher, e.g. the fiori launchpad (experimental setting)
 	 * @param {boolean|string|object} [vConfig.manifest=undefined] {@since 1.49.0} Controls when and from where to load the manifest for the Component.
 	 *              When set to any truthy value, the manifest will be loaded asynchronously by default and evaluated before the Component controller, if it is set to a falsy value
 	 *              other than <code>undefined</code>, the manifest will be loaded after the controller.
@@ -2743,7 +2744,8 @@ sap.ui.define([
 		var vClassOrPromise = loadComponent(vConfig, {
 			failOnError: true,
 			createModels: true,
-			waitFor: vConfig.asyncHints && vConfig.asyncHints.waitFor,
+			waitFor: vConfig.asyncHints?.waitFor,
+			isLauncher: vConfig.asyncHints?.isLauncher === true,
 			activeTerminologies: aActiveTerminologies
 		});
 		if ( vConfig.async ) {
@@ -3008,6 +3010,7 @@ sap.ui.define([
 	 *                                        component preload (should only be set via <code>sap.ui.component</code>)
 	 * @param {boolean} mOptions.preloadOnly see <code>sap.ui.component.load</code> (<code>vConfig.asyncHints.preloadOnly</code>)
 	 * @param {Promise|Promise[]} mOptions.waitFor see <code>sap.ui.component</code> (<code>vConfig.asyncHints.waitFor</code>)
+	 * @param {boolean} mOptions.isLauncher whether the component is a launcher (e.g. the fiori launchpad) (see also <code>vConfig.asyncHints.isLauncher</code>)
 	 * @return {function|Promise<function>} the constructor of the Component class or a Promise that will be fulfilled with the same
 	 *
 	 * @private
@@ -3018,6 +3021,7 @@ sap.ui.define([
 			sName = oConfig.name,
 			sUrl = oConfig.url,
 			bComponentPreload = /^(sync|async)$/.test(Component.getComponentPreloadMode()),
+			bIsLauncher = mOptions.isLauncher,
 			vManifest = oConfig.manifest,
 			bManifestFirst,
 			sManifestUrl,
@@ -3076,7 +3080,10 @@ sap.ui.define([
 		// set the name of this newly loaded component at the interaction measurement,
 		// as otherwise this would be the outer component from where it was called,
 		// which is not true - this component causes the load
-		Interaction.setStepComponent(sName);
+		// only activated for regular Components, launcher scenarios are explicitly excluded (e.g. fiori launchpad)
+		if (!bIsLauncher) {
+			Interaction.setStepComponent(sName);
+		}
 
 		/**
 		 * With Component.create() the manifest option cannot be undefined (default is <true>, other options see API doc for Component.create)
