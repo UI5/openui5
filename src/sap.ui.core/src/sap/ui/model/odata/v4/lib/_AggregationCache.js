@@ -594,7 +594,13 @@ sap.ui.define([
 		const bExpandTreeState = bParentIsLeaf
 			&& oParentNode?.["@$ui5.node.level"] >= this.oAggregation.expandTo;
 		if (bExpandTreeState) {
-			this.oTreeState.expand(oParentNode);
+			this.oTreeState.notALeafAnymore(oParentNode, (sPredicate) => {
+				const oAncestor = this.aElements.$byPredicate[sPredicate];
+				const iAncestor = oAncestor ? this.aElements.indexOf(oAncestor) : -1;
+				return iAncestor >= 0
+					? this.isAncestorOf(iAncestor, iIndex - 1)
+					: undefined; // not sure
+			});
 		} // else: already expanded automatically
 
 		const addElement = (iIndex0, iRank) => {

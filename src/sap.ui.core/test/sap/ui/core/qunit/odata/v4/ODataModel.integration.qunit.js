@@ -53120,6 +53120,251 @@ make root = ${bMakeRoot}`;
 	});
 
 	//*********************************************************************************************
+	// Scenario: Show the single root node of a recursive hierarchy and expand it completely. Scroll
+	// down and optionally request a side effect for all rows (then root is outside the collection).
+	// Create a new node (in place) below the leaf Gamma, collapse Gamma, and request a side-effects
+	// refresh. Gamma must still be collapsed.
+	// JIRA: CPOUI5ODATAV4-3648
+[false, true].forEach((bOutside) => {
+	[1, 4].forEach((iExpandTo) => {
+		const sTitle = "Recursive Hierarchy: expand all, create, collapse"
+			+ "; root is not currently part of the collection = " + bOutside
+			+ ": expandTo : " + iExpandTo;
+
+	QUnit.test(sTitle, async function (assert) {
+		const sUrl = "EMPLOYEES?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
+				+ "HierarchyNodes=$root/EMPLOYEES,HierarchyQualifier='OrgChart'"
+				+ ",NodeProperty='ID',Levels=" + iExpandTo;
+		const sSelect = ")&$select=DescendantCount,DistanceFromRoot,DrillState,ID,Name";
+		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
+		const sView = `
+<t:Table id="table" rows="{path : '/EMPLOYEES',
+		parameters : {
+			$$aggregation : {
+				createInPlace : true,
+				expandTo : ${iExpandTo},
+				hierarchyQualifier : 'OrgChart'
+			}
+		}}" threshold="0" visibleRowCount="2">
+	<Text text="{= %{@$ui5.node.isExpanded} }"/>
+	<Text text="{= %{@$ui5.node.level} }"/>
+	<Text text="{ID}"/>
+	<Text text="{Name}"/>
+</t:Table>`;
+
+		// 0 Alpha (expanded completely, then optionally kicked out of the collection)
+		//   1 Beta
+		//     1.1 Gamma (not a leaf anymore, then collapsed)
+		//       1.1.1 New (created later)
+
+		const oAlphaBetaResponse = {
+			"@odata.count" : "3",
+			value : [{
+				DescendantCount : "2",
+				DistanceFromRoot : "0",
+				DrillState : "expanded",
+				ID : "0",
+				Name : "Alpha"
+			}, {
+				DescendantCount : "1",
+				DistanceFromRoot : "1",
+				DrillState : "expanded",
+				ID : "1",
+				Name : "Beta"
+			}]
+		};
+		this.expectRequestIf(iExpandTo === 1, sUrl
+				+ ")&$select=DrillState,ID,Name&$count=true&$skip=0&$top=2", {
+				"@odata.count" : "1",
+				value : [{
+					DrillState : "collapsed",
+					ID : "0",
+					Name : "Alpha"
+				}]
+			})
+			.expectRequestIf(iExpandTo > 1, sUrl + sSelect + "&$count=true&$skip=0&$top=2",
+				oAlphaBetaResponse);
+
+		await this.createView(assert, sView, oModel);
+
+		const oTable = this.oView.byId("table");
+		const oAlpha = oTable.getRows()[0].getBindingContext();
+
+		const sExpandAllUrl = sUrl
+			+ ",ExpandLevels=" + JSON.stringify([{NodeID : "0", Levels : null}]);
+		this.expectRequest(sExpandAllUrl + sSelect + "&$count=true&$skip=0&$top=2",
+				oAlphaBetaResponse);
+
+		// code under test
+		oAlpha.expand(true);
+
+		await this.waitForChanges(assert, "expand all below Alpha");
+
+		this.expectRequest(sExpandAllUrl + sSelect + "&$skip=2&$top=1", {
+				value : [{
+					DescendantCount : "0",
+					DistanceFromRoot : "2",
+					DrillState : "leaf",
+					ID : "1.1",
+					Name : "Gamma"
+				}]
+			});
+
+		oTable.setFirstVisibleRow(1);
+
+		await this.waitForChanges(assert, "scroll down");
+
+		checkTable("after scroll down", assert, oTable, [
+			oAlpha,
+			"/EMPLOYEES('1')",
+			"/EMPLOYEES('1.1')"
+		], [
+			[true, 2, "1", "Beta"],
+			[undefined, 3, "1.1", "Gamma"]
+		]);
+		const [, oGamma] = oAlpha.getBinding().getCurrentContexts();
+
+		if (bOutside) {
+			this.expectRequest("EMPLOYEES?$select=ID,Name&$filter=ID eq '1' or ID eq '1.1'&$top=2",
+				{
+					value : [{
+						ID : "1",
+						Name : "Beta"
+					}, {
+						ID : "1.1",
+						Name : "Gamma"
+					}]
+				});
+
+			await Promise.all([
+				oGamma.getBinding().getHeaderContext().requestSideEffects(["Name"]),
+				this.waitForChanges(assert, "side-effect for Name")
+			]);
+
+			checkTable("after side-effect for Name", assert, oTable, [
+				// oAlpha, // GONE!
+				"/EMPLOYEES('1')",
+				oGamma
+			], [
+				[true, 2, "1", "Beta"],
+				[undefined, 3, "1.1", "Gamma"]
+			], 3);
+			assert.notOk(oAlpha.getBinding()._getAllExistingContexts().includes(oAlpha),
+				"outside collection");
+			assert.strictEqual(oAlpha.getIndex(), 0, "still remembered");
+			assert.strictEqual(oAlpha.getModel(), oModel, "not yet destroyed");
+			assert.throws(function () {
+				oAlpha.isAncestorOf(oGamma);
+			}, new Error("Not currently part of a recursive hierarchy: " + oAlpha));
+		} else {
+			assert.strictEqual(oAlpha.isAncestorOf(oGamma), true, "ancestor relation is known");
+		}
+
+		const sExpandedUrl = bOutside && iExpandTo < 4
+			? sUrl + ",ExpandLevels=" + JSON.stringify([
+					{NodeID : "0", Levels : null},
+					{NodeID : "1.1", Levels : 1} // Note: not needed, but never mind
+				])
+			: sExpandAllUrl; //TODO: avoid unnecessary refresh below?
+		this.expectRequest("#0 POST EMPLOYEES", {
+				payload : {
+					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('1.1')",
+					Name : "New"
+				}
+			}, {
+				ID : "1.1.1",
+				Name : "New"
+			})
+			.expectRequestIf(iExpandTo < 4,
+				"#0 " + sExpandedUrl + sSelect + "&$count=true&$skip=1&$top=2", {
+				"@odata.count" : "4",
+				value : [{
+					DescendantCount : "2",
+					DistanceFromRoot : "1",
+					DrillState : "expanded",
+					ID : "1",
+					Name : "Beta"
+				}, {
+					DescendantCount : "1",
+					DistanceFromRoot : "2",
+					DrillState : "expanded",
+					ID : "1.1",
+					Name : "Gamma"
+				}]
+			})
+			.expectRequest(sExpandedUrl + ")&$filter=ID eq '1.1.1'&$select=LimitedRank", {
+				value : [{
+					LimitedRank : "3" // Edm.Int64
+				}]
+			});
+
+		// code under test
+		const oNew = oGamma.getBinding()
+			.create({"@$ui5.node.parent" : oGamma, Name : "New"}, /*bSkipRefresh*/true);
+
+		await Promise.all([
+			oNew.created(),
+			this.waitForChanges(assert, "create New")
+		]);
+
+		assert.strictEqual(oAlpha.getModel(), !bOutside && iExpandTo > 1 ? oModel : undefined,
+			"destroyed");
+		assert.strictEqual(oNew.getModel(), iExpandTo < 4 ? undefined : oModel,
+			"already destroyed (and re-created!)");
+
+		oGamma.collapse();
+
+		// Note: table's content is NOT updated synchronously
+		await this.waitForChanges(assert, "collapse Gamma");
+
+		checkTable("after collapse Gamma", assert, oTable, [
+			!bOutside && iExpandTo > 1 && oAlpha,
+			"/EMPLOYEES('1')",
+			oGamma
+		], [
+			[true, 2, "1", "Beta"],
+			[false, 3, "1.1", "Gamma"]
+		], 3);
+
+		const sCollapsedUrl = sUrl + ",ExpandLevels=" + JSON.stringify([
+			{NodeID : "0", Levels : null},
+			{NodeID : "1.1", Levels : 0} // IMPORTANT!
+		]);
+		this.expectRequest(sCollapsedUrl + sSelect + "&$count=true&$skip=1&$top=2", {
+				"@odata.count" : "3",
+				value : [{
+					DescendantCount : "1",
+					DistanceFromRoot : "1",
+					DrillState : "expanded",
+					ID : "1",
+					Name : "Beta"
+				}, {
+					DescendantCount : "0",
+					DistanceFromRoot : "2",
+					DrillState : "collapsed",
+					ID : "1.1",
+					Name : "Gamma"
+				}]
+			});
+
+		await Promise.all([
+			// code under test
+			oGamma.getBinding().getHeaderContext().requestSideEffects([""]),
+			this.waitForChanges(assert, "side-effects refresh")
+		]);
+
+		checkTable("after side-effects refresh", assert, oTable, [
+			"/EMPLOYEES('1')",
+			oGamma
+		], [
+			[true, 2, "1", "Beta"],
+			[false, 3, "1.1", "Gamma"] // still collapsed!
+		], 3);
+	});
+	});
+});
+
+	//*********************************************************************************************
 	// Scenario: Show a recursive hierarchy, fully expanded. Collapse Zeta and afterwards Delta to
 	// guarantee that the filter statements in the 'descendants' request are sorted. Collapse Iota
 	// and afterwards Theta to add a filter for Iota to the 'descendants' request (Iota is not a
