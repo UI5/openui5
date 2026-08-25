@@ -1,33 +1,28 @@
-/*global beforeAll,describe,it,element,by,takeScreenshot,expect,browser,protractor,sap_ui_Device:true */
+/*global beforeAll,describe,it,element,by,takeScreenshot,expect,browser,protractor */
 
 describe("sap.m.Popover", function () {
 	"use strict";
-
-	beforeAll(function() {
-		browser.executeScript(function() {
-			return new Promise(function(resolve) {
-				sap.ui.require([
-					"sap/ui/Device"
-				], function(Device) {
-					sap_ui_Device = Device;
-					resolve();
-				});
-			});
-		});
-	});
 
 	var bPhone = null;
 	var _resolvePopover = function () {
 		return bPhone ? "__dialog1" : "overflowing-popover";
 	};
 
-	it("Should load test page", function () {
-		browser.executeScript(function () {
-			return sap_ui_Device.system.phone;
-		}).then(function (response) {
-			bPhone = response;
+	beforeAll(function() {
+		return browser.executeScript(function() {
+			return new Promise(function(resolve) {
+				sap.ui.require([
+					"sap/ui/Device"
+				], function(Device) {
+					resolve(Device.system.phone);
+				});
+			});
+		}).then(function (bIsPhone) {
+			bPhone = bIsPhone;
 		});
+	});
 
+	it("Should load test page", function () {
 		//click over a button that hides the caret when a popover is opened from an input
 		element(by.id("customCssButton")).click();
 		expect(takeScreenshot()).toLookAs("initial");
@@ -104,6 +99,10 @@ describe("sap.m.Popover", function () {
 		element(by.id("defocus")).click();
 
 		expect(takeScreenshot()).toLookAs("inner-popover-closed-click");
+
+		// The parent popover stays open by design in this test; dismiss it so it
+		// does not overlap the buttons opened by the following tests.
+		browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
 	});
 
 	it("Should open popover with keyboard focusable scroller", function () {
@@ -118,9 +117,9 @@ describe("sap.m.Popover", function () {
 		expect(takeScreenshot()).toLookAs("btn-with-scroller-popover");
 	});
 
-	it("Should open popover with keyboard focusable scroller", function () {
+	it("Should open popover with keyboard focusable scroller and footer", function () {
 		element(by.id("btn19")).click();
 
-		expect(takeScreenshot()).toLookAs("keyboard-focusable-scroller-popover");
+		expect(takeScreenshot()).toLookAs("keyboard-focusable-scroller-footer");
 	});
 });
