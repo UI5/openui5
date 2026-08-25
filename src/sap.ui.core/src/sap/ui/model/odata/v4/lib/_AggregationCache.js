@@ -1876,7 +1876,7 @@ sap.ui.define([
 	 */
 	_AggregationCache.prototype.moveOutOfPlaceNodes = function (aOutOfPlacePredicates,
 			sParentPredicate, iParentRank) {
-		const oParent = this.aElements.$byPredicate[sParentPredicate];
+		const oParent = this.aElements.$byPredicate[sParentPredicate]; // Note: might be outside!
 		// eslint-disable-next-line no-nested-ternary
 		const iParentIndex = iParentRank === undefined
 			? (oParent ? this.aElements.indexOf(oParent) : -1)
@@ -1896,12 +1896,15 @@ sap.ui.define([
 				}
 				this.aElements.splice(iNodeIndex, 1);
 
+				if (sParentPredicate && iParentIndex < 0) { // currently not part of the hierarchy
+					return; // do not insert
+				}
 				if (oParent && oParent["@$ui5.node.isExpanded"] === undefined) {
 					// not a leaf anymore
 					oParent["@$ui5.node.isExpanded"] = this.oTreeState.isExpanded(sParentPredicate);
 				}
-				if (oParent?.["@$ui5.node.isExpanded"] === false) {
-					return; // parent is collapsed -> do not insert
+				if (oParent?.["@$ui5.node.isExpanded"] === false) { // parent is collapsed
+					return; // do not insert
 				}
 
 				this.aElements.splice(iParentIndex + 1, 0, oNode);

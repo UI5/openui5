@@ -601,13 +601,14 @@ sap.ui.define([
 			process : function (oRootElement, oViewInfo, mSettings) {
 				var sCaller = oViewInfo.caller,
 					bDebug = Log.isLoggable(Log.Level.DEBUG, sXMLPreprocessor),
-					bCallerLoggedForWarnings = bDebug, // debug output already contains caller
-					sCurrentName = oViewInfo.name, // current view or fragment name
+					// debug output already contains caller
+					bCallerLoggedForWarnings = bDebug,
+					// current view or fragment name
+					sCurrentName = oViewInfo.name,
 					mFragmentCache = {},
 					iNestingLevel = 0,
-					oScope = {}, // for BindingParser.complexParser()
-					/** @deprecated As of version 1.120.0 */
-					fnSupportInfo = oViewInfo._supportInfo,
+					// for BindingParser.complexParser()
+					oScope = {},
 					bWarning = Log.isLoggable(Log.Level.WARNING, sXMLPreprocessor);
 
 				/**
@@ -1754,19 +1755,7 @@ sap.ui.define([
 				 *   getting the binding's value fails.
 				 */
 				function visitAttribute(oElement, oAttribute, oWithControl) {
-					return resolveAttributeBinding(oElement, oAttribute, oWithControl)
-						/** @deprecated As of version 1.120.0 */
-						.then(function () {
-							if (fnSupportInfo) {
-								fnSupportInfo({
-									context : undefined /*context from node clone*/,
-									env : {
-										caller : "visitAttribute",
-										after : {name : oAttribute.name, value : oAttribute.value}
-									}
-								});
-							}
-						});
+					return resolveAttributeBinding(oElement, oAttribute, oWithControl);
 				}
 
 				/**
@@ -1836,13 +1825,6 @@ sap.ui.define([
 					function visitAttributesAndChildren() {
 						return visitAttributes(oNode, oWithControl).then(function () {
 							return visitChildNodes(oNode, oWithControl);
-						})
-						/** @deprecated As of version 1.120.0 */
-						.then(function () {
-							if (fnSupportInfo) {
-								fnSupportInfo({context : oNode,
-									env : {caller : "visitNode", after : {name : oNode.tagName}}});
-							}
 						});
 					}
 

@@ -19,6 +19,7 @@
 				<Property Name="defaultChannel" Type="Edm.String" />
 				<Property Name="lastUsedChannel" Type="Edm.String" />
 				<Property Name="sendsAutographs" Type="Edm.Boolean" />
+				<Property Name="Gender" Type="special.cases.Gender"/>
 				<Annotation Term="com.sap.vocabularies.Common.v1.Messages" Path="Messages" />
 				<NavigationProperty Name="DraftAdministrativeData" Type="special.cases.DraftAdministrativeDataType"/>
 				<NavigationProperty Name="SiblingEntity" Type="special.cases.ArtistsType" />
@@ -115,6 +116,11 @@
 				<Property Name="EValue" Type="Edm.Int16"/>
 				<NavigationProperty Name="EtoC" Partner="CtoEs" Type="special.cases.C"/>
 			</EntityType>
+			<EnumType Name="Gender">
+				<Member Name="Unknown" Value="0"/>
+				<Member Name="Male" Value="1"/>
+				<Member Name="Female" Value="2"/>
+			</EnumType>
 			<ComplexType Name="HierarchyProperties">
 				<Property Name="NodeID" Type="Edm.String" Nullable="false"/>
 			</ComplexType>

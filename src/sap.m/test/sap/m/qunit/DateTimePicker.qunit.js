@@ -1869,4 +1869,105 @@ sap.ui.define([
 		oDTP.destroy();
 	});
 
+	QUnit.module("Toggle Clock/Input mode — Date tab visibility", {
+		beforeEach: function() {
+			this.stub(Device, "system").value({ phone: true, desktop: false, tablet: false });
+		}
+	});
+
+	QUnit.test("Clocks stay hidden after toggleInputMode() when Date tab is active (phone)", async function(assert) {
+		// Arrange
+		var oDTP = new DateTimePicker({
+			dateValue: UI5Date.getInstance(2024, 0, 15, 10, 30, 0)
+		});
+		oDTP.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		oDTP._createPopup();
+		oDTP._createPopupContent();
+		await nextUIUpdate();
+		oDTP._openPopup();
+		await nextUIUpdate();
+
+		// Ensure Date tab is active (default)
+		var oSwitcher = oDTP._oPopupContent.getAggregation("_switcher");
+		assert.strictEqual(oSwitcher.getSelectedKey(), "Cal", "Date tab is active initially");
+		assert.strictEqual(oDTP._oClocks.$().css("display"), "none", "Clocks are hidden in Date tab before toggle");
+
+		// Act — toggle from Clock to NumberInput mode
+		oDTP._onDTPToggleViewPress();
+		await nextUIUpdate();
+
+		// Assert — clocks must still be hidden because we are still on the Date tab
+		assert.strictEqual(oDTP._oClocks.$().css("display"), "none",
+			"Clocks stay hidden after toggleInputMode() when Date tab is still active");
+
+		// Cleanup
+		oDTP.destroy();
+	});
+
+	QUnit.test("Clocks stay hidden after toggleInputMode() twice when Date tab is active (phone)", async function(assert) {
+		// Arrange
+		var oDTP = new DateTimePicker({
+			dateValue: UI5Date.getInstance(2024, 0, 15, 10, 30, 0)
+		});
+		oDTP.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		oDTP._createPopup();
+		oDTP._createPopupContent();
+		await nextUIUpdate();
+		oDTP._openPopup();
+		await nextUIUpdate();
+
+		// Act — toggle to NumberInput then back to Clock
+		oDTP._onDTPToggleViewPress();
+		await nextUIUpdate();
+		oDTP._onDTPToggleViewPress();
+		await nextUIUpdate();
+
+		// Assert — Date tab is still active; clocks must be hidden
+		var oSwitcher = oDTP._oPopupContent.getAggregation("_switcher");
+		assert.strictEqual(oSwitcher.getSelectedKey(), "Cal", "Date tab is still active");
+		assert.strictEqual(oDTP._oClocks.$().css("display"), "none",
+			"Clocks stay hidden after two toggles when Date tab is active");
+
+		// Cleanup
+		oDTP.destroy();
+	});
+
+	QUnit.test("Clocks become visible after switching to Time tab then toggleInputMode()", async function(assert) {
+		// Arrange
+		var oDTP = new DateTimePicker({
+			dateValue: UI5Date.getInstance(2024, 0, 15, 10, 30, 0)
+		});
+		oDTP.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		oDTP._createPopup();
+		oDTP._createPopupContent();
+		await nextUIUpdate();
+		oDTP._openPopup();
+		await nextUIUpdate();
+
+		// Switch to Time tab
+		oDTP._oPopupContent.switchToTime();
+		await nextUIUpdate();
+
+		// Clocks should be visible now
+		assert.notStrictEqual(oDTP._oClocks.$().css("display"), "none",
+			"Clocks are visible after switching to Time tab");
+
+		// Act — toggle to NumberInput mode while on Time tab
+		oDTP._onDTPToggleViewPress();
+		await nextUIUpdate();
+
+		// Assert
+		assert.notStrictEqual(oDTP._oClocks.$().css("display"), "none",
+			"Clocks container stays visible after toggle while on Time tab");
+
+		// Cleanup
+		oDTP.destroy();
+	});
+
 });

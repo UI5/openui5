@@ -1,0 +1,39 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.m.sample.SelectGrouping",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"type": "application",
+		"title": "Application 'SelectGrouping'"
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"rootView": "sap.m.sample.SelectGrouping.Page",
+		"dependencies": {
+			"minUI5Version": "2.0.0",
+			"libs": {
+				"sap.m": {},
+				"sap.ui.core": {}
+			}
+		},
+		"config": {
+			"sample": {
+				"stretch": true,
+				"files": [
+					"Page.view.xml",
+					"Page.controller.js",
+					"manifest.json"
+				]
+			}
+		}
+	}
+}

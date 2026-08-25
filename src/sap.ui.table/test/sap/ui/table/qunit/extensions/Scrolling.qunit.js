@@ -2,13 +2,14 @@
 
 sap.ui.define([
 	"sap/ui/table/qunit/TableQUnitUtils",
-	"sap/ui/test/utils/nextUIUpdate",
+	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/ui/table/Column",
 	"sap/ui/table/CreationRow",
 	"sap/ui/table/rowmodes/Type",
 	"sap/ui/table/rowmodes/Fixed",
 	"sap/ui/table/rowmodes/Auto",
 	"sap/ui/table/utils/TableUtils",
+	"sap/ui/table/TableRenderer",
 	"sap/ui/table/library",
 	"sap/m/TextArea",
 	"sap/ui/Device",
@@ -27,6 +28,7 @@ sap.ui.define([
 	FixedRowMode,
 	AutoRowMode,
 	TableUtils,
+	TableRenderer,
 	library,
 	TextArea,
 	Device,
@@ -175,6 +177,37 @@ sap.ui.define([
 		await oTable.qunit.rendered();
 		oVSb = oScrollExtension.getVerticalScrollbar();
 		assert.ok(oVSb.offsetWidth === 0 && oVSb.offsetHeight === 0, "Table content fits height -> Vertical scrollbar is not visible");
+	});
+
+	/** @deprecated As of version 1.120.0 */
+	QUnit.test("Vertical scrollbar visibility with renderer API version 1", function(assert) {
+		// BCP: 1970484410
+		const oTable = this.oTable;
+		const oScrollExtension = oTable._getScrollExtension();
+		let oVSb = oScrollExtension.getVerticalScrollbar();
+		const iOriginalApiVersion = TableRenderer.apiVersion;
+
+		oTable.getRowMode().setRowCount(6);
+
+		return oTable.qunit.rendered().then(function() {
+			TableRenderer.apiVersion = 1;
+			oTable.setModel(TableQUnitUtils.createJSONModelWithEmptyRows(7), "other");
+			oTable.bindRows({
+				path: "/",
+				model: "other"
+			});
+			oTable.invalidate();
+		}).then(oTable.qunit.rendered).then(function() {
+			oVSb = oScrollExtension.getVerticalScrollbar();
+
+			assert.notEqual(oVSb, null, "Table is re-rendered without being invalidated -> Vertical scrollbar exists");
+
+			if (oVSb) {
+				assert.ok(oVSb.offsetWidth > 0 && oVSb.offsetHeight > 0, "Table content does not fit height -> Vertical scrollbar is visible");
+			}
+		}).finally(function() {
+			TableRenderer.apiVersion = iOriginalApiVersion;
+		});
 	});
 
 	QUnit.test("Vertical scrollbar position", async function(assert) {
@@ -2965,6 +2998,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Handling of mouse wheel events that do not scroll", async function(assert) {
+
 		const oTable = this.createTable({
 			title: "test",
 			extension: [new HeightControl()],
@@ -2998,6 +3032,9 @@ sap.ui.define([
 			{name: "Extension container", element: oDomRef.querySelector(".sapUiTableExt")},
 			{name: "Footer container", element: oDomRef.querySelector(".sapUiTableFtr")}
 		];
+
+		/** @deprecated As of version 1.72 */
+		aTestConfigs.push({name: "Title container", element: oDomRef.querySelector(".sapUiTableHdr")});
 
 		for (const mConfig of aTestConfigs) {
 			await test(mConfig);
@@ -3371,6 +3408,39 @@ sap.ui.define([
 				firstVisibleRow: 90,
 				scrollTop: 90 * oTable._getBaseRowHeight()
 			});
+		} finally {
+			Device.support.pointer = bOriginalPointerSupport;
+			Device.support.touch = bOriginalTouchSupport;
+		}
+	});
+
+	/** @deprecated As of version 1.72 */
+	QUnit.test("Handling of touch events that do not scroll - on the title", async function(assert) {
+		const bOriginalPointerSupport = Device.support.pointer;
+		const bOriginalTouchSupport = Device.support.touch;
+
+		Device.support.pointer = false;
+		Device.support.touch = true;
+
+		const oTable = this.createTable({
+			title: "test"
+		});
+
+		oTable.qunit.preventFocusOnTouch();
+
+		try {
+			await oTable.qunit.rendered();
+
+			const oTitleContainer = oTable.getDomRef().querySelector(".sapUiTableHdr");
+
+			TableQUnitUtils.startTouchScrolling(oTitleContainer);
+			const oTouchMoveEvent = TableQUnitUtils.doTouchScrolling(0, 50);
+			const oStopPropagationSpy = sinon.spy(oTouchMoveEvent, "stopPropagation");
+
+			await TableQUnitUtils.sleep(100);
+			this.assertPosition(assert, 0, 0, 0, "Touch - Title container: Not scrolled");
+			assert.ok(!oTouchMoveEvent.defaultPrevented, "Touch - Title container: Default action was not prevented");
+			assert.ok(oStopPropagationSpy.notCalled, "Touch - Title container: Propagation was not stopped");
 		} finally {
 			Device.support.pointer = bOriginalPointerSupport;
 			Device.support.touch = bOriginalTouchSupport;
