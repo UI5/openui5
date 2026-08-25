@@ -12,9 +12,16 @@
 	margin: 0.8125rem 0;
 }
 
-html.sap-phone .sapMRI:focus,
-html.sap-tablet .sapMRI:focus {
+/* Reset focus outline by default */
+.sapMRI:focus,
+.sapMRI:focus-visible {
 	outline: none;
+}
+
+html.sap-desktop .sapMRI:focus:not(.sapMRIDisabled):not(.sapMRIDisplayOnly),
+.sapMRI:focus-visible:not(.sapMRIDisabled):not(.sapMRIDisplayOnly) {
+	outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
+	outline-offset: 0.0625rem;
 }
 
 .sapMRISelector {
