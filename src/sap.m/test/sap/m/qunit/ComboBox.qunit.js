@@ -2766,6 +2766,73 @@ sap.ui.define([
 		document.documentElement.style.overflow = ""; // restore scrollbar after test
 	});
 
+	QUnit.test("tapping the field should open the dialog on phone", function (assert) {
+		// arrange
+		this.stub(Device, "system", {
+			desktop: false,
+			phone: true,
+			tablet: false
+		});
+
+		var oComboBox = new ComboBox({
+			items: [
+				new Item({ key: "0", text: "item 0" }),
+				new Item({ key: "1", text: "item 1" })
+			]
+		});
+
+		oComboBox.placeAt("content");
+		sap.ui.getCore().applyChanges();
+
+		assert.strictEqual(oComboBox.getPickerType(), "Dialog", "The picker type is Dialog on phone");
+		assert.notOk(oComboBox.isOpen(), "The picker is initially closed");
+
+		var oOpenSpy = this.spy(oComboBox, "open");
+
+		// act - tap on the field
+		qutils.triggerEvent("tap", oComboBox.getDomRef());
+		this.clock.tick(1000);
+
+		// assert
+		assert.ok(oOpenSpy.calledOnce, "open() is called when tapping the field on phone");
+		assert.ok(oComboBox.isOpen(), "The dialog is open after tapping the field on phone");
+
+		// cleanup
+		oComboBox.destroy();
+	});
+
+	QUnit.test("tapping a non-editable field should not open the dialog on phone", function (assert) {
+		// arrange
+		this.stub(Device, "system", {
+			desktop: false,
+			phone: true,
+			tablet: false
+		});
+
+		var oComboBox = new ComboBox({
+			editable: false,
+			items: [
+				new Item({ key: "0", text: "item 0" })
+			]
+		});
+
+		oComboBox.placeAt("content");
+		sap.ui.getCore().applyChanges();
+
+		var oOpenSpy = this.spy(oComboBox, "open");
+
+		// act
+		qutils.triggerEvent("tap", oComboBox.getDomRef());
+		this.clock.tick(1000);
+
+		// assert
+		assert.notOk(oOpenSpy.called, "open() is not called for a non-editable field");
+		assert.notOk(oComboBox.isOpen(), "The dialog does not open for a non-editable field");
+
+		// cleanup
+		oComboBox.destroy();
+	});
+
 	QUnit.test("open() check whether the active state persist after re-rendering", function (assert) {
 
 		// system under test
