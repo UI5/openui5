@@ -1294,11 +1294,35 @@ sap.ui.define([
 		* @param {jQuery.Event} oEvent The event object.
 		*/
 		ComboBox.prototype.ontap = function(oEvent) {
-			if (!this.getEnabled()) {
+			// in case of a non-editable or disabled combo box, the picker popup cannot be opened
+			if (!this.getEnabled() || !this.getEditable()) {
 				return;
 			}
 
+			// if the picker is a dialog (phone), tapping the field opens the dialog
+			if (this.isPickerDialog() && this.getOpenArea().contains(oEvent.target)) {
+				this.open();
+			}
+
 			this.updateFocusOnClose();
+		};
+
+		/**
+		 * Gets the trigger element of the control's picker popup.
+		 *
+		 * When the picker is a dialog (on phone), the whole control acts as the trigger area,
+		 * so that tapping anywhere on the field opens the dialog. Otherwise, the arrow icon
+		 * is used as the trigger element.
+		 *
+		 * @returns {HTMLElement | null} The element that is used as trigger to open the control's picker popup.
+		 * @private
+		 */
+		ComboBox.prototype.getOpenArea = function() {
+			if (this.isPickerDialog()) {
+				return this.getDomRef();
+			}
+
+			return ComboBoxBase.prototype.getOpenArea.apply(this, arguments);
 		};
 
 
