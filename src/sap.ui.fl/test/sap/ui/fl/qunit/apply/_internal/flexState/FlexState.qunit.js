@@ -726,6 +726,72 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("FlexState with comp variants in different layers", {
+		beforeEach() {
+			FlexInfoSession.removeByReference(sReference);
+			this.oLoadFlexDataStub = mockLoader({
+				changes: {
+					compVariants: [
+						{
+							fileName: "compVariantCustomer",
+							fileType: "variant",
+							reference: sReference,
+							persistencyKey: "persistencyKey",
+							layer: Layer.CUSTOMER
+						},
+						{
+							fileName: "compVariantUser",
+							fileType: "variant",
+							reference: sReference,
+							persistencyKey: "persistencyKey",
+							layer: Layer.USER
+						}
+					]
+				}
+			});
+		},
+		afterEach() {
+			FlexInfoSession.removeByReference(sReference);
+			FlexState.clearState();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when initialize is called without max layer set", async function(assert) {
+			const oDataSelector = FlexState.getFlexObjectsDataSelector();
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId
+			});
+			assert.strictEqual(
+				oDataSelector.get({ reference: sReference }).length, 2,
+				"without max layer, no comp variants were filtered"
+			);
+		});
+
+		QUnit.test("when initialize is called with and without max layer set", async function(assert) {
+			const oDataSelector = FlexState.getFlexObjectsDataSelector();
+			FlexInfoSession.setByReference({ maxLayer: Layer.CUSTOMER }, sReference);
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId
+			});
+			assert.strictEqual(
+				oDataSelector.get({ reference: sReference }).length, 1,
+				"adding a max layer, the USER comp variant was filtered"
+			);
+
+			FlexInfoSession.setByReference({}, sReference);
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId
+			});
+			assert.strictEqual(
+				oDataSelector.get({ reference: sReference }).length, 2,
+				"removing max layer, all comp variants are available again"
+			);
+		});
+	});
+
 	QUnit.module("FlexState with Storage stubs", {
 		beforeEach() {
 			this.oAppComponent = new UIComponent(sComponentId);
