@@ -39,7 +39,7 @@ sap.ui.define([
 			const oComboBox = this.getView().byId("idComboBoxSuccess");
 			const oTable = this.getView().byId("idProductsTable");
 			const sMode = oComboBox.getSelectedKey();
-			oTable.setMultiSelectionMode(sMode);
+			oTable.setMultiSelectMode(sMode);
 		},
 
 		onRowSelectionChange: function() {
