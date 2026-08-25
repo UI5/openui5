@@ -407,6 +407,7 @@ sap.ui.define([
 					oVersion.isPublished = true;
 				}
 			});
+			oModel.updateBindings(true);
 		});
 	};
 
