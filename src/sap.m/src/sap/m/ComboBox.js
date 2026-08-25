@@ -1717,6 +1717,11 @@ sap.ui.define([
 
 			this.addStyleClass("sapMFocus");
 
+			// if the picker is a dialog (phone), tapping the field opens the dialog
+			if (this.isPickerDialog() && this.getOpenArea().contains(oEvent.target) && this.getEnabled() && this.getEditable()) {
+				this.open();
+			}
+
 			if (this.getFormattedTextFocused()) {
 				this.setFormattedTextFocused(false);
 			} else if ((this.getOpen() && this._getList().hasStyleClass("sapMListFocus")) || this._oLastFocusedListItem) {
@@ -1725,6 +1730,24 @@ sap.ui.define([
 				this._oLastFocusedListItem = null;
 				oDomRef.removeAttribute(sActivedescendant);
 			}
+		};
+
+		/**
+		 * Gets the trigger element of the control's picker popup.
+		 *
+		 * When the picker is a dialog (on phone), the whole control acts as the trigger area,
+		 * so that tapping anywhere on the field opens the dialog. Otherwise, the arrow icon
+		 * is used as the trigger element.
+		 *
+		 * @returns {HTMLElement | null} The element that is used as trigger to open the control's picker popup.
+		 * @private
+		 */
+		ComboBox.prototype.getOpenArea = function() {
+			if (this.isPickerDialog()) {
+				return this.getDomRef();
+			}
+
+			return ComboBoxBase.prototype.getOpenArea.apply(this, arguments);
 		};
 
 		/**
