@@ -253,7 +253,7 @@ sap.ui.define([
 	 * Loads variant-related data from connectors.
 	 *
 	 * @param {object} mPropertyBag - Object with the necessary properties
-	 * @param {string} sMethodName - Name of the connector method to call (loadFlVariant, loadAllFlVariants, loadFlVariantDependentControlChanges, loadAllCompVariants)
+	 * @param {string} sMethodName - Name of the connector method to call (loadFlVariant, loadAllFlVariants, loadAllCompVariants)
 	 * @returns {Promise<object>} Resolves with merged variant data
 	 */
 	async function loadVariantDataFromConnectors(mPropertyBag, sMethodName) {
@@ -281,6 +281,7 @@ sap.ui.define([
 
 	/**
 	 * Loads a single FL variant with its related changes.
+	 * Used both for explicit variant loading and lazy loading of stripped variant content.
 	 *
 	 * @param {object} mPropertyBag - Object with the necessary properties
 	 * @param {string} mPropertyBag.reference - Flexibility reference
@@ -302,19 +303,6 @@ sap.ui.define([
 	 */
 	Storage.loadAllFlVariants = function(mPropertyBag) {
 		return loadVariantDataFromConnectors(mPropertyBag, "loadAllFlVariants");
-	};
-
-	/**
-	 * Loads the UI changes (variantDependentControlChanges) for a given FL variant.
-	 * Used for lazy loading when switching to a variant that has variantDependentControlChangesRemoved: true.
-	 *
-	 * @param {object} mPropertyBag - Object with the necessary properties
-	 * @param {string} mPropertyBag.reference - Flexibility reference
-	 * @param {string} mPropertyBag.variantId - Variant ID to load content for
-	 * @returns {Promise<object>} Resolves with variants (including referenced), variantChanges, and variantDependentControlChanges
-	 */
-	Storage.loadFlVariantDependentControlChanges = function(mPropertyBag) {
-		return loadVariantDataFromConnectors(mPropertyBag, "loadFlVariantDependentControlChanges");
 	};
 
 	/**
