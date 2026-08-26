@@ -110,42 +110,28 @@ sap.ui.define([
 		oTable.destroy();
 	});
 
-	QUnit.test("#handleKeyboardShortcut - Event Marking", async function(assert) {
+	QUnit.test("#handleKeyboardShortcut", async function(assert) {
 		const oTable = TableQUnitUtils.createTable();
-		const sEventMarker = "sapUiTableClearAll";
-		const oEvent = {
-			setMarked: function() {}
-		};
 		const oSelectionPlugin = oTable._getSelectionPlugin();
 		const oClearSelectionSpy = sinon.spy(oSelectionPlugin, "clearSelection");
 		const oSelectAllSpy = sinon.spy(oSelectionPlugin, "selectAll");
-		const oSetMarkedSpy = sinon.spy(oEvent, "setMarked");
 
 		await oTable.qunit.rendered();
-		oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
+		oSelectionPlugin.handleKeyboardShortcut("toggle");
 		assert.ok(oSelectAllSpy.calledOnce, "select all called");
-		assert.ok(oSetMarkedSpy.notCalled, `Event has not been marked with ${sEventMarker}`);
 
-		oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
+		oSelectionPlugin.handleKeyboardShortcut("toggle");
 		assert.ok(oClearSelectionSpy.calledOnce, "clear all called");
-		assert.ok(oSetMarkedSpy.calledOnceWithExactly(sEventMarker), `Event has been marked with ${sEventMarker}`);
 
-		oSelectionPlugin.handleKeyboardShortcut("clear", oEvent);
+		oSelectionPlugin.handleKeyboardShortcut("clear");
 		assert.ok(oClearSelectionSpy.calledTwice, "Selection is cleared");
-		assert.ok(oSetMarkedSpy.calledTwice, `Event marked twice`);
-		assert.ok(oSetMarkedSpy.calledWithExactly(sEventMarker), `Event has been marked with ${sEventMarker}`);
 
-		oSetMarkedSpy.reset();
+		oSelectionPlugin.handleKeyboardShortcut("toggle");
+		assert.equal(oSelectAllSpy.callCount, 2, "select all called");
 
-		oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
-		assert.ok(oSelectAllSpy.callCount, 2, "select all called");
-		assert.ok(oSetMarkedSpy.notCalled, "Event has not been marked");
-
-		oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
+		oSelectionPlugin.handleKeyboardShortcut("toggle");
 		assert.ok(oClearSelectionSpy.calledThrice, "clear all called");
-		assert.ok(oSetMarkedSpy.calledOnceWithExactly(sEventMarker), `Event has been marked with ${sEventMarker}`);
 
-		oSetMarkedSpy.reset();
 		oClearSelectionSpy.reset();
 		oSelectAllSpy.reset();
 
