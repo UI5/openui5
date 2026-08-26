@@ -587,6 +587,25 @@ sap.ui.define([
 		assert.strictEqual(oPopup2, oPopup1, "same popup reused");
 	});
 
+	QUnit.test("Popup has close-on-scroll followOf configured", function(assert) {
+		// Act
+		const oPopup = this.oTooltip._ensurePopup();
+
+		// Assert — getFollowOf() returns a function when CLOSE_ON_SCROLL is active
+		assert.strictEqual(typeof oPopup.getFollowOf(), "function",
+			"getFollowOf() returns a function (CLOSE_ON_SCROLL handler)");
+	});
+
+	QUnit.test("Popup has autoClose enabled", function(assert) {
+		// Act
+		const oPopup = this.oTooltip._ensurePopup();
+
+		// Assert — autoClose is enabled on all devices (matches the former
+		// Popover-based tooltip); its outside-tap handler is touch-gated inside Popup.
+		assert.strictEqual(oPopup.getAutoClose(), true,
+			"getAutoClose() is true");
+	});
+
 	QUnit.test("afterClose clears the open flag and fires afterClose", function(assert) {
 		assert.expect(1);
 		// Use a fake Popup so close(0) synchronously drives the closed lifecycle.
@@ -624,7 +643,7 @@ sap.ui.define([
 		});
 		oTooltip.openBy(oAnchor);
 		await nextUIUpdate(oClock);
-		await oClock.tickAsync(1000);
+		await oClock.tickAsync(0);
 		return pAfterOpen;
 	}
 
@@ -750,6 +769,19 @@ sap.ui.define([
 			// Drain any reposition/followOf timers a real open left behind.
 			await this.clock.tickAsync(2000);
 		}
+	});
+
+	QUnit.test("focus stays on the opener after the tooltip opens", async function(assert) {
+		this.oTooltip = new Tooltip({text: "Hi", placement: PlacementType.Bottom, delay: 0});
+		const oBtnDom = this.oButton.getDomRef();
+		oBtnDom.focus();
+		assert.strictEqual(document.activeElement, oBtnDom, "opener focused before open");
+
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
+
+		assert.ok(this.oTooltip.isOpen(), "tooltip open");
+		assert.strictEqual(document.activeElement, oBtnDom,
+			"focus stays on the opener; the tooltip never steals it");
 	});
 
 	QUnit.test("Left places the tooltip to the left of the opener", async function(assert) {
