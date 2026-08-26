@@ -1133,6 +1133,32 @@ sap.ui.define([
 		}
 	};
 
+	/**
+	 * Widens the base implementation so that the Ctrl+A / Ctrl+Shift+A shortcut is also available when the
+	 * focus is on a content cell or on the selection cell, including the select all checkbox and the clear
+	 * all icon. Column header cells stay excluded, as they are reserved for future column selection.
+	 *
+	 * Text-editable elements (input, textarea) are also excluded so that the browser's native Ctrl+A
+	 * text-selection behavior is preserved when focus is inside a text field, regardless of whether
+	 * the field is editable, read-only, or disabled.
+	 *
+	 * @param {HTMLElement} oTarget The keydown event target
+	 * @param {boolean} bItemEvent Whether the event target is a focused row
+	 * @returns {boolean} Whether the shortcut is allowed for the given target
+	 * @private
+	 */
+	Table.prototype._isSelectAllTarget = function(oTarget, bItemEvent) {
+		if (/^(input|textarea)$/i.test(oTarget.tagName)) {
+			return false;
+		}
+
+		if (ListBase.prototype._isSelectAllTarget.apply(this, arguments)) {
+			return true;
+		}
+
+		return Boolean(oTarget.closest(".sapMTblCellFocusable:not(.sapMListTblHeaderCell)"));
+	};
+
 	// Handle shift-tab key
 	Table.prototype.onsaptabprevious = function(oEvent) {
 		if (oEvent.target.id === this.getId("overlay")) {

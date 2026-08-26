@@ -2631,7 +2631,7 @@ function(
 		};
 
 		// Ctrl + (Shift) + A: select/deselect all
-		if (oEvent.code == "KeyA" && (oEvent.metaKey || oEvent.ctrlKey) && bItemEvent && this.getMode() == ListMode.MultiSelect) {
+		if (oEvent.code == "KeyA" && (oEvent.metaKey || oEvent.ctrlKey) && this.getMode() == ListMode.MultiSelect && this._isSelectAllTarget(oEvent.target, bItemEvent)) {
 			var bClearAll = (this.getMultiSelectMode() == MultiSelectMode.ClearAll);
 			if (oEvent.shiftKey) {
 				if (bClearAll) {
@@ -2685,6 +2685,22 @@ function(
 			}
 			return preventDefault();
 		}
+	};
+
+	/**
+	 * Determines whether the target of a keydown event may trigger the Ctrl+A / Ctrl+Shift+A
+	 * select all or deselect all shortcut.
+	 *
+	 * The base implementation only accepts a focused list item. Subclasses that provide additional
+	 * focusable areas can override this method to widen the eligible targets.
+	 *
+	 * @param {HTMLElement} oTarget The keydown event target
+	 * @param {boolean} bItemEvent Whether the event target is a focused list item
+	 * @returns {boolean} Whether the shortcut is allowed for the given target
+	 * @private
+	 */
+	ListBase.prototype._isSelectAllTarget = function(oTarget, bItemEvent) {
+		return bItemEvent;
 	};
 
 	ListBase.prototype.onmousedown = function(oEvent) {

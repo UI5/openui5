@@ -149,10 +149,23 @@
 			</description>
 		</interaction>
 		<interaction>
+			<kbd>Ctrl + A</kbd>
+			<description>
+				<p><span class="emphasis">If multiple row selection is enabled:</span></p>
+				<p>If the focus is on a row, a cell, or a control inside a cell, the selection is toggled.
+					If not all rows were selected, all rows are now selected. If all rows were already selected,
+					the selection of all rows is removed.</p>
+				<p>The shortcut has no effect if the focus is on a column header cell or on a text input field, as
+					the browser handles the text selection in this case.</p>
+			</description>
+		</interaction>
+		<interaction>
 			<kbd>Ctrl + Shift + A</kbd>
 			<description>
-				<p><span class="emphasis">If cell selection is enabled:</span></p>
-				<p>If the focus is inside of the table, the selection for any rows and cells is removed.</p>
+				<p><span class="emphasis">If multiple row selection is enabled:</span></p>
+				<p>If the focus is on a row, a cell, or a control inside a cell, the selection of all rows is removed.</p>
+				<p>The shortcut has no effect if the focus is on a column header cell or on a text input field, as
+					the browser handles the text selection in this case.</p>
 			</description>
 		</interaction>
 		<interaction>

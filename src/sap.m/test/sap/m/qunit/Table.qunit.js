@@ -1152,6 +1152,93 @@ sap.ui.define([
 		sut.destroy();
 	});
 
+	QUnit.test("Ctrl+A / Ctrl+Shift+A select and deselect all rows regardless of the focused element", async function(assert) {
+		const oData = { items: [{ name: "A" }, { name: "B" }, { name: "C" }] };
+		const sut = new Table({ mode: "MultiSelect" });
+		sut.addColumn(new Column({ header: new Label({ text: "Name" }) }));
+		sut.addColumn(new Column({ header: new Label({ text: "Input" }) }));
+		sut.addColumn(new Column({ header: new Label({ text: "ReadOnly" }) }));
+		sut.setModel(new JSONModel(oData));
+		sut.bindAggregation("items", "/items", new ColumnListItem({
+			cells: [
+				new Label({ text: "{name}" }),
+				new Input(),
+				new Input({ editable: false })
+			]
+		}));
+		sut.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const getContentCell = () => sut.getItems()[0].getDomRef().querySelector(".sapMTblCellFocusable");
+		const triggerCtrlA = (oTarget, bShift) => {
+			oTarget.focus();
+			qutils.triggerEvent("keydown", oTarget, {code: "KeyA", ctrlKey: true, shiftKey: !!bShift});
+		};
+
+		// Ctrl+A from a content cell selects all rows, a second Ctrl+A deselects them again
+		triggerCtrlA(getContentCell());
+		assert.ok(sut.isAllSelectableSelected(), "content cell: all rows are selected");
+		triggerCtrlA(getContentCell());
+		assert.notOk(sut.getSelectedItems().length, "content cell: all rows are deselected on the second Ctrl+A");
+
+		// Ctrl+A from the selection cell toggles the selection and updates the select all checkbox
+		triggerCtrlA(sut.getDomRef("tblHeadModeCol"));
+		assert.ok(sut.isAllSelectableSelected(), "selection cell: all rows are selected");
+		assert.ok(sut._selectAllCheckBox.getSelected(), "selection cell: select all checkbox is selected");
+		sut.removeSelections(true);
+
+		// Ctrl+A from the select all checkbox selects all rows
+		triggerCtrlA(sut._selectAllCheckBox.getFocusDomRef());
+		assert.ok(sut.isAllSelectableSelected(), "select all checkbox: all rows are selected");
+		sut.removeSelections(true);
+
+		// Ctrl+A on a column header cell has no effect and does not prevent the default
+		const oColumnHeaderCell = sut.getColumns()[0].getDomRef();
+		oColumnHeaderCell.focus();
+		const oHeaderEvent = jQuery.Event("keydown", {code: "KeyA", ctrlKey: true});
+		jQuery(oColumnHeaderCell).trigger(oHeaderEvent);
+		assert.notOk(sut.getSelectedItems().length, "column header cell: no row is selected");
+		assert.notOk(oHeaderEvent.isDefaultPrevented(), "column header cell: the default is not prevented");
+
+		// Ctrl+A has no effect when the mode is not MultiSelect
+		sut.setMode("SingleSelectMaster");
+		await nextUIUpdate();
+		triggerCtrlA(getContentCell());
+		assert.notOk(sut.getSelectedItems().length, "SingleSelectMaster: Ctrl+A does not select");
+
+		// ClearAll mode: Ctrl+A is a no-op, Ctrl+Shift+A deselects all rows from a content cell
+		sut.setMode("MultiSelect");
+		sut.setMultiSelectMode("ClearAll");
+		await nextUIUpdate();
+		triggerCtrlA(getContentCell());
+		assert.notOk(sut.getSelectedItems().length, "ClearAll: Ctrl+A does not select");
+		sut.getItems().forEach((oItem) => oItem.setSelected(true));
+		triggerCtrlA(getContentCell(), true);
+		assert.notOk(sut.getSelectedItems().length, "ClearAll: Ctrl+Shift+A deselects all rows from a content cell");
+
+		// Ctrl+A on a focused editable Input must NOT select all rows and must NOT prevent the browser default
+		sut.setMode("MultiSelect");
+		sut.setMultiSelectMode("SelectAll");
+		await nextUIUpdate();
+		const oInputDom = sut.getItems()[0].getCells()[1].getFocusDomRef();
+		oInputDom.focus();
+		const oInputEvent = jQuery.Event("keydown", {code: "KeyA", ctrlKey: true});
+		jQuery(oInputDom).trigger(oInputEvent);
+		assert.notOk(sut.getSelectedItems().length, "editable Input: Ctrl+A does not select rows");
+		assert.notOk(oInputEvent.isDefaultPrevented(), "editable Input: browser default (text selection) is not prevented");
+
+		// Ctrl+A on a read-only Input inside a cell does NOT select all rows either —
+		// the browser's text-selection behavior applies even for read-only fields
+		const oReadOnlyInputDom = sut.getItems()[0].getCells()[2].getFocusDomRef();
+		oReadOnlyInputDom.focus();
+		const oReadOnlyEvent = jQuery.Event("keydown", {code: "KeyA", ctrlKey: true});
+		jQuery(oReadOnlyInputDom).trigger(oReadOnlyEvent);
+		assert.notOk(sut.getSelectedItems().length, "read-only Input: Ctrl+A does not select rows");
+		assert.notOk(oReadOnlyEvent.isDefaultPrevented(), "read-only Input: browser default is not prevented");
+
+		sut.destroy();
+	});
+
 	QUnit.test("Test for SingleSelectMaster - enter key should trigger selectionChange event", async function(assert) {
 		const sut = createSUT(true, true, "SingleSelectMaster");
 		const fnSelectionChangeSpy = sinon.spy();
