@@ -28,7 +28,8 @@ sap.ui.define([
 		 * @param {object} [oConfig] Configuration for the helper.
 		 * @param {function():string} [oConfig.textProvider] Callback that builds the visible tooltip text. Defaults to <code>oHost.getTooltip_AsString()</code>. It is called after a user interaction (hover/focus on desktop, touch on touch devices) to decide whether a tooltip should appear, unless the invisible tooltip is being rendered.
 		 * @param {function():string} [oConfig.invisibleTextProvider] Callback that builds the text written into the invisible ARIA anchor. Falls back to <code>textProvider</code> when omitted.
-		 * @param {function():HTMLElement} [oConfig.domRefProvider] Callback that returns the DOM element the gesture listeners should attach to. Defaults to <code>oHost.getFocusDomRef()</code>. Override this when neither the host's focus DOM nor the outer DOM ref is the correct attachment point — for example a wrapper element that owns the hover/focus area.
+		 * @param {function():HTMLElement} [oConfig.domRefProvider] Callback that returns the DOM element for hover events (mouseenter/mouseleave) and tooltip positioning. Defaults to <code>oHost.getFocusDomRef()</code>.
+		 * @param {function():HTMLElement} [oConfig.focusDomRefProvider] Callback that returns the DOM element for focus events (focusin/focusout). Defaults to <code>domRefProvider</code>. Override this when focus events should attach to a different element than hover events.
 		 * @param {string} [oConfig.invisibleTooltipIdSuffix="-invisibleTooltip"] Suffix for the invisible ARIA anchor's id. Set a distinct value when one host owns several <code>TooltipEnablement</code>s so each anchor id stays unique.
 		 * @param {boolean} [oConfig.enableForTouchDevices=true] Whether long-press should open the tooltip on touch devices. Use this to disable it for links.
 		 *
@@ -214,6 +215,7 @@ sap.ui.define([
 				this._fnTextProvider = oConfig.textProvider;
 				this._fnInvisibleTextProvider = oConfig.invisibleTextProvider;
 				this._fnDomRefProvider = oConfig.domRefProvider || (() => oHost.getFocusDomRef());
+				this._fnFocusDomRefProvider = oConfig.focusDomRefProvider || this._fnDomRefProvider;
 				this._sInvisibleTooltipIdSuffix = oConfig.invisibleTooltipIdSuffix || "-invisibleTooltip";
 
 				this._oTooltip = null;
@@ -221,6 +223,7 @@ sap.ui.define([
 				this._oEventTrigger = new TooltipEventTrigger({
 					host: oHost,
 					domRefProvider: this._fnDomRefProvider,
+					focusDomRefProvider: this._fnFocusDomRefProvider,
 					onOpen: (bWithDelay) => this._open(bWithDelay),
 					onClose: (bWithDelay) => this._close(bWithDelay),
 					isPendingOrOpen: this._isPendingOrOpen.bind(this),
@@ -461,7 +464,6 @@ sap.ui.define([
 
 			this._syncInnerTooltip();
 
-			// Open next to the gesture's target so each target anchors correctly; fall back to the host.
 			const oOpenBy = this._fnDomRefProvider() || this._oHost;
 
 			TooltipManager.openSingle(oTooltip, oOpenBy, bWithDelay);
