@@ -14,9 +14,16 @@ sap.ui.define([
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/fl/apply/_internal/changes/Utils",
+	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
+	"sap/ui/fl/apply/_internal/flexState/FlexState",
+	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
+	"sap/ui/fl/variants/VariantManagement",
+	"sap/ui/fl/variants/VariantModel",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
+	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/ui/rta/util/changeVisualization/ChangeCategories",
@@ -25,7 +32,8 @@ sap.ui.define([
 	"sap/ui/rta/util/changeVisualization/ChangeVisualization",
 	"sap/ui/rta/util/changeVisualization/ChangeVisualizationUtils",
 	"sap/ui/thirdparty/sinon-4",
-	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
+	"test-resources/sap/ui/rta/qunit/RtaQunitUtils",
+	"test-resources/sap/ui/fl/qunit/FlQUnitUtils"
 ], function(
 	merge,
 	Button,
@@ -40,9 +48,16 @@ sap.ui.define([
 	OverlayRegistry,
 	KeyCodes,
 	ChangesUtils,
+	FlexObjectFactory,
 	States,
+	VariantManagementState,
+	FlexState,
+	ControlVariantApplyAPI,
+	VariantManagement,
+	VariantModel,
 	ChangesWriteAPI,
 	PersistenceWriteAPI,
+	Layer,
 	FlUtils,
 	nextUIUpdate,
 	ChangeCategories,
@@ -51,13 +66,15 @@ sap.ui.define([
 	ChangeVisualization,
 	ChangeVisualizationUtils,
 	sinon,
-	RtaQunitUtils
+	RtaQunitUtils,
+	FlQUnitUtils
 ) {
 	"use strict";
 
 	const sandbox = sinon.createSandbox();
 	QUnit.config.fixture = null;
-	const oAppComponent = RtaQunitUtils.createAndStubAppComponent(sinon, "appComponent");
+	const sAppComponent = "appComponent";
+	const oAppComponent = RtaQunitUtils.createAndStubAppComponent(sinon, sAppComponent);
 
 	function createMockChange(sId, sCommandName, sSelectorId, oAdditionalProperties, sState) {
 		const oChange = RtaQunitUtils.createUIChange(merge({
@@ -749,6 +766,142 @@ sap.ui.define([
 					);
 				}.bind(this));
 			}.bind(this));
+		});
+	});
+
+	QUnit.module("variant switch", {
+		async beforeEach(assert) {
+			const fnDone = assert.async();
+			this.sVMReference = "vmReference";
+			await FlQUnitUtils.initializeFlexStateWithData(sandbox, sAppComponent, {}, sAppComponent);
+
+			this.oVariantChange = FlexObjectFactory.createUIChange({
+				id: "testChange1",
+				layer: Layer.CUSTOMER,
+				fileType: "change",
+				changeType: "rename",
+				variantReference: "customVariant",
+				selector: JsControlTreeModifier.getSelector("button1", oAppComponent),
+				support: { command: "rename" }
+			});
+			this.oVariantChange.markFinished();
+
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
+				// Standard variant: its id must equal the variant management reference.
+				FlexObjectFactory.createFlVariant({
+					id: this.sVMReference,
+					reference: sAppComponent,
+					layer: Layer.CUSTOMER,
+					variantManagementReference: this.sVMReference,
+					variantName: "Standard"
+				}),
+				FlexObjectFactory.createFlVariant({
+					id: "customVariant",
+					reference: sAppComponent,
+					layer: Layer.CUSTOMER,
+					variantReference: this.sVMReference,
+					variantManagementReference: this.sVMReference,
+					variantName: "Test01"
+				}),
+				this.oVariantChange
+			]);
+
+			sandbox.stub(ChangesWriteAPI, "getChangeHandler").resolves({
+				getChangeVisualizationInfo(oChange) {
+					return { affectedControls: [oChange.getSelector()] };
+				}
+			});
+
+			this.oVMControl = new VariantManagement(oAppComponent.createId(this.sVMReference));
+			this.oVariantModel = new VariantModel({}, {
+				appComponent: oAppComponent,
+				vmReference: this.sVMReference,
+				vmControl: this.oVMControl
+			});
+			this.oVMControl.setModel(this.oVariantModel, ControlVariantApplyAPI.getVariantModelName());
+
+			setupTest.call(this, fnDone);
+		},
+		afterEach() {
+			cleanupTest.call(this);
+			this.oVariantModel.destroy();
+			this.oVMControl.destroy();
+			VariantManagementState.getVariantManagementMap().clearCachedResult({ reference: sAppComponent });
+			VariantManagementState.resetCurrentVariantReference(sAppComponent, this.sVMReference);
+			FlexState.clearState();
+		}
+	}, function() {
+		QUnit.test("when switching to a variant with a change, the border of that change appears", async function(assert) {
+			await this.oChangeVisualization.initialize();
+			assert.strictEqual(
+				this.oChangeVisualization._sFlexReference,
+				sAppComponent,
+				"then the change visualization resolved the expected flex reference"
+			);
+			assert.notOk(
+				OverlayRegistry.getOverlay("button1").hasStyleClass("sapUiRtaOverlayWithChanges"),
+				"then button1 has no border while the standard variant is active"
+			);
+
+			const oRefreshSpy = sandbox.spy(this.oChangeVisualization, "refreshBorders");
+			await ControlVariantApplyAPI.activateVariant({
+				element: this.oVMControl,
+				variantReference: "customVariant"
+			});
+			await Promise.all(oRefreshSpy.returnValues);
+
+			assert.ok(oRefreshSpy.called, "then the variant switch triggered a border refresh");
+			assert.ok(
+				OverlayRegistry.getOverlay("button1").hasStyleClass("sapUiRtaOverlayWithChanges"),
+				"then button1 now has the border for the variant's change"
+			);
+		});
+
+		QUnit.test("when switching away to a variant without the change, the stale border is removed", async function(assert) {
+			await ControlVariantApplyAPI.activateVariant({
+				element: this.oVMControl,
+				variantReference: "customVariant"
+			});
+			await this.oChangeVisualization.initialize();
+			assert.ok(
+				OverlayRegistry.getOverlay("button1").hasStyleClass("sapUiRtaOverlayWithChanges"),
+				"then button1 has the border while the custom variant is active"
+			);
+
+			const oRefreshSpy = sandbox.spy(this.oChangeVisualization, "refreshBorders");
+			await ControlVariantApplyAPI.activateVariant({
+				element: this.oVMControl,
+				variantReference: this.sVMReference
+			});
+			await Promise.all(oRefreshSpy.returnValues);
+
+			assert.ok(oRefreshSpy.called, "then the variant switch triggered a border refresh");
+			assert.notOk(
+				OverlayRegistry.getOverlay("button1").hasStyleClass("sapUiRtaOverlayWithChanges"),
+				"then the stale border is removed after switching to the standard variant"
+			);
+			assert.strictEqual(
+				this.oChangeVisualization._oChangeIndicatorRegistry.getCatalogIds().length,
+				0,
+				"then the stale change is removed from the registry catalog"
+			);
+		});
+
+		QUnit.test("when the change visualization exits, the variant switch listener is removed", async function(assert) {
+			const oRemoveListenerSpy = sandbox.spy(
+				VariantManagementState.getVariantManagementMap(),
+				"removeUpdateListener"
+			);
+
+			await this.oChangeVisualization.initialize();
+			const fnListener = this.oChangeVisualization._fnVariantSwitchHandler;
+			assert.strictEqual(typeof fnListener, "function", "then a listener was registered on initialize");
+
+			this.oChangeVisualization.destroy();
+			assert.ok(
+				oRemoveListenerSpy.calledOnceWith(fnListener),
+				"then the same listener is removed exactly once on exit"
+			);
 		});
 	});
 
