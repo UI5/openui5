@@ -47,7 +47,7 @@ sap.ui.define([
 				 */
 				src: {type: "sap.ui.core.URI", group: "Appearance", defaultValue: null},
 				/**
-				 * Description of image. This text is used to provide ScreenReader information.
+				 * Description of image. This text is used to provide ScreenReader information when the control is interactive (has a press handler).
 				 */
 				description: {type: "string", group: "Accessibility", defaultValue: null}
 			},
@@ -72,29 +72,52 @@ sap.ui.define([
 	/* --- Lifecycle Handling --- */
 
 	ImageContent.prototype.onBeforeRendering = function () {
-		var oImage, sUri, sDescription;
+		var oImage, sUri, sDescription, bHasPressHandler, bImageRecreated;
 		oImage = this.getAggregation("_content");
 		sUri = this.getSrc();
 		sDescription = this.getDescription();
+		bHasPressHandler = this.hasListeners("press");
+		bImageRecreated = false;
 
-		if (!oImage || sUri !== oImage.getSrc() || sDescription !== oImage.getAlt()) {
+		if (!oImage || sUri !== oImage.getSrc()) {
 			if (oImage) {
 				oImage.destroy();
 				oImage = null;
 			}
 
+			// For interactive images, inner image is decorative (aria on outer control)
+			// For non-interactive images, inner image should have alt text
 			oImage = IconPool.createControlByURI({
 				id: this.getId() + "-icon-image",
 				src: sUri,
-				alt: sDescription,
-				decorative: true
+				alt: bHasPressHandler ? "" : (sDescription || ""),
+				decorative: bHasPressHandler,
+				useIconTooltip: false
 			}, Image);
 			this.setAggregation("_content", oImage, true);
 			this._setPointerOnImage();
+			bImageRecreated = true;
 		}
 
+		// Update inner image alt text when description or press handler changes
+		// (only if image was reused, not recreated above)
+		if (!bImageRecreated) {
+			if (bHasPressHandler) {
+				oImage.setAlt("");
+				oImage.setDecorative(true);
+			} else {
+				oImage.setAlt(sDescription || "");
+				oImage.setDecorative(false);
+			}
+		}
+
+		// Always set tooltip when description exists, regardless of press handlers
+		// This ensures tooltip is available on hover for all images
 		if (sDescription) {
 			this.setTooltip(sDescription.trim());
+		} else {
+			// Clear tooltip if description is removed
+			this.setTooltip(null);
 		}
 	};
 
@@ -119,7 +142,7 @@ sap.ui.define([
 	 */
 	ImageContent.prototype.ontap = function (oEvent) {
 		if (Device.browser.msie) {
-			this.$().trigger("focus");
+			this.getDomRef().focus();
 		}
 		this.firePress();
 	};
@@ -139,7 +162,25 @@ sap.ui.define([
 	ImageContent.prototype.attachEvent = function (eventId, data, functionToCall, listener) {
 		Control.prototype.attachEvent.call(this, eventId, data, functionToCall, listener);
 		if (this.hasListeners("press")) {
-			this.$().attr("tabindex", 0).addClass("sapMPointer");
+			var oDomRef = this.getDomRef();
+			var oInnerImage = this.getAggregation("_content");
+			var sDescription = this.getDescription();
+
+			if (oDomRef) {
+				oDomRef.setAttribute("tabindex", "0");
+				oDomRef.classList.add("sapMPointer");
+				// Add aria-label when becoming interactive
+				if (sDescription) {
+					oDomRef.setAttribute("aria-label", sDescription);
+				}
+			}
+
+			// Make inner image decorative when control becomes interactive
+			if (oInnerImage) {
+				oInnerImage.setAlt("");
+				oInnerImage.setDecorative(true);
+			}
+
 			this._setPointerOnImage();
 		}
 		return this;
@@ -148,9 +189,48 @@ sap.ui.define([
 	ImageContent.prototype.detachEvent = function (eventId, functionToCall, listener) {
 		Control.prototype.detachEvent.call(this, eventId, functionToCall, listener);
 		if (!this.hasListeners("press")) {
-			this.$().removeAttr("tabindex").removeClass("sapMPointer");
+			var oDomRef = this.getDomRef();
+			var oInnerImage = this.getAggregation("_content");
+			var sDescription = this.getDescription();
+
+			if (oDomRef) {
+				oDomRef.removeAttribute("tabindex");
+				oDomRef.classList.remove("sapMPointer");
+				// Remove aria-label when becoming non-interactive
+				oDomRef.removeAttribute("aria-label");
+			}
+
+			// Make inner image non-decorative with alt text when control becomes non-interactive
+			if (oInnerImage) {
+				oInnerImage.setAlt(sDescription || "");
+				oInnerImage.setDecorative(false);
+			}
+
 			this._setPointerOnImage();
 		}
+		return this;
+	};
+
+	/**
+	 * Overridden setter for description property to handle dynamic aria-label updates
+	 *
+	 * @param {string} sDescription The new description value
+	 * @returns {this} Reference to this for method chaining
+	 */
+	ImageContent.prototype.setDescription = function (sDescription) {
+		// Call parent setter
+		this.setProperty("description", sDescription);
+
+		// Update aria-label dynamically if control is already rendered and interactive
+		var oDomRef = this.getDomRef();
+		if (oDomRef && this.hasListeners("press")) {
+			if (sDescription) {
+				oDomRef.setAttribute("aria-label", sDescription);
+			} else {
+				oDomRef.removeAttribute("aria-label");
+			}
+		}
+
 		return this;
 	};
 
@@ -164,6 +244,13 @@ sap.ui.define([
 		if (oContent && oContent.getAlt() !== "") {
 			return oContent.getAlt();
 		} else {
+			// Since inner control is decorative, return the description property
+			// as it represents the semantic meaning of the image
+			const sDescription = this.getDescription();
+			if (sDescription) {
+				return sDescription;
+			}
+			// Fallback to inner control's accessibility info
 			const sText = oContent?.getAccessibilityInfo()?.description;
 			return sText || "";
 		}
