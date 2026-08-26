@@ -127,6 +127,7 @@ module.exports = [
 	"Title.spec.js",
 	"TitleInSimpleForm.spec.js",
 	"ToggleButtonStandaloneVisual.spec.js",
+	"ToggleButtonTooltip.spec.js",
 	"Token.spec.js",
 	"Tokenizer.spec.js",
 	"ViewSettingsDialog.spec.js",
