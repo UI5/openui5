@@ -761,7 +761,7 @@ sap.ui.define([
 ].forEach(function (aArguments) {
 	QUnit.test("_createDateInstance: " + aArguments.length + " argument(s)", function (assert) {
 		var oUI5Date,
-			oDateSpy = this.spy(window, "Date");
+			oDateSpy = this.spy(globalThis, "Date");
 
 		// code under test - no arguments
 		oUI5Date = UI5Date._createDateInstance(aArguments);
@@ -782,7 +782,7 @@ sap.ui.define([
 		var oUI5Date, oValueOfSpy,
 			oDate = new Date(), // no need to use UI5Date.getInstance
 			iValueOf = oDate.valueOf(),
-			oDateSpy = this.spy(window, "Date");
+			oDateSpy = this.spy(globalThis, "Date");
 
 		oValueOfSpy = this.spy(oDate, "valueOf");
 
