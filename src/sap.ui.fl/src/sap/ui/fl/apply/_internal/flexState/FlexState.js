@@ -92,7 +92,7 @@ sap.ui.define([
 			pathInResponse: ["changes"]
 		},
 		compVariants: {
-			pathInResponse: []
+			pathInResponse: ["compVariants"]
 		},
 		variants: {
 			initialPreparationFunctionName: "variants",

@@ -82,6 +82,18 @@ sap.ui.define([
 			property: "countries",
 			width: 20
 		}
+	},{
+		key: "countryList",
+		label: "Countries (Tokens)",
+		path: "countryList",
+		dataType: "sap.ui.model.type.String",
+		exportSettings: {
+			label: "Countries (Tokens)",
+			property: [ "countryList/name", "countryList/code" ],
+			template: "{0} ({1})",
+			separator: " - ",
+			width: 30
+		}
 	}];
 
 	return aPropertyInfos;

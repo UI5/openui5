@@ -63,6 +63,11 @@ sap.ui.define([
 ) {
 	"use strict";
 
+	function getSize(oDomRef) {
+		const { width, height } = oDomRef.getBoundingClientRect();
+		return { width, height };
+	}
+
 	// Styles on "qunit-fixture" influence the scrolling tests if positioned on the screen during test execution.
 	// Please keep this tag without any styling.
 	document.getElementById("qunit-fixture").removeAttribute("style");
@@ -696,23 +701,23 @@ sap.ui.define([
 			this.oDesignTime.attachEventOnce("synced", function() {
 				assert.deepEqual(Math.ceil(DOMUtil.getOffset(this.oLayoutOverlay.getDomRef()).top), Math.ceil(DOMUtil.getOffset(this.oVerticalLayout.getDomRef()).top), "top position of the Layout overlay is correct");
 				assert.deepEqual(Math.ceil(DOMUtil.getOffset(this.oLayoutOverlay.getDomRef()).left), Math.ceil(DOMUtil.getOffset(this.oVerticalLayout.getDomRef()).left), "left position of the Layout overlay is correct");
-				assert.deepEqual(Math.ceil(DOMUtil.getSize(this.oLayoutOverlay.getDomRef()).width), Math.ceil(DOMUtil.getSize(this.oVerticalLayout.getDomRef()).width), "width of the Layout overlay is correct");
-				assert.deepEqual(Math.ceil(DOMUtil.getSize(this.oLayoutOverlay.getDomRef()).height), Math.ceil(DOMUtil.getSize(this.oVerticalLayout.getDomRef()).height), "height of the Layout overlay is correct");
+				assert.deepEqual(Math.ceil(getSize(this.oLayoutOverlay.getDomRef()).width), Math.ceil(getSize(this.oVerticalLayout.getDomRef()).width), "width of the Layout overlay is correct");
+				assert.deepEqual(Math.ceil(getSize(this.oLayoutOverlay.getDomRef()).height), Math.ceil(getSize(this.oVerticalLayout.getDomRef()).height), "height of the Layout overlay is correct");
 
 				assert.deepEqual(Math.ceil(DOMUtil.getOffset(this.oLabelOverlay1.getDomRef()).top), Math.ceil(DOMUtil.getOffset(this.oLabel1.getDomRef()).top), "top position of the Label1 overlay is correct");
 				assert.deepEqual(Math.ceil(DOMUtil.getOffset(this.oLabelOverlay1.getDomRef()).left), Math.ceil(DOMUtil.getOffset(this.oLabel1.getDomRef()).left), "left position of the Label1 overlay is correct");
-				assert.deepEqual(Math.ceil(DOMUtil.getSize(this.oLabelOverlay1.getDomRef()).width), Math.ceil(DOMUtil.getSize(this.oLabel1.getDomRef()).width), "width of the Label1 overlay is correct");
-				assert.deepEqual(Math.ceil(DOMUtil.getSize(this.oLabelOverlay1.getDomRef()).height), Math.ceil(DOMUtil.getSize(this.oLabel1.getDomRef()).height), "height of the Label1 overlay is correct");
+				assert.deepEqual(Math.ceil(getSize(this.oLabelOverlay1.getDomRef()).width), Math.ceil(getSize(this.oLabel1.getDomRef()).width), "width of the Label1 overlay is correct");
+				assert.deepEqual(Math.ceil(getSize(this.oLabelOverlay1.getDomRef()).height), Math.ceil(getSize(this.oLabel1.getDomRef()).height), "height of the Label1 overlay is correct");
 
 				assert.deepEqual(Math.ceil(DOMUtil.getOffset(this.oInnerLayoutOverlay.getDomRef()).top), Math.ceil(DOMUtil.getOffset(this.oInnerLayout.getDomRef()).top), "top position of the InnerLayout overlay is correct");
 				assert.deepEqual(Math.ceil(DOMUtil.getOffset(this.oInnerLayoutOverlay.getDomRef()).left), Math.ceil(DOMUtil.getOffset(this.oInnerLayout.getDomRef()).left), "left position of the InnerLayout overlay is correct");
-				assert.deepEqual(Math.ceil(DOMUtil.getSize(this.oInnerLayoutOverlay.getDomRef()).width), Math.ceil(DOMUtil.getSize(this.oInnerLayout.getDomRef()).width), "width of the InnerLayout overlay is correct");
-				assert.deepEqual(Math.ceil(DOMUtil.getSize(this.oInnerLayoutOverlay.getDomRef()).height), Math.ceil(DOMUtil.getSize(this.oInnerLayout.getDomRef()).height), "height of the InnerLayout overlay is correct");
+				assert.deepEqual(Math.ceil(getSize(this.oInnerLayoutOverlay.getDomRef()).width), Math.ceil(getSize(this.oInnerLayout.getDomRef()).width), "width of the InnerLayout overlay is correct");
+				assert.deepEqual(Math.ceil(getSize(this.oInnerLayoutOverlay.getDomRef()).height), Math.ceil(getSize(this.oInnerLayout.getDomRef()).height), "height of the InnerLayout overlay is correct");
 
 				assert.deepEqual(Math.ceil(DOMUtil.getOffset(this.oLabelOverlay2.getDomRef()).top), Math.ceil(DOMUtil.getOffset(this.oLabel2.getDomRef()).top), "top position of the Label2 overlay is correct");
 				assert.deepEqual(Math.ceil(DOMUtil.getOffset(this.oLabelOverlay2.getDomRef()).left), Math.ceil(DOMUtil.getOffset(this.oLabel2.getDomRef()).left), "left position of the Label2 overlay is correct");
-				assert.deepEqual(Math.ceil(DOMUtil.getSize(this.oLabelOverlay2.getDomRef()).width), Math.ceil(DOMUtil.getSize(this.oLabel2.getDomRef()).width), "width of the Label2 overlay is correct");
-				assert.deepEqual(Math.ceil(DOMUtil.getSize(this.oLabelOverlay2.getDomRef()).height), Math.ceil(DOMUtil.getSize(this.oLabel2.getDomRef()).height), "height of the Label2 overlay is correct");
+				assert.deepEqual(Math.ceil(getSize(this.oLabelOverlay2.getDomRef()).width), Math.ceil(getSize(this.oLabel2.getDomRef()).width), "width of the Label2 overlay is correct");
+				assert.deepEqual(Math.ceil(getSize(this.oLabelOverlay2.getDomRef()).height), Math.ceil(getSize(this.oLabel2.getDomRef()).height), "height of the Label2 overlay is correct");
 
 				fnDone();
 			}, this);
@@ -727,23 +732,23 @@ sap.ui.define([
 			this.oDesignTime.attachEventOnce("synced", function() {
 				assert.deepEqual(Math.ceil(DOMUtil.getOffset(this.oLayoutOverlay.getDomRef()).top), Math.ceil(DOMUtil.getOffset(this.oVerticalLayout.getDomRef()).top), "top position of the Layout overlay is correct");
 				assert.deepEqual(Math.ceil(DOMUtil.getOffset(this.oLayoutOverlay.getDomRef()).left), Math.ceil(DOMUtil.getOffset(this.oVerticalLayout.getDomRef()).left), "left position of the Layout overlay is correct");
-				assert.deepEqual(Math.ceil(DOMUtil.getSize(this.oLayoutOverlay.getDomRef()).width), Math.ceil(DOMUtil.getSize(this.oVerticalLayout.getDomRef()).width), "width of the Layout overlay is correct");
-				assert.deepEqual(Math.ceil(DOMUtil.getSize(this.oLayoutOverlay.getDomRef()).height), Math.ceil(DOMUtil.getSize(this.oVerticalLayout.getDomRef()).height), "height of the Layout overlay is correct");
+				assert.deepEqual(Math.ceil(getSize(this.oLayoutOverlay.getDomRef()).width), Math.ceil(getSize(this.oVerticalLayout.getDomRef()).width), "width of the Layout overlay is correct");
+				assert.deepEqual(Math.ceil(getSize(this.oLayoutOverlay.getDomRef()).height), Math.ceil(getSize(this.oVerticalLayout.getDomRef()).height), "height of the Layout overlay is correct");
 
 				assert.deepEqual(Math.ceil(DOMUtil.getOffset(this.oLabelOverlay1.getDomRef()).top), Math.ceil(DOMUtil.getOffset(this.oLabel1.getDomRef()).top), "top position of the Label1 overlay is correct");
 				assert.deepEqual(Math.ceil(DOMUtil.getOffset(this.oLabelOverlay1.getDomRef()).left), Math.ceil(DOMUtil.getOffset(this.oLabel1.getDomRef()).left), "left position of the Label1 overlay is correct");
-				assert.deepEqual(Math.ceil(DOMUtil.getSize(this.oLabelOverlay1.getDomRef()).width), Math.ceil(DOMUtil.getSize(this.oLabel1.getDomRef()).width), "width of the Label1 overlay is correct");
-				assert.deepEqual(Math.ceil(DOMUtil.getSize(this.oLabelOverlay1.getDomRef()).height), Math.ceil(DOMUtil.getSize(this.oLabel1.getDomRef()).height), "height of the Label1 overlay is correct");
+				assert.deepEqual(Math.ceil(getSize(this.oLabelOverlay1.getDomRef()).width), Math.ceil(getSize(this.oLabel1.getDomRef()).width), "width of the Label1 overlay is correct");
+				assert.deepEqual(Math.ceil(getSize(this.oLabelOverlay1.getDomRef()).height), Math.ceil(getSize(this.oLabel1.getDomRef()).height), "height of the Label1 overlay is correct");
 
 				assert.deepEqual(Math.ceil(DOMUtil.getOffset(this.oInnerLayoutOverlay.getDomRef()).top), Math.ceil(DOMUtil.getOffset(this.oInnerLayout.getDomRef()).top), "top position of the InnerLayout overlay is correct");
 				assert.deepEqual(Math.ceil(DOMUtil.getOffset(this.oInnerLayoutOverlay.getDomRef()).left), Math.ceil(DOMUtil.getOffset(this.oInnerLayout.getDomRef()).left), "left position of the InnerLayout overlay is correct");
-				assert.deepEqual(Math.ceil(DOMUtil.getSize(this.oInnerLayoutOverlay.getDomRef()).width), Math.ceil(DOMUtil.getSize(this.oInnerLayout.getDomRef()).width), "width of the InnerLayout overlay is correct");
-				assert.deepEqual(Math.ceil(DOMUtil.getSize(this.oInnerLayoutOverlay.getDomRef()).height), Math.ceil(DOMUtil.getSize(this.oInnerLayout.getDomRef()).height), "height of the InnerLayout overlay is correct");
+				assert.deepEqual(Math.ceil(getSize(this.oInnerLayoutOverlay.getDomRef()).width), Math.ceil(getSize(this.oInnerLayout.getDomRef()).width), "width of the InnerLayout overlay is correct");
+				assert.deepEqual(Math.ceil(getSize(this.oInnerLayoutOverlay.getDomRef()).height), Math.ceil(getSize(this.oInnerLayout.getDomRef()).height), "height of the InnerLayout overlay is correct");
 
 				assert.deepEqual(Math.ceil(DOMUtil.getOffset(this.oLabelOverlay2.getDomRef()).top), Math.ceil(DOMUtil.getOffset(this.oLabel2.getDomRef()).top), "top position of the Label2 overlay is correct");
 				assert.deepEqual(Math.ceil(DOMUtil.getOffset(this.oLabelOverlay2.getDomRef()).left), Math.ceil(DOMUtil.getOffset(this.oLabel2.getDomRef()).left), "left position of the Label2 overlay is correct");
-				assert.deepEqual(Math.ceil(DOMUtil.getSize(this.oLabelOverlay2.getDomRef()).width), Math.ceil(DOMUtil.getSize(this.oLabel2.getDomRef()).width), "width of the Label2 overlay is correct");
-				assert.deepEqual(Math.ceil(DOMUtil.getSize(this.oLabelOverlay2.getDomRef()).height), Math.ceil(DOMUtil.getSize(this.oLabel2.getDomRef()).height), "height of the Label2 overlay is correct");
+				assert.deepEqual(Math.ceil(getSize(this.oLabelOverlay2.getDomRef()).width), Math.ceil(getSize(this.oLabel2.getDomRef()).width), "width of the Label2 overlay is correct");
+				assert.deepEqual(Math.ceil(getSize(this.oLabelOverlay2.getDomRef()).height), Math.ceil(getSize(this.oLabel2.getDomRef()).height), "height of the Label2 overlay is correct");
 
 				fnDone();
 			}, this);

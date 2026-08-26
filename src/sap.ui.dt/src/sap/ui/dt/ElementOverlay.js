@@ -419,10 +419,12 @@ sap.ui.define([
 	 * @private
 	 */
 	ElementOverlay.prototype._sortChildren = function(oContainer) {
-		// compares two DOM Nodes and returns 1, if first child should be bellow in dom order
-		function compareChildren(oChild1, oChild2) {
-			var oGeometry1 = DOMUtil.getGeometry(oChild1);
-			var oGeometry2 = DOMUtil.getGeometry(oChild2);
+		// compares two DOM Nodes and returns 1, if first child should be bellow in dom order.
+		// Geometry is precomputed once per child into mChildrenGeometry (see below) and passed in,
+		// so the comparator reads from the map instead of forcing a reflow on every comparison.
+		function compareChildren(mChildrenGeometry, oChild1, oChild2) {
+			const oGeometry1 = mChildrenGeometry.get(oChild1);
+			const oGeometry2 = mChildrenGeometry.get(oChild2);
 			var oPosition1 = oGeometry1 && oGeometry1.position;
 			var oPosition2 = oGeometry2 && oGeometry2.position;
 
@@ -489,7 +491,12 @@ sap.ui.define([
 		// on the screen with following sorting. That said, sorting happens for intermediate state and then for real
 		// state of the elements in viewport once again. Thus, excluding these elements allow us to avoid 2 extra sortings.
 		var aChildren = Array.from(oContainer.querySelectorAll(":scope >:not(.sapUiDtDummyScrollContainer)"));
-		var aSorted = aChildren.slice().sort(compareChildren);
+		// Batch all geometry reads up front (one per child) before any comparison, so the sort
+		// does not interleave reads with the writes that just positioned these nodes.
+		const mChildrenGeometry = new Map(aChildren.map(function(oChild) {
+			return [oChild, DOMUtil.getGeometry(oChild)];
+		}));
+		const aSorted = aChildren.slice().sort(compareChildren.bind(null, mChildrenGeometry));
 
 		var bOrderChanged = aChildren.some(function(oChild, iIndex) {
 			return oChild !== aSorted[iIndex];

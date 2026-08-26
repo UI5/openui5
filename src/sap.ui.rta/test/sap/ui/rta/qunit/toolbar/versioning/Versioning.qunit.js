@@ -64,7 +64,8 @@ sap.ui.define([
 			versions: aVersions,
 			draftAvailable: true,
 			displayedVersion: Version.Number.Draft,
-			publishVersionVisible: false
+			publishVersionVisible: false,
+			publishVersionEnabled: false
 		});
 		const oToolbarControlsModel = RtaQunitUtils.createToolbarControlsModel();
 
@@ -438,6 +439,7 @@ sap.ui.define([
 		QUnit.test("for activated version with publish", function(assert) {
 			this.oToolbar.getModel("versions").setProperty("/displayedVersion", "2");
 			this.oToolbar.getModel("versions").setProperty("/publishVersionVisible", true);
+			this.oToolbar.getModel("versions").setProperty("/publishVersionEnabled", true);
 			checkFormatting.call(this, assert, {
 				versionText: this.oTextResources.getText("TIT_VERSION_1"),
 				buttonType: ButtonType.Transparent,
@@ -445,6 +447,16 @@ sap.ui.define([
 				bDraft: false,
 				bPublish: true
 			});
+		});
+
+		QUnit.test("for an activated version that is already published, the publish button is disabled", function(assert) {
+			this.oToolbar.getModel("versions").setProperty("/displayedVersion", "2");
+			this.oToolbar.getModel("versions").setProperty("/publishVersionVisible", true);
+			// after the displayed version has been published, publishVersionEnabled is false
+			this.oToolbar.getModel("versions").setProperty("/publishVersionEnabled", false);
+			const oPublishButton = this.oToolbar.getControl("publishVersion");
+			assert.strictEqual(oPublishButton.getVisible(), true, "the publish button is visible");
+			assert.strictEqual(oPublishButton.getEnabled(), false, "the publish button is disabled once the version is published");
 		});
 
 		QUnit.test("for draft with publish", function(assert) {
