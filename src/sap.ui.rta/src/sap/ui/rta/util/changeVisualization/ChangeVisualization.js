@@ -3,6 +3,7 @@
  */
 
 sap.ui.define([
+	"sap/base/Log",
 	"sap/ui/core/Element",
 	"sap/ui/core/format/DateFormat",
 	"sap/ui/core/Fragment",
@@ -14,6 +15,8 @@ sap.ui.define([
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/dt/ElementUtil",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
+	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
@@ -26,6 +29,7 @@ sap.ui.define([
 	"sap/ui/rta/util/changeVisualization/commands/getCommandVisualization",
 	"sap/ui/rta/util/changeVisualization/resolveBinding"
 ], function(
+	Log,
 	Element,
 	DateFormat,
 	Fragment,
@@ -37,6 +41,8 @@ sap.ui.define([
 	OverlayRegistry,
 	ElementUtil,
 	States,
+	VariantManagementState,
+	ManifestUtils,
 	PersistenceWriteAPI,
 	Layer,
 	FlUtils,
@@ -180,6 +186,34 @@ sap.ui.define([
 		// Store bound handler for proper cleanup
 		this._fnOverlayCreatedHandler = this._onElementOverlayCreated.bind(this);
 		this.getDesignTime().attachEvent("elementOverlayCreated", this._fnOverlayCreatedHandler);
+	}
+
+	function attachVariantSwitchListener() {
+		const oComponent = this._getComponent();
+		this._sFlexReference = oComponent && ManifestUtils.getFlexReferenceForControl(oComponent);
+		if (!this._sFlexReference) {
+			return;
+		}
+		this._fnVariantSwitchHandler = (mUpdateParameters, aUpdateInfo) => {
+			// The listener is notified for every flex reference; only react to this app's reference
+			// and only to actual variant switches (not to unrelated variant-map invalidations).
+			if (
+				mUpdateParameters?.reference === this._sFlexReference
+				&& (aUpdateInfo || []).some((oUpdateInfo) => oUpdateInfo.type === "switchVariant")
+			) {
+				this.refreshBorders().catch((oError) => {
+					Log.error("Failed to refresh change visualization borders after variant switch", oError);
+				});
+			}
+		};
+		VariantManagementState.getVariantManagementMap().addUpdateListener(this._fnVariantSwitchHandler);
+	}
+
+	function detachVariantSwitchListener() {
+		if (this._fnVariantSwitchHandler) {
+			VariantManagementState.getVariantManagementMap().removeUpdateListener(this._fnVariantSwitchHandler);
+			this._fnVariantSwitchHandler = null;
+		}
 	}
 
 	function collectChanges() {
@@ -478,6 +512,7 @@ sap.ui.define([
 
 	ChangeVisualization.prototype.exit = function() {
 		this._detachOverlayListeners();
+		detachVariantSwitchListener.call(this);
 		this.removeBorderClasses();
 		this._oChangeIndicatorRegistry.destroy();
 		if (this._oChangeDetailPopup) {
@@ -504,6 +539,7 @@ sap.ui.define([
 		this._oChangeIndicatorRegistry.reset();
 		await refreshChangeRegistryAndDecorations.call(this);
 		attachOverlayListeners.call(this);
+		attachVariantSwitchListener.call(this);
 		this.setInitialized(true);
 	};
 
