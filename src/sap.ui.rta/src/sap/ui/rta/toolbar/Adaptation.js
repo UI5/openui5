@@ -121,10 +121,10 @@ sap.ui.define([
 		Base.prototype.exit.apply(this, aArgs);
 	};
 
-	Adaptation.prototype.formatPublishVersionEnabled = function(bPublishVisible, bVersioningEnabled, bAdaptationMode) {
+	Adaptation.prototype.formatPublishVersionEnabled = function(bPublishVisible, sDisplayedVersion, bPublishVersionEnabled) {
 		return this.getExtension(
 			"versioning",
-			Versioning).formatPublishVersionEnabled(bPublishVisible, bVersioningEnabled, bAdaptationMode
+			Versioning).formatPublishVersionEnabled(bPublishVisible, sDisplayedVersion, bPublishVersionEnabled
 		);
 	};
 

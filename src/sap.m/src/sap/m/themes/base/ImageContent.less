@@ -24,9 +24,7 @@
 }
 
 html.sap-desktop .sapMImageContent:focus {
-	outline-color: var(--sapContent_FocusColor);
-	outline-style: var(--sapContent_FocusStyle);
-	outline-width: var(--sapContent_FocusWidth);
+	outline: var(--sapContent_FocusColor) var(--sapContent_FocusStyle) var(--sapContent_FocusWidth);
 }
 
 html.sap-desktop .sapMImageContent:focus:not([tabindex]) {
@@ -51,7 +49,7 @@ html.sap-desktop .sapMImageContent:focus:not([tabindex]) {
 	}
 
 	.sapMImageContentImageIcon.sapUiIcon {
-		font-size: var(--sapFontHeader3Size);;
+		font-size: var(--sapFontHeader3Size);
 		padding-bottom: 0.25rem;
 	}
 }

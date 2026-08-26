@@ -222,8 +222,9 @@ sap.ui.define([
 		return sText;
 	};
 
-	Versioning.prototype.formatPublishVersionEnabled = function(bPublishVisible, sDisplayedVersion) {
-		return bPublishVisible && sDisplayedVersion !== Version.Number.Draft && sDisplayedVersion !== Version.Number.Original;
+	Versioning.prototype.formatPublishVersionEnabled = function(bPublishVisible, sDisplayedVersion, bPublishVersionEnabled) {
+		return bPublishVisible && bPublishVersionEnabled
+			&& sDisplayedVersion !== Version.Number.Draft && sDisplayedVersion !== Version.Number.Original;
 	};
 
 	Versioning.prototype.formatDiscardDraftVisible = function(sDisplayedVersion, bVersioningEnabled, bAdaptationMode) {

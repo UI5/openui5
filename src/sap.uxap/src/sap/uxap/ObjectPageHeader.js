@@ -1037,8 +1037,7 @@ sap.ui.define([
 	ObjectPageHeader.prototype._getBreadcrumbsAggregation = function () {
 		var oBreadCrumbs = this.getBreadcrumbs();
 
-		return oBreadCrumbs
-			|| ((oBreadCrumbsLegacy && oBreadCrumbsLegacy.getLinks().length) ? oBreadCrumbsLegacy : null);
+		return oBreadCrumbs;
 	};
 
 	/*************************************************************************************/

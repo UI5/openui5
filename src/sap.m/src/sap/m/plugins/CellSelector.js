@@ -960,11 +960,15 @@ sap.ui.define([
 
 		this._oSession.cellRefs = [];
 
-		// Check if we need to draw "Other" cells
+		// Iterate only the rows that are currently rendered.
+		const aRowsToDraw = this.getConfig("getRenderedRowsInRange", this.getControl(), mBounds);
 		const bDrawOther = this._oSession.cellTypes.includes(CellType.Other);
-		for (var iRow = mBounds.from.rowIndex; iRow <= mBounds.to.rowIndex; iRow++) {
+		const bDrawCell = this._oSession.cellTypes.includes(CellType.Cell);
+
+		for (let i = 0; i < aRowsToDraw.length; i++) {
+			const iRow = aRowsToDraw[i];
 			// Only draw cells, if the Cell type is included in the selection
-			if (this._oSession.cellTypes.includes(CellType.Cell)) {
+			if (bDrawCell) {
 				for (var iCol = mBounds.from.colIndex; iCol <= mBounds.to.colIndex; iCol++) {
 					const mPosition = {rowIndex: iRow, colIndex: iCol};
 					var oCellRef = this.getConfig("getCellRef", this.getControl(), mPosition);
@@ -1256,6 +1260,25 @@ sap.ui.define([
 				}
 
 				return getCellDOM(oRow.getCells().filter((oCell) => oCell.getDomRef() || !oCell.getVisible())[mPosition.colIndex], this.selectableCells);
+			},
+			/**
+			 * Returns the row indices that are both inside the given selection bounds and currently rendered in the viewport.
+			 *
+			 * @param {sap.ui.table.Table} oTable Table instance
+			 * @param {{from: {rowIndex: int, colIndex: int}, to: {rowIndex: int, colIndex: int}}} mBounds Normalized selection bounds
+			 * @returns {int[]} Rendered row indices within the bounds, in DOM order
+			 */
+			getRenderedRowsInRange: function(oTable, mBounds) {
+				const aRowIndicesInRange = [];
+
+				for (const oRow of oTable.getRows()) {
+					const iRowIndex = oRow.getIndex();
+					if (iRowIndex >= mBounds.from.rowIndex && iRowIndex <= mBounds.to.rowIndex) {
+						aRowIndicesInRange.push(iRowIndex);
+					}
+				}
+
+				return aRowIndicesInRange;
 			},
 			/**
 			 * Retrieve cell information for a given DOM element.
@@ -1559,6 +1582,23 @@ sap.ui.define([
 				}
 
 				return getCellDOM(oRow.getCells()[oColumn.getInitialOrder()], this.selectableCells);
+			},
+			/**
+			 * Returns the row indices that are both inside the given selection bounds and currently rendered in the table.
+			 *
+			 * @param {sap.m.Table} oTable Table instance
+			 * @param {{from: {rowIndex: int, colIndex: int}, to: {rowIndex: int, colIndex: int}}} mBounds Normalized selection bounds
+			 * @returns {int[]} Rendered row indices within the bounds, in DOM order
+			 */
+			getRenderedRowsInRange: function(oTable, mBounds) {
+				const iToRowIndex = Math.min(mBounds.to.rowIndex, this._getVisibleItems(oTable).length - 1);
+				const aRowIndicesInRange = [];
+
+				for (let i = mBounds.from.rowIndex; i <= iToRowIndex; i++) {
+					aRowIndicesInRange.push(i);
+				}
+
+				return aRowIndicesInRange;
 			},
 			/**
 			 * Retrieves cell information for a given DOM element.

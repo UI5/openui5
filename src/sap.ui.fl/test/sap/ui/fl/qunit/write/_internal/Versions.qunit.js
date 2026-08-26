@@ -996,6 +996,9 @@ sap.ui.define([
 			sandbox.stub(LrepConnector.versions, "publish").resolves("Success");
 
 			return Versions.initialize(mPropertyBag)
+			.then(function(oModel) {
+				this.oUpdateBindingsSpy = sandbox.spy(oModel, "updateBindings");
+			}.bind(this))
 			.then(Versions.publish.bind(undefined, mPropertyBag))
 			.then(Versions.getVersionsModel.bind(Versions, mPropertyBag))
 			.then(function(oResponse) {
@@ -1004,7 +1007,8 @@ sap.ui.define([
 				assert.equal(aVersions[1].isPublished, true, "the 3. version model is updated correctly");
 				assert.equal(aVersions[2].isPublished, true, "the 2. version model is updated correctly");
 				assert.equal(oResponse.getProperty("/publishVersionEnabled"), false, "after publish successfully, the button is disable");
-			});
+				assert.ok(this.oUpdateBindingsSpy.calledWith(true), "then the bindings are force-updated so the UI reflects the published state");
+			}.bind(this));
 		});
 
 		QUnit.test("when the connector rejects with a CancelError, the model is left untouched", function(assert) {
