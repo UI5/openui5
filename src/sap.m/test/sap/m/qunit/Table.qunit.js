@@ -39,8 +39,9 @@ sap.ui.define([
 	"sap/m/TextArea",
 	"sap/ui/core/Control",
 	"sap/m/plugins/ColumnAIAction",
-	"sap/m/plugins/ColumnResizer"
-], function(Localization, Element, Library, qutils, nextUIUpdate, KeyCodes, JSONModel, Device, Filter, Sorter, InvisibleText, ListBase, Table, Column, Label, Link, Toolbar, ToolbarSpacer, Button, Input, ColumnListItem, ListItemAction, Text, Title, ScrollContainer, VBox, library, GroupHeaderListItem, VerticalLayout, Message, jQuery, IllustratedMessage, ComboBox, CheckBox, RatingIndicator, Item, TextArea, Control, ColumnAIAction, ColumnResizer) {
+	"sap/m/plugins/ColumnResizer",
+	"sap/ui/dom/getScrollbarSize"
+], function(Localization, Element, Library, qutils, nextUIUpdate, KeyCodes, JSONModel, Device, Filter, Sorter, InvisibleText, ListBase, Table, Column, Label, Link, Toolbar, ToolbarSpacer, Button, Input, ColumnListItem, ListItemAction, Text, Title, ScrollContainer, VBox, library, GroupHeaderListItem, VerticalLayout, Message, jQuery, IllustratedMessage, ComboBox, CheckBox, RatingIndicator, Item, TextArea, Control, ColumnAIAction, ColumnResizer, getScrollbarSize) {
 	"use strict";
 
 	const TestControl = Control.extend("sap.m.test.TestControl", {
@@ -2680,7 +2681,58 @@ sap.ui.define([
 
 	});
 
-	QUnit.module("Paste data into the Table");
+	QUnit.test("contextualWidth 'Auto': predictive guard produces zero pop-in flips", async function(assert) {
+		const iScrollbar = getScrollbarSize().width;
+
+		const sut = createSUT(true);
+		sut.setContextualWidth("auto");
+
+		const iApplied = 1033;
+		const iRebound = iApplied - iScrollbar;
+
+		// no scrollbar (e.g. overlay scrollbars) means nothing can rebound
+		if (!iScrollbar) {
+			assert.notOk(sut._isSelfInducedScrollbarRebound(iApplied, iRebound), "with no scrollbar nothing is a rebound");
+			sut.destroy();
+			return;
+		}
+
+		// breakpoint inside the flip band (iRebound, iApplied], for any scrollbar width
+		const iBreakpoint = iRebound + 1;
+		sut.getColumns()[2].setMinScreenWidth(iBreakpoint + "px");
+		sut.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oApplySpy = sinon.spy(sut, "_applyContextualWidth");
+
+		sut._onResize({size: {width: iApplied}});
+		assert.equal(sut._oContextualSettings.contextualWidth, iApplied, "first measured width is applied");
+
+		oApplySpy.reset();
+
+		sut._onResize({size: {width: iRebound}});
+		assert.ok(oApplySpy.notCalled, "the self-induced scrollbar rebound is suppressed up front (zero flips)");
+		assert.equal(sut._oContextualSettings.contextualWidth, iApplied, "the table keeps its settled layout");
+
+		sut._onResize({size: {width: 800}});
+		assert.equal(sut._oContextualSettings.contextualWidth, 800, "a real resize is still applied");
+
+		oApplySpy.reset();
+		sut._onResize({size: {width: 800 - iScrollbar}});
+		assert.ok(oApplySpy.called, "a scrollbar-sized change with no breakpoint in the gap is applied");
+		assert.equal(sut._oContextualSettings.contextualWidth, 800 - iScrollbar, "harmless change is not over-suppressed");
+
+		assert.ok(sut._isSelfInducedScrollbarRebound(iApplied, iRebound), "rebound across breakpoint is detected");
+		assert.notOk(sut._isSelfInducedScrollbarRebound(iApplied, iApplied), "no delta is not a rebound");
+		assert.notOk(sut._isSelfInducedScrollbarRebound(iApplied, 800), "a large delta is not a rebound");
+		assert.notOk(sut._isSelfInducedScrollbarRebound(800, 800 - iScrollbar), "no breakpoint in gap is not a rebound");
+
+		sut._deregisterResizeHandler();
+		assert.strictEqual(sut._iLastAppliedContextualWidth, undefined, "the history is reset on deregister");
+
+		oApplySpy.restore();
+		sut.destroy();
+	});
 
 	QUnit.test("Paste to the table on input-enabled cell", async function(assert) {
 		assert.expect(1);
