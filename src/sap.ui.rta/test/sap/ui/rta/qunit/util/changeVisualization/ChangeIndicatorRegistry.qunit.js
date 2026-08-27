@@ -457,6 +457,196 @@ sap.ui.define([
 			assert.ok(true, "then removing an unknown id does not throw");
 		});
 
+		QUnit.test("add-field change resolved before its field overlay exists stays unresolved but is indexed by the field id", async function(assert) {
+			// Simulates an added field on a lazy section: the change handler advertises the new
+			// field as the display/affected target, but the field element is not yet in the tree.
+			ChangesWriteAPI.getChangeHandler.reset();
+			ChangesWriteAPI.getChangeHandler.resolves({
+				getChangeVisualizationInfo() {
+					return { affectedControls: [{ id: "newField" }] };
+				}
+			});
+			// bySelector resolves the group (the change selector) but NOT the not-yet-rendered field.
+			JsControlTreeModifier.bySelector.reset();
+			JsControlTreeModifier.bySelector.callsFake((oSelector) => {
+				return oSelector.id === "newField" ? undefined : this.oControl;
+			});
+
+			const oChange = createMockChange("addFieldChange");
+			this.oRegistry.addChangeToCatalog(oChange, "addDelegateProperty");
+			const oResult = await this.oRegistry.resolveVisualizationInfo(oChange, undefined);
+
+			assert.strictEqual(oResult, undefined, "then resolution returns undefined (field not in the tree yet)");
+			assert.ok(
+				this.oRegistry.getUnresolvedChangeIds().includes("addFieldChange"),
+				"then the change is left unresolved (the group is NOT cached as the display target)"
+			);
+			assert.ok(
+				this.oRegistry.getChangeIdsForSelector("newField").includes("addFieldChange"),
+				"then the change is indexed under the intended field id so the field overlay can trigger re-resolution"
+			);
+		});
+
+		QUnit.test("add-field change re-resolves to the field once the field overlay exists", async function(assert) {
+			ChangesWriteAPI.getChangeHandler.reset();
+			ChangesWriteAPI.getChangeHandler.resolves({
+				getChangeVisualizationInfo() {
+					return { affectedControls: [{ id: "newField" }] };
+				}
+			});
+			// Field absent at first resolution.
+			JsControlTreeModifier.bySelector.reset();
+			JsControlTreeModifier.bySelector.callsFake((oSelector) => {
+				return oSelector.id === "newField" ? undefined : this.oControl;
+			});
+
+			const oChange = createMockChange("addFieldChange");
+			this.oRegistry.addChangeToCatalog(oChange, "addDelegateProperty");
+			await this.oRegistry.resolveVisualizationInfo(oChange, undefined);
+			assert.notOk(this.oRegistry.getRegisteredChange("addFieldChange"), "precondition: change is unresolved while field is absent");
+
+			// Field overlay is now created — bySelector resolves the field.
+			const oFieldControl = new Control("newField");
+			JsControlTreeModifier.bySelector.reset();
+			JsControlTreeModifier.bySelector.callsFake((oSelector) => {
+				return oSelector.id === "newField" ? oFieldControl : this.oControl;
+			});
+			const oResult = await this.oRegistry.resolveVisualizationInfo(oChange, undefined);
+
+			assert.ok(oResult, "then the change resolves once the field is in the tree");
+			assert.deepEqual(
+				oResult.displayElementIds, ["newField"],
+				"then the display target upgrades to the field (not the containing group)"
+			);
+			assert.ok(
+				this.oRegistry.hasChangesForElement("newField"),
+				"then the field element carries the change in the element index"
+			);
+			oFieldControl.destroy();
+		});
+
+		QUnit.test("add-field change whose field exists at resolve time resolves to the field immediately", async function(assert) {
+			ChangesWriteAPI.getChangeHandler.reset();
+			ChangesWriteAPI.getChangeHandler.resolves({
+				getChangeVisualizationInfo() {
+					return { affectedControls: [{ id: "newField" }] };
+				}
+			});
+			const oFieldControl = new Control("newField");
+			JsControlTreeModifier.bySelector.reset();
+			JsControlTreeModifier.bySelector.callsFake((oSelector) => {
+				return oSelector.id === "newField" ? oFieldControl : this.oControl;
+			});
+
+			await registerChange(this.oRegistry, createMockChange("addFieldChange"), "addDelegateProperty");
+			const oEntry = this.oRegistry.getRegisteredChange("addFieldChange");
+			assert.ok(oEntry, "then the change is resolved immediately");
+			assert.deepEqual(
+				oEntry.visualizationInfo.displayElementIds, ["newField"],
+				"then the field is the display target from the start (no regression)"
+			);
+			oFieldControl.destroy();
+		});
+
+		QUnit.test("removeRegisteredChange clears intended-field index entries of a provisionally unresolved change", async function(assert) {
+			ChangesWriteAPI.getChangeHandler.reset();
+			ChangesWriteAPI.getChangeHandler.resolves({
+				getChangeVisualizationInfo() {
+					return { affectedControls: [{ id: "newField" }] };
+				}
+			});
+			JsControlTreeModifier.bySelector.reset();
+			JsControlTreeModifier.bySelector.callsFake((oSelector) => {
+				return oSelector.id === "newField" ? undefined : this.oControl;
+			});
+
+			const oChange = createMockChange("addFieldChange");
+			this.oRegistry.addChangeToCatalog(oChange, "addDelegateProperty");
+			await this.oRegistry.resolveVisualizationInfo(oChange, undefined);
+			assert.ok(
+				this.oRegistry.getChangeIdsForSelector("newField").includes("addFieldChange"),
+				"precondition: change is indexed under the intended field id"
+			);
+
+			this.oRegistry.removeRegisteredChange("addFieldChange");
+			assert.notOk(
+				this.oRegistry.getChangeIdsForSelector("newField").includes("addFieldChange"),
+				"then the intended-field index entry is removed"
+			);
+			assert.notOk(
+				this.oRegistry.getChangeIdsForSelector("myControl").includes("addFieldChange"),
+				"then the change-selector index entry is also removed"
+			);
+		});
+
+		QUnit.test("a not-yet-applied change with a viz-info handler resolves provisionally and re-resolves once applied", async function(assert) {
+			// Real-world root cause: on a lazy sub-page not navigated to, the change's container
+			// (the group) exists so the handler is found, but the change is not applied yet, so the
+			// handler cannot yet advertise the real target (the added field). This must NOT cache the
+			// group as the final display target — the change must stay unresolved and re-resolve once
+			// applied.
+			ChangesWriteAPI.getChangeHandler.reset();
+			ChangesWriteAPI.getChangeHandler.resolves({
+				getChangeVisualizationInfo() {
+					// Once applied, the handler advertises the added field.
+					return { affectedControls: [{ id: "newField" }] };
+				}
+			});
+			const oFieldControl = new Control("newField");
+			JsControlTreeModifier.bySelector.reset();
+			JsControlTreeModifier.bySelector.callsFake((oSelector) => {
+				return oSelector.id === "newField" ? oFieldControl : this.oControl;
+			});
+
+			const oChange = createMockChange("addFieldChange");
+			// Not applied yet.
+			oChange.isSuccessfullyApplied = () => false;
+
+			this.oRegistry.addChangeToCatalog(oChange, "addDelegateProperty");
+			const oProvisional = await this.oRegistry.resolveVisualizationInfo(oChange, undefined);
+
+			assert.strictEqual(oProvisional, undefined, "then a not-yet-applied change is not resolved (no final cache entry)");
+			assert.ok(
+				this.oRegistry.getUnresolvedChangeIds().includes("addFieldChange"),
+				"then the change stays unresolved (the group/container is NOT cached as the display target)"
+			);
+			assert.ok(
+				this.oRegistry.getChangeIdsForSelector("myControl").includes("addFieldChange"),
+				"then the change is indexed under its selector so its container overlay re-triggers resolution"
+			);
+
+			// Simulate the change becoming applied (navigation into the sub-page), then re-resolve.
+			oChange.isSuccessfullyApplied = () => true;
+			const oResolved = await this.oRegistry.resolveVisualizationInfo(oChange, undefined);
+			assert.ok(oResolved, "then the change resolves once applied");
+			assert.deepEqual(
+				oResolved.displayElementIds, ["newField"],
+				"then the display target is the added field, not the containing group"
+			);
+			oFieldControl.destroy();
+		});
+
+		QUnit.test("a change whose handler has no getChangeVisualizationInfo still resolves to the change selector (not provisional)", async function(assert) {
+			// Regression guard: many change handlers do not implement getChangeVisualizationInfo. Such
+			// changes are applied and must resolve immediately to the change selector — they must NOT
+			// be treated as provisional (which would leave them unresolved and never highlighted).
+			ChangesWriteAPI.getChangeHandler.reset();
+			ChangesWriteAPI.getChangeHandler.resolves({
+				// no getChangeVisualizationInfo
+			});
+			JsControlTreeModifier.bySelector.reset();
+			JsControlTreeModifier.bySelector.returns(this.oControl);
+
+			await registerChange(this.oRegistry, createMockChange("plainChange"), "foo");
+			const oEntry = this.oRegistry.getRegisteredChange("plainChange");
+			assert.ok(oEntry, "then the change resolves");
+			assert.deepEqual(
+				oEntry.visualizationInfo.displayElementIds, ["myControl"],
+				"then it resolves to the change selector"
+			);
+			assert.notOk(oEntry.visualizationInfo.provisional, "then it is not flagged provisional");
+		});
+
 		QUnit.test("getRegisteredChange and getCatalogEntry return undefined for unknown ids", function(assert) {
 			assert.strictEqual(
 				this.oRegistry.getRegisteredChange("unknownChange"),

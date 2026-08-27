@@ -180,12 +180,11 @@ sap.ui.define([
 	/**
 	 * @inheritDoc
 	 */
-	SelectionModelSelection.prototype.handleKeyboardShortcut = function(sType, oEvent) {
-		if (sType === "toggle" && toggleSelectAll(this) === false) {
-			oEvent.setMarked("sapUiTableClearAll");
+	SelectionModelSelection.prototype.handleKeyboardShortcut = function(sType) {
+		if (sType === "toggle") {
+			toggleSelectAll(this);
 		} else if (sType === "clear") {
 			this.clearSelection();
-			oEvent.setMarked("sapUiTableClearAll");
 		}
 		return Promise.resolve();
 	};

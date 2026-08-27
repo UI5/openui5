@@ -20,15 +20,26 @@ var ImageContentRenderer = {
  * @param {sap.m.ImageContent} oControl the control to be rendered
  */
 ImageContentRenderer.render = function(oRm, oControl) {
+	var bHasPressHandler = oControl.hasListeners("press");
+	var sDescription = oControl.getDescription();
+	var sTooltip = oControl.getTooltip_AsString();
+
 	oRm.openStart("div",oControl);
 	oRm.class("sapMImageContent");
-	var sTooltip = oControl.getTooltip_AsString();
+
 	if (sTooltip) {
 		oRm.attr("title", sTooltip);
 	}
-	if (oControl.hasListeners("press")) {
+
+	if (bHasPressHandler) {
 		oRm.class("sapMPointer");
 		oRm.attr("tabindex", "0");
+		oRm.attr("role", "button");
+
+		// Provide accessible name for the button
+		if (sDescription) {
+			oRm.attr("aria-label", sDescription);
+		}
 	}
 	oRm.openEnd();
 

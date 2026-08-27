@@ -393,6 +393,9 @@ function(
 	};
 
 	ListItemBase.prototype.getGroupAnnouncement = function() {
+		if (this.isGroupHeader()) {
+			return "";
+		}
 		const oList = this.getList();
 		return oList?.getAriaRole() === "listbox" ? this.$().prevAll(".sapMGHLI:first").text() : "";
 	};

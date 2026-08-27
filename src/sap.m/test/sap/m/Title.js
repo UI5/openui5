@@ -146,7 +146,11 @@ sap.ui.require([
 	// Tests rtl support with mixed texts
 	var aMixedTexts = [
 			"כמה שפות אתה מדבר? English ועברית.",
-			"Do you speak any RTL languages? כן אני כן."
+			"Do you speak any RTL languages? כן אני כן.",
+			"برمجة الكمبيوتر هي مهارة أساسية في العصر الرقمي",
+			"תכנות מחשבים היא מיומנות חיונית בעידן הדיגיטלי",
+			"مرحبا بالعالم",
+			"שלום עולם"
 		],
 		oContentMixedTexts = new VBox("content-mixed-texts");
 

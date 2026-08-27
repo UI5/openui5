@@ -69,8 +69,11 @@ sap.ui.define([
 		this.doReset(oAggregation, bHasGrandTotal, oFirstLevel);
 		this.addKeptElement = this.oFirstLevel.addKeptElement; // @borrows ...
 		this.removeKeptElement = this.oFirstLevel.removeKeptElement; // @borrows ...
-		this.oTreeState = new _TreeState(oAggregation.$NodeProperty,
-			(oNode) => _Helper.getKeyFilter(oNode, this.sMetaPath, this.getTypes()));
+		this.oTreeState = new _TreeState(
+			(oNode) => _Helper.getKeyFilter(oNode, this.sMetaPath, this.getTypes()),
+			oAggregation.$NodeProperty
+				? (oNode) => _Helper.drillDown(oNode, oAggregation.$NodeProperty)
+				: () => {});
 		if (oFirstLevel) {
 			if (oFirstLevel.aElements.$deleted?.length
 					|| !_Helper.isEmptyObject(oFirstLevel.mPostRequests)) {

@@ -749,14 +749,13 @@ sap.ui.define([
 
 	QUnit.test("Ctrl+A & Ctrl+Shift+A", async function(assert) {
 		const oOnKeyboardShortcut = this.spy(this.oSelectionPlugin, "onKeyboardShortcut");
-		let oEvent;
 		const test = (oTarget, bExpectPluginCall = true) => {
 			sinon.assert.pass("Ctrl+A on element " + oTarget.id);
 			oOnKeyboardShortcut.resetHistory();
 			qutils.triggerKeydown(oTarget, Key.A, false, false, true);
 
 			if (bExpectPluginCall) {
-				sinon.assert.alwaysCalledWithExactly(oOnKeyboardShortcut, "toggle", oEvent);
+				sinon.assert.alwaysCalledWithExactly(oOnKeyboardShortcut, "toggle");
 				sinon.assert.callCount(oOnKeyboardShortcut, 1);
 			} else {
 				sinon.assert.notCalled(oOnKeyboardShortcut);
@@ -767,14 +766,13 @@ sap.ui.define([
 			qutils.triggerKeydown(oTarget, Key.A, true, false, true);
 
 			if (bExpectPluginCall) {
-				sinon.assert.alwaysCalledWithExactly(oOnKeyboardShortcut, "clear", oEvent);
+				sinon.assert.alwaysCalledWithExactly(oOnKeyboardShortcut, "clear");
 				sinon.assert.callCount(oOnKeyboardShortcut, 1);
 			} else {
 				sinon.assert.notCalled(oOnKeyboardShortcut);
 			}
 		};
 
-		this.oTable.addDelegate({onkeydown: function(e) { oEvent = e; }});
 		this.oTable.addExtension(new TestInputControl());
 		this.oTable.setFooter(new TestInputControl());
 		await this.oTable.qunit.rendered();

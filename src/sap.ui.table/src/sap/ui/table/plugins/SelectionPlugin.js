@@ -102,25 +102,23 @@ sap.ui.define([
 	 * This hook is called when a keyboard shortcut relevant for selection is pressed.
 	 *
 	 * @param {string} sType Type of the keyboard shortcut. Can be <code>toggle</code> or <code>clear</code>.
-	 * @param {sap.ui.base.Event} oEvent The emitted event.
 	 * @private
 	 */
-	SelectionPlugin.prototype.onKeyboardShortcut = function(sType, oEvent) {
+	SelectionPlugin.prototype.onKeyboardShortcut = function(sType) {
 		if (this.isActive()) {
-			this.handleKeyboardShortcut(sType, oEvent);
+			this.handleKeyboardShortcut(sType);
 		}
 	};
 
 	/**
-	 * Handles a selection-relevant keyboard shortcut. The event object must be marked synchronously if the shortcut is handled.
+	 * Handles a selection-relevant keyboard shortcut.
 	 * TODO: Document type parameter to that possible values are clear
 	 *
 	 * @param {string} sType Type of the keyboard shortcut. Can be <code>toggle</code> or <code>clear</code>.
-	 * @param {sap.ui.base.Event} oEvent The emitted event.
 	 * @returns {Promise} A promise that resolves once the selection change has completed.
 	 * @private
 	 */
-	SelectionPlugin.prototype.handleKeyboardShortcut = function(sType, oEvent) {
+	SelectionPlugin.prototype.handleKeyboardShortcut = function(sType) {
 		return Promise.resolve();
 	};
 

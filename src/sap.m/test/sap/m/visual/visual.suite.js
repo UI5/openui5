@@ -118,6 +118,7 @@ module.exports = [
  "TimePicker.spec.js",
  "TimePickerVisualPart2.spec.js",
  "Title.spec.js",
+ "TitleInSimpleForm.spec.js",
  "ToggleButtonStandaloneVisual.spec.js",
  "Token.spec.js",
  "Tokenizer.spec.js",

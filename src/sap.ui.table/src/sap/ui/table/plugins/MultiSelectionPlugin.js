@@ -203,7 +203,7 @@ sap.ui.define([
 		}
 
 		if (oHeaderSelector.getType() === "CheckBox") {
-			return await toggleSelection(this).promise;
+			return toggleSelection(this);
 		} else if (oHeaderSelector.getType() === "Icon") {
 			if (this.getSelectedCount() > 0) {
 				this.clearSelection();
@@ -216,24 +216,19 @@ sap.ui.define([
 	/**
 	 * @inheritDoc
 	 */
-	MultiSelectionPlugin.prototype.handleKeyboardShortcut = async function(sType, oEvent) {
+	MultiSelectionPlugin.prototype.handleKeyboardShortcut = function(sType) {
 		if (sType === "toggle") { // ctrl + a
 			if (this.getSelectionMode() !== SelectionMode.MultiToggle) {
 				return;
 			}
 
 			if (this._bLimitDisabled) {
-				const mResult = toggleSelection(this);
-				if (!mResult.selectAll) {
-					oEvent.setMarked("sapUiTableClearAll");
-				}
-				return await mResult.promise;
+				return toggleSelection(this);
 			} else {
-				return await this.addSelectionInterval(0, this._getHighestSelectableIndex());
+				return this.addSelectionInterval(0, this._getHighestSelectableIndex());
 			}
 		} else if (sType === "clear") { // ctrl + shift + a
 			this.clearSelection();
-			oEvent.setMarked("sapUiTableClearAll");
 		}
 	};
 
@@ -241,16 +236,14 @@ sap.ui.define([
 	 * If not all indices are selected, all indices are selected, otherwise the selection is removed.
 	 *
 	 * @param {sap.ui.table.plugins.MultiSelectionPlugin} oPlugin The plugin to toggle the selection on.
-	 * @returns {{selectAll: boolean, promise: Promise}}
-	 *   An object providing the synchronous selection state
-	 *   (<code>true</code> - all selected, <code>false</code> - all cleared) and a promise that resolves once the selection change has completed.
+	 * @returns {Promise} A promise that resolves once the selection change has completed.
 	 */
 	function toggleSelection(oPlugin) {
 		if (oPlugin.getSelectableCount() > oPlugin.getSelectedCount()) {
-			return {selectAll: true, promise: oPlugin.selectAll()};
+			return oPlugin.selectAll();
 		} else {
 			oPlugin.clearSelection();
-			return {selectAll: false, promise: Promise.resolve()};
+			return Promise.resolve();
 		}
 	}
 

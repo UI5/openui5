@@ -48,8 +48,9 @@ sap.ui.define([
 		 *
 		 * @param {object} oConfig Configuration for the trigger.
 		 * @param {sap.ui.core.Element} oConfig.host The control the gesture delegate is registered on.
-		 * @param {function():HTMLElement} oConfig.domRefProvider Returns the target sub-element this trigger reacts to. May return <code>null</code> before the first render.
-		 * @param {function(boolean)} oConfig.onOpen Opens the tooltip. Called with <code>true</code> for deferred gestures (hover, keyboard focus), no argument for instant ones (long-press).
+		 * @param {function():HTMLElement} oConfig.domRefProvider Returns the DOM element for hover events (mouseenter/mouseleave) and tooltip positioning. May return <code>null</code> before the first render.
+		 * @param {function():HTMLElement} [oConfig.focusDomRefProvider] Returns the DOM element for focus events (focusin/focusout). Defaults to <code>domRefProvider</code>. May return <code>null</code> before the first render.
+		 * @param {function(boolean)} oConfig.onOpen Opens the tooltip. Called with <code>true</code> for deferred gestures (hover, keyboard focus), no argument for instant ones (long-press). Second argument is the trigger source: "hover", "focus", or "touch".
 		 * @param {function(boolean)} oConfig.onClose Closes the tooltip. Called with <code>true</code> for deferred gestures (mouseleave, focusout), no argument for instant ones (left mousedown, Escape).
 		 * @param {function():boolean} oConfig.isPendingOrOpen Whether a tooltip is pending or open; the Escape handler consumes the key only then.
 		 * @param {function():boolean} [oConfig.hasText] Predicate telling whether the host currently has tooltip text. Used to gate the touch-device suppressions (text-selection class, native context menu), so they only kick in for a control that actually has a tooltip. When omitted, the suppressions are not applied.
@@ -83,6 +84,7 @@ sap.ui.define([
 
 				this._oHost = oConfig.host;
 				this._fnDomRefProvider = oConfig.domRefProvider;
+				this._fnFocusDomRefProvider = oConfig.focusDomRefProvider || this._fnDomRefProvider;
 				this._fnOnOpen = oConfig.onOpen;
 				this._fnOnClose = oConfig.onClose;
 				this._fnIsPendingOrOpen = oConfig.isPendingOrOpen;
@@ -158,6 +160,7 @@ sap.ui.define([
 			this._oDelegate = null;
 			this._oHost = null;
 			this._fnDomRefProvider = null;
+			this._fnFocusDomRefProvider = null;
 			this._fnOnOpen = null;
 			this._fnOnClose = null;
 			this._fnIsPendingOrOpen = null;
@@ -217,7 +220,7 @@ sap.ui.define([
 		};
 
 		/**
-		 * Adds the touch-suppression class on the current target.
+		 * Adds the touch-suppression class on the current hover target.
 		 * @private
 		 */
 		TooltipEventTrigger.prototype._startSuppressSelection = function() {
@@ -228,7 +231,7 @@ sap.ui.define([
 		};
 
 		/**
-		 * Removes the touch-suppression class from the current target.
+		 * Removes the touch-suppression class from the current hover target.
 		 * @private
 		 */
 		TooltipEventTrigger.prototype._stopSuppressSelection = function() {
@@ -239,24 +242,35 @@ sap.ui.define([
 		};
 
 		/**
-		 * Whether the gesture landed inside this trigger's target.
+		 * Whether the gesture landed inside the hover target.
 		 * @private
 		 * @param {jQuery.Event} oEvent
 		 * @returns {boolean}
 		 */
-		TooltipEventTrigger.prototype._isForMyTarget = function(oEvent) {
+		TooltipEventTrigger.prototype._isForHoverTarget = function(oEvent) {
 			const oTarget = this._fnDomRefProvider && this._fnDomRefProvider();
 			return !!(oTarget && oEvent.target && oTarget.contains(oEvent.target));
 		};
 
 		/**
-		 * Whether the move stayed inside the target (an inner move, not a real
+		 * Whether the gesture landed inside the focus target.
+		 * @private
+		 * @param {jQuery.Event} oEvent
+		 * @returns {boolean}
+		 */
+		TooltipEventTrigger.prototype._isForFocusTarget = function(oEvent) {
+			const oTarget = this._fnFocusDomRefProvider && this._fnFocusDomRefProvider();
+			return !!(oTarget && oEvent.target && oTarget.contains(oEvent.target));
+		};
+
+		/**
+		 * Whether the move stayed inside the hover target (an inner move, not a real
 		 * enter/leave).
 		 * @private
 		 * @param {jQuery.Event} oEvent
 		 * @returns {boolean}
 		 */
-		TooltipEventTrigger.prototype._isMoveWithinTarget = function(oEvent) {
+		TooltipEventTrigger.prototype._isMoveWithinHoverTarget = function(oEvent) {
 			const oTarget = this._fnDomRefProvider && this._fnDomRefProvider();
 			const oRelated = oEvent.relatedTarget;
 			return !!(oTarget && oRelated && oTarget.contains(oRelated));
@@ -268,7 +282,7 @@ sap.ui.define([
 		 * @private
 		 */
 		TooltipEventTrigger.prototype._onMouseDown = function(oEvent) {
-			if (!this._isForMyTarget(oEvent)) {
+			if (!this._isForHoverTarget(oEvent)) {
 				return;
 			}
 			if (oEvent.button === 2) {
@@ -284,27 +298,27 @@ sap.ui.define([
 		 * @private
 		 */
 		TooltipEventTrigger.prototype._onMouseOver = function(oEvent) {
-			if (!this._isForMyTarget(oEvent)) {
+			if (!this._isForHoverTarget(oEvent)) {
 				return;
 			}
-			if (this._isMoveWithinTarget(oEvent)) {
+			if (this._isMoveWithinHoverTarget(oEvent)) {
 				return;
 			}
 			// A live selection means a likely right-click / drag-select; opening would clear it.
 			if (hasTextSelection()) {
 				return;
 			}
-			this._fnOnOpen(true);
+			this._fnOnOpen(true, "hover");
 		};
 
 		/**
 		 * @private
 		 */
 		TooltipEventTrigger.prototype._onMouseOut = function(oEvent) {
-			if (!this._isForMyTarget(oEvent)) {
+			if (!this._isForHoverTarget(oEvent)) {
 				return;
 			}
-			if (this._isMoveWithinTarget(oEvent)) {
+			if (this._isMoveWithinHoverTarget(oEvent)) {
 				return;
 			}
 			this._fnOnClose(true);
@@ -315,10 +329,10 @@ sap.ui.define([
 		 * @private
 		 */
 		TooltipEventTrigger.prototype._onFocusIn = function(oEvent) {
-			if (!this._isForMyTarget(oEvent)) {
+			if (!this._isForFocusTarget(oEvent)) {
 				return;
 			}
-			const oTarget = this._fnDomRefProvider();
+			const oTarget = this._fnFocusDomRefProvider();
 			if (!(oTarget && oTarget.matches && oTarget.matches(":focus-visible"))) {
 				return;
 			}
@@ -326,14 +340,14 @@ sap.ui.define([
 			if (bInitialFocus) {
 				return;
 			}
-			this._fnOnOpen(true);
+			this._fnOnOpen(true, "focus");
 		};
 
 		/**
 		 * @private
 		 */
 		TooltipEventTrigger.prototype._onFocusOut = function(oEvent) {
-			if (!this._isForMyTarget(oEvent)) {
+			if (!this._isForFocusTarget(oEvent)) {
 				return;
 			}
 			this._fnOnClose(true);
@@ -355,7 +369,7 @@ sap.ui.define([
 		 * @private
 		 */
 		TooltipEventTrigger.prototype._onContextMenu = function(oEvent) {
-			if (!this._isForMyTarget(oEvent)) {
+			if (!this._isForHoverTarget(oEvent)) {
 				return;
 			}
 			if (this._bEnableForTouchDevices && this._hasText()) {
@@ -367,7 +381,7 @@ sap.ui.define([
 		 * @private
 		 */
 		TooltipEventTrigger.prototype._onTouchStart = function(oEvent) {
-			if (!this._isForMyTarget(oEvent)) {
+			if (!this._isForHoverTarget(oEvent)) {
 				return;
 			}
 			// @todo make the option for late desision for a tooltip to be well documented in the official contract. Better move to isEnabled or beforeOpen which is publicly documented, rather than to rely on late hasText check
@@ -379,7 +393,7 @@ sap.ui.define([
 			this._clearLongPressTimer();
 			this._iLongPressTimer = setTimeout(() => {
 				this._iLongPressTimer = null;
-				this._fnOnOpen();
+				this._fnOnOpen(false, "touch");
 			}, LONG_PRESS_MS);
 		};
 

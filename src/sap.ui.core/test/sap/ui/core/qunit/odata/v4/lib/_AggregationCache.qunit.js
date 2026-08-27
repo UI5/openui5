@@ -493,7 +493,6 @@ sap.ui.define([
 			assert.strictEqual(oCache.removeKeptElement, "~removeKeptElement~", "@borrows ...");
 			assert.strictEqual(oCache.isDeletingInOtherGroup(), false); // <-- code under test
 			assert.ok(oCache.oTreeState instanceof _TreeState);
-			assert.strictEqual(oCache.oTreeState.sNodeProperty, i === 2 ? "node/property" : undefined);
 			assert.strictEqual(oCache.bUnifiedCache, bFirstLevel);
 			assert.strictEqual(oCache.bKeptFirstLevel, bFirstLevel);
 			if (bFirstLevel) {
@@ -510,6 +509,14 @@ sap.ui.define([
 
 			// code under test: callback function provided for _TreeState c'tor
 			assert.strictEqual(oCache.oTreeState.fnGetKeyFilter("~node~"), "~filter~");
+
+			this.mock(_Helper).expects("drillDown").exactly(i === 2 ? 1 : 0)
+				.withExactArgs("~node~", "node/property")
+				.returns("~nodeId~");
+
+			// code under test: callback function provided for _TreeState c'tor
+			assert.strictEqual(oCache.oTreeState.fnGetNodeId("~node~"),
+				i === 2 ? "~nodeId~" : undefined);
 		});
 		});
 	});

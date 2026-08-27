@@ -135,8 +135,7 @@ sap.ui.define([
 				return;
 			}
 
-			if (isKeyCombination(oEvent, KeyCodes.A, true, true)
-				|| (isKeyCombination(oEvent, KeyCodes.A, false, true) && oEvent.isMarked(this.getConfig("eventClearedAll")))) {
+			if (isKeyCombination(oEvent, KeyCodes.A, true, true)) {
 				if (isSelectableCell(oEvent.target, this.getConfig("selectableCells"))) {
 					this.removeSelection();
 					oEvent.preventDefault();
@@ -1195,7 +1194,6 @@ sap.ui.define([
 			selectableCells: ".sapUiTableDataCell",
 			scrollArea: "tableCCnt",
 			scrollEvent: "firstVisibleRowChanged",
-			eventClearedAll: "sapUiTableClearAll",
 			onActivate: function(oTable, oPlugin) {
 				oTable.attachEvent("_change", oPlugin, this._onPropertyChange);
 				oTable.attachEvent("EventHandlerChange", oPlugin, this._onEventHandlerChange);
@@ -1478,7 +1476,6 @@ sap.ui.define([
 		"sap.m.Table": {
 			selectableCells: ".sapMLIBFocusable > :not(.sapMListTblHeaderCell), .sapMListTblCell:not(.sapMListTblHeaderCell), .sapMListTblSubRowCell, .sapMListTblSubCnt",
 			scrollArea: "listUl",
-			eventClearedAll: "sapMTableClearAll",
 			onActivate: function(oTable, oPlugin) {
 				oTable.attachEvent("_change", oPlugin, this._onPropertyChange);
 				oTable.attachEvent("EventHandlerChange", oPlugin, this._onEventHandlerChange);

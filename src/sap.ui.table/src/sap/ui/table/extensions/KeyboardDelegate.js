@@ -920,14 +920,14 @@ sap.ui.define([
 			oEvent.preventDefault(); // Prevent full page text selection.
 
 			if (oCellInfo.isOfType(CellType.ANYCONTENTCELL | CellType.COLUMNROWHEADER)) {
-				oSelectionPlugin.onKeyboardShortcut("toggle", oEvent);
+				oSelectionPlugin.onKeyboardShortcut("toggle");
 			}
 
 		// Ctrl+Shift+A: Deselect all.
 		} else if (KeyboardDelegate._isKeyCombination(oEvent, KeyCodes.A, ModKey.CTRL + ModKey.SHIFT)) {
 			if (oCellInfo.isOfType(CellType.ANYCONTENTCELL | CellType.COLUMNROWHEADER)) {
 				oEvent.preventDefault();
-				oSelectionPlugin.onKeyboardShortcut("clear", oEvent);
+				oSelectionPlugin.onKeyboardShortcut("clear");
 			}
 
 		// F4: Enter the action mode.

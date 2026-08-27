@@ -294,22 +294,19 @@ sap.ui.define([
 	 * Selects all rows if not all are already selected, otherwise the selection is cleared.
 	 *
 	 * @param {sap.ui.table.plugins.ODataV4MultiSelection} oPlugin The selection plugin.
-	 * @returns {{selectAll: (boolean|undefined), promise: Promise}}
-	 *   An object providing the synchronous state of the selection
-	 *   (<code>true</code> - all selected, <code>false</code> - all cleared, <code>undefined</code> - no action) and a promise that
-	 *   resolves once the selection change has completed.
+	 * @returns {Promise} A promise that resolves once the selection change has completed.
 	 */
 	function toggleSelectAll(oPlugin) {
 		if (areAllRowsSelected(getSelectableCount(oPlugin), oPlugin.getSelectedCount())) {
 			oPlugin.clearSelection();
-			return {selectAll: false, promise: Promise.resolve()};
+			return Promise.resolve();
 		} else if (oPlugin._isLimitDisabled()) {
 			const oBinding = oPlugin.getControl().getBinding();
 			if (oBinding?.getLength()) {
-				return {selectAll: true, promise: select(oPlugin, 0, oBinding.getLength() - 1)};
+				return select(oPlugin, 0, oBinding.getLength() - 1);
 			}
 		}
-		return {selectAll: undefined, promise: Promise.resolve()};
+		return Promise.resolve();
 	}
 
 	/**
@@ -340,7 +337,7 @@ sap.ui.define([
 		}
 
 		if (oHeaderSelector.getType() === "CheckBox") {
-			return toggleSelectAll(this).promise;
+			return toggleSelectAll(this);
 		} else if (oHeaderSelector.getType() === "Icon") {
 			if (this.getSelectedCount() > 0) {
 				this.clearSelection();
@@ -358,15 +355,11 @@ sap.ui.define([
 	/**
 	 * @inheritDoc
 	 */
-	ODataV4MultiSelection.prototype.handleKeyboardShortcut = function(sType, oEvent) {
+	ODataV4MultiSelection.prototype.handleKeyboardShortcut = function(sType) {
 
 		if (sType === "toggle") { // ctrl + a
 			if (this._isLimitDisabled()) {
-				const mResult = toggleSelectAll(this);
-				if (mResult.selectAll === false) {
-					oEvent.setMarked("sapUiTableClearAll");
-				}
-				return mResult.promise;
+				return toggleSelectAll(this);
 			} else {
 				const oBinding = this.getControl().getBinding();
 				if (oBinding?.getLength() > 0) {
@@ -375,7 +368,7 @@ sap.ui.define([
 				return Promise.resolve();
 			}
 		} else {
-			return ODataV4Selection.prototype.handleKeyboardShortcut.apply(this, arguments);
+			return ODataV4Selection.prototype.handleKeyboardShortcut.call(this, sType);
 		}
 	};
 

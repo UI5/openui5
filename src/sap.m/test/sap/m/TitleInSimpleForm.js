@@ -1,0 +1,67 @@
+// Note: the HTML page 'TitleInSimpleForm.html' loads this module via data-sap-ui-on-init
+
+sap.ui.define([
+	"sap/ui/layout/form/Form",
+	"sap/ui/layout/form/FormContainer",
+	"sap/ui/layout/form/FormElement",
+	"sap/ui/layout/form/ColumnLayout",
+	"sap/ui/layout/form/ResponsiveGridLayout",
+	"sap/m/Toolbar",
+	"sap/m/ToolbarSpacer",
+	"sap/m/Title",
+	"sap/m/Label",
+	"sap/m/Text",
+	"sap/m/Link",
+	"sap/m/Button",
+	"sap/m/ToggleButton",
+	"sap/m/CheckBox",
+	"sap/m/Select",
+	"sap/m/Input",
+	"sap/ui/core/Icon",
+	"sap/ui/core/Item",
+	"sap/ui/core/library"
+], function(Form, FormContainer, FormElement, ColumnLayout, ResponsiveGridLayout, Toolbar, ToolbarSpacer, Title, Label, Text, Link, Button, ToggleButton, CheckBox, Select, Input, Icon, Item, coreLib) {
+	"use strict";
+
+	var TitleLevel = coreLib.TitleLevel;
+
+	function makeToolbar(sPrefix) {
+		return new Toolbar(sPrefix + "-TB", {
+			content: [
+				new Title(sPrefix + "-Title", { text: "Title (excluded)", level: TitleLevel.H5, titleStyle: TitleLevel.H6, tooltip: "Title tooltip" }),
+				new Icon(sPrefix + "-Icon", { src: "sap-icon://sys-help" }),
+				new Label(sPrefix + "-Label", { text: "Plain Label" }),
+				new Text(sPrefix + "-Text", { text: "Plain Text" }),
+				new Link(sPrefix + "-Link", { text: "A Link", href: "#" }),
+				new CheckBox(sPrefix + "-CB", { text: "Check" }),
+				new ToolbarSpacer(sPrefix + "-Spacer"),
+				new Select(sPrefix + "-Select", { items: [ new Item({ text: "One" }), new Item({ text: "Two" }) ] }),
+				new Input(sPrefix + "-Input", { value: "input", width: "6rem" }),
+				new ToggleButton(sPrefix + "-Toggle", { text: "Toggle" }),
+				new Button(sPrefix + "-Btn", { text: "Button", icon: "sap-icon://accept" })
+			]
+		});
+	}
+
+	function makeForm(sId, oLayout) {
+		return new Form(sId, {
+			toolbar: makeToolbar(sId + "-F"),
+			layout: oLayout,
+			formContainers: [
+				new FormContainer(sId + "-C", {
+					toolbar: makeToolbar(sId + "-C"),
+					formElements: [
+						new FormElement(sId + "-E", {
+							label: "Some field",
+							fields: [ new Input(sId + "-F", { value: "x" }) ]
+						})
+					]
+				})
+			]
+		});
+	}
+
+	makeForm("clForm", new ColumnLayout()).placeAt("content");
+	makeForm("rlForm", new undefined/*ResponsiveLayout*/()).placeAt("content");
+	makeForm("rgForm", new ResponsiveGridLayout()).placeAt("content");
+});

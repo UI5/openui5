@@ -3,6 +3,7 @@
  */
 
 sap.ui.define([
+	"sap/base/Log",
 	"sap/ui/core/Element",
 	"sap/ui/core/format/DateFormat",
 	"sap/ui/core/Fragment",
@@ -14,6 +15,8 @@ sap.ui.define([
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/dt/ElementUtil",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
+	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
@@ -26,6 +29,7 @@ sap.ui.define([
 	"sap/ui/rta/util/changeVisualization/commands/getCommandVisualization",
 	"sap/ui/rta/util/changeVisualization/resolveBinding"
 ], function(
+	Log,
 	Element,
 	DateFormat,
 	Fragment,
@@ -37,6 +41,8 @@ sap.ui.define([
 	OverlayRegistry,
 	ElementUtil,
 	States,
+	VariantManagementState,
+	ManifestUtils,
 	PersistenceWriteAPI,
 	Layer,
 	FlUtils,
@@ -180,6 +186,34 @@ sap.ui.define([
 		// Store bound handler for proper cleanup
 		this._fnOverlayCreatedHandler = this._onElementOverlayCreated.bind(this);
 		this.getDesignTime().attachEvent("elementOverlayCreated", this._fnOverlayCreatedHandler);
+	}
+
+	function attachVariantSwitchListener() {
+		const oComponent = this._getComponent();
+		this._sFlexReference = oComponent && ManifestUtils.getFlexReferenceForControl(oComponent);
+		if (!this._sFlexReference) {
+			return;
+		}
+		this._fnVariantSwitchHandler = (mUpdateParameters, aUpdateInfo) => {
+			// The listener is notified for every flex reference; only react to this app's reference
+			// and only to actual variant switches (not to unrelated variant-map invalidations).
+			if (
+				mUpdateParameters?.reference === this._sFlexReference
+				&& (aUpdateInfo || []).some((oUpdateInfo) => oUpdateInfo.type === "switchVariant")
+			) {
+				this.refreshBorders().catch((oError) => {
+					Log.error("Failed to refresh change visualization borders after variant switch", oError);
+				});
+			}
+		};
+		VariantManagementState.getVariantManagementMap().addUpdateListener(this._fnVariantSwitchHandler);
+	}
+
+	function detachVariantSwitchListener() {
+		if (this._fnVariantSwitchHandler) {
+			VariantManagementState.getVariantManagementMap().removeUpdateListener(this._fnVariantSwitchHandler);
+			this._fnVariantSwitchHandler = null;
+		}
 	}
 
 	function collectChanges() {
@@ -478,6 +512,7 @@ sap.ui.define([
 
 	ChangeVisualization.prototype.exit = function() {
 		this._detachOverlayListeners();
+		detachVariantSwitchListener.call(this);
 		this.removeBorderClasses();
 		this._oChangeIndicatorRegistry.destroy();
 		if (this._oChangeDetailPopup) {
@@ -504,6 +539,7 @@ sap.ui.define([
 		this._oChangeIndicatorRegistry.reset();
 		await refreshChangeRegistryAndDecorations.call(this);
 		attachOverlayListeners.call(this);
+		attachVariantSwitchListener.call(this);
 		this.setInitialized(true);
 	};
 
@@ -584,9 +620,18 @@ sap.ui.define([
 		const oOverlay = oEvent.getParameter("elementOverlay");
 		let sLocalId;
 		try {
-			sLocalId = JsControlTreeModifier.getSelector(oOverlay.getElement(), this._getComponent()).id;
+			const oElement = oOverlay.getElement();
+			sLocalId = JsControlTreeModifier.getSelector(oElement, this._getComponent()).id;
 			const oUnresolvedSet = new Set(this._oChangeIndicatorRegistry.getUnresolvedChangeIds());
-			const aPendingIds = this._oChangeIndicatorRegistry.getChangeIdsForSelector(sLocalId).filter((sId) => oUnresolvedSet.has(sId));
+			let aPendingIds = this._oChangeIndicatorRegistry.getChangeIdsForSelector(sLocalId).filter((sId) => oUnresolvedSet.has(sId));
+
+			// A change resolved before it was applied is indexed under its own selector (the
+			// container), and the container's overlay may have fired before the change applied.
+			// If the new overlay is a descendant of such a container, retry the container's
+			// unresolved changes — by now the applied change and its real target exist.
+			if (aPendingIds.length === 0 && oUnresolvedSet.size > 0) {
+				aPendingIds = this._collectPendingChangesFromAncestors(oElement, oUnresolvedSet);
+			}
 
 			if (aPendingIds.length === 0) {
 				// No unresolved changes for this element — just apply border (fast path).
@@ -598,6 +643,40 @@ sap.ui.define([
 		} catch (oError) {
 			// ignore overlays without valid selector (e.g. due to unstable Id)
 		}
+	};
+
+	/**
+	 * Collects unresolved change IDs that are indexed under any ancestor of the given element. Used
+	 * to retry a container-scoped change (e.g. an add-field change indexed under its group) when a
+	 * descendant overlay is created after the change was applied.
+	 *
+	 * @param {sap.ui.core.Element} oElement - The element whose ancestors are inspected
+	 * @param {Set<string>} oUnresolvedSet - Set of currently unresolved change IDs
+	 * @returns {string[]} Unresolved change IDs indexed under an ancestor
+	 * @private
+	 */
+	ChangeVisualization.prototype._collectPendingChangesFromAncestors = function(oElement, oUnresolvedSet) {
+		const oComponent = this._getComponent();
+		const aPendingIds = [];
+		const oSeen = new Set();
+		let oParent = oElement.getParent && oElement.getParent();
+		// Bounded walk up the control tree; stop at the root control.
+		while (oParent && oParent.getId() !== this.getRootControlId()) {
+			let sAncestorId;
+			try {
+				sAncestorId = JsControlTreeModifier.getSelector(oParent, oComponent).id;
+			} catch (oError) {
+				break;
+			}
+			this._oChangeIndicatorRegistry.getChangeIdsForSelector(sAncestorId).forEach((sId) => {
+				if (oUnresolvedSet.has(sId) && !oSeen.has(sId)) {
+					oSeen.add(sId);
+					aPendingIds.push(sId);
+				}
+			});
+			oParent = oParent.getParent && oParent.getParent();
+		}
+		return aPendingIds;
 	};
 
 	/**
