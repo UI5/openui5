@@ -3376,4 +3376,190 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("VariantManagement Manage dialog lazy loading - additional scenarios", {
+		beforeEach: async function() {
+			this.oVM = new VariantManagement("VM1");
+			this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One", author: "A"}));
+			this.oVM.addItem(new VariantItem("VMI2", {key: "2", title: "Two", author: "B"}));
+			this.oVM.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oVM.destroy();
+		}
+	});
+
+	QUnit.test("a variant lazily loaded after dialog open with runtime values applied is not reported as user-changed", function(assert) {
+		const done = assert.async();
+
+		// Reproduces the reported issue: a shared PUBLIC comp variant is loaded lazily after the manage
+		// dialog was built. The item is created from the persisted file (favorite:false / a given name),
+		// then a runtime value is applied on top (e.g. favorite re-applied from a USER-layer change). The
+		// item's "original" snapshot latched to the file value before the overlay, so without _syncOriginalItemState
+		// _collectManageData would wrongly report the untouched variant as changed.
+		this.oVM.setDynamicVariantsLoadedCallback(function() {
+			const oItem = new VariantItem("VMI_LAZY", {
+				key: "lazy",
+				title: "Lazy Loaded",
+				author: "C",
+				favorite: false
+			});
+			this.oVM.addItem(oItem);
+			// runtime overlay applied AFTER the item exists (after its original snapshot latched):
+			oItem.setFavorite(true);
+			oItem.setExecuteOnSelect(true);
+			return Promise.resolve();
+		}.bind(this));
+
+		this.oVM._createManagementDialog();
+
+		this.oVM.oManagementDialog.attachAfterOpen(function() {
+			Promise.resolve().then(function() {
+				return new Promise(function(resolve) { setTimeout(resolve, 20); });
+			}).then(function() {
+				const oItem = this.oVM.getItems().find((o) => o.getKey() === "lazy");
+				assert.ok(oItem, "the lazily-loaded variant item exists");
+				assert.strictEqual(oItem.getFavorite(), true, "runtime favorite is applied");
+				assert.strictEqual(oItem._getOriginalFavorite(), true, "original favorite is re-synced to the post-load value");
+				assert.strictEqual(oItem._getOriginalExecuteOnSelect(), true, "original executeOnSelect is re-synced to the post-load value");
+
+				const oInfo = this.oVM._collectManageData();
+				const bReported =
+					(oInfo.fav || []).some((o) => o.key === "lazy")
+					|| (oInfo.exe || []).some((o) => o.key === "lazy")
+					|| (oInfo.renamed || []).some((o) => o.key === "lazy");
+				assert.notOk(bReported, "the untouched lazily-loaded variant is NOT reported as changed");
+
+				this.oVM.oManagementDialog.close();
+				done();
+			}.bind(this));
+		}.bind(this));
+
+		this.oVM._openManagementDialog();
+	});
+
+	QUnit.test("check management table is not set busy when no callback is provided", function(assert) {
+		const done = assert.async();
+
+		// No dynamicVariantsLoadedCallback set
+		this.oVM._createManagementDialog();
+		assert.ok(this.oVM.oManagementTable, "management table should exist");
+
+		const oSetBusySpy = sinon.spy(this.oVM.oManagementTable, "setBusy");
+
+		this.oVM.oManagementDialog.attachAfterOpen(function() {
+			assert.ok(!oSetBusySpy.called, "setBusy should not have been called when no callback is provided");
+			assert.ok(!this.oVM.oManagementTable.getBusy(), "table should not be busy");
+
+			oSetBusySpy.restore();
+			this.oVM.oManagementDialog.close();
+			done();
+		}.bind(this));
+
+		this.oVM._openManagementDialog();
+	});
+
+	QUnit.test("check management table is not set busy when callback does not return a promise", function(assert) {
+		const done = assert.async();
+
+		this.oVM.setDynamicVariantsLoadedCallback(function() {
+			return undefined; // not a promise
+		});
+
+		this.oVM._createManagementDialog();
+		assert.ok(this.oVM.oManagementTable, "management table should exist");
+
+		const oSetBusySpy = sinon.spy(this.oVM.oManagementTable, "setBusy");
+
+		this.oVM.oManagementDialog.attachAfterOpen(function() {
+			assert.ok(!oSetBusySpy.called, "setBusy should not have been called when callback does not return a promise");
+			assert.ok(!this.oVM.oManagementTable.getBusy(), "table should not be busy");
+
+			oSetBusySpy.restore();
+			this.oVM.oManagementDialog.close();
+			done();
+		}.bind(this));
+
+		this.oVM._openManagementDialog();
+	});
+
+	QUnit.test("check management table busy state is cleared and table is rebound when promise rejects", function(assert) {
+		const done = assert.async();
+
+		let fnRejectPromise;
+		const oPromise = new Promise(function(resolve, reject) {
+			fnRejectPromise = reject;
+		});
+
+		this.oVM.setDynamicVariantsLoadedCallback(function() {
+			return oPromise;
+		});
+
+		this.oVM._createManagementDialog();
+		assert.ok(this.oVM.oManagementTable, "management table should exist");
+
+		const oSetBusySpy = sinon.spy(this.oVM.oManagementTable, "setBusy");
+		const oRebindVMTableSpy = sinon.spy(this.oVM, "_rebindVMTable");
+
+		this.oVM.oManagementDialog.attachAfterOpen(function() {
+			assert.ok(oSetBusySpy.calledWith(true), "setBusy(true) should have been called");
+			assert.ok(this.oVM.oManagementTable.getBusy(), "table should be busy while promise is pending");
+
+			// Reject the promise
+			fnRejectPromise("error");
+
+			// Wait for promise to settle (.finally is used in implementation)
+			oPromise.catch(function() {}).then(function() {
+				return new Promise(function(resolve) { setTimeout(resolve, 10); });
+			}).then(function() {
+				assert.ok(oSetBusySpy.calledWith(false), "setBusy(false) should have been called after promise rejection");
+				assert.ok(!this.oVM.oManagementTable.getBusy(), "table should not be busy after promise rejects");
+				assert.ok(oRebindVMTableSpy.calledWith(true), "_rebindVMTable(true) should have been called after promise settles");
+
+				oSetBusySpy.restore();
+				oRebindVMTableSpy.restore();
+				this.oVM.oManagementDialog.close();
+				done();
+			}.bind(this));
+		}.bind(this));
+
+		this.oVM._openManagementDialog();
+	});
+
+	QUnit.test("check callback is invoked each time management dialog opens", function(assert) {
+		const done = assert.async();
+
+		let nCallbackCount = 0;
+		this.oVM.setDynamicVariantsLoadedCallback(function() {
+			nCallbackCount++;
+			return Promise.resolve();
+		});
+
+		this.oVM._createManagementDialog();
+		assert.ok(this.oVM.oManagementTable, "management table should exist");
+
+		let nOpenCount = 0;
+
+		this.oVM.oManagementDialog.attachAfterOpen(function() {
+			nOpenCount++;
+
+			if (nOpenCount === 1) {
+				assert.equal(nCallbackCount, 1, "callback should have been called once after first open");
+
+				// Close and reopen the dialog
+				this.oVM.oManagementDialog.attachEventOnce("afterClose", function() {
+					this.oVM._openManagementDialog();
+				}.bind(this));
+				this.oVM.oManagementDialog.close();
+			} else {
+				assert.equal(nCallbackCount, 2, "callback should have been called twice after second open");
+				this.oVM.oManagementDialog.close();
+				done();
+			}
+		}.bind(this));
+
+		this.oVM._openManagementDialog();
+	});
+
 });
+

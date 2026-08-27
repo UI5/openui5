@@ -2653,9 +2653,31 @@ sap.ui.define([
 					this.oManagementTable.setBusy(false);
 					//Rebind table to display refreshed data after lazy loading variants
 					this._rebindVMTable(true);
+					// Variants loaded during the callback (e.g. shared PUBLIC variants) are added to the items
+					// aggregation after the dialog was built. Their "original" snapshot was taken while the item
+					// was created from the persisted file, before the loaded runtime values were applied on top
+					// (e.g. a favorite/executeOnSelection re-applied from a USER-layer change, or the variant
+					// name/contexts). Without re-seeding, _collectManageData would treat these untouched variants
+					// as user-modified on save and issue spurious updates that mark them dirty in the flex layer.
+					this._syncOriginalItemState();
 				}.bind(this));
 			}
 		}
+	};
+
+	/**
+	 * Re-seeds the "original" snapshot of every variant item to its current value. Used after the dynamic
+	 * variants loading completes so that runtime values applied to lazily loaded variants become the baseline
+	 * and are not reported as user changes by {@link #_collectManageData}.
+	 * @private
+	 */
+	VariantManagement.prototype._syncOriginalItemState = function() {
+		this.getItems().forEach(function(oItem) {
+			oItem._setOriginalTitle(oItem.getTitle());
+			oItem._setOriginalFavorite(oItem.getFavorite());
+			oItem._setOriginalExecuteOnSelect(oItem.getExecuteOnSelect());
+			oItem._setOriginalContexts(oItem.getContexts());
+		});
 	};
 
 	VariantManagement.prototype._toggleIconActivityState = function(oIcon, oItem, bToInActive) {
