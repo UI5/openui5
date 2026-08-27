@@ -98,6 +98,21 @@ sap.ui.define([
 				);
 			});
 		});
+
+		QUnit.test("when calling 'getChangeVisualizationInfo'", function(assert) {
+			this.oChangeHandler.completeChangeContent(this.oChange, this.mSpecificChangeData, this.mPropertyBag);
+			const mVizInfo = this.oChangeHandler.getChangeVisualizationInfo(this.oChange);
+			assert.deepEqual(
+				mVizInfo.affectedControls,
+				[this.oChange.getContent().selector],
+				"then the affected control is the change selector"
+			);
+			assert.deepEqual(
+				mVizInfo.descriptionPayload,
+				{ url: { raw: sUrl } },
+				"then the iframe URL is surfaced wrapped as { raw } so it is not resolved as a binding"
+			);
+		});
 	});
 
 	QUnit.module("Given a AddIFrame Change Handler with JSTreeModifier", {
