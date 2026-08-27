@@ -32,7 +32,7 @@
 }
 
 .sapMGT .sapMTileCnt.sapMFrameTypeAuto:not(:only-of-type) {
-	width: ~"calc(50% - 0.25rem)"; /* 0.5rem margin between the contents */
+	width: ~'calc(50% - 0.25rem)'; /* 0.5rem margin between the contents */
 }
 
 /* Footer CSS */
@@ -51,7 +51,7 @@
 	margin-right: 1rem;
 	line-height: normal;
 	font-family: var(--sapFontFamily);
-	font-size: @sapMFontMediumSize;
+	font-size: var(--sapFontSize);
 	font-weight: normal;
 }
 
@@ -59,7 +59,7 @@
 	text-align: left;
 }
 
-html[dir=rtl] .sapMGT .sapMTileCntFtrTxt {
+html[dir='rtl'] .sapMGT .sapMTileCntFtrTxt {
 	text-align: right;
 }
 
@@ -79,7 +79,7 @@ html[dir=rtl] .sapMGT .sapMTileCntFtrTxt {
 	color: var(--sapCriticalTextColor);
 }
 
-html[dir=rtl] .sapMTileCntFtrTxt {
+html[dir='rtl'] .sapMTileCntFtrTxt {
 	text-align: left;
 }
 
