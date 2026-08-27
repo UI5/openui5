@@ -20,10 +20,11 @@ sap.ui.define([
 	"sap/m/table/Util",
 	"sap/ui/core/Lib",
 	"sap/base/Log",
+	"sap/ui/dom/getScrollbarSize",
     // jQuery custom selectors ":sapTabbable"
 	"sap/ui/dom/jquery/Selectors"
 ],
-	function(ControlBehavior, library, ListBase, ListItemBase, CheckBox, TableRenderer, PluginBase, BaseObject, ResizeHandler, PasteHelper, jQuery, ListBaseRenderer, Icon, Util, Library, Log) {
+	function(ControlBehavior, library, ListBase, ListItemBase, CheckBox, TableRenderer, PluginBase, BaseObject, ResizeHandler, PasteHelper, jQuery, ListBaseRenderer, Icon, Util, Library, Log, getScrollbarSize) {
 	"use strict";
 
 
@@ -368,7 +369,39 @@ sap.ui.define([
 	};
 
 	Table.prototype._onResize = function(mParams) {
-		this._applyContextualWidth(mParams.size.width);
+		var iWidth = mParams.size.width;
+
+		// contextualWidth="Auto": a pop-in flip toggles the scroll container's scrollbar, which changes the measured
+		// width by the scrollbar size and would flip the column back. Skip such a self-induced rebound before applying it.
+		if (this._sContextualWidth.toLowerCase() === "auto"
+			&& this._iLastAppliedContextualWidth !== undefined
+			&& this._isSelfInducedScrollbarRebound(this._iLastAppliedContextualWidth, iWidth)) {
+			return;
+		}
+
+		this._iLastAppliedContextualWidth = iWidth;
+		this._applyContextualWidth(iWidth);
+	};
+
+	// Detects whether iNew is the scrollbar-sized rebound of iApplied caused by our own last pop-in flip:
+	// within one scrollbar width AND crossing a visible column's pop-in breakpoint.
+	Table.prototype._isSelfInducedScrollbarRebound = function(iApplied, iNew) {
+		var iDelta = Math.abs(iNew - iApplied);
+		if (!iDelta) {
+			return false;
+		}
+
+		var iScrollbar = getScrollbarSize().width;
+		if (!iScrollbar || iDelta > iScrollbar + 1) {
+			return false;
+		}
+
+		const iMin = Math.min(iApplied, iNew);
+		const iMax = Math.max(iApplied, iNew);
+		return this.getColumns().some((oColumn) => {
+			const iBreakpoint = oColumn.getCalculatedMinScreenWidth();
+			return oColumn.getVisible() && iBreakpoint > iMin && iBreakpoint <= iMax;
+		});
 	};
 
 	Table.prototype._registerResizeHandler = function () {
@@ -389,6 +422,8 @@ sap.ui.define([
 		if (this._iResizeHandlerId) {
 			ResizeHandler.deregister(this._iResizeHandlerId);
 			this._iResizeHandlerId = null;
+			// reset anti-oscillation history
+			this._iLastAppliedContextualWidth = undefined;
 		}
 	};
 
