@@ -14,8 +14,6 @@
 				"local": "./"
 			}'>
 		</script>
-	</head>
-	<body id="body" class="sapUiBody">
 		<style>
 			.myShellOverrides {
 				--sapShell_Navigation_TextColor: red;
@@ -26,7 +24,20 @@
 				--sapShell_Navigation_Hover_Background: darkblue;
 				--sapShell_Navigation_Active_TextColor: pink;
 				--sapShell_Navigation_Active_Background: black;
+
+				--sapShell_Hover_Background: lightblue;
+				--sapShell_Shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.5);
+
+				/* Re-set the private variables to reflect the overridden shell parameters */
+				--_sap_m_IconTabBar_ShellHeaderShadow: var(--sapShell_Shadow);
+				--_sap_m_IconTabBar_ShellTextColor: var(--sapShell_Navigation_TextColor);
+				--_sap_m_IconTabBar_ShellSelectedTextColor: var(--sapShell_Navigation_Selected_TextColor);
+
+				--_sap_m_IconTabBar_ShellOverflowPressedBorderColor: var(--sapShell_Navigation_Active_Background);
+				--_sap_m_IconTabBar_Filter_Expand_Shell_BackgroundColor_Hover: var(--sapShell_Hover_Background);
 			}
 		</style>
+	</head>
+	<body id="body" class="sapUiBody">
 	</body>
 </html>
