@@ -67,17 +67,15 @@ sap.ui.define([
 			// do not delete important info, except nested below a "collapse all"
 			if (oExpandInfo?.important && !bNested) {
 				oExpandInfo.levels = 0;
-				if (bAll) {
-					oExpandInfo.collapseAll = true;
-				}
 			} else if (bNested || oExpandInfo && oExpandInfo.levels !== 0) {
 				delete this.mPredicate2ExpandInfo[sPredicate];
 			} else {
 				// must determine node ID and key filter now; the node may be missing when calling
 				// #getExpandLevels or #getExpandFilters
 				this.mPredicate2ExpandInfo[sPredicate] = {
-					collapseAll : bAll,
 					filter : this.fnGetKeyFilter(oNode),
+					// keep this expand info through following collapse/expand calls?
+					important : bAll,
 					levels : 0,
 					nodeId : this.fnGetNodeId(oNode)
 				};
@@ -170,8 +168,7 @@ sap.ui.define([
 			const oExpandInfo = this.mPredicate2ExpandInfo[sPredicate];
 			if (oExpandInfo?.important) { // do not delete important info
 				oExpandInfo.levels = iLevels;
-				delete oExpandInfo.collapseAll;
-			} else if (oExpandInfo && !oExpandInfo.levels && !oExpandInfo.collapseAll) {
+			} else if (oExpandInfo && !oExpandInfo.levels) {
 				delete this.mPredicate2ExpandInfo[sPredicate];
 			} else {
 				// must determine node ID and key filter now; the node may be missing when calling
@@ -343,7 +340,7 @@ sap.ui.define([
 			// #getExpandLevels or #getExpandFilters
 			this.mPredicate2ExpandInfo[sPredicate] = {
 				filter : this.fnGetKeyFilter(oNode),
-				// keep this expand info through following collapse/expand calls
+				// keep this expand info through following collapse/expand calls?
 				important : bImportant,
 				levels : 1,
 				nodeId : this.fnGetNodeId(oNode)

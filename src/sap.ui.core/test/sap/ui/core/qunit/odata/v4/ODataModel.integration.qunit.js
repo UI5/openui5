@@ -54637,10 +54637,17 @@ make root = ${bMakeRoot}`;
 	//*********************************************************************************************
 	// Scenario: Show the top pyramid of a recursive hierarchy, expanded to level 3.
 	// Expand Gamma. Collapse Alpha completely. Expand Alpha again and see that Beta and Epsilon
-	// (although placeholder when collapsing all) are collapsed. Expand Beta and Gamma again.
+	// (although placeholder when collapsing all) are collapsed. (*) Expand Beta and Gamma again.
 	// Collapse Alpha completely again. Expand all below Alpha and check the complete tree.
 	// JIRA: CPOUI5ODATAV4-2668
-	QUnit.test("Recursive Hierarchy: collapse all, expandTo=3", async function (assert) {
+	//
+	// (*) Optionally, collapse Alpha again and check that a side-effects refresh keeps the tree
+	// state.
+	// JIRA: CPOUI5ODATAV4-3650
+[false, true].forEach((bOptionally) => {
+	const sTitle = "Recursive Hierarchy: collapse all, expandTo=3; (*) = " + bOptionally;
+
+	QUnit.test(sTitle, async function (assert) {
 		const sUrl = "EMPLOYEES?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
 			+ "HierarchyNodes=$root/EMPLOYEES,HierarchyQualifier='OrgChart'"
 			+ ",NodeProperty='ID',Levels=3";
@@ -54772,6 +54779,37 @@ make root = ${bMakeRoot}`;
 			[false, 2, "1", "Beta"],
 			[false, 2, "2", "Epsilon"]
 		]);
+
+		if (bOptionally) {
+			oAlpha.collapse();
+
+			this.expectRequest(sUrl + ",ExpandLevels="
+					+ JSON.stringify([{NodeID : "0", Levels : 0}])
+					+ sSelect + "&$count=true&$skip=0&$top=3", {
+					"@odata.count" : "1",
+					value : [{
+						DescendantCount : "0",
+						DistanceFromRoot : "0",
+						DrillState : "collapsed",
+						ID : "0",
+						Name : "Alpha"
+					}]
+				});
+
+			await Promise.all([
+				// code under test
+				oAlpha.getBinding().getHeaderContext().requestSideEffects([""]),
+				this.waitForChanges(assert, "side-effects refresh")
+			]);
+
+			checkTable("after side-effects refresh", assert, oTable, [
+				"/EMPLOYEES('0')"
+			], [
+				[false, 1, "0", "Alpha"]
+			]);
+
+			return;
+		}
 
 		this.expectRequest(sUrl + ",ExpandLevels="
 				+ JSON.stringify([{NodeID : "0", Levels : 1}, {NodeID : "1", Levels : 1}])
@@ -54936,6 +54974,7 @@ make root = ${bMakeRoot}`;
 				[undefined, 3, "2.1", "Zeta"]
 			]);
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: An out-of-place node is preserved by side-effects (no refresh!), even when hidden

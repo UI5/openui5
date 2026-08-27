@@ -115,7 +115,7 @@ sap.ui.define([
 
 		assert.deepEqual(oTreeState.mPredicate2ExpandInfo, {
 			"~predicate~" :
-				{collapseAll : undefined, filter : "~filter~", levels : 0, nodeId : "~sNodeId~"}
+				{filter : "~filter~", important : undefined, levels : 0, nodeId : "~sNodeId~"}
 		});
 
 		// code under test
@@ -123,7 +123,7 @@ sap.ui.define([
 
 		assert.deepEqual(oTreeState.mPredicate2ExpandInfo, {
 			"~predicate~" :
-				{collapseAll : undefined, filter : "~filter~", levels : 0, nodeId : "~sNodeId~"}
+				{filter : "~filter~", important : undefined, levels : 0, nodeId : "~sNodeId~"}
 		});
 
 		// code under test
@@ -137,9 +137,9 @@ sap.ui.define([
 		const oTreeState = new _TreeState(mustBeMocked, mustBeMocked);
 		this.mock(_Helper).expects("getPrivateAnnotation").twice()
 			.withExactArgs("~oNode~", "predicate").returns("~predicate~");
-		this.mock(oTreeState).expects("fnGetKeyFilter").twice()
+		this.mock(oTreeState).expects("fnGetKeyFilter")
 			.withExactArgs("~oNode~").returns("~filter~");
-		this.mock(oTreeState).expects("fnGetNodeId").twice()
+		this.mock(oTreeState).expects("fnGetNodeId")
 			.withExactArgs("~oNode~").returns("~sNodeId~");
 
 		// code under test
@@ -147,7 +147,7 @@ sap.ui.define([
 
 		assert.deepEqual(oTreeState.mPredicate2ExpandInfo, {
 			"~predicate~" :
-				{collapseAll : true, filter : "~filter~", levels : 0, nodeId : "~sNodeId~"}
+				{filter : "~filter~", important : true, levels : 0, nodeId : "~sNodeId~"}
 		});
 
 		// code under test
@@ -155,7 +155,7 @@ sap.ui.define([
 
 		assert.deepEqual(oTreeState.mPredicate2ExpandInfo, {
 			"~predicate~" :
-				{filter : "~filter~", levels : 42, nodeId : "~sNodeId~"}
+				{filter : "~filter~", important : true, levels : 42, nodeId : "~sNodeId~"}
 		});
 	});
 
@@ -163,7 +163,7 @@ sap.ui.define([
 	QUnit.test("collapse: bNested", function (assert) {
 		const oTreeState = new _TreeState("~fnGetKeyFilter~", "~fnGetNodeId~");
 		oTreeState.mPredicate2ExpandInfo = {
-			"~predicate~" : {collapseAll : false, nodeId : "~sNodeId~", levels : 0},
+			"~predicate~" : {nodeId : "~sNodeId~", levels : 0},
 			foo : "bar"
 		};
 
@@ -257,8 +257,8 @@ sap.ui.define([
 		assert.strictEqual(oTreeState.getExpandLevels(), undefined);
 
 		oTreeState.mPredicate2ExpandInfo = {
-			foo : {collapseAll : true, nodeId : "baz", levels : 42},
-			bar : {collapseAll : false, nodeId : "qux", levels : 23}
+			foo : {important : true, nodeId : "baz", levels : 42},
+			bar : {important : false, nodeId : "qux", levels : 23}
 		};
 		const sPredicate2ExpandInfo = JSON.stringify(oTreeState.mPredicate2ExpandInfo);
 
@@ -798,13 +798,12 @@ sap.ui.define([
 			"expand all" : {levels : null},
 			expanded : {levels : 1}
 		};
-		const deepEqual = (iLevels, bCollapseAll) => {
+		const deepEqual = (iLevels) => {
 			assert.deepEqual(oTreeState.mPredicate2ExpandInfo, {
 				collapsed : {levels : 0},
 				"expand all" : {levels : null},
 				expanded : {levels : 1},
 				"~predicate~" : {
-					...(bCollapseAll && {collapseAll : true}),
 					filter : "~filter~",
 					important : true,
 					levels : iLevels,
@@ -844,7 +843,7 @@ sap.ui.define([
 		// code under test
 		oTreeState.collapse("~oNode~", /*bAll*/true);
 
-		deepEqual(0, /*bCollapseAll*/true);
+		deepEqual(0);
 
 		// code under test
 		oTreeState.collapse("~oNode~", /*bAll*/true, /*bNested*/true);
@@ -856,7 +855,6 @@ sap.ui.define([
 		});
 
 		oTreeState.mPredicate2ExpandInfo["~predicate~"] = {
-			collapseAll : "~collapseAll~", // needs to be dropped
 			filter : "~filter~",
 			important : true, // needs to be kept
 			levels : 0, // needs to be changed
