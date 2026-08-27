@@ -29,7 +29,7 @@ sap.ui.define([
 			Localization.setLanguage("en-US");
 			this.oStubCalendarType = this.stub(Formatting, "getCalendarType");
 			this.oStubCalendarType.returns(CalendarType.Gregorian);
-			this.dateSpy = this.spy(window, 'Date');
+			this.dateSpy = this.spy(globalThis, 'Date');
 		},
 		afterEach: function () {
 			this.dateSpy.restore();
@@ -199,7 +199,7 @@ sap.ui.define([
 			MockDateClass[sMethodName] = () => {};
 
 			const d = new MockDateClass();
-			const oDateConstructorStub = this.stub(window, 'Date').returns(d);
+			const oDateConstructorStub = this.stub(globalThis, 'Date').returns(d);
 			const oMethodStub = this.stub(d, sMethodName).returns(111);
 			Date[sMethodName] = d[sMethodName]; //eslint-disable-line no-extend-native
 
