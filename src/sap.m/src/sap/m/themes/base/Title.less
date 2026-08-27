@@ -15,6 +15,14 @@
 	text-overflow: ellipsis;
 	cursor: text;
 	text-shadow: @sapUiShadowText;
+
+	&[tabindex="0"] {
+		cursor: default;
+	}
+
+	&[tabindex="0"]:focus {
+		outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
+	}
 }
 
 .sapMTitle.sapMTitleWrap {

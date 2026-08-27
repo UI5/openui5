@@ -28,17 +28,17 @@ sap.ui.define([
 
 		/**
 		 * Constructor for a new _TreeState.
-		 * The tree state is only kept if a <code>sNodeProperty</code> is given.
 		 *
-		 * @param {string} [sNodeProperty] - The path to the node id property
 		 * @param {function(object):string} fnGetKeyFilter
 		 *   A function to calculate a node's key filter
+		 * @param {function(object):any} fnGetNodeId
+		 *   A function to calculate a node's ID
 		 *
 		 * @public
 		 */
-		constructor(sNodeProperty, fnGetKeyFilter) {
+		constructor(fnGetKeyFilter, fnGetNodeId) {
 			this.fnGetKeyFilter = fnGetKeyFilter;
-			this.sNodeProperty = sNodeProperty;
+			this.fnGetNodeId = fnGetNodeId;
 		}
 
 		/**
@@ -52,10 +52,6 @@ sap.ui.define([
 		 * @public
 		 */
 		collapse(oNode, bAll, bNested) {
-			if (!this.sNodeProperty) {
-				return;
-			}
-
 			const sPredicate = _Helper.getPrivateAnnotation(oNode, "predicate");
 			const oExpandInfo = this.mPredicate2ExpandInfo[sPredicate];
 			if (bNested || oExpandInfo && oExpandInfo.levels !== 0) {
@@ -67,7 +63,7 @@ sap.ui.define([
 					collapseAll : bAll,
 					filter : this.fnGetKeyFilter(oNode),
 					levels : 0,
-					nodeId : _Helper.drillDown(oNode, this.sNodeProperty)
+					nodeId : this.fnGetNodeId(oNode)
 				};
 			}
 		}
@@ -83,10 +79,6 @@ sap.ui.define([
 		 * @public
 		 */
 		delete(oNode, fnOnDelete) {
-			if (!this.sNodeProperty) {
-				return;
-			}
-
 			const sPredicate = _Helper.getPrivateAnnotation(oNode, "predicate");
 			delete this.mPredicate2ExpandInfo[sPredicate];
 			this.deleteOutOfPlace(sPredicate, false, fnOnDelete);
@@ -153,10 +145,6 @@ sap.ui.define([
 		 * @public
 		 */
 		expand(oNode, iLevels = 1) {
-			if (!this.sNodeProperty) {
-				return;
-			}
-
 			if (iLevels >= Number.MAX_SAFE_INTEGER) {
 				iLevels = null;
 				this.deleteExpandInfo(oNode);
@@ -171,7 +159,7 @@ sap.ui.define([
 				this.mPredicate2ExpandInfo[sPredicate] = {
 					filter : this.fnGetKeyFilter(oNode),
 					levels : iLevels,
-					nodeId : _Helper.drillDown(oNode, this.sNodeProperty)
+					nodeId : this.fnGetNodeId(oNode)
 				};
 			}
 		}

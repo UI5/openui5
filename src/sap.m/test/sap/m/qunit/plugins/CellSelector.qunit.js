@@ -71,7 +71,8 @@ sap.ui.define([
 			columns: [
 				new MColumn({ header: new Text({text: "ProductId"}) }),
 				new MColumn({ header: new Text({text: "Name"}) }),
-				new MColumn({ header: new Text({text: "Category"}), visible: false })
+				new MColumn({header: new Text({text: "Category"}), visible: false}),
+				new MColumn({header: new Text({text: "Input"})})
 			],
 			items: {
 				path: "/Products",
@@ -79,7 +80,8 @@ sap.ui.define([
 					cells: [
 						new Text({text: "{ProductId}"}),
 						new Text({text: "{Name}"}),
-						new Text({text: "{Category}"})
+						new Text({text: "{Category}"}),
+						new Input()
 					],
 					type: "Active"
 				})
@@ -607,6 +609,76 @@ sap.ui.define([
 		);
 	});
 
+	QUnit.test("Cell selection is cleared on the selection plugin's selectionChange event", async function(assert) {
+		const oTable = this.oTable;
+		const oCellSelector = this.oCellSelector;
+		const oSelectionPlugin = oTable.getDependents().find((oPlugin) => oPlugin.isA("sap.ui.table.plugins.MultiSelectionPlugin"));
+
+		const oCell = getCell(oTable, 1, 0); // first cell of first row
+		qutils.triggerKeydown(oCell, KeyCodes.SPACE); // select cell
+		qutils.triggerKeyup(oCell, KeyCodes.SPACE);
+		assert.deepEqual(oCellSelector.getSelectionRange(), {from: {rowIndex: 1, colIndex: 0}, to: {rowIndex: 1, colIndex: 0}},
+			"Cell has been selected");
+
+		// The CellSelector listens to the selection plugin's selectionChange event and clears its cell selection.
+		await oSelectionPlugin.addSelectionInterval(0, 0);
+		assert.equal(oCellSelector.getSelectionRange(), null, "Cell selection is cleared");
+	});
+
+	QUnit.test("Cell selection is cleared on the table's rowSelectionChange event (no selection plugin)", async function(assert) {
+		const oCellSelector = new CellSelector({rangeLimit: 15});
+		const oTable = createGridTable();
+
+		oTable.destroyDependents();
+		oTable.setSelectionMode("MultiToggle");
+		oTable.addDependent(oCellSelector);
+		oTable.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oCell = getCell(oTable, 1, 0); // first cell of first row
+		qutils.triggerKeydown(oCell, KeyCodes.SPACE); // select cell
+		qutils.triggerKeyup(oCell, KeyCodes.SPACE);
+		assert.deepEqual(oCellSelector.getSelectionRange(), {from: {rowIndex: 1, colIndex: 0}, to: {rowIndex: 1, colIndex: 0}},
+			"Cell has been selected");
+
+		oTable.setSelectedIndex(0);
+		assert.equal(oCellSelector.getSelectionRange(), null, "Cell selection is cleared");
+
+		oTable.destroy();
+	});
+
+	QUnit.test("Ctrl+Shift+A clears the cell selection", function(assert) {
+		const oTable = this.oTable;
+		const oCellSelector = this.oCellSelector;
+
+		let oCell = getCell(oTable, 1, 0); // first cell of first row
+		qutils.triggerKeydown(oCell, KeyCodes.SPACE); // select cell
+		qutils.triggerKeyup(oCell, KeyCodes.SPACE);
+		assert.deepEqual(oCellSelector.getSelectionRange(), {from: {rowIndex: 1, colIndex: 0}, to: {rowIndex: 1, colIndex: 0}},
+			"Cell has been selected");
+
+		oCell = getCell(oTable, 2, 0);
+		qutils.triggerKeydown(oCell, KeyCodes.A, true, false, true); // Ctrl+Shift+A
+		assert.equal(oCellSelector.getSelectionRange(), null, "Cell selection is cleared");
+	});
+
+	QUnit.test("Ctrl+Shift+A does not clear the cell selection when focus is on an input", function(assert) {
+		const oTable = this.oTable;
+		const oCellSelector = this.oCellSelector;
+
+		const oCell = getCell(oTable, 1, 0); // first cell of first row
+		qutils.triggerKeydown(oCell, KeyCodes.SPACE); // select cell
+		qutils.triggerKeyup(oCell, KeyCodes.SPACE);
+		assert.deepEqual(oCellSelector.getSelectionRange(), {from: {rowIndex: 1, colIndex: 0}, to: {rowIndex: 1, colIndex: 0}},
+			"Cell has been selected");
+
+		const oInput = oTable.getRows()[0].getCells()[3].getDomRef();
+		oInput.focus();
+		qutils.triggerKeydown(oInput, KeyCodes.A, true, false, true); // Ctrl+Shift+A
+		assert.deepEqual(oCellSelector.getSelectionRange(), {from: {rowIndex: 1, colIndex: 0}, to: {rowIndex: 1, colIndex: 0}},
+			"Cell selection is not cleared when focus is on an input");
+	});
+
 	QUnit.module("Interaction - ResponsiveTable", {
 		beforeEach: async function() {
 			this.oMockServer = new MockServer({ rootUri : sServiceURI });
@@ -826,29 +898,6 @@ sap.ui.define([
 		qutils.triggerEvent("mouseup", oCell);
 	});
 
-	QUnit.test("keyboard remove selection", function (assert) {
-		const oTable = this.oTable;
-		const oCellSelector = this.oCellSelector;
-
-		const fnSelectionChangeSpy = sinon.spy();
-		oCellSelector.attachEvent("selectionChange", fnSelectionChangeSpy);
-
-		let oCell = getCell(oTable, 1, 0); // first cell of first row
-		qutils.triggerKeydown(oCell, KeyCodes.SPACE); // select first cell of first row
-		qutils.triggerKeyup(oCell, KeyCodes.SPACE); // select first cell of first row
-
-		oTable.addDelegate({
-			onkeydown: function(oEvent) {
-				oEvent.setMarked(oCellSelector.getConfig("eventClearedAll"));
-			}
-		}, true);
-
-		oCell = getCell(oTable, 2, 0);
-		qutils.triggerKeydown(oCell, KeyCodes.A, false, false, true);
-
-		assert.equal(this.oCellSelector.getSelectionRange(), null, "Selection is cleared");
-	});
-
 	QUnit.test("Avoid selection clicking on column header", function(assert) {
 		this.oTable.addDragDropConfig(new DragDropInfo({
 			sourceAggregation: "columns",
@@ -968,6 +1017,55 @@ sap.ui.define([
 
 		assert.equal(iGetCellRefCalls, iSelectionRows * iSelectionCols,
 			"getCellRef called only for cells within the selection, not for all rendered cells");
+	});
+
+	QUnit.test("Cell selection is cleared on the table's selectionChange event", function(assert) {
+		const oTable = this.oTable;
+		const oCellSelector = this.oCellSelector;
+
+		oTable.setMode("MultiSelect");
+
+		const oCell = getCell(oTable, 1, 0); // first cell of first row
+		qutils.triggerKeydown(oCell, KeyCodes.SPACE); // select cell
+		qutils.triggerKeyup(oCell, KeyCodes.SPACE);
+		assert.deepEqual(oCellSelector.getSelectionRange(), {from: {rowIndex: 1, colIndex: 0}, to: {rowIndex: 1, colIndex: 0}},
+			"Cell has been selected");
+
+		// The CellSelector listens to the table's selectionChange event and clears its cell selection.
+		oTable.setSelectedItem(oTable.getItems()[0], true, true);
+		assert.equal(oCellSelector.getSelectionRange(), null, "Cell selection is cleared");
+	});
+
+	QUnit.test("Ctrl+Shift+A clears the cell selection", function(assert) {
+		const oTable = this.oTable;
+		const oCellSelector = this.oCellSelector;
+
+		let oCell = getCell(oTable, 1, 0); // first cell of first row
+		qutils.triggerKeydown(oCell, KeyCodes.SPACE); // select cell
+		qutils.triggerKeyup(oCell, KeyCodes.SPACE);
+		assert.deepEqual(oCellSelector.getSelectionRange(), {from: {rowIndex: 1, colIndex: 0}, to: {rowIndex: 1, colIndex: 0}},
+			"Cell has been selected");
+
+		oCell = getCell(oTable, 2, 0);
+		qutils.triggerKeydown(oCell, KeyCodes.A, true, false, true); // Ctrl+Shift+A
+		assert.equal(oCellSelector.getSelectionRange(), null, "Cell selection is cleared");
+	});
+
+	QUnit.test("Ctrl+Shift+A does not clear the cell selection when focus is on an input", function(assert) {
+		const oTable = this.oTable;
+		const oCellSelector = this.oCellSelector;
+
+		const oCell = getCell(oTable, 1, 0); // first cell of first row
+		qutils.triggerKeydown(oCell, KeyCodes.SPACE); // select cell
+		qutils.triggerKeyup(oCell, KeyCodes.SPACE);
+		assert.deepEqual(oCellSelector.getSelectionRange(), {from: {rowIndex: 1, colIndex: 0}, to: {rowIndex: 1, colIndex: 0}},
+			"Cell has been selected");
+
+		const oInput = oTable.getItems()[0].getCells()[3].getDomRef();
+		oInput.focus();
+		qutils.triggerKeydown(oInput, KeyCodes.A, true, false, true); // Ctrl+Shift+A
+		assert.deepEqual(oCellSelector.getSelectionRange(), {from: {rowIndex: 1, colIndex: 0}, to: {rowIndex: 1, colIndex: 0}},
+			"Cell selection is not cleared when focus is on an input");
 	});
 
 	QUnit.module("Dialog Behavior", {

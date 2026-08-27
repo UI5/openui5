@@ -22,10 +22,10 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("constructor", function (assert) {
 		// code under test
-		const oTreeState = new _TreeState("~sNodeProperty~", "~fnGetKeyFilter~");
+		const oTreeState = new _TreeState("~fnGetKeyFilter~", "~fnGetNodeId~");
 
 		assert.ok(oTreeState instanceof _TreeState);
-		assert.strictEqual(oTreeState.sNodeProperty, "~sNodeProperty~");
+		assert.strictEqual(oTreeState.fnGetNodeId, "~fnGetNodeId~");
 		assert.strictEqual(oTreeState.fnGetKeyFilter, "~fnGetKeyFilter~");
 		assert.deepEqual(oTreeState.mPredicate2ExpandInfo, {});
 		assert.deepEqual(oTreeState.mPredicate2OutOfPlace, {});
@@ -35,14 +35,13 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("expand/collapse: default level", function (assert) {
-		const oTreeState = new _TreeState("~sNodeProperty~", mustBeMocked);
-
+		const oTreeState = new _TreeState(mustBeMocked, mustBeMocked);
 		this.mock(_Helper).expects("getPrivateAnnotation").thrice()
 			.withExactArgs("~oNode~", "predicate").returns("~predicate~");
 		this.mock(oTreeState).expects("fnGetKeyFilter").twice()
 			.withExactArgs("~oNode~").returns("~filter~");
-		this.mock(_Helper).expects("drillDown").twice()
-			.withExactArgs("~oNode~", "~sNodeProperty~").returns("~sNodeId~");
+		this.mock(oTreeState).expects("fnGetNodeId").twice()
+			.withExactArgs("~oNode~").returns("~sNodeId~");
 
 		// code under test
 		oTreeState.expand("~oNode~");
@@ -70,7 +69,7 @@ sap.ui.define([
 	{iLevels : 1e16, vResult : null}
 ].forEach(function (oFixture) {
 	QUnit.test("expand by levels: " + oFixture.iLevels, function (assert) {
-		const oTreeState = new _TreeState("~sNodeProperty~", mustBeMocked);
+		const oTreeState = new _TreeState(mustBeMocked, mustBeMocked);
 		if (oFixture.vResult === null) {
 			oTreeState.mPredicate2ExpandInfo["~predicate~"] = "~old~";
 		}
@@ -83,9 +82,8 @@ sap.ui.define([
 			.withExactArgs("~oNode~", "predicate").returns("~predicate~");
 		this.mock(oTreeState).expects("fnGetKeyFilter")
 			.withExactArgs("~oNode~").returns("~filter~");
-		this.mock(_Helper).expects("drillDown")
-			.withExactArgs("~oNode~", "~sNodeProperty~")
-			.returns("~sNodeId~");
+		this.mock(oTreeState).expects("fnGetNodeId")
+			.withExactArgs("~oNode~").returns("~sNodeId~");
 
 		// code under test
 		oTreeState.expand("~oNode~", oFixture.iLevels);
@@ -104,15 +102,13 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("collapse/expand", function (assert) {
-		const oTreeState = new _TreeState("~sNodeProperty~", mustBeMocked);
-
+		const oTreeState = new _TreeState(mustBeMocked, mustBeMocked);
 		this.mock(_Helper).expects("getPrivateAnnotation").thrice()
 			.withExactArgs("~oNode~", "predicate").returns("~predicate~");
 		this.mock(oTreeState).expects("fnGetKeyFilter").twice()
 			.withExactArgs("~oNode~").returns("~filter~");
-		this.mock(_Helper).expects("drillDown").twice()
-			.withExactArgs("~oNode~", "~sNodeProperty~")
-			.returns("~sNodeId~");
+		this.mock(oTreeState).expects("fnGetNodeId").twice()
+			.withExactArgs("~oNode~").returns("~sNodeId~");
 
 		// code under test
 		oTreeState.collapse("~oNode~");
@@ -138,15 +134,13 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("collapse all/expand", function (assert) {
-		const oTreeState = new _TreeState("~sNodeProperty~", mustBeMocked);
-
+		const oTreeState = new _TreeState(mustBeMocked, mustBeMocked);
 		this.mock(_Helper).expects("getPrivateAnnotation").twice()
 			.withExactArgs("~oNode~", "predicate").returns("~predicate~");
 		this.mock(oTreeState).expects("fnGetKeyFilter").twice()
 			.withExactArgs("~oNode~").returns("~filter~");
-		this.mock(_Helper).expects("drillDown").twice()
-			.withExactArgs("~oNode~", "~sNodeProperty~")
-			.returns("~sNodeId~");
+		this.mock(oTreeState).expects("fnGetNodeId").twice()
+			.withExactArgs("~oNode~").returns("~sNodeId~");
 
 		// code under test
 		oTreeState.collapse("~oNode~", true);
@@ -167,7 +161,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("collapse: bNested", function (assert) {
-		const oTreeState = new _TreeState("~sNodeProperty~");
+		const oTreeState = new _TreeState("~fnGetKeyFilter~", "~fnGetNodeId~");
 		oTreeState.mPredicate2ExpandInfo = {
 			"~predicate~" : {collapseAll : false, nodeId : "~sNodeId~", levels : 0},
 			foo : "bar"
@@ -185,7 +179,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("delete", function (assert) {
-		const oTreeState = new _TreeState("~sNodeProperty~");
+		const oTreeState = new _TreeState("~fnGetKeyFilter~", "~fnGetNodeId~");
 		oTreeState.mPredicate2ExpandInfo["foo"] = "bar";
 		oTreeState.mPredicate2ExpandInfo["~predicate~"] = "~";
 
@@ -210,7 +204,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("deleteExpandInfo", function (assert) {
-		const oTreeState = new _TreeState("~sNodeProperty~");
+		const oTreeState = new _TreeState("~fnGetKeyFilter~", "~fnGetNodeId~");
 		oTreeState.mPredicate2ExpandInfo["foo"] = "bar";
 		oTreeState.mPredicate2ExpandInfo["~predicate~"] = "~";
 
@@ -232,23 +226,8 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-["collapse", "delete", "expand"].forEach(function (sMethod) {
-	QUnit.test(sMethod + ": no sNodeProperty", function (assert) {
-		const oTreeState = new _TreeState();
-
-		oTreeState.mPredicate2ExpandInfo["foo"] = "bar";
-		this.mock(_Helper).expects("drillDown").never();
-
-		// code under test
-		oTreeState[sMethod]("~oNode~");
-
-		assert.deepEqual(oTreeState.mPredicate2ExpandInfo, {foo : "bar"});
-	});
-});
-
-	//*********************************************************************************************
 	QUnit.test("getExpandFilters", function (assert) {
-		const oTreeState = new _TreeState("~sNodeProperty~");
+		const oTreeState = new _TreeState("~fnGetKeyFilter~", "~fnGetNodeId~");
 		const fnDoNotCallMe = mustBeMocked;
 
 		// code under test
@@ -271,7 +250,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("getExpandLevels/reset", function (assert) {
-		const oTreeState = new _TreeState("~sNodeProperty~");
+		const oTreeState = new _TreeState("~fnGetKeyFilter~", "~fnGetNodeId~");
 		oTreeState.oOutOfPlace = "~oOutOfPlace~";
 
 		// code under test
@@ -300,7 +279,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("out of place", function (assert) {
-		const oTreeState = new _TreeState("~sNodeProperty~", mustBeMocked);
+		const oTreeState = new _TreeState(/*fnGetKeyFilter*/mustBeMocked, "~fnGetNodeId~");
 
 		// code under test
 		assert.deepEqual(oTreeState.getOutOfPlaceGroupedByParent(), []);
@@ -510,7 +489,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("setOutOfPlace: Not 'created persisted'", function (assert) {
-		const oTreeState = new _TreeState("~sNodeProperty~");
+		const oTreeState = new _TreeState("~fnGetKeyFilter~", "~fnGetNodeId~");
 
 		[{}, {"@$ui5.context.isTransient" : undefined}, {"@$ui5.context.isTransient" : true}]
 			.forEach((oNode) => {
@@ -524,7 +503,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("stillOutOfPlace", function (assert) {
-		const oTreeState = new _TreeState("~sNodeProperty~");
+		const oTreeState = new _TreeState("~fnGetKeyFilter~", "~fnGetNodeId~");
 		oTreeState.mPredicate2OutOfPlace["('a')"] = {
 			context : "~context~"
 		};
@@ -540,7 +519,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("deleteOutOfPlace", function (assert) {
-		const oTreeState = new _TreeState("~sNodeProperty~");
+		const oTreeState = new _TreeState("~fnGetKeyFilter~", "~fnGetNodeId~");
 
 		// we ignore the filters as they are not relevant
 		oTreeState.mPredicate2OutOfPlace = {
@@ -613,7 +592,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("deleteOutOfPlace: bUpAndDown", function (assert) {
-		const oTreeState = new _TreeState("~sNodeProperty~");
+		const oTreeState = new _TreeState("~fnGetKeyFilter~", "~fnGetNodeId~");
 
 		// we ignore the filters as they are not relevant
 		// parent1
@@ -686,7 +665,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("isExpanded", function (assert) {
-		const oTreeState = new _TreeState("~sNodeProperty~");
+		const oTreeState = new _TreeState("~fnGetKeyFilter~", "~fnGetNodeId~");
 		oTreeState.mPredicate2ExpandInfo = {
 			collapsed : {levels : 0},
 			one : {levels : 1},
@@ -716,7 +695,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("isOutOfPlace", function (assert) {
-		const oTreeState = new _TreeState("~sNodeProperty~");
+		const oTreeState = new _TreeState("~fnGetKeyFilter~", "~fnGetNodeId~");
 
 		// we ignore all details as they are not relevant
 		oTreeState.mPredicate2OutOfPlace = {

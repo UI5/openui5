@@ -5,15 +5,13 @@ sap.ui.define([
 	"sap/ui/table/plugins/ODataV4MultiSelection",
 	"sap/ui/table/utils/TableUtils",
 	"sap/ui/model/Filter",
-	"sap/ui/core/IconPool",
-	"sap/ui/thirdparty/jquery"
+	"sap/ui/core/IconPool"
 ], function(
 	TableQUnitUtils,
 	ODataV4MultiSelection,
 	TableUtils,
 	Filter,
-	IconPool,
-	jQuery
+	IconPool
 ) {
 	"use strict";
 
@@ -732,26 +730,19 @@ sap.ui.define([
 
 	QUnit.test("#handleKeyboardShortcut", async function(assert) {
 		const oClearSelection = this.spy(this.oSelectionPlugin, "clearSelection");
-		const oEvent = new jQuery.Event();
 
-		this.spy(oEvent, "setMarked");
-
-		this.oSelectionPlugin.handleKeyboardShortcut("clear", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("clear");
 		await TableQUnitUtils.sleep(10);
 		assert.equal(this.oSelectionChangeHandler.callCount, 0, "Clear selection, no selection: selectionChange event");
 		assert.equal(oClearSelection.callCount, 1, "Clear selection, no selection: #clearSelection call");
-		assert.ok(oEvent.setMarked.calledWithExactly("sapUiTableClearAll"), "Clear selection, no selection: Event mark 'sapUiTableClearAll'");
 
 		this.oSelectionChangeHandler.resetHistory();
-		oEvent.setMarked.resetHistory();
-		this.oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("toggle");
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "Toggle selection, limit enabled, no selection: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 200, "Toggle selection, limit enabled, no selection: Selected contexts");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts()[199].getPath(), "/Products(199)",
 			"Toggle selection, limit enabled, no selection: Last selected context");
-		assert.notOk(oEvent.setMarked.calledWithExactly("sapUiTableClearAll"),
-			"Toggle selection, limit enabled, no selection: Event mark 'sapUiTableClearAll'");
 		await this.oTable.qunit.rendered();
 		assert.ok(this.oShowNotification.calledOnceWithExactly(this.oTable, 199, 200),
 			"Toggle selection, limit enabled, no selection: Limit notification shown at correct position");
@@ -759,10 +750,9 @@ sap.ui.define([
 
 		this.oSelectionChangeHandler.resetHistory();
 		this.oShowNotification.resetHistory();
-		oEvent.setMarked.resetHistory();
 		this.oTable.setFirstVisibleRow(0);
 		await this.oTable.qunit.rendered();
-		this.oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("toggle");
 		await TableQUnitUtils.sleep(10);
 		assert.equal(this.oSelectionChangeHandler.callCount, 0,
 			"Toggle selection, limit enabled, all contexts in limit selected: selectionChange event");
@@ -770,22 +760,19 @@ sap.ui.define([
 			"Toggle selection, limit enabled, all contexts in limit selected: Selected contexts");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts()[199].getPath(), "/Products(199)",
 			"Toggle selection, limit enabled, all contexts in limit selected: Last selected context");
-		assert.notOk(oEvent.setMarked.calledWithExactly("sapUiTableClearAll"),
-			"Toggle selection, limit enabled, all contexts in limit selected: Event mark 'sapUiTableClearAll'");
 		await this.oTable.qunit.rendered();
 		assert.ok(this.oShowNotification.calledOnceWithExactly(this.oTable, 199, 200),
 			"Toggle selection, limit enabled, all contexts in limit selected: Limit notification not shown");
 		assert.equal(this.oTable.getFirstVisibleRow(), 191, "Toggle selection, limit enabled, all contexts in limit selected: Scroll position");
 
 		this.oShowNotification.resetHistory();
-		oEvent.setMarked.resetHistory();
 		this.oTable.setFirstVisibleRow(0);
 		await this.oTable.qunit.rendered();
 		this.oTable.getContextByIndex(200).setSelected(true);
 		this.oSelectionPlugin.getSelectedContexts()[198].setSelected(false);
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		this.oSelectionChangeHandler.resetHistory();
-		this.oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("toggle");
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1,
 			"Toggle selection, limit enabled, some contexts in limit selected: selectionChange event");
@@ -793,8 +780,6 @@ sap.ui.define([
 			"Toggle selection, limit enabled, some contexts in limit selected: Selected contexts");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts()[198].getPath(), "/Products(198)",
 			"Toggle selection, limit enabled, some contexts in limit selected: Selected context in limit");
-		assert.notOk(oEvent.setMarked.calledWithExactly("sapUiTableClearAll"),
-			"Toggle selection, limit enabled, some contexts in limit selected: Event mark 'sapUiTableClearAll'");
 		await this.oTable.qunit.rendered();
 		assert.ok(this.oShowNotification.calledOnceWithExactly(this.oTable, 199, 200),
 			"Toggle selection, limit enabled, some contexts in limit selected: Limit notification not shown");
@@ -802,27 +787,22 @@ sap.ui.define([
 
 		this.oSelectionChangeHandler.resetHistory();
 		oClearSelection.resetHistory();
-		oEvent.setMarked.resetHistory();
-		this.oSelectionPlugin.handleKeyboardShortcut("clear", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("clear");
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "Clear selection: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0, "Clear selection: Selected contexts");
 		assert.equal(oClearSelection.callCount, 1, "Clear selection: #clearSelection call");
-		assert.ok(oEvent.setMarked.calledWithExactly("sapUiTableClearAll"), "Clear selection: Event mark 'sapUiTableClearAll'");
 
 		this.oSelectionChangeHandler.resetHistory();
 		this.oShowNotification.resetHistory();
-		oEvent.setMarked.resetHistory();
 		this.oTable.setFirstVisibleRow(0);
 		this.oSelectionPlugin.setLimit(0);
 		await this.oTable.qunit.rendered();
-		this.oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("toggle");
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "Toggle selection, limit disabled, no selection: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, this.oTable.getBinding().getLength(),
 			"Toggle selection, limit disabled, no selection: Selected contexts");
-		assert.notOk(oEvent.setMarked.calledWithExactly("sapUiTableClearAll"),
-			"Toggle selection, limit disabled, no selection: Event mark 'sapUiTableClearAll'");
 		await this.oTable.qunit.rendered();
 		assert.ok(this.oShowNotification.notCalled,
 			"Toggle selection, limit disabled, no selection: Limit notification not shown");
@@ -831,26 +811,20 @@ sap.ui.define([
 		this.oSelectionPlugin.getSelectedContexts()[1].setSelected(false);
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		this.oSelectionChangeHandler.resetHistory();
-		oEvent.setMarked.resetHistory();
-		this.oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("toggle");
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "Toggle selection, limit disabled, some contexts selected: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, this.oTable.getBinding().getLength(),
 			"Toggle selection, limit disabled, some contexts selected: Selected contexts");
-		assert.notOk(oEvent.setMarked.calledWithExactly("sapUiTableClearAll"),
-			"Toggle selection, limit disabled, some contexts selected: Event mark 'sapUiTableClearAll'");
 
 		this.oSelectionChangeHandler.resetHistory();
 		oClearSelection.resetHistory();
-		oEvent.setMarked.resetHistory();
-		this.oSelectionPlugin.handleKeyboardShortcut("toggle", oEvent);
+		this.oSelectionPlugin.handleKeyboardShortcut("toggle");
 		await TableQUnitUtils.nextEvent("selectionChange", this.oSelectionPlugin);
 		assert.equal(this.oSelectionChangeHandler.callCount, 1, "Toggle selection, limit disabled, all contexts selected: selectionChange event");
 		assert.equal(this.oSelectionPlugin.getSelectedContexts().length, 0,
 			"Toggle selection, limit disabled, all contexts selected: Selected contexts");
 		assert.equal(oClearSelection.callCount, 1, "Toggle selection, limit disabled, all contexts selected: #clearSelection call");
-		assert.ok(oEvent.setMarked.calledWithExactly("sapUiTableClearAll"),
-			"Toggle selection, limit disabled, all contexts selected: Event mark 'sapUiTableClearAll'");
 	});
 
 	QUnit.module("Binding selection API", {

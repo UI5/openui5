@@ -908,8 +908,12 @@ sap.ui.define([
 
 	QUnit.test("selection guard in the open-timer callback deregisters the tooltip", function(assert) {
 		const fnOrig = window.getSelection;
+		const oStubElement = this.stub.getDomRef();
 		window.getSelection = function() {
-			return { toString: function() { return "user has a selection"; } };
+			return {
+				toString: function() { return "user has a selection"; },
+				anchorNode: oStubElement
+			};
 		};
 
 		try {

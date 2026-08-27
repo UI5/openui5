@@ -157,12 +157,11 @@ sap.ui.define([
 	/**
 	 * @inheritDoc
 	 */
-	BindingSelection.prototype.handleKeyboardShortcut = function(sType, oEvent) {
-		if (sType === "toggle" && toggleSelectAll(this) === false) {
-			oEvent.setMarked("sapUiTableClearAll");
+	BindingSelection.prototype.handleKeyboardShortcut = function(sType) {
+		if (sType === "toggle") {
+			toggleSelectAll(this);
 		} else if (sType === "clear") {
 			this.clearSelection();
-			oEvent.setMarked("sapUiTableClearAll");
 		}
 		return Promise.resolve();
 	};

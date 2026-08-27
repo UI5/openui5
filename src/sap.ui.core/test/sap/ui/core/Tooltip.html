@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>sap.ui.core.tooltip.Tooltip - visual test</title>
+		<!--
+			Thin bootstrap for the visual test. It reuses the existing showcase
+			module in ./tooltip/Tooltip.js (resource root "local" -> "./tooltip/")
+			so the UI has a single source of truth; only this HTML shell lives at
+			the location the uiveri5 resolver expects: test-resources/sap/ui/core/Tooltip.html.
+			The "Deterministic open states" and "Auto-flip" panels there expose
+			stable IDs (vt*, vtFlip*) that Tooltip.spec.js drives.
+		-->
+		<script src="shared-config.js"></script>
+		<script id="sap-ui-bootstrap"
+				src="../../../../resources/sap-ui-core.js"
+				data-sap-ui-libs="sap.m"
+				data-sap-ui-on-init="module:local/Tooltip"
+				data-sap-ui-resource-roots='{
+					"local": "./tooltip/"
+				}'
+				data-sap-ui-xx-tooltip="enhanced"
+		>
+		</script>
+		<link rel="stylesheet" href="./Tooltip.css">
+	</head>
+	<body class="sapUiBody" id="content"></body>
+</html>
