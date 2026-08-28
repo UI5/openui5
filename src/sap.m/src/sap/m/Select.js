@@ -1411,6 +1411,15 @@ function(
 				ariaLabelledBy: this._getPickerHiddenLabelId()
 			});
 
+			// The picker is a listbox popup, not a modal dialog: focus deliberately stays on
+			// the select field and the active item is exposed via "aria-activedescendant".
+			// sap.m.Popover renders aria-modal="true" by default; on macOS Chrome, VoiceOver
+			// honors that by trapping its reading cursor inside the popover, so the field's
+			// active-descendant announcement (which comes from outside the popover) is never
+			// read and arrowing through the items stays silent. Safari is not affected.
+			// Declaring the picker non-modal restores the announcement. Precedent: sap.m.MessagePopover.
+			oPicker._setAriaModal(false);
+
 			// detect when the scrollbar or an item is pressed
 			oPicker.addEventDelegate({
 				ontouchstart: function(oEvent) {

@@ -10243,6 +10243,28 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
+		QUnit.test("The picker is not announced as a modal dialog so VoiceOver reads the items (issue #4440)", function(assert) {
+			// Arrange
+			const oSelect = new Select({
+				items: [
+					new Item({ key: "1", text: "Apple" }),
+					new Item({ key: "2", text: "Banana" })
+				]
+			});
+
+			// Act - creating the picker applies _setAriaModal(false) in _createPopover
+			const oPicker = oSelect.getPicker();
+
+			// Assert - the picker is a listbox popup, not a modal dialog. When it is modal,
+			// VoiceOver on macOS Chrome confines its reading cursor to the popover and the
+			// items (announced via aria-activedescendant on the field outside it) stay silent.
+			assert.strictEqual(oPicker.getProperty("ariaModal"), false,
+				"The Select picker is created with ariaModal=false");
+
+			// Cleanup
+			oSelect.destroy();
+		});
+
 		QUnit.test("Referencing labels focusing on tap when selection type is not a range", function (assert) {
 			const oLabel = new Label({ text: "referencing label", labelFor: 'selectTest1' });
 			const oItemA = new Item({ key: "Item1", text: "Item1" });
