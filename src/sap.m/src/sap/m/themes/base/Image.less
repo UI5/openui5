@@ -5,11 +5,9 @@
 
 .sapMImg {
 	border: none;
-
 	/* fix the highlight color on tap*/
 	-webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 	-webkit-user-select: none;
-	-moz-user-select: none;
 	-webkit-touch-callout: none;
 }
 
@@ -21,14 +19,15 @@ span.sapMImg {
 	visibility: hidden;
 }
 
-/* fix chrome browser yellow border on focus problem*/
+/* fix chrome browser yellow border on focus problem */
 .sapMImg:focus {
 	outline: none;
 }
 
 .sapMImgFocusable:focus {
-	outline: 0.0625rem dotted @sapUiContentFocusColor;
-    outline-offset: 0.0625rem;
+	outline: 0.0625rem dotted var(--sapContent_FocusColor);
+	outline-offset: 0.0625rem;
+
 	.sapUiRespGrid & {
 		z-index: 100;
 	}
@@ -38,10 +37,7 @@ html:not(.sap-desktop) .sapMImgFocusable:focus {
 	outline: none;
 }
 
-
-/* ==========================================================================
-   Image opening a LightBox
-  ========================================================================== */
+/* Image opening a LightBox */
 
 .sapMLightBoxImage {
 	position: relative;
@@ -56,5 +52,5 @@ html:not(.sap-desktop) .sapMImgFocusable:focus {
 	}
 }
 
-// Apply LightBox Magnifying glass mixin to control
-.lightBoxMagnifyingGlassMixing(~".sapMLightBoxImage", ~".sapMLightBoxMagnifyingGlass");
+/* Apply LightBox Magnifying glass mixin to control */
+.lightBoxMagnifyingGlassMixing(~'.sapMLightBoxImage', ~'.sapMLightBoxMagnifyingGlass');

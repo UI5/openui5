@@ -6494,9 +6494,9 @@ sap.ui.define([
 				.exactly(bParentExpanded || bCreateRoot ? 0 : 1)
 				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "('42')",
 					sinon.match.same(oParentNode), {"@$ui5.node.isExpanded" : true});
-			this.mock(oCache.oTreeState).expects("expand")
+			const oNotALeafAnymoreExpectation = this.mock(oCache.oTreeState).expects("notALeafAnymore")
 				.exactly(bParentExpanded || bCreateRoot || iExpandTo > 23 ? 0 : 1)
-				.withExactArgs(sinon.match.same(oParentNode));
+				.withExactArgs(sinon.match.same(oParentNode), sinon.match.func);
 			const oEntityData = {
 					"@$ui5.node.parent" : (bCreateRoot ? undefined : "Foo('42')"),
 					bar : "~bar~",
@@ -6743,6 +6743,25 @@ sap.ui.define([
 					oReadCountPromise?.catch(() => {}),
 					oReadGrandTotalPromise.catch(() => {})
 				]);
+
+				if (oNotALeafAnymoreExpectation.called) {
+					const fnIsAncestor = oNotALeafAnymoreExpectation.args[0][1];
+					oCache.aElements = ["0", "1", "2", "3", "4", "~inside~", "6"];
+					oCache.aElements.$byPredicate = {
+						inside : "~inside~",
+						outside : "~outside~"
+					};
+					oCacheMock.expects("isAncestorOf").withExactArgs(5, 2).returns("~isAncestorOf~");
+
+					// code under test
+					assert.strictEqual(fnIsAncestor("inside"), "~isAncestorOf~");
+
+					// code under test
+					assert.strictEqual(fnIsAncestor("not found"), undefined);
+
+					// code under test
+					assert.strictEqual(fnIsAncestor("outside"), undefined);
+				}
 			});
 		});
 							});
@@ -6862,16 +6881,17 @@ sap.ui.define([
 				});
 			oHelperMock.expects("makeRelativePath").exactly(bCreateRoot ? 0 : 1)
 				.withExactArgs("/Foo('42')", "/Foo").returns("~relativeUrl~");
-			const oExpandExpectation = this.mock(oCache.oTreeState).expects("expand")
+			const oNotALeafAnymoreExpectation = this.mock(oCache.oTreeState).expects("notALeafAnymore")
 				.exactly(bExpandTreeState ? 1 : 0)
-				.withExactArgs(oParentNode);
+				.withExactArgs(oParentNode, sinon.match.func);
 
 			// code under test
 			const oResult = oCache.create("~oGroupLock~", "~oPostPathPromise~", "~sPath~",
 				"~sTransientPredicate~", oEntityData, /*bAtEndOfCreated*/false, "~fnErrorCallback~",
 				fnSubmitCallback);
 
-			assert.strictEqual(oExpandExpectation.called, bExpandTreeState, "called synchronously");
+			assert.strictEqual(oNotALeafAnymoreExpectation.called, bExpandTreeState,
+				"called synchronously");
 			assert.deepEqual(oPostBody, bCreateRoot ? {} : {"myParent@odata.bind" : "~relativeUrl~"});
 			const oExpectedEntity = {
 				"@$ui5._" : {postBody : oPostBody},
@@ -6928,6 +6948,26 @@ sap.ui.define([
 				sinon.assert.callOrder(oReadCountExpectation, fnSubmitCallback);
 				sinon.assert.callOrder(oReadGrandTotalExpectation, fnSubmitCallback);
 				fnSubmitCallback.resetHistory();
+
+				if (oNotALeafAnymoreExpectation.called) {
+					const fnIsAncestor = oNotALeafAnymoreExpectation.args[0][1];
+					oCache.aElements = ["~inside~"];
+					oCache.aElements.$byPredicate = {
+						inside : "~inside~",
+						outside : "~outside~"
+					};
+					that.mock(oCache).expects("isAncestorOf").withExactArgs(0, 1)
+						.returns("~isAncestorOf~");
+
+					// code under test
+					assert.strictEqual(fnIsAncestor("inside"), "~isAncestorOf~");
+
+					// code under test
+					assert.strictEqual(fnIsAncestor("not found"), undefined);
+
+					// code under test
+					assert.strictEqual(fnIsAncestor("outside"), undefined);
+				}
 			});
 		});
 				});

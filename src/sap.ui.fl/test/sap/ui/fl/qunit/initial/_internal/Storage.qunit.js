@@ -1174,7 +1174,7 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.module("loadFlVariantDependentControlChanges", {
+	QUnit.module("loadFlVariant for lazy-loaded content", {
 		afterEach() {
 			cleanUp();
 		}
@@ -1192,14 +1192,14 @@ sap.ui.define([
 					layers: [Layer.CUSTOMER]
 				}
 			]);
-			sandbox.stub(BtpServiceConnector, "loadFlVariantDependentControlChanges").resolves({
+			sandbox.stub(BtpServiceConnector, "loadFlVariant").resolves({
 				variantDependentControlChanges: [
 					{ fileName: "change1" },
 					{ fileName: "change2" }
 				]
 			});
-			const oResult = await Storage.loadFlVariantDependentControlChanges({
-				reference: sFlexReference, variantId: "variant1"
+			const oResult = await Storage.loadFlVariant({
+				reference: sFlexReference, variantReference: "variant1"
 			});
 			assert.deepEqual(
 				oResult.variantDependentControlChanges,

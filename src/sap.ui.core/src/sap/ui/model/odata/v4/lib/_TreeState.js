@@ -20,7 +20,17 @@ sap.ui.define([
 	 * @private
 	 */
 	class _TreeState {
-		// @see #collapse, #expand
+		/**
+		 * Keeps track which nodes have been manually expanded resp. collapsed and is able to build
+		 * the "ExpandLevels" parameter for the "TopLevels" request (see {@link #getExpandLevels}).
+		 * Only exceptions w.r.t. the "Levels" parameter need to be taken into account. For nodes
+		 * read from the server, this is simply made sure because you can only collapse what has
+		 * been expanded before and vice versa. But for {@link #notALeafAnymore}, special care is
+		 * needed!
+		 *
+		 * @see #collapse
+		 * @see #expand
+		 */
 		mPredicate2ExpandInfo = {};
 
 		// @see #getOutOfPlace
@@ -54,14 +64,18 @@ sap.ui.define([
 		collapse(oNode, bAll, bNested) {
 			const sPredicate = _Helper.getPrivateAnnotation(oNode, "predicate");
 			const oExpandInfo = this.mPredicate2ExpandInfo[sPredicate];
-			if (bNested || oExpandInfo && oExpandInfo.levels !== 0) {
+			// do not delete important info, except nested below a "collapse all"
+			if (oExpandInfo?.important && !bNested) {
+				oExpandInfo.levels = 0;
+			} else if (bNested || oExpandInfo && oExpandInfo.levels !== 0) {
 				delete this.mPredicate2ExpandInfo[sPredicate];
 			} else {
 				// must determine node ID and key filter now; the node may be missing when calling
 				// #getExpandLevels or #getExpandFilters
 				this.mPredicate2ExpandInfo[sPredicate] = {
-					collapseAll : bAll,
 					filter : this.fnGetKeyFilter(oNode),
+					// keep this expand info through following collapse/expand calls?
+					important : bAll,
 					levels : 0,
 					nodeId : this.fnGetNodeId(oNode)
 				};
@@ -143,6 +157,7 @@ sap.ui.define([
 		 *   used to expand all levels
 		 *
 		 * @public
+		 * @see #notALeafAnymore
 		 */
 		expand(oNode, iLevels = 1) {
 			if (iLevels >= Number.MAX_SAFE_INTEGER) {
@@ -151,7 +166,9 @@ sap.ui.define([
 			}
 			const sPredicate = _Helper.getPrivateAnnotation(oNode, "predicate");
 			const oExpandInfo = this.mPredicate2ExpandInfo[sPredicate];
-			if (oExpandInfo && !oExpandInfo.levels && !oExpandInfo.collapseAll) {
+			if (oExpandInfo?.important) { // do not delete important info
+				oExpandInfo.levels = iLevels;
+			} else if (oExpandInfo && !oExpandInfo.levels) {
 				delete this.mPredicate2ExpandInfo[sPredicate];
 			} else {
 				// must determine node ID and key filter now; the node may be missing when calling
@@ -282,6 +299,52 @@ sap.ui.define([
 		 */
 		isOutOfPlace(sPredicate) {
 			return sPredicate in this.mPredicate2OutOfPlace;
+		}
+
+		/**
+		 * Expands a node because it is not a leaf anymore. Takes care of "expand all" by not
+		 * creating an expand info below or, in case of doubt, by creating one that is not easily
+		 * deleted by {@link #collapse} or {@link #expand} later on.
+		 *
+		 * Do NOT call this method for a node within the top pyramid ("Levels" parameter or
+		 * <code>$$aggregation.expandTo</code>).
+		 *
+		 * @param {object} oNode - The node
+		 * @param {function(string):boolean?} fnIsAncestor
+		 *   Callback function to tell whether the node identified by the given key predicate is for
+		 *   sure an ancestor of <code>oNode</code> or not; <code>undefined</code> for "don't know"
+		 *   is an important information here
+		 *
+		 * @public
+		 * @see #expand
+		 */
+		notALeafAnymore(oNode, fnIsAncestor) {
+			const sPredicate = _Helper.getPrivateAnnotation(oNode, "predicate");
+			if (sPredicate in this.mPredicate2ExpandInfo) {
+				throw new Error("Not a leaf before");
+			}
+
+			let bImportant = false;
+			const bBelow = Object.keys(this.mPredicate2ExpandInfo).some((sPredicate0) => {
+				if (this.mPredicate2ExpandInfo[sPredicate0].levels === null) {
+					const bIsAncestor = fnIsAncestor(sPredicate0);
+					bImportant ||= bIsAncestor === undefined;
+					return bIsAncestor;
+				}
+			});
+			if (bBelow) {
+				return; // below "expand all", no own entry needed
+			}
+
+			// must determine node ID and key filter now; the node may be missing when calling
+			// #getExpandLevels or #getExpandFilters
+			this.mPredicate2ExpandInfo[sPredicate] = {
+				filter : this.fnGetKeyFilter(oNode),
+				// keep this expand info through following collapse/expand calls?
+				important : bImportant,
+				levels : 1,
+				nodeId : this.fnGetNodeId(oNode)
+			};
 		}
 
 		/**

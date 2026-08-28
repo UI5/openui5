@@ -3,16 +3,18 @@
 /* Quartz Dark theme                 */
 /* ================================= */
 
-@_sap_m_GenericTag_BorderWidth: 0.375rem;
-@_sap_m_GenericTag_IconPaddingRight: 0.375rem;
-@_sap_m_GenericTag_PaddingLeft: 0.375rem;
+.sapMGenericTag {
+	--_sap_m_GenericTag_BorderWidth: 0.375rem;
+	--_sap_m_GenericTag_IconPaddingRight: 0.375rem;
+	--_sap_m_GenericTag_PaddingLeft: 0.375rem;
+}
 
 .sapMGenericTag {
 
 	.sapMGenericTagWrap {
-		padding: 0 0 0 @_sap_m_GenericTag_PaddingLeft;
+		padding: 0 0 0 var(--_sap_m_GenericTag_PaddingLeft);
 		border-radius: var(--sapButton_BorderCornerRadius);
-		border-left-width: @_sap_m_GenericTag_BorderWidth;
+		border-left-width: var(--_sap_m_GenericTag_BorderWidth);
 
 		.sapMGenericTagText {
 			margin-right: 0.375rem;

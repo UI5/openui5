@@ -617,6 +617,32 @@ function(
 		assert.notOk(oPage._bClipPathApplied, "tracking flag is false after revert");
 	});
 
+	QUnit.test("clip-path applied when RTA is active, regardless of backgroundDesign", async function(assert) {
+		const oPage = this.oObjectPage;
+
+		oPage.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oWrapperElement = oPage._$opWrapper.get(0);
+
+		// precondition: non-transparent background, no clip-path
+		assert.strictEqual(oWrapperElement.style.clipPath, "", "clipPath not set initially");
+
+		// act: RTA starts
+		oPage.enteringRtaMode();
+
+		assert.notStrictEqual(oWrapperElement.style.clipPath, "", "clipPath applied when RTA is active");
+		assert.ok(oPage._bClipPathApplied, "tracking flag is true during RTA");
+		assert.ok(oPage._isRTAActive(), "_isRTAActive returns true after enteringRtaMode");
+
+		// act: RTA stops
+		oPage.leavingRtaMode();
+
+		assert.strictEqual(oWrapperElement.style.clipPath, "", "clipPath cleared after RTA stops");
+		assert.notOk(oPage._bClipPathApplied, "tracking flag is false after RTA stops");
+		assert.notOk(oPage._isRTAActive(), "_isRTAActive returns false after leavingRtaMode");
+	});
+
 	QUnit.module("update content size", {
 		beforeEach: function (assert) {
 			const done = assert.async();
