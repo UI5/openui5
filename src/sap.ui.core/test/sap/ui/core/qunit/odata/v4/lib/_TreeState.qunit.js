@@ -675,7 +675,7 @@ sap.ui.define([
 		};
 
 		// code under test
-		assert.strictEqual(oTreeState.isExpanded("not found"), false);
+		assert.strictEqual(oTreeState.isExpanded("out"), undefined, "don't know");
 
 		// code under test
 		assert.strictEqual(oTreeState.isExpanded("collapsed"), false);
@@ -684,13 +684,53 @@ sap.ui.define([
 		assert.strictEqual(oTreeState.isExpanded("one"), true);
 
 		// code under test
-		assert.strictEqual(oTreeState.isExpanded("two"), true);
+		assert.strictEqual(oTreeState.isExpanded("one", 1), false);
 
 		// code under test
-		assert.strictEqual(oTreeState.isExpanded("three"), true);
+		assert.strictEqual(oTreeState.isExpanded("two", 1), true);
+
+		// code under test
+		assert.strictEqual(oTreeState.isExpanded("two", 2), false);
+
+		// code under test
+		assert.strictEqual(oTreeState.isExpanded("three", 2), true);
+
+		// code under test
+		assert.strictEqual(oTreeState.isExpanded("three", 3), false);
 
 		// code under test
 		assert.strictEqual(oTreeState.isExpanded("all"), true);
+
+		oTreeState.mPredicate2OutOfPlace = {
+			collapsed : {
+				parentPredicate : "n/a"
+			},
+			three : {
+				parentPredicate : "n/a"
+			},
+			out : {
+				parentPredicate : "parent"
+			}
+		};
+		const oTreeStateMock = this.mock(oTreeState);
+		oTreeStateMock.expects("isExpanded").withExactArgs("out", 42)
+			.callThrough(); // start the recursion
+		oTreeStateMock.expects("isExpanded").withExactArgs("parent", 43).returns("~result~");
+
+		// code under test
+		assert.strictEqual(oTreeState.isExpanded("out", 42), "~result~");
+
+		oTreeStateMock.expects("isExpanded").withExactArgs("collapsed")
+			.callThrough(); // start the recursion
+
+		// code under test (no recursion!)
+		assert.strictEqual(oTreeState.isExpanded("collapsed"), false);
+
+		oTreeStateMock.expects("isExpanded").withExactArgs("three", 3)
+			.callThrough(); // start the recursion
+
+		// code under test (no recursion!)
+		assert.strictEqual(oTreeState.isExpanded("three", 3), false);
 	});
 
 	//*********************************************************************************************
