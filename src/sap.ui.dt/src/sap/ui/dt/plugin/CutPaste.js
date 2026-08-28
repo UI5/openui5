@@ -185,13 +185,56 @@ sap.ui.define([
 	};
 
 	/**
+	 * Inserts the cut overlay into the given target aggregation at the requested final position.
+	 * The <code>iTargetIndex</code> refers to the zero-based position the moved element should
+	 * occupy in the target aggregation <b>after</b> the move completes; the moved element itself
+	 * is excluded from the sibling list while computing that position.
+	 * @param  {sap.ui.dt.Overlay} oCutOverlay The overlay of the element being moved
+	 * @param  {sap.ui.dt.AggregationOverlay} oTargetAggregationOverlay The target aggregation overlay
+	 * @param  {int} [iTargetIndex] Final zero-based position of the moved element; inserted at the start if omitted (legacy paste default), appended at the end if past the end
+	 * @private
+	 */
+	CutPaste.prototype._insertAtIndex = function(oCutOverlay, oTargetAggregationOverlay, iTargetIndex) {
+		const oElementMover = this.getElementMover();
+		const sAggregationName = oTargetAggregationOverlay.getAggregationName();
+		const oTargetParent = oTargetAggregationOverlay.getElement();
+		const aSiblings = oTargetParent.getAggregation(sAggregationName) || [];
+		const aSiblingsArray = Array.isArray(aSiblings) ? aSiblings : [aSiblings];
+		// Exclude the moved element from the sibling list so the index refers
+		// to the post-move ordering the caller is asking for
+		const aOtherSiblings = aSiblingsArray.filter((oSibling) => oSibling !== oCutOverlay.getElement());
+
+		if (typeof iTargetIndex !== "number" || iTargetIndex <= 0) {
+			// No index (legacy paste default) or position 0 -> insert at start
+			oElementMover.insertInto(oCutOverlay, oTargetAggregationOverlay, /* bInsertAtEnd= */ false);
+		} else if (iTargetIndex >= aOtherSiblings.length) {
+			// "Past the end" -> append at end
+			oElementMover.insertInto(oCutOverlay, oTargetAggregationOverlay, /* bInsertAtEnd= */ true);
+		} else {
+			// Arbitrary index N -> reposition relative to the sibling currently at index N-1
+			const oAnchorSibling = aOtherSiblings[iTargetIndex - 1];
+			const oAnchorOverlay = OverlayRegistry.getOverlay(oAnchorSibling);
+			if (!oAnchorOverlay) {
+				throw new Error(`No overlay found for sibling at index ${iTargetIndex - 1}`);
+			}
+			oElementMover.repositionOn(oCutOverlay, oAnchorOverlay, INSERT_AFTER_ELEMENT);
+		}
+	};
+
+	/**
 	 * The actual execution of paste. This method is additionally defined because
 	 * there might be steps between the execution and finalization (stopCutAndPaste) of
 	 * paste (for example in the RTA plugin that extends this one).
 	 * @param  {sap.ui.dt.Overlay} oTargetOverlay The Overlay where the element will be pasted
+	 * @param  {int} [iTargetIndex] Optional final zero-based position of the moved element within the
+	 *   target aggregation. Only honored when <code>oTargetOverlay</code> resolves to a container
+	 *   aggregation; ignored when pasting relative to a sibling. Inserted at the start if omitted
+	 *   (legacy paste default).
+	 * @param  {string} [sTargetAggregation] Optional name of the target aggregation to paste into. When
+	 *   omitted, the first available target-zone aggregation of <code>oTargetOverlay</code> is used.
 	 * @returns {boolean} <code>true</code> if paste was successfully executed
 	 */
-	CutPaste.prototype._executePaste = function(oTargetOverlay) {
+	CutPaste.prototype._executePaste = function(oTargetOverlay, iTargetIndex, sTargetAggregation) {
 		const oCutOverlay = this.getElementMover().getMovedOverlay();
 		if (!oCutOverlay) {
 			return false;
@@ -200,9 +243,9 @@ sap.ui.define([
 		let bResult = false;
 		if (!this._isForSameElement(oCutOverlay, oTargetOverlay)) {
 			// if the paste is done on a container, insertInto is used, otherwise repositionOn is used
-			const oTargetZoneAggregation = this._getTargetZoneAggregation(oTargetOverlay);
+			const oTargetZoneAggregation = this._getTargetZoneAggregation(oTargetOverlay, sTargetAggregation);
 			if (oTargetZoneAggregation) {
-				this.getElementMover().insertInto(oCutOverlay, oTargetZoneAggregation);
+				this._insertAtIndex(oCutOverlay, oTargetZoneAggregation, iTargetIndex);
 				bResult = true;
 			} else if (OverlayUtil.isInTargetZoneAggregation(oTargetOverlay)) {
 				this.getElementMover().repositionOn(oCutOverlay, oTargetOverlay, INSERT_AFTER_ELEMENT);
@@ -249,10 +292,14 @@ sap.ui.define([
 		return oTargetOverlay.getElement() === oCutOverlay.getElement();
 	};
 
-	CutPaste.prototype._getTargetZoneAggregation = function(oTargetOverlay) {
+	CutPaste.prototype._getTargetZoneAggregation = function(oTargetOverlay, sTargetAggregation) {
 		var aAggregationOverlays = oTargetOverlay.getChildren();
 		var aPossibleTargetZones = aAggregationOverlays.filter(function(oAggregationOverlay) {
-			return oAggregationOverlay.isTargetZone();
+			if (!oAggregationOverlay.isTargetZone()) {
+				return false;
+			}
+			// When a specific aggregation is requested, restrict the target zone to it
+			return !sTargetAggregation || oAggregationOverlay.getAggregationName() === sTargetAggregation;
 		});
 		if (aPossibleTargetZones.length > 0) {
 			return aPossibleTargetZones[0];

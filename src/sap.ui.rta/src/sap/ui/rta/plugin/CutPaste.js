@@ -4,6 +4,7 @@
 
 sap.ui.define([
 	"sap/ui/core/Lib",
+	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/dt/plugin/CutPaste",
 	"sap/ui/dt/Util",
 	"sap/ui/rta/plugin/Plugin",
@@ -11,6 +12,7 @@ sap.ui.define([
 	"sap/ui/rta/Utils"
 ], function(
 	Lib,
+	OverlayRegistry,
 	DtCutPaste,
 	DtUtil,
 	Plugin,
@@ -202,7 +204,8 @@ sap.ui.define([
 			icon: "sap-icon://paste",
 			rank: this.getRank("CTX_PASTE"),
 			action: { dummyAction: true, id: "CTX_PASTE" },
-			bAsSibling: false
+			bAsSibling: false,
+			description: "move a previously cut element into the given target"
 		}))[0];
 		const oCutMenuItem = (await this._getMenuItems(aElementOverlays, {
 			pluginId: "CTX_CUT",
@@ -210,13 +213,74 @@ sap.ui.define([
 			icon: "sap-icon://scissors",
 			rank: this.getRank("CTX_CUT"),
 			action: { dummyAction: true, id: "CTX_CUT" },
-			bAsSibling: true
+			bAsSibling: true,
+			description: "move the element to a different position by specifying a target id, aggregation and index"
 		}))[0];
 		return [oCutMenuItem, oPasteMenuItem].filter(Boolean);
 	};
 
 	CutPaste.prototype.getActionName = function() {
 		return "move";
+	};
+
+	/**
+	 * Returns the parameters that a programmatic consumer must provide to create the commands for this plugin.
+	 * @returns {object[]} List of parameter descriptors (name, type, required, description)
+	 * @since 1.153
+	 */
+	CutPaste.prototype.getParameters = function() {
+		return [
+			{
+				name: "targetId",
+				type: "string",
+				required: true,
+				description: "The id of the parent container to move the element into. Combine with targetAggregation and targetIndex to position it precisely."
+			},
+			{
+				name: "targetAggregation",
+				type: "string",
+				required: false,
+				description: "The aggregation of the target container to paste into. Defaults to the current aggregation of the source."
+			},
+			{
+				name: "targetIndex",
+				type: "int",
+				required: false,
+				description: "The FINAL zero-based position of the moved element in the target aggregation after the move completes. To compute: write down the siblings in the desired result order (including the moved element) and pass the index of the moved element in that list. Examples: '[A, B, MOVED, C, D]' → 2; 'move to first' → 0; 'move to last' → omit (defaults to end). Do NOT add 1 for 'after X'; just count the final position."
+			}
+		];
+	};
+
+	/**
+	 * Creates the command for this plugin from the given parameters and fires the "elementModified" event.
+	 * Reuses the design-time cut/paste flow: {@link sap.ui.dt.plugin.CutPaste#cut} activates the valid
+	 * target zones, {@link sap.ui.dt.plugin.CutPaste#_executePaste} performs the positional move (honoring
+	 * the optional target index), and {@link sap.ui.dt.plugin.CutPaste#stopCutAndPaste} cleans up.
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Target overlay
+	 * @param {object} mParameters - Parameters as described by {@link #getParameters}
+	 * @returns {Promise} Resolves once the command has been created and the event has been fired
+	 * @since 1.153
+	 */
+	CutPaste.prototype.createCommands = async function(oOverlay, mParameters) {
+		const oTargetOverlay = OverlayRegistry.getOverlay(mParameters.targetId);
+		if (!oTargetOverlay) {
+			throw new Error(`No overlay found for target id ${mParameters.targetId}`);
+		}
+		const oDesignTime = this.getDesignTime();
+		await this.cut(oOverlay);
+		try {
+			if (!this._executePaste(oTargetOverlay, mParameters.targetIndex, mParameters.targetAggregation)) {
+				throw new Error(`Target ${mParameters.targetId} is not a valid drop zone for the moved element`);
+			}
+
+			await DtUtil.waitForSynced(oDesignTime)();
+			const oMoveCommand = await this.getElementMover().buildMoveCommand();
+			this.fireElementModified({
+				command: oMoveCommand
+			});
+		} finally {
+			this.stopCutAndPaste();
+		}
 	};
 
 	return CutPaste;

@@ -717,6 +717,105 @@ sap.ui.define([
 			const aMenuItems = await this.oAddIFrame.getMenuItems([this.oObjectPageLayoutOverlay]);
 			aMenuItems[0].handler([this.oObjectPageLayoutOverlay], { menuItem: aMenuItems[0] });
 		});
+
+		RtaQunitUtils.testGetParameters(function() {
+			return this.oAddIFrame;
+		}, ["isSibling", "aggregation", "index", "frameUrl"]);
+
+		QUnit.test("when getContext is called", async function(assert) {
+			const mUrlParameters = { some: "parameter" };
+			const oBuildStub = sandbox.stub(AddIFrameDialog, "buildUrlBuilderParametersFor").resolves(mUrlParameters);
+
+			const mContext = await this.oAddIFrame.getContext(this.oObjectPageSectionOverlay);
+
+			assert.strictEqual(oBuildStub.callCount, 1, "then the url builder parameters are collected once");
+			assert.strictEqual(mContext.parameters.value, mUrlParameters, "then the collected parameters are returned as context");
+			assert.ok(mContext.parameters.description, "then the context parameters carry a description");
+		});
+
+		QUnit.test("when createCommands is called directly for a container (with getCreatedContainerId)", async function(assert) {
+			const sTitle = "Agent iFrame";
+			this.oObjectPageLayoutOverlay.setDesignTimeMetadata({
+				aggregations: {
+					sections: {
+						actions: {
+							addIFrame: {
+								changeType: "addIFrame",
+								getCreatedContainerId() {},
+								text: "foo"
+							}
+						}
+					}
+				}
+			});
+			this.oAddIFrame.deregisterElementOverlay(this.oObjectPageSectionOverlay);
+			this.oAddIFrame.registerElementOverlay(this.oObjectPageSectionOverlay);
+			await DtUtil.waitForSynced(this.oDesignTime)();
+
+			const oAction = this.oAddIFrame.getCreateActions(this.oObjectPageSectionOverlay, true)[0];
+			const oFireStub = sandbox.stub();
+			this.oAddIFrame.attachElementModified(oFireStub);
+
+			const oCommand = await this.oAddIFrame.createCommands(this.oObjectPageSectionOverlay, {
+				isSibling: true,
+				aggregation: "sections",
+				index: 1,
+				frameUrl: TEST_URL,
+				title: sTitle,
+				action: oAction
+			});
+
+			assert.strictEqual(
+				oCommand.getMetadata().getName(),
+				"sap.ui.rta.command.AddIFrame",
+				"then createCommands returns an AddIFrame command"
+			);
+			assert.strictEqual(oFireStub.callCount, 1, "then the elementModified event is fired once");
+			const oEventArgs = oFireStub.getCall(0).args[0];
+			assert.strictEqual(oEventArgs.getParameter("command"), oCommand, "then the fired command matches the returned command");
+			assert.strictEqual(oEventArgs.getParameter("newControlId"), oCommand.getBaseId(), "then the newControlId matches the command base id");
+			assert.strictEqual(oEventArgs.getParameter("action"), oAction, "then the container action is passed to the event for the rename flow");
+			assert.strictEqual(oEventArgs.getParameter("title"), sTitle, "then the title is passed to the event");
+		});
+
+		QUnit.test("when createCommands is called directly with explicit width/height units", async function(assert) {
+			const oCommand = await this.oAddIFrame.createCommands(this.oObjectPageLayoutOverlay, {
+				aggregation: "sections",
+				index: 0,
+				frameUrl: TEST_URL,
+				frameWidth: 50,
+				frameWidthUnit: "%",
+				frameHeight: 320,
+				frameHeightUnit: "px"
+			});
+
+			assert.strictEqual(oCommand.getWidth(), "50%", "then the width is assembled from value and unit");
+			assert.strictEqual(oCommand.getHeight(), "320px", "then the height is assembled from value and unit");
+		});
+
+		QUnit.test("when createCommands is called directly with a dimension but no unit", async function(assert) {
+			const oCommand = await this.oAddIFrame.createCommands(this.oObjectPageLayoutOverlay, {
+				aggregation: "sections",
+				index: 0,
+				frameUrl: TEST_URL,
+				frameWidth: 123,
+				frameHeight: 456
+			});
+
+			assert.strictEqual(oCommand.getWidth(), "123px", "then the width falls back to the px unit");
+			assert.strictEqual(oCommand.getHeight(), "456px", "then the height falls back to the px unit");
+		});
+
+		QUnit.test("when createCommands is called directly without any dimensions", async function(assert) {
+			const oCommand = await this.oAddIFrame.createCommands(this.oObjectPageLayoutOverlay, {
+				aggregation: "sections",
+				index: 0,
+				frameUrl: TEST_URL
+			});
+
+			assert.strictEqual(oCommand.getWidth(), "100%", "then the width defaults to 100%");
+			assert.strictEqual(oCommand.getHeight(), "100%", "then the height defaults to 100%");
+		});
 	});
 
 	QUnit.done(function() {

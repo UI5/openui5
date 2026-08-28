@@ -15,7 +15,8 @@ sap.ui.define([
 	"sap/ui/rta/command/CompositeCommand",
 	"sap/ui/rta/command/ManifestCommand",
 	"sap/ui/rta/plugin/AddXMLAtExtensionPoint",
-	"sap/ui/thirdparty/sinon-4"
+	"sap/ui/thirdparty/sinon-4",
+	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	DesignTimeConfig,
 	XMLView,
@@ -31,7 +32,8 @@ sap.ui.define([
 	CompositeCommand,
 	ManifestCommand,
 	AddXMLAtExtensionPointPlugin,
-	sinon
+	sinon,
+	RtaQunitUtils
 ) {
 	"use strict";
 
@@ -406,6 +408,34 @@ sap.ui.define([
 				assert.strictEqual(oBrokenFragmentHandlerStub.callCount, 1, "then the fragment handler function is called once");
 				assert.ok(oError.message.indexOf("Fragment path is not available") > -1, "then plugin handler rejects an error");
 			});
+		});
+
+		RtaQunitUtils.testGetParameters(function() {
+			return this.oAddXmlAtExtensionPointPlugin;
+		}, ["extensionPointName", "fragmentPath"]);
+
+		QUnit.test("when createCommands is called directly", async function(assert) {
+			const oViewOverlay = OverlayRegistry.getOverlay(this.oXmlView);
+			const oFireStub = sandbox.stub();
+			this.oAddXmlAtExtensionPointPlugin.attachElementModified(oFireStub);
+
+			const oCommand = await this.oAddXmlAtExtensionPointPlugin.createCommands(oViewOverlay, {
+				extensionPointName: "EP1",
+				fragmentPath: this.sInitialFragmentPath
+			});
+
+			assert.ok(oCommand instanceof CompositeCommand, "then createCommands returns the CompositeCommand");
+			assert.ok(
+				oCommand.getCommands()[0] instanceof AddXMLAtExtensionPointCommand,
+				"then the composite contains the AddXMLAtExtensionPoint command"
+			);
+			assert.strictEqual(
+				oCommand.getCommands()[0].getFragmentPath(),
+				this.sInitialFragmentPath,
+				"then the command carries the given fragment path"
+			);
+			assert.strictEqual(oFireStub.callCount, 1, "then the elementModified event is fired once");
+			assert.strictEqual(oFireStub.getCall(0).args[0].getParameter("command"), oCommand, "then the fired command matches the returned command");
 		});
 	});
 

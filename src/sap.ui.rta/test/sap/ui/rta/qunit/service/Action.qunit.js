@@ -118,6 +118,40 @@ sap.ui.define([
 			});
 		});
 
+		QUnit.test("get() exposes the agentic action metadata fields", function(assert) {
+			// Plugins may attach programmatic-consumption metadata to their menu items (see sap.ui.dt.Plugin#_getMenuItems).
+			const fnCreateCommands = function() {};
+			const fnGetContext = function() {};
+			const aParameters = [
+				{ name: "fragmentPath", type: "string", required: true, description: "Path to the fragment" }
+			];
+			const oPlugin = this.oRta._oDesignTime.getPlugins()[0];
+			sandbox.stub(oPlugin, "getMenuItems").returns([{
+				id: "CTX_TEST_AGENTIC",
+				text: "Agentic Action",
+				rank: 10,
+				handler() {},
+				description: "does the thing",
+				parameters: aParameters,
+				createCommands: fnCreateCommands,
+				getContext: fnGetContext,
+				someInternalField: "should-be-stripped"
+			}]);
+
+			return this.oActionService.get(this.oGroupOverlay.getId()).then(function(aActions) {
+				const oAction = aActions.find((mAction) => mAction.id === "CTX_TEST_AGENTIC");
+				assert.ok(oAction, "the action is exposed");
+				assert.strictEqual(oAction.description, "does the thing", "the description is exposed");
+				assert.strictEqual(oAction.parameters, aParameters, "the parameters are exposed");
+				assert.strictEqual(oAction.createCommands, fnCreateCommands, "createCommands is exposed");
+				assert.strictEqual(oAction.getContext, fnGetContext, "getContext is exposed");
+				assert.notOk(
+					oAction.hasOwnProperty("someInternalField"),
+					"internal fields are still stripped"
+				);
+			});
+		});
+
 		QUnit.test("get() with non-existent control/non under RTA control", function(assert) {
 			return this.oActionService.get([this.oGroupOverlay.getId(), "fakeControl"]).then(
 				function() {

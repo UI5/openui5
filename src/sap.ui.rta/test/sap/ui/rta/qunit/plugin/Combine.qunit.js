@@ -446,6 +446,33 @@ sap.ui.define([
 				);
 			});
 		});
+
+		RtaQunitUtils.testGetParameters(function() {
+			return this.oCombinePlugin;
+		}, ["elementIds"]);
+
+		QUnit.test("when createCommands is called directly", async function(assert) {
+			const oExpectedCommand = {};
+			const oHandleCombineStub = sandbox.stub(this.oCombinePlugin, "handleCombine").resolves(oExpectedCommand);
+
+			const oResult = await this.oCombinePlugin.createCommands(this.oButton1Overlay, {
+				elementIds: [this.oButton2.getId(), this.oButton3.getId()]
+			});
+
+			assert.strictEqual(oHandleCombineStub.callCount, 1, "then handleCombine is called once");
+			const aPassedOverlays = oHandleCombineStub.getCall(0).args[0];
+			assert.deepEqual(
+				aPassedOverlays.map((oOverlay) => oOverlay.getElement().getId()),
+				[this.oButton1.getId(), this.oButton2.getId(), this.oButton3.getId()],
+				"then handleCombine receives the source overlay plus the overlays resolved from elementIds"
+			);
+			assert.strictEqual(
+				oHandleCombineStub.getCall(0).args[1],
+				this.oButton1,
+				"then handleCombine is called with the source element as combine element"
+			);
+			assert.strictEqual(oResult, oExpectedCommand, "then createCommands returns the command from handleCombine");
+		});
 	});
 
 	QUnit.done(function() {

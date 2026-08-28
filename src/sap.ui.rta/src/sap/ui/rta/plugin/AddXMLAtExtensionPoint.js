@@ -199,11 +199,7 @@ sap.ui.define([
 			if (!mExtensionData.fragmentPath || !(typeof mExtensionData.fragmentPath === "string")) {
 				throw new Error("Fragment path is not available");
 			}
-			const oCompositeCommand = await handleCompositeCommand.call(this, aElementOverlays, mExtensionData);
-
-			this.fireElementModified({
-				command: oCompositeCommand
-			});
+			await this.createCommands(oOverlay, mExtensionData);
 		} catch (vError) {
 			throw DtUtil.propagateError(
 				vError,
@@ -220,8 +216,57 @@ sap.ui.define([
 	AddXMLAtExtensionPoint.prototype.getMenuItems = function(aElementOverlays) {
 		return this._getMenuItems(aElementOverlays, {
 			pluginId: "CTX_ADDXML_AT_EXTENSIONPOINT",
-			icon: "sap-icon://add-equipment"
+			icon: "sap-icon://add-equipment",
+			description: "add an XML fragment at an extension point of the view"
 		});
+	};
+
+	/**
+	 * Returns the parameters that a programmatic consumer must provide to create the commands for this plugin.
+	 * @returns {object[]} List of parameter descriptors (name, type, required, description)
+	 * @since 1.153
+	 */
+	AddXMLAtExtensionPoint.prototype.getParameters = function() {
+		return [
+			{
+				name: "extensionPointName",
+				type: "string",
+				required: true,
+				description: "The name of the extension point at which the fragment should be inserted"
+			},
+			{
+				name: "fragmentPath",
+				type: "string",
+				required: true,
+				description: "Path to the fragment XML file, e.g. 'fragments/{someFragmentName}.fragment.xml'"
+			},
+			{
+				name: "fragment",
+				type: "string",
+				required: false,
+				description: "Inline XML content of the fragment. Defaults to an empty FragmentDefinition."
+			}
+		];
+	};
+
+	/**
+	 * Creates the composite command (an addXML-at-extension-point change plus a manifest change) and fires the "elementModified" event.
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Target overlay
+	 * @param {object} mParameters - Parameters as described by {@link #getParameters}
+	 * @returns {Promise<sap.ui.rta.command.CompositeCommand>} Resolves with the created composite command
+	 * @since 1.153
+	 */
+	AddXMLAtExtensionPoint.prototype.createCommands = async function(oOverlay, mParameters) {
+		const mExtensionData = {
+			extensionPointName: mParameters.extensionPointName,
+			fragmentPath: mParameters.fragmentPath,
+			fragment: mParameters.fragment || "<core:FragmentDefinition xmlns:core='sap.ui.core'></core:FragmentDefinition>"
+		};
+		const oCompositeCommand = await handleCompositeCommand.call(this, [oOverlay], mExtensionData);
+		this.fireElementModified({
+			command: oCompositeCommand
+		});
+		return oCompositeCommand;
 	};
 
 	/**

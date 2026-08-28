@@ -551,6 +551,34 @@ sap.ui.define([
 			);
 			assert.strictEqual(oCreateCommandSpy.callCount, 0, "then no command was created");
 		});
+
+		QUnit.test("when getParameters is called", function(assert) {
+			const aParameters = this.oRenamePlugin.getParameters();
+			assert.strictEqual(aParameters.length, 1, "then one parameter is returned");
+			assert.strictEqual(aParameters[0].name, "newValue", "then the parameter is named 'newValue'");
+			assert.strictEqual(aParameters[0].required, true, "then the parameter is required");
+			assert.ok(aParameters[0].description, "then the parameter has a description");
+		});
+
+		QUnit.test("when createCommands is called directly", function(assert) {
+			const oExpectedCommand = {};
+			const oCreateCommandStub = sandbox.stub(this.oRenamePlugin, "createRenameCommand").returns(oExpectedCommand);
+
+			const vResult = this.oRenamePlugin.createCommands(this.oLayoutOverlay, { newValue: "New Label" });
+
+			assert.strictEqual(oCreateCommandStub.callCount, 1, "then createRenameCommand is called once");
+			assert.strictEqual(
+				oCreateCommandStub.getCall(0).args[0],
+				this.oLayoutOverlay,
+				"then createRenameCommand is called with the given overlay"
+			);
+			assert.strictEqual(
+				oCreateCommandStub.getCall(0).args[1],
+				"New Label",
+				"then createRenameCommand is called with the new value from the parameters"
+			);
+			assert.strictEqual(vResult, oExpectedCommand, "then createCommands returns the created command");
+		});
 	});
 
 	QUnit.done(function() {

@@ -39,6 +39,10 @@ sap.ui.define([
 	 *    enabled: &lt;boolean&gt;, // Indicates whether the action is active and can be executed
 	 *    rank: &lt;int&gt;, // Sorting rank for visual representation of the action position
 	 *    text: &lt;string&gt;, // Action name
+	 *    description: &lt;string&gt;, // Human-readable description of what the action does
+	 *    parameters: &lt;object[]&gt;, // Parameters accepted by the action's command factory
+	 *    createCommands: &lt;function&gt;, // Creates the command(s) for the action from the given parameters
+	 *    getContext: &lt;function&gt;, // Returns action-specific context for the target overlay
 	 * }
 	 * </pre>
 	 *
@@ -53,8 +57,28 @@ sap.ui.define([
 	 * @property {boolean} enabled - Indicates whether the action is active and can be executed
 	 * @property {int} rank - Sorting rank for visual representation of the action position
 	 * @property {string} text - Action name
+	 * @property {string} [description] - Human-readable description of what the action does, for programmatic consumers
+	 * @property {sap.ui.rta.service.Action.ActionParameter[]} [parameters] - Parameters accepted by the action's
+	 *   command factory. Empty array when the underlying plugin does not declare any.
+	 * @property {function} [createCommands] - Bound plugin method that creates the command(s) for the action from a
+	 *   given target overlay and a parameter map (as described by <code>parameters</code>)
+	 * @property {function} [getContext] - Bound plugin method that returns action-specific context for a target overlay,
+	 *   if the underlying plugin provides one
 	 * @property {sap.ui.rta.service.Action.ActionObject[]} [submenu] - Nested actions (e.g. selectable variants).
 	 *   Each entry's <code>id</code> is the target value passed as <code>{ key }</code> to <code>execute</code>
+	*/
+
+	/**
+	 * Descriptor of a single parameter accepted by an action's command factory.
+	 *
+	 * @typedef {object} sap.ui.rta.service.Action.ActionParameter
+	 * @since 1.153
+	 * @private
+	 * @ui5-restricted
+	 * @property {string} name - Parameter name
+	 * @property {string} type - Parameter type (e.g. <code>string</code>, <code>int</code>, <code>boolean</code>)
+	 * @property {boolean} required - Whether the parameter must be provided
+	 * @property {string} description - Human-readable description of the parameter
 	*/
 
 	return function(oRta) {
@@ -86,8 +110,13 @@ sap.ui.define([
 		}
 
 		// Reduce a menu item to the public action shape, keeping submenu entries in the same reduced shape.
+		// The agentic metadata fields (description, parameters, createCommands, getContext) are exposed so that
+		// programmatic consumers can discover and invoke an action without going through the context menu UI.
 		function pickAction(mMenuItem) {
-			const mAction = _pick(mMenuItem, ["id", "icon", "rank", "group", "enabled", "text"]);
+			const mAction = _pick(mMenuItem, [
+				"id", "icon", "rank", "group", "enabled", "text",
+				"description", "parameters", "createCommands", "getContext"
+			]);
 			if (mMenuItem.submenu) {
 				mAction.submenu = mMenuItem.submenu.map(function(mSubMenuItem) {
 					return _pick(mSubMenuItem, ["id", "icon", "enabled", "text"]);

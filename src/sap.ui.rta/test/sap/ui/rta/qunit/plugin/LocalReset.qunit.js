@@ -282,6 +282,25 @@ sap.ui.define([
 				assert.ok(oMessageToastSpy.notCalled, "then no message toast is shown");
 			});
 		});
+
+		QUnit.test("when getParameters is called", function(assert) {
+			assert.deepEqual(this.oLocalResetPlugin.getParameters(), [], "then no parameters are required for local reset");
+		});
+
+		QUnit.test("when createCommands is called directly", async function(assert) {
+			const oExpectedCommand = {};
+			const oHandlerStub = sandbox.stub(this.oLocalResetPlugin, "handler").resolves(oExpectedCommand);
+
+			const vResult = await this.oLocalResetPlugin.createCommands(this.oSimpleFormOverlay);
+
+			assert.strictEqual(oHandlerStub.callCount, 1, "then the handler is invoked");
+			assert.deepEqual(
+				oHandlerStub.getCall(0).args[0],
+				[this.oSimpleFormOverlay],
+				"then the handler is called with the overlay wrapped in an array"
+			);
+			assert.strictEqual(vResult, oExpectedCommand, "then createCommands returns the handler result");
+		});
 	});
 
 	QUnit.done(function() {

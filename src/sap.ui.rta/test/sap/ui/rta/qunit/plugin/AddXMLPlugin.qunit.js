@@ -13,7 +13,8 @@ sap.ui.define([
 	"sap/ui/rta/plugin/AddXMLPlugin",
 	"sap/ui/rta/plugin/Plugin",
 	"sap/ui/rta/Utils",
-	"sap/ui/thirdparty/sinon-4"
+	"sap/ui/thirdparty/sinon-4",
+	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	XMLView,
 	Component,
@@ -28,7 +29,8 @@ sap.ui.define([
 	AddXMLPlugin,
 	Plugin,
 	RtaUtils,
-	sinon
+	sinon,
+	RtaQunitUtils
 ) {
 	"use strict";
 
@@ -259,6 +261,36 @@ sap.ui.define([
 			});
 
 			this.oAddXmlPlugin.handler([this.oPanelOverlay], mPropertyBag);
+		});
+
+		RtaQunitUtils.testGetParameters(function() {
+			return this.oAddXmlPlugin;
+		}, ["fragmentPath", "targetAggregation", "index"]);
+
+		QUnit.test("when createCommands is called directly", async function(assert) {
+			const oFireStub = sandbox.stub();
+			this.oAddXmlPlugin.attachElementModified(oFireStub);
+
+			const oCommand = await this.oAddXmlPlugin.createCommands(this.oPanelOverlay, {
+				fragment: "fragment",
+				fragmentPath: "fragmentPath",
+				targetAggregation: "content",
+				index: 0
+			});
+
+			assert.ok(oCommand instanceof AddXMLCommand, "then createCommands returns the AddXML command");
+			assert.strictEqual(oCommand.getFragmentPath(), "fragmentPath", "then the command has the given fragmentPath");
+			assert.strictEqual(oFireStub.callCount, 1, "then the elementModified event is fired once");
+			assert.strictEqual(oFireStub.getCall(0).args[0].getParameter("command"), oCommand, "then the fired command matches the returned command");
+		});
+
+		QUnit.test("when createCommands is called without a fragment (defaults to an empty FragmentDefinition)", async function(assert) {
+			const oCommand = await this.oAddXmlPlugin.createCommands(this.oPanelOverlay, {
+				fragmentPath: "fragmentPath",
+				targetAggregation: "content",
+				index: 0
+			});
+			assert.ok(oCommand.getFragment().indexOf("FragmentDefinition") >= 0, "then a default FragmentDefinition is used");
 		});
 	});
 

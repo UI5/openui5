@@ -481,6 +481,115 @@ function(
 		});
 	});
 
+	QUnit.module("Given a layout with three elements, when createCommands is called directly", {
+		async beforeEach(assert) {
+			const done = assert.async();
+			this.oCutPastePlugin = new CutPastePlugin({
+				commandFactory: oCommandFactory
+			});
+			sandbox.stub(Plugin.prototype, "hasChangeHandler").resolves(true);
+
+			this.oStatus1 = new ObjectStatus("ccStatus1", { text: "1" });
+			this.oStatus2 = new ObjectStatus("ccStatus2", { text: "2" });
+			this.oStatus3 = new ObjectStatus("ccStatus3", { text: "3" });
+			this.oVerticalLayout = new VerticalLayout("ccLayout", {
+				content: [this.oStatus1, this.oStatus2, this.oStatus3]
+			});
+			this.oPage = new Page("ccPage", {
+				content: [this.oVerticalLayout]
+			}).placeAt("qunit-fixture");
+
+			await nextUIUpdate();
+
+			this.oDesignTime = new DesignTime({
+				rootElements: [this.oPage]
+			});
+			this.oCutPastePlugin.setDesignTime(this.oDesignTime);
+
+			this.oDesignTime.attachEventOnce("synced", function() {
+				this.oLayoutOverlay = OverlayRegistry.getOverlay(this.oVerticalLayout);
+				this.oStatus1Overlay = OverlayRegistry.getOverlay(this.oStatus1);
+
+				const oElementMover = this.oCutPastePlugin.getElementMover();
+				// Let cut() activate the real target zones (so the layout's "content" aggregation
+				// is recognized as a valid drop zone) and set the moved overlay for real by marking
+				// the source movable. Only the actual DOM move and the command build are stubbed,
+				// so the test still isolates the index -> insert/reposition decision by asserting
+				// on the mover primitive arguments.
+				sandbox.stub(this.oStatus1Overlay, "isMovable").returns(true);
+				sandbox.stub(oElementMover, "buildMoveCommand").resolves({});
+				this.oInsertIntoStub = sandbox.stub(oElementMover, "insertInto");
+				this.oRepositionOnStub = sandbox.stub(oElementMover, "repositionOn");
+				done();
+			}.bind(this));
+		},
+		afterEach() {
+			this.oDesignTime.destroy();
+			this.oPage.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when targetIndex is 0", async function(assert) {
+			await this.oCutPastePlugin.createCommands(this.oStatus1Overlay, {
+				targetId: this.oVerticalLayout.getId(),
+				targetAggregation: "content",
+				targetIndex: 0
+			});
+			assert.strictEqual(this.oInsertIntoStub.callCount, 1, "then insertInto is used");
+			assert.strictEqual(this.oInsertIntoStub.getCall(0).args[2], false, "then it inserts at the start (bInsertAtEnd=false)");
+			assert.strictEqual(this.oRepositionOnStub.callCount, 0, "then repositionOn is not used");
+		});
+
+		QUnit.test("when targetIndex is past the end", async function(assert) {
+			// moved element is excluded from the sibling list, leaving [status2, status3] (length 2)
+			await this.oCutPastePlugin.createCommands(this.oStatus1Overlay, {
+				targetId: this.oVerticalLayout.getId(),
+				targetAggregation: "content",
+				targetIndex: 5
+			});
+			assert.strictEqual(this.oInsertIntoStub.callCount, 1, "then insertInto is used");
+			assert.strictEqual(this.oInsertIntoStub.getCall(0).args[2], true, "then it appends at the end (bInsertAtEnd=true)");
+			assert.strictEqual(this.oRepositionOnStub.callCount, 0, "then repositionOn is not used");
+		});
+
+		QUnit.test("when targetIndex is omitted", async function(assert) {
+			await this.oCutPastePlugin.createCommands(this.oStatus1Overlay, {
+				targetId: this.oVerticalLayout.getId(),
+				targetAggregation: "content"
+			});
+			assert.strictEqual(this.oInsertIntoStub.callCount, 1, "then insertInto is used");
+			assert.strictEqual(this.oInsertIntoStub.getCall(0).args[2], false, "then it inserts at the start (bInsertAtEnd=false)");
+		});
+
+		QUnit.test("when targetIndex is an arbitrary position in the middle", async function(assert) {
+			// other siblings (excluding the moved status1) are [status2, status3];
+			// targetIndex 1 -> reposition after the sibling at index 0 (status2)
+			await this.oCutPastePlugin.createCommands(this.oStatus1Overlay, {
+				targetId: this.oVerticalLayout.getId(),
+				targetAggregation: "content",
+				targetIndex: 1
+			});
+			assert.strictEqual(this.oInsertIntoStub.callCount, 0, "then insertInto is not used");
+			assert.strictEqual(this.oRepositionOnStub.callCount, 1, "then repositionOn is used");
+			assert.strictEqual(
+				this.oRepositionOnStub.getCall(0).args[1],
+				OverlayRegistry.getOverlay(this.oStatus2),
+				"then it repositions relative to the sibling at index targetIndex-1 (status2)"
+			);
+			assert.strictEqual(this.oRepositionOnStub.getCall(0).args[2], true, "then it inserts after that sibling (bInsertAfter=true)");
+		});
+
+		QUnit.test("when the target id does not resolve to an overlay", async function(assert) {
+			await this.oCutPastePlugin.createCommands(this.oStatus1Overlay, {
+				targetId: "doesNotExist"
+			}).then(function() {
+				assert.ok(false, "then the promise should not resolve");
+			}).catch(function(oError) {
+				assert.ok(oError instanceof Error, "then createCommands rejects with an error");
+			});
+		});
+	});
+
 	QUnit.done(function() {
 		document.getElementById("qunit-fixture").style.display = "none";
 	});
