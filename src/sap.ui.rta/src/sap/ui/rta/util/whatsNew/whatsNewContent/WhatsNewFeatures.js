@@ -70,6 +70,70 @@ sap.ui.define([
 	const aWhatsNewFeaturesContent =
 	[
 		{
+			featureId: "AdaptationModeOnOff",
+			title: oTextResources.getText("TIT_WHATS_NEW_ADAPTATION_MODE_ON_OFF_TITLE"),
+			description: oTextResources.getText("TXT_WHATS_NEW_ADAPTATION_MODE_ON_OFF_DESCRIPTION"),
+			documentationUrls: {
+				btpUrl: "https://help.sap.com/docs/ui5-flexibility-for-key-users/ui5-flexibility-for-key-users/adapting-ui#overview",
+				s4HanaCloudUrl: "https://help.sap.com/docs/SAP_S4HANA_CLOUD/4fc8d03390c342da8a60f8ee387bca1a/d868950a1e8c4b0f9b9453176939a19b.html?version=2608.500&ai=true#overview",
+				s4HanaOnPremUrl: "https://help.sap.com/docs/ABAP_PLATFORM_NEW/a7b390faab1140c087b8926571e942b7/d868950a1e8c4b0f9b9453176939a19b.html?locale=en-US&version=202510.001&ai=true#overview"
+			},
+			information: [
+				{
+					text: null,
+					image: getImagePath("AdaptationModeOnOff.png")
+				},
+				{
+					text: oTextResources.getText("TXT_WHATS_NEW_ADAPTATION_MODE_ON_OFF_TEXT"),
+					image: null
+				}
+			]
+		},
+		{
+			featureId: "NewVersionManagementDialog",
+			title: oTextResources.getText("TIT_WHATS_NEW_NEW_VERSION_MANAGEMENT_DIALOG_TITLE"),
+			description: oTextResources.getText("TXT_WHATS_NEW_NEW_VERSION_MANAGEMENT_DIALOG_DESCRIPTION"),
+			documentationUrls: {
+				btpUrl: "https://help.sap.com/docs/ui5-flexibility-for-key-users/ui5-flexibility-for-key-users/drafts-and-versioning",
+				s4HanaCloudUrl: "https://help.sap.com/docs/SAP_S4HANA_CLOUD/4fc8d03390c342da8a60f8ee387bca1a/b9de62a11b7941a08c549e0d4e196839.html?version=LATEST&ai=true&locale=de-DE",
+				s4HanaOnPremUrl: "https://help.sap.com/docs/ABAP_PLATFORM_NEW/a7b390faab1140c087b8926571e942b7/b9de62a11b7941a08c549e0d4e196839.html?locale=en-US&version=LATEST&ai=true"
+			},
+			information: [
+				{
+					text: null,
+					image: getImagePath("NewVersionManagementDialog.png")
+				},
+				{
+					text: oTextResources.getText("TXT_WHATS_NEW_NEW_VERSION_MANAGEMENT_DIALOG_TEXT"),
+					image: null
+				}
+			]
+		},
+		{
+			featureId: "NewVisualization",
+			title: oTextResources.getText("TIT_WHATS_NEW_NEW_VISUALIZATION_TITLE"),
+			description: oTextResources.getText("TXT_WHATS_NEW_NEW_VISUALIZATION_DESCRIPTION"),
+			documentationUrls: {
+				btpUrl: "https://help.sap.com/docs/ui5-flexibility-for-key-users/ui5-flexibility-for-key-users/visualizing-ui-changes",
+				s4HanaCloudUrl: "https://help.sap.com/docs/SAP_S4HANA_CLOUD/4fc8d03390c342da8a60f8ee387bca1a/903a2217a0a245e5b42c850cec4b3e86.html?version=LATEST&ai=true&locale=de-DE",
+				s4HanaOnPremUrl: "https://help.sap.com/docs/ABAP_PLATFORM_NEW/a7b390faab1140c087b8926571e942b7/903a2217a0a245e5b42c850cec4b3e86.html?locale=en-US&version=LATEST&ai=true"
+			},
+			information: [
+				{
+					text: oTextResources.getText("TXT_WHATS_NEW_NO_DISTINCT_VISUALIZATION_MODE_TEXT"),
+					image: getImagePath("NoDistinctVisualizationMode.png")
+				},
+				{
+					text: oTextResources.getText("TXT_WHATS_NEW_HIGHLIGHT_ALL_APP_CHANGES_TEXT"),
+					image: getImagePath("HighlightAllAppChangesChecked.png")
+				},
+				{
+					text: oTextResources.getText("TXT_WHATS_NEW_VIEW_CHANGES_VIA_CONTEXT_MENU_TEXT"),
+					image: getImagePath("ViewChangesViaContextMenu.png")
+				}
+			]
+		},
+		{
 			featureId: "lazyLoadingForVariants",
 			title: oTextResources.getText("TIT_WHATS_NEW_LAZY_LOADING_TITLE"),
 			description: oTextResources.getText("TXT_WHATS_NEW_DIALOG_LAZY_LOADING_DESCRIPTION"),
