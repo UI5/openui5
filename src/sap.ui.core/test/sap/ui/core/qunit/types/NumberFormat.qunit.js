@@ -1568,7 +1568,7 @@ sap.ui.define([
 			customUnits: oCustomUnits
 		}, oLocale);
 
-		var oRegexInstantiationSpy = this.spy(window, "RegExp");
+		var oRegexInstantiationSpy = this.spy(globalThis, "RegExp");
 		assert.strictEqual(oFormat.format(1123, "unit299"), "1,123 MN", "invalid unit pattern");
 		assert.strictEqual(oFormat.format(1123, "unit150"), "1,123 GU", "invalid unit pattern");
 		assert.strictEqual(oFormat.format(1123, "unit1"), "1,123 AB", "invalid unit pattern");
@@ -1591,7 +1591,7 @@ sap.ui.define([
 			customUnits: oCustomUnits
 		}, oLocale);
 
-		var oRegexInstantiationSpy = this.spy(window, "RegExp");
+		var oRegexInstantiationSpy = this.spy(globalThis, "RegExp");
 
 		oFormat.parse("1,123 ASD");
 		assert.strictEqual(oRegexInstantiationSpy.callCount, 3, "create regexp instance for pattern");
@@ -1610,7 +1610,7 @@ sap.ui.define([
 		var oLocale = new Locale("en");
 		var oFormat = NumberFormat.getUnitInstance(oLocale);
 
-		var oRegexInstantiationSpy = this.spy(window, "RegExp");
+		var oRegexInstantiationSpy = this.spy(globalThis, "RegExp");
 
 		oFormat.parse("1,123 km");
 
@@ -1646,7 +1646,7 @@ sap.ui.define([
 		}, oLocale);
 
 		var t0 = performance.now();
-		var oRegexInstantiationSpy = this.spy(window, "RegExp");
+		var oRegexInstantiationSpy = this.spy(globalThis, "RegExp");
 		assert.deepEqual(oFormat.parse("1,123 MN"), [1123, "unit299"], "invalid unit pattern");
 		assert.deepEqual(oFormat.parse("1,123 GU"), [1123, "unit150"], "invalid unit pattern");
 		assert.deepEqual(oFormat.parse("1,123 AB"), [1123, "unit1"], "invalid unit pattern");
@@ -2365,7 +2365,6 @@ sap.ui.define([
 		assert.strictEqual(oFormat.format(3, "bike-size"), "bike-size", "(does not exist))");
 	});
 
-
 	//*********************************************************************************************
 	QUnit.test("Unit format edge cases CLDR", function (assert) {
 		var oLocale = new Locale("en");
@@ -2915,7 +2914,6 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("Unit parse with sMeasure complex cldr polish", function (assert) {
-
 		var oLocale = new Locale("pl_PL");
 		var oFormat = NumberFormat.getUnitInstance(oLocale);
 		var aResult = oFormat.parse("1 234 567 mile/h");
@@ -2933,7 +2931,6 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("Unit parse with sMeasure complex cldr polish long", function (assert) {
-
 		var oLocale = new Locale("pl_PL");
 		var oFormat = NumberFormat.getUnitInstance({ style: "long" }, oLocale);
 		var aResult = oFormat.parse("123 tysiące mile/h");
@@ -3114,7 +3111,7 @@ sap.ui.define([
 
 		// execution
 		var sFormatted = oFormat.format(iExpectedNumber);
-		assert.strictEqual(sFormatted, '‏123 מיליון', "can be formatted '" + sFormatted + "'");
+		assert.strictEqual(sFormatted, '\u200f123 מיליון', "can be formatted '" + sFormatted + "'");
 
 		var sParsed = oFormat.parse(sFormatted);
 		assert.strictEqual(sParsed, iExpectedNumber, "should match input number " + iExpectedNumber);
@@ -3819,10 +3816,9 @@ sap.ui.define([
 			aCompareValues = [["", "NaN", null, "0"], ["", NaN, null, 0]],
 			aParseAsString = [true, false];
 
-		aMethods.forEach(function (sMethod, index) {
+		aMethods.forEach(function (sMethod) {
 			assert.ok(NumberFormat[sMethod](), "instantiation with empty options should succeed");
 			aValues.forEach(function (nValue, index1) {
-				// eslint-disable-next-line max-nested-callbacks
 				aParseAsString.forEach(function (bParseAsString, index2) {
 					var oFormatOptions = {
 						emptyString: nValue,
@@ -4973,7 +4969,6 @@ sap.ui.define([
 			[true, false].forEach((bParseAsString) => {
 		const sTitle = `Parse empty string: ${sInstanceGetter} with showNumber=false, emptyString=${vEmptyString}`
 			+ ` and parseAsString=${bParseAsString}`;
-		// eslint-disable-next-line max-nested-callbacks
 		QUnit.test(sTitle, function (assert) {
 			const oFormat = NumberFormat[sInstanceGetter]({
 				emptyString: vEmptyString,
@@ -5453,7 +5448,7 @@ sap.ui.define([
 		{bIndianCurrency: true, bTrailingCurrencyCode: false, sStyle: "~sStyle-indian"},
 		{bIndianCurrency: false, bTrailingCurrencyCode: true, sStyle: "sap-short"},
 		{bIndianCurrency: true, bTrailingCurrencyCode: true, sStyle: "sap-short-indian"}
-	].forEach(({bIndianCurrency, bTrailingCurrencyCode, sStyle}, i) => {
+	].forEach(({bIndianCurrency, bTrailingCurrencyCode, sStyle}) => {
 		//*********************************************************************************************
 		[{
 			sPattern: undefined,
