@@ -19,6 +19,7 @@
       "/*",
       "grunt/**/*",
       "lib/**/*",
+      "src/sap.html/**/*",
       "src/sap.ui.core/**/*",
       "!src/sap.ui.core/src/sap/ui/core/util/Export.js",
       "!src/sap.ui.core/src/sap/ui/core/util/ExportCell.js",

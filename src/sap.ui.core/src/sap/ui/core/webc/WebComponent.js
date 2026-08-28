@@ -4,24 +4,19 @@
 
 // Provides the base class for all Web Component wrappers.
 sap.ui.define([
-	"../Control",
-	"../Element",
+	"../html/HTMLElement",
+	"../html/HTMLElementRenderer",
 	"./WebComponentMetadata",
-	"./WebComponentRenderer",
-	"../library",
-	"../LabelEnablement"
+	"../library"
 ],
 function(
-	Control,
-	Element,
+	HTMLElement,
+	HTMLElementRenderer,
 	WebComponentMetadata,
-	WebComponentRenderer,
-	coreLibrary,
-	LabelEnablement
+	coreLibrary
 ) {
 	"use strict";
 
-	var TextDirection = coreLibrary.TextDirection;
 	const ValueState = coreLibrary.ValueState;
 
 	// Mapping sap.ui.core.ValueState to web component value sates
@@ -38,83 +33,6 @@ function(
 	);
 
 	/**
-	 * Returns the sap.ui.core.Element instance for an arbitrary HTML Element, or undefined, if the HTML element is not a sap.ui.core.Element
-	 *
-	 * @param {HTMLElement|object} obj DOM Element or any object that has an id property
-	 * @returns {sap.ui.core.Element|undefined} UI5 element instance or undefined if the HTML element is not a sap.ui.core.Element
-	 * @private
-	 */
-	var fnGetControlFor = function(obj) {
-		if (obj.id && Element.getElementById(obj.id)) {
-			return Element.getElementById(obj.id);
-		}
-	};
-
-	/**
-	 * Returns the active element in the shadow DOM, if any
-	 *
-	 * @param {HTMLElement|object} obj DOM Element or any object that has an id property
-	 * @returns {HTMLElement} The active element in the shadow DOM, or the original object if no shadow DOM is present
-	 * @private
-	 */
-	var fnGetActiveElement = function(obj) {
-		while (obj && obj.shadowRoot && obj.shadowRoot.activeElement) {
-			obj = obj.shadowRoot.activeElement;
-		}
-		return obj;
-	};
-
-	/**
-	 * Takes an object as an argument and returns another object, where all fields in the original object, that are HTML Elements, are deeply replaced with their sap.ui.core.Element counterparts, where applicable
-	 *
-	 * @param {HTMLElement|object|array} obj an object that can contain HTML Elements, arrays, objects, or any other type
-	 * @param {number} level the current recursion level, used to limit the depth of the conversion
-	 * @param {number} maxLevel the maximum recursion level, defaults to 2
-	 * @returns {object} the converted object, where all HTML Elements are replaced with their sap.ui.core.Element counterparts, where applicable
-	 * @private
-	 */
-	var fnConvert = function(obj, level, maxLevel) {
-		if (level === undefined) {
-			level = 0;
-		}
-		if (maxLevel === undefined) {
-			maxLevel = 2;
-		}
-
-		// Null
-		if (obj == null) {
-			return obj;
-		}
-
-		// HTML Element - if represents a control, return the control. Otherwise return the HTML Element and stop.
-		if (obj instanceof window.HTMLElement) {
-			var oControl = fnGetControlFor(obj);
-			return oControl ? oControl : obj;
-		}
-
-		if (level < maxLevel) {
-			// Array
-			if (Array.isArray(obj)) {
-				return obj.map(fnConvert, level + 1, maxLevel);
-			}
-
-			// Object
-			if (typeof obj === "object") {
-				var oResult = {};
-				for (var i in obj) {
-					if (obj.hasOwnProperty(i)) {
-						oResult[i] = fnConvert(obj[i], level + 1, maxLevel);
-					}
-				}
-				return oResult;
-			}
-		}
-
-		// Anything else
-		return obj;
-	};
-
-	/**
 	 * Constructs and initializes a Web Component Wrapper with the given <code>sId</code> and settings.
 	 *
 	 * @param {string} [sId] Optional ID for the new control; generated automatically if no non-empty ID is given
@@ -128,15 +46,17 @@ function(
 	 * ensures to render the control and put the aggregated controls in the dedicated
 	 * slots of the Web Component.
 	 *
-	 * @extends sap.ui.core.Control
+	 * <b>Note:</b> This class is abstract and must not be instantiated directly.
+	 *
+	 * @abstract
+	 * @extends sap.ui.core.html.HTMLElement
 	 * @author SAP SE
 	 * @version ${version}
 	 * @public
 	 * @since 1.138.0
 	 * @alias sap.ui.core.webc.WebComponent
 	 */
-	var WebComponent = Control.extend("sap.ui.core.webc.WebComponent", {
-
+	var WebComponent = HTMLElement.extend("sap.ui.core.webc.WebComponent", {
 		metadata : {
 			stereotype : "webcomponent",
 			"abstract" : true,
@@ -155,21 +75,13 @@ function(
 		},
 
 		constructor : function(sId, mSettings) {
-			Control.apply(this, arguments);
+			HTMLElement.apply(this, arguments);
 
 			this.__busyIndicatorTimeout = null;
-
 			this.__onInvalidation = this.__onInvalidationBound = this.__onInvalidation.bind(this);
-			this.__handleCustomEvent = this.__handleCustomEventBound = this.__handleCustomEvent.bind(this);
-
-			this.__delegates = {
-				onBeforeRendering: this.__onBeforeRenderingDelegate,
-				onAfterRendering: this.__onAfterRenderingDelegate
-			};
-			this.addDelegate(this.__delegates, true, this, false);
 		},
 
-		renderer: WebComponentRenderer
+		renderer: HTMLElementRenderer
 
 	}, /* Metadata constructor */ WebComponentMetadata);
 
@@ -222,13 +134,6 @@ function(
 	 *     The default mapping of a property is "property" which either renders the value of the property into an attribute of the custom tag or forwards object properties to the mutator in the onAfterRendering phase.
 	 * @property {string} [to] Defines the target of the mapping of the property (e.g. the name of the attribute/property).
 	 * @property {string} [formatter] Defines the name of the formatter function at the WebComponent instance to format the value before its being mapped.
-	 *
-	 * @public
-	 */
-
-	// [FIX] The following mapping omits the <code>no-unnecessary-qualifier</code> error or we need to extend the <code>tslint.json</code>!
-	/**
-	 * @typedef {sap.ui.core.webc.WebComponent.MetadataOptions.Property.Mapping} sap.ui.core.webc.WebComponent.MetadataOptionsPropertyMapping
 	 *
 	 * @public
 	 */
@@ -373,64 +278,9 @@ function(
 	};
 
 	/**
-	 * Return the DOM element that should get the focus.
-	 * This is the Web Component itself, or the element that is returned by the
-	 * getFocusDomRef method of the Web Component.
-	 *
-	 * @override
-	 * @return {Element} Returns the DOM Element that should get the focus
-	 * @protected
-	 */
-	WebComponent.prototype.getFocusDomRef = function() {
-		const component = this.getDomRef();
-
-		if (component && typeof component.getFocusDomRef === "function") {
-			return component.getFocusDomRef();
-		}
-
-		return component;
-	};
-
-	/**
-	 * Sets the focus to the Web Component.
-	 * If the focus information is provided, the focus will be set to the element that is
-	 * represented by the <code>oFocusedElement</code> property of the <code>oFocusInfo</code>.
-	 *
-	 * @override
-	 * @param {object} [oFocusInfo={}] Options for setting the focus
-	 * @param {boolean} [oFocusInfo.preventScroll=false] {@since 1.60} if it's set to true, the focused
-	 *   element won't be shifted into the viewport if it's not completely visible before the focus is set
-	 * @param {any} [oFocusInfo.targetInfo] Further control-specific setting of the focus target within the control {@since 1.98}
-	 * @public
-	 */
-	WebComponent.prototype.focus = function(oFocusInfo) {
-		if (oFocusInfo && oFocusInfo.oFocusedElement) {
-			oFocusInfo.oFocusedElement.focus({ preventScroll: oFocusInfo.preventScroll });
-			return;
-		}
-		Control.prototype.focus.apply(this, arguments);
-	};
-
-	/**
-	 * Returns object with the focused element within the Web Component.
-	 *
-	 * @override
-	 * @returns {object} an object representing the serialized focus information
-	 * @protected
-	 */
-	WebComponent.prototype.getFocusInfo = function () {
-		const oFocusedElement = fnGetActiveElement(this.getDomRef());
-
-		return {
-			id: oFocusedElement ? oFocusedElement.id : null,
-			oFocusedElement
-		};
-	};
-
-	/**
 	 * Removes the __slot property from the sap.ui.core.Element instance
 	 *
-	 * @param oElement
+	 * @param {sap.ui.core.Element} oElement Element from which to remove the slot
 	 * @private
 	 */
 	WebComponent.prototype._unsetSlot = function(oElement) {
@@ -454,7 +304,7 @@ function(
 	 * @protected
 	 */
 	WebComponent.prototype.setAggregation = function(sAggregationName, oObject, bSuppressInvalidate) {
-		var vResult = Control.prototype.setAggregation.apply(this, arguments);
+		var vResult = HTMLElement.prototype.setAggregation.apply(this, arguments);
 		this._setSlot(oObject, sAggregationName);
 		return vResult;
 	};
@@ -479,7 +329,7 @@ function(
 	 * @protected
 	 */
 	WebComponent.prototype.insertAggregation = function(sAggregationName, oObject, iIndex, bSuppressInvalidate) {
-		var vResult = Control.prototype.insertAggregation.apply(this, arguments);
+		var vResult = HTMLElement.prototype.insertAggregation.apply(this, arguments);
 		this._setSlot(oObject, sAggregationName);
 		return vResult;
 	};
@@ -498,7 +348,7 @@ function(
 	 * @protected
 	 */
 	WebComponent.prototype.addAggregation = function(sAggregationName, oObject, bSuppressInvalidate) {
-		var vResult = Control.prototype.addAggregation.apply(this, arguments);
+		var vResult = HTMLElement.prototype.addAggregation.apply(this, arguments);
 		this._setSlot(oObject, sAggregationName);
 		return vResult;
 	};
@@ -519,7 +369,7 @@ function(
 	 * @protected
 	 */
 	WebComponent.prototype.removeAggregation = function(sAggregationName, vObject, bSuppressInvalidate) {
-		var oChild = Control.prototype.removeAggregation.apply(this, arguments);
+		var oChild = HTMLElement.prototype.removeAggregation.apply(this, arguments);
 		this._unsetSlot(oChild);
 		return oChild;
 	};
@@ -536,7 +386,7 @@ function(
 	 * @protected
 	 */
 	WebComponent.prototype.removeAllAggregation = function(sAggregationName, bSuppressInvalidate) {
-		var aChildren = Control.prototype.removeAllAggregation.apply(this, arguments);
+		var aChildren = HTMLElement.prototype.removeAllAggregation.apply(this, arguments);
 		aChildren.forEach(function(oChild) {
 			this._unsetSlot(oChild);
 		}, this);
@@ -547,17 +397,12 @@ function(
 	/**
 	 * @private
 	 */
-	WebComponent.prototype.__onBeforeRenderingDelegate = function() {
-		this.__detachCustomEventsListeners();
-	};
-
-	/**
-	 * @private
-	 */
-	WebComponent.prototype.__onAfterRenderingDelegate = function() {
-		this.__attachCustomEventsListeners();
+	WebComponent.prototype._onAfterRenderingDelegate = function() {
+		// TODO: Make super call?
+		this._attachCustomEventsListeners();
 		var oDomRef = this.getDomRef();
-		this.__updateObjectProperties(oDomRef);
+		this._updateObjectProperties(oDomRef);
+		// ----
 		window.customElements.whenDefined(oDomRef.localName).then(function() {
 			if (typeof oDomRef.attachInvalidate === "function") {
 				oDomRef.attachInvalidate(this.__onInvalidation);
@@ -569,35 +414,6 @@ function(
 		}.bind(this));
 	};
 
-	/**
-	 * Updates all object properties (can't be done via the renderer)
-	 * @param {HTMLElement} oDomRef the DOM reference of the Web Component
-	 * @private
-	 */
-	WebComponent.prototype.__updateObjectProperties = function(oDomRef) {
-		var oAttrProperties = this.getMetadata().getPropertiesByMapping("property");
-		for (var sPropName in oAttrProperties) {
-			if (this.isPropertyInitial(sPropName)) {
-				continue; // do not set properties that were not explicitly set/bound
-			}
-
-			var oPropData = oAttrProperties[sPropName];
-			var vPropValue = oPropData.get(this);
-
-			if (oPropData.type === "object" || typeof vPropValue === "object") {
-				var sWebComponentPropName = oPropData._sMapTo ? oPropData._sMapTo : sPropName;
-				oDomRef[sWebComponentPropName] = vPropValue;
-			}
-		}
-	};
-
-	/**
-	 * Sets the Web Components busy state
-	 *
-	 * @param {boolean} bBusy The new busy state to be set
-	 * @returns {this} <code>this</code> to allow method chaining
-	 * @public
-	 */
 	WebComponent.prototype.setBusy = function(bBusy) {
 		var bCurrentBusyState = this.getBusy();
 
@@ -638,135 +454,13 @@ function(
 		}
 	};
 
-	/**
-	 * @private
-	 */
-	WebComponent.prototype.__attachCustomEventsListeners = function() {
-		var oDomRef = this.getDomRef();
-		var oEvents = this.getMetadata().getCustomEvents();
-		for (var sEventName in oEvents) {
-			var sCustomEventName = oEvents[sEventName]._sCustomEventName;
-			oDomRef.addEventListener(sCustomEventName, this.__handleCustomEvent);
-		}
-	};
-
-	/**
-	 * @private
-	 */
-	WebComponent.prototype.__detachCustomEventsListeners = function() {
-		var oDomRef = this.getDomRef();
-		if (!oDomRef) {
-			return;
-		}
-		var oEvents = this.getMetadata().getCustomEvents();
-		for (var sEventName in oEvents) {
-			var sCustomEventName = oEvents[sEventName]._sCustomEventName;
-			oDomRef.removeEventListener(sCustomEventName, this.__handleCustomEvent);
-		}
-	};
-
-	/**
-	 * @private
-	 */
-	WebComponent.prototype.__handleCustomEvent = function(oEvent) {
-		// Prepare the event data object
-		var oEventData = this.__formatEventData(oEvent.detail);
-
-		// Notify all custom events that are registered for this event name
-		var mCustomEvents = this.getMetadata().getCustomEvents(oEvent.type);
-		for (var sName in mCustomEvents) {
-			var oEventObj = mCustomEvents[sName];
-			var bPrevented = !oEventObj.fire(this, oEventData);
-			if (bPrevented) {
-				oEvent.preventDefault();
-			}
-		}
-	};
-
-	/**
-	 * @private
-	 */
-	WebComponent.prototype.__formatEventData = function(vDetail) {
-		// If the event data is an object, recursively convert all object dom element properties to control references
-		if (typeof vDetail === "object") {
-			return fnConvert(vDetail);
-		}
-
-		// If not an object, this is a DOM event such as click, just return an empty object
-		return {};
-	};
-
-	/**
-	 * @private
-	 */
-	WebComponent.prototype.__callPublicMethod = function(name, args) {
-		if (!this.getDomRef()) {
-			throw new Error("Method called before custom element has been created by: " + this.getId());
-		}
-
-		var converted = Array.from(args).map(function(arg) { //  convert any public method parameter that is a Control instance to a DOM Ref
-			if (arg instanceof Element) {
-				return arg.getDomRef();
-			}
-			return arg;
-		});
-
-		var vResult = this.getDomRef()[name].apply(this.getDomRef(), converted);
-		if (typeof vResult === "object") {
-			vResult = fnConvert(vResult);
-		}
-
-		return vResult;
-	};
-
-	/**
-	 * @private
-	 */
-	WebComponent.prototype.__callPublicGetter = function(name) {
-		if (!this.getDomRef()) {
-			throw new Error("Getter called before custom element has been created by: " + this.getId());
-		}
-
-		var vResult = this.getDomRef()[name];
-		if (typeof vResult === "object") {
-			vResult = fnConvert(vResult);
-		}
-
-		return vResult;
-	};
-
 	WebComponent.prototype.destroy = function() {
 		var oDomRef = this.getDomRef();
-		this.__detachCustomEventsListeners();
 		if (oDomRef && typeof oDomRef.detachInvalidate === "function") {
 			oDomRef.detachInvalidate(this.__onInvalidation);
 		}
 
-		return Control.prototype.destroy.apply(this, arguments);
-	};
-
-	/**
-	 * Maps the "enabled" property to the "disabled" attribute
-	 * @param {boolean} bEnabled the enabled state of the Web Component
-	 * @returns {boolean} the mapped enabled state value
-	 * @private
-	 */
-	WebComponent.prototype._mapEnabled = function(bEnabled) {
-		return !bEnabled;
-	};
-
-	/**
-	 * Maps the "textDirection" property to the "dir" attribute
-	 * @param {sap.ui.core.TextDirection|string} sTextDirection text direction value
-	 * @returns {string} the mapped text direction value
-	 * @private
-	 */
-	WebComponent.prototype._mapTextDirection = function(sTextDirection) {
-		if (sTextDirection === TextDirection.Inherit) {
-			return null;
-		}
-
-		return sTextDirection.toLowerCase();
+		return HTMLElement.prototype.destroy.apply(this, arguments);
 	};
 
 	/**
@@ -790,25 +484,6 @@ function(
 	 */
 	WebComponent.prototype._parseValueState = function(sWebCValueState) {
 		return coreValueStateMapping[sWebCValueState];
-	};
-
-	/**
-	 * Generates a string containing the ID's from the association ariaLabelledBy.
-	 * @param {string[]} aAriaLabelledBy an array of IDs associated with this control
-	 * @returns {string} sAriaLabelledBy
-	 */
-	WebComponent.prototype._getAriaLabelledByForRendering = function (aAriaLabelledBy) {
-		var aFilteredIds = LabelEnablement.getReferencingLabels(this);
-
-		if (Array.isArray(aAriaLabelledBy)) {
-			aAriaLabelledBy.forEach(function (sId) {
-				if (aFilteredIds.indexOf(sId) < 0) {
-					aFilteredIds.unshift(sId);
-				}
-			});
-		}
-
-		return aFilteredIds.join(" ");
 	};
 
 	return WebComponent;
