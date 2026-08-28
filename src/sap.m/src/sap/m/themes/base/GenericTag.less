@@ -3,13 +3,15 @@
 /* Base theme                        */
 /* ================================= */
 
-@_sap_m_GenericTag_BorderWidth: 0.25rem;
-@_sap_m_GenericTag_PaddingLeft: 0.25rem;
-@_sap_m_GenericTag_StatusIconWidth: 1rem;
-@_sap_m_GenericTag_IconPaddingRight: 0.5rem;
-@_sap_m_GenericTag_TextMinWidth: 1.5625rem;
-@_sap_m_GenericTag_HeightCompact: 1.625rem;
-@_sap_m_GenericTag_HeightCozy: 2.5rem;
+.sapMGenericTag {
+	--_sap_m_GenericTag_BorderWidth: 0.25rem;
+	--_sap_m_GenericTag_PaddingLeft: 0.25rem;
+	--_sap_m_GenericTag_StatusIconWidth: 1rem;
+	--_sap_m_GenericTag_IconPaddingRight: 0.5rem;
+	--_sap_m_GenericTag_TextMinWidth: 1.5625rem;
+	--_sap_m_GenericTag_HeightCompact: 1.625rem;
+	--_sap_m_GenericTag_HeightCozy: 2.5rem;
+}
 
 .sapMGenericTag {
 	margin-top: 0.1875rem;
@@ -75,23 +77,23 @@ html.sap-desktop .sapMGenericTag:focus {
 
 .sapMGenericTagWrap {
 	background: var(--sapList_Background);
-	box-shadow: @sapUiShadowLevel0;
+	box-shadow: var(--sapContent_Shadow0);
 	box-sizing: border-box;
 	border-radius: 0.125rem;
-	border-left-width: @_sap_m_GenericTag_BorderWidth;
+	border-left-width: var(--_sap_m_GenericTag_BorderWidth);
 	border-left-style: solid;
-	padding: 0 0.5rem 0 @_sap_m_GenericTag_PaddingLeft;
+	padding: 0 0.5rem 0 var(--_sap_m_GenericTag_PaddingLeft);
 	display: inline-flex;
 	max-width: 100%;
 	flex-flow: row nowrap;
 	align-items: center;
 	page-break-after: auto;
-	height: @_sap_m_GenericTag_HeightCompact;
-	min-width: @_sap_m_GenericTag_BorderWidth + @_sap_m_GenericTag_PaddingLeft + @_sap_m_GenericTag_StatusIconWidth + @_sap_m_GenericTag_IconPaddingRight + @_sap_m_GenericTag_TextMinWidth;
+	height: var(--_sap_m_GenericTag_HeightCompact);
+	min-width: ~'calc(var(--_sap_m_GenericTag_BorderWidth) + var(--_sap_m_GenericTag_PaddingLeft) + var(--_sap_m_GenericTag_StatusIconWidth) + var(--_sap_m_GenericTag_IconPaddingRight) + var(--_sap_m_GenericTag_TextMinWidth))';
 
 	.sapMGenericTagIcon {
 		width: 1rem;
-		padding-right: @_sap_m_GenericTag_IconPaddingRight;
+		padding-right: var(--_sap_m_GenericTag_IconPaddingRight);
 	}
 
 	.sapMGenericTagError & {
@@ -135,7 +137,7 @@ html.sap-desktop .sapMGenericTag:focus {
 	}
 
 	&:hover {
-		box-shadow: 0 0 0 0.0625rem fade(@sapUiContentShadowColor, 30);
+		box-shadow: 0 0 0 0.0625rem ~'hsl(from var(--sapContent_ShadowColor) h s l / .30)';
 		cursor: pointer;
 	}
 
@@ -162,7 +164,7 @@ html.sap-desktop .sapMGenericTag:focus {
 
 	.sapMGenericTagText {
 		font-family: var(--sapFontFamily);
-		font-size: @sapMFontMediumSize;
+		font-size: var(--sapFontSize);
 		font-weight: normal;
 		color: var(--sapTextColor);
 		white-space: nowrap;
@@ -170,7 +172,7 @@ html.sap-desktop .sapMGenericTag:focus {
 		text-overflow: ellipsis;
 		box-sizing: border-box;
 		flex: 1 10000 auto;
-		min-width: @_sap_m_GenericTag_TextMinWidth;
+		min-width: var(--_sap_m_GenericTag_TextMinWidth);
 	}
 
 	.sapMGenericTagValue {
@@ -206,7 +208,7 @@ html.sap-desktop .sapMGenericTag:focus {
 		margin: 0.25rem 0;
 
 		.sapMGenericTagWrap {
-			height: @_sap_m_GenericTag_HeightCozy;
+			height: var(--_sap_m_GenericTag_HeightCozy);
 		}
 	}
 }
