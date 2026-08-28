@@ -689,7 +689,7 @@ sap.ui.define([
 					fileName: "uiChange1", fileType: "change", variantReference: "variantWithRemovedContent"
 				}]
 			};
-			sandbox.stub(Storage, "loadFlVariantDependentControlChanges").resolves(oBackendResponse);
+			sandbox.stub(Storage, "loadFlVariant").resolves(oBackendResponse);
 			// Stub getVariant because the test variant was registered via stubFlexObjectsSelector,
 			// not via real init - so the runtime persistence does not contain it.
 			sandbox.stub(VariantManagementState, "getVariant").returns({ instance: this.oVariantWithRemovedContent });
@@ -728,7 +728,7 @@ sap.ui.define([
 					}
 				]
 			};
-			sandbox.stub(Storage, "loadFlVariantDependentControlChanges").resolves(oBackendResponse);
+			sandbox.stub(Storage, "loadFlVariant").resolves(oBackendResponse);
 			sandbox.stub(VariantManagementState, "getVariant").returns({ instance: this.oVariantWithRemovedContent });
 			const oAddChangeSpy = sandbox.spy(DependencyHandler, "addChangeAndUpdateDependencies");
 
@@ -774,7 +774,7 @@ sap.ui.define([
 					{ fileName: "foreignUiChange", fileType: "change", variantReference: "foreignVariant" }
 				]
 			};
-			sandbox.stub(Storage, "loadFlVariantDependentControlChanges").resolves(oBackendResponse);
+			sandbox.stub(Storage, "loadFlVariant").resolves(oBackendResponse);
 			const oAddNewObjectsSpy = sandbox.spy(FlexState, "addNewObjects");
 			const oLogErrorSpy = sandbox.spy(Log, "error");
 
@@ -790,7 +790,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("loadVariantDependentControlChanges does nothing if the backend response is empty (= variant doesn't exist)", async function(assert) {
-			sandbox.stub(Storage, "loadFlVariantDependentControlChanges").resolves({});
+			sandbox.stub(Storage, "loadFlVariant").resolves({});
 			const oAddNewObjectsSpy = sandbox.spy(FlexState, "addNewObjects");
 			const oLogErrorSpy = sandbox.spy(Log, "error");
 
@@ -814,7 +814,7 @@ sap.ui.define([
 					fileName: "orphanChange", fileType: "change", variantReference: "missingVariant"
 				}]
 			};
-			sandbox.stub(Storage, "loadFlVariantDependentControlChanges").resolves(oBackendResponse);
+			sandbox.stub(Storage, "loadFlVariant").resolves(oBackendResponse);
 			const oAddNewObjectsSpy = sandbox.spy(FlexState, "addNewObjects");
 			const oLogErrorSpy = sandbox.spy(Log, "error");
 

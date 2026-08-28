@@ -115,7 +115,7 @@ sap.ui.define([
 
 		assert.deepEqual(oTreeState.mPredicate2ExpandInfo, {
 			"~predicate~" :
-				{collapseAll : undefined, filter : "~filter~", levels : 0, nodeId : "~sNodeId~"}
+				{filter : "~filter~", important : undefined, levels : 0, nodeId : "~sNodeId~"}
 		});
 
 		// code under test
@@ -123,7 +123,7 @@ sap.ui.define([
 
 		assert.deepEqual(oTreeState.mPredicate2ExpandInfo, {
 			"~predicate~" :
-				{collapseAll : undefined, filter : "~filter~", levels : 0, nodeId : "~sNodeId~"}
+				{filter : "~filter~", important : undefined, levels : 0, nodeId : "~sNodeId~"}
 		});
 
 		// code under test
@@ -137,9 +137,9 @@ sap.ui.define([
 		const oTreeState = new _TreeState(mustBeMocked, mustBeMocked);
 		this.mock(_Helper).expects("getPrivateAnnotation").twice()
 			.withExactArgs("~oNode~", "predicate").returns("~predicate~");
-		this.mock(oTreeState).expects("fnGetKeyFilter").twice()
+		this.mock(oTreeState).expects("fnGetKeyFilter")
 			.withExactArgs("~oNode~").returns("~filter~");
-		this.mock(oTreeState).expects("fnGetNodeId").twice()
+		this.mock(oTreeState).expects("fnGetNodeId")
 			.withExactArgs("~oNode~").returns("~sNodeId~");
 
 		// code under test
@@ -147,7 +147,7 @@ sap.ui.define([
 
 		assert.deepEqual(oTreeState.mPredicate2ExpandInfo, {
 			"~predicate~" :
-				{collapseAll : true, filter : "~filter~", levels : 0, nodeId : "~sNodeId~"}
+				{filter : "~filter~", important : true, levels : 0, nodeId : "~sNodeId~"}
 		});
 
 		// code under test
@@ -155,7 +155,7 @@ sap.ui.define([
 
 		assert.deepEqual(oTreeState.mPredicate2ExpandInfo, {
 			"~predicate~" :
-				{filter : "~filter~", levels : 42, nodeId : "~sNodeId~"}
+				{filter : "~filter~", important : true, levels : 42, nodeId : "~sNodeId~"}
 		});
 	});
 
@@ -163,7 +163,7 @@ sap.ui.define([
 	QUnit.test("collapse: bNested", function (assert) {
 		const oTreeState = new _TreeState("~fnGetKeyFilter~", "~fnGetNodeId~");
 		oTreeState.mPredicate2ExpandInfo = {
-			"~predicate~" : {collapseAll : false, nodeId : "~sNodeId~", levels : 0},
+			"~predicate~" : {nodeId : "~sNodeId~", levels : 0},
 			foo : "bar"
 		};
 
@@ -257,8 +257,8 @@ sap.ui.define([
 		assert.strictEqual(oTreeState.getExpandLevels(), undefined);
 
 		oTreeState.mPredicate2ExpandInfo = {
-			foo : {collapseAll : true, nodeId : "baz", levels : 42},
-			bar : {collapseAll : false, nodeId : "qux", levels : 23}
+			foo : {important : true, nodeId : "baz", levels : 42},
+			bar : {important : false, nodeId : "qux", levels : 23}
 		};
 		const sPredicate2ExpandInfo = JSON.stringify(oTreeState.mPredicate2ExpandInfo);
 
@@ -711,5 +711,180 @@ sap.ui.define([
 
 		// code under test
 		assert.strictEqual(oTreeState.isOutOfPlace("~node3Predicate~"), false);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("notALeafAnymore: Not a leaf before", function (assert) {
+		const oTreeState = new _TreeState("~fnGetKeyFilter~", "~fnGetNodeId~");
+		oTreeState.mPredicate2ExpandInfo = {
+			"~predicate~" : undefined // value must not matter
+		};
+		this.mock(_Helper).expects("getPrivateAnnotation").withExactArgs("~oNode~", "predicate")
+			.returns("~predicate~");
+
+		assert.throws(function () {
+			// code under test
+			oTreeState.notALeafAnymore("~oNode~", "~fnIsAncestor~");
+		}, new Error("Not a leaf before"));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("notALeafAnymore: no expand all", function (assert) {
+		const oTreeState = new _TreeState(mustBeMocked, mustBeMocked);
+		oTreeState.mPredicate2ExpandInfo = {
+			collapsed : {levels : 0},
+			expanded : {levels : 1}
+		};
+		this.mock(_Helper).expects("getPrivateAnnotation").withExactArgs("~oNode~", "predicate")
+			.returns("~predicate~");
+		this.mock(oTreeState).expects("fnGetKeyFilter")
+			.withExactArgs("~oNode~").returns("~filter~");
+		this.mock(oTreeState).expects("fnGetNodeId")
+			.withExactArgs("~oNode~").returns("~sNodeId~");
+
+		// code under test
+		oTreeState.notALeafAnymore("~oNode~", "~fnIsAncestor~");
+
+		assert.deepEqual(oTreeState.mPredicate2ExpandInfo, {
+			collapsed : {levels : 0},
+			expanded : {levels : 1},
+			"~predicate~" : {
+				filter : "~filter~",
+				important : false,
+				levels : 1,
+				nodeId : "~sNodeId~"
+			}
+		});
+	});
+
+	//*********************************************************************************************
+	QUnit.test("notALeafAnymore: expand all elsewhere", function (assert) {
+		const oTreeState = new _TreeState(mustBeMocked, mustBeMocked);
+		oTreeState.mPredicate2ExpandInfo = {
+			collapsed : {levels : 0},
+			"expand all" : {levels : null},
+			expanded : {levels : 1}
+		};
+		this.mock(_Helper).expects("getPrivateAnnotation").withExactArgs("~oNode~", "predicate")
+			.returns("~predicate~");
+		const o = {fnIsAncestor : mustBeMocked};
+		this.mock(o).expects("fnIsAncestor").withExactArgs("expand all").returns(false);
+		this.mock(oTreeState).expects("fnGetKeyFilter")
+			.withExactArgs("~oNode~").returns("~filter~");
+		this.mock(oTreeState).expects("fnGetNodeId")
+			.withExactArgs("~oNode~").returns("~sNodeId~");
+
+		// code under test
+		oTreeState.notALeafAnymore("~oNode~", o.fnIsAncestor);
+
+		assert.deepEqual(oTreeState.mPredicate2ExpandInfo, {
+			collapsed : {levels : 0},
+			"expand all" : {levels : null},
+			expanded : {levels : 1},
+			"~predicate~" : {
+				filter : "~filter~",
+				important : false,
+				levels : 1,
+				nodeId : "~sNodeId~"
+			}
+		});
+	});
+
+	//*********************************************************************************************
+	QUnit.test("notALeafAnymore: expand all somewhere", function (assert) {
+		const oTreeState = new _TreeState(mustBeMocked, mustBeMocked);
+		oTreeState.mPredicate2ExpandInfo = {
+			collapsed : {levels : 0},
+			"expand all" : {levels : null},
+			expanded : {levels : 1}
+		};
+		const deepEqual = (iLevels) => {
+			assert.deepEqual(oTreeState.mPredicate2ExpandInfo, {
+				collapsed : {levels : 0},
+				"expand all" : {levels : null},
+				expanded : {levels : 1},
+				"~predicate~" : {
+					filter : "~filter~",
+					important : true,
+					levels : iLevels,
+					nodeId : "~sNodeId~"
+				}
+			});
+		};
+		this.mock(_Helper).expects("getPrivateAnnotation").exactly(7)
+			.withExactArgs("~oNode~", "predicate").returns("~predicate~");
+		const o = {fnIsAncestor : mustBeMocked};
+		this.mock(o).expects("fnIsAncestor").withExactArgs("expand all").returns(undefined);
+		this.mock(oTreeState).expects("fnGetKeyFilter")
+			.withExactArgs("~oNode~").returns("~filter~");
+		this.mock(oTreeState).expects("fnGetNodeId")
+			.withExactArgs("~oNode~").returns("~sNodeId~");
+
+		// code under test
+		oTreeState.notALeafAnymore("~oNode~", o.fnIsAncestor);
+
+		deepEqual(1);
+
+		// code under test
+		oTreeState.collapse("~oNode~");
+
+		deepEqual(0);
+
+		// code under test
+		oTreeState.expand("~oNode~");
+
+		deepEqual(1);
+
+		// code under test
+		oTreeState.expand("~oNode~", 42);
+
+		deepEqual(42);
+
+		// code under test
+		oTreeState.collapse("~oNode~", /*bAll*/true);
+
+		deepEqual(0);
+
+		// code under test
+		oTreeState.collapse("~oNode~", /*bAll*/true, /*bNested*/true);
+
+		assert.deepEqual(oTreeState.mPredicate2ExpandInfo, {
+			collapsed : {levels : 0},
+			"expand all" : {levels : null},
+			expanded : {levels : 1}
+		});
+
+		oTreeState.mPredicate2ExpandInfo["~predicate~"] = {
+			filter : "~filter~",
+			important : true, // needs to be kept
+			levels : 0, // needs to be changed
+			nodeId : "~sNodeId~"
+		};
+
+		// code under test
+		oTreeState.expand("~oNode~", 7);
+
+		deepEqual(7);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("notALeafAnymore: expand all above", function () {
+		const oTreeState = new _TreeState("~fnGetKeyFilter~", "~fnGetNodeId~");
+		oTreeState.mPredicate2ExpandInfo = Object.freeze({
+			miss : {levels : null},
+			collapsed : {levels : 0},
+			hit : {levels : null},
+			expanded : {levels : 1},
+			"don't ask!" : {levels : null}
+		});
+		this.mock(_Helper).expects("getPrivateAnnotation").withExactArgs("~oNode~", "predicate")
+			.returns("~predicate~");
+		const o = {fnIsAncestor : mustBeMocked};
+		const oMock = this.mock(o);
+		oMock.expects("fnIsAncestor").withExactArgs("miss").returns(false);
+		oMock.expects("fnIsAncestor").withExactArgs("hit").returns(true);
+
+		// code under test
+		oTreeState.notALeafAnymore("~oNode~", o.fnIsAncestor);
 	});
 });

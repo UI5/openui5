@@ -3,8 +3,10 @@
 /* Base theme                               */
 /* ======================================== */
 
-@mdctoken-large-line-height: 1.375rem;
-@mdctoken-small-line-height: 1rem;
+.sapUI5Scope {
+	--sap_ui_mdc_TokenDisplay_large-line-height: 1.375rem;
+	--sap_ui_mdc_TokenDisplay_small-line-height: 1rem;
+}
 
 /* hide Token border and background */
 .sapUiMdcTokenizerDisplay .sapMToken {
@@ -14,24 +16,22 @@
 }
 
 .sapUiMdcTokenizerDisplay.sapMTokenizer.sapMTokenizerReadonly .sapMToken {
-	padding-left: 0; /* remove left padding of a token. The right padding will be used to show the delimiters */
-	padding-top: 0;
-	padding-bottom: 0;
-
+	/* remove left padding of a token. The right padding will be used to show the delimiters */
 	/* right margin and padding of the token (space for the delimiter) */
-	padding-right: 0.375rem;
+	padding: 0 0.375rem 0 0;
 	margin-right: 0.375rem;
 	margin-top: 0;
 	margin-bottom: 0;
 	color: var(--sapTextColor);
-	height: @mdctoken-small-line-height;
+	height: var(--sap_ui_mdc_TokenDisplay_small-line-height);
 }
 
 .sapUiFormEdit .sapUiMdcTokenizerDisplay.sapMTokenizer.sapMTokenizerReadonly .sapMToken {
-	height: @mdctoken-large-line-height;
+	height: var(--sap_ui_mdc_TokenDisplay_large-line-height);
 }
 
 .sapUiSizeCozy {
+
 	.sapUiMdcTokenizerDisplay.sapMTokenizer.sapMTokenizerReadonly .sapMToken {
 		/* right margin and padding of the token (space for the delimiter) */
 		padding-right: 0.5rem;
@@ -49,15 +49,16 @@
 	content: attr(delimiter);
 	color: var(--sapTextColor);
 	font-family: var(--sapFontFamily);
-	font-size: @sapMFontMediumSize;
+	font-size: var(--sapFontSize);
 	font-weight: normal;
 	vertical-align: middle;
 	margin-left: 0.25rem; /* space between tokens. the left margin of the delimiter and the right side of the token */
 	position: absolute;
-	line-height: @mdctoken-small-line-height;
+	line-height: var(--sap_ui_mdc_TokenDisplay_small-line-height);
 }
 
 .sapUiSizeCozy {
+
 	.sapUiMdcTokenizerDisplay .sapMToken::after {
 		margin-left: 0.4rem; /* space between tokens. the left side margin of the token */
 	}
@@ -85,17 +86,18 @@ html.sap-desktop .sapUiMdcTokenizerDisplay .sapMToken:hover {
 
 .sapUiMdcTokenizerDisplay .sapMTokenText {
 	/* enable selection of scrollcontainer */
-    user-select: text;
-	line-height: @mdctoken-small-line-height;
+	user-select: text;
+	line-height: var(--sap_ui_mdc_TokenDisplay_small-line-height);
 }
 
 .sapUiFormEdit .sapUiMdcTokenizerDisplay .sapMTokenText {
-	line-height: @mdctoken-large-line-height;
+	line-height: var(--sap_ui_mdc_TokenDisplay_large-line-height);
 }
 
 .sapUiSizeCompact {
+
 	.sapUiMdcTokenizerDisplay.sapMTokenizer .sapMToken {
-		font-size: @sapMFontMediumSize; /* as set to Small in Tokenizer*/
+		font-size: var(--sapFontSize); /* as set to Small in Tokenizer */
 	}
 
 	.sapUiForm .sapUiMdcTokenizerDisplay.sapMTokenizer .sapMToken {

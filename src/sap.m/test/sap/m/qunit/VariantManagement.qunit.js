@@ -3508,6 +3508,55 @@ sap.ui.define([
 		}
 	});
 
+	QUnit.test("a variant lazily loaded after dialog open with runtime values applied is not reported as user-changed", function(assert) {
+		const done = assert.async();
+
+		// Reproduces the reported issue: a shared PUBLIC comp variant is loaded lazily after the manage
+		// dialog was built. The item is created from the persisted file (favorite:false / a given name),
+		// then a runtime value is applied on top (e.g. favorite re-applied from a USER-layer change). The
+		// item's "original" snapshot latched to the file value before the overlay, so without _syncOriginalItemState
+		// _collectManageData would wrongly report the untouched variant as changed.
+		this.oVM.setDynamicVariantsLoadedCallback(function() {
+			const oItem = new VariantItem("VMI_LAZY", {
+				key: "lazy",
+				title: "Lazy Loaded",
+				author: "C",
+				favorite: false
+			});
+			this.oVM.addItem(oItem);
+			// runtime overlay applied AFTER the item exists (after its original snapshot latched):
+			oItem.setFavorite(true);
+			oItem.setExecuteOnSelect(true);
+			return Promise.resolve();
+		}.bind(this));
+
+		this.oVM._createManagementDialog();
+
+		this.oVM.oManagementDialog.attachAfterOpen(function() {
+			Promise.resolve().then(function() {
+				return new Promise(function(resolve) { setTimeout(resolve, 20); });
+			}).then(function() {
+				const oItem = this.oVM.getItems().find((o) => o.getKey() === "lazy");
+				assert.ok(oItem, "the lazily-loaded variant item exists");
+				assert.strictEqual(oItem.getFavorite(), true, "runtime favorite is applied");
+				assert.strictEqual(oItem._getOriginalFavorite(), true, "original favorite is re-synced to the post-load value");
+				assert.strictEqual(oItem._getOriginalExecuteOnSelect(), true, "original executeOnSelect is re-synced to the post-load value");
+
+				const oInfo = this.oVM._collectManageData();
+				const bReported =
+					(oInfo.fav || []).some((o) => o.key === "lazy")
+					|| (oInfo.exe || []).some((o) => o.key === "lazy")
+					|| (oInfo.renamed || []).some((o) => o.key === "lazy");
+				assert.notOk(bReported, "the untouched lazily-loaded variant is NOT reported as changed");
+
+				this.oVM.oManagementDialog.close();
+				done();
+			}.bind(this));
+		}.bind(this));
+
+		this.oVM._openManagementDialog();
+	});
+
 	QUnit.test("check management table is not set busy when no callback is provided", function(assert) {
 		const done = assert.async();
 

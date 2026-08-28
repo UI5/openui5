@@ -231,14 +231,15 @@ sap.ui.define([
 		},
 
 		/**
-		 * Load missing UI changes when switching to a variant that has variantDependentControlChangesRemoved: true
+		 * Load missing UI changes when switching to a variant that has variantDependentControlChangesRemoved: true.
+		 *
 		 * @param {object} mPropertyBag Property bag
 		 * @param {string} mPropertyBag.reference Flexibility reference
-		 * @param {string} mPropertyBag.variantId Id of the variant for which the dependent control changes should be loaded
+		 * @param {string} mPropertyBag.variantReference Id of the variant for which the dependent control changes should be loaded
 		 * @returns {Promise<object>} Promise resolves with the dependent control changes for the given variant ID
 		 */
-		loadFlVariantDependentControlChanges(mPropertyBag) {
-			const mParameters = { id: mPropertyBag.variantId };
+		loadFlVariant(mPropertyBag) {
+			const mParameters = { id: mPropertyBag.variantReference };
 			this._addClientInfo(mParameters);
 			Utils.addSAPLogonLanguageInfo(mParameters);
 

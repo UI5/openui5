@@ -5,6 +5,12 @@
 	xmlns:l="sap.ui.layout"
 	class="sapUiBodyBackground sapContrastPlus">
 	<VBox class="sapUiSmallMargin">
+		<MessageStrip
+			enableFormattedText="true"
+			text="Deprecated as of version 1.153. Use the UI5 Web Components' notifications instead, which are UXC-compliant and can be integrated using ui5-tooling-modules. See &lt;a href=&quot;https://ui5.sap.com/#/topic/1c80793df5bb424091954697fc0b2828&quot; target=&quot;_blank&quot;&gt;Using Web Components&lt;/a&gt; and the &lt;a href=&quot;https://github.com/SAP-samples/uxc-integration&quot; target=&quot;_blank&quot;&gt;UXC integration sample&lt;/a&gt;."
+			type="Warning"
+			showIcon="true"
+			class="sapUiSmallMarginBottom" />
 		<NotificationList>
 			<layoutData>
 				<FlexItemData maxWidth="600px" />

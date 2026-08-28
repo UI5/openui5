@@ -289,9 +289,9 @@ sap.ui.define([
 	 * @returns {Promise<undefined>} Resolves when the load has completed
 	 */
 	VariantManagerApply.loadVariantDependentControlChanges = async function(mPropertyBag) {
-		const oBackendResponse = await Storage.loadFlVariantDependentControlChanges({
+		const oBackendResponse = await Storage.loadFlVariant({
 			reference: mPropertyBag.reference,
-			variantId: mPropertyBag.variantId
+			variantReference: mPropertyBag.variantId
 		});
 
 		// Discard the entire response if the response does not contain the requested

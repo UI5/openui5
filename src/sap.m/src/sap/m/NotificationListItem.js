@@ -60,6 +60,10 @@ function(
 	 * <li><code>truncate</code> - determines if title and description are truncated to the first two lines (usually needed on mobile devices).</li>
 	 * </ul>
 	 * For each item you can set some additional status information about the item processing by adding a {@link sap.m.MessageStrip} to the <code>processingMessage</code> aggregation.
+	 *
+	 * <b>Note:</b> <code>sap.m.NotificationListItem</code> will no longer be aligned with future design updates. Use the UI5 Web Components' notifications instead,
+	 * which are UXC-compliant and are the successors going forward. They can be integrated seamlessly using ui5-tooling-modules. See {@link topic:1c80793df5bb424091954697fc0b2828 Using Web Components}
+	 * and the {@link https://github.com/SAP-samples/uxc-integration UXC integration sample}.
 	 * @extends sap.m.NotificationListBase
 	 *
 	 * @author SAP SE
@@ -68,6 +72,9 @@ function(
 	 * @constructor
 	 * @public
 	 * @since 1.34
+	 * @deprecated As of version 1.153. Will no longer be aligned with future design updates. Replaced by the UI5 Web Components' notifications, which are UXC-compliant.
+	 * The UI5 Web Components can be integrated seamlessly using ui5-tooling-modules.
+	 * See {@link topic:1c80793df5bb424091954697fc0b2828 Using Web Components} and the {@link https://github.com/SAP-samples/uxc-integration UXC integration sample}.
 	 * @alias sap.m.NotificationListItem
 	 */
 	var NotificationListItem = NotificationListBase.extend('sap.m.NotificationListItem', /** @lends sap.m.NotificationListItem.prototype */ {
