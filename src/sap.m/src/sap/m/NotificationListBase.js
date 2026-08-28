@@ -86,6 +86,10 @@ sap.ui.define([
 		 * <h4>Note</h4>
 		 * There are several properties, that are inherited from <code>ListItemBase</code> and have no
 		 * visual representation in the Notifications - <code>counter</code>, <code>highlight</code>, <code>highlightText</code>, <code>navigated</code>, <code>selected</code>, <code>type</code>
+		 *
+		 * <b>Note:</b> <code>sap.m.NotificationListBase</code> and its subclasses will no longer be aligned with future design updates. Use the UI5 Web Components' notifications instead,
+		 * which are UXC-compliant and are the successors going forward. They can be integrated seamlessly using ui5-tooling-modules. See {@link topic:1c80793df5bb424091954697fc0b2828 Using Web Components}
+		 * and the {@link https://github.com/SAP-samples/uxc-integration UXC integration sample}.
 		 * @extends sap.m.ListItemBase
 		 *
 		 * @author SAP SE
@@ -95,6 +99,9 @@ sap.ui.define([
 		 * @public
 		 * @abstract
 		 * @since 1.38
+		 * @deprecated As of version 1.153. Will no longer be aligned with future design updates. Replaced by the UI5 Web Components' notifications, which are UXC-compliant.
+		 * The UI5 Web Components can be integrated seamlessly using ui5-tooling-modules.
+		 * See {@link topic:1c80793df5bb424091954697fc0b2828 Using Web Components} and the {@link https://github.com/SAP-samples/uxc-integration UXC integration sample}.
 		 * @alias sap.m.NotificationListBase
 		 */
 		var NotificationListBase = ListItemBase.extend('sap.m.NotificationListBase', /** @lends sap.m.NotificationListBase.prototype */ {
