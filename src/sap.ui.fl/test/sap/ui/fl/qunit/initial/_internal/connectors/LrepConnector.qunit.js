@@ -390,11 +390,11 @@ sap.ui.define([
 			}.bind(this));
 		});
 
-		QUnit.test("when loadFlVariantDependentControlChanges is triggered", function(assert) {
+		QUnit.test("when loadFlVariant is triggered for lazy-loaded content", function(assert) {
 			mockResponse.call(this, JSON.stringify(oFLVariantServerResponse));
-			const mPropertyBag = { url: "/sap/bc/lrep", reference: "test.app", variantId: "variant1" };
+			const mPropertyBag = { url: "/sap/bc/lrep", reference: "test.app", variantReference: "variant1" };
 
-			return LrepConnector.loadFlVariantDependentControlChanges(mPropertyBag).then(function(oResponse) {
+			return LrepConnector.loadFlVariant(mPropertyBag).then(function(oResponse) {
 				assert.equal(this.oXHR.method, "GET", "request method is GET");
 				const sExpectedUrl = "/sap/bc/lrep/flex/variantdata/content/test.app?id=variant1&sap-language=EN";
 				assert.equal(this.oXHR.url, sExpectedUrl, "the URL is correct");

@@ -255,7 +255,7 @@ sap.ui.define([
 				"Lazy Variant Alpha content is marked as removed"
 			);
 
-			// Stub loadFlVariantDependentControlChanges to return a hideControl change targeting a section
+			// Stub loadFlVariant to return a hideControl change targeting a section
 			const sTargetControlId = "lazyLoadView--ObjectPageSection1";
 			const oContentResponse = createVariantContentResponse([
 				{
@@ -281,7 +281,7 @@ sap.ui.define([
 					support: { user: "LazyUser" }
 				}
 			]);
-			const oLoadFlVariantDependentControlChangesStub = sandbox.stub(Storage, "loadFlVariantDependentControlChanges")
+			const oLoadFlVariantStub = sandbox.stub(Storage, "loadFlVariant")
 			.resolves(oContentResponse);
 
 			// Verify the target control is visible before variant switch
@@ -297,13 +297,13 @@ sap.ui.define([
 			});
 
 			assert.strictEqual(
-				oLoadFlVariantDependentControlChangesStub.callCount, 1,
-				"Storage.loadFlVariantDependentControlChanges was called once"
+				oLoadFlVariantStub.callCount, 1,
+				"Storage.loadFlVariant was called once"
 			);
 			assert.deepEqual(
-				oLoadFlVariantDependentControlChangesStub.firstCall.args[0],
-				{ reference: sReference, variantId: "lazyVariant1" },
-				"loadFlVariantDependentControlChanges called with correct parameters"
+				oLoadFlVariantStub.firstCall.args[0],
+				{ reference: sReference, variantReference: "lazyVariant1" },
+				"loadFlVariant called with correct parameters"
 			);
 
 			assert.notOk(

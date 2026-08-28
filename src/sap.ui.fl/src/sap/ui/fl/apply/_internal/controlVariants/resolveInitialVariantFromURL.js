@@ -18,7 +18,7 @@ sap.ui.define([
 	function shouldLoad(sReference, sVMReference, sVariantId) {
 		const sOwningVMReference = VariantManagementState.getVariantManagementReferenceForVariant(sReference, sVariantId);
 		// Variant is unknown to every loaded VM - load speculatively.
-		// loadVariantDependentControlChanges discards the response if the variant turns
+		// loadVariant discards the response if the variant turns
 		// out to belong to a different VM, so a wrong guess is harmless.
 		if (!sOwningVMReference) {
 			return true;
@@ -39,7 +39,7 @@ sap.ui.define([
 	 * For a single variant management, ensure that any variant referenced in the URL
 	 * technical parameter is fully loaded with its UI changes. Each URL id is checked
 	 * independently: if the id is unknown to every loaded VM, this VM loads it
-	 * speculatively (loadVariantDependentControlChanges discards the response if the
+	 * speculatively (loadVariant discards the response if the
 	 * variant turns out to belong to a different VM). If the id matches a variant in
 	 * this VM whose content was lazily stripped, the content is loaded. Ids that
 	 * already belong to another VM are left for that VM's registration step.

@@ -65,7 +65,6 @@ sap.ui.define([], function() {
 		 * @param {string} mPropertyBag.reference - Flexibility reference
 		 * @param {string} mPropertyBag.variantReference - Variant reference to be loaded
 		 * @param {string} [mPropertyBag.url] - Configured URL for the connector
-		 * @param {sap.ui.fl.Layer} [mPropertyBag.layer] - Layer of the objects to be loaded
 		 * @returns {Promise<object>} Resolves with the data for variant
 		 */
 		loadFlVariant() {
@@ -81,17 +80,6 @@ sap.ui.define([], function() {
 		 */
 		loadAllFlVariants() {
 			return Promise.reject(new Error("loadAllFlVariants is not implemented"));
-		},
-
-		/**
-		 * Load missing UI changes when switching to a variant that has variantDependentControlChangesRemoved: true
-		 * @param {object} mPropertyBag Property bag
-		 * @param {string} mPropertyBag.reference Flexibility reference
-		 * @param {string} mPropertyBag.variantId Id of the variant for which the dependent control changes should be loaded
-		 * @returns {Promise<object>} Promise resolves with the dependent control changes for the given variant ID
-		 */
-		loadFlVariantDependentControlChanges() {
-			return Promise.reject(new Error("loadFlVariantDependentControlChanges is not implemented"));
 		},
 
 		/**
