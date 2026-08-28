@@ -47,6 +47,14 @@ sap.ui.define([],
 			}],
 		templates: {
 			create: "sap/f/designtime/DynamicPage.create.fragment.xml"
+		},
+		tool: {
+			start(oDynamicPage) {
+				oDynamicPage.enteringRtaMode();
+			},
+			stop(oDynamicPage) {
+				oDynamicPage.leavingRtaMode();
+			}
 		}
 	};
 

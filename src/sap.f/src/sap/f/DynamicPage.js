@@ -1461,7 +1461,8 @@ sap.ui.define([
 		var bScrollBarNeeded = this._needsVerticalScrollBar(),
 			oWrapperElement = this.$wrapper.get(0),
 			oTitle = this.getTitle(),
-			bTitleTransparent = oTitle && oTitle.getBackgroundDesign() === BackgroundDesign.Transparent,
+			bIsTitleTransparent = oTitle && oTitle.getBackgroundDesign() === BackgroundDesign.Transparent,
+			bRequiresClipPath = bIsTitleTransparent || this._isRTAActive(),
 			iTitleHeight,
 			iTitleWidth,
 			iSpaceForScrollbar,
@@ -1489,7 +1490,7 @@ sap.ui.define([
 		// (2) also make the area underneath the title invisible (using clip-path)
 		// to allow usage of *transparent background* of the title element
 		// (otherwise content from the scroll *overflow* will show underneath the transparent title element)
-		if (bTitleTransparent) {
+		if (bRequiresClipPath) {
 			sClipPath = 'polygon(0px ' + Math.floor(iTitleHeight) + 'px, '
 				+ iTitleWidth + 'px ' + Math.floor(iTitleHeight) + 'px, '
 				+ iTitleWidth + 'px 0, 100% 0, 100% 100%, 0 100%)';
@@ -1511,6 +1512,34 @@ sap.ui.define([
 		 // so all of them completed their adjustments for the new size (notably any nested table adjusted its
 		 // visible rows count upon being notified by ResizeHandler for change of height of its container)
 		setTimeout(this._toggleScrollingStyles.bind(this), 0);
+	};
+
+	/**
+	 * Called by the designtime tool hook when RTA starts.
+	 * @private
+	 */
+	DynamicPage.prototype.enteringRtaMode = function () {
+		this._bRtaActive = true;
+		this._updateTitlePositioning();
+	};
+
+	/**
+	 * Called by the designtime tool hook when RTA stops.
+	 * @private
+	 */
+	DynamicPage.prototype.leavingRtaMode = function () {
+		this._bRtaActive = false;
+		this._updateTitlePositioning();
+	};
+
+	/**
+	 * Returns whether RTA (runtime adaptation) is currently active.
+	 * The flag is set/unset via the designtime tool start/stop hooks.
+	 * @returns {boolean}
+	 * @private
+	 */
+	DynamicPage.prototype._isRTAActive = function () {
+		return !!this._bRtaActive;
 	};
 
 	DynamicPage.prototype._toggleScrollingStyles = function (bNeedsVerticalScrollBar) {

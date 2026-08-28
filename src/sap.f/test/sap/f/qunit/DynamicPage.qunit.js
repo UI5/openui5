@@ -309,6 +309,28 @@ function(
 		assert.notOk(oDynamicPage._bClipPathApplied, "clipPath tracking flag should be false after reverting");
 	});
 
+	QUnit.test("DynamicPage - clipPath applied when RTA is active, regardless of backgroundDesign", function(assert) {
+		const oDynamicPage = this.oDynamicPage;
+		const oWrapperElement = oDynamicPage.$wrapper.get(0);
+
+		// precondition: non-transparent background, no clip-path
+		assert.strictEqual(oWrapperElement.style.clipPath, "", "clipPath not set initially");
+
+		// act: RTA starts
+		oDynamicPage.enteringRtaMode();
+
+		assert.notStrictEqual(oWrapperElement.style.clipPath, "", "clipPath applied when RTA is active");
+		assert.ok(oDynamicPage._bClipPathApplied, "clipPath tracking flag is true during RTA");
+		assert.ok(oDynamicPage._isRTAActive(), "_isRTAActive returns true after enteringRtaMode");
+
+		// act: RTA stops
+		oDynamicPage.leavingRtaMode();
+
+		assert.strictEqual(oWrapperElement.style.clipPath, "", "clipPath cleared after RTA stops");
+		assert.notOk(oDynamicPage._bClipPathApplied, "clipPath tracking flag is false after RTA stops");
+		assert.notOk(oDynamicPage._isRTAActive(), "_isRTAActive returns false after leavingRtaMode");
+	});
+
 	QUnit.module("DynamicPage - API - headerPinned property", {
 		beforeEach: function () {
 

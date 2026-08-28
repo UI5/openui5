@@ -201,6 +201,14 @@ function(
 		}],
 		templates: {
 			create: "sap/uxap/designtime/ObjectPageLayout.create.fragment.xml"
+		},
+		tool: {
+			start(oObjectPageLayout) {
+				oObjectPageLayout.enteringRtaMode();
+			},
+			stop(oObjectPageLayout) {
+				oObjectPageLayout.leavingRtaMode();
+			}
 		}
 	};
 
