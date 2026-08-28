@@ -3,11 +3,13 @@
 /* Base theme                                  */
 /* =========================================== */
 
-@_sap_m_NotificationListBase_ItemBackground: var(--sapList_Background);
-@_sap_m_NotificationListBase_ItemGroupedBackground: var(--sapList_Background);
+.sapUI5Scope {
+	--_sap_m_NotificationListBase_ItemBackground: var(--sapList_Background);
+	--_sap_m_NotificationListBase_ItemGroupedBackground: var(--sapList_Background);
+}
 
 .sapMNLI {
-	background: @_sap_m_NotificationListBase_ItemBackground;
+	background: var(--_sap_m_NotificationListBase_ItemBackground);
 	cursor: pointer;
 	display: flex;
 	flex-direction: column;
@@ -42,15 +44,15 @@
 			display: flex;
 			align-items: flex-start;
 			font-size: var(--sapFontHeader6Size);
-			font-weight: @sapUiFontHeaderWeight;
+			font-weight: normal;
 			line-height: 1.4;
 			color: var(--sapGroup_TitleTextColor);
 			padding-bottom: 0.25rem;
 		}
 
 		.sapMNLIDescription {
-			font-size: @sapMFontMediumSize;
-			color: @sapUiBaseText;
+			font-size: var(--sapFontSize);
+			color: var(--sapTextColor);
 			line-height: 1.4;
 			margin-top: 0.5rem;
 			word-wrap: break-word;
@@ -67,7 +69,7 @@
 		padding-top: 0.5rem;
 
 		.sapMNLIFooterItem {
-			font-size: @sapMFontMediumSize;
+			font-size: var(--sapFontSize);
 			color: var(--sapContent_LabelColor);
 			padding-top: 2px;
 			white-space: nowrap;
@@ -119,7 +121,7 @@
 }
 
 .sapMNLGroup .sapMNLI {
-	background: @_sap_m_NotificationListBase_ItemGroupedBackground;
+	background: var(--_sap_m_NotificationListBase_ItemGroupedBackground);
 }
 
 .sapMNLIItemTextLineClamp {
