@@ -95,88 +95,95 @@
 				</ul>
 			</description>
 		</interaction>
-		<interaction>⁪⁪⁪‌​​‌​‍​‍‌​‍‍​‍​‍‍​​‌​‍‌‍​‍‌‌​‌‍​​‍‌‍‌‍‌‌⁪ <kbd>Ctrl + Shift + A</kbd> ⁪⁪<description>
-				<p>⁪⁪⁪‌​‌‌​‍​​‌‍​‌‍​​‌‍‍‍‌​‌‍​‍​​​‍​​‌‍‌‌‍‍‌‍‌⁪<span class="emphasis">If cell selection is enabled:</span>⁪⁪</p>
-				<p>⁪⁪⁪‌​​‍‌‍​‌‌‍‍‌​‍‍‍‌‍‍‌‌​‍‍‍‌‍‌‌​‌‌‍‌​‌‍​​​⁪If the focus is inside of the table, the selection for any rows and cells is removed.⁪⁪</p>
+		<interaction>⁪⁪⁪‌​​‌​‍​‍‌​‍‍​‍​‍‍​​‌​‍‌‍​‍‌‌​‌‍​​‍‌‍‌‍‌‌⁪ <kbd>Ctrl + A</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‌​‌‌​‍​​‌‍​‌‍​​‌‍‍‍‌​‌‍​‍​​​‍​​‌‍‌‌‍‍‌‍‌⁪<span class="emphasis">If multiple row selection is enabled:</span>⁪⁪</p>
+				<p>⁪⁪⁪‌​​‍‌‍​‌‌‍‍‌​‍‍‍‌‍‍‌‌​‍‍‍‌‍‌‌​‌‌‍‌​‌‍​​​⁪If the focus is on a row, a cell, or a control inside a cell, the selection is toggled. If not all rows were selected, all rows are now selected. If all rows were already selected, the selection of all rows is removed.⁪⁪</p>
+				<p>⁪⁪⁪‌‍‌‍​​‍‍‌‌​‍‌‍‍​‍‍‍​​​‌​​‌​‌‍​‍​‌‍‍‌‌​‍‌⁪The shortcut has no effect if the focus is on a column header cell or on a text input field, as the browser handles the text selection in this case.⁪⁪</p>
 			</description>
 		</interaction>
-		<interaction>⁪⁪⁪‌‍‌‍​​‍‍‌‌​‍‌‍‍​‍‍‍​​​‌​​‌​‌‍​‍​‌‍‍‌‌​‍‌⁪ <kbd>Escape</kbd> ⁪⁪<description>
-				<p>⁪⁪⁪‍‌​‍​‌‍‍‌‌‍‌‍‌‍‍‍‌​‌‍‍​‌​​‌‍‌‍‍​‌‍‍‌​​​​⁪<span class="emphasis">If cell selection is enabled:</span>⁪⁪</p>
-				<p>⁪⁪⁪‍​​‌​‍‌‍‍​​​‍​​‍‍​‌​‍‌​​‌​‍​‍​​‌​‍​‌​​‍​⁪If the focus is inside of the table, and cells are selected, the selection of the cells is removed.⁪⁪</p>
+		<interaction>⁪⁪⁪‍‌​‍​‌‍‍‌‌‍‌‍‌‍‍‍‌​‌‍‍​‌​​‌‍‌‍‍​‌‍‍‌​​​​⁪ <kbd>Ctrl + Shift + A</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‍​​‌​‍‌‍‍​​​‍​​‍‍​‌​‍‌​​‌​‍​‍​​‌​‍​‌​​‍​⁪<span class="emphasis">If multiple row selection is enabled:</span>⁪⁪</p>
+				<p>⁪⁪⁪‌​​‌​​​‍‌​‍‍‍‍‌‌​​‌​‍‍‌​​‍‌‌‌​‍​‍‌‍​‍‌‌⁪If the focus is on a row, a cell, or a control inside a cell, the selection of all rows is removed.⁪⁪</p>
+				<p>⁪⁪⁪‍‍‍‍‌​‍‌‍‍​​‌‍‍‌‍‌​‍‌​‍​‌‌‍‍‌‌​​‍​​​‍⁪The shortcut has no effect if the focus is on a column header cell or on a text input field, as the browser handles the text selection in this case.⁪⁪</p>
 			</description>
 		</interaction>
-		<interaction>⁪⁪⁪‌​​‌​​​‍‌​‍‍‍‍‌‌​​‌​‍‍‌​​‍‌‌‌​‍​‍‌‍​‍‌‌⁪ <kbd>F2</kbd> ⁪⁪<description>
-				<p>⁪⁪⁪‍‍‍‍‌​‍‌‍‍​​‌‍‍‌‍‌​‍‌​‍​‌‌‍‍‌‌​​‍​​​‍⁪Toggles the focus between the cell and its content if the cell has interactive elements, such as an input field or button (with the exception of read-only text).⁪⁪</p>
+		<interaction>⁪⁪⁪‌‌​​‌‌‌​​​​​‌‍​‍‌‍‍​‍‌​‍‌‌​‌​‌​​​‌‌‍​‍​​‍⁪ <kbd>Escape</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‌‌​‍​‌‍‍​‍​​‍​‍​‌‌​‌​‍‍​​‍‍​‍‍‌‍​‌​‌‌‍‍‌⁪<span class="emphasis">If cell selection is enabled:</span>⁪⁪</p>
+				<p>⁪⁪⁪‌​‌‌‌‍‍​‍‍​‍‌‍​‌​​​​‌‌‌‌​‍‌‌‌‌‌‌‍​‌‌​‍‍‍⁪If the focus is inside of the table, and cells are selected, the selection of the cells is removed.⁪⁪</p>
 			</description>
 		</interaction>
-		<interaction>⁪⁪⁪‌‌​​‌‌‌​​​​​‌‍​‍‌‍‍​‍‌​‍‌‌​‌​‌​​​‌‌‍​‍​​‍⁪ <kbd>F7</kbd> ⁪⁪<description>
-				<p>⁪⁪⁪‌‌​‍​‌‍‍​‍​​‍​‍​‌‌​‌​‍‍​​‍‍​‍‍‌‍​‌​‌‌‍‍‌⁪If the focus is within a cell in edit mode, the focus moves to the row.⁪⁪</p>
+		<interaction>⁪⁪⁪‍‍‌​​‌‍‌​​​‌‌​‍‌‍‍‌​​‌‍‌‍‍‌​‍​​​‌‌‌‌‌‍​​⁪ <kbd>F2</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‌‌​‌‌‌​‍‍‌​‍‍‍‍​​​​​‌‌​​‍‍​‌​‌‍‌‍‍‌‌‍‌‍‍‍⁪Toggles the focus between the cell and its content if the cell has interactive elements, such as an input field or button (with the exception of read-only text).⁪⁪</p>
 			</description>
 		</interaction>
-		<interaction>⁪⁪⁪‌​‌‌‌‍‍​‍‍​‍‌‍​‌​​​​‌‌‌‌​‍‌‌‌‌‌‌‍​‌‌​‍‍‍⁪ <kbd>Shift + MouseClick</kbd> ⁪⁪<description>
-				<p>⁪⁪⁪‍‍‌​​‌‍‌​​​‌‌​‍‌‍‍‌​​‌‍‌‍‍‌​‍​​​‌‌‌‌‌‍​​⁪<span class="emphasis">If cell selection is enabled</span>:⁪⁪</p>
-				<p>⁪⁪⁪‌‌​‌‌‌​‍‍‌​‍‍‍‍​​​​​‌‌​​‍‍​‌​‌‍‌‍‍‌‌‍‌‍‍‍⁪If cells are selected, <kbd>Shift + MouseClick</kbd> on a different cell enhances the selection up to the clicked cell.⁪⁪</p>
+		<interaction>⁪⁪⁪‌‍‍‍​‌​​‍‍‍‌‌​‍​‍‌‌‍​‌‌‍‌​‌‌‌‍​‍‌‌‍​​‌‌‌⁪ <kbd>F7</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‌‍​​‍‌‍‌‌​‌​​​‍‌​‍‍‍‍​​​​‌​‌‍​​‍‍‍​​‍‌​‍⁪If the focus is within a cell in edit mode, the focus moves to the row.⁪⁪</p>
 			</description>
 		</interaction>
-		<interaction>⁪⁪⁪‌‍‍‍​‌​​‍‍‍‌‌​‍​‍‌‌‍​‌‌‍‌​‌‌‌‍​‍‌‌‍​​‌‌‌⁪ <kbd>Ctrl + C</kbd> ⁪⁪<description>
-				<p>⁪⁪⁪‌‍​​‍‌‍‌‌​‌​​​‍‌​‍‍‍‍​​​​‌​‌‍​​‍‍‍​​‍‌​‍⁪Copies the selected rows or cells to the clipboard if available, and the feature is enabled.⁪⁪</p>
+		<interaction>⁪⁪⁪‍‌​​​‌‍‌​‍‍​​‍​‌‍‍‌‍‌​‌‌​‌​‌‍‌‌​‌‌‌​‌‌​​⁪ <kbd>Shift + MouseClick</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‌​​‌​‍‌​​‍‌‍‍​‌‌​‍​​​‌‍​​‍​‌‌‌‍​​‌‍​‍‍​​​⁪<span class="emphasis">If cell selection is enabled</span>:⁪⁪</p>
+				<p>⁪⁪⁪‌‌​​​‌‌‌‍‍​‌‌​‌‌‌​​‌‌​‍​‍‌​‍‌‍​‍‍‌‍​‌​‍‍‌⁪If cells are selected, <kbd>Shift + MouseClick</kbd> on a different cell enhances the selection up to the clicked cell.⁪⁪</p>
 			</description>
 		</interaction>
-		<interaction>⁪⁪⁪‍‌​​​‌‍‌​‍‍​​‍​‌‍‍‌‍‌​‌‌​‌​‌‍‌‌​‌‌‌​‌‌​​⁪ <kbd>Ctrl + V</kbd> ⁪⁪<description>
-				<p>⁪⁪⁪‌​​‌​‍‌​​‍‌‍‍​‌‌​‍​​​‌‍​​‍​‌‌‌‍​​‌‍​‍‍​​​⁪Pastes the content from the clipboard if the feature is enabled.⁪⁪</p>
+		<interaction>⁪⁪⁪‌‍​​‌‌​​​‍​‍‌​‌​‍​‍​​​‍‌​‌‌‌‌​​​‌‌​‌​‍​⁪ <kbd>Ctrl + C</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‌​‌‌‍‌‍‌‌‍​​​​​‍‍‍‌‍‍‌‌‌‌‍‍‌‌​‍​‍‍​‌‌‍‍​​⁪Copies the selected rows or cells to the clipboard if available, and the feature is enabled.⁪⁪</p>
+			</description>
+		</interaction>
+		<interaction>⁪⁪⁪‌‌‌‌‍​​​‌‍‌‍‌​​‌‍‍‍‌​​‍​‍‍​‍​‍‌​​‍‌‌​‍‌‍‍⁪ <kbd>Ctrl + V</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‌‌‌‌‍‌‌​‍‍​‌​‌​‌​​‌​‍​‍‌‍‍‍‌‍‌​​‍‍‍​‍‌‌⁪Pastes the content from the clipboard if the feature is enabled.⁪⁪</p>
 			</description>
 		</interaction>
 	</control-interactions>
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
-		<interaction>⁪⁪⁪‌‌​​​‌‌‌‍‍​‌‌​‌‌‌​​‌‌​‍​‍‌​‍‌‍​‍‍‌‍​‌​‍‍‌⁪ <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> ⁪⁪<description>
-				<p>⁪⁪⁪‌‍​​‌‌​​​‍​‍‌​‌​‍​‍​​​‍‌​‌‌‌‌​​​‌‌​‌​‍​⁪Opens the My Views dialog.⁪⁪</p>
+		<interaction>⁪⁪⁪‌‌​​‌​​‍​​‌‍​‍​‌‌‌​‌‍‌​‍‌​​‍‍​​‍‍​‌‍‌​‌‌‌⁪ <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‍​​‍‍‍​‍​​‌‌‍​‍‍‍‌‍‌‌‌‍‍‍‍‌‍‍‍​‍​​‌​‌​​​⁪Opens the My Views dialog.⁪⁪</p>
 			</description> 
 		</interaction>
-		<interaction>⁪⁪⁪‌​‌‌‍‌‍‌‌‍​​​​​‍‍‍‌‍‍‌‌‌‌‍‍‌‌​‍​‍‍​‌‌‍‍​​⁪ <kbd>PageUp</kbd> ⁪⁪<description>
-				<p>⁪⁪⁪‌‌‌‌‍​​​‌‍‌‍‌​​‌‍‍‍‌​​‍​‍‍​‍​‍‌​​‍‌‌​‍‌‍‍⁪Closes the error popover of the My Views dialog⁪⁪</p>
+		<interaction>⁪⁪⁪‌​‍‍‌​‍‍‌‌​​​‍‍‍​‌​​‍​​‍​‌‌‍​‍‍‍‍‍‌‌‍‌‍‌⁪ <kbd>PageUp</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‌‍‍​‍‍‌‍‍‌‍‍‌‍‌‍​‍‍‌​‌‌‍​‍‌‌​‌​​‌​​​‌‍​‍⁪Closes the error popover of the My Views dialog⁪⁪</p>
 			</description>
 		</interaction>
-		<interaction>⁪⁪⁪‌‌‌‌‍‌‌​‍‍​‌​‌​‌​​‌​‍​‍‌‍‍‍‌‍‌​​‍‍‍​‍‌‌⁪ <kbd>Ctrl + Enter</kbd> ⁪⁪<description>
-				<p>⁪⁪⁪‌‌​​‌​​‍​​‌‍​‍​‌‌‌​‌‍‌​‍‌​​‍‍​​‍‍​‌‍‌​‌‌‌⁪Saves the new view in the Save As dialog.⁪⁪</p>
+		<interaction>⁪⁪⁪‌​​‌‍‍​‍‍‍​​‍​‌​​‌‌‍‍​‌‌​​​‌‍​‍‌‍‌‍‍‌‍⁪ <kbd>Ctrl + Enter</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‍‍‍​‌‍​​‌‍‍‍​​​‍‌​‌​‌‍​‌‌​‌‍‌​‍‌‍‌‍​​‍​‍⁪Saves the new view in the Save As dialog.⁪⁪</p>
 			</description>
 		</interaction>
-		<interaction>⁪⁪⁪‍​​‍‍‍​‍​​‌‌‍​‍‍‍‌‍‌‌‌‍‍‍‍‌‍‍‍​‍​​‌​‌​​​⁪ <kbd>Ctrl + S</kbd> ⁪⁪<description>
-				<p>⁪⁪⁪‌​‍‍‌​‍‍‌‌​​​‍‍‍​‌​​‍​​‍​‌‌‍​‍‍‍‍‍‌‌‍‌‍‌⁪Saves the changes made to the views.⁪⁪</p>
+		<interaction>⁪⁪⁪‌​‌​‌‌‌​‌‌​‌​​​​‌​‍‌​‍​‍‌‍‍‌​​‌‌​‌​‌​‌‍‌‍⁪ <kbd>Ctrl + S</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‍‍​‌‍​‍​​​​‌‍​‌‌​‌‌‌‌‌​‌‍​‍‌‍​‌‍‌‍‌‌​​‌‍⁪Saves the changes made to the views.⁪⁪</p>
 			</description>
 		</interaction>
 	</control-interactions>
 	<control-interactions>
 		<control name="sap.m.p13n.SelectionPanel"/>
-		<interaction>⁪⁪⁪‌‍‍​‍‍‌‍‍‌‍‍‌‍‌‍​‍‍‌​‌‌‍​‍‌‌​‌​​‌​​​‌‍​‍⁪ <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> <kbd>Home</kbd> <kbd>End</kbd> ⁪⁪<description>
-				<p>⁪⁪⁪‌​​‌‍‍​‍‍‍​​‍​‌​​‌‌‍‍​‌‌​​​‌‍​‍‌‍‌‍‍‌‍⁪<kbd>ArrowUp</kbd>⁪⁪</p>
-				<p>⁪⁪⁪‍‍‍​‌‍​​‌‍‍‍​​​‍‌​‌​‌‍​‌‌​‌‍‌​‍‌‍‌‍​​‍​‍⁪Moves the item one position up if available.⁪⁪</p>
-				<p>⁪⁪⁪‌​‌​‌‌‌​‌‌​‌​​​​‌​‍‌​‍​‍‌‍‍‌​​‌‌​‌​‌​‌‍‌‍⁪<kbd>ArrowDown</kbd>⁪⁪</p>
-				<p>⁪⁪⁪‍‍​‌‍​‍​​​​‌‍​‌‌​‌‌‌‌‌​‌‍​‍‌‍​‌‍‌‍‌‌​​‌‍⁪Moves the item one position down if available.⁪⁪</p>
-				<p>⁪⁪⁪‍​‍‌‍‌‌​‌‌‍​​‌​‍‍‌​‌‌​‌‌​‍‍​​‌‍‌​‌​‍​‌​⁪<kbd>Home</kbd>⁪⁪</p>
-				<p>⁪⁪⁪‌​‍​‌​​‌‍‌​‌‌​​​‌‍​‍‌‌‍‍‍‍‌‌‍​‌​‌‍​​‍‍‌‍‌⁪Moves the item to the top if available.⁪⁪</p>
-				<p>⁪⁪⁪‌​‍‍‌‌​‌‍‌‌‍‍​​‌​‍‍‌‍‍​‌‌​‌‍‌‍‌‌​​​‌‌‍​‍⁪<kbd>End</kbd>⁪⁪</p>
-				<p>⁪⁪⁪‌‌​​‌‌​‍​‍‍‌‍​‍‍​‍‍‍​‍‌‌‌‍‌​​​​​​‍‍‍​‌‌⁪Moves the item to the end if available.⁪⁪</p>
+		<interaction>⁪⁪⁪‍​‍‌‍‌‌​‌‌‍​​‌​‍‍‌​‌‌​‌‌​‍‍​​‌‍‌​‌​‍​‌​⁪ <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> <kbd>Home</kbd> <kbd>End</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‌​‍​‌​​‌‍‌​‌‌​​​‌‍​‍‌‌‍‍‍‍‌‌‍​‌​‌‍​​‍‍‌‍‌⁪<kbd>ArrowUp</kbd>⁪⁪</p>
+				<p>⁪⁪⁪‌​‍‍‌‌​‌‍‌‌‍‍​​‌​‍‍‌‍‍​‌‌​‌‍‌‍‌‌​​​‌‌‍​‍⁪Moves the item one position up if available.⁪⁪</p>
+				<p>⁪⁪⁪‌‌​​‌‌​‍​‍‍‌‍​‍‍​‍‍‍​‍‌‌‌‍‌​​​​​​‍‍‍​‌‌⁪<kbd>ArrowDown</kbd>⁪⁪</p>
+				<p>⁪⁪⁪‌‍‌‌‍‌‌‍‍‌‍‌​​‍​‌​​‍‌‌​‌​​​​​‍‌‌‌​​‍‍‍‍⁪Moves the item one position down, if available.⁪⁪</p>
+				<p>⁪⁪⁪‍‍‍‍​​‍​‌​‍‍‌‍‍‌‌‍‍​‍‌​​​​‍‍​‌​‌​‍​‌‌‌‌‌⁪<kbd>Home</kbd>⁪⁪</p>
+				<p>⁪⁪⁪‌​‍‌‌​​‌‌​​‌​‌‍​​‌‍‍​‌​‌‍​​‍‍‍​‍‌‍​‌​​​‌​⁪Moves the item to the top if available.⁪⁪</p>
+				<p>⁪⁪⁪‍‍‌‍‍​‍‌‍‌​​‌‌‍​‌‌‌‌‍‌​‌‌​‌‌​‍​​‌‌‍‌‌‌‍‌⁪<kbd>End</kbd>⁪⁪</p>
+				<p>⁪⁪⁪‌‌‌​‌‌​‌​​‌‌​‌‌‌​‍‍‍‍‍​‌‌‌‍​‍‍‌‍‍​‌‌‍‍​‌​⁪Moves the item to the end if available.⁪⁪</p>
 			</description>
 		</interaction>
 	</control-interactions>
 	<control-interactions>
 		<control name="sap.m.p13n.SortPanel"/>
-		<interaction>⁪⁪⁪‌‍‌‌‍‌‌‍‍‌‍‌​​‍​‌​​‍‌‌​‌​​​​​‍‌‌‌​​‍‍‍‍⁪ <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> ⁪⁪<description>
-				<p>⁪⁪⁪‍‍‍‍​​‍​‌​‍‍‌‍‍‌‌‍‍​‍‌​​​​‍‍​‌​‌​‍​‌‌‌‌‌⁪<kbd>ArrowUp</kbd>⁪⁪</p>
-				<p>⁪⁪⁪‌​‍‌‌​​‌‌​​‌​‌‍​​‌‍‍​‌​‌‍​​‍‍‍​‍‌‍​‌​​​‌​⁪Moves the item one position up if available.⁪⁪</p>
-				<p>⁪⁪⁪‍‍‌‍‍​‍‌‍‌​​‌‌‍​‌‌‌‌‍‌​‌‌​‌‌​‍​​‌‌‍‌‌‌‍‌⁪<kbd>ArrowDown</kbd>⁪⁪</p>
-				<p>⁪⁪⁪‌‌‌​‌‌​‌​​‌‌​‌‌‌​‍‍‍‍‍​‌‌‌‍​‍‍‌‍‍​‌‌‍‍​‌​⁪Moves the item one position down if available.⁪⁪</p>
-			</description>
-		</interaction>
-	</control-interactions>
-	<control-interactions>
-		<control name="sap.m.p13n.GroupPanel"/>
 		<interaction>⁪⁪⁪‌‌‌​​​‍‌‍‌‌​‍​​‍​‍‍‍‍‍​‌‌‌‍​‍​‍‌​‍‍​‌‍​​‍⁪ <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> ⁪⁪<description>
 				<p>⁪⁪⁪‌‍‌‌‍​‍​‍‍​‌‌‍‍​‍​‌‌​‍​‍​​‌​‍‍‌‍​‌‌‌‌‌​‌⁪<kbd>ArrowUp</kbd>⁪⁪</p>
 				<p>⁪⁪⁪‌‌​‍​‍‌​​‌‌‌​‍​‌​‌‍​‍‌​‌‌‌​​​‌‍‌‍‌‍‍‌​​‍‍⁪Moves the item one position up if available.⁪⁪</p>
 				<p>⁪⁪⁪‌​‌‍‍‍‍​‍‌‍‍‍​​‌​​‌‌‌‍‌‍‌‍‌‌​‍​​‌​‍‌‌‌​‍​⁪<kbd>ArrowDown</kbd>⁪⁪</p>
 				<p>⁪⁪⁪‍‍‌‌​​‌‍‌‌‍‍‍​‌‌‍​‍​‌​​​​‍‍‌‍‍‍‍​‌‌‌​​​‌⁪Moves the item one position down if available.⁪⁪</p>
+			</description>
+		</interaction>
+	</control-interactions>
+	<control-interactions>
+		<control name="sap.m.p13n.GroupPanel"/>
+		<interaction>⁪⁪⁪‌​‍‌‍​‌‍‍‌‍‌​‍​‌‌‍​​​​‌​‌​‌​‍​​‍​‌​‌‍‌‍​⁪ <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‌​​​‍​‍​‌‌‍‍‌‍‍‌‍‍​‍‍‌​‌‌​​‍‌‍‌‍​​‌‍​‍​⁪<kbd>ArrowUp</kbd>⁪⁪</p>
+				<p>⁪⁪⁪‌​​​​‍​​​‌‌‍‍‌‌​‍‍‌​‌​​‌​​​‌​​‌‍​‍​​‍‍‍‍‍⁪Moves the item one position up if available.⁪⁪</p>
+				<p>⁪⁪⁪‌‌‍‌‍‍‍‌​​‌‌‌‍‌​​‌‌‍‍‍‌‌‍‍‌‌‌‍‌​​​‍‍‌​​​⁪<kbd>ArrowDown</kbd>⁪⁪</p>
+				<p>⁪⁪⁪‍​‍‌‍‌​​‍​‍‍‍‍‌‌​​‌​‌‌‍‍‍‍​​‌‌​‌​‌​​​‌‌⁪Moves the item one position down if available.⁪⁪</p>
 			</description>
 		</interaction>
 	</control-interactions>
