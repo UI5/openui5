@@ -278,6 +278,17 @@ sap.ui.define([
 			);
 			delete window["sap-ui-debug"];
 		});
+
+		QUnit.test("when in debug mode and initializing the Message Broker throws an error", async function(assert) {
+			window["sap-ui-debug"] = true;
+			const oError = new Error("Message Broker error");
+			this.oInitMessageBrokerStub.rejects(oError);
+			const oWarningStub = sandbox.stub(Log, "warning");
+			await ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, { asyncHints: true, id: sReference });
+			assert.strictEqual(this.oInitMessageBrokerStub.callCount, 1, "initializeMessageBrokerForComponent was called once");
+			assert.ok(oWarningStub.calledWith("Message Broker could not be initialized", oError), "then a warning was logged");
+			delete window["sap-ui-debug"];
+		});
 	});
 
 	QUnit.module("instanceCreatedHook: RTA Restart", {
