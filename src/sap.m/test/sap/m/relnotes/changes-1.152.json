@@ -3,6 +3,11 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "71de538f38340ff2211e1752580528efcd450124",
+        "type": "FIX",
+        "text": " sap.m.DateTimePicker: Clocks visibility after toggleInputMode on phone"
+      },
+      {
         "id": "43729379b84f124eadf09d2982185e36e3460f3f",
         "type": "FEATURE",
         "text": " We now highlight the Download button as the primary action in the File Preview dialog"
