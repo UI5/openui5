@@ -371,5 +371,15 @@
         "text": " sap.uxap.BlockBase: Fix QUnit test timing out in Chrome 147"
       }
     ]
+  },
+  "1.71.81": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "2a91f4ad68de3a6a22bf28f9d9236e1f7bc9bfea",
+        "type": "FIX",
+        "text": " sap.uxap.AnchorBar: fix Firefox-flaky resize test"
+      }
+    ]
   }
 }
