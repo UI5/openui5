@@ -165,7 +165,11 @@ sap.ui.define([
 		// if it is activated only for some libraries
 		if (window["sap-ui-debug"]) {
 			const SupportAPI = await requireAsync("sap/ui/fl/support/api/SupportAPI");
-			SupportAPI.initializeMessageBrokerForComponent();
+			try {
+				await SupportAPI.initializeMessageBrokerForComponent();
+			} catch (oError) {
+				Log.warning("Message Broker could not be initialized", oError);
+			}
 		}
 	}
 
