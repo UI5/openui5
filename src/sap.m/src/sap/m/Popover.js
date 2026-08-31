@@ -2181,11 +2181,7 @@ sap.ui.define([
 				this._marginRight = 10;
 				this._marginBottom = 10;
 
-				if (this._bSizeCompact) {
-					this._arrowOffset = this._fArrowOffsetCompactParameter;
-				} else {
-					this._arrowOffset = this._fArrowOffsetParameter;
-				}
+				this._arrowOffset = this._fArrowOffsetParameter;
 			} else {
 				this._marginTop = 0;
 				this._marginLeft = 0;
@@ -2547,13 +2543,6 @@ sap.ui.define([
 				name: "_sap_m_Popover_ArrowOffset",
 				callback: (sValue) => {
 					this._fArrowOffsetParameter = Rem.toPx(sValue);
-				}
-			}) || "0.5rem");
-
-			this._fArrowOffsetCompactParameter = Rem.toPx(Parameters.get({
-				name: "_sap_m_Popover_CompactArrowOffset",
-				callback: (sValue) => {
-					this._fArrowOffsetCompactParameter = Rem.toPx(sValue);
 				}
 			}) || "0.5rem");
 
