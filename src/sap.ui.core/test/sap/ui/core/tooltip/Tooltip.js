@@ -12,12 +12,14 @@ sap.ui.require([
 	"sap/m/HBox",
 	"sap/ui/core/tooltip/Tooltip",
 	"sap/m/library",
+	"sap/ui/core/library",
 	"sap/ui/core/Core"
-], async function (FakeControls, Page, Panel, Text, Label, Button, Dialog, Popover, CheckBox, VBox, HBox, Tooltip, mLibrary, Core) {
+], async function (FakeControls, Page, Panel, Text, Label, Button, Dialog, Popover, CheckBox, VBox, HBox, Tooltip, mLibrary, coreLibrary, Core) {
 	"use strict";
 
 	const { FakeButton, FakeText, FakeLink, PlainButton } = FakeControls;
 	const PlacementType = mLibrary.PlacementType;
+	const PopoverPlacement = coreLibrary.popover.PopoverPlacement;
 	const LONG_TOOLTIP = "This is a noticeably longer tooltip text used to verify wrapping behavior.";
 	const VERY_LONG_TOOLTIP =
 		"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra hendrerit convallis. " +
@@ -77,7 +79,7 @@ sap.ui.require([
 	const oFirstButton = new FakeButton("defaultBtn", { text: "Default", tooltipText: "Default tooltip" });
 	const oDefaultPanel = panel("Text and default placement", [
 		row([
-			label("Default (VerticalPreferredTop):"),
+			label("Default (Top):"),
 			oFirstButton,
 			new FakeButton({ text: "Short text", tooltipText: "Short" }),
 			new FakeButton({ text: "Long text", tooltipText: LONG_TOOLTIP }),
@@ -85,25 +87,13 @@ sap.ui.require([
 		])
 	]);
 
-	// --- Placement (every PlacementType value) — via Tooltip directly ---
+	// --- Placement (every PopoverPlacement value) — via Tooltip directly ---
 	const oPlacementPanel = panel("Placement", [
 		row([
-			pair("Top:", withPlacement(new PlainButton({ text: "Top" }), { text: "Top", placement: PlacementType.Top })),
-			pair("Bottom:", withPlacement(new PlainButton({ text: "Bottom" }), { text: "Bottom", placement: PlacementType.Bottom })),
-			pair("Left:", withPlacement(new PlainButton("placeLeft", { text: "Left" }), { text: "Left", placement: PlacementType.Left })),
-			pair("Right:", withPlacement(new PlainButton("placeRight", { text: "Right" }), { text: "Right", placement: PlacementType.Right }))
-		]),
-		row([
-			pair("VerticalPreferredTop:", withPlacement(new PlainButton({ text: "VPreferredTop" }), { text: "VerticalPreferredTop", placement: PlacementType.VerticalPreferredTop })),
-			pair("VerticalPreferredBottom:", withPlacement(new PlainButton({ text: "VPreferredBottom" }), { text: "VerticalPreferredBottom", placement: PlacementType.VerticalPreferredBottom })),
-			pair("HorizontalPreferredLeft:", withPlacement(new PlainButton({ text: "HPreferredLeft" }), { text: "HorizontalPreferredLeft", placement: PlacementType.HorizontalPreferredLeft })),
-			pair("HorizontalPreferredRight:", withPlacement(new PlainButton({ text: "HPreferredRight" }), { text: "HorizontalPreferredRight", placement: PlacementType.HorizontalPreferredRight }))
-		]),
-		row([
-			pair("PreferredTopOrFlip:", withPlacement(new PlainButton({ text: "TopOrFlip" }), { text: "PreferredTopOrFlip", placement: PlacementType.PreferredTopOrFlip })),
-			pair("PreferredBottomOrFlip:", withPlacement(new PlainButton({ text: "BottomOrFlip" }), { text: "PreferredBottomOrFlip", placement: PlacementType.PreferredBottomOrFlip })),
-			pair("PreferredLeftOrFlip:", withPlacement(new PlainButton({ text: "LeftOrFlip" }), { text: "PreferredLeftOrFlip", placement: PlacementType.PreferredLeftOrFlip })),
-			pair("PreferredRightOrFlip:", withPlacement(new PlainButton({ text: "RightOrFlip" }), { text: "PreferredRightOrFlip", placement: PlacementType.PreferredRightOrFlip }))
+			pair("Top:", withPlacement(new PlainButton({ text: "Top" }), { text: "Top", placement: PopoverPlacement.Top })),
+			pair("Bottom:", withPlacement(new PlainButton({ text: "Bottom" }), { text: "Bottom", placement: PopoverPlacement.Bottom })),
+			pair("Begin:", withPlacement(new PlainButton("placeLeft", { text: "Begin" }), { text: "Begin", placement: PopoverPlacement.Begin })),
+			pair("End:", withPlacement(new PlainButton("placeRight", { text: "End" }), { text: "End", placement: PopoverPlacement.End }))
 		])
 	]);
 
@@ -131,7 +121,7 @@ sap.ui.require([
 	// One tooltip via openBy(anchor, 0) onto a centered anchor; stable IDs (vt*) let the uiveri5 spec target each state.
 	const SHORT_TOOLTIP = "Short tooltip";
 	const oVtAnchor = new PlainButton("vtAnchor", { text: "Anchor" });
-	const oVtTooltip = new Tooltip("vtTooltip", { text: SHORT_TOOLTIP, placement: PlacementType.Top });
+	const oVtTooltip = new Tooltip("vtTooltip", { text: SHORT_TOOLTIP, placement: PopoverPlacement.Top });
 
 	function vtButton(sId, sLabel, sText, sPlacement) {
 		return new Button(sId, {
@@ -151,15 +141,15 @@ sap.ui.require([
 			items: [oVtAnchor]
 		}).addStyleClass("sapUiMediumMarginTop sapUiMediumMarginBottom").setWidth("100%"),
 		row([
-			vtButton("vtTop", "Top", SHORT_TOOLTIP, PlacementType.Top),
-			vtButton("vtBottom", "Bottom", SHORT_TOOLTIP, PlacementType.Bottom),
-			vtButton("vtLeft", "Left", SHORT_TOOLTIP, PlacementType.Left),
-			vtButton("vtRight", "Right", SHORT_TOOLTIP, PlacementType.Right)
+			vtButton("vtTop", "Top", SHORT_TOOLTIP, PopoverPlacement.Top),
+			vtButton("vtBottom", "Bottom", SHORT_TOOLTIP, PopoverPlacement.Bottom),
+			vtButton("vtLeft", "Left", SHORT_TOOLTIP, PopoverPlacement.Begin),
+			vtButton("vtRight", "Right", SHORT_TOOLTIP, PopoverPlacement.End)
 		]),
 		row([
-			vtButton("vtShort", "Short text", SHORT_TOOLTIP, PlacementType.Bottom),
-			vtButton("vtLong", "Long text", LONG_TOOLTIP, PlacementType.Bottom),
-			vtButton("vtVeryLong", "Very long text", VERY_LONG_TOOLTIP, PlacementType.Bottom),
+			vtButton("vtShort", "Short text", SHORT_TOOLTIP, PopoverPlacement.Bottom),
+			vtButton("vtLong", "Long text", LONG_TOOLTIP, PopoverPlacement.Bottom),
+			vtButton("vtVeryLong", "Very long text", VERY_LONG_TOOLTIP, PopoverPlacement.Bottom),
 			new Button("vtClose", { text: "Close", press: () => oVtTooltip.close(0) }).addStyleClass("sapUiTinyMarginBottom")
 		])
 	]);
@@ -210,10 +200,10 @@ sap.ui.require([
 		new Text({ text: "Tick the checkbox to reveal the fixed-position anchors in the viewport edges, then use a flip button. Each button opens the tooltip immediately with a strict placement toward the nearby edge; with no room on that side, the tooltip flips to the opposite side instead of being clipped." }).addStyleClass("sapUiTinyMarginBottom"),
 		oFlipToggle,
 		row([
-			flipButton("vtFlipTop", "Top → flips down", oFlipTopAnchor, PlacementType.Top),
-			flipButton("vtFlipBottom", "Bottom → flips up", oFlipBottomAnchor, PlacementType.Bottom),
-			flipButton("vtFlipLeft", "Left → flips right", oFlipLeftAnchor, PlacementType.Left),
-			flipButton("vtFlipRight", "Right → flips left", oFlipRightAnchor, PlacementType.Right),
+			flipButton("vtFlipTop", "Top → flips down", oFlipTopAnchor, PopoverPlacement.Top),
+			flipButton("vtFlipBottom", "Bottom → flips up", oFlipBottomAnchor, PopoverPlacement.Bottom),
+			flipButton("vtFlipLeft", "Left → flips right", oFlipLeftAnchor, PopoverPlacement.Begin),
+			flipButton("vtFlipRight", "Right → flips left", oFlipRightAnchor, PopoverPlacement.End),
 			new Button("vtFlipClose", { text: "Close", press: () => oFlipTooltip.close(0) }).addStyleClass("sapUiTinyMarginBottom")
 		]),
 		oFlipContainer
@@ -222,7 +212,7 @@ sap.ui.require([
 	// --- Tooltip above a modal Dialog (deterministic, for visual testing) ---
 	// Opens a modal Dialog, then a tooltip on an anchor inside it; the tooltip's Popover must layer ABOVE the dialog's block layer.
 	let oVtDialog;
-	const oDialogTooltip = new Tooltip("vtDialogTooltip", { text: SHORT_TOOLTIP, placement: PlacementType.Bottom });
+	const oDialogTooltip = new Tooltip("vtDialogTooltip", { text: SHORT_TOOLTIP, placement: PopoverPlacement.Bottom });
 	const oVtDialogAnchor = new PlainButton("vtDialogAnchor", { text: "Anchor in dialog" });
 	const oVtDialogShowBtn = new Button("vtDialogShow", {
 		text: "Show tooltip",
@@ -307,7 +297,7 @@ sap.ui.require([
 	let oNestedPopover;
 
 	// A tooltip opened on an anchor inside a Popover / nested Popover, to verify it layers ABOVE the container.
-	const oContainerTooltip = new Tooltip("ctTooltip", { text: SHORT_TOOLTIP, placement: PlacementType.Bottom });
+	const oContainerTooltip = new Tooltip("ctTooltip", { text: SHORT_TOOLTIP, placement: PopoverPlacement.Bottom });
 
 	const oOpenDialogBtn = new Button("ctOpenDialog", {
 		text: "Open Dialog",
@@ -391,10 +381,10 @@ sap.ui.require([
 	]);
 
 	// --- Viewport corners (auto-flip placement) ---
-	const oCornerTL = withPlacement(new PlainButton("cornerTL", { text: "Top-Left (Top)" }), { text: "Tooltip flips to bottom because there is no space above", placement: PlacementType.Top });
-	const oCornerTR = withPlacement(new PlainButton("cornerTR", { text: "Top-Right (Right)" }), { text: "Tooltip flips to left because there is no space on the right", placement: PlacementType.Right });
-	const oCornerBL = withPlacement(new PlainButton("cornerBL", { text: "Bottom-Left (Left)" }), { text: "Tooltip flips to right because there is no space on the left", placement: PlacementType.Left });
-	const oCornerBR = withPlacement(new PlainButton("cornerBR", { text: "Bottom-Right (Bottom)" }), { text: "Tooltip flips to top because there is no space below", placement: PlacementType.Bottom });
+	const oCornerTL = withPlacement(new PlainButton("cornerTL", { text: "Top-Left (Top)" }), { text: "Tooltip flips to bottom because there is no space above", placement: PopoverPlacement.Top });
+	const oCornerTR = withPlacement(new PlainButton("cornerTR", { text: "Top-Right (End)" }), { text: "Tooltip flips to begin because there is no space on the end", placement: PopoverPlacement.End });
+	const oCornerBL = withPlacement(new PlainButton("cornerBL", { text: "Bottom-Left (Begin)" }), { text: "Tooltip flips to end because there is no space on the begin", placement: PopoverPlacement.Begin });
+	const oCornerBR = withPlacement(new PlainButton("cornerBR", { text: "Bottom-Right (Bottom)" }), { text: "Tooltip flips to top because there is no space below", placement: PopoverPlacement.Bottom });
 
 	function placeCorner(oControl, sPos) {
 		oControl.addEventDelegate({
