@@ -3,6 +3,31 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "95b098f0fe0761358032d43a1b2952ec101b77c9",
+        "type": "FEATURE",
+        "text": " sap.m.Title: Enhanced Tooltip and Extended Keyboard Navigation enablement"
+      },
+      {
+        "id": "43581df2a7cf88908aedc96d2bc54dab33994bc1",
+        "type": "FIX",
+        "text": " sap.m.Table: Align ClearAll icon with the checkboxes"
+      },
+      {
+        "id": "1aaca0e66e595ed82e175d7be8d932a22d0cc96a",
+        "type": "FEATURE",
+        "text": " sap.m.Select: support grouped items via SeparatorItem"
+      },
+      {
+        "id": "48ae53d19d8931adbab9db93b041dab01fe2ef84",
+        "type": "FIX",
+        "text": " sap.m.DateTimePicker: Clocks visibility after toggleInputMode on phone"
+      },
+      {
+        "id": "d040850ffcdf84ffecf9d165e239b65f152ff77b",
+        "type": "FIX",
+        "text": " We've now fixed the accessibility and the re-rendering issues in the ImageContent control"
+      },
+      {
         "id": "334ea727130ef70d2402fd9c2930bf9e1f8cf20f",
         "type": "FIX",
         "text": " Table: Selection Limit Popover heading level should be H1"

@@ -3,6 +3,21 @@
     "date": "August 2026",
     "notes": [
       {
+        "id": "95b098f0fe0761358032d43a1b2952ec101b77c9",
+        "type": "FEATURE",
+        "text": " sap.m.Title: Enhanced Tooltip and Extended Keyboard Navigation enablement"
+      },
+      {
+        "id": "2647844276ec0fb1440f7b80f256a14d89196ad3",
+        "type": "FIX",
+        "text": " sap.m.Switch: label is aligned correctly"
+      },
+      {
+        "id": "08bf496f471f8c31ad93cfc3070bf1d4bc4be3a6",
+        "type": "FIX",
+        "text": " sap.ui.unified.ColorPicker: percent symbol is aligned correctly"
+      },
+      {
         "id": "5ba3c4344fd28223b577385338f8f3664811e19d",
         "type": "FIX",
         "text": " sap.m.Link: fixed outlines of focused Link border in HC themes"

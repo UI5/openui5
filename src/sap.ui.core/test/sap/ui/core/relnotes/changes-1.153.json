@@ -1,0 +1,12 @@
+{
+  "1.153.0": {
+    "date": "August 2026",
+    "notes": [
+      {
+        "id": "95b098f0fe0761358032d43a1b2952ec101b77c9",
+        "type": "FEATURE",
+        "text": " sap.m.Title: Enhanced Tooltip and Extended Keyboard Navigation enablement"
+      }
+    ]
+  }
+}

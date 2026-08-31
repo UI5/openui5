@@ -6,11 +6,6 @@
         "id": "5a3974d8e51c34cbbf208db8f213371397c84490",
         "type": "FIX",
         "text": " sap.f.DynamicPage, sap.uxap.ObjectPageLayout: RTA overlays overlap title"
-      },
-      {
-        "id": "1be8fa243b17f1aa4592f4ce63fe7749d4994c1f",
-        "type": "FIX",
-        "text": " sap.f: Search - use correct background-color parameter on hover"
       }
     ]
   }
