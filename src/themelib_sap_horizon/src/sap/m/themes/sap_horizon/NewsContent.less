@@ -1,13 +1,10 @@
 /* ================================== */
 /* CSS for control sap.m/NewsContent  */
-/* Horizon theme                      */
+/* Morning Horizon theme              */
 /* ================================== */
 
-@_sap_m_NewsContent_HeaderTextColor: contrast(@sapTile_Background,@sapContent_LabelColor,@sapContent_ContrastTextColor, @sapContent_ContrastTextThreshold);
-@_sap_m_NewsContent_SubHeaderTextColor: contrast(@sapTile_Background,@sapContent_LabelColor,@sapContent_ContrastTextColor, @sapContent_ContrastTextThreshold);
-
 .sapMNwC {
-	background-color: fade(@sapUiTileBackground, 60);
+	background-color: ~'hsl(from var(--sapTile_Background) h s l / .6)';
 	height: 3.625rem;
 }
 
@@ -31,22 +28,22 @@
 	}
 }
 
-.Stretch{
+.Stretch {
 
 	.sapMTileCnt.News .sapMNwC {
 
 		.sapMNwCCTxt .sapMText {
 			font-size: var(--sapFontLargeSize);
-			color: @sapUiText;
+			color: var(--sapTextColor);
 		}
 
 		.sapMNwCCTxt .sapMFT {
 			font-size: 0.938rem;
-			color: @sapUiText;
+			color: var(--sapTextColor);
 		}
 
 		.sapMNwCSbh {
-			color: @sapUiText;
+			color: var(--sapTextColor);
 		}
 	}
 }
