@@ -140,7 +140,8 @@ sap.ui.define([
 		if (!this._oOverflowIcon) {
 			this._oOverflowIcon = new Icon({
 				src: IconPool.getIconURI("overflow"),
-				decorative: false
+				decorative: false,
+				tooltip: TableUtils.getResourceText("TBL_ROW_ACTION_MORE")
 			}).addStyleClass("sapUiTableActionIcon");
 
 			this._oOverflowIcon.addDelegate({

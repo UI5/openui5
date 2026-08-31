@@ -4494,8 +4494,11 @@ sap.ui.define([
 			assert.ok(oInvisibleText.getText().endsWith(ONE_ACTION_AVAILABLE), "One action available");
 
 			const $Overflow = this.oItem1.$("overflow");
+			const sTooltipText = oRB.getText("LIST_ITEM_ACTION_MORE");
 			assert.ok($Overflow[0], "Overflow button is rendered");
 			assert.equal($Overflow[0].getAttribute("aria-haspopup"), "menu", "Overflow button has correct aria-haspopup attribute");
+			assert.equal($Overflow[0].getAttribute("aria-label"), sTooltipText, "Overflow button has correct aria-label");
+			assert.equal($Overflow[0].getAttribute("title"), sTooltipText, "Overflow button has correct tooltip");
 			assert.notOk($Overflow[0].nextSibling || $Overflow[0].previousSibling, "Overflow button is the only rendered action");
 			$Overflow.trigger("tap");
 			await nextUIUpdate();
