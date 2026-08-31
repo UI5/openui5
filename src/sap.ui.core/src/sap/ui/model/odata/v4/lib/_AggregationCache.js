@@ -1910,7 +1910,9 @@ sap.ui.define([
 				}
 				if (oParent && oParent["@$ui5.node.isExpanded"] === undefined) {
 					// not a leaf anymore
-					oParent["@$ui5.node.isExpanded"] = this.oTreeState.isExpanded(sParentPredicate);
+					oParent["@$ui5.node.isExpanded"] = this.oTreeState.isExpanded(sParentPredicate)
+						// *inside* top pyramid (not at edge)?
+						?? oParent["@$ui5.node.level"] < this.oAggregation.expandTo;
 				}
 				if (oParent?.["@$ui5.node.isExpanded"] === false) { // parent is collapsed
 					return; // do not insert
