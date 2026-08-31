@@ -1267,6 +1267,7 @@ sap.ui.define([
 
 		// Cleanup
 		oInput.destroy();
+		oNextInput.destroy();
 	});
 
 	QUnit.test("Check _DEFAULTRESULT_TABULAR function.", function(assert) {
@@ -4762,6 +4763,42 @@ sap.ui.define([
 		assert.equal(oInputWithDes.getDomRef('descr').id, oInputWithDes.$('inner').attr('aria-describedby'), "Inner input aria-describedby attribute is correct");
 
 		oInputWithDes.destroy();
+	});
+
+	QUnit.test("descriptionAlign adds the proper CSS class", async function(assert) {
+		var oInput = new Input({
+			value: "220",
+			description: "EUR"
+		});
+		oInput.placeAt("content");
+		await nextUIUpdate();
+
+		var fnGetWrapper = function() {
+			return oInput.$().find(".sapMInputDescriptionWrapper");
+		};
+
+		// Assert - default value is "Start"
+		assert.strictEqual(oInput.getDescriptionAlign(), "Start", "Default descriptionAlign is 'Start'");
+		assert.ok(fnGetWrapper().hasClass("sapMInputDescriptionAlignStart"), "Description wrapper has class 'sapMInputDescriptionAlignStart' by default");
+		assert.notOk(fnGetWrapper().hasClass("sapMInputDescriptionAlignEnd"), "Description wrapper does not have class 'sapMInputDescriptionAlignEnd' by default");
+
+		// Act - set descriptionAlign to "End"
+		oInput.setDescriptionAlign("End");
+		await nextUIUpdate();
+
+		// Assert
+		assert.ok(fnGetWrapper().hasClass("sapMInputDescriptionAlignEnd"), "Description wrapper has class 'sapMInputDescriptionAlignEnd' when descriptionAlign is 'End'");
+		assert.notOk(fnGetWrapper().hasClass("sapMInputDescriptionAlignStart"), "Description wrapper does not have class 'sapMInputDescriptionAlignStart' when descriptionAlign is 'End'");
+
+		// Act - set descriptionAlign back to "Start"
+		oInput.setDescriptionAlign("Start");
+		await nextUIUpdate();
+
+		// Assert
+		assert.ok(fnGetWrapper().hasClass("sapMInputDescriptionAlignStart"), "Description wrapper has class 'sapMInputDescriptionAlignStart' when descriptionAlign is 'Start'");
+		assert.notOk(fnGetWrapper().hasClass("sapMInputDescriptionAlignEnd"), "Description wrapper does not have class 'sapMInputDescriptionAlignEnd' when descriptionAlign is 'Start'");
+
+		oInput.destroy();
 	});
 
 	QUnit.module("Accessibility", {
