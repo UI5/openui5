@@ -79,7 +79,7 @@ sap.ui.define(['sap/ui/Device', "sap/ui/core/Lib"],
 			oRm.attr("data-sap-ui-region", "main-colors-palette");
 			oRm.accessibilityState(oColorPalette, {
 				"role": "region",
-				"label": oLibraryResourceBundle.getText("COLOR_PALETTE_SWATCH_CONTAINER_TITLE")
+				"label": oLibraryResourceBundle.getText("COLOR_PALETTE_SWATCH_CONTAINER_TITLE", [sColors.length])
 			});
 			oRm.openEnd();
 
@@ -165,7 +165,7 @@ sap.ui.define(['sap/ui/Device', "sap/ui/core/Lib"],
 			var sColor,
 				aRecentColors = oColorPalette._getRecentColors(),
 				iCountOfBoxes = 5,
-				sContainer = oLibraryResourceBundle.getText("COLOR_PALETTE_SWATCH_RECENT_COLOR_CONTAINER_TITLE"),
+				sContainer = oLibraryResourceBundle.getText("COLOR_PALETTE_SWATCH_RECENT_COLOR_CONTAINER_TITLE", [aRecentColors.length]),
 				bInRecentColorsRegion = oColorPalette._isSelectedInRecentColors(),
 				sSelectedColor = oColorPalette.getSelectedColor(),
 				bIsSelected;
