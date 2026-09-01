@@ -2,6 +2,7 @@
 
 sap.ui.define([
 	"qunit/RtaQunitUtils",
+	"sap/base/Log",
 	"sap/base/util/isEmptyObject",
 	"sap/m/Button",
 	"sap/m/MessageBox",
@@ -39,6 +40,7 @@ sap.ui.define([
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	RtaQunitUtils,
+	Log,
 	isEmptyObject,
 	Button,
 	MessageBox,
@@ -441,6 +443,44 @@ sap.ui.define([
 			assert.strictEqual(oButtonBlockedStub.lastCall.args[0], false, "and set to false");
 			assert.strictEqual(oRootControlBlockedStub.callCount, 3, "setBlocked is called");
 			assert.strictEqual(oRootControlBlockedStub.lastCall.args[0], false, "and set to false");
+		});
+
+		QUnit.test("when waitForCommandExecutionResult is called after a command executed successfully", async function(assert) {
+			sandbox.stub(this.oRta.getCommandStack(), "pushAndExecute").resolves();
+			this.oRta.getPluginManager().getDefaultPlugins().rename.fireElementModified({
+				command: new BaseCommand()
+			});
+			await this.oRta.waitForCommandExecutionResult();
+			assert.ok(true, "then the returned promise resolves");
+		});
+
+		QUnit.test("when waitForCommandExecutionResult is called after a command failed", async function(assert) {
+			const oError = new Error("the change handler blew up");
+			sandbox.stub(this.oRta.getCommandStack(), "pushAndExecute").rejects(oError);
+			// the internal error handler logs the failure; stub it so the test output stays clean
+			sandbox.stub(Log, "error");
+			this.oRta.getPluginManager().getDefaultPlugins().rename.fireElementModified({
+				command: new BaseCommand()
+			});
+			try {
+				await this.oRta.waitForCommandExecutionResult();
+				assert.ok(false, "this must never be reached");
+			} catch (oCaughtError) {
+				assert.strictEqual(oCaughtError, oError, "then the returned promise rejects with the underlying error");
+			}
+		});
+
+		QUnit.test("when a command fails, the internal element-modified chain still swallows the error", async function(assert) {
+			const oError = new Error("the change handler blew up");
+			sandbox.stub(this.oRta.getCommandStack(), "pushAndExecute").rejects(oError);
+			const oLogErrorStub = sandbox.stub(Log, "error");
+			this.oRta.getPluginManager().getDefaultPlugins().rename.fireElementModified({
+				command: new BaseCommand()
+			});
+			// waitForPendingActions follows the internal (swallowing) chain and must not reject
+			await this.oRta.waitForPendingActions();
+			assert.ok(true, "then waitForPendingActions resolves despite the failure");
+			assert.ok(oLogErrorStub.called, "and the failure was logged as before");
 		});
 	});
 
