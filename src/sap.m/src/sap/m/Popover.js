@@ -545,12 +545,10 @@ sap.ui.define([
 					}
 				}
 
-				var oRect = jQuery(oPosition.of).rect();
-				var $popoverWithinArea = jQuery(that.getWithinAreaDomRef());
 				// if openBy Dom element is complete out of viewport after resize event, close the popover. But close it only if virtualkeyboard is not opened.
 				if (bFromResize
-					&& $popoverWithinArea.height() == that._initialWindowDimensions.height
-					&& (oRect.top + oRect.height <= 0 || oRect.top >= $popoverWithinArea.height() || oRect.left + oRect.width <= 0 || oRect.left >= $popoverWithinArea.width())) {
+					&& jQuery(window).height() == that._initialWindowDimensions.height
+					&& that._isOpenerCompletelyOutsideViewport(oPosition.of)) {
 					that.close();
 					that._restoreDocumentElementScrolling();
 					return;
@@ -638,7 +636,7 @@ sap.ui.define([
 		 * @private
 		 */
 		Popover.prototype.onBeforeRendering = function () {
-			var oNavContent, oPageContent, $popoverWithinArea,
+			var oNavContent, oPageContent,
 				bHorScrolling = this.getHorizontalScrolling(),
 				bVerScrolling = this.getVerticalScrolling(),
 				bHorScrollingNotApplied = !bHorScrolling || this.isPropertyInitial("horizontalScrolling"),
@@ -649,11 +647,9 @@ sap.ui.define([
 				Log.warning("Usage of CSS class 'sapUiPopupWithPadding' is deprecated. Use 'sapUiContentPadding' instead", null, "sap.m.Popover");
 			}
 
-			if (!this._initialWindowDimensions.width || !this._initialWindowDimensions.height) {
-				$popoverWithinArea = jQuery(this.getWithinAreaDomRef());
+			if (!this._initialWindowDimensions.height) {
 				this._initialWindowDimensions = {
-					width: $popoverWithinArea.width(),
-					height: $popoverWithinArea.height()
+					height: jQuery(window).height()
 				};
 			}
 
@@ -1084,6 +1080,23 @@ sap.ui.define([
 				left: "",
 				top: ""
 			});
+		};
+
+		/**
+		 * Checks whether the opener DOM element is completely outside the visual viewport,
+		 * i.e. it has no overlap with the window on any edge.
+		 *
+		 * @param {Element} oOpenerDomRef The DOM element the Popover is opened by
+		 * @returns {boolean} <code>true</code> if the opener is fully outside the viewport
+		 * @private
+		 */
+		Popover.prototype._isOpenerCompletelyOutsideViewport = function (oOpenerDomRef) {
+			const oRect = oOpenerDomRef.getBoundingClientRect();
+
+			return oRect.bottom <= 0
+				|| oRect.top >= window.innerHeight
+				|| oRect.right <= 0
+				|| oRect.left >= window.innerWidth;
 		};
 
 		Popover.prototype._onOrientationChange = function () {
@@ -2134,11 +2147,7 @@ sap.ui.define([
 				this._marginRight = 10;
 				this._marginBottom = 10;
 
-				if (this._bSizeCompact) {
-					this._arrowOffset = this._fArrowOffsetCompactParameter;
-				} else {
-					this._arrowOffset = this._fArrowOffsetParameter;
-				}
+				this._arrowOffset = this._fArrowOffsetParameter;
 			} else {
 				this._marginTop = 0;
 				this._marginLeft = 0;
@@ -2500,13 +2509,6 @@ sap.ui.define([
 				name: "_sap_m_Popover_ArrowOffset",
 				callback: (sValue) => {
 					this._fArrowOffsetParameter = Rem.toPx(sValue);
-				}
-			}) || "0.5rem");
-
-			this._fArrowOffsetCompactParameter = Rem.toPx(Parameters.get({
-				name: "_sap_m_Popover_CompactArrowOffset",
-				callback: (sValue) => {
-					this._fArrowOffsetCompactParameter = Rem.toPx(sValue);
 				}
 			}) || "0.5rem");
 

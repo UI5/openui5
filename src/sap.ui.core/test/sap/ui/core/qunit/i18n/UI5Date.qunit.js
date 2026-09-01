@@ -1090,7 +1090,7 @@ sap.ui.define([
 	"+002023-03-05T13:48:08.123+0100", "+002023-03-05T13:48:08.123-02:00",
 	"Fri, 20 Jan 2023 09:44:22 GMT", "Fri, 20 Jan 2023 09:44:22 GMT+01:00"
 ].forEach(function (sLocalTimestamp) {
-	QUnit.test("UI5Date: timestamp string is interpreted as a UTC timestamp", function (assert) {
+	QUnit.test("UI5Date: timestamp string is interpreted as a UTC timestamp", function () {
 		var aArguments = [sLocalTimestamp],
 			oJSDate = new Date(), // no need to use UI5Date.getInstance
 			oJSDateMock = this.mock(oJSDate);
@@ -1114,7 +1114,7 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("UI5Date: 1 numeric argument", function (assert) {
+	QUnit.test("UI5Date: 1 numeric argument", function () {
 		var aArguments = [2023], // interpreted as timestamp
 			oJSDate = new Date(), // no need to use UI5Date.getInstance
 			oJSDateMock = this.mock(oJSDate);

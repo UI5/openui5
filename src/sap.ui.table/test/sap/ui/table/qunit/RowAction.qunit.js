@@ -276,6 +276,7 @@ sap.ui.define([
 
 		const oRowAction = oTable.getRows()[0].getRowAction();
 		const aChildren = oRowAction.getDomRef().children;
+		const sOverflowButtonLabel = TableUtils.getResourceText("TBL_ROW_ACTION_MORE");
 
 		assert.equal(aChildren.length, 3, "Number of icons is correct");
 		assert.ok(aChildren[0].classList.contains("sapUiTableActionIcon"), "Icon is rendered");
@@ -289,8 +290,8 @@ sap.ui.define([
 		assert.equal(Element.closestTo(aChildren[1]).getSrc(), "sap-icon://delete", "Icon is correct");
 
 		assert.ok(aChildren[2].classList.contains("sapUiTableActionIcon"), "Icon is rendered");
-		assert.equal(aChildren[2].getAttribute("aria-label"), "More", "Aria-label is correct");
-		assert.equal(aChildren[2].querySelector(".sapUiIconTitle").getAttribute("title"), "More", "Tooltip is correct");
+		assert.equal(aChildren[2].getAttribute("aria-label"), sOverflowButtonLabel, "Aria-label is correct");
+		assert.equal(aChildren[2].querySelector(".sapUiIconTitle").getAttribute("title"), sOverflowButtonLabel, "Tooltip is correct");
 		assert.equal(Element.closestTo(aChildren[2]).getSrc(), "sap-icon://overflow", "Icon is correct");
 		assert.equal(aChildren[2].getAttribute("aria-haspopup"), "Menu", "aria-haspopup on overflow icon");
 		assert.equal(oTable._oRowActionOverflowMenu, undefined, "Menu not initialized");
@@ -317,8 +318,8 @@ sap.ui.define([
 		assert.equal(Element.closestTo(aChildren[0]).getSrc(), "sap-icon://search", "Icon is correct");
 
 		assert.ok(aChildren[1].classList.contains("sapUiTableActionIcon"), "Icon is rendered");
-		assert.equal(aChildren[1].getAttribute("aria-label"), "More", "Aria-label is correct");
-		assert.equal(aChildren[1].querySelector(".sapUiIconTitle").getAttribute("title"), "More", "Tooltip is correct");
+		assert.equal(aChildren[1].getAttribute("aria-label"), sOverflowButtonLabel, "Aria-label is correct");
+		assert.equal(aChildren[1].querySelector(".sapUiIconTitle").getAttribute("title"), sOverflowButtonLabel, "Tooltip is correct");
 		assert.equal(Element.closestTo(aChildren[1]).getSrc(), "sap-icon://overflow", "Icon is correct");
 		assert.equal(aChildren[1].getAttribute("aria-haspopup"), "Menu", "aria-haspopup on overflow icon");
 
