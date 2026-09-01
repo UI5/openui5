@@ -99,7 +99,7 @@ sap.ui.define([
 				openerRef: makeOpener(0, 0, 10, 10),
 				popoverRef: makePopover(5000, 5000), // absurdly large — would never "fit"
 				withinAreaRef: makeWithinArea(100, 100),
-				margins: NO_MARGINS,
+				margin: NO_MARGINS,
 				arrowSize: 0
 			});
 			assert.strictEqual(sResult, sSide, "vertical strict side is never flipped");
@@ -115,7 +115,7 @@ sap.ui.define([
 			openerRef: makeOpener(0, 200, 10, 10), // room on the left
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(400, 400),
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		}), "Left", "left fits → Left");
 	});
@@ -126,7 +126,7 @@ sap.ui.define([
 			openerRef: makeOpener(0, 0, 10, 10), // pinned to the left edge
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(400, 400),
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		}), "Left", "no left room → still Left (Popup 'fit' handles overflow, no flip)");
 	});
@@ -137,7 +137,7 @@ sap.ui.define([
 			openerRef: makeOpener(0, 390, 10, 10), // pinned to the right edge (within 400)
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(400, 400),
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		}), "Right", "no right room → still Right (Popup 'fit' handles overflow, no flip)");
 	});
@@ -148,7 +148,7 @@ sap.ui.define([
 			openerRef: makeOpener(0, 0, 10, 10),
 			popoverRef: makePopover(5000, 50), // wider than either side
 			withinAreaRef: makeWithinArea(400, 400),
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		}), "Left", "neither fits → keep requested side");
 	});
@@ -164,7 +164,7 @@ sap.ui.define([
 			openerRef: makeOpener(50, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: oWithin,
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		}), "Bottom", "opener high on screen → Bottom");
 
@@ -174,7 +174,7 @@ sap.ui.define([
 			openerRef: makeOpener(450, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: oWithin,
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		}), "Top", "opener low on screen → Top");
 	});
@@ -186,7 +186,7 @@ sap.ui.define([
 			openerRef: makeOpener(400, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(500, 500),
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		}), "Top", "prefers Top when it fits");
 	});
@@ -198,7 +198,7 @@ sap.ui.define([
 			openerRef: makeOpener(40, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(500, 500),
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		}), "Bottom", "insufficient top space → Bottom");
 	});
@@ -209,7 +209,7 @@ sap.ui.define([
 			openerRef: makeOpener(40, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(500, 500),
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		}), "Bottom", "flips to Bottom");
 
@@ -218,7 +218,7 @@ sap.ui.define([
 			openerRef: makeOpener(150, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(500, 500),
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		}), "Top", "stays Top when it fits");
 	});
@@ -252,7 +252,7 @@ sap.ui.define([
 			openerRef: makeOpener(40, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: window,
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		}), "Bottom", "no visible space above → Bottom, not Top-over-opener");
 	});
@@ -263,7 +263,7 @@ sap.ui.define([
 			openerRef: makeOpener(40, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: window,
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		}), "Bottom", "more visible space below → Bottom");
 	});
@@ -278,7 +278,7 @@ sap.ui.define([
 			openerRef: makeOpener(0, 50, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(500, 500),
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		}), "Right", "opener on left → Right");
 
@@ -288,7 +288,7 @@ sap.ui.define([
 			openerRef: makeOpener(0, 450, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(500, 500),
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		}), "Left", "opener on right → Left");
 	});
@@ -301,7 +301,7 @@ sap.ui.define([
 			openerRef: makeOpener(0, 50, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(500, 500),
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		}), "Left", "RTL mirrors the horizontal decision");
 		oStub.restore();
@@ -313,7 +313,7 @@ sap.ui.define([
 			openerRef: makeOpener(0, 40, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(500, 500),
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		}), "Right", "flips to Right");
 
@@ -322,7 +322,7 @@ sap.ui.define([
 			openerRef: makeOpener(0, 400, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(500, 500),
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		}), "Left", "stays Left when it fits");
 	});
@@ -337,7 +337,7 @@ sap.ui.define([
 			openerRef: makeOpener(200, 20, 20, 20),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(800, 400),
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		});
 		assert.strictEqual(s, "Right", "landscape → horizontal → Right");
@@ -349,7 +349,7 @@ sap.ui.define([
 			openerRef: makeOpener(20, 200, 20, 20),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(400, 800),
-			margins: NO_MARGINS,
+			margin: NO_MARGINS,
 			arrowSize: 0
 		});
 		assert.strictEqual(s, "Bottom", "portrait → vertical → Bottom");

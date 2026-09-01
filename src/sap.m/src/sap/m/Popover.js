@@ -1773,7 +1773,7 @@ sap.ui.define([
 				openerRef: this._getOpenByDomRef(),
 				popoverRef: this.getDomRef(),
 				withinAreaRef: this.getWithinAreaDomRef(),
-				margins: {
+				margin: {
 					top:    this._marginTop,
 					right:  this._marginRight,
 					bottom: this._marginBottom,
