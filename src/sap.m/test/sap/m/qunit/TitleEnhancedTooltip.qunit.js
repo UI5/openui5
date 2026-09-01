@@ -3,159 +3,134 @@ sap.ui.define([
 	"sap/m/Title",
 	"sap/m/Link",
 	"sap/ui/core/Title",
-	"sap/ui/core/Core",
 	"sap/ui/core/ControlBehavior",
-	"sap/ui/core/tooltip/TooltipEnablement"
-], function(Title, Link, CoreTitle, Core, ControlBehavior, TooltipEnablement) {
+	"sap/ui/core/tooltip/TooltipEnablement",
+	"sap/ui/core/tooltip/Tooltip",
+	"sap/ui/qunit/utils/nextUIUpdate"
+], function(Title, Link, CoreTitle, ControlBehavior, TooltipEnablement, Tooltip, nextUIUpdate) {
 	"use strict";
 
-	QUnit.module("Enhanced Tooltip Performance", {
+	function hoverAndGetTooltipText(oTitle) {
+		return getTooltipTextForInteraction(oTitle, function() {
+			oTitle.getDomRef().dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+		});
+	}
+
+	function focusAndGetTooltipText(oTitle) {
+		const oDomRef = oTitle.getDomRef();
+		const fnOrigMatches = oDomRef.matches;
+		oDomRef.matches = function(sSelector) {
+			return sSelector === ":focus-visible" || fnOrigMatches.call(this, sSelector);
+		};
+
+		try {
+			return getTooltipTextForInteraction(oTitle, function() {
+				document.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+				oDomRef.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+			});
+		} finally {
+			oDomRef.matches = fnOrigMatches;
+		}
+	}
+
+	function getTooltipTextForInteraction(oTitle, fnInteract) {
+		const oOpenByStub = sinon.stub(Tooltip.prototype, "openBy");
+		try {
+			fnInteract();
+			return oOpenByStub.called ? oOpenByStub.thisValues[0].getText() : "";
+		} finally {
+			oOpenByStub.restore();
+		}
+	}
+
+	async function whenTabIndexSettled(oClock, oTitle) {
+		oTitle.placeAt("qunit-fixture");
+		await nextUIUpdate(oClock);
+		await oClock.tickAsync(1);
+		const oDomRef = oTitle.getDomRef();
+		return oDomRef ? oDomRef.getAttribute("tabindex") : null;
+	}
+
+	async function destroyAndDrain(oClock, oTitle) {
+		if (oTitle) {
+			oTitle.destroy();
+		}
+		await oClock.tickAsync(2000);
+	}
+
+	QUnit.module("Enhanced Tooltip - Rendering and Interaction", {
 		beforeEach: function() {
 			this.oTitle = new Title({
 				text: "This is a very long title that will definitely be truncated when the width is constrained",
 				width: "200px"
 			});
 		},
-		afterEach: function() {
-			if (this.oTitle) {
-				this.oTitle.destroy();
-				this.oTitle = null;
-			}
+		afterEach: async function() {
+			await destroyAndDrain(this.clock, this.oTitle);
+			this.oTitle = null;
 		}
 	});
 
-	QUnit.test("_isTextTruncated is NOT called during rendering (lazy evaluation)", function(assert) {
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
-		const oSpy = sinon.spy(this.oTitle, "_isTextTruncated");
-
+	QUnit.test("Tooltip is not shown on render, only on interaction (lazy evaluation)", async function(assert) {
+		const oOpenByStub = sinon.stub(Tooltip.prototype, "openBy");
 		this.oTitle.placeAt("qunit-fixture");
-		Core.applyChanges();
+		await nextUIUpdate(this.clock);
 
-		assert.strictEqual(oSpy.callCount, 0,
-			"_isTextTruncated was not called synchronously during rendering - lazy evaluation works correctly");
+		assert.notOk(oOpenByStub.called,
+			"no tooltip open is triggered from rendering alone - it is only resolved on user interaction");
+		oOpenByStub.restore();
 	});
 
-	QUnit.test("_isTextTruncated IS called on mouseover interaction", function(assert) {
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
+	QUnit.test("Hovering a truncated title shows its text as a tooltip", async function(assert) {
 		this.oTitle.placeAt("qunit-fixture");
-		Core.applyChanges();
+		await nextUIUpdate(this.clock);
 
-		const oSpy = sinon.spy(this.oTitle, "_isTextTruncated");
-
-		this.oTitle.$().trigger("mouseover");
-
-		assert.ok(oSpy.callCount > 0,
-			"_isTextTruncated was called on mouseover interaction (callCount: " + oSpy.callCount + ")");
+		const sText = hoverAndGetTooltipText(this.oTitle);
+		assert.strictEqual(sText, this.oTitle.getText(),
+			"the truncated title's text is shown as a tooltip on hover");
 	});
 
-	QUnit.test("_isTextTruncated IS called on focus interaction (when focusable)", function(assert) {
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
+	QUnit.test("Focusing a title with a tooltip shows the tooltip", async function(assert) {
+		ControlBehavior.setExtendedKeyboardNavigationEnabled(true);
 
-		const oFocusableTitle = new Title({
+		const oTitle = new Title({
 			text: "This is a very long title that will definitely be truncated when the width is constrained",
 			width: "200px",
 			tooltip: "Custom tooltip"
 		});
 
-		oFocusableTitle.placeAt("qunit-fixture");
-		Core.applyChanges();
+		try {
+			await whenTabIndexSettled(this.clock, oTitle);
 
-		const done = assert.async();
-		setTimeout(function() {
-			const oDomRef = oFocusableTitle.getDomRef();
-			const bHasTabIndex = oDomRef && oDomRef.hasAttribute("tabindex");
-
-			if (!bHasTabIndex) {
-				oFocusableTitle.destroy();
-				assert.ok(true, "Title not focusable (Extended Keyboard Navigation disabled) - test skipped");
-				done();
-				return;
-			}
-
-			const oSpy = sinon.spy(oFocusableTitle, "_isTextTruncated");
-
-			oDomRef.focus();
-
-			setTimeout(function() {
-				assert.ok(oSpy.callCount > 0,
-					"_isTextTruncated was called on focus interaction (callCount: " + oSpy.callCount + ")");
-
-				oFocusableTitle.destroy();
-				done();
-			}, 100);
-		}, 50);
+			const sText = focusAndGetTooltipText(oTitle);
+			assert.strictEqual(sText, "Custom tooltip",
+				"the tooltip is shown when the focusable title receives keyboard focus");
+		} finally {
+			await destroyAndDrain(this.clock, oTitle);
+			ControlBehavior.setExtendedKeyboardNavigationEnabled(false);
+		}
 	});
 
-	QUnit.test("_getTooltipAnchorElement is NOT called during rendering (lazy evaluation)", function(assert) {
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
-		const oSpy = sinon.spy(this.oTitle, "_getTooltipAnchorElement");
+	QUnit.test("Rendering a title does not force truncation measurement (no layout thrashing)", async function(assert) {
+		// Truncation is measured by reading scrollWidth/clientWidth on the rendered node.
+		// Spy those getters on the shared prototype so any measurement during render is caught.
+		const oScrollWidthDesc = Object.getOwnPropertyDescriptor(Element.prototype, "scrollWidth");
+		const oClientWidthDesc = Object.getOwnPropertyDescriptor(Element.prototype, "clientWidth");
+		const oScrollSpy = sinon.spy(oScrollWidthDesc, "get");
+		const oClientSpy = sinon.spy(oClientWidthDesc, "get");
+		Object.defineProperty(Element.prototype, "scrollWidth", oScrollWidthDesc);
+		Object.defineProperty(Element.prototype, "clientWidth", oClientWidthDesc);
 
 		this.oTitle.placeAt("qunit-fixture");
-		Core.applyChanges();
+		await this.clock.tickAsync(2000);
 
-		assert.strictEqual(oSpy.callCount, 0,
-			"_getTooltipAnchorElement was not called synchronously during rendering - lazy evaluation works correctly (no DOM measurements during render)");
-	});
+		const iMeasurements = oScrollSpy.callCount + oClientSpy.callCount;
 
-	QUnit.test("Performance: No layout thrashing during batch rendering", function(assert) {
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
+		assert.strictEqual(iMeasurements, 0,
+			"no scrollWidth/clientWidth read while rendering - truncation is deferred to interaction, so rendering does not thrash layout");
 
-		const aTitles = [];
-		for (let i = 0; i < 10; i++) {
-			aTitles.push(new Title({
-				text: "This is a very long title that will definitely be truncated when the width is constrained " + i,
-				width: "200px"
-			}));
-		}
-
-		const aTruncationSpies = aTitles.map(function(oTitle) {
-			return sinon.spy(oTitle, "_isTextTruncated");
-		});
-
-		const aAnchorSpies = aTitles.map(function(oTitle) {
-			return sinon.spy(oTitle, "_getTooltipAnchorElement");
-		});
-
-		aTitles.forEach(function(oTitle) {
-			oTitle.placeAt("qunit-fixture");
-		});
-		Core.applyChanges();
-
-		const iTotalTruncationCalls = aTruncationSpies.reduce(function(sum, spy) {
-			return sum + spy.callCount;
-		}, 0);
-
-		const iTotalAnchorCalls = aAnchorSpies.reduce(function(sum, spy) {
-			return sum + spy.callCount;
-		}, 0);
-
-		assert.strictEqual(iTotalTruncationCalls, 0,
-			"_isTextTruncated was not called during batch rendering of 10 titles (total: " + iTotalTruncationCalls + ")");
-
-		assert.strictEqual(iTotalAnchorCalls, 0,
-			"_getTooltipAnchorElement was not called during batch rendering of 10 titles (total: " + iTotalAnchorCalls + ") - no DOM measurements, no layout thrashing");
-
-		aTitles.forEach(function(oTitle) {
-			oTitle.destroy();
-		});
+		Object.defineProperty(Element.prototype, "scrollWidth", oScrollWidthDesc);
+		Object.defineProperty(Element.prototype, "clientWidth", oClientWidthDesc);
 	});
 
 	QUnit.module("Enhanced Tooltip - Tooltip Text Resolution", {
@@ -165,77 +140,49 @@ sap.ui.define([
 				width: "150px"
 			});
 		},
-		afterEach: function() {
-			if (this.oTitle) {
-				this.oTitle.destroy();
-				this.oTitle = null;
-			}
+		afterEach: async function() {
+			await destroyAndDrain(this.clock, this.oTitle);
+			this.oTitle = null;
 		}
 	});
 
-	QUnit.test("Explicit tooltip takes precedence over truncation", function(assert) {
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
+	QUnit.test("Explicit tooltip takes precedence over truncation", async function(assert) {
 		this.oTitle.setTooltip("Custom tooltip text");
 		this.oTitle.placeAt("qunit-fixture");
-		Core.applyChanges();
+		await nextUIUpdate(this.clock);
 
-		const sTooltipText = this.oTitle._getEnhancedTooltipText();
-
-		assert.strictEqual(sTooltipText, "Custom tooltip text",
-			"Explicit tooltip is returned even if text is truncated");
+		const sText = hoverAndGetTooltipText(this.oTitle);
+		assert.strictEqual(sText, "Custom tooltip text",
+			"the explicit tooltip is shown on hover even though the title text is truncated");
 	});
 
-	QUnit.test("Falls back to title text when truncated and no explicit tooltip", function(assert) {
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
+	QUnit.test("Falls back to title text when truncated and no explicit tooltip", async function(assert) {
 		this.oTitle.placeAt("qunit-fixture");
-		Core.applyChanges();
+		await nextUIUpdate(this.clock);
 
-		sinon.stub(this.oTitle, "_isTextTruncated").returns(true);
-
-		const sTooltipText = this.oTitle._getEnhancedTooltipText();
-
-		assert.strictEqual(sTooltipText, this.oTitle.getText(),
-			"Title text is returned when truncated and no explicit tooltip");
+		const sText = hoverAndGetTooltipText(this.oTitle);
+		assert.strictEqual(sText, this.oTitle.getText(),
+			"the truncated title's own text is shown on hover when there is no explicit tooltip");
 	});
 
-	QUnit.test("Returns empty string when not truncated and no explicit tooltip", function(assert) {
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
+	QUnit.test("Returns empty string when not truncated and no explicit tooltip", async function(assert) {
 		const oShortTitle = new Title({
 			text: "Short",
 			width: "200px"
 		});
 
 		oShortTitle.placeAt("qunit-fixture");
-		Core.applyChanges();
+		await nextUIUpdate(this.clock);
 
-		const sTooltipText = oShortTitle._getEnhancedTooltipText();
-
-		assert.strictEqual(sTooltipText, "",
-			"Empty string returned when text is not truncated and no explicit tooltip");
-
+		const sText = hoverAndGetTooltipText(oShortTitle);
+		assert.strictEqual(sText, "",
+			"no tooltip is shown on hover when the title fits and has no explicit tooltip");
 		oShortTitle.destroy();
 	});
 
-	QUnit.test("Uses association title text when truncated", function(assert) {
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
+	QUnit.test("Uses association title text when truncated", async function(assert) {
 		const oCoreTitle = new CoreTitle({
-			text: "Core title text"
+			text: "Core title text that is long enough to truncate"
 		});
 
 		const oTitleWithAssoc = new Title({
@@ -244,230 +191,101 @@ sap.ui.define([
 		});
 
 		oTitleWithAssoc.placeAt("qunit-fixture");
-		Core.applyChanges();
+		await nextUIUpdate(this.clock);
 
-		sinon.stub(oTitleWithAssoc, "_isTextTruncated").returns(true);
-
-		const sTooltipText = oTitleWithAssoc._getEnhancedTooltipText();
-		assert.strictEqual(sTooltipText, "Core title text",
-			"Association title text is used when truncated");
-
+		const sText = hoverAndGetTooltipText(oTitleWithAssoc);
+		assert.strictEqual(sText, "Core title text that is long enough to truncate",
+			"the associated core Title's text is shown on hover when the title is truncated");
 		oTitleWithAssoc.destroy();
 		oCoreTitle.destroy();
 	});
 
-	QUnit.test("Prefers own text over association when content aggregation is used", function(assert) {
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
-		const oCoreTitle = new CoreTitle({
-			text: "Core title text"
-		});
-
-		const oLink = new Link({
-			text: "Link text"
-		});
-
-		const oTitleWithContent = new Title({
-			text: "Own text",
-			width: "100px",
-			title: oCoreTitle,
-			content: oLink
-		});
-
-		oTitleWithContent.placeAt("qunit-fixture");
-		Core.applyChanges();
-
-		sinon.stub(oTitleWithContent, "_isTextTruncated").returns(true);
-
-		const sTooltipText = oTitleWithContent._getEnhancedTooltipText();
-		assert.strictEqual(sTooltipText, "Own text",
-			"Own text is used when content aggregation is present, not association");
-
-		oTitleWithContent.destroy();
-		oCoreTitle.destroy();
-		oLink.destroy();
-	});
-
 	QUnit.module("Enhanced Tooltip - Focusability", {
 		beforeEach: function() {
-			this._oExtendedKeyboardNavigationStub = null;
+			ControlBehavior.setExtendedKeyboardNavigationEnabled(true);
 		},
-		afterEach: function() {
-			if (this.oTitle) {
-				this.oTitle.destroy();
-				this.oTitle = null;
-			}
-			if (this._oExtendedKeyboardNavigationStub) {
-				this._oExtendedKeyboardNavigationStub.restore();
-				this._oExtendedKeyboardNavigationStub = null;
-			}
+		afterEach: async function() {
+			ControlBehavior.setExtendedKeyboardNavigationEnabled(false);
+			await destroyAndDrain(this.clock, this.oTitle);
+			this.oTitle = null;
 		}
 	});
 
-	QUnit.test("_shouldBeFocusable returns false when Extended Keyboard Navigation is disabled", function(assert) {
-		const oTitle = new Title({
+	QUnit.test("Title is not focusable when Extended Keyboard Navigation is disabled", async function(assert) {
+		ControlBehavior.setExtendedKeyboardNavigationEnabled(false);
+
+		this.oTitle = new Title({
 			text: "Title text",
 			tooltip: "Custom tooltip"
 		});
 
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			oTitle.destroy();
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
-		this._oExtendedKeyboardNavigationStub = sinon.stub(ControlBehavior, "isExtendedKeyboardNavigationEnabled").returns(false);
-
-		const bShouldBeFocusable = oTitle._shouldBeFocusable();
-
-		assert.strictEqual(bShouldBeFocusable, false,
-			"Title is not focusable when Extended Keyboard Navigation is disabled");
-
-		oTitle.destroy();
+		const sTabIndex = await whenTabIndexSettled(this.clock, this.oTitle);
+		assert.strictEqual(sTabIndex, null,
+			"no tabindex is rendered when Extended Keyboard Navigation is disabled");
 	});
 
-	QUnit.test("_shouldBeFocusable returns true with explicit tooltip and Extended Keyboard Navigation enabled", function(assert) {
-		const oTitle = new Title({
+	QUnit.test("Title is focusable with an explicit tooltip and Extended Keyboard Navigation enabled", async function(assert) {
+		this.oTitle = new Title({
 			text: "Title text",
 			tooltip: "Custom tooltip"
 		});
 
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			oTitle.destroy();
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
-		this._oExtendedKeyboardNavigationStub = sinon.stub(ControlBehavior, "isExtendedKeyboardNavigationEnabled").returns(true);
-
-		const bShouldBeFocusable = oTitle._shouldBeFocusable();
-
-		assert.strictEqual(bShouldBeFocusable, true,
-			"Title is focusable with explicit tooltip and Extended Keyboard Navigation enabled");
-
-		oTitle.destroy();
+		const sTabIndex = await whenTabIndexSettled(this.clock, this.oTitle);
+		assert.strictEqual(sTabIndex, "0",
+			"tabindex='0' is rendered for a title with an explicit tooltip");
 	});
 
-	QUnit.test("_shouldBeFocusable returns false when no explicit tooltip", function(assert) {
-		const oTitle = new Title({
+	QUnit.test("Title is not focusable when it has no explicit tooltip", async function(assert) {
+		this.oTitle = new Title({
 			text: "Title text without tooltip"
 		});
 
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			oTitle.destroy();
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
-		this._oExtendedKeyboardNavigationStub = sinon.stub(ControlBehavior, "isExtendedKeyboardNavigationEnabled").returns(true);
-
-		const bShouldBeFocusable = oTitle._shouldBeFocusable();
-
-		assert.strictEqual(bShouldBeFocusable, false,
-			"Title is not focusable via _shouldBeFocusable when no explicit tooltip (truncation check happens separately)");
-
-		oTitle.destroy();
+		const sTabIndex = await whenTabIndexSettled(this.clock, this.oTitle);
+		assert.strictEqual(sTabIndex, null,
+			"no tabindex is rendered for a fitting title without an explicit tooltip");
 	});
 
-	QUnit.test("_shouldBeFocusable returns false when content aggregation is used", function(assert) {
+	QUnit.test("Title is not focusable when a content control is used", async function(assert) {
 		const oLink = new Link({
 			text: "Link"
 		});
 
-		const oTitle = new Title({
+		this.oTitle = new Title({
 			tooltip: "Custom tooltip",
 			content: oLink
 		});
 
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			oTitle.destroy();
-			oLink.destroy();
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
-		this._oExtendedKeyboardNavigationStub = sinon.stub(ControlBehavior, "isExtendedKeyboardNavigationEnabled").returns(true);
-
-		const bShouldBeFocusable = oTitle._shouldBeFocusable();
-
-		assert.strictEqual(bShouldBeFocusable, false,
-			"Title is not focusable when content aggregation is used (Link is already focusable)");
-
-		oTitle.destroy();
-		oLink.destroy();
+		const sTabIndex = await whenTabIndexSettled(this.clock, this.oTitle);
+		assert.strictEqual(sTabIndex, null,
+			"no tabindex is rendered when a content control is used, since the content is already focusable");
 	});
 
-	QUnit.test("tabindex is set after rendering when focusable", function(assert) {
-		this._oExtendedKeyboardNavigationStub = sinon.stub(ControlBehavior, "isExtendedKeyboardNavigationEnabled").returns(true);
-
-		const oTitle = new Title({
+	QUnit.test("tabindex is set after rendering when focusable", async function(assert) {
+		this.oTitle = new Title({
 			text: "Title with tooltip",
 			tooltip: "Custom tooltip"
 		});
 
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			oTitle.destroy();
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
-		oTitle.placeAt("qunit-fixture");
-		Core.applyChanges();
-
-		const done = assert.async();
-
-		setTimeout(function() {
-			const oDomRef = oTitle.getDomRef();
-			const sTabIndex = oDomRef ? oDomRef.getAttribute("tabindex") : null;
-
-			assert.strictEqual(sTabIndex, "0",
-				"tabindex='0' is set after rendering for focusable title");
-
-			oTitle.destroy();
-			done();
-		}, 50);
+		const sTabIndex = await whenTabIndexSettled(this.clock, this.oTitle);
+		assert.strictEqual(sTabIndex, "0",
+			"tabindex='0' is set after rendering for a focusable title");
 	});
 
-	QUnit.test("tabindex is removed when title becomes non-focusable", function(assert) {
-		this._oExtendedKeyboardNavigationStub = sinon.stub(ControlBehavior, "isExtendedKeyboardNavigationEnabled").returns(true);
-
-		const oTitle = new Title({
+	QUnit.test("tabindex is removed when title becomes non-focusable", async function(assert) {
+		this.oTitle = new Title({
 			text: "Short",
 			tooltip: "Custom tooltip"
 		});
 
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			oTitle.destroy();
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
+		await whenTabIndexSettled(this.clock, this.oTitle);
 
-		oTitle.placeAt("qunit-fixture");
-		Core.applyChanges();
+		this.oTitle.setTooltip("");
+		await nextUIUpdate(this.clock);
+		await this.clock.tickAsync(1);
 
-		const done = assert.async();
-
-		// Wait for initial _updateTabIndex
-		setTimeout(function() {
-
-			oTitle.setTooltip("");
-			Core.applyChanges();
-
-
-			setTimeout(function() {
-				const oDomRef = oTitle.getDomRef();
-				const bHasTabIndex = oDomRef ? oDomRef.hasAttribute("tabindex") : false;
-
-				assert.strictEqual(bHasTabIndex, false,
-					"tabindex is removed when title becomes non-focusable");
-
-				oTitle.destroy();
-				done();
-			}, 50);
-		}, 50);
+		const oDomRef = this.oTitle.getDomRef();
+		assert.notOk(oDomRef.hasAttribute("tabindex"),
+			"tabindex is removed once the tooltip is cleared and the title is no longer focusable");
 	});
 
 	QUnit.module("Enhanced Tooltip - ARIA aria-describedby", {
@@ -477,76 +295,43 @@ sap.ui.define([
 				tooltip: "Custom tooltip"
 			});
 		},
-		afterEach: function() {
-			if (this.oTitle) {
-				this.oTitle.destroy();
-				this.oTitle = null;
-			}
+		afterEach: async function() {
+			await destroyAndDrain(this.clock, this.oTitle);
+			this.oTitle = null;
 		}
 	});
 
-	QUnit.test("Invisible text provider returns explicit tooltip", function(assert) {
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
+	QUnit.test("aria-describedby is rendered when explicit tooltip exists", async function(assert) {
 		this.oTitle.placeAt("qunit-fixture");
-		Core.applyChanges();
-
-
-		const sInvisibleText = this.oTitle._getTooltipText();
-
-		assert.strictEqual(sInvisibleText, "Custom tooltip",
-			"Invisible text provider returns explicit tooltip for aria-describedby");
-	});
-
-	QUnit.test("aria-describedby is rendered when explicit tooltip exists", function(assert) {
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
-		this.oTitle.placeAt("qunit-fixture");
-		Core.applyChanges();
+		await nextUIUpdate(this.clock);
 
 		const oDomRef = this.oTitle.getDomRef();
-		const sAriaDescribedBy = oDomRef ? oDomRef.getAttribute("aria-describedby") : null;
+		const sAriaDescribedBy = oDomRef.getAttribute("aria-describedby");
 
 		assert.ok(sAriaDescribedBy && sAriaDescribedBy.length > 0,
 			"aria-describedby attribute is present when explicit tooltip exists");
 
+		const aIds = sAriaDescribedBy.split(" ");
+		const bFoundInvisibleText = aIds.some(function(sId) {
+			const oElement = document.getElementById(sId);
+			return oElement && oElement.textContent === "Custom tooltip";
+		});
 
-		if (sAriaDescribedBy) {
-			const aIds = sAriaDescribedBy.split(" ");
-			const bFoundInvisibleText = aIds.some(function(sId) {
-				const oElement = document.getElementById(sId);
-				return oElement && oElement.textContent === "Custom tooltip";
-			});
-
-			assert.ok(bFoundInvisibleText,
-				"Invisible text element with tooltip content exists in DOM");
-		}
+		assert.ok(bFoundInvisibleText,
+			"Invisible text element with tooltip content exists in DOM");
 	});
 
-	QUnit.test("aria-describedby is NOT rendered for auto-generated truncation tooltip", function(assert) {
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
+	QUnit.test("aria-describedby is NOT rendered for auto-generated truncation tooltip", async function(assert) {
 		const oTruncatedTitle = new Title({
 			text: "Very long title text that will be truncated",
 			width: "100px"
-
 		});
 
 		oTruncatedTitle.placeAt("qunit-fixture");
-		Core.applyChanges();
+		await nextUIUpdate(this.clock);
 
 		const oDomRef = oTruncatedTitle.getDomRef();
-		const sAriaDescribedBy = oDomRef ? oDomRef.getAttribute("aria-describedby") : null;
-
+		const sAriaDescribedBy = oDomRef.getAttribute("aria-describedby");
 
 		if (sAriaDescribedBy) {
 			const aIds = sAriaDescribedBy.split(" ");
@@ -564,21 +349,15 @@ sap.ui.define([
 		oTruncatedTitle.destroy();
 	});
 
-	QUnit.test("Invisible text is updated when tooltip changes", function(assert) {
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
+	QUnit.test("Invisible text is updated when tooltip changes", async function(assert) {
 		this.oTitle.placeAt("qunit-fixture");
-		Core.applyChanges();
-
+		await nextUIUpdate(this.clock);
 
 		this.oTitle.setTooltip("Updated tooltip");
-		Core.applyChanges();
+		await nextUIUpdate(this.clock);
 
 		const oDomRef = this.oTitle.getDomRef();
-		const sAriaDescribedBy = oDomRef ? oDomRef.getAttribute("aria-describedby") : null;
+		const sAriaDescribedBy = oDomRef.getAttribute("aria-describedby");
 
 		assert.ok(sAriaDescribedBy, "aria-describedby still exists after tooltip change");
 
@@ -594,146 +373,86 @@ sap.ui.define([
 		}
 	});
 
+	QUnit.test("Own tooltip is used over the association when a content control is present", async function(assert) {
+		// With a content control the association is ignored, so the invisible aria
+		// text must come from the Title's own tooltip, not the association's.
+		const oCoreTitle = new CoreTitle({
+			text: "Core title text",
+			tooltip: "Association tooltip"
+		});
+		const oLink = new Link({
+			text: "Link text"
+		});
+		const oTitleWithContent = new Title({
+			text: "Own text",
+			tooltip: "Own tooltip",
+			width: "100px",
+			title: oCoreTitle,
+			content: oLink
+		});
+
+		oTitleWithContent.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		const sAriaDescribedBy = oTitleWithContent.getDomRef().getAttribute("aria-describedby");
+		const aIds = sAriaDescribedBy ? sAriaDescribedBy.split(" ") : [];
+
+		const bFoundOwnTooltip = aIds.some(function(sId) {
+			const oElement = document.getElementById(sId);
+			return oElement && oElement.textContent === "Own tooltip";
+		});
+		const bFoundAssociationTooltip = aIds.some(function(sId) {
+			const oElement = document.getElementById(sId);
+			return oElement && oElement.textContent === "Association tooltip";
+		});
+
+		assert.ok(bFoundOwnTooltip,
+			"the invisible aria text is the Title's own tooltip when a content control is present");
+		assert.notOk(bFoundAssociationTooltip,
+			"the association's tooltip is not used when a content control is present");
+
+		oTitleWithContent.destroy();
+		oCoreTitle.destroy();
+		oLink.destroy();
+	});
+
 	QUnit.module("Enhanced Tooltip - Tooltip Anchor Positioning", {
-		beforeEach: function() {
-			this.oTitle = new Title({
-				text: "Title text",
-				tooltip: "Custom tooltip"
-			});
-		},
-		afterEach: function() {
-			if (this.oTitle) {
-				this.oTitle.destroy();
-				this.oTitle = null;
-			}
+		afterEach: async function() {
+			await destroyAndDrain(this.clock, this.oTitle);
+			this.oTitle = null;
 		}
 	});
 
-	QUnit.test("_getTooltipAnchorElement returns inner span when text is not truncated", function(assert) {
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
-		this.oTitle.setWidth("500px");
+	QUnit.test("Tooltip anchors to the text when the title is not truncated", async function(assert) {
+		// Short text in a wide container: the anchor is the inner text span, not the
+		// wide container. Hovering the container's empty area (outside the text) must
+		// therefore not open the tooltip - it would appear detached from the text.
+		this.oTitle = new Title({
+			text: "Short",
+			tooltip: "Custom tooltip",
+			width: "500px"
+		});
 		this.oTitle.placeAt("qunit-fixture");
-		Core.applyChanges();
+		await nextUIUpdate(this.clock);
 
-		const oDomRef = this.oTitle.getDomRef();
-
-		sinon.stub(oDomRef, "scrollWidth").value(100);
-		sinon.stub(oDomRef, "clientWidth").value(100);
-
-		const oAnchor = this.oTitle._getTooltipAnchorElement();
-		const oInnerDomRef = this.oTitle.getDomRef("inner");
-
-		assert.strictEqual(oAnchor, oInnerDomRef,
-			"Anchor is inner span when text is not truncated");
+		const sText = hoverAndGetTooltipText(this.oTitle);
+		assert.strictEqual(sText, "",
+			"hovering the empty area of the wide container does not open the tooltip - it is anchored to the text, not the container");
 	});
 
-	QUnit.test("_getTooltipAnchorElement returns root element when text is truncated", function(assert) {
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
-		this.oTitle.setText("Very long title text that will definitely be truncated");
-		this.oTitle.setWidth("100px");
+	QUnit.test("Tooltip anchors to the container when the title is truncated", async function(assert) {
+		// Long text in a narrow container: the anchor is the container itself, so
+		// hovering it opens the tooltip (the text fills the whole container).
+		this.oTitle = new Title({
+			text: "Very long title text that will definitely be truncated",
+			tooltip: "Custom tooltip",
+			width: "100px"
+		});
 		this.oTitle.placeAt("qunit-fixture");
-		Core.applyChanges();
+		await nextUIUpdate(this.clock);
 
-		const oDomRef = this.oTitle.getDomRef();
-
-		sinon.stub(oDomRef, "scrollWidth").value(200);
-		sinon.stub(oDomRef, "clientWidth").value(100);
-
-		const oAnchor = this.oTitle._getTooltipAnchorElement();
-
-		assert.strictEqual(oAnchor, oDomRef,
-			"Anchor is root element when text is truncated (prevents empty space tooltip)");
-	});
-
-	QUnit.test("_getTooltipAnchorElement returns available element when one is missing", function(assert) {
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
-		this.oTitle.placeAt("qunit-fixture");
-		Core.applyChanges();
-
-		const oDomRef = this.oTitle.getDomRef();
-
-
-		const oInnerSpan = this.oTitle.getDomRef("inner");
-		if (oInnerSpan) {
-			oInnerSpan.remove();
-		}
-
-		const oAnchor = this.oTitle._getTooltipAnchorElement();
-
-		assert.strictEqual(oAnchor, oDomRef,
-			"Anchor is root element when inner span is missing");
-	});
-
-	QUnit.test("_getTooltipAnchorElement returns null when control not rendered", function(assert) {
-		if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
-			assert.ok(true, "Enhanced tooltip not enabled - test skipped");
-			return;
-		}
-
-
-		const oAnchor = this.oTitle._getTooltipAnchorElement();
-
-		assert.strictEqual(oAnchor, null,
-			"Anchor is null when control is not rendered");
-	});
-
-	QUnit.module("Enhanced Tooltip - Truncation Detection", {
-		beforeEach: function() {
-			this.oTitle = new Title();
-		},
-		afterEach: function() {
-			if (this.oTitle) {
-				this.oTitle.destroy();
-				this.oTitle = null;
-			}
-		}
-	});
-
-	QUnit.test("_isTextTruncated returns false when not rendered", function(assert) {
-		const bIsTruncated = this.oTitle._isTextTruncated();
-
-		assert.strictEqual(bIsTruncated, false,
-			"Returns false when control is not rendered");
-	});
-
-	QUnit.test("_isTextTruncated returns true when scrollWidth > clientWidth", function(assert) {
-		this.oTitle.setText("Very long title text that will definitely be truncated in narrow container");
-		this.oTitle.setWidth("100px");
-		this.oTitle.placeAt("qunit-fixture");
-		Core.applyChanges();
-
-		const oDomRef = this.oTitle.getDomRef();
-
-		sinon.stub(oDomRef, "scrollWidth").value(200);
-		sinon.stub(oDomRef, "clientWidth").value(100);
-
-		const bIsTruncated = this.oTitle._isTextTruncated();
-
-		assert.strictEqual(bIsTruncated, true,
-			"Returns true when text is truncated (scrollWidth > clientWidth)");
-	});
-
-	QUnit.test("_isTextTruncated returns false when text fits in container", function(assert) {
-		this.oTitle.setText("Short");
-		this.oTitle.setWidth("500px");
-		this.oTitle.placeAt("qunit-fixture");
-		Core.applyChanges();
-
-		const bIsTruncated = this.oTitle._isTextTruncated();
-
-		assert.strictEqual(bIsTruncated, false,
-			"Returns false when text fits in container");
+		const sText = hoverAndGetTooltipText(this.oTitle);
+		assert.strictEqual(sText, "Custom tooltip",
+			"hovering the truncated title opens the tooltip - it is anchored to the container");
 	});
 });
