@@ -193,10 +193,14 @@ sap.ui.define([
 	 * The accepted values depend on the current locale. In English (en), the
 	 * following values are recognized (case-insensitive):
 	 * <ul>
-	 *   <li><b>Day:</b> <code>today</code>, <code>yesterday</code>, <code>tomorrow</code></li>
-	 *   <li><b>Week:</b> <code>this week</code>, <code>last week</code>, <code>next week</code></li>
-	 *   <li><b>Month:</b> <code>this month</code>, <code>last month</code>, <code>next month</code></li>
-	 *   <li><b>Year:</b> <code>this year</code>, <code>last year</code>, <code>next year</code></li>
+	 *   <li><b>Day:</b> <code>today</code>, <code>yesterday</code>, <code>tomorrow</code>,
+	 *       <code>in N days</code>, <code>N days ago</code></li>
+	 *   <li><b>Week:</b> <code>this week</code>, <code>last week</code>, <code>next week</code>,
+	 *       <code>in N weeks</code>, <code>N weeks ago</code></li>
+	 *   <li><b>Month:</b> <code>this month</code>, <code>last month</code>, <code>next month</code>,
+	 *       <code>in N months</code>, <code>N months ago</code></li>
+	 *   <li><b>Year:</b> <code>this year</code>, <code>last year</code>, <code>next year</code>,
+	 *       <code>in N years</code>, <code>N years ago</code></li>
 	 * </ul>
 	 *
 	 * <b>Note:</b> The relative expressions are locale-specific. In other locales,
