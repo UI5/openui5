@@ -8,6 +8,7 @@ module.exports = [
 	"Breadcrumbs.spec.js",
 	"ButtonToggleButtonInBarsVisual.spec.js",
 	"ButtonStandaloneVisual.spec.js",
+	"ButtonTooltip.spec.js",
 	"Carousel.spec.js",
 	"CarouselNoPages.spec.js",
 	"CheckBox.spec.js",
