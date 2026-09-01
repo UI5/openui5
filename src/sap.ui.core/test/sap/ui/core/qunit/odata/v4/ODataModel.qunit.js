@@ -1687,7 +1687,7 @@ sap.ui.define([
 			mOptions = ODataModel.prototype.buildQueryOptions(oFixture.mParameters,
 				oFixture.bSystemQueryOptionsAllowed, oFixture.bSapAllowed);
 
-			assert.deepEqual(mOptions, oFixture.expected || oFixture.mParameters || {});
+			assert.deepEqual(mOptions, oFixture.expected ?? oFixture.mParameters ?? {});
 			assert.strictEqual(JSON.stringify(oFixture.mParameters), sOriginalParameters);
 		});
 	});
@@ -2883,7 +2883,7 @@ sap.ui.define([
 		oHelperMock.expects("createTechnicalDetails")
 			.withExactArgs(sinon.match.same(oRawMessage)); // ignore details
 		oHelperMock.expects("buildPath").never();
-		[oFixture.target].concat(oFixture.additionalTargets || []).forEach(function (sTarget) {
+		[oFixture.target].concat(oFixture.additionalTargets ?? []).forEach(function (sTarget) {
 			if (sTarget[0] !== "/") {
 				oHelperMock.expects("buildPath")
 					.withExactArgs("/" + "~resourcePath~", "~cachePath~", sTarget)

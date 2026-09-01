@@ -341,7 +341,7 @@ sap.ui.define([
 					+ oGroupProperties + "'");
 			}
 		}
-		this.mGroupProperties = _Helper.clone(mParameters.groupProperties) || {};
+		this.mGroupProperties = _Helper.clone(mParameters.groupProperties) ?? {};
 		this.mGroupProperties.$auto = {submit : SubmitMode.Auto};
 		this.mGroupProperties.$direct = {submit : SubmitMode.Direct};
 		if (mParameters.autoExpandSelect !== undefined
@@ -2651,7 +2651,7 @@ sap.ui.define([
 				aNewMessages.push(that.createUI5Message(oRawMessage, sResourcePath, sCachePath));
 			});
 		});
-		(aCachePaths || [""]).forEach(function (sCachePath) {
+		(aCachePaths ?? [""]).forEach(function (sCachePath) {
 			var sPath = _Helper.buildPath(sDataBindingPath, sCachePath);
 
 			Object.keys(that.mMessages).forEach(function (sMessageTarget) {

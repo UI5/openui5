@@ -225,7 +225,7 @@ sap.ui.define([
 		var oAggregation = {
 				aggregate : {},
 				group : {},
-				groupLevels : oFixture.groupLevels || []
+				groupLevels : oFixture.groupLevels ?? []
 			},
 			mQueryOptions = {};
 
@@ -314,12 +314,12 @@ sap.ui.define([
 	bSharedRequest : true
 }].forEach(function (oFixture) {
 	QUnit.test("create: " + oFixture.message, function (assert) {
-		var oAggregation = oFixture.oAggregation || {
+		var oAggregation = oFixture.oAggregation ?? {
 				aggregate : {},
 				group : {},
-				groupLevels : oFixture.groupLevels || []
+				groupLevels : oFixture.groupLevels ?? []
 			},
-			mQueryOptions = oFixture.queryOptions || {};
+			mQueryOptions = oFixture.queryOptions ?? {};
 
 		this.mock(_AggregationHelper).expects("hasGrandTotal")
 			.withExactArgs(sinon.match.same(oAggregation.aggregate))

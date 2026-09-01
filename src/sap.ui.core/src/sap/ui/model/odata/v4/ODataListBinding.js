@@ -114,7 +114,7 @@ sap.ui.define([
 			throw new Error("Invalid path: " + sPath);
 		}
 
-		mParameters = _Helper.clone(mParameters) || {};
+		mParameters = _Helper.clone(mParameters) ?? {};
 		this.checkBindingParameters(mParameters, ["$$aggregation", "$$canonicalPath",
 			"$$clearSelectionOnFilter", "$$getKeepAliveContext", "$$groupId", "$$operationMode",
 			"$$ownRequest", "$$patchWithoutSideEffects", "$$separate", "$$sharedRequest",
@@ -1044,7 +1044,7 @@ sap.ui.define([
 
 		// clone data to avoid modifications outside the cache
 		// remove any property starting with "@$ui5."
-		oEntityData = _Helper.publicClone(oInitialData, true) || {};
+		oEntityData = _Helper.publicClone(oInitialData, true) ?? {};
 		if (oAggregation?.hierarchyQualifier) {
 			if (!bSkipRefresh) {
 				throw new Error("Missing bSkipRefresh");

@@ -1716,7 +1716,7 @@ sap.ui.define([
 						// Note: inline annotations are reached via above fast path for pure "JSON"
 						// drill-down
 						vBindingParameterType = vResult && vResult.$Type || vBindingParameterType;
-						vResult = mScope.$Annotations[sTarget] || {};
+						vResult = mScope.$Annotations[sTarget] ?? {};
 						bODataMode = false; // switch to pure "JSON" drill-down
 					} else if (sSegment === "$" && i + 1 < aSegments.length) {
 						return log(WARNING, "Unsupported path after $");
@@ -2397,7 +2397,7 @@ sap.ui.define([
 			return j < iBasePathLength || sSegment[0] === "#" || sSegment[0] === "@"
 					|| rNumber.test(sSegment) || sSegment === "$Parameter"
 				? {} // simply an object w/o $Partner and $isCollection
-				: that.getObject(_Helper.getMetaPath(aSegments.slice(0, j + 1).join("/"))) || {};
+				: that.getObject(_Helper.getMetaPath(aSegments.slice(0, j + 1).join("/"))) ?? {};
 		});
 		mPaths[sPath] = true;
 		if (!(bNoReduceBeforeCollection

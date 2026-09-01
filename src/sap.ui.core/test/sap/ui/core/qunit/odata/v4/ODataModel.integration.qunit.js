@@ -1068,10 +1068,8 @@ sap.ui.define([
 			var that = this;
 
 			function getGroupLocks() {
-				return (that.oModel && that.oModel.oRequestor.aLockedGroupLocks || [])
-					.filter(function (oGroupLock) {
-						return oGroupLock.isLocked();
-					});
+				return that.oModel?.oRequestor.aLockedGroupLocks
+					?.filter((oGroupLock) => oGroupLock.isLocked()) ?? [];
 			}
 
 			function cleanup() {
@@ -2512,7 +2510,7 @@ sap.ui.define([
 		 * @throws {Error} If both target and targets are given
 		 */
 		expectMessage : function (oExpectedMessage, bHasMatcher) {
-			const aTargets = oExpectedMessage.targets || [oExpectedMessage.target || ""];
+			const aTargets = oExpectedMessage.targets ?? [oExpectedMessage.target ?? ""];
 			const oClone = Object.assign({
 				code : undefined,
 				descriptionUrl : undefined,
@@ -2690,7 +2688,7 @@ sap.ui.define([
 			vRequest.method ??= "GET";
 			vRequest.payload ??= vRequest.method === "POST" && this.oModel.sODataVersion !== "2.0"
 				? {} : undefined;
-			vRequest.responseHeaders = mResponseHeaders || {};
+			vRequest.responseHeaders = mResponseHeaders ?? {};
 			vRequest.response = vResponse;
 			vRequest.url = TestUtils.encodeReadableUrl(vRequest.url);
 			this.aRequests.push(vRequest);

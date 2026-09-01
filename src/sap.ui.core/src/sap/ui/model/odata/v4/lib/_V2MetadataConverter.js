@@ -686,7 +686,7 @@ sap.ui.define([
 					continue;
 				}
 				sTarget = sEntityContainerName + "/" + sEntitySetName;
-				mAnnotations = _Helper.merge(this.convertedV2Annotations[sTarget] || {},
+				mAnnotations = _Helper.merge(this.convertedV2Annotations[sTarget] ?? {},
 					this.mEntityType2EntitySetAnnotation[oEntitySet.$Type]);
 				if (!_Helper.isEmptyObject(mAnnotations)) {
 					this.convertedV2Annotations[sTarget] = mAnnotations;

@@ -1004,7 +1004,7 @@ sap.ui.define([
 
 			assert.deepEqual(mResult, {$apply : oFixture.sApply}, "sApply");
 			assert.deepEqual(mAlias2MeasureAndMethod,
-				oFixture.mExpectedAlias2MeasureAndMethod || {}, "mAlias2MeasureAndMethod");
+				oFixture.mExpectedAlias2MeasureAndMethod ?? {}, "mAlias2MeasureAndMethod");
 
 			mAlias2MeasureAndMethod = {};
 
@@ -1014,7 +1014,7 @@ sap.ui.define([
 
 			assert.deepEqual(mResult, {$apply : oFixture.sApply}, "sApply");
 			assert.deepEqual(mAlias2MeasureAndMethod,
-				oFixture.mExpectedAlias2MeasureAndMethod || {}, "mAlias2MeasureAndMethod");
+				oFixture.mExpectedAlias2MeasureAndMethod ?? {}, "mAlias2MeasureAndMethod");
 
 			mAlias2MeasureAndMethod = {};
 
@@ -2090,7 +2090,7 @@ sap.ui.define([
 		const aActual = _AggregationHelper.splitFilter(oFixture.filter, oAggregation);
 
 		const aFiltersNoThese
-			= oFixture.noThese?.map((iIndex) => oFixture.filter.getFilters()[iIndex]) || [];
+			= oFixture.noThese?.map((iIndex) => oFixture.filter.getFilters()[iIndex]) ?? [];
 		const aExpected = bHasGroupLevels || bHasGrandTotal && !bOldSchool
 			? [undefined, oFixture.result[1], oFixture.result[0], aFiltersNoThese]
 			: oFixture.result;
