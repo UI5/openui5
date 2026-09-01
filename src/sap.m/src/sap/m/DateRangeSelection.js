@@ -162,6 +162,11 @@ sap.ui.define([
 	 * locale settings. For more information, see the respective documentation in the
 	 * API Reference.
 	 *
+	 * <b>Note:</b> Unlike <code>DatePicker</code>, relative date input (for example,
+	 * <code>today</code>, <code>next week</code>) is not supported in
+	 * <code>DateRangeSelection</code>. Both dates in the range must be entered
+	 * as explicit formatted values.
+	 *
 	 * <h3>Responsive behavior</h3>
 	 *
 	 * The <code>DateRangeSelection</code> is fully responsive. It is smaller in

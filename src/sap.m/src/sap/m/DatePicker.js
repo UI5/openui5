@@ -181,6 +181,37 @@ sap.ui.define([
 	 * locale settings. For more information, see the respective documentation in the
 	 * API Reference.
 	 *
+	 * <h4>Relative date input</h4>
+	 *
+	 * Besides a formatted date string, the input field also accepts locale-aware
+	 * <b>relative date values</b> sourced from
+	 * {@link https://unicode.org/reports/tr35/tr35-dates.html#Calendar_Fields CLDR calendar fields}.
+	 * These allow the user to type natural-language expressions like
+	 * <code>today</code>, <code>yesterday</code>, or <code>next week</code>
+	 * instead of an explicit date.
+	 *
+	 * The accepted values depend on the current locale. In English (en), the
+	 * following values are recognized (case-insensitive):
+	 * <ul>
+	 *   <li><b>Day:</b> <code>today</code>, <code>yesterday</code>, <code>tomorrow</code></li>
+	 *   <li><b>Week:</b> <code>this week</code>, <code>last week</code>, <code>next week</code></li>
+	 *   <li><b>Month:</b> <code>this month</code>, <code>last month</code>, <code>next month</code></li>
+	 *   <li><b>Year:</b> <code>this year</code>, <code>last year</code>, <code>next year</code></li>
+	 * </ul>
+	 *
+	 * <b>Note:</b> The relative expressions are locale-specific. In other locales,
+	 * the equivalent CLDR terms are used (for example, <code>heute</code>,
+	 * <code>gestern</code>, <code>morgen</code> in German). Week-, month-, and
+	 * year-based expressions resolve to a date offset from today
+	 * (for example, <code>next week</code> = today + 7 days). To retrieve the full list
+	 * of accepted relative expressions for a given locale programmatically, use
+	 * {@link sap.ui.core.LocaleData#getRelativePatterns LocaleData#getRelativePatterns}:
+	 * <pre>
+	 * // LocaleData imported from sap/ui/core/LocaleData, Locale from sap/ui/core/Locale
+	 * LocaleData.getInstance(new Locale("en"))
+	 *     .getRelativePatterns(["day", "week", "month", "year"]);
+	 * </pre>
+	 *
 	 * <h3>Responsive behavior</h3>
 	 *
 	 * The <code>DatePicker</code> is smaller in compact mode and provides a
