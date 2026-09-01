@@ -95,10 +95,6 @@ sap.ui.define([
 		name: "_sap_m_Popover_ArrowOffset"
 	}));
 
-	const fCompactArrowOffset = Rem.toPx(Parameters.get({
-		name: "_sap_m_Popover_ArrowOffset"
-	}));
-
 	var app = new App("myApp", {
 		initialPage: "myFirstPage"
 	});
@@ -2018,6 +2014,58 @@ sap.ui.define([
 		assert.strictEqual(oSpy.getCall(0).args[1], true, "_applyPosition is called with the second parameter set to true");
 	});
 
+	QUnit.test("Popover with 'within area' should stay open on resize when opener is outside the within area but inside the viewport", async function (assert){
+		// The 'within area' constrains the Popover's position, not the opener's location. An opener that sits
+		// outside the within area but is still visible in the viewport must not trigger the resize auto-close.
+		const oWithinArea = new HTML({
+			content: "<div style='position:absolute;top:50px;left:50px;width:200px;height:200px;'></div>"
+		});
+		// Opener placed to the right of the within area's right edge (250px) but well inside the viewport.
+		Object.assign(this.oButton.getDomRef().style, { position: "absolute", top: "60px", left: "400px" });
+
+		oWithinArea.placeAt(page);
+		await nextUIUpdate();
+		Popup.setWithinArea(oWithinArea.getDomRef());
+
+		const pOpened = new Promise((resolve) => { this.oPopover.attachAfterOpen(resolve); });
+		this.oPopover.openBy(this.oButton);
+		await pOpened;
+
+		assert.ok(this.oPopover.isOpen(), "Popover is open before resize");
+
+		// Act: simulate a resize event that does not actually change the window size (as WebKit emits on open).
+		let bClosed = false;
+		this.oPopover.attachAfterClose(function () { bClosed = true; });
+		this.oPopover._onOrientationChange();
+
+		// Wait long enough for a potential (buggy) close animation to complete.
+		await new Promise((resolve) => { setTimeout(resolve, 600); });
+
+		// Assert
+		assert.notOk(bClosed, "Popover did not fire afterClose on resize");
+		assert.ok(this.oPopover.isOpen(), "Popover stays open after a resize while the opener is inside the viewport");
+
+		// Cleanup
+		Popup.setWithinArea(null);
+		oWithinArea.destroy();
+	});
+
+	QUnit.test("_isOpenerCompletelyOutsideViewport returns false when the opener overlaps the viewport", function (assert) {
+		// Arrange
+		Object.assign(this.oButton.getDomRef().style, { position: "absolute", top: "60px", left: "60px" });
+
+		// Act & Assert
+		assert.notOk(this.oPopover._isOpenerCompletelyOutsideViewport(this.oButton.getDomRef()), "An opener inside the viewport is not reported as outside");
+	});
+
+	QUnit.test("_isOpenerCompletelyOutsideViewport returns true when the opener is completely outside the viewport", function (assert) {
+		// Arrange - move the opener far below the viewport bottom edge
+		Object.assign(this.oButton.getDomRef().style, { position: "absolute", top: (window.innerHeight + 200) + "px", left: "60px" });
+
+		// Act & Assert
+		assert.ok(this.oPopover._isOpenerCompletelyOutsideViewport(this.oButton.getDomRef()), "An opener fully below the viewport is reported as outside");
+	});
+
 	QUnit.test("_getPopoverPositionCss should return an object with correct top, bottom, right and left position when Popover do not exceed vertically or horizontally of the window", function (assert){
 		var	oPosParams = {
 				_fPopoverWidth: 416,
@@ -2353,12 +2401,12 @@ sap.ui.define([
 		assert.deepEqual(this.oPopover._atPositions, ["begin top", "end center", "begin bottom", "begin center"], "atPositions should be correct");
 	});
 
-	QUnit.test("Popover should use compact arrow offset if _bSizeCompact is true", async function (assert){
+	QUnit.test("Popover should use arrow offset if _bSizeCompact is true", async function (assert){
 		this.oPopover.addStyleClass("sapUiSizeCompact");
 		this.oPopover.openBy(this.oButton);
 		await nextUIUpdate();
 
-		assert.equal(this.oPopover._arrowOffset, fCompactArrowOffset, "_arrowoffset should have correct value");
+		assert.equal(this.oPopover._arrowOffset, fArrowOffset, "_arrowoffset should have correct value");
 		assert.deepEqual(this.oPopover._offsets, [`0 -${fArrowOffset}`, `${fArrowOffset} 0`, `0 ${fArrowOffset}`, `-${fArrowOffset} 0`], "offsets should be correct according the arrowOffset");
 	});
 

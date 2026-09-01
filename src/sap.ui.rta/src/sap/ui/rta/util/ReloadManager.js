@@ -48,14 +48,15 @@ sap.ui.define([
 			sReason = bIsCustomerLayer ? "MSG_VIEWS_OR_PERSONALIZATION_AND_DRAFT_EXISTS" : "MSG_HIGHER_LAYER_CHANGES_AND_DRAFT_EXISTS";
 		} else if (oReloadInfo.hasHigherLayerChanges && oReloadInfo.allContexts) {
 			sReason = "MSG_RESTRICTED_CONTEXT_EXIST_AND_PERSONALIZATION";
-		} else if (oReloadInfo.hasHigherLayerChanges) {
-			sReason = bIsCustomerLayer ? "MSG_PERSONALIZATION_OR_PUBLIC_VIEWS_EXISTS" : "MSG_HIGHER_LAYER_CHANGES_EXIST";
+		} else if (oReloadInfo.hasHigherLayerChanges || oReloadInfo.hasRemovedNonFavoriteVariants) {
+			// Removed non-favorite variants are higher layer changes that are not yet part of the lazy-loaded
+			// flex data, so hasHigherLayerChanges only becomes detectable after the data-fetching reload. Both
+			// reasons share one combined message so the shown text stays stable across open/close cycles.
+			sReason = bIsCustomerLayer ? "MSG_PERSONALIZATION_OR_PUBLIC_OR_MISSING_VIEWS_EXISTS" : "MSG_HIGHER_LAYER_CHANGES_EXIST";
 		} else if (oReloadInfo.isDraftAvailable) {
 			sReason = "MSG_DRAFT_EXISTS";
 		} else if (oReloadInfo.allContexts) {
 			sReason = "MSG_RESTRICTED_CONTEXT_EXIST";
-		} else if (oReloadInfo.hasRemovedNonFavoriteVariants) {
-			sReason = "MSG_VIEWS_NOT_FULLY_LOADED";
 		}// TODO add app descr changes case for start?
 		return sReason;
 	}

@@ -52,7 +52,8 @@ sap.ui.define([
 		}
 
 		/**
-		 * Collapse a node.
+		 * Collapse a node. Takes care of "collapse all" by creating an expand info that is not
+		 * easily deleted by {@link #expand} or {@link #collapse} later on.
 		 *
 		 * @param {object} oNode - The node
 		 * @param {boolean} bAll
@@ -280,13 +281,28 @@ sap.ui.define([
 		 * Tells whether the node with the given key predicate is currently known to be expanded.
 		 *
 		 * @param {string} sPredicate - The node's key predicate
-		 * @returns {boolean} Whether the node is (known to be) expanded
+		 * @param {number} iDistance
+		 *   The distance from the original node to the current one in case of recursion (and only
+		 *   then!)
+		 * @returns {boolean|undefined}
+		 *   Whether the node is known to be collapsed (false) or expanded (true); undefined means
+		 *   unknown and then the "Levels" parameter (or <code>$$aggregation.expandTo</code>) needs
+		 *   to be taken into consideration (inside the top pyramid, all nodes are expanded)
 		 *
 		 * @public
 		 */
-		isExpanded(sPredicate) {
+		isExpanded(sPredicate, iDistance = 0) {
 			const vLevels = this.mPredicate2ExpandInfo[sPredicate]?.levels;
-			return vLevels > 0 || vLevels === null;
+			if (vLevels !== undefined) {
+				return vLevels > iDistance || vLevels === null; // sufficiently expanded?
+			}
+
+			const sParentPredicate = this.mPredicate2OutOfPlace[sPredicate]?.parentPredicate;
+			if (sParentPredicate) { // OOP w/o own expand info, ask the parent
+				return this.isExpanded(sParentPredicate, iDistance + 1);
+			}
+
+			return undefined; // missing expand info: depends on "Levels" parameter
 		}
 
 		/**

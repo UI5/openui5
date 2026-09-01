@@ -150,7 +150,8 @@ sap.ui.define([
 				return this._oPopup;
 			}
 
-			this._oPopup = new Popup(this, /*bModal*/ false, /*bShadow*/ false, /*bAutoClose*/ false);
+			this._oPopup = new Popup(this, /*bModal*/ false, /*bShadow*/ false, /*bAutoClose*/ true);
+			this._oPopup.setFollowOf(Popup.CLOSE_ON_SCROLL);
 
 			// Resolve placement from the *rendered* DOM. The Popup renders the
 			// tooltip content during open() and then calls _applyPosition; at

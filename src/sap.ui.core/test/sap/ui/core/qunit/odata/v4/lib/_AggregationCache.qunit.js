@@ -8645,36 +8645,41 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("moveOutOfPlaceNodes: parent w/o rank", function (assert) {
-		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
-			hierarchyQualifier : "X"
-		});
-		const oOut = {"@$ui5.node.level" : 23, Name : "Out"};
-		const oOutChild = {Name : "Out_Child"};
-		// Note: iParentIndex === 0, almost -1 ;-)
-		oCache.aElements = [oOut, "~foo~", "~bar~", "~baz~", oOutChild];
-		oCache.aElements.$byPredicate = {
-			"~predicateOut~" : oOut,
-			"~predicateOutChild~" : oOutChild
-		};
-		this.mock(oCache).expects("findIndex").never();
-		this.mock(oCache.oTreeState).expects("stillOutOfPlace")
-			.withExactArgs(sinon.match.same(oOutChild), "~predicateOutChild~");
-		this.mock(oCache).expects("collapse").never();
-		this.mock(oCache.oTreeState).expects("isExpanded").withExactArgs("~predicateOut~")
-			.returns("~isExpanded~");
-		this.mock(oCache).expects("expand").never();
+	[undefined, true].forEach((bExpanded) => {
+		const sTitle = "moveOutOfPlaceNodes: parent w/o rank, isExpanded=" + bExpanded;
 
-		// code under test
-		oCache.moveOutOfPlaceNodes(["~predicateOutChild~"], "~predicateOut~");
+		QUnit.test(sTitle, function (assert) {
+			const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+				expandTo : 24,
+				hierarchyQualifier : "X"
+			});
+			const oOut = {"@$ui5.node.level" : 23, Name : "Out"}; // Note: *inside* top pyramid
+			const oOutChild = {Name : "Out_Child"};
+			// Note: iParentIndex === 0, almost -1 ;-)
+			oCache.aElements = [oOut, "~foo~", "~bar~", "~baz~", oOutChild];
+			oCache.aElements.$byPredicate = {
+				"~predicateOut~" : oOut,
+				"~predicateOutChild~" : oOutChild
+			};
+			this.mock(oCache).expects("findIndex").never();
+			this.mock(oCache.oTreeState).expects("stillOutOfPlace")
+				.withExactArgs(sinon.match.same(oOutChild), "~predicateOutChild~");
+			this.mock(oCache).expects("collapse").never();
+			this.mock(oCache.oTreeState).expects("isExpanded").withExactArgs("~predicateOut~")
+				.returns(bExpanded);
+			this.mock(oCache).expects("expand").never();
 
-		assert.deepEqual(oCache.aElements, [oOut, oOutChild, "~foo~", "~bar~", "~baz~"]);
-		assert.deepEqual(oOut, {
-			"@$ui5.node.isExpanded" : "~isExpanded~",
-			"@$ui5.node.level" : 23,
-			Name : "Out"
+			// code under test
+			oCache.moveOutOfPlaceNodes(["~predicateOutChild~"], "~predicateOut~");
+
+			assert.deepEqual(oCache.aElements, [oOut, oOutChild, "~foo~", "~bar~", "~baz~"]);
+			assert.deepEqual(oOut, {
+				"@$ui5.node.isExpanded" : true,
+				"@$ui5.node.level" : 23,
+				Name : "Out"
+			});
+			assert.deepEqual(oOutChild, {"@$ui5.node.level" : 24, Name : "Out_Child"});
 		});
-		assert.deepEqual(oOutChild, {"@$ui5.node.level" : 24, Name : "Out_Child"});
 	});
 
 	//*********************************************************************************************
@@ -8724,10 +8729,13 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	[false, true].forEach((bAlreadyCollapsed) => {
-		const sTitle = "moveOutOfPlaceNodes: parent is collapsed, already=" + bAlreadyCollapsed;
+		[22, 23, 24].forEach((iExpandTo) => {
+			const sTitle = "moveOutOfPlaceNodes: parent is collapsed, already=" + bAlreadyCollapsed
+				+ ", expandTo : " + iExpandTo;
 
 		QUnit.test(sTitle, function (assert) {
 			const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+				expandTo : iExpandTo,
 				hierarchyQualifier : "X"
 			});
 			const oOut = bAlreadyCollapsed
@@ -8748,7 +8756,10 @@ sap.ui.define([
 				.withExactArgs(sinon.match.same(oOutChild), "~predicateOutChild~");
 			this.mock(oCache).expects("collapse").withExactArgs("~predicateOutChild~", {});
 			this.mock(oCache.oTreeState).expects("isExpanded").exactly(bAlreadyCollapsed ? 0 : 1)
-				.withExactArgs("~predicateOut~").returns(false);
+				.withExactArgs("~predicateOut~")
+				.returns(iExpandTo > 23
+					? /*inside top pyramid, but explicitly collapsed*/false
+					: /*unknown, but implicitly collapsed because not *inside* top pyramid*/undefined);
 			this.mock(oCache).expects("expand").never();
 
 			// code under test
@@ -8759,6 +8770,7 @@ sap.ui.define([
 				{"~predicateOut~" : oOut, "~predicateOutChild~" : oOutChild});
 			assert.deepEqual(oOut,
 				{"@$ui5.node.isExpanded" : false, "@$ui5.node.level" : 23, Name : "Out"});
+		});
 		});
 	});
 

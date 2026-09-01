@@ -346,7 +346,7 @@ sap.ui.define([
 				},
 				layer: Layer.CUSTOMER,
 				testName: "only higher layer changes in CUSTOMER layer",
-				expectedMessageKey: "MSG_PERSONALIZATION_OR_PUBLIC_VIEWS_EXISTS"
+				expectedMessageKey: "MSG_PERSONALIZATION_OR_PUBLIC_OR_MISSING_VIEWS_EXISTS"
 			},
 			{
 				oReloadInfo: {
@@ -386,8 +386,17 @@ sap.ui.define([
 					hasRemovedNonFavoriteVariants: true
 				},
 				layer: Layer.CUSTOMER,
-				testName: "only removed non-favorite variants",
-				expectedMessageKey: "MSG_VIEWS_NOT_FULLY_LOADED"
+				testName: "only removed non-favorite variants (incomplete lazy-loaded data)",
+				expectedMessageKey: "MSG_PERSONALIZATION_OR_PUBLIC_OR_MISSING_VIEWS_EXISTS"
+			},
+			{
+				oReloadInfo: {
+					hasRemovedNonFavoriteVariants: true,
+					hasHigherLayerChanges: true
+				},
+				layer: Layer.CUSTOMER,
+				testName: "removed non-favorite variants and higher layer changes (full data) yield the same message",
+				expectedMessageKey: "MSG_PERSONALIZATION_OR_PUBLIC_OR_MISSING_VIEWS_EXISTS"
 			}
 		].forEach(function(oTestInfo) {
 			QUnit.test(oTestInfo.testName, async function(assert) {
