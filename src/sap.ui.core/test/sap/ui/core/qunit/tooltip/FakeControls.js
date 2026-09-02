@@ -33,6 +33,33 @@ sap.ui.define([
 		}
 	});
 
+	// Host that mirrors sap.m.Title: a selectable host <div> whose text lives in a
+	// nested selectable <span>. Both carry .sapUiSelectable, so a suppress-selection
+	// rule must reach the host AND the nested span. The nested span is exposed at
+	// #<id>-inner for computed-style checks.
+	const SelectableTextHost = Control.extend("test.tooltip.SelectableTextHost", {
+		metadata: {
+			properties: {
+				text: { type: "string", defaultValue: "some text" }
+			}
+		},
+		renderer: {
+			apiVersion: 2,
+			render: function (oRm, oControl) {
+				oRm.openStart("div", oControl);
+				oRm.attr("tabindex", "0");
+				oRm.class("sapUiSelectable");
+				oRm.openEnd();
+				oRm.openStart("span", oControl.getId() + "-inner");
+				oRm.class("sapUiSelectable");
+				oRm.openEnd();
+				oRm.text(oControl.getText());
+				oRm.close("span");
+				oRm.close("div");
+			}
+		}
+	});
+
 	// Host with two nested focusable spans, ids <id>-a and <id>-b.
 	const TwoTargetHost = Control.extend("test.tooltip.TwoTargetHost", {
 		renderer: {
@@ -104,5 +131,5 @@ sap.ui.define([
 		}
 	});
 
-	return { PlainHost, FocusableHost, TwoTargetHost, MultiTargetEnablementHost };
+	return { PlainHost, FocusableHost, SelectableTextHost, TwoTargetHost, MultiTargetEnablementHost };
 });
