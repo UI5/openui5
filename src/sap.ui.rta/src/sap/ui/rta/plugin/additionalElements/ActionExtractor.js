@@ -181,10 +181,19 @@ sap.ui.define([
 			});
 			const bAllRequiredLibrariesLoaded = await loadRequiredLibraries(mWriteDelegateInfo?.requiredLibraries);
 			if (mReadDelegateInfo?.instance && mWriteDelegateInfo?.controlType && bAllRequiredLibrariesLoaded) {
-				mAction.element = oCheckElement;
-				mAction.delegateInfo = mReadDelegateInfo;
-				mAction.delegateInfo.requiredLibraries = mWriteDelegateInfo.requiredLibraries; // required for addLibrary command
-				aValidActions.push(mAction);
+				// The action data returned by the designtime metadata can be a shared reference
+				// (e.g. when the "add.delegate" action is defined as a plain object instead of a function).
+				// As several overlays are evaluated in parallel, mutating the action in place would allow
+				// concurrent evaluations to overwrite each other's element and delegate information.
+				// Therefore a dedicated copy is created for each valid action.
+				aValidActions.push({
+					...mAction,
+					element: oCheckElement,
+					delegateInfo: {
+						...mReadDelegateInfo,
+						requiredLibraries: mWriteDelegateInfo.requiredLibraries // required for addLibrary command
+					}
+				});
 			}
 			return aValidActions;
 		}, Promise.resolve([]));
