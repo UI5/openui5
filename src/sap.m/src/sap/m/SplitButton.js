@@ -212,6 +212,8 @@ function(
 					text: this.getText(),
 					press: this._handleAction.bind(this)
 				}).addStyleClass('sapMSBText');
+				// @todo - remove when enhanced tooltip is implemented
+				oCtrl._disableTooltipEnablement();
 
 				this.setAggregation("_textButton", oCtrl);
 			}
@@ -230,6 +232,8 @@ function(
 					tooltip: Library.getResourceBundleFor("sap.m").getText("SPLIT_BUTTON_ARROW_TOOLTIP"),
 					ariaHasPopup: coreLibrary.aria.HasPopup.Menu
 				}).addStyleClass("sapMSBArrow");
+				// @todo - remove when enhanced tooltip is implemented
+				oCtrl._disableTooltipEnablement();
 				this.setAggregation("_arrowButton", oCtrl);
 			}
 

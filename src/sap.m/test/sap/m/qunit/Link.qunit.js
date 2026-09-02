@@ -1123,4 +1123,73 @@ sap.ui.define([
 		assert.strictEqual(this.oLink.getProperty("endIcon"), "", "endIcon property is cleared after setting undefined");
 		assert.notOk(oLinkDomRef.querySelector(".sapUiIcon.sapMLnkEndIcon"), "End Icon is not rendered after setting undefined");
 	});
+	QUnit.module("Tooltip on touch device", {
+		afterEach: function() {
+			if (this.oDeviceStub) {
+				this.oDeviceStub.restore();
+			}
+		}
+	});
+
+	QUnit.test("Enhanced tooltip accessibility content is rendered on touch device", async function(assert) {
+		// Prepare
+		var sInvisibleId = "my-invisible-tooltip",
+			bRenderCalled = false,
+			oLink = new Link({ text: "Link", tooltip: "Helpful text" });
+
+		oLink._oTooltipEnablement = {
+			getInvisibleTooltipId: function() { return sInvisibleId; },
+			renderInvisibleTooltip: function() { bRenderCalled = true; },
+			destroy: function() {}
+		};
+
+		this.oDeviceStub = this.stub(Device, "system").value({
+			desktop: false, tablet: false, phone: true
+		});
+
+		oLink.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Assert
+		assert.ok(bRenderCalled, "renderInvisibleTooltip is called on touch device");
+		var sDescribedBy = oLink.getDomRef().getAttribute("aria-describedby") || "";
+		assert.ok(sDescribedBy.includes(sInvisibleId),
+			"Enhanced tooltip invisible ID is referenced in aria-describedby on touch device");
+		assert.notOk(oLink.getDomRef().getAttribute("title"),
+			"Native title attribute is not rendered when enhanced tooltip is active on touch device");
+
+		// Clean
+		oLink.destroy();
+	});
+
+	QUnit.test("Enhanced tooltip is rendered on non-touch device", async function(assert) {
+		// Prepare
+		var sInvisibleId = "my-invisible-tooltip",
+			bRenderCalled = false,
+			oLink = new Link({ text: "Link", tooltip: "Helpful text" });
+
+		oLink._oTooltipEnablement = {
+			getInvisibleTooltipId: function() { return sInvisibleId; },
+			renderInvisibleTooltip: function() { bRenderCalled = true; },
+			destroy: function() {}
+		};
+
+		this.oDeviceStub = this.stub(Device, "system").value({
+			desktop: true, tablet: false, phone: false
+		});
+
+		oLink.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Assert
+		assert.ok(bRenderCalled, "renderInvisibleTooltip is called on non-touch device");
+		var sDescribedBy = oLink.getDomRef().getAttribute("aria-describedby") || "";
+		assert.ok(sDescribedBy.includes(sInvisibleId),
+			"Enhanced tooltip invisible ID is in aria-describedby on non-touch device");
+		assert.notOk(oLink.getDomRef().getAttribute("title"),
+			"Native title attribute is not rendered when enhanced tooltip is active");
+
+		// Clean
+		oLink.destroy();
+	});
 });

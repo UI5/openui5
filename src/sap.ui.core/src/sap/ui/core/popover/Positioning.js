@@ -78,15 +78,15 @@ sap.ui.define([
 	 * @private
 	 */
 	const computeSpaces = (o) => {
-		const { openerRect, margins, viewport } = o;
+		const { openerRect, margin, viewport } = o;
 		const iOffsetX = o.offsetX ?? 0;
 		const iOffsetY = o.offsetY ?? 0;
 
 		return {
-			top: openerRect.top - getTopBound(o.withinAreaRef) - margins.top + iOffsetY,
-			bottom: getBottomBound(o.withinAreaRef) - openerRect.bottom - margins.bottom - iOffsetY,
-			left: openerRect.left - margins.left + iOffsetX,
-			right: viewport.width - openerRect.right - margins.right - iOffsetX
+			top: openerRect.top - getTopBound(o.withinAreaRef) - margin.top + iOffsetY,
+			bottom: getBottomBound(o.withinAreaRef) - openerRect.bottom - margin.bottom - iOffsetY,
+			left: openerRect.left - margin.left + iOffsetX,
+			right: viewport.width - openerRect.right - margin.right - iOffsetX
 		};
 	};
 
@@ -173,7 +173,7 @@ sap.ui.define([
 		const s = computeSpaces(o);
 		const { width: iW, height: iH } = o.popoverSize;
 		const { width: iVpW, height: iVpH } = o.viewport;
-		const { top: iMgT, right: iMgR, bottom: iMgB, left: iMgL } = o.margins;
+		const { top: iMgT, right: iMgR, bottom: iMgB, left: iMgL } = o.margin;
 		const bRtl = Localization.getRTL();
 
 		const fPopoverSize = iH * iW;
@@ -369,10 +369,10 @@ sap.ui.define([
 
 		// Copy so the caller's object is not mutated.
 		const oMargins = {
-			top: o.margins.top,
-			right: o.margins.right,
-			bottom: o.margins.bottom,
-			left: o.margins.left
+			top: o.foldedMargin.top,
+			right: o.foldedMargin.right,
+			bottom: o.foldedMargin.bottom,
+			left: o.foldedMargin.left
 		};
 
 		switch (o.side) {
@@ -422,7 +422,7 @@ sap.ui.define([
 				shadowSize: o.shadowSize,
 				offsetX: o.offsetX,
 				offsetY: o.offsetY,
-				margins: oMargins
+				foldedMargin: oMargins
 			});
 		}
 
@@ -458,7 +458,7 @@ sap.ui.define([
 	 *   The popover DOM element as currently rendered;
 	 * @param {Element|Window} oOptions.withinAreaRef
 	 *   The within-area.
-	 * @param {{top: number,right: number,bottom: number,left: number}} oOptions.margins
+	 * @param {{top: number,right: number,bottom: number,left: number}} oOptions.margin
 	 *   Screen-edge margins that must be preserved.
 	 * @param {number} oOptions.arrowSize
 	 *   Distance in px between opener and popover reserved for the arrow triangle.

@@ -277,7 +277,7 @@ sap.ui.define([
 				openerRef: oHostElement,
 				popoverRef: this.getDomRef(),
 				withinAreaRef: Popup.getWithinAreaDomRef(),
-				margins: {
+				margin: {
 					top: EDGE_MARGIN_PX,
 					right: EDGE_MARGIN_PX,
 					bottom: EDGE_MARGIN_PX,
