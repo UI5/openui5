@@ -2260,6 +2260,14 @@ sap.ui.define([
 				sinon: false,
 				group: "Designtime"
 			},
+			"designtime/ObjectHeader": {
+				title: "QUnit Page for sap.m.ObjectHeader design time and rta enabling",
+				ui5: {
+					libs: ["sap.m","sap.ui.rta"]
+				},
+				sinon: false,
+				group: "Designtime"
+			},
 			"designtime/ObjectListItem": {
 				title: "QUnit Page for sap.m.ObjectListItem design time and rta enabling",
 				ui5: {

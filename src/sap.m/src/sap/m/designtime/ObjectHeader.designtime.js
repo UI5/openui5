@@ -37,7 +37,13 @@ sap.ui.define([],
 
 					return null;
 				},
-				propagateRelevantContainer: true
+				// The ObjectHeader should only propagate itself as the relevant container for the tab strip of an embedded IconTabBar
+				// to enable the move functionality.
+				// Otherwise there will be conflicts with inner controls also using this mechanism where the ObjectHeader would incorrectly
+				// be the relevant container for inner controls (e.g. a Form inside, which uses this mechanism to enable addViaDelegate)
+				propagateRelevantContainer: function isIconTabBarStructure(oElement) {
+					return oElement.isA("sap.m.IconTabBar") || oElement.isA("sap.m.IconTabFilter");
+				}
 			}
 		},
 		templates: {
