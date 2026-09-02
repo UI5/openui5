@@ -302,6 +302,46 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("getChangeVisualizationInfo", {
+		beforeEach: async function() {
+			this.oChangeHandler = AddIFrameObjectPageLayout;
+			this.oSection = new ObjectPageSection();
+			this.oObjectPageLayout = new ObjectPageLayout({
+				sections: [this.oSection]
+			});
+			this.oObjectPageLayout.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oObjectPageLayout.destroy();
+		}
+	}, function() {
+		function createChange(oContent) {
+			return {
+				getContent: function() { return oContent; }
+			};
+		}
+
+		QUnit.test("when the change carries a URL", function(assert) {
+			const sUrl = "embed/content?category={Product/Category}";
+			const oChange = createChange({
+				selector: { id: this.oSection.getId(), idIsLocal: false },
+				url: sUrl
+			});
+			const mVizInfo = this.oChangeHandler.getChangeVisualizationInfo(oChange, {});
+			assert.deepEqual(
+				mVizInfo.affectedControls,
+				[{ id: this.oSection.getId(), idIsLocal: false }],
+				"then the affected control is the change selector"
+			);
+			assert.deepEqual(
+				mVizInfo.descriptionPayload,
+				{ url: { raw: sUrl } },
+				"then the URL is surfaced wrapped as { raw } so it is not resolved as a binding"
+			);
+		});
+	});
+
 	QUnit.done(function() {
 		jQuery("#qunit-fixture").hide();
 	});

@@ -7,13 +7,15 @@ sap.ui.define([
 	"sap/ui/rta/util/changeVisualization/commands/MoveVisualization",
 	"sap/ui/rta/util/changeVisualization/commands/CombineVisualization",
 	"sap/ui/rta/util/changeVisualization/commands/SplitVisualization",
-	"sap/ui/rta/util/changeVisualization/commands/CreateContainerVisualization"
+	"sap/ui/rta/util/changeVisualization/commands/CreateContainerVisualization",
+	"sap/ui/rta/util/changeVisualization/commands/AddIFrameVisualization"
 ], function(
 	RenameVisualization,
 	MoveVisualization,
 	CombineVisualization,
 	SplitVisualization,
-	CreateContainerVisualization
+	CreateContainerVisualization,
+	AddIFrameVisualization
 ) {
 	"use strict";
 
@@ -22,7 +24,8 @@ sap.ui.define([
 		move: MoveVisualization,
 		combine: CombineVisualization,
 		split: SplitVisualization,
-		createContainer: CreateContainerVisualization
+		createContainer: CreateContainerVisualization,
+		addIFrame: AddIFrameVisualization
 	};
 
 	return function(mIndicatorInformation) {
