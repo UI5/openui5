@@ -1467,14 +1467,15 @@ sap.ui.define([
 			if (oParent) {
 				oPayload["EMPLOYEE_2_MANAGER@odata.bind"] = oParent.getPath().slice(1);
 			}
-			this.expectRequest("POST EMPLOYEES", {
+			this.expectRequest("#0 POST EMPLOYEES", {
 					payload : oPayload
 				}, {
 					ID : sId,
 					Name : sName
 				});
 			if (sRankUrl) {
-				this.expectRequest(sRankUrl + `&$filter=ID eq '${sId}'&$select=LimitedRank`, {
+				this.expectRequest("#A " + sRankUrl
+						+ `&$filter=ID eq '${sId}'&$select=LimitedRank`, {
 						value : iRank === undefined ? [] : [{LimitedRank : `${iRank}`}]
 					});
 			}
@@ -2597,7 +2598,9 @@ sap.ui.define([
 		 * @param {number} [vRequest.batchNo]
 		 *   The number of the ($direct or $batch) request within the test (starting with 1); use a
 		 *   negative number to expect a $direct request; see also <code>sURL</code>; use 0 as a
-		 *   symbolic value for the current batchNo to group multiple requests together
+		 *   symbolic value for the current batchNo to group multiple requests together; use capital
+		 *   letters A, B, C as symbolic values for a relative batchNo, where A denotes the next
+		 *   batchNo after 0 etc. (works only with hash syntax, e.g. "#A ...")
 		 * @param {number} [vRequest.changeSetNo]
 		 *   The number of the change set within $batch (starting with 1)
 		 * @param {string} [vRequest.groupId]
@@ -2668,7 +2671,10 @@ sap.ui.define([
 				const iSpace = vRequest.url.indexOf(" ");
 				const aNumbers = vRequest.url.slice(1, iSpace).split(".");
 				if (aNumbers[0]) {
-					vRequest.batchNo = parseInt(aNumbers[0]);
+					const iRelative = ".0ABC".indexOf(aNumbers[0]); // Note: "." is impossible here
+					vRequest.batchNo = iRelative > 0
+						? this.iBatchNo + iRelative
+						: parseInt(aNumbers[0]);
 				}
 				if (aNumbers[1]) {
 					vRequest.changeSetNo = parseInt(aNumbers[1]);
@@ -40857,7 +40863,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}, {ID : "Out", Name : "Out"})
 			.expectRequest("#0 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2)
 			.expectRequestIf(iExpandTo > 1,
-				sBaseUrl + "&$filter=ID eq 'Out'&$select=LimitedRank", {
+				"#A " + sBaseUrl + "&$filter=ID eq 'Out'&$select=LimitedRank", {
 				value : [] // filtered out, thus no rank
 			});
 
@@ -40907,7 +40913,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}, {ID : "Child", Name : "Out_Child"})
 			.expectRequest("#0 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2)
 			.expectRequestIf(iExpandTo > 1,
-			sBaseUrl + "&$filter=ID eq 'Child'&$select=LimitedRank", {
+				"#A " + sBaseUrl + "&$filter=ID eq 'Child'&$select=LimitedRank", {
 				value : [] // filtered out, thus no rank
 			});
 
@@ -40948,7 +40954,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}, {ID : "Grand", Name : "Out_Grand_Child"})
 			.expectRequest("#0 EMPLOYEES/$count?$filter=not startswith(Name, 'Out')", 2)
 			.expectRequestIf(iExpandTo > 1,
-				sBaseUrl + "&$filter=ID eq 'Grand'&$select=LimitedRank", {
+				"#A " + sBaseUrl + "&$filter=ID eq 'Grand'&$select=LimitedRank", {
 				value : [] // filtered out, thus no rank
 			});
 
@@ -41436,8 +41442,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		this.expectEvents(assert, "sap.ui.model.odata.v4.ODataListBinding: /EMPLOYEES", [
 				[, "change", {reason : "change"}]
 			])
-			.expectRequest("PATCH EMPLOYEES('0')", {
-				batchNo : bMoveCollapsed ? 2 : 3,
+			.expectRequest("#0 PATCH EMPLOYEES('0')", {
 				headers : {
 					Prefer : "return=minimal"
 				},
@@ -41445,9 +41450,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('9')"
 				}
 			}, oNO_CONTENT)
-			.expectRequest(sBaseUrl + "&$filter=ID eq '0'&$select=LimitedRank", {
-				batchNo : bMoveCollapsed ? 2 : 3
-			}, {
+			.expectRequest("#0 " + sBaseUrl + "&$filter=ID eq '0'&$select=LimitedRank", {
 				value : [{
 					LimitedRank : "1" // Edm.Int64
 				}]
@@ -41536,8 +41539,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		this.expectEvents(assert, "sap.ui.model.odata.v4.ODataListBinding: /EMPLOYEES", [
 				[, "change", {reason : "change"}]
 			])
-			.expectRequest("PATCH EMPLOYEES('2')", {
-				batchNo : bMoveCollapsed ? 4 : 5,
+			.expectRequest("#0 PATCH EMPLOYEES('2')", {
 				headers : {
 					Prefer : "return=minimal"
 				},
@@ -41545,9 +41547,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('1')"
 				}
 			}, oNO_CONTENT)
-			.expectRequest(sBaseUrl + "&$filter=ID eq '2'&$select=LimitedRank", {
-				batchNo : bMoveCollapsed ? 4 : 5
-			}, {
+			.expectRequest("#0 " + sBaseUrl + "&$filter=ID eq '2'&$select=LimitedRank", {
 				value : [{
 					LimitedRank : "4" // Edm.Int64
 				}]
@@ -41604,8 +41604,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		this.expectEvents(assert, "sap.ui.model.odata.v4.ODataListBinding: /EMPLOYEES", [
 				[, "change", {reason : "change"}]
 			])
-			.expectRequest("PATCH EMPLOYEES('0')", {
-				batchNo : bMoveCollapsed ? 5 : 6,
+			.expectRequest("#0 PATCH EMPLOYEES('0')", {
 				headers : {
 					Prefer : "return=minimal"
 				},
@@ -41613,9 +41612,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('9')"
 				}
 			}, oNO_CONTENT)
-			.expectRequest(sBaseUrl + "&$filter=ID eq '0'&$select=LimitedRank", {
-				batchNo : bMoveCollapsed ? 5 : 6
-			}, {
+			.expectRequest("#0 " + sBaseUrl + "&$filter=ID eq '0'&$select=LimitedRank", {
 				value : [{
 					LimitedRank : "1" // Edm.Int64
 				}]
@@ -45584,7 +45581,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				}]
 			})
 			.expectRequest("#3 " + sCountUrl, 6)
-			.expectRequest(sUrl + "&$filter=ID eq '6'&$select=LimitedRank",
+			.expectRequest("#4 " + sUrl + "&$filter=ID eq '6'&$select=LimitedRank",
 				{value : [{LimitedRank : "5"}]});
 
 		const oZeta = oBinding.create({Name : "Zeta"}, /*bSkipRefresh*/true);
@@ -45600,7 +45597,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}, {ID : "7", Name : "Eta"})
 			.expectRequest("#5 EMPLOYEES('6')?custom=foo&$select=AGE", {AGE : 42})
 			.expectRequest("#5 " + sCountUrl, 7)
-			.expectRequest(sUrl + "&$filter=ID eq '7'&$select=LimitedRank",
+			.expectRequest("#6 " + sUrl + "&$filter=ID eq '7'&$select=LimitedRank",
 				{value : [{LimitedRank : "6"}]});
 
 		const oEta = oBinding.create({Name : "Eta"}, /*bSkipRefresh*/true);
@@ -45628,7 +45625,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				}
 			}, {ID : "8", Name : "Theta"})
 			.expectRequest("#7 " + sCountUrl, 8)
-			.expectRequest(sUrl + "&$filter=ID eq '8'&$select=LimitedRank",
+			.expectRequest("#8 " + sUrl + "&$filter=ID eq '8'&$select=LimitedRank",
 				{value : [{LimitedRank : "1"}]});
 
 		const oAlpha = oTable.getRows()[0].getBindingContext();
@@ -48449,7 +48446,7 @@ make root = ${bMakeRoot}`;
 				Name : "FilteredOut"
 			})
 			.expectRequest("#2 " + sCountUrl, 3) // filtered out node is not counted
-			.expectRequest(sUrl + "&$filter=ID eq '42'&$select=LimitedRank", {
+			.expectRequest("#3 " + sUrl + "&$filter=ID eq '42'&$select=LimitedRank", {
 				value : [] // filtered out
 			});
 
@@ -48547,7 +48544,7 @@ make root = ${bMakeRoot}`;
 			})
 			.expectRequest("#5 " + sCountUrl, 4)
 			.expectChange("count", "4")
-			.expectRequest(sUrl + "&$filter=ID eq '4'&$select=LimitedRank", {
+			.expectRequest("#6 " + sUrl + "&$filter=ID eq '4'&$select=LimitedRank", {
 				value : [{LimitedRank : "2"}]
 			});
 
@@ -48597,7 +48594,7 @@ make root = ${bMakeRoot}`;
 			})
 			.expectRequest("#7 " + sCountUrl, 5)
 			.expectChange("count", "5")
-			.expectRequest(sUrl + "&$filter=ID eq '5'&$select=LimitedRank", {
+			.expectRequest("#8 " + sUrl + "&$filter=ID eq '5'&$select=LimitedRank", {
 				value : [{LimitedRank : "3"}]
 			});
 
@@ -53368,7 +53365,7 @@ make root = ${bMakeRoot}`;
 					Name : "Gamma"
 				}]
 			})
-			.expectRequest(sExpandedUrl + ")&$filter=ID eq '1.1.1'&$select=LimitedRank", {
+			.expectRequest("#A " + sExpandedUrl + ")&$filter=ID eq '1.1.1'&$select=LimitedRank", {
 				value : [{
 					LimitedRank : "3" // Edm.Int64
 				}]
@@ -72473,18 +72470,16 @@ make root = ${bMakeRoot}`;
 				that.waitForChanges(assert, "(4)")
 			]);
 		}).then(function () {
-			var iBatch = oFixture.bFilter ? 4 : 3;
-
 			that.checkMoreButton(assert, oFixture.bFilter ? "[3/44]" : "[3/104]");
 
 			if (!oFixture.bDeferred) {
-				that.expectRequest("#" + iBatch + " DELETE SalesOrderList('1')", {
+				that.expectRequest("#0 DELETE SalesOrderList('1')", {
 						groupId : "$auto.foo"
 					});
 			}
 
 			if (oFixture.bFilter) {
-				that.expectRequest("#" + iBatch + " SalesOrderList?$count=true"
+				that.expectRequest("#0 SalesOrderList?$count=true"
 						+ "&$filter=(GrossAmount gt 1000) and not (SalesOrderID eq '1'"
 							+ " or SalesOrderID eq 'new')"
 						+ "&$top=0", {
@@ -74131,13 +74126,12 @@ make root = ${bMakeRoot}`;
 	// resolved binding.
 	// SNOW: DINC0637489
 // list, page: the step number in which they are initialized;
-// patchNo: the batchNo of the $batch with the PATCH and the side effect request
 [
-	{list : 1, page : 2, patchNo : 5, title : "(1) first list, then object page"},
+	{list : 1, page : 2, title : "(1) first list, then object page"},
 	// Note: #expectRequest out-of-order here!
-	{list : 1, page : 1, patchNo : 4, title : "(2) list and object page in the same batch"},
-	{list : 2, page : 1, patchNo : 5, title : "(3) first object page, then list, then tests"},
-	{list : 7, page : 1, patchNo : 4, title : "(4) first object page, then tests, then list"}
+	{list : 1, page : 1, title : "(2) list and object page in the same batch"},
+	{list : 2, page : 1, title : "(3) first object page, then list, then tests"},
+	{list : 7, page : 1, title : "(4) first object page, then tests, then list"}
 ].forEach(function (oFixture) {
 	QUnit.test("getKeepAliveContext: " + oFixture.title, function (assert) {
 		var oActiveContext,
@@ -74178,10 +74172,9 @@ make root = ${bMakeRoot}`;
 
 		/*
 		 * Resolves the list report and expects the corresponding request and changes.
-		 * @param {number} iBatchNo - The number of the $batch for the request
 		 */
-		function initializeList(iBatchNo) {
-			that.expectRequest("#" + iBatchNo + " Artists"
+		function initializeList() {
+			that.expectRequest("#0 Artists"
 					+ "?$select=ArtistID,IsActiveEntity,Name,defaultChannel,sendsAutographs"
 					+ "&$skip=0&$top=100", {
 					value : [{
@@ -74205,11 +74198,10 @@ make root = ${bMakeRoot}`;
 		/*
 		 * Gets a context for the active entity, binds the object page to it and expects the
 		 * corresponding requests and changes.
-		 * @param {number} iBatchNo - The number of the $batch for the entity request
 		 * @param {boolean} bLate - Whether it is late, i.e. the list data is already there
 		 * @returns {Promise} - The promise of the requestProperty for "HasDraftEntity"
 		 */
-		function initializeObjectPage(iBatchNo, bLate) {
+		function initializeObjectPage(bLate) {
 			const oLateResponse = {
 				"@odata.etag" : "etag.active1",
 				HasDraftEntity : false,
@@ -74229,17 +74221,16 @@ make root = ${bMakeRoot}`;
 			};
 
 			if (bLate) {
-				that.expectRequest("#" + iBatchNo + " Artists(ArtistID='A1',IsActiveEntity=true)"
+				that.expectRequest("#0 Artists(ArtistID='A1',IsActiveEntity=true)"
 						+ "?$select=HasDraftEntity,Messages,lastUsedChannel",
 						oLateResponse);
 			} else { // if not late, the list's properties are also part of the request
-				that.expectRequest("#" + iBatchNo + " Artists(ArtistID='A1',IsActiveEntity=true)"
+				that.expectRequest("#0 Artists(ArtistID='A1',IsActiveEntity=true)"
 						+ "?$select=ArtistID,HasDraftEntity,IsActiveEntity,Messages,Name"
 						+ ",defaultChannel,lastUsedChannel",
 						oResponse);
 			}
-			that.expectRequest("#" + iBatchNo
-					+ " Artists(ArtistID='A1',IsActiveEntity=true)/_Publication"
+			that.expectRequest("#0 Artists(ArtistID='A1',IsActiveEntity=true)/_Publication"
 					+ "?$select=PublicationID&$skip=0&$top=100",
 					{value : [{PublicationID : "P1"}]}
 				)
@@ -74272,10 +74263,9 @@ make root = ${bMakeRoot}`;
 						{value : [{PublicationID : "P1"}]}
 					);
 
-				// do not observe events and batchNo of these requests (not relevant)
+				// do not observe events of these requests (not relevant)
 				iDataRequestedCount -= 2;
 				iDataReceivedCount -= 2;
-				that.iBatchNo -= 1;
 
 				// code under test (SNOW: DINC0637489)
 				return oActiveContext.requestRefresh();
@@ -74303,19 +74293,19 @@ make root = ${bMakeRoot}`;
 			oObjectPage = that.oView.byId("objectPage");
 
 			if (oFixture.list === 1) {
-				initializeList(1);
+				initializeList();
 			}
 			return Promise.all([
-				oFixture.page === 1 && initializeObjectPage(1, false),
+				oFixture.page === 1 && initializeObjectPage(false),
 				that.waitForChanges(assert, "(1) initialization")
 			]);
 		}).then(function () {
 			checkDataEvents();
 			if (oFixture.list === 2) {
-				initializeList(2);
+				initializeList();
 			}
 			return Promise.all([
-				oFixture.page === 2 && initializeObjectPage(2, true),
+				oFixture.page === 2 && initializeObjectPage(true),
 				that.waitForChanges(assert, "(2) initialization")
 			]);
 		}).then(function () {
@@ -74378,8 +74368,7 @@ make root = ${bMakeRoot}`;
 			return that.checkValueState(assert, "defaultChannel", "Information", "Draft message");
 		}).then(function () {
 			that.expectChange("defaultChannel", "Channel 3")
-				.expectRequest("PATCH Artists(ArtistID='A1',IsActiveEntity=false)", {
-					batchNo : oFixture.patchNo,
+				.expectRequest("#0 PATCH Artists(ArtistID='A1',IsActiveEntity=false)", {
 					headers : {
 						"If-Match" : "etag.draft1",
 						Prefer : "return=minimal"
@@ -74388,10 +74377,8 @@ make root = ${bMakeRoot}`;
 						defaultChannel : "Channel 3"
 					}
 				}, oNO_CONTENT) // no need to update the ETag when requesting side effects
-				.expectRequest("Artists(ArtistID='A1',IsActiveEntity=false)"
+				.expectRequest("#0 Artists(ArtistID='A1',IsActiveEntity=false)"
 					+ "?$select=Messages,defaultChannel", {
-					batchNo : oFixture.patchNo
-				}, {
 					"@odata.etag" : "etag.draft2",
 					Messages : [{
 						message : "Updated message",
@@ -74449,7 +74436,7 @@ make root = ${bMakeRoot}`;
 				oActiveContext = oModel.getKeepAliveContext(
 					"/Artists(ArtistID='A1',IsActiveEntity=true)", true,
 					{$$patchWithoutSideEffects : true});
-				initializeList(6);
+				initializeList();
 			}
 
 			return that.waitForChanges(assert, "(7) resolve list if not done yet");
