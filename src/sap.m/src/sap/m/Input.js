@@ -403,6 +403,7 @@ function(
 				/**
 				 * The suggestionColumns and suggestionRows are for tabular input suggestions. This aggregation allows for binding the table cells.
 				 * The items of this aggregation are to be bound directly or to set in the suggest event method.
+				 * <b>Note:</b> Applications should only use <code>sap.m.Label</code> or <code>sap.m.Text</code> controls as rows content in order to preserve the intended functionality. Usage of other controls would require applications to use <code>setRowResultFunction</code> to provide a custom text extractor.
 				 * <b>Note:</b> If <code>suggestionItems</code> & <code>suggestionRows</code> are set in parallel, the last aggeragtion to come would overwrite the previous ones.
 				 * @since 1.21.1
 				 */
