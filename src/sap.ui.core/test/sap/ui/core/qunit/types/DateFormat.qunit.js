@@ -2851,8 +2851,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Date relative: format and parse", function (assert) {
-		var that = this,
-			aStyles = [undefined, 'wide', 'short', 'narrow'],
+		var aStyles = [undefined, 'wide', 'short', 'narrow'],
 			aTestData = [{
 				scale: "auto",
 				data: [
@@ -2880,10 +2879,10 @@ sap.ui.define([
 						description: "Today - 1 Month --> 1 month ago" },
 					{ unit: "month", diff: 13, results: ["in 1 year", "in 1 year", "in 1 yr.", "in 1y"],
 						description: "Today + 13 Months --> in 1 year",
-						parseDiff: (31 * 24 + that.dst) * 60 * 60 * 1000 },
+						parseDiff: (31 * 24 + this.dst) * 60 * 60 * 1000 },
 					{ unit: "month", diff: 26, results: ["in 2 years", "in 2 years", "in 2 yr.", "in 2y"],
 						description: "Today + 26 Months --> in 2 years",
-						parseDiff: (61 * 24 + that.dst) * 60 * 60 * 1000 },
+						parseDiff: (61 * 24 + this.dst) * 60 * 60 * 1000 },
 					{ unit: "day", diff: 90, results: ["in 1 quarter", "in 1 quarter", "in 1 qtr.", "in 1q"],
 						description: "Today + 90 Days", parseOnly: true, parseDiff: -2 * 24 * 60 * 60 * 1000 },
 					{ unit: "hour", diff: 24, results: ["in 24 hours", "in 24 hours", "in 24 hr.", "in 24h"],
@@ -2923,7 +2922,6 @@ sap.ui.define([
 
 	QUnit.test("DateTime relative: format and parse", function (assert) {
 		var aStyles = [undefined, 'wide', 'short', 'narrow'],
-			that = this,
 			aTestData = [{
 				scale: "auto",
 				data: [
@@ -2973,10 +2971,10 @@ sap.ui.define([
 						description: "Today - 1 Month --> 1 month" },
 					{ unit: "month", diff: 13, results: ["in 1 year", "in 1 year", "in 1 yr.", "in 1y"],
 						description: "Today + 13 Months --> in 1 year",
-						parseDiff: (31 * 24 + that.dst) * 60 * 60 * 1000 },
+						parseDiff: (31 * 24 + this.dst) * 60 * 60 * 1000 },
 					{ unit: "month", diff: 26, results: ["in 2 years", "in 2 years", "in 2 yr.", "in 2y"],
 						description: "Today + 26 Months --> in 2 years",
-						parseDiff: (61 * 24 + that.dst) * 60 * 60 * 1000 },
+						parseDiff: (61 * 24 + this.dst) * 60 * 60 * 1000 },
 					{ unit: "year", diff: 1, results: ["in 1 year", "in 1 year", "in 1 yr.", "in 1y"],
 						description: "Today + 1 year --> in 1 year" }
 				]
@@ -4779,11 +4777,10 @@ sap.ui.define([
 				"d": {type: "day", symbol: "d", digits: 2},
 				"M": {type: "month", symbol: "M", digits: 2}
 			},
-			oFormat = DateFormat.getDateTimeInstance({pattern: oFixture.pattern}),
-			that = this;
+			oFormat = DateFormat.getDateTimeInstance({pattern: oFixture.pattern});
 
-		oFixture.expected.forEach(function (oExpected) {
-			that.mock(oFormat.oSymbols[oExpected.symbol])
+		oFixture.expected.forEach((oExpected) => {
+			this.mock(oFormat.oSymbols[oExpected.symbol])
 				.expects("parse")
 				.withExactArgs(oExpected.subValue,
 					mExpectedParts[oExpected.symbol],
@@ -5281,8 +5278,6 @@ sap.ui.define([
 
 	//*****************************************************************************************************************
 	QUnit.test("getSampleValue DateTimeWithTimezone: w/ oMin, oMax", function (assert) {
-		this.stub(Localization, "getTimezone").returns("Europe/Berlin");
-
 		// code under test
 		assert.deepEqual(
 			DateFormat.getDateTimeWithTimezoneInstance().getSampleValue(getDate("2040-01-01"), getDate("2040-06-15")),
