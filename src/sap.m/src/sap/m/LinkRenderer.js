@@ -9,8 +9,9 @@
 	 'sap/ui/core/AccessKeysEnablement',
 	 "sap/ui/core/InvisibleText",
 	 "sap/ui/util/defaultLinkTypes",
-	 './library'
-	], function(Library, Renderer, coreLibrary, AccessKeysEnablement, InvisibleText, defaultLinkTypes, mobileLibrary) {
+	 './library',
+	 "sap/ui/Device"
+	], function(Library, Renderer, coreLibrary, AccessKeysEnablement, InvisibleText, defaultLinkTypes, mobileLibrary, Device) {
  "use strict";
 
  // shortcut for sap.ui.core.TextDirection
@@ -54,11 +55,12 @@
 		 sRel = defaultLinkTypes(oControl.getRel(), oControl.getTarget()),
 		 sHref = oControl.getHref(),
 		 sAccessibleRole = oControl.getAccessibleRole(),
+		 bEnabled = oControl.getEnabled(),
+		 bEnhancedTooltip = !!oControl._oTooltipEnablement && bEnabled,
 		 oAccAttributes =  {
 			 labelledby: bShouldHaveOwnLabelledBy ? {value: oControl.getId(), append: true } : undefined,
 			 haspopup: (sHasPopupType === AriaHasPopup.None) ? null : sHasPopupType.toLowerCase()
 		 },
-		 bEnabled = oControl.getEnabled(),
 		 sTypeSemanticInfo = "",
 		 sText = oControl.getText(),
 		 sAcccessKey = oControl.getProperty("accesskey");
@@ -104,6 +106,14 @@
 	 }
 	 oAccAttributes.describedby = sDescr ? {value: sDescr, append: true} : undefined;
 
+	 var sInvisibleId = bEnhancedTooltip && oControl._oTooltipEnablement.getInvisibleTooltipId();
+	 if (sInvisibleId) {
+		 oAccAttributes.describedby = {
+			 value: oAccAttributes.describedby ? (oAccAttributes.describedby.value + " " + sInvisibleId).trim() : sInvisibleId,
+			 append: true
+		 };
+	 }
+
 	 if (!bEnabled) {
 		 oRm.class("sapMLnkDsbl");
 		 oRm.attr("aria-disabled", "true");
@@ -118,7 +128,7 @@
 		 oRm.class("sapMLinkContainsEmptyIdicator");
 	 }
 
-	 if (sTooltip) {
+	 if (sTooltip && !bEnhancedTooltip) {
 		 oRm.attr("title", sTooltip);
 	 }
 
@@ -184,6 +194,10 @@
 		 oRm.openEnd();
 		 oRm.text(sTooltip);
 		 oRm.close("span");
+	 }
+
+	 if (bEnhancedTooltip) {
+		 oControl._oTooltipEnablement.renderInvisibleTooltip(oRm);
 	 }
 
 	 oRm.close("a");

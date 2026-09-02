@@ -39,6 +39,7 @@ sap.ui.define([
 	var ShortcutHintsMixin = function(oControl) {
 		this.sControlId = oControl.getId();
 		this._hintConfigs = [];
+		this._bSuppressPopup = false;
 	};
 
 	ShortcutHintsMixin.init = function(oControl) {
@@ -124,6 +125,8 @@ sap.ui.define([
 	ShortcutHintsMixin.prototype._attachToEvents = function() {
 		var oControl;
 
+		// Always attach the delegate so onAfterRendering keeps writing
+		// aria-keyshortcuts. The popup is gated per-handler on _bSuppressPopup.
 		if (!ShortcutHintsMixin.isControlRegistered(this.sControlId)) {
 			oControl = Element.getElementById(this.sControlId);
 			oControl.addEventDelegate(oHintsEventDelegate, this);
@@ -268,6 +271,72 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns the resolved shortcut hint text for the control's primary
+	 * registered hint, or <code>""</code> when none is registered.
+	 *
+	 * @param {sap.ui.core.Control} oControl The control to query.
+	 * @returns {string}
+	 * @private
+	 * @ui5-restricted sap.m
+	 */
+	ShortcutHintsMixin.getRegisteredShortcutText = function(oControl) {
+		var oMixin = oControl && oControl._shortcutHintsMixin;
+		if (!oMixin) {
+			return "";
+		}
+		var aInfos = oMixin.getRegisteredShortcutInfos();
+		if (!aInfos.length) {
+			return "";
+		}
+		return _getShortcutHintText(aInfos[0].id) || "";
+	};
+
+	/**
+	 * Combines a base tooltip text with the control's registered shortcut
+	 * into a single <code>"&lt;base&gt; (&lt;shortcut&gt;)"</code> string.
+	 *
+	 * @param {sap.ui.core.Control} oControl
+	 * @param {string} [sBase]
+	 * @returns {string} <code>"&lt;sBase&gt; (&lt;shortcut&gt;)"</code>,
+	 *  <code>"(&lt;shortcut&gt;)"</code>, <code>sBase</code>, or <code>""</code>.
+	 * @private
+	 * @ui5-restricted sap.m
+	 */
+	ShortcutHintsMixin.getTooltipWithShortcut = function(oControl, sBase) {
+		var sShortcut = ShortcutHintsMixin.getRegisteredShortcutText(oControl);
+		var sBaseText = sBase || "";
+		if (sBaseText && sShortcut) {
+			return sBaseText + " (" + sShortcut + ")";
+		}
+		if (sShortcut) {
+			return "(" + sShortcut + ")";
+		}
+		return sBaseText;
+	};
+
+	/**
+	 * Suppresses or restores the mixin's own popup for a single control.
+	 *
+	 * The mixin still resolves hint text and writes
+	 * <code>aria-keyshortcuts</code>; only the hover/focus popup is skipped
+	 * so the host's own tooltip surface is the sole visible UI.
+	 *
+	 * @param {sap.ui.core.Control} oControl
+	 * @param {boolean} bSuppress
+	 * @private
+	 * @ui5-restricted sap.m
+	 */
+	ShortcutHintsMixin.setPopupSuppressed = function(oControl, bSuppress) {
+		if (!oControl) {
+			return;
+		}
+		if (!oControl._shortcutHintsMixin) {
+			ShortcutHintsMixin.init(oControl);
+		}
+		oControl._shortcutHintsMixin._bSuppressPopup = !!bSuppress;
+	};
+
+	/**
 	 * Shows a shortcut hint for this instance for the attached command.
 	 */
 	ShortcutHintsMixin.prototype.showShortcutHint = function(oHintInfos) {
@@ -284,10 +353,14 @@ sap.ui.define([
 			return;
 		}
 
-		// concatenate with the tooltip
+		// concatenate with the tooltip via the shared helper so the format
+		// stays in sync with hosts that render their own tooltip surface
 		mTooltips = this._getControlTooltips();
 		if (mTooltips[oHintInfos[0].id]) {
-			sShortcut = mTooltips[oHintInfos[0].id].tooltip + " (" + sShortcut + ")";
+			sShortcut = ShortcutHintsMixin.getTooltipWithShortcut(
+				Element.getElementById(this.sControlId),
+				mTooltips[oHintInfos[0].id].tooltip
+			);
 		}
 
 		if (!oPopup) {
@@ -439,6 +512,10 @@ sap.ui.define([
 				return;
 			}
 
+			if (this._bSuppressPopup) {
+				return;
+			}
+
 			ShortcutHintsMixin.hideAll();
 
 			this._updateShortcutHintAccLabel(oShortcutHintRefs[0]);
@@ -466,6 +543,10 @@ sap.ui.define([
 				oDOMRef;
 
 			if (!oShortcutHintRefs.length) {
+				return;
+			}
+
+			if (this._bSuppressPopup) {
 				return;
 			}
 
