@@ -88,6 +88,7 @@ sap.ui.define(["sap/base/i18n/Localization", "sap/ui/core/ControlBehavior", 'sap
 	InputRenderer.writeDescription = function (oRm, oControl) {
 		oRm.openStart("div")
 			.class("sapMInputDescriptionWrapper")
+			.class("sapMInputDescriptionAlign" + oControl.getDescriptionAlign())
 			.style("width", "calc(100% - " + oControl.getFieldWidth() + ")")
 			.openEnd();
 

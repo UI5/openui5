@@ -16,12 +16,15 @@
 			border: 1px solid darkblue;
 		}
 
-		#title {
+		#title, #tableTitle {
 			padding: 10px;
 		}
 	</style>
 
 	<script>
+		var oLibrary = sap.ui.require("sap/m/library");
+		var InputDescriptionAlign = oLibrary.InputDescriptionAlign;
+
 		// Test page is added due to issue reported in this ticket - 1970315739
 		var title = new sap.m.Title({
 			text: "Samples with Input, MultiInput (extends Input), StepInput (extends Input) and ComboBox (extends InputBase) in the different Content Densities"
@@ -127,6 +130,45 @@
 
 		new sap.m.StepInput({width: "150px"}).placeAt('contentCondesed');
 		new sap.m.StepInput({width: "150px", description: "description (Condesed)"}).placeAt('contentCondesed');
+
+		// ---- Input inside sap.m.Table with description align Start and End ----
+		var tableTitle = new sap.m.Title({
+			text: "descriptionAlign inside sap.m.Table"
+		});
+		tableTitle.placeAt('tableTitle');
+
+		var oTable = new sap.m.Table({
+			id: "descriptionAlignTable",
+			columns: [
+				new sap.m.Column({ header: new sap.m.Label({ text: "Alignment" }) }),
+				new sap.m.Column({ header: new sap.m.Label({ text: "Input" }) })
+			],
+			items: [
+				new sap.m.ColumnListItem({
+					cells: [
+						new sap.m.Label({ text: "Start" }),
+						new sap.m.Input({
+							id: "tableInputAlignStart",
+							fieldWidth: "150px",
+							description: "EUR",
+							descriptionAlign: InputDescriptionAlign.Start
+						})
+					]
+				}),
+				new sap.m.ColumnListItem({
+					cells: [
+						new sap.m.Label({ text: "End" }),
+						new sap.m.Input({
+							id: "tableInputAlignEnd",
+							fieldWidth: "150px",
+							description: "EUR",
+							descriptionAlign: InputDescriptionAlign.End
+						})
+					]
+				})
+			]
+		});
+		oTable.placeAt('tableContent');
 	</script>
 
 	</head>
@@ -137,5 +179,8 @@
 		<div class="sapUiSizeCompact sapUiSizeCondensed">
 			<div id="contentCondesed" class="sapUiTableCell"></div>
 		</div>
+
+		<div id="tableTitle"></div>
+		<div id="tableContent" class="sapUiSizeCozy"></div>
 	</body>
 </html>

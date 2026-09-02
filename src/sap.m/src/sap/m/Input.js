@@ -84,6 +84,9 @@ function(
 	// shortcut for sap.m.InputTextFormatMode
 	var InputTextFormatMode = library.InputTextFormatMode;
 
+	// shortcut for sap.m.InputDescriptionAlign
+	var InputDescriptionAlign = library.InputDescriptionAlign;
+
 	// shortcut for sap.m.InputType
 	var InputType = library.InputType;
 
@@ -267,6 +270,20 @@ function(
 				 * The description is a text after the input field, e.g. units of measurement, currencies.
 				 */
 				description: { type: "string", group: "Misc", defaultValue: null },
+
+				/**
+				 * Defines the alignment of the <code>description</code> within the description wrapper container.
+				 *
+				 * This property only takes effect if the <code>description</code> property is set. When set to
+				 * <code>Start</code>, the description is displayed next to the input field. When set to
+				 * <code>End</code>, the description is aligned to the far end of the input wrapper container,
+				 * away from the input field.
+				 *
+				 * <b>Note:</b> The <code>descriptionAlign</code> property should be used mainly when the input is rendered in a
+				 * table cell.
+				 * @since 1.153
+				 */
+				descriptionAlign: { type: "sap.m.InputDescriptionAlign", group: "Appearance", defaultValue: InputDescriptionAlign.Start },
 
 				/**
 				 * This property only takes effect if the description property is set. It controls the distribution of space between the input field and the description text. The default value is 50% leaving the other 50% for the description.
