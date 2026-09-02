@@ -1293,7 +1293,7 @@ sap.ui.define([
 				.returns(sMetaPath);
 			this.oMetaModelMock.expects("getConstraints").atLeast(0)
 				.withExactArgs(sinon.match.same(oProperty), sMetaPath)
-				.returns(oConstraints || {});
+				.returns(oConstraints ?? {});
 		}
 	});
 
@@ -1477,7 +1477,7 @@ sap.ui.define([
 					.withExactArgs(that.oMetaModel.sUrl, false, bPrefetch)
 					.resolves(mRootScope);
 				aReadResults = [];
-				(aAnnotationURL || []).forEach(function (sAnnotationUrl) {
+				aAnnotationURL?.forEach(function (sAnnotationUrl) {
 					var oAnnotationResult = {};
 
 					aReadResults.push(oAnnotationResult);
@@ -4057,7 +4057,7 @@ sap.ui.define([
 				.returns(SyncPromise.resolve(Promise.resolve()).then(function () {
 					that.oMetaModelMock.expects("fetchEntityContainer")
 						.returns(SyncPromise.resolve(mScope));
-					Object.keys(oFixture.fetchPredicates || {}).forEach(function (sPath, j) {
+					Object.keys(oFixture.fetchPredicates ?? {}).forEach(function (sPath, j) {
 						const vResult = oFixture.fetchPredicates[sPath];
 						const oEntityInstance = typeof vResult === "string"
 							? {"@$ui5._" : {predicate : "(~" + j + ")"}}

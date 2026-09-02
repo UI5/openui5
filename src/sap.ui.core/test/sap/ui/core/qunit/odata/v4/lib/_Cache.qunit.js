@@ -7984,10 +7984,10 @@ sap.ui.define([
 	}].forEach(function (oFixture) {
 		QUnit.test("CollectionCache#handleCount: " + oFixture.sTitle, function (assert) {
 			var oCache = this.createCache("Employees"),
-				aElements = oFixture.aElements || [],
+				aElements = oFixture.aElements ?? [],
 				oResult = {
 					"@odata.context" : "foo",
-					value : oFixture.vValue || []
+					value : oFixture.vValue ?? []
 				};
 
 			oCache.mChangeListeners = "~mChangeListeners~";
@@ -11358,7 +11358,7 @@ sap.ui.define([
 					if (oFixture.bTransientElement && iStart === 0) {
 						aPredicates.shift(); // transient element not requested from binding
 					}
-					(oFixture.aKeptAliveKeys || []).forEach(function (sKey) {
+					oFixture.aKeptAliveKeys?.forEach(function (sKey) {
 						var sPredicate = "('" + sKey + "')";
 
 						oCache.aElements.$byPredicate[sPredicate] = {key : sKey};

@@ -339,7 +339,7 @@ sap.ui.define([
 		aElements = oParent[sName] ??= [];
 		aElements.$count = aElements.$created = aElements.length;
 		aElements.$byPredicate = {};
-		aPostBodyCollection = oPostBody[sName] || [];
+		aPostBodyCollection = oPostBody[sName] ?? [];
 		if (aElements.length) {
 			setPostBodyCollection();
 		} else {
@@ -391,7 +391,7 @@ sap.ui.define([
 				} // Note: no changes can happen inside *gaps*
 			});
 		}
-		(aElements.$deleted || []).forEach(function (oDeleted, i) {
+		aElements.$deleted?.forEach(function (oDeleted, i) {
 			if (iIndex < oDeleted.index || iDeletedIndex < i // before the deleted one
 					|| bCreate
 						&& (iIndex === 0 // create at start
@@ -988,7 +988,7 @@ sap.ui.define([
 				// The key properties must only be copied from the result for nested entities. The
 				// root entity is already loaded and has them already. We check that they are
 				// unchanged in this case.
-				(oEntityType.$Key || []).forEach(function (vKey) {
+				oEntityType.$Key?.forEach(function (vKey) {
 					if (typeof vKey === "object") {
 						vKey = vKey[Object.keys(vKey)[0]]; // the path for the alias
 					}
@@ -1018,7 +1018,7 @@ sap.ui.define([
 
 		sFullResourceMetaPath = _Helper.buildPath(this.sMetaPath, sResourceMetaPath);
 		mQueryOptions = this.mLateExpandSelect
-			|| { // ensure that $select precedes $expand in the resulting query
+			?? { // ensure that $select precedes $expand in the resulting query
 				$select : this.mQueryOptions.$select,
 				$expand : this.mQueryOptions.$expand
 			};
@@ -3021,7 +3021,7 @@ sap.ui.define([
 				addKeyFilter(oElement);
 			}
 		}
-		(this.aElements.$deleted || []).forEach(function (oDeleted) {
+		this.aElements.$deleted?.forEach(function (oDeleted) {
 			addKeyFilter(that.aElements.$byPredicate[oDeleted.predicate]);
 		});
 
@@ -3646,7 +3646,7 @@ sap.ui.define([
 				var mStillAliveElements;
 
 				that.visitResponse(oResponse, mTypes, undefined, undefined, 0);
-				mStillAliveElements = oResponse.value.$byPredicate || {};
+				mStillAliveElements = oResponse.value.$byPredicate ?? {};
 
 				aPredicates.forEach(function (sPredicate) {
 					var oElement = that.aElements.$byPredicate[sPredicate],
