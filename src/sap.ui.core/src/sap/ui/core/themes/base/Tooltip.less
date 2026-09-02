@@ -15,12 +15,14 @@
 // Container cross-axis span along the box edge.
 @_sap_ui_core_Tooltip_ArrowContainerSize: @_sap_ui_core_Tooltip_ArrowWidth + (2 * @_sap_ui_core_Tooltip_ArrowRing);
 
-// Applied to the tooltip host element on touch devices to suppress native touch
-// interactions on long-press: the iOS touch callout (context menu, which iOS does
-// not expose as a contextmenu event) and text selection of the underlying text.
+// Suppresses long-press text selection and the iOS touch callout on the tooltip host.
+// Descendant selectors also cover text in a nested .sapUiSelectable (e.g. sap.m.Title).
 html.sap-phone .sapUiSelectable.sapUiCoreTooltipHostSuppressSelection,
+html.sap-phone .sapUiCoreTooltipHostSuppressSelection .sapUiSelectable,
 html.sap-tablet:not(.sap-desktop) .sapUiSelectable.sapUiCoreTooltipHostSuppressSelection,
-.sapUiCoreTooltipHostSuppressSelection  {
+html.sap-tablet:not(.sap-desktop) .sapUiCoreTooltipHostSuppressSelection .sapUiSelectable,
+.sapUiCoreTooltipHostSuppressSelection,
+.sapUiCoreTooltipHostSuppressSelection .sapUiSelectable {
 	-webkit-touch-callout: none; // suppresses the iOS context menu on long-press
 	-webkit-user-select: none;
 	user-select: none;
