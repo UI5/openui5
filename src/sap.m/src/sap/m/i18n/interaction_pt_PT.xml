@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Se a seleção de várias linhas estiver ativada:</span></p>
+				<p>Se o foco estiver numa linha, numa célula ou num controlo dentro de uma célula, a seleção é ativada. Se nem todas as linhas estavam selecionadas, passam a estar todas selecionadas. Se todas as linhas já estavam selecionadas, a seleção de todas as linhas é removida.</p>
+				<p>O atalho não tem efeito se o foco estiver numa célula do cabeçalho da coluna ou num campo de entrada de texto, uma vez que, neste caso, o browser processa a seleção de texto.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Se a seleção de células estiver ativada:</span></p>
-				<p>Se o foco estiver dentro da tabela, a seleção para qualquer linha e célula é removida.</p>
+				<p><span class="emphasis">Se a seleção de várias linhas estiver ativada:</span></p>
+				<p>Se o foco estiver numa linha, numa célula ou num controlo dentro de uma célula, a seleção de todas as linhas é removida.</p>
+				<p>O atalho não tem efeito se o foco estiver numa célula do cabeçalho da coluna ou num campo de entrada de texto, uma vez que, neste caso, o browser processa a seleção de texto.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>

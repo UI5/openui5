@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Als selectie van meerdere rijen is ingeschakeld:</span></p>
+				<p>Als de focus op een rij, een cel of een besturingselement in een cel ligt, wordt de selectie omgeschakeld. Als niet alle rijen zijn geselecteerd, worden alle rijen nu geselecteerd. Als alle rijen al zijn geselecteerd, wordt de selectie van alle rijen verwijderd.</p>
+				<p>De snelkoppeling heeft geen effect als de focus op een kolomkopcel of op een tekstinvoerveld ligt, omdat de browser in dit geval de tekstselectie verwerkt.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Als celselectie is ingeschakeld:</span></p>
-				<p>Als de focus binnen de tabel ligt, wordt de selectie van rijen en cellen verwijderd.</p>
+				<p><span class="emphasis">Als selectie van meerdere rijen is ingeschakeld:</span></p>
+				<p>Als de focus op een rij, een cel of een besturingselement binnen een cel ligt, wordt de selectie van alle rijen verwijderd.</p>
+				<p>De snelkoppeling heeft geen effect als de focus op een kolomkopcel of op een tekstinvoerveld ligt, omdat de browser in dit geval de tekstselectie verwerkt.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>

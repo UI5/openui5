@@ -95,13 +95,20 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Ja ir iespējota vairāku rindu atlase:</span></p>
+				<p>Ja fokuss ir uz rindu, šūnu vai šūnā esošu vadīklu, atlase tiek pārslēgta. Ja nebija atlasītas visas rindas, tagad tiek atlasītas visas rindas. Ja visas rindas jau bija atlasītas, visu rindu atlase tagad tiek noņemta.</p>
+				<p>Šai saīsnei nav nekādas ietekmes, ja fokuss ir uz kolonnas galvenes šūnu vai uz teksta ievades lauku, jo šajā gadījumā pārlūks apstrādā teksta atlasi.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Ja šūnu atlase ir iespējota:</span></p>
-				<p>Ja fokuss ir tabulā, tad jebkādu rindu un šūnu atlase tiek noņemta.</p>
+				<p><span class="emphasis">Ja ir iespējota vairāku rindu atlase:</span></p>
+				<p>Ja fokuss ir uz rindu, šūnu vai šūnā esošu vadīklu, visu rindu atlase tiek noņemta.</p>
+				<p>Šai saīsnei nav nekādas ietekmes, ja fokuss ir uz kolonnas galvenes šūnu vai uz teksta ievades lauku, jo šajā gadījumā pārlūks apstrādā teksta atlasi.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
-				<p><span class="emphasis">Ja šūnu atlase ir iespējota:</span></p>
+				<p><span class="emphasis">Ja ir iespējota šūnu atlase:</span></p>
 				<p>Ja fokuss ir tabulā un šūnas ir atlasītas, tad šūnu atlase tiek noņemta.</p>
 			</description>
 		</interaction>

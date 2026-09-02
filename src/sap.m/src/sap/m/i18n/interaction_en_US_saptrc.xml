@@ -95,88 +95,95 @@
 				</ul>
 			</description>
 		</interaction>
-		<interaction>55M+ZMfxX8JSifkLjzVnzQ_ <kbd>Ctrl + Shift + A</kbd> <description>
-				<p>WBXsCU4Y3RgIcLZhvn0j2g_<span class="emphasis">If cell selection is enabled:</span></p>
-				<p>M8J8aI6Nw0RiSc4ND8APVA_If the focus is inside of the table, the selection for any rows and cells is removed.</p>
+		<interaction>55M+ZMfxX8JSifkLjzVnzQ_ <kbd>Ctrl + A</kbd> <description>
+				<p>feavDyfOWHr6gHzM2d2iKw_<span class="emphasis">If multiple row selection is enabled:</span></p>
+				<p>M4en3laG7mCzEEcL8njYDw_If the focus is on a row, a cell, or a control inside a cell, the selection is toggled. If not all rows were selected, all rows are now selected. If all rows were already selected, the selection of all rows is removed.</p>
+				<p>jQKofBT2Ec5D3iAS9eE+Ag_The shortcut has no effect if the focus is on a column header cell or on a text input field, as the browser handles the text selection in this case.</p>
 			</description>
 		</interaction>
-		<interaction>65eQKMf470RN4fTKs7QnFw_ <kbd>Escape</kbd> <description>
-				<p>Q0ggg2ydz/tS2NOAHI/gTw_<span class="emphasis">If cell selection is enabled:</span></p>
-				<p>4lPBeNgAL2DesNhRBkW5Yw_If the focus is inside of the table, and cells are selected, the selection of the cells is removed.</p>
+		<interaction>rIkz4Jpkur0u6OVtPdnvEw_ <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>O7GEyIOxCCKTUyKXdxn0RQ_<span class="emphasis">If multiple row selection is enabled:</span></p>
+				<p>SWCxccQbd5EIxOHXXqqCBw_If the focus is on a row, a cell, or a control inside a cell, the selection of all rows is removed.</p>
+				<p>zLWJUcM8i61wecQ7zb3WRw_The shortcut has no effect if the focus is on a column header cell or on a text input field, as the browser handles the text selection in this case.</p>
 			</description>
 		</interaction>
-		<interaction>JGbwkbwl8zf+8wRXvzdkNg_ <kbd>F2</kbd> <description>
-				<p>+kQlrMZIPRHP0/4rLEhSuQ_Toggles the focus between the cell and its content if the cell has interactive elements, such as an input field or button (with the exception of read-only text).</p>
+		<interaction>6v8LN1kEtcCKTvvIKXYPvQ_ <kbd>Escape</kbd> <description>
+				<p>knmd+HJ9yjXI/+CO4LMqwA_<span class="emphasis">If cell selection is enabled:</span></p>
+				<p>j0F6+GW5kSVir+ZZ1c928w_If the focus is inside of the table, and cells are selected, the selection of the cells is removed.</p>
 			</description>
 		</interaction>
-		<interaction>6v8LN1kEtcCKTvvIKXYPvQ_ <kbd>F7</kbd> <description>
-				<p>gNO0k7Dijr0bx+beY0cU0g_If the focus is within a cell in edit mode, the focus moves to the row.</p>
+		<interaction>EOngFGcmBvgzyojUSU3MNg_ <kbd>F2</kbd> <description>
+				<p>xWT60mT6DdWYOQ/35pjwQQ_Toggles the focus between the cell and its content if the cell has interactive elements, such as an input field or button (with the exception of read-only text).</p>
 			</description>
 		</interaction>
-		<interaction>pkX97eWgddSj62wN87Zamg_ <kbd>Shift + MouseClick</kbd> <description>
-				<p>Tk3GeE5ur77RSfr657vkQA_<span class="emphasis">If cell selection is enabled</span>:</p>
-				<p>LiAxfhN8+aSNjvDcpVDwbg_If cells are selected, <kbd>Shift + MouseClick</kbd> on a different cell enhances the selection up to the clicked cell.</p>
+		<interaction>o5HMvyd2UVcxAnR1JQwYUw_ <kbd>F7</kbd> <description>
+				<p>wmETGjBgLSgQLxqZM/fMyw_If the focus is within a cell in edit mode, the focus moves to the row.</p>
 			</description>
 		</interaction>
-		<interaction>o5HMvyd2UVcxAnR1JQwYUw_ <kbd>Ctrl + C</kbd> <description>
-				<p>fs1unv0rLAw10smjgPmNbg_Copies the selected rows or cells to the clipboard if available, and the feature is enabled.</p>
+		<interaction>MI0aNZV6BF+1sh/e118OEQ_ <kbd>Shift + MouseClick</kbd> <description>
+				<p>B8yW4hufDlQ2eDZ1Mh/tqg_<span class="emphasis">If cell selection is enabled</span>:</p>
+				<p>VQ2xd35GpmVqp8NRrnllbw_If cells are selected, <kbd>Shift + MouseClick</kbd> on a different cell enhances the selection up to the clicked cell.</p>
 			</description>
 		</interaction>
-		<interaction>MI0aNZV6BF+1sh/e118OEQ_ <kbd>Ctrl + V</kbd> <description>
-				<p>qBZ6oUdoMdmpk3cuBy3pIA_Pastes the content from the clipboard if the feature is enabled.</p>
+		<interaction>gX89mqUrHInWPkXPFDqC8g_ <kbd>Ctrl + C</kbd> <description>
+				<p>jcTls78q92jxSzyVgqJsmQ_Copies the selected rows or cells to the clipboard if available, and the feature is enabled.</p>
+			</description>
+		</interaction>
+		<interaction>suXiKmY/SmxlThYIRYzdXw_ <kbd>Ctrl + V</kbd> <description>
+				<p>1pyPNH/x1shm1SQlDSRSVw_Pastes the content from the clipboard if the feature is enabled.</p>
 			</description>
 		</interaction>
 	</control-interactions>
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
-		<interaction>huvu2AqIfh+7EPM6B1F4aA_ <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>eUnFZG5E5HRxy0JMuOGx5Q_Opens the My Views dialog.</p>
+		<interaction>rM/nyfh3qrhIwp5/TNh56w_ <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
+				<p>o92klMn3CG5iLacCBMaYnA_Opens the My Views dialog.</p>
 			</description> 
 		</interaction>
-		<interaction>dfjIev3FHjyE2/mmrrKloA_ <kbd>PageUp</kbd> <description>
-				<p>TyfiME2r1KBvyW2TKjtrGg_Closes the error popover of the My Views dialog</p>
+		<interaction>EKWmQjl9H6rIGGdEQGpfzw_ <kbd>PageUp</kbd> <description>
+				<p>CCWRo9FChf78tEAVHW3Y0A_Closes the error popover of the My Views dialog</p>
 			</description>
 		</interaction>
-		<interaction>cDwwWTUk4jUDBoA6ZjR5CQ_ <kbd>Ctrl + Enter</kbd> <description>
-				<p>JTdn7gQKy0uhidTr/4DhpA_Saves the new view in the Save As dialog.</p>
+		<interaction>uWqPbCgoCWq/8z19Sy47LQ_ <kbd>Ctrl + Enter</kbd> <description>
+				<p>FUYY+a9GOruJOJh40Q1ScQ_Saves the new view in the Save As dialog.</p>
 			</description>
 		</interaction>
-		<interaction>lwxclNucv0fpUfwItnsIoA_ <kbd>Ctrl + S</kbd> <description>
-				<p>majhqbyFbl4nAiwCiJY3rw_Saves the changes made to the views.</p>
+		<interaction>ODdQgW1a26Vfm9z3KOEtIw_ <kbd>Ctrl + S</kbd> <description>
+				<p>jXCu21yPaqXoneXkosdU5g_Saves the changes made to the views.</p>
 			</description>
 		</interaction>
 	</control-interactions>
 	<control-interactions>
 		<control name="sap.m.p13n.SelectionPanel"/>
-		<interaction>a8kzLkrwND6G++fS+2mrxQ_ <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> <kbd>Home</kbd> <kbd>End</kbd> <description>
-				<p>HYDQtJuNsI2AtAD/Fz70VQ_<kbd>ArrowUp</kbd></p>
-				<p>siuHitMY7PiZd29sndJyrA_Moves the item one position up if available.</p>
-				<p>jXp8acJ77LcoQtPjBvXcYw_<kbd>ArrowDown</kbd></p>
-				<p>VKme8DNdOoR69tsyNfIz9Q_Moves the item one position down if available.</p>
-				<p>raHqAWzoFqSd4HGeuGaD4g_<kbd>Home</kbd></p>
-				<p>8L0DkDdAcsTrTINiXV0FKA_Moves the item to the top if available.</p>
-				<p>saurYOFkrP1PKTxsonT5Gg_<kbd>End</kbd></p>
-				<p>n3rHLNTmGoPtx1x0GRl98Q_Moves the item to the end if available.</p>
+		<interaction>CkFL54OViipBQv/xQVxTmA_ <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> <kbd>Home</kbd> <kbd>End</kbd> <description>
+				<p>F5JTehebx0/U1VNTuAjGyQ_<kbd>ArrowUp</kbd></p>
+				<p>0qrm2e1TzoaUmba3vjXPPQ_Moves the item one position up if available.</p>
+				<p>Fb1joTce06N2yLDKdtMUaA_<kbd>ArrowDown</kbd></p>
+				<p>guI2rDHHrW9O6Q1n3NJUUQ_Moves the item one position down, if available.</p>
+				<p>FT742y4n/FSjJphqWuf5wQ_<kbd>Home</kbd></p>
+				<p>usu3GOdismfpQhvzwy5UkQ_Moves the item to the top if available.</p>
+				<p>1YXuK1Ik1ozPaxGnv1t9IQ_<kbd>End</kbd></p>
+				<p>IqHxCD1aixiMmIrBQyGwIQ_Moves the item to the end if available.</p>
 			</description>
 		</interaction>
 	</control-interactions>
 	<control-interactions>
 		<control name="sap.m.p13n.SortPanel"/>
-		<interaction>YGRG4k6s00ovF2j58HfnpA_ <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> <description>
-				<p>FT742y4n/FSjJphqWuf5wQ_<kbd>ArrowUp</kbd></p>
-				<p>AjCpaP8ayXEKn+M4GwzAIw_Moves the item one position up if available.</p>
-				<p>1YXuK1Ik1ozPaxGnv1t9IQ_<kbd>ArrowDown</kbd></p>
-				<p>1ITLEh336N9D0fFjProbhQ_Moves the item one position down if available.</p>
-			</description>
-		</interaction>
-	</control-interactions>
-	<control-interactions>
-		<control name="sap.m.p13n.GroupPanel"/>
 		<interaction>/Tk/tYXepm9+QU7eAo7jQg_ <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> <description>
 				<p>lE9lD0Ml9vJnUmXaRo9vZw_<kbd>ArrowUp</kbd></p>
 				<p>mj+WcYhkkCJ7hWcJWv8XBA_Moves the item one position up if available.</p>
 				<p>gT8l+fQV6h4TcEnu3g7A9w_<kbd>ArrowDown</kbd></p>
 				<p>VcFK52XsxtyF/BaIH7o/SQ_Moves the item one position down if available.</p>
+			</description>
+		</interaction>
+	</control-interactions>
+	<control-interactions>
+		<control name="sap.m.p13n.GroupPanel"/>
+		<interaction>9Lpu3lg4leLwguYBhy4Pmw_ <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> <description>
+				<p>tzgCbMeUBOABtHeTUQeNOw_<kbd>ArrowUp</kbd></p>
+				<p>Q57hMZ30qjB6cx/OWd91FA_Moves the item one position up if available.</p>
+				<p>74r4qXMNSaHnZFtMa7SOHg_<kbd>ArrowDown</kbd></p>
+				<p>UowPYEwNAv8oh0mFMgFXhQ_Moves the item one position down if available.</p>
 			</description>
 		</interaction>
 	</control-interactions>

@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Jei įjungtas kelių eilučių pasirinkimas:</span></p>
+				<p>Jei suaktyvinta eilutė, langelis arba langelyje esantis valdiklis, pasirinkimas perjungiamas. Jei pasirinktos ne visos eilutės, dabar pasirinktos visos eilutės. Jei visos eilutės jau pasirinktos, visų eilučių pasirinkimas pašalinamas.</p>
+				<p>Spartusis klavišas neturi jokios įtakos, jei suaktyvintas stulpelio antraštės langelis arba teksto įvesties laukas, nes šiuo atveju naršyklė apdoroja teksto pasirinkimą.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Jei įgalintas langelių pasirinkimas:</span></p>
-				<p>Jei suaktyvinta lentelėje, pašalinamas visų eilučių ir langelių pasirinkimas.</p>
+				<p><span class="emphasis">Jei įjungtas kelių eilučių pasirinkimas:</span></p>
+				<p>Jei suaktyvinta eilutė, langelis arba langelyje esantis valdiklis, pašalinamas visų eilučių pasirinkimas.</p>
+				<p>Spartusis klavišas neturi jokios įtakos, jei suaktyvintas stulpelio antraštės langelis arba teksto įvesties laukas, nes šiuo atveju naršyklė apdoroja teksto pasirinkimą.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>

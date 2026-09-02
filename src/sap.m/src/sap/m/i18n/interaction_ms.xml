@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Sekiranya berbilang pemilihan baris didayakan:</span></p>
+				<p>Jika fokus berada pada baris, sel atau kawalan di dalam sel, pemilihan akan ditogol. Jika semua baris tidak dipilih, semua baris kini akan dipilih. Jika semua baris telah dipilih, pemilihan semua baris akan dikeluarkan.</p>
+				<p>Pintasan tidak mempunyai kesan jika fokus berada pada sel pengepala lajur atau pada medan input teks kerana pelayar mengendalikan pemilihan teks dalam kes ini.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Jika pemilihan sel didayakan:</span></p>
-				<p>Jika fokus berada di dalam jadual, pemilihan untuk mana-mana baris dan sel dikeluarkan.</p>
+				<p><span class="emphasis">Sekiranya berbilang pemilihan baris didayakan:</span></p>
+				<p>Jika fokus berada pada baris, sel atau kawalan di dalam sel, pemilihan semua baris dikeluarkan.</p>
+				<p>Pintasan tidak mempunyai kesan jika fokus berada pada sel pengepala lajur atau pada medan input teks kerana pelayar mengendalikan pemilihan teks dalam kes ini.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
@@ -152,7 +159,7 @@
 				<p><kbd>ArrowUp</kbd></p>
 				<p>Alihkan item ke satu kedudukan atas jika tersedia.</p>
 				<p><kbd>ArrowDown</kbd></p>
-				<p>Alihkan item ke satu kedudukan bawah jika tersedia.</p>
+				<p>Alihkan item ke satu kedudukan bawah, jika tersedia.</p>
 				<p><kbd>Home</kbd></p>
 				<p>Alihkan item ke atas sekali jika tersedia.</p>
 				<p><kbd>End</kbd></p>

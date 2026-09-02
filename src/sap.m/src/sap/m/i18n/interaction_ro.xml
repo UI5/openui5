@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Dacă este activată selecția de linii multiple:</span></p>
+				<p>Dacă focalizarea este pe o linie, o celulă sau un control în interiorul unei celule, selecția este comutată. Dacă nu au fost selectate toate liniile, acum sunt selectate toate liniile. Dacă toate liniile au fost deja selectate, selecția tuturor liniilor este eliminată.</p>
+				<p>Shortcutul nu are niciun efect dacă focalizarea este pe o celulă de antet de coloană sau pe un câmp de intrare text, deoarece browserul gestionează selecția textului în acest caz.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Dacă selecția celulei este activată:</span></p>
-				<p>Dacă selecția este în interiorul tabelului, este eliminată selecția pentru orice linie sau celulă.</p>
+				<p><span class="emphasis">Dacă este activată selecția de linii multiple:</span></p>
+				<p>Dacă focalizarea este pe o linie, o celulă sau un control în interiorul unei celule, selecția tuturor liniilor este eliminată.</p>
+				<p>Shortcutul nu are niciun efect dacă focalizarea este pe o celulă de antet de coloană sau pe un câmp de intrare text, deoarece browserul gestionează selecția textului în acest caz.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>

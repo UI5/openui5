@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Hvis valg af flere rækker er aktiveret:</span></p>
+				<p>Hvis fokus er på en række, en celle eller et kontrolelement i en celle, skiftes valget. Hvis ikke alle rækker blev valgt, er alle rækker nu valgt. Hvis alle rækker allerede var valgt, fjernes valget af alle rækker.</p>
+				<p>Genvejen har ingen effekt, hvis fokus er på en kolonneoverskriftscelle eller på et tekstinputfelt, da browseren håndterer tekstvalget i dette tilfælde.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Hvis cellevalg er aktiveret:</span></p>
-				<p>Hvis fokus er inde i tabellen, fjernes valget for alle rækker og celler.</p>
+				<p><span class="emphasis">Hvis valg af flere rækker er aktiveret:</span></p>
+				<p>Hvis fokus er på en række, en celle eller et kontrolelement i en celle, fjernes valget af alle rækker.</p>
+				<p>Genvejen har ingen effekt, hvis fokus er på en kolonneoverskriftscelle eller på et tekstinputfelt, da browseren håndterer tekstvalget i dette tilfælde.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>

@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Si la sélection de plusieurs lignes est activée&#x00a0;:</span></p>
+				<p>Si la zone activée se trouve sur une ligne, une cellule ou un contrôle à l'intérieur d'une cellule, la sélection est activée. Si les lignes n'ont pas toutes été sélectionnées, elles le sont désormais. Si toutes les lignes ont déjà été sélectionnées, la sélection de toutes les lignes est supprimée.</p>
+				<p>Le raccourci n'a aucun effet si la zone activée se trouve sur une cellule d'intitulé de colonne ou sur une zone de saisie de texte, car le navigateur gère la sélection de texte dans ce cas.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Si la sélection de cellule est activée&#x00a0;:</span></p>
-				<p>Si la zone activée se trouve sur le tableau, la sélection de toutes les lignes et cellules est supprimée.</p>
+				<p><span class="emphasis">Si la sélection de plusieurs lignes est activée&#x00a0;:</span></p>
+				<p>Si la zone activée se trouve sur une ligne, une cellule ou un contrôle à l'intérieur d'une cellule, la sélection de toutes les lignes est supprimée.</p>
+				<p>Le raccourci n'a aucun effet si la zone activée se trouve sur une cellule d'intitulé de colonne ou sur une zone de saisie de texte, car le navigateur gère la sélection de texte dans ce cas.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>

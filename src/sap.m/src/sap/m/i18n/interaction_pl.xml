@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Jeśli włączono wybór wielu wierszy:</span></p>
+				<p>Jeśli fokus jest ustawiony na wierszu, komórce lub elemencie sterującym wewnątrz komórki, zaznaczenie jest przełączane. Jeśli nie były zaznaczone wszystkie wiersze, teraz są zaznaczane wszystkie wiersze. Jeśli były zaznaczone wszystkie wiersze, zaznaczenie wszystkich wierszy jest usuwane.</p>
+				<p>Skrót nie działa, jeśli fokus jest ustawiony na komórce nagłówka kolumny lub na polu wprowadzania tekstu, ponieważ w takim przypadku przeglądarka obsługuje zaznaczenie tekstu.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Jeśli zaznaczanie komórki jest włączone:</span></p>
-				<p>Jeśli fokus jest ustawiony wewnątrz tabeli, następuje usunięcie zaznaczenia dowolnych wierszy i komórek.</p>
+				<p><span class="emphasis">Jeśli włączono wybór wielu wierszy:</span></p>
+				<p>Jeśli fokus jest ustawiony na wierszu, komórce lub elemencie sterującym wewnątrz komórki, zaznaczenie wszystkich wierszy jest usuwane.</p>
+				<p>Skrót nie działa, jeśli fokus jest ustawiony na komórce nagłówka kolumny lub na polu wprowadzania tekstu, ponieważ w takim przypadku przeglądarka obsługuje zaznaczenie tekstu.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
@@ -154,7 +161,7 @@
 				<p><kbd>ArrowDown</kbd></p>
 				<p>Powoduje przesunięcie elementu o jedną pozycję w dół, jeśli jest dostępna.</p>
 				<p><kbd>Home</kbd></p>
-				<p>Powoduje przesunięcie elementu do góry, jeśli jest dostępna.</p>
+				<p>Powoduje przesunięcie elementu do góry, jeśli jest to możliwe.</p>
 				<p><kbd>End</kbd></p>
 				<p>Powoduje przesunięcie elementu do dołu, jeśli jest dostępny.</p>
 			</description>

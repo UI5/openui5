@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Ha engedélyezett több sor kiválasztása:</span></p>
+				<p>Ha a fókusz egy soron, cellán vagy cellán belüli vezérlőn van, akkor a kijelölés engedélyezve lesz. Ha nincs kijelölve az összes sor, akkor az összes sor ki lesz választva. Ha már ki van jelölve az összes sor, akkor az összes sor kijelölése megszűnik.</p>
+				<p>A parancsikonnak nincs hatása, ha a fókusz egy oszlopfejléc celláján vagy egy szövegbeviteli mezőn van, mivel ebben az esetben a böngésző kezeli a szövegkijelölést.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Ha engedélyezett a cellakijelölés:</span></p>
-				<p>Ha a fókusz a táblán belül van, akkor megszünteti a sorok és cellák kijelölését.</p>
+				<p><span class="emphasis">Ha több sor kiválasztása engedélyezett:</span></p>
+				<p>Ha a fókusz egy soron, cellán vagy cellán belüli vezérlőn van, akkor eltávolítja az összes sor kijelölését.</p>
+				<p>A parancsikonnak nincs hatása, ha a fókusz egy oszlopfejléc celláján vagy egy szövegbeviteli mezőn van, mivel ebben az esetben a böngésző kezeli a szövegkijelölést.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>

@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Om markering av flera rader har aktiverats:</span></p>
+				<p>Om fokus är på en rad, en cell eller en control inuti en cell växlas urvalet. Om inte alla rader har markerats väljs nu alla rader. Om alla rader redan har valts tas valet av alla rader bort.</p>
+				<p>Genvägen har ingen effekt om fokus ligger på en kolumnhuvudcell eller på ett textinmatningsfält, detta eftersom webbläsaren i detta fall hanterar textmarkeringen.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Om cellurval har aktiverats:</span></p>
-				<p>Om fokus är inuti tabellen tas urvalet för alla rader och celler bort.</p>
+				<p><span class="emphasis">Om markering av flera rader har aktiverats:</span></p>
+				<p>Om fokus ligger på en rad, en cell eller en control inuti en cell tas valet av alla rader bort.</p>
+				<p>Genvägen har ingen effekt om fokus ligger på en kolumnhuvudscell eller på ett textinmatningsfält, detta eftersom webbläsaren i detta fall hanterar textmarkeringen.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
