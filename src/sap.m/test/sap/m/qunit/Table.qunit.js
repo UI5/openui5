@@ -1399,6 +1399,33 @@ sap.ui.define([
 		sut.destroy();
 	});
 
+	QUnit.test("Footer cell announcement", async function(assert) {
+		const sut = createSUT(true, false);
+		let oColumn = sut.getColumns()[0];
+		const oFooterLabel = new Label({text: "Total"});
+		oColumn.setFooter(oFooterLabel);
+		sut.placeAt("qunit-fixture");
+		await nextUIUpdate();
+		const oResourceBundle = Library.getResourceBundleFor("sap.m");
+
+		// Focus an individual footer cell
+		let oFooterCell = sut.getDomRef().querySelector(".sapMListTblFooterCell");
+		oFooterCell.focus();
+		let oInvisibleText = document.getElementById(oFooterCell.getAttribute("aria-labelledby"));
+		assert.ok(oInvisibleText, "aria-labelledby points to invisible text element");
+		assert.ok(oInvisibleText.innerHTML.includes("Total"), "Announcement includes the footer cell content");
+
+		// Focus a footer cell whose column has no footer
+		oColumn = sut.getColumns()[1];
+		assert.notOk(oColumn.getFooter(), "Second column has no footer");
+		oFooterCell = sut.getDomRef().querySelectorAll(".sapMListTblFooterCell")[1];
+		oFooterCell.focus();
+		oInvisibleText = document.getElementById(oFooterCell.getAttribute("aria-labelledby"));
+		assert.ok(oInvisibleText.innerHTML.includes(oResourceBundle.getText("CONTROL_EMPTY")), "Footer cell without footer content announces empty");
+
+		sut.destroy();
+	});
+
 	// Test Case for general controls, but specifically MDC Table with its mdc.table.ColumnHeaderLabel
 	QUnit.test("Test for required ACC with 'custom control'", async function(assert) {
 		const sut = createSUT();
