@@ -49,15 +49,15 @@ sap.ui.define([
 		.and.iRightClickOnAnElementOverlay(sTitleId)
 		.and.iClickOnAContextMenuEntryWithKey("CTX_REMOVE");
 
-		Then.onFlVariantManagement.theModifiedIndicatorShouldBeDisplayed(sContainedVMControlId);
+		Then.onVariantManagement.theModifiedIndicatorShouldBeDisplayed(sContainedVMControlId);
 	});
 
 	opaTest("I save the change in a new Variant", (Given, When, Then) => {
 		When.onPageWithRTA.iRightClickOnAnElementOverlay(sContainedVMControlId)
 		.and.iClickOnAContextMenuEntryWithKey("CTX_VARIANT_SAVEAS");
-		When.onFlVariantManagement.iCreateNewVariant(sContainedVMControlId, sNewContainedVariantName, true);
+		When.onVariantManagement.iCreateNewVariant(sContainedVMControlId, sNewContainedVariantName, true);
 
-		Then.onFlVariantManagement.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName)
+		Then.onVariantManagement.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName)
 		.and.theModifiedIndicatorShouldBeHidden();
 	});
 
@@ -71,17 +71,17 @@ sap.ui.define([
 		.and.iEnterANewName(sLabel);
 
 		Then.onPageWithRTA.iShouldSeeTheElementWithText(sLabel);
-		Then.onFlVariantManagement.theModifiedIndicatorShouldBeDisplayed();
+		Then.onVariantManagement.theModifiedIndicatorShouldBeDisplayed();
 	});
 
 	opaTest("I save the change in a new variant", (Given, When, Then) => {
 		const sLabel = "Rename Label";
 		When.onPageWithRTA.iRightClickOnAnElementOverlay(sVMControlId)
 		.and.iClickOnAContextMenuEntryWithKey("CTX_VARIANT_SAVEAS");
-		When.onFlVariantManagement.iCreateNewVariant(sVMControlId, sNewVariantName, true);
+		When.onVariantManagement.iCreateNewVariant(sVMControlId, sNewVariantName, true);
 
 		Then.onPageWithRTA.iShouldSeeTheElementWithText(sLabel);
-		Then.onFlVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sNewVariantName)
+		Then.onVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sNewVariantName)
 		.and.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName)
 		.and.theModifiedIndicatorShouldBeHidden();
 	});
@@ -95,7 +95,7 @@ sap.ui.define([
 		.and.iEnterANewName(sLabel);
 
 		Then.onPageWithRTA.iShouldSeeTheElementWithText(sLabel);
-		Then.onFlVariantManagement.theModifiedIndicatorShouldBeDisplayed();
+		Then.onVariantManagement.theModifiedIndicatorShouldBeDisplayed();
 	});
 
 	opaTest("I switch to the standard variant", (Given, When, Then) => {
@@ -111,7 +111,7 @@ sap.ui.define([
 
 		When.onPageWithRTA.iClickTheButtonWithTextKey(sButtonTextKey);
 
-		Then.onFlVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sStandardVariantName)
+		Then.onVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sStandardVariantName)
 		.and.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName)
 		.and.theModifiedIndicatorShouldBeHidden();
 	});
@@ -121,13 +121,13 @@ sap.ui.define([
 		When.onPageWithRTA.iClickTheUndoButton();
 
 		Then.onPageWithRTA.iShouldSeeTheElementWithText(sLabelAfterUndo);
-		Then.onFlVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sNewVariantName)
+		Then.onVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sNewVariantName)
 		.and.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName)
 		.and.theModifiedIndicatorShouldBeDisplayed();
 
 		When.onPageWithRTA.iClickTheRedoButton();
 
-		Then.onFlVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sStandardVariantName)
+		Then.onVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sStandardVariantName)
 		.and.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName)
 		.and.theModifiedIndicatorShouldBeHidden();
 	});
@@ -139,7 +139,7 @@ sap.ui.define([
 		.and.iClickOnAVariantMenu(sNewVariantName);
 
 		Then.onPageWithRTA.iShouldSeeTheElementWithText(sLabel);
-		Then.onFlVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sNewVariantName)
+		Then.onVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sNewVariantName)
 		.and.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName)
 		.and.theModifiedIndicatorShouldBeHidden();
 	});
@@ -153,7 +153,7 @@ sap.ui.define([
 		.and.iEnterANewName(sLabel);
 
 		Then.onPageWithRTA.iShouldSeeTheElementWithText(sLabel);
-		Then.onFlVariantManagement.theModifiedIndicatorShouldBeDisplayed();
+		Then.onVariantManagement.theModifiedIndicatorShouldBeDisplayed();
 	});
 
 	opaTest("I switch to the standard variant", (Given, When, Then) => {
@@ -169,7 +169,7 @@ sap.ui.define([
 
 		When.onPageWithRTA.iClickTheButtonWithTextKey(sButtonTextKey);
 
-		Then.onFlVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sStandardVariantName)
+		Then.onVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sStandardVariantName)
 		.and.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName)
 		.and.theModifiedIndicatorShouldBeHidden();
 	});
@@ -181,7 +181,7 @@ sap.ui.define([
 		.and.iClickOnAVariantMenu(sNewVariantName);
 
 		Then.onPageWithRTA.iShouldSeeTheElementWithText(sLabel);
-		Then.onFlVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sNewVariantName)
+		Then.onVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sNewVariantName)
 		.and.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName)
 		.and.theModifiedIndicatorShouldBeHidden();
 	});
@@ -193,7 +193,7 @@ sap.ui.define([
 		.and.iEnterANewName(sNewVariantName);
 		When.onPageWithRTA.iPressOnEscape();
 
-		Then.onFlVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sNewVariantName)
+		Then.onVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sNewVariantName)
 		.and.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName);
 	});
 
@@ -203,14 +203,14 @@ sap.ui.define([
 		When.onPageWithRTA.iRightClickOnAnElementOverlay(sVMControlId)
 		.and.iClickOnAContextMenuEntryWithKey("CTX_VARIANT_MANAGE");
 
-		Then.onFlVariantManagement.theOpenManageViewsDialog(sVMControlId)
+		Then.onVariantManagement.theOpenManageViewsDialog(sVMControlId)
 		.and.theOpenManageViewsDialogDefaultShouldBe(sPreviousVariantName)
 		.and.theOpenManageViewsDialogTitleShouldContain([sStandardVariantName, sPreviousVariantName]);
 
-		When.onFlVariantManagement.iRenameVariant(sPreviousVariantName, sNewVariantName)
+		When.onVariantManagement.iRenameVariant(sPreviousVariantName, sNewVariantName)
 		.and.iPressTheManageViewsSave(sVMControlId);
 
-		Then.onFlVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sNewVariantName)
+		Then.onVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sNewVariantName)
 		.and.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName);
 	});
 
@@ -230,7 +230,7 @@ sap.ui.define([
 
 		Then.onPageWithRTA.iShouldSeeTheToolbar()
 		.and.iShouldSeeTheElementWithText(sLabel);
-		Then.onFlVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sDefaultVariantName)
+		Then.onVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sDefaultVariantName)
 		.and.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName);
 	});
 
@@ -240,14 +240,14 @@ sap.ui.define([
 		When.onPageWithRTA.iRightClickOnAnElementOverlay(sVMControlId)
 		.and.iClickOnAContextMenuEntryWithKey("CTX_VARIANT_MANAGE");
 
-		Then.onFlVariantManagement.theOpenManageViewsDialog(sVMControlId)
+		Then.onVariantManagement.theOpenManageViewsDialog(sVMControlId)
 		.and.theOpenManageViewsDialogTitleShouldContain([sStandardVariantName, sDefaultVariantName]);
 
-		When.onFlVariantManagement.iRemoveVariant(sDefaultVariantName)
+		When.onVariantManagement.iRemoveVariant(sDefaultVariantName)
 		.and.iPressTheManageViewsSave(sVMControlId);
 
 		Then.onPageWithRTA.iShouldSeeTheElementWithText(sLabelText);
-		Then.onFlVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sStandardVariantName)
+		Then.onVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sStandardVariantName)
 		.and.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName);
 	});
 
@@ -255,7 +255,7 @@ sap.ui.define([
 		When.onPageWithRTA.iExitRtaMode()
 		.and.enableAndDeleteLrepLocalStorageAfterRta();
 
-		Then.onFlVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sStandardVariantName)
+		Then.onVariantManagement.theVariantShouldBeDisplayed(sVMControlId, sStandardVariantName)
 		.and.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName);
 		Then.iTeardownMyApp();
 	});
