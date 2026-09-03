@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Je-li aktivován výběr více řádek:</span></p>
+				<p>Je-li fokus na řádce, buňce nebo ovládacím prvku uvnitř buňky, výběr se přepne. Pokud nebyly vybrány všechny řádky, jsou nyní vybrány všechny řádky. Pokud již byly všechny řádky vybrány, výběr všech řádek se odebere.</p>
+				<p>Klávesová zkratka nemá žádný vliv, pokud je fokus na buňce hlavičky sloupce nebo na poli pro zadávání textu, protože prohlížeč v tomto případě zpracovává výběr textu.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Když je aktivován výběr buňky:</span></p>
-				<p>Je-li fokus v tabulce, výběr se pro všechny řádky a buňky odebere.</p>
+				<p><span class="emphasis">Je-li aktivován výběr více řádek:</span></p>
+				<p>Je-li fokus na řádce, buňce nebo ovládacím prvku uvnitř buňky, výběr všech řádek se odebere.</p>
+				<p>Klávesová zkratka nemá žádný vliv, pokud je fokus na buňce hlavičky sloupce nebo na poli pro zadávání textu, protože prohlížeč v tomto případě zpracovává výběr textu.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>

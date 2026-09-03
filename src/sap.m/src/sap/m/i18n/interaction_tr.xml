@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Birden fazla satır seçimi etkinleştirildiyse:</span></p>
+				<p>Odak satırda, hücrede veya hücre içindeki bir denetimdeyse seçim değiştirilir. Tüm satırlar seçili değilse artık tüm satırlar seçilir. Tüm satırlar zaten seçiliyse tüm satırların seçimi kaldırılır.</p>
+				<p>Bu durumda tarayıcı metin seçimini işlediğinden, odak sütun başlığı hücresindeyse veya metin giriş alanındaysa kısayol etki yaratmaz.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Hücre seçimi etkinleştirildiyse:</span></p>
-				<p>Odak tablonun içindeyse tüm satır ve hücreler için seçim kaldırılır.</p>
+				<p><span class="emphasis">Birden fazla satır seçimi etkinleştirildiyse:</span></p>
+				<p>Odak satırda, hücrede veya hücre içindeki bir denetimdeyse tüm satırların seçimi kaldırılır.</p>
+				<p>Bu durumda tarayıcı metin seçimini işlediğinden, odak sütun başlığı hücresindeyse veya metin giriş alanındaysa kısayol etki yaratmaz.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>

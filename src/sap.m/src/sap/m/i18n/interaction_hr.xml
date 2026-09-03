@@ -95,13 +95,20 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Ako je omogućen odabir više redaka:</span></p>
+				<p>Ako je fokus na retku, ćeliji ili kontroli unutar ćelije, odabir se prebacuje. Ako nisu odabrani svi redci, sada su odabrani svi redci. Ako su već odabrani svi redci, odabir svih redaka se uklanja.</p>
+				<p>Prečac nema učinka ako je fokus na ćeliji zaglavlja stupca ili na polju unosa teksta, jer u tom slučaju preglednik obrađuje odabir teksta.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Ako je aktiviran odabir ćelije:</span></p>
-				<p>Ako je fokus unutar tabele, uklanja se odabir za sve redove i ćelije.</p>
+				<p><span class="emphasis">Ako je omogućen odabir više redaka:</span></p>
+				<p>Ako je fokus na retku, ćeliji ili kontroli unutar ćelije, uklanja se odabir svih redaka.</p>
+				<p>Prečac nema učinka ako je fokus na ćeliji zaglavlja stupca ili na polju unosa teksta, jer u tom slučaju preglednik obrađuje odabir teksta.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
-				<p><span class="emphasis">Ako je aktiviran odabir ćelije:</span></p>
+				<p><span class="emphasis">Ako je omogućen odabir ćelije:</span></p>
 				<p>Ako je fokus unutar tabele, a ćelije su odabrane, odabir ćelija se uklanja.</p>
 			</description>
 		</interaction>
@@ -154,7 +161,7 @@
 				<p><kbd>ArrowDown</kbd></p>
 				<p>Pomiče stavku za jedan položaj prema dolje, ako je raspoloživo.</p>
 				<p><kbd>Home</kbd></p>
-				<p>Pomiče stavku na vrh ako je raspoloživo.</p>
+				<p>Pomiče stavku na vrh ako je dostupno.</p>
 				<p><kbd>End</kbd></p>
 				<p>Pomiče stavku na kraj ako je raspoloživo.</p>
 			</description>

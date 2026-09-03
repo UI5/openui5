@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">If multiple row selection is enabled:</span></p>
+				<p>Wenn der Fokus auf einer Zeile, einer Zelle oder einem Control innerhalb einer Zelle liegt, wird die Auswahl umgeschaltet. Wenn nicht alle Zeilen markiert wurden, sind nun alle Zeilen markiert. Wenn alle Zeilen bereits markiert waren, wird die Markierung aller Zeilen entfernt.</p>
+				<p>Das Tastaturkürzel hat keine Auswirkung, wenn der Fokus auf einer Spaltenkopfzelle oder einem Texteingabefeld liegt, da der Browser in diesem Fall die Textauswahl behandelt.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Wenn die Zellenmarkierung aktiviert ist:</span></p>
-				<p>Wenn der Fokus innerhalb der Tabelle liegt, wird die Markierung für alle Zeilen und Zellen entfernt.</p>
+				<p><span class="emphasis">If multiple row selection is enabled:</span></p>
+				<p>Wenn der Fokus auf einer Zeile, einer Zelle oder einem Control innerhalb einer Zelle liegt, wird die Auswahl aller Zeilen entfernt.</p>
+				<p>Das Tastaturkürzel hat keine Auswirkung, wenn der Fokus auf einer Spaltenkopfzelle oder einem Texteingabefeld liegt, da der Browser in diesem Fall die Textauswahl behandelt.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>

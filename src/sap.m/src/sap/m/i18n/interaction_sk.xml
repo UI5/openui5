@@ -95,13 +95,20 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Ak je aktivovaný výber viacerých riadkov:</span></p>
+				<p>Ak je zameranie na riadok, bunku alebo ovládací prvok v bunke, výber sa prepne. Ak neboli vybraté všetky riadky, vyberú sa všetky riadky. Ak už boli vybraté všetky riadky, výber všetkých riadkov sa odstráni.</p>
+				<p>Klávesová skratka nemá žiadny vplyv, ak je zameranie na bunku hlavičky stĺpca alebo na textové vstupné pole, pretože prehliadač v tomto prípade spracováva výber textu.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Ak je povolený výber buniek:</span></p>
-				<p>Ak je zameranie vnútri tabuľky, výber pre všetky riadky a bunky sa odstráni.</p>
+				<p><span class="emphasis">Ak je aktivovaný výber viacerých riadkov:</span></p>
+				<p>Ak je zameranie na riadok, bunku alebo ovládací prvok v bunke, výber všetkých riadkov sa odstráni.</p>
+				<p>Klávesová skratka nemá žiadny vplyv, ak je zameranie na bunku hlavičky stĺpca alebo na textové vstupné pole, pretože prehliadač v tomto prípade spracováva výber textu.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
-				<p><span class="emphasis">Ak je povolený výber buniek:</span></p>
+				<p><span class="emphasis">Ak je aktivovaný výber buniek:</span></p>
 				<p>Ak je zameranie vnútri tabuľky a sú vybraté bunky, výber buniek sa odstráni.</p>
 			</description>
 		</interaction>

@@ -95,13 +95,20 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Si la selección de varias filas está habilitada:</span></p>
+				<p>Si el foco está en una fila, una celda o un control dentro de una celda, la selección alterna. Si no se seleccionaron todas las filas, se seleccionarán. Si ya se seleccionaron todas las filas, entonces se anulará la selección.</p>
+				<p>El acceso directo no funciona si el foco está en una celda de encabezado de columna o en un campo de entrada de texto, ya que el navegador se encarga de la selección de texto en esos casos.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Si la selección de celda está activada:</span></p>
-				<p>Si el foco está dentro de la tabla, se elimina la selección de las filas y celdas.</p>
+				<p><span class="emphasis">Si la selección de varias filas está habilitada:</span></p>
+				<p>Si el foco está en una fila, una celda o un control dentro de una celda, se anula la selección de todas las filas.</p>
+				<p>El acceso directo no funciona si el foco está en una celda de encabezado de columna o en un campo de entrada de texto, ya que el navegador se encarga de la selección de texto en esos casos.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
-				<p><span class="emphasis">Si la selección de celda está activada:</span></p>
+				<p><span class="emphasis">Si la selección de celdas está activada:</span></p>
 				<p>Si el foco está dentro de la tabla y hay celdas seleccionadas, se elimina la selección de las celdas.</p>
 			</description>
 		</interaction>

@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Nếu lựa chọn nhiều hàng được bật:</span></p>
+				<p>Nếu tiêu điểm đang ở trên một hàng, một ô hoặc một điều khiển bên trong ô, lựa chọn sẽ được đảo trạng thái. Nếu chưa chọn tất cả hàng, thì tất cả hàng sẽ được chọn. Nếu tất cả hàng đã được chọn, thì lựa chọn của tất cả hàng sẽ bị loại bỏ.</p>
+				<p>Lối tắt không có hiệu lực nếu tiêu điểm đang ở trên ô tiêu đề cột hoặc trên trường nhập văn bản, vì trình duyệt xử lý lựa chọn văn bản trong trường hợp này.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Nếu lựa chọn ô được bật:</span></p>
-				<p>Nếu tiêu điểm nằm bên trong bảng, lựa chọn bất kỳ hàng hoặc ô nào sẽ bị loại bỏ.</p>
+				<p><span class="emphasis">Nếu lựa chọn nhiều hàng được bật:</span></p>
+				<p>Nếu tiêu điểm đang ở trên một hàng, một ô hoặc một điều khiển bên trong ô, thì lựa chọn tất cả hàng sẽ bị loại bỏ.</p>
+				<p>Lối tắt không có hiệu lực nếu tiêu điểm đang ở trên ô tiêu đề cột hoặc trên trường nhập văn bản, vì trình duyệt xử lý lựa chọn văn bản trong trường hợp này.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
@@ -152,7 +159,7 @@
 				<p><kbd>ArrowUp</kbd></p>
 				<p>Di chuyển mục lên một vị trí nếu có sẵn.</p>
 				<p><kbd>ArrowDown</kbd></p>
-				<p>Di chuyển mục xuống một vị trí nếu có sẵn.</p>
+				<p>Di chuyển mục xuống một vị trí, nếu có sẵn.</p>
 				<p><kbd>Home</kbd></p>
 				<p>Di chuyển mục lên đầu nếu có sẵn.</p>
 				<p><kbd>End</kbd></p>

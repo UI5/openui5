@@ -95,13 +95,20 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Se è attivata la selezione di più righe:</span></p>
+				<p>Se il focus è su una riga, una cella o un controllo all'interno di una cella, la selezione viene commutata. Se non sono state selezionate tutte le righe, vengono ora selezionate tutte le righe. Se tutte le righe sono già state selezionate, la selezione di tutte le righe viene rimossa.</p>
+				<p>Il collegamento non ha effetto se il focus è su una cella di intestazione colonna o su un campo di inserimento di testo, poiché in questo caso il browser gestisce la selezione del testo.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Se la selezione della cella è attivata:</span></p>
-				<p>Se il focus è all'interno della tabella, la selezione delle righe e delle celle viene rimossa.</p>
+				<p><span class="emphasis">Se è attivata la selezione di più righe:</span></p>
+				<p>Se il focus è su una riga, una cella o un controllo all'interno di una cella, la selezione di tutte le righe viene rimossa.</p>
+				<p>Il collegamento non ha effetto se il focus è su una cella di intestazione colonna o su un campo di inserimento di testo, poiché in questo caso il browser gestisce la selezione del testo.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
-				<p><span class="emphasis">Se la selezione della cella è attivata:</span></p>
+				<p><span class="emphasis">Se la selezione delle celle è attivata:</span></p>
 				<p>Se il focus è all'interno della tabella e delle celle sono selezionate, la selezione delle celle viene rimossa.</p>
 			</description>
 		</interaction>
