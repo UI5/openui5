@@ -511,6 +511,54 @@ sap.ui.define([
 				this.oCreateContainer.handler([this.oGroupOverlay], { menuItem: aMenuItems[0] });
 			});
 		});
+
+		RtaQunitUtils.testGetParameters(function() {
+			return this.oCreateContainer;
+		}, ["isSibling", "label"]);
+
+		QUnit.test("when createCommands is called directly with a pre-resolved action", async function(assert) {
+			this.oFormOverlay.setDesignTimeMetadata({
+				aggregations: {
+					formContainers: {
+						childNames: {
+							singular: "GROUP_CONTROL_NAME",
+							plural: "GROUP_CONTROL_NAME_PLURAL"
+						},
+						actions: {
+							createContainer: {
+								changeType: "addGroup",
+								isEnabled: true
+							}
+						}
+					}
+				}
+			});
+			this.oCreateContainer.deregisterElementOverlay(this.oFormOverlay);
+			this.oCreateContainer.registerElementOverlay(this.oFormOverlay);
+			await this.oCreateContainer._isEditable(this.oFormOverlay);
+
+			const oAction = this.oCreateContainer.getCreateActions(this.oFormOverlay, false)[0];
+			const oFireStub = sandbox.stub();
+			this.oCreateContainer.attachElementModified(oFireStub);
+
+			const oCommand = await this.oCreateContainer.createCommands(this.oFormOverlay, {
+				isSibling: false,
+				label: "My New Group",
+				action: oAction
+			});
+
+			assert.strictEqual(
+				oCommand.getMetadata().getName(),
+				"sap.ui.rta.command.CreateContainer",
+				"then createCommands returns a CreateContainer command"
+			);
+			assert.strictEqual(oCommand.getLabel(), "My New Group", "then the command has the given label");
+			assert.strictEqual(oFireStub.callCount, 1, "then the elementModified event is fired once");
+			const oEventArgs = oFireStub.getCall(0).args[0];
+			assert.strictEqual(oEventArgs.getParameter("command"), oCommand, "then the fired command matches the returned command");
+			assert.strictEqual(oEventArgs.getParameter("action"), oAction, "then the pre-resolved action is passed to the event");
+			assert.ok(oEventArgs.getParameter("newControlId"), "then a newControlId is passed to the event");
+		});
 	});
 
 	QUnit.done(function() {

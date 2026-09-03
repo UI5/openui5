@@ -205,7 +205,7 @@ sap.ui.define([
 	 * @param {Array<sap.ui.core.Element>} aSelectedElements - Selected elements when the action was triggered
 	 * @param {string} sTargetAggregation - The aggregation where the element is being inserted
 	 * @param {sap.ui.rta.plugin.additionalElements.AdditionalElementsPlugin} oPlugin - Instance of the AdditionalElementsPlugin
-	 * @returns {Promise<undefined>} Resolves when the commands are created
+	 * @returns {Promise} Resolves once the commands have been created and the "elementModified" event has been fired
 	 */
 	CommandBuilder.createCommands = async function(mParents, oSiblingElement, mActions, iIndex, aSelectedElements, sTargetAggregation, oPlugin) {
 		// sort elements by label in descending order. When added the fields will be in ascending order on the UI

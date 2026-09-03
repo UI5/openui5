@@ -355,6 +355,65 @@ sap.ui.define([
 				"and if plugin is not available for the overlay, no menu items are returned"
 			);
 		});
+
+		QUnit.test("when getParameters is called", function(assert) {
+			assert.deepEqual(this.oSplitPlugin.getParameters(), [], "then no parameters are required for split");
+		});
+
+		QUnit.test("when getMenuItems is called (menu item exposes the programmatic-consumer contract)", async function(assert) {
+			sandbox.stub(this.oSplitPlugin, "isAvailable").returns(true);
+			fnSetOverlayDesigntimeMetadata(this.oButton1Overlay, DEFAULT_DTM);
+			const aMenuItems = await this.oSplitPlugin.getMenuItems([this.oButton1Overlay]);
+			const oMenuItem = aMenuItems[0];
+			assert.strictEqual(typeof oMenuItem.createCommands, "function", "then the menu item exposes a createCommands function");
+			assert.strictEqual(
+				typeof oMenuItem.getContext,
+				"undefined",
+				"then getContext is absent for a plugin that does not implement it"
+			);
+			assert.ok(Array.isArray(oMenuItem.parameters), "then the menu item exposes a parameters array");
+			assert.strictEqual(
+				oMenuItem.description,
+				"split a combined element back into its individual elements",
+				"then the menu item exposes its description"
+			);
+		});
+
+		QUnit.test("when createCommands is called directly", async function(assert) {
+			sandbox.stub(ChangesWriteAPI, "create").resolves({});
+			const oFireStub = sandbox.stub();
+			this.oSplitPlugin.attachElementModified(oFireStub);
+			fnSetOverlayDesigntimeMetadata(this.oButton1Overlay, DEFAULT_DTM);
+			this.oSplitPlugin.deregisterElementOverlay(this.oButton1Overlay);
+			this.oSplitPlugin.registerElementOverlay(this.oButton1Overlay);
+
+			const oCommand = await this.oSplitPlugin.createCommands(this.oButton1Overlay);
+
+			assert.ok(oCommand, "then createCommands resolves with the created command");
+			assert.strictEqual(
+				oCommand.getNewElementIds().length,
+				this.oPanel.getContent().length,
+				"then the returned command has the expected number of new element ids"
+			);
+			assert.strictEqual(oFireStub.callCount, 1, "then the elementModified event is fired once");
+			assert.strictEqual(
+				oFireStub.getCall(0).args[0].getParameter("command"),
+				oCommand,
+				"then the fired event carries the same command that is returned"
+			);
+		});
+
+		QUnit.test("when createCommands is called but no split action is available", async function(assert) {
+			fnSetOverlayDesigntimeMetadata(this.oButton1Overlay, {});
+			this.oSplitPlugin.deregisterElementOverlay(this.oButton1Overlay);
+			this.oSplitPlugin.registerElementOverlay(this.oButton1Overlay);
+			try {
+				await this.oSplitPlugin.createCommands(this.oButton1Overlay);
+				assert.ok(false, "then the promise should not resolve");
+			} catch (oError) {
+				assert.ok(oError instanceof Error, "then createCommands rejects with an error");
+			}
+		});
 	});
 
 	QUnit.done(function() {

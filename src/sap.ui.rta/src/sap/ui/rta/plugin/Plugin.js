@@ -480,6 +480,16 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns the parameters that a programmatic consumer must provide to create the commands for this plugin.
+	 * Plugins that expose parameters override this method; the default is an empty list.
+	 * @returns {object[]} List of parameter descriptors (name, type, required, description)
+	 * @since 1.153
+	 */
+	BasePlugin.prototype.getParameters = function() {
+		return [];
+	};
+
+	/**
 	 * Returns the rank (order) of the plugin action in the context menu.
 	 * @param {string} sPluginId - Plugin ID
 	 * @returns {number} Rank of the plugin action

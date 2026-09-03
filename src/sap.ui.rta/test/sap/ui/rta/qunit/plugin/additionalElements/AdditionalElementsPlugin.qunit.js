@@ -1459,6 +1459,31 @@ sap.ui.define([
 				});
 			}.bind(this));
 		});
+
+		QUnit.test("when getParameters is called", function(assert) {
+			const aParameters = this.oPlugin.getParameters();
+			const aNames = aParameters.map((mParameter) => mParameter.name);
+			["isSibling", "aggregation", "selectedElements"].forEach(function(sName) {
+				assert.ok(aNames.includes(sName), `then the '${sName}' parameter is exposed`);
+			});
+			assert.ok(aParameters.every((mParameter) => !!mParameter.description), "then every parameter has a description");
+		});
+
+		QUnit.test("when getContext is called", async function(assert) {
+			const oOverlay = await createOverlayWithAggregationActions.call(this, {
+				reveal: {
+					changeType: "unhideControl"
+				}
+			}, ON_CHILD);
+			await DtUtil.waitForSynced(this.oDesignTime)();
+
+			const mContext = await this.oPlugin.getContext(oOverlay);
+
+			assert.ok(mContext.availableElements, "then the context exposes availableElements");
+			assert.ok(mContext.availableElements.description, "then the availableElements carry a description");
+			assert.ok(Array.isArray(mContext.availableElements.value.asChild), "then the available child elements are grouped as an array");
+			assert.ok(Array.isArray(mContext.availableElements.value.asSibling), "then the available sibling elements are grouped as an array");
+		});
 	});
 
 	QUnit.module("Given an app that is field extensible enabled...", {

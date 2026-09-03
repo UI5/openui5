@@ -1,3 +1,4 @@
+/* global QUnit */
 sap.ui.define([
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/Component",
@@ -371,6 +372,27 @@ sap.ui.define([
 		})
 		.then(function() {
 			oObject[sMethodName].restore();
+		});
+	};
+
+	/**
+	 * Registers a generic QUnit test asserting that a plugin's <code>getParameters</code> exposes
+	 * the expected parameter descriptors. Reduces the duplicated per-plugin boilerplate.
+	 * @param {function():sap.ui.rta.plugin.Plugin} fnGetPlugin - Returns the plugin instance
+	 *   (called inside the test so the module's <code>beforeEach</code> context is available)
+	 * @param {string[]} aExpectedNames - Parameter names that must be exposed
+	 */
+	RtaQunitUtils.testGetParameters = function(fnGetPlugin, aExpectedNames) {
+		QUnit.test("when getParameters is called", function(assert) {
+			const aParameters = fnGetPlugin.call(this).getParameters();
+			const aNames = aParameters.map((mParameter) => mParameter.name);
+			aExpectedNames.forEach((sName) => {
+				assert.ok(aNames.includes(sName), `then the '${sName}' parameter is exposed`);
+			});
+			assert.ok(
+				aParameters.every((mParameter) => !!mParameter.description),
+				"then every parameter has a description"
+			);
 		});
 	};
 
