@@ -1,7 +1,9 @@
-/*global describe,it,element,by,takeScreenshot,expect*/
+/*global describe,it,element,by,takeScreenshot,expect,browser*/
 
 describe("sap.m.TitleInSimpleForm", function() {
 	"use strict";
+
+	browser.testrunner.currentSuite.meta.controlName = "sap.m.Title";
 
 	// initial loading - all three form layouts
 	it("should load test page", function () {
