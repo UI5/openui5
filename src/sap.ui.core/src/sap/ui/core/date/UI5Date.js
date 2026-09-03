@@ -75,7 +75,7 @@ sap.ui.define([
 			oDateParts: {value: undefined, writable: true}
 		});
 
-		if (isNaN(oDateInstance)) {
+		if (isNaN(oDateInstance.getTime())) {
 			return;
 		}
 
@@ -110,9 +110,9 @@ sap.ui.define([
 					const aDateParts = rLocalDate.exec(vDateParts[0]);
 					if (aDateParts) {
 						aLocalDateParts[1] = +aDateParts[2] - 1; // use + operator to get the value as used by Date
-						aLocalDateParts[2] = aDateParts[3];
-						aLocalDateParts[3] = aDateParts[4] !== undefined ? aDateParts[4] : 0;
-						aLocalDateParts[4] = aDateParts[5] !== undefined ? aDateParts[5] : 0;
+						aLocalDateParts[2] = +aDateParts[3];
+						aLocalDateParts[3] = aDateParts[4] !== undefined ? +aDateParts[4] : 0;
+						aLocalDateParts[4] = aDateParts[5] !== undefined ? +aDateParts[5] : 0;
 					} else {
 						// other string based local input near the switch to Daylight Saving Time cannot be handled
 						// without re-implementing parse logic of JavaScript Date -> recommend to use the constructor
@@ -150,7 +150,7 @@ sap.ui.define([
 	UI5Date.prototype._getPart = function (sPart) {
 		var iResult;
 
-		if (isNaN(this.oDate)) {
+		if (isNaN(this.oDate.getTime())) {
 			return NaN;
 		}
 
@@ -217,7 +217,7 @@ sap.ui.define([
 		}
 		if (this.oDateParts) {
 			oCurrentDateParts = this.oDateParts;
-		} else if (isNaN(this.oDate)) {
+		} else if (isNaN(this.oDate.getTime())) {
 			//era and year are given at least
 			oCurrentDateParts = {day: "1", fractionalSecond: "0", hour: "0", minute: "0",
 				month: "1", second: "0"};
@@ -228,7 +228,7 @@ sap.ui.define([
 
 		// NaN may happen if no year is given if current date is invalid
 		oNewDateAsUTCTimestamp = TimezoneUtils._getDateFromParts(oDateParts);
-		if (isNaN(oNewDateAsUTCTimestamp)) {
+		if (isNaN(oNewDateAsUTCTimestamp.getTime())) {
 			return this.setTime(NaN);
 		}
 
@@ -808,7 +808,7 @@ sap.ui.define([
 	 * @public
 	 */
 	UI5Date.prototype.toDateString = function () {
-		if (isNaN(this.oDate)) {
+		if (isNaN(this.oDate.getTime())) {
 			return this.oDate.toDateString();
 		}
 
@@ -890,7 +890,7 @@ sap.ui.define([
 	 * @public
 	 */
 	UI5Date.prototype.toString = function () {
-		if (isNaN(this.oDate)) {
+		if (isNaN(this.oDate.getTime())) {
 			return this.oDate.toString();
 		}
 
@@ -907,7 +907,7 @@ sap.ui.define([
 	 */
 	UI5Date.prototype.toTimeString = function () {
 		var iHours, iMinutes, sSign, iTimeZoneOffset;
-		if (isNaN(this.oDate)) {
+		if (isNaN(this.oDate.getTime())) {
 			return this.oDate.toTimeString();
 		}
 		iTimeZoneOffset = this.getTimezoneOffset();
