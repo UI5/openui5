@@ -873,7 +873,7 @@ sap.ui.define([
 			vChildQueryOptions
 		];
 		oCanUseCachePromise = SyncPromise.all(aPromises).then(function (aResult) {
-			var mChildQueryOptions = aResult[2] || {},
+			var mChildQueryOptions = aResult[2] ?? {},
 				mCountQueryOptions,
 				mWrappedChildQueryOptions,
 				mLocalQueryOptions = aResult[0],

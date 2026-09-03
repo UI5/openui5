@@ -25,12 +25,23 @@
 	overflow: hidden;
 }
 
+/* In RTL the description sits on the opposite side of the input field, so the spacing toward the input field flips accordingly */
+[dir='rtl'] .sapMInputDescriptionText {
+	padding-left: 0;
+	padding-right: 0.5rem;
+}
+
 .sapMInputWithDescription {
 	white-space: nowrap;
 }
 
 .sapMInputDescriptionWrapper {
 	display: inline-flex;
+}
+
+/* Aligns the description to the far end of the wrapper container, away from the input field */
+.sapMInputDescriptionWrapper.sapMInputDescriptionAlignEnd {
+	justify-content: flex-end;
 }
 
 /* Input with description */

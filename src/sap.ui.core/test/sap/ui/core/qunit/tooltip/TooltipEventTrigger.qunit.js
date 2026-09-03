@@ -7,7 +7,7 @@ sap.ui.define([
 ], function (TooltipEventTrigger, FakeControls, nextUIUpdate, Device) {
 	"use strict";
 
-	const { FocusableHost, TwoTargetHost } = FakeControls;
+	const { FocusableHost, SelectableTextHost, TwoTargetHost } = FakeControls;
 
 	async function renderHost(oHost, oClock) {
 		oHost.placeAt("qunit-fixture");
@@ -696,5 +696,60 @@ sap.ui.define([
 		} finally {
 			oSecond.destroy();
 		}
+	});
+
+	QUnit.module("Suppress-selection computed style (CSS)", {
+		beforeEach: async function () {
+			// sap-phone activates the phone user-select:text baseline for .sapUiSelectable.
+			this.sOrigClassName = document.documentElement.className;
+			document.documentElement.classList.add("sap-phone");
+			this.oDeviceStub = sinon.stub(Device, "system")
+				.value({ desktop: false, combi: false, phone: true, tablet: false });
+			// Selectable host div + nested selectable span, mirroring sap.m.Title.
+			this.oHost = new SelectableTextHost();
+			await renderHost(this.oHost, this.clock);
+			this.oDomRef = this.oHost.getDomRef();
+			this.oInner = this.oDomRef.querySelector("span");
+			this.oConfig = makeConfig(this.oHost, this.oDomRef);
+			this.oTrigger = new TooltipEventTrigger(this.oConfig);
+		},
+		afterEach: async function () {
+			this.oTrigger.destroy();
+			this.oHost.destroy();
+			this.oDeviceStub.restore();
+			document.documentElement.className = this.sOrigClassName;
+			await this.clock.tickAsync(2000);
+			this.clock.restore();
+		},
+		// A touchstart on the host: the delegate maps it and adds the suppress class.
+		startTouch: function () {
+			dispatch(this.oDomRef, new MouseEvent("mousedown", { bubbles: true }));
+		},
+		// A touchend on the host: the delegate maps it and removes the suppress class.
+		endTouch: function () {
+			dispatch(this.oDomRef, new MouseEvent("mouseup", { bubbles: true }));
+		}
+	});
+
+	QUnit.test("touchstart disables selection on the host in computed styles", function (assert) {
+		assert.strictEqual(window.getComputedStyle(this.oDomRef).userSelect, "text",
+			"before touch: host text is selectable");
+		this.startTouch();
+		assert.strictEqual(window.getComputedStyle(this.oDomRef).userSelect, "none",
+			"after touch: host selection disabled");
+		this.endTouch();
+		assert.strictEqual(window.getComputedStyle(this.oDomRef).userSelect, "text",
+			"after touch release: host text is selectable again");
+	});
+
+	QUnit.test("touchstart disables selection on nested .sapUiSelectable text in computed styles", function (assert) {
+		assert.strictEqual(window.getComputedStyle(this.oInner).userSelect, "text",
+			"before touch: nested selectable text is selectable");
+		this.startTouch();
+		assert.strictEqual(window.getComputedStyle(this.oInner).userSelect, "none",
+			"after touch: nested selectable text selection disabled");
+		this.endTouch();
+		assert.strictEqual(window.getComputedStyle(this.oInner).userSelect, "text",
+			"after touch release: nested selectable text is selectable again");
 	});
 });

@@ -130,6 +130,7 @@ sap.ui.define([
 		  "sap.m.IllustratedMessageSize",
 		  "sap.m.IllustratedMessageType",
 		  "sap.m.ImageMode",
+		  "sap.m.InputDescriptionAlign",
 		  "sap.m.InputListItemContentSize",
 		  "sap.m.InputTextFormatMode",
 		  "sap.m.InputType",
@@ -1806,6 +1807,29 @@ sap.ui.define([
 		 */
 		Link: "Link"
 	};
+
+	 /**
+	  * Defines the alignment of the <code>description</code> within the description wrapper of the
+	  * {@link sap.m.Input} control.
+	  *
+	  * @enum {string}
+	  * @public
+	  * @since 1.153
+	  */
+	 thisLib.InputDescriptionAlign = {
+
+		 /**
+		  * The description is aligned next to the input field.
+		  * @public
+		  */
+		 Start: "Start",
+
+		 /**
+		  * The description is aligned to the far end of the input wrapper container, away from the input field.
+		  * @public
+		  */
+		 End: "End"
+	 };
 
 	 /**
 	  * Defines how the input display text should be formatted.
@@ -6537,6 +6561,7 @@ sap.ui.define([
 	 DataType.registerEnum("sap.m.InputTextFormatMode", thisLib.InputTextFormatMode);
 	 DataType.registerEnum("sap.m.SelectDialogInitialFocus", thisLib.SelectDialogInitialFocus);
 	 DataType.registerEnum("sap.m.InputType", thisLib.InputType);
+	 DataType.registerEnum("sap.m.InputDescriptionAlign", thisLib.InputDescriptionAlign);
 	 DataType.registerEnum("sap.m.LabelDesign", thisLib.LabelDesign);
 	 DataType.registerEnum("sap.m.LightBoxLoadingStates", thisLib.LightBoxLoadingStates);
 	 DataType.registerEnum("sap.m.LinkConversion", thisLib.LinkConversion);

@@ -998,7 +998,7 @@ sap.ui.define([
 
 				this.mTypeForMetaPath[sMetaPath] = oType;
 
-				(oType.$Key || []).forEach((vKey) => {
+				oType.$Key?.forEach((vKey) => {
 					if (typeof vKey === "object") {
 						// key has an alias
 						vKey = vKey[Object.keys(vKey)[0]];
@@ -1499,7 +1499,7 @@ sap.ui.define([
 	 */
 	_Requestor.prototype.processBatch = function (sGroupId) {
 		var bHasChanges,
-			aRequests = this.mBatchQueue[sGroupId] || [],
+			aRequests = this.mBatchQueue[sGroupId] ?? [],
 			that = this;
 
 		/*

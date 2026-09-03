@@ -3,10 +3,17 @@ sap.ui.define([
   "sap/m/HBox",
   "sap/m/Input",
   "sap/m/MultiInput",
-  "sap/m/StepInput"
-], function(Title, HBox, Input, MultiInput, StepInput) {
+  "sap/m/StepInput",
+  "sap/m/Table",
+  "sap/m/Column",
+  "sap/m/Label",
+  "sap/m/ColumnListItem"
+], function(Title, HBox, Input, MultiInput, StepInput, Table, Column, Label, ColumnListItem) {
   "use strict";
   // Note: the HTML page 'InputDescriptionVisualTests.html' loads this module via data-sap-ui-on-init
+
+  var oLibrary = sap.ui.require("sap/m/library");
+  var InputDescriptionAlign = oLibrary.InputDescriptionAlign;
 
   // Test page is added due to issue reported in this ticket - 1970315739
   var title = new Title({
@@ -113,4 +120,43 @@ sap.ui.define([
 
   new StepInput({width: "150px"}).placeAt('contentCondesed');
   new StepInput({width: "150px", description: "description (Condesed)"}).placeAt('contentCondesed');
+
+  // ---- Input inside sap.m.Table with description align Start and End ----
+  var tableTitle = new Title({
+	  text: "descriptionAlign inside sap.m.Table"
+  });
+  tableTitle.placeAt('tableTitle');
+
+  var oTable = new Table({
+	  id: "descriptionAlignTable",
+	  columns: [
+		  new Column({ header: new Label({ text: "Alignment" }) }),
+		  new Column({ header: new Label({ text: "Input" }) })
+	  ],
+	  items: [
+		  new ColumnListItem({
+			  cells: [
+				  new Label({ text: "Start" }),
+				  new Input({
+					  id: "tableInputAlignStart",
+					  fieldWidth: "150px",
+					  description: "EUR",
+					  descriptionAlign: InputDescriptionAlign.Start
+				  })
+			  ]
+		  }),
+		  new ColumnListItem({
+			  cells: [
+				  new Label({ text: "End" }),
+				  new Input({
+					  id: "tableInputAlignEnd",
+					  fieldWidth: "150px",
+					  description: "EUR",
+					  descriptionAlign: InputDescriptionAlign.End
+				  })
+			  ]
+		  })
+	  ]
+  });
+  oTable.placeAt('tableContent');
 });

@@ -828,6 +828,14 @@ sap.ui.define([
 					only: ["sap/ui/rta/util/showMessageBox"]
 				}
 			},
+			"util/changeVisualization/commands/AddIFrameVisualization": {
+				group: "Change visualization",
+				coverage: {
+					only: [
+						"sap/ui/rta/util/changeVisualization/commands/AddIFrameVisualization"
+					]
+				}
+			},
 			"util/changeVisualization/commands/CombineVisualization": {
 				group: "Change visualization",
 				coverage: {
