@@ -3260,8 +3260,7 @@ sap.ui.define([
 
 		var oWrapperElement = this._$opWrapper.get(0),
 			oTitleElement = this._$titleArea.get(0),
-			oTitleMetrics = oTitleElement.getBoundingClientRect(),
-			iScrollbarWidth = getScrollbarSize().width;
+			oTitleMetrics = oTitleElement.getBoundingClientRect();
 
 		// the top area of the scroll container is reserved for showing the title element,
 		// (where the title element is positioned absolutely on top of the scroll container),
@@ -3275,7 +3274,7 @@ sap.ui.define([
 		// (2) also make the area underneath the title invisible (using clip-path)
 		// to allow usage of *transparent background* of the title element
 		// (otherwise content from the scroll *overflow* will show underneath the transparent title element)
-		this._adjustClipPathForTitleTransparency(oWrapperElement, oTitleMetrics, iScrollbarWidth);
+		this._adjustClipPathForTitleTransparency(oTitleMetrics);
 
 		this.getHeaderTitle() && this._shiftHeaderTitle();
 	};
@@ -3312,23 +3311,25 @@ sap.ui.define([
 	 * Makes the area underneath the title element invisible using clip-path,
 	 * to allow usage of a transparent background on the title element.
 	 * Without this, content from the scroll overflow would show underneath the transparent title.
-	 * @param {object} oWrapperElement
 	 * @param {object} oTitleMetrics
 	 * @param {number} oTitleMetrics.height
 	 * @param {number} oTitleMetrics.width
-	 * @param {number} iScrollbarWidth
 	 * @private
 	 */
-	ObjectPageLayout.prototype._adjustClipPathForTitleTransparency = function (oWrapperElement, oTitleMetrics, iScrollbarWidth) {
-		var oHeaderTitle = this.getHeaderTitle(),
+	ObjectPageLayout.prototype._adjustClipPathForTitleTransparency = function (oTitleMetrics) {
+		var oWrapperElement = this._$opWrapper.get(0),
+			oHeaderTitle = this.getHeaderTitle(),
 			bIsTitleTransparent = oHeaderTitle && oHeaderTitle.supportsBackgroundDesign()
 				&& oHeaderTitle.getBackgroundDesign() === BackgroundDesign.Transparent,
-			bRequiresClipPath = bIsTitleTransparent || this._isRTAActive(),
+			bIsAnchorBarTransparent = this.getBackgroundDesignAnchorBar() === BackgroundDesign.Transparent,
+			bRequiresClipPath = bIsTitleTransparent || bIsAnchorBarTransparent || this._isRTAActive(),
 			iTitleHeight = oTitleMetrics.height,
 			iTitleWidth = oTitleMetrics.width,
+			iScrollbarWidth,
 			sClipPath;
 
 		if (bRequiresClipPath) {
+			iScrollbarWidth = getScrollbarSize().width;
 			sClipPath = 'polygon(0px ' + iTitleHeight + 'px, '
 				+ Math.floor(iTitleWidth) + 'px ' + iTitleHeight + 'px, '
 				+ Math.floor(iTitleWidth) + 'px 0, 100% 0, 100% 100%, 0 100%)';
@@ -4097,9 +4098,7 @@ sap.ui.define([
 
 		if (oWrapperElement && oTitleElement) {
 			this._adjustClipPathForTitleTransparency(
-				oWrapperElement,
-				oTitleElement.getBoundingClientRect(),
-				getScrollbarSize().width
+				oTitleElement.getBoundingClientRect()
 			);
 		}
 	};
