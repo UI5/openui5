@@ -40,6 +40,7 @@ sap.ui.define([
 		},
 		afterEach() {
 			this.oMutationObserver.destroy();
+			sandbox.restore();
 		}
 	}, function() {
 		QUnit.test("when registration is called once with root parameter", function(assert) {
@@ -55,6 +56,21 @@ sap.ui.define([
 			assert.notOk(this.oMutationObserver._bHandlerRegistered, "then mutation observer does not contain registered handlers");
 			assert.notOk(this.oMutationObserver._mMutationHandlers[this.sNodeId], "then handler function is not registered by the given nodeId");
 			assert.notOk(this.oMutationObserver._aRootIds.length, "then root registration is empty");
+		});
+
+		QUnit.test("when a root is registered whose DOM node does not exist in the document", function(assert) {
+			const fnDone = assert.async();
+			const oHandlerSpy = sandbox.spy();
+			// Register an id that has no corresponding DOM element — getElementById returns null for it.
+			// A second, real root is also registered so the batch callback is entered and the null
+			// root node is actually visited during the resolve loop.
+			this.oMutationObserver.registerHandler("non-existent-root-id", oHandlerSpy, true);
+			this.oMutationObserver.registerHandler(this.sNodeId, function() {
+				assert.ok(true, "then the real root's callback fires");
+				assert.notOk(oHandlerSpy.called, "then the callback for the non-existent root does not fire");
+				fnDone();
+			}, true);
+			this.oNode.textContent = "trigger";
 		});
 
 		QUnit.test("when window is resized several times directly behind each other", function(assert) {
@@ -97,6 +113,97 @@ sap.ui.define([
 					fnDone();
 				});
 			});
+		});
+
+		QUnit.test("when a mutation happens on a node inside an existing overlay-container", function(assert) {
+			const fnDone = assert.async();
+			const oHandlerSpy = sandbox.spy();
+			// Use the real overlay-container if one already exists; otherwise create one.
+			// (A second element with the same id would collide under getElementById.)
+			let oOverlayContainer = document.getElementById("overlay-container");
+			const bCreated = !oOverlayContainer;
+			if (bCreated) {
+				oOverlayContainer = document.createElement("div");
+				oOverlayContainer.id = "overlay-container";
+				document.body.appendChild(oOverlayContainer);
+			}
+			const oInnerNode = document.createElement("div");
+			oOverlayContainer.appendChild(oInnerNode);
+
+			this.oMutationObserver.registerHandler(this.sNodeId, oHandlerSpy, true);
+			// setTimeout lets the setup mutations flush, then we mutate strictly inside the
+			// overlay-container and assert the overlay-related filter ignores it.
+			setTimeout(function() {
+				// Ignore any handler calls caused by the setup mutations (e.g. appending the
+				// created overlay-container to the body); only the inner mutation matters.
+				oHandlerSpy.resetHistory();
+				oInnerNode.textContent = "trigger";
+				setTimeout(function() {
+					assert.notOk(oHandlerSpy.called, "then the domChanged callback is not called for a mutation inside the overlay-container");
+					if (bCreated) {
+						oOverlayContainer.remove();
+					} else {
+						oInnerNode.remove();
+					}
+					fnDone();
+				});
+			});
+		});
+
+		QUnit.test("when a mutation happens on a node inside the preserve area", function(assert) {
+			const fnDone = assert.async();
+			const oHandlerSpy = sandbox.spy();
+			// Use the real preserve area if it already exists; otherwise create one.
+			// (A second element with id "sap-ui-preserve" would collide under getElementById.)
+			let oPreserveArea = document.getElementById("sap-ui-preserve");
+			const bCreated = !oPreserveArea;
+			if (bCreated) {
+				oPreserveArea = document.createElement("div");
+				oPreserveArea.id = "sap-ui-preserve";
+				document.body.appendChild(oPreserveArea);
+			}
+			const oPreservedNode = document.createElement("div");
+			oPreserveArea.appendChild(oPreservedNode);
+
+			this.oMutationObserver.registerHandler(this.sNodeId, oHandlerSpy, true);
+			// setTimeout lets the setup mutations flush, then we mutate strictly inside the
+			// preserve area and assert the preserve-area filter ignores it.
+			setTimeout(function() {
+				// Ignore any handler calls caused by the setup mutations (e.g. appending the
+				// created preserve area to the body); only the in-preserve mutation matters.
+				oHandlerSpy.resetHistory();
+				oPreservedNode.textContent = "trigger-preserve";
+				setTimeout(function() {
+					assert.notOk(oHandlerSpy.called, "then the domChanged callback is not called for a mutation inside the preserve area");
+					if (bCreated) {
+						oPreserveArea.remove();
+					} else {
+						oPreservedNode.remove();
+					}
+					fnDone();
+				});
+			});
+		});
+
+		QUnit.test("when many mutations happen in a single batch (invariant nodes resolved once)", function(assert) {
+			const fnDone = assert.async();
+			const oGetElementByIdSpy = sandbox.spy(document, "getElementById");
+			this.oMutationObserver.registerHandler(this.sNodeId, function() {
+				// Root (1) + overlay-container (1) + sap-ui-preserve (1) = 3 lookups per batch,
+				// independent of the number of mutation records processed.
+				assert.strictEqual(
+					oGetElementByIdSpy.callCount,
+					3,
+					"then invariant DOM nodes are resolved only once per batch, regardless of mutation count"
+				);
+				fnDone();
+			}, true);
+			// Produce several mutation records within one microtask flush.
+			for (let i = 0; i < 10; i++) {
+				const oChild = document.createElement("div");
+				oChild.id = `child-${i}`;
+				this.oNode.appendChild(oChild);
+			}
 		});
 
 		QUnit.test("when the text node of a relevant node is modified", function(assert) {
@@ -455,6 +562,20 @@ sap.ui.define([
 				assert.notOk(true, "then domChanged callback on Button should not been called");
 			});
 			this.oOuterPanel.setHeaderText("hallo");
+		});
+
+		QUnit.test("when a node that is an ancestor of a registered root is mutated", function(assert) {
+			const fnDone = assert.async();
+			// Register the inner layout as the root. Then mutate a node that sits *above*
+			// it in the DOM tree (oOuterPanel). The reverse-contains branch
+			// (oNode.contains(oRootNode)) must fire the inner layout's callback.
+			this.oMutationObserver.registerHandler(this.oVerticalLayoutInner.getId(), function() {
+				assert.ok(true, "then domChanged callback fires for the registered root whose ancestor was mutated");
+				fnDone();
+			}, true);
+			// Changing a style attribute on the outer panel triggers a mutation whose target
+			// is an ancestor of the registered root — exactly the reverse-contains case.
+			this.oOuterPanel.getDomRef().style.outline = "2px solid red";
 		});
 	});
 
