@@ -102,7 +102,7 @@ sap.ui.define([
 	 */
 	function createResponse(oBody, mHeaders) {
 		return {
-			headers : mHeaders || {},
+			headers : mHeaders ?? {},
 			responseText : oBody ? JSON.stringify(oBody) : ""
 		};
 	}

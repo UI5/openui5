@@ -94,8 +94,15 @@ sap.ui.define([
 	};
 
 	AddIFrame.getChangeVisualizationInfo = function(oChange) {
+		const oContent = oChange.getContent();
 		return {
-			affectedControls: [oChange.getContent().selector]
+			affectedControls: [oContent.selector],
+			// Wrap the URL as { raw: ... } so the change indicator does not run it
+			// through binding resolution — iframe URLs can contain placeholders
+			// that must be shown verbatim
+			descriptionPayload: {
+				url: { raw: oContent.url }
+			}
 		};
 	};
 

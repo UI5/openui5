@@ -157,7 +157,7 @@ sap.ui.define([
 			}
 		}
 
-		mParameters = _Helper.clone(mParameters) || {};
+		mParameters = _Helper.clone(mParameters) ?? {};
 		// Note: needs this.oOperation
 		this.checkBindingParameters(mParameters, ["$$canonicalPath", "$$groupId",
 			"$$inheritExpandSelect", "$$ownRequest", "$$patchWithoutSideEffects",

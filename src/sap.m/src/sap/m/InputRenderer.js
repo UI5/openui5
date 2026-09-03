@@ -82,6 +82,7 @@ InputRenderer.addInnerClasses = function (oRm, oControl) {
 InputRenderer.writeDescription = function (oRm, oControl) {
 	oRm.openStart("div")
 		.class("sapMInputDescriptionWrapper")
+		.class("sapMInputDescriptionAlign" + oControl.getDescriptionAlign())
 		.style("width", "calc(100% - " + oControl.getFieldWidth() + ")")
 		.openEnd();
 
