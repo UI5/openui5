@@ -6,33 +6,14 @@ sap.ui.define([
 	"sap/base/util/clamp",
 	"sap/base/i18n/Localization",
 	"sap/ui/dom/getScrollbarSize",
-	"sap/ui/core/popover/PopoverPhysicalSide"
-], (clamp, Localization, getScrollbarSize, PopoverPhysicalSide) => {
+	"sap/ui/core/popover/PopoverPhysicalSide",
+	"sap/ui/core/popover/PopoverFlipMode",
+	"sap/ui/core/library"
+], (clamp, Localization, getScrollbarSize, PopoverPhysicalSide, PopoverFlipMode, coreLib) => {
 	"use strict";
 
-	// -----------------------------------------------------------------
-	// Placement *input* string tokens. These match sap.m.PlacementType
-	// values. We keep them as string literals so the helper has no AMD
-	// dependency on sap.m.library. The four strict output sides are not
-	// here — those come from the shared PopoverPhysicalSide enum.
-	// -----------------------------------------------------------------
-	const LogicalPlacement = Object.freeze({
-		Vertical: "Vertical",
-		Horizontal: "Horizontal",
-		Auto: "Auto",
-		VerticalPreferedTop: "VerticalPreferedTop",
-		VerticalPreferredTop: "VerticalPreferredTop",
-		VerticalPreferedBottom: "VerticalPreferedBottom",
-		VerticalPreferredBottom: "VerticalPreferredBottom",
-		HorizontalPreferedLeft: "HorizontalPreferedLeft",
-		HorizontalPreferredLeft: "HorizontalPreferredLeft",
-		HorizontalPreferedRight: "HorizontalPreferedRight",
-		HorizontalPreferredRight: "HorizontalPreferredRight",
-		PreferredTopOrFlip: "PreferredTopOrFlip",
-		PreferredBottomOrFlip: "PreferredBottomOrFlip",
-		PreferredLeftOrFlip: "PreferredLeftOrFlip",
-		PreferredRightOrFlip: "PreferredRightOrFlip"
-	});
+	// Shortcut for sap.ui.core.popover.PopoverPlacement
+	const PopoverPlacement = coreLib.popover.PopoverPlacement;
 
 	/**
 	 * @namespace sap.ui.core.popover.Positioning
@@ -42,10 +23,8 @@ sap.ui.define([
 	 */
 	const Positioning = {};
 
-	// Page-relative Y of the top bound for the top-space calculation: the visible
-	// viewport top for the window (the current scroll offset), or the within-area's
-	// page top for a custom within-area. Mirrors getBottomBound so both vertical
-	// spaces measure the *visible* gap, not the raw page-relative opener top.
+	// Page-relative Y of the top bound: viewport top (scroll offset) for the
+	// window, or the within-area's page top.
 	const getTopBound = (oWithinArea) => {
 		if (!oWithinArea || oWithinArea === window) {
 			return window.scrollY;
@@ -54,19 +33,35 @@ sap.ui.define([
 		return oWithinArea.getBoundingClientRect().top + window.scrollY;
 	};
 
-	// Page-relative Y of the bottom bound for the bottom-space calculation:
-	// the visible viewport bottom for the window, or the document-end bound
-	// (offset by the within-area's page top) for a custom within-area.
+	// Page-relative Y of the bottom bound: viewport bottom for the window, or the
+	// within-area's page bottom.
 	const getBottomBound = (oWithinArea) => {
 		if (!oWithinArea || oWithinArea === window) {
 			return window.innerHeight + window.scrollY;
 		}
 
-		const oBody = document.body,
-			oHtml = document.documentElement;
+		return oWithinArea.getBoundingClientRect().bottom + window.scrollY;
+	};
 
-		return oWithinArea.getBoundingClientRect().top + window.scrollY
-			+ Math.max(oBody.scrollHeight, oBody.offsetHeight, oHtml.clientHeight, oHtml.offsetHeight);
+	// Viewport-relative X of the left bound: 0 for the window, or the within-area's
+	// left edge. Viewport-relative (no scrollX) to match openerRect.left.
+	const getLeftBound = (oWithinArea) => {
+		if (!oWithinArea || oWithinArea === window) {
+			return 0;
+		}
+
+		return oWithinArea.getBoundingClientRect().left;
+	};
+
+	// Viewport-relative X of the right bound: clientWidth (excludes scrollbar) for
+	// the window, matching getViewport; the within-area's right edge otherwise.
+	// A coordinate, not a width.
+	const getRightBound = (oWithinArea) => {
+		if (!oWithinArea || oWithinArea === window) {
+			return document.documentElement.clientWidth;
+		}
+
+		return oWithinArea.getBoundingClientRect().right;
 	};
 
 	/**
@@ -78,45 +73,51 @@ sap.ui.define([
 	 * @private
 	 */
 	const computeSpaces = (o) => {
-		const { openerRect, margin, viewport } = o;
+		const { openerRect, margin } = o;
 		const iOffsetX = o.offsetX ?? 0;
 		const iOffsetY = o.offsetY ?? 0;
 
 		return {
 			top: openerRect.top - getTopBound(o.withinAreaRef) - margin.top + iOffsetY,
 			bottom: getBottomBound(o.withinAreaRef) - openerRect.bottom - margin.bottom - iOffsetY,
-			left: openerRect.left - margin.left + iOffsetX,
-			right: viewport.width - openerRect.right - margin.right - iOffsetX
+			left: openerRect.left - getLeftBound(o.withinAreaRef) - margin.left + iOffsetX,
+			right: getRightBound(o.withinAreaRef) - openerRect.right - margin.right - iOffsetX
 		};
 	};
 
+	// Resolve a vertical (Top/Bottom) placement from placement + flipMode.
 	const calcVertical = (o) => {
 		const s = computeSpaces(o);
-		const iH = o.popoverSize.height;
-		const iArrow = o.arrowSize ?? 0;
+		const iFits = o.popoverSize.height + (o.arrowSize ?? 0);
+		const bMoreTop = s.top > s.bottom;
+		const sRoomier = bMoreTop ? PopoverPhysicalSide.Top : PopoverPhysicalSide.Bottom;
 
-		const bPreferredTop = o.preferred === LogicalPlacement.VerticalPreferedTop || o.preferred === LogicalPlacement.VerticalPreferredTop;
-		const bPreferredBottom = o.preferred === LogicalPlacement.VerticalPreferedBottom || o.preferred === LogicalPlacement.VerticalPreferredBottom;
-		const bPreferredTopOrFlip = o.preferred === LogicalPlacement.PreferredTopOrFlip;
-		const bPreferredBottomOrFlip = o.preferred === LogicalPlacement.PreferredBottomOrFlip;
-
-		if (bPreferredTop && s.top > iH + iArrow) {
-			return PopoverPhysicalSide.Top;
+		if (o.auto) {
+			return sRoomier;
 		}
 
-		if (bPreferredTopOrFlip) {
-			return (s.top > iH + iArrow) ? PopoverPhysicalSide.Top : PopoverPhysicalSide.Bottom;
+		if (o.flipMode === PopoverFlipMode.PureSpace) {
+			return sRoomier;
 		}
 
-		if (bPreferredBottom && s.bottom > iH + iArrow) {
+		const bOpposite = o.flipMode === PopoverFlipMode.Opposite;
+
+		if (o.placement === PopoverPlacement.Top) {
+			if (s.top > iFits) {
+				return PopoverPhysicalSide.Top;
+			}
+			// MoreSpace: keep the preferred side on a tie (equal space) — flip only
+			// when the opposite side is strictly roomier.
+			const sMoreSpace = s.top >= s.bottom ? PopoverPhysicalSide.Top : PopoverPhysicalSide.Bottom;
+			return bOpposite ? PopoverPhysicalSide.Bottom : sMoreSpace;
+		}
+
+		// placement Bottom
+		if (s.bottom > iFits) {
 			return PopoverPhysicalSide.Bottom;
 		}
-
-		if (bPreferredBottomOrFlip) {
-			return (s.bottom > iH + iArrow) ? PopoverPhysicalSide.Bottom : PopoverPhysicalSide.Top;
-		}
-
-		return (s.top > s.bottom) ? PopoverPhysicalSide.Top : PopoverPhysicalSide.Bottom;
+		const sMoreSpace = s.bottom >= s.top ? PopoverPhysicalSide.Bottom : PopoverPhysicalSide.Top;
+		return bOpposite ? PopoverPhysicalSide.Top : sMoreSpace;
 	};
 
 	// Resolve the logical "start"/"end" horizontal side to a physical side,
@@ -124,35 +125,45 @@ sap.ui.define([
 	const physicalStart = (bRtl) => (bRtl ? PopoverPhysicalSide.Right : PopoverPhysicalSide.Left);
 	const physicalEnd = (bRtl) => (bRtl ? PopoverPhysicalSide.Left : PopoverPhysicalSide.Right);
 
+	// Resolve a horizontal (Begin/End) placement from placement + flipMode.
+	// Begin resolves to the logical start side, End to the logical end side; both
+	// space checks and the returned side are mapped through RTL together.
 	const calcHorizontal = (o) => {
 		const s = computeSpaces(o);
-		const iW = o.popoverSize.width;
-		const iArrow = o.arrowSize ?? 0;
+		const iFits = o.popoverSize.width + (o.arrowSize ?? 0);
 		const bRtl = Localization.getRTL();
-		const bFits = (space) => space > iW + iArrow;
+		const sStart = physicalStart(bRtl);
+		const sEnd = physicalEnd(bRtl);
+		const iStartSpace = bRtl ? s.right : s.left;
+		const iEndSpace = bRtl ? s.left : s.right;
+		const sRoomier = iStartSpace > iEndSpace ? sStart : sEnd;
 
-		const bPreferredLeft = o.preferred === LogicalPlacement.HorizontalPreferedLeft || o.preferred === LogicalPlacement.HorizontalPreferredLeft;
-		const bPreferredRight = o.preferred === LogicalPlacement.HorizontalPreferedRight || o.preferred === LogicalPlacement.HorizontalPreferredRight;
-		const bPreferredLeftOrFlip = o.preferred === LogicalPlacement.PreferredLeftOrFlip;
-		const bPreferredRightOrFlip = o.preferred === LogicalPlacement.PreferredRightOrFlip;
-
-		if (bPreferredLeft && bFits(s.left)) {
-			return physicalStart(bRtl);
+		if (o.auto) {
+			return sRoomier;
 		}
 
-		if (bPreferredLeftOrFlip) {
-			return bFits(s.left) ? physicalStart(bRtl) : physicalEnd(bRtl);
+		if (o.flipMode === PopoverFlipMode.PureSpace) {
+			return sRoomier;
 		}
 
-		if (bPreferredRight && bFits(s.right)) {
-			return physicalEnd(bRtl);
+		const bOpposite = o.flipMode === PopoverFlipMode.Opposite;
+
+		if (o.placement === PopoverPlacement.Begin) {
+			if (iStartSpace > iFits) {
+				return sStart;
+			}
+			// MoreSpace: keep the preferred side on a tie (equal space) — flip only
+			// when the opposite side is strictly roomier.
+			const sMoreSpace = iStartSpace >= iEndSpace ? sStart : sEnd;
+			return bOpposite ? sEnd : sMoreSpace;
 		}
 
-		if (bPreferredRightOrFlip) {
-			return bFits(s.right) ? physicalEnd(bRtl) : physicalStart(bRtl);
+		// placement End
+		if (iEndSpace > iFits) {
+			return sEnd;
 		}
-
-		return (s.left > s.right) ? physicalStart(bRtl) : physicalEnd(bRtl);
+		const sMoreSpace = iEndSpace >= iStartSpace ? sEnd : sStart;
+		return bOpposite ? sStart : sMoreSpace;
 	};
 
 	const checkHorizontal = (o) => {
@@ -186,11 +197,14 @@ sap.ui.define([
 		const fTopCoverage = (fAvailableWidth * s.top) / fPopoverSize;
 		const fBottomCoverage = (fAvailableWidth * s.bottom) / fPopoverSize;
 
-		const fMaxH = Math.max(fLeftCoverage, fRightCoverage);
+		const fStartCoverage = bRtl ? fRightCoverage : fLeftCoverage;
+		const fEndCoverage = bRtl ? fLeftCoverage : fRightCoverage;
+
+		const fMaxH = Math.max(fStartCoverage, fEndCoverage);
 		const fMaxV = Math.max(fTopCoverage, fBottomCoverage);
 
 		if (fMaxH > fMaxV) {
-			return (fMaxH === fLeftCoverage) ? physicalStart(bRtl) : physicalEnd(bRtl);
+			return (fMaxH === fStartCoverage) ? physicalStart(bRtl) : physicalEnd(bRtl);
 		}
 
 		if (fMaxV > fMaxH) {
@@ -202,7 +216,7 @@ sap.ui.define([
 			return (fMaxV === fTopCoverage) ? PopoverPhysicalSide.Top : PopoverPhysicalSide.Bottom;
 		}
 
-		return (fMaxH === fLeftCoverage) ? physicalStart(bRtl) : physicalEnd(bRtl);
+		return (fMaxH === fStartCoverage) ? physicalStart(bRtl) : physicalEnd(bRtl);
 	};
 
 	const calcAuto = (o) => {
@@ -231,26 +245,6 @@ sap.ui.define([
 		return calcBestPos(o);
 	};
 
-	// Preferred values routed through the vertical / horizontal solvers.
-	const VERTICAL_PREFERRED = new Set([
-		LogicalPlacement.Vertical,
-		LogicalPlacement.VerticalPreferedTop,
-		LogicalPlacement.VerticalPreferredTop,
-		LogicalPlacement.VerticalPreferedBottom,
-		LogicalPlacement.VerticalPreferredBottom,
-		LogicalPlacement.PreferredTopOrFlip,
-		LogicalPlacement.PreferredBottomOrFlip
-	]);
-	const HORIZONTAL_PREFERRED = new Set([
-		LogicalPlacement.Horizontal,
-		LogicalPlacement.HorizontalPreferedLeft,
-		LogicalPlacement.HorizontalPreferredLeft,
-		LogicalPlacement.HorizontalPreferedRight,
-		LogicalPlacement.HorizontalPreferredRight,
-		LogicalPlacement.PreferredLeftOrFlip,
-		LogicalPlacement.PreferredRightOrFlip
-	]);
-
 	// Fully page-relative rect of a DOM element: border-box size from
 	// getBoundingClientRect, with left/top shifted by the document scroll.
 	const pageRect = (oDomRef) => {
@@ -264,6 +258,7 @@ sap.ui.define([
 		};
 	};
 
+	// Viewport size. Only feeds calcAuto/calcBestPos; space math uses the bounds above.
 	const getViewport = (oWithinArea) => {
 		if (!oWithinArea || oWithinArea === window) {
 			const oDoc = document.documentElement;
@@ -434,23 +429,15 @@ sap.ui.define([
 	 * up on given a preferred placement value + viewport space.
 	 *
 	 * @param {object} oOptions The options bag.
-	 * @param {string} oOptions.preferred
-	 *   The requested placement — every value accepted by
-	 *   <code>sap.m.PlacementType</code>: <code>Top</code>,
-	 *   <code>Bottom</code>, <code>Left</code>, <code>Right</code>,
-	 *   <code>Vertical</code>, <code>Horizontal</code>,
-	 *   <code>Auto</code>, <code>VerticalPreferedTop</code>,
-	 *   <code>VerticalPreferredTop</code>,
-	 *   <code>VerticalPreferedBottom</code>,
-	 *   <code>VerticalPreferredBottom</code>,
-	 *   <code>HorizontalPreferedLeft</code>,
-	 *   <code>HorizontalPreferredLeft</code>,
-	 *   <code>HorizontalPreferedRight</code>,
-	 *   <code>HorizontalPreferredRight</code>,
-	 *   <code>PreferredTopOrFlip</code>,
-	 *   <code>PreferredBottomOrFlip</code>,
-	 *   <code>PreferredLeftOrFlip</code>,
-	 *   <code>PreferredRightOrFlip</code>.
+	 * @param {sap.ui.core.popover.PopoverPlacement} oOptions.placement
+	 *   The requested placement. <code>Begin</code>/<code>End</code> are
+	 *   RTL-relative horizontal. Ignored when <code>auto</code> is set.
+	 * @param {sap.ui.core.popover.PopoverFlipMode} [oOptions.flipMode]
+	 *   How to react when the preferred side does not fit.
+	 *   Ignored when <code>auto</code> is set.
+	 * @param {boolean} [oOptions.auto]
+	 *   When <code>true</code>, the best side is picked automatically by
+	 *   coverage, ignoring <code>placement</code> and <code>flipMode</code>.
 	 * @param {Element} oOptions.openerRef
 	 *   The opener DOM element the popover is positioned relative to; measured
 	 *   internally.
@@ -473,11 +460,17 @@ sap.ui.define([
 	 * @since 1.151
 	 */
 	Positioning.resolvePlacement = (oOptions) => {
-		const sPreferred = oOptions.preferred;
+		const sPlacement = oOptions.placement;
 
-		// Strict sides pass through unchanged
-		if (Object.hasOwn(PopoverPhysicalSide, sPreferred)) {
-			return sPreferred;
+		// Never: strict physical side, no measurement / flip.
+		if (oOptions.flipMode === PopoverFlipMode.Never && !oOptions.auto) {
+			if (sPlacement === PopoverPlacement.Begin) {
+				return physicalStart(Localization.getRTL());
+			}
+			if (sPlacement === PopoverPlacement.End) {
+				return physicalEnd(Localization.getRTL());
+			}
+			return sPlacement; // Top | Bottom pass through
 		}
 
 		const oPopoverRect = getOpenerRect(oOptions.popoverRef);
@@ -487,15 +480,15 @@ sap.ui.define([
 			viewport: getViewport(oOptions.withinAreaRef)
 		});
 
-		if (sPreferred === LogicalPlacement.Auto) {
+		if (oOptions.auto) {
 			return calcAuto(oOpts);
 		}
 
-		if (VERTICAL_PREFERRED.has(sPreferred)) {
+		if (sPlacement === PopoverPlacement.Top || sPlacement === PopoverPlacement.Bottom) {
 			return calcVertical(oOpts);
 		}
 
-		if (HORIZONTAL_PREFERRED.has(sPreferred)) {
+		if (sPlacement === PopoverPlacement.Begin || sPlacement === PopoverPlacement.End) {
 			return calcHorizontal(oOpts);
 		}
 
@@ -629,6 +622,13 @@ sap.ui.define([
 	 *   Whether the popover has an arrow. With an arrow the popover is centered on
 	 *   the opener (arrow points at the center). Without an arrow it is start-aligned
 	 *   (<code>begin</code>) on the cross axis.
+	 * @param {boolean} [oOptions.mirror=true]
+	 *   Whether the caller relies on <code>sap.ui.core.Popup</code> to mirror the
+	 *   anchor tokens in RTL. When <code>true</code> (default), the horizontal sides
+	 *   emit logical <code>begin</code>/<code>end</code> tokens that Popup flips in
+	 *   RTL. When <code>false</code>, the caller has already resolved a TRUE physical
+	 *   <code>side</code>; the horizontal sides emit physical <code>left</code>/<code>right</code>
+	 *   tokens that pass through Popup untouched, avoiding a double flip.
 	 * @returns {{my: string, at: string, offset: string}} the jquery-ui-position spec.
 	 * @public
 	 * @since 1.151
@@ -636,15 +636,21 @@ sap.ui.define([
 	Positioning.computeAnchor = (oOptions) => {
 		const iArrow = oOptions.arrowSize ?? 0;
 		const bShowArrow = oOptions.showArrow !== false;
+		const bMirror = oOptions.mirror !== false;
+
+		// Horizontal cross-axis tokens: logical begin/end when Popup mirrors in RTL,
+		// physical left/right when the caller already resolved the physical side.
+		const sStartToken = bMirror ? "end" : "right";
+		const sEndToken = bMirror ? "begin" : "left";
 
 		if (!bShowArrow) {
 			switch (oOptions.side) {
 				case PopoverPhysicalSide.Top:
 					return { my: "begin bottom", at: "begin top", offset: "0 0" };
 				case PopoverPhysicalSide.Left:
-					return { my: "end center", at: "begin center", offset: "0 0" };
+					return { my: `${sStartToken} center`, at: `${sEndToken} center`, offset: "0 0" };
 				case PopoverPhysicalSide.Right:
-					return { my: "begin center", at: "end center", offset: "0 0" };
+					return { my: `${sEndToken} center`, at: `${sStartToken} center`, offset: "0 0" };
 				case PopoverPhysicalSide.Bottom:
 				default:
 					return { my: "begin top", at: "begin bottom", offset: "0 0" };
@@ -655,9 +661,9 @@ sap.ui.define([
 			case PopoverPhysicalSide.Top:
 				return { my: "center bottom", at: "center top", offset: `0 ${-iArrow}` };
 			case PopoverPhysicalSide.Left:
-				return { my: "end center", at: "begin center", offset: `${-iArrow} 0` };
+				return { my: `${sStartToken} center`, at: `${sEndToken} center`, offset: `${-iArrow} 0` };
 			case PopoverPhysicalSide.Right:
-				return { my: "begin center", at: "end center", offset: `${iArrow} 0` };
+				return { my: `${sEndToken} center`, at: `${sStartToken} center`, offset: `${iArrow} 0` };
 			case PopoverPhysicalSide.Bottom:
 			default:
 				return { my: "center top", at: "center bottom", offset: `0 ${iArrow}` };

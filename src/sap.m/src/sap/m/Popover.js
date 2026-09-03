@@ -15,6 +15,7 @@ sap.ui.define([
 	'sap/ui/core/Popup',
 	'sap/ui/core/popover/Positioning',
 	'sap/ui/core/popover/PopoverPhysicalSide',
+	'sap/ui/core/popover/PopoverFlipMode',
 	'sap/ui/core/delegate/ScrollEnablement',
 	'sap/ui/core/theming/Parameters',
 	'sap/ui/Device',
@@ -47,6 +48,7 @@ sap.ui.define([
 		Popup,
 		Positioning,
 		PopoverPhysicalSide,
+		PopoverFlipMode,
 		ScrollEnablement,
 		Parameters,
 		Device,
@@ -73,11 +75,50 @@ sap.ui.define([
 		// shortcut for sap.ui.core.OpenState
 		var OpenState = coreLibrary.OpenState;
 
+		// shortcut for sap.ui.core.popover.PopoverPlacement
+		const PopoverPlacement = coreLibrary.popover.PopoverPlacement;
+
 		// shortcut for sap.m.PlacementType
 		var PlacementType = library.PlacementType;
 
 		// shortcut for sap.m.TitleAlignment
 		var TitleAlignment = library.TitleAlignment;
+
+		// Maps sap.m.PlacementType to the sap.ui.core.popover
+		// {placement, flipMode} vocabulary consumed by Positioning.resolvePlacement.
+		const PLACEMENT_TO_POSITIONING = {
+			[PlacementType.Top]:                      { placement: PopoverPlacement.Top,    flipMode: PopoverFlipMode.Never },
+			[PlacementType.Bottom]:                   { placement: PopoverPlacement.Bottom, flipMode: PopoverFlipMode.Never },
+			[PlacementType.Left]:                     { placement: PopoverPlacement.Begin,  flipMode: PopoverFlipMode.Never },
+			[PlacementType.Right]:                    { placement: PopoverPlacement.End,    flipMode: PopoverFlipMode.Never },
+			[PlacementType.Vertical]:                 { placement: PopoverPlacement.Top,    flipMode: PopoverFlipMode.PureSpace },
+			[PlacementType.Horizontal]:               { placement: PopoverPlacement.Begin,  flipMode: PopoverFlipMode.PureSpace },
+			[PlacementType.VerticalPreferredTop]:     { placement: PopoverPlacement.Top,    flipMode: PopoverFlipMode.MoreSpace },
+			/**
+			 * @deprecated As of version 1.36
+			 */
+			[PlacementType.VerticalPreferedTop]:      { placement: PopoverPlacement.Top,    flipMode: PopoverFlipMode.MoreSpace },
+			[PlacementType.VerticalPreferredBottom]:  { placement: PopoverPlacement.Bottom, flipMode: PopoverFlipMode.MoreSpace },
+			/**
+			 * @deprecated As of version 1.36
+			 */
+			[PlacementType.VerticalPreferedBottom]:   { placement: PopoverPlacement.Bottom, flipMode: PopoverFlipMode.MoreSpace },
+			[PlacementType.HorizontalPreferredLeft]:  { placement: PopoverPlacement.Begin,  flipMode: PopoverFlipMode.MoreSpace },
+			/**
+			 * @deprecated As of version 1.36
+			 */
+			[PlacementType.HorizontalPreferedLeft]:   { placement: PopoverPlacement.Begin,  flipMode: PopoverFlipMode.MoreSpace },
+			[PlacementType.HorizontalPreferredRight]: { placement: PopoverPlacement.End,    flipMode: PopoverFlipMode.MoreSpace },
+			/**
+			 * @deprecated As of version 1.36
+			 */
+			[PlacementType.HorizontalPreferedRight]:  { placement: PopoverPlacement.End,    flipMode: PopoverFlipMode.MoreSpace },
+			[PlacementType.PreferredTopOrFlip]:       { placement: PopoverPlacement.Top,    flipMode: PopoverFlipMode.Opposite },
+			[PlacementType.PreferredBottomOrFlip]:    { placement: PopoverPlacement.Bottom, flipMode: PopoverFlipMode.Opposite },
+			[PlacementType.PreferredLeftOrFlip]:      { placement: PopoverPlacement.Begin,  flipMode: PopoverFlipMode.Opposite },
+			[PlacementType.PreferredRightOrFlip]:     { placement: PopoverPlacement.End,    flipMode: PopoverFlipMode.Opposite },
+			[PlacementType.Auto]:                     { auto: true }
+		};
 
 		/**
 		* Constructor for a new Popover.
@@ -1768,8 +1809,12 @@ sap.ui.define([
 
 		// Resolve the physical side for the current placement without moving the popover.
 		Popover.prototype._resolvePlacement = function () {
+			const oMapped = PLACEMENT_TO_POSITIONING[this.getPlacement()];
+
 			return Positioning.resolvePlacement({
-				preferred: this.getPlacement(),
+				placement: oMapped.placement,
+				flipMode: oMapped.flipMode,
+				auto: oMapped.auto,
 				openerRef: this._getOpenByDomRef(),
 				popoverRef: this.getDomRef(),
 				withinAreaRef: this.getWithinAreaDomRef(),
@@ -1867,8 +1912,6 @@ sap.ui.define([
 			oPosParams._fHeaderHeight = oPosParams._$header.length > 0 ? oPosParams._$header.outerHeight(true) : 0;
 			oPosParams._fSubHeaderHeight = oPosParams._$subHeader.length > 0 ? oPosParams._$subHeader.outerHeight(true) : 0;
 			oPosParams._fFooterHeight = oPosParams._$footer.length > 0 ? oPosParams._$footer.outerHeight(true) : 0;
-
-			oPosParams._fPopoverOffset = $popover.offset();
 
 			oPosParams._fPopoverBorderTop = parseFloat(oComputedStyle.borderTopWidth);
 			oPosParams._fPopoverBorderRight = parseFloat(oComputedStyle.borderRightWidth);

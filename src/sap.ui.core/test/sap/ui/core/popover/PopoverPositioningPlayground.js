@@ -13,6 +13,7 @@ sap.ui.define([
 	"sap/ui/core/Icon",
 	"sap/ui/core/Popup",
 	"sap/m/library",
+	"sap/ui/core/library",
 	"sap/ui/core/tooltip/Tooltip"
 ], function (
 	Popover,
@@ -29,13 +30,16 @@ sap.ui.define([
 	Icon,
 	Popup,
 	mLibrary,
+	coreLibrary,
 	Tooltip
 ) {
 	"use strict";
 
 	const PlacementType = mLibrary.PlacementType;
+	const PopoverPlacement = coreLibrary.popover.PopoverPlacement;
 
-	const aPlacements = [
+	// ---- Configuration --------------------------------------------------
+	const aPopoverPlacements = [
 		PlacementType.Top,
 		PlacementType.Bottom,
 		PlacementType.Left,
@@ -52,6 +56,7 @@ sap.ui.define([
 		PlacementType.PreferredRightOrFlip,
 		PlacementType.Auto
 	];
+	const aTooltipPlacements = Object.values(PopoverPlacement);
 
 	const mContent = {
 		"short": "Short tooltip text.",
@@ -237,6 +242,31 @@ sap.ui.define([
 		}
 	});
 
+	const oPlacementSelect = new Select({
+		id: "ppp-placement",
+		selectedKey: sPlacement,
+		items: aPopoverPlacements.map(function (s) {
+			return new Item({ key: s, text: s });
+		}),
+		change: function (oEvent) {
+			sPlacement = oEvent.getParameter("selectedItem").getKey();
+			closeCurrent();
+		}
+	});
+
+	// Rebuild the placement dropdown for the active control's enum.
+	function syncPlacementItems() {
+		const aValues = sControl === "Tooltip" ? aTooltipPlacements : aPopoverPlacements;
+		if (aValues.indexOf(sPlacement) === -1) {
+			sPlacement = aValues[0];
+		}
+		oPlacementSelect.destroyItems();
+		aValues.forEach(function (s) {
+			oPlacementSelect.addItem(new Item({ key: s, text: s }));
+		});
+		oPlacementSelect.setSelectedKey(sPlacement);
+	}
+
 	const oControlSwitch = new SegmentedButton({
 		id: "ppp-control",
 		contentMode: "ContentFit",
@@ -248,18 +278,7 @@ sap.ui.define([
 		selectionChange: function (oEvent) {
 			sControl = oEvent.getParameter("item").getKey();
 			oShowArrowCheck.setVisible(sControl === "Popover");
-			closeCurrent();
-		}
-	});
-
-	const oPlacementSelect = new Select({
-		id: "ppp-placement",
-		selectedKey: sPlacement,
-		items: aPlacements.map(function (s) {
-			return new Item({ key: s, text: s });
-		}),
-		change: function (oEvent) {
-			sPlacement = oEvent.getParameter("selectedItem").getKey();
+			syncPlacementItems();
 			closeCurrent();
 		}
 	});
@@ -348,7 +367,7 @@ sap.ui.define([
 			new HBox({
 				alignItems: "Center",
 				items: [
-					new Label({ text: "Placement", showColon: true }).addStyleClass("sapUiTinyMarginEnd"),
+					new Label({ text: "PopoverPlacement", showColon: true }).addStyleClass("sapUiTinyMarginEnd"),
 					oPlacementSelect,
 					oShowArrowCheck.addStyleClass("sapUiTinyMarginBegin")
 				]

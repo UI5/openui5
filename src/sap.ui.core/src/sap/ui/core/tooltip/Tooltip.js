@@ -11,7 +11,10 @@ sap.ui.define([
 	"sap/ui/core/popover/PopoverPhysicalSide",
 	"sap/ui/core/theming/Parameters",
 	"sap/ui/dom/units/Rem",
+	"sap/ui/core/popover/PopoverFlipMode",
 	"sap/ui/core/tooltip/TooltipManager",
+	"sap/ui/core/library",
+	"sap/base/i18n/Localization",
 	"./TooltipRenderer"
 ],
 	function(
@@ -22,10 +25,16 @@ sap.ui.define([
 		PopoverPhysicalSide,
 		Parameters,
 		Rem,
+		PopoverFlipMode,
 		TooltipManager,
+		coreLibrary,
+		Localization,
 		TooltipRenderer
 	) {
 		"use strict";
+
+		// shortcut for sap.ui.core.popover.PopoverPlacement
+		const PopoverPlacement = coreLibrary.popover.PopoverPlacement;
 
 		/**
 		* Constructor for a new Tooltip.
@@ -71,13 +80,10 @@ sap.ui.define([
 
 					/**
 					 * Defines the placement of the tooltip relative to its target.
-					 *
-					 * Accepts the same placement string tokens understood as <code>sap.m.PlacementType</code>).
-					 * Typed as <code>string</code> so that <code>sap.ui.core</code> does not depend on the <code>sap.m</code> enum.
 					 * @since 1.151
 					 */
 					placement: {
-						type: "string", group: "Behavior", defaultValue: "VerticalPreferredTop"
+						type: "sap.ui.core.popover.PopoverPlacement", group: "Behavior", defaultValue: PopoverPlacement.Top
 					},
 
 					/**
@@ -111,6 +117,25 @@ sap.ui.define([
 		const ARROW_CORNER_INSET_PX = 4;
 		// Base gap the tooltip keeps from the within-area edge.
 		const EDGE_MARGIN_PX = 10;
+
+		// Positioning clamp/class helpers expect a LOGICAL side (they re-derive
+		// physical via RTL, as sap.m.Popover feeds them). The tooltip resolves a
+		// physical side, so swap Left<->Right in RTL before calling them.
+		function toLogicalSide(sSide) {
+			if (!Localization.getRTL()) {
+				return sSide;
+			}
+
+			if (sSide === PopoverPhysicalSide.Left) {
+				return PopoverPhysicalSide.Right;
+			}
+
+			if (sSide === PopoverPhysicalSide.Right) {
+				return PopoverPhysicalSide.Left;
+			}
+
+			return sSide;
+		}
 
 		Tooltip.prototype.init = function () {
 			this._sCalcedPos = null;
@@ -188,7 +213,8 @@ sap.ui.define([
 
 					const oAnchor = Positioning.computeAnchor({
 						side: sSide,
-						arrowSize: oTooltip._arrowProtrusion
+						arrowSize: oTooltip._arrowProtrusion,
+						mirror: false
 					});
 
 					oTooltip._bPosResolved = true;
@@ -267,13 +293,16 @@ sap.ui.define([
 			const sSide = this._sCalcedPos || this.getPlacement();
 
 			if (Object.hasOwn(PopoverPhysicalSide, sSide)) {
-				oDomRef.classList.add("sapUiCoreTooltip-" + sSide);
+				// Logical class: build-mirrored library-RTL.css re-flips it to the
+				// correct physical edge.
+				oDomRef.classList.add("sapUiCoreTooltip-" + toLogicalSide(sSide));
 			}
 		};
 
 		Tooltip.prototype._resolveSide = function (oHostElement) {
 			return Positioning.resolvePlacement({
-				preferred: this.getPlacement(),
+				placement: this.getPlacement(),
+				flipMode: PopoverFlipMode.MoreSpace,
 				openerRef: oHostElement,
 				popoverRef: this.getDomRef(),
 				withinAreaRef: Popup.getWithinAreaDomRef(),
@@ -349,13 +378,18 @@ sap.ui.define([
 			this._oHostForArrow = oHost;
 			this._bPosResolved = false;
 
-			// Open with a provisional anchor derived from the preferred placement
-			// (abstract placements fall back to Bottom in computeAnchor). The
+			// Open with a provisional anchor derived from the preferred placement,
+			// resolved to a physical side without measurement (flipMode Never). The
 			// Popup renders the content, then the _applyPosition override measures
 			// the real DOM, resolves the final side, and re-anchors before paint.
+			const sProvisionalSide = Positioning.resolvePlacement({
+				placement: this.getPlacement(),
+				flipMode: PopoverFlipMode.Never
+			});
 			const oAnchor = Positioning.computeAnchor({
-				side: this.getPlacement(),
-				arrowSize: this._arrowProtrusion
+				side: sProvisionalSide,
+				arrowSize: this._arrowProtrusion,
+				mirror: false
 			});
 
 			this._oPopup.setPosition(oAnchor.my, oAnchor.at, oHost, oAnchor.offset, "none");
@@ -397,7 +431,7 @@ sap.ui.define([
 			const oBoxMax = Positioning.computeMaxContentSize({
 				margin: oMargins,
 				withinAreaRef: oWithinRef,
-				side: this._sCalcedPos,
+				side: toLogicalSide(this._sCalcedPos),
 				openerRef: this._oHostForArrow,
 				arrowSize: this._arrowProtrusion
 			});
@@ -414,7 +448,7 @@ sap.ui.define([
 				const iContMax = Positioning.computeMaxContentSize({
 					margin: oMargins,
 					withinAreaRef: oWithinRef,
-					side: this._sCalcedPos,
+					side: toLogicalSide(this._sCalcedPos),
 					openerRef: this._oHostForArrow,
 					arrowSize: this._arrowProtrusion,
 					reservedHeight: iPadY
@@ -433,7 +467,7 @@ sap.ui.define([
 				hasVerticalScrollbar: false,
 				margin: oMargins,
 				withinAreaRef: oWithinRef,
-				side: this._sCalcedPos,
+				side: toLogicalSide(this._sCalcedPos),
 				openerRef: this._oHostForArrow,
 				arrowSize: this._arrowProtrusion
 			});

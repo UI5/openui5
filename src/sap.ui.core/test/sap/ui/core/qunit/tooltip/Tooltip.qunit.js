@@ -4,14 +4,14 @@ sap.ui.define([
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/ui/core/tooltip/Tooltip",
 	"sap/m/Button",
-	"sap/m/library",
+	"sap/ui/core/library",
+	"sap/ui/core/popover/Positioning",
 	"sap/ui/Device",
 	"sap/ui/core/tooltip/TooltipManager",
-	"sap/ui/core/popover/PopoverPhysicalSide"
-], function(createAndAppendDiv, nextUIUpdate, Tooltip, Button, mLibrary, Device, TooltipManager, PopoverPhysicalSide) {
+	"sap/base/i18n/Localization"
+], function(createAndAppendDiv, nextUIUpdate, Tooltip, Button, coreLibrary, Positioning, Device, TooltipManager, Localization) {
 	"use strict";
-	const PlacementType = mLibrary.PlacementType;
-	const aPhysicalSides = Object.values(PopoverPhysicalSide);
+	const PopoverPlacement = coreLibrary.popover.PopoverPlacement;
 	createAndAppendDiv("content");
 
 	// Minimal stand-in for the sap.ui.core.Popup the control wraps. The control
@@ -86,8 +86,21 @@ sap.ui.define([
 
 	QUnit.test("defaults", function(assert) {
 		assert.strictEqual(this.oTooltip.getText(), "", "text");
-		assert.strictEqual(this.oTooltip.getPlacement(), PlacementType.VerticalPreferredTop, "placement");
+		assert.strictEqual(this.oTooltip.getPlacement(), PopoverPlacement.Top, "placement");
 		assert.strictEqual(this.oTooltip.getDelay(), 500, "delay");
+	});
+
+	QUnit.test("_resolveSide forwards the placement and MoreSpace flip mode", function(assert) {
+		const oTooltip = new Tooltip({ placement: PopoverPlacement.Begin });
+		const oStub = sinon.stub(Positioning, "resolvePlacement").returns("Left");
+		const oHost = document.createElement("div");
+		oTooltip._resolveSide(oHost);
+		assert.strictEqual(oStub.calledOnce, true, "resolvePlacement called");
+		const oArg = oStub.firstCall.args[0];
+		assert.strictEqual(oArg.placement, PopoverPlacement.Begin, "placement forwarded");
+		assert.strictEqual(oArg.flipMode, "MoreSpace", "MoreSpace flip mode");
+		oStub.restore();
+		oTooltip.destroy();
 	});
 
 	QUnit.module("Props", {
@@ -101,10 +114,10 @@ sap.ui.define([
 
 	QUnit.test("set all", function(assert) {
 		this.oTooltip.setText("Hi");
-		this.oTooltip.setPlacement(PlacementType.Bottom);
+		this.oTooltip.setPlacement(PopoverPlacement.Bottom);
 		this.oTooltip.setDelay(1000);
 		assert.strictEqual(this.oTooltip.getText(), "Hi");
-		assert.strictEqual(this.oTooltip.getPlacement(), PlacementType.Bottom);
+		assert.strictEqual(this.oTooltip.getPlacement(), PopoverPlacement.Bottom);
 		assert.strictEqual(this.oTooltip.getDelay(), 1000);
 	});
 
@@ -456,7 +469,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("adds sapUiCoreTooltip-Bottom class when placement is Bottom", function(assert) {
-		this.oTooltip._sCalcedPos = PopoverPhysicalSide.Bottom;
+		this.oTooltip._sCalcedPos = "Bottom";
 		this.oTooltip._applyPlacementClass();
 		const oCl = this.oTooltip.getDomRef().classList;
 		assert.ok(oCl.contains("sapUiCoreTooltip-Bottom"));
@@ -464,26 +477,26 @@ sap.ui.define([
 	});
 
 	QUnit.test("adds sapUiCoreTooltip-Top class when placement is Top", function(assert) {
-		this.oTooltip._sCalcedPos = PopoverPhysicalSide.Top;
+		this.oTooltip._sCalcedPos = "Top";
 		this.oTooltip._applyPlacementClass();
 		assert.ok(this.oTooltip.getDomRef().classList.contains("sapUiCoreTooltip-Top"));
 	});
 
 	QUnit.test("adds sapUiCoreTooltip-Left class when placement is Left", function(assert) {
-		this.oTooltip._sCalcedPos = PopoverPhysicalSide.Left;
+		this.oTooltip._sCalcedPos = "Left";
 		this.oTooltip._applyPlacementClass();
 		assert.ok(this.oTooltip.getDomRef().classList.contains("sapUiCoreTooltip-Left"));
 	});
 
 	QUnit.test("adds sapUiCoreTooltip-Right class when placement is Right", function(assert) {
-		this.oTooltip._sCalcedPos = PopoverPhysicalSide.Right;
+		this.oTooltip._sCalcedPos = "Right";
 		this.oTooltip._applyPlacementClass();
 		assert.ok(this.oTooltip.getDomRef().classList.contains("sapUiCoreTooltip-Right"));
 	});
 
 	QUnit.test("removes stale placement class before adding new one", function(assert) {
 		this.oTooltip.getDomRef().classList.add("sapUiCoreTooltip-Top");
-		this.oTooltip._sCalcedPos = PopoverPhysicalSide.Bottom;
+		this.oTooltip._sCalcedPos = "Bottom";
 		this.oTooltip._applyPlacementClass();
 		const oCl = this.oTooltip.getDomRef().classList;
 		assert.notOk(oCl.contains("sapUiCoreTooltip-Top"), "old class removed");
@@ -498,11 +511,43 @@ sap.ui.define([
 		assert.notOk(oCl.contains("sapUiCoreTooltip-Bottom"));
 	});
 
+	QUnit.test("RTL emits the logical horizontal side class (undoes the CSS build-mirror)", function(assert) {
+		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+
+		this.oTooltip._sCalcedPos = "Left";
+		this.oTooltip._applyPlacementClass();
+		let oCl = this.oTooltip.getDomRef().classList;
+		assert.ok(oCl.contains("sapUiCoreTooltip-Right"), "physical Left maps to logical -Right class in RTL");
+		assert.notOk(oCl.contains("sapUiCoreTooltip-Left"), "physical Left does not keep -Left in RTL");
+
+		this.oTooltip._sCalcedPos = "Right";
+		this.oTooltip._applyPlacementClass();
+		oCl = this.oTooltip.getDomRef().classList;
+		assert.ok(oCl.contains("sapUiCoreTooltip-Left"), "physical Right maps to logical -Left class in RTL");
+		assert.notOk(oCl.contains("sapUiCoreTooltip-Right"), "physical Right does not keep -Right in RTL");
+
+		oStub.restore();
+	});
+
+	QUnit.test("RTL leaves the vertical side class unchanged", function(assert) {
+		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+
+		this.oTooltip._sCalcedPos = "Top";
+		this.oTooltip._applyPlacementClass();
+		assert.ok(this.oTooltip.getDomRef().classList.contains("sapUiCoreTooltip-Top"), "Top unchanged in RTL");
+
+		this.oTooltip._sCalcedPos = "Bottom";
+		this.oTooltip._applyPlacementClass();
+		assert.ok(this.oTooltip.getDomRef().classList.contains("sapUiCoreTooltip-Bottom"), "Bottom unchanged in RTL");
+
+		oStub.restore();
+	});
+
 	QUnit.test("renderer emits base class only; no side class before positioning", function(assert) {
 		const oCl = this.oTooltip.getDomRef().classList;
 		assert.ok(oCl.contains("sapUiCoreTooltip"), "base class present");
 		assert.strictEqual(this.oTooltip._sCalcedPos, null, "side not yet resolved");
-		aPhysicalSides.forEach(function(s) {
+		["Top", "Bottom", "Left", "Right"].forEach(function(s) {
 			assert.notOk(oCl.contains("sapUiCoreTooltip-" + s), "no physical side class: " + s);
 		});
 		assert.notOk(
@@ -619,7 +664,7 @@ sap.ui.define([
 		oPopup.close(0);
 	});
 
-	QUnit.module("Placement class on tooltip DOM", {
+	QUnit.module("PopoverPlacement class on tooltip DOM", {
 		beforeEach: async function() {
 			// Center the anchor so every strict side (Top/Bottom/Left/Right) has
 			// room and the auto-flip fallback never kicks in.
@@ -648,20 +693,20 @@ sap.ui.define([
 	}
 
 	[
-		{placement: PlacementType.Top, expected: "sapUiCoreTooltip-Top"},
-		{placement: PlacementType.Bottom, expected: "sapUiCoreTooltip-Bottom"},
-		{placement: PlacementType.Left, expected: "sapUiCoreTooltip-Left"},
-		{placement: PlacementType.Right, expected: "sapUiCoreTooltip-Right"}
-	].forEach(function(oCase) {
-		QUnit.test("placement " + oCase.placement + " → " + oCase.expected, async function(assert) {
-			this.oTooltip = new Tooltip({text: "Hi", placement: oCase.placement, delay: 0});
+		PopoverPlacement.Top,
+		PopoverPlacement.Bottom,
+		PopoverPlacement.Begin,
+		PopoverPlacement.End
+	].forEach(function(sPlacement) {
+		QUnit.test("placement " + sPlacement + " → a resolved physical side class", async function(assert) {
+			this.oTooltip = new Tooltip({text: "Hi", placement: sPlacement, delay: 0});
 			await openAndWait(this.clock, this.oTooltip, this.oButton);
 
 			const oCl = this.oTooltip.getDomRef().classList;
-			aPhysicalSides.forEach(function(s) {
-				const sCls = "sapUiCoreTooltip-" + s;
-				assert[sCls === oCase.expected ? "ok" : "notOk"](oCl.contains(sCls), sCls);
+			const aPresent = ["Top", "Bottom", "Left", "Right"].filter(function(s) {
+				return oCl.contains("sapUiCoreTooltip-" + s);
 			});
+			assert.strictEqual(aPresent.length, 1, "exactly one physical side class is applied (" + aPresent.join(",") + ")");
 			this.oTooltip.destroy();
 		});
 	});
@@ -687,16 +732,16 @@ sap.ui.define([
 
 	function assertOnlySide(assert, oTooltip, sExpected, sWhen) {
 		const oCl = oTooltip.getDomRef().classList;
-		aPhysicalSides.forEach(function(s) {
+		["Top", "Bottom", "Left", "Right"].forEach(function(s) {
 			const sCls = "sapUiCoreTooltip-" + s;
 			assert[s === sExpected ? "ok" : "notOk"](oCl.contains(sCls), sCls + " " + sWhen);
 		});
 	}
 
 	QUnit.test("class retained when the tooltip is invalidated while open", async function(assert) {
-		this.oTooltip = new Tooltip({text: "Hi", placement: PlacementType.Bottom, delay: 0});
+		this.oTooltip = new Tooltip({text: "Hi", placement: PopoverPlacement.Bottom, delay: 0});
 		await openAndWait(this.clock, this.oTooltip, this.oButton);
-		assertOnlySide(assert, this.oTooltip, PopoverPhysicalSide.Bottom, "after open");
+		assertOnlySide(assert, this.oTooltip, "Bottom", "after open");
 
 		// Re-render while open; _sCalcedPos stays resolved, class must survive.
 		this.oTooltip.invalidate();
@@ -704,42 +749,42 @@ sap.ui.define([
 		await this.clock.tickAsync(1000);
 
 		assert.ok(this.oTooltip.isOpen(), "still open after invalidate");
-		assertOnlySide(assert, this.oTooltip, PopoverPhysicalSide.Bottom, "after invalidate");
+		assertOnlySide(assert, this.oTooltip, "Bottom", "after invalidate");
 	});
 
 	QUnit.test("class retained when setText triggers a re-render while open", async function(assert) {
-		this.oTooltip = new Tooltip({text: "Hi", placement: PlacementType.Right, delay: 0});
+		this.oTooltip = new Tooltip({text: "Hi", placement: PopoverPlacement.End, delay: 0});
 		await openAndWait(this.clock, this.oTooltip, this.oButton);
-		assertOnlySide(assert, this.oTooltip, PopoverPhysicalSide.Right, "after open");
+		assertOnlySide(assert, this.oTooltip, "Right", "after open");
 
 		this.oTooltip.setText("Longer tooltip text");
 		await nextUIUpdate(this.clock);
 		await this.clock.tickAsync(1000);
 
 		assert.strictEqual(this.oTooltip.getDomRef().textContent.indexOf("Longer") !== -1, true, "text updated");
-		assertOnlySide(assert, this.oTooltip, PopoverPhysicalSide.Right, "after setText re-render");
+		assertOnlySide(assert, this.oTooltip, "Right", "after setText re-render");
 	});
 
 	QUnit.test("no stale side class after reopening on a different side", async function(assert) {
-		this.oTooltip = new Tooltip({text: "Hi", placement: PlacementType.Top, delay: 0});
+		this.oTooltip = new Tooltip({text: "Hi", placement: PopoverPlacement.Top, delay: 0});
 		await openAndWait(this.clock, this.oTooltip, this.oButton);
-		assertOnlySide(assert, this.oTooltip, PopoverPhysicalSide.Top, "after first open");
+		assertOnlySide(assert, this.oTooltip, "Top", "after first open");
 
 		this.oTooltip.close();
 		await this.clock.tickAsync(1000);
 
 		// Reopen on the opposite side; the previous class must not linger.
-		this.oTooltip.setPlacement(PlacementType.Bottom);
+		this.oTooltip.setPlacement(PopoverPlacement.Bottom);
 		await openAndWait(this.clock, this.oTooltip, this.oButton);
-		assertOnlySide(assert, this.oTooltip, PopoverPhysicalSide.Bottom, "after reopen on Bottom");
+		assertOnlySide(assert, this.oTooltip, "Bottom", "after reopen on Bottom");
 	});
 
 	QUnit.test("side class is present in the rendered DOM (renderer emits resolved side)", async function(assert) {
-		this.oTooltip = new Tooltip({text: "Hi", placement: PlacementType.Left, delay: 0});
+		this.oTooltip = new Tooltip({text: "Hi", placement: PopoverPlacement.Begin, delay: 0});
 		await openAndWait(this.clock, this.oTooltip, this.oButton);
 
 		// Re-render must re-emit the class from the renderer, not only _applyPlacementClass.
-		assert.strictEqual(this.oTooltip._sCalcedPos, PopoverPhysicalSide.Left, "side resolved");
+		assert.strictEqual(this.oTooltip._sCalcedPos, "Left", "side resolved");
 		this.oTooltip.getDomRef().classList.remove("sapUiCoreTooltip-Left"); // simulate lost class
 		this.oTooltip.invalidate();
 		await nextUIUpdate(this.clock);
@@ -748,6 +793,8 @@ sap.ui.define([
 			"renderer re-emits the resolved side class on re-render"
 		);
 	});
+
+	// The tooltip must dock on the correct side of the opener. Regression guard
 	// for the bug where _fitIntoWithinArea cleared the right/bottom edge that the
 	// Popup uses to dock Left/Top placements, collapsing the tooltip to the
 	// document origin and pinning it to the left/top margin.
@@ -772,7 +819,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("focus stays on the opener after the tooltip opens", async function(assert) {
-		this.oTooltip = new Tooltip({text: "Hi", placement: PlacementType.Bottom, delay: 0});
+		this.oTooltip = new Tooltip({text: "Hi", placement: PopoverPlacement.Bottom, delay: 0});
 		const oBtnDom = this.oButton.getDomRef();
 		oBtnDom.focus();
 		assert.strictEqual(document.activeElement, oBtnDom, "opener focused before open");
@@ -785,7 +832,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Left places the tooltip to the left of the opener", async function(assert) {
-		this.oTooltip = new Tooltip({text: "Hi", placement: PlacementType.Left, delay: 0});
+		this.oTooltip = new Tooltip({text: "Hi", placement: PopoverPlacement.Begin, delay: 0});
 		await openAndWait(this.clock, this.oTooltip, this.oButton);
 
 		const oTipRect = this.oTooltip.getDomRef().getBoundingClientRect();
@@ -795,7 +842,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Right places the tooltip to the right of the opener", async function(assert) {
-		this.oTooltip = new Tooltip({text: "Hi", placement: PlacementType.Right, delay: 0});
+		this.oTooltip = new Tooltip({text: "Hi", placement: PopoverPlacement.End, delay: 0});
 		await openAndWait(this.clock, this.oTooltip, this.oButton);
 
 		const oTipRect = this.oTooltip.getDomRef().getBoundingClientRect();
@@ -804,7 +851,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Top places the tooltip above the opener", async function(assert) {
-		this.oTooltip = new Tooltip({text: "Hi", placement: PlacementType.Top, delay: 0});
+		this.oTooltip = new Tooltip({text: "Hi", placement: PopoverPlacement.Top, delay: 0});
 		await openAndWait(this.clock, this.oTooltip, this.oButton);
 
 		const oTipRect = this.oTooltip.getDomRef().getBoundingClientRect();
@@ -814,7 +861,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Bottom places the tooltip below the opener", async function(assert) {
-		this.oTooltip = new Tooltip({text: "Hi", placement: PlacementType.Bottom, delay: 0});
+		this.oTooltip = new Tooltip({text: "Hi", placement: PopoverPlacement.Bottom, delay: 0});
 		await openAndWait(this.clock, this.oTooltip, this.oButton);
 
 		const oTipRect = this.oTooltip.getDomRef().getBoundingClientRect();
@@ -842,7 +889,7 @@ sap.ui.define([
 		}
 	});
 
-	[PlacementType.Left, PlacementType.Right, PlacementType.Top, PlacementType.Bottom].forEach(function(sPlacement) {
+	[PopoverPlacement.Begin, PopoverPlacement.End, PopoverPlacement.Top, PopoverPlacement.Bottom].forEach(function(sPlacement) {
 		QUnit.test("huge tooltip scrolls and fits the viewport (" + sPlacement + ")", async function(assert) {
 			this.oTooltip = new Tooltip({text: this.sHuge, placement: sPlacement, delay: 0});
 			await openAndWait(this.clock, this.oTooltip, this.oButton);
@@ -858,7 +905,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("a short tooltip is not capped", async function(assert) {
-		this.oTooltip = new Tooltip({text: "Short", placement: PlacementType.Left, delay: 0});
+		this.oTooltip = new Tooltip({text: "Short", placement: PopoverPlacement.Begin, delay: 0});
 		await openAndWait(this.clock, this.oTooltip, this.oButton);
 
 		const oDomRef = this.oTooltip.getDomRef();
