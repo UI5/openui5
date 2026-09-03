@@ -237,6 +237,10 @@ sap.ui.define([
 			this._dependents = {};
 			this._mUShellServices = {};
 			this._pElementModified = Promise.resolve();
+			// Mirrors _pElementModified but is NOT swallowed by the error .catch, so the raw
+			// execution outcome of the last elementModified command survives for consumers of
+			// waitForCommandExecutionResult().
+			this._pLastElementModifiedOutcome = Promise.resolve();
 
 			this.addDependent(new PluginManager(), "pluginManager");
 			this.addDependent(new PopupManager(), "popupManager");
@@ -954,6 +958,38 @@ sap.ui.define([
 	RuntimeAuthoring.prototype.save = function() {
 		return waitForPendingActions.call(this)
 		.then(this._serializeToLrep.bind(this));
+	};
+
+	/**
+	 * Returns a promise that resolves once all pending actions (busy plugins and the
+	 * queued <code>elementModified</code> commands) are finished. Unlike
+	 * {@link sap.ui.rta.RuntimeAuthoring#waitForCommandExecutionResult}, it never rejects
+	 * with a command's execution error.
+	 *
+	 * @returns {Promise<undefined>} Promise that resolves once all pending actions are finished
+	 * @since 1.153
+	 * @private
+	 * @ui5-restricted
+	 */
+	RuntimeAuthoring.prototype.waitForPendingActions = async function() {
+		await waitForPendingActions.call(this);
+	};
+
+	/**
+	 * Returns a promise that resolves once all pending actions are finished AND rejects with
+	 * the underlying error if the most recent <code>elementModified</code> command failed
+	 * (e.g. the change handler threw inside <code>Stack.execute</code>). This lets a
+	 * programmatic consumer await the real execution result instead of the always-resolving
+	 * internal command chain.
+	 *
+	 * @returns {Promise<undefined>} Resolved on success, rejected with the underlying error on failure
+	 * @since 1.153
+	 * @private
+	 * @ui5-restricted
+	 */
+	RuntimeAuthoring.prototype.waitForCommandExecutionResult = async function() {
+		await waitForPendingActions.call(this);
+		await this._pLastElementModifiedOutcome;
 	};
 
 	// ---- API ----
@@ -1858,12 +1894,12 @@ sap.ui.define([
 	 * @param {sap.ui.base.Event} oEvent Event object
 	 * @returns {Promise} Returns promise that resolves after command was executed successfully
 	 */
-	function handleElementModified(oEvent) {
+	async function handleElementModified(oEvent) {
 		// events are synchronously reset after the handlers are called
 		const oCommand = oEvent.getParameter("command");
 		const sNewControlID = oEvent.getParameter("newControlId");
 
-		this._pElementModified = this._pElementModified.then(function() {
+		const pOutcome = this._pElementModified.then(function() {
 			this.getPluginManager().handleStopCutPaste();
 
 			if (oCommand instanceof BaseCommand) {
@@ -1876,18 +1912,21 @@ sap.ui.define([
 						}
 					});
 				}
-				return this.getCommandStack().pushAndExecute(oCommand)
-				// Error handling when a command fails is done in the Stack
-				.catch(function(oError) {
-					if (oError?.message?.indexOf?.("The following Change cannot be applied because of a dependency") > -1) {
-						Utils.showMessageBox("error", "MSG_DEPENDENCY_ERROR", { error: oError });
-					}
-					Log.error("sap.ui.rta:", oError.message, oError.stack);
-				});
+				return this.getCommandStack().pushAndExecute(oCommand);
 			}
 			return undefined;
 		}.bind(this));
-		return this._pElementModified;
+		// Keep the raw (rejecting) outcome for waitForCommandExecutionResult(), while the
+		// internal chain keeps its existing swallow-and-log behavior. Error handling when a
+		// command fails is done in the Stack.
+		this._pLastElementModifiedOutcome = pOutcome;
+		this._pElementModified = pOutcome.catch(function(oError) {
+			if (oError?.message?.indexOf?.("The following Change cannot be applied because of a dependency") > -1) {
+				Utils.showMessageBox("error", "MSG_DEPENDENCY_ERROR", { error: oError });
+			}
+			Log.error("sap.ui.rta:", oError.message, oError.stack);
+		});
+		await this._pElementModified;
 	}
 
 	function onModeChange(oEvent) {
