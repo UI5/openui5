@@ -295,7 +295,7 @@ sap.ui.define([
 	};
 
 	ActionsToolbar.prototype._updateVisibility = function () {
-		var bVisible = this.getAggregation("_actionsMenu").getItems().some(function (oMenuItem) {
+		var bVisible = this.getAggregation("_actionsMenu")?.getItems().some(function (oMenuItem) {
 			return oMenuItem.getVisible();
 		});
 
@@ -396,7 +396,7 @@ sap.ui.define([
 			vVal = oChanges.child;
 		}
 
-		oMenuItem["set" + capitalize(sName)](vVal);
+		oMenuItem?.["set" + capitalize(sName)](vVal);
 		this._updateVisibility();
 	};
 
