@@ -607,6 +607,29 @@ sap.ui.define([
 		oPC.destroy();
 	});
 
+	QUnit.test("PlannigCalendar CalendarWeekNumbering in en_US locale has correct first week number in the Calendar", async function(assert) {
+		// Prepare
+		var oOriginalFormatLocale = new Locale(Formatting.getLanguageTag()),
+			sOriginalFormatLocale = oOriginalFormatLocale.getLanguage() + "_" +  oOriginalFormatLocale.getRegion();
+
+		Formatting.setLanguageTag('en_US');
+		await nextUIUpdate();
+
+		var oPC = createPlanningCalendar("PC7").placeAt("qunit-fixture");
+
+		await nextUIUpdate();
+
+		// Act
+		qutils.triggerEvent("tap", "PC7-Header-NavToolbar-PickerBtn");
+		await nextUIUpdate();
+
+		assert.ok(document.querySelector("#" + CSS.escape("PC7-Header-Cal--Month0-WNum-1")), "Calendar week number is 1");
+
+		// Clean up
+		Formatting.setLanguageTag(sOriginalFormatLocale);
+		oPC.destroy();
+	});
+
 	QUnit.test("PlanningCalendarRow", function(assert) {
 		var oRow = Element.getElementById("PC1-Row1");
 		assert.ok(_getListItem(oRow), "ColumnListItem exist");
