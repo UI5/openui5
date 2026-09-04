@@ -589,14 +589,23 @@ function(
 		oSection1.invalidate();
 	});
 
+	QUnit.module("clip-path", {
+		beforeEach: async function () {
+			this.oObjectPage = createPage("page1", true);
+			this.oObjectPage.placeAt("qunit-fixture");
+			await nextUIUpdate();
+			await waitForDOMReady(this.oObjectPage);
+		},
+		afterEach: function () {
+			this.oObjectPage.destroy();
+			this.oObjectPage = null;
+		}
+	});
+
 	QUnit.test("clip-path applied only when title backgroundDesign is Transparent", async function(assert) {
 		const oPage = this.oObjectPage,
-			oHeaderTitle = oPage.getHeaderTitle();
-
-		oPage.placeAt("qunit-fixture");
-		await nextUIUpdate();
-
-		const oWrapperElement = oPage._$opWrapper.get(0);
+			oHeaderTitle = oPage.getHeaderTitle(),
+			oWrapperElement = oPage._$opWrapper.get(0);
 
 		// initially no transparent background => no clipPath
 		assert.strictEqual(oWrapperElement.style.clipPath, "", "clipPath not set when backgroundDesign is not Transparent");
@@ -617,13 +626,36 @@ function(
 		assert.notOk(oPage._bClipPathApplied, "tracking flag is false after revert");
 	});
 
-	QUnit.test("clip-path applied when RTA is active, regardless of backgroundDesign", async function(assert) {
-		const oPage = this.oObjectPage;
+	QUnit.test("clip-path applied only when backgroundDesignAnchorBar is Transparent", async function(assert) {
+		const oPage = this.oObjectPage,
+			oWrapperElement = oPage._$opWrapper.get(0);
 
-		oPage.placeAt("qunit-fixture");
+		// initially no transparent anchor bar => no clipPath
+		assert.strictEqual(oWrapperElement.style.clipPath, "", "clipPath not set when backgroundDesignAnchorBar is not Transparent");
+		assert.notOk(oPage._bClipPathApplied, "tracking flag is false initially");
+
+		// set Transparent => triggers rerender; register listener before the change
+		let pDOMReady = waitForDOMReady(oPage);
+		oPage.setBackgroundDesignAnchorBar(BackgroundDesign.Transparent);
 		await nextUIUpdate();
+		await pDOMReady;
 
-		const oWrapperElement = oPage._$opWrapper.get(0);
+		assert.notStrictEqual(oWrapperElement.style.clipPath, "", "clipPath set when backgroundDesignAnchorBar is Transparent");
+		assert.ok(oPage._bClipPathApplied, "tracking flag is true");
+
+		// revert to Solid => triggers rerender; register listener before the change
+		pDOMReady = waitForDOMReady(oPage);
+		oPage.setBackgroundDesignAnchorBar(BackgroundDesign.Solid);
+		await nextUIUpdate();
+		await pDOMReady;
+
+		assert.strictEqual(oWrapperElement.style.clipPath, "", "clipPath cleared when backgroundDesignAnchorBar is no longer Transparent");
+		assert.notOk(oPage._bClipPathApplied, "tracking flag is false after revert");
+	});
+
+	QUnit.test("clip-path applied when RTA is active, regardless of backgroundDesign", function(assert) {
+		const oPage = this.oObjectPage,
+			oWrapperElement = oPage._$opWrapper.get(0);
 
 		// precondition: non-transparent background, no clip-path
 		assert.strictEqual(oWrapperElement.style.clipPath, "", "clipPath not set initially");
