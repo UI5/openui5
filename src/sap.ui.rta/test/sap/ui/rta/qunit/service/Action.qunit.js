@@ -133,6 +133,7 @@ sap.ui.define([
 				handler() {},
 				description: "does the thing",
 				parameters: aParameters,
+				aggregationRelevant: true,
 				createCommands: fnCreateCommands,
 				getContext: fnGetContext,
 				someInternalField: "should-be-stripped"
@@ -143,6 +144,7 @@ sap.ui.define([
 				assert.ok(oAction, "the action is exposed");
 				assert.strictEqual(oAction.description, "does the thing", "the description is exposed");
 				assert.strictEqual(oAction.parameters, aParameters, "the parameters are exposed");
+				assert.strictEqual(oAction.aggregationRelevant, true, "the aggregationRelevant flag is exposed");
 				assert.strictEqual(oAction.createCommands, fnCreateCommands, "createCommands is exposed");
 				assert.strictEqual(oAction.getContext, fnGetContext, "getContext is exposed");
 				assert.notOk(

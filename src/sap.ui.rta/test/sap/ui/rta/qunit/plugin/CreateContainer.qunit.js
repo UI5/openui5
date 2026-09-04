@@ -200,6 +200,7 @@ sap.ui.define([
 			const sExpectedText = Lib.getResourceBundleFor("sap.ui.rta").getText("CTX_CREATE_CONTAINER", ["formContainer"]);
 			const aMenuItems = await this.oCreateContainer.getMenuItems([this.oFormOverlay]);
 			assert.strictEqual(aMenuItems[0].id, "CTX_CREATE_CHILD_CONTAINER", "there is an entry for create child container");
+			assert.strictEqual(aMenuItems[0].aggregationRelevant, true, "then the action is flagged as aggregation-relevant");
 			assert.strictEqual(this.oCreateContainer.isEnabled([this.oFormOverlay], aMenuItems[0]), true, "then isEnabled returns true");
 			assert.deepEqual(aMenuItems[0].text, sExpectedText, "then the correct message key is returned");
 		});

@@ -151,7 +151,8 @@ sap.ui.define([
 			additionalInfoKey: "IFRAME_RTA_CONTEXT_MENU_INFO",
 			rank: iBaseRank,
 			action: oSiblingAction,
-			description: "embed an iframe as a sibling of the element; the URL may include UI5 expression bindings computed from the parent element's data"
+			description: "embed an iframe as a sibling of the element; the URL may include UI5 expression bindings computed from the parent element's data",
+			aggregationRelevant: true
 		});
 
 		const aActions = this.getCreateActions(aElementOverlays[0], false);
@@ -163,7 +164,8 @@ sap.ui.define([
 				additionalInfoKey: "IFRAME_RTA_CONTEXT_MENU_INFO",
 				rank: ++iBaseRank,
 				action: oAction,
-				description: "embed an iframe as a child of the element; the URL may include UI5 expression bindings computed from the parent element's data"
+				description: "embed an iframe as a child of the element; the URL may include UI5 expression bindings computed from the parent element's data",
+				aggregationRelevant: true
 			}));
 		}
 		return aMenuItems.flat();
