@@ -16,7 +16,9 @@
   },
   "scripts": {
     "start": "ui5 serve",
+    "start-cli-v5": "UI5_CLI_NO_LOCAL=X node ../../node_modules/@ui5/cli-next/bin/ui5.cjs serve --exclude-task minify generateBundle generateComponentPreload generateLibraryPreload",
     "testsuite": "ui5 serve --open \"/test-resources/testsuite/testframe.html\"",
+    "testsuite-cli-v5": "UI5_CLI_NO_LOCAL=X node ../../node_modules/@ui5/cli-next/bin/ui5.cjs serve --exclude-task minify generateBundle generateComponentPreload generateLibraryPreload --open \"/test-resources/testsuite/testframe.html\"",
     "sdk": "npm run build-sdk && npm run serve-sdk",
     "build-sdk": "node ../../lib/builder/jsdocBuilder.mjs",
     "serve-sdk": "ws --compress -d dist"
