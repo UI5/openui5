@@ -40,6 +40,7 @@ sap.ui.define(["sap/base/i18n/Localization", "sap/m/library", "sap/base/security
 
 		// Render a link when URL is provided, not in action scope and the state is enabled
 		var bRenderLink = oControl.getUrl() && !oControl._isInActionScope() && sState !== LoadState.Disabled;
+		var bSuppressInfoContainer = sScope === GenericTileScope.Actions || sScope === GenericTileScope.ActionMore;
 
 		this._bRTL = Localization.getRTL();
 
@@ -140,7 +141,7 @@ sap.ui.define(["sap/base/i18n/Localization", "sap/m/library", "sap/base/security
 				this._renderSubheader(oRm, oControl);
 			}
 			oRm.close("span");
-			if (oControl.getSystemInfo() || oControl.getAppShortcut()) {
+			if (!bSuppressInfoContainer && (oControl.getSystemInfo() || oControl.getAppShortcut())) {
 				this._renderInfoContainer(oRm,oControl);
 			}
 			oRm.close("span");
@@ -160,7 +161,7 @@ sap.ui.define(["sap/base/i18n/Localization", "sap/m/library", "sap/base/security
 			oRm.openEnd();
 			oRm.close("div");
 
-		} else if (oControl.getSystemInfo() || oControl.getAppShortcut()){
+		} else if (!bSuppressInfoContainer && (oControl.getSystemInfo() || oControl.getAppShortcut())){
 			oRm.openStart("div", oControl.getId() + "-touchArea");
 			oRm.class("sapMGTTouchArea");
 			oRm.openEnd();

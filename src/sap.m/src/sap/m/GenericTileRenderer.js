@@ -9,6 +9,9 @@ sap.ui.define(["sap/m/library", "sap/base/security/encodeCSS", "sap/ui/core/Them
 	// shortcut for sap.m.GenericTileMode
 	var GenericTileMode = library.GenericTileMode;
 
+	// shortcut for sap.m.GenericTileScope
+	var GenericTileScope = library.GenericTileScope;
+
 	// shortcut for sap.m.LoadState
 	var LoadState = library.LoadState;
 
@@ -104,7 +107,7 @@ sap.ui.define(["sap/m/library", "sap/base/security/encodeCSS", "sap/ui/core/Them
 				oRm.class("HighContrastTile");
 			}
 		}
-		if (!bIsArticleMode && !bIsActionMode && frameType !== frameTypes.OneByHalf && (oControl.getSystemInfo() || oControl.getAppShortcut())) {
+		if (!bIsArticleMode && !bIsActionMode && !(oControl._isIconMode() && frameType === frameTypes.OneByOne) && (oControl.getSystemInfo() || oControl.getAppShortcut())) {
 			oRm.class("tileWithAppInfo");
 		}
 		//Set respective Class/ BackgroundColor for IconMode
@@ -300,8 +303,8 @@ sap.ui.define(["sap/m/library", "sap/base/security/encodeCSS", "sap/ui/core/Them
 				}
 			}
 
-			//Wrapper div for adjusting to Info Container
-			if (this._shouldRenderInfoContainer(oControl) && frameType === frameTypes.TwoByHalf) {
+			//Wrapper div for adjusting to Info Container (IconMode TwoByHalf only)
+			if (this._shouldRenderInfoContainer(oControl) && oControl._isIconMode() && frameType === frameTypes.TwoByHalf) {
 				oRm.openStart("div", oControl.getId() + "-wrapper").class("sapMGTWrapper").openEnd();
 				oRm.openStart("div", oControl.getId() + "-wrapper-content").class("sapMGTWrapperCnt").openEnd();
 			}
@@ -440,16 +443,16 @@ sap.ui.define(["sap/m/library", "sap/base/security/encodeCSS", "sap/ui/core/Them
 					oRm.renderControl(aTileContent[i]);
 				}
 
-				//Render InfoContainer except for TwoByHalf frame
-				if (this._shouldRenderInfoContainer(oControl) && frameType !== frameTypes.TwoByHalf) {
+				//Render InfoContainer (for all tiles except IconMode TwoByHalf, which uses wrapper)
+				if (this._shouldRenderInfoContainer(oControl) && !(oControl._isIconMode() && frameType === frameTypes.TwoByHalf)) {
 					this._renderInfoContainer(oRm, oControl);
 				}
 
 				oRm.close("div");
 			}
 
-			//Render InfoContainer for TwoByHalf frame
-			if (this._shouldRenderInfoContainer(oControl) && frameType === frameTypes.TwoByHalf) {
+			//Render InfoContainer for IconMode TwoByHalf frame (after wrapper)
+			if (this._shouldRenderInfoContainer(oControl) && oControl._isIconMode() && frameType === frameTypes.TwoByHalf) {
 				oRm.close("div");
 				this._renderInfoContainer(oRm, oControl);
 				oRm.close("div");
@@ -583,7 +586,12 @@ sap.ui.define(["sap/m/library", "sap/base/security/encodeCSS", "sap/ui/core/Them
 	};
 
 	/**
-	 * Checks if the GenericTile should render the info container.
+	 * Checks if the GenericTile should render the info container (appShortcut / systemInfo chip).
+	 * - ArticleMode and ActionMode: never rendered.
+	 * - IconMode: rendered only for TwoByHalf when at least one of appShortcut or systemInfo is set;
+	 *   not rendered for IconMode OneByOne (the transaction-code chip uses a separate path).
+	 * - All other modes (Normal/ContentMode): rendered for any frame type when at least one of
+	 *   appShortcut or systemInfo is set.
 	 * @param {sap.m.GenericTile} oControl The GenericTile control
 	 * @returns {boolean} True if the info container should be rendered, false otherwise
 	 * @private
@@ -593,38 +601,60 @@ sap.ui.define(["sap/m/library", "sap/base/security/encodeCSS", "sap/ui/core/Them
 			bIsArticleMode = oControl.getMode() === GenericTileMode.ArticleMode,
 			bIsActionMode = oControl.getMode() === GenericTileMode.ActionMode,
 			bIsIconMode = oControl.getMode() === GenericTileMode.IconMode;
-			if (frameType === frameTypes.OneByOne && bIsIconMode){
-				return true;
-			}
-		return !bIsArticleMode && !bIsActionMode && !bIsIconMode && frameType !== frameTypes.OneByHalf && (oControl.getSystemInfo() || oControl.getAppShortcut());
+		if (bIsArticleMode || bIsActionMode) {
+			return false;
+		}
+		if (bIsIconMode) {
+			// IconMode OneByOne: no info container; IconMode TwoByHalf: show info container when systemInfo or appShortcut set
+			return frameType === frameTypes.TwoByHalf && !!(oControl.getAppShortcut() || oControl.getSystemInfo());
+		}
+		// Normal mode: hide info container when scope is Actions or ActionMore
+		if (oControl.getScope() === GenericTileScope.Actions || oControl.getScope() === GenericTileScope.ActionMore) {
+			return false;
+		}
+		// Normal mode: render info container for all frame types when systemInfo or appShortcut is present
+		return !!(oControl.getSystemInfo() || oControl.getAppShortcut());
 	};
 
 	/**
-	 * Renders the Info Container.
+	 * Renders the info container holding the appShortcut and systemInfo Text controls.
+	 * For TwoByHalf IconMode tiles and all OneByHalf tiles the sapMGTTInfoInline class is
+	 * added to enable a flex-row (side-by-side) layout. TwoByHalf NumericContent and
+	 * ImageContent tiles render the values stacked vertically.
+	 * systemInfo is rendered first (left/top), appShortcut second (right/bottom).
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer
 	 * @param {sap.m.GenericTile} oControl The control that will be rendered
 	 * @private
 	 */
 	GenericTileRenderer._renderInfoContainer = function(oRm, oControl) {
+		var bHasAppShortcut = !!oControl.getAppShortcut();
+		var bHasSystemInfo = !!oControl.getSystemInfo();
+
 		oRm.openStart("div", oControl.getId() + "-tInfo");
 		oRm.class("sapMGTTInfoContainer");
 		oRm.openEnd();
+
 		oRm.openStart("div", oControl.getId() + "-tInfo-content");
 		oRm.class("sapMGTTInfo");
-		oRm.openEnd();
-		if (oControl.getAppShortcut()) {
-			oRm.openStart("div", oControl.getId() + "-appShortcutWrapper");
-			oRm.class("sapMGTAppShortcutText").openEnd();
-			oRm.renderControl(oControl._oAppShortcut);
-			oRm.close("div");
+		if ((oControl.getFrameType() === frameTypes.TwoByHalf && oControl._isIconMode()) ||
+			oControl.getFrameType() === frameTypes.OneByHalf) {
+			oRm.class("sapMGTTInfoInline");
 		}
-		if (oControl.getSystemInfo()) {
+		oRm.openEnd();
+		if (bHasSystemInfo) {
 			oRm.openStart("div", oControl.getId() + "-sytemInfoWrapper");
 			oRm.class("sapMGTSystemInfoText").openEnd();
 			oRm.renderControl(oControl._oSystemInfo);
 			oRm.close("div");
 		}
+		if (bHasAppShortcut) {
+			oRm.openStart("div", oControl.getId() + "-appShortcutWrapper");
+			oRm.class("sapMGTAppShortcutText").openEnd();
+			oRm.renderControl(oControl._oAppShortcut);
+			oRm.close("div");
+		}
 		oRm.close("div");
+
 		oRm.close("div");
 	};
 
