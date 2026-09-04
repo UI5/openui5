@@ -110,6 +110,10 @@ sap.ui.define([
 		return aRelevantChanges;
 	}
 
+	FlexObjectState.getDirtyFlexObjectsDataSelector = function() {
+		return oAllDirtyFlexObjectsDataSelector;
+	};
+
 	/**
 	 * Fetches all UIChanges that can be applied. This includes the UIChanges of any current FlVariant.
 	 * This excludes update changes for CompVariants

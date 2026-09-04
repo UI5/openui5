@@ -13,6 +13,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexObjects/UpdatableChange",
 	"sap/ui/fl/apply/_internal/flexState/compVariants/applyChangesOnVariant",
 	"sap/ui/fl/apply/_internal/flexState/compVariants/CompVariantManagementState",
+	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
@@ -30,6 +31,7 @@ sap.ui.define([
 	UpdatableChange,
 	applyChangesOnVariant,
 	CompVariantManagementState,
+	FlexObjectState,
 	FlexState,
 	Settings,
 	FlexObjectManager,
@@ -387,6 +389,9 @@ sap.ui.define([
 				oVariant.setRequest(mPropertyBag.transportId);
 			}
 			oVariant.storeContent(mPropertyBag.content || oVariant.getContent());
+
+			// changing the content or some properties of the variant does not update the DataSelector automatically
+			FlexObjectState.getDirtyFlexObjectsDataSelector().checkUpdate({ reference: mPropertyBag.reference });
 		}
 
 		function updateChange(mPropertyBag, oVariant, oChange) {
