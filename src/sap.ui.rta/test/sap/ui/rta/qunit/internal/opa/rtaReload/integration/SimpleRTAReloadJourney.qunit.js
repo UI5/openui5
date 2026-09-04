@@ -176,8 +176,8 @@ sap.ui.define([
 		When.onTheRTAToolbar.iClickOnAnElementOverlay(sContainedVMControlId);
 		When.onTheRTAToolbar.iClickOnVariantManagementMenuItem("Save View As");
 
-		When.onFlVariantManagement.iCreateNewVariant(sContainedVMControlId, sNewContainedVariantName, true);
-		Then.onFlVariantManagement.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName)
+		When.onVariantManagement.iCreateNewVariant(sContainedVMControlId, sNewContainedVariantName, true);
+		Then.onVariantManagement.theVariantShouldBeDisplayed(sContainedVMControlId, sNewContainedVariantName)
 		.and.theModifiedIndicatorShouldBeHidden();
 		When.onTheRTAToolbar.iPressTheSaveDraftButton();
 

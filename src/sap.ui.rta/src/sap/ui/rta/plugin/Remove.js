@@ -259,7 +259,35 @@ sap.ui.define([
 	 * @override
 	 */
 	Remove.prototype.getMenuItems = function(aElementOverlays) {
-		return this._getMenuItems(aElementOverlays, { pluginId: "CTX_REMOVE", icon: "sap-icon://less" });
+		return this._getMenuItems(aElementOverlays, {
+			pluginId: "CTX_REMOVE",
+			icon: "sap-icon://less",
+			description: "remove the element"
+		});
+	};
+
+	/**
+	 * Creates the remove command (wrapped in a composite command) and fires the "elementModified" event.
+	 * Unlike the handler, this method does not show a confirmation dialog and does not support multiple overlays.
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Target overlay
+	 * @returns {Promise<sap.ui.rta.command.CompositeCommand>} Resolves with the created composite command
+	 * @since 1.153
+	 */
+	Remove.prototype.createCommands = async function(oOverlay) {
+		const oResponsibleElementOverlay = this.getResponsibleElementOverlay(oOverlay);
+		const oRemovedElement = oResponsibleElementOverlay.getElement();
+		const oDesignTimeMetadata = oResponsibleElementOverlay.getDesignTimeMetadata();
+		const sVariantManagementReference = this.getVariantManagementReference(oResponsibleElementOverlay);
+
+		const oCompositeCommand = new CompositeCommand();
+		const oRemoveCommand = await this._getRemoveCommand(
+			oRemovedElement,
+			oDesignTimeMetadata,
+			sVariantManagementReference
+		);
+		oCompositeCommand.addCommand(oRemoveCommand);
+		this._fireElementModified(oCompositeCommand);
+		return oCompositeCommand;
 	};
 
 	/**

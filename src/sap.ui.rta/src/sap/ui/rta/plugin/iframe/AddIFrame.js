@@ -49,12 +49,12 @@ sap.ui.define([
 		let sWidth;
 		let sHeight;
 		if (mSettings.frameWidth) {
-			sWidth = mSettings.frameWidth + mSettings.frameWidthUnit;
+			sWidth = mSettings.frameWidth + (mSettings.frameWidthUnit || "px");
 		} else {
 			sWidth = "100%";
 		}
 		if (mSettings.frameHeight) {
-			sHeight = mSettings.frameHeight + mSettings.frameHeightUnit;
+			sHeight = mSettings.frameHeight + (mSettings.frameHeightUnit || "px");
 		} else {
 			sHeight = "100%";
 		}
@@ -85,26 +85,21 @@ sap.ui.define([
 	 */
 	AddIFrame.prototype.handler = function(aElementOverlays, mPropertyBag) {
 		const oResponsibleElementOverlay = aElementOverlays[0];
-		const oParentOverlay = this._getParentOverlay(mPropertyBag.menuItem.bAsSibling, oResponsibleElementOverlay);
+		const { bAsSibling, action: oAction } = mPropertyBag.menuItem;
+		const oParentOverlay = this._getParentOverlay(bAsSibling, oResponsibleElementOverlay);
 		const oParent = oParentOverlay.getElement();
 		const oDesignTimeMetadata = oParentOverlay.getDesignTimeMetadata();
 		let iIndex = 0;
 
-		if (mPropertyBag.menuItem.bAsSibling) {
+		if (bAsSibling) {
 			const oSiblingElement = oResponsibleElementOverlay.getElement();
-			const fnGetIndex = oDesignTimeMetadata.getAggregation(mPropertyBag.menuItem.action.aggregation).getIndex;
-			iIndex = this._determineIndex(oParent, oSiblingElement, mPropertyBag.menuItem.action.aggregation, fnGetIndex);
+			const fnGetIndex = oDesignTimeMetadata.getAggregation(oAction.aggregation).getIndex;
+			iIndex = this._determineIndex(oParent, oSiblingElement, oAction.aggregation, fnGetIndex);
 		}
 
-		const sVariantManagementReference = this.getVariantManagementReference(oParentOverlay);
-
-		// providing an action will trigger the rename plugin, which we only want in case of addIFrame as container
-		// in that case the function getCreatedContainerId has to be provided
-		const oAction = mPropertyBag.menuItem.action;
 		const bAsContainer = !!oAction.getCreatedContainerId;
 
 		const oAddIFrameDialog = new AddIFrameDialog();
-		let sNewContainerTitle;
 		return AddIFrameDialog.buildUrlBuilderParametersFor(oParent)
 		.then(function(mURLParameters) {
 			const mAddIFrameDialogSettings = {
@@ -119,16 +114,9 @@ sap.ui.define([
 			}
 			mSettings.index = iIndex;
 			mSettings.aggregation = oAction.aggregation;
-			sNewContainerTitle = mSettings.title;
-			return getAddIFrameCommand.call(this, oParent, mSettings, oDesignTimeMetadata, sVariantManagementReference);
-		}.bind(this))
-		.then(function(oCommand) {
-			this.fireElementModified({
-				command: oCommand,
-				newControlId: oCommand.getBaseId(),
-				action: bAsContainer ? oAction : undefined,
-				title: sNewContainerTitle
-			});
+			mSettings.isSibling = bAsSibling;
+			mSettings.action = oAction;
+			return this.createCommands(oResponsibleElementOverlay, mSettings);
 		}.bind(this))
 		.catch(function(vError) {
 			if (vError && !(vError instanceof CancelError)) {
@@ -162,7 +150,8 @@ sap.ui.define([
 			bAsSibling: true,
 			additionalInfoKey: "IFRAME_RTA_CONTEXT_MENU_INFO",
 			rank: iBaseRank,
-			action: oSiblingAction
+			action: oSiblingAction,
+			description: "embed an iframe as a sibling of the element; the URL may include UI5 expression bindings computed from the parent element's data"
 		});
 
 		const aActions = this.getCreateActions(aElementOverlays[0], false);
@@ -173,7 +162,8 @@ sap.ui.define([
 				bAsSibling: false,
 				additionalInfoKey: "IFRAME_RTA_CONTEXT_MENU_INFO",
 				rank: ++iBaseRank,
-				action: oAction
+				action: oAction,
+				description: "embed an iframe as a child of the element; the URL may include UI5 expression bindings computed from the parent element's data"
 			}));
 		}
 		return aMenuItems.flat();
@@ -184,6 +174,181 @@ sap.ui.define([
 	 */
 	AddIFrame.prototype.getActionName = function() {
 		return "addIFrame";
+	};
+
+	/**
+	 * Returns the parameters that a programmatic consumer must provide to create the commands for this plugin.
+	 * @returns {object[]} List of parameter descriptors (name, type, required, description)
+	 * @since 1.153
+	 */
+	AddIFrame.prototype.getParameters = function() {
+		return [
+			{
+				name: "isSibling",
+				type: "boolean",
+				required: true,
+				description: "Whether the iframe should be added as a sibling of the given overlay or as a child of the given overlay, depending on user instructions"
+			},
+			{
+				name: "aggregation",
+				type: "string",
+				required: true,
+				description: "The aggregation of the parent element to which the iframe should be added"
+			},
+			{
+				name: "index",
+				type: "int",
+				required: true,
+				description: "The position index at which the iframe should be added"
+			},
+			{
+				name: "title",
+				type: "string",
+				required: false,
+				description: "The title of the section if added as a section"
+			},
+			{
+				name: "frameUrl",
+				type: "string",
+				required: true,
+				description: [
+					"The URL of the iframe content.",
+					"May contain UI5 expression bindings in the form {= <expression> } to compute parts of the URL from the parent element's data.",
+					"Expressions support property access (${PropertyName}), arithmetic (+, -, *, /, %), comparison (<, <=, >, >=, ===, !==), logical operators (&&, ||, !), the ternary conditional (a ? b : c), and standard functions including Math.floor, Math.ceil, Math.round, Math.abs, and String methods.",
+					"When the user's request implies a computation (percentages, thresholds, ranges, unit conversions, units requiring rounding), locale/region choice (currency, language, country), express that computation inside {= ... } rather than substituting a raw property value.",
+					"You must not encode parameters via encodeURIComponent as this is automatically done!"
+				].join(" ")
+			},
+			{
+				name: "frameWidth",
+				type: "int",
+				required: false,
+				description: "The width of the iframe"
+			},
+			{
+				name: "frameWidthUnit",
+				type: "string",
+				required: false,
+				description: "The unit for the iframe width (must be one of %, px, vh)"
+			},
+			{
+				name: "frameHeight",
+				type: "int",
+				required: false,
+				description: "The height of the iframe"
+			},
+			{
+				name: "frameHeightUnit",
+				type: "string",
+				required: false,
+				description: "The unit for the iframe height (must be one of %, px, vh)"
+			},
+			{
+				name: "advancedSettings",
+				type: "object",
+				signature: {
+					allowForms: {
+						type: "boolean",
+						description: "Allow forms in the iframe",
+						required: false
+					},
+					allowScripts: {
+						type: "boolean",
+						description: "Allow scripts in the iframe",
+						required: false
+					},
+					allowSameOrigin: {
+						type: "boolean",
+						description: "Allow same origin access",
+						required: false
+					},
+					allowPopups: {
+						type: "boolean",
+						description: "Allow popups in the iframe",
+						required: false
+					},
+					allowModals: {
+						type: "boolean",
+						description: "Allow modals in the iframe",
+						required: false
+					},
+					allowTopNavigation: {
+						type: "boolean",
+						description: "Allow top navigation in the iframe",
+						required: false
+					},
+					allowDownloads: {
+						type: "boolean",
+						description: "Allow downloads in the iframe",
+						required: false
+					},
+					additionalSandboxParameters: {
+						type: "array",
+						description: "Additional sandbox parameters",
+						required: false
+					}
+				},
+				required: false,
+				description: "Advanced sandbox settings for the iframe, use as few as required. allowScripts, allowForms, allowSameOrigin is a reasonable default"
+			}
+		];
+	};
+
+	/**
+	 * Collects the context that a programmatic consumer needs to build the parameters for this plugin,
+	 * i.e. the list of parameters that are available for expression bindings in the iframe URL.
+	 * The parameters are derived from the sibling parent's element; child insertion resolves to the
+	 * same parent, so the available binding parameters are identical for both cases.
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay for which the context is collected
+	 * @returns {Promise<object>} Resolves with the context object containing the available binding parameters
+	 * @since 1.153
+	 */
+	AddIFrame.prototype.getContext = async function(oOverlay) {
+		const oParentOverlay = this._getParentOverlay(true, oOverlay);
+		const oParent = oParentOverlay.getElement();
+		const mParameters = await AddIFrameDialog.buildUrlBuilderParametersFor(oParent);
+		return {
+			parameters: {
+				description: "Available parameters for bindings in the url (including name, label and a sample value)",
+				value: mParameters
+			}
+		};
+	};
+
+	/**
+	 * Creates the command for this plugin from the given parameters and fires the "elementModified" event.
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Target overlay
+	 * @param {object} mParameters - Parameters as described by {@link #getParameters}
+	 * @param {object} [mParameters.action] - Pre-resolved create action. When it defines a
+	 *   <code>getCreatedContainerId</code> function the iframe is added as a container and the fired
+	 *   event carries the action and title so the rename plugin can rename the new container.
+	 * @returns {Promise<sap.ui.rta.command.BaseCommand>} Resolves with the created command
+	 * @since 1.153
+	 */
+	AddIFrame.prototype.createCommands = async function(oOverlay, mParameters) {
+		const oParentOverlay = this._getParentOverlay(mParameters.isSibling, oOverlay);
+		const oParent = oParentOverlay.getElement();
+		const oDesignTimeMetadata = oParentOverlay.getDesignTimeMetadata();
+		const sVariantManagementReference = this.getVariantManagementReference(oParentOverlay);
+
+		const oAction = mParameters.action;
+		const bAsContainer = !!oAction?.getCreatedContainerId;
+
+		const oCommand = await getAddIFrameCommand.call(
+			this,
+			oParent,
+			mParameters,
+			oDesignTimeMetadata,
+			sVariantManagementReference
+		);
+		this.fireElementModified({
+			command: oCommand,
+			newControlId: oCommand.getBaseId(),
+			// providing an action triggers the rename plugin, which we only want for addIFrame as container
+			action: bAsContainer ? oAction : undefined,
+			title: mParameters.title
+		});
+		return oCommand;
 	};
 
 	return AddIFrame;

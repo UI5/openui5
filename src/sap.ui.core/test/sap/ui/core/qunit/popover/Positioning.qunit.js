@@ -1,10 +1,14 @@
 /*global QUnit, sinon */
 sap.ui.define([
 	"sap/ui/core/popover/Positioning",
+	"sap/ui/core/library",
+	"sap/ui/core/popover/PopoverFlipMode",
 	"sap/base/i18n/Localization",
 	"sap/ui/dom/getScrollbarSize"
-], (Positioning, Localization, getScrollbarSize) => {
+], (Positioning, coreLibrary, FlipMode, Localization, getScrollbarSize) => {
 	"use strict";
+
+	const PopoverPlacement = coreLibrary.popover.PopoverPlacement;
 
 	// Plain rect helper used by the computeArrowOffset tests, which accept
 	// pre-measured openerRect/popoverRect rects directly (no DOM needed).
@@ -90,28 +94,33 @@ sap.ui.define([
 	const NO_MARGINS = { top: 0, right: 0, bottom: 0, left: 0 };
 
 	// ---------------------------------------------------------------------
-	QUnit.module("resolvePlacement — strict Top/Bottom pass through");
+	QUnit.module("resolvePlacement — Never keeps the strict vertical side");
 
-	["Top", "Bottom"].forEach((sSide) => {
-		QUnit.test(`strict '${sSide}' returns itself regardless of space`, (assert) => {
+	[
+		{ placement: PopoverPlacement.Top, expected: "Top" },
+		{ placement: PopoverPlacement.Bottom, expected: "Bottom" }
+	].forEach(({ placement, expected }) => {
+		QUnit.test(`'${placement}' with Never returns ${expected} regardless of space`, (assert) => {
 			const sResult = Positioning.resolvePlacement({
-				preferred: sSide,
+				placement,
+				flipMode: FlipMode.Never,
 				openerRef: makeOpener(0, 0, 10, 10),
 				popoverRef: makePopover(5000, 5000), // absurdly large — would never "fit"
 				withinAreaRef: makeWithinArea(100, 100),
 				margin: NO_MARGINS,
 				arrowSize: 0
 			});
-			assert.strictEqual(sResult, sSide, "vertical strict side is never flipped");
+			assert.strictEqual(sResult, expected, "Never never flips the vertical side");
 		});
 	});
 
 	// ---------------------------------------------------------------------
-	QUnit.module("resolvePlacement — strict Left/Right never flip");
+	QUnit.module("resolvePlacement — strict Begin/End (Never) never flip");
 
-	QUnit.test("strict 'Left' stays Left when the left side fits", (assert) => {
+	QUnit.test("'Begin' stays Left when the left side fits", (assert) => {
 		assert.strictEqual(Positioning.resolvePlacement({
-			preferred: "Left",
+			placement: PopoverPlacement.Begin,
+			flipMode: FlipMode.Never,
 			openerRef: makeOpener(0, 200, 10, 10), // room on the left
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(400, 400),
@@ -120,9 +129,10 @@ sap.ui.define([
 		}), "Left", "left fits → Left");
 	});
 
-	QUnit.test("strict 'Left' stays Left even when the left side has no room", (assert) => {
+	QUnit.test("'Begin' stays Left even when the left side has no room", (assert) => {
 		assert.strictEqual(Positioning.resolvePlacement({
-			preferred: "Left",
+			placement: PopoverPlacement.Begin,
+			flipMode: FlipMode.Never,
 			openerRef: makeOpener(0, 0, 10, 10), // pinned to the left edge
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(400, 400),
@@ -131,9 +141,10 @@ sap.ui.define([
 		}), "Left", "no left room → still Left (Popup 'fit' handles overflow, no flip)");
 	});
 
-	QUnit.test("strict 'Right' stays Right even when the right side has no room", (assert) => {
+	QUnit.test("'End' stays Right even when the right side has no room", (assert) => {
 		assert.strictEqual(Positioning.resolvePlacement({
-			preferred: "Right",
+			placement: PopoverPlacement.End,
+			flipMode: FlipMode.Never,
 			openerRef: makeOpener(0, 390, 10, 10), // pinned to the right edge (within 400)
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(400, 400),
@@ -142,9 +153,10 @@ sap.ui.define([
 		}), "Right", "no right room → still Right (Popup 'fit' handles overflow, no flip)");
 	});
 
-	QUnit.test("strict 'Left' stays Left when neither side fits", (assert) => {
+	QUnit.test("'Begin' stays Left when neither side fits", (assert) => {
 		assert.strictEqual(Positioning.resolvePlacement({
-			preferred: "Left",
+			placement: PopoverPlacement.Begin,
+			flipMode: FlipMode.Never,
 			openerRef: makeOpener(0, 0, 10, 10),
 			popoverRef: makePopover(5000, 50), // wider than either side
 			withinAreaRef: makeWithinArea(400, 400),
@@ -154,13 +166,14 @@ sap.ui.define([
 	});
 
 	// ---------------------------------------------------------------------
-	QUnit.module("resolvePlacement — Vertical / preferred vertical");
+	QUnit.module("resolvePlacement — vertical (Top/Bottom)");
 
-	QUnit.test("Vertical picks the side with more free space", (assert) => {
+	QUnit.test("PureSpace picks the side with more free space", (assert) => {
 		const oWithin = makeWithinArea(500, 500);
 		// opener near the top → more space below → Bottom
 		assert.strictEqual(Positioning.resolvePlacement({
-			preferred: "Vertical",
+			placement: PopoverPlacement.Top,
+			flipMode: FlipMode.PureSpace,
 			openerRef: makeOpener(50, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: oWithin,
@@ -170,7 +183,8 @@ sap.ui.define([
 
 		// opener near the bottom → more space above → Top
 		assert.strictEqual(Positioning.resolvePlacement({
-			preferred: "Vertical",
+			placement: PopoverPlacement.Top,
+			flipMode: FlipMode.PureSpace,
 			openerRef: makeOpener(450, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: oWithin,
@@ -179,10 +193,11 @@ sap.ui.define([
 		}), "Top", "opener low on screen → Top");
 	});
 
-	QUnit.test("VerticalPreferredTop honours the preference when it fits", (assert) => {
+	QUnit.test("MoreSpace honours the preference when it fits", (assert) => {
 		// Enough space above (top=400, popover 50 + arrow 0 < 400) → Top even though bottom has more.
 		assert.strictEqual(Positioning.resolvePlacement({
-			preferred: "VerticalPreferredTop",
+			placement: PopoverPlacement.Top,
+			flipMode: FlipMode.MoreSpace,
 			openerRef: makeOpener(400, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(500, 500),
@@ -191,10 +206,11 @@ sap.ui.define([
 		}), "Top", "prefers Top when it fits");
 	});
 
-	QUnit.test("VerticalPreferredTop falls back to Bottom when Top doesn't fit", (assert) => {
+	QUnit.test("MoreSpace falls back to Bottom when Top doesn't fit", (assert) => {
 		// top space = 40, popover height 50 → doesn't fit above → Bottom
 		assert.strictEqual(Positioning.resolvePlacement({
-			preferred: "VerticalPreferredTop",
+			placement: PopoverPlacement.Top,
+			flipMode: FlipMode.MoreSpace,
 			openerRef: makeOpener(40, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(500, 500),
@@ -203,9 +219,10 @@ sap.ui.define([
 		}), "Bottom", "insufficient top space → Bottom");
 	});
 
-	QUnit.test("PreferredTopOrFlip flips to Bottom when Top is too small", (assert) => {
+	QUnit.test("Opposite flips to Bottom when Top is too small", (assert) => {
 		assert.strictEqual(Positioning.resolvePlacement({
-			preferred: "PreferredTopOrFlip",
+			placement: PopoverPlacement.Top,
+			flipMode: FlipMode.Opposite,
 			openerRef: makeOpener(40, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(500, 500),
@@ -214,7 +231,8 @@ sap.ui.define([
 		}), "Bottom", "flips to Bottom");
 
 		assert.strictEqual(Positioning.resolvePlacement({
-			preferred: "PreferredTopOrFlip",
+			placement: PopoverPlacement.Top,
+			flipMode: FlipMode.Opposite,
 			openerRef: makeOpener(150, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(500, 500),
@@ -243,12 +261,13 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("VerticalPreferredTop flips to Bottom when the opener is near the viewport top on a scrolled page", (assert) => {
+	QUnit.test("Top/MoreSpace flips to Bottom when the opener is near the viewport top on a scrolled page", (assert) => {
 		// Fixed opener sits 40px below the viewport top; only 40px of visible space
 		// above → 50px popover cannot fit → must flip to Bottom (regression: the
 		// page-relative top of ~1040px falsely reported "room above" → stuck Top).
 		assert.strictEqual(Positioning.resolvePlacement({
-			preferred: "VerticalPreferredTop",
+			placement: PopoverPlacement.Top,
+			flipMode: FlipMode.MoreSpace,
 			openerRef: makeOpener(40, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: window,
@@ -257,9 +276,10 @@ sap.ui.define([
 		}), "Bottom", "no visible space above → Bottom, not Top-over-opener");
 	});
 
-	QUnit.test("Vertical picks Bottom for a viewport-top opener on a scrolled page", (assert) => {
+	QUnit.test("Top/PureSpace picks Bottom for a viewport-top opener on a scrolled page", (assert) => {
 		assert.strictEqual(Positioning.resolvePlacement({
-			preferred: "Vertical",
+			placement: PopoverPlacement.Top,
+			flipMode: FlipMode.PureSpace,
 			openerRef: makeOpener(40, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: window,
@@ -269,12 +289,55 @@ sap.ui.define([
 	});
 
 	// ---------------------------------------------------------------------
-	QUnit.module("resolvePlacement — Horizontal / preferred horizontal");
+	QUnit.module("resolvePlacement — custom within-area bottom bound", {
+		beforeEach() {
+			// A tall document (5000px) with a within-area that occupies only a
+			// band of it (top 200, height 300 → bottom 500). getBottomBound must
+			// measure to the within-area's bottom (500), NOT area.top + docHeight.
+			this._scrollHeight = Object.getOwnPropertyDescriptor(document.body, "scrollHeight");
+			Object.defineProperty(document.body, "scrollHeight", { configurable: true, get: () => 5000 });
+			stubViewport(500, 5000);
+		},
+		afterEach() {
+			restoreViewport();
+			if (this._scrollHeight) { Object.defineProperty(document.body, "scrollHeight", this._scrollHeight); } else { delete document.body.scrollHeight; }
+		}
+	});
 
-	QUnit.test("Horizontal picks the side with more free space (LTR)", (assert) => {
+	// Within-area placed at page top 200, height 300 (bottom 500). Not pinned to
+	// doc height, unlike makeWithinArea — reproduces the live BL-opener bug.
+	function makeOffsetWithinArea(iTop, iWidth, iHeight) {
+		const oEl = document.createElement("div");
+		oEl.style.cssText = "position:fixed;box-sizing:border-box;padding:0;border:0;"
+			+ "top:" + iTop + "px;left:0;width:" + iWidth + "px;height:" + iHeight + "px;";
+		document.body.appendChild(oEl);
+		aCleanup.push(oEl);
+		return oEl;
+	}
+
+	QUnit.test("Bottom/MoreSpace flips to Top for an opener at the within-area bottom", (assert) => {
+		// Opener sits at the area bottom (top 450, bottom 500 = area bottom) →
+		// ~0 space below inside the area → must flip Top (regression: the bottom
+		// bound used area.top + docHeight, falsely reporting huge room below).
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.Bottom,
+			flipMode: FlipMode.MoreSpace,
+			openerRef: makeOpener(450, 0, 50, 50),
+			popoverRef: makePopover(50, 50),
+			withinAreaRef: makeOffsetWithinArea(200, 500, 300),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Top", "no space below within-area → Top");
+	});
+
+	// ---------------------------------------------------------------------
+	QUnit.module("resolvePlacement — horizontal (Begin/End)");
+
+	QUnit.test("PureSpace picks the side with more free space (LTR)", (assert) => {
 		// opener near the left → more space right → Right
 		assert.strictEqual(Positioning.resolvePlacement({
-			preferred: "Horizontal",
+			placement: PopoverPlacement.Begin,
+			flipMode: FlipMode.PureSpace,
 			openerRef: makeOpener(0, 50, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(500, 500),
@@ -284,7 +347,8 @@ sap.ui.define([
 
 		// opener near the right → more space left → Left
 		assert.strictEqual(Positioning.resolvePlacement({
-			preferred: "Horizontal",
+			placement: PopoverPlacement.Begin,
+			flipMode: FlipMode.PureSpace,
 			openerRef: makeOpener(0, 450, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(500, 500),
@@ -293,23 +357,134 @@ sap.ui.define([
 		}), "Left", "opener on right → Left");
 	});
 
-	QUnit.test("Horizontal is mirrored in RTL", (assert) => {
+	QUnit.test("PureSpace is mirrored in RTL", (assert) => {
 		const oStub = sinon.stub(Localization, "getRTL").returns(true);
-		// opener on left → in RTL the "more space" side (physical right) maps to Left
+		// opener on physical left; End=physical Left has no room, roomier logical side is Begin=physical Right
 		assert.strictEqual(Positioning.resolvePlacement({
-			preferred: "Horizontal",
+			placement: PopoverPlacement.Begin,
+			flipMode: FlipMode.PureSpace,
 			openerRef: makeOpener(0, 50, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(500, 500),
 			margin: NO_MARGINS,
 			arrowSize: 0
-		}), "Left", "RTL mirrors the horizontal decision");
+		}), "Right", "RTL: roomier physical-right side wins → Right");
 		oStub.restore();
 	});
 
-	QUnit.test("PreferredLeftOrFlip flips to Right when Left is too small (LTR)", (assert) => {
+	QUnit.test("MoreSpace/Begin honours the preference in RTL: Begin is physical Right and fits", (assert) => {
+		const oStub = sinon.stub(Localization, "getRTL").returns(true);
 		assert.strictEqual(Positioning.resolvePlacement({
-			preferred: "PreferredLeftOrFlip",
+			placement: PopoverPlacement.Begin,
+			flipMode: FlipMode.MoreSpace,
+			openerRef: makeOpener(0, 0, 50, 50), // physical-left edge; Begin=Right in RTL, the large right gap fits
+			popoverRef: makePopover(100, 50),
+			withinAreaRef: makeWithinArea(500, 500),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Right", "RTL Begin (physical Right) fits → stays Right");
+		oStub.restore();
+	});
+
+	QUnit.test("MoreSpace/Begin flips in RTL when the physical-right (start) side has no room", (assert) => {
+		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.Begin,
+			flipMode: FlipMode.MoreSpace,
+			openerRef: makeOpener(0, 450, 50, 50), // physical-right edge; Begin=Right in RTL has no room → flip to End=Left
+			popoverRef: makePopover(100, 50),
+			withinAreaRef: makeWithinArea(500, 500),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Left", "RTL Begin (physical Right) with no room → roomier Left");
+		oStub.restore();
+	});
+
+	QUnit.test("Opposite/Begin flips in RTL: Begin is physical Right, so a right-edge opener flips to Left", (assert) => {
+		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.Begin,
+			flipMode: FlipMode.Opposite,
+			openerRef: makeOpener(0, 450, 50, 50), // physical-right edge; Begin=Right in RTL doesn't fit → opposite End=Left
+			popoverRef: makePopover(100, 50),
+			withinAreaRef: makeWithinArea(500, 500),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Left", "RTL Begin (physical Right) doesn't fit → opposite Left");
+		oStub.restore();
+	});
+
+	QUnit.test("MoreSpace/End honours the preference in RTL: End is physical Left and fits", (assert) => {
+		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.End,
+			flipMode: FlipMode.MoreSpace,
+			openerRef: makeOpener(0, 450, 50, 50), // physical-right edge; End=Left in RTL, the large left gap fits
+			popoverRef: makePopover(100, 50),
+			withinAreaRef: makeWithinArea(500, 500),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Left", "RTL End (physical Left) fits → stays Left");
+		oStub.restore();
+	});
+
+	QUnit.test("MoreSpace/End flips in RTL when the physical-left (end) side has no room", (assert) => {
+		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.End,
+			flipMode: FlipMode.MoreSpace,
+			openerRef: makeOpener(0, 0, 50, 50), // physical-left edge; End=Left in RTL has no room → flip to Begin=Right
+			popoverRef: makePopover(100, 50),
+			withinAreaRef: makeWithinArea(500, 500),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Right", "RTL End (physical Left) with no room → roomier Right");
+		oStub.restore();
+	});
+
+	QUnit.test("Opposite/End flips in RTL: End is physical Left, so a left-edge opener flips to Right", (assert) => {
+		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.End,
+			flipMode: FlipMode.Opposite,
+			openerRef: makeOpener(0, 0, 50, 50), // physical-left edge; End=Left in RTL doesn't fit → opposite Begin=Right
+			popoverRef: makePopover(100, 50),
+			withinAreaRef: makeWithinArea(500, 500),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Right", "RTL End (physical Left) doesn't fit → opposite Right");
+		oStub.restore();
+	});
+
+	QUnit.test("MoreSpace keeps the preferred side on an exact space tie in RTL", (assert) => {
+		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+		const oCenter = makeOpener(0, 225, 50, 50); // left gap 225 == right gap 225; popover 400 fits neither
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.Begin,
+			flipMode: FlipMode.MoreSpace,
+			openerRef: oCenter,
+			popoverRef: makePopover(400, 50),
+			withinAreaRef: makeWithinArea(500, 500),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Right", "RTL tie honours the preferred Begin → physical Right");
+
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.End,
+			flipMode: FlipMode.MoreSpace,
+			openerRef: oCenter,
+			popoverRef: makePopover(400, 50),
+			withinAreaRef: makeWithinArea(500, 500),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Left", "RTL tie honours the preferred End → physical Left");
+		oStub.restore();
+	});
+
+	QUnit.test("Opposite flips to End when Begin is too small (LTR)", (assert) => {
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.Begin,
+			flipMode: FlipMode.Opposite,
 			openerRef: makeOpener(0, 40, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(500, 500),
@@ -318,7 +493,8 @@ sap.ui.define([
 		}), "Right", "flips to Right");
 
 		assert.strictEqual(Positioning.resolvePlacement({
-			preferred: "PreferredLeftOrFlip",
+			placement: PopoverPlacement.Begin,
+			flipMode: FlipMode.Opposite,
 			openerRef: makeOpener(0, 400, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(500, 500),
@@ -327,32 +503,220 @@ sap.ui.define([
 		}), "Left", "stays Left when it fits");
 	});
 
+	QUnit.test("MoreSpace/Begin honours the preference when Begin fits (LTR)", (assert) => {
+		// opener on the right, popover fits left → stays Left, no flip
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.Begin,
+			flipMode: FlipMode.MoreSpace,
+			openerRef: makeOpener(225, 450, 50, 50),
+			popoverRef: makePopover(100, 50),
+			withinAreaRef: makeWithinArea(500, 500),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Left", "prefers Left when it fits");
+	});
+
+	QUnit.test("MoreSpace/Begin flips to Right when the opener is at the within-area left edge", (assert) => {
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.Begin,
+			flipMode: FlipMode.MoreSpace,
+			openerRef: makeOpener(0, 0, 50, 50), // flush against the within-area left
+			popoverRef: makePopover(100, 50),
+			withinAreaRef: makeWithinArea(500, 500),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Right", "no left room inside the within-area → Right");
+	});
+
+	QUnit.test("MoreSpace/End flips to Left when the opener is at the within-area right edge", (assert) => {
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.End,
+			flipMode: FlipMode.MoreSpace,
+			openerRef: makeOpener(0, 450, 50, 50), // right edge at 500 = within-area right
+			popoverRef: makePopover(100, 50),
+			withinAreaRef: makeWithinArea(500, 500),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Left", "no right room inside the within-area → Left");
+	});
+
+	QUnit.test("MoreSpace keeps the preferred side on an exact space tie", (assert) => {
+		const oCenter = makeOpener(0, 225, 50, 50); // left gap 225 == right gap 225; popover 400 fits neither
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.Begin,
+			flipMode: FlipMode.MoreSpace,
+			openerRef: oCenter,
+			popoverRef: makePopover(400, 50),
+			withinAreaRef: makeWithinArea(500, 500),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Left", "tie honours the preferred Begin → Left");
+
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.End,
+			flipMode: FlipMode.MoreSpace,
+			openerRef: oCenter,
+			popoverRef: makePopover(400, 50),
+			withinAreaRef: makeWithinArea(500, 500),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Right", "tie honours the preferred End → Right");
+	});
+
+	QUnit.test("MoreSpace keeps the preferred vertical side on an exact space tie", (assert) => {
+		const oCenter = makeOpener(225, 0, 50, 50); // top gap 225 == bottom gap 225
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.Top,
+			flipMode: FlipMode.MoreSpace,
+			openerRef: oCenter,
+			popoverRef: makePopover(50, 400),
+			withinAreaRef: makeWithinArea(500, 500),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Top", "tie honours the preferred Top");
+
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.Bottom,
+			flipMode: FlipMode.MoreSpace,
+			openerRef: oCenter,
+			popoverRef: makePopover(50, 400),
+			withinAreaRef: makeWithinArea(500, 500),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Bottom", "tie honours the preferred Bottom");
+	});
+
 	// ---------------------------------------------------------------------
 	QUnit.module("resolvePlacement — Auto");
 
-	QUnit.test("Auto in landscape prefers a horizontal side when it fits", (assert) => {
-		// landscape (w>h), opener on the left with plenty of right space
+	QUnit.test("Auto in landscape picks the roomier horizontal side (right)", (assert) => {
 		const s = Positioning.resolvePlacement({
-			preferred: "Auto",
+			auto: true,
 			openerRef: makeOpener(200, 20, 20, 20),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(800, 400),
 			margin: NO_MARGINS,
 			arrowSize: 0
 		});
-		assert.strictEqual(s, "Right", "landscape → horizontal → Right");
+		assert.strictEqual(s, "Right", "landscape → horizontal → Right (right roomier)");
 	});
 
-	QUnit.test("Auto in portrait prefers a vertical side when it fits", (assert) => {
+	QUnit.test("Auto in landscape picks the roomier horizontal side (left)", (assert) => {
 		const s = Positioning.resolvePlacement({
-			preferred: "Auto",
+			auto: true,
+			openerRef: makeOpener(200, 700, 20, 20),
+			popoverRef: makePopover(50, 50),
+			withinAreaRef: makeWithinArea(800, 400),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		});
+		assert.strictEqual(s, "Left", "landscape → horizontal → Left (left roomier)");
+	});
+
+	QUnit.test("Auto horizontal tie resolves to the End side (Right in LTR)", (assert) => {
+		const s = Positioning.resolvePlacement({
+			auto: true,
+			openerRef: makeOpener(200, 390, 20, 20),
+			popoverRef: makePopover(50, 50),
+			withinAreaRef: makeWithinArea(800, 400),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		});
+		assert.strictEqual(s, "Right", "tie → Right (matches legacy sap.m.Popover)");
+	});
+
+	QUnit.test("Auto in portrait picks the roomier vertical side (bottom)", (assert) => {
+		const s = Positioning.resolvePlacement({
+			auto: true,
 			openerRef: makeOpener(20, 200, 20, 20),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: makeWithinArea(400, 800),
 			margin: NO_MARGINS,
 			arrowSize: 0
 		});
-		assert.strictEqual(s, "Bottom", "portrait → vertical → Bottom");
+		assert.strictEqual(s, "Bottom", "portrait → vertical → Bottom (bottom roomier)");
+	});
+
+	QUnit.test("Auto in portrait picks the roomier vertical side (top)", (assert) => {
+		const s = Positioning.resolvePlacement({
+			auto: true,
+			openerRef: makeOpener(700, 20, 20, 20),
+			popoverRef: makePopover(50, 50),
+			withinAreaRef: makeWithinArea(400, 800),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		});
+		assert.strictEqual(s, "Top", "portrait → vertical → Top (top roomier)");
+	});
+
+	QUnit.test("Auto vertical tie resolves to Bottom", (assert) => {
+		const s = Positioning.resolvePlacement({
+			auto: true,
+			openerRef: makeOpener(390, 200, 20, 20),
+			popoverRef: makePopover(50, 50),
+			withinAreaRef: makeWithinArea(400, 800),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		});
+		assert.strictEqual(s, "Bottom", "tie → Bottom (matches legacy sap.m.Popover)");
+	});
+
+	QUnit.test("Auto falls back to best-position scoring when nothing fits", (assert) => {
+		const s = Positioning.resolvePlacement({
+			auto: true,
+			openerRef: makeOpener(20, 20, 20, 20),
+			popoverRef: makePopover(360, 360),
+			withinAreaRef: makeWithinArea(400, 400),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		});
+		assert.strictEqual(s, "Bottom", "best-position scoring → Bottom (most coverage below opener)");
+	});
+
+	QUnit.test("Auto best-position resolves to the physical side with most room in RTL", (assert) => {
+		// Landscape, opener near the physical-right edge, popover too big to fit any
+		// side → best-position scoring. Physical-left has the most room, so the
+		// popover lands Left in both directions; the RTL mapping must not send it to
+		// the empty physical-right side.
+		const oArgs = () => ({
+			auto: true,
+			openerRef: makeOpener(180, 740, 20, 20),
+			popoverRef: makePopover(700, 260),
+			withinAreaRef: makeWithinArea(800, 400),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		});
+
+		assert.strictEqual(Positioning.resolvePlacement(oArgs()), "Left", "LTR: most room on the left → Left");
+
+		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+		assert.strictEqual(Positioning.resolvePlacement(oArgs()), "Left", "RTL: still lands on the roomy physical-left side");
+		oStub.restore();
+	});
+
+	QUnit.test("Auto ignores flipMode Never (resolves by space)", (assert) => {
+		const s = Positioning.resolvePlacement({
+			auto: true,
+			flipMode: FlipMode.Never,
+			openerRef: makeOpener(200, 20, 20, 20),
+			popoverRef: makePopover(50, 50),
+			withinAreaRef: makeWithinArea(800, 400),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		});
+		assert.strictEqual(s, "Right", "auto + Never still resolves by space");
+	});
+
+	QUnit.test("unknown placement value defaults to Bottom", (assert) => {
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: "NotARealPlacement",
+			flipMode: FlipMode.MoreSpace,
+			openerRef: makeOpener(0, 0, 10, 10),
+			popoverRef: makePopover(10, 10),
+			withinAreaRef: makeWithinArea(100, 100),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Bottom", "unknown → Bottom");
 	});
 
 	// ---------------------------------------------------------------------
@@ -509,7 +873,7 @@ sap.ui.define([
 	// ---------------------------------------------------------------------
 	QUnit.module("computeAnchor");
 
-	QUnit.test("maps each side to the right jquery-ui-position spec", (assert) => {
+	QUnit.test("mirror:true (default) emits logical tokens Popup flips in RTL", (assert) => {
 		assert.deepEqual(Positioning.computeAnchor({ side: "Top", arrowSize: 10 }),
 			{ my: "center bottom", at: "center top", offset: "0 -10" }, "Top");
 		assert.deepEqual(Positioning.computeAnchor({ side: "Bottom", arrowSize: 10 }),
@@ -520,7 +884,18 @@ sap.ui.define([
 			{ my: "begin center", at: "end center", offset: "10 0" }, "Right");
 	});
 
-	QUnit.test("showArrow:false uses the start-aligned, zero-gap spec", (assert) => {
+	QUnit.test("mirror:false emits physical tokens for a pre-resolved side", (assert) => {
+		assert.deepEqual(Positioning.computeAnchor({ side: "Top", arrowSize: 10, mirror: false }),
+			{ my: "center bottom", at: "center top", offset: "0 -10" }, "Top unchanged");
+		assert.deepEqual(Positioning.computeAnchor({ side: "Bottom", arrowSize: 10, mirror: false }),
+			{ my: "center top", at: "center bottom", offset: "0 10" }, "Bottom unchanged");
+		assert.deepEqual(Positioning.computeAnchor({ side: "Left", arrowSize: 10, mirror: false }),
+			{ my: "right center", at: "left center", offset: "-10 0" }, "Left physical");
+		assert.deepEqual(Positioning.computeAnchor({ side: "Right", arrowSize: 10, mirror: false }),
+			{ my: "left center", at: "right center", offset: "10 0" }, "Right physical");
+	});
+
+	QUnit.test("showArrow:false, mirror:true (default) uses the start-aligned, zero-gap spec", (assert) => {
 		assert.deepEqual(Positioning.computeAnchor({ side: "Top", arrowSize: 10, showArrow: false }),
 			{ my: "begin bottom", at: "begin top", offset: "0 0" }, "Top no-arrow");
 		assert.deepEqual(Positioning.computeAnchor({ side: "Bottom", arrowSize: 10, showArrow: false }),
@@ -529,6 +904,13 @@ sap.ui.define([
 			{ my: "end center", at: "begin center", offset: "0 0" }, "Left no-arrow");
 		assert.deepEqual(Positioning.computeAnchor({ side: "Right", arrowSize: 10, showArrow: false }),
 			{ my: "begin center", at: "end center", offset: "0 0" }, "Right no-arrow");
+	});
+
+	QUnit.test("showArrow:false, mirror:false uses physical zero-gap spec", (assert) => {
+		assert.deepEqual(Positioning.computeAnchor({ side: "Left", arrowSize: 10, showArrow: false, mirror: false }),
+			{ my: "right center", at: "left center", offset: "0 0" }, "Left no-arrow physical");
+		assert.deepEqual(Positioning.computeAnchor({ side: "Right", arrowSize: 10, showArrow: false, mirror: false }),
+			{ my: "left center", at: "right center", offset: "0 0" }, "Right no-arrow physical");
 	});
 
 	// ---------------------------------------------------------------------
@@ -652,6 +1034,52 @@ sap.ui.define([
 		assert.strictEqual(o.left, 110, "left = margin + inset");
 		assert.strictEqual(o.right, 110, "right = margin + (innerWidth - within.right)");
 		assert.strictEqual(o.bottom, 110, "bottom = margin + (innerHeight - within.bottom)");
+	});
+
+	QUnit.test("physical-Right reserves the opener-facing margin, mirrored by RTL", (assert) => {
+		const oOpener = makeOpener(0, 200, 50, 50);
+		const oArgs = {
+			side: "Right",
+			openerRef: oOpener,
+			withinAreaRef: window,
+			margin: { top: 10, right: 10, bottom: 10, left: 10 },
+			arrowSize: 8,
+			shadowSize: 0
+		};
+
+		const oLtr = Positioning.getEffectiveMargins(oArgs);
+		assert.strictEqual(oLtr.left, 200 + 50 + 8, "LTR reserves left = opener right edge + arrow");
+		assert.strictEqual(oLtr.right, 10, "LTR leaves the right margin at base");
+
+		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+		const oRtl = Positioning.getEffectiveMargins(oArgs);
+		oStub.restore();
+
+		assert.strictEqual(oRtl.right, window.innerWidth - 50 - 200 + 8, "RTL reserves right = innerWidth - opener width - opener left + arrow");
+		assert.strictEqual(oRtl.left, 10, "RTL leaves the left margin at base");
+	});
+
+	QUnit.test("physical-Left reserves the opener-facing margin, mirrored by RTL", (assert) => {
+		const oOpener = makeOpener(0, 200, 50, 50);
+		const oArgs = {
+			side: "Left",
+			openerRef: oOpener,
+			withinAreaRef: window,
+			margin: { top: 10, right: 10, bottom: 10, left: 10 },
+			arrowSize: 8,
+			shadowSize: 0
+		};
+
+		const oLtr = Positioning.getEffectiveMargins(oArgs);
+		assert.strictEqual(oLtr.right, window.innerWidth - 200 + 8, "LTR reserves right = innerWidth - opener left + arrow");
+		assert.strictEqual(oLtr.left, 10, "LTR leaves the left margin at base");
+
+		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+		const oRtl = Positioning.getEffectiveMargins(oArgs);
+		oStub.restore();
+
+		assert.strictEqual(oRtl.left, 200 + 50 + 8, "RTL reserves left = opener right edge + arrow");
+		assert.strictEqual(oRtl.right, 10, "RTL leaves the right margin at base");
 	});
 
 	QUnit.module("computeMaxContentSize", { afterEach: restoreViewport });

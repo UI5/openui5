@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Hvis radutvalg er aktivert:</span></p>
+				<p>Hvis fokuset er på en rad, en celle eller en kontroll i en celle, veksles utvalget. Hvis ikke alle radene er valgt, er alle radene nå valgt. Hvis alle radene allerede er valgt, fjernes utvalget av alle radene.</p>
+				<p>Snarveien har ingen effekt hvis fokuset er på en kolonneoverskriftscelle eller på et tekstinndatafelt, siden nettleseren håndterer tekstutvalget i dette tilfellet.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Hvis celleutvalg er aktivert:</span></p>
-				<p>Hvis fokuset er inne i tabellen, fjernes utvalget for alle rader og celler.</p>
+				<p><span class="emphasis">Hvis radutvalg er aktivert:</span></p>
+				<p>Hvis fokuset er på en rad, en celle eller en kontroll i en celle, fjernes utvalget av alle radene.</p>
+				<p>Snarveien har ingen effekt hvis fokuset er på en kolonneoverskriftscelle eller på et tekstinndatafelt, siden nettleseren håndterer tekstutvalget i dette tilfellet.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
@@ -152,7 +159,7 @@
 				<p><kbd>ArrowUp</kbd></p>
 				<p>Flytter elementet én posisjon opp hvis tilgjengelig.</p>
 				<p><kbd>ArrowDown</kbd></p>
-				<p>Flytter elementet én posisjon ned hvis tilgjengelig.</p>
+				<p>Flytter elementet én posisjon ned, hvis tilgjengelig.</p>
 				<p><kbd>Home</kbd></p>
 				<p>Flytter elementet til toppen hvis tilgjengelig.</p>
 				<p><kbd>End</kbd></p>

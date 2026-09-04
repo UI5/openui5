@@ -62,44 +62,32 @@ sap.ui.define([
 	 */
 	CreateContainer.prototype.handler = async function(aElementOverlays, mPropertyBag) {
 		const oOverlay = aElementOverlays[0];
-		const oParentOverlay = this._getParentOverlay(mPropertyBag.menuItem.bAsSibling, oOverlay);
+		const { bAsSibling, action: oAction } = mPropertyBag.menuItem;
+		const oParentOverlay = this._getParentOverlay(bAsSibling, oOverlay);
 		const oParent = oParentOverlay.getElement();
 		const oDesignTimeMetadata = oParentOverlay.getDesignTimeMetadata();
-		const oView = FlexUtils.getViewForControl(oParent);
-		const oSiblingElement = mPropertyBag.menuItem.bAsSibling ? oOverlay.getElement() : null;
-		const sNewControlID = oView.createId(uid());
-		const fnGetIndex = oDesignTimeMetadata.getAggregation(mPropertyBag.menuItem.action.aggregation).getIndex;
-		const iIndex = this._determineIndex(oParent, oSiblingElement, mPropertyBag.menuItem.action.aggregation, fnGetIndex);
-		const sVariantManagementReference = this.getVariantManagementReference(oParentOverlay);
-		const sDefaultContainerTitle = this._getContainerTitle(mPropertyBag.menuItem.action, oParent, oDesignTimeMetadata);
+		const sDefaultContainerTitle = this._getContainerTitle(oAction, oParent, oDesignTimeMetadata);
 
 		const sNewText = await this._oDialog.openDialogAndHandleRename({
 			overlay: oOverlay,
-			action: mPropertyBag.menuItem.action,
+			action: oAction,
 			currentText: sDefaultContainerTitle,
 			acceptSameText: true,
 			dialogSettings: {
-				title: this.getCreateContainerText(mPropertyBag.menuItem.bAsSibling, oOverlay, mPropertyBag.menuItem.action)
+				title: this.getCreateContainerText(bAsSibling, oOverlay, oAction)
 			}
 		});
 
 		if (!sNewText) {
 			// If the user cancels the dialog, do not create a container
-			return;
+			return undefined;
 		}
 
 		try {
-			const oCreateCommand = await this.getCommandFactory().getCommandFor(oParent, "createContainer", {
-				newControlId: sNewControlID,
+			return await this.createCommands(oOverlay, {
+				isSibling: bAsSibling,
 				label: sNewText,
-				index: iIndex,
-				parentId: oParent.getId()
-			}, oDesignTimeMetadata, sVariantManagementReference);
-
-			this.fireElementModified({
-				command: oCreateCommand,
-				action: mPropertyBag.menuItem.action,
-				newControlId: sNewControlID
+				action: oAction
 			});
 		} catch (oError) {
 			throw DtUtil.propagateError(
@@ -127,7 +115,8 @@ sap.ui.define([
 				icon: "sap-icon://add-folder",
 				bAsSibling: sPluginId === "CTX_CREATE_SIBLING_CONTAINER",
 				text: this.getCreateContainerText(sPluginId === "CTX_CREATE_SIBLING_CONTAINER", aElementOverlays[0], oAction),
-				action: oAction
+				action: oAction,
+				description: "create a new container (e.g. group/section) as sibling or child of the element"
 			});
 		}));
 		return aMenuItems.flat();
@@ -138,6 +127,69 @@ sap.ui.define([
 	 */
 	CreateContainer.prototype.getActionName = function() {
 		return "createContainer";
+	};
+
+	/**
+	 * Returns the parameters that a programmatic consumer must provide to create the commands for this plugin.
+	 * @returns {object[]} List of parameter descriptors (name, type, required, description)
+	 * @since 1.153
+	 */
+	CreateContainer.prototype.getParameters = function() {
+		return [
+			{
+				name: "isSibling",
+				type: "boolean",
+				required: true,
+				description: "Whether the container should be added as a sibling of the given overlay or as a child of the given overlay"
+			},
+			{
+				name: "label",
+				type: "string",
+				required: true,
+				description: "The label / title of the new container"
+			}
+		];
+	};
+
+	/**
+	 * Creates the command for this plugin from the given parameters and fires the "elementModified" event.
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Target overlay
+	 * @param {object} mParameters - Parameters as described by {@link #getParameters}
+	 * @param {object} [mParameters.action] - Pre-resolved create action to use instead of deriving it from the overlay.
+	 *   Used by the context-menu handler to preserve the specific action of the clicked menu item.
+	 * @returns {Promise<sap.ui.rta.command.BaseCommand>} Resolves with the created command
+	 * @since 1.153
+	 */
+	CreateContainer.prototype.createCommands = async function(oOverlay, mParameters) {
+		const bAsSibling = !!mParameters.isSibling;
+		const oAction = mParameters.action || this.getCreateActions(oOverlay, bAsSibling)[0];
+		if (!oAction) {
+			throw new Error(`No createContainer action available for ${oOverlay.getElement().getId()}`);
+		}
+
+		const oParentOverlay = this._getParentOverlay(bAsSibling, oOverlay);
+		const oParent = oParentOverlay.getElement();
+		const oDesignTimeMetadata = oParentOverlay.getDesignTimeMetadata();
+		const oView = FlexUtils.getViewForControl(oParent);
+		const oSiblingElement = bAsSibling ? oOverlay.getElement() : null;
+		const sNewControlID = oView.createId(uid());
+		const fnGetIndex = oDesignTimeMetadata.getAggregation(oAction.aggregation).getIndex;
+		const iIndex = this._determineIndex(oParent, oSiblingElement, oAction.aggregation, fnGetIndex);
+		const sVariantManagementReference = this.getVariantManagementReference(oParentOverlay);
+
+		const oCreateCommand = await this.getCommandFactory().getCommandFor(oParent, "createContainer", {
+			newControlId: sNewControlID,
+			label: mParameters.label,
+			index: iIndex,
+			parentId: oParent.getId()
+		}, oDesignTimeMetadata, sVariantManagementReference);
+
+		this.fireElementModified({
+			command: oCreateCommand,
+			action: oAction,
+			newControlId: sNewControlID
+		});
+		return oCreateCommand;
 	};
 
 	CreateContainer.prototype.destroy = function(...args) {

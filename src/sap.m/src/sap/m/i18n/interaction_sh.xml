@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Ako je aktiviran odabir više redova:</span></p>
+				<p>Ako je fokus na redu, ćeliji ili na kontroli u okviru ćelije, odabir se prebacuje. Ako nisu bili odabrani svi redovi, sada su odabrani svi redovi. Ako su već bili odabrani svi redovi, uklanja se odabir svih redova.</p>
+				<p>Prečica nije efektivna ako je fokus na ćeliji zaglavlja kolone ili na polju unosa teksta jer pretraživač obrađuje odabir teksta u ovom slučaju.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Ako je odabir ćelije aktiviran:</span></p>
-				<p>Ako je fokus unutar tabele, odabir bilo kojih redova i kolona se uklanja.</p>
+				<p><span class="emphasis">Ako je aktiviran odabir više redova:</span></p>
+				<p>Ako je fokus na redu, ćeliji ili na kontroli u okviru ćelije, uklanja se odabir svih redova.</p>
+				<p>Prečica nije efektivna ako je fokus na ćeliji zaglavlja kolone ili na polju unosa teksta jer pretraživač obrađuje odabir teksta u ovom slučaju.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>

@@ -18,63 +18,63 @@ sap.ui.define([
 
 			/**
 			 * Opens/Closes the My Views popup.
-			 * @memberof onFlVariantManagement
+			 * @memberof onVariantManagement
 			 * @public
-			 * @param {string} sFlVMId The fl variant management control ID.
+			 * @param {string} sVMId The variant management control ID.
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
 			 */
-			iOpenMyView(sFlVMId) {
-				return Actions.iPressButtonWithID.call(this, `${sFlVMId}-vm-trigger`);
+			iOpenMyView(sVMId) {
+				return Actions.iPressButtonWithID.call(this, `${sVMId}-vm-trigger`);
 			},
 
 			/**
 			 * Opens the Save View dialog.
-			 * @memberof onFlVariantManagement
+			 * @memberof onVariantManagement
 			 * @public
-			 * @param {string} sFlVMId The fl variant management control ID
+			 * @param {string} sVMId The variant management control ID
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
 			 */
-			iOpenSaveView(sFlVMId) {
-				return Actions.iPressButtonWithID.call(this, `${sFlVMId}-vm-saveas`);
+			iOpenSaveView(sVMId) {
+				return Actions.iPressButtonWithID.call(this, `${sVMId}-vm-saveas`);
 			},
 
 			/**
 			 * Opens the Manage Views dialog.
-			 * @memberof onFlVariantManagement
+			 * @memberof onVariantManagement
 			 * @public
-			 * @param {string} sFlVMId The fl variant management control ID
+			 * @param {string} sVMId The variant management control ID
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
 			 */
-			iOpenManageViews(sFlVMId) {
-				return Actions.iPressButtonWithID.call(this, `${sFlVMId}-vm-manage`);
+			iOpenManageViews(sVMId) {
+				return Actions.iPressButtonWithID.call(this, `${sVMId}-vm-manage`);
 			},
 
 			/**
 			 * Presses the Save button inside the Manage Views dialog.
-			 * @memberof onFlVariantManagement
+			 * @memberof onVariantManagement
 			 * @public
-			 * @param {string} sFlVMId The fl variant management control ID
+			 * @param {string} sVMId The variant management control ID
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
 			 */
-			iPressTheManageViewsSave(sFlVMId) {
-				return Actions.iPressButtonWithID.call(this, `${sFlVMId}-vm-managementsave`);
+			iPressTheManageViewsSave(sVMId) {
+				return Actions.iPressButtonWithID.call(this, `${sVMId}-vm-managementsave`);
 			},
 
 			/**
 			 * Presses the Cancel button inside the Manage Views dialog.
-			 * @memberof onFlVariantManagement
+			 * @memberof onVariantManagement
 			 * @public
-			 * @param {string} sFlVMId The fl variant management control ID
+			 * @param {string} sVMId The variant management control ID
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
 			 */
-			iPressTheManageViewsCancel(sFlVMId) {
-				return Actions.iPressButtonWithID.call(this, `${sFlVMId}-vm-managementcancel`);
+			iPressTheManageViewsCancel(sVMId) {
+				return Actions.iPressButtonWithID.call(this, `${sVMId}-vm-managementcancel`);
 			},
 
 			/**
 			 * Handles the Favorite checkbox.
 			 * Prerequisite is an open Manage Views dialog.
-			 * @memberof onFlVariantManagement				 *
+			 * @memberof onVariantManagement				 *
 			 * @public
 			 * @param {string} sVariantName The name of a variant
 			 * @param {boolean} bValue The state of the Favorite checkbox
@@ -87,7 +87,7 @@ sap.ui.define([
 			/**
 			 * Renames a variant.
 			 * Prerequisite is an open Manage Views dialog.
-			 * @memberof onFlVariantManagement
+			 * @memberof onVariantManagement
 			 * @public
 			 * @param {string} sOriginalVariantName The previous name of a variant
 			 * @param {string} sNewVariantName The new name of a variant
@@ -100,7 +100,7 @@ sap.ui.define([
 			/**
 			 * Sets the default for a variant.
 			 * Prerequisite is an open Manage Views dialog.
-			 * @memberof onFlVariantManagement
+			 * @memberof onVariantManagement
 			 * @public
 			 * @param {string} sVariantName The name of the new default variant
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
@@ -112,7 +112,7 @@ sap.ui.define([
 			/**
 			 * Removes a variant.
 			 * Prerequisite is an open Manage Views dialog.
-			 * @memberof onFlVariantManagement
+			 * @memberof onVariantManagement
 			 * @public
 			 * @param {string} sVariantName The name of the new default variant
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
@@ -124,7 +124,7 @@ sap.ui.define([
 			/**
 			 * Handles the Apply Automatically checkbox for a variant
 			 * Prerequisite is an open Manage Views dialog.
-			 * @memberof onFlVariantManagement
+			 * @memberof onVariantManagement
 			 * @public
 			 * @param {string} sVariantName The name of the variant
 			 * @param {boolean} bApplyAuto The Apply Automatically checkbox for the variant
@@ -136,72 +136,72 @@ sap.ui.define([
 
 			/**
 			 * Creates a new variant.
-			 * @memberof onFlVariantManagement
+			 * @memberof onVariantManagement
 			 * @public
-			 * @param {string} sFlVMId The fl variant management control ID
+			 * @param {string} sVMId The variant management control ID
 			 * @param {string} sVariantTitle The name of the new variant
 			 * @param {boolean} bDefault Default checkbox for the variant
 			 * @param {boolean} bApplyAuto The Apply Automatically for the variant
 			 * @param {boolean} bPublic The Public information for the variant
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
 			 */
-			iCreateNewVariant(sFlVMId, sVariantTitle, bDefault, bApplyAuto, bPublic) {
-				return Actions.iCreateNewVariant.call(this, sFlVMId, sVariantTitle, bDefault, bApplyAuto, bPublic);
+			iCreateNewVariant(sVMId, sVariantTitle, bDefault, bApplyAuto, bPublic) {
+				return Actions.iCreateNewVariant.call(this, sVMId, sVariantTitle, bDefault, bApplyAuto, bPublic);
 			}
 		},
 		assertions: {
 
 			/**
 			 * Checks the expected variant title.
-			 * @memberof onFlVariantManagement
-			 * @param {string} sFlVMId The fl variant management control ID
+			 * @memberof onVariantManagement
+			 * @param {string} sVMId The variant management control ID
 			 * @param {string} sVariantTitle The name of the expected variant
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
 			 * @public
 			 */
-			theVariantShouldBeDisplayed(sFlVMId, sVariantTitle) {
-				return Assertions.theVariantShouldBeDisplayed.call(this, sFlVMId, sVariantTitle);
+			theVariantShouldBeDisplayed(sVMId, sVariantTitle) {
+				return Assertions.theVariantShouldBeDisplayed.call(this, sVMId, sVariantTitle);
 			},
 
 			/**
 			 * Checks the expected variant titles.
 			 * Prerequisite is an open My Views popup.
-			 * @memberof onFlVariantManagement
-			 * @param {string} sFlVMId The fl variant management control ID
+			 * @memberof onVariantManagement
+			 * @param {string} sVMId The variant management control ID
 			 * @param {array} aVariantNames List of the expected variants
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
 			 * @public
 			 */
-			theMyViewShouldContain(sFlVMId, aVariantNames) {
-				return Assertions.theMyViewShouldContain.call(this, sFlVMId, aVariantNames);
+			theMyViewShouldContain(sVMId, aVariantNames) {
+				return Assertions.theMyViewShouldContain.call(this, sVMId, aVariantNames);
 			},
 
 			/**
 			 * Checks is the expected Save View dialog is open.
-			 * @memberof onFlVariantManagement
-			 * @param {string} sFlVMId The fl variant management control ID
+			 * @memberof onVariantManagement
+			 * @param {string} sVMId The variant management control ID
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
 			 * @public
 			 */
-			theOpenSaveViewDialog(sFlVMId) {
-				return Assertions.theOpenDialog.call(this, `${sFlVMId}-vm-savedialog`);
+			theOpenSaveViewDialog(sVMId) {
+				return Assertions.theOpenDialog.call(this, `${sVMId}-vm-savedialog`);
 			},
 
 			/**
 			 * Checks is the expected Manage Views dialog is open.
-			 * @memberof onFlVariantManagement
-			 * @param {string} sFlVMId The fl variant management control ID
+			 * @memberof onVariantManagement
+			 * @param {string} sVMId The variant management control ID
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
 			 * @public
 			 */
-			theOpenManageViewsDialog(sFlVMId) {
-				return Assertions.theOpenDialog.call(this, `${sFlVMId}-vm-managementdialog`);
+			theOpenManageViewsDialog(sVMId) {
+				return Assertions.theOpenDialog.call(this, `${sVMId}-vm-managementdialog`);
 			},
 
 			/**
 			 * Checks the variants in the Manage Views dialog.
 			 * Prerequisite is an open Manage Views dialog.
-			 * @memberof onFlVariantManagement
+			 * @memberof onVariantManagement
 			 * @param {array} aVariantNames List of the expected variants
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
 			 * @public
@@ -213,7 +213,7 @@ sap.ui.define([
 			/**
 			 * Checks the variants with the Favorite checkbox set in the Manage Views dialog.
 			 * Prerequisite is an open Manage Views dialog.
-			 * @memberof onFlVariantManagement
+			 * @memberof onVariantManagement
 			 * @param {array} aVariantFavorites List of the expected variants
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
 			 * @public
@@ -225,7 +225,7 @@ sap.ui.define([
 			/**
 			 * Checks the variants with the Apply Automatically checkbox set in the Manage Views dialog.
 			 * Prerequisite is an open Manage Views dialog.
-			 * @memberof onFlVariantManagement
+			 * @memberof onVariantManagement
 			 * @param {array} aVariantApplayAutos List of the expected variants
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
 			 * @public
@@ -237,7 +237,7 @@ sap.ui.define([
 			/**
 			 * Checks the variants for its sharing information.
 			 * Prerequisite is an open Manage Views dialog.
-			 * @memberof onFlVariantManagement
+			 * @memberof onVariantManagement
 			 * @param {array} aVariantSharing List of the expected sharing information of the variants
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
 			 * @public
@@ -249,7 +249,7 @@ sap.ui.define([
 			/**
 			 * Checks for the expected default variant.
 			 * Prerequisite is an open Manage Views dialog.
-			 * @memberof onFlVariantManagement
+			 * @memberof onVariantManagement
 			 * @param {string} sVariantName The expected default variant
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
 			 * @public
@@ -260,7 +260,7 @@ sap.ui.define([
 
 			/**
 			 * Checks if the modified flag is set and visible on the variant.
-			 * @memberof onFlVariantManagement
+			 * @memberof onVariantManagement
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
 			 * @public
 			 */
@@ -270,7 +270,7 @@ sap.ui.define([
 
 			/**
 			 * Checks if the modified flag is not set.
-			 * @memberof onFlVariantManagement
+			 * @memberof onVariantManagement
 			 * @returns {Promise} The result of the {@link sap.ui.test.Opa5#waitFor} function, to be used for chained statements
 			 * @public
 			 */
@@ -281,18 +281,9 @@ sap.ui.define([
 	};
 
 	/**
-	 * @namespace onFlVariantManagement
-	 * @deprecated Since 1.152. Retained as an alias for cross-repo compatibility. Use {@link onVariantManagement} instead.
-	 */
-	/**
 	 * @namespace onVariantManagement
 	 */
 	Opa5.createPageObjects({
-		// todos#21: "onFlVariantManagement" is a deprecated alias kept so that existing consumers (e.g. in
-		// sapui5.dist) keep working while the new "onVariantManagement" name is adopted. Both names drive
-		// the same sap.m.VariantManagement (used by V4 control variants and by the V2/comp
-		// SmartVariantManagement's inner VM). Remove the alias in a coordinated cross-repo cleanup.
-		onFlVariantManagement: oVariantManagementPageObject,
 		onVariantManagement: oVariantManagementPageObject
 	});
 });

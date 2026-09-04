@@ -5,6 +5,7 @@ sap.ui.define([
 	"sap/m/Button",
 	"sap/ui/dt/DesignTime",
 	"sap/ui/dt/OverlayRegistry",
+	"sap/ui/dt/Util",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/layout/VerticalLayout",
@@ -19,6 +20,7 @@ sap.ui.define([
 	Button,
 	DesignTime,
 	OverlayRegistry,
+	DtUtil,
 	KeyCodes,
 	ChangesWriteAPI,
 	VerticalLayout,
@@ -486,6 +488,40 @@ sap.ui.define([
 				assert.equal(oFireElementModifiedStub.callCount, 0, "no event was fired");
 				assert.notOk(this.oButtonOverlay.getSelected(), "the overlay was not selected again");
 			}.bind(this));
+		});
+
+		QUnit.test("when getParameters is called", function(assert) {
+			assert.deepEqual(this.oRemovePlugin.getParameters(), [], "then no parameters are required for remove");
+		});
+
+		QUnit.test("when createCommands is called directly", async function(assert) {
+			this.oButtonOverlay.setDesignTimeMetadata({
+				actions: {
+					remove: {
+						changeType: "hideControl"
+					}
+				}
+			});
+			this.oRemovePlugin.deregisterElementOverlay(this.oButtonOverlay);
+			this.oRemovePlugin.registerElementOverlay(this.oButtonOverlay);
+			await DtUtil.waitForSynced(this.oDesignTime)();
+
+			const oFireElementModifiedSpy = sandbox.spy(this.oRemovePlugin, "_fireElementModified");
+
+			const oCompositeCommand = await this.oRemovePlugin.createCommands(this.oButtonOverlay);
+
+			assert.strictEqual(oCompositeCommand.getCommands().length, 1, "then the returned composite contains one command");
+			assert.strictEqual(
+				oCompositeCommand.getCommands()[0].getMetadata().getName(),
+				"sap.ui.rta.command.Remove",
+				"then the composite contains a Remove command"
+			);
+			assert.strictEqual(oFireElementModifiedSpy.callCount, 1, "then the elementModified event is fired once");
+			assert.strictEqual(
+				oFireElementModifiedSpy.getCall(0).args[0],
+				oCompositeCommand,
+				"then the fired composite matches the returned composite"
+			);
 		});
 	});
 

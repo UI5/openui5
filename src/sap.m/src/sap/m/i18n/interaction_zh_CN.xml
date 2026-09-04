@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">如果启用多行选择：</span></p>
+				<p>如果焦点位于行、单元格或单元格内的控件，则会切换选择。如果未全部选择所有行，即会选择所有行。如果已选择所有行，则会移除所有行的选择。</p>
+				<p>如果焦点位于列标题单元格或文本输入字段，则该快捷方式没有任何效果，因为在此情况下，浏览器会处理文本选择。</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">如果启用单元格选择：</span></p>
-				<p>如果焦点位于表的内部，则会移除任何行和单元格的选择。</p>
+				<p><span class="emphasis">如果启用多行选择：</span></p>
+				<p>如果焦点位于行、单元格或单元格内的控件，则会移除所有行的选择。</p>
+				<p>如果焦点位于列标题单元格或文本输入字段，则该快捷方式没有任何效果，因为在此情况下，浏览器会处理文本选择。</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>

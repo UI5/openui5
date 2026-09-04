@@ -1032,6 +1032,23 @@ sap.ui.define([
 			// Simulate double-click
 			oHandle.dispatchEvent(new MouseEvent("mousedown", { detail: 2 }));
 		});
+
+		RtaQunitUtils.testGetParameters(function() {
+			return this.oResizePlugin;
+		}, ["newWidth"]);
+
+		QUnit.test("when createCommands is called directly", function(assert) {
+			var oSentinel = {};
+			var oCreateCommandStub = sandbox.stub(this.oResizePlugin, "_createCommand").returns(oSentinel);
+
+			var vResult = this.oResizePlugin.createCommands(this.oColumn0Overlay, { newWidth: 123 });
+
+			assert.ok(
+				oCreateCommandStub.calledWith(this.oColumn0Overlay, 123),
+				"then _createCommand is called with the overlay and the new width"
+			);
+			assert.strictEqual(vResult, oSentinel, "then createCommands returns the created command");
+		});
 	});
 
 	QUnit.done(function() {

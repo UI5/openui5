@@ -102,6 +102,58 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns the parameters that a programmatic consumer must provide to create the commands for this plugin.
+	 * @returns {object[]} List of parameter descriptors (name, type, required, description)
+	 * @since 1.153
+	 */
+	AddXML.prototype.getParameters = function() {
+		return [
+			{
+				name: "fragmentPath",
+				type: "string",
+				required: true,
+				description: "The path to the fragment XML file, should be 'fragments/{someFragmentName}.fragment.xml'"
+			},
+			{
+				name: "targetAggregation",
+				type: "string",
+				required: true,
+				description: "The aggregation of the parent element to which the fragment should be added"
+			},
+			{
+				name: "index",
+				type: "int",
+				required: true,
+				description: "The position index at which the fragment should be added"
+			}
+		];
+	};
+
+	/**
+	 * Creates the command for this plugin from the given parameters and fires the "elementModified" event.
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Target overlay
+	 * @param {object} mParameters - Parameters as described by {@link #getParameters}
+	 * @returns {Promise} Resolves once the command has been created and the event has been fired
+	 * @since 1.153
+	 */
+	AddXML.prototype.createCommands = async function(oOverlay, mParameters) {
+		const mCommandParameters = {
+			...mParameters,
+			fragment: mParameters.fragment || "<core:FragmentDefinition xmlns:core='sap.ui.core'></core:FragmentDefinition>"
+		};
+		const oAddXmlCommand = await this.getCommandFactory().getCommandFor(
+			oOverlay.getElement(),
+			FLEX_CHANGE_TYPE,
+			mCommandParameters
+		);
+
+		this.fireElementModified({
+			command: oAddXmlCommand
+		});
+		return oAddXmlCommand;
+	};
+
+	/**
 	 * @override
 	 */
 	AddXML.prototype.handler = async function(aElementOverlays, mPropertyBag) {
@@ -116,15 +168,7 @@ sap.ui.define([
 
 			const mAddXmlData = await fnFragmentHandler(oOverlay, aExcludedAggregation);
 
-			const oAddXmlCommand = await this.getCommandFactory().getCommandFor(
-				oOverlay.getElement(),
-				FLEX_CHANGE_TYPE,
-				mAddXmlData
-			);
-
-			this.fireElementModified({
-				command: oAddXmlCommand
-			});
+			return await this.createCommands(oOverlay, mAddXmlData);
 		} catch (vError) {
 			throw DtUtil.propagateError(
 				vError,
@@ -142,7 +186,8 @@ sap.ui.define([
 		return this._getMenuItems(aElementOverlays, {
 			pluginId: "CTX_ADDXML",
 			icon: "sap-icon://attachment-html",
-			additionalInfoKey: "ADDXML_RTA_CONTEXT_MENU_INFO"
+			additionalInfoKey: "ADDXML_RTA_CONTEXT_MENU_INFO",
+			description: "add an XML fragment to a target aggregation of the element"
 		});
 	};
 

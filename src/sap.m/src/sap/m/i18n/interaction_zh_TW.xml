@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">若已啟用多列選擇：</span></p>
+				<p>若焦點位於列、儲存格或儲存格內的控制中，則會切換選擇。若未選擇所有列，則現在會選擇所有列。若已選擇所有列，則會移除所有列的選擇。</p>
+				<p>若焦點位於欄表頭儲存格或內文輸入欄位上，則捷徑不會產生作用，因為在此情況下瀏覽器會處理內文選擇。</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">若已啟用儲存格選擇：</span></p>
-				<p>若焦點在表格內，則會移除任何列和儲存格選擇。</p>
+				<p><span class="emphasis">若已啟用多列選擇：</span></p>
+				<p>若焦點位於列、儲存格或儲存格內的控制中，則會移除所有列的選擇。</p>
+				<p>若焦點位於欄表頭儲存格或內文輸入欄位上，則捷徑不會產生作用，因為在此情況下瀏覽器會處理內文選擇。</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>

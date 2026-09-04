@@ -2147,7 +2147,7 @@ sap.ui.define([
 		}
 
 		var aChildren = this.mAggregations[sAggregationName];
-		if (!aChildren) {
+		if (aChildren == null) {
 			aChildren = this.mAggregations[sAggregationName] = oDefaultForCreation || null;
 		}
 		if (aChildren) {
@@ -2527,6 +2527,9 @@ sap.ui.define([
 					}
 				}
 			}
+		} else if (this._observer) {
+			// alternative type (e.g. string tooltip)
+			this._observer.aggregationChange(this, sAggregationName, "remove", aChildren);
 		}
 
 		if (!this.isInvalidateSuppressed()) {

@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Jika pemilihan beberapa baris diaktifkan:</span></p>
+				<p>Jika fokus berada pada baris, sel, atau kontrol di dalam sel, status pemilihan akan dialihkan. Jika masih ada baris yang belum dipilih, semua baris akan dipilih. Jika semua baris sudah dipilih, pemilihan semua baris akan dihapus.</p>
+				<p>Pintasan tidak akan berpengaruh jika fokus berada pada sel header kolom atau bidang input teks karena pada kondisi tersebut, pemilihan teks dilakukan oleh browser.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Jika pemilihan sel diaktifkan:</span></p>
-				<p>Jika fokus berada di dalam tabel, pemilihan pada baris dan sel mana pun akan dihapus.</p>
+				<p><span class="emphasis">Jika pemilihan beberapa baris diaktifkan:</span></p>
+				<p>Jika fokus berada pada baris, sel, atau kontrol di dalam sel, pemilihan semua baris akan dihapus.</p>
+				<p>Pintasan tidak akan berpengaruh jika fokus berada pada sel header kolom atau bidang input teks karena pada kondisi tersebut, pemilihan teks dilakukan oleh browser.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
@@ -152,7 +159,7 @@
 				<p><kbd>ArrowUp</kbd></p>
 				<p>Memindahkan item satu posisi ke atas jika memungkinkan.</p>
 				<p><kbd>ArrowDown</kbd></p>
-				<p>Memindahkan item satu posisi ke bawah jika memungkinkan.</p>
+				<p>Memindahkan item satu posisi ke bawah, jika memungkinkan.</p>
 				<p><kbd>Home</kbd></p>
 				<p>Memindahkan item ke posisi teratas jika memungkinkan.</p>
 				<p><kbd>End</kbd></p>

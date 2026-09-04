@@ -13,7 +13,8 @@ sap.ui.define([
 	"sap/ui/rta/command/ExtendControllerCommand",
 	"sap/ui/rta/plugin/ExtendControllerPlugin",
 	"sap/ui/rta/plugin/Plugin",
-	"sap/ui/thirdparty/sinon-4"
+	"sap/ui/thirdparty/sinon-4",
+	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	XMLView,
 	Component,
@@ -28,7 +29,8 @@ sap.ui.define([
 	ExtendControllerCommand,
 	ExtendControllerPlugin,
 	Plugin,
-	sinon
+	sinon,
+	RtaQunitUtils
 ) {
 	"use strict";
 
@@ -288,6 +290,38 @@ sap.ui.define([
 			});
 
 			this.oExtendControllerPlugin.handler([this.oPanelOverlay], mPropertyBag);
+		});
+
+		RtaQunitUtils.testGetParameters(function() {
+			return this.oExtendControllerPlugin;
+		}, ["codeRef", "viewId"]);
+
+		QUnit.test("when createCommands is called directly", async function(assert) {
+			const oFireStub = sandbox.stub();
+			this.oExtendControllerPlugin.attachElementModified(oFireStub);
+
+			const oCommand = await this.oExtendControllerPlugin.createCommands(this.oPanelOverlay, {
+				viewId: "myView",
+				codeRef: "TestCodeRef",
+				instanceSpecific: true
+			});
+
+			assert.ok(oCommand instanceof ExtendControllerCommand, "then createCommands returns the ExtendController command");
+			assert.strictEqual(oCommand.getSelector().id, "myView--panel", "then the selector is set correctly");
+			assert.strictEqual(oFireStub.callCount, 1, "then the elementModified event is fired once");
+			assert.strictEqual(oFireStub.getCall(0).args[0].getParameter("command"), oCommand, "then the fired command matches the returned command");
+		});
+
+		QUnit.test("when createCommands is called with a viewId that does not resolve", async function(assert) {
+			try {
+				await this.oExtendControllerPlugin.createCommands(this.oPanelOverlay, {
+					viewId: "doesNotExist",
+					codeRef: "TestCodeRef"
+				});
+				assert.ok(false, "then the promise should not resolve");
+			} catch (oError) {
+				assert.ok(oError instanceof Error, "then createCommands rejects with an error");
+			}
 		});
 	});
 

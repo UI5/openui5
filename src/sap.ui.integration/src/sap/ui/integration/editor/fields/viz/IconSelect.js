@@ -415,8 +415,10 @@ sap.ui.define([
 					var bAllowNone = this.getAllowNone();
 					var bFileSelected = this._oIconModel.getProperty("/2/enabled");
 					var iSelected = this._oControl.getSelectedIndex();
-					if (iSelected > 11 + 2) {
-						this._oControl.setSelectedIndex(iSelected - 11);//select will do -1
+
+					const iconsPerRow = this._getIconsPerRow();
+					if (iSelected > iconsPerRow + 1) {
+						this._oControl.setSelectedIndex(iSelected - iconsPerRow + 1);//select will do -1
 					} else if (iSelected >= 3) {
 						if (bAllowNone && !bAllowFile) {
 							this._oControl.setSelectedIndex(0);
@@ -432,7 +434,7 @@ sap.ui.define([
 				if (this._oControl.isOpen()) {
 					var iSelected = this._oControl.getSelectedIndex();
 					if (iSelected > 1) {
-						this._oControl.setSelectedIndex(iSelected + 11); //select will do +1
+						this._oControl.setSelectedIndex(iSelected + this._getIconsPerRow() - 1); //select will do +1
 					}
 				}
 			}.bind(this),
@@ -456,6 +458,16 @@ sap.ui.define([
 		if (this._oControl && this._oControl.getWidth) {
 			oRm.style("width", this._oControl.getWidth());
 		}
+	};
+
+	IconSelect.prototype._getIconsPerRow = function () {
+		const oPicker = this._oControl.getPicker();
+		const oPickerDomRef = oPicker && oPicker.getDomRef();
+		const oFirstIconItem = oPickerDomRef && oPickerDomRef.querySelector('li[aria-posinset="3"]');
+		if (!oPickerDomRef || !oFirstIconItem || !oFirstIconItem.offsetWidth) {
+			return 12;
+		}
+		return Math.floor(oPickerDomRef.offsetWidth / oFirstIconItem.offsetWidth);
 	};
 
 	IconSelect.prototype.onIconTypeChanged = function (oEvent) {
