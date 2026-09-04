@@ -119,8 +119,17 @@
 	min-height: @_sap_tnt_NavigationList_ItemHeight + @_sap_tnt_NavigationList_ItemBottomMargin;
 }
 
-.sapTntNLI {
+.sapTntNLI.sapTntNLIInPopover {
+	min-height: @_sap_tnt_NavigationList_ItemHeight;
+	display: flex;
+	align-items: center;
+}
+
+.sapTntNLI:not(.sapTntNLIInPopover) {
 	height: @_sap_tnt_NavigationList_ItemHeight;
+}
+
+.sapTntNLI {
 	box-sizing: border-box;
 	cursor: pointer;
 	background-color: var(--sapList_Background);
@@ -160,6 +169,8 @@
 	.sapMText {
 		color: var(--sapList_TextColor);
 		font-family: @_sap_tnt_NavigationList_ItemTextFontFamily;
+		display: flex;
+		align-items: center;
 	}
 
 	.sapTntNLIIcon {
@@ -169,6 +180,9 @@
 
 	.sapTntNLIExpandIcon,
 	.sapTntNLIExternalLinkIcon {
+		display: flex;
+		justify-content: center;
+		align-items: center;
 		color: @_sap_tnt_NavigationList_ExpandIconColor;
 	}
 
@@ -189,10 +203,11 @@
 .sapTntNL:not(.sapTntNLCollapsed) .sapTntNLI:not(.sapTntNLIAction):not(.sapTntNLIInPopover) {
 	height: auto;
 	min-height: @_sap_tnt_NavigationList_ItemHeight;
+}
 
+.sapTntNL:not(.sapTntNLCollapsed) .sapTntNLI:not(.sapTntNLIAction) {
 	a {
-		padding-top: @_sap_tnt_NavigationList_ItemTextMargin;
-		padding-bottom: @_sap_tnt_NavigationList_ItemTextMargin;
+		padding-block: @_sap_tnt_NavigationList_ItemTextMargin;
 	}
 }
 
@@ -232,7 +247,7 @@
 	}
 }
 
-.sapTntNLISecondLevel .sapMText {
+.sapTntNLISecondLevel .sapTntNLITextAndTagContainer {
 	padding-inline-start: ~"calc(@{_sap_tnt_NavigationList_GroupIconWidth} + @{_sap_tnt_NavigationList_GroupIconMarginRight})";
 }
 
@@ -271,21 +286,33 @@
 	border: @_sap_tnt_NavigationList_LastItemBorderStyleColor;
 }
 
-.sapTntNLIText {
+.sapTntNLITextAndTagContainer {
 	flex: 1;
+	align-items: center;
 	min-width: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+
+	&:not(:has(+ .sapUiIcon)) {
+		padding-inline-end: 0.5rem;
+	}
 }
 
 .sapTntNLITagContainer {
 	display: inline-flex;
 	align-items: center;
-	margin-inline-start: 0.5rem;
-	height: 1.375rem;
+	margin-inline-start: 0;
 	min-width: 1.375rem;
+}
 
-	.sapMObjStatus {
-		margin-inline-end: 0.375rem;
-		padding-inline-start: 0.5rem;
+.sapTntNLCollapsed {
+	.sapTntNLITextAndTagContainer {
+		flex-wrap: nowrap;
+
+		.sapMObjStatus {
+			white-space: nowrap;
+		}
 	}
 }
 
@@ -312,10 +339,6 @@
 			margin-bottom: @_sap_tnt_NavigationList_ItemBottomMargin;
 		}
 	}
-}
-
-.sapTntNLPopup .sapTntNLISecondLevel .sapMText {
-	padding: @_sap_tnt_NavigationList_PopupItemPadding;
 }
 
 .sapTntNLPopup .sapTntNLIFirstLevel .sapMText {
@@ -387,11 +410,8 @@
 }
 
 .sapTntNLCollapsed {
-
-	.sapTntNLIText {
-		display: none;
-	}
-
+	.sapTntNLITextAndTagContainer,
+	.sapTntNLIText,
 	.sapTntNLIExternalLinkIcon,
 	.sapTntNLIExpandIcon {
 		display: none;
@@ -405,21 +425,24 @@
 			padding: @_sap_tnt_NavigationList_Collapsed_HoverOrFocusItemPadding;
 			z-index: @_sap_tnt_NavigationList_Collapsed_HoverOrFocusItemZIndex;
 
-			.sapTntNLIText {
-				display: @_sap_tnt_NavigationList_Collapsed_HoverOrFocusTextDisplay;
-			}
-
+			.sapTntNLITextAndTagContainer:has(.sapTntNLITagContainer):not(:has(+ .sapUiIcon)),
 			.sapTntNLIText:last-child {
-				padding-right: 1rem;
+				padding-inline-end: 1rem;
 			}
 
+			.sapTntNLITextAndTagContainer,
+			.sapTntNLIText,
 			.sapTntNLIExternalLinkIcon,
-			.sapTntNLIExpandIcon {
-				display: @_sap_tnt_NavigationList_Collapsed_HoverOrFocusTextDisplay;
-			}
-
+			.sapTntNLIExpandIcon,
 			.sapTntNLITagContainer {
 				display: @_sap_tnt_NavigationList_Collapsed_HoverOrFocusTextDisplay;
+			}
+
+			.sapMObjStatusText {
+				max-width: 6rem;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				box-sizing: border-box;
 			}
 
 			.sapUiIcon:first-of-type::after {
@@ -527,10 +550,6 @@
 	.sapTntNLISelectionIndicator {
 		margin: 0 0.5rem;
 	}
-}
-
-.sapTntNLI:not(.sapTntNLIWithExpander):not(.sapTntNLGroup):not(.sapTntNLIExternalLink) .sapMText {
-	padding-inline-end: 0.375rem;
 }
 
 .sapTntNLIWithExpander.sapTntNLITwoClickAreas .sapUiIcon:last-of-type {
@@ -661,8 +680,8 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 		font-family: @_sap_tnt_NavigationList_ParentItemTextFontFamily;
 
 		.sapMMenuItemIcon {
-
 			.sapUiIcon {
+				line-height: unset;
 				color: @_sap_tnt_NavigationList_IconColor;
 				display: block;
 			}
@@ -679,6 +698,7 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 			padding-inline-end: 0;
 			min-width: @_sap_tnt_NavigationList_ExpandIconWidth;
 			min-height: inherit;
+			margin-inline-start: auto;
 
 			&:empty {
 				min-width: 0.75rem;
@@ -711,7 +731,8 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 		li.sapMMenuItem {
 			display: flex;
 			align-items: center;
-			height: @_sap_tnt_NavigationList_ItemHeight;
+			height: unset;
+			padding-block: @_sap_tnt_NavigationList_ItemTextMargin;
 			padding-inline: 1rem 0.375rem;
 			border-radius: @_sap_tnt_NavigationList_ItemBorderRadius;
 			transition: @_sap_tnt_NavigationList_ItemTransition;
@@ -722,8 +743,23 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 				align-items: center;
 				margin: 0 !important;
 				padding: 0 !important;
-				flex: 1;
+				flex: unset;
 				min-width: 0;
+				white-space: normal;
+				overflow-wrap: anywhere;
+			}
+
+			.sapTntNLMenuItemTextAndTagContainer {
+				flex: 1;
+				align-items: center;
+				min-width: 0;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+
+				&:not(:has(+ .sapUiIcon)) {
+					padding-inline-end: 0.5rem;
+				}
 			}
 
 			&:focus {
@@ -782,13 +818,12 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 .sapTntNLMenuItemTagContainer {
 	display: inline-flex;
 	align-items: center;
-	margin-inline-start: 0.5rem;
-	height: 1.375rem;
+	margin-inline-start: 0;
 	min-width: 1.375rem;
 
 	.sapMObjStatus {
-		margin-inline-end: 0.375rem;
-		padding-inline-start: 0.5rem;
+		white-space: normal;
+		overflow-wrap: anywhere;
 	}
 }
 
@@ -816,8 +851,8 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 	}
 }
 
-.sapTntNLPopup .sapTntNLISecondLevel .sapMText {
-	padding-left: 0;
+.sapTntNLPopup .sapTntNLISecondLevel .sapTntNLITextAndTagContainer {
+	padding-inline-start: 0;
 }
 
 .sapTntNavMenuItemExternalLink a {
@@ -845,27 +880,23 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 		min-height: @_sap_tnt_NavigationList_ItemHeightCompact + @_sap_tnt_NavigationList_ItemBottomMargin;
 	}
 
-	.sapTntNLMenu.sapMMenu li.sapMMenuItem,
-	.sapTntNLI {
+	.sapTntNLI:not(.sapTntNLIInPopover) {
 		height: @_sap_tnt_NavigationList_ItemHeightCompact;
+	}
+
+	.sapTntNLI.sapTntNLIInPopover {
+		min-height: @_sap_tnt_NavigationList_ItemHeightCompact;
 	}
 
 	.sapTntNL:not(.sapTntNLCollapsed) .sapTntNLI:not(.sapTntNLIAction):not(.sapTntNLIInPopover) {
 		height: auto;
 		min-height: @_sap_tnt_NavigationList_ItemHeightCompact;
+	}
 
+	.sapTntNL:not(.sapTntNLCollapsed) .sapTntNLI:not(.sapTntNLIAction) {
 		a {
-			padding-top: @_sap_tnt_NavigationList_ItemTextMarginCompact;
-			padding-bottom: @_sap_tnt_NavigationList_ItemTextMarginCompact;
+			padding-block: @_sap_tnt_NavigationList_ItemTextMarginCompact;
 		}
-	}
-
-	.sapTntNLMenu.sapMMenu .sapUiIcon {
-		line-height: @_sap_tnt_NavigationList_ItemHeightCompact;
-	}
-
-	.sapTntNLPopup .sapTntNLISecondLevel .sapMText {
-		padding: 0 0.5rem;
 	}
 
 	.sapTntNL.sapTntNLPopup span.sapTntNLIIcon {
@@ -883,6 +914,10 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 
 	.sapTntNLGroupText {
 		margin: @_sap_tnt_NavigationList_ItemTextMarginCompact 0;
+	}
+
+	.sapTntNLMenu.sapMMenu .sapMMenuList li.sapMMenuItem {
+		padding-block: @_sap_tnt_NavigationList_ItemTextMarginCompact;
 	}
 
 	.sapTntNLCollapsed {

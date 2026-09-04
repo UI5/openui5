@@ -626,9 +626,15 @@ sap.ui.define([
 
 		this._renderIcon(oRM);
 
+		oRM.openStart("div")
+			.class("sapTntNLITextAndTagContainer")
+			.openEnd();
+
 		this._renderText(oRM);
 
 		this._renderTag(oRM);
+
+		oRM.close("div");
 
 		if (bExternalLink) {
 			this._renderExternalLinkIcon(oRM);
@@ -661,8 +667,8 @@ sap.ui.define([
 	 * @private
 	 */
 	NavigationListItem.prototype.renderSecondLevelNavItem = function (oRM, oNavigationList) {
-		const bDisabled = !this.getEnabled() || !this.getAllParentsEnabled(),
-		bExternalLink = this.getHref() && this.getTarget() === "_blank";
+		const bDisabled = !this.getEnabled() || !this.getAllParentsEnabled();
+		const bExternalLink = this.getHref() && this.getTarget() === "_blank";
 
 		oRM.openStart("li", this)
 			.class("sapTntNLI")
@@ -702,9 +708,15 @@ sap.ui.define([
 
 		this._renderStartLink(oRM, oLinkAriaProps, bDisabled);
 
+		oRM.openStart("div")
+			.class("sapTntNLITextAndTagContainer")
+			.openEnd();
+
 		this._renderText(oRM);
 
 		this._renderTag(oRM);
+
+		oRM.close("div");
 
 		if (bExternalLink) {
 			this._renderExternalLinkIcon(oRM);

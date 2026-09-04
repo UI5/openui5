@@ -23,20 +23,20 @@
 							})
 						}),
 						new sap.tnt.NavigationListItem({
-							text: 'Favorites',
+							text: 'Favorites Long Text Favorites Long Text',
 							icon: 'sap-icon://unfavorite',
 							expanded: true,
 							selectable: false,
 							tag: new sap.m.ObjectStatus({
-								text: "Beta",
+								text: "Beta Long Text Beta Long Text Beta Long Text",
 								state: "Indication15",
 								inverted: true
 							}),
 							items: [
 								new sap.tnt.NavigationListItem({
-									text: 'My Accounts',
+									text: 'My Accounts Long Text My Accounts Long Text',
 									tag: new sap.m.ObjectStatus({
-										text: "Active",
+										text: "Active Long Text Active Long Text Active Long Text Active Long Text",
 										state: "Indication18",
 										inverted: true
 									})
@@ -48,6 +48,9 @@
 										state: "Indication17",
 										inverted: true
 									})
+								}),
+								new sap.tnt.NavigationListItem({
+									text: 'No tag'
 								})
 							]
 						}),
@@ -98,7 +101,7 @@
 									})
 								}),
 								new sap.tnt.NavigationListItem({
-									text: 'Feature B',
+									text: 'Feature B Long Title Title',
 									tag: new sap.m.ObjectStatus({
 										text: "Deprecated",
 										state: "Indication18",
@@ -111,7 +114,7 @@
 							]
 						}),
 						new sap.tnt.NavigationListItem({
-							text: 'Documentation',
+							text: 'Documentation Long Text',
 							icon: 'sap-icon://sys-help',
 							tag: new sap.m.ObjectStatus({
 								text: "Updated",
@@ -162,6 +165,9 @@
 						new sap.tnt.NavigationListItem({
 							text: 'Administration',
 							icon: 'sap-icon://settings',
+							href: 'https://sap.com',
+							target: '_blank',
+							selectable: false,
 							tag: new sap.m.ObjectStatus({
 								text: "Long tag Long tag",
 								state: "Indication17",
@@ -173,10 +179,13 @@
 				fixedItem: new sap.tnt.NavigationList({
 					items: [
 						new sap.tnt.NavigationListItem({
-							text: 'Support',
+							text: 'Support Long Text Support Long Text',
 							icon: 'sap-icon://phone',
+							href: 'https://sap.com',
+							target: '_blank',
+							selectable: false,
 							tag: new sap.m.ObjectStatus({
-								text: "24/7",
+								text: "24/7 Long Text 24/7 Long Text 24/7 Long Text",
 								state: "Indication16",
 								inverted: true
 							})
@@ -210,7 +219,6 @@
 			html, body {
 				height: 95%;
 				margin: 0;
-				padding: 0;
 			}
 			#header-1 {
 				padding: 20px;
