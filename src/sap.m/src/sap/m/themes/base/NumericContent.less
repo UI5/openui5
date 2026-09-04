@@ -55,7 +55,7 @@ td .sapMNCValue.WithoutMargin {
 	padding-right: 0.375rem;
 	font-family: var(--sapFontHeaderFamily);
 	font-size: 1.75rem;
-	font-weight: @sapUiFontHeaderWeight;
+	font-weight: normal;
 	color: var(--sapTile_IconColor);
 
 	&.sapMNCLargeFontSize::before {
@@ -81,7 +81,7 @@ td .sapMNCValue.WithoutMargin {
 	text-overflow: ellipsis;
 	font-size: 2.25rem;
 	font-family: var(--sapFontLightFamily);
-	font-weight: @sapUiFontHeaderWeight;
+	font-weight: normal;
 
 	&.WithoutMargin {
 		justify-content: flex-start;
@@ -114,7 +114,7 @@ td .sapMNCValue.WithoutMargin {
 	}
 }
 
-html[dir=rtl] .sapMNCValue {
+html[dir='rtl'] .sapMNCValue {
 	text-align: left;
 }
 
@@ -163,7 +163,7 @@ html[dir=rtl] .sapMNCValue {
 .sapMNCScale {
 	font-size: var(--sapFontSize);
 	font-family: var(--sapFontHeaderFamily);
-	font-weight: @sapUiFontHeaderWeight;
+	font-weight: normal;
 	grid-column: 1;
 	grid-row: 1;
 }
