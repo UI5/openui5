@@ -70,8 +70,30 @@ sap.ui.define([
 			action: mPropertyBag.menuItem.action
 		});
 		if (sNewText) {
-			this.createRenameCommand(oOverlay, sNewText);
+			this.createCommands(oOverlay, { newValue: sNewText });
 		}
+	};
+
+	/**
+	 * Returns the parameters that a programmatic consumer must provide to create the commands for this plugin.
+	 * @returns {object[]} List of parameter descriptors (name, type, required, description)
+	 * @since 1.153
+	 */
+	Rename.prototype.getParameters = function() {
+		return [
+			{ name: "newValue", type: "string", required: true, description: "The new label / text for the element" }
+		];
+	};
+
+	/**
+	 * Creates the rename command for the given new value.
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Target overlay
+	 * @param {object} mParameters - Parameters as described by {@link #getParameters}
+	 * @returns {Promise} Resolves once the command has been created and the event has been fired
+	 * @since 1.153
+	 */
+	Rename.prototype.createCommands = function(oOverlay, mParameters) {
+		return this.createRenameCommand(oOverlay, mParameters.newValue);
 	};
 
 	/**
@@ -107,7 +129,11 @@ sap.ui.define([
 	 * @override
 	 */
 	Rename.prototype.getMenuItems = function(vElementOverlays) {
-		return this._getMenuItems(vElementOverlays, { pluginId: "CTX_RENAME", icon: "sap-icon://edit" });
+		return this._getMenuItems(vElementOverlays, {
+			pluginId: "CTX_RENAME",
+			icon: "sap-icon://edit",
+			description: "rename an element"
+		});
 	};
 
 	/**

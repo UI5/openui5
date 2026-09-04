@@ -263,14 +263,13 @@ sap.ui.define([
 				await this.getDialog().open();
 
 				const aSelectedElements = this.getDialog().getSelectedElements();
-				await CommandBuilder.createCommands(mParents,
-					vSiblingElement,
-					mActions,
-					undefined,
-					aSelectedElements,
-					sAggregationName,
-					this
-				);
+				await this.createCommands(oResponsibleElementOverlay, {
+					isSibling: bOverlayIsSibling,
+					aggregation: sAggregationName,
+					selectedElements: aSelectedElements,
+					actions: mActions,
+					index: undefined
+				});
 
 				const oOverlayToFocus = OverlayRegistry.getOverlay(vSiblingElement) || oResponsibleElementOverlay;
 				oOverlayToFocus.focus();
@@ -487,6 +486,122 @@ sap.ui.define([
 			return this._getMenuItemsPromise;
 		},
 
+		/**
+		 * Returns the parameters that a programmatic consumer must provide to create the commands for this plugin.
+		 * @returns {object[]} List of parameter descriptors (name, type, required, description)
+		 * @since 1.153
+		 */
+		getParameters() {
+			return [
+				{
+					name: "isSibling",
+					type: "boolean",
+					required: true,
+					description: "Whether the elements should be added as siblings of the given overlay or as children of the given overlay"
+				},
+				{
+					name: "aggregation",
+					type: "string",
+					required: true,
+					description: "Name of the aggregation on the parent (when isSibling=true) or on the element itself (when isSibling=false) into which the elements are added"
+				},
+				{
+					name: "selectedElements",
+					type: "array",
+					required: true,
+					description: "Elements to add. Each entry must have shape { type: 'invisible' | 'delegate', elementId?: string, label?: string, ... } as returned in `getContext().availableElements`"
+				},
+				{
+					name: "index",
+					type: "int",
+					required: false,
+					description: "Position index inside the target aggregation. Defaults to the natural position derived from the sibling element."
+				}
+			];
+		},
+
+		/**
+		 * Collects additional context that a programmatic consumer needs to build the parameters for this plugin.
+		 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay for which the context is collected
+		 * @returns {Promise<object>} Resolves with the context object
+		 * @since 1.153
+		 */
+		async getContext(oOverlay) {
+			const [aChildElements, aSiblingElements] = await Promise.all([
+				this.getAllElements(false, [oOverlay]),
+				this.getAllElements(true, [oOverlay])
+			]);
+			const fnSimplify = (aElementsWithAggregations) => aElementsWithAggregations.map((mPerAggregation) => ({
+				aggregation: mPerAggregation.aggregation,
+				elements: (mPerAggregation.elements || []).map((oElement) => ({
+					label: oElement.label,
+					tooltip: oElement.tooltip,
+					originalLabel: oElement.originalLabel,
+					type: oElement.type,
+					elementId: oElement.elementId,
+					bindingPath: oElement.bindingPath,
+					duplicateName: oElement.duplicateName,
+					sourceAggregation: oElement.sourceAggregation
+				}))
+			}));
+			return {
+				availableElements: {
+					description: "Elements that can be added, grouped by aggregation. `asChild` lists what can go into the element, `asSibling` what can go next to it.",
+					value: {
+						asChild: fnSimplify(aChildElements),
+						asSibling: fnSimplify(aSiblingElements)
+					}
+				}
+			};
+		},
+
+		/**
+		 * Creates the command (a composite command with one command per selected element) and fires the "elementModified" event.
+		 * @param {sap.ui.dt.ElementOverlay} oOverlay - Target overlay
+		 * @param {object} mParameters - Parameters as described by {@link #getParameters}
+		 * @param {object} [mParameters.actions] - Pre-resolved actions for the aggregation, used instead of
+		 *   re-extracting them. The context-menu handler passes the actions of the clicked menu item.
+		 * @returns {Promise} Resolves once the command has been created and the "elementModified" event has been fired
+		 * @since 1.153
+		 */
+		async createCommands(oOverlay, mParameters) {
+			const bOverlayIsSibling = !!mParameters.isSibling;
+			const sAggregationName = mParameters.aggregation;
+			const aSelectedElements = mParameters.selectedElements || [];
+			if (!aSelectedElements.length) {
+				throw new Error(`No elements selected to add to aggregation '${sAggregationName}' on ${oOverlay.getElement().getId()}`);
+			}
+
+			const mParents = AdditionalElementsUtils.getParents(bOverlayIsSibling, oOverlay, this);
+			const vSiblingElement = bOverlayIsSibling ? oOverlay.getElement() : undefined;
+
+			let mActions = mParameters.actions;
+			if (!mActions) {
+				const mAllActions = await ActionExtractor.getActions(
+					bOverlayIsSibling,
+					oOverlay,
+					this,
+					undefined,
+					this.getDesignTime()
+				);
+				mActions = mAllActions[sAggregationName];
+			}
+			if (!mActions) {
+				throw new Error(`No add action available for aggregation '${sAggregationName}' on ${oOverlay.getElement().getId()}`);
+			}
+			mActions.aggregation = sAggregationName;
+
+			await CommandBuilder.createCommands(
+				mParents,
+				vSiblingElement,
+				mActions,
+				mParameters.index,
+				aSelectedElements,
+				sAggregationName,
+				this
+			);
+		},
+
 		async _buildMenuItem(sPluginId, bOverlayIsSibling, aElementOverlays, aElementsWithAggregations, bHasSubMenu) {
 			let aSubMenuItems;
 			let sAggregationName;
@@ -525,7 +640,8 @@ sap.ui.define([
 				icon: "sap-icon://add",
 				bAsSibling: bOverlayIsSibling,
 				action: oAction,
-				text: bHasSubMenu ? oTextResources.getText("CTX_ADD_ELEMENTS_WITH_SUBMENU") : null
+				text: bHasSubMenu ? oTextResources.getText("CTX_ADD_ELEMENTS_WITH_SUBMENU") : null,
+				description: `add additional elements (e.g. previously hidden fields or new fields via delegate) into the ${sAggregationName} aggregation`
 			});
 			return oMenuItem[0];
 		},
@@ -560,7 +676,8 @@ sap.ui.define([
 					text: sDisplayText,
 					icon: bOverlayIsSibling ? "sap-icon://BusinessSuiteInAppSymbols/icon-add-outside" : "sap-icon://add",
 					bAsSibling: bOverlayIsSibling,
-					action: oActions[sAggregationName]
+					action: oActions[sAggregationName],
+					description: `add additional elements (e.g. previously hidden fields or new fields via delegate) into the '${sAggregationName}' aggregation`
 				}))[0];
 				oItem.displayText = sDisplayText;
 				aSubMenuItems.push(this.enhanceItemWithResponsibleElement(oItem, aElementOverlays, ["addViaDelegate", "reveal", "custom"]));

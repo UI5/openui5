@@ -4,12 +4,14 @@
 
 sap.ui.define([
 	"sap/base/util/uid",
+	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/dt/Util",
 	"sap/ui/fl/Utils",
 	"sap/ui/rta/plugin/Plugin",
 	"sap/ui/rta/Utils"
 ], function(
 	uid,
+	OverlayRegistry,
 	DtUtil,
 	FlUtils,
 	Plugin,
@@ -168,6 +170,7 @@ sap.ui.define([
 			this.fireElementModified({
 				command: oCombineCommand
 			});
+			return oCombineCommand;
 		} catch (oError) {
 			throw DtUtil.propagateError(
 				oError,
@@ -186,7 +189,8 @@ sap.ui.define([
 			aElementOverlays,
 			{
 				pluginId: "CTX_GROUP_FIELDS",
-				icon: "sap-icon://combine"
+				icon: "sap-icon://combine",
+				description: "combine the source element with one or more sibling elements into a single element"
 			}
 		);
 	};
@@ -202,7 +206,42 @@ sap.ui.define([
 	 * @override
 	 */
 	Combine.prototype.handler = function(aElementOverlays, mPropertyBag) {
-		this.handleCombine(aElementOverlays, mPropertyBag.contextElement);
+		return this.handleCombine(aElementOverlays, mPropertyBag.contextElement);
+	};
+
+	/**
+	 * Returns the parameters that a programmatic consumer must provide to create the commands for this plugin.
+	 * @returns {object[]} List of parameter descriptors (name, type, required, description)
+	 * @since 1.153
+	 */
+	Combine.prototype.getParameters = function() {
+		return [
+			{
+				name: "elementIds",
+				type: "array",
+				required: true,
+				description: "Ids of sibling elements to combine with the source element"
+			}
+		];
+	};
+
+	/**
+	 * Creates the command for this plugin from the given parameters and fires the "elementModified" event.
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Target overlay
+	 * @param {object} mParameters - Parameters as described by {@link #getParameters}
+	 * @returns {Promise<sap.ui.rta.command.BaseCommand>} Resolves with the created command
+	 * @since 1.153
+	 */
+	Combine.prototype.createCommands = async function(oOverlay, mParameters) {
+		const aElementIds = mParameters.elementIds || [];
+		const aSiblingOverlays = aElementIds.map((sId) => {
+			const oSiblingOverlay = OverlayRegistry.getOverlay(sId);
+			if (!oSiblingOverlay) {
+				throw new Error(`No overlay found for element with id '${sId}'`);
+			}
+			return oSiblingOverlay;
+		});
+		return await this.handleCombine([oOverlay].concat(aSiblingOverlays), oOverlay.getElement());
 	};
 
 	return Combine;

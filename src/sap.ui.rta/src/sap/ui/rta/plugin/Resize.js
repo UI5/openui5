@@ -395,5 +395,32 @@ sap.ui.define([
 		return "resize";
 	};
 
+	/**
+	 * Returns the parameters that a programmatic consumer must provide to create the commands for this plugin.
+	 * @returns {object[]} List of parameter descriptors (name, type, required, description)
+	 * @since 1.153
+	 */
+	Resize.prototype.getParameters = function() {
+		return [
+			{
+				name: "newWidth",
+				type: "int",
+				required: true,
+				description: "The new width (in pixels) of the element"
+			}
+		];
+	};
+
+	/**
+	 * Creates the command for this plugin from the given parameters and fires the "elementModified" event.
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Target overlay
+	 * @param {object} mParameters - Parameters as described by {@link #getParameters}
+	 * @returns {Promise} Resolves once the command has been created and the event has been fired
+	 * @since 1.153
+	 */
+	Resize.prototype.createCommands = function(oOverlay, mParameters) {
+		return this._createCommand(oOverlay, mParameters.newWidth);
+	};
+
 	return Resize;
 });

@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">복수 행 선택이 활성화된 경우:</span></p>
+				<p>행, 셀 또는 셀 내부의 컨트롤에 포커스가 있을 경우 선택이 토글됩니다. 일부 행이 선택되지 않았던 경우 이제 모든 행이 선택됩니다. 이미 모든 행이 선택된 경우에는 모든 행의 선택이 제거됩니다.</p>
+				<p>이 경우 브라우저가 텍스트 선택을 처리하므로, 열 머리글 셀 또는 텍스트 입력 필드에 포커스가 있으면 바로가기가 작동하지 않습니다.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">셀 선택이 활성화된 경우:</span></p>
-				<p>테이블 내부에 포커스가 있다면 모든 행과 셀의 선택이 제거됩니다.</p>
+				<p><span class="emphasis">복수 행 선택이 활성화된 경우:</span></p>
+				<p>행, 셀 또는 셀 내부의 컨트롤에 포커스가 있을 경우 모든 행의 선택이 제거됩니다.</p>
+				<p>이 경우 브라우저가 텍스트 선택을 처리하므로, 열 머리글 셀 또는 텍스트 입력 필드에 포커스가 있으면 바로가기가 작동하지 않습니다.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>

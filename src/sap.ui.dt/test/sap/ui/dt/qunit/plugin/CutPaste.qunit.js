@@ -185,6 +185,56 @@ function(
 			assert.equal(aContent.indexOf(this.oButton3), 2, "the third Button is at position 2");
 			assert.equal(oPasteSpy.callCount, 0, "then the paste function was not called");
 		});
+
+		QUnit.test("when _executePaste is called on a container overlay with targetIndex 0", async function(assert) {
+			// cut the last button, then request the first position in the layout content
+			await this.oCutPaste.cut(this.oButton3Overlay);
+			const bResult = this.oCutPaste._executePaste(this.oLayoutOverlay, 0);
+			assert.ok(bResult, "then the paste is executed");
+			const aContent = this.oLayout.getContent();
+			assert.equal(aContent.indexOf(this.oButton3), 0, "then the moved button lands at position 0");
+			assert.equal(aContent.indexOf(this.oButton), 1, "then the first button shifts to position 1");
+			assert.equal(aContent.indexOf(this.oButton2), 2, "then the second button shifts to position 2");
+		});
+
+		QUnit.test("when _executePaste is called on a container overlay with an arbitrary middle targetIndex", async function(assert) {
+			// cut the first button; siblings excluding it are [button2, button3].
+			// targetIndex 1 -> land after the sibling at index 0 (button2)
+			await this.oCutPaste.cut(this.oButtonOverlay);
+			const bResult = this.oCutPaste._executePaste(this.oLayoutOverlay, 1);
+			assert.ok(bResult, "then the paste is executed");
+			const aContent = this.oLayout.getContent();
+			assert.equal(aContent.indexOf(this.oButton2), 0, "then the second button is at position 0");
+			assert.equal(aContent.indexOf(this.oButton), 1, "then the moved button lands at the requested position 1");
+			assert.equal(aContent.indexOf(this.oButton3), 2, "then the third button is at position 2");
+		});
+
+		QUnit.test("when _executePaste is called on a container overlay with targetIndex past the end", async function(assert) {
+			await this.oCutPaste.cut(this.oButtonOverlay);
+			const bResult = this.oCutPaste._executePaste(this.oLayoutOverlay, 99);
+			assert.ok(bResult, "then the paste is executed");
+			const aContent = this.oLayout.getContent();
+			assert.equal(aContent.indexOf(this.oButton), 2, "then the moved button is appended at the end");
+		});
+
+		QUnit.test("when _executePaste is called on a container overlay without a targetIndex", async function(assert) {
+			// omitting the index keeps the legacy paste behavior: insert at the start
+			await this.oCutPaste.cut(this.oButton3Overlay);
+			const bResult = this.oCutPaste._executePaste(this.oLayoutOverlay);
+			assert.ok(bResult, "then the paste is executed");
+			const aContent = this.oLayout.getContent();
+			assert.equal(aContent.indexOf(this.oButton3), 0, "then the moved button is inserted at the start");
+		});
+
+		QUnit.test("when _executePaste is called with an index but the target resolves to a sibling", async function(assert) {
+			// pasting relative to a sibling overlay ignores the index and inserts after the sibling
+			await this.oCutPaste.cut(this.oButtonOverlay);
+			const bResult = this.oCutPaste._executePaste(this.oButton3Overlay, 0);
+			assert.ok(bResult, "then the paste is executed");
+			const aContent = this.oLayout.getContent();
+			assert.equal(aContent.indexOf(this.oButton), 2, "then the moved button lands after the sibling regardless of the index");
+			assert.equal(aContent.indexOf(this.oButton3), 1, "then the sibling stays before the moved button");
+		});
 	});
 
 	QUnit.module("Given a control with a template containing multiple containers", {

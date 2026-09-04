@@ -7,12 +7,12 @@ sap.ui.define(function () {
 			group : "OData V4",
 			qunit : {
 				versions: {
-					"2.18": {
-						module: "test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18",
-						css: "test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18.css"
+					"2.26.0": {
+						module: "test-resources/sap/ui/core/qunit/thirdparty/qunit-2.26.0",
+						css: "test-resources/sap/ui/core/qunit/thirdparty/qunit-2.26.0.css"
 					}
 				},
-				version : "2.18",
+				version : "2.26.0",
 				reorder : false
 			},
 			sinon : {
@@ -36,7 +36,7 @@ sap.ui.define(function () {
 			},
 			loader : {
 				shim : {
-					"test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18" : {
+					"test-resources/sap/ui/core/qunit/thirdparty/qunit-2.26.0" : {
 						amd : true,
 						exports : "QUnit"
 					},

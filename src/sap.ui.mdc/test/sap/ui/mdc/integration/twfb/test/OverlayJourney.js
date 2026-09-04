@@ -279,17 +279,17 @@ sap.ui.define([
 		Then.iShouldSeeNoOverlayOnTable();
 		Then.iShouldSeeNoOverlayOnChart(oMDCChart);
 
-		When.onFlVariantManagement.iOpenMyView(oVM);
-		When.onFlVariantManagement.iOpenSaveView(oVM);
-		When.onFlVariantManagement.iCreateNewVariant(oVM, oVariantName, false, false, false);
-		Then.onFlVariantManagement.theVariantShouldBeDisplayed(oVM, oVariantName);
+		When.onVariantManagement.iOpenMyView(oVM);
+		When.onVariantManagement.iOpenSaveView(oVM);
+		When.onVariantManagement.iCreateNewVariant(oVM, oVariantName, false, false, false);
+		Then.onVariantManagement.theVariantShouldBeDisplayed(oVM, oVariantName);
 		Then.iShouldSeeNoOverlayOnTable();
 		Then.iShouldSeeNoOverlayOnChart(oMDCChart);
 
-		When.onFlVariantManagement.iOpenMyView(oVM);
-		When.onFlVariantManagement.iOpenManageViews(oVM);
-		When.onFlVariantManagement.iRemoveVariant(oVariantName);
-		When.onFlVariantManagement.iPressTheManageViewsSave(oVM);
+		When.onVariantManagement.iOpenMyView(oVM);
+		When.onVariantManagement.iOpenManageViews(oVM);
+		When.onVariantManagement.iRemoveVariant(oVariantName);
+		When.onVariantManagement.iPressTheManageViewsSave(oVM);
 		Then.iShouldSeeNoOverlayOnTable();
 		Then.iShouldSeeNoOverlayOnChart(oMDCChart);
 		Then.iTeardownMyUIComponent();

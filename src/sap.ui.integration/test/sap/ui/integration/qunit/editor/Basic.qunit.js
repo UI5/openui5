@@ -839,547 +839,6 @@ sap.ui.define([
 			}.bind(this));
 		});
 
-		QUnit.test("1 icon parameter: keyboard navigation (as json)", function (assert) {
-			this.oEditor.setJson({ baseUrl: sBaseUrl, manifest: { "sap.app": { "id": "test.sample", "i18n": "../i18n/i18n.properties" }, "sap.card": { "designtime": "designtime/icon", "type": "List", "configuration": { "parameters": { "iconParameter": { "value": "sap-icon://cart" } } } } } });
-			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(this.oEditor).then(function () {
-					assert.ok(this.oEditor.isFieldReady(), "Editor fields are ready");
-					var oLabel = this.oEditor.getAggregation("_formContent")[1];
-					var oField = this.oEditor.getAggregation("_formContent")[2];
-					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.ok(oField.getAggregation("_field").isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field: Icon Select Field");
-					EditorQunitUtils.isReady(this.oEditor).then(function () {
-						assert.ok(this.oEditor.isReady(), "Editor is ready");
-						var oSelect = oField.getAggregation("_field").getAggregation("_control");
-						oSelect.setSelectedIndex(10);
-						oSelect.fireChange({ selectedItem: oSelect.getItems()[10] });
-						oSelect.focus();
-						oSelect.open();
-						EditorQunitUtils.wait().then(async function () {
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for 3 < index < 14");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for index = 1");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for index = 0");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 39, "Field: Page DOWN navigation correct for index = 0");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Page Up navigation correct for index = 39");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Down navigation correct for index = 0");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Down navigation correct for index = 1");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Down navigation correct for index = 3");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 16, "Field: Arrow Right navigation correct for index = 15");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 76, "Field: Page DOWN navigation correct for index = 16");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 16, "Field: Page Up navigation correct for index = 76");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Left navigation correct for index = 16");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 14, "Field: Arrow Left navigation correct for index = 15");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Right navigation correct for index = 14");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 16, "Field: Arrow Right navigation correct for index = 15");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 17, "Field: Arrow Right navigation correct for index = 16");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 29, "Field: Arrow Down navigation correct for index = 17");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 30, "Field: Arrow Right navigation correct for index = 29");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 31, "Field: Arrow Right navigation correct for index = 30");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 43, "Field: Arrow Down navigation correct for index = 31");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 31, "Field: Arrow Up navigation correct for index = 43");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 19, "Field: Arrow Up navigation correct for index = 31");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 7, "Field: Arrow Up navigation correct for index = 19");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 7");
-							resolve();
-						});
-					}.bind(this));
-				}.bind(this));
-			}.bind(this));
-		});
-
-		QUnit.test("1 icon parameter with NOT Allow None: keyboard navigation (as json)", function (assert) {
-			this.oEditor.setJson({ baseUrl: sBaseUrl, manifest: { "sap.app": { "id": "test.sample", "i18n": "../i18n/i18n.properties" }, "sap.card": { "designtime": "designtime/iconWithNotAllowNone", "type": "List", "configuration": { "parameters": { "iconParameter": { "value": "sap-icon://cart" } } } } } });
-			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(this.oEditor).then(function () {
-					assert.ok(this.oEditor.isFieldReady(), "Editor fields are ready");
-					var oLabel = this.oEditor.getAggregation("_formContent")[1];
-					var oField = this.oEditor.getAggregation("_formContent")[2];
-					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.ok(oField.getAggregation("_field").isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field: Icon Select Field");
-					EditorQunitUtils.isReady(this.oEditor).then(function () {
-						assert.ok(this.oEditor.isReady(), "Editor is ready");
-						var oSelect = oField.getAggregation("_field").getAggregation("_control");
-						oSelect.setSelectedIndex(10);
-						oSelect.fireChange({ selectedItem: oSelect.getItems()[10] });
-						oSelect.focus();
-						oSelect.open();
-						EditorQunitUtils.wait().then(async function () {
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for 3 < index < 14");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 1");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 1");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Down navigation correct for index = 1");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Down navigation correct for index = 3");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 14, "Field: Arrow Left navigation correct for index = 15");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 13, "Field: Arrow Left navigation correct for index = 14");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 12, "Field: Arrow Left navigation correct for index = 13");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 11, "Field: Arrow Left navigation correct for index = 12");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 12, "Field: Arrow Right navigation correct for index = 11");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 13, "Field: Arrow Right navigation correct for index = 12");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 14, "Field: Arrow Right navigation correct for index = 13");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 26, "Field: Arrow Down navigation correct for index = 14");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 27, "Field: Arrow Right navigation correct for index = 26");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 28, "Field: Arrow Right navigation correct for index = 27");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 40, "Field: Arrow Down navigation correct for index = 28");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 28, "Field: Arrow Up navigation correct for index = 40");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 16, "Field: Arrow Up navigation correct for index = 28");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 4, "Field: Arrow Up navigation correct for index = 16");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 4");
-							resolve();
-						});
-					}.bind(this));
-				}.bind(this));
-			}.bind(this));
-		});
-
-		QUnit.test("1 icon parameter with NOT Allow File: keyboard navigation (as json)", function (assert) {
-			this.oEditor.setJson({ baseUrl: sBaseUrl, manifest: { "sap.app": { "id": "test.sample", "i18n": "../i18n/i18n.properties" }, "sap.card": { "designtime": "designtime/iconWithNotAllowFile", "type": "List", "configuration": { "parameters": { "iconParameter": { "value": "sap-icon://cart" } } } } } });
-			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(this.oEditor).then(function () {
-					assert.ok(this.oEditor.isFieldReady(), "Editor fields are ready");
-					var oLabel = this.oEditor.getAggregation("_formContent")[1];
-					var oField = this.oEditor.getAggregation("_formContent")[2];
-					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.ok(oField.getAggregation("_field").isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field: Icon Select Field");
-					EditorQunitUtils.isReady(this.oEditor).then(function () {
-						assert.ok(this.oEditor.isReady(), "Editor is ready");
-						var oSelect = oField.getAggregation("_field").getAggregation("_control");
-						oSelect.setSelectedIndex(10);
-						oSelect.fireChange({ selectedItem: oSelect.getItems()[10] });
-						oSelect.focus();
-						oSelect.open();
-						EditorQunitUtils.wait().then(async function () {
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for 3 < index < 14");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for index = 0");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Down navigation correct for index = 0");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Down navigation correct for index = 3");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 14, "Field: Arrow Left navigation correct for index = 15");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 13, "Field: Arrow Left navigation correct for index = 14");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 12, "Field: Arrow Left navigation correct for index = 13");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 13, "Field: Arrow Right navigation correct for index = 12");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 14, "Field: Arrow Right navigation correct for index = 13");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Right navigation correct for index = 14");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 27, "Field: Arrow Down navigation correct for index = 15");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 28, "Field: Arrow Right navigation correct for index = 27");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 29, "Field: Arrow Right navigation correct for index = 28");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 41, "Field: Arrow Down navigation correct for index = 29");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 29, "Field: Arrow Up navigation correct for index = 41");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 17, "Field: Arrow Up navigation correct for index = 29");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 5, "Field: Arrow Up navigation correct for index = 17");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for index = 5");
-							resolve();
-						});
-					}.bind(this));
-				}.bind(this));
-			}.bind(this));
-		});
-
-		QUnit.test("1 icon parameter with NOT Allow None and NOT Allow File: keyboard navigation (as json)", function (assert) {
-			this.oEditor.setJson({ baseUrl: sBaseUrl, manifest: { "sap.app": { "id": "test.sample", "i18n": "../i18n/i18n.properties" }, "sap.card": { "designtime": "designtime/iconWithNotAllowFileAndNone", "type": "List", "configuration": { "parameters": { "iconParameter": { "value": "sap-icon://cart" } } } } } });
-			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(this.oEditor).then(function () {
-					assert.ok(this.oEditor.isFieldReady(), "Editor fields are ready");
-					var oLabel = this.oEditor.getAggregation("_formContent")[1];
-					var oField = this.oEditor.getAggregation("_formContent")[2];
-					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.ok(oField.getAggregation("_field").isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field: Icon Select Field");
-					EditorQunitUtils.isReady(this.oEditor).then(function () {
-						assert.ok(this.oEditor.isReady(), "Editor is ready");
-						var oSelect = oField.getAggregation("_field").getAggregation("_control");
-						oSelect.setSelectedIndex(10);
-						oSelect.fireChange({ selectedItem: oSelect.getItems()[10] });
-						oSelect.focus();
-						oSelect.open();
-						EditorQunitUtils.wait().then(async function () {
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Up navigation correct for 3 < index < 14");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Up navigation correct for index = 3");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Down navigation correct for index = 3");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 27, "Field: Arrow Down navigation correct for index = 15");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 26, "Field: Arrow Left navigation correct for index = 27");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 25, "Field: Arrow Left navigation correct for index = 26");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 24, "Field: Arrow Left navigation correct for index = 25");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 25, "Field: Arrow Right navigation correct for index = 24");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 26, "Field: Arrow Right navigation correct for index = 25");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 27, "Field: Arrow Right navigation correct for index = 26");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 39, "Field: Arrow Down navigation correct for index = 27");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 40, "Field: Arrow Right navigation correct for index = 39");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 41, "Field: Arrow Right navigation correct for index = 40");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 53, "Field: Arrow Down navigation correct for index = 41");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 41, "Field: Arrow Up navigation correct for index = 53");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 29, "Field: Arrow Up navigation correct for index = 41");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 17, "Field: Arrow Up navigation correct for index = 29");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 5, "Field: Arrow Up navigation correct for index = 17");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Up navigation correct for index = 5");
-							resolve();
-						});
-					}.bind(this));
-				}.bind(this));
-			}.bind(this));
-		});
-
-		QUnit.test("1 icon parameter with image: keyboard navigation (as json)", function (assert) {
-			this.oEditor.setJson({ baseUrl: sBaseUrl, manifest: { "sap.app": { "id": "test.sample", "i18n": "../i18n/i18n.properties" }, "sap.card": { "designtime": "designtime/icon", "type": "List", "configuration": { "parameters": { "iconParameter": { "value": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAgCKr4qjAAD//gAQTGF2YzU4LjM1LjEwMAD/2wBDAAgQEBMQExYWFhYWFhoYGhsbGxoaGhobGxsdHR0iIiIdHR0bGx0dICAiIiUmJSMjIiMmJigoKDAwLi44ODpFRVP/xACFAAACAgMBAAAAAAAAAAAAAAAAAwIBBQQGBwEBAQEBAQEAAAAAAAAAAAAAAAEDAgQFEAACAQICBgUHCwUBAQAAAAAAAQIDERIEcTFBIVEFgaFhkbFSQnLRIjIT4dKCwfAVBkNTIzNj4pKToxSiEQEBAQEBAQAAAAAAAAAAAAAAEQESMVH/wAARCAB4AJUDASIAAhEAAxEA/9oADAMBAAIRAxEAPwDWGERh9SslkgJCgJgSFFEiyQoiWTAUQAmAoWUNKJQoiOsRsKFANsUShYEwFGmhhSGIyrVZIsmKKJlkxURLJ2JWFEAsMsXYULsFhtgFCbANCwoTYLDQJQmxVhpEUJsFiZQGmMQtDUZtUxhFDAJEgJhIomWSBFWLsW2krt20nD57ndOg8FG1WW1+aulaxR2VScKUXOclGK1t6kYWfMcvGpSpxl8WVVxSULOyltbv1azxzM5yvm3+7NtbI6oroN7lMqcM7Sc9yu0vSasjjpHuZQwo7WFlEyDYIiLJtiHK2zp2AWAjHfZ3hj7OtAIQ1CENRw0PQqpXpUI4qk4wXa/Ba2YrOZ2GThd75P3Y8fkR49WrVMxNzqSxN9y7F2Erndepz55lY6lUnojbxaNCX4gh5tCT0yS8EzzICVzXdT5/mH7lOnHTeXqMRPm2dn+bh9FJHOARGQq5vMV/5Ks5Lhfd3LcY8AIgC9nda1vQ6nTnVmoQWKUnZI9GX4ejgV6zU7b/AGU437NTC+u3yeap5ulGcHfclJbYy2p/beZI43l/KnkqjqOs5O1sMVhi/S37+w7A0aIsQ3wJvea7iKqDm72w2enXo2PxNf4jT1Jdl9z0cHpJSW7zl/8AS+3cYipOaXlLirYlpVxRvOdnulhvsav3cO0Piv8AUj/iYVVVLz8D7MGF8GrpksX9Z/8AP5oRmEybkoRcnqSv3Gumc1zTNKFF04tYp7nZ70tpw18cFmK88zVlUlte5cFsSNMCg8qwKO2yPKP/AE0lUqSlC79lJa48eki5lcUB6kuRUNs6j7vUcfzLKQydWEYYrSjffxuHW5uOdN3L5epmaip01dvW9iXFmtCDqTjBa5NRWls92ymUp5SGCC3+dLbJhMytbIcvp5KPlVHrn9S4I6EiRuV6JE7kSFyiEDFk2zUlIC39uJpTUGt9n2rdLqEVK8Ye9KMdMkvFHM1ea0Yt2bm+yPs+KvpCa2KtGli9521r2b+r5TW+DR8p/wCv+4xEuaKbu6fRua6xf3jD9PqidM7jEVc9mK2ubS4R9ldRiywIyUWAEAZrL8wzOWWGE7x8mXtJaOBhQCu9p8+ml+5SUnxi8PU7mG5jn4Z34eGDjgvraevQc2QsFutuhV+DVhUtiwSUrXte3aegR/EEfOoNejK/ikea2KsUzdx6n9/0LfxVL/R9Zrvn8NlGXTNeo80sFiL1r0J8/lsoLpm/mmjPnmZl7sacOhvxZxpYOt+ugnzXOT/MtojFfUYueazE/eq1H9JmmAc1Hey7FgEUWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXC4sCIZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwA//Z" } } } } } });
-			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(this.oEditor).then(function () {
-					assert.ok(this.oEditor.isFieldReady(), "Editor fields are ready");
-					var oLabel = this.oEditor.getAggregation("_formContent")[1];
-					var oField = this.oEditor.getAggregation("_formContent")[2];
-					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.ok(oField.getAggregation("_field").isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field: Icon Select Field");
-					EditorQunitUtils.isReady(this.oEditor).then(function () {
-						assert.ok(this.oEditor.isReady(), "Editor is ready");
-						var oSelect = oField.getAggregation("_field").getAggregation("_control");
-						assert.equal(oSelect.getSelectedIndex(), 2, "Field: selected index is 2");
-						oSelect.focus();
-						oSelect.open();
-						EditorQunitUtils.wait().then(async function () {
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 2");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for index = 1");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for index = 0");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 39, "Field: Page DOWN navigation correct for index = 0");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Page Up navigation correct for index = 39");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Down navigation correct for index = 0");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 2, "Field: Arrow Down navigation correct for index = 1");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 14, "Field: Arrow Down navigation correct for index = 2");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 2, "Field: Arrow Up navigation correct for index = 14");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Right navigation correct for index = 2");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Down navigation correct for index = 3");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 16, "Field: Arrow Right navigation correct for index = 15");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 76, "Field: Page DOWN navigation correct for index = 16");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 16, "Field: Page Up navigation correct for index = 76");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Left navigation correct for index = 16");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 14, "Field: Arrow Left navigation correct for index = 15");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Right navigation correct for index = 14");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 16, "Field: Arrow Right navigation correct for index = 15");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 17, "Field: Arrow Right navigation correct for index = 16");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 29, "Field: Arrow Down navigation correct for index = 17");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 30, "Field: Arrow Right navigation correct for index = 29");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 31, "Field: Arrow Right navigation correct for index = 30");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 43, "Field: Arrow Down navigation correct for index = 31");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 31, "Field: Arrow Up navigation correct for index = 43");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 19, "Field: Arrow Up navigation correct for index = 31");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 7, "Field: Arrow Up navigation correct for index = 19");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 7");
-							resolve();
-						});
-					}.bind(this));
-				}.bind(this));
-			}.bind(this));
-		});
-
-		QUnit.test("1 icon parameter with image and Not Allow None: keyboard navigation (as json)", function (assert) {
-			this.oEditor.setJson({ baseUrl: sBaseUrl, manifest: { "sap.app": { "id": "test.sample", "i18n": "../i18n/i18n.properties" }, "sap.card": { "designtime": "designtime/iconWithNotAllowNone", "type": "List", "configuration": { "parameters": { "iconParameter": { "value": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAgCKr4qjAAD//gAQTGF2YzU4LjM1LjEwMAD/2wBDAAgQEBMQExYWFhYWFhoYGhsbGxoaGhobGxsdHR0iIiIdHR0bGx0dICAiIiUmJSMjIiMmJigoKDAwLi44ODpFRVP/xACFAAACAgMBAAAAAAAAAAAAAAAAAwIBBQQGBwEBAQEBAQEAAAAAAAAAAAAAAAEDAgQFEAACAQICBgUHCwUBAQAAAAAAAQIDERIEcTFBIVEFgaFhkbFSQnLRIjIT4dKCwfAVBkNTIzNj4pKToxSiEQEBAQEBAQAAAAAAAAAAAAAAEQESMVH/wAARCAB4AJUDASIAAhEAAxEA/9oADAMBAAIRAxEAPwDWGERh9SslkgJCgJgSFFEiyQoiWTAUQAmAoWUNKJQoiOsRsKFANsUShYEwFGmhhSGIyrVZIsmKKJlkxURLJ2JWFEAsMsXYULsFhtgFCbANCwoTYLDQJQmxVhpEUJsFiZQGmMQtDUZtUxhFDAJEgJhIomWSBFWLsW2krt20nD57ndOg8FG1WW1+aulaxR2VScKUXOclGK1t6kYWfMcvGpSpxl8WVVxSULOyltbv1azxzM5yvm3+7NtbI6oroN7lMqcM7Sc9yu0vSasjjpHuZQwo7WFlEyDYIiLJtiHK2zp2AWAjHfZ3hj7OtAIQ1CENRw0PQqpXpUI4qk4wXa/Ba2YrOZ2GThd75P3Y8fkR49WrVMxNzqSxN9y7F2Erndepz55lY6lUnojbxaNCX4gh5tCT0yS8EzzICVzXdT5/mH7lOnHTeXqMRPm2dn+bh9FJHOARGQq5vMV/5Ks5Lhfd3LcY8AIgC9nda1vQ6nTnVmoQWKUnZI9GX4ejgV6zU7b/AGU437NTC+u3yeap5ulGcHfclJbYy2p/beZI43l/KnkqjqOs5O1sMVhi/S37+w7A0aIsQ3wJvea7iKqDm72w2enXo2PxNf4jT1Jdl9z0cHpJSW7zl/8AS+3cYipOaXlLirYlpVxRvOdnulhvsav3cO0Piv8AUj/iYVVVLz8D7MGF8GrpksX9Z/8AP5oRmEybkoRcnqSv3Gumc1zTNKFF04tYp7nZ70tpw18cFmK88zVlUlte5cFsSNMCg8qwKO2yPKP/AE0lUqSlC79lJa48eki5lcUB6kuRUNs6j7vUcfzLKQydWEYYrSjffxuHW5uOdN3L5epmaip01dvW9iXFmtCDqTjBa5NRWls92ymUp5SGCC3+dLbJhMytbIcvp5KPlVHrn9S4I6EiRuV6JE7kSFyiEDFk2zUlIC39uJpTUGt9n2rdLqEVK8Ye9KMdMkvFHM1ea0Yt2bm+yPs+KvpCa2KtGli9521r2b+r5TW+DR8p/wCv+4xEuaKbu6fRua6xf3jD9PqidM7jEVc9mK2ubS4R9ldRiywIyUWAEAZrL8wzOWWGE7x8mXtJaOBhQCu9p8+ml+5SUnxi8PU7mG5jn4Z34eGDjgvraevQc2QsFutuhV+DVhUtiwSUrXte3aegR/EEfOoNejK/ikea2KsUzdx6n9/0LfxVL/R9Zrvn8NlGXTNeo80sFiL1r0J8/lsoLpm/mmjPnmZl7sacOhvxZxpYOt+ugnzXOT/MtojFfUYueazE/eq1H9JmmAc1Hey7FgEUWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXC4sCIZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwA//Z" } } } } } });
-			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(this.oEditor).then(function () {
-					assert.ok(this.oEditor.isFieldReady(), "Editor fields are ready");
-					var oLabel = this.oEditor.getAggregation("_formContent")[1];
-					var oField = this.oEditor.getAggregation("_formContent")[2];
-					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.ok(oField.getAggregation("_field").isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field: Icon Select Field");
-					EditorQunitUtils.isReady(this.oEditor).then(function () {
-						assert.ok(this.oEditor.isReady(), "Editor is ready");
-						var oSelect = oField.getAggregation("_field").getAggregation("_control");
-						assert.equal(oSelect.getSelectedIndex(), 2, "Field: selected index is 2");
-						oSelect.focus();
-						oSelect.open();
-						EditorQunitUtils.wait().then(async function () {
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 2");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 1");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 39, "Field: Page DOWN navigation correct for index = 1");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Page Up navigation correct for index = 39");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 2, "Field: Arrow Down navigation correct for index = 1");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 14, "Field: Arrow Down navigation correct for index = 2");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 2, "Field: Arrow Up navigation correct for index = 14");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Right navigation correct for index = 2");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Down navigation correct for index = 3");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 16, "Field: Arrow Right navigation correct for index = 15");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 76, "Field: Page DOWN navigation correct for index = 16");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 16, "Field: Page Up navigation correct for index = 76");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Left navigation correct for index = 16");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 14, "Field: Arrow Left navigation correct for index = 15");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 15, "Field: Arrow Right navigation correct for index = 14");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 16, "Field: Arrow Right navigation correct for index = 15");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 17, "Field: Arrow Right navigation correct for index = 16");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 29, "Field: Arrow Down navigation correct for index = 17");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 30, "Field: Arrow Right navigation correct for index = 29");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 31, "Field: Arrow Right navigation correct for index = 30");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 43, "Field: Arrow Down navigation correct for index = 31");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 31, "Field: Arrow Up navigation correct for index = 43");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 19, "Field: Arrow Up navigation correct for index = 31");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 7, "Field: Arrow Up navigation correct for index = 19");
-							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
-							await nextUIUpdate();
-							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 7");
-							resolve();
-						});
-					}.bind(this));
-				}.bind(this));
-			}.bind(this));
-		});
-
 		QUnit.test("1 image parameter", function (assert) {
 			this.oEditor.setJson({ baseUrl: sBaseUrl, manifest: { "sap.app": { "id": "test.sample", "i18n": "../i18n/i18n.properties" }, "sap.card": { "designtime": "designtime/image", "type": "List", "configuration": { "parameters": { "imageParameter": { "value": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAgCKr4qjAAD//gAQTGF2YzU4LjM1LjEwMAD/2wBDAAgQEBMQExYWFhYWFhoYGhsbGxoaGhobGxsdHR0iIiIdHR0bGx0dICAiIiUmJSMjIiMmJigoKDAwLi44ODpFRVP/xACFAAACAgMBAAAAAAAAAAAAAAAAAwIBBQQGBwEBAQEBAQEAAAAAAAAAAAAAAAEDAgQFEAACAQICBgUHCwUBAQAAAAAAAQIDERIEcTFBIVEFgaFhkbFSQnLRIjIT4dKCwfAVBkNTIzNj4pKToxSiEQEBAQEBAQAAAAAAAAAAAAAAEQESMVH/wAARCAB4AJUDASIAAhEAAxEA/9oADAMBAAIRAxEAPwDWGERh9SslkgJCgJgSFFEiyQoiWTAUQAmAoWUNKJQoiOsRsKFANsUShYEwFGmhhSGIyrVZIsmKKJlkxURLJ2JWFEAsMsXYULsFhtgFCbANCwoTYLDQJQmxVhpEUJsFiZQGmMQtDUZtUxhFDAJEgJhIomWSBFWLsW2krt20nD57ndOg8FG1WW1+aulaxR2VScKUXOclGK1t6kYWfMcvGpSpxl8WVVxSULOyltbv1azxzM5yvm3+7NtbI6oroN7lMqcM7Sc9yu0vSasjjpHuZQwo7WFlEyDYIiLJtiHK2zp2AWAjHfZ3hj7OtAIQ1CENRw0PQqpXpUI4qk4wXa/Ba2YrOZ2GThd75P3Y8fkR49WrVMxNzqSxN9y7F2Erndepz55lY6lUnojbxaNCX4gh5tCT0yS8EzzICVzXdT5/mH7lOnHTeXqMRPm2dn+bh9FJHOARGQq5vMV/5Ks5Lhfd3LcY8AIgC9nda1vQ6nTnVmoQWKUnZI9GX4ejgV6zU7b/AGU437NTC+u3yeap5ulGcHfclJbYy2p/beZI43l/KnkqjqOs5O1sMVhi/S37+w7A0aIsQ3wJvea7iKqDm72w2enXo2PxNf4jT1Jdl9z0cHpJSW7zl/8AS+3cYipOaXlLirYlpVxRvOdnulhvsav3cO0Piv8AUj/iYVVVLz8D7MGF8GrpksX9Z/8AP5oRmEybkoRcnqSv3Gumc1zTNKFF04tYp7nZ70tpw18cFmK88zVlUlte5cFsSNMCg8qwKO2yPKP/AE0lUqSlC79lJa48eki5lcUB6kuRUNs6j7vUcfzLKQydWEYYrSjffxuHW5uOdN3L5epmaip01dvW9iXFmtCDqTjBa5NRWls92ymUp5SGCC3+dLbJhMytbIcvp5KPlVHrn9S4I6EiRuV6JE7kSFyiEDFk2zUlIC39uJpTUGt9n2rdLqEVK8Ye9KMdMkvFHM1ea0Yt2bm+yPs+KvpCa2KtGli9521r2b+r5TW+DR8p/wCv+4xEuaKbu6fRua6xf3jD9PqidM7jEVc9mK2ubS4R9ldRiywIyUWAEAZrL8wzOWWGE7x8mXtJaOBhQCu9p8+ml+5SUnxi8PU7mG5jn4Z34eGDjgvraevQc2QsFutuhV+DVhUtiwSUrXte3aegR/EEfOoNejK/ikea2KsUzdx6n9/0LfxVL/R9Zrvn8NlGXTNeo80sFiL1r0J8/lsoLpm/mmjPnmZl7sacOhvxZxpYOt+ugnzXOT/MtojFfUYueazE/eq1H9JmmAc1Hey7FgEUWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXC4sCIZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwA//Z" } } } } } });
 			return new Promise(function (resolve, reject) {
@@ -1849,6 +1308,672 @@ sap.ui.define([
 					assert.equal(oDescriptionText.getText(), "Description", "Text: Description OK");
 					oField._descriptionIcon.onmouseout();
 					resolve();
+				}.bind(this));
+			}.bind(this));
+		});
+	});
+
+	QUnit.module("icon parameter: keyboard navigation", {
+		beforeEach: function () {
+			this.oEditor = EditorQunitUtils.beforeEachTest();
+		},
+		afterEach: function () {
+			EditorQunitUtils.afterEachTest(this.oEditor, sandbox);
+		}
+	}, function () {
+		QUnit.test("basic", function (assert) {
+			this.oEditor.setJson({ baseUrl: sBaseUrl, manifest: { "sap.app": { "id": "test.sample", "i18n": "../i18n/i18n.properties" }, "sap.card": { "designtime": "designtime/icon", "type": "List", "configuration": { "parameters": { "iconParameter": { "value": "sap-icon://cart" } } } } } });
+			return new Promise(function (resolve, reject) {
+				EditorQunitUtils.isFieldReady(this.oEditor).then(function () {
+					assert.ok(this.oEditor.isFieldReady(), "Editor fields are ready");
+					var oLabel = this.oEditor.getAggregation("_formContent")[1];
+					var oField = this.oEditor.getAggregation("_formContent")[2];
+					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
+					assert.ok(oField.getAggregation("_field").isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field: Icon Select Field");
+					EditorQunitUtils.isReady(this.oEditor).then(function () {
+						assert.ok(this.oEditor.isReady(), "Editor is ready");
+						var oSelect = oField.getAggregation("_field").getAggregation("_control");
+						oSelect.setSelectedIndex(5);
+						oSelect.fireChange({ selectedItem: oSelect.getItems()[5] });
+						var bIsClosedByLosingFocus = true;
+						var oPicker = oSelect.getPicker();
+						var oPickerBeforeCloseHandler = function(oEvent) {
+							if (bIsClosedByLosingFocus) {
+								resolve();
+							}
+						};
+						// move resolve call to beforeClose event if the picker is about to close to avoid asserting failures
+						oPicker.attachBeforeClose(oPickerBeforeCloseHandler, this);
+						oSelect.focus();
+						oSelect.open();
+						EditorQunitUtils.wait().then(async function () {
+							assert.ok(oPicker.isOpen(), "Icon 1: Picker opened");
+							// Indices 0-2 are the 3 action items (None, Upload, Selected).
+							// Real icons start at index 3. The grid reflows based on picker width,
+							// so iIconsPerRow is read from the live DOM via _getIconsPerRow().
+							// Navigation expressions use: 3 + row * iIconsPerRow + column
+							// index 3+2: 3rd icon on first row, guaranteed to be on row 0 for any reasonable picker width
+							var iIconsPerRow = oField.getAggregation("_field")._getIconsPerRow();
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for 3 < index < 14");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for index = 1");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for index = 0");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 39, "Field: Page DOWN navigation correct for index = 0");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Page Up navigation correct for index = 39");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Down navigation correct for index = 0");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Down navigation correct for index = 1");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow, "Field: Arrow Down navigation correct for index = 3");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 1, "Field: Arrow Right navigation correct for index = 15");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 1 + 60, "Field: Page DOWN navigation correct for index = 16");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 1, "Field: Page Up navigation correct for index = 16");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow, "Field: Arrow Left navigation correct for index = 16");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow - 1, "Field: Arrow Left navigation correct for index = 15");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow, "Field: Arrow Right navigation correct for index = 14");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 1, "Field: Arrow Right navigation correct for index = 15");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 2, "Field: Arrow Right navigation correct for index = 16");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow + 2, "Field: Arrow Down navigation correct for index = 17");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow + 3, "Field: Arrow Right navigation correct for index = 29");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow + 4, "Field: Arrow Right navigation correct for index = 30");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 3 * iIconsPerRow + 4, "Field: Arrow Down navigation correct for index = 31");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow + 4, "Field: Arrow Up navigation correct for index = 43");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 4, "Field: Arrow Up navigation correct for index = 31");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 7, "Field: Arrow Up navigation correct for index = 15 + 4");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 7");
+							bIsClosedByLosingFocus = false;
+							oPicker.detachBeforeClose(oPickerBeforeCloseHandler, this);
+							oPicker = null;
+							// close popover manually
+							oSelect.close();
+							resolve();
+						});
+					}.bind(this));
+				}.bind(this));
+			}.bind(this));
+		});
+
+		QUnit.test("NOT Allow None", function (assert) {
+			this.oEditor.setJson({ baseUrl: sBaseUrl, manifest: { "sap.app": { "id": "test.sample", "i18n": "../i18n/i18n.properties" }, "sap.card": { "designtime": "designtime/iconWithNotAllowNone", "type": "List", "configuration": { "parameters": { "iconParameter": { "value": "sap-icon://cart" } } } } } });
+			return new Promise(function (resolve, reject) {
+				EditorQunitUtils.isFieldReady(this.oEditor).then(function () {
+					assert.ok(this.oEditor.isFieldReady(), "Editor fields are ready");
+					var oLabel = this.oEditor.getAggregation("_formContent")[1];
+					var oField = this.oEditor.getAggregation("_formContent")[2];
+					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
+					assert.ok(oField.getAggregation("_field").isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field: Icon Select Field");
+					EditorQunitUtils.isReady(this.oEditor).then(function () {
+						assert.ok(this.oEditor.isReady(), "Editor is ready");
+						var oSelect = oField.getAggregation("_field").getAggregation("_control");
+						oSelect.setSelectedIndex(5);
+						oSelect.fireChange({ selectedItem: oSelect.getItems()[5] });
+						var bIsClosedByLosingFocus = true;
+						var oPicker = oSelect.getPicker();
+						var oPickerBeforeCloseHandler = function(oEvent) {
+							if (bIsClosedByLosingFocus) {
+								resolve();
+							}
+						};
+						// move resolve call to beforeClose event if the picker is about to close to avoid asserting failures
+						oPicker.attachBeforeClose(oPickerBeforeCloseHandler, this);
+						oSelect.focus();
+						oSelect.open();
+						EditorQunitUtils.wait().then(async function () {
+							assert.ok(oPicker.isOpen(), "Icon 1: Picker opened");
+							// Indices 0-2 are the 3 action items (None, Upload, Selected).
+							// Real icons start at index 3. The grid reflows based on picker width,
+							// so iIconsPerRow is read from the live DOM via _getIconsPerRow().
+							// Navigation expressions use: 3 + row * iIconsPerRow + column
+							// index 3+2: 3rd icon on first row, guaranteed to be on row 0 for any reasonable picker width
+							var iIconsPerRow = oField.getAggregation("_field")._getIconsPerRow();
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for 3 < index < 14");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 1");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 1");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Down navigation correct for index = 1");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow, "Field: Arrow Down navigation correct for index = 3");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow - 1, "Field: Arrow Left navigation correct for index = 15");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow - 2, "Field: Arrow Left navigation correct for index = 14");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow - 3, "Field: Arrow Left navigation correct for index = 13");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow - 4, "Field: Arrow Left navigation correct for index = 12");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow - 3, "Field: Arrow Right navigation correct for index = 11");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow - 2, "Field: Arrow Right navigation correct for index = 12");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow - 1, "Field: Arrow Right navigation correct for index = 13");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow - 1, "Field: Arrow Down navigation correct for index = 14");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow, "Field: Arrow Right navigation correct for index = 26");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow + 1, "Field: Arrow Right navigation correct for index = 27");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 3 * iIconsPerRow + 1, "Field: Arrow Down navigation correct for index = 28");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow + 1, "Field: Arrow Up navigation correct for index = 40");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 1, "Field: Arrow Up navigation correct for index = 28");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 4, "Field: Arrow Up navigation correct for index = 16");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 4");
+							bIsClosedByLosingFocus = false;
+							oPicker.detachBeforeClose(oPickerBeforeCloseHandler, this);
+							oPicker = null;
+							// close popover manually
+							oSelect.close();
+							resolve();
+						});
+					}.bind(this));
+				}.bind(this));
+			}.bind(this));
+		});
+
+		QUnit.test("NOT Allow File", function (assert) {
+			this.oEditor.setJson({ baseUrl: sBaseUrl, manifest: { "sap.app": { "id": "test.sample", "i18n": "../i18n/i18n.properties" }, "sap.card": { "designtime": "designtime/iconWithNotAllowFile", "type": "List", "configuration": { "parameters": { "iconParameter": { "value": "sap-icon://cart" } } } } } });
+			return new Promise(function (resolve, reject) {
+				EditorQunitUtils.isFieldReady(this.oEditor).then(function () {
+					assert.ok(this.oEditor.isFieldReady(), "Editor fields are ready");
+					var oLabel = this.oEditor.getAggregation("_formContent")[1];
+					var oField = this.oEditor.getAggregation("_formContent")[2];
+					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
+					assert.ok(oField.getAggregation("_field").isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field: Icon Select Field");
+					EditorQunitUtils.isReady(this.oEditor).then(function () {
+						assert.ok(this.oEditor.isReady(), "Editor is ready");
+						var oSelect = oField.getAggregation("_field").getAggregation("_control");
+						oSelect.setSelectedIndex(5);
+						oSelect.fireChange({ selectedItem: oSelect.getItems()[5] });
+						var bIsClosedByLosingFocus = true;
+						var oPicker = oSelect.getPicker();
+						var oPickerBeforeCloseHandler = function(oEvent) {
+							if (bIsClosedByLosingFocus) {
+								resolve();
+							}
+						};
+						// move resolve call to beforeClose event if the picker is about to close to avoid asserting failures
+						oPicker.attachBeforeClose(oPickerBeforeCloseHandler, this);
+						oSelect.focus();
+						oSelect.open();
+						EditorQunitUtils.wait().then(async function () {
+							assert.ok(oPicker.isOpen(), "Icon 1: Picker opened");
+							// Indices 0-2 are the 3 action items (None, Upload, Selected).
+							// Real icons start at index 3. The grid reflows based on picker width,
+							// so iIconsPerRow is read from the live DOM via _getIconsPerRow().
+							// Navigation expressions use: 3 + row * iIconsPerRow + column
+							// index 3+2: 3rd icon on first row, guaranteed to be on row 0 for any reasonable picker width
+							var iIconsPerRow = oField.getAggregation("_field")._getIconsPerRow();
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for 3 < index < 14");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for index = 0");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Down navigation correct for index = 0");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow, "Field: Arrow Down navigation correct for index = 3");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow - 1, "Field: Arrow Left navigation correct for index = 15");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow - 2, "Field: Arrow Left navigation correct for index = 14");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow - 3, "Field: Arrow Left navigation correct for index = 13");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow - 2, "Field: Arrow Right navigation correct for index = 12");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow - 1, "Field: Arrow Right navigation correct for index = 13");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow, "Field: Arrow Right navigation correct for index = 14");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow, "Field: Arrow Down navigation correct for index = 15");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow + 1, "Field: Arrow Right navigation correct for index = 27");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow + 2, "Field: Arrow Right navigation correct for index = 28");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 3 * iIconsPerRow + 2, "Field: Arrow Down navigation correct for index = 29");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow + 2, "Field: Arrow Up navigation correct for index = 41");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 2, "Field: Arrow Up navigation correct for index = 29");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 5, "Field: Arrow Up navigation correct for index = 17");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for index = 5");
+							bIsClosedByLosingFocus = false;
+							oPicker.detachBeforeClose(oPickerBeforeCloseHandler, this);
+							oPicker = null;
+							// close popover manually
+							oSelect.close();
+							resolve();
+						});
+					}.bind(this));
+				}.bind(this));
+			}.bind(this));
+		});
+
+		QUnit.test("NOT Allow None and NOT Allow File", function (assert) {
+			this.oEditor.setJson({ baseUrl: sBaseUrl, manifest: { "sap.app": { "id": "test.sample", "i18n": "../i18n/i18n.properties" }, "sap.card": { "designtime": "designtime/iconWithNotAllowFileAndNone", "type": "List", "configuration": { "parameters": { "iconParameter": { "value": "sap-icon://cart" } } } } } });
+			return new Promise(function (resolve, reject) {
+				EditorQunitUtils.isFieldReady(this.oEditor).then(function () {
+					assert.ok(this.oEditor.isFieldReady(), "Editor fields are ready");
+					var oLabel = this.oEditor.getAggregation("_formContent")[1];
+					var oField = this.oEditor.getAggregation("_formContent")[2];
+					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
+					assert.ok(oField.getAggregation("_field").isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field: Icon Select Field");
+					EditorQunitUtils.isReady(this.oEditor).then(function () {
+						assert.ok(this.oEditor.isReady(), "Editor is ready");
+						var oSelect = oField.getAggregation("_field").getAggregation("_control");
+						oSelect.setSelectedIndex(5);
+						oSelect.fireChange({ selectedItem: oSelect.getItems()[5] });
+						var bIsClosedByLosingFocus = true;
+						var oPicker = oSelect.getPicker();
+						var oPickerBeforeCloseHandler = function(oEvent) {
+							if (bIsClosedByLosingFocus) {
+								resolve();
+							}
+						};
+						// move resolve call to beforeClose event if the picker is about to close to avoid asserting failures
+						oPicker.attachBeforeClose(oPickerBeforeCloseHandler, this);
+						oSelect.focus();
+						oSelect.open();
+						EditorQunitUtils.wait().then(async function () {
+							assert.ok(oPicker.isOpen(), "Picker is open");
+							// Indices 0-2 are the 3 action items (None, Upload, Selected).
+							// Real icons start at index 3. The grid reflows based on picker width,
+							// so iIconsPerRow is read from the live DOM via _getIconsPerRow().
+							// Navigation expressions use: 3 + row * iIconsPerRow + column
+							// index 3+2: 3rd icon on first row, guaranteed to be on row 0 for any reasonable picker width
+							var iIconsPerRow = oField.getAggregation("_field")._getIconsPerRow();
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Up navigation correct for 3 < index < 14");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Up navigation correct for index = 3");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow, "Field: Arrow Down navigation correct for index = 3");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow, "Field: Arrow Down navigation correct for index = 15");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow - 1, "Field: Arrow Left navigation correct for index = 27");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow - 2, "Field: Arrow Left navigation correct for index = 26");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow - 3, "Field: Arrow Left navigation correct for index = 25");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow - 2, "Field: Arrow Right navigation correct for index = 24");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow - 1, "Field: Arrow Right navigation correct for index = 25");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow, "Field: Arrow Right navigation correct for index = 26");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 3 * iIconsPerRow, "Field: Arrow Down navigation correct for index = 27");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 3 * iIconsPerRow + 1, "Field: Arrow Right navigation correct for index = 39");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 3 * iIconsPerRow + 2, "Field: Arrow Right navigation correct for index = 40");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 4 * iIconsPerRow + 2, "Field: Arrow Down navigation correct for index = 41");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 3 * iIconsPerRow + 2, "Field: Arrow Up navigation correct for index = 53");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow + 2, "Field: Arrow Up navigation correct for index = 41");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 2, "Field: Arrow Up navigation correct for index = 29");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 5, "Field: Arrow Up navigation correct for index = 17");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Up navigation correct for index = 5");
+							bIsClosedByLosingFocus = false;
+							oPicker.detachBeforeClose(oPickerBeforeCloseHandler, this);
+							oPicker = null;
+							// close popover manually
+							oSelect.close();
+							resolve();
+						});
+					}.bind(this));
+				}.bind(this));
+			}.bind(this));
+		});
+
+		QUnit.test("with image", function (assert) {
+			this.oEditor.setJson({ baseUrl: sBaseUrl, manifest: { "sap.app": { "id": "test.sample", "i18n": "../i18n/i18n.properties" }, "sap.card": { "designtime": "designtime/icon", "type": "List", "configuration": { "parameters": { "iconParameter": { "value": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAgCKr4qjAAD//gAQTGF2YzU4LjM1LjEwMAD/2wBDAAgQEBMQExYWFhYWFhoYGhsbGxoaGhobGxsdHR0iIiIdHR0bGx0dICAiIiUmJSMjIiMmJigoKDAwLi44ODpFRVP/xACFAAACAgMBAAAAAAAAAAAAAAAAAwIBBQQGBwEBAQEBAQEAAAAAAAAAAAAAAAEDAgQFEAACAQICBgUHCwUBAQAAAAAAAQIDERIEcTFBIVEFgaFhkbFSQnLRIjIT4dKCwfAVBkNTIzNj4pKToxSiEQEBAQEBAQAAAAAAAAAAAAAAEQESMVH/wAARCAB4AJUDASIAAhEAAxEA/9oADAMBAAIRAxEAPwDWGERh9SslkgJCgJgSFFEiyQoiWTAUQAmAoWUNKJQoiOsRsKFANsUShYEwFGmhhSGIyrVZIsmKKJlkxURLJ2JWFEAsMsXYULsFhtgFCbANCwoTYLDQJQmxVhpEUJsFiZQGmMQtDUZtUxhFDAJEgJhIomWSBFWLsW2krt20nD57ndOg8FG1WW1+aulaxR2VScKUXOclGK1t6kYWfMcvGpSpxl8WVVxSULOyltbv1azxzM5yvm3+7NtbI6oroN7lMqcM7Sc9yu0vSasjjpHuZQwo7WFlEyDYIiLJtiHK2zp2AWAjHfZ3hj7OtAIQ1CENRw0PQqpXpUI4qk4wXa/Ba2YrOZ2GThd75P3Y8fkR49WrVMxNzqSxN9y7F2Erndepz55lY6lUnojbxaNCX4gh5tCT0yS8EzzICVzXdT5/mH7lOnHTeXqMRPm2dn+bh9FJHOARGQq5vMV/5Ks5Lhfd3LcY8AIgC9nda1vQ6nTnVmoQWKUnZI9GX4ejgV6zU7b/AGU437NTC+u3yeap5ulGcHfclJbYy2p/beZI43l/KnkqjqOs5O1sMVhi/S37+w7A0aIsQ3wJvea7iKqDm72w2enXo2PxNf4jT1Jdl9z0cHpJSW7zl/8AS+3cYipOaXlLirYlpVxRvOdnulhvsav3cO0Piv8AUj/iYVVVLz8D7MGF8GrpksX9Z/8AP5oRmEybkoRcnqSv3Gumc1zTNKFF04tYp7nZ70tpw18cFmK88zVlUlte5cFsSNMCg8qwKO2yPKP/AE0lUqSlC79lJa48eki5lcUB6kuRUNs6j7vUcfzLKQydWEYYrSjffxuHW5uOdN3L5epmaip01dvW9iXFmtCDqTjBa5NRWls92ymUp5SGCC3+dLbJhMytbIcvp5KPlVHrn9S4I6EiRuV6JE7kSFyiEDFk2zUlIC39uJpTUGt9n2rdLqEVK8Ye9KMdMkvFHM1ea0Yt2bm+yPs+KvpCa2KtGli9521r2b+r5TW+DR8p/wCv+4xEuaKbu6fRua6xf3jD9PqidM7jEVc9mK2ubS4R9ldRiywIyUWAEAZrL8wzOWWGE7x8mXtJaOBhQCu9p8+ml+5SUnxi8PU7mG5jn4Z34eGDjgvraevQc2QsFutuhV+DVhUtiwSUrXte3aegR/EEfOoNejK/ikea2KsUzdx6n9/0LfxVL/R9Zrvn8NlGXTNeo80sFiL1r0J8/lsoLpm/mmjPnmZl7sacOhvxZxpYOt+ugnzXOT/MtojFfUYueazE/eq1H9JmmAc1Hey7FgEUWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXC4sCIZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwA//Z" } } } } } });
+			return new Promise(function (resolve, reject) {
+				EditorQunitUtils.isFieldReady(this.oEditor).then(function () {
+					assert.ok(this.oEditor.isFieldReady(), "Editor fields are ready");
+					var oLabel = this.oEditor.getAggregation("_formContent")[1];
+					var oField = this.oEditor.getAggregation("_formContent")[2];
+					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
+					assert.ok(oField.getAggregation("_field").isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field: Icon Select Field");
+					EditorQunitUtils.isReady(this.oEditor).then(function () {
+						assert.ok(this.oEditor.isReady(), "Editor is ready");
+						var oSelect = oField.getAggregation("_field").getAggregation("_control");
+						assert.equal(oSelect.getSelectedIndex(), 2, "Field: selected index is 2");
+						var bIsClosedByLosingFocus = true;
+						var oPicker = oSelect.getPicker();
+						var oPickerBeforeCloseHandler = function(oEvent) {
+							if (bIsClosedByLosingFocus) {
+								resolve();
+							}
+						};
+						// move resolve call to beforeClose event if the picker is about to close to avoid asserting failures
+						oPicker.attachBeforeClose(oPickerBeforeCloseHandler, this);
+						oSelect.focus();
+						oSelect.open();
+						EditorQunitUtils.wait().then(async function () {
+							assert.ok(oPicker.isOpen(), "Picker is open");
+							var iIconsPerRow = oField.getAggregation("_field")._getIconsPerRow();
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 2");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for index = 1");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Arrow Up navigation correct for index = 0");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 39, "Field: Page DOWN navigation correct for index = 0");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 0, "Field: Page Up navigation correct for index = 39");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Down navigation correct for index = 0");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 2, "Field: Arrow Down navigation correct for index = 1");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 2 + iIconsPerRow, "Field: Arrow Down navigation correct for index = 2");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 2, "Field: Arrow Up navigation correct for index = 14");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Right navigation correct for index = 2");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow, "Field: Arrow Down navigation correct for index = 3");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 1, "Field: Arrow Right navigation correct for index = 15");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 1 + 60, "Field: Page DOWN navigation correct for index = 16");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 1, "Field: Page Up navigation correct for index = 16");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow, "Field: Arrow Left navigation correct for index = 16");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow - 1, "Field: Arrow Left navigation correct for index = 15");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow, "Field: Arrow Right navigation correct for index = 14");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 1, "Field: Arrow Right navigation correct for index = 15");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 2, "Field: Arrow Right navigation correct for index = 16");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow + 2, "Field: Arrow Down navigation correct for index = 17");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow + 3, "Field: Arrow Right navigation correct for index = 29");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow + 4, "Field: Arrow Right navigation correct for index = 30");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 3 * iIconsPerRow + 4, "Field: Arrow Down navigation correct for index = 31");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow + 4, "Field: Arrow Up navigation correct for index = 43");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 4, "Field: Arrow Up navigation correct for index = 31");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 7, "Field: Arrow Up navigation correct for index = 15 + 4");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 7");
+							bIsClosedByLosingFocus = false;
+							oPicker.detachBeforeClose(oPickerBeforeCloseHandler, this);
+							oPicker = null;
+							// close popover manually
+							oSelect.close();
+							resolve();
+						});
+					}.bind(this));
+				}.bind(this));
+			}.bind(this));
+		});
+
+		QUnit.test("with image and Not Allow None", function (assert) {
+			this.oEditor.setJson({ baseUrl: sBaseUrl, manifest: { "sap.app": { "id": "test.sample", "i18n": "../i18n/i18n.properties" }, "sap.card": { "designtime": "designtime/iconWithNotAllowNone", "type": "List", "configuration": { "parameters": { "iconParameter": { "value": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAgCKr4qjAAD//gAQTGF2YzU4LjM1LjEwMAD/2wBDAAgQEBMQExYWFhYWFhoYGhsbGxoaGhobGxsdHR0iIiIdHR0bGx0dICAiIiUmJSMjIiMmJigoKDAwLi44ODpFRVP/xACFAAACAgMBAAAAAAAAAAAAAAAAAwIBBQQGBwEBAQEBAQEAAAAAAAAAAAAAAAEDAgQFEAACAQICBgUHCwUBAQAAAAAAAQIDERIEcTFBIVEFgaFhkbFSQnLRIjIT4dKCwfAVBkNTIzNj4pKToxSiEQEBAQEBAQAAAAAAAAAAAAAAEQESMVH/wAARCAB4AJUDASIAAhEAAxEA/9oADAMBAAIRAxEAPwDWGERh9SslkgJCgJgSFFEiyQoiWTAUQAmAoWUNKJQoiOsRsKFANsUShYEwFGmhhSGIyrVZIsmKKJlkxURLJ2JWFEAsMsXYULsFhtgFCbANCwoTYLDQJQmxVhpEUJsFiZQGmMQtDUZtUxhFDAJEgJhIomWSBFWLsW2krt20nD57ndOg8FG1WW1+aulaxR2VScKUXOclGK1t6kYWfMcvGpSpxl8WVVxSULOyltbv1azxzM5yvm3+7NtbI6oroN7lMqcM7Sc9yu0vSasjjpHuZQwo7WFlEyDYIiLJtiHK2zp2AWAjHfZ3hj7OtAIQ1CENRw0PQqpXpUI4qk4wXa/Ba2YrOZ2GThd75P3Y8fkR49WrVMxNzqSxN9y7F2Erndepz55lY6lUnojbxaNCX4gh5tCT0yS8EzzICVzXdT5/mH7lOnHTeXqMRPm2dn+bh9FJHOARGQq5vMV/5Ks5Lhfd3LcY8AIgC9nda1vQ6nTnVmoQWKUnZI9GX4ejgV6zU7b/AGU437NTC+u3yeap5ulGcHfclJbYy2p/beZI43l/KnkqjqOs5O1sMVhi/S37+w7A0aIsQ3wJvea7iKqDm72w2enXo2PxNf4jT1Jdl9z0cHpJSW7zl/8AS+3cYipOaXlLirYlpVxRvOdnulhvsav3cO0Piv8AUj/iYVVVLz8D7MGF8GrpksX9Z/8AP5oRmEybkoRcnqSv3Gumc1zTNKFF04tYp7nZ70tpw18cFmK88zVlUlte5cFsSNMCg8qwKO2yPKP/AE0lUqSlC79lJa48eki5lcUB6kuRUNs6j7vUcfzLKQydWEYYrSjffxuHW5uOdN3L5epmaip01dvW9iXFmtCDqTjBa5NRWls92ymUp5SGCC3+dLbJhMytbIcvp5KPlVHrn9S4I6EiRuV6JE7kSFyiEDFk2zUlIC39uJpTUGt9n2rdLqEVK8Ye9KMdMkvFHM1ea0Yt2bm+yPs+KvpCa2KtGli9521r2b+r5TW+DR8p/wCv+4xEuaKbu6fRua6xf3jD9PqidM7jEVc9mK2ubS4R9ldRiywIyUWAEAZrL8wzOWWGE7x8mXtJaOBhQCu9p8+ml+5SUnxi8PU7mG5jn4Z34eGDjgvraevQc2QsFutuhV+DVhUtiwSUrXte3aegR/EEfOoNejK/ikea2KsUzdx6n9/0LfxVL/R9Zrvn8NlGXTNeo80sFiL1r0J8/lsoLpm/mmjPnmZl7sacOhvxZxpYOt+ugnzXOT/MtojFfUYueazE/eq1H9JmmAc1Hey7FgEUWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXC4sCIZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwAZcLiwA//Z" } } } } } });
+			return new Promise(function (resolve, reject) {
+				EditorQunitUtils.isFieldReady(this.oEditor).then(function () {
+					assert.ok(this.oEditor.isFieldReady(), "Editor fields are ready");
+					var oLabel = this.oEditor.getAggregation("_formContent")[1];
+					var oField = this.oEditor.getAggregation("_formContent")[2];
+					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
+					assert.ok(oField.getAggregation("_field").isA("sap.ui.integration.editor.fields.viz.IconSelect"), "Field: Icon Select Field");
+					EditorQunitUtils.isReady(this.oEditor).then(function () {
+						assert.ok(this.oEditor.isReady(), "Editor is ready");
+						var oSelect = oField.getAggregation("_field").getAggregation("_control");
+						assert.equal(oSelect.getSelectedIndex(), 2, "Field: selected index is 2");
+						var bIsClosedByLosingFocus = true;
+						var oPicker = oSelect.getPicker();
+						var oPickerBeforeCloseHandler = function(oEvent) {
+							if (bIsClosedByLosingFocus) {
+								resolve();
+							}
+						};
+						// move resolve call to beforeClose event if the picker is about to close to avoid asserting failures
+						oPicker.attachBeforeClose(oPickerBeforeCloseHandler, this);
+						oSelect.focus();
+						oSelect.open();
+						EditorQunitUtils.wait().then(async function () {
+							assert.ok(oPicker.isOpen(), "Picker is open");
+							var iIconsPerRow = oField.getAggregation("_field")._getIconsPerRow();
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 2");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 1");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 39, "Field: Page DOWN navigation correct for index = 1");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Page Up navigation correct for index = 39");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 2, "Field: Arrow Down navigation correct for index = 1");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 2 + iIconsPerRow, "Field: Arrow Down navigation correct for index = 2");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 2, "Field: Arrow Up navigation correct for index = 14");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3, "Field: Arrow Right navigation correct for index = 2");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow, "Field: Arrow Down navigation correct for index = 3");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 1, "Field: Arrow Right navigation correct for index = 15");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 1 + 60, "Field: Page DOWN navigation correct for index = 16");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.PAGE_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 1, "Field: Page Up navigation correct for index = 16");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow, "Field: Arrow Left navigation correct for index = 16");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_LEFT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow - 1, "Field: Arrow Left navigation correct for index = 15");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow, "Field: Arrow Right navigation correct for index = 14");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 1, "Field: Arrow Right navigation correct for index = 15");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 2, "Field: Arrow Right navigation correct for index = 16");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow + 2, "Field: Arrow Down navigation correct for index = 17");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow + 3, "Field: Arrow Right navigation correct for index = 29");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_RIGHT);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow + 4, "Field: Arrow Right navigation correct for index = 30");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 3 * iIconsPerRow + 4, "Field: Arrow Down navigation correct for index = 31");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + 2 * iIconsPerRow + 4, "Field: Arrow Up navigation correct for index = 43");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 3 + iIconsPerRow + 4, "Field: Arrow Up navigation correct for index = 31");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 7, "Field: Arrow Up navigation correct for index = 15 + 4");
+							QUnitUtils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+							await nextUIUpdate();
+							assert.equal(oSelect.getSelectedIndex(), 1, "Field: Arrow Up navigation correct for index = 7");
+							bIsClosedByLosingFocus = false;
+							oPicker.detachBeforeClose(oPickerBeforeCloseHandler, this);
+							oPicker = null;
+							// close popover manually
+							oSelect.close();
+							resolve();
+						});
+					}.bind(this));
 				}.bind(this));
 			}.bind(this));
 		});

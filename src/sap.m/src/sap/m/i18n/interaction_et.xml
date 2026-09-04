@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Kui mitme rea valik on lubatud</span></p>
+				<p>Kui fookus on real, lahtril või lahtris oleval juhtelemendil, pööratakse valik ümber. Kui varem polnud kõik read valitud, valitakse nüüd kõik read. Kui kõik read olid juba valitud, eemaldatakse kõigi ridade valik.</p>
+				<p>Otsetee ei mõjuta seda, kui fookus on veerupäiselahtril või tekstisisestusväljal, kuna sel juhul tegeleb tekstivalikuga brauser.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Kui lahtrivalik on lubatud</span></p>
-				<p>Kui fookus on tabelis, eemaldatakse mis tahes ridade ja lahtrite valik.</p>
+				<p><span class="emphasis">Kui mitme rea valik on lubatud</span></p>
+				<p>Kui fookus on real, lahtril või lahtris oleval juhtelemendil, eemaldatakse kõigi ridade valik.</p>
+				<p>Otsetee ei mõjuta seda, kui fookus on veerupäiselahtril või tekstisisestusväljal, kuna sel juhul tegeleb tekstivalikuga brauser.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
@@ -154,7 +161,7 @@
 				<p><kbd>ArrowDown</kbd></p>
 				<p>Nihutab üksuse ühe koha võrra alla, kui see on saadaval.</p>
 				<p><kbd>Home</kbd></p>
-				<p>Nihutab üksuse ülaserva, kui see on saadaval.</p>
+				<p>Nihutab üksuse algusesse, kui see on saadaval.</p>
 				<p><kbd>End</kbd></p>
 				<p>Nihutab üksuse lõppu, kui see on saadaval.</p>
 			</description>

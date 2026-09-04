@@ -95,13 +95,20 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">複数行選択が有効な場合:</span></p>
+				<p>フォーカスが行、セル、またはセル内のコントロールにある場合、選択が切り替わります。すべての行が選択されていない場合は、すべての行が選択されます。すべての行がすでに選択されている場合は、すべての行の選択が削除されます。</p>
+				<p>フォーカスが列ヘッダセルまたはテキスト入力フィールドにある場合、ショートカットは効果がありません。このような場合、テキスト選択はブラウザによって処理されます。</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">セル選択が有効化されている場合:</span></p>
-				<p>フォーカスがテーブル内部にある場合、行またはセルの選択が解除されます。</p>
+				<p><span class="emphasis">複数行選択が有効な場合:</span></p>
+				<p>フォーカスが行、セル、またはセル内のコントロールにある場合、すべての行の選択が削除されます。</p>
+				<p>フォーカスが列ヘッダセルまたはテキスト入力フィールドにある場合、ショートカットは効果がありません。このような場合、テキスト選択はブラウザによって処理されます。</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
-				<p><span class="emphasis">セル選択が有効化されている場合:</span></p>
+				<p><span class="emphasis">セル選択が有効な場合:</span></p>
 				<p>フォーカスがテーブル内部にあり、セルが選択されている場合は、そのセルの選択が解除されます。</p>
 			</description>
 		</interaction>
@@ -150,9 +157,9 @@
 		<control name="sap.m.p13n.SelectionPanel"/>
 		<interaction> <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> <kbd>Home</kbd> <kbd>End</kbd> <description>
 				<p><kbd>ArrowUp</kbd></p>
-				<p>アイテムを 1 つ上の位置に移動します (可能な場合)。</p>
+				<p>アイテムを 1 つ上の位置に移動します (利用可能な場合)。</p>
 				<p><kbd>ArrowDown</kbd></p>
-				<p>アイテムを 1 つ下の位置に移動します (可能な場合)。</p>
+				<p>アイテムを 1 つ下の位置に移動します (利用可能な場合)。</p>
 				<p><kbd>Home</kbd></p>
 				<p>アイテムを先頭へ移動します (可能な場合)。</p>
 				<p><kbd>End</kbd></p>

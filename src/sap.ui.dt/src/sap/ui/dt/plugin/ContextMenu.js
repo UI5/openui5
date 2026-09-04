@@ -284,7 +284,7 @@ sap.ui.define([
 						const oViewChangesButton = new Button({
 							id: `${this.sId}-viewChanges-button`,
 							tooltip: oTextResources.getText("CTX_VIEW_CHANGES"),
-							icon: "sap-icon://display",
+							icon: "sap-icon://show-edit",
 							type: "Transparent",
 							press: function() {
 								oCallbackFunctions.openPopup(

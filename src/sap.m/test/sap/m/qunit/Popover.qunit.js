@@ -22,6 +22,7 @@ sap.ui.define([
 	"sap/ui/Device",
 	"sap/ui/core/Popup",
 	"sap/ui/core/popover/Positioning",
+	"sap/ui/core/popover/PopoverPhysicalSide",
 	"sap/m/NavContainer",
 	"sap/m/SegmentedButton",
 	"sap/m/SegmentedButtonItem",
@@ -59,6 +60,7 @@ sap.ui.define([
 	Device,
 	Popup,
 	Positioning,
+	PopoverPhysicalSide,
 	NavContainer,
 	SegmentedButton,
 	SegmentedButtonItem,
@@ -1986,6 +1988,23 @@ sap.ui.define([
 		}
 	});
 
+	QUnit.test("_calcPlacement resolves every PlacementType to a physical side", function (assert) {
+		const aSides = Object.values(PopoverPhysicalSide);
+		Object.keys(PlacementType).forEach((sKey) => {
+			const sType = PlacementType[sKey];
+			const oPopover = new Popover({ placement: sType });
+			const oStubDomRef = sinon.stub(oPopover, "getDomRef").returns({
+				getBoundingClientRect: () => ({ top: 0, left: 0, width: 50, height: 50 })
+			});
+			const oStubOpener = sinon.stub(oPopover, "_getOpenByDomRef").returns(document.createElement("div"));
+			oPopover._calcPlacement();
+			assert.ok(aSides.includes(oPopover._getCalculatedPlacement()), sType + " → physical side");
+			oStubOpener.restore();
+			oStubDomRef.restore();
+			oPopover.destroy();
+		});
+	});
+
 	QUnit.test("_getAnimationDuration", function (assert) {
 		const fExpectedDuration = parseFloat(Parameters.get({
 			name: "_sap_m_Popover_OpacityTransitionDuration"
@@ -2071,11 +2090,7 @@ sap.ui.define([
 				_fPopoverWidth: 416,
 				_fPopoverHeight: 802,
 				_fWithinAreaWidth: 1920,
-				_fWithinAreaHeight: 1139,
-				_fPopoverOffset: {
-					top: 21,
-					left: 265
-				}
+				_fWithinAreaHeight: 1139
 			};
 
 		// withinAreaRef=window + no openerRef => margins pass through unchanged.
@@ -2108,11 +2123,7 @@ sap.ui.define([
 			_fPopoverWidth: 416,
 			_fPopoverHeight: 754,
 			_fWithinAreaWidth: 1920,
-			_fWithinAreaHeight: 1139,
-			_fPopoverOffset: {
-				top: 223,
-				left: 0
-			}
+			_fWithinAreaHeight: 1139
 		};
 
 		const oStubFold = sinon.stub(this.oPopover, "_getMarginFoldParams").returns({

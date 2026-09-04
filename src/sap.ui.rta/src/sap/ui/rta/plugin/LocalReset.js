@@ -106,8 +106,19 @@ sap.ui.define([
 		return this._getMenuItems(vElementOverlays, {
 			pluginId: "CTX_LOCAL_RESET",
 			icon: "sap-icon://reset",
-			additionalInfoKey: "LOCALRESET_RTA_CONTEXT_MENU_INFO"
+			additionalInfoKey: "LOCALRESET_RTA_CONTEXT_MENU_INFO",
+			description: "reset the local changes on the element"
 		});
+	};
+
+	/**
+	 * Creates the local reset command (delegating to the plugin handler) and fires the "elementModified" event.
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Target overlay
+	 * @returns {Promise} Resolves once the command has been created and the event has been fired
+	 * @since 1.153
+	 */
+	LocalReset.prototype.createCommands = function(oOverlay) {
+		return this.handler([oOverlay]);
 	};
 
 	/**

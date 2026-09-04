@@ -95,9 +95,16 @@
 				</ul>
 			</description>
 		</interaction>
+		<interaction> <kbd>Ctrl + A</kbd> <description>
+				<p><span class="emphasis">Če je omogočena izbira več vrstic:</span></p>
+				<p>Če je fokus na vrstici, celici ali kontrolniku v celici, se izbira preklopi. Če niso izbrane vse vrstice, so zdaj izbrane vse vrstice. Če so bile vse vrstice že izbrane, se izbira vseh vrstic odstrani.</p>
+				<p>Bližnjica nima učinka, če je fokus na celici glave stolpca ali na polju za vnos besedila, saj brskalnik v tem primeru poskrbi za izbiro besedila.</p>
+			</description>
+		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Če je omogočena izbira celic:</span></p>
-				<p>Če je fokus znotraj tabele, se izbira za katerokoli vrstico in celico odstrani.</p>
+				<p><span class="emphasis">Če je omogočena izbira več vrstic:</span></p>
+				<p>Če je fokus na vrstici, celici ali kontrolniku v celici, se izbira vseh vrstic odstrani.</p>
+				<p>Bližnjica nima učinka, če je fokus na celici glave stolpca ali na polju vnosa besedila, saj brskalnik v tem primeru obravnava izbiro teksta.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>

@@ -1,41 +1,41 @@
-<a name="onFlVariantManagement"></a>
+<a name="onVariantManagement"></a>
 
-> **Note:** `onFlVariantManagement` is a deprecated alias (since 1.152) kept for cross-repo
+> **Note:** `onVariantManagement` is a deprecated alias (since 1.152) kept for cross-repo
 > compatibility. Prefer **`onVariantManagement`**, which is registered against the exact same
 > actions and assertions and drives the same `sap.m.VariantManagement` (used both by V4 control
 > variants and by the V2 comp `SmartVariantManagement`'s inner variant management). All methods
 > below apply identically to `onVariantManagement`.
 
-## onFlVariantManagement : <code>object</code>
+## onVariantManagement : <code>object</code>
 **Kind**: global namespace  
 
-* [onFlVariantManagement](#onFlVariantManagement) : <code>object</code>
-    * [.iOpenMyView(sFlVMId)](#onFlVariantManagement.iOpenMyView) ⇒ <code>Promise</code>
-    * [.iOpenSaveView(sFlVMId)](#onFlVariantManagement.iOpenSaveView) ⇒ <code>Promise</code>
-    * [.iOpenManageViews(sFlVMId)](#onFlVariantManagement.iOpenManageViews) ⇒ <code>Promise</code>
-    * [.iPressTheManageViewsSave(sFlVMId)](#onFlVariantManagement.iPressTheManageViewsSave) ⇒ <code>Promise</code>
-    * [.iPressTheManageViewsCancel(sFlVMId)](#onFlVariantManagement.iPressTheManageViewsCancel) ⇒ <code>Promise</code>
-    * [.iRenameVariant(sOriginalVariantName, sNewVariantName)](#onFlVariantManagement.iRenameVariant) ⇒ <code>Promise</code>
-    * [.iSetDefaultVariant(sVariantName)](#onFlVariantManagement.iSetDefaultVariant) ⇒ <code>Promise</code>
-    * [.iRemoveVariant(sVariantName)](#onFlVariantManagement.iRemoveVariant) ⇒ <code>Promise</code>
-    * [.iApplyAutomaticallyVariant(sVariantName, bApplyAuto)](#onFlVariantManagement.iApplyAutomaticallyVariant) ⇒ <code>Promise</code>
-    * [.iCreateNewVariant(sFlVMId, sVariantTitle, bDefault, bApplyAuto, bPublic)](#onFlVariantManagement.iCreateNewVariant) ⇒ <code>Promise</code>
-    * [.theVariantShouldBeDisplayed(sFlVMId, sVariantTitle)](#onFlVariantManagement.theVariantShouldBeDisplayed) ⇒ <code>Promise</code>
-    * [.theMyViewShouldContain(sFlVMId, aVariantNames)](#onFlVariantManagement.theMyViewShouldContain) ⇒ <code>Promise</code>
-    * [.theOpenSaveViewDialog(sFlVMId)](#onFlVariantManagement.theOpenSaveViewDialog) ⇒ <code>Promise</code>
-    * [.theOpenManageViewsDialog(sFlVMId)](#onFlVariantManagement.theOpenManageViewsDialog) ⇒ <code>Promise</code>
-    * [.theOpenManageViewsDialogTitleShouldContain(aVariantNames)](#onFlVariantManagement.theOpenManageViewsDialogTitleShouldContain) ⇒ <code>Promise</code>
-    * [.theOpenManageViewsDialogFavoritesShouldContain(aVariantFavorites)](#onFlVariantManagement.theOpenManageViewsDialogFavoritesShouldContain) ⇒ <code>Promise</code>
-    * [.theOpenManageViewsDialogApplyAutomaticallyShouldContain(aVariantApplayAutos)](#onFlVariantManagement.theOpenManageViewsDialogApplyAutomaticallyShouldContain) ⇒ <code>Promise</code>
-    * [.theOpenManageViewsDialogSharingShouldContain(aVariantSharing)](#onFlVariantManagement.theOpenManageViewsDialogSharingShouldContain) ⇒ <code>Promise</code>
-    * [.theOpenManageViewsDialogDefaultShouldBe(sVariantName)](#onFlVariantManagement.theOpenManageViewsDialogDefaultShouldBe) ⇒ <code>Promise</code>
+* [onVariantManagement](#onVariantManagement) : <code>object</code>
+    * [.iOpenMyView(sFlVMId)](#onVariantManagement.iOpenMyView) ⇒ <code>Promise</code>
+    * [.iOpenSaveView(sFlVMId)](#onVariantManagement.iOpenSaveView) ⇒ <code>Promise</code>
+    * [.iOpenManageViews(sFlVMId)](#onVariantManagement.iOpenManageViews) ⇒ <code>Promise</code>
+    * [.iPressTheManageViewsSave(sFlVMId)](#onVariantManagement.iPressTheManageViewsSave) ⇒ <code>Promise</code>
+    * [.iPressTheManageViewsCancel(sFlVMId)](#onVariantManagement.iPressTheManageViewsCancel) ⇒ <code>Promise</code>
+    * [.iRenameVariant(sOriginalVariantName, sNewVariantName)](#onVariantManagement.iRenameVariant) ⇒ <code>Promise</code>
+    * [.iSetDefaultVariant(sVariantName)](#onVariantManagement.iSetDefaultVariant) ⇒ <code>Promise</code>
+    * [.iRemoveVariant(sVariantName)](#onVariantManagement.iRemoveVariant) ⇒ <code>Promise</code>
+    * [.iApplyAutomaticallyVariant(sVariantName, bApplyAuto)](#onVariantManagement.iApplyAutomaticallyVariant) ⇒ <code>Promise</code>
+    * [.iCreateNewVariant(sFlVMId, sVariantTitle, bDefault, bApplyAuto, bPublic)](#onVariantManagement.iCreateNewVariant) ⇒ <code>Promise</code>
+    * [.theVariantShouldBeDisplayed(sFlVMId, sVariantTitle)](#onVariantManagement.theVariantShouldBeDisplayed) ⇒ <code>Promise</code>
+    * [.theMyViewShouldContain(sFlVMId, aVariantNames)](#onVariantManagement.theMyViewShouldContain) ⇒ <code>Promise</code>
+    * [.theOpenSaveViewDialog(sFlVMId)](#onVariantManagement.theOpenSaveViewDialog) ⇒ <code>Promise</code>
+    * [.theOpenManageViewsDialog(sFlVMId)](#onVariantManagement.theOpenManageViewsDialog) ⇒ <code>Promise</code>
+    * [.theOpenManageViewsDialogTitleShouldContain(aVariantNames)](#onVariantManagement.theOpenManageViewsDialogTitleShouldContain) ⇒ <code>Promise</code>
+    * [.theOpenManageViewsDialogFavoritesShouldContain(aVariantFavorites)](#onVariantManagement.theOpenManageViewsDialogFavoritesShouldContain) ⇒ <code>Promise</code>
+    * [.theOpenManageViewsDialogApplyAutomaticallyShouldContain(aVariantApplayAutos)](#onVariantManagement.theOpenManageViewsDialogApplyAutomaticallyShouldContain) ⇒ <code>Promise</code>
+    * [.theOpenManageViewsDialogSharingShouldContain(aVariantSharing)](#onVariantManagement.theOpenManageViewsDialogSharingShouldContain) ⇒ <code>Promise</code>
+    * [.theOpenManageViewsDialogDefaultShouldBe(sVariantName)](#onVariantManagement.theOpenManageViewsDialogDefaultShouldBe) ⇒ <code>Promise</code>
 
-<a name="onFlVariantManagement.iOpenMyView"></a>
+<a name="onVariantManagement.iOpenMyView"></a>
 
-### onFlVariantManagement.iOpenMyView(sFlVMId) ⇒ <code>Promise</code>
+### onVariantManagement.iOpenMyView(sFlVMId) ⇒ <code>Promise</code>
 Opens/Closes the My Views popup.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 
@@ -43,12 +43,12 @@ Opens/Closes the My Views popup.
 | --- | --- | --- |
 | sFlVMId | <code>string</code> | The fl variant management control ID. |
 
-<a name="onFlVariantManagement.iOpenSaveView"></a>
+<a name="onVariantManagement.iOpenSaveView"></a>
 
-### onFlVariantManagement.iOpenSaveView(sFlVMId) ⇒ <code>Promise</code>
+### onVariantManagement.iOpenSaveView(sFlVMId) ⇒ <code>Promise</code>
 Opens the Save View dialog.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 
@@ -56,12 +56,12 @@ Opens the Save View dialog.
 | --- | --- | --- |
 | sFlVMId | <code>string</code> | The fl variant management control ID |
 
-<a name="onFlVariantManagement.iOpenManageViews"></a>
+<a name="onVariantManagement.iOpenManageViews"></a>
 
-### onFlVariantManagement.iOpenManageViews(sFlVMId) ⇒ <code>Promise</code>
+### onVariantManagement.iOpenManageViews(sFlVMId) ⇒ <code>Promise</code>
 Opens the Manage Views dialog.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 
@@ -69,12 +69,12 @@ Opens the Manage Views dialog.
 | --- | --- | --- |
 | sFlVMId | <code>string</code> | The fl variant management control ID |
 
-<a name="onFlVariantManagement.iPressTheManageViewsSave"></a>
+<a name="onVariantManagement.iPressTheManageViewsSave"></a>
 
-### onFlVariantManagement.iPressTheManageViewsSave(sFlVMId) ⇒ <code>Promise</code>
+### onVariantManagement.iPressTheManageViewsSave(sFlVMId) ⇒ <code>Promise</code>
 Presses the Save button inside the Manage Views dialog.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 
@@ -82,12 +82,12 @@ Presses the Save button inside the Manage Views dialog.
 | --- | --- | --- |
 | sFlVMId | <code>string</code> | The fl variant management control ID |
 
-<a name="onFlVariantManagement.iPressTheManageViewsCancel"></a>
+<a name="onVariantManagement.iPressTheManageViewsCancel"></a>
 
-### onFlVariantManagement.iPressTheManageViewsCancel(sFlVMId) ⇒ <code>Promise</code>
+### onVariantManagement.iPressTheManageViewsCancel(sFlVMId) ⇒ <code>Promise</code>
 Presses the Cancel button inside the Manage Views dialog.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 
@@ -95,13 +95,13 @@ Presses the Cancel button inside the Manage Views dialog.
 | --- | --- | --- |
 | sFlVMId | <code>string</code> | The fl variant management control ID |
 
-<a name="onFlVariantManagement.iRenameVariant"></a>
+<a name="onVariantManagement.iRenameVariant"></a>
 
-### onFlVariantManagement.iRenameVariant(sOriginalVariantName, sNewVariantName) ⇒ <code>Promise</code>
+### onVariantManagement.iRenameVariant(sOriginalVariantName, sNewVariantName) ⇒ <code>Promise</code>
 Renames a variant.
 Prerequisite is an open Manage Views dialog.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 
@@ -110,13 +110,13 @@ Prerequisite is an open Manage Views dialog.
 | sOriginalVariantName | <code>string</code> | The previous name of a variant |
 | sNewVariantName | <code>string</code> | The new name of a variant |
 
-<a name="onFlVariantManagement.iSetDefaultVariant"></a>
+<a name="onVariantManagement.iSetDefaultVariant"></a>
 
-### onFlVariantManagement.iSetDefaultVariant(sVariantName) ⇒ <code>Promise</code>
+### onVariantManagement.iSetDefaultVariant(sVariantName) ⇒ <code>Promise</code>
 Sets the default for a variant.
 Prerequisite is an open Manage Views dialog.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 
@@ -124,13 +124,13 @@ Prerequisite is an open Manage Views dialog.
 | --- | --- | --- |
 | sVariantName | <code>string</code> | The name of the new default variant |
 
-<a name="onFlVariantManagement.iRemoveVariant"></a>
+<a name="onVariantManagement.iRemoveVariant"></a>
 
-### onFlVariantManagement.iRemoveVariant(sVariantName) ⇒ <code>Promise</code>
+### onVariantManagement.iRemoveVariant(sVariantName) ⇒ <code>Promise</code>
 Removes a variant.
 Prerequisite is an open Manage Views dialog.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 
@@ -138,13 +138,13 @@ Prerequisite is an open Manage Views dialog.
 | --- | --- | --- |
 | sVariantName | <code>string</code> | The name of the new default variant |
 
-<a name="onFlVariantManagement.iApplyAutomaticallyVariant"></a>
+<a name="onVariantManagement.iApplyAutomaticallyVariant"></a>
 
-### onFlVariantManagement.iApplyAutomaticallyVariant(sVariantName, bApplyAuto) ⇒ <code>Promise</code>
+### onVariantManagement.iApplyAutomaticallyVariant(sVariantName, bApplyAuto) ⇒ <code>Promise</code>
 Handles the Apply Automatically checkbox for a variant
 Prerequisite is an open Manage Views dialog.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 
@@ -153,12 +153,12 @@ Prerequisite is an open Manage Views dialog.
 | sVariantName | <code>string</code> | The name of the variant |
 | bApplyAuto | <code>boolean</code> | The Apply Automatically checkbox for the variant |
 
-<a name="onFlVariantManagement.iCreateNewVariant"></a>
+<a name="onVariantManagement.iCreateNewVariant"></a>
 
-### onFlVariantManagement.iCreateNewVariant(sFlVMId, sVariantTitle, bDefault, bApplyAuto, bPublic) ⇒ <code>Promise</code>
+### onVariantManagement.iCreateNewVariant(sFlVMId, sVariantTitle, bDefault, bApplyAuto, bPublic) ⇒ <code>Promise</code>
 Creates a new variant.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 
@@ -170,12 +170,12 @@ Creates a new variant.
 | bApplyAuto | <code>boolean</code> | The Apply Automatically for the variant |
 | bPublic | <code>boolean</code> | The Public information for the variant |
 
-<a name="onFlVariantManagement.theVariantShouldBeDisplayed"></a>
+<a name="onVariantManagement.theVariantShouldBeDisplayed"></a>
 
-### onFlVariantManagement.theVariantShouldBeDisplayed(sFlVMId, sVariantTitle) ⇒ <code>Promise</code>
+### onVariantManagement.theVariantShouldBeDisplayed(sFlVMId, sVariantTitle) ⇒ <code>Promise</code>
 Checks the expected variant title.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 
@@ -184,13 +184,13 @@ Checks the expected variant title.
 | sFlVMId | <code>string</code> | The fl variant management control ID |
 | sVariantTitle | <code>string</code> | The name of the expected variant |
 
-<a name="onFlVariantManagement.theMyViewShouldContain"></a>
+<a name="onVariantManagement.theMyViewShouldContain"></a>
 
-### onFlVariantManagement.theMyViewShouldContain(sFlVMId, aVariantNames) ⇒ <code>Promise</code>
+### onVariantManagement.theMyViewShouldContain(sFlVMId, aVariantNames) ⇒ <code>Promise</code>
 Checks the expected variant titles.
 Prerequisite is an open My Views popup.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 
@@ -199,12 +199,12 @@ Prerequisite is an open My Views popup.
 | sFlVMId | <code>string</code> | The fl variant management control ID |
 | aVariantNames | <code>array</code> | List of the expected variants |
 
-<a name="onFlVariantManagement.theOpenSaveViewDialog"></a>
+<a name="onVariantManagement.theOpenSaveViewDialog"></a>
 
-### onFlVariantManagement.theOpenSaveViewDialog(sFlVMId) ⇒ <code>Promise</code>
+### onVariantManagement.theOpenSaveViewDialog(sFlVMId) ⇒ <code>Promise</code>
 Checks is the expected Save View dialog is open.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 
@@ -212,12 +212,12 @@ Checks is the expected Save View dialog is open.
 | --- | --- | --- |
 | sFlVMId | <code>string</code> | The fl variant management control ID |
 
-<a name="onFlVariantManagement.theOpenManageViewsDialog"></a>
+<a name="onVariantManagement.theOpenManageViewsDialog"></a>
 
-### onFlVariantManagement.theOpenManageViewsDialog(sFlVMId) ⇒ <code>Promise</code>
+### onVariantManagement.theOpenManageViewsDialog(sFlVMId) ⇒ <code>Promise</code>
 Checks is the expected Manage Views dialog is open.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 
@@ -225,13 +225,13 @@ Checks is the expected Manage Views dialog is open.
 | --- | --- | --- |
 | sFlVMId | <code>string</code> | The fl variant management control ID |
 
-<a name="onFlVariantManagement.theOpenManageViewsDialogTitleShouldContain"></a>
+<a name="onVariantManagement.theOpenManageViewsDialogTitleShouldContain"></a>
 
-### onFlVariantManagement.theOpenManageViewsDialogTitleShouldContain(aVariantNames) ⇒ <code>Promise</code>
+### onVariantManagement.theOpenManageViewsDialogTitleShouldContain(aVariantNames) ⇒ <code>Promise</code>
 Checks the variants in the Manage Views dialog.
 Prerequisite is an open Manage Views dialog.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 
@@ -239,13 +239,13 @@ Prerequisite is an open Manage Views dialog.
 | --- | --- | --- |
 | aVariantNames | <code>array</code> | List of the expected variants |
 
-<a name="onFlVariantManagement.theOpenManageViewsDialogFavoritesShouldContain"></a>
+<a name="onVariantManagement.theOpenManageViewsDialogFavoritesShouldContain"></a>
 
-### onFlVariantManagement.theOpenManageViewsDialogFavoritesShouldContain(aVariantFavorites) ⇒ <code>Promise</code>
+### onVariantManagement.theOpenManageViewsDialogFavoritesShouldContain(aVariantFavorites) ⇒ <code>Promise</code>
 Checks the variants with the Favorite checkbox set in the Manage Views dialog.
 Prerequisite is an open Manage Views dialog.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 
@@ -253,13 +253,13 @@ Prerequisite is an open Manage Views dialog.
 | --- | --- | --- |
 | aVariantFavorites | <code>array</code> | List of the expected variants |
 
-<a name="onFlVariantManagement.theOpenManageViewsDialogApplyAutomaticallyShouldContain"></a>
+<a name="onVariantManagement.theOpenManageViewsDialogApplyAutomaticallyShouldContain"></a>
 
-### onFlVariantManagement.theOpenManageViewsDialogApplyAutomaticallyShouldContain(aVariantApplayAutos) ⇒ <code>Promise</code>
+### onVariantManagement.theOpenManageViewsDialogApplyAutomaticallyShouldContain(aVariantApplayAutos) ⇒ <code>Promise</code>
 Checks the variants with the Apply Automatically checkbox set in the Manage Views dialog.
 Prerequisite is an open Manage Views dialog.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 
@@ -267,13 +267,13 @@ Prerequisite is an open Manage Views dialog.
 | --- | --- | --- |
 | aVariantApplayAutos | <code>array</code> | List of the expected variants |
 
-<a name="onFlVariantManagement.theOpenManageViewsDialogSharingShouldContain"></a>
+<a name="onVariantManagement.theOpenManageViewsDialogSharingShouldContain"></a>
 
-### onFlVariantManagement.theOpenManageViewsDialogSharingShouldContain(aVariantSharing) ⇒ <code>Promise</code>
+### onVariantManagement.theOpenManageViewsDialogSharingShouldContain(aVariantSharing) ⇒ <code>Promise</code>
 Checks the variants for its sharing information.
 Prerequisite is an open Manage Views dialog.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 
@@ -281,13 +281,13 @@ Prerequisite is an open Manage Views dialog.
 | --- | --- | --- |
 | aVariantSharing | <code>array</code> | List of the expected sharing information of the variants |
 
-<a name="onFlVariantManagement.theOpenManageViewsDialogDefaultShouldBe"></a>
+<a name="onVariantManagement.theOpenManageViewsDialogDefaultShouldBe"></a>
 
-### onFlVariantManagement.theOpenManageViewsDialogDefaultShouldBe(sVariantName) ⇒ <code>Promise</code>
+### onVariantManagement.theOpenManageViewsDialogDefaultShouldBe(sVariantName) ⇒ <code>Promise</code>
 Checks for the expected default variant.
 Prerequisite is an open Manage Views dialog.
 
-**Kind**: static method of [<code>onFlVariantManagement</code>](#onFlVariantManagement)  
+**Kind**: static method of [<code>onVariantManagement</code>](#onVariantManagement)  
 **Returns**: <code>Promise</code> - The result of the [sap.ui.test.Opa5#waitFor](sap.ui.test.Opa5#waitFor) function, to be used for chained statements  
 **Access**: public  
 

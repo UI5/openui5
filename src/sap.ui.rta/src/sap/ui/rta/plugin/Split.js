@@ -68,29 +68,12 @@ sap.ui.define([
 	};
 
 	/**
-	 * @param {sap.ui.dt.ElementOverlay} oElementOverlay - Element overlay to split
+	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Element overlays to split
 	 * @returns {Promise<sap.ui.rta.command.Split>} Resolves with a split command
 	 */
-	Split.prototype.handler = async function(aElementOverlays, mPropertyBag) {
-		const oElementOverlay = aElementOverlays[0];
-		const oSplitElement = oElementOverlay.getElement();
-		const oAction = mPropertyBag.menuItem.action;
-		const aNewElementIds = [];
-
-		for (let i = 0; i < oAction.getControlsCount(oSplitElement); i++) {
-			aNewElementIds.push(FlexUtils.getViewForControl(oSplitElement).createId(uid()));
-		}
-
+	Split.prototype.handler = async function(aElementOverlays) {
 		try {
-			const oSplitCommand = await this.getCommandFactory().getCommandFor(oSplitElement, "split", {
-				newElementIds: aNewElementIds,
-				source: oSplitElement,
-				parentElement: oSplitElement.getParent()
-			}, oElementOverlay.getDesignTimeMetadata(), this.getVariantManagementReference(oElementOverlay, oAction));
-
-			this.fireElementModified({
-				command: oSplitCommand
-			});
+			return await this.createCommands(aElementOverlays[0]);
 		} catch (vError) {
 			throw DtUtil.propagateError(
 				vError,
@@ -105,7 +88,11 @@ sap.ui.define([
 	 * @override
 	 */
 	Split.prototype.getMenuItems = function(vElementOverlays) {
-		return this._getMenuItems(vElementOverlays, { pluginId: "CTX_UNGROUP_FIELDS", icon: "sap-icon://split" });
+		return this._getMenuItems(vElementOverlays, {
+			pluginId: "CTX_UNGROUP_FIELDS",
+			icon: "sap-icon://split",
+			description: "split a combined element back into its individual elements"
+		});
 	};
 
 	/**
@@ -113,6 +100,36 @@ sap.ui.define([
 	 */
 	Split.prototype.getActionName = function() {
 		return "split";
+	};
+
+	/**
+	 * Creates the split command and fires the "elementModified" event.
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Target overlay
+	 * @returns {Promise} Resolves once the command has been created and the event has been fired
+	 * @since 1.153
+	 */
+	Split.prototype.createCommands = async function(oOverlay) {
+		const oSplitElement = oOverlay.getElement();
+		const oAction = this.getAction(oOverlay);
+		if (!oAction) {
+			throw new Error(`No split action available for ${oSplitElement.getId()}`);
+		}
+		const aNewElementIds = [];
+
+		for (let i = 0; i < oAction.getControlsCount(oSplitElement); i++) {
+			aNewElementIds.push(FlexUtils.getViewForControl(oSplitElement).createId(uid()));
+		}
+
+		const oSplitCommand = await this.getCommandFactory().getCommandFor(oSplitElement, "split", {
+			newElementIds: aNewElementIds,
+			source: oSplitElement,
+			parentElement: oSplitElement.getParent()
+		}, oOverlay.getDesignTimeMetadata(), this.getVariantManagementReference(oOverlay, oAction));
+
+		this.fireElementModified({
+			command: oSplitCommand
+		});
+		return oSplitCommand;
 	};
 
 	return Split;

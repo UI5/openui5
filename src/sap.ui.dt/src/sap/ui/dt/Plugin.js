@@ -394,6 +394,7 @@ sap.ui.define([
 	 * @param {object} [mPropertyBag.action] - The action object defined in the designtime, if the plugin wants to define it by itself instead of taking it from the designtime
 	 * @param {object[]} [mPropertyBag.submenu] - All submenu items if the item should open a submenu
 	 * @param {string} [mPropertyBag.additionalInfoKey] - The key for the additional information defined by the plugin
+	 * @param {string} [mPropertyBag.description] - A human-readable description of what the menu item's action does, used by programmatic consumers of the menu item
 	 * @return {object[]} Returns an array with the object containing the required data for a context menu item
 	 */
 	Plugin.prototype._getMenuItems = async function(aElementOverlays, mPropertyBag) {
@@ -404,7 +405,11 @@ sap.ui.define([
 			rank: mPropertyBag.rank,
 			icon: mPropertyBag.icon,
 			bAsSibling: mPropertyBag.bAsSibling,
-			submenu: mPropertyBag.submenu
+			submenu: mPropertyBag.submenu,
+			createCommands: this.createCommands?.bind(this),
+			description: mPropertyBag.description,
+			parameters: this.getParameters?.() || [],
+			getContext: this.getContext?.bind(this)
 		}, aElementOverlays);
 
 		// menu items with submenus don't trigger an action and must always be enabled
