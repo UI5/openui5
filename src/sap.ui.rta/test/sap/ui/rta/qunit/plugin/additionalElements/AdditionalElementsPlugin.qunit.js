@@ -1829,6 +1829,7 @@ sap.ui.define([
 			const aMenuItems = await this.oPlugin.getMenuItems([oOverlay]);
 			assert.ok(aMenuItems[0].enabled([oOverlay], aMenuItems[0]),
 				"then the MenuItem creation is not blocked by the _isEditableCheck");
+			assert.strictEqual(aMenuItems[0].aggregationRelevant, true, "then the action is flagged as aggregation-relevant");
 		});
 	});
 

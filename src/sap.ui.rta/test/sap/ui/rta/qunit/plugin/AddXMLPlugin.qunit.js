@@ -119,6 +119,7 @@ sap.ui.define([
 		QUnit.test("Menu Item, positive case", async function(assert) {
 			const aMenuItems = await this.oAddXmlPlugin.getMenuItems([this.oPanelOverlay]);
 			assert.strictEqual(aMenuItems[0].icon, "sap-icon://attachment-html", "then the icon is set correctly");
+			assert.strictEqual(aMenuItems[0].aggregationRelevant, true, "then the action is flagged as aggregation-relevant");
 			assert.strictEqual(
 				aMenuItems[0].text, oResourceBundle.getText("CTX_ADDXML"), "then the text is set correctly");
 			assert.strictEqual(aMenuItems[0].additionalInfo,
