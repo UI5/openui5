@@ -1167,4 +1167,31 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.test("B1: Title stays visible at XS width when the header has no avatar", async function (assert) {
+		// Arrange - avatar-less header in a shrink-to-fit container (as with
+		// nested cards). The XS rule must not collapse the lone title. ACC-260.
+		const oWrapper = document.createElement("div");
+		oWrapper.style.display = "flex";
+		oWrapper.style.alignItems = "flex-start";
+		document.getElementById(DOM_RENDER_LOCATION).appendChild(oWrapper);
+
+		// Intermediate flex item with no width -> it shrinks to the card's
+		// content, so the card width is driven by the header content.
+		const oHost = document.createElement("div");
+		oWrapper.appendChild(oHost);
+
+		const oHeader = new CardHeader({ title: "Child Card" });
+		this.oCard = new Card({ header: oHeader });
+		this.oCard.placeAt(oHost);
+
+		// Act
+		await nextUIUpdate();
+		await this.waitForXSClass(true);
+
+		// Assert
+		const oText = oHeader.getDomRef().querySelector(".sapFCardHeaderText");
+		assert.ok(oHeader.getDomRef().classList.contains("sapFCardXSHeader"), "Header is in XS layout");
+		assert.ok(oText.getBoundingClientRect().width > 0, "Title text area keeps a non-zero width without an avatar");
+	});
+
 });
