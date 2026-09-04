@@ -636,9 +636,27 @@ sap.ui.define([
 		// Act
 		const oPopup = this.oTooltip._ensurePopup();
 
-		// Assert — getFollowOf() returns a function when CLOSE_ON_SCROLL is active
+		// Assert — getFollowOf() returns a function (scroll-close handler)
 		assert.strictEqual(typeof oPopup.getFollowOf(), "function",
-			"getFollowOf() returns a function (CLOSE_ON_SCROLL handler)");
+			"getFollowOf() returns a function (scroll-close handler)");
+	});
+
+	QUnit.test("scroll (followOf) closes the tooltip instantly, cancelling a pending delayed close", function(assert) {
+		const oPopup = this.oTooltip._ensurePopup();
+		const oCloseSpy = sinon.spy(this.oTooltip, "close");
+
+		// A delayed close (e.g. mouseout during scroll) is pending.
+		this.oTooltip._bIsOpen = true;
+		this.oTooltip.close(500);
+		assert.ok(this.oTooltip._iCloseTimeout, "delayed close scheduled");
+
+		// The scroll poll fires the wired followOf handler.
+		oPopup.getFollowOf()();
+
+		assert.ok(oCloseSpy.calledWith(0), "followOf routed through Tooltip.close(0)");
+		assert.strictEqual(this.oTooltip._iCloseTimeout, null,
+			"pending delayed close was cancelled");
+		oCloseSpy.restore();
 	});
 
 	QUnit.test("Popup has autoClose enabled", function(assert) {
