@@ -182,6 +182,8 @@ sap.ui.define([
 				undefined,
 				"the additionalInfo is not given as expected"
 			);
+			assert.strictEqual(aMenuItems[0].aggregationRelevant, true, "the first action is flagged as aggregation-relevant");
+			assert.strictEqual(aMenuItems[1].aggregationRelevant, true, "the second action is flagged as aggregation-relevant");
 		});
 
 		QUnit.test("when an overlay has no addIFrame action designTimeMetadata", async function(assert) {

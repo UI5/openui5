@@ -641,7 +641,8 @@ sap.ui.define([
 				bAsSibling: bOverlayIsSibling,
 				action: oAction,
 				text: bHasSubMenu ? oTextResources.getText("CTX_ADD_ELEMENTS_WITH_SUBMENU") : null,
-				description: `add additional elements (e.g. previously hidden fields or new fields via delegate) into the ${sAggregationName} aggregation`
+				description: `add additional elements (e.g. previously hidden fields or new fields via delegate) into the ${sAggregationName} aggregation`,
+				aggregationRelevant: true
 			});
 			return oMenuItem[0];
 		},
@@ -677,7 +678,8 @@ sap.ui.define([
 					icon: bOverlayIsSibling ? "sap-icon://BusinessSuiteInAppSymbols/icon-add-outside" : "sap-icon://add",
 					bAsSibling: bOverlayIsSibling,
 					action: oActions[sAggregationName],
-					description: `add additional elements (e.g. previously hidden fields or new fields via delegate) into the '${sAggregationName}' aggregation`
+					description: `add additional elements (e.g. previously hidden fields or new fields via delegate) into the '${sAggregationName}' aggregation`,
+					aggregationRelevant: true
 				}))[0];
 				oItem.displayText = sDisplayText;
 				aSubMenuItems.push(this.enhanceItemWithResponsibleElement(oItem, aElementOverlays, ["addViaDelegate", "reveal", "custom"]));

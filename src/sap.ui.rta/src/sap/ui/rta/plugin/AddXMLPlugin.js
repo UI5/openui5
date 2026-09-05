@@ -187,7 +187,8 @@ sap.ui.define([
 			pluginId: "CTX_ADDXML",
 			icon: "sap-icon://attachment-html",
 			additionalInfoKey: "ADDXML_RTA_CONTEXT_MENU_INFO",
-			description: "add an XML fragment to a target aggregation of the element"
+			description: "add an XML fragment to a target aggregation of the element",
+			aggregationRelevant: true
 		});
 	};
 

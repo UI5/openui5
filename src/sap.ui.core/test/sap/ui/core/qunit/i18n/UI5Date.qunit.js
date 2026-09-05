@@ -418,7 +418,7 @@ sap.ui.define([
 		this.mock(TimezoneUtils).expects("_getDateFromParts")
 			.withExactArgs(oFixture.oExpectedParts)
 			.returns(oNewDate);
-		this.mock(oNewDate).expects("getTime").withExactArgs().returns(42);
+		this.mock(oNewDate).expects("getTime").exactly(2).withExactArgs().returns(42);
 		this.mock(TimezoneUtils).expects("calculateOffset")
 			.withExactArgs(sinon.match.same(oNewDate),"~timezoneID")
 			.returns(3600);
@@ -520,7 +520,7 @@ sap.ui.define([
 		this.mock(TimezoneUtils).expects("_getDateFromParts")
 			.withExactArgs(oFixture.oExpectedParts)
 			.returns(oNewDate);
-		this.mock(oNewDate).expects("getTime").withExactArgs().returns(42);
+		this.mock(oNewDate).expects("getTime").exactly(2).withExactArgs().returns(42);
 		this.mock(TimezoneUtils).expects("calculateOffset")
 			.withExactArgs(sinon.match.same(oNewDate),"~timezoneID")
 			.returns(3600);
@@ -549,7 +549,7 @@ sap.ui.define([
 		this.mock(TimezoneUtils).expects("_getDateFromParts")
 			.withExactArgs(oFixture.oExpectedParts)
 			.returns(oNewDate);
-		this.mock(oNewDate).expects("getTime").withExactArgs().returns(42);
+		this.mock(oNewDate).expects("getTime").exactly(2).withExactArgs().returns(42);
 		this.mock(TimezoneUtils).expects("calculateOffset")
 			.withExactArgs(sinon.match.same(oNewDate),"~timezoneID")
 			.returns(3600);
@@ -835,7 +835,7 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("getInstance: different configured and local time zone", function (assert) {
 		var oUI5Date,
-			oMockedDate = {};
+			oMockedDate = {getTime() {}};
 
 		this.mock(Localization).expects("getTimezone").withExactArgs().returns("~configuredTimezone");
 		this.mock(TimezoneUtils).expects("getLocalTimezone").withExactArgs().returns("~localTimezone");
@@ -900,7 +900,7 @@ sap.ui.define([
 		oJSDateMock.expects("getTimezoneOffset").withExactArgs()
 			// simulate no daylight saving time shift
 			.returns(new Date(oJSDate - /*2 hours = max time shift*/7200000).getTimezoneOffset());
-		oJSDateMock.expects("getTime").withExactArgs().returns(oJSDate.valueOf());
+		oJSDateMock.expects("getTime").withExactArgs().exactly(2).returns(oJSDate.valueOf());
 		oExpectation = this.mock(UI5Date.prototype).expects("_setParts")
 			.withExactArgs(aAllParts,
 				["~fullYear", "~month", "~date", "~hours", "~minutes", "~seconds", "~milliseconds"])
@@ -922,19 +922,19 @@ sap.ui.define([
 	aPartsToSet:["~fullYear", "0", 1, "2", 3, "~seconds", "~milliseconds"]
 }, {
 	aDateParts: ["2023-02-03T04:05:06.789"],
-	aPartsToSet:["~fullYear", 1, "03", "04", "05", "~seconds", "~milliseconds"]
+	aPartsToSet:["~fullYear", 1, 3, 4, 5, "~seconds", "~milliseconds"]
 }, {
 	aDateParts: ["2023-2-3 4:5:6.789"],
-	aPartsToSet:["~fullYear", 1, "3", "4", "5", "~seconds", "~milliseconds"]
+	aPartsToSet:["~fullYear", 1, 3, 4, 5, "~seconds", "~milliseconds"]
 }, {
 	aDateParts: ["2023-02-03T04:05"],
-	aPartsToSet:["~fullYear", 1, "03", "04", "05", "~seconds", "~milliseconds"]
+	aPartsToSet:["~fullYear", 1, 3, 4, 5, "~seconds", "~milliseconds"]
 }, {
 	aDateParts: ["2023-2-3 4:5"],
-	aPartsToSet:["~fullYear", 1, "3", "4", "5", "~seconds", "~milliseconds"]
+	aPartsToSet:["~fullYear", 1, 3, 4, 5, "~seconds", "~milliseconds"]
 }, {
 	aDateParts: ["2023-2-3"],
-	aPartsToSet:["~fullYear", 1, "3", 0, 0, "~seconds", "~milliseconds"]
+	aPartsToSet:["~fullYear", 1, 3, 0, 0, "~seconds", "~milliseconds"]
 }].forEach((oFixture, i) => {
 	const sTitle = "UI5Date: timestamp parts in local time zone; DST switch in local time zone to DST time -> fix it, #"
 		+ i;
@@ -954,7 +954,7 @@ sap.ui.define([
 		oJSDateMock.expects("getTimezoneOffset").withExactArgs()
 			// simulate daylight saving time shift to daylight saving time -> time shift has to be fixed
 			.returns(new Date(oJSDate - /*2 hours = max time shift*/7200000).getTimezoneOffset() - 1);
-		oJSDateMock.expects("getTime").withExactArgs().returns(oJSDate.valueOf());
+		oJSDateMock.expects("getTime").withExactArgs().exactly(2).returns(oJSDate.valueOf());
 		const oExpectation = this.mock(UI5Date.prototype).expects("_setParts")
 			.withExactArgs(aAllParts, oFixture.aPartsToSet)
 			.returns("~notRelevant");
@@ -985,7 +985,7 @@ sap.ui.define([
 		oJSDateMock.expects("getTimezoneOffset").withExactArgs()
 			// simulate daylight saving time shift to daylight saving time -> time shift has to be fixed
 			.returns(new Date(oJSDate - /*2 hours = max time shift*/7200000).getTimezoneOffset() - 1);
-		oJSDateMock.expects("getTime").withExactArgs().returns(oJSDate.valueOf());
+		oJSDateMock.expects("getTime").withExactArgs().exactly(2).returns(oJSDate.valueOf());
 		this.oLogMock.expects("warning")
 			.withExactArgs("UI5Date for '" + sTimestamp + "' cannot be ensured to be correct as it is near"
 				+ " the change from standard time to daylight saving time in the current browser locale;"
@@ -1027,7 +1027,7 @@ sap.ui.define([
 		oJSDateMock.expects("getTimezoneOffset").withExactArgs()
 			// simulate daylight saving time shift to daylight saving time -> time shift has to be fixed
 			.returns(new Date(oJSDate - /*2 hours = max time shift*/7200000).getTimezoneOffset() + 1);
-		oJSDateMock.expects("getTime").withExactArgs().returns(oJSDate.valueOf());
+		oJSDateMock.expects("getTime").withExactArgs().exactly(2).returns(oJSDate.valueOf());
 		const oExpectation = this.mock(UI5Date.prototype).expects("_setParts")
 			.withExactArgs(aAllParts,
 				["~fullYear", "~month", "~date", "~hours", "~minutes", "~seconds", "~milliseconds"])

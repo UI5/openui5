@@ -41,6 +41,7 @@ sap.ui.define([
 	 *    text: &lt;string&gt;, // Action name
 	 *    description: &lt;string&gt;, // Human-readable description of what the action does
 	 *    parameters: &lt;object[]&gt;, // Parameters accepted by the action's command factory
+	 *    aggregationRelevant: &lt;boolean&gt;, // Whether the action's payload depends on aggregation structure
 	 *    createCommands: &lt;function&gt;, // Creates the command(s) for the action from the given parameters
 	 *    getContext: &lt;function&gt;, // Returns action-specific context for the target overlay
 	 * }
@@ -60,6 +61,9 @@ sap.ui.define([
 	 * @property {string} [description] - Human-readable description of what the action does, for programmatic consumers
 	 * @property {sap.ui.rta.service.Action.ActionParameter[]} [parameters] - Parameters accepted by the action's
 	 *   command factory. Empty array when the underlying plugin does not declare any.
+	 * @property {boolean} [aggregationRelevant] - Whether the action's payload depends on aggregation structure
+	 *   (e.g. move, add). Programmatic consumers use this to decide if aggregation information must be collected.
+	 *   Defaults to <code>false</code>.
 	 * @property {function} [createCommands] - Bound plugin method that creates the command(s) for the action from a
 	 *   given target overlay and a parameter map (as described by <code>parameters</code>)
 	 * @property {function} [getContext] - Bound plugin method that returns action-specific context for a target overlay,
@@ -115,7 +119,7 @@ sap.ui.define([
 		function pickAction(mMenuItem) {
 			const mAction = _pick(mMenuItem, [
 				"id", "icon", "rank", "group", "enabled", "text",
-				"description", "parameters", "createCommands", "getContext"
+				"description", "parameters", "aggregationRelevant", "createCommands", "getContext"
 			]);
 			if (mMenuItem.submenu) {
 				mAction.submenu = mMenuItem.submenu.map(function(mSubMenuItem) {

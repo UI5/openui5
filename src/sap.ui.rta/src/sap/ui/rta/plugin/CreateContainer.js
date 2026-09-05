@@ -116,7 +116,8 @@ sap.ui.define([
 				bAsSibling: sPluginId === "CTX_CREATE_SIBLING_CONTAINER",
 				text: this.getCreateContainerText(sPluginId === "CTX_CREATE_SIBLING_CONTAINER", aElementOverlays[0], oAction),
 				action: oAction,
-				description: "create a new container (e.g. group/section) as sibling or child of the element"
+				description: "create a new container (e.g. group/section) as sibling or child of the element",
+				aggregationRelevant: true
 			});
 		}));
 		return aMenuItems.flat();

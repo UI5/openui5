@@ -6,6 +6,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
 	"sap/ui/fl/apply/_internal/flexState/compVariants/CompVariantManagementState",
+	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/write/_internal/flexState/compVariants/CompVariantManager",
@@ -23,6 +24,7 @@ sap.ui.define([
 	FlexObjectFactory,
 	States,
 	CompVariantManagementState,
+	FlexObjectState,
 	FlexState,
 	Settings,
 	CompVariantManager,
@@ -886,6 +888,7 @@ sap.ui.define([
 
 	QUnit.module("updateVariant", {
 		async beforeEach() {
+			sandbox.stub(Storage, "write").resolves();
 			await FlexState.initialize({
 				reference: sComponentId,
 				componentId: sComponentId
@@ -912,6 +915,11 @@ sap.ui.define([
 			};
 
 			this.oVariant = CompVariantManager.addVariant(this.oVariantData);
+			await CompVariantManager.persist({
+				reference: sComponentId,
+				control: oComponent,
+				persistencyKey: this.sPersistencyKey
+			});
 		},
 		afterEach() {
 			FlexState.clearState(sComponentId);
@@ -919,6 +927,8 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("Given updateVariant is called on an updatable variant", function(assert) {
+			// call the function to initialize the dirty flex objects cache
+			FlexObjectState.getDirtyFlexObjects(sComponentId);
 			// Set favorite to false
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
@@ -931,6 +941,9 @@ sap.ui.define([
 				name: "newName",
 				visible: false
 			});
+			const aDirtyFlexObjects = FlexObjectState.getDirtyFlexObjects(sComponentId);
+			assert.strictEqual(aDirtyFlexObjects.length, 1, "then one dirty flex object is returned");
+			assert.strictEqual(aDirtyFlexObjects[0].getId(), this.oVariant.getId(), "then the updated variant is returned as dirty");
 			assert.strictEqual(this.oVariant.getLayer(), Layer.VENDOR, "the layer of the variant is VENDOR");
 			assert.strictEqual(this.oVariant.getSupportInformation().user, "SAP", "the author is SAP");
 			assert.strictEqual(this.oVariant.getFavorite(), false, "the favorite was set to false for the variant");
