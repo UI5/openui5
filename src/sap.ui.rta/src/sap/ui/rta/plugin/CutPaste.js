@@ -205,7 +205,8 @@ sap.ui.define([
 			rank: this.getRank("CTX_PASTE"),
 			action: { dummyAction: true, id: "CTX_PASTE" },
 			bAsSibling: false,
-			description: "move a previously cut element into the given target"
+			description: "move a previously cut element into the given target",
+			aggregationRelevant: true
 		}))[0];
 		const oCutMenuItem = (await this._getMenuItems(aElementOverlays, {
 			pluginId: "CTX_CUT",
@@ -214,7 +215,8 @@ sap.ui.define([
 			rank: this.getRank("CTX_CUT"),
 			action: { dummyAction: true, id: "CTX_CUT" },
 			bAsSibling: true,
-			description: "move the element to a different position by specifying a target id, aggregation and index"
+			description: "move the element to a different position by specifying a target id, aggregation and index",
+			aggregationRelevant: true
 		}))[0];
 		return [oCutMenuItem, oPasteMenuItem].filter(Boolean);
 	};

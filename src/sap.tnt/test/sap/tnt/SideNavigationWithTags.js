@@ -36,20 +36,20 @@ sap.ui.define([
 				  })
 			  }),
 			  new NavigationListItem({
-				  text: 'Favorites',
+				  text: 'Favorites Long Text Favorites Long Text',
 				  icon: 'sap-icon://unfavorite',
 				  expanded: true,
 				  selectable: false,
 				  tag: new ObjectStatus({
-					  text: "Beta",
+					  text: "Beta Long Text Beta Long Text Beta Long Text",
 					  state: "Indication15",
 					  inverted: true
 				  }),
 				  items: [
 					  new NavigationListItem({
-						  text: 'My Accounts',
+						  text: 'My Accounts Long Text My Accounts Long Text',
 						  tag: new ObjectStatus({
-							  text: "Active",
+							  text: "Active Long Text Active Long Text Active Long Text Active Long Text",
 							  state: "Indication18",
 							  inverted: true
 						  })
@@ -61,6 +61,9 @@ sap.ui.define([
 							  state: "Indication17",
 							  inverted: true
 						  })
+					  }),
+					  new NavigationListItem({
+						  text: 'No tag'
 					  })
 				  ]
 			  }),
@@ -111,7 +114,7 @@ sap.ui.define([
 						  })
 					  }),
 					  new NavigationListItem({
-						  text: 'Feature B',
+						  text: 'Feature B Long Title Title',
 						  tag: new ObjectStatus({
 							  text: "Deprecated",
 							  state: "Indication18",
@@ -124,7 +127,7 @@ sap.ui.define([
 				  ]
 			  }),
 			  new NavigationListItem({
-				  text: 'Documentation',
+				  text: 'Documentation Long Text',
 				  icon: 'sap-icon://sys-help',
 				  tag: new ObjectStatus({
 					  text: "Updated",
@@ -175,6 +178,9 @@ sap.ui.define([
 			  new NavigationListItem({
 				  text: 'Administration',
 				  icon: 'sap-icon://settings',
+				  href: 'https://sap.com',
+				  target: '_blank',
+				  selectable: false,
 				  tag: new ObjectStatus({
 					  text: "Long tag Long tag",
 					  state: "Indication17",
@@ -186,10 +192,13 @@ sap.ui.define([
 	  fixedItem: new NavigationList({
 		  items: [
 			  new NavigationListItem({
-				  text: 'Support',
+				  text: 'Support Long Text Support Long Text',
 				  icon: 'sap-icon://phone',
+				  href: 'https://sap.com',
+				  target: '_blank',
+				  selectable: false,
 				  tag: new ObjectStatus({
-					  text: "24/7",
+					  text: "24/7 Long Text 24/7 Long Text 24/7 Long Text",
 					  state: "Indication16",
 					  inverted: true
 				  })

@@ -395,6 +395,7 @@ sap.ui.define([
 	 * @param {object[]} [mPropertyBag.submenu] - All submenu items if the item should open a submenu
 	 * @param {string} [mPropertyBag.additionalInfoKey] - The key for the additional information defined by the plugin
 	 * @param {string} [mPropertyBag.description] - A human-readable description of what the menu item's action does, used by programmatic consumers of the menu item
+	 * @param {boolean} [mPropertyBag.aggregationRelevant] - Whether the action's payload depends on aggregation structure (e.g. move, add), used by programmatic consumers to decide if aggregation information must be collected. Defaults to <code>false</code>
 	 * @return {object[]} Returns an array with the object containing the required data for a context menu item
 	 */
 	Plugin.prototype._getMenuItems = async function(aElementOverlays, mPropertyBag) {
@@ -409,6 +410,7 @@ sap.ui.define([
 			createCommands: this.createCommands?.bind(this),
 			description: mPropertyBag.description,
 			parameters: this.getParameters?.() || [],
+			aggregationRelevant: mPropertyBag.aggregationRelevant || false,
 			getContext: this.getContext?.bind(this)
 		}, aElementOverlays);
 

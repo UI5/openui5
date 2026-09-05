@@ -55,7 +55,7 @@ function(
 		}
 	}, function() {
 		QUnit.test("When retrieving the context menu items", async function(assert) {
-			assert.expect(9);
+			assert.expect(11);
 			let bIsCutAvailable = true;
 			const oMockParentAggregationOverlay = {
 				getDesignTimeMetadata() {}
@@ -109,12 +109,14 @@ function(
 
 			const aMenuItems = await this.oCutPastePlugin.getMenuItems([oMockOverlay]);
 			assert.strictEqual(aMenuItems[0].id, "CTX_CUT", "'getMenuItems' returns a context menu item for 'cut'");
+			assert.strictEqual(aMenuItems[0].aggregationRelevant, true, "the cut action is flagged as aggregation-relevant");
 			await aMenuItems[0].handler([oMockOverlay], { menuItem: aMenuItems[0] });
 			assert.strictEqual(
 				aMenuItems[0].enabled([oMockOverlay], aMenuItems[0]), true,
 				"the 'enabled' function returns true for single selection"
 			);
 			assert.strictEqual(aMenuItems[1].id, "CTX_PASTE", "'getMenuItems' returns a context menu item for 'paste'");
+			assert.strictEqual(aMenuItems[1].aggregationRelevant, true, "the paste action is flagged as aggregation-relevant");
 			await aMenuItems[1].handler([oMockOverlay], { menuItem: aMenuItems[1] });
 			aMenuItems[1].enabled([oMockOverlay], aMenuItems[1]);
 
