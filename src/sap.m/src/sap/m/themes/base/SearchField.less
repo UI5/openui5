@@ -3,19 +3,21 @@
 /* Base theme                         */
 /* ================================== */
 
-@_sap_m_SearchField_Height: 3rem;
-@_sap_m_SearchField_ButtonSize: 2.375rem;
-@_sap_m_SearchField_ButtonFontSize: 1.125rem;
-@_sap_m_SearchField_CompactButtonLineHeight: 1.5rem;
-@_sap_m_SearchField_Compact_FormPaddingLeft: 0.375rem;
-@_sap_m_SearchField_ResetIcon: '\e1c7';
-@_sap_m_SearchField_SearchIcon: '\e00d';
-@_sap_m_SearchField_PlaceholderColor: var(--sapField_PlaceholderTextColor);
-@_sap_m_SearchField_Border: var(--sapField_BorderWidth) var(--sapField_BorderStyle) var(--sapField_BorderColor);
-@_sap_m_SearchField_FocusOffset: 1px;
-@_sap_m_SearchField_FocusBorderRadius: unset;
-@_sap_m_SearchField_PlaceholderFontStyle: italic;
-@_sap_m_SearchField_ActiveBackgroundStyle: var(--sapField_Focus_Background);
+.sapUI5Scope {
+	--_sap_m_SearchField_Height: 3rem;
+	--_sap_m_SearchField_ButtonSize: 2.375rem;
+	--_sap_m_SearchField_ButtonFontSize: 1.125rem;
+	--_sap_m_SearchField_CompactButtonLineHeight: 1.5rem;
+	--_sap_m_SearchField_Compact_FormPaddingLeft: 0.375rem;
+	--_sap_m_SearchField_ResetIcon: '\e1c7';
+	--_sap_m_SearchField_SearchIcon: '\e00d';
+	--_sap_m_SearchField_PlaceholderColor: var(--sapField_PlaceholderTextColor);
+	--_sap_m_SearchField_Border: var(--sapField_BorderWidth) var(--sapField_BorderStyle) var(--sapField_BorderColor);
+	--_sap_m_SearchField_FocusOffset: 1px;
+	--_sap_m_SearchField_FocusBorderRadius: unset;
+	--_sap_m_SearchField_PlaceholderFontStyle: italic;
+	--_sap_m_SearchField_ActiveBackgroundStyle: var(--sapField_Focus_Background);
+}
 
 .sapMSF {
 	position: relative;
@@ -26,7 +28,7 @@
 	box-sizing: border-box;
 	width: 100%;
 	min-width: 7rem;
-	height: @_sap_m_SearchField_Height;
+	height: var(--_sap_m_SearchField_Height);
 	background: transparent;
 	padding: 0.25rem 0;
 }
@@ -43,11 +45,11 @@ html.sap-desktop .sapMFocus > .sapMSFF::before {
 	border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapField_Active_BorderColor);
 	position: absolute;
 	content: ' ';
-	top: @_sap_m_SearchField_FocusOffset;
-	right: @_sap_m_SearchField_FocusOffset;
-	left: @_sap_m_SearchField_FocusOffset;
-	bottom: @_sap_m_SearchField_FocusOffset;
-	border-radius: @_sap_m_SearchField_FocusBorderRadius;
+	top: var(--_sap_m_SearchField_FocusOffset);
+	right: var(--_sap_m_SearchField_FocusOffset);
+	left: var(--_sap_m_SearchField_FocusOffset);
+	bottom: var(--_sap_m_SearchField_FocusOffset);
+	border-radius: var(--_sap_m_SearchField_FocusBorderRadius);
 	z-index: 2;
 	pointer-events: none;
 }
@@ -88,7 +90,7 @@ input.sapMSFI[type='search']:focus {
 	box-sizing: border-box;
 	height: var(--sapElement_Height);
 	box-shadow: var(--sapField_Shadow);
-	border: @_sap_m_SearchField_Border;
+	border: var(--_sap_m_SearchField_Border);
 	background: var(--sapField_BackgroundStyle);
 	background-color: var(--sapField_Background);
 	vertical-align: top;
@@ -103,7 +105,7 @@ input.sapMSFI[type='search']:focus {
 	display: inline-block;
 }
 
-.sapMFocus>.sapMSFF {
+.sapMFocus > .sapMSFF {
 	border-color: var(--sapField_Focus_BorderColor);
 }
 
@@ -113,13 +115,13 @@ input.sapMSFI[type='search']:focus {
 }
 
 :not(.sapMSFDisabled) > .sapMSFF:active {
-	background: @_sap_m_SearchField_ActiveBackgroundStyle;
+	background: var(--_sap_m_SearchField_ActiveBackgroundStyle);
 }
 
 .sapMSFI {
 	color: var(--sapField_TextColor);
 	font-family: var(--sapFontFamily);
-	font-size: @sapMFontMediumSize;
+	font-size: var(--sapFontSize);
 	background: transparent;
 	height: 100%;
 	border: none;
@@ -143,14 +145,14 @@ input.sapMSFI[type='search']:focus {
 }
 
 .sapMSFB {
-	width: @_sap_m_SearchField_ButtonSize;
+	width: var(--_sap_m_SearchField_ButtonSize);
 	height: 100%;
-	line-height: @_sap_m_SearchField_ButtonSize;
-	font-size: @_sap_m_SearchField_ButtonFontSize;
+	line-height: var(--_sap_m_SearchField_ButtonSize);
+	font-size: var(--_sap_m_SearchField_ButtonFontSize);
 	color: var(--sapContent_IconColor);
 	text-align: center;
 	cursor: pointer;
-	padding:0;
+	padding: 0;
 	box-sizing: border-box;
 }
 
@@ -162,7 +164,7 @@ input.sapMSFI[type='search']:focus {
 }
 
 .sapMSFR::after {
-	content: @_sap_m_SearchField_ResetIcon;
+	content: var(--_sap_m_SearchField_ResetIcon);
 }
 
 .sapMSFVal > .sapMSFF .sapMSFR,
@@ -172,12 +174,12 @@ input.sapMSFI[type='search']:focus {
 
 /* search icon in place of the reset button */
 :not(.sapMSFVal) > .sapMSFReload .sapMSFR::after {
-	content: @_sap_m_SearchField_SearchIcon;
+	content: var(--_sap_m_SearchField_SearchIcon);
 }
 
 /* search button */
 .sapMSFS::after {
-	content: @_sap_m_SearchField_SearchIcon;
+	content: var(--_sap_m_SearchField_SearchIcon);
 }
 
 /* refresh icon in some cases */
@@ -187,15 +189,15 @@ input.sapMSFI[type='search']:focus {
 
 /* grouping is not allowed here */
 .sapMSFI::-webkit-input-placeholder {
-	color: @_sap_m_SearchField_PlaceholderColor;
-	font-size: @sapMFontMediumSize;
-	font-style: @_sap_m_SearchField_PlaceholderFontStyle;
+	color: var(--_sap_m_SearchField_PlaceholderColor);
+	font-size: var(--sapFontSize);
+	font-style: var(--_sap_m_SearchField_PlaceholderFontStyle);
 }
 
 .sapMSFI::-moz-placeholder {
-	color: @_sap_m_SearchField_PlaceholderColor;
-	font-size: @sapMFontMediumSize;
-	font-style: @_sap_m_SearchField_PlaceholderFontStyle;
+	color: var(--_sap_m_SearchField_PlaceholderColor);
+	font-size: var(--sapFontSize);
+	font-style: var(--_sap_m_SearchField_PlaceholderFontStyle);
 	opacity: 1; /* in FF by default the opacity is 60% */
 }
 
@@ -220,19 +222,19 @@ input.sapMSFI[type='search']:focus {
 
 	.sapMSFF {
 		height: var(--sapElement_Compact_Height);
-		padding-left: @_sap_m_SearchField_Compact_FormPaddingLeft;
+		padding-left: var(--_sap_m_SearchField_Compact_FormPaddingLeft);
 	}
 
 	.sapMSFB {
 		width: 2rem;
 		font-size: 1rem;
 		text-align: center;
-		padding:0;
-		line-height: @_sap_m_SearchField_CompactButtonLineHeight;
+		padding: 0;
+		line-height: var(--_sap_m_SearchField_CompactButtonLineHeight);
 	}
 
 	.sapMSF.sapMSFDisabled form,
 	.sapMSF:not(.sapMSFVal) form.sapMSFNS:not(.sapMSFReload) {
-		padding-right: @_sap_m_SearchField_Compact_FormPaddingLeft;
+		padding-right: var(--_sap_m_SearchField_Compact_FormPaddingLeft);
 	}
 }
