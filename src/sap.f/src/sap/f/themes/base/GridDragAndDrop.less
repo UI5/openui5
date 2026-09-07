@@ -1,5 +1,10 @@
+/* ============================== */
+/* CSS for sap.f/GridDragAndDrop  */
+/* Base theme                     */
+/* ============================== */
+
 .sapUiDnDGridIndicator {
-	background: fade(@sapUiContentDragAndDropActiveColor, 5%);
-	border: 0.125rem solid @sapUiContentDragAndDropActiveColor;
+	background: ~'hsl(from var(--sapContent_DragAndDropActiveColor) h s l / .05)';
+	border: 0.125rem solid var(--sapContent_DragAndDropActiveColor);
 	box-sizing: border-box;
 }
