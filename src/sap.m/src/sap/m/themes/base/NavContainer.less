@@ -41,62 +41,48 @@ html[data-sap-ui-animation='on'] {
 
 	/* for slide animation */
 	.sapMNavItem.sapMNavItemCenter {
-		transform: translate3d(0px, 0px, 0px);
+		transform: translate3d(0, 0, 0);
 	}
 
 	.sapMNavItem.sapMNavItemSlideLeft {
-		transform: translate3d(1rem, 0px, 0px);
+		transform: translate3d(1rem, 0, 0);
 	}
 
 	.sapMNavItem.sapMNavItemSlideRight {
-		transform: translate3d(-1rem, 0px, 0px);
+		transform: translate3d(-1rem, 0, 0);
 	}
 
-    /* for base slide animation */
+	/* for base slide animation */
 
 	.sapMNavItem.sapMNavItemSlideRightToCenter {
 		animation: sapMNavItemAnimationRightToCenter .3s;
 	}
 
-    .sapMNavItem.sapMNavItemSlideCenterToLeft {
-        animation: sapMNavItemAnimationCenterToLeft .3s;
-    }
+	.sapMNavItem.sapMNavItemSlideCenterToLeft {
+		animation: sapMNavItemAnimationCenterToLeft .3s;
+	}
 
-    @-webkit-keyframes sapMNavItemAnimationRightToCenter {
-        0% {
-            -webkit-transform: translate3d(100%, 0px, 0px);
-        }
-        100% {
-            -webkit-transform: translate3d(0px, 0px, 0px);
-        }
-    }
+	@keyframes sapMNavItemAnimationRightToCenter {
 
-    @-webkit-keyframes sapMNavItemAnimationCenterToLeft {
-        0% {
-            -webkit-transform: translate3d(0px, 0px, 0px);
-        }
-        100% {
-            -webkit-transform: translate3d(-100%, 0px, 0px);
-        }
-    }
+		from {
+			transform: translate3d(100%, 0, 0);
+		}
 
-    @keyframes sapMNavItemAnimationRightToCenter {
-        0% {
-            transform: translate3d(100%, 0px, 0px);
-        }
-        100% {
-            transform: translate3d(0px, 0px, 0px);
-        }
-    }
+		to {
+			transform: translate3d(0, 0, 0);
+		}
+	}
 
-    @keyframes sapMNavItemAnimationCenterToLeft {
-        0% {
-            transform: translate3d(0px, 0px, 0px);
-        }
-        100% {
-            transform: translate3d(-100%, 0px, 0px);
-        }
-    }
+	@keyframes sapMNavItemAnimationCenterToLeft {
+
+		from {
+			transform: translate3d(0, 0, 0);
+		}
+
+		to {
+			transform: translate3d(-100%, 0, 0);
+		}
+	}
 
 	/* for fade animation */
 
@@ -108,7 +94,7 @@ html[data-sap-ui-animation='on'] {
 	.sapMNavItem.sapMNavItemOpaque {
 		transition-property: opacity, transform;
 		opacity: 1;
-		transform: translate3d(0px, 0px, 0px);
+		transform: translate3d(0, 0, 0);
 	}
 
 	.sapMNavItem.sapMNavItemFading {
@@ -134,38 +120,20 @@ html[data-sap-ui-animation='on'] {
 
 	/* for door animation */
 
-	@-webkit-keyframes sapMNavItemDoorInPrevious {
-		from {
-			-webkit-transform: rotate3d(0, 1, 0, 0deg);
-			visibility: visible;
-			opacity: 1;
-		}
-		40% {
-			-webkit-transform: rotate3d(0, 1, 0, -70deg);
-			visibility: visible;
-			opacity: 0;
-		}
-		41% {
-			-webkit-transform: rotate3d(0, 1, 0, -70deg);
-			visibility: hidden;
-		}
-
-		to {
-			-webkit-transform: rotate3d(0, 1, 0, -70deg);
-		}
-	}
-
 	@keyframes sapMNavItemDoorInPrevious {
+
 		from {
 			transform: rotate3d(0, 1, 0, 0deg);
 			visibility: visible;
 			opacity: 1;
 		}
+
 		40% {
 			transform: rotate3d(0, 1, 0, -70deg);
 			visibility: visible;
 			opacity: 0;
 		}
+
 		41% {
 			transform: rotate3d(0, 1, 0, -70deg);
 			visibility: hidden;
@@ -173,113 +141,73 @@ html[data-sap-ui-animation='on'] {
 
 		to {
 			transform: rotate3d(0, 1, 0, -70deg);
-		}
-	}
-
-	@-webkit-keyframes sapMNavItemDoorInNext {
-		from {
-			-webkit-transform: rotate3d(0, 1, 0, 80deg);
-			opacity: 0;
-		}
-		46% {
-			-webkit-transform: rotate3d(0, 1, 0, 80deg);
-			opacity: 0;
-		}
-		to {
-			-webkit-transform: rotate3d(0, 1, 0, 0deg);
-			opacity: 1;
 		}
 	}
 
 	@keyframes sapMNavItemDoorInNext {
+
 		from {
 			transform: rotate3d(0, 1, 0, 80deg);
 			visibility: hidden;
 			opacity: 0;
 		}
+
 		45% {
 			transform: rotate3d(0, 1, 0, 80deg);
 			visibility: hidden;
 			opacity: 0;
 		}
+
 		46% {
 			transform: rotate3d(0, 1, 0, 80deg);
 			visibility: visible;
 			opacity: 0;
 		}
+
 		to {
 			transform: rotate3d(0, 1, 0, 0deg);
 			opacity: 1;
-		}
-	}
-
-	@-webkit-keyframes sapMNavItemDoorOutPrevious {
-		from {
-			-webkit-transform: rotate3d(0, 1, 0, 0deg);
-			visibility: visible;
-			opacity: 1;
-		}
-		40% {
-			-webkit-transform: rotate3d(0, 1, 0, 80deg);
-			visibility: visible;
-			opacity: 0;
-		}
-		41% {
-			-webkit-transform: rotate3d(0, 1, 0, 80deg);
-			visibility: hidden;
-		}
-		to {
-			-webkit-transform: rotate3d(0, 1, 0, 80deg);
 		}
 	}
 
 	@keyframes sapMNavItemDoorOutPrevious {
+
 		from {
 			transform: rotate3d(0, 1, 0, 0deg);
 			visibility: visible;
 			opacity: 1;
 		}
+
 		40% {
 			transform: rotate3d(0, 1, 0, 80deg);
 			visibility: visible;
 			opacity: 0;
 		}
+
 		41% {
 			transform: rotate3d(0, 1, 0, 80deg);
 			visibility: hidden;
 		}
+
 		to {
 			transform: rotate3d(0, 1, 0, 80deg);
 		}
 	}
 
-	@-webkit-keyframes sapMNavItemDoorOutNext {
-		from {
-			-webkit-transform: rotate3d(0, 1, 0, -70deg);
-			opacity: 0;
-		}
-		46% {
-			-webkit-transform: rotate3d(0, 1, 0, -70deg);
-			opacity: 0;
-		}
-
-		to {
-			-webkit-transform: rotate3d(0, 1, 0, 0deg);
-			opacity: 1;
-		}
-	}
-
 	@keyframes sapMNavItemDoorOutNext {
+
 		from {
 			transform: rotate3d(0, 1, 0, -70deg);
 			visibility: hidden;
 			opacity: 0;
 		}
+
 		45% {
 			transform: rotate3d(0, 1, 0, -70deg);
 			visibility: hidden;
 			opacity: 0;
 		}
+
 		46% {
 			transform: rotate3d(0, 1, 0, -70deg);
 			visibility: visible;
@@ -323,5 +251,4 @@ html[data-sap-ui-animation='on'] {
 		animation-timing-function: ease-out;
 		transform-origin: 0% 50%;
 	}
-
 }
