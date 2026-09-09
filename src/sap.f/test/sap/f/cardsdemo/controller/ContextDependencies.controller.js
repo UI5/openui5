@@ -7,6 +7,8 @@ sap.ui.define([
 ], function (Controller, Host, RequestDataProvider, sinon, Log) {
 	"use strict";
 
+	const CONTEXT_DELAY = 3000;
+
 	const mContextValues = {
 		"sample/currentUser/id": "U12345",
 		"sample/currentUser/name": "John Miller",
@@ -20,29 +22,55 @@ sap.ui.define([
 		{"task": "Update team allocation"}
 	];
 
+	const aCategoriesData = [
+		{"key": "all", "title": "All categories"},
+		{"key": "finance", "title": "Finance"},
+		{"key": "engineering", "title": "Engineering"}
+	];
+
+	const oBudgetData = { "budget": "15000" };
+
+	// Data returned per stubbed URL.
+	const mMockData = {
+		"tasks.json": aTasksData,
+		"categories.json": aCategoriesData,
+		"budget.json": oBudgetData
+	};
+
 	return Controller.extend("sap.f.cardsdemo.controller.ContextDependencies", {
 		onInit: function () {
-			let bContextAvailable = false;
+			// Resolves once, CONTEXT_DELAY after the first context/data request.
+			// Cards show loading placeholders until then.
+			let pReady;
+			const fnWhenReady = function () {
+				if (!pReady) {
+					pReady = new Promise(function (resolve) {
+						setTimeout(resolve, CONTEXT_DELAY);
+					});
+				}
+				return pReady;
+			};
 
 			const oHost = new Host();
 			oHost.getContextValue = function (sPath) {
-				if (bContextAvailable) {
-					return Promise.resolve(mContextValues[sPath]);
-				}
-				return Promise.resolve(null);
+				return fnWhenReady().then(function () {
+					return mContextValues[sPath];
+				});
 			};
 
-			// Stub getData to delay tasks.json responses until context is available
+			// Stub getData so mocked requests wait for the context to be resolved.
 			const fnOriginalGetData = RequestDataProvider.prototype.getData;
 			this._fnGetDataStub = sinon.stub(RequestDataProvider.prototype, "getData").callsFake(function () {
 				const oConfig = this.getConfiguration();
 				const sUrl = oConfig && oConfig.request && oConfig.request.url || "";
+				const sKey = Object.keys(mMockData).find(function (sName) {
+					return sUrl.indexOf(sName) > -1;
+				});
 
-				if (sUrl.indexOf("tasks.json") > -1) {
-					if (bContextAvailable) {
-						return Promise.resolve(aTasksData);
-					}
-					return new Promise(function () {});
+				if (sKey) {
+					return fnWhenReady().then(function () {
+						return mMockData[sKey];
+					});
 				}
 				return fnOriginalGetData.apply(this, arguments);
 			});
@@ -51,24 +79,20 @@ sap.ui.define([
 				this.byId("cardWithContext"),
 				this.byId("cardWithoutContext"),
 				this.byId("cardWithContextInHeader"),
-				this.byId("cardWithContextEverywhere")
+				this.byId("cardWithContextEverywhere"),
+				this.byId("cardWithContextInFilter"),
+				this.byId("dataRequestInCard"),
+				this.byId("dataRequestInHeader"),
+				this.byId("dataRequestInContent"),
+				this.byId("objectCardWithContext"),
+				this.byId("extensionCardWithContext")
 			];
 
 			aCards.forEach(function (oCard) {
 				oCard.setHost(oHost);
 
 				oCard.attachEventOnce("manifestReady", function () {
-					const aDeps = oCard.getContextDependencies();
-					Log.info("Card '" + oCard.getId() + "' context dependencies: " + JSON.stringify(aDeps));
-
-					if (aDeps.some(function (sPath) { return sPath.indexOf("currentUser") > -1; })) {
-						oCard.showLoadingPlaceholders();
-
-						setTimeout(function () {
-							bContextAvailable = true;
-							oCard.refresh();
-						}, 3000);
-					}
+					Log.info("Card '" + oCard.getId() + "' context dependencies: " + JSON.stringify(oCard.getContextDependencies()));
 				});
 			});
 		},

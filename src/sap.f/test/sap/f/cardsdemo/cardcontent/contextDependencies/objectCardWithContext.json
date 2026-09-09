@@ -1,0 +1,44 @@
+{
+	"sap.app": {
+		"id": "sap.f.cardsdemo.cardcontent.contextDependencies.objectCardWithContext",
+		"type": "card"
+	},
+	"sap.card": {
+		"type": "Object",
+		"configuration": {
+			"parameters": {
+				"userId": {
+					"value": "{context>/sample/currentUser/id}"
+				}
+			}
+		},
+		"header": {
+			"title": "{context>/sample/currentUser/name}",
+			"subtitle": "{context>/sample/department/title}",
+			"icon": {
+				"src": "sap-icon://person-placeholder"
+			}
+		},
+		"content": {
+			"groups": [
+				{
+					"title": "Details",
+					"items": [
+						{
+							"label": "User ID",
+							"value": "{parameters>/userId/value}"
+						},
+						{
+							"label": "Department",
+							"value": "{context>/sample/department/title}"
+						},
+						{
+							"label": "Budget",
+							"value": "{context>/sample/currentUser/budget}"
+						}
+					]
+				}
+			]
+		}
+	}
+}

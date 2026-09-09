@@ -235,13 +235,17 @@ sap.ui.define([
 			return true;
 		}
 
-		if (this._oDataProvider) {
-			return this.getAggregation("_loadingProvider").getLoading();
+		if (this.getAggregation("_loadingProvider").getLoading()) {
+			return true;
 		}
 
-		var oCard = this.getCardInstance();
+		// with own data provider the loading state is fully determined by the checks above
+		if (this._oDataProvider) {
+			return false;
+		}
 
-		return oCard && oCard.isLoading();
+		// without own data provider defer to the card's loading state
+		return this.getCardInstance()?.isLoading() ?? false;
 	};
 
 	/**
