@@ -676,6 +676,17 @@ sap.ui.define([
 						intervalsL: 5
 					})
 				);
+				oPC1.addView(
+					new PlanningCalendarView({
+						key: "customView3",
+						intervalType: CalendarIntervalType.Day,
+						description: "custom view 3",
+						intervalsS: 7,
+						intervalsM: 14,
+						intervalsL: 31
+					})
+				);
+
 				oPC1.setViewKey(oPC1.getViews()[0].getKey());
 			} else {
 				oPC1.destroyViews();
