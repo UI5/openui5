@@ -7,8 +7,8 @@
 .sapMSplitContainerMaster::before {
 	content: '';
 	position: absolute;
-	width: 0px;
-	right: 0px;
+	width: 0;
+	right: 0;
 	height: 0.25rem;
 	top: 0;
 	border-right: 1px solid var(--sapGroup_ContentBorderColor);
@@ -33,7 +33,9 @@
 	}
 }
 
-@media (min-height: @_sap_m_SplitContainer_MinHeightForHeader) {
+/* Ux decision: never show the header, so make this value large enough even for zoom-out cases */
+
+@media (min-height: 3401px) {
 
 	/* Shell draws its own branding bar */
 	.sap-desktop .sapMShell .sapMSplitContainerMaster::before {
