@@ -86,6 +86,7 @@ describe("sap.ui.core.Tooltip", function () {
 		// Tick the checkbox once so the fixed-position anchors are rendered
 		// before any flip button opens a tooltip on them.
 		element(by.id("vtFlipShow")).click();
+		settle(); // wait for the async UI5 rerender triggered by setVisible(true)
 	});
 
 	[
@@ -191,6 +192,7 @@ describe("sap.ui.core.Tooltip", function () {
 	it("should reveal the viewport-corner buttons", function () {
 		moveAway();
 		element(by.id("cornerShow")).click();
+		settle(); // wait for the async UI5 rerender triggered by setVisible(true)
 	});
 
 	[
