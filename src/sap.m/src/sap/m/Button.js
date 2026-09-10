@@ -1043,6 +1043,20 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns the control that owns the registered keyboard shortcut hint.
+	 *
+	 * Composite controls that embed a <code>Button</code> (for example
+	 * <code>sap.m.MenuButton</code>) can override this hook so the shortcut registered
+	 * on the outer control is shown in the inner button's tooltip.
+	 *
+	 * @returns {sap.ui.core.Control} The shortcut-hint host, defaults to the button itself
+	 * @private
+	 */
+	Button.prototype._getShortcutHintHost = function() {
+		return this;
+	};
+
+	/**
 	 * Tooltip text + " (Shortcut)" suffix from ShortcutHintsMixin, if any.
 	 *
 	 * @returns {string} Tooltip text optionally suffixed with the registered shortcut.
@@ -1052,7 +1066,7 @@ sap.ui.define([
 		if (!this.getEnabled()) {
 			return "";
 		}
-		return ShortcutHintsMixin.getTooltipWithShortcut(this, this._getTooltip());
+		return ShortcutHintsMixin.getTooltipWithShortcut(this._getShortcutHintHost(), this._getTooltip());
 	};
 
 	/**

@@ -48,6 +48,7 @@ module.exports = [
 	"LinkTooltip.spec.js",
 	"MenuButton.spec.js",
 	"MenuButtonMenuPosition.spec.js",
+	"MenuButtonTooltip.spec.js",
 	"MessageBox.spec.js",
 	/**
 	 * @deprecated since version 1.112
