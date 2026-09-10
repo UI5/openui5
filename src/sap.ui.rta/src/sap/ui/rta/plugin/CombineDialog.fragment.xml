@@ -1,0 +1,44 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+
+	<Dialog
+		class="sapUIRtaFieldRepositoryDialog sapUiNoContentPadding"
+		title="{/dialogTitle}"
+		contentWidth="25rem"
+		horizontalScrolling="false">
+		<buttons>
+			<Button
+				id="rta_combineDialogOkButton"
+				text="{i18n>BTN_FREP_OK}"
+				enabled="{/okEnabled}"
+				press="._submitDialog"
+				type="Emphasized"/>
+			<Button
+				text="{i18n>BTN_FREP_CANCEL}"
+				press="._cancelDialog"/>
+		</buttons>
+		<content>
+			<MessageStrip
+				class="sapUiSmallMargin"
+				text="{/infoText}"
+				type="Information"
+				showIcon="true"
+				visible="{/infoVisible}"/>
+			<List
+				id="rta_combineDialogList"
+				items="{/elements}">
+				<CustomListItem
+					type="Active"
+					press="._onItemPress">
+					<CheckBox
+						width="100%"
+						text="{displayLabel}"
+						selected="{selected}"
+						enabled="{enabled}"
+						select="._onSelectionChange"/>
+				</CustomListItem>
+			</List>
+		</content>
+	</Dialog>
+</core:FragmentDefinition>

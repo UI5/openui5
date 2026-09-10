@@ -44,6 +44,7 @@ sap.ui.define([
 		CTX_CUT: 70,
 		CTX_PASTE: 80,
 		CTX_GROUP_FIELDS: 90,
+		CTX_COMBINE_WITH: 95,
 		CTX_UNGROUP_FIELDS: 100,
 		CTX_ADDXML_AT_EXTENSIONPOINT: 105,
 		// Settings ranks go up 1 by 1 for each setting

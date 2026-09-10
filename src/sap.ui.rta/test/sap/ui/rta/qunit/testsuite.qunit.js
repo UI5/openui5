@@ -559,6 +559,12 @@ sap.ui.define([
 					only: ["sap/ui/rta/plugin/Combine"]
 				}
 			},
+			"plugin/CombineDialog": {
+				group: "Plugin",
+				coverage: {
+					only: ["sap/ui/rta/plugin/CombineDialog"]
+				}
+			},
 			"plugin/ControlVariant": {
 				group: "Plugin",
 				coverage: {

@@ -4,16 +4,24 @@
 
 sap.ui.define([
 	"sap/base/util/uid",
+	"sap/ui/core/Lib",
+	"sap/ui/dt/ElementUtil",
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/dt/Util",
+	"sap/ui/fl/util/CancelError",
 	"sap/ui/fl/Utils",
+	"sap/ui/rta/plugin/CombineDialog",
 	"sap/ui/rta/plugin/Plugin",
 	"sap/ui/rta/Utils"
 ], function(
 	uid,
+	Lib,
+	ElementUtil,
 	OverlayRegistry,
 	DtUtil,
+	CancelError,
 	FlUtils,
+	CombineDialog,
 	Plugin,
 	Utils
 ) {
@@ -84,10 +92,117 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns the maximum number of controls that may be combined, as declared by the combine action
+	 * via <code>maxControlsCount</code>. When the action does not declare a maximum there is no count
+	 * limit.
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay providing the combine action
+	 * @returns {int|undefined} The maximum number of controls, or <code>undefined</code> when unlimited
+	 */
+	Combine.prototype._getMaxControlsCount = function(oOverlay) {
+		return this.getAction(oOverlay)?.maxControlsCount;
+	};
+
+	/**
+	 * Returns how many controls the given element counts as towards the combine limit. An element that
+	 * already combines several controls counts as more than one; the combine action reports this via
+	 * <code>getControlsCount</code>. Elements whose action does not expose it count as a single control.
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Element overlay
+	 * @returns {int} The control count (at least 1)
+	 */
+	Combine.prototype._getControlsCount = function(oOverlay) {
+		const oCombineAction = this.getAction(oOverlay);
+		if (typeof oCombineAction?.getControlsCount === "function") {
+			return oCombineAction.getControlsCount(oOverlay.getElement());
+		}
+		return 1;
+	};
+
+	/**
+	 * Checks whether combining the given element overlays stays within the control-defined limit. The
+	 * limit is preferably expressed as a maximum number of controls (<code>maxControlsCount</code>), with
+	 * each element contributing its own control count. For controls that still express the limit via a
+	 * combine action <code>isEnabled</code> function, that function is used as a fallback. When the action
+	 * declares neither, any combination is allowed.
+	 * @param {sap.ui.dt.ElementOverlay} oSourceOverlay - Source overlay providing the combine action
+	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Overlays that would be combined (including the source)
+	 * @returns {boolean} <code>true</code> when the combination is within the limit
+	 */
+	Combine.prototype._isCombinationWithinLimit = function(oSourceOverlay, aElementOverlays) {
+		const iMax = this._getMaxControlsCount(oSourceOverlay);
+		if (iMax !== undefined) {
+			const iCount = aElementOverlays.reduce((iSum, oOverlay) => iSum + this._getControlsCount(oOverlay), 0);
+			return iCount <= iMax;
+		}
+		// fallback for controls that still express the limit / enablement via the combine action's isEnabled
+		const oCombineAction = this.getAction(oSourceOverlay);
+		if (typeof oCombineAction?.isEnabled === "function") {
+			return oCombineAction.isEnabled(aElementOverlays.map((oOverlay) => oOverlay.getElement()));
+		}
+		if (typeof oCombineAction?.isEnabled === "boolean") {
+			return oCombineAction.isEnabled;
+		}
+		return true;
+	};
+
+	/**
+	 * Returns the sibling element overlays that are candidates for combining with the given source
+	 * overlay. A candidate is editable by this plugin, shares the same relevant container and combine
+	 * change type as the source, and is binding-compatible with it. The control-defined <em>limit</em>
+	 * on the number of combinable elements is deliberately NOT applied here: a sibling that is already
+	 * at its own limit is still a candidate so it can be shown (disabled) in the dialog, letting the
+	 * user understand why it cannot be combined.
+	 * @param {sap.ui.dt.ElementOverlay} oSourceOverlay - Source element overlay
+	 * @returns {sap.ui.dt.ElementOverlay[]} Candidate sibling element overlays
+	 */
+	Combine.prototype._getCompatibleSiblingOverlays = function(oSourceOverlay) {
+		const oParentAggregationOverlay = oSourceOverlay.getParentAggregationOverlay();
+		if (!oParentAggregationOverlay) {
+			return [];
+		}
+		const oSourceElement = oSourceOverlay.getElement();
+		const oModel = oSourceElement.getModel();
+		return oParentAggregationOverlay.getChildren().filter((oSiblingOverlay) => {
+			return oSiblingOverlay !== oSourceOverlay
+				&& this._isEditableByPlugin(oSiblingOverlay)
+				&& this._checkForSameRelevantContainer([oSourceOverlay, oSiblingOverlay])
+				&& this._checkBindingCompatibilityOfControls([oSourceElement, oSiblingOverlay.getElement()], oModel);
+		});
+	};
+
+	/**
+	 * Checks if the "Combine With" action is available for a single element overlay, i.e. the overlay
+	 * is combinable and has at least one compatible sibling. Like the multi-selection case, the
+	 * control-defined limit is NOT considered here (that is an <code>isEnabled</code> concern), so the
+	 * action stays available - and thus discoverable - even when the current element is already at its
+	 * limit.
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Element overlay to check
+	 * @returns {boolean} <code>true</code> when the overlay is combinable and has a compatible sibling
+	 */
+	Combine.prototype._isAvailableForSingle = function(oOverlay) {
+		return this._isEditableByPlugin(oOverlay) && this._getCompatibleSiblingOverlays(oOverlay).length >= 1;
+	};
+
+	/**
+	 * Checks if the "Combine With" action is enabled for a single element overlay, i.e. at least one of
+	 * its compatible siblings can actually be combined with it within the control-defined limit. Siblings
+	 * that are only shown disabled (already at their own limit) do not enable the action on their own.
+	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Element overlay to check
+	 * @returns {boolean} <code>true</code> when at least one sibling can be combined with the overlay
+	 */
+	Combine.prototype._isEnabledForSingle = function(oOverlay) {
+		return this._getCompatibleSiblingOverlays(oOverlay).some((oSiblingOverlay) => {
+			return this._isCombinationWithinLimit(oOverlay, [oOverlay, oSiblingOverlay]);
+		});
+	};
+
+	/**
 	 * @override
 	 */
 	Combine.prototype.isAvailable = function(aElementOverlays) {
-		if (aElementOverlays.length <= 1) {
+		if (aElementOverlays.length === 1) {
+			return this._isAvailableForSingle(aElementOverlays[0]);
+		}
+		if (aElementOverlays.length < 1) {
 			return false;
 		}
 
@@ -101,31 +216,23 @@ sap.ui.define([
 	 * @override
 	 */
 	Combine.prototype.isEnabled = function(aElementOverlays, oMenuItem) {
+		// For a single element the menu item is enabled when at least one sibling can actually be
+		// combined within the limit; the "Combine With" dialog then decides the concrete combination.
+		if (aElementOverlays.length === 1) {
+			return this._isEnabledForSingle(aElementOverlays[0]);
+		}
+
 		// check that at least 2 fields can be combined
 		if (!this.isAvailable(aElementOverlays) || aElementOverlays.length <= 1) {
 			return false;
 		}
 		const oResponsibleElementOverlays = oMenuItem.responsible || aElementOverlays;
-
 		const aControls = oResponsibleElementOverlays.map((oElementOverlay) => oElementOverlay.getElement());
 
-		// check that each specified element has an enabled action
-		const bActionCheck = oResponsibleElementOverlays.every((oElementOverlay) => {
-			const oAction = this.getAction(oElementOverlay);
-			if (!oAction) {
-				return false;
-			}
-
-			// when isEnabled is not defined the default is true
-			if (typeof oAction.isEnabled !== "undefined") {
-				if (typeof oAction.isEnabled === "function") {
-					return oAction.isEnabled(aControls);
-				}
-				return oAction.isEnabled;
-			}
-
-			return true;
-		});
+		// check that each specified element has a combine action and that the combination stays within
+		// the control-defined limit (the same check the single-element "Combine With" path uses)
+		const bActionCheck = oResponsibleElementOverlays.every((oElementOverlay) => this.getAction(oElementOverlay))
+			&& this._isCombinationWithinLimit(oResponsibleElementOverlays[0], oResponsibleElementOverlays);
 
 		if (bActionCheck) {
 			// check if all the target elements have the same binding context
@@ -182,9 +289,80 @@ sap.ui.define([
 	};
 
 	/**
+	 * Opens the "Combine With" dialog for a single source overlay, offering the compatible
+	 * sibling elements, and combines the source with the elements the user selects.
+	 * @param {sap.ui.dt.ElementOverlay} oSourceOverlay - Source element overlay the combine was triggered on
+	 * @returns {Promise<sap.ui.rta.command.Combine|undefined>} Resolves with the created command,
+	 * or <code>undefined</code> when the user cancels or selects nothing
+	 */
+	Combine.prototype.handleCombineWith = async function(oSourceOverlay) {
+		const aSiblingOverlays = this._getCompatibleSiblingOverlays(oSourceOverlay);
+		const oResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
+
+		// Use a title that names the source element (e.g. "Combine Company With..."), falling back to the
+		// generic title when the source element has no meaningful label (getLabelForElement returns the
+		// element id in that case)
+		const oSourceElement = oSourceOverlay.getElement();
+		const sSourceLabel = ElementUtil.getLabelForElement(oSourceElement);
+		const sTitle = sSourceLabel && sSourceLabel !== oSourceElement.getId()
+			? oResourceBundle.getText("TIT_COMBINE_WITH", [sSourceLabel])
+			: oResourceBundle.getText("CTX_COMBINE_WITH");
+
+		// The dialog is created and destroyed within this flow, so all data is passed via the
+		// constructor.
+		const oDialog = new CombineDialog({
+			title: sTitle,
+			maxControlsCount: this._getMaxControlsCount(oSourceOverlay),
+			sourceControlsCount: this._getControlsCount(oSourceOverlay),
+			elements: aSiblingOverlays.map((oSiblingOverlay) => ({
+				id: oSiblingOverlay.getElement().getId(),
+				label: ElementUtil.getLabelForElement(oSiblingOverlay.getElement()),
+				count: this._getControlsCount(oSiblingOverlay),
+				selected: false
+			}))
+		});
+
+		try {
+			await oDialog.open();
+			const aSelectedElements = oDialog.getSelectedElements();
+			if (!aSelectedElements.length) {
+				return undefined;
+			}
+			return await this.createCommands(oSourceOverlay, {
+				elementIds: aSelectedElements.map((oElement) => oElement.id)
+			});
+		} catch (oError) {
+			if (oError instanceof CancelError) {
+				return undefined;
+			}
+			throw DtUtil.propagateError(
+				oError,
+				"Combine#handleCombineWith",
+				"Error occurred in Combine handler function",
+				"sap.ui.rta"
+			);
+		} finally {
+			oDialog.destroy();
+		}
+	};
+
+	/**
 	 * @override
 	 */
 	Combine.prototype.getMenuItems = function(aElementOverlays) {
+		// For a single element, offer the "Combine With" entry that opens a selection dialog.
+		if (aElementOverlays.length === 1) {
+			return this._getMenuItems(
+				aElementOverlays,
+				{
+					pluginId: "CTX_COMBINE_WITH",
+					icon: "sap-icon://combine",
+					additionalInfoKey: "COMBINE_WITH_RTA_CONTEXT_MENU_INFO",
+					description: "combine the source element with selected sibling elements via a selection dialog"
+				}
+			);
+		}
+		// For a multi-selection, offer the classic "Combine" entry.
 		return this._getMenuItems(
 			aElementOverlays,
 			{
@@ -206,6 +384,10 @@ sap.ui.define([
 	 * @override
 	 */
 	Combine.prototype.handler = function(aElementOverlays, mPropertyBag) {
+		// Single selection opens the "Combine With" dialog, multi-selection combines directly.
+		if (aElementOverlays.length === 1) {
+			return this.handleCombineWith(aElementOverlays[0]);
+		}
 		return this.handleCombine(aElementOverlays, mPropertyBag.contextElement);
 	};
 

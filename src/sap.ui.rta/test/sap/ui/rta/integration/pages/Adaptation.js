@@ -357,6 +357,47 @@ sap.ui.define([
 						errorMessage: "OK Button not found"
 					});
 				},
+				iSelectAnElementByLabelInTheCombineDialog(sLabel) {
+					return this.waitFor({
+						searchOpenDialogs: true,
+						controlType: "sap.m.CheckBox",
+						matchers: new PropertyStrictEquals({
+							name: "text",
+							value: sLabel
+						}),
+						actions: new Press(),
+						errorMessage: `Combine dialog checkbox with label '${sLabel}' not found`
+					});
+				},
+				iSelectTheFirstEnabledElementInTheCombineDialog() {
+					return this.waitFor({
+						searchOpenDialogs: true,
+						controlType: "sap.m.List",
+						matchers(oList) {
+							return oList.getId().includes("rta_combineDialogList");
+						},
+						actions(oList) {
+							const oCheckBox = oList.getItems()
+							.map((oItem) => oItem.getContent()[0])
+							.find((oBox) => oBox.getEnabled() && !oBox.getSelected());
+							new Press().executeOn(oCheckBox);
+						},
+						errorMessage: "No selectable element found in the Combine dialog"
+					});
+				},
+				iPressCancel() {
+					const oResources = Lib.getResourceBundleFor("sap.ui.rta");
+					return this.waitFor({
+						searchOpenDialogs: true,
+						controlType: "sap.m.Button",
+						matchers: new PropertyStrictEquals({
+							name: "text",
+							value: oResources.getText("BTN_FREP_CANCEL")
+						}),
+						actions: new Press(),
+						errorMessage: "Cancel Button not found"
+					});
+				},
 				iActivateAVersion(sVersionName) {
 					sVersionName ||= "Version X";
 					return this.waitFor({
@@ -734,6 +775,104 @@ sap.ui.define([
 							Opa5.assert.ok(aPopover[0], "The context menu is shown.");
 						},
 						errorMessage: "Did not find the Context Menu"
+					});
+				},
+				iShouldSeeTheCombineDialogInfoText(sTextKey, aPlaceholders) {
+					const oResources = Lib.getResourceBundleFor("sap.ui.rta");
+					const sExpectedText = oResources.getText(sTextKey, aPlaceholders);
+					return this.waitFor({
+						searchOpenDialogs: true,
+						controlType: "sap.m.MessageStrip",
+						matchers: new PropertyStrictEquals({
+							name: "text",
+							value: sExpectedText
+						}),
+						success(aStrips) {
+							Opa5.assert.ok(aStrips.length > 0, `The Combine dialog shows the info text '${sExpectedText}'`);
+						},
+						errorMessage: `Did not find the Combine dialog info text '${sExpectedText}'`
+					});
+				},
+				iShouldSeeACombineDialogElementDisabled(sLabel) {
+					return this.waitFor({
+						searchOpenDialogs: true,
+						controlType: "sap.m.CheckBox",
+						matchers(oCheckBox) {
+							return oCheckBox.getText() === sLabel && !oCheckBox.getEnabled();
+						},
+						success() {
+							Opa5.assert.ok(true, `The Combine dialog element '${sLabel}' is disabled`);
+						},
+						errorMessage: `The Combine dialog element '${sLabel}' is not disabled`
+					});
+				},
+				iShouldSeeACombineDialogElementEnabled(sLabel) {
+					return this.waitFor({
+						searchOpenDialogs: true,
+						controlType: "sap.m.CheckBox",
+						matchers(oCheckBox) {
+							return oCheckBox.getText() === sLabel && oCheckBox.getEnabled();
+						},
+						success() {
+							Opa5.assert.ok(true, `The Combine dialog element '${sLabel}' is enabled`);
+						},
+						errorMessage: `The Combine dialog element '${sLabel}' is not enabled`
+					});
+				},
+				iShouldSeeCombineDialogElements(iEnabledCount, iDisabledCount) {
+					return this.waitFor({
+						searchOpenDialogs: true,
+						controlType: "sap.m.List",
+						matchers(oList) {
+							return oList.getId().includes("rta_combineDialogList");
+						},
+						check(aLists) {
+							const aCheckBoxes = aLists[0].getItems().map((oItem) => oItem.getContent()[0]);
+							const iEnabled = aCheckBoxes.filter((oCheckBox) => oCheckBox.getEnabled()).length;
+							const iDisabled = aCheckBoxes.filter((oCheckBox) => !oCheckBox.getEnabled()).length;
+							return iEnabled === iEnabledCount && iDisabled === iDisabledCount;
+						},
+						success() {
+							Opa5.assert.ok(
+								true,
+								`The Combine dialog shows ${iEnabledCount} enabled and ${iDisabledCount} disabled element(s)`
+							);
+						},
+						errorMessage: `The Combine dialog does not show ${iEnabledCount} enabled and ${iDisabledCount} disabled element(s)`
+					});
+				},
+				iShouldSeeAllCombineDialogElementsEnabled() {
+					return this.waitFor({
+						searchOpenDialogs: true,
+						controlType: "sap.m.List",
+						matchers(oList) {
+							return oList.getId().includes("rta_combineDialogList");
+						},
+						check(aLists) {
+							const aCheckBoxes = aLists[0].getItems().map((oItem) => oItem.getContent()[0]);
+							return aCheckBoxes.length > 0 && aCheckBoxes.every((oCheckBox) => oCheckBox.getEnabled());
+						},
+						success() {
+							Opa5.assert.ok(true, "All elements in the Combine dialog are selectable");
+						},
+						errorMessage: "Not all elements in the Combine dialog are selectable"
+					});
+				},
+				iShouldSeeAtLeastOneCombineDialogElementDisabled() {
+					return this.waitFor({
+						searchOpenDialogs: true,
+						controlType: "sap.m.List",
+						matchers(oList) {
+							return oList.getId().includes("rta_combineDialogList");
+						},
+						check(aLists) {
+							const aCheckBoxes = aLists[0].getItems().map((oItem) => oItem.getContent()[0]);
+							return aCheckBoxes.some((oCheckBox) => !oCheckBox.getEnabled());
+						},
+						success() {
+							Opa5.assert.ok(true, "At least one element in the Combine dialog is disabled at the limit");
+						},
+						errorMessage: "No element in the Combine dialog became disabled at the limit"
 					});
 				},
 				iShouldSeetheContextMenuEntriesWithKeys(aContextEntriesKeys) {
