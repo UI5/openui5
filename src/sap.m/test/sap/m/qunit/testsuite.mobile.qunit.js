@@ -1370,9 +1370,6 @@ sap.ui.define([
 
 			RadioButtonGroup: {
 				title: "RadioButton - sap.m - QUnit test",
-				sinon: {
-					useFakeTimers: true
-				},
 				coverage: {
 					only: [
 						"sap/m/RadioButtonGroup",
