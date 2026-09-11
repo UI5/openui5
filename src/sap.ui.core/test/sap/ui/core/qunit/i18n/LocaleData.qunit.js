@@ -513,6 +513,7 @@ sap.ui.define([
 
 	QUnit.test("Currency Digits", function(assert) {
 
+		Formatting.setCustomCurrencies({}); // must be before LocaleData.getInstance so that CustomLocaleData is created
 		var oLocaleData = LocaleData.getInstance(
 			Formatting.getLanguageTag()
 		);
@@ -709,7 +710,7 @@ sap.ui.define([
 		var mTranslations1 = oLocaleData.getTimezoneTranslations();
 
 		assert.deepEqual(mTranslations1, {"~Key": "~ValueDe"});
-		assert.notStrictEqual(mTranslations !== mTranslations1);
+		assert.notStrictEqual(mTranslations, mTranslations1);
 
 		oLocaleData = LocaleData.getInstance(new Locale("en"));
 
@@ -1054,7 +1055,7 @@ sap.ui.define([
 		{languageTag: "en", result: "~EN"},
 		{languageTag: "en_US", result: "~EN~US"},
 		{languageTag: "en-US", result: "~EN~US"}
-	].forEach((oFixture, i) => {
+	].forEach((oFixture) => {
 		QUnit.test(`getLanguageName: found in languages object, ${oFixture.languageTag}`, function (assert) {
 			const oLocaleData = {_get() {}};
 			this.mock(Localization).expects("getModernLanguage").withExactArgs("en").returns("en");
@@ -1070,7 +1071,7 @@ sap.ui.define([
 	[
 		{languageTag: "zh_Hant", result: "~Chinese (~Traditional)"},
 		{languageTag: "zh-Hant", result: "~Chinese (~Traditional)"}
-	].forEach((oFixture, i) => {
+	].forEach((oFixture) => {
 		QUnit.test(`getLanguageName: using script, ${oFixture.languageTag}`, function (assert) {
 			const oLocaleData = {_get() {}};
 			const oLocaleDataMock = this.mock(oLocaleData);
@@ -1088,7 +1089,7 @@ sap.ui.define([
 	[
 		{languageTag: "en_AU", result: "~ENGLISH (~Australia)"},
 		{languageTag: "en-AU", result: "~ENGLISH (~Australia)"}
-	].forEach((oFixture, i) => {
+	].forEach((oFixture) => {
 		QUnit.test(`getLanguageName: using territories, ${oFixture.languageTag}`, function (assert) {
 			const oLocaleData = {_get() {}};
 			const oLocaleDataMock = this.mock(oLocaleData);
@@ -1549,13 +1550,13 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("getAllCurrencyDigits, custom currencies without DEFAULT", function(assert) {
-		const oLocaleData = LocaleData.getInstance(Formatting.getLanguageTag());
-		oLocaleData.mData.currencyDigits = {BAR: 1, DEFAULT: 2, FOO: "~cldrFOO", QUX: "~cldrQUX"};
-		Formatting.setCustomCurrencies({
+		Formatting.setCustomCurrencies({ // must be before LocaleData.getInstance so that CustomLocaleData is created
 			BAR: {digits: 0},
 			BAZ: {},
 			FOO: {}
 		});
+		const oLocaleData = LocaleData.getInstance(Formatting.getLanguageTag());
+		oLocaleData.mData.currencyDigits = {BAR: 1, DEFAULT: 2, FOO: "~cldrFOO", QUX: "~cldrQUX"};
 
 		// code under test
 		assert.deepEqual(oLocaleData.getAllCurrencyDigits(), {
@@ -1570,14 +1571,14 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("getAllCurrencyDigits, custom currencies with DEFAULT", function(assert) {
-		const oLocaleData = LocaleData.getInstance(Formatting.getLanguageTag());
-		oLocaleData.mData.currencyDigits = {BAR: 1, DEFAULT: 2, FOO: "~cldrFOO", QUX: "~cldrQUX"};
-		Formatting.setCustomCurrencies({
+		Formatting.setCustomCurrencies({ // must be before LocaleData.getInstance so that CustomLocaleData is created
 			BAR: {digits: 0},
 			BAZ: {},
 			DEFAULT: {digits: "~customDEFAULT"},
 			FOO: {}
 		});
+		const oLocaleData = LocaleData.getInstance(Formatting.getLanguageTag());
+		oLocaleData.mData.currencyDigits = {BAR: 1, DEFAULT: 2, FOO: "~cldrFOO", QUX: "~cldrQUX"};
 
 		// code under test
 		assert.deepEqual(oLocaleData.getAllCurrencyDigits(), {

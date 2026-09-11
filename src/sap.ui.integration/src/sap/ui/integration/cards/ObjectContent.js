@@ -1055,6 +1055,7 @@ sap.ui.define([
 			oSettings = {
 				visible: BindingHelper.reuse(vVisible),
 				selectedIndex: oItem.selectedIndex ?? -1,
+				required: oForm.getRequiredValidationValue(oItem),
 				columns: 1
 			};
 
@@ -1062,7 +1063,6 @@ sap.ui.define([
 
 		if (oLabel) {
 			oLabel.setLabelFor(oControl);
-			oLabel.setRequired(oForm.getRequiredValidationValue(oItem));
 		}
 
 		if (oItem.item) {
