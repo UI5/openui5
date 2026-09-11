@@ -52,7 +52,7 @@ sap.ui.define([
 	 * @since 1.30
 	 * @alias sap.ui.dt.DesignTimeMetadata
 	 */
-	var DesignTimeMetadata = ManagedObject.extend("sap.ui.dt.DesignTimeMetadata", /** @lends sap.ui.dt.DesignTimeMetadata.prototype */ {
+	const DesignTimeMetadata = ManagedObject.extend("sap.ui.dt.DesignTimeMetadata", /** @lends sap.ui.dt.DesignTimeMetadata.prototype */ {
 		metadata: {
 			library: "sap.ui.dt",
 			properties: {
@@ -74,7 +74,13 @@ sap.ui.define([
 	 * @protected
 	 */
 	DesignTimeMetadata.prototype.setData = function(oData) {
-		this.setProperty("data", merge({}, this.getDefaultData(), oData));
+		const oDefaultData = this.getDefaultData();
+		const { aggregations: oDataAggregations, ...oDataRest } = oData ?? {};
+		const oResult = Object.assign({}, oDefaultData, merge({}, oDataRest));
+		if (oDefaultData.aggregations || oDataAggregations) {
+			oResult.aggregations = merge({}, oDefaultData.aggregations, oDataAggregations);
+		}
+		this.setProperty("data", oResult);
 		return this;
 	};
 
@@ -97,11 +103,8 @@ sap.ui.define([
 	 * @public
 	 */
 	DesignTimeMetadata.prototype.isIgnored = function(oElement) {
-		var vIgnore = this.getData().ignore;
-		if (!vIgnore || (vIgnore && typeof vIgnore === "function" && !vIgnore(oElement))) {
-			return false;
-		}
-		return true;
+		const vIgnore = this.getData().ignore;
+		return !(!vIgnore || (typeof vIgnore === "function" && !vIgnore(oElement)));
 	};
 
 	/**
@@ -110,7 +113,7 @@ sap.ui.define([
 	 * @public
 	 */
 	DesignTimeMetadata.prototype.markedAsNotAdaptable = function() {
-		var vActions = this.getData().actions;
+		const vActions = this.getData().actions;
 		return vActions === "not-adaptable";
 	};
 
@@ -134,8 +137,8 @@ sap.ui.define([
 	DesignTimeMetadata.prototype.getAssociatedDomRef = function(...aArgs) {
 		const [oElement, vDomRef, sAggregationName] = aArgs;
 		if (oElement) {
-			var oElementDomRef = ElementUtil.getDomRef(oElement);
-			var aArguments = [];
+			const oElementDomRef = ElementUtil.getDomRef(oElement);
+			const aArguments = [];
 			aArguments.push(oElement);
 			if (sAggregationName) {
 				aArguments.push(sAggregationName);
@@ -143,7 +146,7 @@ sap.ui.define([
 
 			if (typeof (vDomRef) === "function") {
 				try {
-					var vRes = vDomRef(...aArgs);
+					let vRes = vDomRef(...aArgs);
 					// convert NodeList to an Array
 					if (vRes instanceof NodeList) {
 						vRes = Array.from(vRes);
@@ -169,8 +172,8 @@ sap.ui.define([
 	 * @public
 	 */
 	DesignTimeMetadata.prototype.getAction = function(sAction, oElement, sSubAction) {
-		var mData = this.getData();
-		var aActionPath = ["actions", sAction];
+		const mData = this.getData();
+		const aActionPath = ["actions", sAction];
 		if (sSubAction) {
 			aActionPath.push(sSubAction);
 		}
@@ -186,18 +189,13 @@ sap.ui.define([
 	 * @public
 	 */
 	DesignTimeMetadata.prototype.getCommandName = function(sChangeType, oElement, sAggregationName) {
-		var mData = this.getData();
-		var mActions = merge(
-			{},
-			sAggregationName && mData.aggregations[sAggregationName]
-				? mData.aggregations[sAggregationName].actions
-				: {},
-			mData.actions
-		);
+		const mData = this.getData();
+		const mAggregationActions = mData.aggregations?.[sAggregationName]?.actions ?? {};
+		const mActions = Object.assign({}, mAggregationActions, mData.actions);
 		function findAction(mActionMap) {
 			return Object.keys(mActionMap)
 			.map(function(sCommandName) {
-				var vAction = mActionMap[sCommandName];
+				const vAction = mActionMap[sCommandName];
 				if (sCommandName === "add" && !vAction.changeType) {
 					// Handle nested subactions
 					return {
@@ -206,7 +204,7 @@ sap.ui.define([
 					}[findAction(vAction)];
 				}
 				try {
-					var oActionData = evaluateAction(vAction, oElement);
+					const oActionData = evaluateAction(vAction, oElement);
 					return oActionData && (oActionData.changeType === sChangeType) && sCommandName;
 				} catch (vError) {
 					// If a function action expects to be called with a certain element
@@ -241,16 +239,15 @@ sap.ui.define([
 	 * @public
 	 */
 	DesignTimeMetadata.prototype.getLibraryText = function(oElement, sKey, aArgs) {
-		var oElementMetadata = oElement.getMetadata();
+		const oElementMetadata = oElement.getMetadata();
 		return this._lookForLibraryTextInHierarchy(oElementMetadata, sKey, aArgs);
 	};
 
 	DesignTimeMetadata.prototype._lookForLibraryTextInHierarchy = function(oMetadata, sKey, aArgs) {
-		var sLibraryName;
-		var oParentMetadata;
-		var sResult;
+		let oParentMetadata;
+		let sResult;
 
-		sLibraryName = oMetadata.getLibraryName();
+		const sLibraryName = oMetadata.getLibraryName();
 		sResult = this._getTextFromLibrary(sLibraryName, sKey, aArgs);
 		if (!sResult) {
 			oParentMetadata = oMetadata.getParent();
@@ -287,7 +284,7 @@ sap.ui.define([
 	 * @public
 	 */
 	DesignTimeMetadata.prototype.getLabel = function(...aArgs) {
-		var vLabel = this.getData().getLabel;
+		const vLabel = this.getData().getLabel;
 		return typeof vLabel === "function"
 			? vLabel.apply(this, aArgs)
 			: undefined;
@@ -304,7 +301,7 @@ sap.ui.define([
 	 * @public
 	 */
 	DesignTimeMetadata.prototype.getResponsibleElement = function(oElement) {
-		var mData = this.getData();
+		const mData = this.getData();
 		const fnResponsibleElement = mData ? ObjectPath.get(["actions", "getResponsibleElement"], mData) : undefined;
 		if (fnResponsibleElement) {
 			return fnResponsibleElement(oElement);
@@ -319,7 +316,7 @@ sap.ui.define([
 	 * @public
 	 */
 	DesignTimeMetadata.prototype.isResponsibleActionAvailable = function(sActionName) {
-		var mData = this.getData();
+		const mData = this.getData();
 		const aActionsFromResponsibleElement = mData ? ObjectPath.get(["actions", "actionsFromResponsibleElement"], mData) : undefined;
 		if (aActionsFromResponsibleElement) {
 			return aActionsFromResponsibleElement.includes(sActionName);
