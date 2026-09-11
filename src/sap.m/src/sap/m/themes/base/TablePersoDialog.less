@@ -33,7 +33,7 @@
 .sapMPersoDialog .sapMListBGTranslucent .sapMLIB.sapMListTblRow.sapMPersoDialogItemSelected:focus,
 .sapMPersoDialog .sapMListBGTranslucent .sapMLIB:not(.sapMLIBActive):not(.sapMLIBSelected):not(:hover).sapMListTblRow.sapMPersoDialogItemSelected,
 .sapMPersoDialog .sapMListBGTranslucent .sapMLIB:not(.sapMLIBActive):not(.sapMLIBSelected):not(:hover).sapMListTblRow.sapMPersoDialogItemSelected:focus {
-	background-color: @sapUiListSelectionHoverBackground;
+	background-color: var(--sapList_Hover_SelectionBackground);
 	/* Commented as of 1.119 --> causes issues in hcb theme, rather stick to the Table's default styling */
 	/* box-shadow: inset 0px -0.0625rem @sapUiListSelectionBorderColor; */
 }
@@ -55,7 +55,7 @@
 
 html.sap-desktop .sapMPersoDialog .sapMLIBSelected:not(.sapMLIBActive):not(.sapMALI):hover,
 html.sap-desktop .sapMPersoDialog .sapMLIBSelected:not(.sapMLIBActive):not(.sapMALI):hover > td {
-	background-color: @sapUiListSelectionHoverBackground;
+	background-color: var(--sapList_Hover_SelectionBackground);
 }
 
 .sapMPersoDialogFixedBar {
