@@ -272,16 +272,19 @@ sap.ui.define([
 		aCommands.forEach((oCommand) => {
 			const aSubCommands = this.getSubCommands(oCommand);
 			aSubCommands.forEach((oSubCommand) => {
-				// for revertable changes which don't belong to LREP (variantSwitch) or runtime only changes
-				if (!(oSubCommand instanceof FlexCommand || oSubCommand instanceof ManifestCommand)
-					|| oSubCommand.getRuntimeOnly()) {
+				// Skip commands with no flex objects (e.g. ControlVariantSwitch has no getPreparedChange)
+				// and runtime-only changes
+				if (!oSubCommand.getPreparedChange || oSubCommand.getRuntimeOnly()) {
 					return;
 				}
-				const oChange = oSubCommand.getPreparedChange();
+				const vChange = oSubCommand.getPreparedChange();
+				const aChanges = Array.isArray(vChange) ? vChange : [vChange];
 				oAppComponent = oSubCommand.getAppComponent();
-				if (oAppComponent) {
-					aFlexObjects.push(oChange);
-				}
+				aChanges.forEach((oChange) => {
+					if (oChange) {
+						aFlexObjects.push(oChange);
+					}
+				});
 			});
 		});
 		if (oAppComponent) {

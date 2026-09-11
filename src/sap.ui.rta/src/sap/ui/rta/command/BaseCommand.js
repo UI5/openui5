@@ -3,8 +3,9 @@
  */
 sap.ui.define([
 	"sap/ui/base/ManagedObject",
-	"sap/ui/core/Element"
-], function(ManagedObject, Element) {
+	"sap/ui/core/Element",
+	"sap/ui/fl/Utils"
+], function(ManagedObject, Element, FlUtils) {
 	"use strict";
 
 	/**
@@ -80,6 +81,15 @@ sap.ui.define([
 
 	BaseCommand.prototype.getVariantChange = function() {
 		return this._oVariantChange;
+	};
+
+	/**
+	 * @returns {sap.ui.core.UIComponent|undefined} App component instance
+	 * @public
+	 */
+	BaseCommand.prototype.getAppComponent = function() {
+		const oElement = this.getElement();
+		return oElement ? FlUtils.getAppComponentForControl(oElement) : undefined;
 	};
 
 	/**

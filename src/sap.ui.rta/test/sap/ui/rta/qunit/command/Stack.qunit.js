@@ -670,6 +670,41 @@ sap.ui.define([
 			);
 		});
 
+		QUnit.test("removeAllCommands includes BaseCommand subcommands with single and array getPreparedChange", function(assert) {
+			const sDummyComponent = "dummyComponent";
+			const oRemoveStub = sandbox.stub(PersistenceWriteAPI, "remove");
+
+			// BaseCommand returning a single object (e.g. CompVariantSaveAs)
+			const oBaseCommandSingle = new BaseCommand();
+			oBaseCommandSingle.getPreparedChange = () => ({ getId: () => "singleChangeId" });
+			sandbox.stub(oBaseCommandSingle, "getAppComponent").returns(sDummyComponent);
+
+			// BaseCommand returning an array (e.g. ControlVariantSaveAs)
+			const oBaseCommandArray = new BaseCommand();
+			oBaseCommandArray.getPreparedChange = () => [
+				{ getId: () => "arrayChangeId1" },
+				{ getId: () => "arrayChangeId2" }
+			];
+			sandbox.stub(oBaseCommandArray, "getAppComponent").returns(sDummyComponent);
+
+			// BaseCommand with no getPreparedChange (e.g. ControlVariantSwitch — nothing to remove)
+			const oBaseCommandNone = new BaseCommand();
+
+			this.oCommandStack.push(oBaseCommandSingle);
+			this.oCommandStack.push(oBaseCommandArray);
+			this.oCommandStack.push(oBaseCommandNone);
+
+			this.oCommandStack.removeAllCommands(false, true);
+
+			assert.ok(oRemoveStub.calledOnce, "then PersistenceWriteAPI.remove is called once");
+			const aFlexObjects = oRemoveStub.getCalls()[0].args[0].flexObjects;
+			assert.strictEqual(aFlexObjects.length, 3, "then all three flex objects are included");
+			const aIds = aFlexObjects.map((o) => o.getId());
+			assert.ok(aIds.includes("singleChangeId"), "then the single change is included");
+			assert.ok(aIds.includes("arrayChangeId1"), "then the first array change is included");
+			assert.ok(aIds.includes("arrayChangeId2"), "then the second array change is included");
+		});
+
 		QUnit.test("removeAllCommands resets stack state correctly", async function(assert) {
 			const oBaseCommand1 = new BaseCommand();
 			const oBaseCommand2 = new BaseCommand();
