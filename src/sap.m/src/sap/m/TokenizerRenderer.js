@@ -80,6 +80,7 @@ sap.ui.define(['sap/ui/Device', 'sap/ui/core/InvisibleText'],
 
 		if ((Device.system.desktop || Device.system.combi) && aTokens.length) {
 			oRm.openStart("div", oControl.getId() + "-clip").class("sapMTokenizerClip");
+			oRm.attr("aria-hidden", "true");
 			if (window.clipboardData) { //IE
 				oRm.attr("contenteditable", "true");
 				oRm.attr("tabindex", "-1");
