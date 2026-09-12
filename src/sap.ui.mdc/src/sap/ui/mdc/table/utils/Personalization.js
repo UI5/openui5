@@ -4,10 +4,12 @@
 
 sap.ui.define([
 	"sap/ui/mdc/enums/ProcessingStrategy",
-	"sap/ui/core/library"
+	"sap/ui/core/library",
+	"sap/ui/mdc/util/DynamicPropertiesUtil"
 ], (
 	ProcessingStrategy,
-	CoreLibrary
+	CoreLibrary,
+	DynamicPropertiesUtil
 ) => {
 	"use strict";
 
@@ -262,6 +264,10 @@ sap.ui.define([
 
 		if (iCurrentIndex === mSettings.index) {
 			return;
+		}
+
+		if (oTable.isInPropertyKeysMode()) {
+			mSettings.index = DynamicPropertiesUtil.translateAggregationToPropertyKeysIndex(oTable, mSettings.index);
 		}
 
 		oTable.getEngine().createChanges({
