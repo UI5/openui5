@@ -167,10 +167,13 @@ sap.ui.define([
 				oDelegate.onmousedown = this._onMouseDown;
 				oDelegate.onmouseover = this._onMouseOver;
 				oDelegate.onmouseout  = this._onMouseOut;
-				oDelegate.onfocusin   = this._onFocusIn;
-				oDelegate.onfocusout  = this._onFocusOut;
-				oDelegate.onsapescape = this._onSapEscape;
 			}
+
+			oDelegate.onfocusin   = this._onFocusIn;
+			oDelegate.onfocusout  = this._onFocusOut;
+			oDelegate.onsapescape = this._onSapEscape;
+			oDelegate.onsapenter  = this._onKeyboardActivation;
+			oDelegate.onsapspace  = this._onKeyboardActivation;
 
 			// Touch-only (phone or tablet, not combi).
 			if ((Device.system.phone || Device.system.tablet) && !Device.system.combi) {
@@ -347,6 +350,19 @@ sap.ui.define([
 				this._fnOnClose();
 				oEvent.preventDefault();
 			}
+		};
+
+		/**
+		 * Keyboard activation (Enter/Space) closes the tooltip immediately,
+		 * mirroring the left-mousedown close. The key is left to propagate so
+		 * the host still performs its activation.
+		 * @private
+		 */
+		TooltipEventTrigger.prototype._onKeyboardActivation = function(oEvent) {
+			if (!this._isForFocusTarget(oEvent)) {
+				return;
+			}
+			this._fnOnClose();
 		};
 
 		/**
