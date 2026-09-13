@@ -2,7 +2,7 @@
 
 sap.ui.define([
 	"sap/ui/unified/calendar/Header",
-	"sap/ui/test/utils/nextUIUpdate"
+	"sap/ui/qunit/utils/nextUIUpdate"
 ], function(Header, nextUIUpdate) {
 	"use strict";
 
