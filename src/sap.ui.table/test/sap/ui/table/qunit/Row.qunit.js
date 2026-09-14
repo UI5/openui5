@@ -245,16 +245,6 @@ sap.ui.define([
 		assert.notOk(oRow.isSelectable(), "Empty row is not selectable");
 	});
 
-	QUnit.test("isSelectable - not selectable via Row.UpdateState hook", function(assert) {
-		const oRow = this.oTable.getRows()[0];
-
-		TableUtils.Hook.register(this.oTable, TableUtils.Hook.Keys.Row.UpdateState, (oState) => {
-			oState.selectable = false;
-		});
-		oRow.setRowBindingContext(oRow.getBindingContext(), this.oTable);
-		assert.notOk(oRow.isSelectable(), "Row is not selectable when hook sets selectable to false");
-	});
-
 	QUnit.test("sapUiTableRowSelectable CSS class", function(assert) {
 		const oRow = this.oTable.getRows()[0];
 		const oSelectionPlugin = new TableQUnitUtils.TestSelectionPlugin();
@@ -330,6 +320,131 @@ sap.ui.define([
 			this.oRow.destroy();
 			this.oTable.destroy();
 		}
+	});
+
+	QUnit.test("UpdateState - called when a non-null context is set", function(assert) {
+		const oUpdateStateSpy = sinon.spy();
+
+		TableUtils.Hook.register(this.oTable, TableUtils.Hook.Keys.Row.UpdateState, oUpdateStateSpy);
+
+		this.oRow.setRowBindingContext(null, this.oTable);
+		assert.ok(oUpdateStateSpy.notCalled, "'UpdateState' hook not called when context is null");
+
+		this.oRow.setRowBindingContext({}, this.oTable);
+		assert.strictEqual(oUpdateStateSpy.callCount, 1, "'UpdateState' hook called once when context is set");
+	});
+
+	QUnit.test("UpdateState - state.context is the context that was set", function(assert) {
+		const oContext = {};
+		let oContextInState;
+
+		TableUtils.Hook.register(this.oTable, TableUtils.Hook.Keys.Row.UpdateState, (oState) => {
+			oContextInState = oState.context;
+		});
+
+		this.oRow.setRowBindingContext(oContext, this.oTable);
+		assert.strictEqual(oContextInState, oContext, "oState.context is the context passed to setRowBindingContext");
+	});
+
+	QUnit.test("UpdateState - state properties can be read and written", function(assert) {
+		let oState;
+
+		TableUtils.Hook.register(this.oTable, TableUtils.Hook.Keys.Row.UpdateState, (_oState) => {
+			oState = _oState;
+			_oState.type = _oState.Type.GroupHeader;
+			_oState.contentHidden = true;
+			_oState.title = "My Title";
+			_oState.expandable = true;
+			_oState.expanded = true;
+			_oState.level = 3;
+			_oState.selectable = false;
+		});
+
+		this.oRow.setRowBindingContext({}, this.oTable);
+
+		assert.strictEqual(oState.type, oState.Type.GroupHeader, "type is set to GroupHeader");
+		assert.strictEqual(oState.contentHidden, true, "contentHidden is set to true");
+		assert.strictEqual(oState.title, "My Title", "title is set");
+		assert.strictEqual(oState.expandable, true, "expandable is set to true");
+		assert.strictEqual(oState.expanded, true, "expanded is true when expandable is true");
+		assert.strictEqual(oState.level, 3, "level is set to 3");
+		assert.strictEqual(oState.selectable, false, "selectable is set to false");
+	});
+
+	QUnit.test("UpdateState - state is reset before the hook is called on each update", function(assert) {
+		let iCallCount = 0;
+
+		TableUtils.Hook.register(this.oTable, TableUtils.Hook.Keys.Row.UpdateState, (oState) => {
+			iCallCount++;
+			if (iCallCount === 1) {
+				oState.selectable = false;
+				oState.title = "First";
+			}
+		});
+
+		this.oRow.setRowBindingContext({}, this.oTable);
+		assert.strictEqual(this.oRow.isSelectable(), false, "selectable is false after first update");
+		assert.strictEqual(this.oRow.getTitle(), "First", "title is 'First' after first update");
+
+		this.oRow.setRowBindingContext({}, this.oTable);
+		assert.strictEqual(this.oRow.isSelectable(), true, "selectable is reset to true before second update");
+		assert.strictEqual(this.oRow.getTitle(), "", "title is reset to empty before second update");
+	});
+
+	QUnit.test("UpdateState - selectable defaults to false when row is empty", function(assert) {
+		TableUtils.Hook.register(this.oTable, TableUtils.Hook.Keys.Row.UpdateState, (oState) => {
+			oState.selectable = true;
+		});
+
+		this.oRow.setRowBindingContext(null, this.oTable);
+		assert.strictEqual(this.oRow.isSelectable(), false, "empty row is not selectable even if hook sets selectable to true");
+	});
+
+	QUnit.test("UpdateState - expanded defaults to false when not expandable", function(assert) {
+		let oState;
+
+		TableUtils.Hook.register(this.oTable, TableUtils.Hook.Keys.Row.UpdateState, (_oState) => {
+			oState = _oState;
+			_oState.expandable = false;
+			_oState.expanded = true;
+		});
+
+		this.oRow.setRowBindingContext({}, this.oTable);
+		assert.strictEqual(oState.expanded, false, "expanded is false when expandable is false");
+	});
+
+	QUnit.test("UpdateState - invalid type throws", function(assert) {
+		TableUtils.Hook.register(this.oTable, TableUtils.Hook.Keys.Row.UpdateState, (oState) => {
+			assert.throws(() => {
+				oState.type = "InvalidType";
+			}, /not a valid type/i, "Setting an invalid type throws an error");
+		});
+
+		this.oRow.setRowBindingContext({}, this.oTable);
+	});
+
+	QUnit.test("UpdateState - state.Type is read-only", function(assert) {
+		TableUtils.Hook.register(this.oTable, TableUtils.Hook.Keys.Row.UpdateState, (oState) => {
+			assert.throws(() => {
+				oState.Type = {};
+			}, "Assigning to state.Type throws");
+		});
+
+		this.oRow.setRowBindingContext({}, this.oTable);
+	});
+
+	QUnit.test("UpdateState - state.empty is read-only and reflects context presence", function(assert) {
+		let oState;
+
+		TableUtils.Hook.register(this.oTable, TableUtils.Hook.Keys.Row.UpdateState, (_oState) => {
+			oState = _oState;
+			assert.throws(() => {
+				_oState.empty = true;
+			}, "Assigning to state.empty throws");
+		});
+
+		this.oRow.setRowBindingContext({}, this.oTable);
+		assert.strictEqual(oState.empty, false, "state.empty is false when a context is set");
 	});
 
 	QUnit.test("Expand", function(assert) {
