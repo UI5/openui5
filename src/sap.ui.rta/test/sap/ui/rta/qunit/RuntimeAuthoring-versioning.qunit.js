@@ -7,11 +7,11 @@ sap.ui.define([
 	"sap/ui/core/BusyIndicator",
 	"sap/ui/fl/initial/api/Version",
 	"sap/ui/fl/util/CancelError",
+	"sap/ui/fl/write/_internal/Storage",
 	"sap/ui/fl/write/_internal/Versions",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/fl/write/api/ReloadInfoAPI",
 	"sap/ui/fl/write/api/VersionsAPI",
-	"sap/ui/fl/write/_internal/Storage",
 	"sap/ui/fl/Utils",
 	"sap/ui/rta/util/ReloadManager",
 	"sap/ui/rta/RuntimeAuthoring",
@@ -24,11 +24,11 @@ sap.ui.define([
 	BusyIndicator,
 	Version,
 	CancelError,
+	Storage,
 	Versions,
 	PersistenceWriteAPI,
 	ReloadInfoAPI,
 	VersionsAPI,
-	Storage,
 	FlexUtils,
 	ReloadManager,
 	RuntimeAuthoring,
@@ -65,6 +65,7 @@ sap.ui.define([
 			return this.oRta.start();
 		},
 		afterEach() {
+			ReloadInfoAPI.removeInfoSessionStorage(this.oRta.getRootControlInstance());
 			this.oRta.destroy();
 			sandbox.restore();
 		}
@@ -146,12 +147,15 @@ sap.ui.define([
 			});
 			sandbox.stub(this.oRta, "canSave").returns(true);
 			this.oSerializeStub = sandbox.stub(this.oRta, "_serializeToLrep").resolves();
+			this.oStopStub = sandbox.stub(this.oRta, "stop").resolves();
 			this.oEnableRestartStub = sandbox.stub(RuntimeAuthoring, "enableRestart");
 			this.oLoadVersionStub = sandbox.stub(VersionsAPI, "loadVersionForApplication").resolves();
+			this.oRestartStub = sandbox.stub(ReloadManager, "triggerReload").resolves();
 			this.nVersionParameter = 1;
 			return this.oRta.start();
 		},
 		afterEach() {
+			ReloadInfoAPI.removeInfoSessionStorage(this.oRta.getRootControlInstance());
 			this.oRta.destroy();
 			sandbox.restore();
 		}
@@ -160,14 +164,21 @@ sap.ui.define([
 			const fnDone = assert.async();
 			sandbox.stub(Utils, "showMessageBox").resolves(MessageBox.Action.YES);
 
-			this.oLoadVersionStub.callsFake(function(mPropertyBag) {
-				assert.strictEqual(mPropertyBag.version, this.nVersionParameter, "the version parameter was passed correct");
+			this.oRestartStub.callsFake(function() {
+				assert.strictEqual(
+					this.oLoadVersionStub.lastCall.args[0].version, this.nVersionParameter,
+					"the version parameter was passed correct"
+				);
 				assert.strictEqual(this.oSerializeStub.callCount, 1, "the changes were saved");
 				assert.strictEqual(
 					this.oSerializeStub.args[0].length,
 					0,
 					"then '_serializeToLrep' was called without 'bCondenseAnyLayer' parameter"
 				);
+				assert.strictEqual(this.oStopStub.callCount, 1, "the RTA stop was triggered");
+				assert.strictEqual(this.oStopStub.lastCall.args[0], true, "the RTA stop was called with the correct first argument");
+				assert.strictEqual(this.oStopStub.lastCall.args[1], true, "the RTA stop was called with the correct second argument");
+				assert.strictEqual(this.oStopStub.lastCall.args[2], true, "the RTA stop was called with the correct third argument");
 				fnDone();
 			}.bind(this));
 			this.oRta.getToolbar().fireSwitchVersion({
@@ -218,9 +229,8 @@ sap.ui.define([
 			});
 			this.oActivateStub = sandbox.stub(VersionsAPI, "activate").resolves(true);
 
-			const oFlexInfo = JSON.parse(window.sessionStorage.getItem(`sap.ui.fl.info.${oComp.getId()}`));
-			oFlexInfo.allContextsProvided = true;
-			window.sessionStorage.setItem(`sap.ui.fl.info.${oComp.getId()}`, JSON.stringify(oFlexInfo));
+			ReloadInfoAPI.addParametersToInfoSessionStorage(oComp.getId(), [{ key: "allContextsProvided", value: true }]);
+			sandbox.stub(ReloadManager, "handleReloadOnStart").resolves(false);
 
 			return this.oRta.start().then(function() {
 				this.oRta._oVersionsModel.setProperty("/versions", [{
@@ -233,6 +243,7 @@ sap.ui.define([
 			}.bind(this));
 		},
 		afterEach() {
+			ReloadInfoAPI.removeInfoSessionStorage(this.oRta.getRootControlInstance());
 			this.oRta.destroy();
 			sandbox.restore();
 		}
@@ -462,11 +473,10 @@ sap.ui.define([
 			const done = assert.async();
 			sandbox.stub(PersistenceWriteAPI, "hasDirtyChanges").returns(true);
 			sandbox.stub(this.oRta, "canSave").returns(true);
-			sandbox.stub(ReloadManager, "handleReloadOnExit");
 			sandbox.stub(ReloadInfoAPI, "removeInfoSessionStorage");
 			const oMessageBoxStub = sandbox.stub(Utils, "showMessageBox").resolves();
 			const oSerializeStub = sandbox.stub(this.oRta, "_serializeToLrep").resolves();
-			sandbox.stub(ReloadManager, "checkReloadOnExit");
+			sandbox.stub(ReloadManager, "checkReloadOnExit").resolves({});
 
 			this.oRta.attachEventOnce("stop", function() {
 				assert.ok(true, "then the RTA stop event is fired");
@@ -488,6 +498,7 @@ sap.ui.define([
 			await this.oRta.start();
 		},
 		afterEach() {
+			ReloadInfoAPI.removeInfoSessionStorage(this.oRta.getRootControlInstance());
 			VersionsAPI.clearInstances();
 			this.oRta.destroy();
 			sandbox.restore();

@@ -610,6 +610,7 @@ sap.ui.define([
 			const oReloadStub = sandbox.stub(ReloadManager, "triggerReload");
 
 			await createAndStartRTA.call(this, oAdaptationsModel);
+			sandbox.stub(this.oRta, "stop").resolves();
 			this.oToolbar.setModel(oAdaptationsModel, "contextBasedAdaptations");
 			this.oToolbar.setModel(this.oToolbarControlsModel, "controls");
 			await RtaQunitUtils.showActionsMenu(this.oToolbar);
