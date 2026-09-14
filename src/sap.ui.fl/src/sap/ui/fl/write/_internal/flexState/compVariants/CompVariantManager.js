@@ -718,7 +718,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Takes an array of FlexObjects and filters out any changes of a deleted variant
+	 * Takes an array of FlexObjects and filters out any changes referencing a variant that is not available
 	 *
 	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} aFlexObjects - FlexObjects to be filtered
 	 * @param {string} sReference - Flex reference of the application
@@ -734,11 +734,16 @@ sap.ui.define([
 		return aFlexObjects.filter((oFlexObject) => {
 			if (oFlexObject.getFileType() === "change") {
 				if (oFlexObject.getChangeType() === "updateVariant") {
-					return aVariants.includes(oFlexObject.getSelector().variantId);
+					const sVariantId = oFlexObject.getSelector().variantId;
+					// Standard variant is always valid even if not yet registered in comp state
+					return sVariantId === CompVariant.STANDARD_VARIANT_ID || aVariants.includes(sVariantId);
 				}
 				if (oFlexObject.getChangeType() === "defaultVariant") {
-					// Set default of Standard (empty variant name) or existing variant is valid
-					return !oFlexObject.getContent().defaultVariantName || aVariants.includes(oFlexObject.getContent().defaultVariantName);
+					// Set default of Standard (empty variant name or explicit *standard* id) or existing variant is valid
+					const sDefaultVariantName = oFlexObject.getContent().defaultVariantName;
+					return !sDefaultVariantName
+					|| sDefaultVariantName === CompVariant.STANDARD_VARIANT_ID
+					|| aVariants.includes(sDefaultVariantName);
 				}
 			}
 			return true;
