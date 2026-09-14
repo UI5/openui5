@@ -84,14 +84,17 @@ sap.ui.define([
 		const oSelectors = this._oChangeIndicatorRegistry.getSelectorsWithRegisteredChanges();
 		const oConnectedElements = this._getConnectedElements();
 		const oTargetIds = new Set();
+		// Single source of truth: maps every decorated overlay ID to the change infos that caused it.
+		// This lets findOverlayWithChanges and getChangesForOverlay use the same resolution as the border path.
+		const oDecoratedOverlayChangeInfos = new Map();
 
 		Object.keys(oSelectors).forEach((sSelectorId) => {
 			const aChangeInfos = oSelectors[sSelectorId];
-			const bHasVisibleChanges = aChangeInfos.some((oChangeInfo) => {
+			const aVisibleChangeInfos = aChangeInfos.filter((oChangeInfo) => {
 				return !oChangeInfo.dependent && matchesStateFilter.call(this, oChangeInfo);
 			});
 
-			if (!bHasVisibleChanges) {
+			if (aVisibleChangeInfos.length === 0) {
 				return;
 			}
 
@@ -100,7 +103,10 @@ sap.ui.define([
 				return;
 			}
 
-			oTargetIds.add(oOverlay.getId());
+			const sOverlayId = oOverlay.getId();
+			oTargetIds.add(sOverlayId);
+			const aExisting = oDecoratedOverlayChangeInfos.get(sOverlayId) || [];
+			oDecoratedOverlayChangeInfos.set(sOverlayId, [...aExisting, ...aVisibleChangeInfos]);
 
 			// Connected overlay (e.g. IconTabBar anchor for an ObjectPageSection)
 			const sElementId = oOverlay.getElement().getId();
@@ -108,7 +114,10 @@ sap.ui.define([
 			if (sConnectedElementId) {
 				const oConnectedOverlay = OverlayRegistry.getOverlay(sConnectedElementId);
 				if (oConnectedOverlay && !_isOverlayUnavailable(oConnectedOverlay) && !oConnectedOverlay.bIsDestroyed) {
-					oTargetIds.add(oConnectedOverlay.getId());
+					const sConnectedOverlayId = oConnectedOverlay.getId();
+					oTargetIds.add(sConnectedOverlayId);
+					const aConnectedExisting = oDecoratedOverlayChangeInfos.get(sConnectedOverlayId) || [];
+					oDecoratedOverlayChangeInfos.set(sConnectedOverlayId, [...aConnectedExisting, ...aVisibleChangeInfos]);
 				}
 			}
 		});
@@ -130,6 +139,7 @@ sap.ui.define([
 		});
 
 		this._oDecoratedOverlayIds = oTargetIds;
+		this._oDecoratedOverlayChangeInfos = oDecoratedOverlayChangeInfos;
 	}
 
 	function removePopupAnchor() {
@@ -332,7 +342,9 @@ sap.ui.define([
 
 		const mPropertyBag = { appComponent: FlUtils.getAppComponentForControl(oAffectedElement) };
 		const oOverlay = Element.getElementById(sOverlayId);
-		const sElementLabel = oOverlay.getDesignTimeMetadata().getLabel(oAffectedElement);
+		// Guard: oAffectedElement may be null when the change targets a removed element (e.g. a stashed
+		// SmartForm group that no longer exists). Pass null safely — DT metadata getLabel must handle it.
+		const sElementLabel = oOverlay.getDesignTimeMetadata().getLabel(oAffectedElement) || "";
 		const oCommandVisualization = getCommandVisualization(mChangeInformation);
 		const oDescription = oCommandVisualization?.getDescription(mDescriptionPayload, sElementLabel, mPropertyBag) || {};
 		let sCommandName = mChangeInformation.commandName;
@@ -467,6 +479,9 @@ sap.ui.define([
 			// A Set keeps membership checks O(1) — the decorated set can grow into the hundreds
 			// (large changesets), so the lookup in _applyBorderToOverlay must not be linear.
 			this._oDecoratedOverlayIds = new Set();
+			// Maps decorated overlay IDs to the change infos that caused them — single source of
+			// truth shared by the border path, findOverlayWithChanges, and getChangesForOverlay.
+			this._oDecoratedOverlayChangeInfos = new Map();
 
 			// Default: show only draft/dirty changes
 			this._bShowAllChanges = false;
@@ -726,6 +741,7 @@ sap.ui.define([
 			}
 		});
 		this._oDecoratedOverlayIds = new Set();
+		this._oDecoratedOverlayChangeInfos = new Map();
 	};
 
 	/**
@@ -791,6 +807,15 @@ sap.ui.define([
 		if (this.hasChangesForElement(sConnectedElementId)) {
 			return OverlayRegistry.getOverlay(sConnectedElementId);
 		}
+
+		// Fallback: the overlay may be a relevant-container target (e.g. SmartForm for a stashed group).
+		// In that case hasChangesForElement returns false (the registry keys are group/Form, not SmartForm),
+		// but applyDecorationDiff already computed the correct decorated overlay via _determineElementOverlay
+		// and stored it in _oDecoratedOverlayChangeInfos.
+		if (this._oDecoratedOverlayChangeInfos?.has(oOverlay.getId())) {
+			return oOverlay;
+		}
+
 		return undefined;
 	};
 
@@ -803,7 +828,14 @@ sap.ui.define([
 	ChangeVisualization.prototype.getChangesForOverlay = function(oOverlay) {
 		const sElementId = oOverlay.getElement().getId();
 		const sOverlayId = oOverlay.getId();
-		const aChangeInfos = this._oChangeIndicatorRegistry.getChangeInfosForElement(sElementId, matchesStateFilter.bind(this));
+		let aChangeInfos = this._oChangeIndicatorRegistry.getChangeInfosForElement(sElementId, matchesStateFilter.bind(this));
+
+		// Fallback for relevant-container overlays (e.g. SmartForm decorated because of a stashed group):
+		// the registry keys are the child element IDs, not the SmartForm ID, so getChangeInfosForElement
+		// returns empty. Use the pre-computed map from applyDecorationDiff instead.
+		if (aChangeInfos.length === 0) {
+			aChangeInfos = this._oDecoratedOverlayChangeInfos?.get(sOverlayId) || [];
+		}
 
 		// Sort by creation date (newest first); changes created in-session have no creation date
 		// and are treated as "now" so they sort to the top and stay equal to each other.
