@@ -1,0 +1,12 @@
+{
+  "1.151.1": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "f9d5fd445cdc2ed389482f4dcd3885a8b187726b",
+        "type": "FIX",
+        "text": " SimpleForm: use sap.m.Title for rendering"
+      }
+    ]
+  }
+}

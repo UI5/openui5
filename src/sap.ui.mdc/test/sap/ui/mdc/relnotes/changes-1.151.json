@@ -48,5 +48,35 @@
         "text": " Adapt Filters Dialog: invisible label for mode switch"
       }
     ]
+  },
+  "1.151.1": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "ce6108d4686dbf2540e234ca4b225b8b04a13f6d",
+        "type": "FIX",
+        "text": " FilterBar: misaligned after saving variant"
+      },
+      {
+        "id": "0a36b426adac8e0462217cb8aac801935b0b0bad",
+        "type": "FIX",
+        "text": "p13n.AdaptFiltersPanel: fix boolean field visibility"
+      },
+      {
+        "id": "b4a5f0deffd16ed564ab7c0e57f293ddfa032967",
+        "type": "FIX",
+        "text": " ValueHelp: Token counter not updated"
+      },
+      {
+        "id": "ed813e6d36193460f6e405a9a9a5b9733069638a",
+        "type": "FIX",
+        "text": "p13n.AdaptFiltersPanel: Fix keyboard navigation"
+      },
+      {
+        "id": "522a5a8c06bf2c4b5aa26a93d2bef4e2f1b93891",
+        "type": "FIX",
+        "text": " DynamicDateRange cannot parse \"empty\" operator"
+      }
+    ]
   }
 }

@@ -43,5 +43,15 @@
         "text": " sap.f.DynamicPageTitle: refresh accessible name on title text changes"
       }
     ]
+  },
+  "1.151.1": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "92cf4b6d56bb13b95e05a40bd97133b673c85d3c",
+        "type": "FIX",
+        "text": " sap.f: Search - use correct background-color parameter on hover"
+      }
+    ]
   }
 }

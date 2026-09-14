@@ -1,0 +1,27 @@
+{
+  "1.151.1": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "1849db92a2c88bfb13361a651b626e28ca2f00f8",
+        "type": "FIX",
+        "text": " FormContainer breaks if used in XML fragment"
+      },
+      {
+        "id": "f9d5fd445cdc2ed389482f4dcd3885a8b187726b",
+        "type": "FIX",
+        "text": " SimpleForm: use sap.m.Title for rendering"
+      },
+      {
+        "id": "c70a03f27c4294d50d21531b483fd97978b64f11",
+        "type": "FIX",
+        "text": " Form: use sap.m.Title for rendering"
+      },
+      {
+        "id": "3b5a7f6ec66036a66c7f7e460619098321e93ce0",
+        "type": "FIX",
+        "text": " SemanticFormElement: aria-label on Text controls"
+      }
+    ]
+  }
+}

@@ -38,5 +38,15 @@
         "text": " sap.ui.integration.widgets.CardFacade: hideMessage method is now properly assigned"
       }
     ]
+  },
+  "1.151.1": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "fb46dfc9e61ca8169954bbde80a163abc79fc094",
+        "type": "FIX",
+        "text": " sap.ui.integration.widgets.Card: Stabilize PreventKeyboardScrolling test"
+      }
+    ]
   }
 }

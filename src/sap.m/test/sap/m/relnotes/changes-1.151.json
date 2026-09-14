@@ -223,5 +223,40 @@
         "text": " sap.m.Wizard: Progress navigator is properly updated"
       }
     ]
+  },
+  "1.151.1": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "f5e85827a62a9978ee9661822db8a9a1ba9739a5",
+        "type": "FIX",
+        "text": "sap.m.ComboBox: Dialog opens when tapping on mobile"
+      },
+      {
+        "id": "d25e6db8405bd4992d65ea0b0c4c064cf7c20b1e",
+        "type": "FIX",
+        "text": " sap.m.Popover: Label custom header when showHeader is false"
+      },
+      {
+        "id": "06725746f0600dfbf53354e953da140e2ce4269e",
+        "type": "FIX",
+        "text": " m.Table: No columns message not visible"
+      },
+      {
+        "id": "f9d5fd445cdc2ed389482f4dcd3885a8b187726b",
+        "type": "FIX",
+        "text": " SimpleForm: use sap.m.Title for rendering"
+      },
+      {
+        "id": "d26ff3e998fc96cb98db53335140e179a587b941",
+        "type": "FIX",
+        "text": " sap.m.MessageView: Details view is correctly updated on message update"
+      },
+      {
+        "id": "93085a91a1cc6fb5370030f1b0618584d4db2cb0",
+        "type": "FIX",
+        "text": " GroupPanel, SortPanel: improve for small screens"
+      }
+    ]
   }
 }
