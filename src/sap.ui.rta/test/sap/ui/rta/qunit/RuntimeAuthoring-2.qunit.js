@@ -34,6 +34,7 @@ sap.ui.define([
 	"sap/ui/rta/command/BaseCommand",
 	"sap/ui/rta/command/Stack",
 	"sap/ui/rta/plugin/Stretch",
+	"sap/ui/rta/util/changeVisualization/ChangeVisualization",
 	"sap/ui/rta/util/ReloadManager",
 	"sap/ui/rta/RuntimeAuthoring",
 	"sap/ui/rta/Utils",
@@ -72,6 +73,7 @@ sap.ui.define([
 	BaseCommand,
 	Stack,
 	Stretch,
+	ChangeVisualization,
 	ReloadManager,
 	RuntimeAuthoring,
 	RtaUtils,
@@ -1023,6 +1025,75 @@ sap.ui.define([
 				this.oRta._oToolbarControlsModel.getProperty("/highlightAllChanges/enabled"),
 				false,
 				"then the 'Highlight All Changes' button is reset to disabled"
+			);
+		});
+
+		QUnit.test("when stop() triggers a reload and 'Highlight All Changes' is active, then the pressed state is saved to sessionStorage", async function(assert) {
+			sandbox.stub(ReloadManager, "handleReloadOnExit").resolves();
+			await this.oRta.start();
+			this.oRta._oToolbarControlsModel.setProperty("/highlightAllChanges/pressed", true);
+
+			await this.oRta.stop();
+
+			assert.strictEqual(
+				window.sessionStorage.getItem("sap.ui.rta.RuntimeAuthoring.highlightAllChangesAfterRestart"),
+				"true",
+				"then the pressed state is stored in sessionStorage"
+			);
+			window.sessionStorage.removeItem("sap.ui.rta.RuntimeAuthoring.highlightAllChangesAfterRestart");
+		});
+
+		QUnit.test("when stop() triggers a reload and 'Highlight All Changes' is not active, then sessionStorage is not written", async function(assert) {
+			sandbox.stub(ReloadManager, "handleReloadOnExit").resolves();
+			await this.oRta.start();
+			this.oRta._oToolbarControlsModel.setProperty("/highlightAllChanges/pressed", false);
+
+			await this.oRta.stop();
+
+			assert.strictEqual(
+				window.sessionStorage.getItem("sap.ui.rta.RuntimeAuthoring.highlightAllChangesAfterRestart"),
+				null,
+				"then nothing is written to sessionStorage"
+			);
+		});
+
+		QUnit.test("when draft is discarded and 'Highlight All Changes' is active, then the pressed state is saved to sessionStorage", async function(assert) {
+			sandbox.stub(VersionsAPI, "discardDraft").resolves();
+			sandbox.stub(RtaUtils, "showMessageBox").resolves(MessageBox.Action.OK);
+			sandbox.stub(ReloadManager, "triggerReload").resolves();
+			await this.oRta.start();
+			this.oRta._oToolbarControlsModel.setProperty("/highlightAllChanges/pressed", true);
+
+			this.oRta.getToolbar().fireEvent("discardDraft", { versionTitle: "Version 1" });
+			await new Promise((resolve) => { sandbox.stub(this.oRta, "stop").callsFake(resolve); });
+
+			assert.strictEqual(
+				window.sessionStorage.getItem("sap.ui.rta.RuntimeAuthoring.highlightAllChangesAfterRestart"),
+				"true",
+				"then the pressed state is stored in sessionStorage"
+			);
+			window.sessionStorage.removeItem("sap.ui.rta.RuntimeAuthoring.highlightAllChangesAfterRestart");
+		});
+
+		QUnit.test("when RTA starts and the sessionStorage reload flag is set, then 'Highlight All Changes' is restored", async function(assert) {
+			window.sessionStorage.setItem("sap.ui.rta.RuntimeAuthoring.highlightAllChangesAfterRestart", "true");
+			const oSetShowAllChangesSpy = sandbox.spy(ChangeVisualization.prototype, "setShowAllChanges");
+
+			await this.oRta.start();
+
+			assert.strictEqual(
+				window.sessionStorage.getItem("sap.ui.rta.RuntimeAuthoring.highlightAllChangesAfterRestart"),
+				null,
+				"then the sessionStorage flag is cleared"
+			);
+			assert.strictEqual(
+				this.oRta._oToolbarControlsModel.getProperty("/highlightAllChanges/pressed"),
+				true,
+				"then the toolbar model has the pressed state restored"
+			);
+			assert.ok(
+				oSetShowAllChangesSpy.calledWith(true),
+				"then setShowAllChanges(true) was called on ChangeVisualization"
 			);
 		});
 	});
