@@ -18,17 +18,17 @@
 	background-color: var(--sapTile_Background);
 	border: 1px solid var(--sapTile_BorderColor);
 	border-radius: 0.125rem;
-	box-shadow: @sapUiShadowLevel0;
+	box-shadow: var(--sapContent_Shadow0);
 }
 
 .sapMTile * { /* FIXME!!! (star rule with any-parent selector...) */
 	-webkit-user-select: none;
 	-webkit-user-drag: none;
-	-moz-user-select: -moz-none;
+	user-select: none;
 }
 
 .sapMTCEditable .sapMTile {
-	background-color: fade(@sapUiTileBackground, 50);
+	background-color: ~'hsl(from var(--sapTile_Background) h s l / .5)';
 }
 
 .sapMTile.sapMTileActive {
@@ -70,5 +70,5 @@ html.sap-desktop .sapMTile:focus,
 
 .sapMTile .sapMTileDrag {
 	opacity: 0.6;
-	box-shadow: 0 1px 3px fade(@sapUiContentShadowColor,60);
+	box-shadow: 0 1px 3px ~'hsl(from var(--sapContent_ShadowColor) h s l / .6)';
 }
