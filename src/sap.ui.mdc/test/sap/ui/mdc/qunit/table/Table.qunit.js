@@ -16,6 +16,7 @@ sap.ui.define([
 	"sap/ui/mdc/table/ResponsiveColumnSettings",
 	"sap/ui/mdc/table/menus/GroupHeaderRowContextMenu",
 	"sap/ui/mdc/table/utils/Personalization",
+	"sap/ui/mdc/table/utils/FilterInfoBar",
 	"sap/ui/mdc/FilterBar",
 	"sap/m/Table",
 	"sap/m/Text",
@@ -74,6 +75,7 @@ sap.ui.define([
 	ResponsiveColumnSettings,
 	GroupHeaderRowContextMenu,
 	PersonalizationUtils,
+	FilterInfoBar,
 	FilterBar,
 	TableM,
 	Text,
@@ -3306,6 +3308,20 @@ sap.ui.define([
 		await this.oTable.initialized();
 
 		this.assertFilterInfoBarText(["NameLabel"], "Only active property label shown");
+	});
+
+	QUnit.test("Super class init is called", async function(assert) {
+		const oSuperProto = FilterInfoBar.getMetadata().getParent().getClass().prototype;
+		const oInitSpy = sinon.spy(oSuperProto, "init");
+
+		try {
+			this.createTable({p13nMode: ["Filter"]});
+			await this.oTable.initialized();
+
+			assert.ok(oInitSpy.calledOnce, "init was called on the super class");
+		} finally {
+			oInitSpy.restore();
+		}
 	});
 
 	QUnit.module("p13nMode", {
