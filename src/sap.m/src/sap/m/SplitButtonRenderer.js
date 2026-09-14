@@ -2,9 +2,14 @@
  * ${copyright}
  */
 
-sap.ui.define(["sap/m/library", "sap/ui/core/InvisibleText", "sap/ui/core/ShortcutHintsMixin"],
+sap.ui.define([
+	"sap/m/library",
+	"sap/ui/core/InvisibleText",
+	"sap/ui/core/ShortcutHintsMixin",
+	"sap/ui/core/tooltip/TooltipEnablement"
+],
 
-	function(library, InvisibleText, ShortcutHintsMixin) {
+	function(library, InvisibleText, ShortcutHintsMixin, TooltipEnablement) {
 		"use strict";
 
 		// shortcut for sap.m.ButtonType
@@ -35,6 +40,9 @@ sap.ui.define(["sap/m/library", "sap/ui/core/InvisibleText", "sap/ui/core/Shortc
 				sType = oButton.getType(),
 				bEnabled = oButton.getEnabled(),
 				sTitleAttribute = oButton.getTitleAttributeValue(),
+				bEnhancedTooltip = TooltipEnablement.isEnhancedTooltipEnabled(),
+				bHasShortcut = ShortcutHintsMixin.isDOMIDRegistered(oButton.getId()),
+				bRenderNativeTooltip = sTitleAttribute && !bEnhancedTooltip && !bHasShortcut,
 				sTooltipId;
 
 			//write root DOM element
@@ -60,7 +68,7 @@ sap.ui.define(["sap/m/library", "sap/ui/core/InvisibleText", "sap/ui/core/Shortc
 			oRm.attr("tabindex", bEnabled ? "0" : "-1");
 
 			// add tooltip if available
-			if (sTitleAttribute && !ShortcutHintsMixin.isDOMIDRegistered(oButton.getId())) {
+			if (bRenderNativeTooltip) {
 				oRm.attr("title", sTitleAttribute);
 			}
 
@@ -85,7 +93,7 @@ sap.ui.define(["sap/m/library", "sap/ui/core/InvisibleText", "sap/ui/core/Shortc
 
 			oRm.close("div");
 
-			if (sTitleAttribute) {
+			if (bRenderNativeTooltip) {
 				sTooltipId = oButton.getId() + "-tooltip";
 				oRm.openStart("span", sTooltipId);
 				oRm.class("sapUiInvisibleText");
@@ -114,6 +122,8 @@ sap.ui.define(["sap/m/library", "sap/ui/core/InvisibleText", "sap/ui/core/Shortc
 		SplitButtonRenderer.writeAriaLabelledBy = function(oButton, mAccProperties) {
 			var sAriaLabelledByValue = "",
 				sTitleAttribute = oButton.getTitleAttributeValue(),
+				bEnhancedTooltip = TooltipEnablement.isEnhancedTooltipEnabled(),
+				bRenderNativeTooltip = sTitleAttribute && !bEnhancedTooltip,
 				sTooltipId;
 
 			if (oButton.getText()) {
@@ -121,7 +131,7 @@ sap.ui.define(["sap/m/library", "sap/ui/core/InvisibleText", "sap/ui/core/Shortc
 				sAriaLabelledByValue += " ";
 			}
 
-			if (sTitleAttribute) {
+			if (bRenderNativeTooltip) {
 				sTooltipId = oButton.getId() + "-tooltip";
 				sAriaLabelledByValue += sTooltipId + " ";
 			}
