@@ -1254,7 +1254,7 @@ sap.ui.define([
 			const oRowId = oRowListItem.getTimeline().getAssociation("row"),
 				oRow = Element.getElementById(oRowId),
 				sRowDesctiption = oRow.getRowHeaderDescription() || this._oRB.getText("PLANNING_CALENDAR_ROW_HEADER_DESCRIPTION");
-			oRowListItem.getDomRef().querySelector(".sapMPlanCalRowHead").setAttribute("aria-description", sRowDesctiption);
+			oRowListItem.getDomRef().querySelector(".sapMPlanCalRowHead")?.setAttribute("aria-description", sRowDesctiption);
 		}, this);
 	};
 

@@ -5241,4 +5241,24 @@ sap.ui.define([
 			assert.strictEqual(oWeeksRow, null, "WeeksRow is NOT rendered for primaryCalendarType: " + aNonGregorianTypes[i]);
 		}
 	});
+
+	QUnit.test("WeeksRow weeksLabelRow is not shown when showHeaderRow is false", async function(assert) {
+		// Arrange
+		this.oPC.setViewKey(CalendarIntervalType.Month);
+		await nextUIUpdate();
+
+		// Act
+		let oWeeksRowLabel = this.oPC.getDomRef().querySelector('.sapMPlanWeeksLabelRow');
+
+		// Assert
+		assert.ok(oWeeksRowLabel, "WeeksRowLabel is shown");
+
+		// Act
+		this.oPC.setShowRowHeaders(false);
+		await nextUIUpdate();
+		oWeeksRowLabel = this.oPC.getDomRef().querySelector('.sapMPlanWeeksLabelRow');
+
+		// Assert
+		assert.strictEqual(window.getComputedStyle(oWeeksRowLabel).display, "none", "WeeksRowLabel is not shown when showHeaderRow is false");
+	});
 });
