@@ -1586,5 +1586,15 @@
         "text": " GroupPanel, SortPanel: improve for small screens"
       }
     ]
+  },
+  "1.120.50": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "5e03d16410f3ecb66600ceacc39589252deb0b50",
+        "type": "FIX",
+        "text": "sap.m.ComboBox: Dialog opens when tapping on mobile"
+      }
+    ]
   }
 }
