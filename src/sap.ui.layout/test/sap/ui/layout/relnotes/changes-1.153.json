@@ -3,6 +3,11 @@
     "date": "September 2026",
     "notes": [
       {
+        "id": "74f35f7a7b5d253e602e9dbab335ff0115163b05",
+        "type": "FIX",
+        "text": " FormContainer breaks if used in XML fragment"
+      },
+      {
         "id": "95b098f0fe0761358032d43a1b2952ec101b77c9",
         "type": "FEATURE",
         "text": " sap.m.Title: Enhanced Tooltip and Extended Keyboard Navigation enablement"

@@ -3,6 +3,31 @@
     "date": "September 2026",
     "notes": [
       {
+        "id": "2abc3a5d2fc4c5d9bb6e9ec79d4aeab89f6e4817",
+        "type": "FIX",
+        "text": " sap.m.Dialog: Buttons are no longer moved to the overflow area, when there is a space"
+      },
+      {
+        "id": "89fa571928f94a7ac782981d654ba57de02b2ea0",
+        "type": "FIX",
+        "text": " sap.m.SplitButton: paddings on hover"
+      },
+      {
+        "id": "e909f4acb23dc777fdfd0b021228a328b1ee739a",
+        "type": "FIX",
+        "text": " sap.m.PlanningCalendar: weeks row label is not shown when showHeaderRows is false"
+      },
+      {
+        "id": "70d3e87e1c415c62b45ba0338b0faf7dda9f3416",
+        "type": "FEATURE",
+        "text": " sap.m.RadioButtonGroup: required property and MessageMixin support are now added"
+      },
+      {
+        "id": "1866f57372681e50ae25fd354304150460a058dc",
+        "type": "FIX",
+        "text": " sap.m.Switch: fixed read-only and disabled control appearance"
+      },
+      {
         "id": "7671942fa4779c9121fb5215f66c833b2287c918",
         "type": "FIX",
         "text": " sap.m.Title: visual test is now linked to control"

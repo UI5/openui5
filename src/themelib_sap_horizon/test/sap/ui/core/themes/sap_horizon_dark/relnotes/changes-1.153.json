@@ -3,6 +3,11 @@
     "date": "September 2026",
     "notes": [
       {
+        "id": "89fa571928f94a7ac782981d654ba57de02b2ea0",
+        "type": "FIX",
+        "text": " sap.m.SplitButton: paddings on hover"
+      },
+      {
         "id": "7c7f706729b090c41cc6053f2f3dc933adda5d92",
         "type": "FIX",
         "text": " sap.m.Link: Fix hover text-decoration for Link in HCB and HCW themes"

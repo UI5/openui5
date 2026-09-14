@@ -3,6 +3,11 @@
     "date": "September 2026",
     "notes": [
       {
+        "id": "9227216652403762bfbc67369e5ed7031f3a3b8d",
+        "type": "FIX",
+        "text": " rowmodes.Auto: Exclude parent padding from available space calculation"
+      },
+      {
         "id": "334ea727130ef70d2402fd9c2930bf9e1f8cf20f",
         "type": "FIX",
         "text": " Table: Selection Limit Popover heading level should be H1"

@@ -1,0 +1,32 @@
+{
+  "1.153.0": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "673a7af0d2c9a4b0a6f6b122ccf6a2eca527fbfa",
+        "type": "FIX",
+        "text": " MTable: not able to scroll to last items if growing enabled"
+      },
+      {
+        "id": "059c503e7d73e1e3b30676d560e7a67008567529",
+        "type": "FEATURE",
+        "text": " ValueHelp: APIs made public"
+      },
+      {
+        "id": "bc6d4dfc68f5c5e0129c6e4ae238f09a2b3067c7",
+        "type": "FIX",
+        "text": " FilterBar: misaligned after saving variant"
+      },
+      {
+        "id": "f5c29d6506c02af60f6853a802fe33528841b461",
+        "type": "FIX",
+        "text": " sap.ui.mdc.field.FieldInfoBase: resolve duplicated IDs error in mdc.Link"
+      },
+      {
+        "id": "4f0824323799781f79152f708561eda2c20a64c8",
+        "type": "FEATURE",
+        "text": " odata.v4.TableDelegate: Add aggregationConfiguration.enabled to control data aggregation"
+      }
+    ]
+  }
+}

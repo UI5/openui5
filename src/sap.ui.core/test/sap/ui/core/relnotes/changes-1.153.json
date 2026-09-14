@@ -3,6 +3,16 @@
     "date": "September 2026",
     "notes": [
       {
+        "id": "7a8bb3cefc8cf4e5bc222d8119e365bc791f22b1",
+        "type": "FIX",
+        "text": " forced-color-adjust performance optimization"
+      },
+      {
+        "id": "8836c8613bbc18aea6c78d32c9127307cbbf97a2",
+        "type": "FIX",
+        "text": " FESR: Escape commas in string fields to avoid breaking the FESR payload"
+      },
+      {
         "id": "fe0a30bda9aa109e6d45db8624c38b569e967753",
         "type": "FIX",
         "text": " base/ManagedObject: notify observer on destroyAggregation for altTypes"
