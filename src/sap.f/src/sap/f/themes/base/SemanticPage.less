@@ -12,8 +12,8 @@
 	.sapFDynamicPageContent {
 
 		.sapFSemanticPageAlignContent {
-			margin-left: -@sapUiMarginSmall;
-			margin-right: -@sapUiMarginSmall;
+			margin-left: ~'calc(-1 * var(--sapContent_Margin_M))';
+			margin-right: ~'calc(-1 * var(--sapContent_Margin_M))';
 		}
 	}
 
@@ -31,7 +31,7 @@
 		.sapFDynamicPage-Std-Phone {
 
 			.sapFSemanticPageAlignContent {
-				margin: 0 -@sapUiMarginSmall;
+				margin: 0  ~'calc(-1 * var(--sapContent_Margin_M))';
 			}
 		}
 	}
