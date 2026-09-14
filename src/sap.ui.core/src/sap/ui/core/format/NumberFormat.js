@@ -920,7 +920,7 @@ sap.ui.define([
 	 *   decimals, shortDecimals, or the 'precision' option itself.
 	 * @param {boolean} [oFormatOptions.trailingCurrencyCode] overrides the global configuration
 	 *   value {@link module:sap/base/i18n/Formatting.getTrailingCurrencyCode Formatting.getTrailingCurrencyCode},
-	 *   which has a default value of <code>true</>.
+	 *   which has a default value of <code>true</code>.
 	 *   This is ignored if <code>oFormatOptions.currencyCode</code> is set to <code>false</code>,
 	 *   or if <code>oFormatOptions.pattern</code> is supplied.
 	 * @param {sap.ui.core.Locale} [oLocale]
