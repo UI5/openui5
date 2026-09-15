@@ -34,7 +34,7 @@
 	justify-content: center;
 	position: absolute;
 	font-family: var(--sapFontFamily);
-	font-size: @sapMFontMediumSize;
+	font-size: var(--sapFontSize);
 	color: var(--sapContent_LabelColor);
 	top: 2.75rem;
 	left: 2.75rem;
@@ -125,7 +125,7 @@
 	z-index: 3;
 	-webkit-touch-callout: none; /* iOS Safari */
 	-webkit-user-select: none; /* Safari */
-	user-select: none; /* Chrome, Edge, Opera and Firefox */
+	user-select: none;
 
 	&.sapMTPCMarker {
 		z-index: 4;
@@ -146,7 +146,7 @@
 	text-align: center;
 	vertical-align: top;
 	font-family: var(--sapFontBoldFamily);
-	font-size:@sapMFontMediumSize;
+	font-size: var(--sapFontSize);
 	color: var(--sapTextColor);
 	border: 0.0625rem solid transparent;
 
@@ -182,7 +182,7 @@
 		}
 	}
 
-	html[dir=rtl] .@{class} {
+	html[dir='rtl'] .@{class} {
 		transform: translate(-50%) rotate(-@angle);
 
 		.sapMTPCNumber {
