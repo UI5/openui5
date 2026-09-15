@@ -204,7 +204,7 @@ html.sap-desktop {
 	}
 }
 
-.sapMSinglePC .sapUiCalItemSel:focus > .sapUiCalItemText::after,
+html.sap-desktop .sapMSinglePC .sapUiCalItemSel:focus > .sapUiCalItemText::after,
 .sapMSinglePC .sapUiCalItemSel:focus-visible > .sapUiCalItemText::after {
 	left: 0;
 	right: 0;
@@ -217,7 +217,7 @@ html.sap-desktop {
 	border-radius: 0 0.25rem 0.25rem 0;
 }
 
-.sapMSinglePC .sapUiCalItem.sapUiCalItemSel:focus > .sapUiCalItemText::after,
+html.sap-desktop .sapMSinglePC .sapUiCalItem.sapUiCalItemSel:focus > .sapUiCalItemText::after,
 .sapMSinglePC .sapUiCalItem.sapUiCalItemSel:focus-visible > .sapUiCalItemText::after {
 	outline: none;
 }
@@ -269,8 +269,8 @@ html.sap-desktop .sapMSinglePCGrid .sapUiCalItem.sapUiCalItemSel:not(.sapUiCalIt
 	border-radius: 0.0625rem;
 }
 
-html.sap-desktop .sapUiCalItem.sapUiCalItemSel:focus::after,
-.sapUiCalItem:not(.sapUiCalItemFocusFromTouch).sapUiCalItemSel:focus-visible::after {
+html.sap-desktop .sapMSinglePCGrid .sapUiCalItem.sapUiCalItemSel:focus::after,
+.sapMSinglePCGrid .sapUiCalItem:not(.sapUiCalItemFocusFromTouch).sapUiCalItemSel:focus-visible::after {
 	position: absolute;
 	top: 0.375rem;
 	left: 0.375rem;
@@ -281,8 +281,8 @@ html.sap-desktop .sapUiCalItem.sapUiCalItemSel:focus::after,
 	border-radius: 0.1875rem;
 }
 
-html.sap-desktop .sapUiCalItem.sapUiCalItemSel:focus > .sapUiCalItemText::after,
-.sapUiCalItem:not(.sapUiCalItemFocusFromTouch).sapUiCalItemSel:focus-visible > .sapUiCalItemText::after {
+html.sap-desktop .sapMSinglePCGrid .sapUiCalItem.sapUiCalItemSel:focus > .sapUiCalItemText::after,
+.sapMSinglePCGrid .sapUiCalItem:not(.sapUiCalItemFocusFromTouch).sapUiCalItemSel:focus-visible > .sapUiCalItemText::after {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -331,4 +331,3 @@ html.sap-desktop .sapMSinglePCGridContent .sapMSinglePCColumns .sapMSinglePCRow:
 .sapMSinglePCGridContent .sapMSinglePCColumns .sapMSinglePCRow:focus-visible::after {
 	border: .125rem solid var(--sapContent_FocusColor);
 }
-
