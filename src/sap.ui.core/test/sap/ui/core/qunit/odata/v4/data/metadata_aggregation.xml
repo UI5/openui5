@@ -219,6 +219,7 @@
 						</PropertyValue>
 					</Record>
 				</Annotation>
+				<Annotation Term="Common.ExpandAfterConcatSupported"/>
 			</EntityContainer>
 			<Annotations Target="Self.BusinessPartnerType">
 				<Annotation Term="Aggregation.CustomAggregate" Qualifier="SalesAmount">

@@ -326,6 +326,7 @@ sap.ui.define([
 				return "";
 			}
 
+			bSortSystemQueryOptions ||= mParameters.$$sortSystemQueryOptions;
 			if (bSortSystemQueryOptions) { // sort only system query options, and keep them last
 				aKeys = aKeys.filter((sKey) => sKey[0] !== "$")
 					.concat(

@@ -62,6 +62,15 @@ sap.ui.define(['sap/ui/layout/VerticalLayout', 'sap/ui/layout/VerticalLayoutRend
 		return aContent;
 	};
 
+	FilterItemLayout.prototype.invalidate = function(oOrigin) {
+		const oParent = this.getParent();
+		if (oParent?.isA("sap.ui.mdc.filterbar.FilterBarBaseLayout")) { // let the FilterBarLayout render the item
+			oParent.invalidate(this);
+		} else {
+			VerticalLayout.prototype.invalidate.apply(this, arguments);
+		}
+	};
+
 	FilterItemLayout.prototype.exit = function() {
 		this._oFilterField = null;
 

@@ -3,10 +3,13 @@
 /* Base theme                               */
 /* ======================================== */
 
-@_sap_m_ProgressIndicator_PopoverCloseIconWidth: 1.4375rem;
-@_sap_m_ProgressIndicator_PopoverCloseIconHeight: 1.375rem;
-@_sap_m_ProgressIndicator_PopoverCloseIconMargin: 0.125rem;
 @_sap_m_ProgressIndicator_TextLeftTextThreshold: @sapUiContentContrastTextThreshold;
+
+.sapUI5Scope {
+	--_sap_m_ProgressIndicator_PopoverCloseIconWidth: 1.4375rem;
+	--_sap_m_ProgressIndicator_PopoverCloseIconHeight: 1.375rem;
+	--_sap_m_ProgressIndicator_PopoverCloseIconMargin: 0.125rem;
+}
 
 .sapMPI {
 
@@ -31,7 +34,7 @@
 }
 
 .sapMPIPopover {
-	min-height: @_sap_m_ProgressIndicator_PopoverCloseIconHeight;
+	min-height: var(--_sap_m_ProgressIndicator_PopoverCloseIconHeight);
 
 	.sapMPopoverScroll {
 		padding-left: 0.5rem;
@@ -46,23 +49,23 @@
 	}
 
 	.sapUiIcon {
-		width: @_sap_m_ProgressIndicator_PopoverCloseIconWidth;
-		height: @_sap_m_ProgressIndicator_PopoverCloseIconHeight;
-		line-height: @_sap_m_ProgressIndicator_PopoverCloseIconHeight;
+		width: var(--_sap_m_ProgressIndicator_PopoverCloseIconWidth);
+		height: var(--_sap_m_ProgressIndicator_PopoverCloseIconHeight);
+		line-height: var(--_sap_m_ProgressIndicator_PopoverCloseIconHeight);
 		font-size: var(--sapFontSmallSize);
 		color: var(--sapContent_IconColor);
 		flex-shrink: 0;
-		margin: @_sap_m_ProgressIndicator_PopoverCloseIconMargin;
+		margin: var(--_sap_m_ProgressIndicator_PopoverCloseIconMargin);
 	}
 
 	/* Additional touch area for the close icon/button required by ACC standards */
 	.sapUiIcon::after {
 		content: '';
 		position: absolute;
-		right: (@_sap_m_ProgressIndicator_PopoverCloseIconMargin * -1);
-		top: (@_sap_m_ProgressIndicator_PopoverCloseIconMargin * -1);
-		width: @_sap_m_ProgressIndicator_PopoverCloseIconWidth + (@_sap_m_ProgressIndicator_PopoverCloseIconMargin * 2);
-		height: @_sap_m_ProgressIndicator_PopoverCloseIconHeight + (@_sap_m_ProgressIndicator_PopoverCloseIconMargin * 2);
+		right: ~'calc(-1 * var(--_sap_m_ProgressIndicator_PopoverCloseIconMargin))';
+		top: ~'calc(-1 * var(--_sap_m_ProgressIndicator_PopoverCloseIconMargin))';
+		width: ~'calc(var(--_sap_m_ProgressIndicator_PopoverCloseIconWidth) + 2 * var(--_sap_m_ProgressIndicator_PopoverCloseIconMargin))';
+		height: ~'calc(var(--_sap_m_ProgressIndicator_PopoverCloseIconHeight) + 2 * var(--_sap_m_ProgressIndicator_PopoverCloseIconMargin))';
 	}
 }
 
@@ -144,7 +147,7 @@
 }
 
 .sapMPIValueNormal .sapMPIBar {
-	max-width: calc(~"100% - 0.5rem");
+	max-width: calc(~'100% - 0.5rem');
 	min-width: 0.5rem;
 }
 

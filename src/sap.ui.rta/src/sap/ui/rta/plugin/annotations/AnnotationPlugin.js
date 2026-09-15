@@ -55,22 +55,6 @@ sap.ui.define([
 		}
 	}
 
-	function getActionText(oElementOverlay, oAction) {
-		const vName = oAction.title;
-		const oElement = oElementOverlay.getElement();
-		if (vName) {
-			if (typeof vName === "function") {
-				return vName(oElement);
-			}
-			const sText = oElementOverlay.getDesignTimeMetadata()?.getLibraryText(oElement, vName);
-			if (sText) {
-				return sText;
-			}
-		}
-		BaseLog.error("Annotation action title is not properly defined in the designtime metadata");
-		return undefined;
-	}
-
 	function getActionIcon(oAnnotationAction) {
 		const sDefaultIcon = oAnnotationAction.type === AnnotationTypes.StringType ? "sap-icon://edit" : "sap-icon://request";
 		const sActionIcon = oAnnotationAction.icon;
@@ -136,6 +120,22 @@ sap.ui.define([
 		}
 
 		return false;
+	};
+
+	AnnotationPlugin.prototype.getActionText = function(oElementOverlay, oAction) {
+		const vName = oAction.title;
+		const oElement = oElementOverlay.getElement();
+		if (vName) {
+			if (typeof vName === "function") {
+				return vName(oElement);
+			}
+			const sText = oElementOverlay.getDesignTimeMetadata()?.getLibraryText(oElement, vName);
+			if (sText) {
+				return sText;
+			}
+		}
+		BaseLog.error("Annotation action title is not properly defined in the designtime metadata");
+		return undefined;
 	};
 
 	/**
@@ -205,7 +205,7 @@ sap.ui.define([
 					? sPluginIdSingleLabelChange
 					: sPluginIdDefault;
 				const iRank = this.getRank(sPluginId);
-				const sActionText = getActionText(oResponsibleElementOverlay, oAction);
+				const sActionText = this.getActionText(oResponsibleElementOverlay, oAction);
 				if (checkDesigntimeActionProperties(oAction) && sActionText) {
 					aMenuItems.push(await this._getMenuItems(aElementOverlays, {
 						pluginId: `${sPluginId}_${sKey}`,

@@ -443,6 +443,30 @@ sap.ui.define([
 		oFilterBar.destroyFilterItems();
 	});
 
+	QUnit.test("rendering", async (assert) => {
+		const oFilterField = new FilterField("FF", { conditions: "{cm>/conditions/filter}" });
+
+		oFilterBar.addFilterItem(oFilterField);
+		oFilterBar.placeAt("qunit-fixture-visible");
+		await nextUIUpdate();
+		const oLayout = oFilterBar.getAggregation("layout");
+		assert.ok(oLayout.isA("sap.ui.mdc.filterbar.FilterContainer"), "FilterContainer used");
+		const oRenderedLayout = oLayout.getAggregation("_layout");
+		assert.ok(oRenderedLayout.isA("sap.ui.mdc.filterbar.FilterBarBaseLayout"), "FilterBarBaseLayout used");
+		let oItem = oLayout.getFilterFields()[0];
+		assert.ok(oItem.isA("sap.ui.mdc.filterbar.aligned.FilterItemLayout"), "FilterItemLayout used");
+		let oItemDomRef = oItem.getDomRef();
+		assert.ok(oItemDomRef?.classList.contains("sapUiMdcFilterBarLayoutItem"), "Dom node has class sapUiMdcFilterBarLayoutItem");
+
+		oFilterBar.removeFilterItem(oFilterField); // remove item and create new -> like in Flex-change
+		oFilterBar.addFilterItem(oFilterField);
+		oItem = oLayout.getFilterFields()[0];
+		oItem.invalidate();
+		await nextUIUpdate();
+		oItemDomRef = oItem.getDomRef();
+		assert.ok(oItemDomRef?.classList.contains("sapUiMdcFilterBarLayoutItem"), "Dom node has class sapUiMdcFilterBarLayoutItem");
+	});
+
 	QUnit.module("FilterBar adaptation", {
 		beforeEach: function() {
 			return this.createTestObjects();

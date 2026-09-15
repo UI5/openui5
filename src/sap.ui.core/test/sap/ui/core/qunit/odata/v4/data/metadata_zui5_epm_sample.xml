@@ -1017,6 +1017,7 @@
 						<PropertyValue Property="CollectionPath" String="UnitsOfMeasure" />
 					</Record>
 				</Annotation>
+				<Annotation Term="SAP__common.ExpandAfterConcatSupported"/>
 			</Annotations>
 			<Annotations Target="SAP__self.BusinessPartner/BusinessPartnerID">
 				<Annotation Term="SAP__common.Label" String="Character Field with Length 10" />
