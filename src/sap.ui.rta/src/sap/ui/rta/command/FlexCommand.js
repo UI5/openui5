@@ -86,11 +86,11 @@ sap.ui.define([
 	 * Retrieves app component of element or selector
 	 *
 	 * @returns {sap.ui.core.UIComponent} App component Instance
+	 * @override
 	 * @private
 	 */
 	FlexCommand.prototype.getAppComponent = function() {
-		const oElement = this.getElement();
-		return oElement ? FlUtils.getAppComponentForControl(oElement) : this.getSelector().appComponent;
+		return BaseCommand.prototype.getAppComponent.call(this) || this.getSelector().appComponent;
 	};
 
 	/**

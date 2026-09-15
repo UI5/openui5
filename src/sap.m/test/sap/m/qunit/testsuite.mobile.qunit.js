@@ -829,6 +829,16 @@ sap.ui.define([
 				}
 			},
 
+			MenuButtonTooltipEnablement: {
+				title: "Test Page for sap.m.MenuButton with enhanced tooltip",
+				ui5: {
+					language: "en"
+				},
+				sinon: {
+					useFakeTimers: true
+				}
+			},
+
 			MessageBox: {
 				title: "QUnit Page for MessageBox",
 				sinon: {

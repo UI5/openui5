@@ -16,7 +16,9 @@ sap.ui.define([
 	'sap/ui/core/LabelEnablement',
 	"./MenuButtonRenderer",
 	'sap/base/i18n/Localization',
-	"sap/ui/events/KeyCodes"
+	"sap/ui/events/KeyCodes",
+	"sap/ui/core/ShortcutHintsMixin",
+	"sap/ui/core/tooltip/TooltipEnablement"
 ], function(
 	library,
 	Control,
@@ -30,7 +32,9 @@ sap.ui.define([
 	LabelEnablement,
 	MenuButtonRenderer,
 	Localization,
-	KeyCodes
+	KeyCodes,
+	ShortcutHintsMixin,
+	TooltipEnablement
 ) {
 		"use strict";
 
@@ -323,11 +327,19 @@ sap.ui.define([
 		 * @private
 		 */
 		MenuButton.prototype._initButton = function() {
-			var oBtn = new Button(this.getId() + "-internalBtn", {
+			const oBtn = new Button(this.getId() + "-internalBtn", {
 				width: "100%",
 				ariaHasPopup: coreLibrary.aria.HasPopup.Menu
 			});
-			oBtn._disableTooltipEnablement();
+
+			// Shortcuts are registered on the MenuButton, not the inner button, so the
+			// inner button looks up its shortcut hint on the outer MenuButton.
+			oBtn._getShortcutHintHost = () => this;
+
+			if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+				ShortcutHintsMixin.setPopupSuppressed(this, true);
+			}
+
 			oBtn.attachPress(this._handleButtonPress, this);
 			oBtn.onkeydown = this.handleKeydown;
 			return oBtn;
@@ -339,12 +351,35 @@ sap.ui.define([
 		 * @private
 		 */
 		MenuButton.prototype._initSplitButton = function() {
-			var oBtn = new SplitButton(this.getId() + "-internalSplitBtn", {
+			const oBtn = new SplitButton(this.getId() + "-internalSplitBtn", {
 				width: "100%"
 			});
 			oBtn.attachPress(this._handleActionPress, this);
 			oBtn.attachArrowPress(this._handleButtonPress, this);
 			oBtn._getArrowButton().onkeydown = this.handleKeydown;
+
+			const oTextBtn = oBtn._getTextButton();
+
+			if (!TooltipEnablement.isEnhancedTooltipEnabled()) {
+				return oBtn;
+			}
+
+			const getMainButtonTooltip = () => oBtn.getTooltip_AsString() || oTextBtn._getTooltip() || "";
+
+			// Host the tooltip on the outer SplitButton as it's the only focusable element, so focus and positioning must use it.
+			oTextBtn._oTooltipEnablement?.destroy();
+			oTextBtn._oTooltipEnablement = new TooltipEnablement(oBtn, {
+				textProvider: () => (
+					oTextBtn.getEnabled() ? ShortcutHintsMixin.getTooltipWithShortcut(this, getMainButtonTooltip()) : ""
+				),
+				invisibleTextProvider: getMainButtonTooltip,
+				domRefProvider: () => oBtn.getDomRef(),
+				focusDomRefProvider: () => oBtn.getDomRef()
+			});
+			// Apply tooltip on hover only over the text button, the arrow has its own tooltip
+			oTextBtn._oTooltipEnablement._oEventTrigger._fnDomRefProvider = () => oTextBtn.getDomRef();
+			ShortcutHintsMixin.setPopupSuppressed(this, true);
+
 			return oBtn;
 		};
 

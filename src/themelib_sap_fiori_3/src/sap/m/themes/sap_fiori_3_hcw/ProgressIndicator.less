@@ -83,7 +83,7 @@
 
 .sapMPIBarDisabled {
 	opacity: 1;
-	border-color: @sapUiHcReducedForeground;
+	border-color: var(--sapContent_DisabledTextColor);
 
 	.sapMPIText.sapMPITextLeft,
 	.sapMPITextRight,
@@ -95,16 +95,17 @@
 	.sapMPIBarPositive,
 	.sapMPIBarNegative,
 	.sapMPIBarCritical,
-	.sapMPIBarInformation  {
-		background: @sapUiHcReducedBackground;
-		border-color: @sapUiHcReducedForeground;
+	.sapMPIBarInformation {
+		background: var(--sapInfobar_NonInteractive_Background);
+		border-color: var(--sapContent_DisabledTextColor);
 	}
 
 	.sapMPIBarRemaining {
-		border-color: @sapUiHcReducedForeground;
+		border-color: var(--sapContent_DisabledTextColor);
 	}
 }
-.sapMPIValueMin >.sapMPIBar {
+
+.sapMPIValueMin > .sapMPIBar {
 	border: none;
 }
 

@@ -2226,15 +2226,18 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("with hidden variants", function(assert) {
+			const oLiveVariant = FlexObjectFactory.createCompVariant({
+				fileName: "variant1",
+				variantId: "variant1",
+				persisted: true,
+				selector: {
+					persistencyKey: "persistencyKey1"
+				}
+			});
+			sandbox.stub(CompVariantManagementState, "getCompEntities").returns([oLiveVariant]);
+
 			const aFlexObjects = [
-				FlexObjectFactory.createCompVariant({
-					fileName: "variant1",
-					variantId: "variant1",
-					persisted: true,
-					selector: {
-						persistencyKey: "persistencyKey1"
-					}
-				}),
+				oLiveVariant,
 				FlexObjectFactory.createFromFileContent({
 					id: "uichange1",
 					layer: Layer.USER,
@@ -2253,7 +2256,7 @@ sap.ui.define([
 					layer: Layer.USER,
 					changeType: "updateVariant",
 					selector: {
-						variantId: "deletedVariant"
+						variantId: "unknownVariant"
 					}
 				}),
 				FlexObjectFactory.createFromFileContent({
@@ -2261,7 +2264,7 @@ sap.ui.define([
 					layer: Layer.USER,
 					changeType: "defaultVariant",
 					content: {
-						defaultVariantName: "deletedVariant"
+						defaultVariantName: "unknownVariant"
 					}
 				}),
 				FlexObjectFactory.createFromFileContent({
@@ -2274,7 +2277,33 @@ sap.ui.define([
 				})
 			];
 			const aFilteredFlexObjects = CompVariantManager.filterHiddenFlexObjects(aFlexObjects, "something");
-			assert.strictEqual(aFilteredFlexObjects.length, 3, "updateVariant change of deleted variant is filter out");
+			assert.strictEqual(aFilteredFlexObjects.length, 4, "updateVariant and defaultVariant changes of unknown variants are filtered out");
+		});
+
+		QUnit.test("with a change on the standard variant", function(assert) {
+			// *standard* variant is valid even if not registered in comp state (e.g. SVM not yet initialized)
+			sandbox.stub(CompVariantManagementState, "getCompEntities").returns([]);
+
+			const aFlexObjects = [
+				FlexObjectFactory.createFromFileContent({
+					id: "uichange1",
+					layer: Layer.USER,
+					changeType: "updateVariant",
+					selector: {
+						variantId: "*standard*"
+					}
+				}),
+				FlexObjectFactory.createFromFileContent({
+					id: "uichange2",
+					layer: Layer.USER,
+					changeType: "defaultVariant",
+					content: {
+						defaultVariantName: "*standard*"
+					}
+				})
+			];
+			const aFilteredFlexObjects = CompVariantManager.filterHiddenFlexObjects(aFlexObjects, "something");
+			assert.strictEqual(aFilteredFlexObjects.length, 2, "changes referencing the standard variant are always kept");
 		});
 	});
 

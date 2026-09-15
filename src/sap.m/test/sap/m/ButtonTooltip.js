@@ -8,9 +8,6 @@ sap.ui.require([
 	"sap/m/ToggleButton",
 	"sap/m/SegmentedButton",
 	"sap/m/SegmentedButtonItem",
-	"sap/m/MenuButton",
-	"sap/m/Menu",
-	"sap/m/MenuItem",
 	"sap/m/Switch",
 	"sap/m/Label",
 	"sap/m/Text",
@@ -19,7 +16,7 @@ sap.ui.require([
 	"sap/ui/core/Core",
 	"sap/ui/core/ShortcutHintsMixin"
 ], async function (App, Page, Panel, HBox, VBox, Button, ToggleButton, SegmentedButton,
-		SegmentedButtonItem, MenuButton, Menu, MenuItem, Switch, Label, Text,
+		SegmentedButtonItem, Switch, Label, Text,
 		FormattedText, MessageToast, Core, ShortcutHintsMixin) {
 	"use strict";
 
@@ -319,73 +316,6 @@ sap.ui.require([
 		}).addStyleClass("sapUiResponsiveMargin");
 	}
 
-	function buildMenuButtonPanel() {
-		const oMenu = new Menu({
-			items: [
-				new MenuItem({ text: "Save", icon: SAVE_ICON }),
-				new MenuItem({ text: "Save As..." }),
-				new MenuItem({ text: "Export" })
-			]
-		});
-		const oMenuButton = new MenuButton({
-			text: "Save",
-			tooltip: TOOLTIP_TEXT,
-			menu: oMenu
-		});
-		registerShortcut(oMenuButton);
-
-		const oMenuSplit = new Menu({
-			items: [
-				new MenuItem({ text: "Save", icon: SAVE_ICON }),
-				new MenuItem({ text: "Save As..." }),
-				new MenuItem({ text: "Export" })
-			]
-		});
-		const oMenuButtonSplit = new MenuButton({
-			text: "Save",
-			tooltip: TOOLTIP_TEXT,
-			buttonMode: "Split",
-			menu: oMenuSplit,
-			defaultAction: function () {
-				MessageToast.show("Default action pressed");
-			}
-		});
-		registerShortcut(oMenuButtonSplit);
-
-		const oEnabledSwitch = new Switch({
-			state: true,
-			customTextOn: "On",
-			customTextOff: "Off",
-			change: function (oEvent) {
-				const bOn = oEvent.getParameter("state");
-				oMenuButton.setEnabled(bOn);
-				oMenuButtonSplit.setEnabled(bOn);
-			}
-		});
-
-		return new Panel({
-			headerText: "7. MenuButton – Should have regular tooltip",
-			expandable: false,
-			width: "30rem",
-			content: [
-				new VBox({
-					items: [
-						new HBox({ items: [oMenuButton] }).addStyleClass("sapUiTinyMarginBottom"),
-						new HBox({ items: [oMenuButtonSplit] }).addStyleClass("sapUiTinyMarginBottom"),
-						new HBox({
-							alignItems: "Center",
-							items: [
-								new Label({ text: "Enabled", labelFor: oEnabledSwitch })
-									.addStyleClass("sapUiSmallMarginEnd"),
-								oEnabledSwitch
-							]
-						})
-					]
-				}).addStyleClass("sapUiSmallMarginBegin")
-			]
-		}).addStyleClass("sapUiResponsiveMargin");
-	}
-
 	// Row of mixed buttons for tab-focus testing: text/icon-only crossed with
 	// tooltip/no-tooltip/shortcut so quick Tab switching exercises the
 	// open-on-focus, close-on-blur and "switch from one tooltip to another"
@@ -464,8 +394,7 @@ sap.ui.require([
 			}),
 			buildTabFocusRow(),
 			buildToggleScenario(),
-			buildSegmentedButtonPanel(),
-			buildMenuButtonPanel()
+			buildSegmentedButtonPanel()
 		]
 	});
 
