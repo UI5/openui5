@@ -140,6 +140,11 @@ sap.ui.define(['./util/EnvHelper', "sap/base/util/merge"], function (EnvHelper, 
 				group: "Testsuite",
 				page: "test-resources/sap/ui/mdc/qunit/table/testsuite.table.qunit.html"
 			},
+			"List Testsuite": {
+				title: "List Testsuite",
+				group: "Testsuite",
+				page: "test-resources/sap/ui/mdc/qunit/list/testsuite.list.qunit.html"
+			},
 			"FilterBar Testsuite": {
 				title: "FilterBar Testsuite",
 				group: "Testsuite",
@@ -189,6 +194,30 @@ sap.ui.define(['./util/EnvHelper', "sap/base/util/merge"], function (EnvHelper, 
 				module: "./util/DynamicPropertiesUtil.qunit",
 				coverage: {
 					only: "[sap/ui/mdc/util]"
+				},
+				sinon: true
+			},
+			"ExportUtils": {
+				group: "Util",
+				module: "./util/ExportUtils.qunit",
+				coverage: {
+					only: ["sap/ui/mdc/util/ExportUtils"]
+				},
+				sinon: true
+			},
+			"P13nUtils": {
+				group: "Util",
+				module: "./util/P13nUtils.qunit",
+				coverage: {
+					only: ["sap/ui/mdc/util/P13nUtils"]
+				},
+				sinon: true
+			},
+			"Common": {
+				group: "Util",
+				module: "./util/Common.qunit",
+				coverage: {
+					only: ["sap/ui/mdc/util/Common"]
 				},
 				sinon: true
 			},

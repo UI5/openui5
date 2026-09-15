@@ -1,0 +1,100 @@
+<mvc:View
+	controllerName="mdc.sample.controller.Controller"
+	height="100%"
+	displayBlock="true"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:mdc="sap.ui.mdc"
+	xmlns:mdcList="sap.ui.mdc.list">
+
+	<Page id="page" title="MDC List Features" showHeader="true" class="sapUiContentPadding">
+		<mdc:FilterBar id="filterbar"
+			delegate="{ name: 'mdc/sample/delegate/JSONListFilterDelegate' }"
+			p13nMode="Item,Value"
+			visible="false">
+			<mdc:filterItems>
+				<mdc:FilterField
+					id="filterbar--filter--name"
+					propertyKey="name"
+					label="Name"
+					dataType="sap.ui.model.type.String"
+					conditions="{$filters>/conditions/name}"
+					delegate="{ name: 'sap/ui/mdc/field/FieldBaseDelegate' }" />
+				<mdc:FilterField
+					id="filterbar--filter--range"
+					propertyKey="range"
+					label="Range"
+					dataType="sap.ui.model.type.String"
+					conditions="{$filters>/conditions/range}"
+					delegate="{ name: 'sap/ui/mdc/field/FieldBaseDelegate' }" />
+			</mdc:filterItems>
+		</mdc:FilterBar>
+		<mdc:List
+			id="list"
+			header="Mountains"
+			filter="filterbar"
+			p13nMode="Sort,Filter,Group"
+			showItemCount="true"
+			selectionMode="Multi"
+			threshold="10"
+			width="100%"
+			selectionChange=".onSelectionChange"
+			beforeOpenContextMenu=".onBeforeOpenContextMenu"
+			itemPress=".onItemPress"
+			delegate="{
+				name: 'mdc/sample/delegate/JSONListDelegate',
+				payload: {
+					bindingPath: 'mountains>/mountains'
+				}
+			}">
+			<mdc:actions>
+				<!-- List vs. Grid layout toggle -->
+				<SegmentedButton id="btnType" selectionChange=".onListTypeChange" selectedKey="GridListType">
+					<items>
+						<SegmentedButtonItem key="GridListType" icon="sap-icon://grid" tooltip="Grid List"/>
+						<SegmentedButtonItem key="ListType" icon="sap-icon://list" tooltip="List"/>
+					</items>
+				</SegmentedButton>
+				<!-- Selection mode: Multi / Single / None -->
+				<SegmentedButton id="btnSelectionMode" selectionChange=".onSelectionModeChange" selectedKey="Multi">
+					<items>
+						<SegmentedButtonItem key="Multi" icon="sap-icon://multi-select" tooltip="Multi Select"/>
+						<SegmentedButtonItem key="Single" icon="sap-icon://expense-report" tooltip="Single Select"/>
+						<SegmentedButtonItem key="None" icon="sap-icon://cancel" tooltip="No Selection"/>
+					</items>
+				</SegmentedButton>
+				<!-- boxMinWidth input (GridListType only) -->
+				<Input id="inputBoxMinWidth" width="8rem" placeholder="Box min width" value="16rem" change=".onBoxMinWidthChange" />
+			</mdc:actions>
+			<mdc:contextMenu>
+				<Menu>
+					<MenuItem text="View Details" icon="sap-icon://detail-view" press=".onContextMenuViewDetails" />
+					<MenuItem text="Copy Name" icon="sap-icon://copy" press=".onContextMenuCopyName" />
+				</Menu>
+			</mdc:contextMenu>
+			<mdc:itemSettings>
+				<!--
+					ItemSettings demonstrates all per-row visual states:
+					- highlight: green for eight-thousanders (height >= 8000)
+					- navigated: true only for the #1 ranked mountain
+					Each action's visibility is driven by per-row boolean flags injected at
+					init time, producing a random 1–2 action subset per card.
+				-->
+				<mdcList:ItemSettings
+					highlight="{= ${mountains>height} >= 8000 ? 'Success' : 'None'}"
+					highlightText="{= ${mountains>height} >= 8000 ? 'Eight-thousander' : ''}"
+					navigated="{= ${mountains>rank} === 1}">
+					<mdcList:itemActions>
+						<mdcList:ItemActionItem  icon="sap-icon://favorite"  text="Favorite"  visible="{mountains>action_favorite}"  press=".onItemActionPress" />
+						<mdcList:ItemActionItem      icon="sap-icon://edit"       text="Edit"      visible="{mountains>action_edit}"      press=".onItemActionPress" />
+						<mdcList:ItemActionItem     icon="sap-icon://share"      text="Share"     visible="{mountains>action_share}"     press=".onItemActionPress" />
+						<mdcList:ItemActionItem  icon="sap-icon://download"   text="Download"  visible="{mountains>action_download}"  press=".onItemActionPress" />
+						<mdcList:ItemActionItem      icon="sap-icon://flag"       text="Flag"      visible="{mountains>action_flag}"      press=".onItemActionPress" />
+						<mdcList:ItemActionItem  icon="sap-icon://bookmark"   text="Bookmark"  visible="{mountains>action_bookmark}"  press=".onItemActionPress" />
+					</mdcList:itemActions>
+				</mdcList:ItemSettings>
+			</mdc:itemSettings>
+		</mdc:List>
+	</Page>
+
+</mvc:View>

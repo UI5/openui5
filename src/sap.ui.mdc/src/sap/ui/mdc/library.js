@@ -56,6 +56,7 @@ sap.ui.define([
 		],
 		controls: [
 			"sap.ui.mdc.Table",
+			"sap.ui.mdc.List",
 			"sap.ui.mdc.FilterBar",
 			"sap.ui.mdc.field.FieldBase",
 			"sap.ui.mdc.field.FieldInput",
@@ -78,7 +79,14 @@ sap.ui.define([
 			"sap.ui.mdc.table.GridTableType",
 			"sap.ui.mdc.table.ResponsiveTableType",
 			"sap.ui.mdc.table.RowSettings",
+			"sap.ui.mdc.table.RowActionItem",
 			"sap.ui.mdc.table.ActionLayoutData",
+			"sap.ui.mdc.list.ListTypeBase",
+			"sap.ui.mdc.list.ListType",
+			"sap.ui.mdc.list.GridListType",
+			"sap.ui.mdc.list.ItemSettings",
+			"sap.ui.mdc.list.ItemActionItem",
+			"sap.ui.mdc.list.DragDropConfig",
 			"sap.ui.mdc.chart.ActionLayoutData",
 			"sap.ui.mdc.chart.Item",
 			"sap.ui.mdc.chart.ChartSelectionDetails",
@@ -114,6 +122,7 @@ sap.ui.define([
 		extensions: {
 			flChangeHandlers: {
 				"sap.ui.mdc.Table": "sap/ui/mdc/flexibility/Table",
+				"sap.ui.mdc.List": "sap/ui/mdc/flexibility/List",
 				"sap.ui.mdc.Chart": "sap/ui/mdc/flexibility/Chart",
 				"sap.ui.mdc.FilterBar": "sap/ui/mdc/flexibility/FilterBar",
 				"sap.ui.mdc.filterbar.p13n.AdaptationFilterBar": "sap/ui/mdc/flexibility/FilterBar",
@@ -1339,6 +1348,14 @@ sap.ui.define([
 	 * @namespace
 	 * @name sap.ui.mdc.chart
 	 * @public
+	 */
+
+	/**
+	 * Modules for {@link sap.ui.mdc.List List}
+	 * @namespace
+	 * @name sap.ui.mdc.list
+	 * @since 1.153
+	 * @ui5-restricted sap.fe
 	 */
 
 	/**

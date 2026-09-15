@@ -1,12 +1,12 @@
 /* global QUnit */
 
 sap.ui.define([
-	"sap/ui/mdc/table/TableSettings",
+	"sap/ui/mdc/util/ToolbarSettings",
 	"sap/m/OverflowToolbarButton",
 	"sap/ui/mdc/enums/TableActionPosition",
 	"sap/ui/core/theming/Parameters"
 ], function(
-	TableSettings,
+	ToolbarSettings,
 	OverflowToolbarButton,
 	TableActionPosition,
 	ThemeParameters
@@ -18,15 +18,15 @@ sap.ui.define([
 	QUnit.test("getToolbarButtonType returns configured value or Ghost fallback", function(assert) {
 		const oStub = this.stub(ThemeParameters, "get");
 		oStub.withArgs({name: "_sap_ui_mdc_Table_OverflowButtonType"}).returns("Transparent");
-		assert.strictEqual(TableSettings.getToolbarButtonType(), "Transparent", "Returns theme-configured button type");
+		assert.strictEqual(ToolbarSettings.getToolbarButtonType(), "Transparent", "Returns theme-configured button type");
 
 		oStub.withArgs({name: "_sap_ui_mdc_Table_OverflowButtonType"}).returns(undefined);
-		assert.strictEqual(TableSettings.getToolbarButtonType(), "Ghost", "Falls back to Ghost when theme parameter is undefined");
+		assert.strictEqual(ToolbarSettings.getToolbarButtonType(), "Ghost", "Falls back to Ghost when theme parameter is undefined");
 	});
 
 	QUnit.test("createSettingsButton creates a configured OverflowToolbarButton", function(assert) {
 		const oFakeTable = {getId: () => "fakeTable", isA: () => false};
-		const oButton = TableSettings.createSettingsButton("myPrefix", [() => {}, oFakeTable]);
+		const oButton = ToolbarSettings.createSettingsButton("myPrefix", [() => {}, oFakeTable]);
 
 		assert.ok(oButton.isA("sap.m.OverflowToolbarButton"), "Returns an OverflowToolbarButton");
 		assert.strictEqual(oButton.getId(), "myPrefix-settings", "Correct id");
@@ -47,7 +47,7 @@ sap.ui.define([
 			getCopyButton: this.stub().returns(oReturnedButton)
 		};
 
-		const oButton = TableSettings.createCopyButton("prefixX", oCopyProvider);
+		const oButton = ToolbarSettings.createCopyButton("prefixX", oCopyProvider);
 
 		assert.strictEqual(oButton, oReturnedButton, "Returns the button provided by the CopyProvider");
 		assert.ok(oCopyProvider.getCopyButton.calledOnce, "getCopyButton was invoked exactly once");
@@ -61,7 +61,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("createPasteButton creates a button with paste provider dependent", async function(assert) {
-		const oButton = TableSettings.createPasteButton("prefY");
+		const oButton = ToolbarSettings.createPasteButton("prefY");
 
 		assert.ok(oButton.isA("sap.m.OverflowToolbarButton"), "Returns an OverflowToolbarButton");
 		assert.strictEqual(oButton.getId(), "prefY-paste", "Correct id");
@@ -84,7 +84,7 @@ sap.ui.define([
 		const fnDefault = () => {};
 		const fnExportAs = () => {};
 		const oFakeTable = {getId: () => "fakeTable"};
-		const oMenuBtn = TableSettings.createExportButton("expPref", {
+		const oMenuBtn = ToolbarSettings.createExportButton("expPref", {
 			"default": [fnDefault, oFakeTable],
 			exportAs: [fnExportAs, oFakeTable]
 		});
@@ -104,7 +104,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("createExpandCollapseButton returns Expand variant when bIsExpand is true", function(assert) {
-		const oButton = TableSettings.createExpandCollapseButton("expPref", true, () => {});
+		const oButton = ToolbarSettings.createExpandCollapseButton("expPref", true, () => {});
 
 		assert.ok(oButton.isA("sap.m.OverflowToolbarButton"), "Returns an OverflowToolbarButton");
 		assert.strictEqual(oButton.getId(), "expPref-expandAll", "Correct expand id");
@@ -115,7 +115,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("createExpandCollapseButton returns Collapse variant when bIsExpand is false", function(assert) {
-		const oButton = TableSettings.createExpandCollapseButton("colPref", false, () => {});
+		const oButton = ToolbarSettings.createExpandCollapseButton("colPref", false, () => {});
 
 		assert.strictEqual(oButton.getId(), "colPref-collapseAll", "Correct collapse id");
 		assert.strictEqual(oButton.getIcon(), "sap-icon://collapse-all", "Correct collapse icon");
@@ -126,7 +126,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("createExpandCollapseMenuButton returns Expand variant with tree/node menu items", function(assert) {
-		const oMenuBtn = TableSettings.createExpandCollapseMenuButton("expMenu", true, {
+		const oMenuBtn = ToolbarSettings.createExpandCollapseMenuButton("expMenu", true, {
 			tree: () => {},
 			node: () => {}
 		});
@@ -142,7 +142,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("createExpandCollapseMenuButton returns Collapse variant when bIsExpand is false", function(assert) {
-		const oMenuBtn = TableSettings.createExpandCollapseMenuButton("colMenu", false, {
+		const oMenuBtn = ToolbarSettings.createExpandCollapseMenuButton("colMenu", false, {
 			tree: () => {},
 			node: () => {}
 		});
