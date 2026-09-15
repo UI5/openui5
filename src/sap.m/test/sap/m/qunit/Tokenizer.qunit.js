@@ -2199,6 +2199,17 @@ sap.ui.define([
 		assert.notOk(this.tokenizer.$().attr("aria-hidden"), "aria-hidden attribute should not be presented when there are tokens.");
 	});
 
+	QUnit.test("clip div has aria-hidden", async function(assert) {
+		// Arrange
+		var token1 = new Token();
+		this.tokenizer.addToken(token1);
+		await nextUIUpdate();
+
+		// Assert
+		const sClipId = this.tokenizer.getId() + "-clip";
+		assert.strictEqual(this.tokenizer.$().find("#" + sClipId).attr("aria-hidden"), "true", "The clip div has aria-hidden=\"true\"");
+	});
+
 	QUnit.test("aria-readonly attribute", async function(assert) {
 		// Assert
 		const sInnerContainerId = this.tokenizer.getId() + "-scrollContainer";
