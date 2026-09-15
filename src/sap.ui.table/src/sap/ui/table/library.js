@@ -90,7 +90,8 @@ sap.ui.define([
 			"sap.ui.table.plugins.ODataV4MultiSelection",
 			"sap.ui.table.plugins.ODataV4SingleSelection",
 			"sap.ui.table.plugins.ODataV4Aggregation",
-			"sap.ui.table.plugins.ODataV4Hierarchy"
+			"sap.ui.table.plugins.ODataV4Hierarchy",
+			"sap.ui.table.plugins.ClientHierarchy"
 		],
 		extensions: {
 			flChangeHandlers: {

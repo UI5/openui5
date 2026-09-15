@@ -386,6 +386,10 @@ sap.ui.define([
 				group: "Plugins",
 				module: "./plugins/{name}.qunit"
 			},
+			"ClientHierarchy": {
+				group: "Plugins",
+				module: "./plugins/{name}.qunit"
+			},
 			"Support of external plugins": {
 				group: "Plugins",
 				module: "./plugins/SupportOfExternalPlugins.qunit",
