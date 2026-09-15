@@ -564,11 +564,13 @@ sap.ui.define([
 
 			const aSeenFeatureIds = await FeaturesAPI.getSeenFeatureIds({ layer: this.getLayer() });
 
-			const bGuidedTourAutostart = await shouldAutoStartGuidedTour(this.getRootControlInstance(), this.getLayer(), aSeenFeatureIds);
+			const bGuidedTourAutostart = this.getNonInteractiveMode()
+				? false
+				: await shouldAutoStartGuidedTour(this.getRootControlInstance(), this.getLayer(), aSeenFeatureIds);
 
 			// The What's new should only be shown once per session
 			const sWhatsNewReloadFlag = "sap.ui.rta.dontShowWhatsNewAfterReload";
-			const bShowWhatsNew = this.getWhatsNew && !window.sessionStorage.getItem(sWhatsNewReloadFlag);
+			const bShowWhatsNew = this.getWhatsNew && !window.sessionStorage.getItem(sWhatsNewReloadFlag) && !this.getNonInteractiveMode();
 
 			if (bGuidedTourAutostart) {
 				const oGuidedTour = this.getGuidedTour();
