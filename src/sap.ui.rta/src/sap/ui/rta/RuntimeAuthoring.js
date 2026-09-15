@@ -1015,6 +1015,16 @@ sap.ui.define([
 	};
 
 	/**
+	 * Activates a new version with the given title.
+	 * @param {string} sVersionTitle - Title for the new Version
+	 * @returns {Promise} Resolves when the activation is complete
+	 * @ui5-restricted sap.ui.rta
+	 */
+	RuntimeAuthoring.prototype.activate = function(sVersionTitle) {
+		return activate.call(this, sVersionTitle);
+	};
+
+	/**
 	 * Returns a promise that resolves once all pending actions (busy plugins and the
 	 * queued <code>elementModified</code> commands) are finished. Unlike
 	 * {@link sap.ui.rta.RuntimeAuthoring#waitForCommandExecutionResult}, it never rejects

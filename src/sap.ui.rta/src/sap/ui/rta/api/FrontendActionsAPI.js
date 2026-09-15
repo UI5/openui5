@@ -655,16 +655,7 @@ sap.ui.define([
 			}
 			oStatusReporter.setStatus(getText("AI_STATUS_ACTIVATING", [oStatusReporter.getAgentName()]));
 			try {
-				// Serialize pending RTA commands to LREP first (matches the toolbar's
-				// activate flow), then activate the resulting draft as a new version.
-				// _serializeToLrep(bCondenseAnyLayer=false, bIsExit=false, bActivateVersion=true)
-				await oRta._serializeToLrep(false, false, true);
-				await VersionsAPI.activate({
-					layer: oRta.getLayer(),
-					control: oRta.getRootControlInstance(),
-					title: sTitle.trim(),
-					displayedVersion: oRta._oVersionsModel.getProperty("/displayedVersion")
-				});
+				await oRta.activate(sTitle.trim());
 				const oResult = FrontendActionResult.success(true);
 				Log.info("FrontendActionsAPI: saveAndActivateChanges returning", JSON.stringify(oResult));
 				return oResult;
