@@ -1517,7 +1517,7 @@ sap.ui.define([
 
 		// in "de-DE" locale there's already space in the currency pattern: #,##0.00 ¤
 		// there shouldn't be more space inserted
-		oCurrencyCodeFormatter = getCurrencyInstance(new Locale("de-DE"));
+		oCurrencyCodeFormatter = getCurrencyInstance({}, new Locale("de-DE"));
 		oCurrencySymbolFormatter = getCurrencyInstance({
 			currencyCode: false
 		}, new Locale("de-DE"));
