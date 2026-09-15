@@ -3376,6 +3376,44 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.test("afterClose clears key-user state", function(assert) {
+		const done = assert.async();
+
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One", author: "A"}));
+		this.oVM.setSupportContexts(true);
+		this.oVM._sStyleClass = "STYLECLASS";
+		this.oVM._oRolesComponentContainer = {};
+
+		this.oVM._createManagementDialog();
+		this.oVM.oManagementDialog.attachAfterOpen(function() {
+			this.oVM.oManagementDialog.attachAfterClose(function() {
+				assert.notOk(this.oVM.getSupportContexts(), "supportContexts reset to false");
+				assert.notOk(this.oVM._sStyleClass, "_sStyleClass cleared");
+				assert.notOk(this.oVM._oRolesComponentContainer, "_oRolesComponentContainer cleared");
+				done();
+			}.bind(this));
+			this.oVM.oManagementDialog.close();
+		}.bind(this));
+		this.oVM._openManagementDialog();
+	});
+
+	QUnit.test("destroyManageDialog clears key-user state", function(assert) {
+		this.oVM.addItem(new VariantItem("VMI1", {key: "1", title: "One", author: "A"}));
+		this.oVM.setSupportContexts(true);
+		this.oVM._sStyleClass = "STYLECLASS";
+		this.oVM._oRolesComponentContainer = {};
+
+		this.oVM._createManagementDialog();
+		assert.ok(this.oVM.oManagementDialog, "manage dialog created");
+
+		this.oVM.destroyManageDialog();
+
+		assert.notOk(this.oVM.oManagementDialog, "manage dialog destroyed");
+		assert.notOk(this.oVM.getSupportContexts(), "supportContexts reset to false");
+		assert.notOk(this.oVM._sStyleClass, "_sStyleClass cleared");
+		assert.notOk(this.oVM._oRolesComponentContainer, "_oRolesComponentContainer cleared");
+	});
+
 	QUnit.module("VariantManagement SaveAs dialog lazy loading with dynamicVariantsLoadedCallback", {
 		beforeEach: async function() {
 			this.oVM = new VariantManagement("VM1");
