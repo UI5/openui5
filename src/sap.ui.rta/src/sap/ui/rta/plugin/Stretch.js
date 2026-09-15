@@ -396,7 +396,13 @@ sap.ui.define([
 		const oParentOverlay = oOverlay.getParentElementOverlay();
 		const oParentElementDOM = oParentOverlay?.getAssociatedDomRef();
 		if (oParentElementDOM) {
-			if (startAtSamePosition(oParentOverlay, oOverlay)) {
+			// Skip DOM-passthrough wrappers (e.g. ActionToolbarAction): same DOM ref means the parent
+			// has no own DOM, so adding padding-top to it would break the child element's layout.
+			// Controls with multiple DOM refs (arrays) are never passthrough wrappers.
+			const oChildElementDOM = oOverlay.getAssociatedDomRef();
+			const bSameDOM = !Array.isArray(oParentElementDOM) && !Array.isArray(oChildElementDOM)
+				&& oParentElementDOM === oChildElementDOM;
+			if (!bSameDOM && startAtSamePosition(oParentOverlay, oOverlay)) {
 				if (childrenAreSameSize(oParentOverlay)) {
 					this.addStretchCandidate(oParentOverlay);
 				}
