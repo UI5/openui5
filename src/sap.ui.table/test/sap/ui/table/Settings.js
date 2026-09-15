@@ -716,8 +716,34 @@ sap.ui.define("test-resources/sap/ui/table/Settings", [
 			}
 		},
 		SCROLLING: {
-			text: "Scroll Settings (private)",
+			text: "Scrolling",
 			group: {
+				SHOWSCROLLHANDLE: {
+					text: "Show Scroll Handle",
+					value: function(oTable) {
+						return oTable.getShowScrollHandle().toUpperCase();
+					},
+					choice: {
+						ON: {
+							text: "On",
+							action: function(oTable) {
+								oTable.setShowScrollHandle("On");
+							}
+						},
+						OFF: {
+							text: "Off",
+							action: function(oTable) {
+								oTable.setShowScrollHandle("Off");
+							}
+						},
+						DEFAULT: {
+							text: "Default",
+							action: function(oTable) {
+								oTable.setShowScrollHandle("Default");
+							}
+						}
+					}
+				},
 				LARGEDATA: {
 					text: "Large Data Scrolling",
 					value: function(oTable) {

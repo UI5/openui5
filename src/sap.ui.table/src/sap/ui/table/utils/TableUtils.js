@@ -48,6 +48,10 @@ sap.ui.define([
 	const SelectionMode = library.SelectionMode;
 	let iBaseFontSize = null;
 
+	// The minimum size of a scrollbar thumb in pixels. Ensures the thumb stays large enough to remain usable and to align
+	// with the browser-rendered thumb, which enforces its own minimum size.
+	const MIN_SCROLL_THUMB_SIZE = 25;
+
 	/**
 	 * Table cell type.
 	 *
@@ -1564,6 +1568,34 @@ sap.ui.define([
 		 */
 		getBindingContextOfRow: function(oRow) {
 			return oRow.getBindingContext(oRow.getTable()?.getBindingInfo("rows")?.model);
+		},
+
+		/**
+		 * Calculates the size of a scrollbar thumb.
+		 *
+		 * The returned size is never smaller than 25px, so the thumb stays usable and aligns with the browser-rendered thumb.
+		 *
+		 * @param {number} nTrackSize The size of the scrollbar track (scrollbar height minus arrow buttons).
+		 * @param {number} nScrollbarHeight The visible height of the scrollbar.
+		 * @param {number} nScrollHeight The total scrollable height.
+		 * @returns {number} The calculated thumb size.
+		 */
+		calculateScrollThumbSize: function(nTrackSize, nScrollbarHeight, nScrollHeight) {
+			return Math.max(MIN_SCROLL_THUMB_SIZE, nTrackSize * (nScrollbarHeight / nScrollHeight));
+		},
+
+		/**
+		 * Calculates the top-edge offset of a scrollbar thumb within its track.
+		 *
+		 * @param {number} nScrollTop The current scrollTop of the scrollbar.
+		 * @param {number} nScrollRange The total scrollable range (scrollHeight minus scrollbarHeight).
+		 * @param {number} nTrackSize The size of the scrollbar track.
+		 * @param {number} nThumbSize The size of the thumb.
+		 * @returns {number} The offset of the thumb's top edge from the start of the track.
+		 */
+		calculateScrollThumbOffset: function(nScrollTop, nScrollRange, nTrackSize, nThumbSize) {
+			const nThumbRatio = nScrollRange > 0 ? nScrollTop / nScrollRange : 0;
+			return nThumbRatio * (nTrackSize - nThumbSize);
 		}
 	};
 
