@@ -64,6 +64,7 @@
     "npm": ">= 8"
   },
   "devDependencies": {
+    "@npmcli/arborist": "^9.9.3",
     "@stylistic/stylelint-plugin": "^5.1.0",
     "@ui5/builder": "^4.2.0",
     "@ui5/cli": "^4.0.57",

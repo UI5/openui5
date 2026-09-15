@@ -1,0 +1,19 @@
+{
+	"overrides": [
+		{
+			// Shared build and verification scripts are CommonJS Node.js modules.
+			"files": ["**/*.js"],
+			"env": {
+				"browser": false,
+				"node": true
+			},
+			"parserOptions": {
+				"sourceType": "commonjs"
+			},
+			"rules": {
+				"no-console": "off",
+				"strict": ["error", "global"]
+			}
+		}
+	]
+}
