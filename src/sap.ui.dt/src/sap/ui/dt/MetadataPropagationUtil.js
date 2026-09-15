@@ -25,7 +25,7 @@ sap.ui.define([
 	 * @alias sap.ui.dt.MetadataPropagationUtil
 	 */
 
-	var MetadataPropagationUtil = {};
+	const MetadataPropagationUtil = {};
 
 	MetadataPropagationUtil._getParentPropagationInfo = function(mAggregationMetadata) {
 		if (!mAggregationMetadata ||
@@ -187,7 +187,7 @@ sap.ui.define([
 	 * @return {sap.ui.core.Element|boolean} Returns relevant container element if available, otherwise it returns false.
 	 */
 	MetadataPropagationUtil.getRelevantContainerForPropagation = function(mParentMetadata, oElement) {
-		var vPropagatedRelevantContainer = false;
+		let vPropagatedRelevantContainer = false;
 
 		if (!mParentMetadata ||
 			!mParentMetadata.propagationInfos) {
@@ -244,15 +244,15 @@ sap.ui.define([
 		// The highest parent always "wins", so we need to extend starting from the bottom
 		const aRevertedPropagationInfos = mParentMetadata.propagationInfos.slice().reverse();
 
-		vReturnMetadata = aRevertedPropagationInfos.reduce(function(vReturnMetadata, oPropagatedInfo) {
+		vReturnMetadata = aRevertedPropagationInfos.reduce((vCurrentMetadata, oPropagatedInfo) => {
 			if (oPropagatedInfo.metadataFunction) {
 				let oCurrentMetadata = oPropagatedInfo.metadataFunction(oElement, oPropagatedInfo.relevantContainerElement);
 				if (oCurrentMetadata && oPropagatedInfo.propagatedActionInfo) {
 					oCurrentMetadata = addPropagatedActions(oCurrentMetadata, oPropagatedInfo);
 				}
-				return merge(vReturnMetadata, oCurrentMetadata);
+				return merge(vCurrentMetadata, oCurrentMetadata);
 			}
-			return merge(addPropagatedActions(vReturnMetadata, oPropagatedInfo), vReturnMetadata);
+			return addPropagatedActions(vCurrentMetadata, oPropagatedInfo);
 		}, vReturnMetadata);
 
 		return isEmptyObject(vReturnMetadata) ? false : vReturnMetadata;
@@ -267,14 +267,14 @@ sap.ui.define([
 	 * @return {object} Returns extended data part of the element designtime metadata.
 	 */
 	MetadataPropagationUtil.propagateMetadataToElementOverlay = function(mTargetMetadata, mParentMetadata, oElement) {
-		var vPropagatedRelevantContainer = MetadataPropagationUtil.getRelevantContainerForPropagation(mParentMetadata, oElement);
-		var vPropagatedMetadata = MetadataPropagationUtil.getMetadataForPropagation(mParentMetadata, oElement);
+		const vPropagatedRelevantContainer = MetadataPropagationUtil.getRelevantContainerForPropagation(mParentMetadata, oElement);
+		const vPropagatedMetadata = MetadataPropagationUtil.getMetadataForPropagation(mParentMetadata, oElement);
 
 		if (!vPropagatedRelevantContainer && !vPropagatedMetadata) {
 			return mTargetMetadata;
 		}
 
-		var mResultMetadata = merge({}, mTargetMetadata);
+		const mResultMetadata = merge({}, mTargetMetadata);
 
 		if (vPropagatedRelevantContainer) {
 			mResultMetadata.relevantContainer = vPropagatedRelevantContainer;
@@ -282,22 +282,26 @@ sap.ui.define([
 
 		if (vPropagatedMetadata) {
 			if (vPropagatedMetadata.actions === null || vPropagatedMetadata.actions === "not-adaptable") {
-				var mAggregations = oElement.getMetadata().getAllAggregations();
-				var aAggregationNames = Object.keys(mAggregations);
+				const mAllAggregations = oElement.getMetadata().getAllAggregations();
+				const aAggregationNames = Object.keys(mAllAggregations);
 
 				if (mResultMetadata.aggregations) {
-					aAggregationNames = aAggregationNames.concat(
-						Object.keys(mResultMetadata.aggregations).filter(function(sAggregationName) {
-							return aAggregationNames.indexOf(sAggregationName) < 0;
-						})
-					);
+					const oSeen = new Set(aAggregationNames);
+					Object.keys(mResultMetadata.aggregations).forEach((sName) => {
+						if (!oSeen.has(sName)) {
+							aAggregationNames.push(sName);
+						}
+					});
 				} else {
 					mResultMetadata.aggregations = {};
 				}
 
-				aAggregationNames.forEach(function(sAggregationName) {
-					if (mResultMetadata.aggregations[sAggregationName] && mResultMetadata.aggregations[sAggregationName].actions) {
-						mResultMetadata.aggregations[sAggregationName].actions = vPropagatedMetadata.actions;
+				aAggregationNames.forEach((sAggregationName) => {
+					if (mResultMetadata.aggregations[sAggregationName]?.actions) {
+						mResultMetadata.aggregations[sAggregationName] = {
+							...mResultMetadata.aggregations[sAggregationName],
+							actions: vPropagatedMetadata.actions
+						};
 					}
 				});
 			}
