@@ -1178,6 +1178,48 @@ sap.ui.define([
 				"then the overlay of the connected element with changes is returned"
 			);
 		});
+
+		QUnit.test("when the overlay is a relevant-container target for a change on a child element", async function(assert) {
+			prepareChanges([]);
+
+			await this.oChangeVisualization.initialize();
+			const oContainerOverlay = OverlayRegistry.getOverlay("parentContainer");
+			const oMockChangeInfo = { id: "testChange1", change: { getCreation: () => "" } };
+
+			// Simulate applyDecorationDiff having resolved a child change to this overlay via the
+			// relevant-container fallback (e.g. SmartForm scenario: group→Form→SmartForm overlay).
+			this.oChangeVisualization._oDecoratedOverlayChangeInfos = new Map([
+				[oContainerOverlay.getId(), [oMockChangeInfo]]
+			]);
+
+			const oFoundOverlay = this.oChangeVisualization.findOverlayWithChanges(oContainerOverlay);
+			assert.strictEqual(
+				oFoundOverlay, oContainerOverlay,
+				"then the overlay itself is returned because it is the decorated relevant-container target"
+			);
+		});
+
+		QUnit.test("when the overlay is a relevant-container target and the invariant border⇒findOverlay⇒getChanges holds", async function(assert) {
+			prepareChanges([
+				createMockChange("testChange1", "rename", "parentContainer")
+			], {
+				getChangeVisualizationInfo(oChange) {
+					return { affectedControls: [oChange.getSelector()] };
+				}
+			});
+
+			await this.oChangeVisualization.initialize();
+			const oContainerOverlay = OverlayRegistry.getOverlay("parentContainer");
+
+			assert.ok(
+				oContainerOverlay.hasStyleClass("sapUiRtaOverlayWithChanges"),
+				"precondition: overlay has the dashed border class"
+			);
+			const oFoundOverlay = this.oChangeVisualization.findOverlayWithChanges(oContainerOverlay);
+			assert.ok(oFoundOverlay, "then findOverlayWithChanges returns a truthy overlay");
+			const aChanges = this.oChangeVisualization.getChangesForOverlay(oFoundOverlay);
+			assert.strictEqual(aChanges.length, 1, "then getChangesForOverlay returns exactly one change");
+		});
 	});
 
 	QUnit.module("getChangesForOverlay", {
@@ -1354,6 +1396,33 @@ sap.ui.define([
 				);
 				fnDone();
 			}.bind(this));
+		});
+
+		QUnit.test("when the overlay is a relevant-container target, returns changes from the decorated overlay map", async function(assert) {
+			prepareChanges([]);
+
+			await this.oChangeVisualization.initialize();
+			const oOverlay = OverlayRegistry.getOverlay("button1");
+			const oMockChange = createMockChange("testChange1", "rename", "button1");
+			const oMockChangeInfo = {
+				id: "testChange1",
+				change: oMockChange,
+				commandName: "rename",
+				changeCategory: "rename",
+				changeStates: ["draft"],
+				affectedElementId: "button1",
+				dependent: false,
+				descriptionPayload: {}
+			};
+
+			// Simulate applyDecorationDiff having decorated this overlay via the relevant-container path.
+			this.oChangeVisualization._oDecoratedOverlayChangeInfos = new Map([
+				[oOverlay.getId(), [oMockChangeInfo]]
+			]);
+
+			const aChanges = this.oChangeVisualization.getChangesForOverlay(oOverlay);
+			assert.strictEqual(aChanges.length, 1, "then one change is returned from the decorated overlay map");
+			assert.strictEqual(aChanges[0].id, "testChange1", "then the correct change is returned");
 		});
 	});
 
