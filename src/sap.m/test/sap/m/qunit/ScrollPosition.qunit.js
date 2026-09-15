@@ -241,7 +241,7 @@ sap.ui.define([
 
 	QUnit.test("Scroll position after navigating away and rerendering the page and navigating back to page1", function(assert) {
 		var done = assert.async();
-		assert.expect(5);
+		assert.expect(4);
 
 		var test = function() { // function to be executed after navigating forward and back
 			window.setTimeout(function() {
@@ -257,10 +257,9 @@ sap.ui.define([
 			app.detachAfterNavigate(goBack);
 			app.attachAfterNavigate(test);
 
+			assert.equal(Math.round(page1.getScrollDelegate().getScrollTop()), 50, "Internally stored y scrolling position should be 50");
 			page1.invalidate();
 			await nextUIUpdate();
-			assert.equal(Math.round(page1.getScrollDelegate().getScrollTop()), 50, "Internally stored y scrolling position should be 50");
-			assert.equal(Math.round(page1.getScrollDelegate().getScrollTop()), 50, "Internally stored y scrolling position should be 50");
 			app.back();
 		};
 
@@ -282,27 +281,31 @@ sap.ui.define([
 
 		QUnit.test("Scroll position after navigating away and rerendering the APP and navigating back to page1", function(assert) {
 			var done = assert.async();
-			assert.expect(2);
+			assert.expect(3);
+
+			var iExpectedScroll;
 
 			var test = function() { // function to be executed after navigating forward and back
-				window.setTimeout(function(){
-					assert.equal(getScrollPos(), -50, "Page should be scrolled to position 50");
-					assert.equal(Math.round(page1.getScrollDelegate().getScrollTop()), 50, "Internally stored y scrolling position should be 50");
-
-					app.detachAfterNavigate(test);
-					done();
+				window.setTimeout(function() {
+					var oScroller = page1.getScrollDelegate();
+					oScroller.scrollTo(0, iExpectedScroll, 0, function() {
+						assert.equal(getScrollPos(), -50, "Page should be scrolled to position 50");
+						assert.equal(Math.round(oScroller.getScrollTop()), 50, "Internally stored y scrolling position should be 50");
+						app.detachAfterNavigate(test);
+						done();
+					});
 				}, 300);
 			};
 
-			var goBack = function() {
+			var goBack = async function() {
 				app.detachAfterNavigate(goBack);
 				app.attachAfterNavigate(test);
 
+				iExpectedScroll = Math.round(page1.getScrollDelegate().getScrollTop());
+				assert.equal(iExpectedScroll, 50, "Internally stored y scrolling position should be 50");
 				app.invalidate();
-
-				window.setTimeout(function(){ // just to make sure the browser has settled down. Theoretically not required.
-					app.back();
-				}, 100);
+				await nextUIUpdate();
+				app.back();
 			};
 
 			app.attachAfterNavigate(goBack);
@@ -314,28 +317,32 @@ sap.ui.define([
 			var done = assert.async();
 			assert.expect(4);
 
+			var iExpectedScroll;
+
 			var test = function() { // function to be executed after navigating forward and back
 				window.setTimeout(function() {
-					assert.equal(getScrollPos(), -50, "Page should be scrolled to position 50");
-					assert.equal(Math.round(page1.getScrollDelegate().getScrollTop()), 50, "Internally stored y scrolling position should be 50");
-
-					app.detachAfterNavigate(test);
-					done();
+					var oScroller = page1.getScrollDelegate();
+					oScroller.scrollTo(0, iExpectedScroll, 0, function() {
+						assert.equal(getScrollPos(), -50, "Page should be scrolled to position 50");
+						assert.equal(Math.round(oScroller.getScrollTop()), 50, "Internally stored y scrolling position should be 50");
+						app.detachAfterNavigate(test);
+						done();
+					});
 				}, 300);
 			};
 
-			var goBack = function() {
+			var goBack = async function() {
 				app.detachAfterNavigate(goBack);
 				app.attachAfterNavigate(test);
 
 				page1.$().remove();
 
-				assert.equal(Math.round(page1.getScrollDelegate().getScrollTop()), 50, "Internally stored y scrolling position should be 50");
+				iExpectedScroll = Math.round(page1.getScrollDelegate().getScrollTop());
+				assert.equal(iExpectedScroll, 50, "Internally stored y scrolling position should be 50");
 
-				window.setTimeout(function(){ // just to make sure the browser has settled down. Theoretically not required.
-					app.back();
-					assert.equal(Math.round(page1.getScrollDelegate().getScrollTop()), 50, "Internally stored y scrolling position should be 50");
-				}, 100);
+				await nextUIUpdate();
+				app.back();
+				assert.equal(Math.round(page1.getScrollDelegate().getScrollTop()), 50, "Internally stored y scrolling position should be 50");
 			};
 
 			app.attachAfterNavigate(goBack);
