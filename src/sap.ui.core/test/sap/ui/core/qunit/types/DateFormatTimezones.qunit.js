@@ -6,10 +6,8 @@ sap.ui.define([
 	"sap/ui/core/Locale",
 	"sap/ui/core/LocaleData",
 	"sap/ui/core/date/UI5Date",
-	"sap/ui/core/format/DateFormat",
-	"sap/ui/core/format/FormatUtils",
-	"sap/ui/core/format/TimezoneUtil"
-], function (Log, Localization, TimezoneUtils, Locale, LocaleData, UI5Date, DateFormat, FormatUtils, TimezoneUtil) {
+	"sap/ui/core/format/DateFormat"
+], function (Log, Localization, TimezoneUtils, Locale, LocaleData, UI5Date, DateFormat) {
 	"use strict";
 
 	var sDefaultTimezone = Localization.getTimezone();
@@ -1018,12 +1016,12 @@ sap.ui.define([
 		const oFormat = {
 				oLocaleData : {getTimezoneTranslations() {}}
 			};
-		const oTimezoneUtilMock = this.mock(TimezoneUtil);
+		const oTimezoneUtilsMock = this.mock(TimezoneUtils);
 
 		this.mock(oFormat.oLocaleData).expects("getTimezoneTranslations").withExactArgs().returns({});
 
-		oTimezoneUtilMock.expects("isValidTimezone").withExactArgs("~Timezone7").returns(false);
-		oTimezoneUtilMock.expects("isValidTimezone").withExactArgs("~Timezone").returns(true);
+		oTimezoneUtilsMock.expects("isValidTimezone").withExactArgs("~Timezone7").returns(false);
+		oTimezoneUtilsMock.expects("isValidTimezone").withExactArgs("~Timezone").returns(true);
 
 		// code under test
 		const oTimezoneParsed = DateFormat.prototype.oSymbols.V.parse("~Timezone7", {digits : 2}, oFormat);
