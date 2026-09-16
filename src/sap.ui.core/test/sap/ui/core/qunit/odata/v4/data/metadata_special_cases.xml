@@ -229,9 +229,6 @@
 				<Singleton Name="MyFavoriteArtist" Type="special.cases.ArtistsType"/>
 				<ActionImport Name="HirePerson" Action="special.cases.AcHirePerson"/>
 			</EntityContainer>
-			<Annotations Target="special.cases.Container">
-				<Annotation Term="com.sap.vocabularies.Common.v1.ExpandAfterConcatSupported"/>
-			</Annotations>
 			<Annotations Target="special.cases.Address/RegionName">
 				<Annotation Term="com.sap.vocabularies.Common.v1.DocumentationRef"
 					String="urn:sap-com:documentation:key?=type=DTEL&amp;id=REGION_NAME"/>
