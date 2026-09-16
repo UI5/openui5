@@ -9,6 +9,7 @@ sap.ui.define([
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/rta/RuntimeAuthoring",
+	"sap/ui/rta/plugin/CombineDialog",
 	"sap/ui/rta/Utils",
 	"sap/ui/thirdparty/sinon-4",
 	"sap/ui/Device",
@@ -22,6 +23,7 @@ sap.ui.define([
 	nextUIUpdate,
 	QUnitUtils,
 	RuntimeAuthoring,
+	CombineDialog,
 	RtaUtils,
 	sinon,
 	Device,
@@ -454,6 +456,53 @@ sap.ui.define([
 				shiftKey: true
 			});
 			oCombinedElementOverlay.getDomRef().dispatchEvent(oEvent);
+		});
+
+		QUnit.test("when combining a single SmartForm field with a sibling via the context menu (Combine With...)", function(assert) {
+			const fnDone = assert.async();
+			const oCommandStack = this.oRta.getCommandStack();
+
+			let iDirtyChangesCount = FlexTestAPI.getDirtyChanges({ selector: this.oCompanyCodeField }).length;
+			assert.strictEqual(iDirtyChangesCount, 0, "then there are no dirty changes in the flex persistence");
+
+			oCommandStack.attachEventOnce("modified", async function() {
+				const oFirstExecutedCommand = oCommandStack.getAllExecutedCommands()[0];
+				assert.strictEqual(oFirstExecutedCommand.getName(), "combine", "then a combine command is created");
+				iDirtyChangesCount = FlexTestAPI.getDirtyChanges({ selector: this.oCompanyCodeField }).length;
+				assert.strictEqual(iDirtyChangesCount, 1, "then there is one dirty change in the flex persistence");
+				stubShowMessageBoxOnRtaClose(this.oRta);
+				await this.oRta.stop();
+				const iNumberOfChanges = await RtaQunitUtils.getNumberOfChangesForTestApp();
+				assert.strictEqual(iNumberOfChanges, 1, "then one change is saved");
+				fnDone();
+			}, this);
+
+			// capture the Combine dialog instance the plugin creates on the fly, then drive it
+			const fnOriginalOpen = CombineDialog.prototype.open;
+			sandbox.stub(CombineDialog.prototype, "open").callsFake(function(...aArgs) {
+				this.attachOpened(async function() {
+					// select the sibling field (in the dialog model) and confirm the dialog
+					const sSiblingId = "Comp1---idMain1--GeneralLedgerDocument.Name";
+					const oElementToCombine = this._oDialogModel.getProperty("/elements").find((oElement) => oElement.id === sSiblingId);
+					assert.ok(oElementToCombine, "then the sibling field is offered in the dialog");
+					oElementToCombine.selected = true;
+					this._onSelectionChange();
+					const oOkButton = Element.getElementById(`${this.getId()}--rta_combineDialogOkButton`);
+					QUnitUtils.triggerEvent("tap", oOkButton.getDomRef());
+					await nextUIUpdate();
+				}.bind(this));
+				return fnOriginalOpen.apply(this, aArgs);
+			});
+
+			this.oCompanyCodeFieldOverlay.focus();
+			this.oCompanyCodeFieldOverlay.setSelected(true);
+			RtaQunitUtils.openContextMenuWithKeyboard.call(this, this.oCompanyCodeFieldOverlay).then(async function() {
+				const oMenu = this.oRta.getPlugins().contextMenu.oContextMenuControl;
+				const oContextMenuItem = oMenu.getItems().find((oItem) => oItem.getKey() === "CTX_COMBINE_WITH");
+				assert.ok(oContextMenuItem, "then the Combine With action is available in the context menu of a single element");
+				QUnitUtils.triggerEvent("click", oContextMenuItem.getDomRef());
+				await nextUIUpdate();
+			}.bind(this));
 		});
 	});
 

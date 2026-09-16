@@ -7,6 +7,7 @@ sap.ui.define([
 	"sap/m/OverflowToolbarButton",
 	"sap/m/Panel",
 	"sap/ui/core/mvc/View",
+	"sap/ui/core/Lib",
 	"sap/ui/dt/DesignTime",
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/dt/Util",
@@ -14,7 +15,9 @@ sap.ui.define([
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/rta/plugin/Combine",
+	"sap/ui/rta/plugin/CombineDialog",
 	"sap/ui/rta/Utils",
+	"sap/ui/fl/util/CancelError",
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
@@ -24,6 +27,7 @@ sap.ui.define([
 	OverflowToolbarButton,
 	Panel,
 	View,
+	Lib,
 	DesignTime,
 	OverlayRegistry,
 	DtUtil,
@@ -31,7 +35,9 @@ sap.ui.define([
 	nextUIUpdate,
 	CommandFactory,
 	CombinePlugin,
+	CombineDialog,
 	Utils,
+	CancelError,
 	sinon,
 	RtaQunitUtils
 ) {
@@ -294,14 +300,39 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test("when only one control is specified", async function(assert) {
+		QUnit.test("when a single combinable control with compatible siblings is specified", async function(assert) {
 			fnSetOverlayDesigntimeMetadata(this.oButton1Overlay, DEFAULT_DTM);
+			sandbox.stub(Utils, "checkSourceTargetBindingCompatibility").returns(true);
 
+			// button1 sits next to button2/3/4 in the same panel with the same combine change type,
+			// so the single-element "Combine With" entry is available and enabled
 			await getMenuEntryAndCheck.call(this, assert, [this.oButton1Overlay], {
 				editable: true,
-				available: false,
-				enabled: false
+				available: true,
+				enabled: true
 			});
+		});
+
+		QUnit.test("when a single combinable control has no compatible sibling", async function(assert) {
+			fnSetOverlayDesigntimeMetadata(this.oButton5Overlay, DEFAULT_DTM);
+			sandbox.stub(Utils, "checkSourceTargetBindingCompatibility").returns(true);
+
+			// button5 is alone in panel2, so there is no sibling to combine with
+			assert.strictEqual(
+				this.oCombinePlugin.isAvailable([this.oButton5Overlay]),
+				false,
+				"then isAvailable returns false for the single element"
+			);
+			assert.strictEqual(
+				this.oCombinePlugin.isEnabled([this.oButton5Overlay], {}),
+				false,
+				"then isEnabled returns false for the single element"
+			);
+			assert.strictEqual(
+				(await this.oCombinePlugin.getMenuItems([this.oButton5Overlay])).length,
+				0,
+				"then no menu item is returned for the single element"
+			);
 		});
 
 		QUnit.test("when controls which enabled function delivers false are specified", async function(assert) {
@@ -356,6 +387,8 @@ sap.ui.define([
 
 		QUnit.test("when an overlay has a combine action designTime metadata which has no changeOnRelevantContainer", async function(assert) {
 			fnSetOverlayDesigntimeMetadata(this.oButton1Overlay, oDesigntimeMetadata4);
+			// re-evaluate editability so the plugin picks up the swapped designtime metadata
+			await this.oCombinePlugin.evaluateEditable([this.oButton1Overlay], { onRegistration: false });
 
 			await getMenuEntryAndCheck.call(this, assert, [this.oButton1Overlay], {
 				editable: false,
@@ -386,23 +419,20 @@ sap.ui.define([
 				);
 				return bIsAvailable;
 			}.bind(this));
-			sinon.stub(this.oCombinePlugin, "handleCombine").callsFake(function(aElementOverlays, oCombineElement) {
+			const oHandleCombineWithStub = sinon.stub(this.oCombinePlugin, "handleCombineWith").callsFake(function(oElementOverlay) {
 				assert.equal(
-					aElementOverlays[0].getId(),
+					oElementOverlay.getId(),
 					this.oButton6Overlay.getId(),
 					"the 'handler' method is called with the right overlay"
-				);
-				assert.equal(
-					oCombineElement.getId(),
-					this.oButton6.getId(),
-					"the 'handler' method is called with the right combine element"
 				);
 			}.bind(this));
 
 			const aMenuItems = await this.oCombinePlugin.getMenuItems([this.oButton6Overlay]);
-			assert.equal(aMenuItems[0].id, "CTX_GROUP_FIELDS", "'getMenuItems' returns the context menu item for the plugin");
+			assert.equal(aMenuItems[0].id, "CTX_COMBINE_WITH", "'getMenuItems' returns the single-element menu item");
+			assert.ok(aMenuItems[0].additionalInfo, "then the single-element menu item carries additional info about multi-selection");
 
 			aMenuItems[0].handler([this.oButton6Overlay], { contextElement: this.oButton6 });
+			assert.strictEqual(oHandleCombineWithStub.callCount, 1, "then the single-element handler routes to handleCombineWith");
 			aMenuItems[0].enabled([this.oButton6Overlay], aMenuItems[0]);
 
 			bIsAvailable = false;
@@ -472,6 +502,203 @@ sap.ui.define([
 				"then handleCombine is called with the source element as combine element"
 			);
 			assert.strictEqual(oResult, oExpectedCommand, "then createCommands returns the command from handleCombine");
+		});
+
+		QUnit.test("when handleCombineWith combines the source with the selected sibling", async function(assert) {
+			const oExpectedCommand = {};
+			const oCreateCommandsStub = sandbox.stub(this.oCombinePlugin, "createCommands").resolves(oExpectedCommand);
+			sandbox.stub(Utils, "checkSourceTargetBindingCompatibility").returns(true);
+			sandbox.stub(CombineDialog.prototype, "open").resolves();
+			sandbox.stub(CombineDialog.prototype, "getSelectedElements").returns([{ id: this.oButton2.getId() }]);
+
+			const oResult = await this.oCombinePlugin.handleCombineWith(this.oButton1Overlay);
+
+			assert.strictEqual(oCreateCommandsStub.callCount, 1, "then createCommands is called once");
+			assert.strictEqual(
+				oCreateCommandsStub.getCall(0).args[0],
+				this.oButton1Overlay,
+				"then createCommands is called with the source overlay"
+			);
+			assert.deepEqual(
+				oCreateCommandsStub.getCall(0).args[1],
+				{ elementIds: [this.oButton2.getId()] },
+				"then createCommands is called with the selected sibling id"
+			);
+			assert.strictEqual(oResult, oExpectedCommand, "then handleCombineWith returns the created command");
+		});
+
+		QUnit.test("when handleCombineWith is cancelled", async function(assert) {
+			const oCreateCommandsStub = sandbox.stub(this.oCombinePlugin, "createCommands").resolves({});
+			sandbox.stub(Utils, "checkSourceTargetBindingCompatibility").returns(true);
+			sandbox.stub(CombineDialog.prototype, "open").rejects(new CancelError());
+
+			const oResult = await this.oCombinePlugin.handleCombineWith(this.oButton1Overlay);
+
+			assert.strictEqual(oResult, undefined, "then handleCombineWith resolves without a command");
+			assert.strictEqual(oCreateCommandsStub.callCount, 0, "then no command is created");
+		});
+
+		QUnit.test("when handleCombineWith is confirmed without a selection", async function(assert) {
+			const oCreateCommandsStub = sandbox.stub(this.oCombinePlugin, "createCommands").resolves({});
+			sandbox.stub(Utils, "checkSourceTargetBindingCompatibility").returns(true);
+			sandbox.stub(CombineDialog.prototype, "open").resolves();
+			sandbox.stub(CombineDialog.prototype, "getSelectedElements").returns([]);
+
+			const oResult = await this.oCombinePlugin.handleCombineWith(this.oButton1Overlay);
+
+			assert.strictEqual(oResult, undefined, "then handleCombineWith resolves without a command");
+			assert.strictEqual(oCreateCommandsStub.callCount, 0, "then no command is created");
+		});
+
+		QUnit.test("when handleCombineWith passes the control-defined limit to the dialog", async function(assert) {
+			sandbox.stub(Utils, "checkSourceTargetBindingCompatibility").returns(true);
+			// combine action that caps the number of combinable controls at 2, each element counting as 1
+			const oLimitedMetadata = {
+				actions: {
+					combine: {
+						changeType: "combineStuff",
+						changeOnRelevantContainer: true,
+						maxControlsCount: 2,
+						getControlsCount() {
+							return 1;
+						}
+					}
+				}
+			};
+			fnSetOverlayDesigntimeMetadata(this.oButton1Overlay, oLimitedMetadata);
+
+			let mDialogSettings;
+			sandbox.stub(CombineDialog.prototype, "open").callsFake(function() {
+				mDialogSettings = {
+					title: this.getTitle(),
+					maxControlsCount: this.getMaxControlsCount(),
+					sourceControlsCount: this.getSourceControlsCount(),
+					elements: this.getElements()
+				};
+				return Promise.resolve();
+			});
+			sandbox.stub(CombineDialog.prototype, "getSelectedElements").returns([]);
+			sandbox.stub(this.oCombinePlugin, "createCommands").resolves({});
+
+			await this.oCombinePlugin.handleCombineWith(this.oButton1Overlay);
+
+			assert.strictEqual(mDialogSettings.maxControlsCount, 2, "then the maximum number of controls is passed to the dialog");
+			assert.strictEqual(mDialogSettings.sourceControlsCount, 1, "then the source's control count is passed to the dialog");
+			assert.ok(mDialogSettings.elements.length > 0, "then the candidate elements are passed to the dialog");
+			assert.ok(
+				mDialogSettings.elements.every((oElement) => oElement.count === 1),
+				"then each candidate carries its control count"
+			);
+		});
+
+		QUnit.test("when handleCombineWith names the source element in the dialog title", async function(assert) {
+			sandbox.stub(Utils, "checkSourceTargetBindingCompatibility").returns(true);
+			fnSetOverlayDesigntimeMetadata(this.oButton1Overlay, DEFAULT_DTM);
+			this.oButton1.setText("Company");
+
+			let sTitle;
+			sandbox.stub(CombineDialog.prototype, "open").callsFake(function() {
+				sTitle = this.getTitle();
+				return Promise.resolve();
+			});
+			sandbox.stub(CombineDialog.prototype, "getSelectedElements").returns([]);
+
+			await this.oCombinePlugin.handleCombineWith(this.oButton1Overlay);
+
+			const oResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
+			assert.strictEqual(
+				sTitle,
+				oResourceBundle.getText("TIT_COMBINE_WITH", ["Company"]),
+				"then the dialog title names the source element (e.g. 'Combine with: Company')"
+			);
+		});
+
+		QUnit.test("when handleCombineWith uses the generic title if the source has no label", async function(assert) {
+			sandbox.stub(Utils, "checkSourceTargetBindingCompatibility").returns(true);
+			fnSetOverlayDesigntimeMetadata(this.oButton1Overlay, DEFAULT_DTM);
+			// button1 has no text -> getLabelForElement falls back to the id -> generic title
+
+			let sTitle;
+			sandbox.stub(CombineDialog.prototype, "open").callsFake(function() {
+				sTitle = this.getTitle();
+				return Promise.resolve();
+			});
+			sandbox.stub(CombineDialog.prototype, "getSelectedElements").returns([]);
+
+			await this.oCombinePlugin.handleCombineWith(this.oButton1Overlay);
+
+			const oResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
+			assert.strictEqual(
+				sTitle,
+				oResourceBundle.getText("CTX_COMBINE_WITH"),
+				"then the generic dialog title is used when the source has no meaningful label"
+			);
+		});
+
+		QUnit.test("when _isCombinationWithinLimit applies the control-defined maximum", function(assert) {
+			const oLimitedMetadata = {
+				actions: {
+					combine: {
+						changeType: "combineStuff",
+						changeOnRelevantContainer: true,
+						maxControlsCount: 2,
+						getControlsCount() {
+							return 1;
+						}
+					}
+				}
+			};
+			fnSetOverlayDesigntimeMetadata(this.oButton1Overlay, oLimitedMetadata);
+
+			// source (1) + one sibling (1) = 2 controls -> within the limit
+			assert.strictEqual(
+				this.oCombinePlugin._isCombinationWithinLimit(this.oButton1Overlay, [this.oButton1Overlay, this.oButton2Overlay]),
+				true,
+				"then a combination within the maximum is allowed"
+			);
+			// source (1) + two siblings (1 + 1) = 3 controls -> over the limit
+			assert.strictEqual(
+				this.oCombinePlugin._isCombinationWithinLimit(
+					this.oButton1Overlay,
+					[this.oButton1Overlay, this.oButton2Overlay, this.oButton3Overlay]
+				),
+				false,
+				"then a combination over the maximum is rejected"
+			);
+		});
+
+		QUnit.test("when the source element is already at its own combine limit the action is available but disabled", function(assert) {
+			sandbox.stub(Utils, "checkSourceTargetBindingCompatibility").returns(true);
+			// a maximum of a single control -> combining with any sibling exceeds the limit
+			const oAtLimitMetadata = {
+				actions: {
+					combine: {
+						changeType: "combineStuff",
+						changeOnRelevantContainer: true,
+						maxControlsCount: 1,
+						getControlsCount() {
+							return 1;
+						}
+					}
+				}
+			};
+			fnSetOverlayDesigntimeMetadata(this.oButton1Overlay, oAtLimitMetadata);
+
+			// siblings are still returned as candidates (so they can be shown disabled in the dialog)
+			const aSiblings = this.oCombinePlugin._getCompatibleSiblingOverlays(this.oButton1Overlay);
+			assert.ok(aSiblings.length > 0, "then siblings are still returned as candidates");
+			// like the multi-selection case, the action stays available (discoverable) even at the limit ...
+			assert.strictEqual(
+				this.oCombinePlugin.isAvailable([this.oButton1Overlay]),
+				true,
+				"then the single-element combine action is still available"
+			);
+			// ... but is disabled because nothing can actually be combined within the limit
+			assert.strictEqual(
+				this.oCombinePlugin.isEnabled([this.oButton1Overlay], {}),
+				false,
+				"then the single-element combine action is disabled when nothing fits within the limit"
+			);
 		});
 	});
 
