@@ -5,8 +5,10 @@
   "private": true,
   "scripts": {
     "start": "npm run start --workspace src/testsuite --",
+    "start-cli-v5": "npm run start-cli-v5 --workspace src/testsuite --",
     "start-grunt": "grunt serve",
     "testsuite": "npm run testsuite --workspace src/testsuite",
+    "testsuite-cli-v5": "npm run testsuite-cli-v5 --workspace src/testsuite",
     "sdk": "npm run sdk --workspace src/testsuite",
     "build-sdk": "npm run build-sdk --workspace src/testsuite",
     "serve-sdk": "npm run serve-sdk --workspace src/testsuite",
@@ -64,6 +66,7 @@
     "@stylistic/stylelint-plugin": "^5.1.0",
     "@ui5/builder": "^4.2.0",
     "@ui5/cli": "^4.0.57",
+    "@ui5/cli-next": "npm:@ui5/cli@^5.0.0-alpha.10",
     "@ui5/project": "^4.0.17",
     "@ui5/server": "^4.0.15",
     "async": "^3.2.6",
