@@ -15,7 +15,7 @@ sap.ui.define([
 	"sap/ui/core/theming/Parameters",
 	"sap/ui/performance/trace/FESRHelper",
 	"sap/ui/mdc/enums/TableActionPosition",
-	"./ActionLayoutData"
+	"../table/ActionLayoutData"
 ], (
 	OverflowToolbarButton,
 	MLibrary,
@@ -41,16 +41,21 @@ sap.ui.define([
 	}
 
 	/**
-	 * P13n/Settings helper class for sap.ui.mdc.Table.
+	 * Toolbar button factory shared by sap.ui.mdc.Table and sap.ui.mdc.List.
 	 *
 	 * @author SAP SE
 	 * @private
 	 * @since 1.60
-	 * @alias sap.ui.mdc.table.TableSettings
+	 * @alias sap.ui.mdc.util.ToolbarSettings
 	 */
-	const TableSettings = {
+	const ToolbarSettings = {
 		getToolbarButtonType,
-		createSettingsButton: function(sIdPrefix, aEventInfo) {
+		/**
+		 * @param {string} sIdPrefix ID prefix for the button
+		 * @param {Array} aEventInfo Event handler info array
+		 * @param {string} sModelName Model name used for the toolbar button type binding
+		 */
+		createSettingsButton: function(sIdPrefix, aEventInfo, sModelName) {
 			if (!oRb) {
 				this._loadResourceBundle();
 			}
@@ -63,7 +68,7 @@ sap.ui.define([
 				layoutData: new ActionLayoutData({
 					position: TableActionPosition.PersonalizationActionsSettings
 				})
-			});
+			}, sModelName);
 
 			FESRHelper.setSemanticStepname(oBtn, "press", "mdc:tbl:p13n");
 
@@ -77,7 +82,7 @@ sap.ui.define([
 		},
 		createCopyButton: function(sIdPrefix, oCopyProvider) {
 			return oCopyProvider.getCopyButton({
-				...this._getButtonSettings(),
+				...this._getButtonSettings("$sap.ui.mdc.Table"),
 				id: sIdPrefix + "-copy",
 				layoutData: new ActionLayoutData({
 					position: TableActionPosition.ModificationActionsCopy
@@ -89,7 +94,7 @@ sap.ui.define([
 				layoutData: new ActionLayoutData({
 					position: TableActionPosition.ModificationActionsPaste
 				})
-			});
+			}, "$sap.ui.mdc.Table");
 
 			FESRHelper.setSemanticStepname(oPasteButton, "press", "mdc:tbl:paste");
 
@@ -101,7 +106,12 @@ sap.ui.define([
 
 			return oPasteButton;
 		},
-		createExportButton: function(sIdPrefix, mEventInfo) {
+		/**
+		 * @param {string} sIdPrefix ID prefix for the button
+		 * @param {object} mEventInfo Map with <code>default</code> and <code>exportAs</code> press handlers
+		 * @param {string} sModelName Model name used for the toolbar button type binding
+		 */
+		createExportButton: function(sIdPrefix, mEventInfo, sModelName) {
 			if (!oRb) {
 				this._loadResourceBundle();
 			}
@@ -115,7 +125,7 @@ sap.ui.define([
 				layoutData: new ActionLayoutData({
 					position: TableActionPosition.ExportActionsExport
 				})
-			});
+			}, sModelName);
 
 			const oMenu = new Menu({
 				items: [
@@ -186,25 +196,35 @@ sap.ui.define([
 			});
 			return oMenuButton;
 		},
-		_createButton: function(sId, mSettings) {
+		/**
+		 * @param {string} sId Control ID
+		 * @param {object} mSettings Settings passed to <code>OverflowToolbarButton</code>
+		 * @param {string} sModelName Model name used for the toolbar button type binding
+		 */
+		_createButton: function(sId, mSettings, sModelName) {
 			return new OverflowToolbarButton(sId, {
-				...this._getButtonSettings(),
+				...this._getButtonSettings(sModelName),
 				...mSettings
 			});
 		},
-		_createMenuButton: function(sId, mSettings) {
+		/**
+		 * @param {string} sId Control ID
+		 * @param {object} mSettings Settings passed to <code>OverflowToolbarMenuButton</code>
+		 * @param {string} sModelName Model name used for the toolbar button type binding
+		 */
+		_createMenuButton: function(sId, mSettings, sModelName) {
 			return new OverflowToolbarMenuButton(sId, {
-				...this._getButtonSettings(),
+				...this._getButtonSettings(sModelName),
 				...mSettings
 			});
 		},
-		_getButtonSettings: function() {
-			return {type: "{$sap.ui.mdc.Table>/@custom/toolbarButtonType}"};
+		_getButtonSettings: function(sModelName) {
+			return {type: `{${sModelName}>/@custom/toolbarButtonType}`};
 		},
 		_loadResourceBundle: function() {
 			oRb = Library.getResourceBundleFor("sap.ui.mdc");
 		}
 	};
 
-	return TableSettings;
+	return ToolbarSettings;
 });

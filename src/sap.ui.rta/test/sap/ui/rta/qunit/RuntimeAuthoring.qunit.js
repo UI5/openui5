@@ -742,6 +742,36 @@ sap.ui.define([
 			assert.notOk(DOMUtil.isVisible(document.getElementById("sapUiRtaWhatsNewDialog")), "then the WhatsNew dialog is not visible");
 		});
 
+		QUnit.test("when UI Adaptation is started with nonInteractiveMode, then the What's New dialog is not shown", async function(assert) {
+			sandbox.stub(FeaturesAPI, "isSeenFeaturesAvailable").returns(true);
+			sandbox.stub(FeaturesAPI, "getSeenFeatureIds").returns([]);
+			this.oRta = new RuntimeAuthoring({
+				rootControl: oComp.getAggregation("rootControl"),
+				nonInteractiveMode: true
+			});
+
+			await RtaQunitUtils.clear();
+			await this.oRta.start();
+
+			assert.notOk(
+				DOMUtil.isVisible(document.getElementById("sapUiRtaWhatsNewDialog")),
+				"then the WhatsNew dialog is not visible"
+			);
+		});
+
+		QUnit.test("when RTA is started with nonInteractiveMode, then the UI Adaptation Tour does not autostart", async function(assert) {
+			sandbox.stub(FlexRuntimeInfoAPI, "getUserId").returns("testUser");
+			sandbox.stub(VersionsAPI, "getCreatedVersionsByUser").returns([]);
+			this.oRta = new RuntimeAuthoring({
+				rootControl: oComp.getAggregation("rootControl"),
+				nonInteractiveMode: true
+			});
+
+			await RtaQunitUtils.clear();
+			await this.oRta.start();
+			assert.ok(this.oMessageBoxStub.notCalled, "then the tour message box is not shown");
+		});
+
 		QUnit.test("RTA start/stop/start test", async function(assert) {
 			this.oRta = new RuntimeAuthoring({
 				rootControl: oComp.getAggregation("rootControl")

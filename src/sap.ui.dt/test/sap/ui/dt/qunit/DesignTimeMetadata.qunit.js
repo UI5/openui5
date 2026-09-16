@@ -168,6 +168,22 @@ sap.ui.define([
 			);
 		});
 
+		QUnit.test("when getCommandName is called with an aggregation name but the data has no aggregations", function(assert) {
+			const oMetadata = new DesignTimeMetadata({
+				data: {
+					actions: {
+						rename: "renameChangeType"
+					}
+				}
+			});
+			assert.strictEqual(
+				oMetadata.getCommandName("renameChangeType", null, "someAggregation"),
+				"rename",
+				"then the top-level action is still found and no error is thrown"
+			);
+			oMetadata.destroy();
+		});
+
 		QUnit.test("when getLibraryText is called for a designtime bundle", function(assert) {
 			const oFakeElement = {
 				getMetadata: sandbox.stub().returns({
@@ -245,6 +261,25 @@ sap.ui.define([
 				}
 			});
 			assert.strictEqual(this.oDesignTimeMetadata.isIgnored(), true, "then ignore property is returned right");
+		});
+
+		QUnit.test("when setData is called with null or undefined, defaults are applied without throwing", function(assert) {
+			const oMetadata = new DesignTimeMetadata();
+			oMetadata.setData(null);
+			assert.strictEqual(oMetadata.isIgnored(), false, "setData(null): ignore default is false");
+			oMetadata.setData(undefined);
+			assert.strictEqual(oMetadata.isIgnored(), false, "setData(undefined): ignore default is false");
+			oMetadata.destroy();
+		});
+
+		QUnit.test("when setData is called, mutating the original oData afterwards does not affect stored data", function(assert) {
+			const oData = { testField: "original", nested: { key: "value" } };
+			const oMetadata = new DesignTimeMetadata({ data: oData });
+			oData.testField = "mutated";
+			oData.nested.key = "mutated";
+			assert.strictEqual(oMetadata.getData().testField, "original", "top-level string value is isolated");
+			assert.strictEqual(oMetadata.getData().nested.key, "value", "nested value is isolated");
+			oMetadata.destroy();
 		});
 
 		QUnit.test("when 'getControllerExtensionTemplate' is called with a path specified", function(assert) {

@@ -73,6 +73,7 @@ sap.ui.define([
 
 	const SelectionMode = library.SelectionMode;
 	const SelectionBehavior = library.SelectionBehavior;
+	const ShowScrollHandle = library.ShowScrollHandle;
 	const SortOrder = CoreLibrary.SortOrder;
 	const Hook = TableUtils.Hook.Keys.Table;
 	const _private = TableUtils.createWeakMapFacade();
@@ -195,6 +196,13 @@ sap.ui.define([
 			 * @since 1.128
 			 */
 			scrollThreshold: {type: "int", group: "Behavior", defaultValue: -1},
+
+			/**
+			 * Defines whether the scroll handle is shown during vertical scrolling.
+			 *
+			 * @since 1.153
+			 */
+			showScrollHandle: {type: "sap.ui.table.ShowScrollHandle", group: "Behavior", defaultValue: ShowScrollHandle.Default},
 
 			/**
 			 * Flag to enable or disable column reordering
@@ -883,7 +891,7 @@ sap.ui.define([
 		ExtensionBase.enrich(this, AccExtension); // Must be registered after keyboard to reach correct delegate order
 		ExtensionBase.enrich(this, DragAndDropExtension);
 
-		if (Device.os.ios /*iPhone*/ || (Device.os.macintosh && !Device.system.desktop) /*iPad*/) {
+		if (Device.os.ios || Device.os.macintosh && Device.browser.mobile) {
 			sap.ui.require(["sap/ui/table/extensions/ScrollingIOS"], (ScrollingIOSExtension) => {
 				if (!this.bIsDestroyed) {
 					ExtensionBase.enrich(this, ScrollingIOSExtension);

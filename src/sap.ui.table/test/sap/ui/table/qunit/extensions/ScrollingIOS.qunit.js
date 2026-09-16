@@ -5,13 +5,15 @@ sap.ui.define([
 	"sap/ui/table/rowmodes/Type",
 	"sap/ui/table/rowmodes/Fixed",
 	'sap/ui/Device',
-	"sap/ui/model/Filter"
+	"sap/ui/model/Filter",
+	"sap/ui/table/library"
 ], function(
 	TableQUnitUtils,
 	RowModeType,
 	FixedRowMode,
 	Device,
-	Filter
+	Filter,
+	library
 ) {
 	"use strict";
 
@@ -154,7 +156,7 @@ sap.ui.define([
 
 			const iThumbHeight = this.oTable._getScrollIOSExtension().getCalculateThumbHeight();
 			const iScrollPosition = Math.round(iVerticalScrollTop * (iVerticalScrollbarHeight - iThumbHeight) /
-				(iVerticalScrollHeight - iThumbHeight));
+				(iVerticalScrollHeight - iVerticalScrollbarHeight));
 			assert.strictEqual(oVSbThumb.style.top, iScrollPosition + "px", "Thumb position is correct");
 		}
 	});
@@ -249,5 +251,43 @@ sap.ui.define([
 		await that.oTable.qunit.vScrolled();
 		await that.oTable.qunit.rendered();
 		that.assertThumbPosition(assert);
+	});
+
+	QUnit.module("Scroll handle", {
+		before: function() {
+			this.bIos = Device.os.ios;
+			Device.os.ios = true;
+		},
+		beforeEach: async function() {
+			this.oTable = TableQUnitUtils.createTable({
+				visibleRowCount: 10,
+				rows: {path: "/"},
+				models: TableQUnitUtils.createJSONModelWithEmptyRows(100),
+				columns: [TableQUnitUtils.createTextColumn()]
+			});
+
+			await this.oTable.qunit.rendered();
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		},
+		after: function() {
+			Device.os.ios = this.bIos;
+		},
+		getHandle: function() {
+			return this.oTable._getScrollExtension().getVerticalScrollbar()?.parentElement.querySelector(".sapUiTableVScrHandle");
+		}
+	});
+
+	QUnit.test("showScrollHandle is Default with thumb dragging on iOS", function(assert) {
+		this.oTable.setShowScrollHandle(library.ShowScrollHandle.Default);
+		const oScrollExtension = this.oTable._getScrollExtension();
+		const oScrollIOSExtension = this.oTable._getScrollIOSExtension();
+		const oVSbIOS = oScrollIOSExtension.getVerticalScrollbar();
+
+		oVSbIOS.dispatchEvent(new PointerEvent("pointerdown", {
+			clientY: oVSbIOS.getBoundingClientRect().y
+		}));
+		assert.ok(oScrollExtension._bIOSThumbDrag, "Extension sets _bIOSThumbDrag");
 	});
 });

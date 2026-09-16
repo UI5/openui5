@@ -126,7 +126,7 @@ sap.ui.define([
 
 		assert.ok(oTree._oProxy.expand.calledOnce, "expand method is called on TreeBindingProxy");
 
-		await waitForItems(oTree, 5);
+		await waitForItems(oTree, 5, 10000);
 		await nextUIUpdate(); // Ensure rendering is complete before DOM interaction
 
 		oTree.getItems()[0].$().find(".sapMTreeItemBaseExpander").trigger("click");

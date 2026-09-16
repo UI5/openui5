@@ -52,7 +52,8 @@ sap.ui.define([
 	 types: [
 	  "sap.ui.table.RowActionType",
 	  "sap.ui.table.SelectionBehavior",
-	  "sap.ui.table.SelectionMode"
+	  "sap.ui.table.SelectionMode",
+	  "sap.ui.table.ShowScrollHandle"
 	 ],
 	 interfaces: [],
 	 controls: [
@@ -187,6 +188,38 @@ sap.ui.define([
  };
 
  DataType.registerEnum("sap.ui.table.SelectionMode", thisLib.SelectionMode);
+
+ /**
+  * Whether the scroll handle is shown during vertical scrolling.
+  *
+  * @version ${version}
+  * @enum {string}
+  * @public
+  * @since 1.153
+  */
+ thisLib.ShowScrollHandle = {
+
+	 /**
+	  * The scroll handle is shown when the user scrolls the table vertically.
+	  * @public
+	  */
+	 On: "On",
+
+	 /**
+	  * The default behavior. The scroll handle is shown only on touch scrolling.
+	  * @public
+	  */
+	 Default: "Default",
+
+	 /**
+	  * The scroll handle is not shown.
+	  * @public
+	  */
+	 Off: "Off"
+
+ };
+
+ DataType.registerEnum("sap.ui.table.ShowScrollHandle", thisLib.ShowScrollHandle);
 
  /**
   * Shared DOM Reference IDs of the table.

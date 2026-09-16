@@ -3,7 +3,9 @@
 /* Base theme                           */
 /* ==================================== */
 
-@_sap_f_GridContainer_FocusBorderOffset: 0;
+.sapUI5Scope {
+	--_sap_f_GridContainer_FocusBorderOffset: 0;
+}
 
 .sapFGridContainer {
 
@@ -15,7 +17,7 @@
 .sapFGridContainerItemWrapper:focus::before {
 	content: '';
 	position: absolute;
-	inset: @_sap_f_GridContainer_FocusBorderOffset;
+	inset: var(--_sap_f_GridContainer_FocusBorderOffset);
 	z-index: 1;
 	border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 	border-radius: var(--sapElement_BorderCornerRadius);
