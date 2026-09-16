@@ -345,6 +345,21 @@ sap.ui.define([
 				"css styles of source and dest element are equal");
 		});
 
+		QUnit.test("when copyComputedStyle is called, standard properties are copied but CSS custom properties are skipped", function(assert) {
+			// Copying CSS custom properties (--*) is pure overhead for the detached drag ghost and,
+			// with themes defining ~1700 --sapUi* tokens, dominates the copy cost. Only standard
+			// (already resolved) longhand values are needed for the ghost's appearance.
+			this.oSrcDomElement.style.setProperty("--my-custom-token", "rgb(1, 2, 3)");
+			this.oSrcDomElement.style.color = "rgb(4, 5, 6)";
+
+			DOMUtil.copyComputedStyle(this.oSrcDomElement, this.oDestDomElement);
+
+			assert.strictEqual(this.oDestDomElement.style.color, "rgb(4, 5, 6)",
+				"then the standard property is copied to the destination element");
+			assert.strictEqual(this.oDestDomElement.style.getPropertyValue("--my-custom-token"), "",
+				"then the CSS custom property is not copied to the destination element");
+		});
+
 		QUnit.test("when copyComputedStyle is called with pseudoElements", function(assert) {
 			const oLeftPart = document.createElement("div");
 			oLeftPart.style.cssText = "float: left; width: 50%; height: 100%;";
