@@ -7,15 +7,13 @@ sap.ui.define([
 	"sap/ui/dt/Overlay",
 	"sap/ui/dt/ElementUtil",
 	"sap/ui/dt/OverlayUtil",
-	"sap/ui/dt/Util",
-	"sap/base/util/merge"
+	"sap/ui/dt/Util"
 ],
 function(
 	Overlay,
 	ElementUtil,
 	OverlayUtil,
-	Util,
-	merge
+	Util
 ) {
 	"use strict";
 
@@ -38,7 +36,7 @@ function(
 	 * @since 1.30
 	 * @alias sap.ui.dt.AggregationOverlay
 	 */
-	var AggregationOverlay = Overlay.extend("sap.ui.dt.AggregationOverlay", /** @lends sap.ui.dt.AggregationOverlay.prototype */ {
+	const AggregationOverlay = Overlay.extend("sap.ui.dt.AggregationOverlay", /** @lends sap.ui.dt.AggregationOverlay.prototype */ {
 		metadata: {
 			library: "sap.ui.dt",
 			properties: {
@@ -76,13 +74,10 @@ function(
 	 * @override
 	 */
 	AggregationOverlay.prototype._getAttributes = function(...aArgs) {
-		return merge(
-			{},
-			Overlay.prototype._getAttributes.apply(this, aArgs),
-			{
-				"data-sap-ui-dt-aggregation": this.getAggregationName()
-			}
-		);
+		return {
+			...Overlay.prototype._getAttributes.apply(this, aArgs),
+			"data-sap-ui-dt-aggregation": this.getAggregationName()
+		};
 	};
 
 	/**
@@ -91,10 +86,10 @@ function(
 	 * @return {number} - position index in DOM
 	 */
 	AggregationOverlay.prototype._getChildIndex = function(oChild) {
-		var aChildren = this.getChildren();
+		const aChildren = this.getChildren();
 
-		var oPreviousSibling;
-		var iPreviousSiblingWithDomIndex = aChildren.indexOf(oChild) - 1;
+		let oPreviousSibling;
+		let iPreviousSiblingWithDomIndex = aChildren.indexOf(oChild) - 1;
 
 		while (iPreviousSiblingWithDomIndex > 0) {
 			oPreviousSibling = aChildren[iPreviousSiblingWithDomIndex];
@@ -128,7 +123,7 @@ function(
 			);
 		}
 
-		var iPreviousPosition = this.indexOfAggregation("children", oChild);
+		const iPreviousPosition = this.indexOfAggregation("children", oChild);
 
 		if (iPreviousPosition !== iPosition) {
 			// when child is already inside the aggregation but on different position, we need to remove it first
@@ -138,17 +133,18 @@ function(
 			this.insertAggregation("children", oChild, iPosition);
 
 			if (this.isRendered()) {
-				var iPositionInDom = this._getChildIndex(oChild);
-				var bChildRendered = oChild.isRendered();
+				const iPositionInDom = this._getChildIndex(oChild);
+				const bChildRendered = oChild.isRendered();
 
+				let oRenderResult;
 				if (!bChildRendered) {
-					var oRenderResult = oChild.render(true);
+					oRenderResult = oChild.render(true);
 				}
 
-				var oChildDOM = bChildRendered ? oChild.getDomRef() : oRenderResult;
-				var aChildren = this.getChildrenDomRef().children;
-				var iCurrentPosition = [].indexOf.call(aChildren, oChildDOM);
-				var iInsertIndex;
+				const oChildDOM = bChildRendered ? oChild.getDomRef() : oRenderResult;
+				const aChildren = this.getChildrenDomRef().children;
+				const iCurrentPosition = [].indexOf.call(aChildren, oChildDOM);
+				let iInsertIndex;
 
 				if (iCurrentPosition !== iPositionInDom) {
 					if (iPositionInDom > 0) {
@@ -225,9 +221,9 @@ function(
 	 * @public
 	 */
 	AggregationOverlay.prototype.getAssociatedDomRef = function() {
-		var oElement = this.getElement();
-		var sAggregationName = this.getAggregationName();
-		var oDesignTimeMetadata = this.getDesignTimeMetadata();
+		const oElement = this.getElement();
+		const sAggregationName = this.getAggregationName();
+		const oDesignTimeMetadata = this.getDesignTimeMetadata();
 
 		return oDesignTimeMetadata.getAssociatedDomRef(
 			oElement,

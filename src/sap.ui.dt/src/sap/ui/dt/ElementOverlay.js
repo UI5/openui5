@@ -313,14 +313,11 @@ sap.ui.define([
 	};
 
 	ElementOverlay.prototype._getAttributes = function(...aArgs) {
-		return merge(
-			{},
-			Overlay.prototype._getAttributes.apply(this, aArgs),
-			{
-				"data-sap-ui-dt-for": this.getElement().getId(),
-				draggable: this.getMovable()
-			}
-		);
+		return {
+			...Overlay.prototype._getAttributes.apply(this, aArgs),
+			"data-sap-ui-dt-for": this.getElement().getId(),
+			draggable: this.getMovable()
+		};
 	};
 
 	ElementOverlay.prototype.render = function(...aArgs) {
