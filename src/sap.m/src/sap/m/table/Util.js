@@ -488,6 +488,17 @@ sap.ui.define([
 	};
 
 	/**
+	 * Checks whether the given element handles text selection natively (e.g. input, textarea, contenteditable).
+	 *
+	 * @param {HTMLElement} oElement The element to check.
+	 * @returns {boolean} Whether the element handles text selection natively.
+	 * @private
+	 */
+	Util.isTextInputElement = function(oElement) {
+		return oElement.matches("input, textarea, [contenteditable=true]");
+	};
+
+	/**
 	 * Checks whether the binding supports exporting the table data.
 	 * This can be used to define the enabled property of the export
 	 * button.
