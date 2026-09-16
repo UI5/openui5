@@ -5756,7 +5756,7 @@ sap.ui.define([
 		 */
 		fastScroll: async function() {
 			const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
-			oVSb.dispatchEvent(new MouseEvent("mousedown")); // Seed the baseline for the speed calculation.
+			oVSb.dispatchEvent(new Event("pointerdown")); // Seed the baseline for the speed calculation.
 			oVSb.scrollTop += 490; // 10 rows at once.
 			await this.oTable.qunit.vScrolled();
 		},
@@ -5765,9 +5765,25 @@ sap.ui.define([
 		 */
 		slowScroll: async function() {
 			const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
-			oVSb.dispatchEvent(new MouseEvent("mousedown")); // Seed the baseline for the speed calculation.
+			oVSb.dispatchEvent(new Event("pointerdown")); // Seed the baseline for the speed calculation.
 			await TableQUnitUtils.sleep(50); // Wait so that a 1-row delta is below the fast scroll threshold.
 			oVSb.scrollTop += 49; // One row.
+			await this.oTable.qunit.vScrolled();
+		},
+		/**
+		 * Grabs the scroll handle and performs a fast scroll, returning once the scroll event has been processed.
+		 */
+		fastHandleDrag: async function() {
+			this.oTable.setShowScrollHandle(library.ShowScrollHandle.On);
+			await this.oTable.qunit.rendered();
+
+			const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
+			oVSb.dispatchEvent(new Event("pointerdown")); // Create and show the handle.
+			const oHandle = oVSb.parentElement.querySelector(".sapUiTableVScrHandle");
+
+			// Grab the handle (still needed otherwise the scroll wouldn't be treated as a handle drag).
+			oHandle.dispatchEvent(new PointerEvent("pointerdown", {clientY: 0}));
+			oVSb.scrollTop += 490; // 10 rows at once.
 			await this.oTable.qunit.vScrolled();
 		},
 		assertSkeletons: function(bExpected, sPrefix) {
@@ -5909,6 +5925,48 @@ sap.ui.define([
 
 		assert.ok(this.oTable.getFirstVisibleRow() > iFastScrollFirstVisibleRow, "firstVisibleRow updated immediately for the slow scroll");
 		this.assertSkeletons(false);
+	});
+
+	QUnit.test("Fast handle drag", async function(assert) {
+		this.makeBindingNonClient();
+
+		const iInitialFirstVisibleRow = this.oTable.getFirstVisibleRow();
+		await this.fastHandleDrag();
+		await TableQUnitUtils.sleep(200);
+
+		assert.equal(this.oTable.getFirstVisibleRow(), iInitialFirstVisibleRow,
+			"firstVisibleRow not updated immediately for a fast handle drag (debounced 300ms)");
+		this.assertSkeletons(true);
+
+		await TableQUnitUtils.sleep(200);
+		assert.ok(this.oTable.getFirstVisibleRow() > iInitialFirstVisibleRow, "firstVisibleRow updated after debounce for a fast handle drag");
+		this.assertSkeletons(false);
+
+		document.dispatchEvent(new PointerEvent("pointerup")); // Release the handle to clean up the drag listeners.
+	});
+
+	QUnit.test("Fast handle drag updates the handle during the debounce", async function(assert) {
+		this.makeBindingNonClient();
+		this.oTable.setShowScrollHandle(library.ShowScrollHandle.On);
+		await this.oTable.qunit.rendered();
+
+		const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
+		oVSb.dispatchEvent(new Event("pointerdown")); // Create and show the handle.
+		const oHandle = oVSb.parentElement.querySelector(".sapUiTableVScrHandle");
+		const sInitialText = oHandle.firstChild.textContent;
+		const iInitialFirstVisibleRow = this.oTable.getFirstVisibleRow();
+
+		oHandle.dispatchEvent(new PointerEvent("pointerdown", {clientY: 0})); // Grab the handle (activates drag mode).
+		oVSb.scrollTop += 490; // 10 rows at once.
+		await this.oTable.qunit.vScrolled();
+
+		// The row update is debounced
+		assert.equal(this.oTable.getFirstVisibleRow(), iInitialFirstVisibleRow, "firstVisibleRow not updated yet during the debounce");
+		this.assertSkeletons(true);
+		// The scroll handle already reflects the drag target position.
+		assert.notEqual(oHandle.firstChild.textContent, sInitialText, "Handle content updated immediately while the row update is debounced");
+
+		document.dispatchEvent(new PointerEvent("pointerup")); // Release the handle to clean up the drag listeners.
 	});
 
 	QUnit.module("Scroll handle", {

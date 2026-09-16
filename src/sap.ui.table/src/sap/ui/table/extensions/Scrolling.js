@@ -710,6 +710,10 @@ sap.ui.define([
 
 				await VerticalScrollingHelper.adjustScrollPositionToScrollbar(oTable, oProcessInterface);
 
+				// Update the scroll handle immediately so it tracks the drag in real time. The scroll position it reflects is
+				// already final at this point; only the row update below is debounced during a large-data fast scroll.
+				VerticalScrollingHelper.showScrollHandle(oTable);
+
 				let bUpdateRows = true;
 
 				if (oProcessInterface.isCancelled()) {
@@ -736,7 +740,6 @@ sap.ui.define([
 
 				// The rows have been updated (or no update was necessary). Remove any skeletons shown during a large-data fast scroll.
 				VerticalScrollingHelper._clearSkeletons(oTable);
-				VerticalScrollingHelper.showScrollHandle(oTable);
 				VerticalScrollingHelper.debounceFadeScrollHandle(oTable);
 
 				delete oTable._getScrollExtension()._bIOSThumbDrag;
@@ -898,15 +901,32 @@ sap.ui.define([
 		},
 
 		/**
-		 * Will be called if the vertical scrollbar is clicked.
+		 * Seeds the large-data scroll speed baseline so the first scroll movement is measured against a valid starting point.
+		 *
+		 * @param {sap.ui.table.Table} oTable The table instance.
 		 */
-		onScrollbarMouseDown: function() {
-			if (VerticalScrollingHelper._isLargeDataScrollingActive(this)) {
-				_private(this).oLargeDataScrollState = {
+		seedLargeDataScrollBaseline: function(oTable) {
+			if (VerticalScrollingHelper._isLargeDataScrollingActive(oTable)) {
+				_private(oTable).oLargeDataScrollState = {
 					timestamp: Date.now(),
-					rowIndex: _private(this).oVerticalScrollPosition.getIndex()
+					rowIndex: _private(oTable).oVerticalScrollPosition.getIndex()
 				};
 			}
+		},
+
+		/**
+		 * Will be called when a pointer is pressed down on the vertical scrollbar.
+		 */
+		onScrollbarPointerDown: function() {
+			VerticalScrollingHelper.seedLargeDataScrollBaseline(this);
+			VerticalScrollingHelper.showScrollHandle(this);
+		},
+
+		/**
+		 * Will be called when a pointer is released on the vertical scrollbar.
+		 */
+		onScrollbarPointerUp: function() {
+			VerticalScrollingHelper.debounceFadeScrollHandle(this);
 		},
 
 		/**
@@ -1968,6 +1988,10 @@ sap.ui.define([
 				}
 
 				_private(oTable).bHandleDragging = true;
+				// Seed the large-data scroll speed baseline, just like a mousedown on the scrollbar does. Dragging the handle
+				// scrolls the scrollbar without dispatching a mousedown on it, so without this the first movement would be measured
+				// against no baseline (speed 0), bypass the fast-scroll debounce, and send a data request immediately.
+				VerticalScrollingHelper.seedLargeDataScrollBaseline(oTable);
 				clearTimeout(_private(oTable).iScrollHandleHideTimeout);
 				delete _private(oTable).iScrollHandleHideTimeout;
 
@@ -2101,21 +2125,12 @@ sap.ui.define([
 			}
 
 			if (oVSb) {
-				if (!oScrollExtension._onVerticalScrollbarMouseDownEventHandler) {
-					oScrollExtension._onVerticalScrollbarMouseDownEventHandler = VerticalScrollingHelper.onScrollbarMouseDown.bind(oTable);
-				}
-				oVSb.addEventListener("mousedown", oScrollExtension._onVerticalScrollbarMouseDownEventHandler);
-
 				if (!oScrollExtension._onScrollbarPointerDown) {
-					oScrollExtension._onScrollbarPointerDown = function() {
-						VerticalScrollingHelper.showScrollHandle(oTable);
-					};
+					oScrollExtension._onScrollbarPointerDown = VerticalScrollingHelper.onScrollbarPointerDown.bind(oTable);
 				}
 
 				if (!oScrollExtension._onScrollbarPointerUp) {
-					oScrollExtension._onScrollbarPointerUp = function() {
-						VerticalScrollingHelper.debounceFadeScrollHandle(oTable);
-					};
+					oScrollExtension._onScrollbarPointerUp = VerticalScrollingHelper.onScrollbarPointerUp.bind(oTable);
 				}
 
 				oVSb.addEventListener("pointerdown", oScrollExtension._onScrollbarPointerDown);
@@ -2151,11 +2166,6 @@ sap.ui.define([
 			}
 
 			if (oVSb) {
-				if (oScrollExtension._onVerticalScrollbarMouseDownEventHandler) {
-					oVSb.removeEventListener("mousedown", oScrollExtension._onVerticalScrollbarMouseDownEventHandler);
-					delete oScrollExtension._onVerticalScrollbarMouseDownEventHandler;
-				}
-
 				if (oScrollExtension._onScrollbarPointerDown) {
 					oVSb.removeEventListener("pointerdown", oScrollExtension._onScrollbarPointerDown);
 					delete oScrollExtension._onScrollbarPointerDown;
@@ -3383,6 +3393,15 @@ sap.ui.define([
 			Log.error("This method can only be used with synchronization enabled.", oTable, "sap.ui.table.extensions.Scrolling#registerForTouch");
 			return null;
 		}
+	};
+
+	/**
+	 * Seeds the large-data scroll speed baseline so the first scroll movement after a drag-start is measured against a valid
+	 * starting point rather than an empty baseline (which would result in speed 0, bypassing the fast-scroll debounce).
+	 * Call this whenever a scroll-handle drag begins without a native scrollbar mousedown event.
+	 */
+	ScrollExtension.prototype.seedLargeDataScrollBaseline = function() {
+		VerticalScrollingHelper.seedLargeDataScrollBaseline(this.getTable());
 	};
 
 	/**
