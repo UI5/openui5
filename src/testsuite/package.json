@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@openui5/sap.f": "1.154.0-SNAPSHOT",
+	"@openui5/sap.html": "1.154.0-SNAPSHOT",
     "@openui5/sap.m": "1.154.0-SNAPSHOT",
     "@openui5/sap.tnt": "1.154.0-SNAPSHOT",
     "@openui5/sap.ui.codeeditor": "1.154.0-SNAPSHOT",

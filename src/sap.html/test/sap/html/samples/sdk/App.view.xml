@@ -1,0 +1,845 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.html" height="100%">
+    <div id="fix__page0" class="sapMPage sapMPageBgStandard sapMPageBusyCoversAll" style="height: 100%;">
+        <section id="fix__page0-cont" class="sapMPageEnableScrolling sapUiScrollDelegate" style="overflow: hidden auto; height: 100%;">
+            <div id="fix__container0" class="sapUiComponentContainer" style="height: 100%;">
+                <div id="fix__container0-uiarea" style="height: 100%;">
+                    <div id="sdk---app" class="sapUiView sapUiXMLView sapUiViewDisplayBlock" style="width: 100%; height: 100%;">
+                        <div id="sdk---app--demoKitPage" class="sapTntToolPage sapTntToolPageWithSideContent sapUiDemokit sapTntToolPage-LayoutM" style="height: 100%;">
+                            <div class="sapTntToolPageHeaderWrapper sapTntToolPageHeaderWithSubHeaderWrapper">
+                                <header>
+                                    <div id="sdk---app--demoKitPage-header" class="sapTntToolPageHeader">
+                                        <!--
+                                        <ui5-shellbar-0b2c601f id="sdk- - -app- -demoKitShellBar" show-notifications="" class="sapUiDemokitMainHeader" ui5-shellbar="" data-sap-ui-fastnavgroup="true" notifications-count="1" breakpoint-size="M">
+                                            <ui5-shellbar-branding-0b2c601f id="fix__branding0" slot="branding" ui5-shellbar-branding="">UI5 Demo Kit<img id="sdk- - -app- -sap_logo" slot="logo" src="../../../../../resources/sap/ui/documentation/sdk/images/open-ui5-logo.svg" alt="UI5 Logo" ariaLabel="UI5 Logo" class="sapMImg sapMImgFocusable" style="height: 2rem;"/>
+                                            </ui5-shellbar-branding-0b2c601f>
+                                            <span id="sap-ui-invisible-__label0" ariaHidden="true" class="sapUiHiddenPlaceholder" slot="default-1"></span>
+                                            <span id="sap-ui-invisible-sdk- - -app- -versionSwitchButton" ariaHidden="true" class="sapUiHiddenPlaceholder" slot="default-2"></span>
+                                            <ui5-shellbar-spacer-0b2c601f id="fix__spacer0" slot="content-1" ui5-shellbar-spacer="">
+                                            </ui5-shellbar-spacer-0b2c601f>
+                                            <ui5-shellbar-item-0b2c601f id="sdk- - -app- -surveyButton" count="" icon="sap-icon://feedback" text="Feedback" class="sapUiDemoKitHeaderActionsSurveyButton" ui5-shellbar-item="" slot="default-3">
+                                            </ui5-shellbar-item-0b2c601f>
+                                            <ui5-shellbar-item-0b2c601f id="sdk- - -app- -policiesMenuButton" icon="sap-icon://official-service" text="Legal Information" class="sapUiDemoKitHeaderActionsMenuButton" ui5-shellbar-item="" slot="default-4">
+                                            </ui5-shellbar-item-0b2c601f>
+                                            <ui5-shellbar-item-0b2c601f id="sdk- - -app- -aboutMenuButton" icon="sap-icon://action-settings" text="Settings" class="sapUiDemoKitHeaderActionsMenuButton" ui5-shellbar-item="" slot="default-5">
+                                            </ui5-shellbar-item-0b2c601f>
+                                            <ui5-shellbar-search-0b2c601f id="sdk- - -app- -searchControl" slot="searchField" placeholder="Search Anything" scope-value="" show-clear-icon="" value="" class="sapUiDemokitSearchInput" ui5-shellbar-search="" style="- -search_width: 400px;" collapsed="">
+                                            <ui5-search-message-area-0b2c601f id="fix__area0" slot="messageArea" class="sapUiDemokitSearchMessageArea" ui5-search-message-area="">
+                                            </ui5-search-message-area-0b2c601f>
+                                            </ui5-shellbar-search-0b2c601f>
+                                            <span id="sap-ui-invisible-sdk- - -app- -sideNavigationToggleButton" ariaHidden="true" class="sapUiHiddenPlaceholder" slot="default-6"></span>
+                                        </ui5-shellbar-0b2c601f>
+                                        -->
+                                    </div>
+                                    <div id="sdk---app--demoKitPage-subHeader" class="sapTntToolPageHeader">
+                                        <div id="fix__header0" data-sap-ui-fastnavgroup="true" class="sapMIBar sapMTBInactive sapMTB sapMTBNewFlex sapMTBStandard sapMTB-Auto-CTX sapMOTB sapTntToolHeader sapContrast sapContrastPlus sapUiDemokitSubHeader">
+                                            <div id="sdk---app--demoKitSubHeader" role="navigation" class="sapMITH sapContrastPlus sapMITHBackgroundDesignSolid sapMITBInLine sapMITBTextOnly sapMBarChild sapMBarChildFirstChild" tabindex="0">
+                                                <div id="sdk---app--demoKitSubHeader-head" role="tablist" ariaOrientation="horizontal" class="sapMITBHead">
+                                                    <div id="sdk---app--welcomeTab" role="tab" ariaLabelledby="sdk---app--welcomeTab-text sdk---app--welcomeTab-icon" ariaPosinset="1" ariaSetsize="6" tabindex="-1" ariaSelected="true" class="sapMITBItem sapMITBItemNoCount sapMITBVertical sapMITBFilter sapMITBFilterDefault sapMITBSelected">
+                                                        <div class="sapMITBFilterWrapper">
+                                                            <div id="sdk---app--welcomeTab-text" class="sapMITBText sapMITBBadgeHolder">
+                                                                <span data-sap-ui-icon-content="&#xE070;" role="presentation" id="sdk---app--welcomeTab-icon" ariaHidden="true" class="sapMITBSelectItemIcon sapUiIconMirrorInRTL sapMITBInlineIcon sapUiIcon sapUiIconMirrorInRTL" style="font-family: SAP-icons;"></span>
+                                                                <span dir="auto" class="sapMITHTextContent">Home</span>
+                                                            </div>
+                                                            <div class="sapMITBContentArrow">
+                                                            </div>
+                                                        </div>
+                                                        <div id="fix__badge0" class="sapMITFExpandButtonBadge">
+                                                        </div>
+                                                    </div>
+                                                    <div id="sdk---app--topicMasterTab" role="tab" ariaLabelledby="sdk---app--topicMasterTab-text sdk---app--topicMasterTab-icon" ariaPosinset="2" ariaSetsize="6" tabindex="-1" ariaSelected="false" class="sapMITBItem sapMITBItemNoCount sapMITBVertical sapMITBFilter sapMITBFilterDefault">
+                                                        <div class="sapMITBFilterWrapper">
+                                                            <div id="sdk---app--topicMasterTab-text" class="sapMITBText sapMITBBadgeHolder">
+                                                                <span data-sap-ui-icon-content="&#xE0A2;" role="presentation" id="sdk---app--topicMasterTab-icon" ariaHidden="true" class="sapMITBSelectItemIcon sapUiIconMirrorInRTL sapMITBInlineIcon sapUiIcon sapUiIconMirrorInRTL" style="font-family: SAP-icons;"></span>
+                                                                <span dir="auto" class="sapMITHTextContent">Documentation</span>
+                                                            </div>
+                                                            <div class="sapMITBContentArrow">
+                                                            </div>
+                                                        </div>
+                                                        <div id="fix__badge1" class="sapMITFExpandButtonBadge">
+                                                        </div>
+                                                    </div>
+                                                    <div id="sdk---app--apiMasterTab" role="tab" ariaLabelledby="sdk---app--apiMasterTab-text sdk---app--apiMasterTab-icon" ariaPosinset="3" ariaSetsize="6" tabindex="-1" ariaSelected="false" class="sapMITBItem sapMITBItemNoCount sapMITBVertical sapMITBFilter sapMITBFilterDefault">
+                                                        <div class="sapMITBFilterWrapper">
+                                                            <div id="sdk---app--apiMasterTab-text" class="sapMITBText sapMITBBadgeHolder">
+                                                                <span data-sap-ui-icon-content="&#xE139;" role="presentation" id="sdk---app--apiMasterTab-icon" ariaHidden="true" class="sapMITBSelectItemIcon sapUiIconMirrorInRTL sapMITBInlineIcon sapUiIcon sapUiIconMirrorInRTL" style="font-family: SAP-icons;"></span>
+                                                                <span dir="auto" class="sapMITHTextContent">API Reference</span>
+                                                            </div>
+                                                            <div class="sapMITBContentArrow">
+                                                            </div>
+                                                        </div>
+                                                        <div id="fix__badge2" class="sapMITFExpandButtonBadge">
+                                                        </div>
+                                                    </div>
+                                                    <div id="sdk---app--controlsMasterTab" role="tab" ariaLabelledby="sdk---app--controlsMasterTab-text sdk---app--controlsMasterTab-icon" ariaPosinset="4" ariaSetsize="6" tabindex="-1" ariaSelected="false" class="sapMITBItem sapMITBItemNoCount sapMITBVertical sapMITBFilter sapMITBFilterDefault">
+                                                        <div class="sapMITBFilterWrapper">
+                                                            <div id="sdk---app--controlsMasterTab-text" class="sapMITBText sapMITBBadgeHolder">
+                                                                <span data-sap-ui-icon-content="&#xE16D;" role="presentation" id="sdk---app--controlsMasterTab-icon" ariaHidden="true" class="sapMITBSelectItemIcon sapUiIconMirrorInRTL sapMITBInlineIcon sapUiIcon sapUiIconMirrorInRTL" style="font-family: SAP-icons;"></span>
+                                                                <span dir="auto" class="sapMITHTextContent">Samples</span>
+                                                            </div>
+                                                            <div class="sapMITBContentArrow">
+                                                            </div>
+                                                        </div>
+                                                        <div id="fix__badge3" class="sapMITFExpandButtonBadge">
+                                                        </div>
+                                                    </div>
+                                                    <div id="sdk---app--demoAppsTab" role="tab" ariaLabelledby="sdk---app--demoAppsTab-text sdk---app--demoAppsTab-icon" ariaPosinset="5" ariaSetsize="6" tabindex="-1" ariaSelected="false" class="sapMITBItem sapMITBItemNoCount sapMITBVertical sapMITBFilter sapMITBFilterDefault">
+                                                        <div class="sapMITBFilterWrapper">
+                                                            <div id="sdk---app--demoAppsTab-text" class="sapMITBText sapMITBBadgeHolder">
+                                                                <span data-sap-ui-icon-content="&#xE071;" role="presentation" id="sdk---app--demoAppsTab-icon" ariaHidden="true" class="sapMITBSelectItemIcon sapUiIconMirrorInRTL sapMITBInlineIcon sapUiIcon sapUiIconMirrorInRTL" style="font-family: SAP-icons;"></span>
+                                                                <span dir="auto" class="sapMITHTextContent">Demo Apps</span>
+                                                            </div>
+                                                            <div class="sapMITBContentArrow">
+                                                            </div>
+                                                        </div>
+                                                        <div id="fix__badge4" class="sapMITFExpandButtonBadge">
+                                                        </div>
+                                                    </div>
+                                                    <div id="sdk---app--resourcesTab" role="tab" ariaLabelledby="sdk---app--resourcesTab-text sdk---app--resourcesTab-icon" ariaPosinset="6" ariaSetsize="6" tabindex="-1" ariaSelected="false" class="sapMITBItem sapMITBItemNoCount sapMITBVertical sapMITBFilter sapMITBFilterDefault">
+                                                        <div class="sapMITBFilterWrapper">
+                                                            <div id="sdk---app--resourcesTab-text" class="sapMITBText sapMITBBadgeHolder">
+                                                                <span data-sap-ui-icon-content="&#xE002;" role="presentation" id="sdk---app--resourcesTab-icon" ariaHidden="true" class="sapMITBSelectItemIcon sapUiIconMirrorInRTL sapMITBInlineIcon sapUiIcon sapUiIconMirrorInRTL" style="font-family: SAP-icons;"></span>
+                                                                <span dir="auto" class="sapMITHTextContent">Resources</span>
+                                                            </div>
+                                                            <div class="sapMITBContentArrow">
+                                                            </div>
+                                                        </div>
+                                                        <div id="fix__badge5" class="sapMITFExpandButtonBadge">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="sapMITHEndOverflow">
+                                                    <div id="sdk---app--demoKitSubHeader-overflow" role="button" ariaExpanded="false" ariaLabelledby="sdk---app--demoKitSubHeader-overflow-text" tabindex="-1" ariaHaspopup="menu" class="sapMITBItem sapMITBItemNoCount sapMITBVertical sapMITBFilter sapMITBFilterDefault">
+                                                        <div class="sapMITBFilterWrapper">
+                                                            <div id="sdk---app--demoKitSubHeader-overflow-text" class="sapMITBText sapMITBBadgeHolder">
+                                                                <span dir="auto" class="sapMITHTextContent">Mehr</span>
+                                                                <span id="sdk---app--demoKitSubHeader-overflow-expandButton" class="sapMITHShowSubItemsIcon">
+                                                                    <span data-sap-ui-icon-content="&#xE1EF;" role="presentation" ariaHidden="true" id="id-1789125605117-25" ariaLabel="slim-arrow-down" class="sapUiIcon sapUiIconMirrorInRTL" style="font-family: SAP-icons;"></span>
+                                                                </span>
+                                                            </div>
+                                                            <div class="sapMITBContentArrow">
+                                                            </div>
+                                                        </div>
+                                                        <div id="fix__badge6" class="sapMITFExpandButtonBadge">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button id="fix__header0-overflowButtonClone" data-ui5-accesskey="" ariaHaspopup="menu" ariaPressed="false" class="sapMBtnBase sapMBtn sapMTBHiddenElement sapMBarChild">
+                                                <span id="fix__header0-overflowButtonClone-inner" class="sapMBtnInner sapMBtnHoverable sapMFocusable sapMBtnIconFirst sapMBtnTransparent">
+                                                    <span id="fix__header0-overflowButtonClone-img" role="presentation" ariaHidden="true" data-sap-ui-icon-content="&#xE1F2;" class="sapUiIcon sapUiIconMirrorInRTL sapMBtnCustomIcon sapMBtnIcon sapMBtnIconLeft" style="font-family: SAP-icons;"></span>
+                                                </span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </header>
+                            </div>
+                            <div class="sapTntToolPageContentWrapper" style="height: 100%;">
+                                <div id="sdk---app--demoKitPage-main" class="sapTntToolPageMain sapTntToolPageMainBackground-Standard" style="height: 100%;">
+                                    <div class="sapTntToolPageMainContent" style="height: 100%;">
+                                        <div class="sapTntToolPageMainContentWrapper" style="height: 100%;">
+                                            <span id="sap-ui-invisible-__vbox1" ariaHidden="true" class="sapUiHiddenPlaceholder"></span>
+                                            <span id="sap-ui-invisible-__toolbar7" ariaHidden="true" class="sapUiHiddenPlaceholder"></span>
+                                            <div id="sdk---app--demoKitScrollContainer" class="sapMScrollContH sapMScrollCont sapUiScrollDelegate" style="width: 100%; height: 100%; overflow: hidden;">
+                                                <div id="sdk---app--demoKitScrollContainer-scroll" class="sapMScrollContScroll" style="height: 100%;">
+                                                    <div id="sdk---app--splitApp" class="sapMSplitContainer sapUiGlobalBackgroundColor sapMSplitContainerHideMode sapMSplitApp sapUiDocumentationSplitApp">
+                                                        <div id="sdk---app--splitApp-BG" class="sapMSplitContainerBG sapUiGlobalBackgroundImage">
+                                                        </div>
+                                                        <div id="sdk---app--splitApp-Master" class="sapMNav sapMSplitContainerMasterHidden sapMSplitContainerMaster">
+                                                        </div>
+                                                        <div id="sdk---app--splitApp-Detail" class="sapMNav sapMSplitContainerDetail">
+                                                            <div id="sdk---welcome" class="sapUiView sapUiXMLView sapMNavItem" style="width: 100%;">
+                                                                <div id="fix__page1" role="region" class="sapMPage sapMPageBgStandard sapMPageBusyCoversAll sapUiHomePage">
+                                                                    <section id="fix__page1-cont" role="main" ariaLabel="Get Started with UI5" class="sapMPageEnableScrolling sapUiScrollDelegate" style="overflow: hidden auto;">
+                                                                        <div id="fix__panel0" data-sap-ui-fastnavgroup="true" role="region" class="sapMPanel sapUiNoContentPadding" style="width: 100%; height: auto;">
+                                                                            <div role="heading" ariaLevel="2" class="sapMPanelHeadingDiv">
+                                                                            </div>
+                                                                            <div id="fix__panel0-content" class="sapMPanelContent sapMPanelBGTransparent" style="height: auto;">
+                                                                                <div id="fix__layout1" class="sapUiBlockLayout sapUiBlockLayoutBackgroundDefault sapUiBlockLayoutSizeM">
+                                                                                    <div id="fix__row0" class="sapUiBlockLayoutRow sapUiBlockHorizontalCellsRow sapUiBlockLayoutBackgroundColorSet1">
+                                                                                        <div style="display: flex;">
+                                                                                            <div id="fix__cell0" class="sapUiBlockLayoutCell sapUiNoContentPadding sapUiDemokitLandingImageCell welcomeImageCell sapUiBlockLayoutOddCell sapUiBlockHorizontalCell" style="flex: 1 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <span id="sap-ui-invisible-sdk---welcome--phoneImage" ariaHidden="true" class="sapUiHiddenPlaceholder"></span>
+                                                                                                    <img id="fix__image0" src="../../../../../resources/sap/ui/documentation/sdk/images/Home_M_and_L_cropped_1.jpg" role="presentation" ariaHidden="true" alt="" class="sapMImg welcomeImage" style="width: 100%;" />
+                                                                                                    <div id="sdk---welcome--landingImageHeadline" class="sapUiVlt sapuiVlt welcomeImageTextLayout" style="width: 100%;">
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <span id="fix__text0" dir="auto" class="sapMText sapUiSelectable welcomeImageTextHeadline" style="width: 100%; text-align: center;">Discover New Enterprise Grade Horizons</span>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__layout0" class="sapUiHLayout sapUiHLayoutNoWrap">
+                                                                                                                <div class="sapUiHLayoutChildWrapper">
+                                                                                                                    <button id="fix__button0" data-ui5-accesskey="g" ariaDescribedby="fix__text48" class="sapMBtnBase sapMBtn sapMBtnInverted actionButton">
+                                                                                                                        <span id="fix__button0-inner" class="sapMBtnInner sapMBtnHoverable sapMFocusable sapMBtnText sapMBtnEmphasized">
+                                                                                                                            <span id="fix__button0-content" class="sapMBtnContent">
+                                                                                                                                <bdi id="fix__button0-BDI-content">Get Started with UI5</bdi>
+                                                                                                                            </span>
+                                                                                                                        </span>
+                                                                                                                    </button>
+                                                                                                                </div>
+                                                                                                                <div class="sapUiHLayoutChildWrapper">
+                                                                                                                    <button id="sdk---welcome--readMoreButton" data-ui5-accesskey="d" class="sapMBtnBase sapMBtn actionButton sapContrast sapContrastPlus sapUiSmallMarginBegin">
+                                                                                                                        <span id="sdk---welcome--readMoreButton-inner" class="sapMBtnInner sapMBtnHoverable sapMFocusable sapMBtnText sapMBtnDefault">
+                                                                                                                            <span id="sdk---welcome--readMoreButton-content" class="sapMBtnContent">
+                                                                                                                                <bdi id="sdk---welcome--readMoreButton-BDI-content">Download</bdi>
+                                                                                                                            </span>
+                                                                                                                        </span>
+                                                                                                                    </button>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div id="fix__panel1" data-sap-ui-fastnavgroup="true" role="region" ariaLabelledby="fix__title0" class="sapMPanel sapUiNoContentPadding" style="width: 100%; height: auto;">
+                                                                            <div class="sapMPanelHeadingDiv">
+                                                                                <div id="fix__toolbar0" data-sap-ui-fastnavgroup="true" class="sapMIBar sapMTBInactive sapMTB sapMTBNewFlex sapMTBStandard sapMTB-Transparent-CTX headlineCell sapMPanelHeaderTB">
+                                                                                    <h1 id="fix__title0" class="sapMTitle sapMTitleStyleH1 sapMTitleNoWrap sapUiMediumMarginTopBottom sapMBarChild sapMBarChildFirstChild sapMTBShrinkItem" style="width: 100%;">
+                                                                                        <span id="fix__title0-inner" dir="auto" class="sapUiSelectable">Key Features</span>
+                                                                                    </h1>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div id="fix__panel1-content" class="sapMPanelContent sapMPanelBGTransparent" style="height: auto;">
+                                                                                <div id="fix__layout6" class="sapUiBlockLayout sapUiBlockLayoutBackgroundDefault sapUiBlockLayoutSizeM">
+                                                                                    <div id="fix__row1" class="sapUiBlockLayoutRow sapUiBlockHorizontalCellsRow sapUiBlockLayoutBackgroundColorSet1">
+                                                                                        <div style="display: flex;">
+                                                                                            <div id="fix__cell1" class="sapUiBlockLayoutCell sapUiBlockLayoutCellColor10A sapUiBlockLayoutOddCell sapUiBlockHorizontalCell" style="flex: 1 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <div id="fix__grid0" class="sapUiRespGrid sapUiRespGridMedia-Std-Tablet sapUiRespGridHSpace0 sapUiRespGridVSpace0">
+                                                                                                        <div id="fix__grid0-wrapperfor-__layout2" class="sapUiRespGridSpanXL6 sapUiRespGridSpanL6 sapUiRespGridSpanM12 sapUiRespGridSpanS12">
+                                                                                                            <div id="fix__layout2" class="sapUiVlt sapuiVlt" style="width: 100%;">
+                                                                                                                <div class="sapUiVltCell sapuiVltCell">
+                                                                                                                    <div id="fix__link0" role="heading" class="sapUiDocTitleLink sapMTitle sapMTitleStyleH2 sapUiSelectable wrap sapMTitleMaxWidth sapUiSmallMarginBottom">
+                                                                                                                        <a tabindex="0" href="topic/50eadaac8d2e49ee8996dc2b560cb76b" class="sapMLnk">
+                                                                                                                            <span id="fix__link0-inner">Responsive Across Browsers and Devices</span>
+                                                                                                                        </a>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                                <div class="sapUiVltCell sapuiVltCell">
+                                                                                                                    <span id="fix__text1" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth" style="text-align: left;">No need to worry about device specifics! UI5 apps run on smartphones, tablets, and desktops. The UI controls automatically adapt themselves to the capabilities of each device and make the most of the available real estate.</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div id="fix__grid0-wrapperfor-__image1" class="sapUiRespGridSpanL6 sapUiRespGridSpanM12 sapUiRespGridSpanS12 sapUiRespGridSpanXL6">
+                                                                                                            <img id="fix__image1" src="../../../../../resources/sap/ui/documentation/sdk/images/Fiori_guidelines_image.png" role="presentation" ariaHidden="true" alt="" ariaLabel="Picture showing phone, desktop screen and tablet" class="sapMImg" style="width: 100%;"/>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div id="fix__cell2" class="sapUiBlockLayoutCell sapUiBlockLayoutCellColor10B sapUiBlockLayoutEvenCell sapUiBlockHorizontalCell" style="flex: 1 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <div id="fix__layout3" class="sapUiVlt sapuiVlt" style="width: 100%;">
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__link1" role="heading" class="sapUiDocTitleLink sapMTitle sapMTitleStyleH2 sapUiSelectable wrap sapMTitleMaxWidth sapUiSmallMarginBottom">
+                                                                                                                <a tabindex="0" href="topic/23cfd955f58142389fa7c9097e11559c" class="sapMLnk">
+                                                                                                                    <span id="fix__link1-inner">Powerful Development Concepts</span>
+                                                                                                                </a>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <span id="fix__text2" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth sapUiSmallMarginBottom" style="text-align: left;">UI5 was created by professionals for modern developers to build state of the art web applications. It comes with all features needed to cover most current application requirements. The UI5 core offers a solid foundation that simplifies your work by managing many aspects of modern development behind the scenes:</span>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__hbox0" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent">
+                                                                                                                <div id="fix__data77" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__icon0" role="presentation" ariaHidden="true" ariaLabel="accept" data-sap-ui-icon-content="&#xE05B;" class="sapUiIcon sapUiIconColorDefault sapUiTinyMarginBegin sapUiSmallMarginEnd" style="font-family: SAP-icons; font-size: 0.875rem;"></span>
+                                                                                                                </div>
+                                                                                                                <div id="fix__data78" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__text3" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth" style="text-align: left;">Includes standards like MVC and various data-binding types</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__hbox1" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent">
+                                                                                                                <div id="fix__data79" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__icon1" role="presentation" ariaHidden="true" ariaLabel="accept" data-sap-ui-icon-content="&#xE05B;" class="sapUiIcon sapUiIconColorDefault sapUiTinyMarginBegin sapUiSmallMarginEnd" style="font-family: SAP-icons; font-size: 0.875rem;"></span>
+                                                                                                                </div>
+                                                                                                                <div id="fix__data80" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__text4" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth" style="text-align: left;">Choice of different view formats (XML, HTML, JavaScript, JSON)</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__hbox2" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent">
+                                                                                                                <div id="fix__data81" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__icon2" role="presentation" ariaHidden="true" ariaLabel="accept" data-sap-ui-icon-content="&#xE05B;" class="sapUiIcon sapUiIconColorDefault sapUiTinyMarginBegin sapUiSmallMarginEnd" style="font-family: SAP-icons; font-size: 0.875rem;"></span>
+                                                                                                                </div>
+                                                                                                                <div id="fix__data82" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__text5" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth" style="text-align: left;">Binding with OData, JSON, XML and other data formats</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__hbox3" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent">
+                                                                                                                <div id="fix__data83" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__icon3" role="presentation" ariaHidden="true" ariaLabel="accept" data-sap-ui-icon-content="&#xE05B;" class="sapUiIcon sapUiIconColorDefault sapUiTinyMarginBegin sapUiSmallMarginEnd" style="font-family: SAP-icons; font-size: 0.875rem;"></span>
+                                                                                                                </div>
+                                                                                                                <div id="fix__data84" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__text6" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth" style="text-align: left;">Built-in support tool for exploring the object tree and binding status</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__hbox4" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent">
+                                                                                                                <div id="fix__data85" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__icon4" role="presentation" ariaHidden="true" ariaLabel="accept" data-sap-ui-icon-content="&#xE05B;" class="sapUiIcon sapUiIconColorDefault sapUiTinyMarginBegin sapUiSmallMarginEnd" style="font-family: SAP-icons; font-size: 0.875rem;"></span>
+                                                                                                                </div>
+                                                                                                                <div id="fix__data86" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__text7" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth" style="text-align: left;">Translation and internationalization support</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__hbox5" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent">
+                                                                                                                <div id="fix__data87" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__icon5" role="presentation" ariaHidden="true" ariaLabel="accept" data-sap-ui-icon-content="&#xE05B;" class="sapUiIcon sapUiIconColorDefault sapUiTinyMarginBegin sapUiSmallMarginEnd" style="font-family: SAP-icons; font-size: 0.875rem;"></span>
+                                                                                                                </div>
+                                                                                                                <div id="fix__data88" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__text8" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth" style="text-align: left;">Extensibility concepts at code and application level</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div id="fix__row2" class="sapUiBlockLayoutRow sapUiBlockHorizontalCellsRow sapUiBlockLayoutBackgroundColorSet2">
+                                                                                        <div style="display: flex;">
+                                                                                            <div id="fix__cell3" class="sapUiBlockLayoutCell sapUiBlockLayoutCellColor10C sapUiBlockLayoutOddCell sapUiBlockHorizontalCell" style="flex: 1 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <div id="fix__layout4" class="sapUiVlt sapuiVlt" style="width: 100%;">
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__container1" class="sapUIDisclaimerLink sapUiSmallMarginBottom">
+                                                                                                                <div id="fix__link2" role="heading" class="sapUiDocTitleLink sapMTitle sapMTitleStyleH2 sapUiSelectable wrap sapMTitleMaxWidth">
+                                                                                                                    <a tabindex="0" href="https://experience.sap.com/fiori-design/" target="_blank" rel="noopener noreferrer" class="sapMLnk">
+                                                                                                                        <span id="fix__link2-inner">Award-Winning SAP Fiori Design in Action</span>
+                                                                                                                    </a>
+                                                                                                                </div>
+                                                                                                                <img id="fix__image2" src="../../../../../resources/sap/ui/documentation/sdk/images/link-sap.png" alt="Information published on non-SAP site" ariaLabel="Information published on non-SAP site" title="Information published on non-SAP site" role="button" tabindex="0" class="sapMImg sapMPointer sapMImgFocusable" style="width: 1.25rem;" />
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <span id="fix__text9" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth sapUiSmallMarginBottom" style="text-align: left;">UI5 applications benefit from a consistent design language and predefined UX patterns across all frontend features. Use a predefined theme or try our online theming tool to create a custom theme.</span>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div id="fix__cell4" class="sapUiBlockLayoutCell sapUiBlockLayoutCellColor10C sapUiBlockLayoutEvenCell sapUiBlockHorizontalCell" style="flex: 1 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <div id="fix__hbox6" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyCenter sapMFlexBoxAlignItemsCenter sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent" style="height: 100%; width: 100%;">
+                                                                                                        <div id="fix__data6" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto; max-width: 37.5rem;">
+                                                                                                            <img id="fix__image3" src="../../../../../resources/sap/ui/documentation/sdk/images/Fiori_design_examples.png" role="presentation" ariaHidden="true" alt="" ariaLabel="Picture showing SAP Fiori design elements" class="sapMImg sapUiTinyMarginBeginEnd" style="width: 100%;" />
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <span id="sap-ui-invisible-__row3" ariaHidden="true" class="sapUiHiddenPlaceholder"></span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div id="fix__panel2" data-sap-ui-fastnavgroup="true" role="region" ariaLabelledby="fix__title1" class="sapMPanel sapUiNoContentPadding" style="width: 100%; height: auto;">
+                                                                            <div class="sapMPanelHeadingDiv">
+                                                                                <div id="fix__toolbar1" data-sap-ui-fastnavgroup="true" class="sapMIBar sapMTBInactive sapMTB sapMTBNewFlex sapMTBStandard sapMTB-Transparent-CTX headlineCell sapMPanelHeaderTB">
+                                                                                    <h1 id="fix__title1" class="sapMTitle sapMTitleStyleH1 sapMTitleNoWrap sapUiMediumMarginTopBottom sapMBarChild sapMBarChildFirstChild sapMTBShrinkItem" style="width: 100%;">
+                                                                                        <span id="fix__title1-inner" dir="auto" class="sapUiSelectable">Start Coding</span>
+                                                                                    </h1>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div id="fix__panel2-content" class="sapMPanelContent sapMPanelBGTransparent" style="height: auto;">
+                                                                                <div id="fix__layout7" class="sapUiBlockLayout sapUiBlockLayoutBackgroundDefault sapUiBlockLayoutSizeM">
+                                                                                    <div id="fix__row4" class="sapUiBlockLayoutRow sapUiBlockHorizontalCellsRow sapUiBlockLayoutBackgroundColorSet1">
+                                                                                        <div style="display: flex;">
+                                                                                            <div id="fix__cell7" class="sapUiBlockLayoutCell sapUiBlockLayoutCellColor10A sapUiBlockLayoutOddCell sapUiBlockHorizontalCell" style="flex: 2 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <div id="fix__hbox16" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyCenter sapMFlexBoxAlignItemsCenter sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent" style="height: 100%; width: 100%;">
+                                                                                                        <div id="fix__data15" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto; max-width: 37.5rem;">
+                                                                                                            <img id="fix__image5" src="../../../../../resources/sap/ui/documentation/sdk/images/Home_laptop.png" role="presentation" ariaHidden="true" alt="" ariaLabel="The UI5 evolution is creating innovation, providing build tooling, modular core, open standards, and gaining high performance using asynchronous loading." class="sapMImg" style="width: 100%;" />
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div id="fix__cell8" class="sapUiBlockLayoutCell sapUiBlockLayoutCellColor10A welcomeBlock sapUiBlockLayoutEvenCell sapUiBlockHorizontalCell" style="flex: 2 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <div id="fix__hbox18" class="sapMFlexBox sapMVBox sapMFlexBoxJustifyCenter sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent" style="height: 100%; width: 100%;">
+                                                                                                        <div id="fix__data89" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <div id="fix__link6" role="heading" class="sapUiDocTitleLink sapMTitle sapMTitleStyleH2 sapUiSelectable wrap sapMTitleMaxWidth">
+                                                                                                                <a tabindex="0" href="topic/8b49fc198bf04b2d9800fc37fecbb218" class="sapMLnk">
+                                                                                                                    <span id="fix__link6-inner">Get Ready</span>
+                                                                                                                </a>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div id="fix__data90" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <span id="fix__text20" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth sapUiMediumMarginTop" style="text-align: left;">All you need to develop Web apps with UI5 is a development environment and a browser. For maximum convenience, you can use SAP Business Application Studio in the cloud. For maximum flexibility, you have the alternative choice of setting up your local development environment.</span>
+                                                                                                        </div>
+                                                                                                        <div id="fix__hbox17" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent sapMFlexItem" style="width: 100%;">
+                                                                                                            <div id="fix__data91" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                <span id="fix__text21" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth sapUiSmallMarginTop" style="text-align: left;">Try the first example here:</span>
+                                                                                                            </div>
+                                                                                                            <div id="fix__data92" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                <a id="fix__link7" href="liveEditor" tabindex="0" class="sapMLnk sapMLnkMaxWidth liveEditorLink sapUiSmallMarginTop">
+                                                                                                                    <span class="sapMLnkText">Live Editor</span>
+                                                                                                                </a>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <span id="sap-ui-invisible-__panel3" ariaHidden="true" class="sapUiHiddenPlaceholder"></span>
+                                                                        <div id="fix__panel4" data-sap-ui-fastnavgroup="true" role="region" ariaLabelledby="fix__title3" class="sapMPanel sapUiNoContentPadding" style="width: 100%; height: auto;">
+                                                                            <div class="sapMPanelHeadingDiv">
+                                                                                <div id="fix__toolbar3" data-sap-ui-fastnavgroup="true" class="sapMIBar sapMTBInactive sapMTB sapMTBNewFlex sapMTBStandard sapMTB-Transparent-CTX headlineCell sapMPanelHeaderTB">
+                                                                                    <h1 id="fix__title3" class="sapMTitle sapMTitleStyleH1 sapMTitleNoWrap sapUiMediumMarginTopBottom sapMBarChild sapMBarChildFirstChild sapMTBShrinkItem" style="width: 100%;">
+                                                                                        <span id="fix__title3-inner" dir="auto" class="sapUiSelectable">UI5 Evolution</span>
+                                                                                    </h1>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div id="fix__panel4-content" class="sapMPanelContent sapMPanelBGTransparent" style="height: auto;">
+                                                                                <div id="fix__layout12" class="sapUiBlockLayout sapUiBlockLayoutBackgroundDefault sapUiBlockLayoutSizeM">
+                                                                                    <div id="fix__row6" class="sapUiBlockLayoutRow sapUiBlockHorizontalCellsRow sapUiBlockLayoutBackgroundColorSet1">
+                                                                                        <div style="display: flex;">
+                                                                                            <div id="fix__cell11" class="sapUiBlockLayoutCell sapUiBlockLayoutCellColor10A sapUiBlockLayoutOddCell sapUiBlockHorizontalCell" style="flex: 1 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <div id="fix__layout11" class="sapUiVlt sapuiVlt" style="width: 100%;">
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__link10" role="heading" class="sapUiDocTitleLink sapMTitle sapMTitleStyleH2 sapUiSelectable wrap sapMTitleMaxWidth sapUiSmallMarginBottom">
+                                                                                                                <a tabindex="0" href="topic/28fcd55b04654977b63dacbee0552712" class="sapMLnk">
+                                                                                                                    <span id="fix__link10-inner">UI5 Evolution</span>
+                                                                                                                </a>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <span id="fix__text24" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth sapUiSmallMarginBottom" style="text-align: left;">UI5 evolution stands for fundamental improvements as part of an ongoing effort to advance SAPUI5, to enable applications to run faster, and code to become more modular. By embracing web standards, asynchronous loading, and emerging technologies, SAPUI5 continues to be a future-proof, enterprise-proven solution.</span>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <span id="fix__text25" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth" style="text-align: left;">We encourage developers to actively support and leverage the new capabilities.</span>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div id="fix__cell12" class="sapUiBlockLayoutCell sapUiBlockLayoutCellColor10A sapUiBlockLayoutEvenCell sapUiBlockHorizontalCell" style="flex: 1 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <div id="fix__hbox19" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyCenter sapMFlexBoxAlignItemsCenter sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent" style="height: 100%; width: 100%;">
+                                                                                                        <div id="fix__data25" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto; max-width: 37.5rem;">
+                                                                                                            <img id="fix__image9" src="../../../../../resources/sap/ui/documentation/sdk/images/Evolution_demokit_illustration_single.png" role="presentation" ariaHidden="true" alt="" ariaLabel="The UI5 evolution is creating innovation, providing build tooling, modular core, open standards, and gaining high performance using asynchronous loading." class="sapMImg sapUiTinyMarginBeginEnd" style="width: 100%;" />
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div id="fix__panel5" data-sap-ui-fastnavgroup="true" role="region" ariaLabelledby="fix__title4" class="sapMPanel sapUiNoContentPadding" style="width: 100%; height: auto;">
+                                                                            <div class="sapMPanelHeadingDiv">
+                                                                                <div id="fix__toolbar4" data-sap-ui-fastnavgroup="true" class="sapMIBar sapMTBInactive sapMTB sapMTBNewFlex sapMTBStandard sapMTB-Transparent-CTX headlineCell sapMPanelHeaderTB">
+                                                                                    <h1 id="fix__title4" class="sapMTitle sapMTitleStyleH1 sapMTitleNoWrap sapUiMediumMarginTopBottom sapMBarChild sapMBarChildFirstChild sapMTBShrinkItem" style="width: 100%;">
+                                                                                        <span id="fix__title4-inner" dir="auto" class="sapUiSelectable">Choose Your Scenario</span>
+                                                                                    </h1>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div id="fix__panel5-content" class="sapMPanelContent sapMPanelBGTransparent" style="height: auto;">
+                                                                                <div id="fix__layout17" class="sapUiBlockLayout sapUiBlockLayoutBackgroundDefault sapUiBlockLayoutSizeM">
+                                                                                    <div id="fix__row7" class="sapUiBlockLayoutRow sapUiBlockHorizontalCellsRow sapUiBlockLayoutBackgroundColorSet1">
+                                                                                        <div style="display: flex;">
+                                                                                            <div id="fix__cell13" class="sapUiBlockLayoutCell sapUiBlockLayoutCellColor10A sapUiBlockLayoutOddCell sapUiBlockHorizontalCell" style="flex: 1 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <div id="fix__layout13" class="sapUiVlt sapuiVlt" style="width: 100%;">
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__container3" class="sapUIDisclaimerLink sapUiSmallMarginBottom">
+                                                                                                                <div id="fix__link11" role="heading" class="sapUiDocTitleLink sapMTitle sapMTitleStyleH2 sapUiSelectable wrap sapMTitleMaxWidth">
+                                                                                                                    <a tabindex="0" href="https://www.sap.com/developer/tutorials/hcp-create-trial-account.html" target="_blank" rel="noopener noreferrer" class="sapMLnk">
+                                                                                                                        <span id="fix__link11-inner">SAPUI5 on SAP BTP</span>
+                                                                                                                    </a>
+                                                                                                                </div>
+                                                                                                                <img id="fix__image10" src="../../../../../resources/sap/ui/documentation/sdk/images/link-sap.png" alt="Information published on SAP site" ariaLabel="Information published on SAP site" title="Information published on SAP site" role="button" tabindex="0" class="sapMImg sapMPointer sapMImgFocusable" style="width: 1.25rem;" />
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <span id="fix__text26" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth sapUiSmallMarginBottom" style="text-align: left;">Sign up for the free SAP BTP trial account to test the platform and build cloud-based UI5 apps.</span>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__hbox20" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent">
+                                                                                                                <div id="fix__data93" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__icon13" role="presentation" ariaHidden="true" ariaLabel="accept" data-sap-ui-icon-content="&#xE05B;" class="sapUiIcon sapUiIconColorDefault sapUiTinyMarginBegin sapUiSmallMarginEnd" style="font-family: SAP-icons; font-size: 0.875rem;"></span>
+                                                                                                                </div>
+                                                                                                                <div id="fix__data94" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__text27" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth" style="text-align: left;">Easy-to-use development environment with SAP Business Application Studio</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__hbox21" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent sapUiSmallMarginBottom">
+                                                                                                                <div id="fix__data95" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__icon14" role="presentation" ariaHidden="true" ariaLabel="accept" data-sap-ui-icon-content="&#xE05B;" class="sapUiIcon sapUiIconColorDefault sapUiTinyMarginBegin sapUiSmallMarginEnd" style="font-family: SAP-icons; font-size: 0.875rem;"></span>
+                                                                                                                </div>
+                                                                                                                <div id="fix__data96" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__text28" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth" style="text-align: left;">Free trial for development use</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div id="fix__cell14" class="sapUiBlockLayoutCell sapUiBlockLayoutCellColor10B sapUiBlockLayoutEvenCell sapUiBlockHorizontalCell" style="flex: 1 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <div id="fix__layout14" class="sapUiVlt sapuiVlt" style="width: 100%;">
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__container4" class="sapUIDisclaimerLink sapUiSmallMarginBottom">
+                                                                                                                <div id="fix__link12" role="heading" class="sapUiDocTitleLink sapMTitle sapMTitleStyleH2 sapUiSelectable wrap sapMTitleMaxWidth">
+                                                                                                                    <a tabindex="0" href="https://ui5.sap.com/#/topic/91f346786f4d1014b6dd926db0e91070" target="_blank" rel="noopener noreferrer" class="sapMLnk">
+                                                                                                                        <span id="fix__link12-inner">SAPUI5 (On-Premise)</span>
+                                                                                                                    </a>
+                                                                                                                </div>
+                                                                                                                <img id="fix__image11" src="../../../../../resources/sap/ui/documentation/sdk/images/link-sap.png" alt="Information published on SAP site" ariaLabel="Information published on SAP site" title="Information published on SAP site" role="button" tabindex="0" class="sapMImg sapMPointer sapMImgFocusable" style="width: 1.25rem;" />
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <span id="fix__text29" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth sapUiSmallMarginBottom" style="text-align: left;">SAPUI5 is part of the user interface technologies in SAP HANA, NetWeaver ABAP, and Java systems.</span>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__hbox22" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent">
+                                                                                                                <div id="fix__data97" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__icon15" role="presentation" ariaHidden="true" ariaLabel="accept" data-sap-ui-icon-content="&#xE05B;" class="sapUiIcon sapUiIconColorDefault sapUiTinyMarginBegin sapUiSmallMarginEnd" style="font-family: SAP-icons; font-size: 0.875rem;"></span>
+                                                                                                                </div>
+                                                                                                                <div id="fix__data98" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__text30" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth" style="text-align: left;">Ready to use for SAP customers</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__hbox23" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent sapUiSmallMarginBottom">
+                                                                                                                <div id="fix__data99" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__icon16" role="presentation" ariaHidden="true" ariaLabel="accept" data-sap-ui-icon-content="&#xE05B;" class="sapUiIcon sapUiIconColorDefault sapUiTinyMarginBegin sapUiSmallMarginEnd" style="font-family: SAP-icons; font-size: 0.875rem;"></span>
+                                                                                                                </div>
+                                                                                                                <div id="fix__data100" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__text31" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth" style="text-align: left;">Integrates with existing system landscapes</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div style="display: flex;">
+                                                                                            <div id="fix__cell15" class="sapUiBlockLayoutCell sapUiBlockLayoutCellColor10C sapUiBlockLayoutOddCell sapUiBlockHorizontalCell" style="flex: 1 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <div id="fix__layout15" class="sapUiVlt sapuiVlt" style="width: 100%;">
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__container5" class="sapUIDisclaimerLink sapUiSmallMarginBottom">
+                                                                                                                <div id="fix__link13" role="heading" class="sapUiDocTitleLink sapMTitle sapMTitleStyleH2 sapUiSelectable wrap sapMTitleMaxWidth">
+                                                                                                                    <a tabindex="0" href="http://openui5.org" target="_blank" rel="noopener noreferrer" class="sapMLnk">
+                                                                                                                        <span id="fix__link13-inner">OpenUI5 - Free and Open Source</span>
+                                                                                                                    </a>
+                                                                                                                </div>
+                                                                                                                <img id="fix__image12" src="../../../../../resources/sap/ui/documentation/sdk/images/link-sap.png" alt="Information published on SAP site" ariaLabel="Information published on SAP site" title="Information published on SAP site" role="button" tabindex="0" class="sapMImg sapMPointer sapMImgFocusable" style="width: 1.25rem;" />
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <span id="fix__text32" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth sapUiSmallMarginBottom" style="text-align: left;">Try the open source variant of UI5. It contains all core UI5 features and is available on GitHub under the Apache 2.0 license.</span>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__hbox24" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent">
+                                                                                                                <div id="fix__data101" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__icon17" role="presentation" ariaHidden="true" ariaLabel="accept" data-sap-ui-icon-content="&#xE05B;" class="sapUiIcon sapUiIconColorDefault sapUiTinyMarginBegin sapUiSmallMarginEnd" style="font-family: SAP-icons; font-size: 0.875rem;"></span>
+                                                                                                                </div>
+                                                                                                                <div id="fix__data102" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__text33" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth" style="text-align: left;">Supported by the open source community</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__hbox25" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent sapUiSmallMarginBottom">
+                                                                                                                <div id="fix__data103" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__icon18" role="presentation" ariaHidden="true" ariaLabel="accept" data-sap-ui-icon-content="&#xE05B;" class="sapUiIcon sapUiIconColorDefault sapUiTinyMarginBegin sapUiSmallMarginEnd" style="font-family: SAP-icons; font-size: 0.875rem;"></span>
+                                                                                                                </div>
+                                                                                                                <div id="fix__data104" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__text34" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth" style="text-align: left;">Managed on GitHub - contributions welcome!</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div id="fix__cell16" class="sapUiBlockLayoutCell sapUiBlockLayoutCellColor10A sapUiBlockLayoutEvenCell sapUiBlockHorizontalCell" style="flex: 1 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <div id="fix__layout16" class="sapUiVlt sapuiVlt" style="width: 100%;">
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__link14" role="heading" class="sapUiDocTitleLink sapMTitle sapMTitleStyleH2 sapUiSelectable wrap sapMTitleMaxWidth sapUiSmallMarginBottom">
+                                                                                                                <a tabindex="0" href="topic/2d3eb2f322ea4a82983c1c62a33ec4ae" class="sapMLnk">
+                                                                                                                    <span id="fix__link14-inner">UI5 on Content Delivery Network</span>
+                                                                                                                </a>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <span id="fix__text35" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth sapUiSmallMarginBottom" style="text-align: left;">Develop and run UI5 apps with the flexibility of a robust CDN. Files are loaded from the location closest to the user for optimal performance.</span>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__hbox26" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent">
+                                                                                                                <div id="fix__data105" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__icon19" role="presentation" ariaHidden="true" ariaLabel="accept" data-sap-ui-icon-content="&#xE05B;" class="sapUiIcon sapUiIconColorDefault sapUiTinyMarginBegin sapUiSmallMarginEnd" style="font-family: SAP-icons; font-size: 0.875rem;"></span>
+                                                                                                                </div>
+                                                                                                                <div id="fix__data106" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__text36" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth" style="text-align: left;">Multi-version CDN to maintain a custom lifecycle</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="sapUiVltCell sapuiVltCell">
+                                                                                                            <div id="fix__hbox27" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent sapUiSmallMarginBottom">
+                                                                                                                <div id="fix__data107" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__icon20" role="presentation" ariaHidden="true" ariaLabel="accept" data-sap-ui-icon-content="&#xE05B;" class="sapUiIcon sapUiIconColorDefault sapUiTinyMarginBegin sapUiSmallMarginEnd" style="font-family: SAP-icons; font-size: 0.875rem;"></span>
+                                                                                                                </div>
+                                                                                                                <div id="fix__data108" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                                    <span id="fix__text37" dir="auto" class="sapMText sapUiSelectable sapMTextMaxWidth" style="text-align: left;">For any on-premise and cloud development scenario</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div id="fix__panel6" data-sap-ui-fastnavgroup="true" role="region" ariaLabelledby="fix__title5" class="sapMPanel sapUiNoContentPadding" style="width: 100%; height: auto;">
+                                                                            <div class="sapMPanelHeadingDiv">
+                                                                                <div id="fix__toolbar5" data-sap-ui-fastnavgroup="true" class="sapMIBar sapMTBInactive sapMTB sapMTBNewFlex sapMTBStandard sapMTB-Transparent-CTX headlineCell sapMPanelHeaderTB">
+                                                                                    <h1 id="fix__title5" class="sapMTitle sapMTitleStyleH1 sapMTitleNoWrap sapUiMediumMarginTopBottom sapMBarChild sapMBarChildFirstChild sapMTBShrinkItem" style="width: 100%;">
+                                                                                        <span id="fix__title5-inner" dir="auto" class="sapUiSelectable">Join the Community</span>
+                                                                                    </h1>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div id="fix__panel6-content" class="sapMPanelContent sapMPanelBGTransparent" style="height: auto;">
+                                                                                <div id="fix__layout18" class="sapUiBlockLayout sapUiBlockLayoutBackgroundDefault sapUiBlockLayoutSizeM">
+                                                                                    <div id="fix__row8" class="sapUiBlockLayoutRow sapUiBlockHorizontalCellsRow sapUiBlockLayoutBackgroundColorSet1">
+                                                                                        <div style="display: flex;">
+                                                                                            <div id="fix__cell17" class="sapUiBlockLayoutCell sapUiBlockLayoutCellColor10A sapUiBlockLayoutOddCell sapUiBlockHorizontalCell" style="flex: 1 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <div id="fix__hbox28" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyCenter sapMFlexBoxAlignItemsCenter sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent">
+                                                                                                        <div id="fix__data109" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <span id="fix__icon21" role="presentation" ariaHidden="true" ariaLabel="collaborate" data-sap-ui-icon-content="&#xE0B4;" class="sapUiIcon sapUiIconMirrorInRTL sapUiIconColorDefault sapUiCommunityLinkLogo" style="font-family: SAP-icons; font-size: 2.5rem;"></span>
+                                                                                                        </div>
+                                                                                                        <div id="fix__data110" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <div id="fix__link15" role="heading" class="sapUiDocTitleLink sapMTitle sapMTitleStyleAuto sapUiSelectable sapMTitleNoWrap sapMTitleMaxWidth sapUiSmallMargin sapUiNoMarginBottom sapUiNoMarginEnd sapUiCommunityLinkTitle">
+                                                                                                                <a tabindex="0" href="https://community.sap.com/topics/ui5" target="_blank" rel="noopener noreferrer" class="sapMLnk">
+                                                                                                                    <span id="fix__link15-inner">SAP Community</span>
+                                                                                                                </a>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div id="fix__data111" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <img id="fix__image13" src="../../../../../resources/sap/ui/documentation/sdk/images/link-sap.png" alt="Information published on SAP site" ariaLabel="Information published on SAP site" title="Information published on SAP site" role="button" tabindex="0" class="sapMImg sapMPointer sapMImgFocusable sapUiDisclaimerCommunityLink" style="width: 1.25rem;" />
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div id="fix__cell18" class="sapUiBlockLayoutCell sapUiBlockLayoutCellColor10B sapUiBlockLayoutEvenCell sapUiBlockHorizontalCell" style="flex: 1 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <div id="fix__hbox29" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyCenter sapMFlexBoxAlignItemsCenter sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent">
+                                                                                                        <div id="fix__data112" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <img id="fix__image14" src="../../../../../resources/sap/ui/documentation/sdk/images/logo_stackoverflow.png" role="presentation" ariaHidden="true" alt="" class="sapMImg sapUiCommunityLinkLogo" style="width: 2.5rem;" />
+                                                                                                        </div>
+                                                                                                        <div id="fix__data113" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <div id="fix__link16" role="heading" class="sapUiDocTitleLink sapMTitle sapMTitleStyleAuto sapUiSelectable sapMTitleNoWrap sapMTitleMaxWidth sapUiSmallMargin sapUiNoMarginBottom sapUiNoMarginEnd sapUiCommunityLinkTitle">
+                                                                                                                <a tabindex="0" href="http://stackoverflow.com/search?q=sapui5" target="_blank" rel="noopener noreferrer" class="sapMLnk">
+                                                                                                                    <span id="fix__link16-inner">StackOverflow</span>
+                                                                                                                </a>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div id="fix__data114" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <img id="fix__image15" src="../../../../../resources/sap/ui/documentation/sdk/images/link-external.png" alt="Information published on non-SAP site" ariaLabel="Information published on non-SAP site" title="Information published on non-SAP site" role="button" tabindex="0" class="sapMImg sapMPointer sapMImgFocusable sapUiDisclaimerCommunityLink" style="width: 1.25rem;" />
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div id="fix__cell19" class="sapUiBlockLayoutCell sapUiBlockLayoutCellColor10D sapUiBlockLayoutOddCell sapUiBlockHorizontalCell" style="flex: 1 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <div id="fix__hbox30" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyCenter sapMFlexBoxAlignItemsCenter sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent">
+                                                                                                        <div id="fix__data115" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <img id="fix__image16" src="../../../../../resources/sap/ui/documentation/sdk/images/logo_youtube.png" role="presentation" ariaHidden="true" alt="" class="sapMImg sapUiCommunityLinkLogo" style="width: 2.5rem;" />
+                                                                                                        </div>
+                                                                                                        <div id="fix__data116" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <div id="fix__link17" role="heading" class="sapUiDocTitleLink sapMTitle sapMTitleStyleAuto sapUiSelectable sapMTitleNoWrap sapMTitleMaxWidth sapUiSmallMargin sapUiNoMarginBottom sapUiNoMarginEnd sapUiCommunityLinkTitle">
+                                                                                                                <a tabindex="0" href="https://youtube.com/openui5videos" target="_blank" rel="noopener noreferrer" class="sapMLnk">
+                                                                                                                    <span id="fix__link17-inner">YouTube</span>
+                                                                                                                </a>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div id="fix__data117" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <img id="fix__image17" src="../../../../../resources/sap/ui/documentation/sdk/images/link-external.png" alt="Information published on non-SAP site" ariaLabel="Information published on non-SAP site" title="Information published on non-SAP site" role="button" tabindex="0" class="sapMImg sapMPointer sapMImgFocusable sapUiDisclaimerCommunityLink" style="width: 1.25rem;" />
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div id="fix__row9" class="sapUiBlockLayoutRow sapUiBlockHorizontalCellsRow sapUiBlockLayoutBackgroundColorSet2">
+                                                                                        <div style="display: flex;">
+                                                                                            <div id="fix__cell20" class="sapUiBlockLayoutCell sapUiBlockLayoutCellColor10C sapUiBlockLayoutOddCell sapUiBlockHorizontalCell" style="flex: 1 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <div id="fix__hbox31" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyCenter sapMFlexBoxAlignItemsCenter sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent">
+                                                                                                        <div id="fix__data118" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <img id="fix__image18" src="../../../../../resources/sap/ui/documentation/sdk/images/logo_bsky.png" role="presentation" ariaHidden="true" alt="" class="sapMImg sapUiCommunityLinkLogo" style="width: 2.5rem;" />
+                                                                                                        </div>
+                                                                                                        <div id="fix__data119" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <div id="fix__link18" role="heading" class="sapUiDocTitleLink sapMTitle sapMTitleStyleAuto sapUiSelectable sapMTitleNoWrap sapMTitleMaxWidth sapUiSmallMargin sapUiNoMarginBottom sapUiNoMarginEnd sapUiCommunityLinkTitle">
+                                                                                                                <a tabindex="0" href="https://bsky.app/profile/ui5.bsky.social" target="_blank" rel="noopener noreferrer" class="sapMLnk">
+                                                                                                                    <span id="fix__link18-inner">Bluesky</span>
+                                                                                                                </a>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div id="fix__data120" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <img id="fix__image19" src="../../../../../resources/sap/ui/documentation/sdk/images/link-external.png" alt="Information published on non-SAP site" ariaLabel="Information published on non-SAP site" title="Information published on non-SAP site" role="button" tabindex="0" class="sapMImg sapMPointer sapMImgFocusable sapUiDisclaimerCommunityLink" style="width: 1.25rem;" />
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div id="fix__cell21" class="sapUiBlockLayoutCell sapUiBlockLayoutCellColor10A sapUiBlockLayoutEvenCell sapUiBlockHorizontalCell" style="flex: 1 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <div id="fix__hbox32" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyCenter sapMFlexBoxAlignItemsCenter sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent">
+                                                                                                        <div id="fix__data121" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <img id="fix__image20" src="../../../../../resources/sap/ui/documentation/sdk/images/logo_linkedin.png" role="presentation" ariaHidden="true" alt="" class="sapMImg sapUiCommunityLinkLogo" style="width: 2.5rem;" />
+                                                                                                        </div>
+                                                                                                        <div id="fix__data122" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <div id="fix__link19" role="heading" class="sapUiDocTitleLink sapMTitle sapMTitleStyleAuto sapUiSelectable sapMTitleNoWrap sapMTitleMaxWidth sapUiSmallMargin sapUiNoMarginBottom sapUiNoMarginEnd sapUiCommunityLinkTitle">
+                                                                                                                <a tabindex="0" href="https://www.linkedin.com/company/openui5/" target="_blank" rel="noopener noreferrer" class="sapMLnk">
+                                                                                                                    <span id="fix__link19-inner">LinkedIn</span>
+                                                                                                                </a>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div id="fix__data123" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <img id="fix__image21" src="../../../../../resources/sap/ui/documentation/sdk/images/link-external.png" alt="Information published on non-SAP site" ariaLabel="Information published on non-SAP site" title="Information published on non-SAP site" role="button" tabindex="0" class="sapMImg sapMPointer sapMImgFocusable sapUiDisclaimerCommunityLink" style="width: 1.25rem;" />
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div id="fix__cell22" class="sapUiBlockLayoutCell sapUiBlockLayoutCellColor10B sapUiBlockLayoutOddCell sapUiBlockHorizontalCell" style="flex: 1 1 0%;">
+                                                                                                <div class="sapUiBlockCellContent">
+                                                                                                    <div id="fix__hbox33" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyCenter sapMFlexBoxAlignItemsCenter sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent">
+                                                                                                        <div id="fix__data124" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <span id="fix__icon22" role="presentation" ariaHidden="true" ariaLabel="email" data-sap-ui-icon-content="&#xE037;" class="sapUiIcon sapUiIconMirrorInRTL sapUiIconColorDefault sapUiCommunityLinkLogo" style="font-family: SAP-icons; font-size: 2.5rem;"></span>
+                                                                                                        </div>
+                                                                                                        <div id="fix__data125" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <div id="fix__link20" role="heading" class="sapUiDocTitleLink sapMTitle sapMTitleStyleAuto sapUiSelectable sapMTitleNoWrap sapMTitleMaxWidth sapUiSmallMargin sapUiNoMarginBottom sapUiNoMarginEnd sapUiCommunityLinkTitle">
+                                                                                                                <a tabindex="0" href="https://listserv.sap.com/mailman/listinfo/ui5.announce" target="_blank" rel="noopener noreferrer" class="sapMLnk">
+                                                                                                                    <span id="fix__link20-inner">Newsletter</span>
+                                                                                                                </a>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div id="fix__data126" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                                            <img id="fix__image22" src="../../../../../resources/sap/ui/documentation/sdk/images/link-sap.png" alt="Information published on SAP site" ariaLabel="Information published on SAP site" title="Information published on SAP site" role="button" tabindex="0" class="sapMImg sapMPointer sapMImgFocusable sapUiDisclaimerCommunityLink" style="width: 1.25rem;" />
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div id="fix__toolbar6" data-sap-ui-fastnavgroup="true" class="sapMIBar sapMTBInactive sapMTB sapMTBNewFlex sapMTBClear sapMTB-Auto-CTX sapUiDocumentationFooter">
+                                                                            <div id="fix__box1" class="sapMFlexBox sapMHBox sapMFlexBoxJustifySpaceBetween sapMFlexBoxAlignItemsCenter sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent sapMBarChild sapMBarChildFirstChild sapMTBShrinkItem" style="width: 100%;">
+                                                                                <div id="fix__data69" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                    <img id="fix__image23" src="../../../../../resources/sap/ui/documentation/sdk/images/logo_sap.svg" role="presentation" ariaHidden="true" alt="" ariaLabel="SAP Company Logo" class="sapMImg" style="width: 3rem; height: 1.5rem;" />
+                                                                                </div>
+                                                                                <div id="fix__box0" class="sapMFlexBox sapMHBox sapMFlexBoxJustifyStart sapMFlexBoxAlignItemsStretch sapMFlexBoxWrapNoWrap sapMFlexBoxAlignContentStretch sapMFlexBoxBGTransparent sapUiTinyMarginTop sapMFlexItem">
+                                                                                    <div id="fix__data70" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem sapUiHiddenPlaceholder" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                        <span id="sap-ui-invisible-__link21" ariaHidden="true" class="sapUiHiddenPlaceholder"></span>
+                                                                                    </div>
+                                                                                    <div id="fix__data71" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                        <a id="fix__link22" href="https://www.sap.com/corporate/en/legal/impressum.html" tabindex="0" target="_blank" rel="noopener noreferrer" class="sapMLnk sapMLnkMaxWidth sapUiLargeMarginEnd sapUiTinyMarginBottom sapUiDocumentationFooterLink">
+                                                                                            <span class="sapMLnkText">Legal Disclosure</span>
+                                                                                        </a>
+                                                                                    </div>
+                                                                                    <div id="fix__data72" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                        <a id="fix__link23" href="#" tabindex="0" class="sapMLnk sapMLnkMaxWidth sapUiLargeMarginEnd sapUiTinyMarginBottom sapUiDocumentationFooterLink">
+                                                                                            <span class="sapMLnkText">Privacy</span>
+                                                                                        </a>
+                                                                                    </div>
+                                                                                    <div id="fix__data73" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem sapUiHiddenPlaceholder" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                        <span id="sap-ui-invisible-__link24" ariaHidden="true" class="sapUiHiddenPlaceholder"></span>
+                                                                                    </div>
+                                                                                    <div id="fix__data74" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                        <a id="fix__link25" href="LICENSE.txt" tabindex="0" target="_blank" rel="noopener noreferrer" class="sapMLnk sapMLnkMaxWidth sapUiTinyMarginBottom sapUiLargeMarginEnd sapUiDocumentationFooterLink">
+                                                                                            <span class="sapMLnkText">License</span>
+                                                                                        </a>
+                                                                                    </div>
+                                                                                    <div id="fix__data75" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                        <a id="fix__link26" href="TermsOfUse.txt" tabindex="0" target="_blank" rel="noopener noreferrer" class="sapMLnk sapMLnkMaxWidth sapUiTinyMarginBottom sapUiLargeMarginEnd sapUiDocumentationFooterLink">
+                                                                                            <span class="sapMLnkText">Terms of Use</span>
+                                                                                        </a>
+                                                                                    </div>
+                                                                                    <div id="fix__data76" class="sapMFlexItemAlignAuto sapMFlexBoxBGTransparent sapMFlexItem" style="order: 0; flex: 0 1 auto; min-height: auto; min-width: auto;">
+                                                                                        <a id="fix__link27" href="#" tabindex="0" class="sapMLnk sapMLnkMaxWidth sapUiDocumentationFooterLink">
+                                                                                            <span class="sapMLnkText">Cookie Preferences</span>
+                                                                                        </a>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </section>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <!--
+                        <ui5-menu-0b2c601f id="sdk- - -app- -aboutMenu" horizontal-align="Start" loading-delay="1000" placement="Bottom" ui5-menu="">
+                        <ui5-menu-item-0b2c601f id="sdk- - -app- -menuItem-about" text="About" highlight="None" type="Active" icon="sap-icon://hint" loading-delay="1000" ui5-menu-item="" actionable="" _selection-mode="None" media-range="S" _check-mode="None" desktop="" forced-tab-index="0">
+                        </ui5-menu-item-0b2c601f>
+                        <ui5-menu-item-0b2c601f id="sdk- - -app- -menuItem-appearance" text="Appearance" highlight="None" type="Active" icon="sap-icon://palette" loading-delay="1000" ui5-menu-item="" actionable="" _selection-mode="None" media-range="S" _check-mode="None" desktop="" forced-tab-index="-1">
+                        <ui5-menu-item-0b2c601f id="sdk- - -app- -menuItem-light" text="Light" highlight="None" type="Active" loading-delay="1000" ui5-menu-item="" actionable="" _selection-mode="None" media-range="S" _check-mode="None" desktop="" forced-tab-index="0">
+                        </ui5-menu-item-0b2c601f>
+                        <ui5-menu-item-0b2c601f id="sdk- - -app- -menuItem-dark" text="Dark" highlight="None" type="Active" loading-delay="1000" ui5-menu-item="" actionable="" _selection-mode="None" media-range="S" _check-mode="None" desktop="" forced-tab-index="-1">
+                        </ui5-menu-item-0b2c601f>
+                        <ui5-menu-item-0b2c601f id="sdk- - -app- -menuItem-hcb" text="High Contrast Black" highlight="None" type="Active" loading-delay="1000" ui5-menu-item="" actionable="" _selection-mode="None" media-range="S" _check-mode="None" desktop="" forced-tab-index="-1">
+                        </ui5-menu-item-0b2c601f>
+                        <ui5-menu-item-0b2c601f id="sdk- - -app- -menuItem-hcw" text="High Contrast White" highlight="None" type="Active" loading-delay="1000" ui5-menu-item="" actionable="" _selection-mode="None" media-range="S" _check-mode="None" desktop="" forced-tab-index="-1">
+                        </ui5-menu-item-0b2c601f>
+                        <ui5-menu-item-0b2c601f id="sdk- - -app- -menuItem-auto" text="Auto (Depending on the OS Settings)" highlight="None" type="Active" loading-delay="1000" ui5-menu-item="" actionable="" _selection-mode="None" media-range="S" _check-mode="None" desktop="" forced-tab-index="-1">
+                        </ui5-menu-item-0b2c601f>
+                        </ui5-menu-item-0b2c601f>
+                        <ui5-menu-item-0b2c601f id="sdk- - -app- -menuItem-sitemap" text="Sitemap" highlight="None" type="Active" icon="sap-icon://tree" loading-delay="1000" ui5-menu-item="" actionable="" _selection-mode="None" media-range="S" _check-mode="None" desktop="" forced-tab-index="-1">
+                        </ui5-menu-item-0b2c601f>
+                        <ui5-menu-item-0b2c601f id="sdk- - -app- -menuItem-settings" text="Language" highlight="None" type="Active" icon="sap-icon://hello-world" loading-delay="1000" ui5-menu-item="" actionable="" _selection-mode="None" media-range="S" _check-mode="None" desktop="" forced-tab-index="-1">
+                        </ui5-menu-item-0b2c601f>
+                        <span id="sap-ui-invisible-sdk- - -app- -menuItem-cookie_preferences" ariaHidden="true" class="sapUiHiddenPlaceholder"></span>
+                        </ui5-menu-0b2c601f>
+                        <ui5-menu-0b2c601f id="sdk- - -app- -policiesMenu" horizontal-align="Start" loading-delay="1000" placement="Bottom" ui5-menu="">
+                        <ui5-menu-item-0b2c601f id="sdk- - -app- -menuItem-legal" text="Legal" highlight="None" type="Active" icon="sap-icon://compare" loading-delay="1000" ui5-menu-item="" actionable="" _selection-mode="None" media-range="S" _check-mode="None" desktop="" forced-tab-index="0">
+                        </ui5-menu-item-0b2c601f>
+                        <ui5-menu-item-0b2c601f id="sdk- - -app- -menuItem-privacy" text="Privacy" highlight="None" type="Active" icon="sap-icon://locked" loading-delay="1000" ui5-menu-item="" actionable="" _selection-mode="None" media-range="S" _check-mode="None" desktop="" forced-tab-index="-1">
+                        </ui5-menu-item-0b2c601f>
+                        <ui5-menu-item-0b2c601f id="sdk- - -app- -menuItem-license" text="License" highlight="None" type="Active" icon="sap-icon://permission" loading-delay="1000" ui5-menu-item="" actionable="" _selection-mode="None" media-range="S" _check-mode="None" desktop="" forced-tab-index="-1">
+                        </ui5-menu-item-0b2c601f>
+                        <ui5-menu-item-0b2c601f id="sdk- - -app- -menuItem-terms_of_use" text="Terms of Use" highlight="None" type="Active" icon="sap-icon://document-text" loading-delay="1000" ui5-menu-item="" actionable="" _selection-mode="None" media-range="S" _check-mode="None" desktop="" forced-tab-index="-1">
+                        </ui5-menu-item-0b2c601f>
+                        <ui5-menu-item-0b2c601f id="sdk- - -app- -menuItem-cookie_preferences_policies" text="Cookie Preferences" highlight="None" type="Active" icon="sap-icon://user-settings" loading-delay="1000" ui5-menu-item="" actionable="" _selection-mode="None" media-range="S" _check-mode="None" desktop="" forced-tab-index="-1">
+                        </ui5-menu-item-0b2c601f>
+                        <span id="sap-ui-invisible-sdk- - -app- -menuItem-terms_parent" ariaHidden="true" class="sapUiHiddenPlaceholder"></span>
+                        </ui5-menu-0b2c601f>
+                        -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</mvc:View>

@@ -16,6 +16,7 @@ sap.ui.define([], function() {
 			"sap/ui/documentation/sdk": {},
 			"sap/ui/dt": {},
 			"sap/ui/fl": {},
+			"sap/html": {},
 			"sap/ui/mdc": {},
 			"sap/ui/integration": {},
 			"sap/ui/layout": {},

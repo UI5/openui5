@@ -118,6 +118,16 @@ function(
 	 */
 	var XHTML_NAMESPACE = "http://www.w3.org/1999/xhtml";
 
+	// essentially a marker namespace for HTML nodes that should be transformed into UI5 controls
+	const UI5_HTML_NAMESPACE = "sap.html";
+	function hasUI5HtmlNamespace(node) {
+		return node.namespaceURI === UI5_HTML_NAMESPACE;
+	}
+
+	// namespace of the sap.ui.core.html controls, e.g. the TextContent wrapper used for inline
+	// text within mixed HTML content (see handleChild).
+	const CORE_HTML_NAMESPACE = "sap.ui.core.html";
+
 	/**
 	 * The official XMLNS namespace. Must only be used for xmlns:* attributes.
 	 * @const
@@ -1216,7 +1226,8 @@ function(
 				if (iControlNameStart >= 0) {
 					sControlName = sLocalName.substring(iControlNameStart + 1, sLocalName.length);
 				}
-				if (/^[a-z].*/.test(sControlName)) {
+				// allow lower-case names for html
+				if (/^[a-z].*/.test(sControlName) && !hasUI5HtmlNamespace(node)) {
 					var sNameOrId = oView.sViewName || oView._sFragmentName || oView.getId();
 					// View or Fragment
 					Log.warning("View or Fragment '" + sNameOrId + "' contains a Control tag that starts with lower case '" + sControlName + "'",
@@ -1226,7 +1237,13 @@ function(
 				}
 				// [/SUPPORT-RULE]
 
-				var vClass = findControlClass(node.namespaceURI, sLocalName);
+				// special namespace for simple HTML node wrapping
+				if (hasUI5HtmlNamespace(node)) {
+					sLocalName = sLocalName.toLowerCase();
+					sLocalName = sLocalName.charAt(0).toUpperCase() + sLocalName.slice(1);
+				}
+
+				const vClass = findControlClass(node.namespaceURI, sLocalName);
 				if (vClass && typeof vClass.then === 'function') {
 					return vClass.then(function (fnClass) {
 						return createRegularControls(node, fnClass, pRequireContext, oClosestBinding);
@@ -1324,6 +1341,17 @@ function(
 							sValue = attr.value;
 
 						if (bViewRootNode && VIEW_SPECIAL_ATTRIBUTES.includes(sName)) {
+							continue;
+						}
+
+						// See special handling for data attributes on HTML nodes above
+						if (hasUI5HtmlNamespace(node) && sName.startsWith("data-")) {
+							const sKey = sName.substring(5);
+							aCustomData.push(new CustomData({
+								key: sKey,
+								value: sValue,
+								writeToDom: true
+							}));
 							continue;
 						}
 
@@ -1550,6 +1578,25 @@ function(
 					oNamedAggregation,
 					fnCreateStashedControl;
 
+				// simple UI5 HTML Nodes accept text content
+				if (hasUI5HtmlNamespace(node) && childNode.nodeType === 3 /* TEXT_NODE */) {
+					const sTextContent = childNode.textContent?.trim();
+					if (sTextContent) {
+						// The text-node is the only childNode -> nothing needs to be aggregated
+						if (node.childNodes?.length === 1) {
+							mSettings.text = sTextContent;
+							return;
+						} else {
+							// Mixed content: the text is only one of several child nodes, so it cannot
+							// be mapped to the parent's "text" property. We wrap the raw text content in a
+							// sap.ui.core.html.TextContent control for the UI5 control tree. This way we preserves the text's
+							// position within the parent and later render the bare HTML text.
+							childNode = node.ownerDocument.createElementNS(CORE_HTML_NAMESPACE, "TextContent");
+							childNode.setAttribute("text", sTextContent);
+						}
+					}
+				}
+
 				// inspect only element nodes
 				if (childNode.nodeType === 1 /* ELEMENT_NODE */) {
 
@@ -1722,6 +1769,14 @@ function(
 				closestBinding: oClosestBinding,
 				config: oConfig
 			}).then(function() {
+				// Void HTML elements (e.g. <br>, <img>) must not carry any content — neither inline
+				// text nor children controls.
+				// This can only be validated here cleanly, since the "void" flag lives on the control metadata.
+				if (oMetadata.isA("sap.ui.core.html.HTMLElement") && oMetadata.isVoid()
+						&& (mSettings.hasOwnProperty("text") || mSettings.hasOwnProperty("children"))) {
+					throw new Error(createErrorInfo(node, `The void HTML element '<${oMetadata.getTag()}>' must not have text content or child elements.`));
+				}
+
 				// apply the settings to the control
 				var vNewControlInstance;
 				var pProvider = SyncPromise.resolve();

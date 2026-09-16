@@ -1,0 +1,45 @@
+<mvc:View xmlns="sap.html" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns:m="sap.m">
+	<div>
+		<h2>{myModel&gt;/title}</h2>
+	</div>
+	<div style="
+	background: #FAFAFA;
+	border-bottom: 2px solid #777777;
+	border-radius: 5px;
+	box-shadow: 0px 5px 10px #999999;
+	padding: 10px;
+	margin: 10px">
+		<div style="border-bottom: 1px solid #D0D0D0; padding: 2px;">
+			I'm a self made card :)
+			<br /> <!-- this is a void tag -->
+			<div style="margin-top: 20px">
+				A lot of buttons:
+				<div children="{/buttons}">
+					<m:Button text="{buttonText}" />
+				</div>
+			</div>
+		</div>
+		<div>
+			<p class="myStyleClass"><span>This is an input: </span><input type="datetime-local"/></p>
+			<p>
+				<a href="https://ui5.sap.com" data-my-data-attribute="12">link to demokit</a>
+				<br />
+				<a href="https://ui5.sap.com" target="_blank" rel="noreferrer">open demokit in new tab (new browsing context)</a>
+			</p>
+			<p>
+				Now some mix between text content, HTML nodes and UI5 controls
+				text content before the &lt;hr&gt;...
+				<hr /> <!-- this is a void tag -->
+				... and text content after the &lt;hr&gt;.
+			</p>
+			<!-- a mix between HTML, UI5 and random text content -->
+			<p>
+				Some text flowing before <m:Button text="a UI5 control!" /> And then some text flowing behind, because we are all inline elements.
+				<br />
+				This text content even has a binding 😱: {myModel&gt;/title}
+				<!-- this would break! -->
+				<!-- <br>foo</br> -->
+			</p>
+		</div>
+	</div>
+</mvc:View>
