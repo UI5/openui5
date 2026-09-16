@@ -3,6 +3,11 @@
     "date": "September 2026",
     "notes": [
       {
+        "id": "545cf2cda920e43dcf37f960e163f8bae3aa9875",
+        "type": "FIX",
+        "text": " ValueHelp. improve tooltip for \"remove all\" button"
+      },
+      {
         "id": "673a7af0d2c9a4b0a6f6b122ccf6a2eca527fbfa",
         "type": "FIX",
         "text": " MTable: not able to scroll to last items if growing enabled"

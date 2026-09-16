@@ -3,6 +3,11 @@
     "date": "September 2026",
     "notes": [
       {
+        "id": "cf812b7359161a4dd6a41cacdd7f80a6603defab",
+        "type": "FIX",
+        "text": " sap.m.SinglePlanningCalendar: doesn't overwrite Calendar css"
+      },
+      {
         "id": "89fa571928f94a7ac782981d654ba57de02b2ea0",
         "type": "FIX",
         "text": " sap.m.SplitButton: paddings on hover"

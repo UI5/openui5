@@ -3,6 +3,31 @@
     "date": "September 2026",
     "notes": [
       {
+        "id": "37f024ca50f24207fe93da63d3f64dd2944b8329",
+        "type": "FIX",
+        "text": " sap.m.ScrollPosition: fix intermittent QUnit test failures after navigation and re-render"
+      },
+      {
+        "id": "6e790c05a497516fdb4680398f754f593e6a407b",
+        "type": "FIX",
+        "text": " sap.m.FacetFilter: fix dialog paddings"
+      },
+      {
+        "id": "39d8ad5311d4200fc5aae7d8f37bb6aedbc656a0",
+        "type": "FIX",
+        "text": " sap.m.FacetFilter: has correct compact density"
+      },
+      {
+        "id": "62aaf81283dbdb19b96b37d584a93d7e1defaed5",
+        "type": "FEATURE",
+        "text": " sap.m.MenuButton: enable enhanced tooltip"
+      },
+      {
+        "id": "0135b54328a19b728b51e9e4531ef51587abdeee",
+        "type": "FIX",
+        "text": " sap.m.Tokenizer: add aria-hidden to the clip div"
+      },
+      {
         "id": "2abc3a5d2fc4c5d9bb6e9ec79d4aeab89f6e4817",
         "type": "FIX",
         "text": " sap.m.Dialog: Buttons are no longer moved to the overflow area, when there is a space"

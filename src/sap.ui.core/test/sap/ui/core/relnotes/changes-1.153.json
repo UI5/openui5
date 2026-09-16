@@ -3,6 +3,11 @@
     "date": "September 2026",
     "notes": [
       {
+        "id": "4b2aa684cf86f3bc5a5c5034aaf3e3b83f314de0",
+        "type": "FIX",
+        "text": " sap.ui.core.Tooltip: fix visual test timing for flip and corner cases"
+      },
+      {
         "id": "7a8bb3cefc8cf4e5bc222d8119e365bc791f22b1",
         "type": "FIX",
         "text": " forced-color-adjust performance optimization"

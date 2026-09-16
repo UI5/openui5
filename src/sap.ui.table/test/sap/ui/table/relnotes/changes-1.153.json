@@ -3,6 +3,11 @@
     "date": "September 2026",
     "notes": [
       {
+        "id": "fad3da850ab21d6643ffc9a8a6c8270da317bd71",
+        "type": "FEATURE",
+        "text": " ui.Table: Display visible range of indices in scroll handle"
+      },
+      {
         "id": "9227216652403762bfbc67369e5ed7031f3a3b8d",
         "type": "FIX",
         "text": " rowmodes.Auto: Exclude parent padding from available space calculation"
