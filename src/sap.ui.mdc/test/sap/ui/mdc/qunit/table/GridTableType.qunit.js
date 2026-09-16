@@ -334,6 +334,31 @@ sap.ui.define([
 		}
 	});
 
+	QUnit.test("createTable returns null when there is no parent", function(assert) {
+		const oType = new GridTableType();
+		assert.strictEqual(oType.createTable("myId"), null);
+		oType.destroy();
+	});
+
+	QUnit.test("loadModules resolves immediately on subsequent calls", async function(assert) {
+		const oType = new GridTableType();
+
+		// First call ensures the inner table modules are loaded.
+		await oType.loadModules();
+
+		// Spy on sap.ui.require to ensure it is not called again.
+		const oRequireSpy = this.spy(sap.ui, "require");
+
+		await oType.loadModules();
+
+		const bRequiredAgain = oRequireSpy.getCalls().some((oCall) => {
+			return Array.isArray(oCall.args[0]) && oCall.args[0].length > 0;
+		});
+		assert.notOk(bRequiredAgain, "sap.ui.require was not called again on the second loadModules call");
+
+		oType.destroy();
+	});
+
 	QUnit.test("scrollThreshold property", async function(assert) {
 		const oTable = this.createTable({
 			type: new GridTableType({scrollThreshold: 200})

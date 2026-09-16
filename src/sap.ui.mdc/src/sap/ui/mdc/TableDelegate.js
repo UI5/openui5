@@ -526,7 +526,15 @@ sap.ui.define([
 	 */
 	TableDelegate.initializeContent = async function(oTable) {
 		await this.initializeSelection(oTable);
-		return initializeTitleProvider(oTable);
+		await initializeTitleProvider(oTable);
+
+		if (oTable._isOfType(TableType.TreeTable)) {
+			const [ClientHierarchy] = await loadModules("sap/ui/table/plugins/ClientHierarchy");
+
+			if (!oTable.isDestroyed()) {
+				oTable._oTable.addDependent(new ClientHierarchy({tolerateUnsupportedModel: true}));
+			}
+		}
 	};
 
 	/**
@@ -537,54 +545,49 @@ sap.ui.define([
 	 * @returns {Promise} A <code>Promise</code> that resolves after the selection has been initialized
 	 * @private
 	 */
-	TableDelegate.initializeSelection = function(oTable) {
+	TableDelegate.initializeSelection = async function(oTable) {
 		if (oTable._isOfType(TableType.Table, true)) {
-			return initializeGridTableSelection(oTable);
+			await initializeGridTableSelection(oTable);
 		} else if (oTable._isOfType(TableType.ResponsiveTable)) {
-			return initializeResponsiveTableSelection(oTable);
-		} else {
-			return Promise.resolve();
+			await initializeResponsiveTableSelection(oTable);
 		}
 	};
 
-	function initializeGridTableSelection(oTable) {
+	async function initializeGridTableSelection(oTable) {
 		const mSelectionModeMap = {
 			Single: "Single",
 			SingleMaster: "Single",
 			Multi: "MultiToggle"
 		};
+		const [MultiSelectionPlugin] = await loadModules("sap/ui/table/plugins/MultiSelectionPlugin");
 
-		return loadModules("sap/ui/table/plugins/MultiSelectionPlugin").then(([MultiSelectionPlugin]) => {
-			if (oTable.isDestroyed()) {
-				return Promise.reject("Destroyed");
-			}
+		if (oTable.isDestroyed()) {
+			return;
+		}
 
-			oTable._oTable.addDependent(new MultiSelectionPlugin({
-				limit: "{$sap.ui.mdc.Table#type>/selectionLimit}",
-				enableNotification: true,
-				showHeaderSelector: "{$sap.ui.mdc.Table#type>/showHeaderSelector}",
-				selectionMode: {
-					path: "$sap.ui.mdc.Table>/selectionMode",
-					formatter: function(sSelectionMode) {
-						return mSelectionModeMap[sSelectionMode];
-					}
-				},
-				enabled: {
-					path: "$sap.ui.mdc.Table>/selectionMode",
-					formatter: function(sSelectionMode) {
-						return sSelectionMode in mSelectionModeMap;
-					}
-				},
-				selectionChange: function(oEvent) {
-					// TODO: Add something sililar like TableTypeBase#callHook -> move to reusable util? Use here and in other places in delegates.
-					oTable._onSelectionChange({
-						selectAll: oEvent.getParameter("selectAll")
-					});
+		oTable._oTable.addDependent(new MultiSelectionPlugin({
+			limit: "{$sap.ui.mdc.Table#type>/selectionLimit}",
+			enableNotification: true,
+			showHeaderSelector: "{$sap.ui.mdc.Table#type>/showHeaderSelector}",
+			selectionMode: {
+				path: "$sap.ui.mdc.Table>/selectionMode",
+				formatter: function(sSelectionMode) {
+					return mSelectionModeMap[sSelectionMode];
 				}
-			}));
-
-			return Promise.resolve();
-		});
+			},
+			enabled: {
+				path: "$sap.ui.mdc.Table>/selectionMode",
+				formatter: function(sSelectionMode) {
+					return sSelectionMode in mSelectionModeMap;
+				}
+			},
+			selectionChange: function(oEvent) {
+				// TODO: Add something sililar like TableTypeBase#callHook -> move to reusable util? Use here and in other places in delegates.
+				oTable._onSelectionChange({
+					selectAll: oEvent.getParameter("selectAll")
+				});
+			}
+		}));
 	}
 
 	function initializeResponsiveTableSelection(oTable) {
@@ -621,22 +624,21 @@ sap.ui.define([
 		return Promise.resolve();
 	}
 
-	function initializeTitleProvider(oTable) {
-		return loadModules("sap/m/plugins/TitleProvider").then(([TitleProvider]) => {
-			if (oTable.isDestroyed()) {
-				return Promise.reject("Destroyed");
-			}
+	async function initializeTitleProvider(oTable) {
+		const [TitleProvider] = await loadModules("sap/m/plugins/TitleProvider");
 
-			const bIsTreeTable = oTable._isOfType(TableType.TreeTable);
-			const oTitleProvider = new TitleProvider({
-				id: `${oTable.getId()}-titleProvider`,
-				title: `${oTable.getId()}-tableTitle`,
-				enabled: "{= ${$sap.ui.mdc.Table>/headerVisible} && ${$sap.ui.mdc.Table>/showRowCount} && !${$sap.ui.mdc.Table>/hideToolbar} }",
-				manageSelectedCount: bIsTreeTable ? false : "{= ${$sap.ui.mdc.Table>/selectionMode} === 'Multi' }"
-			});
-			oTable._oTable.addDependent(oTitleProvider);
-			return Promise.resolve();
+		if (oTable.isDestroyed()) {
+			return;
+		}
+
+		const bIsTreeTable = oTable._isOfType(TableType.TreeTable);
+		const oTitleProvider = new TitleProvider({
+			id: `${oTable.getId()}-titleProvider`,
+			title: `${oTable.getId()}-tableTitle`,
+			enabled: "{= ${$sap.ui.mdc.Table>/headerVisible} && ${$sap.ui.mdc.Table>/showRowCount} && !${$sap.ui.mdc.Table>/hideToolbar} }",
+			manageSelectedCount: bIsTreeTable ? false : "{= ${$sap.ui.mdc.Table>/selectionMode} === 'Multi' }"
 		});
+		oTable._oTable.addDependent(oTitleProvider);
 	}
 
 	/**
