@@ -35,7 +35,6 @@ sap.ui.define([
 			search : "string",
 			subtotalsAtBottomOnly : "boolean"
 		},
-		sExpandAfterConcatSupported = "/@com.sap.vocabularies.Common.v1.ExpandAfterConcatSupported",
 		oFrozenCollapsed = Object.freeze({"@$ui5.node.isExpanded" : false}),
 		oFrozenExpanded = Object.freeze({"@$ui5.node.isExpanded" : true}),
 		// Example: "Texts/Country asc"
@@ -261,9 +260,6 @@ sap.ui.define([
 		 *   A map of key-value pairs representing the query string, including a value for the
 		 *   "$apply" system query option if needed; it is a modified copy of
 		 *   <code>mQueryOptions</code>, with values removed as described above
-		 * @throws {Error}
-		 *   If this method was called for an identity transformation while
-		 *   <code>mQueryOptions</code> contains an option which is not compatible
 		 *
 		 * @public
 		 */
@@ -280,15 +276,6 @@ sap.ui.define([
 				sSkipTop,
 				aSortedGroups,
 				aSubtotalsAggregate = []; // groupby(.,aggregate(???)) content for subtotals/leaves
-
-			/*
-			 * Appends the given transformation part to the current $apply expression.
-			 *
-			 * @param {string} sPart - A part to be added to the end of the current $apply
-			 */
-			function append(sPart) {
-				sApply = sApply ? sApply + "/" + sPart : sPart;
-			}
 
 			/*
 			 * Builds the min/max expression for the "concat" term (for example
@@ -367,17 +354,6 @@ sap.ui.define([
 				sApply = "aggregate(" + aSubtotalsAggregate.join(",") + ")";
 			}
 
-			const bUseIdentity = bIsLeafLevel && oAggregation.$leafLevelAggregated === false
-				&& !bGrandTotalLike184 && iLevel >= 0
-				&& !aAliases.some((sAlias) => oAggregation.aggregate[sAlias].name);
-			if (bUseIdentity) {
-				for (const sOption of ["$filter", "$$filterOnAggregate", "$$leaves"]) {
-					if (mQueryOptions[sOption]) {
-						throw new Error("Cannot combine identity with " + sOption);
-					}
-				}
-			}
-
 			if (aGroupBy.length) {
 				aGroupBy.forEach(function (sGroup) {
 					var aAdditionally = oAggregation.group[sGroup].additionally;
@@ -386,31 +362,7 @@ sap.ui.define([
 						aGroupBy.push.apply(aGroupBy, aAdditionally);
 					}
 				});
-				if (bUseIdentity
-						&& oAggregation.$fetchMetadata?.(sExpandAfterConcatSupported).getResult()) {
-					sApply = ""; // identity; override aSubtotalsAggregate
-				} else {
-					sApply = "groupby((" + aGroupBy.join(",")
-						+ (sApply ? ")," + sApply + ")" : "))");
-				}
-			}
-			if (bUseIdentity
-					&& (iLevel > 1 || !aMinMaxAggregate.length && !aGrandTotalAggregate.length)) {
-				// no $apply needed, just plain system query options
-				delete mQueryOptions.$apply;
-				if (bFollowUp) {
-					delete mQueryOptions.$count;
-				}
-				if (oAggregation.search) {
-					mQueryOptions.$search = oAggregation.search;
-				}
-				if (mQueryOptions.$$filterBeforeAggregate) {
-					mQueryOptions.$filter = mQueryOptions.$$filterBeforeAggregate;
-					delete mQueryOptions.$$filterBeforeAggregate;
-				}
-				mQueryOptions.$$sortSystemQueryOptions = true;
-
-				return mQueryOptions;
+				sApply = "groupby((" + aGroupBy.join(",") + (sApply ? ")," + sApply + ")" : "))");
 			}
 
 			if (bFollowUp) {
@@ -425,7 +377,7 @@ sap.ui.define([
 				delete mQueryOptions.$filter;
 			}
 			if (mQueryOptions.$orderby) {
-				append("orderby(" + mQueryOptions.$orderby + ")");
+				sApply += "/orderby(" + mQueryOptions.$orderby + ")";
 				delete mQueryOptions.$orderby;
 			}
 			sSkipTop = skipTop(mQueryOptions);
@@ -439,10 +391,10 @@ sap.ui.define([
 					+ (sSkipTop || "identity") + ")";
 			} else {
 				if (aMinMaxAggregate.length) {
-					append("concat(aggregate(" + aMinMaxAggregate.join(",") + "),"
-						+ (sSkipTop || "identity") + ")");
+					sApply += "/concat(aggregate(" + aMinMaxAggregate.join(",") + "),"
+						+ (sSkipTop || "identity") + ")";
 				} else if (sSkipTop) {
-					append(sSkipTop);
+					sApply += "/" + sSkipTop;
 				}
 				if (iLevel === 1 && mQueryOptions.$$leaves && !bFollowUp) {
 					sLeaves = "groupby((" + aSortedGroups.join(",")
@@ -451,7 +403,7 @@ sap.ui.define([
 				delete mQueryOptions.$$leaves;
 				if (aGrandTotalAggregate.length) {
 					sApply = "concat(" + (sLeaves ? sLeaves + "," : "") + "aggregate("
-						+ aGrandTotalAggregate.join(",") + ")," + (sApply || "identity") + ")";
+						+ aGrandTotalAggregate.join(",") + ")," + sApply + ")";
 				} else if (sLeaves) {
 					sApply = "concat(" + sLeaves + "," + sApply + ")";
 				}
