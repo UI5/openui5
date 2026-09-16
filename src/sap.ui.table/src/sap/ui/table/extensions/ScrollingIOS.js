@@ -15,8 +15,6 @@ sap.ui.define([
 		}
 	};
 
-	const MIN_THUMB_HEIGHT = 25; // For better usability on touch devices the minimum height of the scroll thumb is 25px.
-
 	/**
 	 * Extension for sap.ui.table.Table which displays vertical scrollbar on iOS and provides event handlers for user interaction.
 	 * <b>This is an internal class that is only intended to be used inside the sap.ui.table library! Any usage outside the sap.ui.table library
@@ -52,7 +50,6 @@ sap.ui.define([
 			const oTable = this.getTable();
 
 			oTable.removeEventDelegate(ExtensionDelegate);
-			clearTimeout(this._iUpdateDefaultScrollbarPositionTimeoutId);
 			ExtensionBase.prototype.destroy.apply(this, arguments);
 		},
 
@@ -226,7 +223,8 @@ sap.ui.define([
 		const iVerticalScrollbarHeight = oScrollExtension.getVerticalScrollbarHeight();
 		const iVerticalScrollHeight = oScrollExtension.getVerticalScrollHeight();
 
-		return Math.max(MIN_THUMB_HEIGHT, Math.round(Math.pow(iVerticalScrollbarHeight, 2) / iVerticalScrollHeight));
+		const iThumbSize = TableUtils.calculateScrollThumbSize(iVerticalScrollbarHeight, iVerticalScrollbarHeight, iVerticalScrollHeight);
+		return Math.round(iThumbSize);
 	};
 
 	/**
@@ -240,10 +238,11 @@ sap.ui.define([
 		const iVerticalScrollbarHeight = oScrollExtension.getVerticalScrollbarHeight();
 		const iVerticalScrollHeight = oScrollExtension.getVerticalScrollHeight();
 		const oVSb = oScrollExtension.getVerticalScrollbar();
-		const iVerticalScrollTop = oVSb ? oScrollExtension.getVerticalScrollbar().scrollTop : 0;
+		const iVerticalScrollTop = oVSb ? oVSb.scrollTop : 0;
 
 		const iThumbHeight = this.getCalculateThumbHeight();
-		return Math.round(iVerticalScrollTop * (iVerticalScrollbarHeight - iThumbHeight) / (iVerticalScrollHeight - iThumbHeight));
+		const iScrollRange = iVerticalScrollHeight - iVerticalScrollbarHeight;
+		return Math.round(TableUtils.calculateScrollThumbOffset(iVerticalScrollTop, iScrollRange, iVerticalScrollbarHeight, iThumbHeight));
 	};
 
 	/**
@@ -264,11 +263,7 @@ sap.ui.define([
 		oEvent.stopPropagation();
 		oVSbThumb.style.top = iOffset + "px";
 
-		clearTimeout(this._iUpdateDefaultScrollbarPositionTimeoutId);
-		this._iUpdateDefaultScrollbarPositionTimeoutId = setTimeout(() => {
-			this.updateDefaultScrollbarPosition(iOffset, iThumbHeight);
-			delete this._iUpdateDefaultScrollbarPositionTimeoutId;
-		}, 30);
+		this.updateDefaultScrollbarPosition(iOffset, iThumbHeight);
 	};
 
 	/**
@@ -307,6 +302,7 @@ sap.ui.define([
 		const oScrollExtension = oTable._getScrollExtension();
 		const iScrollbarHeight = oScrollExtension.getVerticalScrollbarHeight();
 
+		oScrollExtension._bIOSThumbDrag = true;
 		if (iOffset + iThumbHeight >= iScrollbarHeight) {
 			oScrollExtension.scrollVerticallyMax(true);
 		} else {

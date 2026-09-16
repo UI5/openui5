@@ -426,3 +426,69 @@ html.sap-phone {
 		}
 	}
 }
+
+/* Scroll handle showing the range of visible rows during scrolling */
+.sapUiTableVScrHandle {
+	position: absolute;
+	right: 100%;
+	margin-right: 0.375rem;
+	min-width: 4.375rem;
+	max-width: max-content;
+	height: 1.625rem;
+	padding: 0 0.5rem;
+	box-sizing: border-box;
+	white-space: nowrap;
+	font-family: var(--sapFontFamily);
+	font-size: var(--sapFontSize);
+	font-weight: normal;
+	text-align: left;
+	color: var(--sapContent_ContrastTextColor);
+	background-color: var(--sapIndicationColor_9_Background);
+	border-radius: 0.25rem;
+	box-shadow: var(--sapContent_Lite_Shadow);
+	pointer-events: none;
+	touch-action: none;
+	opacity: 0;
+	transform: translateY(-50%) translateX(10px);
+	transition: opacity 0.3s ease, transform 0.3s ease;
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+
+	&.sapUiTableVScrHandleVisible {
+		pointer-events: auto;
+		cursor: grab;
+		opacity: 1;
+		transform: translateY(-50%) translateX(0);
+
+		&:active {
+			cursor: grabbing;
+		}
+	}
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: 50%;
+		right: -0.375rem;
+		transform: translateY(-50%);
+		border-top: 0.375rem solid transparent;
+		border-bottom: 0.375rem solid transparent;
+		border-left: 0.375rem solid var(--sapIndicationColor_9_Background);
+	}
+
+	.sapUiSizeCozy &,
+	.sapUiSizeCozy& {
+		height: 2.25rem;
+	}
+
+	.sapUiTableVScrHandleGrip {
+		font-family: SAP-icons;
+		font-size: var(--sapFontSmallSize);
+		color: var(--sapContent_ContrastTextColor);
+
+		&::before {
+			content: "\e1fa";
+		}
+	}
+}

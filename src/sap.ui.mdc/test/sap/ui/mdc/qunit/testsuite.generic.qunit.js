@@ -38,6 +38,17 @@ sap.ui.define([
 					return (new Class(mSettings)).initialized();
 				}
 			},
+			"sap.ui.mdc.List": {
+				properties: {
+					delegate: GenericTestCollection.ExcludeReason.NotChangeableAfterInit,
+					sortConditions: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
+					filterConditions: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
+					groupConditions: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings
+				},
+				create: function(Class, mSettings) {
+					return (new Class(mSettings)).initialized();
+				}
+			},
 			"sap.ui.mdc.FilterBar": {
 				properties: {
 					delegate: GenericTestCollection.ExcludeReason.NotChangeableAfterInit,

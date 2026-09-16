@@ -1,0 +1,126 @@
+/* ================================= */
+/* CSS for control sap.ui.mdc/List   */
+/* Base theme                        */
+/* ================================= */
+@_sap_ui_mdc_List_GridListItem_HeaderHeight: 3rem;
+@_sap_ui_mdc_List_GridListItem_Compact_HeaderHeight: 2rem;
+
+
+/* --- 1. MDC-specific: headerVisible=false accessibility --- */
+
+/* Keep the title in the DOM for aria-labelledby, but hide it visually and from layout. */
+.sapUiMdcListTitleHidden {
+	position: absolute;
+	width: 0.0625rem;
+	height: 0.0625rem;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+
+/* --- 2. GridList item action buttons --- */
+
+.sapUiMdcListGridList {
+
+	/* Default 1rem gap between cards. GridBoxLayout writes an inline 0.5rem grid-gap on
+	   .sapMListUl, so !important is required. No public API is exposed to change it. */
+	.sapMListUl {
+		grid-gap: 1rem !important;
+	}
+
+	/* Each card gets its own stacking context so the absolutely-positioned action buttons
+	   (z-index: 2) cannot escape the card and paint over the sticky list toolbar. */
+	.sapFGLI {
+		isolation: isolate;
+	}
+
+	/* Separator line beneath the item toolbar. sap.f.GridListItem renders it via box-shadow,
+	   but some themes (e.g. sap_horizon) set it to none; MDC List re-applies it. */
+	.sapFGLIToolbar {
+		box-shadow: inset 0 -0.0625rem var(--sapPageHeader_BorderColor);
+	}
+
+	/* Item action buttons positioned in the toolbar row, aligned with the selection checkbox. */
+	.sapFGLI .sapUiMdcListItemActions {
+		position: absolute;
+		top: 0;
+		right: 2rem;
+		z-index: 2;
+		display: flex;
+		align-items: center;
+		height: @_sap_ui_mdc_List_GridListItem_HeaderHeight;
+	}
+
+	/* In SingleSelect/Delete modes the mode control is rendered on the right of the toolbar
+	   (ModeOrder = 1); shift the actions further left so they do not overlap it. */
+	.sapMListModeSingleSelect .sapFGLI .sapUiMdcListItemActions,
+	.sapMListModeDelete .sapFGLI .sapUiMdcListItemActions {
+		right: 4rem;
+	}
+
+	/* The wrapper type is DetailAndActive to force .sapFGLIToolbar to always render. The native
+	   detail button it produces is replaced by our custom actions HBox, so hide it. */
+	.sapFGLI .sapMLIBIconDet {
+		display: none;
+	}
+}
+
+.sapUiSizeCompact .sapUiMdcListGridList .sapFGLI .sapUiMdcListItemActions {
+	height: @_sap_ui_mdc_List_GridListItem_Compact_HeaderHeight;
+}
+
+
+/* --- 3. List mode double-wrap side effects --- */
+
+/* In list mode the itemTemplate is wrapped in a CustomListItem with padding: 0. When the
+   template is itself a ListItemBase subclass, its own background/separator/focus ring
+   conflict with the outer item's states. The rules below suppress them. */
+
+/* Make the inner content transparent so the outer CustomListItem's hover/selected/active
+   backgrounds show through. */
+.sapUiMdcListList .sapMLIBContent {
+	background: transparent;
+}
+
+/* Same for the item template root — e.g. StandardListItem sets --sapList_Background on
+   .sapMLIB, which would otherwise occlude the outer item's state background. */
+.sapUiMdcListItemContent,
+.sapUiMdcListItemContent .sapMLIB {
+	background: inherit;
+}
+
+/* Drop the inner item's border-bottom (doubles the outer separator) and its focus outline
+   (the outer CustomListItem owns focus, see ::after below). */
+.sapUiMdcListList .sapMLIBContent .sapMLIB {
+	border-bottom: none;
+	outline: none;
+}
+
+/* sap.m's CustomListItem stylesheet only adds the right padding for the .sapMLIBActions marker.
+   Apply the equivalent padding for the detail/navigation markers, scoped to the MDC List. */
+.sapUiMdcListList .sapMCLI:has(> .sapMLIBIconDet:last-child),
+.sapUiMdcListList .sapMCLI:has(> .sapMLIBIconDet + .sapMLIBNavigated),
+.sapUiMdcListList .sapMCLI:has(> .sapMLIBImgDet:last-child),
+.sapUiMdcListList .sapMCLI:has(> .sapMLIBImgDet + .sapMLIBNavigated),
+.sapUiMdcListList .sapMCLI:has(> .sapMLIBImgNav:last-child),
+.sapUiMdcListList .sapMCLI:has(> .sapMLIBImgNav + .sapMLIBNavigated) {
+	padding-right: 1rem;
+}
+
+/* Content fills edge-to-edge (padding: 0), so the native focus outline is hidden behind the
+   flex children. Paint the focus ring on a ::after with z-index above them, as sap.m.Table
+   does for row focus. */
+.sapUiMdcListItem.sapMLIBFocusable:focus {
+	outline: none;
+}
+
+.sapUiMdcListItem.sapMLIBFocusable:focus::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	z-index: 1;
+	outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
+	outline-offset: calc(-@sapUiContentFocusWidth ~"- 0.0625rem");
+}

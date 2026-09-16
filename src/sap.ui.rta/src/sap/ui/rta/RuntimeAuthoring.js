@@ -109,6 +109,7 @@ sap.ui.define([
 	const STOPPED = "STOPPED";
 	const FAILED = "FAILED";
 	const sParametersAfterRestartKey = "sap.ui.rta.RuntimeAuthoring.parametersAfterRestart";
+	const sHighlightAllChangesKey = "sap.ui.rta.RuntimeAuthoring.highlightAllChangesAfterRestart";
 	let oCurrentInstance;
 
 	/**
@@ -533,6 +534,9 @@ sap.ui.define([
 				oChangeVisualization.setVersionsModel(this.getToolbar());
 				// Recompute the "Highlight All App Changes" enablement whenever CViz refreshes its registry.
 				oChangeVisualization.attachChangesResolved(updateHighlightAllChangesEnabled, this);
+				if (this._oToolbarControlsModel.getProperty("/highlightAllChanges/pressed")) {
+					oChangeVisualization.setShowAllChanges(true);
+				}
 				await oChangeVisualization.initialize();
 				updateHighlightAllChangesEnabled.call(this);
 
@@ -560,11 +564,13 @@ sap.ui.define([
 
 			const aSeenFeatureIds = await FeaturesAPI.getSeenFeatureIds({ layer: this.getLayer() });
 
-			const bGuidedTourAutostart = await shouldAutoStartGuidedTour(this.getRootControlInstance(), this.getLayer(), aSeenFeatureIds);
+			const bGuidedTourAutostart = this.getNonInteractiveMode()
+				? false
+				: await shouldAutoStartGuidedTour(this.getRootControlInstance(), this.getLayer(), aSeenFeatureIds);
 
 			// The What's new should only be shown once per session
 			const sWhatsNewReloadFlag = "sap.ui.rta.dontShowWhatsNewAfterReload";
-			const bShowWhatsNew = this.getWhatsNew && !window.sessionStorage.getItem(sWhatsNewReloadFlag);
+			const bShowWhatsNew = this.getWhatsNew && !window.sessionStorage.getItem(sWhatsNewReloadFlag) && !this.getNonInteractiveMode();
 
 			if (bGuidedTourAutostart) {
 				const oGuidedTour = this.getGuidedTour();
@@ -725,6 +731,7 @@ sap.ui.define([
 			checkToolbarAndExecuteFunction.call(this, "hide", bSkipSave);
 			this.fireStop();
 			if (!bSkipRestart) {
+				persistHighlightAllChangesState.call(this);
 				ReloadInfoAPI.removeInfoSessionStorage(this.getRootControlInstance());
 				await ReloadManager.handleReloadOnExit(oReloadInfo);
 			}
@@ -1008,6 +1015,16 @@ sap.ui.define([
 	};
 
 	/**
+	 * Activates a new version with the given title.
+	 * @param {string} sVersionTitle - Title for the new Version
+	 * @returns {Promise} Resolves when the activation is complete
+	 * @ui5-restricted sap.ui.rta
+	 */
+	RuntimeAuthoring.prototype.activate = function(sVersionTitle) {
+		return activate.call(this, sVersionTitle);
+	};
+
+	/**
 	 * Returns a promise that resolves once all pending actions (busy plugins and the
 	 * queued <code>elementModified</code> commands) are finished. Unlike
 	 * {@link sap.ui.rta.RuntimeAuthoring#waitForCommandExecutionResult}, it never rejects
@@ -1280,6 +1297,12 @@ sap.ui.define([
 		this._oToolbarControlsModel.setProperty("/highlightAllChanges/enabled", bHasPersisted);
 	}
 
+	function persistHighlightAllChangesState() {
+		if (this.getShowToolbars() && this._oToolbarControlsModel?.getProperty("/highlightAllChanges/pressed")) {
+			window.sessionStorage.setItem(sHighlightAllChangesKey, "true");
+		}
+	}
+
 	/**
 	 * Adapt the enablement of undo/redo/reset button
 	 */
@@ -1411,6 +1434,7 @@ sap.ui.define([
 			}
 		}
 		RuntimeAuthoring.enableRestart(this.getLayer(), this.getRootControlInstance());
+		persistHighlightAllChangesState.call(this);
 		await this.stop(true, true, true);
 		await ReloadManager.triggerReload({});
 	}
@@ -1539,6 +1563,7 @@ sap.ui.define([
 		RuntimeAuthoring.enableRestart(sLayer, this.getRootControlInstance());
 		// suppress invalidate and remove dirty changes from persistence since a reload is triggered right after
 		this.getCommandStack().removeAllCommands(true, true);
+		persistHighlightAllChangesState.call(this);
 		await ReloadManager.triggerReload(oReloadInfo);
 		return this.stop(true, true);
 	}
@@ -1676,6 +1701,7 @@ sap.ui.define([
 			version: sVersion,
 			selector: this.getRootControlInstance()
 		};
+		persistHighlightAllChangesState.call(this);
 		await ReloadManager.triggerReload(oReloadInfo);
 	}
 
@@ -1852,10 +1878,11 @@ sap.ui.define([
 				enabled: false
 			},
 			highlightAllChanges: {
-				pressed: false,
+				pressed: !!window.sessionStorage.getItem(sHighlightAllChangesKey),
 				enabled: false
 			}
 		});
+		window.sessionStorage.removeItem(sHighlightAllChangesKey);
 
 		this._oVersionsModel.setProperty("/publishVersionVisible", mButtonsAvailability.publishAvailable);
 

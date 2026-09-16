@@ -54,6 +54,14 @@ sap.ui.define([
 	const SCROLL_BLOCK_TIMEOUT = 500;
 
 	/**
+	 * The timeout for hiding the scroll handle after scrolling ends (milliseconds).
+	 *
+	 * @constant
+	 * @type {int}
+	 */
+	const SCROLL_HANDLE_HIDE_TIMEOUT = 3000;
+
+	/**
 	 * Scroll directions.
 	 *
 	 * @enum {string}
@@ -647,8 +655,9 @@ sap.ui.define([
 		 * Performs all necessary steps to scroll the table based on the extension's internal scroll position.
 		 *
 		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {boolean} [bShowScrollHandle=false] Whether to show the scroll handle.
 		 */
-		performUpdateFromScrollPosition: function(oTable) {
+		performUpdateFromScrollPosition: function(oTable, bShowScrollHandle) {
 			log("VerticalScrollingHelper.performUpdateFromScrollPosition", oTable);
 
 			VerticalScrollProcess.start(oTable, VerticalScrollProcess.UpdateFromScrollPosition, async function(resolve, reject, oProcessInterface) {
@@ -676,6 +685,12 @@ sap.ui.define([
 					VerticalScrollingHelper.scrollViewport(oTable, oProcessInterface),
 					VerticalScrollingHelper.scrollScrollbar(oTable, oProcessInterface)
 				]);
+
+				if (bShowScrollHandle) {
+					VerticalScrollingHelper.showScrollHandle(oTable);
+					VerticalScrollingHelper.debounceFadeScrollHandle(oTable);
+				}
+
 				resolve();
 			});
 		},
@@ -721,6 +736,10 @@ sap.ui.define([
 
 				// The rows have been updated (or no update was necessary). Remove any skeletons shown during a large-data fast scroll.
 				VerticalScrollingHelper._clearSkeletons(oTable);
+				VerticalScrollingHelper.showScrollHandle(oTable);
+				VerticalScrollingHelper.debounceFadeScrollHandle(oTable);
+
+				delete oTable._getScrollExtension()._bIOSThumbDrag;
 				resolve();
 			});
 		},
@@ -871,6 +890,9 @@ sap.ui.define([
 				await VerticalScrollingHelper.adjustScrollPositionToViewport(oTable, oProcessInterface);
 				await VerticalScrollingHelper.adjustFirstVisibleRowToScrollPosition(oTable, true, oProcessInterface);
 				await VerticalScrollingHelper.scrollScrollbar(oTable, oProcessInterface);
+
+				VerticalScrollingHelper.showScrollHandle(oTable);
+				VerticalScrollingHelper.debounceFadeScrollHandle(oTable);
 				resolve();
 			});
 		},
@@ -907,6 +929,7 @@ sap.ui.define([
 				log("VerticalScrollingHelper.onScrollbarScroll: Scrollbar is not connected with the DOM", this);
 			} else if (bScrollWithScrollbar) {
 				log("VerticalScrollingHelper.onScrollbarScroll: Scroll position changed to " + nNewScrollTop + " by interaction", this);
+
 				VerticalScrollingHelper.performUpdateFromScrollbar(this);
 			} else {
 				log("VerticalScrollingHelper.onScrollbarScroll: Scroll position changed to " + nNewScrollTop + " by API", this);
@@ -1815,6 +1838,191 @@ sap.ui.define([
 			VerticalScrollingHelper.updateScrollbarPosition(this);
 		},
 
+		isScrollHandleEnabled: function(oTable) {
+			const sShowScrollHandle = oTable.getShowScrollHandle();
+
+			if (sShowScrollHandle === library.ShowScrollHandle.Off) {
+				return false;
+			}
+
+			if (sShowScrollHandle === library.ShowScrollHandle.Default) {
+				const oScrollExtension = oTable._getScrollExtension();
+
+				return oScrollExtension._bTouchScroll || oScrollExtension._bIOSThumbDrag || _private(oTable).bHandleDragging;
+			}
+
+			return true;
+		},
+
+		showScrollHandle: function(oTable) {
+			if (!VerticalScrollingHelper.isScrollHandleEnabled(oTable)) {
+				return;
+			}
+
+			const oScrollExtension = oTable._getScrollExtension();
+			const oVSb = oScrollExtension.getVerticalScrollbar();
+			const oVSbContainer = oVSb.parentElement;
+			const oHandle = VerticalScrollingHelper.getScrollHandle(oTable, oVSbContainer);
+			oHandle.classList.add("sapUiTableVScrHandleVisible");
+
+			VerticalScrollingHelper.setScrollHandleContent(oTable, oVSb, oHandle);
+			VerticalScrollingHelper.updateScrollHandlePosition(oTable, oVSb, oHandle);
+
+			clearTimeout(_private(oTable).iScrollHandleHideTimeout);
+			delete _private(oTable).iScrollHandleHideTimeout;
+		},
+
+		debounceFadeScrollHandle: function(oTable) {
+			const oHandle = _private(oTable).oScrollHandle;
+
+			if (_private(oTable).bHandleDragging || !oHandle) {
+				return;
+			}
+
+			clearTimeout(_private(oTable).iScrollHandleHideTimeout);
+
+			_private(oTable).iScrollHandleHideTimeout = setTimeout(function() {
+				oHandle.classList.remove("sapUiTableVScrHandleVisible");
+				delete _private(oTable).iScrollHandleHideTimeout;
+			}, SCROLL_HANDLE_HIDE_TIMEOUT);
+		},
+
+		setScrollHandleContent: function(oTable, oVSb, oHandle) {
+			const iFirstRowIndex = _private(oTable).oVerticalScrollPosition.getIndex();
+			const mRowCounts = oTable._getRowCounts();
+			const iFirstRow = iFirstRowIndex + 1 + mRowCounts.fixedTop;
+			const iLastRow = iFirstRow - 1 + mRowCounts.scrollable;
+			const bTotalKnown = oTable.getBinding().isLengthFinal();
+			let sText;
+
+			if (bTotalKnown) {
+				sText = TableUtils.getResourceText("TBL_SCROLL_HANDLE_ROWS_OF", [iFirstRow, iLastRow, oTable._getTotalRowCount()]);
+			} else {
+				sText = TableUtils.getResourceText("TBL_SCROLL_HANDLE_ROWS", [iFirstRow, iLastRow]);
+			}
+
+			oHandle.firstChild.textContent = sText;
+		},
+
+		/**
+		 * Calculates the vertical center position of the scroll handle, aligned to the middle of the scroll thumb.
+		 *
+		 * @param {sap.ui.table.Table} oTable The table instance.
+		 * @param {HTMLElement} oVSb The vertical scrollbar element.
+		 * @param {number} nScrollTop The scrollTop value to base the calculation on.
+		 * @returns {number} The top position (in px) for the scroll handle, centered on the thumb.
+		 */
+		calculateScrollHandlePosition: function(oTable, oVSb, nScrollTop) {
+			const iScrollRange = VerticalScrollingHelper.getScrollRange(oTable);
+			const nScrollbarHeight = oVSb.clientHeight;
+			const nTrackSize = nScrollbarHeight;
+			const nThumbSize = TableUtils.calculateScrollThumbSize(nTrackSize, nScrollbarHeight, oVSb.scrollHeight);
+			const nThumbOffset = TableUtils.calculateScrollThumbOffset(nScrollTop, iScrollRange, nTrackSize, nThumbSize);
+			return oVSb.offsetTop + nThumbOffset + nThumbSize / 2;
+		},
+
+		updateScrollHandlePosition: function(oTable, oVSb, oHandle) {
+			const nThumbCenter = VerticalScrollingHelper.calculateScrollHandlePosition(oTable, oVSb, oVSb.scrollTop);
+
+			oHandle.style.top = nThumbCenter + "px";
+		},
+
+		getScrollHandle: function(oTable, oVSbContainer) {
+			let oHandle = _private(oTable).oScrollHandle;
+			if (oHandle?.isConnected) {
+				return oHandle;
+			}
+
+			oHandle = VerticalScrollingHelper.createScrollHandle(oTable, oVSbContainer);
+			return oHandle;
+		},
+
+		createScrollHandle: function(oTable, oVSbContainer) {
+			const oHandle = document.createElement("div");
+			oHandle.className = "sapUiTableVScrHandle";
+			oHandle.setAttribute("tabindex", "-1");
+			oHandle.setAttribute("role", "none");
+			oHandle.setAttribute("aria-hidden", "true");
+
+			const oText = document.createElement("span");
+			oHandle.appendChild(oText);
+
+			const oIcon = document.createElement("span");
+			oIcon.className = "sapUiTableVScrHandleGrip";
+			oHandle.appendChild(oIcon);
+
+			oVSbContainer.appendChild(oHandle);
+			_private(oTable).oScrollHandle = oHandle;
+
+			VerticalScrollingHelper.setupHandleDrag(oTable, oHandle);
+			return oHandle;
+		},
+
+		setupHandleDrag: function(oTable, oHandle) {
+			const oScrollExtension = oTable._getScrollExtension();
+
+			function startDrag(nStartY) {
+				const oVSb = oScrollExtension.getVerticalScrollbar();
+				if (!oVSb) {
+					return null;
+				}
+
+				_private(oTable).bHandleDragging = true;
+				clearTimeout(_private(oTable).iScrollHandleHideTimeout);
+				delete _private(oTable).iScrollHandleHideTimeout;
+
+				const nStartScrollTop = oVSb.scrollTop;
+				const iScrollRange = VerticalScrollingHelper.getScrollRange(oTable);
+				const nScrollbarHeight = oVSb.clientHeight;
+				const nTrackSize = nScrollbarHeight;
+				const nThumbSize = TableUtils.calculateScrollThumbSize(nTrackSize, nScrollbarHeight, oVSb.scrollHeight);
+				const nDragTrackSize = nTrackSize - nThumbSize;
+
+				return function(nCurrentY) {
+					const nDeltaY = nCurrentY - nStartY;
+					const nScrollDelta = nDragTrackSize > 0 ? (nDeltaY / nDragTrackSize) * iScrollRange : 0;
+					oVSb.scrollTop = Math.max(0, Math.min(iScrollRange, nStartScrollTop + nScrollDelta));
+				};
+			}
+
+			function endDrag() {
+				_private(oTable).bHandleDragging = false;
+				delete _private(oTable).fnCancelDrag;
+				VerticalScrollingHelper.debounceFadeScrollHandle(oTable);
+			}
+
+			_private(oTable).fnHandlePointerDown = function(oEvent) {
+				oEvent.preventDefault();
+				const fnMove = startDrag(oEvent.clientY);
+				if (!fnMove) {
+					return;
+				}
+
+				function onPointerMove(oMoveEvent) {
+					fnMove(oMoveEvent.clientY);
+				}
+
+				function onPointerUp() {
+					document.removeEventListener("pointermove", onPointerMove);
+					document.removeEventListener("pointerup", onPointerUp);
+					document.removeEventListener("pointercancel", onPointerUp);
+					endDrag();
+				}
+
+				_private(oTable).fnCancelDrag = function() {
+					document.removeEventListener("pointermove", onPointerMove);
+					document.removeEventListener("pointerup", onPointerUp);
+					document.removeEventListener("pointercancel", onPointerUp);
+					endDrag();
+				};
+
+				document.addEventListener("pointermove", onPointerMove);
+				document.addEventListener("pointerup", onPointerUp);
+				document.addEventListener("pointercancel", onPointerUp);
+			};
+			oHandle.addEventListener("pointerdown", _private(oTable).fnHandlePointerDown);
+		},
+
 		updateScrollbarVisibility: function(oTable) {
 			const oScrollExtension = oTable._getScrollExtension();
 			const oVSb = oScrollExtension.getVerticalScrollbar();
@@ -1842,6 +2050,38 @@ sap.ui.define([
 		},
 
 		/**
+		 * Calculates a sensitivity factor for vertical touch scrolling that considers the total number of rows.
+		 *
+		 * In native scrolling, one pixel of touch movement scrolls one pixel of content. In the table, the scrollbar range may be compressed, so one
+		 * pixel of touch movement can scroll multiple rows. This factor corrects for that compression so that the perceived scrolling velocity
+		 * matches native behavior regardless of the total row count.
+		 *
+		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @returns {number} A factor between 0.002 and 1 to multiply the touch delta with.
+		 */
+		_getVerticalTouchScrollSensitivityFactor: function(oTable) {
+			const iBaseRowHeight = oTable._getBaseRowHeight();
+			const nScrollRangeRowFraction = VerticalScrollingHelper.getScrollRangeRowFraction(oTable);
+
+			return Math.max(0.002, Math.min(1, nScrollRangeRowFraction / iBaseRowHeight));
+		},
+
+		/**
+		 * Calculates the clamped scroll top position of the vertical scrollbar after applying a scroll delta.
+		 *
+		 * @param {sap.ui.table.Table} oTable The table instance.
+		 * @param {HTMLElement} oVSb The vertical scrollbar element.
+		 * @param {number} fDelta The scroll delta to apply (positive = scroll down).
+		 * @returns {number} The new scrollTop, clamped to [0, maxScrollTop].
+		 */
+		calculateScrollTop: function(oTable, oVSb, fDelta) {
+			const fSensitivityFactor = VerticalScrollingHelper._getVerticalTouchScrollSensitivityFactor(oTable);
+			const fNewScrollTop = oVSb.scrollTop - fDelta * fSensitivityFactor;
+			const fMaxScrollTop = oVSb.scrollHeight - oVSb.clientHeight;
+			return Math.min(Math.max(0, fNewScrollTop), fMaxScrollTop);
+		},
+
+		/**
 		 * Adds the event listeners which are required for the vertical scrolling.
 		 *
 		 * @param {sap.ui.table.Table} oTable Instance of the table.
@@ -1865,6 +2105,21 @@ sap.ui.define([
 					oScrollExtension._onVerticalScrollbarMouseDownEventHandler = VerticalScrollingHelper.onScrollbarMouseDown.bind(oTable);
 				}
 				oVSb.addEventListener("mousedown", oScrollExtension._onVerticalScrollbarMouseDownEventHandler);
+
+				if (!oScrollExtension._onScrollbarPointerDown) {
+					oScrollExtension._onScrollbarPointerDown = function() {
+						VerticalScrollingHelper.showScrollHandle(oTable);
+					};
+				}
+
+				if (!oScrollExtension._onScrollbarPointerUp) {
+					oScrollExtension._onScrollbarPointerUp = function() {
+						VerticalScrollingHelper.debounceFadeScrollHandle(oTable);
+					};
+				}
+
+				oVSb.addEventListener("pointerdown", oScrollExtension._onScrollbarPointerDown);
+				oVSb.addEventListener("pointerup", oScrollExtension._onScrollbarPointerUp);
 			}
 
 			if (oViewport) {
@@ -1895,9 +2150,21 @@ sap.ui.define([
 				delete oScrollExtension._onVerticalScrollEventHandler;
 			}
 
-			if (oVSb && oScrollExtension._onVerticalScrollbarMouseDownEventHandler) {
-				oVSb.removeEventListener("mousedown", oScrollExtension._onVerticalScrollbarMouseDownEventHandler);
-				delete oScrollExtension._onVerticalScrollbarMouseDownEventHandler;
+			if (oVSb) {
+				if (oScrollExtension._onVerticalScrollbarMouseDownEventHandler) {
+					oVSb.removeEventListener("mousedown", oScrollExtension._onVerticalScrollbarMouseDownEventHandler);
+					delete oScrollExtension._onVerticalScrollbarMouseDownEventHandler;
+				}
+
+				if (oScrollExtension._onScrollbarPointerDown) {
+					oVSb.removeEventListener("pointerdown", oScrollExtension._onScrollbarPointerDown);
+					delete oScrollExtension._onScrollbarPointerDown;
+				}
+
+				if (oScrollExtension._onScrollbarPointerUp) {
+					oVSb.removeEventListener("pointerup", oScrollExtension._onScrollbarPointerUp);
+					delete oScrollExtension._onScrollbarPointerUp;
+				}
 			}
 
 			if (oViewport && oScrollExtension._onViewportScrollEventHandler) {
@@ -2018,7 +2285,7 @@ sap.ui.define([
 				}
 
 				this._getKeyboardExtension().setActionMode(false);
-				VerticalScrollingHelper.performUpdateFromScrollPosition(this);
+				VerticalScrollingHelper.performUpdateFromScrollPosition(this, true);
 			}
 		},
 
@@ -2063,9 +2330,6 @@ sap.ui.define([
 				const $Cell = TableUtils.getCell(this, oEvent.target);
 				const oCellInfo = TableUtils.getCellInfo($Cell);
 
-				// On touch devices: distinguish between tap, scroll and long tap.
-				// _bTouchScroll tracks whether a scroll occurred. The cell will be focused ontouchend only if no scrolling is detected.
-				// preventDefault is NOT called here so that the browser can still fire the contextmenu event on long tap.
 				if (oCellInfo.isOfType(TableUtils.CELLTYPE.ANYCONTENTCELL)) {
 					this._getKeyboardExtension().suspendItemNavigation();
 				}
@@ -2175,12 +2439,12 @@ sap.ui.define([
 						}
 
 						if (!mTouchSessionData.initialScrolledToEnd) {
-							const nSensitivityFactor = ScrollingHelper._getVerticalTouchScrollSensitivityFactor(this);
+							const fSensitivityFactor = VerticalScrollingHelper._getVerticalTouchScrollSensitivityFactor(this);
 							// Browsers differ in how they round fractional scrollTop values: Chrome rounds up
 							// (ceil), Safari truncates (floor). Pre-ceiling ensures the resulting scroll
 							// position is identical across browsers, which is critical for the scroll position
 							// to row index mapping when the table has variable row heights.
-							oVSb.scrollTop = Math.ceil(mTouchSessionData.initialScrollTop - iTouchDistanceY * nSensitivityFactor);
+							oVSb.scrollTop = Math.ceil(mTouchSessionData.initialScrollTop - iTouchDistanceY * fSensitivityFactor);
 							bScrollingPerformed = true;
 							oScrollExtension._bTouchScroll = true;
 						}
@@ -2277,23 +2541,6 @@ sap.ui.define([
 		},
 
 		/**
-		 * Calculates a sensitivity factor for vertical touch scrolling that considers the total number of rows.
-		 *
-		 * In native scrolling, one pixel of touch movement scrolls one pixel of content. In the table, the scrollbar range may be compressed, so one
-		 * pixel of touch movement can scroll multiple rows. This factor corrects for that compression so that the perceived scrolling velocity
-		 * matches native behavior regardless of the total row count.
-		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
-		 * @returns {number} A factor between 0.001 and 1 to multiply the touch delta with.
-		 */
-		_getVerticalTouchScrollSensitivityFactor: function(oTable) {
-			const iBaseRowHeight = oTable._getBaseRowHeight();
-			const nScrollRangeRowFraction = VerticalScrollingHelper.getScrollRangeRowFraction(oTable);
-
-			return Math.max(0.002, Math.min(1, nScrollRangeRowFraction / iBaseRowHeight));
-		},
-
-		/**
 		 * Starts and manages the momentum scrolling animation.
 		 *
 		 * @param {sap.ui.table.extensions.Scrolling.EventListenerOptions} mOptions The options.
@@ -2311,7 +2558,6 @@ sap.ui.define([
 			const oScrollExtension = this._getScrollExtension();
 			const oHSb = oScrollExtension.getHorizontalScrollbar();
 			const oVSb = oScrollExtension.getVerticalScrollbar();
-			const nSensitivityFactor = ScrollingHelper._getVerticalTouchScrollSensitivityFactor(this);
 
 			// Deceleration parameters
 			const fDeceleration = 0.95; // Exponential decay factor (0-1, lower = faster stop)
@@ -2385,22 +2631,16 @@ sap.ui.define([
 						if (oVSb && (mOptions.scrollDirection === ScrollDirection.VERTICAL
 							|| mOptions.scrollDirection === ScrollDirection.BOTH)) {
 
-							const fNewScrollTop = oVSb.scrollTop - fDeltaY * nSensitivityFactor;
+							const fNewScrollTop = VerticalScrollingHelper.calculateScrollTop(oTable, oVSb, fDeltaY);
 							const fMaxScrollTop = oVSb.scrollHeight - oVSb.clientHeight;
 
 							// Boundary check - stop at edges
-							if (fNewScrollTop < 0) {
-								oVSb.scrollTop = 0;
-								delete _private(oTable).mTouchSessionData;
-								delete oScrollExtension._bTouchScroll;
-								return;
-							} else if (fNewScrollTop > fMaxScrollTop) {
-								oVSb.scrollTop = fMaxScrollTop;
+							oVSb.scrollTop = fNewScrollTop;
+							if (fNewScrollTop <= 0 || fNewScrollTop >= fMaxScrollTop) {
 								delete _private(oTable).mTouchSessionData;
 								delete oScrollExtension._bTouchScroll;
 								return;
 							} else {
-								oVSb.scrollTop = fNewScrollTop;
 								oScrollExtension._bTouchScroll = true;
 								bDidScroll = true;
 							}
@@ -2558,6 +2798,7 @@ sap.ui.define([
 	const ExtensionDelegate = {
 		onBeforeRendering: function(oEvent) {
 			this._getScrollExtension()._clearCache();
+			_private(this).fnCancelDrag?.();
 		},
 
 		onAfterRendering: function(oEvent) {
@@ -2781,6 +3022,19 @@ sap.ui.define([
 					_private(oTable).pVerticalScrollUpdateProcess = null;
 				}
 
+				clearTimeout(_private(oTable).iScrollHandleHideTimeout);
+				delete _private(oTable).iScrollHandleHideTimeout;
+
+				const oScrollHandle = _private(oTable).oScrollHandle;
+				if (oScrollHandle) {
+					oScrollHandle.removeEventListener("pointerdown", _private(oTable).fnHandlePointerDown);
+					oScrollHandle.remove();
+				}
+
+				delete _private(oTable).oScrollHandle;
+				delete _private(oTable).fnHandlePointerDown;
+				delete _private(oTable).bHandleDragging;
+
 				// Cancel any active momentum animation
 				const mTouchSessionData = _private(oTable).mTouchSessionData;
 				if (mTouchSessionData && mTouchSessionData.momentumAnimationFrame) {
@@ -2820,7 +3074,7 @@ sap.ui.define([
 			_private(oTable).oVerticalScrollPosition.setPosition(Math.max(0, iFirstRenderedRowIndex - iScrollDistance));
 		}
 
-		VerticalScrollingHelper.performUpdateFromScrollPosition(oTable);
+		VerticalScrollingHelper.performUpdateFromScrollPosition(oTable, bPage === true);
 	};
 
 	/**
@@ -2842,7 +3096,7 @@ sap.ui.define([
 			_private(oTable).oVerticalScrollPosition.setPosition(0);
 		}
 
-		VerticalScrollingHelper.performUpdateFromScrollPosition(oTable);
+		VerticalScrollingHelper.performUpdateFromScrollPosition(oTable, true);
 	};
 
 	/**

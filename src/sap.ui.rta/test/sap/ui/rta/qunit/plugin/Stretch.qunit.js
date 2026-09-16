@@ -888,6 +888,65 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("Given a parent control whose associated DOM ref is the same node as its child's (DOM-passthrough wrapper)", {
+		async beforeEach(assert) {
+			const done = assert.async();
+
+			this.oButton = new Button("passthroughButton");
+			this.oWrapper = new VBox("passthroughWrapper", {
+				width: "300px",
+				items: [this.oButton]
+			});
+			this.oLayout = new VerticalLayout("passthroughLayout", {
+				width: "300px",
+				content: [this.oWrapper]
+			}).addStyleClass("sapUiRtaRoot");
+
+			this.oLayout.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			this.oStretchPlugin = new Stretch();
+			sandbox.stub(this.oStretchPlugin, "_isEditable").returns(true);
+
+			this.oDesignTime = new DesignTime({
+				rootElements: [this.oLayout],
+				plugins: [this.oStretchPlugin]
+			});
+
+			this.oDesignTime.attachEventOnce("synced", function() {
+				this.oWrapperOverlay = OverlayRegistry.getOverlay(this.oWrapper);
+				this.oButtonOverlay = OverlayRegistry.getOverlay(this.oButton);
+				// Simulate a DOM-passthrough wrapper: both overlays report the same DOM ref (the button's)
+				const oSharedDomRef = this.oButton.getDomRef();
+				sandbox.stub(this.oWrapperOverlay, "getAssociatedDomRef").returns(oSharedDomRef);
+				sandbox.stub(this.oButtonOverlay, "getAssociatedDomRef").returns(oSharedDomRef);
+				// Re-run candidate check as it would happen during overlay registration
+				this.oStretchPlugin._checkParentAndAddToStretchCandidates(this.oButtonOverlay);
+				done();
+			}.bind(this));
+		},
+		afterEach() {
+			sandbox.restore();
+			this.oDesignTime.destroy();
+			this.oLayout.destroy();
+		}
+	}, function() {
+		QUnit.test("the wrapper is not added as a stretch candidate and the style class is not applied", function(assert) {
+			assert.notOk(
+				this.oStretchPlugin.getStretchCandidates().includes(this.oWrapper.getId()),
+				"the passthrough wrapper is not a stretch candidate"
+			);
+			assert.notOk(
+				this.oWrapper.hasStyleClass(Stretch.STRETCHSTYLECLASS),
+				"the style class is not set on the passthrough wrapper"
+			);
+			assert.notOk(
+				this.oButton.getDomRef()?.classList.contains(Stretch.STRETCHSTYLECLASS),
+				"the style class is not set on the button DOM node"
+			);
+		});
+	});
+
 	QUnit.done(function() {
 		document.getElementById("qunit-fixture").style.display = "none";
 	});
