@@ -519,11 +519,19 @@ sap.ui.define([
 			qutils.triggerEvent("keydown", document.activeElement, {code: "KeyA", ctrlKey: true});
 			assert.equal(oHeaderSelectorPressSpy.callCount, 1, "Fired on Ctrl+A again (deselect all)");
 
-			// Ctrl+Shift+A is a no-op in default multiSelectMode, so the event must not be fired.
+			// Ctrl+Shift+A always clears the selection and fires the event, even in default multiSelectMode.
 			oHeaderSelectorPressSpy.resetHistory();
 			oList.getItems()[0].focus();
 			qutils.triggerEvent("keydown", document.activeElement, {code: "KeyA", ctrlKey: true, shiftKey: true});
-			assert.equal(oHeaderSelectorPressSpy.callCount, 0, "Not fired on Ctrl+Shift+A");
+			assert.equal(oHeaderSelectorPressSpy.callCount, 1, "Fired on Ctrl+Shift+A (clear all)");
+			assert.notOk(oList.getSelectedItems().length, "All items are deselected after Ctrl+Shift+A");
+
+			// Ctrl+Shift+A is also a direct clear when not all items are selected, unlike toggling Ctrl+A.
+			oHeaderSelectorPressSpy.resetHistory();
+			oList.getItems()[0].setSelected(true).focus();
+			qutils.triggerEvent("keydown", document.activeElement, {code: "KeyA", ctrlKey: true, shiftKey: true});
+			assert.equal(oHeaderSelectorPressSpy.callCount, 1, "Fired on Ctrl+Shift+A (clear partial selection)");
+			assert.notOk(oList.getSelectedItems().length, "Partial selection is cleared after Ctrl+Shift+A");
 		});
 
 		QUnit.test("_headerSelectorPress event - ClearAll multiSelectMode", async function(assert) {
@@ -3339,6 +3347,10 @@ sap.ui.define([
 
 			qutils.triggerEvent("keydown", document.activeElement, {code: "KeyA", ctrlKey: true});
 			assert.notOk(oList.getSelectedItems().length, "multiSelectMode: Default, Items are deselected when 'ctrl+A' is pressed again");
+
+			oList.getItems()[0].setSelected(true);
+			qutils.triggerEvent("keydown", document.activeElement, {code: "KeyA", ctrlKey: true, shiftKey: true});
+			assert.notOk(oList.getSelectedItems().length, "multiSelectMode: Default, Partial selection is cleared when 'ctrl+shift+A' is pressed");
 
 			oList.setMultiSelectMode("ClearAll");
 			oList.placeAt("qunit-fixture");
