@@ -4440,6 +4440,7 @@ sap.ui.define([
 			const ONE_ACTION_AVAILABLE = oRB.getText("LIST_ITEM_SINGLE_ACTION");
 			const TWO_ACTIONS_AVAILABLE = oRB.getText("LIST_ITEM_MULTIPLE_ACTIONS", [2]);
 			const oInvisibleText = ListBase.getInvisibleText();
+			const fnShortcutHintsMixinSpy = sinon.spy(ShortcutHintsMixin, "addConfig");
 			const oAction1 = this.oItem1.getActions()[0];
 			const oAction2 = this.oItem1.getActions()[1];
 			assert.notOk(this.oItem1.getDomRef("actions"), "By default no actions are rendered");
@@ -4458,6 +4459,9 @@ sap.ui.define([
 			assert.equal(oFirstAction.getTooltip_AsString(), "Edit", "First action edit has correct tooltup");
 			assert.equal(oSecondAction.getIcon(), "sap-icon://decline", "Second action delete has correct icon");
 			assert.equal(oSecondAction.getTooltip_AsString(), "Delete", "Second action delete has correct tooltup");
+			assert.ok(fnShortcutHintsMixinSpy.calledWithExactly(oFirstAction, sinon.match({shortcut: "Ctrl+E"}), oFirstAction));
+			assert.ok(fnShortcutHintsMixinSpy.calledWithExactly(oSecondAction, sinon.match({shortcut: "Delete"}), oSecondAction));
+			fnShortcutHintsMixinSpy.restore();
 
 			this.oItem1.focus();
 			assert.ok(oInvisibleText.getText().endsWith(TWO_ACTIONS_AVAILABLE), "Two actions available");
@@ -4538,16 +4542,16 @@ sap.ui.define([
 			aSteps.push("Delete");
 			assert.verifySteps(aSteps, "Correct actions are triggered");
 
-			const fnShortcutHintsMixinSpy = sinon.spy(ShortcutHintsMixin, "addConfig");
+			const fnNavigationShortcutHintsMixinSpy = sinon.spy(ShortcutHintsMixin, "addConfig");
 			this.oItem1.setType("Navigation");
 			this.oList.setMode("Delete");
 			await nextUIUpdate();
-			assert.ok(fnShortcutHintsMixinSpy.calledWithExactly(
+			assert.ok(fnNavigationShortcutHintsMixinSpy.calledWithExactly(
 				this.oItem1.getNavigationControl(),
 				sinon.match({ shortcut: "Enter" }),
 				this.oItem1.getNavigationControl()
 			), "ShortcutHintsMixin config of the Navigation Button is correct");
-			fnShortcutHintsMixinSpy.restore();
+			fnNavigationShortcutHintsMixinSpy.restore();
 			assert.ok(this.oItem1.getDomRef("imgNav").parentNode === this.oItem1.getDomRef("actions") ,"Navigation type is rendered inside the custom actions");
 			assert.notOk(this.oItem1.getDomRef("imgDel"), "Delete mode button is not rendered since custom actions active");
 			assert.notOk(this.oList.getDomRef("listUl").classList.contains("sapMListModeDelete"), "Delete mode class is not added to the list");
