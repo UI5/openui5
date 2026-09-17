@@ -166,6 +166,12 @@ sap.ui.define([
 			reference: this.sFlexReference,
 			variantManagementReference: this.sVMReference
 		});
+		// The entry can be temporarily undefined during FlexState teardown/rebuild
+		// (e.g. back-and-forth navigation clears the cache for a vmRef that is still registered
+		// as a listener). Return early; the next cache population will call updateData again.
+		if (!oVariantMapEntry) {
+			return;
+		}
 		const oCurrentData = { ...this.getData() };
 		const aPreviousVariants = oCurrentData.variants || [];
 		oCurrentData.variants = oVariantMapEntry.variants.map((oVariant) => {
