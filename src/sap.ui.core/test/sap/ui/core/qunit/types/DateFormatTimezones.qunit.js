@@ -1133,7 +1133,7 @@ sap.ui.define([
 		var oDateFormat = DateFormat.getDateTimeWithTimezoneInstance(new Locale("fa"));
 
 		var sFormattedFA = oDateFormat.format(oDate, "America/New_York");
-		assert.strictEqual(sFormattedFA, "12 اکتبر 2021،\u200f 22:22:33 (امریکا, نیویورک)",
+		assert.strictEqual(sFormattedFA, "12 اکتبر 2021،\u200F 22:22:33 (امریکا, نیویورک)",
 			"New timezone should be be applied.");
 
 		var oParsedDateFA = oDateFormat.parse(sFormattedFA, "America/New_York");
