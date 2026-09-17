@@ -32,7 +32,7 @@ sap.ui.define([
 	 * @since 1.30
 	 * @alias sap.ui.dt.ElementDesignTimeMetadata
 	 */
-	var ElementDesignTimeMetadata = DesignTimeMetadata.extend("sap.ui.dt.ElementDesignTimeMetadata", /** @lends sap.ui.dt.ElementDesignTimeMetadata.prototype */ {
+	const ElementDesignTimeMetadata = DesignTimeMetadata.extend("sap.ui.dt.ElementDesignTimeMetadata", /** @lends sap.ui.dt.ElementDesignTimeMetadata.prototype */ {
 		metadata: {
 			// ---- object ----
 
@@ -47,7 +47,7 @@ sap.ui.define([
 	 * @override
 	 */
 	ElementDesignTimeMetadata.prototype.getDefaultData = function(...aArgs) {
-		var oDefaultData = DesignTimeMetadata.prototype.getDefaultData.apply(this, aArgs);
+		const oDefaultData = DesignTimeMetadata.prototype.getDefaultData.apply(this, aArgs);
 
 		oDefaultData.aggregations = {
 			layout: {
@@ -114,15 +114,19 @@ sap.ui.define([
 	 * @public
 	 */
 	ElementDesignTimeMetadata.prototype.getAggregations = function() {
-		var mAggregations = this.getData().aggregations || {};
-		var mAssociations = this.getData().associations || {};
-		Object.keys(mAssociations).forEach(function(sAssociation) {
-			var mAssociation = mAssociations[sAssociation];
-			if (mAssociation.aggregationLike) {
-				mAggregations[sAssociation] = mAssociation;
-			}
-		});
-		return mAggregations;
+		if (!this._mAggregations) {
+			const oData = this.getData();
+			const mAggregations = { ...oData.aggregations };
+			const mAssociations = oData.associations || {};
+			Object.keys(mAssociations).forEach((sAssociation) => {
+				const mAssociation = mAssociations[sAssociation];
+				if (mAssociation.aggregationLike) {
+					mAggregations[sAssociation] = mAssociation;
+				}
+			});
+			this._mAggregations = mAggregations;
+		}
+		return this._mAggregations;
 	};
 
 	/**
@@ -132,25 +136,25 @@ sap.ui.define([
 	 * @public
 	 */
 	ElementDesignTimeMetadata.prototype.getAggregationNamesWithAction = function(sAction) {
-		var mAggregations = this.getAggregations();
-		return Object.keys(mAggregations).filter(function(sAggregation) {
+		const mAggregations = this.getAggregations();
+		return Object.keys(mAggregations).filter((sAggregation) => {
 			return mAggregations[sAggregation].actions && mAggregations[sAggregation].actions[sAction];
 		});
 	};
 
 	ElementDesignTimeMetadata.prototype.getActionDataFromAggregations = function(sAction, oElement, aArgs, sSubAction) {
-		var vAction;
-		var mAggregations = this.getAggregations();
-		var aActions = [];
+		let vAction;
+		const mAggregations = this.getAggregations();
+		const aActions = [];
 
-		for (var sAggregation in mAggregations) {
+		for (const sAggregation in mAggregations) {
 			if (mAggregations[sAggregation].actions && mAggregations[sAggregation].actions[sAction]) {
 				vAction = mAggregations[sAggregation].actions[sAction];
 				if (sSubAction) {
 					vAction = vAction[sSubAction];
 				}
 				if (typeof vAction === "function") {
-					var aActionParameters = [oElement];
+					let aActionParameters = [oElement];
 					if (aArgs) {
 						aActionParameters = aActionParameters.concat(aArgs);
 					}
@@ -179,7 +183,7 @@ sap.ui.define([
 	};
 
 	ElementDesignTimeMetadata.prototype.getAggregationDescription = function(sAggregationName, oElement) {
-		var vChildNames = this.getAggregation(sAggregationName).childNames;
+		let vChildNames = this.getAggregation(sAggregationName).childNames;
 		if (typeof vChildNames === "function") {
 			vChildNames = vChildNames(oElement);
 		}
@@ -199,7 +203,7 @@ sap.ui.define([
 	 * @public
 	 */
 	ElementDesignTimeMetadata.prototype.getAggregationDisplayName = function(sAggregationName, oElement) {
-		var vDisplayNames = this.getAggregation(sAggregationName) && this.getAggregation(sAggregationName).displayName;
+		let vDisplayNames = this.getAggregation(sAggregationName)?.displayName;
 		if (typeof vDisplayNames === "function") {
 			vDisplayNames = vDisplayNames(oElement);
 		}
@@ -212,7 +216,7 @@ sap.ui.define([
 	};
 
 	ElementDesignTimeMetadata.prototype.getName = function(oElement) {
-		var vName = this.getData().name;
+		let vName = this.getData().name;
 		if (typeof vName === "function") {
 			vName = vName(oElement);
 		}
@@ -239,13 +243,10 @@ sap.ui.define([
 	 * @public
 	 */
 	ElementDesignTimeMetadata.prototype.isAggregationIgnored = function(oElement, sAggregationName) {
-		var mAggregations = this.getAggregations();
-		var oAggregationMetadata = mAggregations[sAggregationName];
-		var vIgnore = (oAggregationMetadata) ? oAggregationMetadata.ignore : false;
-		if (!vIgnore || (vIgnore && typeof vIgnore === "function" && !vIgnore(oElement))) {
-			return false;
-		}
-		return true;
+		const mAggregations = this.getAggregations();
+		const oAggregationMetadata = mAggregations[sAggregationName];
+		const vIgnore = oAggregationMetadata ? oAggregationMetadata.ignore : false;
+		return !(!vIgnore || (typeof vIgnore === "function" && !vIgnore(oElement)));
 	};
 
 	/**
@@ -258,18 +259,35 @@ sap.ui.define([
 	 * @public
 	 */
 	ElementDesignTimeMetadata.prototype.getScrollContainers = function(oElement, bInvalidate, fnUpdateFunction) {
-		var aScrollContainers = this.getData().scrollContainers || [];
+		this._mScrollContainersByElement ??= new Map();
+		let aResolved = this._mScrollContainersByElement.get(oElement);
 
-		aScrollContainers.forEach(function(oScrollContainer) {
-			if (typeof oScrollContainer.aggregations === "function") {
-				oScrollContainer.aggregationsFunction = oScrollContainer.aggregations;
-				oScrollContainer.aggregations = oScrollContainer.aggregations(oElement, fnUpdateFunction);
-			} else if (bInvalidate && oScrollContainer.aggregationsFunction) {
-				oScrollContainer.aggregations = oScrollContainer.aggregationsFunction(oElement, fnUpdateFunction);
-			}
-		});
+		if (!aResolved) {
+			const aStoredScrollContainers = this.getData().scrollContainers || [];
+			aResolved = aStoredScrollContainers.map((oStored) => {
+				const oCopy = { ...oStored };
+				if (typeof oCopy.aggregations === "function") {
+					oCopy.aggregationsFunction = oCopy.aggregations;
+					oCopy.aggregations = oCopy.aggregationsFunction(oElement, fnUpdateFunction);
+				}
+				return oCopy;
+			});
+			this._mScrollContainersByElement.set(oElement, aResolved);
+		} else if (bInvalidate) {
+			aResolved.forEach((oCopy) => {
+				if (oCopy.aggregationsFunction) {
+					oCopy.aggregations = oCopy.aggregationsFunction(oElement, fnUpdateFunction);
+				}
+			});
+		}
 
-		return aScrollContainers;
+		return aResolved;
+	};
+
+	ElementDesignTimeMetadata.prototype.setData = function(...aArgs) {
+		delete this._mAggregations;
+		delete this._mScrollContainersByElement;
+		return DesignTimeMetadata.prototype.setData.apply(this, aArgs);
 	};
 
 	/**
@@ -293,9 +311,9 @@ sap.ui.define([
 	 * @returns {sap.ui.base.ManagedObject[]|object[]} Returns an array of elements or selectors.
 	 */
 	ElementDesignTimeMetadata.prototype.getStableElements = function(oOverlay) {
-		var oElement = oOverlay.getElement();
-		var aStableElements;
-		var fnGetStableElements = this.getData().getStableElements;
+		const oElement = oOverlay.getElement();
+		let aStableElements;
+		const fnGetStableElements = this.getData().getStableElements;
 		if (fnGetStableElements) {
 			aStableElements = fnGetStableElements(oElement);
 		} else {

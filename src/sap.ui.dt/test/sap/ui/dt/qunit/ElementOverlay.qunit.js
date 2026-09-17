@@ -521,6 +521,46 @@ sap.ui.define([
 			assert.ok(this.oElementOverlay.getAggregationNames().indexOf("testAggregation2") !== -1, "then aggregation is not ignored");
 		});
 
+		QUnit.test("when getAggregationNames is called and a name appears in both control metadata and DT metadata", function(assert) {
+			const oStub = sandbox.stub(this.oButton.getMetadata(), "getAllAggregations").returns({
+				myControlAgg: {},
+				mySharedAgg: {}
+			});
+			this.oElementOverlay.setDesignTimeMetadata(new ElementDesignTimeMetadata({
+				data: {
+					aggregations: {
+						mySharedAgg: {},
+						myDtOnlyAgg: {}
+					}
+				}
+			}));
+
+			const aNames = this.oElementOverlay.getAggregationNames();
+			oStub.restore();
+			assert.strictEqual(aNames.filter((sName) => sName === "mySharedAgg").length, 1, "then the duplicate name appears exactly once");
+			assert.ok(aNames.indexOf("mySharedAgg") < aNames.indexOf("myDtOnlyAgg"), "then control-metadata names precede DT-only names");
+		});
+
+		QUnit.test("when getAggregationOverlay is called with a matching aggregation name", function(assert) {
+			const oFakeOverlay1 = { getAggregationName: () => "content" };
+			const oFakeOverlay2 = { getAggregationName: () => "footer" };
+			sandbox.stub(this.oElementOverlay, "getChildren").returns([oFakeOverlay1, oFakeOverlay2]);
+
+			assert.strictEqual(this.oElementOverlay.getAggregationOverlay("content"), oFakeOverlay1, "then the matching overlay is returned");
+			assert.strictEqual(this.oElementOverlay.getAggregationOverlay("unknown"), undefined, "then undefined is returned for an unknown name");
+		});
+
+		QUnit.test("when getAggregationOverlay is called with a custom aggregation type", function(assert) {
+			const oFakeOverlay = { getAggregationName: () => "templates" };
+			const oGetTemplateOverlaysSpy = sandbox.stub(this.oElementOverlay, "getAggregationBindingTemplateOverlays").returns([oFakeOverlay]);
+			const oGetChildrenSpy = sandbox.stub(this.oElementOverlay, "getChildren").returns([]);
+
+			const oResult = this.oElementOverlay.getAggregationOverlay("templates", "AggregationBindingTemplateOverlays");
+			assert.strictEqual(oResult, oFakeOverlay, "then the matching overlay is returned");
+			assert.ok(oGetTemplateOverlaysSpy.calledOnce, "then the custom getter was used");
+			assert.ok(oGetChildrenSpy.notCalled, "then getChildren was not called");
+		});
+
 		QUnit.test("when the overlay is being destroyed and applyStyles is triggered", function(assert) {
 			const oIsVisibleSpy = sinon.spy(this.oElementOverlay, "isVisible");
 			this.oElementOverlay.destroy();
