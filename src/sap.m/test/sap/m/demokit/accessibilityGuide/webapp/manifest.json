@@ -46,7 +46,13 @@
 				"sap.m": {},
 				"sap.tnt": {},
 				"sap.ui.core": {},
+				"sap.ui.documentation": {},
 				"sap.ui.layout": {}
+			}
+		},
+		"componentUsages": {
+			"cookieSettingsDialog": {
+				"name": "sap.ui.documentation.sdk.cookieSettingsDialog"
 			}
 		},
 		"resources": {

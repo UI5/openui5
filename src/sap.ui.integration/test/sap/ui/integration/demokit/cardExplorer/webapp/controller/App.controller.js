@@ -65,6 +65,13 @@ sap.ui.define([
 			Device.media.detachHandler(this.onDeviceSizeChange, this);
 		},
 
+		onCookiePreferences: function () {
+			var oComponent = this.getOwnerComponent();
+			oComponent.getCookiesManagement().then(function (oCookieMgmtComponent) {
+				oCookieMgmtComponent.openCookieSettingsDialog({ showCookieDetails: true }, oComponent.getRootControl());
+			});
+		},
+
 		/**
 		 * @param {Array|string} vKey The key or keys to check in the history.
 		 * @returns {string} The first url hash found in the history.
