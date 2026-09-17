@@ -653,7 +653,7 @@ function(
 
 		// indicates whether input's popover has finished opening
 		// we asume that after open its content has been rendered => we don't have the power user scenario
-		this._bAfterOpenFinisihed = false;
+		this._setAfterOpenFinished(false);
 
 		AccessKeysEnablement.registerControl(this);
 	};
@@ -1395,6 +1395,7 @@ function(
 	 * If no custom filter is set or default filtering is forced, this function will apply the default filter to the column item.
 	 *
 	 * @private
+	 * @ui5-restricted
 	 * @param {boolean} bForceDefaultFiltering Whether or not to apply the default filter even if custom one is set
 	 *
 	 * @returns {function} The row filtering function(s) to execute on the selected row item.
@@ -1584,7 +1585,7 @@ function(
 			return;
 		}
 
-		if (this.getShowSuggestion() && this._bAfterOpenFinisihed) {
+		if (this.getShowSuggestion() && this._isAfterOpenFinished()) {
 			// Ensure that the selected item is going to be updated after
 			// the closing of the popup when there is a proposed item due
 			// to the typeahead, but no direct navigation is performed
@@ -2508,6 +2509,7 @@ function(
 	 * Check for tabular suggestions in the input.
 	 *
 	 * @private
+	 * @ui5-restricted
 	 * @returns {boolean} Determines if the Input has tabular suggestions.
 	 */
 	Input.prototype._hasTabularSuggestions = function() {
@@ -2518,6 +2520,7 @@ function(
 	 * Gets suggestion table with lazy loading.
 	 *
 	 * @private
+	 * @ui5-restricted
 	 * @returns {sap.m.Table|null} Suggestion table or <code>null</code> in case the control is currently being destroyed.
 	 */
 	Input.prototype._getSuggestionsTable = function () {
@@ -3050,6 +3053,7 @@ function(
 	 *
 	 * @returns {sap.m.SuggestionsPopover} A suggestion popover instance.
 	 * @private
+	 * @ui5-restricted
 	 */
 	Input.prototype._getSuggestionsPopover = function () {
 		return this._oSuggPopover;
@@ -3233,7 +3237,7 @@ function(
 						return;
 					}
 
-					this._bAfterOpenFinisihed = false;
+					this._setAfterOpenFinished(false);
 
 					// only destroy items in simple suggestion mode
 					if (oList instanceof Table) {
@@ -3254,7 +3258,7 @@ function(
 
 					oSuggPopover.resizePopup(this);
 					this._registerPopupResize();
-					this._bAfterOpenFinisihed = false;
+					this._setAfterOpenFinished(false);
 				}, this);
 
 			oPopover.addEventDelegate({
@@ -3262,7 +3266,7 @@ function(
 					var iInputWidth = this.getDomRef().getBoundingClientRect().width;
 					var sPopoverMaxWidth = getComputedStyle(this.getDomRef()).getPropertyValue("--sPopoverMaxWidth");
 
-					this._bAfterOpenFinisihed = true;
+					this._setAfterOpenFinished(true);
 
 					if (this.getMaxSuggestionWidth()) {
 						return;
@@ -3624,6 +3628,33 @@ function(
 	};
 
 	/**
+	 * Indicates whether the input's suggestion popover has finished opening
+	 * and its content has been rendered.
+	 *
+	 * @private
+	 * @ui5-restricted
+	 * @since 1.153
+	 * @returns {boolean} <code>true</code> if the suggestion popover has finished opening.
+	 */
+	Input.prototype._isAfterOpenFinished = function () {
+		return this._bAfterOpenFinished;
+	};
+
+	/**
+	 * Sets whether the input's suggestion popover has finished opening.
+	 *
+	 * @private
+	 * @ui5-restricted
+	 * @since 1.153
+	 * @param {boolean} bFinished The new value for the flag.
+	 * @returns {this} <code>this</code> to allow method chaining.
+	 */
+	Input.prototype._setAfterOpenFinished = function (bFinished) {
+		this._bAfterOpenFinished = bFinished;
+		return this;
+	};
+
+	/**
 	 * Setter for the separateSuggestions property representing whether to display separators in tabular suggestions.
 	 *
 	 * @private
@@ -3647,6 +3678,7 @@ function(
 	 * Setter for the _sProposedItemText property, representing the text extracted from the proposed item/row.
 	 *
 	 * @private
+	 * @ui5-restricted
 	 * @param {string} sProposedText The new proposed text, extracted from the item/row.
 	 * @returns {this} <code>this</code> to allow method chaining.
 	 */
@@ -3659,6 +3691,7 @@ function(
 	 * Getter for the _sProposedItemText property representing the text extracted from the proposed item/row.
 	 *
 	 * @private
+	 * @ui5-restricted
 	 * @returns {string} The text extracted from the proposed item/row.
 	 */
 	Input.prototype._getProposedItemText = function () {

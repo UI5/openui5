@@ -6231,7 +6231,7 @@ sap.ui.define([
 		this.clock.tick(300);
 		await nextUIUpdate(this.clock);
 
-		assert.ok(oInput._bAfterOpenFinisihed, "After open flag is correct");
+		assert.ok(oInput._isAfterOpenFinished(), "After open flag is correct");
 
 		oInput.destroy();
 	});
