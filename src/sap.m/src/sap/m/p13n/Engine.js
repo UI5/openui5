@@ -425,10 +425,12 @@ sap.ui.define([
 	};
 
 	/**
+	 * A flat map whose keys are the controller keys registered with the <code>Engine</code>
+	 * (see {@link sap.m.p13n.EngineRegistrationConfig}) and whose values are arrays of
+	 * state items understood by the corresponding controller.
 	 *
 	 * @public
-	 * @typedef {object} sap.m.p13n.State
-	 * @property {Object<string,Object[]>} controller A map of arbitrary keys that contain a controller instance as value. The key must be unique and needs to be provided for later access when using <code>Engine</code> functionality specific for one controller type.
+	 * @typedef {Object<string,Object[]>} sap.m.p13n.State
 	 */
 
 	/**

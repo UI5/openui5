@@ -55,6 +55,7 @@ sap.ui.define([
 	});
 
 	FilterInfoBar.prototype.init = function() {
+		Toolbar.prototype.init.apply(this, arguments);
 		this.oText = new Text({wrapping: false});
 		this.oInvisibleText = new InvisibleText().toStatic();
 		this.oRemoveAllFiltersBtn = new Button({

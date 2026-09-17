@@ -25171,8 +25171,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// total are requested in the same $batch, but as the deleted entity was excluded by the filter,
 	// the count and the grand total remain unchanged.
 	// JIRA: CPOUI5ODATAV4-3260
-	//
-	// ODLB#getDownloadUrl does not need $apply, URL has no $count=true (JIRA: CPOUI5ODATAV4-3362)
 	[
 		"context refresh",
 		"context refresh via side effects",
@@ -25220,9 +25218,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			this.expectRequest("SalesOrderList?sap-client=123&custom=foo&$apply="
 					+ "filter(LifecycleStatus gt 'P' and GrossAmount lt 100)/search(covfefe)"
-					//TODO: SO_2_BP/Address/City
-					+ "/concat(aggregate(GrossAmount),orderby(LifecycleStatus desc)"
-						+ "/concat(aggregate($count as UI5__count),top(99)))", {
+					+ "/concat(aggregate(GrossAmount)"
+					+ ",groupby((LifecycleStatus,SalesOrderID,SO_2_BP/Address/City)"
+					+ ",aggregate(GrossAmount))/orderby(LifecycleStatus desc)"
+					+ "/concat(aggregate($count as UI5__count),top(99)))", {
 					value : [
 						{GrossAmount : "6"},
 						{UI5__count : "3", "UI5__count@odata.type" : "#Decimal"},
@@ -25246,12 +25245,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				oTable = that.oView.byId("table");
 				oBinding = oTable.getBinding("items");
 				oHeaderContext = oBinding.getHeaderContext();
-
-				// code under test (JIRA: CPOUI5ODATAV4-3362)
-				assert.strictEqual(oBinding.getDownloadUrl(),
-					sSalesOrderService + "SalesOrderList?sap-client=123&custom=foo"
-					+ "&$filter=LifecycleStatus%20gt%20'P'%20and%20GrossAmount%20lt%20100"
-					+ "&$orderby=LifecycleStatus%20desc&$search=covfefe");
 
 				// code under test (JIRA: CPOUI5ODATAV4-3392)
 				assert.strictEqual(oHeaderContext.isOutdated(), undefined);
@@ -25469,9 +25462,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 				that.expectRequest("SalesOrderList?sap-client=123&custom=foo&$apply="
 						+ "filter(LifecycleStatus gt 'P' and GrossAmount lt 100)/search(covfefe)"
-						//TODO: SO_2_BP/Address/City
-						+ "/concat(aggregate(GrossAmount),orderby(LifecycleStatus desc)"
-							+ "/concat(aggregate($count as UI5__count),top(99)))", {
+						+ "/concat(aggregate(GrossAmount)"
+						+ ",groupby((LifecycleStatus,SalesOrderID,SO_2_BP/Address/City)"
+						+ ",aggregate(GrossAmount))/orderby(LifecycleStatus desc)"
+						+ "/concat(aggregate($count as UI5__count),top(99)))", {
 						value : [
 							{GrossAmount : "15"},
 							{UI5__count : "2", "UI5__count@odata.type" : "#Decimal"},
@@ -25676,7 +25670,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		this.expectRequest("SalesOrderList?sap-client=123&$apply="
 				+ "filter(LifecycleStatus gt 'P')/concat(aggregate(GrossAmount)"
-				+ ",concat(aggregate($count as UI5__count),top(2)))", {
+				+ ",groupby((SalesOrderID),aggregate(GrossAmount))"
+				+ "/concat(aggregate($count as UI5__count),top(2)))", {
 				value : [
 					{GrossAmount : "1000"},
 					{UI5__count : "42", "UI5__count@odata.type" : "#Decimal"},
@@ -25761,8 +25756,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[false, "true", "0", "990", ""]
 		], 43); // length unchanged, header context is outdated instead
 
-		this.expectRequest("SalesOrderList?sap-client=123&$filter=LifecycleStatus gt 'P'"
-				+ "&$skip=40&$top=1", {
+		this.expectRequest("SalesOrderList?sap-client=123&$apply="
+				+ "filter(LifecycleStatus gt 'P')"
+				+ "/groupby((SalesOrderID),aggregate(GrossAmount))/skip(40)/top(1)", {
 				value : [
 					{GrossAmount : "420", SalesOrderID : "42"}
 				]
@@ -25830,8 +25826,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			.expectChange("level", 1, 40)
 			.expectChange("grossAmount", "420", 40)
 			.expectChange("salesOrderID", "42", 40)
-			.expectRequest("SalesOrderList?sap-client=123&$filter=LifecycleStatus gt 'P'"
-				+ "&$skip=39&$top=1", {
+			.expectRequest("SalesOrderList?sap-client=123&$apply="
+				+ "filter(LifecycleStatus gt 'P')"
+				+ "/groupby((SalesOrderID),aggregate(GrossAmount))/skip(39)/top(1)", {
 				value : [
 					{GrossAmount : "420", SalesOrderID : "42"} // duplicate
 				]
@@ -25950,9 +25947,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				? "filter(CurrencyCode eq 'EUR' and LifecycleStatus gt 'A')/"
 				: "";
 			this.expectRequest("SalesOrderList?sap-client=123&$apply=" + sFilter + "concat("
-					+ "aggregate(GrossAmount,CurrencyCode),"
-					+ (iSorterCase ? "orderby(CurrencyCode,LifecycleStatus desc)/" : "")
-					+ "concat(aggregate($count as UI5__count),top(99)))", {
+					+ "aggregate(GrossAmount,CurrencyCode),groupby((LifecycleStatus,SalesOrderID)"
+					+ ",aggregate(GrossAmount,CurrencyCode))"
+					+ (iSorterCase ? "/orderby(CurrencyCode,LifecycleStatus desc)" : "")
+					+ "/concat(aggregate($count as UI5__count),top(99)))", {
 					value : [
 						{CurrencyCode : "EUR", GrossAmount : "6"},
 						{UI5__count : "3", "UI5__count@odata.type" : "#Decimal"},
@@ -28389,9 +28387,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				that.waitForChanges(assert, "1st expand")
 			]);
 		}).then(function () {
-			that.expectRequest("Artists?$count=true&$filter=IsActiveEntity eq true and Name eq 'B'"
-					+ "&$orderby=Address/City asc" //TODO: Address/City
-					+ "&$skip=0&$top=6", {
+			that.expectRequest("Artists?$apply=filter(IsActiveEntity eq true and Name eq 'B')"
+					+ "/groupby((ArtistID,Address/City),aggregate(sendsAutographs))"
+					+ "/orderby(Address/City asc)&$count=true&$skip=0&$top=6", {
 					"@odata.count" : "2",
 					value : [{
 						Address : {City : "Liverpool"},
@@ -29390,8 +29388,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// Test #setKeepAlive w/ messages (JIRA: CPOUI5ODATAV4-3390)
 	// ODM/ODLB#getKeepAlive (w/ messages) (JIRA: CPOUI5ODATAV4-3259)
-	// ODLB#getDownloadUrl does not need $apply (JIRA: CPOUI5ODATAV4-3362)
-	// Paging in a group level cache with identity (JIRA: CPOUI5ODATAV4-3362)
 	QUnit.test("Data Aggregation: keep alive single entity", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
 		const sView = `
@@ -29442,17 +29438,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		await this.createView(assert, sView, oModel);
 
 		const oListBinding = this.oView.byId("table").getBinding("rows");
-
-		// code under test (JIRA: CPOUI5ODATAV4-3362)
-		assert.strictEqual(oListBinding.getDownloadUrl(), "/aggregation/BusinessPartners");
-
 		const oContextA = oListBinding.getCurrentContexts()[0];
 		assert.throws(() => {
 			// code under test
 			oContextA.setKeepAlive(true);
 		}, new Error("Unsupported on aggregated data: /BusinessPartners(Country='A')[0]"));
 
-		this.expectRequest("BusinessPartners?$count=true&$filter=Country eq 'A'&$skip=0&$top=3", {
+		this.expectRequest("BusinessPartners?"
+				+ "$apply=filter(Country eq 'A')/groupby((Id,Name),aggregate(SalesAmount,Currency))"
+				+ "&$count=true&$skip=0&$top=3", {
 				"@odata.count" : "2",
 				value : [
 					{Id : 26, Name : "Foo", Currency : "EUR", SalesAmount : "60"},
@@ -29584,8 +29578,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		assert.strictEqual(oContext26.getBinding(), oListBinding, "context for Id 26 still alive");
 		assert.strictEqual(oContext26.getProperty("SalesAmount"), "61", "data still available");
 
-		this.expectRequest("BusinessPartners?$count=true&$filter=Country eq 'A refreshed'"
-				+ "&$skip=0&$top=3", {
+		this.expectRequest("BusinessPartners?$apply=filter(Country eq 'A refreshed')"
+				+ "/groupby((Id,Name),aggregate(SalesAmount,Currency))"
+				+ "&$count=true&$skip=0&$top=3", {
 				"@odata.count" : "1",
 				value : [{Id : 26, Name : "Foo", Currency : "EUR", SalesAmount : "61"}]
 			})
@@ -29644,12 +29639,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		sinon.assert.calledOnceWithExactly(fnOnBeforeDestroy24);
 		assert.strictEqual(oContext24.getBinding(), undefined, "context for Id 24 destroyed");
 
-		this.expectRequest("BusinessPartners?$count=true&$filter=Country eq 'A'&$skip=0&$top=3", {
-				"@odata.count" : "4",
+		this.expectRequest("BusinessPartners?$apply=filter(Country eq 'A')"
+				+ "/groupby((Id,Name),aggregate(SalesAmount,Currency))"
+				+ "&$count=true&$skip=0&$top=3", {
+				"@odata.count" : "2",
 				value : [
 					{Id : 26, Name : "Foo", Currency : "EUR", SalesAmount : "61"},
-					{Id : 24, Name : "Baz", Currency : "EUR", SalesAmount : "20"},
-					{Id : 23, Name : "Qux", Currency : "EUR", SalesAmount : "30"}
+					{Id : 24, Name : "Baz", Currency : "EUR", SalesAmount : "20"}
 				]
 			})
 			.expectChange("country", [, "A", "A"])
@@ -29663,22 +29659,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oListBinding.getCurrentContexts()[0].expand(),
 			this.waitForChanges(assert, "expand Country 'A' again")
 		]);
-
-		this.expectRequest("BusinessPartners?$filter=Country eq 'A'&$skip=3&$top=1", {
-				value : [
-					{Id : 22, Name : "Quux", Currency : "EUR", SalesAmount : "10"}
-				]
-			})
-			.expectChange("country", [,,,, "A"])
-			.expectChange("id", [,, "24", "23", "22"])
-			.expectChange("name", [,, "Baz", "Qux", "Quux"])
-			.expectChange("salesAmount", [,, "20", "30", "10"])
-			.expectChange("currency", [,, "EUR",, "EUR"]);
-
-		// code under test (JIRA: CPOUI5ODATAV4-3362)
-		this.oView.byId("table").setFirstVisibleRow(2);
-
-		await this.waitForChanges(assert, "load more items of Country 'A'");
 
 		const sErrorMessage = "Unsupported for data aggregation with groupLevels: " + sODLB
 			+ ": /BusinessPartners";
@@ -29726,8 +29706,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<Text id="salesNumber" text="{SalesNumber}"/>
 </t:Table>`;
 
-		this.expectRequest("BusinessPartners?$apply="
-				+ "concat(aggregate(SalesNumber with min as UI5min__SalesNumber"
+		this.expectRequest("BusinessPartners?$apply=groupby((Id),aggregate(SalesNumber))"
+				+ "/concat(aggregate(SalesNumber with min as UI5min__SalesNumber"
 				+ ",SalesNumber with max as UI5max__SalesNumber),top(3))", {
 				value : [{
 					UI5min__SalesNumber : 1,
@@ -30003,7 +29983,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			const sUrl = "BusinessPartners?$apply=filter(Currency ne 'USD' and SalesAmount gt 0)"
 				+ "/search(covfefe)/concat(aggregate(SalesAmount,Currency)"
-				+ ",orderby(Region asc,SalesAmount desc)"
+					+ ",groupby((Currency,Id,Region),aggregate(SalesAmount))"
+				+ "/orderby(Region asc,SalesAmount desc)"
 				// Note: $count is requested automatically
 				+ "/concat(aggregate($count as UI5__count),top(4)))";
 			// data model: Id 1...26, Region "A"..."Z", SalesAmount "100"..."2600" (in EUR)
@@ -30425,10 +30406,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/BusinessPartners()"
 			], null, (bInactive ? 27 : 28) + 3); // Note: aExpectedContent is not interesting here
 
-			this.expectRequest("BusinessPartners?$filter=(Currency ne 'USD' and SalesAmount gt 0)"
+			this.expectRequest("BusinessPartners?$apply=filter((Currency ne 'USD' and SalesAmount gt 0)"
 					// exclusive filter (see _CollectionCache#getExclusiveFilter)
-					+ " and not (" + (bInactive ? "" : "Id eq 27 or ") + "Id eq 28)"
-					+ "&$orderby=Region asc,SalesAmount desc&$search=covfefe&$skip=4&$top=4", {
+					+ " and not (" + (bInactive ? "" : "Id eq 27 or ") + "Id eq 28))"
+					+ "/search(covfefe)/groupby((Currency,Id,Region),aggregate(SalesAmount))"
+					+ "/orderby(Region asc,SalesAmount desc)/skip(4)/top(4)", {
 					value : [{
 						Currency : "EUR",
 						Id : 5, // Edm.Int16
@@ -30640,7 +30622,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		let fnRespond;
 		this.expectChange("isOutdatedHeader")
 			.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesAmount)"
-				+ ",concat(aggregate($count as UI5__count),top(2)))",
+				+ ",groupby((Id,Region),aggregate(SalesAmount))"
+				+ "/concat(aggregate($count as UI5__count),top(2)))",
 				new Promise(function (resolve) {
 					fnRespond = resolve.bind(null, {
 						value : [{
@@ -30747,8 +30730,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	</t:Table>`;
 
 			this.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesAmount,Currency)"
+						+ ",groupby((Id),aggregate(SalesAmount,Currency))"
 					// Note: $count is requested automatically
-					+ ",concat(aggregate($count as UI5__count),top(109)))", {
+					+ "/concat(aggregate($count as UI5__count),top(109)))", {
 					value : [{
 						Currency : "EUR",
 						SalesAmount : "123", // unrealistic, but easier to tell apart
@@ -71643,7 +71627,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			const sUrl = "SalesOrderList('42')/SO_2_SOITEM?"
 				+ "$apply=concat(aggregate(TaxAmount,CurrencyCode)"
-				+ ",concat(aggregate($count as UI5__count),top(110)))";
+				+ ",groupby((ItemPosition,SalesOrderID),aggregate(TaxAmount,CurrencyCode))"
+				+ "/concat(aggregate($count as UI5__count),top(110)))";
 			this.expectRequest(sUrl, {
 					value : [
 						{TaxAmount : "250", CurrencyCode : "USD"},

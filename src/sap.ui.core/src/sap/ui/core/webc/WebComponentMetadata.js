@@ -4,15 +4,11 @@
 
 // Provides class sap.ui.core.webc.WebComponentMetadata
 sap.ui.define([
-	"../ElementMetadata",
-	"./WebComponentRenderer",
-	"sap/base/strings/camelize",
-	"sap/base/strings/hyphenate"
+	"../html/HTMLElementMetadata",
+	"../html/HTMLElementRenderer"
 ],
-function(ElementMetadata, WebComponentRenderer, camelize, hyphenate) {
+function(HTMLElementMetadata, WebComponentRenderer) {
 	"use strict";
-
-	var MAPPING_TYPES = ["property", "style", "textContent", "slot", "none"];
 
 	/**
 	 * Creates a new metadata object for a WebComponent Wrapper subclass.
@@ -25,145 +21,23 @@ function(ElementMetadata, WebComponentRenderer, camelize, hyphenate) {
 	 * @version ${version}
 	 * @since 1.138.0
 	 * @alias sap.ui.core.webc.WebComponentMetadata
-	 * @extends sap.ui.core.ElementMetadata
+	 * @extends sap.ui.core.html.HTMLElementMetadata
 	 * @public
 	 */
 	var WebComponentMetadata = function(sClassName, oClassInfo) {
 		// call super constructor
-		ElementMetadata.apply(this, arguments);
+		HTMLElementMetadata.apply(this, arguments);
 	};
 
 	//chain the prototypes
-	WebComponentMetadata.prototype = Object.create(ElementMetadata.prototype);
+	WebComponentMetadata.prototype = Object.create(HTMLElementMetadata.prototype);
 	WebComponentMetadata.prototype.constructor = WebComponentMetadata;
 
-	// mapping validation function
-	var fnValidateType = function (sType) {
-		return MAPPING_TYPES.includes(sType) ? sType : MAPPING_TYPES[0];
-	};
-
-	// Enrich property factory
-	var OriginalProperty = ElementMetadata.prototype.metaFactoryProperty;
-	var WebComponentProperty = function(oClass, name, info) {
-		OriginalProperty.apply(this, arguments);
-
-		if (!info.mapping || typeof info.mapping === "string") {
-			this._sMapping = fnValidateType(info.mapping);
-		} else if (typeof info.mapping === "object") {
-			this._sMapping = fnValidateType(info.mapping.type);
-			this._sMapTo = info.mapping.to;
-			this._sSlotName = info.mapping.slotName;
-			this._fnMappingFormatter = info.mapping.formatter;
-			this._fnMappingParser = info.mapping.parser;
-		}
-	};
-	WebComponentProperty.prototype = Object.create(OriginalProperty.prototype);
-	WebComponentProperty.prototype.constructor = WebComponentProperty;
-	WebComponentMetadata.prototype.metaFactoryProperty = WebComponentProperty;
-
-	// Enrich aggregation factory
-	var OriginalAggregation = ElementMetadata.prototype.metaFactoryAggregation;
-	var WebComponentAggregation = function(oClass, name, info) {
-		OriginalAggregation.apply(this, arguments);
-		this._sSlot = info.slot || "";
-	};
-	WebComponentAggregation.prototype = Object.create(OriginalAggregation.prototype);
-	WebComponentAggregation.prototype.constructor = WebComponentAggregation;
-	WebComponentMetadata.prototype.metaFactoryAggregation = WebComponentAggregation;
-
-	// Enrich association factory
-	var OriginalAssociation = ElementMetadata.prototype.metaFactoryAssociation;
-	var WebComponentAssociation = function(oClass, name, info) {
-		OriginalAssociation.apply(this, arguments);
-		if (!info.mapping || typeof info.mapping !== "object") {
-			this._sMapping = ""; // For associations, "mapping" must be an object, because "to" is required
-		} else {
-			this._sMapping = "property"; // Associations map only to properties, no matter what is set, it's always "property" mapping
-			this._sMapTo = info.mapping.to; // The property, to which the association is related
-			this._fnMappingFormatter = info.mapping.formatter;
-			this._fnMappingParser = info.mapping.parser;
-		}
-	};
-	WebComponentAssociation.prototype = Object.create(OriginalAssociation.prototype);
-	WebComponentAssociation.prototype.constructor = WebComponentAssociation;
-	WebComponentMetadata.prototype.metaFactoryAssociation = WebComponentAssociation;
-
-	// Enrich event factory
-	var OriginalEvent = ElementMetadata.prototype.metaFactoryEvent;
-	var WebComponentEvent = function(oClass, name, info) {
-		OriginalEvent.apply(this, arguments);
-		if (info.mapping) {
-			this._sMapTo = info.mapping.to;
-		}
-		this._sCustomEventName = this._sMapTo ? this._sMapTo : hyphenate(name); // Create the custom event name from the mapping or the event name itself (then hyphenated)
-	};
-	WebComponentEvent.prototype = Object.create(OriginalEvent.prototype);
-	WebComponentEvent.prototype.constructor = WebComponentEvent;
-	WebComponentMetadata.prototype.metaFactoryEvent = WebComponentEvent;
-
-	WebComponentMetadata.prototype.applySettings = function(oClassInfo) {
-		var oStaticInfo = oClassInfo.metadata;
-
-		this._sTag = oStaticInfo.tag;
-		this._aMethods = oStaticInfo.methods || [];
-		this._aGetters = oStaticInfo.getters || [];
-
-		ElementMetadata.prototype.applySettings.call(this, oClassInfo);
-	};
-
-	WebComponentMetadata.prototype.generateAccessors = function() {
-		ElementMetadata.prototype.generateAccessors.call(this);
-		var proto = this.getClass().prototype;
-
-		// Generate accessors for proxied public methods - only if not created explicitly already
-		this._aMethods.forEach(function(name) {
-			if (!proto[name]) {
-				proto[name] = function() {
-					return this.__callPublicMethod(name, arguments);
-				};
-			}
-		});
-
-		// Generate accessors for proxied public getters - only if not created explicitly already
-		this._aGetters.forEach(function(name) {
-			var functionName = "get" + name.substr(0, 1).toUpperCase() + name.substr(1);
-			if (!proto[functionName]) {
-				proto[functionName] = function() {
-					return this.__callPublicGetter(name);
-				};
-			}
-		});
-	};
-
 	/**
-	 * Returns the tag, used to render the Component Wrapper
-	 * @public
-	 * @returns {string}
-	 */
-	WebComponentMetadata.prototype.getTag = function() {
-		return this._sTag;
-	};
-
-	/**
-	 * Returns the list of public methods, proxied by the Component Wrapper to the component itself
-	 * @public
-	 * @returns {Array}
-	 */
-	WebComponentMetadata.prototype.getMethods = function() {
-		return this._aMethods;
-	};
-
-	/**
-	 * Returns the list of public getters, proxied by the Component Wrapper to the component itself
-	 * @public
-	 * @returns {Array}
-	 */
-	WebComponentMetadata.prototype.getGetters = function() {
-		return this._aGetters;
-	};
-
-	/**
-	 * Returns the slot to be assigned to a particular aggregation's items
+	 * Returns the slot to be assigned to a particular aggregation's items.
+	 *
+	 * @param {string} sAggregationName The name of the aggregation.
+	 * @returns {string|undefined} The slot assigned to the aggregation's items, or undefined if not found.
 	 * @private
 	 */
 	WebComponentMetadata.prototype.getAggregationSlot = function(sAggregationName) {
@@ -172,106 +46,11 @@ function(ElementMetadata, WebComponentRenderer, camelize, hyphenate) {
 	};
 
 	/**
-	 * Determines whether the attribute corresponds to a managed property
-	 * @param sAttr the attribute's name
-	 * @returns {boolean}
-	 */
-	WebComponentMetadata.prototype.isManagedAttribute = function(sAttr) {
-		var mProperties = this.getAllProperties();
-		for (var propName in mProperties) {
-			if (mProperties.hasOwnProperty(propName)) {
-				var propData = mProperties[propName];
-				if (propData._sMapping === "property" && (propData._sMapTo === sAttr || camelize(sAttr) === propName)) {
-					return true;
-				}
-			}
-		}
-
-		var mAssociations = this.getAllAssociations();
-		for (var sAssocName in mAssociations) {
-			if (mAssociations.hasOwnProperty(sAssocName)) {
-				var oAssocData = mAssociations[sAssocName];
-				if (oAssocData._sMapping === "property" && oAssocData._sMapTo === camelize(sAttr)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	};
-
-	/**
-	 * Returns a map, containing all properties of a certain mapping type
-	 * @param {string} sMapping mapping type
-	 * @returns {Object} map of all properties of a certain mapping type
-	 */
-	WebComponentMetadata.prototype.getPropertiesByMapping = function(sMapping) {
-		var mFiltered = {};
-		var mProperties = this.getAllProperties();
-		var mPrivateProperties = this.getAllPrivateProperties();
-		for (var propName in mProperties) {
-			if (mProperties.hasOwnProperty(propName)) {
-				var propData = mProperties[propName];
-				if (propData._sMapping === sMapping) {
-					mFiltered[propName] = propData;
-				}
-			}
-		}
-
-		for (var propName in mPrivateProperties) {
-			if (mPrivateProperties.hasOwnProperty(propName)) {
-				var propData = mPrivateProperties[propName];
-				if (propData._sMapping === sMapping) {
-					mFiltered[propName] = propData;
-				}
-			}
-		}
-
-		return mFiltered;
-	};
-
-	/**
-	 * Returns a map of all associations that control properties (have mapping to properties)
-	 * @returns {Object} map of all associations having mappings
-	 */
-	WebComponentMetadata.prototype.getAssociationsWithMapping = function() {
-		var mFiltered = {};
-		var mAssociations = this.getAllAssociations();
-		for (var sAssocName in mAssociations) {
-			if (mAssociations.hasOwnProperty(sAssocName)) {
-				var oAssocData = mAssociations[sAssocName];
-				if (oAssocData._sMapping) {
-					mFiltered[sAssocName] = oAssocData;
-				}
-			}
-		}
-
-		return mFiltered;
-	};
-
-	/**
-	 * Returns a map of all events that are custom events (have mapping to a custom event)
-	 * @param {string} [sCustomEventName] if provided, only returns the event with this name
-	 * @returns {Object} map of custom events, where the key is the event name and the value is the event metadata object
-	 */
-	WebComponentMetadata.prototype.getCustomEvents = function(sCustomEventName) {
-		var mFiltered = {};
-		var mEvents = this.getAllEvents();
-		for (var sEventName in mEvents) {
-			var oEventObj = mEvents[sEventName];
-			if (oEventObj._sCustomEventName) {
-				if (!sCustomEventName || oEventObj._sCustomEventName === sCustomEventName) {
-					mFiltered[sEventName] = oEventObj;
-				}
-			}
-		}
-
-		return mFiltered;
-	};
-
-	/**
-	 * Retrieves the renderer for the described web component class.
-	 * Note: this is always the default renderer and Web Component wrappers should not define their own renderers.
+	 * Returns the renderer for the described web component class.
+	 *
+	 * <b>Note:</b> This always returns the default renderer. Web Component wrappers must not define custom renderers.
+	 *
+	 * @returns {object} The default renderer instance.
 	 * @public
 	 */
 	WebComponentMetadata.prototype.getRenderer = function() {
