@@ -1,0 +1,10 @@
+{
+	"overrides": [
+		{
+			"files": [
+				"src/**/*.js",
+				"test/**/*.js"
+			]
+		}
+	]
+}

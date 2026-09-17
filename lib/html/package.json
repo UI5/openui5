@@ -1,0 +1,29 @@
+{
+  "name": "html5-element-generator",
+  "version": "0.1.0",
+  "description": "Generates a custom-elements.json (CEM v2.1.0) for HTML5 elements from W3C WebRef data",
+  "type": "module",
+  "scripts": {
+    "generate": "tsc && node lib/generate.js",
+    "build": "tsc && node lib/main.js",
+    "clean": "tsc && node lib/main.js clean"
+  },
+  "dependencies": {
+    "@nberlette/webref-elements": "^2.7.2",
+    "@nberlette/webref-idl": "^3.75.3",
+    "@vscode/web-custom-data": "^0.6.3",
+    "@webref/elements": "^2.8.0",
+    "@webref/idl": "^3.83.1",
+    "ui5-tooling-modules": "^3.38.2"
+  },
+  "engines": {
+    "node": "^24.15.0"
+  },
+  "private": true,
+  "devDependencies": {
+    "@types/node": "^24.2.0",
+    "@types/webidl2": "^24.4.4",
+    "custom-elements-manifest": "^2.1.0",
+    "typescript": "^6.0.3"
+  }
+}

@@ -120,7 +120,8 @@ sap.ui.define(function() {
 			util: {},
 			rule: {},
 			webc: {},
-			xml: {}
+			xml: {},
+			html: {}
 		}
 	};
 });

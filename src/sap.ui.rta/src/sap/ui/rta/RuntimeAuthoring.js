@@ -1703,6 +1703,7 @@ sap.ui.define([
 			selector: this.getRootControlInstance()
 		};
 		persistHighlightAllChangesState.call(this);
+		await this.stop(true, true, true);
 		await ReloadManager.triggerReload(oReloadInfo);
 	}
 

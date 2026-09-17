@@ -60,6 +60,14 @@ In this case, the UI5 CLI will always try to invoke the local installation. This
 
 In principle, you may be interested in other features of the UI5 CLI than _serving_ the TestSuite. See the [UI5 CLI documentation](https://ui5.github.io/cli/pages/CLI/) for many comprehensive features such as building a project.
 
+###### Experimental: UI5 CLI v5
+
+An experimental installation of UI5 CLI v5 is available alongside the default v4. Two npm scripts are provided in the **root directory** to try it out:
+
+- `start-cli-v5`: Serves the TestSuite using UI5 CLI v5
+- `testsuite-cli-v5`: Serves the TestSuite using UI5 CLI v5 and opens it in the browser
+
+
 
 #### Building the OpenUI5 SDK (Demo Kit)
 
