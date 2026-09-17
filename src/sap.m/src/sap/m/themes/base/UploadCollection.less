@@ -164,7 +164,7 @@
 	display: block;
 
 	.sapUiIcon {
-		color: fade(@sapUiContentNonInteractiveIconColor, 50);
+		color: ~'hsl(from var(--sapContent_NonInteractiveIconColor) h s l / .5)';
 	}
 
 	.sapMUCNoDataText {
@@ -198,7 +198,7 @@
 		right: 0;
 		left: 0;
 		bottom: 0;
-		background-color: fade(@sapUiDragAndDropBackground, 80);
+		background-color: ~'hsl(from var(--sapGroup_ContentBackground) h s l / .8)';
 		z-index: 1;
 
 		&.sapMUCDragDropOverlayHide {
@@ -214,7 +214,7 @@
 			bottom: 0;
 			right: 0;
 			margin: 0.5rem;
-			border: 0.125rem dashed @sapUiDragAndDropBorderColor;
+			border: 0.125rem dashed var(--sapContent_ForegroundBorderColor);
 		}
 
 		.sapMUCDragDropIndicator {
@@ -226,20 +226,20 @@
 			.sapUiIcon {
 				position: relative;
 				display: block;
-				color: @sapUiDragAndDropColor;
+				color: var(--sapContent_NonInteractiveIconColor);
 				padding-bottom: 1rem;
 			}
 
 			.sapMText {
 				position: relative;
 				font-size: var(--sapFontHeader4Size);
-				color: @sapUiDragAndDropColor;
+				color: var(--sapContent_NonInteractiveIconColor);
 			}
 		}
 
 		&.sapMUCDropIndicator::after {
-			background-color: @sapUiDragAndDropActiveBackground;
-			border: 0.125rem solid @sapUiDragAndDropActiveBorderColor;
+			background-color: var(--sapGroup_ContentBackground);
+			border: 0.125rem solid var(--sapContent_HelpColor);
 		}
 
 		&.sapMUCDropIndicator {
@@ -247,10 +247,10 @@
 			.sapMUCDragDropIndicator {
 
 				.sapMText {
-					color: @sapUiDragAndDropActiveColor;
+					color: var(--sapContent_HelpColor);
 				}
 				.sapUiIcon {
-					color: @sapUiDragAndDropActiveColor;
+					color: var(--sapContent_HelpColor);
 				}
 			}
 		}
@@ -401,7 +401,6 @@
 	height: 2.5rem;
 }
 
-
 /*compact form */
 .sapUiSizeCompact .sapMUCButtonContainer > .sapMBtn {
 	height: 1.625rem;
@@ -478,7 +477,7 @@
 
 .sapMUCAttrContainer,
 .sapMUCStatusContainer {
-	font-size: @sapMFontMediumSize; /* it cannot be moved to base as the LESS constant is not known there */
+	font-size: var(--sapFontSize); /* it cannot be moved to base as the LESS constant is not known there */
 }
 
 /*for width > 30rem the buttons should be displayed as buttons of type transparent */
