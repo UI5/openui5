@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+	<edmx:DataServices>
+		<Schema Namespace="foo">
+			<Annotations Target="AnalyticsService.EntityContainer">
+				<!-- Annotation Term="com.sap.vocabularies.Common.v1.ExpandAfterConcatSupported"/ -->
+			</Annotations>
+		</Schema>
+	</edmx:DataServices>
+</edmx:Edmx>

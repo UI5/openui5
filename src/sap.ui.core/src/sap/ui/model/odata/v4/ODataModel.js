@@ -925,6 +925,10 @@ sap.ui.define([
 	 *   given as a <code>number</code> value, and $select can also be given as an array (but
 	 *   without navigation paths). An empty map can also be given as <code>null</code> or
 	 *   <code>true</code>. See also {@link topic:1ab4f62de6ab467096a2a98b363a1373 Parameters}.
+	 *   Since 1.154.0, this option can be combined with pure data aggregation defined via
+	 *   <code>$$aggregation</code> and is then used for requests without <code>$apply</code> and
+	 *   for requests with an (implicit or explicit) "identity" transformation, but silently ignored
+	 *   for others.
 	 * @param {string} [mParameters.$filter]
 	 *   The value for the "5.1.2 System Query Option $filter" used in addition to
 	 *   <code>vFilters</code>
@@ -939,7 +943,10 @@ sap.ui.define([
 	 *   A comma separated list or an array of items which determine the value for the
 	 *   "5.1.4 System Query Option $select". Since 1.75.0, when using the "autoExpandSelect" model
 	 *   parameter (see {@link #constructor}), paths with navigation properties can be included and
-	 *   will contribute to the "5.1.3 System Query Option $expand".
+	 *   will contribute to the "5.1.3 System Query Option $expand". Since 1.154.0, this option can
+	 *   be combined with pure data aggregation defined via <code>$$aggregation</code> and is then
+	 *   used for requests without <code>$apply</code> and for requests with an (implicit or
+	 *   explicit) "identity" transformation, but silently ignored for others.
 	 * @param {object} [mParameters.$$aggregation]
 	 *   An object holding the information needed for data aggregation, see
 	 *   {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation} for details.

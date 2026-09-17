@@ -1836,9 +1836,6 @@ sap.ui.define([
 
 	//*********************************************************************************************
 [{
-	bHeaderContext : true,
-	sTitle : "$$aggregation with header context"
-}, {
 	bAggregated : true,
 	sTitle : "isAggregated"
 }, {
@@ -1880,10 +1877,7 @@ sap.ui.define([
 		this.mock(_Helper).expects("isDataAggregation")
 			.withExactArgs(sinon.match.same(mParameters))
 			.returns(true);
-		this.mock(oBinding).expects("getHeaderContext").withExactArgs()
-			.returns(oFixture.bHeaderContext ? oContext : {/*any other context*/});
 		this.mock(oContext).expects("isAggregated").withExactArgs()
-			.exactly(oFixture.bHeaderContext ? 0 : 1)
 			.returns(oFixture.bAggregated);
 
 		assert.strictEqual(

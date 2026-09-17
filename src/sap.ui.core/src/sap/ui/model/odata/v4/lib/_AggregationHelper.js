@@ -35,6 +35,7 @@ sap.ui.define([
 			search : "string",
 			subtotalsAtBottomOnly : "boolean"
 		},
+		sExpandAfterConcatSupported = "/@com.sap.vocabularies.Common.v1.ExpandAfterConcatSupported",
 		oFrozenCollapsed = Object.freeze({"@$ui5.node.isExpanded" : false}),
 		oFrozenExpanded = Object.freeze({"@$ui5.node.isExpanded" : true}),
 		// Example: "Texts/Country asc"
@@ -65,12 +66,13 @@ sap.ui.define([
 	 * @param {string[]} aGroupBy - groupby((???),...) content
 	 * @param {string[]} aAggregate - aggregate(???) content
 	 * @param {boolean} bGrandTotalLike184 - Handle grand totals like 1.84?
+	 * @param {Set} [oSelect] - Optional set to add aggregate and unit to
 	 * @param {string} sAlias - An aggregatable property name/alias
 	 * @param {number} i - Index of sAlias in aAliases
 	 * @param {string[]} aAliases - Array of all applicable aggregatable property names/aliases
 	 * @throws {Error} If "average" or "countdistinct" are used together with grand totals like 1.84
 	 */
-	function aggregate(oAggregation, aGroupBy, aAggregate, bGrandTotalLike184, sAlias, i,
+	function aggregate(oAggregation, aGroupBy, aAggregate, bGrandTotalLike184, oSelect, sAlias, i,
 			aAliases) {
 		var oDetails = oAggregation.aggregate[sAlias],
 			sAggregate = oDetails.name || sAlias,
@@ -88,12 +90,15 @@ sap.ui.define([
 			sAggregate += " with " + sWith + " as " + sAlias;
 		} else if (oDetails.name) {
 			sAggregate += " as " + sAlias;
+		} else { // Note: needed only for "identity" which is incompatible w/ "with ... as"
+			oSelect?.add(sAlias);
 		}
 		aAggregate.push(sAggregate);
 
 		if (sUnit && !aAggregate.includes(sUnit) && !aAliases.includes(sUnit, i + 1)
 				&& !aGroupBy.includes(sUnit)) {
 			aAggregate.push(sUnit);
+			oSelect?.add(sUnit);
 		}
 	}
 
@@ -209,10 +214,16 @@ sap.ui.define([
 		 * an additional aggregate "$count as UI5__count"; this way it still works with "skip()" and
 		 * "top()".
 		 *
+		 * If the leaf level represents single entity instances (not aggregated data), an "identity"
+		 * transformation is used instead of "groupby((...),aggregate(...))". Unless "concat()" is
+		 * needed, "$apply" can be avoided altogether in favor of plain system query options.
+		 *
 		 * @param {object} oAggregation
 		 *   An object holding the information needed for data aggregation; see
 		 *   {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation}. The properties
 		 *   "aggregate", "group", "groupLevels", and "expandTo" are normalized if applicable!
+		 * @param {function} oAggregation.$fetchMetadata
+		 *   Function which fetches metadata for a given meta path
 		* @param {string} [oAggregation.hierarchyQualifier]
 		*   If present, a recursive hierarchy w/o data aggregation is defined and
 		*   {@link _AggregationHelper.buildApply4Hierarchy} is invoked instead.
@@ -223,17 +234,18 @@ sap.ui.define([
 		 *   follow-up request or in case it is turned into an aggregate "$count as UI5__count"
 		 * @param {string} [mQueryOptions.$filter]
 		 *   The value for a "$filter" system query option; it is removed from the returned map and
-		 *   turned into a "filter()" transformation
+		 *   turned into a "filter()" transformation. MUST NOT be combined with "identity"!
 		 * @param {string} [mQueryOptions.$$filterBeforeAggregate]
 		 *   The value for a filter which is applied before the aggregation; it is removed from the
 		 *   returned map and turned into a "filter()" transformation
 		 * @param {string} [mQueryOptions.$$filterOnAggregate]
 		 *   The value for a filter which is applied on aggregates and thus contains the special
 		 *   syntax "$these/aggregate(...)"; it is removed from the returned map and turned into a
-		 *   "groupby((...),filter(...)" transformation
+		 *   "groupby((...),filter(...)" transformation. MUST NOT be combined with "identity"!
 		 * @param {boolean} [mQueryOptions.$$leaves]
 		 *   Tells whether the count of leaves is requested; it is removed from the returned map; it
-		 *   is turned into an aggregate "$count as UI5__leaves" for the first request
+		 *   is turned into an aggregate "$count as UI5__leaves" for the first request. MUST NOT be
+		 *   combined with "identity"!
 		 * @param {string} [mQueryOptions.$orderby]
 		 *   The value for a "$orderby" system query option; it is removed from the returned map and
 		 *   turned into an "orderby()" transformation
@@ -259,13 +271,21 @@ sap.ui.define([
 		 * @returns {object}
 		 *   A map of key-value pairs representing the query string, including a value for the
 		 *   "$apply" system query option if needed; it is a modified copy of
-		 *   <code>mQueryOptions</code>, with values removed as described above
+		 *   <code>mQueryOptions</code>, with values removed as described above and
+		 *   "$$applyWithSelect" added as either <code>false</code> (which means that "$apply" must
+		 *   not be combined with "$expand" and "$select" at all) or a sorted <code>string[]</code>
+		 *   containing all property names which need to be added to "$select" later on (while
+		 *   keeping "$expand" as is)
+		 * @throws {Error}
+		 *   If the preconditions for an "identity" transformation hold (see above) while
+		 *   <code>mQueryOptions</code> contains an option which cannot be combined (see above)
 		 *
 		 * @public
 		 */
 		buildApply : function (oAggregation, mQueryOptions, iLevel = 0, bFollowUp = false,
 				mAlias2MeasureAndMethod = undefined) {
-			var aAliases,
+			var oSelect = new Set(),
+				aAliases,
 				sApply = "",
 				aGrandTotalAggregate = [], // concat(aggregate(???),.) content for grand totals
 				bGrandTotalLike184 = oAggregation["grandTotal like 1.84"],
@@ -275,7 +295,29 @@ sap.ui.define([
 				aMinMaxAggregate = [], // concat(aggregate(???),.) content for min/max or count
 				sSkipTop,
 				aSortedGroups,
-				aSubtotalsAggregate = []; // groupby(.,aggregate(???)) content for subtotals/leaves
+				aSubtotalsAggregate = [], // groupby(.,aggregate(???)) content for subtotals/leaves
+				bUseIdentity;
+
+			/*
+			 * Appends the given transformation part to the current $apply expression.
+			 *
+			 * @param {string} sPart - A part to be added to the end of the current $apply
+			 */
+			function append(sPart) {
+				sApply = sApply ? sApply + "/" + sPart : sPart;
+			}
+
+			/*
+			 * Returns a read-only list of paths, sorted and w/o duplicates, which need to be added
+			 * to "$select" later on.
+			 *
+			 * @returns {string[]} Read-only list of paths, sorted and w/o duplicates
+			 *
+			 * @see sap.ui.model.odata.v4.lib._Helper.getJoinedPaths
+			 */
+			function getApplyWithSelect() {
+				return Object.freeze(Array.from(oSelect).sort());
+			}
 
 			/*
 			 * Builds the min/max expression for the "concat" term (for example
@@ -291,6 +333,7 @@ sap.ui.define([
 
 				if (oDetails[sMinOrMax]) {
 					sAlias = "UI5" + sMinOrMax + "__" + sName;
+					oSelect.add(sAlias);
 
 					aMinMaxAggregate.push(sName + " with " + sMinOrMax + " as " + sAlias);
 					if (mAlias2MeasureAndMethod) {
@@ -308,6 +351,8 @@ sap.ui.define([
 			}
 
 			mQueryOptions = Object.assign({}, mQueryOptions);
+			oAggregation.aggregate ??= {};
+			aAliases = Object.keys(oAggregation.aggregate).sort();
 			oAggregation.groupLevels ??= [];
 
 			oAggregation.group ??= {};
@@ -320,24 +365,41 @@ sap.ui.define([
 				oAggregation.groupLevels.pop();
 			}
 			bIsLeafLevel = iLevel <= 0 || iLevel > oAggregation.groupLevels.length;
+			bUseIdentity = bIsLeafLevel && oAggregation.$leafLevelAggregated === false
+				&& !bGrandTotalLike184 && iLevel >= 0
+				&& !aAliases.some((sAlias) => oAggregation.aggregate[sAlias].name);
+
 			aGroupBy = bIsLeafLevel
 				? aSortedGroups.filter(function (sGroup) {
 					return !oAggregation.groupLevels.includes(sGroup);
 				})
 				: [oAggregation.groupLevels[iLevel - 1]];
-			if (!iLevel) {
+			if (!iLevel || bUseIdentity) {
 				// Note: group levels are in front, in original order, followed by leaf level
 				aGroupBy = oAggregation.groupLevels.concat(aGroupBy);
+				// Note: bUseIdentity cannot be reset below due to "ExpandAfterConcatSupported"
+				// because with visual grouping, there is no need for "concat" on leaf level (and
+				// no $apply is used at all)!
+			}
+			if (aGroupBy.length) {
+				aGroupBy.forEach(function (sGroup) {
+					var aAdditionally = oAggregation.group[sGroup].additionally;
+
+					if (aAdditionally) { // Note: addt'l properties intentionally at end
+						aGroupBy.push.apply(aGroupBy, aAdditionally);
+					}
+					oSelect.add(sGroup);
+				});
 			}
 
-			oAggregation.aggregate ??= {};
-			aAliases = Object.keys(oAggregation.aggregate).sort();
 			if (iLevel === 1 && !bFollowUp) {
 				aAliases.filter(function (sAlias) {
 					return oAggregation.aggregate[sAlias].grandTotal;
-				}).forEach(
-					aggregate.bind(null, oAggregation, [], aGrandTotalAggregate, bGrandTotalLike184)
-				);
+				}).forEach(aggregate.bind(null,
+					oAggregation, [], aGrandTotalAggregate, bGrandTotalLike184,
+					// Note: no oSelect needed here! w/ bUseIdentity, bIsLeafLevel is true
+					// and thus all aggregates are (also) handled below
+					/*oSelect*/null));
 			}
 			if (!bFollowUp) {
 				aAliases.forEach(function (sAlias) {
@@ -347,28 +409,56 @@ sap.ui.define([
 			}
 			aAliases.filter(function (sAlias) {
 				return bIsLeafLevel || oAggregation.aggregate[sAlias].subtotals;
-			}).forEach(
-				aggregate.bind(null, oAggregation, aGroupBy, aSubtotalsAggregate, false)
-			);
+			}).forEach(aggregate.bind(null,
+				oAggregation, aGroupBy, aSubtotalsAggregate, false, oSelect));
 			if (aSubtotalsAggregate.length) {
 				sApply = "aggregate(" + aSubtotalsAggregate.join(",") + ")";
 			}
 
-			if (aGroupBy.length) {
-				aGroupBy.forEach(function (sGroup) {
-					var aAdditionally = oAggregation.group[sGroup].additionally;
-
-					if (aAdditionally) { // Note: addt'l properties intentionally at end
-						aGroupBy.push.apply(aGroupBy, aAdditionally);
+			if (bUseIdentity) {
+				for (const sOption of ["$filter", "$$filterOnAggregate", "$$leaves"]) {
+					if (mQueryOptions[sOption]) {
+						throw new Error("Cannot combine identity with " + sOption);
 					}
-				});
-				sApply = "groupby((" + aGroupBy.join(",") + (sApply ? ")," + sApply + ")" : "))");
+				}
+				if (iLevel > 1 || !aMinMaxAggregate.length && !aGrandTotalAggregate.length) {
+					// no $apply needed, just plain system query options
+					delete mQueryOptions.$apply;
+					if (bFollowUp) {
+						delete mQueryOptions.$count;
+					}
+					if (oAggregation.search) {
+						mQueryOptions.$search = oAggregation.search;
+					}
+					if (mQueryOptions.$$filterBeforeAggregate) {
+						mQueryOptions.$filter = mQueryOptions.$$filterBeforeAggregate;
+						delete mQueryOptions.$$filterBeforeAggregate;
+					}
+					// needed to enhance $select
+					mQueryOptions.$$applyWithSelect = getApplyWithSelect();
+
+					return mQueryOptions;
+				}
+
+				if (!oAggregation.$fetchMetadata(sExpandAfterConcatSupported).getResult()) {
+					bUseIdentity = false; // identity below would be inside concat, avoid!
+				}
+			}
+
+			if (aGroupBy.length) {
+				if (bUseIdentity) {
+					sApply = ""; // identity; override aSubtotalsAggregate
+				} else {
+					sApply = "groupby((" + aGroupBy.join(",")
+						+ (sApply ? ")," + sApply + ")" : "))");
+				}
 			}
 
 			if (bFollowUp) {
 				delete mQueryOptions.$count;
 			} else if (mQueryOptions.$count) {
 				aMinMaxAggregate.push("$count as UI5__count");
+				oSelect.add("UI5__count");
 				delete mQueryOptions.$count;
 			}
 
@@ -377,7 +467,7 @@ sap.ui.define([
 				delete mQueryOptions.$filter;
 			}
 			if (mQueryOptions.$orderby) {
-				sApply += "/orderby(" + mQueryOptions.$orderby + ")";
+				append("orderby(" + mQueryOptions.$orderby + ")");
 				delete mQueryOptions.$orderby;
 			}
 			sSkipTop = skipTop(mQueryOptions);
@@ -391,10 +481,10 @@ sap.ui.define([
 					+ (sSkipTop || "identity") + ")";
 			} else {
 				if (aMinMaxAggregate.length) {
-					sApply += "/concat(aggregate(" + aMinMaxAggregate.join(",") + "),"
-						+ (sSkipTop || "identity") + ")";
+					append("concat(aggregate(" + aMinMaxAggregate.join(",") + "),"
+						+ (sSkipTop || "identity") + ")");
 				} else if (sSkipTop) {
-					sApply += "/" + sSkipTop;
+					append(sSkipTop);
 				}
 				if (iLevel === 1 && mQueryOptions.$$leaves && !bFollowUp) {
 					sLeaves = "groupby((" + aSortedGroups.join(",")
@@ -403,7 +493,7 @@ sap.ui.define([
 				delete mQueryOptions.$$leaves;
 				if (aGrandTotalAggregate.length) {
 					sApply = "concat(" + (sLeaves ? sLeaves + "," : "") + "aggregate("
-						+ aGrandTotalAggregate.join(",") + ")," + sApply + ")";
+						+ aGrandTotalAggregate.join(",") + ")," + (sApply || "identity") + ")";
 				} else if (sLeaves) {
 					sApply = "concat(" + sLeaves + "," + sApply + ")";
 				}
@@ -421,6 +511,8 @@ sap.ui.define([
 				delete mQueryOptions.$$filterBeforeAggregate;
 			}
 			if (sApply) {
+				// allow to combine w/ $expand/$select?
+				mQueryOptions.$$applyWithSelect = bUseIdentity && getApplyWithSelect();
 				mQueryOptions.$apply = sApply;
 			}
 
@@ -863,16 +955,24 @@ sap.ui.define([
 		 *
 		 * @param {object} oAggregation
 		 *   An object holding the information needed for data aggregation; see {@link #.buildApply}
+		 * @param {object} [mQueryOptions]
+		 *   An optional read-only map of key-value pairs representing the query string
+		 * @param {string[]} [mQueryOptions.$select]
+		 *   Optional array of paths
 		 * @returns {Array<(string|Array<string>)>}
 		 *   An unsorted list of all aggregatable or groupable properties, including units and
 		 *   additional properties (where paths are given as arrays of segments)
 		 *
 		 * @public
 		 */
-		getAllProperties : function (oAggregation) {
+		getAllProperties : function (oAggregation, mQueryOptions) {
 			var aAggregates = Object.keys(oAggregation.aggregate),
 				aGroups = Object.keys(oAggregation.group),
 				aAllProperties = aAggregates.concat(aGroups);
+
+			function push(sPath) {
+				aAllProperties.push(sPath.includes("/") ? sPath.split("/") : sPath);
+			}
 
 			aAggregates.forEach(function (sAlias) {
 				var sUnit = oAggregation.aggregate[sAlias].unit;
@@ -883,13 +983,10 @@ sap.ui.define([
 			});
 
 			aGroups.forEach(function (sGroup) {
-				oAggregation.group[sGroup].additionally
-					?.forEach(function (sAdditionally) {
-						aAllProperties.push(sAdditionally.includes("/")
-							? sAdditionally.split("/")
-							: sAdditionally);
-					});
+				oAggregation.group[sGroup].additionally?.forEach(push);
 			});
+
+			mQueryOptions?.$select?.forEach(push);
 
 			return aAllProperties;
 		},
@@ -1161,15 +1258,17 @@ sap.ui.define([
 		 *   An object holding the information needed for data aggregation; see {@link #.buildApply}
 		 * @param {object} oGrandTotal
 		 *   An object representing a grand total row response from the server
+		 * @param {object} mQueryOptions
+		 *   A read-only map of key-value pairs representing the query string
 		 *
 		 * @public
 		 */
-		handleGrandTotal : function (oAggregation, oGrandTotal) {
+		handleGrandTotal : function (oAggregation, oGrandTotal, mQueryOptions) {
 			if (oAggregation["grandTotal like 1.84"]) { // rename measures
 				_AggregationHelper.removeUI5grand__(oGrandTotal);
 			}
 			_AggregationHelper.setAnnotations(oGrandTotal, true, true, 0,
-				_AggregationHelper.getAllProperties(oAggregation));
+				_AggregationHelper.getAllProperties(oAggregation, mQueryOptions));
 
 			if (oAggregation.grandTotalAtBottomOnly === false) {
 				// Note: make shallow copy *before* there are private annotations!

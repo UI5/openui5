@@ -834,7 +834,8 @@ sap.ui.define([
 			},
 			$select : "abc,def/ghi,def/jkl",
 			$orderby : "foo,bar",
-			$search : "baz"
+			$search : "baz",
+			$$ignore : "drop this!"
 		}
 	}, { // garbage in, garbage out - do not touch if there is a type cast
 		expectedResultHandlerCalls : [

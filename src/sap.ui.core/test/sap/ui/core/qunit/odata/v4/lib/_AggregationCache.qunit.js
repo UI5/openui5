@@ -98,38 +98,30 @@ sap.ui.define([
 
 	//*********************************************************************************************
 [
-	{},
-	{$$filterBeforeAggregate : "foo", $apply : "bar"}
-].forEach(function (mQueryOptions, i) {
+	null, // improves code coverage
+	{
+		aggregate : {},
+		group : {},
+		groupLevels : []
+	}
+].forEach(function (oAggregation, i) {
 	QUnit.test("create: no aggregation #" + i, function (assert) {
-		var mAggregate = {},
-			oAggregation = i
-				? {
-					aggregate : mAggregate,
-					group : {},
-					groupLevels : []
-				}
-				: null, // improves code coverage
-			sQueryOptions = JSON.stringify(mQueryOptions);
-
 		this.mock(_AggregationHelper).expects("hasGrandTotal").exactly(i ? 1 : 0)
-			.withExactArgs(sinon.match.same(mAggregate)).returns(false);
+			.withExactArgs(sinon.match.same(oAggregation?.aggregate)).returns(false);
 		this.mock(_AggregationHelper).expects("hasMinOrMax").exactly(i ? 1 : 0)
-			.withExactArgs(sinon.match.same(mAggregate)).returns(false);
+			.withExactArgs(sinon.match.same(oAggregation?.aggregate)).returns(false);
 		this.mock(_MinMaxHelper).expects("createCache").never();
 		this.mock(_Cache).expects("create")
-			.withExactArgs("~requestor~", "resource/path", i ? {$apply : "filter(foo)/bar"} : {},
+			.withExactArgs("~requestor~", "resource/path", {},
 				"~sortExpandSelect~", "deep/resource/path", "~sharedRequest~")
 			.returns("~cache~");
 
 		assert.strictEqual(
 			// code under test
 			_AggregationCache.create("~requestor~", "resource/path", "deep/resource/path",
-				mQueryOptions, oAggregation, "~sortExpandSelect~", "~sharedRequest~",
+				Object.freeze({}), oAggregation, "~sortExpandSelect~", "~sharedRequest~",
 				/*bIsGrouped*/"n/a"),
 			"~cache~");
-
-		assert.strictEqual(JSON.stringify(mQueryOptions), sQueryOptions, "unchanged");
 	});
 });
 
@@ -207,45 +199,6 @@ sap.ui.define([
 				oAggregation),
 			"~cache~");
 	});
-
-	//*********************************************************************************************
-[{
-	groupLevels : ["BillToParty"],
-	hasGrandTotal : false,
-	hasMinOrMax : false
-}, {
-	hasGrandTotal : false,
-	hasMinOrMax : true
-}, {
-	hasGrandTotal : true,
-	hasMinOrMax : false
-}].forEach(function (oFixture, i) {
-	["$expand", "$select"].forEach(function (sName) {
-	QUnit.test("create: " + sName + " not allowed #" + i, function (assert) {
-		var oAggregation = {
-				aggregate : {},
-				group : {},
-				groupLevels : oFixture.groupLevels ?? []
-			},
-			mQueryOptions = {};
-
-		mQueryOptions[sName] = undefined; // even falsy values are forbidden!
-
-		this.mock(_AggregationHelper).expects("hasGrandTotal")
-			.withExactArgs(sinon.match.same(oAggregation.aggregate))
-			.returns(oFixture.hasGrandTotal);
-		this.mock(_AggregationHelper).expects("hasMinOrMax")
-			.withExactArgs(sinon.match.same(oAggregation.aggregate)).returns(oFixture.hasMinOrMax);
-		this.mock(_MinMaxHelper).expects("createCache").never();
-		this.mock(_Cache).expects("create").never();
-
-		assert.throws(function () {
-			// code under test
-			_AggregationCache.create(this.oRequestor, "Foo", "", mQueryOptions, oAggregation);
-		}, new Error("Unsupported system query option: " + sName));
-	});
-	});
-});
 
 	//*********************************************************************************************
 [{
@@ -375,7 +328,8 @@ sap.ui.define([
 		assert.strictEqual(oReadPromise.isPending(), true);
 
 		this.mock(_AggregationHelper).expects("handleGrandTotal")
-			.withExactArgs(sinon.match.same(oAggregation), "~oGrandTotal~");
+			.withExactArgs(sinon.match.same(oAggregation), "~oGrandTotal~",
+				sinon.match.same(oCache.mQueryOptions));
 
 		// code under test (fnGrandTotal)
 		oEnhanceCacheWithGrandTotalExpectation.args[0][2][0]("~oGrandTotal~");
@@ -624,6 +578,9 @@ sap.ui.define([
 			};
 
 		function isOK(o) {
+			if ("$$leaves" in o) {
+				return false;
+			}
 			if (oPICT.oParentGroupNode) {
 				return o.$$filterBeforeAggregate === (oPICT.sFilterBeforeAggregate
 					? "~filter~ and (~filterBeforeAggregate~)"
@@ -640,6 +597,7 @@ sap.ui.define([
 			aGroupBy = ["a", "b", "c"];
 			oPICT.oParentGroupNode["@$ui5.node.level"] = 2;
 			_Helper.setPrivateAnnotation(oPICT.oParentGroupNode, "filter", "~filter~");
+			mQueryOptions.$$leaves = "must be removed";
 		}
 		if (oPICT.bLeaf) {
 			// Note: duplicates do not hurt for key predicate, but order is important
@@ -649,11 +607,13 @@ sap.ui.define([
 			oAggregation.groupLevels.push("d"); // leaf level (JIRA: CPOUI5ODATAV4-2755)
 		}
 
-		oAggregationCache = _AggregationCache.create(this.oRequestor, "Foo", "",
+		oAggregationCache = _AggregationCache.create(this.oRequestor, "Foo(42)", "",
 			{/*$orderby : "~orderby~"*/}, oAggregation);
 
 		this.mock(_AggregationHelper).expects("getAllProperties")
-			.withExactArgs(sinon.match.same(oAggregation)).returns(aAllProperties);
+			.withExactArgs(sinon.match.same(oAggregation),
+				sinon.match.same(oAggregationCache.mQueryOptions))
+			.returns(aAllProperties);
 		this.mock(_AggregationHelper).expects("filterOrderby")
 			.withExactArgs(sinon.match.same(oAggregationCache.mQueryOptions),
 				sinon.match.same(oAggregation), iLevel)
@@ -668,7 +628,7 @@ sap.ui.define([
 				.returns(mCacheQueryOptions);
 		}
 		this.mock(_Cache).expects("create")
-			.withExactArgs(sinon.match.same(oAggregationCache.oRequestor), "Foo",
+			.withExactArgs(sinon.match.same(oAggregationCache.oRequestor), "Foo(42)",
 				sinon.match(function (o) {
 					// Note: w/o grand total, buildApply determines the query options to be used!
 					return o.$count
@@ -681,7 +641,7 @@ sap.ui.define([
 		// This must be done before calling createGroupLevelCache, so that bind grabs the mock
 		this.mock(_AggregationCache).expects("calculateKeyPredicate").on(null)
 			.withExactArgs(sinon.match.same(oPICT.oParentGroupNode), aGroupBy,
-				sinon.match.same(aAllProperties), oPICT.bLeaf, oPICT.bSubtotals,
+				sinon.match.same(aAllProperties), oPICT.bLeaf, oPICT.bSubtotals, "/Foo",
 				"~oElement~", "~mTypeForMetaPath~", "~metapath~")
 			.returns("~sPredicate~");
 		this.mock(_AggregationCache).expects("calculateKeyPredicateRH").never();
@@ -897,7 +857,8 @@ sap.ui.define([
 			assert.strictEqual(oCache.oGrandTotalPromise.isPending(), true);
 
 			this.mock(_AggregationHelper).expects("handleGrandTotal")
-				.withExactArgs(sinon.match.same(oNewAggregation), "~oGrandTotal~");
+				.withExactArgs(sinon.match.same(oNewAggregation), "~oGrandTotal~",
+					sinon.match.same(oCache.mQueryOptions));
 
 			// code under test
 			fnGrandTotal("~oGrandTotal~");
@@ -975,7 +936,8 @@ sap.ui.define([
 		assert.strictEqual(
 			// code under test
 			_AggregationCache.calculateKeyPredicate(bParent ? oGroupNode : undefined, aGroupBy,
-				aAllProperties, bLeaf, "~bTotal~", oElement, mTypeForMetaPath, "/meta/path"),
+				aAllProperties, bLeaf, "~bTotal~", "/meta/path", oElement, mTypeForMetaPath,
+				"/meta/path"),
 			"~predicate~");
 
 		assert.deepEqual(oElement, bParent ? {
@@ -1095,7 +1057,7 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("calculateKeyPredicate: nested object", function (assert) {
+	QUnit.test("calculateKeyPredicate: nested complex type", function (assert) {
 		var mTypeForMetaPath = {"/Artists" : {}};
 
 		this.mock(_Helper).expects("inheritPathValue").never();
@@ -1106,10 +1068,34 @@ sap.ui.define([
 
 		assert.strictEqual(
 			// code under test
-			_AggregationCache.calculateKeyPredicate(null, null, null, undefined, undefined, null,
-				mTypeForMetaPath, "/Artists/BestFriend"),
+			_AggregationCache.calculateKeyPredicate(null, null, null, undefined, undefined,
+				"/Artists", null, mTypeForMetaPath, "/Artists/Address"),
 			undefined);
 	});
+
+	//*********************************************************************************************
+[undefined, "('42')"].forEach((sPredicate) => {
+	const sTitle = "calculateKeyPredicate: nested entity, key predicate = " + sPredicate;
+
+	QUnit.test(sTitle, function (assert) {
+		var mTypeForMetaPath = {"/Artists" : {}, "/Artists/BestFriend" : {}};
+
+		this.mock(_Helper).expects("getKeyPredicate")
+			.withExactArgs("~oElement~", "/Artists/BestFriend", sinon.match.same(mTypeForMetaPath))
+			.returns(sPredicate);
+		this.mock(_Helper).expects("setPrivateAnnotation").exactly(sPredicate ? 1 : 0)
+			.withExactArgs("~oElement~", "predicate", "('42')");
+		this.mock(_Helper).expects("inheritPathValue").never();
+		this.mock(_Helper).expects("getKeyFilter").never();
+		this.mock(_AggregationHelper).expects("setAnnotations").never();
+
+		assert.strictEqual(
+			// code under test
+			_AggregationCache.calculateKeyPredicate(null, null, null, undefined, undefined,
+				"/Artists", "~oElement~", mTypeForMetaPath, "/Artists/BestFriend"),
+			sPredicate);
+	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("calculateKeyPredicateRH: nested object", function (assert) {
@@ -4832,6 +4818,7 @@ sap.ui.define([
 		this.mock(_AggregationHelper).expects("buildApply")
 			.withExactArgs(sinon.match.same(oCache.oAggregation), {
 				$$filterBeforeAggregate : "~$$filterBeforeAggregate~",
+				$apply : "~apply~", // Note: recreated anyway
 				custom : "~custom~"
 			}, -1)
 			.returns("~mQueryOptions~");
@@ -5640,14 +5627,45 @@ sap.ui.define([
 				group : {},
 				groupLevels : ["a"]
 			},
-			oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, oAggregation);
+			oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, oAggregation),
+			mFilteredQueryOptions = {
+				$apply : "A.P.P.L.E.",
+				$count : true,
+				$expand : {EMPLOYEE_2_TEAM : null},
+				$filter : "age gt 40",
+				$orderby : "TEAM_ID desc",
+				$search : "OR",
+				$select : ["Name"],
+				$skip : 17, // unrealistic, but ignored here
+				$top : 4, // dito
+				foo : "bar",
+				"sap-client" : "123",
+				$$leaves : "must be removed"
+			};
 
 		this.mock(_AggregationHelper).expects("filterOrderby")
 			.withExactArgs("~mQueryOptions~", sinon.match.same(oAggregation))
-			.returns("~mFilteredQueryOptions~");
+			.returns(mFilteredQueryOptions);
 		this.mock(_AggregationHelper).expects("buildApply")
-			.withExactArgs(sinon.match.same(oAggregation), "~mFilteredQueryOptions~", 0, true)
-			.returns("~result~");
+			.withExactArgs(sinon.match.same(oAggregation), sinon.match.same(mFilteredQueryOptions),
+				0, true)
+			.callsFake((_oAggregation, mQueryOptions) => {
+				assert.deepEqual(mQueryOptions, {
+					$apply : "A.P.P.L.E.",
+					$count : true,
+					$expand : {EMPLOYEE_2_TEAM : null},
+					$filter : "age gt 40",
+					$orderby : "TEAM_ID desc",
+					$search : "OR",
+					$select : ["Name"],
+					$skip : 17,
+					$top : 4,
+					foo : "bar",
+					"sap-client" : "123"
+					// NO $$leaves
+				});
+				return "~result~";
+			});
 
 		// code under test
 		assert.strictEqual(oCache.getDownloadQueryOptions("~mQueryOptions~"), "~result~");

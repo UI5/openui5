@@ -557,19 +557,26 @@ sap.ui.define([
 		assert.strictEqual(_Helper.buildQuery(), "");
 		assert.strictEqual(_Helper.buildQuery({}, true), "");
 		assert.strictEqual(_Helper.buildQuery({$$foo : "n/a"}, true), "");
+		assert.strictEqual(_Helper.buildQuery({$$applyWithSelect : "n/a"}, true), "");
 	});
 
 	//*********************************************************************************************
 	QUnit.test("buildQuery: query", function (assert) {
-		var sEncoded,
-			oHelperMock = this.mock(_Helper);
-
+		const oHelperMock = this.mock(_Helper);
 		oHelperMock.expects("encodePair").withExactArgs("a", "b").returns("a=b");
 		oHelperMock.expects("encodePair").withExactArgs("c", "d").returns("c=d");
 		oHelperMock.expects("encodePair").withExactArgs("c", "e").returns("c=e");
+		const mQueryOptions = Object.freeze({
+			a : "b",
+			c : ["d", "e"],
+			$$foo : "n/a",
+			$$filterBeforeAggregate : "n/a w/o $apply"
+		});
 
-		sEncoded = _Helper.buildQuery({a : "b", c : ["d", "e"], $$foo : "n/a"});
-		assert.strictEqual(sEncoded, "?a=b&c=d&c=e");
+		assert.strictEqual(
+			// code under test
+			_Helper.buildQuery(mQueryOptions),
+			"?a=b&c=d&c=e");
 	});
 
 	//*********************************************************************************************
@@ -581,11 +588,23 @@ sap.ui.define([
 		oHelperMock.expects("encodePair").withExactArgs("$x", "x").returns("$x=x");
 		oHelperMock.expects("encodePair").withExactArgs("$y", "y").returns("$y=y");
 		oHelperMock.expects("encodePair").withExactArgs("$z", "z").returns("$z=z");
+		oHelperMock.expects("encodePair")
+			.withExactArgs("$apply", "filter(filter*Before*Aggregate)/A.P.P.L.E.")
+			.returns("$apply=~");
+		const mQueryOptions = Object.freeze({
+			$z : "z",
+			c : ["d", "e"],
+			$y : "y",
+			a : "b",
+			$x : "x",
+			$apply : "A.P.P.L.E.",
+			$$filterBeforeAggregate : "filter*Before*Aggregate"
+		});
 
 		assert.strictEqual(
 			// code under test
-			_Helper.buildQuery({$z : "z", c : ["d", "e"], $y : "y", a : "b", $x : "x"}, true),
-			"?c=d&c=e&a=b&$x=x&$y=y&$z=z");
+			_Helper.buildQuery(mQueryOptions, true),
+			"?c=d&c=e&a=b&$apply=~&$x=x&$y=y&$z=z");
 	});
 
 	//*********************************************************************************************
@@ -607,6 +626,103 @@ sap.ui.define([
 		sURL = _Helper.buildQuery({[sComplexString] : "foo"});
 
 		assert.strictEqual(decodeURIComponent(sURL), `?${sComplexString}=foo`);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("buildQuery: $$applyWithSelect", function (assert) {
+		this.mock(_Helper).expects("getJoinedPaths").never();
+
+		assert.strictEqual(
+			// code under test
+			_Helper.buildQuery(Object.freeze({ // unsorted!
+				$apply : "A.P.P.L.E.",
+				$filter : "foo",
+				$expand : "bar",
+				$search : "covfefe",
+				$select : "Name",
+				$count : true
+			})),
+			"?$apply=A.P.P.L.E.&$filter=foo&$expand=bar&$search=covfefe&$select=Name&$count=true");
+
+		assert.strictEqual(
+			// code under test
+			_Helper.buildQuery(Object.freeze({ // unsorted!
+				// NO $apply - for robustness sake
+				$$applyWithSelect : false, // must be ignored
+				$filter : "foo",
+				$expand : "bar",
+				$search : "covfefe",
+				$select : "Name",
+				$count : true
+			})),
+			"?$filter=foo&$expand=bar&$search=covfefe&$select=Name&$count=true");
+
+		assert.strictEqual(
+			// code under test
+			_Helper.buildQuery(Object.freeze({ // unsorted!
+				$apply : "A.P.P.L.E.",
+				$$applyWithSelect : false,
+				$filter : "foo",
+				$expand : "n/a",
+				$search : "covfefe",
+				$select : "n/a",
+				$count : true
+			})),
+			"?$apply=A.P.P.L.E.&$filter=foo&$search=covfefe&$count=true");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("buildQuery: $$applyWithSelect, getJoinedPaths", function (assert) {
+		this.mock(_Helper).expects("getJoinedPaths").twice()
+			.withExactArgs("~applyWithSelect~", "A,B,C").returns("X,Y,Z");
+
+		assert.strictEqual(
+			// code under test
+			_Helper.buildQuery(Object.freeze({ // unsorted!
+				$apply : "A.P.P.L.E.",
+				$$applyWithSelect : "~applyWithSelect~",
+				$filter : "foo",
+				$expand : "bar",
+				$search : "covfefe",
+				$select : "A,B,C",
+				$count : true
+			})),
+			"?$apply=A.P.P.L.E.&$count=true&$expand=bar&$filter=foo&$search=covfefe&$select=X,Y,Z",
+			"sorted!");
+
+		assert.strictEqual(
+			// code under test
+			_Helper.buildQuery(Object.freeze({ // unsorted!
+				// NO $apply
+				$$applyWithSelect : "~applyWithSelect~", // must NOT be ignored
+				$filter : "foo",
+				$expand : "bar",
+				$search : "covfefe",
+				$select : "A,B,C",
+				$count : true
+			})),
+			"?$count=true&$expand=bar&$filter=foo&$search=covfefe&$select=X,Y,Z",
+			"$$applyWithSelect joined w/ $select");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("buildQuery: $$applyWithSelect, getJoinedPaths w/o $select", function (assert) {
+		this.mock(_Helper).expects("getJoinedPaths")
+			.withExactArgs("~applyWithSelect~", undefined).returns("X,Y,Z");
+
+		assert.strictEqual(
+			// code under test
+			_Helper.buildQuery(Object.freeze({ // unsorted!
+				$apply : "A.P.P.L.E.",
+				$$applyWithSelect : "~applyWithSelect~",
+				$filter : "foo",
+				$expand : "bar",
+				$search : "covfefe",
+				// NO $select
+				$count : true
+			})),
+			"?$apply=A.P.P.L.E.&$count=true&$expand=bar&$filter=foo&$search=covfefe&$select=X,Y,Z",
+			"sorted!");
 	});
 
 	//*********************************************************************************************
@@ -6277,6 +6393,38 @@ sap.ui.define([
 				encoded : "ID eq '1'",
 				foo : "bar"
 			});
+	});
+
+	//*********************************************************************************************
+	QUnit.test("getJoinedPaths", function (assert) {
+		const aEmpty = Object.freeze([]);
+
+		assert.strictEqual(
+			// code under test
+			_Helper.getJoinedPaths(aEmpty),
+			"");
+
+		assert.strictEqual(
+			// code under test
+			_Helper.getJoinedPaths(aEmpty, "X"),
+			"X");
+
+		assert.strictEqual(
+			// code under test
+			_Helper.getJoinedPaths(aEmpty, "C,B,A"),
+			"A,B,C");
+
+		const aXYZ = Object.freeze(["X", "Y", "Z"]);
+
+		assert.strictEqual(
+			// code under test
+			_Helper.getJoinedPaths(aXYZ),
+			"X,Y,Z");
+
+		assert.strictEqual(
+			// code under test
+			_Helper.getJoinedPaths(aXYZ, "X,C,B,A,Z"),
+			"A,B,C,X,Y,Z");
 	});
 
 	//*********************************************************************************************

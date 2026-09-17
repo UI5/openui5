@@ -584,9 +584,12 @@ sap.ui.define([
 					that.mQueryOptions, sResultingPath, oEntityData, oCreatedEntity,
 					_Helper.getPrivateAnnotation(oEntityData, "select"));
 				if (!bDeepCreate) { // after a deep create the complete response is accepted
-					aSelect = _Helper.getQueryOptionsForPath(
+					const mQueryOptions = _Helper.getQueryOptionsForPath(
 						that.mLateExpandSelect ?? that.mQueryOptions, sPath
-					).$select;
+					);
+					aSelect = mQueryOptions.$$applyWithSelect === false
+						? undefined // ignore $select, just like before
+						: mQueryOptions.$select;
 					_Helper.setPrivateAnnotation(oEntityData, "postResponse", oCreatedEntity);
 				}
 				// update all existing properties (including the properties of the initial data)

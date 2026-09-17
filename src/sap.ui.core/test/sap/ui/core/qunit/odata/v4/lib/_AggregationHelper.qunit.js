@@ -381,7 +381,7 @@ sap.ui.define([
 			+ "/filter(SalesNumber ge 100)/orderby(Region desc)"
 			+ "/concat(aggregate(SalesNumber with min as UI5min__SalesNumber"
 				+ ",SalesNumber with max as UI5max__SalesNumber,$count as UI5__count),identity)",
-		// Note: use this for download URL
+		// Note: this is used for download URL (_AC#getDownloadQueryOptions)
 		sFollowUpApply : "filter(TransactionCurrency ne 'EUR' and Region ne 'UK')"
 			+ "/groupby((TransactionCurrency,Region,A,B,C,CountryText,Texts/Country)"
 				+ ",aggregate(Amount,Currency,SalesNumber))"
@@ -389,6 +389,51 @@ sap.ui.define([
 		mExpectedAlias2MeasureAndMethod : {
 			UI5max__SalesNumber : {measure : "SalesNumber", method : "max"},
 			UI5min__SalesNumber : {measure : "SalesNumber", method : "min"}
+		}
+	}, {
+		// unaggregated leaf: bypassing visual grouping with iLevel = 0
+		// bFollowUp = false: keep concat (min/max), but use identity (no groupby)
+		// bFollowUp = true: no $apply needed
+		oAggregation : {
+			$leafLevelAggregated : false,
+			aggregate : {
+				Amount : {grandTotal : true}, // ignored with iLevel=0
+				SalesNumber : {max : true} // must still be added to concat with iLevel=0
+			},
+			group : {
+				Country : {additionally : ["CountryText", "Texts/Country"]},
+				Region : {additionally : ["RegionText", "Texts/Region"]}
+			},
+			groupLevels : ["Country", "Region", "ID"],
+			search : "covfefe"
+		},
+		mQueryOptions : {
+			$$filterBeforeAggregate : "Name eq 'foo'",
+			$count : true,
+			$orderby : "ID",
+			$skip : 3,
+			$top : 42
+		},
+		iLevel : 0,
+		bExpandAfterConcatSupported : true,
+		//TODO: "CountryText", "Texts/Country", "RegionText", "Texts/Region"
+		aApplyWithSelect : ["Amount", "Country", "ID", "Region", "SalesNumber", "UI5__count",
+			"UI5max__SalesNumber"],
+		sApply : "filter(Name eq 'foo')/search(covfefe)/orderby(ID)"
+			+ "/concat(aggregate(SalesNumber with max as UI5max__SalesNumber,$count as UI5__count)"
+			+ ",skip(3)/top(42))",
+		// Note: this is used for download URL (_AC#getDownloadQueryOptions)
+		mFollowUpQueryOptions : {
+			$filter : "Name eq 'foo'",
+			$orderby : "ID",
+			$search : "covfefe",
+			$skip : 3,
+			$top : 42
+		},
+		//TODO: "CountryText", "Texts/Country", "RegionText", "Texts/Region"
+		aFollowUpApplyWithSelect : ["Amount", "Country", "ID", "Region", "SalesNumber"],
+		mExpectedAlias2MeasureAndMethod : {
+			UI5max__SalesNumber : {measure : "SalesNumber", method : "max"}
 		}
 	}, {
 		oAggregation : {
@@ -774,6 +819,8 @@ sap.ui.define([
 			+ "/filter(SalesNumber ge 0)"
 	}, {
 		oAggregation : {
+			// $leafLevelAggregated not yet determined? do not remove groupby on leaf level
+			$leafLevelAggregated : undefined,
 			aggregate : {
 				SalesNumber : {}
 			},
@@ -786,6 +833,9 @@ sap.ui.define([
 			+ ",aggregate(SalesNumber))"
 	}, {
 		oAggregation : {
+			// $leafLevelAggregated=false is unrealistic for the given oAggregation, but make sure
+			// groupby is not removed on leaf level if "grandTotal like 1.84" is set
+			$leafLevelAggregated : false,
 			aggregate : {
 				SalesAmount : {grandTotal : true, unit : "Currency"}
 			},
@@ -802,6 +852,7 @@ sap.ui.define([
 			$skip : 42,
 			$top : 99
 		},
+		// NO aApplyWithSelect
 		sApply : "filter(Name eq 'Foo')/groupby((Country),aggregate(SalesAmount,Currency))"
 			+ "/filter(SalesAmount gt 0)/orderby(Country desc)"
 			+ "/concat(aggregate(SalesAmount,Currency),aggregate($count as UI5__count)"
@@ -893,6 +944,9 @@ sap.ui.define([
 			+ "/filter(SalesAmountSum gt 0)/orderby(Country desc)/skip(42)/top(99)"
 	}, {
 		oAggregation : {
+			// $leafLevelAggregated=false is unrealistic for the given oAggregation, but make sure
+			// groupby is not removed on a group level
+			$leafLevelAggregated : false,
 			aggregate : {
 				GrossAmount : {subtotals : true}
 			},
@@ -909,6 +963,7 @@ sap.ui.define([
 			$orderby : "LifecycleStatus desc",
 			$top : 3
 		},
+		// NO aApplyWithSelect
 		sApply : "concat(groupby((CurrencyCode,LifecycleStatus))/aggregate($count as UI5__leaves)"
 			+ ",groupby((LifecycleStatus),aggregate(GrossAmount))/orderby(LifecycleStatus desc)"
 			+ "/concat(aggregate($count as UI5__count),top(3)))",
@@ -956,6 +1011,8 @@ sap.ui.define([
 		sFollowUpApply : "groupby((LifecycleStatus),aggregate(GrossAmount))/top(3)"
 	}, {
 		oAggregation : {
+			// make sure not to use identity if the leaf level is aggregated
+			$leafLevelAggregated : true,
 			aggregate : {
 				Amount : {grandTotal : true}
 			},
@@ -975,6 +1032,8 @@ sap.ui.define([
 			+ "/groupby((A,B,C),aggregate(Amount))"
 	}, {
 		oAggregation : {
+			// must not consider $leafLevelAggregated if iLevel = -1
+			$leafLevelAggregated : false,
 			aggregate : {
 				Amount : {grandTotal : true}
 			},
@@ -988,21 +1047,160 @@ sap.ui.define([
 			$$filterBeforeAggregate : "~filterBeforeAggregate~"
 		},
 		sApply : "filter(~filterBeforeAggregate~)/search(covfefe)/aggregate(Amount)"
+	}, {
+		// unaggregated leaf: aggregate+group, no groupby, previous $apply removed
+		oAggregation : {
+			$leafLevelAggregated : false,
+			aggregate : {Amount : {}},
+			group : {ID : {}}
+		},
+		bExpandAfterConcatSupported : true,
+		aApplyWithSelect : ["Amount", "ID"],
+		mQueryOptions : {$apply : "old apply"},
+		sApply : ""
+	}, {
+		// unaggregated leaf: with grand total
+		oAggregation : {
+			$leafLevelAggregated : false,
+			aggregate : {SalesAmount : {grandTotal : true, unit : "Currency"}},
+			group : {ID : {additionally : ["a", "b/c"]}}
+		},
+		bExpandAfterConcatSupported : true,
+		//TODO: "a", "b/c"
+		aApplyWithSelect : ["Currency", "ID", "SalesAmount"],
+		sApply : "concat(aggregate(SalesAmount,Currency),identity)",
+		sFollowUpApply : ""
+	}, {
+		// unaggregated leaf: with grand total and skip/top
+		oAggregation : {
+			$leafLevelAggregated : false,
+			aggregate : {SalesNumber : {grandTotal : true}},
+			group : {ID : {}}
+		},
+		mQueryOptions : {
+			$skip : 3,
+			$top : 42
+		},
+		bExpandAfterConcatSupported : true,
+		aApplyWithSelect : ["ID", "SalesNumber"],
+		sApply : "concat(aggregate(SalesNumber),skip(3)/top(42))",
+		mFollowUpQueryOptions : {
+			$skip : 3,
+			$top : 42
+		}
+	}, {
+		// unaggregated leaf: with grand total and skip/top, same as in the previous test but
+		// ExpandAfterConcatSupported is not enabled => groupby is used instead of identity
+		oAggregation : {
+			$leafLevelAggregated : false,
+			aggregate : {Amount : {grandTotal : true}},
+			group : {ID : {}}
+		},
+		mQueryOptions : {
+			$skip : 3,
+			$top : 42
+		},
+		bExpandAfterConcatSupported : false,
+		sApply : "concat(aggregate(Amount),groupby((ID),aggregate(Amount))/skip(3)/top(42))",
+		aFollowUpApplyWithSelect : ["Amount", "ID"],
+		mFollowUpQueryOptions : {
+			$skip : 3,
+			$top : 42
+		}
+	}, {
+		// unaggregated leaf: with "min" aggregate
+		oAggregation : {
+			$leafLevelAggregated : false,
+			aggregate : {Amount : {min : true}},
+			group : {ID : {}}
+		},
+		bExpandAfterConcatSupported : true,
+		aApplyWithSelect : ["Amount", "ID", "UI5min__Amount"],
+		sApply : "concat(aggregate(Amount with min as UI5min__Amount),identity)",
+		sFollowUpApply : "",
+		aFollowUpApplyWithSelect : ["Amount", "ID"],
+		mExpectedAlias2MeasureAndMethod : {UI5min__Amount : {measure : "Amount", method : "min"}}
+	}, {
+		// unaggregated leaf: combined options
+		oAggregation : {
+			$leafLevelAggregated : false,
+			aggregate : {SalesNumber : {grandTotal : true}},
+			group : {ID : {additionally : ["Name"]}},
+			search : "covfefe"
+		},
+		mQueryOptions : {
+			$$filterBeforeAggregate : "Name eq 'foo'",
+			$count : true,
+			$orderby : "ID",
+			$skip : 3,
+			$top : 42
+		},
+		bExpandAfterConcatSupported : true,
+		aApplyWithSelect : ["ID", "SalesNumber", "UI5__count"], //TODO: "Name"
+		sApply : "filter(Name eq 'foo')/search(covfefe)"
+			+ "/concat(aggregate(SalesNumber),orderby(ID)"
+			+ "/concat(aggregate($count as UI5__count),skip(3)/top(42)))",
+		mFollowUpQueryOptions : {
+			$filter : "Name eq 'foo'",
+			$orderby : "ID",
+			$search : "covfefe",
+			$skip : 3,
+			$top : 42
+		},
+		aFollowUpApplyWithSelect : ["ID", "SalesNumber"] //TODO: "Name"
+	}, {
+		// unaggregated leaf: must not consider $leafLevelAggregated when defining an alias
+		oAggregation : {
+			$leafLevelAggregated : false,
+			aggregate : {
+				Amount : {},
+				SalesNumberAlias : {name : "SalesNumber"}
+			},
+			group : {ID : {}}
+		},
+		sApply : "groupby((ID),aggregate(Amount,SalesNumber as SalesNumberAlias))"
 	}].forEach(function (oFixture) {
-		QUnit.test("buildApply with " + oFixture.sApply, function (assert) {
+		const sTitle = "buildApply with " + oFixture.sApply
+			+ "; $leafLevelAggregated=" + oFixture.oAggregation.$leafLevelAggregated
+			+ "; aApplyWithSelect=" + oFixture.aApplyWithSelect;
+
+		QUnit.test(sTitle, function (assert) {
 			var mAlias2MeasureAndMethod = {},
-				sFollowUpApply = oFixture.sFollowUpApply || oFixture.sApply,
+				sFollowUpApply = oFixture.sFollowUpApply ?? oFixture.sApply,
 				iLevel = "iLevel" in oFixture ? oFixture.iLevel : 1,
 				sQueryOptionsJSON = JSON.stringify(oFixture.mQueryOptions),
 				mResult;
 
+			function deepEqual(bFollowUp) {
+				const mExpected = bFollowUp // eslint-disable-line no-nested-ternary
+					? oFixture.mFollowUpQueryOptions
+						?? (sFollowUpApply ? {$apply : sFollowUpApply} : {})
+					: (oFixture.sApply ? {$apply : oFixture.sApply} : {});
+				const aApplyWithSelect = bFollowUp && oFixture.aFollowUpApplyWithSelect
+					|| oFixture.aApplyWithSelect;
+				if (aApplyWithSelect) {
+					assert.ok(Object.isFrozen(mResult.$$applyWithSelect),
+						bFollowUp ? "follow-up $$applyWithSelect" : "1st $$applyWithSelect");
+					assert.deepEqual(mResult.$$applyWithSelect, aApplyWithSelect);
+					delete mResult.$$applyWithSelect;
+				} else if (!_Helper.isEmptyObject(mExpected)) {
+					mExpected.$$applyWithSelect = false;
+				}
+				assert.deepEqual(mResult, mExpected, bFollowUp ? "sFollowUpApply" : "sApply");
+			}
+
+			oFixture.oAggregation.$fetchMetadata = mustBeMocked;
+			this.mock(oFixture.oAggregation).expects("$fetchMetadata")
+				.atMost("bExpandAfterConcatSupported" in oFixture ? 3 : 0)
+				.withArgs("/@com.sap.vocabularies.Common.v1.ExpandAfterConcatSupported")
+				.returns(SyncPromise.resolve(oFixture.bExpandAfterConcatSupported));
 			this.mock(_AggregationHelper).expects("checkTypeof").never();
 
 			// code under test
 			mResult = _AggregationHelper.buildApply(oFixture.oAggregation, oFixture.mQueryOptions,
 				iLevel, false, mAlias2MeasureAndMethod);
 
-			assert.deepEqual(mResult, {$apply : oFixture.sApply}, "sApply");
+			deepEqual();
 			assert.deepEqual(mAlias2MeasureAndMethod,
 				oFixture.mExpectedAlias2MeasureAndMethod ?? {}, "mAlias2MeasureAndMethod");
 
@@ -1012,7 +1210,7 @@ sap.ui.define([
 			mResult = _AggregationHelper.buildApply(oFixture.oAggregation, oFixture.mQueryOptions,
 				iLevel === 0 ? undefined : iLevel, undefined, mAlias2MeasureAndMethod);
 
-			assert.deepEqual(mResult, {$apply : oFixture.sApply}, "sApply");
+			deepEqual();
 			assert.deepEqual(mAlias2MeasureAndMethod,
 				oFixture.mExpectedAlias2MeasureAndMethod ?? {}, "mAlias2MeasureAndMethod");
 
@@ -1022,7 +1220,7 @@ sap.ui.define([
 			mResult = _AggregationHelper.buildApply(oFixture.oAggregation,
 				oFixture.mQueryOptions, iLevel, true, mAlias2MeasureAndMethod);
 
-			assert.deepEqual(mResult, {$apply : sFollowUpApply}, "sFollowUpApply");
+			deepEqual(true);
 			assert.deepEqual(mAlias2MeasureAndMethod, {}, "mAlias2MeasureAndMethod");
 
 			assert.strictEqual(JSON.stringify(oFixture.mQueryOptions), sQueryOptionsJSON,
@@ -1066,6 +1264,56 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("buildApply: never build $apply on leaf; iLevel > 1", function (assert) {
+		function deepEqual(mActual, mExpected) {
+			assert.deepEqual(mActual.$$applyWithSelect, ["Country", "ID", "SalesNumber"]);
+			delete mActual.$$applyWithSelect;
+			assert.deepEqual(mActual, mExpected);
+		}
+
+		const oAggregation = {
+			$fetchMetadata : mustBeMocked,
+			$leafLevelAggregated : false,
+			aggregate : {SalesNumber : {grandTotal : true}},
+			groupLevels : ["Country", "ID"], // last group level = leaf level
+			search : "covfefe"
+		};
+		const mQueryOptions = {
+			$$filterBeforeAggregate : "Name eq 'foo'",
+			$count : true,
+			$orderby : "ID",
+			$skip : 3,
+			$top : 42
+		};
+
+		this.mock(oAggregation).expects("$fetchMetadata").never();
+
+		deepEqual(
+			// code under test
+			_AggregationHelper.buildApply(oAggregation, mQueryOptions, 2, /*bFollowUp*/false),
+			{
+				$count : true,
+				$filter : "Name eq 'foo'",
+				$orderby : "ID",
+				$search : "covfefe",
+				$skip : 3,
+				$top : 42
+			});
+
+		deepEqual(
+			// code under test
+			_AggregationHelper.buildApply(oAggregation, mQueryOptions, 2, /*bFollowUp*/true),
+			{
+				// NO $count : true,
+				$filter : "Name eq 'foo'",
+				$orderby : "ID",
+				$search : "covfefe",
+				$skip : 3,
+				$top : 42
+			});
+	});
+
+	//*********************************************************************************************
 	QUnit.test("buildApply: optional mAlias2MeasureAndMethod", function (assert) {
 		// mAlias2MeasureAndMethod is optional in _AggregationHelper.buildApply
 		assert.deepEqual(_AggregationHelper.buildApply({
@@ -1075,9 +1323,11 @@ sap.ui.define([
 				group : {
 					BillToParty : {}
 				}
-			}),
-			{$apply : "groupby((BillToParty),aggregate(Amount))"
-				+ "/concat(aggregate(Amount with max as UI5max__Amount),identity)"});
+			}), {
+				$apply : "groupby((BillToParty),aggregate(Amount))"
+					+ "/concat(aggregate(Amount with max as UI5max__Amount),identity)",
+				$$applyWithSelect : false
+			});
 	});
 
 	//*********************************************************************************************
@@ -1114,6 +1364,22 @@ sap.ui.define([
 			}, new Error(oFixture.sError));
 		});
 	});
+
+	//*********************************************************************************************
+["$filter", "$$filterOnAggregate", "$$leaves"].forEach(function (sOption) {
+	QUnit.test("buildApply: identity, illegal option " + sOption, function (assert) {
+		const oAggregation = {
+			$leafLevelAggregated : false,
+			group : {ID : {}}
+		};
+		const mQueryOptions = {[sOption] : "foo"};
+
+		assert.throws(function () {
+			// code under test
+			_AggregationHelper.buildApply(oAggregation, mQueryOptions);
+		}, new Error("Cannot combine identity with " + sOption));
+	});
+});
 
 	//*********************************************************************************************
 [0, 1, 2].forEach(function (iLevel) {
@@ -1884,7 +2150,8 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(oGrandTotal));
 		const aAllProperties = [];
 		this.mock(_AggregationHelper).expects("getAllProperties")
-			.withExactArgs(sinon.match.same(oAggregation)).returns(aAllProperties);
+			.withExactArgs(sinon.match.same(oAggregation), "~mQueryOptions~")
+			.returns(aAllProperties);
 		this.mock(_AggregationHelper).expects("setAnnotations")
 			.withExactArgs(sinon.match.same(oGrandTotal), true, true, 0,
 				sinon.match.same(aAllProperties));
@@ -1903,7 +2170,7 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(oGrandTotal), "predicate", "()");
 
 		// code under test
-		_AggregationHelper.handleGrandTotal(oAggregation, oGrandTotal);
+		_AggregationHelper.handleGrandTotal(oAggregation, oGrandTotal, "~mQueryOptions~");
 	});
 	});
 });
@@ -2668,8 +2935,16 @@ sap.ui.define([
 
 		assert.deepEqual(
 			// code under test
-			_AggregationHelper.getAllProperties(oAggregation),
+			_AggregationHelper.getAllProperties(oAggregation, {}),
 			["x", "y", "c", "a", "b", "UnitY", "TextA", ["Texts", "A"]]);
+
+		assert.deepEqual(
+			// code under test
+			_AggregationHelper.getAllProperties(oAggregation, {
+				$select : ["also", "some/deep/path"]
+			}),
+			["x", "y", "c", "a", "b", "UnitY", "TextA", ["Texts", "A"],
+				"also", ["some", "deep", "path"]]);
 	});
 
 	//*********************************************************************************************
