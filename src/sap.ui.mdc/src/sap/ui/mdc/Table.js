@@ -2514,7 +2514,7 @@ sap.ui.define([
 		const {tree: fnTree, node: fnNode, isExpanded: fnIsExpanded} = mConfig;
 
 		if (this.getSelectionMode() === "None" || typeof fnNode !== "function" || typeof fnIsExpanded !== "function") {
-			return ToolbarSettings.createExpandCollapseButton(this.getId(), bIsExpand, () => fnTree(this));
+			return ToolbarSettings.createExpandCollapseButton(this.getId(), bIsExpand, () => fnTree(this), "$sap.ui.mdc.Table");
 		}
 
 		const oMenuButton = ToolbarSettings.createExpandCollapseMenuButton(this.getId(), bIsExpand, {
@@ -2523,7 +2523,7 @@ sap.ui.define([
 				const aContexts = this.getSelectedContexts();
 				return aContexts.length === 1 && fnNode(this, aContexts[0]);
 			}
-		});
+		}, "$sap.ui.mdc.Table");
 
 		oMenuButton.attachBeforeMenuOpen(() => {
 			const aContexts = this.getSelectedContexts();
