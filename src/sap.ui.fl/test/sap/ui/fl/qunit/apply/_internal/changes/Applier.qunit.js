@@ -15,6 +15,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/changes/FlexCustomData",
 	"sap/ui/fl/apply/_internal/changes/Utils",
 	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
@@ -39,6 +40,7 @@ sap.ui.define([
 	FlexCustomData,
 	ChangeUtils,
 	DependencyHandler,
+	VariantManagementState,
 	FlexObjectState,
 	FlexState,
 	ManifestUtils,
@@ -1817,6 +1819,141 @@ sap.ui.define([
 			.catch(function() {
 				assert.ok(false, "then the apply process must not fail");
 			});
+		});
+	});
+
+	QUnit.module("applyAllChangesForControl - variant-dependent changes on late-rendering controls", {
+		async beforeEach() {
+			this.sReference = "DummyFlexReference";
+			this.sVMReference = "vmReference";
+			this.sCurrentVariant = "currentVariant";
+			this.oSelectorComponent = new UIComponent("mockComponentVariant");
+			this.oSelectorComponent.runAsOwner(function() {
+				this.oControl = new Control("someId");
+			}.bind(this));
+			this.oApplyChangeOnControlStub = sandbox.stub(Applier, "applyChangeOnControl").resolves({ success: true });
+			this.oAppComponent = new UIComponent("appComponentVariant");
+			sandbox.stub(FlUtils, "getAppComponentForControl").callThrough().withArgs(this.oControl).returns(this.oAppComponent);
+
+			// The change belongs to a variant management; the current variant is resolved from the state.
+			sandbox.stub(VariantManagementState, "getVariantManagementReferences").returns([this.sVMReference]);
+			sandbox.stub(VariantManagementState, "getCurrentVariantReference")
+			.returns(this.sCurrentVariant);
+
+			await FlQUnitUtils.initializeFlexStateWithData(sandbox, "testScenarioComponent");
+		},
+		afterEach() {
+			this.oControl.destroy();
+			this.oSelectorComponent.destroy();
+			this.oAppComponent.destroy();
+			VariantManagementState.setVariantSwitchPromise(this.sReference, this.sVMReference, () => Promise.resolve());
+			FlexState.clearState("testScenarioComponent");
+			sandbox.restore();
+		}
+	}, function() {
+		function getVariantChangeContent(sVariantReference) {
+			return {
+				fileType: "change",
+				layer: Layer.USER,
+				fileName: `change_${sVariantReference}`,
+				changeType: "labelChange",
+				reference: "",
+				variantReference: sVariantReference,
+				selector: { id: "someId", idIsLocal: false },
+				content: {}
+			};
+		}
+
+		QUnit.test("a change that belongs to the current variant is queued and applied", function(assert) {
+			const oChange = FlexObjectFactory.createFromFileContent(getVariantChangeContent(this.sCurrentVariant));
+			const oSetQueuedForApplySpy = sandbox.spy(oChange, "setQueuedForApply");
+			sandbox.stub(VariantManagementState, "getControlChangesForVariant").returns([oChange]);
+			const oDependencyMap = getInitialDependencyMap({ mChanges: { someId: [oChange] } });
+			sandbox.stub(FlexObjectState, "getLiveDependencyMap").returns(oDependencyMap);
+
+			return Applier.applyAllChangesForControl(this.oAppComponent, this.sReference, this.oControl)
+			.then(function() {
+				assert.ok(oSetQueuedForApplySpy.calledOnce, "the change was queued for apply");
+				assert.strictEqual(this.oApplyChangeOnControlStub.callCount, 1, "the change was applied");
+				assert.ok(oDependencyMap.mChanges.someId.includes(oChange), "the change stays in the dependency map");
+			}.bind(this));
+		});
+
+		QUnit.test("a change that no longer belongs to the current variant is removed from the map and not applied", function(assert) {
+			const oStaleChange = FlexObjectFactory.createFromFileContent(getVariantChangeContent("otherVariant"));
+			const oSetQueuedForApplySpy = sandbox.spy(oStaleChange, "setQueuedForApply");
+			// The current variant does not contain the stale change.
+			sandbox.stub(VariantManagementState, "getControlChangesForVariant").returns([]);
+			const oDependencyMap = getInitialDependencyMap({ mChanges: { someId: [oStaleChange] } });
+			sandbox.stub(FlexObjectState, "getLiveDependencyMap").returns(oDependencyMap);
+			const oRemoveFromMapSpy = sandbox.spy(DependencyHandler, "removeChangeFromMap");
+			const oRemoveFromDependenciesSpy = sandbox.spy(DependencyHandler, "removeChangeFromDependencies");
+
+			return Applier.applyAllChangesForControl(this.oAppComponent, this.sReference, this.oControl)
+			.then(function() {
+				assert.strictEqual(oSetQueuedForApplySpy.callCount, 0, "the stale change was not queued for apply");
+				assert.strictEqual(this.oApplyChangeOnControlStub.callCount, 0, "the stale change was not applied");
+				assert.ok(
+					oRemoveFromMapSpy.calledWith(oDependencyMap, oStaleChange.getId()),
+					"the stale change was removed from the dependency map"
+				);
+				assert.ok(
+					oRemoveFromDependenciesSpy.calledWith(oDependencyMap, oStaleChange.getId()),
+					"the stale change dependencies were removed"
+				);
+				assert.notOk(
+					oStaleChange.isQueuedForApply(),
+					"the stale change has no queued apply left that could hang waitForFlexObjectsToBeApplied"
+				);
+			}.bind(this));
+		});
+
+		QUnit.test("extends the variant switch promise so a later switch waits for the late applies", function(assert) {
+			const oChange = FlexObjectFactory.createFromFileContent(getVariantChangeContent(this.sCurrentVariant));
+			sandbox.stub(VariantManagementState, "getControlChangesForVariant").returns([oChange]);
+			sandbox.stub(FlexObjectState, "getLiveDependencyMap").returns(getInitialDependencyMap({
+				mChanges: { someId: [oChange] }
+			}));
+
+			// Before rendering, the switch promise is already settled (the initial-changes wait excluded
+			// this late-rendering control).
+			VariantManagementState.setVariantSwitchPromise(this.sReference, this.sVMReference, () => Promise.resolve());
+			const pSwitchBeforeRender = VariantManagementState.waitForVariantSwitch(this.sReference, this.sVMReference);
+
+			const oReturnPromise = Applier.applyAllChangesForControl(this.oAppComponent, this.sReference, this.oControl);
+			const pSwitchAfterRender = VariantManagementState.waitForVariantSwitch(this.sReference, this.sVMReference);
+
+			assert.notStrictEqual(
+				pSwitchAfterRender,
+				pSwitchBeforeRender,
+				"the switch promise was replaced with one that chains the late applies"
+			);
+
+			let bAppliesFinished = false;
+			oReturnPromise.then(function() {
+				bAppliesFinished = true;
+			});
+
+			return pSwitchAfterRender.then(function() {
+				assert.ok(bAppliesFinished, "the extended switch promise resolves only after the late applies finished");
+			});
+		});
+
+		QUnit.test("a non-variant change is untouched (no variant reference)", function(assert) {
+			const oChange = FlexObjectFactory.createFromFileContent(getLabelChangeContent("plain"));
+			const oSetQueuedForApplySpy = sandbox.spy(oChange, "setQueuedForApply");
+			const oRemoveFromMapSpy = sandbox.spy(DependencyHandler, "removeChangeFromMap");
+			sandbox.stub(VariantManagementState, "getControlChangesForVariant").returns([]);
+			sandbox.stub(FlexObjectState, "getLiveDependencyMap").returns(getInitialDependencyMap({
+				mChanges: { someId: [oChange] }
+			}));
+
+			return Applier.applyAllChangesForControl(this.oAppComponent, this.sReference, this.oControl)
+			.then(function() {
+				assert.ok(oSetQueuedForApplySpy.calledOnce, "the change was queued for apply as before");
+				assert.strictEqual(this.oApplyChangeOnControlStub.callCount, 1, "the change was applied");
+				assert.strictEqual(oRemoveFromMapSpy.callCount, 0, "the non-variant change was not removed as stale");
+			}.bind(this));
 		});
 	});
 

@@ -10,6 +10,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/changes/FlexCustomData",
 	"sap/ui/fl/apply/_internal/changes/Utils",
 	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/Utils"
 ], function(
@@ -20,6 +21,7 @@ sap.ui.define([
 	FlexCustomData,
 	Utils,
 	DependencyHandler,
+	VariantManagementState,
 	FlexObjectState,
 	FlUtils
 ) {
@@ -41,6 +43,33 @@ sap.ui.define([
 	function formatAndLogMessage(sLogType, aMessageComponents, aValuesToInsert, sCallStack) {
 		const sLogMessage = formatMessage(aMessageComponents.join(" "), aValuesToInsert);
 		Log[sLogType](sLogMessage, sCallStack || "");
+	}
+
+	/**
+	 * Builds a map from change ID to variant management reference for all control changes of the current
+	 * variants of the given app. Referenced variants are resolved, so inherited changes are included.
+	 * Used to tell whether a variant-dependent change still belongs to its VM's current variant.
+	 *
+	 * @param {string} sReference - Flex reference of the app
+	 * @returns {Map<string, string>} Map of change ID to variant management reference
+	 */
+	function getCurrentVariantChangesById(sReference) {
+		const mChangeIdToVMReference = new Map();
+		VariantManagementState.getVariantManagementReferences(sReference).forEach((sVMReference) => {
+			const sCurrentVariantReference = VariantManagementState.getCurrentVariantReference({
+				vmReference: sVMReference,
+				reference: sReference
+			});
+			if (!sCurrentVariantReference) {
+				return;
+			}
+			VariantManagementState.getControlChangesForVariant({
+				vmReference: sVMReference,
+				vReference: sCurrentVariantReference,
+				reference: sReference
+			}).forEach((oChange) => mChangeIdToVMReference.set(oChange.getId(), sVMReference));
+		});
+		return mChangeIdToVMReference;
 	}
 
 	async function checkControlAndDependentSelectorControls(oChange, mPropertyBag) {
@@ -418,11 +447,31 @@ sap.ui.define([
 			await oPendingProcessesOnControl[sControlId][oPendingProcessesOnControl[sControlId].length - 1].promise;
 		}
 
+		// Variant-dependent changes for a late-rendering control arrive here via the propagation listener,
+		// which is separate from the variant switch machinery. A change that no longer belongs to the current
+		// variant is removed from the dependency map like a switch drops the left variant; changes on the current
+		// variant are queued and the switch promise is extended below so a later switch waits for them.
+		const mCurrentVariantChangesById = getCurrentVariantChangesById(sReference);
+		const aStaleVariantChanges = [];
+		let sVMReferenceToChain;
 		aChangesForControl.forEach((oChange) => {
+			if (oChange.getVariantReference()) {
+				const sChangeVMReference = mCurrentVariantChangesById.get(oChange.getId());
+				if (!sChangeVMReference) {
+					aStaleVariantChanges.push(oChange);
+					return;
+				}
+				sVMReferenceToChain = sChangeVMReference;
+			}
 			checkAndAdjustChangeStatus(oControl, oChange, mPropertyBag);
 			if (!oChange.isApplyProcessFinished() && !oChange._ignoreOnce) {
 				oChange.setQueuedForApply();
 			}
+		});
+
+		aStaleVariantChanges.forEach((oChange) => {
+			DependencyHandler.removeChangeFromMap(oDependencyMap, oChange.getId());
+			DependencyHandler.removeChangeFromDependencies(oDependencyMap, oChange.getId());
 		});
 
 		oPendingProcessesOnControl[sControlId] ||= [];
@@ -434,6 +483,13 @@ sap.ui.define([
 
 		// make sure that the current control waits for the previous control to be processed
 		oLastPromise = oLastPromise.then(processControl.bind(undefined, oControl, mPropertyBag, oDependencyMap, oAppComponent));
+
+		// Extend the variant switch promise so a switch triggered after this control rendered waits for these
+		// applies. oLastPromise covers all of the control's changes, so it is set once for the affected VM.
+		if (sVMReferenceToChain) {
+			VariantManagementState.setVariantSwitchPromise(sReference, sVMReferenceToChain, () => oLastPromise);
+		}
+
 		return oLastPromise;
 	};
 

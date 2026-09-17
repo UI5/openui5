@@ -811,14 +811,23 @@ sap.ui.define([
 
 	/**
 	 * Sets the promise for the variant switch for the given flex reference and VM reference.
+	 * The promise returned by the passed callback is chained onto the current switch promise: the callback
+	 * runs only once the current switch promise has settled, and the combined promise is stored atomically.
+	 * This ensures a variant switch waits for previously registered work (e.g. late change applies) and that
+	 * switches triggered in quick succession run one after the other instead of overwriting each other.
 	 *
 	 * @param {string} sReference - Flex reference of the app
 	 * @param {string} sVMReference - Variant Management reference
-	 * @param {Promise<undefined>} oPromise - Variant Switch Promise
+	 * @param {function():Promise<undefined>} fnCallback - Callback returning the switch promise, invoked once
+	 *   the current switch promise has settled
 	 */
-	VariantManagementState.setVariantSwitchPromise = function(sReference, sVMReference, oPromise) {
+	VariantManagementState.setVariantSwitchPromise = function(sReference, sVMReference, fnCallback) {
 		mVariantSwitchPromises[sReference] ||= {};
-		mVariantSwitchPromises[sReference][sVMReference] = oPromise;
+		mVariantSwitchPromises[sReference][sVMReference] = VariantManagementState.waitForVariantSwitch(sReference, sVMReference)
+		.catch(function() {
+			// A previous switch error must not block the chained promise
+		})
+		.then(fnCallback);
 	};
 
 	/**

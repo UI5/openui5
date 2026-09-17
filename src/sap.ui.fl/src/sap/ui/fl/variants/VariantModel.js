@@ -445,7 +445,7 @@ sap.ui.define([
 		VariantManagementState.setVariantSwitchPromise(
 			this.sFlexReference,
 			sVariantManagementReference,
-			waitForInitialVariantChanges(mParameters)
+			() => waitForInitialVariantChanges(mParameters)
 		);
 	};
 

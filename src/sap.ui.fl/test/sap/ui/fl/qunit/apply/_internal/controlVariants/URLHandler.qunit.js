@@ -153,7 +153,7 @@ sap.ui.define([
 			VariantManagementState.setVariantSwitchPromise(
 				sFlexReference,
 				sVariantManagementReference,
-				new Promise((resolve) => {
+				() => new Promise((resolve) => {
 					setTimeout(() => {
 						resolve();
 					}, 0);
