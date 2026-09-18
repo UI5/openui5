@@ -248,6 +248,21 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 		assert.ok(oObjectPage._isClosestScrolledSection(oFirstSection.getId()), "identified current section");
 	});
 
+	QUnit.test("_isClosestScrolledSubSection identifies the closest scrolled subSection", function(assert) {
+		// Arrange
+		const oObjectPage = this.oObjectPage;
+		const oFirstSubSection = oObjectPage.getSections()[0].getSubSections()[0];
+		const oOtherSubSection = oObjectPage.getSections()[1].getSubSections()[0];
+
+		this.stub(oObjectPage, "_getClosestScrolledSectionBaseId").returns(oFirstSubSection.getId());
+
+		// Assert
+		assert.strictEqual(oObjectPage._isClosestScrolledSubSection(oFirstSubSection.getId()), true,
+			"the closest scrolled subSection is identified as closest");
+		assert.strictEqual(oObjectPage._isClosestScrolledSubSection(oOtherSubSection.getId()), false,
+			"a different subSection is not identified as closest");
+	});
+
 	QUnit.test("selectedSection value correct after resize content in scroll overflow", async function(assert) {
 		assert.expect(Device.browser.safari ? 1 : 2);
 		const oObjectPage = this.oObjectPage;
