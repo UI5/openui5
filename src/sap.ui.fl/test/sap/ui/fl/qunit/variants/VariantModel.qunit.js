@@ -422,6 +422,15 @@ sap.ui.define([
 			assert.deepEqual(oVariantEntry.contexts, { role: ["ADMINISTRATOR1"], country: ["DE1"] }, "then contexts were updated");
 		});
 
+		QUnit.test("when the DataSelector fires an update but the VM entry is no longer in the map", function(assert) {
+			// Simulate back-and-forth navigation: FlexState teardown clears the cache and fires
+			// the update listener before the new component's map entry is populated.
+			sandbox.stub(this.oModel.oDataSelector, "get").returns(undefined);
+			assert.ok(true, "updateData() returns without throwing when oVariantMapEntry is undefined");
+			this.oModel.updateData();
+			assert.ok(true, "no crash");
+		});
+
 		QUnit.test("when calling 'setModelPropertiesForControl'", function(assert) {
 			var fnDone = assert.async();
 			sandbox.stub(Settings, "getInstanceOrUndef").returns({
