@@ -424,7 +424,7 @@ sap.ui.define([
 		VariantManagementState.setVariantSwitchPromise(
 			this.sFlexReference,
 			this.sVMReference,
-			resolveInitialVariantFromURL({
+			() => resolveInitialVariantFromURL({
 				reference: this.sFlexReference,
 				componentId: this.oAppComponent.getId(),
 				vmReference: this.sVMReference
