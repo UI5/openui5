@@ -151,7 +151,7 @@ sap.ui.define([
 
 			return oMenuButton;
 		},
-		createExpandCollapseButton: function(sIdPrefix, bIsExpand, fnPressEvent) {
+		createExpandCollapseButton: function(sIdPrefix, bIsExpand, fnPressEvent, sModelName) {
 			if (!oRb) {
 				this._loadResourceBundle();
 			}
@@ -166,13 +166,13 @@ sap.ui.define([
 				layoutData: new ActionLayoutData({
 					position: bIsExpand ? TableActionPosition.PersonalizationActionsExpandAll : TableActionPosition.PersonalizationActionsCollapseAll
 				})
-			});
+			}, sModelName);
 
 			FESRHelper.setSemanticStepname(oButton, "press", "mdc:tbl:" + (bIsExpand ? "expandAll" : "collapseAll"));
 
 			return oButton;
 		},
-		createExpandCollapseMenuButton: function(sIdPrefix, bIsExpand, mItemEventInfo) {
+		createExpandCollapseMenuButton: function(sIdPrefix, bIsExpand, mItemEventInfo, sModelName) {
 			if (!oRb) {
 				this._loadResourceBundle();
 			}
@@ -193,7 +193,7 @@ sap.ui.define([
 				layoutData: new ActionLayoutData({
 					position: bIsExpand ? TableActionPosition.PersonalizationActionsExpandAll : TableActionPosition.PersonalizationActionsCollapseAll
 				})
-			});
+			}, sModelName);
 			return oMenuButton;
 		},
 		/**

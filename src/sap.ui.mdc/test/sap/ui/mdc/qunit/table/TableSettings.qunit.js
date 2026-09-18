@@ -154,4 +154,51 @@ sap.ui.define([
 
 		oMenuBtn.destroy();
 	});
+
+	QUnit.module("type binding model name");
+
+	function assertTypeBinding(assert, oButton, sExpectedModel) {
+		const oBindingInfo = oButton.getBindingInfo("type");
+		assert.ok(oBindingInfo, "type is bound");
+		assert.strictEqual(oBindingInfo.parts[0].model, sExpectedModel, "type binds to model '" + sExpectedModel + "'");
+		assert.strictEqual(oBindingInfo.parts[0].path, "/@custom/toolbarButtonType", "type binds to the button type path");
+	}
+
+	QUnit.test("createExpandCollapseButton forwards the model name to the type binding", function(assert) {
+		const oButton = ToolbarSettings.createExpandCollapseButton("expPref", true, () => {}, "$sap.ui.mdc.Table");
+		assertTypeBinding(assert, oButton, "$sap.ui.mdc.Table");
+		oButton.destroy();
+	});
+
+	QUnit.test("createExpandCollapseMenuButton forwards the model name to the type binding", function(assert) {
+		const oMenuBtn = ToolbarSettings.createExpandCollapseMenuButton("expMenu", true, {
+			tree: () => {},
+			node: () => {}
+		}, "$sap.ui.mdc.List");
+		assertTypeBinding(assert, oMenuBtn, "$sap.ui.mdc.List");
+		oMenuBtn.destroy();
+	});
+
+	// "undefined" is the literal model name a factory produces when its caller omits sModelName.
+	QUnit.test("no factory binds the type to an 'undefined' model", function(assert) {
+		const oFakeTable = {getId: () => "fakeTable", isA: () => false};
+		const aButtons = [
+			ToolbarSettings.createSettingsButton("s", [() => {}, oFakeTable], "$sap.ui.mdc.Table"),
+			ToolbarSettings.createPasteButton("p"),
+			ToolbarSettings.createExportButton("e", {
+				"default": [() => {}, oFakeTable],
+				exportAs: [() => {}, oFakeTable]
+			}, "$sap.ui.mdc.Table"),
+			ToolbarSettings.createExpandCollapseButton("ec", true, () => {}, "$sap.ui.mdc.Table"),
+			ToolbarSettings.createExpandCollapseMenuButton("ecm", true, {tree: () => {}, node: () => {}}, "$sap.ui.mdc.Table")
+		];
+
+		for (const oButton of aButtons) {
+			const oBindingInfo = oButton.getBindingInfo("type");
+			assert.ok(oBindingInfo, oButton.getId() + ": type is bound");
+			assert.notStrictEqual(oBindingInfo.parts[0].model, "undefined",
+				oButton.getId() + ": type is not bound against an 'undefined' model");
+			oButton.destroy();
+		}
+	});
 });
