@@ -723,7 +723,7 @@ sap.ui.define([
 			var bIsSystemQueryOption = sName[0] === "$",
 				vValue = mQueryOptions[sName];
 
-			if (bDropSystemQueryOptions && bIsSystemQueryOption) {
+			if (bDropSystemQueryOptions && bIsSystemQueryOption || sName.startsWith("$$")) {
 				return;
 			}
 

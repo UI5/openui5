@@ -745,7 +745,7 @@ sap.ui.define([
 		if (oAggregation.hierarchyQualifier) {
 			mQueryOptions = Object.assign({}, this.mQueryOptions);
 		} else {
-			aAllProperties = _AggregationHelper.getAllProperties(oAggregation);
+			aAllProperties = _AggregationHelper.getAllProperties(oAggregation, this.mQueryOptions);
 			bLeaf = iLevel > oAggregation.groupLevels.length;
 			aGroupBy = bLeaf
 				? oAggregation.groupLevels.concat(Object.keys(oAggregation.group).sort())
@@ -765,6 +765,7 @@ sap.ui.define([
 				+ (mQueryOptions.$$filterBeforeAggregate
 					? " and (" + mQueryOptions.$$filterBeforeAggregate + ")"
 					: "");
+			delete mQueryOptions.$$leaves; // only needed for the first level cache
 		}
 		if (!bHasConcatHelper) {
 			// Note: UI5__count currently handled only by _ConcatHelper!
@@ -780,7 +781,7 @@ sap.ui.define([
 		oCache.calculateKeyPredicate = oAggregation.hierarchyQualifier
 			? _AggregationCache.calculateKeyPredicateRH.bind(null, oGroupNode, oAggregation)
 			: _AggregationCache.calculateKeyPredicate.bind(null, oGroupNode, aGroupBy,
-				aAllProperties, bLeaf, bTotal);
+				aAllProperties, bLeaf, bTotal, this.sMetaPath);
 		if (sParentFilter) {
 			oCache.$parentFilter = sParentFilter;
 		}
@@ -837,7 +838,8 @@ sap.ui.define([
 		this.oGrandTotalPromise = bHasGrandTotal
 			? new SyncPromise((resolve) => {
 				aAdditionalRowHandlers.push((oGrandTotal) => {
-					_AggregationHelper.handleGrandTotal(oAggregation, oGrandTotal);
+					_AggregationHelper
+						.handleGrandTotal(oAggregation, oGrandTotal, this.mQueryOptions);
 					resolve(oGrandTotal);
 				});
 			})
@@ -1019,6 +1021,8 @@ sap.ui.define([
 			}
 			if (bSubtotalsAtBottom) {
 				oSubtotals = Object.assign({}, oSubtotals);
+				// Note: mQueryOptions.$select does not matter here, no "identity" being used for
+				// non-leaf level
 				_AggregationHelper.setAnnotations(oSubtotals, undefined, true, iLevel,
 					_AggregationHelper.getAllProperties(that.oAggregation));
 				_Helper.setPrivateAnnotation(oSubtotals, "predicate",
@@ -1272,6 +1276,7 @@ sap.ui.define([
 		} else {
 			mQueryOptions = _AggregationHelper.filterOrderby(mQueryOptions, this.oAggregation);
 		}
+		delete mQueryOptions.$$leaves;
 
 		return _AggregationHelper.buildApply(this.oAggregation, mQueryOptions, 0, true);
 	};
@@ -2386,9 +2391,10 @@ sap.ui.define([
 		}
 
 		let mQueryOptions = {...this.mQueryOptions};
-		// drop not needed system query options; $expand, $filter, $search, and $select must not be
-		// used with grand totals; all filters are contained in $$filterBeforeAggregate
-		delete mQueryOptions.$apply;
+		// drop not needed system query options; $filter and $search must not be used with grand
+		// totals; all filters are contained in $$filterBeforeAggregate
+		// Note: buildApply overwrites $apply and sets $$applyWithSelect:false, thus $expand/$select
+		// are ignored anyway
 		delete mQueryOptions.$count;
 		delete mQueryOptions.$orderby;
 
@@ -2475,8 +2481,9 @@ sap.ui.define([
 
 		const mQueryOptions = {...this.oFirstLevel.mQueryOptions};
 		mQueryOptions.$count = true; // may have been removed in #readGap
-		// drop not needed system query options; $expand, $filter, $search, and $select must not be
-		// used with grand totals; all filters are contained in $$filterBeforeAggregate
+		// drop not needed system query options; $filter and $search must not be used with grand
+		// totals; all filters are contained in $$filterBeforeAggregate; $expand/$select are ignored
+		// by #requestCount below anyway
 		delete mQueryOptions.$apply;
 		if (mQueryOptions.$$filterBeforeAggregate) {
 			mQueryOptions.$filter = mQueryOptions.$$filterBeforeAggregate;
@@ -3116,12 +3123,15 @@ sap.ui.define([
 	 *   Whether this element is a leaf
 	 * @param {boolean} bTotal
 	 *   Whether this element is a (sub)total
+	 * @param {string} sRootMetaPath
+	 *   The meta path for the aggregation cache's collection of elements
 	 * @param {object} oElement
 	 *   The element for which to calculate the key predicate
 	 * @param {object} mTypeForMetaPath
 	 *   A map from meta paths to entity types (as delivered by {@link #fetchTypes})
 	 * @param {string} sMetaPath
-	 *   The meta path for the given element
+	 *   The meta path for the given element; it differs from <code>sRootMetaPath</code> in case of
+	 *   nested objects
 	 * @returns {string|undefined}
 	 *   The key predicate or <code>undefined</code>, if key predicate cannot be determined
 	 *
@@ -3129,11 +3139,15 @@ sap.ui.define([
 	 */
 	// @override sap.ui.model.odata.v4.lib._Cache#calculateKeyPredicate
 	_AggregationCache.calculateKeyPredicate = function (oGroupNode, aGroupBy, aAllProperties, bLeaf,
-			bTotal, oElement, mTypeForMetaPath, sMetaPath) {
-		var sPredicate;
-
-		if (!(sMetaPath in mTypeForMetaPath)) {
-			return undefined; // nested object
+			bTotal, sRootMetaPath, oElement, mTypeForMetaPath, sMetaPath) {
+		if (sRootMetaPath !== sMetaPath) { // nested object
+			const sPredicate = sMetaPath in mTypeForMetaPath
+				? _Helper.getKeyPredicate(oElement, sMetaPath, mTypeForMetaPath)
+				: undefined; // complex type
+			if (sPredicate) {
+				_Helper.setPrivateAnnotation(oElement, "predicate", sPredicate);
+			}
+			return sPredicate;
 		}
 
 		if (oGroupNode) {
@@ -3150,7 +3164,7 @@ sap.ui.define([
 			});
 		}
 		// prefer real key predicate for leaf
-		sPredicate = bLeaf && _Helper.getKeyPredicate(oElement, sMetaPath, mTypeForMetaPath)
+		const sPredicate = bLeaf && _Helper.getKeyPredicate(oElement, sMetaPath, mTypeForMetaPath)
 			|| _Helper.getKeyPredicate(oElement, sMetaPath, mTypeForMetaPath, aGroupBy, true);
 		_Helper.setPrivateAnnotation(oElement, "predicate", sPredicate);
 		if (!bLeaf) {
@@ -3283,13 +3297,11 @@ sap.ui.define([
 	 * @throws {Error}
 	 *   If the system query option "$filter" is combined with group levels or with grand totals
 	 *   (unless "grandTotal like 1.84"), or if grand totals or group levels or recursive hierarchy
-	 *   are combined with min/max or with grouping via sorter, or if the system query options
-	 *   "$expand" or "$select" are combined with pure data aggregation (no recursive hierarchy), or
-	 *   if the system query option "$search" is combined with grand totals or group levels or a
-	 *   recursive hierarchy, or if shared requests are combined with min/max or with grand totals
-	 *   or group levels or recursive hierarchy, or if a first level cache is given but no
-	 *   aggregation cache needs to be created, or if a first level cache is given and it has
-	 *   pending DELETEs or POSTs
+	 *   are combined with min/max or with grouping via sorter, or if the system query option
+	 *   "$search" is combined with grand totals or group levels or a recursive hierarchy, or if
+	 *   shared requests are combined with min/max or with grand totals or group levels or recursive
+	 *   hierarchy, or if a first level cache is given but no aggregation cache needs to be created,
+	 *   or if a first level cache is given and it has pending DELETEs or POSTs
 	 *
 	 * @public
 	 */
@@ -3297,15 +3309,6 @@ sap.ui.define([
 			mQueryOptions, oAggregation, bSortExpandSelect, bSharedRequest, bIsGrouped,
 			oFirstLevel) {
 		var bHasGrandTotal, bHasGroupLevels;
-
-		function checkExpandSelect() {
-			if ("$expand" in mQueryOptions) {
-				throw new Error("Unsupported system query option: $expand");
-			}
-			if ("$select" in mQueryOptions) {
-				throw new Error("Unsupported system query option: $select");
-			}
-		}
 
 		if (oAggregation) {
 			bHasGrandTotal = _AggregationHelper.hasGrandTotal(oAggregation.aggregate);
@@ -3327,7 +3330,6 @@ sap.ui.define([
 				if (oFirstLevel) {
 					throw new Error("Unsupported oFirstLevel together with min/max");
 				}
-				checkExpandSelect();
 
 				return _MinMaxHelper.createCache(oRequestor, sResourcePath, oAggregation,
 					mQueryOptions);
@@ -3342,9 +3344,6 @@ sap.ui.define([
 			if (bHasGrandTotal || bHasGroupLevels || oAggregation.hierarchyQualifier) {
 				if (mQueryOptions.$search) {
 					throw new Error("Unsupported system query option: $search");
-				}
-				if (!oAggregation.hierarchyQualifier) {
-					checkExpandSelect();
 				}
 				if (bIsGrouped) {
 					throw new Error("Unsupported grouping via sorter");
@@ -3363,14 +3362,6 @@ sap.ui.define([
 		}
 		if ("$$filterOnAggregate" in mQueryOptions) {
 			throw new Error("Unsupported $$filterOnAggregate");
-		}
-		if (mQueryOptions.$$filterBeforeAggregate) {
-			mQueryOptions = {
-				...mQueryOptions,
-				$apply : "filter(" + mQueryOptions.$$filterBeforeAggregate + ")/"
-					+ mQueryOptions.$apply
-			};
-			delete mQueryOptions.$$filterBeforeAggregate;
 		}
 
 		return _Cache.create(oRequestor, sResourcePath, mQueryOptions, bSortExpandSelect,

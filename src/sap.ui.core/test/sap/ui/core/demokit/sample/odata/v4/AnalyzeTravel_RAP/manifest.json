@@ -10,8 +10,13 @@
 				"uri" : "/sap/opu/odata4/sap/zee_ui_travel_editanly_d_d_v4/srvd/sap/zee_ui_travel_editanly_d_d/0001/",
 				"type" : "OData",
 				"settings" : {
+					"annotations" : ["localAnnotations"],
 					"odataVersion" : "4.0"
 				}
+			},
+			"localAnnotations" : {
+				"uri" : "data/localAnnotations.xml",
+				"type" : "ODataAnnotation"
 			}
 		},
 		"description" : "Example for OData V4 Editable Data Aggregation w/ RAP",
