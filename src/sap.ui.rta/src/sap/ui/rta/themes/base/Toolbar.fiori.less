@@ -3,14 +3,6 @@
 /* Base theme                                */
 /* ========================================= */
 
-/**
-	This class is being assigned to the original Fiori Header Toolbar when RTA Toolbar shows
- */
-
-.sapUiRtaFioriHeaderInvisible {
-	visibility: hidden;
-}
-
 /* type: fiori */
 .sapUiRtaToolbar.type_fiori {
 	transition: opacity 0.25s ease-out;
@@ -22,5 +14,17 @@
 
 	&.is_visible {
 		opacity: 1;
+	}
+
+	/*
+		The Fiori toolbar is rendered into the dedicated RTA header area of the FLP shell layout
+		(sap.ushell.api.RTA#getRtaHeaderDomRef) and therefore has to participate in the normal
+		document flow, so that the shell reserves space for it and the app content is shifted down
+		instead of being covered by the absolutely positioned toolbar.
+	*/
+	position: relative;
+
+	&.sapUiRtaToolbar_scrolling {
+		position: relative !important;
 	}
 }
