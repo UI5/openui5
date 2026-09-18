@@ -26,6 +26,12 @@ sap.ui.define([
 ) {
 	"use strict";
 
+	function waitForDOMReady(oOPL) {
+		return new Promise((resolve) => {
+			oOPL.attachEventOnce("onAfterRenderingDOMReady", resolve);
+		});
+	}
+
 	// utility function that will be used in these tests
 	var _getOneBlock = function () {
 		return {
@@ -369,36 +375,67 @@ sap.ui.define([
 		}, 1000);
 	});
 
-	QUnit.test("_triggerVisibleSubSectionsEvents makes sure the OPL is scrolled to the correct position before executing lazyloading",
+	QUnit.test("_triggerVisibleSubSectionsEvents scrolls to the selected section when it is not the one currently in view",
 		async function(assert) {
+		assert.expect(1);
 		// Arrange
-		var oObjectPageLayout = this.oComponentContainer.getObjectPageLayoutInstance(),
-			fnDone = assert.async(),
-			oScrolledToSection = oObjectPageLayout.getSections()[2],
-			sScrolledToSectionId = oScrolledToSection.getId(),
-			oData = oConfigModel.getData(),
-			oSpy;
+		const oObjectPageLayout = this.oComponentContainer.getObjectPageLayoutInstance();
+		const oScrolledToSection = oObjectPageLayout.getSections()[2];
+		const oFirstSection = oObjectPageLayout.getSections()[0];
+		const oData = oConfigModel.getData();
 
 		_loadBlocksData(oData);
 		oConfigModel.setData(oData);
 		oObjectPageLayout.setSelectedSection(oScrolledToSection);
 		await nextUIUpdate();
+		await waitForDOMReady(oObjectPageLayout);
 
-		oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady", function () {
-			oSpy = this.spy(oObjectPageLayout, "scrollToSection");
+		const sSelectedSubSectionId = oScrolledToSection.getSelectedSubSection();
+		const sExpectedScrollTargetId = sSelectedSubSectionId || oScrolledToSection.getId();
 
-			// Fake different top position of scrolled section
-			oObjectPageLayout._oSectionInfo[sScrolledToSectionId].positionTop = 1500;
+		// Simulate the page being scrolled away from the selected section by reporting the first
+		// (sub)section as the closest scrolled one. (Faking positionTop no longer influences the
+		// decision, which is now based on the closest scrolled (sub)section.)
+		this.stub(oObjectPageLayout, "_getClosestScrolledSectionBaseId").callsFake(function (iScrollTop, iPageHeight, bSubSectionsOnly) {
+			return bSubSectionsOnly ? oFirstSection.getSubSections()[0].getId() : oFirstSection.getId();
+		});
 
-			// Act
-			oObjectPageLayout._triggerVisibleSubSectionsEvents();
+		const oSpy = this.spy(oObjectPageLayout, "scrollToSection");
 
-			// Assert
-			assert.ok(oSpy.calledWith(oScrolledToSection.getId()), "scrolled to correct Section");
+		// Act
+		oObjectPageLayout._triggerVisibleSubSectionsEvents();
 
-			// Clean up
-			fnDone();
-		}.bind(this));
+		// Assert
+		assert.ok(oSpy.calledWith(sExpectedScrollTargetId), "scrolled to the selected (sub)section");
+	});
+
+	QUnit.test("_triggerVisibleSubSectionsEvents does not scroll when the selected subSection is already the closest scrolled one",
+		async function(assert) {
+		assert.expect(1);
+		// Arrange
+		const oObjectPageLayout = this.oComponentContainer.getObjectPageLayoutInstance();
+		const oSelectedSection = oObjectPageLayout.getSections()[2];
+		const oData = oConfigModel.getData();
+
+		_loadBlocksData(oData);
+		oConfigModel.setData(oData);
+		oObjectPageLayout.setSelectedSection(oSelectedSection);
+		await nextUIUpdate();
+		await waitForDOMReady(oObjectPageLayout);
+
+		// Simulate the scenario where the selected (sub)section is already scrolled into view (e.g. the
+		// browser scrolled a control that Fiori Elements focused after an FCL column change). In that case
+		// the selected subSection is the closest scrolled one, so no corrective scroll must be triggered.
+		const sSelectedSubSectionId = oSelectedSection.getSelectedSubSection() || oSelectedSection.getSubSections()[0].getId();
+		this.stub(oObjectPageLayout, "_getClosestScrolledSectionBaseId").returns(sSelectedSubSectionId);
+
+		const oSpy = this.spy(oObjectPageLayout, "scrollToSection");
+
+		// Act
+		oObjectPageLayout._triggerVisibleSubSectionsEvents();
+
+		// Assert
+		assert.notOk(oSpy.called, "no corrective scroll is triggered when already at the selected subSection");
 	});
 
 	QUnit.module("ObjectPageAfterRendering");
