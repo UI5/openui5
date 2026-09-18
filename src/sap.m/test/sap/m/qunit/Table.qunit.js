@@ -1185,12 +1185,19 @@ sap.ui.define([
 		triggerCtrlA(sut.getDomRef("tblHeadModeCol"));
 		assert.ok(sut.isAllSelectableSelected(), "selection cell: all rows are selected");
 		assert.ok(sut._selectAllCheckBox.getSelected(), "selection cell: select all checkbox is selected");
-		sut.removeSelections(true);
+
+		// Ctrl+Shift+A from the selection cell directly clears the selection, unlike toggling Ctrl+A
+		triggerCtrlA(sut.getDomRef("tblHeadModeCol"), true);
+		assert.notOk(sut.getSelectedItems().length, "selection cell: all rows are deselected on Ctrl+Shift+A");
+		assert.notOk(sut._selectAllCheckBox.getSelected(), "selection cell: select all checkbox is unchecked");
 
 		// Ctrl+A from the select all checkbox selects all rows
 		triggerCtrlA(sut._selectAllCheckBox.getFocusDomRef());
 		assert.ok(sut.isAllSelectableSelected(), "select all checkbox: all rows are selected");
-		sut.removeSelections(true);
+
+		// Ctrl+Shift+A from a content cell directly clears the selection while in SelectAll mode
+		triggerCtrlA(getContentCell(), true);
+		assert.notOk(sut.getSelectedItems().length, "content cell: all rows are deselected on Ctrl+Shift+A (SelectAll mode)");
 
 		// Ctrl+A on a column header cell has no effect and does not prevent the default
 		const oColumnHeaderCell = sut.getColumns()[0].getDomRef();

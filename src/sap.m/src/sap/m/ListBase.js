@@ -2632,13 +2632,11 @@ function(
 
 		// Ctrl + (Shift) + A: select/deselect all
 		if (oEvent.code == "KeyA" && (oEvent.metaKey || oEvent.ctrlKey) && this.getMode() == ListMode.MultiSelect && this._isSelectAllTarget(oEvent.target, bItemEvent)) {
-			var bClearAll = (this.getMultiSelectMode() == MultiSelectMode.ClearAll);
+			// Ctrl+Shift+A always clears the selection, regardless of multiSelectMode
 			if (oEvent.shiftKey) {
-				if (bClearAll) {
-					this.removeSelections(false, true);
-					this._fireHeaderSelectorPress();
-				}
-			} else if (!bClearAll) {
+				this.removeSelections(false, true);
+				this._fireHeaderSelectorPress();
+			} else if (this.getMultiSelectMode() != MultiSelectMode.ClearAll) {
 				if (this.isAllSelectableSelected()) {
 					this.removeSelections(false, true);
 				} else {
