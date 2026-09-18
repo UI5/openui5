@@ -34,7 +34,7 @@
 	box-sizing: border-box;
 	border-left: @_sap_ui_table_BaseBorderWidth solid @sapUiListVerticalBorderColor;
 	background-color: @_sap_ui_table_Scrolling_ScrollbarBackground;
-	z-index: 4; /* Ensure that the resize/reorder bars do not become visible/active when hovering the scrollbar. */
+	z-index: 5; /* Above resize/reorder bars (z-index: 3) and row actions (z-index: 4) */
 
 	&.sapUiTableVSbExternal {
 		position: relative;
