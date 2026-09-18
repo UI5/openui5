@@ -4,6 +4,7 @@
 
 sap.ui.define([
 	"sap/base/util/merge",
+	"sap/ui/core/Lib",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/initial/api/InitialFlexAPI",
@@ -14,6 +15,7 @@ sap.ui.define([
 	"sap/ui/rta/Utils"
 ], function(
 	merge,
+	Lib,
 	ControlVariantApplyAPI,
 	FlexRuntimeInfoAPI,
 	InitialFlexAPI,
@@ -40,75 +42,85 @@ sap.ui.define([
 
 	let mUShellServices = {};
 
-	function getReloadMessageOnStart(oReloadInfo) {
-		let sReason;
+	/**
+	 * Collects the message keys for all reload reasons that apply to the given reload info. Unlike a
+	 * first-match selection, every applicable reason is returned so that the reload dialog can list them
+	 * all in its expandable details section.
+	 *
+	 * @param {object} oReloadInfo - Information about why a reload happens (see ReloadInfoAPI)
+	 * @param {boolean} bExit - Whether RTA is being left (<code>true</code>) or started (<code>false</code>)
+	 * @returns {string[]} The message bundle keys of all applicable reload reasons
+	 */
+	ReloadManager.getReloadReasons = function(oReloadInfo, bExit) {
+		const aReasons = [];
 		const bIsCustomerLayer = oReloadInfo.layer === Layer.CUSTOMER;
 
-		if (oReloadInfo.hasHigherLayerChanges && oReloadInfo.isDraftAvailable) {
-			sReason = bIsCustomerLayer ? "MSG_VIEWS_OR_PERSONALIZATION_AND_DRAFT_EXISTS" : "MSG_HIGHER_LAYER_CHANGES_AND_DRAFT_EXISTS";
-		} else if (oReloadInfo.hasHigherLayerChanges && oReloadInfo.allContexts) {
-			sReason = "MSG_RESTRICTED_CONTEXT_EXIST_AND_PERSONALIZATION";
-		} else if (oReloadInfo.hasHigherLayerChanges || oReloadInfo.hasRemovedNonFavoriteVariants) {
-			// Removed non-favorite variants are higher layer changes that are not yet part of the lazy-loaded
-			// flex data, so hasHigherLayerChanges only becomes detectable after the data-fetching reload. Both
-			// reasons share one combined message so the shown text stays stable across open/close cycles.
-			sReason = bIsCustomerLayer ? "MSG_PERSONALIZATION_OR_PUBLIC_OR_MISSING_VIEWS_EXISTS" : "MSG_HIGHER_LAYER_CHANGES_EXIST";
-		} else if (oReloadInfo.isDraftAvailable) {
-			sReason = "MSG_DRAFT_EXISTS";
-		} else if (oReloadInfo.allContexts) {
-			sReason = "MSG_RESTRICTED_CONTEXT_EXIST";
-		}// TODO add app descr changes case for start?
-		return sReason;
-	}
-
-	function getReloadMessageOnExit(oReloadInfo) {
-		const bIsCustomerLayer = oReloadInfo.layer === Layer.CUSTOMER;
-
-		if (oReloadInfo.hasHigherLayerChanges) {
-			if (!bIsCustomerLayer) {
-				return "MSG_RELOAD_WITH_ALL_CHANGES";
+		// Removed non-favorite variants are higher layer changes that are not yet part of the lazy-loaded
+		// flex data, so hasHigherLayerChanges only becomes detectable after the data-fetching reload. Both
+		// reasons therefore map to the same "personalization" reason so the listed reasons stay stable
+		// across open/close cycles.
+		if (oReloadInfo.hasHigherLayerChanges || oReloadInfo.hasRemovedNonFavoriteVariants) {
+			if (bExit && bIsCustomerLayer) {
+				aReasons.push("MSG_RELOAD_REASON_EXIT_PERSONALIZATION_CUSTOMER");
+			} else if (bExit) {
+				aReasons.push("MSG_RELOAD_REASON_EXIT_PERSONALIZATION");
+			} else if (bIsCustomerLayer) {
+				aReasons.push("MSG_RELOAD_REASON_START_PERSONALIZATION_CUSTOMER");
+			} else {
+				aReasons.push("MSG_RELOAD_REASON_START_PERSONALIZATION");
 			}
-			if (oReloadInfo.isDraftAvailable) {
-				return "MSG_RELOAD_WITH_VIEWS_PERSONALIZATION_AND_WITHOUT_DRAFT";
+		}
+		if (oReloadInfo.isDraftAvailable) {
+			aReasons.push(bExit ? "MSG_RELOAD_REASON_EXIT_DRAFT" : "MSG_RELOAD_REASON_START_DRAFT");
+		}
+		if (oReloadInfo.allContexts) {
+			aReasons.push(bExit ? "MSG_RELOAD_REASON_EXIT_RESTRICTED_CONTEXT" : "MSG_RELOAD_REASON_START_RESTRICTED_CONTEXT");
+		}
+		if (bExit) {
+			if (oReloadInfo.changesNeedReload) {
+				aReasons.push("MSG_RELOAD_REASON_EXIT_CHANGES_NEED_RELOAD");
 			}
-			if (oReloadInfo.allContexts) {
-				return "MSG_RELOAD_WITH_PERSONALIZATION_AND_RESTRICTED_CONTEXT";
+			if (oReloadInfo.initialDraftGotActivated || oReloadInfo.activeVersionNotSelected) {
+				aReasons.push("MSG_RELOAD_REASON_EXIT_ACTIVATED_VERSION");
 			}
 			if (oReloadInfo.switchEndUserAdaptation) {
-				return "MSG_RELOAD_WITH_PERSONALIZATION_AND_CONTEXT_BASED_ADAPTATION";
+				aReasons.push("MSG_RELOAD_REASON_EXIT_CONTEXT_BASED_ADAPTATION");
 			}
-			return "MSG_RELOAD_WITH_PERSONALIZATION_AND_VIEWS";
 		}
+		return aReasons;
+	};
 
-		if (oReloadInfo.changesNeedReload) {
-			return "MSG_RELOAD_NEEDED";
-		}
-
-		if (oReloadInfo.initialDraftGotActivated || oReloadInfo.activeVersionNotSelected) {
-			return "MSG_RELOAD_ACTIVATED_DRAFT";
-		}
-
-		if (oReloadInfo.isDraftAvailable) {
-			return "MSG_RELOAD_WITHOUT_DRAFT";
-		}
-
-		if (oReloadInfo.allContexts) {
-			return "MSG_RELOAD_WITHOUT_ALL_CONTEXT";
-		}
-
-		if (oReloadInfo.switchEndUserAdaptation) {
-			return "MSG_RELOAD_OTHER_CONTEXT_BASED_ADAPTATION";
-		}
-		return undefined;
+	function buildReasonsDetails(aReasonKeys) {
+		const oResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
+		const sListItems = aReasonKeys.map(function(sReasonKey) {
+			return `<li>${oResourceBundle.getText(sReasonKey)}</li>`;
+		}).join("");
+		return `<ul>${sListItems}</ul>`;
 	}
 
-	async function handleReloadMessageBoxOnExit(oReloadReasons) {
-		const sReason = getReloadMessageOnExit(oReloadReasons);
-
-		if (sReason) {
-			await Utils.showMessageBox("information", sReason, {
-				titleKey: "HEADER_RELOAD_NEEDED"
+	async function showReloadMessageBox(aReasonKeys) {
+		// A single reason is shown directly as the dialog's main text. Only when several reasons apply
+		// do we fall back to a generic message plus a collapsible details list, so the user is not
+		// forced to expand a section just to read one reason.
+		if (aReasonKeys.length === 1) {
+			const oResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
+			await Utils.showMessageBox("information", "MSG_RELOAD_SINGLE_REASON", {
+				titleKey: "HEADER_RELOAD_NEEDED",
+				messageArgs: [oResourceBundle.getText(aReasonKeys[0])]
 			});
+			return;
+		}
+		await Utils.showMessageBox("information", "MSG_RELOAD_GENERIC", {
+			titleKey: "HEADER_RELOAD_NEEDED",
+			details: buildReasonsDetails(aReasonKeys)
+		});
+	}
+
+	async function handleReloadMessageBoxOnExit(oReloadInfo) {
+		const aReasons = ReloadManager.getReloadReasons(oReloadInfo, true);
+
+		if (aReasons.length) {
+			await showReloadMessageBox(aReasons);
 		}
 	}
 
@@ -131,10 +143,9 @@ sap.ui.define([
 				});
 			}
 		}
-		const sReason = getReloadMessageOnStart(oReloadInfo);
 		// showing messages in visual editor is leading to blocked screen. In this case we should reload without message
 		if (!oReloadInfo.developerMode) {
-			await Utils.showMessageBox("information", sReason);
+			await showReloadMessageBox(ReloadManager.getReloadReasons(oReloadInfo, false));
 		}
 		ReloadManager.enableAutomaticStart(oReloadInfo.layer, oReloadInfo.selector);
 		oReloadInfo.onStart = true;

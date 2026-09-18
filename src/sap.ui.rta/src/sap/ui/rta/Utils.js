@@ -334,6 +334,7 @@ sap.ui.define([
 	 * @param  {object} [mPropertyBag] - Object with additional information; error and titleKey are evaluated, the rest is passed as option to the MessageBox
 	 * @param  {any} [mPropertyBag.error] - If an error is passed on, the message box text is derived from it
 	 * @param  {string} [mPropertyBag.titleKey] - The text key for the title of the message box; if none is provided the default of the selectde MessageBox type  will be displayed
+	 * @param  {array} [mPropertyBag.messageArgs] - Arguments passed to {@link sap.base.i18n.ResourceBundle#getText} for the message key
 	 * @param  {array} [mPropertyBag.actions] - Available actions for the messabe box
 	 * @param  {array} [mPropertyBag.actionKeys] - The text key for the action buttons of the message box. It is provided as actions property to the MessageBox.
 	 * 											   If mPropertyBag.actions property is set, it will not be overriden
@@ -345,7 +346,9 @@ sap.ui.define([
 	Utils.showMessageBox = function(sMessageType, sMessageKey, mPropertyBag) {
 		var oResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
 		mPropertyBag ||= {};
-		var sMessage = oResourceBundle.getText(sMessageKey, mPropertyBag.error ? [mPropertyBag.error.userMessage || mPropertyBag.error.message || mPropertyBag.error] : undefined);
+		var aMessageArgs = mPropertyBag.messageArgs
+			|| (mPropertyBag.error ? [mPropertyBag.error.userMessage || mPropertyBag.error.message || mPropertyBag.error] : undefined);
+		var sMessage = oResourceBundle.getText(sMessageKey, aMessageArgs);
 		var sTitle = mPropertyBag.titleKey && oResourceBundle.getText(mPropertyBag.titleKey);
 		var vActionTexts =
 			mPropertyBag.actionKeys &&
@@ -355,7 +358,8 @@ sap.ui.define([
 		var sEmphasizedAction = mPropertyBag.emphasizedActionKey ? oResourceBundle.getText(mPropertyBag.emphasizedActionKey) : undefined;
 
 		var bShowCancel = mPropertyBag.showCancel;
-		var mOptions = _omit(mPropertyBag, ["titleKey", "error", "actionKeys", "emphasizedAction", "emphasizedActionKey", "showCancel"]);
+		var mOptions = _omit(mPropertyBag,
+			["titleKey", "error", "messageArgs", "actionKeys", "emphasizedAction", "emphasizedActionKey", "showCancel"]);
 		mOptions.title = sTitle;
 		mOptions.styleClass = Utils.getRtaStyleClassName();
 		mOptions.actions ||= vActionTexts;

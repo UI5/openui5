@@ -1,6 +1,7 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/ui/core/Lib",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
@@ -12,6 +13,7 @@ sap.ui.define([
 	"sap/ui/rta/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
+	Lib,
 	ControlVariantApplyAPI,
 	FlexRuntimeInfoAPI,
 	FlexInfoSession,
@@ -24,6 +26,12 @@ sap.ui.define([
 	sinon
 ) {
 	"use strict";
+
+	function buildExpectedReasonsDetails(aReasonKeys) {
+		const oResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
+		const sListItems = aReasonKeys.map((sReasonKey) => `<li>${oResourceBundle.getText(sReasonKey)}</li>`).join("");
+		return `<ul>${sListItems}</ul>`;
+	}
 
 	var sandbox = sinon.createSandbox();
 
@@ -76,7 +84,11 @@ sap.ui.define([
 					allContexts: true
 				},
 				testName: "with hasHigherLayerChanges in User layer",
-				expectedMessageKey: "MSG_RELOAD_WITH_ALL_CHANGES"
+				expectedReasonKeys: [
+					"MSG_RELOAD_REASON_EXIT_PERSONALIZATION",
+					"MSG_RELOAD_REASON_EXIT_DRAFT",
+					"MSG_RELOAD_REASON_EXIT_RESTRICTED_CONTEXT"
+				]
 			},
 			{
 				oReloadInfo: {
@@ -86,7 +98,11 @@ sap.ui.define([
 					allContexts: true
 				},
 				testName: "with hasHigherLayerChanges in Customer layer with draft and allContexts",
-				expectedMessageKey: "MSG_RELOAD_WITH_VIEWS_PERSONALIZATION_AND_WITHOUT_DRAFT"
+				expectedReasonKeys: [
+					"MSG_RELOAD_REASON_EXIT_PERSONALIZATION_CUSTOMER",
+					"MSG_RELOAD_REASON_EXIT_DRAFT",
+					"MSG_RELOAD_REASON_EXIT_RESTRICTED_CONTEXT"
+				]
 			},
 			{
 				oReloadInfo: {
@@ -96,7 +112,10 @@ sap.ui.define([
 					allContexts: true
 				},
 				testName: "with hasHigherLayerChanges in Customer layer with allContexts",
-				expectedMessageKey: "MSG_RELOAD_WITH_PERSONALIZATION_AND_RESTRICTED_CONTEXT"
+				expectedReasonKeys: [
+					"MSG_RELOAD_REASON_EXIT_PERSONALIZATION_CUSTOMER",
+					"MSG_RELOAD_REASON_EXIT_RESTRICTED_CONTEXT"
+				]
 			},
 			{
 				oReloadInfo: {
@@ -106,7 +125,7 @@ sap.ui.define([
 					allContexts: false
 				},
 				testName: "with hasHigherLayerChanges in Customer layer",
-				expectedMessageKey: "MSG_RELOAD_WITH_PERSONALIZATION_AND_VIEWS"
+				expectedReasonKeys: ["MSG_RELOAD_REASON_EXIT_PERSONALIZATION_CUSTOMER"]
 			},
 			{
 				oReloadInfo: {
@@ -118,7 +137,11 @@ sap.ui.define([
 					changesNeedReload: false
 				},
 				testName: "with initial draft",
-				expectedMessageKey: "MSG_RELOAD_ACTIVATED_DRAFT"
+				expectedReasonKeys: [
+					"MSG_RELOAD_REASON_EXIT_DRAFT",
+					"MSG_RELOAD_REASON_EXIT_RESTRICTED_CONTEXT",
+					"MSG_RELOAD_REASON_EXIT_ACTIVATED_VERSION"
+				]
 			},
 			{
 				oReloadInfo: {
@@ -130,7 +153,10 @@ sap.ui.define([
 					changesNeedReload: false
 				},
 				testName: "with draft",
-				expectedMessageKey: "MSG_RELOAD_WITHOUT_DRAFT"
+				expectedReasonKeys: [
+					"MSG_RELOAD_REASON_EXIT_DRAFT",
+					"MSG_RELOAD_REASON_EXIT_RESTRICTED_CONTEXT"
+				]
 			},
 			{
 				oReloadInfo: {
@@ -142,7 +168,10 @@ sap.ui.define([
 					changesNeedReload: true
 				},
 				testName: "with changesNeedReload",
-				expectedMessageKey: "MSG_RELOAD_NEEDED"
+				expectedReasonKeys: [
+					"MSG_RELOAD_REASON_EXIT_RESTRICTED_CONTEXT",
+					"MSG_RELOAD_REASON_EXIT_CHANGES_NEED_RELOAD"
+				]
 			},
 			{
 				oReloadInfo: {
@@ -154,7 +183,7 @@ sap.ui.define([
 					changesNeedReload: false
 				},
 				testName: "with only allContexts",
-				expectedMessageKey: "MSG_RELOAD_WITHOUT_ALL_CONTEXT"
+				expectedReasonKeys: ["MSG_RELOAD_REASON_EXIT_RESTRICTED_CONTEXT"]
 			},
 			{
 				oReloadInfo: {
@@ -167,7 +196,7 @@ sap.ui.define([
 					switchEndUserAdaptation: true
 				},
 				testName: "with only switchEndUserAdaptation",
-				expectedMessageKey: "MSG_RELOAD_OTHER_CONTEXT_BASED_ADAPTATION"
+				expectedReasonKeys: ["MSG_RELOAD_REASON_EXIT_CONTEXT_BASED_ADAPTATION"]
 			},
 			{
 				oReloadInfo: {
@@ -180,7 +209,10 @@ sap.ui.define([
 					switchEndUserAdaptation: true
 				},
 				testName: "with hasHigherLayerChanges in Customer layer and switchEndUserAdaptation",
-				expectedMessageKey: "MSG_RELOAD_WITH_PERSONALIZATION_AND_CONTEXT_BASED_ADAPTATION"
+				expectedReasonKeys: [
+					"MSG_RELOAD_REASON_EXIT_PERSONALIZATION_CUSTOMER",
+					"MSG_RELOAD_REASON_EXIT_CONTEXT_BASED_ADAPTATION"
+				]
 			},
 			{
 				oReloadInfo: {
@@ -193,7 +225,28 @@ sap.ui.define([
 					activeVersionNotSelected: true
 				},
 				testName: "with active version not selected",
-				expectedMessageKey: "MSG_RELOAD_ACTIVATED_DRAFT"
+				expectedReasonKeys: ["MSG_RELOAD_REASON_EXIT_ACTIVATED_VERSION"]
+			},
+			{
+				oReloadInfo: {
+					hasHigherLayerChanges: true,
+					layer: Layer.CUSTOMER,
+					isDraftAvailable: true,
+					allContexts: true,
+					initialDraftGotActivated: false,
+					activeVersionNotSelected: true,
+					changesNeedReload: true,
+					switchEndUserAdaptation: true
+				},
+				testName: "with all reload reasons applying at once lists every reason",
+				expectedReasonKeys: [
+					"MSG_RELOAD_REASON_EXIT_PERSONALIZATION_CUSTOMER",
+					"MSG_RELOAD_REASON_EXIT_DRAFT",
+					"MSG_RELOAD_REASON_EXIT_RESTRICTED_CONTEXT",
+					"MSG_RELOAD_REASON_EXIT_CHANGES_NEED_RELOAD",
+					"MSG_RELOAD_REASON_EXIT_ACTIVATED_VERSION",
+					"MSG_RELOAD_REASON_EXIT_CONTEXT_BASED_ADAPTATION"
+				]
 			}
 		].forEach(function(oTestInfo) {
 			QUnit.test(oTestInfo.testName, function(assert) {
@@ -203,9 +256,28 @@ sap.ui.define([
 				this.oGetReloadInfoInfoStub.returns(oTestInfo.oReloadInfo);
 				return ReloadManager.checkReloadOnExit(mProperties).then(function() {
 					assert.strictEqual(this.oMessageBoxStub.callCount, 1, "the message box is opened");
-					assert.strictEqual(this.oMessageBoxStub.lastCall.args[0], "information", "the type is correct");
-					assert.strictEqual(this.oMessageBoxStub.lastCall.args[1], oTestInfo.expectedMessageKey, "the type is correct");
-					assert.strictEqual(this.oMessageBoxStub.lastCall.args[2].titleKey, "HEADER_RELOAD_NEEDED", "the header is correct");
+					const aArgs = this.oMessageBoxStub.lastCall.args;
+					assert.strictEqual(aArgs[0], "information", "the type is correct");
+					assert.strictEqual(aArgs[2].titleKey, "HEADER_RELOAD_NEEDED", "the header is correct");
+					if (oTestInfo.expectedReasonKeys.length === 1) {
+						const oResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
+						const sExpectedReasonText = oResourceBundle.getText(oTestInfo.expectedReasonKeys[0]);
+						assert.strictEqual(aArgs[1], "MSG_RELOAD_SINGLE_REASON", "the single-reason wrapper key is used");
+						assert.deepEqual(aArgs[2].messageArgs, [sExpectedReasonText], "the reason text is passed as message argument");
+						assert.notOk(aArgs[2].details, "no details are used for a single reason");
+					} else {
+						assert.strictEqual(aArgs[1], "MSG_RELOAD_GENERIC", "the generic message is shown");
+						assert.strictEqual(
+							aArgs[2].details,
+							buildExpectedReasonsDetails(oTestInfo.expectedReasonKeys),
+							"all reasons are rendered as a details list"
+						);
+					}
+					assert.deepEqual(
+						ReloadManager.getReloadReasons(oTestInfo.oReloadInfo, true),
+						oTestInfo.expectedReasonKeys,
+						"all applicable reasons are collected"
+					);
 				}.bind(this));
 			});
 		});
@@ -329,7 +401,10 @@ sap.ui.define([
 				},
 				layer: Layer.CUSTOMER,
 				testName: "higher layer changes and draft in CUSTOMER layer",
-				expectedMessageKey: "MSG_VIEWS_OR_PERSONALIZATION_AND_DRAFT_EXISTS"
+				expectedReasonKeys: [
+					"MSG_RELOAD_REASON_START_PERSONALIZATION_CUSTOMER",
+					"MSG_RELOAD_REASON_START_DRAFT"
+				]
 			},
 			{
 				oReloadInfo: {
@@ -338,7 +413,10 @@ sap.ui.define([
 				},
 				layer: Layer.USER,
 				testName: "higher layer changes and draft in USER layer",
-				expectedMessageKey: "MSG_HIGHER_LAYER_CHANGES_AND_DRAFT_EXISTS"
+				expectedReasonKeys: [
+					"MSG_RELOAD_REASON_START_PERSONALIZATION",
+					"MSG_RELOAD_REASON_START_DRAFT"
+				]
 			},
 			{
 				oReloadInfo: {
@@ -346,7 +424,7 @@ sap.ui.define([
 				},
 				layer: Layer.CUSTOMER,
 				testName: "only higher layer changes in CUSTOMER layer",
-				expectedMessageKey: "MSG_PERSONALIZATION_OR_PUBLIC_OR_MISSING_VIEWS_EXISTS"
+				expectedReasonKeys: ["MSG_RELOAD_REASON_START_PERSONALIZATION_CUSTOMER"]
 			},
 			{
 				oReloadInfo: {
@@ -354,7 +432,7 @@ sap.ui.define([
 				},
 				layer: Layer.USER,
 				testName: "only higher layer changes in USER layer",
-				expectedMessageKey: "MSG_HIGHER_LAYER_CHANGES_EXIST"
+				expectedReasonKeys: ["MSG_RELOAD_REASON_START_PERSONALIZATION"]
 			},
 			{
 				oReloadInfo: {
@@ -362,7 +440,7 @@ sap.ui.define([
 				},
 				layer: Layer.CUSTOMER,
 				testName: "only draft",
-				expectedMessageKey: "MSG_DRAFT_EXISTS"
+				expectedReasonKeys: ["MSG_RELOAD_REASON_START_DRAFT"]
 			},
 			{
 				oReloadInfo: {
@@ -370,7 +448,7 @@ sap.ui.define([
 				},
 				layer: Layer.CUSTOMER,
 				testName: "only all contexts",
-				expectedMessageKey: "MSG_RESTRICTED_CONTEXT_EXIST"
+				expectedReasonKeys: ["MSG_RELOAD_REASON_START_RESTRICTED_CONTEXT"]
 			},
 			{
 				oReloadInfo: {
@@ -379,7 +457,10 @@ sap.ui.define([
 				},
 				layer: Layer.CUSTOMER,
 				testName: "higher layer changes and allContexts",
-				expectedMessageKey: "MSG_RESTRICTED_CONTEXT_EXIST_AND_PERSONALIZATION"
+				expectedReasonKeys: [
+					"MSG_RELOAD_REASON_START_PERSONALIZATION_CUSTOMER",
+					"MSG_RELOAD_REASON_START_RESTRICTED_CONTEXT"
+				]
 			},
 			{
 				oReloadInfo: {
@@ -387,7 +468,7 @@ sap.ui.define([
 				},
 				layer: Layer.CUSTOMER,
 				testName: "only removed non-favorite variants (incomplete lazy-loaded data)",
-				expectedMessageKey: "MSG_PERSONALIZATION_OR_PUBLIC_OR_MISSING_VIEWS_EXISTS"
+				expectedReasonKeys: ["MSG_RELOAD_REASON_START_PERSONALIZATION_CUSTOMER"]
 			},
 			{
 				oReloadInfo: {
@@ -396,7 +477,7 @@ sap.ui.define([
 				},
 				layer: Layer.CUSTOMER,
 				testName: "removed non-favorite variants and higher layer changes (full data) yield the same message",
-				expectedMessageKey: "MSG_PERSONALIZATION_OR_PUBLIC_OR_MISSING_VIEWS_EXISTS"
+				expectedReasonKeys: ["MSG_RELOAD_REASON_START_PERSONALIZATION_CUSTOMER"]
 			}
 		].forEach(function(oTestInfo) {
 			QUnit.test(oTestInfo.testName, async function(assert) {
@@ -407,8 +488,27 @@ sap.ui.define([
 				assert.strictEqual(this.oReloadStub.callCount, 1, "reload was triggered");
 				assert.strictEqual(this.oReloadStub.lastCall.args[0].onStart, true, "the onStart flag was added");
 				assert.strictEqual(this.oMessageBoxStub.callCount, 1, "the message box is opened");
-				assert.strictEqual(this.oMessageBoxStub.lastCall.args[0], "information", "the type is correct");
-				assert.strictEqual(this.oMessageBoxStub.lastCall.args[1], oTestInfo.expectedMessageKey, "the type is correct");
+				const aArgs = this.oMessageBoxStub.lastCall.args;
+				assert.strictEqual(aArgs[0], "information", "the type is correct");
+				if (oTestInfo.expectedReasonKeys.length === 1) {
+					const oResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
+					const sExpectedReasonText = oResourceBundle.getText(oTestInfo.expectedReasonKeys[0]);
+					assert.strictEqual(aArgs[1], "MSG_RELOAD_SINGLE_REASON", "the single-reason wrapper key is used");
+					assert.deepEqual(aArgs[2].messageArgs, [sExpectedReasonText], "the reason text is passed as message argument");
+					assert.notOk(aArgs[2].details, "no details are used for a single reason");
+				} else {
+					assert.strictEqual(aArgs[1], "MSG_RELOAD_GENERIC", "the generic message is shown");
+					assert.strictEqual(
+						aArgs[2].details,
+						buildExpectedReasonsDetails(oTestInfo.expectedReasonKeys),
+						"all reasons are rendered as a details list"
+					);
+				}
+				assert.deepEqual(
+					ReloadManager.getReloadReasons({ ...oTestInfo.oReloadInfo, layer: oTestInfo.layer }, false),
+					oTestInfo.expectedReasonKeys,
+					"all applicable reasons are collected"
+				);
 			});
 		});
 	});
