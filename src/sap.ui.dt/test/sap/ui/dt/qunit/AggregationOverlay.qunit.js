@@ -25,7 +25,7 @@ sap.ui.define([
 	nextUIUpdate
 ) {
 	"use strict";
-	var sandbox = sinon.createSandbox();
+	const sandbox = sinon.createSandbox();
 
 	QUnit.module("Given that an AggregationOverlay is created for an aggregation without domRef DT metadata and without children", {
 		async beforeEach() {
@@ -88,7 +88,7 @@ sap.ui.define([
 
 	QUnit.module("Given that an AggregationOverlay is created for an aggregation and a rendered child is added", {
 		async beforeEach(assert) {
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 
 			this.oButton1 = new Button({ text: "button1" });
 			this.oButton2 = new Button({ text: "button2" });
@@ -139,7 +139,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when an un-rendered ElementOverlay is added as child into the AggregationOverlay", function(assert) {
-			var done = assert.async();
+			const done = assert.async();
 			this.oChildNotAdded.attachEventOnce("afterRendering", function(oEvent) {
 				assert.deepEqual(oEvent.getSource(), this.oChildNotAdded,
 					"then 'afterRendering' event is fired for the added un-rendered ElementOverlay");
@@ -167,10 +167,11 @@ sap.ui.define([
 
 	QUnit.module("Given that an AggregationOverlay is created for an aggregation where scroll is needed", {
 		async beforeEach(assert) {
-			var fnDone = assert.async();
+			const fnDone = assert.async();
+
 			this.aPanels = [];
-			for (var i = 0; i < 50; i++) {
-				var oPanel = new Panel();
+			for (let i = 0; i < 50; i++) {
+				const oPanel = new Panel();
 				this.aPanels.push(oPanel);
 			}
 			this.oPage = new Page({
@@ -202,7 +203,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when AggregationOverlay is scrolled", function(assert) {
-			var done = assert.async();
+			const done = assert.async();
 
 			assert.strictEqual(this.oPageContent.scrollTop, this.oPageContentOverlay.scrollTop, "initial scroll position is equal");
 
@@ -215,7 +216,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when aggregation dom is scrolled", function(assert) {
-			var done = assert.async();
+			const done = assert.async();
 
 			this.oPageContentOverlay.addEventListener("scroll", function() {
 				assert.strictEqual(this.oPageContentOverlay.scrollTop, 20, "page content overlay is also scrolled to same position");
@@ -278,12 +279,12 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when this AggregationOverlay is rendered later and two browser events exist for it", function(assert) {
-			var fnDone = assert.async(2);
-			var sMockText1 = "mockContextText1";
-			var sMockText2 = "mockContextText2";
-			var sEventName = "mockEvent";
+			const fnDone = assert.async(2);
+			const sMockText1 = "mockContextText1";
+			const sMockText2 = "mockContextText2";
+			const sEventName = "mockEvent";
 
-			var fnEventHandler = sandbox.stub()
+			const fnEventHandler = sandbox.stub()
 			.withArgs(sinon.match.any, sMockText1).callsFake(fnDone)
 			.withArgs(sinon.match.any, sMockText2).callsFake(fnDone);
 
@@ -295,6 +296,37 @@ sap.ui.define([
 
 			this.oAggregationOverlay.attachBrowserEvent(sEventName, fnEventHandler, this.oAggregationOverlay);
 			this.oAggregationOverlay.render();
+		});
+	});
+
+	QUnit.module("AggregationOverlay._getAttributes", {
+		async beforeEach() {
+			this.oPage = new Page();
+			this.oPage.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			this.oAggregationOverlay = new AggregationOverlay({
+				aggregationName: "content",
+				element: this.oPage,
+				designTimeMetadata: new AggregationDesignTimeMetadata()
+			});
+			Overlay.getOverlayContainer().append(this.oAggregationOverlay.render());
+		},
+		afterEach() {
+			this.oPage.destroy();
+			this.oAggregationOverlay.destroy();
+			Overlay.removeOverlayContainer();
+		}
+	}, function() {
+		QUnit.test("returns attribute map with base keys plus aggregation-specific attribute", function(assert) {
+			const mAttrs = this.oAggregationOverlay._getAttributes();
+			assert.strictEqual(typeof mAttrs.id, "string", "id is present");
+			assert.strictEqual(typeof mAttrs.class, "string", "class is present");
+			assert.strictEqual(
+				mAttrs["data-sap-ui-dt-aggregation"],
+				this.oAggregationOverlay.getAggregationName(),
+				"data-sap-ui-dt-aggregation equals getAggregationName()"
+			);
 		});
 	});
 

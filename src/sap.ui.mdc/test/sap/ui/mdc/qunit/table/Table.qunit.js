@@ -5987,10 +5987,23 @@ sap.ui.define([
 			await nextUIUpdate();
 			const oCopyButton = Element.getElementById(this.oTable.getId() + "-copy");
 
+			// Expand/collapse buttons only exist on a hierarchy, so build both variants
+			// directly and parent them so the model propagates; the menu variant needs a
+			// selection mode other than "None".
+			this.oTable.setSelectionMode("Multi");
+			const oExpandButton = this.oTable._createExpandCollapseButton(true, {tree: () => {}});
+			const oCollapseMenuButton = this.oTable._createExpandCollapseButton(false, {
+				tree: () => {}, node: () => {}, isExpanded: () => {}
+			});
+			this.oTable.addDependent(oExpandButton);
+			this.oTable.addDependent(oCollapseMenuButton);
+
 			assert.ok(this.oTable._oExportButton, "Export button exists");
 			assert.ok(this.oTable._oP13nButton, "Settings button exists");
 			assert.ok(this.oTable._oPasteButton, "Paste button exists");
 			assert.ok(oCopyButton, "Copy button exists");
+			assert.ok(oExpandButton.isA("sap.m.OverflowToolbarButton"), "Expand button (plain variant) exists");
+			assert.ok(oCollapseMenuButton.isA("sap.m.OverflowToolbarMenuButton"), "Collapse button (menu variant) exists");
 			assert.equal(this.oTable.getModel("$sap.ui.mdc.Table").getProperty("/@custom/toolbarButtonType"),
 				sExpectedButtontype, "Model provides the common overflow type");
 
@@ -5998,7 +6011,9 @@ sap.ui.define([
 				this.oTable._oExportButton.getType(),
 				this.oTable._oP13nButton.getType(),
 				this.oTable._oPasteButton.getType(),
-				oCopyButton.getType()
+				oCopyButton.getType(),
+				oExpandButton.getType(),
+				oCollapseMenuButton.getType()
 			];
 
 			for (const t of types) {

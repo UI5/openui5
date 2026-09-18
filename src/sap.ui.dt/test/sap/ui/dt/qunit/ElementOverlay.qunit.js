@@ -2027,6 +2027,40 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("ElementOverlay._getAttributes", {
+		async beforeEach() {
+			this.oButton = new Button({ text: "Button" });
+			this.oButton.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			await new Promise((fnResolve) => {
+				this.oElementOverlay = new ElementOverlay({
+					isRoot: true,
+					element: this.oButton,
+					init(oEvent) {
+						oEvent.getSource().placeInOverlayContainer();
+						this.attachEventOnce("geometryChanged", fnResolve);
+					}
+				});
+			});
+			this._fnApplyStyles = this.oElementOverlay.applyStyles.bind(this.oElementOverlay);
+			this.oElementOverlay.attachEvent("applyStylesRequired", this._fnApplyStyles);
+		},
+		afterEach() {
+			this.oElementOverlay.detachEvent("applyStylesRequired", this._fnApplyStyles);
+			this.oElementOverlay.destroy();
+			this.oButton.destroy();
+		}
+	}, function() {
+		QUnit.test("returns attribute map with base keys plus element-specific attributes", function(assert) {
+			const mAttrs = this.oElementOverlay._getAttributes();
+			assert.strictEqual(typeof mAttrs.id, "string", "id is present");
+			assert.strictEqual(typeof mAttrs.class, "string", "class is present");
+			assert.strictEqual(mAttrs["data-sap-ui-dt-for"], this.oButton.getId(), "data-sap-ui-dt-for equals element id");
+			assert.strictEqual(mAttrs.draggable, this.oElementOverlay.getMovable(), "draggable equals getMovable()");
+		});
+	});
+
 	QUnit.done(function() {
 		document.getElementById("qunit-fixture").style.display = "none";
 	});
