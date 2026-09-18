@@ -280,27 +280,15 @@ sap.ui.define([
 					getUser() {},
 					getCurrentApplication() {}
 				});
-			},
-			getRenderer() {
-				return {
-					getRootControl() {
-						return {
-							getShellHeader() {
-								return {
-									addStyleClass: () => {},
-									removeStyleClass: () => {}
-								};
-							}
-						};
-					}
-				};
 			}
 		});
 		RtaQunitUtils.stubSapUiRequire(sandbox, [{
 			name: "sap/ushell/api/RTA",
 			stub: {
-				getLogo: sandbox.stub().returns(""),
-				setShellHeaderVisibility: () => {}
+				getLogoSrc: sandbox.stub().resolves(""),
+				getRtaHeaderDomRef: sandbox.stub().resolves(document.getElementById("qunit-fixture")),
+				startUIAdaptation: sandbox.stub().resolves(),
+				endUIAdaptation: sandbox.stub().resolves()
 			}
 		}]);
 	};
