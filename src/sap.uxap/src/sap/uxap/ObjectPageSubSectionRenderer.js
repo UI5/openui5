@@ -16,7 +16,8 @@ sap.ui.define(["sap/ui/core/Configuration"], function (Configuration) {
 	ObjectPageSubSectionRenderer.render = function (oRm, oControl) {
 		var aActions, bHasTitle, bShowTitle, bHasTitleLine, bHasActions, bUseTitleOnTheLeft, bHasVisibleActions,
 			bAccessibilityOn = Configuration.getAccessibility(),
-			oLabelledBy = oControl.getAggregation("ariaLabelledBy");
+			oLabelledBy = oControl.getAggregation("ariaLabelledBy"),
+			bIsPromoted = !!oControl._sBorrowedTitleDomId;
 
 		if (!oControl.getVisible() || !oControl._getInternalVisible()) {
 			return;
@@ -30,8 +31,11 @@ sap.ui.define(["sap/ui/core/Configuration"], function (Configuration) {
 		bHasVisibleActions = oControl._hasVisibleActions();
 
 		oRm.openStart("div", oControl)
-			.attr("role", "region")
-			.style("height", oControl._getHeight());
+		.style("height", oControl._getHeight());
+
+		if (bHasTitle && !bIsPromoted) {
+			oRm.attr("role", "region");
+		}
 
 		if (oControl._bBlockHasMore) {
 			oRm.class("sapUxAPObjectPageSubSectionWithSeeMore");
@@ -45,7 +49,7 @@ sap.ui.define(["sap/ui/core/Configuration"], function (Configuration) {
 			.class("ui-helper-clearfix");
 
 
-		if (bAccessibilityOn && oLabelledBy) {
+		if (bAccessibilityOn && oLabelledBy && bHasTitle) {
 			oRm.attr("aria-labelledby", oLabelledBy.getId());
 		}
 

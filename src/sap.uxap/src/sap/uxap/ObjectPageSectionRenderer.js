@@ -14,7 +14,7 @@ sap.ui.define(["sap/ui/core/Configuration"], function (Configuration) {
 	};
 
 	ObjectPageSectionRenderer.render = function (oRm, oControl) {
-		var sTitle, bTitleVisible,
+		var sTitle, bTitleVisible, sLabelledById,
 			bAccessibilityOn = Configuration.getAccessibility(),
 			oLabelledBy = oControl.getAggregation("ariaLabelledBy"),
 			oHeading = oControl.getHeading(),
@@ -26,6 +26,9 @@ sap.ui.define(["sap/ui/core/Configuration"], function (Configuration) {
 
 		sTitle = oControl._getTitle();
 		bTitleVisible = oControl._isTitleVisible();
+		sLabelledById = bAccessibilityOn && !bTitleVisible
+			? oControl._getAriaLabelledByAnchorButton()
+			: undefined;
 
 		oRm.openStart("section", oControl)
 			.class("sapUxAPObjectPageSection");
@@ -37,11 +40,14 @@ sap.ui.define(["sap/ui/core/Configuration"], function (Configuration) {
 		if (bWrapTitle) {
 			oRm.class("sapUxAPObjectPageSectionWrapTitle");
 		}
-
-		oRm.attr("role", "region");
+		if (bTitleVisible || oLabelledBy || sLabelledById) {
+			oRm.attr("role", "region");
+		}
 
 		if (bAccessibilityOn && oLabelledBy) {
 			oRm.attr("aria-labelledby", oLabelledBy.getId());
+		} else if (sLabelledById) {
+			oRm.attr("aria-labelledby", sLabelledById);
 		}
 
 		oRm.attr("data-sap-ui-customfastnavgroup", true);
