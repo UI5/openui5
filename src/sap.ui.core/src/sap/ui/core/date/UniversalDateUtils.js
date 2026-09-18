@@ -201,7 +201,11 @@ sap.ui.define([
 				oLocaleData = LocaleData.getInstance(oLocale),
 				iFirstDayOfWeek = oLocaleData.getFirstDayOfWeek();
 			oUniversalDate = oUniversalDate ? clone(oUniversalDate) : clone(UniversalDateUtils.createNewUniversalDate());
-			oUniversalDate.setDate(oUniversalDate.getDate() - oUniversalDate.getDay() + iFirstDayOfWeek);
+			// Number of days to walk back to reach the locale's first day of the week. As iFirstDayOfWeek may be bigger
+			// than oUniversalDate.getDay(), it needs to be ensured that iDaysSinceWeekStart is non-negative and between
+			// 0 and 6.
+			var iDaysSinceWeekStart = (oUniversalDate.getDay() - iFirstDayOfWeek + 7) % 7;
+			oUniversalDate.setDate(oUniversalDate.getDate() - iDaysSinceWeekStart);
 			return UniversalDateUtils.resetStartTime(oUniversalDate);
 		};
 
