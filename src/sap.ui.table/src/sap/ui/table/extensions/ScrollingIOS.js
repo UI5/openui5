@@ -280,6 +280,7 @@ sap.ui.define([
 		const iTop = oVSbThumb.offsetTop + oEvent.clientY - iThumbTop - iThumbHeight / 2;
 		const iOffset = Math.min(oScrollExtension.getVerticalScrollbarHeight() - iThumbHeight, Math.max(0, iTop));
 
+		oScrollExtension.seedLargeDataScrollBaseline();
 		oEvent.preventDefault();
 		oEvent.stopPropagation();
 

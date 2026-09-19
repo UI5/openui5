@@ -290,40 +290,75 @@ sap.ui.define([
 		},
 
 		/**
-		 * Builds a query string from the given parameter map. Takes care of encoding, but ensures
+		 * Builds a query string from the given options map. Takes care of encoding, but ensures
 		 * that the characters "$", "(", ")", ";" and "=" are not encoded, so that OData queries
-		 * remain readable. A parameter starting with "$$" is meant to be internal and does not
+		 * remain readable. A query option starting with "$$" is meant to be internal and does not
 		 * become part of the query string.
 		 *
 		 * ';' is not encoded although RFC 1866 encourages its usage as separator between query
-		 * parameters. However OData Version 4.0 Part 2 specifies that only '&' is a valid
+		 * options. However OData Version 4.0 Part 2 specifies that only '&' is a valid
 		 * separator.
 		 *
-		 * @param {object} [mParameters]
+		 * @param {object} [mQueryOptions]
 		 *   A map of key-value pairs representing the query string, the value in this pair has to
 		 *   be a string or an array of strings; if it is an array, the resulting query string
 		 *   repeats the key for each array value
 		 *   Examples:
 		 *   buildQuery({foo : "bar", "bar" : "baz"}) results in the query string "?foo=bar&bar=baz"
 		 *   buildQuery({foo : ["bar", "baz"]}) results in the query string "?foo=bar&foo=baz"
+		 * @param {string} [mQueryOptions.$apply]
+		 *   Prerequisite for falsy "$$applyWithSelect"; enhanced with "$$filterBeforeAggregate"
+		 * @param {boolean|string[]} [mQueryOptions.$$applyWithSelect]
+		 *   Either <code>false</code> (which means that "$apply" must not be combined with
+		 *   "$expand" and "$select" at all) or a sorted <code>string[]</code> containing all
+		 *   property names which need to be added to "$select" (while keeping "$expand" as is)
+		 * @param {string} [mQueryOptions.$expand]
+		 *   System query option to be ignored via "$$applyWithSelect"
+		 * @param {string} [mQueryOptions.$$filterBeforeAggregate]
+		 *   The value for a filter which is applied before the aggregation; it is turned into a
+		 *   "filter()" transformation and added in front of "$apply" if both are present
+		 * @param {string} [mQueryOptions.$select]
+		 *   System query option to be enhanced or ignored via "$$applyWithSelect"
 		 * @param {boolean} [bSortSystemQueryOptions]
 		 *   Whether system query options are sorted alphabetically and moved to the query string's
 		 *   end
 		 * @returns {string}
-		 *   The query string; it is empty if there are no parameters; it starts with "?" otherwise
+		 *   The query string; it is empty if there are no options; it starts with "?" otherwise
 		 *
 		 * @public
 		 */
-		buildQuery : function (mParameters, bSortSystemQueryOptions) {
+		buildQuery : function (mQueryOptions, bSortSystemQueryOptions) {
 			var aKeys, aQuery;
 
-			if (!mParameters) {
+			if (!mQueryOptions) {
 				return "";
 			}
 
-			aKeys = Object.keys(mParameters).filter((sKey) => !sKey.startsWith("$$"));
+			aKeys = Object.keys(mQueryOptions).filter((sKey) => !sKey.startsWith("$$"));
 			if (aKeys.length === 0) {
 				return "";
+			}
+			if ("$$applyWithSelect" in mQueryOptions) {
+				if (mQueryOptions.$$applyWithSelect) {
+					bSortSystemQueryOptions = true;
+					if (!("$select" in mQueryOptions)) {
+						aKeys.push("$select"); // also take $select added below into account
+					}
+					mQueryOptions = {
+						...mQueryOptions,
+						$select : _Helper.getJoinedPaths(mQueryOptions.$$applyWithSelect,
+							mQueryOptions.$select)
+					};
+				} else if (mQueryOptions.$apply) { // cannot combine w/ $expand/$select
+					aKeys = aKeys.filter((sKey) => sKey !== "$expand" && sKey !== "$select");
+				} // else: ignore falsy $$applyWithSelect in case no $apply present (anymore)
+			}
+			if (mQueryOptions.$$filterBeforeAggregate && mQueryOptions.$apply) {
+				mQueryOptions = {
+					...mQueryOptions,
+					$apply : "filter(" + mQueryOptions.$$filterBeforeAggregate + ")/"
+						+ mQueryOptions.$apply
+				};
 			}
 
 			if (bSortSystemQueryOptions) { // sort only system query options, and keep them last
@@ -334,7 +369,7 @@ sap.ui.define([
 			}
 			aQuery = [];
 			aKeys.forEach(function (sKey) {
-				var vValue = mParameters[sKey];
+				var vValue = mQueryOptions[sKey];
 
 				if (Array.isArray(vValue)) {
 					vValue.forEach(function (sItem) {
@@ -1563,6 +1598,26 @@ sap.ui.define([
 			return aFilters.length === 1
 				? aFilters[0]
 				: new Filter({and : true, filters : aFilters});
+		},
+
+		/**
+		 * Joins a comma separated list with an array and again returns a comma separated list,
+		 * sorted and w/o duplicates.
+		 *
+		 * @param {string[]} aPaths
+		 *   Read-only list of paths, sorted and w/o duplicates
+		 * @param {string} [sPathList]
+		 *   Optional comma separated list of paths (unsorted, maybe duplicates)
+		 * @returns {string}
+		 *   Comma separated list of paths, sorted and w/o duplicates; possibly empty
+		 */
+		getJoinedPaths : function (aPaths, sPathList) {
+			if (sPathList) {
+				const oPathSet = new Set(aPaths);
+				sPathList.split(",").forEach((sPath) => oPathSet.add(sPath));
+				aPaths = Array.from(oPathSet).sort();
+			}
+			return aPaths.join(",");
 		},
 
 		/**

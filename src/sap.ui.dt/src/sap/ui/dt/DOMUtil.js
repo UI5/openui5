@@ -377,6 +377,13 @@ sap.ui.define([
 		// Styles is an array, but has some special access functions
 		for (let i = 0; i < iLength; i++) {
 			sStyle = oStyles[i];
+			// Skip CSS custom properties (names starting with "--"). getComputedStyle enumerates
+			// every theme design token (~1700 --sapUi* variables), which dominates the copy cost.
+			// They are only variable definitions - the ghost is a detached clone whose appearance
+			// comes from the already resolved standard longhand values, so copying them is overhead.
+			if (sStyle.startsWith("--")) {
+				continue;
+			}
 			sStyles = `${sStyles + sStyle}:${oStyles.getPropertyValue(sStyle)};`;
 		}
 

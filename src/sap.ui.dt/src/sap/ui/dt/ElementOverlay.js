@@ -786,13 +786,9 @@ sap.ui.define([
 		const oDesignTimeMetadata = this.getDesignTimeMetadata();
 		const mAggregations = oElement.getMetadata().getAllAggregations();
 
-		return []
-		.concat(Object.keys(mAggregations), Object.keys(oDesignTimeMetadata.getAggregations()))
-		.filter(function(sAggregationName, iIndex, aSource) {
-			return (
-				iIndex === aSource.indexOf(sAggregationName) // remove duplicates
-					&& !oDesignTimeMetadata.isAggregationIgnored(oElement, sAggregationName)
-			);
+		const aAllNames = [...Object.keys(mAggregations), ...Object.keys(oDesignTimeMetadata.getAggregations())];
+		return [...new Set(aAllNames)].filter((sAggregationName) => {
+			return !oDesignTimeMetadata.isAggregationIgnored(oElement, sAggregationName);
 		});
 	};
 
@@ -884,9 +880,9 @@ sap.ui.define([
 	 */
 	ElementOverlay.prototype.getAggregationOverlay = function(sAggregationName, sAggregationType) {
 		const sGetterFunction = `get${sAggregationType || "Children"}`;
-		return this[sGetterFunction]().filter(function(oAggregationOverlay) {
+		return this[sGetterFunction]().find((oAggregationOverlay) => {
 			return oAggregationOverlay.getAggregationName() === sAggregationName;
-		}).pop();
+		});
 	};
 
 	/**

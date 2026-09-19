@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx"
+		xmlns="http://docs.oasis-open.org/odata/ns/edm">
+	<edmx:Reference Uri="https://github.com/SAP/odata-vocabularies/blob/main/vocabularies/Common.xml">
+		<edmx:Include Namespace="com.sap.vocabularies.Common.v1" />
+	</edmx:Reference>
+	<edmx:DataServices>
+		<Schema Namespace="Expand.After.Concat.Supported">
+			<Annotations Target="com.odata.v4.aggregation.BusinessPartnerTest.Container">
+				<Annotation Term="com.sap.vocabularies.Common.v1.ExpandAfterConcatSupported"/>
+			</Annotations>
+			<Annotations Target="com.sap.gateway.default.iwbep.tea_busi.v0001.Container">
+				<Annotation Term="com.sap.vocabularies.Common.v1.ExpandAfterConcatSupported"/>
+			</Annotations>
+			<Annotations Target="com.sap.gateway.default.zui5_epm_sample.v0002.Container">
+				<Annotation Term="com.sap.vocabularies.Common.v1.ExpandAfterConcatSupported"/>
+			</Annotations>
+			<Annotations Target="special.cases.Container">
+				<Annotation Term="com.sap.vocabularies.Common.v1.ExpandAfterConcatSupported"/>
+			</Annotations>
+		</Schema>
+	</edmx:DataServices>
+</edmx:Edmx>

@@ -717,16 +717,6 @@ sap.ui.define([
 		}
 	}, {
 		oContext : Context.create({}, {}, "/v4Context"),
-		oTemplate : {
-			aChildCanUseCachePromises : [],
-			oModel : {bAutoExpandSelect : true},
-			mParameters : {$$aggregation : {/*irrelevant*/}},
-			sPath : "relativeWithDataAggregation",
-			bRelative : true
-		},
-		isDataAggregation : true
-	}, {
-		oContext : Context.create({}, {}, "/v4Context"),
 		bIgnoreParentCache : true,
 		oTemplate : {sPath : "ignoreParentCache", bRelative : true}
 	}].forEach(function (oFixture) {
@@ -750,9 +740,6 @@ sap.ui.define([
 			oBindingMock.expects("doFetchOrGetQueryOptions")
 				.withExactArgs(sinon.match.same(oFixture.oContext))
 				.returns(bAsPromise ? SyncPromise.resolve(mQueryOptions) : mQueryOptions);
-			this.mock(_Helper).expects("isDataAggregation")
-				.exactly(oFixture.isDataAggregation ? 1 : 0)
-				.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(true);
 
 			assert.deepEqual(
 				// code under test
@@ -906,8 +893,6 @@ sap.ui.define([
 			this.mock(oBinding).expects("doFetchOrGetQueryOptions")
 				.withExactArgs(sinon.match.same(oContext))
 				.returns(SyncPromise.resolve(Promise.resolve(mCurrentBindingQueryOptions)));
-			this.mock(_Helper).expects("isDataAggregation")
-				.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
 			this.mock(oBinding).expects("updateAggregatedQueryOptions")
 				.withExactArgs(sinon.match.same(mCurrentBindingQueryOptions));
 			oExpectation = this.mock(oParentBinding).expects("fetchIfChildCanUseCache")
@@ -964,8 +949,6 @@ sap.ui.define([
 			this.mock(oBinding).expects("doFetchOrGetQueryOptions")
 				.withExactArgs(sinon.match.same(oContext))
 				.returns(SyncPromise.resolve(Promise.resolve(mCurrentBindingQueryOptions)));
-			this.mock(_Helper).expects("isDataAggregation")
-				.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
 			this.mock(oBinding).expects("updateAggregatedQueryOptions")
 				.withExactArgs(sinon.match.same(mCurrentBindingQueryOptions));
 			this.mock(oParentBinding).expects("fetchIfChildCanUseCache")

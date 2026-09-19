@@ -38,9 +38,9 @@
 }
 
 /* Custom focus outline */
-html.sap-desktop .sapMRI:focus:not(.sapMRIDisabled):not(.sapMRIDisplayOnly) {
+html.sap-desktop .sapMRI:focus:not(.sapMRIDisabled):not(.sapMRIDisplayOnly),
+.sapMRI:focus-visible:not(.sapMRIDisabled):not(.sapMRIDisplayOnly) {
 	border-radius: 0.25rem;
-	outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 	outline-offset: 0.125rem;
 }
 

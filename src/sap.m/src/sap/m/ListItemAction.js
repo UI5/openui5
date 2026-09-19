@@ -5,12 +5,11 @@ sap.ui.define([
 	"./library",
 	"./ListItemActionBase",
 	"./Button",
-	"sap/ui/Device",
 	"sap/ui/core/Lib",
 	"sap/ui/core/IconPool",
 	"sap/ui/core/ShortcutHintsMixin"
 ],
-	function(library, ListItemActionBase, Button, Device, Lib, IconPool, ShortcutHintsMixin) {
+	function(library, ListItemActionBase, Button, Lib, IconPool, ShortcutHintsMixin) {
 	"use strict";
 
 	const ListItemActionType = library.ListItemActionType;
@@ -141,13 +140,13 @@ sap.ui.define([
 				return {
 					icon: IconPool.getIconURI("edit"),
 					text: oRB.getText("LIST_ITEM_EDIT"),
-					shortcut: Device.os.macintosh ? "LIST_ITEM_EDIT_SHORTCUT_MAC" : "LIST_ITEM_EDIT_SHORTCUT"
+					shortcut: "Ctrl+E" // ShortcutHintsMixin takes care of normalizing and localizing
 				};
 			case ListItemActionType.Delete:
 				return {
 					icon: IconPool.getIconURI("decline"),
 					text: oRB.getText("LIST_ITEM_DELETE"),
-					shortcut: "LIST_ITEM_DELETE_SHORTCUT"
+					shortcut: "Delete" // Keyboard.Shortcut.Delete, see sap.ui.core/messagebundle.properties
 				};
 			default:
 				return {
@@ -179,7 +178,7 @@ sap.ui.define([
 
 		if (mActionInfo.shortcut) {
 			ShortcutHintsMixin.addConfig(this._oAction, {
-				messageBundleKey: mActionInfo.shortcut
+				shortcut: mActionInfo.shortcut
 			}, this._oAction);
 		}
 

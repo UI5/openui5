@@ -295,6 +295,56 @@ sap.ui.define([
 		QUnit.test("when the drop triggered on aggregation overlay", function(assert) {
 			testDragAndDropEventHandlerTriggering.call(this, "onAggregationDrop", this.oAggregationOverlay, ["drop"], assert);
 		});
+
+		QUnit.test("when dragstart is triggered with a native event, a drag ghost image is set", function(assert) {
+			// Overlay browser events are attached via native addEventListener, so the handler receives a
+			// native DragEvent (no jQuery "originalEvent" wrapper). showGhost must read dataTransfer directly
+			// and call setDragImage; otherwise the browser renders its default drag image (BCP: Safari artifact).
+			var oSetDragImageSpy = sinon.spy();
+			var oDataTransfer = {
+				setData() {},
+				setDragImage: oSetDragImageSpy
+			};
+
+			triggerEvent("dragstart", this.oButtonOverlay.getDomRef(), {
+				dataTransfer: oDataTransfer,
+				pageX: 10,
+				pageY: 10
+			});
+
+			assert.ok(this.oDragDrop.getGhost(), "then a ghost element was created");
+			assert.strictEqual(oSetDragImageSpy.callCount, 1, "then setDragImage was called once with the ghost");
+			assert.strictEqual(
+				oSetDragImageSpy.getCall(0).args[0],
+				this.oDragDrop.getGhost(),
+				"then setDragImage received the created ghost as the drag image"
+			);
+		});
+
+		QUnit.test("when createGhost is called and the associated DOM ref is a single element", function(assert) {
+			// getAssociatedDomRef returns a single DOM node for a regular control (e.g. a group). The ghost
+			// must contain the cloned DOM, otherwise the browser renders a broken/placeholder drag image.
+			var oGhostWrapper = this.oDragDrop.createGhost(this.oButtonOverlay);
+			var oGhost = oGhostWrapper.querySelector(".sapUiDtDragGhost");
+			assert.ok(oGhost, "then the ghost element exists inside the wrapper");
+			assert.ok(
+				oGhost.childNodes.length > 0,
+				"then the ghost contains the cloned DOM of the associated element (not an empty drag image)"
+			);
+		});
+
+		QUnit.test("when createGhost is called and the associated DOM ref is an array of elements", function(assert) {
+			// getAssociatedDomRef may return an array of nodes when the designtime metadata provides a domRef function
+			var oButtonDom = this.oButtonOverlay.getElement().getDomRef();
+			sandbox.stub(this.oButtonOverlay, "getAssociatedDomRef").returns([oButtonDom]);
+
+			var oGhostWrapper = this.oDragDrop.createGhost(this.oButtonOverlay);
+			var oGhost = oGhostWrapper.querySelector(".sapUiDtDragGhost");
+			assert.ok(
+				oGhost.childNodes.length > 0,
+				"then the ghost contains the cloned DOM from the array of associated elements"
+			);
+		});
 	});
 
 	QUnit.module("Given that DragDrop touchevents are initialized ", {

@@ -9693,10 +9693,12 @@ sap.ui.define([
 	[false, true].forEach(function (bMissingPredicate) {
 		[undefined, "~mQueryOptions~"].forEach(function (mLateExpandSelect) {
 			[false, true].forEach(function (bDeepCreate) {
-			var sTitle = "_Cache#create: bMissingPredicate: " + bMissingPredicate
-					+ ", bDropTransientElement: " + bDropTransientElement
-				+ ", mLateExpandSelect: " + mLateExpandSelect
-				+ ", bDeepCreate: " + bDeepCreate;
+				[false, true].forEach(function (bNoApplyWithSelect) {
+		var sTitle = "_Cache#create: bMissingPredicate: " + bMissingPredicate
+				+ ", bDropTransientElement: " + bDropTransientElement
+			+ ", mLateExpandSelect: " + mLateExpandSelect
+			+ ", bDeepCreate: " + bDeepCreate
+			+ ", bNoApplyWithSelect: " + bNoApplyWithSelect;
 
 		if (bMissingPredicate && bDropTransientElement) {
 			return;
@@ -9784,7 +9786,10 @@ sap.ui.define([
 			oHelperMock.expects("getQueryOptionsForPath").exactly(bDeepCreate ? 0 : 1)
 				.withExactArgs(sinon.match.same(mLateExpandSelect || oCache.mQueryOptions),
 					sPathInCache)
-				.returns({$select : aSelectForPath});
+				.returns({
+					$select : aSelectForPath,
+					...(bNoApplyWithSelect && {$$applyWithSelect : false})
+				});
 			oCancelNestedExpectation = oHelperMock.expects("cancelNestedCreates")
 				.withExactArgs(sinon.match.same(oInitialData), "Deep create of " + sPostPath
 					+ " succeeded. Do not use this promise.");
@@ -9809,7 +9814,7 @@ sap.ui.define([
 				.withExactArgs(sinon.match.same(oCache.mChangeListeners),
 					sPathInCache + (bMissingPredicate ? sTransientPredicate : sPredicate),
 					sinon.match.same(oInitialData), sinon.match.same(oPostResult),
-					bDeepCreate ? undefined : aSelectForPath, undefined, true)
+					bDeepCreate || bNoApplyWithSelect ? undefined : aSelectForPath, undefined, true)
 				.callsFake(function () {
 					assert.strictEqual(arguments[3]["@$ui5.context.isTransient"], false);
 					arguments[2]["@$ui5.context.isTransient"] = false;
@@ -9888,6 +9893,7 @@ sap.ui.define([
 					oUpdateExistingExpectation, oUpdateSelectedExpectation);
 			});
 		});
+				});
 			});
 		});
 	});
