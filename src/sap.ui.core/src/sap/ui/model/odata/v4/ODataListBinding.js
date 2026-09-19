@@ -126,9 +126,7 @@ sap.ui.define([
 		// number of active (client-side) created contexts in aContexts
 		this.iActiveContexts = 0;
 		this.aApplicationFilters = aFilters;
-		this.sChangeReason = oModel.bAutoExpandSelect && !_Helper.isDataAggregation(mParameters)
-			? "AddVirtualContext"
-			: undefined;
+		this.sChangeReason = oModel.bAutoExpandSelect ? "AddVirtualContext" : undefined;
 		// optional change reason to be used for the next refresh event after RemoveVirtualContext
 		// Note: must only be used in combination with this.sChangeReason set to "AddVirtualContext"
 		this.sChangeReasonAfterRemoveVirtualContext = undefined;
@@ -288,7 +286,8 @@ sap.ui.define([
 	 */
 	ODataListBinding.prototype.applyParameters = function (mParameters, sChangeReason,
 			aChangedParameters) {
-		var sApply,
+		var vApplyWithSelect,
+			sApply,
 			oOldAggregation = this.mParameters && this.mParameters.$$aggregation,
 			sOldApply = this.mQueryOptions && this.mQueryOptions.$apply;
 
@@ -304,7 +303,8 @@ sap.ui.define([
 					this.oModel.bAutoExpandSelect, this.oModel.oInterface.fetchMetadata,
 					this.getResolvedPath());
 			}
-			sApply = _AggregationHelper.buildApply(mParameters.$$aggregation).$apply;
+			({$apply : sApply, $$applyWithSelect : vApplyWithSelect}
+				= _AggregationHelper.buildApply(mParameters.$$aggregation));
 		}
 
 		// Note: called from c'tor before mParameters are stored for the 1st time
@@ -317,6 +317,7 @@ sap.ui.define([
 		this.mParameters = mParameters; // store mParameters at binding after validation
 		if (sApply) {
 			this.mQueryOptions.$apply = sApply;
+			this.mQueryOptions.$$applyWithSelect = vApplyWithSelect;
 		}
 
 		if (sChangeReason === "") { // called from #setAggregation

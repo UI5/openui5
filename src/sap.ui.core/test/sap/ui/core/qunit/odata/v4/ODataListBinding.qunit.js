@@ -394,26 +394,6 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("c'tor: no AddVirtualContext w/ $$aggregation", function (assert) {
-		var oBinding,
-			mClonedParameters = {},
-			mParameters = {/*$$aggregation : {aggregate : {"n/a" : {}}}*/};
-
-		this.oModel.bAutoExpandSelect = true;
-		this.mock(_Helper).expects("clone").withExactArgs(sinon.match.same(mParameters))
-			.returns(mClonedParameters);
-		this.mock(_Helper).expects("isDataAggregation")
-			.withExactArgs(sinon.match.same(mClonedParameters)).returns(true);
-		// avoid 2nd call to _Helper.clone
-		this.mock(ODataListBinding.prototype).expects("applyParameters");
-
-		// code under test
-		oBinding = this.bindList("/EMPLOYEES", null, [], [], mParameters);
-
-		assert.strictEqual(oBinding.sChangeReason, undefined);
-	});
-
-	//*********************************************************************************************
 	QUnit.test("c'tor: error cases", function (assert) {
 		assert.throws(function () {
 			// code under test
@@ -786,7 +766,8 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(oAggregation), "~autoExpandSelect~",
 				sinon.match.same(this.oModel.oInterface.fetchMetadata), "/EMPLOYEES");
 		this.mock(_AggregationHelper).expects("buildApply")
-			.withExactArgs(sinon.match.same(oAggregation)).returns({$apply : sApply});
+			.withExactArgs(sinon.match.same(oAggregation))
+			.returns({$apply : sApply, $$applyWithSelect : "~applyWithSelect~"});
 		oModelMock.expects("buildQueryOptions").withExactArgs(sinon.match.same(mParameters), true)
 			.returns({$filter : "bar"});
 		oExpectation = this.mock(oBinding).expects("removeCachesAndMessages").withExactArgs("");
@@ -803,6 +784,7 @@ sap.ui.define([
 
 		assert.deepEqual(oBinding.mQueryOptions, {
 			$apply : sApply,
+			$$applyWithSelect : "~applyWithSelect~",
 			$filter : "bar"
 		}, "mQueryOptions");
 		assert.deepEqual(oBinding.mParameters, mParameters);
@@ -907,7 +889,8 @@ sap.ui.define([
 		}
 		this.mock(_AggregationHelper).expects("validateAggregationAndSetPath").never();
 		this.mock(_AggregationHelper).expects("buildApply").exactly(bAggregation ? 1 : 0)
-			.withExactArgs(sinon.match.same(oAggregation)).returns({$apply : sApply});
+			.withExactArgs(sinon.match.same(oAggregation))
+			.returns({$apply : sApply, $$applyWithSelect : "~applyWithSelect~"});
 		oModelMock.expects("buildQueryOptions")
 			.withExactArgs(sinon.match.same(mParameters), true).returns({$filter : "bar"});
 		this.mock(oBinding).expects("isRootBindingSuspended").withExactArgs().returns(bSuspended);
@@ -928,7 +911,7 @@ sap.ui.define([
 		oBinding.applyParameters(mParameters, ChangeReason.Change, aChangedParameters);
 
 		assert.deepEqual(oBinding.mQueryOptions, bAggregation
-			? {$apply : sApply, $filter : "bar"}
+			? {$apply : sApply, $$applyWithSelect : "~applyWithSelect~", $filter : "bar"}
 			: {$filter : "bar"});
 		assert.deepEqual(oBinding.mParameters, mParameters);
 		assert.strictEqual(oBinding.mParameters.$$aggregation,
@@ -948,11 +931,13 @@ sap.ui.define([
 			};
 
 		oBinding.mQueryOptions.$apply = "old $apply";
+		oBinding.mQueryOptions.$$applyWithSelect = "~old applyWithSelect~";
 		this.mock(_AggregationHelper).expects("validateAggregationAndSetPath")
 			.withExactArgs(sinon.match.same(oAggregation), false,
 				sinon.match.same(this.oModel.oInterface.fetchMetadata), "/EMPLOYEES");
 		this.mock(_AggregationHelper).expects("buildApply")
-			.withExactArgs(sinon.match.same(oAggregation)).returns({$apply : sApply});
+			.withExactArgs(sinon.match.same(oAggregation))
+			.returns({$apply : sApply, $$applyWithSelect : "~applyWithSelect~"});
 		this.mock(this.oModel).expects("buildQueryOptions")
 			.withExactArgs(sinon.match.same(mParameters), true).returns({$filter : "bar"});
 		this.mock(oBinding).expects("isRootBindingSuspended").withExactArgs().returns(bSuspended);
@@ -969,6 +954,7 @@ sap.ui.define([
 
 		assert.deepEqual(oBinding.mQueryOptions, {
 			$apply : sApply,
+			$$applyWithSelect : "~applyWithSelect~",
 			$filter : "bar"
 		}, "mQueryOptions");
 		assert.deepEqual(oBinding.mParameters, mParameters);
@@ -983,6 +969,7 @@ sap.ui.define([
 			};
 
 		oBinding.mQueryOptions.$apply = "old $apply";
+		oBinding.mQueryOptions.$$applyWithSelect = "~applyWithSelect~";
 		this.mock(_AggregationHelper).expects("validateAggregationAndSetPath").never();
 		this.mock(_AggregationHelper).expects("buildApply").never();
 		this.mock(this.oModel).expects("buildQueryOptions")
@@ -1019,6 +1006,7 @@ sap.ui.define([
 			};
 
 		oBinding.mQueryOptions.$apply = sApply; // no change in $apply
+		oBinding.mQueryOptions.$$applyWithSelect = "~applyWithSelect~"; // no change here as well
 		oBinding.mParameters.$$aggregation = {
 			// aggregate : {GrossAmount : {}},
 			// groupLevels : ["LifecycleStatus"]
@@ -1027,7 +1015,8 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(oAggregation), false,
 				sinon.match.same(this.oModel.oInterface.fetchMetadata), "/EMPLOYEES");
 		this.mock(_AggregationHelper).expects("buildApply")
-			.withExactArgs(sinon.match.same(oAggregation)).returns({$apply : sApply});
+			.withExactArgs(sinon.match.same(oAggregation))
+			.returns({$apply : sApply, $$applyWithSelect : "~applyWithSelect~"});
 		this.mock(this.oModel).expects("buildQueryOptions")
 			.withExactArgs(sinon.match.same(mParameters), true).returns({$filter : "bar"});
 		this.mock(oBinding).expects("isUnchangedParameter")
@@ -1047,6 +1036,7 @@ sap.ui.define([
 
 		assert.deepEqual(oBinding.mQueryOptions, {
 			$apply : sApply,
+			$$applyWithSelect : "~applyWithSelect~",
 			$filter : "bar"
 		}, "mQueryOptions");
 		assert.deepEqual(oBinding.mParameters, mParameters);
@@ -1070,7 +1060,8 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(oAggregation), false,
 				sinon.match.same(this.oModel.oInterface.fetchMetadata), "/EMPLOYEES");
 		this.mock(_AggregationHelper).expects("buildApply")
-			.withExactArgs(sinon.match.same(oAggregation)).returns({$apply : sApply});
+			.withExactArgs(sinon.match.same(oAggregation))
+			.returns({$apply : sApply, $$applyWithSelect : "~applyWithSelect~"});
 		this.mock(this.oModel).expects("buildQueryOptions")
 			.withExactArgs(sinon.match.same(mParameters), true).returns({});
 		this.mock(oBinding).expects("isRootBindingSuspended").withExactArgs().returns(bSuspended);
@@ -1086,7 +1077,7 @@ sap.ui.define([
 		oBinding.applyParameters(mParameters, "");
 
 		assert.deepEqual(oBinding.mQueryOptions, {
-			$apply : sApply
+			$apply : sApply, $$applyWithSelect : "~applyWithSelect~"
 		}, "mQueryOptions");
 		assert.deepEqual(oBinding.mParameters, mParameters);
 		assert.strictEqual(oBinding.mParameters.$$aggregation, oAggregation, "$$aggregation");
@@ -1121,11 +1112,13 @@ sap.ui.define([
 
 		oBinding.mParameters.$$aggregation = oFixture.oOldAggregation;
 		oBinding.mQueryOptions.$apply = sApply;
+		oBinding.mQueryOptions.$$applyWithSelect = "~applyWithSelect~";
 		this.mock(_AggregationHelper).expects("validateAggregationAndSetPath")
 			.withExactArgs(sinon.match.same(oFixture.oNewAggregation), false,
 				sinon.match.same(this.oModel.oInterface.fetchMetadata), "/EMPLOYEES");
 		this.mock(_AggregationHelper).expects("buildApply")
-			.withExactArgs(sinon.match.same(oFixture.oNewAggregation)).returns({$apply : sApply});
+			.withExactArgs(sinon.match.same(oFixture.oNewAggregation))
+			.returns({$apply : sApply, $$applyWithSelect : "~applyWithSelect~"});
 		this.mock(this.oModel).expects("buildQueryOptions")
 			.withExactArgs(sinon.match.same(mParameters), true).returns({$filter : "bar"});
 		this.mock(oBinding).expects("isUnchangedParameter").exactly(oFixture.iDeepEqualCallCount)
@@ -1142,6 +1135,7 @@ sap.ui.define([
 
 		assert.deepEqual(oBinding.mQueryOptions, {
 			$apply : sApply,
+			$$applyWithSelect : "~applyWithSelect~",
 			$filter : "bar"
 		}, "mQueryOptions");
 		assert.deepEqual(oBinding.mParameters, mParameters);

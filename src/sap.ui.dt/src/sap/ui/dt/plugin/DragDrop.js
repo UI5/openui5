@@ -287,8 +287,8 @@ sap.ui.define([
 		oEvent.stopPropagation();
 
 		// Fix for Firfox - Firefox only fires drag events when data is set
-		if (Device.browser.firefox && oEvent && oEvent.originalEvent && oEvent.originalEvent.dataTransfer && oEvent.originalEvent.dataTransfer.setData) {
-			oEvent.originalEvent.dataTransfer.setData("text/plain", "");
+		if (Device.browser.firefox && oEvent?.dataTransfer?.setData) {
+			oEvent.dataTransfer.setData("text/plain", "");
 		}
 
 		this.setBusy(true);
@@ -443,22 +443,21 @@ sap.ui.define([
 	 * @protected
 	 */
 	DragDrop.prototype.showGhost = function(oOverlay, oEvent) {
-		if (oEvent && oEvent.originalEvent && oEvent.originalEvent.dataTransfer) {
-			if (oEvent.originalEvent.dataTransfer.setDragImage) {
-				this._oGhost = this.createGhost(oOverlay, oEvent);
+		// Overlay browser events are attached via native addEventListener, so oEvent is the native DragEvent.
+		if (oEvent?.dataTransfer?.setDragImage) {
+			this._oGhost = this.createGhost(oOverlay, oEvent);
 
-				// ghost should be visible to set it as dragImage
-				document.getElementById("overlay-container").append(this._oGhost);
-				// if ghost will be removed without timeout, setDragImage won't work
-				setTimeout(function() {
-					this._removeGhost();
-				}.bind(this), 0);
-				oEvent.originalEvent.dataTransfer.setDragImage(
-					this._oGhost,
-					oEvent.originalEvent.pageX - DOMUtil.getOffset(oOverlay.getDomRef()).left,
-					oEvent.originalEvent.pageY - DOMUtil.getOffset(oOverlay.getDomRef()).top
-				);
-			}
+			// ghost should be visible to set it as dragImage
+			document.getElementById("overlay-container").append(this._oGhost);
+			// if ghost will be removed without timeout, setDragImage won't work
+			setTimeout(function() {
+				this._removeGhost();
+			}.bind(this), 0);
+			oEvent.dataTransfer.setDragImage(
+				this._oGhost,
+				oEvent.pageX - DOMUtil.getOffset(oOverlay.getDomRef()).left,
+				oEvent.pageY - DOMUtil.getOffset(oOverlay.getDomRef()).top
+			);
 		}
 	};
 
@@ -493,7 +492,13 @@ sap.ui.define([
 			oGhost = oGhostDom;
 		} else {
 			oGhost = document.createElement("div");
-			[].slice.call(oGhostDom).forEach(function(oNode) {
+			// getAssociatedDomRef returns either a single DOM node (the common case, e.g. a group's
+			// rendered DOM) or an array/NodeList of nodes when the designtime metadata provides a
+			// domRef function. Normalize to an array so both are cloned into the ghost.
+			const aGhostNodes = Array.isArray(oGhostDom) || oGhostDom instanceof NodeList
+				? Array.from(oGhostDom)
+				: [oGhostDom];
+			aGhostNodes.forEach(function(oNode) {
 				DOMUtil.cloneDOMAndStyles(oNode, oGhost);
 			});
 		}

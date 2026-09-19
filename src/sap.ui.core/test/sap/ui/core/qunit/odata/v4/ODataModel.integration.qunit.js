@@ -1435,13 +1435,15 @@ sap.ui.define([
 		 * Creates a V4 OData model for data aggregation tests.
 		 *
 		 * @param {object} [mModelParameters] Map of parameters for model construction...
+		 * @param {boolean} [bExpandAfterConcatSupported]
+		 *   Whether "ExpandAfterConcatSupported" is added via a "local annotation file"
 		 * @returns {ODataModel} The model
 		 */
-		createAggregationModel : function (mModelParameters) {
+		createAggregationModel : function (mModelParameters, bExpandAfterConcatSupported) {
 			return this.createModel("/aggregation/", mModelParameters, {
 				"/aggregation/$metadata"
 					: {source : "odata/v4/data/metadata_aggregation.xml"}
-			});
+			}, [/*aRegExps*/], bExpandAfterConcatSupported);
 		},
 
 		/**
@@ -1613,19 +1615,27 @@ sap.ui.define([
 		 *   The fixture. See {@link sap.ui.test.TestUtils.useFakeServer}
 		 * @param {object[]} [aRegExps]
 		 *   The reg exp fixture. See {@link sap.ui.test.TestUtils.useFakeServer}
+		 * @param {boolean} [bExpandAfterConcatSupported]
+		 *   Whether "ExpandAfterConcatSupported" is added via a "local annotation file"
 		 * @returns {sap.ui.model.odata.v4.ODataModel} The model
 		 */
-		createModel : function (sServiceUrl, mModelParameters, mFixture, aRegExps) {
-			var mDefaultParameters = {
-					operationMode : OperationMode.Server,
-					serviceUrl : sServiceUrl
-				};
-
+		createModel : function (sServiceUrl, mModelParameters, mFixture, aRegExps,
+				bExpandAfterConcatSupported) {
+			mModelParameters = {
+				operationMode : OperationMode.Server,
+				serviceUrl : sServiceUrl,
+				...mModelParameters
+			};
+			if (bExpandAfterConcatSupported) {
+				mModelParameters.annotationURI = "/ExpandAfterConcatSupported.xml";
+				mFixture["/ExpandAfterConcatSupported.xml"]
+					= {source : "odata/v4/data/ExpandAfterConcatSupported.xml"};
+			}
 			mFixture = TestUtils.normalizeFixture(mFixture, sServiceUrl);
 			TestUtils.useFakeServer(this._oSandbox, "sap/ui/core/qunit", mFixture, aRegExps,
 				sServiceUrl, /*bStrict*/true);
 
-			return new ODataModel(Object.assign(mDefaultParameters, mModelParameters));
+			return new ODataModel(mModelParameters);
 		},
 
 		/**
@@ -1693,27 +1703,32 @@ sap.ui.define([
 		 *   The additional fixture. See {@link sap.ui.test.TestUtils.useFakeServer}
 		 * @param {object[]} [aRegExps]
 		 *   The reg exp fixture. See {@link sap.ui.test.TestUtils.useFakeServer}
+		 * @param {boolean} [bExpandAfterConcatSupported]
+		 *   Whether "ExpandAfterConcatSupported" is added via a "local annotation file"
 		 * @returns {ODataModel} The model
 		 */
-		createSalesOrdersModel : function (mModelParameters, mAdditionalFixture, aRegExps) {
+		createSalesOrdersModel : function (mModelParameters, mAdditionalFixture, aRegExps,
+				bExpandAfterConcatSupported) {
 			return this.createModel(sSalesOrderService, mModelParameters,
 				Object.assign({
 					[sSalesOrderService + "$metadata"]
 						: {source : "odata/v4/data/metadata_zui5_epm_sample.xml"}
-				}, mAdditionalFixture), aRegExps);
+				}, mAdditionalFixture), aRegExps, bExpandAfterConcatSupported);
 		},
 
 		/**
 		 * Creates a V4 OData model for <code>zui5_epm_sample</code> using client "123".
 		 *
 		 * @param {object} [mModelParameters] Map of parameters for model construction...
+		 * @param {boolean} [bExpandAfterConcatSupported]
+		 *   Whether "ExpandAfterConcatSupported" is added via a "local annotation file"
 		 * @returns {ODataModel} The model
 		 */
-		createSalesOrdersModel123 : function (mModelParameters) {
+		createSalesOrdersModel123 : function (mModelParameters, bExpandAfterConcatSupported) {
 			return this.createModel(sSalesOrderService + "?sap-client=123", mModelParameters, {
 					[sSalesOrderService + "$metadata?sap-client=123"]
 						: {source : "odata/v4/data/metadata_zui5_epm_sample.xml"}
-				});
+				}, [/*aRegExps*/], bExpandAfterConcatSupported);
 		},
 
 		/**
@@ -21064,8 +21079,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				groupLevels : []
 			}, "JIRA: CPOUI5ODATAV4-1825, CPOUI5ODATAV4-1961");
 
-			that.expectRequest("TEAMS('TEAM_01')/TEAM_2_EMPLOYEES?custom=foo&$apply=aggregate(AGE)"
-					+ "&$orderby=Name&$filter=AGE gt 42&$skip=0&$top=100", {
+			that.expectRequest("TEAMS('TEAM_01')/TEAM_2_EMPLOYEES?$filter=AGE gt 42&$orderby=Name"
+					+ "&custom=foo&$apply=aggregate(AGE)&$skip=0&$top=100", {
 					value : [{ // Note: unrealistic response in order to reduce UI changes
 						AGE : 52,
 						ID : "1",
@@ -24729,7 +24744,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// aggregation on leaf level and visual grouping w/o totals!
 	// JIRA: CPOUI5ODATAV4-2796
 	QUnit.test("Data Aggregation: CPOUI5ODATAV4-2796", async function (assert) {
-		await this.createView(assert, "", this.createSalesOrdersModel());
+		await this.createView(assert, "", this.createSalesOrdersModel({autoExpandSelect : true}));
 
 		const oListBinding = this.oModel.bindList("/ProductList", null, [/*vSorters*/], [
 			new Filter("Depth", FilterOperator.GT, "111"),
@@ -25171,6 +25186,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// total are requested in the same $batch, but as the deleted entity was excluded by the filter,
 	// the count and the grand total remain unchanged.
 	// JIRA: CPOUI5ODATAV4-3260
+	//
+	// ODLB#getDownloadUrl does not need $apply, URL has no $count=true (JIRA: CPOUI5ODATAV4-3362)
+	// Check that auto-$expand/$select works, incl. manual $select (JIRA: CPOUI5ODATAV4-3438)
 	[
 		"context refresh",
 		"context refresh via side effects",
@@ -25180,7 +25198,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		QUnit.test("Data Aggregation: leaves' key predicates; " + sScenario, function (assert) {
 			var oBinding,
 				oHeaderContext,
-				oModel = this.createSalesOrdersModel123({autoExpandSelect : true}),
+				oModel = this.createSalesOrdersModel123({autoExpandSelect : true},
+					/*bExpandAfterConcatSupported*/true),
 				oTable,
 				sView = `
 	<Table id="table" items="{path : '/SalesOrderList',
@@ -25202,6 +25221,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				},
 				$count : true,
 				$orderby : 'LifecycleStatus desc',
+				$select : 'SO_2_BP/Address/PostalCode',
 				custom : 'foo'
 			}}">
 		<Text id="isOutdated" text="{= %{@$ui5.context.isOutdated} }"/>
@@ -25218,16 +25238,19 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			this.expectRequest("SalesOrderList?sap-client=123&custom=foo&$apply="
 					+ "filter(LifecycleStatus gt 'P' and GrossAmount lt 100)/search(covfefe)"
-					+ "/concat(aggregate(GrossAmount)"
-					+ ",groupby((LifecycleStatus,SalesOrderID,SO_2_BP/Address/City)"
-					+ ",aggregate(GrossAmount))/orderby(LifecycleStatus desc)"
-					+ "/concat(aggregate($count as UI5__count),top(99)))", {
+					+ "/concat(aggregate(GrossAmount),orderby(LifecycleStatus desc)"
+						+ "/concat(aggregate($count as UI5__count),top(99)))"
+					+ "&$expand=SO_2_BP($select=Address/City,Address/PostalCode,BusinessPartnerID)"
+					+ "&$select=GrossAmount,LifecycleStatus,SalesOrderID,UI5__count", {
 					value : [
 						{GrossAmount : "6"},
 						{UI5__count : "3", "UI5__count@odata.type" : "#Decimal"},
 						{GrossAmount : "1", LifecycleStatus : "Z", SalesOrderID : "26", SO_2_BP : null},
 						{GrossAmount : "2", LifecycleStatus : "Y", SalesOrderID : "25",
-							SO_2_BP : {Address : {City : "Walldorf"}}},
+							SO_2_BP : {
+								Address : {City : "Walldorf", PostalCode : "69190"},
+								BusinessPartnerID : "n/a"
+							}},
 						{GrossAmount : "3", LifecycleStatus : "X", SalesOrderID : "24", SO_2_BP : null}
 					]
 				})
@@ -25245,6 +25268,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				oTable = that.oView.byId("table");
 				oBinding = oTable.getBinding("items");
 				oHeaderContext = oBinding.getHeaderContext();
+
+				// code under test (JIRA: CPOUI5ODATAV4-3362)
+				assert.strictEqual(oBinding.getDownloadUrl(),
+					sSalesOrderService + "SalesOrderList?sap-client=123&custom=foo"
+					+ "&$expand=SO_2_BP($select=Address/City,Address/PostalCode,BusinessPartnerID)"
+					+ "&$filter=LifecycleStatus%20gt%20'P'%20and%20GrossAmount%20lt%20100"
+					+ "&$orderby=LifecycleStatus%20desc&$search=covfefe"
+					+ "&$select=GrossAmount,LifecycleStatus,SalesOrderID");
 
 				// code under test (JIRA: CPOUI5ODATAV4-3392)
 				assert.strictEqual(oHeaderContext.isOutdated(), undefined);
@@ -25296,7 +25327,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							"Unsupported on aggregated data: " + aCurrentContexts[0]);
 					});
 			}).then(function () {
-				const [oGrandTotalContext, oContext26] = oBinding.getCurrentContexts();
+				const [oGrandTotalContext, oContext26, oContext25] = oBinding.getCurrentContexts();
 				assert.deepEqual(oGrandTotalContext.getObject(), {
 						// NO @$ui5.context.isOutdated
 						"@$ui5.node.isExpanded" : true,
@@ -25305,13 +25336,32 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						GrossAmount : "6",
 						"LifecycleStatus@$ui5.noData" : true,
 						"SalesOrderID@$ui5.noData" : true,
-						SO_2_BP : {
+						SO_2_BP : { //TODO: why not "SO_2_BP@$ui5.noData" : true?
 							Address : {
 								"City@$ui5.noData" : true
+								//TODO: "PostalCode@$ui5.noData" : true
 							}
 						}
 					});
 				assert.strictEqual(oGrandTotalContext.isOutdated(), undefined);
+				//TODO: oGrandTotalContext.requestProperty("SO_2_BP/Address/PostalCode")
+				//   .then((sPostalCode) => {
+				//     assert.strictEqual(sPostalCode, undefined, "not available here");
+				//   });
+				assert.deepEqual(oContext25.getObject(), {
+					"@$ui5.node.isTotal" : false,
+					"@$ui5.node.level" : 1,
+					GrossAmount : "2",
+					LifecycleStatus : "Y",
+					SO_2_BP : {
+						Address : {
+							City : "Walldorf",
+							PostalCode : "69190"
+						},
+						BusinessPartnerID : "n/a"
+					},
+					SalesOrderID : "25"
+				});
 
 				that.expectRequest("SalesOrderList('26')?sap-client=123&custom=foo&$select=Note",
 						{Note : "Late"});
@@ -25368,14 +25418,17 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					const sSelect = "GrossAmount,LifecycleStatus" + (bMessages ? ",Messages" : "")
 						+ ",Note,SalesOrderID";
 					that.expectRequest("#0 SalesOrderList('25')?sap-client=123&custom=foo"
-							+ "&$select=" + sSelect
-							+ "&$expand=SO_2_BP($select=Address/City,BusinessPartnerID)", {
+							+ "&$select=" + sSelect + "&$expand=SO_2_BP("
+								+ "$select=Address/City,Address/PostalCode,BusinessPartnerID)", {
 							GrossAmount : "5",
 							LifecycleStatus : "Y*",
 							...(bMessages && {Messages : []}),
 							Note : "n/a",
 							SalesOrderID : "25",
-							SO_2_BP : {Address : {City : "Heidelberg"}, BusinessPartnerID : "n/a"}
+							SO_2_BP : {
+								Address : {City : "Heidelberg", PostalCode : "69121"},
+								BusinessPartnerID : "n/a"
+							}
 						})
 						.expectChange("lifecycleStatus", [, "Y*"])
 						.expectChange("city", [, "Heidelberg"])
@@ -25405,15 +25458,18 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						that.waitForChanges(assert, sScenario)
 					]);
 				} else if (sScenario === "request properties of a context via side effects") {
-					that.expectRequest("#0 SalesOrderList('25')?sap-client=123&custom=foo"
-							+ "&$select=LifecycleStatus,Note", {
+					that.expectRequest("#0 SalesOrderList('25')?sap-client=123"
+							+ "&$select=LifecycleStatus,Note&custom=foo", {
 							LifecycleStatus : "Y*",
 							Note : "Late*"
 						})
-						.expectRequest("#0 SalesOrderList('25')?sap-client=123&custom=foo"
-							+ "&$select=SO_2_BP"
-							+ "&$expand=SO_2_BP($select=Address/City,BusinessPartnerID)", {
-							SO_2_BP : {Address : {City : "Heidelberg"}, BusinessPartnerID : "n/a"}
+						.expectRequest("#0 SalesOrderList('25')?sap-client=123"
+							+ "&$select=SO_2_BP&custom=foo&$expand=SO_2_BP("
+								+ "$select=Address/City,Address/PostalCode,BusinessPartnerID)", {
+							SO_2_BP : {
+								Address : {City : "Heidelberg", PostalCode : "69121"},
+								BusinessPartnerID : "n/a"
+							}
 						})
 						.expectChange("lifecycleStatus", [, "Y*"])
 						.expectChange("city", [, "Heidelberg"]);
@@ -25462,15 +25518,18 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 				that.expectRequest("SalesOrderList?sap-client=123&custom=foo&$apply="
 						+ "filter(LifecycleStatus gt 'P' and GrossAmount lt 100)/search(covfefe)"
-						+ "/concat(aggregate(GrossAmount)"
-						+ ",groupby((LifecycleStatus,SalesOrderID,SO_2_BP/Address/City)"
-						+ ",aggregate(GrossAmount))/orderby(LifecycleStatus desc)"
-						+ "/concat(aggregate($count as UI5__count),top(99)))", {
+						+ "/concat(aggregate(GrossAmount),orderby(LifecycleStatus desc)"
+							+ "/concat(aggregate($count as UI5__count),top(99)))"
+						+ "&$expand=SO_2_BP($select=Address/City,Address/PostalCode,BusinessPartnerID)"
+						+ "&$select=GrossAmount,LifecycleStatus,SalesOrderID,UI5__count", {
 						value : [
 							{GrossAmount : "15"},
 							{UI5__count : "2", "UI5__count@odata.type" : "#Decimal"},
 							{GrossAmount : "7", LifecycleStatus : "Y", SalesOrderID : "25",
-								SO_2_BP : {Address : {City : "Walldorf"}}},
+								SO_2_BP : {
+									Address : {City : "Walldorf", PostalCode : "69190"},
+									BusinessPartnerID : "n/a"
+								}},
 							{GrossAmount : "8", LifecycleStatus : "X", SalesOrderID : "24",
 								SO_2_BP : null}
 						]
@@ -25640,8 +25699,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// end responds with the same element again. It is shown as a duplicate, which is acceptable in
 	// the outdated state.
 	// JIRA: CPOUI5ODATAV4-3260
+	//
+	// Check that manual $select works even w/o auto-$expand/$select (JIRA: CPOUI5ODATAV4-3438)
 	QUnit.test("Data Aggregation: delete kept-alive outside collection", async function (assert) {
-		const oModel = this.createSalesOrdersModel123({autoExpandSelect : true});
+		const oModel = this.createSalesOrdersModel123({autoExpandSelect : false},
+			/*bExpandAfterConcatSupported*/true);
 		const sView = `
 <Text id="count" text="{$count}"/>
 <Text id="isOutdatedHeader" text="{= %{@$ui5.context.isOutdated} }"/>
@@ -25656,7 +25718,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				group : {
 					SalesOrderID : {}
 				}
-			}
+			},
+			$select : 'Currency'
 		}}" threshold="0">
 	<t:rowMode>
 		<trm:Fixed rowCount="3" fixedBottomRowCount="1"/>
@@ -25670,13 +25733,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		this.expectRequest("SalesOrderList?sap-client=123&$apply="
 				+ "filter(LifecycleStatus gt 'P')/concat(aggregate(GrossAmount)"
-				+ ",groupby((SalesOrderID),aggregate(GrossAmount))"
-				+ "/concat(aggregate($count as UI5__count),top(2)))", {
+				+ ",concat(aggregate($count as UI5__count),top(2)))"
+				+ "&$select=Currency,GrossAmount,SalesOrderID,UI5__count", {
 				value : [
 					{GrossAmount : "1000"},
 					{UI5__count : "42", "UI5__count@odata.type" : "#Decimal"},
-					{GrossAmount : "10", SalesOrderID : "1"},
-					{GrossAmount : "20", SalesOrderID : "2"}
+					{Currency : "DEM", GrossAmount : "10", SalesOrderID : "1"},
+					{Currency : "DEM", GrossAmount : "20", SalesOrderID : "2"}
 				]
 			})
 			.expectChange("count")
@@ -25715,6 +25778,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[undefined, "false", "1", "20", "2"],
 			[undefined, "true", "0", "1000", ""]
 		], 43); // 42 entities + grand total row
+
+		assert.deepEqual(oBinding.getCurrentContexts()[0].getObject(), {
+			"@$ui5.node.isTotal" : false,
+			"@$ui5.node.level" : 1,
+			Currency : "DEM", // manual $select => here it is :-)
+			GrossAmount : "10",
+			SalesOrderID : "1"
+		});
 
 		this.expectRequest("SalesOrderList('31')?sap-client=123&$select=SalesOrderID", {
 				SalesOrderID : "31"
@@ -25756,11 +25827,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[false, "true", "0", "990", ""]
 		], 43); // length unchanged, header context is outdated instead
 
-		this.expectRequest("SalesOrderList?sap-client=123&$apply="
-				+ "filter(LifecycleStatus gt 'P')"
-				+ "/groupby((SalesOrderID),aggregate(GrossAmount))/skip(40)/top(1)", {
+		this.expectRequest("SalesOrderList?sap-client=123&$filter=LifecycleStatus gt 'P'"
+				+ "&$select=Currency,GrossAmount,SalesOrderID&$skip=40&$top=1", {
 				value : [
-					{GrossAmount : "420", SalesOrderID : "42"}
+					{Currency : "DEM", GrossAmount : "420", SalesOrderID : "42"}
 				]
 			})
 			.expectChange("isTotal", false, 40)
@@ -25826,11 +25896,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			.expectChange("level", 1, 40)
 			.expectChange("grossAmount", "420", 40)
 			.expectChange("salesOrderID", "42", 40)
-			.expectRequest("SalesOrderList?sap-client=123&$apply="
-				+ "filter(LifecycleStatus gt 'P')"
-				+ "/groupby((SalesOrderID),aggregate(GrossAmount))/skip(39)/top(1)", {
+			.expectRequest("SalesOrderList?sap-client=123&$filter=LifecycleStatus gt 'P'"
+				+ "&$select=Currency,GrossAmount,SalesOrderID&$skip=39&$top=1", {
 				value : [
-					{GrossAmount : "420", SalesOrderID : "42"} // duplicate
+					{Currency : "DEM", GrossAmount : "420", SalesOrderID : "42"} // duplicate
 				]
 			})
 			.expectChange("isTotal", false, 39)
@@ -25908,7 +25977,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			+ iSorterCase + "; with filter: " + bWithFilter;
 
 		QUnit.test(sTitle, async function (assert) {
-			const oModel = this.createSalesOrdersModel123({autoExpandSelect : true});
+			const oModel = this.createSalesOrdersModel123({autoExpandSelect : true},
+				/*bExpandAfterConcatSupported*/true);
 			const sView = `
 	<Table id="table" items="{path : '/SalesOrderList',
 			${bWithFilter
@@ -25947,10 +26017,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				? "filter(CurrencyCode eq 'EUR' and LifecycleStatus gt 'A')/"
 				: "";
 			this.expectRequest("SalesOrderList?sap-client=123&$apply=" + sFilter + "concat("
-					+ "aggregate(GrossAmount,CurrencyCode),groupby((LifecycleStatus,SalesOrderID)"
-					+ ",aggregate(GrossAmount,CurrencyCode))"
-					+ (iSorterCase ? "/orderby(CurrencyCode,LifecycleStatus desc)" : "")
-					+ "/concat(aggregate($count as UI5__count),top(99)))", {
+					+ "aggregate(GrossAmount,CurrencyCode),"
+					+ (iSorterCase ? "orderby(CurrencyCode,LifecycleStatus desc)/" : "")
+					+ "concat(aggregate($count as UI5__count),top(99)))"
+					+ "&$select=CurrencyCode,GrossAmount,LifecycleStatus,SalesOrderID,UI5__count", {
 					value : [
 						{CurrencyCode : "EUR", GrossAmount : "6"},
 						{UI5__count : "3", "UI5__count@odata.type" : "#Decimal"},
@@ -26422,7 +26492,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		var sTitle = "Data Aggregation: aggregate a key property, use $apply: " + bApply;
 
 		QUnit.test(sTitle, function (assert) {
-			var oModel = this.createSalesOrdersModel(),
+			var oModel = this.createSalesOrdersModel({autoExpandSelect : true}),
 				mParameters = bApply
 				? {$apply : "groupby((LifecycleStatus),aggregate(SalesOrderID))"}
 				: {
@@ -26487,7 +26557,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// key predicates.
 	// BCP: 2280187516
 	QUnit.test("Data Aggregation: aggregate a key property, w/ grand total", function (assert) {
-		var oModel = this.createSalesOrdersModel(),
+		var oModel = this.createSalesOrdersModel({autoExpandSelect : true}),
 			mParameters = {
 				$$aggregation : {
 					aggregate : {
@@ -26799,7 +26869,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Check download URL.
 	// JIRA: CPOUI5ODATAV4-609
 	QUnit.test("Data Aggregation: expand and paging on sap.ui.table.Table", function (assert) {
-		var oModel = this.createAggregationModel(),
+		var oModel = this.createAggregationModel({autoExpandSelect : true}),
 			oTable,
 			sView = '\
 <t:Table id="table" threshold="0" visibleRowCount="3"\
@@ -27005,7 +27075,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		QUnit.test(sTitle, function (assert) {
 			var oExpandPromise,
-				oModel = this.createAggregationModel(),
+				oModel = this.createAggregationModel({autoExpandSelect : true}),
 				fnRespondExpand,
 				fnRespondScroll1,
 				fnRespondScroll2,
@@ -27183,7 +27253,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Request leaf count.
 	// JIRA: CPOUI5ODATAV4-164
 	QUnit.test("Data Aggregation: expand and paging to the last loaded leaf", function (assert) {
-		var oModel = this.createAggregationModel(),
+		var oModel = this.createAggregationModel({autoExpandSelect : true}),
 			oTable,
 			sView = '\
 <Text id="count" text="{$count}"/>\
@@ -27390,7 +27460,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		const sTitle = "Data Aggregation: no data, grandTotalAtBottomOnly=" + bGrandTotalAtBottomOnly;
 
 		QUnit.test(sTitle, async function (assert) {
-			const oModel = this.createAggregationModel();
+			const oModel = this.createAggregationModel({autoExpandSelect : true});
 
 			await this.createView(assert, "", oModel);
 
@@ -27436,7 +27506,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		var sTitle = "Data Aggregation: grandTotalAtBottomOnly=" + bGrandTotalAtBottomOnly;
 
 		QUnit.test(sTitle, function (assert) {
-			var oModel = this.createAggregationModel(),
+			var oModel = this.createAggregationModel({autoExpandSelect : true}),
 				sView = '\
 <t:Table id="table" rows="{path : \'/BusinessPartners\', parameters : {\
 		$$aggregation : {\
@@ -27527,7 +27597,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		QUnit.test(sTitle, function (assert) {
 			var oListBinding,
-				oModel = this.createAggregationModel(),
+				oModel = this.createAggregationModel({autoExpandSelect : true}),
 				oTable,
 				sView = '\
 <Table id="table" items="{path : \'/BusinessPartners\', parameters : {\
@@ -27752,7 +27822,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		QUnit.test(sTitle, function (assert) {
 			var oListBinding,
-				oModel = this.createAggregationModel(),
+				oModel = this.createAggregationModel({autoExpandSelect : true}),
 				oTable,
 				sView = '\
 <Table id="table" items="{path : \'/BusinessPartners\', parameters : {\
@@ -27910,7 +27980,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// anything!
 	// JIRA: CPOUI5ODATAV4-825
 	QUnit.test("Data Aggregation: grandTotalAtBottomOnly=true, just two rows", function (assert) {
-		var oModel = this.createAggregationModel(),
+		var oModel = this.createAggregationModel({autoExpandSelect : true}),
 			sView = '\
 <t:Table id="table" rows="{path : \'/BusinessPartners\', parameters : {\
 		$$aggregation : {\
@@ -27956,7 +28026,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Collapse with placeholders
 	// JIRA: CPOUI5ODATAV4-179
 	QUnit.test("Data Aggregation: collapse with placeholders", function (assert) {
-		var oModel = this.createAggregationModel(),
+		var oModel = this.createAggregationModel({autoExpandSelect : true}),
 			oTable,
 			sView = '\
 <t:Table id="table" rows="{path : \'/BusinessPartners\',\
@@ -28056,7 +28126,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Check download URL (JIRA: CPOUI5ODATAV4-609)
 	// Some, but not all, levels present as groups (JIRA: CPOUI5ODATAV4-2755)
 	QUnit.test("Data Aggregation: expand three levels, expand after collapse", function (assert) {
-		var oModel = this.createAggregationModel(),
+		var oModel = this.createAggregationModel({autoExpandSelect : true}),
 			oRowsBinding,
 			oTable,
 			oUKContext,
@@ -28278,6 +28348,78 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	});
 
 	//*********************************************************************************************
+	// Scenario: sap.ui.table.Table leaf count and visual grouping, but no auto-$expand/$select.
+	// Get download URL and expand to leaf level. Both use "identity" and must not fail due to
+	// pseudo query option "$$leaves".
+	// JIRA: CPOUI5ODATAV4-3438
+	QUnit.test("Data Aggregation: identity & $$leaves", async function (assert) {
+		const oModel = this.createSpecialCasesModel({autoExpandSelect : false});
+		const sView = `
+<t:Table id="table" rows="{path : '/Artists',
+	parameters : {
+		$$aggregation : {
+			groupLevels : ['IsActiveEntity', 'ArtistID']
+		},
+		$count : true
+	}}">
+	<Text text="{= %{@$ui5.node.isExpanded} }"/>
+	<Text text="{= %{@$ui5.node.level} }"/>
+	<Text text="{= %{IsActiveEntity} }"/>
+	<Text text="{ArtistID}"/>
+</t:Table>`;
+
+		this.expectRequest("Artists?$apply=concat("
+				+ "groupby((ArtistID,IsActiveEntity))/aggregate($count as UI5__leaves)"
+				+ ",groupby((IsActiveEntity))/concat(aggregate($count as UI5__count),top(110)))", {
+				value : [
+					{UI5__leaves : "42", "UI5__leaves@odata.type" : "#Decimal"},
+					{UI5__count : "2", "UI5__count@odata.type" : "#Decimal"},
+					{IsActiveEntity : false},
+					{IsActiveEntity : true}
+				]
+			});
+
+		await this.createView(assert, sView, oModel);
+
+		const oTable = this.oView.byId("table");
+		checkTable("initial state", assert, oTable, [
+			"/Artists(IsActiveEntity=false)",
+			"/Artists(IsActiveEntity=true)"
+		], [ // isExpanded|level|IsActiveEntity|ArtistID
+			[false, 1, "false", ""],
+			[false, 1, "true", ""]
+		]);
+
+		const oBinding = oTable.getBinding("rows");
+		// code under test
+		assert.strictEqual(oBinding.getDownloadUrl(), "/special/cases/Artists");
+
+		this.expectRequest("Artists?$count=true&$filter=IsActiveEntity eq false"
+				+ "&$select=ArtistID,IsActiveEntity&$skip=0&$top=110", {
+				"@odata.count" : "1",
+				value : [
+					{ArtistID : "1", IsActiveEntity : false}
+				]
+			});
+
+		await Promise.all([
+			// code under test
+			oBinding.getCurrentContexts()[0].expand(),
+			this.waitForChanges(assert, "expand")
+		]);
+
+		checkTable("after expand", assert, oTable, [
+			"/Artists(IsActiveEntity=false)",
+			"/Artists(ArtistID='1',IsActiveEntity=false)",
+			"/Artists(IsActiveEntity=true)"
+		], [ // isExpanded|level|IsActiveEntity|ArtistID
+			[true, 1, "false", ""],
+			[undefined, 2, "false", "1"],
+			[false, 1, "true", ""]
+		]);
+	});
+
+	//*********************************************************************************************
 	// Scenario: sap.ui.table.Table with aggregation and visual grouping. Show additional text
 	// properties for group levels via navigation. Expand all levels.
 	// JIRA: CPOUI5ODATAV4-680
@@ -28288,8 +28430,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// All levels present as groups (JIRA: CPOUI5ODATAV4-2755)
 	// Delete with visual grouping is not allowed (JIRA: CPOUI5ODATAV4-3229)
+	// Editing works via navigation on leaf level (JIRA: CPOUI5ODATAV4-3438)
 	QUnit.test("Data Aggregation: additionally via navigation", function (assert) {
-		var oTable,
+		var oModel = this.createSpecialCasesModel({autoExpandSelect : true}),
+			oTable,
 			sView = '\
 <t:Table id="table" rows="{path : \'/Artists\',\
 	parameters : {\
@@ -28357,7 +28501,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			.expectChange("city", [null, null])
 			.expectChange("sendsAutographs", [undefined, undefined]);
 
-		return this.createView(assert, sView, this.createSpecialCasesModel()).then(function () {
+		return this.createView(assert, sView, oModel).then(function () {
 			oTable = that.oView.byId("table");
 
 			that.expectRequest("Artists?$apply=filter(IsActiveEntity eq true)"
@@ -28387,18 +28531,50 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				that.waitForChanges(assert, "1st expand")
 			]);
 		}).then(function () {
-			that.expectRequest("Artists?$apply=filter(IsActiveEntity eq true and Name eq 'B')"
-					+ "/groupby((ArtistID,Address/City),aggregate(sendsAutographs))"
-					+ "/orderby(Address/City asc)&$count=true&$skip=0&$top=6", {
+			that.expectRequest("Artists?$count=true"
+					+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity,Name)"
+						+ ",BestPublication($select=PublicationID"
+							+ ";$expand=DraftAdministrativeData($select=DraftID,InProcessByUser))"
+					+ "&$filter=IsActiveEntity eq true and Name eq 'B'&$orderby=Address/City asc"
+					+ "&$select=Address/City,ArtistID,IsActiveEntity,Name,sendsAutographs"
+					+ "&$skip=0&$top=6", {
 					"@odata.count" : "2",
 					value : [{
 						Address : {City : "Liverpool"},
 						ArtistID : "1",
+						BestFriend : {
+							ArtistID : "BF4E",
+							IsActiveEntity : true,
+							Name : "B's best friend"
+						},
+						BestPublication : {
+							DraftAdministrativeData : {
+								DraftID : "n/a",
+								InProcessByUser : null
+							},
+							PublicationID : "0815"
+						},
+						IsActiveEntity : true,
+						Name : "B",
 						// Note: think of "sendsAutographs" as a weird custom aggregate ;-)
 						sendsAutographs : false
 					}, {
 						Address : {City : "London"},
 						ArtistID : "2",
+						BestFriend : {
+							ArtistID : "n/a",
+							IsActiveEntity : true,
+							Name : "B's best friend"
+						},
+						BestPublication : {
+							DraftAdministrativeData : {
+								DraftID : "n/a",
+								InProcessByUser : null
+							},
+							PublicationID : "n/a"
+						},
+						IsActiveEntity : true,
+						Name : "B",
 						sendsAutographs : true
 					}]
 				})
@@ -28427,6 +28603,46 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				// code under test (JIRA: CPOUI5ODATAV4-3229)
 				oContext.delete();
 			}, new Error("Unsupported on aggregated data: " + oContext));
+			assert.deepEqual(oContext.getObject(), {
+				"@$ui5.node.isTotal" : false,
+				"@$ui5.node.level" : 3,
+				Address : {
+					City : "Liverpool"
+				},
+				ArtistID : "1",
+				BestFriend : {
+					ArtistID : "BF4E",
+					IsActiveEntity : true,
+					Name : "B's best friend"
+				},
+				BestPublication : {
+					DraftAdministrativeData : {
+						DraftID : "n/a",
+						InProcessByUser : null
+					},
+					PublicationID : "0815"
+				},
+				IsActiveEntity : true,
+				Name : "B",
+				sendsAutographs : false
+			});
+
+			that.expectChange("bestFriendName", [,,,, "B's best friend 4ever!"])
+				.expectChange("inProcessByUser", [,,,, "JANEDOE"])
+				.expectRequest("#0 PATCH Artists(ArtistID='BF4E',IsActiveEntity=true)", {
+					payload : {Name : "B's best friend 4ever!"}
+				}, oNO_CONTENT)
+				.expectRequest("#0 PATCH Publications('0815')/DraftAdministrativeData", {
+					payload : {InProcessByUser : "JANEDOE"}
+				}, oNO_CONTENT);
+
+			return Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3438)
+				oContext.setProperty("BestFriend/Name", "B's best friend 4ever!"),
+				oContext.setProperty("BestPublication/DraftAdministrativeData/InProcessByUser",
+					"JANEDOE"),
+				that.waitForChanges(assert, "edit via navigation")
+			]);
 		});
 	});
 
@@ -28443,7 +28659,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			+ bSecondScroll + ")";
 
 		QUnit.test(sTitle, function (assert) {
-			var oModel = this.createAggregationModel(),
+			var oModel = this.createAggregationModel({autoExpandSelect : true}),
 				oTable,
 				sView = '\
 <t:Table id="table" rows="{path : \'/BusinessPartners\',\
@@ -28569,7 +28785,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// at the root level and find the 2nd level properly expanded as well.
 	// JIRA: CPOUI5ODATAV4-378
 	QUnit.test("Data Aggregation: collapse while expanding", function (assert) {
-		var oModel = this.createAggregationModel(),
+		var oModel = this.createAggregationModel({autoExpandSelect : true}),
 			oRowsBinding,
 			oTable,
 			oUKContext,
@@ -28742,7 +28958,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// has finished.
 	// JIRA: CPOUI5ODATAV4-378
 	QUnit.test("Data Aggregation: collapse while paging", function (assert) {
-		var oModel = this.createAggregationModel(),
+		var oModel = this.createAggregationModel({autoExpandSelect : true}),
 			oRowsBinding,
 			oTable,
 			oUSContext,
@@ -29388,6 +29604,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// Test #setKeepAlive w/ messages (JIRA: CPOUI5ODATAV4-3390)
 	// ODM/ODLB#getKeepAlive (w/ messages) (JIRA: CPOUI5ODATAV4-3259)
+	// ODLB#getDownloadUrl does not need $apply (JIRA: CPOUI5ODATAV4-3362)
+	// Paging in a group level cache with identity (JIRA: CPOUI5ODATAV4-3362)
+	// Check that auto-$expand/$select works, incl. manual $select (JIRA: CPOUI5ODATAV4-3438)
 	QUnit.test("Data Aggregation: keep alive single entity", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
 		const sView = `
@@ -29404,7 +29623,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					},
 					groupLevels : ['Country', 'Id']
 				},
-				$$getKeepAliveContext : true
+				$$getKeepAliveContext : true,
+				$select : 'LocalCurrency'
 			}
 		}" threshold="0" visibleRowCount="3">
 	<Text id="country" text="{Country}"/>
@@ -29438,19 +29658,39 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		await this.createView(assert, sView, oModel);
 
 		const oListBinding = this.oView.byId("table").getBinding("rows");
+
+		// code under test (JIRA: CPOUI5ODATAV4-3362)
+		assert.strictEqual(oListBinding.getDownloadUrl(), "/aggregation/BusinessPartners"
+			+ "?$select=Country,Currency,Id,LocalCurrency,Name,SalesAmount");
+
 		const oContextA = oListBinding.getCurrentContexts()[0];
 		assert.throws(() => {
 			// code under test
 			oContextA.setKeepAlive(true);
 		}, new Error("Unsupported on aggregated data: /BusinessPartners(Country='A')[0]"));
+		assert.deepEqual(oContextA.getObject(), {
+			"@$ui5.node.isExpanded" : false,
+			"@$ui5.node.isTotal" : false,
+			"@$ui5.node.level" : 1,
+			Country : "A",
+			"Currency@$ui5.noData" : true,
+			"Id@$ui5.noData" : true,
+			"LocalCurrency@$ui5.noData" : true,
+			"Name@$ui5.noData" : true,
+			"SalesAmount@$ui5.noData" : true
+		});
+		oContextA.requestProperty("LocalCurrency").then((sLocalCurrency) => {
+			assert.strictEqual(sLocalCurrency, undefined, "not available here");
+		});
 
-		this.expectRequest("BusinessPartners?"
-				+ "$apply=filter(Country eq 'A')/groupby((Id,Name),aggregate(SalesAmount,Currency))"
-				+ "&$count=true&$skip=0&$top=3", {
+		this.expectRequest("BusinessPartners?$count=true&$filter=Country eq 'A'"
+				+ "&$select=Country,Currency,Id,LocalCurrency,Name,SalesAmount&$skip=0&$top=3", {
 				"@odata.count" : "2",
 				value : [
-					{Id : 26, Name : "Foo", Currency : "EUR", SalesAmount : "60"},
-					{Id : 25, Name : "Bar", Currency : "EUR", SalesAmount : "40"}
+					{Country : "A", Currency : "EUR", Id : 26, LocalCurrency : "DEM", Name : "Foo",
+						SalesAmount : "60"},
+					{Country : "A", Currency : "EUR", Id : 25, LocalCurrency : "DEM", Name : "Bar",
+						SalesAmount : "40"}
 				]
 			})
 			.expectChange("country", [, "A", "A"])
@@ -29469,6 +29709,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			.expectChange("region", "Late");
 
 		const [, oContext26, oContext25] = oListBinding.getCurrentContexts();
+		assert.strictEqual(oContext26.getProperty("LocalCurrency"), "DEM");
 		this.oView.byId("details").setBindingContext(oContext26);
 
 		await this.waitForChanges(assert, "show details for Id 26");
@@ -29534,12 +29775,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		await this.waitForChanges(assert, "modify Region of Id 26");
 
 		this.expectRequest("#7 BusinessPartners?"
-				+ "$select=Country,Currency,Id,Name,Region,SalesAmount,myMessages"
+				+ "$select=Country,Currency,Id,LocalCurrency,Name,Region,SalesAmount,myMessages"
 				+ "&$filter=Id eq 24 or Id eq 25 or Id eq 26&$top=3", {
 				value : [{ // simulate that Id 25 was deleted in the meantime
 					Country : "A refreshed",
 					Currency : "EUR",
 					Id : 26,
+					LocalCurrency : "DEM",
 					Name : "Foo",
 					Region : "Refreshed",
 					SalesAmount : "61",
@@ -29548,6 +29790,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					Country : "A refreshed",
 					Currency : "EUR",
 					Id : 24,
+					LocalCurrency : "DEM",
 					Name : "Bar",
 					Region : "Outside",
 					SalesAmount : "0",
@@ -29578,11 +29821,17 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		assert.strictEqual(oContext26.getBinding(), oListBinding, "context for Id 26 still alive");
 		assert.strictEqual(oContext26.getProperty("SalesAmount"), "61", "data still available");
 
-		this.expectRequest("BusinessPartners?$apply=filter(Country eq 'A refreshed')"
-				+ "/groupby((Id,Name),aggregate(SalesAmount,Currency))"
-				+ "&$count=true&$skip=0&$top=3", {
+		this.expectRequest("BusinessPartners?$count=true&$filter=Country eq 'A refreshed'"
+				+ "&$select=Country,Currency,Id,LocalCurrency,Name,SalesAmount&$skip=0&$top=3", {
 				"@odata.count" : "1",
-				value : [{Id : 26, Name : "Foo", Currency : "EUR", SalesAmount : "61"}]
+				value : [{
+					Country : "A refreshed",
+					Currency : "EUR",
+					Id : 26,
+					LocalCurrency : "DEM",
+					Name : "Foo",
+					SalesAmount : "61"
+				}]
 			})
 			.expectChange("country", [, "A refreshed", "B refreshed"])
 			.expectChange("id", [, "26"])
@@ -29599,12 +29848,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		assert.strictEqual(oListBinding.getCurrentContexts()[1], oContext26, "still the same");
 
 		this.expectRequest("#9 BusinessPartners?"
-				+ "$select=Country,Currency,Id,Name,Region,SalesAmount,myMessages"
+				+ "$select=Country,Currency,Id,LocalCurrency,Name,Region,SalesAmount,myMessages"
 				+ "&$filter=Id eq 24 or Id eq 26&$top=2", {
 				value : [{ // simulate that Id 24 was deleted in the meantime
 					Country : "A",
 					Currency : "EUR",
 					Id : 26,
+					LocalCurrency : "DEM",
 					Name : "Foo",
 					Region : "side-effects refresh",
 					SalesAmount : "61",
@@ -29639,13 +29889,16 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		sinon.assert.calledOnceWithExactly(fnOnBeforeDestroy24);
 		assert.strictEqual(oContext24.getBinding(), undefined, "context for Id 24 destroyed");
 
-		this.expectRequest("BusinessPartners?$apply=filter(Country eq 'A')"
-				+ "/groupby((Id,Name),aggregate(SalesAmount,Currency))"
-				+ "&$count=true&$skip=0&$top=3", {
-				"@odata.count" : "2",
+		this.expectRequest("BusinessPartners?$count=true&$filter=Country eq 'A'"
+				+ "&$select=Country,Currency,Id,LocalCurrency,Name,SalesAmount&$skip=0&$top=3", {
+				"@odata.count" : "4",
 				value : [
-					{Id : 26, Name : "Foo", Currency : "EUR", SalesAmount : "61"},
-					{Id : 24, Name : "Baz", Currency : "EUR", SalesAmount : "20"}
+					{Country : "A", Currency : "EUR", Id : 26, LocalCurrency : "DEM", Name : "Foo",
+						SalesAmount : "61"},
+					{Country : "A", Currency : "EUR", Id : 24, LocalCurrency : "DEM", Name : "Baz",
+						SalesAmount : "20"},
+					{Country : "A", Currency : "EUR", Id : 23, LocalCurrency : "DEM", Name : "Qux",
+						SalesAmount : "30"}
 				]
 			})
 			.expectChange("country", [, "A", "A"])
@@ -29659,6 +29912,23 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oListBinding.getCurrentContexts()[0].expand(),
 			this.waitForChanges(assert, "expand Country 'A' again")
 		]);
+
+		this.expectRequest("BusinessPartners?$filter=Country eq 'A'"
+				+ "&$select=Country,Currency,Id,LocalCurrency,Name,SalesAmount&$skip=3&$top=1", {
+				value : [
+					{Id : 22, Name : "Quux", Currency : "EUR", SalesAmount : "10"}
+				]
+			})
+			.expectChange("country", [,,,, "A"])
+			.expectChange("id", [,, "24", "23", "22"])
+			.expectChange("name", [,, "Baz", "Qux", "Quux"])
+			.expectChange("salesAmount", [,, "20", "30", "10"])
+			.expectChange("currency", [,, "EUR",, "EUR"]);
+
+		// code under test (JIRA: CPOUI5ODATAV4-3362)
+		this.oView.byId("table").setFirstVisibleRow(2);
+
+		await this.waitForChanges(assert, "load more items of Country 'A'");
 
 		const sErrorMessage = "Unsupported for data aggregation with groupLevels: " + sODLB
 			+ ": /BusinessPartners";
@@ -29684,7 +29954,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// entities with additional min/max: late properties are requested.
 	// JIRA: CPOUI5ODATAV4-3209
 	QUnit.test("Data Aggregation: late properties with min/max", async function (assert) {
-		const oModel = this.createAggregationModel({autoExpandSelect : true});
+		const oModel = this.createAggregationModel({autoExpandSelect : true},
+			/*bExpandAfterConcatSupported*/true);
 		const sView = `
 <t:Table id="table" rows="{
 			path : '/BusinessPartners',
@@ -29706,9 +29977,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<Text id="salesNumber" text="{SalesNumber}"/>
 </t:Table>`;
 
-		this.expectRequest("BusinessPartners?$apply=groupby((Id),aggregate(SalesNumber))"
-				+ "/concat(aggregate(SalesNumber with min as UI5min__SalesNumber"
-				+ ",SalesNumber with max as UI5max__SalesNumber),top(3))", {
+		this.expectRequest("BusinessPartners?$apply="
+				+ "concat(aggregate(SalesNumber with min as UI5min__SalesNumber"
+				+ ",SalesNumber with max as UI5max__SalesNumber),top(3))"
+				+ "&$select=Id,SalesNumber,UI5max__SalesNumber,UI5min__SalesNumber", {
 				value : [{
 					UI5min__SalesNumber : 1,
 					UI5max__SalesNumber : 3
@@ -29749,9 +30021,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// they reflect inside the request.
 	// BCP: 2070187260
 	QUnit.test("API calls before binding is resolved", function (assert) {
-		var that = this;
+		var oModel = this.createAggregationModel({autoExpandSelect : true}),
+			that = this;
 
-		return this.createView(assert, "", this.createAggregationModel()).then(function () {
+		return this.createView(assert, "", oModel).then(function () {
 			var oListBinding = that.oModel.bindList("BusinessPartners");
 
 			// code under test
@@ -29940,7 +30213,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		}
 
 		QUnit.test(sTitle, async function (assert) {
-			const oModel = this.createAggregationModel({autoExpandSelect : true});
+			const oModel = this.createAggregationModel({autoExpandSelect : true},
+				/*bExpandAfterConcatSupported*/true);
 			const sView = `
 	<Text id="count" text="{headerContext>$count}"/>
 	<Text id="isOutdatedHeader" text="{= %{headerContext>@$ui5.context.isOutdated} }"/>
@@ -29983,10 +30257,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			const sUrl = "BusinessPartners?$apply=filter(Currency ne 'USD' and SalesAmount gt 0)"
 				+ "/search(covfefe)/concat(aggregate(SalesAmount,Currency)"
-					+ ",groupby((Currency,Id,Region),aggregate(SalesAmount))"
-				+ "/orderby(Region asc,SalesAmount desc)"
+				+ ",orderby(Region asc,SalesAmount desc)"
 				// Note: $count is requested automatically
-				+ "/concat(aggregate($count as UI5__count),top(4)))";
+				+ "/concat(aggregate($count as UI5__count),top(4)))"
+				+ "&$select=Currency,Id,Region,SalesAmount,UI5__count";
 			// data model: Id 1...26, Region "A"..."Z", SalesAmount "100"..."2600" (in EUR)
 			const aResults = [{
 					Currency : "EUR",
@@ -30406,11 +30680,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/BusinessPartners()"
 			], null, (bInactive ? 27 : 28) + 3); // Note: aExpectedContent is not interesting here
 
-			this.expectRequest("BusinessPartners?$apply=filter((Currency ne 'USD' and SalesAmount gt 0)"
+			this.expectRequest("BusinessPartners?$filter=(Currency ne 'USD' and SalesAmount gt 0)"
 					// exclusive filter (see _CollectionCache#getExclusiveFilter)
-					+ " and not (" + (bInactive ? "" : "Id eq 27 or ") + "Id eq 28))"
-					+ "/search(covfefe)/groupby((Currency,Id,Region),aggregate(SalesAmount))"
-					+ "/orderby(Region asc,SalesAmount desc)/skip(4)/top(4)", {
+					+ " and not (" + (bInactive ? "" : "Id eq 27 or ") + "Id eq 28)"
+					+ "&$orderby=Region asc,SalesAmount desc&$search=covfefe"
+					+ "&$select=Currency,Id,Region,SalesAmount&$skip=4&$top=4", {
 					value : [{
 						Currency : "EUR",
 						Id : 5, // Edm.Int16
@@ -30526,7 +30800,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						fnRespond = resolve.bind(null, {value : aResults.slice(0, 2 + 2)});
 					}));
 
-				await "next tick";
+				await resolveLater(); // Note: cache needs to be determined async
 
 				assert.deepEqual(oStartOfStartContext.getObject(), {
 					"@$ui5.context.isInactive" : true,
@@ -30593,7 +30867,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// the grand total is set even if there are no filters, search, or custom query options.
 	// JIRA: CPOUI5ODATAV4-3482
 	QUnit.test("Data Aggregation: create before read is finished", async function (assert) {
-		const oModel = this.createAggregationModel({autoExpandSelect : true});
+		const oModel = this.createAggregationModel({autoExpandSelect : true},
+			/*bExpandAfterConcatSupported*/true);
 		const sView = `
 <Text id="isOutdatedHeader" text="{= %{headerContext>@$ui5.context.isOutdated} }"/>
 <t:Table id="table" rows="{
@@ -30622,8 +30897,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		let fnRespond;
 		this.expectChange("isOutdatedHeader")
 			.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesAmount)"
-				+ ",groupby((Id,Region),aggregate(SalesAmount))"
-				+ "/concat(aggregate($count as UI5__count),top(2)))",
+				+ ",concat(aggregate($count as UI5__count),top(2)))"
+				+ "&$select=Id,Region,SalesAmount,UI5__count",
 				new Promise(function (resolve) {
 					fnRespond = resolve.bind(null, {
 						value : [{
@@ -30704,7 +30979,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		const sTitle = "Data Aggregation: create at end; grand total at bottom: " + bAtBottom;
 
 		QUnit.test(sTitle, async function (assert) {
-			const oModel = this.createAggregationModel({autoExpandSelect : true});
+			const oModel = this.createAggregationModel({autoExpandSelect : true},
+				/*bExpandAfterConcatSupported*/true);
 			const sView = `
 	<t:Table id="table" rows="{
 				path : '/BusinessPartners',
@@ -30730,9 +31006,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	</t:Table>`;
 
 			this.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesAmount,Currency)"
-						+ ",groupby((Id),aggregate(SalesAmount,Currency))"
 					// Note: $count is requested automatically
-					+ "/concat(aggregate($count as UI5__count),top(109)))", {
+					+ ",concat(aggregate($count as UI5__count),top(109)))"
+					+ "&$select=Currency,Id,SalesAmount,UI5__count", {
 					value : [{
 						Currency : "EUR",
 						SalesAmount : "123", // unrealistic, but easier to tell apart
@@ -30800,41 +31076,120 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// Add $count as well as searching before and after aggregating.
 	// JIRA: CPOUI5ODATAV4-1030
+	//
+	// A UI w/ auto-$expand/$select must not break this (JIRA: CPOUI5ODATAV4-3438)
 	QUnit.test("Data Aggregation: CPOUI5ODATAV4-119 with CollectionCache", function (assert) {
 		var oModel = this.createAggregationModel({autoExpandSelect : true}),
-			that = this;
+			sView = `
+<t:Table id="table" rows="{path : '/BusinessPartners',
+	filters : [{path : 'Name', operator : 'EQ', value1 : 'Foo'},
+		{path : 'SalesNumber', operator : 'GT', value1 : 0}],
+	parameters : {
+		$$aggregation : {
+			aggregate : {
+				SalesNumber : {}
+			},
+			group : {
+				Region : {}
+			},
+			search : 'tee'
+		},
+		$count : true,
+		$search : 'covfefe'
+	}}">
+	<Text text="{= %{@$ui5.node.level} }"/>
+	<Text text="{Region}"/>
+	<Text text="{SalesNumber}"/>
+</t:Table>`;
 
-		return this.createView(assert, "", oModel).then(function () {
-			var oListBinding = oModel.bindList("/BusinessPartners", null, null, [
-					new Filter("Name", FilterOperator.EQ, "Foo"),
-					new Filter("SalesNumber", FilterOperator.GT, 0)
-				], {
-					$$aggregation : {
-						aggregate : {
-							SalesNumber : {}
-						},
-						group : {
-							Region : {}
-						},
-						search : "tee"
-					},
-					$count : true,
-					$search : "covfefe"
-				});
+		this.expectRequest("BusinessPartners?$count=true&$search=covfefe&$apply"
+				+ "=filter(Name eq 'Foo')/search(tee)/groupby((Region),aggregate(SalesNumber))"
+				+ "&$filter=SalesNumber gt 0&$skip=0&$top=110", {
+				"@odata.count" : "0",
+				value : [
+					// ... (don't care)
+				]
+			});
 
-			that.expectRequest("BusinessPartners?$count=true&$search=covfefe&$apply"
-					+ "=filter(Name eq 'Foo')/search(tee)/groupby((Region),aggregate(SalesNumber))"
-					+ "&$filter=SalesNumber gt 0&$skip=0&$top=100", {
-					"@odata.count" : "0",
-					value : [
-						// ... (don't care)
-					]
-				});
+		return this.createView(assert, sView, oModel);
+	});
 
-			return Promise.all([
-				oListBinding.requestContexts(),
-				that.waitForChanges(assert)
+	//*********************************************************************************************
+	// Scenario: Data Aggregation w/ no UI and w/ or w/o auto-$expand/$select may use "identity",
+	// but must make sure $select is correct. Check effect of ExpandAfterConcatSupported annotation.
+	// JIRA: CPOUI5ODATAV4-3438
+	[false, true].forEach((bAutoExpandSelect) => {
+		[false, true].forEach((bExpandAfterConcatSupported) => {
+			const sTitle = "Data Aggregation: no UI, auto-$expand/$select = " + bAutoExpandSelect
+				+ ", ExpandAfterConcatSupported = " + bExpandAfterConcatSupported;
+
+		QUnit.test(sTitle, async function (assert) {
+			await this.createView(assert, "",
+				this.createAggregationModel({autoExpandSelect : bAutoExpandSelect},
+					bExpandAfterConcatSupported));
+
+			const oListBinding0 = this.oModel.bindList("/BusinessPartners", null, null, [], {
+				$$aggregation : {
+					aggregate : {SalesAmount : {grandTotal : true, unit : "Currency"}},
+					group : {Id : {additionally : ["Name", "AccountResponsible"]}} // unsorted!
+				}
+			});
+			const oResponse = {
+				value : [{
+					Currency : null,
+					SalesAmount : 0
+				}, {
+					UI5__count : "0"
+				}] // ... (don't care)
+			};
+
+			if (bExpandAfterConcatSupported) {
+				this.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesAmount,Currency)"
+						+ ",concat(aggregate($count as UI5__count),top(99)))"
+						//TODO: + "&$select=AccountResponsible,Name,...", {
+						+ "&$select=Currency,Id,SalesAmount,UI5__count", oResponse);
+			} else {
+				this.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesAmount,Currency)"
+						+ ",groupby((Id,Name,AccountResponsible),aggregate(SalesAmount,Currency))"
+							+ "/concat(aggregate($count as UI5__count),top(99)))", oResponse);
+			}
+
+			await Promise.all([
+				oListBinding0.requestContexts(),
+				this.waitForChanges(assert)
 			]);
+
+			const oListBinding1 = this.oModel.bindList("/BusinessPartners", null, null, [], {
+				$$aggregation : {
+					aggregate : {SalesNumber : {grandTotal : true}},
+					groupLevels : ["Id"]
+				},
+				// Note: previously forbidden (Error: Unsupported system query option: $select)
+				$select : "Name"
+			});
+			const oResponse1 = {
+				value : [{
+					SalesNumber : 0
+				}, {
+					UI5__count : "0"
+				}] // ... (don't care)
+			};
+
+			if (bExpandAfterConcatSupported) {
+				this.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesNumber)"
+						+ ",concat(aggregate($count as UI5__count),top(99)))"
+						+ "&$select=Id,Name,SalesNumber,UI5__count", oResponse1);
+			} else {
+				this.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesNumber)"
+						+ ",groupby((Id),aggregate(SalesNumber))"
+							+ "/concat(aggregate($count as UI5__count),top(99)))", oResponse1);
+			}
+
+			await Promise.all([
+				oListBinding1.requestContexts(),
+				this.waitForChanges(assert)
+			]);
+		});
 		});
 	});
 
@@ -30961,7 +31316,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		var sFilterOnAggregate // JIRA: CPOUI5ODATAV4-713
 				= "/groupby((Country,Region),filter($these/aggregate(SalesNumber) gt 0))",
 			oListBinding,
-			oModel = this.createAggregationModel(),
+			oModel = this.createAggregationModel({autoExpandSelect : true}),
 			oTable,
 			sView = '\
 <t:Table id="table" rows="{path : \'/BusinessPartners\',\
@@ -31080,7 +31435,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// BCP: 2080047558
 	QUnit.test("Data Aggregation: BCP: 2080047558", function (assert) {
 		var oListBinding,
-			oModel = this.createSalesOrdersModel(),
+			oModel = this.createSalesOrdersModel({autoExpandSelect : false}),
 			sView = '\
 <Table id="table" items="{/SalesOrderList}">\
 	<Text id="grossAmount" text="{= %{GrossAmount} }"/>\
@@ -31607,7 +31962,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	QUnit.test("Data Aggregation: requestSideEffects and $$aggregation", function (assert) {
 		var oBinding,
 			oHeaderContext,
-			oModel = this.createAggregationModel(),
+			oModel = this.createAggregationModel({autoExpandSelect : true}),
 			oResponse = {
 				"@odata.count" : "1",
 				value : [{Currency : "EUR", Region : "A", SalesAmount : "123"}]
@@ -31763,7 +32118,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		const sTitle = "Data Aggregation: keep alive via selection; leaf count=" + bCount;
 
 		QUnit.test(sTitle, async function (assert) {
-			const oModel = this.createAggregationModel();
+			const oModel = this.createAggregationModel({autoExpandSelect : true});
 			const sView = `
 	<Text id="count" text="{$count}"/>
 	<Text id="selectionCount" text="{$selectionCount}"/>
@@ -31963,6 +32318,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"@$ui5.node.isTotal" : false,
 				// "@$ui5.node.level": 2, // intentionally missing
 				Country : "A",
+				"Id@$ui5.noData" : true,
 				Region : "A1",
 				SalesNumber : 20 // "last known good"
 			});
@@ -31996,6 +32352,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"@$ui5.node.isTotal" : false,
 				"@$ui5.node.level" : 2,
 				Country : "A",
+				"Id@$ui5.noData" : true,
 				Region : "A1",
 				SalesNumber : 31 // updated
 			});
@@ -32054,7 +32411,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		const sTitle = "Data Aggregation: keep alive via selection; grand total; leaf count=" + bCount;
 
 		QUnit.test(sTitle, async function (assert) {
-			const oModel = this.createAggregationModel();
+			const oModel = this.createAggregationModel({autoExpandSelect : true});
 			const sView = `
 	<Text id="count" text="{$count}"/>
 	<Text id="selectionCount" text="{$selectionCount}"/>
@@ -32281,10 +32638,19 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			// code under test
 			oListBinding.sort(new Sorter("Country"));
 
-			assert.strictEqual(oListBinding.getDownloadUrl(), "/aggregation/BusinessPartners"
-				+ "?$apply=groupby((Country,Region),aggregate(SalesNumber))/orderby(Country)");
+			const sExpectedDownloadUrl = "/aggregation/BusinessPartners"
+				+ "?$apply=groupby((Country,Region),aggregate(SalesNumber))/orderby(Country)";
+			assert.throws(function () {
+				// code under test
+				assert.strictEqual(oListBinding.getDownloadUrl(), sExpectedDownloadUrl);
+				}, new Error("Result pending"));
+			oListBinding.requestDownloadUrl().then((sDownloadUrl) => {
+				assert.strictEqual(sDownloadUrl, sExpectedDownloadUrl);
+			});
 
 			await this.waitForChanges(assert, "sort");
+
+			assert.strictEqual(oListBinding.getDownloadUrl(), sExpectedDownloadUrl, "now ;-)");
 
 			assert.ok(oListBinding.getAllCurrentContexts().includes(oContextA1), "still alive");
 			checkSelected(assert, oContextA1, true);
@@ -32293,6 +32659,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"@$ui5.node.isTotal" : false,
 				// "@$ui5.node.level": 2, // intentionally missing
 				Country : "A",
+				"Id@$ui5.noData" : true,
 				Region : "A1",
 				SalesNumber : 101
 			});
@@ -32324,6 +32691,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"@$ui5.node.isTotal" : false,
 				"@$ui5.node.level" : 2,
 				Country : "A",
+				"Id@$ui5.noData" : true,
 				Region : "A1",
 				SalesNumber : 101
 			});
@@ -71599,11 +71967,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// setContext with transient row present (which is effectively kept alive via selection). Switch
 	// back and expect that transient row has survived and further APIs work as expected.
 	// JIRA: CPOUI5ODATAV4-3555
+	//
+	// Check that auto-$expand/$select works, incl. manual $select (JIRA: CPOUI5ODATAV4-3438)
 	["delete", "resetChanges", "setProperty"].forEach((sMethod) => {
 		const sTitle = "Data Aggregation: setContext w/ transient; finally do " + sMethod;
 
 		QUnit.test(sTitle, async function (assert) {
-			const oModel = this.createSalesOrdersModel({autoExpandSelect : true});
+			const oModel = this.createSalesOrdersModel({autoExpandSelect : true}, {}, [],
+				/*bExpandAfterConcatSupported*/true);
 			const sView = `
 	<FlexBox id="flexbox" binding="{/SalesOrderList('42')}">
 		<t:Table id="table" rows="{path : 'SO_2_SOITEM',
@@ -71619,22 +71990,26 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						}
 					},
 					$$ownRequest : true,
-					$$updateGroupId : 'update', $count: true}
-				}">
+					$$updateGroupId : 'update',
+					$count: true,
+					$select : 'GrossAmount,NetAmount'
+				}
+			}">
 			<Text id="tax" text="{TaxAmount}"/>
 		</t:Table>
 	</FlexBox>`;
 
 			const sUrl = "SalesOrderList('42')/SO_2_SOITEM?"
 				+ "$apply=concat(aggregate(TaxAmount,CurrencyCode)"
-				+ ",groupby((ItemPosition,SalesOrderID),aggregate(TaxAmount,CurrencyCode))"
-				+ "/concat(aggregate($count as UI5__count),top(110)))";
+				+ ",concat(aggregate($count as UI5__count),top(110)))"
+				+ "&$select=CurrencyCode,GrossAmount,ItemPosition,NetAmount,SalesOrderID,TaxAmount"
+					+ ",UI5__count";
 			this.expectRequest(sUrl, {
 					value : [
 						{TaxAmount : "250", CurrencyCode : "USD"},
 						{UI5__count : "1", "UI5__count@odata.type" : "#Decimal"},
-						{ItemPosition : "10", SalesOrderID : "42",
-							TaxAmount : "250", CurrencyCode : "USD"}
+						{CurrencyCode : "USD", GrossAmount : "G.A.", ItemPosition : "10",
+							NetAmount : "N.A.", SalesOrderID : "42", TaxAmount : "250"}
 					]
 				})
 				.expectChange("tax", ["250", "250"]);
@@ -71644,6 +72019,28 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			const oListBinding = this.oView.byId("table").getBinding("rows");
 			const oFirstBindingContext = this.oView.byId("table").getBindingContext();
 			assert.strictEqual(oListBinding.isFirstCreateAtEnd(), undefined);
+			assert.strictEqual(oListBinding.getLength(), 2);
+			assert.deepEqual(oListBinding.getCurrentContexts()[0].getObject(), {
+				"@$ui5.node.isTotal" : false,
+				"@$ui5.node.level" : 1,
+				CurrencyCode : "USD",
+				GrossAmount : "G.A.",
+				ItemPosition : "10",
+				NetAmount : "N.A.",
+				SalesOrderID : "42",
+				TaxAmount : "250"
+			}, "leaf level");
+			assert.deepEqual(oListBinding.getCurrentContexts()[1].getObject(), {
+				"@$ui5.node.isExpanded" : true,
+				"@$ui5.node.isTotal" : true,
+				"@$ui5.node.level" : 0,
+				CurrencyCode : "USD",
+				"GrossAmount@$ui5.noData" : true,
+				"ItemPosition@$ui5.noData" : true,
+				"NetAmount@$ui5.noData" : true,
+				"SalesOrderID@$ui5.noData" : true,
+				TaxAmount : "250"
+			}, "grand total at bottom");
 
 			this.expectChange("tax", [, "80", "250"]);
 
@@ -71734,7 +72131,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							}
 						}, {
 							CurrencyCode : "USD",
+							// NO GrossAmount
 							ItemPosition : "20",
+							NetAmount : "n/a",
 							SalesOrderID : "42",
 							TaxAmount : "8.1"
 						})
@@ -71759,7 +72158,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							"@$ui5.node.isTotal" : false,
 							"@$ui5.node.level" : 1,
 							CurrencyCode : "USD",
+							"GrossAmount@$ui5.noData" : true,
 							ItemPosition : "20",
+							NetAmount : "n/a",
 							SalesOrderID : "42",
 							TaxAmount : "8.1"
 						});

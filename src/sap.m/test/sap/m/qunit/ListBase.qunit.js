@@ -550,11 +550,19 @@ sap.ui.define([
 		qutils.triggerEvent("keydown", document.activeElement, {code: "KeyA", ctrlKey: true});
 		assert.equal(oHeaderSelectorPressSpy.callCount, 1, "Fired on Ctrl+A again (deselect all)");
 
-		// Ctrl+Shift+A is a no-op in default multiSelectMode, so the event must not be fired.
+		// Ctrl+Shift+A always clears the selection and fires the event, even in default multiSelectMode.
 		oHeaderSelectorPressSpy.resetHistory();
 		oList.getItems()[0].focus();
 		qutils.triggerEvent("keydown", document.activeElement, {code: "KeyA", ctrlKey: true, shiftKey: true});
-		assert.equal(oHeaderSelectorPressSpy.callCount, 0, "Not fired on Ctrl+Shift+A");
+		assert.equal(oHeaderSelectorPressSpy.callCount, 1, "Fired on Ctrl+Shift+A (clear all)");
+		assert.notOk(oList.getSelectedItems().length, "All items are deselected after Ctrl+Shift+A");
+
+		// Ctrl+Shift+A is also a direct clear when not all items are selected, unlike toggling Ctrl+A.
+		oHeaderSelectorPressSpy.resetHistory();
+		oList.getItems()[0].setSelected(true).focus();
+		qutils.triggerEvent("keydown", document.activeElement, {code: "KeyA", ctrlKey: true, shiftKey: true});
+		assert.equal(oHeaderSelectorPressSpy.callCount, 1, "Fired on Ctrl+Shift+A (clear partial selection)");
+		assert.notOk(oList.getSelectedItems().length, "Partial selection is cleared after Ctrl+Shift+A");
 	});
 
 	QUnit.test("_headerSelectorPress event - ClearAll multiSelectMode", async function(assert) {
@@ -3328,6 +3336,10 @@ sap.ui.define([
 		qutils.triggerEvent("keydown", document.activeElement, {code: "KeyA", ctrlKey: true});
 		assert.notOk(oList.getSelectedItems().length, "multiSelectMode: Default, Items are deselected when 'ctrl+A' is pressed again");
 
+		oList.getItems()[0].setSelected(true);
+		qutils.triggerEvent("keydown", document.activeElement, {code: "KeyA", ctrlKey: true, shiftKey: true});
+		assert.notOk(oList.getSelectedItems().length, "multiSelectMode: Default, Partial selection is cleared when 'ctrl+shift+A' is pressed");
+
 		oList.setMultiSelectMode("ClearAll");
 		oList.placeAt("qunit-fixture");
 		await nextUIUpdate();
@@ -4428,6 +4440,7 @@ sap.ui.define([
 		const ONE_ACTION_AVAILABLE = oRB.getText("LIST_ITEM_SINGLE_ACTION");
 		const TWO_ACTIONS_AVAILABLE = oRB.getText("LIST_ITEM_MULTIPLE_ACTIONS", [2]);
 		const oInvisibleText = ListBase.getInvisibleText();
+		const fnShortcutHintsMixinSpy = sinon.spy(ShortcutHintsMixin, "addConfig");
 		const oAction1 = this.oItem1.getActions()[0];
 		const oAction2 = this.oItem1.getActions()[1];
 		assert.notOk(this.oItem1.getDomRef("actions"), "By default no actions are rendered");
@@ -4446,6 +4459,9 @@ sap.ui.define([
 		assert.equal(oFirstAction.getTooltip_AsString(), "Edit", "First action edit has correct tooltup");
 		assert.equal(oSecondAction.getIcon(), "sap-icon://decline", "Second action delete has correct icon");
 		assert.equal(oSecondAction.getTooltip_AsString(), "Delete", "Second action delete has correct tooltup");
+		assert.ok(fnShortcutHintsMixinSpy.calledWithExactly(oFirstAction, sinon.match({shortcut: "Ctrl+E"}), oFirstAction));
+		assert.ok(fnShortcutHintsMixinSpy.calledWithExactly(oSecondAction, sinon.match({shortcut: "Delete"}), oSecondAction));
+		fnShortcutHintsMixinSpy.restore();
 
 		this.oItem1.focus();
 		assert.ok(oInvisibleText.getText().endsWith(TWO_ACTIONS_AVAILABLE), "Two actions available");
@@ -4526,16 +4542,16 @@ sap.ui.define([
 		aSteps.push("Delete");
 		assert.verifySteps(aSteps, "Correct actions are triggered");
 
-		const fnShortcutHintsMixinSpy = sinon.spy(ShortcutHintsMixin, "addConfig");
+		const fnNavigationShortcutHintsMixinSpy = sinon.spy(ShortcutHintsMixin, "addConfig");
 		this.oItem1.setType("Navigation");
 		this.oList.setMode("Delete");
 		await nextUIUpdate();
-		assert.ok(fnShortcutHintsMixinSpy.calledWithExactly(
+		assert.ok(fnNavigationShortcutHintsMixinSpy.calledWithExactly(
 			this.oItem1.getNavigationControl(),
 			sinon.match({ shortcut: "Enter" }),
 			this.oItem1.getNavigationControl()
 		), "ShortcutHintsMixin config of the Navigation Button is correct");
-		fnShortcutHintsMixinSpy.restore();
+		fnNavigationShortcutHintsMixinSpy.restore();
 		assert.ok(this.oItem1.getDomRef("imgNav").parentNode === this.oItem1.getDomRef("actions") ,"Navigation type is rendered inside the custom actions");
 		assert.notOk(this.oItem1.getDomRef("imgDel"), "Delete mode button is not rendered since custom actions active");
 		assert.notOk(this.oList.getDomRef("listUl").classList.contains("sapMListModeDelete"), "Delete mode class is not added to the list");
