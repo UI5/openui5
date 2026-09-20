@@ -3,10 +3,12 @@
 /* Base theme                      */
 /* =============================== */
 
-@_sap_f_GridList_ItemFocusBorderRadius: unset;
-@_sap_f_GridList_ItemHighlightBorderRadius: 0;
-@_sap_f_GridList_ItemFocusedHighlightOffset: 0;
-@_sap_f_GridList_ItemOverflow: unset;
+.sapUI5Scope {
+	--_sap_f_GridList_ItemFocusBorderRadius: unset;
+	--_sap_f_GridList_ItemHighlightBorderRadius: 0;
+	--_sap_f_GridList_ItemFocusedHighlightOffset: 0;
+	--_sap_f_GridList_ItemOverflow: unset;
+}
 
 .sapFGridList {
 
@@ -21,15 +23,16 @@
 	}
 
 	> .sapMListUl {
+
 		> .sapMLIBFocusable:focus {
 			outline: none;
 		}
 
 		> .sapMLIBFocusable:focus::after {
 			border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
-			border-radius: @_sap_f_GridList_ItemFocusBorderRadius;
+			border-radius: var(--_sap_f_GridList_ItemFocusBorderRadius);
 			position: absolute;
-			content: ' ';
+			content: '';
 			top: 1px;
 			right: 1px;
 			bottom: 1px;
@@ -38,7 +41,6 @@
 			pointer-events: none;
 		}
 	}
-
 }
 
 .sapFGridList ul {
@@ -58,7 +60,7 @@
 		background: none;
 		border: none;
 		padding-top: 0.25rem;
-		grid-column: ~"1 / -1";
+		grid-column: ~'1 / -1';
 		width: 100%;
 
 		& .sapMGHLITitle {
@@ -73,7 +75,7 @@
 	border-radius: var(--sapTile_BorderCornerRadius);
 	border: none;
 	box-shadow: var(--sapContent_Shadow0);
-	overflow: @_sap_f_GridList_ItemOverflow;
+	overflow: var(--_sap_f_GridList_ItemOverflow);
 
 	/* Highlighted items */
 	> .sapMLIBHighlight {
@@ -82,10 +84,10 @@
 	}
 
 	&.sapMLIBFocusable:focus > .sapMLIBHighlight {
-		top: @_sap_f_GridList_ItemFocusedHighlightOffset;
-		bottom: @_sap_f_GridList_ItemFocusedHighlightOffset;
-		border-top-left-radius: @_sap_f_GridList_ItemHighlightBorderRadius;
-		border-bottom-left-radius: @_sap_f_GridList_ItemHighlightBorderRadius;
+		top: var(--_sap_f_GridList_ItemFocusedHighlightOffset);
+		bottom: var(--_sap_f_GridList_ItemFocusedHighlightOffset);
+		border-top-left-radius: var(--_sap_f_GridList_ItemHighlightBorderRadius);
+		border-bottom-left-radius: var(--_sap_f_GridList_ItemHighlightBorderRadius);
 	}
 
 	> .sapMLIBContent {
