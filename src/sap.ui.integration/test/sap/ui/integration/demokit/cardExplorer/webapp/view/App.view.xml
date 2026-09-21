@@ -63,6 +63,12 @@
 								<tnt:NavigationListItem
 									selectable="false" href="https://www.sap.com/copyright" target="_blank"
 									text="{i18n>APP_INFORMATION_BTN_COPYRIGHT}" />
+								<tnt:NavigationListItem
+									selectable="false" href="https://ui5.sap.com/#/static/CookieStatement" target="_blank"
+									text="{i18n>APP_INFORMATION_BTN_COOKIE_STATEMENT}" />
+								<tnt:NavigationListItem
+									select=".onCookiePreferences"
+									text="{i18n>APP_INFORMATION_BTN_COOKIE_PREFERENCES}" />
 							</tnt:NavigationListItem>
 						</tnt:NavigationList>
 					</tnt:fixedItem>

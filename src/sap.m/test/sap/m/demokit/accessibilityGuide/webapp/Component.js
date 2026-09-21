@@ -59,6 +59,12 @@ sap.ui.define([
 		 * @override
 		 */
 		destroy: function () {
+			if (this._pCookiesMgmtComponent) {
+				this._pCookiesMgmtComponent.then(function (oCookiesMgmtComp) {
+					oCookiesMgmtComp.destroy();
+				});
+			}
+
 			// call the base component's destroy function
 			UIComponent.prototype.destroy.apply(this, arguments);
 		},
@@ -82,6 +88,19 @@ sap.ui.define([
 				}
 			}
 			return this._sContentDensityClass;
+		},
+
+		getCookiesManagement: function () {
+			var sId = "sap.ui.documentation.sdk.cookieSettingsDialog";
+
+			if (!this._pCookiesMgmtComponent) {
+				this._pCookiesMgmtComponent = this.createComponent({
+					id: "cookiesMgmtComp-" + sId,
+					usage: "cookieSettingsDialog"
+				});
+			}
+
+			return this._pCookiesMgmtComponent;
 		}
 	});
 });
