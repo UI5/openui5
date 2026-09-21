@@ -2612,28 +2612,35 @@ function(
 		}
 
 		var $Target = jQuery(oEvent.target);
-		var $FocusableItem = $Target.closest(".sapMLIBFocusable").next(".sapMListTblSubRow").addBack();
-		if (!$FocusableItem[0]) {
-			$FocusableItem = $Target.closest(".sapMListTblSubRow").prev(".sapMLIBFocusable").addBack();
-		}
-		if (!$FocusableItem[0]) {
-			return;
-		}
-
-		if (this._bItemNavigationInvalidated) {
-			this._startItemNavigation();
-		}
-
 		var bItemEvent = $Target.hasClass("sapMLIBFocusable");
 		var preventDefault = function() {
 			oEvent.preventDefault();
 			oEvent.setMarked();
 		};
 
+		var $FocusableItem = $Target.closest(".sapMLIBFocusable").next(".sapMListTblSubRow").addBack();
+		if (!$FocusableItem[0]) {
+			$FocusableItem = $Target.closest(".sapMListTblSubRow").prev(".sapMLIBFocusable").addBack();
+		}
+
+		if ($FocusableItem[0] && this._bItemNavigationInvalidated) {
+			this._startItemNavigation();
+		}
+
 		// Ctrl + (Shift) + A: select/deselect all
-		if (oEvent.code == "KeyA" && (oEvent.metaKey || oEvent.ctrlKey) && this.getMode() == ListMode.MultiSelect && this._isSelectAllTarget(oEvent.target, bItemEvent)) {
-			// Ctrl+Shift+A always clears the selection, regardless of multiSelectMode
+		if (oEvent.code == "KeyA" && (oEvent.metaKey || oEvent.ctrlKey) && !oEvent.altKey) {
+			if (!oEvent.shiftKey && Util.isTextInputElement(oEvent.target)) {
+				return;
+			}
+			preventDefault();
+
+			// Suppress on single/none mode and non-select-all targets, but only after preventDefault above.
+			if (this.getMode() != ListMode.MultiSelect || !this._isSelectAllTarget(oEvent.target, bItemEvent)) {
+				return;
+			}
+
 			if (oEvent.shiftKey) {
+				// Ctrl+Shift+A always clears the selection, regardless of multiSelectMode
 				this.removeSelections(false, true);
 				this._fireHeaderSelectorPress();
 			} else if (this.getMultiSelectMode() != MultiSelectMode.ClearAll) {
@@ -2644,7 +2651,11 @@ function(
 				}
 				this._fireHeaderSelectorPress();
 			}
-			return preventDefault();
+			return;
+		}
+
+		if (!$FocusableItem[0]) {
+			return;
 		}
 
 		// Enter / F2: focus from container to the content

@@ -1199,19 +1199,48 @@ sap.ui.define([
 		triggerCtrlA(getContentCell(), true);
 		assert.notOk(sut.getSelectedItems().length, "content cell: all rows are deselected on Ctrl+Shift+A (SelectAll mode)");
 
-		// Ctrl+A on a column header cell has no effect and does not prevent the default
+		// Ctrl+Shift+A from a content cell deselects all rows in the default MultiSelect mode
+		sut.selectAll(true);
+		assert.ok(sut.isAllSelectableSelected(), "content cell: all rows selected before Ctrl+Shift+A");
+		triggerCtrlA(getContentCell(), true);
+		assert.notOk(sut.getSelectedItems().length, "content cell: Ctrl+Shift+A deselects all rows in default MultiSelect mode");
+
+		// Ctrl+A / Ctrl+Shift+A on a column header cell select no rows but suppress the default
 		const oColumnHeaderCell = sut.getColumns()[0].getDomRef();
 		oColumnHeaderCell.focus();
 		const oHeaderEvent = jQuery.Event("keydown", {code: "KeyA", ctrlKey: true});
 		jQuery(oColumnHeaderCell).trigger(oHeaderEvent);
 		assert.notOk(sut.getSelectedItems().length, "column header cell: no row is selected");
-		assert.notOk(oHeaderEvent.isDefaultPrevented(), "column header cell: the default is not prevented");
+		assert.ok(oHeaderEvent.isDefaultPrevented(), "column header cell: Ctrl+A is prevented");
 
-		// Ctrl+A has no effect when the mode is not MultiSelect
+		const oHeaderShiftEvent = jQuery.Event("keydown", {code: "KeyA", ctrlKey: true, shiftKey: true});
+		jQuery(oColumnHeaderCell).trigger(oHeaderShiftEvent);
+		assert.notOk(sut.getSelectedItems().length, "column header cell: no row is selected");
+		assert.ok(oHeaderShiftEvent.isDefaultPrevented(), "column header cell: Ctrl+Shift+A is prevented");
+
+		// Fallback: parts of the table that don't support the shortcut still suppress the browser default
+		const oInfoToolbarButton = new Button();
+		sut.setInfoToolbar(new Toolbar({ content: [oInfoToolbarButton] }));
+		await nextUIUpdate();
+		const oInfoEvent = jQuery.Event("keydown", {code: "KeyA", ctrlKey: true});
+		oInfoToolbarButton.getFocusDomRef().focus();
+		jQuery(oInfoToolbarButton.getFocusDomRef()).trigger(oInfoEvent);
+		assert.notOk(sut.getSelectedItems().length, "info toolbar button: no row is selected");
+		assert.ok(oInfoEvent.isDefaultPrevented(), "info toolbar button: Ctrl+A is prevented");
+
+		const oInfoShiftEvent = jQuery.Event("keydown", {code: "KeyA", ctrlKey: true, shiftKey: true});
+		jQuery(oInfoToolbarButton.getFocusDomRef()).trigger(oInfoShiftEvent);
+		assert.ok(oInfoShiftEvent.isDefaultPrevented(), "info toolbar button: Ctrl+Shift+A is prevented");
+
+		// Ctrl+A has no effect when the mode is not MultiSelect, and the browser default is still suppressed
 		sut.setMode("SingleSelectMaster");
 		await nextUIUpdate();
-		triggerCtrlA(getContentCell());
+		const oCell = getContentCell();
+		oCell.focus();
+		const oEvent = jQuery.Event("keydown", {code: "KeyA", ctrlKey: true});
+		jQuery(oCell).trigger(oEvent);
 		assert.notOk(sut.getSelectedItems().length, "SingleSelectMaster: Ctrl+A does not select");
+		assert.ok(oEvent.isDefaultPrevented(), "SingleSelectMaster: Ctrl+A is prevented");
 
 		// ClearAll mode: Ctrl+A is a no-op, Ctrl+Shift+A deselects all rows from a content cell
 		sut.setMode("MultiSelect");
