@@ -1997,6 +1997,12 @@ sap.ui.define([
 
 	VariantManagement.prototype.destroyManageDialog = function() {
 		if (this.oManagementDialog) {
+			if (this._sStyleClass) {
+				this.setSupportPublic(this._bShowPublic, true);
+				this._sStyleClass = undefined;
+				this._oRolesComponentContainer = null;
+				this.setSupportContexts(false);
+			}
 			this.oManagementDialog.destroy();
 			this.oManagementDialog = undefined;
 		}
@@ -2294,6 +2300,7 @@ sap.ui.define([
 						this.oManagementDialog.removeStyleClass(this._sStyleClass);
 						this._sStyleClass = undefined;
 						this._oRolesComponentContainer = null;
+						this.setSupportContexts(false);
 					}
 				}.bind(this),
 				content: [
