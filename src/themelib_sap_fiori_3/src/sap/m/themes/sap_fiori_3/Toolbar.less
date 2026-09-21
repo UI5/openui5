@@ -1,6 +1,6 @@
 /* ============================== */
 /* CSS for control sap.m/Toolbar  */
-/* Fiori 3 theme                  */
+/* Quartz Light theme             */
 /* ============================== */
 
 html.sap-desktop .sapMTBActive:focus,
@@ -36,7 +36,7 @@ html.sap-desktop .sapMTBActive.sapMTBFocused {
 
 /* Info Toolbar Context */
 .sapMTB-Info-CTX.sapMTB {
-	background: darken(@sapUiBaseColor, 10);
+	background: ~'hsl(from var(--sapBaseColor) h s calc(l - 10))';
 
 	> .sapUiIcon {
 		color: var(--sapTextColor);
