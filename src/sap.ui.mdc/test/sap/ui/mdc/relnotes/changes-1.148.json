@@ -198,5 +198,15 @@
         "text": " ValueHelp: Token counter not updated"
       }
     ]
+  },
+  "1.148.9": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "2452950796c42c0e363a71a761144b0491b0c70c",
+        "type": "FIX",
+        "text": " FilterBar: misaligned after saving variant"
+      }
+    ]
   }
 }

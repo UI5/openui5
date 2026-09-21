@@ -78,5 +78,15 @@
         "text": " sap.ui.test.actions.Action: fix focus issue on Firefox"
       }
     ]
+  },
+  "1.148.9": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "ab2251dc285cd207bf576f067c5f865ce2b7e5ae",
+        "type": "FIX",
+        "text": " forced-color-adjust performance optimization"
+      }
+    ]
   }
 }

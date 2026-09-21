@@ -23,5 +23,15 @@
         "text": " Form: use sap.m.Title for rendering"
       }
     ]
+  },
+  "1.148.9": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "fd4bf21f95a72aa9bc3134271d771d89796aaa36",
+        "type": "FIX",
+        "text": " FormContainer breaks if used in XML fragment"
+      }
+    ]
   }
 }
