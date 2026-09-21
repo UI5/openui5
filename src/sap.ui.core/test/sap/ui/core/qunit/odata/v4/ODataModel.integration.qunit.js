@@ -21876,12 +21876,53 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			.expectChange("country", [, "A"])
 			.expectChange("region", [, "A1"]);
 		const oContextA = oListBinding.getCurrentContexts()[0];
+		assert.deepEqual(oContextA.getObject(), {
+			"@$ui5.node.isExpanded" : false,
+			"@$ui5.node.isTotal" : false,
+			"@$ui5.node.level" : 1,
+			Country : "A",
+			"Id@$ui5.noData" : true,
+			"Region@$ui5.noData" : true
+		});
 
 		await Promise.all([
 			// code under test
 			oContextA.expand(),
 			this.waitForChanges(assert, "expand 'A'")
 		]);
+
+		this.expectRequest("BusinessPartners?$count=true"
+				+ "&$filter=Country eq 'A' and Region eq 'A1' and (Country ne '')"
+				+ "&$select=Country,Id,Region&$skip=0&$top=100", {
+				"@odata.count" : "1",
+				value : [{Country : "A", Id : "n/a", Region : "A1"}]
+			})
+			.expectChange("country", [,, "A"])
+			.expectChange("region", [,, "A1"]);
+		const oContextA1 = oListBinding.getCurrentContexts()[1];
+		assert.deepEqual(oContextA1.getObject(), {
+			"@$ui5.node.isExpanded" : false,
+			"@$ui5.node.isTotal" : false,
+			"@$ui5.node.level" : 2,
+			Country : "A",
+			"Id@$ui5.noData" : true,
+			Region : "A1"
+		});
+
+		await Promise.all([
+			// code under test
+			oContextA1.expand(),
+			this.waitForChanges(assert, "expand 'A1' to reach leaf level")
+		]);
+
+		const oLeafContext = oListBinding.getCurrentContexts()[2];
+		assert.deepEqual(oLeafContext.getObject(), {
+			"@$ui5.node.isTotal" : false,
+			"@$ui5.node.level" : 3,
+			Country : "A",
+			Id : "n/a",
+			Region : "A1"
+		});
 	});
 
 	//*********************************************************************************************
@@ -29686,6 +29727,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			// code under test
 			oContextA.setKeepAlive(true);
 		}, new Error("Unsupported on aggregated data: /BusinessPartners(Country='A')[0]"));
+		assert.strictEqual(oContextA.isAggregated(), true);
 		assert.deepEqual(oContextA.getObject(), {
 			"@$ui5.node.isExpanded" : false,
 			"@$ui5.node.isTotal" : false,
@@ -29697,6 +29739,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"Name@$ui5.noData" : true,
 			"SalesAmount@$ui5.noData" : true
 		});
+
+		// code under test - LocalCurrency doesn't lead to a "failed to drill-down"
 		oContextA.requestProperty("LocalCurrency").then((sLocalCurrency) => {
 			assert.strictEqual(sLocalCurrency, undefined, "not available here");
 		});
@@ -72374,12 +72418,26 @@ make root = ${bMakeRoot}`;
 						"@$ui5.node.isTotal" : false,
 						"@$ui5.node.level" : 1,
 						CurrencyCode : "USD",
-						"GrossAmount@$ui5.noData" : true,
+						// NO "GrossAmount@$ui5.noData"
 						ItemPosition : "20",
 						NetAmount : "n/a",
 						SalesOrderID : "42",
 						TaxAmount : "8.1"
 					});
+
+					this.expectRequest("#5 SalesOrderList('42')"
+							+ "/SO_2_SOITEM(SalesOrderID='42',ItemPosition='20')"
+							+ "?$select=GrossAmount", {
+								GrossAmount : "42.20"
+							});
+
+					return Promise.all([
+						// code under test (SNOW: DINC1048957)
+						oTransientContext.requestProperty("GrossAmount").then((sGrossAmount) => {
+							assert.strictEqual(sGrossAmount, "42.20");
+						}),
+						this.waitForChanges(assert, "late property request works")
+					]);
 				});
 				break;
 
@@ -72388,7 +72446,8 @@ make root = ${bMakeRoot}`;
 
 		await Promise.all([
 			oPromise,
-			this.waitForChanges(assert, sMethod)
+			// Note: avoid concurrent #waitForChanges!
+			sMethod === "setProperty" || this.waitForChanges(assert, sMethod)
 		]);
 	});
 });

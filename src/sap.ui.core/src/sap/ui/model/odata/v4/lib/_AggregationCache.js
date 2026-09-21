@@ -745,8 +745,9 @@ sap.ui.define([
 		if (oAggregation.hierarchyQualifier) {
 			mQueryOptions = Object.assign({}, this.mQueryOptions);
 		} else {
-			aAllProperties = _AggregationHelper.getAllProperties(oAggregation, this.mQueryOptions);
 			bLeaf = iLevel > oAggregation.groupLevels.length;
+			aAllProperties
+				= _AggregationHelper.getAllProperties(oAggregation, this.mQueryOptions, bLeaf);
 			aGroupBy = bLeaf
 				? oAggregation.groupLevels.concat(Object.keys(oAggregation.group).sort())
 				: oAggregation.groupLevels.slice(0, iLevel);
