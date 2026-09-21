@@ -218,5 +218,15 @@
         "text": " ValueHelp: min width of SearchField."
       }
     ]
+  },
+  "1.136.21": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "554d53c5be5ee8956be8be6559c91bcd57584103",
+        "type": "FIX",
+        "text": "mdc.FilterBar: fix wrapping issue"
+      }
+    ]
   }
 }

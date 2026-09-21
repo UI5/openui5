@@ -38,5 +38,15 @@
         "text": " sap.ui.integration.widgets.Card: Stabilize PreventKeyboardScrolling test"
       }
     ]
+  },
+  "1.136.21": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "51ce412f433396990978ec93e3efdf3946f620bb",
+        "type": "FIX",
+        "text": " sap.ui.integration.widgets.Card: Stabilize PreventKeyboardScrolling test"
+      }
+    ]
   }
 }

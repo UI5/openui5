@@ -833,5 +833,25 @@
         "text": " sap.m.Dialog: Screen reader no longer announces the footer button before the link in content"
       }
     ]
+  },
+  "1.136.21": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "def4da20abf3334e8c0268b47b79d010c42dde9c",
+        "type": "FIX",
+        "text": " sap.m.Popover: Screen reader and focus handling are improved"
+      },
+      {
+        "id": "22561a40814cf4d17665ce654ed454be6091e855",
+        "type": "FIX",
+        "text": "sap.m.ComboBox: Dialog opens when tapping on mobile"
+      },
+      {
+        "id": "17d574e8380f69fd7d99b836cd33757d5deeb0d4",
+        "type": "FIX",
+        "text": " sap.m.Popover: Label custom header when showHeader is false"
+      }
+    ]
   }
 }

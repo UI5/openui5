@@ -183,5 +183,20 @@
         "text": " Form: use sap.m.Title for rendering"
       }
     ]
+  },
+  "1.136.21": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "7719b4f9659c5184429632552b2e354cf47f2e65",
+        "type": "FIX",
+        "text": " sap.m.SegmentedButton: Use CSS variable for border radius instead of hardcoded value"
+      },
+      {
+        "id": "4ee9ef739ba1d749ce9a138d6d341ede66d17662",
+        "type": "FIX",
+        "text": " sap.f.DynamicPageTitle: GenericTag layout corrected"
+      }
+    ]
   }
 }
