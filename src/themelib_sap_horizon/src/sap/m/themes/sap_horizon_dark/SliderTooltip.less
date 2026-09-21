@@ -15,7 +15,7 @@
 }
 
 .sapMSliderTooltipInput {
-	font-size: @sapMFontMediumSize;
+	font-size: var(--sapFontSize);
 	color: var(--sapField_TextColor);
 	background: var(--sapField_Focus_Background);
 }
@@ -26,7 +26,7 @@
 }
 
 .sapMSliderTooltip.sapMSliderTooltipErrorState:has(.sapMSliderTooltipInput:focus) {
-	outline-color: var(--sapField_InvalidColor);	
+	outline-color: var(--sapField_InvalidColor);
 }
 
 .sapMSliderTooltip.sapMSliderTooltipNonEditableWrapper {
