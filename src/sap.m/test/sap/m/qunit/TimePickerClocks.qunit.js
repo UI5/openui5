@@ -502,6 +502,32 @@ sap.ui.define([
 		assert.ok(!TimePickerInternals._isHoursValue24("00-00-23", -1, 6)); // valueFormat is "mm-ss-H", iIndexOfHH is -1, iIndexOfH is 6
 	});
 
+	QUnit.test("_createControls initializes _activeClock to 0", async function (assert) {
+		// _activeClock must be set during control creation so standalone use (without
+		// prepareForOpen) reports the correct active clock index from the start.
+		assert.strictEqual(this.oTPC._activeClock, 0, "_activeClock is 0 after initial render");
+
+		this.oTPC.setDisplayFormat("HH:mm:ss");
+		await nextUIUpdate();
+
+		assert.strictEqual(this.oTPC._activeClock, 0, "_activeClock is reset to 0 after _createControls is called again");
+	});
+
+	QUnit.test("_createControls presses the first button without requiring prepareForOpen", async function (assert) {
+		// The first segmented button must be pressed after _createControls so the
+		// standalone control is visually consistent without calling prepareForOpen.
+		var aButtons = this.oTPC.getAggregation("_buttons");
+
+		assert.ok(aButtons && aButtons.length > 0, "at least one button exists");
+		assert.ok(aButtons[0].getPressed(), "first button is pressed after initial render");
+
+		this.oTPC.setDisplayFormat("HH:mm:ss");
+		await nextUIUpdate();
+
+		aButtons = this.oTPC.getAggregation("_buttons");
+		assert.ok(aButtons[0].getPressed(), "first button is still pressed after _createControls is called again");
+	});
+
 	QUnit.module("Clocks Interactions", {
 		beforeEach: async function () {
 			this.oTPC = new TimePickerClocks();
