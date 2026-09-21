@@ -230,6 +230,27 @@ sap.ui.define([
 		oDate = UniversalDateUtils.getWeekStartDate(new UniversalDate(), "de");
 		assert.strictEqual(oDate.getDay(), 1, "en-US first day of week is Monday (1)");
 
+		// week start must be the current week's start, never the next week's, even when the
+		// locale's first day of the week is later than the input's weekday (e.g. Saturday for "ar").
+		// 2000-02-02 is a Wednesday; the preceding Saturday is 2000-01-29.
+		var oWednesday = new UniversalDate(2000, 1, 2);
+		oDate = UniversalDateUtils.getWeekStartDate(oWednesday, "ar");
+		assert.strictEqual(oDate.getDay(), 6, "ar first day of week is Saturday (6)");
+		assert.strictEqual(oDate.getFullYear(), 2000, "ar week start year is 2000");
+		assert.strictEqual(oDate.getMonth(), 0, "ar week start is in the previous month (January)");
+		assert.strictEqual(oDate.getDate(), 29, "ar week start is 2000-01-29 (the preceding Saturday)");
+		assert.ok(oDate.getTime() <= oWednesday.getTime(), "ar week start must not be after the input date");
+
+		var sOriginalCalendarWeekNumbering = Formatting.getCalendarWeekNumbering();
+		Formatting.setCalendarWeekNumbering("ISO_8601"); // monday is first day of week
+		oDate = new UniversalDate(2026, 7, 2); // Sunday 2026-08-2
+		var oWeekStartDate = UniversalDateUtils.getWeekStartDate(oDate);
+		assert.strictEqual(oWeekStartDate.getDay(), 1, "ISO_8601 first day of week is Monday (1)");
+		assert.strictEqual(oWeekStartDate.getFullYear(),2026, "week start year is 2026");
+		assert.strictEqual(oWeekStartDate.getMonth(), 6, "week start is in the previous month (July)");
+		assert.strictEqual(oWeekStartDate.getDate(), 27, "week start is 2026-07-27 (the preceding Monday)");
+		assert.ok(oWeekStartDate.getTime() <= oDate.getTime(), "week start must not be after the input date");
+		Formatting.setCalendarWeekNumbering(sOriginalCalendarWeekNumbering);
 	});
 
 	QUnit.test("Checking ranges", function (assert) {
