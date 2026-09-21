@@ -10,7 +10,7 @@ sap.ui.define(["sap/base/security/URLListValidator"], function(URLListValidator)
 	 *
 	 * @namespace
 	 * @since 1.58
-	 * @alias module:sap/base/security/URLWhitelist
+	 * @name module:sap/base/security/URLWhitelist
 	 * @public
 	 * @deprecated Since 1.85 use {@link module:sap/base/security/URLListValidator} instead.
 	 * SAP strives to replace insensitive terms with inclusive language.

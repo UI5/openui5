@@ -192,7 +192,7 @@ function(
 	 * An object literal describing a property of a class derived from <code>sap.ui.core.html.HTMLElement</code>.
 	 * See {@link sap.ui.core.html.HTMLElement.MetadataOptions MetadataOptions} for details on its usage.
 	 *
-	 * @property {"property" | "style" | "textContent" | "slot" | "none" | sap.ui.core.html.HTMLElement.MetadataOptions.PropertyMapping} [mapping="property"] Defines the mapping of the property to be either "property", "style", "textContent", "slot", or "none".
+	 * @property {"property" | "style" | "textContent" | "slot" | "none" | sap.ui.core.html.HTMLElement.MetadataOptions.Property.Mapping} [mapping="property"] Defines the mapping of the property to be either "property", "style", "textContent", "slot", or "none".
 	 *     The default mapping of a property is "property" which either renders the value of the property into an attribute of the custom tag or forwards object properties to the mutator in the onAfterRendering phase.
 	 *
 	 * @public
@@ -230,7 +230,7 @@ function(
 	 * An object literal describing an association of a class derived from <code>sap.ui.core.html.HTMLElement</code>.
 	 * See {@link sap.ui.core.html.HTMLElement.MetadataOptions MetadataOptions} for details on its usage.
 	 *
-	 * @property {"property" | sap.ui.core.html.HTMLElement.MetadataOptions.AssociationMapping} [mapping="property"] Defines the mapping of the association which defaults to "property".
+	 * @property {"property" | sap.ui.core.html.HTMLElement.MetadataOptions.Association.Mapping} [mapping="property"] Defines the mapping of the association which defaults to "property".
 	 *     Associations are forwarded to the corresponding mutator of the HTMLElement.
 	 *
 	 * @public
