@@ -687,10 +687,10 @@ sap.ui.define([
 	 */
 	// todos#22: Replace manual root-element traversal with OverlayRegistry
 	DesignTime.prototype.getElementOverlays = function() {
-		let aElementOverlays = [];
+		const aElementOverlays = [];
 
 		this._iterateRootElements(function(oRootElement) {
-			aElementOverlays = aElementOverlays.concat(this._getAllElementOverlaysIn(oRootElement));
+			aElementOverlays.push(...this._getAllElementOverlaysIn(oRootElement));
 		}, this);
 
 		return aElementOverlays;
