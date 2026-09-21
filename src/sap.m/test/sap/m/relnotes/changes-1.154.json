@@ -1,0 +1,12 @@
+{
+  "1.154.0": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "ec5791d1d0dcd627f03a4fa04f29c5fa311b5ba2",
+        "type": "FIX",
+        "text": " m.ListItemAction: use direct shortcut definitions"
+      }
+    ]
+  }
+}

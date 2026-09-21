@@ -1,0 +1,12 @@
+{
+  "1.154.0": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "ba6d42c2c6529093896c35ff2e6553bb12ca0c31",
+        "type": "FEATURE",
+        "text": " sap.html: New library for native HTML element controls"
+      }
+    ]
+  }
+}

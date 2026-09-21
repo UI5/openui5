@@ -1,0 +1,12 @@
+{
+  "1.154.0": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "ebc89c23c0c3a0ec8c5eb3d02a3b5215382686e2",
+        "type": "FIX",
+        "text": " sap.ui.mdc.Table: correct model name for expand/collapse button type"
+      }
+    ]
+  }
+}

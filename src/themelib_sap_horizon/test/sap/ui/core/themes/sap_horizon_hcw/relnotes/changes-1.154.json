@@ -1,0 +1,17 @@
+{
+  "1.154.0": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "ebc07950860e7aecd2c51a8d0a25f52ec23fb750",
+        "type": "FIX",
+        "text": " sap.ui.unified.Calendar: correct border radius of selected dates"
+      },
+      {
+        "id": "4f0429fd36840cb7f88ed3e2c9605537d51daddf",
+        "type": "FIX",
+        "text": " sap.ui.unified.Calendar: special days in two types calendar"
+      }
+    ]
+  }
+}
