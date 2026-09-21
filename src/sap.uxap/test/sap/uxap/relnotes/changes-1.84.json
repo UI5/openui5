@@ -222,5 +222,15 @@
         "text": " sap.uxap.ObjectPageLayout: Remove restrictions for text size"
       }
     ]
+  },
+  "1.84.59": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "f76736141999672783ee864f2f20f43acd673497",
+        "type": "FIX",
+        "text": " sap.uxap.AnchorBar: fix Firefox-flaky resize test"
+      }
+    ]
   }
 }

@@ -2393,5 +2393,15 @@
         "text": " sap.m.Text: Skip unstable test in Chrome"
       }
     ]
+  },
+  "1.84.59": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "1275d4354db2cc1ab6d03067ba3dd15ddc6da44b",
+        "type": "FIX",
+        "text": "sap.m.ComboBox: Dialog opens when tapping on mobile"
+      }
+    ]
   }
 }
