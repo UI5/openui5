@@ -390,13 +390,21 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("must return unique arrays each time it's called", function(assert) {
 			assert.ok(Array.isArray(this.oTaskManager.getQueuedTasks()), "function return an array value");
-			assert.notStrictEqual(this.oTaskManager.getQueuedTasks(), this.oTaskManager.getQueuedTasks(), "function returns unique instances (arrays)");
+			assert.notStrictEqual(
+				this.oTaskManager.getQueuedTasks(),
+				this.oTaskManager.getQueuedTasks(),
+				"function returns unique instances (arrays)"
+			);
 		});
 
 		QUnit.test("must return the task just once (once asked the task is marked pending and is removed from the queued list)", function(assert) {
 			this.oTaskManager.add({ type: "foo" });
 			assert.strictEqual(this.oTaskManager.getQueuedTasks()[0].type, "foo", "on first call function returns added task");
-			assert.strictEqual(this.oTaskManager.getQueuedTasks().length, 0, "on second call function should not return the task again (not queued anymore)");
+			assert.strictEqual(
+				this.oTaskManager.getQueuedTasks().length,
+				0,
+				"on second call function should not return the task again (not queued anymore)"
+			);
 			assert.ok(!this.oTaskManager.isEmpty(), "after the get calls the task still exists in the task manager");
 		});
 
@@ -448,6 +456,27 @@ sap.ui.define([
 			);
 
 			assert.ok(true, "events were not called");
+		});
+	});
+
+	QUnit.module("complete() - same-type drain correctness", {
+		beforeEach() {
+			this.oTaskManager = new TaskManager();
+		},
+		afterEach() {
+			this.oTaskManager.destroy();
+		}
+	}, function() {
+		QUnit.test("draining many same-type tasks one by one leaves the manager empty", function(assert) {
+			const iCount = 200;
+			const aIds = [];
+			for (let i = 0; i < iCount; i++) {
+				aIds.push(this.oTaskManager.add({ type: "createOverlay" }));
+			}
+			assert.strictEqual(this.oTaskManager.count(), iCount, "counter correct after adding");
+			aIds.forEach((iId) => this.oTaskManager.complete(iId));
+			assert.strictEqual(this.oTaskManager.count(), 0, "counter reaches zero after draining all tasks");
+			assert.ok(this.oTaskManager.isEmpty(), "manager is empty after all completions");
 		});
 	});
 
