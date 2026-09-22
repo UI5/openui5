@@ -1,9 +1,9 @@
 /* =================================== */
 /* CSS for control sap.m/Illustration  */
 /* Base theme                          */
-/* ============================= ===== */
+/* =================================== */
 
-:root {
+.sapUI5Scope {
 	--sapIllus_BrandColorPrimary: var(--sapContent_Illustrative_Color1);
 	--sapIllus_BrandColorSecondary: var(--sapContent_Illustrative_Color2);
 	--sapIllus_StrokeDetailColor: var(--sapContent_Illustrative_Color4);
@@ -13,8 +13,8 @@
 	--sapIllus_ObjectFillColor: var(--sapContent_Illustrative_Color8);
 	--sapIllus_AccentColor: var(--sapContent_Illustrative_Color3);
 	--sapIllus_NoColor: none;
-	--sapIllus_PatternShadow: ~"url(#sapIllus_PatternShadow)";
-	--sapIllus_PatternHighlight: ~"url(#sapIllus_PatternHighlight)";
+	--sapIllus_PatternShadow: ~'url(#sapIllus_PatternShadow)';
+	--sapIllus_PatternHighlight: ~'url(#sapIllus_PatternHighlight)';
 
 	.generate-illustrative-colors (20);
 }
@@ -29,8 +29,8 @@
 	mask-type: alpha;
 }
 
-.sapIllus_BlendModeMultiply { 
-    mix-blend-mode: multiply; 
+.sapIllus_BlendModeMultiply {
+	mix-blend-mode: multiply;
 }
 
 .sapIllus_BrandColorPrimary {

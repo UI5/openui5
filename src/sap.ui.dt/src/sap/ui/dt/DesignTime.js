@@ -75,7 +75,7 @@ sap.ui.define([
 	 * @alias sap.ui.dt.DesignTime
 	 */
 
-	var DesignTime = ManagedObject.extend("sap.ui.dt.DesignTime", /** @lends sap.ui.dt.DesignTime.prototype */ {
+	const DesignTime = ManagedObject.extend("sap.ui.dt.DesignTime", /** @lends sap.ui.dt.DesignTime.prototype */ {
 		metadata: {
 			library: "sap.ui.dt",
 			properties: {
@@ -310,19 +310,19 @@ sap.ui.define([
 
 			// Attach processingStatusChange for future added plugins
 			this.attachEvent("addPlugin", function(oEvent) {
-				var oPlugin = oEvent.getParameter("plugin");
+				const oPlugin = oEvent.getParameter("plugin");
 				oPlugin.attachEvent("processingStatusChange", this._onProcessingStatusChange, this);
 			}, this);
 
 			// Toggle root overlays visibility when property "enabled" is changed
 			this.attachEvent("enabledChanged", function(oEvent) {
-				var bValue = oEvent.getParameter("value");
-				var oOverlayContainer = Overlay.getOverlayContainer();
+				const bValue = oEvent.getParameter("value");
+				const oOverlayContainer = Overlay.getOverlayContainer();
 				oOverlayContainer.style.display = bValue ? "block" : "none";
 
 				// Ensure that the overlays are correct when the mode is enabled
 				this.getRootElements().forEach(function(oRootElement) {
-					var oRootElementOverlay = OverlayRegistry.getOverlay(oRootElement);
+					const oRootElementOverlay = OverlayRegistry.getOverlay(oRootElement);
 					oRootElementOverlay.setVisible(bValue);
 
 					// TODO: move to overlay
@@ -353,8 +353,8 @@ sap.ui.define([
 	};
 
 	DesignTime.prototype._onApplyStylesRequired = function(oEvent) {
-		var mParameters = oEvent.getParameters();
-		var oOverlay = oEvent.getSource();
+		const mParameters = oEvent.getParameters();
+		const oOverlay = oEvent.getSource();
 		this._oTaskManager.add({
 			type: "applyStyles",
 			callbackFn: oOverlay.applyStyles.bind(oOverlay, mParameters.bForceScrollbarSync, mParameters.bSkipForceCalculation),
@@ -363,14 +363,14 @@ sap.ui.define([
 	};
 
 	DesignTime.prototype._removeOverlayFromSyncingBatch = function(oElementOverlay) {
-		var iIndex = this._aOverlaysCreatedInLastBatch.indexOf(oElementOverlay);
+		const iIndex = this._aOverlaysCreatedInLastBatch.indexOf(oElementOverlay);
 		if (iIndex !== -1) {
 			this._aOverlaysCreatedInLastBatch.splice(iIndex, 1);
 		}
 	};
 
 	DesignTime.prototype._registerElementOverlays = function() {
-		var aElementOverlays = this._aOverlaysCreatedInLastBatch.slice();
+		const aElementOverlays = this._aOverlaysCreatedInLastBatch.slice();
 
 		if (!aElementOverlays.length) {
 			return;
@@ -379,10 +379,10 @@ sap.ui.define([
 		this._aOverlaysCreatedInLastBatch = [];
 
 		// TODO: get rid of this temporary solution with UICSFLEX-3718 BLI
-		var iTaskId = this._oTaskManager.add({
+		const iTaskId = this._oTaskManager.add({
 			type: "registerElementOverlays"
 		});
-		var aPlugins = this.getPlugins();
+		const aPlugins = this.getPlugins();
 
 		// IMPORTANT: cycles below should not be combined in one.
 		// Reason: overlays life-cycle:
@@ -408,7 +408,7 @@ sap.ui.define([
 				try {
 					oPlugin.callElementOverlayRegistrationMethods(oElementOverlay);
 				} catch (vError) {
-					var oError = Util.propagateError(
+					const oError = Util.propagateError(
 						vError,
 						"DesignTime#_registerElementOverlays",
 						`registerElementOverlay() method of the plugin ${oPlugin.getMetadata().getName()} has failed for overlay with id='${oElementOverlay.getId()}' (element id='${oElementOverlay.getElement().getId()}')`
@@ -425,7 +425,7 @@ sap.ui.define([
 					elementOverlay: oElementOverlay
 				});
 			} catch (vError) {
-				var oError = Util.propagateError(
+				const oError = Util.propagateError(
 					vError,
 					"DesignTime#_registerElementOverlays",
 					`One of the listeners of elementOverlayCreated event failed while processing the overlay with id='${oElementOverlay.getId()}' for element with id='${oElementOverlay.getElement().getId()}'`
@@ -495,7 +495,7 @@ sap.ui.define([
 	 * @returns {Promise} Resolves with undefined when no plugin is busy anymore
 	 */
 	DesignTime.prototype.waitForBusyPlugins = function() {
-		var aBusyPlugins = this.getBusyPlugins();
+		const aBusyPlugins = this.getBusyPlugins();
 		return Promise.all(aBusyPlugins.map(function(oPlugin) {
 			return oPlugin.waitForBusyAction();
 		}));
@@ -585,7 +585,7 @@ sap.ui.define([
 	 * @protected
 	 */
 	DesignTime.prototype.getDesignTimeMetadataFor = function(oElement) {
-		var sClassName;
+		let sClassName;
 
 		if (typeof oElement === "string") { // backwards compatibility, should be dropped in future releases (>rel-1.54)
 			sClassName = oElement;
@@ -617,7 +617,7 @@ sap.ui.define([
 	 * @private
 	 */
 	DesignTime.prototype._createOverlaysForRootElement = function(oRootElement) {
-		var iTaskId = this._oTaskManager.add({
+		const iTaskId = this._oTaskManager.add({
 			type: "createOverlay",
 			element: oRootElement,
 			root: true
@@ -639,7 +639,7 @@ sap.ui.define([
 				return oElementOverlay;
 			}.bind(this),
 			function(vError) {
-				var oError = Util.propagateError(
+				const oError = Util.propagateError(
 					vError,
 					"DesignTime#_createOverlaysForRootElement",
 					`Initialization failed for root element with id '${oRootElement.getId()}'`
@@ -685,9 +685,9 @@ sap.ui.define([
 	 * @return {sap.ui.dt.ElementOverlay[]} all element overlays created and handled by the DesignTime
 	 * @public
 	 */
-	// TODO: replace with OverlayRegistry
+	// todos#22: Replace manual root-element traversal with OverlayRegistry
 	DesignTime.prototype.getElementOverlays = function() {
-		var aElementOverlays = [];
+		let aElementOverlays = [];
 
 		this._iterateRootElements(function(oRootElement) {
 			aElementOverlays = aElementOverlays.concat(this._getAllElementOverlaysIn(oRootElement));
@@ -813,7 +813,7 @@ sap.ui.define([
 	 * @private
 	 */
 	DesignTime.prototype._rejectCreateOverlay = function(oElement) {
-		var sReason;
+		let sReason;
 
 		if (!oElement) {
 			sReason = "Cannot create overlay — no element is specified.";
@@ -842,12 +842,12 @@ sap.ui.define([
 				data: mAggregationMetadata
 			}),
 			init: function(oEvent) {
-				var oAggregationOverlay = oEvent.getSource();
+				const oAggregationOverlay = oEvent.getSource();
 				oAggregationOverlay.attachEvent("destroyed", this._onAggregationOverlayDestroyed, this);
 				oAggregationOverlay.attachEvent("applyStylesRequired", this._onApplyStylesRequired, this);
 			}.bind(this),
 			beforeDestroy: function(oEvent) {
-				var oAggregationOverlay = oEvent.getSource();
+				const oAggregationOverlay = oEvent.getSource();
 				OverlayRegistry.deregister(oAggregationOverlay);
 				oAggregationOverlay.detachEvent("applyStylesRequired", this._onApplyStylesRequired, this);
 			}.bind(this)
@@ -866,7 +866,7 @@ sap.ui.define([
 	 * @private
 	 */
 	DesignTime.prototype._createElementOverlay = function(mParams) {
-		var oElement = mParams.element;
+		const oElement = mParams.element;
 
 		function createElementOverlay(mParameters) {
 			return new ElementOverlay(mParameters);
@@ -899,7 +899,7 @@ sap.ui.define([
 						})(this.getDesignTimeMetadataFor(oElement), mParams.parentMetadata, oElement)
 				),
 				init: function(oEvent) {
-					var oElementOverlay = oEvent.getSource();
+					const oElementOverlay = oEvent.getSource();
 					fnResolve(oEvent.getSource());
 					oElementOverlay.attachEvent("destroyed", this._onElementOverlayDestroyed, this);
 					oElementOverlay.attachEvent("elementDestroyed", this._onElementDestroyed, this);
@@ -910,17 +910,17 @@ sap.ui.define([
 
 					const mDTMetadataData = oElementOverlay.getDesignTimeMetadata().getData();
 					if (mDTMetadataData && ObjectPath.get(["actions", "actionsFromResponsibleElement"], mDTMetadataData)) {
-						var mConnectedElements = this.getSelectionManager().getConnectedElements();
-						var oElement = oElementOverlay.getElement();
-						var oResponsibleElement = oElementOverlay.getDesignTimeMetadata().getResponsibleElement(oElement);
+						const mConnectedElements = this.getSelectionManager().getConnectedElements();
+						const oElement = oElementOverlay.getElement();
+						const oResponsibleElement = oElementOverlay.getDesignTimeMetadata().getResponsibleElement(oElement);
 						mConnectedElements[oElement.getId()] = oResponsibleElement.getId();
 						mConnectedElements[oResponsibleElement.getId()] = oElement.getId();
 						this.getSelectionManager().setConnectedElements(mConnectedElements);
 					}
 				}.bind(this),
 				initFailed: function(sElementId, oEvent) {
-					var oElementOverlay = oEvent.getSource();
-					var oError = Util.propagateError(
+					const oElementOverlay = oEvent.getSource();
+					const oError = Util.propagateError(
 						oEvent.getParameter("error"),
 						"DesignTime#_createElementOverlay",
 						`Error creating overlay (id='${oElementOverlay.getId()}') for '${sElementId}'`
@@ -938,9 +938,9 @@ sap.ui.define([
 	};
 
 	function getAggregationBindingTemplates(oElementOverlay, aAggregationNames) {
-		var oElement = oElementOverlay.getElement();
+		const oElement = oElementOverlay.getElement();
 		return aAggregationNames.reduce(function(mTemplateAggregations, sAggregationName) {
-			var oTemplate = ElementUtil.getAggregationBindingTemplate(oElement, sAggregationName);
+			const oTemplate = ElementUtil.getAggregationBindingTemplate(oElement, sAggregationName);
 			if (oTemplate) {
 				mTemplateAggregations[sAggregationName] = oTemplate;
 			}
@@ -1025,19 +1025,19 @@ sap.ui.define([
 	 * @private
 	 */
 	DesignTime.prototype._createChildren = function(oElementOverlay, mParams) {
-		var aAggregationNames = oElementOverlay.getAggregationNames();
-		var mParentAggregationMetadata = mParams.parentMetadata;
-		var mAggregationBindingTemplates = getAggregationBindingTemplates(oElementOverlay, aAggregationNames);
-		var aTemplateAggregationNames = Object.keys(mAggregationBindingTemplates);
+		let aAggregationNames = oElementOverlay.getAggregationNames();
+		const mParentAggregationMetadata = mParams.parentMetadata;
+		const mAggregationBindingTemplates = getAggregationBindingTemplates(oElementOverlay, aAggregationNames);
+		const aTemplateAggregationNames = Object.keys(mAggregationBindingTemplates);
 
 		// Consider each aggregation binding template which is not nested inside an existing template structure as a root template
 		// Separate root templates and their children from the instances of the root template as well as all nested template instances
-		var bEncounteredTemplate = mParams.isPartOfTemplate !== undefined;
-		var bHasTemplateAggregation = !isEmptyObject(mAggregationBindingTemplates);
-		var bIsRootTemplate = bHasTemplateAggregation && !bEncounteredTemplate;
-		var bIsPartOfTemplate = bIsRootTemplate ? true : mParams.isPartOfTemplate;
+		const bEncounteredTemplate = mParams.isPartOfTemplate !== undefined;
+		const bHasTemplateAggregation = !isEmptyObject(mAggregationBindingTemplates);
+		const bIsRootTemplate = bHasTemplateAggregation && !bEncounteredTemplate;
+		const bIsPartOfTemplate = bIsRootTemplate ? true : mParams.isPartOfTemplate;
 		// Whether cloned instances are nested deeply in the root template structure
-		var bIsCloneInsideTemplate = bIsRootTemplate ? false : mParams.isPartOfTemplate;
+		const bIsCloneInsideTemplate = bIsRootTemplate ? false : mParams.isPartOfTemplate;
 
 		// Avoid creating aggregation overlays for cloned template instances inside the template structure
 		if (bHasTemplateAggregation && bIsPartOfTemplate && !bIsRootTemplate) {
@@ -1067,7 +1067,7 @@ sap.ui.define([
 		bIsPartOfTemplate,
 		mAggregationBindingTemplates
 	) {
-		var bIsTemplateAggregation = !isEmptyObject(mAggregationBindingTemplates);
+		const bIsTemplateAggregation = !isEmptyObject(mAggregationBindingTemplates);
 		// Nested template inside a clone of another template
 		if (bIsTemplateAggregation && !bIsPartOfTemplate) {
 			return Promise.resolve();
@@ -1181,8 +1181,8 @@ sap.ui.define([
 	 * @private
 	 */
 	DesignTime.prototype._enrichChildCreationError = function(oError, oElement, sParentElementClassName, sAggregationName) {
-		var sSeverity = "error";
-		var sError = Util.errorToString(oError);
+		let sSeverity = "error";
+		let sError = Util.errorToString(oError);
 
 		if (oError.message.includes("Cannot create overlay without a valid element")) {
 			sSeverity = "warning";
@@ -1208,7 +1208,7 @@ sap.ui.define([
 	 * @private
 	 */
 	DesignTime.prototype._destroyOverlaysForElement = function(oElement) {
-		var oOverlay = OverlayRegistry.getOverlay(oElement);
+		const oOverlay = OverlayRegistry.getOverlay(oElement);
 		if (oOverlay) {
 			oOverlay.destroy();
 		}
@@ -1235,7 +1235,7 @@ sap.ui.define([
 			return;
 		}
 
-		var oElementOverlay = oEvent.getSource();
+		const oElementOverlay = oEvent.getSource();
 
 		// cancel open applyStyles tasks for the destroyed overlays in the task manager
 		this._oTaskManager.cancelBy({
@@ -1247,7 +1247,7 @@ sap.ui.define([
 		this._removeOverlayFromSyncingBatch(oElementOverlay);
 
 		// FIXME: workaround. Overlays should not kill themselves (see ElementOverlay@_onElementDestroyed).
-		var sElementId = oElementOverlay.getAssociation("element");
+		const sElementId = oElementOverlay.getAssociation("element");
 		if (sElementId in this._mPendingOverlays) { // means that the overlay was destroyed during initialization process
 			delete this._mPendingOverlays[sElementId];
 			return;
@@ -1268,7 +1268,7 @@ sap.ui.define([
 	};
 
 	DesignTime.prototype._onElementDestroyed = function(oEvent) {
-		var sElementId = oEvent.getParameter("targetId");
+		const sElementId = oEvent.getParameter("targetId");
 
 		this.removeRootElement(sElementId);
 	};
@@ -1295,8 +1295,8 @@ sap.ui.define([
 	 * @private
 	 */
 	DesignTime.prototype._onElementOverlaySelectionChange = function(oEvent) {
-		var oElementOverlay = oEvent.getSource();
-		var bSelected = oEvent.getParameter("selected");
+		const oElementOverlay = oEvent.getSource();
+		const bSelected = oEvent.getParameter("selected");
 
 		if (bSelected) {
 			if (this.getSelectionManager().getSelectionMode() === SelectionMode.Multi) {
@@ -1318,8 +1318,8 @@ sap.ui.define([
 	 * @private
 	 */
 	DesignTime.prototype._onElementModified = function(oEvent) {
-		var oParams = merge({}, oEvent.getParameters());
-		var oElementOverlay = oEvent.getSource();
+		const oParams = { ...oEvent.getParameters() };
+		const oElementOverlay = oEvent.getSource();
 		oParams.type = !oParams.type ? oEvent.getId() : oParams.type;
 		switch (oParams.type) {
 			case "addOrSetAggregation":
@@ -1371,8 +1371,8 @@ sap.ui.define([
 	 * @private
 	 */
 	DesignTime.prototype._onEditableChanged = function(oEvent) {
-		var oParams = merge({}, oEvent.getParameters());
-		var oElementOverlay = oEvent.getSource();
+		const oParams = { ...oEvent.getParameters() };
+		const oElementOverlay = oEvent.getSource();
 		oParams.id = oElementOverlay.getId();
 		if (this.getStatus() === DesignTimeStatus.SYNCING) {
 			this.attachEventOnce("synced", oParams, function(...aArgs) {
@@ -1394,13 +1394,13 @@ sap.ui.define([
 	 */
 	DesignTime.prototype._onAddAggregation = function(oElement, oParent, sAggregationName) {
 		if (ElementUtil.isElementValid(oElement, OverlayRegistry.getOverlay(oElement)?.getOngoingMoveInformation())) {
-			var oParentOverlay = OverlayRegistry.getOverlay(oParent);
-			var oParentAggregationOverlay = oParentOverlay && oParentOverlay.getAggregationOverlay(sAggregationName);
+			const oParentOverlay = OverlayRegistry.getOverlay(oParent);
+			const oParentAggregationOverlay = oParentOverlay && oParentOverlay.getAggregationOverlay(sAggregationName);
 			if (!oParentAggregationOverlay) {
-				var onElementOverlayCreated = function(oEvent) {
-					var oElementOverlay = oEvent.getParameter("elementOverlay");
+				const onElementOverlayCreated = function(oEvent) {
+					const oElementOverlay = oEvent.getParameter("elementOverlay");
 					if (oElementOverlay.getElement().getId() === oParent.getId()) {
-						var oParentAggregationOverlay = oElementOverlay.getAggregationOverlay(sAggregationName);
+						const oParentAggregationOverlay = oElementOverlay.getAggregationOverlay(sAggregationName);
 						this.detachElementOverlayCreated(onElementOverlayCreated, this);
 						this._addAggregation(oElement, oParentAggregationOverlay);
 					}
@@ -1427,7 +1427,7 @@ sap.ui.define([
 	};
 
 	DesignTime.prototype._addAggregation = function(oElement, oParentAggregationOverlay) {
-		var oElementOverlay = OverlayRegistry.getOverlay(oElement);
+		let oElementOverlay = OverlayRegistry.getOverlay(oElement);
 
 		// When a binding refresh recreates an element with the same ID, the old overlay
 		// survives but its child overlays are destroyed. Detect this stale state and
@@ -1442,7 +1442,7 @@ sap.ui.define([
 			&& oParentAggregationOverlay
 			&& oParentAggregationOverlay.getElement()
 		) {
-			var iTaskId = this._oTaskManager.add({
+			const iTaskId = this._oTaskManager.add({
 				type: "createChildOverlay",
 				element: oElement
 			});
@@ -1452,7 +1452,7 @@ sap.ui.define([
 				parentMetadata: oParentAggregationOverlay.getDesignTimeMetadata().getData()
 			})
 			.then(function(oElementOverlay) {
-				var vInsertChildReply = oParentAggregationOverlay.insertChild(null, oElementOverlay);
+				const vInsertChildReply = oParentAggregationOverlay.insertChild(null, oElementOverlay);
 				if (vInsertChildReply === true) {
 					this._oTaskManager.add({
 						type: "applyStyles",
@@ -1460,7 +1460,7 @@ sap.ui.define([
 						overlayId: oElementOverlay.getId()
 					}, "overlayId");
 
-					var iOverlayPosition = oParentAggregationOverlay.indexOfAggregation("children", oElementOverlay);
+					const iOverlayPosition = oParentAggregationOverlay.indexOfAggregation("children", oElementOverlay);
 
 					// `ElementOverlayAdded` event should be emitted only when overlays are ready to prevent
 					// an access to still syncing overlays (e.g. the overlay is still not available in overlay registry
@@ -1482,7 +1482,7 @@ sap.ui.define([
 				// In case of any crash or rejection the task has to be canceled
 				this._oTaskManager.cancel(iTaskId);
 
-				var oError = Util.propagateError(
+				const oError = Util.propagateError(
 					vError,
 					"DesignTime#_onAddAggregation",
 					`Failed to add new element overlay (elementId='${sElementId}') into aggregation overlay (id='${sAggregationOverlayId}')`
@@ -1574,7 +1574,7 @@ sap.ui.define([
 	 * @private
 	 */
 	DesignTime.prototype._checkIfOverlayShouldBeDestroyed = function(oElement) {
-		var oElementOverlay = OverlayRegistry.getOverlay(oElement);
+		const oElementOverlay = OverlayRegistry.getOverlay(oElement);
 		// Overlays of elements in "dependents" aggregation or not in root elements should be destroyed
 		if (
 			// element overlays for destroyed elements will be destroyed already,
@@ -1615,7 +1615,7 @@ sap.ui.define([
 	 * @private
 	 */
 	DesignTime.prototype._isElementInRootElements = function(oElement) {
-		var bFoundAncestor = false;
+		let bFoundAncestor = false;
 
 		this._iterateRootElements(function(oRootElement) {
 			if (ElementUtil.hasAncestor(oElement, oRootElement)) {
@@ -1634,9 +1634,9 @@ sap.ui.define([
 	 * @private
 	 */
 	DesignTime.prototype._iterateRootElements = function(fnStep, oScope) {
-		var aRootElements = this.getRootElements();
+		const aRootElements = this.getRootElements();
 		aRootElements.forEach(function(sRootElementId) {
-			var oRootElement = ElementUtil.getElementInstance(sRootElementId);
+			const oRootElement = ElementUtil.getElementInstance(sRootElementId);
 			fnStep.call(oScope || this, oRootElement);
 		}, this);
 	};
@@ -1647,9 +1647,9 @@ sap.ui.define([
 	 * @private
 	 */
 	DesignTime.prototype._getAllElementOverlaysIn = function(oElement) {
-		var aElementOverlays = [];
+		const aElementOverlays = [];
 
-		var oElementOverlay = OverlayRegistry.getOverlay(oElement);
+		const oElementOverlay = OverlayRegistry.getOverlay(oElement);
 		if (oElementOverlay) {
 			OverlayUtil.iterateOverlayElementTree(oElementOverlay, function(oChildOverlay) {
 				if (oChildOverlay.getDesignTimeMetadata()) {
