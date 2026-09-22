@@ -245,9 +245,9 @@ sap.ui.define([
 						time = new Date().getTime() - start.getTime();
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
 						assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + time + "ms OK");
-						assert.equal(oCustomerField.getAggregation("_field").getItems().length, 4, "Field: Customer lenght is OK");
-						assert.equal(oEmployeeField.getAggregation("_field").getItems().length, 6, "Field: Employee lenght is OK");
-						assert.equal(oOrderField.getAggregation("_field").getItems().length, 0, "Field: Order lenght is OK");
+						assert.equal(oCustomerField.getAggregation("_field").getItems().length, 4, "Field: Customer length is OK");
+						assert.equal(oEmployeeField.getAggregation("_field").getItems().length, 6, "Field: Employee length is OK");
+						assert.equal(oOrderField.getAggregation("_field").getItems().length, 0, "Field: Order length is OK");
 						oOrderField.getAggregation("_field").focus();
 						// sometimes the focus in not in the test browser, need to call the onfocusin function hardly to set the message strip
 						oOrderField.onfocusin();
@@ -257,7 +257,7 @@ sap.ui.define([
 						assert.equal(oMsgStrip.getDomRef().style.opacity, "1", "Message strip visible");
 						assert.equal(oMsgStrip.getType(), "Error", "Message strip Error");
 						assert.equal(oMsgStrip.getText(), "400: Please select a cutomer and an employee first", "Order Error Text");
-						assert.equal(oProductField.getAggregation("_field").getItems().length, 0, "Field: Product lenght is OK");
+						assert.equal(oProductField.getAggregation("_field").getItems().length, 0, "Field: Product length is OK");
 						oProductField.getAggregation("_field").focus();
 						// sometimes the focus in not in the test browser, need to call the onfocusin function hardly to set the message strip
 						oProductField.onfocusin();
@@ -265,7 +265,7 @@ sap.ui.define([
 						assert.equal(oMsgStrip.getDomRef().style.opacity, "1", "Message strip visible");
 						assert.equal(oMsgStrip.getType(), "Error", "Message strip Error");
 						assert.equal(oMsgStrip.getText(), "400: Please select an order first", "Product Error Text");
-						assert.equal(oCustomerLimitField.getAggregation("_field").getItems().length, 2, "Field: CustomerWithTopAndSkipOption lenght is OK");
+						assert.equal(oCustomerLimitField.getAggregation("_field").getItems().length, 2, "Field: CustomerWithTopAndSkipOption length is OK");
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -320,15 +320,15 @@ sap.ui.define([
 						assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + time + "ms OK");
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
 						var oComboBox = oCustomerField.getAggregation("_field");
-						assert.equal(oComboBox.getItems().length, 4, "Field: Customer lenght is OK");
+						assert.equal(oComboBox.getItems().length, 4, "Field: Customer length is OK");
 						var oOrderModel = oOrderField.getModel();
 						oOrderModel.attachPropertyChange(async function (){
 							await nextUIUpdate();
 							time = new Date().getTime() - start.getTime();
 							assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Data Request " + time + "ms OK");
-							assert.equal(oCustomerField.getAggregation("_field").getItems().length, 4, "Field: Customer lenght is OK");
-							assert.equal(oEmployeeField.getAggregation("_field").getItems().length, 6, "Field: Employee lenght is OK");
-							assert.equal(oOrderField.getAggregation("_field").getItems().length, 0, "Field: Order lenght is OK");
+							assert.equal(oCustomerField.getAggregation("_field").getItems().length, 4, "Field: Customer length is OK");
+							assert.equal(oEmployeeField.getAggregation("_field").getItems().length, 6, "Field: Employee length is OK");
+							assert.equal(oOrderField.getAggregation("_field").getItems().length, 0, "Field: Order length is OK");
 							oOrderField.getAggregation("_field").focus();
 							// sometimes the focus in not in the test browser, need to call the onfocusin function hardly to set the message strip
 							oOrderField.onfocusin();
@@ -338,7 +338,7 @@ sap.ui.define([
 							assert.equal(oMsgStrip.getDomRef().style.opacity, "1", "Message strip visible");
 							assert.equal(oMsgStrip.getType(), "Error", "Message strip Error");
 							assert.equal(oMsgStrip.getText(), "400: Please select a cutomer and an employee first", "Order Error Text");
-							assert.equal(oProductField.getAggregation("_field").getItems().length, 0, "Field: Product lenght is OK");
+							assert.equal(oProductField.getAggregation("_field").getItems().length, 0, "Field: Product length is OK");
 							oProductField.getAggregation("_field").focus();
 							// sometimes the focus in not in the test browser, need to call the onfocusin function hardly to set the message strip
 							oProductField.onfocusin();
@@ -346,7 +346,7 @@ sap.ui.define([
 							assert.equal(oMsgStrip.getDomRef().style.opacity, "1", "Message strip visible");
 							assert.equal(oMsgStrip.getType(), "Error", "Message strip Error");
 							assert.equal(oMsgStrip.getText(), "400: Please select an order first", "Product Error Text");
-							assert.equal(oCustomerLimitField.getAggregation("_field").getItems().length, 2, "Field: CustomerWithTopAndSkipOption lenght is OK");
+							assert.equal(oCustomerLimitField.getAggregation("_field").getItems().length, 2, "Field: CustomerWithTopAndSkipOption length is OK");
 							resolve();
 						});
 						start = new Date();
@@ -405,15 +405,15 @@ sap.ui.define([
 						assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + time + "ms OK");
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
 						var oComboBox = oEmployeeField.getAggregation("_field");
-						assert.equal(oComboBox.getItems().length, 6, "Field: Employee lenght is OK");
+						assert.equal(oComboBox.getItems().length, 6, "Field: Employee length is OK");
 						var oOrderModel = oOrderField.getModel();
 						oOrderModel.attachPropertyChange(async function (){
 							await nextUIUpdate();
 							time = new Date().getTime() - start.getTime();
 							assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Data Request " + time + "ms OK");
-							assert.equal(oCustomerField.getAggregation("_field").getItems().length, 4, "Field: Customer lenght is OK");
-							assert.equal(oEmployeeField.getAggregation("_field").getItems().length, 6, "Field: Employee lenght is OK");
-							assert.equal(oOrderField.getAggregation("_field").getItems().length, 0, "Field: Order lenght is OK");
+							assert.equal(oCustomerField.getAggregation("_field").getItems().length, 4, "Field: Customer length is OK");
+							assert.equal(oEmployeeField.getAggregation("_field").getItems().length, 6, "Field: Employee length is OK");
+							assert.equal(oOrderField.getAggregation("_field").getItems().length, 0, "Field: Order length is OK");
 							oOrderField.getAggregation("_field").focus();
 							// sometimes the focus in not in the test browser, need to call the onfocusin function hardly to set the message strip
 							oOrderField.onfocusin();
@@ -423,7 +423,7 @@ sap.ui.define([
 							assert.equal(oMsgStrip.getDomRef().style.opacity, "1", "Message strip visible");
 							assert.equal(oMsgStrip.getType(), "Error", "Message strip Error");
 							assert.equal(oMsgStrip.getText(), "400: Please select a cutomer and an employee first", "Order Error Text");
-							assert.equal(oProductField.getAggregation("_field").getItems().length, 0, "Field: Product lenght is OK");
+							assert.equal(oProductField.getAggregation("_field").getItems().length, 0, "Field: Product length is OK");
 							oProductField.getAggregation("_field").focus();
 							// sometimes the focus in not in the test browser, need to call the onfocusin function hardly to set the message strip
 							oProductField.onfocusin();
@@ -431,7 +431,7 @@ sap.ui.define([
 							assert.equal(oMsgStrip.getDomRef().style.opacity, "1", "Message strip visible");
 							assert.equal(oMsgStrip.getType(), "Error", "Message strip Error");
 							assert.equal(oMsgStrip.getText(), "400: Please select an order first", "Product Error Text");
-							assert.equal(oCustomerLimitField.getAggregation("_field").getItems().length, 2, "Field: CustomerWithTopAndSkipOption lenght is OK");
+							assert.equal(oCustomerLimitField.getAggregation("_field").getItems().length, 2, "Field: CustomerWithTopAndSkipOption length is OK");
 							resolve();
 						});
 						start = new Date();
@@ -490,7 +490,7 @@ sap.ui.define([
 						assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + time + "ms OK");
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
 						var oCustomerComboBox = oCustomerField.getAggregation("_field");
-						assert.equal(oCustomerComboBox.getItems().length, 4, "Field: Customer lenght is OK");
+						assert.equal(oCustomerComboBox.getItems().length, 4, "Field: Customer length is OK");
 						var oOrderModel = oOrderField.getModel();
 						oOrderModel.attachEventOnce("propertyChange", async function (){
 							var end = new Date();
@@ -499,10 +499,10 @@ sap.ui.define([
 							await nextUIUpdate();
 							var uiChangetime = new Date().getTime() - end.getTime();
 							assert.ok(uiChangetime < EditorQunitUtils.performance.interaction, "Performance - UI Change " + uiChangetime + "ms OK");
-							assert.equal(oCustomerComboBox.getItems().length, 4, "Field: Customer lenght is OK");
+							assert.equal(oCustomerComboBox.getItems().length, 4, "Field: Customer length is OK");
 							var oEmployeeComboBox = oEmployeeField.getAggregation("_field");
-							assert.equal(oEmployeeComboBox.getItems().length, 6, "Field: Employee lenght is OK");
-							assert.equal(oOrderField.getAggregation("_field").getItems().length, 0, "Field: Order lenght is OK");
+							assert.equal(oEmployeeComboBox.getItems().length, 6, "Field: Employee length is OK");
+							assert.equal(oOrderField.getAggregation("_field").getItems().length, 0, "Field: Order length is OK");
 							oOrderField.getAggregation("_field").focus();
 							// sometimes the focus in not in the test browser, need to call the onfocusin function hardly to set the message strip
 							oOrderField.onfocusin();
@@ -512,7 +512,7 @@ sap.ui.define([
 							assert.equal(oMsgStrip.getDomRef().style.opacity, "1", "Message strip visible");
 							assert.equal(oMsgStrip.getType(), "Error", "Message strip Error");
 							assert.equal(oMsgStrip.getText(), "400: Please select a cutomer and an employee first", "Order Error Text");
-							assert.equal(oProductField.getAggregation("_field").getItems().length, 0, "Field: Product lenght is OK");
+							assert.equal(oProductField.getAggregation("_field").getItems().length, 0, "Field: Product length is OK");
 							oProductField.getAggregation("_field").focus();
 							// sometimes the focus in not in the test browser, need to call the onfocusin function hardly to set the message strip
 							oProductField.onfocusin();
@@ -520,7 +520,7 @@ sap.ui.define([
 							assert.equal(oMsgStrip.getDomRef().style.opacity, "1", "Message strip visible");
 							assert.equal(oMsgStrip.getType(), "Error", "Message strip Error");
 							assert.equal(oMsgStrip.getText(), "400: Please select an order first", "Product Error Text");
-							assert.equal(oCustomerLimitField.getAggregation("_field").getItems().length, 2, "Field: CustomerWithTopAndSkipOption lenght is OK");
+							assert.equal(oCustomerLimitField.getAggregation("_field").getItems().length, 2, "Field: CustomerWithTopAndSkipOption length is OK");
 							var newStart;
 							oOrderModel.attachEventOnce("propertyChange", async function (){
 								end = new Date();
@@ -529,9 +529,9 @@ sap.ui.define([
 								await nextUIUpdate();
 								var uiChangetime = new Date().getTime() - end.getTime();
 								assert.ok(uiChangetime < EditorQunitUtils.performance.interaction, "Performance - UI Change " + uiChangetime + "ms OK");
-								assert.equal(oCustomerField.getAggregation("_field").getItems().length, 4, "Field: Customer lenght is OK");
-								assert.equal(oEmployeeField.getAggregation("_field").getItems().length, 6, "Field: Employee lenght is OK");
-								assert.equal(oOrderField.getAggregation("_field").getItems().length, 1, "Field: Order lenght is OK");
+								assert.equal(oCustomerField.getAggregation("_field").getItems().length, 4, "Field: Customer length is OK");
+								assert.equal(oEmployeeField.getAggregation("_field").getItems().length, 6, "Field: Employee length is OK");
+								assert.equal(oOrderField.getAggregation("_field").getItems().length, 1, "Field: Order length is OK");
 								oOrderField.getAggregation("_field").focus();
 								// sometimes the focus in not in the test browser, need to call the onfocusin function hardly to set the message strip
 								oOrderField.onfocusin();
@@ -542,7 +542,7 @@ sap.ui.define([
 								assert.equal(oMsgStrip.getDomRef().style.opacity, "1", "Message strip visible");
 								assert.equal(oMsgStrip.getType(), "Error", "Message strip Error");
 								assert.equal(oDefaultBundle.getText("EDITOR_VAL_TEXTREQ"), oMsgStrip.getText(), "Order Error Text : required");
-								assert.equal(oProductField.getAggregation("_field").getItems().length, 0, "Field: Product lenght is OK");
+								assert.equal(oProductField.getAggregation("_field").getItems().length, 0, "Field: Product length is OK");
 								oProductField.getAggregation("_field").focus();
 								// sometimes the focus in not in the test browser, need to call the onfocusin function hardly to set the message strip
 								oProductField.onfocusin();
@@ -550,7 +550,7 @@ sap.ui.define([
 								assert.equal(oMsgStrip.getDomRef().style.opacity, "1", "Message strip visible");
 								assert.equal(oMsgStrip.getType(), "Error", "Message strip Error");
 								assert.equal(oMsgStrip.getText(), "400: Please select an order first", "Product Error Text");
-								assert.equal(oCustomerLimitField.getAggregation("_field").getItems().length, 2, "Field: CustomerWithTopAndSkipOption lenght is OK");
+								assert.equal(oCustomerLimitField.getAggregation("_field").getItems().length, 2, "Field: CustomerWithTopAndSkipOption length is OK");
 								resolve();
 							});
 							newStart = new Date();
@@ -605,13 +605,13 @@ sap.ui.define([
 						time = new Date().getTime() - start.getTime();
 						assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + time + "ms OK");
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
-						assert.equal(oCustomerComoboBox.getItems().length, 4, "Field: Customer origin lenght is OK");
+						assert.equal(oCustomerComoboBox.getItems().length, 4, "Field: Customer origin length is OK");
 						var oModel = oCustomerComoboBox.getModel();
 						oModel.attachPropertyChange(async function () {
 							await nextUIUpdate();
 							time = new Date().getTime() - start.getTime();
 							assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Data Request " + time + "ms OK");
-							assert.equal(oCustomerComoboBox.getItems().length, 2, "Field: Customer lenght is OK");
+							assert.equal(oCustomerComoboBox.getItems().length, 2, "Field: Customer length is OK");
 							resolve();
 						});
 						start = new Date();
@@ -647,13 +647,13 @@ sap.ui.define([
 						time = new Date().getTime() - start.getTime();
 						assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + time + "ms OK");
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
-						assert.equal(oCustomersMultiComboBox.getItems().length, 5, "Field: Customers origin lenght is OK");
+						assert.equal(oCustomersMultiComboBox.getItems().length, 5, "Field: Customers origin length is OK");
 						var oModel = oCustomersMultiComboBox.getModel();
 						oModel.attachPropertyChange(async function () {
 							await nextUIUpdate();
 							time = new Date().getTime() - start.getTime();
 							assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Data Request " + time + "ms OK");
-							assert.equal(oCustomersMultiComboBox.getItems().length, 3, "Field: Customers lenght is OK");
+							assert.equal(oCustomersMultiComboBox.getItems().length, 3, "Field: Customers length is OK");
 							resolve();
 						});
 						start = new Date();
@@ -690,12 +690,12 @@ sap.ui.define([
 						assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + time + "ms OK");
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
 						var oModel = oCustomersMultiInput.getModel();
-						assert.deepEqual(oModel.getData(), {},  "Field: Customers ori lenght is OK");
+						assert.deepEqual(oModel.getData(), {},  "Field: Customers ori length is OK");
 						oModel.attachPropertyChange(async function () {
 							await nextUIUpdate();
 							time = new Date().getTime() - start.getTime();
 							assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Data Request " + time + "ms OK");
-							assert.equal(oModel.getData().value.length, 2,  "Field: Customers lenght is OK");
+							assert.equal(oModel.getData().value.length, 2,  "Field: Customers length is OK");
 							resolve();
 						});
 						start = new Date();
