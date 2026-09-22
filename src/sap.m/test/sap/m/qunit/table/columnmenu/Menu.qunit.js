@@ -17,6 +17,7 @@ sap.ui.define([
 	"sap/ui/core/StaticArea",
 	"sap/ui/core/library",
 	"sap/ui/dom/containsOrEquals",
+	"sap/ui/events/KeyCodes",
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/qunit/utils/createAndAppendDiv",
 	"sap/ui/qunit/utils/nextUIUpdate",
@@ -39,6 +40,7 @@ sap.ui.define([
 	StaticArea,
 	coreLibrary,
 	containsOrEquals,
+	KeyCodes,
 	QUnitUtils,
 	createAndAppendDiv,
 	nextUIUpdate,
@@ -1272,5 +1274,59 @@ sap.ui.define([
 		clock.restore();
 		assert.ok(this.oColumnMenu.isOpen());
 		this.oColumnMenu.close();
+	});
+
+	QUnit.module("Ctrl+A keyboard guard", {
+		beforeEach: async function() {
+			this.oColumnMenu = new Menu({
+				items: [new ActionItem({label: "Test Item"})]
+			});
+			this.oButton = new Button();
+			this.oButton.placeAt("qunit-fixture");
+			await nextUIUpdate();
+			this.oColumnMenu.openBy(this.oButton);
+		},
+		afterEach: function() {
+			this.oColumnMenu.destroy();
+			this.oButton.destroy();
+		},
+		isPrevented: function(oTarget, bShift, bAlt, bCtrl, sKey) {
+			let bPrevented = false;
+			const oDelegate = {onkeydown: (oEvent) => {
+				bPrevented = oEvent.isDefaultPrevented();
+			}};
+			this.oColumnMenu._oPopover.addEventDelegate(oDelegate);
+			QUnitUtils.triggerKeydown(oTarget, sKey || KeyCodes.A, bShift, bAlt, bCtrl);
+			this.oColumnMenu._oPopover.removeEventDelegate(oDelegate);
+			return bPrevented;
+		}
+	});
+
+	QUnit.test("Ctrl+A and Ctrl+Shift+A are prevented", function(assert) {
+		const oTarget = this.oColumnMenu._oPopover.getDomRef();
+		assert.ok(this.isPrevented(oTarget, false, false, true), "Ctrl+A is prevented");
+		assert.ok(this.isPrevented(oTarget, true, false, true), "Ctrl+Shift+A is prevented");
+	});
+
+	QUnit.test("On a text input, Ctrl+A keeps the native selection but Ctrl+Shift+A is still prevented", function(assert) {
+		const oPopover = this.oColumnMenu._oPopover.getDomRef();
+		const oInput = oPopover.appendChild(document.createElement("input"));
+		const oTextarea = oPopover.appendChild(document.createElement("textarea"));
+		const oEditable = oPopover.appendChild(document.createElement("div"));
+		oEditable.setAttribute("contenteditable", "true");
+
+		assert.notOk(this.isPrevented(oInput, false, false, true), "Ctrl+A on an <input> keeps the native selection");
+		assert.ok(this.isPrevented(oInput, true, false, true), "Ctrl+Shift+A on an <input> is prevented");
+		assert.notOk(this.isPrevented(oTextarea, false, false, true), "Ctrl+A on a <textarea> keeps the native selection");
+		assert.ok(this.isPrevented(oTextarea, true, false, true), "Ctrl+Shift+A on a <textarea> is prevented");
+		assert.notOk(this.isPrevented(oEditable, false, false, true), "Ctrl+A on a contenteditable element keeps the native selection");
+		assert.ok(this.isPrevented(oEditable, true, false, true), "Ctrl+Shift+A on a contenteditable element is prevented");
+	});
+
+	QUnit.test("Plain A, Ctrl+Alt+A and Ctrl with a non-A key are not prevented", function(assert) {
+		const oTarget = this.oColumnMenu._oPopover.getDomRef();
+		assert.notOk(this.isPrevented(oTarget, false, false, false), "Plain A without a modifier is ignored");
+		assert.notOk(this.isPrevented(oTarget, false, true, true), "Ctrl+Alt+A is ignored");
+		assert.notOk(this.isPrevented(oTarget, false, false, true, KeyCodes.B), "Ctrl with a non-A key is ignored");
 	});
 });
