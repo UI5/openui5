@@ -5259,6 +5259,13 @@ sap.ui.define([
 		const oOnExportSpy = this.spy(this.oTable, "_onExport");
 		const oMessageBoxSpy = sinon.spy(sap.m.MessageBox, "error");
 
+		// Stub _getExportHandler to avoid loading sap.ui.export, which is not available in openui5.
+		this.stub(this.oTable, "_getExportHandler").resolves({
+			"export": function() { return Promise.resolve(); },
+			exportAs: function() { return Promise.resolve(); },
+			attachBeforeExport: function() { }
+		});
+
 		assert.expect(7);
 
 		const oPromise = this.oTable.triggerExport();
