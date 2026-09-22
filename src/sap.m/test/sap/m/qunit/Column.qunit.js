@@ -13,9 +13,11 @@ sap.ui.define([
 	"sap/m/table/columnmenu/ActionItem",
 	"sap/ui/Device",
 	"sap/ui/core/InvisibleText",
+	"sap/ui/events/KeyCodes",
+	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/ui/thirdparty/jquery"
-], function(Button, Column, ColumnListItem, Label, library, Page, Table, Text, ColumnMenu, QuickAction, Item, Device, InvisibleText, nextUIUpdate, jQuery) {
+], function(Button, Column, ColumnListItem, Label, library, Page, Table, Text, ColumnMenu, QuickAction, Item, Device, InvisibleText, KeyCodes, qutils, nextUIUpdate, jQuery) {
 	"use strict";
 
 	async function timeout(iDuration) {
@@ -613,6 +615,30 @@ sap.ui.define([
 		assert.ok(oOpenSpy.calledWith(this.oColumn), "openBy called with correct column");
 		assert.notOk(oColumnPressSpy.calledWithExactly("columnPress"), "The columnPress event is not fired");
 		assert.ok(oFakeEvent.isDefaultPrevented(), "Default action is prevented for event");
+	});
+
+	QUnit.test("Space should open the menu on keyup, not on keydown", function(assert) {
+		const oOpenSpy = this.spy(this.oMenu, "openBy");
+		const oColumnDomRef = this.oColumn.getFocusDomRef();
+
+		qutils.triggerKeydown(oColumnDomRef, KeyCodes.SPACE);
+		assert.equal(oOpenSpy.callCount, 0, "menu is not opened while space is held down");
+
+		qutils.triggerKeydown(oColumnDomRef, KeyCodes.SPACE);
+		assert.equal(oOpenSpy.callCount, 0, "menu is still not opened on repeated keydown");
+
+		qutils.triggerKeyup(oColumnDomRef, KeyCodes.SPACE);
+		assert.equal(oOpenSpy.callCount, 1, "menu is opened once space is released");
+		assert.ok(oOpenSpy.calledWith(this.oColumn), "openBy called with correct column");
+	});
+
+	QUnit.test("Enter should open the menu on keydown", function(assert) {
+		const oOpenSpy = this.spy(this.oMenu, "openBy");
+		const oColumnDomRef = this.oColumn.getFocusDomRef();
+
+		qutils.triggerKeydown(oColumnDomRef, KeyCodes.ENTER);
+		assert.equal(oOpenSpy.callCount, 1, "menu is opened on enter keydown");
+		assert.ok(oOpenSpy.calledWith(this.oColumn), "openBy called with correct column");
 	});
 
 	QUnit.module("FieldHelp support", {
