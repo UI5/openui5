@@ -751,6 +751,12 @@ sap.ui.define([
 		 * Records the current scroll position as a speed sample and returns whether the table is being scrolled fast. The speed is measured in
 		 * rows per second relative to the previous sample.
 		 *
+		 * The first sample of an interaction has no predecessor to measure against (e.g. the initial movement of a scrollbar or scroll-handle
+		 * drag, or the first movement after a debounced update deleted the previous baseline). Such a sample only seeds the baseline and is
+		 * treated as fast scrolling, so the row update is debounced instead of being sent immediately. The actual speed is measured from the
+		 * next sample on. This avoids misreading a missing baseline as a speed of 0 (i.e. a slow scroll), which would send a data request on
+		 * every unseeded movement.
+		 *
 		 * @param {sap.ui.table.Table} oTable Instance of the table.
 		 * @returns {boolean} Whether the table is being scrolled fast.
 		 */
@@ -758,17 +764,18 @@ sap.ui.define([
 			const iTargetRow = _private(oTable).oVerticalScrollPosition.getIndex();
 			const nNow = Date.now();
 			const oScrollState = _private(oTable).oLargeDataScrollState;
-			let nSpeed = 0;
 
-			if (oScrollState) {
-				const nElapsedMs = Math.max(nNow - oScrollState.timestamp, 1);
-				nSpeed = Math.abs(iTargetRow - oScrollState.rowIndex) / (nElapsedMs / 1000);
-			}
-
-			const bFastScroll = nSpeed >= 60; // Empirically determined threshold for fast scrolling.
+			// This sample becomes the baseline for the next one.
 			_private(oTable).oLargeDataScrollState = {timestamp: nNow, rowIndex: iTargetRow};
 
-			return bFastScroll;
+			if (!oScrollState) {
+				return true;
+			}
+
+			const nElapsedMs = Math.max(nNow - oScrollState.timestamp, 1);
+			const nSpeed = Math.abs(iTargetRow - oScrollState.rowIndex) / (nElapsedMs / 1000);
+
+			return nSpeed >= 60; // Empirically determined threshold for fast scrolling.
 		},
 
 		/**
@@ -1989,8 +1996,8 @@ sap.ui.define([
 
 				_private(oTable).bHandleDragging = true;
 				// Seed the large-data scroll speed baseline, just like a mousedown on the scrollbar does. Dragging the handle
-				// scrolls the scrollbar without dispatching a mousedown on it, so without this the first movement would be measured
-				// against no baseline (speed 0), bypass the fast-scroll debounce, and send a data request immediately.
+				// scrolls the scrollbar without dispatching a mousedown on it, so without this the first movement would be
+				// measured against no baseline and debounced.
 				VerticalScrollingHelper.seedLargeDataScrollBaseline(oTable);
 				clearTimeout(_private(oTable).iScrollHandleHideTimeout);
 				delete _private(oTable).iScrollHandleHideTimeout;
@@ -3397,8 +3404,7 @@ sap.ui.define([
 
 	/**
 	 * Seeds the large-data scroll speed baseline so the first scroll movement after a drag-start is measured against a valid
-	 * starting point rather than an empty baseline (which would result in speed 0, bypassing the fast-scroll debounce).
-	 * Call this whenever a scroll-handle drag begins without a native scrollbar mousedown event.
+	 * starting point rather than an empty baseline.
 	 */
 	ScrollExtension.prototype.seedLargeDataScrollBaseline = function() {
 		VerticalScrollingHelper.seedLargeDataScrollBaseline(this.getTable());
