@@ -1,6 +1,6 @@
 /* ==================================== */
 /* CSS for control sap.m/SliderTooltip  */
-/* Horizon theme                        */
+/* Morning Horizon theme                */
 /* ==================================== */
 
 .sapMSliderTooltip {
@@ -14,7 +14,7 @@
 }
 
 .sapMSliderTooltipInput {
-	font-size: @sapMFontMediumSize;
+	font-size: var(--sapFontSize);
 	color: var(--sapField_TextColor);
 }
 
@@ -24,7 +24,7 @@
 }
 
 .sapMSliderTooltip.sapMSliderTooltipErrorState:has(.sapMSliderTooltipInput:focus) {
-	outline-color: var(--sapField_InvalidColor);	
+	outline-color: var(--sapField_InvalidColor);
 }
 
 .sapMSliderTooltip.sapMSliderTooltipNonEditableWrapper {

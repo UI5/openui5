@@ -42,10 +42,22 @@ sap.ui.define([
 
 			Device.media.attachHandler(this.onDeviceSizeChange, this);
 			this.onDeviceSizeChange();
+
+			var oComponent = this.getOwnerComponent();
+			oComponent.getCookiesManagement().then(function (oCookieMgmtComponent) {
+				oCookieMgmtComponent.enable(oComponent.getRootControl());
+			});
 		},
 
 		onExit: function () {
 			Device.media.detachHandler(this.onDeviceSizeChange, this);
+		},
+
+		onCookiePreferences: function () {
+			var oComponent = this.getOwnerComponent();
+			oComponent.getCookiesManagement().then(function (oCookieMgmtComponent) {
+				oCookieMgmtComponent.openCookieSettingsDialog({ showCookieDetails: true }, oComponent.getRootControl());
+			});
 		},
 
 		/**
