@@ -2381,13 +2381,13 @@ sap.ui.define([
 		if (this.oAggregation.$leafLevelAggregated) {
 			throw new Error("Leaves must not be aggregated");
 		}
-		const oGrandTotal = this.aElements.$byPredicate["()"];
+		let oGrandTotal = this.aElements.$byPredicate["()"];
 		if (!oGrandTotal) {
 			this.setGrandTotalOutdated(true);
-			return;
-		}
-
-		if (oGrandTotal["@$ui5.context.isOutdated"]) {
+			if (this.oGrandTotalPromise.isPending()) {
+				return;
+			}
+		} else if (oGrandTotal["@$ui5.context.isOutdated"]) {
 			return; // don't read grand total, a full refresh is needed
 		}
 
@@ -2411,6 +2411,12 @@ sap.ui.define([
 				undefined, undefined, undefined, undefined, undefined, undefined,
 				{/*mMergeableQueryOptions*/})
 			.then((oResult) => {
+				oGrandTotal = this.aElements.$byPredicate["()"];
+				if (!oGrandTotal) {
+					oGrandTotal = this.oGrandTotalPromise.getResult();
+					this.aElements.length += 1;
+					this.addElements(oGrandTotal, this.aElements.length - 1);
+				}
 				_Helper.updateExisting(this.mChangeListeners, "()", oGrandTotal, oResult.value[0]);
 				const oGrandTotalCopy = _Helper.getPrivateAnnotation(oGrandTotal, "copy");
 				if (oGrandTotalCopy) {

@@ -4751,10 +4751,12 @@ sap.ui.define([
 			}
 		});
 		oCache.aElements.$byPredicate = {}; // no grand total available yet
+		oCache.oGrandTotalPromise = {isPending : mustBeMocked};
 		this.mock(_AggregationHelper).expects("hasGrandTotal")
 			.withExactArgs(sinon.match.same(oCache.oAggregation.aggregate))
 			.returns(true);
 		this.mock(oCache).expects("setGrandTotalOutdated").withExactArgs(true);
+		this.mock(oCache.oGrandTotalPromise).expects("isPending").returns(true);
 		this.mock(_AggregationHelper).expects("buildApply").never();
 		this.mock(this.oRequestor).expects("buildQueryString").never();
 		this.mock(this.oRequestor).expects("request").never();
@@ -4791,9 +4793,18 @@ sap.ui.define([
 [false, true].forEach((bWithGrandTotalCopy) => {
 	[false, true].forEach((bOutdatedInBetween) => {
 		[false, true].forEach((bInactive) => {
+			[false, true].forEach((bGrandTotalAtStart) => {
+				[false, true].forEach((bGrandTotalAddedInBetween) => {
 	const sTitle = "readGrandTotal: success, 2 grand totals:" + bWithGrandTotalCopy
-		+ ", outdated in between: " + bOutdatedInBetween + ", inactive: " + bInactive;
-
+		+ ", outdated in between: " + bOutdatedInBetween + ", inactive: " + bInactive
+		+ ", grand total present at start: " + bGrandTotalAtStart
+		+ ", grand total added in between: " + bGrandTotalAddedInBetween;
+	if (bWithGrandTotalCopy && !bGrandTotalAtStart) { //TODO: allow this
+		return;
+	}
+	if (bGrandTotalAtStart && bGrandTotalAddedInBetween) { // Note: should not happen
+		return;
+	}
 	QUnit.test(sTitle, function (assert) {
 		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {
 			// $expand, $filter, $search, and $select must not be used with grand totals
@@ -4811,10 +4822,19 @@ sap.ui.define([
 			}
 		});
 		const oGrandTotal = {"@$ui5.context.isOutdated" : false}; // grand total is up-to-date
-		oCache.aElements.$byPredicate["()"] = oGrandTotal;
+		if (bGrandTotalAtStart) {
+			oCache.aElements.$byPredicate["()"] = oGrandTotal;
+		}
+		oCache.aElements.length = 23;
 		this.mock(_AggregationHelper).expects("hasGrandTotal")
 			.withExactArgs(sinon.match.same(oCache.oAggregation.aggregate))
 			.returns(true);
+		const oCacheMock = this.mock(oCache);
+		oCacheMock.expects("setGrandTotalOutdated").exactly(bGrandTotalAtStart ? 0 : 1)
+			.withExactArgs(true);
+		this.mock(oCache.oGrandTotalPromise).expects("isPending")
+			.exactly(bGrandTotalAtStart ? 0 : 1)
+			.withExactArgs().returns(false);
 		this.mock(_AggregationHelper).expects("buildApply")
 			.withExactArgs(sinon.match.same(oCache.oAggregation), {
 				$$filterBeforeAggregate : "~$$filterBeforeAggregate~",
@@ -4847,7 +4867,19 @@ sap.ui.define([
 					// simulate that grand total becomes outdated before the response arrives
 					oGrandTotal["@$ui5.context.isOutdated"] = true;
 				}
+				if (bGrandTotalAddedInBetween) {
+					oCache.aElements.$byPredicate["()"] = oGrandTotal;
+				}
 				return Promise.resolve({value : ["~newGrandTotal~"]});
+			});
+		this.mock(oCache.oGrandTotalPromise).expects("getResult")
+			.exactly(bGrandTotalAtStart || bGrandTotalAddedInBetween ? 0 : 1)
+			.withExactArgs().returns(oGrandTotal);
+		oCacheMock.expects("addElements").withExactArgs(sinon.match.same(oGrandTotal), 23)
+			.exactly(bGrandTotalAtStart || bGrandTotalAddedInBetween ? 0 : 1)
+			.callsFake(() => {
+				// Note: aElements.length must be increased before #addElements is called
+				assert.strictEqual(oCache.aElements.length, 24);
 			});
 		const oHelperMock = this.mock(_Helper);
 		oHelperMock.expects("updateExisting")
@@ -4862,14 +4894,19 @@ sap.ui.define([
 		oHelperMock.expects("updateExisting").exactly(bWithGrandTotalCopy ? 1 : 0)
 			.withExactArgs(sinon.match.same(oCache.mChangeListeners), "~oGrandTotalCopyPredicate~",
 				"~oGrandTotalCopy~", "~newGrandTotal~");
-		this.mock(oCache).expects("setGrandTotalOutdated").exactly(bOutdatedInBetween ? 0 : 1)
+		oCacheMock.expects("setGrandTotalOutdated").exactly(bOutdatedInBetween ? 0 : 1)
 			.withExactArgs(false);
 
 		// code under test
 		return oCache.readGrandTotal(oGroupLock).then((oResult) => {
 			assert.strictEqual(oResult, undefined);
+			assert.strictEqual(
+				oCache.aElements.length,
+				bGrandTotalAtStart || bGrandTotalAddedInBetween ? 23 : 24);
 		});
 	});
+				});
+			});
 		});
 	});
 });
