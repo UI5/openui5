@@ -399,7 +399,7 @@
       {
         "id": "eae62eb4143c206b8acc21910375d408f01e1fd0",
         "type": "FIX",
-        "text": "sap.m.SinglePlanningCalendar: proper lenght of image names in VT",
+        "text": "sap.m.SinglePlanningCalendar: proper length of image names in VT",
         "references": []
       },
       {
