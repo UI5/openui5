@@ -29666,6 +29666,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// ODLB#getDownloadUrl does not need $apply (JIRA: CPOUI5ODATAV4-3362)
 	// Paging in a group level cache with identity (JIRA: CPOUI5ODATAV4-3362)
 	// Check that auto-$expand/$select works, incl. manual $select (JIRA: CPOUI5ODATAV4-3438)
+	// Check that subtotals at bottom have "...@$ui5.noData" as needed (JIRA: CPOUI5ODATAV4-3438)
 	QUnit.test("Data Aggregation: keep alive single entity", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
 		const sView = `
@@ -29673,14 +29674,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			parameters : {
 				$$aggregation : {
 					aggregate : {
-						SalesAmount : {unit : 'Currency'}
+						SalesAmount : {subtotals : true, unit : 'Currency'}
 					},
 					group : {
 						Id : {
 							additionally : ['Name']
 						}
 					},
-					groupLevels : ['Country', 'Id']
+					groupLevels : ['Country', 'Id'],
+					subtotalsAtBottomOnly : false
 				},
 				$$getKeepAliveContext : true,
 				$select : 'LocalCurrency'
@@ -29697,20 +29699,21 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<Text id="region" text="{Region}"/>
 </FlexBox>`;
 
-		this.expectRequest("BusinessPartners?$apply=groupby((Country))&$count=true"
-				+ "&$skip=0&$top=3", {
+		this.expectRequest("BusinessPartners"
+				+ "?$apply=groupby((Country),aggregate(SalesAmount,Currency))"
+				+ "&$count=true&$skip=0&$top=3", {
 				"@odata.count" : "26",
 				value : [
-					{Country : "A"},
-					{Country : "B"},
-					{Country : "C"}
+					{Country : "A", Currency : "EUR", SalesAmount : "1"},
+					{Country : "B", Currency : "EUR", SalesAmount : "2"},
+					{Country : "C", Currency : "EUR", SalesAmount : "3"}
 				]
 			})
 			.expectChange("country", ["A", "B", "C"])
 			.expectChange("id", [null, null, null])
 			.expectChange("name", [null, null, null])
-			.expectChange("salesAmount", [null, null, null])
-			.expectChange("currency", [null, null, null])
+			.expectChange("salesAmount", ["1", "2", "3"])
+			.expectChange("currency", ["EUR", "EUR", "EUR"])
 			.expectChange("detailId")
 			.expectChange("region");
 
@@ -29730,14 +29733,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		assert.strictEqual(oContextA.isAggregated(), true);
 		assert.deepEqual(oContextA.getObject(), {
 			"@$ui5.node.isExpanded" : false,
-			"@$ui5.node.isTotal" : false,
+			"@$ui5.node.isTotal" : true,
 			"@$ui5.node.level" : 1,
 			Country : "A",
-			"Currency@$ui5.noData" : true,
+			Currency : "EUR",
 			"Id@$ui5.noData" : true,
 			"LocalCurrency@$ui5.noData" : true,
 			"Name@$ui5.noData" : true,
-			"SalesAmount@$ui5.noData" : true
+			SalesAmount : "1"
 		});
 
 		// code under test - LocalCurrency doesn't lead to a "failed to drill-down"
@@ -29758,8 +29761,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			.expectChange("country", [, "A", "A"])
 			.expectChange("id", [, "26", "25"])
 			.expectChange("name", [, "Foo", "Bar"])
-			.expectChange("salesAmount", [, "60", "40"])
-			.expectChange("currency", [, "EUR", "EUR"]);
+			.expectChange("salesAmount", [, "60", "40"]);
 
 		await Promise.all([
 			oContextA.expand(),
@@ -29811,9 +29813,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		this.expectChange("country", [, "B", "C"])
 			.expectChange("id", [, null, null])
 			.expectChange("name", [, null, null])
-			.expectChange("salesAmount", [, null, null])
-			.expectChange("currency", [, null, null]);
-			// detailId and region remain unchanged
+			.expectChange("salesAmount", [, "2", "3"]);
+			// currency, detailId, and region remain unchanged
 
 		await Promise.all([
 			// code under test
@@ -29859,17 +29860,19 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					myMessages : []
 				}]
 			})
-			.expectRequest("#7 BusinessPartners?$apply=groupby((Country))&$count=true"
-				+ "&$skip=0&$top=3", {
+			.expectRequest("#7 BusinessPartners"
+				+ "?$apply=groupby((Country),aggregate(SalesAmount,Currency))"
+				+ "&$count=true&$skip=0&$top=3", {
 				"@odata.count" : "26",
 				value : [
-					{Country : "A refreshed"},
-					{Country : "B refreshed"},
-					{Country : "C refreshed"}
+					{Country : "A refreshed", Currency : "EUR", SalesAmount : "11"},
+					{Country : "B refreshed", Currency : "EUR", SalesAmount : "22"},
+					{Country : "C refreshed", Currency : "EUR", SalesAmount : "33"}
 				]
 			})
 			.expectChange("region", "Refreshed")
-			.expectChange("country", ["A refreshed", "B refreshed", "C refreshed"]);
+			.expectChange("country", ["A refreshed", "B refreshed", "C refreshed"])
+			.expectChange("salesAmount", ["11", "22", "33"]);
 
 		await Promise.all([
 			// code under test
@@ -29895,11 +29898,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					SalesAmount : "61"
 				}]
 			})
-			.expectChange("country", [, "A refreshed", "B refreshed"])
+			.expectChange("country", [, "A refreshed", null])
 			.expectChange("id", [, "26"])
 			.expectChange("name", [, "Foo"])
-			.expectChange("salesAmount", [, "61"])
-			.expectChange("currency", [, "EUR"]);
+			.expectChange("salesAmount", [, "61", "11"]);
 
 		await Promise.all([
 			// code under test
@@ -29908,6 +29910,34 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		]);
 
 		assert.strictEqual(oListBinding.getCurrentContexts()[1], oContext26, "still the same");
+		assert.deepEqual(oListBinding.getCurrentContexts()[0].getObject(), {
+			"@$ui5.node.groupLevelCount" : 1,
+			"@$ui5.node.isExpanded" : true,
+			"@$ui5.node.isTotal" : true,
+			"@$ui5.node.level" : 1,
+			Country : "A refreshed",
+			Currency : "EUR",
+			"Id@$ui5.noData" : true,
+			"LocalCurrency@$ui5.noData" : true,
+			"Name@$ui5.noData" : true,
+			SalesAmount : "11"
+		}, "group level");
+		const oSubtotal = oListBinding.getCurrentContexts()[2];
+		assert.deepEqual(oSubtotal.getObject(), {
+			"@$ui5.node.isTotal" : true,
+			"@$ui5.node.level" : 1,
+			"Country@$ui5.noData" : true,
+			Currency : "EUR",
+			"Id@$ui5.noData" : true,
+			"LocalCurrency@$ui5.noData" : true,
+			"Name@$ui5.noData" : true,
+			SalesAmount : "11"
+		}, "subtotals");
+
+		// code under test - LocalCurrency doesn't lead to a "failed to drill-down"
+		oSubtotal.requestProperty("LocalCurrency").then((sLocalCurrency) => {
+			assert.strictEqual(sLocalCurrency, undefined, "not available here");
+		});
 
 		this.expectRequest("#9 BusinessPartners?"
 				+ "$select=Country,Currency,Id,LocalCurrency,Name,Region,SalesAmount,myMessages"
@@ -29923,13 +29953,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					myMessages : []
 				}]
 			})
-			.expectRequest("#9 BusinessPartners?$apply=groupby((Country))&$count=true"
-				+ "&$skip=0&$top=3", {
+			.expectRequest("#9 BusinessPartners"
+				+ "?$apply=groupby((Country),aggregate(SalesAmount,Currency))"
+				+ "&$count=true&$skip=0&$top=3", {
 				"@odata.count" : "26",
 				value : [
-					{Country : "A"},
-					{Country : "B"},
-					{Country : "C"}
+					{Country : "A", Currency : "EUR", SalesAmount : "1"},
+					{Country : "B", Currency : "EUR", SalesAmount : "2"},
+					{Country : "C", Currency : "EUR", SalesAmount : "3"}
 				]
 			})
 			// First update kept-alive entity
@@ -29939,8 +29970,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			.expectChange("country", ["A", "B", "C"])
 			.expectChange("id", [, null])
 			.expectChange("name", [, null])
-			.expectChange("salesAmount", [, null])
-			.expectChange("currency", [, null]);
+			.expectChange("salesAmount", ["1", "2", "3"]);
 
 		await Promise.all([
 			// code under test
@@ -29966,8 +29996,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			.expectChange("country", [, "A", "A"])
 			.expectChange("id", [, "26", "24"])
 			.expectChange("name", [, "Foo", "Baz"])
-			.expectChange("salesAmount", [, "61", "20"])
-			.expectChange("currency", [, "EUR", "EUR"]);
+			.expectChange("salesAmount", [, "61", "20"]);
 
 		await Promise.all([
 			// code under test (JIRA: CPOUI5ODATAV4-3284)
@@ -29985,7 +30014,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			.expectChange("id", [,, "24", "23", "22"])
 			.expectChange("name", [,, "Baz", "Qux", "Quux"])
 			.expectChange("salesAmount", [,, "20", "30", "10"])
-			.expectChange("currency", [,, "EUR",, "EUR"]);
+			.expectChange("currency", [,,,, "EUR"]);
 
 		// code under test (JIRA: CPOUI5ODATAV4-3362)
 		this.oView.byId("table").setFirstVisibleRow(2);
