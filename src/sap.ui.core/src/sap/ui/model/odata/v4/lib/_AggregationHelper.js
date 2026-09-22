@@ -959,13 +959,18 @@ sap.ui.define([
 		 *   An optional read-only map of key-value pairs representing the query string
 		 * @param {string[]} [mQueryOptions.$select]
 		 *   Optional array of paths
+		 * @param {boolean} [bLeaf]
+		 *   Whether we are targeting the aggregation's leaf level; if we do and it represents
+		 *   single entity instances rather than aggregated data, <code>mQueryOptions.$select</code>
+		 *   is ignored in order not to prevent late property requests by setting
+		 *   <code>"...@$ui5.noData" : true</code> later on
 		 * @returns {Array<(string|Array<string>)>}
 		 *   An unsorted list of all aggregatable or groupable properties, including units and
 		 *   additional properties (where paths are given as arrays of segments)
 		 *
 		 * @public
 		 */
-		getAllProperties : function (oAggregation, mQueryOptions) {
+		getAllProperties : function (oAggregation, mQueryOptions, bLeaf) {
 			var aAggregates = Object.keys(oAggregation.aggregate),
 				aGroups = Object.keys(oAggregation.group),
 				aAllProperties = aAggregates.concat(aGroups);
@@ -986,7 +991,9 @@ sap.ui.define([
 				oAggregation.group[sGroup].additionally?.forEach(push);
 			});
 
-			mQueryOptions?.$select?.forEach(push);
+			if (!bLeaf || oAggregation.$leafLevelAggregated) {
+				mQueryOptions?.$select?.forEach(push);
+			}
 
 			return aAllProperties;
 		},
@@ -1268,7 +1275,7 @@ sap.ui.define([
 				_AggregationHelper.removeUI5grand__(oGrandTotal);
 			}
 			_AggregationHelper.setAnnotations(oGrandTotal, true, true, 0,
-				_AggregationHelper.getAllProperties(oAggregation, mQueryOptions));
+				_AggregationHelper.getAllProperties(oAggregation, mQueryOptions, false));
 
 			if (oAggregation.grandTotalAtBottomOnly === false) {
 				// Note: make shallow copy *before* there are private annotations!

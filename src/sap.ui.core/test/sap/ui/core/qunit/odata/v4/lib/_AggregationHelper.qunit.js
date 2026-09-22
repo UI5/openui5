@@ -2150,7 +2150,7 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(oGrandTotal));
 		const aAllProperties = [];
 		this.mock(_AggregationHelper).expects("getAllProperties")
-			.withExactArgs(sinon.match.same(oAggregation), "~mQueryOptions~")
+			.withExactArgs(sinon.match.same(oAggregation), "~mQueryOptions~", false)
 			.returns(aAllProperties);
 		this.mock(_AggregationHelper).expects("setAnnotations")
 			.withExactArgs(sinon.match.same(oGrandTotal), true, true, 0,
@@ -2938,11 +2938,30 @@ sap.ui.define([
 			_AggregationHelper.getAllProperties(oAggregation, {}),
 			["x", "y", "c", "a", "b", "UnitY", "TextA", ["Texts", "A"]]);
 
+		[undefined, false].forEach((bLeaf) => { // no "late property requests" here
+			assert.deepEqual(
+				// code under test
+				_AggregationHelper.getAllProperties(oAggregation, {
+					$select : ["also", "some/deep/path"]
+				}, bLeaf),
+				["x", "y", "c", "a", "b", "UnitY", "TextA", ["Texts", "A"],
+					"also", ["some", "deep", "path"]]);
+		});
+
+		assert.deepEqual(
+			// code under test
+			_AggregationHelper.getAllProperties(oAggregation, {
+				$select : ["n/a"]
+			}, /*bLeaf*/true),
+			["x", "y", "c", "a", "b", "UnitY", "TextA", ["Texts", "A"]]);
+
+		oAggregation.$leafLevelAggregated = true; // no "late property requests" here
+
 		assert.deepEqual(
 			// code under test
 			_AggregationHelper.getAllProperties(oAggregation, {
 				$select : ["also", "some/deep/path"]
-			}),
+			}, /*bLeaf*/true),
 			["x", "y", "c", "a", "b", "UnitY", "TextA", ["Texts", "A"],
 				"also", ["some", "deep", "path"]]);
 	});

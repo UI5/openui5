@@ -612,7 +612,7 @@ sap.ui.define([
 
 		this.mock(_AggregationHelper).expects("getAllProperties")
 			.withExactArgs(sinon.match.same(oAggregation),
-				sinon.match.same(oAggregationCache.mQueryOptions))
+				sinon.match.same(oAggregationCache.mQueryOptions), oPICT.bLeaf)
 			.returns(aAllProperties);
 		this.mock(_AggregationHelper).expects("filterOrderby")
 			.withExactArgs(sinon.match.same(oAggregationCache.mQueryOptions),
