@@ -49,6 +49,31 @@
 	},
 
 	"sap.ui5": {
+		"models": {
+			"": {
+				"dataSource": "mainService",
+				"settings": {
+					"defaultBindingMode": "TwoWay",
+					"defaultCountMode": "None"
+				}
+			},
+			"smartFilterModel": {
+				"dataSource": "smartFilterService",
+				"settings": {
+					"defaultCountMode": "None"
+				}
+			},
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "sap.ui.rta.test.i18n.i18n",
+					"supportedLocales": [
+						""
+					],
+					"fallbackLocale": ""
+				}
+			}
+		},
 		"dependencies": {
 			"minUI5Version": "${project.version}",
 			"libs": {
@@ -63,18 +88,6 @@
 				},
 				"sap.ui.rta": {
 					"minVersion": "${project.version}"
-				}
-			}
-		},
-		"models": {
-			"i18n": {
-				"type": "sap.ui.model.resource.ResourceModel",
-				"settings": {
-					"bundleName": "sap.ui.rta.test.i18n.i18n",
-					"supportedLocales": [
-						""
-					],
-					"fallbackLocale": ""
 				}
 			}
 		},

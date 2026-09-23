@@ -4,10 +4,7 @@ sap.ui.define([
 	"sap/ui/core/mvc/Controller",
 	"sap/ui/core/util/MockServer",
 	"sap/ui/core/Fragment",
-	"sap/ui/model/BindingMode",
 	"sap/ui/model/json/JSONModel",
-	"sap/ui/model/odata/v2/ODataModel",
-	"sap/ui/model/odata/CountMode",
 	"sap/ui/fl/Utils",
 	"sap/ui/core/Element"
 ], function(
@@ -16,10 +13,7 @@ sap.ui.define([
 	Controller,
 	MockServer,
 	Fragment,
-	BindingMode,
 	JSONModel,
-	ODataModel,
-	CountMode,
 	FlUtils,
 	Element
 ) {
@@ -42,97 +36,74 @@ sap.ui.define([
 
 		onInit() {
 			this._sResourcePath = sap.ui.require.toUrl("sap/ui/rta/test");
-			var oManifest = FlUtils.getAppComponentForControl(this.getView()).getManifest();
-			var iServerDelay = new URLSearchParams(window.location.search).get("serverDelay");
+			const oManifest = FlUtils.getAppComponentForControl(this.getView()).getManifest();
+			const iServerDelay = new URLSearchParams(window.location.search).get("serverDelay");
 
-			var iAutoRespond = iServerDelay || 1000;
-			var oMockServer;
-			var dataSource;
-			var sMockServerPath;
-			var sMetadataUrl;
-			var aEntities = [];
-			var oDataSources = oManifest["sap.app"].dataSources;
+			const iAutoRespond = iServerDelay || 1000;
+			const oDataSources = oManifest["sap.app"].dataSources;
 
 			MockServer.config({
 				autoRespond: true,
 				autoRespondAfter: iAutoRespond
 			});
 
-			for (var property in oDataSources) {
+			for (const property in oDataSources) {
 				if (oDataSources.hasOwnProperty(property)) {
-					dataSource = oDataSources[property];
+					const dataSource = oDataSources[property];
 
-					// do we have a mock url in the manifest
 					if (dataSource.settings && dataSource.settings.localUri) {
 						if (typeof dataSource.type === "undefined" || dataSource.type === "OData") {
-							oMockServer = new MockServer({
+							const oMockServer = new MockServer({
 								rootUri: dataSource.uri
 							});
-							sMetadataUrl = this._sResourcePath + dataSource.settings.localUri;
-							sMockServerPath = sMetadataUrl.slice(0, sMetadataUrl.lastIndexOf("/") + 1);
-							aEntities = dataSource.settings.aEntitySetsNames ? dataSource.settings.aEntitySetsNames : [];
+							const sMetadataUrl = this._sResourcePath + dataSource.settings.localUri;
+							const sMockServerPath = sMetadataUrl.slice(0, sMetadataUrl.lastIndexOf("/") + 1);
+							const aEntities = dataSource.settings.aEntitySetsNames ? dataSource.settings.aEntitySetsNames : [];
 							oMockServer.simulate(sMetadataUrl, {
 								sMockdataBaseUrl: sMockServerPath,
 								bGenerateMissingMockData: true,
 								aEntitySetsNames: aEntities
 							});
-						}
-						// else if *Other types can be inserted here, like Annotations*
-						oMockServer.start();
-						Log.info(`Running the app with mock data for ${property}`);
-
-						if (property === "mainService") {
-							var oModel;
-
-							oModel = new ODataModel(dataSource.uri, {
-								json: true,
-								loadMetadataAsync: true
-							});
-
-							oModel.setDefaultBindingMode(BindingMode.TwoWay);
-							oModel.setDefaultCountMode(CountMode.None);
-							this._oModel = oModel;
-
-							this.oView = this.getView();
-							this.oView.setModel(oModel);
-
-							var data = {
-								readonly: false,
-								mandatory: false,
-								visible: true,
-								enabled: true
-							};
-
-							var oTableModel = new JSONModel();
-							this.oView.setModel(oTableModel, "ProductCollection");
-							setTableModelData(oTableModel, this._sResourcePath);
-
-							var oStateModel = new JSONModel(data);
-							this.oView.setModel(oStateModel, "state");
-							this.oView.bindElement("/Headers(AccountingDocument='100015012',CompanyCode='0001',FiscalYear='2015')");
-
-							fetch(`${this._sResourcePath}/countriesExtendedCollection.json`)
-							.then(function(oResponse) {
-								return oResponse.json();
-							}).then(function(oJson) {
-								var oComboBox = this.byId("ComboBox0");
-								var oCountriesModel = new JSONModel(oJson);
-								oComboBox.setModel(oCountriesModel);
-							}.bind(this));
-						} else if (property === "smartFilterService") {
-							// smartfilterbar bind
-							var oSmartFilterModel = new ODataModel("/foo", true);
-							oSmartFilterModel.setDefaultCountMode(CountMode.None);
-							var oSmartFilterLayout = this.byId("smartFilterLayout");
-							if (oSmartFilterLayout) {
-								oSmartFilterLayout.unbindElement();
-								oSmartFilterLayout.setModel(oSmartFilterModel);
-							}
+							oMockServer.start();
+							Log.info(`Running the app with mock data for ${property}`);
 						}
 					} else {
 						Log.error(`Running the app with mock data for ${property}`);
 					}
 				}
+			}
+
+			// Models are defined in the manifest and created by the Component framework
+			// so that sap.ui.fl can apply annotation changes via the modelCreatedHook.
+			const oView = this.getView();
+
+			const oTableModel = new JSONModel();
+			oView.setModel(oTableModel, "ProductCollection");
+			setTableModelData(oTableModel, this._sResourcePath);
+
+			const oStateModel = new JSONModel({
+				readonly: false,
+				mandatory: false,
+				visible: true,
+				enabled: true
+			});
+			oView.setModel(oStateModel, "state");
+			oView.bindElement("/Headers(AccountingDocument='100015012',CompanyCode='0001',FiscalYear='2015')");
+
+			fetch(`${this._sResourcePath}/countriesExtendedCollection.json`)
+			.then(function(oResponse) {
+				return oResponse.json();
+			})
+			.then(function(oJson) {
+				const oComboBox = this.byId("ComboBox0");
+				const oCountriesModel = new JSONModel(oJson);
+				oComboBox.setModel(oCountriesModel);
+			}.bind(this));
+
+			const oSmartFilterLayout = this.byId("smartFilterLayout");
+			if (oSmartFilterLayout) {
+				oSmartFilterLayout.unbindElement();
+				oSmartFilterLayout.setModel(oView.getModel("smartFilterModel"));
 			}
 		},
 
