@@ -21858,12 +21858,53 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			.expectChange("country", [, "A"])
 			.expectChange("region", [, "A1"]);
 		const oContextA = oListBinding.getCurrentContexts()[0];
+		assert.deepEqual(oContextA.getObject(), {
+			"@$ui5.node.isExpanded" : false,
+			"@$ui5.node.isTotal" : false,
+			"@$ui5.node.level" : 1,
+			Country : "A",
+			"Id@$ui5.noData" : true,
+			"Region@$ui5.noData" : true
+		});
 
 		await Promise.all([
 			// code under test
 			oContextA.expand(),
 			this.waitForChanges(assert, "expand 'A'")
 		]);
+
+		this.expectRequest("BusinessPartners?$count=true"
+				+ "&$filter=Country eq 'A' and Region eq 'A1' and (Country ne '')"
+				+ "&$select=Country,Id,Region&$skip=0&$top=100", {
+				"@odata.count" : "1",
+				value : [{Country : "A", Id : "n/a", Region : "A1"}]
+			})
+			.expectChange("country", [,, "A"])
+			.expectChange("region", [,, "A1"]);
+		const oContextA1 = oListBinding.getCurrentContexts()[1];
+		assert.deepEqual(oContextA1.getObject(), {
+			"@$ui5.node.isExpanded" : false,
+			"@$ui5.node.isTotal" : false,
+			"@$ui5.node.level" : 2,
+			Country : "A",
+			"Id@$ui5.noData" : true,
+			Region : "A1"
+		});
+
+		await Promise.all([
+			// code under test
+			oContextA1.expand(),
+			this.waitForChanges(assert, "expand 'A1' to reach leaf level")
+		]);
+
+		const oLeafContext = oListBinding.getCurrentContexts()[2];
+		assert.deepEqual(oLeafContext.getObject(), {
+			"@$ui5.node.isTotal" : false,
+			"@$ui5.node.level" : 3,
+			Country : "A",
+			Id : "n/a",
+			Region : "A1"
+		});
 	});
 
 	//*********************************************************************************************
@@ -29668,6 +29709,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			// code under test
 			oContextA.setKeepAlive(true);
 		}, new Error("Unsupported on aggregated data: /BusinessPartners(Country='A')[0]"));
+		assert.strictEqual(oContextA.isAggregated(), true);
 		assert.deepEqual(oContextA.getObject(), {
 			"@$ui5.node.isExpanded" : false,
 			"@$ui5.node.isTotal" : false,
@@ -29679,6 +29721,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"Name@$ui5.noData" : true,
 			"SalesAmount@$ui5.noData" : true
 		});
+
+		// code under test - LocalCurrency doesn't lead to a "failed to drill-down"
 		oContextA.requestProperty("LocalCurrency").then((sLocalCurrency) => {
 			assert.strictEqual(sLocalCurrency, undefined, "not available here");
 		});
@@ -30866,6 +30910,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Scenario: Create an active entity before the initial read is finished. The outdated flag at
 	// the grand total is set even if there are no filters, search, or custom query options.
 	// JIRA: CPOUI5ODATAV4-3482
+	//
+	// Refresh the table, it becomes empty. Create two entries in paralell. The grand total is
+	// requested and shown.
+	// JIRA: CPOUI5ODATAV4-3672
 	QUnit.test("Data Aggregation: create before read is finished", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true},
 			/*bExpandAfterConcatSupported*/true);
@@ -30890,6 +30938,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		<trm:Fixed rowCount="3" fixedBottomRowCount="1"/>
 	</t:rowMode>
 	<Text text="{= %{@$ui5.context.isOutdated} }"/>
+	<Text text="{= %{@$ui5.node.isTotal} }"/>
 	<Text text="{Id}"/>
 	<Text id="region" text="{Region}"/>
 	<Text text="{SalesAmount}"/>
@@ -30938,18 +30987,18 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			});
 
 		// code under test (JIRA: CPOUI5ODATAV4-3482)
-		const oCreatedContext = oListBinding.create({Region : "New"}, true);
+		const oCreatedContext0 = oListBinding.create({Region : "New"}, true);
 
 		await Promise.all([
-			oCreatedContext.created(),
+			oCreatedContext0.created(),
 			this.waitForChanges(assert,
 				"created at start; first read is not yet finished -> grand total gets outdated")
 		]);
 
 		checkTable("after created at start", assert, oTable, [
-			oCreatedContext
-		], [ // Outdated|Id|Region|SalesAmount
-			[, "2", "New", "200"]
+			oCreatedContext0
+		], [ // isOutdated|isTotal|Id|Region|SalesAmount
+			[, false, "2", "New", "200"]
 		], 10 + 1, /*bLengthFinal*/false);
 
 		this.expectChange("region", [, "A", null]);
@@ -30959,14 +31008,75 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		await this.waitForChanges(assert, "1st GET response");
 
 		checkTable("after 1st GET response", assert, oTable, [
-			oCreatedContext,
+			oCreatedContext0,
 			"/BusinessPartners(1)",
 			"/BusinessPartners()"
-		], [ // Outdated|Id|Region|SalesAmount
-			[, "2", "New", "200"],
-			[, "1", "A", "100"],
-			[true, "", "", "100"] // not yet up-to-date
-		], 3);
+		], [ // isOutdated|isTotal|Id|Region|SalesAmount
+			[, false, "2", "New", "200"],
+			[, false, "1", "A", "100"],
+			[true, true, "", "", "100"] // not yet up-to-date
+		]);
+
+		this.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesAmount)"
+				+ ",concat(aggregate($count as UI5__count),top(2)))"
+				+ "&$select=Id,Region,SalesAmount,UI5__count", {
+				value : [
+					{SalesAmount : "0", "SalesAmount@odata.type" : "#Decimal"},
+					{UI5__count : "0", "UI5__count@odata.type" : "#Decimal"}
+				]
+			})
+			.expectChange("region", [])
+			.expectChange("isOutdatedHeader", false);
+
+		await Promise.all([
+			oListBinding.requestRefresh(),
+			this.waitForChanges(assert, "refresh to empty list")
+		]);
+
+		checkTable("after refresh to empty list", assert, oTable, []);
+
+		this.expectChange("isOutdatedHeader", true)
+			.expectChange("region", ["A0", "B0"])
+			.expectRequest("#0 POST BusinessPartners", {
+				payload : {Region : "B0", SalesAmount : "200"}
+			}, {
+				Id : 4, // Edm.Int16
+				Region : "B1",
+				SalesAmount : "300"
+			})
+			.expectRequest("#0 POST BusinessPartners", {
+				payload : {Region : "A0", SalesAmount : "100"}
+			}, {
+				Id : 3, // Edm.Int16
+				Region : "A1",
+				SalesAmount : "200"
+			})
+			.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesAmount)", {
+				value : [{SalesAmount : "500"}]
+			})
+			.expectChange("region", ["A1", "B1"]);
+
+		// code under test (JIRA: CPOUI5ODATAV4-3672)
+		const oCreatedContext1 = oListBinding.create({Region : "B0", SalesAmount : "200"},
+			/*bSkipRefresh*/true);
+		const oCreatedContext2 = oListBinding.create({Region : "A0", SalesAmount : "100"},
+			/*bSkipRefresh*/true);
+
+		await Promise.all([
+			oCreatedContext1.created(),
+			oCreatedContext2.created(),
+			this.waitForChanges(assert, "create in empty list")
+		]);
+
+		checkTable("after create in empty list", assert, oTable, [
+			oCreatedContext2,
+			oCreatedContext1,
+			"/BusinessPartners()"
+		], [ // isOutdated|isTotal|Id|Region|SalesAmount
+			[, false, "3", "A1", "200"],
+			[, false, "4", "B1", "300"],
+			[false, true, "", "", "500"]
+		]);
 	});
 
 	//*********************************************************************************************
@@ -72158,12 +72268,26 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							"@$ui5.node.isTotal" : false,
 							"@$ui5.node.level" : 1,
 							CurrencyCode : "USD",
-							"GrossAmount@$ui5.noData" : true,
+							// NO "GrossAmount@$ui5.noData"
 							ItemPosition : "20",
 							NetAmount : "n/a",
 							SalesOrderID : "42",
 							TaxAmount : "8.1"
 						});
+
+						this.expectRequest("#5 SalesOrderList('42')"
+								+ "/SO_2_SOITEM(SalesOrderID='42',ItemPosition='20')"
+								+ "?$select=GrossAmount", {
+									GrossAmount : "42.20"
+								});
+
+						return Promise.all([
+							// code under test (SNOW: DINC1048957)
+							oTransientContext.requestProperty("GrossAmount").then((sGrossAmount) => {
+								assert.strictEqual(sGrossAmount, "42.20");
+							}),
+							this.waitForChanges(assert, "late property request works")
+						]);
 					});
 					break;
 
@@ -72172,7 +72296,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			await Promise.all([
 				oPromise,
-				this.waitForChanges(assert, sMethod)
+				// Note: avoid concurrent #waitForChanges!
+				sMethod === "setProperty" || this.waitForChanges(assert, sMethod)
 			]);
 		});
 	});

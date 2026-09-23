@@ -992,6 +992,7 @@ sap.ui.define([
 			sResolvedPath = this.getResolvedPath(),
 			sTransientPredicate = "($uid=" + _Helper.uid() + ")",
 			sTransientPath = sResolvedPath + sTransientPredicate,
+			bGrandTotalAdded,
 			that = this;
 
 		if (!sResolvedPath) {
@@ -1010,6 +1011,8 @@ sap.ui.define([
 		if (_Helper.isDataAggregation(this.mParameters)) {
 			if (!_AggregationHelper.hasGrandTotal(oAggregation.aggregate)) {
 				throw new Error("No use for data aggregation: " + this);
+			} else if (!this.getLength()) {
+				bGrandTotalAdded = true;
 			}
 			if (oInitialData && "@$ui5.node.parent" in oInitialData) {
 				throw new Error('"@$ui5.node.parent" not supported: ' + this);
@@ -1111,6 +1114,9 @@ sap.ui.define([
 				that.oModel.checkMessages();
 			}
 			that.fireEvent("createCompleted", {context : oContext, success : true});
+			if (bGrandTotalAdded) {
+				that._fireChange({reason : ChangeReason.Add});
+			}
 			if (bCreateInPlace) {
 				const iRank = _Helper.getPrivateAnnotation(oCreatedEntity, "rank");
 				oContext.iIndex = iRank;
