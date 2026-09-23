@@ -6554,9 +6554,11 @@ sap.ui.define([
 	[false, true].forEach((bRecursiveHierarchy) => {
 		[false, true].forEach((bAtEnd) => {
 			[false, true].forEach((bSkipRefresh) => {
+				[false, true].forEach((bEmptyList) => {
 	const sTitle = "create: " + (bRecursiveHierarchy
 		? "recursive hierarchy, root #" + i
-		: "data aggregation, bAtEnd=" + bAtEnd + ", bSkipRefresh=" + bSkipRefresh);
+		: "data aggregation, bAtEnd=" + bAtEnd + ", bSkipRefresh=" + bSkipRefresh
+			+ ", bEmptyList=" + bEmptyList);
 
 	if (bRecursiveHierarchy ? bAtEnd || !bSkipRefresh : oInitialData) {
 		return;
@@ -6588,6 +6590,8 @@ sap.ui.define([
 		this.mock(_AggregationHelper).expects("hasGrandTotal").exactly(bRecursiveHierarchy ? 0 : 1)
 			.withExactArgs(sinon.match.same(oBinding.mParameters.$$aggregation.aggregate))
 			.returns(true);
+		this.mock(oBinding).expects("getLength").exactly(bRecursiveHierarchy ? 0 : 1)
+			.withExactArgs().returns(bEmptyList ? 0 : 10);
 		this.mock(_Helper).expects("uid").withExactArgs().returns("id-1-23");
 		this.mock(oBinding).expects("checkSuspended").withExactArgs();
 		this.mock(oBinding).expects("isTransient").twice().withExactArgs().returns(false);
@@ -6619,6 +6623,9 @@ sap.ui.define([
 		this.mock(oContext).expects("doSetSelected").withExactArgs("~selected~");
 		this.mock(oContext).expects("fetchValue").withExactArgs()
 			.returns(SyncPromise.resolve());
+		this.mock(oBinding).expects("_fireChange")
+			.exactly(!bRecursiveHierarchy && bEmptyList ? 1 : 0)
+			.withExactArgs({reason : ChangeReason.Add});
 		this.mock(oBinding).expects("insertContext")
 			.withExactArgs(sinon.match.same(oContext), bRecursiveHierarchy ? 0 : undefined, bAtEnd);
 		this.mock(oContext).expects("updateAfterCreate").exactly(bSkipRefresh ? 1 : 0)
@@ -6640,6 +6647,7 @@ sap.ui.define([
 		assert.strictEqual(oBinding.iCreatedContexts, bRecursiveHierarchy ? 0 : 1);
 		assert.strictEqual(oBinding.bFirstCreateAtEnd, false);
 	});
+				});
 			});
 		});
 	});

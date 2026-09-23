@@ -526,6 +526,22 @@ sap.ui.define([
 		assert.ok(oPopover.getContent()[0].getBindingInfo("items").template.getContent()[0].getId(), oTemplate.getId(), "Item template is reused");
 	});
 
+	QUnit.test("isTextInputElement", function(assert) {
+		assert.ok(Util.isTextInputElement(document.createElement("input")), "input is a text input element");
+		assert.ok(Util.isTextInputElement(document.createElement("textarea")), "textarea is a text input element");
+
+		const oEditable = document.createElement("div");
+		oEditable.setAttribute("contenteditable", "true");
+		assert.ok(Util.isTextInputElement(oEditable), "contenteditable=true is a text input element");
+
+		assert.notOk(Util.isTextInputElement(document.createElement("div")), "div is not a text input element");
+		assert.notOk(Util.isTextInputElement(document.createElement("span")), "span is not a text input element");
+
+		const oNonEditable = document.createElement("div");
+		oNonEditable.setAttribute("contenteditable", "false");
+		assert.notOk(Util.isTextInputElement(oNonEditable), "contenteditable=false is not a text input element");
+	});
+
 	QUnit.test("cleanupPluginsBeforeDestroy", function(assert) {
 		const oTable = new Table({
 			dependents: [
