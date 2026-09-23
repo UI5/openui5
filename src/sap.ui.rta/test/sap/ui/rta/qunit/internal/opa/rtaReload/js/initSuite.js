@@ -12,27 +12,15 @@ sap.ui.require([
 	const oSandbox = sinon.createSandbox();
 	const oStub = oSandbox.stub(sap.ui, "require");
 	oStub.withArgs(["sap/ushell/api/RTA"]).callsFake((_, fnSuccess) => fnSuccess({
-		getLogo: () => {},
-		setShellHeaderVisibility: () => {}
+		getLogoSrc: () => Promise.resolve(),
+		getRtaHeaderDomRef: () => Promise.resolve(document.getElementById("content")),
+		startUIAdaptation: () => Promise.resolve(),
+		endUIAdaptation: () => Promise.resolve()
 	}));
 	oStub.callThrough();
 	oSandbox.stub(FlUtils, "getUShellService").resolves();
 	oSandbox.stub(FlUtils, "getUshellContainer").callsFake(() => ({
-		getLogonSystem: () => ({ isTrial: () => false }),
-		getRenderer() {
-			return {
-				getRootControl() {
-					return {
-						getShellHeader() {
-							return {
-								addStyleClass: () => {},
-								removeStyleClass: () => {}
-							};
-						}
-					};
-				}
-			};
-		}
+		getLogonSystem: () => ({ isTrial: () => false })
 	}));
 	oSandbox.stub(Storage, "loadFeatures").resolves({
 		isKeyUser: true,

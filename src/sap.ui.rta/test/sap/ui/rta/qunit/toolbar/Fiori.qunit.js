@@ -54,30 +54,19 @@ sap.ui.define([
 		this.oImage.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		const oGetLogoStub = sandbox.stub().returns(this.oImage.getSrc());
+		const oGetLogoStub = sandbox.stub().resolves(this.oImage.getSrc());
 		const oGetLogoDomRefStub = sandbox.stub().returns(this.oImage.getDomRef());
 		this.oUshellApi = {
-			getLogo: oGetLogoStub,
+			getLogoSrc: oGetLogoStub,
 			getLogoDomRef: oGetLogoDomRefStub,
+			getRtaHeaderDomRef: sandbox.stub().resolves(document.getElementById("qunit-fixture")),
+			startUIAdaptation: sandbox.stub().resolves(),
+			endUIAdaptation: sandbox.stub().resolves(),
 			navigateBack: sandbox.stub()
 		};
 
 		sandbox.stub(Utils, "getUshellContainer").returns({
-			async getServiceAsync() {},
-			getRenderer() {
-				return {
-					getRootControl() {
-						return {
-							getShellHeader() {
-								return {
-									addStyleClass: () => {},
-									removeStyleClass: () => {}
-								};
-							}
-						};
-					}
-				};
-			}
+			async getServiceAsync() {}
 		});
 		RtaQunitUtils.stubSapUiRequire(sandbox, [{
 			name: "sap/ushell/api/RTA",
@@ -110,6 +99,19 @@ sap.ui.define([
 			assert.equal(oImage.getSrc(), sLogoSource, "then the source of the logo is correctly set");
 
 			await this.oToolbar.show();
+			assert.strictEqual(
+				this.oUshellApi.startUIAdaptation.callCount, 1,
+				"then the ushell API was called to start the UI adaptation"
+			);
+			assert.strictEqual(
+				this.oUshellApi.getRtaHeaderDomRef.callCount, 1,
+				"then the ushell API was called to get the RTA header area to render into"
+			);
+			assert.strictEqual(
+				this.oToolbar.getDomRef().parentNode,
+				document.getElementById("qunit-fixture"),
+				"then the toolbar is rendered into the RTA header area"
+			);
 
 			const oErrorStub = sandbox.stub(Log, "error");
 			this.oToolbar._checkLogoSize(oImage.getDomRef(), 20, 20);
@@ -119,6 +121,10 @@ sap.ui.define([
 
 			sandbox.stub(Adaptation.prototype, "hide").returns(Promise.resolve());
 			await this.oToolbar.hide();
+			assert.strictEqual(
+				this.oUshellApi.endUIAdaptation.callCount, 1,
+				"then the ushell API was called to end the UI adaptation"
+			);
 
 			this.oToolbar.destroy();
 		});
@@ -159,7 +165,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when there is no logo source", async function(assert) {
-			this.oUshellApi.getLogo.returns(null);
+			this.oUshellApi.getLogoSrc.resolves(null);
 			this.oToolbar = new Fiori({
 				ushellApi: this.oUshellApi,
 				textResources: Lib.getResourceBundleFor("sap.ui.rta")

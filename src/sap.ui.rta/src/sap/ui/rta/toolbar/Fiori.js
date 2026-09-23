@@ -6,23 +6,14 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/m/Image",
 	"sap/ui/rta/toolbar/Adaptation",
-	"sap/ui/rta/toolbar/AdaptationRenderer",
-	"sap/ui/fl/Utils"
+	"sap/ui/rta/toolbar/AdaptationRenderer"
 ], function(
 	Log,
 	Image,
 	Adaptation,
-	AdaptationRenderer,
-	Utils
+	AdaptationRenderer
 ) {
 	"use strict";
-
-	const FIORI_HIDDEN_CLASS = "sapUiRtaFioriHeaderInvisible";
-
-	/**
-	 * This class is being assigned to the original Fiori Header Toolbar when RTA Toolbar shows
-	 * @type {string}
-	 */
 
 	/**
 	 * Constructor for a new sap.ui.rta.toolbar.Fiori control
@@ -53,28 +44,31 @@ sap.ui.define([
 		type: "fiori"
 	});
 
-	function getFiori2Renderer() {
-		var oContainer = Utils.getUshellContainer() || {};
-		return typeof oContainer.getRenderer === "function" ? oContainer.getRenderer("fiori2") : undefined;
-	}
-
-	Fiori.prototype.init = function(...aArgs) {
-		// TODO: Remove, as this does not work in legacy-free
-		this._oRenderer = getFiori2Renderer();
-		this._oFioriHeader = this._oRenderer.getRootControl().getShellHeader();
-		Adaptation.prototype.init.apply(this, aArgs);
+	/**
+	 * The Fiori toolbar is rendered into the dedicated RTA header area of the FLP shell layout
+	 * (see sap.ushell.api.RTA#getRtaHeaderDomRef). This area is only available once the UI adaptation
+	 * has been started, so the actual placement is deferred to {@link sap.ui.rta.toolbar.Fiori#show}.
+	 * @override
+	 */
+	Fiori.prototype.placeToContainer = function() {
+		// Intentionally left blank: placement happens in show() once startUIAdaptation
+		// has reserved the RTA header area.
 	};
 
-	Fiori.prototype.show = function(...aArgs) {
-		this._oFioriHeader.addStyleClass(FIORI_HIDDEN_CLASS);
+	Fiori.prototype.show = async function(...aArgs) {
+		await this.getUshellApi().startUIAdaptation();
+		const oRtaHeaderDomRef = await this.getUshellApi().getRtaHeaderDomRef();
+		this.placeAt(oRtaHeaderDomRef);
 		return Adaptation.prototype.show.apply(this, aArgs);
 	};
 
 	Fiori.prototype.buildControls = async function(...aArgs) {
 		const aControls = await Adaptation.prototype.buildControls.apply(this, aArgs);
-		const sLogoPath = this.getUshellApi().getLogo();
+		const sLogoPath = await this.getUshellApi().getLogoSrc();
 
 		if (sLogoPath) {
+			// getLogoDomRef only works in the direct shell scenario and returns undefined in iframe
+			// scenarios; the size handling below falls back gracefully when no domRef is available.
 			const oLogo = this.getUshellApi().getLogoDomRef();
 			let iWidth;
 			let iHeight;
@@ -104,7 +98,7 @@ sap.ui.define([
 	 */
 	Fiori.prototype.hide = async function(...aArgs) {
 		await Adaptation.prototype.hide.apply(this, aArgs);
-		this._oFioriHeader.removeStyleClass(FIORI_HIDDEN_CLASS);
+		await this.getUshellApi().endUIAdaptation();
 	};
 
 	Fiori.prototype._checkLogoSize = function(oLogo, iWidth, iHeight) {
@@ -121,8 +115,9 @@ sap.ui.define([
 	};
 
 	Fiori.prototype.destroy = function(...aArgs) {
-		// In case of destroy() without normal hide() call
-		this._oFioriHeader.removeStyleClass(FIORI_HIDDEN_CLASS);
+		// In case of destroy() without normal hide() call.
+		// endUIAdaptation is asynchronous, but destroy() cannot be, so this runs as a fire-and-forget cleanup.
+		this.getUshellApi().endUIAdaptation();
 
 		Adaptation.prototype.destroy.apply(this, aArgs);
 	};
