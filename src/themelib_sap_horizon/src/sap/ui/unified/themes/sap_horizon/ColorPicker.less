@@ -118,7 +118,7 @@
 
 .sapUnifiedColorPicker .sapMSliderInner:not(.sapMSliderInnerDisabled):hover .sapMSliderHandle {
 	background: var(--sapButton_Background);
-	border-color: darken(@sapUiFieldBorderColor, 15);
+	border-color: ~'hsl(from var(--sapField_BorderColor) h s calc(l - 15))';
 }
 
 .sapUnifiedColorPicker .sapMSliderInner::before,
@@ -142,7 +142,7 @@
 
 .sapUnifiedColorPicker .sapMSliderInner:not(.sapMSliderInnerDisabled).sapMSliderPressed .sapMSliderHandle,
 .sapUnifiedColorPicker .sapMSliderInner:not(.sapMSliderInnerDisabled) .sapMSliderHandle:focus {
-	border: 0.125rem solid darken(@sapUiFieldBorderColor, 15);
+	border: 0.125rem solid ~'hsl(from var(--sapField_BorderColor) h s calc(l - 15))';
 	background-color: transparent;
 	top: -0.45rem;
 }

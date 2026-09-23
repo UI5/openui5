@@ -3,8 +3,10 @@
 /* Base theme                                  */
 /* =========================================== */
 
-@_sap_ui_unified_ColorPicker_CircleSize: 13px;
-@_sap_ui_unified_ColorPicker_commonsCircleSize: 8px;
+.sapUI5Scope {
+	--_sap_ui_unified_ColorPicker_CircleSize: 0.8125rem;
+	--_sap_ui_unified_ColorPicker_commonsCircleSize: 0.5rem;
+}
 
 .sapUiColorPicker-ColorPickerMatrix {
 	padding-bottom: 0.2rem;
@@ -85,7 +87,7 @@
 			margin-top: 0.75rem;
 
 			&.sapMInputBase {
-				width: ~"calc(100% - 3rem)";
+				width: ~'calc(100% - 3rem)';
 			}
 		}
 
@@ -111,8 +113,8 @@
 		.sapUiColorPicker-ColorPickerCircle {
 			position: absolute;
 			box-sizing: border-box;
-			width: @_sap_ui_unified_ColorPicker_CircleSize;
-			height: @_sap_ui_unified_ColorPicker_CircleSize;
+			width: var(--_sap_ui_unified_ColorPicker_CircleSize);
+			height: var(--_sap_ui_unified_ColorPicker_CircleSize);
 			border: 1px solid var(--sapContent_ContrastShadowColor);
 			border-radius: 6px;
 			pointer-events: none;
@@ -172,11 +174,11 @@
 	cursor: crosshair;
 	width: 105px;
 	height: 105px;
-	background-color: none;
 	background-image: url('img/ColorPicker/GradientBox.png');
+	background-color: none;
 	background-size: 100%;
 	background-image: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0)),
-					  linear-gradient(to bottom, rgba(255, 255, 255, 0),rgba(255, 255, 255, 1));
+		linear-gradient(to bottom, rgba(255, 255, 255, 0),rgba(255, 255, 255, 1));
 	-webkit-user-select: none;
 	user-select: none;
 }
@@ -184,8 +186,8 @@
 .sapUiColorPicker-ColorPickerMatrix:not(.sapUnifiedColorPicker) .sapUiColorPicker-ColorPickerBox > .sapUiColorPicker-ColorPickerCircle {
 	position: absolute;
 	box-sizing: border-box;
-	width: @_sap_ui_unified_ColorPicker_commonsCircleSize;
-	height: @_sap_ui_unified_ColorPicker_commonsCircleSize;
+	width: var(--_sap_ui_unified_ColorPicker_commonsCircleSize);
+	height: var(--_sap_ui_unified_ColorPicker_commonsCircleSize);
 	border-width: 1px;
 	border-style: solid;
 	border-color: var(--sapContent_ContrastFocusColor);
@@ -378,7 +380,7 @@
 			/* pressed */
 			&.sapMSliderPressed:not(.sapMSliderInnerDisabled ) > .sapMSliderHandle {
 				/* override the blue border color when the handle is pressed */
-				border-color: darken(@sapUiFieldBorderColor, 15);
+				border-color: ~'hsl(from var(--sapField_BorderColor) h s calc(l - 15))';
 			}
 		}
 
@@ -559,7 +561,7 @@
 		.sapUiCPHSLVText,
 		.sapUiCPRGBText {
 			display: flex;
-			width: ~"calc(100% - 1.875rem)"; /* minus the button's width (1.625rem) & left margin (0.25rem) */
+			width: ~'calc(100% - 1.875rem)'; /* minus the button's width (1.625rem) & left margin (0.25rem) */
 		}
 
 		.sapMBtn {
@@ -587,7 +589,7 @@
 		display: none;
 	}
 
-	/*on desktop the button has to be smaller */
+	/* on desktop the button has to be smaller */
 	&:not(.sapUiCPPhone) .sapMBtn {
 
 		.sapMBtnInner {
@@ -607,7 +609,7 @@
 		.sapUiCPDefaultHSLV,
 		.sapUiCPHSLVText,
 		.sapUiCPRGBText {
-			width: ~"calc(100% - 3.438rem)"; /* 100% minus button's width (2.5rem) + space between */
+			width: ~'calc(100% - 3.438rem)'; /* 100% minus button's width (2.5rem) + space between */
 		}
 
 		.sapUiCPDefaultWrapper .sapUiCPHexText {
@@ -618,7 +620,7 @@
 		}
 
 		.sapUiColorPicker-ColorPickerHexField {
-			margin-top:0.25rem;
+			margin-top: 0.25rem;
 		}
 
 		&.sapUiCPHideHex .sapUiColorPicker-ColorPickerHexField,
@@ -630,6 +632,7 @@
 
 /* Unified Simplified ColorPicker */
 .sapUiColorPicker-Simplified.sapUnifiedColorPicker.sapUiCPPhone {
+
 	.sapUiColorPicker-ColorPickerNewColor,
 	.sapUiColorPicker-ColorPickerOldColor {
 		height: 2.9rem;
@@ -638,11 +641,11 @@
 	.sapUiCPPhoneContent {
 
 		.sapUiColorPicker-ColorPickerHexField {
-			width: ~"calc(100% - 3.438rem)"; /* 100% minus comparison field's width + space between */
+			width: ~'calc(100% - 3.438rem)'; /* 100% minus comparison field's width + space between */
 		}
 
-		.sapUiCPHexWrapper{
-			width: ~"calc(100% - 3.438rem)"; /* same width as hex input field */
+		.sapUiCPHexWrapper {
+			width: ~'calc(100% - 3.438rem)'; /* same width as hex input field */
 			text-align: center; /* and center the text */
 			margin-top: 0;
 		}
@@ -684,6 +687,7 @@
 	}
 
 	&.sapUiCPHighZoom {
+
 		.sapUiColorPicker-ColorPickerBox {
 			float: none;
 			width: 100%;
@@ -840,7 +844,7 @@
 	}
 
 	.sapMRbG :last-child {
-			top: calc(@sapUiDesktopFontSize * 1.38);
+		top: ~'calc(var(--sapFontSmallSize) * 1.38)';
 	}
 
 	.sapMRbG {
@@ -862,7 +866,7 @@
 	.sapUnifiedColorPicker {
 
 		&.sapUiCPPhone .sapUiColorPicker-ColorPickerHexField {
-			margin-top:0.2rem;
+			margin-top: 0.2rem;
 		}
 
 		&.sapUiCPPhone .sapUiCPComparisonWrapper {
