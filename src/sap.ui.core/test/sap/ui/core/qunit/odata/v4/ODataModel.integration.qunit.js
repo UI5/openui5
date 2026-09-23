@@ -4122,7 +4122,7 @@ sap.ui.define([
 			that.oLogMock.expects("error")
 				.withArgs("Failed to drill-down into CompanyName, invalid segment: CompanyName");
 
-			// code under test - CompanyName leads to a "failed to drill-down"
+			// code under test - CompanyName leads to a "Failed to drill-down into ..."
 			assert.strictEqual(oFormContext.getProperty("CompanyName"), undefined);
 
 			// code under test - Longitude is requested once
@@ -25071,8 +25071,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// No late property on aggregated leaf (JIRA: CPOUI5ODATAV4-2756)
 	// Delete on aggregated data is not allowed, even w/o visual grouping (JIRA: CPOUI5ODATAV4-3229)
 	// Avoid unsupported (by RAP) duplicate filter for unit (JIRA: CPOUI5ODATAV4-3458)
+	// "additionally" must work w/o autoExpandSelect! (JIRA: CPOUI5ODATAV4-3438)
 	QUnit.test("Data Aggregation: $$aggregation w/ grand total w/ unit", function (assert) {
-		var oModel = this.createSalesOrdersModel({autoExpandSelect : true}),
+		var oModel = this.createSalesOrdersModel({autoExpandSelect : false}), // see scenario!
 			sView = '\
 <Table id="table" items="{path : \'/SalesOrderList\',\
 		filters : [{path : \'CurrencyCode\', operator : \'EQ\', value1 : \'EUR\'}],\
@@ -25247,7 +25248,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-3260
 	//
 	// ODLB#getDownloadUrl does not need $apply, URL has no $count=true (JIRA: CPOUI5ODATAV4-3362)
-	// Check that auto-$expand/$select works, incl. manual $select (JIRA: CPOUI5ODATAV4-3438)
+	// Check that manual $expand/$select works w/ auto-$expand/$select (JIRA: CPOUI5ODATAV4-3438)
 [
 	"context refresh",
 	"context refresh via side effects",
@@ -25279,6 +25280,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				search : 'covfefe'
 			},
 			$count : true,
+			$expand : {SO_2_BP : {$select : 'Address/Country'}},
 			$orderby : 'LifecycleStatus desc',
 			$select : 'SO_2_BP/Address/PostalCode',
 			custom : 'foo'
@@ -25299,7 +25301,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				+ "filter(LifecycleStatus gt 'P' and GrossAmount lt 100)/search(covfefe)"
 				+ "/concat(aggregate(GrossAmount),orderby(LifecycleStatus desc)"
 					+ "/concat(aggregate($count as UI5__count),top(99)))"
-				+ "&$expand=SO_2_BP($select=Address/City,Address/PostalCode,BusinessPartnerID)"
+				+ "&$expand=SO_2_BP($select=Address/City,Address/Country,Address/PostalCode"
+					+ ",BusinessPartnerID)"
 				+ "&$select=GrossAmount,LifecycleStatus,SalesOrderID,UI5__count", {
 				value : [
 					{GrossAmount : "6"},
@@ -25307,7 +25310,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					{GrossAmount : "1", LifecycleStatus : "Z", SalesOrderID : "26", SO_2_BP : null},
 					{GrossAmount : "2", LifecycleStatus : "Y", SalesOrderID : "25",
 						SO_2_BP : {
-							Address : {City : "Walldorf", PostalCode : "69190"},
+							Address : {City : "Walldorf", Country : "DE", PostalCode : "69190"},
 							BusinessPartnerID : "n/a"
 						}},
 					{GrossAmount : "3", LifecycleStatus : "X", SalesOrderID : "24", SO_2_BP : null}
@@ -25331,7 +25334,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			// code under test (JIRA: CPOUI5ODATAV4-3362)
 			assert.strictEqual(oBinding.getDownloadUrl(),
 				sSalesOrderService + "SalesOrderList?sap-client=123&custom=foo"
-				+ "&$expand=SO_2_BP($select=Address/City,Address/PostalCode,BusinessPartnerID)"
+				+ "&$expand=SO_2_BP($select=Address/City,Address/Country,Address/PostalCode"
+					+ ",BusinessPartnerID)"
 				+ "&$filter=LifecycleStatus%20gt%20'P'%20and%20GrossAmount%20lt%20100"
 				+ "&$orderby=LifecycleStatus%20desc&$search=covfefe"
 				+ "&$select=GrossAmount,LifecycleStatus,SalesOrderID");
@@ -25388,25 +25392,26 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		}).then(function () {
 			const [oGrandTotalContext, oContext26, oContext25] = oBinding.getCurrentContexts();
 			assert.deepEqual(oGrandTotalContext.getObject(), {
-					// NO @$ui5.context.isOutdated
-					"@$ui5.node.isExpanded" : true,
-					"@$ui5.node.isTotal" : true,
-					"@$ui5.node.level" : 0,
-					GrossAmount : "6",
-					"LifecycleStatus@$ui5.noData" : true,
-					"SalesOrderID@$ui5.noData" : true,
-					SO_2_BP : { //TODO: why not "SO_2_BP@$ui5.noData" : true?
-						Address : {
-							"City@$ui5.noData" : true
-							//TODO: "PostalCode@$ui5.noData" : true
-						}
+				// NO @$ui5.context.isOutdated
+				"@$ui5.node.isExpanded" : true,
+				"@$ui5.node.isTotal" : true,
+				"@$ui5.node.level" : 0,
+				GrossAmount : "6",
+				"LifecycleStatus@$ui5.noData" : true,
+				"SalesOrderID@$ui5.noData" : true,
+				SO_2_BP : {
+					Address : {
+						"City@$ui5.noData" : true
+						//TODO: "Country@$ui5.noData" : true
+						//TODO: "PostalCode@$ui5.noData" : true
 					}
-				});
+				}
+			});
 			assert.strictEqual(oGrandTotalContext.isOutdated(), undefined);
-			//TODO: oGrandTotalContext.requestProperty("SO_2_BP/Address/PostalCode")
-			//   .then((sPostalCode) => {
-			//     assert.strictEqual(sPostalCode, undefined, "not available here");
-			//   });
+			// code under test (no "Failed to drill-down into ...")
+			oGrandTotalContext.requestProperty("SO_2_BP/Address/City").then((sCity) => {
+				assert.strictEqual(sCity, undefined, "not available here");
+			});
 			assert.deepEqual(oContext25.getObject(), {
 				"@$ui5.node.isTotal" : false,
 				"@$ui5.node.level" : 1,
@@ -25415,6 +25420,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				SO_2_BP : {
 					Address : {
 						City : "Walldorf",
+						Country : "DE",
 						PostalCode : "69190"
 					},
 					BusinessPartnerID : "n/a"
@@ -25477,15 +25483,16 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				const sSelect = "GrossAmount,LifecycleStatus" + (bMessages ? ",Messages" : "")
 					+ ",Note,SalesOrderID";
 				that.expectRequest("#0 SalesOrderList('25')?sap-client=123&custom=foo"
-						+ "&$select=" + sSelect + "&$expand=SO_2_BP("
-							+ "$select=Address/City,Address/PostalCode,BusinessPartnerID)", {
+						+ "&$expand=SO_2_BP($select=Address/City,Address/Country,Address/PostalCode"
+							+ ",BusinessPartnerID)"
+						+ "&$select=" + sSelect, {
 						GrossAmount : "5",
 						LifecycleStatus : "Y*",
 						...(bMessages && {Messages : []}),
 						Note : "n/a",
 						SalesOrderID : "25",
 						SO_2_BP : {
-							Address : {City : "Heidelberg", PostalCode : "69121"},
+							Address : {City : "Heidelberg", Country : "DE", PostalCode : "69121"},
 							BusinessPartnerID : "n/a"
 						}
 					})
@@ -25523,10 +25530,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						Note : "Late*"
 					})
 					.expectRequest("#0 SalesOrderList('25')?sap-client=123"
-						+ "&$select=SO_2_BP&custom=foo&$expand=SO_2_BP("
-							+ "$select=Address/City,Address/PostalCode,BusinessPartnerID)", {
+						+ "&$expand=SO_2_BP($select=Address/City,Address/Country,Address/PostalCode"
+							+ ",BusinessPartnerID)"
+						+ "&$select=SO_2_BP&custom=foo", {
 						SO_2_BP : {
-							Address : {City : "Heidelberg", PostalCode : "69121"},
+							Address : {City : "Heidelberg", Country : "DE", PostalCode : "69121"},
 							BusinessPartnerID : "n/a"
 						}
 					})
@@ -25579,14 +25587,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					+ "filter(LifecycleStatus gt 'P' and GrossAmount lt 100)/search(covfefe)"
 					+ "/concat(aggregate(GrossAmount),orderby(LifecycleStatus desc)"
 						+ "/concat(aggregate($count as UI5__count),top(99)))"
-					+ "&$expand=SO_2_BP($select=Address/City,Address/PostalCode,BusinessPartnerID)"
+					+ "&$expand=SO_2_BP($select=Address/City,Address/Country,Address/PostalCode"
+						+ ",BusinessPartnerID)"
 					+ "&$select=GrossAmount,LifecycleStatus,SalesOrderID,UI5__count", {
 					value : [
 						{GrossAmount : "15"},
 						{UI5__count : "2", "UI5__count@odata.type" : "#Decimal"},
 						{GrossAmount : "7", LifecycleStatus : "Y", SalesOrderID : "25",
 							SO_2_BP : {
-								Address : {City : "Walldorf", PostalCode : "69190"},
+								Address : {City : "Walldorf", Country : "DE", PostalCode : "69190"},
 								BusinessPartnerID : "n/a"
 							}},
 						{GrossAmount : "8", LifecycleStatus : "X", SalesOrderID : "24",
@@ -25759,9 +25768,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// the outdated state.
 	// JIRA: CPOUI5ODATAV4-3260
 	//
-	// Check that manual $select works even w/o auto-$expand/$select (JIRA: CPOUI5ODATAV4-3438)
+	// Check that manual $expand/$select works w/ auto-$expand/$select (JIRA: CPOUI5ODATAV4-3438)
 	QUnit.test("Data Aggregation: delete kept-alive outside collection", async function (assert) {
-		const oModel = this.createSalesOrdersModel123({autoExpandSelect : false},
+		const oModel = this.createSalesOrdersModel123({autoExpandSelect : true},
 			/*bExpandAfterConcatSupported*/true);
 		const sView = `
 <Text id="count" text="{$count}"/>
@@ -25778,7 +25787,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					SalesOrderID : {}
 				}
 			},
-			$select : 'Currency'
+			$expand : 'SO_2_BP',
+			$select : 'CurrencyCode'
 		}}" threshold="0">
 	<t:rowMode>
 		<trm:Fixed rowCount="3" fixedBottomRowCount="1"/>
@@ -25793,12 +25803,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		this.expectRequest("SalesOrderList?sap-client=123&$apply="
 				+ "filter(LifecycleStatus gt 'P')/concat(aggregate(GrossAmount)"
 				+ ",concat(aggregate($count as UI5__count),top(2)))"
-				+ "&$select=Currency,GrossAmount,SalesOrderID,UI5__count", {
+				+ "&$expand=SO_2_BP&$select=CurrencyCode,GrossAmount,SalesOrderID,UI5__count", {
 				value : [
 					{GrossAmount : "1000"},
 					{UI5__count : "42", "UI5__count@odata.type" : "#Decimal"},
-					{Currency : "DEM", GrossAmount : "10", SalesOrderID : "1"},
-					{Currency : "DEM", GrossAmount : "20", SalesOrderID : "2"}
+					{CurrencyCode : "DEM", GrossAmount : "10", SalesOrderID : "1", SO_2_BP : null},
+					{CurrencyCode : "DEM", GrossAmount : "20", SalesOrderID : "2", SO_2_BP : null}
 				]
 			})
 			.expectChange("count")
@@ -25841,10 +25851,20 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		assert.deepEqual(oBinding.getCurrentContexts()[0].getObject(), {
 			"@$ui5.node.isTotal" : false,
 			"@$ui5.node.level" : 1,
-			Currency : "DEM", // manual $select => here it is :-)
+			CurrencyCode : "DEM", // manual $select => here it is :-)
 			GrossAmount : "10",
-			SalesOrderID : "1"
+			SalesOrderID : "1",
+			SO_2_BP : null
 		});
+		assert.deepEqual(oBinding.getAllCurrentContexts()[2].getObject(), {
+			"@$ui5.node.isExpanded" : true,
+			"@$ui5.node.isTotal" : true,
+			"@$ui5.node.level" : 0,
+			"CurrencyCode@$ui5.noData" : true,
+			GrossAmount : "1000",
+			"SalesOrderID@$ui5.noData" : true
+			//TODO: "SO_2_BP@$ui5.noData" : true
+		}, "grand total");
 
 		this.expectRequest("SalesOrderList('31')?sap-client=123&$select=SalesOrderID", {
 				SalesOrderID : "31"
@@ -25886,10 +25906,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[false, "true", "0", "990", ""]
 		], 43); // length unchanged, header context is outdated instead
 
-		this.expectRequest("SalesOrderList?sap-client=123&$filter=LifecycleStatus gt 'P'"
-				+ "&$select=Currency,GrossAmount,SalesOrderID&$skip=40&$top=1", {
+		this.expectRequest("SalesOrderList?sap-client=123"
+				+ "&$expand=SO_2_BP&$filter=LifecycleStatus gt 'P'"
+				+ "&$select=CurrencyCode,GrossAmount,SalesOrderID&$skip=40&$top=1", {
 				value : [
-					{Currency : "DEM", GrossAmount : "420", SalesOrderID : "42"}
+					{CurrencyCode : "DEM", GrossAmount : "420", SalesOrderID : "42", SO_2_BP : null}
 				]
 			})
 			.expectChange("isTotal", false, 40)
@@ -25955,10 +25976,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			.expectChange("level", 1, 40)
 			.expectChange("grossAmount", "420", 40)
 			.expectChange("salesOrderID", "42", 40)
-			.expectRequest("SalesOrderList?sap-client=123&$filter=LifecycleStatus gt 'P'"
-				+ "&$select=Currency,GrossAmount,SalesOrderID&$skip=39&$top=1", {
-				value : [
-					{Currency : "DEM", GrossAmount : "420", SalesOrderID : "42"} // duplicate
+			.expectRequest("SalesOrderList?sap-client=123"
+				+ "&$expand=SO_2_BP&$filter=LifecycleStatus gt 'P'"
+				+ "&$select=CurrencyCode,GrossAmount,SalesOrderID&$skip=39&$top=1", {
+				value : [ // duplicate
+					{CurrencyCode : "DEM", GrossAmount : "420", SalesOrderID : "42", SO_2_BP : null}
 				]
 			})
 			.expectChange("isTotal", false, 39)
@@ -28408,7 +28430,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 	//*********************************************************************************************
 	// Scenario: sap.ui.table.Table leaf count and visual grouping, but no auto-$expand/$select.
-	// Get download URL and expand to leaf level. Both use "identity" and must not fail due to
+	// Get download URL and expand to leaf level. Do not use "identity" and do not fail due to
 	// pseudo query option "$$leaves".
 	// JIRA: CPOUI5ODATAV4-3438
 	QUnit.test("Data Aggregation: identity & $$leaves", async function (assert) {
@@ -28451,14 +28473,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		const oBinding = oTable.getBinding("rows");
 		// code under test
-		assert.strictEqual(oBinding.getDownloadUrl(), "/special/cases/Artists");
+		assert.strictEqual(oBinding.getDownloadUrl(),
+			"/special/cases/Artists?$apply=groupby((IsActiveEntity,ArtistID))");
 
-		this.expectRequest("Artists?$count=true&$filter=IsActiveEntity eq false"
-				+ "&$select=ArtistID,IsActiveEntity&$skip=0&$top=110", {
+		this.expectRequest("Artists?$apply=filter(IsActiveEntity eq false)/groupby((ArtistID))"
+				+ "&$count=true&$skip=0&$top=110", {
 				"@odata.count" : "1",
-				value : [
-					{ArtistID : "1", IsActiveEntity : false}
-				]
+				value : [{ArtistID : "1"}]
 			});
 
 		await Promise.all([
@@ -28490,8 +28511,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// All levels present as groups (JIRA: CPOUI5ODATAV4-2755)
 	// Delete with visual grouping is not allowed (JIRA: CPOUI5ODATAV4-3229)
 	// Editing works via navigation on leaf level (JIRA: CPOUI5ODATAV4-3438)
+	// Overlapping paths for "additionally" on different group levels (JIRA: CPOUI5ODATAV4-3438)
+	// Late property requests via API & UI (JIRA: CPOUI5ODATAV4-3438)
 	QUnit.test("Data Aggregation: additionally via navigation", function (assert) {
-		var oModel = this.createSpecialCasesModel({autoExpandSelect : true}),
+		var oArtist1,
+			oModel = this.createSpecialCasesModel({autoExpandSelect : true}),
 			oTable,
 			sView = '\
 <t:Table id="table" rows="{path : \'/Artists\',\
@@ -28505,7 +28529,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				IsActiveEntity : {\
 					additionally : [\'BestPublication/DraftAdministrativeData/InProcessByUser\']\
 				},\
-				Name : {additionally : [\'BestFriend/Name\']}\
+				Name : {additionally : [\'Address/RegionName\', \'BestFriend/Name\']}\
 			},\
 			groupLevels : [\'IsActiveEntity\', \'Name\', \'ArtistID\'],\
 			subtotalsAtBottomOnly : true\
@@ -28524,7 +28548,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<Text id="artistID" text="{ArtistID}"/>\
 	<Text id="city" text="{Address/City}"/>\
 	<Text id="sendsAutographs" text="{= %{sendsAutographs} }"/>\
-</t:Table>',
+</t:Table>\
+<Text id="regionID" text="{Address/RegionID}"/>',
 			that = this;
 
 		this.expectRequest("Artists?$apply=groupby"
@@ -28558,19 +28583,52 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			.expectChange("bestFriendName", [null, null])
 			.expectChange("artistID", [null, null])
 			.expectChange("city", [null, null])
-			.expectChange("sendsAutographs", [undefined, undefined]);
+			.expectChange("sendsAutographs", [undefined, undefined])
+			.expectChange("regionID");
 
 		return this.createView(assert, sView, oModel).then(function () {
 			oTable = that.oView.byId("table");
+			const oIsActiveEntityTrue = oTable.getRows()[1].getBindingContext();
+			assert.deepEqual(oIsActiveEntityTrue.getObject(), {
+				"@$ui5.node.isExpanded" : false,
+				"@$ui5.node.isTotal" : false,
+				"@$ui5.node.level" : 1,
+				Address : {
+					"City@$ui5.noData" : true,
+					"RegionName@$ui5.noData" : true
+				},
+				"ArtistID@$ui5.noData" : true,
+				BestFriend : {
+					"Name@$ui5.noData" : true
+				},
+				BestPublication : {
+					DraftAdministrativeData : {
+						InProcessByUser : null
+					}
+				},
+				IsActiveEntity : true,
+				"Name@$ui5.noData" : true,
+				"sendsAutographs@$ui5.noData" : true
+			});
+
+			// code under test (no "Failed to drill-down into ...")
+			oIsActiveEntityTrue.requestProperty("Address/RegionName").then((sRegionName) => {
+				assert.strictEqual(sRegionName, undefined, "not available here");
+			});
 
 			that.expectRequest("Artists?$apply=filter(IsActiveEntity eq true)"
-					+ "/groupby((Name,BestFriend/Name))/orderby(BestFriend/Name)"
+					+ "/groupby((Name,Address/RegionName,BestFriend/Name))/orderby(BestFriend/Name)"
 					+ "&$count=true&$skip=0&$top=6", {
 					"@odata.count" : "2",
-					value : [
-						{BestFriend : {Name : "A's best friend"}, Name : "A"},
-						{BestFriend : {Name : "B's best friend"}, Name : "B"}
-					]
+					value : [{
+						Address : {RegionName : "England"},
+						BestFriend : {Name : "A's best friend"},
+						Name : "A"
+					}, {
+						Address : {RegionName : "England"},
+						BestFriend : {Name : "B's best friend"},
+						Name : "B"
+					}]
 				})
 				.expectChange("groupLevelCount", [, 2, undefined, undefined])
 				.expectChange("isExpanded", [, true, false, false])
@@ -28586,20 +28644,49 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			return Promise.all([
 				// code under test
-				oTable.getRows()[1].getBindingContext().expand(),
+				oIsActiveEntityTrue.expand(),
 				that.waitForChanges(assert, "1st expand")
 			]);
 		}).then(function () {
+			const oNameB = oTable.getRows()[3].getBindingContext();
+			assert.deepEqual(oNameB.getObject(), {
+				"@$ui5.node.isExpanded" : false,
+				"@$ui5.node.isTotal" : false,
+				"@$ui5.node.level" : 2,
+				Address : {
+					"City@$ui5.noData" : true,
+					RegionName : "England"
+				},
+				"ArtistID@$ui5.noData" : true,
+				BestFriend : {
+					Name : "B's best friend"
+				},
+				BestPublication : {
+					DraftAdministrativeData : {
+						InProcessByUser : null
+					}
+				},
+				IsActiveEntity : true,
+				Name : "B",
+				"sendsAutographs@$ui5.noData" : true
+			});
+
+			// code under test (no "Failed to drill-down into ...")
+			oNameB.requestProperty("Address/City").then((sCity) => {
+				assert.strictEqual(sCity, undefined, "not available here");
+			});
+
 			that.expectRequest("Artists?$count=true"
 					+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity,Name)"
 						+ ",BestPublication($select=PublicationID"
 							+ ";$expand=DraftAdministrativeData($select=DraftID,InProcessByUser))"
 					+ "&$filter=IsActiveEntity eq true and Name eq 'B'&$orderby=Address/City asc"
-					+ "&$select=Address/City,ArtistID,IsActiveEntity,Name,sendsAutographs"
+					+ "&$select=Address/City,Address/RegionName,ArtistID,IsActiveEntity,Name"
+						+ ",sendsAutographs"
 					+ "&$skip=0&$top=6", {
 					"@odata.count" : "2",
 					value : [{
-						Address : {City : "Liverpool"},
+						Address : {City : "Liverpool", RegionName : "England"},
 						ArtistID : "1",
 						BestFriend : {
 							ArtistID : "BF4E",
@@ -28618,7 +28705,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						// Note: think of "sendsAutographs" as a weird custom aggregate ;-)
 						sendsAutographs : false
 					}, {
-						Address : {City : "London"},
+						Address : {City : "London", RegionName : "England"},
 						ArtistID : "2",
 						BestFriend : {
 							ArtistID : "n/a",
@@ -28651,22 +28738,23 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			return Promise.all([
 				// code under test
-				oTable.getRows()[3].getBindingContext().expand(),
+				oNameB.expand(),
 				that.waitForChanges(assert, "2nd expand")
 			]);
 		}).then(function () {
-			const oContext = oTable.getRows()[4].getBindingContext();
-			assert.strictEqual(oContext.isAggregated(), false);
-			assert.strictEqual(oContext.isExpanded(), undefined);
+			oArtist1 = oTable.getRows()[4].getBindingContext();
+			assert.strictEqual(oArtist1.isAggregated(), false);
+			assert.strictEqual(oArtist1.isExpanded(), undefined);
 			assert.throws(function () {
 				// code under test (JIRA: CPOUI5ODATAV4-3229)
-				oContext.delete();
-			}, new Error("Unsupported on aggregated data: " + oContext));
-			assert.deepEqual(oContext.getObject(), {
+				oArtist1.delete();
+			}, new Error("Unsupported on aggregated data: " + oArtist1));
+			assert.deepEqual(oArtist1.getObject(), {
 				"@$ui5.node.isTotal" : false,
 				"@$ui5.node.level" : 3,
 				Address : {
-					City : "Liverpool"
+					City : "Liverpool",
+					RegionName : "England"
 				},
 				ArtistID : "1",
 				BestFriend : {
@@ -28697,10 +28785,27 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			return Promise.all([
 				// code under test (JIRA: CPOUI5ODATAV4-3438)
-				oContext.setProperty("BestFriend/Name", "B's best friend 4ever!"),
-				oContext.setProperty("BestPublication/DraftAdministrativeData/InProcessByUser",
+				oArtist1.setProperty("BestFriend/Name", "B's best friend 4ever!"),
+				oArtist1.setProperty("BestPublication/DraftAdministrativeData/InProcessByUser",
 					"JANEDOE"),
 				that.waitForChanges(assert, "edit via navigation")
+			]);
+		}).then(function () {
+			that.expectRequest("Artists(ArtistID='1',IsActiveEntity=true)"
+					+ "?$select=Address/RegionID,Address/ZIP", {
+					Address : {RegionID : 42, ZIP : "L2 6RE"}
+				})
+				.expectChange("regionID", "42");
+
+			// code under test (JIRA: CPOUI5ODATAV4-3438)
+			that.oView.byId("regionID").setBindingContext(oArtist1);
+
+			return Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3438)
+				oArtist1.requestProperty("Address/ZIP").then(function (sZIP) {
+					assert.strictEqual(sZIP, "L2 6RE");
+				}),
+				that.waitForChanges(assert, "request late properties")
 			]);
 		});
 	});
@@ -29743,7 +29848,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			SalesAmount : "1"
 		});
 
-		// code under test - LocalCurrency doesn't lead to a "failed to drill-down"
+		// code under test (no "Failed to drill-down into ...")
 		oContextA.requestProperty("LocalCurrency").then((sLocalCurrency) => {
 			assert.strictEqual(sLocalCurrency, undefined, "not available here");
 		});
@@ -31272,13 +31377,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	});
 
 	//*********************************************************************************************
-	// Scenario: Data Aggregation w/ no UI and w/ or w/o auto-$expand/$select may use "identity",
-	// but must make sure $select is correct. Check effect of ExpandAfterConcatSupported annotation.
+	// Scenario: Data Aggregation w/o UI; may use "identity" only w/ auto-$expand/$select and must
+	// make sure $select is correct. Check effect of ExpandAfterConcatSupported annotation.
 	// JIRA: CPOUI5ODATAV4-3438
 [false, true].forEach((bAutoExpandSelect) => {
 	[false, true].forEach((bExpandAfterConcatSupported) => {
-		const sTitle = "Data Aggregation: no UI, auto-$expand/$select = " + bAutoExpandSelect
-			+ ", ExpandAfterConcatSupported = " + bExpandAfterConcatSupported;
+		const sTitle = "Data Aggregation: $select w/o UI, auto-$expand/$select = "
+			+ bAutoExpandSelect + ", ExpandAfterConcatSupported = " + bExpandAfterConcatSupported;
 
 	QUnit.test(sTitle, async function (assert) {
 		await this.createView(assert, "",
@@ -31300,11 +31405,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}] // ... (don't care)
 		};
 
-		if (bExpandAfterConcatSupported) {
+		if (bExpandAfterConcatSupported && bAutoExpandSelect) {
 			this.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesAmount,Currency)"
 					+ ",concat(aggregate($count as UI5__count),top(99)))"
-					//TODO: + "&$select=AccountResponsible,Name,...", {
-					+ "&$select=Currency,Id,SalesAmount,UI5__count", oResponse);
+					+ "&$select=AccountResponsible,Currency,Id,Name,SalesAmount,UI5__count",
+					oResponse);
 		} else {
 			this.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesAmount,Currency)"
 					+ ",groupby((Id,Name,AccountResponsible),aggregate(SalesAmount,Currency))"
@@ -31316,34 +31421,94 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			this.waitForChanges(assert)
 		]);
 
-		const oListBinding1 = this.oModel.bindList("/BusinessPartners", null, null, [], {
+		const oAggregation = {
 			$$aggregation : {
 				aggregate : {SalesNumber : {grandTotal : true}},
 				groupLevels : ["Id"]
 			},
 			// Note: previously forbidden (Error: Unsupported system query option: $select)
 			$select : "Name"
+		};
+
+		if (bAutoExpandSelect) {
+			const oListBinding1
+				= this.oModel.bindList("/BusinessPartners", null, null, [], oAggregation);
+			const oResponse1 = {
+				value : [{
+					SalesNumber : 0
+				}, {
+					UI5__count : "0"
+				}] // ... (don't care)
+			};
+
+			if (bExpandAfterConcatSupported) {
+				this.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesNumber)"
+						+ ",concat(aggregate($count as UI5__count),top(99)))"
+						+ "&$select=Id,Name,SalesNumber,UI5__count", oResponse1);
+			} else {
+				this.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesNumber)"
+						+ ",groupby((Id),aggregate(SalesNumber))"
+							+ "/concat(aggregate($count as UI5__count),top(99)))", oResponse1);
+			}
+
+			await Promise.all([
+				oListBinding1.requestContexts(),
+				this.waitForChanges(assert)
+			]);
+		} else {
+			assert.throws(function () {
+				// code under test
+				this.oModel.bindList("/BusinessPartners", null, null, [], oAggregation);
+			}, new Error("Missing parameter autoExpandSelect"));
+		}
+	});
+	});
+});
+
+	//*********************************************************************************************
+	// Scenario: Data Aggregation w/o UI; may use "identity" only w/ auto-$expand/$select and must
+	// make sure $expand is correct. Check effect of ExpandAfterConcatSupported annotation.
+	// JIRA: CPOUI5ODATAV4-3438
+[false, true].forEach((bAutoExpandSelect) => {
+	[false, true].forEach((bExpandAfterConcatSupported) => {
+		const sTitle = "Data Aggregation: $expand w/o UI, auto-$expand/$select = "
+			+ bAutoExpandSelect + ", ExpandAfterConcatSupported = " + bExpandAfterConcatSupported;
+
+	QUnit.test(sTitle, async function (assert) {
+		await this.createView(assert, "",
+			this.createSalesOrdersModel({autoExpandSelect : bAutoExpandSelect}, {}, [],
+				bExpandAfterConcatSupported));
+
+		const oListBinding = this.oModel.bindList("/SalesOrderList", null, null, [], {
+			$$aggregation : {
+				aggregate : {SalesAmount : {grandTotal : true, unit : "CurrencyCode"}},
+				group : {SalesOrderID : {additionally : ["SO_2_BP/Address/City"]}}
+			}
 		});
-		const oResponse1 = {
+		const oResponse = {
 			value : [{
-				SalesNumber : 0
+				CurrencyCode : null,
+				SalesAmount : 0
 			}, {
 				UI5__count : "0"
 			}] // ... (don't care)
 		};
 
-		if (bExpandAfterConcatSupported) {
-			this.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesNumber)"
+		if (bAutoExpandSelect && bExpandAfterConcatSupported) {
+			this.expectRequest("SalesOrderList?$apply=concat(aggregate(SalesAmount,CurrencyCode)"
 					+ ",concat(aggregate($count as UI5__count),top(99)))"
-					+ "&$select=Id,Name,SalesNumber,UI5__count", oResponse1);
+					+ "&$expand=SO_2_BP($select=Address/City,BusinessPartnerID)"
+					+ "&$select=CurrencyCode,SO_2_BP,SalesAmount,SalesOrderID,UI5__count",
+					oResponse);
 		} else {
-			this.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesNumber)"
-					+ ",groupby((Id),aggregate(SalesNumber))"
-						+ "/concat(aggregate($count as UI5__count),top(99)))", oResponse1);
+			this.expectRequest("SalesOrderList?$apply=concat(aggregate(SalesAmount,CurrencyCode)"
+					+ ",groupby((SalesOrderID,SO_2_BP/Address/City)"
+						+ ",aggregate(SalesAmount,CurrencyCode))"
+					+ "/concat(aggregate($count as UI5__count),top(99)))", oResponse);
 		}
 
 		await Promise.all([
-			oListBinding1.requestContexts(),
+			oListBinding.requestContexts(),
 			this.waitForChanges(assert)
 		]);
 	});
@@ -32317,37 +32482,43 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	QUnit.test("Data Aggregation: requestSideEffects and $$aggregation", function (assert) {
 		var oBinding,
 			oHeaderContext,
-			oModel = this.createAggregationModel({autoExpandSelect : true}),
+			oModel = this.createSalesOrdersModel({autoExpandSelect : true}),
 			oResponse = {
 				"@odata.count" : "1",
-				value : [{Currency : "EUR", Region : "A", SalesAmount : "123"}]
+				value : [{CurrencyCode : "EUR", LifecycleStatus : "A", GrossAmount : "123"}]
 			},
-			sUrl = "BusinessPartners?$apply"
-				+ "=groupby((Region),aggregate(SalesAmount,Currency))&$count=true&$skip=0&$top=100",
-			sUrlWithFilter = "BusinessPartners?$apply"
-				+ "=filter(Country eq 'US' or Industry eq '4.0' or myMessages/code ne '-')"
-				+ "/groupby((Region),aggregate(SalesAmount,Currency))&$count=true&$skip=0&$top=100",
+			sUrl = "SalesOrderList"
+				+ "?$apply=groupby((LifecycleStatus),aggregate(GrossAmount,CurrencyCode))"
+				+ "&$count=true&$skip=0&$top=100",
+			sUrlWithFilter = "SalesOrderList?$apply"
+				+ "=filter(NoteLanguage eq 'US' or Note eq '4.0' or SO_2_BP/LegalForm ne '-')"
+				+ "/groupby((LifecycleStatus),aggregate(GrossAmount,CurrencyCode))"
+				+ "&$count=true&$skip=0&$top=100",
 			sView = '\
-<Table id="table" items="{path : \'/BusinessPartners\',\
+<Table id="table" items="{path : \'/SalesOrderList\',\
 		parameters : {\
 			$$aggregation : {\
 				aggregate : {\
-					SalesAmount : {subtotals : true, unit : \'Currency\'},\
-					SalesNumberSum : {name : \'SalesNumber\', with : \'sum\'}\
+					GrossAmount : {subtotals : true, unit : \'CurrencyCode\'},\
+					SOItemCountSum : {name : \'SOItemCount\', with : \'sum\'}\
 				},\
-				group : {Segment : {additionally : [\'Text/Segment\', \'RegionText\']}},\
-				groupLevels : [\'Region\'],\
+				group : {\
+					BillingStatus : {\
+						additionally : [\'SO_2_BP/CompanyName\',\'LifecycleStatusDesc\']\
+					}\
+				},\
+				groupLevels : [\'LifecycleStatus\'],\
 				subtotalsAtBottomOnly : true\
 			}\
 		}}">\
-	<Text id="region" text="{Region}"/>\
-	<Text id="salesAmount" text="{= %{SalesAmount} }"/>\
+	<Text id="lifecycleStatus" text="{LifecycleStatus}"/>\
+	<Text id="grossAmount" text="{= %{GrossAmount} }"/>\
 </Table>',
 			that = this;
 
 		this.expectRequest(sUrl, oResponse)
-			.expectChange("region", ["A"])
-			.expectChange("salesAmount", ["123"]);
+			.expectChange("lifecycleStatus", ["A"])
+			.expectChange("grossAmount", ["123"]);
 
 		return this.createView(assert, sView, oModel).then(function () {
 			// expect no request
@@ -32383,65 +32554,65 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			that.expectRequest(sUrl, oResponse);
 
 			return Promise.all([
-				oHeaderContext.requestSideEffects([{$PropertyPath : "SalesAmount"}]),
-				that.waitForChanges(assert, "SalesAmount (aggregate)")
+				oHeaderContext.requestSideEffects([{$PropertyPath : "GrossAmount"}]),
+				that.waitForChanges(assert, "GrossAmount (aggregate)")
 			]);
 		}).then(function () {
 			that.expectRequest(sUrl, oResponse);
 
 			return Promise.all([
-				oHeaderContext.requestSideEffects([{$PropertyPath : "SalesNumber"}]),
-				that.waitForChanges(assert, "SalesNumber (aggregate w/ alias)")
+				oHeaderContext.requestSideEffects([{$PropertyPath : "SOItemCount"}]),
+				that.waitForChanges(assert, "SOItemCount (aggregate w/ alias)")
 			]);
 		}).then(function () {
 			that.expectRequest(sUrl, oResponse);
 
 			return Promise.all([
-				oHeaderContext.requestSideEffects([{$PropertyPath : "Currency"}]),
-				that.waitForChanges(assert, "Currency (unit)")
+				oHeaderContext.requestSideEffects([{$PropertyPath : "CurrencyCode"}]),
+				that.waitForChanges(assert, "CurrencyCode (unit)")
 			]);
 		}).then(function () {
 			that.expectRequest(sUrl, oResponse);
 
 			return Promise.all([
-				oHeaderContext.requestSideEffects([{$PropertyPath : "Region"}]),
-				that.waitForChanges(assert, "Region (group level)")
+				oHeaderContext.requestSideEffects([{$PropertyPath : "LifecycleStatus"}]),
+				that.waitForChanges(assert, "LifecycleStatus (group level)")
 			]);
 		}).then(function () {
 			that.expectRequest(sUrl, oResponse);
 
 			return Promise.all([
-				oHeaderContext.requestSideEffects([{$PropertyPath : "Segment"}]),
-				that.waitForChanges(assert, "Segment (group, not level)")
+				oHeaderContext.requestSideEffects([{$PropertyPath : "BillingStatus"}]),
+				that.waitForChanges(assert, "BillingStatus (group, not level)")
 			]);
 		}).then(function () {
 			that.expectRequest(sUrl, oResponse);
 
 			return Promise.all([
-				oHeaderContext.requestSideEffects([{$PropertyPath : "Text/Segment"}]),
-				that.waitForChanges(assert, "Text/Segment (additionally)")
+				oHeaderContext.requestSideEffects([{$PropertyPath : "SO_2_BP/CompanyName"}]),
+				that.waitForChanges(assert, "SO_2_BP/CompanyName (additionally)")
 			]);
 		}).then(function () {
 			that.expectRequest(sUrl, oResponse);
 
 			return Promise.all([
-				oHeaderContext.requestSideEffects([{$PropertyPath : "Text/*"}]),
-				that.waitForChanges(assert, "Text/* (additionally)")
+				oHeaderContext.requestSideEffects([{$PropertyPath : "SO_2_BP/*"}]),
+				that.waitForChanges(assert, "SO_2_BP/* (additionally)")
 			]);
 		}).then(function () {
 			that.expectRequest(sUrl, oResponse);
 
 			return Promise.all([
-				oHeaderContext.requestSideEffects([{$PropertyPath : "RegionText"}]),
-				that.waitForChanges(assert, "RegionText (additionally)")
+				oHeaderContext.requestSideEffects([{$PropertyPath : "LifecycleStatusDesc"}]),
+				that.waitForChanges(assert, "LifecycleStatusDesc (additionally)")
 			]);
 		}).then(function () {
 			that.expectRequest(sUrlWithFilter, oResponse);
 
 			oBinding.filter(new Filter([
-				new Filter("Country", FilterOperator.EQ, "US"),
-				new Filter("Industry", FilterOperator.EQ, "4.0"),
-				new Filter("myMessages/code", FilterOperator.NE, "-") // slightly faked ;-)
+				new Filter("NoteLanguage", FilterOperator.EQ, "US"),
+				new Filter("Note", FilterOperator.EQ, "4.0"),
+				new Filter("SO_2_BP/LegalForm", FilterOperator.NE, "-")
 			]));
 
 			return that.waitForChanges(assert, "filter");
@@ -32449,15 +32620,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			that.expectRequest(sUrlWithFilter, oResponse);
 
 			return Promise.all([
-				oHeaderContext.requestSideEffects([{$PropertyPath : "Country"}]),
-				that.waitForChanges(assert, "Country (filter)")
+				oHeaderContext.requestSideEffects([{$PropertyPath : "NoteLanguage"}]),
+				that.waitForChanges(assert, "NoteLanguage (filter)")
 			]);
 		}).then(function () {
 			that.expectRequest(sUrlWithFilter, oResponse);
 
 			return Promise.all([
-				oHeaderContext.requestSideEffects([{$PropertyPath : "myMessages/*"}]),
-				that.waitForChanges(assert, "myMessages/* (filter)")
+				oHeaderContext.requestSideEffects([{$PropertyPath : "SO_2_BP/*"}]),
+				that.waitForChanges(assert, "SO_2_BP/* (filter)")
 			]);
 		});
 	});
