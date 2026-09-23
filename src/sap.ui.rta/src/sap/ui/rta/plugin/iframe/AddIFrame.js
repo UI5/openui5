@@ -8,6 +8,7 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/dt/Util",
 	"sap/ui/fl/util/CancelError",
+	"sap/ui/fl/util/IFrame",
 	"sap/ui/fl/Utils",
 	"sap/ui/rta/plugin/iframe/AddIFrameDialog",
 	"sap/ui/rta/plugin/BaseCreate"
@@ -17,6 +18,7 @@ sap.ui.define([
 	Lib,
 	DtUtil,
 	CancelError,
+	IFrame,
 	FlexUtils,
 	AddIFrameDialog,
 	BaseCreate
@@ -213,13 +215,22 @@ sap.ui.define([
 				name: "frameUrl",
 				type: "string",
 				required: true,
-				description: [
-					"The URL of the iframe content.",
-					"May contain UI5 expression bindings in the form {= <expression> } to compute parts of the URL from the parent element's data.",
-					"Expressions support property access (${PropertyName}), arithmetic (+, -, *, /, %), comparison (<, <=, >, >=, ===, !==), logical operators (&&, ||, !), the ternary conditional (a ? b : c), and standard functions including Math.floor, Math.ceil, Math.round, Math.abs, and String methods.",
-					"When the user's request implies a computation (percentages, thresholds, ranges, unit conversions, units requiring rounding), locale/region choice (currency, language, country), express that computation inside {= ... } rather than substituting a raw property value.",
-					"You must not encode parameters via encodeURIComponent as this is automatically done!"
-				].join(" ")
+				description: `The URL of the iframe content.
+					May contain UI5 expression bindings in the form {= <expression> } to compute parts of the URL
+					from the parent element's data.
+					Expressions support property access (\${PropertyName}), arithmetic (+, -, *, /, %),
+					comparison (<, <=, >, >=, ===, !==), logical operators (&&, ||, !),
+					the ternary conditional (a ? b : c), and standard functions including Math.floor,
+					Math.ceil, Math.round, Math.abs, and String methods.
+					When the user's request implies a computation (percentages, thresholds, ranges, unit conversions,
+					units requiring rounding), locale/region choice (currency, language, country),
+					express that computation inside {= ... } rather than substituting a raw property value.
+					You must not encode parameters via encodeURIComponent as this is automatically done!
+					Creating the command validates the URL and may fail with an error describing why the URL was rejected
+					(e.g. an unsafe protocol or malformed syntax). Do not retry with the same URL;
+					read the error and adjust the URL accordingly before creating the command again.
+					If the user provided an explicit URL that violates the rules, do not create the command
+					with a silently adjusted URL; present the adjusted URL to the user and only proceed once the user has accepted it.`
 			},
 			{
 				name: "frameWidth",
@@ -328,6 +339,15 @@ sap.ui.define([
 	 * @since 1.153
 	 */
 	AddIFrame.prototype.createCommands = async function(oOverlay, mParameters) {
+		const { result: bValidUrl, error: sError } = IFrame.isValidUrl(mParameters.frameUrl);
+		if (!bValidUrl) {
+			throw DtUtil.createError(
+				"AddIFrame#createCommands",
+				`The provided URL is not valid: ${sError}`,
+				"sap.ui.rta"
+			);
+		}
+
 		const oParentOverlay = this._getParentOverlay(mParameters.isSibling, oOverlay);
 		const oParent = oParentOverlay.getElement();
 		const oDesignTimeMetadata = oParentOverlay.getDesignTimeMetadata();

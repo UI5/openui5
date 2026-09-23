@@ -54,19 +54,6 @@ sap.ui.define([
 		_aNumericInputFields, _aUnitInputFields, ["advancedSettings", "allowFocusWithoutUserActivation"]
 	);
 
-	function isValidUrl(sUrl) {
-		if (
-			typeof sUrl !== "string"
-			|| sUrl.trim() === ""
-		) {
-			return {
-				result: false,
-				error: IFrame.VALIDATION_ERROR.INVALID_URL
-			};
-		}
-		return IFrame.isValidUrl(encodeURI(sUrl));
-	}
-
 	function multiInputValidator(oValue) {
 		const sText = oValue.text;
 		return new Token({ key: sText, text: sText });
@@ -221,7 +208,7 @@ sap.ui.define([
 		 */
 		async onSavePress() {
 			const sUrl = await this._buildPreviewURL();
-			const { result: bResult, error: sError } = isValidUrl(sUrl);
+			const { result: bResult, error: sError } = IFrame.isValidUrl(sUrl);
 
 			if (!bResult) {
 				setURLErrorMessage.call(this, sError);
@@ -243,7 +230,7 @@ sap.ui.define([
 			const sReturnedURL = this._buildReturnedURL();
 			const sURL = await this._buildPreviewURL();
 
-			if (!isValidUrl(sURL).result) {
+			if (!IFrame.isValidUrl(sURL).result) {
 				return;
 			}
 			const oIFrame = Element.getElementById("sapUiRtaAddIFrameDialog_PreviewFrame");
@@ -475,7 +462,7 @@ sap.ui.define([
 
 		async onValidateUrl() {
 			const sUrl = await this._buildPreviewURL();
-			const { result: bResult, error: sError } = isValidUrl(sUrl);
+			const { result: bResult, error: sError } = IFrame.isValidUrl(sUrl);
 			if (bResult) {
 				this._oJSONModel.setProperty("/frameUrlError/value", "");
 			} else {
