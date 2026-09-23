@@ -2155,6 +2155,25 @@ sap.ui.define([
 		return oSection && (sSectionId === oSection.getId());
 	};
 
+	/**
+	 * Determines whether the given SubSection is the one currently scrolled to the top of the viewport
+	 * (i.e. the closest scrolled SubSection for the current scroll position).
+	 *
+	 * Unlike {@link #_isClosestScrolledSection}, which resolves to the parent Section, this check works at
+	 * SubSection granularity, so it can tell whether the page is already showing a specific SubSection
+	 * without triggering a redundant corrective scroll.
+	 * @param {string} sSubSectionId The SubSection ID to check
+	 * @returns {boolean} <code>true</code> if the SubSection is the closest scrolled one
+	 * @private
+	 */
+	ObjectPageLayout.prototype._isClosestScrolledSubSection = function (sSubSectionId) {
+		var iScrollTop = this._$opWrapper.length > 0 ? this._$opWrapper.scrollTop() : 0,
+			iPageHeight = this.iScreenHeight,
+			sClosestSubSectionBaseId = this._getClosestScrolledSectionBaseId(iScrollTop, iPageHeight, true /* subSections only */);
+
+		return !!sClosestSubSectionBaseId && sClosestSubSectionBaseId === sSubSectionId;
+	};
+
 	ObjectPageLayout.prototype._hasOngoingScrollToSection = function (sSectionId) {
 		return this._oScroller._$Container
 			&& this._oScroller._$Container.is(":animated")
@@ -2225,10 +2244,15 @@ sap.ui.define([
 
 		this._bDelayDOMBasedCalculations = false;
 
-		// Making sure lazyloading is executed with the correct selected Section/SubSection (if any) and the scroll is at the relevant position
-		if (sSelectedSubSectionId && bScrollDomReady && this._oSectionInfo[sSelectedSubSectionId]?.positionTop !== this._$opWrapper.scrollTop()) {
+		// Making sure lazyloading is executed with the correct selected Section/SubSection (if any) and the
+		// scroll is at the relevant position. We only re-scroll when the page is NOT already showing the
+		// selected (sub)section at the top of the viewport. Comparing against the *closest scrolled*
+		// (sub)section - instead of requiring an exact positionTop/scrollTop match - avoids overriding a
+		// legitimate scroll position (e.g. one produced by the browser when focusing a control inside a
+		// subsection) with a scroll to the top of the selected section.
+		if (sSelectedSubSectionId && bScrollDomReady && !this._isClosestScrolledSubSection(sSelectedSubSectionId)) {
 			this.scrollToSection(sSelectedSubSectionId, 0);
-		} else if (sSelectedSectionId && bScrollDomReady && this._oSectionInfo[sSelectedSectionId]?.positionTop !== this._$opWrapper.scrollTop()) {
+		} else if (sSelectedSectionId && bScrollDomReady && !this._isClosestScrolledSection(sSelectedSectionId)) {
 			this.scrollToSection(sSelectedSectionId, 0);
 		}
 
