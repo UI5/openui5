@@ -82,6 +82,17 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns the app component provided by the command factory.
+	 * Manifest commands are not element-bound, so the app component is taken from the property
+	 * instead of being derived from an element (as done in the base implementation).
+	 * @returns {sap.ui.core.UIComponent|undefined} App component instance
+	 * @public
+	 */
+	ManifestCommand.prototype.getAppComponent = function() {
+		return this.getProperty("appComponent");
+	};
+
+	/**
 	 * Create the change for the manifest and adds it to the Flex Persistence.
 	 * @return {Promise} Returns Promise resolving after change has been created and stored
 	 */
