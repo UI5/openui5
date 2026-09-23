@@ -5,59 +5,64 @@ sap.ui.define([
 	"sap/ui/core/Item",
 	"sap/m/Select",
 	"sap/m/App",
-	"sap/m/Page"
-], function(Label, ObjectNumber, coreLibrary, Item, Select, App, Page) {
+	"sap/m/Page",
+	"sap/m/library",
+	"sap/m/HBox"
+], function(Label, ObjectNumber, coreLibrary, Item, Select, App, Page, mobileLibrary, HBox) {
 	"use strict";
 
 	// shortcut for sap.ui.core.ValueState
-	var ValueState = coreLibrary.ValueState;
+	const ValueState = coreLibrary.ValueState;
 
 	// shortcut for sap.ui.core.TextAlign
-	var TextAlign = coreLibrary.TextAlign;
+	const TextAlign = coreLibrary.TextAlign;
 
 	// shortcut for sap.ui.core.TextDirection
-	var TextDirection = coreLibrary.TextDirection;
+	const TextDirection = coreLibrary.TextDirection;
 
 	// shortcut for sap.ui.core.TitleLevel
-	var TitleLevel = coreLibrary.TitleLevel;
+	const TitleLevel = coreLibrary.TitleLevel;
 
-	var txt1 = new Label({text:"ObjectNumber (emphasized by default):"});
+	// shortcut for sap.m.ObjectNumberDisplayMode
+	const ObjectNumberDisplayMode = mobileLibrary.ObjectNumberDisplayMode;
 
-	var on1 = new ObjectNumber("on1", {
+	const txt1 = new Label({text:"ObjectNumber (emphasized by default):"});
+
+	const on1 = new ObjectNumber("on1", {
 		number: "12",
 		unit: "Euro",
 		emptyIndicatorMode: "Auto"
 	});
 
-	var txt2 = new Label({text:"Non-emphasized ObjectNumber:"});
+	const txt2 = new Label({text:"Non-emphasized ObjectNumber:"});
 
-	var on2 = new ObjectNumber("on2", {
+	const on2 = new ObjectNumber("on2", {
 		number: "1.50",
 		unit: "Euro",
 		emphasized: false
 	});
 
-	var txt23 = new Label({text:"Empty Text ObjectNumber:"});
+	const txt23 = new Label({text:"Empty Text ObjectNumber:"});
 
-	var on23 = new ObjectNumber("on23", {
+	const on23 = new ObjectNumber("on23", {
 		number: "",
 		unit: "Euro",
 		emptyIndicatorMode: "On"
 	});
 
-	var txt3 = new sap.m.Title({
+	const txt3 = new sap.m.Title({
 		text:"ObjectNumber state changes"
 	});
 
-	var on3 = new ObjectNumber("on3", {
+	const on3 = new ObjectNumber("on3", {
 		number: "1.50",
 		unit: "Euro",
 		emphasized: false
 	});
 
-	var txt4 = new Label({text: "textDirection: LTR, textAlign: Begin"});
+	const txt4 = new Label({text: "textDirection: LTR, textAlign: Begin"});
 
-	var on4 = new ObjectNumber("on4", {
+	const on4 = new ObjectNumber("on4", {
 		number: "1.50",
 		unit: "Euro",
 		emphasized: true,
@@ -65,9 +70,9 @@ sap.ui.define([
 		textAlign: TextAlign.Begin
 	});
 
-	var txt5 = new Label({text: "textDirection: LTR, textAlign: End"});
+	const txt5 = new Label({text: "textDirection: LTR, textAlign: End"});
 
-	var on5 = new ObjectNumber("on5", {
+	const on5 = new ObjectNumber("on5", {
 		number: "1.50",
 		unit: "Euro",
 		emphasized: true,
@@ -75,9 +80,9 @@ sap.ui.define([
 		textAlign: TextAlign.End
 	});
 
-	var txt6 = new Label({text: "textDirection: RTL, textAlign: Begin"});
+	const txt6 = new Label({text: "textDirection: RTL, textAlign: Begin"});
 
-	var on6 = new ObjectNumber("on6", {
+	const on6 = new ObjectNumber("on6", {
 		number: "1.50",
 		unit: "וְהָיוּ הַדְּבָרִים",
 		emphasized: true,
@@ -85,9 +90,9 @@ sap.ui.define([
 		textAlign: TextAlign.Begin
 	});
 
-	var txt7 = new Label({text: "textDirection: RTL, textAlign: End"});
+	const txt7 = new Label({text: "textDirection: RTL, textAlign: End"});
 
-	var on7 = new ObjectNumber("on7", {
+	const on7 = new ObjectNumber("on7", {
 		number: "1.50",
 		unit: "וְהָיוּ הַדְּבָרִים",
 		emphasized: true,
@@ -95,9 +100,9 @@ sap.ui.define([
 		textAlign: TextAlign.End
 	});
 
-	var txt8 = new Label({text: "textDirection: RTL, textAlign: Left"});
+	const txt8 = new Label({text: "textDirection: RTL, textAlign: Left"});
 
-	var on8 = new ObjectNumber("on8", {
+	const on8 = new ObjectNumber("on8", {
 		number: "1.50",
 		unit: "וְהָיוּ הַדְּבָרִים",
 		emphasized: true,
@@ -105,9 +110,9 @@ sap.ui.define([
 		textAlign: TextAlign.Left
 	});
 
-	var txt9 = new Label({text: "textDirection: RTL, textAlign: Right"});
+	const txt9 = new Label({text: "textDirection: RTL, textAlign: Right"});
 
-	var on9 = new ObjectNumber("on9", {
+	const on9 = new ObjectNumber("on9", {
 		number: "1.50",
 		unit: "וְהָיוּ הַדְּבָרִים",
 		emphasized: true,
@@ -115,70 +120,104 @@ sap.ui.define([
 		textAlign: TextAlign.Right
 	});
 
-	var txt10 = new Label({text: "Active ObjectNumber", labelFor: "on10"});
+	const txt10 = new Label({text: "Active ObjectNumber", labelFor: "on10"});
 
-	var on10 = new ObjectNumber("on10", {
+	const on10 = new ObjectNumber("on10", {
 		number: "1.50",
 		active: true
 	});
 
-	var on102 = new ObjectNumber("on102", {
+	const on102 = new ObjectNumber("on102", {
 		number: "1.50",
 		unit: "EUR",
 		active: true
 	});
 
-	var txt11 = new Label({text: "Inverted ObjectNumber"});
+	const txt11 = new Label({text: "Inverted ObjectNumber"});
 
-	var on11 = new ObjectNumber("on11", {
+	const on11 = new ObjectNumber("on11", {
 		number: "1.50",
 		inverted: true
 	});
 
-	var txt12 = new Label({text: "Large ObjectNumber"});
+	const txt12 = new Label({text: "Large ObjectNumber"});
 
-	var on12 = new ObjectNumber("on12", {
+	const on12 = new ObjectNumber("on12", {
 		number: "1.50"
 	}).addStyleClass("sapMObjectNumberLarge");
 
-	var txt13 = new Label({text: "Inverted active ObjectNumber", labelFor: "on13"});
+	const txt13 = new Label({text: "Inverted active ObjectNumber", labelFor: "on13"});
 
-	var on13 = new ObjectNumber("on13", {
+	const on13 = new ObjectNumber("on13", {
 		number: "1.50",
 		active: true,
 		inverted: true
 	});
 
-	var txt14 = new Label({text: "Active large ObjectNumber", labelFor: "on14"});
+	const txt14 = new Label({text: "Active large ObjectNumber", labelFor: "on14"});
 
-	var on14 = new ObjectNumber("on14", {
+	const on14 = new ObjectNumber("on14", {
 		number: "1.50",
 		active: true
 	}).addStyleClass("sapMObjectNumberLarge");
 
-	var on142 = new ObjectNumber("on142", {
+	const on142 = new ObjectNumber("on142", {
 		number: "1.50",
 		unit: "EUR",
 		active: true
 	}).addStyleClass("sapMObjectNumberLarge");
 
-	var txt15 = new Label({text: "Inverted large ObjectNumber"});
+	const txt15 = new Label({text: "Inverted large ObjectNumber"});
 
-	var on15 = new ObjectNumber("on15", {
+	const on15 = new ObjectNumber("on15", {
 		number: "1.50",
 		inverted: true
 	}).addStyleClass("sapMObjectNumberLarge");
 
-	var txt16 = new Label({text: "Inverted active large ObjectNumber", labelFor: "on16"});
+	const txt16 = new Label({text: "Inverted active large ObjectNumber", labelFor: "on16"});
 
-	var on16 = new ObjectNumber("on16", {
+	const on16 = new ObjectNumber("on16", {
 		number: "1.50",
 		active: true,
 		inverted: true
 	}).addStyleClass("sapMObjectNumberLarge");
 
+	const txt17 = new Label({text: "Currency display mode (USD)"});
+
+	const on17 = new ObjectNumber("on17", {
+		number: "1234.5",
+		unit: "USD",
+		useSymbol: false,
+		displayMode: ObjectNumberDisplayMode.Currency
+	});
+
+	const txt18 = new Label({text: "Currency display mode, symbol (EUR)"});
+
+	const on18 = new ObjectNumber("on18", {
+		number: "9876.543",
+		unit: "EUR",
+		displayMode: ObjectNumberDisplayMode.Currency,
+		useSymbol: true
+	});
+
+	const txt19 = new Label({text: "Unit display mode (kg)"});
+
+	const on19 = new ObjectNumber("on19", {
+		number: "42.5",
+		unit: "kg",
+		displayMode: ObjectNumberDisplayMode.Unit
+	});
+
+	const txt20 = new Label({text: "Unit display mode (km/h)"});
+
+	const on20 = new ObjectNumber("on20", {
+		number: "120.75",
+		unit: "km/h",
+		displayMode: ObjectNumberDisplayMode.Unit
+	});
+
 	// items
-	var oItemNone = new Item({
+	const oItemNone = new Item({
 		key: ValueState.None,
 		text: "None"
 	}),
@@ -212,14 +251,14 @@ sap.ui.define([
 		}
 	});
 
-	var oVBox = new sap.m.VBox().addStyleClass("sapUiSmallMargin");
+	const oVBox = new sap.m.VBox().addStyleClass("sapUiSmallMargin");
 		oVBox.addItem(txt3);
 		oVBox.addItem(oSelectLabel);
 		oVBox.addItem(oStateSelect);
 		oVBox.addItem(on3.addStyleClass("sapUiTinyMarginTop"));
 
-	var app = new App();
-	var page = new Page({
+	const app = new App();
+	const page = new Page({
 		title: "Object Number",
 		titleLevel: TitleLevel.H1,
 		enableScrolling : true,
@@ -258,7 +297,15 @@ sap.ui.define([
 			txt15,
 			on15,
 			txt16,
-			on16
+			on16,
+			txt17,
+			new HBox({width: "30%", justifyContent: "End", items: [on17]}),
+			txt18,
+			new HBox({width: "30%", justifyContent: "End", items: [on18]}),
+			txt19,
+			new HBox({width: "30%", justifyContent: "End", items: [on19]}),
+			txt20,
+			new HBox({width: "30%", justifyContent: "End", items: [on20]})
 		]
 	});
 	app.setInitialPage(page.getId());

@@ -1,0 +1,62 @@
+<mvc:View
+	controllerName="sap.ui.unified.sample.ObjectNumberCurrency.Controller"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:l="sap.ui.layout"
+	xmlns:u="sap.ui.unified">
+	<l:Grid
+		defaultSpan="XL7 L12 M12 S12">
+		<List
+			id="listOneId"
+			headerText="Various currencies with and without decimals"
+			items="{path: '/variousNumberDataModel'}">
+			<CustomListItem>
+				<ObjectNumber displayMode="Currency" emphasized="false" number="{price}" unit="{currency}" useSymbol="false"/>
+			</CustomListItem>
+		</List>
+
+		<List
+			id="listTwoId"
+			headerText="Currency without decimals"
+			items="{path: '/nonDecimalCurrencyDataModel'}">
+			<CustomListItem>
+				<ObjectNumber displayMode="Currency" emphasized="false" number="{price}" unit="{currency}" useSymbol="false"/>
+			</CustomListItem>
+		</List>
+
+		<List
+			id="listThreeId"
+			headerText="Currency without decimals using maxPrecision"
+			items="{path: '/nonDecimalCurrencyDataModel'}">
+			<CustomListItem>
+				<ObjectNumber displayMode="Currency" emphasized="false" number="{price}" unit="{currency}" useSymbol="false" maxPrecision="0"/>
+			</CustomListItem>
+		</List>
+
+		<List
+			id="listFourId"
+			headerText="Currency with really big numbers"
+			items="{path: '/bigNumberDataModel'}">
+			<CustomListItem>
+				<ObjectNumber displayMode="Currency" emphasized="false" number="{price}" unit="{currency}" useSymbol="false"/>
+			</CustomListItem>
+		</List>
+
+		<List
+			id="listFiveId"
+			headerText="Custom currencies with decimals"
+			items="{path: '/customCurrencyDataModel'}">
+			<CustomListItem>
+				<ObjectNumber displayMode="Currency" emphasized="false" number="{price}" unit="{currency}" useSymbol="false"/>
+			</CustomListItem>
+		</List>
+		<List
+			id="listSixId"
+			headerText="Different currencies with maxPrecision 3"
+			items="{path: '/variousNumberDataModel'}">
+			<CustomListItem>
+				<ObjectNumber displayMode="Currency" emphasized="false" number="{price}" unit="{currency}" useSymbol="false" maxPrecision="3"/>
+			</CustomListItem>
+		</List>
+	</l:Grid>
+</mvc:View>
