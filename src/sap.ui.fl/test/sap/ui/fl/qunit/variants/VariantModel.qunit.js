@@ -854,8 +854,6 @@ sap.ui.define([
 				changeType: "foo",
 				selector: { id: this.sVMReference }
 			})]);
-			sandbox.stub(FlexObjectState, "waitForFlexObjectsToBeApplied").resolves();
-
 			this.createModel = () => {
 				this.oModel = new VariantModel({}, {
 					appComponent: this.oComponent,
@@ -899,12 +897,11 @@ sap.ui.define([
 			);
 		});
 
-		QUnit.test("when calling 'setModel' of VariantManagement control", async function(assert) {
+		QUnit.test("when calling 'setModel' of VariantManagement control", function(assert) {
 			this.createModel();
 			var fnRegisterToModelSpy = sandbox.spy(this.oModel, "registerToModel");
 			this.oVariantManagement.setExecuteOnSelectionForStandardDefault(true);
 			sandbox.stub(this.oVariantManagement, "setShowExecuteOnSelection");
-			FlexObjectState.waitForFlexObjectsToBeApplied.resetHistory();
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 
 			assert.ok(
@@ -918,12 +915,6 @@ sap.ui.define([
 			assert.ok(
 				this.oVariantManagement.setShowExecuteOnSelection.calledWith(false),
 				"showExecuteOnSelection is set to false"
-			);
-			await fnRegisterToModelSpy.firstCall.returnValue;
-			await VariantManagementState.waitForVariantSwitch(sReference, this.sVMReference);
-			assert.strictEqual(
-				FlexObjectState.waitForFlexObjectsToBeApplied.callCount, 1,
-				"the initial changes promise was added to the variant switch promise"
 			);
 		});
 
@@ -952,12 +943,11 @@ sap.ui.define([
 			assert.strictEqual(oSetCallbackStub.callCount, 0, "then setDynamicVariantsLoadedCallback is not called");
 		});
 
-		QUnit.test("when 'registerToModel' is called, the apply step is wired into the variant switch chain before waitForFlexObjectsToBeApplied", async function(assert) {
+		QUnit.test("when 'registerToModel' is called, applyInitialChangesForExistingControls is wired into the switch promise", async function(assert) {
 			const oApplyStub = sandbox.stub(VariantManagerApply, "applyInitialChangesForExistingControls").resolves();
 
 			this.createModel();
 			const oRegisterSpy = sandbox.spy(this.oModel, "registerToModel");
-			FlexObjectState.waitForFlexObjectsToBeApplied.resetHistory();
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			await oRegisterSpy.firstCall.returnValue;
 			await VariantManagementState.waitForVariantSwitch(sReference, this.sVMReference);
@@ -974,10 +964,6 @@ sap.ui.define([
 					vmReference: this.sVMReference
 				},
 				"then it receives the expected property bag"
-			);
-			assert.ok(
-				oApplyStub.calledBefore(FlexObjectState.waitForFlexObjectsToBeApplied),
-				"then it runs before waitForFlexObjectsToBeApplied — otherwise the wait still hangs"
 			);
 		});
 

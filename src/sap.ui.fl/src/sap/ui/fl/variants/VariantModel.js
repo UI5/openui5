@@ -93,22 +93,6 @@ sap.ui.define([
 		}));
 	}
 
-	function waitForInitialVariantChanges(mPropertyBag) {
-		const aCurrentVariantChanges = VariantManagementState.getInitialUIChanges({
-			vmReference: mPropertyBag.vmReference,
-			reference: mPropertyBag.reference
-		});
-		const aSelectors = aCurrentVariantChanges.reduce((aCurrentControls, oChange) => {
-			const oSelector = oChange.getSelector();
-			const oControl = JsControlTreeModifier.bySelector(oSelector, mPropertyBag.appComponent);
-			if (oControl && Utils.indexOfObject(aCurrentControls, { selector: oControl }) === -1) {
-				aCurrentControls.push({ selector: oControl });
-			}
-			return aCurrentControls;
-		}, []);
-		return aSelectors.length ? FlexObjectState.waitForFlexObjectsToBeApplied(aSelectors, mPropertyBag.appComponent) : Promise.resolve();
-	}
-
 	/**
 	 * Constructor for a new sap.ui.fl.variants.VariantModel model.
 	 * @class Variant model implementation for JSON format.
@@ -411,11 +395,8 @@ sap.ui.define([
 			});
 		}
 
-		// the initial changes are not applied via a variant switch
-		// to enable early variant switches to work properly they need to wait for the initial changes
-		// so the initial changes are set as a variant switch.
-		// If the URL targets a variant that is not yet loaded, ensure it is loaded
-		// before the initial changes are awaited.
+		// Set initial changes as a variant switch so early switches wait for them.
+		// If the URL targets a variant that is not yet loaded, ensure it is loaded first.
 		const mParameters = {
 			appComponent: this.oAppComponent,
 			reference: this.sFlexReference,
@@ -430,12 +411,11 @@ sap.ui.define([
 				vmReference: this.sVMReference
 			})
 			.catch((oError) => {
-				// A failed lazy-load should not skip the initial-changes wait;
+				// A failed lazy-load should not skip the initial changes apply;
 				// getInitialCurrentVariant falls back to the default variant.
 				Log.error("URL-targeted variant lazy-load failed", oError);
 			})
 			.then(() => VariantManagerApply.applyInitialChangesForExistingControls(mParameters))
-			.then(() => waitForInitialVariantChanges(mParameters))
 		);
 	};
 
