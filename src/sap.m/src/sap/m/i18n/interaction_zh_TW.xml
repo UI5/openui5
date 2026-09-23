@@ -109,7 +109,7 @@
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
 				<p><span class="emphasis">若已啟用儲存格選擇：</span></p>
-				<p>If the focus is inside the table, and cells are selected, the selection of the cells is removed.</p>
+				<p>若焦點在表格內且已選擇儲存格，則會移除儲存格選擇。</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>F2</kbd> <description>
@@ -122,11 +122,11 @@
 		</interaction>
 		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">若已啟用儲存格選擇</span>：</p>
-				<p>若已選擇儲存格，則 <kbd>Shift + MouseClick</kbd> 在其他儲存格可增強至所點擊儲存格的選擇。</p>
+				<p>若已選擇儲存格，則 <kbd>Shift + MouseClick</kbd> 其他儲存格可增強對所點選儲存格的選擇。</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Copies the selected rows or cells to the clipboard (if available), and the feature is enabled.</p>
+				<p>若已啟用該功能，則會將所選的列或儲存格複製到剪貼簿 (若可用)。</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

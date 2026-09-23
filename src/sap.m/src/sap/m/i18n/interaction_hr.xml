@@ -109,7 +109,7 @@
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
 				<p><span class="emphasis">Ako je omogućen odabir ćelije:</span></p>
-				<p>If the focus is inside the table, and cells are selected, the selection of the cells is removed.</p>
+				<p>Ako je fokus unutar tabele, a ćelije su odabrane, odabir ćelija se uklanja.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>F2</kbd> <description>
@@ -117,16 +117,16 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>F7</kbd> <description>
-				<p>Ako je fokus unutar ćelije u modu uređivanja, premješta se na red.</p>
+				<p>Ako je fokus unutar ćelije u modu uređivanja, premješta se u red.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Ako je aktiviran odabir ćelije</span>:</p>
-				<p>Ako su ćelije odabrane, <kbd>Shift + MouseClick</kbd> na različitu ćeliju povećava odabir do kliknute ćelije.</p>
+				<p>ako su ćelije odabrane, <kbd>Shift + MouseClick</kbd> u različitoj ćeliji povećava odabir do kliknute ćelije.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Copies the selected rows or cells to the clipboard (if available), and the feature is enabled.</p>
+				<p>Kopira odabrane redove ili ćelije u međuspremnik (ako je raspoloživo), a obilježje se aktivira.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>
@@ -163,7 +163,7 @@
 				<p><kbd>Home</kbd></p>
 				<p>Pomiče stavku na vrh ako je dostupno.</p>
 				<p><kbd>End</kbd></p>
-				<p>Pomiče stavku na kraj ako je raspoloživo.</p>
+				<p>Pomiče stavku na kraj, ako je raspoloživo.</p>
 			</description>
 		</interaction>
 	</control-interactions>

@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>若焦點在儲存格、列選擇器或 <span class="uicontrol">[全選]</span> 上，則會切換 <span class="uicontrol">[全選]</span> 核取方塊：個別選擇或取消選擇所有列。</p>
+				<p>若焦點位於欄表頭儲存格上，則捷徑無效。</p>
+				<p>若焦點位於內文輸入欄位上，則捷徑無效，因為在此情況下瀏覽器會處理內文選擇。</p>
+				<p><span class="emphasis">若已啟用儲存格選擇：</span></p>
+				<p>若焦點位於儲存格上，則會選擇截至選擇限制的所有可用儲存格。若已選擇所有可用儲存格，則會移除儲存格選擇。</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>若焦點位於儲存格、列選擇器或 <span class="uicontrol">[全選]</span> 上，則會移除所有列的選擇。</p>
+				<p>若焦點位於欄表頭儲存格或內文輸入欄位上，則捷徑無效。</p>
 				<p><span class="emphasis">若已啟用儲存格選擇：</span></p>
 				<p>若焦點在表格內，則會移除任何列和儲存格選擇。</p>
 			</description>
@@ -176,11 +182,11 @@
 		</interaction>
 		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">若已啟用儲存格選擇：</span></p>
-				<p>若已選擇儲存格，則 <kbd>Shift + MouseClick</kbd> 在其他儲存格可增強至所點擊儲存格的選擇。</p>
+				<p>若已選擇儲存格，則 <kbd>Shift + MouseClick</kbd> 其他儲存格可增強對所點選儲存格的選擇。</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>若可用且已啟用該功能，則會將所選的列或儲存格複製到剪貼簿。</p>
+				<p>若已啟用該功能，則會將所選的列或儲存格複製到剪貼簿 (若可用)。</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

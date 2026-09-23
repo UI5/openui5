@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>אם המיקוד הוא בתא, בורר השורות, או <span class="uicontrol">'בחר הכול'</span>, זה מחליף את תיבת התיוג <span class="uicontrol">'בחר הכול'</span>: כל השורות נבחרות או שבחירתן מתבטלת בהתאמה.</p>
+				<p>לקיצור הדרך אין השפעה אם המיקוד הוא בתא כותרת עמודה.</p>
+				<p>לקיצור הדרך אין השפעה אם המיקוד הוא בשדה קלט טקסט, מכיוון שהדפדפן מטפל בבחירת הטקסט במקרה זה.</p>
+				<p><span class="emphasis">אם בחירת תא מופעלת:</span></p>
+				<p>אם המיקוד הוא על תא, כל התאים הזמינים נבחרים עד גבול הבחירה. אם כל התאים הזמינים כבר נבחרו, בחירת התאים מוסרת.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>אם המיקוד הוא על תא, בורר שורות או אפשרות <span class="uicontrol">בחר הכל</span>, בחירת כל השורות תבוטל.</p>
+				<p>לקיצור הדרך אין השפעה אם המיקוד הוא על תא כותרת עמודה או על שדה קלט טקסט.</p>
 				<p><span class="emphasis">אם בחירת תא מופעלת:</span></p>
 				<p>אם המיקוד הוא בתוך הטבלה, הבחירה עבור כל שורה ותא מוסרת.</p>
 			</description>
@@ -180,7 +186,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>מעתיק את השורות או התאים שנבחרו ללוח העריכה, אם זמין, והמאפיין הופעל.</p>
+				<p>מעתיק את השורות או התאים שנבחרו ללוח העריכה (אם זמין) והמאפיין הופעל.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Os yw'r ffocws ar gell, y dewisydd rhesi, neu <span class="uicontrol">Dewis Pob Un</span>, mae hyn yn toglo'r blwch ticio <span class="uicontrol">Dewis Pob Un</span>: Bydd pob rhes yn cael ei dewis neu ei dad-ddewis yn y drefn honno.</p>
+				<p>Nid oes unrhyw effaith i'r llwybr byr os yw'r ffocws ar gell pennawd colofn.</p>
+				<p>Nid oes unrhyw effaith i'r llwybr byr os yw'r ffocws ar faes mewnbynnu testun, gan fod y porwr yn rheoli'r broses o ddewis testun yn yr achos hwn.</p>
+				<p><span class="emphasis">Os yw dewis cell wedi'i alluogi:</span></p>
+				<p>Os yw'r ffocws ar gell, mae pob cell sydd ar gael yn cael ei dewis hyd at y terfyn dewis. Os yw pob cell sydd ar gael wedi'i dewis yn baros, mae'r dewis celloedd yn cael ei dynnu.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Os yw'r ffocws ar res, y dewisydd rhesi, neu <span class="uicontrol">Dewis Pob Un</span>, caiff y dewis o'r holl resi ei ddileu.</p>
+				<p>Nid oes unrhyw effaith i'r llwybr byr os yw'r ffocws ar gell pennawd colofn neu ar faes mewnbynnu testun.</p>
 				<p><span class="emphasis">Os yw dewis cell wedi'i alluogi:</span></p>
 				<p>Os yw'r ffocws y tu mewn i'r tabl, bydd y dewis ar gyfer unrhyw resi a chelloedd yn cael ei dynnu.</p>
 			</description>
@@ -180,7 +186,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Yn copïo’r rhesi neu'r celloedd a ddewiswyd i'r clipfwrdd, os yw ar gael a bod y nodwedd wedi'i galluogi.</p>
+				<p>Yn copïo’r rhesi neu'r celloedd a ddewiswyd i'r clipfwrdd (os yw ar gael), a bod y nodwedd wedi'i galluogi.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

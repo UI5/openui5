@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Jeśli fokus jest ustawiony na komórce, selektorze wiersza lub opcji <span class="uicontrol">Wybierz wszystkie</span>, to powoduje przełączenie stanu pola wyboru <span class="uicontrol">Wybierz wszystkie</span>: wszystkie wiersze zostają zaznaczone lub następuje usunięcie ich zaznaczenia.</p>
+				<p>Skrót nie działa, jeśli fokus jest ustawiony na komórce nagłówka kolumny.</p>
+				<p>Skrót nie działa, jeśli fokus jest ustawiony na polu wprowadzania tekstu, ponieważ w takim przypadku przeglądarka obsługuje zaznaczenie tekstu.</p>
+				<p><span class="emphasis">Jeśli zaznaczanie komórki jest włączone:</span></p>
+				<p>Jeśli fokus jest ustawiony na komórce, wszystkie dostępne komórki są zaznaczane do limitu zaznaczenia. Jeśli wszystkie dostępne komórki są już zaznaczone, zaznaczenie komórki jest usuwane.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Jeśli fokus jest ustawiony na komórce, selektorze wiersza lub opcji <span class="uicontrol">Wybierz wszystkie</span>, zaznaczenie wszystkich wierszy jest usuwane.</p>
+				<p>Skrót nie działa, jeśli fokus jest ustawiony na komórce nagłówka kolumny lub na polu wprowadzania tekstu.</p>
 				<p><span class="emphasis">Jeśli zaznaczanie komórki jest włączone:</span></p>
 				<p>Jeśli fokus jest ustawiony wewnątrz tabeli, następuje usunięcie zaznaczenia wszelkich wierszy i komórek.</p>
 			</description>
@@ -180,7 +186,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Kopiuje zaznaczone wiersze lub komórki do schowka, jeśli są dostępne, a ta funkcja jest włączona.</p>
+				<p>Kopiuje zaznaczone wiersze lub komórki do schowka (jeśli dostępne), a ta funkcja jest włączona.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

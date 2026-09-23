@@ -157,10 +157,16 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Kui fookus on lahtril, reaselektoril või märkeruudul <span class="uicontrol">Vali kõik</span>, lülitab see ümber märkeruudu <span class="uicontrol">Vali kõik</span> oleku: vastavalt valitakse kõik read või tühistatakse nende valik.</p>
+				<p>Otsetee ei mõjuta seda, kui fookus on veerupäise lahtril.</p>
+				<p>Otsetee ei mõjuta seda, kui fookus on tekstisisestusväljal, kuna sel juhul tegeleb tekstivalikuga brauser.</p>
+				<p><span class="emphasis">Kui lahtrivalik on lubatud</span></p>
+				<p>Kui fookus on lahtril, valitakse kõik saadaolevad lahtrid valiku limiidini. Kui kõik saadaolevad lahtrid on juba valitud, eemaldatakse lahtrivalik.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Kui lahtrivalik on lubatud</span></p>
+				<p>Kui fookus on lahtril, reavalijal või käsul <span class="uicontrol">Vali kõik</span>, eemaldatakse kõigi ridade valik.</p>
+				<p>Otsetee ei mõjuta seda, kui fookus on veerupäise lahtril või tekstisisestusväljal.</p>
+				<p><span class="emphasis">Kui lahtrivalik on lubatud:</span></p>
 				<p>Kui fookus on tabelis, eemaldatakse mis tahes ridade ja lahtrite valik.</p>
 			</description>
 		</interaction>

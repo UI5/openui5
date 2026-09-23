@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Hvis fokus er på en celle, rækkevælgeren eller <span class="uicontrol">Vælg alt</span>, skifter dette afkrydsningsfeltet <span class="uicontrol">Vælg alt</span>: Alle rækker vælges eller fravælges.</p>
+				<p>Genvejen har ingen effekt, hvis fokus er på en kolonneoverskriftscelle.</p>
+				<p>Genvejen har ingen effekt, hvis fokus er på et tekstinputfelt, da browseren håndterer tekstvalget i dette tilfælde.</p>
+				<p><span class="emphasis">Hvis cellevalg er aktiveret:</span></p>
+				<p>Hvis fokus er på en celle, vælges alle tilgængelige celler op til valggrænsen. Hvis alle tilgængelige celler allerede er valgt, fjernes cellevalget.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Hvis fokus er på en celle, rækkevælgeren eller <span class="uicontrol">Vælg alle</span>, fjernes valget af alle rækker.</p>
+				<p>Genvejen har ingen effekt, hvis fokus er på en kolonneoverskriftscelle eller på et tekstinputfelt.</p>
 				<p><span class="emphasis">Hvis cellevalg er aktiveret:</span></p>
 				<p>Hvis fokus er inde i tabellen, fjernes valget for alle rækker og celler.</p>
 			</description>
@@ -180,7 +186,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Kopierer de valgte rækker eller celler til udklipsholderen, hvis den er tilgængelig, og hvis funktionen er aktiveret.</p>
+				<p>Kopierer de valgte rækker eller celler til udklipsholderen (hvis den er tilgængelig), og hvis funktionen er aktiveret.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

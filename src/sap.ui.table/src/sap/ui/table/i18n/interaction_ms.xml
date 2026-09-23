@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Jika fokus berada pada sel, pemilih baris atau <span class="uicontrol">Pilih Semua</span>, tindakan ini menogol kotak semak <span class="uicontrol">Pilih Semua</span>: Semua baris dipilih atau dinyahpilih masing-masing.</p>
+				<p>Pintasan tidak mempunyai kesan jika fokus berada pada sel pengepala lajur.</p>
+				<p>Pintasan tidak mempunyai kesan jika fokus berada pada medan input teks kerana pelayar mengendalikan pemilihan teks dalam kes ini.</p>
+				<p><span class="emphasis">Jika pemilihan sel didayakan:</span></p>
+				<p>Jika fokus berada pada sel, semua sel yang tersedia dipilih sehingga had pemilihan. Jika semua sel yang tersedia telah dipilih, pemilihan sel telah dikeluarkan.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Jika fokus berada pada sel, pemilih baris, atau <span class="uicontrol">Pilih Semua</span>, pemilihan semua baris akan dikeluarkan.</p>
+				<p>Pintasan tidak mempunyai kesan jika fokus berada pada sel pengepala lajur atau pada medan input teks.</p>
 				<p><span class="emphasis">Jika pemilihan sel didayakan:</span></p>
 				<p>Jika fokus berada di dalam jadual, pemilihan untuk mana-mana baris dan sel dikeluarkan.</p>
 			</description>
@@ -180,7 +186,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Salin baris atau sel dipilih ke papan klip jika tersedia, dan ciri didayakan.</p>
+				<p>Salin baris atau sel dipilih ke papan klip (jika tersedia), dan ciri didayakan.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

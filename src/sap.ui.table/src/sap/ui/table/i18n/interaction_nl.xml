@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Als de focus op een cel, de rijselector of <span class="uicontrol">Alles selecteren</span> ligt, schakelt dit het aankruisvakje <span class="uicontrol">Alles selecteren</span> om. Alle rijen worden geselecteerd of gedeselecteerd, afhankelijk van de situatie.</p>
+				<p>De snelkoppeling heeft geen effect als de focus op een kolomkopcel ligt.</p>
+				<p>De snelkoppeling heeft geen effect als de focus op een tekstinvoerveld ligt, omdat de browser in dit geval de tekstselectie verwerkt.</p>
+				<p><span class="emphasis">Als celselectie is ingeschakeld:</span></p>
+				<p>Als de focus op een cel ligt, worden alle beschikbare cellen geselecteerd tot aan de selectielimiet. Als alle beschikbare cellen al zijn geselecteerd, wordt de celselectie verwijderd.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Als de focus op een cel, de rijselectie of <span class="uicontrol">Alles selecteren</span> ligt, wordt de selectie van alle rijen verwijderd.</p>
+				<p>De snelkoppeling heeft geen effect als de focus op een kolomkopcel of een tekstinvoerveld ligt.</p>
 				<p><span class="emphasis">Als celselectie is ingeschakeld:</span></p>
 				<p>Als de focus binnen de tabel ligt, wordt de selectie van rijen en cellen verwijderd.</p>
 			</description>
@@ -176,7 +182,7 @@
 		</interaction>
 		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Als celselectie is ingeschakeld:</span></p>
-				<p>Als de cellen zijn geselecteerd, wordt door <kbd>Shift + MouseClick</kbd> op een andere cel de selectie tot de geklikte cel uitgebreid.</p>
+				<p>Als cellen zijn geselecteerd, wordt door <kbd>Shift + MouseClick</kbd> op een andere cel de selectie uitgebreid tot de cel waarop is geklikt.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>

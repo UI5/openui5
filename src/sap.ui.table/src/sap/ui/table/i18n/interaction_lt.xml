@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Jei suaktyvintas langelis, eilučių parinkiklis arba <span class="uicontrol">Žymėti viską</span>, perjungiamas žymės langelis <span class="uicontrol">Žymėti viską</span>: visos eilutės atitinkamai pažymimos arba atžymimos.</p>
+				<p>Nuoroda neturi įtakos, jei suaktyvintas stulpelio antraštės langelis.</p>
+				<p>Spartusis klavišas neturi jokios įtakos, jei suaktyvintas teksto įvesties laukas, nes šiuo atveju naršyklė apdoroja teksto pasirinkimą.</p>
+				<p><span class="emphasis">Jei įgalintas langelių pasirinkimas:</span></p>
+				<p>Jei suaktyvintas langelis, visi galimi langeliai pasirenkami iki pasirinkimo limito. Jei visi galimi langeliai jau pasirinkti, langelių pasirinkimas pašalinamas.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Jei suaktyvintas langelis, eilučių parinkiklis arba <span class="uicontrol">Žymėti viską</span>, pašalinamas visų eilučių pasirinkimas.</p>
+				<p>Nuoroda neturi įtakos, jei suaktyvintas stulpelio antraštės langelis arba teksto įvesties laukas.</p>
 				<p><span class="emphasis">Jei įgalintas langelių pasirinkimas:</span></p>
 				<p>Jei suaktyvinta lentelėje, pašalinamas visų eilučių ir langelių pasirinkimas.</p>
 			</description>
@@ -180,7 +186,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Esant galimybei ir įjungus funkciją pasirinktos eilutės ir langeliai nukopijuojami į mainų sritį.</p>
+				<p>Įjungus funkciją pasirinktos eilutės ir langeliai nukopijuojami į mainų sritį (esant galimybei).</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

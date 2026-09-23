@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Jos kohdistus on solussa, rivivalitsimessa tai <span class="uicontrol">Valitse kaikki</span> -valintaruudussa, tämä vaihtelee <span class="uicontrol">Valitse kaikki</span> -valintaruutua: joko kaikki rivit valitaan tai kaikkien rivien valinnat poistetaan.</p>
+				<p>Pikakuvakkeella ei ole vaikutusta, jos kohdistus on sarakeotsikkosolussa.</p>
+				<p>Pikakuvakkeella ei ole vaikutusta, jos kohdistus on tekstin syöttökentässä, koska selain käsittelee tässä tapauksessa tekstivalinnan.</p>
+				<p><span class="emphasis">Jos solun valinta on käytössä:</span></p>
+				<p>Jos kohdistus on solussa, kaikki käytettävissä olevat solut valitaan valintarajaan asti. Jos kaikki käytettävissä olevat solut on jo valittu, solun valinta poistetaan.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Jos kohdistus on solussa, rivivalitsimessa tai kohdassa <span class="uicontrol">Valitse kaikki</span>, kaikkien rivien valinta poistetaan.</p>
+				<p>Pikakuvakkeella ei ole vaikutusta, jos kohdistus on sarakeotsikkosolussa tai tekstin syöttökentässä.</p>
 				<p><span class="emphasis">Jos solun valinta on käytössä:</span></p>
 				<p>Jos kohdistus on taulukon sisällä, kaikkien rivien ja solujen valinta poistetaan.</p>
 			</description>
@@ -180,7 +186,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Kopioi valitut rivit tai solut leikepöydälle, jos toiminto on käytettävissä ja aktivoitu.</p>
+				<p>Kopioi valitut rivit tai solut leikepöydälle (jos käytettävissä) ja toiminto on aktivoitu.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

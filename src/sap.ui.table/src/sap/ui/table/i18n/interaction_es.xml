@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Si el enfoque está en una celda, en el selector de filas o en <span class="uicontrol">Seleccionar todo</span>, esto alterna la casilla }<span class="uicontrol">Seleccionar todo</span>. Se seleccionan o se desmarcan todas las filas, respectivamente.</p>
+				<p>El acceso directo no tiene efecto si el foco está en una celda de encabezado de columna.</p>
+				<p>El acceso directo no tiene efecto si el foco está en un campo de entrada de texto, ya que en este caso el navegador gestiona la selección del texto.</p>
+				<p><span class="emphasis">Si la selección de celdas está activada:</span></p>
+				<p>Si el foco está en una celda, se seleccionan todas las celdas disponibles hasta alcanzar el límite de selección. Si todas las celdas disponibles ya están seleccionadas, se elimina la selección de celdas.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Si el foco está en una celda, en el selector de filas o en <span class="uicontrol">Seleccionar todo</span>, se quita la selección de todas las filas.</p>
+				<p>El acceso directo no funciona si el foco está en una celda de encabezado de columna o en un campo de entrada de texto.</p>
 				<p><span class="emphasis">Si la selección de celdas está activada:</span></p>
 				<p>Si el enfoque está dentro de la tabla, se quita la selección de todas las filas y celdas.</p>
 			</description>
@@ -176,11 +182,11 @@
 		</interaction>
 		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Si la selección de celdas está activada:</span></p>
-				<p>Si hay celdas seleccionadas, al presionar <kbd>Shift + MouseClick</kbd> en otra celda se amplía la selección hasta la celda en la que se hizo clic.</p>
+				<p>Si hay celdas seleccionadas, <kbd>Shift + MouseClick</kbd> en otra celda se amplía la selección hasta la celda en la que se hizo clic.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Copia las filas o celdas seleccionadas en el portapapeles, si está disponible y en caso de que la función esté activada.</p>
+				<p>Copia las filas o celdas seleccionadas al portapapeles (si está disponible) y la función está activada.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

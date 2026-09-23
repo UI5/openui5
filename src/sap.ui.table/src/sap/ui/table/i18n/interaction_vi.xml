@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Nếu tiêu điểm đang ở trên một ô, bộ chọn hàng hoặc <span class="uicontrol">Chọn tất cả</span>, thao tác này sẽ đảo trạng thái của ô đánh dấu <span class="uicontrol">Chọn tất cả</span>: Tất cả các hàng sẽ được chọn hoặc bỏ chọn tương ứng.</p>
+				<p>Phím tắt không có tác dụng nếu tiêu điểm đang nằm trên ô tiêu đề cột.</p>
+				<p>Phím tắt không có tác dụng nếu tiêu điểm đang nằm trên trường nhập văn bản, vì trình duyệt xử lý việc lựa chọn văn bản trong trường hợp này.</p>
+				<p><span class="emphasis">Nếu lựa chọn ô được bật:</span></p>
+				<p>Nếu tiêu điểm đang nằm trên một ô, tất cả các ô có sẵn sẽ được chọn cho đến khi đạt giới hạn lựa chọn. Nếu tất cả ô có sẵn đã được chọn, thì việc lựa chọn ô sẽ bị loại bỏ.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Nếu tiêu điểm đang nằm trên một ô, trình chọn hàng, hoặc <span class="uicontrol">Chọn tất cả</span>, thì việc lựa chọn tất cả các hàng sẽ bị loại bỏ.</p>
+				<p>Phím tắt không có tác dụng nếu tiêu điểm đang nằm trên ô tiêu đề cột hoặc trên trường nhập văn bản.</p>
 				<p><span class="emphasis">Nếu lựa chọn ô được bật:</span></p>
 				<p>Nếu tiêu điểm nằm bên trong bảng, lựa chọn bất kỳ hàng hoặc ô nào sẽ bị loại bỏ.</p>
 			</description>
@@ -176,11 +182,11 @@
 		</interaction>
 		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Nếu lựa chọn ô được bật:</span></p>
-				<p>Nếu các ô đang được chọn, <kbd>Shift + MouseClick</kbd> trên một ô khác sẽ mở rộng phạm vi chọn đến ô được nhấp.</p>
+				<p>Nếu các ô được chọn, <kbd>Shift + MouseClick</kbd> trên một ô khác sẽ mở rộng lựa chọn đến ô được nhấp.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Sao chép các hàng hoặc ô đã chọn vào clipboard nếu có sẵn, và tính năng này được bật. </p>
+				<p>Sao chép các hàng hoặc ô đã chọn vào clipboard (nếu có) và tính năng được bật.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

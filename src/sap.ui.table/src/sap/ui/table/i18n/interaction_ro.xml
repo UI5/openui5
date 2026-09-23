@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Dacă focalizarea este pe celulă, selector de linie sau <span class="uicontrol">Selectare tot</span>, acest lucru comută caseta de marcaj <span class="uicontrol">Selectare tot</span>: toate liniile sunt selectate sau, respectiv, deselectate.</p>
+				<p>Shortcutul nu are niciun efect dacă focalizarea este pe o celulă de antet de coloană.</p>
+				<p>Shortcutul nu are niciun efect dacă focalizarea este pe un câmp de intrare text, deoarece browserul gestionează selecția textului în acest caz.</p>
+				<p><span class="emphasis">Dacă selecția celulei este activată:</span></p>
+				<p>Dacă focalizarea este pe o celulă, toate celulele disponibile sunt selectate până la limita de selecție. Dacă toate celulele disponibile sunt deja selectate, selecția celulei este eliminată.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Dacă focalizarea este pe o celulă, un selector de linie sau pe <span class="uicontrol">Selectare tot</span>, selecția tuturor liniilor este eliminată.</p>
+				<p>Shortcutul nu are niciun efect dacă focalizarea este pe o celulă de antet de coloană sau pe un câmp de intrare a textului.</p>
 				<p><span class="emphasis">Dacă selecția celulei este activată:</span></p>
 				<p>Dacă selecția este în interiorul tabelului, este eliminată selecția pentru orice linie sau celulă.</p>
 			</description>
@@ -180,7 +186,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Copiază liniile selectate sau celulele în clipboard, dacă opțiunea este disponibilă și caracteristica activată.</p>
+				<p>Copiază liniile sau celulele selectate în clipboard, dacă opțiunea este disponibilă și caracteristica activată.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>
