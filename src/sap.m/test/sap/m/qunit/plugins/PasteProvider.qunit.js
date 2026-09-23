@@ -7,8 +7,9 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
 	"sap/ui/core/ShortcutHintsMixin",
-	"sap/ui/qunit/utils/nextUIUpdate"
-], function(Button, Table, OverflowToolbarButton, PasteProvider, Device, Element, Library, ShortcutHintsMixin, nextUIUpdate) {
+	"sap/ui/qunit/utils/nextUIUpdate",
+	"sap/ui/events/KeyCodes"
+], function(Button, Table, OverflowToolbarButton, PasteProvider, Device, Element, Library, ShortcutHintsMixin, nextUIUpdate, KeyCodes) {
 
 	"use strict";
 	/*global sinon, QUnit, ClipboardEvent, DataTransfer */
@@ -113,7 +114,6 @@ sap.ui.define([
 		assert.ok(this.oTable.$().hasClass("sapMPluginsPasteProviderHighlight"));
 		assert.equal(document.activeElement, getPopover().$().find("[contenteditable]")[0]);
 
-		getPopover().$().trigger("keypress");
 		triggerPasteEvent(getPopover().getDomRef(), sClipboardText);
 		assert.ok(this.oPluginPasteSpy.calledWithMatch({ text: sClipboardText, data: [["Aa", "Bb"], ["Cc", "Dd"]] }));
 		assert.ok(this.oAssociationPasteSpy.calledOnce);
@@ -149,6 +149,18 @@ sap.ui.define([
 		this.oButton.firePress();
 
 		assert.ok(this.oTable.$(sPasteRegionId).hasClass("sapMPluginsPasteProviderHighlight"));
+
+		const oKeypressEvent = new KeyboardEvent("keypress", { bubbles: true });
+		const oKeypressPreventSpy = sinon.spy(oKeypressEvent, "preventDefault");
+		getPopover().getDomRef().dispatchEvent(oKeypressEvent);
+		assert.ok(oKeypressPreventSpy.calledOnce, "keypress is prevented");
+
+		[{key: "Backspace", keyCode: KeyCodes.BACKSPACE}, {key: "Delete", keyCode: KeyCodes.DELETE}].forEach(function(oKeyInfo) {
+			const oKeydownEvent = new KeyboardEvent("keydown", { key: oKeyInfo.key, keyCode: oKeyInfo.keyCode, bubbles: true });
+			const oPreventDefaultSpy = sinon.spy(oKeydownEvent, "preventDefault");
+			getPopover().getDomRef().dispatchEvent(oKeydownEvent);
+			assert.ok(oPreventDefaultSpy.calledOnce, oKeyInfo.key + " keydown is prevented");
+		});
 
 		triggerPasteEvent(getPopover().getDomRef(), sClipboardText);
 		assert.ok(this.oPluginPasteSpy.calledWithMatch({ text: sClipboardText, data: [["Dd", "Bb"], ["Cc", "Aa"]] }));
