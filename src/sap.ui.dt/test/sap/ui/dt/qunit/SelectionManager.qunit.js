@@ -17,11 +17,11 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	var sandbox = sinon.createSandbox();
+	const sandbox = sinon.createSandbox();
 
 	QUnit.module("Given a DesignTime instance", {
 		async beforeEach(assert) {
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			this.oLayout = new VerticalLayout({
 				content: [
 					this.oButton1 = new Button("button1"),
@@ -55,12 +55,12 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when get() is called", function(assert) {
-			var aSelection = this.oSelectionManager.get();
+			const aSelection = this.oSelectionManager.get();
 			assert.ok(Array.isArray(aSelection));
 		});
 
 		QUnit.test("when get() is called make sure that returned value is immutable", function(assert) {
-			var aSelection = this.oSelectionManager.get();
+			const aSelection = this.oSelectionManager.get();
 			assert.strictEqual(aSelection.length, 0);
 			aSelection.push(this.oButton1Overlay);
 			assert.strictEqual(this.oSelectionManager.get().length, 0);
@@ -68,11 +68,11 @@ sap.ui.define([
 
 		QUnit.test("when set() is called with one overlay", function(assert) {
 			assert.expect(6);
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			assert.strictEqual(this.oSelectionManager.get().length, 0, "nothing is selected before the execution");
 
 			this.oSelectionManager.attachChange(function(oEvent) {
-				var aSelection = oEvent.getParameter("selection");
+				const aSelection = oEvent.getParameter("selection");
 				assert.deepEqual(aSelection, this.oSelectionManager.get(), "selection change event is fired with a correct selection");
 				assert.strictEqual(aSelection.length, 1, "one overlay is selected after the execution");
 				assert.strictEqual(this.oButton1Overlay.isSelected(), true, "the overlay is selected");
@@ -85,7 +85,7 @@ sap.ui.define([
 
 		QUnit.test("when set() is called with an empty parameter (and selection exists)", function(assert) {
 			assert.expect(5);
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			this.oSelectionManager.set(this.oButton1Overlay);
 			assert.strictEqual(this.oSelectionManager.get().length, 1, "one overlay is selected before the execution");
 
@@ -101,7 +101,7 @@ sap.ui.define([
 
 		QUnit.test("when set() is called without parameter (and nothing is selected)", function(assert) {
 			assert.strictEqual(this.oSelectionManager.set(), false);
-			var oSpy = sandbox.spy();
+			const oSpy = sandbox.spy();
 			this.oSelectionManager.attachChange(oSpy);
 			assert.strictEqual(this.oSelectionManager.get().length, 0);
 			assert.ok(oSpy.notCalled);
@@ -109,7 +109,7 @@ sap.ui.define([
 
 		QUnit.test("when set() is called with an array of overlays", function(assert) {
 			assert.expect(6);
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			assert.strictEqual(this.oSelectionManager.get().length, 0, "nothing is selected before the execution");
 
 			this.oSelectionManager.attachChange(function(oEvent) {
@@ -125,7 +125,7 @@ sap.ui.define([
 
 		QUnit.test("when set() is called with one element", function(assert) {
 			assert.expect(5);
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			assert.strictEqual(this.oSelectionManager.get().length, 0, "nothing is selected before the execution");
 
 			this.oSelectionManager.attachChange(function(oEvent) {
@@ -140,7 +140,7 @@ sap.ui.define([
 
 		QUnit.test("when set() is called with an array of elements", function(assert) {
 			assert.expect(6);
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			assert.strictEqual(this.oSelectionManager.get().length, 0, "nothing is selected before the execution");
 
 			this.oSelectionManager.attachChange(function(oEvent) {
@@ -158,12 +158,12 @@ sap.ui.define([
 			this.oSelectionManager.set(this.oButton1Overlay);
 			assert.strictEqual(this.oSelectionManager.get().length, 1, "one overlay is selected before the execution");
 
-			var oSpy = sandbox.spy();
+			const oSpy = sandbox.spy();
 			this.oSelectionManager.attachChange(oSpy);
 
 			this.oButton2Overlay.setSelectable(false);
 
-			var bResult = this.oSelectionManager.set(this.oButton2Overlay);
+			const bResult = this.oSelectionManager.set(this.oButton2Overlay);
 
 			assert.strictEqual(bResult, false);
 			assert.strictEqual(this.oSelectionManager.get().length, 1, "nothing changed");
@@ -172,9 +172,23 @@ sap.ui.define([
 			assert.ok(oSpy.notCalled);
 		});
 
+		QUnit.test("when set() is called with a mix of a valid overlay and an element without an overlay, the unknown element is filtered out", function(assert) {
+			const fnDone = assert.async();
+
+			this.oSelectionManager.attachChange(function(oEvent) {
+				const aSelection = oEvent.getParameter("selection");
+				assert.strictEqual(aSelection.length, 1, "only the valid overlay is selected, the unknown element is dropped");
+				assert.ok(this.oButton1Overlay.isSelected(), "Button1 overlay is selected");
+				assert.notOk(this.oButton2Overlay.isSelected(), "Button2 overlay is not selected");
+				fnDone();
+			}, this);
+
+			assert.strictEqual(this.oSelectionManager.set([this.oButton1Overlay, new Button()]), true);
+		});
+
 		QUnit.test("when set() is called with one element without an overlay", function(assert) {
 			assert.expect(5);
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 
 			this.oSelectionManager.set(this.oButton1Overlay);
 			assert.strictEqual(this.oSelectionManager.get().length, 1, "one overlay is selected before the execution");
@@ -191,7 +205,7 @@ sap.ui.define([
 
 		QUnit.test("when set() is called with a mixed array (overlays/elements)", function(assert) {
 			assert.expect(6);
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			assert.strictEqual(this.oSelectionManager.get().length, 0, "nothing is selected before the execution");
 
 			this.oSelectionManager.attachChange(function(oEvent) {
@@ -209,9 +223,9 @@ sap.ui.define([
 			this.oSelectionManager.set(this.oButton1Overlay);
 			assert.strictEqual(this.oSelectionManager.get().length, 1, "one overlay is selected before the execution");
 			assert.ok(this.oButton1Overlay.isSelected(), "overlay for button1 is selected before the execution");
-			var oSpy = sandbox.spy();
+			const oSpy = sandbox.spy();
 			this.oSelectionManager.attachChange(oSpy);
-			var bResult = this.oSelectionManager.add();
+			const bResult = this.oSelectionManager.add();
 			assert.strictEqual(bResult, false);
 			assert.strictEqual(this.oSelectionManager.get().length, 1, "it is still one overlay selected after the execution");
 			assert.ok(this.oButton1Overlay.isSelected(), "the selection didn't change");
@@ -220,7 +234,7 @@ sap.ui.define([
 
 		QUnit.test("when add() is called with one overlay", function(assert) {
 			assert.expect(7);
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			this.oSelectionManager.set(this.oButton1Overlay);
 			assert.strictEqual(this.oSelectionManager.get().length, 1, "one overlay is selected before the execution");
 			assert.ok(this.oButton1Overlay.isSelected(), "overlay for button1 is selected before the execution");
@@ -238,7 +252,7 @@ sap.ui.define([
 
 		QUnit.test("when add() is called with an array of overlays", function(assert) {
 			assert.expect(8);
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			this.oSelectionManager.set(this.oButton1Overlay);
 			assert.strictEqual(this.oSelectionManager.get().length, 1, "one overlay is selected before the execution");
 			assert.ok(this.oButton1Overlay.isSelected(), "overlay for button1 is selected before the execution");
@@ -257,7 +271,7 @@ sap.ui.define([
 
 		QUnit.test("when add() is called with one element", function(assert) {
 			assert.expect(5);
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			assert.strictEqual(this.oSelectionManager.get().length, 0, "nothing is selected before the execution");
 
 			this.oSelectionManager.attachChange(function(oEvent) {
@@ -272,7 +286,7 @@ sap.ui.define([
 
 		QUnit.test("when add() is called with an array of elements", function(assert) {
 			assert.expect(6);
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			assert.strictEqual(this.oSelectionManager.get().length, 0, "nothing is selected before the execution");
 
 			this.oSelectionManager.attachChange(function(oEvent) {
@@ -291,10 +305,10 @@ sap.ui.define([
 			assert.strictEqual(this.oSelectionManager.get().length, 1, "one overlay is selected before the execution");
 
 			this.oButton2Overlay.setSelectable(false);
-			var oSpy = sandbox.spy();
+			const oSpy = sandbox.spy();
 			this.oSelectionManager.attachChange(oSpy);
 
-			var oResult = this.oSelectionManager.add(this.oButton2Overlay);
+			const oResult = this.oSelectionManager.add(this.oButton2Overlay);
 
 			assert.strictEqual(oResult, false);
 			assert.strictEqual(this.oSelectionManager.get().length, 1, "one overlay is selected after the execution");
@@ -306,10 +320,10 @@ sap.ui.define([
 		QUnit.test("when add() is called with with an overlay which is already selected", function(assert) {
 			this.oSelectionManager.set(this.oButton1Overlay);
 			assert.strictEqual(this.oSelectionManager.get().length, 1, "one overlay is selected before the execution");
-			var oSpy = sandbox.spy();
+			const oSpy = sandbox.spy();
 			this.oSelectionManager.attachChange(oSpy);
 
-			var bResult = this.oSelectionManager.add(this.oButton1Overlay);
+			const bResult = this.oSelectionManager.add(this.oButton1Overlay);
 
 			assert.strictEqual(bResult, false);
 			assert.strictEqual(this.oSelectionManager.get().length, 1, "one overlay is selected after the execution");
@@ -320,7 +334,7 @@ sap.ui.define([
 			this.oSelectionManager.set(this.oButton1Overlay);
 			assert.strictEqual(this.oSelectionManager.get().length, 1, "one overlay is selected before the execution");
 
-			var bResult = this.oSelectionManager.add(new Button());
+			const bResult = this.oSelectionManager.add(new Button());
 
 			assert.strictEqual(bResult, false);
 			assert.strictEqual(this.oSelectionManager.get().length, 1, "one overlay is selected after the execution");
@@ -329,7 +343,7 @@ sap.ui.define([
 
 		QUnit.test("when add() is called with a mixed array (overlays/elements)", function(assert) {
 			assert.expect(8);
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			this.oSelectionManager.set(this.oButton1Overlay);
 			assert.strictEqual(this.oSelectionManager.get().length, 1, "one overlay is selected before the execution");
 			assert.ok(this.oButton1Overlay.isSelected(), "overlay of Button1 is selected before the execution");
@@ -349,11 +363,11 @@ sap.ui.define([
 		QUnit.test("when add() is called with one selectable overlay and another non-selectable overlay", function(assert) {
 			assert.strictEqual(this.oSelectionManager.get().length, 0, "nothing is selected before the execution");
 
-			var oSpy = sandbox.spy();
+			const oSpy = sandbox.spy();
 			this.oSelectionManager.attachChange(oSpy);
 			this.oButton2Overlay.setSelectable(false);
 
-			var bResult = this.oSelectionManager.add([this.oButton1Overlay, this.oButton2Overlay]);
+			const bResult = this.oSelectionManager.add([this.oButton1Overlay, this.oButton2Overlay]);
 
 			assert.strictEqual(bResult, false);
 			assert.strictEqual(this.oSelectionManager.get().length, 0, "nothing is selected after the execution");
@@ -366,9 +380,9 @@ sap.ui.define([
 			this.oSelectionManager.set(this.oButton1Overlay);
 			assert.strictEqual(this.oSelectionManager.get().length, 1, "one overlay is selected before the execution");
 
-			var oSpy = sandbox.spy();
+			const oSpy = sandbox.spy();
 			this.oSelectionManager.attachChange(oSpy);
-			var bResult = this.oSelectionManager.remove();
+			const bResult = this.oSelectionManager.remove();
 
 			assert.strictEqual(bResult, false);
 			assert.strictEqual(this.oSelectionManager.get().length, 1, "it is still one overlay selected after the execution");
@@ -378,7 +392,7 @@ sap.ui.define([
 
 		QUnit.test("when remove() is called with one overlay", function(assert) {
 			assert.expect(6);
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			this.oSelectionManager.set([this.oButton1Overlay, this.oButton2Overlay]);
 			assert.strictEqual(this.oSelectionManager.get().length, 2, "two overlays are selected before the execution");
 
@@ -395,7 +409,7 @@ sap.ui.define([
 
 		QUnit.test("when remove() is called with an array of overlays", function(assert) {
 			assert.expect(5);
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			this.oSelectionManager.set([this.oButton1Overlay, this.oButton2Overlay, this.oLayoutOverlay]);
 			assert.strictEqual(this.oSelectionManager.get().length, 3, "three overlays are selected before the execution");
 
@@ -411,7 +425,7 @@ sap.ui.define([
 
 		QUnit.test("when remove() is called with one element", function(assert) {
 			assert.expect(5);
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			this.oSelectionManager.set([this.oButton1Overlay, this.oButton2Overlay]);
 			assert.strictEqual(this.oSelectionManager.get().length, 2, "two overlays are selected before the execution");
 
@@ -427,7 +441,7 @@ sap.ui.define([
 
 		QUnit.test("when remove() is called with an array of elements", function(assert) {
 			assert.expect(5);
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			this.oSelectionManager.set([this.oButton1Overlay, this.oButton2Overlay, this.oLayoutOverlay]);
 			assert.strictEqual(this.oSelectionManager.get().length, 3, "three overlays are selected before the execution");
 
@@ -445,10 +459,10 @@ sap.ui.define([
 			this.oSelectionManager.set([this.oButton1Overlay, this.oButton2Overlay]);
 			assert.strictEqual(this.oSelectionManager.get().length, 2, "two overlays are selected before the execution");
 
-			var oSpy = sandbox.spy();
+			const oSpy = sandbox.spy();
 			this.oSelectionManager.attachChange(oSpy);
 
-			var bResult = this.oSelectionManager.remove(this.oLayoutOverlay);
+			const bResult = this.oSelectionManager.remove(this.oLayoutOverlay);
 
 			assert.strictEqual(bResult, false);
 			assert.strictEqual(this.oSelectionManager.get().length, 2, "three overlays are selected after the execution");
@@ -461,10 +475,10 @@ sap.ui.define([
 			this.oSelectionManager.set([this.oButton1, this.oButton2]);
 			assert.strictEqual(this.oSelectionManager.get().length, 2, "two overlays are selected before the execution");
 
-			var oSpy = sandbox.spy();
+			const oSpy = sandbox.spy();
 			this.oSelectionManager.attachChange(oSpy);
 
-			var bResult = this.oSelectionManager.remove(this.oLayout);
+			const bResult = this.oSelectionManager.remove(this.oLayout);
 
 			assert.strictEqual(bResult, false);
 			assert.strictEqual(this.oSelectionManager.get().length, 2, "three overlays are selected after the execution");
@@ -477,7 +491,7 @@ sap.ui.define([
 			this.oSelectionManager.set([this.oButton1, this.oButton2]);
 			assert.strictEqual(this.oSelectionManager.get().length, 2, "two overlays are selected before the execution");
 
-			var bResult = this.oSelectionManager.remove(new Button());
+			const bResult = this.oSelectionManager.remove(new Button());
 
 			assert.strictEqual(bResult, false);
 			assert.strictEqual(this.oSelectionManager.get().length, 2, "two overlays are selected after the execution");
@@ -487,7 +501,7 @@ sap.ui.define([
 
 		QUnit.test("when remove() is called with a mixed array (overlays/elements)", function(assert) {
 			assert.expect(7);
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			this.oSelectionManager.set([this.oButton1Overlay, this.oButton2Overlay, this.oLayoutOverlay]);
 			assert.strictEqual(this.oSelectionManager.get().length, 3, "three overlays are selected before the execution");
 
@@ -505,7 +519,7 @@ sap.ui.define([
 
 		QUnit.test("when reset() is called", function(assert) {
 			assert.strictEqual(this.oSelectionManager.get().length, 0, "nothing is selected before the execution");
-			var oSpy = sandbox.spy();
+			const oSpy = sandbox.spy();
 			this.oSelectionManager.attachChange(oSpy);
 			assert.strictEqual(this.oSelectionManager.reset(), false);
 			assert.ok(oSpy.notCalled);
@@ -513,7 +527,7 @@ sap.ui.define([
 
 		QUnit.test("when reset() is called with pre-selected overlay", function(assert) {
 			assert.expect(5);
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			this.oSelectionManager.set(this.oButton1Overlay);
 			assert.strictEqual(this.oSelectionManager.get().length, 1, "one overlay is selected before the execution");
 
@@ -528,10 +542,10 @@ sap.ui.define([
 		});
 
 		QUnit.test("when an element overlay with connected elements is selected and deselected", function(assert) {
-			var fnDone = assert.async();
-			var oConnectedElements = this.oSelectionManager.getConnectedElements();
-			var sButtonId1 = this.oButton1.getId();
-			var sButtonId2 = this.oButton2.getId();
+			const fnDone = assert.async();
+			const oConnectedElements = this.oSelectionManager.getConnectedElements();
+			const sButtonId1 = this.oButton1.getId();
+			const sButtonId2 = this.oButton2.getId();
 			oConnectedElements[sButtonId1] = sButtonId2;
 			oConnectedElements[sButtonId2] = sButtonId1;
 
@@ -567,7 +581,7 @@ sap.ui.define([
 
 		QUnit.test("when addValidator()/removeValidator() are called with a custom validator", function(assert) {
 			// Validator allows to select only overlays for sap.m.Button control
-			var fnCustomValidator = function(aElementOverlays) {
+			const fnCustomValidator = function(aElementOverlays) {
 				return aElementOverlays.every(function(oElementOverlay) {
 					return oElementOverlay.getElement() instanceof Button;
 				});
@@ -583,6 +597,33 @@ sap.ui.define([
 
 			assert.strictEqual(this.oSelectionManager.set([this.oButton1Overlay, this.oButton2Overlay]), true);
 			assert.strictEqual(this.oSelectionManager.set([this.oButton1Overlay, this.oLayoutOverlay]), true);
+		});
+		QUnit.test("when set() is called with the same overlay twice, it is deduplicated to a single selection", function(assert) {
+			assert.expect(3);
+			const fnDone = assert.async();
+
+			this.oSelectionManager.attachChange(function(oEvent) {
+				const aSelection = oEvent.getParameter("selection");
+				assert.strictEqual(aSelection.length, 1, "only one overlay is selected despite duplicates");
+				assert.ok(this.oButton1Overlay.isSelected(), "Button1 overlay is selected");
+				fnDone();
+			}, this);
+
+			assert.strictEqual(this.oSelectionManager.set([this.oButton1Overlay, this.oButton1Overlay]), true);
+		});
+
+		QUnit.test("when set() is called with an overlay and its underlying element (both resolve to same overlay), it is deduplicated", function(assert) {
+			assert.expect(3);
+			const fnDone = assert.async();
+
+			this.oSelectionManager.attachChange(function(oEvent) {
+				const aSelection = oEvent.getParameter("selection");
+				assert.strictEqual(aSelection.length, 1, "only one overlay is selected despite overlay+element pointing to same overlay");
+				assert.ok(this.oButton1Overlay.isSelected(), "Button1 overlay is selected");
+				fnDone();
+			}, this);
+
+			assert.strictEqual(this.oSelectionManager.set([this.oButton1Overlay, this.oButton1]), true);
 		});
 	});
 

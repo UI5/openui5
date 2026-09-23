@@ -37,7 +37,7 @@ function(
 	 * @since 1.54
 	 * @alias sap.ui.dt.SelectionManager
 	 */
-	var SelectionManager = ManagedObject.extend("sap.ui.dt.SelectionManager", {
+	const SelectionManager = ManagedObject.extend("sap.ui.dt.SelectionManager", {
 		metadata: {
 			events: {
 				change: {
@@ -58,22 +58,13 @@ function(
 	});
 
 	function getOverlays(vObjects) {
-		return Util.castArray(vObjects)
-		// Get overlays
-		.map(function(oObject) {
+		const aMapped = Util.castArray(vObjects).map((oObject) => {
 			if (oObject instanceof ElementOverlay) {
 				return oObject;
 			}
-
-			var oElementOverlay = OverlayRegistry.getOverlay(oObject);
-			if (oElementOverlay) {
-				return oElementOverlay;
-			}
-		})
-		// Filter out not found overlays & duplicates
-		.filter(function(oElementOverlay, iIndex, aSource) {
-			return oElementOverlay && aSource.indexOf(oElementOverlay) === iIndex;
+			return OverlayRegistry.getOverlay(oObject);
 		});
+		return [...new Set(aMapped.filter(Boolean))];
 	}
 
 	function selectableValidator(aElementOverlays) {
@@ -83,10 +74,10 @@ function(
 	}
 
 	function highlightConnectedOverlay(oElementOverlay, bAdd) {
-		var sConnectedElementId = this.getConnectedElements()[oElementOverlay.getAssociation("element")];
-		var oConnectedOverlay = OverlayRegistry.getOverlay(sConnectedElementId);
+		const sConnectedElementId = this.getConnectedElements()[oElementOverlay.getAssociation("element")];
+		const oConnectedOverlay = OverlayRegistry.getOverlay(sConnectedElementId);
 		if (oConnectedOverlay) {
-			var sFunctionName = bAdd ? "addStyleClass" : "removeStyleClass";
+			const sFunctionName = bAdd ? "addStyleClass" : "removeStyleClass";
 			oConnectedOverlay[sFunctionName]("sapUiDtOverlaySelected");
 		}
 	}
@@ -140,11 +131,11 @@ function(
 	 * @public
 	 */
 	SelectionManager.prototype.set = function(vObjects) {
-		var aElementOverlays = getOverlays(vObjects);
-		var bResult = false;
+		const aElementOverlays = getOverlays(vObjects);
+		let bResult = false;
 
 		if (this._validate(aElementOverlays)) {
-			var aElementOverlaysToRemove = this.get().filter(function(oElementOverlay) {
+			const aElementOverlaysToRemove = this.get().filter(function(oElementOverlay) {
 				return !aElementOverlays.includes(oElementOverlay);
 			});
 
@@ -168,7 +159,7 @@ function(
 	};
 
 	SelectionManager.prototype._add = function(aElementOverlays) {
-		var aCurrentSelection = this.get();
+		const aCurrentSelection = this.get();
 
 		// Filter out already selected overlays
 		aElementOverlays = aElementOverlays.filter(function(oElementOverlay) {
@@ -176,7 +167,7 @@ function(
 		});
 
 		if (aElementOverlays.length) {
-			var aNextSelection = aCurrentSelection.concat(aElementOverlays);
+			const aNextSelection = aCurrentSelection.concat(aElementOverlays);
 
 			if (this._validate(aNextSelection)) {
 				this._aSelection = aNextSelection;
@@ -217,9 +208,9 @@ function(
 	};
 
 	SelectionManager.prototype._remove = function(aElementOverlays) {
-		var aCurrentSelection = this.get();
+		const aCurrentSelection = this.get();
 
-		var aNextSelection = aCurrentSelection.filter(function(oElementOverlay) {
+		const aNextSelection = aCurrentSelection.filter(function(oElementOverlay) {
 			return !aElementOverlays.includes(oElementOverlay);
 		});
 
