@@ -1722,7 +1722,7 @@ sap.ui.define([
 			assert.ok(true, "the function resolves");
 
 			const oDeferred = new Deferred();
-			VariantManagementState.setVariantSwitchPromise(sReference, sVMReference, oDeferred.promise);
+			VariantManagementState.setVariantSwitchPromise(sReference, sVMReference, () => oDeferred.promise);
 			VariantManagementState.waitForVariantSwitch(sReference, sVMReference).then(() => {
 				assert.ok(true, "the promise is resolved");
 				done();
@@ -1737,8 +1737,8 @@ sap.ui.define([
 
 			const oDeferred = new Deferred();
 			const oDeferred2 = new Deferred();
-			VariantManagementState.setVariantSwitchPromise(sReference, "someVMReference", oDeferred.promise);
-			VariantManagementState.setVariantSwitchPromise(sReference, "someOtherVMReference", oDeferred2.promise);
+			VariantManagementState.setVariantSwitchPromise(sReference, "someVMReference", () => oDeferred.promise);
+			VariantManagementState.setVariantSwitchPromise(sReference, "someOtherVMReference", () => oDeferred2.promise);
 			VariantManagementState.waitForAllVariantSwitches(sReference).then(() => {
 				assert.ok(true, "the promise is resolved");
 				done();

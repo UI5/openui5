@@ -119,13 +119,8 @@ sap.ui.define([
 	 * @private
 	 */
 	VariantManagerApply.executeAfterSwitch = function(fnCallback, sFlexReference, sVMReference) {
-		const oNewPromise = VariantManagementState.waitForVariantSwitch(sFlexReference, sVMReference)
-		.catch(function() {
-			// Catch previous errors to not block the queue
-		})
-		.then(fnCallback);
-		VariantManagementState.setVariantSwitchPromise(sFlexReference, sVMReference, oNewPromise);
-		return oNewPromise;
+		VariantManagementState.setVariantSwitchPromise(sFlexReference, sVMReference, fnCallback);
+		return VariantManagementState.waitForVariantSwitch(sFlexReference, sVMReference);
 	};
 
 	/**
