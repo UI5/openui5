@@ -9,7 +9,7 @@ sap.ui.define([], () => {
 	 * @namespace
 	 * @alias sap.ui.mdc.util.ExportUtils
 	 * @ui5-restricted sap.ui.mdc
-	 * @since 1.151
+	 * @since 1.153
 	 */
 	const ExportUtils = {
 		/**
