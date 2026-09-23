@@ -161,6 +161,9 @@ sap.ui.define([
 		assert.equal(Object.keys(currentState)[0], "test_1", "Correct key provided in state");
 		assert.equal(currentState["test_1"][0].operator, "EQ", "Correct operator provided");
 		assert.deepEqual(currentState["test_1"][0].values, ["ABC"], "Correct value provided");
+
+		currentState["test_1"][0].values[0] = "XYZ";
+		assert.equal(currentState["test_1"][0].values[0], "XYZ", "Condition value can be mutated");
 	});
 
 	QUnit.test("Check #changesToState", function(assert){
