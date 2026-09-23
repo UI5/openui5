@@ -75,6 +75,7 @@ describe("sap.m.PlanningCalendarPicker", function() {
 		element(by.id("inputFocusHelper")).click(); //clean up - make sure no popups are opened
 	});
 	it("should check that date, month, year picker work properly in days view under 600px", function () {
+		element(by.id("PC1-Header-ActionsToolbar-overflowButton")).click();
 		element(by.id("PC1-Header-ViewSwitch")).click();
 		element(by.cssContainingText(".sapMSelectListItem", "Days")).click();
 		element(by.id("PC1-Header-NavToolbar-PickerBtn")).click();
@@ -86,6 +87,7 @@ describe("sap.m.PlanningCalendarPicker", function() {
 		element(by.id("inputFocusHelper")).click(); //clean up - make sure no popups are opened
 	});
 	it("should check that year picker works properly in months view under 600px", function () {
+		element(by.id("PC1-Header-ActionsToolbar-overflowButton")).click();
 		element(by.id("PC1-Header-ViewSwitch")).click();
 		element(by.cssContainingText(".sapMSelectListItem", "Months")).click();
 		element(by.id("PC1-Header-NavToolbar-PickerBtn")).click();
@@ -93,6 +95,7 @@ describe("sap.m.PlanningCalendarPicker", function() {
 		element(by.id("inputFocusHelper")).click(); //clean up - make sure no popups are opened
 	});
 	it("should check that date, month and year picker work properly in 1 week view under 600px", function() {
+		element(by.id("PC1-Header-ActionsToolbar-overflowButton")).click();
 		element(by.id("PC1-Header-ViewSwitch")).click();
 		element(by.cssContainingText(".sapMSelectListItem", "1 Week")).click();
 		element(by.id("PC1-Header-NavToolbar-PickerBtn")).click();
@@ -104,6 +107,7 @@ describe("sap.m.PlanningCalendarPicker", function() {
 		element(by.id("inputFocusHelper")).click(); //clean up - make sure no popups are opened
 	});
 	it("should check that month and year picker work properly in 1 month view under 600px", function () {
+		element(by.id("PC1-Header-ActionsToolbar-overflowButton")).click();
 		element(by.id("PC1-Header-ViewSwitch")).click();
 		element(by.cssContainingText(".sapMSelectListItem", "1 Month")).click();
 		element(by.id("PC1-Header-NavToolbar-PickerBtn")).click();
