@@ -11,9 +11,10 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/Renderer",
 	"sap/ui/core/library",
-	"sap/ui/core/InvisibleText"
+	"sap/ui/core/InvisibleText",
+	"sap/ui/events/KeyCodes"
 ],
-	function(library, ListItemBase, PluginBase, Device, Element, Renderer, coreLibrary, InvisibleText) {
+	function(library, ListItemBase, PluginBase, Device, Element, Renderer, coreLibrary, InvisibleText, KeyCodes) {
 	"use strict";
 
 
@@ -264,12 +265,26 @@ sap.ui.define([
 
 	Column.prototype.onsapspace = function(oEvent) {
 		if (oEvent.srcControl === this) {
+			// the press is handled on keyup, only remember that space was pressed on the column
+			this._bSpacePressed = true;
+			oEvent.preventDefault();
+		}
+	};
+
+	Column.prototype.onkeyup = function(oEvent) {
+		if (oEvent.which === KeyCodes.SPACE && oEvent.srcControl === this && this._bSpacePressed) {
+			this._bSpacePressed = false;
 			this.informTable("Press");
 			oEvent.preventDefault();
 		}
 	};
 
-	Column.prototype.onsapenter = Column.prototype.onsapspace;
+	Column.prototype.onsapenter = function(oEvent) {
+		if (oEvent.srcControl === this) {
+			this.informTable("Press");
+			oEvent.preventDefault();
+		}
+	};
 
 	Column.prototype.oncontextmenu = function (oEvent) {
 		var oMenu = this.getHeaderMenuInstance();
