@@ -1313,6 +1313,81 @@ sap.ui.define([
 			}
 		};
 
+		const oManifest_BoundCalendarSettings = {
+			"_version": "1.90.0",
+			"sap.app": {
+				"id": "card.explorer.simple.calendar.card",
+				"type": "card",
+				"title": "Sample of a List with Highlight",
+				"subTitle": "Sample of a Calendar with Highlight",
+				"applicationVersion": {
+					"version": "1.0.0"
+				},
+				"shortTitle": "A short title for this Card",
+				"info": "Additional information about this Card",
+				"description": "A long description for this Card",
+				"tags": {
+					"keywords": [
+						"Calendar",
+						"Highlight",
+						"Card",
+						"Sample"
+					]
+				}
+			},
+			"sap.card": {
+				"type": "Calendar",
+				"data": {
+					"json": {
+						"weekNumbering": "ISO_8601",
+						"use12HourFormat": true,
+						"item": [
+							{
+								"start": "2020-09-18T09:00",
+								"end": "2020-09-18T10:00",
+								"title": "Payment reminder",
+								"icon": "sap-icon://desktop-mobile",
+								"type": "Type06",
+								"url": "http://sap.com"
+							},
+							{
+								"start": "2020-09-18T17:00",
+								"end": "2020-09-18T17:30",
+								"title": "Private appointment",
+								"icon": "sap-icon://desktop-mobile",
+								"type": "Type07"
+							}
+						]
+					}
+				},
+				"header": {
+					"title": "My calendar"
+				},
+				"content": {
+					"date": "2020-09-18",
+					"maxItems": 5,
+					"maxLegendItems": 5,
+					"noItemsText": "You have nothing planned for this day",
+					"calendarWeekNumbering": "{/weekNumbering}",
+					"use12HourFormat": "{/use12HourFormat}",
+					"item": {
+						"template": {
+							"startDate": "{start}",
+							"endDate": "{end}",
+							"title": "{title}",
+							"text": "{text}",
+							"icon": {
+								"src": "{icon}",
+								"visible": true
+							},
+							"type": "{type}"
+						},
+						"path": "/item"
+					}
+				}
+			}
+		};
+
 		var oManifest_MultipleLegendItems = {
 			"_version": "1.14.0",
 			"sap.app": {
@@ -1568,6 +1643,75 @@ sap.ui.define([
 			assert.equal(aLegendItems[4].type, oManifestData.legendItem[4].type, "Third appointment legend item type is correct");
 			assert.equal(aLegendItems[5].text, oManifestData.legendItem[5].text, "Fourth appointment legend item text is correct");
 			assert.equal(aLegendItems[5].type, oManifestData.legendItem[5].type, "Fourth appointment legend item type is correct");
+		});
+
+		QUnit.test("getStaticConfiguration - calendarWeekNumbering is included", async function (assert) {
+			// Arrange - manifest with explicit calendarWeekNumbering
+			const oManifest = JSON.parse(JSON.stringify(oManifest_Simple));
+			oManifest["sap.card"].content.calendarWeekNumbering = "ISO_8601";
+
+			this.oCard.setManifest(oManifest);
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			const oStaticConfiguration = this.oCard.getAggregation("_content").getStaticConfiguration();
+
+			// Assert
+			assert.strictEqual(oStaticConfiguration.calendarWeekNumbering, "ISO_8601", "calendarWeekNumbering is included in getStaticConfiguration()");
+		});
+
+		QUnit.test("getStaticConfiguration - calendarWeekNumbering defaults to 'Default' when not set in manifest", async function (assert) {
+			// Arrange - manifest without calendarWeekNumbering
+			this.oCard.setManifest(oManifest_Simple);
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			const oStaticConfiguration = this.oCard.getAggregation("_content").getStaticConfiguration();
+
+			// Assert - should always be present, falling back to the control's default
+			assert.strictEqual(oStaticConfiguration.calendarWeekNumbering, "Default", "calendarWeekNumbering defaults to 'Default' when not set in manifest");
+		});
+
+		QUnit.test("getStaticConfiguration - use12HourFormat is included", async function (assert) {
+			const oManifest = JSON.parse(JSON.stringify(oManifest_Simple));
+			oManifest["sap.card"].content.use12HourFormat = true;
+
+			this.oCard.setManifest(oManifest);
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			const oStaticConfiguration = this.oCard.getAggregation("_content").getStaticConfiguration();
+
+			assert.strictEqual(oStaticConfiguration.use12HourFormat, true, "use12HourFormat is included in getStaticConfiguration()");
+		});
+
+		QUnit.test("getStaticConfiguration - use12HourFormat defaults to false when not set in manifest", async function (assert) {
+			this.oCard.setManifest(oManifest_Simple);
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			const oStaticConfiguration = this.oCard.getAggregation("_content").getStaticConfiguration();
+
+			assert.strictEqual(oStaticConfiguration.use12HourFormat, false, "use12HourFormat defaults to false when not set in manifest");
+		});
+
+		QUnit.test("getStaticConfiguration - calendarWeekNumbering and use12HourFormat resolved from data binding", async function (assert) {
+			// Arrange - both settings are bound from the card's JSON data model
+			this.oCard.setManifest(oManifest_BoundCalendarSettings);
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			const oCalendarContent = this.oCard.getAggregation("_content");
+			const oStaticConfiguration = oCalendarContent.getStaticConfiguration();
+
+			// Assert - values should be resolved from the data model, not from literals
+			assert.strictEqual(oStaticConfiguration.calendarWeekNumbering, "ISO_8601", "calendarWeekNumbering is correctly resolved from data binding");
+			assert.strictEqual(oStaticConfiguration.use12HourFormat, true, "use12HourFormat is correctly resolved from data binding");
 		});
 
 		QUnit.module("Parameters", {
