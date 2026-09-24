@@ -157,15 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>フォーカスがセル、行セレクタ、または<span class="uicontrol">すべて選択</span>にある場合、これにより<span class="uicontrol">すべて選択</span>チェックボックスが切り替わります。これに応じて、すべての行が選択されるか、または選択が解除されます。</p>
-				<p>フォーカスが列ヘッダセルにある場合、ショートカットは影響しません。</p>
-				<p>The shortcut has no effect if the focus is on a text input field, as the browser handles the text selection in this case.</p>
+				<p>フォーカスが列ヘッダセルにある場合、ショートカットは機能しません。</p>
+				<p>フォーカスがテキスト入力フィールドにある場合、ショートカットは機能しません。このような場合、テキスト選択はブラウザによって処理されます。</p>
 				<p><span class="emphasis">セル選択が有効な場合:</span></p>
-				<p>フォーカスがセルにある場合、選択制限までに利用可能なすべてのセルが選択されます。利用可能なすべてのセルがすでに選択されている場合、セル選択は削除されます。</p>
+				<p>フォーカスがセルにある場合、選択の限度まで、利用可能なすべてのセルが選択されます。利用可能なすべてのセルがすでに選択されている場合、そのセル選択は削除されます。</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p>If the focus is on a cell, the row selector, or <span class="uicontrol">Select All</span>, the selection of all rows is removed.</p>
-				<p>The shortcut has no effect if the focus is on a column header cell or on a text input field.</p>
+				<p>フォーカスがセル、行セレクタ、または<span class="uicontrol">すべて選択</span>にある場合、すべての行の選択が削除されます。</p>
+				<p>フォーカスが列ヘッダセルまたはテキスト入力フィールドにある場合、ショートカットは機能しません。</p>
 				<p><span class="emphasis">セル選択が有効な場合:</span></p>
 				<p>フォーカスがテーブル内部にある場合、行またはセルの選択が解除されます。</p>
 			</description>
@@ -186,11 +186,11 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Copies the selected rows or cells to the clipboard (if available), and the feature is enabled.</p>
+				<p>選択した行またはセルがクリップボードにコピーされ (利用可能な場合)、機能が有効化されます。</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>
-				<p>この機能が有効化されている場合は、コンテンツがクリップボードからペーストされます。</p>
+				<p>この機能が有効化されている場合は、コンテンツがクリップボードからペーストされます</p>
 			</description>
 		</interaction>
 	</control-interactions>
