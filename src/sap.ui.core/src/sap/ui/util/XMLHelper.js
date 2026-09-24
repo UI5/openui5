@@ -16,7 +16,7 @@ sap.ui.define(['sap/ui/Device'], function(Device) {
 
 	/**
 	 * Parses the specified XML string into an XML document, using the native parsing functionality of the
-	 * browser. If an error occurs during parsing, a {@link module:sap/base/util/XMLHelper.XMLParseErrorInfo
+	 * browser. If an error occurs during parsing, a {@link module:sap/ui/util/XMLHelper.XMLParseErrorInfo
 	 * parse error info object} is attached as the <code>parseError</code> property of the returned document.
 	 *
 	 * @param {string} sXMLText An XML string
@@ -48,7 +48,7 @@ sap.ui.define(['sap/ui/Device'], function(Device) {
 	 *
 	 * Note that the set of properties with meaningful content differs between browsers.
 	 *
-	 * @typedef {object} module:sap/base/util/XMLHelper.XMLParseErrorInfo
+	 * @typedef {object} module:sap/ui/util/XMLHelper.XMLParseErrorInfo
 	 * @property {int} [errorCode=-1]
 	 * @property {sap.ui.core.URI} [url=""]
 	 * @property {string} [reason="unknown error"]
@@ -69,7 +69,7 @@ sap.ui.define(['sap/ui/Device'], function(Device) {
 	 *
 	 * @param {XMLDocument} oDocument
 	 *    The parsed XML document
-	 * @returns {module:sap/base/util/XMLHelper.XMLParseErrorInfo}
+	 * @returns {module:sap/ui/util/XMLHelper.XMLParseErrorInfo}
 	 *    A browser-specific error info object if errors were found, or an object with an <code>errorCode<code> of 0 only
 	 * @public
 	 * @static

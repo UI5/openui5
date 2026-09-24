@@ -109,7 +109,7 @@
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
 				<p><span class="emphasis">Hücre seçimi etkinleştirildiyse:</span></p>
-				<p>If the focus is inside the table, and cells are selected, the selection of the cells is removed.</p>
+				<p>Odak tablonun içindeyse ve hücreler seçiliyse hücrelerin seçimi kaldırılır.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>F2</kbd> <description>
@@ -126,7 +126,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Copies the selected rows or cells to the clipboard (if available), and the feature is enabled.</p>
+				<p>Varsa ve özellik etkinleştirilmişse seçilen satırları veya hücreleri panoya kopyalar.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>
@@ -137,11 +137,11 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Görünümlerim diyaloğunu açar.</p>
+				<p>Görünümlerim iletişim kutusunu açar.</p>
 			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Görünümlerim diyaloğunun hata açılır menüsünü kapatır</p>
+				<p>Görünümlerim iletişim kutusunun hata açılır menüsünü kapatır</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Enter</kbd> <description>

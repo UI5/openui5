@@ -157,10 +157,16 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Se o foco estiver em uma célula, seletor de linhas ou <span class="uicontrol">Selecionar tudo</span>, isso muda a caixa de seleção <span class="uicontrol">Selecionar tudo</span>: todas as linhas são marcadas ou desmarcadas, respectivamente.</p>
+				<p>O atalho não tem efeito se o foco estiver em uma célula do cabeçalho da coluna.</p>
+				<p>O atalho não tem efeito se o foco estiver em um campo de entrada de texto, uma vez que o navegador trata a seleção de texto neste caso.</p>
+				<p><span class="emphasis">Se a seleção de células estiver ativada:</span></p>
+				<p>Se o foco estiver em uma célula, todas as células disponíveis são selecionadas até o limite de seleção. Se todas as células disponíveis já estiverem selecionadas, a seleção de células será removida.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Se a seleção de células for ativada:</span></p>
+				<p>Se o foco estiver em uma célula, o seletor de linhas ou <span class="uicontrol">Selecionar tudo</span>, a seleção de todas as linhas é removida.</p>
+				<p>O atalho não tem efeito se o foco estiver em uma célula do cabeçalho da coluna ou em um campo do texto de entrada.</p>
+				<p><span class="emphasis">Se a seleção de células estiver ativada:</span></p>
 				<p>Se o foco estiver dentro da tabela, a seleção para qualquer linha ou célula é removida.</p>
 			</description>
 		</interaction>
@@ -180,11 +186,11 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Copia as linhas ou células selecionadas para o clipboard, se disponível, e o recurso é ativado.</p>
+				<p>Copia as linhas ou células selecionadas para o clipboard (se estiverem disponíveis) e a funcionalidade é ativada.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>
-				<p>Cola o conteúdo do clipboard, se o recurso estiver ativado.</p>
+				<p>Cola o conteúdo do clipboard, se a funcionalidade estiver ativada.</p>
 			</description>
 		</interaction>
 	</control-interactions>

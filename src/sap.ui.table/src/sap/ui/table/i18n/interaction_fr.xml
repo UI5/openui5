@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Si la zone activée se trouve sur une cellule, le sélecteur de cellule ou la case à cocher <span class="uicontrol">Sélectionner tout</span>, cela active/désactive la case à cocher <span class="uicontrol">Sélectionner tout</span>&#x00a0;: toutes les lignes sont respectivement sélectionnées ou désélectionnées.</p>
+				<p>Le raccourci n'a aucun effet si la zone activée se trouve sur une cellule d'intitulé de colonne.</p>
+				<p>Le raccourci n'a aucun effet si la zone activée se trouve sur une zone de saisie de texte, car le navigateur gère la sélection de texte dans ce cas.</p>
+				<p><span class="emphasis">Si la sélection de cellule est activée&#x00a0;:</span></p>
+				<p>Si la zone activée se trouve sur une cellule, toutes les cellules disponibles sont sélectionnées jusqu'à la limite de sélection. Si toutes les cellules disponibles sont déjà sélectionnées, la sélection de cellule est supprimée.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Si la zone activée se trouve sur une cellule, le sélecteur de ligne ou la case à cocher <span class="uicontrol">Sélectionner tout</span>, la sélection de toutes les lignes est supprimée.</p>
+				<p>Le raccourci n'a aucun effet si la zone activée se trouve sur une cellule d'intitulé de colonne ou une zone de saisie de texte.</p>
 				<p><span class="emphasis">Si la sélection de cellule est activée&#x00a0;:</span></p>
 				<p>Si la zone activée se trouve à l'intérieur de la table, la sélection de toutes les lignes et cellules est supprimée.</p>
 			</description>
@@ -180,11 +186,11 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Copie les lignes ou cellules sélectionnées vers le presse-papiers, si cette option est disponible et si la fonctionnalité est activée.</p>
+				<p>Copie les lignes ou cellules sélectionnées dans le presse-papiers (si disponible) et la fonctionnalité est activée.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>
-				<p>Colle le contenu à partir du presse-papiers, si la fonctionnalité est activée.</p>
+				<p>Colle le contenu du presse-papiers, si la fonctionnalité est activée.</p>
 			</description>
 		</interaction>
 	</control-interactions>

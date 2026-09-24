@@ -109,11 +109,11 @@
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
 				<p><span class="emphasis">Si la selección de celdas está activada:</span></p>
-				<p>If the focus is inside the table, and cells are selected, the selection of the cells is removed.</p>
+				<p>Si el foco está dentro de la tabla y hay celdas seleccionadas, se anula la selección de las celdas.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>F2</kbd> <description>
-				<p>Alterna el enfoque entre la celda y su contenido si la celda tiene elementos interactivos como un campo de entrada o botón (con la excepción del texto de solo lectura).</p>
+				<p>Alterna el foco entre la celda y su contenido si la celda tiene elementos interactivos como un campo de entrada o botón (con la excepción del texto de solo lectura).</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>F7</kbd> <description>
@@ -126,7 +126,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Copies the selected rows or cells to the clipboard (if available), and the feature is enabled.</p>
+				<p>Copia las filas o celdas seleccionadas al portapapeles, si la función está disponible y activada.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>
@@ -149,7 +149,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + S</kbd> <description>
-				<p>Guarda los cambios hechos a las vistas.</p>
+				<p>Guarda los cambios realizados en las vistas.</p>
 			</description>
 		</interaction>
 	</control-interactions>

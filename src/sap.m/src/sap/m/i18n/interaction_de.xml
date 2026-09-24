@@ -96,20 +96,20 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
-				<p><span class="emphasis">If multiple row selection is enabled:</span></p>
-				<p>Wenn der Fokus auf einer Zeile, einer Zelle oder einem Control innerhalb einer Zelle liegt, wird die Auswahl umgeschaltet. Wenn nicht alle Zeilen markiert wurden, sind nun alle Zeilen markiert. Wenn alle Zeilen bereits markiert waren, wird die Markierung aller Zeilen entfernt.</p>
-				<p>Das Tastaturkürzel hat keine Auswirkung, wenn der Fokus auf einer Spaltenkopfzelle oder einem Texteingabefeld liegt, da der Browser in diesem Fall die Textauswahl behandelt.</p>
+				<p><span class="emphasis">Wenn die Markierung mehrerer Zeilen aktiviert ist:</span></p>
+				<p>Wenn der Fokus auf einer Zeile, einer Zelle oder einem Control innerhalb einer Zelle liegt, wird die Markierung aktiviert/deaktiviert. Wenn nicht alle Zeilen markiert waren, sind nun alle Zeilen markiert. Wenn alle Zeilen bereits markiert waren, wird die Markierung aller Zeilen entfernt.</p>
+				<p>Das Tastaturkürzel hat keine Auswirkung, wenn der Fokus auf einer Spaltenkopfzelle oder einem Texteingabefeld liegt, da der Browser in diesem Fall die Textmarkierung steuert.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">If multiple row selection is enabled:</span></p>
-				<p>Wenn der Fokus auf einer Zeile, einer Zelle oder einem Control innerhalb einer Zelle liegt, wird die Auswahl aller Zeilen entfernt.</p>
-				<p>Das Tastaturkürzel hat keine Auswirkung, wenn der Fokus auf einer Spaltenkopfzelle oder einem Texteingabefeld liegt, da der Browser in diesem Fall die Textauswahl behandelt.</p>
+				<p><span class="emphasis">Wenn die Markierung mehrerer Zeilen aktiviert ist:</span></p>
+				<p>Wenn der Fokus auf einer Zeile, einer Zelle oder einem Control innerhalb einer Zelle liegt, wird die Markierung aller Zeilen entfernt.</p>
+				<p>Das Tastaturkürzel hat keine Auswirkung, wenn der Fokus auf einer Spaltenkopfzelle oder einem Texteingabefeld liegt, da der Browser in diesem Fall die Textmarkierung steuert.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
 				<p><span class="emphasis">Wenn die Zellenmarkierung aktiviert ist:</span></p>
-				<p>If the focus is inside the table, and cells are selected, the selection of the cells is removed.</p>
+				<p>Wenn der Fokus innerhalb der Tabelle liegt und Zellen markiert sind, wird die Markierung der Zellen entfernt.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>F2</kbd> <description>
@@ -126,7 +126,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Copies the selected rows or cells to the clipboard (if available), and the feature is enabled.</p>
+				<p>Kopiert die markierten Zeilen oder Zellen in die Zwischenablage, falls verfügbar und die Funktion aktiviert ist.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

@@ -1,0 +1,97 @@
+<mvc:View
+	controllerName="sap.m.sample.ObjectNumberCurrency.C"
+	xmlns:l="sap.ui.layout"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m">
+
+	<l:VerticalLayout
+		class="sapUiContentPadding"
+		width="100%">
+
+		<Label text="Currency Mode — symbol (default)" class="sapUiSmallMarginTop" design="Bold" />
+		<l:HorizontalLayout class="sapUiContentPadding">
+			<ObjectNumber
+				class="sapUiSmallMarginEnd"
+				displayMode="Currency"
+				useSymbol="true"
+				binding="{/items/0}"
+				number="{number}"
+				unit="{currency}" />
+			<ObjectNumber
+				class="sapUiSmallMarginEnd"
+				displayMode="Currency"
+				useSymbol="true"
+				binding="{/items/1}"
+				number="{number}"
+				unit="{currency}"
+				state="Error" />
+			<ObjectNumber
+				class="sapUiSmallMarginEnd"
+				displayMode="Currency"
+				useSymbol="true"
+				binding="{/items/2}"
+				number="{number}"
+				unit="{currency}"
+				state="Warning" />
+			<ObjectNumber
+				class="sapUiSmallMarginEnd"
+				displayMode="Currency"
+				useSymbol="true"
+				binding="{/items/3}"
+				number="{number}"
+				unit="{currency}"
+				state="Success" />
+			<ObjectNumber
+				displayMode="Currency"
+				useSymbol="true"
+				binding="{/items/4}"
+				number="{number}"
+				unit="{currency}"
+				state="Information" />
+		</l:HorizontalLayout>
+
+		<Label text="Currency Mode — ISO code" class="sapUiSmallMarginTop" design="Bold" />
+		<l:HorizontalLayout class="sapUiContentPadding">
+			<ObjectNumber
+				class="sapUiSmallMarginEnd"
+				displayMode="Currency"
+				useSymbol="false"
+				binding="{/items/0}"
+				number="{number}"
+				unit="{currency}" />
+			<ObjectNumber
+				class="sapUiSmallMarginEnd"
+				displayMode="Currency"
+				useSymbol="false"
+				binding="{/items/1}"
+				number="{number}"
+				unit="{currency}"
+				state="Error" />
+			<ObjectNumber
+				class="sapUiSmallMarginEnd"
+				displayMode="Currency"
+				useSymbol="false"
+				binding="{/items/2}"
+				number="{number}"
+				unit="{currency}"
+				state="Warning" />
+			<ObjectNumber
+				class="sapUiSmallMarginEnd"
+				displayMode="Currency"
+				useSymbol="false"
+				binding="{/items/3}"
+				number="{number}"
+				unit="{currency}"
+				state="Success" />
+			<ObjectNumber
+				displayMode="Currency"
+				useSymbol="false"
+				binding="{/items/4}"
+				number="{number}"
+				unit="{currency}"
+				state="Information" />
+		</l:HorizontalLayout>
+
+	</l:VerticalLayout>
+
+</mvc:View>

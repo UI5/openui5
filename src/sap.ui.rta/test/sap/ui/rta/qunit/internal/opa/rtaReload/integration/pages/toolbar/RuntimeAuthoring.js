@@ -14,7 +14,6 @@ sap.ui.define([
 					window.reloaded = false;
 					return this.waitFor({
 						id: "sapUIRta_toolbar_fragment--sapUiRta_exit",
-						searchOpenDialogs: true,
 						actions: new Press()
 					});
 				},
@@ -50,7 +49,6 @@ sap.ui.define([
 				iPressTheSaveDraftButton() {
 					return this.waitFor({
 						id: "sapUIRta_toolbar_fragment--sapUiRta_save-img",
-						searchOpenDialogs: true,
 						actions: new Press()
 					});
 				}
@@ -59,7 +57,6 @@ sap.ui.define([
 				iShouldSeeTheToolbar() {
 					return this.waitFor({
 						id: "sapUIRta_toolbar",
-						searchOpenDialogs: true,
 						success() {
 							Opa5.assert.ok(true, "I see the rta toolbar");
 						}

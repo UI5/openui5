@@ -3099,7 +3099,9 @@ sap.ui.define([
 				this.mock(Object).expects("assign").withExactArgs({}, sinon.match.same(oCollapsed))
 					.returns("~oSubtotals~");
 				oAggregationHelperMock.expects("getAllProperties")
-					.withExactArgs(sinon.match.same(oAggregation)).returns("~aAllProperties~");
+					.withExactArgs(sinon.match.same(oAggregation),
+						sinon.match.same(oCache.mQueryOptions), false)
+					.returns("~aAllProperties~");
 				oAggregationHelperMock.expects("setAnnotations")
 					.withExactArgs("~oSubtotals~", undefined, true, 23, "~aAllProperties~");
 				oHelperMock.expects("setPrivateAnnotation")

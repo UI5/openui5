@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Jika fokus berada pada sel, pemilih baris, atau <span class="uicontrol">Pilih Semua</span>, tindakan ini akan mengubah status kotak centang <span class="uicontrol">Pilih Semua</span>: Semua baris akan dipilih atau dibatalkan pilihannya secara bersamaan.</p>
+				<p>Pintasan tidak berfungsi saat fokus berada pada sel header kolom.</p>
+				<p>Pintasan tidak akan berpengaruh jika fokus berada pada bidang input teks karena pada kondisi tersebut, pemilihan teks dilakukan oleh browser.</p>
+				<p><span class="emphasis">Jika pemilihan sel diaktifkan:</span></p>
+				<p>Saat fokus berada pada sel, semua sel yang tersedia akan dipilih hingga batas jumlah yang dapat dipilih. Jika semua sel yang tersedia sudah dipilih, pilihan sel akan dihapus.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Saat fokus berada pada sel, pemilih baris, atau <span class="uicontrol">Pilih Semua</span>, pemilihan semua baris akan dihapus.</p>
+				<p>Pintasan tidak berfungsi saat fokus berada pada sel header kolom atau bidang input teks.</p>
 				<p><span class="emphasis">Jika pemilihan sel diaktifkan:</span></p>
 				<p>Jika fokus berada di dalam tabel, pemilihan pada baris dan sel mana pun akan dihapus.</p>
 			</description>
@@ -176,11 +182,11 @@
 		</interaction>
 		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Jika pemilihan sel diaktifkan:</span></p>
-				<p>Jika sel-sel dipilih, <kbd>Shift + MouseClick</kbd> pada sel yang berbeda akan memperluas pemilihan hingga ke sel yang diklik.</p>
+				<p>Jika sel dipilih, <kbd>Shift + MouseClick</kbd> pada sel yang berbeda akan memperluas pemilihan hingga ke sel yang diklik.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Menyalin baris atau sel yang dipilih ke clipboard, jika fitur ini diaktifkan dan tersedia.</p>
+				<p>Menyalin baris atau sel yang dipilih ke clipboard (jika tersedia) jika fitur ini diaktifkan.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

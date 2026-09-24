@@ -1129,9 +1129,8 @@ sap.ui.define([
 	 * @private
 	 */
 	PlanningCalendar.prototype._createHeader = function () {
-		var oHeader = new PlanningCalendarHeader(this.getId() + "-Header", {
-			calendarWeekNumbering: this.getCalendarWeekNumbering()
-		});
+		var oHeader = new PlanningCalendarHeader(this.getId() + "-Header", {});
+		!this.isPropertyInitial("calendarWeekNumbering") && oHeader.setCalendarWeekNumbering(this._getCalendarWeekNumbering());
 
 		oHeader._getRelativeInfo = this._getRelativeInfo.bind(this);
 
@@ -1919,14 +1918,17 @@ sap.ui.define([
 	};
 
 	PlanningCalendar.prototype._setCalendarWeekNumbering = function() {
-		var sCalendarWeekNumbering = this.getCalendarWeekNumbering(),
+		var sCalendarWeekNumbering = this._getCalendarWeekNumbering(),
 			oHeader = this._getHeader(),
 			oCalendarPicker = oHeader._oPopup && oHeader._oPopup.getContent()[0],
 			key;
 
 		this._updateWeekConfiguration();
-		oHeader.setCalendarWeekNumbering(sCalendarWeekNumbering);
-		oCalendarPicker && oCalendarPicker.setCalendarWeekNumbering(sCalendarWeekNumbering);
+		if (sCalendarWeekNumbering) {
+			oHeader.setCalendarWeekNumbering(sCalendarWeekNumbering);
+			oCalendarPicker && oCalendarPicker.setCalendarWeekNumbering(sCalendarWeekNumbering);
+		}
+
 		for (key in INTERVAL_METADATA) {
 			this[INTERVAL_METADATA[key].sInstanceName] && this[INTERVAL_METADATA[key].sInstanceName].setCalendarWeekNumbering(sCalendarWeekNumbering);
 		}
@@ -2047,7 +2049,7 @@ sap.ui.define([
 							showDayNamesLine: this.getShowDayNamesLine(),
 							legend: this.getLegend(),
 							showWeekNumbers: this.getShowWeekNumbers(),
-							calendarWeekNumbering: this.getCalendarWeekNumbering()
+							calendarWeekNumbering: this._getCalendarWeekNumbering()
 						});
 
 						oInterval.isRelative = this.isRelative.bind(this);
@@ -2111,7 +2113,7 @@ sap.ui.define([
 							viewKey: sKey,
 							intervalType: sIntervalType,
 							showWeekNumbers: this.getShowWeekNumbers(),
-							calendarWeekNumbering: this.getCalendarWeekNumbering()
+							calendarWeekNumbering: this._getCalendarWeekNumbering()
 						});
 					} else {
 						this._oCalendarWeeks.setInterval(iIntervals);
@@ -2164,7 +2166,7 @@ sap.ui.define([
 							viewKey: CalendarIntervalType.Month,
 							intervalType: CalendarIntervalType.Month,
 							showWeekNumbers: this.getShowWeekNumbers(),
-							calendarWeekNumbering: this.getCalendarWeekNumbering()
+							calendarWeekNumbering: this._getCalendarWeekNumbering()
 						});
 					} else {
 						this._oCalendarWeeks.setInterval(iIntervals);
@@ -2322,7 +2324,7 @@ sap.ui.define([
 
 	PlanningCalendar.prototype._getWeekConfigurationValues = function() {
 		var sLocale = new Locale(Formatting.getLanguageTag()).toString(),
-			sCalendarWeekNumbering = this.getCalendarWeekNumbering(),
+			sCalendarWeekNumbering = this._getCalendarWeekNumbering(),
 			iFirstDayOfWeek = this.getFirstDayOfWeek(),
 			oWeekConfiguration = CalendarDateUtils.getWeekConfigurationValues(sCalendarWeekNumbering, new Locale(sLocale));
 
@@ -5358,6 +5360,14 @@ sap.ui.define([
 		oDate.setDate(oDate.getDate() + iIndex * this._getView(this.getViewKey()).getIntervalSize());
 
 		return oDate;
+	};
+
+	PlanningCalendar.prototype._getCalendarWeekNumbering = function () {
+		if (this.isPropertyInitial("calendarWeekNumbering")) {
+			return;
+		}
+
+		return this.getCalendarWeekNumbering();
 	};
 
 	PlanningCalendar.prototype._getRelativeInfo = function() {

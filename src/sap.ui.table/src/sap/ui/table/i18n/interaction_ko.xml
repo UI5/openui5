@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>셀, 행 선택, 또는 <span class="uicontrol">모두 선택</span>에 포커스가 있는 경우, <span class="uicontrol">모두 선택</span> 체크박스 선택을 토글합니다. 즉, 모든 행이 선택되거나 선택이 해제됩니다.</p>
+				<p>열 헤더 셀에 포커스가 있으면 바로가기가 적용되지 않습니다.</p>
+				<p>텍스트 입력 필드에 포커스가 있으면, 이 경우 브라우저가 텍스트 선택을 처리하므로 바로가기가 작동하지 않습니다.</p>
+				<p><span class="emphasis">셀 선택이 활성화된 경우:</span></p>
+				<p>셀에 포커스가 있으면 선택 한도까지 사용 가능한 모든 셀이 선택됩니다. 사용 가능한 모든 셀이 이미 선택된 경우 셀 선택이 제거됩니다.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>포커스가 셀, 행 선택자, 또는 <span class="uicontrol">모두 선택</span>에 있는 경우, 모든 행 선택이 제거됩니다.</p>
+				<p>열 헤더 셀 또는 텍스트 입력 필드에 포커스가 있으면 바로가기가 적용되지 않습니다.</p>
 				<p><span class="emphasis">셀 선택이 활성화된 경우:</span></p>
 				<p>테이블 내부에 포커스가 있다면 모든 행과 셀의 선택이 제거됩니다.</p>
 			</description>
@@ -180,11 +186,11 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>해당 기능이 활성화되어 사용 가능한 경우 선택한 행 또는 셀을 클립보드로 복사합니다.</p>
+				<p>선택한 행이나 셀을 클립보드로 복사하며(사용 가능한 경우). 해당 기능은 활성화되어 있습니다.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>
-				<p>해당 기능이 활성화된 경우 클립보드에서 내용을 붙여넣습니다.</p>
+				<p>해당 기능이 활성화된 경우 클립보드에서 컨텐트를 붙여넣습니다.</p>
 			</description>
 		</interaction>
 	</control-interactions>

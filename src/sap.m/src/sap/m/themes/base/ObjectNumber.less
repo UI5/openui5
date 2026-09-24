@@ -346,3 +346,43 @@ html.sap-desktop .sapMObjectNumberActive:focus,
 	@sapUiButtonNeutralHoverTextColor,
 	@sapUiButtonNeutralActiveBackground
 );
+
+.sapMObjectNumberCurrency,
+.sapMObjectNumberUnitMode {
+	display: inline-block;
+	width: 100%;
+	min-height: 0;
+	overflow: hidden;
+	line-height: normal;
+
+	.sapMObjectNumberInner {
+		display: block;
+		line-height: normal;
+		min-height: 0;
+		text-align: right;
+	}
+
+	.sapMObjectNumberText {
+		font-family: var(--sapFontFamily);
+		font-size: var(--sapFontSize);
+		line-height: normal;
+		min-height: 0;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.sapMObjectNumberUnit {
+		font-family: var(--sapContent_MonospaceFontFamily);
+		font-size: var(--sapFontSize);
+		display: inline-block;
+		text-align: end;
+		line-height: normal;
+		height: auto;
+		min-height: 0;
+	}
+}
+
+.sapMObjectNumberCurrency {
+	.sapMObjectNumberUnit {
+		min-width: 3rem;
+	}
+}

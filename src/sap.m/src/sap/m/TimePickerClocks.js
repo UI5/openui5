@@ -48,8 +48,7 @@ sap.ui.define([
 		 * @param {object} [mSettings] Initial settings for the new control
 		 *
 		 * @class
-		 * A picker clocks container control used inside the {@link sap.m.TimePicker}.
-		 * If you use the control standalone, please call the {@link #prepareForOpen} method before opening or displaying it.
+		 * A picker clocks container control used inside the {@link sap.m.TimePicker} or as a standalone control.
 		 * @extends sap.ui.core.Control
 		 *
 		 * @author SAP SE
@@ -1113,6 +1112,8 @@ sap.ui.define([
 
 			if (this._clockCount) {
 				aClocks[0].setSkipAnimation(this.getSkipAnimation()).setFadeIn(true);
+				this._activeClock = 0;
+				aButtons[0].setPressed(true);
 			}
 
 			// attach events to the controls

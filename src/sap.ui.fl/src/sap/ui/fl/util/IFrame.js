@@ -218,16 +218,25 @@ sap.ui.define([
 	};
 
 	IFrame.isValidUrl = function(sUrl) {
+		if (typeof sUrl !== "string" || sUrl.trim() === "") {
+			return {
+				result: false,
+				error: IFrame.VALIDATION_ERROR.INVALID_URL
+			};
+		}
+
+		const sEncodedUrl = encodeURI(sUrl);
+
 		try {
 			// Explicitly allow about:blank as a way to reset the iframe content
 			// e.g. if the control is reused and no valid URL is provided
-			if (sUrl === "about:blank") {
+			if (sEncodedUrl === "about:blank") {
 				return {
 					result: true
 				};
 			}
 
-			const oUrl = IFrame._toUrl(sUrl);
+			const oUrl = IFrame._toUrl(sEncodedUrl);
 
 			// Forbid dangerous javascript pseudo protocol
 			if (/javascript/i.test(oUrl.protocol)) {
@@ -252,7 +261,7 @@ sap.ui.define([
 
 			// Take further customer restrictions into account
 			// Since the validator doesn't return an error, use a generic error message
-			if (!URLListValidator.validate(sUrl)) {
+			if (!URLListValidator.validate(sEncodedUrl)) {
 				return {
 					result: false,
 					error: IFrame.VALIDATION_ERROR.FORBIDDEN_URL

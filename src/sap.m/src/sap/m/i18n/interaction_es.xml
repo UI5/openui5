@@ -109,7 +109,7 @@
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
 				<p><span class="emphasis">Si la selección de celdas está activada:</span></p>
-				<p>If the focus is inside the table, and cells are selected, the selection of the cells is removed.</p>
+				<p>Si el foco está dentro de la tabla y hay celdas seleccionadas, se eliminará la selección de las celdas.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>F2</kbd> <description>
@@ -117,7 +117,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>F7</kbd> <description>
-				<p>Si el enfoque está dentro de una celda en modo edición, el enfoque se mueve a la fila.</p>
+				<p>Si el foco está dentro de una celda en modo edición, se desplazará a la fila.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Shift + MouseClick</kbd> <description>
@@ -126,7 +126,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Copies the selected rows or cells to the clipboard (if available), and the feature is enabled.</p>
+				<p>Copia las filas o celdas seleccionadas al portapapeles (si está disponible) y la función está activada.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

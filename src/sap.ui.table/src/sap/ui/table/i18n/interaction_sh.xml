@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Ako je fokus na ćeliji, selektoru reda ili na <span class="uicontrol">Odaberi sve</span>, ovo prebacuje kvadratić za potvrdu <span class="uicontrol">Odaberi sve</span>: Biraju se svi redovi, odnosno poništava odabir svih redova.</p>
+				<p>Prečica nije efektivna ako je fokus na ćeliji zaglavlja kolone.</p>
+				<p>Prečica nije efektivna ako je fokus na polju unosa teksta jer pretraživač obrađuje odabir teksta u ovom slučaju.</p>
+				<p><span class="emphasis">Ako je odabir ćelije aktiviran:</span></p>
+				<p>Ako je fokus na ćeliji, biraju se sve dostupne ćelije do ograničenja odabira. Ako su sve dostupne ćelije već odabrane, odabir ćelija se uklanja.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Ako je fokus na ćeliji, selektoru reda ili na opciji <span class="uicontrol">Odaberi sve</span>, uklanja se odabir svih redova.</p>
+				<p>Prečica nije efektivna ako je fokus na ćeliji zaglavlja kolone ili na polju unosa teksta.</p>
 				<p><span class="emphasis">Ako je odabir ćelije aktiviran:</span></p>
 				<p>Ako je fokus unutar tabele, odabir bilo kojih redova i kolona se uklanja.</p>
 			</description>
@@ -180,7 +186,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Kopira odabrane redove ili ćelije u prelaznu memoriju, ako je dostupno i ako je funkcija aktivirana.</p>
+				<p>Kopira odabrane redove ili ćelije u prelaznu memoriju (ako je dostupno) i ako je funkcija aktivirana.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

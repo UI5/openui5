@@ -241,6 +241,32 @@ sap.ui.define([
 			});
 		});
 
+		QUnit.test("when creating a manifest command without an element (e.g. addLibrary on a group) ...", async function(assert) {
+			const oManifestCommand = await CommandFactory.getCommandFor(undefined, "manifest", {
+				reference: this.sReference,
+				parameters: {
+					libraries: {}
+				},
+				texts: this.mTexts,
+				changeType: "appdescr_ui5_addLibraries",
+				appComponent: this.oMockedAppComponent
+			}, {}, { layer: this.mFlexSettings.layer });
+			assert.notOk(oManifestCommand.getElement(), "then the command has no element");
+			assert.strictEqual(
+				oManifestCommand.getAppComponent(),
+				this.oMockedAppComponent,
+				"then the app component is resolved from the property filled by the command factory"
+			);
+			await oManifestCommand.createAndStoreChange();
+			const oStoredChange = oManifestCommand.getPreparedChange();
+			assert.ok(oStoredChange, "then the change is created and stored without an element being present");
+			assert.strictEqual(
+				oStoredChange.getChangeType(),
+				"appdescr_ui5_addLibraries",
+				"then the stored change has the expected change type"
+			);
+		});
+
 		QUnit.test("when calling command factory for a change with long name without mocks ...", function(assert) {
 			const done = assert.async();
 			this.sChangeType = "appdescr_ui_generic_app_changePageConfiguration";

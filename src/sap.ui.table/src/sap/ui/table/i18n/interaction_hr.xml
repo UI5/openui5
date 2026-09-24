@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Ako je fokus na ćeliji, selektoru reda ili na <span class="uicontrol">Odaberi sve</span>, time se prebacuje kvadratić za potvrdu <span class="uicontrol">Odaberi sve</span>: svi se redovi odaberu ili se poništava njihov odabir.</p>
+				<p>Prečica nema učinka ako je fokus na ćeliji zaglavlja stupca.</p>
+				<p>Prečac nema učinka ako je fokus na polju unosa teksta, jer u tom slučaju pretraživač obrađuje odabir teksta.</p>
+				<p><span class="emphasis">Ako je aktiviran odabir ćelije:</span></p>
+				<p>ako je fokus na ćeliji, odabiru se sve raspoložive ćelije do ograničenja odabira. Ako su sve raspoložive ćelije već odabrane, odabir ćelije se uklanja,</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>ako je fokus na ćeliji, selektoru reda ili <span class="uicontrol">Odaberi sve</span>, uklanja se odabir svih redova.</p>
+				<p>Prečica nema učinka ako je fokus na ćeliji zaglavlja stupca ili na polju unosa teksta.</p>
 				<p><span class="emphasis">Ako je aktiviran odabir ćelije:</span></p>
 				<p>Ako je fokus unutar tabele, uklanja se odabir za sve redove i ćelije.</p>
 			</description>
@@ -176,11 +182,11 @@
 		</interaction>
 		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Ako je aktiviran odabir ćelije:</span></p>
-				<p>Ako su ćelije odabrane, <kbd>Shift + MouseClick</kbd> na različitu ćeliju povećava odabir do kliknute ćelije.</p>
+				<p>Ako su ćelije odabrane, <kbd>Shift + MouseClick</kbd> u različitoj ćeliji povećava odabir do kliknute ćelije.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Kopira odabrane redove ili ćelije u međuspremnik, ako je dostupan, a obilježje se aktivira.</p>
+				<p>Kopira odabrane redove ili ćelije u međuspremnik (ako je dostupno), a obilježje se aktivira.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

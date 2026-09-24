@@ -157,10 +157,16 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Si el foco está en una celda, en el selector de filas o en <span class="uicontrol">Seleccionar todo</span>, esto activa la casilla <span class="uicontrol">Seleccionar todo</span>: Todas las filas se seleccionan o deseleccionan respectivamente.</p>
+				<p>El acceso directo no funciona si el foco está en una celda de encabezado de columna.</p>
+				<p>El acceso directo no funciona si el foco está en un campo de entrada de texto, ya que el navegador se encarga de la selección de texto en esos casos.</p>
+				<p><span class="emphasis">Si la selección de celdas está activada:</span></p>
+				<p>Si el foco está en una celda, todas las celdas disponibles se seleccionan hasta el límite de selección. Si todas las celdas disponibles ya están seleccionadas, se anula la selección.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
-				<p><span class="emphasis">Si la selección de celda está activada:</span></p>
+				<p>Si el foco está en una celda, el selector de filas o <span class="uicontrol">Seleccionar todo</span>, se anula la selección de todas las filas.</p>
+				<p>El acceso directo no funciona si el foco está en una celda de encabezado de columna o en un campo de entrada de texto.</p>
+				<p><span class="emphasis">Si la selección de celdas está activada:</span></p>
 				<p>Si el foco está dentro de la tabla, se elimina la selección de las filas y celdas.</p>
 			</description>
 		</interaction>
@@ -176,7 +182,7 @@
 		</interaction>
 		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Si la selección de celda está activada:</span></p>
-				<p>Si las celdas están seleccionadas, <kbd>Shift + MouseClick</kbd> en una celda diferente actualiza la selección hasta la celda en la que se hizo clic.</p>
+				<p>Si las celdas están seleccionadas, <kbd>Shift + MouseClick</kbd> en una celda diferente mejora la selección hasta la celda en la que se hizo clic.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>

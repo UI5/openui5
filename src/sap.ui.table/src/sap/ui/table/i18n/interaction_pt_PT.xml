@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Se o foco estiver numa célula, no seletor de linhas ou em <span class="uicontrol">Selecionar tudo</span>, isso ativa/desativa a caixa de verificação <span class="uicontrol">Selecionar tudo</span>: todas as linhas são marcadas ou desmarcadas respetivamente.</p>
+				<p>O atalho não tem efeito se o foco estiver numa célula do cabeçalho da coluna.</p>
+				<p>O atalho não tem efeito se o foco estiver num campo de entrada de texto, uma vez que, neste caso, o browser processa a seleção de texto.</p>
+				<p><span class="emphasis">Se a seleção de células estiver ativada:</span></p>
+				<p>Se o foco estiver numa célula, todas as células disponíveis são selecionadas até ao limite da seleção. Se todas as células disponíveis já estiverem selecionadas, a seleção de células é removida.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Se o foco estiver numa célula, no seletor de linhas ou em <span class="uicontrol">Selecionar tudo</span>, a seleção de todas as linhas é removida.</p>
+				<p>O atalho não tem efeito se o foco estiver numa célula do cabeçalho da coluna ou num campo de texto de entrada.</p>
 				<p><span class="emphasis">Se a seleção de células estiver ativada:</span></p>
 				<p>Se o foco estiver dentro da tabela, a seleção para qualquer linha e célula é removida.</p>
 			</description>
@@ -180,7 +186,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Copia as linhas ou células selecionadas para a área de transferência, se disponível, e a funcionalidade é ativada.</p>
+				<p>Copia as linhas ou células selecionadas para a área de transferência (se disponível), e a funcionalidade é ativada.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>
