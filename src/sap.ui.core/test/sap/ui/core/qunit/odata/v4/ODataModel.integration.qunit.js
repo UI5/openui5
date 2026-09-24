@@ -263,7 +263,7 @@ sap.ui.define([
 				}
 
 				const aSpliced = _Helper.getPrivateAnnotation(oElement, "spliced");
-				if (aSpliced) {
+				if (aSpliced?.length) {
 					visitElements(aSpliced, true, iLevel + 1 - aSpliced[0]["@$ui5.node.level"],
 						iRank - aSpliced.$rank);
 				}
@@ -508,11 +508,15 @@ sap.ui.define([
 	 *   handled as <code>undefined</code>
 	 * @param {number} [iExpectedLength=aExpectedPaths.length] - Expected length
 	 * @param {boolean} [bLengthFinal=true] - Whether the length is expected to be "final"
+	 * @param {any[][]} [aExpectedRowStates]
+	 *   In case of a <t:Table> with ODataV4Aggregation plugin, an array of arrays can be given to
+	 *   check the state of each row; the inner arrays represent the following properties in order:
+	 *   type|level|expandable|expanded|title
 	 * @throws {Error} If <code>iExpectedLength</code> is given but not <code>aExpectedPaths</code>
 	 */
 	// eslint-disable-next-line valid-jsdoc -- [][] is unsupported
 	function checkTable(sTitle, assert, oTable, aExpectedPaths, aExpectedContent, iExpectedLength,
-			bLengthFinal = true) {
+			bLengthFinal = true, aExpectedRowStates = null) {
 		var oListBinding = oTable.getBinding("items") || oTable.getBinding("rows"),
 			aRows = oTable.getItems ? oTable.getItems() : oTable.getRows();
 
@@ -554,6 +558,16 @@ sap.ui.define([
 					return oCell.getText ? oCell.getText() : oCell.getValue();
 				});
 			}), aExpectedContent, sTitle);
+		}
+
+		if (aExpectedRowStates) {
+			while (aExpectedRowStates.length < aRows.length) { // pad with "empty" rows
+				aExpectedRowStates.push(["Standard", 0, false, false, ""]);
+			}
+			assert.deepEqual(aRows.map(function (oRow) {
+				return [oRow.getType(), oRow.getLevel(), oRow.isExpandable(), oRow.isExpanded(),
+					oRow.getTitle()];
+			}), aExpectedRowStates, `${sTitle}: checking row states via ODataV4Aggregation`);
 		}
 
 		checkSelectionCount(assert, oListBinding);
@@ -870,7 +884,7 @@ sap.ui.define([
 
 		oDocument = XMLHelper.parse(
 			'<mvc:View xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc"'
-			+ ' xmlns:plugins="sap.m.plugins"'
+			+ ' xmlns:plugins="sap.m.plugins" xmlns:t_plugins="sap.ui.table.plugins"'
 			+ ' xmlns:t="sap.ui.table" xmlns:trm="sap.ui.table.rowmodes"'
 			+ ' xmlns:template="http://schemas.sap.com/sapui5/extension/sap.ui.core.template/1"'
 			+ (sViewXML.startsWith(" ") ? "" : ">")
@@ -919,6 +933,7 @@ sap.ui.define([
 				oChildNode = aChildNodes[j];
 				if (oChildNode.nodeType === Node.ELEMENT_NODE
 						&& oChildNode.localName !== "Column"
+						&& oChildNode.localName !== "dependents"
 						&& oChildNode.localName !== "rowMode") {
 					oColumn = document.createElementNS("sap.ui.table", "Column");
 					oElement.insertBefore(oColumn, oChildNode);
@@ -29061,16 +29076,25 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-825
 	//
 	// All levels present as groups (JIRA: CPOUI5ODATAV4-2755)
-	// Delete with visual grouping is not allowed (JIRA: CPOUI5ODATAV4-3229)
 	// Editing works via navigation on leaf level (JIRA: CPOUI5ODATAV4-3438)
 	// Overlapping paths for "additionally" on different group levels (JIRA: CPOUI5ODATAV4-3438)
 	// Late property requests via API & UI (JIRA: CPOUI5ODATAV4-3438)
-	QUnit.test("Data Aggregation: additionally via navigation", function (assert) {
+	// Delete w/ visual grouping works on leaf level w/ $count & outdated (JIRA: CPOUI5ODATAV4-3398)
+[false, true].forEach((bEdit) => {
+	const sTitle = "Data Aggregation: additionally via navigation; edit before delete = " + bEdit;
+
+	QUnit.test(sTitle, function (assert) {
 		var oArtist1,
+			oIsActiveEntityTrue,
 			oModel = this.createSpecialCasesModel({autoExpandSelect : true}),
+			oNameB,
 			oTable,
 			sView = '\
+<Text id="count" text="{$count}"/>\
+<Text id="isOutdatedHeader" text="{= %{@$ui5.context.isOutdated} }"/>\
 <t:Table id="table" rows="{path : \'/Artists\',\
+	filters : [{path : \'Name\', operator : \'NE\', value1 : \'TAFKAP\'},\
+		{path : \'sendsAutographs\', operator : \'GE\', value1 : false}],\
 	parameters : {\
 		$$aggregation : {\
 			aggregate : {\
@@ -29084,11 +29108,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				Name : {additionally : [\'Address/RegionName\', \'BestFriend/Name\']}\
 			},\
 			groupLevels : [\'IsActiveEntity\', \'Name\', \'ArtistID\'],\
+			search : \'covfefe\',\
 			subtotalsAtBottomOnly : true\
 		},\
+		$count : true,\
 		$orderby :\
 \'BestPublication/DraftAdministrativeData/InProcessByUser desc,BestFriend/Name,Address/City asc\'\
 	}}" threshold="0" visibleRowCount="6">\
+	<t:dependents><t_plugins:ODataV4Aggregation/></t:dependents>\
 	<Text id="groupLevelCount" text="{= %{@$ui5.node.groupLevelCount} }"/>\
 	<Text id="isExpanded" text="{= %{@$ui5.node.isExpanded} }"/>\
 	<Text id="isTotal" text="{= %{@$ui5.node.isTotal} }"/>\
@@ -29104,12 +29131,28 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 <Text id="regionID" text="{Address/RegionID}"/>',
 			that = this;
 
-		this.expectRequest("Artists?$apply=groupby"
-				+ "((IsActiveEntity,BestPublication/DraftAdministrativeData/InProcessByUser))"
-				+ "/orderby(BestPublication/DraftAdministrativeData/InProcessByUser desc)"
-				+ "&$count=true&$skip=0&$top=6", {
-				"@odata.count" : "2",
+		// IsActiveEntity > Name > ArtistID
+		// false
+		//                  n/a
+		//                         n/a
+		// true
+		//                  A
+		//                         n/a
+		//                  B
+		//                         1
+		//                         2
+
+		this.expectRequest("Artists"
+				+ "?$apply=filter(Name ne 'TAFKAP' and sendsAutographs ge false)/search(covfefe)"
+				+ "/concat(groupby((ArtistID,IsActiveEntity,Name))/aggregate($count as UI5__leaves)"
+				+ ",groupby((IsActiveEntity,BestPublication/DraftAdministrativeData/InProcessByUser"
+					+ "))/orderby(BestPublication/DraftAdministrativeData/InProcessByUser desc)"
+					+ "/concat(aggregate($count as UI5__count),top(6)))", {
 				value : [{
+					UI5__leaves : "4"
+				}, {
+					UI5__count : "2"
+				}, {
 					BestPublication : {
 						DraftAdministrativeData : {
 							InProcessByUser : "JOHNDOE"
@@ -29125,6 +29168,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					IsActiveEntity : true
 				}]
 			})
+			.expectChange("count")
+			.expectChange("isOutdatedHeader")
 			.expectChange("groupLevelCount", [undefined, undefined])
 			.expectChange("isExpanded", [false, false])
 			.expectChange("isTotal", [false, false])
@@ -29140,7 +29185,17 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		return this.createView(assert, sView, oModel).then(function () {
 			oTable = that.oView.byId("table");
-			const oIsActiveEntityTrue = oTable.getRows()[1].getBindingContext();
+			oIsActiveEntityTrue = oTable.getRows()[1].getBindingContext();
+			const oHeaderContext = oIsActiveEntityTrue.getBinding().getHeaderContext();
+
+			that.expectChange("count", "4")
+				.expectChange("isOutdatedHeader", undefined);
+
+			that.oView.byId("count").setBindingContext(oHeaderContext);
+			that.oView.byId("isOutdatedHeader").setBindingContext(oHeaderContext);
+
+			return that.waitForChanges(assert, "set header context");
+		}).then(function () {
 			assert.deepEqual(oIsActiveEntityTrue.getObject(), {
 				"@$ui5.node.isExpanded" : false,
 				"@$ui5.node.isTotal" : false,
@@ -29168,7 +29223,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				assert.strictEqual(sRegionName, undefined, "not available here");
 			});
 
-			that.expectRequest("Artists?$apply=filter(IsActiveEntity eq true)"
+			that.expectRequest("Artists?$apply=filter(IsActiveEntity eq true"
+					+ " and (Name ne 'TAFKAP' and sendsAutographs ge false))/search(covfefe)"
 					+ "/groupby((Name,Address/RegionName,BestFriend/Name))/orderby(BestFriend/Name)"
 					+ "&$count=true&$skip=0&$top=6", {
 					"@odata.count" : "2",
@@ -29200,7 +29256,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				that.waitForChanges(assert, "1st expand")
 			]);
 		}).then(function () {
-			const oNameB = oTable.getRows()[3].getBindingContext();
+			oNameB = oTable.getRows()[3].getBindingContext();
 			assert.deepEqual(oNameB.getObject(), {
 				"@$ui5.node.isExpanded" : false,
 				"@$ui5.node.isTotal" : false,
@@ -29232,7 +29288,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity,Name)"
 						+ ",BestPublication($select=PublicationID"
 							+ ";$expand=DraftAdministrativeData($select=DraftID,InProcessByUser))"
-					+ "&$filter=IsActiveEntity eq true and Name eq 'B'&$orderby=Address/City asc"
+					+ "&$filter=IsActiveEntity eq true and Name eq 'B'"
+						+ " and (Name ne 'TAFKAP' and sendsAutographs ge false)"
+					+ "&$orderby=Address/City asc&$search=covfefe"
 					+ "&$select=Address/City,Address/RegionName,ArtistID,IsActiveEntity,Name"
 						+ ",sendsAutographs"
 					+ "&$skip=0&$top=6", {
@@ -29297,10 +29355,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oArtist1 = oTable.getRows()[4].getBindingContext();
 			assert.strictEqual(oArtist1.isAggregated(), false);
 			assert.strictEqual(oArtist1.isExpanded(), undefined);
-			assert.throws(function () {
-				// code under test (JIRA: CPOUI5ODATAV4-3229)
-				oArtist1.delete();
-			}, new Error("Unsupported on aggregated data: " + oArtist1));
 			assert.deepEqual(oArtist1.getObject(), {
 				"@$ui5.node.isTotal" : false,
 				"@$ui5.node.level" : 3,
@@ -29326,7 +29380,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				sendsAutographs : false
 			});
 
-			that.expectChange("bestFriendName", [,,,, "B's best friend 4ever!"])
+			if (!bEdit) {
+				return;
+			}
+
+			that.expectChange("isOutdatedHeader", true)
+				.expectChange("bestFriendName", [,,,, "B's best friend 4ever!"])
 				.expectChange("inProcessByUser", [,,,, "JANEDOE"])
 				.expectRequest("#0 PATCH Artists(ArtistID='BF4E',IsActiveEntity=true)", {
 					payload : {Name : "B's best friend 4ever!"}
@@ -29359,8 +29418,151 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				}),
 				that.waitForChanges(assert, "request late properties")
 			]);
+		}).then(function () {
+			const sInProcessByUser = bEdit ? "JANEDOE" : "";
+			const sBestFriendName = bEdit ? "B's best friend 4ever!" : "B's best friend";
+			checkTable("before delete", assert, oTable, [
+				"/Artists(IsActiveEntity=false)",
+				oIsActiveEntityTrue,
+				"/Artists(IsActiveEntity=true,Name='A')",
+				oNameB,
+				oArtist1,
+				"/Artists(ArtistID='2',IsActiveEntity=true)"
+			], [ // groupLevelCount|isExpanded|isTotal|level|isActiveEntity|inProcessByUser|name|...
+				// ...|bestFriendName|artistID|city|sendsAutographs
+				["", "false", "false", "1", "false", "JOHNDOE", "", "", "", "", ""],
+				["2", "true", "false", "1", "true", "", "", "", "", "", ""],
+				["", "false", "false", "2", "true", "", "A", "A's best friend", "", "", ""],
+				["2", "true", "false", "2", "true", "", "B", "B's best friend", "", "", ""],
+				["", "", "false", "3", "true", sInProcessByUser, "B", sBestFriendName, "1",
+					"Liverpool", "false"],
+				["", "", "false", "3", "true", "", "B", "B's best friend", "2", "London", "true"]
+			]);
+
+			that.expectChangeIf(!bEdit, "isOutdatedHeader", true)
+				.expectRequest("#0 DELETE Artists(ArtistID='1',IsActiveEntity=true)", oNO_CONTENT)
+				.expectRequest("#0 Artists/$count"
+					+ "?$filter=Name ne 'TAFKAP' and sendsAutographs ge false&$search=covfefe", 3)
+				.expectChange("count", "3")
+				//TODO: .expectChange("groupLevelCount", [,,, 1])
+				.expectChangeIf(bEdit, "inProcessByUser", [""], 4)
+				.expectChangeIf(bEdit, "bestFriendName", ["B's best friend"], 4)
+				.expectChange("artistID", ["2"], 4)
+				.expectChange("city", ["London"], 4)
+				.expectChange("sendsAutographs", [true], 4)
+				.expectChange("regionID", null);
+
+			return Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3398)
+				oArtist1.delete(),
+				that.waitForChanges(assert, "delete 1st leaf")
+			]);
+		}).then(function () {
+			checkTable("after delete 1st leaf", assert, oTable, [
+				"/Artists(IsActiveEntity=false)",
+				oIsActiveEntityTrue,
+				"/Artists(IsActiveEntity=true,Name='A')",
+				oNameB,
+				"/Artists(ArtistID='2',IsActiveEntity=true)"
+			], [ // groupLevelCount|isExpanded|isTotal|level|isActiveEntity|inProcessByUser|name|...
+				// ...|bestFriendName|artistID|city|sendsAutographs
+				["", "false", "false", "1", "false", "JOHNDOE", "", "", "", "", ""],
+				["2", "true", "false", "1", "true", "", "", "", "", "", ""],
+				["", "false", "false", "2", "true", "", "A", "A's best friend", "", "", ""],
+				["2", "true", "false", "2", "true", "", "B", "B's best friend", "", "", ""],
+				["", "", "false", "3", "true", "", "B", "B's best friend", "2", "London", "true"]
+			]);
+			const oArtist2 = oTable.getRows()[4].getBindingContext();
+
+			that.expectRequest("#0 DELETE Artists(ArtistID='2',IsActiveEntity=true)", oNO_CONTENT)
+				.expectRequest("#0 Artists/$count"
+					+ "?$filter=Name ne 'TAFKAP' and sendsAutographs ge false&$search=covfefe", 2)
+				.expectChange("count", "2");
+				//TODO: .expectChange("groupLevelCount", [,,, 0])
+
+			return Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3398)
+				oArtist2.delete(),
+				that.waitForChanges(assert, "delete 2nd leaf")
+			]);
+		}).then(function () {
+			checkTable("after delete 2nd leaf", assert, oTable, [
+				"/Artists(IsActiveEntity=false)",
+				oIsActiveEntityTrue,
+				"/Artists(IsActiveEntity=true,Name='A')",
+				oNameB
+			], [ // groupLevelCount|isExpanded|isTotal|level|isActiveEntity|inProcessByUser|name|...
+				// ...|bestFriendName|artistID|city|sendsAutographs
+				["", "false", "false", "1", "false", "JOHNDOE", "", "", "", "", ""],
+				["2", "true", "false", "1", "true", "", "", "", "", "", ""],
+				["", "false", "false", "2", "true", "", "A", "A's best friend", "", "", ""],
+				["2", "true", "false", "2", "true", "", "B", "B's best friend", "", "", ""]
+			], 4, true, [ // type|level|expandable|expanded|title
+				["GroupHeader", 1, true, false, "No"],
+				["GroupHeader", 1, true, true, "Yes"],
+				["GroupHeader", 2, true, false, "A"],
+				["GroupHeader", 2, true, /*look here*/true, "B"]
+			]);
+
+			that.expectChange("isExpanded", [,,, false])
+				.expectEvents(assert, oNameB.getBinding(), [
+					[, "change", {reason : "change"}] // needed to update ODataV4Aggregation
+				]);
+
+			// code under test (JIRA: CPOUI5ODATAV4-3398)
+			oNameB.collapse();
+
+			return that.waitForChanges(assert, "collapse empty group");
+		}).then(function () {
+			checkTable("after collapse empty group", assert, oTable, [
+				"/Artists(IsActiveEntity=false)",
+				oIsActiveEntityTrue,
+				"/Artists(IsActiveEntity=true,Name='A')",
+				oNameB
+			], [ // groupLevelCount|isExpanded|isTotal|level|isActiveEntity|inProcessByUser|name|...
+				// ...|bestFriendName|artistID|city|sendsAutographs
+				["", "false", "false", "1", "false", "JOHNDOE", "", "", "", "", ""],
+				["2", "true", "false", "1", "true", "", "", "", "", "", ""],
+				["", "false", "false", "2", "true", "", "A", "A's best friend", "", "", ""],
+				["2", "false", "false", "2", "true", "", "B", "B's best friend", "", "", ""]
+			], 4, true, [ // type|level|expandable|expanded|title
+				["GroupHeader", 1, true, false, "No"],
+				["GroupHeader", 1, true, true, "Yes"],
+				["GroupHeader", 2, true, false, "A"],
+				["GroupHeader", 2, true, /*look here*/false, "B"]
+			]);
+
+			that.expectChange("isExpanded", [,,, true])
+				.expectEvents(assert, oNameB.getBinding(), [
+					[, "change", {reason : "change"}] // needed to update ODataV4Aggregation
+				]);
+
+			return Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3398)
+				oNameB.expand(),
+				that.waitForChanges(assert, "expand empty group")
+			]);
+		}).then(function () {
+			checkTable("after expand empty group", assert, oTable, [
+				"/Artists(IsActiveEntity=false)",
+				oIsActiveEntityTrue,
+				"/Artists(IsActiveEntity=true,Name='A')",
+				oNameB
+			], [ // groupLevelCount|isExpanded|isTotal|level|isActiveEntity|inProcessByUser|name|...
+				// ...|bestFriendName|artistID|city|sendsAutographs
+				["", "false", "false", "1", "false", "JOHNDOE", "", "", "", "", ""],
+				["2", "true", "false", "1", "true", "", "", "", "", "", ""],
+				["", "false", "false", "2", "true", "", "A", "A's best friend", "", "", ""],
+				["2", "true", "false", "2", "true", "", "B", "B's best friend", "", "", ""]
+			], 4, true, [ // type|level|expandable|expanded|title
+				["GroupHeader", 1, true, false, "No"],
+				["GroupHeader", 1, true, true, "Yes"],
+				["GroupHeader", 2, true, false, "A"],
+				["GroupHeader", 2, true, /*look here*/true, "B"]
+			]);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: sap.ui.table.Table with aggregation and visual grouping.
