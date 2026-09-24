@@ -11077,7 +11077,7 @@ sap.ui.define([
 			}].forEach((oFixture) => {
 				[false, true].forEach((bWithPath) => {
 					[undefined, false, true].forEach((bNoRequest) => {
-						[undefined, [], ["X"]].forEach((aGroupLevels) => {
+						[[], ["X"]].forEach((aGroupLevels) => {
 	const sTitle = "setOutdated: bDataAggregation=" + bDataAggregation
 		+ ", bWithAggregationCache=" + bWithAggregationCache + ", sForce=" + sForce
 		+ ", bWithPath=" + bWithPath + ", bNoRequest=" + bNoRequest
@@ -11103,10 +11103,9 @@ sap.ui.define([
 				&& sForce !== "delete" ? 1 : 0)
 			.withExactArgs(bWithPath ? "~aPaths~" : undefined)
 			.returns(oFixture.isFilteredByResult);
-		const bForceHeader = sForce === "header" || bForce
-			|| sForce === "delete" && aGroupLevels?.length > 0;
+		const bForceHeader = sForce === "header" || bForce || aGroupLevels.length;
 		this.mock(oBinding).expects("isSortedBy")
-			.exactly(bDataAggregation && !bForce && sForce !== "delete" && sForce !== "header"
+			.exactly(bDataAggregation && !bForceHeader && sForce !== "delete"
 				&& "isSortedByResult" in oFixture ? 1 : 0)
 			.withExactArgs(bWithPath ? "~aPaths~" : undefined)
 			.returns(oFixture.isSortedByResult);
@@ -11129,6 +11128,11 @@ sap.ui.define([
 					.exactly(bDataAggregation && (bForce || oFixture.grandTotal) && !bNoRequest
 						&& sForce !== "delete" ? 1 : 0)
 					.withExactArgs(true);
+				oBinding.oCache.setSubtotalsOutdated = mustBeMocked;
+				this.mock(oBinding.oCache).expects("setSubtotalsOutdated")
+					.exactly(bDataAggregation && !bNoRequest
+						&& (bForceHeader || sForce !== "delete" && oFixture.headerContext) ? 1 : 0)
+					.withExactArgs();
 			}
 			this.mock(oBinding.oHeaderContext).expects("setOutdated")
 				.exactly(bDataAggregation && !bNoRequest

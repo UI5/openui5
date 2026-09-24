@@ -5485,9 +5485,10 @@ sap.ui.define([
 					|| this.mParameters.$search || oAggregation.search
 					|| Object.keys(this.mParameters).some((sKey) => sKey[0] !== "$")
 					|| this.isFilteredBy(aPaths);
-			const bHeaderContextOutdated = sForce === "delete"
-				? oAggregation.groupLevels?.length > 0
-				: bGrandTotalOutdated || sForce === "header" || this.isSortedBy(aPaths);
+			const bHeaderContextOutdated = oAggregation.groupLevels.length > 0
+				|| (sForce === "delete"
+					? false
+					: bGrandTotalOutdated || sForce === "header" || this.isSortedBy(aPaths));
 			if (bNoRequest
 					&& (bHeaderContextOutdated
 					|| _AggregationHelper.isUsedForGrandTotal(aPaths, oAggregation.aggregate))) {
@@ -5498,6 +5499,7 @@ sap.ui.define([
 			}
 			if (bHeaderContextOutdated) {
 				this.oHeaderContext.setOutdated(true);
+				this.oCache.setSubtotalsOutdated?.();
 			}
 		}
 	};
