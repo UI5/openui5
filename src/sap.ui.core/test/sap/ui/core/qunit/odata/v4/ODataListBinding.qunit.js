@@ -6603,16 +6603,18 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(oInitialData), true).returns("~oEntityData~");
 		this.mock(oBinding).expects("lockGroup")
 			.withExactArgs("~sGroupId~", true, true, sinon.match.func).returns("~oGroupLock~");
+		const oCreateInCachePromise = Promise.resolve("~oCreatedEntity~");
 		this.mock(oBinding).expects("createInCache")
 			.withExactArgs("~oGroupLock~", "~oCreatePathPromise~", "~sResolvedPath~",
 				sinon.match(rTransientPredicate), "~oEntityData~", bAtEnd, sinon.match.func,
 				sinon.match.func)
-			.returns(SyncPromise.resolve(Promise.resolve("~oCreatedEntity~")));
+			.returns(SyncPromise.resolve(oCreateInCachePromise));
 		const oContext = {
 			fetchValue : mustBeMocked,
 			doSetSelected : mustBeMocked,
 			updateAfterCreate : mustBeMocked
 		};
+
 		this.mock(Context).expects("create")
 			.withExactArgs(sinon.match.same(this.oModel), sinon.match.same(oBinding),
 				"~sResolvedPath~($uid=id-1-23)", bRecursiveHierarchy ? 0 : -1,
@@ -6623,15 +6625,21 @@ sap.ui.define([
 		this.mock(oContext).expects("doSetSelected").withExactArgs("~selected~");
 		this.mock(oContext).expects("fetchValue").withExactArgs()
 			.returns(SyncPromise.resolve());
-		this.mock(oBinding).expects("_fireChange")
-			.exactly(!bRecursiveHierarchy && bEmptyList ? 1 : 0)
-			.withExactArgs({reason : ChangeReason.Add});
 		this.mock(oBinding).expects("insertContext")
 			.withExactArgs(sinon.match.same(oContext), bRecursiveHierarchy ? 0 : undefined, bAtEnd);
-		this.mock(oContext).expects("updateAfterCreate").exactly(bSkipRefresh ? 1 : 0)
-			.withExactArgs(true, "$auto");
-		this.mock(oBinding).expects("refreshSingle").exactly(bSkipRefresh ? 0 : 1)
-			.withExactArgs(sinon.match.same(oContext), "$auto");
+		let oFireEventExpectation;
+		let oFireChangeExpectation;
+		oCreateInCachePromise.then(() => {
+			oFireEventExpectation = this.mock(oBinding).expects("fireEvent")
+				.withExactArgs("createCompleted", {context : oContext, success : true});
+			oFireChangeExpectation = this.mock(oBinding).expects("_fireChange")
+				.exactly(!bRecursiveHierarchy && bEmptyList ? 1 : 0)
+				.withExactArgs({reason : ChangeReason.Add});
+			this.mock(oContext).expects("updateAfterCreate").exactly(bSkipRefresh ? 1 : 0)
+				.withExactArgs(true, "$auto");
+			this.mock(oBinding).expects("refreshSingle").exactly(bSkipRefresh ? 0 : 1)
+				.withExactArgs(sinon.match.same(oContext), "$auto");
+		});
 
 		if (bRecursiveHierarchy) {
 			// code under test
@@ -6646,6 +6654,11 @@ sap.ui.define([
 		assert.strictEqual(oBinding.iActiveContexts, bRecursiveHierarchy ? 0 : 1);
 		assert.strictEqual(oBinding.iCreatedContexts, bRecursiveHierarchy ? 0 : 1);
 		assert.strictEqual(oBinding.bFirstCreateAtEnd, false);
+		return oCreateInCachePromise.then(() => {
+			if (oFireChangeExpectation.called) {
+				sinon.assert.callOrder(oFireEventExpectation, oFireChangeExpectation);
+			}
+		});
 	});
 				});
 			});
