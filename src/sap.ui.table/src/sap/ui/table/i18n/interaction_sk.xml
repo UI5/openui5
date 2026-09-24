@@ -76,13 +76,13 @@
 				<p><kbd>Enter</kbd></p>
 				<p>Ak je zameranie na hlavičku skupiny, otvorí sa ponuka hlavičky skupiny.</p>
 				<p><kbd>Spacebar</kbd></p>
-				<p><span class="emphasis">Ak je povolený výber buniek:</span></p>
+				<p><span class="emphasis">Ak je aktivovaný výber buniek:</span></p>
 				<p>Ak je zameranie na bunku, vyberie sa zameraná bunka.</p>
 				<p>Ak je zameranie na blok výberu buniek, výber buniek sa odstráni.</p>
 				<p>Ak je zameranie na bunku a tabuľka má určitú konfiguráciu správania pri výbere (na výber riadka môžete vybrať buď samotný riadok alebo začiarkavacie pole, ak je k dispozícii), namiesto riadka sa vyberie iba aktívna bunka.</p>
 				<p><kbd>Shift + Spacebar</kbd></p>
 				<p>Ak je zameranie na výber bunky alebo riadka, prepne sa výber aktuálneho riadka.</p>
-				<p><span class="emphasis">Ak je povolený výber buniek:</span></p>
+				<p><span class="emphasis">Ak je aktivovaný výber buniek:</span></p>
 				<p>Ak je zameranie na blok výberu buniek, blok výberu buniek sa zmení na výber riadkov. Výber buniek sa odstráni.</p>
 				<p>V závislosti od režimu výberu riadkov sa stane toto:</p>
 				<ul>
@@ -93,7 +93,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>ESC</kbd> <description>
-				<p><span class="emphasis">Ak je povolený výber buniek:</span></p>
+				<p><span class="emphasis">Ak je aktivovaný výber buniek:</span></p>
 				<p>Ak je zameranie vnútri tabuľky a sú vybraté bunky, výber buniek sa odstráni.</p>
 			</description>
 		</interaction>
@@ -112,7 +112,7 @@
 		<interaction> <kbd>Shift + ArrowUp</kbd> <description>
 				<p>Ak je zameranie na výber bunky alebo riadka a je vybratý príslušný riadok, zameranie sa presunie na riadok vyššie a výber sa rozšíri až po tento riadok.</p>
 				<p>Ak je zameranie na výber bunky alebo riadka a <span class="emphasis">nie</span> je vybratý príslušný riadok, zameranie sa presunie na riadok vyššie a výber sa odstráni pre tento riadok.</p>
-				<p><span class="emphasis">Ak je povolený výber buniek:</span></p>
+				<p><span class="emphasis">Ak je aktivovaný výber buniek:</span></p>
 				<p>Ak je zameraná bunka, ktorá <span class="emphasis">nie je</span> vybratá, a riadok <span class="emphasis">nie je</span> vybratý, vyberie sa aktívna bunka a bunka nad ňou. Zameranie sa presunie na bunku nad zameranou bunkou.</p>
 				<p>Ak je zameranie na vybratú bunku, bude zameraná bunka nad a výber bunky sa rozšíri až po túto bunku.</p>
 			</description>
@@ -120,21 +120,21 @@
 		<interaction> <kbd>Shift + ArrowDown</kbd> <description>
 				<p>Ak je zameranie na výber bunky alebo riadka a je vybratý príslušný riadok, zameranie sa presunie na riadok nižšie a výber sa rozšíri až po tento riadok.</p>
 				<p>Ak je zameranie na výber bunky alebo riadka a <span class="emphasis">nie</span> je vybratý príslušný riadok, zameranie sa presunie na riadok nižšie a výber sa odstráni pre tento riadok.</p>
-				<p><span class="emphasis">Ak je povolený výber buniek:</span></p>
+				<p><span class="emphasis">Ak je aktivovaný výber buniek:</span></p>
 				<p>Ak je zameraná bunka, ktorá <span class="emphasis">nie je</span> vybratá, a riadok <span class="emphasis">nie je</span> vybratý, vyberie sa aktívna bunka a bunka nižšie. Zameranie sa presunie na bunku pod zameranou bunkou.</p>
 				<p>Ak je zameranie na vybratú bunku, bude zameraná bunka pod a výber bunky sa rozšíri až po túto bunku.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Shift + ArrowRight</kbd> <description>
 				<p>Ak je zameranie na hlavičku stĺpca, šírka tohto stĺpca sa zväčší o 1 em. Toto sa opakuje, ak zostane tlačidlo stlačené.</p>
-				<p><span class="emphasis">Ak je povolený výber buniek:</span></p>
+				<p><span class="emphasis">Ak je aktivovaný výber buniek:</span></p>
 				<p>Ak je zameranie na bunku, ktorá <span class="emphasis">nie je</span> vybratá, vyberie sa aktívna bunka a bunka napravo. Zameranie sa presunie na bunku napravo od zameranej bunky.</p>
 				<p>Ak je zameranie na vybratú bunku, zamerá sa bunka napravo a výber bunky sa rozšíri až po túto bunku.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Shift + ArrowLeft</kbd> <description>
 				<p>Ak je zameranie na hlavičku stĺpca, šírka tohto stĺpca sa zmenší o 1 em. Toto sa opakuje, ak zostane tlačidlo stlačené.</p>
-				<p><span class="emphasis">Ak je povolený výber buniek:</span></p>
+				<p><span class="emphasis">Ak je aktivovaný výber buniek:</span></p>
 				<p>Ak je zameranie na bunku, ktorá <span class="emphasis">nie je</span> vybratá, vyberie sa aktívna bunka a bunka naľavo. Zameranie sa presunie na bunku naľavo od zameranej bunky.</p>
 				<p>Ak je zameranie na vybratú bunku, zamerá sa bunka naľavo a výber bunky sa rozšíri až po túto bunku.</p>
 			</description>
