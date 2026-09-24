@@ -6,7 +6,8 @@ sap.ui.define(function() {
 		defaults: {
 			qunit: {
 				version: 2,
-				reorder: false
+				reorder: false,
+				testTimeout: 60000
 			}
 		},
 		tests: {
