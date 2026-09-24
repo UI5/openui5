@@ -323,9 +323,9 @@ function(
 			}.bind(this)
 		});
 		const oCalendarPicker = new Calendar(sOPHId + "-Cal", {
-			calendarWeekNumbering: this.getCalendarWeekNumbering(),
 			primaryCalendarType: sCalendarType
 		});
+		!this.isPropertyInitial("calendarWeekNumbering") && oCalendarPicker.setCalendarWeekNumbering(this._getCalendarWeekNumbering());
 		oCalendarPicker.attachEvent("select", this._handlePickerDateSelect, this);
 		oCalendarPicker.attachEvent("cancel", this._handlePickerCancelEvent, this);
 		this.setAggregation("_calendarPicker", oCalendarPicker);
@@ -382,7 +382,7 @@ function(
 					if (oPicker.displayDate) {
 						oPicker.displayDate(oDate);
 					}
-					oPicker.setCalendarWeekNumbering && oPicker.setCalendarWeekNumbering(this.getCalendarWeekNumbering());
+					!this.isPropertyInitial("calendarWeekNumbering") && oCalendarPicker.setCalendarWeekNumbering(this._getCalendarWeekNumbering());
 					this._openCalendarPickerPopup(oPicker);
 				}
 			}.bind(this)
@@ -882,6 +882,14 @@ function(
 	 */
 	PlanningCalendarHeader.prototype._getNavigationToolbar = function () {
 		return this.getAggregation("_navigationToolbar");
+	};
+
+	PlanningCalendarHeader.prototype._getCalendarWeekNumbering = function () {
+		if (this.isPropertyInitial("calendarWeekNumbering")) {
+			return;
+		}
+
+		return this.getCalendarWeekNumbering();
 	};
 
 	return PlanningCalendarHeader;

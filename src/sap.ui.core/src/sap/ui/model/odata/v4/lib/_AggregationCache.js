@@ -1022,10 +1022,10 @@ sap.ui.define([
 			}
 			if (bSubtotalsAtBottom) {
 				oSubtotals = Object.assign({}, oSubtotals);
-				// Note: mQueryOptions.$select does not matter here, no "identity" being used for
-				// non-leaf level
-				_AggregationHelper.setAnnotations(oSubtotals, undefined, true, iLevel,
-					_AggregationHelper.getAllProperties(that.oAggregation));
+				const aAllProperties = _AggregationHelper
+					.getAllProperties(that.oAggregation, that.mQueryOptions, false);
+				_AggregationHelper
+					.setAnnotations(oSubtotals, undefined, true, iLevel, aAllProperties);
 				_Helper.setPrivateAnnotation(oSubtotals, "predicate",
 					_Helper.getPrivateAnnotation(oGroupNode, "predicate").slice(0, -1)
 						+ ",$isTotal=true)");

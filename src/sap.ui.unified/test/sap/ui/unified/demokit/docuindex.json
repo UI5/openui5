@@ -27,7 +27,9 @@
 				"formFactors": "SML",
 				"samples": [
 					"sap.ui.unified.sample.Currency",
-					"sap.ui.unified.sample.CurrencyInTable"
+					"sap.ui.unified.sample.CurrencyInTable",
+					"sap.ui.unified.sample.ObjectNumberCurrency",
+					"sap.ui.unified.sample.ObjectNumberCurrencyInTable"
 				]
 			},
 			{
@@ -105,6 +107,16 @@
 				"id": "sap.ui.unified.sample.CurrencyInTable",
 				"name": "Currency in Table",
 				"description": "Display Currencies in Table"
+			},
+			{
+				"id": "sap.ui.unified.sample.ObjectNumberCurrency",
+				"name": "Object Number in Currency Mode",
+				"description": "Display currencies with Object Numbers in Currency Mode"
+			},
+			{
+				"id": "sap.ui.unified.sample.ObjectNumberCurrencyInTable",
+				"name": "Object Number in Currency Mode in Table",
+				"description": "Display currencies with Object Numbers in Currency Mode in Table"
 			},
 			{
 				"id": "sap.ui.unified.sample.ColorPicker",

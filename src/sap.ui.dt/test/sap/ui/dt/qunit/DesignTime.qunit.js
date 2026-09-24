@@ -1304,6 +1304,29 @@ sap.ui.define([
 			assert.deepEqual(this.oDesignTime.getRootElements(), [this.oLayout3], "then only the remaining root element is returned");
 		});
 
+		QUnit.test("when 'getElementOverlays' is called, it returns all overlays from all roots matching OverlayRegistry", function(assert) {
+			const aElementOverlays = this.oDesignTime.getElementOverlays();
+			const aRegistryOverlays = OverlayRegistry.getOverlays().filter((oOvl) => oOvl instanceof ElementOverlay);
+			assert.ok(aElementOverlays.length >= 2, "at least the two root overlays are returned");
+			assert.strictEqual(
+				aElementOverlays.length,
+				aRegistryOverlays.length,
+				"the number of overlays matches the OverlayRegistry count"
+			);
+			assert.ok(
+				aElementOverlays.includes(OverlayRegistry.getOverlay(this.oLayout1)),
+				"overlay for layout1 is included"
+			);
+			assert.ok(
+				aElementOverlays.includes(OverlayRegistry.getOverlay(this.oLayout3)),
+				"overlay for layout3 is included"
+			);
+			assert.notOk(
+				aElementOverlays.includes(OverlayRegistry.getOverlay(this.oLayout2)),
+				"overlay for layout2 (not a root) is not included"
+			);
+		});
+
 		QUnit.test("when one root element is removed", function(assert) {
 			this.oDesignTime.removeRootElement(this.oLayout3);
 			assert.ok(OverlayRegistry.getOverlay(this.oLayout1), "then overlay for layout1 exists");

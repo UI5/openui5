@@ -109,7 +109,7 @@
 		</interaction>
 		<interaction> <kbd>Escape</kbd> <description>
 				<p><span class="emphasis">Jei įgalintas langelių pasirinkimas:</span></p>
-				<p>If the focus is inside the table, and cells are selected, the selection of the cells is removed.</p>
+				<p>Jei suaktyvinta lentelėje ir pasirinkti langeliai, pašalinamas visų langelių pasirinkimas.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>F2</kbd> <description>
@@ -117,16 +117,16 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>F7</kbd> <description>
-				<p>Jei suaktyvinta langelyje redagavimo režimu, suaktyvinama eilutė.</p>
+				<p>Jei suaktyvinta langelyje redagavimo režimu, suaktyvinimas perkeliamas į eilutę.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Shift + MouseClick</kbd> <description>
-				<p><span class="emphasis">Jei įgalintas langelių pasirinkimas:</span></p>
+				<p><span class="emphasis">Jei įgalintas langelių pasirinkimas</span>:</p>
 				<p>Jei pasirinkti langeliai, spustelėjus <kbd>Shift + MouseClick</kbd> kitame langelyje pasirinkimas išplečiamas iki paspausto langelio.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Copies the selected rows or cells to the clipboard (if available), and the feature is enabled.</p>
+				<p>Įjungus funkciją pasirinktos eilutės ir langeliai nukopijuojami į mainų sritį (esant galimybei).</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>
@@ -141,7 +141,7 @@
 			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Uždaromas dialogo lango Mano rakursai“ iškylantysis klaidos langas.</p>
+				<p>Uždaromas dialogo lango „Mano rakursai“ iškylantysis klaidos langas.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Enter</kbd> <description>

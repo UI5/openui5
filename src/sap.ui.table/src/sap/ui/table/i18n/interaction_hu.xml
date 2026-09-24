@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Ha a fókusz egy cellán, a sorkijelölőn vagy az <span class="uicontrol">Összes kijelölése</span> jelölőmezőn van, átváltja az <span class="uicontrol">Összes kijelölése</span> jelölőmező állapotát: kijelöli az összes sort, illetve megszünteti a kijelölésüket.</p>
+				<p>A billentyűparancsnak nincs hatása, ha a fókusz oszlopfejléccellán van.</p>
+				<p>A billentyűparancsnak nincs hatása, ha a fókusz egy szövegbeviteli mezőn van, mivel ebben az esetben a böngésző kezeli a szövegkijelölést.</p>
+				<p><span class="emphasis">Ha engedélyezett a cellakijelölés:</span></p>
+				<p>Ha a fókusz egy cellán van, akkor minden elérhető cellát kijelöl a kijelölési korlátig. Ha már minden elérhető cella ki van jelölve, a cellakijelölés megszűnik.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Ha a fókusz egy cellán vagy sorkiválasztáson vagy az <span class="uicontrol">Összes kijelölése</span> lehetőségen van, akkor megszünteti az összes sor kijelölését.</p>
+				<p>A billentyűparancsnak nincs hatása, ha a fókusz oszlopfejléccellán vagy szövegbeviteli mezőn van.</p>
 				<p><span class="emphasis">Ha engedélyezett a cellakijelölés:</span></p>
 				<p>Ha a fókusz a táblán belül van, akkor megszünteti a sorok és cellák kijelölését.</p>
 			</description>

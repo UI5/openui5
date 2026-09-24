@@ -2,27 +2,33 @@ sap.ui.define([
   "sap/m/ObjectNumber",
   "sap/m/Button",
   "sap/ui/core/library",
+  "sap/m/library",
   "sap/m/App",
-  "sap/m/Page"
-], function(ObjectNumber, Button, coreLibrary, App, Page) {
+  "sap/m/Page",
+  "sap/m/Title",
+  "sap/m/VBox"
+], function(ObjectNumber, Button, coreLibrary, mobileLibrary, App, Page, Title, VBox) {
   "use strict";
+
+  // shortcut for sap.m.ObjectNumberDisplayMode
+  const ObjectNumberDisplayMode = mobileLibrary.ObjectNumberDisplayMode;
 
   // shortcut for sap.ui.core.ValueState
   const ValueState = coreLibrary.ValueState;
 
   // Note: the HTML page 'ObjectNumberVisualTest.html' loads this module via data-sap-ui-on-init
 
-  var on1 = new ObjectNumber("on1", {
+  conston1 = new ObjectNumber("on1", {
 	  number: "300,000,000",
 	  unit: "Euro"
   }).addStyleClass("sapUiSmallMargin");
 
-  var on2 = new ObjectNumber("on2", {
+  conston2 = new ObjectNumber("on2", {
 	  number: "300,000,000",
 	  unit: "Euro"
   }).addStyleClass("sapMObjectNumberLarge").addStyleClass("sapUiSmallMargin");
 
-  var oButtonEmphasized = new Button("emphasized", {
+  constoButtonEmphasized = new Button("emphasized", {
 	  text:"Toggle emphasized",
 	  press: function(){
 		  on1.setEmphasized(!on1.getEmphasized());
@@ -30,7 +36,7 @@ sap.ui.define([
 	  }
   });
 
-  var oButtonNum = new Button("num", {
+  constoButtonNum = new Button("num", {
 	  text:"Set number",
 	  press: function(){
 		  on1.setNumber("100");
@@ -38,7 +44,7 @@ sap.ui.define([
 	  }
   });
 
-  var oButtonUnit = new Button("unit", {
+  constoButtonUnit = new Button("unit", {
 	  text:"Set unit",
 	  press: function(){
 		  on1.setUnit("Dollars");
@@ -46,7 +52,7 @@ sap.ui.define([
 	  }
   });
 
-  var oButtonStateS = new Button("change_stateS", {
+  constoButtonStateS = new Button("change_stateS", {
 	  text:"Success state",
 	  press: function(){
 		  on1.setState(ValueState.Success);
@@ -54,7 +60,7 @@ sap.ui.define([
 	  }
   });
 
-  var oButtonStateE = new Button("change_stateE", {
+  constoButtonStateE = new Button("change_stateE", {
 	  text:"Error state",
 	  press: function(){
 		  on1.setState(ValueState.Error);
@@ -62,7 +68,7 @@ sap.ui.define([
 	  }
   });
 
-  var oButtonStateW = new Button("change_stateW", {
+  constoButtonStateW = new Button("change_stateW", {
 	  text:"Warning state",
 	  press: function(){
 		  on1.setState(ValueState.Warning);
@@ -70,7 +76,7 @@ sap.ui.define([
 	  }
   });
 
-  var oButtonStateI = new Button("change_stateI", {
+  constoButtonStateI = new Button("change_stateI", {
 	  text:"Information state",
 	  press: function(){
 		  on1.setState(ValueState.Information);
@@ -78,39 +84,122 @@ sap.ui.define([
 	  }
   });
 
-  var on3 = new ObjectNumber("on3", {
+  conston3 = new ObjectNumber("on3", {
 	  number: "300",
 	  unit: "Euro",
 	  active: true
   }).addStyleClass("sapUiSmallMargin");
 
-  var on4 = new ObjectNumber("on4", {
+  conston4 = new ObjectNumber("on4", {
 	  number: "300000",
 	  unit: "Euro",
 	  active: true
   }).addStyleClass("sapMObjectNumberLarge").addStyleClass("sapUiSmallMargin");
 
-  var on5 = new ObjectNumber("on5", {
+  conston5 = new ObjectNumber("on5", {
 	  number: "1.50",
 	  active: true,
 	  inverted: true
   }).addStyleClass("sapUiSmallMargin");
 
-  var on6 = new ObjectNumber("on6", {
+  conston6 = new ObjectNumber("on6", {
 	  number: "1.50",
 	  unit: "Euro",
 	  inverted: true
   }).addStyleClass("sapUiSmallMargin");
 
-  var on7 = new ObjectNumber("on7", {
+  conston7 = new ObjectNumber("on7", {
 	  number: "300000",
 	  unit: "Euro",
 	  inverted: true,
 	  active: true
   }).addStyleClass("sapMObjectNumberLarge").addStyleClass("sapUiSmallMargin");
 
-  var app = new App();
-  var page = new Page({
+  constObjectNumberDisplayMode = ObjectNumberDisplayMode;
+
+  // --- Currency mode ---
+
+  // USD, useSymbol=true (default) → symbol "$"
+  constonCurrency1 = new ObjectNumber("onCurrency1", {
+	  number: "1234.5",
+	  unit: "USD",
+	  displayMode: ObjectNumberDisplayMode.Currency
+  });
+
+  // USD, useSymbol=false → ISO code "USD"
+  constonCurrency2 = new ObjectNumber("onCurrency2", {
+	  number: "1234.5",
+	  unit: "USD",
+	  displayMode: ObjectNumberDisplayMode.Currency,
+	  useSymbol: false
+  });
+
+  // EUR, maxPrecision=4 → 2 extra figure-space padding digits
+  constonCurrency3 = new ObjectNumber("onCurrency3", {
+	  number: "99",
+	  unit: "EUR",
+	  displayMode: ObjectNumberDisplayMode.Currency,
+	  maxPrecision: 4
+  });
+
+  // JPY — 0 CLDR decimal digits, edge case
+  constonCurrency4 = new ObjectNumber("onCurrency4", {
+	  number: "12000",
+	  unit: "JPY",
+	  displayMode: ObjectNumberDisplayMode.Currency
+  });
+
+  // CHF — standard 2 decimal digits, maxPrecision matches CLDR (no padding)
+  constonCurrency5 = new ObjectNumber("onCurrency5", {
+	  number: "750",
+	  unit: "CHF",
+	  displayMode: ObjectNumberDisplayMode.Currency,
+	  maxPrecision: 2
+  });
+
+  // --- Unit mode ---
+
+  // kg, no maxPrecision → integer rendering
+  constonUnit1 = new ObjectNumber("onUnit1", {
+	  number: "42",
+	  unit: "kg",
+	  displayMode: ObjectNumberDisplayMode.Unit
+  });
+
+  // km, maxPrecision=2 → formatted to 2 decimal places
+  constonUnit2 = new ObjectNumber("onUnit2", {
+	  number: "3.5",
+	  unit: "km",
+	  displayMode: ObjectNumberDisplayMode.Unit,
+	  maxPrecision: 2
+  });
+
+  // m², maxPrecision=3 → formatted to 3 decimal places
+  constonUnit3 = new ObjectNumber("onUnit3", {
+	  number: "0.5",
+	  unit: "m²",
+	  displayMode: ObjectNumberDisplayMode.Unit,
+	  maxPrecision: 3
+  });
+
+  // useSymbol=true has no effect in Unit mode — raw unit string shown
+  constonUnit4 = new ObjectNumber("onUnit4", {
+	  number: "100",
+	  unit: "kWh",
+	  displayMode: ObjectNumberDisplayMode.Unit,
+	  useSymbol: true
+  });
+
+  // emphasized unit
+  constonUnit5 = new ObjectNumber("onUnit5", {
+	  number: "200",
+	  unit: "kg",
+	  displayMode: ObjectNumberDisplayMode.Unit,
+	  emphasized: true
+  });
+
+  constapp = new App();
+  constpage = new Page({
 	  showHeader : false,
 	  enableScrolling : true,
 	  content: [
@@ -127,7 +216,17 @@ sap.ui.define([
 		  on4,
 		  on5,
 		  on6,
-		  on7
+		  on7,
+		  new Title({ text: "Currency mode" }).addStyleClass("sapUiSmallMarginBegin"),
+		  new VBox({
+			  renderType: "Bare",
+			  items: [onCurrency1, onCurrency2, onCurrency3, onCurrency4, onCurrency5]
+		  }).addStyleClass("sapUiSmallMarginBeginEnd"),
+		  new Title({ text: "Unit mode" }).addStyleClass("sapUiSmallMarginBegin"),
+		  new VBox({
+			  renderType: "Bare",
+			  items: [onUnit1, onUnit2, onUnit3, onUnit4, onUnit5]
+		  }).addStyleClass("sapUiSmallMarginBeginEnd")
 	  ]
   });
   app.setInitialPage(page.getId());

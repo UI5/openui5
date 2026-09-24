@@ -5,6 +5,14 @@ sap.ui.define(function() {
 	"use strict";
 
 	/**
+	 * Namespace containing test starter configuration types.
+	 *
+	 * @name module:sap/ui/test/starter/config
+	 * @namespace
+	 * @public
+	 */
+
+	/**
 	 * @typedef {object} module:sap/ui/test/starter/config.SuiteConfiguration
 	 *
 	 * @property {string} [name]

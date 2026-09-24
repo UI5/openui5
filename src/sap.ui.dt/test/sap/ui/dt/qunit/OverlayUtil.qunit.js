@@ -35,7 +35,7 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	var sandbox = sinon.createSandbox();
+	const sandbox = sinon.createSandbox();
 
 	QUnit.module("Given that an Overlay is created for a control", {
 		async beforeEach(assert) {
@@ -89,7 +89,7 @@ sap.ui.define([
 				rootElements: [this.oLayout2]
 			});
 
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			this.oDesignTime.attachEventOnce("synced", function() {
 				this.oButtonOverlay01 = OverlayRegistry.getOverlay(this.oButton01);
 				this.oButtonOverlay02 = OverlayRegistry.getOverlay(this.oButton02);
@@ -108,7 +108,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when Overlays are created and the getAllChildOverlays function is called", function(assert) {
-			var aChildOverlays = OverlayUtil.getAllChildOverlays(this.oLayoutOverlay0);
+			let aChildOverlays = OverlayUtil.getAllChildOverlays(this.oLayoutOverlay0);
 			assert.strictEqual(aChildOverlays.length, 2, "oLayoutOverlay0 has 2 children");
 
 			aChildOverlays = OverlayUtil.getAllChildOverlays(this.oLayoutOverlay1);
@@ -123,16 +123,16 @@ sap.ui.define([
 		});
 
 		QUnit.test("when Overlays are created and the getFirstDescendantByCondition function is called", function(assert) {
-			var aSelectableOverlays = [
+			const aSelectableOverlays = [
 				this.oButtonOverlay01,
 				this.oButtonOverlay02,
 				this.oButtonOverlay21
 			];
-			var fnCondition = function(oOverlay) {
+			const fnCondition = function(oOverlay) {
 				return aSelectableOverlays.indexOf(oOverlay) >= 0;
 			};
 
-			var oChildOverlay = OverlayUtil.getFirstDescendantByCondition(this.oLayoutOverlay0, fnCondition);
+			let oChildOverlay = OverlayUtil.getFirstDescendantByCondition(this.oLayoutOverlay0, fnCondition);
 			assert.strictEqual(
 				oChildOverlay, this.oButtonOverlay01, "oLayoutOverlay0 -> oButtonOverlay01 is the first overlay which fulfill the condition"
 			);
@@ -157,16 +157,16 @@ sap.ui.define([
 		});
 
 		QUnit.test("when Overlays are created and the getLastDescendantByCondition function is called", function(assert) {
-			var aSelectableOverlays = [
+			const aSelectableOverlays = [
 				this.oButtonOverlay01,
 				this.oButtonOverlay02,
 				this.oButtonOverlay21
 			];
-			var fnCondition = function(oOverlay) {
+			const fnCondition = function(oOverlay) {
 				return aSelectableOverlays.indexOf(oOverlay) >= 0;
 			};
 
-			var oChildOverlay = OverlayUtil.getLastDescendantByCondition(this.oLayoutOverlay0, fnCondition);
+			let oChildOverlay = OverlayUtil.getLastDescendantByCondition(this.oLayoutOverlay0, fnCondition);
 			assert.strictEqual(
 				oChildOverlay, this.oButtonOverlay02, "oLayoutOverlay0 -> oButtonOverlay02 is the last overlay which fulfill the condition"
 			);
@@ -191,7 +191,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when getParentInformation is requested for a control with a parent ", function(assert) {
-			var oParentInformation = OverlayUtil.getParentInformation(this.oButtonOverlay01);
+			const oParentInformation = OverlayUtil.getParentInformation(this.oButtonOverlay01);
 
 			assert.strictEqual(!!oParentInformation, true, "then parent information is returned");
 			assert.strictEqual(oParentInformation.parent, this.oLayout0, "parent is correct");
@@ -200,10 +200,10 @@ sap.ui.define([
 		});
 
 		QUnit.test("when getParentInformation is requested for a control with no parent ", function(assert) {
-			var oButton = new Button();
-			var oOverlay = new ElementOverlay({ element: oButton });
+			const oButton = new Button();
+			const oOverlay = new ElementOverlay({ element: oButton });
 
-			var oParentInformation = OverlayUtil.getParentInformation(oOverlay);
+			const oParentInformation = OverlayUtil.getParentInformation(oOverlay);
 
 			assert.strictEqual(!!oParentInformation, true, "then parent information is returned");
 			assert.strictEqual(oParentInformation.parent, null, "parent is undefined");
@@ -214,26 +214,26 @@ sap.ui.define([
 		});
 
 		QUnit.test("when getAggregation is called and Element is not part of the aggregation", function(assert) {
-			var oButton = new Button();
-			var nPosition = OverlayUtil.getIndexInAggregation(oButton, this.oLayout0, "content");
+			const oButton = new Button();
+			const nPosition = OverlayUtil.getIndexInAggregation(oButton, this.oLayout0, "content");
 			assert.strictEqual(nPosition, -1, "then it returns -1");
 			oButton.destroy();
 		});
 
 		QUnit.test("when getAggregation is called and Element is part of the aggregation and all other Elements have Overlays", function(assert) {
-			var oButton = new Button();
+			const oButton = new Button();
 			this.oLayout0.addContent(oButton);
-			var nPosition = OverlayUtil.getIndexInAggregation(oButton, this.oLayout0, "content");
+			const nPosition = OverlayUtil.getIndexInAggregation(oButton, this.oLayout0, "content");
 			assert.strictEqual(nPosition, 2, "then it returns the correct index position");
 			oButton.destroy();
 		});
 
 		QUnit.test("when getAggregation is called and Element is part of the aggregation and not all other Elements have Overlays", function(assert) {
-			var oButton = new Button();
+			const oButton = new Button();
 			this.oLayout0.addContent(oButton);
 			// remove Overlay from Button01
 			OverlayRegistry.deregister(OverlayRegistry.getOverlay(this.oButton01));
-			var nPosition = OverlayUtil.getIndexInAggregation(oButton, this.oLayout0, "content");
+			const nPosition = OverlayUtil.getIndexInAggregation(oButton, this.oLayout0, "content");
 			assert.strictEqual(nPosition, 1, "then it returns the correct index position");
 			oButton.destroy();
 		});
@@ -269,7 +269,7 @@ sap.ui.define([
 
 	QUnit.module("Given a VBox with an ObjectPageLayout with Overlays created", {
 		async beforeEach(assert) {
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 
 			//	VBox0
 			//		Layout0
@@ -535,6 +535,19 @@ sap.ui.define([
 			);
 		});
 
+		QUnit.test("when findAllUniqueAggregationOverlaysInContainer is called with siblings sharing the same aggregation, it deduplicates to one entry", function(assert) {
+			// oButton0 and oButton1 are both in oSubSection0.blocks — two siblings, one aggregation overlay
+			const aResult = OverlayUtil.findAllUniqueAggregationOverlaysInContainer(
+				this.oButtonOverlay0, this.oSubSectionOverlay0
+			);
+			assert.strictEqual(aResult.length, 1, "two siblings in the same aggregation collapse to one aggregation overlay");
+			assert.strictEqual(
+				aResult[0],
+				this.oButtonOverlay1.getParentAggregationOverlay(),
+				"the returned aggregation overlay is the shared parent aggregation overlay"
+			);
+		});
+
 		QUnit.test("when isInTargetZoneAggregation is called", function(assert) {
 			assert.strictEqual(
 				OverlayUtil.isInTargetZoneAggregation(this.oButtonOverlay0), false, "then it returns false if Targetzone is false"
@@ -551,7 +564,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when getNextSiblingOverlay function is called", function(assert) {
-			var oNextSiblingOverlay = OverlayUtil.getNextSiblingOverlay(this.oVBoxOverlay0);
+			let oNextSiblingOverlay = OverlayUtil.getNextSiblingOverlay(this.oVBoxOverlay0);
 			assert.strictEqual(oNextSiblingOverlay, undefined, "oVBoxOverlay0 -> undefined");
 
 			oNextSiblingOverlay = OverlayUtil.getNextSiblingOverlay(this.oSectionOverlay0);
@@ -565,7 +578,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when getPreviousSiblingOverlay function is called", function(assert) {
-			var oPreviousSiblingOverlay = OverlayUtil.getPreviousSiblingOverlay(this.oVBoxOverlay0);
+			let oPreviousSiblingOverlay = OverlayUtil.getPreviousSiblingOverlay(this.oVBoxOverlay0);
 			assert.strictEqual(oPreviousSiblingOverlay, undefined, "oVBoxOverlay0 -> undefined");
 
 			oPreviousSiblingOverlay = OverlayUtil.getPreviousSiblingOverlay(this.oButtonOverlay1);
@@ -579,7 +592,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when iterateOverlayElementTree function is called", function(assert) {
-			var oSpy = sandbox.spy();
+			const oSpy = sandbox.spy();
 			OverlayUtil.iterateOverlayElementTree(this.oVBoxOverlay0, oSpy);
 			assert.strictEqual(oSpy.callCount, 23, "callback was called 23 times for oVBoxOverlay0");
 			oSpy.reset();
@@ -607,10 +620,10 @@ sap.ui.define([
 
 	QUnit.module("Given some geometry objects", {}, function() {
 		QUnit.test("when getGeometry is called with different overlays", function(assert) {
-			var oGeometry0 = createGeometryObject(20, 100, 5, 100, true);
-			var oGeometry1 = createGeometryObject(200, 200, 6, 300, true);
-			var oGeometry2 = createGeometryObject(0, 0, 0, 0, true);
-			var oGeometry3 = createGeometryObject(0, 0, 0, 0, false);
+			const oGeometry0 = createGeometryObject(20, 100, 5, 100, true);
+			const oGeometry1 = createGeometryObject(200, 200, 6, 300, true);
+			const oGeometry2 = createGeometryObject(0, 0, 0, 0, true);
+			const oGeometry3 = createGeometryObject(0, 0, 0, 0, false);
 
 			assert.deepEqual(
 				OverlayUtil.getGeometry([oGeometry0, oGeometry1, oGeometry2, oGeometry3]),
@@ -647,7 +660,7 @@ sap.ui.define([
 
 	QUnit.module("getClosestBoundControl() - Given is a list with bounded items", {
 		async beforeEach(assert) {
-			var fnDone = assert.async();
+			const fnDone = assert.async();
 			this.oHorizontalLayout = await TestUtil.createListWithBoundItems();
 			this.oDesignTime = new DesignTime({
 				rootElements: [this.oHorizontalLayout]
@@ -661,9 +674,9 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when overlay that is part of the binding aggregation template is given", function(assert) {
-			var oSelectedOverlay = OverlayRegistry.getOverlay("boundListItem-btn");
-			var mAggregationBindingStack = OverlayUtil.getClosestBoundControl(oSelectedOverlay);
-			var oClosestBoundOverlay = OverlayRegistry.getOverlay(mAggregationBindingStack.overlayId);
+			const oSelectedOverlay = OverlayRegistry.getOverlay("boundListItem-btn");
+			const mAggregationBindingStack = OverlayUtil.getClosestBoundControl(oSelectedOverlay);
+			const oClosestBoundOverlay = OverlayRegistry.getOverlay(mAggregationBindingStack.overlayId);
 			assert.strictEqual(oClosestBoundOverlay.getElement().getId(), "boundlist", "then the closest bounded overlay could be found");
 			assert.strictEqual(
 				mAggregationBindingStack.aggregation,
@@ -673,7 +686,7 @@ sap.ui.define([
 			assert.strictEqual(
 				mAggregationBindingStack.stack.length, 2, "then the stack to the closest bounded overlay includes 3 info objects"
 			);
-			var mFirstStackObject = mAggregationBindingStack.stack.pop();
+			const mFirstStackObject = mAggregationBindingStack.stack.pop();
 			assert.deepEqual(mFirstStackObject, {
 				overlayId: OverlayRegistry.getOverlay("boundListItem").getId(),
 				aggregation: "items",
@@ -682,9 +695,9 @@ sap.ui.define([
 		});
 
 		QUnit.test("when overlay that is part of the binding aggregation cloned item is given", function(assert) {
-			var oSelectedOverlay = OverlayRegistry.getOverlay("boundListItem-btn-boundlist-0");
-			var mAggregationBindingStack = OverlayUtil.getClosestBoundControl(oSelectedOverlay);
-			var oClosestBoundOverlay = OverlayRegistry.getOverlay(mAggregationBindingStack.overlayId);
+			const oSelectedOverlay = OverlayRegistry.getOverlay("boundListItem-btn-boundlist-0");
+			const mAggregationBindingStack = OverlayUtil.getClosestBoundControl(oSelectedOverlay);
+			const oClosestBoundOverlay = OverlayRegistry.getOverlay(mAggregationBindingStack.overlayId);
 			assert.strictEqual(oClosestBoundOverlay.getElement().getId(), "boundlist", "then the closest bounded overlay could be found");
 			assert.strictEqual(
 				mAggregationBindingStack.aggregation, "items", "then the closest bounded overlay could be found for the correct aggregation"
@@ -692,7 +705,7 @@ sap.ui.define([
 			assert.strictEqual(
 				mAggregationBindingStack.stack.length, 2, "then the stack to the closest bounded overlay includes 3 info objects"
 			);
-			var mFirstStackObject = mAggregationBindingStack.stack.pop();
+			const mFirstStackObject = mAggregationBindingStack.stack.pop();
 			assert.deepEqual(mFirstStackObject, {
 				overlayId: OverlayRegistry.getOverlay("boundListItem-boundlist-0").getId(),
 				aggregation: "items",
@@ -701,8 +714,8 @@ sap.ui.define([
 		});
 
 		QUnit.test("when overlay that does not belong to a binding aggregation is given", function(assert) {
-			var oSelectedOverlay = OverlayRegistry.getOverlay("item1-btn");
-			var mAggregationBindingStack = OverlayUtil.getClosestBoundControl(oSelectedOverlay);
+			const oSelectedOverlay = OverlayRegistry.getOverlay("item1-btn");
+			const mAggregationBindingStack = OverlayUtil.getClosestBoundControl(oSelectedOverlay);
 			assert.strictEqual(mAggregationBindingStack.overlayId, undefined, "then the closest bounded overlay id is empty (not found)");
 			assert.strictEqual(
 				mAggregationBindingStack.aggregation, undefined, "then no aggregation available as no closest bounded overlay was found"

@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Wenn der Fokus auf einer Zelle, dem Zeilenauswahlfeld oder <span class="uicontrol">Alle markieren</span> liegt, wird das Ankreuzfeld <span class="uicontrol">Alle markieren</span> umgeschaltet: Alle Zeilen werden markiert bzw. die Markierung aller Zeilen gelöscht.</p>
+				<p>Das Tastaturkürzel hat keine Auswirkung, wenn der Fokus auf einer Spaltenkopfzelle liegt.</p>
+				<p>Das Tastaturkürzel hat keine Auswirkung, wenn der Fokus auf einem Texteingabefeld liegt, da der Browser in diesem Fall die Textmarkierung steuert.</p>
+				<p><span class="emphasis">Wenn die Zellenmarkierung aktiviert ist:</span></p>
+				<p>Wenn der Fokus auf einer Zelle liegt, werden alle verfügbaren Zellen bis zur Selektionsgrenze markiert. Wenn alle verfügbaren Zellen bereits markiert sind, wird die Zellenmarkierung entfernt.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Wenn der Fokus auf einer Zelle, dem Zeilenauswahlfeld oder <span class="uicontrol">Alle markieren</span> liegt, wird die Markierung aller Zeilen entfernt.</p>
+				<p>Das Tastaturkürzel hat keine Auswirkung, wenn der Fokus auf einer Spaltenkopfzelle oder einem Texteingabefeld liegt.</p>
 				<p><span class="emphasis">Wenn die Zellenmarkierung aktiviert ist:</span></p>
 				<p>Wenn der Fokus innerhalb der Tabelle liegt, wird die Markierung für alle Zeilen und Zellen entfernt.</p>
 			</description>

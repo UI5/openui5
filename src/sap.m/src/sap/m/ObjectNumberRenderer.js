@@ -12,27 +12,30 @@ sap.ui.define([
 
 
 // shortcut for sap.ui.core.ValueState
-var ValueState = coreLibrary.ValueState;
+const ValueState = coreLibrary.ValueState;
 
 // shortcut for sap.ui.core.TextDirection
-var TextDirection = coreLibrary.TextDirection;
+const TextDirection = coreLibrary.TextDirection;
 
 // shortcut for sap.m.ReactiveAreaMode
-var ReactiveAreaMode = library.ReactiveAreaMode;
+const ReactiveAreaMode = library.ReactiveAreaMode;
+
+// shortcut for sap.m.ObjectNumberDisplayMode
+const ObjectNumberDisplayMode = library.ObjectNumberDisplayMode;
 
 /**
  * String to prefix CSS class for number status.
  */
-var _sCSSPrefixObjNumberStatus = 'sapMObjectNumberStatus';
+const _sCSSPrefixObjNumberStatus = 'sapMObjectNumberStatus';
 
 // shortcut for sap.m.EmptyIndicatorMode
-var EmptyIndicatorMode = library.EmptyIndicatorMode;
+const EmptyIndicatorMode = library.EmptyIndicatorMode;
 
 /**
  * ObjectNumber renderer.
  * @namespace
  */
-var ObjectNumberRenderer = {
+const ObjectNumberRenderer = {
 	apiVersion: 2
 };
 
@@ -47,10 +50,17 @@ ObjectNumberRenderer.render = function(oRm, oON) {
 		sTextDir = oON.getTextDirection(),
 		sTextAlign = oON.getTextAlign(),
 		sAriaLabelIds = oON._generateSelfLabellingIds(),
+		sDisplayMode = oON.getDisplayMode(),
 		oAccAttributes = {};
 
 	oRm.openStart("div", oON);
 	oRm.class("sapMObjectNumber");
+
+	if (sDisplayMode === ObjectNumberDisplayMode.Currency) {
+		oRm.class("sapMObjectNumberCurrency");
+	} else if (sDisplayMode === ObjectNumberDisplayMode.Unit) {
+		oRm.class("sapMObjectNumberUnitMode");
+	}
 
 	if (oON._isActive()) {
 		oRm.class("sapMObjectNumberActive");
@@ -81,7 +91,7 @@ ObjectNumberRenderer.render = function(oRm, oON) {
 
 	sTextAlign = Renderer.getTextAlign(sTextAlign, sTextDir);
 
-	if (sTextAlign) {
+	if (sDisplayMode === ObjectNumberDisplayMode.Default && sTextAlign) {
 		oRm.style("text-align", sTextAlign);
 	}
 
@@ -129,13 +139,19 @@ ObjectNumberRenderer.render = function(oRm, oON) {
  * @private
  */
 ObjectNumberRenderer.renderText = function(oRm, oON) {
-	var sUnit = oON.getUnit();
+	var sUnit = oON.getUnit(),
+		bFormattedMode = oON.getDisplayMode() !== ObjectNumberDisplayMode.Default,
+		sNumber = bFormattedMode ? oON._getFormattedNumber() : oON.getNumber();
 
 	oRm.openStart("span", oON.getId() + "-number");
 	oRm.class("sapMObjectNumberText");
+	if (bFormattedMode) {
+		oRm.attr("dir", "ltr");
+	}
 	oRm.openEnd();
-	oRm.text(oON.getNumber());
-	if (sUnit !== "") {
+
+	oRm.text(sNumber);
+	if (sUnit !== "" && !bFormattedMode) {
 		oRm.text(" ");
 	}
 	oRm.close("span");
@@ -147,12 +163,15 @@ ObjectNumberRenderer.renderText = function(oRm, oON) {
  * @private
  */
 ObjectNumberRenderer.renderUnit = function(oRm, oON) {
-	var sUnit = oON.getUnit();
+	const sUnit = oON._getUnit();
 
 	if (sUnit !== "") {
 		oRm.openStart("span", oON.getId() + "-unit");
 		oRm.class("sapMObjectNumberUnit");
 		oRm.openEnd();
+		if (oON.getDisplayMode() === ObjectNumberDisplayMode.Unit) {
+			oRm.text(oON.constructor.FIGURE_SPACE);
+		}
 		oRm.text(sUnit);
 		oRm.close("span");
 	}

@@ -818,6 +818,44 @@ sap.ui.define([
 			assert.strictEqual(oCommand.getWidth(), "100%", "then the width defaults to 100%");
 			assert.strictEqual(oCommand.getHeight(), "100%", "then the height defaults to 100%");
 		});
+
+		QUnit.test("when createCommands is called directly with an unsafe URL", async function(assert) {
+			const oFireStub = sandbox.stub();
+			this.oAddIFrame.attachElementModified(oFireStub);
+
+			let oError;
+			try {
+				await this.oAddIFrame.createCommands(this.oObjectPageLayoutOverlay, {
+					aggregation: "sections",
+					index: 0,
+					// eslint-disable-next-line no-script-url
+					frameUrl: "javascript:alert(1)"
+				});
+			} catch (oCaughtError) {
+				oError = oCaughtError;
+			}
+
+			assert.ok(oError, "then createCommands rejects instead of creating a command for an unsafe URL");
+			assert.strictEqual(oFireStub.callCount, 0, "then no elementModified event is fired");
+		});
+
+		QUnit.test("when createCommands is called directly without a URL", async function(assert) {
+			const oFireStub = sandbox.stub();
+			this.oAddIFrame.attachElementModified(oFireStub);
+
+			let oError;
+			try {
+				await this.oAddIFrame.createCommands(this.oObjectPageLayoutOverlay, {
+					aggregation: "sections",
+					index: 0
+				});
+			} catch (oCaughtError) {
+				oError = oCaughtError;
+			}
+
+			assert.ok(oError, "then createCommands rejects when no URL is provided");
+			assert.strictEqual(oFireStub.callCount, 0, "then no elementModified event is fired");
+		});
 	});
 
 	QUnit.done(function() {

@@ -479,6 +479,24 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, () => {
+		QUnit.test("when providing an empty string", function(assert) {
+			const { result, error } = IFrame.isValidUrl("");
+			assert.strictEqual(result, false);
+			assert.strictEqual(error, IFrame.VALIDATION_ERROR.INVALID_URL);
+		});
+
+		QUnit.test("when providing a whitespace-only string", function(assert) {
+			const { result, error } = IFrame.isValidUrl("   ");
+			assert.strictEqual(result, false);
+			assert.strictEqual(error, IFrame.VALIDATION_ERROR.INVALID_URL);
+		});
+
+		QUnit.test("when providing a non-string value", function(assert) {
+			const { result, error } = IFrame.isValidUrl(undefined);
+			assert.strictEqual(result, false);
+			assert.strictEqual(error, IFrame.VALIDATION_ERROR.INVALID_URL);
+		});
+
 		QUnit.test("when providing a valid url", function(assert) {
 			const { result, error } = IFrame.isValidUrl("https://example.com");
 			assert.strictEqual(result, true, "then the url is allowed");

@@ -4,27 +4,23 @@
 
 sap.ui.define([
 	"sap/base/Log",
-	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/Component",
 	"sap/ui/core/Element",
 	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
-	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/Utils",
 	"sap/ui/fl/apply/_internal/init"
 ], function(
 	Log,
-	JsControlTreeModifier,
 	Component,
 	Element,
 	URLHandler,
 	VariantUtil,
 	VariantManagementState,
 	VariantManagerApply,
-	FlexObjectState,
 	ManifestUtils,
 	Utils
 ) {
@@ -62,22 +58,6 @@ sap.ui.define([
 			return true;
 		}
 		return false;
-	}
-
-	function waitForInitialVariantChanges(mPropertyBag) {
-		const aCurrentVariantChanges = VariantManagementState.getInitialUIChanges({
-			vmReference: mPropertyBag.vmReference,
-			reference: mPropertyBag.reference
-		});
-		const aSelectors = aCurrentVariantChanges.reduce((aCurrentControls, oChange) => {
-			const oSelector = oChange.getSelector();
-			const oControl = JsControlTreeModifier.bySelector(oSelector, mPropertyBag.appComponent);
-			if (oControl && Utils.indexOfObject(aCurrentControls, { selector: oControl }) === -1) {
-				aCurrentControls.push({ selector: oControl });
-			}
-			return aCurrentControls;
-		}, []);
-		return aSelectors.length ? FlexObjectState.waitForFlexObjectsToBeApplied(aSelectors, mPropertyBag.appComponent) : Promise.resolve();
 	}
 
 	function waitForControlToBeRendered(oControl) {
@@ -280,18 +260,15 @@ sap.ui.define([
 			await oVariantManagementControl.waitForInit();
 
 			const oControl = mPropertyBag.selector.id && Element.getElementById(mPropertyBag.selector.id) || mPropertyBag.selector;
-			const oAppComponent = Utils.getAppComponentForControl(oControl);
 			const sVMReference = oVariantManagementControl.getVariantManagementReference();
 			const sFlexReference = ManifestUtils.getFlexReferenceForControl(oVariantManagementControl);
 
 			const bInitialLoad = handleInitialLoadScenario(sVMReference, oVariantManagementControl, sFlexReference);
 			// if the parameter callAfterInitialVariant or initialLoad is true call the function without check
 			if (mPropertyBag.callAfterInitialVariant || bInitialLoad) {
-				waitForInitialVariantChanges({
-					appComponent: oAppComponent,
-					reference: sFlexReference,
-					vmReference: sVMReference
-				}).then(() => {
+				// waitForVariantSwitch also waits for the initial variant changes to be applied,
+				// since applyInitialChangesForExistingControls is wired into the switch promise.
+				VariantManagementState.waitForVariantSwitch(sFlexReference, sVMReference).then(() => {
 					const sCurrentVariantReference = VariantManagementState.getCurrentVariantReference({
 						vmReference: sVMReference,
 						reference: sFlexReference

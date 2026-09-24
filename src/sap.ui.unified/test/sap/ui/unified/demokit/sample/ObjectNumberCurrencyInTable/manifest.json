@@ -1,0 +1,39 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.ui.unified.sample.ObjectNumberCurrencyInTable",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"type": "application",
+		"title": "Application 'ObjectNumberCurrencyInTable'"
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"rootView": "sap.ui.unified.sample.ObjectNumberCurrencyInTable.View",
+		"dependencies": {
+			"minUI5Version": "2.0.0",
+			"libs": {
+				"sap.ui.unified": {},
+				"sap.ui.core": {},
+				"sap.m": {}
+			}
+		},
+		"config": {
+			"sample": {
+				"files": [
+					"View.view.xml",
+					"Controller.controller.js",
+					"manifest.json"
+				]
+			}
+		}
+	}
+}

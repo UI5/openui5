@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Om fokus är på en cell, radväljaren eller <span class="uicontrol">Markera alla</span>, växlas kryssrutan <span class="uicontrol">Markera alla</span>: Alla rader markeras respektive avmarkeras.</p>
+				<p>Genvägen har ingen effekt om fokus ligger på en kolumnhuvudscell.</p>
+				<p>Genvägen har ingen effekt om fokus ligger på ett textinmatningsfält, detta eftersom webbläsaren i detta fall hanterar textmarkeringen.</p>
+				<p><span class="emphasis">Om cellurval har aktiverats:</span></p>
+				<p>Om fokus ligger på en cell väljs alla tillgängliga celler fram till urvalsgränsen. Om alla tillgängliga celler redan har valts tas cellurvalet bort.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Om fokus ligger på en cell, radväljaren eller <span class="uicontrol">Markera alla</span> tas valet av alla rader bort.</p>
+				<p>Genvägen har ingen effekt om fokus ligger på en kolumnhuvudscell eller på ett textinmatningsfält.</p>
 				<p><span class="emphasis">Om cellurval har aktiverats:</span></p>
 				<p>Om fokus är inuti tabellen tas urvalet för alla rader och celler bort.</p>
 			</description>
@@ -176,11 +182,11 @@
 		</interaction>
 		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Om cellurval har aktiverats:</span></p>
-				<p>Om celler markerats utökar <kbd>Shift + MouseClick</kbd> för en annan cell urvalet till och med den klickade cellen.</p>
+				<p>Om celler markerats utökar <kbd>Shift + MouseClick</kbd> i en annan cell urvalet till och med den klickade cellen.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Kopierar markerade rader eller celler till urklipp om det är tillgängligt och funktionen aktiverats.</p>
+				<p>Kopierar markerade rader eller celler till urklipp (om det är tillgängligt) och funktionen aktiverats.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

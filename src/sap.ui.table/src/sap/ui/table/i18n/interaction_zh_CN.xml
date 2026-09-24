@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>如果焦点位于某个单元格、行选择器或<span class="uicontrol">全选</span>，这会切换<span class="uicontrol">全选</span>复选框；相应会选择或取消选择所有行。</p>
+				<p>如果焦点位于列标题单元格，则该快捷方式没有任何效果。</p>
+				<p>如果焦点位于文本输入字段，则该快捷方式没有任何效果，因为在此情况下，浏览器会处理文本选择。</p>
+				<p><span class="emphasis">如果启用单元格选择：</span></p>
+				<p>如果焦点位于某个单元格，则会选择所有可用单元格，直至达到选择限制。如果已选择所有可用单元格，则会移除单元格选择。</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>如果焦点位于某个单元格、行选择器或<span class="uicontrol">全选</span>，则会移除所有行的选择。</p>
+				<p>如果焦点位于列标题单元格或文本输入字段，则该快捷方式没有任何效果。</p>
 				<p><span class="emphasis">如果启用单元格选择：</span></p>
 				<p>如果焦点位于表的内部，则会移除任何行和单元格的选择。</p>
 			</description>
@@ -180,7 +186,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>如果可用并启用该功能，则会将所选行或单元格复制到剪贴板。</p>
+				<p>将所选行或单元格复制到剪贴板（如果可用），并且会启用该功能。</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

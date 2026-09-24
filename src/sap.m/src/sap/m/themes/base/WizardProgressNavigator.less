@@ -55,12 +55,13 @@
 
 	&:focus {
 		outline: none;
-
-		.sapMWizardProgressNavStepContainer {
-			outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
-			outline-offset: 1px;
-		}
 	}
+}
+
+html.sap-desktop .sapMWizardProgressNavStep:focus .sapMWizardProgressNavStepContainer,
+.sapMWizardProgressNavStep:focus-visible .sapMWizardProgressNavStepContainer {
+	outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
+	outline-offset: 1px;
 }
 
 /* the separator connecting every two steps */

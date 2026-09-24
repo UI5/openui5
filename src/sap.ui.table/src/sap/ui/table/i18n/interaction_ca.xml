@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Si el focus és en una cel·la, el selector de files o <span class="uicontrol">Selecciona-ho tot</span>, això activa o desactiva la casella de selecció <span class="uicontrol">Selecciona-ho tot</span>: Totes les files es seleccionen o es desseleccionen respectivament.</p>
+				<p>La drecera no té cap efecte si el focus és en una cel·la de capçalera de columna.</p>
+				<p>La drecera no té cap efecte si el focus és en un camp d'entrada de text, ja que el navegador gestiona la selecció de text en aquest cas.</p>
+				<p><span class="emphasis">Si la selecció de cel·les està activada:</span></p>
+				<p>Si el focus és en una cel·la, totes les cel·les disponibles se seleccionen fins al límit de selecció. Si ja s'han seleccionat totes les cel·les disponibles, s'eliminarà la selecció de cel·les.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Si el focus està en una cel·la, en el selector de files o en l'opció <span class="uicontrol">Seleccionar-ho tot</span>, se suprimeix la selecció de totes les files.</p>
+				<p>La drecera no té cap efecte si el focus és en una cel·la de capçalera de columna o en un camp d'entrada de text.</p>
 				<p><span class="emphasis">Si la selecció de cel·les està activada:</span></p>
 				<p>Si el focus és dins de la taula, es treu la selecció de totes les files i cel·les.</p>
 			</description>
@@ -180,7 +186,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
-				<p>Copia les files o cel·les seleccionades al porta-retalls, si està disponible i en cas que la funció estigui activada.</p>
+				<p>Copia les files o cel·les seleccionades al porta-retalls (si està disponible) i en cas que la funció estigui activada.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>

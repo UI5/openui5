@@ -157,9 +157,15 @@
 		</interaction>
 		<interaction> <kbd>Ctrl + A</kbd> <description>
 				<p>Hvis fokuset er på en celle, radvelgeren eller på <span class="uicontrol">Velg alle</span>, veksler statusen for markeringsfeltet <span class="uicontrol">Velg alle</span>. Alle rader velges eller valget av rader oppheves.</p>
+				<p>Snarveien har ingen effekt hvis fokuset er på en celle i en kolonneoverskrift.</p>
+				<p>Snarveien har ingen effekt hvis fokuset er på et tekstinndatafelt, siden nettleseren håndterer tekstutvalget i dette tilfellet.</p>
+				<p><span class="emphasis">Hvis celleutvalg er aktivert:</span></p>
+				<p>Hvis fokuset er på en celle, velges alle tilgjengelige celler opptil utvalgsgrensen. Hvis alle tilgjengelige celler allerede er valgt, fjernes celleutvalget.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>Hvis fokuset er på en celle, valg av rad eller <span class="uicontrol">Velg alle</span>, fjernes valget av alle radene.</p>
+				<p>Snarveien har ingen effekt hvis fokuset er på en celle i en kolonneoverskrift eller i et tekstinndatafelt.</p>
 				<p><span class="emphasis">Hvis celleutvalg er aktivert:</span></p>
 				<p>Hvis fokuset er inne i tabellen, fjernes utvalget for alle rader og celler.</p>
 			</description>
@@ -176,7 +182,7 @@
 		</interaction>
 		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Hvis celleutvalg er aktivert:</span></p>
-				<p>Hvis celler er valgt: <kbd>Shift + MouseClick</kbd> på en annen celle utvider utvalget opp til cellen det ble klikket på.</p>
+				<p>Hvis celler er valgt: <kbd>Shift + MouseClick</kbd> på en annen celle utvider utvalget opp til cellen du klikket på.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>
@@ -184,7 +190,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + V</kbd> <description>
-				<p>Limer inn innholdet fra utklippstablen hvis funksjonen er aktivert.</p>
+				<p>Limer inn innholdet fra utklippstavlen hvis funksjonen er aktivert.</p>
 			</description>
 		</interaction>
 	</control-interactions>
