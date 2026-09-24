@@ -12,6 +12,7 @@
 	--_sap_ui_dt_Overlay_TargetZoneOutlineColor: var(--sapSelectedColor);
 	--_sap_ui_dt_Overlay_SelectionOutlineColor: var(--sapLegendColor7);
 	--_sap_ui_dt_Overlay_CuttedBorderColor: var(--sapLegendColor7);
+	--_sap_ui_dt_Overlay_FocusBorderColor: var(--sapLegendColor7);
 }
 
 .sapUiDtOverlayFocusable {
@@ -20,9 +21,9 @@
 
 		&::before {
 			border-radius: var(--_sap_ui_dt_Overlay_BorderRadius);
-			outline: 0.0625rem dotted var(--_sap_ui_dt_Overlay_FocusBorderColor);
+			outline: 0.125rem dotted var(--_sap_ui_dt_Overlay_FocusBorderColor); /* 2px */
 			border: none;
-			outline-offset: -0.125rem;
+			outline-offset: -0.25rem; /* 4px */
 		}
 	}
 }
