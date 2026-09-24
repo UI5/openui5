@@ -67,7 +67,12 @@ sap.ui.define([
 		return aConditions?.reduce((mConditions, oState) => {
 			const sKey = oState.key;
 			mConditions[sKey] = mConditions[sKey] || [];
-			mConditions[sKey].push(oState.condition);
+
+			// xConfigAPI returns a shared reference to an immutable object. The conditions returned by getCurrentState
+			// are used as model data backing the UI, therefore it must return mutable copies so that bindings can
+			// write back without throwing an error.
+			mConditions[sKey].push(merge({}, oState.condition));
+
 			return mConditions;
 		}, {}) || {};
 	};
