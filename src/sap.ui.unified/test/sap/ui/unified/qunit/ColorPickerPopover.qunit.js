@@ -235,6 +235,36 @@ sap.ui.define([
 		oStubCreatePopover.restore();
 	});
 
+	QUnit.module("ColorPickerPopover - Focus");
+
+	QUnit.test("initialFocus is set to the hue slider after opening", async function (assert) {
+		// Prepare
+		var oCPP = new ColorPickerPopover(),
+			oOpener = new Button();
+
+		oOpener.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act
+		oCPP.openBy(oOpener);
+
+		// Assert
+		var oColorPicker = oCPP._getColorPicker(),
+			oSlider = oColorPicker.getAggregation("_oSlider");
+
+		assert.ok(oSlider, "Hue slider aggregation exists after open");
+		assert.strictEqual(
+			oCPP._oPopover.getInitialFocus(),
+			oSlider.getId(),
+			"initialFocus is set to the hue slider"
+		);
+
+		// Cleanup
+		oCPP.close();
+		oCPP.destroy();
+		oOpener.destroy();
+	});
+
 	QUnit.module("ColorPickerPopover - ARIA");
 
 	QUnit.test("Popover has certain aria attributes", async function (assert) {
