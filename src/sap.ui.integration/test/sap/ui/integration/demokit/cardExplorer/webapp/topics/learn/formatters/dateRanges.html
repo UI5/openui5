@@ -98,6 +98,30 @@
 						<th>Description</th>
 						<th><code>value</code></th>
 					</tr>
+					<!-- minutes -->
+					<tr>
+						<td>lastMinutes</td>
+						<td>Start and end of the period of iMinutes before the current time</td>
+						<td>Number of minutes</td>
+					</tr>
+					<tr>
+						<td>nextMinutes</td>
+						<td>Start and end of the period of iMinutes after the current time</td>
+						<td>Number of minutes</td>
+					</tr>
+
+					<!-- hours -->
+					<tr>
+						<td>lastHours</td>
+						<td>Start and end of the period of iHours before the current time</td>
+						<td>Number of hours</td>
+					</tr>
+					<tr>
+						<td>nextHours</td>
+						<td>Start and end of the period of iHours after the current time</td>
+						<td>Number of hours</td>
+					</tr>
+
 					<!-- days -->
 					<tr>
 						<td>lastDays</td>
@@ -112,6 +136,11 @@
 					<tr>
 						<td>today</td>
 						<td>Start and end of today's date</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>tomorrow</td>
+						<td>Start and end of tomorrow's date</td>
 						<td></td>
 					</tr>
 					<tr>
@@ -137,8 +166,18 @@
 						<td></td>
 					</tr>
 					<tr>
+						<td>firstDayOfWeek</td>
+						<td>Start and end of the first day of the current week</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>lastDayOfWeek</td>
+						<td>Start and end of the last day of the current week</td>
+						<td></td>
+					</tr>
+					<tr>
 						<td>nextWeek</td>
-						<td>Start and end of next week's</td>
+						<td>Start and end of next week</td>
 						<td></td>
 					</tr>
 					<tr>
@@ -161,6 +200,16 @@
 					<tr>
 						<td>currentMonth</td>
 						<td>Start and end of current month</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>firstDayOfMonth</td>
+						<td>Start and end of the first day of the current month</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>lastDayOfMonth</td>
+						<td>Start and end of the last day of the current month</td>
 						<td></td>
 					</tr>
 					<tr>
@@ -188,6 +237,16 @@
 					<tr>
 						<td>currentQuarter</td>
 						<td>Start and end of current quarter</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>firstDayOfQuarter</td>
+						<td>Start and end of the first day of the current quarter</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>lastDayOfQuarter</td>
+						<td>Start and end of the last day of the current quarter</td>
 						<td></td>
 					</tr>
 					<tr>
@@ -223,6 +282,16 @@
 						<td></td>
 					</tr>
 					<tr>
+						<td>firstDayOfYear</td>
+						<td>Start and end of the first day of the current year</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>lastDayOfYear</td>
+						<td>Start and end of the last day of the current year</td>
+						<td></td>
+					</tr>
+					<tr>
 						<td>nextYear</td>
 						<td>Start and end of next year</td>
 						<td></td>
@@ -235,6 +304,11 @@
 					<tr>
 						<td>yearToDate</td>
 						<td>Range between the first day of the current year and today</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>dateToYear</td>
+						<td>Range between today and the last day of the current year</td>
 						<td></td>
 					</tr>
 				</table>
@@ -281,7 +355,7 @@
 			<pre class="lang-json">{
 	"data": {
 		"request": {
-			"url": "https/services.odata.org/V3/Northwind/Northwind.svc/Orders",
+			"url": "https://services.odata.org/V3/Northwind/Northwind.svc/Orders",
 			"parameters": {
 				"$format": "json",
 				"$top": 5,
