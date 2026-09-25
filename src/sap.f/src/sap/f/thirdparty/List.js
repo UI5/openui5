@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/ListSelectionMode', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/i18n-defaults2'], (function (exports, webcomponentsBase, jsxRuntime, toLowercaseEnumValue, eventStrict, parametersBundle_css, Theme, ListItemGroup, AccessibilityTextsHelper, ListSelectionMode, BusyIndicator, i18nDefaults) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/ListItemBase'], (function (exports, webcomponentsBase, jsxRuntime, toLowercaseEnumValue, eventStrict, parametersBundle_css, ManagedStyles, ListItemGroup, AccessibilityTextsHelper, InvisibleMessage, ListItemTemplate, Button, i18nDefaults, Icons, ListItemBase) { 'use strict';
 
     const t=e=>{let o=e;return e.shadowRoot&&e.shadowRoot.activeElement&&(o=e.shadowRoot.activeElement),o};
 
@@ -88,10 +88,10 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
     var ListSeparator$1 = ListSeparator;
 
     function ListTemplate() {
-        return (jsxRuntime.jsx("div", { class: "ui5-list-root", onFocusIn: this._onfocusin, onKeyDown: this._onkeydown, onDragEnter: this._ondragenter, onDragOver: this._ondragover, onDrop: this._ondrop, onDragLeave: this._ondragleave, "onui5-_close": this.onItemClose, "onui5-toggle": this.onItemToggle, "onui5-request-tabindex-change": this.onItemTabIndexChange, "onui5-_focused": this.onItemFocused, "onui5-forward-after": this.onForwardAfter, "onui5-forward-before": this.onForwardBefore, "onui5-selection-requested": this.onSelectionRequested, "onui5-focus-requested": this.onFocusRequested, "onui5-_press": this.onItemPress, children: jsxRuntime.jsxs(BusyIndicator.BusyIndicator, { id: `${this._id}-busyIndicator`, delay: this.loadingDelay, active: this.showBusyIndicatorOverlay, class: "ui5-list-busy-indicator", children: [jsxRuntime.jsxs("div", { class: "ui5-list-container", children: [this.header.length > 0 && jsxRuntime.jsx("slot", { name: "header" }), this.shouldRenderH1 &&
+        return (jsxRuntime.jsx("div", { class: "ui5-list-root", onFocusIn: this._onfocusin, onKeyDown: this._onkeydown, onDragEnter: this._ondragenter, onDragOver: this._ondragover, onDrop: this._ondrop, onDragLeave: this._ondragleave, "onui5-_close": this.onItemClose, "onui5-toggle": this.onItemToggle, "onui5-request-tabindex-change": this.onItemTabIndexChange, "onui5-_focused": this.onItemFocused, "onui5-forward-after": this.onForwardAfter, "onui5-forward-before": this.onForwardBefore, "onui5-selection-requested": this.onSelectionRequested, "onui5-focus-requested": this.onFocusRequested, "onui5-_press": this.onItemPress, children: jsxRuntime.jsxs(Button.BusyIndicator, { id: `${this._id}-busyIndicator`, delay: this.loadingDelay, active: this.showBusyIndicatorOverlay, class: "ui5-list-busy-indicator", children: [jsxRuntime.jsxs("div", { class: "ui5-list-container", children: [this.header.length > 0 && jsxRuntime.jsx("slot", { name: "header" }), this.shouldRenderH1 &&
                                 jsxRuntime.jsx("header", { id: this.headerID, class: "ui5-list-header", children: this.headerText }), jsxRuntime.jsxs("div", { class: "ui5-list-scroll-container", children: [jsxRuntime.jsx("span", { tabindex: -1, "aria-hidden": "true", class: "ui5-list-start-marker" }), this.hasData &&
                                         jsxRuntime.jsx("div", { id: `${this._id}-before`, tabindex: 0, role: "none", class: "ui5-list-focusarea" }), jsxRuntime.jsx("span", { id: `${this._id}-modeLabel`, class: "ui5-hidden-text", children: this.ariaLabelModeText }), jsxRuntime.jsxs("ul", { id: `${this._id}-listUl`, class: "ui5-list-ul", role: this.listAccessibleRole, "aria-label": this.ariaLabelTxt, "aria-labelledby": this.ariaLabelledBy, "aria-description": this.ariaDescriptionText || undefined, children: [jsxRuntime.jsx("slot", {}), this.showNoDataText &&
-                                                jsxRuntime.jsx("li", { tabindex: 0, id: `${this._id}-nodata`, class: "ui5-list-nodata", role: "listitem", children: jsxRuntime.jsx("div", { id: `${this._id}-nodata-text`, class: "ui5-list-nodata-text", children: this.noDataText }) })] }), this.growsWithButton && moreRow.call(this), this.footerText &&
+                                                jsxRuntime.jsx("li", { tabindex: 0, id: `${this._id}-nodata`, class: "ui5-list-nodata", role: this.noDataItemRole, children: jsxRuntime.jsx("div", { id: `${this._id}-nodata-text`, class: "ui5-list-nodata-text", children: this.noDataText }) })] }), this.growsWithButton && moreRow.call(this), this.footerText &&
                                         jsxRuntime.jsx("footer", { id: `${this._id}-footer`, class: "ui5-list-footer", children: this.footerText }), this.hasData &&
                                         jsxRuntime.jsx("div", { id: `${this._id}-after`, tabindex: 0, role: "none", class: "ui5-list-focusarea" }), jsxRuntime.jsx("span", { tabindex: -1, "aria-hidden": "true", class: "ui5-list-end-marker" })] })] }), jsxRuntime.jsx(ListItemGroup.DropIndicator, { orientation: "Horizontal", ownerReference: this })] }) }));
     }
@@ -100,14 +100,303 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
                         "ui5-growing-button-inner": true,
                         "ui5-growing-button-inner-active": this._loadMoreActive,
                     }, "aria-label": this.growingButtonAriaLabel, "aria-labelledby": this.growingButtonAriaLabelledBy, "aria-describedby": this.growingButtonAriaDescribedBy, onClick: this._onLoadMoreClick, onKeyDown: this._onLoadMoreKeydown, onKeyUp: this._onLoadMoreKeyup, onMouseDown: this._onLoadMoreMousedown, onMouseUp: this._onLoadMoreMouseup, children: [this.loading &&
-                            jsxRuntime.jsx(BusyIndicator.BusyIndicator, { delay: this.loadingDelay, part: "growing-button-busy-indicator", class: "ui5-list-growing-button-busy-indicator", active: true }), jsxRuntime.jsx("span", { id: `${this._id}-growingButton-text`, class: "ui5-growing-button-text", "growing-button-text": true, children: this._growingButtonText })] }), this.accessibilityAttributes.growingButton?.description &&
+                            jsxRuntime.jsx(Button.BusyIndicator, { delay: this.loadingDelay, part: "growing-button-busy-indicator", class: "ui5-list-growing-button-busy-indicator", active: true }), jsxRuntime.jsx("span", { id: `${this._id}-growingButton-text`, class: "ui5-growing-button-text", "growing-button-text": true, children: this._growingButtonText })] }), this.accessibilityAttributes.growingButton?.description &&
                     jsxRuntime.jsx("span", { id: `${this._id}-growingButton-description`, class: "ui5-hidden-text", children: this.accessibilityAttributes.growingButton.description })] }));
     }
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var listCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}.ui5-growing-button{display:flex;align-items:center;padding:var(--_ui5_load_more_padding);border-top:1px solid var(--sapList_BorderColor);border-bottom:var(--_ui5_load_more_border-bottom);box-sizing:border-box;cursor:pointer;outline:none}.ui5-growing-button-inner{display:flex;align-items:center;justify-content:center;flex-direction:row;min-height:var(--_ui5_load_more_text_height);width:100%;color:var(--sapButton_TextColor);background-color:var(--sapList_Background);border:var(--_ui5_load_more_border);border-radius:var(--_ui5_load_more_border_radius);box-sizing:border-box}.ui5-growing-button-inner:focus-visible{outline:var(--_ui5_load_more_outline_width) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);outline-offset:-.125rem;border-color:transparent}.ui5-growing-button-inner:hover{background-color:var(--sapList_Hover_Background)}.ui5-growing-button-inner:active,.ui5-growing-button-inner.ui5-growing-button-inner--active{background-color:var(--sapList_Active_Background);border-color:var(--sapList_Active_Background)}.ui5-growing-button-inner:active>*,.ui5-growing-button-inner.ui5-growing-button-inner--active>*{color:var(--sapList_Active_TextColor)}.ui5-growing-button-text{text-align:center;font-family:var(--sapFontFamily);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box}.ui5-growing-button-text{height:var(--_ui5_load_more_text_height);padding:.875rem 1rem 1rem;font-size:var(--_ui5_load_more_text_font_size);font-weight:700}:host([loading]) .ui5-list-growing-button-busy-indicator:not([_is-busy]){display:none}:host([loading]) .ui5-list-growing-button-busy-indicator[_is-busy]+.ui5-growing-button-text{padding-left:.5rem}:host(:not([hidden])){display:block;max-width:100%;width:100%;-webkit-tap-highlight-color:transparent}:host([indent]) .ui5-list-root{padding:2rem}:host([separators="None"]) .ui5-list-nodata{border-bottom:0}.ui5-list-root,.ui5-list-busy-indicator,.ui5-list-container{width:100%;height:100%;position:relative;box-sizing:border-box}.ui5-list-scroll-container{overflow:auto;height:100%;width:100%}.ui5-list-ul{list-style-type:none;padding:0;margin:0}.ui5-list-ul:focus{outline:none}.ui5-list-focusarea{position:fixed}.ui5-list-header{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;box-sizing:border-box;font-size:var(--sapFontHeader4Size);font-family:var(--sapFontFamily);color:var(--sapGroup_TitleTextColor);height:3rem;line-height:3rem;padding:0 1rem;background-color:var(--sapGroup_TitleBackground);border-bottom:1px solid var(--sapGroup_TitleBorderColor)}.ui5-list-footer{height:2rem;box-sizing:border-box;-webkit-text-size-adjust:none;font-size:var(--sapFontSize);font-family:var(--sapFontFamily);line-height:2rem;background-color:var(--sapList_FooterBackground);color:var(--ui5_list_footer_text_color);padding:0 1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ui5-list-nodata{list-style-type:none;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:center;justify-content:center;color:var(--sapTextColor);background-color:var(--sapList_Background);border-bottom:1px solid var(--sapList_BorderColor);padding:0 1rem!important;outline:none;min-height:var(--_ui5_list_no_data_height);font-size:var(--_ui5_list_no_data_font_size);font-family:var(--sapFontFamily);position:relative}.ui5-list-nodata:focus:after{content:"";border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);position:absolute;inset:.125rem;pointer-events:none}.ui5-list-nodata-text{overflow:hidden;text-overflow:ellipsis;white-space:normal;margin:var(--_ui5_list_item_content_vertical_offset) 0}:host([growing="Scroll"]) .ui5-list-end-marker{display:inline-block}:host([sticky-header]) ::slotted([slot="header"]),:host([sticky-header]) .ui5-list-header{position:sticky;top:0;z-index:100}
 `;
+
+    const predefinedHooks = {
+        listItemContent,
+    };
+    function ListItemCustomTemplate(hooks) {
+        const currentHooks = { ...predefinedHooks, ...hooks };
+        return ListItemTemplate.ListItemTemplate.call(this, currentHooks);
+    }
+    function listItemContent() {
+        return jsxRuntime.jsx("slot", {});
+    }
+
+    let i18nBundle;
+    let invisibleText;
+    const getBundle = () => {
+        i18nBundle ??= new Icons.u("@ui5/webcomponents-base");
+        return i18nBundle;
+    };
+    const checkVisibility = (element) => {
+        return element.checkVisibility() || getComputedStyle(element).display === "contents";
+    };
+    const applyCustomAnnouncement = (element, text = []) => {
+        if (!invisibleText || !invisibleText.isConnected) {
+            invisibleText = document.createElement("span");
+            invisibleText.id = "ui5-invisible-text";
+            invisibleText.hidden = true;
+            document.body.appendChild(invisibleText);
+        }
+        const ariaLabelledByElements = [...(element.ariaLabelledByElements || [])];
+        const invisibleTextIndex = ariaLabelledByElements.indexOf(invisibleText);
+        text = Array.isArray(text) ? text.filter(Boolean).join(" . ").trim() : text.trim();
+        invisibleText.textContent = text;
+        if (text && invisibleTextIndex === -1) {
+            ariaLabelledByElements.unshift(invisibleText);
+            element.ariaLabelledByElements = ariaLabelledByElements;
+        }
+        else if (!text && invisibleTextIndex > -1) {
+            ariaLabelledByElements.splice(invisibleTextIndex, 1);
+            element.ariaLabelledByElements = ariaLabelledByElements.length ? ariaLabelledByElements : null;
+        }
+    };
+    const getCustomAnnouncement = (element, options = {}, _isRootElement = true) => {
+        if (!element) {
+            return "";
+        }
+        if (element.nodeType === Node.TEXT_NODE) {
+            return element.data.trim();
+        }
+        if (!(element instanceof HTMLElement)) {
+            return "";
+        }
+        if (element.hasAttribute("data-ui5-acc-text")) {
+            return element.getAttribute("data-ui5-acc-text") || "";
+        }
+        if (element.ariaHidden === "true" || !checkVisibility(element)) {
+            return _isRootElement ? getBundle().getText(i18nDefaults.ACC_STATE_EMPTY) : "";
+        }
+        let childNodes = [];
+        const descriptions = [];
+        const accessibilityInfo = element.accessibilityInfo;
+        const { lessDetails } = options;
+        if (accessibilityInfo) {
+            const { type, description, required, disabled, readonly, children, } = accessibilityInfo;
+            childNodes = children || [];
+            type && descriptions.push(type);
+            description && descriptions.push(description);
+            if (!lessDetails) {
+                required && descriptions.push(getBundle().getText(i18nDefaults.ACC_STATE_REQUIRED));
+                disabled && descriptions.push(getBundle().getText(i18nDefaults.ACC_STATE_DISABLED));
+                readonly && descriptions.push(getBundle().getText(i18nDefaults.ACC_STATE_READONLY));
+            }
+        }
+        else if (element.localName === "slot") {
+            childNodes = element.assignedNodes({ flatten: true });
+        }
+        else {
+            childNodes = element.shadowRoot ? [...element.shadowRoot.childNodes] : [...element.childNodes];
+        }
+        childNodes.forEach(child => {
+            const childDescription = getCustomAnnouncement(child, options, false);
+            childDescription && descriptions.push(childDescription);
+        });
+        if (_isRootElement) {
+            const hasDescription = descriptions.length > 0;
+            if (!hasDescription || !lessDetails) {
+                const tabbables = ListItemBase.b(element);
+                const bundleKey = [
+                    hasDescription ? "" : i18nDefaults.ACC_STATE_EMPTY,
+                    i18nDefaults.ACC_STATE_SINGLE_CONTROL,
+                    i18nDefaults.ACC_STATE_MULTIPLE_CONTROLS,
+                ][Math.min(tabbables.length, 2)];
+                if (bundleKey) {
+                    hasDescription && descriptions.push(".");
+                    descriptions.push(getBundle().getText(bundleKey));
+                }
+            }
+        }
+        return descriptions.join(" ").trim();
+    };
+
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    var ListItemCustomCss = `:host(:not([hidden])){display:block}:host{min-height:var(--_ui5_list_item_base_height);height:auto;box-sizing:border-box}.ui5-li-root.ui5-custom-li-root{pointer-events:inherit;min-height:inherit}.ui5-li-root.ui5-custom-li-root .ui5-li-content{pointer-events:inherit}[ui5-checkbox].ui5-li-singlesel-radiobtn,[ui5-radio-button].ui5-li-singlesel-radiobtn{display:flex;align-items:center}.ui5-li-root.ui5-custom-li-root,[ui5-checkbox].ui5-li-singlesel-radiobtn,[ui5-radio-button].ui5-li-singlesel-radiobtn{min-width:var(--_ui5_custom_list_item_rb_min_width)}:host([_selection-mode="SingleStart"]) .ui5-li-root.ui5-custom-li-root{padding-inline:0 1rem}:host([_selection-mode="Multiple"]) .ui5-li-root.ui5-custom-li-root{padding-inline:0 1rem}:host([_selection-mode="SingleEnd"]) .ui5-li-root.ui5-custom-li-root{padding-inline:1rem 0}
+`;
+
+    var __decorate$1 = (this && this.__decorate) || function (decorators, target, key, desc) {
+        var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+        if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+        else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+        return c > 3 && r && Object.defineProperty(target, key, r), r;
+    };
+    var ListItemCustom_1;
+    /**
+     * @class
+     *
+     * A component to be used as custom list item within the `ui5-list`
+     * the same way as the standard `ui5-li`.
+     *
+     * The component accepts arbitrary HTML content to allow full customization.
+     *
+     * ### Keyboard Handling
+     *
+     * Interactive elements placed in the default slot (buttons, links, inputs, etc.)
+     * are **not** reached by [Tab] from outside the list. This follows the SAP Fiori
+     * "Intentional Edit Pattern" and preserves fast keyboard navigation between items.
+     *
+     * To activate an interactive element inside a `ui5-li-custom`:
+     *
+     * - [F2] on the focused item - moves focus to the first interactive element inside the item.
+     *   Pressing [F2] again returns focus to the item level.
+     * - [F7] on the focused item - moves focus to the last remembered interactive element
+     *   inside the item (or to the first interactive element if none is remembered).
+     *   Pressing [F7] again saves the current position and returns focus to the item level.
+     * - [Tab] or [Shift] + [Tab] then walks through the interactive elements within the item
+     *   and continues into the next/previous item.
+     * - [Up] or [Down] while focused on an interactive element moves focus to the element
+     *   at the same index in the previous/next item; items with no interactive elements
+     *   are skipped and `ui5-li-group` boundaries are crossed.
+     *
+     * See the `ui5-list` "Keyboard Handling" section for the full behavior.
+     *
+     * @csspart native-li - Used to style the main li tag of the list item
+     * @csspart content - Used to style the content area of the list item
+     * @csspart detail-button - Used to style the button rendered when the list item is of type detail
+     * @csspart delete-button - Used to style the button rendered when the list item is in delete mode
+     * @csspart radio - Used to style the radio button rendered when the list item is in single selection mode
+     * @csspart checkbox - Used to style the checkbox rendered when the list item is in multiple selection mode
+     * @slot {Node[]} default - Defines the content of the component.
+     * @constructor
+     * @extends ListItem
+     * @public
+     */
+    let ListItemCustom = ListItemCustom_1 = class ListItemCustom extends ListItemTemplate.ListItem {
+        constructor() {
+            super(...arguments);
+            /**
+             * Defines whether the item is movable.
+             * @default false
+             * @public
+             * @since 2.0.0
+             */
+            this.movable = false;
+        }
+        get isCustomListItem() {
+            return true;
+        }
+        _onkeydown(e) {
+            const isFocused = this.matches(":focus");
+            const shouldHandle = isFocused
+                || webcomponentsBase.x(e) || webcomponentsBase.V(e)
+                || webcomponentsBase.ro(e) || webcomponentsBase.io(e)
+                || webcomponentsBase.P(e) || webcomponentsBase._(e);
+            if (shouldHandle) {
+                super._onkeydown(e);
+            }
+        }
+        _onkeyup(e) {
+            const isFocused = this.matches(":focus");
+            const shouldHandle = isFocused
+                || webcomponentsBase.x(e) || webcomponentsBase.V(e)
+                || webcomponentsBase.ro(e) || webcomponentsBase.io(e)
+                || webcomponentsBase.P(e) || webcomponentsBase._(e);
+            if (shouldHandle) {
+                super._onkeyup(e);
+            }
+        }
+        get _accessibleNameRef() {
+            return `${this._id}-invisibleText`;
+        }
+        _onfocusin(e) {
+            super._onfocusin(e);
+            // Skip updating invisible text during drag operations
+            if (!this._isDragging() && !this.accessibleName) {
+                this._updateInvisibleTextContent();
+            }
+        }
+        _onfocusout(e) {
+            super._onfocusout(e);
+            // Skip clearing invisible text during drag operations
+            if (!this._isDragging() && !this.accessibleName) {
+                this._clearInvisibleTextContent();
+            }
+        }
+        /**
+         * Checks if this element is currently being dragged
+         * @returns True if this element is being dragged
+         * @private
+         */
+        _isDragging() {
+            // Check if this specific element has the data-moving attribute
+            return this.hasAttribute("data-moving");
+        }
+        _updateInvisibleTextContent() {
+            const listItem = this._listItem;
+            if (!listItem) {
+                return;
+            }
+            // Get accessibility announcements
+            const accessibilityText = getCustomAnnouncement(this);
+            // Apply the announcement using the shared invisible text element from CustomAnnouncement
+            applyCustomAnnouncement(listItem, accessibilityText);
+        }
+        _clearInvisibleTextContent() {
+            const listItem = this._listItem;
+            if (!listItem) {
+                return;
+            }
+            // Clear the announcement by passing empty text
+            applyCustomAnnouncement(listItem, "");
+        }
+        /**
+         * Gets delete button nodes to process for accessibility
+         * @returns Array of nodes to process
+         * @private
+         */
+        _getDeleteButtonNodes() {
+            if (!this.modeDelete) {
+                return [];
+            }
+            if (this.hasDeleteButtonSlot) {
+                // Return custom delete buttons from slot
+                return this.deleteButton;
+            }
+            // Return the built-in delete button from the shadow DOM if it exists
+            const deleteButton = this.shadowRoot?.querySelector(`#${this._id}-deleteSelectionElement`);
+            return deleteButton ? [deleteButton] : [];
+        }
+        get classes() {
+            const result = super.classes;
+            result.main["ui5-custom-li-root"] = true;
+            return result;
+        }
+        get accessibilityInfo() {
+            const children = [];
+            // Get slotted content elements (default slot)
+            const defaultSlot = this.shadowRoot?.querySelector("slot:not([name])");
+            if (defaultSlot) {
+                const assignedNodes = defaultSlot.assignedNodes({ flatten: true });
+                children.push(...assignedNodes);
+            }
+            // Get delete button nodes
+            const deleteButtonNodes = this._getDeleteButtonNodes();
+            children.push(...deleteButtonNodes);
+            return {
+                type: ListItemCustom_1.i18nBundle.getText(i18nDefaults.LISTITEMCUSTOM_TYPE_TEXT),
+                children,
+            };
+        }
+    };
+    __decorate$1([
+        webcomponentsBase.s({ type: Boolean })
+    ], ListItemCustom.prototype, "movable", void 0);
+    __decorate$1([
+        webcomponentsBase.s()
+    ], ListItemCustom.prototype, "accessibleName", void 0);
+    __decorate$1([
+        parametersBundle_css.i("@ui5/webcomponents")
+    ], ListItemCustom, "i18nBundle", void 0);
+    ListItemCustom = ListItemCustom_1 = __decorate$1([
+        webcomponentsBase.m({
+            tag: "ui5-li-custom",
+            template: ListItemCustomTemplate,
+            renderer: jsxRuntime.y,
+            styles: [ListItemTemplate.ListItem.styles, ListItemCustomCss],
+        })
+    ], ListItemCustom);
+    ListItemCustom.define();
+    var ListItemCustom$1 = ListItemCustom;
+    const isInstanceOfListItemCustom = webcomponentsBase.r$1("isCustomListItem");
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -146,20 +435,47 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
      *
      * ### Keyboard Handling
      *
+     * The `ui5-list` follows the SAP Fiori "Intentional Edit Pattern" (forms-editing variant)
+     * and exposes two interaction modes:
+     *
+     * - **Navigation mode** (default) - Arrow keys move focus between items; [Tab] leaves the list.
+     * - **Edit mode** (toggled by [F2] or [F7]) - [Tab] walks through the interactive elements
+     *   inside items (buttons, links, inputs, checkboxes, etc.) and continues into the next item.
+     *
      * #### Basic Navigation
-     * The `ui5-list` provides advanced keyboard handling.
-     * When a list is focused the user can use the following keyboard
-     * shortcuts in order to perform a navigation:
+     * The `ui5-list` provides advanced keyboard handling for navigation between items.
+     * When an item is focused the user can use the following keyboard shortcuts:
      *
      * - [Up] or [Down] - Navigates up and down the items
      * - [Home] - Navigates to first item
      * - [End] - Navigates to the last item
+     * - [Tab] or [Shift] + [Tab] - Moves focus out of the list, to the next/previous control in the tab chain
      *
      * The user can use the following keyboard shortcuts to perform actions (such as select, delete),
      * when the `selectionMode` property is in use:
      *
      * - [Space] - Select an item (if `type` is 'Active') when `selectionMode` is selection
      * - [Delete] - Delete an item if `selectionMode` property is `Delete`
+     *
+     * #### Edit Mode - Reaching Interactive Elements Inside Items
+     * Interactive elements inside a list item (buttons, links, inputs, etc.) are not reached
+     * by [Tab] from navigation mode. To activate them, the user first enters edit mode.
+     *
+     * - [F2] - While focus is on an item, moves focus to the first interactive element inside it.
+     *   While focus is on an interactive element, moves focus back to the item level.
+     *   Unlike [F7], [F2] does not remember the previous position — it always lands on the first interactive element.
+     * - [F7] - While focus is on an item, moves focus to the last remembered internal element
+     *   (or to the first interactive element if none is remembered).
+     *   While focus is on an interactive element, saves its position and moves focus back to the item level.
+     * - [Tab] or [Shift] + [Tab] - While in edit mode, moves focus through the interactive
+     *   elements within an item, then continues into the next/previous item's interactive elements,
+     *   and exits the list after the last/first element.
+     * - [Up] or [Down] - While focus is on an interactive element inside an item, moves focus
+     *   to the element at the same index in the previous/next item. Items with no interactive
+     *   elements are skipped, and boundaries of `ui5-li-group` are crossed.
+     *
+     * **Note:** In `selectionMode="Delete"`, the per-item delete button is reachable through
+     * the edit-mode [Tab] flow described above, in addition to the [Delete] shortcut.
      *
      * #### Fast Navigation
      * This component provides a build in fast navigation group which can be used via [F6] / [Shift] + [F6] / [Ctrl] + [Alt/Option] / [Down] or [Ctrl] + [Alt/Option] + [Up].
@@ -181,7 +497,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
      * @csspart growing-button - Used to style the button, that is used for growing of the component
      * @csspart growing-button-inner - Used to style the button inner element
      */
-    let List = List_1 = class List extends webcomponentsBase.S {
+    let List = List_1 = class List extends webcomponentsBase.b {
         constructor() {
             super();
             /**
@@ -395,18 +711,18 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
             return !this.hasData && this.noDataText;
         }
         get isDelete() {
-            return this.selectionMode === ListSelectionMode.ListSelectionMode.Delete;
+            return this.selectionMode === ListItemTemplate.ListSelectionMode.Delete;
         }
         get isSingleSelect() {
             return [
-                ListSelectionMode.ListSelectionMode.Single,
-                ListSelectionMode.ListSelectionMode.SingleStart,
-                ListSelectionMode.ListSelectionMode.SingleEnd,
-                ListSelectionMode.ListSelectionMode.SingleAuto,
+                ListItemTemplate.ListSelectionMode.Single,
+                ListItemTemplate.ListSelectionMode.SingleStart,
+                ListItemTemplate.ListSelectionMode.SingleEnd,
+                ListItemTemplate.ListSelectionMode.SingleAuto,
             ].includes(this.selectionMode);
         }
         get isMultiple() {
-            return this.selectionMode === ListSelectionMode.ListSelectionMode.Multiple;
+            return this.selectionMode === ListItemTemplate.ListSelectionMode.Multiple;
         }
         get ariaLabelledBy() {
             if (this.accessibleNameRef || this.accessibleName) {
@@ -426,7 +742,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
         }
         get ariaDescriptionText() {
             const parts = [];
-            if (this.accessibleRole === ListAccessibleRole$1.List) {
+            if (this.accessibleRole === ListAccessibleRole$1.List && this._hasInteractiveItems) {
                 parts.push(this.defaultAriaDescriptionText);
             }
             const externalDescription = this._associatedDescriptionRefTexts || AccessibilityTextsHelper.L(this);
@@ -441,6 +757,20 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
         }
         get defaultAriaDescriptionText() {
             return List_1.i18nBundle.getText(i18nDefaults.LIST_ROLE_DESCRIPTION);
+        }
+        get _hasInteractiveItems() {
+            if (this.selectionMode === ListItemTemplate.ListSelectionMode.Delete) {
+                return true;
+            }
+            return this.getItems().some(item => {
+                if (item.getAttribute("type") === "Detail") {
+                    return true;
+                }
+                if (isInstanceOfListItemCustom(item)) {
+                    return item._hasFocusableElements();
+                }
+                return false;
+            });
         }
         get growingButtonAriaLabel() {
             return this.accessibilityAttributes.growingButton?.name;
@@ -498,6 +828,9 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
         get listAccessibleRole() {
             return toLowercaseEnumValue.n(this.accessibleRole);
         }
+        get noDataItemRole() {
+            return LIST_ACCESSIBLE_ROLE_TO_ITEM_ROLE[this.accessibleRole] || "listitem";
+        }
         get classes() {
             return {
                 root: {
@@ -521,7 +854,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
             });
         }
         async observeListEnd() {
-            await Theme.w();
+            await ManagedStyles.w();
             this.getEndIntersectionObserver().observe(this.listEndDOM);
         }
         unobserveListEnd() {
@@ -531,7 +864,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
             }
         }
         async observeListStart() {
-            await Theme.w();
+            await ManagedStyles.w();
             this.getStartIntersectionObserver().observe(this.listStartDOM);
         }
         unobserveListStart() {
@@ -558,7 +891,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
         onSelectionRequested(e) {
             const previouslySelectedItems = this.getSelectedItems();
             let selectionChange = false;
-            if (this.selectionMode !== ListSelectionMode.ListSelectionMode.None && this[`handle${this.selectionMode}`]) {
+            if (this.selectionMode !== ListItemTemplate.ListSelectionMode.None && this[`handle${this.selectionMode}`]) {
                 selectionChange = this[`handle${this.selectionMode}`](e.detail.item, !!e.detail.selected);
             }
             if (selectionChange) {
@@ -571,6 +904,13 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
                 });
                 if (changePrevented) {
                     this._revertSelection(previouslySelectedItems);
+                }
+                else if (this.selectionMode !== ListItemTemplate.ListSelectionMode.Delete) {
+                    const item = e.detail.item;
+                    const selectedText = item.selected
+                        ? List_1.i18nBundle.getText(i18nDefaults.LIST_ITEM_SELECTED)
+                        : List_1.i18nBundle.getText(i18nDefaults.LIST_ITEM_NOT_SELECTED);
+                    InvisibleMessage.v(selectedText);
                 }
             }
         }
@@ -749,7 +1089,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
                 e.preventDefault();
                 this._loadMoreActive = true;
             }
-            if (webcomponentsBase.b(e)) {
+            if (webcomponentsBase.b$1(e)) {
                 this._onLoadMoreClick();
                 this._loadMoreActive = true;
             }
@@ -924,7 +1264,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
             e.stopPropagation();
             this._itemNavigation.setCurrentItem(target);
             this.fireDecoratorEvent("item-focused", { item: target });
-            if (this.selectionMode === ListSelectionMode.ListSelectionMode.SingleAuto) {
+            if (this.selectionMode === ListItemTemplate.ListSelectionMode.SingleAuto && !target.isInactiveSelectable) {
                 const detail = {
                     item: target,
                     selectionComponentPressed: false,
@@ -936,10 +1276,13 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
         }
         onItemPress(e) {
             const pressedItem = e.detail.item;
-            if (!this.fireDecoratorEvent("item-click", { item: pressedItem })) {
+            // if InactiveSelectable - don't fire the public "item-click" event
+            // we fall through to the selection code below
+            const isInactiveSelectable = pressedItem.isInactiveSelectable;
+            if (!isInactiveSelectable && !this.fireDecoratorEvent("item-click", { item: pressedItem })) {
                 return;
             }
-            if (this.selectionMode !== ListSelectionMode.ListSelectionMode.Delete) {
+            if (this.selectionMode !== ListItemTemplate.ListSelectionMode.Delete) {
                 const detail = {
                     item: pressedItem,
                     selectionComponentPressed: false,
@@ -961,7 +1304,11 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
             if (!e.target?.isListItemBase) {
                 return;
             }
-            this.fireDecoratorEvent("item-toggle", { item: e.detail.item });
+            const item = e.detail?.item;
+            if (!item) {
+                return;
+            }
+            this.fireDecoratorEvent("item-toggle", { item });
         }
         onForwardBefore(e) {
             const listItem = e.target;
@@ -1349,6 +1696,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 
     exports.List = List$1;
     exports.ListAccessibleRole = ListAccessibleRole$1;
+    exports.ListItemCustom = ListItemCustom$1;
     exports.ListSeparator = ListSeparator$1;
 
 }));

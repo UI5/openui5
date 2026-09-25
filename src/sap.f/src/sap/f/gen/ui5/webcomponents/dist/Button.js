@@ -48,7 +48,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.Button",
       {
         metadata: {
-          tag: "ui5-button-a1d68b0e",
+          tag: "ui5-button-77e31d2b",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 

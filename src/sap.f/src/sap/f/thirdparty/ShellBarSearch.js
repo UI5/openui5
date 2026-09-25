@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Search3', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/ListItemAdditionalText.css', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/List', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/ListSelectionMode', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/search2', 'sap/f/thirdparty/encodeXML', 'sap/f/thirdparty/information', 'sap/f/thirdparty/sys-enter-2'], (function (webcomponentsBase, Search, Theme, jsxRuntime, Button, parametersBundle_css, i18nDefaults, Icons, eventStrict, Icon, parametersBundle_css$1, i18nDefaults$1, ListItemBase, ListItemAdditionalText_css, InvisibleMessage, AccessibilityTextsHelper, ValueState, decline, List, toLowercaseEnumValue, ListItemGroup, WrappingType, ListSelectionMode, BusyIndicator, willShowContent, Label, ResponsivePopover, Title, FocusableElements, slimArrowDown, search, encodeXML, information, sysEnter2) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Search3', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/information', 'sap/f/thirdparty/List', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/search2', 'sap/f/thirdparty/ListItemStandard', 'sap/f/thirdparty/encodeXML', 'sap/f/thirdparty/information2', 'sap/f/thirdparty/sys-enter-2', 'sap/f/thirdparty/willShowContent'], (function (webcomponentsBase, Search, ManagedStyles, jsxRuntime, Button, parametersBundle_css, i18nDefaults, Icons, eventStrict, Icon, parametersBundle_css$1, i18nDefaults$1, ListItemBase, ListItemTemplate, decline, ValueState, AccessibilityTextsHelper, Label, InvisibleMessage, information, List, toLowercaseEnumValue, ListItemGroup, WrappingType, ResponsivePopover, Title, FocusableElements, slimArrowDown, search, ListItemStandard, encodeXML, information$1, sysEnter2, willShowContent) { 'use strict';
 
     function ShellBarSearchPopoverTemplate() {
         return (Search.SearchPopoverTemplate.call(this, ShellBarSearchDialogHeader));
@@ -11,8 +11,8 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Search3
         return (jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [Search.SearchFieldTemplate.call(this), ShellBarSearchPopoverTemplate.call(this)] }));
     }
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var ShellBarSearchCss = `:host(:not([collapsed])){min-width:13rem}
 `;
 
@@ -43,7 +43,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Search3
             this.autoOpen = false;
         }
         _handleSearchIconPress() {
-            if (Theme.d() && this.open) {
+            if (ManagedStyles.d() && this.open) {
                 this._handleSearchEvent();
                 this._closePopupAndResetState();
                 return;
@@ -58,6 +58,9 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Search3
         }
         _handleEnter() {
             if (!this.value && !this.collapsed) {
+                // Fire `ui5-search` so a host ShellBar collapses in sync; also collapse
+                // locally for standalone usage (host converges on the same state).
+                this._handleSearchEvent();
                 this.collapsed = true;
                 setTimeout(() => {
                     this.focus();
@@ -68,14 +71,14 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Search3
             }
         }
         _onFocusOutSearch(e) {
-            if (Theme.d()) {
+            if (ManagedStyles.d()) {
                 return;
             }
             super._onFocusOutSearch(e);
         }
         _handleInput(e) {
             super._handleInput(e);
-            if (Theme.d()) {
+            if (ManagedStyles.d()) {
                 this._performItemSelectionOnMobile = this._shouldPerformSelectionOnMobile(e.inputType);
             }
         }
@@ -90,18 +93,21 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Search3
         }
         get nativeInput() {
             const domRef = this.shadowRoot;
-            return Theme.d() ? domRef?.querySelector(`[ui5-responsive-popover] input`) : super.nativeInput;
+            return ManagedStyles.d() ? domRef?.querySelector(`[ui5-responsive-popover] input`) : super.nativeInput;
+        }
+        getSearchButtonDomRef() {
+            return this.shadowRoot?.querySelector(".ui5-shell-search-field-button") ?? null;
         }
         _onfocusin() {
             super._onfocusin();
             if (this.autoOpen) {
-                this.open = true;
+                this._setInternalOpen(true);
                 this.fireDecoratorEvent("open");
             }
         }
         onBeforeRendering() {
             super.onBeforeRendering();
-            if (Theme.d()) {
+            if (ManagedStyles.d()) {
                 this.collapsed = true;
             }
         }

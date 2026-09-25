@@ -1,4 +1,4 @@
-sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/Theme'], (function (require, exports, webcomponentsBase, eventStrict, jsxRuntime, parametersBundle_css, toLowercaseEnumValue, ListItemBase, i18nDefaults, WrappingType, Theme) { 'use strict';
+sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/ManagedStyles'], (function (require, exports, webcomponentsBase, eventStrict, jsxRuntime, parametersBundle_css, toLowercaseEnumValue, ListItemBase, i18nDefaults, WrappingType, ManagedStyles) { 'use strict';
 
     function i(t,o,n,m,r={}){const a=webcomponentsBase.D$1.getDraggedElement(),e={targetReference:null,placement:null};if(!a&&!r?.crossDnD)return e;const s=n.placements;return e.targetReference=t.target,s.some(l=>{const c=r.originalEvent?{originalEvent:t}:{};return o.fireDecoratorEvent("move-over",{...c,source:{element:a},destination:{element:m,placement:l}})?false:(t.preventDefault(),e.targetReference=n.element,e.placement=l,true)})||(e.targetReference=null),e}
 
@@ -107,12 +107,12 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             } });
     }
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var DropIndicatorCss = `:host{position:absolute;pointer-events:none;z-index:99}:host([orientation="Vertical"]) .ui5-di-needle{width:.125rem;height:100%;inset-block:0;background:var(--sapContent_DragAndDropActiveColor)}:host([orientation="Vertical"]){margin-left:-.0625rem}:host([orientation="Horizontal"]) .ui5-di-needle{height:.125rem;width:100%;inset-inline:0;background:var(--sapContent_DragAndDropActiveColor)}:host([orientation="Horizontal"]){margin-top:-.0625rem}:host([orientation="Horizontal"][placement="Before"][first]){margin-top:.3125rem}:host([orientation="Horizontal"][placement="After"][last]){margin-top:-.3125rem}:host([orientation="Vertical"]) .ui5-di-needle:before{left:-.1875rem;content:"";position:absolute;width:.25rem;height:.25rem;border-radius:.25rem;border:.125rem solid var(--sapContent_DragAndDropActiveColor);background-color:#fff;pointer-events:none}:host([orientation="Horizontal"]) .ui5-di-needle:before{top:-.1875rem;content:"";position:absolute;width:.25rem;height:.25rem;border-radius:.25rem;border:.125rem solid var(--sapContent_DragAndDropActiveColor);background-color:#fff;pointer-events:none}:host .ui5-di-rect{border:.125rem solid var(--sapContent_DragAndDropActiveColor);position:absolute;inset:0}:host .ui5-di-rect:before{content:" ";position:absolute;inset:0;background:var(--sapContent_DragAndDropActiveColor);opacity:.05}
 `;
 
-    var __decorate$2 = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var __decorate$3 = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
         else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
@@ -133,7 +133,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
      * @extends UI5Element
      * @private
      */
-    let DropIndicator = class DropIndicator extends webcomponentsBase.S {
+    let DropIndicator = class DropIndicator extends webcomponentsBase.b {
         get _positionProperty() {
             if (this.orientation === a.Vertical) {
                 return "left";
@@ -231,19 +231,19 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
             Object.assign(this.style, style);
         }
     };
-    __decorate$2([
+    __decorate$3([
         webcomponentsBase.s({ type: Object })
     ], DropIndicator.prototype, "targetReference", void 0);
-    __decorate$2([
+    __decorate$3([
         webcomponentsBase.s({ type: Object })
     ], DropIndicator.prototype, "ownerReference", void 0);
-    __decorate$2([
+    __decorate$3([
         webcomponentsBase.s()
     ], DropIndicator.prototype, "placement", void 0);
-    __decorate$2([
+    __decorate$3([
         webcomponentsBase.s()
     ], DropIndicator.prototype, "orientation", void 0);
-    DropIndicator = __decorate$2([
+    DropIndicator = __decorate$3([
         webcomponentsBase.m({
             tag: "ui5-drop-indicator",
             renderer: jsxRuntime.y,
@@ -253,6 +253,54 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     ], DropIndicator);
     DropIndicator.define();
     var DropIndicator$1 = DropIndicator;
+
+    var __decorate$2 = (this && this.__decorate) || function (decorators, target, key, desc) {
+        var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+        if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+        else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+        return c > 3 && r && Object.defineProperty(target, key, r), r;
+    };
+    /**
+     * @class
+     *
+     * ### Overview
+     *
+     * `ListItemGroupBase` is the abstract base for grouping components. It provides the minimal
+     * "group" contract shared by `ui5-li-group` and `ui5-option-group`: a header text, the default
+     * items slot, and the plumbing the internal `ui5-list` relies on to flatten grouped items.
+     *
+     * Concrete group components extend this class and add only the public API that is relevant to them.
+     * @constructor
+     * @abstract
+     * @extends UI5Element
+     * @public
+     * @since 2.27.0
+     */
+    let ListItemGroupBase = class ListItemGroupBase extends webcomponentsBase.b {
+        get groupHeaderItem() {
+            return this.shadowRoot.querySelector("[ui5-li-group-header]");
+        }
+        get isListItemGroup() {
+            return true;
+        }
+    };
+    __decorate$2([
+        webcomponentsBase.s()
+    ], ListItemGroupBase.prototype, "headerText", void 0);
+    __decorate$2([
+        webcomponentsBase.d({
+            "default": true,
+            invalidateOnChildChange: true,
+            type: HTMLElement,
+        })
+    ], ListItemGroupBase.prototype, "items", void 0);
+    ListItemGroupBase = __decorate$2([
+        webcomponentsBase.m({
+            renderer: jsxRuntime.y,
+        })
+    ], ListItemGroupBase);
+    var ListItemGroupBase$1 = ListItemGroupBase;
+    const isInstanceOfListItemGroup = webcomponentsBase.r$1("isListItemGroup");
 
     function ListItemGroupHeaderTemplate() {
         return (jsxRuntime.jsxs("div", { part: "native-li", role: this.effectiveAccRole, tabindex: this.forcedTabIndex ? parseInt(this.forcedTabIndex) : undefined, class: {
@@ -272,8 +320,8 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
         return (jsxRuntime.jsx("span", { part: "title", class: "ui5-ghli-title", children: jsxRuntime.jsx("slot", {}) }));
     }
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var ListItemGroupHeaderCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host{height:var(--_ui5_group_header_list_item_height);background:var(--ui5-group-header-listitem-background-color);color:var(--sapList_TableGroupHeaderTextColor)}:host([wrapping-type="Normal"]){height:auto}:host([has-border]){border-bottom:var(--sapList_BorderWidth) solid var(--sapList_GroupHeaderBorderColor)}:host([actionable]:not([disabled])){cursor:default}.ui5-li-root.ui5-ghli-root{padding-top:.5rem;color:currentColor;font-size:var(--sapFontHeader6Size);font-weight:400;line-height:2rem;margin:0}.ui5-ghli-title{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700;font-family:var(--sapFontHeaderFamily)}.ui5-li-content{width:100%}
 `;
 
@@ -459,8 +507,8 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
                     jsxRuntime.jsxs(ListItemGroupHeader$1, { wrappingType: this.wrappingType, focused: this.focused, part: "header", exportparts: "title", accessibleRole: ListItemAccessibleRole$1.ListItem, children: [this.hasFormattedHeader ? jsxRuntime.jsx("slot", { name: "header" }) : this.headerText, jsxRuntime.jsx("div", { role: "list", slot: "subItems", "aria-owns": `${this._id}-content`, "aria-label": this.headerText })] }), jsxRuntime.jsxs("div", { class: "ui5-group-li-root", onDragEnter: this._ondragenter, onDragOver: this._ondragover, onDrop: this._ondrop, onDragLeave: this._ondragleave, id: `${this._id}-content`, children: [jsxRuntime.jsx("slot", {}), jsxRuntime.jsx(DropIndicator$1, { orientation: "Horizontal", ownerReference: this })] })] }));
     }
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var ListItemGroupCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host{height:var(--_ui5_group_header_list_item_height);background:var(--ui5-group-header-listitem-background-color);color:var(--sapList_TableGroupHeaderTextColor)}.ui5-group-li-root{width:100%;height:100%;position:relative;box-sizing:border-box;padding:0;margin:0;list-style-type:none}
 `;
 
@@ -482,11 +530,11 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
      * @csspart header - Used to style the header item of the group
      * @csspart title - Used to style the title of the group header
      * @constructor
-     * @extends UI5Element
+     * @extends ListItemGroupBase
      * @public
      * @since 2.0.0
      */
-    let ListItemGroup = class ListItemGroup extends webcomponentsBase.S {
+    let ListItemGroup = class ListItemGroup extends ListItemGroupBase$1 {
         constructor() {
             super();
             /**
@@ -520,17 +568,11 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
                 filterPlacements: this._filterPlacements.bind(this),
             });
         }
-        get groupHeaderItem() {
-            return this.shadowRoot.querySelector("[ui5-li-group-header]");
-        }
         get hasHeader() {
             return !!this.headerText || this.hasFormattedHeader;
         }
         get hasFormattedHeader() {
             return !!this.header.length;
-        }
-        get isListItemGroup() {
-            return true;
         }
         get dropIndicatorDOM() {
             return this.shadowRoot.querySelector("[ui5-drop-indicator]");
@@ -561,17 +603,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     };
     __decorate([
         webcomponentsBase.s()
-    ], ListItemGroup.prototype, "headerText", void 0);
-    __decorate([
-        webcomponentsBase.s()
     ], ListItemGroup.prototype, "headerAccessibleName", void 0);
-    __decorate([
-        webcomponentsBase.d({
-            "default": true,
-            invalidateOnChildChange: true,
-            type: HTMLElement,
-        })
-    ], ListItemGroup.prototype, "items", void 0);
     __decorate([
         webcomponentsBase.s()
     ], ListItemGroup.prototype, "wrappingType", void 0);
@@ -619,11 +651,11 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-fiori', 'sa
     ], ListItemGroup);
     ListItemGroup.define();
     var ListItemGroup$1 = ListItemGroup;
-    const isInstanceOfListItemGroup = webcomponentsBase.r$1("isListItemGroup");
 
     exports.DragAndDropHandler = DragAndDropHandler;
     exports.DropIndicator = DropIndicator$1;
     exports.ListItemGroup = ListItemGroup$1;
+    exports.ListItemGroupBase = ListItemGroupBase$1;
     exports.ListItemGroupHeader = ListItemGroupHeader$1;
     exports.isInstanceOfListItemGroup = isInstanceOfListItemGroup;
     exports.k = k;

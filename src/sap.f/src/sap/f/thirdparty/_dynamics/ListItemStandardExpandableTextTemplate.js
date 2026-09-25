@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Text', 'sap/f/thirdparty/Link', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/ListItemBase'], (function (exports, jsxRuntime, webcomponentsBase, parametersBundle_css, Theme, i18nDefaults, Text, Link, Button, ResponsivePopover, Icons, willShowContent, eventStrict, AccessibilityTextsHelper, toLowercaseEnumValue, Icon, BusyIndicator, Label, decline, Title, ValueState, FocusableElements, ListItemBase) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Text', 'sap/f/thirdparty/Link', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/information'], (function (exports, jsxRuntime, webcomponentsBase, parametersBundle_css, ManagedStyles, i18nDefaults, Text, Link, Button, ResponsivePopover, Icons, willShowContent, eventStrict, AccessibilityTextsHelper, toLowercaseEnumValue, Icon, Label, decline, Title, ValueState, FocusableElements, ListItemBase, InvisibleMessage, information) { 'use strict';
 
     /**
      * Overflow Mode.
@@ -24,8 +24,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/webc
                             jsxRuntime.jsxs(ResponsivePopover.ResponsivePopover, { open: this._expanded, opener: "toggle", accessibleNameRef: "popover-text", contentOnlyOnDesktop: true, _hideHeader: true, class: "ui5-exp-text-popover", onClose: this._handlePopoverClose, children: [jsxRuntime.jsx(Text.Text, { class: "ui5-exp-text-popover-text", id: "popover-text", children: this.text }), jsxRuntime.jsx("div", { slot: "footer", class: "ui5-exp-text-footer", children: jsxRuntime.jsx(Button.Button, { design: "Transparent", onClick: this._handleCloseButtonClick, children: this._closeButtonText }) })] })] })] }));
     }
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var ExpandableTextCss = `:host{display:inline-block;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapTextColor)}:host([hidden]){display:none}.ui5-exp-text-text{display:inline;white-space:inherit}.ui5-exp-text-text,.ui5-exp-text-toggle{font-family:inherit;font-size:inherit}.ui5-exp-text-text,.ui5-exp-text-ellipsis{color:inherit}.ui5-exp-text-popover,.ui5-exp-text-popover-text{white-space:inherit;font-family:inherit;font-size:inherit}.ui5-exp-text-popover::part(content){padding-inline:1rem}.ui5-exp-text-footer{width:100%;display:flex;align-items:center;justify-content:flex-end}
 `;
 
@@ -65,7 +65,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/webc
      * @public
      * @since 2.6.0
      */
-    let ExpandableText = ExpandableText_1 = class ExpandableText extends webcomponentsBase.S {
+    let ExpandableText = ExpandableText_1 = class ExpandableText extends webcomponentsBase.b {
         constructor() {
             super(...arguments);
             /**
@@ -137,7 +137,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/webc
             return undefined;
         }
         _handlePopoverClose() {
-            if (!Theme.d()) {
+            if (!ManagedStyles.d()) {
                 this._expanded = false;
             }
         }

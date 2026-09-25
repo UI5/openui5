@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/SearchItem.css', 'sap/f/thirdparty/generateHighlightedMarkup', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/encodeXML', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/parameters-bundle2.css'], (function (webcomponentsBase, ListItemBase, jsxRuntime, Icon, Tag, Button, decline, SearchItem_css, generateHighlightedMarkup, eventStrict, i18nDefaults, FocusableElements, parametersBundle_css, encodeXML, Theme, Icons, i18nDefaults$1, willShowContent, AccessibilityTextsHelper, toLowercaseEnumValue, BusyIndicator, Label, parametersBundle_css$1) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/SearchItem.css', 'sap/f/thirdparty/generateHighlightedMarkup', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/encodeXML', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/information', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/parameters-bundle2.css'], (function (webcomponentsBase, ListItemBase, jsxRuntime, Icon, Tag, Button, decline, SearchItem_css, generateHighlightedMarkup, eventStrict, i18nDefaults, FocusableElements, parametersBundle_css, encodeXML, ManagedStyles, Icons, i18nDefaults$1, willShowContent, information, AccessibilityTextsHelper, toLowercaseEnumValue, Label, parametersBundle_css$1) { 'use strict';
 
     function SearchItemTemplate() {
         return (jsxRuntime.jsx("li", { part: "native-li", class: "ui5-li-root ui5-li--focusable", "aria-selected": this.selected, role: "option", "data-sap-focus-ref": true, draggable: this.movable, tabindex: this._effectiveTabIndex, onFocusIn: this._onfocusin, onFocusOut: this._onfocusout, onKeyUp: this._onkeyup, onKeyDown: this._onkeydown, onClick: this._onclick, children: jsxRuntime.jsx("div", { part: "content", class: "ui5-search-item-content", children: jsxRuntime.jsxs("div", { class: "ui5-search-item-begin-content", children: [this.image.length > 0 && !this.icon &&
@@ -6,7 +6,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/ListIte
                             jsxRuntime.jsx(Icon.Icon, { class: "ui5-search-item-icon", name: this.icon }), this.scopeName &&
                             jsxRuntime.jsx(Tag.Tag, { design: Tag.TagDesign.Set2, colorScheme: "10", children: this.scopeName }), jsxRuntime.jsxs("div", { class: "ui5-search-item-titles-container", children: [jsxRuntime.jsx("span", { part: "title", class: "ui5-search-item-text", dangerouslySetInnerHTML: { __html: this._markupText } }), jsxRuntime.jsx("span", { part: "subtitle", class: "ui5-search-item-description", children: this.description })] }), jsxRuntime.jsxs("div", { class: "ui5-search-item-actions-container", children: [this.hasActions &&
                                     jsxRuntime.jsx("div", { class: "ui5-search-item-actions", children: jsxRuntime.jsx("slot", { name: "actions" }) }), this.deletable &&
-                                    jsxRuntime.jsx(Button.Button, { class: "ui5-search-item-selected-delete", design: Button.ButtonDesign.Transparent, icon: decline.decline, onClick: this._onDeleteButtonClick, tooltip: this._deleteButtonTooltip, onKeyDown: this._onDeleteButtonKeyDown })] })] }) }) }));
+                                    jsxRuntime.jsx(Button.Button, { class: "ui5-search-item-selected-delete", design: Button.ButtonDesign.Transparent, icon: decline.declineIcon, onClick: this._onDeleteButtonClick, tooltip: this._deleteButtonTooltip, onKeyDown: this._onDeleteButtonKeyDown })] })] }) }) }));
     }
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -72,7 +72,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/ListIte
             super._onkeydown(e);
             // Handle space/enter when focus is within action items
             if (this.getFocusDomRef().matches(":has(:focus-within)")) {
-                if (webcomponentsBase.A(e) || webcomponentsBase.b(e)) {
+                if (webcomponentsBase.A(e) || webcomponentsBase.b$1(e)) {
                     e.preventDefault();
                     return;
                 }
@@ -140,7 +140,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/ListIte
             this.fireDecoratorEvent("delete");
         }
         _onDeleteButtonKeyDown(e) {
-            if (webcomponentsBase.A(e) || webcomponentsBase.b(e)) {
+            if (webcomponentsBase.A(e) || webcomponentsBase.b$1(e)) {
                 this.fireDecoratorEvent("delete");
             }
         }

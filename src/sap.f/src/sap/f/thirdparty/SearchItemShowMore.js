@@ -1,11 +1,11 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/SearchItem.css', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, eventStrict, ListItemBase, jsxRuntime, parametersBundle_css$1, SearchItem_css, Theme, parametersBundle_css, i18nDefaults, Icons) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/SearchItem.css', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, eventStrict, ListItemBase, jsxRuntime, parametersBundle_css$1, SearchItem_css, ManagedStyles, parametersBundle_css, i18nDefaults, Icons) { 'use strict';
 
     function SearchItemShowMoreTemplate() {
         return (jsxRuntime.jsx("li", { class: "ui5-li-root ui5-li--focusable ui5-search-item-show-more", role: "option", tabindex: this._effectiveTabIndex, "aria-selected": this.selected, onFocusIn: this._onfocusin, onFocusOut: this._onfocusout, onClick: this._onclick, onKeyDown: this._onkeydown, onKeyUp: this._onkeyup, children: jsxRuntime.jsx("span", { class: "ui5-search-item-show-more-text", children: this.showMoreTextCount }) }));
     }
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var SearchItemShowMoreCss = `.ui5-search-item-show-more-text{color:var(--sapLinkColor)}.ui5-search-item-show-more-text:active{color:var(--sapList_Active_TextColor)}
 `;
 
@@ -60,7 +60,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
             this.fireDecoratorEvent("click", { item: this, originalEvent: e, fromKeyboard });
         }
         _onkeydown(e) {
-            if (webcomponentsBase.b(e)) {
+            if (webcomponentsBase.b$1(e)) {
                 this._onclick(e, true);
                 e.preventDefault();
             }
@@ -73,7 +73,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
         }
     };
     __decorate([
-        webcomponentsBase.s()
+        webcomponentsBase.s({ type: Number })
     ], SearchItemShowMore.prototype, "itemsToShowCount", void 0);
     __decorate([
         webcomponentsBase.s({ type: Boolean })

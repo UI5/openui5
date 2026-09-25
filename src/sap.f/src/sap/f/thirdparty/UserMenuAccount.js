@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, Theme, Icons) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, ManagedStyles, Icons) { 'use strict';
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -21,7 +21,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Theme',
      * @public
      * @since 2.5.0
      */
-    class UserMenuAccount extends webcomponentsBase.S {
+    class UserMenuAccount extends webcomponentsBase.b {
         constructor() {
             super(...arguments);
             /**
