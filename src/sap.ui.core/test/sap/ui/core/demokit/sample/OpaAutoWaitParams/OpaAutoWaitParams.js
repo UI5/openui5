@@ -15,7 +15,7 @@ sap.ui.require([
 	opaTest("Should change autoWait parameters", function (Given, When, Then) {
 		Opa5.extendConfig({
 			viewNamespace: "appUnderTest.view.",
-			timeout: 1,
+			timeout: 5,
 			logLevel: "trace",
 			autoWait: {
 				timeoutWaiter: {

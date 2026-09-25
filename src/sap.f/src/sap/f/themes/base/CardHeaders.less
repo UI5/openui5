@@ -1,19 +1,21 @@
-/* ======================================== */
-/* CSS for control sap.f.cards/BaseHeader	*/
-/* Base theme								*/
-/* ======================================== */
+/* ======================================= */
+/* CSS for control sap.f.cards/BaseHeader  */
+/* Base theme                              */
+/* ======================================= */
 
-@_sap_f_CardHeaders_Padding: 1rem;
-@_sap_f_CardHeaders_TitleFontSize: @sapMFontHeader5Size;
-@_sap_f_CardHeaders_HeaderFocusBorderLeftOffset: 1px;
-@_sap_f_CardHeaders_HeaderFocusBorderBottomOffset: 1px;
-@_sap_f_CardHeaders_HeaderFocusBorderRightOffset: 1px;
-@_sap_f_CardHeaders_HeaderFocusBorderTopOffset: 1px;
+.sapUI5Scope {
+	--_sap_f_CardHeaders_Padding: 1rem;
+	--_sap_f_CardHeaders_TitleFontSize: var(--sapFontHeader5Size);
+	--_sap_f_CardHeaders_HeaderFocusBorderLeftOffset: 1px;
+	--_sap_f_CardHeaders_HeaderFocusBorderBottomOffset: 1px;
+	--_sap_f_CardHeaders_HeaderFocusBorderRightOffset: 1px;
+	--_sap_f_CardHeaders_HeaderFocusBorderTopOffset: 1px;
+}
 
 .sapFCardHeader {
 	position: relative;
 	flex-shrink: 0;
-	background: @sapUiTileBackground;
+	background: var(--sapTile_Background);
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
@@ -43,17 +45,17 @@
 		display: flex;
 		min-width: 0;
 		height: fit-content;
-		padding: @_sap_f_CardHeaders_Padding @_sap_f_CardHeaders_Padding 0.25rem @_sap_f_CardHeaders_Padding;
+		padding: var(--_sap_f_CardHeaders_Padding) var(--_sap_f_CardHeaders_Padding) 0.25rem var(--_sap_f_CardHeaders_Padding);
 		position: relative;
 		border-radius: 0;
 		flex-grow: 1;
 
-		&.sapFCardHeaderLastPart{
-			padding: @_sap_f_CardHeaders_Padding;
+		&.sapFCardHeaderLastPart {
+			padding: var(--_sap_f_CardHeaders_Padding);
 		}
 
 		&:has(+ .sapFCardHeaderToolbarCont),
-		&.sapFCardHeaderLastPart:has(+ .sapFCardHeaderToolbarCont)  {
+		&.sapFCardHeaderLastPart:has(+ .sapFCardHeaderToolbarCont) {
 			padding-right: 0;
 		}
 	}
@@ -62,11 +64,11 @@
 		cursor: pointer;
 
 		&:hover {
-			background: @sapUiTileHoverBackground;
+			background: var(--sapTile_Hover_Background);
 		}
 
 		&:active {
-			background: @sapUiTileActiveBackground;
+			background: var(--sapTile_Active_Background);
 		}
 	}
 
@@ -81,8 +83,9 @@
 		justify-content: center;
 
 		&.sapFAvatarColorTransparent {
+
 			.sapUiIcon {
-				color: @sapUiTileIconColor;
+				color: var(--sapTile_IconColor);
 				font-size: 2rem;
 				align-self: center;
 			}
@@ -94,7 +97,7 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		//fixes bug with flex
+		/* fixes bug with flex */
 		min-width: 0;
 		width: 100%;
 
@@ -102,8 +105,8 @@
 			min-width: 0;
 			display: block;
 			font-family: var(--sapFontBoldFamily);
-			font-size: @_sap_f_CardHeaders_TitleFontSize;
-			color: @sapUiTileTitleTextColor;
+			font-size: var(--_sap_f_CardHeaders_TitleFontSize);
+			color: var(--sapTile_TitleTextColor);
 			min-height: 1rem;
 			position: relative;
 		}
@@ -111,16 +114,17 @@
 
 	.sapFCardSubtitle {
 		position: relative;
-		font-family: @sapUiFontFamily;
-		font-size: @sapMFontMediumSize;
+		font-family: var(--sapFontFamily);
+		font-size: var(--sapFontSize);
 		font-weight: normal;
-		color: @sapUiTileTextColor;
+		color: var(--sapTile_TextColor);
 		min-height: 1rem;
 		flex-grow: 1;
 	}
 
 	&:not(.sapFCardHeaderHasToolbar) {
-		.sapFCardStatusWrapper{
+
+		.sapFCardStatusWrapper {
 			padding-top: 1rem;
 		}
 	}
@@ -133,9 +137,9 @@
 
 	.sapFCardStatus {
 		position: relative;
-		font-family: @sapUiFontFamily;
-		font-size: @sapMFontSmallSize;
-		color: @sapUiTileTextColor;
+		font-family: var(--sapFontFamily);
+		font-size: var(--sapFontSmallSize);
+		color: var(--sapTile_TextColor);
 		text-align: right;
 		line-height: normal;
 		margin-top: 0.188rem;
@@ -158,8 +162,8 @@
 	}
 
 	.sapFCardDataTimestamp {
-		color: @sapUiTileTextColor;
-		font-size: @sapMFontSmallSize;
+		color: var(--sapTile_TextColor);
+		font-size: var(--sapFontSmallSize);
 		flex-shrink: 0;
 		text-align: right;
 		line-height: normal;
@@ -168,7 +172,7 @@
 		align-items: center;
 	}
 
-	.sapFCardStatusWrapper.sapFCardHeaderLineIncludesDataTimestamp  .sapFCardStatus{
+	.sapFCardStatusWrapper.sapFCardHeaderLineIncludesDataTimestamp  .sapFCardStatus {
 		padding-bottom: 0.25rem;
 	}
 
@@ -186,10 +190,11 @@
 	}
 
 	.sapFCardHeaderLastPart + .sapFCardHeaderToolbarCont {
-		padding-bottom: @_sap_f_CardHeaders_Padding;
+		padding-bottom: var(--_sap_f_CardHeaders_Padding);
 	}
 
 	&.sapFCardHeaderHasToolbar {
+
 		&:not(.sapFCardHeaderHasIcon) .sapFCardHeaderMainPart {
 			min-height: 2rem;
 			align-items: flex-start;
@@ -203,12 +208,11 @@
 	.sapFCardHeaderBanner {
 		display: none;
 		justify-content: flex-end;
-		margin: 0.25rem -(@_sap_f_CardHeaders_Padding) 0;
+		margin: 0.25rem ~'calc(-1 * var(--_sap_f_CardHeaders_Padding))' 0;
 
 		.sapFCardHeaderBannerInner {
-			padding-inline-start: 0.25rem;
-			padding-inline-end: @_sap_f_CardHeaders_Padding;
-			background-color: @sapUiInfobarNonInteractiveBackground;
+			padding-inline: 0.25rem var(--_sap_f_CardHeaders_Padding);
+			background-color: var(--sapInfobar_NonInteractive_Background);
 			min-width: 0;
 
 			.sapFCardHeaderBannerLine {
@@ -217,12 +221,12 @@
 				padding: 0.125rem 0;
 
 				.sapMText {
-					font-size: @sapMFontSmallSize;
-					color: @sapUiTileTitleTextColor;
+					font-size: var(--sapFontSmallSize);
+					color: var(--sapTile_TitleTextColor);
 				}
 
 				.sapMText.sapFCardHeaderBannerLineDiminished {
-					color: @sapUiTileTextColor;
+					color: var(--sapTile_TextColor);
 				}
 			}
 		}
@@ -244,6 +248,7 @@
 	}
 
 	&:not(:has(.sapFCardSubtitle)) {
+
 		.sapFCardHeaderToolbarCont {
 			justify-content: center;
 		}
@@ -254,20 +259,21 @@
 .sapUiIntCardTileFlatWide,
 .sapUiIntCardTileStandardWide,
 .sapUiIntCardTileStandard {
-	/* the banner feature is not yet available for standard card variant so we set it only for tiles variants*/
+
+	/* the banner feature is not yet available for standard card variant so we set it only for tiles variants */
 	.sapFCardHeader .sapFCardHeaderBanner {
 		display: flex;
 	}
 }
 
 .sapFCardHeaderInfoSection {
-	padding: 0.25rem @_sap_f_CardHeaders_Padding 0.25rem @_sap_f_CardHeaders_Padding;
+	padding: 0.25rem var(--_sap_f_CardHeaders_Padding) 0.25rem var(--_sap_f_CardHeaders_Padding);
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
 }
 
-.sapFCardHeaderInfoSection:not(:has(+ .sapFCardNumericHeaderNumericPart))  {
+.sapFCardHeaderInfoSection:not(:has(+ .sapFCardNumericHeaderNumericPart)) {
 	padding-block-end: 1rem;
 }
 
@@ -278,14 +284,14 @@
 	}
 
 	.sapFCardNumericHeaderNumericPart {
-		padding: 0rem @_sap_f_CardHeaders_Padding @_sap_f_CardHeaders_Padding @_sap_f_CardHeaders_Padding;
+		padding: 0 var(--_sap_f_CardHeaders_Padding) var(--_sap_f_CardHeaders_Padding) var(--_sap_f_CardHeaders_Padding);
 
 		.sapFCardHeaderNumericPartFirstLine {
 			display: flex;
 			align-items: center;
 			overflow: hidden;
 
-			.sapFCardNumericIndicators  {
+			.sapFCardNumericIndicators {
 				flex: 1;
 			}
 		}
@@ -308,22 +314,22 @@
 		&.sapFCardSubtitleAndUnit .sapFCardHeaderUnitOfMeasurement {
 			margin-left: 0.25rem;
 			padding-left: 0.25rem;
-			border-left: 1px solid @sapUiTileTextColor;
+			border-left: 1px solid var(--sapTile_TextColor);
 		}
 	}
 
 	.sapFCardHeaderText .sapFCardSubtitle .sapMText {
-		color: @sapUiTileTextColor;
+		color: var(--sapTile_TextColor);
 	}
 
 	.sapFCardNumericIndicators {
 		flex: 1;
-		min-width: 0; // allows items to shrink and truncate the content inside
+		min-width: 0; /* allows items to shrink and truncate the content inside */
 
 		.sapFCardHeaderSideIndicator .sapFCardHeaderSITitle,
 		.sapFCardHeaderSINumber,
 		.sapFCardHeaderSINumber .sapMText {
-			font-size: @sapMFontSmallSize;
+			font-size: var(--sapFontSmallSize);
 		}
 
 		.sapFCardNumericIndicatorsSide {
@@ -339,31 +345,32 @@
 	}
 
 	.sapFCardHeaderDetails {
-		font-size: @sapMFontSmallSize;
-		color: @sapUiTileTextColor;
+		font-size: var(--sapFontSmallSize);
+		color: var(--sapTile_TextColor);
 		position: relative;
 		flex-grow: 1;
 	}
 
 	.sapFCardNumericHeaderDetailsState {
+
 		&None {
-			color: @sapUiNeutralText;
+			color: var(--sapNeutralTextColor);
 		}
 
 		&Success {
-			color: @sapUiPositiveText;
+			color: var(--sapPositiveTextColor);
 		}
 
 		&Warning {
-			color: @sapUiCriticalText;
+			color: var(--sapCriticalTextColor);
 		}
 
 		&Error {
-			color: @sapUiNegativeText;
+			color: var(--sapNegativeTextColor);
 		}
 
 		&Information {
-			color: @sapUiInformativeText;
+			color: var(--sapInformativeTextColor);
 		}
 	}
 
@@ -376,38 +383,41 @@
 	display: flex;
 	flex-direction: column;
 	align-items: flex-end;
-	min-width: 0; // allows items to shrink and truncate the content inside
+	min-width: 0; /* allows items to shrink and truncate the content inside */
+
 	.sapFCardHeaderSITitle {
-		color: @sapUiTileTextColor;
+		color: var(--sapTile_TextColor);
 		padding-bottom: 0.25rem;
 		position: relative;
 	}
+
 	.sapFCardHeaderSINumber,
 	.sapFCardHeaderSINumber .sapMText {
-		color: @sapUiTileTitleTextColor;
+		color: var(--sapTile_TitleTextColor);
 		position: relative;
 	}
 }
 
-// Value colors for the Side Indicators in the Numeric header
+/* Value colors for the Side Indicators in the Numeric header */
 .sapFCardHeaderSideIndicatorStateCritical .sapFCardHeaderSINumber .sapMText {
-	color: @sapUiCriticalText;
+	color: var(--sapCriticalTextColor);
 }
 
 .sapFCardHeaderSideIndicatorStateError .sapFCardHeaderSINumber .sapMText {
-	color: @sapUiNegativeText;
+	color: var(--sapNegativeTextColor);
 }
 
 .sapFCardHeaderSideIndicatorStateGood .sapFCardHeaderSINumber .sapMText {
-	color: @sapUiPositiveText;
+	color: var(--sapPositiveTextColor);
 }
 
 .sapFCardHeaderSideIndicatorStateNeutral .sapFCardHeaderSINumber .sapMText {
-	color: @sapUiNeutralText;
+	color: var(--sapNeutralTextColor);
 }
 
 .sapUiSizeCompact {
-	.sapFCardHeaderHasToolbar:not(.sapFCardHeaderHasIcon) .sapFCardHeaderMainPart{
+
+	.sapFCardHeaderHasToolbar:not(.sapFCardHeaderHasIcon) .sapFCardHeaderMainPart {
 		min-height: 1rem;
 	}
 }
@@ -416,11 +426,11 @@
 	content: '';
 	display: block;
 	position: absolute;
-	left: @_sap_f_CardHeaders_HeaderFocusBorderLeftOffset;
-	bottom: @_sap_f_CardHeaders_HeaderFocusBorderBottomOffset;
-	right: @_sap_f_CardHeaders_HeaderFocusBorderRightOffset;
-	top: @_sap_f_CardHeaders_HeaderFocusBorderTopOffset;
-	border: @sapUiContentFocusWidth @sapUiContentFocusStyle @sapUiContentFocusColor;
+	left: var(--_sap_f_CardHeaders_HeaderFocusBorderLeftOffset);
+	bottom: var(--_sap_f_CardHeaders_HeaderFocusBorderBottomOffset);
+	right: var(--_sap_f_CardHeaders_HeaderFocusBorderRightOffset);
+	top: var(--_sap_f_CardHeaders_HeaderFocusBorderTopOffset);
+	border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 	border-radius: inherit;
 	pointer-events: none;
 	z-index: 1;
@@ -434,36 +444,36 @@
 	}
 }
 
-.sapFAvatar[class*="sapFCardHeaderImageState"] {
-    background-color: transparent;
-    font-size: 2rem;
-    color: var(--avatar-state-color);
+.sapFAvatar[class*='sapFCardHeaderImageState'] {
+	background-color: transparent;
+	font-size: 2rem;
+	color: var(--avatar-state-color);
 }
 
 .sapFAvatar.sapFCardHeaderImageStateError {
-    --avatar-state-color: var(--sapNegativeElementColor);
+	--avatar-state-color: var(--sapNegativeElementColor);
 }
 
 .sapFAvatar.sapFCardHeaderImageStateWarning {
-    --avatar-state-color: var(--sapCriticalElementColor);
+	--avatar-state-color: var(--sapCriticalElementColor);
 }
 
 .sapFAvatar.sapFCardHeaderImageStateInformation {
-    --avatar-state-color: var(--sapInformativeElementColor);
+	--avatar-state-color: var(--sapInformativeElementColor);
 }
 
 .sapFAvatar.sapFCardHeaderImageStateSuccess {
-    --avatar-state-color: var(--sapPositiveElementColor);
+	--avatar-state-color: var(--sapPositiveElementColor);
 }
 
-/* ============================================================= */
+/* ============================================================== */
 /* ACC-260: 200% Zoom Accessibility - XS card header layout       */
 /* Applied when the header width <= 180px (360px device at 200%   */
 /* zoom). The class is toggled on the header itself, so all       */
 /* selectors below are scoped to the header (see BaseHeader.js).  */
 /* Tile-like cards are excluded via :not(.sapUiIntCardTile) on    */
 /* the card root, as they are already optimized for small sizes.  */
-/* ============================================================= */
+/* ============================================================== */
 
 .sapFCard:not(.sapUiIntCardTile) .sapFCardHeader.sapFCardXSHeader {
 
@@ -501,8 +511,8 @@
 	}
 
 	/* B1: No Action/Timestamp/Counter - title stays next to avatar.
-	   Scoped to :has(avatar): otherwise a zero flex-basis collapses the
-	   lone title in shrink-to-fit layouts such as nested cards. */
+	Scoped to :has(avatar): otherwise a zero flex-basis collapses the
+	lone title in shrink-to-fit layouts such as nested cards. */
 	.sapFCardHeaderTopRow:not(:has(.sapFCardHeaderToolbarCont)) .sapFCardHeaderMainPart:has(.sapFCardHeaderImage) {
 		flex-wrap: nowrap;
 
@@ -548,7 +558,7 @@
 	}
 
 	/* Columns are sized to their content (not 1fr) so the indicators sit
-	   next to each other without a trailing gap on the right. */
+	next to each other without a trailing gap on the right. */
 	.sapFCardNumericIndicators .sapFCardNumericIndicatorsSide {
 		margin-top: 0.25rem;
 		padding: 0;
