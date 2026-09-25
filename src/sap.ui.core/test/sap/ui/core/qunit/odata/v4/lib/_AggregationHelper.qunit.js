@@ -395,6 +395,7 @@ sap.ui.define([
 		// bFollowUp = false: keep concat (min/max), but use identity (no groupby)
 		// bFollowUp = true: no $apply needed
 		oAggregation : {
+			$autoExpandSelect : true,
 			$leafLevelAggregated : false,
 			aggregate : {
 				Amount : {grandTotal : true}, // ignored with iLevel=0
@@ -819,6 +820,7 @@ sap.ui.define([
 			+ "/filter(SalesNumber ge 0)"
 	}, {
 		oAggregation : {
+			$autoExpandSelect : true,
 			// $leafLevelAggregated not yet determined? do not remove groupby on leaf level
 			$leafLevelAggregated : undefined,
 			aggregate : {
@@ -833,6 +835,20 @@ sap.ui.define([
 			+ ",aggregate(SalesNumber))"
 	}, {
 		oAggregation : {
+			$autoExpandSelect : false, // do not use "identity"!
+			$leafLevelAggregated : false,
+			aggregate : {
+				SalesNumber : {}
+			},
+			group : {
+				Country : {},
+				Region : {}
+			}
+		},
+		sApply : "groupby((Country,Region),aggregate(SalesNumber))"
+	}, {
+		oAggregation : {
+			$autoExpandSelect : true,
 			// $leafLevelAggregated=false is unrealistic for the given oAggregation, but make sure
 			// groupby is not removed on leaf level if "grandTotal like 1.84" is set
 			$leafLevelAggregated : false,
@@ -944,6 +960,7 @@ sap.ui.define([
 			+ "/filter(SalesAmountSum gt 0)/orderby(Country desc)/skip(42)/top(99)"
 	}, {
 		oAggregation : {
+			$autoExpandSelect : true,
 			// $leafLevelAggregated=false is unrealistic for the given oAggregation, but make sure
 			// groupby is not removed on a group level
 			$leafLevelAggregated : false,
@@ -1011,6 +1028,7 @@ sap.ui.define([
 		sFollowUpApply : "groupby((LifecycleStatus),aggregate(GrossAmount))/top(3)"
 	}, {
 		oAggregation : {
+			$autoExpandSelect : true,
 			// make sure not to use identity if the leaf level is aggregated
 			$leafLevelAggregated : true,
 			aggregate : {
@@ -1032,6 +1050,7 @@ sap.ui.define([
 			+ "/groupby((A,B,C),aggregate(Amount))"
 	}, {
 		oAggregation : {
+			$autoExpandSelect : true,
 			// must not consider $leafLevelAggregated if iLevel = -1
 			$leafLevelAggregated : false,
 			aggregate : {
@@ -1050,6 +1069,7 @@ sap.ui.define([
 	}, {
 		// unaggregated leaf: aggregate+group, no groupby, previous $apply removed
 		oAggregation : {
+			$autoExpandSelect : true,
 			$leafLevelAggregated : false,
 			aggregate : {Amount : {}},
 			group : {ID : {}}
@@ -1061,6 +1081,7 @@ sap.ui.define([
 	}, {
 		// unaggregated leaf: with grand total
 		oAggregation : {
+			$autoExpandSelect : true,
 			$leafLevelAggregated : false,
 			aggregate : {SalesAmount : {grandTotal : true, unit : "Currency"}},
 			group : {ID : {additionally : ["a", "b/c"]}}
@@ -1073,6 +1094,7 @@ sap.ui.define([
 	}, {
 		// unaggregated leaf: with grand total and skip/top
 		oAggregation : {
+			$autoExpandSelect : true,
 			$leafLevelAggregated : false,
 			aggregate : {SalesNumber : {grandTotal : true}},
 			group : {ID : {}}
@@ -1092,6 +1114,7 @@ sap.ui.define([
 		// unaggregated leaf: with grand total and skip/top, same as in the previous test but
 		// ExpandAfterConcatSupported is not enabled => groupby is used instead of identity
 		oAggregation : {
+			$autoExpandSelect : true,
 			$leafLevelAggregated : false,
 			aggregate : {Amount : {grandTotal : true}},
 			group : {ID : {}}
@@ -1110,6 +1133,7 @@ sap.ui.define([
 	}, {
 		// unaggregated leaf: with "min" aggregate
 		oAggregation : {
+			$autoExpandSelect : true,
 			$leafLevelAggregated : false,
 			aggregate : {Amount : {min : true}},
 			group : {ID : {}}
@@ -1123,6 +1147,7 @@ sap.ui.define([
 	}, {
 		// unaggregated leaf: combined options
 		oAggregation : {
+			$autoExpandSelect : true,
 			$leafLevelAggregated : false,
 			aggregate : {SalesNumber : {grandTotal : true}},
 			group : {ID : {additionally : ["Name"]}},
@@ -1151,6 +1176,7 @@ sap.ui.define([
 	}, {
 		// unaggregated leaf: must not consider $leafLevelAggregated when defining an alias
 		oAggregation : {
+			$autoExpandSelect : true,
 			$leafLevelAggregated : false,
 			aggregate : {
 				Amount : {},
@@ -1272,6 +1298,7 @@ sap.ui.define([
 		}
 
 		const oAggregation = {
+			$autoExpandSelect : true,
 			$fetchMetadata : mustBeMocked,
 			$leafLevelAggregated : false,
 			aggregate : {SalesNumber : {grandTotal : true}},
@@ -1369,6 +1396,7 @@ sap.ui.define([
 ["$filter", "$$filterOnAggregate", "$$leaves"].forEach(function (sOption) {
 	QUnit.test("buildApply: identity, illegal option " + sOption, function (assert) {
 		const oAggregation = {
+			$autoExpandSelect : true,
 			$leafLevelAggregated : false,
 			group : {ID : {}}
 		};
@@ -1836,8 +1864,9 @@ sap.ui.define([
 			"~fnFetchMetadata~", "/some(0)/path");
 
 		assert.deepEqual(oAggregation, {
-			hierarchyQualifier : "X",
-			$fetchMetadata : "~fnFetchMetadata~"
+			$autoExpandSelect : "~bAutoExpandSelect~",
+			$fetchMetadata : "~fnFetchMetadata~",
+			hierarchyQualifier : "X"
 		});
 	});
 

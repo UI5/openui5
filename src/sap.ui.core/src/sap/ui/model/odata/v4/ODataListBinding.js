@@ -3570,16 +3570,35 @@ sap.ui.define([
 	 * @see sap.ui.model.odata.v4.ODataParentBinding#getQueryOptionsFromParameters
 	 */
 	ODataListBinding.prototype.getQueryOptionsFromParameters = function () {
-		let mQueryOptions = this.mQueryOptions;
+		let mQueryOptions;
+		const addToSelect = (aPaths) => {
+			if (!mQueryOptions) { // copy on write
+				mQueryOptions = {...this.mQueryOptions}; // shallow clone (as deep as needed)
+				// avoid that this.mQueryOptions.$select is modified
+				mQueryOptions.$select &&= mQueryOptions.$select.slice();
+			}
+			_Helper.addToSelect(mQueryOptions, aPaths);
+		};
+
 		const aGroupPaths = this.getGroupPaths();
 		if (aGroupPaths.length) {
-			mQueryOptions = {...mQueryOptions};
-			// avoid that this.mQueryOptions.$select is modified
-			mQueryOptions.$select &&= mQueryOptions.$select.slice();
-			_Helper.addToSelect(mQueryOptions, aGroupPaths);
+			addToSelect(aGroupPaths);
 		}
 
-		return mQueryOptions;
+		if (_Helper.isDataAggregation(this.mParameters)) {
+			if (this.oModel.bAutoExpandSelect) {
+				for (const sGroup in this.mParameters.$$aggregation.group) {
+					const oGroup = this.mParameters.$$aggregation.group[sGroup];
+					if (oGroup.additionally?.length) {
+						addToSelect(oGroup.additionally);
+					}
+				}
+			} else if (this.mQueryOptions.$expand || this.mQueryOptions.$select) {
+				throw new Error("Missing parameter autoExpandSelect");
+			}
+		}
+
+		return mQueryOptions ?? this.mQueryOptions;
 	};
 
 	/**

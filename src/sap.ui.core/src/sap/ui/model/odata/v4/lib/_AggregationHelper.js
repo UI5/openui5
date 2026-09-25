@@ -365,8 +365,8 @@ sap.ui.define([
 				oAggregation.groupLevels.pop();
 			}
 			bIsLeafLevel = iLevel <= 0 || iLevel > oAggregation.groupLevels.length;
-			bUseIdentity = bIsLeafLevel && oAggregation.$leafLevelAggregated === false
-				&& !bGrandTotalLike184 && iLevel >= 0
+			bUseIdentity = bIsLeafLevel && !bGrandTotalLike184 && iLevel >= 0
+				&& !!oAggregation.$autoExpandSelect && oAggregation.$leafLevelAggregated === false
 				&& !aAliases.some((sAlias) => oAggregation.aggregate[sAlias].name);
 
 			aGroupBy = bIsLeafLevel
@@ -1688,7 +1688,7 @@ sap.ui.define([
 		 * Validates the given data aggregation information. If successful, the given path and its
 		 * corresponding meta path as well as the given function are stored inside that information
 		 * as <code>$metaPath</code>, <code>$path</code>, and <code>$fetchMetadata</code>
-		 * respectively.
+		 * respectively. <code>$autoExpandSelect</code> is stored there as well.
 		 *
 		 * @param {object} oAggregation
 		 *   An object holding the information needed for data aggregation; see {@link #.buildApply}
@@ -1710,6 +1710,7 @@ sap.ui.define([
 				sPath) {
 			_AggregationHelper.validateAggregation(oAggregation, bAutoExpandSelect);
 
+			oAggregation.$autoExpandSelect = bAutoExpandSelect;
 			oAggregation.$fetchMetadata = fnFetchMetadata;
 			_AggregationHelper.setPath(oAggregation, sPath);
 		}
