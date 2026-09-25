@@ -227,7 +227,7 @@ sap.ui.define([
 					assert.ok(oNextField.isA("sap.m.Panel"), "Field: Customer NotVisible is not visible");
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
-						assert.equal(oCustomerComboBox.getItems().length, 4, "Field: Customer NotEditable data lenght is OK");
+						assert.equal(oCustomerComboBox.getItems().length, 4, "Field: Customer NotEditable data length is OK");
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -253,11 +253,11 @@ sap.ui.define([
 
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
-						assert.equal(oCustomerComoboBox.getItems().length, 4, "Field: Customer origin lenght is OK");
+						assert.equal(oCustomerComoboBox.getItems().length, 4, "Field: Customer origin length is OK");
 						var oModel = oCustomerComoboBox.getModel();
 						oModel.attachPropertyChange(function () {
 							EditorQunitUtils.wait(iWaitTimeout).then(function () {
-								assert.equal(oCustomerComoboBox.getItems().length, 2, "Field: Customer lenght is OK");
+								assert.equal(oCustomerComoboBox.getItems().length, 2, "Field: Customer length is OK");
 								resolve();
 							});
 						});
@@ -287,11 +287,11 @@ sap.ui.define([
 
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
-						assert.equal(oCustomerComoboBox.getItems().length, 4, "Field: Customer origin lenght is OK");
+						assert.equal(oCustomerComoboBox.getItems().length, 4, "Field: Customer origin length is OK");
 						var oModel = oCustomerComoboBox.getModel();
 						oModel.attachPropertyChange(function () {
 							EditorQunitUtils.wait(iWaitTimeout).then(function () {
-								assert.equal(oCustomerComoboBox.getItems().length, 2, "Field: Customer lenght is OK");
+								assert.equal(oCustomerComoboBox.getItems().length, 2, "Field: Customer length is OK");
 								resolve();
 							});
 						});
@@ -399,7 +399,7 @@ sap.ui.define([
 					assert.ok(oNextField.isA("sap.m.Panel"), "Field: Customers NotVisible is not visible");
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
-						assert.equal(oCustomersMultiComboBox.getItems().length, 5, "Field: Customers NotEditable data lenght is OK");
+						assert.equal(oCustomersMultiComboBox.getItems().length, 5, "Field: Customers NotEditable data length is OK");
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -425,11 +425,11 @@ sap.ui.define([
 
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
-						assert.equal(oCustomersMultiComboBox.getItems().length, 5, "Field: Customers origin lenght is OK");
+						assert.equal(oCustomersMultiComboBox.getItems().length, 5, "Field: Customers origin length is OK");
 						var oModel = oCustomersMultiComboBox.getModel();
 						oModel.attachPropertyChange(function () {
 							EditorQunitUtils.wait(iWaitTimeout).then(function () {
-								assert.equal(oCustomersMultiComboBox.getItems().length, 3, "Field: Customers lenght is OK");
+								assert.equal(oCustomersMultiComboBox.getItems().length, 3, "Field: Customers length is OK");
 								resolve();
 							});
 						});
@@ -459,11 +459,11 @@ sap.ui.define([
 
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
-						assert.equal(oCustomersMultiComboBox.getItems().length, 5, "Field: Customers origin lenght is OK");
+						assert.equal(oCustomersMultiComboBox.getItems().length, 5, "Field: Customers origin length is OK");
 						var oModel = oCustomersMultiComboBox.getModel();
 						oModel.attachPropertyChange(function () {
 							EditorQunitUtils.wait(iWaitTimeout).then(function () {
-								assert.equal(oCustomersMultiComboBox.getItems().length, 3, "Field: Customers lenght is OK");
+								assert.equal(oCustomersMultiComboBox.getItems().length, 3, "Field: Customers length is OK");
 								resolve();
 							});
 						});
@@ -594,10 +594,10 @@ sap.ui.define([
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
 						var oModel = oCustomersMultiInput.getModel();
-						assert.deepEqual(oModel.getData(), {},  "Field: Customers ori lenght is OK");
+						assert.deepEqual(oModel.getData(), {},  "Field: Customers ori length is OK");
 						oModel.attachPropertyChange(function () {
 							EditorQunitUtils.wait(iWaitTimeout).then(function () {
-								assert.equal(oModel.getData().value.length, 2,  "Field: Customers lenght is OK");
+								assert.equal(oModel.getData().value.length, 2,  "Field: Customers length is OK");
 								resolve();
 							});
 						});
@@ -628,10 +628,10 @@ sap.ui.define([
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
 						var oModel = oCustomersMultiInput.getModel();
-						assert.deepEqual(oModel.getData(), {},  "Field: Customers ori lenght is OK");
+						assert.deepEqual(oModel.getData(), {},  "Field: Customers ori length is OK");
 						oModel.attachPropertyChange(function () {
 							EditorQunitUtils.wait(iWaitTimeout).then(function () {
-								assert.equal(oModel.getData().value.length, 2,  "Field: Customers lenght is OK");
+								assert.equal(oModel.getData().value.length, 2,  "Field: Customers length is OK");
 								resolve();
 							});
 						});
@@ -670,17 +670,17 @@ sap.ui.define([
 					var oCustomersMultiInput = oCustomersField.getAggregation("_field");
 					assert.ok(oCustomersMultiInput.isA("sap.m.MultiInput"), "Field: Customers is MultiInput");
 					var oTokens = oCustomersMultiInput.getTokens();
-					assert.equal(oTokens.length, 3, "Field: token lenght is OK");
+					assert.equal(oTokens.length, 3, "Field: token length is OK");
 					assert.equal(oTokens[0].getText(), "A Company", "Field: token1 text is OK");
 					assert.equal(oTokens[1].getText(), "B Company", "Field: token2 text is OK");
 					assert.equal(oTokens[2].getText(), "C2 Company", "Field: token3 text is OK");
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
 						var oModel = oCustomersMultiInput.getModel();
-						assert.deepEqual(oModel.getData(), {},  "Field: Customers ori lenght is OK");
+						assert.deepEqual(oModel.getData(), {},  "Field: Customers ori length is OK");
 						oModel.attachPropertyChange(function () {
 							EditorQunitUtils.wait(iWaitTimeout).then(function () {
-								assert.equal(oModel.getData().value.length, 4,  "Field: Customers lenght is OK");
+								assert.equal(oModel.getData().value.length, 4,  "Field: Customers length is OK");
 								resolve();
 							});
 						});

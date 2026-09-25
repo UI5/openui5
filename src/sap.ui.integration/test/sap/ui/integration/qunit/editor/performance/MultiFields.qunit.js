@@ -137,7 +137,7 @@ sap.ui.define([
 						assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 						assert.ok(oEditor.isReady(), "Editor is ready");
 						var aItems3 = oControl3.getItems();
-						assert.equal(aItems3.length, 3, "Field 3: Select items lenght is OK");
+						assert.equal(aItems3.length, 3, "Field 3: Select items length is OK");
 						assert.equal(aItems3[0].getKey(), "key1", "Field 3: Select item 0 Key is OK");
 						assert.equal(aItems3[0].getText(), "text1", "Field 3: Select item 0 Text is OK");
 						assert.equal(aItems3[1].getKey(), "key2", "Field 3: Select item 1 Key is OK");
@@ -145,7 +145,7 @@ sap.ui.define([
 						assert.equal(aItems3[2].getKey(), "key3", "Field 3: Select item 1 Key is OK");
 						assert.equal(aItems3[2].getText(), "text3", "Field 3: Select item 1 Text is OK");
 						var aItems4 = oField4.getAggregation("_field").getItems();
-						assert.equal(aItems4.length, 4, "Field 4: Select items lenght is OK");
+						assert.equal(aItems4.length, 4, "Field 4: Select items length is OK");
 						assert.equal(aItems4[0].getKey(), "key1", "Field 4: Select item 0 Key is OK");
 						assert.equal(aItems4[0].getText(), "text1req", "Field 4: Select item 0 Text is OK");
 						assert.equal(aItems4[1].getKey(), "key2", "Field 4: Select item 1 Key is OK");
@@ -206,7 +206,7 @@ sap.ui.define([
 									assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 									assert.ok(oEditor.isReady(), "Editor is ready");
 									var aItems3 = oControl3.getItems();
-									assert.equal(aItems3.length, 3, "Field 3: Select items lenght is OK");
+									assert.equal(aItems3.length, 3, "Field 3: Select items length is OK");
 									assert.equal(aItems3[0].getKey(), "key1", "Field 3: Select item 0 Key is OK");
 									assert.equal(aItems3[0].getText(), "text1", "Field 3: Select item 0 Text is OK");
 									assert.equal(aItems3[1].getKey(), "key2", "Field 3: Select item 1 Key is OK");
@@ -214,7 +214,7 @@ sap.ui.define([
 									assert.equal(aItems3[2].getKey(), "key3", "Field 3: Select item 1 Key is OK");
 									assert.equal(aItems3[2].getText(), "text3", "Field 3: Select item 1 Text is OK");
 									var aItems4 = oField4.getAggregation("_field").getItems();
-									assert.equal(aItems4.length, 4, "Field 4: Select items lenght is OK");
+									assert.equal(aItems4.length, 4, "Field 4: Select items length is OK");
 									assert.equal(aItems4[0].getKey(), "key1", "Field 4: Select item 0 Key is OK");
 									assert.equal(aItems4[0].getText(), "text1req", "Field 4: Select item 0 Text is OK");
 									assert.equal(aItems4[1].getKey(), "key2", "Field 4: Select item 1 Key is OK");
@@ -275,7 +275,7 @@ sap.ui.define([
 												assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 												assert.ok(oEditor.isReady(), "Editor is ready");
 												var aItems3 = oControl3.getItems();
-												assert.equal(aItems3.length, 3, "Field 3: Select items lenght is OK");
+												assert.equal(aItems3.length, 3, "Field 3: Select items length is OK");
 												assert.equal(aItems3[0].getKey(), "key1", "Field 3: Select item 0 Key is OK");
 												assert.equal(aItems3[0].getText(), "text1", "Field 3: Select item 0 Text is OK");
 												assert.equal(aItems3[1].getKey(), "key2", "Field 3: Select item 1 Key is OK");
@@ -283,7 +283,7 @@ sap.ui.define([
 												assert.equal(aItems3[2].getKey(), "key3", "Field 3: Select item 1 Key is OK");
 												assert.equal(aItems3[2].getText(), "text3", "Field 3: Select item 1 Text is OK");
 												var aItems4 = oField4.getAggregation("_field").getItems();
-												assert.equal(aItems4.length, 4, "Field 4: Select items lenght is OK");
+												assert.equal(aItems4.length, 4, "Field 4: Select items length is OK");
 												assert.equal(aItems4[0].getKey(), "key1", "Field 4: Select item 0 Key is OK");
 												assert.equal(aItems4[0].getText(), "text1req", "Field 4: Select item 0 Text is OK");
 												assert.equal(aItems4[1].getKey(), "key2", "Field 4: Select item 1 Key is OK");
@@ -344,7 +344,7 @@ sap.ui.define([
 															assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 															assert.ok(oEditor.isReady(), "Editor is ready");
 															var aItems3 = oControl3.getItems();
-															assert.equal(aItems3.length, 3, "Field 3: Select items lenght is OK");
+															assert.equal(aItems3.length, 3, "Field 3: Select items length is OK");
 															assert.equal(aItems3[0].getKey(), "key1", "Field 3: Select item 0 Key is OK");
 															assert.equal(aItems3[0].getText(), "text1", "Field 3: Select item 0 Text is OK");
 															assert.equal(aItems3[1].getKey(), "key2", "Field 3: Select item 1 Key is OK");
@@ -352,7 +352,7 @@ sap.ui.define([
 															assert.equal(aItems3[2].getKey(), "key3", "Field 3: Select item 1 Key is OK");
 															assert.equal(aItems3[2].getText(), "text3", "Field 3: Select item 1 Text is OK");
 															var aItems4 = oField4.getAggregation("_field").getItems();
-															assert.equal(aItems4.length, 4, "Field 4: Select items lenght is OK");
+															assert.equal(aItems4.length, 4, "Field 4: Select items length is OK");
 															assert.equal(aItems4[0].getKey(), "key1", "Field 4: Select item 0 Key is OK");
 															assert.equal(aItems4[0].getText(), "text1req", "Field 4: Select item 0 Text is OK");
 															assert.equal(aItems4[1].getKey(), "key2", "Field 4: Select item 1 Key is OK");
@@ -413,7 +413,7 @@ sap.ui.define([
 																		assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 																		assert.ok(oEditor.isReady(), "Editor is ready");
 																		var aItems3 = oControl3.getItems();
-																		assert.equal(aItems3.length, 3, "Field 3: Select items lenght is OK");
+																		assert.equal(aItems3.length, 3, "Field 3: Select items length is OK");
 																		assert.equal(aItems3[0].getKey(), "key1", "Field 3: Select item 0 Key is OK");
 																		assert.equal(aItems3[0].getText(), "text1", "Field 3: Select item 0 Text is OK");
 																		assert.equal(aItems3[1].getKey(), "key2", "Field 3: Select item 1 Key is OK");
@@ -421,7 +421,7 @@ sap.ui.define([
 																		assert.equal(aItems3[2].getKey(), "key3", "Field 3: Select item 1 Key is OK");
 																		assert.equal(aItems3[2].getText(), "text3", "Field 3: Select item 1 Text is OK");
 																		var aItems4 = oField4.getAggregation("_field").getItems();
-																		assert.equal(aItems4.length, 4, "Field 4: Select items lenght is OK");
+																		assert.equal(aItems4.length, 4, "Field 4: Select items length is OK");
 																		assert.equal(aItems4[0].getKey(), "key1", "Field 4: Select item 0 Key is OK");
 																		assert.equal(aItems4[0].getText(), "text1req", "Field 4: Select item 0 Text is OK");
 																		assert.equal(aItems4[1].getKey(), "key2", "Field 4: Select item 1 Key is OK");
@@ -513,8 +513,8 @@ sap.ui.define([
 						time = new Date().getTime() - start.getTime();
 						assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 						assert.ok(oEditor.isReady(), "Editor is ready");
-						assert.equal(oControl1.getItems().length, 5, "Field 1: MultiComboBox items lenght is OK");
-						assert.equal(oControl2.getItems().length, 6, "Field 2: MultiComboBox items lenght is OK");
+						assert.equal(oControl1.getItems().length, 5, "Field 1: MultiComboBox items length is OK");
+						assert.equal(oControl2.getItems().length, 6, "Field 2: MultiComboBox items length is OK");
 						EditorQunitUtils.wait().then(function () {
 							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
@@ -550,8 +550,8 @@ sap.ui.define([
 									time = new Date().getTime() - start.getTime();
 									assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 									assert.ok(oEditor.isReady(), "Editor is ready");
-									assert.equal(oControl1.getItems().length, 5, "Field 1: MultiComboBox items lenght is OK");
-									assert.equal(oControl2.getItems().length, 6, "Field 2: MultiComboBox items lenght is OK");
+									assert.equal(oControl1.getItems().length, 5, "Field 1: MultiComboBox items length is OK");
+									assert.equal(oControl2.getItems().length, 6, "Field 2: MultiComboBox items length is OK");
 									EditorQunitUtils.wait().then(function () {
 										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
@@ -587,8 +587,8 @@ sap.ui.define([
 												time = new Date().getTime() - start.getTime();
 												assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 												assert.ok(oEditor.isReady(), "Editor is ready");
-												assert.equal(oControl1.getItems().length, 5, "Field 1: MultiComboBox items lenght is OK");
-												assert.equal(oControl2.getItems().length, 6, "Field 2: MultiComboBox items lenght is OK");
+												assert.equal(oControl1.getItems().length, 5, "Field 1: MultiComboBox items length is OK");
+												assert.equal(oControl2.getItems().length, 6, "Field 2: MultiComboBox items length is OK");
 												EditorQunitUtils.wait().then(function () {
 													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
@@ -624,8 +624,8 @@ sap.ui.define([
 															time = new Date().getTime() - start.getTime();
 															assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 															assert.ok(oEditor.isReady(), "Editor is ready");
-															assert.equal(oControl1.getItems().length, 5, "Field 1: MultiComboBox items lenght is OK");
-															assert.equal(oControl2.getItems().length, 6, "Field 2: MultiComboBox items lenght is OK");
+															assert.equal(oControl1.getItems().length, 5, "Field 1: MultiComboBox items length is OK");
+															assert.equal(oControl2.getItems().length, 6, "Field 2: MultiComboBox items length is OK");
 															EditorQunitUtils.wait().then(function () {
 																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
@@ -661,8 +661,8 @@ sap.ui.define([
 																		time = new Date().getTime() - start.getTime();
 																		assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 																		assert.ok(oEditor.isReady(), "Editor is ready");
-																		assert.equal(oControl1.getItems().length, 5, "Field 1: MultiComboBox items lenght is OK");
-																		assert.equal(oControl2.getItems().length, 6, "Field 2: MultiComboBox items lenght is OK");
+																		assert.equal(oControl1.getItems().length, 5, "Field 1: MultiComboBox items length is OK");
+																		assert.equal(oControl2.getItems().length, 6, "Field 2: MultiComboBox items length is OK");
 																		EditorQunitUtils.wait().then(function () {
 																			EditorQunitUtils.destroyEditor(oEditor);
 																			oHost.destroy();
@@ -1745,7 +1745,7 @@ sap.ui.define([
 						assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 						assert.ok(oEditor.isReady(), "Editor is ready");
 						var aItems3 = oControl3.getItems();
-						assert.equal(aItems3.length, 3, "Field 3: Select items lenght is OK");
+						assert.equal(aItems3.length, 3, "Field 3: Select items length is OK");
 						assert.equal(aItems3[0].getKey(), "key1", "Field 3: Select item 0 Key is OK");
 						assert.equal(aItems3[0].getText(), "text1", "Field 3: Select item 0 Text is OK");
 						assert.equal(aItems3[1].getKey(), "key2", "Field 3: Select item 1 Key is OK");
@@ -1753,7 +1753,7 @@ sap.ui.define([
 						assert.equal(aItems3[2].getKey(), "key3", "Field 3: Select item 1 Key is OK");
 						assert.equal(aItems3[2].getText(), "text3", "Field 3: Select item 1 Text is OK");
 						var aItems4 = oField4.getAggregation("_field").getItems();
-						assert.equal(aItems4.length, 4, "Field 4: Select items lenght is OK");
+						assert.equal(aItems4.length, 4, "Field 4: Select items length is OK");
 						assert.equal(aItems4[0].getKey(), "key1", "Field 4: Select item 0 Key is OK");
 						assert.equal(aItems4[0].getText(), "text1req", "Field 4: Select item 0 Text is OK");
 						assert.equal(aItems4[1].getKey(), "key2", "Field 4: Select item 1 Key is OK");
@@ -1762,8 +1762,8 @@ sap.ui.define([
 						assert.equal(aItems4[2].getText(), "text3req", "Field 4: Select item 2 Text is OK");
 						assert.equal(aItems4[3].getKey(), "key4", "Field 4: Select item 3 Key is OK");
 						assert.equal(aItems4[3].getText(), "text4req", "Field 4: Select item 3 Text is OK");
-						assert.equal(oControl5.getItems().length, 5, "Field 5: MultiComboBox items lenght is OK");
-						assert.equal(oControl6.getItems().length, 6, "Field 6: MultiComboBox items lenght is OK");
+						assert.equal(oControl5.getItems().length, 5, "Field 5: MultiComboBox items length is OK");
+						assert.equal(oControl6.getItems().length, 6, "Field 6: MultiComboBox items length is OK");
 						assert.equal(oSelect9.getSelectedIndex(), 2, "Field 9: selected index is 2");
 						assert.equal(oSelect9.getItems().length, 3, "Field 9: select item number is 3");
 						oSelect9.focus();
@@ -1836,7 +1836,7 @@ sap.ui.define([
 									assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 									assert.ok(oEditor.isReady(), "Editor is ready");
 									var aItems3 = oControl3.getItems();
-									assert.equal(aItems3.length, 3, "Field 3: Select items lenght is OK");
+									assert.equal(aItems3.length, 3, "Field 3: Select items length is OK");
 									assert.equal(aItems3[0].getKey(), "key1", "Field 3: Select item 0 Key is OK");
 									assert.equal(aItems3[0].getText(), "text1", "Field 3: Select item 0 Text is OK");
 									assert.equal(aItems3[1].getKey(), "key2", "Field 3: Select item 1 Key is OK");
@@ -1844,7 +1844,7 @@ sap.ui.define([
 									assert.equal(aItems3[2].getKey(), "key3", "Field 3: Select item 1 Key is OK");
 									assert.equal(aItems3[2].getText(), "text3", "Field 3: Select item 1 Text is OK");
 									var aItems4 = oField4.getAggregation("_field").getItems();
-									assert.equal(aItems4.length, 4, "Field 4: Select items lenght is OK");
+									assert.equal(aItems4.length, 4, "Field 4: Select items length is OK");
 									assert.equal(aItems4[0].getKey(), "key1", "Field 4: Select item 0 Key is OK");
 									assert.equal(aItems4[0].getText(), "text1req", "Field 4: Select item 0 Text is OK");
 									assert.equal(aItems4[1].getKey(), "key2", "Field 4: Select item 1 Key is OK");
@@ -1905,7 +1905,7 @@ sap.ui.define([
 												assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 												assert.ok(oEditor.isReady(), "Editor is ready");
 												var aItems3 = oControl3.getItems();
-												assert.equal(aItems3.length, 3, "Field 3: Select items lenght is OK");
+												assert.equal(aItems3.length, 3, "Field 3: Select items length is OK");
 												assert.equal(aItems3[0].getKey(), "key1", "Field 3: Select item 0 Key is OK");
 												assert.equal(aItems3[0].getText(), "text1", "Field 3: Select item 0 Text is OK");
 												assert.equal(aItems3[1].getKey(), "key2", "Field 3: Select item 1 Key is OK");
@@ -1913,7 +1913,7 @@ sap.ui.define([
 												assert.equal(aItems3[2].getKey(), "key3", "Field 3: Select item 1 Key is OK");
 												assert.equal(aItems3[2].getText(), "text3", "Field 3: Select item 1 Text is OK");
 												var aItems4 = oField4.getAggregation("_field").getItems();
-												assert.equal(aItems4.length, 4, "Field 4: Select items lenght is OK");
+												assert.equal(aItems4.length, 4, "Field 4: Select items length is OK");
 												assert.equal(aItems4[0].getKey(), "key1", "Field 4: Select item 0 Key is OK");
 												assert.equal(aItems4[0].getText(), "text1req", "Field 4: Select item 0 Text is OK");
 												assert.equal(aItems4[1].getKey(), "key2", "Field 4: Select item 1 Key is OK");
@@ -1974,7 +1974,7 @@ sap.ui.define([
 															assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 															assert.ok(oEditor.isReady(), "Editor is ready");
 															var aItems3 = oControl3.getItems();
-															assert.equal(aItems3.length, 3, "Field 3: Select items lenght is OK");
+															assert.equal(aItems3.length, 3, "Field 3: Select items length is OK");
 															assert.equal(aItems3[0].getKey(), "key1", "Field 3: Select item 0 Key is OK");
 															assert.equal(aItems3[0].getText(), "text1", "Field 3: Select item 0 Text is OK");
 															assert.equal(aItems3[1].getKey(), "key2", "Field 3: Select item 1 Key is OK");
@@ -1982,7 +1982,7 @@ sap.ui.define([
 															assert.equal(aItems3[2].getKey(), "key3", "Field 3: Select item 1 Key is OK");
 															assert.equal(aItems3[2].getText(), "text3", "Field 3: Select item 1 Text is OK");
 															var aItems4 = oField4.getAggregation("_field").getItems();
-															assert.equal(aItems4.length, 4, "Field 4: Select items lenght is OK");
+															assert.equal(aItems4.length, 4, "Field 4: Select items length is OK");
 															assert.equal(aItems4[0].getKey(), "key1", "Field 4: Select item 0 Key is OK");
 															assert.equal(aItems4[0].getText(), "text1req", "Field 4: Select item 0 Text is OK");
 															assert.equal(aItems4[1].getKey(), "key2", "Field 4: Select item 1 Key is OK");
@@ -2043,7 +2043,7 @@ sap.ui.define([
 																		assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready " + count + ": " + time + "ms OK");
 																		assert.ok(oEditor.isReady(), "Editor is ready");
 																		var aItems3 = oControl3.getItems();
-																		assert.equal(aItems3.length, 3, "Field 3: Select items lenght is OK");
+																		assert.equal(aItems3.length, 3, "Field 3: Select items length is OK");
 																		assert.equal(aItems3[0].getKey(), "key1", "Field 3: Select item 0 Key is OK");
 																		assert.equal(aItems3[0].getText(), "text1", "Field 3: Select item 0 Text is OK");
 																		assert.equal(aItems3[1].getKey(), "key2", "Field 3: Select item 1 Key is OK");
@@ -2051,7 +2051,7 @@ sap.ui.define([
 																		assert.equal(aItems3[2].getKey(), "key3", "Field 3: Select item 1 Key is OK");
 																		assert.equal(aItems3[2].getText(), "text3", "Field 3: Select item 1 Text is OK");
 																		var aItems4 = oField4.getAggregation("_field").getItems();
-																		assert.equal(aItems4.length, 4, "Field 4: Select items lenght is OK");
+																		assert.equal(aItems4.length, 4, "Field 4: Select items length is OK");
 																		assert.equal(aItems4[0].getKey(), "key1", "Field 4: Select item 0 Key is OK");
 																		assert.equal(aItems4[0].getText(), "text1req", "Field 4: Select item 0 Text is OK");
 																		assert.equal(aItems4[1].getKey(), "key2", "Field 4: Select item 1 Key is OK");
