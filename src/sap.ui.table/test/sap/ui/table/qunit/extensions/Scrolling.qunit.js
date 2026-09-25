@@ -5231,7 +5231,10 @@ sap.ui.define([
 			"Remove DOM after scrolling with scrollbar: The firstVisibleRow is correct");
 		oTableParentElement.appendChild(oTableElement);
 		oTable._setLargeDataScrolling(true);
-		oScrollExtension.getVerticalScrollbar().scrollTop = 200;
+		const oVSb = oScrollExtension.getVerticalScrollbar();
+		oVSb.dispatchEvent(new Event("pointerdown")); // Seed the baseline for the speed calculation.
+		await TableQUnitUtils.sleep(50); // Wait so that the scroll delta is below the fast scroll threshold (slow scroll -> immediate update).
+		oVSb.scrollTop = 200;
 		await oTable.qunit.vScrolled();
 		oTableParentElement.removeChild(oTableElement);
 		await TableQUnitUtils.sleep(300);
@@ -5325,6 +5328,7 @@ sap.ui.define([
 		await test("Fixed column", 0);
 		await test("Scrollable column", 1);
 
+		oTable.destroy();
 	});
 
 	QUnit.module("Leave action mode on scrolling", {
@@ -5967,6 +5971,47 @@ sap.ui.define([
 		assert.notEqual(oHandle.firstChild.textContent, sInitialText, "Handle content updated immediately while the row update is debounced");
 
 		document.dispatchEvent(new PointerEvent("pointerup")); // Release the handle to clean up the drag listeners.
+	});
+
+	QUnit.test("Unseeded scroll is debounced", async function(assert) {
+		this.makeBindingNonClient();
+
+		const iInitialFirstVisibleRow = this.oTable.getFirstVisibleRow();
+		const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
+
+		oVSb.scrollTop += 49; // One row.
+		await this.oTable.qunit.vScrolled();
+		await TableQUnitUtils.sleep(200);
+
+		assert.equal(this.oTable.getFirstVisibleRow(), iInitialFirstVisibleRow,
+			"firstVisibleRow not updated immediately for the first (unseeded) movement - it is debounced");
+		this.assertSkeletons(true);
+
+		await TableQUnitUtils.sleep(200);
+		assert.ok(this.oTable.getFirstVisibleRow() > iInitialFirstVisibleRow, "firstVisibleRow updated after the debounce");
+		this.assertSkeletons(false);
+	});
+
+	QUnit.test("Resume after a debounced update stays debounced", async function(assert) {
+		this.makeBindingNonClient();
+
+		const oVSb = this.oTable._getScrollExtension().getVerticalScrollbar();
+
+		// Seed and fast scroll, then let the debounce complete. Completing the debounced update deletes the speed baseline.
+		oVSb.dispatchEvent(new Event("pointerdown"));
+		oVSb.scrollTop += 490; // 10 rows at once.
+		await this.oTable.qunit.vScrolled();
+		await TableQUnitUtils.sleep(400); // Wait out the debounce (300ms); completing the update deletes the baseline.
+		await this.oTable.qunit.rendered(); // Wait for the resulting row update to render.
+
+		const iFirstVisibleRowAfterUpdate = this.oTable.getFirstVisibleRow();
+		oVSb.scrollTop += 49; // One row.
+		await this.oTable.qunit.vScrolled();
+		await TableQUnitUtils.sleep(200);
+
+		assert.equal(this.oTable.getFirstVisibleRow(), iFirstVisibleRowAfterUpdate,
+			"firstVisibleRow not updated immediately when resuming after a debounced update");
+		this.assertSkeletons(true);
 	});
 
 	QUnit.module("Scroll handle", {
