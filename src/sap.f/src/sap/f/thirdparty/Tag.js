@@ -109,7 +109,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
      * @since 2.0.0
      * @public
      */
-    let Tag = Tag_1 = class Tag extends webcomponentsBase.S {
+    let Tag = Tag_1 = class Tag extends webcomponentsBase.b {
         constructor() {
             super(...arguments);
             /**

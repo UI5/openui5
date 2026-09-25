@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/List', 'sap/f/thirdparty/NotificationListGroupItem', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/parameters-bundle3.css', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/NotificationListItemBase', 'sap/f/thirdparty/FocusableElements'], (function (webcomponentsBase, parametersBundle_css, eventStrict, parametersBundle_css$2, List, NotificationListGroupItem, ManagedStyles, parametersBundle_css$1, i18nDefaults, Icons, toLowercaseEnumValue, ListItemGroup, ListItemBase, i18nDefaults$1, WrappingType, AccessibilityTextsHelper, ListItemTemplate, decline, Button, willShowContent, Icon, Label, ValueState, NotificationListItemBase, FocusableElements) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/List', 'sap/f/thirdparty/NotificationListGroupItem', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/parameters-bundle3.css', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/edit', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/ListItemCustom', 'sap/f/thirdparty/NotificationListItemBase', 'sap/f/thirdparty/FocusableElements'], (function (webcomponentsBase, parametersBundle_css, eventStrict, parametersBundle_css$2, List, NotificationListGroupItem, ManagedStyles, parametersBundle_css$1, i18nDefaults, Icons, toLowercaseEnumValue, ListItemGroup, ListItemBase, i18nDefaults$1, WrappingType, AccessibilityTextsHelper, InvisibleMessage, ListItemTemplate, decline, edit, Button, willShowContent, Icon, Label, ValueState, ListItemCustom, NotificationListItemBase, FocusableElements) { 'use strict';
 
     var __decorate$1 = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -19,7 +19,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/paramet
         constructor() {
             super();
             this._allNavigationItems = [];
-            this._itemNavigation._navigationMode = webcomponentsBase.r.Auto;
+            this._itemNavigation._navigationMode = webcomponentsBase.r$1.Auto;
         }
         getEnabledItems() {
             const items = new Array();
@@ -203,7 +203,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/paramet
      * @since 2.0.0
      * @public
      */
-    let NotificationList = NotificationList_1 = class NotificationList extends webcomponentsBase.S {
+    let NotificationList = NotificationList_1 = class NotificationList extends webcomponentsBase.b {
         get _accessibleName() {
             return NotificationList_1.i18nFioriBundle.getText(i18nDefaults.NOTIFICATION_LIST_ACCESSIBLE_NAME);
         }

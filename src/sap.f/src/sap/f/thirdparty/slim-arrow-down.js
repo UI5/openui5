@@ -18,8 +18,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/Ic
 
 	Icons.y(name, { pathData, ltr, viewBox, collection, packageName });
 
-	var slimArrowDown = "slim-arrow-down";
+	var slimArrowDownIcon = "slim-arrow-down";
 
-	exports.slimArrowDown = slimArrowDown;
+	exports.slimArrowDownIcon = slimArrowDownIcon;
 
 }));

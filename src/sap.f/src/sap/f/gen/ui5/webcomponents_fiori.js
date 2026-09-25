@@ -18,7 +18,7 @@ sap.ui.define(
     // export the UI5 metadata along with the package
     pkg["_ui5metadata"] = {
       name: "sap/f/gen/ui5/webcomponents_fiori",
-      version: "2.24.2",
+      version: "2.27.2",
       dependencies: ["sap.ui.core"],
       types: [
         "sap.f.gen.ui5.webcomponents_fiori.dist.types.FCLLayout",
@@ -110,6 +110,9 @@ sap.ui.define(
         "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsAppearanceViewItem",
         "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsDialog",
         "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsNotificationsView",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsNotificationsViewGroup",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsNotificationsViewItem",
         "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsView",
         "sap.f.gen.ui5.webcomponents_fiori.dist.ViewSettingsDialog",
         "sap.f.gen.ui5.webcomponents_fiori.dist.ViewSettingsDialogCustomTab",

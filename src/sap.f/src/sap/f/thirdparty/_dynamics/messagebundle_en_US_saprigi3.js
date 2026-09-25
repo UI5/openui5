@@ -13,6 +13,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	var FCL_MIDDLE_COLUMN_TXT = "⁪⁪⁪‍‍‍‌‍​‌‍​‌‌‌‌​‍‌‌​‌‍‍‍‍‍​​‌‍‌​​‌‍‍‍‌‍‍‌⁪Middle column⁪⁪";
 	var FCL_END_COLUMN_TXT = "⁪⁪⁪‌‍‌​‌‌​‌​‌‌​‌‍‍‍​‌​​‌‌‌‍‍‌‌‌‍‌‍‌‌​​​‌‍​‌⁪Last column⁪⁪";
 	var FCL_START_SEPARATOR_TOOLTIP = "⁪⁪⁪‍‍​‍​‍‌‍​‍​‍​‌‍‍​​​‍‌‌‌​‌‌‍‌​​​‌​‍‌‌​​​⁪Resize between start and mid columns⁪⁪";
+	var FCL_START_ARROW_TOOLTIP = "⁪⁪⁪‍​‌​‍‍‍‍‍‍‌​‍​​‌​‌‍​‌‌‌‌‌​‍‌‌​​​‌‍​‌​​‍‍⁪Switch between start and middle column layouts⁪⁪";
 	var FCL_END_SEPARATOR_TOOLTIP = "⁪⁪⁪‌‍‍‍‍​‌​​​‍‍​​​​​‌​‍‌‌​​‌‌​​​​​‌​​‌‌​‌‍⁪Resize between mid and end columns⁪⁪";
 	var NAVIGATION_MENU_POPOVER_HIDDEN_TEXT = "⁪⁪⁪‍‌​‌​‍‍​​‌​‌‍‍​​​‌‌‍‌‌‍‌‍‍​​‌‌‌‌‌‌‍​‍​‍​⁪Additional Navigation Items⁪⁪";
 	var NAVIGATION_MENU_SELECTABLE_ITEM_HIDDEN_TEXT = "⁪⁪⁪‌‌​‍​​‍‌​‍‌​‍‌‌‍‌​​​​​‌‌‌‍​‍‌‌‌​​‌‌‍‌‌‍⁪This menu item opens a submenu and also links to a page. To go to the page, press Enter or the right arrow key to open the submenu, then select the first item in the submenu.⁪⁪";
@@ -51,10 +52,10 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	var UPLOADCOLLECTIONITEM_RETRY_BUTTON_TEXT = "⁪⁪⁪‌‌‌‍‍‌‍‍‍​‌‍‌‍‌‌​‌‌‌‌‍‌‌‍‌‌‌‍‍‌​​‌‍‍‍‌​‌⁪Retry⁪⁪";
 	var UPLOADCOLLECTIONITEM_EDIT_BUTTON_TEXT = "⁪⁪⁪‌‌‍‍‌‍​‍‍‌‌‌​‍​​​‍‍​‌‌‌‍‌‍‍‍‌‌‌‍‌​‍‌‌​​‍⁪Edit⁪⁪";
 	var UPLOADCOLLECTION_NO_DATA_TEXT = "⁪⁪⁪‍‌‍​‍‍‌‌‌​​​‌‌‌​‌​‍​‍‍‍‌‌​‍‌‍‍​‍‌​‌‌‌​‍⁪No files found⁪⁪";
-	var UPLOADCOLLECTION_NO_DATA_DESCRIPTION = "⁪⁪⁪‍‌‌‌​​‌​‌‌‌‌‍‍​​​​‌‍‍‌‌‌‌‌‍‍‍​​‍‌‍‌‍​‌⁪Drop files to upload them or use the \"Upload\" button.⁪⁪";
+	var UPLOADCOLLECTION_NO_DATA_DESCRIPTION = "⁪⁪⁪‍‌‌‌​​‌​‌‌‌‌‍‍​​​​‌‍‍‌‌‌‌‌‍‍‍​​‍‌‍‌‍​‌⁪Drop files to upload them or use the \"Upload\" button⁪⁪";
 	var UPLOADCOLLECTION_ARIA_ROLE_DESCRIPTION = "⁪⁪⁪‍‍​​​​​​‍‍‍‌‍‌​‍​‌​‌​‍‌‌‌​​​‌‍​‌‍​‌‌‍‌⁪Upload Collection⁪⁪";
-	var UPLOADCOLLECTION_DRAG_FILE_INDICATOR = "⁪⁪⁪‌‌​​​‌‌‌‌‍‌​‍‌​​​‌‌‌​​​​​‍​‌‍‍‍‍‍​​​‌‌​‌‍⁪Drag files here.⁪⁪";
-	var UPLOADCOLLECTION_DROP_FILE_INDICATOR = "⁪⁪⁪‌‌​‍‍​‌​‍​​‌‌​‍​‍‌​‌​​‌‍​‌​‍​‍​‍​​​‌‍‍⁪Drop files to upload them.⁪⁪";
+	var UPLOADCOLLECTION_DRAG_FILE_INDICATOR = "⁪⁪⁪‌‌​​​‌‌‌‌‍‌​‍‌​​​‌‌‌​​​​​‍​‌‍‍‍‍‍​​​‌‌​‌‍⁪Drag files here⁪⁪";
+	var UPLOADCOLLECTION_DROP_FILE_INDICATOR = "⁪⁪⁪‌‌​‍‍​‌​‍​​‌‌​‍​‍‌​‌​​‌‍​‌​‍​‍​‍​​​‌‍‍⁪Drop files to upload them⁪⁪";
 	var SHELLBAR_LABEL = "⁪⁪⁪‌​‍‌‌‍‍​​‍‍​​‍‍‍‍​​​‌‌​​​‌‍‌‌‌​​‌‍‌​‍‌‌⁪Shell Bar⁪⁪";
 	var SHELLBAR_LOGO = "⁪⁪⁪‌‌‌​‌‍‍‌‌‍​​​‍​​‌​​‌‌‌​‍‌​‍‍‍‌‌​‌​‍‌​‌​​‌⁪Logo⁪⁪";
 	var SHELLBAR_LOGO_AREA = "⁪⁪⁪‍‍​‌​‍​‍‌‍​​​‍​‍‍​‌​‌‌‌​‌‌​‍​‍​‍​‌​​​‌‍‌⁪​​​{0}‌‌‌ ​​​{1}‌‌‌⁪⁪";
@@ -117,13 +118,13 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	var IM_SUBTITLE_NOMAIL = "⁪⁪⁪‌‌‌​‍​‌‌​‍‌​‍​​‍‌​‍‌​‌‍​​‍‍​‍‍​​‌‍‍‌​‍​‍​⁪Check back again later.⁪⁪";
 	var IM_TITLE_NOENTRIES = "⁪⁪⁪‌​‌​‍​​‌‌​‍‍​‌​‌‌​‌‍‍​​‌​‍​‍​‌‌‍‌​‍​‍​‍‍​⁪There are no entries yet⁪⁪";
 	var IM_SUBTITLE_NOENTRIES = "⁪⁪⁪‌​‌​​‌‍‍‌‌‌‍​‍​‌​‍​​‍​​‌‌‌​‌‍‌‍​​‌‌‍‍‍‍​⁪When there are, you''ll see them here.⁪⁪";
-	var IM_TITLE_NONOTIFICATIONS = "⁪⁪⁪‌‌​‍‍​​‌‌‌‌​‌‌‍​‍‌​​‍‌‍‌‌‍‍‍‍​‍​‌​‍‍‌​​‌​⁪You''ve no notifications⁪⁪";
+	var IM_TITLE_NONOTIFICATIONS = "⁪⁪⁪‌‌​‍‍​​‌‌‌‌​‌‌‍​‍‌​​‍‌‍‌‌‍‍‍‍​‍​‌​‍‍‌​​‌​⁪You do not have any notifications.⁪⁪";
 	var IM_SUBTITLE_NONOTIFICATIONS = "⁪⁪⁪‌‍‌‍‌‍​‌‌‍‍‍​‍​​​‍​‌‍‌‌​​​​​‍‌‍​‌​​‍​​‍​⁪Check back again later.⁪⁪";
-	var IM_TITLE_NOSAVEDITEMS = "⁪⁪⁪‍​​​‌​‍​‌‌​​​​‌‍​‍‌‍‍‌​‌‍‌​​‌‍‍‌​​‌‌‍‍‍⁪You''ve no pins⁪⁪";
+	var IM_TITLE_NOSAVEDITEMS = "⁪⁪⁪‍​​​‌​‍​‌‌​​​​‌‍​‍‌‍‍‌​‌‍‌​​‌‍‍‌​​‌‌‍‍‍⁪You do not have any pins.⁪⁪";
 	var IM_SUBTITLE_NOSAVEDITEMS = "⁪⁪⁪‍‍‌‌‍‌‍‌‌‌​‌‍​‌‌​‍‍‍‌‌‍‌‍​​‍‍​‍​​‌‍​‍‌‍‌⁪Would you like to add one now?⁪⁪";
 	var IM_TITLE_NOSEARCHRESULTS = "⁪⁪⁪‌​‌​‌‌​‍‍​​​‍​‍‌​‍​‍‌‌‍‍‍‌‌‌‌​‌‌‌‍‍‍‌‌‍​‌⁪We could not find this.⁪⁪";
 	var IM_SUBTITLE_NOSEARCHRESULTS = "⁪⁪⁪‍‍‌​‌‍‌‌‍​‍‍‍‍‌‍‍‌‌‌‌‍​‌‍​‌​‌‌​​‍‍‌‍‌​‌​⁪Try adjusting your search.⁪⁪";
-	var IM_TITLE_NOTASKS = "⁪⁪⁪‌​‍​‌​‍‍​‍​‍​‍​‌​‍‌​​‍‌‌‌‌‌‍‌‍‍‍‍‍‌‍‌‍​‍‍⁪You''ve no tasks⁪⁪";
+	var IM_TITLE_NOTASKS = "⁪⁪⁪‌​‍​‌​‍‍​‍​‍​‍​‌​‍‌​​‍‌‌‌‌‌‍‌‍‍‍‍‍‌‍‌‍​‍‍⁪You do not have any tasks.⁪⁪";
 	var IM_SUBTITLE_NOTASKS = "⁪⁪⁪‌‌​‌​‌​‌​‍‍‍‍‌‍‍‌‍‌‍‍‍‍‌‍‌‌‌​‌‌‌‌‍‌​‌‍‌​‌⁪When you do, you''ll see them here.⁪⁪";
 	var IM_TITLE_UNABLETOLOAD = "⁪⁪⁪‌​​‌‌‍‍​‌‍‍‍‌‌‍‌​‍‍‍‌​‍‌‌‍‌‌‍‌‍‍‌‍‍‌​​​​​⁪Unable to load data⁪⁪";
 	var IM_SUBTITLE_UNABLETOLOAD = "⁪⁪⁪‌​‌​‌​​​‌‍‍​​​​‍‍​‌‍​‍‍​‍‌‍​‍‌​‍‌​‌‍‌​‍​‌⁪Check your internet connection. And if that''s not it, try reloading. If that still doesn''t help, check with your administrator.⁪⁪";
@@ -171,6 +172,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	var DSC_SIDE_ARIA_LABEL = "⁪⁪⁪‍​‍‌​‌​‌‌‍​‌‍‍​‌‌‌‌​​‌‍‍‍‍​​​‌​​‍‌‌​‍‍‌​⁪Side Content⁪⁪";
 	var SEARCH_FIELD_SCOPE_SELECT_LABEL = "⁪⁪⁪‍​‍‌​‍‍​​‌​​​‍​​‌​​‍​‌‌‍​‍‌‍​‍​​‌‌‌​‍‌‍‌⁪Select Scope⁪⁪";
 	var SEARCH_FIELD_LABEL = "⁪⁪⁪‍‌​‌‌‍‌​‍‍​‌‌‍‍‌‍‌​‌​‍​‌​‌‍‍‌​‍‌‌‍​​​​​‍⁪Search Field⁪⁪";
+	var SEARCH_FIELD_PLACEHOLDER_WITH_SCOPE = "⁪⁪⁪‌​‌‍​​​‌​‌‌​​​‌‌‌​‍‍​‍‌​​‍‌‌​‌‌‍‍‍‌‍​‍‌‍‌⁪Search in: ​​​{0}‌‌‌⁪⁪";
 	var SEARCH_FIELD_CLEAR_ICON = "⁪⁪⁪‍‍​‍​​‍‌​‌‌‍​‍​‌‍‍‍‌‍​​​‍‍‌‌‌‌​​​‍​‌‌‍‌‌⁪Clear Search⁪⁪";
 	var SEARCH_FIELD_SEARCH_ICON = "⁪⁪⁪‌​‍‌​​‌‌‍‌‌​‌‍‌‍‌​‌‍‍​‌‍‍‌‌​‍‍‌‌​‍‌​‌‌‌‍‌⁪Search⁪⁪";
 	var SEARCH_ITEM_SHOW_MORE_NO_COUNT = "⁪⁪⁪‍​‌‌‌‌‍‍‌​‌​‍‌​‌​‌​‍‌‍​​​​‌‌‍‌‌‍‍‌‌‍‍​⁪Show More⁪⁪";
@@ -205,9 +207,16 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	var USER_SETTINGS_DIALOG_ACCESSIBLE_NAME = "⁪⁪⁪‌​​‌​‍​​‍‌​‍​‍‌‍​‍​‌‍​‌‍​​‌‌​‌​‍‌​​​‌​⁪User Settings⁪⁪";
 	var USER_SETTINGS_LIST_ARIA_ROLE_DESC = "⁪⁪⁪‌​‌‍​​‍‌‍‌‍‌‌‌‍‌​‌​‌​​‌​​‍‌‍​‍‍‌​​‌‍‌‍‍⁪User Settings Item⁪⁪";
 	var USER_SETTINGS_DIALOG_CLOSE_BUTTON_TEXT = "⁪⁪⁪‍‍​‍‍‍​‍​‌‌​‌‌‍‍‌‍‍​‌​​​​​​‌‍‍​​‍‍​‌‌​‌⁪Close⁪⁪";
+	var USER_SETTINGS_DIALOG_SAVE_BUTTON_TEXT = "⁪⁪⁪‌​​‍​‍​‍​​‍‍‌​‍‍‍​‍​​‍‌​‌‌‌‍‌​‌​‌‍‍​​‍​‍​⁪Save⁪⁪";
+	var USER_SETTINGS_DIALOG_CANCEL_BUTTON_TEXT = "⁪⁪⁪‍​​​​‍​‌‌‌‍‍‌‌‌‍‌‍‌‌‌​​​‍‌​‍‍‍‌‌‍​​‍​‌​​⁪Cancel⁪⁪";
 	var USER_SETTINGS_DIALOG_NO_SEARCH_RESULTS_TEXT = "⁪⁪⁪‍‍‌‍‍‍​​‍‍‌‍‍​‌‌‍‍​​​‍‌‍‍​​​‍​‌​​‌‍‌‍​​‍⁪No search results⁪⁪";
+	var USER_SETTINGS_DIALOG_SEARCH_NO_RESULTS = "⁪⁪⁪‌​‌‌‌‌‌‌​‌‍‍‍​‌​‌​‍‍‌​‍‍‌‍​​‍‍​​‌‌‌​‍‍‍‌⁪No search results⁪⁪";
+	var USER_SETTINGS_DIALOG_SEARCH_ONE_RESULT = "⁪⁪⁪‌‌​​‌​‍‌‍‍‌‍‍‍‍‍‌‍​‌‍‌‌‌‌‌​​‍​​‍‌‌‌‌‌​‍‍‍⁪1 result available⁪⁪";
+	var USER_SETTINGS_DIALOG_SEARCH_MORE_RESULTS = "⁪⁪⁪‍‌​‌​​‌‍‌‍‌‌​‌‌​‌‍‌‌‍‍​‍‍‌‍​‌‍‍​‍‌‍​‍‍​⁪​​​{0}‌‌‌ results are available⁪⁪";
 	var USER_SETTINGS_ACCOUNT_EDIT_AVATAR_TXT = "⁪⁪⁪‌‌​​​​​​‍‌‌‌‌​‍‍​‌‍​​‍‍​‍‍​​‌‍‌‌‍​‍​‍‍‍‌‍⁪Edit Avatar⁪⁪";
 	var USER_SETTINGS_ACCOUNT_MANAGE_ACCOUNT_BUTTON_TXT = "⁪⁪⁪‌​‍​​‌‍​‌‍‍​‍​‌‌‍‍‍​‍‍‍‍‌‍‌​​‌‌‌​‍​​‍​​‌​⁪Manage Account⁪⁪";
+	var USER_SETTINGS_NOTIFICATIONS_LIST_LABEL = "⁪⁪⁪‍‍‌‍‍​‍‌‍‍‌‌‌‍​​​‌​​‌‍‌‌‌‌‌‌‍‍‍‍​‌‌​‌​‍​⁪List of Notifications Type⁪⁪";
+	var USER_SETTINGS_NOTIFICATIONS_PREFERENCES_LIST_LABEL = "⁪⁪⁪‍​​​‍‍​​‌​‌‌‌​​‍‍‍‌‌‍‌​‍​‌‌‌‍‍‌‌‍​​​‍‍‍⁪List of Notifications Preferences⁪⁪";
 	var messagebundle_en_US_saprigi = {
 		BARCODE_SCANNER_DIALOG_CANCEL_BUTTON_TXT: BARCODE_SCANNER_DIALOG_CANCEL_BUTTON_TXT,
 		BARCODE_SCANNER_DIALOG_LOADING_TXT: BARCODE_SCANNER_DIALOG_LOADING_TXT,
@@ -222,6 +231,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 		FCL_MIDDLE_COLUMN_TXT: FCL_MIDDLE_COLUMN_TXT,
 		FCL_END_COLUMN_TXT: FCL_END_COLUMN_TXT,
 		FCL_START_SEPARATOR_TOOLTIP: FCL_START_SEPARATOR_TOOLTIP,
+		FCL_START_ARROW_TOOLTIP: FCL_START_ARROW_TOOLTIP,
 		FCL_END_SEPARATOR_TOOLTIP: FCL_END_SEPARATOR_TOOLTIP,
 		NAVIGATION_MENU_POPOVER_HIDDEN_TEXT: NAVIGATION_MENU_POPOVER_HIDDEN_TEXT,
 		NAVIGATION_MENU_SELECTABLE_ITEM_HIDDEN_TEXT: NAVIGATION_MENU_SELECTABLE_ITEM_HIDDEN_TEXT,
@@ -380,6 +390,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 		DSC_SIDE_ARIA_LABEL: DSC_SIDE_ARIA_LABEL,
 		SEARCH_FIELD_SCOPE_SELECT_LABEL: SEARCH_FIELD_SCOPE_SELECT_LABEL,
 		SEARCH_FIELD_LABEL: SEARCH_FIELD_LABEL,
+		SEARCH_FIELD_PLACEHOLDER_WITH_SCOPE: SEARCH_FIELD_PLACEHOLDER_WITH_SCOPE,
 		SEARCH_FIELD_CLEAR_ICON: SEARCH_FIELD_CLEAR_ICON,
 		SEARCH_FIELD_SEARCH_ICON: SEARCH_FIELD_SEARCH_ICON,
 		SEARCH_ITEM_SHOW_MORE_NO_COUNT: SEARCH_ITEM_SHOW_MORE_NO_COUNT,
@@ -414,9 +425,16 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 		USER_SETTINGS_DIALOG_ACCESSIBLE_NAME: USER_SETTINGS_DIALOG_ACCESSIBLE_NAME,
 		USER_SETTINGS_LIST_ARIA_ROLE_DESC: USER_SETTINGS_LIST_ARIA_ROLE_DESC,
 		USER_SETTINGS_DIALOG_CLOSE_BUTTON_TEXT: USER_SETTINGS_DIALOG_CLOSE_BUTTON_TEXT,
+		USER_SETTINGS_DIALOG_SAVE_BUTTON_TEXT: USER_SETTINGS_DIALOG_SAVE_BUTTON_TEXT,
+		USER_SETTINGS_DIALOG_CANCEL_BUTTON_TEXT: USER_SETTINGS_DIALOG_CANCEL_BUTTON_TEXT,
 		USER_SETTINGS_DIALOG_NO_SEARCH_RESULTS_TEXT: USER_SETTINGS_DIALOG_NO_SEARCH_RESULTS_TEXT,
+		USER_SETTINGS_DIALOG_SEARCH_NO_RESULTS: USER_SETTINGS_DIALOG_SEARCH_NO_RESULTS,
+		USER_SETTINGS_DIALOG_SEARCH_ONE_RESULT: USER_SETTINGS_DIALOG_SEARCH_ONE_RESULT,
+		USER_SETTINGS_DIALOG_SEARCH_MORE_RESULTS: USER_SETTINGS_DIALOG_SEARCH_MORE_RESULTS,
 		USER_SETTINGS_ACCOUNT_EDIT_AVATAR_TXT: USER_SETTINGS_ACCOUNT_EDIT_AVATAR_TXT,
-		USER_SETTINGS_ACCOUNT_MANAGE_ACCOUNT_BUTTON_TXT: USER_SETTINGS_ACCOUNT_MANAGE_ACCOUNT_BUTTON_TXT
+		USER_SETTINGS_ACCOUNT_MANAGE_ACCOUNT_BUTTON_TXT: USER_SETTINGS_ACCOUNT_MANAGE_ACCOUNT_BUTTON_TXT,
+		USER_SETTINGS_NOTIFICATIONS_LIST_LABEL: USER_SETTINGS_NOTIFICATIONS_LIST_LABEL,
+		USER_SETTINGS_NOTIFICATIONS_PREFERENCES_LIST_LABEL: USER_SETTINGS_NOTIFICATIONS_PREFERENCES_LIST_LABEL
 	};
 
 	exports.BARCODE_SCANNER_DIALOG_CANCEL_BUTTON_TXT = BARCODE_SCANNER_DIALOG_CANCEL_BUTTON_TXT;
@@ -433,6 +451,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	exports.FCL_END_COLUMN_TXT = FCL_END_COLUMN_TXT;
 	exports.FCL_END_SEPARATOR_TOOLTIP = FCL_END_SEPARATOR_TOOLTIP;
 	exports.FCL_MIDDLE_COLUMN_TXT = FCL_MIDDLE_COLUMN_TXT;
+	exports.FCL_START_ARROW_TOOLTIP = FCL_START_ARROW_TOOLTIP;
 	exports.FCL_START_COLUMN_TXT = FCL_START_COLUMN_TXT;
 	exports.FCL_START_SEPARATOR_TOOLTIP = FCL_START_SEPARATOR_TOOLTIP;
 	exports.IM_SUBTITLE_ACHIEVEMENT = IM_SUBTITLE_ACHIEVEMENT;
@@ -527,6 +546,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	exports.SEARCH_CANCEL_BUTTON = SEARCH_CANCEL_BUTTON;
 	exports.SEARCH_FIELD_CLEAR_ICON = SEARCH_FIELD_CLEAR_ICON;
 	exports.SEARCH_FIELD_LABEL = SEARCH_FIELD_LABEL;
+	exports.SEARCH_FIELD_PLACEHOLDER_WITH_SCOPE = SEARCH_FIELD_PLACEHOLDER_WITH_SCOPE;
 	exports.SEARCH_FIELD_SCOPE_SELECT_LABEL = SEARCH_FIELD_SCOPE_SELECT_LABEL;
 	exports.SEARCH_FIELD_SEARCH_ICON = SEARCH_FIELD_SEARCH_ICON;
 	exports.SEARCH_ITEM_DELETE_BUTTON_TOOLTIP = SEARCH_ITEM_DELETE_BUTTON_TOOLTIP;
@@ -597,9 +617,16 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	exports.USER_SETTINGS_ACCOUNT_EDIT_AVATAR_TXT = USER_SETTINGS_ACCOUNT_EDIT_AVATAR_TXT;
 	exports.USER_SETTINGS_ACCOUNT_MANAGE_ACCOUNT_BUTTON_TXT = USER_SETTINGS_ACCOUNT_MANAGE_ACCOUNT_BUTTON_TXT;
 	exports.USER_SETTINGS_DIALOG_ACCESSIBLE_NAME = USER_SETTINGS_DIALOG_ACCESSIBLE_NAME;
+	exports.USER_SETTINGS_DIALOG_CANCEL_BUTTON_TEXT = USER_SETTINGS_DIALOG_CANCEL_BUTTON_TEXT;
 	exports.USER_SETTINGS_DIALOG_CLOSE_BUTTON_TEXT = USER_SETTINGS_DIALOG_CLOSE_BUTTON_TEXT;
 	exports.USER_SETTINGS_DIALOG_NO_SEARCH_RESULTS_TEXT = USER_SETTINGS_DIALOG_NO_SEARCH_RESULTS_TEXT;
+	exports.USER_SETTINGS_DIALOG_SAVE_BUTTON_TEXT = USER_SETTINGS_DIALOG_SAVE_BUTTON_TEXT;
+	exports.USER_SETTINGS_DIALOG_SEARCH_MORE_RESULTS = USER_SETTINGS_DIALOG_SEARCH_MORE_RESULTS;
+	exports.USER_SETTINGS_DIALOG_SEARCH_NO_RESULTS = USER_SETTINGS_DIALOG_SEARCH_NO_RESULTS;
+	exports.USER_SETTINGS_DIALOG_SEARCH_ONE_RESULT = USER_SETTINGS_DIALOG_SEARCH_ONE_RESULT;
 	exports.USER_SETTINGS_LIST_ARIA_ROLE_DESC = USER_SETTINGS_LIST_ARIA_ROLE_DESC;
+	exports.USER_SETTINGS_NOTIFICATIONS_LIST_LABEL = USER_SETTINGS_NOTIFICATIONS_LIST_LABEL;
+	exports.USER_SETTINGS_NOTIFICATIONS_PREFERENCES_LIST_LABEL = USER_SETTINGS_NOTIFICATIONS_PREFERENCES_LIST_LABEL;
 	exports.VSD_CANCEL_BUTTON = VSD_CANCEL_BUTTON;
 	exports.VSD_DIALOG_TITLE_SORT = VSD_DIALOG_TITLE_SORT;
 	exports.VSD_FILTER_BY = VSD_FILTER_BY;

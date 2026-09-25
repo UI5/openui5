@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Text', 'sap/f/thirdparty/Link', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/information'], (function (exports, parametersBundle_css, webcomponentsBase, parametersBundle_css$1, ManagedStyles, i18nDefaults, Text, Link, Button, ResponsivePopover, Icons, willShowContent, eventStrict, AccessibilityTextsHelper, toLowercaseEnumValue, Icon, Label, decline, Title, ValueState, FocusableElements, ListItemBase, information) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Text', 'sap/f/thirdparty/Link', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/Popover', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/information', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/InvisibleMessage'], (function (exports, parametersBundle_css, webcomponentsBase, parametersBundle_css$1, ManagedStyles, i18nDefaults, Text, Link, Button, ResponsivePopover, Icons, willShowContent, eventStrict, AccessibilityTextsHelper, toLowercaseEnumValue, Icon, Label, decline, Popover, ValueState, FocusableElements, ListItemBase, information, Title, InvisibleMessage) { 'use strict';
 
     /**
      * Overflow Mode.
@@ -65,7 +65,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thir
      * @public
      * @since 2.6.0
      */
-    let ExpandableText = ExpandableText_1 = class ExpandableText extends webcomponentsBase.S {
+    let ExpandableText = ExpandableText_1 = class ExpandableText extends webcomponentsBase.b {
         constructor() {
             super(...arguments);
             /**
