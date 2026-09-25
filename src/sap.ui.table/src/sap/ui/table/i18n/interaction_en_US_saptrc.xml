@@ -157,34 +157,40 @@
 		</interaction>
 		<interaction>OyzfJBqHVNH1oMRxOc/ibA_ <kbd>Ctrl + A</kbd> <description>
 				<p>P/I3u/8Ogi5Mk2qwwXKbjw_If the focus is on a cell, the row selector, or <span class="uicontrol">Select All</span>, this toggles the <span class="uicontrol">Select All</span> checkbox: All rows get selected or deselected respectively.</p>
+				<p>ZrpGRXErbEFYlCkQJbfAfA_The shortcut has no effect if the focus is on a column header cell.</p>
+				<p>8XFNiDBgfeL5pG01It9s7w_The shortcut has no effect if the focus is on a text input field, as the browser handles the text selection in this case.</p>
+				<p>aGqti93pnOeb26v7/++N+Q_<span class="emphasis">If cell selection is enabled:</span></p>
+				<p>QfZ0i0XqVH0EgzNHjYeiMQ_If the focus is on a cell, all available cells are selected up to the selection limit. If all available cells are already selected, the cell selection is removed.</p>
 			</description>
 		</interaction>
-		<interaction>C2oNwE5zHdRQFHBTusNedQ_ <kbd>Ctrl + Shift + A</kbd> <description>
-				<p>BYx9dKTyJsy5WQcgjrhhxQ_<span class="emphasis">If cell selection is enabled:</span></p>
-				<p>usYVCkQn2hdkbOX38IbKaQ_If the focus is inside of the table, the selection for any rows and cells is removed.</p>
+		<interaction>Nw70fbwfBXm+oMYFw/nKdA_ <kbd>Ctrl + Shift + A</kbd> <description>
+				<p>R5x6uOVYzi3s5HERVxyU5Q_If the focus is on a cell, the row selector, or <span class="uicontrol">Select All</span>, the selection of all rows is removed.</p>
+				<p>gZHj1Ev3uVhbwoa0ltk1nQ_The shortcut has no effect if the focus is on a column header cell or on a text input field.</p>
+				<p>S6NLq/96r8mGlhu/X0IQNQ_<span class="emphasis">If cell selection is enabled:</span></p>
+				<p>RME1M3czS4AfkS0eVhsToA_If the focus is inside of the table, the selection for any rows and cells is removed.</p>
 			</description>
 		</interaction>
-		<interaction>yGXYL4gHXj7MvNrDRA4qoQ_ <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <kbd>F4</kbd> <description>
-				<p>fWAsH93S3/KebWNKBzvGBw_If the focus is on a cell, the focus moves to its content (with the exception of a read-only text).</p>
-				<p>E4z+CAZWpitXE0fbtLO0tg_If the focus is on the group header or a non-leaf node of a tree, this toggles the expansion of the group: The group is expanded or collapsed respectively.</p>
+		<interaction>MXAc9Ly2+fKd0eBLJt8n8w_ <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <kbd>F4</kbd> <description>
+				<p>V1ZHFFV9lZkHZZ3O5A1XZA_If the focus is on a cell, the focus moves to its content (with the exception of a read-only text).</p>
+				<p>J22phGRg1Esd95yT/t+Csg_If the focus is on the group header or a non-leaf node of a tree, this toggles the expansion of the group: The group is expanded or collapsed respectively.</p>
 			</description>
 		</interaction>
-		<interaction>T8MT5sFcki1OAoJq+qnrtg_ <kbd>Shift + F10</kbd> <description>
-				<p>RMrhYo+vrJo2+THzByRddw_If the focus is on the group header, the group header menu is opened.</p>
-				<p>lQYUjjtlJr6ePqI4s+VJkA_If the focus is on the column header, the column header menu is opened.</p>
+		<interaction>h+x5fJOxJg1fL+WC1ZpGSg_ <kbd>Shift + F10</kbd> <description>
+				<p>g8pV01N6akMGVU3k+gcw8Q_If the focus is on the group header, the group header menu is opened.</p>
+				<p>tdaCWgUTPIOad/kLE0lt0w_If the focus is on the column header, the column header menu is opened.</p>
 			</description>
 		</interaction>
-		<interaction>3PUzTMdr/cjAeAHQn/jDLQ_ <kbd>Shift + MouseClick</kbd> <description>
-				<p>xkK0WgyyaRB6EJaM6N6YNQ_<span class="emphasis">If cell selection is enabled:</span></p>
-				<p>9JYU+XfXV6TxzLERtR1bIg_If cells are selected, <kbd>Shift + MouseClick</kbd> on a different cell enhances the selection up to the clicked cell.</p>
+		<interaction>OCDWCEpyE7+3twlWSH+32g_ <kbd>Shift + MouseClick</kbd> <description>
+				<p>kp95T8Ep8QQr7P3U1RuprA_<span class="emphasis">If cell selection is enabled:</span></p>
+				<p>O+Tg8JeioGz/xnbi/IRQGw_If cells are selected, <kbd>Shift + MouseClick</kbd> on a different cell enhances the selection up to the clicked cell.</p>
 			</description>
 		</interaction>
-		<interaction>h+x5fJOxJg1fL+WC1ZpGSg_ <kbd>Ctrl + C</kbd> <description>
-				<p>VPjEFffEhMazmLqWVa3DqQ_Copies the selected rows or cells to the clipboard if available, and the feature is enabled.</p>
+		<interaction>IVIy9YmvlOFuIsm+vf1Fnw_ <kbd>Ctrl + C</kbd> <description>
+				<p>5uE2KxH5dtmwy0Cn2mUyVA_Copies the selected rows or cells to the clipboard (if available), and the feature is enabled.</p>
 			</description>
 		</interaction>
-		<interaction>p92qU0KZf7nqLIjb6yHRaw_ <kbd>Ctrl + V</kbd> <description>
-				<p>25pyv8zBR2fibUq4H3uwpQ_Pastes the content from the clipboard if the feature is enabled.</p>
+		<interaction>7zP7HiHR/ye647ekw2Xkmg_ <kbd>Ctrl + V</kbd> <description>
+				<p>SeJF/69J46V9wFPllX/cDQ_Pastes the content from the clipboard if the feature is enabled.</p>
 			</description>
 		</interaction>
 	</control-interactions>
