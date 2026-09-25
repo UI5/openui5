@@ -21,7 +21,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Managed
      * @public
      * @since 2.5.0
      */
-    class UserMenuAccount extends webcomponentsBase.S {
+    class UserMenuAccount extends webcomponentsBase.b {
         constructor() {
             super(...arguments);
             /**

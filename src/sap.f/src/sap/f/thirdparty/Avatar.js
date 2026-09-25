@@ -130,7 +130,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
      * @implements {IAvatarGroupItem}
      * @public
      */
-    let Avatar = Avatar_1 = class Avatar extends webcomponentsBase.S {
+    let Avatar = Avatar_1 = class Avatar extends webcomponentsBase.b {
         constructor() {
             super();
             /**
@@ -295,12 +295,19 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
             }
             return null;
         }
+        /**
+         * Returns the accessible label for the avatar root element.
+         * Uses `accessibleName` if provided, otherwise falls back to the default
+         * "Avatar" text appended with `initials` if set.
+         * The badge's effective tooltip, if present, is always appended at the end
+         * so screen readers announce the badge state.
+         */
         get accessibleNameText() {
-            if (this.accessibleName) {
-                return this.accessibleName;
-            }
             const defaultLabel = Avatar_1.i18nBundle.getText(i18nDefaults.AVATAR_TOOLTIP);
-            return this.initials ? `${defaultLabel} ${this.initials}`.trim() : defaultLabel;
+            const baseLabel = this.accessibleName
+                || (this.initials ? `${defaultLabel} ${this.initials}`.trim() : defaultLabel);
+            const badgeTooltip = this.badge[0]?.effectiveTooltip;
+            return badgeTooltip ? `${baseLabel} ${badgeTooltip}` : baseLabel;
         }
         get hasImage() {
             return !!this.image.length && !this._imageLoadError;
@@ -361,7 +368,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
             if (!this._interactive) {
                 return;
             }
-            if (webcomponentsBase.b(e)) {
+            if (webcomponentsBase.b$1(e)) {
                 this._fireClick();
             }
             if (webcomponentsBase.A(e)) {
@@ -498,7 +505,13 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
         webcomponentsBase.d({ type: HTMLElement, "default": true })
     ], Avatar.prototype, "image", void 0);
     __decorate([
-        webcomponentsBase.d()
+        webcomponentsBase.d({
+            type: HTMLElement,
+            invalidateOnChildChange: {
+                properties: ["icon", "tooltip", "effectiveTooltip"],
+                slots: false,
+            },
+        })
     ], Avatar.prototype, "badge", void 0);
     __decorate([
         parametersBundle_css$1.i("@ui5/webcomponents")

@@ -1,7 +1,7 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/List', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/MenuItem2', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/information', 'sap/f/thirdparty/willShowContent'], (function (webcomponentsBase, eventStrict, ManagedStyles, parametersBundle_css$1, List, ListItemTemplate, parametersBundle_css, ResponsivePopover, MenuItem, i18nDefaults, slimArrowDown, Button, Icons, toLowercaseEnumValue, ListItemGroup, ListItemBase, WrappingType, AccessibilityTextsHelper, decline, Icon, ValueState, Label, Title, FocusableElements, information, willShowContent) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/MenuItem2', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/List', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/information', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/WrappingType'], (function (webcomponentsBase, eventStrict, ManagedStyles, parametersBundle_css$1, InvisibleMessage, ListItemTemplate, parametersBundle_css, ResponsivePopover, MenuItem, i18nDefaults, slimArrowDown, Button, List, Icons, ListItemBase, decline, Icon, ValueState, AccessibilityTextsHelper, Label, Title, toLowercaseEnumValue, FocusableElements, information, willShowContent, ListItemGroup, WrappingType) { 'use strict';
 
     function SplitButtonTemplate() {
-        return (parametersBundle_css.jsxs("div", { role: this._hideArrowButton ? "presentation" : "group", class: "ui5-split-button-root", tabindex: this._tabIndex, "aria-labelledby": !this._hideArrowButton ? `${this._id}-invisibleTextDefault ${this._id}-invisibleText` : undefined, "aria-haspopup": this._computedAccessibilityAttributes?.root?.hasPopup, "aria-roledescription": this._computedAccessibilityAttributes?.root?.roleDescription, "aria-label": this._computedAccessibilityAttributes?.root?.title, "aria-keyshortcuts": this._computedAccessibilityAttributes?.root?.ariaKeyShortcuts, onFocusOut: this._onFocusOut, onKeyDown: this._onKeyDown, onKeyUp: this._onKeyUp, children: [parametersBundle_css.jsx(Button.Button, { class: "ui5-split-text-button", design: this.design, icon: this.icon, endIcon: this._endIcon, tabindex: -1, disabled: this.disabled, active: this._textButtonActive, exportparts: "icon,endIcon,button", onClick: this._handleMouseClick, onTouchStart: this.handleTouchStart, onMouseDown: this.handleTouchStart, onMouseUp: this._textButtonRelease, onFocusIn: this._onInnerButtonFocusIn, onFocusOut: this._onFocusOut, tooltip: this._computedAccessibilityAttributes?.root?.title, children: this.isTextButton && parametersBundle_css.jsx("slot", {}) }), !this._hideArrowButton && (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [parametersBundle_css.jsx(Button.Button, { class: "ui5-split-arrow-button", design: this.design, icon: slimArrowDown.slimArrowDown, tabindex: -1, tooltip: this._computedAccessibilityAttributes?.arrowButton?.title, accessibilityAttributes: { hasPopup: this._computedAccessibilityAttributes?.arrowButton?.hasPopup, expanded: this._computedAccessibilityAttributes?.arrowButton?.expanded }, disabled: this.disabled, active: this.effectiveActiveArrowButton, part: "arrowButton", onClick: this._handleArrowButtonAction, onMouseDown: this._arrowButtonPress, onMouseUp: this._arrowButtonRelease, onFocusIn: this._onInnerButtonFocusIn, onActiveStateChange: this._onArrowButtonActiveStateChange }), parametersBundle_css.jsxs("span", { id: `${this._id}-invisibleText`, class: "ui5-hidden-text", children: [this.accInfo.keyboardHint, " ", this.accessibleName] }), parametersBundle_css.jsx("span", { id: `${this._id}-invisibleTextDefault`, class: "ui5-hidden-text", children: this.buttonTextContent })] }))] }));
+        return (parametersBundle_css.jsxs("div", { role: this._hideArrowButton ? "presentation" : "group", class: "ui5-split-button-root", tabindex: this._tabIndex, "aria-labelledby": !this._hideArrowButton ? `${this._id}-invisibleTextDefault ${this._id}-invisibleText` : undefined, "aria-haspopup": this._computedAccessibilityAttributes?.root?.hasPopup, "aria-label": this._computedAccessibilityAttributes?.root?.title, "aria-keyshortcuts": this._computedAccessibilityAttributes?.root?.ariaKeyShortcuts, onFocusOut: this._onFocusOut, onKeyDown: this._onKeyDown, onKeyUp: this._onKeyUp, children: [parametersBundle_css.jsx(Button.Button, { class: "ui5-split-text-button", design: this.design, icon: this.icon, endIcon: this._endIcon, tabindex: -1, disabled: this.disabled, active: this._textButtonActive, exportparts: "icon,endIcon,button", onClick: this._handleMouseClick, onTouchStart: this.handleTouchStart, onMouseDown: this.handleTouchStart, onMouseUp: this._textButtonRelease, onFocusIn: this._onInnerButtonFocusIn, onFocusOut: this._onFocusOut, tooltip: this._computedAccessibilityAttributes?.root?.title, children: this.isTextButton && parametersBundle_css.jsx("slot", {}) }), !this._hideArrowButton && (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [parametersBundle_css.jsx(Button.Button, { class: "ui5-split-arrow-button", design: this.design, icon: slimArrowDown.slimArrowDown, tabindex: -1, tooltip: this._computedAccessibilityAttributes?.arrowButton?.title, accessibilityAttributes: { hasPopup: this._computedAccessibilityAttributes?.arrowButton?.hasPopup, expanded: this._computedAccessibilityAttributes?.arrowButton?.expanded }, disabled: this.disabled, active: this.effectiveActiveArrowButton, part: "arrowButton", onClick: this._handleArrowButtonAction, onMouseDown: this._arrowButtonPress, onMouseUp: this._arrowButtonRelease, onFocusIn: this._onInnerButtonFocusIn, onActiveStateChange: this._onArrowButtonActiveStateChange }), parametersBundle_css.jsxs("span", { id: `${this._id}-invisibleText`, class: "ui5-hidden-text", children: [this.accessibleName, " ", this.accInfo.description, " ", this.accInfo.keyboardHint] }), parametersBundle_css.jsx("span", { id: `${this._id}-invisibleTextDefault`, class: "ui5-hidden-text", children: this.buttonTextContent })] }))] }));
     }
 
     ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
@@ -63,7 +63,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
      * @public
      * @since 1.1.0
      */
-    let SplitButton = SplitButton_1 = class SplitButton extends webcomponentsBase.S {
+    let SplitButton = SplitButton_1 = class SplitButton extends webcomponentsBase.b {
         constructor() {
             super(...arguments);
             /**
@@ -125,8 +125,6 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
              * - **root**: Attributes that will be applied to the main (text) button.
              *   - **hasPopup**: Indicates the presence and type of popup triggered by the button.
              *     Accepts string values: `"dialog"`, `"grid"`, `"listbox"`, `"menu"`, or `"tree"`.
-             *   - **roleDescription**: Provides a human-readable description for the role of the button.
-             *     Accepts any string value.
              *   - **title**: Specifies a tooltip or description for screen readers.
              *     Accepts any string value.
              * 	- **ariaKeyShortcuts**: Defines keyboard shortcuts that activate or give focus to the button.
@@ -210,7 +208,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
                 this._shiftOrEscapePressedDuringSpace = false;
                 return;
             }
-            const shouldToggleTextButtonActiveStateOff = webcomponentsBase.b(e) || (webcomponentsBase.Ko(e) && this._textButtonActive);
+            const shouldToggleTextButtonActiveStateOff = webcomponentsBase.b$1(e) || (webcomponentsBase.Ko(e) && this._textButtonActive);
             if (shouldToggleTextButtonActiveStateOff) {
                 this._textButtonActive = false;
             }
@@ -265,7 +263,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
          * @private
          */
         _isDefaultAction(e) {
-            return webcomponentsBase.A(e) || webcomponentsBase.b(e);
+            return webcomponentsBase.A(e) || webcomponentsBase.b$1(e);
         }
         /**
          * Handles the click event and the focus on the arrow button.
@@ -284,7 +282,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
         _handleDefaultAction(e) {
             e.preventDefault();
             const target = e.target;
-            if (webcomponentsBase.b(e)) {
+            if (webcomponentsBase.b$1(e)) {
                 if (this.arrowButton && target === this.arrowButton) {
                     this._activeArrowButton = true;
                     this._fireArrowClick();
@@ -317,7 +315,6 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
             return {
                 root: {
                     hasPopup: this.accessibilityAttributes?.root?.hasPopup,
-                    roleDescription: this.accessibilityAttributes?.root?.roleDescription || (this._hideArrowButton ? undefined : SplitButton_1.i18nBundle.getText(i18nDefaults.SPLIT_BUTTON_DESCRIPTION)),
                     title: this.accessibilityAttributes?.root?.title,
                     ariaKeyShortcuts: this.accessibilityAttributes?.root?.ariaKeyShortcuts,
                 },
@@ -331,7 +328,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
         get accInfo() {
             return {
                 "keyboardHint": SplitButton_1.i18nBundle.getText(i18nDefaults.SPLIT_BUTTON_KEYBOARD_HINT),
-                "description": SplitButton_1.i18nBundle.getText(i18nDefaults.SPLIT_BUTTON_DESCRIPTION),
+                "description": this._roleDescription || SplitButton_1.i18nBundle.getText(i18nDefaults.SPLIT_BUTTON_DESCRIPTION),
             };
         }
         get arrowButtonTooltip() {
@@ -377,6 +374,9 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
     __decorate$1([
         webcomponentsBase.s({ type: Boolean })
     ], SplitButton.prototype, "_hideArrowButton", void 0);
+    __decorate$1([
+        webcomponentsBase.s({ noAttribute: true })
+    ], SplitButton.prototype, "_roleDescription", void 0);
     __decorate$1([
         webcomponentsBase.s({ type: Object })
     ], SplitButton.prototype, "accessibilityAttributes", void 0);
@@ -478,7 +478,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
      * @since 1.3.0
      * @public
      */
-    let Menu = Menu_1 = class Menu extends webcomponentsBase.S {
+    let Menu = Menu_1 = class Menu extends webcomponentsBase.b {
         constructor() {
             super(...arguments);
             /**
@@ -589,6 +589,23 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
                 this._list._itemNavigation._getItems = () => this._navigatableMenuItems;
             }
         }
+        _updatePageSize() {
+            const list = this._list;
+            if (!list) {
+                return;
+            }
+            const firstItem = this._navigatableMenuItems[0];
+            if (!firstItem) {
+                return;
+            }
+            const itemHeight = firstItem.offsetHeight;
+            if (itemHeight === 0) {
+                return;
+            }
+            const popoverHeight = this._popover.getBoundingClientRect().height;
+            const visibleCount = Math.round(popoverHeight / itemHeight);
+            list._itemNavigation._skipItemsSize = visibleCount > 1 ? visibleCount - 1 : null;
+        }
         _close() {
             this.open = false;
         }
@@ -669,7 +686,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
             }
             const isEndContentNavigation = webcomponentsBase.R(e) || webcomponentsBase.D(e);
             const shouldOpenMenu = this.isRtl ? webcomponentsBase.D(e) : webcomponentsBase.R(e);
-            if (webcomponentsBase.b(e) || isTabNextPrevious || (isShowKey && isSplitButton)) {
+            if (webcomponentsBase.b$1(e) || isTabNextPrevious || (isShowKey && isSplitButton)) {
                 e.preventDefault();
             }
             if (isEndContentNavigation) {
@@ -703,8 +720,9 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
         }
         _afterPopoverOpen() {
             this._allMenuItems[0]?.focus();
+            this._updatePageSize();
             if (this.loading) {
-                List.p(Menu_1.i18nBundle.getText(i18nDefaults.MENU_ITEM_LOADING));
+                InvisibleMessage.v(Menu_1.i18nBundle.getText(i18nDefaults.MENU_ITEM_LOADING));
             }
             this.fireDecoratorEvent("open");
         }

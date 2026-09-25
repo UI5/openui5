@@ -1,22 +1,22 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/information', 'sap/f/thirdparty/Button2'], (function (exports, webcomponentsBase, ManagedStyles, parametersBundle_css$1, i18nDefaults, parametersBundle_css, decline, Icon, Icons, Title, ValueState, toLowercaseEnumValue, eventStrict, FocusableElements, AccessibilityTextsHelper, information, Button) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/information', 'sap/f/thirdparty/Button2'], (function (exports, webcomponentsBase, ManagedStyles, parametersBundle_css$1, i18nDefaults, parametersBundle_css, decline, Icon, Icons, Title, ValueState, toLowercaseEnumValue, FocusableElements, eventStrict, AccessibilityTextsHelper, InvisibleMessage, information, Button) { 'use strict';
 
-	const name$1 = "resize-corner";
-	const pathData$1 = "M13 5v1c0 .25-.104.48-.313.688l-6 6C6.48 12.896 6.25 13 6 13H5l8-8Zm-5 8 5-5v1c0 .25-.104.48-.313.688l-3 3C9.48 12.896 9.25 13 9 13H8Zm5-2v1c0 .25-.104.48-.313.688-.208.208-.437.312-.687.312h-1l2-2Z";
-	const ltr$1 = false;
-	const viewBox$1 = "0 0 16 16";
-	const collection$1 = "SAP-icons-v4";
-	const packageName$1 = "@ui5/webcomponents-icons";
+	const name$5 = "resize-corner";
+	const pathData$5 = "M13 5v1c0 .25-.104.48-.313.688l-6 6C6.48 12.896 6.25 13 6 13H5l8-8Zm-5 8 5-5v1c0 .25-.104.48-.313.688l-3 3C9.48 12.896 9.25 13 9 13H8Zm5-2v1c0 .25-.104.48-.313.688-.208.208-.437.312-.687.312h-1l2-2Z";
+	const ltr$5 = false;
+	const viewBox$5 = "0 0 16 16";
+	const collection$5 = "SAP-icons-v4";
+	const packageName$5 = "@ui5/webcomponents-icons";
 
-	Icons.y(name$1, { pathData: pathData$1, ltr: ltr$1, viewBox: viewBox$1, collection: collection$1, packageName: packageName$1 });
+	Icons.y(name$5, { pathData: pathData$5, ltr: ltr$5, viewBox: viewBox$5, collection: collection$5, packageName: packageName$5 });
 
-	const name = "resize-corner";
-	const pathData = "M11.72 3.22a.75.75 0 1 1 1.06 1.06l-8.5 8.5a.75.75 0 1 1-1.06-1.06l8.5-8.5Zm0 5a.75.75 0 1 1 1.06 1.06l-3.5 3.5a.75.75 0 1 1-1.06-1.06l3.5-3.5Z";
-	const ltr = false;
-	const viewBox = "0 0 16 16";
-	const collection = "SAP-icons-v5";
-	const packageName = "@ui5/webcomponents-icons";
+	const name$4 = "resize-corner";
+	const pathData$4 = "M11.72 3.22a.75.75 0 1 1 1.06 1.06l-8.5 8.5a.75.75 0 1 1-1.06-1.06l8.5-8.5Zm0 5a.75.75 0 1 1 1.06 1.06l-3.5 3.5a.75.75 0 1 1-1.06-1.06l3.5-3.5Z";
+	const ltr$4 = false;
+	const viewBox$4 = "0 0 16 16";
+	const collection$4 = "SAP-icons-v5";
+	const packageName$4 = "@ui5/webcomponents-icons";
 
-	Icons.y(name, { pathData, ltr, viewBox, collection, packageName });
+	Icons.y(name$4, { pathData: pathData$4, ltr: ltr$4, viewBox: viewBox$4, collection: collection$4, packageName: packageName$4 });
 
 	var resizeCorner = "resize-corner";
 
@@ -81,7 +81,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	const t="handledByControl",a=(e,n=t)=>!!e[`_sapui_${n}`];
 
 	const OpenedPopupsRegistry = ManagedStyles.m("OpenedPopupsRegistry", { openedRegistry: [] });
-	const openUI5Support = ManagedStyles.n("OpenUI5Support");
+	const openUI5Support = ManagedStyles.n$1("OpenUI5Support");
 	function registerPopupWithOpenUI5Support(popupInfo) {
 	    openUI5Support?.addOpenedPopup(popupInfo);
 	}
@@ -203,7 +203,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	 * @extends UI5Element
 	 * @public
 	 */
-	let Popup = Popup_1 = class Popup extends webcomponentsBase.S {
+	let Popup = Popup_1 = class Popup extends webcomponentsBase.b {
 	    constructor() {
 	        super();
 	        /**
@@ -290,6 +290,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        }
 	        this._deregisterResizeHandler();
 	        this._detachBrowserEvents();
+	        this._deregisterInvisibleMessageRegion();
 	        AccessibilityTextsHelper.T(this);
 	    }
 	    /**
@@ -333,6 +334,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	            this._updateMediaRange();
 	        }
 	        this._addOpenedPopup();
+	        this._registerInvisibleMessageRegion();
 	        this.classList.add("ui5-popup-opening");
 	        setTimeout(() => {
 	            this.classList.remove("ui5-popup-opening");
@@ -389,7 +391,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    _onkeydown(e) {
 	        const isTabOutAttempt = e.target === this._root && webcomponentsBase.V(e);
 	        // if the popup is closed, focus is already moved, so Enter keydown may result in click on the newly focused element
-	        const isEnterOnClosedPopupChild = webcomponentsBase.b(e) && !this.open;
+	        const isEnterOnClosedPopupChild = webcomponentsBase.b$1(e) && !this.open;
 	        if (isTabOutAttempt || isEnterOnClosedPopupChild) {
 	            e.preventDefault();
 	        }
@@ -478,13 +480,16 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	            element = this.getRootNode().getElementById(this.initialFocus)
 	                || document.getElementById(this.initialFocus);
 	        }
-	        element = element || await FocusableElements.b(this) || this._root; // in case of no focusable content focus the root
+	        element = element || await this._getFirstFocusableElement() || this._root; // in case of no focusable content focus the root
 	        if (element) {
 	            if (element === this._root) {
 	                element.tabIndex = -1;
 	            }
 	            element.focus();
 	        }
+	    }
+	    async _getFirstFocusableElement() {
+	        return FocusableElements.b(this);
 	    }
 	    isFocusWithin() {
 	        return a$1(this._root);
@@ -521,6 +526,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        this.hide();
 	        this.open = false;
 	        this._detachBrowserEvents();
+	        this._deregisterInvisibleMessageRegion();
 	        if (!preventRegistryUpdate) {
 	            this._removeOpenedPopup();
 	        }
@@ -535,6 +541,31 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	     */
 	    _removeOpenedPopup() {
 	        removeOpenedPopup(this);
+	    }
+	    /**
+	     * Asks the InvisibleMessage to render its aria-live region inside the popup, so that announcements
+	     * made while the popup is open are read out.
+	     *
+	     * A screen reader scopes its accessibility tree to a modal popup (aria-modal="true"), so a body-level
+	     * aria-live region is silenced while the popup is open. Non-modal popups (e.g. a ComboBox dropdown) do
+	     * not cause this scoping, so their announcements are still heard from the default body-level region and
+	     * must not be routed into the popup subtree.
+	     * @protected
+	     */
+	    _registerInvisibleMessageRegion() {
+	        if (this.isModal && this._root) {
+	            InvisibleMessage.u(this._root);
+	        }
+	    }
+	    /**
+	     * Asks the InvisibleMessage to stop rendering its aria-live region inside the popup, restoring
+	     * the default region.
+	     * @protected
+	     */
+	    _deregisterInvisibleMessageRegion() {
+	        if (this._root) {
+	            InvisibleMessage.d(this._root);
+	        }
 	    }
 	    /**
 	     * Returns the focus to the previously focused element
@@ -611,6 +642,9 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    }
 	    get contentDOM() {
 	        return this.shadowRoot.querySelector(".ui5-popup-content");
+	    }
+	    get footerDOM() {
+	        return this.shadowRoot.querySelector(".ui5-popup-footer-root");
 	    }
 	    get styles() {
 	        return {
@@ -720,6 +754,46 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	], Popup);
 	var Popup$1 = Popup;
 
+	const name$3 = "full-screen";
+	const pathData$3 = "m10.204 5.204 3.937-4.188h-3.625c-.292 0-.458-.146-.5-.438 0-.354.167-.541.5-.562h4.5c.292 0 .531.099.719.297.187.198.281.443.281.734v4.469c0 .354-.167.542-.5.562a.674.674 0 0 1-.344-.171.462.462 0 0 1-.156-.36v-3.75l-4.062 4.125a.512.512 0 0 1-.375.156c-.167 0-.292-.041-.375-.125-.209-.291-.209-.541 0-.75ZM.016 10.579c0-.355.167-.542.5-.563.125.02.24.078.344.172a.462.462 0 0 1 .156.36v3.687L5.08 10.11a.512.512 0 0 1 .375-.156c.166 0 .291.041.375.124.229.271.229.521 0 .75l-4.157 4.188h3.844c.292 0 .458.146.5.438 0 .354-.167.541-.5.562h-4.5a.947.947 0 0 1-.719-.297 1.027 1.027 0 0 1-.28-.734v-4.406Zm8 3.437h6v-6h1v6c0 .27-.094.505-.281.703a.947.947 0 0 1-.719.297h-6v-1Zm-6-13h6v1h-6v6h-1v-6c0-.292.1-.531.297-.719a.988.988 0 0 1 .703-.281Z";
+	const ltr$3 = false;
+	const accData$3 = decline.ICON_FULL_SCREEN;
+	const viewBox$3 = "0 0 17 17";
+	const collection$3 = "SAP-icons-v4";
+	const packageName$3 = "@ui5/webcomponents-icons";
+
+	Icons.y(name$3, { pathData: pathData$3, ltr: ltr$3, viewBox: viewBox$3, accData: accData$3, collection: collection$3, packageName: packageName$3 });
+
+	const name$2 = "full-screen";
+	const pathData$2 = "M4.926 9.99a.75.75 0 0 1 1.06-.02.752.752 0 0 1 .021 1.062l-3.33 3.466h1.575a.75.75 0 0 1 0 1.502H.75a.75.75 0 0 1-.75-.75v-3.5a.75.75 0 1 1 1.5 0v1.808l3.426-3.567Zm9.323-.98a.75.75 0 0 1 .75.75v2.503a2.752 2.752 0 0 1-2.75 2.753H9.752a.75.75 0 0 1 0-1.502h2.499c.69 0 1.25-.56 1.25-1.251V9.76a.75.75 0 0 1 .75-.75ZM6.252 1a.75.75 0 0 1 0 1.502h-2.5c-.69 0-1.25.56-1.25 1.25v2.503a.75.75 0 1 1-1.5 0V3.754A2.755 2.755 0 0 1 3.753 1h2.5Zm9-1.001a.75.75 0 0 1 .749.75v3.5a.75.75 0 1 1-1.5 0V2.444L11.076 6.01a.75.75 0 1 1-1.081-1.04l3.33-3.467h-1.577a.75.75 0 0 1 0-1.502h3.502Z";
+	const ltr$2 = false;
+	const accData$2 = decline.ICON_FULL_SCREEN;
+	const viewBox$2 = "0 0 16 16";
+	const collection$2 = "SAP-icons-v5";
+	const packageName$2 = "@ui5/webcomponents-icons";
+
+	Icons.y(name$2, { pathData: pathData$2, ltr: ltr$2, viewBox: viewBox$2, accData: accData$2, collection: collection$2, packageName: packageName$2 });
+
+	const name$1 = "exit-full-screen";
+	const pathData$1 = "M9.977 4.99V.593c0-.354.166-.541.498-.562a.67.67 0 0 1 .342.172.461.461 0 0 1 .156.358v3.68L15.082.157A.51.51 0 0 1 15.455 0a.58.58 0 0 1 .374.125c.228.27.228.52 0 .748l-4.203 4.148h3.83c.29 0 .456.146.497.437 0 .354-.166.54-.498.562h-4.482a.942.942 0 0 1-.716-.297 1.026 1.026 0 0 1-.28-.733ZM.17 15.127l4.171-4.117H.514c-.29 0-.457-.146-.498-.437 0-.353.166-.54.498-.561h4.482c.29 0 .53.098.716.296.187.198.28.442.28.733v4.398c0 .353-.166.54-.498.561a.67.67 0 0 1-.342-.171.461.461 0 0 1-.156-.36v-3.68L.918 15.845A.509.509 0 0 1 .545 16a.578.578 0 0 1-.374-.125c-.228-.27-.228-.52 0-.748Zm13.79-1.123V8.016h.996v5.988c0 .27-.093.504-.28.702a.942.942 0 0 1-.716.296H7.984v-.998h5.977ZM2.008 8.016h-.996V2.027c0-.29.098-.53.295-.717a.983.983 0 0 1 .7-.28h5.977v.997H2.008v5.989Z";
+	const ltr$1 = false;
+	const accData$1 = decline.ICON_EXIT_FULL_SCREEN;
+	const viewBox$1 = "0 0 16 16";
+	const collection$1 = "SAP-icons-v4";
+	const packageName$1 = "@ui5/webcomponents-icons";
+
+	Icons.y(name$1, { pathData: pathData$1, ltr: ltr$1, viewBox: viewBox$1, accData: accData$1, collection: collection$1, packageName: packageName$1 });
+
+	const name = "exit-full-screen";
+	const pathData = "M5.254 10.003a.75.75 0 0 1 .75.75v3.503a.75.75 0 0 1-1.5 0V12.64l-3.23 3.146a.75.75 0 1 1-1.046-1.074l3.293-3.209H1.758a.75.75 0 0 1 0-1.5h3.496Zm8.996-1a.75.75 0 0 1 .75.75v2.5a2.75 2.75 0 0 1-2.75 2.75h-2.5a.75.75 0 0 1 0-1.5h2.5c.69 0 1.25-.56 1.25-1.25v-2.5a.75.75 0 0 1 .75-.75Zm-8-8a.75.75 0 0 1 0 1.5h-2.5c-.69 0-1.25.56-1.25 1.25v2.5a.75.75 0 0 1-1.5 0v-2.5a2.75 2.75 0 0 1 2.75-2.75h2.5Zm8.46-.776a.75.75 0 1 1 1.073 1.046l-3.146 3.23h1.615a.75.75 0 0 1 0 1.5H10.75a.75.75 0 0 1-.75-.75V1.757a.75.75 0 0 1 1.5 0v1.764L14.71.227Z";
+	const ltr = false;
+	const accData = decline.ICON_EXIT_FULL_SCREEN;
+	const viewBox = "0 0 16 16";
+	const collection = "SAP-icons-v5";
+	const packageName = "@ui5/webcomponents-icons";
+
+	Icons.y(name, { pathData, ltr, viewBox, accData, collection, packageName });
+
 	function DialogTemplate() {
 	    return PopupTemplate.call(this, {
 	        beforeContent,
@@ -728,11 +802,12 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	}
 	function beforeContent() {
 	    return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: !!this._displayHeader &&
-	            parametersBundle_css.jsxs("div", { class: "ui5-popup-header-root", id: "ui5-popup-header", role: "region", "aria-label": this._headerAriaLabel, onMouseDown: this._onDragMouseDown, part: "header", children: [this.hasValueState &&
+	            parametersBundle_css.jsxs("div", { class: "ui5-popup-header-root", id: "ui5-popup-header", role: "region", "aria-label": this._headerAriaLabel, onMouseDown: this._onDragMouseDown, onDblClick: this._showFullscreenButton ? this._onHeaderDblClick : undefined, part: "header", children: [this.hasValueState &&
 	                        parametersBundle_css.jsx(Icon.Icon, { class: "ui5-dialog-value-state-icon", name: this._dialogStateIcon }), this.header.length ?
 	                        parametersBundle_css.jsx("slot", { name: "header" })
 	                        :
-	                            parametersBundle_css.jsx(Title.Title, { level: "H1", id: "ui5-popup-header-text", class: "ui5-popup-header-text", children: this.headerText })] }) }));
+	                            parametersBundle_css.jsx(Title.Title, { level: "H1", id: "ui5-popup-header-text", class: "ui5-popup-header-text", children: this.headerText }), this._showFullscreenButton &&
+	                        parametersBundle_css.jsx(Button.Button, { class: "ui5-dialog-fullscreen-btn", icon: this._fullscreenButtonIcon, design: "Transparent", tooltip: this._fullscreenButtonTooltip, accessibleName: this._fullscreenButtonTooltip, accessibilityAttributes: this._fullscreenButtonAccessibilityAttributes, onClick: this._toggleFullscreen })] }) }));
 	}
 	function afterContent() {
 	    return (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [!!this.footer.length &&
@@ -750,7 +825,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 
 	ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
 	ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
-	var dialogCSS = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host{min-width:min(20rem,90vw);min-height:min(6rem,90vh);max-height:94%;max-width:90%;flex-direction:column;box-shadow:var(--sapContent_Shadow3);border-radius:var(--sapElement_BorderCornerRadius)}:host([stretch]){width:90%;height:94%}:host([stretch][on-phone]){width:100%;height:100%;max-height:100%;max-width:100%;border-radius:0;min-width:0}:host([draggable]) .ui5-popup-header-root,:host([draggable]) ::slotted([slot="header"]){cursor:move}:host([draggable]) .ui5-popup-header-root *{cursor:auto}:host([draggable]) .ui5-popup-root{user-select:text}::slotted([slot="header"]){max-width:100%}.ui5-popup-root{display:flex;flex-direction:column;max-width:100vw}.ui5-popup-header-root{position:relative}.ui5-popup-header-root:before{content:"";position:absolute;inset-block-start:auto;inset-block-end:0;inset-inline-start:0;inset-inline-end:0;height:var(--_ui5_dialog_header_state_line_height);background:var(--sapObjectHeader_BorderColor)}:host([state="Negative"]) .ui5-popup-header-root:before{background:var(--sapErrorBorderColor)}:host([state="Information"]) .ui5-popup-header-root:before{background:var(--sapInformationBorderColor)}:host([state="Positive"]) .ui5-popup-header-root:before{background:var(--sapSuccessBorderColor)}:host([state="Critical"]) .ui5-popup-header-root:before{background:var(--sapWarningBorderColor)}.ui5-dialog-value-state-icon{margin-inline-end:.5rem;flex-shrink:0}:host([state="Negative"]) .ui5-dialog-value-state-icon{color:var(--sapNegativeElementColor)}:host([state="Information"]) .ui5-dialog-value-state-icon{color:var(--sapInformativeElementColor)}:host([state="Positive"]) .ui5-dialog-value-state-icon{color:var(--sapPositiveElementColor)}:host([state="Critical"]) .ui5-dialog-value-state-icon{color:var(--sapCriticalElementColor)}.ui5-popup-header-root{outline:none}.ui5-popup-drag-resize-handler:focus{outline:none}.ui5-popup-root:has(.ui5-popup-drag-resize-handler:focus):before{content:"";position:absolute;inset:var(--_ui5_dialog_focus_outline_offset);border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);border-radius:var(--sapElement_BorderCornerRadius);pointer-events:none;z-index:5}:host([resizable]) .ui5-popup-root:has(.ui5-popup-drag-resize-handler:focus):before{border-end-end-radius:var(--_ui5_dialog_resizable_bottom_right_radius)}:host([stretch]) .ui5-popup-content{width:100%;height:100%}.ui5-popup-content{min-height:var(--_ui5_dialog_content_min_height);flex:1 1 auto}.ui5-popup-resize-handle{position:absolute;bottom:-.5rem;inset-inline-end:-.5rem;cursor:var(--_ui5_dialog_resize_cursor);width:1.5rem;height:1.5rem;border-radius:50%}.ui5-popup-resize-handle [ui5-icon]{color:var(--sapButton_Lite_TextColor)}:host::backdrop{background-color:var(--_ui5_popup_block_layer_background);opacity:var(--_ui5_popup_block_layer_opacity)}.ui5-block-layer{display:block}
+	var dialogCSS = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host{min-width:min(20rem,90vw);min-height:min(6rem,90vh);max-height:94%;max-width:90%;flex-direction:column;box-shadow:var(--sapContent_Shadow3);border-radius:var(--sapElement_BorderCornerRadius)}:host([stretch]){width:90%;height:94%}:host([stretch][on-phone]){width:100%;height:100%;max-height:100%;max-width:100%;border-radius:0;min-width:0}:host([draggable]) .ui5-popup-header-root,:host([draggable]) ::slotted([slot="header"]){cursor:move}:host([draggable]) .ui5-popup-header-root *:not(.ui5-dialog-fullscreen-btn){cursor:auto}:host([draggable]) .ui5-popup-root{user-select:text}::slotted([slot="header"]){max-width:100%}.ui5-popup-root{display:flex;flex-direction:column;max-width:100vw}.ui5-popup-header-root{position:relative}.ui5-popup-header-root:before{content:"";position:absolute;inset-block-start:auto;inset-block-end:0;inset-inline-start:0;inset-inline-end:0;height:var(--_ui5_dialog_header_state_line_height);background:var(--sapObjectHeader_BorderColor)}:host([state="Negative"]) .ui5-popup-header-root:before{background:var(--sapErrorBorderColor)}:host([state="Information"]) .ui5-popup-header-root:before{background:var(--sapInformationBorderColor)}:host([state="Positive"]) .ui5-popup-header-root:before{background:var(--sapSuccessBorderColor)}:host([state="Critical"]) .ui5-popup-header-root:before{background:var(--sapWarningBorderColor)}.ui5-dialog-value-state-icon{margin-inline-end:.5rem;flex-shrink:0}:host([state="Negative"]) .ui5-dialog-value-state-icon{color:var(--sapNegativeElementColor)}:host([state="Information"]) .ui5-dialog-value-state-icon{color:var(--sapInformativeElementColor)}:host([state="Positive"]) .ui5-dialog-value-state-icon{color:var(--sapPositiveElementColor)}:host([state="Critical"]) .ui5-dialog-value-state-icon{color:var(--sapCriticalElementColor)}.ui5-popup-header-root{outline:none}.ui5-popup-drag-resize-handler:focus{outline:none}.ui5-popup-root:has(.ui5-popup-drag-resize-handler:focus):before{content:"";position:absolute;inset:var(--_ui5_dialog_focus_outline_offset);border:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);border-radius:var(--sapElement_BorderCornerRadius);pointer-events:none;z-index:5}:host([resizable]) .ui5-popup-root:has(.ui5-popup-drag-resize-handler:focus):before{border-end-end-radius:var(--_ui5_dialog_resizable_bottom_right_radius)}:host([stretch]) .ui5-popup-content{width:100%;height:100%}:host(:not([header-text])[_show-fullscreen-button]) .ui5-popup-header-root{justify-content:flex-end}:host([header-text][_show-fullscreen-button]) .ui5-popup-header-root{justify-content:space-between}.ui5-popup-header-root{gap:.5rem}.ui5-popup-content{min-height:var(--_ui5_dialog_content_min_height);flex:1 1 auto}.ui5-popup-resize-handle{position:absolute;bottom:-.5rem;inset-inline-end:-.5rem;cursor:var(--_ui5_dialog_resize_cursor);width:1.5rem;height:1.5rem;border-radius:50%}.ui5-popup-resize-handle [ui5-icon]{color:var(--sapButton_Lite_TextColor)}.ui5-popup-header-text{min-width:0;justify-content:flex-start}:host([on-phone]) .ui5-dialog-fullscreen-btn{display:none}:host::backdrop{background-color:var(--_ui5_popup_block_layer_background);opacity:var(--_ui5_popup_block_layer_opacity)}.ui5-block-layer{display:block}
 `;
 
 	var __decorate$2 = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -764,6 +839,9 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	 * Defines the step size at which this component would change by when being dragged or resized with the keyboard.
 	 */
 	const STEP_SIZE = 16;
+	const FULLSCREEN_BUTTON_ACCESSIBILITY_ATTRIBUTES = {
+	    ariaKeyShortcuts: "Shift+Ctrl+F",
+	};
 	/**
 	 * Defines the icons corresponding to the dialog's state.
 	 */
@@ -817,6 +895,12 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	 * - [Shift] + [Up] or [Down] - Decrease/Increase the height of the dialog.
 	 * - [Shift] + [Left] or [Right] - Decrease/Increase the width of the dialog.
 	 *
+	 * #### Fullscreen
+	 * When the `ui5-dialog` has the `showFullscreenButton` property set to `true`, the user can toggle fullscreen mode
+	 * with the following keyboard shortcut:
+	 *
+	 * - [Shift] + [Ctrl] + [F] - Toggle fullscreen mode.
+	 *
 	 * ### ES6 Module Import
 	 *
 	 * `import "@ui5/webcomponents/dist/Dialog";`
@@ -868,6 +952,19 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	         */
 	        this.resizable = false;
 	        /**
+	         * Defines whether a fullscreen toggle button is shown in the dialog header.
+	         * When pressed, it toggles the `stretch` property.
+	         * The fullscreen button is not available on phone devices.
+	         *
+	         * **Note:** The fullscreen button is not available on phone devices,
+	         * nor when a custom header slot is provided — the application is expected
+	         * to render its own toggle inside the custom header in those cases.
+	         * @default false
+	         * @since 2.25.0
+	         * @public
+	         */
+	        this.showFullscreenButton = false;
+	        /**
 	         * Defines the state of the `Dialog`.
 	         *
 	         * **Note:** If `"Negative"` and `"Critical"` states is set, it will change the
@@ -877,8 +974,13 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	         * @since 1.0.0-rc.15
 	         */
 	        this.state = "None";
+	        /**
+	         * @private
+	         */
+	        this._showFullscreenButton = false;
 	        this._draggedOrResized = false;
 	        this._dragHandlerRegistered = false;
+	        this._fullscreenKeydownHandlerRegistered = false;
 	        this._revertSize = () => {
 	            Object.assign(this.style, {
 	                top: "",
@@ -893,6 +995,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        this._resizeMouseMoveHandler = this._onResizeMouseMove.bind(this);
 	        this._resizeMouseUpHandler = this._onResizeMouseUp.bind(this);
 	        this._dragStartHandler = this._handleDragStart.bind(this);
+	        this._fullscreenKeydownHandler = this._onFullscreenKeydown.bind(this);
 	    }
 	    static _isHeader(element) {
 	        return element.classList.contains("ui5-popup-header-root") || element.getAttribute("slot") === "header";
@@ -956,7 +1059,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	     * Determines if the header should be shown.
 	     */
 	    get _displayHeader() {
-	        return this.header.length || this.headerText || this.draggable || this.resizable;
+	        return this.header.length || this.headerText || this.draggable || this.resizable || this._showFullscreenButton;
 	    }
 	    get _movable() {
 	        return !this.stretch && this.onDesktop && (this.draggable || this.resizable);
@@ -986,7 +1089,18 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        return this._movable ? `${this._id}-descr` : undefined;
 	    }
 	    get _showResizeHandle() {
-	        return this.resizable && this.onDesktop;
+	        return this.resizable && this.onDesktop && !this.stretch;
+	    }
+	    get _fullscreenButtonIcon() {
+	        return this.stretch ? "exit-full-screen" : "full-screen";
+	    }
+	    get _fullscreenButtonTooltip() {
+	        return this.stretch
+	            ? Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_FULLSCREEN_RESTORE)
+	            : Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_FULLSCREEN_MAXIMIZE);
+	    }
+	    get _fullscreenButtonAccessibilityAttributes() {
+	        return FULLSCREEN_BUTTON_ACCESSIBILITY_ATTRIBUTES;
 	    }
 	    get _resizeHandleTooltip() {
 	        return this._showResizeHandle ? Dialog_1.i18nBundle.getText(i18nDefaults.DIALOG_RESIZE_HANDLE_TOOLTIP) : undefined;
@@ -1036,6 +1150,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    }
 	    onBeforeRendering() {
 	        super.onBeforeRendering();
+	        this._showFullscreenButton = this.showFullscreenButton && !this.onPhone && !this.header.length;
 	        this._isRTL = this.effectiveDir === "rtl";
 	    }
 	    /**
@@ -1053,10 +1168,12 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    _attachBrowserEvents() {
 	        this._attachScreenResizeHandler();
 	        this._registerDragHandler();
+	        this._registerFullscreenKeydownHandler();
 	    }
 	    _detachBrowserEvents() {
 	        this._detachScreenResizeHandler();
 	        this._deregisterDragHandler();
+	        this._deregisterFullscreenKeydownHandler();
 	    }
 	    _attachScreenResizeHandler() {
 	        if (!this._screenResizeHandlerAttached) {
@@ -1082,6 +1199,18 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	            this._dragHandlerRegistered = false;
 	        }
 	    }
+	    _registerFullscreenKeydownHandler() {
+	        if (this.showFullscreenButton && !this._fullscreenKeydownHandlerRegistered) {
+	            document.addEventListener("keydown", this._fullscreenKeydownHandler);
+	            this._fullscreenKeydownHandlerRegistered = true;
+	        }
+	    }
+	    _deregisterFullscreenKeydownHandler() {
+	        if (this._fullscreenKeydownHandlerRegistered) {
+	            document.removeEventListener("keydown", this._fullscreenKeydownHandler);
+	            this._fullscreenKeydownHandlerRegistered = false;
+	        }
+	    }
 	    _center() {
 	        const height = window.innerHeight - this.offsetHeight, width = window.innerWidth - this.offsetWidth;
 	        Object.assign(this.style, {
@@ -1092,6 +1221,40 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    /**
 	     * Event handlers
 	     */
+	    _toggleFullscreen() {
+	        if (this.onPhone) {
+	            return;
+	        }
+	        const wasStretched = this.stretch;
+	        this.stretch = !this.stretch;
+	        this._revertSize();
+	        this._draggedOrResized = false;
+	        if (wasStretched) {
+	            requestAnimationFrame(() => {
+	                if (this.open) {
+	                    this._center();
+	                }
+	            });
+	        }
+	    }
+	    _onHeaderDblClick(e) {
+	        const target = e.target;
+	        const headerRoot = this._root.querySelector(".ui5-popup-header-root");
+	        if (target !== headerRoot && !target.classList.contains("ui5-popup-header-text")) {
+	            return;
+	        }
+	        this._toggleFullscreen();
+	    }
+	    _onFullscreenKeydown(e) {
+	        if (this.isTopModalPopup && this._showFullscreenButton && this._isFullscreenShortcut(e)) {
+	            e.preventDefault();
+	            e.stopImmediatePropagation();
+	            this._toggleFullscreen();
+	        }
+	    }
+	    _isFullscreenShortcut(e) {
+	        return (e.key === "f" || e.key === "F") && e.ctrlKey && e.shiftKey && !e.altKey;
+	    }
 	    _onDragMouseDown(e) {
 	        // allow dragging only on the header
 	        if (!this._movable || !this.draggable || !Dialog_1._isHeader(e.target)) {
@@ -1275,6 +1438,13 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        window.removeEventListener("mousemove", this._resizeMouseMoveHandler);
 	        window.removeEventListener("mouseup", this._resizeMouseUpHandler);
 	    }
+	    async _getFirstFocusableElement() {
+	        if (this._showFullscreenButton) {
+	            const firstFocusable = await FocusableElements.b(this.contentDOM) || (this.footerDOM ? await FocusableElements.b(this.footerDOM) : null);
+	            return firstFocusable || FocusableElements.b(this);
+	        }
+	        return FocusableElements.b(this);
+	    }
 	    /**
 	     * Overrides Popup's forwardToLast to prioritize the drag/resize handler
 	     * when Shift+Tab is pressed from the first focusable element.
@@ -1304,8 +1474,14 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    webcomponentsBase.s({ type: Boolean })
 	], Dialog.prototype, "resizable", void 0);
 	__decorate$2([
+	    webcomponentsBase.s({ type: Boolean })
+	], Dialog.prototype, "showFullscreenButton", void 0);
+	__decorate$2([
 	    webcomponentsBase.s()
 	], Dialog.prototype, "state", void 0);
+	__decorate$2([
+	    webcomponentsBase.s({ type: Boolean })
+	], Dialog.prototype, "_showFullscreenButton", void 0);
 	__decorate$2([
 	    webcomponentsBase.d()
 	], Dialog.prototype, "header", void 0);
@@ -1338,7 +1514,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	                    :
 	                        parametersBundle_css.jsxs("div", { class: this.classes.header, slot: "header", children: [this.headerText &&
 	                                    parametersBundle_css.jsx(Title.Title, { level: "H1", wrappingType: "None", class: "ui5-popup-header-text ui5-responsive-popover-header-text", children: this.headerText }), !this._hideCloseButton &&
-	                                    parametersBundle_css.jsx(Button.Button, { icon: decline.decline, design: "Transparent", accessibleName: this._closeDialogAriaLabel, onClick: this._dialogCloseButtonClick })] }) }), parametersBundle_css.jsx("slot", {}), parametersBundle_css.jsx("slot", { slot: "footer", name: "footer" })] }));
+	                                    parametersBundle_css.jsx(Button.Button, { icon: decline.declineIcon, design: "Transparent", accessibleName: this._closeDialogAriaLabel, onClick: this._dialogCloseButtonClick })] }) }), parametersBundle_css.jsx("slot", {}), parametersBundle_css.jsx("slot", { slot: "footer", name: "footer" })] }));
 	}
 
 	const e$1={toAttribute(t){return t instanceof HTMLElement?null:t},fromAttribute(t){return t}};
@@ -2370,15 +2546,17 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        }
 	        this._maxHeight = Math.round(maxHeight - Popover_1.VIEWPORT_MARGIN);
 	        this._maxWidth = Math.round(maxWidth - Popover_1.VIEWPORT_MARGIN);
+	        const borderRadius = Number.parseInt(window.getComputedStyle(this).getPropertyValue("border-radius"));
+	        const arrowPos = this.getArrowPosition(targetRect, popoverSize, left, top, isVertical, borderRadius);
+	        // Apply the RTL correction before the dead-band check so it is baked into `this._left`
+	        // once. Adding it after would re-apply it every reposition, causing the position to drift.
+	        left += this.getRTLCorrectionLeft();
 	        if (this._left === undefined || Math.abs(this._left - left) > 1.5) {
 	            this._left = Math.round(left);
 	        }
 	        if (this._top === undefined || Math.abs(this._top - top) > 1.5) {
 	            this._top = Math.round(top);
 	        }
-	        const borderRadius = Number.parseInt(window.getComputedStyle(this).getPropertyValue("border-radius"));
-	        const arrowPos = this.getArrowPosition(targetRect, popoverSize, left, top, isVertical, borderRadius);
-	        this._left += this.getRTLCorrectionLeft();
 	        return {
 	            arrow: arrowPos,
 	            top: this._top,

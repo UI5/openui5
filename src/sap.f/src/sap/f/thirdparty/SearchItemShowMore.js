@@ -60,7 +60,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
             this.fireDecoratorEvent("click", { item: this, originalEvent: e, fromKeyboard });
         }
         _onkeydown(e) {
-            if (webcomponentsBase.b(e)) {
+            if (webcomponentsBase.b$1(e)) {
                 this._onclick(e, true);
                 e.preventDefault();
             }
@@ -73,7 +73,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
         }
     };
     __decorate([
-        webcomponentsBase.s()
+        webcomponentsBase.s({ type: Number })
     ], SearchItemShowMore.prototype, "itemsToShowCount", void 0);
     __decorate([
         webcomponentsBase.s({ type: Boolean })

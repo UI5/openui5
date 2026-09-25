@@ -37,7 +37,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.SearchField",
       {
         metadata: {
-          tag: "ui5-search-field-0b2c601f",
+          tag: "ui5-search-field-5ad9cdcd",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -70,6 +70,10 @@ sap.ui.define(
             /**
              * Defines a short hint intended to aid the user with data entry when the
              * component has no value.
+             *
+             * **Note:** When `scopes` are defined and no custom placeholder is provided,
+             * the placeholder automatically displays "Search in: \{selected scope name\}".
+             * Setting a custom placeholder will override this automatic behavior.
              */
             placeholder: { type: "string", mapping: "property" },
             /**

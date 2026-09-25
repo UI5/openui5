@@ -26,7 +26,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.SearchScope",
       {
         metadata: {
-          tag: "ui5-search-scope-0b2c601f",
+          tag: "ui5-search-scope-5ad9cdcd",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 

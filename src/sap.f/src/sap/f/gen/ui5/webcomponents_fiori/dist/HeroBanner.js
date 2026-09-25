@@ -60,7 +60,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.HeroBanner",
       {
         metadata: {
-          tag: "ui5-hero-banner-0b2c601f",
+          tag: "ui5-hero-banner-5ad9cdcd",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 

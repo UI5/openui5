@@ -2,6 +2,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/Ic
 
 	const ICON_DECLINE = { key: "ICON_DECLINE", defaultText: "Decline" };
 	const ICON_ERROR = { key: "ICON_ERROR", defaultText: "Error" };
+	const ICON_EXIT_FULL_SCREEN = { key: "ICON_EXIT_FULL_SCREEN", defaultText: "Exit Full Screen" };
+	const ICON_FULL_SCREEN = { key: "ICON_FULL_SCREEN", defaultText: "Enter Full Screen" };
 	const ICON_NAV_BACK = { key: "ICON_NAV_BACK", defaultText: "Navigate Back" };
 	const ICON_OVERFLOW = { key: "ICON_OVERFLOW", defaultText: "More" };
 	const ICON_SEARCH = { key: "ICON_SEARCH", defaultText: "Search" };
@@ -26,12 +28,14 @@ sap.ui.define(['exports', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/Ic
 
 	Icons.y(name, { pathData, ltr, viewBox, accData, collection, packageName });
 
-	var decline = "decline";
+	var declineIcon = "decline";
 
 	exports.ICON_ERROR = ICON_ERROR;
+	exports.ICON_EXIT_FULL_SCREEN = ICON_EXIT_FULL_SCREEN;
+	exports.ICON_FULL_SCREEN = ICON_FULL_SCREEN;
 	exports.ICON_NAV_BACK = ICON_NAV_BACK;
 	exports.ICON_OVERFLOW = ICON_OVERFLOW;
 	exports.ICON_SEARCH = ICON_SEARCH;
-	exports.decline = decline;
+	exports.declineIcon = declineIcon;
 
 }));

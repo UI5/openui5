@@ -78,7 +78,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/paramet
      * @csspart startContent - Used to style the start (default) content block
      * @csspart endContent - Used to style the end content block
      */
-    let HeroBanner = class HeroBanner extends webcomponentsBase.S {
+    let HeroBanner = class HeroBanner extends webcomponentsBase.b {
         constructor() {
             super(...arguments);
             /**

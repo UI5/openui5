@@ -1,4 +1,136 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/query', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/MenuItem2', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/Avatar', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/Text', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/List', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/sys-enter-2', 'sap/f/thirdparty/parameters-bundle3.css', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/information', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/WrappingType'], (function (webcomponentsBase, eventStrict, parametersBundle_css$1, parametersBundle_css, query, ResponsivePopover, MenuItem, ManagedStyles, Avatar, Button, Icon, Tag, Title, Text, Label, List, ListItemTemplate, i18nDefaults, AccessibilityTextsHelper, Icons, decline, sysEnter2, parametersBundle_css$2, i18nDefaults$1, ValueState, toLowercaseEnumValue, FocusableElements, ListItemBase, information, willShowContent, ListItemGroup, WrappingType) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/query', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/MenuItem2', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/Avatar', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/Text', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/List', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/sys-enter-2', 'sap/f/thirdparty/parameters-bundle3.css', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/information', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/WrappingType'], (function (webcomponentsBase, eventStrict, parametersBundle_css$1, parametersBundle_css, query, ResponsivePopover, MenuItem, ManagedStyles, Avatar, Button, Icon, Icons, ValueState, Title, Text, Label, List, ListItemTemplate, i18nDefaults, AccessibilityTextsHelper, decline, sysEnter2, parametersBundle_css$2, i18nDefaults$1, toLowercaseEnumValue, FocusableElements, ListItemBase, InvisibleMessage, information, willShowContent, ListItemGroup, WrappingType) { 'use strict';
+
+    function AvatarBadgeTemplate() {
+        return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: !this.invalid && (parametersBundle_css.jsx(Icon.Icon, { name: this.icon, class: "ui5-avatar-badge-icon", title: this.effectiveTooltip, mode: "Image" })) }));
+    }
+
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
+    var AvatarBadgeCss = `:host{display:flex;align-items:center;justify-content:center;box-sizing:border-box;outline:none;border:.0625rem solid;background:var(--sapButton_Emphasized_Background);border-color:var(--sapButton_Emphasized_BorderColor);color:var(--sapButton_Emphasized_TextColor)}:host([invalid]){display:none}:host([state="Positive"]){background:var(--sapSuccessBackground);border-color:var(--sapSuccessBorderColor);color:var(--sapPositiveTextColor)}:host([state="Critical"]){background:var(--sapWarningBackground);border-color:var(--sapWarningBorderColor);color:var(--sapCriticalTextColor)}:host([state="Negative"]){background:var(--sapErrorBackground);border-color:var(--sapErrorBorderColor);color:var(--sapNegativeTextColor)}:host([state="Information"]){background:var(--sapInformationBackground);border-color:var(--sapInformationBorderColor);color:var(--sapInformativeTextColor)}:host([color-scheme="1"][state="None"]){background:var(--sapIndicationColor_1_Background);border-color:var(--sapIndicationColor_1_BorderColor);color:var(--sapIndicationColor_1_TextColor);box-shadow:var(--sapContent_Shadow1)}:host([color-scheme="2"][state="None"]){background:var(--sapIndicationColor_2_Background);border-color:var(--sapIndicationColor_2_BorderColor);color:var(--sapIndicationColor_2_TextColor);box-shadow:var(--sapContent_Shadow1)}:host([color-scheme="3"][state="None"]){background:var(--sapIndicationColor_3_Background);border-color:var(--sapIndicationColor_3_BorderColor);color:var(--sapIndicationColor_3_TextColor);box-shadow:var(--sapContent_Shadow1)}:host([color-scheme="4"][state="None"]){background:var(--sapIndicationColor_4_Background);border-color:var(--sapIndicationColor_4_BorderColor);color:var(--sapIndicationColor_4_TextColor);box-shadow:var(--sapContent_Shadow1)}:host([color-scheme="5"][state="None"]){background:var(--sapIndicationColor_5_Background);border-color:var(--sapIndicationColor_5_BorderColor);color:var(--sapIndicationColor_5_TextColor);box-shadow:var(--sapContent_Shadow1)}:host([color-scheme="6"][state="None"]){background:var(--sapIndicationColor_6_Background);border-color:var(--sapIndicationColor_6_BorderColor);color:var(--sapIndicationColor_6_TextColor);box-shadow:var(--sapContent_Shadow1)}:host([color-scheme="7"][state="None"]){background:var(--sapIndicationColor_7_Background);border-color:var(--sapIndicationColor_7_BorderColor);color:var(--sapIndicationColor_7_TextColor);box-shadow:var(--sapContent_Shadow1)}:host([color-scheme="8"][state="None"]){background:var(--sapIndicationColor_8_Background);border-color:var(--sapIndicationColor_8_BorderColor);color:var(--sapIndicationColor_8_TextColor);box-shadow:var(--sapContent_Shadow1)}:host([color-scheme="9"][state="None"]){background:var(--sapIndicationColor_9_Background);border-color:var(--sapIndicationColor_9_BorderColor);color:var(--sapIndicationColor_9_TextColor);box-shadow:var(--sapContent_Shadow1)}:host([color-scheme="10"][state="None"]){background:var(--sapIndicationColor_10_Background);border-color:var(--sapIndicationColor_10_BorderColor);color:var(--sapIndicationColor_10_TextColor);box-shadow:var(--sapContent_Shadow1)}.ui5-avatar-badge-icon{width:var(--_ui5-avatar-badge-icon-size);height:var(--_ui5-avatar-badge-icon-size);color:inherit}
+`;
+
+    var __decorate$3 = (this && this.__decorate) || function (decorators, target, key, desc) {
+        var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+        if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+        else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+        return c > 3 && r && Object.defineProperty(target, key, r), r;
+    };
+    const ICON_NOT_FOUND = "ICON_NOT_FOUND";
+    /**
+     * @class
+     * ### Overview
+     *
+     * The `ui5-avatar-badge` component is used to display a badge on top of `ui5-avatar` component.
+     * The badge can display an icon and supports different states for visual affordance.
+     *
+     * ### Usage
+     *
+     * The badge should be used as a child element of `ui5-avatar` in the `badge` slot.
+     *
+     * ```html
+     * <ui5-avatar>
+     *   <ui5-avatar-badge icon="edit" slot="badge"></ui5-avatar-badge>
+     * </ui5-avatar>
+     * ```
+     *
+     * ### Keyboard Handling
+     *
+     * The badge does not receive keyboard focus.
+     *
+     * ### ES6 Module Import
+     * `import "@ui5/webcomponents/dist/AvatarBadge.js";`
+     *
+     * @constructor
+     * @extends UI5Element
+     * @since 2.19.0
+     * @public
+     */
+    let AvatarBadge = class AvatarBadge extends webcomponentsBase.b {
+        constructor() {
+            super(...arguments);
+            /**
+             * Defines the state of the badge, which determines its styling.
+             *
+             * Available options:
+             * - `None` (default) - Standard appearance
+             * - `Positive` - Green, used for success/approved states
+             * - `Critical` - Orange, used for warning states
+             * - `Negative` - Red, used for error/rejected states
+             * - `Information` - Blue, used for informational states
+             *
+             * **Note:** `state` takes precedence over `colorScheme`. When `state` is set
+             * to any value other than `None`, the semantic styling applies and `colorScheme` is ignored.
+             *
+             * @default "None"
+             * @public
+             */
+            this.state = ValueState.o.None;
+            /**
+             * @private
+             */
+            this.invalid = false;
+        }
+        async onBeforeRendering() {
+            const icon = this.icon;
+            if (!icon) {
+                this.invalid = true;
+                this.effectiveTooltip = undefined;
+                return;
+            }
+            const iconData = Icons.D(icon) || await Icons.n(icon);
+            this.invalid = !iconData || iconData === ICON_NOT_FOUND;
+            if (this.invalid) {
+                this.effectiveTooltip = undefined;
+            }
+            else if (this.tooltip) {
+                // User-provided tooltip takes precedence
+                this.effectiveTooltip = this.tooltip;
+            }
+            else if (iconData && iconData !== ICON_NOT_FOUND && iconData.accData) {
+                // Use the icon's registered i18n label (e.g., message-error -> "Error")
+                if (iconData.packageName) {
+                    const i18nBundle = await Icons.f(iconData.packageName);
+                    this.effectiveTooltip = i18nBundle.getText(iconData.accData) || undefined;
+                }
+                else {
+                    this.effectiveTooltip = iconData.accData.defaultText || undefined;
+                }
+            }
+            else {
+                // Derive from icon name (e.g., "edit" -> "Edit")
+                this.effectiveTooltip = icon.charAt(0).toUpperCase() + icon.slice(1);
+            }
+        }
+    };
+    __decorate$3([
+        webcomponentsBase.s()
+    ], AvatarBadge.prototype, "icon", void 0);
+    __decorate$3([
+        webcomponentsBase.s()
+    ], AvatarBadge.prototype, "tooltip", void 0);
+    __decorate$3([
+        webcomponentsBase.s()
+    ], AvatarBadge.prototype, "state", void 0);
+    __decorate$3([
+        webcomponentsBase.s()
+    ], AvatarBadge.prototype, "colorScheme", void 0);
+    __decorate$3([
+        webcomponentsBase.s({ type: Boolean })
+    ], AvatarBadge.prototype, "invalid", void 0);
+    __decorate$3([
+        webcomponentsBase.s({ noAttribute: true })
+    ], AvatarBadge.prototype, "effectiveTooltip", void 0);
+    AvatarBadge = __decorate$3([
+        webcomponentsBase.m({
+            tag: "ui5-avatar-badge",
+            languageAware: true,
+            renderer: parametersBundle_css.y,
+            styles: AvatarBadgeCss,
+            template: AvatarBadgeTemplate,
+        })
+    ], AvatarBadge);
+    AvatarBadge.define();
+    var AvatarBadge$1 = AvatarBadge;
 
     function PanelTemplate() {
         return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: parametersBundle_css.jsxs("div", { class: "ui5-panel-root", role: this.accRole, "aria-label": this.effectiveAccessibleName, "aria-labelledby": this.fixedPanelAriaLabelledbyReference, children: [this.hasHeaderOrHeaderText &&
@@ -94,7 +226,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
      * @csspart header - Used to style the header.
      * @csspart content - Used to style the wrapper of the content.
      */
-    let Panel = Panel_1 = class Panel extends webcomponentsBase.S {
+    let Panel = Panel_1 = class Panel extends webcomponentsBase.b {
         constructor() {
             super(...arguments);
             /**
@@ -174,7 +306,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
             return true;
         }
         get shouldNotAnimate() {
-            return this.noAnimation || ManagedStyles.d$1() === ManagedStyles.u.None;
+            return this.noAnimation || ManagedStyles.m$2() === ManagedStyles.u.None;
         }
         _isMobile() {
             if (ManagedStyles.l$1()) {
@@ -199,7 +331,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
             if (!this.shouldToggle(e.target)) {
                 return;
             }
-            if (webcomponentsBase.b(e)) {
+            if (webcomponentsBase.b$1(e)) {
                 this._toggleOpen();
             }
             if (webcomponentsBase.A(e)) {
@@ -216,7 +348,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
             if (!this.shouldToggle(e.target)) {
                 return;
             }
-            if (webcomponentsBase.b(e)) {
+            if (webcomponentsBase.b$1(e)) {
                 e.preventDefault();
             }
             if (webcomponentsBase.A(e)) {
@@ -244,7 +376,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
                     animations.push(webcomponentsBase.u$1(oElement).promise());
                 }
                 else {
-                    animations.push(webcomponentsBase.b$1(oElement).promise());
+                    animations.push(webcomponentsBase.b$2(oElement).promise());
                 }
             });
             Promise.all(animations).then(() => {
@@ -432,7 +564,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
      * @public
      * @since 1.0.0-rc.11
      */
-    let Bar = class Bar extends webcomponentsBase.S {
+    let Bar = class Bar extends webcomponentsBase.b {
         get accInfo() {
             return {
                 "label": this.ariaLabelText,
@@ -613,8 +745,8 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
         return (parametersBundle_css.jsxs(ResponsivePopover.ResponsivePopover, { id: "user-menu-rp", class: "ui5-user-menu-rp", placement: "Bottom", verticalAlign: "Bottom", horizontalAlign: "End", tabindex: -1, accessibleName: this.accessibleNameText, "aria-label": this.accessibleNameText, open: this.open, opener: this.opener, onClose: this._handlePopoverAfterClose, onOpen: this._handlePopoverAfterOpen, onScroll: this._handleScroll, children: [parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [parametersBundle_css.jsxs(Bar$1, { class: {
                                 "ui5-user-menu-fixed-header": true,
                                 "ui5-user-menu-rp-scrolled": this._isScrolled || this._titleMovedToHeader
-                            }, slot: "header", children: [this._titleMovedToHeader &&
-                                    parametersBundle_css.jsx(Title.Title, { level: "H1", wrappingType: "None", children: this._selectedAccount.titleText }), this._isPhone && parametersBundle_css.jsx(Button.Button, { icon: decline.decline, design: "Transparent", accessibleName: this._closeDialogAriaLabel, onClick: this._closeUserMenu, slot: "endContent" })] }), parametersBundle_css.jsx("div", { class: "ui5-user-menu-header", children: headerContent.call(this) })] }), this.showOtherAccounts &&
+                            }, slot: "header", "accessible-name": this._ariaLabelledByAccountInformationText, children: [this._titleMovedToHeader &&
+                                    parametersBundle_css.jsx(Title.Title, { level: "H1", wrappingType: "None", children: this._selectedAccount.titleText }), this._isPhone && parametersBundle_css.jsx(Button.Button, { icon: decline.declineIcon, design: "Transparent", accessibleName: this._closeDialogAriaLabel, onClick: this._closeUserMenu, slot: "endContent" })] }), parametersBundle_css.jsx("div", { class: "ui5-user-menu-header", children: headerContent.call(this) })] }), this.showOtherAccounts &&
                     parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: otherAccountsContent.call(this) }), this.menuItems.length > 0 &&
                     parametersBundle_css.jsx(List.List, { id: "ui5-user-menu-list", class: "ui5-user-menu-list", selectionMode: "None", separators: "None", accessibleRole: "Menu", accessibleName: this._ariaLabelledByActions, onItemClick: this._handleMenuItemClick, onMouseOver: this._itemMouseOver, "onui5-close-menu": this._handleMenuItemClose, children: parametersBundle_css.jsx("slot", {}) }), this._hasCustomFooter &&
                     parametersBundle_css.jsx("div", { slot: "footer", class: "ui5-user-menu-footer", children: parametersBundle_css.jsx("slot", { name: "footer" }) }), this._showDefaultFooter &&
@@ -622,9 +754,9 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
     }
     function headerContent() {
         return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: this._selectedAccount &&
-                parametersBundle_css.jsxs("div", { class: "ui5-user-menu-selected-account", "aria-label": this._ariaLabelledByAccountInformationText, children: [parametersBundle_css.jsx("span", { title: this.showEditButton ? this._editAvatarTooltip : undefined, children: parametersBundle_css.jsxs(Avatar, { size: "L", onClick: this._isAvatarInteractive ? this._handleAvatarClick : undefined, initials: this._selectedAccount._initials, colorScheme: this._selectedAccount.avatarColorScheme, fallbackIcon: personPlaceholder, class: "ui5-user-menu-selected-account-avatar", mode: this._isAvatarInteractive ? "Interactive" : "Image", children: [this._selectedAccount.avatarSrc &&
+                parametersBundle_css.jsxs("div", { class: "ui5-user-menu-selected-account", children: [parametersBundle_css.jsx("span", { title: this.showEditButton ? this._editAvatarTooltip : undefined, children: parametersBundle_css.jsxs(Avatar, { size: "L", onClick: this._isAvatarInteractive ? this._handleAvatarClick : undefined, initials: this._selectedAccount._initials, colorScheme: this._selectedAccount.avatarColorScheme, fallbackIcon: personPlaceholder, class: "ui5-user-menu-selected-account-avatar", mode: this._isAvatarInteractive ? "Interactive" : "Image", children: [this._selectedAccount.avatarSrc &&
                                         parametersBundle_css.jsx("img", { src: this._selectedAccount.avatarSrc }), this.showEditButton &&
-                                        parametersBundle_css.jsx(Tag.Tag, { slot: "badge", wrappingType: "None", design: "Set1", colorScheme: "5", children: parametersBundle_css.jsx(Icon.Icon, { slot: "icon", name: ListItemTemplate.edit }) })] }) }), this._selectedAccount.titleText &&
+                                        parametersBundle_css.jsx(AvatarBadge$1, { slot: "badge", icon: ListItemTemplate.edit })] }) }), this._selectedAccount.titleText &&
                             parametersBundle_css.jsx(Text.Text, { id: "selected-account-title", class: "ui5-user-menu-selected-account-title", children: this._selectedAccount.titleText }), this._selectedAccount.subtitleText &&
                             parametersBundle_css.jsx(Text.Text, { class: "ui5-user-menu-selected-account-subtitleText", children: this._selectedAccount.subtitleText }), this._selectedAccount.description &&
                             parametersBundle_css.jsx(Text.Text, { class: "ui5-user-menu-selected-account-description", children: this._selectedAccount.description }), this._selectedAccount.additionalInfo &&
@@ -633,7 +765,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
                             parametersBundle_css.jsx(Button.Button, { id: "selected-account-manage-btn", icon: userSettings, class: "ui5-user-menu-manage-account-btn", onClick: this._handleManageAccountClick, children: this._manageAccountButtonText })] }) }));
     }
     function otherAccountsContent() {
-        return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: parametersBundle_css.jsxs(Panel$1, { collapsed: true, class: "ui5-user-menu-other-accounts", children: [parametersBundle_css.jsxs("div", { slot: "header", class: "ui5-user-menu-account-header", children: [parametersBundle_css.jsxs(Title.Title, { slot: "header", level: "H4", "wrapping-type": "None", children: [this._otherAccountsButtonText, " (", this._otherAccounts.length, ")"] }), this.showEditAccounts &&
+        return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: parametersBundle_css.jsxs(Panel$1, { collapsed: true, class: "ui5-user-menu-other-accounts", accessibleName: `${this._otherAccountsButtonText} (${this._otherAccounts.length})`, children: [parametersBundle_css.jsxs("div", { slot: "header", class: "ui5-user-menu-account-header", children: [parametersBundle_css.jsxs(Title.Title, { slot: "header", level: "H4", "wrapping-type": "None", children: [this._otherAccountsButtonText, " (", this._otherAccounts.length, ")"] }), this.showEditAccounts &&
                                 parametersBundle_css.jsx(Button.Button, { slot: "header", class: "ui5-user-menu-add-account-btn", design: "Transparent", icon: userEdit, onClick: this._handleEditAccountsClick, tooltip: this._editAccountsTooltip })] }), this._otherAccounts.length > 0 &&
                         parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: otherAccountsList.call(this) })] }) }));
     }
@@ -651,7 +783,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
 
     ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
     ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$2.defaultTheme, "host");
-    var UserMenuCss = `.ui5-user-menu-rp{width:20rem}.ui5-user-menu-rp::part(content),.ui5-user-menu-rp::part(footer){padding-inline:.5rem}.ui5-user-menu-rp::part(header){box-shadow:none;padding:0}.ui5-user-menu-header{display:flex;flex-direction:column}[on-phone] .ui5-user-menu-header{padding-inline:0}.ui5-user-menu-fixed-header:not(.ui5-user-menu-rp-scrolled){box-shadow:none}.ui5-user-menu-fixed-header::part(startContent),.ui5-user-menu-fixed-header::part(endContent){padding:0}.ui5-user-menu-fixed-header [ui5-button]{margin-inline:.5rem;font-family:var(--sapFontSemiboldDuplexFamily)}.ui5-user-menu-rp::part(content){padding-top:0;padding-bottom:.5rem}.ui5-user-menu-selected-account{display:flex;align-items:center;flex-direction:column;margin-block-end:.5rem;overflow:hidden}.ui5-user-menu-selected-account-avatar{margin-block-start:.25rem;margin-block-end:.5rem}.ui5-user-menu-avatar-img{object-fit:cover}.ui5-user-menu-selected-account-title{text-align:center;margin-block:.25rem;font-family:var(--sapFontSemiboldDuplexFamily);font-size:var(--sapFontLargeSize);color:var(--sapTextColor)}.ui5-user-menu-selected-account-subtitleText{text-align:center;margin-bottom:.25rem;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapContent_LabelColor)}.ui5-user-menu-selected-account-description{text-align:center;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapContent_LabelColor)}.ui5-user-menu-selected-account-additional-info{margin-top:.25rem;text-align:center;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapContent_LabelColor)}.ui5-user-menu-manage-account-btn{font-family:var(--sapFontSemiboldDuplexFamily);margin-block-start:1rem}.ui5-user-menu-sign-out-btn{font-family:var(--sapFontSemiboldDuplexFamily)}.ui5-user-menu-other-accounts{margin-block-end:.5rem}.ui5-user-menu-other-accounts::part(header){border-bottom-left-radius:0;border-bottom-right-radius:0}.ui5-user-menu-other-accounts::part(content){padding:0}.ui5-user-menu-other-accounts-content{display:flex;align-items:center;width:100%;min-height:4.5rem;gap:12px}.ui5-user-menu-other-accounts-info{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:4px;align-self:stretch;width:100%;overflow:hidden}.ui5-user-menu-other-accounts-title{overflow:hidden;color:var(--sapList_TextColor);text-overflow:ellipsis;font-family:var(--sapFontSemiboldDuplexFamily);font-size:var(--sapFontSize);font-style:normal;line-height:normal}.ui5-user-menu-other-accounts-additional-info{overflow:hidden;color:var(--sapContent_LabelColor);text-overflow:ellipsis;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);font-style:normal;line-height:normal}.ui5-user-menu-selected-account-icon{display:flex;width:18px;align-items:center;align-self:stretch;color:var(--sapContent_NonInteractiveIconColor);font-family:var(--_ui5_slider_handle_font_family);font-size:1.125rem}.ui5-user-menu-account-header{display:flex;flex:1;justify-content:space-between;align-items:center}.ui5-user-menu-footer{display:flex;flex:1;justify-content:flex-end;align-items:center}.ui5-user-menu-info-area{display:flex;flex-direction:column;align-self:stretch;margin-block:.5rem;padding-block:.5rem;padding-inline:.5rem;margin-inline:-.5rem}.ui5-user-menu-selected-account-subtitleText:has(+.ui5-user-menu-info-area){margin-bottom:0}.ui5-user-menu-info-area+.ui5-user-menu-manage-account-btn{margin-block-start:0}
+    var UserMenuCss = `.ui5-user-menu-rp{width:20rem}.ui5-user-menu-rp::part(content),.ui5-user-menu-rp::part(footer){padding-inline:.5rem}.ui5-user-menu-rp::part(header){box-shadow:none;padding:0}.ui5-user-menu-rp::part(header):before{display:none}.ui5-user-menu-rp{--_ui5_popup_header_shadow: none}.ui5-user-menu-header{display:flex;flex-direction:column}[on-phone] .ui5-user-menu-header{padding-inline:0}.ui5-user-menu-fixed-header:not(.ui5-user-menu-rp-scrolled){box-shadow:none}.ui5-user-menu-fixed-header::part(bar){position:relative}.ui5-user-menu-fixed-header::part(startContent),.ui5-user-menu-fixed-header::part(endContent){padding:0}.ui5-user-menu-fixed-header::part(midContent){position:absolute;left:50%;transform:translate(-50%);justify-content:center;pointer-events:none}.ui5-user-menu-fixed-header [ui5-button]{margin-inline:.5rem;font-family:var(--sapFontSemiboldDuplexFamily)}.ui5-user-menu-rp::part(content){padding-top:0;padding-bottom:.5rem}.ui5-user-menu-selected-account{display:flex;align-items:center;flex-direction:column;margin-block-end:.5rem;overflow:hidden}.ui5-user-menu-selected-account-avatar{margin-block-start:.25rem;margin-block-end:.5rem}.ui5-user-menu-avatar-img{object-fit:cover}.ui5-user-menu-selected-account-title{text-align:center;margin-block:.25rem;font-family:var(--sapFontSemiboldDuplexFamily);font-size:var(--sapFontLargeSize);color:var(--sapTextColor)}.ui5-user-menu-selected-account-subtitleText{text-align:center;margin-bottom:.25rem;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapContent_LabelColor)}.ui5-user-menu-selected-account-description{text-align:center;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapContent_LabelColor)}.ui5-user-menu-selected-account-additional-info{margin-top:.25rem;text-align:center;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapContent_LabelColor)}.ui5-user-menu-manage-account-btn{font-family:var(--sapFontSemiboldDuplexFamily);margin-block-start:1rem}.ui5-user-menu-sign-out-btn{font-family:var(--sapFontSemiboldDuplexFamily)}.ui5-user-menu-other-accounts{margin-block-end:.5rem}.ui5-user-menu-other-accounts::part(header){border-bottom-left-radius:0;border-bottom-right-radius:0}.ui5-user-menu-other-accounts::part(content){padding:0}.ui5-user-menu-other-accounts-content{display:flex;align-items:center;width:100%;min-height:4.5rem;gap:12px}.ui5-user-menu-other-accounts-info{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:4px;align-self:stretch;width:100%;overflow:hidden}.ui5-user-menu-other-accounts-title{overflow:hidden;color:var(--sapList_TextColor);text-overflow:ellipsis;font-family:var(--sapFontSemiboldDuplexFamily);font-size:var(--sapFontSize);font-style:normal;line-height:normal}.ui5-user-menu-other-accounts-additional-info{overflow:hidden;color:var(--sapContent_LabelColor);text-overflow:ellipsis;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);font-style:normal;line-height:normal}.ui5-user-menu-selected-account-icon{display:flex;width:18px;align-items:center;align-self:stretch;color:var(--sapContent_NonInteractiveIconColor);font-family:var(--_ui5_slider_handle_font_family);font-size:1.125rem}.ui5-user-menu-account-header{display:flex;flex:1;justify-content:space-between;align-items:center}.ui5-user-menu-footer{display:flex;flex:1;justify-content:flex-end;align-items:center}.ui5-user-menu-info-area{display:flex;flex-direction:column;align-self:stretch;margin-block:.5rem;padding:.5rem;margin-inline:-.5rem}.ui5-user-menu-selected-account-subtitleText:has(+.ui5-user-menu-info-area){margin-bottom:0}.ui5-user-menu-info-area+.ui5-user-menu-manage-account-btn{margin-block-start:0}
 `;
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -679,7 +811,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
      * @public
      * @since 2.5.0
      */
-    let UserMenu = UserMenu_1 = class UserMenu extends webcomponentsBase.S {
+    let UserMenu = UserMenu_1 = class UserMenu extends webcomponentsBase.b {
         constructor() {
             super(...arguments);
             /**
@@ -729,7 +861,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
              *
              * @default false
              * @public
-             * @since 2.25.0
+             * @since 2.24.0
              */
             this.avatarInteractive = false;
             /**
@@ -841,6 +973,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-s
             this._titleMovedToHeader = false;
             this._isScrolled = false;
             this._setupObserver();
+            this._menuItems[0]?.getFocusDomRef()?.focus();
             this.fireDecoratorEvent("open");
         }
         _handlePopoverAfterClose() {

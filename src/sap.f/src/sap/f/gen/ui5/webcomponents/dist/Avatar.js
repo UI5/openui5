@@ -41,7 +41,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.Avatar",
       {
         metadata: {
-          tag: "ui5-avatar-0b2c601f",
+          tag: "ui5-avatar-5ad9cdcd",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 
