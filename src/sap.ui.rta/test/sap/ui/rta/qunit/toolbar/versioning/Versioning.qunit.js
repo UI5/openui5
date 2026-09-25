@@ -116,6 +116,30 @@ sap.ui.define([
 			assert.strictEqual(oVersionList.getGrowingScrollToLoad(), true, "more versions are loaded on scroll");
 		});
 
+		QUnit.test("all content columns in the version list have a header title", async function(assert) {
+			await this.oToolbar.showManageVersions();
+			const oTextResources = this.oToolbar.getTextResources();
+			const oVersionList = this.oToolbar.getControl("manageVersionsDialog--versionList");
+			const aColumns = oVersionList.getColumns();
+
+			const aExpectedTitles = [
+				oTextResources.getText("TIT_VERSION_COLUMN"),
+				oTextResources.getText("TIT_VERSION_STATE"),
+				oTextResources.getText("TIT_CHANGEVISUALIZATION_DATE"),
+				oTextResources.getText("TIT_CHANGEVISUALIZATION_USER")
+			];
+
+			aExpectedTitles.forEach((sExpectedTitle, iIndex) => {
+				const oHeader = aColumns[iIndex].getHeader();
+				assert.ok(oHeader, `column ${iIndex} has a header control`);
+				assert.strictEqual(oHeader.getText(), sExpectedTitle, `column ${iIndex} shows the expected title`);
+				assert.ok(oHeader.getText().length > 0, `column ${iIndex} title is not empty`);
+			});
+
+			// the trailing action column (switch-to-version button) has no header by design
+			assert.notOk(aColumns[4].getHeader(), "the trailing action column has no header title (by design)");
+		});
+
 		QUnit.test("when a version is selected the switchVersion event is fired", async function(assert) {
 			await this.oToolbar.showManageVersions();
 			const oDialog = this.oToolbar.getControl("manageVersionsDialog--manageVersionsDialog");
