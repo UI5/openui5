@@ -2,16 +2,14 @@ sap.ui.require([
 	"sap/m/App",
 	"sap/m/OverflowToolbar",
 	"sap/m/ToolbarSpacer",
-	"sap/m/Switch",
-	"sap/m/Label",
+	"sap/m/ToggleButton",
 	"sap/m/Page",
 	"sap/m/Title",
 	"sap/m/Shell",
 	"sap/m/Text",
 	"sap/ui/layout/DynamicSideContent",
-	"sap/m/OverflowToolbarLayoutData",
 	"sap/ui/core/library"
-], function(App, OverflowToolbar, ToolbarSpacer, Switch, Label, Page, Title, Shell, Text, DynamicSideContent, OverflowToolbarLayoutData, coreLibrary) {
+], function(App, OverflowToolbar, ToolbarSpacer, ToggleButton, Page, Title, Shell, Text, DynamicSideContent, coreLibrary) {
 	"use strict";
 
 	var TitleLevel = coreLibrary.TitleLevel;
@@ -168,61 +166,40 @@ sap.ui.require([
 
 	var oFooterBar = new OverflowToolbar({
 		content: [
-		new Label({
-			wrapping: true,
-			text: "Toggle side/main content on small screen",
-			labelFor: "toggleContentBtn",
-			layoutData: new OverflowToolbarLayoutData({ priority: "NeverOverflow" })
-		}),
-		new Switch("toggleContentBtn", {
-			state: true,
-			change: function () {
-				oDynamicSideContent.toggle();
-			}
-		}),
-		new ToolbarSpacer(),
-			new Label({
-				wrapping: true,
-				text: "Set limit",
-				labelFor: "shellLimitBtn"
+			new ToggleButton({
+				text: "Toggle side/main content on small screen",
+				pressed: true,
+				press: function () {
+					oDynamicSideContent.toggle();
+				}
 			}),
-			new Switch("shellLimitBtn", {
-				change: function () {
+			new ToolbarSpacer(),
+			new ToggleButton({
+				text: "Set limit",
+				press: function () {
 					oShell.setAppWidthLimited(!oShell.getAppWidthLimited());
 				}
 			}),
 			new ToolbarSpacer(),
-			new Label({
-				wrapping: true,
+			new ToggleButton({
 				text: "Show side content",
-				labelFor: "sideContentBtn"
-			}),
-			new Switch("sideContentBtn", {
-				state: true,
-				change: function () {
+				pressed: true,
+				press: function () {
 					oDynamicSideContent.setShowSideContent(!oDynamicSideContent.getShowSideContent());
 				}
 			}),
 			new ToolbarSpacer(),
-			new Label({
-				wrapping: true,
+			new ToggleButton({
 				text: "Show main content",
-				labelFor: "mineContentBtn"
-			}),
-			new Switch("mineContentBtn", {
-				state: true,
-				change: function () {
+				pressed: true,
+				press: function () {
 					oDynamicSideContent.setShowMainContent(!oDynamicSideContent.getShowMainContent());
 				}
 			}),
 			new ToolbarSpacer(),
-			new Label({
-				wrapping: true,
+			new ToggleButton({
 				text: "Equal split content",
-				labelFor: "equalSplitBtn"
-			}),
-			new Switch("equalSplitBtn", {
-				change: function () {
+				press: function () {
 					oDynamicSideContent.setEqualSplit(!oDynamicSideContent.getEqualSplit());
 				}
 			})
