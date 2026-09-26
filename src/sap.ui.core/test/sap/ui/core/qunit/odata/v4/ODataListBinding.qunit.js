@@ -8259,9 +8259,14 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("getQueryOptionsFromParameters", function (assert) {
-		var oBinding = this.bindList("/EMPLOYEES");
+		var oBinding = this.bindList("/EMPLOYEES", null, [], [], {
+				// MUST be ignored according to _Helper.isDataAggregation()
+				$$aggregation : {group : {foo : {additionally : ["n/a"]}}}
+			});
 
 		this.mock(oBinding).expects("getGroupPaths").withExactArgs().returns([]);
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
 		this.mock(_Helper).expects("addToSelect").never();
 
 		// code under test
@@ -8269,39 +8274,90 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+[{
+	$$aggregation : {group : {foo : {additionally : ["n/a"]}}},
+	$select : "forbidden"
+}, {
+	$$aggregation : {group : {foo : {additionally : ["n/a"]}}},
+	$expand : "forbidden"
+}].forEach((mParameters, i) => {
+	QUnit.test("getQueryOptionsFromParameters: no autoExpandSelect #" + i, function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		oBinding.mParameters = oBinding.mQueryOptions = mParameters; // avoid errors in c'tor
+		this.mock(oBinding).expects("getGroupPaths").withExactArgs().returns([]);
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(true);
+		this.mock(_Helper).expects("addToSelect").never();
+
+		assert.throws(function () {
+			// code under test
+			oBinding.getQueryOptionsFromParameters();
+		}, new Error("Missing parameter autoExpandSelect"));
+	});
+});
+
+	//*********************************************************************************************
 [false, true].forEach(function (bHasSelect) {
-	const sTitle = "getQueryOptionsFromParameters: add group paths to $select"
-		+ ", has $select = " + bHasSelect;
+	[false, true].forEach(function (bHasGroupPaths) {
+		[false, true].forEach(function (bDataAggregation) {
+	const sTitle = "getQueryOptionsFromParameters: add group paths (& additionally) to $select"
+		+ ", has $select = " + bHasSelect
+		+ ", has group paths = " + bHasGroupPaths
+		+ ", is data aggregation = " + bDataAggregation;
 
 	QUnit.test(sTitle, function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
-		oBinding.mQueryOptions = {$expand : "~expand~"};
-		if (bHasSelect) {
-			oBinding.mQueryOptions.$select = ["~select~"];
-		}
-		const sOriginalQueryOptions = JSON.stringify(oBinding.mQueryOptions);
-		const aGroupPaths = ["~path~"];
-		this.mock(oBinding).expects("getGroupPaths").withExactArgs().returns(aGroupPaths);
-		this.mock(_Helper).expects("addToSelect")
-			.withExactArgs(/*NOT match.same*/oBinding.mQueryOptions, sinon.match.same(aGroupPaths))
-			.callsFake(function (mQueryOptions0) {
-				if (mQueryOptions0.$select) {
-					mQueryOptions0.$select.push("MODIFIED"); // addToSelect operates on reference
-				} else {
-					mQueryOptions0.$select = "MODIFIED"; // ... and creates $select if not present
+		this.oModel.bAutoExpandSelect = true;
+		oBinding.mQueryOptions = Object.freeze({
+			$expand : "~expand~",
+			...(bHasSelect && {$select : Object.freeze(["~select~"])})
+		});
+		oBinding.mParameters = { // avoid errors in c'tor
+			// MUST be ignored according to _Helper.isDataAggregation()
+			$$aggregation : {
+				group : {
+					foo : {additionally : ["a", "b/c"]},
+					bar : {additionally : []},
+					baz : {},
+					qux : {additionally : ["x", "y", "z"]}
 				}
-			});
+			}
+		};
+		const aGroupPaths = Object.freeze(bHasGroupPaths ? ["~path~"] : []);
+		this.mock(oBinding).expects("getGroupPaths").withExactArgs().returns(aGroupPaths);
+		const oHelperMock = this.mock(_Helper);
+		const addToSelect = (mQueryOptions0, aPaths) => {
+			mQueryOptions0.$select ??= [];
+			mQueryOptions0.$select.push(...aPaths);
+		};
+		oHelperMock.expects("addToSelect").exactly(bHasGroupPaths ? 1 : 0)
+			.withExactArgs(sinon.match.object, aGroupPaths)
+			.callsFake(addToSelect);
+		oHelperMock.expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(bDataAggregation);
+		oHelperMock.expects("addToSelect").exactly(bDataAggregation ? 1 : 0)
+			.withExactArgs(sinon.match.object, ["a", "b/c"])
+			.callsFake(addToSelect);
+		oHelperMock.expects("addToSelect").exactly(bDataAggregation ? 1 : 0)
+			.withExactArgs(sinon.match.object, ["x", "y", "z"])
+			.callsFake(addToSelect);
 
 		// code under test
 		const mResult = oBinding.getQueryOptionsFromParameters();
 
+		const aExpectedSelect = bDataAggregation ? ["a", "b/c", "x", "y", "z"] : [];
+		if (bHasGroupPaths) {
+			aExpectedSelect.unshift("~path~");
+		}
+		if (bHasSelect) {
+			aExpectedSelect.unshift("~select~");
+		}
 		assert.deepEqual(mResult, {
 			$expand : "~expand~",
-			$select : bHasSelect ? ["~select~", "MODIFIED"] : "MODIFIED"
+			...(aExpectedSelect.length && {$select : aExpectedSelect})
 		});
-		assert.notStrictEqual(mResult, oBinding.mQueryOptions);
-		assert.strictEqual(JSON.stringify(oBinding.mQueryOptions), sOriginalQueryOptions,
-			"both mQueryOptions and its $select are unchanged");
+	});
+		});
 	});
 });
 
