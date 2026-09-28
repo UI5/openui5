@@ -3243,6 +3243,9 @@ sap.ui.define([
 				}
 			}
 		});
+		// applyExternalState resolves once the changes are applied, but the filter info bar is updated
+		// asynchronously in the control's _onModifications handler. Wait for it before asserting.
+		await this.oTable.awaitPendingModification();
 
 		this.assertFilterInfoBarExists(true, "After combined changes");
 		this.assertFilterInfoBarText(["NewLabel"], "After combined filter and label change");
@@ -3254,6 +3257,7 @@ sap.ui.define([
 				}
 			}
 		});
+		await this.oTable.awaitPendingModification();
 
 		this.assertFilterInfoBarText(["AnotherLabel"], "After subsequent label change");
 
