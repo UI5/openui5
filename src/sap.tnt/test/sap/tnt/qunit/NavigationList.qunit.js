@@ -2761,6 +2761,17 @@ sap.ui.define([
 		assert.strictEqual(oTextSpan.querySelector(".sapTntNLIHighlight").textContent, "Account", "Only matching part is in highlight span");
 	});
 
+	QUnit.test("Text span keeps inline flow so highlight and surrounding text stay on the same line", async function (assert) {
+		this.navigationList.setHighlightedText("Acc");
+		await nextUIUpdate();
+
+		const oItem = this.navigationList.getItems()[1];
+		const oTextSpan = oItem.getDomRef().querySelector(".sapTntNLIText");
+		const sDisplay = window.getComputedStyle(oTextSpan).display;
+
+		assert.notStrictEqual(sDisplay, "flex", "Text span is not a flex container, so the highlight span flows inline with the surrounding text");
+	});
+
 	QUnit.test("Group text is highlighted", async function (assert) {
 		this.navigationList.setHighlightedText("Business");
 		await nextUIUpdate();
