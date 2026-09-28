@@ -1075,7 +1075,7 @@ sap.ui.define([
 				assert.strictEqual(oIFramePreview.getWidth(), "100px", "then the width of the preview is set to 100px");
 
 				// Simulate user input - copied from StepInput.qunit.js
-				const oWidthInnerInput = oWidthValueInput._getInput();
+				const oWidthInnerInput = oWidthValueInput._getNumericInput()._getInput();
 				oWidthInnerInput.focus();
 				oWidthInnerInput.getDomRef("inner").value = 200;
 				QUnitUtils.triggerKeydown(oWidthInnerInput.getDomRef(), KeyCodes.ENTER);
@@ -1089,7 +1089,7 @@ sap.ui.define([
 				assert.strictEqual(oModel.getProperty("/frameHeightUnit/value"), "rem", "then the height unit of the model is set to rem");
 				assert.strictEqual(oIFramePreview.getHeight(), "35rem", "then the height of the preview is set to 35rem");
 
-				const oHeightInnerInput = oHeightValueInput._getInput();
+				const oHeightInnerInput = oHeightValueInput._getNumericInput()._getInput();
 				oHeightInnerInput.focus();
 				oHeightInnerInput.getDomRef("inner").value = 20;
 				QUnitUtils.triggerKeydown(oHeightInnerInput.getDomRef(), KeyCodes.ENTER);
@@ -1269,7 +1269,7 @@ sap.ui.define([
 			this.oAddIFrameDialog.attachOpened(async function() {
 				const oSaveButton = Element.getElementById("sapUiRtaAddIFrameDialogSaveButton");
 				const oWidthInput = Element.getElementById("sapUiRtaAddIFrameDialog_WidthInput");
-				const oInnerInput = oWidthInput._getInput();
+				const oInnerInput = oWidthInput._getNumericInput()._getInput();
 				assert.strictEqual(oSaveButton.getEnabled(), false, "Save button is initially disabled");
 
 				oInnerInput.focus();

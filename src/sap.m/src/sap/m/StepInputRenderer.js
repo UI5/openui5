@@ -5,7 +5,7 @@ sap.ui.define([], function () {
 	"use strict";
 
 	/**
-	 * <code>StepInput renderer</code>
+	 * <code>StepInput</code> renderer.
 	 * @namespace
 	 */
 	var StepInputRenderer = {
@@ -13,25 +13,13 @@ sap.ui.define([], function () {
 	};
 
 	StepInputRenderer.render = function (oRm, oControl) {
-		var oInput = oControl._getInput(),
-			sWidth = oControl.getWidth(),
-			bEnabled = oControl.getEnabled(),
-			bEditable = oControl.getEditable(),
-			sValueState = oControl.getValueState();
+		var oNumericInput = oControl._getNumericInput();
 
 		oRm.openStart("div", oControl);
-
-		oRm.style("width", sWidth);
 		oRm.class("sapMStepInput");
-		oRm.class("sapMStepInput-CTX");
-		!bEnabled && oRm.class("sapMStepInputReadOnly");
-		!bEditable && oRm.class("sapMStepInputNotEditable");
-		if (sValueState === "Error" || sValueState === "Warning") {
-			oRm.class("sapMStepInput" + sValueState);
-		}
 		oRm.openEnd();
 
-		oRm.renderControl(oInput);
+		oRm.renderControl(oNumericInput);
 
 		oRm.close("div");
 	};
