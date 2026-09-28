@@ -36,13 +36,13 @@ sap.ui.define([
 
 	initSli(1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1); //default values
 	initSli(2, "512px", -1, 10, 210, 100, 5, true, true, 0, false, false); // with step-wide
-	initSli(3, "512px", -1, 10, 210, 100, null, true, true, 5, false, false); // without step-wide (512px because so lenght of bar is 500px)
+	initSli(3, "512px", -1, 10, 210, 100, null, true, true, 5, false, false); // without step-wide (512px because so length of bar is 500px)
 	initSli(4, "512px", -1, 10, 210, 100, 5, true, true, 8, true, false); // with step-wide, ticks & Texts
 	initSli(5, "512px", -1, 10, 210, 100, 5, false, true, 0, false, false); // with step-wide INVISIBLE
 	initSli(6, "512px", -1, 10, 210, 100, 5, true, false, 0, true, false); // with step-wide READ ONLY - no ticks but text -> also no text
 	//Vertical
 	initSli(7, -1, "512px", 10, 210, 100, 5, true, true, 0, false, true); // with step-wide
-	initSli(8, -1, "512px", 10, 210, 100, 0.1, true, true, 5, false, true); // without step-wide (512px because so lenght of bar is 500px)
+	initSli(8, -1, "512px", 10, 210, 100, 0.1, true, true, 5, false, true); // without step-wide (512px because so length of bar is 500px)
 	initSli(9, -1, "512px", 10, 210, 100, 5, true, true, 8, true, true); // with step-wide, ticks & Texts
 	initSli(10, -1, "512px", 10, 210, 100, 5, false, true, 0, false, true); // with step-wide INVISIBLE
 	initSli(11, -1, "512px", 10, 210, 100, 5, true, false, 0, true, true); // with step-wide READ ONLY - no ticks but text -> also no text

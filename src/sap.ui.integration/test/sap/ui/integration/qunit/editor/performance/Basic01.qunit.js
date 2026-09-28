@@ -482,7 +482,7 @@ sap.ui.define([
 					EditorQunitUtils.isReady(oEditor).then(function () {
 						time = new Date().getTime() - start.getTime();
 						var aItems = oField.getAggregation("_field").getItems();
-						assert.equal(aItems.length, 3, "Field: Select items lenght is OK");
+						assert.equal(aItems.length, 3, "Field: Select items length is OK");
 						assert.equal(aItems[0].getKey(), "key1", "Field: Select item 0 Key is OK");
 						assert.equal(aItems[0].getText(), "text1", "Field: Select item 0 Text is OK");
 						assert.equal(aItems[1].getKey(), "key2", "Field: Select item 1 Key is OK");
@@ -516,7 +516,7 @@ sap.ui.define([
 								EditorQunitUtils.isReady(oEditor).then(function () {
 									time = new Date().getTime() - start.getTime();
 									var aItems = oField.getAggregation("_field").getItems();
-									assert.equal(aItems.length, 3, "Field: Select items lenght is OK");
+									assert.equal(aItems.length, 3, "Field: Select items length is OK");
 									assert.equal(aItems[0].getKey(), "key1", "Field: Select item 0 Key is OK");
 									assert.equal(aItems[0].getText(), "text1", "Field: Select item 0 Text is OK");
 									assert.equal(aItems[1].getKey(), "key2", "Field: Select item 1 Key is OK");
@@ -550,7 +550,7 @@ sap.ui.define([
 											EditorQunitUtils.isReady(oEditor).then(function () {
 												time = new Date().getTime() - start.getTime();
 												var aItems = oField.getAggregation("_field").getItems();
-												assert.equal(aItems.length, 3, "Field: Select items lenght is OK");
+												assert.equal(aItems.length, 3, "Field: Select items length is OK");
 												assert.equal(aItems[0].getKey(), "key1", "Field: Select item 0 Key is OK");
 												assert.equal(aItems[0].getText(), "text1", "Field: Select item 0 Text is OK");
 												assert.equal(aItems[1].getKey(), "key2", "Field: Select item 1 Key is OK");
@@ -584,7 +584,7 @@ sap.ui.define([
 														EditorQunitUtils.isReady(oEditor).then(function () {
 															time = new Date().getTime() - start.getTime();
 															var aItems = oField.getAggregation("_field").getItems();
-															assert.equal(aItems.length, 3, "Field: Select items lenght is OK");
+															assert.equal(aItems.length, 3, "Field: Select items length is OK");
 															assert.equal(aItems[0].getKey(), "key1", "Field: Select item 0 Key is OK");
 															assert.equal(aItems[0].getText(), "text1", "Field: Select item 0 Text is OK");
 															assert.equal(aItems[1].getKey(), "key2", "Field: Select item 1 Key is OK");
@@ -618,7 +618,7 @@ sap.ui.define([
 																	EditorQunitUtils.isReady(oEditor).then(function () {
 																		time = new Date().getTime() - start.getTime();
 																		var aItems = oField.getAggregation("_field").getItems();
-																		assert.equal(aItems.length, 3, "Field: Select items lenght is OK");
+																		assert.equal(aItems.length, 3, "Field: Select items length is OK");
 																		assert.equal(aItems[0].getKey(), "key1", "Field: Select item 0 Key is OK");
 																		assert.equal(aItems[0].getText(), "text1", "Field: Select item 0 Text is OK");
 																		assert.equal(aItems[1].getKey(), "key2", "Field: Select item 1 Key is OK");
@@ -697,7 +697,7 @@ sap.ui.define([
 					EditorQunitUtils.isReady(oEditor).then(function () {
 						time = new Date().getTime() - start.getTime();
 						var aItems = oField.getAggregation("_field").getItems();
-						assert.equal(aItems.length, 4, "Field: Select items lenght is OK");
+						assert.equal(aItems.length, 4, "Field: Select items length is OK");
 						assert.equal(aItems[0].getKey(), "key1", "Field: Select item 0 Key is OK");
 						assert.equal(aItems[0].getText(), "text1req", "Field: Select item 0 Text is OK");
 						assert.equal(aItems[1].getKey(), "key2", "Field: Select item 1 Key is OK");
@@ -733,7 +733,7 @@ sap.ui.define([
 								EditorQunitUtils.isReady(oEditor).then(function () {
 									time = new Date().getTime() - start.getTime();
 									var aItems = oField.getAggregation("_field").getItems();
-									assert.equal(aItems.length, 4, "Field: Select items lenght is OK");
+									assert.equal(aItems.length, 4, "Field: Select items length is OK");
 									assert.equal(aItems[0].getKey(), "key1", "Field: Select item 0 Key is OK");
 									assert.equal(aItems[0].getText(), "text1req", "Field: Select item 0 Text is OK");
 									assert.equal(aItems[1].getKey(), "key2", "Field: Select item 1 Key is OK");
@@ -769,7 +769,7 @@ sap.ui.define([
 											EditorQunitUtils.isReady(oEditor).then(function () {
 												time = new Date().getTime() - start.getTime();
 												var aItems = oField.getAggregation("_field").getItems();
-												assert.equal(aItems.length, 4, "Field: Select items lenght is OK");
+												assert.equal(aItems.length, 4, "Field: Select items length is OK");
 												assert.equal(aItems[0].getKey(), "key1", "Field: Select item 0 Key is OK");
 												assert.equal(aItems[0].getText(), "text1req", "Field: Select item 0 Text is OK");
 												assert.equal(aItems[1].getKey(), "key2", "Field: Select item 1 Key is OK");
@@ -805,7 +805,7 @@ sap.ui.define([
 														EditorQunitUtils.isReady(oEditor).then(function () {
 															time = new Date().getTime() - start.getTime();
 															var aItems = oField.getAggregation("_field").getItems();
-															assert.equal(aItems.length, 4, "Field: Select items lenght is OK");
+															assert.equal(aItems.length, 4, "Field: Select items length is OK");
 															assert.equal(aItems[0].getKey(), "key1", "Field: Select item 0 Key is OK");
 															assert.equal(aItems[0].getText(), "text1req", "Field: Select item 0 Text is OK");
 															assert.equal(aItems[1].getKey(), "key2", "Field: Select item 1 Key is OK");
@@ -841,7 +841,7 @@ sap.ui.define([
 																	EditorQunitUtils.isReady(oEditor).then(function () {
 																		time = new Date().getTime() - start.getTime();
 																		var aItems = oField.getAggregation("_field").getItems();
-																		assert.equal(aItems.length, 4, "Field: Select items lenght is OK");
+																		assert.equal(aItems.length, 4, "Field: Select items length is OK");
 																		assert.equal(aItems[0].getKey(), "key1", "Field: Select item 0 Key is OK");
 																		assert.equal(aItems[0].getText(), "text1req", "Field: Select item 0 Text is OK");
 																		assert.equal(aItems[1].getKey(), "key2", "Field: Select item 1 Key is OK");
@@ -922,7 +922,7 @@ sap.ui.define([
 					EditorQunitUtils.isReady(oEditor).then(function () {
 						time = new Date().getTime() - start.getTime();
 						assert.ok(oEditor.isReady(), "Editor is ready");
-						assert.equal(oField.getAggregation("_field").getItems().length, 5, "Field: MultiComboBox items lenght is OK");
+						assert.equal(oField.getAggregation("_field").getItems().length, 5, "Field: MultiComboBox items length is OK");
 						assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 						EditorQunitUtils.wait().then(function () {
 							EditorQunitUtils.destroyEditor(oEditor);
@@ -950,7 +950,7 @@ sap.ui.define([
 								EditorQunitUtils.isReady(oEditor).then(function () {
 									time = new Date().getTime() - start.getTime();
 									assert.ok(oEditor.isReady(), "Editor is ready");
-									assert.equal(oField.getAggregation("_field").getItems().length, 5, "Field: MultiComboBox items lenght is OK");
+									assert.equal(oField.getAggregation("_field").getItems().length, 5, "Field: MultiComboBox items length is OK");
 									assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 									EditorQunitUtils.wait().then(function () {
 										EditorQunitUtils.destroyEditor(oEditor);
@@ -978,7 +978,7 @@ sap.ui.define([
 											EditorQunitUtils.isReady(oEditor).then(function () {
 												time = new Date().getTime() - start.getTime();
 												assert.ok(oEditor.isReady(), "Editor is ready");
-												assert.equal(oField.getAggregation("_field").getItems().length, 5, "Field: MultiComboBox items lenght is OK");
+												assert.equal(oField.getAggregation("_field").getItems().length, 5, "Field: MultiComboBox items length is OK");
 												assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 												EditorQunitUtils.wait().then(function () {
 													EditorQunitUtils.destroyEditor(oEditor);
@@ -1006,7 +1006,7 @@ sap.ui.define([
 														EditorQunitUtils.isReady(oEditor).then(function () {
 															time = new Date().getTime() - start.getTime();
 															assert.ok(oEditor.isReady(), "Editor is ready");
-															assert.equal(oField.getAggregation("_field").getItems().length, 5, "Field: MultiComboBox items lenght is OK");
+															assert.equal(oField.getAggregation("_field").getItems().length, 5, "Field: MultiComboBox items length is OK");
 															assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 															EditorQunitUtils.wait().then(function () {
 																EditorQunitUtils.destroyEditor(oEditor);
@@ -1033,7 +1033,7 @@ sap.ui.define([
 																	assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Field Ready " + count + ": " + time + "ms OK");
 																	EditorQunitUtils.isReady(oEditor).then(function () {
 																		time = new Date().getTime() - start.getTime();
-																		assert.equal(oField.getAggregation("_field").getItems().length, 5, "Field: MultiComboBox items lenght is OK");
+																		assert.equal(oField.getAggregation("_field").getItems().length, 5, "Field: MultiComboBox items length is OK");
 																		assert.ok(oEditor.isReady(), "Editor is ready");
 																		assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 																		EditorQunitUtils.wait().then(function () {
@@ -1107,7 +1107,7 @@ sap.ui.define([
 					EditorQunitUtils.isReady(oEditor).then(function () {
 						time = new Date().getTime() - start.getTime();
 						assert.ok(oEditor.isReady(), "Editor is ready");
-						assert.equal(oField.getAggregation("_field").getItems().length, 6, "Field: MultiComboBox items lenght is OK");
+						assert.equal(oField.getAggregation("_field").getItems().length, 6, "Field: MultiComboBox items length is OK");
 						assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 						EditorQunitUtils.wait().then(function () {
 							EditorQunitUtils.destroyEditor(oEditor);
@@ -1135,7 +1135,7 @@ sap.ui.define([
 								EditorQunitUtils.isReady(oEditor).then(function () {
 									time = new Date().getTime() - start.getTime();
 									assert.ok(oEditor.isReady(), "Editor is ready");
-									assert.equal(oField.getAggregation("_field").getItems().length, 6, "Field: MultiComboBox items lenght is OK");
+									assert.equal(oField.getAggregation("_field").getItems().length, 6, "Field: MultiComboBox items length is OK");
 									assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 									EditorQunitUtils.wait().then(function () {
 										EditorQunitUtils.destroyEditor(oEditor);
@@ -1163,7 +1163,7 @@ sap.ui.define([
 											EditorQunitUtils.isReady(oEditor).then(function () {
 												time = new Date().getTime() - start.getTime();
 												assert.ok(oEditor.isReady(), "Editor is ready");
-												assert.equal(oField.getAggregation("_field").getItems().length, 6, "Field: MultiComboBox items lenght is OK");
+												assert.equal(oField.getAggregation("_field").getItems().length, 6, "Field: MultiComboBox items length is OK");
 												assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 												EditorQunitUtils.wait().then(function () {
 													EditorQunitUtils.destroyEditor(oEditor);
@@ -1191,7 +1191,7 @@ sap.ui.define([
 														EditorQunitUtils.isReady(oEditor).then(function () {
 															time = new Date().getTime() - start.getTime();
 															assert.ok(oEditor.isReady(), "Editor is ready");
-															assert.equal(oField.getAggregation("_field").getItems().length, 6, "Field: MultiComboBox items lenght is OK");
+															assert.equal(oField.getAggregation("_field").getItems().length, 6, "Field: MultiComboBox items length is OK");
 															assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 															EditorQunitUtils.wait().then(function () {
 																EditorQunitUtils.destroyEditor(oEditor);
@@ -1219,7 +1219,7 @@ sap.ui.define([
 																	EditorQunitUtils.isReady(oEditor).then(function () {
 																		time = new Date().getTime() - start.getTime();
 																		assert.ok(oEditor.isReady(), "Editor is ready");
-																		assert.equal(oField.getAggregation("_field").getItems().length, 6, "Field: MultiComboBox items lenght is OK");
+																		assert.equal(oField.getAggregation("_field").getItems().length, 6, "Field: MultiComboBox items length is OK");
 																		assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 																		EditorQunitUtils.wait().then(function () {
 																			EditorQunitUtils.destroyEditor(oEditor);

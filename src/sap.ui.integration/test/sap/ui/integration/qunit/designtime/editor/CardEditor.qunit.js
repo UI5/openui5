@@ -408,8 +408,8 @@ sap.ui.define([
 
 					EditorQunitUtils.isReady(this.oCardEditor).then(function () {
 						assert.ok(this.oCardEditor.isReady(), "Card Editor is ready");
-						assert.equal(oCustomerField.getAggregation("_field").getItems().length, 4, "Field: DataGotFromExtensionRequest lenght is OK");
-						assert.equal(oEmployeeField.getAggregation("_field").getItems().length, 4, "Field: DataGotFromCardExtension lenght is OK");
+						assert.equal(oCustomerField.getAggregation("_field").getItems().length, 4, "Field: DataGotFromExtensionRequest length is OK");
+						assert.equal(oEmployeeField.getAggregation("_field").getItems().length, 4, "Field: DataGotFromCardExtension length is OK");
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -466,8 +466,8 @@ sap.ui.define([
 
 					EditorQunitUtils.isReady(this.oCardEditor).then(function () {
 						assert.ok(this.oCardEditor.isReady(), "Card Editor is ready");
-						assert.equal(oCustomerField.getAggregation("_field").getItems().length, 4, "Field: DataGotFromExtensionRequest lenght is OK");
-						assert.equal(oEmployeeField.getAggregation("_field").getItems().length, 4, "Field: DataGotFromCardExtension lenght is OK");
+						assert.equal(oCustomerField.getAggregation("_field").getItems().length, 4, "Field: DataGotFromExtensionRequest length is OK");
+						assert.equal(oEmployeeField.getAggregation("_field").getItems().length, 4, "Field: DataGotFromCardExtension length is OK");
 						resolve();
 					}.bind(this));
 				}.bind(this));
