@@ -421,9 +421,10 @@ sap.ui.define([
 		if (this._iResizeHandlerId) {
 			ResizeHandler.deregister(this._iResizeHandlerId);
 			this._iResizeHandlerId = null;
-			// reset anti-oscillation history
-			this._iLastAppliedContextualWidth = undefined;
 		}
+
+		// reset anti-oscillation history
+		this._iLastAppliedContextualWidth = undefined;
 	};
 
 	Table.prototype.onBeforeRendering = function() {
