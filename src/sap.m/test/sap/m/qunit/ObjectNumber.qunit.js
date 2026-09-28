@@ -668,4 +668,13 @@ sap.ui.define([
 		const sNumberText = this.oON.getDomRef().querySelector(".sapMObjectNumberText").textContent;
 		assert.strictEqual(sNumberText, "", "Number text is empty for '*' currency");
 	});
+
+	QUnit.test("Currency mode: unit span is rendered even when no unit is set", async function(assert) {
+		this.oON.setDisplayMode(ObjectNumberDisplayMode.Currency);
+		this.oON.setUnit("");
+		await nextUIUpdate();
+
+		assert.strictEqual(this.oON.getDomRef().querySelectorAll(".sapMObjectNumberUnit").length, 1,
+			"Unit span is rendered in Currency mode when unit is empty");
+	});
 });
