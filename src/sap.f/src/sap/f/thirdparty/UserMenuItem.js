@@ -1,11 +1,50 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/MenuItem2', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/parameters-bundle3.css', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/List', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/information'], (function (webcomponentsBase, MenuItem, parametersBundle_css, ManagedStyles, parametersBundle_css$1, Icons, eventStrict, parametersBundle_css$2, decline, List, toLowercaseEnumValue, ListItemGroup, ListItemBase, i18nDefaults, WrappingType, AccessibilityTextsHelper, ListItemTemplate, Button, willShowContent, Icon, Label, ValueState, ResponsivePopover, Title, FocusableElements, information) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/MenuItem2', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/List', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Popover', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/parameters-bundle3.css', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/nav-back', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/edit', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/ListItemCustom', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/information'], (function (webcomponentsBase, MenuItem, parametersBundle_css, ListItemTemplate, ResponsivePopover, Button, List, Icon, Popover, decline, ManagedStyles, parametersBundle_css$1, Icons, eventStrict, parametersBundle_css$2, navBack, InvisibleMessage, i18nDefaults, ListItemBase, edit, ValueState, AccessibilityTextsHelper, Label, Title, willShowContent, toLowercaseEnumValue, ListItemGroup, WrappingType, ListItemCustom, FocusableElements, information) { 'use strict';
 
     function UserMenuItemTemplate() {
+        if (this.isPhone) {
+            return phoneTemplate.call(this);
+        }
         const hooks = {};
         if (this.showSelection) {
             hooks.menuItemTextContent = userMenuItemTextContent;
         }
         return [MenuItem.MenuItemTemplate.call(this, hooks)];
+    }
+    function phoneTemplate() {
+        const hooks = {
+            iconBegin() {
+                if (this.hasIcon) {
+                    return parametersBundle_css.jsx(Icon.Icon, { class: "ui5-li-icon", name: this.icon });
+                }
+                if (this._siblingsWithIcon) {
+                    return parametersBundle_css.jsx("div", { class: "ui5-menu-item-dummy-icon" });
+                }
+            },
+            listItemContent() {
+                return (parametersBundle_css.jsxs(parametersBundle_css.Fragment, { children: [this.showSelection ? (parametersBundle_css.jsxs("div", { class: "ui5-user-menu-item-text-wrapper", children: [this.text && parametersBundle_css.jsx("div", { class: "ui5-menu-item-text", children: this.text }), this._selectedSubItemText &&
+                                    parametersBundle_css.jsx("div", { class: "ui5-user-menu-item-selection-text", children: this._selectedSubItemText })] })) : (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: this.text && parametersBundle_css.jsx("div", { class: "ui5-menu-item-text", children: this.text }) })), rightContent.call(this), checkmarkContent.call(this)] }));
+            },
+        };
+        return [
+            ListItemTemplate.ListItemTemplate.call(this, hooks),
+            phoneSubmenuPopover.call(this),
+        ];
+    }
+    function checkmarkContent() {
+        return !this._markChecked ? "" : (parametersBundle_css.jsx("div", { class: "ui5-menu-item-checked", children: parametersBundle_css.jsx(Icon.Icon, { name: ListItemTemplate.acceptIcon, class: "ui5-menu-item-icon-checked" }) }));
+    }
+    function rightContent() {
+        switch (true) {
+            case this.hasSubmenu:
+                return (parametersBundle_css.jsx("div", { class: "ui5-menu-item-submenu-icon", children: parametersBundle_css.jsx(Icon.Icon, { part: "subicon", name: ListItemTemplate.slimArrowRight, class: "ui5-menu-item-icon-end" }) }));
+            case this.hasEndContent:
+                return (parametersBundle_css.jsx("div", { class: "ui5-menu-item-end-content", role: "group", "aria-label": this.endContentAccessibleName, children: parametersBundle_css.jsx("slot", { name: "endContent", onKeyDown: this._endContentKeyDown }) }));
+            case !!this.additionalText:
+                return (parametersBundle_css.jsx("span", { part: "additional-text", class: "ui5-li-additional-text", "aria-hidden": this._accInfo.ariaHidden, children: this.additionalText }));
+        }
+    }
+    function phoneSubmenuPopover() {
+        return this.hasSubmenu && parametersBundle_css.jsxs(ResponsivePopover.ResponsivePopover, { id: `${this._id}-menu-rp`, class: "ui5-menu-rp ui5-menu-rp-sub-menu", preventInitialFocus: true, preventFocusRestore: true, hideArrow: true, allowTargetOverlap: true, placement: Popover.PopoverPlacement.End, verticalAlign: "Top", accessibleName: this.accessibleNameText, onBeforeOpen: this._beforePopoverOpen, onOpen: this._afterPopoverOpen, onBeforeClose: this._beforePopoverClose, onClose: this._afterPopoverClose, children: [parametersBundle_css.jsxs("div", { slot: "header", class: "ui5-menu-dialog-header", children: [parametersBundle_css.jsx(Button.Button, { icon: MenuItem.navBackIcon, class: "ui5-menu-back-button", design: "Transparent", "aria-label": this.labelBack, onClick: this._close }), parametersBundle_css.jsx("div", { class: "ui5-menu-dialog-title", children: parametersBundle_css.jsx("div", { children: this.text }) }), parametersBundle_css.jsx(Button.Button, { icon: decline.declineIcon, class: "ui5-menu-close-button", design: "Transparent", "aria-label": this.labelCancel, onClick: this._closeAll })] }), parametersBundle_css.jsx("div", { id: `${this._id}-menu-main`, class: this.loading ? "menu-busy-indicator-main" : "", "aria-busy": this.loading, children: this.items.length ? (parametersBundle_css.jsx(List.List, { id: `${this._id}-menu-list`, selectionMode: "None", separators: "None", accessibleRole: "Menu", loading: this.loading, loadingDelay: this.loadingDelay, onMouseOver: this._itemMouseOver, onKeyDown: this._itemKeyDown, onKeyUp: this._itemKeyUp, "onui5-close-menu": this._close, "onui5-exit-end-content": this._navigateOutOfEndContent, children: parametersBundle_css.jsx("slot", {}) })) : this.loading && parametersBundle_css.jsx(Button.BusyIndicator, { id: `${this._id}-menu-busy-indicator`, delay: this.loadingDelay, class: "ui5-menu-busy-indicator", active: true }) })] });
     }
     function userMenuItemTextContent() {
         return (parametersBundle_css.jsxs("div", { class: "ui5-user-menu-item-text-wrapper", children: [this.text && parametersBundle_css.jsx("div", { class: "ui5-menu-item-text", children: this.text }), this._selectedSubItemText &&
@@ -14,7 +53,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/MenuIte
 
     ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
     ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
-    var userMenuItemCss = `:host{height:2.5rem;min-height:2.5rem;border:none}.ui5-li-root{min-height:2.5rem}:host(:last-of-type){margin-bottom:0}:host(:first-of-type){margin-top:0}:host([show-selection]){height:3.25rem;min-height:3.25rem}:host([show-selection]) .ui5-li-root{min-height:3.25rem;padding-block:.5rem}.ui5-user-menu-item-text-wrapper{display:flex;flex-direction:column;gap:.25rem;overflow:hidden;flex:1;min-width:0}.ui5-user-menu-item-selection-text{font-family:var(--sapFontFamily);font-size:var(--sapFontSize);font-weight:400;color:var(--sapContent_LabelColor);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    var userMenuItemCss = `:host{height:2.5rem;min-height:2.5rem;border:none}.ui5-li-root{min-height:2.5rem}:host(:last-of-type){margin-bottom:0}:host(:first-of-type){margin-top:0}:host([show-selection]){height:3.25rem;min-height:3.25rem}:host([show-selection]) .ui5-li-root{min-height:3.25rem;padding-block:.5rem}.ui5-user-menu-item-text-wrapper{display:flex;flex-direction:column;gap:.25rem;overflow:hidden;flex:1;min-width:0}.ui5-user-menu-item-selection-text{font-family:var(--sapFontFamily);font-size:var(--sapFontSize);font-weight:400;color:var(--sapContent_LabelColor);white-space:normal;text-overflow:initial}.ui5-menu-close-button{margin-left:auto}
 `;
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {

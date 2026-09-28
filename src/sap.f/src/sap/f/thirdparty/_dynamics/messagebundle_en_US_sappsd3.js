@@ -13,6 +13,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	var FCL_MIDDLE_COLUMN_TXT = "[[[Μįƌƌĺē ċŏĺűɱŋ∙∙∙∙∙∙]]]";
 	var FCL_END_COLUMN_TXT = "[[[Ļąşţ ċŏĺűɱŋ∙∙∙∙∙∙∙∙]]]";
 	var FCL_START_SEPARATOR_TOOLTIP = "[[[Řēşįžē ƃēţŵēēŋ şţąŗţ ąŋƌ ɱįƌ ċŏĺűɱŋş∙∙∙∙∙∙∙∙∙∙∙∙]]]";
+	var FCL_START_ARROW_TOOLTIP = "[[[Ŝŵįţċĥ ƃēţŵēēŋ şţąŗţ ąŋƌ ɱįƌƌĺē ċŏĺűɱŋ ĺąŷŏűţş∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙]]]";
 	var FCL_END_SEPARATOR_TOOLTIP = "[[[Řēşįžē ƃēţŵēēŋ ɱįƌ ąŋƌ ēŋƌ ċŏĺűɱŋş∙∙∙∙∙∙∙∙∙∙∙]]]";
 	var NAVIGATION_MENU_POPOVER_HIDDEN_TEXT = "[[[Āƌƌįţįŏŋąĺ Ńąʋįğąţįŏŋ Ĭţēɱş∙∙∙∙∙∙∙∙]]]";
 	var NAVIGATION_MENU_SELECTABLE_ITEM_HIDDEN_TEXT = "[[[Ţĥįş ɱēŋű įţēɱ ŏρēŋş ą şűƃɱēŋű ąŋƌ ąĺşŏ ĺįŋķş ţŏ ą ρąğē. Ţŏ ğŏ ţŏ ţĥē ρąğē, ρŗēşş Ĕŋţēŗ ŏŗ ţĥē ŗįğĥţ ąŗŗŏŵ ķēŷ ţŏ ŏρēŋ ţĥē şűƃɱēŋű, ţĥēŋ şēĺēċţ ţĥē ƒįŗşţ įţēɱ įŋ ţĥē şűƃɱēŋű.∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙]]]";
@@ -51,10 +52,10 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	var UPLOADCOLLECTIONITEM_RETRY_BUTTON_TEXT = "[[[Řēţŗŷ∙∙∙∙∙∙∙∙∙]]]";
 	var UPLOADCOLLECTIONITEM_EDIT_BUTTON_TEXT = "[[[Ĕƌįţ]]]";
 	var UPLOADCOLLECTION_NO_DATA_TEXT = "[[[Ńŏ ƒįĺēş ƒŏűŋƌ∙∙∙∙∙]]]";
-	var UPLOADCOLLECTION_NO_DATA_DESCRIPTION = "[[[Ďŗŏρ ƒįĺēş ţŏ űρĺŏąƌ ţĥēɱ ŏŗ űşē ţĥē \"Ůρĺŏąƌ\" ƃűţţŏŋ.∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙]]]";
+	var UPLOADCOLLECTION_NO_DATA_DESCRIPTION = "[[[Ďŗŏρ ƒįĺēş ţŏ űρĺŏąƌ ţĥēɱ ŏŗ űşē ţĥē \"Ůρĺŏąƌ\" ƃűţţŏŋ∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙]]]";
 	var UPLOADCOLLECTION_ARIA_ROLE_DESCRIPTION = "[[[Ůρĺŏąƌ Ĉŏĺĺēċţįŏŋ∙∙∙∙∙∙∙]]]";
-	var UPLOADCOLLECTION_DRAG_FILE_INDICATOR = "[[[Ďŗąğ ƒįĺēş ĥēŗē.∙∙∙∙∙∙∙∙]]]";
-	var UPLOADCOLLECTION_DROP_FILE_INDICATOR = "[[[Ďŗŏρ ƒįĺēş ţŏ űρĺŏąƌ ţĥēɱ.∙∙∙∙∙∙∙]]]";
+	var UPLOADCOLLECTION_DRAG_FILE_INDICATOR = "[[[Ďŗąğ ƒįĺēş ĥēŗē∙∙∙∙]]]";
+	var UPLOADCOLLECTION_DROP_FILE_INDICATOR = "[[[Ďŗŏρ ƒįĺēş ţŏ űρĺŏąƌ ţĥēɱ∙∙∙∙∙∙∙]]]";
 	var SHELLBAR_LABEL = "[[[Ŝĥēĺĺ Ɓąŗ∙∙∙∙∙]]]";
 	var SHELLBAR_LOGO = "[[[Ļŏğŏ]]]";
 	var SHELLBAR_LOGO_AREA = "[[[{0} {1}]]]";
@@ -117,13 +118,13 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	var IM_SUBTITLE_NOMAIL = "[[[Ĉĥēċķ ƃąċķ ąğąįŋ ĺąţēŗ.∙∙∙∙∙∙]]]";
 	var IM_TITLE_NOENTRIES = "[[[Ţĥēŗē ąŗē ŋŏ ēŋţŗįēş ŷēţ∙∙∙∙∙∙]]]";
 	var IM_SUBTITLE_NOENTRIES = "[[[Ŵĥēŋ ţĥēŗē ąŗē, ŷŏű''ĺĺ şēē ţĥēɱ ĥēŗē.∙∙∙∙∙∙∙∙∙∙∙∙∙]]]";
-	var IM_TITLE_NONOTIFICATIONS = "[[[Ŷŏű''ʋē ŋŏ ŋŏţįƒįċąţįŏŋş∙∙∙∙∙∙]]]";
+	var IM_TITLE_NONOTIFICATIONS = "[[[Ŷŏű ƌŏ ŋŏţ ĥąʋē ąŋŷ ŋŏţįƒįċąţįŏŋş.∙∙∙∙∙∙∙∙∙∙∙]]]";
 	var IM_SUBTITLE_NONOTIFICATIONS = "[[[Ĉĥēċķ ƃąċķ ąğąįŋ ĺąţēŗ.∙∙∙∙∙∙]]]";
-	var IM_TITLE_NOSAVEDITEMS = "[[[Ŷŏű''ʋē ŋŏ ρįŋş∙∙∙∙∙]]]";
+	var IM_TITLE_NOSAVEDITEMS = "[[[Ŷŏű ƌŏ ŋŏţ ĥąʋē ąŋŷ ρįŋş.∙∙∙∙∙∙∙]]]";
 	var IM_SUBTITLE_NOSAVEDITEMS = "[[[Ŵŏűĺƌ ŷŏű ĺįķē ţŏ ąƌƌ ŏŋē ŋŏŵ?∙∙∙∙∙∙∙∙∙]]]";
 	var IM_TITLE_NOSEARCHRESULTS = "[[[Ŵē ċŏűĺƌ ŋŏţ ƒįŋƌ ţĥįş.∙∙∙∙∙∙]]]";
 	var IM_SUBTITLE_NOSEARCHRESULTS = "[[[Ţŗŷ ąƌĵűşţįŋğ ŷŏűŗ şēąŗċĥ.∙∙∙∙∙∙∙]]]";
-	var IM_TITLE_NOTASKS = "[[[Ŷŏű''ʋē ŋŏ ţąşķş∙∙∙∙]]]";
+	var IM_TITLE_NOTASKS = "[[[Ŷŏű ƌŏ ŋŏţ ĥąʋē ąŋŷ ţąşķş.∙∙∙∙∙∙∙]]]";
 	var IM_SUBTITLE_NOTASKS = "[[[Ŵĥēŋ ŷŏű ƌŏ, ŷŏű''ĺĺ şēē ţĥēɱ ĥēŗē.∙∙∙∙∙∙∙∙∙∙∙]]]";
 	var IM_TITLE_UNABLETOLOAD = "[[[Ůŋąƃĺē ţŏ ĺŏąƌ ƌąţą∙∙∙∙∙]]]";
 	var IM_SUBTITLE_UNABLETOLOAD = "[[[Ĉĥēċķ ŷŏűŗ įŋţēŗŋēţ ċŏŋŋēċţįŏŋ. Āŋƌ įƒ ţĥąţ''ş ŋŏţ įţ, ţŗŷ ŗēĺŏąƌįŋğ. Ĭƒ ţĥąţ şţįĺĺ ƌŏēşŋ''ţ ĥēĺρ, ċĥēċķ ŵįţĥ ŷŏűŗ ąƌɱįŋįşţŗąţŏŗ.∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙]]]";
@@ -171,6 +172,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	var DSC_SIDE_ARIA_LABEL = "[[[Ŝįƌē Ĉŏŋţēŋţ∙∙∙∙∙∙∙]]]";
 	var SEARCH_FIELD_SCOPE_SELECT_LABEL = "[[[Ŝēĺēċţ Ŝċŏρē∙∙∙∙∙∙∙]]]";
 	var SEARCH_FIELD_LABEL = "[[[Ŝēąŗċĥ Ƒįēĺƌ∙∙∙∙∙∙∙]]]";
+	var SEARCH_FIELD_PLACEHOLDER_WITH_SCOPE = "[[[Ŝēąŗċĥ įŋ: {0}]]]";
 	var SEARCH_FIELD_CLEAR_ICON = "[[[Ĉĺēąŗ Ŝēąŗċĥ∙∙∙∙∙∙∙]]]";
 	var SEARCH_FIELD_SEARCH_ICON = "[[[Ŝēąŗċĥ∙∙∙∙∙∙∙∙]]]";
 	var SEARCH_ITEM_SHOW_MORE_NO_COUNT = "[[[Ŝĥŏŵ Μŏŗē∙∙∙∙∙]]]";
@@ -205,9 +207,16 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	var USER_SETTINGS_DIALOG_ACCESSIBLE_NAME = "[[[Ůşēŗ Ŝēţţįŋğş∙∙∙∙∙∙]]]";
 	var USER_SETTINGS_LIST_ARIA_ROLE_DESC = "[[[Ůşēŗ Ŝēţţįŋğş Ĭţēɱ∙∙∙∙∙∙]]]";
 	var USER_SETTINGS_DIALOG_CLOSE_BUTTON_TEXT = "[[[Ĉĺŏşē∙∙∙∙∙∙∙∙∙]]]";
+	var USER_SETTINGS_DIALOG_SAVE_BUTTON_TEXT = "[[[Ŝąʋē]]]";
+	var USER_SETTINGS_DIALOG_CANCEL_BUTTON_TEXT = "[[[Ĉąŋċēĺ∙∙∙∙∙∙∙∙]]]";
 	var USER_SETTINGS_DIALOG_NO_SEARCH_RESULTS_TEXT = "[[[Ńŏ şēąŗċĥ ŗēşűĺţş∙∙∙∙∙∙∙]]]";
+	var USER_SETTINGS_DIALOG_SEARCH_NO_RESULTS = "[[[Ńŏ şēąŗċĥ ŗēşűĺţş∙∙∙∙∙∙∙]]]";
+	var USER_SETTINGS_DIALOG_SEARCH_ONE_RESULT = "[[[1 ŗēşűĺţ ąʋąįĺąƃĺē∙∙∙∙∙∙]]]";
+	var USER_SETTINGS_DIALOG_SEARCH_MORE_RESULTS = "[[[{0} ŗēşűĺţş ąŗē ąʋąįĺąƃĺē]]]";
 	var USER_SETTINGS_ACCOUNT_EDIT_AVATAR_TXT = "[[[Ĕƌįţ Āʋąţąŗ∙∙∙∙∙∙∙∙]]]";
 	var USER_SETTINGS_ACCOUNT_MANAGE_ACCOUNT_BUTTON_TXT = "[[[Μąŋąğē Āċċŏűŋţ∙∙∙∙∙]]]";
+	var USER_SETTINGS_NOTIFICATIONS_LIST_LABEL = "[[[Ļįşţ ŏƒ Ńŏţįƒįċąţįŏŋş Ţŷρē∙∙∙∙∙∙∙]]]";
+	var USER_SETTINGS_NOTIFICATIONS_PREFERENCES_LIST_LABEL = "[[[Ļįşţ ŏƒ Ńŏţįƒįċąţįŏŋş Ƥŗēƒēŗēŋċēş∙∙∙∙∙∙∙∙∙∙∙]]]";
 	var messagebundle_en_US_sappsd = {
 		BARCODE_SCANNER_DIALOG_CANCEL_BUTTON_TXT: BARCODE_SCANNER_DIALOG_CANCEL_BUTTON_TXT,
 		BARCODE_SCANNER_DIALOG_LOADING_TXT: BARCODE_SCANNER_DIALOG_LOADING_TXT,
@@ -222,6 +231,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 		FCL_MIDDLE_COLUMN_TXT: FCL_MIDDLE_COLUMN_TXT,
 		FCL_END_COLUMN_TXT: FCL_END_COLUMN_TXT,
 		FCL_START_SEPARATOR_TOOLTIP: FCL_START_SEPARATOR_TOOLTIP,
+		FCL_START_ARROW_TOOLTIP: FCL_START_ARROW_TOOLTIP,
 		FCL_END_SEPARATOR_TOOLTIP: FCL_END_SEPARATOR_TOOLTIP,
 		NAVIGATION_MENU_POPOVER_HIDDEN_TEXT: NAVIGATION_MENU_POPOVER_HIDDEN_TEXT,
 		NAVIGATION_MENU_SELECTABLE_ITEM_HIDDEN_TEXT: NAVIGATION_MENU_SELECTABLE_ITEM_HIDDEN_TEXT,
@@ -380,6 +390,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 		DSC_SIDE_ARIA_LABEL: DSC_SIDE_ARIA_LABEL,
 		SEARCH_FIELD_SCOPE_SELECT_LABEL: SEARCH_FIELD_SCOPE_SELECT_LABEL,
 		SEARCH_FIELD_LABEL: SEARCH_FIELD_LABEL,
+		SEARCH_FIELD_PLACEHOLDER_WITH_SCOPE: SEARCH_FIELD_PLACEHOLDER_WITH_SCOPE,
 		SEARCH_FIELD_CLEAR_ICON: SEARCH_FIELD_CLEAR_ICON,
 		SEARCH_FIELD_SEARCH_ICON: SEARCH_FIELD_SEARCH_ICON,
 		SEARCH_ITEM_SHOW_MORE_NO_COUNT: SEARCH_ITEM_SHOW_MORE_NO_COUNT,
@@ -414,9 +425,16 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 		USER_SETTINGS_DIALOG_ACCESSIBLE_NAME: USER_SETTINGS_DIALOG_ACCESSIBLE_NAME,
 		USER_SETTINGS_LIST_ARIA_ROLE_DESC: USER_SETTINGS_LIST_ARIA_ROLE_DESC,
 		USER_SETTINGS_DIALOG_CLOSE_BUTTON_TEXT: USER_SETTINGS_DIALOG_CLOSE_BUTTON_TEXT,
+		USER_SETTINGS_DIALOG_SAVE_BUTTON_TEXT: USER_SETTINGS_DIALOG_SAVE_BUTTON_TEXT,
+		USER_SETTINGS_DIALOG_CANCEL_BUTTON_TEXT: USER_SETTINGS_DIALOG_CANCEL_BUTTON_TEXT,
 		USER_SETTINGS_DIALOG_NO_SEARCH_RESULTS_TEXT: USER_SETTINGS_DIALOG_NO_SEARCH_RESULTS_TEXT,
+		USER_SETTINGS_DIALOG_SEARCH_NO_RESULTS: USER_SETTINGS_DIALOG_SEARCH_NO_RESULTS,
+		USER_SETTINGS_DIALOG_SEARCH_ONE_RESULT: USER_SETTINGS_DIALOG_SEARCH_ONE_RESULT,
+		USER_SETTINGS_DIALOG_SEARCH_MORE_RESULTS: USER_SETTINGS_DIALOG_SEARCH_MORE_RESULTS,
 		USER_SETTINGS_ACCOUNT_EDIT_AVATAR_TXT: USER_SETTINGS_ACCOUNT_EDIT_AVATAR_TXT,
-		USER_SETTINGS_ACCOUNT_MANAGE_ACCOUNT_BUTTON_TXT: USER_SETTINGS_ACCOUNT_MANAGE_ACCOUNT_BUTTON_TXT
+		USER_SETTINGS_ACCOUNT_MANAGE_ACCOUNT_BUTTON_TXT: USER_SETTINGS_ACCOUNT_MANAGE_ACCOUNT_BUTTON_TXT,
+		USER_SETTINGS_NOTIFICATIONS_LIST_LABEL: USER_SETTINGS_NOTIFICATIONS_LIST_LABEL,
+		USER_SETTINGS_NOTIFICATIONS_PREFERENCES_LIST_LABEL: USER_SETTINGS_NOTIFICATIONS_PREFERENCES_LIST_LABEL
 	};
 
 	exports.BARCODE_SCANNER_DIALOG_CANCEL_BUTTON_TXT = BARCODE_SCANNER_DIALOG_CANCEL_BUTTON_TXT;
@@ -433,6 +451,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	exports.FCL_END_COLUMN_TXT = FCL_END_COLUMN_TXT;
 	exports.FCL_END_SEPARATOR_TOOLTIP = FCL_END_SEPARATOR_TOOLTIP;
 	exports.FCL_MIDDLE_COLUMN_TXT = FCL_MIDDLE_COLUMN_TXT;
+	exports.FCL_START_ARROW_TOOLTIP = FCL_START_ARROW_TOOLTIP;
 	exports.FCL_START_COLUMN_TXT = FCL_START_COLUMN_TXT;
 	exports.FCL_START_SEPARATOR_TOOLTIP = FCL_START_SEPARATOR_TOOLTIP;
 	exports.IM_SUBTITLE_ACHIEVEMENT = IM_SUBTITLE_ACHIEVEMENT;
@@ -527,6 +546,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	exports.SEARCH_CANCEL_BUTTON = SEARCH_CANCEL_BUTTON;
 	exports.SEARCH_FIELD_CLEAR_ICON = SEARCH_FIELD_CLEAR_ICON;
 	exports.SEARCH_FIELD_LABEL = SEARCH_FIELD_LABEL;
+	exports.SEARCH_FIELD_PLACEHOLDER_WITH_SCOPE = SEARCH_FIELD_PLACEHOLDER_WITH_SCOPE;
 	exports.SEARCH_FIELD_SCOPE_SELECT_LABEL = SEARCH_FIELD_SCOPE_SELECT_LABEL;
 	exports.SEARCH_FIELD_SEARCH_ICON = SEARCH_FIELD_SEARCH_ICON;
 	exports.SEARCH_ITEM_DELETE_BUTTON_TOOLTIP = SEARCH_ITEM_DELETE_BUTTON_TOOLTIP;
@@ -597,9 +617,16 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	exports.USER_SETTINGS_ACCOUNT_EDIT_AVATAR_TXT = USER_SETTINGS_ACCOUNT_EDIT_AVATAR_TXT;
 	exports.USER_SETTINGS_ACCOUNT_MANAGE_ACCOUNT_BUTTON_TXT = USER_SETTINGS_ACCOUNT_MANAGE_ACCOUNT_BUTTON_TXT;
 	exports.USER_SETTINGS_DIALOG_ACCESSIBLE_NAME = USER_SETTINGS_DIALOG_ACCESSIBLE_NAME;
+	exports.USER_SETTINGS_DIALOG_CANCEL_BUTTON_TEXT = USER_SETTINGS_DIALOG_CANCEL_BUTTON_TEXT;
 	exports.USER_SETTINGS_DIALOG_CLOSE_BUTTON_TEXT = USER_SETTINGS_DIALOG_CLOSE_BUTTON_TEXT;
 	exports.USER_SETTINGS_DIALOG_NO_SEARCH_RESULTS_TEXT = USER_SETTINGS_DIALOG_NO_SEARCH_RESULTS_TEXT;
+	exports.USER_SETTINGS_DIALOG_SAVE_BUTTON_TEXT = USER_SETTINGS_DIALOG_SAVE_BUTTON_TEXT;
+	exports.USER_SETTINGS_DIALOG_SEARCH_MORE_RESULTS = USER_SETTINGS_DIALOG_SEARCH_MORE_RESULTS;
+	exports.USER_SETTINGS_DIALOG_SEARCH_NO_RESULTS = USER_SETTINGS_DIALOG_SEARCH_NO_RESULTS;
+	exports.USER_SETTINGS_DIALOG_SEARCH_ONE_RESULT = USER_SETTINGS_DIALOG_SEARCH_ONE_RESULT;
 	exports.USER_SETTINGS_LIST_ARIA_ROLE_DESC = USER_SETTINGS_LIST_ARIA_ROLE_DESC;
+	exports.USER_SETTINGS_NOTIFICATIONS_LIST_LABEL = USER_SETTINGS_NOTIFICATIONS_LIST_LABEL;
+	exports.USER_SETTINGS_NOTIFICATIONS_PREFERENCES_LIST_LABEL = USER_SETTINGS_NOTIFICATIONS_PREFERENCES_LIST_LABEL;
 	exports.VSD_CANCEL_BUTTON = VSD_CANCEL_BUTTON;
 	exports.VSD_DIALOG_TITLE_SORT = VSD_DIALOG_TITLE_SORT;
 	exports.VSD_FILTER_BY = VSD_FILTER_BY;

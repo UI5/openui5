@@ -40,7 +40,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/paramet
      *
      * **Note:** Although this slot accepts HTML Elements, it is strongly recommended that you only use text in order to preserve the intended design.
      */
-    let Label = Label_1 = class Label extends webcomponentsBase.S {
+    let Label = Label_1 = class Label extends webcomponentsBase.b {
         constructor() {
             super(...arguments);
             /**

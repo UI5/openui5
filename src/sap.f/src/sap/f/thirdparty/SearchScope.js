@@ -17,7 +17,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Managed
      * @since 2.9.0
      * @experimental
      */
-    let SearchScope = class SearchScope extends webcomponentsBase.S {
+    let SearchScope = class SearchScope extends webcomponentsBase.b {
         get stableDomRef() {
             return this.getAttribute("stable-dom-ref") || `${this._id}-stable-dom-ref`;
         }
