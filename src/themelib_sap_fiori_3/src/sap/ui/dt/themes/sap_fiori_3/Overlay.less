@@ -7,7 +7,20 @@
 	--_sap_ui_dt_Overlay_DropZoneBackgroundColor: ~'hsl(from var(--sapSelectedColor) h s l / .05)';
 	--_sap_ui_dt_Overlay_SelectionOutlineColor: var(--sapLegendColor7);
 	--_sap_ui_dt_Overlay_CuttedBorderColor: var(--sapLegendColor7);
+	--_sap_ui_dt_Overlay_FocusBorderColor: var(--sapLegendColor7);
 	--_sap_ui_dt_Overlay_HoverBackgroundColor: ~'hsl(from var(--sapLegendColor7) h s l / .05)';
+}
+
+.sapUiDtOverlayFocusable {
+
+	&:focus {
+
+		&::before {
+			outline: 0.125rem dotted var(--_sap_ui_dt_Overlay_FocusBorderColor); /* 2px */
+			border: none;
+			outline-offset: -0.25rem; /* 4px */
+		}
+	}
 }
 
 .sapUiDtOverlayDropZone {
