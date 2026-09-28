@@ -5,7 +5,6 @@
 sap.ui.define([
 	"sap/base/i18n/Localization",
 	"sap/ui/core/Control",
-	"sap/ui/core/Core",
 	"sap/base/util/deepClone",
 	"sap/base/util/deepEqual",
 	"sap/base/util/merge",
@@ -18,11 +17,7 @@ sap.ui.define([
 	"sap/ui/integration/util/Utils",
 	"sap/ui/integration/util/Destinations",
 	"sap/ui/integration/util/DataProviderFactory",
-	"sap/m/Label",
-	"sap/ui/core/Icon",
-	"sap/m/ResponsivePopover",
 	"sap/m/Popover",
-	"sap/m/Text",
 	"sap/base/Log",
 	"sap/ui/core/Popup",
 	"sap/base/i18n/ResourceBundle",
@@ -31,22 +26,18 @@ sap.ui.define([
 	"sap/base/util/LoaderExtensions",
 	"sap/ui/core/theming/Parameters",
 	"sap/base/util/ObjectPath",
-	"sap/m/FormattedText",
 	"sap/m/MessageStrip",
-	"sap/m/ToolbarSpacer",
 	"sap/ui/model/resource/ResourceModel",
 	"./Manifest",
 	"./Merger",
-	"./Settings",
 	"./Constants",
-	"sap/m/Button",
 	"sap/m/Tree",
 	"sap/m/StandardTreeItem",
-	"./EditorRenderer"
+	"./EditorRenderer",
+	"./EditorFieldManager"
 ], function(
 	Localization,
 	Control,
-	Core,
 	deepClone,
 	deepEqual,
 	merge,
@@ -59,11 +50,7 @@ sap.ui.define([
 	Utils,
 	Destinations,
 	DataProviderFactory,
-	Label,
-	Icon,
-	RPopover,
 	Popover,
-	Text,
 	Log,
 	Popup,
 	ResourceBundle,
@@ -72,18 +59,15 @@ sap.ui.define([
 	LoaderExtensions,
 	Parameters,
 	ObjectPath,
-	FormattedText,
 	MessageStrip,
-	Separator,
 	ResourceModel,
 	Manifest,
 	Merger,
-	Settings,
 	Constants,
-	Button,
 	Tree,
 	StandardTreeItem,
-	EditorRenderer
+	EditorRenderer,
+	EditorFieldManager
 ) {
 	"use strict";
 
@@ -1208,8 +1192,10 @@ sap.ui.define([
 			that._applyDesigntimeLayers(); //changes done from admin to content on the dt values
 			return that._requestExtensionData();
 		}).then(function () {
-			that._requireFields().then(function () {
-				that._startEditor();
+			EditorFieldManager.requireFields().then(function () {
+				// TODO: Editor.Fields is never read anywhere — remove this line
+				Editor.Fields = EditorFieldManager.Fields;
+				EditorFieldManager.startEditor(that);
 			});
 		});
 	};
@@ -1696,327 +1682,17 @@ sap.ui.define([
 		return Promise.resolve();
 	};
 
-	//map editors for a specific type
-	Editor.fieldMap = {
-		"string": "sap/ui/integration/editor/fields/StringField",
-		"string[]": "sap/ui/integration/editor/fields/StringListField",
-		"integer": "sap/ui/integration/editor/fields/IntegerField",
-		"number": "sap/ui/integration/editor/fields/NumberField",
-		"boolean": "sap/ui/integration/editor/fields/BooleanField",
-		"date": "sap/ui/integration/editor/fields/DateField",
-		"datetime": "sap/ui/integration/editor/fields/DateTimeField",
-		"object": "sap/ui/integration/editor/fields/ObjectField",
-		"object[]": "sap/ui/integration/editor/fields/ObjectListField",
-		"destination": "sap/ui/integration/editor/fields/DestinationField",
-		"group": "sap/ui/integration/editor/fields/GroupField"
-	};
-	Editor.Fields = null;
 	/**
-	 * Loads all field modules registered in Editor.fieldMap and stores the classes in Editor.Fields
+	 * Returns (or lazily creates) the description popover for the editor
+	 *
+	 * @param {sap.ui.integration.editor.Editor} oEditor
+	 * @returns {sap.m.ResponsivePopover}
 	 */
-	Editor.prototype._requireFields = function () {
-		if (Editor.Fields) {
-			return Promise.resolve();
-		}
-		return new Promise(function (resolve) {
-			sap.ui.require(Object.values(Editor.fieldMap), function () {
-				Editor.Fields = {};
-				for (var n in Editor.fieldMap) {
-					Editor.Fields[n] = arguments[Object.keys(Editor.fieldMap).indexOf(n)];
-				}
-
-				const aFieldsDependencies = [];
-
-				for (const FieldClass of Object.values(Editor.Fields)) {
-					if (FieldClass.loadDependencies) {
-						aFieldsDependencies.push(FieldClass.loadDependencies());
-					}
-				}
-
-				Promise.all(aFieldsDependencies).then(resolve);
-			});
-		});
-	};
-
-	Editor.prototype._createDescription = function (oConfig, sParameterKey) {
-		var oDescIcon = new Icon(this.getId() + "_" + sParameterKey + "_description_icon", {
-			src: "sap-icon://message-information",
-			color: "Marker",
-			size: "12px",
-			useIconTooltip: false,
-			visible: typeof oConfig.visible === "boolean" ? "{currentSettings>visible}" : oConfig.visible,
-			objectBindings: {
-				currentSettings: {
-					path: "currentSettings>" + oConfig._settingspath
-				},
-				items: {
-					path: "items>/form/items"
-				},
-				context: {
-					path: "context>/"
-				}
-			}
-		});
-		oDescIcon.addStyleClass("sapUiIntegrationEditorDescriptionIcon");
-		oDescIcon.onmouseover = function (oDescIcon) {
-			oDescIcon.addDependent(this._getPopover());
-			this._getPopover().getContent()[0].applySettings({ text: oConfig.description });
-			this._getPopover().openBy(oDescIcon);
-		}.bind(this, oDescIcon);
-		oDescIcon.onmouseout = function (oDescIcon) {
-			this._getPopover().close();
-			oDescIcon.removeDependent(this._getPopover());
-		}.bind(this, oDescIcon);
-		return oDescIcon;
-	};
-
-	Editor.prototype._createMessageIcon = function (oField, sParameterKey) {
-		var oConfig = oField.getConfiguration();
-		var oMsgIcon = new Icon(this.getId() + "_" + sParameterKey + "_message_icon", {
-			src: "sap-icon://message-information",
-			size: "12px",
-			visible: typeof oConfig.visible === "boolean" ? "{currentSettings>visible}" : oConfig.visible,
-			useIconTooltip: false,
-			objectBindings: {
-				currentSettings: {
-					path: "currentSettings>" + oConfig._settingspath
-				},
-				items: {
-					path: "items>/form/items"
-				},
-				context: {
-					path: "context>/"
-				}
-			}
-		});
-		oMsgIcon.onmouseover = function (oField) {
-			oField._showMessage();
-		}.bind(this, oField);
-		oMsgIcon.onmouseout = function (oField) {
-			oField._hideMessage();
-		}.bind(this, oField);
-		oMsgIcon.addStyleClass("sapUiIntegrationEditorMessageIcon");
-		return oMsgIcon;
-	};
-
-	/**
-	 * Creates a label based on the configuration settings
-	 * @param {object} oConfig
-	 * @param {string} sParameterKey
-	 */
-	Editor.prototype._createLabel = function (oConfig, sParameterKey) {
-		var oLabel = new Label(this.getId() + "_" + sParameterKey + "_label", {
-			text: oConfig.label,
-			tooltip: oConfig.tooltip || oConfig.label,
-			//mark only fields that are required and editable,
-			//otherwise this is confusing because user will not be able to correct it
-			required: oConfig.required && oConfig.editable || false,
-			visible: typeof oConfig.visible === "boolean" ? "{currentSettings>visible}" : oConfig.visible,
-			objectBindings: {
-				currentSettings: {
-					path: "currentSettings>" + oConfig._settingspath
-				},
-				items: {
-					path: "items>/form/items"
-				},
-				context: {
-					path: "context>/"
-				}
-			}
-		});
-		oLabel._cols = oConfig.cols || 2; //by default 2 cols
-		if (oConfig.layout) {
-			oLabel._layout = oConfig.layout;
-		}
-		oLabel._sOriginalType = oConfig.type;
-		return oLabel;
-	};
-
-	/**
-	 * Create the settings button
-	 */
-	 Editor.prototype._createSettingsButton = function (oField, sParameterKey) {
-		var oConfig = oField.getConfiguration();
-		var oSettingsButton = new Button(this.getId() + "_" + sParameterKey + "_settings_btn", {
-			icon: "{= ${currentSettings>_hasDynamicValue} ? 'sap-icon://display-more' : 'sap-icon://enter-more'}",
-			type: "Transparent",
-			tooltip: this._oResourceBundle.getText("EDITOR_FIELD_MORE_SETTINGS"),
-			press: function (oEvent) {
-				this._openSettingsDialog(200, oEvent.oSource, oField);
-			}.bind(this),
-			visible: typeof oConfig.visible === "boolean" ? "{currentSettings>visible}" : oConfig.visible,
-			objectBindings: {
-				currentSettings: {
-					path: "currentSettings>" + oConfig._settingspath
-				},
-				items: {
-					path: "items>/form/items"
-				},
-				context: {
-					path: "context>/"
-				}
-			}
-		});
-		return oSettingsButton;
-	};
-
-	Editor.prototype._getSettingsPanel = function (oField) {
-		if (!oField._oSettingsPanel) {
-			oField._oSettingsPanel = new Settings();
-		}
-		return oField._oSettingsPanel;
-	};
-
-	Editor.prototype._openSettingsDialog = function (iDelay, oSettingsButton, oField) {
-		var oSettingsPanel = this._getSettingsPanel(oField);
-		window.setTimeout(function () {
-			oSettingsPanel.setConfiguration(oField.getConfiguration());
-			oSettingsPanel.open(
-				oSettingsButton,
-				oSettingsButton,
-				this,
-				oField.getHost(),
-				oField,
-				oField._applySettings.bind(oField),
-				oField._cancelSettings.bind(oField));
-		}.bind(this), iDelay || 600);
-	};
-
 	Editor.prototype._getPopover = function () {
-		if (this._oPopover) {
-			return this._oPopover;
+		if (!this._oPopover) {
+			this._oPopover = EditorFieldManager.getPopover(this);
 		}
-		var oText = new Text({
-			text: ""
-		});
-		oText.addStyleClass("sapUiTinyMargin sapUiIntegrationEditorDescriptionText");
-		this._oPopover = new RPopover(this.getId() + "_popover", {
-			showHeader: false,
-			content: [oText]
-		});
-		this._oPopover.addStyleClass("sapUiIntegrationEditorPopover");
 		return this._oPopover;
-	};
-
-	/**
-	 * Creates a Field based on the configuration settings
-	 * @param {object} oConfig
-	 * @param {string} sParameterKey
-	 */
-	Editor.prototype._createField = function (oConfig, sParameterKey) {
-		var oField = new Editor.Fields[oConfig.type](this.getId() + "_" + sParameterKey + "_field", {
-			configuration: oConfig,
-			mode: this.getMode(),
-			host: this.getHostInstance(),
-			parameterKey: sParameterKey,
-			objectBindings: {
-				currentSettings: {
-					path: "currentSettings>" + oConfig._settingspath
-				},
-				items: {
-					path: "items>/form/items"
-				},
-				context: {
-					path: "context>/"
-				},
-				destinations: {
-					path: "destinations>/"
-				}
-			},
-			visible: typeof oConfig.visible === "boolean" ? "{currentSettings>visible}" : oConfig.visible
-		});
-		oField.setAssociation("_editor", this);
-
-		this._aFieldReadyPromise.push(oField._readyPromise.then(function() {
-			// for group field, will do nothing else
-			if (oConfig.type !== "group") {
-				if (oConfig.require
-					|| oConfig.validation
-					|| (oConfig.validations && oConfig.validations.length > 0)
-					|| (oConfig.values && oConfig.values.data && !oConfig.values.data.json)) {
-					var oMsgIcon = this._createMessageIcon(oField, sParameterKey);
-					oField.setAssociation("_messageIcon", oMsgIcon);
-				}
-				if (oConfig.description && this.getMode() !== Constants.EDITOR_MODE.TRANSLATION) {
-					oField._descriptionIcon = this._createDescription(oConfig, sParameterKey);
-				}
-				if (oConfig._changeDynamicValues) {
-					oField._settingsButton = this._createSettingsButton(oField, sParameterKey);
-					oField._applyButtonStyles();
-				}
-			}
-		}.bind(this)));
-		if (oConfig.type !== "group") {
-			// listen to value changes on the settings
-			oField._oValueBinding = this._oSettingsModel.bindProperty(oConfig._settingspath + "/value");
-			oField._oValueBinding.attachChange(function () {
-				if (!this._bIgnoreUpdates) {
-					oConfig._changed = true;
-					if (oConfig._dependentFields && oConfig._dependentFields.length > 0) {
-						this._updateEditor(oConfig._dependentFields);
-					}
-					this._updatePreview();
-				}
-			}.bind(this));
-			if (oField.isFilterBackend()) {
-				// listen to suggest value changes on the settings if current field support filter backend feature
-				var oSuggestValueBinding = this._oSettingsModel.bindProperty(oConfig._settingspath + "/suggestValue");
-				oSuggestValueBinding.attachChange(function () {
-					var oConfigTemp = merge({}, oConfig);
-					oConfigTemp._cancel = false;
-					this._addValueListModel(oConfigTemp, oField);
-				}.bind(this));
-			}
-			if (oConfig.values) {
-				// load metadata
-				if (oConfig.values.metadata) {
-					this._addMetadataModel(oConfig, oField);
-				}
-				// for MultiInput used in string[] field with filter backend, do not request data when creating it
-				if (oConfig.type === "string[]" && oField.isFilterBackend() && oConfig.visualization && oConfig.visualization.type === "MultiInput") {
-					oField.setModel(new JSONModel({}), undefined);
-				} else {
-					var pGetFieldData = Utils.timeoutPromise(this._addValueListModel(oConfig, oField));
-					pGetFieldData = pGetFieldData
-						.catch(function (sReason) {
-							Log.error("sap.ui.integration.editor.Editor: get data of field " + sParameterKey + " could not be resolved. Reason: " + sReason);
-						});
-
-					this._aFieldDataReadyPromise.push(pGetFieldData);
-				}
-			}
-			this._createDependentFields(oConfig, oField);
-			oField._oDataProviderFactory = this._oDataProviderFactory;
-		}
-		oField._cols = oConfig.cols || 2; //by default 2 cols
-		if (oConfig.layout) {
-			oField._layout = oConfig.layout;
-		}
-		oField._oEditorResourceBundles = this._oEditorResourceBundles;
-		oField.setAssociation("_messageStrip", MessageStripId);
-		return oField;
-	};
-
-	Editor.prototype._updateEditor = function (aDependentFields) {
-		if (this._fieldReady) {
-			if (aDependentFields.length === 0) {
-				return;
-			}
-			for (var i = 0; i < aDependentFields.length; i++) {
-				var o = aDependentFields[i];
-				o.config._cancel = true;
-			}
-			if (!this._oDataProviderFactory) {
-				return;
-			}
-			this._bIgnoreUpdates = true;
-			for (var i = 0; i < aDependentFields.length; i++) {
-				var o = aDependentFields[i];
-				o.config._cancel = false;
-				this._addValueListModel(o.config, o.field, 500 * i);
-			}
-			this._bIgnoreUpdates = false;
-		}
 	};
 
 	/**
@@ -2085,11 +1761,11 @@ sap.ui.define([
 				    results = [],
 					selResults = [],
 					selItemsResults = [];
-				this.prepareFieldsInKey(oConfig);
+				EditorFieldManager.prepareFieldsInKey(this, oConfig);
 				if (paValues.length > 0) {
 					for (var i = 0; i < paValues.length; i++) {
 						for (var j = 0; j < tResult.length; j++) {
-							var keyValue = this.getKeyFromItem(tResult[j]);
+							var keyValue = EditorFieldManager.getKeyFromItem(this, tResult[j]);
 							if (paValues[i] === keyValue) {
 								results.push(tResult[j]);
 							}
@@ -2101,7 +1777,7 @@ sap.ui.define([
 								}
 							}
 							for (var l = 0; l < selValueItems.length; l++) {
-								var kValue = this.getKeyFromItem(selValueItems[l]);
+								var kValue = EditorFieldManager.getKeyFromItem(this, selValueItems[l]);
 								if (paValues[i] === kValue) {
 									selItemsResults.push(selValueItems[l]);
 								}
@@ -2335,7 +2011,7 @@ sap.ui.define([
 				oValueModel = this.getAggregation("_extension").getModel();
 				//filter data for page admin
 				if (oValueModel && this.getMode() === Constants.EDITOR_MODE.CONTENT && oConfig.pageAdminValues && oConfig.pageAdminValues.length > 0) {
-					this.prepareFieldsInKey(oConfig);
+					EditorFieldManager.prepareFieldsInKey(this, oConfig);
 					var ePath = oConfig.values.path;
 					if (ePath.length > 1) {
 						ePath = ePath.substring(1);
@@ -2345,7 +2021,7 @@ sap.ui.define([
 						results = [];
 					for (var m = 0; m < paValues.length; m++) {
 						for (var j = 0; j < oValueData.length; j++) {
-							var keyValue = this.getKeyFromItem(oValueData[j]);
+							var keyValue = EditorFieldManager.getKeyFromItem(this, oValueData[j]);
 							if (paValues[m] === keyValue) {
 								results.push(oValueData[j]);
 							}
@@ -2397,44 +2073,6 @@ sap.ui.define([
 		}
 	};
 
-	Editor.prototype._createDependentFields = function (oConfig, oField) {
-		if (oConfig.values) {
-			var sData = JSON.stringify(oConfig.values.data);
-			if (sData) {
-				var destParamRegExp = /parameters\.([^\}\}]+)|destinations\.([^\}\}]+)|\{items\>[\/?\w+]+\}/g,
-					aResult = sData.match(destParamRegExp);
-				if (aResult) {
-					//add the field to dependency to either the parameter or destination
-					for (var i = 0; i < aResult.length; i++) {
-						var sValueKey = "/value";
-						var sDependentPath = this.getConfigurationPath();
-						if (aResult[i].indexOf("destinations.") === 0 || aResult[i].indexOf("parameters.") === 0) {
-							if (aResult[i].indexOf("destinations.") === 0) {
-								sValueKey = "/name";
-							}
-							sDependentPath = sDependentPath + "/" + aResult[i].replace(".", "/") + sValueKey;
-						} else if (aResult[i].indexOf("{items>") === 0) {
-							sDependentPath = sDependentPath + "/parameters/" + aResult[i].slice(7, -1);
-						}
-						var oItem = this._mItemsByPaths[sDependentPath];
-						if (oItem) {
-							//DIGITALWORKPLACE-4802
-							//clone the config since the item may dependent to itself in filter backend feature
-							if (oItem._settingspath === oConfig._settingspath) {
-								oConfig = merge({}, oConfig);
-							}
-							oItem._dependentFields = oItem._dependentFields || [];
-							oItem._dependentFields.push({
-								field: oField,
-								config: oConfig
-							});
-						}
-					}
-				}
-			}
-		}
-	};
-
 	Editor.prototype.getTranslationValueInTexts = function (sLanguage, sManifestPath) {
 		var sTranslationPath = "/texts/" + sLanguage;
 		var oProperty = this._oSettingsModel.getProperty(sTranslationPath) || {};
@@ -2457,172 +2095,10 @@ sap.ui.define([
 		this._oSettingsModel.setProperty(sTranslationPath, oTexts);
 	};
 
-	/**
-	 * Adds an item to the _formContent aggregation based on the config settings
-	 * @param {object} oConfig
-	 * @param {string} sParameterKey
-	 */
-	 Editor.prototype._addItem = function (oConfig, sParameterKey) {
-		var sMode = this.getMode();
-		//force to turn off features for settings and dynamic values and set the default if not configured
-		if (this.getAllowDynamicValues() === false || !oConfig.allowDynamicValues) {
-			oConfig.allowDynamicValues = false;
-		}
-		if (this.getAllowSettings() === false) {
-			oConfig.allowSettings = false;
-		}
-		oConfig.__cols = oConfig.cols || 2;
-
-		//if the item is not visible or translation mode, continue immediately
-		if (oConfig.visible === false || (!oConfig.translatable && sMode === Constants.EDITOR_MODE.TRANSLATION && oConfig.type !== "group")) {
-			return;
-		}
-		//display subPanel as iconTabBar or Panel
-		if (oConfig.type === "group") {
-			oConfig.expanded = oConfig.expanded !== false;
-			var oField = this._createField(oConfig, sParameterKey);
-			this.addAggregation("_formContent", oField);
-			if (oConfig.hint) {
-				this._addHint(oConfig.hint, this.getId() + "_" + sParameterKey);
-			}
-			return;
-		}
-		if (oConfig.type === "separator") {
-			var oSeparator = new Separator();
-			this.addAggregation("_formContent", oSeparator);
-			//currently do not publish the line property to customer
-			//oSeparator._hasLine = oConfig.line || false;
-			return;
-		}
-		var oNewLabel = null;
-		var sLanguage = Utils._language;
-		if (!Editor._oLanguages[sLanguage] && sLanguage.indexOf("-") > -1) {
-			sLanguage = sLanguage.substring(0, sLanguage.indexOf("-"));
-		}
-		if (sMode === Constants.EDITOR_MODE.TRANSLATION) {
-			if (oConfig.type !== "string") {
-				return;
-			}
-			if ((typeof oConfig.value === "string" && oConfig.value.indexOf("{") === 0) || typeof oConfig.values !== "undefined") {
-				//do not show dynamic values for translation
-				return;
-			}
-			//adding an internal _language object to save the original value for the UI
-			oConfig._language = {
-				value: oConfig.value
-			};
-
-			//force a 2 column layout in the form, remember the original to reset
-
-			oConfig.cols = 1;
-			//delete values property of string field
-			delete oConfig.values;
-
-			//create a configuration clone. map the _settingspath setting to _language, and set it to not editable
-			var origLangFieldConfig = deepClone(oConfig, 500);
-			origLangFieldConfig._settingspath += "/_language";
-			origLangFieldConfig.editable = false;
-			origLangFieldConfig.required = false;
-			//if has value transaltions, get value via language setting in core
-			if (Editor._oLanguages[sLanguage]) {
-				var sTranslateText = this.getTranslationValueInTexts(sLanguage, oConfig.manifestpath);
-				if (sTranslateText) {
-					origLangFieldConfig.value = sTranslateText;
-				}
-			}
-			if (!origLangFieldConfig.value) {
-				//the original language field shows only a text control. If empty we show a dash to avoid empty text.
-				origLangFieldConfig.value = "-";
-			}
-			var oLabel = this._createLabel(origLangFieldConfig, sParameterKey);
-			this.addAggregation("_formContent",
-				oLabel
-			);
-			var oOrigLanguageField = this._createField(origLangFieldConfig, sParameterKey + "_ori");
-			oOrigLanguageField.isOrigLangField = true;
-			this.addAggregation("_formContent", oOrigLanguageField);
-
-			//even if a item is not visible or not editable by another layer for translations it should always be editable and visible
-			oConfig.editable = oConfig.visible = oConfig.translatable;
-			sLanguage = this._language;
-			if (!this._oBeforeLayerChange[oConfig.manifestpath]) {
-				oConfig.value = oConfig._translatedValue || "";
-			}
-			var sTranslateText = this.getTranslationValueInTexts(sLanguage, oConfig.manifestpath);
-			if (sTranslateText) {
-				oConfig.value = sTranslateText;
-			}
-			//change the label for the translation field
-			oConfig.label = oConfig._translatedLabel || "";
-			oConfig.required = false; //translation is never required
-			var oTranslateLanguageField = this._createField(oConfig, sParameterKey + "_trans");
-			//accessibility set aria-label
-			var tfDelegate = {
-				onAfterRendering: function(oEvent) {
-					var tfField = document.getElementById(oTranslateLanguageField.getId());
-					tfField.setAttribute("aria-label", oLabel);
-				}
-			};
-			oTranslateLanguageField.addEventDelegate(tfDelegate);
-			this.addAggregation("_formContent",
-				oTranslateLanguageField
-			);
-		} else {
-			oNewLabel = this._createLabel(oConfig, sParameterKey);
-			this.addAggregation("_formContent",
-				oNewLabel
-			);
-			var sBeforeLayerChange = this._oBeforeLayerChange[oConfig.manifestpath];
-			if (sBeforeLayerChange) {
-				oConfig._beforeLayerChange = sBeforeLayerChange;
-			}
-			//if there are changes for the current layer, read the already translated value from there
-			//now merge these changes for translation into the item configs
-			if (this._oCurrentLayerChange && this._oCurrentLayerChange[oConfig.manifestpath]) {
-				oConfig.value = this._oCurrentLayerChange[oConfig.manifestpath];
-				oConfig._beforeLayerChange = oConfig.value;
-			}
-			//only get translations of string fields
-			if (oConfig.type === "string" && Editor._oLanguages[sLanguage]) {
-				var sTranslateText = this.getTranslationValueInTexts(sLanguage, oConfig.manifestpath);
-				if (sTranslateText) {
-					oConfig.value = sTranslateText;
-				}
-			}
-			var oField = this._createField(oConfig, sParameterKey);
-			//accessibility set aria-label
-			var fDelegate = {
-				onAfterRendering: function(oEvent) {
-					var eField = document.getElementById(oField.getId());
-					eField.setAttribute("aria-label", oNewLabel);
-				}
-			};
-			oField.addEventDelegate(fDelegate);
-			this.addAggregation("_formContent",
-				oField
-			);
-		}
-		//add hint in the new row.
-		if (oConfig.hint && (!oConfig.cols || oConfig.cols === 2)) {
-			this._addHint(oConfig.hint, this.getId() + "_" + sParameterKey);
-		}
-		//reset the cols to original
-		oConfig.cols = oConfig.__cols;
-		delete oConfig.__cols;
-	};
-
 	Editor.prototype._createHint = function (sHint, sHintIdPrefix) {
-		sHint = sHint.replace(/<a href/g, "<a target='blank' href");
-		var oFormattedText = new FormattedText(sHintIdPrefix + "_hint", {
-			htmlText: sHint
-		});
-		return oFormattedText;
+		return EditorFieldManager.createHint(sHint, sHintIdPrefix);
 	};
 
-	Editor.prototype._addHint = function (sHint, sHintIdPrefix) {
-		var oHint = this._createHint(sHint, sHintIdPrefix);
-		this.addAggregation("_formContent", oHint);
-	};
 	/**
 	 * Returns the current language specific text for a given key or "" if no translation for the key exists
 	 */
@@ -2708,277 +2184,6 @@ sap.ui.define([
 		return aFallbacks;
 	};
 
-	/**
-	 * Starts the editor, creates the fields
-	 */
-	Editor.prototype._startEditor = function () {
-		var oContents = this.getAggregation("_formContent");
-		if (oContents && oContents.length > 0) {
-			this.destroyAggregation("_formContent");
-		}
-
-		var oSettingsData = this._oSettingsModel.getData();
-		var oItems;
-		if (oSettingsData.form && oSettingsData.form.items) {
-			oItems = oSettingsData.form.items;
-			// ### check if need to add general configuration group ###
-			// since the items had already reordered in _addDestinationSettings function according by this._bDestinationGroupAtTop,
-			// if destination group is at top:
-			//    a. check item from 2nd position (the 1st item is the destination group itme)
-			//    b. if item is a destination item, set iInsertPosition to current position number, then check the next item
-			//    c. if item is a group and not a sub group, break, no need to add general configuration group
-			//    d. if item is not a group and visible is true, which means it is a valid item, so need to add general configuration group, or check the next item
-			// if destination group is NOT at top:
-			//    a. check item from 1st position
-			//    b. if item is destination item, which means no parameters exist(items sorted in _addDestinationSettings), no need to add general configuration group
-			//    c. if item is a group and not a sub group, break, no need to add general configuration group
-			//    d. if item is not a group and visible is true, which means it is a valid item, so need to add general configuration group, or check the next item
-			var bAddGeneralSettingsPanel = false,
-				iStartIndex = this._bDestinationGroupAtTop ? 1 : 0,
-				aKeys = Object.keys(oItems),
-				iLength = aKeys.length,
-				iInsertPosition = 0;
-			for (var i = iStartIndex; i < iLength; i++) {
-				var oItem = oItems[aKeys[i]];
-				if (oItem.type === "destination") {
-					if (!this._bDestinationGroupAtTop) {
-						break;
-					}
-					iInsertPosition = i;
-					continue;
-				} else if (oItem.type === "group" && oItem.level !== "1") {
-					break;
-				} else if (oItem.visible) {
-					bAddGeneralSettingsPanel = true;
-					break;
-				}
-			}
-			if (bAddGeneralSettingsPanel) {
-				var oGeneralPanel = {
-					type: "group",
-					translatable: true,
-					expanded: true,
-					label: this._oResourceBundle.getText("EDITOR_PARAMETERS_GENERALSETTINGS"),
-					_settingspath: "/form/items/generalPanel"
-				};
-				//insert general settings panel in position iInsertPosition
-				if (this._bDestinationGroupAtTop) {
-					var oNewItems = {};
-					var iPosition = 0;
-					aKeys.forEach(function(sKey) {
-						oNewItems[sKey] = oItems[sKey];
-						if (iPosition === iInsertPosition) {
-							oNewItems["generalPanel"] = oGeneralPanel;
-						}
-						iPosition++;
-					});
-					oItems = oNewItems;
-				} else {
-					oItems = merge(
-						{
-							"generalPanel": oGeneralPanel
-						}, oItems
-					);
-				}
-				oSettingsData.form.items = oItems;
-				this._oSettingsModel.setData(oSettingsData);
-			}
-		}
-
-		var oSettings = this._oSettingsModel.getProperty("/");
-		this._mItemsByPaths = {};
-		if (oSettings.form && oSettings.form.items) {
-			oItems = oSettings.form.items;
-			//get current language
-			var sLanguage = this._language || this.getLanguage() || Utils._language;
-			if (this.getMode() === Constants.EDITOR_MODE.TRANSLATION) {
-				//add top panel of translation editor
-				this._addItem({
-					type: "group",
-					translatable: true,
-					expandable: false,
-					expanded: true,
-					label: this._oResourceBundle.getText("EDITOR_ORIGINALLANG") + ": " + Editor._oLanguages[sLanguage]
-				}, "translationTopPanel");
-			}
-			for (var n in oItems) {
-				var oItem = oItems[n];
-				if (oItem) {
-					//force a label setting, set it to the name of the item
-					oItem.label = oItem.label || n;
-					//what is the current value from the change?
-					var sCurrentLayerValue;
-					if (oItem.manifestpath) {
-						this._mItemsByPaths[oItem.manifestpath] = oItem;
-						if (this.getMode() !== Constants.EDITOR_MODE.TRANSLATION) {
-							sCurrentLayerValue = this._oCurrentLayerChange[oItem.manifestpath];
-						}
-					}
-					//if not changed it should be undefined, and ignore changes in tranlation layer
-					oItem._changed = sCurrentLayerValue !== undefined && this.getMode() !== Constants.EDITOR_MODE.TRANSLATION;
-
-					if (oItem.values) {
-						oItem.translatable = false;
-					}
-
-					oItem._beforeLayerValue = this._getBeforeLayerValue(oItem.manifestpath);
-
-					//check if the provided value from the parameter or designtime default value is a translated value
-					//restrict this to string types for now
-					if (oItem.type === "string") {
-						//check if is translatable via default value, if default value match "{{sTranslationTextKey}}" or "{i18n>sTranslationTextKey}", it is translatable
-						oItem._translatedDefaultPlaceholder = this._getInitialValue(oItem.manifestpath);
-						var sTranslationTextKey = null,
-							sPlaceholder = oItem._translatedDefaultPlaceholder;
-						if (sPlaceholder) {
-							//value with parameter syntax will not be translated
-							if (this._isValueWithParameterSyntax(sPlaceholder)) {
-								oItem.translatable = false;
-							}
-							//parameter translated value
-							if (this._isValueWithHandlebarsTranslation(sPlaceholder)) {
-								sTranslationTextKey = sPlaceholder.substring(2, sPlaceholder.length - 2);
-							} else if (sPlaceholder.startsWith("{i18n>")) {
-								sTranslationTextKey = sPlaceholder.substring(6, sPlaceholder.length - 1);
-							}
-							//only if there is a translation key
-							if (sTranslationTextKey) {
-								//force translatable, even if it was not explicitly set already
-								oItem.translatable = true;
-							} else if (oItem.translatable  && this.getMode() === Constants.EDITOR_MODE.TRANSLATION && !this._oBeforeLayerChange[oItem.manifestpath]) {
-								//if no translation key which means item defined as string value directly.
-								//set the _translatedValue with item manifest value.
-								oItem._translatedValue  = oItem._translatedDefaultPlaceholder;
-								oItem.value = oItem._translatedValue;
-							}
-						}
-						//check if before layer value still has tranlation key
-						oItem._translatedPlaceholder = oItem._beforeLayerValue;
-						sPlaceholder = oItem._translatedPlaceholder;
-						if (sPlaceholder) {
-							//value with parameter syntax will not be translated
-							if (this._isValueWithParameterSyntax(sPlaceholder)) {
-								oItem.translatable = false;
-							}
-							//parameter translated value wins over designtime defaultValue
-							if (this._isValueWithHandlebarsTranslation(sPlaceholder)) {
-								sTranslationTextKey = sPlaceholder.substring(2, sPlaceholder.length - 2);
-							} else if (sPlaceholder.startsWith("{i18n>")) {
-								sTranslationTextKey = sPlaceholder.substring(6, sPlaceholder.length - 1);
-							}
-						}
-						// if the value is a dynamic value, do not allow to translate, and delete all the translations
-						if (oItem.value && (oItem.value.indexOf("{context>") === 0 || oItem.value.indexOf("{{parameters") === 0)) {
-							this.deleteAllTranslationValuesInTexts(oItem.manifestpath);
-							sTranslationTextKey = null;
-						}
-						var sTranslationValueinTexts = this.getTranslationValueInTexts(sLanguage, oItem.manifestpath);
-						//only if there is a translation key
-						if (sTranslationTextKey) {
-							oItem._translatedValue = this.getModel("i18n").getResourceBundle().getText(sTranslationTextKey);
-							if (oItem._changed) {
-								//item was changed, take the current value
-								oItem.value = sCurrentLayerValue;
-							} else if (oItem.value === oItem._translatedDefaultPlaceholder) {
-								oItem.value = oItem._translatedValue;
-							}
-							if (this.getMode() === Constants.EDITOR_MODE.TRANSLATION) {
-								//if we are in translation mode the default value differs and depends on the language
-								//TODO this does not work in SWZ, the base path is not taken into account...
-								//get the translated default value for the language we want to translate this.getLanguage()
-								//if the value is "", which means the i18n setting is not correct, do not use it as translated value
-								var sCurrentLanguageSpecificText = this._getCurrentLanguageSpecificText(sTranslationTextKey);
-								if (sCurrentLanguageSpecificText !== "") {
-									oItem._translatedValue = sCurrentLanguageSpecificText;
-								}
-							} else if (sTranslationValueinTexts) {
-								oItem.value = sTranslationValueinTexts;
-							}
-						} else if (this.getMode() !== Constants.EDITOR_MODE.TRANSLATION && oItem.translatable && sTranslationValueinTexts) {
-							oItem.value = sTranslationValueinTexts;
-						}
-						if (this.getMode() === Constants.EDITOR_MODE.TRANSLATION) {
-							if (this._isValueWithHandlebarsTranslation(oItem.label)) {
-								oItem._translatedLabel = this._getCurrentLanguageSpecificText(oItem.label.substring(2, oItem.label.length - 2), true);
-							} else if (oItem.label && oItem.label.startsWith("{i18n>")) {
-								//TODO this does not work in SWZ, the base path is not taken into account...
-								//get the translated default value for the language we want to translate this.getLanguage()
-								oItem._translatedLabel = this._getCurrentLanguageSpecificText(oItem.label.substring(6, oItem.label.length - 1), true);
-							}
-						}
-					} else if (oItem.type === "string[]") {
-						var sValueItemsPath = oItem.manifestpath.substring(0, oItem.manifestpath.lastIndexOf("/")) + "/valueItems";
-						var oValueItems = this._oManifestModel.getProperty(sValueItemsPath);
-						if (oValueItems) {
-							oItem.valueItems = oValueItems;
-						}
-						// get value tokens of MultiInput from manifest change for current item
-						var sValueTokensPath = oItem.manifestpath.substring(0, oItem.manifestpath.lastIndexOf("/")) + "/valueTokens";
-						var oValueTokens = this._oManifestModel.getProperty(sValueTokensPath);
-						if (oValueTokens) {
-							oItem.valueTokens = oValueTokens;
-						}
-					} else if (typeof oItem.value === "object" && oItem.type === "object") {
-						// backward compatibility for pre saved value
-						if (typeof oItem.value._editable === "boolean") {
-							oItem.value._dt = {
-								"_editable" : oItem.value._editable
-							};
-							delete oItem.value._editable;
-						}
-					} else if (Array.isArray(oItem.value) && oItem.value.length > 0 && oItem.type === "object[]") {
-						// backward compatibility for pre saved value
-						oItem.value.forEach(function (oObject) {
-							if (typeof oObject._editable === "boolean") {
-								oObject._dt = {
-									"_editable" : oObject._editable
-								};
-								delete oObject._editable;
-							}
-						});
-					}
-
-					//translate label if it is {{KEY}}
-					if (oItem.label && this._isValueWithHandlebarsTranslation(oItem.label)) {
-						var sTranslationLabelKey = oItem.label.substring(2, oItem.label.length - 2);
-						if (sTranslationLabelKey) {
-							oItem.label = this.getModel("i18n").getResourceBundle().getText(sTranslationLabelKey);
-						}
-					}
-				}
-			}
-		}
-
-		for (var n in oItems) {
-			var oItem = oItems[n];
-			this._addItem(oItem, n);
-		}
-		// customize the size of editor, define the size in dt.js
-		var editorHeight = this._oSettingsModel.getProperty("/form/height") !== undefined ? this._oSettingsModel.getProperty("/form/height") : "350px",
-		editorWidth = this._oSettingsModel.getProperty("/form/width") !== undefined ? this._oSettingsModel.getProperty("/form/width") : "100%";
-		if (this.getProperty("height") === "") {
-			this.setProperty("height", editorHeight);
-			document.body.style.setProperty("--sapUiIntegrationEditorFormHeight", editorHeight);
-			document.body.style.setProperty("--sapUiIntegrationEditorPreviewHeight", editorHeight);
-		}
-		if (this.getProperty("width") === "") {
-			this.setProperty("width", editorWidth);
-			document.body.style.setProperty("--sapUiIntegrationEditorFormWidth", editorWidth);
-		}
-		//add preview
-		if (this.getMode() !== Constants.EDITOR_MODE.TRANSLATION && this.getPreviewPosition() !== "separate") {
-			this._initPreview();
-		}
-		Promise.all(this._aFieldReadyPromise).then(function () {
-			this._fieldReady = true;
-			this.fireFieldReady();
-			if (this.getMode() !== Constants.EDITOR_MODE.ADMIN && this.getMode() !== Constants.EDITOR_MODE.ALL) {
-				setTimeout(function () {
-					this.fireDestinationReady();
-				}.bind(this), 100);
-			}
-		}.bind(this));
-	};
 
 	Editor.prototype.setHeight = function(sValue) {
 		if (sValue) {
@@ -3374,35 +2579,7 @@ sap.ui.define([
 		return false;
 	};
 
-	Editor.prototype.prepareFieldsInKey = function(oConfig) {
-		//get field names in the item key
-		this._sKeySeparator = oConfig.values.keySeparator;
-		if (!this._sKeySeparator) {
-			this._sKeySeparator = "#";
-		}
-		var sKey = oConfig.values.item.key;
-		this._aFields = sKey.split(this._sKeySeparator);
-		for (var n in this._aFields) {
-			//remove the {} in the field
-			if (this._aFields[n].startsWith("{")) {
-				this._aFields[n] = this._aFields[n].substring(1);
-			}
-			if (this._aFields[n].endsWith("}")) {
-				this._aFields[n] = this._aFields[n].substring(0, this._aFields[n].length - 1);
-			}
-		}
-	};
 
-	Editor.prototype.getKeyFromItem = function(oItem) {
-		var sItemKey = "";
-		this._aFields.forEach(function (field) {
-			sItemKey += oItem[field].toString() + this._sKeySeparator;
-		}.bind(this));
-		if (sItemKey.endsWith(this._sKeySeparator)) {
-			sItemKey = sItemKey.substring(0, sItemKey.length - this._sKeySeparator.length);
-		}
-		return sItemKey;
-	};
 
 	Editor.oResourceBundle = Library.getResourceBundleFor("sap.ui.integration", Utils._language);
 
