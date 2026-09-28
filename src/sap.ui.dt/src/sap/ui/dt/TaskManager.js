@@ -50,8 +50,15 @@ function(
 		},
 		constructor: function(...aArgs) {
 			ManagedObject.apply(this, aArgs);
+			// Each list maps a task type to a Map of task id -> task. Using a Map per type keeps
+			// insertion order (so tasks run in the order they were added) while allowing O(1)
+			// completion by id, instead of filtering an array on every complete() call.
 			this._mQueuedTasks = {};
 			this._mPendingTasks = {};
+			// Index: task id -> task type. The type never changes after a task is added, so this
+			// stays valid even when a task moves from the queued to the pending list. It lets
+			// complete() locate the owning type bucket in O(1) without scanning all buckets.
+			this._mTaskIdToType = {};
 		},
 		/**
 		 * IDs counter
@@ -73,9 +80,9 @@ function(
 	}
 
 	function getTaskIdentifierFunction(vTaskIdentifier) {
-		var fnTaskIdentifier;
+		let fnTaskIdentifier;
 		if (typeof vTaskIdentifier === "string") {
-			fnTaskIdentifier = function(mTask) { return mTask[vTaskIdentifier]; };
+			fnTaskIdentifier = (mTask) => mTask[vTaskIdentifier];
 		} else if (typeof vTaskIdentifier === "function") {
 			fnTaskIdentifier = vTaskIdentifier;
 		} else {
@@ -84,41 +91,46 @@ function(
 		return fnTaskIdentifier;
 	}
 
-	function filterTasks(fnTaskIdentifier, sNewTaskIdentifier, oTask) {
-		if (fnTaskIdentifier(oTask) === sNewTaskIdentifier) {
+	/**
+	 * Removes a task from the given list and keeps the counter and the id->type index in sync.
+	 * @param {object} mTask - Task to be removed
+	 * @param {string} sListName - Name of the list (<code>_mQueuedTasks</code> or <code>_mPendingTasks</code>)
+	 * @private
+	 */
+	TaskManager.prototype._deleteTask = function(mTask, sListName) {
+		const mBucket = this[sListName][mTask.type];
+		if (mBucket && mBucket.delete(mTask.id)) {
 			this._iTaskCounter--;
-			return false;
+			delete this._mTaskIdToType[mTask.id];
 		}
-		return true;
-	}
+	};
 
 	TaskManager.prototype._removeTasksByIdentifier = function(mTask, vTaskIdentifier, sListName) {
 		if (vTaskIdentifier) {
-			var fnTaskIdentifier = getTaskIdentifierFunction(vTaskIdentifier);
-			var sNewTaskIdentifier = fnTaskIdentifier(mTask);
-			if (this[sListName][mTask.type] && sNewTaskIdentifier) {
-				this[sListName][mTask.type] = this[sListName][mTask.type]
-				.filter(filterTasks.bind(this, fnTaskIdentifier, sNewTaskIdentifier));
+			const fnTaskIdentifier = getTaskIdentifierFunction(vTaskIdentifier);
+			const sNewTaskIdentifier = fnTaskIdentifier(mTask);
+			const mBucket = this[sListName][mTask.type];
+			if (mBucket && sNewTaskIdentifier) {
+				[...mBucket.values()].forEach((mLocalTask) => {
+					if (fnTaskIdentifier(mLocalTask) === sNewTaskIdentifier) {
+						this._deleteTask(mLocalTask, sListName);
+					}
+				});
 			}
 		}
 	};
 
-	TaskManager.prototype._removeTaskById = function(iTaskId, sListName) {
-		Object.keys(this[sListName]).forEach(function(sTypeName) {
-			this[sListName][sTypeName] = this[sListName][sTypeName].filter(function(mTask) {
-				if (mTask.id === iTaskId) {
-					this._iTaskCounter--;
-					return false;
-				}
-				return true;
-			}.bind(this));
-		}, this);
+	TaskManager.prototype._removeTaskById = function(iTaskId, sType) {
+		const mTask = { id: iTaskId, type: sType };
+		this._deleteTask(mTask, "_mQueuedTasks");
+		this._deleteTask(mTask, "_mPendingTasks");
 	};
 
 	TaskManager.prototype._addTask = function(mTask) {
-		var iTaskId = this._iNextId++;
-		this._mQueuedTasks[mTask.type] ||= [];
-		this._mQueuedTasks[mTask.type].push({ ...mTask, id: iTaskId });
+		const iTaskId = this._iNextId++;
+		this._mQueuedTasks[mTask.type] ||= new Map();
+		this._mQueuedTasks[mTask.type].set(iTaskId, { ...mTask, id: iTaskId });
+		this._mTaskIdToType[iTaskId] = mTask.type;
 		this._iTaskCounter++;
 		if (!this.getSuppressEvents()) {
 			this.fireAdd({
@@ -148,8 +160,10 @@ function(
 	 * @param {number} iTaskId - Task ID
 	 */
 	TaskManager.prototype.complete = function(iTaskId) {
-		this._removeTaskById(iTaskId, "_mQueuedTasks");
-		this._removeTaskById(iTaskId, "_mPendingTasks");
+		const sType = this._mTaskIdToType[iTaskId];
+		if (sType !== undefined) {
+			this._removeTaskById(iTaskId, sType);
+		}
 		if (!this.getSuppressEvents()) {
 			this.fireComplete({
 				taskId: [iTaskId]
@@ -165,26 +179,28 @@ function(
 	 */
 	TaskManager.prototype.completeBy = function(mTask) {
 		validateTask(mTask);
-		var aCompledTaskIds = [];
+		const aCompletedTaskIds = [];
 		// TODO: get rid of filtering other task parameters then type for performance reasons
-		var _removeTasksByDefinition = function(aTasks) {
-			return (aTasks || []).filter(function(mLocalTask) {
-				var bCompleteTask = Object.keys(mTask).every(function(sKey) {
-					return mLocalTask[sKey] && mLocalTask[sKey] === mTask[sKey];
-				});
+		const removeTasksByDefinition = (sListName) => {
+			const mBucket = this[sListName][mTask.type];
+			if (!mBucket) {
+				return;
+			}
+			[...mBucket.values()].forEach((mLocalTask) => {
+				const bCompleteTask = Object.keys(mTask).every(
+					(sKey) => mLocalTask[sKey] && mLocalTask[sKey] === mTask[sKey]
+				);
 				if (bCompleteTask) {
-					this._iTaskCounter--;
-					aCompledTaskIds.push(mLocalTask.id);
-					return false;
+					aCompletedTaskIds.push(mLocalTask.id);
+					this._deleteTask(mLocalTask, sListName);
 				}
-				return true;
-			}.bind(this));
-		}.bind(this);
-		this._mQueuedTasks[mTask.type] = _removeTasksByDefinition(this._mQueuedTasks[mTask.type]);
-		this._mPendingTasks[mTask.type] = _removeTasksByDefinition(this._mPendingTasks[mTask.type]);
+			});
+		};
+		removeTasksByDefinition("_mQueuedTasks");
+		removeTasksByDefinition("_mPendingTasks");
 		if (!this.getSuppressEvents()) {
 			this.fireComplete({
-				taskId: aCompledTaskIds
+				taskId: aCompletedTaskIds
 			});
 		}
 	};
@@ -228,36 +244,39 @@ function(
 	};
 
 	TaskManager.prototype._markAsPending = function(sType, aTasks) {
-		this._mPendingTasks[sType] = (this._mPendingTasks[sType] || []).concat(aTasks);
-		this._mQueuedTasks[sType] = [];
+		this._mPendingTasks[sType] ||= new Map();
+		aTasks.forEach(function(mTask) {
+			this._mPendingTasks[sType].set(mTask.id, mTask);
+		}, this);
+		this._mQueuedTasks[sType] = new Map();
 	};
 
 	TaskManager.prototype._getTypedList = function(sTaskType, bMarkAsPending) {
-		var aTasks = [];
+		let aTasks = [];
 		if (this._mQueuedTasks[sTaskType]) {
-			aTasks = this._mQueuedTasks[sTaskType].slice(0);
+			aTasks = [...this._mQueuedTasks[sTaskType].values()];
 		}
 		if (bMarkAsPending) {
 			this._markAsPending(sTaskType, aTasks);
 		} else if (this._mPendingTasks[sTaskType]) {
-			aTasks = aTasks.concat(this._mQueuedTasks[sTaskType].slice(0));
+			aTasks = aTasks.concat([...this._mPendingTasks[sTaskType].values()]);
 		}
 		return aTasks;
 	};
 
 	TaskManager.prototype._getAllTasks = function(bMarkAsPending) {
-		var aAllTasks = [];
+		let aAllTasks = [];
 		aAllTasks = Object.keys(this._mQueuedTasks).reduce(function(aResult, _sType) {
-			aResult = aResult.concat(this._mQueuedTasks[_sType]);
+			aResult = aResult.concat([...this._mQueuedTasks[_sType].values()]);
 			if (bMarkAsPending) {
-				this._markAsPending(_sType, this._mQueuedTasks[_sType]);
+				this._markAsPending(_sType, [...this._mQueuedTasks[_sType].values()]);
 			}
 			return aResult;
 		}.bind(this), []);
 		if (!bMarkAsPending) {
 			aAllTasks = aAllTasks.concat(
 				Object.keys(this._mPendingTasks).reduce(function(aResult, _sType) {
-					return aResult.concat(this._mPendingTasks[_sType]);
+					return aResult.concat([...this._mPendingTasks[_sType].values()]);
 				}.bind(this), [])
 			);
 		}
