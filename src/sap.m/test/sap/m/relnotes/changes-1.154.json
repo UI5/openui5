@@ -3,6 +3,46 @@
     "date": "September 2026",
     "notes": [
       {
+        "id": "ea237cfde91c1d8088b38e578da2763a4217b91b",
+        "type": "FEATURE",
+        "text": " sap.m.NumericInput - Introduce sap.m.NumericInput"
+      },
+      {
+        "id": "937e45cfd20035e7ef18495c83059328631ffa53",
+        "type": "FIX",
+        "text": " sap.m.p13n.FilterController: Editing existing filter condition fails"
+      },
+      {
+        "id": "4864a384e120ebf1aa6f0804b751e12581c99056",
+        "type": "FIX",
+        "text": " sap.m.Column: open header menu on Space keyup, not keydown"
+      },
+      {
+        "id": "8fcfc2f3d78e8a17da0ef0fa88f24e3b10606e3e",
+        "type": "FIX",
+        "text": " sap.m.TimePickerClocks: initialize active clock state on control creation"
+      },
+      {
+        "id": "cc7375bc9459d23a34823a57317188aeaba76484",
+        "type": "FEATURE",
+        "text": " sap.m.ObjectNumber: Currency and Unit functionality are now added"
+      },
+      {
+        "id": "0aa3a662095047398a2c227d94bbe29475e7cdbe",
+        "type": "FEATURE",
+        "text": " sap.m.ToggleButton: enable enhanced tooltip"
+      },
+      {
+        "id": "360ed6a14cf66ef06ef6cef3989581cbfb912bb4",
+        "type": "FEATURE",
+        "text": " sap.m.MessageStrip: Enhanced Tooltip enablement"
+      },
+      {
+        "id": "3c73f96f7a17587d5ebda04b3e750f623d705c8e",
+        "type": "FIX",
+        "text": " sap.m.PlanningCalendar: calendarWeekNumbering is forward correctly"
+      },
+      {
         "id": "ec5791d1d0dcd627f03a4fa04f29c5fa311b5ba2",
         "type": "FIX",
         "text": " m.ListItemAction: use direct shortcut definitions"

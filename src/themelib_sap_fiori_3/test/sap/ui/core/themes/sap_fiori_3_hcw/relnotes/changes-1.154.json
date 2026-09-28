@@ -6,11 +6,6 @@
         "id": "ea237cfde91c1d8088b38e578da2763a4217b91b",
         "type": "FEATURE",
         "text": " sap.m.NumericInput - Introduce sap.m.NumericInput"
-      },
-      {
-        "id": "ba6d42c2c6529093896c35ff2e6553bb12ca0c31",
-        "type": "FEATURE",
-        "text": " sap.html: New library for native HTML element controls"
       }
     ]
   }

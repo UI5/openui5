@@ -1,0 +1,12 @@
+{
+  "1.154.0": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "cc7375bc9459d23a34823a57317188aeaba76484",
+        "type": "FEATURE",
+        "text": " sap.m.ObjectNumber: Currency and Unit functionality are now added"
+      }
+    ]
+  }
+}

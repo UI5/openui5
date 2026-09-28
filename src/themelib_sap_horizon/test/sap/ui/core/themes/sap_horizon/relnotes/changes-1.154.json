@@ -3,6 +3,16 @@
     "date": "September 2026",
     "notes": [
       {
+        "id": "ea237cfde91c1d8088b38e578da2763a4217b91b",
+        "type": "FEATURE",
+        "text": " sap.m.NumericInput - Introduce sap.m.NumericInput"
+      },
+      {
+        "id": "6fa8d86f647f9d3890d4e82252161187253ab93d",
+        "type": "FIX",
+        "text": " sap.m.Panel: Enhance title offset according to the specification"
+      },
+      {
         "id": "ebc07950860e7aecd2c51a8d0a25f52ec23fb750",
         "type": "FIX",
         "text": " sap.ui.unified.Calendar: correct border radius of selected dates"

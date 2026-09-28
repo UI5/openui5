@@ -1,0 +1,12 @@
+{
+  "1.154.0": {
+    "date": "September 2026",
+    "notes": [
+      {
+        "id": "8596bc66b89f3f078ed17a4507dc3508e53dbc05",
+        "type": "FIX",
+        "text": " sap.ui.integration: Include calendarWeekNumbering and use12HourFromat in CalendarContent.getStaticConfiguration()"
+      }
+    ]
+  }
+}
