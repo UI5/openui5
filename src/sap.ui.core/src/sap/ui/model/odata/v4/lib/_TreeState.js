@@ -198,20 +198,26 @@ sap.ui.define([
 		}
 
 		/**
-		 * Returns the "ExpandLevels" parameter to the "TopLevels" function describing the tree
-		 * state in "$apply".
+		 * Returns the "ExpandLevels" parameter to the "TopLevels" (or "MultiLevelExpand") function
+		 * describing the tree state in "$apply".
 		 *
+		 * @param {boolean} [bMultiLevelExpand]
+		 *   Whether "MultiLevelExpand" is used instead of "TopLevels", with a node identified
+		 *   inside the "ExpandLevels" parameter via "Entry", not "NodeID"
 		 * @returns {string|undefined}
 		 *   The "ExpandLevels" parameter or undefined if no tree state is kept
 		 *
 		 * @public
 		 */
-		getExpandLevels() {
+		getExpandLevels(bMultiLevelExpand) {
 			const aExpandInfos = Object.values(this.mPredicate2ExpandInfo);
 			return aExpandInfos.length
 				? JSON.stringify(aExpandInfos.map((oExpandInfo) => {
 						// build the server representation
-						return {NodeID : oExpandInfo.nodeId, Levels : oExpandInfo.levels};
+						return {
+							[bMultiLevelExpand ? "Entry" : "NodeID"] : oExpandInfo.nodeId,
+							Levels : oExpandInfo.levels
+						};
 					}))
 				: undefined;
 		}

@@ -209,7 +209,7 @@ sap.ui.define([
 							`"parent" @ level ${iLevel}`, oElement);
 					}
 					const checkRankConsecutive = () => {
-						if (bRecursiveHierarchy && iExpandTo > 1) {
+						if (iExpandTo > 1) {
 							return; //TODO: "rank" not consecutive *per level*
 						}
 						strictEqual(iRank, aNextRankByLevel[iLevel], `rank @ level ${iLevel}`,
@@ -28498,6 +28498,558 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[false, 1, "true", ""]
 		]);
 	});
+
+	//*********************************************************************************************
+	// Scenario: Data aggregation supports "expandTo". Start with 2 levels and collapse an initially
+	// expanded node, expand an initially collapsed node and do a side-effects refresh. The tree
+	// state is kept. $count, grand total, subtotals, different kind of sorters (UI5 sorter and
+	// $orderby) and UI5 filters (before aggregate, on aggregate; $filter is not supported) are
+	// properly considered. The "com.sap.vocabularies.Analytics.v1.MultiLevelExpand" $apply
+	// transformation must not be used for the download URL. Show aggregates on group levels only
+	// if they are used for subtotals. "expandTo" cannot be combined with aggregates having 'name'
+	// or 'with'.
+	// JIRA: CPOUI5ODATAV4-3503
+[false, true].forEach((bSubtotalsAtBottomOnly) => {
+	const sTitle = "Data Aggregation: expandTo support, subtotalsAtBottomOnly = "
+		+ bSubtotalsAtBottomOnly;
+
+	QUnit.test(sTitle, async function (assert) {
+		const oModel = this.createAggregationModel({autoExpandSelect : true});
+		const sView = `
+<Text id="count" text="{$count}"/>
+<t:Table id="table" rows="{path : '/BusinessPartners',
+		filters : [
+			{path : 'Country', operator : 'GT', value1 : 'D'},
+			{path : 'SalesAmount', operator : 'GT', value1 : '50'},
+			{path : 'AccountResponsible', operator : 'EQ', value1 : 'AR'}
+		],
+		parameters : {
+			$$aggregation : {
+				aggregate : {
+					SalesAmount : {
+						subtotals : true,
+						unit : 'Currency'
+					},
+					SalesNumber : {
+						grandTotal : true
+					}
+				},
+				expandTo : 2,
+				group : {
+					Region : {additionally : ['RegionText']}
+				},
+				groupLevels : ['Currency', 'Region', 'Segment'],
+				subtotalsAtBottomOnly : ${bSubtotalsAtBottomOnly}
+			},
+			$count : true,
+			$orderby : 'Region asc,n/a'
+		},
+		sorter : [{path : 'Currency', descending : true}, {path : 'ignored'}]}"
+		threshold="0" visibleRowCount="7">
+	<Text text="{= %{@$ui5.node.isExpanded} }"/>
+	<Text text="{= %{@$ui5.node.level} }"/>
+	<Text text="{Currency}"/>
+	<Text text="{Region}"/>
+	<Text text="{RegionText}"/>
+	<Text text="{Segment}"/>
+	<Text text="{SalesAmount}"/>
+	<Text text="{SalesNumber}"/>
+</t:Table>`;
+		const sURLPrefix = "BusinessPartners?"
+			+ "$apply=filter(Country gt 'D' and AccountResponsible eq 'AR')/"
+			+ "groupby((Currency,Region,Segment),filter($these/aggregate(SalesAmount) gt 50))/";
+		const sMultiLevelExpandPrefix = "com.sap.vocabularies.Analytics.v1.MultiLevelExpand("
+			+ "LevelProperties="
+			+ JSON.stringify([{
+				DimensionProperties : ["Currency"],
+				AdditionalProperties : []
+			}, {
+				DimensionProperties : ["Region"],
+				AdditionalProperties : ["RegionText"]
+			}, {
+				DimensionProperties : ["Segment"],
+				AdditionalProperties : []
+			}])
+			+ ',Aggregation=["SalesAmount","SalesNumber"]'
+			+ ",SiblingOrder=" + JSON.stringify([{
+				Property : "Currency",
+				Descending : true
+			}, {
+				Property : "Region",
+				Descending : false
+			}])
+			+ ",Levels=2";
+		// Grand total
+		// US
+		//   US A (initially collapsed, later expanded)
+		//     US A S1
+		//   US A (subtotal if US A is expanded)
+		// US (subtotal)
+		// UK (later collapsed)
+		//   UK B
+		// UK (subtotal if UK is expanded)
+		// DE
+		//   DE C
+		// DE (subtotal; never in the visible area)
+		this.expectRequest(sURLPrefix
+				+ "concat(groupby((Currency,Region,Segment))/aggregate($count as UI5__leaves),"
+				+ "aggregate(SalesNumber),"
+				+ sMultiLevelExpandPrefix + ",SubtotalsAtBottom=true)"
+				+ "/concat(aggregate($count as UI5__count),top(6)))", {
+				value : [{
+					UI5__leaves : "135"
+					//"UI5__leaves@odata.type" : "#Decimal"
+				}, {
+					SalesNumber : 987 // Edm.Int32
+				}, {
+					UI5__count : "42",
+					"UI5__count@odata.type" : "#Decimal"
+				}, {
+					"@com.sap.vocabularies.Analytics.v1.LevelInformation" : {
+						DistanceFromRoot : "0", // Edm.Int64
+						DrillState : "expanded",
+						LimitedDescendantCount : "1" // Edm.Int64; 1 child + no subtotal
+					},
+					Currency : "USD",
+					SalesAmount : "100",
+					// With MultiLevelExpand it cannot be specified whether an aggregate is used as
+					// subtotal so the service returns the aggregated values for all entries; as
+					// SalesNumber shall not be shown as subtotal, the value is discarded on client
+					// side; only on leaf level the value is kept
+					SalesNumber : 50
+				}, {
+					"@com.sap.vocabularies.Analytics.v1.LevelInformation" : {
+						DistanceFromRoot : "1",
+						DrillState : "collapsed"
+					},
+					Currency : "USD",
+					Region : "A",
+					RegionText : "<A>",
+					SalesAmount : "100",
+					SalesNumber : "n/a"
+				}, {
+					"@com.sap.vocabularies.Analytics.v1.LevelInformation" : {
+						DistanceFromRoot : "0",
+						DrillState : "subtotal",
+						LimitedDescendantCount : "ignored" // copy of the expanded node
+					},
+					Currency : "USD",
+					SalesAmount : "100",
+					SalesNumber : "n/a"
+				}, {
+					"@com.sap.vocabularies.Analytics.v1.LevelInformation" : {
+						DistanceFromRoot : "0",
+						DrillState : "expanded",
+						LimitedDescendantCount : "1" // 1 child + no subtotal
+					},
+					Currency : "GBP",
+					SalesAmount : "200",
+					SalesNumber : "n/a"
+				}, {
+					"@com.sap.vocabularies.Analytics.v1.LevelInformation" : {
+						DistanceFromRoot : "1",
+						DrillState : "collapsed"
+					},
+					Currency : "GBP",
+					Region : "B",
+					RegionText : "<B>",
+					SalesAmount : "200",
+					SalesNumber : "n/a"
+				}, {
+					"@com.sap.vocabularies.Analytics.v1.LevelInformation" : {
+						DistanceFromRoot : "0",
+						DrillState : "subtotal",
+						LimitedDescendantCount : "ignored" // copy of the expanded node
+					},
+					Currency : "GBP",
+					SalesAmount : "200",
+					SalesNumber : "n/a"
+				}]
+			})
+			.expectChange("count");
+
+		await this.createView(assert, sView, oModel);
+
+		const oTable = this.oView.byId("table");
+		const oBinding = oTable.getBinding("rows");
+		const sDownloadUrl = ("/aggregation/BusinessPartners?$apply="
+			+ "filter(Country gt 'D' and AccountResponsible eq 'AR')"
+			+ "/groupby((Currency,Region,Segment),filter($these/aggregate(SalesAmount) gt 50))"
+			+ "/groupby((Currency,Region,Segment,RegionText),aggregate(SalesAmount,SalesNumber))"
+			+ "/orderby(Currency desc,Region asc)").replaceAll(" ", "%20");
+
+		assert.strictEqual(oBinding.getDownloadUrl(), sDownloadUrl, "Download URL");
+
+		function subtotalAtTop(sText) {
+			return bSubtotalsAtBottomOnly ? "" : sText;
+		}
+
+		checkTable("after view creation", assert, oTable, [
+			"/BusinessPartners()",
+			"/BusinessPartners(Currency='USD')",
+			"/BusinessPartners(Currency='USD',Region='A')",
+			"/BusinessPartners(Currency='USD',$isTotal=true)",
+			"/BusinessPartners(Currency='GBP')",
+			"/BusinessPartners(Currency='GBP',Region='B')",
+			"/BusinessPartners(Currency='GBP',$isTotal=true)"
+		], [ // isExpanded, level, Currency, Region, RegionText, Segment, SalesAmount, SalesNumber
+			[true, 0, "", "", "", "", "", "987"],
+			[true, 1, "USD", "", "", "", subtotalAtTop("100"), ""],
+			[false, 2, "USD", "A", "<A>", "", "100", ""],
+			[undefined, 1, "USD", "", "", "", "100", ""],
+			[true, 1, "GBP", "", "", "", subtotalAtTop("200"), ""],
+			[false, 2, "GBP", "B", "<B>", "", "200", ""],
+			[undefined, 1, "GBP", "", "", "", "200", ""]
+		], 42 + 1);
+		const [,, oUSD_A,, oGBP] = oBinding.getCurrentContexts();
+
+		this.expectChange("count", "135");
+
+		this.oView.byId("count").setBindingContext(oBinding.getHeaderContext());
+
+		await this.waitForChanges(assert, "set header context");
+
+		this.expectRequest(sURLPrefix + sMultiLevelExpandPrefix + ",SubtotalsAtBottom=true)"
+				+ "/skip(6)/top(2)", {
+				value : [{
+					"@com.sap.vocabularies.Analytics.v1.LevelInformation" : {
+						DistanceFromRoot : "0",
+						DrillState : "expanded",
+						LimitedDescendantCount : "1" // 1 child + no subtotal
+					},
+					Currency : "EUR",
+					SalesAmount : "300",
+					SalesNumber : "n/a"
+				}, {
+					"@com.sap.vocabularies.Analytics.v1.LevelInformation" : {
+						DistanceFromRoot : "1",
+						DrillState : "collapsed"
+					},
+					Currency : "EUR",
+					Region : "C",
+					RegionText : "<C>",
+					SalesAmount : "300",
+					SalesNumber : "n/a"
+				}]
+			});
+
+		// code under test
+		oGBP.collapse();
+
+		await this.waitForChanges(assert, "collapse 'GBP'");
+
+		checkTable("after collapse 'GBP'", assert, oTable, [
+			"/BusinessPartners()",
+			"/BusinessPartners(Currency='USD')",
+			"/BusinessPartners(Currency='USD',Region='A')",
+			"/BusinessPartners(Currency='USD',$isTotal=true)",
+			"/BusinessPartners(Currency='GBP')",
+			"/BusinessPartners(Currency='EUR')",
+			"/BusinessPartners(Currency='EUR',Region='C')"
+		], [ // isExpanded, level, Currency, Region, RegionText, Segment, SalesAmount, SalesNumber
+			[true, 0, "", "", "", "", "", 987],
+			[true, 1, "USD", "", "", "", subtotalAtTop("100"), ""],
+			[false, 2, "USD", "A", "<A>", "", "100", ""],
+			[undefined, 1, "USD", "", "", "", "100", ""],
+			[false, 1, "GBP", "", "", "", "200", ""],
+			[true, 1, "EUR", "", "", "", subtotalAtTop("300"), ""],
+			[false, 2, "EUR", "C", "<C>", "", "300", ""]
+		], 40 + 1);
+
+		const test = async (sMessage, fnCodeUnderTest) => {
+			this.expectRequest(sURLPrefix
+					+ "concat(groupby((Currency,Region,Segment))/aggregate($count as UI5__leaves),"
+					+ "aggregate(SalesNumber),"
+					+ sMultiLevelExpandPrefix + ",ExpandLevels="
+						+ JSON.stringify([{
+							Entry : ["GBP"], Levels : 0
+						}, {
+							Entry : ["USD", "A"], Levels : 1
+						}]) + ",SubtotalsAtBottom=true)"
+					+ "/concat(aggregate($count as UI5__count),top(6)))", {
+					value : [{
+						UI5__leaves : "135"
+						// "UI5__leaves@odata.type" : "#Decimal"
+					}, {
+						SalesNumber : 987
+					}, {
+						UI5__count : "42",
+						"UI5__count@odata.type" : "#Decimal"
+					}, {
+						"@com.sap.vocabularies.Analytics.v1.LevelInformation" : {
+							DistanceFromRoot : "0",
+							DrillState : "expanded",
+							LimitedDescendantCount : "3" // 1 child + 1 grand child + 1 subtotal
+						},
+						Currency : "USD",
+						SalesAmount : "100",
+						SalesNumber : "n/a"
+					}, {
+						"@com.sap.vocabularies.Analytics.v1.LevelInformation" : {
+							DistanceFromRoot : "1",
+							DrillState : "expanded",
+							LimitedDescendantCount : "1" // 1 child + no subtotal
+						},
+						Currency : "USD",
+						Region : "A",
+						RegionText : "<A>",
+						SalesAmount : "100",
+						SalesNumber : "n/a"
+					}, {
+						"@com.sap.vocabularies.Analytics.v1.LevelInformation" : {
+							DistanceFromRoot : "2",
+							DrillState : "leaf"
+						},
+						Currency : "USD",
+						Region : "A",
+						RegionText : "<A>",
+						SalesAmount : "100",
+						SalesNumber : 50, // on leaf level all aggregates are shown
+						Segment : "S1"
+					}, {
+						"@com.sap.vocabularies.Analytics.v1.LevelInformation" : {
+							DistanceFromRoot : "1",
+							DrillState : "subtotal",
+							LimitedDescendantCount : "ignored" // copy of the expanded node
+						},
+						Currency : "USD",
+						Region : "A",
+						RegionText : "<A>",
+						SalesAmount : "100",
+						SalesNumber : "n/a"
+					}, {
+						"@com.sap.vocabularies.Analytics.v1.LevelInformation" : {
+							DistanceFromRoot : "0",
+							DrillState : "subtotal",
+							LimitedDescendantCount : "ignored" // copy of the expanded node
+						},
+						Currency : "USD",
+						SalesAmount : "100",
+						SalesNumber : "n/a"
+					}, {
+						"@com.sap.vocabularies.Analytics.v1.LevelInformation" : {
+							DistanceFromRoot : "0",
+							DrillState : "collapsed"
+						},
+						Currency : "GBP",
+						SalesAmount : "200",
+						SalesNumber : "n/a"
+					}]
+				});
+
+			await Promise.all([
+				// code under test
+				fnCodeUnderTest(),
+				this.waitForChanges(assert, sMessage)
+			]);
+
+			checkTable("after " + sMessage, assert, oTable, [
+				"/BusinessPartners()",
+				"/BusinessPartners(Currency='USD')",
+				"/BusinessPartners(Currency='USD',Region='A')",
+				"/BusinessPartners(Currency='USD',Region='A',Segment='S1')",
+				"/BusinessPartners(Currency='USD',Region='A',$isTotal=true)",
+				"/BusinessPartners(Currency='USD',$isTotal=true)",
+				"/BusinessPartners(Currency='GBP')"
+			], [ // isExpanded,level,Currency,Region,RegionText,Segment,SalesAmount,SalesNumber
+				[true, 0, "", "", "", "", "", 987],
+				[true, 1, "USD", "", "", "", subtotalAtTop("100"), ""],
+				[true, 2, "USD", "A", "<A>", "", subtotalAtTop("100"), ""],
+				[undefined, 3, "USD", "A", "<A>", "S1", "100", "50"],
+				[undefined, 2, "USD", "", "", "", "100", ""],
+				[undefined, 1, "USD", "", "", "", "100", ""],
+				[false, 1, "GBP", "", "", "", "200", ""]
+			], 42 + 1);
+			assert.strictEqual(oBinding.getCount(), 135);
+			assert.strictEqual(oBinding.getDownloadUrl(), sDownloadUrl, "unchanged");
+		};
+
+		await test("expand 'USD' Region 'A'",
+			() => {
+				// code under test
+				return oUSD_A.expand();
+			}
+		);
+
+		await test("side-effects refresh",
+			() => {
+				// code under test
+				return oBinding.getHeaderContext().requestSideEffects([""]);
+			}
+		);
+
+		assert.throws(() => {
+			oBinding.setAggregation({
+				expandTo : 1,
+				aggregate : {
+					MySalesNumber : {grandTotal : true, name : "SalesNumber"}
+				}
+			});
+		}, new Error("Cannot combine 'expandTo' with aggregates having 'name' or 'with'"));
+
+		assert.throws(() => {
+			oBinding.setAggregation({
+				expandTo : 1,
+				aggregate : {
+					SalesNumber : {grandTotal : true, with : "average"}
+				}
+			});
+		}, new Error("Cannot combine 'expandTo' with aggregates having 'name' or 'with'"));
+	});
+});
+
+	//*********************************************************************************************
+	// Scenario: Data aggregation supports "expand all".
+	// "com.sap.vocabularies.Analytics.v1.MultiLevelExpand" $apply transformation is used to fetch
+	// data, but it must not be used for requesting the grand total only. $select is used in
+	// combination with MultiLevelExpand if the leaf level is not aggregated and if no concat is
+	// used or if ExpandAfterConcatSupported annotation is set.
+	// JIRA: CPOUI5ODATAV4-3503
+[false, true].forEach((bExpandAfterConcatSupported) => {
+	const sTitle = "Data Aggregation: expand all, with ExpandAfterConcatSupported: "
+		+ bExpandAfterConcatSupported;
+
+	QUnit.test(sTitle, async function (assert) {
+		const oModel = this.createAggregationModel({autoExpandSelect : true},
+			bExpandAfterConcatSupported);
+		const sView = `
+<t:Table id="table" rows="{path : '/BusinessPartners',
+		parameters : {
+			$$aggregation : {
+				aggregate : {
+					SalesNumber : {
+						grandTotal : true
+					}
+				},
+				expandTo : 1E16,
+				groupLevels : ['Country', 'Id']
+			}
+		}}" threshold="0" visibleRowCount="3">
+	<Text text="{Country}"/>
+	<Text text="{Id}"/>
+	<Text text="{SalesNumber}"/>
+</t:Table>`;
+		// Grand total
+		// US
+		//   US 11
+		this.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesNumber),"
+				+ "com.sap.vocabularies.Analytics.v1.MultiLevelExpand("
+					+ "LevelProperties=" + JSON.stringify([
+						{DimensionProperties : ["Country"], AdditionalProperties : []},
+						{DimensionProperties : ["Id"], AdditionalProperties : []}
+					])
+					+ ',Aggregation=["SalesNumber"]'
+					+ ",SiblingOrder=[]"
+				+ ")/concat(aggregate($count as UI5__count),top(2)))"
+				+ (bExpandAfterConcatSupported ? "&$select=Country,Id,SalesNumber,UI5__count" : ""),
+			{
+				value : [{
+					SalesNumber : 6
+				}, {
+					UI5__count : "4",
+					"UI5__count@odata.type" : "#Decimal"
+				}, {
+					"@com.sap.vocabularies.Analytics.v1.LevelInformation" : {
+						DistanceFromRoot : "0", // Edm.Int64
+						DrillState : "expanded",
+						LimitedDescendantCount : "1" // Edm.Int64; 1 child + no subtotal
+					},
+					Country : "US",
+					SalesNumber : "n/a"
+				}, {
+					"@com.sap.vocabularies.Analytics.v1.LevelInformation" : {
+						DistanceFromRoot : "1",
+						DrillState : "leaf"
+					},
+					Country : "US",
+					Id : 11,
+					SalesNumber : 4
+				}]
+			});
+
+		await this.createView(assert, sView, oModel);
+
+		const oTable = this.oView.byId("table");
+		checkTable("after view creation", assert, oTable, [
+			"/BusinessPartners()",
+			"/BusinessPartners(Country='US')",
+			"/BusinessPartners(11)"
+		], [ // Country, Id, SalesNumber
+			["", "", 6],
+			["US", "", ""],
+			["US", 11, 4]
+		], 4 + 1);
+
+		const oBinding = oTable.getBinding("rows");
+		this.expectRequest("#0 PATCH BusinessPartners(11)", {
+				payload : {SalesNumber : 5}
+			}, oNO_CONTENT)
+			.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
+				value : [{SalesNumber : 7}]
+			});
+
+		await Promise.all([
+			// code under test
+			oBinding.getCurrentContexts()[2].setProperty("SalesNumber", 5),
+			this.waitForChanges(assert, "update SalesNumber and update the grand total")
+		]);
+
+		checkTable("after update SalesNumber and update the grand total", assert, oTable, [
+			"/BusinessPartners()",
+			"/BusinessPartners(Country='US')",
+			"/BusinessPartners(11)"
+		], [ // Country, Id, SalesNumber
+			["", "", 7],
+			["US", "", ""],
+			["US", 11, 5]
+		], 4 + 1);
+
+		this.expectRequest("BusinessPartners?$apply="
+				+ "com.sap.vocabularies.Analytics.v1.MultiLevelExpand("
+					+ "LevelProperties=" + JSON.stringify([
+						{DimensionProperties : ["Country"], AdditionalProperties : []},
+						{DimensionProperties : ["Id"], AdditionalProperties : []}
+					])
+					+ ',Aggregation=["SalesNumber"]'
+					+ ",SiblingOrder=[]"
+				+ ")/skip(2)/top(2)&$select=Country,Id,SalesNumber", {
+				value : [{
+					"@com.sap.vocabularies.Analytics.v1.LevelInformation" : {
+						DistanceFromRoot : "0", // Edm.Int64
+						DrillState : "expanded",
+						LimitedDescendantCount : "1" // Edm.Int64; 1 child + no subtotal
+					},
+					Country : "UK",
+					SalesNumber : "n/a"
+				}, {
+					"@com.sap.vocabularies.Analytics.v1.LevelInformation" : {
+						DistanceFromRoot : "1",
+						DrillState : "leaf"
+					},
+					Country : "UK",
+					Id : 22,
+					SalesNumber : 2
+				}]
+			});
+
+		// code under test
+		oTable.setFirstVisibleRow(2);
+
+		await this.waitForChanges(assert, "scroll down, no concat -> $select can always be added");
+
+		checkTable("after scroll down", assert, oTable, [
+			"/BusinessPartners()",
+			"/BusinessPartners(Country='US')",
+			"/BusinessPartners(11)",
+			"/BusinessPartners(Country='UK')",
+			"/BusinessPartners(22)"
+		], [ // Country, Id, SalesNumber
+			["US", 11, 5],
+			["UK", "", ""],
+			["UK", 22, 2]
+		], 4 + 1);
+	});
+});
 
 	//*********************************************************************************************
 	// Scenario: sap.ui.table.Table with aggregation and visual grouping. Show additional text
