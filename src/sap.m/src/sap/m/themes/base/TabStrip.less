@@ -8,7 +8,7 @@
 	position: relative;
 	height: 3rem;
 	background: var(--sapPageHeader_Background);
-	box-shadow: @sapUiShadowHeader;
+	box-shadow: var(--sapContent_HeaderShadow);
 	box-sizing: border-box;
 
 	.sapMTSLeftOverflowButtons {
@@ -53,7 +53,6 @@
 				float: left;
 				cursor: pointer;
 				-webkit-user-select: none;
-				-moz-user-select: none;
 				user-select: none;
 				background: transparent;
 				color: var(--sapGroup_TitleTextColor);
@@ -81,7 +80,7 @@
 
 				.sapMTabStripItemLabel {
 					vertical-align: middle;
-					font-size: @sapMFontMediumSize;
+					font-size: var(--sapFontSize);
 				}
 
 				.sapMTSItemCloseBtnCnt {
@@ -156,6 +155,7 @@
 	font-family: var(--sapFontFamily);
 	font-size: var(--sapFontSmallSize);
 }
+
 .sapMSelectListItemBase.sapMSelectListItemBasePressed.sapMTSOverflowSelectListItem .sapMTabStripSelectListItemCloseBtn .sapMBtnIcon,
 .sapMSelectListItemBase.sapMSelectListItemBasePressed.sapMTSOverflowSelectListItem .sapMSelectListItemText .sapMTabContIcon.sapUiIcon,
 .sapMSelectListItemBase.sapMSelectListItemBasePressed.sapMTSOverflowSelectListItem .sapMTabStripItemAddText {
@@ -267,24 +267,24 @@ html[data-sap-ui-animation='on'] .sapMTabStrip .sapMTSTabsContainer .sapMTSTabs 
 	transition: opacity 0.3s;
 }
 
-html[dir=ltr] .sapMTabStrip .sapMTSLeftOverflowButtons,
-html[dir=rtl] .sapMTabStrip .sapMTSRightOverflowButtons {
-	background: linear-gradient(90deg, @sapUiPageHeaderBackground 0%, @sapUiPageHeaderBackground 75%, fade(@sapUiPageHeaderBackground, 0) 100%);
+html[dir='ltr'] .sapMTabStrip .sapMTSLeftOverflowButtons,
+html[dir='rtl'] .sapMTabStrip .sapMTSRightOverflowButtons {
+	background: linear-gradient(90deg, var(--sapPageHeader_Background) 0%, var(--sapPageHeader_Background) 75%, ~'hsl(from var(--sapPageHeader_Background) h s l / 0)' 100%);
 }
 
-html[dir=ltr] .sapMTabStrip .sapMTSLeftOverflowButtons::after,
-html[dir=rtl] .sapMTabStrip .sapMTSRightOverflowButtons::after {
-	background: linear-gradient(90deg, @sapUiObjectHeaderBorderColor 0%, @sapUiObjectHeaderBorderColor 75%, fade(@sapUiObjectHeaderBorderColor, 0) 100%);
+html[dir='ltr'] .sapMTabStrip .sapMTSLeftOverflowButtons::after,
+html[dir='rtl'] .sapMTabStrip .sapMTSRightOverflowButtons::after {
+	background: linear-gradient(90deg, var(--sapObjectHeader_BorderColor) 0%, var(--sapObjectHeader_BorderColor) 75%, ~'hsl(from var(--sapObjectHeader_BorderColor) h s l / 0)' 100%);
 }
 
-html[dir=ltr] .sapMTabStrip .sapMTSRightOverflowButtons,
-html[dir=rtl] .sapMTabStrip .sapMTSLeftOverflowButtons {
-	background: linear-gradient(90deg, fade(@sapUiPageHeaderBackground, 0) 0%, @sapUiPageHeaderBackground 25%, @sapUiPageHeaderBackground 100%);
+html[dir='ltr'] .sapMTabStrip .sapMTSRightOverflowButtons,
+html[dir='rtl'] .sapMTabStrip .sapMTSLeftOverflowButtons {
+	background: linear-gradient(90deg, ~'hsl(from var(--sapPageHeader_Background) h s l / 0)' 0%, var(--sapPageHeader_Background) 25%, var(--sapPageHeader_Background) 100%);
 }
 
-html[dir=ltr] .sapMTabStrip .sapMTSRightOverflowButtons::after,
-html[dir=rtl] .sapMTabStrip .sapMTSLeftOverflowButtons::after {
-	background: linear-gradient(90deg, fade(@sapUiObjectHeaderBorderColor, 0) 0%, @sapUiObjectHeaderBorderColor 25%, @sapUiObjectHeaderBorderColor 100%);
+html[dir='ltr'] .sapMTabStrip .sapMTSRightOverflowButtons::after,
+html[dir='rtl'] .sapMTabStrip .sapMTSLeftOverflowButtons::after {
+	background: linear-gradient(90deg, ~'hsl(from var(--sapObjectHeader_BorderColor) h s l / 0)' 0%, var(--sapObjectHeader_BorderColor) 25%, var(--sapObjectHeader_BorderColor) 100%);
 }
 
 html .sapMTabStripSelectListItemCloseBtn .sapMBtnInner {
@@ -455,7 +455,7 @@ html .sapMTabStripSelectListItemCloseBtn .sapMBtnInner {
 			line-height: 1.25rem;
 		}
 
-		.sapMBtnInner  {
+		.sapMBtnInner {
 			height: 1.25rem;
 			min-width: 1.25rem;
 			width: 1.25rem;
@@ -491,6 +491,7 @@ html .sapMTabStripSelectListItemCloseBtn .sapMBtnInner {
 
 /* Phone overflow dialog list */
 html.sap-phone {
+
 	.sapMTSOverflowSelectListItem {
 		min-height: 3rem;
 		padding: 0 0.5rem 0 0.5rem;
@@ -570,6 +571,7 @@ html.sap-phone {
 		border-bottom: 1px solid var(--sapList_BorderColor);
 		box-sizing: border-box;
 		cursor: pointer;
+
 		&:focus {
 			outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 			outline-offset: -2px;
