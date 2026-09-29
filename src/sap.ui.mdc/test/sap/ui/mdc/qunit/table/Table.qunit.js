@@ -1662,11 +1662,14 @@ sap.ui.define([
 	});
 
 	QUnit.test("copyProvider", function(assert) {
-		const oClipboardStub = sinon.stub(window, "navigator").value({clipboard: {}});
-		const oSecureContextStub = sinon.stub(window, "isSecureContext").value(true);
-		this.oTable.setCopyProvider(new CopyProvider());
-
+		// Set the CopyProvider only after full initialization so that the toolbar already exists and the Copy button is
+		// created synchronously while the isSecureContext stub is guaranteed to be active. Creating the button during the
+		// async table initialization made the test rely on the host-global stub surviving the async gap, which is flaky
+		// in Safari/WebKit and caused sporadic failures.
 		return this.oTable._fullyInitialized().then(function() {
+			const oSecureContextStub = sinon.stub(window, "isSecureContext").value(true);
+			this.oTable.setCopyProvider(new CopyProvider());
+
 			assert.equal(this.oTable.getCopyProviderPluginOwner(), this.oTable._oTable, "The inner table is set as plugin owner for CopyProvider");
 
 			const oColumn = new Column();
@@ -1681,7 +1684,6 @@ sap.ui.define([
 			assert.equal(this.oTable._oToolbar.indexOfEnd(oCopyButton), 0,
 				"Copy button is added to the toolbar, as a first element of the end aggreagtion");
 
-			oClipboardStub.restore();
 			oSecureContextStub.restore();
 		}.bind(this));
 	});
