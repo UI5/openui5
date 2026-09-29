@@ -7,7 +7,8 @@
 		<script src="shared-config.js"></script>
 		<script src="../../../resources/sap-ui-core.js"
 			id="sap-ui-bootstrap"
-			data-sap-ui-libs="sap.m, sap.ui.layout">
+			data-sap-ui-libs="sap.m, sap.ui.layout"
+			data-sap-ui-xx-tooltip="enhanced">
 		</script>
 
 		<script>
@@ -1133,6 +1134,30 @@
 									oInput.addSuggestionItem(new sap.ui.core.SeparatorItem({text: "Group C"}));
 									["Apron", "Amber", "Arrow"].filter(function(s){ return s.toLowerCase().indexOf(sValue) === 0; })
 										.forEach(function(s){ oInput.addSuggestionItem(new sap.ui.core.Item({text: s})); });
+								}
+							}),
+
+							new sap.m.Input({
+								value: "007",
+								valueState: "Error",
+								showClearIcon: true,
+								showValueHelp: true,
+								description: "Bastian Schweinsteiger",
+								fieldWidth: "20%",
+								formattedValueStateText: new sap.m.FormattedText({
+									htmlText: "This value is invalid. Use %%0 to pick a valid entry.",
+									controls: [new sap.m.Link({
+										text: "value help",
+										tooltip: "Open the value help dialog",
+										href: "#",
+										press: function(oEvent) {
+											oEvent.preventDefault();
+											sap.m.MessageBox.alert("Value help requested");
+										}
+									})]
+								}),
+								valueHelpRequest: function() {
+									sap.m.MessageBox.alert("Value help requested");
 								}
 							})
 						]

@@ -86,7 +86,10 @@ sap.ui.define(["sap/ui/core/ControlBehavior", 'sap/ui/core/Renderer', 'sap/ui/co
 		this.writeOuterAttributes(oRm, oControl);
 		var sTooltip = oControl.getTooltip_AsString();
 
-		if (sTooltip) {
+		// When the enhanced tooltip is active, the tooltip text is displayed via the
+		// TooltipEnablement popup, so the native "title" attribute is suppressed to
+		// avoid a duplicated browser tooltip.
+		if (sTooltip && !oControl._oEnhancedTooltip) {
 			oRm.attr("title", sTooltip);
 		}
 
@@ -195,6 +198,10 @@ sap.ui.define(["sap/ui/core/ControlBehavior", 'sap/ui/core/Renderer', 'sap/ui/co
 		// for backward compatibility
 		this.writeDecorations(oRm, oControl);
 
+		if (oControl._oEnhancedTooltip) {
+			oControl._oEnhancedTooltip.renderInvisibleTooltip(oRm);
+		}
+
 		// render hidden aria nodes
 		if (bAccessibility) {
 			this.renderAriaLabelledBy(oRm, oControl);
@@ -273,9 +280,18 @@ sap.ui.define(["sap/ui/core/ControlBehavior", 'sap/ui/core/Renderer', 'sap/ui/co
 	 * @returns {string|undefined}
 	 */
 	InputBaseRenderer.getAriaDescribedBy = function(oControl) {
+		var sAriaDescribedBy;
+
 		if (this.getDescribedByAnnouncement(oControl)) {
-			return oControl.getId() + "-describedby";
+			sAriaDescribedBy = oControl.getId() + "-describedby";
 		}
+
+		var sEnhancedTooltipId = oControl._oEnhancedTooltip && oControl._oEnhancedTooltip.getInvisibleTooltipId();
+		if (sEnhancedTooltipId) {
+			sAriaDescribedBy = sAriaDescribedBy ? sAriaDescribedBy + " " + sEnhancedTooltipId : sEnhancedTooltipId;
+		}
+
+		return sAriaDescribedBy;
 	};
 
 	/**

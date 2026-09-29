@@ -92,11 +92,20 @@ sap.ui.define(["sap/base/i18n/Localization", "sap/ui/core/ControlBehavior", 'sap
 			.style("width", "calc(100% - " + oControl.getFieldWidth() + ")")
 			.openEnd();
 
+		var sDescrTooltipId = oControl._oDescriptionTooltip && oControl._oDescriptionTooltip.getInvisibleTooltipId();
 		oRm.openStart("span", oControl.getId() + "-descr")
-			.class("sapMInputDescriptionText")
-			.openEnd()
+			.class("sapMInputDescriptionText");
+		if (sDescrTooltipId) {
+			oRm.attr("aria-describedby", sDescrTooltipId);
+		}
+		oRm.openEnd()
 			.text(oControl.getDescription())
 			.close("span");
+
+		if (oControl._oDescriptionTooltip) {
+			oControl._oDescriptionTooltip.renderInvisibleTooltip(oRm);
+		}
+
 		oRm.close("div");
 	};
 
@@ -110,6 +119,12 @@ sap.ui.define(["sap/base/i18n/Localization", "sap/ui/core/ControlBehavior", 'sap
 	InputRenderer.writeDecorations = function (oRm, oControl) {
 		if (oControl.getDescription()) {
 			this.writeDescription(oRm, oControl);
+		}
+		if (oControl._oClearIconTooltip) {
+			oControl._oClearIconTooltip.renderInvisibleTooltip(oRm);
+		}
+		if (oControl._oValueHelpIconTooltip) {
+			oControl._oValueHelpIconTooltip.renderInvisibleTooltip(oRm);
 		}
 	};
 

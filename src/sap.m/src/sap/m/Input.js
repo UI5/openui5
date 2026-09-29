@@ -38,6 +38,7 @@ sap.ui.define([
 	"sap/ui/base/ManagedObject",
 	"sap/ui/base/ManagedObjectObserver",
 	"sap/ui/core/Lib",
+	"sap/ui/core/tooltip/TooltipEnablement",
 	// provides jQuery.fn.selectText
 	"sap/ui/dom/jquery/selectText"
 ],
@@ -75,7 +76,8 @@ function(
 	InputRenderer,
 	ManagedObject,
 	ManagedObjectObserver,
-	Library
+	Library,
+	TooltipEnablement
 ) {
 	"use strict";
 	// shortcut for sap.m.ListType
@@ -656,6 +658,31 @@ function(
 		this._setAfterOpenFinished(false);
 
 		AccessKeysEnablement.registerControl(this);
+
+		if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+			this._oClearIconTooltip = new TooltipEnablement(this, {
+				textProvider: () => this._oRb.getText("INPUT_CLEAR_ICON_ALT"),
+				domRefProvider: () => (this._oClearButton ? this._oClearButton.getDomRef() : null),
+				focusDomRefProvider: () => (this._oClearButton ? this._oClearButton.getDomRef() : null),
+				invisibleTooltipIdSuffix: "-clearIconTooltip"
+			});
+
+			this._oValueHelpIconTooltip = new TooltipEnablement(this, {
+				textProvider: () => this._oRb.getText("INPUT_VALUEHELP_BUTTON_TOOLTIP"),
+				domRefProvider: () => (this._oValueHelpIcon ? this._oValueHelpIcon.getDomRef() : null),
+				focusDomRefProvider: () => (this._oValueHelpIcon ? this._oValueHelpIcon.getDomRef() : null),
+				invisibleTooltipIdSuffix: "-valueHelpIconTooltip"
+			});
+
+			this._oDescriptionTooltip = new TooltipEnablement(this, {
+				textProvider: () => {
+					const oDescrDom = this.getDomRef("descr");
+					return (oDescrDom && oDescrDom.scrollWidth > oDescrDom.offsetWidth) ? (this.getDescription() || "") : "";
+				},
+				domRefProvider: () => this.getDomRef("descr") || null,
+				invisibleTooltipIdSuffix: "-descrTooltip"
+			});
+		}
 	};
 
 	var setRefLabelsHighlightAccKeysRef = function (bHighlightAccKeysRef) {
@@ -707,6 +734,13 @@ function(
 
 		// Unregister custom events handlers after migration to semantic rendering
 		this.$().off("click");
+
+		this._oClearIconTooltip?.destroy();
+		this._oClearIconTooltip = null;
+		this._oValueHelpIconTooltip?.destroy();
+		this._oValueHelpIconTooltip = null;
+		this._oDescriptionTooltip?.destroy();
+		this._oDescriptionTooltip = null;
 	};
 
 	/*
@@ -729,6 +763,14 @@ function(
 			this._getClearIcon().setProperty("visible", bShowClearIcon);
 		} else if (this._oClearButton) {
 			this._getClearIcon().setProperty("visible", false);
+		}
+
+		if (!bShowClearIcon) {
+			this._oClearIconTooltip?.close();
+		}
+
+		if (!bShowValueHelpIcon) {
+			this._oValueHelpIconTooltip?.close();
 		}
 
 		this._deregisterEvents();
@@ -1199,6 +1241,19 @@ function(
 					that._fireValueHelpRequest(false, false);
 				}
 			});
+
+			const sVhiTooltipId = this._oValueHelpIconTooltip?.getInvisibleTooltipId();
+			this._oValueHelpIcon.addDelegate({
+				onAfterRendering: () => {
+					const oDom = this._oValueHelpIcon.getDomRef();
+					if (oDom) {
+						oDom.setAttribute("aria-keyshortcuts", "F4");
+						if (sVhiTooltipId) {
+							oDom.setAttribute("aria-describedby", sVhiTooltipId);
+						}
+					}
+				}
+			});
 		} else if (this._oValueHelpIcon.getSrc() !== sIconSrc) {
 			this._oValueHelpIcon.setSrc(sIconSrc);
 		}
@@ -1243,6 +1298,17 @@ function(
 				}
 			}
 		}, 0);
+
+		if (this._oClearIconTooltip) {
+			const sTooltipId = this._oClearIconTooltip.getInvisibleTooltipId();
+			if (sTooltipId) {
+				this._oClearButton.addDelegate({
+					onAfterRendering: () => {
+						this._oClearButton.getDomRef()?.setAttribute("aria-describedby", sTooltipId);
+					}
+				});
+			}
+		}
 
 		return this._oClearButton;
 	};

@@ -21,6 +21,7 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/core/Lib",
+	"sap/ui/core/tooltip/TooltipEnablement",
 	// jQuery Plugin "cursorPos"
 	"sap/ui/dom/jquery/cursorPos",
 	// jQuery Plugin "getSelectedText"
@@ -46,7 +47,8 @@ function(
 	log,
 	KeyCodes,
 	jQuery,
-	Library
+	Library,
+	TooltipEnablement
 ) {
 	"use strict";
 
@@ -329,6 +331,20 @@ function(
 		this.setErrorMessageAnnouncementState(false);
 
 		this.fnCloseValueStateOnClick = this.closeValueStateMessage.bind(this);
+
+		if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+			this._oEnhancedTooltip = new TooltipEnablement(this, {
+				textProvider: () => {
+					const bInputFocused = this.getFocusDomRef() === document.activeElement;
+					if (bInputFocused && this.shouldValueStateMessageBeOpened()) {
+						return "";
+					}
+					var sTooltip = this.getTooltip_AsString();
+					return sTooltip || "";
+				},
+				invisibleTooltipIdSuffix: "-enhancedTooltip"
+			});
+		}
 	};
 
 	InputBase.prototype._oLinkDelegate = {
@@ -514,6 +530,9 @@ function(
 			this._oInvisibleMessage.destroy();
 			this._oInvisibleMessage = null;
 		}
+
+		this._oEnhancedTooltip?.destroy();
+		this._oEnhancedTooltip = null;
 
 		this._oValueStateMessage = null;
 	};
@@ -779,6 +798,8 @@ function(
 	InputBase.prototype.oninput = function(oEvent) {
 		// dom value updated other than value property
 		this._bCheckDomValue = true;
+
+		this._oEnhancedTooltip?.close();
 	};
 
 	/**
@@ -1260,6 +1281,7 @@ function(
 	 */
 	InputBase.prototype.openValueStateMessage = function() {
 		if (this._oValueStateMessage && this.shouldValueStateMessageBeOpened()) {
+			this._oEnhancedTooltip?.close();
 			this._oPreviousFocus = Popup.getCurrentFocusInfo();
 			// Render the value state message after closing of the popover
 			// is complete and the FormattedText aggregation is finished the parent
