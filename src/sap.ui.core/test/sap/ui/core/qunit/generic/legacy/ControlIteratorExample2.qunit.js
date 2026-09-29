@@ -19,6 +19,34 @@ sap.ui.define([
 		ControlIterator.run(function(sControlName, oControlClass, oInfo) { // loop over all controls
 			assert.ok(true, sControlName + " would be tested now");        // do one or more asserts per control
 		},{
+			excludedControls: [
+				"sap.m._overflowToolbarHelpers.OverflowToolbarAssociativePopover",
+				"sap.m._PlanningCalendarInternalHeader",
+				"sap.m._PlanningCalendarIntervalPlaceholder",
+				"sap.m._PlanningCalendarRowHeader",
+				"sap.m._PlanningCalendarRowTimeline",
+				"sap.m.DynamicDateRangeListItem",
+				"sap.m.HeaderContainerItemContainer",
+				"sap.m.internal.CustomNumericInput",
+				"sap.m.internal.DateTimePickerPopup",
+				"sap.m.internal.DynamicDateRangeInput",
+				"sap.m.internal.ObjectMarkerCustomLink",
+				"sap.m.internal.ObjectMarkerCustomText",
+				"sap.m.internal.PlanningCalendarRowListItem",
+				"sap.m.internal.TabStripSelect",
+				"sap.m.internal.TabStripSelectList",
+				"sap.m.internal.ToggleSpinButton",
+				"sap.m.SinglePlanningCalendarGrid._internal.IntervalPlaceholder",
+				"sap.m.SinglePlanningCalendarMonthGrid._internal.IntervalPlaceholder",
+				"sap.m.table.columnmenu.AssociativeControl",
+				"sap.m.upload.DynamicItemContent",
+				"sap.ui.comp.SmartToggle",
+				"sap.ui.documentation.Container",
+				"sap.ui.layout.form.ResponsiveLayoutPanel",
+				"sap.ui.unified._ColorPickerBox",
+				"sap.ui.unified.internal.CustomMonthPicker",
+				"sap.ui.unified.internal.CustomYearPicker"
+			],
 			done: function(oResult) {
 				// do something when all control tests have been executed
 

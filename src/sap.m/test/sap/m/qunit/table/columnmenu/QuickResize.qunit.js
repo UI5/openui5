@@ -57,7 +57,7 @@ sap.ui.define([
 				});
 
 				oQuickResize.setWidth(iValue);
-				oStepInput._verifyValue();
+				oStepInput._getNumericInput()._verifyValue();
 			});
 		}
 

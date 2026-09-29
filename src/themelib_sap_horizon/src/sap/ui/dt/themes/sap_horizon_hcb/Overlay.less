@@ -6,6 +6,7 @@
 .sapUI5Scope {
 	--_sap_ui_dt_Overlay_TargetZoneOutlineColor: var(--sapSuccessBorderColor);
 	--_sap_ui_dt_Overlay_SelectionOutlineColor: ~'hsl(from var(--sapSuccessBorderColor) h s calc(l - 25))';
+	--_sap_ui_dt_Overlay_FocusBorderColor: var(--_sap_ui_dt_Overlay_SelectionOutlineColor);
 	--_sap_ui_dt_Overlay_CuttedBackgroundColor: var(--sapField_PlaceholderTextColor);
 	--_sap_ui_dt_Overlay_CuttedBorderColor: ~'hsl(from var(--sapSuccessBorderColor) h s calc(l - 25))';
 	--_sap_ui_dt_Overlay_HighlightOutlineColor: var(--sapWarningBorderColor);
@@ -20,7 +21,7 @@
 
 		&::before {
 			border-radius: var(--_sap_ui_dt_Overlay_BorderRadius);
-			outline: 0.125rem dotted var(--_sap_ui_dt_Overlay_FocusBorderColor);
+			outline: 0.125rem dotted var(--_sap_ui_dt_Overlay_FocusBorderColor); /* 2px */
 			border: none;
 			outline-offset: -0.25rem; /* 4px */
 		}

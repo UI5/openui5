@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Illustrations', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/parameters-bundle3.css', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, parametersBundle_css$2, Illustrations, AccessibilityTextsHelper, parametersBundle_css, i18nDefaults, ManagedStyles, parametersBundle_css$1, Title, Icons) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/Illustrations', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/parameters-bundle3.css', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, parametersBundle_css$2, ManagedStyles, Illustrations, AccessibilityTextsHelper, parametersBundle_css, i18nDefaults, parametersBundle_css$1, Title, Icons) { 'use strict';
 
     /**
      * Different types of IllustrationMessageDesign.
@@ -899,7 +899,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/paramet
 
     ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
     ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
-    var IllustratedMessageCss = `:host(:not([hidden])){display:block}:host{box-sizing:border-box;width:100%;height:100%;padding:1rem}.ui5-illustrated-message-root,.ui5-illustrated-message-inner,.ui5-illustrated-message-text-and-actions-container{display:flex;flex-direction:column;align-items:center;justify-content:center;height:inherit;min-height:0;flex-basis:content}.ui5-illustrated-message-illustration{margin:2rem 0}.ui5-illustrated-message-illustration svg{max-height:100%;max-width:100%}.ui5-illustrated-message-illustration.ui5-illustrated-message-illustration-fit-content{position:relative;width:0;padding:0 0 0 100%;height:100%;display:flex;align-items:center}.ui5-illustrated-message-illustration.ui5-illustrated-message-illustration-fit-content svg{position:absolute;height:100%;width:100%;left:0;top:0}.ui5-illustrated-message-title [ui5-title],.ui5-illustrated-message-title ::slotted([slot="title"]){text-align:center;margin-bottom:1rem;font-size:var(--sapFontHeader2Size);font-family:var(--sapFontHeaderFamily);font-weight:700;max-width:61.9375rem}.ui5-illustrated-message-subtitle{text-align:center;font-size:var(--sapFontLargeSize);font-family:var(--sapFontFamily);color:var(--sapTextColor);margin-bottom:.5rem;max-width:61.9375rem}.ui5-illustrated-message-actions{margin:1rem 0}:host([media="dialog"]) .ui5-illustrated-message-illustration{margin:1rem 0}:host([media="dialog"]) .ui5-illustrated-message-title [ui5-title],:host([media="dialog"]) ::slotted([slot="title"]){margin-bottom:.5rem;font-size:var(--sapFontHeader3Size);max-width:40.5625rem}:host([media="dialog"]) .ui5-illustrated-message-subtitle{margin-bottom:.5rem;font-size:var(--sapFontSize);max-width:40.5625rem}:host([media="dialog"]) .ui5-illustrated-message-actions{margin-top:.5rem;margin-bottom:1rem}:host([media="spot"]){padding:.5rem}:host([media="spot"]) .ui5-illustrated-message-illustration{margin-bottom:.5rem;margin-top:0}:host([media="spot"]) .ui5-illustrated-message-title [ui5-title],:host([media="spot"]) ::slotted([slot="title"]){margin-bottom:.5rem;font-size:var(--sapFontHeader4Size);max-width:21.5rem}:host([media="spot"]) .ui5-illustrated-message-subtitle{font-size:var(--sapFontSize);max-width:21.5rem;margin-bottom:.5rem}:host([media="spot"]) .ui5-illustrated-message-actions{margin:.5rem 0}:host([media="dot"]){padding:.25rem;min-height:4rem}:host([media="dot"]) .ui5-illustrated-message-inner{flex-direction:row}:host([media="dot"]) .ui5-illustrated-message-illustration{margin:0 .25rem 0 0;height:2.8125rem;width:2.8125rem;align-self:baseline}:host([media="dot"]) .ui5-illustrated-message-title [ui5-title],:host([media="dot"]) ::slotted([slot="title"]){margin-bottom:.25rem;font-size:var(--sapFontHeader5Size);max-width:12.6875rem}:host([media="dot"]) .ui5-illustrated-message-subtitle{font-size:var(--sapFontSize);max-width:12.6875rem;margin-bottom:.25rem}:host([media="dot"]) .ui5-illustrated-message-actions{margin:.25rem 0}:host([media="base"]) .ui5-illustrated-message-illustration{display:none}:host([media="base"]) .ui5-illustrated-message-title [ui5-title],:host([media="base"]) ::slotted([slot="title"]){margin-bottom:.25rem;font-size:var(--sapFontHeader5Size);max-width:10rem}:host([media="base"]) .ui5-illustrated-message-subtitle{font-size:var(--sapFontSize);max-width:10rem;margin-bottom:0rem}.ui5-illustrated-message-util{position:fixed;top:-9999px;left:-9999px}.sapIllus_BlendModeMultiply{mix-blend-mode:multiply}.sapIllus_MaskTypeAlpha{mask-type:alpha}.sapIllus_BackgroundColor{fill:var(--sapContent_Illustrative_Color7)}.sapIllus_BrandColorPrimary{fill:var(--sapContent_Illustrative_Color1)}.sapIllus_BrandColorSecondary{fill:var(--sapContent_Illustrative_Color2)}.sapIllus_StrokeDetailColor{fill:var(--sapContent_Illustrative_Color4)}.sapIllus_Layering1{fill:var(--sapContent_Illustrative_Color5)}.sapIllus_Layering2{fill:var(--sapContent_Illustrative_Color6)}.sapIllus_ObjectFillColor{fill:var(--sapContent_Illustrative_Color8)}.sapIllus_AccentColor{fill:var(--sapContent_Illustrative_Color3)}.sapIllus_NoColor{fill:none}.sapIllus_PatternShadow{fill:url(#sapIllus_PatternShadow)}.sapIllus_PatternHighlight{fill:url(#sapIllus_PatternHighlight)}.sapIllus_NoColor_Fill{fill:none}.sapIllus_BrandColorPrimary_Fill{fill:var(--sapContent_Illustrative_Color1)}.sapIllus_ObjectFillColor_Fill{fill:var(--sapContent_Illustrative_Color8)}
+    var IllustratedMessageCss = `:host(:not([hidden])){display:block}:host{box-sizing:border-box;width:100%;height:100%}.ui5-illustrated-message-root,.ui5-illustrated-message-inner,.ui5-illustrated-message-text-and-actions-container{display:flex;flex-direction:column;align-items:center;justify-content:center;height:inherit;flex-basis:content}.ui5-illustrated-message-root,.ui5-illustrated-message-inner{min-height:0}.ui5-illustrated-message-inner{padding:1rem;box-sizing:border-box}.ui5-illustrated-message-illustration{margin:2rem 0}.ui5-illustrated-message-illustration svg{max-height:100%;max-width:100%}.ui5-illustrated-message-title [ui5-title],.ui5-illustrated-message-title ::slotted([slot="title"]){text-align:center;margin-bottom:1rem;font-size:var(--sapFontHeader2Size);font-family:var(--sapFontHeaderFamily);font-weight:700;max-width:61.9375rem}.ui5-illustrated-message-subtitle{text-align:center;font-size:var(--sapFontLargeSize);font-family:var(--sapFontFamily);color:var(--sapTextColor);margin-bottom:.5rem;max-width:61.9375rem}.ui5-illustrated-message-actions{margin:1rem 0}:host([media="dialog"]) .ui5-illustrated-message-illustration{margin:1rem 0}:host([media="dialog"]) .ui5-illustrated-message-title [ui5-title],:host([media="dialog"]) ::slotted([slot="title"]){margin-bottom:.5rem;font-size:var(--sapFontHeader3Size);max-width:40.5625rem}:host([media="dialog"]) .ui5-illustrated-message-subtitle{margin-bottom:.5rem;font-size:var(--sapFontSize);max-width:40.5625rem}:host([media="dialog"]) .ui5-illustrated-message-actions{margin-top:.5rem;margin-bottom:1rem}:host([media="spot"]) .ui5-illustrated-message-inner{padding:.5rem}:host([media="spot"]) .ui5-illustrated-message-illustration{margin-bottom:.5rem;margin-top:0}:host([media="spot"]) .ui5-illustrated-message-title [ui5-title],:host([media="spot"]) ::slotted([slot="title"]){margin-bottom:.5rem;font-size:var(--sapFontHeader4Size);max-width:21.5rem}:host([media="spot"]) .ui5-illustrated-message-subtitle{font-size:var(--sapFontSize);max-width:21.5rem;margin-bottom:.5rem}:host([media="spot"]) .ui5-illustrated-message-actions{margin:.5rem 0}:host([media="dot"]) .ui5-illustrated-message-inner{padding:.25rem;min-height:4rem}:host([media="dot"]) .ui5-illustrated-message-inner{flex-direction:row}:host([media="dot"]) .ui5-illustrated-message-illustration{margin:0 .25rem 0 0;height:2.8125rem;width:2.8125rem;align-self:baseline}:host([media="dot"]) .ui5-illustrated-message-title [ui5-title],:host([media="dot"]) ::slotted([slot="title"]){margin-bottom:.25rem;font-size:var(--sapFontHeader5Size);max-width:12.6875rem}:host([media="dot"]) .ui5-illustrated-message-subtitle{font-size:var(--sapFontSize);max-width:12.6875rem;margin-bottom:.25rem}:host([media="dot"]) .ui5-illustrated-message-actions{margin:.25rem 0}:host([media="base"]) .ui5-illustrated-message-illustration{display:none}:host([media="base"]) .ui5-illustrated-message-title [ui5-title],:host([media="base"]) ::slotted([slot="title"]){margin-bottom:.25rem;font-size:var(--sapFontHeader5Size);max-width:10rem}:host([media="base"]) .ui5-illustrated-message-subtitle{font-size:var(--sapFontSize);max-width:10rem;margin-bottom:0rem}.ui5-illustrated-message-util{position:fixed;top:-9999px;left:-9999px}.sapIllus_BlendModeMultiply{mix-blend-mode:multiply}.sapIllus_MaskTypeAlpha{mask-type:alpha}.sapIllus_BackgroundColor{fill:var(--sapContent_Illustrative_Color7)}.sapIllus_BrandColorPrimary{fill:var(--sapContent_Illustrative_Color1)}.sapIllus_BrandColorSecondary{fill:var(--sapContent_Illustrative_Color2)}.sapIllus_StrokeDetailColor{fill:var(--sapContent_Illustrative_Color4)}.sapIllus_Layering1{fill:var(--sapContent_Illustrative_Color5)}.sapIllus_Layering2{fill:var(--sapContent_Illustrative_Color6)}.sapIllus_ObjectFillColor{fill:var(--sapContent_Illustrative_Color8)}.sapIllus_AccentColor{fill:var(--sapContent_Illustrative_Color3)}.sapIllus_NoColor{fill:none}.sapIllus_PatternShadow{fill:url(#sapIllus_PatternShadow)}.sapIllus_PatternHighlight{fill:url(#sapIllus_PatternHighlight)}.sapIllus_NoColor_Fill{fill:none}.sapIllus_BrandColorPrimary_Fill{fill:var(--sapContent_Illustrative_Color1)}.sapIllus_ObjectFillColor_Fill{fill:var(--sapContent_Illustrative_Color8)}
 `;
 
     function IllustratedMessageTemplate() {
@@ -985,7 +985,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/paramet
      * @public
      * @since 1.0.0-rc.15
      */
-    let IllustratedMessage = IllustratedMessage_1 = class IllustratedMessage extends webcomponentsBase.S {
+    let IllustratedMessage = IllustratedMessage_1 = class IllustratedMessage extends webcomponentsBase.b {
         constructor() {
             super();
             /**
@@ -1034,11 +1034,13 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/paramet
             */
             this.decorative = false;
             this._handleResize = this.handleResize.bind(this);
-            // this will store the last known offsetWidth of the IllustratedMessage DOM node for a given media (e.g. "Spot")
-            this._lastKnownOffsetWidthForMedia = {};
-            this._lastKnownOffsetHeightForMedia = {};
-            // this will store the last known media, in order to detect if IllustratedMessage has been hidden by expand/collapse container
-            this._lastKnownMedia = "base";
+            this._handleThemeLoaded = () => {
+                // Cached content-height are theme-dependent, so clear them when the theme changes.
+                // This hook is needed because `onInvalidation` does not fire when the theme changes
+                this._contentHeightForMedia = {};
+            };
+            // this will store the height of the inner content of the IllustratedMessage (illustration + title + subtitle + actions) for a given media (e.g. "Spot")
+            this._contentHeightForMedia = {};
         }
         static get BREAKPOINTS() {
             return {
@@ -1046,14 +1048,6 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/paramet
                 SPOT: 360,
                 DOT: 260,
                 BASE: 160,
-            };
-        }
-        static get BREAKPOINTS_HEIGHT() {
-            return {
-                DIALOG: 415,
-                SPOT: 284,
-                DOT: 207,
-                BASE: 61,
             };
         }
         static get MEDIA() {
@@ -1111,49 +1105,68 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/paramet
         }
         onEnterDOM() {
             webcomponentsBase.f.register(this, this._handleResize);
+            ManagedStyles.o$1(this._handleThemeLoaded);
         }
         onExitDOM() {
             webcomponentsBase.f.deregister(this, this._handleResize);
+            ManagedStyles.n(this._handleThemeLoaded);
+        }
+        onInvalidation(changeInfo) {
+            if ((changeInfo.type === "property" && ["name", "titleText", "subtitleText"].includes(changeInfo.name))
+                || (changeInfo.type === "slot" && ["title", "subtitle", "default"].includes(changeInfo.name))) {
+                this._contentHeightForMedia = {};
+            }
         }
         handleResize() {
-            if (this.design !== IllustrationMessageDesign$1.Auto) {
-                this._adjustHeightToFitContainer();
-                return;
+            if (this.design === IllustrationMessageDesign$1.Auto) {
+                this._checkHeightConstraints();
+                this._applyMedia();
             }
-            this._applyMedia();
-            window.requestAnimationFrame(this._adjustHeightToFitContainer.bind(this));
         }
-        _applyMedia(heightChange) {
-            const currOffsetWidth = this.offsetWidth, currOffsetHeight = this.offsetHeight;
-            const design = heightChange ? currOffsetHeight : currOffsetWidth, oBreakpounts = heightChange ? IllustratedMessage_1.BREAKPOINTS_HEIGHT : IllustratedMessage_1.BREAKPOINTS;
-            let newMedia = "";
-            if (design <= oBreakpounts.BASE) {
-                newMedia = IllustratedMessage_1.MEDIA.BASE;
+        /**
+         * Checks if the current height of the component is enough to display the illustration, title, subtitle and actions.
+         * If not, the minimum required height for the current media is stored in the `_contentHeightForMedia` object.
+         * @private
+         */
+        _checkHeightConstraints() {
+            // The `scrollHeight > clientHeight` guard is load-bearing: the cache must be populated ONLY
+            // when the content genuinely overflows the container. When the host container has
+            // `height: auto`, its clientHeight equals the content height and there is by definition no
+            // real constraint — recording that height would falsely poison `_contentHeightForMedia` and
+            // cause spurious downgrades on the next render (e.g. after a width shrink-and-grow).
+            if (this.media && this.scrollHeight > this.clientHeight) { // needs vertical responsiveness
+                const innerEl = this.shadowRoot.querySelector(".ui5-illustrated-message-inner");
+                const innerElHeight = innerEl ? innerEl.scrollHeight : 0;
+                innerElHeight && (this._contentHeightForMedia[this.media] = innerElHeight);
             }
-            else if (design <= oBreakpounts.DOT) {
-                newMedia = IllustratedMessage_1.MEDIA.DOT;
+        }
+        _applyMedia() {
+            const width = this.offsetWidth;
+            let media = "", mediaIndex = -1;
+            if (width <= IllustratedMessage_1.BREAKPOINTS.BASE) {
+                media = IllustratedMessage_1.MEDIA.BASE;
             }
-            else if (design <= oBreakpounts.SPOT) {
-                newMedia = IllustratedMessage_1.MEDIA.SPOT;
+            else if (width <= IllustratedMessage_1.BREAKPOINTS.DOT) {
+                media = IllustratedMessage_1.MEDIA.DOT;
             }
-            else if (design <= oBreakpounts.DIALOG) {
-                newMedia = IllustratedMessage_1.MEDIA.DIALOG;
+            else if (width <= IllustratedMessage_1.BREAKPOINTS.SPOT) {
+                media = IllustratedMessage_1.MEDIA.SPOT;
+            }
+            else if (width <= IllustratedMessage_1.BREAKPOINTS.DIALOG) {
+                media = IllustratedMessage_1.MEDIA.DIALOG;
             }
             else {
-                newMedia = IllustratedMessage_1.MEDIA.SCENE;
+                media = IllustratedMessage_1.MEDIA.SCENE;
             }
-            const lastKnownOffsetWidth = this._lastKnownOffsetWidthForMedia[newMedia], lastKnownOffsetHeight = this._lastKnownOffsetHeightForMedia[newMedia];
-            // prevents infinite resizing, when same width is detected for the same media,
-            // excluding the case in which, the control is placed inside expand/collapse container
-            if (!(lastKnownOffsetWidth && currOffsetWidth === lastKnownOffsetWidth
-                && lastKnownOffsetHeight && currOffsetHeight === lastKnownOffsetHeight)
-                || this._lastKnownOffsetWidthForMedia[this._lastKnownMedia] === 0
-                || this._lastKnownOffsetHeightForMedia[this._lastKnownMedia] === 0) {
-                this.media = newMedia;
-                this._lastKnownOffsetWidthForMedia[newMedia] = currOffsetWidth;
-                this._lastKnownOffsetHeightForMedia[newMedia] = currOffsetHeight;
-                this._lastKnownMedia = newMedia;
+            mediaIndex = Object.values(IllustratedMessage_1.MEDIA).indexOf(media);
+            while (mediaIndex > 0 && this._mediaExceedsContainerHeight(media)) {
+                mediaIndex--;
+                media = Object.values(IllustratedMessage_1.MEDIA)[mediaIndex];
             }
+            this.media = media;
+        }
+        _mediaExceedsContainerHeight(media) {
+            return !!this._contentHeightForMedia[media] && this.clientHeight < this._contentHeightForMedia[media];
         }
         _setSVGAccAttrs() {
             const svg = this.shadowRoot.querySelector(".ui5-illustrated-message-illustration svg");
@@ -1177,18 +1190,17 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/paramet
                 }
             }
         }
-        _adjustHeightToFitContainer() {
-            const illustrationWrapper = this.shadowRoot.querySelector(".ui5-illustrated-message-illustration"), illustration = illustrationWrapper.querySelector("svg");
-            if (illustration) {
-                illustrationWrapper.classList.toggle("ui5-illustrated-message-illustration-fit-content", false);
-                if (this.getDomRef().scrollHeight > this.getDomRef().offsetHeight) {
-                    illustrationWrapper.classList.toggle("ui5-illustrated-message-illustration-fit-content", true);
-                    this._applyMedia(true /* height change */);
-                }
-            }
-        }
         onAfterRendering() {
             this._setSVGAccAttrs();
+            if (this.design !== IllustrationMessageDesign$1.Auto) {
+                return;
+            }
+            const heightMeasurementNeeded = this.media && !(this.media in this._contentHeightForMedia);
+            const mightOverflow = this.scrollHeight > this.clientHeight;
+            if (heightMeasurementNeeded || mightOverflow) {
+                this._checkHeightConstraints();
+                this._applyMedia();
+            }
         }
         /**
          * Modifies the IM styles in accordance to the `size` property's value.

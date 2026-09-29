@@ -8007,11 +8007,17 @@ sap.ui.define([
 	//*********************************************************************************************
 [false, true].forEach(function (bResetViaSideEffects) {
 	[false, true].forEach(function (bAggregationCache) {
-	const sTitle = "doCreateCache w/ old cache, recursive hierarchy, aggregation cache: "
-		+ bAggregationCache + ", reset via side effects: " + bResetViaSideEffects;
+		[false, true].forEach(function (bDataAggregation) {
+	const sTitle = "doCreateCache w/ old cache, "
+		+ (bDataAggregation ? "data aggregation with expandTo" : "recursive hierarchy")
+		+ ", aggregation cache: " + bAggregationCache
+		+ ", reset via side effects: " + bResetViaSideEffects;
+
 	QUnit.test(sTitle, function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
-		oBinding.mParameters.$$aggregation = {hierarchyQualifier : "foo"};
+		oBinding.mParameters.$$aggregation = bDataAggregation
+			? {expandTo : 5}
+			: {hierarchyQualifier : "foo"};
 		const oOldCache = {
 			$deepResourcePath : "deep/resource/path",
 			getResourcePath : mustBeMocked,
@@ -8028,15 +8034,18 @@ sap.ui.define([
 		this.mock(oBinding).expects("hasEffectivelyKeptAlive").withExactArgs().returns(false);
 		this.mock(oBinding).expects("getKeepAlivePredicates").never();
 		this.mock(oBinding).expects("isGrouped").withExactArgs().returns("~isGrouped~");
-		this.mock(oBinding).expects("getGroupId")
-			.exactly((bAggregationCache && bResetViaSideEffects) ? 1 : 0)
+		const bRecursiveHierarchyReset = bAggregationCache && bResetViaSideEffects
+			&& !bDataAggregation;
+		this.mock(oBinding).expects("getGroupId").exactly(bRecursiveHierarchyReset ? 1 : 0)
 			.returns("resetGroup");
-		this.mock(oOldCache).expects("resetOutOfPlace")
-			.exactly((bAggregationCache && bResetViaSideEffects) ? 1 : 0);
+		this.mock(oOldCache).expects("resetOutOfPlace").exactly(bRecursiveHierarchyReset ? 1 : 0);
 		this.mock(oOldCache).expects("reset").exactly(bAggregationCache ? 1 : 0)
-			.withExactArgs({}, bAggregationCache && bResetViaSideEffects ? "resetGroup" : undefined,
+			.withExactArgs({}, bRecursiveHierarchyReset ? "resetGroup" : undefined,
 				"~queryOptions~", sinon.match.same(oBinding.mParameters.$$aggregation),
 				"~isGrouped~");
+		this.mock(oBinding).expects("validateSelection").exactly(bAggregationCache ? 1 : 0)
+			.withExactArgs(sinon.match.same(oOldCache),
+				bRecursiveHierarchyReset ? "resetGroup" : "groupId");
 		this.mock(oBinding).expects("inheritQueryOptions").exactly(bAggregationCache ? 0 : 1)
 			.withExactArgs("~queryOptions~", "~context~")
 			.returns("~mInheritedQueryOptions~");
@@ -8050,10 +8059,11 @@ sap.ui.define([
 		assert.strictEqual(
 			// code under test
 			oBinding.doCreateCache("resource/path", "~queryOptions~", "~context~",
-				"deep/resource/path", undefined, /*bSideEffectsRefresh*/false, oOldCache),
+				"deep/resource/path", "groupId", /*bSideEffectsRefresh*/false, oOldCache),
 			bAggregationCache ? oOldCache : "~oNewCache~");
 		assert.strictEqual(oBinding.bResetViaSideEffects, undefined);
 	});
+		});
 	});
 });
 

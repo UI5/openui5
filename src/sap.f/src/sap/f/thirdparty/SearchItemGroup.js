@@ -20,6 +20,8 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/ListIte
      * @public
      * @since 2.9.0
      * @experimental
+     * @csspart header - Used to style the header item of the group
+     * @csspart title - Used to style the title of the group header
      */
     let SearchItemGroup = class SearchItemGroup extends ListItemGroup.ListItemGroup {
         get isGroupItem() {

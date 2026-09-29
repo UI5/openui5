@@ -18,7 +18,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Managed
      * @abstract
      * @public
      */
-    let ShellBarSpacer = class ShellBarSpacer extends webcomponentsBase.S {
+    let ShellBarSpacer = class ShellBarSpacer extends webcomponentsBase.b {
         constructor() {
             super(...arguments);
             this.visible = false;

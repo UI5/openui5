@@ -329,6 +329,11 @@ sap.ui.define([
 					var $Popover = this.$(); //this is bound to the popover, see below
 					$Popover.attr("aria-modal", "true");
 					$Popover.attr("aria-label", this.getTitle());
+
+					var oSlider = oColorPicker.getAggregation("_oSlider");
+					if (oSlider) {
+						this.setAssociation("initialFocus", oSlider, true);
+					}
 				}
 			};
 

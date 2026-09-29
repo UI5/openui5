@@ -62,6 +62,7 @@ var aControlsThatCannotBeRenderedGenerically = [
 "sap.chart.Chart",
 "sap.m.FacetFilterItem",
 "sap.m.internal.NumericInput",
+"sap.m.NumericInputBase",
 "sap.m.IconTabBarSelectList",
 "sap.m.LightBox",
 "sap.m.Menu",

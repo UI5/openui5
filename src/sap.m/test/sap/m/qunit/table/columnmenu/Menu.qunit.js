@@ -675,7 +675,8 @@ sap.ui.define([
 		this.oColumnMenu.openBy(this.oButton);
 		await nextUIUpdate();
 
-		assert.equal(this.oColumnMenu._oPopover.getAriaLabelledBy(), this.oColumnMenu.getId() + "-title", "Popover has correct aria-labelledby");
+		assert.equal(this.oColumnMenu._oPopover.getDomRef().getAttribute("aria-labelledby"), this.oColumnMenu.getId() + "-title",
+			"Popover has correct aria-labelledby");
 	});
 
 	QUnit.test("ARIA label for quick actions", async function(assert) {

@@ -504,6 +504,8 @@ sap.ui.define([
 			oStaticConfiguration.maxItems = iMaxItems;
 			oStaticConfiguration.maxLegendItems = iMaxLegendItems;
 			oStaticConfiguration.noItemsText = sNoItemsText;
+			oStaticConfiguration.calendarWeekNumbering = BindingResolver.resolveValue(oConfiguration.calendarWeekNumbering, this) ?? this._oCalendar.getCalendarWeekNumbering();
+			oStaticConfiguration.use12HourFormat = BindingResolver.resolveValue(oConfiguration.use12HourFormat, this) ?? this.getUse12HourFormat();
 			if (bMoreItems) {
 				oStaticConfiguration.moreItems = BindingResolver.resolveValue(oConfiguration.moreItems, this);
 			}

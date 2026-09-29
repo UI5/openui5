@@ -1421,6 +1421,16 @@
 				]
 			},
 			{
+				"id": "sap.m.NumericInput",
+				"name": "Numeric Input",
+				"category": "User Input",
+				"since": "1.154",
+				"samples": [
+					"sap.m.sample.NumericInput",
+					"sap.m.sample.NumericInputValueState"
+				]
+			},
+			{
 				"id": "sap.m.StepInput",
 				"name": "Step Input",
 				"category": "User Input",
@@ -3659,6 +3669,16 @@
 				"id": "sap.m.sample.StepInputValueState",
 				"name": "Step Input - Value States",
 				"description": "This example shows different StepInput value states."
+			},
+			{
+				"id": "sap.m.sample.NumericInput",
+				"name": "Numeric Input",
+				"description": "The NumericInput is a numeric input field that allows the user to enter or adjust a value using configurable step increments. It supports optional min/max bounds, decimal precision, and an optional description suffix for units or currencies."
+			},
+			{
+				"id": "sap.m.sample.NumericInputValueState",
+				"name": "Numeric Input - Value States",
+				"description": "This example shows different NumericInput value states."
 			},
 			{
 				"id": "sap.m.sample.TimePicker",

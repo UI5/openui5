@@ -163,13 +163,14 @@ ObjectNumberRenderer.renderText = function(oRm, oON) {
  * @private
  */
 ObjectNumberRenderer.renderUnit = function(oRm, oON) {
-	const sUnit = oON._getUnit();
+	const sUnit = oON._getUnit(),
+		sDisplayMode = oON.getDisplayMode();
 
-	if (sUnit !== "") {
+	if (sUnit !== "" || sDisplayMode === ObjectNumberDisplayMode.Currency) {
 		oRm.openStart("span", oON.getId() + "-unit");
 		oRm.class("sapMObjectNumberUnit");
 		oRm.openEnd();
-		if (oON.getDisplayMode() === ObjectNumberDisplayMode.Unit) {
+		if (sDisplayMode === ObjectNumberDisplayMode.Unit) {
 			oRm.text(oON.constructor.FIGURE_SPACE);
 		}
 		oRm.text(sUnit);

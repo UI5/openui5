@@ -112,6 +112,9 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	var GROUP_HEADER_TEXT = "⁪⁪⁪‍‍‌‍​‍​​‍‍​​‍​‍‍‍‍‍‍‌​‌‌‍‌​‌​‌​‌‌‌​‌​​‌‌⁪Group Header⁪⁪";
 	var SELECT_ROLE_DESCRIPTION = "⁪⁪⁪‌​​‌‌‌‌‌‍‌‌‍‍​​‌​‌​​‍​‌‌​​​​‌‌‍‌‌‍‌​​‍‍‍‌⁪Listbox⁪⁪";
 	var SELECT_OPTIONS = "⁪⁪⁪‍‌​​‍​​‌‍‌‌‍‍‌‌​​‌‌​‌​​‌‍‌‍​​​‍​‌‌‍​‍‍‍⁪Select Options⁪⁪";
+	var SELECT_OPTIONS_IN_GROUPS = "⁪⁪⁪‌‍​‌‌‍‌‍‌​​‍‍​‌‍‌​‌​‍​​​‍‌​‌‌‍‍‍​‌‍‌‌‍⁪​​​{0}‌‌‌ results are available in ​​​{1}‌‌‌ groups⁪⁪";
+	var SELECT_POPOVER_ACCESSIBLE_NAME_PREFIX = "⁪⁪⁪‍‍‌​‍‍‌‍​‍‍‍‌‍‌‍‍​‌​‍‌‍​‍​‍‌‌​‍‌​‌​‍​​‌‌⁪Select:⁪⁪";
+	var SELECT_LISTBOX_LABEL = "⁪⁪⁪‌​​​​‍‌‌‍​​​‌‍‌‌​‍​‍‌​​‍‌​​‍‍​‍​‌​‌‌‌‌‍‌⁪All Items⁪⁪";
 	var SHOW_SELECTED_BUTTON = "⁪⁪⁪‌‌‌‌‍‍‍​‌‌​​​‌‌‍‍‌‍‌‌‌‌​‌​‍‍​‍​‌‌‍​‍​‍‌​⁪Show Selected Items Only⁪⁪";
 	var INPUT_SUGGESTIONS = "⁪⁪⁪‌‌‌​​‌‍‍‍‌‌​‌​‍‌‌‍‌‍​‌​‍‌‌‌‌‍‍​‍‌​‍​​‌​‌⁪Suggestions Available⁪⁪";
 	var MCB_SELECTED_ITEMS = "⁪⁪⁪‌​‌‍‍​‌‍‌‌‌​‍‌​‌​‌‍‌‍‌‍​‌‍‌‍‌‌‍‌‌‌​‍‍‌​‌‍⁪Select All (​​​{0}‌‌‌ of ​​​{1}‌‌‌)⁪⁪";
@@ -148,7 +151,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	var MESSAGE_STRIP_ERROR = "⁪⁪⁪‍‍‍‌​‍​‍‍​‍​​‌‍‌‌‍‍‌​​‍‍‍‍‌‍​‍‍‌​​‍‍‌‍⁪Error Message Strip⁪⁪";
 	var MESSAGE_STRIP_WARNING = "⁪⁪⁪‌​‍​‌‍‍‍‌‍‍​‍‌​‌‌‍​‌​‍‌‌‍​‌‌​​​‌​‌‍‌‍‍‍‍‌⁪Warning Message Strip⁪⁪";
 	var MESSAGE_STRIP_SUCCESS = "⁪⁪⁪‌​​‌‍​‌‌​‍‌​‍‍‌‌​‌​‍‌‍‍‌‌‌‌​​​‌‍‍‍​‍​‌​‍​⁪Success Message Strip⁪⁪";
-	var MESSAGE_STRIP_INFORMATION = "⁪⁪⁪‍‍‌​‌​‍‍‌‍‌​​‌‌‍‍​‌​‌​​‌‌‌‌​‌‍‍​‌‌‌‍‍⁪Message Strip⁪⁪";
+	var MESSAGE_STRIP_INFORMATION = "⁪⁪⁪‍‍‌​‌​‍‍‌‍‌​​‌‌‍‍​‌​‌​​‌‌‌‌​‌‍‍​‌‌‌‍‍⁪Information Message Strip⁪⁪";
 	var MESSAGE_STRIP_CUSTOM = "⁪⁪⁪‌‌‍‌‌‍​​‌‌‍‌​‍‍‌​‍​​‍‍​‍​‌‍‌‍‍‌‍​‌‍‌‌‌‍‍⁪Custom Message Strip⁪⁪";
 	var MULTICOMBOBOX_DIALOG_OK_BUTTON = "⁪⁪⁪‍​‍‍‍​‌‍‌​‍​‍‍​​‌​‌‍​​‍‍‍‍​‌‌‌​‌‍‍‍‍‍​‌⁪OK⁪⁪";
 	var MULTICOMBOBOX_DIALOG_CANCEL_BUTTON = "⁪⁪⁪‌‍​​‍‌​‍​‍​​‍​‍‍‌‍‌​‌‍‍​​‍‌‍‍​​‍​‍‌‍‍​​‌⁪Cancel⁪⁪";
@@ -226,6 +229,8 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	var TOKENIZER_CLEAR_ALL = "⁪⁪⁪‌‌​‍‍​‍‍​‍‍​​​‌​‍​‌​‍‍​‌​‌‌‍​‍​​​‍​​‌‌​​‍⁪Clear All⁪⁪";
 	var TOKENIZER_DIALOG_CANCEL_BUTTON = "⁪⁪⁪‌‌‌‍​‌​‍​‌​‌​​‌‌‌​‌​‍​‌​‌‌‍‍​​‍​‍‌‍‍‍​​‌⁪Cancel⁪⁪";
 	var TOKENIZER_DIALOG_OK_BUTTON = "⁪⁪⁪‍‌‍‍‍‍​​‌​​‌​​​‌​‍‌​‌​‍‍‍‌‌‍‍​​‍‍‌​​​‌‍‌⁪OK⁪⁪";
+	var TOKENIZER_TOKEN_DELETED_SINGULAR = "⁪⁪⁪‍‍‌‍‍‍​​‍​‌​‌‍‌‌‌‍​‌‍‍​‌‍‍‌​‍‌‍​​‌‍‍‌‌​‍⁪1 token deleted⁪⁪";
+	var TOKENIZER_TOKEN_DELETED_PLURAL = "⁪⁪⁪‌​‍​‍‌‍‍‍‌‍‍​​‍‌‌‌‌​‍‌​‍‌​‌‍‌​‍‍​‌​‌​‌​‍​⁪​​​{0}‌‌‌ tokens deleted⁪⁪";
 	var TREE_ITEM_ARIA_LABEL = "⁪⁪⁪‌‌‌​​‌​​​‍‍‌‌​‍‍‍​‍‌​‍​​‍‌‌‍‌‌‌‌‌​‍‌‌‍​‍​⁪Tree Item⁪⁪";
 	var TREE_ITEM_EXPAND_NODE = "⁪⁪⁪‍‍‍‍​​‍​‌‍‍​‌‍‍​‍‌‍​​​‌​‍‍‌‌​​‌‌‍‌​‍‌‌​‍⁪Expand Node⁪⁪";
 	var TREE_ITEM_COLLAPSE_NODE = "⁪⁪⁪‌‌​‌‌​‌‍‌‌‍‍‌​​​‍​‌‌‌‍‍‍‌‍‌‍‌​‍‌‌​​‍​‌‍‍⁪Collapse Node⁪⁪";
@@ -261,6 +266,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	var DAY_PICKER_SELECTED_RANGE_BETWEEN = "⁪⁪⁪‍​‌​​​​‌‍‌‌‍‍‍‍‍‍‌​‍‌​‌​‍‌​‌‍​‌‍​‌​​‍​‌‍⁪​​​{0}‌‌‌ in a selected range⁪⁪";
 	var DAY_PICKER_SELECTED_RANGE_END = "⁪⁪⁪‌‌‌​‌‌​​‌‌‌‍​‍‌​‍​‍‌‍‌‌‌‍​​‍​‌‍​​‌​​‍‌‌​​⁪​​​{0}‌‌‌ Last date of range⁪⁪";
 	var DAY_PICKER_WEEK_NUMBER_TEXT = "⁪⁪⁪‌‌​‌​‌‌​‍‌‌​​‌‍‍‍‌‌‌​‍‍​​‌​‌​​​‌‌​‍‌‌‌‌‌⁪Week Number⁪⁪";
+	var DAY_PICKER_CALENDAR_WEEK = "⁪⁪⁪‌​‍‌​‍​‌‌​‌‍​‌​​‍‌​​​‍‍‌‍​‌‍‌‍‍‍‌‌​‍‌‍‍‍‍⁪Calendar Week ​​​{0}‌‌‌⁪⁪";
 	var DAY_PICKER_NON_WORKING_DAY = "⁪⁪⁪‍‌​​​‍‌​​​​‍‌​​​‍‌‌‍‍‌​​​​​​​‌‌​‌‌​‌​‍‌‌⁪Non-Working Day⁪⁪";
 	var DAY_PICKER_TODAY = "⁪⁪⁪‌​‌​‌‍‌‍‍‌‌​‌‍‌‍​‍​‌‍​‌‌​‌‌‍‌‌‌‍‌​‌​‍​‌‌​⁪Today⁪⁪";
 	var MONTH_PICKER_DESCRIPTION = "⁪⁪⁪‌‌​‌​‍‌‌‌​​‍​‍‌‌‍‍‌‌‍‌‍​‌‌​‌‌​​‌‌‍‍‍​​‌⁪Month Picker⁪⁪";
@@ -268,11 +274,11 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	var YEAR_RANGE_PICKER_DESCRIPTION = "⁪⁪⁪‌‌​​‌‍‌​‌​‍‌​‌​‍‌‍‍​‍​​‌‌​‌​‌‍‌​‍‍‌‍​​‌‍⁪Year Range Picker⁪⁪";
 	var SLIDER_TOOLTIP_INPUT_DESCRIPTION = "⁪⁪⁪‌‌‍‍​‌‍​‍‌‍‌​​‍​‍‍​‍‌‍​‌​​‍‍‌‌‌‍‍‍‌‌‌‍‌‍⁪Press F2 to enter a value⁪⁪";
 	var SLIDER_TOOLTIP_INPUT_LABEL = "⁪⁪⁪‌​‌​​‍‍‍‌‍​‍‌‌‍‍‍‍​‌​‍​​​‌​​‌​‍‌​‍‍‌‌​‌⁪Current Value⁪⁪";
-	var STEPINPUT_DEC_ICON_TITLE = "⁪⁪⁪‌‌‌​​​‍​‍‍‍​‌‍​‌‍‌​‌‍​‍‍​‌​‍‍​​‍‌‌‍‌‍‍​‌​⁪Decrease⁪⁪";
-	var STEPINPUT_INC_ICON_TITLE = "⁪⁪⁪‌​‍‍‍​‍​‌‌‌‍‍‌​​​​‍‍​​​‍‍‌‍​‍‍‌‍​‌‌‍‍‍​​‍⁪Increase⁪⁪";
-	var STEPINPUT_PATTER_MISSMATCH = "⁪⁪⁪‌​‌‍‍‌​‍​‌​‌​‍‍​‍​‍​‌‌‍‌‍‍‌‌‍​​‍‌‍‍​​​​​​⁪This format is not supported. Enter a number with ​​​{0}‌‌‌ decimal places.⁪⁪";
-	var STEPINPUT_RANGEOVERFLOW = "⁪⁪⁪‌‍​‍‌‌‌​​‍‌‍‍‍‌‍‌‍‍​‌‌‍​​‍​‍‍​​‍‌​‌‍‌​‌⁪Enter a number lower than the maximum value of  ​​​{0}‌‌‌.⁪⁪";
-	var STEPINPUT_RANGEUNDERFLOW = "⁪⁪⁪‍​​‌‍​​​‌‍‌‍​​‍‍​​​‌‌‌‍‍​‌‌‍‍‌‌‌‌​‍‌​‌‍‌⁪Enter a number higher than the minimum value of  ​​​{0}‌‌‌.⁪⁪";
+	var NUMBERINPUT_DEC_ICON_TITLE = "⁪⁪⁪‌​​​‌‍​‌‌‌‍​‌‌‍‍‌‍‍​​‌‌​‍‍‍​‍​‌‍​‍​‌‌‍‌‌​⁪Decrease⁪⁪";
+	var NUMBERINPUT_INC_ICON_TITLE = "⁪⁪⁪‌‌‌​‌​‍​​‌‍‌‌‍‌‍‍​​‌‍‌​‍‍‌‍‍‌‍​‌‌‍‌​‍‍‍‍‌⁪Increase⁪⁪";
+	var NUMBERINPUT_PATTERN_MISSMATCH = "⁪⁪⁪‍‌‌​‍‌‌‌‌​‌‍​​​‍‌​‍‌‍​‍‍​‍​‍​‌‍‍​​‌‌​‍‍‍⁪This format is not supported. Enter a number with ​​​{0}‌‌‌ decimal places.⁪⁪";
+	var NUMBERINPUT_RANGEOVERFLOW = "⁪⁪⁪‌​​‌​‍‌‍‍‌‍‌‍‌‍​​​​​‌‌‍‍‍​‍‌‍‌‌‌‍‌‌‌​‍‍​‌⁪Enter a number lower than the maximum value of  ​​​{0}‌‌‌.⁪⁪";
+	var NUMBERINPUT_RANGEUNDERFLOW = "⁪⁪⁪‍‍‍‍‍‍‌‌​‌​‌‍​​​‌​‌​‌​‍​​‌‍‍‍​‍‌‍​​‍‍​‍​⁪Enter a number higher than the minimum value of  ​​​{0}‌‌‌.⁪⁪";
 	var SPLIT_BUTTON_DESCRIPTION = "⁪⁪⁪‌‌‍‍‌‌​‍​​‌​‌‍​‌‍‌​‍‍​‌​‍‌‌‌‍‌‍​‌‌​​​​‌⁪Split Button⁪⁪";
 	var SPLIT_BUTTON_KEYBOARD_HINT = "⁪⁪⁪‌‌​​​​​​​‍‌‍‌‌‍​‌‍‍‌‌​‌​​‌‌‌‍‍​‌​‍‌‌​‍‍‌‌⁪Press Space or Enter to trigger default action and Alt + Arrow Down or F4 to trigger arrow action⁪⁪";
 	var SPLIT_BUTTON_ARROW_BUTTON_TOOLTIP = "⁪⁪⁪‌‍​‌​‍‌‍‌‍​‍​‍​​‌‌‍​‌​​‍‌‍‍‌‌‌‍‍‍‍‍‍‌‌‌⁪Open Menu⁪⁪";
@@ -298,6 +304,8 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	var DIALOG_HEADER_ARIA_LABEL = "⁪⁪⁪‌​‍​‍‌​‌​‍​‍‌‌‍‌‍‍‍‍‍​‍‍​​‌‍‌​​​​‍‍‍​‍‌‌‍⁪Header⁪⁪";
 	var DIALOG_CONTENT_ARIA_LABEL = "⁪⁪⁪‍‌‌‌‍​‍​​‌​​​‌‍​‌‌‍‌‌‍‌​​‌‍‍‌‍‌‍‌‍‌​‌‌​​⁪Content⁪⁪";
 	var DIALOG_FOOTER_ARIA_LABEL = "⁪⁪⁪‌​‍​‌‌‍‌‌​​‌‍‍‍‍​‍‍‌‍‍‍‌‍​‍‌‌​​‌‌‍​​​‌‍‍​⁪Footer⁪⁪";
+	var DIALOG_FULLSCREEN_MAXIMIZE = "⁪⁪⁪‍‍‌‌‌​‍​‍​‍‍​‌‌​‍‍‌​​‌‍​‌‍​​‌‌‍‍‍​‍‍‍‍‍⁪Maximize (Shift+Ctrl+F)⁪⁪";
+	var DIALOG_FULLSCREEN_RESTORE = "⁪⁪⁪‍‌‍‍​‍​​‍‌‍‍‌​‍​​​‌‍​​​‍‌‍‌​​‍‍‌​‌⁪Restore (Shift+Ctrl+F)⁪⁪";
 	var LABEL_COLON = "⁪⁪⁪‌​‌‌‍‌‍‌‌‌‌‍‌‌‌​‌​​​‌​​​‍​‍​‌‍​​‍‍‌‌‍​‌‌⁪:⁪⁪";
 	var TOOLBAR_OVERFLOW_BUTTON_ARIA_LABEL = "⁪⁪⁪‌​‌‌​‌​‌​‌‌​​​‌​​‍​​​‍‍‌‍‍‍‍​‍‍‌​‍‌‌​‍‌⁪Additional Options⁪⁪";
 	var TOOLBAR_POPOVER_AVAILABLE_VALUES = "⁪⁪⁪‌​​‍‌‌​‍‌‍​​‌​​​‍‌​​‍‌​‌‍​‌​‌‌​‍​‍‌‍​‌​‌⁪Available Values⁪⁪";
@@ -329,6 +337,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	var TABLE_ROW_ACTIONS = "⁪⁪⁪‌‌‍‍‍‍​‍‍​‌‌‌​‌‌‌‍‍‍‌‍​‍‍​‌‍‍​‍‌‌‍‌‌‍‍⁪Row Actions⁪⁪";
 	var TABLE_ROW_SINGLE_ACTION = "⁪⁪⁪‌​‌​‌​‌​​‌​‍​‌‍‌‌‌‍‍​‌​​‌‌‍‌‍‌‍‍‍​‌​‍​‍​⁪1 row action available⁪⁪";
 	var TABLE_ROW_MULTIPLE_ACTIONS = "⁪⁪⁪‌​‍‌‍​‍​‌‍‌‍‍​‌‌‍‌‍‌‍​​‌‍‌‍‍‍​‌‌‍​​​​‌‌​‌⁪​​​{0}‌‌‌ row actions available⁪⁪";
+	var TABLE_ROW_OVERFLOW_BUTTON = "⁪⁪⁪‌‍​‍​​‍‌‌‍‍‌‌​​‌‌​‍‌‍‌‌‌‍​‌‌‍‌​‍​​‍‍​‌‍‌⁪More Actions⁪⁪";
 	var TABLE_NAVIGATION = "⁪⁪⁪‌‌​​‍​‌‍​​‌​​‌‍‌‌‌‍​‍‍​‍​‍‍‍‍‌‍‍‍‌‍​‌​⁪Navigation⁪⁪";
 	var TABLE_GENERATED_BY_AI = "⁪⁪⁪‌​‌‌​​‌​​‌‍​‌​​​​​​​​‍‍‌​​​‍‍‍‌‌​​​‍‌‍​‍⁪Generated by AI⁪⁪";
 	var TABLE_SELECT_ALL_ROWS = "⁪⁪⁪‌‍​‌‍​‍​​‍​​‌‌​‌‌​​‌‌‌‍‍​‍‍‍​‌​​‍​‍​‍‌​‌⁪Select All Rows⁪⁪";
@@ -489,6 +498,9 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 		GROUP_HEADER_TEXT: GROUP_HEADER_TEXT,
 		SELECT_ROLE_DESCRIPTION: SELECT_ROLE_DESCRIPTION,
 		SELECT_OPTIONS: SELECT_OPTIONS,
+		SELECT_OPTIONS_IN_GROUPS: SELECT_OPTIONS_IN_GROUPS,
+		SELECT_POPOVER_ACCESSIBLE_NAME_PREFIX: SELECT_POPOVER_ACCESSIBLE_NAME_PREFIX,
+		SELECT_LISTBOX_LABEL: SELECT_LISTBOX_LABEL,
 		SHOW_SELECTED_BUTTON: SHOW_SELECTED_BUTTON,
 		INPUT_SUGGESTIONS: INPUT_SUGGESTIONS,
 		MCB_SELECTED_ITEMS: MCB_SELECTED_ITEMS,
@@ -603,6 +615,8 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 		TOKENIZER_CLEAR_ALL: TOKENIZER_CLEAR_ALL,
 		TOKENIZER_DIALOG_CANCEL_BUTTON: TOKENIZER_DIALOG_CANCEL_BUTTON,
 		TOKENIZER_DIALOG_OK_BUTTON: TOKENIZER_DIALOG_OK_BUTTON,
+		TOKENIZER_TOKEN_DELETED_SINGULAR: TOKENIZER_TOKEN_DELETED_SINGULAR,
+		TOKENIZER_TOKEN_DELETED_PLURAL: TOKENIZER_TOKEN_DELETED_PLURAL,
 		TREE_ITEM_ARIA_LABEL: TREE_ITEM_ARIA_LABEL,
 		TREE_ITEM_EXPAND_NODE: TREE_ITEM_EXPAND_NODE,
 		TREE_ITEM_COLLAPSE_NODE: TREE_ITEM_COLLAPSE_NODE,
@@ -638,6 +652,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 		DAY_PICKER_SELECTED_RANGE_BETWEEN: DAY_PICKER_SELECTED_RANGE_BETWEEN,
 		DAY_PICKER_SELECTED_RANGE_END: DAY_PICKER_SELECTED_RANGE_END,
 		DAY_PICKER_WEEK_NUMBER_TEXT: DAY_PICKER_WEEK_NUMBER_TEXT,
+		DAY_PICKER_CALENDAR_WEEK: DAY_PICKER_CALENDAR_WEEK,
 		DAY_PICKER_NON_WORKING_DAY: DAY_PICKER_NON_WORKING_DAY,
 		DAY_PICKER_TODAY: DAY_PICKER_TODAY,
 		MONTH_PICKER_DESCRIPTION: MONTH_PICKER_DESCRIPTION,
@@ -645,11 +660,11 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 		YEAR_RANGE_PICKER_DESCRIPTION: YEAR_RANGE_PICKER_DESCRIPTION,
 		SLIDER_TOOLTIP_INPUT_DESCRIPTION: SLIDER_TOOLTIP_INPUT_DESCRIPTION,
 		SLIDER_TOOLTIP_INPUT_LABEL: SLIDER_TOOLTIP_INPUT_LABEL,
-		STEPINPUT_DEC_ICON_TITLE: STEPINPUT_DEC_ICON_TITLE,
-		STEPINPUT_INC_ICON_TITLE: STEPINPUT_INC_ICON_TITLE,
-		STEPINPUT_PATTER_MISSMATCH: STEPINPUT_PATTER_MISSMATCH,
-		STEPINPUT_RANGEOVERFLOW: STEPINPUT_RANGEOVERFLOW,
-		STEPINPUT_RANGEUNDERFLOW: STEPINPUT_RANGEUNDERFLOW,
+		NUMBERINPUT_DEC_ICON_TITLE: NUMBERINPUT_DEC_ICON_TITLE,
+		NUMBERINPUT_INC_ICON_TITLE: NUMBERINPUT_INC_ICON_TITLE,
+		NUMBERINPUT_PATTERN_MISSMATCH: NUMBERINPUT_PATTERN_MISSMATCH,
+		NUMBERINPUT_RANGEOVERFLOW: NUMBERINPUT_RANGEOVERFLOW,
+		NUMBERINPUT_RANGEUNDERFLOW: NUMBERINPUT_RANGEUNDERFLOW,
 		SPLIT_BUTTON_DESCRIPTION: SPLIT_BUTTON_DESCRIPTION,
 		SPLIT_BUTTON_KEYBOARD_HINT: SPLIT_BUTTON_KEYBOARD_HINT,
 		SPLIT_BUTTON_ARROW_BUTTON_TOOLTIP: SPLIT_BUTTON_ARROW_BUTTON_TOOLTIP,
@@ -675,6 +690,8 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 		DIALOG_HEADER_ARIA_LABEL: DIALOG_HEADER_ARIA_LABEL,
 		DIALOG_CONTENT_ARIA_LABEL: DIALOG_CONTENT_ARIA_LABEL,
 		DIALOG_FOOTER_ARIA_LABEL: DIALOG_FOOTER_ARIA_LABEL,
+		DIALOG_FULLSCREEN_MAXIMIZE: DIALOG_FULLSCREEN_MAXIMIZE,
+		DIALOG_FULLSCREEN_RESTORE: DIALOG_FULLSCREEN_RESTORE,
 		LABEL_COLON: LABEL_COLON,
 		TOOLBAR_OVERFLOW_BUTTON_ARIA_LABEL: TOOLBAR_OVERFLOW_BUTTON_ARIA_LABEL,
 		TOOLBAR_POPOVER_AVAILABLE_VALUES: TOOLBAR_POPOVER_AVAILABLE_VALUES,
@@ -706,6 +723,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 		TABLE_ROW_ACTIONS: TABLE_ROW_ACTIONS,
 		TABLE_ROW_SINGLE_ACTION: TABLE_ROW_SINGLE_ACTION,
 		TABLE_ROW_MULTIPLE_ACTIONS: TABLE_ROW_MULTIPLE_ACTIONS,
+		TABLE_ROW_OVERFLOW_BUTTON: TABLE_ROW_OVERFLOW_BUTTON,
 		TABLE_NAVIGATION: TABLE_NAVIGATION,
 		TABLE_GENERATED_BY_AI: TABLE_GENERATED_BY_AI,
 		TABLE_SELECT_ALL_ROWS: TABLE_SELECT_ALL_ROWS,
@@ -873,6 +891,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	exports.DATETIME_RANGEOVERFLOW = DATETIME_RANGEOVERFLOW;
 	exports.DATETIME_RANGEUNDERFLOW = DATETIME_RANGEUNDERFLOW;
 	exports.DATETIME_VALUE_MISSING = DATETIME_VALUE_MISSING;
+	exports.DAY_PICKER_CALENDAR_WEEK = DAY_PICKER_CALENDAR_WEEK;
 	exports.DAY_PICKER_NON_WORKING_DAY = DAY_PICKER_NON_WORKING_DAY;
 	exports.DAY_PICKER_SELECTED_RANGE_BETWEEN = DAY_PICKER_SELECTED_RANGE_BETWEEN;
 	exports.DAY_PICKER_SELECTED_RANGE_END = DAY_PICKER_SELECTED_RANGE_END;
@@ -890,6 +909,8 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	exports.DIALOG_DRAG_AND_RESIZE_HANDLE_ARIA_LABEL = DIALOG_DRAG_AND_RESIZE_HANDLE_ARIA_LABEL;
 	exports.DIALOG_DRAG_HANDLE_ARIA_LABEL = DIALOG_DRAG_HANDLE_ARIA_LABEL;
 	exports.DIALOG_FOOTER_ARIA_LABEL = DIALOG_FOOTER_ARIA_LABEL;
+	exports.DIALOG_FULLSCREEN_MAXIMIZE = DIALOG_FULLSCREEN_MAXIMIZE;
+	exports.DIALOG_FULLSCREEN_RESTORE = DIALOG_FULLSCREEN_RESTORE;
 	exports.DIALOG_HANDLE_ARIA_ROLEDESCRIPTION = DIALOG_HANDLE_ARIA_ROLEDESCRIPTION;
 	exports.DIALOG_HEADER_ARIA_LABEL = DIALOG_HEADER_ARIA_LABEL;
 	exports.DIALOG_RESIZE_HANDLE_ARIA_LABEL = DIALOG_RESIZE_HANDLE_ARIA_LABEL;
@@ -1009,6 +1030,11 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	exports.MULTIINPUT_SHOW_MORE_TOKENS = MULTIINPUT_SHOW_MORE_TOKENS;
 	exports.MULTIINPUT_VALUE_HELP = MULTIINPUT_VALUE_HELP;
 	exports.MULTIINPUT_VALUE_HELP_LABEL = MULTIINPUT_VALUE_HELP_LABEL;
+	exports.NUMBERINPUT_DEC_ICON_TITLE = NUMBERINPUT_DEC_ICON_TITLE;
+	exports.NUMBERINPUT_INC_ICON_TITLE = NUMBERINPUT_INC_ICON_TITLE;
+	exports.NUMBERINPUT_PATTERN_MISSMATCH = NUMBERINPUT_PATTERN_MISSMATCH;
+	exports.NUMBERINPUT_RANGEOVERFLOW = NUMBERINPUT_RANGEOVERFLOW;
+	exports.NUMBERINPUT_RANGEUNDERFLOW = NUMBERINPUT_RANGEUNDERFLOW;
 	exports.PANEL_ICON = PANEL_ICON;
 	exports.RANGE_SLIDER_ARIA_DESCRIPTION = RANGE_SLIDER_ARIA_DESCRIPTION;
 	exports.RANGE_SLIDER_END_HANDLE_DESCRIPTION = RANGE_SLIDER_END_HANDLE_DESCRIPTION;
@@ -1021,7 +1047,10 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	exports.SEGMENTEDBUTTON_ARIA_DESCRIBEDBY = SEGMENTEDBUTTON_ARIA_DESCRIBEDBY;
 	exports.SEGMENTEDBUTTON_ARIA_DESCRIPTION = SEGMENTEDBUTTON_ARIA_DESCRIPTION;
 	exports.SELECT_DIALOG_CANCEL_BUTTON = SELECT_DIALOG_CANCEL_BUTTON;
+	exports.SELECT_LISTBOX_LABEL = SELECT_LISTBOX_LABEL;
 	exports.SELECT_OPTIONS = SELECT_OPTIONS;
+	exports.SELECT_OPTIONS_IN_GROUPS = SELECT_OPTIONS_IN_GROUPS;
+	exports.SELECT_POPOVER_ACCESSIBLE_NAME_PREFIX = SELECT_POPOVER_ACCESSIBLE_NAME_PREFIX;
 	exports.SELECT_ROLE_DESCRIPTION = SELECT_ROLE_DESCRIPTION;
 	exports.SHOW_SELECTED_BUTTON = SHOW_SELECTED_BUTTON;
 	exports.SLIDER_ARIA_DESCRIPTION = SLIDER_ARIA_DESCRIPTION;
@@ -1030,11 +1059,6 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	exports.SPLIT_BUTTON_ARROW_BUTTON_TOOLTIP = SPLIT_BUTTON_ARROW_BUTTON_TOOLTIP;
 	exports.SPLIT_BUTTON_DESCRIPTION = SPLIT_BUTTON_DESCRIPTION;
 	exports.SPLIT_BUTTON_KEYBOARD_HINT = SPLIT_BUTTON_KEYBOARD_HINT;
-	exports.STEPINPUT_DEC_ICON_TITLE = STEPINPUT_DEC_ICON_TITLE;
-	exports.STEPINPUT_INC_ICON_TITLE = STEPINPUT_INC_ICON_TITLE;
-	exports.STEPINPUT_PATTER_MISSMATCH = STEPINPUT_PATTER_MISSMATCH;
-	exports.STEPINPUT_RANGEOVERFLOW = STEPINPUT_RANGEOVERFLOW;
-	exports.STEPINPUT_RANGEUNDERFLOW = STEPINPUT_RANGEUNDERFLOW;
 	exports.SWITCH_OFF = SWITCH_OFF;
 	exports.SWITCH_ON = SWITCH_ON;
 	exports.TABCONTAINER_END_OVERFLOW = TABCONTAINER_END_OVERFLOW;
@@ -1063,6 +1087,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	exports.TABLE_ROW_MULTIPLE_ACTIONS = TABLE_ROW_MULTIPLE_ACTIONS;
 	exports.TABLE_ROW_NAVIGABLE = TABLE_ROW_NAVIGABLE;
 	exports.TABLE_ROW_NAVIGATED = TABLE_ROW_NAVIGATED;
+	exports.TABLE_ROW_OVERFLOW_BUTTON = TABLE_ROW_OVERFLOW_BUTTON;
 	exports.TABLE_ROW_POPIN = TABLE_ROW_POPIN;
 	exports.TABLE_ROW_POSITION = TABLE_ROW_POSITION;
 	exports.TABLE_ROW_SELECTED = TABLE_ROW_SELECTED;
@@ -1108,6 +1133,8 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	exports.TOKENIZER_DIALOG_CANCEL_BUTTON = TOKENIZER_DIALOG_CANCEL_BUTTON;
 	exports.TOKENIZER_DIALOG_OK_BUTTON = TOKENIZER_DIALOG_OK_BUTTON;
 	exports.TOKENIZER_SHOW_ALL_ITEMS = TOKENIZER_SHOW_ALL_ITEMS;
+	exports.TOKENIZER_TOKEN_DELETED_PLURAL = TOKENIZER_TOKEN_DELETED_PLURAL;
+	exports.TOKENIZER_TOKEN_DELETED_SINGULAR = TOKENIZER_TOKEN_DELETED_SINGULAR;
 	exports.TOKEN_ARIA_DELETABLE = TOKEN_ARIA_DELETABLE;
 	exports.TOKEN_ARIA_DELETE = TOKEN_ARIA_DELETE;
 	exports.TOKEN_ARIA_LABEL = TOKEN_ARIA_LABEL;

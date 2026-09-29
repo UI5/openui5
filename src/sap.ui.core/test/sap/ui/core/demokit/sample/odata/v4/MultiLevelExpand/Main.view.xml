@@ -51,6 +51,10 @@
 					<core:Item key="true" text="Subtotals At Bottom"/>
 					<core:Item key="off" text="No Subtotals"/>
 				</m:Select>
+				<m:Label text="expandTo:" width="5em"/>
+				<m:Input change=".onChangeExpandTo" submit=".onChangeExpandTo"
+					tooltip="Number of initially expanded levels; 0 or empty for none, * for all"
+					value="{ui>/sExpandTo}" width="2em"/>
 			</m:Toolbar>
 		</extension>
 		<rowMode>

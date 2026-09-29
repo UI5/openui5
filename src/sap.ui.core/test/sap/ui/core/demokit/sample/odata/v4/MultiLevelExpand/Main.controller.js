@@ -97,6 +97,21 @@ sap.ui.define([
 			}
 		},
 
+		onChangeExpandTo : function () {
+			const oUIModel = this.getView().getModel("ui");
+			const sExpandTo = oUIModel.getProperty("/sExpandTo");
+			const iExpandTo = sExpandTo === "*"
+				? Number.MAX_SAFE_INTEGER
+				: parseFloat(sExpandTo); // Note: parseInt("1E16") === 1; "" leads to NaN
+			if (iExpandTo > 0) {
+				this._oAggregation.expandTo = iExpandTo;
+			} else {
+				delete this._oAggregation.expandTo;
+				oUIModel.setProperty("/sExpandTo", "");
+			}
+			this.byId("table").getBinding("rows").setAggregation(this._oAggregation);
+		},
+
 		onInit : function () {
 			// initialization has to wait for view model/context propagation
 			this.getView().attachEventOnce("modelContextChange", function () {
@@ -114,6 +129,7 @@ sap.ui.define([
 					sVisibleRowCount = oURLSearchParams.get("visibleRowCount");
 
 				this.getView().setModel(new JSONModel({
+					sExpandTo : sExpandTo,
 					iMessages : 0,
 					sSearch : "",
 					iVisibleRowCount : parseInt(sVisibleRowCount) || 20
@@ -133,12 +149,7 @@ sap.ui.define([
 					},
 					groupLevels : ["airline", "ConnectionID", "FlightDate", "status", "BookingDate"]
 				};
-				if (sExpandTo) {
-					this._oAggregation.expandTo = sExpandTo === "*"
-						? Number.MAX_SAFE_INTEGER
-						: parseFloat(sExpandTo); // Note: parseInt("1E16") === 1
-				}
-				oRowsBinding.setAggregation(this._oAggregation);
+				this.onChangeExpandTo();
 				this.getView().setModel(oRowsBinding.getModel(), "header");
 				this.getView().setBindingContext(oRowsBinding.getHeaderContext(), "header");
 				if (sLeafCount === "false" || sLeafCount === "off") {

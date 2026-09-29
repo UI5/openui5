@@ -1,0 +1,15 @@
+<mvc:View
+	xmlns:mvc="sap.ui.core.mvc"
+	controllerName="sap.m.sample.NumericInputValueState.NumericInput"
+	xmlns="sap.m">
+	<FlexBox items="{path: '/modelData'}" direction="Column">
+		<VBox class="sapUiTinyMargin" >
+			<Label text="{label}" labelFor="NI" />
+			<NumericInput
+				id="NI"
+				width="100%"
+				value="5"
+				valueState="{valueState}"/>
+		</VBox>
+	</FlexBox>
+</mvc:View>

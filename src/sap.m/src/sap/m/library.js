@@ -146,6 +146,8 @@ sap.ui.define([
 		  "sap.m.LoadState",
 		  "sap.m.MenuButtonMode",
 		  "sap.m.MultiSelectMode",
+		  "sap.m.NumericInputStepModeType",
+		  "sap.m.NumericInputValidationMode",
 		  "sap.m.ObjectHeaderPictureShape",
 		  "sap.m.ObjectMarkerType",
 		  "sap.m.ObjectMarkerVisibility",
@@ -306,6 +308,7 @@ sap.ui.define([
 		  "sap.m.NavContainer",
 		  "sap.m.NewsContent",
 		  "sap.m.NumericContent",
+		  "sap.m.NumericInput",
 		  "sap.m.NotificationList",
 		  "sap.m.NotificationListBase",
 		  "sap.m.NotificationListItem",
@@ -5831,6 +5834,54 @@ sap.ui.define([
 		 SelectAll: "SelectAll"
 	 };
 
+	 /**
+	  * Available step modes for {@link sap.m.NumericInput}.
+	  *
+	  * @enum {string}
+	  * @public
+	  * @ui5-experimental-since 1.153
+	  */
+	 thisLib.NumericInputStepModeType = {
+
+		 /**
+		  * Choosing increase/decrease button will add/subtract the <code>step</code> value
+		  * to/from the current value.
+		  * @public
+		  */
+		 AdditionAndSubtraction: "AdditionAndSubtraction",
+
+		 /**
+		  * Pressing increase/decrease button will increase/decrease the current
+		  * <code>value</code> to the closest number that is divisible by the <code>step</code>.
+		  * @public
+		  */
+		 Multiple: "Multiple"
+
+	 };
+
+	 /**
+	  * Available validation modes for {@link sap.m.NumericInput}.
+	  *
+	  * @enum {string}
+	  * @public
+	  * @ui5-experimental-since 1.153
+	  */
+	 thisLib.NumericInputValidationMode = {
+
+		 /**
+		  * Validation happens on <code>FocusOut</code>.
+		  * @public
+		  */
+		 FocusOut: "FocusOut",
+
+		 /**
+		  * Validation happens on <code>LiveChange</code>.
+		  * @public
+		  */
+		 LiveChange: "LiveChange"
+
+	 };
+
 	 thisLib.plugins = thisLib.plugins || {};
 
 	 /**
@@ -6609,6 +6660,8 @@ sap.ui.define([
 	 DataType.registerEnum("sap.m.LoadState", thisLib.LoadState);
 	 DataType.registerEnum("sap.m.MenuButtonMode", thisLib.MenuButtonMode);
 	 DataType.registerEnum("sap.m.MultiSelectMode", thisLib.MultiSelectMode);
+	 DataType.registerEnum("sap.m.NumericInputStepModeType", thisLib.NumericInputStepModeType);
+	 DataType.registerEnum("sap.m.NumericInputValidationMode", thisLib.NumericInputValidationMode);
 	 DataType.registerEnum("sap.m.ObjectHeaderPictureShape", thisLib.ObjectHeaderPictureShape);
 	 DataType.registerEnum("sap.m.ObjectMarkerType", thisLib.ObjectMarkerType);
 	 DataType.registerEnum("sap.m.ObjectMarkerVisibility", thisLib.ObjectMarkerVisibility);
