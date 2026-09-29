@@ -1,0 +1,33 @@
+{
+	"sap.app": {
+		"id": "sap.f.cardsdemo.cardcontent.contextDependencies.dataRequestInContent",
+		"type": "card"
+	},
+	"sap.card": {
+		"type": "List",
+		"configuration": {
+			"parameters": {
+				"userId": {
+					"value": "{context>/sample/currentUser/id}"
+				}
+			}
+		},
+		"header": {
+			"title": "Data request in content",
+			"subtitle": "User ID: {parameters>/userId/value}",
+			"icon": {
+				"src": "sap-icon://list"
+			}
+		},
+		"content": {
+			"data": {
+				"request": {
+					"url": "./tasks.json"
+				}
+			},
+			"item": {
+				"title": "{task}"
+			}
+		}
+	}
+}

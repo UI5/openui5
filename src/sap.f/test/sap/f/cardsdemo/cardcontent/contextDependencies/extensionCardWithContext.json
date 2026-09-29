@@ -1,0 +1,34 @@
+{
+	"sap.app": {
+		"id": "sap.f.cardsdemo.cardcontent.contextDependencies.extensionCardWithContext",
+		"type": "card"
+	},
+	"sap.card": {
+		"extension": "SampleExtension",
+		"type": "List",
+		"configuration": {
+			"parameters": {
+				"userId": {
+					"value": "{context>/sample/currentUser/id}"
+				}
+			}
+		},
+		"header": {
+			"title": "Extension card",
+			"subtitle": "User id {parameters>/userId/value}",
+			"icon": {
+				"src": "sap-icon://add-employee"
+			}
+		},
+		"content": {
+			"data": {
+				"extension": {
+					"method": "getData"
+				}
+			},
+			"item": {
+				"title": "{title}"
+			}
+		}
+	}
+}
