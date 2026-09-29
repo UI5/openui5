@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/Label'], (function (exports, webcomponentsBase, parametersBundle_css, ListItemBase, eventStrict, parametersBundle_css$1, ManagedStyles, decline, i18nDefaults, Button, Icon, Icons, ValueState, AccessibilityTextsHelper, Label) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/edit', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/Label'], (function (exports, webcomponentsBase, parametersBundle_css, ListItemBase, eventStrict, parametersBundle_css$1, ManagedStyles, decline, edit, i18nDefaults, Button, Icon, Icons, ValueState, AccessibilityTextsHelper, Label) { 'use strict';
 
     /**
      * Different list selection modes.
@@ -46,26 +46,6 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
     })(ListSelectionMode || (ListSelectionMode = {}));
     var ListSelectionMode$1 = ListSelectionMode;
 
-    const name$b = "edit";
-    const pathData$b = "M15.821 2.571c.12.167.179.31.179.429 0 .143-.06.274-.179.393L4.214 15.036c-.095.095-.19.143-.285.143L0 16l.786-3.929a.44.44 0 0 1 .143-.321L12.57.143A.531.531 0 0 1 12.964 0a.53.53 0 0 1 .393.143l2.464 2.428ZM11.5 6.107 9.857 4.5l-8 7.964L3.5 14.107l8-8Zm3.107-3.143-1.643-1.571-2.285 2.286 1.607 1.607 2.321-2.322Z";
-    const ltr$b = false;
-    const viewBox$b = "0 0 16 16";
-    const collection$b = "SAP-icons-v4";
-    const packageName$b = "@ui5/webcomponents-icons";
-
-    Icons.y(name$b, { pathData: pathData$b, ltr: ltr$b, viewBox: viewBox$b, collection: collection$b, packageName: packageName$b });
-
-    const name$a = "edit";
-    const pathData$a = "M11.621.515a1.75 1.75 0 0 1 2.48 0l1.383 1.388a1.752 1.752 0 0 1-.004 2.477L4.03 15.781A.751.751 0 0 1 3.5 16H.75a.75.75 0 0 1-.75-.75v-2.751a.75.75 0 0 1 .219-.53L11.62.515ZM1.808 12.498l1.691 1.692 7.936-7.9-1.743-1.712-7.884 7.92Zm11.23-10.924a.25.25 0 0 0-.354 0l-1.932 1.94 1.746 1.716 1.924-1.914a.25.25 0 0 0 0-.353l-1.384-1.389Z";
-    const ltr$a = false;
-    const viewBox$a = "0 0 16 16";
-    const collection$a = "SAP-icons-v5";
-    const packageName$a = "@ui5/webcomponents-icons";
-
-    Icons.y(name$a, { pathData: pathData$a, ltr: ltr$a, viewBox: viewBox$a, collection: collection$a, packageName: packageName$a });
-
-    var edit = "edit";
-
     /**
      * Different types of Highlight .
      *
@@ -107,6 +87,15 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
          * @public
          */
         ListItemType["Inactive"] = "Inactive";
+        /**
+         * Indicates the list item does not have any active feedback when item is pressed,
+         * but the item can still be selected when a selection mode is active
+         * (via the item body, Space/Enter, or the checkbox/radio).
+         * The `item-click` event is not fired for items of this type.
+         * @public
+         * @since 2.26.0
+         */
+        ListItemType["InactiveSelectable"] = "InactiveSelectable";
         /**
          * Indicates that the item is clickable via active feedback when item is pressed.
          * @public
@@ -176,10 +165,15 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
             super();
             /**
              * Defines the visual indication and behavior of the list items.
-             * Available options are `Active` (by default), `Inactive`, `Detail` and `Navigation`.
+             * Available options are `Active` (by default), `Inactive`, `InactiveSelectable`, `Detail` and `Navigation`.
              *
              * **Note:** When set to `Active` or `Navigation`, the item will provide visual response upon press and hover,
-             * while with type `Inactive` and `Detail` - will not.
+             * while with type `Inactive`, `InactiveSelectable` and `Detail` - will not.
+             *
+             * **Note:** `InactiveSelectable` behaves like `Inactive` (no active press/hover feedback and the
+             * `item-click` event is not fired), but the item can still be selected. Clicking the item body,
+             * pressing Space/Enter, or interacting with the selection component (checkbox in Multi mode, radio
+             * button in Single modes) toggles the selection when the list has a selection mode.
              * @default "Active"
              * @public
             */
@@ -236,7 +230,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
              */
             this.mediaRange = "S";
             this.deactivateByKey = (e) => {
-                if (webcomponentsBase.b(e)) {
+                if (webcomponentsBase.b$1(e)) {
                     this.deactivate();
                 }
             };
@@ -263,12 +257,12 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
         }
         _onkeydown(e) {
             const isInternalElementFocused = e.target !== this.getFocusDomRef();
-            if ((webcomponentsBase.A(e) || webcomponentsBase.b(e)) && isInternalElementFocused) {
+            if ((webcomponentsBase.A(e) || webcomponentsBase.b$1(e)) && isInternalElementFocused) {
                 return;
             }
             super._onkeydown(e);
             const itemActive = this.type === ListItemType$1.Active, itemNavigated = this.typeNavigation;
-            if ((webcomponentsBase.A(e) || webcomponentsBase.b(e)) && (itemActive || itemNavigated)) {
+            if ((webcomponentsBase.A(e) || webcomponentsBase.b$1(e)) && (itemActive || itemNavigated)) {
                 this.activate();
             }
             if (webcomponentsBase.ro(e)) {
@@ -277,7 +271,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
         }
         _onkeyup(e) {
             super._onkeyup(e);
-            if (webcomponentsBase.A(e) || webcomponentsBase.b(e)) {
+            if (webcomponentsBase.A(e) || webcomponentsBase.b$1(e)) {
                 this.deactivate();
             }
             if (this.modeDelete && webcomponentsBase.X(e)) {
@@ -369,6 +363,9 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
         }
         get isInactive() {
             return this.type === ListItemType$1.Inactive || this.type === ListItemType$1.Detail;
+        }
+        get isInactiveSelectable() {
+            return this.type === ListItemType$1.InactiveSelectable;
         }
         get placeSelectionElementBefore() {
             return this._selectionMode === ListSelectionMode$1.Multiple
@@ -528,7 +525,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
         }
         _getFocusableElements() {
             const focusDomRef = this.getFocusDomRef();
-            return ListItemBase.b(focusDomRef);
+            return focusDomRef ? ListItemBase.b(focusDomRef) : [];
         }
         _indexOfActiveElement(focusables) {
             const activeElement = webcomponentsBase.t();
@@ -900,7 +897,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
      * @csspart inner-ring - Used to style the inner ring of the `ui5-radio-button`.
      * @csspart root - Used to style the root DOM element of the component.
      */
-    let RadioButton = RadioButton_1 = class RadioButton extends webcomponentsBase.S {
+    let RadioButton = RadioButton_1 = class RadioButton extends webcomponentsBase.b {
         get formValidityMessage() {
             return RadioButton_1.i18nBundle.getText(i18nDefaults.FORM_SELECTABLE_REQUIRED2);
         }
@@ -1064,7 +1061,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
                 this.active = true;
                 return e.preventDefault();
             }
-            if (webcomponentsBase.b(e)) {
+            if (webcomponentsBase.b$1(e)) {
                 this.active = true;
                 return this.toggle();
             }
@@ -1222,7 +1219,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 
     ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
     ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
-    var checkboxCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host{-webkit-tap-highlight-color:rgba(0,0,0,0)}:host{vertical-align:middle}:host(:not([hidden])){display:inline-block}:host([required]){vertical-align:middle}:host{overflow:hidden;max-width:100%;outline:none;border-radius:var(--_ui5_checkbox_border_radius);transition:var(--_ui5_checkbox_transition);cursor:pointer;user-select:none;-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none}:host([disabled]){cursor:default}:host([disabled]) .ui5-checkbox-root{opacity:var(--_ui5_checkbox_disabled_opacity)}:host([disabled]) .ui5-checkbox-inner{border-color:var(--_ui5_checkbox_inner_disabled_border_color)}:host([disabled]) .ui5-checkbox-label{color:var(--_ui5_checkbox_disabled_label_color)}:host([readonly]:not([value-state="Critical"]):not([value-state="Negative"])) .ui5-checkbox-inner{background:var(--sapField_ReadOnly_Background);border:var(--_ui5_checkbox_inner_readonly_border);color:var(--sapField_TextColor)}:host(:not([wrapping-type="None"])[text]) .ui5-checkbox-root{min-height:auto;box-sizing:border-box;align-items:flex-start;padding-top:var(--_ui5_checkbox_root_side_padding);padding-bottom:var(--_ui5_checkbox_root_side_padding)}:host(:not([wrapping-type="None"])[text]) .ui5-checkbox-root .ui5-checkbox-label{overflow-wrap:break-word;align-self:center}:host([desktop][text]:not([wrapping-type="None"])) .ui5-checkbox-root:focus:before,.ui5-checkbox-root[text]:focus-visible:before{inset-block:var(--_ui5_checkbox_wrapped_focus_inset_block)}:host([value-state="Negative"]) .ui5-checkbox-inner,:host([value-state="Negative"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--sapField_InvalidBackground);border:var(--_ui5_checkbox_inner_error_border);color:var(--sapField_InvalidColor)}:host([value-state="Negative"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--_ui5_checkbox_inner_error_background_hover)}:host([value-state="Critical"]) .ui5-checkbox-inner,:host([value-state="Critical"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--sapField_WarningBackground);border:var(--_ui5_checkbox_inner_warning_border);color:var(--_ui5_checkbox_inner_warning_color)}:host([value-state="Critical"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--_ui5_checkbox_inner_warning_background_hover)}:host([value-state="Information"]) .ui5-checkbox-inner,:host([value-state="Information"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--sapField_InformationBackground);border:var(--_ui5_checkbox_inner_information_border);color:var(--_ui5_checkbox_inner_information_color)}:host([value-state="Information"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--_ui5_checkbox_inner_information_background_hover)}:host([value-state="Positive"]) .ui5-checkbox-inner,:host([value-state="Positive"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--sapField_SuccessBackground);border:var(--_ui5_checkbox_inner_success_border);color:var(--sapField_SuccessColor)}:host([value-state="Positive"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--_ui5_checkbox_inner_success_background_hover)}:host([value-state="Critical"]) .ui5-checkbox-icon,:host([value-state="Critical"][indeterminate]) .ui5-checkbox-inner:after{color:var(--_ui5_checkbox_checkmark_warning_color)}.ui5-checkbox-root{position:relative;display:inline-flex;align-items:center;max-width:100%;min-height:var(--_ui5_checkbox_width_height);min-width:var(--_ui5_checkbox_width_height);padding:0 var(--_ui5_checkbox_wrapper_padding);outline:none;transition:var(--_ui5_checkbox_transition);border:var(--_ui5_checkbox_default_focus_border);border-radius:var(--_ui5_checkbox_border_radius);box-sizing:border-box}:host([desktop]) .ui5-checkbox-root:focus:before,.ui5-checkbox-root:focus-visible:before{display:var(--_ui5_checkbox_focus_outline_display);content:"";position:absolute;inset-inline:var(--_ui5_checkbox_focus_position);inset-block:var(--_ui5_checkbox_focus_position);border:var(--_ui5_checkbox_focus_outline);border-radius:var(--_ui5_checkbox_focus_border_radius)}:host([text]) .ui5-checkbox-root{padding-inline-end:var(--_ui5_checkbox_right_focus_distance)}:host([text]) .ui5-checkbox-root:focus:before,:host([text]) .ui5-checkbox-root:focus-visible:before{inset-inline-end:0}:host(:hover:not([disabled])){background:var(--_ui5_checkbox_outer_hover_background)}.ui5-checkbox--hoverable .ui5-checkbox-label:hover{color:var(--_ui5_checkbox_label_color)}:host(:not([active]):not([checked]):not([value-state])) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner,:host(:not([active]):not([checked])[value-state="None"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--_ui5_checkbox_hover_background);border-color:var(--_ui5_checkbox_inner_hover_border_color)}:host(:not([active])[checked]:not([value-state])) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner,:host(:not([active])[checked][value-state="None"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--_ui5_checkbox_hover_background);border-color:var(--_ui5_checkbox_inner_hover_checked_border_color)}:host([checked]:not([value-state])) .ui5-checkbox-inner,:host([checked][value-state="None"]) .ui5-checkbox-inner{border-color:var(--_ui5_checkbox_inner_selected_border_color)}:host([active]:not([checked]):not([value-state]):not([disabled])) .ui5-checkbox-inner,:host([active]:not([checked])[value-state="None"]:not([disabled])) .ui5-checkbox-inner{border-color:var(--_ui5_checkbox_inner_active_border_color);background-color:var(--_ui5_checkbox_active_background)}:host([active][checked]:not([value-state]):not([disabled])) .ui5-checkbox-inner,:host([active][checked][value-state="None"]:not([disabled])) .ui5-checkbox-inner{border-color:var(--_ui5_checkbox_inner_selected_border_color);background-color:var(--_ui5_checkbox_active_background)}.ui5-checkbox-inner{min-width:var(--_ui5_checkbox_inner_width_height);max-width:var(--_ui5_checkbox_inner_width_height);height:var(--_ui5_checkbox_inner_width_height);max-height:var(--_ui5_checkbox_inner_width_height);border:var(--_ui5_checkbox_inner_border);border-radius:var(--_ui5_checkbox_inner_border_radius);background:var(--_ui5_checkbox_inner_background);color:var(--_ui5_checkbox_checkmark_color);box-sizing:border-box;position:relative;cursor:inherit}:host([indeterminate][checked]) .ui5-checkbox-inner:after{content:"";background-color:currentColor;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:var(--_ui5_checkbox_partially_icon_size);height:var(--_ui5_checkbox_partially_icon_size)}:host input{-webkit-appearance:none;visibility:hidden;width:0;left:0;position:absolute;font-size:inherit}.ui5-checkbox-root .ui5-checkbox-label{margin-inline-start:var(--_ui5_checkbox_label_offset);cursor:inherit;text-overflow:ellipsis;overflow:hidden;pointer-events:none;color:var(--_ui5_checkbox_label_color)}.ui5-checkbox-icon{width:var(--_ui5_checkbox_icon_size);height:var(--_ui5_checkbox_icon_size);color:currentColor;cursor:inherit;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}:host([display-only]){cursor:default}:host([display-only]) .ui5-checkbox-display-only-icon-inner [ui5-icon]{color:var(--sapTextColor)}:host([display-only]) .ui5-checkbox-display-only-icon-inner{min-width:var(--_ui5_checkbox_inner_width_height);max-width:var(--_ui5_checkbox_inner_width_height);height:var(--_ui5_checkbox_inner_width_height);max-height:var(--_ui5_checkbox_inner_width_height);display:flex;align-items:center;justify-content:center}
+    var checkboxCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host{-webkit-tap-highlight-color:rgba(0,0,0,0)}:host{vertical-align:middle}:host(:not([hidden])){display:inline-flex;align-items:center}:host([required]){vertical-align:middle}:host{max-width:100%;outline:none;border-radius:var(--_ui5_checkbox_border_radius);transition:var(--_ui5_checkbox_transition);cursor:pointer;user-select:none;-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;font-size:var(--sapFontSize)}:host([disabled]){cursor:default}:host([disabled]) .ui5-checkbox-root{opacity:var(--_ui5_checkbox_disabled_opacity)}:host([disabled]) .ui5-checkbox-inner{border-color:var(--_ui5_checkbox_inner_disabled_border_color)}:host([disabled]) .ui5-checkbox-label{color:var(--_ui5_checkbox_disabled_label_color)}:host([readonly]:not([value-state="Critical"]):not([value-state="Negative"])) .ui5-checkbox-inner{background:var(--sapField_ReadOnly_Background);border:var(--_ui5_checkbox_inner_readonly_border);color:var(--sapField_TextColor)}:host(:not([wrapping-type="None"])[text]) .ui5-checkbox-root{align-items:flex-start}:host(:not([wrapping-type="None"])[text]) .ui5-checkbox-root .ui5-checkbox-label{overflow-wrap:break-word;align-self:center}:host([desktop][text]:not([wrapping-type="None"])) .ui5-checkbox-root:focus:before,.ui5-checkbox-root[text]:focus-visible:before{inset-block:var(--_ui5_checkbox_wrapped_focus_inset_block)}:host([value-state="Negative"]) .ui5-checkbox-inner,:host([value-state="Negative"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--sapField_InvalidBackground);border:var(--_ui5_checkbox_inner_error_border);color:var(--sapField_InvalidColor)}:host([value-state="Negative"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--_ui5_checkbox_inner_error_background_hover)}:host([value-state="Critical"]) .ui5-checkbox-inner,:host([value-state="Critical"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--sapField_WarningBackground);border:var(--_ui5_checkbox_inner_warning_border);color:var(--_ui5_checkbox_inner_warning_color)}:host([value-state="Critical"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--_ui5_checkbox_inner_warning_background_hover)}:host([value-state="Information"]) .ui5-checkbox-inner,:host([value-state="Information"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--sapField_InformationBackground);border:var(--_ui5_checkbox_inner_information_border);color:var(--_ui5_checkbox_inner_information_color)}:host([value-state="Information"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--_ui5_checkbox_inner_information_background_hover)}:host([value-state="Positive"]) .ui5-checkbox-inner,:host([value-state="Positive"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--sapField_SuccessBackground);border:var(--_ui5_checkbox_inner_success_border);color:var(--sapField_SuccessColor)}:host([value-state="Positive"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--_ui5_checkbox_inner_success_background_hover)}:host([value-state="Critical"]) .ui5-checkbox-icon,:host([value-state="Critical"][indeterminate]) .ui5-checkbox-inner:after{color:var(--_ui5_checkbox_checkmark_warning_color)}.ui5-checkbox-root{position:relative;display:inline-flex;align-items:center;overflow:hidden;max-width:100%;padding-block:var(--_ui5_checkbox_root_side_padding);padding-inline:var(--_ui5_checkbox_wrapper_padding);box-sizing:border-box;outline:none;transition:var(--_ui5_checkbox_transition);border:var(--_ui5_checkbox_default_focus_border);border-radius:var(--_ui5_checkbox_border_radius)}:host([desktop]) .ui5-checkbox-root:focus:before,.ui5-checkbox-root:focus-visible:before{display:var(--_ui5_checkbox_focus_outline_display);content:"";position:absolute;inset-inline:var(--_ui5_checkbox_focus_position);inset-block:var(--_ui5_checkbox_focus_position);border:var(--_ui5_checkbox_focus_outline);border-radius:var(--_ui5_checkbox_focus_border_radius)}:host([text]) .ui5-checkbox-root{padding-inline-end:var(--_ui5_checkbox_right_focus_distance)}:host([text]) .ui5-checkbox-root:focus:before,:host([text]) .ui5-checkbox-root:focus-visible:before{inset-inline-end:0}:host(:hover:not([disabled])){background:var(--_ui5_checkbox_outer_hover_background)}.ui5-checkbox--hoverable .ui5-checkbox-label:hover{color:var(--_ui5_checkbox_label_color)}:host(:not([active]):not([checked]):not([value-state])) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner,:host(:not([active]):not([checked])[value-state="None"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--_ui5_checkbox_hover_background);border-color:var(--_ui5_checkbox_inner_hover_border_color)}:host(:not([active])[checked]:not([value-state])) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner,:host(:not([active])[checked][value-state="None"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--_ui5_checkbox_hover_background);border-color:var(--_ui5_checkbox_inner_hover_checked_border_color)}:host([checked]:not([value-state])) .ui5-checkbox-inner,:host([checked][value-state="None"]) .ui5-checkbox-inner{border-color:var(--_ui5_checkbox_inner_selected_border_color)}:host([active]:not([checked]):not([value-state]):not([disabled])) .ui5-checkbox-inner,:host([active]:not([checked])[value-state="None"]:not([disabled])) .ui5-checkbox-inner{border-color:var(--_ui5_checkbox_inner_active_border_color);background-color:var(--_ui5_checkbox_active_background)}:host([active][checked]:not([value-state]):not([disabled])) .ui5-checkbox-inner,:host([active][checked][value-state="None"]:not([disabled])) .ui5-checkbox-inner{border-color:var(--_ui5_checkbox_inner_selected_border_color);background-color:var(--_ui5_checkbox_active_background)}.ui5-checkbox-inner{min-width:var(--_ui5_checkbox_inner_width_height);max-width:var(--_ui5_checkbox_inner_width_height);height:var(--_ui5_checkbox_inner_width_height);max-height:var(--_ui5_checkbox_inner_width_height);flex-shrink:0;border:var(--_ui5_checkbox_inner_border);border-radius:var(--_ui5_checkbox_inner_border_radius);background:var(--_ui5_checkbox_inner_background);color:var(--_ui5_checkbox_checkmark_color);box-sizing:border-box;position:relative;cursor:inherit}:host([indeterminate][checked]) .ui5-checkbox-inner:after{content:"";background-color:currentColor;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:var(--_ui5_checkbox_partially_icon_size);height:var(--_ui5_checkbox_partially_icon_size)}:host input{-webkit-appearance:none;visibility:hidden;width:0;left:0;position:absolute;font-size:inherit}.ui5-checkbox-root .ui5-checkbox-label{margin-inline-start:var(--_ui5_checkbox_label_offset);cursor:inherit;text-overflow:ellipsis;overflow:hidden;pointer-events:none;color:var(--_ui5_checkbox_label_color);font-size:inherit}.ui5-checkbox-icon{width:var(--_ui5_checkbox_icon_size);height:var(--_ui5_checkbox_icon_size);font-size:inherit;color:currentColor;cursor:inherit;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}:host([display-only]){cursor:default}:host([display-only]) .ui5-checkbox-display-only-icon-inner [ui5-icon]{color:var(--sapTextColor);width:var(--_ui5_checkbox_icon_size);height:var(--_ui5_checkbox_icon_size)}:host([display-only]) .ui5-checkbox-display-only-icon-inner{min-width:var(--_ui5_checkbox_inner_width_height);max-width:var(--_ui5_checkbox_inner_width_height);height:var(--_ui5_checkbox_inner_width_height);max-height:var(--_ui5_checkbox_inner_width_height);display:flex;align-items:center;justify-content:center}
 `;
 
     const name$7 = "accept";
@@ -1243,7 +1240,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 
     Icons.y(name$6, { pathData: pathData$6, ltr: ltr$6, viewBox: viewBox$6, collection: collection$6, packageName: packageName$6 });
 
-    var checkIcon = "accept";
+    var acceptIcon = "accept";
 
     const name$5 = "complete";
     const pathData$5 = "M12.998 10.002h1V14a.946.946 0 0 1-.297.719.987.987 0 0 1-.703.281H1a.973.973 0 0 1-.719-.281A.973.973 0 0 1 0 14V2.005c0-.271.094-.506.281-.703A.947.947 0 0 1 1 1.005h4v1H1V14h11.998v-3.998ZM14.872.786c.146.146.167.313.063.5l-5.78 8.497a.39.39 0 0 1-.313.219.42.42 0 0 1-.375-.125L4.562 5.535c-.188-.188-.188-.375 0-.563l.656-.656c.208-.208.406-.208.593 0l2.5 2.5a.4.4 0 0 0 .36.124c.135-.02.234-.104.296-.25L13.53.224a.38.38 0 0 1 .297-.219.4.4 0 0 1 .359.125l.687.656Z";
@@ -1313,7 +1310,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
                     parametersBundle_css.jsx("div", { class: "ui5-checkbox-display-only-icon-inner", children: parametersBundle_css.jsx(Icon.Icon, { "aria-hidden": "true", name: displayOnlyIcon.call(this), class: "ui5-checkbox-display-only-icon", part: "icon" }) })
                     :
                         parametersBundle_css.jsx("div", { id: `${this._id}-CbBg`, class: "ui5-checkbox-inner", children: this.isCompletelyChecked &&
-                                parametersBundle_css.jsx(Icon.Icon, { "aria-hidden": "true", name: checkIcon, class: "ui5-checkbox-icon", part: "icon" }) }), this.accInfo.role === "checkbox" &&
+                                parametersBundle_css.jsx(Icon.Icon, { "aria-hidden": "true", name: acceptIcon, class: "ui5-checkbox-icon", part: "icon" }) }), this.accInfo.role === "checkbox" &&
                     parametersBundle_css.jsx("input", { id: `${this._id}-CB`, type: "checkbox", checked: this.checked, value: this.value, readonly: this.readonly, disabled: this.disabled, tabindex: -1, "aria-hidden": "true", "data-sap-no-tab-ref": true }), this.text &&
                     parametersBundle_css.jsx(Label, { id: `${this._id}-label`, part: "label", class: "ui5-checkbox-label", wrappingType: this.wrappingType, required: this.required, children: this.text }), this.hasValueState &&
                     parametersBundle_css.jsx("span", { id: `${this._id}-descr`, class: "ui5-hidden-text", children: this.valueStateText })] }));
@@ -1379,7 +1376,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
      * @csspart label - Used to style the label of the `ui5-checkbox`
      * @csspart icon - Used to style the icon of the `ui5-checkbox`
      */
-    let CheckBox = CheckBox_1 = class CheckBox extends webcomponentsBase.S {
+    let CheckBox = CheckBox_1 = class CheckBox extends webcomponentsBase.b {
         get formValidityMessage() {
             return CheckBox_1.i18nBundle.getText(i18nDefaults.FORM_CHECKABLE_REQUIRED);
         }
@@ -1531,7 +1528,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
             if (this.readonly || this.disabled) {
                 return;
             }
-            if (webcomponentsBase.b(e)) {
+            if (webcomponentsBase.b$1(e)) {
                 this.toggle();
             }
             this.active = true;
@@ -1739,7 +1736,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
     };
     function ListItemTemplate(hooks) {
         const currentHooks = { ...predefinedHooks, ...hooks };
-        return parametersBundle_css.jsxs("li", { part: "native-li", "data-sap-focus-ref": true, tabindex: this._effectiveTabIndex, class: this.classes.main, onFocusIn: this._onfocusin, onFocusOut: this._onfocusout, onKeyUp: this._onkeyup, onKeyDown: this._onkeydown, onMouseUp: this._onmouseup, onMouseDown: this._onmousedown, onTouchStart: this._onmousedown, onTouchEnd: this._ontouchend, onClick: this._onclick, draggable: this.movable, onDragStart: this._ondragstart, onDragEnd: this._ondragend, role: this._accInfo.role, title: this._accInfo.tooltip, "aria-expanded": this._accInfo.ariaExpanded, "aria-level": this._accInfo.ariaLevel, "aria-haspopup": this._accInfo.ariaHaspopup, "aria-posinset": this._accInfo.posinset, "aria-setsize": this._accInfo.setsize, "aria-describedby": this._accInfo.ariaDescribedBy, "aria-labelledby": this._accessibleNameRef, "aria-disabled": this._ariaDisabled, "aria-selected": this._accInfo.ariaSelected, "aria-checked": this._accInfo.ariaChecked, "aria-owns": this._accInfo.ariaOwns, "aria-keyshortcuts": this._accInfo.ariaKeyShortcuts, children: [currentHooks.listItemPreContent.call(this), this.placeSelectionElementBefore && selectionElement.call(this), this._hasHighlightColor && parametersBundle_css.jsx("div", { class: "ui5-li-highlight" }), parametersBundle_css.jsxs("div", { part: "content", id: `${this._id}-content`, class: "ui5-li-content", children: [currentHooks.imageBegin.call(this), currentHooks.iconBegin.call(this), currentHooks.listItemContent.call(this)] }), currentHooks.iconEnd.call(this), this.typeDetail && (parametersBundle_css.jsx("div", { class: "ui5-li-detailbtn", children: parametersBundle_css.jsx(Button.Button, { part: "detail-button", design: "Transparent", onClick: this.onDetailClick, icon: edit }) })), this.typeNavigation && (parametersBundle_css.jsx(Icon.Icon, { name: slimArrowRight })), this.navigated && (parametersBundle_css.jsx("div", { class: "ui5-li-navigated" })), this.placeSelectionElementAfter && (currentHooks.selectionElement.call(this)), parametersBundle_css.jsx("span", { id: `${this._id}-invisibleText`, class: "ui5-hidden-text", children: this.ariaLabelledByText }), parametersBundle_css.jsx("span", { id: `${this._id}-invisibleText-describedby`, class: "ui5-hidden-text", children: this._accInfo.ariaSelectedText })] });
+        return parametersBundle_css.jsxs("li", { part: "native-li", "data-sap-focus-ref": true, tabindex: this._effectiveTabIndex, class: this.classes.main, onFocusIn: this._onfocusin, onFocusOut: this._onfocusout, onKeyUp: this._onkeyup, onKeyDown: this._onkeydown, onMouseUp: this._onmouseup, onMouseDown: this._onmousedown, onTouchStart: this._onmousedown, onTouchEnd: this._ontouchend, onClick: this._onclick, draggable: this.movable, onDragStart: this._ondragstart, onDragEnd: this._ondragend, role: this._accInfo.role, title: this._accInfo.tooltip, "aria-expanded": this._accInfo.ariaExpanded, "aria-level": this._accInfo.ariaLevel, "aria-haspopup": this._accInfo.ariaHaspopup, "aria-posinset": this._accInfo.posinset, "aria-setsize": this._accInfo.setsize, "aria-describedby": this._accInfo.ariaDescribedBy, "aria-labelledby": this._accessibleNameRef, "aria-disabled": this._ariaDisabled, "aria-selected": this._accInfo.ariaSelected, "aria-checked": this._accInfo.ariaChecked, "aria-owns": this._accInfo.ariaOwns, "aria-keyshortcuts": this._accInfo.ariaKeyShortcuts, children: [currentHooks.listItemPreContent.call(this), this.placeSelectionElementBefore && selectionElement.call(this), this._hasHighlightColor && parametersBundle_css.jsx("div", { class: "ui5-li-highlight" }), parametersBundle_css.jsxs("div", { part: "content", id: `${this._id}-content`, class: "ui5-li-content", children: [currentHooks.imageBegin.call(this), currentHooks.iconBegin.call(this), currentHooks.listItemContent.call(this)] }), currentHooks.iconEnd.call(this), this.typeDetail && (parametersBundle_css.jsx("div", { class: "ui5-li-detailbtn", children: parametersBundle_css.jsx(Button.Button, { part: "detail-button", design: "Transparent", onClick: this.onDetailClick, icon: edit.edit }) })), this.typeNavigation && (parametersBundle_css.jsx(Icon.Icon, { name: slimArrowRight })), this.navigated && (parametersBundle_css.jsx("div", { class: "ui5-li-navigated" })), this.placeSelectionElementAfter && (currentHooks.selectionElement.call(this)), parametersBundle_css.jsx("span", { id: `${this._id}-invisibleText`, class: "ui5-hidden-text", children: this.ariaLabelledByText }), parametersBundle_css.jsx("span", { id: `${this._id}-invisibleText-describedby`, class: "ui5-hidden-text", children: this._accInfo.ariaSelectedText })] });
     }
     function listItemPreContent() { }
     function listItemContent() { }
@@ -1754,15 +1751,15 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
                 return (parametersBundle_css.jsx(CheckBox$1, { part: "checkbox", disabled: this.isInactive, indeterminate: this.indeterminate, tabindex: -1, id: `${this._id}-multiSelectionElement`, class: "ui5-li-multisel-cb", checked: this.selected, accessibleName: this._accInfo.ariaLabel, onChange: this.onMultiSelectionComponentPress }));
             case this.modeDelete:
                 return (parametersBundle_css.jsx("div", { class: "ui5-li-deletebtn", children: this.hasDeleteButtonSlot ?
-                        (parametersBundle_css.jsx("slot", { name: "deleteButton" })) : (parametersBundle_css.jsx(Button.Button, { part: "delete-button", id: `${this._id}-deleteSelectionElement`, design: "Transparent", icon: decline.decline, onClick: this.onDelete, tooltip: this.deleteText })) }));
+                        (parametersBundle_css.jsx("slot", { name: "deleteButton" })) : (parametersBundle_css.jsx(Button.Button, { part: "delete-button", id: `${this._id}-deleteSelectionElement`, design: "Transparent", icon: decline.declineIcon, onClick: this.onDelete, tooltip: this.deleteText })) }));
         }
     }
 
     exports.ListItem = ListItem$1;
     exports.ListItemTemplate = ListItemTemplate;
+    exports.ListItemType = ListItemType$1;
     exports.ListSelectionMode = ListSelectionMode$1;
-    exports.checkIcon = checkIcon;
-    exports.edit = edit;
+    exports.acceptIcon = acceptIcon;
     exports.listItemAdditionalTextCss = listItemAdditionalTextCss;
     exports.slimArrowRight = slimArrowRight;
 

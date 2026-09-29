@@ -251,20 +251,28 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("getExpandLevels/reset", function (assert) {
 		const oTreeState = new _TreeState("~fnGetKeyFilter~", "~fnGetNodeId~");
-		oTreeState.oOutOfPlace = "~oOutOfPlace~";
 
 		// code under test
 		assert.strictEqual(oTreeState.getExpandLevels(), undefined);
 
+		// code under test
+		assert.strictEqual(oTreeState.getExpandLevels(true), undefined);
+
 		oTreeState.mPredicate2ExpandInfo = {
-			foo : {important : true, nodeId : "baz", levels : 42},
-			bar : {important : false, nodeId : "qux", levels : 23}
+			// In case of a recursive hierarchy the nodeId is typically the ID of the affected node
+			// and in case of data aggregation it is an array of group level values.
+			foo : {filter : "ignored", important : true, levels : 42, nodeId : "anyNodeID"},
+			bar : {filter : "ignored", important : false, levels : 23, nodeId : ["DE", "Berlin"]}
 		};
 		const sPredicate2ExpandInfo = JSON.stringify(oTreeState.mPredicate2ExpandInfo);
 
 		// code under test
 		assert.strictEqual(oTreeState.getExpandLevels(),
-			'[{"NodeID":"baz","Levels":42},{"NodeID":"qux","Levels":23}]');
+			'[{"NodeID":"anyNodeID","Levels":42},{"NodeID":["DE","Berlin"],"Levels":23}]');
+
+		// code under test
+		assert.strictEqual(oTreeState.getExpandLevels(true),
+			'[{"Entry":"anyNodeID","Levels":42},{"Entry":["DE","Berlin"],"Levels":23}]');
 
 		assert.strictEqual(JSON.stringify(oTreeState.mPredicate2ExpandInfo),
 			sPredicate2ExpandInfo);

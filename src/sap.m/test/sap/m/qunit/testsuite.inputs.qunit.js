@@ -21,6 +21,7 @@ sap.ui.define([
 		"MaskInput",
 		"MultiComboBox",
 		"MultiInput",
+		"NumericInput",
 		"StepInput",
 		"SuggestionsPopover",
 		"TextArea",

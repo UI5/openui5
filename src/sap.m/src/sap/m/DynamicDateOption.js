@@ -172,8 +172,8 @@ sap.ui.define([
 
 				switch (aParams[i].getType()) {
 					case "int":
-						if (oInputControl._isLessThanMin(oInputControl.getValue()) ||
-							oInputControl._isMoreThanMax(oInputControl.getValue())) {
+						if (oInputControl._getNumericInput()._isLessThanMin(oInputControl.getValue()) ||
+							oInputControl._getNumericInput()._isMoreThanMax(oInputControl.getValue())) {
 							return false;
 						}
 						break;

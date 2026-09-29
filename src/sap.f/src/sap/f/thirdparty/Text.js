@@ -66,7 +66,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
      * @public
      * @since 2.0.0
      */
-    let Text = Text_1 = class Text extends webcomponentsBase.S {
+    let Text = Text_1 = class Text extends webcomponentsBase.b {
         constructor() {
             super(...arguments);
             /**

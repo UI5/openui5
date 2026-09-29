@@ -1,0 +1,38 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.m.sample.NumericInput",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"type": "application",
+		"title": "Application 'NumericInput'"
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"rootView": "sap.m.sample.NumericInput.NumericInput",
+		"dependencies": {
+			"minUI5Version": "2.0.0",
+			"libs": {
+				"sap.m": {},
+				"sap.ui.core": {}
+			}
+		},
+		"config": {
+			"sample": {
+				"files": [
+					"NumericInput.view.xml",
+					"NumericInput.controller.js",
+					"manifest.json"
+				]
+			}
+		}
+	}
+}

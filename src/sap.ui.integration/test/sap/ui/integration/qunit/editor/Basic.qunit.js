@@ -400,7 +400,7 @@ sap.ui.define([
 						assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
 						assert.ok(oField.getAggregation("_field").isA("sap.m.ComboBox"), "Field: Editor is ComboBox");
 						var aItems = oField.getAggregation("_field").getItems();
-						assert.equal(aItems.length, 3, "Field: Select items lenght is OK");
+						assert.equal(aItems.length, 3, "Field: Select items length is OK");
 						assert.equal(aItems[0].getKey(), "key1", "Field: Select item 0 Key is OK");
 						assert.equal(aItems[0].getText(), "text1", "Field: Select item 0 Text is OK");
 						assert.equal(aItems[1].getKey(), "key2", "Field: Select item 1 Key is OK");
@@ -446,7 +446,7 @@ sap.ui.define([
 						assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
 						assert.ok(oField.getAggregation("_field").isA("sap.m.ComboBox"), "Field: Editor is ComboBox");
 						var aItems = oField.getAggregation("_field").getItems();
-						assert.equal(aItems.length, 4, "Field: Select items lenght is OK");
+						assert.equal(aItems.length, 4, "Field: Select items length is OK");
 						assert.equal(aItems[0].getKey(), "key1", "Field: Select item 0 Key is OK");
 						assert.equal(aItems[0].getText(), "text1req", "Field: Select item 0 Text is OK");
 						assert.equal(aItems[1].getKey(), "key2", "Field: Select item 1 Key is OK");
@@ -493,7 +493,7 @@ sap.ui.define([
 						assert.equal(oLabel.getText(), "stringArrayParameter", "Label: Has static label text");
 						assert.ok(oField.isA("sap.ui.integration.editor.fields.StringListField"), "Field: List Field");
 						assert.ok(oField.getAggregation("_field").isA("sap.m.MultiComboBox"), "Field: Editor is MultiComboBox");
-						assert.equal(oField.getAggregation("_field").getItems().length, 5, "Field: MultiComboBox items lenght is OK");
+						assert.equal(oField.getAggregation("_field").getItems().length, 5, "Field: MultiComboBox items length is OK");
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -533,7 +533,7 @@ sap.ui.define([
 						assert.ok(oField.isA("sap.ui.integration.editor.fields.StringListField"), "Field: List Field");
 						var oMultiComboBox = oField.getAggregation("_field");
 						assert.ok(oMultiComboBox.isA("sap.m.MultiComboBox"), "Field: Editor is MultiComboBox");
-						assert.equal(oMultiComboBox.getItems().length, 5, "Field: MultiComboBox items lenght is OK");
+						assert.equal(oMultiComboBox.getItems().length, 5, "Field: MultiComboBox items length is OK");
 						assert.equal(oMultiComboBox.getSelectedKeys().length, 1, "Field: Selected Keys length correct");
 						assert.equal(oMultiComboBox.getSelectedKeys()[0], "key1", "Field: Selected Keys correct");
 						var aValue = this.oEditor.getCurrentSettings()["/sap.card/configuration/parameters/stringArrayParameter/value"];
@@ -620,7 +620,7 @@ sap.ui.define([
 						assert.equal(oLabel.getText(), "stringArrayParameter", "Label: Has static label text");
 						assert.ok(oField.isA("sap.ui.integration.editor.fields.StringListField"), "Field: List Field");
 						assert.ok(oField.getAggregation("_field").isA("sap.m.MultiComboBox"), "Field: Editor is MultiComboBox");
-						assert.equal(oField.getAggregation("_field").getItems().length, 6, "Field: MultiComboBox items lenght is OK");
+						assert.equal(oField.getAggregation("_field").getItems().length, 6, "Field: MultiComboBox items length is OK");
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -3977,12 +3977,12 @@ sap.ui.define([
 					var oControl1 = oField1.getAggregation("_field");
 					assert.ok(oControl1.isA("sap.m.Select"), "Field 1: Control is Select");
 					assert.ok(oControl1.getEditable(), "Field 1: Control is editable");
-					assert.equal(oControl1.getItems().length, 3, "Field 1: Select lenght is OK");
+					assert.equal(oControl1.getItems().length, 3, "Field 1: Select length is OK");
 					var oField2 = this.oEditor.getAggregation("_formContent")[4];
 					var oControl2 = oField2.getAggregation("_field");
 					assert.ok(oControl2.isA("sap.m.Select"), "Field 2: Control is Select");
 					assert.ok(!oControl2.getEditable(), "Field 2: Control is NOT editable since 'editable' is false");
-					assert.equal(oControl2.getItems().length, 3, "Field 2: Select lenght is OK");
+					assert.equal(oControl2.getItems().length, 3, "Field 2: Select length is OK");
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
 						assert.equal(oField1._getCurrentProperty("value"), "", "Field 1: String1 Value '' correct");

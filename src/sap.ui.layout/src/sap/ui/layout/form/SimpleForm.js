@@ -72,14 +72,6 @@ sap.ui.define([
 			library : "sap.ui.layout",
 			properties : {
 				/**
-				 * The maximum amount of groups (<code>{@link sap.ui.layout.form.FormContainer FormContainers}</code>) per row that is used before a new row is started.
-				 *
-				 * <b>Note:</b> If <code>{@link sap.ui.layout.form.SimpleFormLayout.ResponsiveGridLayout}</code> is used as <code>layout</code>, this property is not used.
-				 * Please use the properties <code>ColumnsL</code> and <code>ColumnsM</code> in this case.
-				 */
-				maxContainerCols : {type : "int", group : "Appearance", defaultValue : 2},
-
-				/**
 				 * Width of the form.
 				 * @since 1.28.0
 				 */

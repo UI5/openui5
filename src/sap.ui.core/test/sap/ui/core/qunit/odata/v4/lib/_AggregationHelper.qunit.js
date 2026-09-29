@@ -13,6 +13,32 @@ sap.ui.define([
 	"use strict";
 
 	const mustBeMocked = function () { throw new Error("Must be mocked"); };
+	const mDataAggregationType = Object.freeze({
+		aggregate : {
+			"*" : {
+				grandTotal : "boolean",
+				max : "boolean",
+				min : "boolean",
+				name : "string",
+				subtotals : "boolean",
+				unit : "string",
+				with : "string"
+			}
+		},
+
+		expandTo : /^[1-9]\d*$/,
+		grandTotalAtBottomOnly : "boolean",
+
+		group : {
+			"*" : {
+				additionally : ["string"]
+			}
+		},
+
+		groupLevels : ["string"],
+		search : "string",
+		subtotalsAtBottomOnly : "boolean"
+	});
 
 	//*********************************************************************************************
 	QUnit.module("sap.ui.model.odata.v4.lib._AggregationHelper", {
@@ -1051,11 +1077,14 @@ sap.ui.define([
 	}, {
 		oAggregation : {
 			$autoExpandSelect : true,
+			$ExpandLevels : "ignored",
 			// must not consider $leafLevelAggregated if iLevel = -1
 			$leafLevelAggregated : false,
 			aggregate : {
-				Amount : {grandTotal : true}
+				SalesAmount : {subTotals : true, unit : "Currency"},
+				SalesNumber : {grandTotal : true}
 			},
+			expandTo : Number.MAX_SAFE_INTEGER, // ignored
 			group : {
 				N_A : {}
 			},
@@ -1063,9 +1092,290 @@ sap.ui.define([
 		},
 		iLevel : -1, // grand total only
 		mQueryOptions : {
+			$$filterBeforeAggregate : "~filterBeforeAggregate~",
+			$$foo : "discarded",
+			$apply : "replaced",
+			$count : "discarded",
+			$expand : "discarded",
+			$filter : "discarded",
+			$foo : "discarded",
+			$orderby : "discarded",
+			$search : "discarded",
+			$select : "discarded",
+			custom : "~custom~"
+		},
+		// grand total request must not contain MultiLevelExpand $apply transformation
+		sApply : "filter(~filterBeforeAggregate~)/search(covfefe)/aggregate(SalesNumber)",
+		mExpectedQueryOptions : {
+			$apply : "filter(~filterBeforeAggregate~)/search(covfefe)/aggregate(SalesNumber)",
+			custom : "~custom~"
+		}
+	}, {
+		oAggregation : {
+			$ExpandLevels : "ignored",
+			aggregate : {
+				SalesNumber : {grandTotal : true}
+			},
+			expandTo : Number.MAX_SAFE_INTEGER, // ignored
+			group : {
+				N_A : {}
+			},
+			search : "covfefe"
+		},
+		iLevel : -1, // grand total only
+		mQueryOptions : {
+			//NO $$filterBeforeAggregate
+		},
+		// grand total request must not contain MultiLevelExpand $apply transformation; no filter
+		sApply : "search(covfefe)/aggregate(SalesNumber)"
+	}, {
+		oAggregation : {
+			$ExpandLevels : "ignored",
+			aggregate : {
+				SalesAmount : {grandTotal : true, unit : "Currency"},
+				SalesNumber : {grandTotal : true}
+			},
+			expandTo : Number.MAX_SAFE_INTEGER, // ignored
+			group : {
+				N_A : {}
+			}
+			// NO search
+		},
+		iLevel : -1, // grand total only
+		mQueryOptions : {
 			$$filterBeforeAggregate : "~filterBeforeAggregate~"
 		},
-		sApply : "filter(~filterBeforeAggregate~)/search(covfefe)/aggregate(Amount)"
+		// grand total request must not contain MultiLevelExpand $apply transformation; no search
+		sApply : "filter(~filterBeforeAggregate~)/aggregate(SalesAmount,Currency,SalesNumber)"
+	}, {
+		oAggregation : {
+			aggregate : {
+				SalesNumber : {grandTotal : true}
+			},
+			group : {
+				N_A : {}
+			}
+		},
+		iLevel : -1, // grand total only
+		sApply : "aggregate(SalesNumber)"
+	}, { // MultiLevelExpand with all optional parts
+		oAggregation : {
+			$ExpandLevels : "~$ExpandLevels~",
+			$leafLevelAggregated : true,
+			aggregate : {
+				SalesNumber : {grandTotal : true},
+				SalesAmount : {subTotals : true, unit : "Currency"}
+			},
+			expandTo : 1,
+			group : {
+				Foo : {},
+				Country : {additionally : ["C", "B"]}, // intentionally not sorted
+				Region : {additionally : ["A"]},
+				Bar : {}
+			},
+			groupLevels : ["Country", "Region"],
+			search : "covfefe",
+			subtotalsAtBottomOnly : false
+		},
+		bAggregationUnchanged : true,
+		iLevel : 1,
+		mQueryOptions : {
+			$$filterBeforeAggregate : "~filterBeforeAggregate~",
+			$$filterOnAggregate : "~filterOnAggregate~",
+			$$leaves : true,
+			$count : true,
+			$orderby : "Country desc,Region,Qux asc",
+			$skip : 42,
+			$top : 99
+		},
+		sApply : "filter(~filterBeforeAggregate~)/search(covfefe)"
+			+ "/groupby((Bar,Country,Foo,Region),filter(~filterOnAggregate~))"
+			+ "/concat(groupby((Bar,Country,Foo,Region))/aggregate($count as UI5__leaves)"
+			+ ",aggregate(SalesNumber)"
+			+ ",com.sap.vocabularies.Analytics.v1.MultiLevelExpand(LevelProperties=[{"
+			+ '"DimensionProperties":["Country"],"AdditionalProperties":["B","C"]},'
+			+ '{"DimensionProperties":["Region"],"AdditionalProperties":["A"]},'
+			+ '{"DimensionProperties":["Bar"],"AdditionalProperties":[]},'
+			+ '{"DimensionProperties":["Foo"],"AdditionalProperties":[]}]'
+			+ ',Aggregation=["SalesAmount","Currency","SalesNumber"]'
+			+ ',SiblingOrder=[{"Property":"Country","Descending":true},'
+			+ '{"Property":"Region","Descending":false},{"Property":"Qux","Descending":false}]'
+			+ ",Levels=1"
+			+ ",ExpandLevels=~$ExpandLevels~"
+			+ ",SubtotalsAtBottom=true)"
+			+ "/concat(aggregate($count as UI5__count),skip(42)/top(99)))",
+		sFollowUpApply : "filter(~filterBeforeAggregate~)/search(covfefe)"
+			+ "/groupby((Bar,Country,Foo,Region),filter(~filterOnAggregate~))"
+			+ "/com.sap.vocabularies.Analytics.v1.MultiLevelExpand(LevelProperties=[{"
+			+ '"DimensionProperties":["Country"],"AdditionalProperties":["B","C"]},'
+			+ '{"DimensionProperties":["Region"],"AdditionalProperties":["A"]},'
+			+ '{"DimensionProperties":["Bar"],"AdditionalProperties":[]},'
+			+ '{"DimensionProperties":["Foo"],"AdditionalProperties":[]}]'
+			+ ',Aggregation=["SalesAmount","Currency","SalesNumber"]'
+			+ ',SiblingOrder=[{"Property":"Country","Descending":true},'
+			+ '{"Property":"Region","Descending":false},{"Property":"Qux","Descending":false}]'
+			+ ",Levels=1"
+			+ ",ExpandLevels=~$ExpandLevels~"
+			+ ",SubtotalsAtBottom=true)/skip(42)/top(99)"
+	}, { // MultiLevelExpand; expand after concat supported so $select can be used for first and
+		// follow-up requests
+		oAggregation : {
+			$autoExpandSelect : true,
+			$leafLevelAggregated : false,
+			aggregate : {
+				SalesAmount : {grandTotal : true, unit : "Currency"}
+			},
+			expandTo : 1,
+			groupLevels : ["Country"]
+		},
+		bExpandAfterConcatSupported : true,
+		iLevel : 1,
+		mQueryOptions : {
+			$$leaves : true,
+			$count : true,
+			$skip : 42,
+			$top : 99
+		},
+		sApply : "concat(groupby((Country))/aggregate($count as UI5__leaves)"
+			+ ",aggregate(SalesAmount,Currency)"
+			+ ",com.sap.vocabularies.Analytics.v1.MultiLevelExpand(LevelProperties=[{"
+			+ '"DimensionProperties":["Country"],"AdditionalProperties":[]}]'
+			+ ',Aggregation=["SalesAmount","Currency"]'
+			+ ",SiblingOrder=[]"
+			+ ",Levels=1)"
+			+ "/concat(aggregate($count as UI5__count),skip(42)/top(99)))",
+		aApplyWithSelect : ["Country", "Currency", "SalesAmount", "UI5__count"],
+		sFollowUpApply : "com.sap.vocabularies.Analytics.v1.MultiLevelExpand(LevelProperties=[{"
+			+ '"DimensionProperties":["Country"],"AdditionalProperties":[]}]'
+			+ ',Aggregation=["SalesAmount","Currency"]'
+			+ ",SiblingOrder=[]"
+			+ ",Levels=1)/skip(42)/top(99)",
+		aFollowUpApplyWithSelect : ["Country", "Currency", "SalesAmount"]
+	}, { // MultiLevelExpand; if $count causes a concat in the first request, $select must not be
+		// used if expand after concat is not supported; follow-up requests don't contain any
+		// concat so $select can be used
+		oAggregation : {
+			$autoExpandSelect : true,
+			$leafLevelAggregated : false,
+			aggregate : {
+				SalesNumber : {}
+			},
+			expandTo : Number.MAX_SAFE_INTEGER,
+			groupLevels : ["Country"]
+		},
+		bExpandAfterConcatSupported : false,
+		iLevel : 1,
+		mQueryOptions : {
+			$count : true,
+			$skip : 42,
+			$top : 99
+		},
+		sApply : "com.sap.vocabularies.Analytics.v1.MultiLevelExpand(LevelProperties=[{"
+			+ '"DimensionProperties":["Country"],"AdditionalProperties":[]}]'
+			+ ',Aggregation=["SalesNumber"]'
+			+ ",SiblingOrder=[])"
+			+ "/concat(aggregate($count as UI5__count),skip(42)/top(99))",
+		sFollowUpApply : "com.sap.vocabularies.Analytics.v1.MultiLevelExpand(LevelProperties=[{"
+			+ '"DimensionProperties":["Country"],"AdditionalProperties":[]}]'
+			+ ',Aggregation=["SalesNumber"]'
+			+ ",SiblingOrder=[])"
+			+ "/skip(42)/top(99)",
+		aFollowUpApplyWithSelect : ["Country", "SalesNumber"]
+	}, { // MultiLevelExpand; if a grand total causes a concat in the first request, $select must
+		// not be used if expand after concat is not supported; follow-up requests don't contain any
+		// concat so $select can be used
+		oAggregation : {
+			$autoExpandSelect : true,
+			$leafLevelAggregated : false,
+			aggregate : {
+				SalesNumber : {grandTotal : true}
+			},
+			expandTo : Number.MAX_SAFE_INTEGER,
+			groupLevels : ["Country"]
+		},
+		bExpandAfterConcatSupported : false,
+		iLevel : 1,
+		mQueryOptions : {
+			$skip : 42,
+			$top : 99
+		},
+		sApply : "concat(aggregate(SalesNumber)"
+			+ ",com.sap.vocabularies.Analytics.v1.MultiLevelExpand(LevelProperties=[{"
+			+ '"DimensionProperties":["Country"],"AdditionalProperties":[]}]'
+			+ ',Aggregation=["SalesNumber"]'
+			+ ",SiblingOrder=[])"
+			+ "/skip(42)/top(99))",
+		sFollowUpApply : "com.sap.vocabularies.Analytics.v1.MultiLevelExpand(LevelProperties=[{"
+			+ '"DimensionProperties":["Country"],"AdditionalProperties":[]}]'
+			+ ',Aggregation=["SalesNumber"]'
+			+ ",SiblingOrder=[])"
+			+ "/skip(42)/top(99)",
+		aFollowUpApplyWithSelect : ["Country", "SalesNumber"]
+	}, { // MultiLevelExpand; if $$leaves causes a concat in the first request, $select must not be
+		// used if expand after concat is not supported; follow-up requests don't contain any concat
+		// so $select can be used
+		oAggregation : {
+			$autoExpandSelect : true,
+			$leafLevelAggregated : false,
+			aggregate : {
+				SalesNumber : {}
+			},
+			expandTo : Number.MAX_SAFE_INTEGER,
+			groupLevels : ["Country"]
+		},
+		bExpandAfterConcatSupported : false,
+		iLevel : 1,
+		mQueryOptions : {
+			$$leaves : true,
+			$skip : 42,
+			$top : 99
+		},
+		sApply : "concat(groupby((Country))/aggregate($count as UI5__leaves)"
+			+ ",com.sap.vocabularies.Analytics.v1.MultiLevelExpand(LevelProperties=[{"
+			+ '"DimensionProperties":["Country"],"AdditionalProperties":[]}]'
+			+ ',Aggregation=["SalesNumber"]'
+			+ ",SiblingOrder=[])"
+			+ "/skip(42)/top(99))",
+		sFollowUpApply : "com.sap.vocabularies.Analytics.v1.MultiLevelExpand(LevelProperties=[{"
+			+ '"DimensionProperties":["Country"],"AdditionalProperties":[]}]'
+			+ ',Aggregation=["SalesNumber"]'
+			+ ",SiblingOrder=[])"
+			+ "/skip(42)/top(99)",
+		aFollowUpApplyWithSelect : ["Country", "SalesNumber"]
+	}, {
+		oAggregation : {
+			$ExpandLevels : "ignored",
+			aggregate : {
+				SalesAmount : {grandTotal : true, subTotals : true}
+			},
+			expandTo : Number.MAX_SAFE_INTEGER,
+			group : {
+				Country : {},
+				Region : {}
+			},
+			groupLevels : ["Country", "Region"]
+		},
+		iLevel : 0,
+		// download URL must not contain MultiLevelExpand $apply transformation
+		sApply : "groupby((Country,Region),aggregate(SalesAmount))"
+	}, {
+		oAggregation : {
+			// no $ExpandLevels -> no "ExpandLevels=..." in MultiLevelExpand
+			aggregate : {},
+			expandTo : Number.MAX_SAFE_INTEGER, // expand all -> no "Levels=..." in MultiLevelExpand
+			group : {
+				Country : {},
+				Region : {}
+			},
+			groupLevels : ["Country", "Region"],
+			subtotalsAtBottomOnly : true // ignored as there are no aggregates
+		},
+		iLevel : 2,
+		sApply : "com.sap.vocabularies.Analytics.v1.MultiLevelExpand(LevelProperties=[{"
+			+ '"DimensionProperties":["Country"],"AdditionalProperties":[]},'
+			+ '{"DimensionProperties":["Region"],"AdditionalProperties":[]}]'
+			+ ",Aggregation=[]"
+			+ ",SiblingOrder=[])"
 	}, {
 		// unaggregated leaf: aggregate+group, no groupby, previous $apply removed
 		oAggregation : {
@@ -1185,13 +1495,14 @@ sap.ui.define([
 			group : {ID : {}}
 		},
 		sApply : "groupby((ID),aggregate(Amount,SalesNumber as SalesNumberAlias))"
-	}].forEach(function (oFixture) {
-		const sTitle = "buildApply with " + oFixture.sApply
+	}].forEach(function (oFixture, i) {
+		const sTitle = `buildApply #${i} with ${oFixture.sApply}`
 			+ "; $leafLevelAggregated=" + oFixture.oAggregation.$leafLevelAggregated
 			+ "; aApplyWithSelect=" + oFixture.aApplyWithSelect;
 
 		QUnit.test(sTitle, function (assert) {
-			var mAlias2MeasureAndMethod = {},
+			var sAggregation,
+				mAlias2MeasureAndMethod = {},
 				sFollowUpApply = oFixture.sFollowUpApply ?? oFixture.sApply,
 				iLevel = "iLevel" in oFixture ? oFixture.iLevel : 1,
 				sQueryOptionsJSON = JSON.stringify(oFixture.mQueryOptions),
@@ -1199,9 +1510,10 @@ sap.ui.define([
 
 			function deepEqual(bFollowUp) {
 				const mExpected = bFollowUp // eslint-disable-line no-nested-ternary
-					? oFixture.mFollowUpQueryOptions
+					? oFixture.mFollowUpQueryOptions ?? oFixture.mExpectedQueryOptions
 						?? (sFollowUpApply ? {$apply : sFollowUpApply} : {})
-					: (oFixture.sApply ? {$apply : oFixture.sApply} : {});
+					: oFixture.mExpectedQueryOptions
+						?? (oFixture.sApply ? {$apply : oFixture.sApply} : {});
 				const aApplyWithSelect = bFollowUp && oFixture.aFollowUpApplyWithSelect
 					|| oFixture.aApplyWithSelect;
 				if (aApplyWithSelect) {
@@ -1216,8 +1528,9 @@ sap.ui.define([
 			}
 
 			oFixture.oAggregation.$fetchMetadata = mustBeMocked;
+			sAggregation = JSON.stringify(oFixture.oAggregation);
 			this.mock(oFixture.oAggregation).expects("$fetchMetadata")
-				.atMost("bExpandAfterConcatSupported" in oFixture ? 3 : 0)
+				.atMost("bExpandAfterConcatSupported" in oFixture ? 4 : 0)
 				.withArgs("/@com.sap.vocabularies.Common.v1.ExpandAfterConcatSupported")
 				.returns(SyncPromise.resolve(oFixture.bExpandAfterConcatSupported));
 			this.mock(_AggregationHelper).expects("checkTypeof").never();
@@ -1229,6 +1542,9 @@ sap.ui.define([
 			deepEqual();
 			assert.deepEqual(mAlias2MeasureAndMethod,
 				oFixture.mExpectedAlias2MeasureAndMethod ?? {}, "mAlias2MeasureAndMethod");
+			if (oFixture.bAggregationUnchanged) {
+				assert.strictEqual(JSON.stringify(oFixture.oAggregation), sAggregation);
+			}
 
 			mAlias2MeasureAndMethod = {};
 
@@ -1252,6 +1568,23 @@ sap.ui.define([
 			assert.strictEqual(JSON.stringify(oFixture.mQueryOptions), sQueryOptionsJSON,
 				"original mQueryOptions unchanged");
 		});
+	});
+
+	//*********************************************************************************************
+	QUnit.test("buildApply: level -1 but no grand totals", function (assert) {
+		const oAggregation = {
+			aggregate : {
+				SalesNumber : {}
+			},
+			group : {
+				N_A : {}
+			}
+		};
+
+		assert.throws(() => {
+			// code under test
+			_AggregationHelper.buildApply(oAggregation, {}, -1);
+		}, new Error("No grand total aggregate found"));
 	});
 
 	//*********************************************************************************************
@@ -1383,11 +1716,37 @@ sap.ui.define([
 			"grandTotal like 1.84" : true
 		},
 		sError : "Cannot aggregate totals with 'countdistinct'"
+	}, {
+		oAggregation : {
+			aggregate : {A : {grandTotal : true}},
+			expandTo : 1,
+			"grandTotal like 1.84" : true
+		},
+		sError : "Cannot combine 'grandTotal like 1.84' with 'expandTo'"
+	}, {
+		oAggregation : {
+			aggregate : {A : {grandTotal : true}},
+			expandTo : 1
+		},
+		mQueryOptions : {
+			$filter : "foo"
+		},
+		sError : "Cannot combine '$filter' query option with 'expandTo'"
+	}, {
+		oAggregation : {
+			aggregate : {A : {grandTotal : true}},
+			expandTo : 1
+		},
+		mQueryOptions : {
+			$orderby : "A,B asc,C desc,X Y Z"
+		},
+		sError : 'Unsupported $orderby item: "X Y Z"'
 	}].forEach(function (oFixture) {
 		QUnit.test("buildApply: " + oFixture.sError, function (assert) {
 			assert.throws(function () {
 				// code under test
-				_AggregationHelper.buildApply(oFixture.oAggregation, {}, /*iLevel*/1);
+				_AggregationHelper.buildApply(oFixture.oAggregation, oFixture.mQueryOptions ?? {},
+					/*iLevel*/1);
 			}, new Error(oFixture.sError));
 		});
 	});
@@ -1784,31 +2143,7 @@ sap.ui.define([
 			oError = new Error();
 
 		this.mock(_AggregationHelper).expects("checkTypeof")
-			.withExactArgs(sinon.match.same(oAggregation), {
-			aggregate : {
-				"*" : {
-					grandTotal : "boolean",
-					max : "boolean",
-					min : "boolean",
-					name : "string",
-					subtotals : "boolean",
-					unit : "string",
-					with : "string"
-				}
-			},
-
-			grandTotalAtBottomOnly : "boolean",
-
-			group : {
-				"*" : {
-					additionally : ["string"]
-				}
-			},
-
-			groupLevels : ["string"],
-			search : "string",
-			subtotalsAtBottomOnly : "boolean"
-		}, "$$aggregation")
+			.withExactArgs(sinon.match.same(oAggregation), mDataAggregationType, "$$aggregation")
 			.throws(oError);
 
 		assert.throws(function () {
@@ -1850,6 +2185,54 @@ sap.ui.define([
 
 		assert.deepEqual(oAggregation, {hierarchyQualifier : "X"}, "unchanged");
 	});
+
+	//*********************************************************************************************
+	QUnit.test("validateAggregation: 'expandTo' unsupported aggregates", function (assert) {
+		let oAggregation = Object.freeze({
+			aggregate : {
+				foo : {},
+				bar : {name : "name"}
+			},
+			expandTo : 1
+		});
+
+		assert.throws(function () {
+			// code under test
+			_AggregationHelper.validateAggregation(oAggregation);
+		}, new Error("Cannot combine 'expandTo' with aggregates having 'name' or 'with'"));
+
+		oAggregation = Object.freeze({
+			aggregate : {
+				foo : {},
+				bar : {with : "with"}
+			},
+			expandTo : 1
+		});
+
+		assert.throws(function () {
+			// code under test
+			_AggregationHelper.validateAggregation(oAggregation);
+		}, new Error("Cannot combine 'expandTo' with aggregates having 'name' or 'with'"));
+	});
+
+	//*********************************************************************************************
+[
+	{},
+	{expandTo : 2},
+	{expandTo : 2, aggregate : {foo : {}}},
+	{aggregate : {foo : {name : "bar"}}},
+	{aggregate : {foo : {with : "average"}}}
+].forEach((oAggregation, i) => {
+	QUnit.test("validateAggregation: data aggregation, no error #" + i, function () {
+		oAggregation = Object.freeze(oAggregation);
+
+		this.mock(_AggregationHelper).expects("checkTypeof")
+			.withExactArgs(sinon.match.same(oAggregation), mDataAggregationType, "$$aggregation");
+
+		// code under test
+		_AggregationHelper.validateAggregation(oAggregation);
+	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("validateAggregationAndSetPath: OK", function (assert) {
@@ -2687,6 +3070,73 @@ sap.ui.define([
 		assert.strictEqual(JSON.stringify(mQueryOptions), sQueryOptionsJSON, "unchanged");
 	});
 });
+
+	//*********************************************************************************************
+	QUnit.test("dropAggregatesWithoutSubtotals", function (assert) {
+		const oAggregation = {
+			aggregate : {
+				A : {},
+				B : {subtotals : false, unit : "noSubtotalUnit"},
+				C : {subtotals : false, unit : "usedUnit"},
+				D : {subtotals : true, unit : "usedUnit"},
+				E : {subtotals : true}
+			}
+		};
+		const oNode = {
+			A : "a",
+			B : "b",
+			C : "c",
+			D : "d",
+			E : "e",
+			noSubtotalUnit : "u",
+			notAggregatedProperty : "v",
+			usedUnit : "w"
+		};
+		const oUsedSubtotalUnits = new Set(["usedUnit"]);
+
+		// code under test
+		_AggregationHelper.dropAggregatesWithoutSubtotals(oAggregation, oNode, oUsedSubtotalUnits);
+
+		assert.deepEqual(oNode, {
+			D : "d",
+			E : "e",
+			notAggregatedProperty : "v",
+			usedUnit : "w"
+		});
+	});
+
+	//*********************************************************************************************
+	QUnit.test("keepSubtotalsOnly", function (assert) {
+		const oAggregation = {
+			aggregate : {
+				A : {},
+				B : {subtotals : false, unit : "noSubtotalUnit"},
+				C : {subtotals : false, unit : "usedUnit"},
+				D : {subtotals : true, unit : "usedUnit"},
+				E : {subtotals : true}
+			}
+		};
+		const oNode = {
+			A : "a",
+			B : "b",
+			C : "c",
+			D : "d",
+			E : "e",
+			noSubtotalUnit : "u",
+			notAggregatedProperty : "v",
+			usedUnit : "w"
+		};
+		const oUsedSubtotalUnits = new Set(["usedUnit"]);
+
+		// code under test
+		_AggregationHelper.keepSubtotalsOnly(oAggregation, oNode, oUsedSubtotalUnits);
+
+		assert.deepEqual(oNode, {
+			D : "d",
+			E : "e",
+			usedUnit : "w"
+		});
+	});
 
 	//*********************************************************************************************
 [false, true].forEach(function (bSubtotalsAtBottomOnly) {

@@ -6,6 +6,7 @@
 @_sap_ui_rta_Toolbar_Adaptation_DraftVersionColor: var(--sapShell_CriticalColor); /* #ffab1d */
 @_sap_ui_rta_Toolbar_Adaptation_ActiveVersionColor: var(--sapShell_PositiveColor); /* #9c9 */
 @_sap_ui_rta_Toolbar_Adaptation_SegBBtnBackgroundColor: var(--sapShell_Background); /* #000 */
+@_sap_ui_rta_Toolbar_Adaptation_HighlightAllChangesButtonColor: var(--sapContent_Illustrative_Color9); /* #0899a7 */
 
 .sapUiRtaMode {
 
@@ -20,14 +21,28 @@
 			}
 		}
 
-		/* set text to white on hover for better accessibility */
-		.sapUiRtaVersionButton {
+		.sapUiRtaVersionButton:hover.sapUiRtaDraftVersionAccent > .sapMBtn > span::after {
+			color: @_sap_ui_rta_Toolbar_Adaptation_TextColor;
+		}
 
-			&:hover {
+		.sapUiRtaVersionButton.sapUiRtaActiveVersionAccent > .sapMBtn:hover > span > span > bdi,
+		.sapUiRtaVersionButton.sapUiRtaActiveVersionAccent > .sapMBtn:hover > span::after {
+			color: @_sap_ui_rta_Toolbar_Adaptation_TextColor;
+		}
+	}
 
-				> span > span > bdi {
-					color: @_sap_ui_rta_Toolbar_Adaptation_TextColor;
-				}
+	.sapMMenuItem:not(:hover).sapUiRtaHighlightAllChangesButton {
+		.sapMMenuItemSelected {
+			&:after {
+				color: @_sap_ui_rta_Toolbar_Adaptation_HighlightAllChangesButtonColor;
+			}
+		}
+	}
+
+	.sapMMenuItem:hover.sapUiRtaHighlightAllChangesButton {
+		.sapMMenuItemSelected {
+			&:after {
+				color: @_sap_ui_rta_Toolbar_Adaptation_TextColor;
 			}
 		}
 	}

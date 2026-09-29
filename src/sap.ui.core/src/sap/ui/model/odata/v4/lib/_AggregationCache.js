@@ -61,9 +61,11 @@ sap.ui.define([
 		this.iReadLength = undefined;
 		this.iResetCount = 0;
 		this.bKeptFirstLevel = !!oFirstLevel;
+		const bUseMultiLevelExpand = !!oAggregation.expandTo && !oAggregation.hierarchyQualifier;
 		// Whether this cache is a unified cache, using oFirstLevel with ExpandLevels instead of
 		// separate group level caches
-		this.bUnifiedCache = this.bKeptFirstLevel || !!oAggregation.createInPlace
+		this.bUnifiedCache = bUseMultiLevelExpand || this.bKeptFirstLevel
+			|| !!oAggregation.createInPlace
 			|| oAggregation.expandTo >= Number.MAX_SAFE_INTEGER;
 
 		this.doReset(oAggregation, bHasGrandTotal, oFirstLevel);
@@ -71,8 +73,12 @@ sap.ui.define([
 		this.removeKeptElement = this.oFirstLevel.removeKeptElement; // @borrows ...
 		this.oTreeState = new _TreeState(
 			(oNode) => _Helper.getKeyFilter(oNode, this.sMetaPath, this.getTypes()),
+			// eslint-disable-next-line no-nested-ternary
 			oAggregation.$NodeProperty
-				? (oNode) => _Helper.drillDown(oNode, oAggregation.$NodeProperty)
+			? (oNode) => _Helper.drillDown(oNode, oAggregation.$NodeProperty)
+			: bUseMultiLevelExpand
+				? (oNode) => oAggregation.groupLevels.slice(0, oNode["@$ui5.node.level"])
+					.map((sGroup) => oNode[sGroup])
 				: () => {});
 		if (oFirstLevel) {
 			if (oFirstLevel.aElements.$deleted?.length
@@ -740,22 +746,32 @@ sap.ui.define([
 			oCache) {
 		var oAggregation = this.oAggregation,
 			iLevel = oGroupNode ? oGroupNode["@$ui5.node.level"] + 1 : 1,
-			aAllProperties, aGroupBy, bLeaf, sParentFilter, mQueryOptions, bTotal;
+			aAllProperties, aGroupBy, bLeaf, sParentFilter, mQueryOptions, oSubtotalUnits, bTotal;
 
 		if (oAggregation.hierarchyQualifier) {
 			mQueryOptions = Object.assign({}, this.mQueryOptions);
 		} else {
 			bLeaf = iLevel > oAggregation.groupLevels.length;
 			aAllProperties
-				= _AggregationHelper.getAllProperties(oAggregation, this.mQueryOptions, bLeaf);
-			aGroupBy = bLeaf
+				= _AggregationHelper.getAllProperties(oAggregation, this.mQueryOptions,
+					bLeaf || !!oAggregation.expandTo);
+			aGroupBy = bLeaf || oAggregation.expandTo
 				? oAggregation.groupLevels.concat(Object.keys(oAggregation.group).sort())
 				: oAggregation.groupLevels.slice(0, iLevel);
-			mQueryOptions
-				= _AggregationHelper.filterOrderby(this.mQueryOptions, oAggregation, iLevel);
-			bTotal = !bLeaf && Object.keys(oAggregation.aggregate).some(function (sAlias) {
-				return oAggregation.aggregate[sAlias].subtotals;
-			});
+			mQueryOptions = _AggregationHelper.filterOrderby(this.mQueryOptions, oAggregation,
+				oAggregation.expandTo ? 0 : iLevel);
+			bTotal = (oAggregation.expandTo || !bLeaf)
+				&& Object.keys(oAggregation.aggregate).some(function (sAlias) {
+					return oAggregation.aggregate[sAlias].subtotals;
+				});
+			if (oAggregation.expandTo) {
+				oSubtotalUnits = new Set();
+				Object.values(oAggregation.aggregate).forEach(function (oAggregate) {
+					if (oAggregate.subtotals && oAggregate.unit) {
+						oSubtotalUnits.add(oAggregate.unit);
+					}
+				});
+			}
 		}
 		if (oGroupNode) {
 			sParentFilter = _Helper.getPrivateAnnotation(oGroupNode, "filter")
@@ -779,10 +795,14 @@ sap.ui.define([
 		} else {
 			oCache = _Cache.create(this.oRequestor, this.sResourcePath, mQueryOptions, true);
 		}
+		// eslint-disable-next-line no-nested-ternary
 		oCache.calculateKeyPredicate = oAggregation.hierarchyQualifier
 			? _AggregationCache.calculateKeyPredicateRH.bind(null, oGroupNode, oAggregation)
-			: _AggregationCache.calculateKeyPredicate.bind(null, oGroupNode, aGroupBy,
-				aAllProperties, bLeaf, bTotal, this.sMetaPath);
+			: oAggregation.expandTo
+				? _AggregationCache.calculateKeyPredicateLevels.bind(null, oAggregation, aGroupBy,
+					aAllProperties, bTotal, oSubtotalUnits)
+				: _AggregationCache.calculateKeyPredicate.bind(null, oGroupNode, aGroupBy,
+					aAllProperties, bLeaf, bTotal, this.sMetaPath);
 		if (sParentFilter) {
 			oCache.$parentFilter = sParentFilter;
 		}
@@ -2391,15 +2411,8 @@ sap.ui.define([
 			return; // don't read grand total, a full refresh is needed
 		}
 
-		let mQueryOptions = {...this.mQueryOptions};
-		// drop not needed system query options; $filter and $search must not be used with grand
-		// totals; all filters are contained in $$filterBeforeAggregate
-		// Note: buildApply overwrites $apply and sets $$applyWithSelect:false, thus $expand/$select
-		// are ignored anyway
-		delete mQueryOptions.$count;
-		delete mQueryOptions.$orderby;
-
-		mQueryOptions = _AggregationHelper.buildApply(this.oAggregation, mQueryOptions, -1);
+		const mQueryOptions
+			= _AggregationHelper.buildApply(this.oAggregation, this.mQueryOptions, -1);
 		const sResourcePathWithQuery = this.sResourcePath
 			+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions, false, false, true);
 		const sGroupId = oGroupLock.getGroupId();
@@ -2824,18 +2837,20 @@ sap.ui.define([
 			iCreated = this.aElements.$created = this.oFirstLevel.getCreated();
 		}
 		fnSuper.call(this, {...mKeptElementPredicates}, sGroupId, mQueryOptions);
+		const bUseMultiLevelExpand = !!oAggregation.expandTo && !oAggregation.hierarchyQualifier;
 		if (sGroupId) { // sGroupId means we are in a side-effects refresh
 			this.oBackup.oCountPromise = this.oCountPromise;
 			this.oBackup.oFirstLevel = this.oFirstLevel;
 			this.oBackup.oGrandTotalPromise = this.oGrandTotalPromise;
 			this.oBackup.mKeptElements = {};
 			this.oBackup.bUnifiedCache = this.bUnifiedCache;
-			this.bUnifiedCache = this.bKeptFirstLevel || !!oAggregation.hierarchyQualifier;
+			this.bUnifiedCache = bUseMultiLevelExpand || this.bKeptFirstLevel
+				|| !!oAggregation.hierarchyQualifier;
 		} else {
 			this.oTreeState.reset();
 		}
 		oAggregation = Object.assign({}, oAggregation);
-		oAggregation.$ExpandLevels = this.oTreeState.getExpandLevels();
+		oAggregation.$ExpandLevels = this.oTreeState.getExpandLevels(bUseMultiLevelExpand);
 
 		let oFirstLevel;
 		if (this.bKeptFirstLevel || iCreated) {
@@ -3182,6 +3197,101 @@ sap.ui.define([
 		_AggregationHelper.setAnnotations(oElement, bLeaf ? undefined : false, bTotal,
 			oGroupNode ? oGroupNode["@$ui5.node.level"] + 1 : 1,
 			oGroupNode ? null : aAllProperties);
+
+		return sPredicate;
+	};
+
+	/**
+	 * Calculates the virtual key predicate for the given element and sets the node attributes using
+	 * "@com.sap.vocabularies.Analytics.v1.LevelInformation".
+	 *
+	 * @param {object} oAggregation
+	 *   An object holding the information needed for data aggregation; must already be normalized
+	 *   by {@link _AggregationHelper.buildApply}
+	 * @param {string[]} aGroupBy
+	 *   The ordered list of all leaf-level group-by properties; used for the key predicate
+	 * @param {string[]} aAllProperties
+	 *   A list of all properties that might be missing in the result and thus have to be nulled, in
+	 *   order to avoid drill-down errors
+	 * @param {boolean} bTotal
+	 *   Whether a non-leaf element is a (sub)total
+	 * @param {Set<string>} oSubtotalUnits
+	 *   A set of all subtotal units
+	 * @param {object} oElement
+	 *   The element for which to calculate the key predicate
+	 * @param {object} mTypeForMetaPath
+	 *   A map from meta paths to entity types (as delivered by {@link #fetchTypes})
+	 * @param {string} sMetaPath
+	 *   The meta path for the given element
+	 * @returns {string|undefined}
+	 *   The key predicate or <code>undefined</code>, if key predicate cannot be determined
+	 *
+	 * @public
+	 */
+	// @override sap.ui.model.odata.v4.lib._Cache#calculateKeyPredicate
+	_AggregationCache.calculateKeyPredicateLevels = function (oAggregation, aGroupBy,
+			aAllProperties, bTotal, oSubtotalUnits, oElement, mTypeForMetaPath, sMetaPath) {
+		if (!(sMetaPath in mTypeForMetaPath)) {
+			return undefined; // nested object
+		}
+
+		const oLevelInformation = oElement["@com.sap.vocabularies.Analytics.v1.LevelInformation"];
+		delete oElement["@com.sap.vocabularies.Analytics.v1.LevelInformation"];
+		if ((oLevelInformation.LimitedDescendantCount ?? "0") !== "0" // Edm.Int64
+				// don't take over the LimitedDescendantCount as subtotals are handled as leaves
+				&& oLevelInformation.DrillState !== "subtotal") {
+			_Helper.setPrivateAnnotation(oElement, "descendants",
+				parseInt(oLevelInformation.LimitedDescendantCount));
+		}
+		const iLevel = parseInt(oLevelInformation.DistanceFromRoot) + 1; // Edm.Int64
+		let bIsExpanded;
+		let bLeaf = false;
+		let bSubtotal = false;
+		switch (oLevelInformation.DrillState) {
+			case "collapsed":
+				bIsExpanded = false;
+				break;
+
+			case "expanded":
+				bIsExpanded = true;
+				_AggregationHelper.getOrCreateExpandedObject(oAggregation, oElement);
+				if (oAggregation.subtotalsAtBottomOnly) {
+					_AggregationHelper.extractSubtotals(oAggregation,
+						{"@$ui5.node.level" : iLevel}, {/*oCollapsed*/}, oElement);
+				}
+				break;
+
+			case "subtotal":
+				bIsExpanded = undefined;
+				bSubtotal = true;
+				bTotal = true;
+				break;
+
+			default: // "leaf"
+				bIsExpanded = undefined;
+				bLeaf = true;
+				bTotal = false;
+		}
+		aGroupBy = bLeaf ? aGroupBy : oAggregation.groupLevels.slice(0, iLevel);
+		// prefer real key predicate for leaf; calculate it before any data is dropped
+		let sPredicate = bLeaf && _Helper.getKeyPredicate(oElement, sMetaPath, mTypeForMetaPath)
+			|| _Helper.getKeyPredicate(oElement, sMetaPath, mTypeForMetaPath, aGroupBy, true);
+		if (bSubtotal) {
+			sPredicate = sPredicate.slice(0, -1) + ",$isTotal=true)";
+			// keepSubtotalsOnly would also remove private annotations, so call it before setting
+			// the private annotation for the predicate
+			_AggregationHelper.keepSubtotalsOnly(oAggregation, oElement, oSubtotalUnits);
+		}
+		_Helper.setPrivateAnnotation(oElement, "predicate", sPredicate);
+		if (bIsExpanded !== undefined) {
+			// values for aggregates that are not marked as subtotals shall be shown on leaf level
+			// only; for subtotals the values have been removed above, for collapsed and expanded
+			// group nodes the values are dropped here
+			_AggregationHelper.dropAggregatesWithoutSubtotals(oAggregation, oElement,
+				oSubtotalUnits);
+		}
+		// set the node values
+		_AggregationHelper.setAnnotations(oElement, bIsExpanded, bTotal, iLevel, aAllProperties);
 
 		return sPredicate;
 	};

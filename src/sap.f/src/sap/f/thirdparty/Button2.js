@@ -80,7 +80,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
      * @slot {Array<Node>} default - Determines the content over which the component will appear.
      * @since 0.12.0
      */
-    let BusyIndicator = BusyIndicator_1 = class BusyIndicator extends webcomponentsBase.S {
+    let BusyIndicator = BusyIndicator_1 = class BusyIndicator extends webcomponentsBase.b {
         constructor() {
             super();
             /**
@@ -423,7 +423,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
      * @implements { IButton }
      * @public
      */
-    let Button = Button_1 = class Button extends webcomponentsBase.S {
+    let Button = Button_1 = class Button extends webcomponentsBase.b {
         constructor() {
             super();
             /**
@@ -673,7 +673,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
             else if (webcomponentsBase.A(e)) {
                 this._isSpacePressed = true;
             }
-            if ((webcomponentsBase.A(e) || webcomponentsBase.b(e))) {
+            if ((webcomponentsBase.A(e) || webcomponentsBase.b$1(e))) {
                 this._setActiveState(true);
             }
             else if (this._cancelAction) {
@@ -695,7 +695,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
             else if (isCancelKey && !this._isSpacePressed) {
                 this._cancelAction = false;
             }
-            if ((webcomponentsBase.A(e) || webcomponentsBase.b(e))) {
+            if ((webcomponentsBase.A(e) || webcomponentsBase.b$1(e))) {
                 if (this.active) {
                     this._setActiveState(false);
                 }

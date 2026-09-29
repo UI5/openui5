@@ -20,8 +20,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/Ic
 
 	Icons.y(name, { pathData, ltr, viewBox, accData, collection, packageName });
 
-	var searchIcon = "search";
+	var search = "search";
 
-	exports.searchIcon = searchIcon;
+	exports.search = search;
 
 }));
