@@ -530,6 +530,8 @@ sap.ui.define([
 
 		if (oTable._isOfType(TableType.Table)) {
 			await configureGridTable(oTable);
+		} else if (oTable._isOfType(TableType.TreeTable)) {
+			await configureTreeTable(oTable);
 		}
 	};
 
@@ -544,6 +546,13 @@ sap.ui.define([
 				return oTable.getControlDelegate().formatGroupHeader(oTable, oContext, sGroupLevelKey);
 			}
 		}));
+	}
+
+	async function configureTreeTable(oTable) {
+		const [ODataV4HierarchyPlugin] = await loadModules("sap/ui/table/plugins/ODataV4Hierarchy");
+
+		PluginBase.getPlugin(oTable._oTable, "sap.ui.table.plugins.ClientHierarchy")?.destroy();
+		oTable._oTable.addDependent(new ODataV4HierarchyPlugin());
 	}
 
 	/**

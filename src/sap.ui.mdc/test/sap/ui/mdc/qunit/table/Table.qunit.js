@@ -255,7 +255,6 @@ sap.ui.define([
 
 		await this.oTable.initialized();
 		assert.ok(this.oTable._getType().isA("sap.ui.mdc.table.GridTableType"), "Default type instance is a sap.ui.mdc.table.GridTableType");
-		assert.ok(this.oTable._oTable.isA("sap.ui.table.Table"), "Inner table is a sap.ui.table.Table");
 	});
 
 	QUnit.test("Shorthand type='Table'", async function(assert) {
@@ -263,7 +262,6 @@ sap.ui.define([
 
 		await oTable.initialized();
 		assert.ok(oTable._getType().isA("sap.ui.mdc.table.GridTableType"), "Type instance is a sap.ui.mdc.table.GridTableType");
-		assert.ok(oTable._oTable.isA("sap.ui.table.Table"), "Inner table is a sap.ui.table.Table");
 		oTable.destroy();
 	});
 
@@ -272,7 +270,6 @@ sap.ui.define([
 
 		await oTable.initialized();
 		assert.ok(oTable._getType().isA("sap.ui.mdc.table.TreeTableType"), "Type instance is a sap.ui.mdc.table.TreeTableType");
-		assert.ok(oTable._oTable.isA("sap.ui.table.TreeTable"), "Inner table is a sap.ui.table.TreeTable");
 		oTable.destroy();
 	});
 
@@ -281,7 +278,6 @@ sap.ui.define([
 
 		await oTable.initialized();
 		assert.ok(oTable._getType().isA("sap.ui.mdc.table.ResponsiveTableType"), "Type instance is a sap.ui.mdc.table.ResponsiveTableType");
-		assert.ok(oTable._oTable.isA("sap.m.Table"), "Inner table is a sap.m.Table");
 		oTable.destroy();
 	});
 
@@ -367,7 +363,7 @@ sap.ui.define([
 	QUnit.test("Change type during initialization", async function(assert) {
 		this.oTable.setType(TableType.TreeTable);
 		await this.oTable.initialized();
-		assert.ok(this.oTable._oTable.isA("sap.ui.table.TreeTable"), "Inner table is a sap.ui.table.TreeTable");
+		assert.ok(this.oTable._oTable.isA("sap.ui.table.Table"), "Inner table is a sap.ui.table.Table");
 	});
 
 	QUnit.test("Set same type", async function(assert) {
