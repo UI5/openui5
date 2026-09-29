@@ -3,6 +3,11 @@
     "date": "September 2026",
     "notes": [
       {
+        "id": "ba9b61a170a24884f2f0c9817ea8f892fcf629fc",
+        "type": "FIX",
+        "text": " m.ListItemAction: use direct shortcut definitions"
+      },
+      {
         "id": "37f024ca50f24207fe93da63d3f64dd2944b8329",
         "type": "FIX",
         "text": " sap.m.ScrollPosition: fix intermittent QUnit test failures after navigation and re-render"

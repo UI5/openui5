@@ -3,6 +3,11 @@
     "date": "September 2026",
     "notes": [
       {
+        "id": "e0790b4845481ff94655b1f0f56baf0156038f6d",
+        "type": "FIX",
+        "text": " sap.ui.mdc.Table: correct model name for expand/collapse button type"
+      },
+      {
         "id": "545cf2cda920e43dcf37f960e163f8bae3aa9875",
         "type": "FIX",
         "text": " ValueHelp. improve tooltip for \"remove all\" button"
