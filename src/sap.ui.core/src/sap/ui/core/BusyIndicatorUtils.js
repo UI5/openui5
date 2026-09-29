@@ -91,28 +91,60 @@ sap.ui.define([
 	}
 
 	/**
-	 * Adds the necessary ARIA attributes to the given DOM element.
-	 * @param {object} oDOM The DOM which gets added for the busy animation
+	 * Adds the necessary ARIA attributes to the busy indicator and marks the busy region.
+	 *
+	 * The busy indicator element carries the <code>progressbar</code> semantics
+	 * (<code>role</code>, <code>aria-value*</code>, <code>aria-label</code>) and is made
+	 * focusable, while <code>aria-busy</code> is set on the busy region (the busy section or,
+	 * if none is defined, the control root).
+	 *
+	 * @param {object|HTMLDivElement} oBusyBlockState The block-state, or the standalone busy
+	 *        indicator container created by {@link sap.ui.core.BusyIndicatorUtils.getElement}
 	 * @private
 	 */
-	BusyIndicatorUtils.addAriaAttributes = function(oDOM, oControl) {
+	BusyIndicatorUtils.addAriaAttributes = function(oBusyBlockState) {
 		const oResourceBundle = Library.getResourceBundleFor("sap.ui.core");
+		let oIndicatorDom, oBusyRegionDom;
 
-		// make the blockLayer tabbable
-		oDOM.setAttribute("tabindex", "0");
+		if (oBusyBlockState instanceof HTMLDivElement) {
+			// Standalone container from BusyIndicatorUtils.getElement: it is the indicator itself
+			oIndicatorDom = oBusyBlockState;
+		} else {
+			oIndicatorDom = oBusyBlockState.$blockLayer.get(0);
+			// aria-busy marks the busy region: the busy section if defined, otherwise the control root
+			oBusyRegionDom = oBusyBlockState.control._sBusySection
+				? oBusyBlockState.$parent.get(0)
+				: oBusyBlockState.control.getDomRef();
+		}
 
-		// attributes for inderterminate progressbar
-		oDOM.setAttribute("role", "progressbar");
-		oDOM.setAttribute("aria-valuemin", "0");
-		oDOM.setAttribute("aria-valuemax", "100");
-		oDOM.setAttribute("aria-valuetext", oResourceBundle.getText("BUSY_VALUE_TEXT"));
+		if (oIndicatorDom) {
+			// make the busy indicator focusable and expose it as an indeterminate progressbar
+			oIndicatorDom.setAttribute("tabindex", "0");
+			oIndicatorDom.setAttribute("role", "progressbar");
+			oIndicatorDom.setAttribute("aria-label", oResourceBundle.getText("BUSY_VALUE_TEXT"));
+			oIndicatorDom.setAttribute("aria-valuemin", "0");
+			oIndicatorDom.setAttribute("aria-valuemax", "100");
+			oIndicatorDom.setAttribute("aria-valuetext", oResourceBundle.getText("BUSY_TEXT"));
+		}
 
-		// message to describe current state to screen readers
-		oDOM.setAttribute("title", oResourceBundle.getText("BUSY_TEXT"));
+		oBusyRegionDom?.setAttribute("aria-busy", "true");
+	};
 
-		// TODO: tooltip: Check if control provides aria-describedby attribute?
-		const oDomRef = oControl?.getDomRef(oControl?._sBusySection);
-		oDomRef?.setAttribute("aria-busy", "true");
+	/**
+	 * Removes the <code>aria-busy</code> marker added by {@link #addAriaAttributes} from the busy region.
+	 *
+	 * The progressbar ARIA attributes live on the busy indicator DOM, which is removed as a whole
+	 * on unblock, so only <code>aria-busy</code> on the busy region needs to be cleaned up here.
+	 *
+	 * @param {object} oBusyBlockState The block state
+	 * @private
+	 */
+	BusyIndicatorUtils.removeAriaAttributes = function(oBusyBlockState) {
+		const oBusyRegionDom = oBusyBlockState.control._sBusySection
+			? oBusyBlockState.$parent.get(0)
+			: oBusyBlockState.control.getDomRef();
+
+		oBusyRegionDom?.removeAttribute("aria-busy");
 	};
 
 	/**
@@ -121,6 +153,7 @@ sap.ui.define([
 	 * @param {sap.ui.core.BusyIndicatorSize} sSize either "Auto", "Large", "Medium" or "Small", determines the size of the
 	 *                     indicator, default is "Medium"
 	 * @see sap.ui.core.BusyIndicatorSize
+	 * @private
 	 */
 	BusyIndicatorUtils.addHTML = function (oBusyBlockState, sSize) {
 		var sSizeClass, sAnimationSizeClass;
@@ -156,8 +189,8 @@ sap.ui.define([
 		var oParentDOM = oBusyBlockState.$parent.get(0),
 			oBlockLayerDOM = oBusyBlockState.$blockLayer.get(0);
 
-		// aria attribtues
-		BusyIndicatorUtils.addAriaAttributes(oBlockLayerDOM, oBusyBlockState.control);
+		// aria attributes
+		BusyIndicatorUtils.addAriaAttributes(oBusyBlockState);
 
 		oParentDOM.className += " sapUiLocalBusy";
 		oBlockLayerDOM.className += " sapUiLocalBusyIndicator " + sSizeClass + " sapUiLocalBusyIndicatorFade";
