@@ -955,6 +955,13 @@ sap.ui.define([
 				ariaLabelledBy: this._isOverflow() ? InvisibleText.getStaticId("sap.m", this._getOverflowPopoverAccessibleNameLabel()) : InvisibleText.getStaticId("sap.m", this._getSubItemsPopoverAccessibleNameLabel())
 			}).addStyleClass("sapMITBFilterPopover");
 
+			// The popover content (subsection select list) must never be a target for
+			// Key User Adaptation / flex changes. Prevent RTA from adapting it, same as
+			// sap.m.VariantManagement and sap.m.p13n.Popup do for their popups.
+			this._oPopover.isPopupAdaptationAllowed = function () {
+				return false;
+			};
+
 			this._oPopover.attachAfterClose(function () {
 				this._getSelectList().destroyItems();
 				if (this._isOverflow()) {
