@@ -203,7 +203,10 @@ sap.ui.define([
 		return this.initTable({
 			type: TableType.TreeTable
 		}).then(function(oTable) {
-			assert.notOk(PluginBase.getPlugin(oTable._oTable, "sap.ui.table.plugins.ODataV4Aggregation"), "ODataV4Aggregation plugin in inner table");
+			assert.notOk(PluginBase.getPlugin(oTable._oTable, "sap.ui.table.plugins.ODataV4Aggregation"),
+				"ODataV4Aggregation plugin not in inner table");
+			assert.ok(PluginBase.getPlugin(oTable._oTable, "sap.ui.table.plugins.ODataV4Hierarchy"),
+				"ODataV4Hierarchy plugin in inner table");
 			assert.notOk(oTable._oTableTitle.getShowExtendedView(), "getShowExtendedView of TableTitle is false");
 			this.assertFetchPropertyCalls(assert, 1);
 		}.bind(this));
@@ -822,34 +825,64 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.test("Data aggregation forced on is ignored for TreeTable and ResponsiveTable", async function(assert) {
-		for (const TableType of [TreeTableType, ResponsiveTableType]) {
-			await this.initTable({
-				type: new TableType(),
-				p13nMode: []
-			}, ["Country"], {
-				aggregationConfiguration: {
-					enabled: true
-				},
-				propertyInfo: [{
-					key: "Country",
-					path: "CountryPath",
-					label: "Country Label",
-					dataType: "String",
-					extension: {
-						technicallyGroupable: true
-					}
-				}]
-			});
-			await this.oTable.rebind();
+	QUnit.test("Data aggregation forced on is ignored for TreeTable", async function(assert) {
+		await this.initTable({
+			type: new TreeTableType(),
+			p13nMode: [],
+			models: new ODataModel({
+				serviceUrl: "serviceUrl/",
+				operationMode: "Server",
+				autoExpandSelect: true
+			})
+		}, ["Country"], {
+			aggregationConfiguration: {
+				enabled: true
+			},
+			propertyInfo: [{
+				key: "Country",
+				path: "CountryPath",
+				label: "Country Label",
+				dataType: "String",
+				extension: {
+					technicallyGroupable: true
+				}
+			}]
+		});
+		sinon.stub(this.oTable.getControlDelegate(), "updateBindingInfo").callsFake(function(oTable, oBindingInfo) {
+			this.updateBindingInfo.wrappedMethod.call(this, oTable, oBindingInfo);
+			oBindingInfo.parameters.$$aggregation = {hierarchyQualifier: "Hierarchy"};
+		});
+		await this.oTable.rebind();
+		this.oTable.getControlDelegate().updateBindingInfo.restore();
 
-			// The ODataV4Aggregation plugin is only added for GridTable, so it must be absent here.
-			const oPlugin = PluginBase.getPlugin(this.oTable._oTable, "sap.ui.table.plugins.ODataV4Aggregation");
-			assert.notOk(oPlugin, "No data aggregation plugin for " + TableType.getMetadata().getName());
-			this.verify$$aggregation(undefined);
+		const oPlugin = PluginBase.getPlugin(this.oTable._oTable, "sap.ui.table.plugins.ODataV4Aggregation");
+		assert.notOk(oPlugin, "No data aggregation plugin");
+		this.verify$$aggregation({hierarchyQualifier: "Hierarchy"});
+	});
 
-			this.oTable.destroy();
-		}
+	QUnit.test("Data aggregation forced on is ignored for ResponsiveTable", async function(assert) {
+		await this.initTable({
+			type: new ResponsiveTableType(),
+			p13nMode: []
+		}, ["Country"], {
+			aggregationConfiguration: {
+				enabled: true
+			},
+			propertyInfo: [{
+				key: "Country",
+				path: "CountryPath",
+				label: "Country Label",
+				dataType: "String",
+				extension: {
+					technicallyGroupable: true
+				}
+			}]
+		});
+		await this.oTable.rebind();
+
+		const oPlugin = PluginBase.getPlugin(this.oTable._oTable, "sap.ui.table.plugins.ODataV4Aggregation");
+		assert.notOk(oPlugin, "No data aggregation plugin");
+		this.verify$$aggregation(undefined);
 	});
 
 	QUnit.test("Data aggregation forced off when auto-detection would enable", async function(assert) {
@@ -3986,7 +4019,8 @@ sap.ui.define([
 				],
 				models: new ODataModel({
 					serviceUrl: "serviceUrl/",
-					operationMode: "Server"
+					operationMode: "Server",
+					autoExpandSelect: true
 				}),
 				...mSettings
 			});
@@ -3998,7 +4032,16 @@ sap.ui.define([
 			this.createTable({
 				type: sTableType
 			});
+
+			if (sTableType === TableType.TreeTable) {
+				sinon.stub(this.oTable.getControlDelegate(), "updateBindingInfo").callsFake(function(oTable, oBindingInfo) {
+					this.updateBindingInfo.wrappedMethod.call(this, oTable, oBindingInfo);
+					oBindingInfo.parameters.$$aggregation = {hierarchyQualifier: "OrgChart"};
+				});
+			}
+
 			await this.oTable.rebind();
+			this.oTable.getControlDelegate().updateBindingInfo.restore?.();
 
 			assert.ok(true, "Rebind did not fail");
 			assert.ok(this.oTable.getRowBinding(), "Table has a row binding");

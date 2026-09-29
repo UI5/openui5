@@ -1,0 +1,44 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "contextLoadingComponent",
+		"type": "card",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"title": "Card 'contextLoadingComponent'"
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"rootView": {
+			"viewName": "contextLoadingComponent.Main",
+			"id": "app"
+		},
+		"dependencies": {
+			"minUI5Version": "2.0.0",
+			"libs": {
+				"sap.m": {},
+				"sap.ui.core": {}
+			}
+		}
+	},
+	"sap.card": {
+		"type": "Component",
+		"configuration": {
+			"parameters": {
+				"userName": {}
+			}
+		},
+		"header": {
+			"title": "Component card",
+			"subtitle": "User {parameters>/userName/value}"
+		}
+	}
+}

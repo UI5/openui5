@@ -1114,7 +1114,7 @@ sap.ui.define([
 			}.bind(this))
 			.then(this._applyManifest.bind(this))
 			.catch(function (e) {
-				if (e.message === CARD_DESTROYED_ERROR) {
+				if (e.message === CARD_DESTROYED_ERROR || this.isDestroyed() || !this._oCardManifest) {
 					return;
 				}
 
@@ -1211,6 +1211,11 @@ sap.ui.define([
 	Card.prototype._applyManifest = async function () {
 		var oCardManifest = this._oCardManifest;
 
+		// The card may have been destroyed while awaiting an earlier async step.
+		if (this.isDestroyed() || !oCardManifest) {
+			return;
+		}
+
 		if (!oCardManifest.get("/sap.card")) {
 			this._logSevereError("There must be a 'sap.card' section in the manifest.");
 		}
@@ -1222,13 +1227,31 @@ sap.ui.define([
 		this._oActiveRb = await this.getModel("i18n").getResourceBundle();
 		this.getModel("context").resetHostProperties();
 
-		if (this._hasContextParams()) {
-			this._oContextParameters = await this._resolveContextParams();
+		this._prepareIconFormatter();
+
+		if (this._hasContextDependencies()) {
+			// Create header, content and filter bar in a loading-only state (no data requests) until the context is resolved.
+			this._setLoadingProviderState(true);
+			this._applyHeaderManifestSettings(true);
+			this._applyFilterBarManifestSettings(true);
+			this._applyContentManifestSettings(true);
+			this._oContextParameters = await this._resolveContextDependencies();
+			this._setLoadingProviderState(false);
+
+			// Context resolution is async - the card could have been destroyed meanwhile.
+			if (this.isDestroyed() || !this._oCardManifest) {
+				return;
+			}
 		}
 
 		oCardManifest.processParameters(this._getContextAndRuntimeParams());
 
 		await this._prepareToApplyManifestSettings();
+
+		if (this.isDestroyed() || !this._oCardManifest) {
+			return;
+		}
+
 		this._applyManifestSettings();
 	};
 
@@ -1243,35 +1266,25 @@ sap.ui.define([
 	};
 
 	/**
-	 * Checks if there are context params in the card.
+	 * Whether the card references any host context - in parameters, header, content, filters or data.
 	 * @private
-	 * @return {boolean} True if the are context params in the card.
+	 * @return {boolean} True if the card has at least one context dependency.
 	 */
-	Card.prototype._hasContextParams = function () {
-		var oManifestParams = this._oCardManifest.get(MANIFEST_PATHS.PARAMS),
-			sKey,
-			vValue;
-
-		for (sKey in oManifestParams) {
-			if (oManifestParams[sKey].ignoreBinding === true) {
-				continue;
-			}
-			vValue = oManifestParams[sKey].value;
-			if (typeof vValue === "string" && vValue.indexOf("{context>") !== -1) {
-				return true;
-			}
-		}
-
-		return false;
+	Card.prototype._hasContextDependencies = function () {
+		return this._isManifestReady && this.getContextDependencies().length > 0;
 	};
 
 	/**
-	 * Resolves any context params in the card.
-	 * Calls the host for each of them and waits for the response.
+	 * Resolves all context dependencies of the card into the resolved parameter values.
+	 *
+	 * Triggers a host request for every context path found in the manifest
+	 * (parameters, header, content, filters and data) and waits until all of them
+	 * are resolved before returning the resolved parameter values.
+	 *
 	 * @private
-	 * @return {Promise} A promise which resolves when all params are resolved.
+	 * @return {Promise<Object>} A promise which resolves with the resolved context parameters.
 	 */
-	Card.prototype._resolveContextParams = function () {
+	Card.prototype._resolveContextDependencies = function () {
 		var oContextModel = this.getModel("context"),
 			oManifestParams = this._oCardManifest.get(MANIFEST_PATHS.PARAMS),
 			oContextParams = {},
@@ -1288,11 +1301,14 @@ sap.ui.define([
 			}
 		}
 
-		// trigger getProperty for the model
-		BindingResolver.resolveValue(oContextParams, this, "/");
+		// Trigger a host request for every context path in the manifest so the card
+		// waits for all of them. Each path is requested once - the values are cached.
+		this.getContextDependencies().forEach(function (sPath) {
+			oContextModel.getProperty(sPath);
+		});
 
 		return oContextModel.waitForPendingProperties().then(function () {
-			// properties are ready, no resolve again
+			// properties are ready, resolve the parameter values from the cache
 			return BindingResolver.resolveValue(oContextParams, this, "/");
 		}.bind(this));
 	};
@@ -1536,6 +1552,7 @@ sap.ui.define([
 			this._oCardManifest.destroy();
 			this._oCardManifest = null;
 		}
+
 		if (this._oDestinations) {
 			this._oDestinations.destroy();
 			this._oDestinations = null;
@@ -2099,6 +2116,18 @@ sap.ui.define([
 	};
 
 	/**
+	 * Creates the icon formatter. Needed early - before the host context
+	 * resolves - so headers with an icon can render their loading placeholder.
+	 *
+	 * @private
+	 */
+	Card.prototype._prepareIconFormatter = function () {
+		this._oIconFormatter = new IconFormatter({
+			card: this
+		});
+	};
+
+	/**
 	 * Initializes internal classes needed for the card, based on the ready manifest.
 	 *
 	 * @private
@@ -2120,7 +2149,7 @@ sap.ui.define([
 				card: this,
 				mainCard: this.getMainCard(),
 				isPaginationCard: this.getProperty("isPaginationCard")
-		});
+			});
 		} catch (oError) {
 			this.getMainCard()._handleError({
 				illustrationType: IllustratedMessageType.UnableToLoad,
@@ -2132,10 +2161,6 @@ sap.ui.define([
 
 			return Promise.reject(oError);
 		}
-
-		this._oIconFormatter = new IconFormatter({
-			card: this
-		});
 
 		return this.processDestinations(this._oCardManifest.getJson()).then(function (oResult) {
 			this._oCardManifest.setJson(oResult);
@@ -2414,11 +2439,13 @@ sap.ui.define([
 	};
 
 	/**
-	 * Lazily load and create a specific type of card header based on sap.card/header part of the manifest
+	 * Creates the header from the manifest.
 	 *
 	 * @private
+	 * @param {boolean} [bOnlyShowLoading] When true, the header is created without its data
+	 *   configuration and shown in a loading state while the host context resolves.
 	 */
-	Card.prototype._applyHeaderManifestSettings = function () {
+	Card.prototype._applyHeaderManifestSettings = function (bOnlyShowLoading) {
 		var oPrevHeader = this.getCardHeader();
 
 		if (oPrevHeader) {
@@ -2427,10 +2454,12 @@ sap.ui.define([
 			this._bMimicPressAttached = false;
 		}
 
-		var oHeader = this.createHeader();
+		var oHeader = this.createHeader(bOnlyShowLoading);
 
 		if (!oHeader) {
-			this.fireEvent("_headerReady");
+			if (!bOnlyShowLoading) {
+				this.fireEvent("_headerReady");
+			}
 			return;
 		}
 
@@ -2440,7 +2469,9 @@ sap.ui.define([
 
 		this.setAggregation("_header", oHeader);
 
-		if (oHeader.isReady()) {
+		if (bOnlyShowLoading) {
+			oHeader.showLoadingPlaceholders();
+		} else if (oHeader.isReady()) {
 			this.fireEvent("_headerReady");
 		} else {
 			oHeader.attachEvent("_ready", function () {
@@ -2453,21 +2484,28 @@ sap.ui.define([
 		}
 	};
 
-	Card.prototype._applyFilterBarManifestSettings = function () {
-		var oFilterBar = this.createFilterBar();
+	Card.prototype._applyFilterBarManifestSettings = function (bOnlyShowLoading) {
+		var oFilterBar = this.createFilterBar(bOnlyShowLoading);
 
 		this.destroyAggregation("_filterBar");
 
 		if (!oFilterBar) {
-			this.fireEvent("_filterBarReady");
+			if (!bOnlyShowLoading) {
+				this.fireEvent("_filterBarReady");
+			}
+			return;
+		}
+
+		this.setAggregation("_filterBar", oFilterBar);
+
+		if (bOnlyShowLoading) {
+			oFilterBar.showLoadingPlaceholders();
 			return;
 		}
 
 		oFilterBar.attachEventOnce("_filterBarDataReady", function () {
 			this.fireEvent("_filterBarReady");
 		}.bind(this));
-
-		this.setAggregation("_filterBar", oFilterBar);
 	};
 
 	Card.prototype._applyFooterManifestSettings = function () {
@@ -2624,8 +2662,10 @@ sap.ui.define([
 	 * Creates specific type of card content based on sap.card/content part of the manifest.
 	 *
 	 * @private
+	 * @param {boolean} [bOnlyShowLoading] When true, the content is created without its data
+	 *   configuration and shown in a loading state while the host context resolves.
 	 */
-	Card.prototype._applyContentManifestSettings = function () {
+	Card.prototype._applyContentManifestSettings = function (bOnlyShowLoading) {
 		var sCardType = this._oCardManifest.get(MANIFEST_PATHS.TYPE),
 			oContentManifest = this.getContentManifest(),
 			oContent;
@@ -2635,8 +2675,23 @@ sap.ui.define([
 		this._applyAriaTexts();
 
 		if (this._shouldIgnoreContent()) {
-			this.fireEvent("_contentReady");
+			// During context loading the content is (re)created later, so don't signal readiness yet.
+			if (!bOnlyShowLoading) {
+				this.fireEvent("_contentReady");
+			}
 			return;
+		}
+
+		// While the context is loading, component cards and cards without a content manifest
+		// are not pre-created here - their content is created once, after the context resolves.
+		if (bOnlyShowLoading && (!oContentManifest || this._isComponentCard())) {
+			return;
+		}
+
+		if (bOnlyShowLoading) {
+			// Strip the data section so no request fires before the context is resolved.
+			oContentManifest = Object.assign({}, oContentManifest);
+			delete oContentManifest.data;
 		}
 
 		try {
@@ -2783,16 +2838,31 @@ sap.ui.define([
 		return bIsTile || bIsHeader;
 	};
 
-	Card.prototype.createHeader = function () {
+	Card.prototype.createHeader = function (bOnlyShowLoading) {
 		var oManifestHeader = this._oCardManifest.get(MANIFEST_PATHS.HEADER),
 			oHeaderFactory = new HeaderFactory(this);
+
+		if (bOnlyShowLoading && oManifestHeader) {
+			// Strip the data section so no request fires before the context is resolved.
+			oManifestHeader = Object.assign({}, oManifestHeader);
+			delete oManifestHeader.data;
+		}
 
 		return oHeaderFactory.create(oManifestHeader, this._getActionsToolbar() /** move the toolbar to the next header */);
 	};
 
-	Card.prototype.createFilterBar = function () {
+	Card.prototype.createFilterBar = function (bOnlyShowLoading) {
 		var mFiltersConfig = this._oCardManifest.get(MANIFEST_PATHS.FILTERS),
 			oFactory = new FilterBarFactory(this);
+
+		if (bOnlyShowLoading && mFiltersConfig) {
+			// Strip the data section of each filter so no request fires before the context is resolved.
+			mFiltersConfig = Object.keys(mFiltersConfig).reduce(function (mResult, sKey) {
+				mResult[sKey] = Object.assign({}, mFiltersConfig[sKey]);
+				delete mResult[sKey].data;
+				return mResult;
+			}, {});
+		}
 
 		return oFactory.create(mFiltersConfig, this.getModel("filters"), (oEvent) => {
 			this._fireConfigurationChange({

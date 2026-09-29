@@ -1,0 +1,12 @@
+.contextLoadingPage {
+	padding: 1rem;
+}
+.contextLoadingPage h2 {
+	font-family: var(--sapFontFamily);
+	margin: 1.5rem 0 0.5rem;
+}
+.contextLoadingPage p {
+	font-family: var(--sapFontFamily);
+	color: var(--sapNeutralTextColor);
+	margin: 0 0 1rem;
+}

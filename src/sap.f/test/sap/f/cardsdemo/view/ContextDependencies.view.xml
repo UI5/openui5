@@ -6,42 +6,101 @@
 	xmlns:w="sap.ui.integration.widgets"
 	displayBlock="true">
 	<Page title="Context Dependencies - Loading Placeholders">
-		<headerContent>
-			<Text text="Cards 1, 3 and 4 depend on host context - loading placeholders shown until context is resolved. Card 2 has no context dependency." />
-		</headerContent>
+		<VBox class="sapUiSmallMargin">
+			<Title text="1. Context dependency detection" level="H2" />
+			<Text text="Cards 1, 3, 4 and 5 depend on host context - loading placeholders shown until context is resolved. Card 2 has no context dependency." class="sapUiSmallMarginBottom" />
 
-		<f:GridContainer class="sapUiSmallMargin">
-			<w:Card
-				id="cardWithContext"
-				manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/contextDependencies/cardWithContext.json">
-				<w:layoutData>
-					<f:GridContainerItemLayoutData columns="4" minRows="4" />
-				</w:layoutData>
-			</w:Card>
+			<f:GridContainer>
+				<w:Card
+					id="cardWithContext"
+					manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/contextDependencies/cardWithContext.json">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" minRows="4" />
+					</w:layoutData>
+				</w:Card>
 
-			<w:Card
-				id="cardWithoutContext"
-				manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/contextDependencies/cardWithoutContext.json">
-				<w:layoutData>
-					<f:GridContainerItemLayoutData columns="4" />
-				</w:layoutData>
-			</w:Card>
+				<w:Card
+					id="cardWithoutContext"
+					manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/contextDependencies/cardWithoutContext.json">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
 
-			<w:Card
-				id="cardWithContextInHeader"
-				manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/contextDependencies/cardWithContextInHeader.json">
-				<w:layoutData>
-					<f:GridContainerItemLayoutData columns="4" minRows="4" />
-				</w:layoutData>
-			</w:Card>
+				<w:Card
+					id="cardWithContextInHeader"
+					manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/contextDependencies/cardWithContextInHeader.json">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" minRows="4" />
+					</w:layoutData>
+				</w:Card>
 
-			<w:Card
-				id="cardWithContextEverywhere"
-				manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/contextDependencies/cardWithContextEverywhere.json">
-				<w:layoutData>
-					<f:GridContainerItemLayoutData columns="4" minRows="4" />
-				</w:layoutData>
-			</w:Card>
-		</f:GridContainer>
+				<w:Card
+					id="cardWithContextEverywhere"
+					manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/contextDependencies/cardWithContextEverywhere.json">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" minRows="4" />
+					</w:layoutData>
+				</w:Card>
+
+				<w:Card
+					id="cardWithContextInFilter"
+					manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/contextDependencies/cardWithContextInFilter.json">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" minRows="4" />
+					</w:layoutData>
+				</w:Card>
+			</f:GridContainer>
+
+			<Title text="2. Context in data requests" level="H2" class="sapUiMediumMarginTop" />
+			<Text text="These cards use host context inside a data request (card, header or content). The request must not fire before the context is resolved - loading placeholders are shown meanwhile." class="sapUiSmallMarginBottom" />
+
+			<f:GridContainer>
+				<w:Card
+					id="dataRequestInCard"
+					manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/contextDependencies/dataRequestInCard.json">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" minRows="4" />
+					</w:layoutData>
+				</w:Card>
+
+				<w:Card
+					id="dataRequestInHeader"
+					manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/contextDependencies/dataRequestInHeader.json">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" minRows="4" />
+					</w:layoutData>
+				</w:Card>
+
+				<w:Card
+					id="dataRequestInContent"
+					manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/contextDependencies/dataRequestInContent.json">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" minRows="4" />
+					</w:layoutData>
+				</w:Card>
+			</f:GridContainer>
+
+			<Title text="3. Object and Extension cards" level="H2" class="sapUiMediumMarginTop" />
+			<Text text="An Object card bound to context and an Extension card whose content data is provided by an extension - both show loading placeholders until the context is resolved." class="sapUiSmallMarginBottom" />
+
+			<f:GridContainer>
+				<w:Card
+					id="objectCardWithContext"
+					manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/contextDependencies/objectCardWithContext.json">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" minRows="4" />
+					</w:layoutData>
+				</w:Card>
+
+				<w:Card
+					id="extensionCardWithContext"
+					manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/contextDependencies/extensionCardWithContext.json">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" minRows="4" />
+					</w:layoutData>
+				</w:Card>
+			</f:GridContainer>
+		</VBox>
 	</Page>
 </mvc:View>

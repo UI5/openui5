@@ -1494,6 +1494,16 @@ sap.ui.define([
 				}
 			},
 
+			SegmentedButtonTooltipEnablement: {
+				title: "Test Page for sap.m.SegmentedButton with enhanced tooltip",
+				ui5: {
+					language: "en"
+				},
+				sinon: {
+					useFakeTimers: true
+				}
+			},
+
 			Select: {
 				title: "Test Page for sap.m.Select",
 				loader: {
@@ -1933,6 +1943,16 @@ sap.ui.define([
 
 			ToggleButton: {
 				title: "Test Page for sap.m.ToggleButton"
+			},
+
+			ToggleButtonTooltipEnablement: {
+				title: "Test Page for sap.m.ToggleButton with enhanced tooltip",
+				ui5: {
+					language: "en"
+				},
+				sinon: {
+					useFakeTimers: true
+				}
 			},
 
 			Token: {

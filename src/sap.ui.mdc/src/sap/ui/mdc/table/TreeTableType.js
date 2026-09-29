@@ -9,8 +9,6 @@ sap.ui.define([
 ) => {
 	"use strict";
 
-	let InnerTable;
-
 	/**
 	 * Constructor for a new <code>TreeTableType</code>.
 	 *
@@ -33,42 +31,6 @@ sap.ui.define([
 			library: "sap.ui.mdc"
 		}
 	});
-
-	/**
-	 * @inheritDoc
-	 */
-	TreeTableType.prototype.loadModules = function() {
-		if (InnerTable) {
-			return Promise.resolve();
-		}
-
-		return GridTableType.prototype.loadModules.apply(this, arguments).then(() => {
-			return new Promise((resolve, reject) => {
-				sap.ui.require([
-					"sap/ui/table/TreeTable"
-				], (TreeTable) => {
-					InnerTable = TreeTable;
-					resolve();
-				}, () => {
-					reject("Failed to load some modules");
-				});
-			});
-		});
-	};
-
-	TreeTableType.prototype.createTable = function(sId) {
-		const oTable = this.getTable();
-
-		if (!oTable || !InnerTable) {
-			return null;
-		}
-
-		const oTreeTable = new InnerTable(sId, this.getTableSettings());
-
-		oTreeTable._oProxy._bEnableV4 = true;
-
-		return oTreeTable;
-	};
 
 	return TreeTableType;
 });

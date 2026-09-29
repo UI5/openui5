@@ -1,10 +1,11 @@
 /* =============================== */
 /* CSS for control sap.m/TabStrip  */
-/* Horizon theme                   */
+/* Morning Horizon theme           */
 /* =============================== */
 
-@_sap_m_TabStrip_ItemHoverTextColor: darken(@sapUiGroupTitleTextColor, 10);
-@_sap_m_TabStrip_ItemSelectedTextColor: darken(@sapUiGroupTitleTextColor, 20);
+.sapUI5Scope {
+	--_sap_m_TabStrip_ItemHoverTextColor: ~'hsl(from var(--sapGroup_TitleTextColor) h s calc(l - 10))';
+}
 
 .sapMTabStripContainer .sapMTabStrip {
 	height: 3.25rem;
@@ -119,7 +120,7 @@
 				border-bottom: 0;
 
 				&:hover {
-					color: @_sap_m_TabStrip_ItemHoverTextColor;
+					color: var(--_sap_m_TabStrip_ItemHoverTextColor);
 					background-color: var(--sapList_Hover_Background);
 					padding: 0 2rem 0 0.5rem;
 				}
@@ -167,25 +168,25 @@ html.sap-phone .sapMTabStripSelectListItemCloseBtn {
 	margin-right: 1rem;
 }
 
-html[dir=ltr] .sapMTabStrip .sapMTSLeftOverflowButtons,
-html[dir=rtl] .sapMTabStrip .sapMTSRightOverflowButtons {
+html[dir='ltr'] .sapMTabStrip .sapMTSLeftOverflowButtons,
+html[dir='rtl'] .sapMTabStrip .sapMTSRightOverflowButtons {
 	background: var(--sapShell_Background);
 	width: 2.25rem;
 }
 
-html[dir=ltr] .sapMTabStrip .sapMTSLeftOverflowButtons::after,
-html[dir=rtl] .sapMTabStrip .sapMTSRightOverflowButtons::after {
+html[dir='ltr'] .sapMTabStrip .sapMTSLeftOverflowButtons::after,
+html[dir='rtl'] .sapMTabStrip .sapMTSRightOverflowButtons::after {
 	background: transparent;
 }
 
-html[dir=ltr] .sapMTabStrip .sapMTSRightOverflowButtons,
-html[dir=rtl] .sapMTabStrip .sapMTSLeftOverflowButtons {
+html[dir='ltr'] .sapMTabStrip .sapMTSRightOverflowButtons,
+html[dir='rtl'] .sapMTabStrip .sapMTSLeftOverflowButtons {
 	background: var(--sapShell_Background);
 	width: 2.25rem;
 }
 
-html[dir=ltr] .sapMTabStrip .sapMTSRightOverflowButtons::after,
-html[dir=rtl] .sapMTabStrip .sapMTSLeftOverflowButtons::after {
+html[dir='ltr'] .sapMTabStrip .sapMTSRightOverflowButtons::after,
+html[dir='rtl'] .sapMTabStrip .sapMTSLeftOverflowButtons::after {
 	background: transparent;
 }
 

@@ -101,6 +101,7 @@ module.exports = [
  "SearchField.spec.js",
  "SearchField_Suggestions.spec.js",
  "SegmentedButton.spec.js",
+ "SegmentedButtonTooltip.spec.js",
  "Select.spec.js",
  "SelectDialog.spec.js",
  "SemanticPage.spec.js",

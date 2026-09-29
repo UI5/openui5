@@ -1,0 +1,9 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc"
+		  xmlns="sap.m"
+		  width="100%"
+		  controllerName="contextLoadingComponent.Main">
+	<VBox class="sapUiSmallMargin">
+		<Text text="Rendered by the component after context resolved:" />
+		<Title text="{/userName}" />
+	</VBox>
+</mvc:View>

@@ -133,7 +133,7 @@ function(
 		});
 
 		// act
-		this.clock.tick(Utils.DEFAULT_PROMISE_TIMEOUT + 100);
+		this.clock.tick(ContextModel.PROMISE_TIMEOUT + 100);
 	});
 
 	QUnit.test("Call #getProperty with Host which resolves with undefined", function (assert) {

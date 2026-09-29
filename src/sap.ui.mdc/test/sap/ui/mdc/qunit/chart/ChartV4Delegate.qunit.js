@@ -1496,6 +1496,101 @@ function(
 		});
 	});
 
+	QUnit.test("getAdditionalVizProperties - base delegate returns null", function(assert) {
+		assert.strictEqual(ChartDelegate.getAdditionalVizProperties(this.oMDCChart), null,
+			"Base delegate returns null by default");
+	});
+
+	QUnit.test("getAdditionalVizProperties - hook result is applied to inner chart during createInnerChartContent", function(assert) {
+		const done = assert.async();
+		const oExpectedProps = {
+			timeAxis: {
+				levels: ["minute"],
+				interval: { unit: "minute", step: 15 }
+			}
+		};
+		const oChart = new Chart("IdChart2", { delegate: {
+			name: sDelegatePath,
+			payload: { collectionPath: "/testPath" }
+		}});
+
+		sandbox.stub(ChartDelegate, "getAdditionalVizProperties").returns(oExpectedProps);
+		// Spy on the prototype so it catches the call on whichever instance createInnerChartContent creates
+		const oSetVizSpy = sandbox.spy(SapChart.prototype, "setVizProperties");
+		ChartDelegate._setInnerStructure(oChart, new ChartImplementationContainer(oChart.getId() + "--implementationContainer", {}));
+
+		ChartDelegate._loadChart().then(() => {
+			ChartDelegate.createInnerChartContent(oChart).then(() => {
+				// setVizProperties is called with the hook result — assert on what was passed, not what sap.chart returns back
+				assert.ok(oSetVizSpy.calledWith(oExpectedProps),
+					"setVizProperties was called with the object returned by the hook");
+
+				oChart.destroy();
+				done();
+			});
+		});
+	});
+
+	QUnit.test("getAdditionalVizProperties - null return skips setVizProperties call", function(assert) {
+		const done = assert.async();
+		const oChart = new Chart("IdChart3", { delegate: {
+			name: sDelegatePath,
+			payload: { collectionPath: "/testPath" }
+		}});
+
+		// Base delegate returns null — spy to confirm setVizProperties is never called with null/undefined
+		const oSetVizSpy = sandbox.spy(SapChart.prototype, "setVizProperties");
+		ChartDelegate._setInnerStructure(oChart, new ChartImplementationContainer(oChart.getId() + "--implementationContainer", {}));
+
+		ChartDelegate._loadChart().then(() => {
+			ChartDelegate.createInnerChartContent(oChart).then(() => {
+				const bCalledWithNullOrUndefined = oSetVizSpy.args.some((args) => !args[0]);
+				assert.ok(!bCalledWithNullOrUndefined,
+					"setVizProperties is never called with null or undefined");
+
+				oChart.destroy();
+				done();
+			});
+		});
+	});
+
+	QUnit.test("getAdditionalVizProperties - deep merges with vizProperties already set on inner chart", function(assert) {
+		const done = assert.async();
+		const oAdditionalProps = {
+			timeAxis: {
+				levels: ["hour"],
+				interval: { unit: "hour", step: 1 }
+			}
+		};
+		const oChart = new Chart("IdChart4", { delegate: {
+			name: sDelegatePath,
+			payload: { collectionPath: "/testPath" }
+		}});
+
+		sandbox.stub(ChartDelegate, "getAdditionalVizProperties").returns(oAdditionalProps);
+		ChartDelegate._setInnerStructure(oChart, new ChartImplementationContainer(oChart.getId() + "--implementationContainer", {}));
+
+		ChartDelegate._loadChart().then(() => {
+			ChartDelegate.createInnerChartContent(oChart).then(() => {
+				const oInnerChart = ChartDelegate._getChart(oChart);
+				// Use getProperty("vizProperties") to read the raw stored object —
+				// getVizProperties() runs through VizPropertiesHelper.sanitize() which strips
+				// properties unknown to VizFrame (e.g. timeAxis) on an unbound chart
+				const oStoredProps = oInnerChart.getProperty("vizProperties");
+
+				assert.deepEqual(oStoredProps.timeAxis, oAdditionalProps.timeAxis,
+					"Hook timeAxis is merged into the stored vizProperties");
+				assert.strictEqual(oStoredProps.tooltip.formatString, null,
+					"Pre-existing tooltip.formatString is preserved after merge");
+				assert.strictEqual(oStoredProps.valueAxis.label.formatString, null,
+					"Pre-existing valueAxis.label.formatString is preserved after merge");
+
+				oChart.destroy();
+				done();
+			});
+		});
+	});
+
     QUnit.test("_performInitialBind", function(assert) {
         const oMockChart = {bindData: function(){}};
         ChartDelegate._setState(this.oMDCChart, {innerChart: oMockChart, dataLoadedCallback: function(){}, innerStructure: new ChartImplementationContainer()});

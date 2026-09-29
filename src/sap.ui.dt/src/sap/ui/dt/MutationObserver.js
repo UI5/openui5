@@ -56,6 +56,8 @@ sap.ui.define([
 		}
 	});
 
+	const OVERLAY_CONTAINER_ID = "overlay-container";
+	const SAP_UI_PRESERVE = "sap-ui-preserve";
 	MutationObserver.prototype.init = function() {
 		this._mutationOnTransitionend = this._callDomChangedCallback.bind(this, "MutationOnTransitionend");
 		this._mutationOnAnimationEnd = this._callDomChangedCallback.bind(this, "MutationOnAnimationEnd");
@@ -194,9 +196,12 @@ sap.ui.define([
 			|| mElementIds.closestElementInWhitlist; /* when element with scrollbar and his parents are not registered */
 	};
 
-	MutationObserver.prototype._isNodeOverlayRelated = function(oNode, oMutation) {
-		var sOverlayContainerId = "overlay-container";
-		if (DOMUtil.contains(sOverlayContainerId, oNode)) {
+	MutationObserver.prototype._isNodeOverlayRelated = function(oNode, oMutation, oOverlayContainerNode) {
+		// oOverlayContainerNode is pre-resolved once per batch; fall back to live lookup for single calls (e.g. from event handlers)
+		const oResolvedOverlayContainerNode = oOverlayContainerNode !== undefined
+			? oOverlayContainerNode
+			: document.getElementById(OVERLAY_CONTAINER_ID);
+		if (oResolvedOverlayContainerNode?.contains(oNode)) {
 			return true;
 		}
 		if (oNode === document.body) {
@@ -204,17 +209,20 @@ sap.ui.define([
 				&& oMutation.addedNodes
 				&& oMutation.addedNodes[0]
 				&& oMutation.addedNodes[0].getAttribute
-				&& oMutation.addedNodes[0].getAttribute("id") === sOverlayContainerId;
+				&& oMutation.addedNodes[0].getAttribute("id") === OVERLAY_CONTAINER_ID;
 		}
 		return false;
 	};
 
-	MutationObserver.prototype._getRelevantElementId = function(oNode, oMutation) {
-		var sNodeId = oNode && oNode.getAttribute && oNode.getAttribute("id");
-		var sRelevantElementId;
+	MutationObserver.prototype._getRelevantElementId = function(oNode, oMutation, mBatchNodes) {
+		const sNodeId = oNode?.getAttribute?.("id");
+		let sRelevantElementId;
+		// Batch nodes are pre-resolved once per batch; fall back to live lookup for single calls (e.g. from event handlers)
+		const oOverlayContainerNode = mBatchNodes?.overlayContainerNode;
+		const oPreserveNode = mBatchNodes ? mBatchNodes.preserveNode : document.getElementById(SAP_UI_PRESERVE);
 		if (
 			// 1. Filter out overlay related mutations (overlays, overlay-container and body mutation when overlay-container is added)
-			!this._isNodeOverlayRelated(oNode, oMutation)
+			!this._isNodeOverlayRelated(oNode, oMutation, oOverlayContainerNode)
 
 			// 2. Mutation happened in Node which is still in actual DOM Tree
 			// Must be always on the first place since sometimes mutations for detached nodes may come
@@ -224,23 +232,23 @@ sap.ui.define([
 			&& sNodeId !== StaticArea.STATIC_UIAREA_ID
 
 			// 4. Node is not part of preserve area
-			&& !DOMUtil.contains("sap-ui-preserve", oNode)
+			&& !(oPreserveNode?.contains(oNode))
 
 		) {
-			// // 4.1, OR the closest element need to be registered
-			// var sRelevantElementId = this._getClosestParentIdForNodeRegisteredWithScrollbar(sNodeId, oNode);
-			// if (sRelevantElementId) {
-			// 	return sRelevantElementId;
-			// }
-			// // 4.2. Target Node is an ancestor of the root element, but not a static area
-			// return (this._sRootId && oNode.contains(document.getElementById(this._sRootId))) ? this._sRootId : undefined;
-			var iIndex = 0;
-			while (this._aRootIds.length > iIndex && !sRelevantElementId) {
+			// aRootNodes are pre-resolved once per batch; fall back to live lookup for single calls (e.g. from event handlers)
+			const aResolvedRootNodes = mBatchNodes ? mBatchNodes.rootNodes : this._aRootIds.map(function(sId) {
+				return document.getElementById(sId);
+			});
+			let iIndex = 0;
+			while (aResolvedRootNodes.length > iIndex && !sRelevantElementId) {
+				const oRootNode = aResolvedRootNodes[iIndex];
 				if (
-					// 4.1, OR the closest element need to be registered
-					DOMUtil.contains(this._aRootIds[iIndex], oNode)
-					// 4.2. Target Node is an ancestor of the root element, but not a static area
-					|| oNode.contains(document.getElementById(this._aRootIds[iIndex]))
+					oRootNode && (
+						// 4.1. Mutation happened inside a registered root
+						oRootNode.contains(oNode)
+						// 4.2. Target Node is an ancestor of the root element, but not a static area
+						|| oNode.contains(oRootNode)
+					)
 				) {
 					sRelevantElementId = this._aRootIds[iIndex];
 				}
@@ -317,10 +325,19 @@ sap.ui.define([
 	MutationObserver.prototype._startMutationObserver = function() {
 		this._oMutationObserver = new window.MutationObserver(function(aMutations) {
 			if (this._bHandlerRegistered) {
-				var aOverallTargetElementIds = aMutations.reduce(function(aOverallTargetElementIds, oMutation) {
-					var aTargetElementIds = [];
-					var oTargetNode = this._getTargetNode(oMutation);
-					var sTargetElementId = this._getRelevantElementId(oTargetNode, oMutation);
+				// Resolve invariant DOM nodes once per batch — they cannot change within a single microtask flush
+				const mBatchNodes = {
+					rootNodes: this._aRootIds.map(function(sId) {
+						return document.getElementById(sId);
+					}),
+					overlayContainerNode: document.getElementById(OVERLAY_CONTAINER_ID),
+					preserveNode: document.getElementById(SAP_UI_PRESERVE)
+				};
+
+				const aOverallTargetElementIds = aMutations.reduce(function(aOverallTargetElementIds, oMutation) {
+					let aTargetElementIds = [];
+					const oTargetNode = this._getTargetNode(oMutation);
+					const sTargetElementId = this._getRelevantElementId(oTargetNode, oMutation, mBatchNodes);
 					if (sTargetElementId) {
 						aTargetElementIds.push(sTargetElementId);
 					} else {

@@ -33,8 +33,14 @@ sap.ui.define([
 			JSONModel.apply(this, arguments);
 
 			this._aPendingPromises = [];
+			this._oPendingPaths = new Set();
 		}
 	});
+
+	/**
+	 * @const {int} The timeout before a host context property fetch is rejected.
+	 */
+	ContextModel.PROMISE_TIMEOUT = 60000;
 
 	/**
 	 * Sets the host instance which will be used to resolve properties.
@@ -63,14 +69,23 @@ sap.ui.define([
 				return this._mValues[sAbsolutePath];
 			}
 
+			// If a fetch for this path is already in-flight, don't start another one.
+			if (this._oPendingPaths.has(sAbsolutePath)) {
+				return null;
+			}
+
+			this._oPendingPaths.add(sAbsolutePath);
+
 			// ask the host and timeout if it does not respond
-			pGetProperty = Utils.timeoutPromise(oHost.getContextValue(sAbsolutePath.substring(1)));
+			pGetProperty = Utils.timeoutPromise(oHost.getContextValue(sAbsolutePath.substring(1)), ContextModel.PROMISE_TIMEOUT);
 
 			pGetProperty = pGetProperty.then(function (vValue) {
+					this._oPendingPaths.delete(sAbsolutePath);
 					this._mValues[sAbsolutePath] = vValue;
 					this.checkUpdate();
 				}.bind(this))
 				.catch(function (sReason) {
+					this._oPendingPaths.delete(sAbsolutePath);
 					this._mValues[sAbsolutePath] = null;
 					this.checkUpdate();
 					Log.error("Path " + sAbsolutePath + " could not be resolved. Reason: " + sReason);
@@ -89,6 +104,7 @@ sap.ui.define([
 	 */
 	ContextModel.prototype.resetHostProperties = function () {
 		this._mValues = {};
+		this._oPendingPaths = new Set();
 	};
 
 	/**

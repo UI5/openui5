@@ -5,7 +5,8 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"fl/performance/utils/FlexPerformanceTestUtil",
 	"sap/ui/core/mvc/XMLView",
-	"sap/ui/core/Element"
+	"sap/ui/core/Element",
+	"sap/ui/model/json/JSONModel"
 ], function(
 	App,
 	UIComponent,
@@ -13,7 +14,8 @@ sap.ui.define([
 	VariantUtil,
 	FlexPerformanceTestUtil,
 	XMLView,
-	Element
+	Element,
+	JSONModel
 ) {
 	"use strict";
 
@@ -34,6 +36,7 @@ sap.ui.define([
 
 		createContent() {
 			var oApp = new App();
+			oApp.setModel(new JSONModel());
 			var sTestCase = FlUtils.getUrlParameter("sap-ui-fl-test-case") || "rename";
 			var sTestProcessing = FlUtils.getUrlParameter("sap-ui-fl-test-processing") || "js";
 			var mViewProperties = {

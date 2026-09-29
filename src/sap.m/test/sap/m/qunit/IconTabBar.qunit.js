@@ -2741,6 +2741,54 @@ sap.ui.define([
 		assert.strictEqual(this.oIconTabBar.getDomRef("content").getAttribute("aria-labelledby"), oSelectedItem._getRootTab().getId(), "aria-labelledby should be set to the id of the root tab");
 	});
 
+	QUnit.module("Key User Adaptation", {
+		beforeEach: function () {
+			this.oIconTabBar = new IconTabBar({
+				items: [
+					new IconTabFilter({
+						text: "Tab 1",
+						items: [
+							new IconTabFilter({ text: "Tab 1 1", content: new Text({ text: "Content" }) }),
+							new IconTabFilter({ text: "Tab 1 2", content: new Text({ text: "Content" }) })
+						]
+					})
+				]
+			});
+
+			this.oIconTabBar.placeAt("qunit-fixture");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+		},
+		afterEach: function () {
+			this.oIconTabBar.destroy();
+			this.oIconTabBar = null;
+		}
+	});
+
+	QUnit.test("Sub items popover is not adaptable", function (assert) {
+		// Act
+		var oTabFilter = this.oIconTabBar.getItems()[0];
+		oTabFilter._expandButtonPress();
+
+		// Assert
+		assert.ok(oTabFilter._oPopover, "The popover is created");
+		assert.strictEqual(typeof oTabFilter._oPopover.isPopupAdaptationAllowed, "function", "isPopupAdaptationAllowed is defined on the popover");
+		assert.strictEqual(oTabFilter._oPopover.isPopupAdaptationAllowed(), false, "The popover content must not be a target for Key User Adaptation");
+
+		oTabFilter._oPopover.close();
+	});
+
+	QUnit.test("Overflow popover is not adaptable", function (assert) {
+		// Act
+		var oOverflowButton = this.oIconTabBar._getIconTabHeader()._getOverflow();
+		oOverflowButton._expandButtonPress();
+
+		// Assert
+		assert.ok(oOverflowButton._oPopover, "The overflow popover is created");
+		assert.strictEqual(oOverflowButton._oPopover.isPopupAdaptationAllowed(), false, "The overflow popover content must not be a target for Key User Adaptation");
+
+		oOverflowButton._oPopover.close();
+	});
+
 	QUnit.module("Padding");
 
 	QUnit.test("Container Padding Classes", function (assert) {

@@ -21,7 +21,7 @@ sap.ui.define([
 				return new Promise(function (resolve) {
 					setTimeout(function () {
 						resolve(oValues[sPath]);
-					}, 1000); // timeout for testing
+					}, 2000); // timeout for testing
 				});
 			};
 

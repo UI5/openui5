@@ -1242,8 +1242,9 @@ sap.ui.define([
 				return oElement.classList.contains("sapUiBLy") || oElement.classList.contains("sapUiBlockLayer");
 			});
 
-			if (iBlockLayerIndex !== -1 && iFocusDomRefIndex > iBlockLayerIndex) {
+			if (iBlockLayerIndex !== -1 && iFocusDomRefIndex >= iBlockLayerIndex) {
 				// when block layer is visible and it's displayed over the Element's DOM
+				// or when the focus DOM ref is the block layer itself, the Element is not focusable
 				return false;
 			}
 

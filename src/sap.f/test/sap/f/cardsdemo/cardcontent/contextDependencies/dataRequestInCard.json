@@ -1,0 +1,38 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.f.cardsdemo.cardcontent.contextDependencies.dataRequestInCard",
+		"type": "card",
+		"title": "Card 'dataRequestInCard'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"data": {
+			"request": {
+				"url": "./tasks.json"
+			}
+		},
+		"configuration": {
+			"parameters": {
+				"userId": {
+					"value": "{context>/sample/currentUser/id}"
+				}
+			}
+		},
+		"header": {
+			"title": "Data request in card",
+			"subtitle": "User ID: {parameters>/userId/value}",
+			"icon": {
+				"src": "sap-icon://request"
+			}
+		},
+		"content": {
+			"item": {
+				"title": "{task}"
+			}
+		}
+	}
+}

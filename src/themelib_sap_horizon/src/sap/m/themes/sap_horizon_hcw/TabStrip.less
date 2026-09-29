@@ -3,9 +3,6 @@
 /* Horizon High Contrast White theme  */
 /* ================================== */
 
-@_sap_m_TabStrip_ItemHoverTextColor: darken(@sapUiGroupTitleTextColor, 10);
-@_sap_m_TabStrip_ItemSelectedTextColor: darken(@sapUiGroupTitleTextColor, 20);
-
 .sapMTabStripContainer .sapMTabStrip {
 	background: var(--sapShell_Background);
 	box-shadow: none;
@@ -172,27 +169,27 @@ html.sap-phone {
 	}
 }
 
-html[dir=rtl] .sapMTabStrip .sapMTSLeftOverflowButtons {
+html[dir='rtl'] .sapMTabStrip .sapMTSLeftOverflowButtons {
 	text-align: right;
 }
 
-html[dir=ltr] .sapMTabStrip .sapMTSLeftOverflowButtons,
-html[dir=rtl] .sapMTabStrip .sapMTSRightOverflowButtons {
+html[dir='ltr'] .sapMTabStrip .sapMTSLeftOverflowButtons,
+html[dir='rtl'] .sapMTabStrip .sapMTSRightOverflowButtons {
 	background: var(--sapShell_Background);
 }
 
-html[dir=ltr] .sapMTabStrip .sapMTSLeftOverflowButtons::after,
-html[dir=rtl] .sapMTabStrip .sapMTSRightOverflowButtons::after {
+html[dir='ltr'] .sapMTabStrip .sapMTSLeftOverflowButtons::after,
+html[dir='rtl'] .sapMTabStrip .sapMTSRightOverflowButtons::after {
 	background: transparent;
 }
 
-html[dir=ltr] .sapMTabStrip .sapMTSRightOverflowButtons,
-html[dir=rtl] .sapMTabStrip .sapMTSLeftOverflowButtons {
+html[dir='ltr'] .sapMTabStrip .sapMTSRightOverflowButtons,
+html[dir='rtl'] .sapMTabStrip .sapMTSLeftOverflowButtons {
 	background: var(--sapShell_Background);
 }
 
-html[dir=ltr] .sapMTabStrip .sapMTSRightOverflowButtons::after,
-html[dir=rtl] .sapMTabStrip .sapMTSLeftOverflowButtons::after {
+html[dir='ltr'] .sapMTabStrip .sapMTSRightOverflowButtons::after,
+html[dir='rtl'] .sapMTabStrip .sapMTSLeftOverflowButtons::after {
 	background: transparent;
 }
 

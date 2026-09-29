@@ -136,7 +136,7 @@ SegmentedButtonRenderer.render = function(oRM, oControl){
 				sButtonTooltip = sButtonTooltip || sIconAriaLabel; // Prefer user-provided tooltips, as they bring better semantics
 			}
 
-			if (sButtonTooltip) {
+			if (sButtonTooltip && !oButton._oTooltipEnablement) {
 				oRM.attr("title", sButtonTooltip);
 			}
 
@@ -149,8 +149,17 @@ SegmentedButtonRenderer.render = function(oRM, oControl){
 				selected: sSelectedButton === oButton.getId()
 			};
 
+			const sTooltipId = oButton._oTooltipEnablement
+				? oButton._oTooltipEnablement.getInvisibleTooltipId() : null;
+			const aDescribedByToAdd = [];
 			if (oButton.getAriaDescribedBy().indexOf(sSelectionDescriptionId) === -1) {
-				mButtonAccessibilityState.describedby = { value: sSelectionDescriptionId, append: true };
+				aDescribedByToAdd.push(sSelectionDescriptionId);
+			}
+			if (sTooltipId) {
+				aDescribedByToAdd.push(sTooltipId);
+			}
+			if (aDescribedByToAdd.length > 0) {
+				mButtonAccessibilityState.describedby = { value: aDescribedByToAdd.join(" "), append: true };
 			}
 
 			oRM.accessibilityState(oButton, mButtonAccessibilityState);
@@ -175,6 +184,9 @@ SegmentedButtonRenderer.render = function(oRM, oControl){
 			}
 			oRM.close("div");
 			oRM.close("div");
+			if (oButton._oTooltipEnablement) {
+				oButton._oTooltipEnablement.renderInvisibleTooltip(oRM);
+			}
 			oRM.close("li");
 		} else {
 			InvisibleRenderer.render(oRM, oButton, "li");
