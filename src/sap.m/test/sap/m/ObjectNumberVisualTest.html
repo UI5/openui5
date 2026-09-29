@@ -10,17 +10,17 @@
 		</script>
 		<script>
 
-			conston1 = new sap.m.ObjectNumber("on1", {
+			const on1 = new sap.m.ObjectNumber("on1", {
 				number: "300,000,000",
 				unit: "Euro"
 			}).addStyleClass("sapUiSmallMargin");
 
-			conston2 = new sap.m.ObjectNumber("on2", {
+			const on2 = new sap.m.ObjectNumber("on2", {
 				number: "300,000,000",
 				unit: "Euro"
 			}).addStyleClass("sapMObjectNumberLarge").addStyleClass("sapUiSmallMargin");
 
-			constoButtonEmphasized = new sap.m.Button("emphasized", {
+			const oButtonEmphasized = new sap.m.Button("emphasized", {
 				text:"Toggle emphasized",
 				press: function(){
 					on1.setEmphasized(!on1.getEmphasized());
@@ -28,7 +28,7 @@
 				}
 			});
 
-			constoButtonNum = new sap.m.Button("num", {
+			const oButtonNum = new sap.m.Button("num", {
 				text:"Set number",
 				press: function(){
 					on1.setNumber("100");
@@ -36,7 +36,7 @@
 				}
 			});
 
-			constoButtonUnit = new sap.m.Button("unit", {
+			const oButtonUnit = new sap.m.Button("unit", {
 				text:"Set unit",
 				press: function(){
 					on1.setUnit("Dollars");
@@ -44,7 +44,7 @@
 				}
 			});
 
-			constoButtonStateS = new sap.m.Button("change_stateS", {
+			const oButtonStateS = new sap.m.Button("change_stateS", {
 				text:"Success state",
 				press: function(){
 					on1.setState(sap.ui.core.ValueState.Success);
@@ -52,7 +52,7 @@
 				}
 			});
 
-			constoButtonStateE = new sap.m.Button("change_stateE", {
+			const oButtonStateE = new sap.m.Button("change_stateE", {
 				text:"Error state",
 				press: function(){
 					on1.setState(sap.ui.core.ValueState.Error);
@@ -60,7 +60,7 @@
 				}
 			});
 
-			constoButtonStateW = new sap.m.Button("change_stateW", {
+			const oButtonStateW = new sap.m.Button("change_stateW", {
 				text:"Warning state",
 				press: function(){
 					on1.setState(sap.ui.core.ValueState.Warning);
@@ -68,7 +68,7 @@
 				}
 			});
 
-			constoButtonStateI = new sap.m.Button("change_stateI", {
+			const oButtonStateI = new sap.m.Button("change_stateI", {
 				text:"Information state",
 				press: function(){
 					on1.setState(sap.ui.core.ValueState.Information);
@@ -76,50 +76,50 @@
 				}
 			});
 
-			conston3 = new sap.m.ObjectNumber("on3", {
+			const on3 = new sap.m.ObjectNumber("on3", {
 				number: "300",
 				unit: "Euro",
 				active: true
 			}).addStyleClass("sapUiSmallMargin");
 
-			conston4 = new sap.m.ObjectNumber("on4", {
+			const on4 = new sap.m.ObjectNumber("on4", {
 				number: "300000",
 				unit: "Euro",
 				active: true
 			}).addStyleClass("sapMObjectNumberLarge").addStyleClass("sapUiSmallMargin");
 
-			conston5 = new sap.m.ObjectNumber("on5", {
+			const on5 = new sap.m.ObjectNumber("on5", {
 				number: "1.50",
 				active: true,
 				inverted: true
 			}).addStyleClass("sapUiSmallMargin");
 
-			conston6 = new sap.m.ObjectNumber("on6", {
+			const on6 = new sap.m.ObjectNumber("on6", {
 				number: "1.50",
 				unit: "Euro",
 				inverted: true
 			}).addStyleClass("sapUiSmallMargin");
 
-			conston7 = new sap.m.ObjectNumber("on7", {
+			const on7 = new sap.m.ObjectNumber("on7", {
 				number: "300000",
 				unit: "Euro",
 				inverted: true,
 				active: true
 			}).addStyleClass("sapMObjectNumberLarge").addStyleClass("sapUiSmallMargin");
 
-			constObjectNumberDisplayMode = sap.m.ObjectNumberDisplayMode;
+			const ObjectNumberDisplayMode = sap.m.ObjectNumberDisplayMode;
 
 			// --- Currency mode ---
 
 			// USD, useSymbol=true (default) → symbol "$"
-			constonCurrency1 = new sap.m.ObjectNumber("onCurrency1", {
+			const onCurrency1 = new sap.m.ObjectNumber("onCurrency1", {
 				number: "1234.5",
 				unit: "USD",
 				displayMode: ObjectNumberDisplayMode.Currency
 			});
 
 			// USD, useSymbol=false → ISO code "USD"
-			constonCurrency2 = new sap.m.ObjectNumber("onCurrency2", {
+			const onCurrency2 = new sap.m.ObjectNumber("onCurrency2", {
 				number: "1234.5",
 				unit: "USD",
 				displayMode: ObjectNumberDisplayMode.Currency,
@@ -127,7 +127,7 @@
 			});
 
 			// EUR, maxPrecision=4 → 2 extra figure-space padding digits
-			constonCurrency3 = new sap.m.ObjectNumber("onCurrency3", {
+			const onCurrency3 = new sap.m.ObjectNumber("onCurrency3", {
 				number: "99",
 				unit: "EUR",
 				displayMode: ObjectNumberDisplayMode.Currency,
@@ -135,14 +135,14 @@
 			});
 
 			// JPY — 0 CLDR decimal digits, edge case
-			constonCurrency4 = new sap.m.ObjectNumber("onCurrency4", {
+			const onCurrency4 = new sap.m.ObjectNumber("onCurrency4", {
 				number: "12000",
 				unit: "JPY",
 				displayMode: ObjectNumberDisplayMode.Currency
 			});
 
 			// CHF — standard 2 decimal digits, maxPrecision matches CLDR (no padding)
-			constonCurrency5 = new sap.m.ObjectNumber("onCurrency5", {
+			const onCurrency5 = new sap.m.ObjectNumber("onCurrency5", {
 				number: "750",
 				unit: "CHF",
 				displayMode: ObjectNumberDisplayMode.Currency,
@@ -152,14 +152,14 @@
 			// --- Unit mode ---
 
 			// kg, no maxPrecision → integer rendering
-			constonUnit1 = new sap.m.ObjectNumber("onUnit1", {
+			const onUnit1 = new sap.m.ObjectNumber("onUnit1", {
 				number: "42",
 				unit: "kg",
 				displayMode: ObjectNumberDisplayMode.Unit
 			});
 
 			// km, maxPrecision=2 → formatted to 2 decimal places
-			constonUnit2 = new sap.m.ObjectNumber("onUnit2", {
+			const onUnit2 = new sap.m.ObjectNumber("onUnit2", {
 				number: "3.5",
 				unit: "km",
 				displayMode: ObjectNumberDisplayMode.Unit,
@@ -167,7 +167,7 @@
 			});
 
 			// m², maxPrecision=3 → formatted to 3 decimal places
-			constonUnit3 = new sap.m.ObjectNumber("onUnit3", {
+			const onUnit3 = new sap.m.ObjectNumber("onUnit3", {
 				number: "0.5",
 				unit: "m²",
 				displayMode: ObjectNumberDisplayMode.Unit,
@@ -175,7 +175,7 @@
 			});
 
 			// useSymbol=true has no effect in Unit mode — raw unit string shown
-			constonUnit4 = new sap.m.ObjectNumber("onUnit4", {
+			const onUnit4 = new sap.m.ObjectNumber("onUnit4", {
 				number: "100",
 				unit: "kWh",
 				displayMode: ObjectNumberDisplayMode.Unit,
@@ -183,15 +183,15 @@
 			});
 
 			// emphasized unit
-			constonUnit5 = new sap.m.ObjectNumber("onUnit5", {
+			const onUnit5 = new sap.m.ObjectNumber("onUnit5", {
 				number: "200",
 				unit: "kg",
 				displayMode: ObjectNumberDisplayMode.Unit,
 				emphasized: true
 			});
 
-			constapp = new sap.m.App();
-			constpage = new sap.m.Page({
+			const app = new sap.m.App();
+			const page = new sap.m.Page({
 				showHeader : false,
 				enableScrolling : true,
 				content: [
