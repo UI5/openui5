@@ -3252,6 +3252,28 @@ sap.ui.define([
 		assert.ok(width2 > width1, "dialog is resized");
 	});
 
+	QUnit.test("resize does not shrink below min-height plus footer height", function(assert) {
+		// arrange
+		this.oDialog.addButton(new Button({ text: "Cancel" }));
+
+		// act
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		const oDragAndResizeHandler = this.oDialog.getDomRef("dragAndResizeHandler");
+		const iMinHeight = parseInt(this.oDialog.$().css("min-height")) + this.oDialog._getFooterHeight();
+
+		for (let i = 0; i < 30; i++) {
+			qutils.triggerKeydown(oDragAndResizeHandler, KeyCodes.ARROW_UP, true);
+			this.clock.tick(50);
+		}
+		this.clock.tick(500);
+
+		// assert
+		assert.ok(this.oDialog.$().height() >= iMinHeight,
+			"dialog height stays at or above min-height plus footer height so the resize handle stays at the bottom");
+	});
+
 	QUnit.test("change draggable/resizable", function(assert) {
 
 		this.oDialog.setDraggable(false);
