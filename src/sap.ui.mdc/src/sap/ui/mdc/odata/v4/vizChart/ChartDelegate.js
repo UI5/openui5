@@ -1090,6 +1090,26 @@ sap.ui.define([
 
 	};
 
+	/**
+	 * Returns additional vizProperties to be applied to the inner <code>sap.chart.Chart</code> after creation.
+	 * Override this in extending delegates to supply chart-level visualization configuration
+	 * (for example, <code>timeAxis</code> levels and intervals for sub-day granularity).
+	 *
+	 * <b>Note:</b> This hook is called once during <code>createInnerChartContent</code>, before the chart
+	 * is bound to data. The returned properties are deep-merged into the inner chart via <code>setVizProperties</code>
+	 * and are not refreshed on subsequent chart type changes or rebinds.
+	 *
+	 * @param {sap.ui.mdc.Chart} oChart Reference to the MDC chart
+	 * @returns {object|null} A vizProperties object that will be merged into the inner chart via <code>setVizProperties</code>. Return <code>null</code> if no additional properties are needed.
+	 *
+	 * @private
+	 * @ui5-restricted sap.fe, sap.ui.mdc
+	 * @since 1.154
+	 */
+	ChartDelegate.getAdditionalVizProperties = function(oChart) {
+		return null;
+	};
+
 	ChartDelegate.createInnerChartContent = function(oChart, fnCallbackDataLoaded) {
 
 		return new Promise((resolve, reject) => {
@@ -1119,6 +1139,11 @@ sap.ui.define([
 			oInnerChart.setCustomMessages({
 				'NO_DATA': oChart.getNoDataText()
 			});
+
+			const oAdditionalVizProps = this.getAdditionalVizProperties(oChart);
+			if (oAdditionalVizProps) {
+				oInnerChart.setVizProperties(oAdditionalVizProps);
+			}
 
 			//Initialize empty; will get filled later on
 			this._getState(oChart).inResultDimensions = [];
