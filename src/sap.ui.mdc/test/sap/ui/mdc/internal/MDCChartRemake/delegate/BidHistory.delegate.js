@@ -17,28 +17,13 @@ sap.ui.define([
 		oBindingInfo.path = "/data";
 	};
 
-	BidHistoryDelegate._performInitialBind = function (oChart, oBindingInfo) {
-		if (!oChart || !oBindingInfo || !this._getChart(oChart)) {
-			return;
-		}
-
-		var oInnerChart = this._getChart(oChart);
-		var oState = this._getState(oChart);
-
-		oInnerChart.bindData(oBindingInfo);
-		this._setBindingInfoForState(oChart, oBindingInfo);
-		oState.innerChartBound = true;
-
-		oInnerChart.attachEventOnce("renderComplete", function () {
-			oInnerChart.setVizProperties({
-				timeAxis: {
-					levels: ["minute"],
-					interval: {unit: "minute", step: 15}
-				}
-			});
-			oChart.setBusy(false);
-			oChart._innerChartDataLoadComplete({});
-		});
+	BidHistoryDelegate.getAdditionalVizProperties = function (oChart) {
+		return {
+			timeAxis: {
+				levels: ["minute"],
+				interval: {unit: "minute", step: 15}
+			}
+		};
 	};
 
 	return BidHistoryDelegate;

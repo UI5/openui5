@@ -549,6 +549,7 @@ sap.ui.define([
 		oList.getItems()[0].focus();
 		qutils.triggerEvent("keydown", document.activeElement, {code: "KeyA", ctrlKey: true});
 		assert.equal(oHeaderSelectorPressSpy.callCount, 1, "Fired on Ctrl+A again (deselect all)");
+		assert.notOk(oList.getSelectedItems().length, "All items are deselected after the second Ctrl+A");
 
 		// Ctrl+Shift+A always clears the selection and fires the event, even in default multiSelectMode.
 		oHeaderSelectorPressSpy.resetHistory();

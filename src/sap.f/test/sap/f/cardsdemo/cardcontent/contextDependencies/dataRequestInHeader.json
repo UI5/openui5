@@ -1,0 +1,47 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.f.cardsdemo.cardcontent.contextDependencies.dataRequestInHeader",
+		"type": "card",
+		"title": "Card 'dataRequestInHeader'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"configuration": {
+			"parameters": {
+				"userId": {
+					"value": "{context>/sample/currentUser/id}"
+				}
+			}
+		},
+		"header": {
+			"type": "Numeric",
+			"data": {
+				"request": {
+					"url": "./budget.json"
+				}
+			},
+			"title": "Data request in header",
+			"subtitle": "User ID: {parameters>/userId/value}",
+			"mainIndicator": {
+				"number": "{budget}",
+				"unit": "USD"
+			}
+		},
+		"content": {
+			"data": {
+				"json": [
+					{
+						"task": "Static row"
+					}
+				]
+			},
+			"item": {
+				"title": "{task}"
+			}
+		}
+	}
+}

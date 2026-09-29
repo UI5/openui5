@@ -981,6 +981,43 @@ sap.ui.define([
 		assert.equal(aFilters[0].sPath, "Name_Path", "Filter is for the active property");
 	});
 
+	QUnit.module("TreeTable initialization", {
+		afterEach: function() {
+			this.oTable?.destroy();
+		},
+		initTreeTable: function() {
+			this.oTable = new Table({
+				type: new TreeTableType(),
+				delegate: {
+					name: "sap/ui/mdc/TableDelegate",
+					payload: {collectionPath: "/foo"}
+				}
+			});
+			return this.oTable.awaitControlDelegate();
+		}
+	});
+
+	QUnit.test("ClientHierarchy plugin", async function(assert) {
+		await this.initTreeTable();
+		await this.oTable.initialized();
+		const oPlugin = PluginBase.getPlugin(this.oTable._oTable, "sap.ui.table.plugins.ClientHierarchy");
+		assert.ok(oPlugin, "ClientHierarchy plugin present in the inner table");
+		assert.strictEqual(oPlugin.getTolerateUnsupportedModel(), true, "tolerateUnsupportedModel is enabled");
+	});
+
+	QUnit.test("No ClientHierarchy plugin for non-TreeTable types", async function(assert) {
+		for (const sType of [TableType.Table, TableType.ResponsiveTable]) {
+			this.oTable = new Table({
+				type: sType,
+				delegate: {name: "sap/ui/mdc/TableDelegate", payload: {collectionPath: "/foo"}}
+			});
+			await this.oTable.initialized();
+			assert.notOk(PluginBase.getPlugin(this.oTable._oTable, "sap.ui.table.plugins.ClientHierarchy"),
+				`No ClientHierarchy plugin for type ${sType}`);
+			this.oTable.destroy();
+		}
+	});
+
 	QUnit.module("Rebind with invalid state", {
 		afterEach: function() {
 			this.oTable?.destroy();

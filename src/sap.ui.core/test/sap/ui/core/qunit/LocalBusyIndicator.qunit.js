@@ -14,88 +14,9 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/qunit/QUnitUtils",
-	"sap/ui/test/utils/nextUIUpdate",
-	/* jQuery custom selectors ":sapTabbable"*/
-	"sap/ui/dom/jquery/Selectors"
+	"sap/ui/test/utils/nextUIUpdate"
 ], function(BusyDialog, Button, List, OverflowToolbar, Slider, StandardListItem, Title, ToolbarSpacer, VBox, Element, XMLView, KeyCodes, jQuery, qutils, nextUIUpdate) {
 	"use strict";
-
-	// Checks whether the given DomRef is contained or equals (in) one of the given container
-	function isContained(aContainers, oRef) {
-		for (var i = 0; i < aContainers.length; i++) {
-			if (aContainers[i] === oRef || aContainers[i] !== oRef && aContainers[i].contains(oRef)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	// Returns a jQuery object which contains all next/previous (bNext) tabbable DOM elements of the given starting point (oRef) within the given scopes (DOMRefs)
-	function findTabbables(oRef, aScopes, bNext) {
-		var $Ref = jQuery(oRef),
-			$All, $Tabbables;
-
-		if (bNext) {
-			$All = jQuery.merge($Ref.find("*"), jQuery.merge($Ref.nextAll(), $Ref.parents().nextAll()));
-			// jQuery custom selectors ":sapTabbable"
-			$Tabbables = $All.find(':sapTabbable').addBack(':sapTabbable');
-		} else {
-			$All = jQuery.merge($Ref.prevAll(), $Ref.parents().prevAll());
-			// jQuery custom selectors ":sapTabbable"
-			$Tabbables = jQuery.merge($Ref.parents(':sapTabbable'), $All.find(':sapTabbable').addBack(':sapTabbable'));
-		}
-
-		$Tabbables = jQuery.uniqueSort($Tabbables);
-		return $Tabbables.filter(function() {
-			return isContained(aScopes, this);
-		});
-	}
-
-	function simulateTabEvent(oTarget, bBackward) {
-		var oParams = {};
-		oParams.keyCode = KeyCodes.TAB;
-		oParams.which = oParams.keyCode;
-		oParams.shiftKey = !!bBackward;
-		oParams.altKey = false;
-		oParams.metaKey = false;
-		oParams.ctrlKey = false;
-
-		if (typeof (oTarget) == "string") {
-			oTarget = document.getElementById(oTarget);
-		}
-
-		var oEvent = jQuery.Event({type: "keydown"});
-		for (var x in oParams) {
-			oEvent[x] = oParams[x];
-			oEvent.originalEvent[x] = oParams[x];
-		}
-
-		jQuery(oTarget).trigger(oEvent);
-
-		if (oEvent.isDefaultPrevented()) {
-			return;
-		}
-
-		var $Tabbables = findTabbables(document.activeElement, [document.getElementById("target1")], !bBackward);
-		if ($Tabbables.length) {
-			$Tabbables.get(bBackward ? $Tabbables.length - 1 : 0).focus();
-		}
-	}
-
-	/**
-	 * Check whether an element is focused.
-	 * @param {jQuery|HTMLElement} oElement The element to check.
-	 * @param {Object} assert QUnit assert object.
-	 * @returns {jQuery} A jQuery object containing the active element.
-	 */
-	function checkFocus(oElement, assert) {
-		var $ActiveElement = jQuery(document.activeElement);
-		var $Element = jQuery(oElement);
-
-		assert.ok($Element[0] === document.activeElement, "Focus is on: " + $ActiveElement.attr("id") + ", should be on: " + $Element.attr("id"));
-
-		return $ActiveElement;
-	}
 
 	// create page content
 	["target1", "target2", "target3", "failsafeTests"].forEach(function(sId) {
@@ -148,19 +69,22 @@ sap.ui.define([
 
 	QUnit.test("Accessibility", function(assert) {
 		var done = assert.async();
-		this.oListBox.setBusy(true);
-		var $LB = this.oListBox.$();
+		var oListBox = this.oListBox;
+		oListBox.setBusy(true);
+		var $LB = oListBox.$();
 		var iChildren = $LB.children().length;
 
 		setTimeout(function() {
-			var oBusyIndicatorDOM = $LB.children('.sapUiLocalBusyIndicator')[0];
+			var oBusyIndicator = oListBox.getDomRef("busyIndicator");
 			assert.equal($LB.children().length, iChildren + 1, 'Busy Indicator added to DOM tree');
-			assert.ok($LB[0].hasAttribute("aria-busy"), "ARIA busy is set to Control");
-			assert.equal(oBusyIndicatorDOM.getAttribute("role"), "progressbar", 'ARIA role "progressbar" is set to busy indicator');
-			assert.ok(oBusyIndicatorDOM.hasAttribute("aria-valuemin"), 'aria-valuemin is set to busy indicator');
-			assert.ok(oBusyIndicatorDOM.hasAttribute("aria-valuemax"), 'aria-valuemax is set to busy indicator');
-			assert.ok(oBusyIndicatorDOM.hasAttribute("aria-valuetext"), 'aria-valuetext is set to busy indicator');
-			assert.ok(oBusyIndicatorDOM.hasAttribute("title"), 'title attribute is set to busy indicator');
+			assert.ok(oBusyIndicator, "Busy Indicator element is present in the DOM");
+			assert.equal(oBusyIndicator.getAttribute("role"), "progressbar", "ARIA role 'progressbar' is set on the busy indicator");
+			assert.equal(oBusyIndicator.getAttribute("tabindex"), "0", "The busy indicator is focusable (tabindex=0)");
+			assert.ok(oBusyIndicator.hasAttribute("aria-label"), "ARIA label is set on the busy indicator");
+			assert.ok(oBusyIndicator.hasAttribute("aria-valuetext"), "Busy indicator has 'aria-valuetext'");
+			assert.ok(oBusyIndicator.hasAttribute("aria-valuemin"), "Busy indicator has 'aria-valuemin'");
+			assert.ok(oBusyIndicator.hasAttribute("aria-valuemax"), "Busy indicator has 'aria-valuemax'");
+			assert.ok($LB[0].hasAttribute("aria-busy"), "ARIA busy is set on the control root");
 			done();
 		}, 1200);
 	});
@@ -182,6 +106,24 @@ sap.ui.define([
 			"aria-busy is removed from the busy-section DOM after setBusy(false)");
 	});
 
+	QUnit.test("aria-valuetext is set on the busy indicator when a busy section is defined", function(assert) {
+		this.oListBox.setBusyIndicatorDelay(0);
+		this.oListBox.setBusy(true, "listUl");
+
+		var oBusySectionDOM = this.oListBox.getDomRef("listUl");
+		var oBusyIndicator = this.oListBox.getDomRef("busyIndicator");
+
+		assert.ok(oBusyIndicator.hasAttribute("aria-valuetext"),
+			"aria-valuetext is set on the busy indicator");
+		assert.strictEqual(oBusySectionDOM.getAttribute("aria-valuetext"), null,
+			"aria-valuetext is NOT set on the busy-section DOM (<id>-listUl)");
+
+		this.oListBox.setBusy(false);
+		assert.strictEqual(this.oListBox.getDomRef("busyIndicator"), null,
+			"busy indicator (with its aria-valuetext) is removed after setBusy(false)");
+	});
+
+
 	QUnit.test("aria-busy is set on the root control DOM when no busy section is defined", function(assert) {
 		this.oListBox.setBusyIndicatorDelay(0);
 		this.oListBox.setBusy(true);
@@ -199,158 +141,21 @@ sap.ui.define([
 			"aria-busy is removed from the root control DOM after setBusy(false)");
 	});
 
-	QUnit.test("Focus Restoration", function(assert) {
-		const $LB = this.oListBox.$();
+	QUnit.test("aria-valuetext is set on the busy indicator when no busy section is defined", function(assert) {
 		this.oListBox.setBusyIndicatorDelay(0);
-		this.oListBox.focus(); // set initial focus
-		const oLastFocusPosition = document.activeElement; // remember last focus position
-
 		this.oListBox.setBusy(true);
-		const oBusyIndicatorDOM = $LB.children('.sapUiLocalBusyIndicator')[0];
-		assert.equal(oBusyIndicatorDOM, document.activeElement, "setBusy(true): Focus moved to busy indicator.");
-		assert.ok($LB.attr("aria-busy"), "'aria-busy' attribute should be defined on the busy control.");
 
+		var oRootDOM = this.oListBox.getDomRef();
+		var oBusyIndicator = this.oListBox.getDomRef("busyIndicator");
+
+		assert.ok(oBusyIndicator.hasAttribute("aria-valuetext"),
+			"aria-valuetext is set on the busy indicator");
+		assert.strictEqual(oRootDOM.getAttribute("aria-valuetext"), null,
+			"aria-valuetext is NOT set on the root control DOM");
 
 		this.oListBox.setBusy(false);
-		assert.equal(oLastFocusPosition, document.activeElement, "setBusy(false): Focus restored correctly to last focus position.");
-		assert.notOk($LB.attr("aria-busy"), "'aria-busy' attribute should be removed again.");
-
-	});
-
-	QUnit.test("Focus Restoration when focused item is out of busy section of the control", function(assert) {
-		this.oListBox.setBusyIndicatorDelay(0);
-		this.oToolbarButton.focus();
-
-		this.oListBox.setBusy(true, "listUl");
-		assert.ok(this.oToolbarButton.getDomRef().contains(document.activeElement), "setBusy(true): focus is still on the button because the busy section doesn't contain the focused element");
-
-		this.oListBox.setBusy(false);
-		assert.ok(this.oToolbarButton.getDomRef().contains(document.activeElement), "setBusy(false): focus is still on the button because the busy section doesn't contain the focused element");
-	});
-
-	QUnit.test("Focus Restoration Advanced", function(assert) {
-		const $LB = this.oListBox.$();
-		this.oListBox.setBusyIndicatorDelay(0);
-		this.oListBox.focus(); // set initial focus
-
-		this.oListBox.setBusy(true);
-		const oBusyIndicatorDOM = $LB.children('.sapUiLocalBusyIndicator')[0];
-		assert.equal(oBusyIndicatorDOM, document.activeElement, "setBusy(true): Focus moved to busy indicator.");
-		assert.ok($LB.attr("aria-busy"), "'aria-busy' attribute should be defined on the busy control.");
-
-		this.oSlider.focus(); // Move focus away from busy area
-		const oSliderFocus = document.activeElement;
-		assert.ok(this.oSlider.getDomRef().contains(oSliderFocus), "Focus moved away from busy area to the slider");
-
-		this.oListBox.setBusy(false);
-		assert.equal(oSliderFocus, document.activeElement, "setBusy(false): Focus shouldn't be restored.");
-		assert.notOk($LB.attr("aria-busy"), "'aria-busy' attribute should be removed again.");
-	});
-
-	QUnit.test("Focus Restoration after navigating back to the BusyIndicator", function(assert) {
-		const $LB = this.oListBox.$();
-		this.oListBox.setBusyIndicatorDelay(0);
-		this.oListBox.focus(); // set initial focus
-
-		this.oListBox.setBusy(true);
-		const oBusyIndicatorDOM = $LB.children('.sapUiLocalBusyIndicator')[0];
-		assert.equal(oBusyIndicatorDOM, document.activeElement, "setBusy(true): Focus moved to busy indicator.");
-		assert.ok($LB.attr("aria-busy"), "'aria-busy' attribute should be defined on the busy control.");
-
-		this.oSlider.focus(); // Move focus away from busy area
-		assert.ok(this.oSlider.getDomRef().contains(document.activeElement), "Focus moved away from busy area to the slider");
-		this.oSlider.setBusyIndicatorDelay(0);
-		this.oSlider.setBusy(true); // set initial focus
-
-		// move the focus back to the busy indicator of the ListBox
-		oBusyIndicatorDOM.focus();
-
-		this.oListBox.setBusy(false);
-		assert.ok(this.oListBox.getDomRef().contains(document.activeElement), "setBusy(false): Focus should be restored because its BusyIndicator got focus again");
-		assert.notOk($LB.attr("aria-busy"), "'aria-busy' attribute should be removed again.");
-	});
-
-	QUnit.test("Focus Restoration after busy control is invalidated", async function(assert) {
-		const $LB = this.oListBox.$();
-		this.oListBox.setBusyIndicatorDelay(0);
-		this.oListBox.focus(); // set initial focus
-
-		this.oListBox.setBusy(true);
-		let oBusyIndicatorDOM = $LB.children('.sapUiLocalBusyIndicator')[0];
-		assert.equal(oBusyIndicatorDOM, document.activeElement, "setBusy(true): Focus moved to busy indicator.");
-		assert.ok($LB.attr("aria-busy"), "'aria-busy' attribute should be defined on the busy control.");
-
-		const oDelegate = {
-			onBeforeRendering() {
-				assert.ok(this.getDomRef()?.contains(document.activeElement), "Focus is set back to the control before the next rendering");
-			}
-		};
-		this.oListBox.addDelegate(oDelegate, false, this.oListBox);
-		this.oListBox.invalidate();
-		await nextUIUpdate();
-
-		return new Promise((resolve, reject) => {
-			setTimeout(() => {
-				oBusyIndicatorDOM = $LB.children('.sapUiLocalBusyIndicator')[0];
-				assert.equal(document.activeElement, oBusyIndicatorDOM, "After rerendering: Focus moved to busy indicator since control is still busy.");
-				resolve();
-			});
-		});
-	});
-
-	QUnit.test("tab chain - busy delay 0", function(assert) {
-		var done = assert.async(),
-			oElem;
-		this.oFocusBefore.getDomRef().focus();
-		this.oListBox.setBusyIndicatorDelay(0);
-		this.oListBox.setBusy(true);
-		simulateTabEvent(this.oFocusBefore.getDomRef());
-		oElem = this.oListBox.getDomRef("busyIndicator");
-		checkFocus(oElem, assert);
-		simulateTabEvent(oElem);
-		checkFocus(this.oFocusAfter.getDomRef(), assert);
-		simulateTabEvent(this.oFocusAfter.getDomRef(), true);
-		checkFocus(oElem, assert);
-		simulateTabEvent(oElem, true);
-		checkFocus(this.oFocusBefore.getDomRef(), assert);
-		done();
-	});
-
-	QUnit.test("tab chain - normal delay", function(assert) {
-		var done = assert.async(),
-			oElem;
-		this.oFocusBefore.getDomRef().focus();
-		this.oListBox.setBusy(true);
-
-		simulateTabEvent(this.oFocusBefore.getDomRef());
-		oElem = this.oToolbarButton.getFocusDomRef();
-		checkFocus(oElem, assert);
-		simulateTabEvent(oElem);
-		oElem = document.getElementById(this.oListBox.getItems()[0].getId());
-		checkFocus(oElem, assert);
-		simulateTabEvent(oElem);
-		checkFocus(this.oFocusAfter.getDomRef(), assert);
-		simulateTabEvent(this.oFocusAfter.getDomRef(), true);
-		checkFocus(oElem, assert);
-		simulateTabEvent(oElem, true);
-		oElem = this.oToolbarButton.getFocusDomRef();
-		checkFocus(oElem, assert);
-		simulateTabEvent(oElem, true);
-		checkFocus(this.oFocusBefore.getDomRef(), assert);
-
-		setTimeout(function() {
-			simulateTabEvent(this.oFocusBefore.getDomRef());
-			oElem = this.oListBox.getDomRef("busyIndicator");
-			checkFocus(oElem, assert);
-			simulateTabEvent(oElem);
-			checkFocus(this.oFocusAfter.getDomRef(), assert);
-			simulateTabEvent(this.oFocusAfter.getDomRef(), true);
-			oElem = this.oListBox.getDomRef("busyIndicator");
-			checkFocus(oElem, assert);
-			simulateTabEvent(oElem, true);
-			checkFocus(this.oFocusBefore.getDomRef(), assert);
-			done();
-		}.bind(this), 1200);
+		assert.strictEqual(this.oListBox.getDomRef("busyIndicator"), null,
+			"busy indicator (with its aria-valuetext) is removed after setBusy(false)");
 	});
 
 	QUnit.test("Check suppressed events", function(assert) {
@@ -360,11 +165,6 @@ sap.ui.define([
 		var $LB = this.oListBox.$();
 
 		var aPreventedEvents = [
-			"focusin",
-			"focusout",
-			"keydown",
-			"keypress",
-			"keyup",
 			"mousedown",
 			"touchstart",
 			"touchmove",
@@ -424,6 +224,196 @@ sap.ui.define([
 			}, 250);
 
 		}.bind(this), 250);
+	});
+
+	QUnit.test("Focus entering the busy section is redirected to the busy indicator", function(assert) {
+		var oListBox = this.oListBox;
+		oListBox.setBusyIndicatorDelay(0);
+		oListBox.setBusy(true);
+
+		var oBusyIndicator = oListBox.getDomRef("busyIndicator");
+		assert.ok(oBusyIndicator, "Busy indicator is present in the DOM");
+
+		// Simulate focus entering the blocked section (e.g. via click or programmatic focus).
+		// The redirectFocus handler on the control root must move focus onto the busy indicator.
+		var oRoot = oListBox.getDomRef();
+		oRoot.setAttribute("tabindex", "-1");
+		oRoot.focus();
+
+		assert.strictEqual(document.activeElement, oBusyIndicator,
+			"Focus entering the busy section is redirected to the busy indicator");
+
+		oRoot.removeAttribute("tabindex");
+		oListBox.setBusy(false);
+	});
+
+	QUnit.test("Focus is moved to the indicator while busy and restored afterwards", function(assert) {
+		var oListBox = this.oListBox;
+		var oItemDom = oListBox.getItems()[0].getFocusDomRef();
+		oListBox.setBusyIndicatorDelay(0);
+
+		// put focus inside the control before it becomes busy
+		oItemDom.focus();
+		assert.ok(oListBox.getDomRef().contains(document.activeElement),
+			"Focus is inside the control before it becomes busy");
+
+		oListBox.setBusy(true);
+		var oBusyIndicator = oListBox.getDomRef("busyIndicator");
+		assert.strictEqual(document.activeElement, oBusyIndicator,
+			"Focus is moved to the busy indicator while the control is busy");
+
+		oListBox.setBusy(false);
+		assert.strictEqual(document.activeElement, oItemDom,
+			"Focus is restored to the previously focused element after the control is no longer busy");
+	});
+
+	QUnit.test("Focus is restored to the block layer after invalidation of a busy control", async function(assert) {
+		var oListBox = this.oListBox;
+		var oItemDom = oListBox.getItems()[0].getFocusDomRef();
+		oListBox.setBusyIndicatorDelay(0);
+
+		// Focus an item, then make the control busy
+		oItemDom.focus();
+		oListBox.setBusy(true);
+		var oBusyIndicator = oListBox.getDomRef("busyIndicator");
+		assert.strictEqual(document.activeElement, oBusyIndicator,
+			"Focus is on the busy indicator before invalidation");
+
+		// Invalidate the busy control → triggers rerendering
+		oListBox.invalidate();
+		await nextUIUpdate();
+
+		// After rerendering, the block layer is recreated. RenderManager restores focus into the
+		// control, and the async focus redirect in fnAppendBusyIndicator must move it back to the
+		// new busy indicator.
+		var oNewBusyIndicator = oListBox.getDomRef("busyIndicator");
+		assert.ok(oNewBusyIndicator, "New busy indicator exists after rerendering");
+
+		await new Promise(function(resolve) { setTimeout(resolve, 0); });
+		assert.strictEqual(document.activeElement, oNewBusyIndicator,
+			"Focus is restored to the block layer after invalidation");
+
+		oListBox.setBusy(false);
+	});
+
+	QUnit.test("Manual focus change during invalidation of a busy control is not overwritten", async function(assert) {
+		var oListBox = this.oListBox;
+		var oItemDom = oListBox.getItems()[0].getFocusDomRef();
+		var oFocusAfter = this.oFocusAfter;
+		oListBox.setBusyIndicatorDelay(0);
+
+		// Focus an item, then make the control busy
+		oItemDom.focus();
+		oListBox.setBusy(true);
+		var oBusyIndicator = oListBox.getDomRef("busyIndicator");
+		assert.strictEqual(document.activeElement, oBusyIndicator,
+			"Focus is on the busy indicator before invalidation");
+
+		// Invalidate the busy control → triggers rerendering
+		oListBox.invalidate();
+		await nextUIUpdate();
+
+		// Simulate application code moving focus to a different control between
+		// onAfterRendering and the async focus redirect
+		oFocusAfter.focus();
+		assert.strictEqual(document.activeElement, oFocusAfter.getFocusDomRef(),
+			"Focus was manually moved to another control");
+
+		await new Promise(function(resolve) { setTimeout(resolve, 0); });
+		assert.strictEqual(document.activeElement, oFocusAfter.getFocusDomRef(),
+			"Manual focus change is respected and not overwritten by the busy indicator");
+
+		oListBox.setBusy(false);
+	});
+
+	QUnit.test("Arrow keys are forwarded to the control's item navigation from a busy item", async function(assert) {
+		// When a list item is busy, arrow keys pressed on its busy indicator must be delegated to
+		// the list's own keyboard navigation (ItemNavigation), so navigation follows the actual
+		// layout (linear or grid) instead of a naive sibling walk.
+		var oList = new List({
+			items: [
+				new StandardListItem({ title: "Item 0" }),
+				new StandardListItem({ title: "Item 1" }),
+				new StandardListItem({ title: "Item 2" })
+			]
+		}).placeAt("failsafeTests");
+		await nextUIUpdate();
+
+		var aItems = oList.getItems();
+		var oBusyItem = aItems[1];
+		oBusyItem.getDomRef().focus(); // ItemNavigation: current item -> index 1
+		oBusyItem.setBusyIndicatorDelay(0);
+		oBusyItem.setBusy(true);
+
+		var oBusyIndicator = oBusyItem.getDomRef("busyIndicator");
+		assert.ok(oBusyIndicator, "Busy indicator is present in the DOM");
+		assert.strictEqual(document.activeElement, oBusyIndicator,
+			"Focus is on the busy indicator while the item is busy");
+
+		// Arrow Down on the indicator is forwarded to the list -> focus moves to the next item
+		qutils.triggerKeydown(oBusyIndicator, KeyCodes.ARROW_DOWN);
+		assert.strictEqual(document.activeElement, aItems[2].getDomRef(),
+			"ARROW_DOWN is delegated to the control and moves focus to the next item");
+
+		oList.destroy();
+	});
+
+	QUnit.test("Focus that enters the busy section during busyIndicatorDelay is redirected to the block layer", function(assert) {
+		var done = assert.async();
+		var oListBox = this.oListBox;
+		var oItemDom = oListBox.getItems()[0].getFocusDomRef();
+
+		// Use a non-zero delay so there's a window where the control is logically busy
+		// but the block layer (and inert) hasn't been applied yet.
+		oListBox.setBusyIndicatorDelay(50);
+		oListBox.setBusy(true);
+
+		// No block layer yet — focus can still enter the control during the delay
+		assert.notOk(oListBox.getDomRef("busyIndicator"),
+			"Busy indicator not yet in DOM during delay");
+		oItemDom.focus();
+		assert.strictEqual(document.activeElement, oItemDom,
+			"Focus is inside the control during busyIndicatorDelay");
+
+		// After the delay, fnAppendBusyIndicator fires, applies inert, and must
+		// redirect focus to the block layer.
+		setTimeout(function() {
+			var oBusyIndicator = oListBox.getDomRef("busyIndicator");
+			assert.ok(oBusyIndicator, "Busy indicator is now in the DOM");
+			assert.strictEqual(document.activeElement, oBusyIndicator,
+				"Focus is redirected to the block layer after busyIndicatorDelay");
+
+			oListBox.setBusy(false);
+			done();
+		}, 200);
+	});
+
+	QUnit.test("Shift+Tab moves focus from a busy button back to the previous tabbable element", async function(assert) {
+		// A busy control whose root is itself tabbable (e.g. a <button>) holds the busy indicator
+		// as a child. Backward tabbing lands on the tabbable root; focus must escape to the
+		// previous tabbable element instead of bouncing back onto the busy indicator.
+		// The busy button is nested in a VBox (its own flex item), so it has no focusable previous
+		// element sibling - the escape must therefore use document order, not just siblings.
+		var oButtonBefore = new Button({ text: "Before" });
+		var oBusyButton = new Button({ text: "Busy", busyIndicatorDelay: 0 });
+		var oVBox = new VBox({ items: [oButtonBefore, oBusyButton] }).placeAt("failsafeTests");
+		await nextUIUpdate();
+
+		oBusyButton.setBusy(true);
+		var oBusyIndicator = oBusyButton.getDomRef("busyIndicator");
+		assert.ok(oBusyIndicator, "Busy indicator is present in the DOM");
+		assert.strictEqual(oBusyButton.getDomRef().previousElementSibling, null,
+			"Busy button has no previous element sibling (it is nested in its own flex item)");
+
+		// Focus the indicator, then simulate the browser moving focus onto the <button> root (Shift+Tab)
+		oBusyIndicator.focus();
+		assert.strictEqual(document.activeElement, oBusyIndicator, "Busy indicator is focused");
+		oBusyButton.getDomRef().focus();
+
+		assert.ok(oButtonBefore.getDomRef().contains(document.activeElement),
+			"Focus escapes to the previous tabbable element instead of bouncing back to the busy indicator");
+
+		oVBox.destroy();
 	});
 
 
@@ -554,28 +544,6 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.test("span elements for tab chain", function(assert) {
-		this.oListBox.setBusyIndicatorDelay(0);
-		var oBusySection = jQuery(this.oListBox.getDomRef(this.oListBox._sBusySection));
-		var aChildrenBefore = oBusySection.parent()[0].childNodes;
-
-		assert.equal(aChildrenBefore.length, 1, 'No busy spans inserted');
-		this.oListBox.setBusy(true);
-		assert.equal(this.oListBox.getBusy(), true, 'ListBox is busy');
-		assert.equal(aChildrenBefore.length, 3, 'busy spans inserted');
-		this.oListBox.setBusy(true);
-		assert.equal(aChildrenBefore.length, 3, 'busy spans inserted only once');
-		this.oListBox.setBusy(false);
-		assert.equal(aChildrenBefore.length, 1, 'No busy spans inserted');
-		this.oListBox.setBusy(false);
-		this.oListBox.setBusy(false);
-		assert.equal(aChildrenBefore.length, 1, 'No busy spans inserted');
-		this.oListBox.setBusy(true);
-		assert.equal(aChildrenBefore.length, 3, 'busy spans inserted only once');
-		this.oListBox.setBusy(false);
-	});
-
-
 
 	QUnit.module("Delay", {
 		beforeEach : function() {
@@ -591,54 +559,6 @@ sap.ui.define([
 			delete this.iDelay;
 			this.oButton.destroy();
 		}
-	});
-
-	QUnit.test("OnBeforeRendering", async function(assert) {
-		var done = assert.async();
-
-		this.oButton.setBusyIndicatorDelay(0);
-
-		this.oButton.placeAt("target1");
-		this.oButton.setBusy(true);
-
-		await nextUIUpdate();
-
-		// before delegate
-		this.oButton.addDelegate({
-			onBeforeRendering: function() {
-				var oControl = this.getDomRef();
-				var oBusyIndicator = this.getDomRef("busyIndicator");
-
-				assert.equal(oControl.previousElementSibling.nodeName.toLowerCase(), "span", "<span> before is available.");
-				assert.equal(oControl.previousElementSibling.getAttribute("tabindex"), 0, "Previous <span> has tabindex 0.");
-				assert.ok(oBusyIndicator, "BusyIndicator DOM is still available.");
-				assert.equal(oControl.nextElementSibling.nodeName.toLowerCase(), "span", "<span> after is available.");
-				assert.equal(oControl.previousElementSibling.getAttribute("tabindex"), 0, "Next <span> has tabindex 0.");
-			}
-		}, true, this.oButton);
-
-		// after delegate
-		this.oButton.addDelegate({
-			onBeforeRendering: function() {
-				var oControl = this.getDomRef();
-				var oBusyIndicator = this.getDomRef("busyIndicator");
-
-				// check if prev & next sibilings are either not existant or not a <span tabindex='0'> element
-				var oTabSpan = oControl.previousElementSibling;
-				assert.ok(oTabSpan === null || (oTabSpan.getAttribute("tabindex") !== "0" && oTabSpan.nodeName !== "SPAN"), "Previous tabbable span shouldn't be available.");
-
-				assert.notOk(oBusyIndicator, "BusyIndicator DOM is now removed");
-
-				oTabSpan = oControl.nextElementSibling;
-				assert.ok(oTabSpan === null || (oTabSpan.getAttribute("tabindex") !== "0" && oTabSpan.nodeName !== "SPAN"), "Previous tabbable span shouldn't be available.");
-
-				done();
-			}
-		}, false, this.oButton);
-
-		// force a rendering
-		this.oButton.invalidate();
-		await nextUIUpdate();
 	});
 
 	QUnit.test("OnAfterRendering", async function(assert) {
@@ -858,6 +778,115 @@ sap.ui.define([
 		this.oButton.setBusy(false);
 		// after reset the busy state, the control should be able to react to click event
 		this.testClickEventOn(this.oButton, assert);
+	});
+
+
+	QUnit.module("getFocusDomRef wrapping while busy", {
+		beforeEach: async function() {
+			this.oList = new List({
+				items: [new StandardListItem({ title: "Item" })]
+			}).placeAt("target1");
+			this.oList.setBusyIndicatorDelay(0);
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oList.destroy();
+		}
+	});
+
+	QUnit.test("getFocusDomRef returns block layer while control is busy", function(assert) {
+		this.oList.setBusy(true);
+
+		var oBlockLayer = this.oList.getDomRef("busyIndicator");
+		assert.ok(oBlockLayer, "Block layer DOM exists");
+		assert.strictEqual(this.oList.getFocusDomRef(), oBlockLayer,
+			"getFocusDomRef returns the block layer while the control is busy");
+	});
+
+	QUnit.test("getFocusDomRef returns original value after busy is cleared", function(assert) {
+		var oOriginalFocusDomRef = this.oList.getFocusDomRef();
+		assert.ok(oOriginalFocusDomRef, "Original getFocusDomRef returns a DOM element");
+
+		this.oList.setBusy(true);
+		assert.notStrictEqual(this.oList.getFocusDomRef(), oOriginalFocusDomRef,
+			"getFocusDomRef returns block layer, not original, while busy");
+
+		this.oList.setBusy(false);
+		assert.strictEqual(this.oList.getFocusDomRef(), oOriginalFocusDomRef,
+			"getFocusDomRef returns the original value after busy is cleared");
+	});
+
+	QUnit.test("Subclass getFocusDomRef override is respected when not busy", async function(assert) {
+		// Create a control with a custom getFocusDomRef override
+		var oButton = new Button({ text: "Custom" });
+		oButton.setBusyIndicatorDelay(0);
+		oButton.placeAt("target1");
+		await nextUIUpdate();
+
+		// Button overrides getFocusDomRef — store its result before busy
+		var oSubclassFocusDom = oButton.getFocusDomRef();
+		assert.ok(oSubclassFocusDom, "Button has a custom getFocusDomRef result");
+
+		oButton.setBusy(true);
+		var oBlockLayer = oButton.getDomRef("busyIndicator");
+		assert.strictEqual(oButton.getFocusDomRef(), oBlockLayer,
+			"getFocusDomRef returns block layer while busy");
+
+		oButton.setBusy(false);
+		assert.strictEqual(oButton.getFocusDomRef(), oSubclassFocusDom,
+			"Subclass getFocusDomRef override is restored after busy is cleared");
+
+		oButton.destroy();
+	});
+
+	QUnit.test("getFocusDomRef wrapping survives rerendering while busy", async function(assert) {
+		this.oList.setBusy(true);
+
+		var oBlockLayer = this.oList.getDomRef("busyIndicator");
+		assert.strictEqual(this.oList.getFocusDomRef(), oBlockLayer,
+			"getFocusDomRef returns block layer before rerendering");
+
+		// Trigger rerender
+		this.oList.invalidate();
+		await nextUIUpdate();
+
+		var oNewBlockLayer = this.oList.getDomRef("busyIndicator");
+		assert.ok(oNewBlockLayer, "New block layer exists after rerendering");
+		assert.strictEqual(this.oList.getFocusDomRef(), oNewBlockLayer,
+			"getFocusDomRef returns the new block layer after rerendering");
+	});
+
+	QUnit.test("focus() targets block layer while busy", function(assert) {
+		this.oList.setBusy(true);
+
+		var oBlockLayer = this.oList.getDomRef("busyIndicator");
+		this.oList.focus();
+
+		assert.strictEqual(document.activeElement, oBlockLayer,
+			"focus() on a busy control sets focus to the block layer");
+	});
+
+	QUnit.test("Focus stays on block layer after rerendering a focused busy control", async function(assert) {
+		// Focus the control before it becomes busy
+		this.oList.focus();
+		assert.ok(this.oList.getDomRef().contains(document.activeElement),
+			"Control has focus before becoming busy");
+
+		// Make the control busy — focus should move to block layer
+		this.oList.setBusy(true);
+		var oBlockLayer = this.oList.getDomRef("busyIndicator");
+		assert.strictEqual(document.activeElement, oBlockLayer,
+			"Block layer is focused after setting busy");
+
+		// Trigger rerender
+		this.oList.invalidate();
+		await nextUIUpdate();
+
+		// After rerendering, focus should still be on the (new) block layer
+		var oNewBlockLayer = this.oList.getDomRef("busyIndicator");
+		assert.ok(oNewBlockLayer, "Block layer exists after rerendering");
+		assert.strictEqual(document.activeElement, oNewBlockLayer,
+			"Focus is on the block layer after rerendering a focused busy control");
 	});
 
 

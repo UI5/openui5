@@ -835,6 +835,8 @@ sap.ui.define([
 			oDomRefToFocus,
 			oControl;
 
+		this.getContent();
+
 		if (this._shouldGetFocusAfterOpen()) {
 			if (this._sInitialFocusId) {
 				oControl = Element.getElementById(this._sInitialFocusId);
