@@ -628,21 +628,18 @@ sap.ui.define([
 		 * Returns the aria attributes for the column row header cell.
 		 *
 		 * @param {sap.ui.table.extensions.Accessibility} oExtension The accessibility extension
-		 * @param {{bLabel: boolean}} mParams Whether an aria-label should be added
 		 * @returns {object} An object containing the aria attributes
 		 */
-		getAriaAttributesForColumnRowHeaderCell: function(oExtension, mParams) {
+		getAriaAttributesForColumnRowHeaderCell: function(oExtension) {
 			const mAttributes = {"role": "columnheader"};
 			const oTable = oExtension.getTable();
 			const sSelectionMode = oTable.getSelectionMode();
 
-			if (mParams.bLabel) {
-				if (sSelectionMode !== SelectionMode.None) {
-					mAttributes["aria-label"] = TableUtils.getResourceText("TBL_TABLE_SELECTION_COLUMNHEADER");
-				} else if (TableUtils.hasRowHeader(oTable)) {
-					// Table has no selection, but because group mode is active, selection column is still visible with focusable row header cells.
-					mAttributes["aria-label"] = TableUtils.getResourceText("TBL_ROW_SELECTION_COLUMN_LABEL");
-				}
+			if (sSelectionMode !== SelectionMode.None) {
+				mAttributes["aria-label"] = TableUtils.getResourceText("TBL_TABLE_SELECTION_COLUMNHEADER");
+			} else if (TableUtils.hasRowHeader(oTable)) {
+				// Table has no selection, but because group mode is active, selection column is still visible with focusable row header cells.
+				mAttributes["aria-label"] = TableUtils.getResourceText("TBL_ROW_SELECTION_COLUMN_LABEL");
 			}
 
 			return mAttributes;
@@ -658,12 +655,7 @@ sap.ui.define([
 		getAriaAttributesForColumnRowHeader: function(oExtension, mParams) {
 			const mAttributes = {};
 			const oTable = oExtension.getTable();
-
 			const mRenderConfig = oTable._getSelectionPlugin().getRenderConfig();
-
-			if (oTable.getSelectionMode() !== SelectionMode.None) {
-				mAttributes["aria-label"] = TableUtils.getResourceText("TBL_TABLE_SELECTION_COLUMNHEADER");
-			}
 
 			if (mRenderConfig.headerSelector.visible) {
 				if (mRenderConfig.headerSelector.type === "toggle") {

@@ -419,7 +419,7 @@ sap.ui.define([
 			// are rendered in the same row which does not affect the announcement because the row has aria-hidden.
 			for (let i = 0; i < iHeaderRowCount - 1; i++) {
 				rm.openStart("div", oTable.getId() + "-rowcolhdr" + i);
-				oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "ColumnRowHeaderCell", {bLabel: false});
+				oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "ColumnRowHeaderCell");
 				rm.openEnd();
 				rm.close("div");
 			}
@@ -428,7 +428,7 @@ sap.ui.define([
 			rm.openStart("div", oTable.getId() + "-rowcolhdr");
 		}
 
-		oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "ColumnRowHeaderCell", {bLabel: true});
+		oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "ColumnRowHeaderCell");
 		rm.openEnd();
 		rm.openStart("div", oTable.getId() + "-selall");
 

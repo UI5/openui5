@@ -1411,7 +1411,7 @@ sap.ui.define([
 		checkAriaSelected(this.oTable.qunit.getRowActionCell(1).getAttribute("aria-selected"), false, assert);
 	});
 
-	QUnit.module("SelectAll", {
+	QUnit.module("Header Selector", {
 		beforeEach: async function() {
 			await createTables();
 			await _modifyTables();
@@ -1421,7 +1421,27 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("aria-labelledby without Focus", function(assert) {
+	QUnit.test("Cell: role", function(assert) {
+		const oCell = getSelectAll().parent()[0];
+		assert.strictEqual(oCell.getAttribute("role"), "columnheader");
+	});
+
+	QUnit.test("Cell: aria-label", async function(assert) {
+		const oCell = getSelectAll().parent()[0];
+
+		assert.strictEqual(oCell.getAttribute("aria-label"), TableUtils.getResourceText("TBL_TABLE_SELECTION_COLUMNHEADER"), "Selection enabled");
+
+		oTable.setSelectionMode(SelectionMode.None);
+		await nextUIUpdate();
+		assert.strictEqual(oCell.getAttribute("aria-label"), null, "Selection disabled");
+
+		TableUtils.Grouping.setHierarchyMode(oTable, TableUtils.Grouping.HierarchyMode.Group);
+		await nextUIUpdate();
+		assert.strictEqual(oCell.getAttribute("aria-label"), TableUtils.getResourceText("TBL_ROW_SELECTION_COLUMN_LABEL"),
+			"Selection disabled. Hierarchy mode set to 'Group'");
+	});
+
+	QUnit.test("Cell content: aria-labelledby without Focus", function(assert) {
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
 		const $Cell = getSelectAll(false, assert);
 		assert.strictEqual(($Cell.attr("aria-labelledby") || "").trim(),
@@ -1429,7 +1449,7 @@ sap.ui.define([
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
 	});
 
-	QUnit.test("aria-describedby with Focus", function(assert) {
+	QUnit.test("Cell content: aria-describedby with Focus", function(assert) {
 		const done = assert.async();
 		const $Cell = getSelectAll(true, assert);
 		assert.strictEqual(($Cell.attr("aria-describedby") || "").trim(), "", "aria-describedby of select all");
@@ -1439,14 +1459,14 @@ sap.ui.define([
 		}, 100);
 	});
 
-	QUnit.test("aria-describedby without Focus", function(assert) {
+	QUnit.test("Cell content: aria-describedby without Focus", function(assert) {
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
 		const $Cell = getSelectAll(false, assert);
 		assert.strictEqual(($Cell.attr("aria-describedby") || "").trim(), "", "aria-describedby of select all");
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
 	});
 
-	QUnit.test("Other ARIA attributes of select all cell", async function(assert) {
+	QUnit.test("Cell content: Other ARIA attributes", async function(assert) {
 		let $Elem = getSelectAll(false);
 		assert.strictEqual($Elem.attr("role"), "checkbox", "role");
 		assert.strictEqual($Elem.attr("aria-checked"), "false", "aria-checked");
