@@ -73249,13 +73249,19 @@ make root = ${bMakeRoot}`;
 	// JIRA: CPOUI5ODATAV4-3555
 	//
 	// Check that auto-$expand/$select works, incl. manual $select (JIRA: CPOUI5ODATAV4-3438)
+	// Check that "createCompleted" and "createSent" events are fired (JIRA: CPOUI5ODATAV4-3684)
 ["delete", "resetChanges", "setProperty"].forEach((sMethod) => {
 	const sTitle = "Data Aggregation: setContext w/ transient; finally do " + sMethod;
 
 	QUnit.test(sTitle, async function (assert) {
-		const oModel = this.createSalesOrdersModel({autoExpandSelect : true}, {}, [],
-			/*bExpandAfterConcatSupported*/true);
-		const sView = `
+		var oCreateCompletedPromise,
+			oCreateSentPromise,
+			oModel = this.createSalesOrdersModel({autoExpandSelect : true}, {}, [],
+				/*bExpandAfterConcatSupported*/true),
+			fnResolveCreateCompleted,
+			fnResolveCreateSent,
+			oTransientContext,
+			sView = `
 <FlexBox id="flexbox" binding="{/SalesOrderList('42')}">
 	<t:Table id="table" rows="{path : 'SO_2_SOITEM',
 			parameters : {
@@ -73278,6 +73284,51 @@ make root = ${bMakeRoot}`;
 		<Text id="tax" text="{TaxAmount}"/>
 	</t:Table>
 </FlexBox>`;
+
+		/*
+		 * Event handler for createCompleted event. Checks that "context" and "success" parameters
+		 * are as expected and resolves the promise for the createCompleted event.
+		 */
+		function onCreateCompleted(oEvent) {
+			assert.ok(fnResolveCreateCompleted, "expect createCompleted");
+			assert.strictEqual(oEvent.getParameter("context"), oTransientContext);
+			assert.strictEqual(oEvent.getParameter("success"), fnResolveCreateCompleted.bSuccess);
+			fnResolveCreateCompleted();
+			fnResolveCreateCompleted = undefined;
+		}
+
+		/*
+		 * Event handler for createSent event. Checks that the "context" parameter is as expected
+		 * and resolves the promise for the createSent event.
+		 */
+		function onCreateSent(oEvent) {
+			assert.ok(fnResolveCreateSent, "expect createSent");
+			assert.strictEqual(oEvent.getParameter("context"), oTransientContext);
+			fnResolveCreateSent();
+			fnResolveCreateSent = undefined;
+		}
+
+		/*
+		 * Creates a pending promise for the createCompleted event. It is resolved when the event
+		 * handler for createCompleted is called.
+		 * @param {boolean} bSuccess The expected success flag in the createCompleted event payload
+		 */
+		function expectCreateCompleted(bSuccess) {
+			return new Promise(function (resolve) {
+				fnResolveCreateCompleted = resolve;
+				fnResolveCreateCompleted.bSuccess = bSuccess;
+			});
+		}
+
+		/*
+		 * Creates a pending promise for the createSent event. It is resolved when the event handler
+		 * for createSent is called.
+		 */
+		function expectCreateSent() {
+			return new Promise(function (resolve) {
+				fnResolveCreateSent = resolve;
+			});
+		}
 
 		const sUrl = "SalesOrderList('42')/SO_2_SOITEM?"
 			+ "$apply=concat(aggregate(TaxAmount,CurrencyCode)"
@@ -73324,7 +73375,8 @@ make root = ${bMakeRoot}`;
 
 		this.expectChange("tax", [, "80", "250"]);
 
-		const oTransientContext = oListBinding.create({TaxAmount : "80"}, true, true);
+		// code under test
+		oTransientContext = oListBinding.create({TaxAmount : "80"}, true, true);
 
 		await this.waitForChanges(assert, "create transient");
 
@@ -73403,6 +73455,11 @@ make root = ${bMakeRoot}`;
 				break;
 
 			case "setProperty":
+				oCreateCompletedPromise = expectCreateCompleted(true);
+				oListBinding.attachCreateCompleted(onCreateCompleted);
+				oCreateSentPromise = expectCreateSent();
+				oListBinding.attachCreateSent(onCreateSent);
+
 				this.expectChange("tax", [, "81"])
 					.expectRequest("#4 POST SalesOrderList('42')/SO_2_SOITEM", {
 						payload : {
@@ -73430,6 +73487,8 @@ make root = ${bMakeRoot}`;
 					// code under test
 					oTransientContext.setProperty("TaxAmount", "81", "update"),
 					oTransientContext.created(),
+					oCreateSentPromise,
+					oCreateCompletedPromise,
 					oModel.submitBatch("update")
 				]).then(() => {
 					assert.deepEqual(oTransientContext.getObject(), {
