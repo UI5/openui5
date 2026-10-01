@@ -4,7 +4,7 @@
  */
 /* =================================== */
 /* CSS for control sap.m/StandardTile  */
-/* Fiori 3 theme                       */
+/* Quartz Light theme                  */
 /* =================================== */
 
 .sapMStdTileIconDiv {
@@ -16,11 +16,11 @@
 }
 
 .sapMStdTileMonitorType {
-	background-color: darken(@sapUiTileBackground, 5);
+	background-color: ~'hsl(from var(--sapTile_Background) h s calc(l - 5%))';
 }
 
 .sapMTCEditable .sapMStdTileMonitorType {
-	background-color: fade(darken(@sapUiTileBackground, 5), 50);
+	background-color: ~'hsl(from var(--sapTile_Background) h s calc(l - 5%) / 0.5)';
 }
 
 .sapMStdTileMonitorType .sapMStdTileTitle {
