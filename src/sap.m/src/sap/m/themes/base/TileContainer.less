@@ -40,7 +40,7 @@ html.sap-desktop .sapMTC .sapMTCScroller:focus,
 	top: 0;
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
-	-moz-user-select: none;
+	user-select: none;
 }
 
 html.sap-tablet .sapMTC .sapMTCScrl,
@@ -85,8 +85,8 @@ html.sap-phone .sapMTC .sapMTCScrl {
 	left: 0;
 	bottom: 0;
 	right: 0;
-	display:none;
-	box-shadow: @sapUiShadowLevel1;
+	display: none;
+	box-shadow: var(--sapContent_Shadow1);
 }
 
 .sapMTC .sapMTCPager span.sapMTCActive {
@@ -105,7 +105,7 @@ html.sap-phone .sapMTC .sapMTCScrl {
 	cursor: default;
 	transition-property: opacity, left, right;
 	transition-duration: 0.4s;
-	box-shadow: @sapUiShadowLevel1;
+	box-shadow: var(--sapContent_Shadow1);
 	padding: 0.25rem;
 	box-sizing: border-box;
 }
@@ -164,15 +164,15 @@ html.sap-phone .sapMTC .sapMTCScrl {
 	left: 0;
 }
 
-html[dir=rtl] .sapMTC .sapMTile,
-html[dir=rtl] .sapMTC .sapMCustomTile {
+html[dir='rtl'] .sapMTC .sapMTile,
+html[dir='rtl'] .sapMTC .sapMCustomTile {
 	left: auto;
 	right: 0;
 }
 
 html.sap-tablet .sapMTC .sapMTCScroller,
 html.sap-phone .sapMTC .sapMTCScroller {
-	display : none;
+	display: none;
 }
 
 .sapMTC .sapMTCRemove {
@@ -181,7 +181,7 @@ html.sap-phone .sapMTC .sapMTCScroller {
 
 .sapMTC.sapMTCEditable .sapMTile {
 	cursor: move;
-	box-shadow: @sapUiShadowLevel0;
+	box-shadow: var(--sapContent_Shadow0);
 }
 
 .sapMTC.sapMTCEditable .sapMTCRemove {
@@ -232,26 +232,26 @@ html[data-sap-ui-browser^='ff'] .sapMTC.sapMTCEditable .sapMTile .sapMTCRemove {
 
 /* use dir-specific rules to prevent mirroring in dir=rtl mode */
 .sapMTC .sapMTCEdgeRight,
-html[dir=rtl] .sapMTC .sapMTCEdgeLeft {
+html[dir='rtl'] .sapMTC .sapMTCEdgeLeft {
 	position: absolute;
 	top: 0;
 	right: 0;
 	width: 2.5rem;
 	height: 100%;
-	border-right: 0.125rem solid fade(lighten(@sapUiHighlight,20),60);
+	border-right: 0.125rem solid ~'hsl(from var(--sapHighlightColor) h s calc(l + 20) / 0.6)';
 	opacity: 0.01;
 	background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 76%, rgba(255,255,255,1) 100%);
 }
 
 /* use dir-specific rules to prevent mirroring in dir=rtl mode */
 .sapMTC .sapMTCEdgeLeft,
-html[dir=rtl] .sapMTC .sapMTCEdgeRight {
+html[dir='rtl'] .sapMTC .sapMTCEdgeRight {
 	position: absolute;
 	top: 0;
 	left: 0;
 	width: 2.5rem;
 	height: 100%;
-	border-left: 0.125rem solid fade(lighten(@sapUiHighlight,20),60);
+	border-left: 0.125rem solid ~'hsl(from var(--sapHighlightColor) h s calc(l + 20) / 0.6)';
 	opacity: 0.01;
 	background: linear-gradient(to right, rgba(255,255,255,1) 0%,rgba(255,255,255,1) 24%,rgba(255,255,255,0) 100%);
 }
