@@ -5949,6 +5949,44 @@ sap.ui.define([
 		document.dispatchEvent(new PointerEvent("pointerup")); // Release the handle to clean up the drag listeners.
 	});
 
+	QUnit.test("Fast handle drag while touch scrolling is active", async function(assert) {
+		this.makeBindingNonClient();
+		this.oTable.setShowScrollHandle(library.ShowScrollHandle.Default);
+		await this.oTable.qunit.rendered();
+
+		const oScrollExtension = this.oTable._getScrollExtension();
+		const oVSb = oScrollExtension.getVerticalScrollbar();
+		const oTableContent = this.oTable.getDomRef("tableCCnt");
+
+		// Simulate a touch scroll with enough velocity to trigger a momentum animation.
+		oTableContent.dispatchEvent(new PointerEvent("pointerdown", {pointerType: "touch", clientX: 100, clientY: 200}));
+		await TableQUnitUtils.sleep(20);
+		oTableContent.dispatchEvent(new PointerEvent("pointermove", {pointerType: "touch", clientX: 100, clientY: 160}));
+		oTableContent.dispatchEvent(new PointerEvent("pointerup", {pointerType: "touch", clientX: 100, clientY: 160}));
+		await TableQUnitUtils.sleep(20);
+
+		const oHandle = oVSb.parentElement.querySelector(".sapUiTableVScrHandle");
+		oHandle.dispatchEvent(new PointerEvent("pointerdown", {clientY: 0}));
+
+		const iScrollTopAfterGrab = oVSb.scrollTop;
+		await TableQUnitUtils.sleep(100);
+		assert.equal(oVSb.scrollTop, iScrollTopAfterGrab, "Scroll position does not change after grabbing the handle");
+
+		const iInitialFirstVisibleRow = this.oTable.getFirstVisibleRow();
+		oVSb.scrollTop += 490; // 10 rows at once.
+		await this.oTable.qunit.vScrolled();
+		await TableQUnitUtils.sleep(200);
+
+		assert.equal(this.oTable.getFirstVisibleRow(), iInitialFirstVisibleRow, "firstVisibleRow not updated immediately for a fast handle drag");
+		this.assertSkeletons(true);
+
+		await TableQUnitUtils.sleep(200);
+		assert.ok(this.oTable.getFirstVisibleRow() > iInitialFirstVisibleRow, "firstVisibleRow updated after the debounce");
+		this.assertSkeletons(false);
+
+		document.dispatchEvent(new PointerEvent("pointerup")); // Release the handle to clean up the drag listeners.
+	});
+
 	QUnit.test("Fast handle drag updates the handle during the debounce", async function(assert) {
 		this.makeBindingNonClient();
 		this.oTable.setShowScrollHandle(library.ShowScrollHandle.On);
