@@ -487,4 +487,46 @@ sap.ui.define([
 		var oTileContent = this.oToDo.getTileContent()[0];
 		assert.ok(getComputedStyle(oTileContent.getDomRef()).marginBottom.slice(0,-2) !== '0',"Margin Bottom has been added to create space between the button and the tile");
 	});
+
+	QUnit.module("Busy Indicator Styling", {
+		beforeEach: async function() {
+			this.oActionTile = new ActionTile("busyTile", {
+				header: "Test Tile",
+				tileContent: new ActionTileContent({
+					attributes: [
+						new TileAttribute({
+							label: "Test Attribute",
+							contentConfig: new ContentConfig({
+								type: ContentConfigType.Text,
+								text: "Test Value"
+							})
+						})
+					]
+				})
+			}).placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oActionTile.destroy();
+			this.oActionTile = null;
+		}
+	});
+
+	QUnit.test("Busy indicator is not inside sapMGTContentWrapper so its focus outline is not clipped", async function(assert) {
+		//Arrange
+		this.oActionTile.setBusyIndicatorDelay(0);
+		this.oActionTile.setBusy(true);
+		await nextUIUpdate();
+
+		//Act
+		var oTileDomRef = this.oActionTile.getDomRef();
+		var oContentWrapper = oTileDomRef.querySelector(".sapMGTContentWrapper");
+		var oBusyIndicator = oTileDomRef.querySelector(".sapUiLocalBusyIndicator");
+
+		//Assert
+		assert.ok(oBusyIndicator, "Busy indicator is rendered");
+		assert.ok(oContentWrapper, "sapMGTContentWrapper is rendered");
+		assert.notOk(oContentWrapper.contains(oBusyIndicator), "Busy indicator is outside sapMGTContentWrapper so its focus outline is not clipped by overflow:hidden");
+	});
+
 });
