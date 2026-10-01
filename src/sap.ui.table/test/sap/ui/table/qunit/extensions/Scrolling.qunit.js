@@ -6176,6 +6176,18 @@ sap.ui.define([
 		oHandle = this.getHandle();
 		sText = oHandle.firstChild.textContent;
 		assert.equal(sText, TableUtils.getResourceText("TBL_SCROLL_HANDLE_ROWS_OF", [3, 8, 100]));
+
+		// Simulate a binding that doesn't implement isLengthFinal (e.g. AnalyticalBinding extends TreeBinding, not ListBinding).
+		// The optional chaining in setScrollHandleContent must not throw and must fall back to the text without total.
+		const oMissingIsLengthFinalStub = sinon.stub(oBinding, "isLengthFinal").value(undefined);
+		oVSb.dispatchEvent(new Event("pointerdown"));
+
+		oHandle = this.getHandle();
+		sText = oHandle.firstChild.textContent;
+		assert.equal(sText, TableUtils.getResourceText("TBL_SCROLL_HANDLE_ROWS", [3, 8]),
+			"Falls back to the text without total when the binding doesn't implement isLengthFinal");
+
+		oMissingIsLengthFinalStub.restore();
 	});
 
 	QUnit.test("Reuses existing element on repeated calls", function(assert) {

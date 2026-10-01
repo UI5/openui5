@@ -1919,7 +1919,7 @@ sap.ui.define([
 			const mRowCounts = oTable._getRowCounts();
 			const iFirstRow = iFirstRowIndex + 1 + mRowCounts.fixedTop;
 			const iLastRow = iFirstRow - 1 + mRowCounts.scrollable;
-			const bTotalKnown = oTable.getBinding().isLengthFinal();
+			const bTotalKnown = oTable.getBinding().isLengthFinal?.();
 			let sText;
 
 			if (bTotalKnown) {
