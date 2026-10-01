@@ -386,9 +386,9 @@ sap.ui.define([
 		assert.strictEqual(sDraggableAttr && sDraggableAttr.value, "false", "The draggable attribute is set to false.");
 		assert.strictEqual(oTileElement.getAttribute("role"), "link", "The role attribute for the link element is set to link.");
 		assert.strictEqual(oTileElement.href, sLink, "The link is correctly set.");
-		assert.strictEqual(document.getElementById("generic-tile-content").parentNode, oTileElement, "The tile content is a child of the link.");
-		assert.strictEqual(document.getElementById("generic-tile-hover-overlay").parentNode, oTileElement, "The tile overlay is a child of the link.");
-		assert.strictEqual(document.getElementById("generic-tile-focus").parentNode, oTileElement, "The tile content is a child of the link.");
+		assert.ok(oTileElement.contains(document.getElementById("generic-tile-content")), "The tile content is a descendant of the link.");
+		assert.strictEqual(document.getElementById("generic-tile-hover-overlay").parentNode, oTileElement, "The tile overlay is a direct child of the link.");
+		assert.strictEqual(document.getElementById("generic-tile-focus").parentNode, oTileElement, "The focus div is a direct child of the link.");
 	});
 
 	/**
@@ -452,12 +452,20 @@ sap.ui.define([
 		assert.notOk(document.querySelector("#generic-tile .sapMGTCriticalBorder"), "Generic tile border was not rendered");
 	});
 
-	QUnit.test("GenericTile has overflow hidden to clip valueColor border", async function(assert) {
+	QUnit.test("GenericTile has overflow hidden on content wrapper to clip valueColor border", async function(assert) {
 		this.oGenericTile.setValueColor("Error");
 		await nextUIUpdate();
 		var oTileDomRef = document.querySelector("#generic-tile");
-		var sOverflow = window.getComputedStyle(oTileDomRef).overflow;
-		assert.strictEqual(sOverflow, "hidden", "GenericTile has overflow:hidden to properly clip the valueColor border");
+		var oContentWrapper = oTileDomRef.querySelector(".sapMGTContentWrapper");
+		assert.ok(oContentWrapper, "sapMGTContentWrapper is rendered inside the tile");
+		var sWrapperOverflow = window.getComputedStyle(oContentWrapper).overflow;
+		assert.strictEqual(sWrapperOverflow, "hidden", "sapMGTContentWrapper has overflow:hidden to clip the valueColor border");
+		var sTileOverflow = window.getComputedStyle(oTileDomRef).overflow;
+		assert.notStrictEqual(sTileOverflow, "hidden", "sapMGT root does not have overflow:hidden so the focus ring is not clipped");
+		assert.ok(oContentWrapper.querySelector(".sapMGTCriticalBorder"), "sapMGTCriticalBorder is inside the content wrapper and gets clipped correctly");
+		var oFocusDiv = oTileDomRef.querySelector(".sapMGTFocusDiv");
+		assert.ok(oFocusDiv, "sapMGTFocusDiv is rendered");
+		assert.notOk(oContentWrapper.contains(oFocusDiv), "sapMGTFocusDiv is outside the content wrapper so it is not clipped");
 	});
 
 	QUnit.test("GenericTile is dragged", async function(assert) {
@@ -2272,7 +2280,7 @@ sap.ui.define([
 		this.oGenericTile.setState("Loading");
 		await nextUIUpdate();
 		//Act
-		var oDomRef = this.oGenericTile.getDomRef().children[0];
+		var oDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[0];
 		//Assert
 		assert.ok(oDomRef.classList.contains("sapMGTContentShimmerPlaceholderItem"), "Placeholder div is present when state is loading");
 		//Arrange
@@ -3994,7 +4002,7 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 					this.oGenericTile.setState("Loading");
 					await nextUIUpdate();
 					setTimeout(async function(){
-						var oDomRef = this.oGenericTile.getDomRef().children[0];
+						var oDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[0];
 						assert.ok(oDomRef.classList.contains("sapMGTContentShimmerPlaceholderItemOneByOne"), "Placeholder div is present when state is loading");
 						this.oGenericTile.setState("Loaded");
 						await nextUIUpdate();
@@ -4074,7 +4082,7 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 					this.oGenericTile.setState("Loading");
 					await nextUIUpdate();
 					setTimeout(async function(){
-						var oDomRef = this.oGenericTile.getDomRef().children[0];
+						var oDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[0];
 						assert.ok(oDomRef.classList.contains("sapMGTContentShimmerPlaceholderItemTwoByHalf"), "Placeholder div is present when state is loading");
 						this.oGenericTile.setState("Loaded");
 						await nextUIUpdate();
@@ -4864,7 +4872,7 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 		this.oGenericTile.setState(LoadState.Loading);
 		await nextUIUpdate();
 		//Act
-		var oDomRef = this.oGenericTile.getDomRef().children[0];
+		var oDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[0];
 		//Assert
 		assert.ok(oDomRef.classList.contains("sapMGTContentShimmerPlaceholderItemOneByOne"), "Placeholder div is present when state is loading");
 		assert.ok(oDomRef.children[0].classList.contains("sapMGTContentShimmerPlaceholderRowsOneByOne"), "Row Placeholder div is present when state is loading");
@@ -4880,7 +4888,7 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 		this.oGenericTile.setIconLoaded(false);
 		await nextUIUpdate();
 		//Act
-		var oDomRef = this.oGenericTile.getDomRef().children[0];
+		var oDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[0];
 		//Assert
 		assert.equal(this.oGenericTile.getIconLoaded(), false, "IconLoaded property = false");
 		assert.ok(oDomRef.classList.contains("sapMGTContentShimmerPlaceholderItemOneByOne"), "Placeholder div is present when state is loading");
@@ -4897,8 +4905,8 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 		this.oGenericTile.setState(LoadState.Loaded);
 		await nextUIUpdate();
 		//Act
-		var oPlaceHolderDomRef = this.oGenericTile.getDomRef().children[0];
-		var oContentDomRef = this.oGenericTile.getDomRef().children[1];
+		var oPlaceHolderDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[0];
+		var oContentDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[1];
 		//Assert
 		assert.ok(oPlaceHolderDomRef.classList.contains("sapMGTContentShimmerPlaceholderItemOneByOne"), "Placeholder div is present when state is loaded");
 		assert.ok(oPlaceHolderDomRef.children[0].classList.contains("sapMGTContentShimmerPlaceholderRowsOneByOne"), "Row Placeholder div is present when state is loading");
@@ -4931,7 +4939,7 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 		this.oGenericTile.setIconLoaded(false);
 		await nextUIUpdate();
 		//Act
-		var oDomRef = this.oGenericTile.getDomRef().children[0];
+		var oDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[0];
 		//Assert
 		assert.equal(this.oGenericTile.getIconLoaded(), false, "IconLoaded property = false");
 		assert.ok(oDomRef.classList.contains("sapMGTContentShimmerPlaceholderItemOneByOne"), "Placeholder div is present when state is loading");
@@ -4948,8 +4956,8 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 		this.oGenericTile.setIconLoaded(false);
 		await nextUIUpdate();
 		//Act
-		var oPlaceHolderDomRef = this.oGenericTile.getDomRef().children[0];
-		var oContentDomRef = this.oGenericTile.getDomRef().children[1];
+		var oPlaceHolderDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[0];
+		var oContentDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[1];
 		//Assert
 		assert.ok(oPlaceHolderDomRef.classList.contains("sapMGTContentShimmerPlaceholderItemOneByOne"), "Placeholder div is not present when state is loaded");
 		assert.ok(oPlaceHolderDomRef.children[0].classList.contains("sapMGTContentShimmerPlaceholderRowsOneByOne"), "Row Placeholder div is present when state is loaded");
@@ -4982,7 +4990,7 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 		this.oGenericTile.setState(LoadState.Loading);
 		await nextUIUpdate();
 		//Act
-		var oDomRef = this.oGenericTile.getDomRef().children[0];
+		var oDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[0];
 		//Assert
 		assert.ok(oDomRef.classList.contains("sapMGTContentShimmerPlaceholderItemTwoByHalf"), "Placeholder div is present when state is loading");
 		assert.ok(oDomRef.children[0].classList.contains("sapMGTContentShimmerPlaceholderRowsTwoByHalf"), "Row Placeholder div is present when state is loading");
@@ -4998,7 +5006,7 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 		this.oGenericTile.setIconLoaded(false);
 		await nextUIUpdate();
 		//Act
-		var oDomRef = this.oGenericTile.getDomRef().children[0];
+		var oDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[0];
 		//Assert
 		assert.equal(this.oGenericTile.getIconLoaded(), false, "IconLoaded property = false");
 		assert.ok(oDomRef.classList.contains("sapMGTContentShimmerPlaceholderItemTwoByHalf"), "Placeholder div is present when state is loading");
@@ -5015,8 +5023,8 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 		this.oGenericTile.setState(LoadState.Loaded);
 		await nextUIUpdate();
 		//Act
-		var oPlaceHolderDomRef = this.oGenericTile.getDomRef().children[0];
-		var oContentDomRef = this.oGenericTile.getDomRef().children[1];
+		var oPlaceHolderDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[0];
+		var oContentDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[1];
 		//Assert
 		assert.ok(oPlaceHolderDomRef.classList.contains("sapMGTContentShimmerPlaceholderItemTwoByHalf"), "Placeholder div is present when state is loaded");
 		assert.ok(oPlaceHolderDomRef.children[0].classList.contains("sapMGTContentShimmerPlaceholderRowsTwoByHalf"), "Row Placeholder div is present when state is loading");
@@ -5033,8 +5041,8 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 		this.oGenericTile.setIconLoaded(true);
 		await nextUIUpdate();
 		//Act
-		var oIconDomRef = this.oGenericTile.getDomRef().children[0];
-		var oContentDomRef = this.oGenericTile.getDomRef().children[1];
+		var oIconDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[0];
+		var oContentDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[1];
 		//Assert
 		assert.notOk(oIconDomRef.classList.contains("sapMGTContentShimmerPlaceholderItemTwoByHalf"), "Placeholder div is not present when state is loaded");
 		assert.ok(oIconDomRef.classList.contains("sapMGTTwoByHalfIcon"), "Icon div is present when state is loaded");
@@ -5049,7 +5057,7 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 		this.oGenericTile.setIconLoaded(false);
 		await nextUIUpdate();
 		//Act
-		var oDomRef = this.oGenericTile.getDomRef().children[0];
+		var oDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[0];
 		//Assert
 		assert.equal(this.oGenericTile.getIconLoaded(), false, "IconLoaded property = false");
 		assert.ok(oDomRef.classList.contains("sapMGTContentShimmerPlaceholderItemTwoByHalf"), "Placeholder div is present when state is loading");
@@ -5066,8 +5074,8 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 		this.oGenericTile.setIconLoaded(false);
 		await nextUIUpdate();
 		//Act
-		var oPlaceHolderDomRef = this.oGenericTile.getDomRef().children[0];
-		var oContentDomRef = this.oGenericTile.getDomRef().children[1];
+		var oPlaceHolderDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[0];
+		var oContentDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[1];
 		//Assert
 		assert.ok(oPlaceHolderDomRef.classList.contains("sapMGTContentShimmerPlaceholderItemTwoByHalf"), "Placeholder div is not present when state is loaded");
 		assert.ok(oPlaceHolderDomRef.children[0].classList.contains("sapMGTContentShimmerPlaceholderRowsTwoByHalf"), "Row Placeholder div is present when state is loaded");
@@ -5084,8 +5092,8 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 		this.oGenericTile.setIconLoaded(true);
 		await nextUIUpdate();
 		//Act
-		var oIconDomRef = this.oGenericTile.getDomRef().children[0];
-		var oContentDomRef = this.oGenericTile.getDomRef().children[1];
+		var oIconDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[0];
+		var oContentDomRef = this.oGenericTile.getDomRef().querySelector(".sapMGTContentWrapper").children[1];
 		//Assert
 		assert.notOk(oIconDomRef.classList.contains("sapMGTContentShimmerPlaceholderItemTwoByHalf"), "Placeholder div is not present when state is loaded");
 		assert.ok(oIconDomRef.classList.contains("sapMGTTwoByHalfIcon"), "Icon div is present when state is loaded");
