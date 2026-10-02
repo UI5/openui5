@@ -1316,6 +1316,15 @@ sap.ui.define([
 			PopoverResize: {
 				title: "QUnit Page for resizing in sap.m.Popover"
 			},
+			PopoverResizeKeyboard: {
+				title: "QUnit Page for keyboard resizing in sap.m.Popover"
+			},
+			PopoverResizeKeyboardRTL: {
+				title: "QUnit Page for keyboard resizing in sap.m.Popover in RTL mode",
+				ui5: {
+					rtl: true
+				}
+			},
 			PopoverResizeRTL: {
 				title: "QUnit Page for resizing in sap.m.Popover in RTL mode",
 				ui5: {
