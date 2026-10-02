@@ -5,8 +5,8 @@
 
 .sapUiCrslCnt {
 	font-family: var(--sapFontFamily);
-	font-size: @sapUiDesktopFontSize;
-	border-color: darken(@sapUiContentForegroundBorderColor, 24.6);
+	font-size: var(--sapFontSmallSize);
+	border-color: ~'hsl(from var(--sapContent_ForegroundBorderColor) h s calc(l - 24.6))';
 }
 
 .sapUiCrslHorizontal .sapUiCrslCnt {
