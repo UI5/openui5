@@ -1,5 +1,8 @@
-<mvc:View xmlns:mvc="sap.ui.core.mvc"
-	xmlns="sap.m" controllerName="sap.ui.fl.support.apps.contentbrowser.controller.Layers">
+<mvc:View
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	controllerName="sap.ui.fl.support.apps.contentbrowser.controller.Layers"
+>
 	<Page title="Layers">
 		<List id="masterComponentsList" items="{layers>/}">
 			<items>
@@ -7,8 +10,8 @@
 					title="{layers>name}"
 					type="Navigation"
 					press=".onLayerSelected"
-					icon="{layers>icon}">
-				</StandardListItem>
+					icon="{layers>icon}"
+				/>
 			</items>
 		</List>
 		<footer>
@@ -17,7 +20,8 @@
 					icon="sap-icon://alert"
 					text="{messages>/length}"
 					type="Emphasized"
-					press=".handleMessagePopoverPress"/>
+					press=".handleMessagePopoverPress"
+				/>
 			</Toolbar>
 		</footer>
 	</Page>

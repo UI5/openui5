@@ -1,14 +1,19 @@
-<mvc:View xmlns:mvc="sap.ui.core.mvc"
-	xmlns="sap.m" controllerName="sap.ui.fl.support.apps.contentbrowser.controller.LayerContentMaster">
+<mvc:View
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	controllerName="sap.ui.fl.support.apps.contentbrowser.controller.LayerContentMaster"
+>
 	<Page
-			showNavButton="true"
-			navButtonPress=".navBack">
+		showNavButton="true"
+		navButtonPress=".navBack"
+	>
 		<subHeader>
 			<Toolbar>
 				<SearchField
 					id="search"
 					liveChange=".onSearch"
-					width="100%" />
+					width="100%"
+				/>
 			</Toolbar>
 		</subHeader>
 		<content>
@@ -17,7 +22,8 @@
 				growing="true"
 				growingThreshold="100"
 				growingScrollToLoad="true"
-				items="{content>/}">
+				items="{content>/}"
+			>
 				<items>
 					<StandardListItem
 						title="{content>name}"
@@ -25,8 +31,8 @@
 						type="Active"
 						press=".onContentSelected"
 						visible="{path: 'content>', formatter: '.oDataUtils.isNotExcluded'}"
-						icon="{= ${content>fileType} ? 'sap-icon://document' : 'sap-icon://folder-full'}">
-					</StandardListItem>
+						icon="{= ${content>fileType} ? 'sap-icon://document' : 'sap-icon://folder-full'}"
+					/>
 				</items>
 			</List>
 		</content>
@@ -37,7 +43,8 @@
 					text="{messages>/length}"
 					type="Emphasized"
 					press=".handleMessagePopoverPress"
-					visible="{= ${messages>/length} > 0 }"/>
+					visible="{= ${messages>/length} > 0 }"
+				/>
 			</Toolbar>
 		</footer>
 	</Page>

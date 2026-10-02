@@ -8,29 +8,27 @@
 				<smartField:SmartField value="{CompanyCode}"/>
 			</smartForm:GroupElement>
 			<smartForm:GroupElement label="Ship-to-Adress" id="MainFormExpandable.GeneralLedgerDocument.CompanyAdress" >
-				<smartField:SmartField value="{CompanyAdress}">
-				</smartField:SmartField>
+				<smartField:SmartField value="{CompanyAdress}" />
 			</smartForm:GroupElement>
 			<smartForm:GroupElement id="MainFormExpandable.GeneralLedgerDocument.TextArea" >
 				<TextArea value="{CreatedByUserName}"/>
 			</smartForm:GroupElement>
 			<smartForm:GroupElement id="MainFormExpandable.GeneralLedgerDocument.Mandatory" >
-				<smartField:SmartField value="Some Value" mandatory="true"></smartField:SmartField>
+				<smartField:SmartField value="Some Value" mandatory="true" />
 			</smartForm:GroupElement>
 			<smartForm:GroupElement label="Hello" id="MainFormExpandable.GeneralLedgerDocument.I18NTest" >
-				<smartField:SmartField value="{i18n>groupElementLabelText}">
-				</smartField:SmartField>
+				<smartField:SmartField value="{i18n>groupElementLabelText}" />
 			</smartForm:GroupElement>
 			<smartForm:GroupElement label="One-Bound-Field" id="MainFormExpandable.GeneralLedgerDocument.BoundButton" >
-				<Button text="{i18n>buttonText}"></Button>
-				<TextArea value="{CreatedByUser}"></TextArea>
+				<Button text="{i18n>buttonText}" />
+				<TextArea value="{CreatedByUser}" />
 			</smartForm:GroupElement>
 			<smartForm:GroupElement label="No-Bound-Field" id="MainFormExpandable.GeneralLedgerDocument.BoundButton34" >
-				<Button text="{i18n>buttonText}"></Button>
-				<TextArea value="Some Text"></TextArea>
+				<Button text="{i18n>buttonText}" />
+				<TextArea value="Some Text" />
 			</smartForm:GroupElement>
 			<smartForm:GroupElement id="MainFormExpandable.GeneralLedgerDocument.UnboundButton" >
-				<Button text="No Binding"></Button>
+				<Button text="No Binding" />
 			</smartForm:GroupElement>
 			<smartForm:GroupElement label="Expiry Date" id="MainFormExpandable.GeneralLedgerDocument.ExpirationDate" >
 				<smartField:SmartField value="{ExpirationDate}" />
@@ -50,8 +48,8 @@
 				<smartField:SmartField value="{DocumentDate}" />
 			</smartForm:GroupElement>
 			<smartForm:GroupElement label="Two-Bound-Fields" id="MainFormExpandable.GeneralLedgerDocument.BoundButton35" >
-				<Button text="{PostingDate}"></Button>
-				<Input value="{CreationDate}"></Input>
+				<Button text="{PostingDate}" />
+				<Input value="{CreationDate}" />
 			</smartForm:GroupElement>
 		</smartForm:Group>
 	</smartForm:SmartForm>

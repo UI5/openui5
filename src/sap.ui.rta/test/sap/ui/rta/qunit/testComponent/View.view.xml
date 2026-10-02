@@ -1,2 +1,1 @@
-<mvc:View xmlns:mvc="sap.ui.core.mvc">
-</mvc:View>
+<mvc:View xmlns:mvc="sap.ui.core.mvc" />

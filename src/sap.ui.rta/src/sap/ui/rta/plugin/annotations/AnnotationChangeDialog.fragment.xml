@@ -20,17 +20,21 @@
 					text="{i18n>ANNOTATION_CHANGE_DIALOG_WARNING}"
 					type="Warning"
 					showIcon="true"
-					class="sapUiSmallMarginBottom">
+					class="sapUiSmallMarginBottom"
+				>
 					<link>
-						<Link text="{i18n>ANNOTATION_CHANGE_DIALOG_WARNING_MORE_INFO}"
+						<Link
+							text="{i18n>ANNOTATION_CHANGE_DIALOG_WARNING_MORE_INFO}"
 							target="_blank"
-							href="{/documentationUrl}"/>
+							href="{/documentationUrl}"
+						/>
 					</link>
 				</MessageStrip>
 				<Label
 					id="sapUiRtaChangeAnnotationDialog_description"
 					visible="{= ${/description}.length > 0}"
-					text="{/description}"/>
+					text="{/description}"
+				/>
 				<HBox
 					id="sapUiRtaChangeAnnotationDialog_filterHBox"
 					fitContainer="true"
@@ -41,27 +45,31 @@
 						placeholder="{i18n>ANNOTATION_CHANGE_DIALOG_PROPERTY_SEARCH}"
 						value="{/filterText}"
 						liveChange=".onFilterProperties"
-						enabled="{= ${/properties}.length > 0}">
+						enabled="{= ${/properties}.length > 0}"
+					>
 						<layoutData>
 							<FlexItemData growFactor="1" styleClass="sapUiSmallMarginEnd"/>
 						</layoutData>
 					</SearchField>
 					<HBox alignItems="Center">
 						<Label
-							text="{i18n>ANNOTATION_CHANGE_DIALOG_BUTTON_CHANGED_PROPERTIES}"/>
+							text="{i18n>ANNOTATION_CHANGE_DIALOG_BUTTON_CHANGED_PROPERTIES}"
+						/>
 						<Switch
 							id="sapUiRtaChangeAnnotationDialog_toggleShowAllPropertiesSwitch"
 							state="{/showChangedPropertiesOnly}"
 							change=".switchDisplayMode"
 							customTextOn=" "
 							customTextOff=" "
-							enabled="{= ${/properties}.length > 0}"/>
+							enabled="{= ${/properties}.length > 0}"
+						/>
 					</HBox>
 				</HBox>
 				<f:Form
 					id="sapUiRtaChangeAnnotationDialog_propertyListForm"
 					editable="true"
-					visible="{= ${/properties}.length > 0}">
+					visible="{= ${/properties}.length > 0}"
+				>
 					<f:layout>
 						<f:ResponsiveGridLayout
 							labelSpanXL="4"
@@ -76,19 +84,21 @@
 							columnsXL="1"
 							columnsL="1"
 							columnsM="1"
-							singleContainerFullSize="true"/>
+							singleContainerFullSize="true"
+						/>
 					</f:layout>
 					<f:FormContainer
 						id="sapUiRtaChangeAnnotationDialog_propertyList"
-						formElements="{path: '/propertiesToDisplay', factory: '.editorFactory'}" />
+						formElements="{path: '/propertiesToDisplay', factory: '.editorFactory'}"
+					/>
 				</f:Form>
 				<IllustratedMessage
 					illustrationType="sapIllus-NoData"
 					enableVerticalResponsiveness="true"
 					title="{i18n>ANNOTATION_CHANGE_DIALOG_NO_PROPERTIES_TITLE}"
 					description="{i18n>ANNOTATION_CHANGE_DIALOG_NO_PROPERTIES_DESCRIPTION}"
-					visible="{= ${/properties}.length === 0}">
-				</IllustratedMessage>
+					visible="{= ${/properties}.length === 0}"
+				/>
 			</VBox>
 		</content>
 		<beginButton>

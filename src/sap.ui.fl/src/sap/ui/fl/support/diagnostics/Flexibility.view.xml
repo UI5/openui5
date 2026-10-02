@@ -1,4 +1,3 @@
-
 <mvc:View
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core"
@@ -9,26 +8,31 @@
 	<l:VerticalLayout>
 		<Text
 			text="You can download the flexibility data of the current application in JSON format."
-			class="sapUiSmallMarginBottom sapUiSmallMarginTop"/>
+			class="sapUiSmallMarginBottom sapUiSmallMarginTop"
+		/>
 		<MessageStrip
 			text="Before sharing the file with others, please review its contents for any personal data."
 			type="Information"
 			showIcon="true"
-			class="sapUiSmallMarginBottom"/>
+			class="sapUiSmallMarginBottom"
+		/>
 		<CheckBox
 			id="anonymizeUsersCheckbox"
 			text="Anonymize User IDs"
 			selected="{flexToolSettings>/anonymizeData}"
-			class="sapUiSmallMarginBottom"/>
+			class="sapUiSmallMarginBottom"
+		/>
 		<CheckBox
 			id="fullDataExportCheckbox"
 			text="Export Full Data Set"
 			selected="{flexToolSettings>/exportFullData}"
-			class="sapUiSmallMarginBottom"/>
+			class="sapUiSmallMarginBottom"
+		/>
 		<Button
 			id="downloadButton"
 			text="Download Flexibility Data"
 			press=".onDownloadPress"
-			class="sapUiSmallMarginBottom"/>
+			class="sapUiSmallMarginBottom"
+		/>
 	</l:VerticalLayout>
 </mvc:View>

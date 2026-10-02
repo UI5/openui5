@@ -1,9 +1,11 @@
-<mvc:View xmlns:core="sap.ui.core"
+<mvc:View
+	xmlns:core="sap.ui.core"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
 	xmlns:l="sap.ui.layout"
 	xmlns:f="sap.ui.layout.form"
-	controllerName="dt.view.SimpleForm">
+	controllerName="dt.view.SimpleForm"
+>
 	<Page title="Title" id="Page" showFooter="true">
 		<content>
 			<f:SimpleForm editable="false" layout="ColumnLayout" id="SimpleForm">
