@@ -289,7 +289,22 @@ sap.ui.define([
 						QUnit.config.autostart = false;
 					});
 				} else if (oSettings.instrumenter === "istanbul") {
-					return requireP("sap/ui/qunit/qunit-coverage-istanbul").then(function() {
+					// Publish the cover filter before loading the instrumenter so its hooks have
+					// it from the very first module resolution. The data-sap-ui-cover-* attributes
+					// set below are applied only after this script has loaded — too late once
+					// modules stream in individually, which would default to instrumenting
+					// everything (see qunit-coverage-istanbul.js getFilters()).
+					if (oConfig.coverage) {
+						window["sap-ui-qunit-coverage-filter"] = {
+							only: oConfig.coverage.only,
+							never: oConfig.coverage.never
+						};
+					}
+					return requireP([
+						"sap/ui/qunit/qunit-coverage-istanbul",
+						"sap/ui/test/starter/_coverageFilter"
+					]).then(function(aModules) {
+						var coverageFilter = aModules[1];
 						var _adjustHtmlAttrValues = function(filter) {
 							return Array.isArray(filter) ?
 								JSON.stringify(filter) : filter;
@@ -329,6 +344,31 @@ sap.ui.define([
 									}
 								});
 							}
+
+							// Load the covered modules ("cover-only") as individual files rather than
+							// from their preload bundle, so they can be served as "-dbg" sources and
+							// instrumented. Requires an explicit "cover-only"; without one the set is
+							// ~everything (a slow global single-file load).
+							if (oConfig.coverage.only != null) {
+								// Best-effort: only modules still in state INITIAL switch to single-file.
+								//
+								// The single-file set is the covered set plus any active sap-ui-debug
+								// filter (debug modules must load unminified even when excluded from
+								// coverage). This only affects ignoreBundledResources; the instrument
+								// filter reads the untouched oConfig.coverage.only, so debug-only modules
+								// stay uninstrumented. The config() call is last-write-wins, so it also
+								// preserves the debug filter the framework set at bootstrap.
+								var oParams = new URLSearchParams(window.location.search);
+								var vDebug = oParams.has("sap-ui-debug")
+									? oParams.get("sap-ui-debug")
+									: utils.getAttribute("data-sap-ui-debug");
+								sap.ui.loader.config({
+									ignoreBundledResources: coverageFilter.buildSingleFileIgnore(
+										oConfig.coverage.only, oConfig.coverage.never, vDebug)
+								});
+							}
+							// Without "cover-only" the single-file set would be ~everything, so covered
+							// modules are intentionally left bundled (and therefore uncovered).
 						}
 					});
 				} else  if (oSettings.instrumenter === null && oSettings.error) { // No middleware
