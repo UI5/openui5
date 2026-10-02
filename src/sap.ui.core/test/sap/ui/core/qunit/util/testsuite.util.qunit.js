@@ -232,6 +232,14 @@ sap.ui.define(["sap/ui/Device"], function (Device) {
 					"test-resources/sap/ui/test/qunit/TestUtils.qunit"
 				]
 			},
+			_coverageFilter: {
+				coverage: {
+					only: "sap/ui/test/starter/_coverageFilter"
+				},
+				module: [
+					"test-resources/sap/ui/test/starter/qunit/_coverageFilter.qunit"
+				]
+			},
 			XMLPreprocessor: {
 				coverage: {
 					only: "sap/ui/core/util/XMLPreprocessor"

@@ -58,7 +58,17 @@
 			return filters;
 		}
 
-		if (oScript) {
+		// Prefer a filter published before this script was loaded: the test starter sets it
+		// before requiring this module, so the filter is known from the very first module
+		// resolution. The data-sap-ui-cover-* attributes are applied only after this script
+		// loads, which is too late once modules stream in individually (they would default to
+		// "instrument everything"). Static test pages that carry the attributes inline (no
+		// starter) have no global and fall through to reading them.
+		var oEarly = window["sap-ui-qunit-coverage-filter"];
+		if (oEarly) {
+			sFilterAttr = oEarly.only == null ? undefined : oEarly.only;
+			sAntiFilterAttr = oEarly.never == null ? undefined : oEarly.never;
+		} else if (oScript) {
 			// Set custom client-side instrument filter (from script attributes)
 			if (oScript.hasAttribute("data-sap-ui-cover-only")) {
 				sFilterAttr = oScript.getAttribute("data-sap-ui-cover-only");
@@ -72,11 +82,11 @@
 		return filters;
 	}
 
-	function shouldBeInstrumented(sModuleName) {
-		var appliedFilters = getFilters(),
-			sFilterAttr = appliedFilters.filter,
-			sAntiFilterAttr = appliedFilters.antiFilter;
-
+	// Decide whether a module should be instrumented, applying the coverage precedence:
+	// cover-never wins; otherwise an absent cover-only includes everything, a present one includes
+	// only matches. Parameterized (filter + anti-filter passed in) so the same logic can be reused
+	// by sap/ui/test/starter/_coverageFilter.js via the global exposed below.
+	function shouldBeInstrumented(sModuleName, sFilterAttr, sAntiFilterAttr) {
 		if (typeof sAntiFilterAttr !== "undefined" && matchPatternAttribute(sModuleName, sAntiFilterAttr)) {
 			// NEVER INSTRUMENT (excluded)
 			return false;
@@ -87,6 +97,14 @@
 			// DONT INSTRUMENT (not explicitly excluded / included)
 			return false;
 		}
+	}
+
+	// Expose the matcher so that `sap/ui/test/starter/_coverageFilter.js` can reuse it.
+	window["sap-ui-qunit-coverage-shouldBeInstrumented"] = shouldBeInstrumented;
+
+	function isInstrumented(sModuleName) {
+		var oFilters = getFilters();
+		return shouldBeInstrumented(sModuleName, oFilters.filter, oFilters.antiFilter);
 	}
 
 	function appendUrlParameter(sUrl) {
@@ -120,7 +138,7 @@
 
 		var fnSetAttributeOrig = HTMLScriptElement.prototype.setAttribute;
 		HTMLScriptElement.prototype.setAttribute = function(sName, sValue) {
-			if (sName === "data-sap-ui-module" && shouldBeInstrumented(sValue || "")) {
+			if (sName === "data-sap-ui-module" && isInstrumented(sValue || "")) {
 				this.src = appendUrlParameter(this.src);
 			}
 			fnSetAttributeOrig.apply(this, arguments);
@@ -130,7 +148,7 @@
 		XMLHttpRequest.prototype.open = function(sMethod, sUrl) {
 			if (
 				typeof sap !== "undefined" && sap.ui && sap.ui.loader &&
-				sUrl && sUrl.endsWith(".js") && shouldBeInstrumented(sap.ui.loader._.guessResourceName(sUrl) || "")
+				sUrl && sUrl.endsWith(".js") && isInstrumented(sap.ui.loader._.guessResourceName(sUrl) || "")
 			) {
 				arguments[1] = appendUrlParameter(sUrl);
 			}
