@@ -3797,13 +3797,14 @@ sap.ui.define([
 		assert.notOk($noData.find(".sapMListTblDummyCell")[0], "Dummy cell is NOT rendered for no-data row");
 		assert.notOk($noData.hasClass("sapMTableRowCustomFocus"), "No-data row does NOT have custom focus handling");
 
-		assert.equal($noDataText.attr("colspan"), 5, "| Selection | Name | Color | Number | Spacer | (highlight and navigated rendered as separate empty cells)");
+		assert.strictEqual($noData.children().length, 2, "nodata row contains 2 cells: highlight pad and nodata-text (dummy column is spanned)");
+		assert.equal($noDataText.attr("colspan"), 6, "| Selection | Name | Color | Number | Navigated | Spacer | (highlight rendered as a separate empty cell)");
 		sut.setMode("SingleSelectMaster");
 		await nextUIUpdate();
-		assert.equal($noDataText.attr("colspan"), 4, "| Name | Color | Number | Spacer | (highlight and navigated rendered as separate empty cells)");
+		assert.equal($noDataText.attr("colspan"), 5, "| Name | Color | Number | Navigated | Spacer | (highlight rendered as a separate empty cell)");
 		sut.getColumns().forEach((oColummn) => oColummn.setWidth(""));
 		await nextUIUpdate();
-		assert.equal($noDataText.attr("colspan"), 3, "| Name | Color | Number | (highlight and navigated rendered as separate empty cells)");
+		assert.equal($noDataText.attr("colspan"), 3, "| Name | Color | Number | (highlight and navigated rendered as separate empty cells, no dummy column)");
 
 		$noData.trigger("focus");
 		let sLabelledBy = $noData.attr("aria-labelledby");
