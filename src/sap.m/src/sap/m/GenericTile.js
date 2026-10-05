@@ -901,8 +901,8 @@ sap.ui.define([
 	 * Sets the maxLines property on the appShortcut and systemInfo Text controls.
 	 *
 	 * Default assignment:
-	 *   - OneByOne, OneByHalf, TwoByHalf → maxLines = 1
-	 *   - All other frame types (TwoByOne, TwoByTwo, …) → maxLines = 2
+	 *   - OneByOne, OneByHalf, TwoByHalf, TwoByOne → maxLines = 1
+	 *   - All other frame types (TwoByTwo, …) → maxLines = 2
 	 *
 	 * Exception — bump one value to maxLines = 2 when text exceeds 11 characters
 	 * (applies to TwoByHalf IconMode only):
@@ -1564,7 +1564,7 @@ sap.ui.define([
 			}
 			this._oTitle.setMaxLines(iHeaderLines);
 			this._oSubTitle.setMaxLines(iSubHeaderLines);
-		} else if (frameType === FrameType.TwoByOne && (this.getLinkTileContents() > 0 || this.getMode() === GenericTileMode.ActionMode)) {
+		} else if (frameType === FrameType.TwoByOne && (this.getLinkTileContents().length > 0 || this.getMode() === GenericTileMode.ActionMode)) {
 			this._oTitle.setMaxLines(2);
 		} else if (frameType === FrameType.OneByHalf || frameType === FrameType.TwoByHalf) {
 			this._oTitle.setMaxLines(2);
