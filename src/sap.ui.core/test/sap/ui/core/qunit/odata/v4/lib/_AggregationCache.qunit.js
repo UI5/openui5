@@ -953,6 +953,11 @@ sap.ui.define([
 			oHelperMock = this.mock(_Helper),
 			mTypeForMetaPath = {"/meta/path" : {}};
 
+		if (bParent) {
+			// must not influence bLeaf/bTotal, new entities are always created in oFirstLevel
+			oElement["@$ui5.context.isTransient"] = false;
+		}
+
 		oHelperMock.expects("inheritPathValue").exactly(bParent ? 1 : 0)
 			.withExactArgs(["a", "b"], sinon.match.same(oGroupNode), sinon.match.same(oElement));
 		oHelperMock.expects("inheritPathValue").exactly(bParent ? 1 : 0)
@@ -987,7 +992,8 @@ sap.ui.define([
 			p2 : "v2",
 			p3 : "v3",
 			"p3@$ui5.noData" : true,
-			p4 : "v4"
+			p4 : "v4",
+			"@$ui5.context.isTransient" : false
 		} : {
 			p2 : "v2",
 			p4 : "v4"
@@ -996,6 +1002,27 @@ sap.ui.define([
 		});
 	});
 });
+
+	//*********************************************************************************************
+	QUnit.test("calculateKeyPredicate: creation with groupLevels", function (assert) {
+		const oElement = {"@$ui5.context.isTransient" : false};
+		this.mock(_Helper).expects("inheritPathValue").never();
+		this.mock(_Helper).expects("getKeyPredicate")
+			.withExactArgs(sinon.match.same(oElement), "/meta/path", "~mTypeForMetaPath~")
+			.returns("~predicate~");
+		this.mock(_Helper).expects("setPrivateAnnotation")
+			.withExactArgs(sinon.match.same(oElement), "predicate", "~predicate~");
+		this.mock(_Helper).expects("getKeyFilter").never();
+		this.mock(_AggregationHelper).expects("setAnnotations")
+			.withExactArgs(sinon.match.same(oElement), undefined, false, 1, "~aAllProperties~");
+
+		assert.strictEqual(
+			// code under test
+			_AggregationCache.calculateKeyPredicate(/*oGroupNode*/undefined, "~aGroupBy~",
+				"~aAllProperties~", /*bLeaf*/false, /*bTotal*/true, "/meta/path", oElement,
+				"~mTypeForMetaPath~", "/meta/path"),
+			"~predicate~");
+	});
 
 	//*********************************************************************************************
 [{

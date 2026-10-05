@@ -3189,6 +3189,9 @@ sap.ui.define([
 					oElement[vProperty] = oGroupNode[vProperty];
 				}
 			});
+		} else if (oElement["@$ui5.context.isTransient"] === false) { // creation with groupLevels
+			bLeaf = true;
+			bTotal = false;
 		}
 		// prefer real key predicate for leaf
 		const sPredicate = bLeaf && _Helper.getKeyPredicate(oElement, sMetaPath, mTypeForMetaPath)
