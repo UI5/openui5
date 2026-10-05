@@ -163,9 +163,11 @@ sap.ui.define(["sap/m/library", "sap/base/security/encodeCSS", "sap/ui/core/Them
 			oRm.class("sapMGTLinkTileContent");
 		}
 		oRm.openEnd();
-		oRm.openStart("div");
-		oRm.class("sapMGTContentWrapper");
-		oRm.openEnd();
+		if (!oControl._isIconMode()) {
+			oRm.openStart("div");
+			oRm.class("sapMGTContentWrapper");
+			oRm.openEnd();
+		}
 		if (sTooltipText) {
 			oControl.getAggregation("_invisibleText").setText(sTooltipText);
 			oRm.renderControl(oControl.getAggregation("_invisibleText"));
@@ -448,7 +450,9 @@ sap.ui.define(["sap/m/library", "sap/base/security/encodeCSS", "sap/ui/core/Them
 
 		}
 
-		oRm.close("div"); // close sapMGTContentWrapper
+		if (!oControl._isIconMode()) {
+			oRm.close("div"); // close sapMGTContentWrapper
+		}
 
 		if (oControl._isActionMode() && oControl.getActionButtons().length > 0) {
 			//Render Action Buttons, only in ActionMode and in TwoByOne frame type
