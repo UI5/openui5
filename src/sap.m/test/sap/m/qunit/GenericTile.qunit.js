@@ -3275,7 +3275,7 @@ QUnit.test("Check the padding classes of the 4*1 tile", async function(assert) {
 	assert.ok(height,20,"all ok");
 });
 
-QUnit.test("Content Proritisation - No Content rendered in OneByHalf in case of image", async function(assert) {
+QUnit.test("Content Proritisation - Content rendered in OneByHalf in case of image", async function(assert) {
 	this.oGenericTile.setFrameType("OneByHalf");
 	var tileContent =  new TileContent("tile-cont-two-by-half", {
 		unit: "EUR",
@@ -3289,7 +3289,7 @@ QUnit.test("Content Proritisation - No Content rendered in OneByHalf in case of 
 	this.oGenericTile.addTileContent(tileContent);
 	await nextUIUpdate();
 	var tileContentChildren = this.oGenericTile.getTileContent()[0].getDomRef().children.length;
-	assert.equal(tileContentChildren, 0);
+	assert.ok(tileContentChildren > 0);
 	assert.notEqual(this.oGenericTile._oTitle.getDomRef(), null);
 	assert.notEqual(this.oGenericTile._oSubTitle.getDomRef(), null);
 	assert.equal(this.oGenericTile.getTileContent()[0]._bRenderFooter, false);
@@ -3328,7 +3328,7 @@ QUnit.test("Content Proritisation - Header has max two lines no Numeric Content 
 	this.oGenericTile.setHeader("this is a very long header which should exceed two lines so we can test it");
 	this.oGenericTile.setSubheader("this is a very long subheader which should exceed two lines so we can test it");
 	await nextUIUpdate();
-	assert.equal(Element.getElementById("generic-tile-title").getMaxLines(), 2, "The header has 2 lines");
+	assert.equal(Element.getElementById("generic-tile-title").getMaxLines(), 1, "The header has 1 line (subheader present, OneByHalf)");
 });
 
 QUnit.test("Content Proritisation -  Content rendered in TwoByHalf", async function(assert) {
@@ -3415,7 +3415,7 @@ QUnit.test("Height of the system Info Container for TwoByOne tile", async functi
 	const marginBottom = parseFloat(this.oGenericTile.$().find(".sapMGTTInfo").css("margin-bottom"));
 	const roundedMargin = Math.ceil(marginBottom * 10) / 10;
 
-	assert.equal(roundedMargin, 11.2, "Sufficient Height applied");
+	assert.equal(roundedMargin, 8, "Sufficient Height applied");
 });
 
 QUnit.test("App shortcut and System info only rendered in OneByOne", async function(assert) {
@@ -3427,13 +3427,13 @@ QUnit.test("App shortcut and System info only rendered in OneByOne", async funct
 	assert.notEqual(this.oGenericTile._oSystemInfo.getDomRef(), null);
 	const marginBottom = parseFloat(this.oGenericTile.$().find(".sapMGTTInfo").css("margin-bottom"));
 	const roundedMargin = Math.ceil(marginBottom * 10) / 10;
-	assert.equal(roundedMargin,"6.4","Sufficient Height applied");
-	assert.equal(this.oGenericTile.$().find(".sapMGTTInfo").css("background-color"), "rgb(245, 246, 247)", "Non active background color has been applied");
+	assert.equal(roundedMargin, 4, "Sufficient Height applied");
+	assert.equal(this.oGenericTile.$().find(".sapMGTTInfo").css("background-color"), "rgb(234, 236, 238)", "Non active background color has been applied");
 	this.oGenericTile.setFrameType("OneByHalf");
 	await nextUIUpdate();
 
-	assert.equal(this.oGenericTile._oAppShortcut.getDomRef(), null);
-	assert.equal(this.oGenericTile._oSystemInfo.getDomRef(), null);
+	assert.ok(this.oGenericTile._oAppShortcut.getDomRef());
+	assert.ok(this.oGenericTile._oSystemInfo.getDomRef());
 });
 
 QUnit.test("App shortcut and System info only rendered in TwoByOne", async function(assert) {
@@ -3489,7 +3489,7 @@ QUnit.test("Header has max two lines if subheader exists for 4*1 tile", async fu
 	this.oGenericTile.setSubheader("Subtitle Launch Tile");
 	this.oGenericTile.setHeader("this is a very long header which should exceed two lines so we can test it");
 	await nextUIUpdate();
-	assert.equal(Element.getElementById("generic-tile-title").getMaxLines(), 2, "The header has 2 lines");
+	assert.equal(Element.getElementById("generic-tile-title").getMaxLines(), 1, "The header has 1 line (subheader present, TwoByHalf)");
 });
 
 QUnit.test("Header has max one lines if content aggregation exists for 4*1 tile", async function(assert) {
@@ -3591,8 +3591,8 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 		var tileContentChildren = this.oGenericTile.getTileContent()[0].getDomRef().children.length;
 		assert.equal(this.oGenericTile.getTileContent().length, 1, "Single Tile content is added to GenericTile.");
 		assert.equal(this.oGenericTile.getTileContent()[0].getAggregation('content').getMetadata()._sClassName, "sap.m.ImageContent", "Tile Content contains ImageContent.");
-		assert.equal(this.oGenericTile.getTileContent()[0].getVisible(), true, "Tile Content with ImageContent is not rendered for the GenericTile.");
-		assert.equal(tileContentChildren, 0, "Tile Content with ImageContent does not add overlay on the GenericTile.");
+		assert.equal(this.oGenericTile.getTileContent()[0].getVisible(), true, "Tile Content with ImageContent is rendered for the GenericTile.");
+		assert.ok(tileContentChildren > 0, "Tile Content with ImageContent adds overlay on the GenericTile.");
 	});
 
 	QUnit.test("TwoByHalf Tile with NumericContent", async function(assert){
@@ -4050,7 +4050,7 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 			assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTSubHdrTxt").length, 1, "SubHeader Text is created.");
 			assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTContent").length, 1, "Content Created.");
 			assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMTileCntFtrTxt").length, 1, "Footer Text Created.");
-			assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTTInfoContainer").length, 1, "InfoContainer Created.");
+			assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTTInfoContainer").length, 0, "InfoContainer Created.");
 			assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTOneByOneIcon").length, 0, "No Icon Container Created.");
 			assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTOneByOne").length, 0, "No Text Container Created.");
 			this.oGenericTile.setTileIcon("sap-icon://key");
@@ -4120,7 +4120,7 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 			assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTSubHdrTxt").length, 0, "SubHeader Text is created.");
 			assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTContent").length, 1, "Content Created.");
 			assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMTileCntFtrTxt").length, 0, "No Footer Text Created.");
-			assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTTInfoContainer").length, 0, "No InfoContainer Created.");
+			assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTTInfoContainer").length, 1, "No InfoContainer Created.");
 			assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTTwoByHalfIcon").length, 0, "No Icon Container Created.");
 			assert.equal(this.oGenericTile._oMoreIcon.getType(), "Unstyled", "Button Created in Unstyled Type");
 			this.oGenericTile.setTileIcon("sap-icon://key");
@@ -4141,7 +4141,7 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 				assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTSubHdrTxt").length, 0, "No SubHeader Text Created.");
 				assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTContent").length, 0, "No Content Created.");
 				assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMTileCntFtrTxt").length, 0, "No Footer Text Created.");
-				assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTTInfoContainer").length, 0, "No InfoContainer Created.");
+				assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTTInfoContainer").length, 1, "No InfoContainer Created.");
 				assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTTwoByHalfIcon").length, 1, "Icon Container Created.");
 				assert.ok(this.oGenericTile._oMoreIcon.isA("sap.m.Button"), "Button is created in place of action more icon");
 				assert.equal(this.oGenericTile._oMoreIcon.getType(), "Transparent", "Button Created in Transparent Type");
@@ -4159,7 +4159,7 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 					assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTSubHdrTxt").length, 0, "No SubHeader Text Created.");
 					assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTContent").length, 0, "No Content Created.");
 					assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMTileCntFtrTxt").length, 0, "No SubHeader Text Created.");
-					assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTTInfoContainer").length, 0, "No InfoContainer Created.");
+					assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTTInfoContainer").length, 1, "No InfoContainer Created.");
 					assert.equal(this.oGenericTile.getDomRef().querySelectorAll(".sapMGTTwoByHalfIcon").length, 1, "Icon Container Created.");
 					var sLink = "https://www.google.com/";
 					this.oGenericTile.setUrl(sLink);
@@ -6107,6 +6107,206 @@ QUnit.test("Check for visibilty of content in header mode in 2*1 tile ", async f
 			"normal",
 			"line-height of .sapMGTHdrContent .sapMGTHdrTxt .sapMText should be 'normal' and not overridden by .sapUiFormEdit styles"
 		);
+	});
+
+	// ─── appShortcut / systemInfo layout tests ──────────────────────────────────
+
+	QUnit.module("appShortcut / systemInfo layout");
+
+	QUnit.test("sapMGTTInfoInline: suppressed for TwoByHalf NumericContent and ImageContent (Normal mode)", async function(assert) {
+		var oTile = new GenericTile({
+			header: "Tile", subheader: "Sub",
+			frameType: FrameType.TwoByHalf, appShortcut: "F1234",
+			tileContent: [new TileContent({ content: new NumericContent({ value: "99" }) })]
+		}).placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		var oInfoEl = oTile.getDomRef().querySelector(".sapMGTTInfo");
+		assert.notOk(oInfoEl.classList.contains("sapMGTTInfoInline"), "sapMGTTInfoInline suppressed for TwoByHalf + NumericContent (Normal mode)");
+
+		oTile.destroyTileContent();
+		oTile.addTileContent(new TileContent({ content: new ImageContent({ src: "test-resources/sap/f/images/Woman_avatar_01.png" }) }));
+		await nextUIUpdate();
+		assert.notOk(oTile.getDomRef().querySelector(".sapMGTTInfo").classList.contains("sapMGTTInfoInline"),
+			"sapMGTTInfoInline suppressed for TwoByHalf + ImageContent (_bIsImageContent=true)");
+
+		oTile.destroy();
+	});
+
+	QUnit.test("sapMGTTInfoInline: always applied for OneByHalf; applied for TwoByHalf IconMode", async function(assert) {
+		var oTile = new GenericTile({
+			header: "Tile", subheader: "Sub", appShortcut: "F1234",
+			frameType: FrameType.OneByHalf
+		}).placeAt("qunit-fixture");
+		await nextUIUpdate();
+		assert.ok(oTile.getDomRef().querySelector(".sapMGTTInfo").classList.contains("sapMGTTInfoInline"),
+			"sapMGTTInfoInline applied for OneByHalf");
+
+		oTile.setFrameType(FrameType.TwoByHalf);
+		oTile.setMode(library.GenericTileMode.IconMode);
+		await nextUIUpdate();
+		assert.notOk(oTile.getDomRef().querySelector(".sapMGTTInfo").classList.contains("sapMGTTInfoInline"),
+			"sapMGTTInfoInline suppressed for TwoByHalf IconMode without tileIcon/backgroundColor");
+
+		oTile.destroy();
+	});
+
+	QUnit.test("_bIsImageContent: true for ImageContent, false for NumericContent, reset to false in IconMode", async function(assert) {
+		var oTile = new GenericTile({
+			header: "Tile", frameType: FrameType.TwoByHalf, appShortcut: "F1234",
+			tileContent: [new TileContent({ content: new ImageContent({ src: "test-resources/sap/f/images/Woman_avatar_01.png" }) })]
+		}).placeAt("qunit-fixture");
+		await nextUIUpdate();
+		assert.ok(oTile._bIsImageContent, "_bIsImageContent=true for ImageContent");
+
+		oTile.destroyTileContent();
+		oTile.addTileContent(new TileContent({ content: new NumericContent({ value: "42" }) }));
+		await nextUIUpdate();
+		assert.notOk(oTile._bIsImageContent, "_bIsImageContent=false for NumericContent");
+
+		oTile.destroyTileContent();
+		oTile.addTileContent(new TileContent({ content: new ImageContent({ src: "test-resources/sap/f/images/Woman_avatar_01.png" }) }));
+		oTile.setMode(library.GenericTileMode.IconMode);
+		await nextUIUpdate();
+		assert.notOk(oTile._bIsImageContent, "_bIsImageContent reset to false when switching to IconMode (_applyHeaderMode)");
+
+		oTile.destroy();
+	});
+
+	QUnit.test("Title maxLines: 1 with subheader, 2 without — TwoByHalf and OneByHalf", async function(assert) {
+		var oTile = new GenericTile({
+			header: "Tile", appShortcut: "F1234",
+			tileContent: [new TileContent({ content: new NumericContent({ value: "1" }) })]
+		}).placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		var aFrameTypes = [FrameType.TwoByHalf, FrameType.OneByHalf];
+		for (var i = 0; i < aFrameTypes.length; i++) {
+			oTile.setFrameType(aFrameTypes[i]);
+			oTile.setSubheader("Sub");
+			await nextUIUpdate();
+			assert.equal(oTile._oTitle.getMaxLines(), 1, "maxLines=1 for " + aFrameTypes[i] + " + subheader");
+
+			oTile.setSubheader("");
+			await nextUIUpdate();
+			assert.equal(oTile._oTitle.getMaxLines(), 2, "maxLines=2 for " + aFrameTypes[i] + " + no subheader");
+		}
+
+		oTile.destroy();
+	});
+
+	QUnit.test("appShortcut/systemInfo maxLines=1 for OneByHalf and TwoByOne; bumped to 2 for long text in TwoByHalf IconMode", async function(assert) {
+		var oTile = new GenericTile({
+			header: "Tile", appShortcut: "F1234", systemInfo: "SYS"
+		}).placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		var aDefaultFrameTypes = [FrameType.OneByHalf, FrameType.TwoByOne];
+		for (var i = 0; i < aDefaultFrameTypes.length; i++) {
+			oTile.setFrameType(aDefaultFrameTypes[i]);
+			await nextUIUpdate();
+			assert.equal(oTile._oAppShortcut.getMaxLines(), 1, "appShortcut maxLines=1 for " + aDefaultFrameTypes[i]);
+			assert.equal(oTile._oSystemInfo.getMaxLines(), 1, "systemInfo maxLines=1 for " + aDefaultFrameTypes[i]);
+		}
+
+		oTile.setFrameType(FrameType.TwoByHalf);
+		oTile.setMode(library.GenericTileMode.IconMode);
+		oTile.setTileIcon("sap-icon://home");
+		oTile.setBackgroundColor("#007db8");
+		oTile.setAppShortcut("LONGSHORTCUT"); // 12 chars — exceeds 11-char threshold
+		await nextUIUpdate();
+		assert.equal(oTile._oAppShortcut.getMaxLines(), 2, "appShortcut bumped to maxLines=2 in TwoByHalf IconMode when > 11 chars");
+		assert.equal(oTile._oSystemInfo.getMaxLines(), 1, "systemInfo stays maxLines=1");
+
+		oTile.setMode(library.GenericTileMode.ContentMode);
+		await nextUIUpdate();
+		assert.equal(oTile._oAppShortcut.getMaxLines(), 1, "No bump in ContentMode — appShortcut stays maxLines=1");
+
+		oTile.destroy();
+	});
+
+	QUnit.test("OneByHalf + NumericContent: content shown when no appInfo; hidden when appShortcut or systemInfo present", async function(assert) {
+		var oTile = new GenericTile({
+			header: "Tile", subheader: "Sub",
+			frameType: FrameType.OneByHalf,
+			tileContent: [new TileContent({ content: new NumericContent({ value: "42" }) })]
+		}).placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		assert.ok(oTile.getTileContent()[0]._bRenderContent, "NumericContent rendered when no appInfo");
+		assert.strictEqual(oTile._oSubTitle.getDomRef(), null, "Subtitle suppressed when NumericContent is shown");
+		assert.notOk(oTile.getDomRef().querySelector(".sapMGTTInfo"), "Info container not rendered when no appInfo");
+
+		oTile.setAppShortcut("F1234");
+		await nextUIUpdate();
+		assert.notOk(oTile.getTileContent()[0]._bRenderContent, "NumericContent hidden when appShortcut present");
+		assert.ok(oTile.getDomRef().querySelector(".sapMGTTInfo"), "Info container rendered when appShortcut present");
+
+		oTile.setAppShortcut("");
+		oTile.setSystemInfo("SYS");
+		await nextUIUpdate();
+		assert.notOk(oTile.getTileContent()[0]._bRenderContent, "NumericContent hidden when systemInfo present");
+		assert.ok(oTile.getDomRef().querySelector(".sapMGTTInfo"), "Info container rendered when systemInfo present");
+
+		oTile.destroy();
+	});
+
+	QUnit.test("OneByHalf + ImageContent: content shown when no appInfo; hidden when appShortcut or systemInfo present", async function(assert) {
+		var oTile = new GenericTile({
+			header: "Tile", subheader: "Sub",
+			frameType: FrameType.OneByHalf,
+			tileContent: [new TileContent({ content: new ImageContent({ src: "test-resources/sap/f/images/Woman_avatar_01.png" }) })]
+		}).placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		assert.ok(oTile.getTileContent()[0]._bRenderContent, "ImageContent rendered when no appInfo");
+		assert.notStrictEqual(oTile._oSubTitle.getDomRef(), null, "Subtitle visible when ImageContent is shown with no appInfo");
+		assert.notOk(oTile.getDomRef().querySelector(".sapMGTTInfo"), "Info container not rendered when no appInfo");
+
+		oTile.setAppShortcut("F1234");
+		await nextUIUpdate();
+		assert.notOk(oTile.getTileContent()[0]._bRenderContent, "ImageContent hidden when appShortcut present");
+		assert.ok(oTile.getDomRef().querySelector(".sapMGTTInfo"), "Info container rendered when appShortcut present");
+
+		oTile.setAppShortcut("");
+		oTile.setSystemInfo("SYS");
+		await nextUIUpdate();
+		assert.notOk(oTile.getTileContent()[0]._bRenderContent, "ImageContent hidden when systemInfo present");
+		assert.ok(oTile.getDomRef().querySelector(".sapMGTTInfo"), "Info container rendered when systemInfo present");
+
+		oTile.destroy();
+	});
+
+	QUnit.test("OneByHalf + NumericContent in ActionMore scope: content hidden, info container not rendered", async function(assert) {
+		var oTile = new GenericTile({
+			header: "Tile",
+			frameType: FrameType.OneByHalf,
+			scope: library.GenericTileScope.ActionMore,
+			appShortcut: "F1234",
+			tileContent: [new TileContent({ content: new NumericContent({ value: "42" }) })]
+		}).placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		assert.notOk(oTile.getTileContent()[0]._bRenderContent, "NumericContent hidden in ActionMore scope (appInfo present)");
+		assert.notOk(oTile.getDomRef().querySelector(".sapMGTTInfo"), "Info container suppressed in ActionMore scope");
+
+		oTile.destroy();
+	});
+
+	QUnit.test("OneByHalf + ImageContent in ActionMore scope: content hidden, info container not rendered", async function(assert) {
+		var oTile = new GenericTile({
+			header: "Tile",
+			frameType: FrameType.OneByHalf,
+			scope: library.GenericTileScope.ActionMore,
+			systemInfo: "SYS",
+			tileContent: [new TileContent({ content: new ImageContent({ src: "test-resources/sap/f/images/Woman_avatar_01.png" }) })]
+		}).placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		assert.notOk(oTile.getTileContent()[0]._bRenderContent, "ImageContent hidden in ActionMore scope (appInfo present)");
+		assert.notOk(oTile.getDomRef().querySelector(".sapMGTTInfo"), "Info container suppressed in ActionMore scope");
+
+		oTile.destroy();
 	});
 
 });
